@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : lokal
+ Source Server         : local
  Source Server Type    : MySQL
- Source Server Version : 100136
+ Source Server Version : 100411
  Source Host           : localhost:3306
  Source Schema         : common
 
  Target Server Type    : MySQL
- Target Server Version : 100136
+ Target Server Version : 100411
  File Encoding         : 65001
 
- Date: 12/05/2019 17:11:09
+ Date: 08/06/2020 23:49:45
 */
 
 SET NAMES utf8mb4;
@@ -25,7 +25,7 @@ CREATE TABLE `exp_table`  (
   `level` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `exp` int(10) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`level`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 121 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 121 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of exp_table
@@ -152,31 +152,18 @@ INSERT INTO `exp_table` VALUES (119, 2490000000);
 INSERT INTO `exp_table` VALUES (120, 2500000000);
 
 -- ----------------------------
--- Table structure for gmconfig
+-- Table structure for gmhost
 -- ----------------------------
-DROP TABLE IF EXISTS `gmconfig`;
-CREATE TABLE `gmconfig`  (
-  `authority` enum('IMPLEMENTOR','GOD','HIGH_WIZARD','WIZARD','LOW_WIZARD','PLAYER') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'PLAYER',
-  `can_drop_player_item` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `can_drop_gm_item` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `can_exchange_player_item_to_gm` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `can_exchange_player_item_to_player` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `can_exchange_gm_item_to_gm` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `can_exchange_gm_item_to_player` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `can_exchange_to_gm` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `can_exchange_to_player` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `can_buy_private_item` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `can_create_private_shop` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `can_use_safebox` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `can_create_player` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  `can_delete_player` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
-  PRIMARY KEY (`authority`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
+DROP TABLE IF EXISTS `gmhost`;
+CREATE TABLE `gmhost`  (
+  `mIP` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`mIP`) USING BTREE
+) ENGINE = MyISAM CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of gmconfig
+-- Records of gmhost
 -- ----------------------------
-INSERT INTO `gmconfig` VALUES ('IMPLEMENTOR', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+INSERT INTO `gmhost` VALUES ('127.0.0.1');
 
 -- ----------------------------
 -- Table structure for gmlist
@@ -186,15 +173,11 @@ CREATE TABLE `gmlist`  (
   `mID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `mAccount` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
   `mName` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
-  `mAuthority` enum('IMPLEMENTOR','GOD','HIGH_WIZARD','WIZARD','LOW_WIZARD','PLAYER') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'PLAYER',
+  `mContactIP` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
+  `mServerIP` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'ALL',
+  `mAuthority` enum('IMPLEMENTOR','HIGH_WIZARD','GOD','LOW_WIZARD','PLAYER') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'PLAYER',
   PRIMARY KEY (`mID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of gmlist
--- ----------------------------
-INSERT INTO `gmlist` VALUES (1, 'koray', 'koray31', 'IMPLEMENTOR');
-INSERT INTO `gmlist` VALUES (2, 'zuko', 'Zuko', 'IMPLEMENTOR');
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for locale
@@ -204,7 +187,7 @@ CREATE TABLE `locale`  (
   `mKey` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
   `mValue` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`mKey`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of locale
@@ -217,7 +200,7 @@ INSERT INTO `locale` VALUES ('SKILL_POWER_BY_LEVEL_TYPE4', '0 5 6 8 10 12 14 16 
 INSERT INTO `locale` VALUES ('SKILL_POWER_BY_LEVEL_TYPE5', '0 5 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 50 52 54 56 58 60 63 66 69 72 82 85 88 91 94 98 102 106 110 115 125 125 125 125 125');
 INSERT INTO `locale` VALUES ('SKILL_POWER_BY_LEVEL_TYPE6', '0 5 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 50 52 54 56 58 60 63 66 69 72 82 85 88 91 94 98 102 106 110 115 125 125 125 125 125');
 INSERT INTO `locale` VALUES ('SKILL_POWER_BY_LEVEL_TYPE7', '0 5 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 50 52 54 56 58 60 63 66 69 72 82 85 88 91 94 98 102 106 110 115 125 125 125 125 125');
-INSERT INTO `locale` VALUES ('LOCALE', 'turkey');
+INSERT INTO `locale` VALUES ('LOCALE', 'germany');
 INSERT INTO `locale` VALUES ('DB_NAME_COLUMN', 'locale_name');
 INSERT INTO `locale` VALUES ('SKILL_DAMAGE_BY_LEVEL_UNDER_90', '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0');
 INSERT INTO `locale` VALUES ('SKILL_DAMAGE_BY_LEVEL_UNDER_45', '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0');
@@ -228,13 +211,13 @@ INSERT INTO `locale` VALUES ('SKILL_POWER_BY_LEVEL', '0 5 6 8 10 12 14 16 18 20 
 -- ----------------------------
 DROP TABLE IF EXISTS `priv_settings`;
 CREATE TABLE `priv_settings`  (
-  `priv_type` enum('PLAYER','GUILD','EMPIRE') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'EMPIRE' COMMENT 'GUILD and PLAYER are untested.',
+  `priv_type` enum('PLAYER','GUILD','EMPIRE') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'EMPIRE' COMMENT 'GUILD and PLAYER are untested.',
   `id` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'this is for empire_id, player_id or guild_id',
   `type` int(10) UNSIGNED NOT NULL DEFAULT 4 COMMENT '1:item_drop, 2:gold_drop, 3:gold10_drop, 4:exp (1~4)',
   `value` int(11) NOT NULL DEFAULT 0 COMMENT '0~1000%',
-  `duration` datetime(0) NOT NULL,
+  `duration` datetime(0) NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`priv_type`, `id`, `type`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Fixed;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of priv_settings
@@ -253,6 +236,6 @@ CREATE TABLE `spam_db`  (
   `score` int(3) NOT NULL DEFAULT 1,
   `type` enum('SPAM','MAPS') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'SPAM',
   PRIMARY KEY (`word`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

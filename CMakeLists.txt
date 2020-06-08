@@ -23,8 +23,8 @@ endif()
 file (STRINGS "VERSION.txt" MAJOR_VERSION)
 
 # Build options
-option(BUILD_UTILITIES "Build the common utilities" OFF)
-option(BUILD_CLIENT "Build the client binaries" OFF)
+option(BUILD_UTILITIES "Build the common utilities" ON)
+option(BUILD_CLIENT "Build the client binaries" ON)
 option(BUILD_SERVER "Build the server binaries" ON)
 option(BUILD_TOOLS "Build the tool binaries" OFF)
 option(ENABLE_STATIC_ANALYSIS "Enable static code analysis with PVS Studio" OFF)
@@ -61,9 +61,11 @@ add_definitions(-DASIO_STANDALONE) # websocketpp
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 	add_definitions(-DTARGET_ARCH=64)
 	set(TARGET_ARCH_STR "64")
+	message(STATUS "Arch: x64")
 else() 
 	add_definitions(-DTARGET_ARCH=86)
 	set(TARGET_ARCH_STR "86")
+	message(STATUS "Arch: x86")
 endif()
 
 # Additional languages

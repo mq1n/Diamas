@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : testserver
+ Source Server         : local
  Source Server Type    : MySQL
- Source Server Version : 50562
- Source Host           : 5.135.217.85:3306
+ Source Server Version : 100411
+ Source Host           : localhost:3306
  Source Schema         : anticheat
 
  Target Server Type    : MySQL
- Target Server Version : 50562
+ Target Server Version : 100411
  File Encoding         : 65001
 
- Date: 06/03/2019 02:57:18
+ Date: 08/06/2020 23:49:51
 */
 
 SET NAMES utf8mb4;
