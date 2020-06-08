@@ -1,0 +1,275 @@
+--[[ martysama0134 - sample MOB_DROP from QUEST
+	NOTES:
+		-) pct 10000 will be 100%, which means 100 will be 1% and so on; pct/100 = real % (change MIN_PCT and MAX_PCT otherwise)
+		-) range_level = 0 no range detection at all; skip if abs(player_level - mob_level) > range_level (if missing, MOB_RANGE_LVL will be used by default)
+		-) min_level = 0 does nothing, non-zero -> drop only if player level >= min_level
+		-) max_level = 0 does nothing, non-zero -> drop only if player level <= max_level
+		-) limit_map = 0 all maps, non-zero -> player_map_index = limit_map
+		-) a table can have "multi" for containing a sub-table of drops
+		-) "vnum" can have a range of values for dropping all of them at once
+]]
+
+define MIN_PCT 1
+define MAX_PCT 10000
+
+define MOB_RANGE_LVL 15
+
+define DROP_TYPE_INVENTORY 1
+define DROP_TYPE_INVENTORY_WITH_DICE 2
+define DROP_TYPE_GROUND 3
+define DROP_TYPE_GROUND_WITH_OWNERSHIP 4
+define DROP_TYPE_GROUND_WITH_OWNERSHIP_AND_DICE 5
+
+define MSG_TYPE_INFO 1
+define MSG_TYPE_NOTICE_ALL 2
+define MSG_TYPE_BIG_NOTICE_ALL 3
+
+quest mob_drop_item begin
+	state start begin
+		function fnc_drop(drop_type)
+			if mob_drop_item.fnc_drop_list==nil then
+				mob_drop_item.fnc_drop_list = {
+					[DROP_TYPE_INVENTORY] = pc.give_item2,
+					[DROP_TYPE_INVENTORY_WITH_DICE] = pc.give_item2_with_dice,
+					[DROP_TYPE_GROUND] = game.drop_item,
+					[DROP_TYPE_GROUND_WITH_OWNERSHIP] = game.drop_item_with_ownership,
+					[DROP_TYPE_GROUND_WITH_OWNERSHIP_AND_DICE] = game.drop_item_with_ownership_and_dice,
+				}
+			end
+			return mob_drop_item.fnc_drop_list[drop_type] or mob_drop_item.fnc_drop_list[DROP_TYPE_GROUND_WITH_OWNERSHIP]
+		end
+		function fnc_msg(msg_type)
+			if mob_drop_item.fnc_msg_list==nil then
+				mob_drop_item.fnc_msg_list = {
+					[MSG_TYPE_INFO] = syschat,
+					[MSG_TYPE_NOTICE_ALL] = notice_all,
+					[MSG_TYPE_BIG_NOTICE_ALL] = big_notice_all,
+				}
+			end
+			return mob_drop_item.fnc_msg_list[msg_type] or mob_drop_item.fnc_msg_list[MSG_TYPE_BIG_NOTICE_ALL]
+		end
+		function get_drop_table(mob_vnum)
+			if mob_drop_item.drop_table==nil then
+				mob_drop_item.drop_table = {
+				-- mob_drop_item.drop_table begins
+					[0] = {
+						["multi"] = { -- multiple droppable items
+							{ -- drop table 1
+								["limit_map"] = 0, -- all maps
+								["range_level"] = 5, -- drop only player_level < or > mob_level by 5
+								["drop_type"] = DROP_TYPE_GROUND_WITH_OWNERSHIP,
+								["drop_table"] = {
+								-- drop_table begins
+									{ -- Red Potions (P) (M) (G) given together 0.05%
+										["vnum"] = {27001, 27002, 27003},
+										["count"] = 1,
+										["pct"] = 5,
+									},
+								-- drop_table ends
+								},
+							},
+							{ -- drop table 2
+								["limit_map"] = 0, -- 0 = all maps, non-zero = drop only in that map index
+								["drop_type"] = DROP_TYPE_GROUND_WITH_OWNERSHIP,
+								["drop_table"] = {
+								-- drop_table begins
+									{ -- Blue Potions (P) (M) (G) given together 0.05%
+										["vnum"] = {27004, 27005, 27006},
+										["count"] = 1,
+										["pct"] = 5,
+									},
+								-- drop_table ends
+								},
+							},
+						}
+					},
+					[101] = {
+						["limit_map"] = 0, -- 0 = all maps, non-zero = drop only in that map index
+						["min_level"] = 1, -- 0 = no check, non-zero = drop only if player level >= min_level
+						["max_level"] = 20, -- 0 = no check, non-zero = drop only if player level <= max_level
+						["drop_type"] = DROP_TYPE_INVENTORY,
+						["drop_table"] = {
+						-- drop_table begins
+							{ -- red potion 1x 100%
+								["vnum"] = 27001,
+								["count"] = 1,
+								["pct"] = MAX_PCT,
+							},
+						-- drop_table ends
+						},
+					},
+					[102] = {
+						["limit_map"] = 0, -- 0 = all maps, non-zero = drop only in that map index
+						["min_level"] = 1, -- 0 = no check, non-zero = drop only if player level >= min_level
+						["max_level"] = 20, -- 0 = no check, non-zero = drop only if player level <= max_level
+						["drop_type"] = DROP_TYPE_INVENTORY_WITH_DICE,
+						["drop_table"] = {
+						-- drop_table begins
+							{ -- red potion (m) 1x 100%
+								["vnum"] = 27002,
+								["count"] = 1,
+								["pct"] = MAX_PCT,
+							},
+							{ -- red potion (l) 2x 50% (10000/100*50=5000)
+								["vnum"] = 27003,
+								["count"] = 1,
+								["pct"] = 5000,
+							},
+							{ -- blue potion (s) 1x 100%
+								["vnum"] = 27004,
+								["count"] = 1,
+								["pct"] = MAX_PCT,
+							},
+							{ -- blue potion (m) 2x 1% (10000/100=100)
+								["vnum"] = 27005,
+								["count"] = 1,
+								["pct"] = 100,
+							},
+							{ -- blue potion (l) 2x 80% (10000*0.80=8000)
+								["vnum"] = 27006,
+								["count"] = 2,
+								["pct"] = MAX_PCT * 0.80,
+							},
+						-- drop_table ends
+						},
+					},
+					[103] = {
+						["limit_map"] = 0, -- 0 = all maps, non-zero = drop only in that map index
+						["min_level"] = 1, -- 0 = no check, non-zero = drop only if player level >= min_level
+						["max_level"] = 20, -- 0 = no check, non-zero = drop only if player level <= max_level
+						["drop_type"] = DROP_TYPE_GROUND,
+						["drop_table"] = {
+						-- drop_table begins
+							{ -- red potion 1x 100%
+								["vnum"] = 27001,
+								["count"] = 1,
+								["pct"] = MAX_PCT,
+							},
+						-- drop_table ends
+						},
+					},
+					[104] = {
+						["limit_map"] = 0, -- all maps
+						["min_level"] = 1, -- player level >= 1
+						["max_level"] = 20, -- player level <= 20
+						["drop_type"] = DROP_TYPE_GROUND_WITH_OWNERSHIP,
+						["drop_table"] = {
+						-- drop_table begins
+							{ -- red potion 1x 100%
+								["vnum"] = 27001,
+								["count"] = 1,
+								["pct"] = MAX_PCT,
+							},
+						-- drop_table ends
+						},
+					},
+					[105] = {
+						["drop_type"] = DROP_TYPE_GROUND_WITH_OWNERSHIP_AND_DICE,
+						["drop_table"] = {
+						-- drop_table begins
+							{ -- red potion 1x 100%
+								["vnum"] = 27001,
+								["count"] = 1,
+								["pct"] = MAX_PCT,
+							},
+						-- drop_table ends
+						},
+					},
+					[691] = {
+						["limit_map"] = 0, -- all maps index
+						["min_level"] = 30, -- player_level >= 30
+						["max_level"] = 50, -- and player_level <= 50
+						["drop_type"] = DROP_TYPE_GROUND_WITH_OWNERSHIP_AND_DICE,
+						["drop_table"] = {
+						-- drop_table begins
+							{ -- nymph sword+0 5%
+								["vnum"] = 160,
+								["count"] = 1,
+								["pct"] = MAX_PCT / 100*5,
+							},
+						-- drop_table ends
+						},
+						["msg_note"] = "%s has annihilated the big and ugly %s", -- first % = player name, second % = mob name
+						["msg_type"] = MSG_TYPE_BIG_NOTICE_ALL,
+					},
+				-- mob_drop_item.drop_table ends
+				}
+				-- alternative clones:
+				----mob_drop_item.drop_table[106] = mob_drop_item.drop_table[101] -- make 106 the same of 101
+				----mob_drop_item.drop_table[107] = mob_drop_item.drop_table[101] -- make 107 the same of 101
+			end
+			return mob_drop_item.drop_table[mob_vnum]
+		end
+		function subprocess_drop(mob_drop_table, mob_vnum, mob_level, map_index, player_level, player_name)
+			-- check valid map
+			if mob_drop_table["limit_map"]~=nil then
+				local is_valid_map = mob_drop_table["limit_map"]==0 or mob_drop_table["limit_map"]==map_index
+				if not is_valid_map then
+					return
+				end
+			end
+
+			----test_chat(string.format("<mob_drop_item> lvl range check %d %d %d", mob_level, player_level, MOB_RANGE_LVL))
+			----test_chat(string.format("<mob_drop_item> valid level (min_level %d, max_level %d, range_level %d)", mob_drop_table["min_level"] or -1, mob_drop_table["max_level"] or -1, mob_drop_table["range_level"] or -1))
+
+			-- check valid level
+			-- skip if player < min_level
+			if mob_drop_table["min_level"]~=nil and mob_drop_table["min_level"]~=0 and player_level < mob_drop_table["min_level"] then
+				return
+			end
+			-- skip if player > max_level
+			if mob_drop_table["max_level"]~=nil and mob_drop_table["max_level"]~=0 and player_level > mob_drop_table["max_level"] then
+				return
+			end
+			-- skip if abs(player_level - mob_level) > range_level
+			local range_level = mob_drop_table["range_level"]~=nil and mob_drop_table["range_level"] or MOB_RANGE_LVL
+			if (range_level ~= 0 and math.abs(mob_level - player_level) > MOB_RANGE_LVL) then -- default case: skip if level range is > mob range level
+				return
+			end
+			----test_chat("<mob_drop_item> after check valid level")
+
+			-- drop item
+			for idx,elem in ipairs(mob_drop_table["drop_table"]) do
+				local nnn = number(MIN_PCT, MAX_PCT)
+				----test_chat(string.format("<mob_drop_item> roll %d >= %d", elem["pct"], nnn))
+				if elem["pct"] >= nnn then
+					_fnc_drop = mob_drop_item.fnc_drop(mob_drop_table["drop_type"])
+					if type(elem["vnum"]) == "table" then -- list of vnums with same count
+						for idx,vnum_sub in ipairs(elem["vnum"]) do
+							_fnc_drop(vnum_sub, elem["count"])
+						end
+					else
+						_fnc_drop(elem["vnum"], elem["count"])
+					end
+				end
+			end
+			----test_chat("<mob_drop_item> after drop check")
+
+			-- send message
+			if mob_drop_table["msg_note"]~=nil and mob_drop_table["msg_type"]~=nil then
+				mob_drop_item.fnc_msg(mob_drop_table["msg_type"])(string.format(mob_drop_table["msg_note"], player_name, mob_name(mob_vnum)))
+			end
+		end
+		function process_drop(mob_vnum, mob_level, map_index, player_level, player_name)
+			-- get mob drop table
+			local mob_drop_table = mob_drop_item.get_drop_table(mob_vnum)
+			if mob_drop_table==nil then
+				return
+			end
+			---
+			if mob_drop_table["multi"]==nil then
+				mob_drop_item.subprocess_drop(mob_drop_table, mob_vnum, mob_level, map_index, player_level, player_name)
+			else
+				for idx,mob_drop_table_sub in ipairs(mob_drop_table["multi"]) do
+					mob_drop_item.subprocess_drop(mob_drop_table_sub, mob_vnum, mob_level, map_index, player_level, player_name)
+				end
+			end
+		end
+		when kill with not npc.is_pc() begin
+			-- global drop
+			mob_drop_item.process_drop(0, npc.get_level0(), pc.get_map_index(), pc.get_level(), pc.get_name())
+			-- mob vnum drop
+			mob_drop_item.process_drop(npc.get_vnum0(), npc.get_level0(), pc.get_map_index(), pc.get_level(), pc.get_name())
+		end
+	end
+end

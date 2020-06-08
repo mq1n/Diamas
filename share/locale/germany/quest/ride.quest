@@ -201,7 +201,7 @@ quest ride begin
 			if mount_info==nil then return end
 
 			if pc.level < mount_info["req_level"] then
-				syschat(gameforge.ride._010_say)
+				syschat("Level not enough")
 			else
 				if 112 == pc.get_map_index() then -- duel map
 					return
@@ -219,6 +219,9 @@ quest ride begin
 					end
 				end
 
+				-- syschat("duration "..remain_time)
+				-- syschat("socket1 "..item.get_socket(1))
+				-- syschat("socket2 "..item.get_socket(2))
 				pc.mount(mount_info["mount_vnum"], remain_time)
 				pc.mount_bonus(mount_info["bonus_id"], mount_info["bonus_value"], remain_time)
 			end
@@ -226,6 +229,7 @@ quest ride begin
 
 		when login begin
 			local vnum, remain_time = pc.get_special_ride_vnum()
+			-- syschat("remain_time "..remain_time)
 			if vnum==0 then return end
 
 			local mount_info = ride.GetRideInfo(vnum)
@@ -259,14 +263,14 @@ quest ride begin
 			71220.use
 		begin
 			if pc.is_polymorphed() then
-				syschat(gameforge.ride._020_say)
+				syschat("You are transformed")
 			elseif not pc.is_riding() then
 				if horse.is_summon() then
 					horse.unsummon()
 				end
 				ride.Ride(item.vnum, 0)
 			else
-				syschat(gameforge.ride._040_say)
+				syschat("You are already riding")
 			end
 		end
 	end

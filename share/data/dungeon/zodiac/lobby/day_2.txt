@@ -1,9 +1,0 @@
-//type	cx	cy	sx	sy	z	dir	time	percent	count	vnum
-//-----------------------------------------------------------------------------------
-// ZODIAC NPC
-m	261	252	0	0	0	5	1m	100	1	20438
-// Zodiac Temple - Day 2
-//Cow Portal
-m	290	235	0	0	0	8	1m	100	1	20440
-//Mouse Portal
-m	274	226	0	0	0	5	1m	100	1	20439

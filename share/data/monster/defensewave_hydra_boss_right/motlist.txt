@@ -1,1 +1,0 @@
-GENERAL WAIT wait_right.msa 100

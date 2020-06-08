@@ -1,0 +1,46 @@
+define __givememoney__ 1000000000
+quest guild_make begin
+    state start begin
+		when guild_man1.chat."Make a guild" or guild_man2.chat."Make a guild" or guild_man3.chat."Make a guild" with not pc.hasguild() and not pc.isguildmaster() begin
+			say("Do you wanna make a guild? I require much money.")
+			say_reward("You should give him: ".. __givememoney__ .." yang.")
+			if select("Yes", "No")==2 then return end
+			-- let's start!
+			say("Input the name you want for your guild:")
+			local guild_name = string.gsub(input(), "[^A-Za-z0-9]", "") -- it also clean non alphanumeric characters
+			local guild_len_name = string.len(guild_name)
+			if not ((2 < guild_len_name) and (guild_len_name < 12)) then
+				say_reward("The name should not have special characters and its length should be between 3-11 characters!")
+				return
+			end
+			say("Are you sure you wanna create such guild?[ENTER]"..guild_name)
+			if select("Yes", "No")==2 then return end
+			-- checks begin
+			if not (pc.get_gold() >= __givememoney__ ) then
+				say_reward("Not enough money.")
+				return
+			end
+			if (pc.hasguild() or pc.isguildmaster()) then
+				say_reward("You're already inside a guild.")
+				return
+			end
+			-- checks end
+			-- so many ifs, we can simplify this by using a table
+			local ret = pc.make_guild0(guild_name)
+			if ret==-2 then
+				say_reward("[NO] guild name is invalid (strlen <2 or >11!)")
+			elseif ret==-1 then
+				say_reward("[NO] guild name is invalid (special chars found!)")
+			elseif ret==0 then
+				say_reward("[NO] guild not created (guild name already present or already member of a guild)")
+			elseif ret==1 then
+				pc.change_gold(- __givememoney__ )
+				say_reward("[YES] guild created")
+			elseif ret==2 then
+				say_reward("[NO] player already part of a guild")
+			elseif ret==3 then
+				say_reward("[NO] player already guild master")
+			end
+		end
+	end
+end

@@ -1,8 +1,0 @@
-ScriptType		SkillDataScript
-
-Type			HIGH
-Name			"¿ë±ÇÆÄ"
-Description		"Test - Description"
-
-IconFileName	"skill/sura/yonggwon.sub"
-MotionIndex		16
