@@ -1,7 +1,7 @@
 #ifndef __INC_LIBTHECORE_FDWATCH_H__
 #define __INC_LIBTHECORE_FDWATCH_H__
 
-#ifndef __WIN32__
+#ifdef __FreeBSD__
 
     typedef struct fdwatch	FDWATCH;
     typedef struct fdwatch *	LPFDWATCH;
@@ -12,7 +12,7 @@
 	FDW_READ		= 1,
 	FDW_WRITE		= 2,
 	FDW_WRITE_ONESHOT	= 4,
-	FDW_EOF			= 8,
+	FDW_EOF			= 8
     };
 
     typedef struct kevent	KEVENT;

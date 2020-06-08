@@ -15,9 +15,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR})
 if (MSVC)
 	add_definitions(-DWIN32)
 	add_definitions(-D_WIN32)
+	add_definitions(-D__WIN32__)
 endif()
 
-#add_definitions(-D_USE_32BIT_TIME_T)
+add_definitions(-D_USE_32BIT_TIME_T)
 add_definitions(-DNOMINMAX)
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
@@ -44,6 +45,12 @@ file(GLOB DBCACHE_SOURCES
     "src/*.c"
     "src/*.cpp"
 )
+
+#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+#	set(STDLIB_FLAG "-stdlib=libc++")
+#ELSE() # gcc
+#	set(STDLIB_FLAG "-stdlib=libstdc++")
+#ENDIF()
 
 if (MSVC)
 	set(EXTRA_LIBS ws2_32 dbghelp shlwapi)

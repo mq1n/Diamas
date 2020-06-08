@@ -1,210 +1,138 @@
-#ifndef __INC_METIN_II_ASYNCSQL_H__
-#define __INC_METIN_II_ASYNCSQL_H__
+#ifndef __INC_ASYNCSQL_H__
+#define __INC_ASYNCSQL_H__
 
-#include "../libthecore/include/stdafx.h"
-#include "../libthecore/include/log.h"
+#include "../../libthecore/include/stdafx.h"
+#include "../../libthecore/include/log.h"
 
 #include <string>
 #include <queue>
 #include <vector>
 #include <map>
-#include <mysql/mysql.h>
-#include <mysql/errmsg.h>
-#include <mysql/mysqld_error.h>
+#include <mysql.h>
+#include <errmsg.h>
+#include <mysqld_error.h>
+
+#include <thread>
+#include <mutex>
 
 #include "Semaphore.h"
 
-#define QUERY_MAX_LEN 8192
+#define ASQL_QUERY_MAX_LEN 8192
 
-typedef struct _SQLResult
+//Safe strlcpy method for mysql returning a nullptr.
+inline void m_strlcpy(char* dst, char* src, size_t size)
 {
-	_SQLResult()
-	   	: pSQLResult(NULL), uiNumRows(0), uiAffectedRows(0), uiInsertID(0)
-	{
+	if (src == nullptr) { //if we got a nullptr set to \0 termination char
+		strlcpy(dst, "\0", 1);
+		return;
 	}
 
-	~_SQLResult()
-	{
-		if (pSQLResult)
-		{
-			mysql_free_result(pSQLResult);
-			pSQLResult = NULL;
-		}
-	}
 
-	MYSQL_RES *	pSQLResult;
-	uint32_t		uiNumRows;
-	uint32_t		uiAffectedRows;
-	uint32_t		uiInsertID;
-} SQLResult;
+	strlcpy(dst, src, size);
+}
 
-typedef struct _SQLMsg
+struct SQLResult
 {
-	_SQLMsg() : m_pkSQL(NULL), iID(0), uiResultPos(0), pvUserData(NULL), bReturn(false), uiSQLErrno(0)
-	{
-	}
+	SQLResult();
+	~SQLResult();
 
-	~_SQLMsg()
-	{
-		std::vector<SQLResult *>::iterator first = vec_pkResult.begin();
-		std::vector<SQLResult *>::iterator past = vec_pkResult.end();
+	MYSQL_RES* pSQLResult;
+	uint32_t uiNumRows;
+	uint32_t uiAffectedRows;
+	uint32_t uiInsertID;
+};
 
-		while (first != past)
-			delete *(first++);
+struct SQLMsg
+{
+	SQLMsg();
+	~SQLMsg();
 
-		vec_pkResult.clear();
-	}
+	void Store();
 
-	void Store()
-	{
-		do
-		{
-			SQLResult * pRes = new SQLResult;
+	SQLResult* Get();
+	bool Next();
 
-			pRes->pSQLResult = mysql_store_result(m_pkSQL);
-			pRes->uiInsertID = mysql_insert_id(m_pkSQL);
-			pRes->uiAffectedRows = mysql_affected_rows(m_pkSQL);
+	MYSQL* m_pkSQL;
+	int32_t iID;
+	std::string stQuery;
 
-			if (pRes->pSQLResult)
-			{
-				pRes->uiNumRows = mysql_num_rows(pRes->pSQLResult);
-			}
-			else
-			{
-				pRes->uiNumRows = 0;
-			}
+	std::vector<SQLResult*> vec_pkResult; // result ??
+	uint32_t uiResultPos; // ?? result ??
 
-			vec_pkResult.push_back(pRes);
-		} while (!mysql_next_result(m_pkSQL));
-	}
+	void* pvUserData;
+	bool bReturn;
 
-	SQLResult * Get()
-	{
-		if (uiResultPos >= vec_pkResult.size())
-			return NULL;
-
-		return vec_pkResult[uiResultPos];
-	}
-
-	bool Next()
-	{
-		if (uiResultPos + 1 >= vec_pkResult.size())
-			return false;
-
-		++uiResultPos;
-		return true;
-	}
-
-	MYSQL *			m_pkSQL;
-	int				iID;
-	std::string			stQuery;
-
-	std::vector<SQLResult *>	vec_pkResult;	// result 벡터
-	unsigned int		uiResultPos;	// 현재 result 위치
-
-	void *			pvUserData;
-	bool			bReturn;
-
-	unsigned int		uiSQLErrno;
-} SQLMsg;
+	uint32_t uiSQLErrno;
+};
 
 class CAsyncSQL
 {
-	public:
-		CAsyncSQL();
-		virtual ~CAsyncSQL();
+public:
+	CAsyncSQL();
+	~CAsyncSQL();
 
-		void		Quit();
+	void Quit();
 
-		bool   		Setup(const char * c_pszHost, const char * c_pszUser, const char * c_pszPassword, const char * c_pszDB, const char * c_pszLocale, 
-			bool bNoThread = false, int iPort = 0);
-		bool		Setup(CAsyncSQL * sql, bool bNoThread = false);
+	bool Setup(const char* c_pszHost, const char* c_pszUser,
+		const char* c_pszPassword,
+		const char* c_pszDB, const char* c_pszLocale,
+		bool bNoThread = false, int32_t iPort = 0);
 
-		bool		Connect();
-		bool		IsConnected() { return m_bConnected; }
-		bool		QueryLocaleSet();
+	bool Setup(CAsyncSQL* sql, bool bNoThread = false);
 
-		void		AsyncQuery(const char * c_pszQuery);
-		void		ReturnQuery(const char * c_pszQuery, void * pvUserData);
-		SQLMsg *	DirectQuery(const char * c_pszQuery);
+	void SetLocale(const std::string& stLocale);
 
-		DWORD		CountQuery();
-		DWORD		CountResult();
+	bool Connect();
 
-		void		PushResult(SQLMsg * p);
-		bool		PopResult(SQLMsg ** pp);
+	void AsyncQuery(const char* c_pszQuery);
+	void ReturnQuery(const char* c_pszQuery, void* pvUserData);
+	SQLMsg* DirectQuery(const char* c_pszQuery);
 
-		void		ChildLoop();
+	uint32_t CountQuery() const;
+	uint32_t CountResult() const;
 
-		MYSQL *		GetSQLHandle();
+	void PushResult(SQLMsg* p);
+	bool PopResult(SQLMsg** pp);
 
-		int			CountQueryFinished();
-		void		ResetQueryFinished();
+	void ChildLoop();
 
-		size_t		EscapeString(char* dst, size_t dstSize, const char *src, size_t srcSize);
+	MYSQL* GetSQLHandle();
 
-	protected:
-		void		Destroy();
+	int32_t CountQueryFinished() const;
+	void ResetQueryFinished();
 
-		void		PushQuery(SQLMsg * p);
+	size_t EscapeString(char* dst, size_t dstSize, const char *src, size_t srcSize);
 
-		bool		PeekQuery(SQLMsg ** pp);
-		bool		PopQuery(int iID);
+protected:
+	void PushQuery(SQLMsg* p);
 
-		bool		PeekQueryFromCopyQueue(SQLMsg ** pp );
-		INT			CopyQuery();
-		bool		PopQueryFromCopyQueue();
+	std::queue<SQLMsg*> PopPendingQueries();
 
-	public:
-		int			GetCopiedQueryCount();
-		void		ResetCopiedQueryCount();
-		void		AddCopiedQueryCount( int iCopiedQuery );
+	MYSQL m_hDB;
 
-		//private:
-	protected:
-		MYSQL m_hDB;
+	std::string m_stHost;
+	std::string m_stUser;
+	std::string m_stPassword;
+	std::string m_stDB;
+	std::string m_stLocale;
+	bool m_connected;
 
-		std::string	m_stHost;
-		std::string	m_stUser;
-		std::string	m_stPassword;
-		std::string	m_stDB;
-		std::string	m_stLocale;
+	int32_t	m_iMsgCount;
+	int32_t m_iPort;
 
-		int	m_iMsgCount;
-		int	m_aiPipe[2];
-		int m_iPort;
+	std::queue<SQLMsg*> m_queue_query;
+	std::queue<SQLMsg*> m_queue_result;
 
-		std::queue<SQLMsg *> m_queue_query;
-		std::queue<SQLMsg *> m_queue_query_copy;
-		//std::map<int, SQLMsg *>	m_map_kSQLMsgUnfinished;
+	volatile bool m_bEnd;
 
-		std::queue<SQLMsg *> m_queue_result;
+	std::thread m_asyncThread;
+	std::mutex m_queryMutex;
+	std::mutex m_resultMutex;
 
-		volatile bool m_bEnd;
+	CSemaphore m_sem;
 
-#ifndef __WIN32__
-		pthread_t m_hThread;
-		pthread_mutex_t	* m_mtxQuery;
-		pthread_mutex_t	* m_mtxResult;
-#else
-		HANDLE m_hThread;
-		CRITICAL_SECTION* m_mtxQuery;
-		CRITICAL_SECTION* m_mtxResult;
-#endif
-
-		CSemaphore m_sem;
-
-		int	m_iQueryFinished;
-
-		unsigned long m_ulThreadID;
-		bool m_bConnected;
-		int	m_iCopiedQuery;
+	int32_t	m_iQueryFinished;
 };
 
-class CAsyncSQL2 : public CAsyncSQL
-{
-	public:
-		void SetLocale ( const std::string & stLocale );
-};
-
+typedef CAsyncSQL CAsyncSQL2;
 #endif

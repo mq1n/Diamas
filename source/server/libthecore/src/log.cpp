@@ -1,19 +1,14 @@
-/*
- *    Filename: log.c
- * Description: local log file 관련
- *
- *      Author: 비엽 aka. Cronan
- */
-#define __LIBTHECORE__
 #include "stdafx.h"
 
-#ifndef __WIN32__
+#ifndef _WIN32
 #define SYSLOG_FILENAME "syslog"
 #define SYSERR_FILENAME "syserr"
+#define NETERR_FILENAME "neterr"
 #define PTS_FILENAME "PTS"
 #else
 #define SYSLOG_FILENAME "syslog.txt"
 #define SYSERR_FILENAME "syserr.txt"
+#define NETERR_FILENAME "neterr.txt"
 #define PTS_FILENAME "PTS.txt"
 #endif
 
@@ -31,6 +26,7 @@ struct log_file_s
 
 LPLOGFILE	log_file_sys = NULL;
 LPLOGFILE	log_file_err = NULL;
+LPLOGFILE	log_file_net_err = NULL;
 LPLOGFILE	log_file_pt = NULL;
 static char	log_dir[32] = { 0, };
 unsigned int log_keep_days = 3;
@@ -68,32 +64,35 @@ int log_init(void)
 {
 	log_file_set_dir("./log");
 
-	do
-	{
-		log_file_sys = log_file_init(SYSLOG_FILENAME, "a+");
-		if( NULL == log_file_sys ) break;
+	log_file_sys = log_file_init(SYSLOG_FILENAME, "a+");
+	if (!log_file_sys)
+		return false;
 
-		log_file_err = log_file_init(SYSERR_FILENAME, "a+");
-		if( NULL == log_file_err ) break;
+	log_file_err = log_file_init(SYSERR_FILENAME, "a+");
+	if (!log_file_err)
+		return false;
 
-		log_file_pt = log_file_init(PTS_FILENAME, "w");
-		if( NULL == log_file_pt ) break;
+	log_file_net_err = log_file_init(NETERR_FILENAME, "a+");
+	if (!log_file_net_err)
+		return false;
 
-		return true;
-	}
-	while( false );
+	log_file_pt = log_file_init(PTS_FILENAME, "w");
+	if (!log_file_pt)
+		return false;
 
-	return false;
+	return true;
 }
 
 void log_destroy(void)
 {
 	log_file_destroy(log_file_sys);
 	log_file_destroy(log_file_err);
+	log_file_destroy(log_file_net_err);
 	log_file_destroy(log_file_pt);
 
 	log_file_sys = NULL;
 	log_file_err = NULL;
+	log_file_net_err = NULL;
 	log_file_pt = NULL;
 }
 
@@ -101,32 +100,24 @@ void log_rotate(void)
 {
 	log_file_check(log_file_sys);
 	log_file_check(log_file_err);
+	log_file_check(log_file_net_err);
 	log_file_check(log_file_pt);
 
 	log_file_rotate(log_file_sys);
 }
 
-#ifndef __WIN32__
+#ifndef _WIN32
 void _sys_err(const char *func, int line, const char *format, ...)
 {
 	va_list args;
-	time_t ct = time(0);  
+	time_t ct = time(nullptr);  
 	char *time_s = asctime(localtime(&ct));
-
-	struct timeval tv;
-	int nMiliSec = 0;
-	gettimeofday(&tv, NULL);
-
-
 
 	char buf[1024 + 2]; // \n을 붙이기 위해..
 	int len;
 
-	if (!log_file_err)
-		return;
-
 	time_s[strlen(time_s) - 1] = '\0';
-	len = snprintf(buf, 1024, "SYSERR: %-15.15s.%d :: %s: ", time_s + 4, tv.tv_usec,  func);
+	len = snprintf(buf, 1024, "SYSERR: %-15.15s :: %s: ", time_s + 4, func);
 	buf[1025] = '\0';
 
 	if (len < 1024)
@@ -139,18 +130,93 @@ void _sys_err(const char *func, int line, const char *format, ...)
 	strcat(buf, "\n");
 
 	// log_file_err 에 출력
-	fputs(buf, log_file_err->fp);
-	fflush(log_file_err->fp);
+	if (log_file_err) {
+		fputs(buf, log_file_err->fp);
+		fflush(log_file_err->fp);
+	}
 
 	// log_file_sys 에도 출력
-	fputs(buf, log_file_sys->fp);
-	fflush(log_file_sys->fp);
+	if (log_file_sys) {
+		fputs(buf, log_file_sys->fp);
+		fflush(log_file_sys->fp);
+	}
+}
+
+void _net_err(const char *func, int line, const char *format, ...)
+{
+	va_list args;
+	time_t ct = time(nullptr);
+	char *time_s = asctime(localtime(&ct));
+
+	struct timeval tv;
+	int nMiliSec = 0;
+	gettimeofday(&tv, NULL);
+
+	char buf[1024 + 2]; // \n을 붙이기 위해..
+	int len;
+	
+	time_s[strlen(time_s) - 1] = '\0';
+	len = snprintf(buf, 1024, "NETERR: %-15.15s.%ld :: %s: ", time_s + 4, tv.tv_usec, func);
+	buf[1025] = '\0';
+
+	if (len < 1024)
+	{
+		va_start(args, format);
+		vsnprintf(buf + len, 1024 - len, format, args);
+		va_end(args);
+	}
+
+	strcat(buf, "\n");
+
+	if (log_file_net_err) {
+		fputs(buf, log_file_net_err->fp);
+		fflush(log_file_net_err->fp);
+	}
+
+	if (log_file_sys) {
+		fputs(buf, log_file_sys->fp);
+		// don't flush, we already have this info somewhere
+	}
 }
 #else
+void _net_err(const char *func, int line, const char *format, ...)
+{
+	va_list args;
+	time_t ct = time(nullptr);
+	char *time_s = asctime(localtime(&ct));
+
+	char buf[1024 + 2];
+	int len;
+
+	time_s[strlen(time_s) - 1] = '\0';
+	len = snprintf(buf, 1024, "NETERR: %-15.15s :: %s: ", time_s + 4, func);
+	buf[1025] = '\0';
+
+	if (len < 1024)
+	{
+		va_start(args, format);
+		vsnprintf(buf + len, 1024 - len, format, args);
+		va_end(args);
+	}
+
+	strcat(buf, "\n");
+
+	// Write to neterr
+	fputs(buf, log_file_net_err->fp);
+	fflush(log_file_net_err->fp);
+
+	// Write to log
+	fputs(buf, log_file_sys->fp);
+	fflush(log_file_sys->fp);
+
+	fputs(buf, stdout);
+	fflush(stdout);
+}
+
 void _sys_err(const char *func, int line, const char *format, ...)
 {
 	va_list args;
-	time_t ct = time(0);  
+	time_t ct = time(nullptr);  
 	char *time_s = asctime(localtime(&ct));
 
 	char buf[1024 + 2]; // \n을 붙이기 위해..
@@ -182,6 +248,8 @@ void _sys_err(const char *func, int line, const char *format, ...)
 
 	fputs(buf, stdout);
 	fflush(stdout);
+
+	OutputDebugStringA(buf);
 }
 #endif
 
@@ -195,9 +263,8 @@ void sys_log_header(const char *header)
 void sys_log(unsigned int bit, const char *format, ...)
 {
 	va_list	args;
-
+	
 	struct timeval tv;
-	int nMiliSec = 0;
 	gettimeofday(&tv, NULL);
 
 	if (bit != 0 && !(log_level_bits & bit))
@@ -205,13 +272,13 @@ void sys_log(unsigned int bit, const char *format, ...)
 
 	if (log_file_sys)
 	{
-		time_t ct = time(0);  
+		time_t ct = time(nullptr);  
 		char *time_s = asctime(localtime(&ct));
 
-		fprintf(log_file_sys->fp, sys_log_header_string);
+		fprintf(log_file_sys->fp, "%s", sys_log_header_string);
 
 		time_s[strlen(time_s) - 1] = '\0';
-		fprintf(log_file_sys->fp, "%-15.15s.%d :: ", time_s + 4, tv.tv_usec );
+		fprintf(log_file_sys->fp, "%-15.15s.%ld :: ", time_s + 4, tv.tv_usec );
 
 		va_start(args, format);
 		vfprintf(log_file_sys->fp, format, args);
@@ -221,12 +288,12 @@ void sys_log(unsigned int bit, const char *format, ...)
 		fflush(log_file_sys->fp);
 	}
 
-#ifndef __WIN32__
+#ifndef _WIN32
 	// log_level이 1 이상일 경우에는 테스트일 경우가 많으니 stdout에도 출력한다.
 	if (log_level_bits > 1)
 	{
 #endif
-		fprintf(stdout, sys_log_header_string);
+		printf("%s", sys_log_header_string);
 
 		va_start(args, format);
 		vfprintf(stdout, format, args);
@@ -234,7 +301,7 @@ void sys_log(unsigned int bit, const char *format, ...)
 
 		fputc('\n', stdout);
 		fflush(stdout);
-#ifndef __WIN32__
+#ifndef _WIN32
 	}
 #endif
 }
@@ -261,7 +328,7 @@ LPLOGFILE log_file_init(const char * filename, const char * openmode)
 	struct tm curr_tm;
 	time_t time_s;
 
-	time_s = time(0);
+	time_s = time(nullptr);
 	curr_tm = *localtime(&time_s);
 
 	fp = fopen(filename, openmode);
@@ -270,7 +337,11 @@ LPLOGFILE log_file_init(const char * filename, const char * openmode)
 		return NULL;
 
 	logfile = (LPLOGFILE) malloc(sizeof(LOGFILE));
+#ifndef _WIN32
 	logfile->filename = strdup(filename);
+#else
+	logfile->filename = _strdup(filename);
+#endif
 	logfile->fp	= fp;
 	logfile->last_hour = curr_tm.tm_hour;
 	logfile->last_day = curr_tm.tm_mday;
@@ -316,7 +387,7 @@ void log_file_delete_old(const char *filename)
 	struct stat		sb;
 	int			num1, num2;
 	char		buf[32];
-	char		system_cmd[64];
+	char		system_cmd[512];
 	struct tm		new_tm;
 
 	if (stat(filename, &sb) == -1)
@@ -328,10 +399,10 @@ void log_file_delete_old(const char *filename)
 	if (!S_ISDIR(sb.st_mode))
 		return;
 
-	new_tm = *tm_calc(NULL, -log_keep_days);
+	new_tm = *tm_calc(NULL, -(int)log_keep_days);
 	sprintf(buf, "%04d%02d%02d", new_tm.tm_year + 1900, new_tm.tm_mon + 1, new_tm.tm_mday);
 	num1 = atoi(buf);
-#ifndef __WIN32__
+#ifndef _WIN32
 	{
 		struct dirent ** namelist;
 		int	n;
@@ -347,7 +418,7 @@ void log_file_delete_old(const char *filename)
 			while (n-- > 0)
 			{
 				strncpy(name, namelist[n]->d_name, 255);
-				name[255] = '\0';
+				name[MAXNAMLEN] = '\0';
 
 				free(namelist[n]);
 
@@ -404,17 +475,17 @@ void log_file_rotate(LPLOGFILE logfile)
     struct tm	curr_tm;
     time_t	time_s;
     char	dir[128];
-    char	system_cmd[128];
+    char	system_cmd[512];
 
-    time_s = time(0);
+    time_s = time(nullptr);
     curr_tm = *localtime(&time_s);
 
     if (curr_tm.tm_mday != logfile->last_day)
     {
 	struct tm new_tm;
-	new_tm = *tm_calc(&curr_tm, -3);
+	new_tm = *tm_calc(&curr_tm, -(int)log_keep_days);
 
-#ifndef __WIN32__
+#ifndef _WIN32
 	sprintf(system_cmd, "rm -rf %s/%04d%02d%02d", log_dir, new_tm.tm_year + 1900, new_tm.tm_mon + 1, new_tm.tm_mday);
 #else
 	sprintf(system_cmd, "del %s\\%04d%02d%02d", log_dir, new_tm.tm_year + 1900, new_tm.tm_mon + 1, new_tm.tm_mday);
@@ -429,11 +500,11 @@ void log_file_rotate(LPLOGFILE logfile)
     if (curr_tm.tm_hour != logfile->last_hour)
     {
 		struct stat	stat_buf;
-		snprintf(dir, 128, "%s/%04d%02d%02d", log_dir, curr_tm.tm_year + 1900, curr_tm.tm_mon + 1, curr_tm.tm_mday);
+		snprintf(dir, sizeof(dir), "%s/%04d%02d%02d", log_dir, curr_tm.tm_year + 1900, curr_tm.tm_mon + 1, curr_tm.tm_mday);
 
 		if (stat(dir, &stat_buf) != 0 || S_ISDIR(stat_buf.st_mode))
 		{
-#ifdef __WIN32__
+#ifdef _WIN32
 			CreateDirectory(dir, NULL);
 #else
 			mkdir(dir, S_IRWXU);
@@ -447,10 +518,10 @@ void log_file_rotate(LPLOGFILE logfile)
 		fclose(logfile->fp);
 
 		// 옮긴다.
-#ifndef __WIN32__
-		snprintf(system_cmd, 128, "mv %s %s/%s.%02d", logfile->filename, dir, logfile->filename, logfile->last_hour);
+#ifndef _WIN32
+		snprintf(system_cmd, sizeof(system_cmd), "mv %s %s/%s.%02d", logfile->filename, dir, logfile->filename, logfile->last_hour);
 #else
-		snprintf(system_cmd, 128, "move %s %s\\%s.%02d", logfile->filename, dir, logfile->filename, logfile->last_hour);
+		snprintf(system_cmd, sizeof(system_cmd), "move %s %s\\%s.%02d", logfile->filename, dir, logfile->filename, logfile->last_hour);
 #endif
 		system(system_cmd);
 

@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "Semaphore.h"
 
-#ifndef __WIN32__
+#if defined(_WIN32)
 
-CSemaphore::CSemaphore() : m_hSem(NULL)
+CSemaphore::CSemaphore()
+	: m_sem(nullptr)
 {
 	Initialize();
 }
@@ -13,17 +14,13 @@ CSemaphore::~CSemaphore()
 	Destroy();
 }
 
-int CSemaphore::Initialize()
+bool CSemaphore::Initialize()
 {
 	Clear();
 
-	m_hSem = new sem_t;
-
-	if (sem_init(m_hSem, 0, 0) == -1)
-	{
-		perror("sem_init");
+	m_sem = ::CreateSemaphore(nullptr, 0, 32, nullptr);
+	if (m_sem == nullptr)
 		return false;
-	}
 
 	return true;
 }
@@ -35,48 +32,39 @@ void CSemaphore::Destroy()
 
 void CSemaphore::Clear()
 {
-	if (m_hSem)
-	{
-		sem_destroy(m_hSem);
-		delete m_hSem;
+	if (m_sem) {
+		::CloseHandle(m_sem);
+		m_sem = nullptr;
 	}
-
-	m_hSem = NULL;
 }
 
-int CSemaphore::Wait()
+bool CSemaphore::Wait()
 {
-	if (!m_hSem)
+	assert(m_sem && "Not initialized");
+
+	uint32_t dwWaitResult = ::WaitForSingleObject(m_sem, INFINITE);
+	switch (dwWaitResult) {
+	case WAIT_OBJECT_0:
 		return true;
 
-	int re = sem_wait(m_hSem);
-
-	if (re == -1)
-	{
-		if (errno == EINTR)
-			return Wait();
-
-		perror("sem_wait");
-		return false;
+	default:
+		break;
 	}
 
-	return true;
+	return false;
 }
 
-int CSemaphore::Release(int count)
+bool CSemaphore::Release(int32_t count)
 {
-	if (!m_hSem)
-		return false;
+	assert(m_sem  && "Not initialized");
 
-	for (int i = 0; i < count; ++i)
-		sem_post(m_hSem);
-
+	::ReleaseSemaphore(m_sem, count, nullptr);
 	return true;
 }
 
 #else
 
-CSemaphore::CSemaphore() : m_hSem(NULL)
+CSemaphore::CSemaphore()
 {
 	Initialize();
 }
@@ -86,13 +74,10 @@ CSemaphore::~CSemaphore()
 	Destroy();
 }
 
-int CSemaphore::Initialize()
+bool CSemaphore::Initialize()
 {
-	Clear();
-
-	m_hSem = ::CreateSemaphore(NULL, 0, 32, NULL);
-
-	if (m_hSem == NULL) {
+	if (sem_init(&m_sem, 0, 0) == -1) {
+		sys_err("sem_init() failed with %d", errno);
 		return false;
 	}
 
@@ -106,35 +91,35 @@ void CSemaphore::Destroy()
 
 void CSemaphore::Clear()
 {
-	if (m_hSem == NULL) {
-		return;
-	}
-	::CloseHandle(m_hSem);
-	m_hSem = NULL;
+	sem_destroy(&m_sem);
 }
 
-int CSemaphore::Wait()
+bool CSemaphore::Wait()
 {
-	if (!m_hSem)
-		return true;
-
-	DWORD dwWaitResult = ::WaitForSingleObject(m_hSem, INFINITE);
-
-	switch (dwWaitResult) {
-		case WAIT_OBJECT_0:
-			return true;
-		default:
+	while (true) {
+		int32_t re = sem_wait(&m_sem);
+		if (re == 0)
 			break;
+
+		if (errno != EINTR) {
+			sys_err("sem_wait() failed with %d",
+				errno);
+			return false;
+		}
 	}
-	return false;
+
+	return true;
 }
 
-int CSemaphore::Release(int count)
+bool CSemaphore::Release(int32_t count)
 {
-	if (!m_hSem)
-		return false;
-
-	::ReleaseSemaphore(m_hSem, count, NULL);
+	for (int32_t i = 0; i < count; ++i) {
+		if (sem_post(&m_sem) != 0) {
+			sys_err("sem_post(%p) failed with %d",
+				&m_sem, errno);
+			return false;
+		}
+	}
 
 	return true;
 }

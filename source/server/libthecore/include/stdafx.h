@@ -7,7 +7,7 @@
 #define INLINE inline
 #endif
 
-#ifdef __WIN32__
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
@@ -30,16 +30,10 @@
 #include <fcntl.h>
 
 #include "xdirent.h"
-#include "xgetopt.h"
+#include "random.h"
 
 #define S_ISDIR(m)	(m & _S_IFDIR)
 #define snprintf _snprintf
-
-struct timespec
-{
-    time_t  tv_sec;         /* seconds */
-    long    tv_nsec;        /* and nanoseconds */
-};
 
 #define __USE_SELECT__
 
@@ -49,15 +43,11 @@ struct timespec
 #define strlcat(dst, src, size) strcat_s(dst, size, src)
 #define strlcpy(dst, src, size) strncpy_s(dst, size, src, _TRUNCATE)
 #define strtoull(str, endptr, base) _strtoui64(str, endptr, base)
-#define strtof(str, endptr) (float)strtod(str, endptr)
-#define strcasecmp(s1, s2) stricmp(s1, s2)
-#define strncasecmp(s1, s2, n) strnicmp(s1, s2, n)
+#define strcasecmp(s1, s2) _stricmp(s1, s2)
+#define strncasecmp(s1, s2, n) _strnicmp(s1, s2, n)
 #define atoll(str) _atoi64(str)
 #define localtime_r(timet, result) localtime_s(result, timet)
 #define strtok_r(s, delim, ptrptr) strtok_s(s, delim, ptrptr)
-
-#include <boost/typeof/typeof.hpp>
-#define typeof(t) BOOST_TYPEOF(t)
 
 // dummy declaration of non-supported signals
 #define SIGUSR1     30  /* user defined signal 1 */
@@ -69,10 +59,6 @@ inline void usleep(unsigned long usec) {
 inline unsigned sleep(unsigned sec) {
 	::Sleep(sec * 1000);
 	return 0;
-}
-inline double rint(double x)
-{
-	return ::floor(x+.5);
 }
 
 
@@ -118,28 +104,31 @@ inline double rint(double x)
 
 #endif
 
-#ifndef false
-#define false	0
-#define true	(!false)
-#endif
-
 #ifndef FALSE
 #define FALSE	false
 #define TRUE	(!FALSE)
+#endif
+
+#define ishan(ch)       (((ch) & 0xE0) > 0x90)
+#define ishanasc(ch)    (isascii(ch) || ishan(ch))
+#define ishanalp(ch)    (isalpha(ch) || ishan(ch))
+#define isnhdigit(ch)   (!ishan(ch) && isdigit(ch))
+#define isnhspace(ch)   (!ishan(ch) && isspace(ch))
+
+#ifdef _WIN32
+#define isdigit iswdigit
+#define isspace iswspace
 #endif
 
 #include "typedef.h"
 #include "heart.h"
 #include "fdwatch.h"
 #include "socket.h"
-#include "kstbl.h"
-#include "hangul.h"
 #include "buffer.h"
 #include "signal.h"
 #include "log.h"
 #include "main.h"
 #include "utils.h"
 #include "crypt.h"
-#include "memcpy.h"
 
 #endif // __INC_LIBTHECORE_STDAFX_H__

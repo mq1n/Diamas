@@ -10,6 +10,7 @@ extern "C"
     extern volatile int	tics;
     extern volatile int shutdowned;
 #endif
+    extern int	bCheckpointCheck;
 #include "heart.h"
 
     extern LPHEART	thecore_heart;
@@ -21,9 +22,8 @@ extern "C"
 	NUM_PF
     };
 
-    extern unsigned int		thecore_profiler[NUM_PF];
-
-    extern int			thecore_init(int fps, HEARTFUNC heartbeat_func);
+	extern bool			thecore_init();
+	extern bool 		thecore_set(int fps, HEARTFUNC heartbeat_func);
     extern int			thecore_idle(void);
     extern void			thecore_shutdown(void);
     extern void			thecore_destroy(void);

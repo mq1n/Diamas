@@ -1,11 +1,10 @@
-/*
- *    Filename: utils.c
- * Description: 각종 유틸리티
- *
- *      Author: 비엽 aka. Cronan
- */
-#define __LIBTHECORE__
 #include "stdafx.h"
+
+#include <random>
+#include <algorithm>
+#include <cctype>
+#include <thread>
+#include <chrono>
 
 static struct timeval null_time = { 0, 0 };
 
@@ -110,6 +109,9 @@ struct timeval * timeadd(struct timeval *a, struct timeval *b)
 
 char *time_str(time_t ct)
 {
+    auto sttime = std::to_string(ct);
+    return const_cast<char*>(sttime.c_str());
+    /*
     static char * time_s;
 
     time_s = asctime(localtime(&ct));
@@ -118,6 +120,7 @@ char *time_str(time_t ct)
     time_s += 4;
 
     return (time_s);
+    */
 }
 
 void trim_and_lower(const char * src, char * dest, size_t dest_size)
@@ -240,7 +243,8 @@ void parse_token(char *src, char *token, char *value)
 
     for (tmp = src; *tmp && *tmp != ':'; tmp++)
     {
-	if (isnhspace(*tmp))
+
+	if (std::isspace(*tmp))
 	    continue;
 
 	*(token++) = LOWER(*tmp);
@@ -268,11 +272,11 @@ struct tm * tm_calc(const struct tm * curr_tm, int days)
 
     if (!curr_tm)
     {       
-	time_t time_s = time(0);
+	time_t time_s = time(nullptr);
 	new_tm = *localtime(&time_s);
     }
     else    
-	thecore_memcpy(&new_tm, curr_tm, sizeof(struct tm));
+	memcpy(&new_tm, curr_tm, sizeof(struct tm));
 
     if (new_tm.tm_mon == 1)
     {
@@ -338,72 +342,82 @@ int MAX(int a, int b)
 
 int MINMAX(int min, int value, int max)
 {
-    register int tv;
-
-    tv = (min > value ? min : value);
+    int tv = (min > value ? min : value);
     return (max < tv) ? max : tv;
 }
 
 DWORD thecore_random()
 {
-#ifdef __WIN32__
-    return rand();
-#else
-    return random();
-#endif
+	return static_cast<DWORD>(number(
+		std::numeric_limits<int>::min(),
+		std::numeric_limits<int>::max())
+	);
 }
 
 int number_ex(int from, int to, const char *file, int line)
 {
-    if (from > to)
-    {
-	int tmp = from;
+	// We only need (and want) to initialize the mersenne twister generator once
+	static std::random_device rd;
+	static std::mt19937 mt(rd());
+	static std::uniform_int_distribution<int> dist; //not too expensive to create, though
 
-	sys_err("number(): first argument is bigger than second argument %d -> %d, %s %d", from, to, file, line);
+	if (from > to)
+	{
+		auto tmp = from;
 
-	from = to;
-	to = tmp;
-    }
+		sys_err("number(): first argument is bigger than second argument %d -> %d, %s %d", from, to, file, line);
 
-	int returnValue = 0;
+		from = to;
+		to = tmp;
+	}
 
-	if ((to - from + 1) != 0)
-		returnValue = ((thecore_random() % (to - from + 1)) + from);
-	else
-		sys_err("number(): devided by 0");
+	//Set the range we'd like our distribution to be on, and generate the number
+	return dist(mt, std::uniform_int_distribution<int>::param_type(from, to));
+}
 
-    return returnValue;
+long long number_ex_64(long long from, long long to, const char *file, int line)
+{
+	// We only need (and want) to initialize the mersenne twister generator once
+	static std::random_device rd;
+	static std::mt19937 mt(rd());
+	static std::uniform_int_distribution<long long> dist; //not too expensive to create, though
+
+	if (from > to)
+	{
+		auto tmp = from;
+
+		sys_err("number(): first argument is bigger than second argument %lld -> %lld, %s %d", from, to, file, line);
+
+		from = to;
+		to = tmp;
+	}
+
+	//Set the range we'd like our distribution to be on, and generate the number
+	return dist(mt, std::uniform_int_distribution<long long>::param_type(from, to));
 }
 
 float fnumber(float from, float to)
 {
-	return (((float)thecore_random() / (float)RAND_MAX) * (to - from)) + from;
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<float> dis(from, to);
+	return dis(gen);
 }
 
-#ifndef __WIN32__
 void thecore_sleep(struct timeval* timeout)
 {
-    if (select(0, (fd_set *) 0, (fd_set *) 0, (fd_set *) 0, timeout) < 0)
-    {
-	if (errno != EINTR)
-	{
-	    sys_err("select sleep %s", strerror(errno));
-	    return;
-	}
-    }
+	std::this_thread::sleep_for(std::chrono::microseconds(timeout->tv_sec * 1000000 + timeout->tv_usec));
 }
 
 void thecore_msleep(DWORD dwMillisecond)
 {
-    static struct timeval tv_sleep;
-    tv_sleep.tv_sec = dwMillisecond / 1000;
-    tv_sleep.tv_usec = dwMillisecond * 1000;
-    thecore_sleep(&tv_sleep);
+	std::this_thread::sleep_for(std::chrono::milliseconds(dwMillisecond));
 }
 
-void core_dump_unix(const char *who, WORD line)
+#ifndef _WIN32
+void core_dump_unix(const char *who, long line)
 {   
-    sys_err("*** Dumping Core %s:%d ***", who, line);
+    sys_err("*** Dumping Core %s:%ld ***", who, line);
 
     fflush(stdout);
     fflush(stderr); 
@@ -423,16 +437,6 @@ uint64_t rdtsc()
 
 #else
 
-void thecore_sleep(struct timeval* timeout)
-{
-    Sleep(timeout->tv_sec * 1000 + timeout->tv_usec / 1000);
-}
-
-void thecore_msleep(DWORD dwMillisecond)
-{
-    Sleep(dwMillisecond);
-}
-
 void gettimeofday(struct timeval* t, struct timezone* dummy)
 {
     DWORD millisec = GetTickCount();
@@ -441,8 +445,9 @@ void gettimeofday(struct timeval* t, struct timezone* dummy)
     t->tv_usec = (millisec % 1000) * 1000;
 }
 
-void core_dump_unix(const char *who, WORD line)
+void core_dump_unix(const char *who, long line)
 {   
+	sys_err("*** Attempting a linux core dump %s:%ld ***", who, line);
 }
 
 #endif
@@ -455,21 +460,7 @@ float get_float_time()
     return ((float) tv.tv_sec + ((float) tv.tv_usec / 1000000.0f));
 }
 
-static DWORD get_boot_sec()
+DWORD get_unix_ms_time()
 {
-	static struct timeval tv_boot = {0L, 0L};
-
-	if (tv_boot.tv_sec == 0)
-		gettimeofday(&tv_boot, NULL);
-
-	return tv_boot.tv_sec;
-}
-
-DWORD get_dword_time()
-{
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    //tv.tv_sec -= 1057699978;
-    tv.tv_sec -= get_boot_sec();
-    return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+	return (DWORD)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }

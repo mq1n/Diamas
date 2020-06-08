@@ -14,7 +14,6 @@ extern "C"
 #define LOWER(c)	(((c)>='A'  && (c) <= 'Z') ? ((c)+('a'-'A')) : (c))
 #define UPPER(c)	(((c)>='a'  && (c) <= 'z') ? ((c)+('A'-'a')) : (c))
 
-#define str_cmp strcasecmp
 #define STRNCPY(dst, src, len)          do {strncpy(dst, src, len); dst[len] = '\0'; } while(0)
 
     extern char *	str_dup(const char * source);	// ¸Þ¸ð¸® ÇÒ´ç ÇØ¼­ source º¹»ç ÇÑ°Å ¸®ÅÏ
@@ -22,9 +21,9 @@ extern "C"
     extern int		filesize(FILE * fp);	// ÆÄÀÏ Å©±â ¸®ÅÏ
 
 #define core_dump()	core_dump_unix(__FILE__, __LINE__)
-    extern void		core_dump_unix(const char *who, WORD line);	// ÄÚ¾î¸¦ °­Á¦·Î ´ýÇÁ
+    extern void		core_dump_unix(const char *who, long line);	// ì½”ì–´ë¥¼ ê°•ì œë¡œ ë¤í”„
 
-#define TOKEN(string) if (!str_cmp(token_string, string))
+#define TOKEN(string) if (!strcasecmp(token_string, string))
     // src = ÅäÅ« : °ª
     extern void		parse_token(char * src, char * token, char * value);
 
@@ -48,29 +47,26 @@ extern "C"
     extern int MAX(int a, int b); // µÑÁß¿¡ Å« °ªÀ» ¸®ÅÏ
     extern int MIN(int a, int b); // µÑÁß¿¡ ÀÛÀº °ªÀ» ¸®ÅÏ
     extern int MINMAX(int min, int value, int max); // ÃÖ¼Ò ÃÖ´ë °ªÀ» ÇÔ²² ºñ±³ÇØ¼­ ¸®ÅÏ
-
-    extern int		number_ex(int from, int to, const char *file, int line); // fromÀ¸·Î ºÎÅÍ to±îÁöÀÇ ·£´ý °ª ¸®ÅÏ
-#define number(from, to) number_ex(from, to, __FILE__, __LINE__)
-
+	
 	float	fnumber(float from, float to);
 
     extern void		thecore_sleep(struct timeval * timeout);	// timeout¸¸Å­ ÇÁ·Î¼¼½º ½¬±â
     extern DWORD	thecore_random();				// ·£´ý ÇÔ¼ö
 
     extern float	get_float_time();
-    extern DWORD	get_dword_time();
+    extern DWORD	get_unix_ms_time();
 
     extern char *	time_str(time_t ct);
 
+	// memory
 #define CREATE(result, type, number)  do { \
-	if (!((result) = (type *) calloc ((number), sizeof(type)))) { \
-		sys_err("calloc failed [%d] %s", errno, strerror(errno)); \
-		abort(); } } while(0)
+	if (!((result) = (type *) calloc ((number), sizeof(type)))) \
+	{ perror("malloc failure"); abort(); } } while (0)
 
-#define RECREATE(result,type,number) do { \
-	if (!((result) = (type *) realloc ((result), sizeof(type) * (number)))) { \
-		sys_err("realloc failed [%d] %s", errno, strerror(errno)); \
-		abort(); } } while(0)
+#define RECREATE(result, type, number) do { \
+	if (!((result) = (type *) realloc ((result), sizeof(type) * (number))))\
+	{ perror("realloc failure"); abort(); } } while (0)
+
 
     // Next ¿Í Prev °¡ ÀÖ´Â ¸®½ºÆ®¿¡ Ãß°¡
 #define INSERT_TO_TW_LIST(item, head, prev, next)   \
@@ -131,6 +127,9 @@ extern "C"
 }
 #endif	// __cplusplus
 
+extern int		number_ex(int from, int to, const char *file, int line); // fromìœ¼ë¡œ ë¶€í„° toê¹Œì§€ì˜ ëžœë¤ ê°’ ë¦¬í„´
+#define number(from, to) number_ex(from, to, __FILE__, __LINE__)
+
 // _countof for gcc/g++
 #if !defined(_countof)
 #if !defined(__cplusplus)
@@ -145,8 +144,20 @@ extern "C++"
 #endif
 #endif
 
-#ifdef __WIN32__
+#ifdef _WIN32
 extern void gettimeofday(struct timeval* t, struct timezone* dummy);
 #endif
+
+#include <string>
+#include <memory>
+
+template<typename ... Args>
+std::string string_format(const std::string& format, Args ... args)
+{
+	std::size_t size = snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
+	std::unique_ptr<char[]> buf(new char[size]);
+	snprintf(buf.get(), size, format.c_str(), args ...);
+	return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+}
 
 #endif	// __INC_UTILS_H__

@@ -1,13 +1,4 @@
-/*
- *    Filename: heart.c
- * Description: fps 에 한번씩 호출되는 "심장" 이다.
- *
- *      Author: 비엽 aka. Cronan
- */
-#define __LIBTHECORE__
-#include "stdafx.h"
-
-extern volatile int num_events_called;
+#include "../include/stdafx.h"
 
 LPHEART heart_new(int opt_usec, HEARTFUNC func)
 {

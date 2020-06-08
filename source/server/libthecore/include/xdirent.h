@@ -18,10 +18,12 @@ extern "C"
 
 typedef struct DIR DIR;
 
-struct dirent
+typedef struct dirent
 {
-    char *d_name;
-};
+	char d_name[MAX_PATH + 1];                  /* File name */
+	size_t d_namlen;                            /* Length of name without \0 */
+	int d_type;                                 /* File type */
+} dirent;
 
 DIR           *opendir(const char *);
 int           closedir(DIR *);

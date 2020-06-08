@@ -1,37 +1,13 @@
-/*
- *    Filename: tea.c
- * Description: TEA 암호화 모듈
- *
- *      Author: 김한주 (aka. 비엽, Cronan), 송영진 (aka. myevan, 빗자루)
- */
 #include "stdafx.h"
 
-/*
- * TEA Encryption Module Instruction
- *					Edited by 김한주 aka. 비엽, Cronan
- *
- * void tea_code(const DWORD sz, const DWORD sy, const DWORD *key, DWORD *dest)
- * void tea_decode(const DWORD sz, const DWORD sy, const DWORD *key, DWORD *dest)
- *   8바이트를 암호/복호화 할때 사용된다. key 는 16 바이트여야 한다.
- *   sz, sy 는 8바이트의 역순으로 대입한다. 
- * 
- * int tea_decrypt(DWORD *dest, const DWORD *src, const DWORD *key, int size);
- * int tea_encrypt(DWORD *dest, const DWORD *src, const DWORD *key, int size);
- *   한꺼번에 8 바이트 이상을 암호/복호화 할때 사용한다. 만약 size 가
- *   8의 배수가 아니면 8의 배수로 크기를 "늘려서" 암호화 한다. 
- *
- * ex. tea_code(pdwSrc[1], pdwSrc[0], pdwKey, pdwDest);
- *     tea_decrypt(pdwDest, pdwSrc, pdwKey, nSize);
- */
-
 #define TEA_ROUND		32		// 32 를 권장하며, 높을 수록 결과가 난해해 진다.
-#define DELTA			0x9E3779B9	// DELTA 값 바꾸지 말것.
+#define DELTA			0x9E3779B9U	// DELTA 값 바꾸지 말것.
 
 char tea_nilbuf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-INLINE void tea_code(const DWORD sz, const DWORD sy, const DWORD *key, DWORD *dest)
+INLINE void tea_code(const uint32_t sz, const uint32_t sy, const uint32_t *key, uint32_t *dest)
 {
-    register DWORD	y = sy, z = sz, sum = 0;
+	uint32_t	y = sy, z = sz, sum = 0;
 
     y	+= ((z << 4 ^ z >> 5) + z) ^ (sum + key[sum & 3]);		// 1
     sum	+= DELTA;
@@ -165,9 +141,9 @@ INLINE void tea_code(const DWORD sz, const DWORD sy, const DWORD *key, DWORD *de
     *dest	= z;
 }
 
-INLINE void tea_decode(const DWORD sz, const DWORD sy, const DWORD *key, DWORD *dest)
+INLINE void tea_decode(const uint32_t sz, const uint32_t sy, const uint32_t *key, uint32_t *dest)
 {
-    register DWORD y = sy, z = sz, sum = DELTA * TEA_ROUND;
+	uint32_t y = sy, z = sz, sum = DELTA * TEA_ROUND;
 
     z -= ((y << 4 ^ y >> 5) + y) ^ (sum + key[sum >> 11 & 3]);		// 1
     sum -= DELTA;
@@ -301,7 +277,7 @@ INLINE void tea_decode(const DWORD sz, const DWORD sy, const DWORD *key, DWORD *
     *dest	= z;
 }
 
-int TEA_Encrypt(DWORD *dest, const DWORD *src, const DWORD * key, int size)
+int TEA_Encrypt(uint32_t *dest, const uint32_t *src, const uint32_t * key, int size)
 {
     int		i;
     int		resize;
@@ -320,7 +296,7 @@ int TEA_Encrypt(DWORD *dest, const DWORD *src, const DWORD * key, int size)
     return (resize);
 }
 
-int TEA_Decrypt(DWORD *dest, const DWORD *src, const DWORD * key, int size)
+int TEA_Decrypt(uint32_t *dest, const uint32_t *src, const uint32_t * key, int size)
 {
     int		i;
     int		resize;

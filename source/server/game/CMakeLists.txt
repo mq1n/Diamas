@@ -5,18 +5,22 @@ set(EXE_NAME game_server)
 # Output dir
 set(OUTPUT_DIR ${PROJECT_SOURCE_DIR}/../../../Bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR})
 
 #Liblua
 include_directories("../liblua/include")
-include_directories("../liblua/src")
 
 # Preprocessor flags
 if (WIN32)
 	add_definitions(-DWIN32)
 	add_definitions(-D_WIN32)
+	add_definitions(-D__WIN32__)
 endif()
 
-# add_definitions(-D_USE_32BIT_TIME_T)
+add_definitions(-D_USE_32BIT_TIME_T)
 add_definitions(-DNOMINMAX)
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
@@ -39,15 +43,22 @@ endif()
 
 # Project files
 file(GLOB GAMESERVER_HEADERS
-    "${PROJECT_SOURCE_DIR}/src/*.h"
+	"${PROJECT_SOURCE_DIR}/../common/*.h"
+	"${PROJECT_SOURCE_DIR}/src/*.h"
 	"${PROJECT_SOURCE_DIR}/src/*.hpp"
 	"${PROJECT_SOURCE_DIR}/../../../extern/3rd/xxHash/*.h"
 )
 file(GLOB GAMESERVER_SOURCES
-    "${PROJECT_SOURCE_DIR}/src/*.c"
+	"${PROJECT_SOURCE_DIR}/src/*.c"
 	"${PROJECT_SOURCE_DIR}/src/*.cpp"
 	"${PROJECT_SOURCE_DIR}/../../../extern/3rd/xxHash/xxhash.c"
 )
+
+#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+#	set(STDLIB_FLAG "-stdlib=libc++")
+#ELSE() # gcc
+#	set(STDLIB_FLAG "-stdlib=libstdc++")
+#ENDIF()
 
 if (MSVC)
 	link_directories(${PROJECT_SOURCE_DIR}/../liblua/lib)
@@ -96,8 +107,8 @@ if (WIN32)
     add_custom_command(
         TARGET ${EXE_NAME}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${CMAKE_BUILD_TYPE}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../share/bin/${EXE_NAME}.exe"
-        COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${CMAKE_BUILD_TYPE}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../share/bin/${EXE_NAME}.exe
+        COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../share/bin/${EXE_NAME}.exe"
+        COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../share/bin/${EXE_NAME}.exe
         COMMAND ${CMAKE_COMMAND} -E echo "DIR: ${PROJECT_BINARY_DIR}/../../../../win_server/"
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/../../../../win_server/
         COMMAND ${CMAKE_COMMAND} -E echo "SYMLINK-REMOVE: C:/Python27/python.exe ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kaldir ${BUILD_MODE}"

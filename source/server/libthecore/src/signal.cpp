@@ -1,13 +1,7 @@
-/*
- *    Filename: signal.c
- * Description: 시그널 관련 함수.
- *
- *      Author: 비엽 aka. Cronan
- */
 #define __LIBTHECORE__
 #include "stdafx.h"
 
-#ifdef __WIN32__
+#ifdef _WIN32
 void signal_setup() {}
 void signal_timer_disable() {}
 void signal_timer_enable(int timeout_seconds) {}
@@ -25,11 +19,10 @@ RETSIGTYPE checkpointing(int sig)
 {
     if (!tics)
     {
-	sys_err("CHECKPOINT shutdown: tics did not updated.");
-	abort();
+        sys_err("CHECKPOINT shutdown: tics did not updated.");
     }
     else
-	tics = 0;
+		tics = 0;
 }
 
 

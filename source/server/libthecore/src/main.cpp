@@ -1,24 +1,19 @@
-/*
- *    Filename: main.c
- * Description: 라이브러리 초기화/삭제 등
- *
- *      Author: 비엽 aka. Cronan
- */
 #define __LIBTHECORE__
 #include "stdafx.h"
 #include "memory.h"
-
-extern void GOST_Init();
+#include "srandomdev.h"
 
 LPHEART		thecore_heart = NULL;
 
 volatile int	shutdowned = FALSE;
 volatile int	tics = 0;
-unsigned int	thecore_profiler[NUM_PF];
+
+// newstuff
+int	bCheckpointCheck = 1;
 
 static int pid_init(void)
-{   
-#ifdef __WIN32__
+{
+#ifdef _WIN32
 	return true;
 #else
 	FILE*	fp;
@@ -26,7 +21,7 @@ static int pid_init(void)
 	{
 		fprintf(fp, "%d", getpid());
 		fclose(fp);
-		sys_err("\nStart of pid: %d\n", getpid());
+		sys_log(0, "\nStart of pid: %d\n", getpid());
 	}
 	else
 	{
@@ -39,21 +34,21 @@ static int pid_init(void)
 }
 
 static void pid_deinit(void)
-{   
-#ifdef __WIN32__
+{
+#ifdef _WIN32
     return;
 #else
     remove("./pid");
-	sys_err("\nEnd of pid\n");
+	sys_log(0, "\nEnd of pid\n");
 #endif
 }
 
-int thecore_init(int fps, HEARTFUNC heartbeat_func)
+bool thecore_init()
 {
-#ifdef __WIN32__
-    srand(time(0));
+#ifdef _WIN32
+    srand(static_cast<unsigned int>(time(nullptr)));
 #else
-    srandom(time(0) + getpid() + getuid());
+    srandom(time(nullptr) + getpid() + getuid());
     srandomdev();
 #endif
     signal_setup();
@@ -61,8 +56,11 @@ int thecore_init(int fps, HEARTFUNC heartbeat_func)
 	if (!log_init() || !pid_init())
 		return false;
 
-	GOST_Init();
+	return true;
+}
 
+bool thecore_set(int fps, HEARTFUNC heartbeat_func)
+{
 	thecore_heart = heart_new(1000000 / fps, heartbeat_func);
 	return true;
 }
@@ -79,21 +77,14 @@ int thecore_idle(void)
     if (shutdowned)
 		return 0;
 
-	int pulses;
-	DWORD t = get_dword_time();
+	int pulses = heart_idle(thecore_heart);
 
-	if (!(pulses = heart_idle(thecore_heart)))
-	{
-		thecore_profiler[PF_IDLE] += (get_dword_time() - t);
-		return 0;
-	}
-
-    thecore_profiler[PF_IDLE] += (get_dword_time() - t);
     return pulses;
 }
 
 void thecore_destroy(void)
 {
+	delete thecore_heart;
 	pid_deinit();
 	log_destroy();
 }

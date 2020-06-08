@@ -9,14 +9,8 @@ extern "C" {
        This implementation is based on their code in
        <URL:http://www.cl.cam.ac.uk/ftp/users/djw3/xtea.ps> */
 
-    extern int TEA_Encrypt(DWORD *dest, const DWORD *src, const DWORD *key, int size);
-    extern int TEA_Decrypt(DWORD *dest, const DWORD *src, const DWORD *key, int size);
-
-    extern int GOST_Encrypt(DWORD * DstBuffer, const DWORD * SrcBuffer, const DWORD * KeyAddress, DWORD Length, DWORD *IVector);
-    extern int GOST_Decrypt(DWORD * DstBuffer, const DWORD * SrcBuffer, const DWORD * KeyAddress, DWORD Length, DWORD *IVector);
-
-    extern int DES_Encrypt(DWORD *DstBuffer, const DWORD * SrcBuffer, const DWORD *KeyAddress, DWORD Length, DWORD *IVector);
-    extern int DES_Decrypt(DWORD *DstBuffer, const DWORD * SrcBuffer, const DWORD *KeyAddress, DWORD Length, DWORD *IVector);
+    extern int TEA_Encrypt(uint32_t *dest, const uint32_t *src, const uint32_t *key, int size);
+    extern int TEA_Decrypt(uint32_t *dest, const uint32_t *src, const uint32_t *key, int size);
 
 #ifdef __cplusplus
 };
