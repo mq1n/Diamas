@@ -1,0 +1,200 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(Windows) Attach",
+            "type": "cppvsdbg",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        },
+        {
+            "name": "DB Server",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/win_server/db/db.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/win_server/db/",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "Auth Server",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/win_server/auth/game.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/win_server/auth/",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "Game Server",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/win_server/kanal/game.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/win_server/kanal/",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "Client (x86)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/../Diamas_Client/Diamas_Release_x86.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../Diamas_Client/",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "------------------------------------"
+        },
+        {
+            "name": "DB Server/Debug",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/win_server/db/db_d.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/win_server/db/",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "Auth Server/Debug",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/win_server/auth/game_d.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/win_server/auth/",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "Game Server/Debug",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/win_server/kanal/game_d.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/win_server/kanal/",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "Client (x86) / Debug",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/../Diamas_Client/Diamas_Debug_x86.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../Diamas_Client/",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "------------------------------------"
+        },
+        {
+            "name": "FSTest",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Bin/Utilities/FSTest.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/Bin/Utilities/",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "FS Property test",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Bin/Utilities/FSTest.exe",
+            "args": ["property_test"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/Bin/Utilities/",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "FS Archiver",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/../Diamas_Client/CRYPTION/Archiver.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../Diamas_Client/CRYPTION/",
+            "environment": [],
+            "externalConsole": true
+        },
+        // --------------------------------------------------------------------
+        {
+            "name": "FS Archiver / Root only",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/../Diamas_Client/CRYPTION/Archiver.exe",
+            "args": ["root"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../Diamas_Client/CRYPTION/",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "FS Archiver / Locale only",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/../Diamas_Client/CRYPTION/Archiver.exe",
+            "args": ["locale"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../Diamas_Client/CRYPTION/",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "FS Property generator",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/../Diamas_Client/CRYPTION/PropertyGenerator.exe",
+            "args": ["..\\Diamas_Client\\CRYPTION\\property", "..\\Diamas_Client\\CRYPTION\\root\\PropertyList.json"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../Diamas_Client/",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "------------------------------------"
+        },
+        {
+            "name": "NetEngine server test",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Bin/Utilities/NetEngineTest.exe",
+            "args": ["server"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/Bin/Utilities/",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "NetEngine client test",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Bin/Utilities/NetEngineTest.exe",
+            "args": ["client"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/Bin/Utilities/",
+            "environment": [],
+            "externalConsole": true
+        } 
+    ]
+}

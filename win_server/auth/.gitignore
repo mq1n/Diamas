@@ -1,0 +1,15 @@
+data/
+locale/
+log/
+mark/
+package/
+DEV_LOG.log
+syserr.txt
+neterr.txt
+syslog.txt
+packet_info.txt
+p2p_packet_info.txt
+PTS.txt
+game_d.exe
+game.exe
+GAME_VERSION.txt

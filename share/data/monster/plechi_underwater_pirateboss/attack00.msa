@@ -1,0 +1,60 @@
+ScriptType               MotionData
+
+MotionFileName           "D:\ymir work\monster\plechi_underwater_pirateboss\attack00.GR2"
+MotionDuration           2.466667
+
+Group AttackingData
+{
+    AttackType           0
+    HittingType          2
+    StiffenTime          0.000000
+    InvisibleTime        0.300000
+    ExternalForce        0.000000
+    HitLimitCount        2
+    
+    MotionType           2
+    HitDataCount         1
+    Group HitData00
+    {
+        AttackingStartTime   0.900000
+        AttackingEndTime     1.450000
+        AttackingBone        "Bip01"
+        WeaponLength         80.000000
+        List HitPosition
+        {
+            0.950000 0.000000 -350.000000 120.000000 0.000000 -0.000000 50.000000
+            0.951000 0.000000 -450.000000 120.000000 0.000000 -0.000000 50.000000
+            1.351000 0.000000 -450.000000 120.000000 0.000000 -0.000000 50.000000
+            1.350000 0.000000 -350.000000 120.000000 0.000000 -0.000000 50.000000
+		}
+   }
+}
+
+Group MotionEventData
+{
+    MotionEventDataCount     2
+    Group Event00
+    {
+        MotionEventType      1
+        StartingTime         0.950000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Root"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/monster/underwater_pirateboss_attack00a.mse"
+        EffectPosition       0.000000 -350.000000 100.000000
+    }
+    Group Event01
+    {
+        MotionEventType      1
+        StartingTime         1.350000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Root"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/monster/underwater_pirateboss_attack00a.mse"
+        EffectPosition       0.000000 -350.000000 100.000000
+    }
+}

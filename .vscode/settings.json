@@ -1,0 +1,8 @@
+{
+	"C_Cpp.configurationWarnings": "Disabled",
+	"workbench.colorCustomizations": {
+		"activityBar.background": "#113505",
+		"titleBar.activeBackground": "#184A08",
+		"titleBar.activeForeground": "#F3FEEF"
+	}
+}

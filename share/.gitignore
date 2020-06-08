@@ -1,0 +1,13 @@
+/locale/turkey/quest/object/*
+/locale/turkey/quest/*.pyc
+bin/auth_server
+bin/db_cache
+bin/db
+bin/qc
+bin/game_server
+locale/turkey/quest/pre_qc/*
+locale/turkey/quest/qc.core
+locale/turkey/quest/qc.exe
+locale/turkey/gaya/*
+conf/*.exe
+conf/*_proto

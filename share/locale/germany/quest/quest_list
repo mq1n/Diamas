@@ -1,0 +1,14 @@
+### To compile all the quests written in here, you just have to do:
+## ./pre_qc.py -ac
+### OR
+## python2.7 pre_qc.py -ac
+
+
+## READ
+game_option.quest
+ride.quest
+pet_system.quest
+
+## SKIPPED - if commented with "#", it will be skipped just like these ones:
+# sample__guild_make.quest
+# sample__mob_drop_item.quest

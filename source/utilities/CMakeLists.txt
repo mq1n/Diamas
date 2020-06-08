@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.2)
+project(utilities)
+
+add_subdirectory(${PROJECT_SOURCE_DIR}/NetEngine)
+if(WIN32)
+	if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+		add_subdirectory(${PROJECT_SOURCE_DIR}/discord-sdk)
+		add_subdirectory(${PROJECT_SOURCE_DIR}/discord-app-test)
+		add_subdirectory(${PROJECT_SOURCE_DIR}/FileSystem)
+	endif()
+endif()

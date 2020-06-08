@@ -1,0 +1,178 @@
+ScriptType               MotionData
+
+MotionFileName           "D:\ymir work\monster\plechi_underwater_pirateboss\skill01.GR2"
+MotionDuration           6.566667
+
+Group MotionEventData
+{
+    MotionEventDataCount     11
+    Group Event00
+    {
+        MotionEventType      1
+        StartingTime         2.371677
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Root"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/monster/underwater_pirateboss_skill01a.mse"
+        EffectPosition       0.000000 -350.000000 0.000000
+    }
+    Group Event01
+    {
+        MotionEventType      1
+        StartingTime         2.855533
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Root"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/monster/underwater_pirateboss_skill01a.mse"
+        EffectPosition       0.000000 -400.000000 0.000000
+    }
+    Group Event02
+    {
+        MotionEventType      1
+        StartingTime         3.364370
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Root"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/monster/underwater_pirateboss_skill01a.mse"
+        EffectPosition       0.000000 -500.000000 0.000000
+    }
+    Group Event03
+    {
+        MotionEventType      1
+        StartingTime         3.824843
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Root"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/monster/underwater_pirateboss_skill01a.mse"
+        EffectPosition       0.000000 -500.000000 0.000000
+    }
+    Group Event04
+    {
+        MotionEventType      1
+        StartingTime         4.510300
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Root"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/monster/underwater_pirateboss_skill01a.mse"
+        EffectPosition       0.000000 -500.000000 0.000000
+    }
+    Group Event05
+    {
+        MotionEventType      1
+        StartingTime         0.110300
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "WeaponR"
+        FollowingEnable      1
+        EffectFileName       "d:/ymir work/effect/plechito/monster/underwater_pirateboss_skill01b.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event06
+    {
+        MotionEventType      2
+        StartingTime         2.371677
+        
+        DuringTime           3.100000
+        Power                700
+        AffectingRange       500
+    }
+    Group Event07
+    {
+        MotionEventType      4
+        StartingTime         2.371677
+        DuringTime           1.100000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         0.000000 -300.000000 0.000000
+        }
+    }
+    Group Event08
+    {
+        MotionEventType      4
+        StartingTime         2.855533
+        DuringTime           1.100000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         0.000000 -300.000000 0.000000
+        }
+    }
+    Group Event09
+    {
+        MotionEventType      4
+        StartingTime         3.364370
+        DuringTime           1.100000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         0.000000 -300.000000 0.000000
+        }
+    }
+    Group Event10
+    {
+        MotionEventType      4
+        StartingTime         4.510300
+        DuringTime           1.100000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           600.000000
+            Position         0.000000 -300.000000 0.000000
+        }
+    }
+}

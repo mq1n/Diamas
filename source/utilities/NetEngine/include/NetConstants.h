@@ -1,0 +1,40 @@
+#pragma once
+#include <cstdint>
+#include <unordered_map>
+#include <list>
+#include <array>
+#include <memory>
+
+#define NET_CREATEMAGIC(b0, b1, b2, b3) \
+	(uint32_t(uint8_t(b0)) | (uint32_t(uint8_t(b1)) << 8) | \
+	(uint32_t(uint8_t(b2)) << 16) | (uint32_t(uint8_t(b3)) << 24))
+
+namespace net_engine
+{
+	static constexpr auto PACKET_CRYPT_KEY_LENGTH	= 64;
+	static constexpr auto PACKET_MAGIC 				= NET_CREATEMAGIC('S', 'N', 'E', 'T');
+	static constexpr auto PACKET_VERSION			= 1;
+
+	static const auto DEFAULT_CRYPT_KEY = std::array <uint8_t, PACKET_CRYPT_KEY_LENGTH> // TODO: XOR
+	{
+		// Key: 0 - 32
+		0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+		0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2,
+
+		// IV: 32 - 64
+		0x0, 0x0, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+		0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4
+	};
+
+	enum EPacketFlags
+	{
+		PACKET_FLAG_RAW  	= 1 << 0,
+		PACKET_FLAG_LZ4  	= 1 << 1,
+		PACKET_FLAG_LZO  	= 1 << 2,
+		PACKET_FLAG_ZLIB	= 1 << 3,
+		PACKET_FLAG_AES256	= 1 << 4,
+		PACKET_FLAG_TWOFISH	= 1 << 5,
+		PACKET_FLAG_RC5 	= 1 << 6,
+		PACKET_FLAG_MAX		= PACKET_FLAG_RC5 | PACKET_FLAG_ZLIB
+	};
+}

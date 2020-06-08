@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.8)
+project(DiscordAppTest)
+
+set(OUTPUT_DIR ${PROJECT_SOURCE_DIR}/../../../Bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR})
+
+include_directories(${PROJECT_SOURCE_DIR}/../discord-sdk/src)
+link_directories(${PROJECT_SOURCE_DIR}/../../../Bin)
+
+add_subdirectory(api-test/client)
+add_subdirectory(api-test/server)

@@ -1,0 +1,100 @@
+ScriptType               MotionData
+
+MotionFileName           "D:\ymir work\monster\plechi_v2019_treeboss\skill01.GR2"
+MotionDuration           3.900000
+
+Group MotionEventData
+{
+    MotionEventDataCount     7
+    Group Event00
+    {
+        MotionEventType      1
+        StartingTime         0.390000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Root"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/monster/v2019_treeboss_skill01a.mse"
+        EffectPosition       100.000000 -200.000000 20.000000
+    }
+    Group Event01
+    {
+        MotionEventType      1
+        StartingTime         1.150000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Root"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/monster/v2019_treeboss_skill01b.mse"
+        EffectPosition       0.000000 -400.000000 0.000000
+    }
+    Group Event02
+    {
+        MotionEventType      1
+        StartingTime         1.150000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Root"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/monster/v2019_treeboss_skill01b.mse"
+        EffectPosition       300.000000 -100.000000 0.000000
+    }
+    Group Event03
+    {
+        MotionEventType      1
+        StartingTime         1.150000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Root"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/monster/v2019_treeboss_skill01b.mse"
+        EffectPosition       -300.000000 -100.000000 0.000000
+    }
+    Group Event04
+    {
+        MotionEventType      1
+        StartingTime         1.150000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Root"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/plechito/monster/v2019_treeboss_skill01c.mse"
+        EffectPosition       0.000000 0.000000 200.000000
+    }
+    Group Event05
+    {
+        MotionEventType      2
+        StartingTime         1.150000
+        
+        DuringTime           1.000000
+        Power                900
+        AffectingRange       900
+    }
+    Group Event06
+    {
+        MotionEventType      4
+        StartingTime         1.150000
+        DuringTime           1.000000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           900.000000
+            Position         0.000000 0.000000 0.000000
+        }
+    }
+}

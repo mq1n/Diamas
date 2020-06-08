@@ -1,0 +1,20 @@
+﻿kurulcaklar:
+pkg -vv
+pkg install git
+pkg install gcc9-devel-9
+pkg install cmake-3.13
+pkg install gmake
+pkg install mysql55-server-5.5
+
+git configleri:
+git config --global http.sslVerify false
+git config --global credential.helper "cache --timeout=3600"
+
+projeyi indirme:
+git clone https://github.com/mq1n/Diamas
+git submodule update --init --recursive
+git submodule update --recursive --remote
+
+build etme:
+build.sh ve rebuild.sh için 777 izni
+./build.sh <build_modu> (Debug/Release/MinSizeRel/RelWithDebInfo)
