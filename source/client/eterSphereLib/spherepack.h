@@ -211,7 +211,7 @@ public:
 	
 	float DistanceSquared(const SpherePack *pack) const { return mCenter.DistanceSq( pack->mCenter );  };
 	
-	inline void LostChild(SpherePack *pack);
+	void LostChild(SpherePack *pack);
 	
 	const Vector3d& GetPos(void) const { return mCenter; };
 	

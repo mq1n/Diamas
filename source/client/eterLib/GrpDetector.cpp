@@ -618,7 +618,7 @@ BOOL D3D_CDisplayModeAutoDetector::Build(IDirect3D8& rkD3D, PFNCONFIRMDEVICE pfn
 	m_uD3DAdapterInfoCount=0;
 
 	UINT uTotalAdapterCount=rkD3D.GetAdapterCount();	
-	uTotalAdapterCount=min(uTotalAdapterCount, D3DADAPTERINFO_NUM);
+	uTotalAdapterCount=std::min<UINT>(uTotalAdapterCount, D3DADAPTERINFO_NUM);
 
 	for (UINT iD3DAdapterInfo=0; iD3DAdapterInfo<uTotalAdapterCount; ++iD3DAdapterInfo)
 	{

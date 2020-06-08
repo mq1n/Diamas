@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../EterLib/GrpScreen.h"
+#include "../eterLib/GrpScreen.h"
 
 class CSnowParticle;
 

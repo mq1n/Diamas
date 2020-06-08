@@ -7,8 +7,6 @@ static DWORD gs_dwServerTime=0;
 static DWORD gs_dwClientTime=0;
 static DWORD gs_dwFrameTime=0;
 
-#pragma comment(lib, "winmm.lib")
-
 BOOL ELTimer_Init()
 {	
 	/*

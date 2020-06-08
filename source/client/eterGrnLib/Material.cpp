@@ -222,12 +222,12 @@ bool CGrannyMaterial::CreateFromGrannyMaterialPointer(granny_material * pgrnMate
 {
 	m_pgrnMaterial = pgrnMaterial;
 
-	granny_texture * pgrnDiffuseTexture = NULL;
-	granny_texture * pgrnOpacityTexture = NULL;
+	granny_texture* pgrnDiffuseTexture = nullptr;
+	granny_texture* pgrnOpacityTexture = nullptr;
 
 	if (pgrnMaterial)
 	{
-		if (pgrnMaterial->MapCount > 1 && !strnicmp(pgrnMaterial->Name, "Blend", 5))
+		if (pgrnMaterial->MapCount > 1 && !_strnicmp(pgrnMaterial->Name, "Blend", 5))
 		{
 			pgrnDiffuseTexture = GrannyGetMaterialTextureByType(pgrnMaterial->Maps[0].Material, GrannyDiffuseColorTexture);
 			pgrnOpacityTexture = GrannyGetMaterialTextureByType(pgrnMaterial->Maps[1].Material, GrannyDiffuseColorTexture);
@@ -247,10 +247,12 @@ bool CGrannyMaterial::CreateFromGrannyMaterialPointer(granny_material * pgrnMate
 				{GrannyEndMember},
 			};
 
-			granny_variant twoSideResult = GrannyFindMatchingMember(pgrnMaterial->ExtendedData.Type, pgrnMaterial->ExtendedData.Object, "Two-sided");
+			granny_variant twoSideResult;
 
-			if (NULL != twoSideResult.Type)
-				GrannyConvertSingleObject(twoSideResult.Type, twoSideResult.Object, TwoSidedFieldType, &twoSided);
+
+			if (GrannyFindMatchingMember(pgrnMaterial->ExtendedData.Type, pgrnMaterial->ExtendedData.Object, "Two-sided", &twoSideResult)
+				&& nullptr != twoSideResult.Type)
+				GrannyConvertSingleObject(twoSideResult.Type, twoSideResult.Object, TwoSidedFieldType, &twoSided, nullptr);
 
 			m_bTwoSideRender = 1 == twoSided;
 		}

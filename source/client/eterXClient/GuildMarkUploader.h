@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../EterLib/NetStream.h"
+#include "../eterLib/NetStream.h"
 #include "MarkImage.h"
 
 #ifdef __VTUNE__

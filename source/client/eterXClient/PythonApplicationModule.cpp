@@ -1,7 +1,8 @@
 #include "StdAfx.h"
 #include "Resource.h"
 #include "PythonApplication.h"
-#include "../EterLib/Camera.h"
+#include "../eterLib/Camera.h"
+#include <FileSystemIncl.hpp>
 
 extern bool PERF_CHECKER_RENDER_GAME;
 extern D3DXCOLOR g_fSpecularColor;
@@ -360,15 +361,13 @@ PyObject* appGetImageInfo(PyObject* poSelf, PyObject* poArgs)
 }
 #endif
 
-#include "../EterPack/EterPackManager.h"
-
 PyObject* appIsExistFile(PyObject* poSelf, PyObject* poArgs)
 {
 	char* szFileName;
 	if (!PyTuple_GetString(poArgs, 0, &szFileName))
 		return Py_BuildException();
 
-	bool isExist=CEterPackManager::Instance().isExist(szFileName);
+	bool isExist = FileSystemManager::Instance().DoesFileExist(szFileName);
 
 	return Py_BuildValue("i", isExist);
 }
@@ -707,8 +706,7 @@ PyObject * appRunPythonFile(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szFileName))
 		return Py_BuildException();
 
-	bool ret = CPythonLauncher::Instance().RunFile(szFileName);
-	return Py_BuildValue("i", ret);
+	return Py_BuildValue("i", 0);
 }
 
 PyObject * appIsPressed(PyObject * poSelf, PyObject * poArgs)
@@ -1042,12 +1040,11 @@ class CTextLineLoader
 	public:
 		CTextLineLoader(const char * c_szFileName)
 		{
-			const VOID* pvData;
-			CMappedFile kFile;
-			if (!CEterPackManager::Instance().Get(kFile, c_szFileName, &pvData))
+			CFile kFile;
+			if (!FileSystemManager::Instance().OpenFile(c_szFileName, kFile))
 				return;
 
-			m_kTextFileLoader.Bind(kFile.Size(), pvData);
+			m_kTextFileLoader.Bind(kFile.GetSize(), kFile.GetData());
 		}
 
 		DWORD GetLineCount()

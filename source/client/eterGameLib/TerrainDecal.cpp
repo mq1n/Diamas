@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "../eterLib/StateManager.h"
-#include "../PRTerrainLib/StdAfx.h"
+#include "../eterTerrainLib/StdAfx.h"
 
 #include "TerrainDecal.h"
 #include "MapOutdoor.h"

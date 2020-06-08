@@ -3,7 +3,7 @@
 
 #include "Image.h"
 
-class CTGAImage : public CImage
+class CTGAImage : public CImageC
 {
 	public:
 		enum ETGAImageFlags
@@ -12,12 +12,12 @@ class CTGAImage : public CImage
 		};
 			
 		CTGAImage();
-		CTGAImage(CImage &image);
+		CTGAImage(CImageC &image);
 		virtual ~CTGAImage();
 
-		virtual void	Create(int width, int height);
-		virtual bool	LoadFromMemory(int iSize, const BYTE * c_pbMem);
-		virtual bool	LoadFromDiskFile(const char * c_szFileName);
+		virtual void	Create(int32_t width, int32_t height);
+		virtual bool	LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem);
+		virtual bool	LoadFromDiskFile(const std::string& stFileName);
 		virtual bool	SaveToDiskFile(const char* c_szFileName);
 
 		void			SetCompressed(bool isCompress = true);
@@ -25,8 +25,8 @@ class CTGAImage : public CImage
 
 		TGA_HEADER &	GetHeader();
 	protected:
-		int			GetRawPixelCount(const DWORD * data);
-		int			GetRLEPixelCount(const DWORD * data);
+		int32_t			GetRawPixelCount(const DWORD * data);
+		int32_t			GetRLEPixelCount(const DWORD * data);
 
 	protected:
 		TGA_HEADER	m_Header;

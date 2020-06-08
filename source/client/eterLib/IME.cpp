@@ -1931,7 +1931,7 @@ void CTsfUiLessMode::MakeCandidateStrings(ITfCandidateListUIElement* pcandidate)
 		}
 	}
 
-	CIME::ms_dwCandidatePageSize = min(dwPageSize, CIME::MAX_CANDLIST);
+	CIME::ms_dwCandidatePageSize = std::min<DWORD>(dwPageSize, CIME::MAX_CANDLIST);
 	CIME::ms_dwCandidateSelection = CIME::ms_dwCandidateSelection - dwPageStart;
 
 	memset(&CIME::ms_wszCandidate, 0, sizeof(CIME::ms_wszCandidate));

@@ -3,7 +3,7 @@
 #include "AreaTerrain.h"
 #include "AreaLoaderThread.h"
 #include "../eterLib/ResourceManager.h"
-#include "../EterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 
 //CAreaLoaderThread CMapOutdoor::ms_AreaLoaderThread;
 
@@ -11,16 +11,7 @@ bool CMapOutdoor::Load(float x, float y, float z)
 {
 	Destroy();
 
-	CEterPackManager& rkPackMgr=CEterPackManager::Instance();
-	{
-		static std::string s_strOldPathName="";
-
-		// 2004.08.09.myevan.Pack파일을 찾을때.. 폴더명만으로는 그냥 리턴되는 부분이 있다
-		std::string c_rstrNewPathName=GetName()+"\\cache";
-		
-		s_strOldPathName=c_rstrNewPathName;
-	}
-
+	std::string s_strOldPathName(GetName() + "\\cache");
 	std::string strFileName = GetMapDataDirectory() + "\\Setting.txt";
 
 	if (!LoadSetting(strFileName.c_str()))
@@ -45,7 +36,7 @@ bool CMapOutdoor::Load(float x, float y, float z)
 
 	// LOCAL_ENVIRONMENT_DATA
 	std::string local_envDataName = GetMapDataDirectory() + "\\" + m_settings_envDataName;
-	if (rkPackMgr.isExist(local_envDataName.c_str()))
+	if (FileSystemManager::Instance().DoesFileExist(local_envDataName.c_str()))
 	{
 		m_envDataName = local_envDataName;
 	}
@@ -452,10 +443,8 @@ bool CMapOutdoor::LoadMonsterAreaInfo()
 	char c_szFileName[256];
 	sprintf(c_szFileName, "%s\\regen.txt", GetMapDataDirectory().c_str());
 	
-	LPCVOID pModelData;
-	CMappedFile File;
-	
-	if (!CEterPackManager::Instance().Get(File, c_szFileName, &pModelData))
+	CFile File;
+	if (!FileSystemManager::Instance().OpenFile(c_szFileName, File))
 	{
 		//TraceError(" CMapOutdoorAccessor::LoadMonsterAreaInfo Load File %s ERROR", c_szFileName);
 		return false;
@@ -464,7 +453,7 @@ bool CMapOutdoor::LoadMonsterAreaInfo()
 	CMemoryTextFileLoader textFileLoader;
 	CTokenVector stTokenVector;
 	
-	textFileLoader.Bind(File.Size(), pModelData);
+	textFileLoader.Bind(File.GetSize(), File.GetData());
 	
 	for (DWORD i = 0; i < textFileLoader.GetLineCount(); ++i)
 	{

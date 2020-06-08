@@ -4,10 +4,10 @@
 #include "../eterLib/LensFlare.h"
 #include "../eterLib/ScreenFilter.h"
 
-#include "../PRTerrainLib/TerrainType.h"
-#include "../PRTerrainLib/TextureSet.h"
+#include "../eterTerrainLib/TerrainType.h"
+#include "../eterTerrainLib/TextureSet.h"
 
-#include "../SpeedTreeLib/SpeedTreeForestDirectX8.h"
+#include "../eterTreeLib/SpeedTreeForestDirectX8.h"
 
 #include "MapBase.h"
 #include "Area.h"

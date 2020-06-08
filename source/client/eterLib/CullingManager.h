@@ -3,7 +3,7 @@
 #include "GrpScreen.h"
 
 #include "../eterbase/Singleton.h"
-#include "../SphereLib/spherepack.h"
+#include "../eterSphereLib/spherepack.h"
 
 class CGraphicObjectInstance;
 template <class T>

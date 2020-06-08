@@ -124,7 +124,6 @@ void __RPC_USER MIDL_user_free( void * );
 // PARTICULAR PURPOSE.
 //=--------------------------------------------------------------------------=
 
-#pragma comment(lib,"uuid.lib")
 
 //--------------------------------------------------------------------------
 // IActiveIMM Interfaces.

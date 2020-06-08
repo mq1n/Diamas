@@ -6,7 +6,7 @@
 
 #include "AbstractPlayer.h"
 
-#include "../eterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 
 void CPythonNetworkStream::EnableChatInsultFilter(bool isEnable)
 {
@@ -33,13 +33,12 @@ bool CPythonNetworkStream::IsInsultIn(const char* c_szMsg)
 
 bool CPythonNetworkStream::LoadInsultList(const char* c_szInsultListFileName)
 {
-	CMappedFile file;
-	const VOID* pvData;
-	if (!CEterPackManager::Instance().Get(file, c_szInsultListFileName, &pvData))
+	CFile file;
+	if (!FileSystemManager::Instance().OpenFile(c_szInsultListFileName, file))
 		return false;
 
 	CMemoryTextFileLoader kMemTextFileLoader;
-	kMemTextFileLoader.Bind(file.Size(), pvData);
+	kMemTextFileLoader.Bind(file.GetSize(), file.GetData());
 
 	m_kInsultChecker.Clear();
 	for (DWORD dwLineIndex=0; dwLineIndex<kMemTextFileLoader.GetLineCount(); ++dwLineIndex)
@@ -55,9 +54,8 @@ bool CPythonNetworkStream::LoadConvertTable(DWORD dwEmpireID, const char* c_szFi
 	if (dwEmpireID<1 || dwEmpireID>=4)
 		return false;
 
-	CMappedFile file;
-	const VOID* pvData;
-	if (!CEterPackManager::Instance().Get(file, c_szFileName, &pvData))
+	CFile file;
+	if (!FileSystemManager::Instance().OpenFile(c_szFileName, file))
 		return false;
 
 	DWORD dwEngCount=26;
@@ -65,10 +63,10 @@ bool CPythonNetworkStream::LoadConvertTable(DWORD dwEmpireID, const char* c_szFi
 	DWORD dwHanSize=dwHanCount*2;
 	DWORD dwFileSize=dwEngCount*2+dwHanSize;
 
-	if (file.Size()<dwFileSize)
+	if (file.GetSize() < dwFileSize)
 		return false;
 
-	char* pcData=(char*)pvData;
+	char* pcData = (char*)file.GetData();
 
 	STextConvertTable& rkTextConvTable=m_aTextConvTable[dwEmpireID-1];		
 	memcpy(rkTextConvTable.acUpper, pcData, dwEngCount);pcData+=dwEngCount;
@@ -143,16 +141,6 @@ void CPythonNetworkStream::LoadingPhase()
 
 		case HEADER_GC_QUICKSLOT_ADD:
 			if (RecvQuickSlotAddPacket())
-				return;
-			break;
-
-		case HEADER_GC_HYBRIDCRYPT_KEYS:
-			RecvHybridCryptKeyPacket();
-			return;
-			break;
-
-		case HEADER_GC_HYBRIDCRYPT_SDB:
-			RecvHybridCryptSDBPacket();
 			return;
 			break;
 

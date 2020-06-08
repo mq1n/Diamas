@@ -4,7 +4,7 @@
 class CProperty;
 
 #include "../eterLib/SkyBox.h"
-#include "../mileslib/SoundManager.h"
+#include "../eterSoundLib/SoundManager.h"
 
 /////////////////////////////////////////////////////////////////
 // Property

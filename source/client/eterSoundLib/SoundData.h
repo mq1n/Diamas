@@ -2,7 +2,7 @@
 #define __MILESLIB_CSOUNDDATA_H__
 
 #include <mss.h>
-#include "../eterBase/MappedFile.h"
+#include <FileSystemIncl.hpp>
 
 class CSoundData
 {
@@ -53,7 +53,7 @@ class CSoundData
 		static int					GetEmptySlotIndex();
 
 		static bool					ms_isSoundFile[SOUND_FILE_MAX_NUM];
-		static CMappedFile			ms_SoundFile[SOUND_FILE_MAX_NUM];
+		static CFile				ms_SoundFile[SOUND_FILE_MAX_NUM];
 };
 
 #endif

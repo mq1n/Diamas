@@ -2,20 +2,34 @@
 #include "AccountConnector.h"
 #include "Packet.h"
 #include "PythonNetworkStream.h"
-#include "../EterBase/tea.h"
-#include "../EterPack/EterPackManager.h"
+#include "../eterBase/tea.h"
 
 #include "Hackshield.h"
 #include "WiseLogicXTrap.h"
 
 // CHINA_CRYPT_KEY
-extern DWORD g_adwEncryptKey[4];
-extern DWORD g_adwDecryptKey[4];
+DWORD g_adwEncryptKey[4];
+DWORD g_adwDecryptKey[4];
 // END_OF_CHINA_CRYPT_KEY
 
 #ifdef USE_OPENID
 extern int openid_test;
 #endif
+
+inline const BYTE* GetKey_20050304Myevan()
+{
+	volatile static DWORD s_adwKey[1938];
+
+	volatile DWORD seed = 1491971513;
+	for (UINT i = 0; i < BYTE(seed); i++)
+	{
+		seed ^= 2148941891;
+		seed += 3592385981;
+		s_adwKey[i] = seed;
+	}
+
+	return (const BYTE*)s_adwKey;
+}
 
 void CAccountConnector::SetHandler(PyObject* poHandler)
 {
@@ -32,6 +46,18 @@ void CAccountConnector::SetLoginInfo(const char * c_szName, const char * c_szPwd
 void CAccountConnector::ClearLoginInfo( void )
 {
 	m_strPassword = "";
+}
+
+void CAccountConnector::__BuildClientKey_20050304Myevan()
+{
+	const BYTE* c_pszKey = GetKey_20050304Myevan();
+	memcpy(g_adwEncryptKey, c_pszKey + 157, 16);
+
+	for (DWORD i = 0; i < 4; ++i)
+		g_adwEncryptKey[i] = random();
+
+	tea_encrypt((DWORD*)g_adwDecryptKey, (const DWORD*)g_adwEncryptKey, (const DWORD*)(c_pszKey + 37), 16);
+	//	TEA_Encrypt((DWORD *) g_adwDecryptKey, (const DWORD *) g_adwEncryptKey, (const DWORD *) (c_pszKey+37), 16);
 }
 
 bool CAccountConnector::Connect(const char * c_szAddr, int iPort, const char * c_szAccountAddr, int iAccountPort)
@@ -148,13 +174,6 @@ bool CAccountConnector::__HandshakeState_Process()
 	if (!__AnalyzePacket(HEADER_GC_PING, sizeof(TPacketGCPing), &CAccountConnector::__AuthState_RecvPing))
 		return false;
 
-	//  TODO :  차후 서버와 동일하게 가변길이 data serialize & deserialize  작업해야 한다.
-	if (!__AnalyzeVarSizePacket(HEADER_GC_HYBRIDCRYPT_KEYS, &CAccountConnector::__AuthState_RecvHybridCryptKeys))
-		return false;
-
-	if (!__AnalyzeVarSizePacket(HEADER_GC_HYBRIDCRYPT_SDB, &CAccountConnector::__AuthState_RecvHybridCryptSDB))
-		return false;
-
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT, sizeof(TPacketKeyAgreement), &CAccountConnector::__AuthState_RecvKeyAgreement))
 		return false;
@@ -200,9 +219,6 @@ bool CAccountConnector::__AuthState_Process()
 	if (!__AnalyzePacket(HEADER_GC_HANDSHAKE, sizeof(TPacketGCHandshake), &CAccountConnector::__AuthState_RecvHandshake))
 		return false;
 
-	if (!__AnalyzePacket(HEADER_GC_PANAMA_PACK, sizeof(TPacketGCPanamaPack), &CAccountConnector::__AuthState_RecvPanamaPack))
-		return false;
-
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT, sizeof(TPacketKeyAgreement), &CAccountConnector::__AuthState_RecvKeyAgreement))
 		return false;
@@ -210,13 +226,6 @@ bool CAccountConnector::__AuthState_Process()
 	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT_COMPLETED, sizeof(TPacketKeyAgreementCompleted), &CAccountConnector::__AuthState_RecvKeyAgreementCompleted))
 		return false;
 #endif
-
-	//  TODO :  차후 서버와 동일하게 가변길이 data serialize & deserialize  작업해야 한다.
-	if (!__AnalyzeVarSizePacket(HEADER_GC_HYBRIDCRYPT_KEYS, &CAccountConnector::__AuthState_RecvHybridCryptKeys))
-		return false;
-
-	if (!__AnalyzeVarSizePacket(HEADER_GC_HYBRIDCRYPT_SDB, &CAccountConnector::__AuthState_RecvHybridCryptSDB))
-		return false;
 
 	return true;
 }
@@ -380,50 +389,6 @@ bool CAccountConnector::__AuthState_RecvHandshake()
 	return true;
 }
 
-bool CAccountConnector::__AuthState_RecvPanamaPack()
-{
-	TPacketGCPanamaPack kPacket;
-
-	if (!Recv(sizeof(TPacketGCPanamaPack), &kPacket))
-		return false;
-
-	CEterPackManager::instance().RegisterPack(kPacket.szPackName, "*", kPacket.abIV);
-	return true;
-}
-
-bool CAccountConnector::__AuthState_RecvHybridCryptKeys(int iTotalSize)
-{
-	int iFixedHeaderSize = TPacketGCHybridCryptKeys::GetFixedHeaderSize();
-	
-	TPacketGCHybridCryptKeys kPacket(iTotalSize-iFixedHeaderSize);
-
-	if (!Recv(iFixedHeaderSize, &kPacket))
-		return false;
-
-	if (!Recv(kPacket.iKeyStreamLen, kPacket.m_pStream))
-		return false;
-
-	CEterPackManager::Instance().RetrieveHybridCryptPackKeys( kPacket.m_pStream ); 
-	return true;
-}
-
-bool CAccountConnector::__AuthState_RecvHybridCryptSDB(int iTotalSize)
-{
-	int iFixedHeaderSize = TPacketGCHybridSDB::GetFixedHeaderSize();
-
-	TPacketGCHybridSDB kPacket(iTotalSize-iFixedHeaderSize);
-
-	if (!Recv(iFixedHeaderSize, &kPacket))
-		return false;
-
-	if (!Recv(kPacket.iSDBStreamLen, kPacket.m_pStream))
-		return false;
-
-	CEterPackManager::Instance().RetrieveHybridCryptPackSDB( kPacket.m_pStream ); 
-	return true;
-}
-
-
 bool CAccountConnector::__AuthState_RecvPing()
 {
 	TPacketGCPing kPacketPing;
@@ -461,9 +426,6 @@ bool CAccountConnector::__AuthState_RecvAuthSuccess()
 	}
 	else
 	{
-		DWORD dwPanamaKey = kAuthSuccessPacket.dwLoginKey ^ g_adwEncryptKey[0] ^ g_adwEncryptKey[1] ^ g_adwEncryptKey[2] ^ g_adwEncryptKey[3];
-		CEterPackManager::instance().DecryptPackIV(dwPanamaKey);
-
 		CPythonNetworkStream & rkNet = CPythonNetworkStream::Instance();
 		rkNet.SetLoginKey(kAuthSuccessPacket.dwLoginKey);
 		rkNet.Connect(m_strAddr.c_str(), m_iPort);
@@ -489,9 +451,6 @@ bool CAccountConnector::__AuthState_RecvAuthSuccess_OpenID()
 	}
 	else
 	{
-		DWORD dwPanamaKey = kAuthSuccessOpenIDPacket.dwLoginKey ^ g_adwEncryptKey[0] ^ g_adwEncryptKey[1] ^ g_adwEncryptKey[2] ^ g_adwEncryptKey[3];
-		CEterPackManager::instance().DecryptPackIV(dwPanamaKey);
-
 		CPythonNetworkStream & rkNet = CPythonNetworkStream::Instance();
 		rkNet.SetLoginInfo(kAuthSuccessOpenIDPacket.login, "0000");		//OpenID 인증 과정에서 비밀번호는 사용되지 않는다.
 		rkNet.SetLoginKey(kAuthSuccessOpenIDPacket.dwLoginKey);

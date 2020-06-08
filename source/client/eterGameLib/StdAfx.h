@@ -23,8 +23,8 @@
 #include "../eterBase/Random.h"
 
 #include "../eterLib/StdAfx.h"
-#include "../milesLib/StdAfx.h"
-#include "../effectLib/StdAfx.h"
+#include "../eterSoundLib/StdAfx.h"
+#include "../eterEffectLib/StdAfx.h"
 
 #include "GameType.h"
 #include "GameUtil.h"

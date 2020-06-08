@@ -4,7 +4,7 @@
 #include <deque>
 #include "Thread.h"
 #include "Mutex.h"
-#include "../eterBase/MappedFile.h"
+#include <FileSystemIncl.hpp>
 
 class CFileLoaderThread 
 {
@@ -13,7 +13,7 @@ class CFileLoaderThread
 		{
 			std::string	stFileName;
 
-			CMappedFile	File;
+			CFile	File;
 			LPVOID		pvBuf;
 			DWORD		dwSize;
 		} TData;

@@ -7,8 +7,7 @@
 
 #include <vector>
 #include "../eterBase/Filename.h"
-#include "../eterBase/MappedFile.h"
-#include "../eterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 
 #include "SpeedTreeForest.h"
 #include "SpeedTreeConfig.h"
@@ -75,16 +74,13 @@ BOOL CSpeedTreeForest::GetMainTree(DWORD dwCRC, CSpeedTreeWrapper ** ppMainTree,
 		pTree = itor->second;
 	else
 	{
-		CMappedFile file;
-		LPCVOID c_pvData;
-
-		// NOTE : 파일이 없을때는 return FALSE 아닌가요? - [levites]
-		if (!CEterPackManager::Instance().Get(file, c_pszFileName, &c_pvData))
+		CFile file;
+		if (!FileSystemManager::Instance().OpenFile(c_pszFileName, file))
 			return FALSE;
 
 		pTree = new CSpeedTreeWrapper;
 
-		if (!pTree->LoadTree(c_pszFileName, (const BYTE *) c_pvData, file.Size()))
+		if (!pTree->LoadTree(c_pszFileName, (const uint8_t*)file.GetData(), file.GetSize()))
 		{
 			delete pTree;
 			return FALSE;
@@ -92,7 +88,7 @@ BOOL CSpeedTreeForest::GetMainTree(DWORD dwCRC, CSpeedTreeWrapper ** ppMainTree,
 
 		m_pMainTreeMap.insert(std::map<DWORD, CSpeedTreeWrapper *>::value_type(dwCRC, pTree));
 
-		file.Destroy();
+		file.Close();
 	}
 
 	*ppMainTree = pTree;

@@ -127,7 +127,7 @@ void CLightManager::FlushLight()
 	// NOTE - 거리로 정렬된 라이트를 Limit 갯수 만큼 제한해서 켜준다.
 	STATEMANAGER.SaveRenderState(D3DRS_LIGHTING, TRUE);
 
-	for (DWORD k = 0; k < min(m_dwLimitLightCount, m_LightSortVector.size()); ++k)
+	for (DWORD k = 0; k < std::min<DWORD>(m_dwLimitLightCount, m_LightSortVector.size()); ++k)
 	{
 		m_LightSortVector[k]->Update();
 		m_LightSortVector[k]->SetDeviceLight(TRUE);
@@ -139,7 +139,7 @@ void CLightManager::RestoreLight()
 {
 	STATEMANAGER.RestoreRenderState(D3DRS_LIGHTING);
 
-	for (DWORD k = 0; k < min(m_dwLimitLightCount, m_LightSortVector.size()); ++k)
+	for (DWORD k = 0; k < std::min<DWORD>(m_dwLimitLightCount, m_LightSortVector.size()); ++k)
 		m_LightSortVector[k]->SetDeviceLight(FALSE);
 }
 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "../eterlib/GrpMath.h"
-#include "../gamelib/ItemManager.h"
-#include "../EffectLib/EffectManager.h"
+#include "../eterGameLib/ItemManager.h"
+#include "../eterEffectLib/EffectManager.h"
 #include "PythonBackground.h"
 
 #include "pythonitem.h"

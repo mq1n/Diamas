@@ -2,7 +2,7 @@
 
 #include "../eterlib/GrpObjectInstance.h"
 #include "../eterlib/Pool.h"
-#include "../mileslib/Type.h"
+#include "../eterSoundLib/Type.h"
 
 #include "EffectElementBaseInstance.h"
 #include "EffectData.h"

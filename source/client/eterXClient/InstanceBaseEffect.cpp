@@ -6,9 +6,9 @@
 #include "PythonPlayer.h"
 #include "PythonSystem.h"
 
-#include "../EffectLib/EffectManager.h"
-#include "../EffectLib/ParticleSystemData.h"
-#include "../EterLib/Camera.h"
+#include "../eterEffectLib/EffectManager.h"
+#include "../eterEffectLib/ParticleSystemData.h"
+#include "../eterLib/Camera.h"
 
 float CInstanceBase::ms_fDustGap;
 float CInstanceBase::ms_fHorseDustGap;

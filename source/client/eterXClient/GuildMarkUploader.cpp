@@ -97,7 +97,7 @@ bool CGuildMarkUploader::__Load(const char* c_szFileName, UINT* peError)
 
 	ilConvertImage(IL_BGRA, IL_BYTE);
 
-	ilCopyPixels(0, 0, 0, SGuildMark::WIDTH, SGuildMark::HEIGHT, 1, IL_BGRA, IL_BYTE, (ILvoid*)m_kMark.m_apxBuf);
+	ilCopyPixels(0, 0, 0, SGuildMark::WIDTH, SGuildMark::HEIGHT, 1, IL_BGRA, IL_BYTE, (void*)m_kMark.m_apxBuf);
 
 	ilDeleteImages(1, &uImg);
 	return true;

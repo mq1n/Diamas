@@ -227,7 +227,8 @@ bool CWeaponTrace::BuildVertex()
 			TPDTVertex v;
 			//v.diffuse = D3DXCOLOR(0.3f,0.8f,1.0f, (loop)?max(1.0f-(t/m_fLifeTime),0.0f)/2:0.0f );
 			float ttt = min(max((t+Input[0].first)/m_fLifeTime,0.0f),1.0f);
-			v.diffuse = D3DXCOLOR(0.3f,0.8f,1.0f, (loop)?min(max((1.0f-ttt)*(1.0f-ttt)/2.5-0.1f,0.0f),1.0f):0.0f );
+			v.diffuse = D3DXCOLOR(0.3f, 0.8f, 1.0f,
+				(loop) ? std::min(std::max<float>((1.0f - ttt) * (1.0f - ttt) / 2.5 - 0.1f, 0.0f), 1.0f) : 0.0f);
 			//v.diffuse = D3DXCOLOR(0.0f,0.0f,0.0f, (loop)?min(max((1.0f-ttt)*(1.0f-ttt)-0.1f,0.0f),1.0f):0.0f );
 			//v.diffuse =	0xffffffff;
 			v.position = a+cc*(b+cc*(c+cc*d));	// next position 

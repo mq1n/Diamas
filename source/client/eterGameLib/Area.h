@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../SpeedTreeLib/SpeedTreeWrapper.h"
+#include "../eterTreeLib/SpeedTreeWrapper.h"
 #include "../eterGrnLib/ThingInstance.h"
 #include "MapType.h"
 #include "DungeonBlock.h"

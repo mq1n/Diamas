@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "../eterBase/CRC32.h"
 #include <string>
-#include "../eterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 
 #include "Pool.h"
 #include "TextFileLoader.h"
@@ -179,23 +179,22 @@ bool CTextFileLoader::Load(const char * c_szFileName)
 {
 	m_strFileName = "";
 
-	const VOID* pvData;
-	CMappedFile kFile;
-	if (!CEterPackManager::Instance().Get(kFile, c_szFileName, &pvData))
+	CFile kFile;
+	if (!FileSystemManager::Instance().OpenFile(c_szFileName, kFile))
 		return false;
 
-	if (m_dwBufCapacity<kFile.Size())
+	if (m_dwBufCapacity < kFile.GetSize())
 	{
-		m_dwBufCapacity=kFile.Size();
+		m_dwBufCapacity = kFile.GetSize();
 
 		if (m_acBufData)
-			delete [] m_acBufData;
+			delete[] m_acBufData;
 
-		m_acBufData=new char[m_dwBufCapacity];
+		m_acBufData = new char[m_dwBufCapacity];
 	}
 
-	m_dwBufSize=kFile.Size();
-	memcpy(m_acBufData, pvData, m_dwBufSize);
+	m_dwBufSize = kFile.GetSize();
+	memcpy(m_acBufData, kFile.GetData(), m_dwBufSize);
 
 	m_strFileName = c_szFileName;
 	m_dwcurLineIndex = 0;

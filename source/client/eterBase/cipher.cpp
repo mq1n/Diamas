@@ -220,8 +220,8 @@ bool Cipher::SetUp(bool polarity) {
 	BlockCipherAlgorithm* detail_1 = BlockCipherAlgorithm::Pick(hint_1);
 	assert(detail_0 != NULL);
 	assert(detail_1 != NULL);
-	std::auto_ptr<BlockCipherAlgorithm> algorithm_0(detail_0);
-	std::auto_ptr<BlockCipherAlgorithm> algorithm_1(detail_1);
+	std::unique_ptr<BlockCipherAlgorithm> algorithm_0(detail_0);
+	std::unique_ptr<BlockCipherAlgorithm> algorithm_1(detail_1);
 
 	const size_t key_length_0 = algorithm_0->GetDefaultKeyLength();
 	const size_t iv_length_0 = algorithm_0->GetBlockSize();

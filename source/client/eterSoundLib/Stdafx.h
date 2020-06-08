@@ -12,6 +12,7 @@
 #include <mss.h>
 #pragma warning(default:4201)
 #include <windows.h>
+#include <algorithm>
 
 //#include <crtdbg.h>
 

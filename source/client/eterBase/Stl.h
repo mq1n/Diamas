@@ -31,6 +31,24 @@ extern int split_string(const std::string & input, const std::string & delimiter
 
 namespace std
 {
+#if _HAS_CXX17
+	// FUNCTIONAL STUFF (from <functional>)
+	// STRUCT TEMPLATE unary_function
+	template <class _Arg, class _Result> struct unary_function
+	{ // base class for unary functions
+		typedef _Arg argument_type;
+		typedef _Result result_type;
+	};
+
+	// STRUCT TEMPLATE binary_function
+	template <class _Arg1, class _Arg2, class _Result> struct binary_function
+	{ // base class for binary functions
+		typedef _Arg1 first_argument_type;
+		typedef _Arg2 second_argument_type;
+		typedef _Result result_type;
+	};
+#endif // _HAS_CXX17
+
 	template <class _Ty>
 	class void_mem_fun_t
 		: public unary_function<_Ty *, void> {

@@ -291,7 +291,7 @@ namespace UI
 		}
 		m_rect.right = m_rect.left + m_lWidth;
 #endif
-		std::for_each(m_pChildList.begin(), m_pChildList.end(), std::mem_fun(&CWindow::UpdateRect));
+		std::for_each(m_pChildList.begin(), m_pChildList.end(), std::mem_fn(&CWindow::UpdateRect));
 
 		OnChangePosition();
 
@@ -1976,10 +1976,10 @@ namespace UI
 
 	void CDragButton::OnChangePosition()
 	{
-		m_x = max(m_x, m_restrictArea.left);
-		m_y = max(m_y, m_restrictArea.top);
-		m_x = min(m_x, max(0, m_restrictArea.right - m_lWidth));
-		m_y = min(m_y, max(0, m_restrictArea.bottom - m_lHeight));
+		m_x = std::max<int32_t>(m_x, m_restrictArea.left);
+		m_y = std::max<int32_t>(m_y, m_restrictArea.top);
+		m_x = std::min<int32_t>(m_x, std::max(0l, m_restrictArea.right - m_lWidth));
+		m_y = std::min<int32_t>(m_y, std::max(0l, m_restrictArea.bottom - m_lHeight));
 
 		m_rect.left = m_x;
 		m_rect.top = m_y;
@@ -1994,7 +1994,7 @@ namespace UI
 		m_rect.right = m_rect.left + m_lWidth;
 		m_rect.bottom = m_rect.top + m_lHeight;
 
-		std::for_each(m_pChildList.begin(), m_pChildList.end(), std::mem_fun(&CWindow::UpdateRect));
+		std::for_each(m_pChildList.begin(), m_pChildList.end(), std::mem_fn(&CWindow::UpdateRect));
 
 		if (m_pcurVisual)
 			m_pcurVisual->SetPosition(m_rect.left, m_rect.top);

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "MarkImage.h"
+#include "../eterBase/lzo.h"
 
 #if !defined(_MSC_VER)
 #include <IL/il.h>
@@ -11,7 +12,6 @@
 #define sys_err TraceError
 #define sys_log //(n, format, ...) Tracenf(format, __VA_ARGS__)
 #define thecore_memcpy memcpy
-#define itertype(cont) typeof(cont.begin())
 #endif
 
 CGuildMarkImage * NewMarkImage()

@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "PythonSkill.h"
 
-#include "../EterBase/Poly/Poly.h"
-#include "../EterPack/EterPackManager.h"
+#include "../eterBase/Poly/Poly.h"
+#include <FileSystemIncl.hpp>
 #include "InstanceBase.h"
 #include "PythonPlayer.h"
 
@@ -89,13 +89,12 @@ void string_replace_word(const char* base, int base_len, const char* src, int sr
 
 bool CPythonSkill::RegisterSkillTable(const char * c_szFileName)
 {
-	const VOID* pvData;
-	CMappedFile kFile;
-	if (!CEterPackManager::Instance().Get(kFile, c_szFileName, &pvData))
+	CFile kFile;
+	if (!FileSystemManager::Instance().OpenFile(c_szFileName, kFile))
 		return false;
 
 	CMemoryTextFileLoader textFileLoader;
-	textFileLoader.Bind(kFile.Size(), pvData);
+	textFileLoader.Bind(kFile.GetSize(), kFile.GetData());
 
 	// OVERWRITE_SKILLPROTO_POLY
 	string src_poly_rand;
@@ -279,13 +278,12 @@ void CPythonSkill::__RegisterNormalIconImage(TSkillData & rData, const char * c_
 extern const DWORD c_iSkillIndex_Riding;
 bool CPythonSkill::RegisterSkillDesc(const char * c_szFileName)
 {
-	const VOID* pvData;
-	CMappedFile kFile;
-	if (!CEterPackManager::Instance().Get(kFile, c_szFileName, &pvData))
+	CFile kFile;
+	if (!FileSystemManager::Instance().OpenFile(c_szFileName, kFile))
 		return false;
 
 	CMemoryTextFileLoader textFileLoader;
-	textFileLoader.Bind(kFile.Size(), pvData);
+	textFileLoader.Bind(kFile.GetSize(), kFile.GetData());
 
 	CTokenVector TokenVector;
 	for (DWORD i = 0; i < textFileLoader.GetLineCount(); ++i)
@@ -692,7 +690,7 @@ bool CPythonSkill::RegisterSkill(DWORD dwSkillIndex, const char * c_szFileName)
 			if (SKILL_GRADE_COUNT*2 != pGradeDataVector->size())
 				TraceError("CPythonSkill::RegisterSkill(dwSkillIndex=%d, c_szFileName=%s) - Strange Grade Data Count", dwSkillIndex, c_szFileName);
 
-			for (DWORD i = 0; i < min(SKILL_GRADE_COUNT, pGradeDataVector->size()/2); ++i)
+			for (DWORD i = 0; i < std::min<DWORD>(SKILL_GRADE_COUNT, pGradeDataVector->size()/2); ++i)
 			{
 				SkillData.GradeData[i].strName = pGradeDataVector->at(i*2+0);
 				std::string strIconFileName = g_strImagePath + pGradeDataVector->at(i*2+1);
@@ -1792,7 +1790,7 @@ PyObject * skillGetSkillRequirementData(PyObject * poSelf, PyObject * poArgs)
 	if (!CPythonSkill::Instance().GetSkillDataByName(c_pSkillData->strRequireSkillName.c_str(), &pRequireSkillData))
 		return Py_BuildValue("si", 0, "None", 0);
 
-	int ireqLevel = (int)ceil(float(c_pSkillData->byRequireSkillLevel)/float(max(1, pRequireSkillData->byLevelUpPoint)));
+	int ireqLevel = (int)ceil(float(c_pSkillData->byRequireSkillLevel)/float(std::max<BYTE>(1, pRequireSkillData->byLevelUpPoint)));
 	return Py_BuildValue("si", c_pSkillData->strRequireSkillName.c_str(), ireqLevel);
 }
 

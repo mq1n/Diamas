@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-#include "../effectLib/EffectManager.h"
-#include "../milesLib/SoundManager.h"
+#include "../eterEffectLib/EffectManager.h"
+#include "../eterSoundLib/SoundManager.h"
 
 #include "ActorInstance.h"
 #include "RaceData.h"

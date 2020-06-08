@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "GameType.h"
-#include "../effectLib/EffectManager.h"
+#include "../eterEffectLib/EffectManager.h"
 
 extern float g_fGameFPS = 60.0f;
 

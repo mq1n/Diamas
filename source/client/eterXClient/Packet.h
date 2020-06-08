@@ -18,7 +18,7 @@ typedef struct _AHNHS_TRANS_BUFFER
 #pragma pack(pop) // 기존 alignment 복구.
 #endif /* !USE_AHNLAB_HACKSHIELD */
 
-#include "../gamelib/RaceData.h"
+#include "../eterGameLib/RaceData.h"
 
 typedef BYTE TPacketHeader;
 
@@ -325,13 +325,6 @@ enum
 	// END_OF_SUPPORT_BGM
 
     HEADER_GC_AUTH_SUCCESS                      = 150,
-    HEADER_GC_PANAMA_PACK						= 151,
-
-	//HYBRID CRYPT
-	HEADER_GC_HYBRIDCRYPT_KEYS					= 152,
-	HEADER_GC_HYBRIDCRYPT_SDB					= 153, // SDB means Supplmentary Data Blocks
-	//HYBRID CRYPT
-
 	HEADER_GC_AUTH_SUCCESS_OPENID				= 154,
 
 	HEADER_GC_RUNUP_MATRIX_QUIZ                 = 201,
@@ -552,7 +545,7 @@ typedef struct command_login2
 	BYTE	header;
 	char	name[ID_MAX_NUM + 1];
 	DWORD	login_key;
-    DWORD	adwClientKey[4];
+    uint32_t	adwClientKey[4];
 } TPacketCGLogin2;
 
 typedef struct command_login3
@@ -2617,73 +2610,7 @@ typedef struct SPacketGCResetOnTime
     BYTE header;
 } TPacketGCResetOnTime;
 
-typedef struct SPacketGCPanamaPack
-{
-    BYTE    bHeader;
-    char    szPackName[256];
-    BYTE    abIV[32];
-} TPacketGCPanamaPack;
-
-typedef struct SPacketGCHybridCryptKeys
-{
-private:
-	SPacketGCHybridCryptKeys() : m_pStream(NULL) {}
-
-public:
-	SPacketGCHybridCryptKeys(int iStreamSize) : iKeyStreamLen(iStreamSize)
-	{
-		m_pStream = new BYTE[iStreamSize];
-	}
-	~SPacketGCHybridCryptKeys()
-	{
-		if( m_pStream )
-		{
-			delete[] m_pStream;
-			m_pStream = NULL;
-		}
-	}
-	static int GetFixedHeaderSize() 
-	{
-		return sizeof(BYTE)+sizeof(WORD)+sizeof(int);
-	}
-
-	BYTE	bHeader;
-	WORD    wDynamicPacketSize;
-	int		iKeyStreamLen;
-	BYTE*	m_pStream;
-
-} TPacketGCHybridCryptKeys;
-
-
-typedef struct SPacketGCHybridSDB
-{
-private:
-	SPacketGCHybridSDB() : m_pStream(NULL) {}
-
-public:
-	SPacketGCHybridSDB(int iStreamSize) : iSDBStreamLen(iStreamSize)
-	{
-		m_pStream = new BYTE[iStreamSize];
-	}
-	~SPacketGCHybridSDB()
-	{
-		delete[] m_pStream;
-		m_pStream = NULL;
-	}
-	static int GetFixedHeaderSize()
-	{
-		return sizeof(BYTE)+sizeof(WORD)+sizeof(int);
-	}
-
-	BYTE	bHeader;
-	WORD    wDynamicPacketSize;
-	int		iSDBStreamLen;
-	BYTE*	m_pStream;
-
-} TPacketGCHybridSDB;
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Client To Client
-
 typedef struct packet_state
 {
 	BYTE			bHeader;

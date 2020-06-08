@@ -100,7 +100,7 @@ void CSoundInstance2D::GetVolume(float& rfVolume) const
 
 void CSoundInstance2D::SetVolume(float volume) const
 {
-	volume = max(0.0f, min(1.0f, volume));
+	volume = std::max<float>(0.0f, std::min<float>(1.0f, volume));
 	AIL_set_sample_volume_pan(m_sample, volume, 0.5f);
 }
 

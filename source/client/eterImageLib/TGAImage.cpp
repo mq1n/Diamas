@@ -2,10 +2,10 @@
 
 #include <assert.h>
 
-#include "../eterBase/MappedFile.h"
+#include <FileSystemIncl.hpp>
 #include "TGAImage.h"
 
-CTGAImage::CTGAImage() : m_dwFlag(0)
+CTGAImage::CTGAImage() : m_dwFlag(0), m_pdwEndPtr(nullptr)
 {
 }
 
@@ -13,10 +13,10 @@ CTGAImage::~CTGAImage()
 {
 }
 
-CTGAImage::CTGAImage(CImage &image) : m_dwFlag(0)
+CTGAImage::CTGAImage(CImageC &image) : m_dwFlag(0)
 {
-	int w = image.GetWidth();
-	int h = image.GetHeight();
+	int32_t w = image.GetWidth();
+	int32_t h = image.GetHeight();
 
 	Create(w, h);
 
@@ -25,29 +25,29 @@ CTGAImage::CTGAImage(CImage &image) : m_dwFlag(0)
 	FlipTopToBottom();
 }
 
-void CTGAImage::Create(int width, int height)
+void CTGAImage::Create(int32_t width, int32_t height)
 {
 	memset(&m_Header, 0, sizeof(m_Header));
 
 	m_Header.imgType	= 2;
-	m_Header.width		= (short) width;
-	m_Header.height		= (short) height;
+	m_Header.width		= (int16_t) width;
+	m_Header.height		= (int16_t) height;
 	m_Header.colorBits	= 32;
 	m_Header.desc		= 0x08;	// alpha channel 있음
 
-	CImage::Create(width, height);
+	CImageC::Create(width, height);
 }
 
-bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
+bool CTGAImage::LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem)
 {
 	memcpy(&m_Header, c_pbMem, 18);
 	c_pbMem += 18;
 	iSize -= 18;
 
-	CImage::Create(m_Header.width, m_Header.height);
+	CImageC::Create(m_Header.width, m_Header.height);
 
-	UINT hxw = m_Header.width * m_Header.height;
-	BYTE r, g, b, a;
+	DWORD hxw = m_Header.width * m_Header.height;
+	uint8_t r, g, b, a;
 	DWORD i;
 
 	DWORD * pdwDest = GetBasePointer();
@@ -70,15 +70,15 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 				{
 					for (i = 0; i < hxw; ++i)
 					{
-						WORD w;
+						uint16_t w;
 
-						memcpy(&w, c_pbMem, sizeof(WORD));
-						c_pbMem += sizeof(WORD);
-						iSize -= sizeof(WORD);
+						memcpy(&w, c_pbMem, sizeof(uint16_t));
+						c_pbMem += sizeof(uint16_t);
+						iSize -= sizeof(uint16_t);
 						
-						b = (BYTE) (w & 0x1F);
-						g = (BYTE) ((w >> 5) & 0x1F);
-						r = (BYTE) ((w >> 10) & 0x1F);
+						b = (uint8_t) (w & 0x1F);
+						g = (uint8_t) ((w >> 5) & 0x1F);
+						r = (uint8_t) ((w >> 10) & 0x1F);
 						
 						b <<= 3;
 						g <<= 3;
@@ -92,9 +92,9 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 				{
 					for (i = 0; i < hxw; ++i)
 					{
-						r = (BYTE) *(c_pbMem++); --iSize;
-						g = (BYTE) *(c_pbMem++); --iSize;
-						b = (BYTE) *(c_pbMem++); --iSize;
+						r = (uint8_t) *(c_pbMem++); --iSize;
+						g = (uint8_t) *(c_pbMem++); --iSize;
+						b = (uint8_t) *(c_pbMem++); --iSize;
 						a = 0xff;
 						
 						pdwDest[i] = (a << 24) | (r << 16) | (g << 8) | b;
@@ -102,7 +102,7 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 				}
 				else if (m_Header.colorBits == 32)	// 32bit
 				{
-					int size = GetWidth();
+					int32_t size = GetWidth();
 					size *= GetHeight() * 4;
 
 					memcpy(pdwDest, c_pbMem, size);
@@ -114,14 +114,14 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 
 		case 10: // 압축 된 TGA (RLE)
 			{
-				BYTE rle;
+				uint8_t rle;
 
 				if (m_Header.colorBits == 24)
 				{
 					i = 0;
 					while (i < hxw)
 					{
-						rle = (BYTE) *(c_pbMem++); --iSize;
+						rle = (uint8_t) *(c_pbMem++); --iSize;
 
 						if (rle < 0x80)	// 압축 안된 곳
 						{
@@ -129,9 +129,9 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 
 							while (rle)
 							{
-								b = (BYTE) *(c_pbMem++); --iSize;
-								g = (BYTE) *(c_pbMem++); --iSize;
-								r = (BYTE) *(c_pbMem++); --iSize;
+								b = (uint8_t) *(c_pbMem++); --iSize;
+								g = (uint8_t) *(c_pbMem++); --iSize;
+								r = (uint8_t) *(c_pbMem++); --iSize;
 								a = 0xff;
 								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
 
@@ -149,9 +149,9 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 							// 압축 된 곳
 							rle -= 127;
 
-							b = (BYTE) *(c_pbMem++); --iSize;
-							g = (BYTE) *(c_pbMem++); --iSize;
-							r = (BYTE) *(c_pbMem++); --iSize;
+							b = (uint8_t) *(c_pbMem++); --iSize;
+							g = (uint8_t) *(c_pbMem++); --iSize;
+							r = (uint8_t) *(c_pbMem++); --iSize;
 							a = 0xff;
 
 							while (rle)
@@ -174,7 +174,7 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 					i = 0;
 					while (i < hxw)
 					{
-						rle = (BYTE) *(c_pbMem++); --iSize;
+						rle = (uint8_t) *(c_pbMem++); --iSize;
 						
 						if (rle < 0x80)
 						{
@@ -182,10 +182,10 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 							
 							while (rle)
 							{
-								b = (BYTE) *(c_pbMem++); --iSize;
-								g = (BYTE) *(c_pbMem++); --iSize;
-								r = (BYTE) *(c_pbMem++); --iSize;
-								a = (BYTE) *(c_pbMem++); --iSize;
+								b = (uint8_t) *(c_pbMem++); --iSize;
+								g = (uint8_t) *(c_pbMem++); --iSize;
+								r = (uint8_t) *(c_pbMem++); --iSize;
+								a = (uint8_t) *(c_pbMem++); --iSize;
 								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
 								
 								if (i > hxw)
@@ -201,10 +201,10 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 						{
 							rle -= 127;
 							
-							b = (BYTE) *(c_pbMem++); --iSize;
-							g = (BYTE) *(c_pbMem++); --iSize;
-							r = (BYTE) *(c_pbMem++); --iSize;
-							a = (BYTE) *(c_pbMem++); --iSize;
+							b = (uint8_t) *(c_pbMem++); --iSize;
+							g = (uint8_t) *(c_pbMem++); --iSize;
+							r = (uint8_t) *(c_pbMem++); --iSize;
+							a = (uint8_t) *(c_pbMem++); --iSize;
 							
 							while (rle)
 							{
@@ -234,25 +234,21 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 	return true;
 }
 
-bool CTGAImage::LoadFromDiskFile(const char * c_szFileName)
+bool CTGAImage::LoadFromDiskFile(const std::string& stFileName)
 {
-	CMappedFile file;
-
-	const BYTE * c_pbMap;
-
-	if (!file.Create(c_szFileName, (const void **) &c_pbMap, 0, 0))
+	CFile file;
+	if (!file.Create(stFileName, FILEMODE_READ, true))
 		return false;
 
-	return LoadFromMemory(file.Size(), c_pbMap);
+	return LoadFromMemory(file.GetSize(), file.GetData());
 }
 
-int CTGAImage::GetRLEPixelCount(const DWORD * data)
+int32_t CTGAImage::GetRLEPixelCount(const DWORD * data)
 {
-    int r = 0;
 	DWORD pixel;
-    
-    r = 1;
-	
+
+    int32_t r = 1;
+
     if (data >= m_pdwEndPtr)
         return 0;
     
@@ -269,16 +265,16 @@ int CTGAImage::GetRLEPixelCount(const DWORD * data)
 	return r;
 }
 
-int CTGAImage::GetRawPixelCount(const DWORD * data)
+int32_t CTGAImage::GetRawPixelCount(const DWORD * data)
 {
-    int i = 0;
+    int32_t i = 0;
     
     if (data >= m_pdwEndPtr)
         return 0;
 	
     while ((data < m_pdwEndPtr) && (i < 127))
     {
-		int rle = GetRLEPixelCount(data);
+		int32_t rle = GetRLEPixelCount(data);
 		
 		if (rle >= 4)
 			break;
@@ -308,7 +304,8 @@ void CTGAImage::SetAlphaChannel(bool isExist)
 
 bool CTGAImage::SaveToDiskFile(const char* c_szFileName)
 {
-	FILE * fp = fopen(c_szFileName, "wb");
+	FILE * fp;
+	fopen_s(&fp, c_szFileName, "wb");
 	
 	if (!fp)
 		return false;
@@ -321,11 +318,11 @@ bool CTGAImage::SaveToDiskFile(const char* c_szFileName)
 		
 		while (data < m_pdwEndPtr)
 		{
-			int rle = GetRLEPixelCount(data);
+			int32_t rle = GetRLEPixelCount(data);
 			
 			if (rle < 4)
 			{
-				int raw = GetRawPixelCount(data);
+				int32_t raw = GetRawPixelCount(data);
 				
 				if (raw == 0)
 					break;
@@ -349,7 +346,7 @@ bool CTGAImage::SaveToDiskFile(const char* c_szFileName)
 	}
 	else
 	{
-		int size = GetWidth();
+		int32_t size = GetWidth();
 		size *= GetHeight() * 4;
 		fwrite(GetBasePointer(), size, 1, fp);
 	}

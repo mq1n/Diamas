@@ -1,8 +1,8 @@
 #include "StdAfx.h"
-#include "../eterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 #include "../eterBase/CRC32.h"
 #include "../eterBase/Timer.h"
-
+#include "../eterBase/Stl.h"
 #include "Resource.h"
 #include "ResourceManager.h"
 
@@ -41,19 +41,23 @@ void CResource::Load()
 		return;
 
 	const char * c_szFileName = GetFileName();
+	
+	if (c_szFileName && c_szFileName[0] == '\0') {
+		me_state = STATE_ERROR;
+		return;
+	}
 
-	DWORD		dwStart = ELTimer_GetMSec();
-	CMappedFile	file;
-	LPCVOID		fileData;
+	uint32_t		dwStart = ELTimer_GetMSec();
+	CFile	file;
 
 	//Tracenf("Load %s", c_szFileName);
 
-	if (CEterPackManager::Instance().Get(file, c_szFileName, &fileData))
+	if (FileSystemManager::Instance().OpenFile(c_szFileName, file))
 	{
 		m_dwLoadCostMiliiSecond = ELTimer_GetMSec() - dwStart;
-		//Tracef("CResource::Load %s (%d bytes) in %d ms\n", c_szFileName, file.Size(), m_dwLoadCostMiliiSecond);
+		//Tracef("CResource::Load %s (%d bytes) in %d ms\n", c_szFileName, file.GetSize(), m_dwLoadCostMiliiSecond);
 
-		if (OnLoad(file.Size(), fileData))
+		if (OnLoad(file.GetSize(), file.GetData()))
 		{
 			me_state = STATE_EXIST;
 		}
@@ -66,7 +70,7 @@ void CResource::Load()
 	}
 	else
 	{
-		if (OnLoad(0, NULL))
+		if (OnLoad(0, nullptr))
 			me_state = STATE_EXIST;
 		else
 		{
@@ -81,12 +85,10 @@ void CResource::Reload()
 	Clear();
 	Tracef("CResource::Reload %s\n", GetFileName());
 
-	CMappedFile	file;
-	LPCVOID		fileData;
-
-	if (CEterPackManager::Instance().Get(file, GetFileName(), &fileData))
+	CFile	file;
+	if (FileSystemManager::Instance().OpenFile(GetFileName(), file))
 	{
-		if (OnLoad(file.Size(), fileData))
+		if (OnLoad(file.GetSize(), file.GetData()))
 		{
 			me_state = STATE_EXIST;
 		}
@@ -98,7 +100,7 @@ void CResource::Reload()
 	}
 	else
 	{
-		if (OnLoad(0, NULL))
+		if (OnLoad(0, nullptr))
 			me_state = STATE_EXIST;
 		else
 		{
@@ -112,10 +114,10 @@ CResource::TType CResource::StringToType(const char* c_szType)
 	return GetCRC32(c_szType, strlen(c_szType));
 }
 
-int CResource::ConvertPathName(const char * c_szPathName, char * pszRetPathName, int retLen)
+int32_t CResource::ConvertPathName(const char * c_szPathName, char * pszRetPathName, int32_t retLen)
 {
 	const char * pc;
-	int len = 0;
+	int32_t len = 0;
 
 	for (pc = c_szPathName; *pc && len < retLen; ++pc, ++len)
 	{

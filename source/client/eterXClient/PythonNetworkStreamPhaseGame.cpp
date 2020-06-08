@@ -17,8 +17,8 @@
 #include "PythonMessenger.h"
 #include "PythonApplication.h"
 
-#include "../EterPack/EterPackManager.h"
-#include "../gamelib/ItemManager.h"
+#include <FileSystemIncl.hpp>
+#include "../eterGameLib/ItemManager.h"
 
 #include "AbstractApplication.h"
 #include "AbstractCharacterManager.h"
@@ -590,17 +590,6 @@ void CPythonNetworkStream::GamePhase()
 				RecvHandshakeOKPacket();
 				return;
 				break;
-			
-			case HEADER_GC_HYBRIDCRYPT_KEYS:
-				RecvHybridCryptKeyPacket();
-				return;
-				break;
-
-			case HEADER_GC_HYBRIDCRYPT_SDB:
-				RecvHybridCryptSDBPacket();
-				return;
-				break;
-
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 			case HEADER_GC_KEY_AGREEMENT:

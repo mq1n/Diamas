@@ -5,7 +5,7 @@
 
 #include "../eterBase/Stl.h"
 #include "../eterLib/StateManager.h"
-#include "../MilesLib/SoundManager.h"
+#include "../eterSoundLib/SoundManager.h"
 
 CDynamicPool<CEffectInstance>	CEffectInstance::ms_kPool;
 int CEffectInstance::ms_iRenderingEffectCount = 0;

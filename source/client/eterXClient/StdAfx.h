@@ -15,12 +15,12 @@
 
 #include "../eterLib/StdAfx.h"
 #include "../eterPythonLib/StdAfx.h"
-#include "../gameLib/StdAfx.h"
-#include "../scriptLib/StdAfx.h"
-#include "../milesLib/StdAfx.h"
-#include "../EffectLib/StdAfx.h"
-#include "../PRTerrainLib/StdAfx.h"
-#include "../SpeedTreeLib/StdAfx.h"
+#include "../eterGameLib/StdAfx.h"
+#include "../eterScriptLib/StdAfx.h"
+#include "../eterSoundLib/StdAfx.h"
+#include "../eterEffectLib/StdAfx.h"
+#include "../eterTerrainLib/StdAfx.h"
+#include "../eterTreeLib/StdAfx.h"
 
 #ifndef __D3DRM_H__
 #define __D3DRM_H__

@@ -500,7 +500,7 @@ void CGrannyLODController::UpdateLODLevel(float fDistanceFromCenter, float fDist
 				bLODLevel = 3;
 			}
 
-			bLODLevel = (BYTE) (m_que_pkModelInst.size() - min(bLODLevel, m_que_pkModelInst.size()) - 1);
+			bLODLevel = (BYTE) (m_que_pkModelInst.size() - std::min<BYTE>(bLODLevel, m_que_pkModelInst.size()) - 1);
 		}
 		
 		if (ms_isMinLODModeEnable)

@@ -1,7 +1,8 @@
 #include "StdAfx.h"
-#include "../EterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 #include "FileLoaderThread.h"
 #include "ResourceManager.h"
+#include "../eterBase/Stl.h"
 
 CFileLoaderThread::CFileLoaderThread() : m_bShutdowned(false), m_pArg(NULL), m_hThread(NULL), m_uThreadID(0)
 {
@@ -165,11 +166,11 @@ void CFileLoaderThread::Process()	// called in loader thread
 
 	LPCVOID pvBuf;
 
-	if (CEterPackManager::Instance().Get(pData->File, pData->stFileName.c_str(), &pvBuf))
+	if (FileSystemManager::Instance().OpenFile(pData->stFileName, pData->File))
 	{
-		pData->dwSize	= pData->File.Size();
-		pData->pvBuf	= new char [pData->dwSize];
-		memcpy(pData->pvBuf, pvBuf, pData->dwSize);
+		pData->dwSize = pData->File.GetSize();
+		pData->pvBuf = new char[pData->dwSize];
+		memcpy(pData->pvBuf, pData->File.GetData(), pData->dwSize);
 	}
 
 	m_CompleteMutex.Lock();

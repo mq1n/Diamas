@@ -1,7 +1,7 @@
 #pragma 
 
-#include "../EterLib/NetStream.h"
-#include "../EterLib/FuncObject.h"
+#include "../eterLib/NetStream.h"
+#include "../eterLib/FuncObject.h"
 
 class CAccountConnector : public CNetworkStream, public CSingleton<CAccountConnector>
 {
@@ -59,13 +59,10 @@ class CAccountConnector : public CNetworkStream, public CSingleton<CAccountConne
 		bool __AuthState_RecvChinaMatrixCard();
 		bool __AuthState_RecvRunupMatrixQuiz();
 		bool __AuthState_RecvNEWCIBNPasspodRequest();
-		bool __AuthState_RecvPanamaPack();
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 		bool __AuthState_RecvKeyAgreement();
 		bool __AuthState_RecvKeyAgreementCompleted();
 #endif
-		bool __AuthState_RecvHybridCryptKeys(int VarSize);
-		bool __AuthState_RecvHybridCryptSDB(int VarSize);
 
 		bool __AnalyzePacket(UINT uHeader, UINT uPacketSize, bool (CAccountConnector::*pfnDispatchPacket)());
 		// TODO:  지금 현재는 임시다.  header뒤에 size 4byte가 무조건 온다는 가정임.

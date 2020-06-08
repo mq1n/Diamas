@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "InstanceBase.h"
 #include "AbstractPlayer.h"
-#include "../gameLib/ActorInstance.h"
+#include "../eterGameLib/ActorInstance.h"
 
 const int c_iFishingRotStep = 8;
 const float c_fFishingDistance = 600.0f;

@@ -6,7 +6,7 @@
 class CResource : public CReferenceObject
 {
 	public:
-		typedef DWORD TType;
+		typedef uint32_t TType;
 
 		enum EState
 		{
@@ -25,7 +25,7 @@ class CResource : public CReferenceObject
 
 		void			Load();
 		void			Reload();
-		int				ConvertPathName(const char * c_szPathName, char * pszRetPathName, int retLen);
+		int32_t				ConvertPathName(const char * c_szPathName, char * pszRetPathName, int32_t retLen);
 
 		virtual bool	CreateDeviceObjects();
 		virtual void	DestroyDeviceObjects();
@@ -41,12 +41,12 @@ class CResource : public CReferenceObject
 		bool			IsEmpty() const;
 		bool			IsType(TType type);
 
-		DWORD			GetLoadCostMilliSecond()	{ return m_dwLoadCostMiliiSecond;	}
+		uint32_t			GetLoadCostMilliSecond()	{ return m_dwLoadCostMiliiSecond;	}
 		//const char *	GetFileName() const			{ return m_pszFileName;				}
 		const char *	GetFileName() const			{ return m_stFileName.c_str();				}
 		const std::string& GetFileNameString() const { return m_stFileName;	}
 
-		virtual bool	OnLoad(int iSize, const void * c_pvBuf) = 0;
+		virtual bool	OnLoad(int32_t iSize, const void * c_pvBuf) = 0;
 
 	protected:
 		void			SetFileName(const char* c_szFileName);
@@ -61,7 +61,7 @@ class CResource : public CReferenceObject
 	protected:
 		std::string		m_stFileName;
 		//char *			m_pszFileName;
-		DWORD			m_dwLoadCostMiliiSecond;
+		uint32_t			m_dwLoadCostMiliiSecond;
 		EState			me_state;
 
 	protected:

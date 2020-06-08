@@ -9,9 +9,9 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "../gamelib/MapManager.h"
-#include "../gamelib/TerrainDecal.h"
-#include "../gamelib/SnowEnvironment.h"
+#include "../eterGameLib/MapManager.h"
+#include "../eterGameLib/TerrainDecal.h"
+#include "../eterGameLib/SnowEnvironment.h"
 
 class CInstanceBase;
 

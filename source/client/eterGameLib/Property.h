@@ -5,30 +5,28 @@
 class CProperty
 {
 	public:
-		CProperty(const char * c_pszFileName);
+		CProperty(const char* c_pszFileName, uint32_t dwCRC = 0);
 		~CProperty();
 
 		void			Clear();
-		bool			ReadFromMemory(const void * c_pvData, int iLen, const char * c_pszFileName);
+		bool			ReadFromMemory(const void* c_pvData, int32_t iLen, const char* c_pszFileName);
 
-		const char *	GetFileName();
+		const char* GetFileName();
 
-		bool			GetVector(const char * c_pszKey, CTokenVector & rTokenVector);
-		bool			GetString(const char * c_pszKey, const char ** c_ppString);
+		bool			GetVector(const char* c_pszKey, CTokenVector& rTokenVector);
+		bool			GetString(const char* c_pszKey, const char** c_ppString);
 
-		void			PutVector(const char * c_pszKey, const CTokenVector & c_rTokenVector);
-		void			PutString(const char * c_pszKey, const char * c_pszString);
+		void			PutVector(const char* c_pszKey, const CTokenVector& c_rTokenVector);
+		void			PutString(const char* c_pszKey, const char* c_pszString);
 
-		bool			Save(const char * c_pszFileName);
-
-		DWORD			GetSize();
-		DWORD			GetCRC();
+		uint32_t			GetSize();
+		uint32_t			GetCRC();
 
 	protected:
 		std::string							m_stFileName;
 		std::string							m_stCRC;
 		const char *						mc_pFileName;
-		DWORD								m_dwCRC;
+		uint32_t								m_dwCRC;
 
 		CTokenVectorMap						m_stTokenMap;
 };

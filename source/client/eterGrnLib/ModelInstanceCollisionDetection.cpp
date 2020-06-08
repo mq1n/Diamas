@@ -2,12 +2,8 @@
 #include "ModelInstance.h"
 #include "Model.h"
 
-void CGrannyModelInstance::MakeBoundBox(TBoundBox* pBoundBox, 
-										 const float* mat, 
-										 const float* OBBMin, 
-										 const float* OBBMax, 
-										 D3DXVECTOR3* vtMin, 
-										 D3DXVECTOR3* vtMax)
+void CGrannyModelInstance::MakeBoundBox(TBoundBox* pBoundBox, const float* mat, const float* OBBMin, const float* OBBMax,
+	D3DXVECTOR3* vtMin, D3DXVECTOR3* vtMax)
 {
 	pBoundBox->sx = OBBMin[0] * mat[0] + OBBMin[1] * mat[4] + OBBMin[2] * mat[8] + mat[12];
 	pBoundBox->sy = OBBMin[0] * mat[1] + OBBMin[1] * mat[5] + OBBMin[2] * mat[9] + mat[13];
@@ -17,19 +13,19 @@ void CGrannyModelInstance::MakeBoundBox(TBoundBox* pBoundBox,
 	pBoundBox->ey = OBBMax[0] * mat[1] + OBBMax[1] * mat[5] + OBBMax[2] * mat[9] + mat[13];
 	pBoundBox->ez = OBBMax[0] * mat[2] + OBBMax[1] * mat[6] + OBBMax[2] * mat[10] + mat[14];
 
-	vtMin->x = min(vtMin->x, pBoundBox->sx);
-	vtMin->x = min(vtMin->x, pBoundBox->ex);
-	vtMin->y = min(vtMin->y, pBoundBox->sy);
-	vtMin->y = min(vtMin->y, pBoundBox->ey);
-	vtMin->z = min(vtMin->z, pBoundBox->sz);
-	vtMin->z = min(vtMin->z, pBoundBox->ez);
+	vtMin->x = std::min(vtMin->x, pBoundBox->sx);
+	vtMin->x = std::min(vtMin->x, pBoundBox->ex);
+	vtMin->y = std::min(vtMin->y, pBoundBox->sy);
+	vtMin->y = std::min(vtMin->y, pBoundBox->ey);
+	vtMin->z = std::min(vtMin->z, pBoundBox->sz);
+	vtMin->z = std::min(vtMin->z, pBoundBox->ez);
 
-	vtMax->x = max(vtMax->x, pBoundBox->sx);
-	vtMax->x = max(vtMax->x, pBoundBox->ex);
-	vtMax->y = max(vtMax->y, pBoundBox->sy);
-	vtMax->y = max(vtMax->y, pBoundBox->ey);
-	vtMax->z = max(vtMax->z, pBoundBox->sz);
-	vtMax->z = max(vtMax->z, pBoundBox->ez);
+	vtMax->x = std::max(vtMax->x, pBoundBox->sx);
+	vtMax->x = std::max(vtMax->x, pBoundBox->ex);
+	vtMax->y = std::max(vtMax->y, pBoundBox->sy);
+	vtMax->y = std::max(vtMax->y, pBoundBox->ey);
+	vtMax->z = std::max(vtMax->z, pBoundBox->sz);
+	vtMax->z = std::max(vtMax->z, pBoundBox->ez);
 }
 
 bool CGrannyModelInstance::Intersect(const D3DXMATRIX * c_pMatrix,
@@ -176,7 +172,7 @@ bool CGrannyModelInstance::Intersect(const D3DXMATRIX * c_pMatrix,
 */
 }
 
-#include "../EterBase/Timer.h"
+#include "../eterBase/Timer.h"
 
 void CGrannyModelInstance::GetBoundBox(D3DXVECTOR3* vtMin, D3DXVECTOR3* vtMax)
 {
@@ -195,7 +191,7 @@ void CGrannyModelInstance::GetBoundBox(D3DXVECTOR3* vtMin, D3DXVECTOR3* vtMax)
 		const granny_mesh* pgrnMesh = m_pModel->GetGrannyModelPointer()->MeshBindings[m].Mesh;
 
 		// WORK
-		int* boneIndices = __GetMeshBoneIndices(m);
+		const granny_int32x* boneIndices = __GetMeshBoneIndices(m);
 		// END_OF_WORK
 		for (int b = 0; b < pgrnMesh->BoneBindingCount; ++b)
 		{

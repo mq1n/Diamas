@@ -1,9 +1,9 @@
 #include "StdAfx.h"
 #include "SnowEnvironment.h"
 
-#include "../EterLib/StateManager.h"
-#include "../EterLib/Camera.h"
-#include "../EterLib/ResourceManager.h"
+#include "../eterLib/StateManager.h"
+#include "../eterLib/Camera.h"
+#include "../eterLib/ResourceManager.h"
 #include "SnowParticle.h"
 
 void CSnowEnvironment::Enable()
@@ -76,7 +76,7 @@ void CSnowEnvironment::Deform()
 
 	if (m_bSnowEnable)
 	{
-		for (int p = 0; p < min(10, m_dwParticleMaxNum - m_kVct_pkParticleSnow.size()); ++p)
+		for (int p = 0; p < std::min(10UL, m_dwParticleMaxNum - m_kVct_pkParticleSnow.size()); ++p)
 		{
 			CSnowParticle * pSnowParticle = CSnowParticle::New();
 			pSnowParticle->Init(v3ChangedPos);
@@ -177,7 +177,7 @@ void CSnowEnvironment::Render()
 
 	__BeginBlur();
 
-	DWORD dwParticleCount = min(m_dwParticleMaxNum, m_kVct_pkParticleSnow.size());
+	DWORD dwParticleCount = std::min<DWORD>(m_dwParticleMaxNum, m_kVct_pkParticleSnow.size());
 
 	CCamera * pCamera = CCameraManager::Instance().GetCurrentCamera();
 	if (!pCamera)

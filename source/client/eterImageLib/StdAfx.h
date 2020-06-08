@@ -16,27 +16,12 @@
 
 //#include <crtdbg.h>
 
-#include <windows.h>
+#include <Windows.h>
 #include <assert.h>
 
-#pragma warning(push, 3)
 #include <string>
 #include <vector>
-#pragma warning(pop)
-
-inline void _TraceForImage(const char* c_szFormat, ...)
-{
-	va_list args;
-	va_start(args, c_szFormat);
-	
-	static char szBuf[1024];
-	_vsnprintf(szBuf, sizeof(szBuf), c_szFormat, args);
-#ifdef _DEBUG
-	OutputDebugString(szBuf);
-#endif
-	va_end(args);
-	printf(szBuf);
-}
+#include <algorithm>
 
 #pragma warning(default:4018)
 

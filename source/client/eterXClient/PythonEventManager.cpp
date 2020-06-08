@@ -5,10 +5,10 @@
 
 #include "AbstractApplication.h"
 
-#include "../gamelib/ItemData.h"
-#include "../gamelib/ItemManager.h"
+#include "../eterGameLib/ItemData.h"
+#include "../eterGameLib/ItemManager.h"
 
-#include "../eterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 
 #include "PythonMiniMap.h"
 
@@ -106,16 +106,14 @@ void CPythonEventManager::__InitEventSet(TEventSet& rEventSet)
 
 int CPythonEventManager::RegisterEventSet(const char * c_szFileName)
 {
-	CMappedFile File;
-	LPCVOID pMap;
-
-	if (!CEterPackManager::Instance().Get(File, c_szFileName, &pMap))
+	CFile File;
+	if (!FileSystemManager::Instance().OpenFile(c_szFileName, File))
 		return -1;
 
 	std::string strEventString;
-	strEventString.resize(File.Size()+1);
+	strEventString.resize(File.GetSize()+1);
 
-	File.Read(&strEventString[0], File.Size());
+	File.Read(&strEventString[0], File.GetSize());
 
 	TEventSet * pEventSet = m_EventSetPool.Alloc();
 	if (!pEventSet)
@@ -325,7 +323,7 @@ void CPythonEventManager::UpdateEventSet(int iIndex, int ix, int iy)
 
 	if (pEventSet->isConfirmWait)
 	{
-		int iLeftTime = max(0, pEventSet->iConfirmEndTime - timeGetTime()/1000);
+		int iLeftTime = std::max<int>(0, pEventSet->iConfirmEndTime - timeGetTime()/1000);
 		pEventSet->pConfirmTimeTextLine->SetValue(_getf(m_strLeftTimeString.c_str(), iLeftTime));
 	}
 
@@ -337,7 +335,7 @@ void CPythonEventManager::UpdateEventSet(int iIndex, int ix, int iy)
 	// Process EventSet
 	long lElapsedTime = CTimer::Instance().GetElapsedMilliecond();
 
-	pEventSet->lLastDelayTime = max(0, pEventSet->lLastDelayTime - lElapsedTime);
+	pEventSet->lLastDelayTime = std::max<long>(0, pEventSet->lLastDelayTime - lElapsedTime);
 
 	while (lElapsedTime > 0)
 	{

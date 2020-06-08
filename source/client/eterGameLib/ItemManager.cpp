@@ -1,7 +1,7 @@
 #include "StdAfx.h"
-#include "../eterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 #include "../eterLib/ResourceManager.h"
-
+#include "../eterBase/lzo.h"
 #include "ItemManager.h"
 
 static DWORD s_adwItemProtoKey[4] =
@@ -95,14 +95,12 @@ CItemData * CItemManager::MakeItemData(DWORD dwIndex)
 
 bool CItemManager::LoadItemList(const char * c_szFileName)
 {
-	CMappedFile File;
-	LPCVOID pData;
-
-	if (!CEterPackManager::Instance().Get(File, c_szFileName, &pData))
+	CFile File;
+	if (!FileSystemManager::Instance().OpenFile(c_szFileName, File))
 		return false;
 
 	CMemoryTextFileLoader textFileLoader;
-	textFileLoader.Bind(File.Size(), pData);
+	textFileLoader.Bind(File.GetSize(), File.GetData());
 
 	CTokenVector TokenVector;
     for (DWORD i = 0; i < textFileLoader.GetLineCount(); ++i)
@@ -196,16 +194,15 @@ const std::string& __SnapString(const std::string& c_rstSrc, std::string& rstTem
 
 bool CItemManager::LoadItemDesc(const char* c_szFileName)
 {
-	const VOID* pvData;
-	CMappedFile kFile;
-	if (!CEterPackManager::Instance().Get(kFile, c_szFileName, &pvData))
+	CFile kFile;
+	if (!FileSystemManager::Instance().OpenFile(c_szFileName, kFile))
 	{
 		Tracenf("CItemManager::LoadItemDesc(c_szFileName=%s) - Load Error", c_szFileName);
 		return false;
 	}
 
 	CMemoryTextFileLoader kTextFileLoader;
-	kTextFileLoader.Bind(kFile.Size(), pvData);
+	kTextFileLoader.Bind(kFile.GetSize(), kFile.GetData());
 
 	std::string stTemp;
 
@@ -254,10 +251,8 @@ DWORD GetHashCode( const char* pString )
 
 bool CItemManager::LoadItemTable(const char* c_szFileName)
 {	
-	CMappedFile file;
-	LPCVOID pvData;
-
-	if (!CEterPackManager::Instance().Get(file, c_szFileName, &pvData))
+	CFile file;
+	if (!FileSystemManager::Instance().OpenFile(c_szFileName, file))
 		return false;
 
 	DWORD dwFourCC, dwElements, dwDataSize;

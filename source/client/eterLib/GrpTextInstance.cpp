@@ -3,9 +3,7 @@
 #include "StateManager.h"
 #include "IME.h"
 #include "TextTag.h"
-#include "../EterLocale/StringCodec.h"
-#include "../EterBase/Utils.h"
-#include "../EterLocale/Arabic.h"
+#include "../eterBase/Utils.h"
 
 extern DWORD GetDefaultCodePage();
 
@@ -32,7 +30,7 @@ int CGraphicTextInstance::Hyperlink_GetText(char* buf, int len)
 
 	int codePage = GetDefaultCodePage();
 
-	return Ymir_WideCharToMultiByte(codePage, 0, gs_hyperlinkText.c_str(), gs_hyperlinkText.length(), buf, len, NULL, NULL);	
+	return WideCharToMultiByte(codePage, 0, gs_hyperlinkText.c_str(), gs_hyperlinkText.length(), buf, len, NULL, NULL);	
 }
 
 int CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture * pFontTexture, WORD codePage, wchar_t text, DWORD dwColor)
@@ -45,7 +43,7 @@ int CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture * pFontTexture, WO
 		m_pCharInfoVector.push_back(pInsCharInfo);
 
 		m_textWidth += pInsCharInfo->advance;
-		m_textHeight = max(pInsCharInfo->height, m_textHeight);
+		m_textHeight = std::max<WORD>(pInsCharInfo->height, m_textHeight);
 		return pInsCharInfo->advance;
 	}
 	
@@ -54,7 +52,7 @@ int CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture * pFontTexture, WO
 
 void CGraphicTextInstance::__GetTextPos(DWORD index, float* x, float* y)
 {
-	index = min(index, m_pCharInfoVector.size());
+	index = std::min<DWORD>(index, m_pCharInfoVector.size());
 
 	float sx = 0;
 	float sy = 0;
@@ -167,7 +165,7 @@ void CGraphicTextInstance::Update()
 	{
 		const char * token = FindToken(begin, end);
 
-		int wTextLen = Ymir_MultiByteToWideChar(dataCodePage, 0, begin, token - begin, wText, wTextMax);
+		int wTextLen = MultiByteToWideChar(dataCodePage, 0, begin, token - begin, wText, wTextMax);
 
 		if (m_isSecret)
 		{
@@ -176,232 +174,6 @@ void CGraphicTextInstance::Update()
 		} 
 		else 
 		{
-			if (defCodePage == CP_ARABIC) // ARABIC
-			{
-
-				wchar_t* wArabicText = (wchar_t*)_alloca(sizeof(wchar_t) * wTextLen);
-				int wArabicTextLen = Arabic_MakeShape(wText, wTextLen, wArabicText, wTextLen);
-
-				bool isEnglish = true;
-				int nEnglishBase = wArabicTextLen - 1;
-
-				//<<하이퍼 링크>>
-				int x = 0;
-
-				int len;				
-				int hyperlinkStep = 0;
-				SHyperlink kHyperlink;
-				std::wstring hyperlinkBuffer;
-				int no_hyperlink = 0;
-
-				// 심볼로 끝나면 아랍어 모드로 시작해야한다
-				if (Arabic_IsInSymbol(wArabicText[wArabicTextLen - 1]))
-				{
-					isEnglish = false;
-				}
-				
-				int i = 0;
-				for (i = wArabicTextLen - 1 ; i >= 0; --i)
-				{
-					wchar_t wArabicChar = wArabicText[i];
-
-					if (isEnglish)
-					{
-
-						// <<심볼의 경우 (ex. 기호, 공백)>> -> 영어 모드 유지.
-						//		<<(심볼이 아닌 것들 : 숫자, 영어, 아랍어)>>
-						//  (1) 맨 앞의 심볼 or
-						//	(2) 
-						//		1) 앞 글자가 아랍어 아님 &&
-						//		2) 뒷 글자가 아랍어 아님 &&
-						//		3) 뒷 글자가 심볼'|'이 아님 &&
-						//		or
-						//	(3) 현재 심볼이 '|'
-						// <<아랍어 모드로 넘어가는 경우 : 심볼에서.>>
-						//	1) 앞글자 아랍어
-						//	2) 뒷글자 아랍어
-						//
-						//
-						if (Arabic_IsInSymbol(wArabicChar) && (
-								(i == 0) ||
-								(i > 0 && 
-									!(Arabic_HasPresentation(wArabicText, i - 1) || Arabic_IsInPresentation(wArabicText[i + 1]))  && //앞글자, 뒷글자가 아랍어 아님.
-									wArabicText[i+1] != '|'
-								) ||
-								wArabicText[i] == '|'
-							))//if end.
-						{
-							// pass
-							int temptest = 1;
-						}
-						// (1)아랍어이거나 (2)아랍어 다음의 심볼이라면 아랍어 모드 전환
-						else if (Arabic_IsInPresentation(wArabicChar) || Arabic_IsInSymbol(wArabicChar))
-						{
-							//그 전까지의 영어를 그린다.
-							for (int e = i + 1; e <= nEnglishBase;) {
-								int ret = GetTextTag(&wArabicText[e], wArabicTextLen - e, len, hyperlinkBuffer);
-
-								if (ret == TEXT_TAG_PLAIN || ret == TEXT_TAG_TAG)
-								{
-									if (hyperlinkStep == 1)
-										hyperlinkBuffer.append(1, wArabicText[e]);
-									else
-									{
-										int charWidth = __DrawCharacter(pFontTexture, dataCodePage, wArabicText[e], dwColor);
-										kHyperlink.ex += charWidth;
-										//x += charWidth;
-										
-										//기존 추가한 하이퍼링크의 좌표 수정.
-										for (int j = 1; j <= no_hyperlink; j++)
-										{
-											if(m_hyperlinkVector.size() < j)
-												break;
-
-											SHyperlink & tempLink = m_hyperlinkVector[m_hyperlinkVector.size() - j];
-											tempLink.ex += charWidth;
-											tempLink.sx += charWidth;
-										}
-									}
-								}
-								else
-								{
-									if (ret == TEXT_TAG_COLOR)
-										dwColor = htoi(hyperlinkBuffer.c_str(), 8);
-									else if (ret == TEXT_TAG_RESTORE_COLOR)
-										dwColor = m_dwTextColor;
-									else if (ret == TEXT_TAG_HYPERLINK_START)
-									{
-										hyperlinkStep = 1;
-										hyperlinkBuffer = L"";
-									}
-									else if (ret == TEXT_TAG_HYPERLINK_END)
-									{
-										if (hyperlinkStep == 1)
-										{
-											++hyperlinkStep;
-											kHyperlink.ex = kHyperlink.sx = 0; // 실제 텍스트가 시작되는 위치
-										}
-										else
-										{
-											kHyperlink.text = hyperlinkBuffer;
-											m_hyperlinkVector.push_back(kHyperlink);
-											no_hyperlink++;
-
-
-											hyperlinkStep = 0;
-											hyperlinkBuffer = L"";						
-										}
-									}
-								}
-								e += len;
-							}
-
-							int charWidth = __DrawCharacter(pFontTexture, dataCodePage, Arabic_ConvSymbol(wArabicText[i]), dwColor);
-							kHyperlink.ex += charWidth;
-							
-							//기존 추가한 하이퍼링크의 좌표 수정.
-							for (int j = 1; j <= no_hyperlink; j++)
-							{
-								if(m_hyperlinkVector.size() < j)
-									break;
-
-								SHyperlink & tempLink = m_hyperlinkVector[m_hyperlinkVector.size() - j];
-								tempLink.ex += charWidth;
-								tempLink.sx += charWidth;
-							}
-
-							isEnglish = false;
-						}
-					}
-					else //[[[아랍어 모드]]]
-					{
-						// 아랍어이거나 아랍어 출력중 나오는 심볼이라면
-						if (Arabic_IsInPresentation(wArabicChar) || Arabic_IsInSymbol(wArabicChar))
-						{
-							int charWidth = __DrawCharacter(pFontTexture, dataCodePage, Arabic_ConvSymbol(wArabicText[i]), dwColor);
-							kHyperlink.ex += charWidth;
-							x += charWidth;
-							
-							//기존 추가한 하이퍼링크의 좌표 수정.
-							for (int j = 1; j <= no_hyperlink; j++)
-							{
-								if(m_hyperlinkVector.size() < j)
-									break;
-
-								SHyperlink & tempLink = m_hyperlinkVector[m_hyperlinkVector.size() - j];
-								tempLink.ex += charWidth;
-								tempLink.sx += charWidth;
-							}
-						}
-						else //영어이거나, 영어 다음에 나오는 심볼이라면,
-						{
-							nEnglishBase = i;
-							isEnglish = true;
-						}
-					}
-				}
-
-				if (isEnglish)
-				{
-					for (int e = i + 1; e <= nEnglishBase;) {
-						int ret = GetTextTag(&wArabicText[e], wArabicTextLen - e, len, hyperlinkBuffer);
-
-						if (ret == TEXT_TAG_PLAIN || ret == TEXT_TAG_TAG)
-						{
-							if (hyperlinkStep == 1)
-								hyperlinkBuffer.append(1, wArabicText[e]);
-							else
-							{
-								int charWidth = __DrawCharacter(pFontTexture, dataCodePage, wArabicText[e], dwColor);
-								kHyperlink.ex += charWidth;
-
-								//기존 추가한 하이퍼링크의 좌표 수정.
-								for (int j = 1; j <= no_hyperlink; j++)
-								{
-									if(m_hyperlinkVector.size() < j)
-										break;
-
-									SHyperlink & tempLink = m_hyperlinkVector[m_hyperlinkVector.size() - j];
-									tempLink.ex += charWidth;
-									tempLink.sx += charWidth;
-								}
-							}
-						}
-						else
-						{
-							if (ret == TEXT_TAG_COLOR)
-								dwColor = htoi(hyperlinkBuffer.c_str(), 8);
-							else if (ret == TEXT_TAG_RESTORE_COLOR)
-								dwColor = m_dwTextColor;
-							else if (ret == TEXT_TAG_HYPERLINK_START)
-							{
-								hyperlinkStep = 1;
-								hyperlinkBuffer = L"";
-							}
-							else if (ret == TEXT_TAG_HYPERLINK_END)
-							{
-								if (hyperlinkStep == 1)
-								{
-									++hyperlinkStep;
-									kHyperlink.ex = kHyperlink.sx = 0; // 실제 텍스트가 시작되는 위치
-								}
-								else
-								{
-									kHyperlink.text = hyperlinkBuffer;
-									m_hyperlinkVector.push_back(kHyperlink);
-									no_hyperlink++;
-
-									hyperlinkStep = 0;
-									hyperlinkBuffer = L"";						
-								}
-							}
-						}
-						e += len;
-					}
-
-				}
-			}
-			else	// 아랍외 다른 지역.
 			{
 				int x = 0;
 				int len;				
@@ -492,20 +264,6 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 
 	UINT defCodePage = GetDefaultCodePage();
 
-	if (defCodePage == CP_ARABIC)
-	{
-		switch (m_hAlign)
-		{
-			case HORIZONTAL_ALIGN_LEFT:
-				fStanX -= m_textWidth;
-				break;
-
-			case HORIZONTAL_ALIGN_CENTER:
-				fStanX -= float(m_textWidth / 2);
-				break;	
-		}
-	}
-	else
 	{	
 		switch (m_hAlign)
 		{
@@ -695,7 +453,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 
 			fFontWidth=float(pCurCharInfo->width);
 			fFontHeight=float(pCurCharInfo->height);
-			fFontMaxHeight=max(fFontHeight, pCurCharInfo->height);
+			fFontMaxHeight=std::max<float>(fFontHeight, pCurCharInfo->height);
 			fFontAdvance=float(pCurCharInfo->advance);
 
 			// NOTE : 폰트 출력에 Width 제한을 둡니다. - [levites]
@@ -785,15 +543,6 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 			ex = sx + 2;
 		}
 
-		// FOR_ARABIC_ALIGN
-		if (defCodePage == CP_ARABIC)
-		{
-			sx += m_v3Position.x - m_textWidth;
-			ex += m_v3Position.x - m_textWidth;
-			sy += m_v3Position.y;			
-			ey = sy + m_textHeight;
-		}
-		else
 		{
 			sx += m_v3Position.x;
 			sy += m_v3Position.y;
@@ -870,12 +619,6 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 	{
 		int lx = gs_mx - m_v3Position.x;
 		int ly = gs_my - m_v3Position.y;
-
-		//아랍은 좌표 부호를 바꿔준다.
-		if (GetDefaultCodePage() == CP_ARABIC) {
-			lx = -lx;
-			ly = -ly + m_textHeight;
-		}
 
 		if (lx >= 0 && ly >= 0 && lx < m_textWidth && ly < m_textHeight)
 		{

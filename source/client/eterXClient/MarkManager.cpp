@@ -7,7 +7,6 @@
 #define sys_err TraceError
 #define sys_log // (n, format, ...) Tracenf(format, __VA_ARGS__)
 #define thecore_memcpy memcpy
-#define itertype(cont) typeof((cont).begin())
 #endif
 
 CGuildMarkImage * CGuildMarkManager::__NewImage()
@@ -473,7 +472,7 @@ int main(int argc, char **argv)
 
 	printf("#1 Diff %u\n", mapDiff.size());
 
-	for (itertype(mapDiff) it = mapDiff.begin(); it != mapDiff.end(); ++it)
+	for (auto it = mapDiff.begin(); it != mapDiff.end(); ++it)
 	{
 		printf("Put Block pos %u crc %u\n", it->first, it->second->m_crc);
 		mgr->SaveBlockFromCompressedData(0, it->first, it->second->m_abCompBuf, it->second->m_sizeCompBuf);

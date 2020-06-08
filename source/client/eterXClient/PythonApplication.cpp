@@ -2,9 +2,9 @@
 #include "../eterBase/Error.h"
 #include "../eterlib/Camera.h"
 #include "../eterlib/AttributeInstance.h"
-#include "../gamelib/AreaTerrain.h"
-#include "../EterGrnLib/Material.h"
-#include "../CWebBrowser/CWebBrowser.h"
+#include "../eterGameLib/AreaTerrain.h"
+#include "../eterGrnLib/Material.h"
+#include "../eterWebBrowser/CWebBrowser.h"
 
 #include "resource.h"
 #include "PythonApplication.h"
@@ -427,7 +427,7 @@ bool CPythonApplication::Process()
 		m_dwRenderFPS		= s_dwRenderFrameCount;
 		m_dwLoad			= s_uiLoad;
 
-		m_dwFaceCount		= s_dwFaceCount / max(1, s_dwRenderFrameCount);
+		m_dwFaceCount		= s_dwFaceCount / std::max<DWORD>(1, s_dwRenderFrameCount);
 
 		s_dwCheckTime		= ELTimer_GetMSec();
 
@@ -819,14 +819,14 @@ bool CPythonApplication::Process()
 					{
 						static float s_fAveRenderTime = 16.0f;
 						float fRatio=0.3f;
-						s_fAveRenderTime=(s_fAveRenderTime*(100.0f-fRatio)+max(16.0f, m_dwCurRenderTime)*fRatio)/100.0f;
+						s_fAveRenderTime=(s_fAveRenderTime*(100.0f-fRatio)+std::max<float>(16.0f, m_dwCurRenderTime)*fRatio)/100.0f;
 
 
 						float fFar=25600.0f;
 						float fNear=MIN_FOG;
 						double dbAvePow=double(1000.0f/s_fAveRenderTime);
 						double dbMaxPow=60.0;
-						float fDistance=max(fNear+(fFar-fNear)*(dbAvePow)/dbMaxPow, fNear);
+						float fDistance=std::max<float>(fNear+(fFar-fNear)*(dbAvePow)/dbMaxPow, fNear);
 						m_pyBackground.SetViewDistanceSet(0, fDistance);
 					}
 					// 거리 강제 설정시

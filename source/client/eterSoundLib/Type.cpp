@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "Type.h"
-#include "../EterLib/TextFileLoader.h"
+#include "../eterLib/TextFileLoader.h"
 
 std::string NSound::strResult;
 

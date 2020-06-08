@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "../eterlib/StateManager.h"
 #include "../eterlib/Camera.h"
-#include "../PRTerrainLib/StdAfx.h"
-#include "../EffectLib/EffectManager.h"
+#include "../eterTerrainLib/StdAfx.h"
+#include "../eterEffectLib/EffectManager.h"
 
 #include "MapOutdoor.h"
 #include "TerrainPatch.h"

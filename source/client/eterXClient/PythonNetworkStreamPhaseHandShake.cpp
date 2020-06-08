@@ -2,7 +2,6 @@
 #include "PythonNetworkStream.h"
 #include "PythonApplication.h"
 #include "Packet.h"
-#include "../eterpack/EterPackManager.h"
 #include "Hackshield.h"
 #include "WiseLogicXTrap.h"
 
@@ -65,16 +64,6 @@ void CPythonNetworkStream::HandShakePhase()
 			break;
 		case HEADER_GC_PING:
 			RecvPingPacket();
-			return;
-			break;
-
-		case HEADER_GC_HYBRIDCRYPT_KEYS:
-			RecvHybridCryptKeyPacket();
-			return;
-			break;
-
-		case HEADER_GC_HYBRIDCRYPT_SDB:
-			RecvHybridCryptSDBPacket();
 			return;
 			break;
 
@@ -162,47 +151,6 @@ bool CPythonNetworkStream::RecvHandshakeOKPacket()
 
 	return true;
 }
-
-bool CPythonNetworkStream::RecvHybridCryptKeyPacket()
-{
-	int iFixedHeaderSize = TPacketGCHybridCryptKeys::GetFixedHeaderSize();
-
-	TDynamicSizePacketHeader header;
-	if( !Peek( sizeof(header), &header) )
-		return false;
-
-	TPacketGCHybridCryptKeys kPacket(header.size-iFixedHeaderSize);
-
-	if (!Recv(iFixedHeaderSize, &kPacket))
-		return false;
-
-	if (!Recv(kPacket.iKeyStreamLen, kPacket.m_pStream))
-		return false;
-
-	CEterPackManager::Instance().RetrieveHybridCryptPackKeys( kPacket.m_pStream ); 
-	return true;
-}
-
-bool CPythonNetworkStream::RecvHybridCryptSDBPacket()
-{
-	int iFixedHeaderSize = TPacketGCHybridSDB::GetFixedHeaderSize();
-
-	TDynamicSizePacketHeader header;
-	if( !Peek( sizeof(header), &header) )
-		return false;
-
-	TPacketGCHybridSDB kPacket(header.size-iFixedHeaderSize);
-
-	if (!Recv(iFixedHeaderSize, &kPacket))
-		return false;
-
-	if (!Recv(kPacket.iSDBStreamLen, kPacket.m_pStream))
-		return false;
-
-	CEterPackManager::Instance().RetrieveHybridCryptPackSDB( kPacket.m_pStream ); 
-	return true;
-}
-
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 bool CPythonNetworkStream::RecvKeyAgreementPacket()

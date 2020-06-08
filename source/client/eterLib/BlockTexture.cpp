@@ -113,10 +113,10 @@ void CBlockTexture::InvalidateRect(const RECT & c_rsrcRect)
 
 	// DIBBAR_LONGSIZE_BUGFIX
 	const RECT clipRect = { 				
-		max(c_rsrcRect.left - dstRect.left, 0),
-		max(c_rsrcRect.top - dstRect.top, 0),
-		min(c_rsrcRect.right - dstRect.left, dstRect.right - dstRect.left),
-		min(c_rsrcRect.bottom - dstRect.top, dstRect.bottom - dstRect.top),
+		std::max(c_rsrcRect.left - dstRect.left, 0l),
+		std::max(c_rsrcRect.top - dstRect.top, 0l),
+		std::min(c_rsrcRect.right - dstRect.left, dstRect.right - dstRect.left),
+		std::min(c_rsrcRect.bottom - dstRect.top, dstRect.bottom - dstRect.top)
 	};
 	// END_OF_DIBBAR_LONGSIZE_BUGFIX
 

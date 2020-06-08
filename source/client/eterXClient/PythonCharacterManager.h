@@ -2,7 +2,7 @@
 
 #include "AbstractCharacterManager.h"
 #include "InstanceBase.h"
-#include "../GameLib/PhysicsObject.h"
+#include "../eterGameLib/PhysicsObject.h"
 
 class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, public IAbstractCharacterManager, public IObjectManager
 {

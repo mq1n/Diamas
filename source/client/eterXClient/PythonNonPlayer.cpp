@@ -1,8 +1,9 @@
 #include "stdafx.h"
-#include "../eterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 #include "pythonnonplayer.h"
 #include "InstanceBase.h"
 #include "PythonCharacterManager.h"
+#include "../eterBase/lzo.h"
 
 bool CPythonNonPlayer::LoadNonPlayerData(const char * c_szFileName)
 {
@@ -14,12 +15,10 @@ bool CPythonNonPlayer::LoadNonPlayerData(const char * c_szFileName)
 		6822045
 	};
 
-	CMappedFile file;
-	LPCVOID pvData;
-
 	Tracef("CPythonNonPlayer::LoadNonPlayerData: %s, sizeof(TMobTable)=%u\n", c_szFileName, sizeof(TMobTable));
 
-	if (!CEterPackManager::Instance().Get(file, c_szFileName, &pvData))
+	CFile file;
+	if (!FileSystemManager::Instance().OpenFile(c_szFileName, file))
 		return false;
 
 	DWORD dwFourCC, dwElements, dwDataSize;

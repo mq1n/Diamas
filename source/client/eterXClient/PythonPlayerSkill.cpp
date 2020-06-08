@@ -5,7 +5,7 @@
 #include "InstanceBase.h"
 #include "PythonChat.h"
 #include "PythonGuild.h"
-#include "../GameLib/ItemManager.h"
+#include "../eterGameLib/ItemManager.h"
 
 void CPythonPlayer::ClearAffects()
 {

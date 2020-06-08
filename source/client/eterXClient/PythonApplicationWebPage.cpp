@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "PythonApplication.h"
-#include "../CWebBrowser/CWebBrowser.h"
+#include "../eterWebBrowser/CWebBrowser.h"
 
 bool CPythonApplication::IsWebPageMode()
 {

@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "RaceManager.h"
 #include "RaceMotionData.h"
-#include "../EterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 
 bool __IsGuildRace(unsigned race)
 {
@@ -237,14 +237,12 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SKILL5", CRaceMotionData::NAME_SKILL+125));
 	}
 	
-	const void* pvData;
-	CMappedFile kMappedFile;
-	if (!CEterPackManager::Instance().Get(kMappedFile, motionListFileName, &pvData))
+	CFile kMappedFile;
+	if (!FileSystemManager::Instance().OpenFile(motionListFileName, kMappedFile))
 		return false;
-	
 
 	CMemoryTextFileLoader kTextFileLoader;
-	kTextFileLoader.Bind(kMappedFile.Size(), pvData);
+	kTextFileLoader.Bind(kMappedFile.GetSize(), kMappedFile.GetData());
 
 	rkRaceData.RegisterMotionMode(CRaceMotionData::MODE_GENERAL);
 

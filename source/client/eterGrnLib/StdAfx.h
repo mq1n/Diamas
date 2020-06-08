@@ -3,7 +3,7 @@
 #pragma warning(disable:4786)	// character 255 넘어가는거 끄기
 
 //#include <crtdbg.h>
-#include <granny.h>
+#include <granny2/granny2.11.8.0.h>
 
 #include "../eterBase/Utils.h"
 #include "../eterBase/Debug.h"

@@ -2,7 +2,7 @@
 #define __INC_METIN_II_371GNFBQOCJ_LZO_H__
 
 #include <windows.h>
-#include <lzo-2.03/lzo1x.h>
+#include <lzo/lzo1x.h>
 #include "Singleton.h"
 
 class CLZObject

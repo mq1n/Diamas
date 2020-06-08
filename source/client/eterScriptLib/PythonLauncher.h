@@ -1,25 +1,19 @@
 #pragma once
-#include "Python-2.2/frameobject.h"
-
+#include <python27/frameobject.h>
 #include "../eterBase/Singleton.h"
 
 class CPythonLauncher : public CSingleton<CPythonLauncher>
 {
-	public:
-		CPythonLauncher();
-		virtual ~CPythonLauncher();
+public:
+	CPythonLauncher();
+	virtual ~CPythonLauncher();
 
-		void Clear();
+	void Clear();
 
-		bool Create(const char* c_szProgramName="eter.python");
-		void SetTraceFunc(int (*pFunc)(PyObject * obj, PyFrameObject * f, int what, PyObject *arg));
-		bool RunLine(const char* c_szLine);
-		bool RunFile(const char* c_szFileName);
-		bool RunMemoryTextFile(const char* c_szFileName, UINT uFileSize, const VOID* c_pvFileData);
-		bool RunCompiledFile(const char* c_szFileName);
-		const char* GetError();
+	bool Create(const char* c_szProgramName);
+	bool RunFile(const std::string& filename, const std::string& modName) const;
 
-	protected:
-		PyObject* m_poModule;
-		PyObject* m_poDic;
+protected:
+	PyObject* m_poModule;
+	PyObject* m_poDic;
 };

@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "PythonChat.h"
 #include "PythonItem.h"
-#include "../gamelib/ItemManager.h"
+#include "../eterGameLib/ItemManager.h"
 
 PyObject * chatSetChatColor(PyObject* poSelf, PyObject* poArgs)
 {

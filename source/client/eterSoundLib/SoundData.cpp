@@ -1,11 +1,11 @@
 #include "StdAfx.h"
 #include "SoundData.h"
 
-#include "../EterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 #include "../eterBase/Timer.h"
 
 bool CSoundData::ms_isSoundFile[SOUND_FILE_MAX_NUM];
-CMappedFile CSoundData::ms_SoundFile[SOUND_FILE_MAX_NUM];
+CFile CSoundData::ms_SoundFile[SOUND_FILE_MAX_NUM];
 
 const char * CSoundData::GetFileName()
 {
@@ -139,10 +139,11 @@ U32 AILCALLBACK CSoundData::open_callback(char const * filename, U32 *file_handl
 	if (-1 == iIndex)
 		return 0;
 
-	LPCVOID	pMap;
-	
-	if (!CEterPackManager::Instance().Get(ms_SoundFile[iIndex], filename, &pMap))
+	if (!FileSystemManager::Instance().OpenFile(filename, ms_SoundFile[iIndex]))
+	{
+		TraceError("sound file: %s can not open", filename);
 		return 0;
+	}
 
 	ms_isSoundFile[iIndex] = true;
 	
@@ -155,7 +156,7 @@ void AILCALLBACK CSoundData::close_callback(U32 file_handle)
 	if (!isSlotIndex(file_handle))
 		return;
 
-	ms_SoundFile[file_handle].Destroy();
+	ms_SoundFile[file_handle].Close();
 	ms_isSoundFile[file_handle] = false;
 }
 
@@ -172,7 +173,7 @@ U32 AILCALLBACK CSoundData::read_callback(U32 file_handle, void * buffer, U32 by
 	if (!isSlotIndex(file_handle))
 		return 0;
 
-	DWORD dwRealSize = min(ms_SoundFile[file_handle].Size(), bytes);
+	DWORD dwRealSize = std::min<DWORD>(ms_SoundFile[file_handle].GetSize(), bytes);
 	ms_SoundFile[file_handle].Read(buffer, dwRealSize);
 	return dwRealSize;
 }

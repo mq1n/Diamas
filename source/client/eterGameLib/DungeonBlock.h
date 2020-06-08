@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../EterLib/ResourceManager.h"
-#include "../EterLib/GrpObjectInstance.h"
-#include "../EterGrnLib/ModelInstance.h"
-#include "../EterGrnLib/Thing.h"
+#include "../eterLib/ResourceManager.h"
+#include "../eterLib/GrpObjectInstance.h"
+#include "../eterGrnLib/ModelInstance.h"
+#include "../eterGrnLib/Thing.h"
 
 class CDungeonModelInstance;
 

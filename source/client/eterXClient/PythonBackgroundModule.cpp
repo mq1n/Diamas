@@ -2,7 +2,7 @@
 #include "PythonSystem.h"
 #include "PythonBackground.h"
 #include "../eterlib/StateManager.h"
-#include "../gamelib/MapOutDoor.h"
+#include "../eterGameLib/MapOutDoor.h"
 
 PyObject * backgroundIsSoftwareTiling(PyObject * poSelf, PyObject * poArgs)
 {

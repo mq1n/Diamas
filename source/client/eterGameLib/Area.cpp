@@ -2,15 +2,13 @@
 
 #include "../eterLib/ResourceManager.h"
 #include "../eterLib/StateManager.h"
-#include "../effectLib/EffectManager.h"
-#include "../SpeedTreeLib/SpeedTreeForestDirectX8.h"
+#include "../eterEffectLib/EffectManager.h"
+#include "../eterTreeLib/SpeedTreeForestDirectX8.h"
 #include "../eterBase/Timer.h"
 
 #include "Area.h"
 #include "PropertyManager.h"
 #include "Property.h"
-
-#include <boost/algorithm/string.hpp>
 
 CDynamicPool<CArea::TObjectInstance>	CArea::ms_ObjectInstancePool;
 CDynamicPool<CAttributeInstance>		CArea::ms_AttributeInstancePool;
@@ -732,7 +730,8 @@ void CArea::__LoadAttribute(TObjectInstance * pObjectInstance, const char * c_sz
 	if (false == bFileExist)
 	{
 		std::string attrFileName(c_szAttributeFileName);
-		boost::algorithm::to_lower(attrFileName);
+		std::transform(attrFileName.begin(), attrFileName.end(), attrFileName.begin(), tolower);
+
 		const bool bIsDungeonObject = (std::string::npos != attrFileName.find("/dungeon/")) || (std::string::npos != attrFileName.find("\\dungeon\\"));
 
 		// NOTE: dungeon 오브젝트는 Dummy Collision을 자동으로 생성하지 않도록 함 (던전의 경우 더미 컬리전때문에 문제가 된 경우가 수차례 있었음. 이렇게 하기로 그래픽 팀과 협의 완료)
@@ -968,7 +967,7 @@ bool CArea::__Load_LoadObject(const char * c_szFileName)
 
 		if (rVector.size() > 6)
 		{
-			for (int portalIdx = 0; portalIdx < min(rVector.size()-6, PORTAL_ID_MAX_NUM); ++portalIdx)
+			for (int portalIdx = 0; portalIdx < std::min<int>(rVector.size()-6, PORTAL_ID_MAX_NUM); ++portalIdx)
 			{
 				ObjectData.abyPortalID[portalIdx] = atoi(rVector[6+portalIdx].c_str());
 			}

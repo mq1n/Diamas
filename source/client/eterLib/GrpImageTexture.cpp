@@ -1,6 +1,5 @@
 #include "StdAfx.h"
-#include "../eterBase/MappedFile.h"
-#include "../eterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 #include "GrpImageTexture.h"
 
 bool CGraphicImageTexture::Lock(int* pRetPitch, void** ppRetPixels, int level)
@@ -50,13 +49,11 @@ bool CGraphicImageTexture::CreateDeviceObjects()
 	}
 	else
 	{
-		CMappedFile	mappedFile;
-		LPCVOID		c_pvMap;
-
-		if (!CEterPackManager::Instance().Get(mappedFile, m_stFileName.c_str(), &c_pvMap))
+		CFile mappedFile;
+		if (!FileSystemManager::Instance().OpenFile(m_stFileName, mappedFile))
 			return false;
 
-		return CreateFromMemoryFile(mappedFile.Size(), c_pvMap, m_d3dFmt, m_dwFilter);
+		return CreateFromMemoryFile(mappedFile.GetSize(), mappedFile.GetData(), m_d3dFmt, m_dwFilter);
 	}
 
 	m_bEmpty = false;
@@ -209,7 +206,7 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvB
 
 	static CDXTCImage image;
 
-	if (image.LoadHeaderFromMemory((const BYTE *) c_pvBuf))	// DDS인가 확인
+	if (image.LoadHeaderFromMemory((const BYTE *) c_pvBuf, bufSize))	// DDS인가 확인
 	{
 		return (CreateDDSTexture(image, (const BYTE *) c_pvBuf));
 	}

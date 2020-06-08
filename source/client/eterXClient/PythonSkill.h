@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../gamelib/ItemData.h"
-#include "../EterBase/Poly/Poly.h"
+#include "../eterGameLib/ItemData.h"
+#include "../eterBase/Poly/Poly.h"
 
 class CInstanceBase;
 

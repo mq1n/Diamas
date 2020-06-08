@@ -3,27 +3,9 @@
 #include "../eterLib/StdAfx.h"
 #include "../eterGrnLib/StdAfx.h"
 
-//#include <crtdbg.h>
-#ifdef _DEBUG
-	#undef _DEBUG
-	#include "Python-2.2/python.h"
-	#define _DEBUG
-#else
-	#include <Python-2.2/python.h>
-#endif
-#include "Python-2.2/node.h"
-#include "Python-2.2/grammar.h"
-#include "Python-2.2/token.h"
-#include "Python-2.2/parsetok.h"
-#include "Python-2.2/errcode.h"
-#include "Python-2.2/compile.h"
-#include "Python-2.2/symtable.h"
-#include "Python-2.2/eval.h"
-#include "Python-2.2/marshal.h"
-
+#include <python27/python.h>
 #include "PythonUtils.h"
 #include "PythonLauncher.h"
-#include "PythonMarshal.h"
 #include "Resource.h"
 
 void initdbg();

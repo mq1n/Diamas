@@ -1,18 +1,22 @@
 #include "StdAfx.h"
+#include "resource.h"
+#include "Version.h"
 #include "PythonApplication.h"
 #include "ProcessScanner.h"
 #include "PythonExceptionSender.h"
-#include "resource.h"
-#include "Version.h"
 
-#ifdef _DEBUG
-#include <crtdbg.h>
-#endif
+#include <cstdlib>
+#include <fstream>
+#include <xorstr.hpp>
+#include <array>
+#include <memory>
+#include <filesystem>
 
-#include "../eterPack/EterPackManager.h"
+#include <FileSystemIncl.hpp>
 #include "../eterLib/Util.h"
-#include "../CWebBrowser/CWebBrowser.h"
+#include "../eterWebBrowser/CWebBrowser.h"
 #include "../eterBase/CPostIt.h"
+#include "../eterBase/lzo.h"
 
 #include "CheckLatestFiles.h"
 
@@ -20,32 +24,15 @@
 #include "NProtectGameGuard.h"
 #include "WiseLogicXTrap.h"
 
+// d3dx8.lib(cleanmesh.obj) : error LNK2019: unresolved external symbol __vsnprintf referenced in function "void __cdecl OutputError
+int(WINAPIV* __vsnprintf)(char*, size_t, const char*, va_list) = _vsnprintf;
+
 extern "C" {  
 extern int _fltused;  
 volatile int _AVOID_FLOATING_POINT_LIBRARY_BUG = _fltused;  
 };  
 
-#pragma comment(linker, "/NODEFAULTLIB:libci.lib")
-
-#pragma comment( lib, "version.lib" )
-#pragma comment( lib, "python22.lib" )
-#pragma comment( lib, "imagehlp.lib" )
-#pragma comment( lib, "devil.lib" )
-#pragma comment( lib, "granny2.lib" )
-#pragma comment( lib, "mss32.lib" )
-#pragma comment( lib, "winmm.lib" )
-#pragma comment( lib, "imm32.lib" )
-#pragma comment( lib, "oldnames.lib" )
-#pragma comment( lib, "SpeedTreeRT.lib" )
-#pragma comment( lib, "dinput8.lib" )
-#pragma comment( lib, "dxguid.lib" )
-#pragma comment( lib, "ws2_32.lib" )
-#pragma comment( lib, "strmiids.lib" )
-#pragma comment( lib, "ddraw.lib" )
-#pragma comment( lib, "dmoguids.lib" )
-//#pragma comment( lib, "wsock32.lib" )
 #include <stdlib.h>
-#include <cryptopp/cryptoppLibLink.h>
 bool __IS_TEST_SERVER_MODE__=false;
 
 extern bool SetDefaultCodePage(DWORD codePage);
@@ -159,82 +146,56 @@ const char* ApplicationStringTable_GetStringz(DWORD dwID)
 
 int Setup(LPSTR lpCmdLine); // Internal function forward
 
-bool PackInitialize(const char * c_pszFolder)
+bool PackInitialize(const char* c_pszFolder)
 {
-	NANOBEGIN
-	if (_access(c_pszFolder, 0) != 0)
-		return true;
-
-	std::string stFolder(c_pszFolder);
-	stFolder += "/";
-
-	std::string stFileName(stFolder);
-	stFileName += "Index";
-
-	CMappedFile file;
-	LPCVOID pvData;
-
-	if (!file.Create(stFileName.c_str(), &pvData, 0, 0))
+	if (!std::filesystem::exists(c_pszFolder))
 	{
-		LogBoxf("FATAL ERROR! File not exist: %s", stFileName.c_str());
-		TraceError("FATAL ERROR! File not exist: %s", stFileName.c_str());
-		return true;
-	}
-
-	CMemoryTextFileLoader TextLoader;
-	TextLoader.Bind(file.Size(), pvData);
-
-	bool bPackFirst = TRUE;
-
-	const std::string& strPackType = TextLoader.GetLineString(0);
-
-	if (strPackType.compare("FILE") && strPackType.compare("PACK"))
-	{
-		TraceError("Pack/Index has invalid syntax. First line must be 'PACK' or 'FILE'");
+		TraceError("pack folder not exist");
 		return false;
 	}
 
-#ifdef _DISTRIBUTE
-	Tracef("알림: 팩 모드입니다.\n");
-	
-	//if (0 == strPackType.compare("FILE"))
-	//{
-	//	bPackFirst = FALSE;
-	//	Tracef("알림: 파일 모드입니다.\n");
-	//}
-	//else
-	//{
-	//	Tracef("알림: 팩 모드입니다.\n");
-	//}
-#else
-	bPackFirst = FALSE;
-	Tracef("알림: 파일 모드입니다.\n");
-#endif
-
 	CTextFileLoader::SetCacheMode();
-#if defined(USE_RELATIVE_PATH)
-	CEterPackManager::Instance().SetRelativePathMode();
+	CSoundData::SetPackMode();
+
+	const std::string folder = c_pszFolder;
+	const std::string indexFile = folder + "/Index";
+	const std::string devIndexFile = folder + "/DevIndex";
+
+	CFile file;
+#if defined(_DEBUG) || defined(USE_DEV_INDEX)
+	if (!FileSystemManager::Instance().OpenFile(devIndexFile, file) || !file.GetSize())
 #endif
-	CEterPackManager::Instance().SetCacheMode();
-	CEterPackManager::Instance().SetSearchMode(bPackFirst);
-
-	CSoundData::SetPackMode(); // Miles 파일 콜백을 셋팅
-
-	std::string strPackName, strTexCachePackName;
-	for (DWORD i = 1; i < TextLoader.GetLineCount() - 1; i += 2)
 	{
-		const std::string & c_rstFolder = TextLoader.GetLineString(i);
-		const std::string & c_rstName = TextLoader.GetLineString(i + 1);
-
-		strPackName = stFolder + c_rstName;
-		strTexCachePackName = strPackName + "_texcache";
-
-		CEterPackManager::Instance().RegisterPack(strPackName.c_str(), c_rstFolder.c_str());
-		CEterPackManager::Instance().RegisterPack(strTexCachePackName.c_str(), c_rstFolder.c_str());
+		if (!FileSystemManager::Instance().OpenFile(indexFile, file) || !file.GetSize())
+		{
+			TraceError("Failed to load %s", indexFile.c_str());
+			return false;
+		}
 	}
 
-	CEterPackManager::Instance().RegisterRootPack((stFolder + std::string("root")).c_str());
-	NANOEND
+	CMemoryTextFileLoader TextLoader;
+	TextLoader.Bind(file.GetSize(), file.GetData());
+
+	for (size_t i = 0; i < TextLoader.GetLineCount(); ++i)
+	{
+		const std::string& ArchiveName = TextLoader.GetLineString(i);
+		Tracenf("%u) %s", i, ArchiveName.c_str());
+
+		if (ArchiveName.empty())
+		{
+			Tracenf("Index file line: %u is empty", i);
+			continue;
+		}
+
+		const std::wstring archiveTarget = L"pack/" + std::wstring(ArchiveName.begin(), ArchiveName.end());
+
+		if (FileSystemManager::Instance().AddArchive(archiveTarget, DEFAULT_ARCHIVE_KEY))
+			Tracenf("%ls succesfully loaded!", archiveTarget.c_str());
+		else
+			TraceError("%ls can not loaded!", archiveTarget.c_str());
+	}
+
+	file.Close();
 	return true;
 }
 
@@ -278,79 +239,27 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 
 	NANOBEGIN
 
-	// RegisterDebugFlag
-	{
-		std::string stRegisterDebugFlag;
-
-#ifdef _DISTRIBUTE 
-		stRegisterDebugFlag ="__DEBUG__ = 0";
+	PyObject* builtins = PyImport_ImportModule("__builtin__");
+#ifdef _NDEBUG
+	PyModule_AddIntConstant(builtins, "__DEBUG__", 0);
 #else
-		stRegisterDebugFlag ="__DEBUG__ = 1"; 
+	PyModule_AddIntConstant(builtins, "__DEBUG__", 1);
+#endif
+#ifdef __USE_CYTHON__
+	PyModule_AddIntConstant(builtins, "__USE_CYTHON__", 1);
+#else
+	PyModule_AddIntConstant(builtins, "__USE_CYTHON__", 0);
 #endif
 
-		if (!pyLauncher.RunLine(stRegisterDebugFlag.c_str()))
-		{
-			TraceError("RegisterDebugFlag Error");
-			return false;
-		}
-	}
+	PyModule_AddStringConstant(builtins, "__COMMAND_LINE__", "");
 
-	// RegisterCommandLine
+	char szSystemPy[] = { 's', 'y', 's', 't', 'e', 'm', '_', 'p', 'y', 't', 'h', 'o', 'n', 0x0 }; // system_python
+	char szSystemPyFailMsg[] = { 'M', 'a', 'i', 'n', ' ', 's', 'c', 'r', 'i', 'p', 't', ' ', 'i', 'n', 'i', 't', 'i', 'l', 'i', 'z', 'a', 't', 'i', 'o', 'n', ' ', 'f', 'a', 'i', 'l', 'e', 'd', '!', 0x0 }; // Main script initilization failed!
+
+	if (!pyLauncher.RunFile(szSystemPy, szSystemPy))
 	{
-		std::string stRegisterCmdLine;
-
-		const char * loginMark = "-cs";
-		const char * loginMark_NonEncode = "-ncs";
-		const char * seperator = " ";
-
-		std::string stCmdLine;
-		const int CmdSize = 3;
-		vector<std::string> stVec;
-		SplitLine(lpCmdLine,seperator,&stVec);
-		if (CmdSize == stVec.size() && stVec[0]==loginMark)
-		{
-			char buf[MAX_PATH];	//TODO 아래 함수 string 형태로 수정
-			base64_decode(stVec[2].c_str(),buf);
-			stVec[2] = buf;
-			string_join(seperator,stVec,&stCmdLine);
-		}
-		else if (CmdSize <= stVec.size() && stVec[0]==loginMark_NonEncode)
-		{
-			stVec[0] = loginMark;
-			string_join(" ",stVec,&stCmdLine);
-		}
-		else
-			stCmdLine = lpCmdLine;
-
-		stRegisterCmdLine ="__COMMAND_LINE__ = ";
-		stRegisterCmdLine+='"';
-		stRegisterCmdLine+=stCmdLine;
-		stRegisterCmdLine+='"';
-
-		const CHAR* c_szRegisterCmdLine=stRegisterCmdLine.c_str();
-		if (!pyLauncher.RunLine(c_szRegisterCmdLine))
-		{
-			TraceError("RegisterCommandLine Error");
-			return false;
-		}
-	}
-	{
-		vector<std::string> stVec;
-		SplitLine(lpCmdLine," " ,&stVec);
-
-		if (stVec.size() != 0 && "--pause-before-create-window" == stVec[0])
-		{
-#ifdef XTRAP_CLIENT_ENABLE
-			if (!XTrap_CheckInit())
-				return false;
-#endif
-			system("pause");
-		}
-		if (!pyLauncher.RunFile("system.py"))
-		{
-			TraceError("RunMain Error");
-			return false;
-		}
+		TraceError(szSystemPyFailMsg);
+		return false;
 	}
 
 	NANOEND
@@ -398,8 +307,21 @@ bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 	OpenLogFile(false); // false == uses syserr.txt only
 #endif
 
-	static CLZO				lzo;
-	static CEterPackManager	EterPackManager;
+	static CLZO	lzo;
+	static FileSystemManager fileSystem;
+
+	if (!fileSystem.InitializeFSManager(
+#ifdef ENABLE_LAYER2_FILE_ENCRYPTION
+		FILE_FLAG_XTEA
+#endif
+	))
+	{
+		LogBox("File system Initialization failed. Check FileSystem.log file..");
+		return false;
+	}
+
+	fileSystem.AddToDiskBlacklist("py");
+	fileSystem.AddToDiskBlacklist("pyc");
 
 	if (!PackInitialize("pack"))
 	{
@@ -420,7 +342,7 @@ bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 		CPythonExceptionSender pyExceptionSender;
 		SetExceptionSender(&pyExceptionSender);
 
-		if (pyLauncher.Create())
+		if (pyLauncher.Create("pyApi"))
 		{
 			ret=RunMainScript(pyLauncher, lpCmdLine);	//게임 실행중엔 함수가 끝나지 않는다.
 		}
@@ -689,12 +611,17 @@ Clean:
 	return 0;
 }
 
-static void GrannyError(granny_log_message_type Type,
-						granny_log_message_origin Origin,
-						char const *Error,
-						void *UserData)
+static void GrannyError(granny_log_message_type Type, granny_log_message_origin Origin, char const* File, granny_int32x Line, char const* Error, void* UserData)
 {
-    TraceError("GRANNY: %s", Error);
+	//Origin==GrannyFileReadingLogMessage for granny run-time tag& revision warning (Type==GrannyWarningLogMessage)
+	//Origin==GrannyControlLogMessage for miss track_group on static models as weapons warning (Type==GrannyWarningLogMessage)
+	//Origin==GrannyMeshBindingLogMessage for miss bone ToSkeleton on new ymir models error (Type==GrannyErrorLogMessage)
+
+	if (Origin == GrannyFileReadingLogMessage || Origin == GrannyControlLogMessage || Origin == GrannyMeshBindingLogMessage)
+		return;
+
+	TraceError("GRANNY: %s(%d): ERROR: %s --- [%d] %s --- [%d] %s",
+		File, Line, Error, Type, GrannyGetLogMessageTypeString(Type), Origin, GrannyGetLogMessageOriginString(Origin));
 }
 
 int Setup(LPSTR lpCmdLine)

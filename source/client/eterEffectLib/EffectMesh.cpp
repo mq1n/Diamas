@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "../eterlib/StateManager.h"
 #include "../eterlib/ResourceManager.h"
-#include "../eterpack/EterPackManager.h"
 #include "EffectMesh.h"
+#include <FileSystemIncl.hpp>
 
 CDynamicPool<CEffectMesh::SEffectMeshData> CEffectMesh::SEffectMeshData::ms_kPool;
 
@@ -192,15 +192,13 @@ BOOL CEffectMesh::__LoadData_Ver002(int iSize, const BYTE * c_pbBuf)
 
 		if (0 == strExtension.compare("ifl"))
 		{
-			LPCVOID pMotionData;
-			CMappedFile File;
-
-			if (CEterPackManager::Instance().Get(File, pMeshData->szDiffuseMapFileName, &pMotionData))
+			CFile File;
+			if (FileSystemManager::Instance().OpenFile(pMeshData->szDiffuseMapFileName, File))
 			{
 				CMemoryTextFileLoader textFileLoader;
 				std::vector<std::string> stTokenVector;
 
-				textFileLoader.Bind(File.Size(), pMotionData);
+				textFileLoader.Bind(File.GetSize(), File.GetData());
 
 				std::string strPathName;
 				GetOnlyPathName(pMeshData->szDiffuseMapFileName, strPathName);
@@ -337,15 +335,13 @@ BOOL CEffectMesh::__LoadData_Ver001(int iSize, const BYTE * c_pbBuf)
 
 		if (0 == strExtension.compare("ifl"))
 		{
-			LPCVOID pMotionData;
-			CMappedFile File;
-
-			if (CEterPackManager::Instance().Get(File, pMeshData->szDiffuseMapFileName, &pMotionData))
+			CFile File;
+			if (FileSystemManager::Instance().OpenFile(pMeshData->szDiffuseMapFileName, File))
 			{
 				CMemoryTextFileLoader textFileLoader;
 				std::vector<std::string> stTokenVector;
 
-				textFileLoader.Bind(File.Size(), pMotionData);
+				textFileLoader.Bind(File.GetSize(), File.GetData());
 
 				std::string strPathName;
 				GetOnlyPathName(pMeshData->szDiffuseMapFileName, strPathName);

@@ -650,7 +650,7 @@ void SpherePackFactory::RayTrace(const Vector3d &p1,
 	mRoot->RayTrace(p1,dir,dist,this);
 }
 
-#include "../EterBase/Debug.h"
+#include "../eterBase/Debug.h"
 
 void SpherePackFactory::RangeTest(const Vector3d &center,float radius,SpherePackCallback *callback)
 {

@@ -30,57 +30,57 @@ enum EPixFormat
 
 typedef struct _XDDPIXELFORMAT
 {
-	DWORD       dwSize;                 // size of structure
-	DWORD       dwFlags;                // pixel format flags
-	DWORD       dwFourCC;               // (FOURCC code)
+	uint32_t       dwSize;                 // size of structure
+	uint32_t       dwFlags;                // pixel format flags
+	uint32_t       dwFourCC;               // (FOURCC code)
 
     union
     {
-        DWORD   dwRGBBitCount;          // how many bits per pixel
-        DWORD   dwYUVBitCount;          // how many bits per pixel
-        DWORD   dwZBufferBitDepth;      // how many total bits/pixel in z buffer (including any stencil bits)
-        DWORD   dwAlphaBitDepth;        // how many bits for alpha channels
-        DWORD   dwLuminanceBitCount;    // how many bits per pixel
-        DWORD   dwBumpBitCount;         // how many bits per "buxel", total
-        DWORD   dwPrivateFormatBitCount;// Bits per pixel of private driver formats. Only valid in texture
+        uint32_t   dwRGBBitCount;          // how many bits per pixel
+        uint32_t   dwYUVBitCount;          // how many bits per pixel
+        uint32_t   dwZBufferBitDepth;      // how many total bits/pixel in z buffer (including any stencil bits)
+        uint32_t   dwAlphaBitDepth;        // how many bits for alpha channels
+        uint32_t   dwLuminanceBitCount;    // how many bits per pixel
+        uint32_t   dwBumpBitCount;         // how many bits per "buxel", total
+        uint32_t   dwPrivateFormatBitCount;// Bits per pixel of private driver formats. Only valid in texture
 		// format list and if DDPF_D3DFORMAT is set
     } DUMMYUNIONNAMEN(1);
     union
     {
-        DWORD   dwRBitMask;             // mask for red bit
-        DWORD   dwYBitMask;             // mask for Y bits
-        DWORD   dwStencilBitDepth;      // how many stencil bits (note: dwZBufferBitDepth-dwStencilBitDepth is total Z-only bits)
-        DWORD   dwLuminanceBitMask;     // mask for luminance bits
-        DWORD   dwBumpDuBitMask;        // mask for bump map U delta bits
-        DWORD   dwOperations;           // DDPF_D3DFORMAT Operations
+        uint32_t   dwRBitMask;             // mask for red bit
+        uint32_t   dwYBitMask;             // mask for Y bits
+        uint32_t   dwStencilBitDepth;      // how many stencil bits (note: dwZBufferBitDepth-dwStencilBitDepth is total Z-only bits)
+        uint32_t   dwLuminanceBitMask;     // mask for luminance bits
+        uint32_t   dwBumpDuBitMask;        // mask for bump map U delta bits
+        uint32_t   dwOperations;           // DDPF_D3DFORMAT Operations
     } DUMMYUNIONNAMEN(2);
     union
     {
-        DWORD   dwGBitMask;             // mask for green bits
-        DWORD   dwUBitMask;             // mask for U bits
-        DWORD   dwZBitMask;             // mask for Z bits
-        DWORD   dwBumpDvBitMask;        // mask for bump map V delta bits
+        uint32_t   dwGBitMask;             // mask for green bits
+        uint32_t   dwUBitMask;             // mask for U bits
+        uint32_t   dwZBitMask;             // mask for Z bits
+        uint32_t   dwBumpDvBitMask;        // mask for bump map V delta bits
         struct
         {
-            WORD    wFlipMSTypes;       // Multisample methods supported via flip for this D3DFORMAT
-            WORD    wBltMSTypes;        // Multisample methods supported via blt for this D3DFORMAT
+            uint16_t    wFlipMSTypes;       // Multisample methods supported via flip for this D3DFORMAT
+            uint16_t    wBltMSTypes;        // Multisample methods supported via blt for this D3DFORMAT
         } MultiSampleCaps;
-		
+
     } DUMMYUNIONNAMEN(3);
     union
     {
-        DWORD   dwBBitMask;             // mask for blue bits
-        DWORD   dwVBitMask;             // mask for V bits
-        DWORD   dwStencilBitMask;       // mask for stencil bits
-        DWORD   dwBumpLuminanceBitMask; // mask for luminance in bump map
+        uint32_t   dwBBitMask;             // mask for blue bits
+        uint32_t   dwVBitMask;             // mask for V bits
+        uint32_t   dwStencilBitMask;       // mask for stencil bits
+        uint32_t   dwBumpLuminanceBitMask; // mask for luminance in bump map
     } DUMMYUNIONNAMEN(4);
     union
     {
-        DWORD   dwRGBAlphaBitMask;      // mask for alpha channel
-        DWORD   dwYUVAlphaBitMask;      // mask for alpha channel
-        DWORD   dwLuminanceAlphaBitMask;// mask for alpha channel
-        DWORD   dwRGBZBitMask;          // mask for Z channel
-        DWORD   dwYUVZBitMask;          // mask for Z channel
+        uint32_t   dwRGBAlphaBitMask;      // mask for alpha channel
+        uint32_t   dwYUVAlphaBitMask;      // mask for alpha channel
+        uint32_t   dwLuminanceAlphaBitMask;// mask for alpha channel
+        uint32_t   dwRGBZBitMask;          // mask for Z channel
+        uint32_t   dwYUVZBitMask;          // mask for Z channel
     } DUMMYUNIONNAMEN(5);
 } XDDPIXELFORMAT;
 
@@ -93,51 +93,29 @@ class CDXTCImage
 
 		void	Initialize();
 		void	Clear();
-		
-	public:
-		const BYTE *		m_pbCompBufferByLevels[MAX_MIPLEVELS];
-		std::vector<BYTE>	m_bCompVector[MAX_MIPLEVELS];
 
-		int					m_nCompSize;
-		int					m_nCompLineSz;
+	public:
+		const uint8_t *		m_pbCompBufferByLevels[MAX_MIPLEVELS];
+		std::vector<uint8_t>	m_bCompVector[MAX_MIPLEVELS];
 
 		char				m_strFormat[32];
 		EPixFormat			m_CompFormat;
-		
-		long				m_lPitch;
-		DWORD				m_dwMipMapCount;
+
+		int32_t				m_lPitch;
+		uint32_t				m_dwMipMapCount;
 		bool				m_bMipTexture;	// texture has mipmaps?
-		DWORD				m_dwFlags;
-		
-		int					m_nWidth;		// in pixels of uncompressed image 
-		int					m_nHeight;
-		
+		uint32_t				m_dwFlags;
+
+		int32_t					m_nWidth;		// in pixels of uncompressed image
+		int32_t					m_nHeight;
+
 		XDDPIXELFORMAT		m_xddPixelFormat;
 
-		bool LoadFromFile(const char * filename);		// true if success
-		bool LoadFromMemory(const BYTE * c_pbMap);
-		bool LoadHeaderFromMemory(const BYTE * c_pbMap);
-		bool Copy(int miplevel, BYTE * pbDest, long lDestPitch);
-
-		void Decompress(int miplevel, DWORD * pdwDest);
-		void DecompressDXT1(int miplevel, DWORD * pdwDest);
-		void DecompressDXT3(int miplevel, DWORD * pdwDest);
-		void DecompressDXT5(int miplevel, DWORD * pdwDest);
-		void DecompressARGB(int miplevel, DWORD * pdwDest);
-
+	
+		bool LoadHeaderFromMemory(const uint8_t * c_pbMap, uint32_t dwSize);
+		bool Copy(int32_t miplevel, uint8_t * pbDest, int32_t lDestPitch);
 		VOID DecodePixelFormat(CHAR* strPixelFormat, XDDPIXELFORMAT* pddpf);
 
-		void Unextract(BYTE * pbDest, int iWidth, int iHeight, int iPitch);
-		/*
-		struct TimingInfo;			// defined in Image_DXTC.cpp
-		void RunTimingSession();	// run a few methods & time the code
-
-		// must use dxt5 texture
-		void Time_Decomp5_01(int ntimes, TimingInfo * info);
-		void Time_Decomp5_02(int ntimes, TimingInfo * info);
-		void Time_Decomp5_03(int ntimes, TimingInfo * info);
-		void Time_Decomp5_04(int ntimes, TimingInfo * info);
-		*/
 };
 
 #endif // #ifndef AFX_IMAGE_DXTC_H__4B89D8D0_7857_11D4_9630_00A0C996DE3D__INCLUDED_

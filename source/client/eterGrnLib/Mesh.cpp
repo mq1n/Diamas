@@ -55,13 +55,9 @@ void CGrannyMesh::DeformPNTVertices(void * dstBaseVertices, D3DXMATRIX * boneMat
 	
 	int vtxCount = GrannyGetMeshVertexCount(pgrnMesh);
 
-	// WORK
-	int * boneIndices = GrannyGetMeshBindingToBoneIndices(pgrnMeshBinding);
-	// END_OF_WORK
-
 	GrannyDeformVertices(
 		m_pgrnMeshDeformer, 
-		boneIndices, 
+		GrannyGetMeshBindingToBoneIndices(pgrnMeshBinding),
 		(float *)boneMatrices,
 		vtxCount,
 		srcVertices,
@@ -100,7 +96,7 @@ int CGrannyMesh::GetIndexBasePosition() const
 }
 
 // WORK
-int * CGrannyMesh::GetDefaultBoneIndices() const
+const granny_int32x * CGrannyMesh::GetDefaultBoneIndices() const
 {
 	return GrannyGetMeshBindingToBoneIndices(m_pgrnMeshBindingTemp);
 }
@@ -136,7 +132,7 @@ bool CGrannyMesh::CreateFromGrannyMeshPointer(granny_skeleton * pgrnSkeleton, gr
 		granny_data_type_definition * pgrnInputType = GrannyGetMeshVertexType(m_pgrnMesh);
 		granny_data_type_definition * pgrnOutputType = m_pgrnMeshType;
 
-		m_pgrnMeshDeformer = GrannyNewMeshDeformer(pgrnInputType, pgrnOutputType, GrannyDeformPositionNormal);
+		m_pgrnMeshDeformer = GrannyNewMeshDeformer(pgrnInputType, pgrnOutputType, GrannyDeformPositionNormal, GrannyAllowUncopiedTail);
 		assert(m_pgrnMeshDeformer != NULL && "Cannot create mesh deformer");
 	}
 

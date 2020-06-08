@@ -9,7 +9,7 @@
 #include "packet.h"
 
 #include "../eterlib/StateManager.h"
-#include "../gamelib/ItemManager.h"
+#include "../eterGameLib/ItemManager.h"
 
 BOOL HAIR_COLOR_ENABLE=FALSE;
 BOOL USE_ARMOR_SPECULAR=FALSE;
@@ -2684,7 +2684,7 @@ void CInstanceBase::__ClearArmorRefineEffect()
 
 UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 {
-	DWORD refine = max(pItem->GetRefine() + pItem->GetSocketCount(),CItemData::ITEM_SOCKET_MAX_NUM) - CItemData::ITEM_SOCKET_MAX_NUM;
+	DWORD refine = std::max<DWORD>(pItem->GetRefine() + pItem->GetSocketCount(),CItemData::ITEM_SOCKET_MAX_NUM) - CItemData::ITEM_SOCKET_MAX_NUM;
 	switch (pItem->GetType())
 	{
 	case CItemData::ITEM_TYPE_WEAPON:

@@ -1,11 +1,11 @@
 #include "StdAfx.h"
-#include "../eterPack/EterPackManager.h"
-
+#include <FileSystemIncl.hpp>
 #include "PropertyManager.h"
 #include "Property.h"
 
-CPropertyManager::CPropertyManager() : m_isFileMode(true)
+CPropertyManager::CPropertyManager()
 {
+	m_bInitialized = false;
 }
 
 CPropertyManager::~CPropertyManager()
@@ -15,156 +15,133 @@ CPropertyManager::~CPropertyManager()
 
 bool CPropertyManager::Initialize(const char * c_pszPackFileName)
 {
-	if (c_pszPackFileName)
+	if (m_bInitialized)
+		return true;
+
+	CFile kPropertyFile;
+	if (!FileSystemManager::Instance().OpenFile(c_pszPackFileName, kPropertyFile))
 	{
-		if (!m_pack.Create(m_fileDict, c_pszPackFileName, "", true))
+		TraceError("Property list: %s can NOT load", c_pszPackFileName);
+		return false;
+	}
+
+	auto stContent = std::string(reinterpret_cast<const char*>(kPropertyFile.GetData()), kPropertyFile.GetSize());
+	if (stContent.empty())
+	{
+		TraceError("Property list: %s is null", c_pszPackFileName);
+		return false;
+	}
+
+	TPropertyContainer vPropertyList;
+	if (LoadPropertyList(stContent, vPropertyList) == false)
+	{
+		TraceError("Property list: %s can NOT parsed", c_pszPackFileName);
+		return false;
+	}
+	if (vPropertyList.empty())
+	{
+		TraceError("Property list: %s is empty");
+		return false;
+	}
+	// TraceError("Property container size: %u", vPropertyList.size());
+
+	for (auto& element : vPropertyList)
+	{
+		CProperty* pProperty = new CProperty(element["filename"].c_str(), std::stoul(element["crc"]));
+
+		uint32_t dwCRC = pProperty->GetCRC();
+		auto stCRC = std::to_string(dwCRC);
+
+		if (stCRC != element["crc"])
 		{
-			LogBoxf("Cannot open property pack file (filename %s)", c_pszPackFileName);
-			return false;
+			TraceError("CPropertyManager::Initialize: Cannot register '%s' Hash: %s/%s",
+				element["filename"].c_str(), stCRC.c_str(), element["crc"].c_str());
+			delete pProperty;
+			continue;
 		}
 
-		m_isFileMode = false;
-
-		TDataPositionMap & indexMap = m_pack.GetIndexMap();
-
-		TDataPositionMap::iterator itor = indexMap.begin();
-
-		typedef std::map<DWORD, TEterPackIndex *> TDataPositionMap;
-
-		int i = 0;
-
-		while (indexMap.end() != itor)
+		auto itor = m_PropertyByCRCMap.find(dwCRC);
+		if (itor != m_PropertyByCRCMap.end())
 		{
-			TEterPackIndex * pIndex = itor->second;
-			++itor;
+			Tracef("CPropertyManager::Initialize: Property already registered, replace %s to %s\n",
+				itor->second->GetFileName(), element["filename"].c_str());
 
-			if (!stricmp("property/reserve", pIndex->filename))
-			{
-				LoadReservedCRC(pIndex->filename);
-				continue;
-			}
+			delete itor->second;
+			itor->second = pProperty;
+		}
+		else
+		{
+			m_PropertyByCRCMap.emplace(dwCRC, pProperty);
+			// TraceError("Property registired! File: %s CRC: %u", element["filename"].c_str(), element["crc"].c_str());
+		}
 
-			if (!Register(pIndex->filename))
-				continue;
+		for (auto& elementdata : element)
+		{
+			CTokenVector kVec;
+			kVec.push_back(elementdata.second.c_str());
+			pProperty->PutVector(elementdata.first.c_str(), kVec);
 
-			++i;
+			// TraceError("PutVector: '%s'-'%s'", elementdata.first.c_str(), elementdata.second.c_str());
 		}
 	}
-	else
-	{
-		m_isFileMode = true;
-		// NOTE : 여기서 Property를 등록시키면 WorldEditor에서 이상이 생김 ;
-		//        또한, Property Tree List에도 등록을 시켜야 되기 때문에 바깥쪽에서.. - [levites]
-	}
 
+	m_bInitialized = true;
 	return true;
 }
 
-bool CPropertyManager::BuildPack()
+void CPropertyManager::ReserveCRC(uint32_t dwCRC)
 {
-	if (!m_pack.Create(m_fileDict, "property", ""))
-		return false;
-
-	WIN32_FIND_DATA fdata;
-	HANDLE hFind = FindFirstFile("property\\*", &fdata);
-
-	if (hFind == INVALID_HANDLE_VALUE)
-		return false;
-
-	do
-	{
-		if (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			continue;
-
-		char szSourceFileName[256 + 1];
-		_snprintf(szSourceFileName, sizeof(szSourceFileName), "property\\%s", fdata.cFileName);
-
-		m_pack.Put(fdata.cFileName, szSourceFileName,COMPRESSED_TYPE_NONE,"");
-	}
-	while (FindNextFile(hFind, &fdata));
-
-	FindClose(hFind);
-	return true;
+	m_ReservedCRCSet.emplace(dwCRC);
 }
 
-bool CPropertyManager::LoadReservedCRC(const char * c_pszFileName)
-{
-	CMappedFile file;
-	LPCVOID c_pvData;
-
-	if (!CEterPackManager::Instance().Get(file, c_pszFileName, &c_pvData))
-		return false;
-	
-	CMemoryTextFileLoader textFileLoader;
-	textFileLoader.Bind(file.Size(), c_pvData);
-
-	for (DWORD i = 0; i < textFileLoader.GetLineCount(); ++i)
-	{
-		const char * pszLine = textFileLoader.GetLineString(i).c_str();
-
-		if (!pszLine || !*pszLine)
-			continue;
-
-		ReserveCRC(atoi(pszLine));
-	}
-
-	return true;
-}
-
-void CPropertyManager::ReserveCRC(DWORD dwCRC)
-{
-	m_ReservedCRCSet.insert(dwCRC);
-}
-
-DWORD CPropertyManager::GetUniqueCRC(const char * c_szSeed)
+uint32_t CPropertyManager::GetUniqueCRC(const char * c_szSeed)
 {
 	std::string stTmp = c_szSeed;
 
-	while (1)
+	while (true)
 	{
-		DWORD dwCRC = GetCRC32(stTmp.c_str(), stTmp.length());
+		uint32_t dwCRC = GetCRC32(stTmp.c_str(), stTmp.length());
 
 		if (m_ReservedCRCSet.find(dwCRC) == m_ReservedCRCSet.end() &&
 			m_PropertyByCRCMap.find(dwCRC) == m_PropertyByCRCMap.end())
 			return dwCRC;
 
 		char szAdd[2];
-		_snprintf(szAdd, sizeof(szAdd), "%d", random() % 10);
+		_snprintf_s(szAdd, sizeof(szAdd), "%u", random() % 10);
 		stTmp += szAdd;
 	}
 }
 
 bool CPropertyManager::Register(const char * c_pszFileName, CProperty ** ppProperty)
 {
-	CMappedFile file;
-	LPCVOID		c_pvData;
-
-	if (!CEterPackManager::Instance().Get(file, c_pszFileName, &c_pvData))
-		return false;
-
-	CProperty * pProperty = new CProperty(c_pszFileName);
-
-	if (!pProperty->ReadFromMemory(c_pvData, file.Size(), c_pszFileName))
+	CFile file;
+	if (!FileSystemManager::Instance().OpenFile(c_pszFileName, file))
 	{
-		delete pProperty;
+		TraceError("Property: %s can NOT open!", c_pszFileName);
 		return false;
 	}
 
-	DWORD dwCRC = pProperty->GetCRC();
+	auto * pProperty = new CProperty(c_pszFileName);
+	if (!pProperty->ReadFromMemory(file.GetData(), file.GetSize(), c_pszFileName))
+	{
+		delete pProperty;
+		TraceError("Property: %s can NOT read!", c_pszFileName);
+		return false;
+	}
 
-	TPropertyCRCMap::iterator itor = m_PropertyByCRCMap.find(dwCRC);
+	uint32_t dwCRC = pProperty->GetCRC();
+
+	auto itor = m_PropertyByCRCMap.find(dwCRC);
 
 	if (m_PropertyByCRCMap.end() != itor)
 	{
-		Tracef("Property already registered, replace %s to %s\n",
-				itor->second->GetFileName(),
-				c_pszFileName);
+		Tracef("Property(%u) already registered, replace %s to %s\n", dwCRC, itor->second->GetFileName(), c_pszFileName);
 
 		delete itor->second;
 		itor->second = pProperty;
 	}
 	else
-		m_PropertyByCRCMap.insert(TPropertyCRCMap::value_type(dwCRC, pProperty));
+		m_PropertyByCRCMap.emplace(dwCRC, pProperty);
 
 	if (ppProperty)
 		*ppProperty = pProperty;
@@ -177,10 +154,9 @@ bool CPropertyManager::Get(const char * c_pszFileName, CProperty ** ppProperty)
 	return Register(c_pszFileName, ppProperty);
 }
 
-bool CPropertyManager::Get(DWORD dwCRC, CProperty ** ppProperty)
+bool CPropertyManager::Get(uint32_t dwCRC, CProperty ** ppProperty)
 {
-	TPropertyCRCMap::iterator itor = m_PropertyByCRCMap.find(dwCRC);
-
+	auto itor = m_PropertyByCRCMap.find(dwCRC);
 	if (m_PropertyByCRCMap.end() == itor)
 		return false;
 
@@ -188,48 +164,25 @@ bool CPropertyManager::Get(DWORD dwCRC, CProperty ** ppProperty)
 	return true;
 }
 
-bool CPropertyManager::Put(const char * c_pszFileName, const char * c_pszSourceFileName)
+bool CPropertyManager::Erase(uint32_t dwCRC)
 {
-	if (!CopyFile(c_pszSourceFileName, c_pszFileName, FALSE))
-		return false;
-
-	if (!m_isFileMode)	// 팩 파일에도 넣음
-	{
-		if (!m_pack.Put(c_pszFileName, NULL, COMPRESSED_TYPE_NONE,""))
-		{
-			assert(!"CPropertyManager::Put cannot write to pack file");
-			return false;
-		}
-	}
-
-	Register(c_pszFileName);
-	return true;
-}
-
-bool CPropertyManager::Erase(DWORD dwCRC)
-{
-	TPropertyCRCMap::iterator itor = m_PropertyByCRCMap.find(dwCRC);
-
+	auto itor = m_PropertyByCRCMap.find(dwCRC);
 	if (m_PropertyByCRCMap.end() == itor)
 		return false;
 
 	CProperty * pProperty = itor->second;
 	m_PropertyByCRCMap.erase(itor);
 
-	DeleteFile(pProperty->GetFileName());
+	DeleteFileA(pProperty->GetFileName());
 	ReserveCRC(pProperty->GetCRC());
 
-	if (!m_isFileMode)	// 파일 모드가 아니면 팩에서도 지움
-		m_pack.Delete(pProperty->GetFileName());
-
-	FILE * fp = fopen("property/reserve", "a+");
-
+	FILE* fp = fopen("property/reserve", "a+");
 	if (!fp)
-		LogBox("예약 CRC 파일을 열 수 없습니다.");
+		LogBox("Cannot open the CRC file 'property/reserve'.");
 	else
 	{
 		char szCRC[64 + 1];
-		_snprintf(szCRC, sizeof(szCRC), "%u\r\n", pProperty->GetCRC());
+		_snprintf_s(szCRC, sizeof(szCRC), "%u\r\n", pProperty->GetCRC());
 
 		fputs(szCRC, fp);
 		fclose(fp);
@@ -241,7 +194,7 @@ bool CPropertyManager::Erase(DWORD dwCRC)
 
 bool CPropertyManager::Erase(const char * c_pszFileName)
 {
-	CProperty * pProperty = NULL;
+	CProperty * pProperty = nullptr;
 
 	if (Get(c_pszFileName, &pProperty))
 		return Erase(pProperty->GetCRC());

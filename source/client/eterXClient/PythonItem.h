@@ -4,7 +4,7 @@
 //        각 아이템의 데이타와 Icon Image Instance의 매니져 역할까지 주관
 //        조금 난잡해진거 같기도 하다 - 2003. 01. 13. [levites]
 
-#include "../EterGrnLib/ThingInstance.h"
+#include "../eterGrnLib/ThingInstance.h"
 
 class CItemData;
 

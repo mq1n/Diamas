@@ -37,13 +37,9 @@
 #include <direct.h>
 #include <malloc.h>
 
-#pragma comment(lib, "winmm.lib")
-#pragma comment(lib, "d3d8.lib")
-#pragma comment(lib, "d3dx8.lib")
-
 #include "../eterBase/StdAfx.h"
 #include "../eterBase/Debug.h"
-#include "../eterLocale/CodePageId.h"
+#include "../eterBase/CodePageId.h"
 
 #ifndef VC_EXTRALEAN
 #include <winsock.h>

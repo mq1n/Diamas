@@ -2,7 +2,6 @@
 
 #include <imm.h>
 
-#pragma comment(lib, "imm32.lib")
 
 #include "DIMM.h"
 

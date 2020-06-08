@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../EffectLib/StdAfx.h"
+#include "../eterEffectLib/StdAfx.h"
 #include "../eterlib/Resource.h"
 #include "../eterlib/ResourceManager.h"
 
