@@ -1,11 +1,10 @@
 #ifndef __INC_METIN_II_GAME_DESC_MANAGER_H__
 #define __INC_METIN_II_GAME_DESC_MANAGER_H__
 
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 
 #include "../../common/stl.h"
 #include "../../common/length.h"
-#include "IFileMonitor.h"
 
 class CLoginKey;
 class CClientPackageCryptInfo;
@@ -13,12 +12,12 @@ class CClientPackageCryptInfo;
 class DESC_MANAGER : public singleton<DESC_MANAGER>
 {
 	public:
-		typedef TR1_NS::unordered_set<LPDESC>			DESC_SET;
-		typedef TR1_NS::unordered_set<LPCLIENT_DESC>	CLIENT_DESC_SET;
+		typedef std::unordered_set<LPDESC>			DESC_SET;
+		typedef std::unordered_set<LPCLIENT_DESC>	CLIENT_DESC_SET;
 		typedef std::map<int, LPDESC>					DESC_HANDLE_MAP;
 		typedef std::map<DWORD, LPDESC>					DESC_HANDSHAKE_MAP;
 		typedef std::map<DWORD, LPDESC>					DESC_ACCOUNTID_MAP;
-		typedef boost::unordered_map<std::string, LPDESC>	DESC_LOGINNAME_MAP;
+		typedef std::unordered_map<std::string, LPDESC>	DESC_LOGINNAME_MAP;
 		typedef std::map<DWORD, DWORD>					DESC_HANDLE_RANDOM_KEY_MAP;
 
 	public:

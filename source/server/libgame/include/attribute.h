@@ -1,5 +1,5 @@
-#ifndef __INC_METIN_II_ATTRIBUTE_H__
-#define __INC_METIN_II_ATTRIBUTE_H__
+#ifndef __INC_ATTRIBUTE_H__
+#define __INC_ATTRIBUTE_H__
 
 enum EDataType
 {
@@ -14,30 +14,30 @@ enum EDataType
 class CAttribute
 {
     public:
-	CAttribute(DWORD width, DWORD height); // dword 타잎으로 모두 0을 채운다.
-	CAttribute(DWORD * attr, DWORD width, DWORD height); // attr을 읽어서 smart하게 속성을 읽어온다.
+	CAttribute(uint32_t width, uint32_t height); // dword 타잎으로 모두 0을 채운다.
+	CAttribute(uint32_t * attr, uint32_t width, uint32_t height); // attr을 읽어서 smart하게 속성을 읽어온다.
 	~CAttribute();
 	void Alloc();
-	int GetDataType();
+	int32_t GetDataType();
 	void * GetDataPtr();
-	void Set(DWORD x, DWORD y, DWORD attr);
-	void Remove(DWORD x, DWORD y, DWORD attr);
-	DWORD Get(DWORD x, DWORD y);
-	void CopyRow(DWORD y, DWORD * row);
+	void Set(uint32_t x, uint32_t y, uint32_t attr);
+	void Remove(uint32_t x, uint32_t y, uint32_t attr);
+	uint32_t Get(uint32_t x, uint32_t y);
+	void CopyRow(uint32_t y, uint32_t * row);
 
     private:
-	void Initialize(DWORD width, DWORD height);
+	void Initialize(uint32_t width, uint32_t height);
 
     private:
-	int dataType;
-	DWORD defaultAttr;
-	DWORD width, height;
+	int32_t dataType;
+	uint32_t defaultAttr;
+	uint32_t width, height;
 
 	void * data;
 
-	BYTE **	bytePtr;
-	WORD **	wordPtr;
-	DWORD ** dwordPtr;
+	uint8_t **	bytePtr;
+	uint16_t **	wordPtr;
+	uint32_t ** dwordPtr;
 };
 
 #endif

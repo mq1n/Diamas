@@ -1,11 +1,5 @@
-#ifndef __INC_METIN_II_GAME_POOL_H__
-#define __INC_METIN_II_GAME_POOL_H__
-
-// Neither error-checking nor watermarking here.
-// Definitely not thread-safe.
-// In order to debug the heap memory usage, activate DebugAllocator by defining
-// DEBUG_ALLOC.
-#ifdef M2_USE_POOL
+#ifndef __INC_GAME_POOL_H__
+#define __INC_GAME_POOL_H__
 
 template<typename T>
 struct PoolNode {
@@ -53,8 +47,8 @@ template<typename T>
 class ArrayPool {
 public:
 	ArrayPool(size_t array_size, size_t initial_capacity = 0)
-			: free_(NULL),
-			  array_size_(array_size), 
+			: free_(nullptr),
+			  array_size_(array_size),
 			  capacity_(0),
 			  alloc_count_(0),
 			  alloc_index_of_last_release_(0) {
@@ -69,19 +63,19 @@ public:
 
 	// Acquires an available array from the pool.
 	T* Acquire() {
-		if (free_ == NULL) {
+		if (free_ == nullptr) {
 			if (Stretch(capacity_) == false) {
-				return NULL;
+				return nullptr;
 			}
 		}
-		assert(free_ != NULL);
+		assert(free_ != nullptr);
 		PointerType p = free_->block;
 		free_ = free_->next;
 		return p;
 	}
 	// Releases the specified array and returns it to the pool.
 	void Release(T* p) {
-		if (p == NULL) {
+		if (p == nullptr) {
 			return;
 		}
 		size_t index = alloc_index_of_last_release_;
@@ -127,7 +121,7 @@ public:
 			delete[] alloc.nodes;
 		}
 		capacity_ = 0;
-		free_ = NULL;
+		free_ = nullptr;
 	}
 
 	// Gets the size of an array in the pool.
@@ -154,13 +148,13 @@ private:
 
 		ArithmeticPointerType p = static_cast<ArithmeticPointerType>(
 			DetailType::Alloc(array_size_ * increment));
-		assert(p != NULL);
-		if (p == NULL) {
+		assert(p != nullptr);
+		if (p == nullptr) {
 			return false;
 		}
 		NodeType* node = new NodeType[increment];
-		assert(node != NULL);
-		if (node == NULL) {
+		assert(node != nullptr);
+		if (node == nullptr) {
 			DetailType::Free(p);
 			return false;
 		}
@@ -232,7 +226,7 @@ public:
 		pool->Release(p);
 	}
 private:
-	typedef TR1_NS::unordered_map<size_t, Pool*> PoolMapType;
+	typedef std::unordered_map<size_t, Pool*> PoolMapType;
 	PoolMapType pools_;
 };
 
@@ -247,14 +241,14 @@ public:
 	// Constructs a new object from the pool.
 	T* Construct() {
 		void* p = pool_.Acquire();
-		if (p == NULL) {
-			return NULL;
+		if (p == nullptr) {
+			return nullptr;
 		}
 		return new (p) T();
 	}
 	// Destroys the specified object and returns it to the pool.
 	void Destroy(T* p) {
-		if (p == NULL) {
+		if (p == nullptr) {
 			return;
 		}
 		p->~T();
@@ -275,5 +269,3 @@ private:
 };
 
 #endif
-
-#endif // __INC_METIN_II_GAME_POOL_H__

@@ -32,7 +32,7 @@ int CHARACTER::ChangeEmpire(BYTE empire)
 				"SELECT id, pid1, pid2, pid3, pid4 FROM player_index%s WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u AND empire=%u", 
 				get_table_postfix(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
 
-		std::auto_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
 
 		if (msg->Get()->uiNumRows == 0)
 		{
@@ -105,7 +105,7 @@ int CHARACTER::ChangeEmpire(BYTE empire)
 		snprintf(szQuery, sizeof(szQuery), "UPDATE player_index%s SET empire=%u WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u AND empire=%u", 
 				get_table_postfix(), empire, GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
 
-		std::auto_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
 
 		if (msg->Get()->uiAffectedRows > 0)
 		{
@@ -173,7 +173,7 @@ void CHARACTER::SetChangeEmpireCount()
 		snprintf(szQuery, sizeof(szQuery), "UPDATE change_empire SET change_count=%d WHERE account_id=%u", count, dwAID);
 	}
 
-	std::auto_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery(szQuery));
 }
 
 DWORD CHARACTER::GetAID() const

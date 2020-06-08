@@ -31,7 +31,6 @@
 #include "horsename_manager.h"
 #include "MarkManager.h"
 #include "HackShield.h"
-#include "XTrapManager.h"
 
 static void _send_bonus_info(LPCHARACTER ch)
 {
@@ -198,7 +197,7 @@ void CInputLogin::LoginByKey(LPDESC d, const char * data)
 
 	strlcpy(ptod.szLogin, login, sizeof(ptod.szLogin));
 	ptod.dwLoginKey = pinfo->dwLoginKey;
-	thecore_memcpy(ptod.adwClientKey, pinfo->adwClientKey, sizeof(DWORD) * 4);
+	memcpy(ptod.adwClientKey, pinfo->adwClientKey, sizeof(DWORD) * 4);
 	strlcpy(ptod.szIP, d->GetHostName(), sizeof(ptod.szIP));
 
 	db_clientdesc->DBPacket(HEADER_GD_LOGIN_BY_KEY, d->GetHandle(), &ptod, sizeof(TPacketGDLoginByKey));
@@ -980,7 +979,7 @@ void CInputLogin::GuildMarkCRCList(LPDESC d, const char* c_pData)
 	DWORD blockCount = 0;
 	TEMP_BUFFER buf(1024 * 1024); // 1M ¹öÆÛ
 
-	for (itertype(mapDiffBlocks) it = mapDiffBlocks.begin(); it != mapDiffBlocks.end(); ++it)
+	for (auto it = mapDiffBlocks.begin(); it != mapDiffBlocks.end(); ++it)
 	{
 		BYTE posBlock = it->first;
 		const SGuildMarkBlock & rkBlock = *it->second;
@@ -1102,13 +1101,6 @@ int CInputLogin::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			if (isHackShieldEnable)
 			{
 				CHackShieldManager::instance().VerifyAck(d->GetCharacter(), c_pData);
-			}
-			break;
-
-		case HEADER_CG_XTRAP_ACK:
-			{
-				TPacketXTrapCSVerify* p = reinterpret_cast<TPacketXTrapCSVerify*>((void*)c_pData);
-				CXTrapManager::instance().Verify_CSStep3(d->GetCharacter(), p->bPacketData);
 			}
 			break;
 

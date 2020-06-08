@@ -140,7 +140,7 @@ CWarMap::~CWarMap()
 
 	sys_log(0, "WarMap::~WarMap : map index %d", GetMapIndex());
 
-	itertype(m_set_pkChr) it = m_set_pkChr.begin();
+	auto it = m_set_pkChr.begin();
 
 	while (it != m_set_pkChr.end())
 	{
@@ -1026,8 +1026,7 @@ bool CWarMapManager::GetStartPosition(long lMapIndex, BYTE bIdx, PIXEL_POSITION 
 	{
 		sys_log(0, "GetStartPosition FAILED [%d] WarMapInfoSize(%d)", lMapIndex, m_map_kWarMapInfo.size());
 
-		itertype(m_map_kWarMapInfo) it;
-		for (it	= m_map_kWarMapInfo.begin(); it != m_map_kWarMapInfo.end(); ++it)
+		for (auto it	= m_map_kWarMapInfo.begin(); it != m_map_kWarMapInfo.end(); ++it)
 		{
 			PIXEL_POSITION& cur=it->second->posStart[bIdx];
 			sys_log(0, "WarMap[%d]=Pos(%d, %d)", it->first, cur.x, cur.y);
@@ -1063,7 +1062,7 @@ TWarMapInfo * CWarMapManager::GetWarMapInfo(long lMapIndex)
 	if (lMapIndex >= 10000)
 		lMapIndex /= 10000;
 
-	itertype(m_map_kWarMapInfo) it = m_map_kWarMapInfo.find(lMapIndex);
+	auto it = m_map_kWarMapInfo.find(lMapIndex);
 
 	if (m_map_kWarMapInfo.end() == it)
 		return NULL;
@@ -1085,7 +1084,7 @@ void CWarMapManager::DestroyWarMap(CWarMap* pMap)
 
 CWarMap * CWarMapManager::Find(long lMapIndex)
 {
-	itertype(m_mapWarMap) it = m_mapWarMap.find(lMapIndex);
+	auto it = m_mapWarMap.find(lMapIndex);
 
 	if (it == m_mapWarMap.end())
 		return NULL;
@@ -1095,7 +1094,7 @@ CWarMap * CWarMapManager::Find(long lMapIndex)
 
 void CWarMapManager::OnShutdown()
 {
-	itertype(m_mapWarMap) it = m_mapWarMap.begin();
+	auto it = m_mapWarMap.begin();
 
 	while (it != m_mapWarMap.end())
 		(it++)->second->Draw();

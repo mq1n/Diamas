@@ -176,7 +176,8 @@ int Start()
 		fprintf(stderr, "Setting log keeping days to %d\n", tmpValue);
 	}
 
-	thecore_init(heart_beat, emptybeat);
+	thecore_init();
+	thecore_set(heart_beat, emptybeat);
 	signal_timer_enable(60);
 
 	char szBuf[256+1];

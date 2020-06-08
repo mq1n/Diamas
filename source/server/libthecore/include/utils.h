@@ -54,7 +54,7 @@ extern "C"
     extern DWORD	thecore_random();				// ·£´ý ÇÔ¼ö
 
     extern float	get_float_time();
-    extern DWORD	get_unix_ms_time();
+    extern DWORD	get_dword_time();
 
     extern char *	time_str(time_t ct);
 

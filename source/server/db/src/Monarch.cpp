@@ -42,7 +42,7 @@ void CMonarch::ElectMonarch()
 
 	int * s = new int[size];
 
-	itertype(m_map_MonarchElection) it = m_map_MonarchElection.begin();
+	auto it = m_map_MonarchElection.begin();
 
 	int idx = 0;
 
@@ -94,7 +94,7 @@ bool CMonarch::AddCandidacy(DWORD pid, const char * name)
 
 bool CMonarch::DelCandidacy(const char * name)
 {
-	itertype(m_vec_MonarchCandidacy) it = m_vec_MonarchCandidacy.begin();
+	auto it = m_vec_MonarchCandidacy.begin();
 	for (; it != m_vec_MonarchCandidacy.end(); ++it)
 	{
 		if (0 == strncmp(it->name, name, sizeof(it->name)))
@@ -297,7 +297,7 @@ bool CMonarch::DelMonarch(const char * name)
 
 int CMonarch::GetCandidacyIndex(DWORD pid)
 {
-	itertype(m_vec_MonarchCandidacy) it = m_vec_MonarchCandidacy.begin();
+	auto it = m_vec_MonarchCandidacy.begin();
 
 	for (int n = 0; it != m_vec_MonarchCandidacy.end(); ++it, ++n)
 	{

@@ -1,4 +1,4 @@
-#if !defined(_MSC_VER) && defined(__cplusplus)
+#if defined(__cplusplus)
 extern "C" {
 #endif
 
@@ -6,6 +6,6 @@ extern "C" {
 #include <lauxlib.h>
 #include <lualib.h>
 
-#if !defined(_MSC_VER) && defined(__cplusplus)
+#if defined(__cplusplus)
 }
 #endif

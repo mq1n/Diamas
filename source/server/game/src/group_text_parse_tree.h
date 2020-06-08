@@ -121,7 +121,7 @@ bool CGroupNode::GetValue(size_t i, const std::string & c_rstrColKey, T& tValue)
 	TMapRow::const_iterator row_it = m_map_rows.begin();
 	std::advance(row_it, i);
 	
-	itertype(m_map_columnNameToIndex) col_idx_it = m_map_columnNameToIndex.find(c_rstrColKey);
+	auto col_idx_it = m_map_columnNameToIndex.find(c_rstrColKey);
 	if (m_map_columnNameToIndex.end() == col_idx_it)
 	{
 		return FALSE;
@@ -144,7 +144,7 @@ bool CGroupNode::GetValue(const std::string & c_rstrRowKey, const std::string & 
 	{
 		return FALSE;
 	}
-	itertype(m_map_columnNameToIndex) col_idx_it = m_map_columnNameToIndex.find(c_rstrColKey);
+	auto col_idx_it = m_map_columnNameToIndex.find(c_rstrColKey);
 	if (m_map_columnNameToIndex.end() == col_idx_it)
 	{
 		return FALSE;

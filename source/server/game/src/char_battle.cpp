@@ -1052,7 +1052,7 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 
 		if (!vec_bSlots.empty())
 		{
-			random_shuffle(vec_bSlots.begin(), vec_bSlots.end());
+			std::shuffle(vec_bSlots.begin(), vec_bSlots.end(), GetRand());
 
 			int iQty = MIN(vec_bSlots.size(), r.iInventoryQty);
 
@@ -1084,7 +1084,7 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 
 		if (!vec_bSlots.empty())
 		{
-			random_shuffle(vec_bSlots.begin(), vec_bSlots.end());
+			std::shuffle(vec_bSlots.begin(), vec_bSlots.end(), GetRand());
 			int iQty;
 
 			if (isDropAllEquipments)
@@ -1453,7 +1453,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 		//
 		// 클라이언트에 에펙트 패킷을 다시 보낸다.
 		//
-		itertype(m_list_pkAffect) it = m_list_pkAffect.begin();
+		auto it = m_list_pkAffect.begin();
 
 		while (it != m_list_pkAffect.end())
 			SendAffectAddPacket(GetDesc(), *it++);

@@ -1,20 +1,19 @@
 #include <string.h>
 #include <stdio.h>
-#include "../../libthecore/include/memcpy.h"
-#include "../../common/stl.h"
+#include <algorithm>
 #include "grid.h"
 
-CGrid::CGrid(int w, int h) : m_iWidth(w), m_iHeight(h)
+CGrid::CGrid(int32_t w, int32_t h) : m_iWidth(w), m_iHeight(h)
 {
     m_pGrid = new char[m_iWidth * m_iHeight];
     memset(m_pGrid, 0, sizeof(char) * m_iWidth * m_iHeight);
 }
 
-CGrid::CGrid(CGrid * pkGrid, int w, int h) : m_iWidth(w), m_iHeight(h)
+CGrid::CGrid(CGrid * pkGrid, int32_t w, int32_t h) : m_iWidth(w), m_iHeight(h)
 {
     m_pGrid = new char[m_iWidth * m_iHeight];
-    int iSize = std::MIN(w * h, pkGrid->m_iWidth * pkGrid->m_iHeight);
-    thecore_memcpy(m_pGrid, pkGrid->m_pGrid, sizeof(char) * iSize);
+    int32_t iSize = std::min(w * h, pkGrid->m_iWidth * pkGrid->m_iHeight);
+    memcpy(m_pGrid, pkGrid->m_pGrid, sizeof(char) * iSize);
 }
 
 CGrid::~CGrid()
@@ -22,24 +21,33 @@ CGrid::~CGrid()
     delete [] m_pGrid;
 }
 
+void CGrid::UpdateSize(int32_t w, int32_t h)
+{
+	m_iWidth = w;
+	m_iHeight = h;
+	delete [] m_pGrid;
+	m_pGrid = new char[m_iWidth * m_iHeight];
+	memset(m_pGrid, 0, sizeof(char) * m_iWidth * m_iHeight);
+}
+
 void CGrid::Clear()
 {
     memset(m_pGrid, 0, sizeof(char) * m_iWidth * m_iHeight);
 }
 
-int CGrid::FindBlank(int w, int h)
+int32_t CGrid::FindBlank(int32_t w, int32_t h)
 {
     // 크기가 더 크다면 확인할 필요 없이 그냥 리턴
     if (w > m_iWidth || h > m_iHeight)
 	return -1;
 
-    int iRow;
+    int32_t iRow;
 
     for (iRow = 0; iRow < m_iHeight; ++iRow)
     {
-	for (int iCol = 0; iCol < m_iWidth; ++iCol)
+	for (int32_t iCol = 0; iCol < m_iWidth; ++iCol)
 	{
-	    int iIndex = iRow * m_iWidth + iCol;
+	    int32_t iIndex = iRow * m_iWidth + iCol;
 
 	    if (IsEmpty(iIndex, w, h))
 		return iIndex;
@@ -49,46 +57,46 @@ int CGrid::FindBlank(int w, int h)
     return -1;
 }
 
-bool CGrid::Put(int iPos, int w, int h)
+bool CGrid::Put(int32_t iPos, int32_t w, int32_t h)
 {
     if (!IsEmpty(iPos, w, h))
 	return false;
 
-    for (int y = 0; y < h; ++y)
+    for (int32_t y = 0; y < h; ++y)
     {
-	int iStart = iPos + (y * m_iWidth);
-	m_pGrid[iStart] = true;
+	int32_t iStart = iPos + (y * m_iWidth);
+	m_pGrid[iStart] = 1;
 
-	int x = 1;
+	int32_t x = 1;
 	while (x < w)
-	    m_pGrid[iStart + x++] = true;
+	    m_pGrid[iStart + x++] = 1;
     }
 
     return true;
 }
 
-void CGrid::Get(int iPos, int w, int h)
+void CGrid::Get(int32_t iPos, int32_t w, int32_t h)
 {
     if (iPos < 0 || iPos >= m_iWidth * m_iHeight)
 	return;
 
-    for (int y = 0; y < h; ++y)
+    for (int32_t y = 0; y < h; ++y)
     {
-	int iStart = iPos + (y * m_iWidth);
-	m_pGrid[iStart] = false;
+	int32_t iStart = iPos + (y * m_iWidth);
+	m_pGrid[iStart] = 0;
 
-	int x = 1;
+	int32_t x = 1;
 	while (x < w)
-	    m_pGrid[iStart + x++] = false;
+	    m_pGrid[iStart + x++] = 0;
     }
 }
 
-bool CGrid::IsEmpty(int iPos, int w, int h)
+bool CGrid::IsEmpty(int32_t iPos, int32_t w, int32_t h)
 {
     if (iPos < 0)
 	return false;
 
-    int iRow = iPos / m_iWidth;
+    int32_t iRow = iPos / m_iWidth;
 
     // Grid 안쪽인가를 먼저 검사
     if (iRow + h > m_iHeight)
@@ -97,14 +105,14 @@ bool CGrid::IsEmpty(int iPos, int w, int h)
     if (iPos + w > iRow * m_iWidth + m_iWidth)
 	return false;
 
-    for (int y = 0; y < h; ++y)
+    for (int32_t y = 0; y < h; ++y)
     {
-	int iStart = iPos + (y * m_iWidth);
+	int32_t iStart = iPos + (y * m_iWidth);
 
 	if (m_pGrid[iStart])
 	    return false;
 
-	int x = 1;
+	int32_t x = 1;
 	while (x < w)
 	    if (m_pGrid[iStart + x++])
 		return false;
@@ -117,17 +125,28 @@ void CGrid::Print()
 {
     printf("Grid %p\n", this);
 
-    for (int y = 0; y < m_iHeight; ++y)
+    for (int32_t y = 0; y < m_iHeight; ++y)
     {
-	for (int x = 0; x < m_iWidth; ++x)
+	for (int32_t x = 0; x < m_iWidth; ++x)
 	    printf("%d", m_pGrid[y * m_iWidth + x]);
 
 	printf("\n");
     }
 }
 
-unsigned int CGrid::GetSize()
+uint32_t CGrid::GetSize()
 {
     return m_iWidth * m_iHeight;
 }
 
+//Starting from 1
+int32_t CGrid::GetPosColumn(int32_t iPos)
+{
+	return iPos % m_iWidth;
+}
+
+//Starting from 1
+int32_t CGrid::GetPosRow(int32_t iPos)
+{
+	return iPos / m_iWidth;
+}

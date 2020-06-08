@@ -19,7 +19,6 @@
 #include "locale_service.h"
 #include "pcbang.h"
 #include "spam.h"
-#include "auth_brazil.h"
 
 extern bool g_bNoPasspod;
 extern std::string g_stBlockDate;
@@ -217,7 +216,7 @@ void DBManager::SetBilling(DWORD dwKey, bool bOn, bool bSkipPush)
 
 	CLoginData * ld = it->second;
 
-	itertype(mapLDBilling) it2 = mapLDBilling.find(ld->GetLogin());
+	auto it2 = mapLDBilling.find(ld->GetLogin());
 
 	if (it2 != mapLDBilling.end())
 		if (it2->second != ld)
@@ -438,7 +437,7 @@ void DBManager::CheckBilling()
 
 	//sys_log(0, "CheckBilling: map size %d", m_map_pkLoginData.size());
 
-	itertype(m_map_pkLoginData) it = m_map_pkLoginData.begin();
+	auto it = m_map_pkLoginData.begin();
 
 	while (it != m_map_pkLoginData.end())
 	{
@@ -490,8 +489,8 @@ void DBManager::SendAuthLogin(LPDESC d)
 	ptod.bBillType = pkLD->GetBillType();
 	ptod.dwBillID = pkLD->GetBillID();
 
-	thecore_memcpy(ptod.iPremiumTimes, pkLD->GetPremiumPtr(), sizeof(ptod.iPremiumTimes));
-	thecore_memcpy(&ptod.adwClientKey, pkLD->GetClientKey(), sizeof(DWORD) * 4);
+	memcpy(ptod.iPremiumTimes, pkLD->GetPremiumPtr(), sizeof(ptod.iPremiumTimes));
+	memcpy(&ptod.adwClientKey, pkLD->GetClientKey(), sizeof(DWORD) * 4);
 
 	db_clientdesc->DBPacket(HEADER_GD_AUTH_LOGIN, d->GetHandle(), &ptod, sizeof(TPacketGDAuthLogin));
 	sys_log(0, "SendAuthLogin %s key %u", ptod.szLogin, ptod.dwID);
@@ -872,7 +871,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 							char szQuery[1024];
 							snprintf(szQuery, sizeof(szQuery), "UPDATE account SET last_play=NOW() WHERE id=%u", dwID);
-							std::auto_ptr<SQLMsg> msg( DBManager::instance().DirectQuery(szQuery) );
+							std::unique_ptr<SQLMsg> msg( DBManager::instance().DirectQuery(szQuery) );
 						}
 
 						TAccountTable & r = d->GetAccountTable();
@@ -1104,7 +1103,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 							char szQuery[1024];
 							snprintf(szQuery, sizeof(szQuery), "UPDATE account SET last_play=NOW() WHERE id=%u", dwID);
-							std::auto_ptr<SQLMsg> msg( DBManager::instance().DirectQuery(szQuery) );
+							std::unique_ptr<SQLMsg> msg( DBManager::instance().DirectQuery(szQuery) );
 						}
 
 						TAccountTable & r = d->GetAccountTable();
@@ -1255,7 +1254,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 				m_map_dbstring.clear();
 				m_vec_GreetMessage.clear();
 
-				for (uint i = 0; i < pMsg->Get()->uiNumRows; ++i)
+				for (size_t i = 0; i < pMsg->Get()->uiNumRows; ++i)
 				{
 					MYSQL_ROW row = mysql_fetch_row(pMsg->Get()->pSQLResult);
 					//ch->SetSafeboxSize(SAFEBOX_PAGE_SIZE * atoi(row[0]));
@@ -1515,7 +1514,7 @@ void DBManager::LoadDBString()
 const std::string& DBManager::GetDBString(const std::string& key)
 {
 	static std::string null_str = "";
-	itertype(m_map_dbstring) it = m_map_dbstring.find(key);
+	auto it = m_map_dbstring.find(key);
 	if (it == m_map_dbstring.end())
 		return null_str;
 	return it->second;
@@ -1562,7 +1561,7 @@ void VCardUse(LPCHARACTER CardOwner, LPCHARACTER CardTaker, LPITEM item)
 
 void DBManager::StopAllBilling()
 {
-	for (itertype(m_map_pkLoginData) it = m_map_pkLoginData.begin(); it != m_map_pkLoginData.end(); ++it)
+	for (auto it = m_map_pkLoginData.begin(); it != m_map_pkLoginData.end(); ++it)
 	{
 		SetBilling(it->first, false);
 	}
@@ -1617,7 +1616,6 @@ bool AccountDB::ConnectAsync(const char * host, const int port, const char * use
 void AccountDB::SetLocale(const std::string & stLocale)
 {
 	m_sql_direct.SetLocale(stLocale);
-	m_sql_direct.QueryLocaleSet();
 }
 
 SQLMsg* AccountDB::DirectQuery(const char * query)

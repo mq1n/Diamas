@@ -198,7 +198,7 @@ void AuctionManager::LoadAuctionInfo()
 		str_to_number(auctionItemInfo.offer_price, row[cur++]);
 		str_to_number(auctionItemInfo.price, row[cur++]);
 		str_to_number(auctionItemInfo.offer_id, row[cur++]);
-		thecore_memcpy (auctionItemInfo.shown_name, (char*)row[cur], strlen((char*)row[cur]) +1);
+		memcpy (auctionItemInfo.shown_name, (char*)row[cur], strlen((char*)row[cur]) +1);
 		cur++;
 		str_to_number(auctionItemInfo.empire, row[cur++]);
 		str_to_number(auctionItemInfo.expired_time, row[cur++]);
@@ -242,7 +242,7 @@ void AuctionManager::LoadSaleInfo()
 		str_to_number(saleItemInfo.offer_price, row[cur++]);
 		str_to_number(saleItemInfo.price, row[cur++]);
 		str_to_number(saleItemInfo.offer_id, row[cur++]);
-		thecore_memcpy (saleItemInfo.shown_name, (char*)row[cur], strlen((char*)row[cur]) +1);
+		memcpy (saleItemInfo.shown_name, (char*)row[cur], strlen((char*)row[cur]) +1);
 		cur++;
 		str_to_number(saleItemInfo.empire, row[cur++]);
 		str_to_number(saleItemInfo.expired_time, row[cur++]);
@@ -285,7 +285,7 @@ void AuctionManager::LoadWishInfo()
 		str_to_number(wishItemInfo.offer_price, row[cur++]);
 		str_to_number(wishItemInfo.price, row[cur++]);
 		str_to_number(wishItemInfo.offer_id, row[cur++]);
-		thecore_memcpy (wishItemInfo.shown_name, (char*)row[cur], strlen((char*)row[cur]) +1);
+		memcpy (wishItemInfo.shown_name, (char*)row[cur], strlen((char*)row[cur]) +1);
 		cur++;
 		str_to_number(wishItemInfo.empire, row[cur++]);
 		str_to_number(wishItemInfo.expired_time, row[cur++]);
@@ -348,7 +348,7 @@ void AuctionManager::Boot(CPeer* peer)
 	peer->EncodeWORD(sizeof(TPlayerItem));
 	peer->EncodeWORD(auction_item_cache_map.size());
 
-	itertype(auction_item_cache_map) auction_item_cache_map_it = auction_item_cache_map.begin();
+	auto auction_item_cache_map_it = auction_item_cache_map.begin();
 
 	while (auction_item_cache_map_it != auction_item_cache_map.end())
 		peer->Encode((auction_item_cache_map_it++)->second->Get(), sizeof(TPlayerItem));
@@ -551,7 +551,7 @@ AuctionResult AuctionManager::GetAuctionedItem (DWORD actor_id, DWORD item_id, T
 		return AUCTION_NOT_EXPIRED;
 	}
 
-	thecore_memcpy(&item, c->Get(), sizeof(TPlayerItem));
+	memcpy(&item, c->Get(), sizeof(TPlayerItem));
 
 	return AUCTION_SUCCESS;
 }
@@ -574,7 +574,7 @@ AuctionResult AuctionManager::BuySoldItem (DWORD actor_id, DWORD item_id, TPlaye
 
 	TSaleItemInfo* item_info = item_info_cache->Get(false);
 
-	thecore_memcpy(&item, c->Get(), sizeof(TPlayerItem));
+	memcpy(&item, c->Get(), sizeof(TPlayerItem));
 
 	return AUCTION_SUCCESS;
 }
@@ -596,7 +596,7 @@ AuctionResult AuctionManager::CancelAuction (DWORD actor_id, DWORD item_id, TPla
 	}
 	TAuctionItemInfo* item_info = item_info_cache->Get(false);
 
-	thecore_memcpy(&item, c->Get(), sizeof(TPlayerItem));
+	memcpy(&item, c->Get(), sizeof(TPlayerItem));
 
 	return AUCTION_SUCCESS;
 }
@@ -630,7 +630,7 @@ AuctionResult AuctionManager::CancelSale (DWORD actor_id, DWORD item_id, TPlayer
 	}
 	TSaleItemInfo* item_info = item_info_cache->Get(false);
 
-	thecore_memcpy(&item, c->Get(), sizeof(TPlayerItem));
+	memcpy(&item, c->Get(), sizeof(TPlayerItem));
 
 	return AUCTION_SUCCESS;
 }

@@ -1,7 +1,7 @@
 #ifndef __INC_METIN_II_GAME_PROFILER_H__
 #define __INC_METIN_II_GAME_PROFILER_H__
 
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 
 class CProfiler : public singleton<CProfiler>
 {
@@ -50,7 +50,7 @@ class CProfiler : public singleton<CProfiler>
 			}
 		};
 
-		typedef boost::unordered_map<std::string, TProfileAccumData> TProfileAccumDataMap;
+		typedef std::unordered_map<std::string, TProfileAccumData> TProfileAccumDataMap;
 
 	public:
 		CProfiler()

@@ -29,7 +29,6 @@
 #include <cryptopp/shacal2.h>
 #include <cryptopp/skipjack.h>
 #include <cryptopp/tea.h>
-#include <cryptopp/cryptoppLibLink.h>
 
 using namespace CryptoPP;
 
@@ -192,8 +191,8 @@ bool Cipher::SetUp(bool polarity) {
   BlockCipherAlgorithm* detail_1 = BlockCipherAlgorithm::Pick(hint_1);
   assert(detail_0 != NULL);
   assert(detail_1 != NULL);
-  std::auto_ptr<BlockCipherAlgorithm> algorithm_0(detail_0);
-  std::auto_ptr<BlockCipherAlgorithm> algorithm_1(detail_1);
+  std::unique_ptr<BlockCipherAlgorithm> algorithm_0(detail_0);
+  std::unique_ptr<BlockCipherAlgorithm> algorithm_1(detail_1);
 
   const size_t key_length_0 = algorithm_0->GetDefaultKeyLength();
   const size_t iv_length_0 = algorithm_0->GetBlockSize();
@@ -215,11 +214,7 @@ bool Cipher::SetUp(bool polarity) {
 
   key_0.Assign(shared, key_length_0);
   offset = key_length_0;
-#ifdef __GNUC__
   offset = std::min(key_length_0, shared.size() - key_length_1);
-#else
-  offset = min(key_length_0, shared.size() - key_length_1);
-#endif
   key_1.Assign(shared.BytePtr() + offset, key_length_1);
 
   offset = shared.size() - iv_length_0;

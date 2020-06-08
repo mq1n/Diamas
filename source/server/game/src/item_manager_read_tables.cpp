@@ -626,7 +626,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 		{
 			CDropItemGroup* pkGroup;
 			bool bNew = true;
-			itertype(m_map_pkDropItemGroup) it = m_map_pkDropItemGroup.find (iMobVnum);
+			auto it = m_map_pkDropItemGroup.find (iMobVnum);
 			if (it == m_map_pkDropItemGroup.end())
 			{
 				pkGroup = M2_NEW CDropItemGroup(0, iMobVnum, stName);
@@ -833,7 +833,7 @@ bool ITEM_MANAGER::ReadDropItemGroup(const char * c_pszFileName)
 
 		TTokenVector * pTok;
 
-		itertype(m_map_pkDropItemGroup) it = m_map_pkDropItemGroup.find(iMobVnum);
+		auto it = m_map_pkDropItemGroup.find(iMobVnum);
 
 		CDropItemGroup* pkGroup;
 

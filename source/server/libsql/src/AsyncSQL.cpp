@@ -1,5 +1,5 @@
 #include "../include/AsyncSQL.h"
-#include <errmsg.h>
+#include <mysql/errmsg.h>
 
 #include <cstdlib>
 #include <cstring>
@@ -344,7 +344,7 @@ void CAsyncSQL::ChildLoop()
 		{
 			auto p = queue.front();
 
-			const auto startTime = get_unix_ms_time();
+			const auto startTime = get_dword_time();
 			if (mysql_real_query(&m_hDB, p->stQuery.c_str(), p->stQuery.length())) 
 			{
 				p->uiSQLErrno = mysql_errno(&m_hDB);
@@ -357,7 +357,7 @@ void CAsyncSQL::ChildLoop()
 			}
 
 			// 0.5? ?? ???? ??? ???
-			const auto runTime = get_unix_ms_time() - startTime;
+			const auto runTime = get_dword_time() - startTime;
 			if (runTime > 5000)
 				sys_log(1, "Query %s took %d ms", p->stQuery.c_str(), runTime);
 

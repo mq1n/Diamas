@@ -43,7 +43,7 @@ void MessengerManager::Login(MessengerManager::keyA account)
 	if (m_set_loginAccount.find(account) != m_set_loginAccount.end())
 		return;
 
-	DBManager::instance().FuncQuery(std::bind1st(std::mem_fun(&MessengerManager::LoadList), this),
+	DBManager::instance().FuncQuery(std::bind(&MessengerManager::LoadList, this, std::placeholders::_1),
 			"SELECT account, companion FROM messenger_list%s WHERE account='%s'", get_table_postfix(), account.c_str());
 
 	m_set_loginAccount.insert(account);
@@ -64,7 +64,7 @@ void MessengerManager::LoadList(SQLMsg * msg)
 
 	sys_log(1, "Messenger::LoadList");
 
-	for (uint i = 0; i < msg->Get()->uiNumRows; ++i)
+	for (size_t i = 0; i < msg->Get()->uiNumRows; ++i)
 	{
 		MYSQL_ROW row = mysql_fetch_row(msg->Get()->pSQLResult);
 
@@ -293,7 +293,7 @@ void MessengerManager::SendList(MessengerManager::keyA account)
 
 	TEMP_BUFFER buf(128 * 1024); // 128k
 
-	itertype(m_Relation[account]) it = m_Relation[account].begin(), eit = m_Relation[account].end();
+	auto it = m_Relation[account].begin(), eit = m_Relation[account].end();
 
 	while (it != eit)
 	{

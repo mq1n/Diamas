@@ -1,24 +1,28 @@
-#ifndef __INC_METIN_II_GRID_H__
-#define __INC_METIN_II_GRID_H__
+#ifndef __INC_GRID_H__
+#define __INC_GRID_H__
 
 class CGrid
 {
     public:
-	CGrid(int w, int h);
-	CGrid(CGrid * pkGrid, int w, int h);
+	CGrid(int32_t w, int32_t h);
+	CGrid(CGrid * pkGrid, int32_t w, int32_t h);
 	~CGrid();
 
+	void		UpdateSize(int32_t w, int32_t h);
 	void		Clear();
-	int		FindBlank(int w, int h);
-	bool		IsEmpty(int iPos, int w, int h);
-	bool		Put(int iPos, int w, int h);
-	void		Get(int iPos, int w, int h);
+	int32_t		FindBlank(int32_t w, int32_t h);
+	bool		IsEmpty(int32_t iPos, int32_t w, int32_t h);
+	bool		Put(int32_t iPos, int32_t w, int32_t h);
+	void		Get(int32_t iPos, int32_t w, int32_t h);
 	void		Print();
-	unsigned int	GetSize();
+	uint32_t	GetSize();
+
+	int32_t GetPosColumn(int32_t iPos);
+	int32_t GetPosRow(int32_t iPos);
 
     protected:
-	int	m_iWidth;
-	int	m_iHeight;
+	int32_t	m_iWidth;
+	int32_t	m_iHeight;
 
 	char *	m_pGrid;
 };

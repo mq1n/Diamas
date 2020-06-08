@@ -175,14 +175,3 @@ void CDBManager::SetLocale(const char * szLocale)
 	}
 	sys_log(0, "End setlocale %s", szLocale);
 }
-
-void CDBManager::QueryLocaleSet()
-{
-	for (int n = 0; n < SQL_MAX_NUM; ++n)
-	{
-		m_mainSQL[n]->QueryLocaleSet();
-		m_directSQL[n]->QueryLocaleSet();
-		m_asyncSQL[n]->QueryLocaleSet();
-	}
-}
-

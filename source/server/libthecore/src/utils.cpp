@@ -460,7 +460,7 @@ float get_float_time()
     return ((float) tv.tv_sec + ((float) tv.tv_usec / 1000000.0f));
 }
 
-DWORD get_unix_ms_time()
+DWORD get_dword_time()
 {
 	return (DWORD)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }

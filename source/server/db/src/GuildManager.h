@@ -5,8 +5,8 @@
 #include "Peer.h"
 #include <queue>
 #include <utility>
-#include "../../libsql/libsql.h"
-#include "../../libpoly/Poly.h"
+#include "../../libsql/include/libsql.h"
+#include "../../libthecore/include/poly.h"
 
 enum
 {

@@ -17,7 +17,7 @@ namespace xmas
 			// »Ñ·ÁÁØ´Ù
 			const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
 
-			for (itertype(c_ref_set) it = c_ref_set.begin(); it != c_ref_set.end(); ++it)
+			for (auto it = c_ref_set.begin(); it != c_ref_set.end(); ++it)
 			{
 				LPCHARACTER ch = (*it)->GetCharacter();
 

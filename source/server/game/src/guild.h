@@ -3,7 +3,7 @@
 
 #include "skill.h"
 
-typedef struct _SQLMsg SQLMsg;
+struct SQLMsg;
 
 enum
 {
@@ -207,7 +207,7 @@ class CGuild
 		void		SendLoginPacket(LPCHARACTER ch, DWORD pid);
 		void		SendLogoutPacket(LPCHARACTER ch, DWORD pid);
 		void		SendGuildInfoPacket(LPCHARACTER ch);
-		void		SendGuildDataUpdateToAllMember(SQLMsg* pmsg);
+		void		SendGuildDataUpdateToAllMember();
 
 		void		Load(DWORD guild_id);
 		void		SaveLevel();

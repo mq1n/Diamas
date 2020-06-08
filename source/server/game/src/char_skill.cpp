@@ -163,7 +163,7 @@ void CHARACTER::SkillLevelPacket()
 	TPacketGCSkillLevel pack;
 
 	pack.bHeader = HEADER_GC_SKILL_LEVEL;
-	thecore_memcpy(&pack.skills, m_pSkillLevels, sizeof(TPlayerSkill) * SKILL_MAX_NUM);
+	memcpy(&pack.skills, m_pSkillLevels, sizeof(TPlayerSkill) * SKILL_MAX_NUM);
 	GetDesc()->Packet(&pack, sizeof(TPacketGCSkillLevel));
 }
 
@@ -2970,7 +2970,7 @@ bool CHARACTER::UseMobSkill(unsigned int idx)
 			info->index = i;
 
 			// <Factor> Cancel existing event first
-			itertype(m_mapMobSkillEvent) it = m_mapMobSkillEvent.find(i);
+			auto it = m_mapMobSkillEvent.find(i);
 			if (it != m_mapMobSkillEvent.end()) {
 				LPEVENT existing = it->second;
 				event_cancel(&existing);
@@ -3556,7 +3556,7 @@ bool CHARACTER::CheckSkillHitCount(const BYTE SkillID, const VID TargetVID)
 			return false;
 	}
 
-	boost::unordered_map<VID, size_t>::iterator iterTargetMap = rSkillUseInfo.TargetVIDMap.find(TargetVID);
+	std::unordered_map<VID, size_t>::iterator iterTargetMap = rSkillUseInfo.TargetVIDMap.find(TargetVID);
 
 	if (rSkillUseInfo.TargetVIDMap.end() != iterTargetMap)
 	{

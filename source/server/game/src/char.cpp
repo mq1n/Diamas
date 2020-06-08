@@ -55,7 +55,6 @@
 #include "BlueDragon_Binder.h"
 #include "HackShield.h"
 #include "skill_power.h"
-#include "XTrapManager.h"
 #include "buff_on_attributes.h"
 
 #ifdef __PET_SYSTEM__
@@ -530,7 +529,7 @@ void CHARACTER::Destroy()
 
 	StopHackShieldCheckCycle();
 
-	for (itertype(m_mapMobSkillEvent) it = m_mapMobSkillEvent.begin(); it != m_mapMobSkillEvent.end(); ++it)
+	for (auto it = m_mapMobSkillEvent.begin(); it != m_mapMobSkillEvent.end(); ++it)
 	{
 		LPEVENT pkEvent = it->second;
 		event_cancel(&pkEvent);
@@ -690,7 +689,7 @@ void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, BYTE
 		TEMP_BUFFER buf;
 		buf.write(&header, sizeof(header));
 
-		for (itertype(itemkind) it = itemkind.begin(); it != itemkind.end(); ++it)
+		for (auto it = itemkind.begin(); it != itemkind.end(); ++it)
 		{
 			info.dwVnum = it->first;
 			info.dwPrice = it->second;
@@ -1241,10 +1240,10 @@ void CHARACTER::CreatePlayerProto(TPlayerTable & tab)
 	if (m_stMobile.length() && !*m_szMobileAuth)
 		strlcpy(tab.szMobile, m_stMobile.c_str(), sizeof(tab.szMobile));
 
-	thecore_memcpy(tab.parts, m_pointsInstant.parts, sizeof(tab.parts));
+	memcpy(tab.parts, m_pointsInstant.parts, sizeof(tab.parts));
 
 	// REMOVE_REAL_SKILL_LEVLES
-	thecore_memcpy(tab.skills, m_pSkillLevels, sizeof(TPlayerSkill) * SKILL_MAX_NUM);
+	memcpy(tab.skills, m_pSkillLevels, sizeof(TPlayerSkill) * SKILL_MAX_NUM);
 	// END_OF_REMOVE_REAL_SKILL_LEVLES
 
 	tab.horse = GetHorseData();
@@ -1406,8 +1405,6 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 		GetDesc()->BindCharacter(NULL);
 //		BindDesc(NULL);
 	}
-
-	CXTrapManager::instance().DestroyClientSession(this);
 
 	M2_DESTROY_CHARACTER(this);
 }
@@ -1754,7 +1751,7 @@ void CHARACTER::SetPlayerProto(const TPlayerTable * t)
 		M2_DELETE_ARRAY(m_pSkillLevels);
 
 	m_pSkillLevels = M2_NEW TPlayerSkill[SKILL_MAX_NUM];
-	thecore_memcpy(m_pSkillLevels, t->skills, sizeof(TPlayerSkill) * SKILL_MAX_NUM);
+	memcpy(m_pSkillLevels, t->skills, sizeof(TPlayerSkill) * SKILL_MAX_NUM);
 	// END_OF_REMOVE_REAL_SKILL_LEVLES
 
 	if (t->lMapIndex >= 10000)
@@ -1821,7 +1818,7 @@ void CHARACTER::SetPlayerProto(const TPlayerTable * t)
 	if (GetHorseLevel() > 0)
 		UpdateHorseDataByLogoff(t->logoff_interval);
 
-	thecore_memcpy(m_aiPremiumTimes, t->aiPremiumTimes, sizeof(t->aiPremiumTimes));
+	memcpy(m_aiPremiumTimes, t->aiPremiumTimes, sizeof(t->aiPremiumTimes));
 
 	m_dwLogOffInterval = t->logoff_interval;
 
@@ -3692,7 +3689,7 @@ void CHARACTER::ApplyPoint(BYTE bApplyType, int iVal)
 				if (0 == iAdd)
 					iChange = -iChange;
 
-				boost::unordered_map<BYTE, int>::iterator iter = m_SkillDamageBonus.find(bSkillVnum);
+				std::unordered_map<BYTE, int>::iterator iter = m_SkillDamageBonus.find(bSkillVnum);
 
 				if (iter == m_SkillDamageBonus.end())
 					m_SkillDamageBonus.insert(std::make_pair(bSkillVnum, iChange));
@@ -5991,9 +5988,9 @@ void CHARACTER::SetGuild(CGuild* pGuild)
 
 void CHARACTER::SendGreetMessage()
 {
-	typeof(DBManager::instance().GetGreetMessage()) v = DBManager::instance().GetGreetMessage();
+	auto v = DBManager::instance().GetGreetMessage();
 
-	for (itertype(v) it = v.begin(); it != v.end(); ++it)
+	for (auto it = v.begin(); it != v.end(); ++it)
 	{
 		ChatPacket(CHAT_TYPE_NOTICE, it->c_str());
 	}
@@ -6272,8 +6269,8 @@ void CHARACTER::SendEquipment(LPCHARACTER ch)
 			p.equips[i].vnum = item->GetVnum();
 			p.equips[i].count = item->GetCount();
 
-			thecore_memcpy(p.equips[i].alSockets, item->GetSockets(), sizeof(p.equips[i].alSockets));
-			thecore_memcpy(p.equips[i].aAttr, item->GetAttributes(), sizeof(p.equips[i].aAttr));
+			memcpy(p.equips[i].alSockets, item->GetSockets(), sizeof(p.equips[i].alSockets));
+			memcpy(p.equips[i].aAttr, item->GetAttributes(), sizeof(p.equips[i].aAttr));
 		}
 		else
 		{

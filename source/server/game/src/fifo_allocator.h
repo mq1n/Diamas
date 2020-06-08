@@ -2,14 +2,7 @@
 #define _FIFO_ALLOCATOR_H_
 
 #include <deque>
-
-#ifdef __GNUC__
-#include <tr1/unordered_map>
-#define TR1_NS std::tr1
-#else
-#include <boost/unordered_map.hpp>
-#define TR1_NS boost
-#endif
+#include <unordered_map>
 
 // Allocator implementation detail with simple FIFO grow-only pool.
 // It relies on default CRT malloc/free.
@@ -70,8 +63,8 @@ private:
 	}
 
 	typedef std::deque<void*> PoolType;
-	typedef TR1_NS::unordered_map<size_t, PoolType> PoolMapType;
-	typedef TR1_NS::unordered_map<void*, size_t> AllocMapType;
+	typedef std::unordered_map<size_t, PoolType> PoolMapType;
+	typedef std::unordered_map<void*, size_t> AllocMapType;
 
 	static const size_t kWatermark = 4; // FIFO enforcement level
 

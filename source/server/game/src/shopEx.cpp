@@ -31,7 +31,7 @@ bool CShopEx::Create(DWORD dwVnum, DWORD dwNPCVnum)
 
 bool CShopEx::AddShopTable(TShopTableEx& shopTable)
 {
-	for (itertype(m_vec_shopTabs) it = m_vec_shopTabs.begin(); it != m_vec_shopTabs.end(); it++)
+	for (auto it = m_vec_shopTabs.begin(); it != m_vec_shopTabs.end(); it++)
 	{
 		const TShopTableEx& _shopTable = *it;
 		if (0 != _shopTable.dwVnum && _shopTable.dwVnum == shopTable.dwVnum)
@@ -72,7 +72,7 @@ bool CShopEx::AddGuest(LPCHARACTER ch,DWORD owner_vid, bool bOtherEmpire)
 	char temp[8096]; // √÷¥Î 1728 * 3
 	char* buf = &temp[0];
 	size_t size = 0;
-	for (itertype(m_vec_shopTabs) it = m_vec_shopTabs.begin(); it != m_vec_shopTabs.end(); it++)
+	for (auto it = m_vec_shopTabs.begin(); it != m_vec_shopTabs.end(); it++)
 	{
 		const TShopTableEx& shop_tab = *it;
 		TPacketGCShopStartEx::TSubPacketShopTab pack_tab;

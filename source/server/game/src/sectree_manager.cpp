@@ -466,14 +466,14 @@ bool SECTREE_MANAGER::LoadAttribute(LPSECTREE_MAP pkMapSectree, const char * c_p
 	int maxMemSize = LZOManager::instance().GetMaxCompressedSize(sizeof(DWORD) * (SECTREE_SIZE / CELL_SIZE) * (SECTREE_SIZE / CELL_SIZE));
 
 	unsigned int uiSize;
-	unsigned int uiDestSize;
+	lzo_uint uiDestSize;
 
 #ifndef _MSC_VER
 	BYTE abComp[maxMemSize];
 #else
 	BYTE* abComp = M2_NEW BYTE[maxMemSize];
 #endif
-	DWORD * attr = M2_NEW DWORD[maxMemSize];
+	uint32_t* attr = M2_NEW uint32_t[maxMemSize];
 
 	for (int y = 0; y < iHeight; ++y)
 		for (int x = 0; x < iWidth; ++x)
@@ -1116,7 +1116,7 @@ void SECTREE_MANAGER::DestroyPrivateMap(long lMapIndex)
 
 TAreaMap& SECTREE_MANAGER::GetDungeonArea(long lMapIndex)
 {
-	itertype(m_map_pkArea) it = m_map_pkArea.find(lMapIndex);
+	auto it = m_map_pkArea.find(lMapIndex);
 
 	if (it == m_map_pkArea.end())
 	{
@@ -1144,9 +1144,7 @@ void SECTREE_MANAGER::SendNPCPosition(LPCHARACTER ch)
 	TNPCPosition np;
 
 	// TODO m_mapNPCPosition[lMapIndex] 를 보내주세요
-	itertype(m_mapNPCPosition[lMapIndex]) it;
-
-	for (it = m_mapNPCPosition[lMapIndex].begin(); it != m_mapNPCPosition[lMapIndex].end(); ++it)
+	for (auto it = m_mapNPCPosition[lMapIndex].begin(); it != m_mapNPCPosition[lMapIndex].end(); ++it)
 	{
 		np.bType = it->bType;
 		strlcpy(np.name, it->name, sizeof(np.name));
@@ -1446,7 +1444,7 @@ bool SECTREE_MANAGER::SaveAttributeToImage(int lMapIndex, const char * c_pszFile
 
 	sys_log(0, "2 %p", pdwDest);
 
-	DWORD * pdwLine = M2_NEW DWORD[SECTREE_SIZE / CELL_SIZE];
+	uint32_t* pdwLine = M2_NEW uint32_t[SECTREE_SIZE / CELL_SIZE];
 
 	for (y = 0; y < 4 * iMapHeight; ++y)
 	{

@@ -15,11 +15,7 @@
 #include "questmanager.h"
 #include "questlua.h"
 #include "locale_service.h"
-#include "XTrapManager.h"
-
-#ifndef __GNUC__
-#include <boost/bind.hpp>
-#endif
+#include "log.h"
 
 CHARACTER_MANAGER::CHARACTER_MANAGER() :
 	m_iVIDCount(0),
@@ -52,7 +48,7 @@ CHARACTER_MANAGER::~CHARACTER_MANAGER()
 
 void CHARACTER_MANAGER::Destroy()
 {
-	itertype(m_map_pkChrByVID) it = m_map_pkChrByVID.begin();
+	auto it = m_map_pkChrByVID.begin();
 	while (it != m_map_pkChrByVID.end()) {
 		LPCHARACTER ch = it->second;
 		M2_DESTROY_CHARACTER(ch); // m_map_pkChrByVID is changed here
@@ -109,7 +105,7 @@ void CHARACTER_MANAGER::DestroyCharacter(LPCHARACTER ch, const char* file, size_
 		return;
 
 	// <Factor> Check whether it has been already deleted or not.
-	itertype(m_map_pkChrByVID) it = m_map_pkChrByVID.find(ch->GetVID());
+	auto it = m_map_pkChrByVID.find(ch->GetVID());
 	if (it == m_map_pkChrByVID.end()) {
 		sys_err("[CHARACTER_MANAGER::DestroyCharacter] <Factor> %d not found", (long)(ch->GetVID()));
 		return; // prevent duplicated destrunction
@@ -146,7 +142,7 @@ void CHARACTER_MANAGER::DestroyCharacter(LPCHARACTER ch, const char* file, size_
 
 	if (0 != ch->GetPlayerID())
 	{
-		itertype(m_map_pkChrByPID) it = m_map_pkChrByPID.find(ch->GetPlayerID());
+		auto it = m_map_pkChrByPID.find(ch->GetPlayerID());
 
 		if (m_map_pkChrByPID.end() != it)
 		{
@@ -171,7 +167,7 @@ void CHARACTER_MANAGER::DestroyCharacter(LPCHARACTER ch, const char* file, size_
 
 LPCHARACTER CHARACTER_MANAGER::Find(DWORD dwVID)
 {
-	itertype(m_map_pkChrByVID) it = m_map_pkChrByVID.find(dwVID);
+	auto it = m_map_pkChrByVID.find(dwVID);
 
 	if (m_map_pkChrByVID.end() == it)
 		return NULL;
@@ -197,7 +193,7 @@ LPCHARACTER CHARACTER_MANAGER::Find(const VID & vid)
 
 LPCHARACTER CHARACTER_MANAGER::FindByPID(DWORD dwPID)
 {
-	itertype(m_map_pkChrByPID) it = m_map_pkChrByPID.find(dwPID);
+	auto it = m_map_pkChrByPID.find(dwPID);
 
 	if (m_map_pkChrByPID.end() == it)
 		return NULL;
@@ -644,94 +640,68 @@ struct FuncUpdateAndResetChatCounter
 	}
 };
 
-void CHARACTER_MANAGER::Update(int iPulse)
+void CHARACTER_MANAGER::Update(int32_t iPulse)
 {
-	using namespace std;
-#ifdef __GNUC__
-	using namespace __gnu_cxx;
-#endif
-
 	BeginPendingDestroy();
 
-	// PC 캐릭터 업데이트
-	{
-		if (!m_map_pkPCChr.empty())
+	auto resetChatCounter = !(iPulse % PASSES_PER_SEC(5));
+
+	// Update PC character
+	std::for_each(m_map_pkPCChr.begin(), m_map_pkPCChr.end(),
+		[&resetChatCounter, &iPulse](const NAME_MAP::value_type& v)
 		{
-			// 컨테이너 복사
-			CHARACTER_VECTOR v;
-			v.reserve(m_map_pkPCChr.size());
-#ifdef __GNUC__
-			transform(m_map_pkPCChr.begin(), m_map_pkPCChr.end(), back_inserter(v), select2nd<NAME_MAP::value_type>());
-#else
-			transform(m_map_pkPCChr.begin(), m_map_pkPCChr.end(), back_inserter(v), boost::bind(&NAME_MAP::value_type::second, _1));
-#endif
+			auto ch = v.second;
 
-			if (0 == (iPulse % PASSES_PER_SEC(5)))
+			if (resetChatCounter)
 			{
-				FuncUpdateAndResetChatCounter f;
-				for_each(v.begin(), v.end(), f);
+				ch->ResetChatCounter();
+				ch->CFSM::Update();
 			}
-			else
-			{
-				//for_each(v.begin(), v.end(), mem_fun(&CFSM::Update));
-				for_each(v.begin(), v.end(), bind2nd(mem_fun(&CHARACTER::UpdateCharacter), iPulse));
-			}
+
+			ch->UpdateCharacter(iPulse);
 		}
+	);
 
-//		for_each_pc(bind2nd(mem_fun(&CHARACTER::UpdateCharacter), iPulse));
-	}
-
-	// 몬스터 업데이트
-	{
-		if (!m_set_pkChrState.empty())
+	// Update Monster
+	std::for_each(m_set_pkChrState.begin(), m_set_pkChrState.end(),
+		[iPulse](LPCHARACTER ch)
 		{
-			CHARACTER_VECTOR v;
-			v.reserve(m_set_pkChrState.size());
-#ifdef __GNUC__
-			transform(m_set_pkChrState.begin(), m_set_pkChrState.end(), back_inserter(v), identity<CHARACTER_SET::value_type>());
-#else
-			v.insert(v.end(), m_set_pkChrState.begin(), m_set_pkChrState.end());
-#endif
-			for_each(v.begin(), v.end(), bind2nd(mem_fun(&CHARACTER::UpdateStateMachine), iPulse));
+			ch->UpdateStateMachine(iPulse);
 		}
-	}
+	);
 
-	// 산타 따로 업데이트
+	// Update to Santa
+	// /*
 	{
 		CharacterVectorInteractor i;
-
 		if (CHARACTER_MANAGER::instance().GetCharactersByRaceNum(xmas::MOB_SANTA_VNUM, i))
 		{
-			for_each(i.begin(), i.end(),
-					bind2nd(mem_fun(&CHARACTER::UpdateStateMachine), iPulse));
+			std::for_each(i.begin(), i.end(), [iPulse](LPCHARACTER ch)
+				{
+					ch->UpdateStateMachine(iPulse);
+				}
+			);
 		}
 	}
+	// */
 
-	// 1시간에 한번씩 몹 사냥 개수 기록 
+	// Record mob hunting counts once every hour
 	if (0 == (iPulse % PASSES_PER_SEC(3600)))
 	{
-		for (itertype(m_map_dwMobKillCount) it = m_map_dwMobKillCount.begin(); it != m_map_dwMobKillCount.end(); ++it)
-			DBManager::instance().SendMoneyLog(MONEY_LOG_MONSTER_KILL, it->first, it->second);
-
-#ifdef _USE_SERVER_KEY_
-		extern bool Metin2Server_IsInvalid();
-		extern bool g_bShutdown;
-		if (Metin2Server_IsInvalid())
-		{
-			g_bShutdown = true;
-		}
-#endif
+		for (const auto& it : m_map_dwMobKillCount)
+			LogManager::instance().MoneyLog(MONEY_LOG_MONSTER_KILL, it.first, it.second);
 
 		m_map_dwMobKillCount.clear();
 	}
 
-	// 테스트 서버에서는 60초마다 캐릭터 개수를 센다
+	// The test server counts the number of characters every 60 seconds
 	if (test_server && 0 == (iPulse % PASSES_PER_SEC(60)))
-		sys_log(0, "CHARACTER COUNT vid %zu pid %zu", m_map_pkChrByVID.size(), m_map_pkChrByPID.size());
+		sys_log(0, "CHARACTER COUNT vid %u pid %u", m_map_pkChrByVID.size(), m_map_pkChrByPID.size());
 
-	// 지연된 DestroyCharacter 하기
+	// Delayed DestroyCharacter
 	FlushPendingDestroy();
 }
+
 
 void CHARACTER_MANAGER::ProcessDelayedSave()
 {
@@ -801,9 +771,7 @@ void CHARACTER_MANAGER::UnregisterForMonsterLog(LPCHARACTER ch)
 
 void CHARACTER_MANAGER::PacketMonsterLog(LPCHARACTER ch, const void* buf, int size)
 {
-	itertype(m_set_pkChrMonsterLog) it;
-
-	for (it = m_set_pkChrMonsterLog.begin(); it!=m_set_pkChrMonsterLog.end();++it)
+	for (auto it = m_set_pkChrMonsterLog.begin(); it!=m_set_pkChrMonsterLog.end();++it)
 	{
 		LPCHARACTER c = *it;
 
@@ -821,7 +789,7 @@ void CHARACTER_MANAGER::KillLog(DWORD dwVnum)
 {
 	const DWORD SEND_LIMIT = 10000;
 
-	itertype(m_map_dwMobKillCount) it = m_map_dwMobKillCount.find(dwVnum);
+	auto it = m_map_dwMobKillCount.find(dwVnum);
 
 	if (it == m_map_dwMobKillCount.end())
 		m_map_dwMobKillCount.insert(std::make_pair(dwVnum, 1));
@@ -857,7 +825,7 @@ void CHARACTER_MANAGER::UnregisterRaceNumMap(LPCHARACTER ch)
 {
 	DWORD dwVnum = ch->GetRaceNum();
 
-	itertype(m_map_pkChrByRaceNum) it = m_map_pkChrByRaceNum.find(dwVnum);
+	auto it = m_map_pkChrByRaceNum.find(dwVnum);
 
 	if (it != m_map_pkChrByRaceNum.end())
 		it->second.erase(ch);
@@ -898,10 +866,9 @@ bool CHARACTER_MANAGER::GetCharactersByRaceNum(DWORD dwRaceNum, CharacterVectorI
 LPCHARACTER CHARACTER_MANAGER::FindSpecifyPC(unsigned int uiJobFlag, long lMapIndex, LPCHARACTER except, int iMinLevel, int iMaxLevel)
 {
 	LPCHARACTER chFind = NULL;
-	itertype(m_map_pkChrByPID) it;
 	int n = 0;
 
-	for (it = m_map_pkChrByPID.begin(); it != m_map_pkChrByPID.end(); ++it)
+	for (auto it = m_map_pkChrByPID.begin(); it != m_map_pkChrByPID.end(); ++it)
 	{
 		LPCHARACTER ch = it->second;
 

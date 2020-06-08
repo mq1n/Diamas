@@ -32,7 +32,7 @@ CSkillManager::CSkillManager()
 
 CSkillManager::~CSkillManager()
 {
-	itertype(m_map_pkSkillProto) it = m_map_pkSkillProto.begin();
+	auto it = m_map_pkSkillProto.begin();
 	for ( ; it != m_map_pkSkillProto.end(); ++it) {
 		M2_DELETE(it->second);
 	}
@@ -298,7 +298,7 @@ bool CSkillManager::Initialize(TSkillTable * pTab, int iSize)
 	if (!bError)
 	{
 		// 기존 테이블의 내용을 지운다.
-		itertype(m_map_pkSkillProto) it = m_map_pkSkillProto.begin();
+		auto it = m_map_pkSkillProto.begin();
 
 		while (it != m_map_pkSkillProto.end()) {
 			M2_DELETE(it->second);

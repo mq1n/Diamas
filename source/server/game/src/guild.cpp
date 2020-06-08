@@ -72,7 +72,7 @@ CGuild::CGuild(TGuildCreateParameter & cp)
 		m_data.grade_array[i].auth_flag = 0;
 	}
 
-	std::auto_ptr<SQLMsg> pmsg (DBManager::instance().DirectQuery(
+	std::unique_ptr<SQLMsg> pmsg (DBManager::instance().DirectQuery(
 				"INSERT INTO guild%s(name, master, sp, level, exp, skill_point, skill) "
 				"VALUES('%s', %u, 1000, 1, 0, 0, '\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0')", 
 				get_table_postfix(), m_data.name, m_data.master_pid));
@@ -534,7 +534,7 @@ void CGuild::LoadGuildMemberData(SQLMsg* pmsg)
 
 	m_member.clear();
 
-	for (uint i = 0; i < pmsg->Get()->uiNumRows; ++i)
+	for (size_t i = 0; i < pmsg->Get()->uiNumRows; ++i)
 	{
 		MYSQL_ROW row = mysql_fetch_row(pmsg->Get()->pSQLResult);
 
@@ -568,7 +568,7 @@ void CGuild::LoadGuildGradeData(SQLMsg* pmsg)
 		return;
 	}
 	*/
-	for (uint i = 0; i < pmsg->Get()->uiNumRows; ++i)
+	for (size_t i = 0; i < pmsg->Get()->uiNumRows; ++i)
 	{
 		MYSQL_ROW row = mysql_fetch_row(pmsg->Get()->pSQLResult);
 		BYTE grade = 0;
@@ -600,7 +600,7 @@ void CGuild::LoadGuildData(SQLMsg* pmsg)
 
 	m_data.skill_point = (BYTE) strtoul(row[4], (char **) NULL, 10);
 	if (row[5])
-		thecore_memcpy(m_data.abySkill, row[5], sizeof(BYTE) * GUILD_SKILL_COUNT);
+		memcpy(m_data.abySkill, row[5], sizeof(BYTE) * GUILD_SKILL_COUNT);
 	else
 		memset(m_data.abySkill, 0, sizeof(BYTE) * GUILD_SKILL_COUNT);
 
@@ -625,15 +625,15 @@ void CGuild::Load(DWORD guild_id)
 
 	m_data.guild_id = guild_id;
 
-	DBManager::instance().FuncQuery(std::bind1st(std::mem_fun(&CGuild::LoadGuildData), this), 
+	DBManager::instance().FuncQuery(std::bind(&CGuild::LoadGuildData, this, std::placeholders::_1),
 			"SELECT master, level, exp, name, skill_point, skill, sp, ladder_point, win, draw, loss, gold FROM guild%s WHERE id = %u", get_table_postfix(), m_data.guild_id);
 
 	sys_log(0, "GUILD: loading guild id %12s %u", m_data.name, guild_id);
 
-	DBManager::instance().FuncQuery(std::bind1st(std::mem_fun(&CGuild::LoadGuildGradeData), this), 
+	DBManager::instance().FuncQuery(std::bind(&CGuild::LoadGuildGradeData, this, std::placeholders::_1),
 			"SELECT grade, name, auth+0 FROM guild_grade%s WHERE guild_id = %u", get_table_postfix(), m_data.guild_id);
 
-	DBManager::instance().FuncQuery(std::bind1st(std::mem_fun(&CGuild::LoadGuildMemberData), this), 
+	DBManager::instance().FuncQuery(std::bind(&CGuild::LoadGuildMemberData, this, std::placeholders::_1),
 			"SELECT pid, grade, is_general, offer, level, job, name FROM guild_member%s, player%s WHERE guild_id = %u and pid = id", get_table_postfix(), get_table_postfix(), guild_id);
 }
 
@@ -648,7 +648,7 @@ void CGuild::SendDBSkillUpdate(int amount)
 	guild_skill.guild_id = m_data.guild_id;
 	guild_skill.amount = amount;
 	guild_skill.skill_point = m_data.skill_point;
-	thecore_memcpy(guild_skill.skill_levels, m_data.abySkill, sizeof(BYTE) * GUILD_SKILL_COUNT);
+	memcpy(guild_skill.skill_levels, m_data.abySkill, sizeof(BYTE) * GUILD_SKILL_COUNT);
 
 	db_clientdesc->DBPacket(HEADER_GD_GUILD_SKILL_UPDATE, 0, &guild_skill, sizeof(guild_skill));
 }
@@ -763,7 +763,7 @@ void CGuild::__P2PUpdateGrade(SQLMsg* pmsg)
 
 void CGuild::P2PChangeGrade(BYTE grade)
 {
-	DBManager::instance().FuncQuery(std::bind1st(std::mem_fun(&CGuild::__P2PUpdateGrade),this),
+	DBManager::instance().FuncQuery(std::bind(&CGuild::__P2PUpdateGrade, this, std::placeholders::_1),
 			"SELECT grade, name, auth+0 FROM guild_grade%s WHERE guild_id = %u and grade = %d", get_table_postfix(), m_data.guild_id, grade);
 }
 
@@ -1018,7 +1018,8 @@ void CGuild::AddComment(LPCHARACTER ch, const std::string& str)
 	char text[GUILD_COMMENT_MAX_LEN * 2 + 1];
 	DBManager::instance().EscapeString(text, sizeof(text), str.c_str(), str.length());
 
-	DBManager::instance().FuncAfterQuery(void_bind(std::bind1st(std::mem_fun(&CGuild::RefreshCommentForce),this),ch->GetPlayerID()),
+	auto callback = [this, ch]() { RefreshCommentForce(ch->GetPlayerID()); };
+	DBManager::instance().FuncAfterQuery(callback,
 			"INSERT INTO guild_comment%s(guild_id, name, notice, content, time) VALUES(%u, '%s', %d, '%s', NOW())", 
 			get_table_postfix(), m_data.guild_id, ch->GetName(), (str[0] == '!') ? 1 : 0, text);
 }
@@ -1052,7 +1053,7 @@ void CGuild::RefreshCommentForce(DWORD player_id)
 		return;
 	}
 
-	std::auto_ptr<SQLMsg> pmsg (DBManager::instance().DirectQuery("SELECT id, name, content FROM guild_comment%s WHERE guild_id = %u ORDER BY notice DESC, id DESC LIMIT %d", get_table_postfix(), m_data.guild_id, GUILD_COMMENT_MAX_COUNT));
+	std::unique_ptr<SQLMsg> pmsg (DBManager::instance().DirectQuery("SELECT id, name, content FROM guild_comment%s WHERE guild_id = %u ORDER BY notice DESC, id DESC LIMIT %d", get_table_postfix(), m_data.guild_id, GUILD_COMMENT_MAX_COUNT));
 
 	TPacketGCGuild pack;
 	pack.header = HEADER_GC_GUILD;
@@ -1074,7 +1075,7 @@ void CGuild::RefreshCommentForce(DWORD player_id)
 	memset(szName, 0, sizeof(szName));
 	memset(szContent, 0, sizeof(szContent));
 
-	for (uint i = 0; i < pmsg->Get()->uiNumRows; i++)
+	for (size_t i = 0; i < pmsg->Get()->uiNumRows; i++)
 	{
 		MYSQL_ROW row = mysql_fetch_row(pmsg->Get()->pSQLResult);
 		DWORD id = strtoul(row[0], NULL, 10);
@@ -1230,7 +1231,7 @@ void CGuild::SkillLevelUp(DWORD dwVnum)
 	  break;
 	  }*/
 
-	for_each(m_memberOnline.begin(), m_memberOnline.end(), std::bind1st(std::mem_fun_ref(&CGuild::SendSkillInfoPacket),*this));
+	std::for_each(m_memberOnline.begin(), m_memberOnline.end(), std::bind(&CGuild::SendSkillInfoPacket, this, std::placeholders::_1));
 
 	sys_log(0, "Guild SkillUp: %s %d level %d type %u", GetName(), pkSk->dwVnum, m_data.abySkill[dwRealVnum], pkSk->dwType);
 }
@@ -1372,7 +1373,7 @@ void CGuild::UseSkill(DWORD dwVnum, LPCHARACTER ch, DWORD pid)
 
 				SendDBSkillUpdate(-iNeededSP);
 
-				for (itertype(m_memberOnline) it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)
+				for (auto it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)
 				{
 					LPCHARACTER victim = *it;
 					victim->RemoveAffect(dwVnum);
@@ -1466,7 +1467,7 @@ void CGuild::UpdateSkill(BYTE skill_point, BYTE* skill_levels)
 	  }
 	  }*/
 
-	thecore_memcpy(m_data.abySkill, skill_levels, sizeof(BYTE) * GUILD_SKILL_COUNT);
+	memcpy(m_data.abySkill, skill_levels, sizeof(BYTE) * GUILD_SKILL_COUNT);
 	ComputeGuildPoints();
 }
 
@@ -1496,7 +1497,7 @@ void CGuild::GuildPointChange(BYTE type, int amount, bool save)
 				SaveSkill();
 			}
 
-			for_each(m_memberOnline.begin(), m_memberOnline.end(), std::bind1st(std::mem_fun_ref(&CGuild::SendSkillInfoPacket),*this));
+			std::for_each(m_memberOnline.begin(), m_memberOnline.end(), std::bind(&CGuild::SendSkillInfoPacket, this, std::placeholders::_1));
 			break;
 
 		case POINT_EXP:
@@ -1527,7 +1528,7 @@ void CGuild::GuildPointChange(BYTE type, int amount, bool save)
 							ChangeLadderPoint(GUILD_LADDER_POINT_PER_LEVEL);
 
 						// NOTIFY_GUILD_EXP_CHANGE
-						for_each(m_memberOnline.begin(), m_memberOnline.end(), std::bind1st(std::mem_fun(&CGuild::SendGuildInfoPacket), this));
+						std::for_each(m_memberOnline.begin(), m_memberOnline.end(), std::bind(&CGuild::SendGuildInfoPacket, this, std::placeholders::_1));
 						// END_OF_NOTIFY_GUILD_EXP_CHANGE
 					}
 
@@ -1692,7 +1693,7 @@ LPCHARACTER CGuild::GetMasterCharacter()
 
 void CGuild::Packet(const void* buf, int size)
 {
-	for (itertype(m_memberOnline) it = m_memberOnline.begin(); it!=m_memberOnline.end();++it)
+	for (auto it = m_memberOnline.begin(); it!=m_memberOnline.end();++it)
 	{
 		LPDESC d = (*it)->GetDesc();
 
@@ -1705,7 +1706,7 @@ int CGuild::GetTotalLevel() const
 {
 	int total = 0;
 
-	for (itertype(m_member) it = m_member.begin(); it != m_member.end(); ++it)
+	for (auto it = m_member.begin(); it != m_member.end(); ++it)
 	{
 		total += it->second.level;
 	}
@@ -1867,7 +1868,7 @@ void CGuild::RecvMoneyChange(int iGold)
 	p.size = sizeof(p) + sizeof(int);
 	p.subheader = GUILD_SUBHEADER_GC_MONEY_CHANGE;
 
-	for (itertype(m_memberOnline) it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)
+	for (auto it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)
 	{
 		LPCHARACTER ch = *it;
 		LPDESC d = ch->GetDesc();
@@ -2090,7 +2091,7 @@ CGuild::GuildJoinErrCode CGuild::VerifyGuildJoinableCondition( const LPCHARACTER
 	}
 	else if ( LC_IsBrazil() == true )
 	{
-		std::auto_ptr<SQLMsg> pMsg( DBManager::instance().DirectQuery("SELECT value FROM guild_invite_limit WHERE id=%d", GetID()) );
+		std::unique_ptr<SQLMsg> pMsg( DBManager::instance().DirectQuery("SELECT value FROM guild_invite_limit WHERE id=%d", GetID()) );
 
 		if ( pMsg->Get()->uiNumRows > 0 )
 		{
@@ -2129,7 +2130,7 @@ bool CGuild::ChangeMasterTo(DWORD dwPID)
 	return true;
 }
 
-void CGuild::SendGuildDataUpdateToAllMember(SQLMsg* pmsg)
+void CGuild::SendGuildDataUpdateToAllMember()
 {
 	TGuildMemberOnlineContainer::iterator iter = m_memberOnline.begin();
 

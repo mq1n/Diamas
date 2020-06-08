@@ -28,7 +28,7 @@ void ItemAwardManager::Load(SQLMsg * pMsg)
 {
 	MYSQL_RES * pRes = pMsg->Get()->pSQLResult;
 
-	for (uint i = 0; i < pMsg->Get()->uiNumRows; ++i)
+	for (size_t i = 0; i < pMsg->Get()->uiNumRows; ++i)
 	{
 		MYSQL_ROW row = mysql_fetch_row(pRes);
 		int col = 0;
@@ -85,7 +85,7 @@ void ItemAwardManager::Load(SQLMsg * pMsg)
 
 std::set<TItemAward *> * ItemAwardManager::GetByLogin(const char * c_pszLogin)
 {
-	itertype(m_map_kSetAwardByLogin) it = m_map_kSetAwardByLogin.find(c_pszLogin);
+	auto it = m_map_kSetAwardByLogin.find(c_pszLogin);
 
 	if (it == m_map_kSetAwardByLogin.end())
 		return NULL;
@@ -95,7 +95,7 @@ std::set<TItemAward *> * ItemAwardManager::GetByLogin(const char * c_pszLogin)
 
 void ItemAwardManager::Taken(DWORD dwAwardID, DWORD dwItemID)
 {
-	itertype(m_map_award) it = m_map_award.find(dwAwardID);
+	auto it = m_map_award.find(dwAwardID);
 
 	if (it == m_map_award.end())
 	{

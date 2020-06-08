@@ -37,7 +37,7 @@ CObject::CObject(TObject * pData, TObjectProto * pProto)
 {
 	CEntity::Initialize(ENTITY_OBJECT);
 
-	thecore_memcpy(&m_data, pData, sizeof(TObject));
+	memcpy(&m_data, pData, sizeof(TObject));
 }
 
 CObject::~CObject()
@@ -315,7 +315,7 @@ void CObject::RegenNPC()
 
 CLand::CLand(TLand * pData)
 {
-	thecore_memcpy(&m_data, pData, sizeof(TLand));
+	memcpy(&m_data, pData, sizeof(TLand));
 }
 
 CLand::~CLand()
@@ -325,7 +325,7 @@ CLand::~CLand()
 
 void CLand::Destroy()
 {
-	itertype(m_map_pkObject) it = m_map_pkObject.begin();
+	auto it = m_map_pkObject.begin();
 
 	while (it != m_map_pkObject.end())
 	{
@@ -637,7 +637,7 @@ CManager::~CManager()
 
 void CManager::Destroy()
 {
-	itertype(m_map_pkLand) it = m_map_pkLand.begin();
+	auto it = m_map_pkLand.begin();
 	for ( ; it != m_map_pkLand.end(); ++it) {
 		M2_DELETE(it->second);
 	}
@@ -647,7 +647,7 @@ void CManager::Destroy()
 bool CManager::LoadObjectProto(const TObjectProto * pProto, int size) // from DB
 {
 	m_vec_kObjectProto.resize(size);
-	thecore_memcpy(&m_vec_kObjectProto[0], pProto, sizeof(TObjectProto) * size);
+	memcpy(&m_vec_kObjectProto[0], pProto, sizeof(TObjectProto) * size);
 
 	for (int i = 0; i < size; ++i)
 	{
@@ -680,7 +680,7 @@ bool CManager::LoadObjectProto(const TObjectProto * pProto, int size) // from DB
 
 TObjectProto * CManager::GetObjectProto(DWORD dwVnum)
 {
-	itertype(m_map_pkObjectProto) it = m_map_pkObjectProto.find(dwVnum);
+	auto it = m_map_pkObjectProto.find(dwVnum);
 
 	if (it == m_map_pkObjectProto.end())
 		return NULL;
@@ -720,7 +720,7 @@ void CManager::UpdateLand(TLand * pTable)
 
 	const DESC_MANAGER::DESC_SET & cont = DESC_MANAGER::instance().GetClientSet();
 
-	itertype(cont) it = cont.begin();
+	auto it = cont.begin();
 
 	TPacketGCLandList p;
 
@@ -776,7 +776,7 @@ CLand * CManager::FindLand(long lMapIndex, long x, long y)
 	x -= r->sx;
 	y -= r->sy;
 
-	itertype(m_map_pkLand) it = m_map_pkLand.begin();
+	auto it = m_map_pkLand.begin();
 
 	while (it != m_map_pkLand.end())
 	{
@@ -800,7 +800,7 @@ CLand * CManager::FindLand(long lMapIndex, long x, long y)
 
 CLand * CManager::FindLandByGuild(DWORD GID)
 {
-	itertype(m_map_pkLand) it = m_map_pkLand.begin();
+	auto it = m_map_pkLand.begin();
 
 	while (it != m_map_pkLand.end())
 	{
@@ -866,7 +866,7 @@ bool CManager::LoadObject(TObject * pTable, bool isBoot) // from DB
 
 void CManager::FinalizeBoot()
 {
-	itertype(m_map_pkObjByID) it = m_map_pkObjByID.begin();
+	auto it = m_map_pkObjByID.begin();
 
 	while (it != m_map_pkObjByID.end())
 	{
@@ -883,7 +883,7 @@ void CManager::FinalizeBoot()
 	sys_log(0, "FinalizeBoot");
 	// END_OF_BUILDING_NPC
 
-	itertype(m_map_pkLand) it2 = m_map_pkLand.begin();
+	auto it2 = m_map_pkLand.begin();
 
 	while (it2 != m_map_pkLand.end())
 	{
@@ -913,7 +913,7 @@ void CManager::DeleteObject(DWORD dwID) // from DB
 {
 	sys_log(0, "OBJ_DEL: %u", dwID);
 
-	itertype(m_map_pkObjByID) it = m_map_pkObjByID.find(dwID);
+	auto it = m_map_pkObjByID.find(dwID);
 
 	if (it == m_map_pkObjByID.end())
 		return;
@@ -923,7 +923,7 @@ void CManager::DeleteObject(DWORD dwID) // from DB
 
 LPOBJECT CManager::FindObjectByVID(DWORD dwVID)
 {
-	itertype(m_map_pkObjByVID) it = m_map_pkObjByVID.find(dwVID);
+	auto it = m_map_pkObjByVID.find(dwVID);
 
 	if (it == m_map_pkObjByVID.end())
 		return NULL;
@@ -945,7 +945,7 @@ void CManager::SendLandList(LPDESC d, long lMapIndex)
 
 	WORD wCount = 0;
 
-	itertype(m_map_pkLand) it = m_map_pkLand.begin();
+	auto it = m_map_pkLand.begin();
 
 	while (it != m_map_pkLand.end())
 	{
@@ -1022,7 +1022,7 @@ void CManager::ClearLandByGuildID(DWORD dwGuildID)
 
 void CLand::ClearLand()
 {
-	itertype(m_map_pkObject) iter = m_map_pkObject.begin();
+	auto iter = m_map_pkObject.begin();
 
 	while ( iter != m_map_pkObject.end() )
 	{
@@ -1142,7 +1142,7 @@ bool CLand::RequestCreateWall(long nMapIndex, float rot)
 
 void CLand::RequestDeleteWall()
 {
-	itertype(m_map_pkObject) iter = m_map_pkObject.begin();
+	auto iter = m_map_pkObject.begin();
 
 	while (iter != m_map_pkObject.end())
 	{
@@ -1247,7 +1247,7 @@ bool CLand::RequestCreateWallBlocks(DWORD dwVnum, long nMapIndex, char wallSize,
 
 void CLand::RequestDeleteWallBlocks(DWORD dwID)
 {
-	itertype(m_map_pkObject) iter = m_map_pkObject.begin();
+	auto iter = m_map_pkObject.begin();
 
 	DWORD corner = dwID - 4;
 	DWORD wall = dwID - 3;

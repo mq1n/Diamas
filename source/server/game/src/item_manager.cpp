@@ -36,7 +36,7 @@ ITEM_MANAGER::~ITEM_MANAGER()
 
 void ITEM_MANAGER::Destroy()
 {
-	itertype(m_VIDMap) it = m_VIDMap.begin();
+	auto it = m_VIDMap.begin();
 	for ( ; it != m_VIDMap.end(); ++it) {
 #ifdef M2_USE_POOL
 		pool_.Destroy(it->second);
@@ -49,7 +49,7 @@ void ITEM_MANAGER::Destroy()
 
 void ITEM_MANAGER::GracefulShutdown()
 {
-	TR1_NS::unordered_set<LPITEM>::iterator it = m_set_pkItemForDelayedSave.begin();
+	std::unordered_set<LPITEM>::iterator it = m_set_pkItemForDelayedSave.begin();
 
 	while (it != m_set_pkItemForDelayedSave.end())
 		SaveSingleItem(*(it++));
@@ -65,7 +65,7 @@ bool ITEM_MANAGER::Initialize(TItemTable * table, int size)
 	int	i;
 
 	m_vec_prototype.resize(size);
-	thecore_memcpy(&m_vec_prototype[0], table, sizeof(TItemTable) * size);
+	memcpy(&m_vec_prototype[0], table, sizeof(TItemTable) * size);
 	for (int i = 0; i < size; i++)
 	{
 		if (0 != m_vec_prototype[i].dwVnumRange)
@@ -389,7 +389,7 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 
 	if (item->GetType() == ITEM_QUEST)
 	{
-		for (itertype (m_map_pkQuestItemGroup) it = m_map_pkQuestItemGroup.begin(); it != m_map_pkQuestItemGroup.end(); it++)
+		for (auto it = m_map_pkQuestItemGroup.begin(); it != m_map_pkQuestItemGroup.end(); it++)
 		{
 			if (it->second->m_bType == CSpecialItemGroup::QUEST && it->second->Contains(vnum))
 			{
@@ -399,7 +399,7 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 	}
 	else if (item->GetType() == ITEM_UNIQUE)
 	{
-		for (itertype (m_map_pkSpecialItemGroup) it = m_map_pkSpecialItemGroup.begin(); it != m_map_pkSpecialItemGroup.end(); it++)
+		for (auto it = m_map_pkSpecialItemGroup.begin(); it != m_map_pkSpecialItemGroup.end(); it++)
 		{
 			if (it->second->m_bType == CSpecialItemGroup::SPECIAL && it->second->Contains(vnum))
 			{
@@ -424,7 +424,7 @@ void ITEM_MANAGER::DelayedSave(LPITEM item)
 
 void ITEM_MANAGER::FlushDelayedSave(LPITEM item)
 {
-	TR1_NS::unordered_set<LPITEM>::iterator it = m_set_pkItemForDelayedSave.find(item);
+	std::unordered_set<LPITEM>::iterator it = m_set_pkItemForDelayedSave.find(item);
 
 	if (it == m_set_pkItemForDelayedSave.end())
 	{
@@ -460,8 +460,8 @@ void ITEM_MANAGER::SaveSingleItem(LPITEM item)
 	t.count = item->GetCount();
 	t.vnum = item->GetOriginalVnum();
 	t.owner = (t.window == SAFEBOX || t.window == MALL) ? item->GetOwner()->GetDesc()->GetAccountTable().id : item->GetOwner()->GetPlayerID();
-	thecore_memcpy(t.alSockets, item->GetSockets(), sizeof(t.alSockets));
-	thecore_memcpy(t.aAttr, item->GetAttributes(), sizeof(t.aAttr));
+	memcpy(t.alSockets, item->GetSockets(), sizeof(t.alSockets));
+	memcpy(t.aAttr, item->GetAttributes(), sizeof(t.aAttr));
 
 	db_clientdesc->DBPacketHeader(HEADER_GD_ITEM_SAVE, 0, sizeof(TPlayerItem));
 	db_clientdesc->Packet(&t, sizeof(TPlayerItem));
@@ -469,8 +469,8 @@ void ITEM_MANAGER::SaveSingleItem(LPITEM item)
 
 void ITEM_MANAGER::Update()
 {
-	TR1_NS::unordered_set<LPITEM>::iterator it = m_set_pkItemForDelayedSave.begin();
-	TR1_NS::unordered_set<LPITEM>::iterator this_it;
+	std::unordered_set<LPITEM>::iterator it = m_set_pkItemForDelayedSave.begin();
+	std::unordered_set<LPITEM>::iterator this_it;
 
 	while (it != m_set_pkItemForDelayedSave.end())
 	{
@@ -540,7 +540,7 @@ void ITEM_MANAGER::DestroyItem(LPITEM item, const char* file, size_t line)
 		}
 	}
 
-	TR1_NS::unordered_set<LPITEM>::iterator it = m_set_pkItemForDelayedSave.find(item);
+	std::unordered_set<LPITEM>::iterator it = m_set_pkItemForDelayedSave.find(item);
 
 	if (it != m_set_pkItemForDelayedSave.end())
 		m_set_pkItemForDelayedSave.erase(it);
@@ -579,7 +579,7 @@ void ITEM_MANAGER::DestroyItem(LPITEM item, const char* file, size_t line)
 
 LPITEM ITEM_MANAGER::Find(DWORD id)
 {
-	itertype(m_map_pkItemByID) it = m_map_pkItemByID.find(id);
+	auto it = m_map_pkItemByID.find(id);
 	if (it == m_map_pkItemByID.end())
 		return NULL;
 	return it->second;
@@ -892,12 +892,10 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 
 	// Drop Item Group
 	{
-		itertype(m_map_pkDropItemGroup) it;
-		it = m_map_pkDropItemGroup.find(pkChr->GetRaceNum());
-
+		auto it = m_map_pkDropItemGroup.find(pkChr->GetRaceNum());
 		if (it != m_map_pkDropItemGroup.end())
 		{
-			typeof(it->second->GetVector()) v = it->second->GetVector();
+			auto v = it->second->GetVector();
 
 			for (DWORD i = 0; i < v.size(); ++i)
 			{
@@ -926,9 +924,7 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 
 	// MobDropItem Group
 	{
-		itertype(m_map_pkMobItemGroup) it;
-		it = m_map_pkMobItemGroup.find(pkChr->GetRaceNum());
-
+		auto it = m_map_pkMobItemGroup.find(pkChr->GetRaceNum());
 		if ( it != m_map_pkMobItemGroup.end() )
 		{
 			CMobItemGroup* pGroup = it->second;
@@ -952,14 +948,12 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 
 	// Level Item Group
 	{
-		itertype(m_map_pkLevelItemGroup) it;
-		it = m_map_pkLevelItemGroup.find(pkChr->GetRaceNum());
-
+		auto it = m_map_pkLevelItemGroup.find(pkChr->GetRaceNum());
 		if ( it != m_map_pkLevelItemGroup.end() )
 		{
 			if ( it->second->GetLevelLimit() <= (DWORD)iLevel )
 			{
-				typeof(it->second->GetVector()) v = it->second->GetVector();
+				auto v = it->second->GetVector();
 
 				for ( DWORD i=0; i < v.size(); i++ )
 				{
@@ -979,12 +973,10 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 		if (pkKiller->GetPremiumRemainSeconds(PREMIUM_ITEM) > 0 ||
 				pkKiller->IsEquipUniqueGroup(UNIQUE_GROUP_DOUBLE_ITEM))
 		{
-			itertype(m_map_pkGloveItemGroup) it;
-			it = m_map_pkGloveItemGroup.find(pkChr->GetRaceNum());
-
+			auto it = m_map_pkGloveItemGroup.find(pkChr->GetRaceNum());
 			if (it != m_map_pkGloveItemGroup.end())
 			{
-				typeof(it->second->GetVector()) v = it->second->GetVector();
+				auto v = it->second->GetVector();
 
 				for (DWORD i = 0; i < v.size(); ++i)
 				{
@@ -1004,7 +996,7 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 	// ÀâÅÛ
 	if (pkChr->GetMobDropItemVnum())
 	{
-		itertype(m_map_dwEtcItemDropProb) it = m_map_dwEtcItemDropProb.find(pkChr->GetMobDropItemVnum());
+		auto it = m_map_dwEtcItemDropProb.find(pkChr->GetMobDropItemVnum());
 
 		if (it != m_map_dwEtcItemDropProb.end())
 		{
@@ -1061,7 +1053,7 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 	// 
 	CreateQuestDropItem(pkChr, pkKiller, vec_item, iDeltaPercent, iRandRange);
 
-	for (itertype(vec_item) it = vec_item.begin(); it != vec_item.end(); ++it)
+	for (auto it = vec_item.begin(); it != vec_item.end(); ++it)
 	{
 		LPITEM item = *it;
 		DBManager::instance().SendMoneyLog(MONEY_LOG_DROP, item->GetVnum(), item->GetCount());
@@ -1697,7 +1689,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 
 DWORD ITEM_MANAGER::GetRefineFromVnum(DWORD dwVnum)
 {
-	itertype(m_map_ItemRefineFrom) it = m_map_ItemRefineFrom.find(dwVnum);
+	auto it = m_map_ItemRefineFrom.find(dwVnum);
 	if (it != m_map_ItemRefineFrom.end())
 		return it->second;
 	return 0;
@@ -1705,7 +1697,7 @@ DWORD ITEM_MANAGER::GetRefineFromVnum(DWORD dwVnum)
 
 const CSpecialItemGroup* ITEM_MANAGER::GetSpecialItemGroup(DWORD dwVnum)
 {
-	itertype(m_map_pkSpecialItemGroup) it = m_map_pkSpecialItemGroup.find(dwVnum);
+	auto it = m_map_pkSpecialItemGroup.find(dwVnum);
 	if (it != m_map_pkSpecialItemGroup.end())
 	{
 		return it->second;
@@ -1715,7 +1707,7 @@ const CSpecialItemGroup* ITEM_MANAGER::GetSpecialItemGroup(DWORD dwVnum)
 
 const CSpecialAttrGroup* ITEM_MANAGER::GetSpecialAttrGroup(DWORD dwVnum)
 {
-	itertype(m_map_pkSpecialAttrGroup) it = m_map_pkSpecialAttrGroup.find(dwVnum);
+	auto it = m_map_pkSpecialAttrGroup.find(dwVnum);
 	if (it != m_map_pkSpecialAttrGroup.end())
 	{
 		return it->second;

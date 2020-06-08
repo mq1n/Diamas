@@ -1,8 +1,8 @@
 #ifndef __INC_METIN_II_DB_MANAGER_H__
 #define __INC_METIN_II_DB_MANAGER_H__
 
-#include "../../libsql/AsyncSQL.h"
-#include "any_function.h"
+#include "../../libsql/include/AsyncSQL.h"
+#include <functional>
 
 enum
 {
@@ -66,13 +66,13 @@ class CReturnQueryInfo : public CQueryInfo
 class CFuncQueryInfo : public CQueryInfo
 {
 	public:
-		any_function f;
+	std::function<void(SQLMsg*)> f;
 };
 
 class CFuncAfterQueryInfo : public CQueryInfo
 {
 	public:
-		any_void_function f;
+	std::function<void()> f;
 };
 
 class CLoginData;

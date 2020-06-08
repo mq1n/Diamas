@@ -217,7 +217,7 @@ EVENTFUNC(oxevent_timer)
 
 			if (LC_IsJapan())
 			{
-				SendNoticeMap("間違えた方々を外に移動させます。", OXEVENT_MAP_INDEX, true);
+				SendNoticeMap("間違えた方杞を外に移動させます曖", OXEVENT_MAP_INDEX, true);
 			}
 			else
 			{
@@ -272,8 +272,8 @@ bool COXEventManager::CheckAnswer(bool answer)
 {
 	if (m_map_attender.size() <= 0) return true;
 	
-	itertype(m_map_attender) iter = m_map_attender.begin();
-	itertype(m_map_attender) iter_tmp;
+	auto iter = m_map_attender.begin();
+	auto iter_tmp = iter;
 	
 	m_map_miss.clear();
 
@@ -343,10 +343,10 @@ bool COXEventManager::CheckAnswer(bool answer)
 		}
 		else
 		{
-			itertype(m_map_char) err = m_map_char.find(iter->first);
+			auto err = m_map_char.find(iter->first);
 			if (err != m_map_char.end()) m_map_char.erase(err);
 
-			itertype(m_map_miss) err2 = m_map_miss.find(iter->first);
+			auto err2 = m_map_miss.find(iter->first);
 			if (err2 != m_map_miss.end()) m_map_miss.erase(err2);
 
 			iter_tmp = iter;
@@ -361,7 +361,7 @@ void COXEventManager::WarpToAudience()
 {
 	if (m_map_miss.size() <= 0) return;
 
-	itertype(m_map_miss) iter = m_map_miss.begin();
+	auto iter = m_map_miss.begin();
 	LPCHARACTER pkChar = NULL;
 	
 	for (; iter != m_map_miss.end(); ++iter)
@@ -390,7 +390,7 @@ bool COXEventManager::CloseEvent()
 		event_cancel(&m_timedEvent);
 	}
 
-	itertype(m_map_char) iter = m_map_char.begin();
+	auto iter = m_map_char.begin();
 
 	LPCHARACTER pkChar = NULL;
 	for (; iter != m_map_char.end(); ++iter)
@@ -408,7 +408,7 @@ bool COXEventManager::CloseEvent()
 
 bool COXEventManager::LogWinner()
 {
-	itertype(m_map_attender) iter = m_map_attender.begin();
+	auto iter = m_map_attender.begin();
 	
 	for (; iter != m_map_attender.end(); ++iter)
 	{
@@ -423,7 +423,7 @@ bool COXEventManager::LogWinner()
 
 bool COXEventManager::GiveItemToAttender(DWORD dwItemVnum, BYTE count)
 {
-	itertype(m_map_attender) iter = m_map_attender.begin();
+	auto iter = m_map_attender.begin();
 
 	for (; iter != m_map_attender.end(); ++iter)
 	{

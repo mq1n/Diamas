@@ -32,10 +32,10 @@ namespace quest
 
 		while (itEventName != CQuestManager::instance().m_mapEventName.end())
 		{
-			typeof(itEventName) it = itEventName;
+			auto it = itEventName;
 			++itEventName;
 
-			for (itertype(g_setQuestObjectDir) itObjectDir = g_setQuestObjectDir.begin(); itObjectDir != g_setQuestObjectDir.end(); ++itObjectDir)
+			for (auto itObjectDir = g_setQuestObjectDir.begin(); itObjectDir != g_setQuestObjectDir.end(); ++itObjectDir)
 			{	
 				int is = snprintf(buf, sizeof(buf), "%s/%s/%s/", itObjectDir->c_str(), script_name.c_str(), it->first.c_str());
 
@@ -539,7 +539,7 @@ namespace quest
 			if (NPC::HasStartState(itQuestMap->second) && CQuestManager::instance().CanStartQuest(dwQuestIndex))
 			{
 				const NPC::AQuestScriptType & QuestScript = itQuestMap->second;
-				itertype(QuestScript) it = QuestScript.find(QUEST_START_STATE_INDEX);
+				auto it = QuestScript.find(QUEST_START_STATE_INDEX);
 
 				if (it != QuestScript.end())
 				{
@@ -568,7 +568,7 @@ namespace quest
 		{
 			const NPC::AQuestScriptType& QuestScript = itQuestMap->second;
 			int iPCState = itPCQuest->second.st;
-			itertype(QuestScript) itQuestScript = QuestScript.find(iPCState);
+			auto itQuestScript = QuestScript.find(iPCState);
 
 			if (itQuestScript != QuestScript.end())
 			{
@@ -637,7 +637,7 @@ namespace quest
 			if (NPC::HasStartState(itQuestMap->second) && CQuestManager::instance().CanStartQuest(dwQuestIndex))
 			{
 				const NPC::AQuestScriptType& QuestScript = itQuestMap->second;
-				itertype(QuestScript) it = QuestScript.find(QUEST_START_STATE_INDEX);
+				auto it = QuestScript.find(QUEST_START_STATE_INDEX);
 				if (it != QuestScript.end())
 				{
 					bHandled = true;
@@ -674,7 +674,7 @@ namespace quest
 		{
 			const NPC::AQuestScriptType & QuestScript = itQuestMap->second;
 			int iPCState = itPCQuest->second.st;
-			itertype(QuestScript) itQuestScript = QuestScript.find(iPCState);
+			auto itQuestScript = QuestScript.find(iPCState);
 
 			if (itQuestScript != QuestScript.end())
 			{
@@ -936,7 +936,7 @@ namespace quest
 	{
 		QuestMapType& rQuest = m_mapOwnQuest[EventIndex];
 
-		itertype(rQuest) itQuest = rQuest.find(dwQuestIndex);
+		auto itQuest = rQuest.find(dwQuestIndex);
 		if (itQuest == rQuest.end())
 		{
 			sys_log(0, "ExecuteEventScript ei %d qi %u is %d - NO QUEST", EventIndex, dwQuestIndex, iState);
@@ -944,7 +944,7 @@ namespace quest
 		}
 
 		AQuestScriptType& rScript = itQuest->second;
-		itertype(itQuest->second) itState = rScript.find(iState);
+		auto itState = rScript.find(iState);
 		if (itState == rScript.end())
 		{
 			sys_log(0, "ExecuteEventScript ei %d qi %u is %d - NO STATE", EventIndex, dwQuestIndex, iState);

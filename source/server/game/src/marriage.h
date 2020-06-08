@@ -129,7 +129,7 @@ namespace marriage
 				Func	for_each_wedding(Func f);
 
 		private:
-			TR1_NS::unordered_set<TMarriage*> m_Marriages;
+			std::unordered_set<TMarriage*> m_Marriages;
 			std::map<DWORD, TMarriage *> m_MarriageByPID;
 			std::set<std::pair<DWORD, DWORD> > m_setWedding;
 	};
@@ -137,7 +137,7 @@ namespace marriage
 	template <typename Func>
 		Func CManager::for_each_wedding(Func f)
 		{
-			for (itertype(m_setWedding) it = m_setWedding.begin(); it!=m_setWedding.end(); ++it)
+			for (auto it = m_setWedding.begin(); it!=m_setWedding.end(); ++it)
 			{
 				TMarriage* pMarriage = Get(it->first);
 				if (pMarriage)

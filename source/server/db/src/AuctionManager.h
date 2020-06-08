@@ -3,7 +3,7 @@
 #ifndef __INC_AUCTION_MANAGER_H__
 #define __INC_AUCTION_MANAGER_H__
 
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 #include "Cache.h"
 #include "../../common/auction_table.h"
 
@@ -98,7 +98,7 @@ public:
 		return true;
 	}
 private:
-	typedef boost::unordered_map <Key, ItemInfoCache *> TItemInfoCacheMap;
+	typedef std::unordered_map <Key, ItemInfoCache *> TItemInfoCacheMap;
 	TItemInfoCacheMap item_cache_map;
 };
 
@@ -169,7 +169,7 @@ public:
 	}
 
 private:
-	typedef boost::unordered_map <Key, ItemInfoCache *> TItemInfoCacheMap;
+	typedef std::unordered_map <Key, ItemInfoCache *> TItemInfoCacheMap;
 	TItemInfoCacheMap item_cache_map;
 };
 
@@ -239,7 +239,7 @@ public:
 		return true;
 	}
 private:
-	typedef boost::unordered_map <Key, ItemInfoCache *> TItemInfoCacheMap;
+	typedef std::unordered_map <Key, ItemInfoCache *> TItemInfoCacheMap;
 	TItemInfoCacheMap item_cache_map;
 };
 
@@ -260,7 +260,7 @@ public:
 
 private:
 	typedef std::map <DWORD, int> TItemMap;
-	typedef boost::unordered_map <DWORD, TItemMap*> TMyBidBoard;
+	typedef std::unordered_map <DWORD, TItemMap*> TMyBidBoard;
 	TMyBidBoard pc_map;
 };
 
@@ -268,7 +268,7 @@ class AuctionManager : public singleton <AuctionManager>
 {
 private:
 	// auction에 등록된 아이템들.
-	typedef boost::unordered_map<DWORD, CItemCache *> TItemCacheMap;
+	typedef std::unordered_map<DWORD, CItemCache *> TItemCacheMap;
 	TItemCacheMap auction_item_cache_map;
 
 	// auction에 등록된 정보 중 가격, 등등 아이템 테이블에 포함되지 않는 정보들을 관리하는 것들

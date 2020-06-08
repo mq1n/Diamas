@@ -8,10 +8,10 @@ inline const char *encode_byte(char ind)
 	return (a);
 }
 
-inline const char *encode_2bytes(sh_int ind)
+inline const char *encode_2bytes(short ind)
 {
 	static char a[8];
-	*((sh_int *) a) = ind;
+	*((short*) a) = ind;
 	return (a);
 }
 

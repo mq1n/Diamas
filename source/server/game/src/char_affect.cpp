@@ -52,7 +52,7 @@ void SendAffectAddPacket(LPDESC d, CAffect * pkAff)
 // Affect
 CAffect * CHARACTER::FindAffect(DWORD dwType, BYTE bApply) const
 {
-	itertype(m_list_pkAffect) it = m_list_pkAffect.begin();
+	auto it = m_list_pkAffect.begin();
 
 	while (it != m_list_pkAffect.end())
 	{
@@ -183,7 +183,7 @@ void CHARACTER::ClearAffect(bool bSave)
 	WORD	wMovSpd = GetPoint(POINT_MOV_SPEED);
 	WORD	wAttSpd = GetPoint(POINT_ATT_SPEED);
 
-	itertype(m_list_pkAffect) it = m_list_pkAffect.begin();
+	auto it = m_list_pkAffect.begin();
 
 	while (it != m_list_pkAffect.end())
 	{
@@ -275,10 +275,7 @@ int CHARACTER::ProcessAffect()
 	long lMovSpd = GetPoint(POINT_MOV_SPEED);
 	long lAttSpd = GetPoint(POINT_ATT_SPEED);
 
-	itertype(m_list_pkAffect) it;
-
-	it = m_list_pkAffect.begin();
-
+	auto it = m_list_pkAffect.begin();
 	while (it != m_list_pkAffect.end())
 	{
 		pkAff = *it;
@@ -348,7 +345,7 @@ void CHARACTER::SaveAffect()
 {
 	TPacketGDAddAffect p;
 
-	itertype(m_list_pkAffect) it = m_list_pkAffect.begin();
+	auto it = m_list_pkAffect.begin();
 
 	while (it != m_list_pkAffect.end())
 	{
@@ -453,7 +450,7 @@ void CHARACTER::LoadAffect(DWORD dwCount, TPacketAffectElement * pElements)
 		info->pid = GetPlayerID();
 		info->count = dwCount;
 		info->data = M2_NEW char[sizeof(TPacketAffectElement) * dwCount];
-		thecore_memcpy(info->data, pElements, sizeof(TPacketAffectElement) * dwCount);
+		memcpy(info->data, pElements, sizeof(TPacketAffectElement) * dwCount);
 
 		event_create(load_affect_login_event, info, PASSES_PER_SEC(1));
 
@@ -630,7 +627,7 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 
 void CHARACTER::RefreshAffect()
 {
-	itertype(m_list_pkAffect) it = m_list_pkAffect.begin();
+	auto it = m_list_pkAffect.begin();
 
 	while (it != m_list_pkAffect.end())
 	{

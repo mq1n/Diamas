@@ -87,8 +87,8 @@ bool GuildMarkConvert(const std::vector<DWORD> & vecGuildID)
 		}
 
 		// mark id -> 이미지에서의 위치 찾기
-		uint row = mark_id / 32;
-		uint col = mark_id % 32;
+		size_t row = mark_id / 32;
+		size_t col = mark_id % 32;
 
 		if (row >= 42)
 		{
@@ -96,8 +96,8 @@ bool GuildMarkConvert(const std::vector<DWORD> & vecGuildID)
 			continue;
 		}
 
-		uint sx = col * 16;
-		uint sy = row * 12;
+		size_t sx = col * 16;
+		size_t sy = row * 12;
 
 		Pixel * src = oldImagePtr + sy * 512 + sx;
 		Pixel * dst = mark;

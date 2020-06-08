@@ -152,23 +152,5 @@ bool operator<(const DebugPtr<T>& lhs, const DebugPtr<T>& rhs) {
 }
 } // namespace std
 
-#ifdef __GNUC__
-namespace std { namespace tr1 {
-#else
-namespace boost {
-#endif
-template<typename T>
-struct hash<DebugPtr<T> > {
-	size_t operator()(const DebugPtr<T>& v) const {
-		return reinterpret_cast<size_t>(v.Get());
-	}
-};
-#ifdef __GNUC__
-}} // namespace std::tr1
-#else
-} // namespace boost
-#endif
-
-
 #endif // DEBUG_ALLOC
 #endif // _DEBUG_PTR_H_

@@ -10,7 +10,6 @@
 #include "item_manager.h"
 #include "log.h"
 #include "db.h"
-#include <boost/bind.hpp>
 #include "item.h"
 #include "desc_client.h"
 #include "../../common/tables.h"
@@ -116,7 +115,7 @@ bool AuctionBoard::InsertItemInfo (TAuctionItemInfo* item_info)
 	}
 
 	c = new TAuctionItemInfo();
-	thecore_memcpy (c, item_info, sizeof(TAuctionItemInfo));
+	memcpy (c, item_info, sizeof(TAuctionItemInfo));
 
 	c->item_proto = ITEM_MANAGER::instance().GetTable(c->item_num);
 	item_map.insert(TItemInfoMap::value_type(item_info->item_id, c));
@@ -170,7 +169,7 @@ bool AuctionBoard::UpdateItemInfo (TAuctionItemInfo* item_info)
 		return false;
 	}
 
-	thecore_memcpy (c, item_info, sizeof(TAuctionItemInfo));
+	memcpy (c, item_info, sizeof(TAuctionItemInfo));
 	return true;
 }
 
@@ -270,7 +269,7 @@ void AuctionBoard::SortedItemInfos (TItemInfoVec& vec, BYTE grade, BYTE category
 			{
 				continue;
 			}
-			for (uint i = 0; i < temp.size(); i++)
+			for (size_t i = 0; i < temp.size(); i++)
 			{
 				bool check_grade = (grade == 0);
 				for (int j = 0; j < ITEM_LIMIT_MAX_NUM; j++)
@@ -352,7 +351,7 @@ bool SaleBoard::InsertItemInfo (TSaleItemInfo* item_info)
 		return false;
 	}
 	c = new TSaleItemInfo ();
-	thecore_memcpy (c, item_info, sizeof(TSaleItemInfo));
+	memcpy (c, item_info, sizeof(TSaleItemInfo));
 
 	c->item_proto = ITEM_MANAGER::instance().GetTable(c->item_num);
 
@@ -457,7 +456,7 @@ bool WishBoard::InsertItemInfo (TWishItemInfo* item_info)
 	if (item_it == item_map->end())
 	{
 		TWishItemInfo* c = new TWishItemInfo();
-		thecore_memcpy (c, item_info, sizeof(TWishItemInfo));
+		memcpy (c, item_info, sizeof(TWishItemInfo));
 
 		c->item_proto = ITEM_MANAGER::instance().GetTable(c->item_num);
 		item_map->insert (TItemMap::value_type (item_num, c));
@@ -829,7 +828,7 @@ void AuctionManager::get_auction_list (LPCHARACTER ch, int start_idx, int size, 
 		break;
 
 	}
-	for (uint i = 0; i < vec.size(); i++)
+	for (size_t i = 0; i < vec.size(); i++)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "%s item id : %d price : %d", vec[i]->item_proto->szName, vec[i]->get_item_id(), vec[i]->get_price());
 	}
@@ -840,13 +839,13 @@ void AuctionManager::get_my_auction_list (LPCHARACTER ch, int start_idx, int siz
 	AuctionBoard::TItemInfoVec auction_vec;
 	Auction.YourItemInfoList (auction_vec, ch->GetPlayerID(), 0, 6);
 
-	for (uint i = 0; i < auction_vec.size(); i++)
+	for (size_t i = 0; i < auction_vec.size(); i++)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "%s item id : %d price : %d", auction_vec[i]->item_proto->szName, auction_vec[i]->get_item_id(), auction_vec[i]->get_price());
 	}
 	SaleBoard::TItemInfoVec wish_vec;
 	Sale.WisherItemInfoList (wish_vec, ch->GetPlayerID(), 0, 6);
-	for (uint i = 0; i < auction_vec.size(); i++)
+	for (size_t i = 0; i < auction_vec.size(); i++)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "%s item id : %d price : %d", wish_vec[i]->item_proto->szName, wish_vec[i]->item_id, 
 			wish_vec[i]->get_price());
@@ -858,14 +857,14 @@ void AuctionManager::get_my_purchase_list (LPCHARACTER ch, int start_idx, int si
 	AuctionBoard::TItemInfoVec auction_vec;
 	YourBidItemInfoList (auction_vec, ch->GetPlayerID(), 0, 6);
 
-	for (uint i = 0; i < auction_vec.size(); i++)
+	for (size_t i = 0; i < auction_vec.size(); i++)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "%s item id : %d price : %d", auction_vec[i]->item_proto->szName, auction_vec[i]->get_item_id(), auction_vec[i]->get_price());
 	}
 
 	//WishBoard::TItemInfoVec wish_vec;
 	//Wish.WisherItemInfoList (wish_vec, ch->GetPlayerID(), 0, 6);
-	//for (uint i = 0; i < auction_vec.size(); i++)
+	//for (size_t i = 0; i < auction_vec.size(); i++)
 	//{
 	//	ch->ChatPacket(CHAT_TYPE_INFO, "%s item id : %d price : %d", wish_vec[i]->item_proto->szName, wish_vec[i]->item_id, 
 	//		wish_vec[i]->get_price());
@@ -1234,7 +1233,7 @@ void AuctionManager::recv_result_auction (DWORD commander_id, TPacketDGResultAuc
 			cmd_result++;
 			TAuctionItemInfo* new_item_info = (TAuctionItemInfo*)cmd_result;
 			TAuctionItemInfo* old_item_info = Auction.GetItemInfo (new_item_info->get_item_id());
-			thecore_memcpy (old_item_info, new_item_info, sizeof(TAuctionItemInfo));
+			memcpy (old_item_info, new_item_info, sizeof(TAuctionItemInfo));
 			MyBid.Insert(new_item_info->bidder_id, new_item_info->item_id, new_item_info->get_bid_price());
 			if (ch != NULL)
 			{
@@ -1251,7 +1250,7 @@ void AuctionManager::recv_result_auction (DWORD commander_id, TPacketDGResultAuc
 			cmd_result++;
 			TAuctionItemInfo* new_item_info = (TAuctionItemInfo*)cmd_result;
 			TAuctionItemInfo* old_item_info = Auction.GetItemInfo (new_item_info->get_item_id());
-			thecore_memcpy (old_item_info, new_item_info, sizeof(TAuctionItemInfo));
+			memcpy (old_item_info, new_item_info, sizeof(TAuctionItemInfo));
 			if (ch != NULL)
 			{
 				ch->ChatPacket(CHAT_TYPE_INFO, "즉구 해버렸어.");

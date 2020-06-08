@@ -195,7 +195,7 @@ void CItemPriceListTableCache::UpdateList(const TItemPriceListTable* pUpdateList
 
 	std::vector<TItemPriceInfo> tmpvec;
 
-	for (uint idx = 0; idx < m_data.byCount; ++idx)
+	for (size_t idx = 0; idx < m_data.byCount; ++idx)
 	{
 		const TItemPriceInfo* pos = pUpdateList->aPriceInfo;
 		for (; pos != pUpdateList->aPriceInfo + pUpdateList->byCount && m_data.aPriceInfo[idx].dwVnum != pos->dwVnum; ++pos)
@@ -217,7 +217,7 @@ void CItemPriceListTableCache::UpdateList(const TItemPriceListTable* pUpdateList
 
 	m_data.byCount = pUpdateList->byCount;
 
-	thecore_memcpy(m_data.aPriceInfo, pUpdateList->aPriceInfo, sizeof(TItemPriceInfo) * pUpdateList->byCount);
+	memcpy(m_data.aPriceInfo, pUpdateList->aPriceInfo, sizeof(TItemPriceInfo) * pUpdateList->byCount);
 
 	int nDeletedNum;	// 삭제된 가격정보의 갯수
 
@@ -228,7 +228,7 @@ void CItemPriceListTableCache::UpdateList(const TItemPriceListTable* pUpdateList
 		if (tmpvec.size() < sizeAddOldDataSize)
 			sizeAddOldDataSize = tmpvec.size();
 
-		thecore_memcpy(m_data.aPriceInfo + pUpdateList->byCount, &tmpvec[0], sizeof(TItemPriceInfo) * sizeAddOldDataSize);
+		memcpy(m_data.aPriceInfo + pUpdateList->byCount, &tmpvec[0], sizeof(TItemPriceInfo) * sizeAddOldDataSize);
 		m_data.byCount += sizeAddOldDataSize;
 
 		nDeletedNum = tmpvec.size() - sizeAddOldDataSize;

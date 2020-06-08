@@ -26,7 +26,7 @@ const TRefineTable* CRefineManager::GetRefineRecipe(DWORD vnum)
 	if (vnum == 0)
 		return NULL;
 
-	itertype(m_map_RefineRecipe) it = m_map_RefineRecipe.find(vnum);
+	auto it = m_map_RefineRecipe.find(vnum);
 	sys_log(0, "REFINE: FIND %u %s", vnum, it == m_map_RefineRecipe.end() ? "FALSE" : "TRUE");
 
 	if (it == m_map_RefineRecipe.end())

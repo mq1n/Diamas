@@ -2,7 +2,7 @@
 #ifndef HACK_SHIELD_IMPL_H_
 #define HACK_SHIELD_IMPL_H_
 
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 
 #ifdef __FreeBSD__
 // Live build only
@@ -39,10 +39,10 @@ class CHackShieldImpl
 #ifdef __FreeBSD__
 		AHNHS_SERVER_HANDLE handle_;
 
-		typedef boost::unordered_map<DWORD, AHNHS_CLIENT_HANDLE> ClientHandleContainer;
+		typedef std::unordered_map<DWORD, AHNHS_CLIENT_HANDLE> ClientHandleContainer;
 		ClientHandleContainer CliehtHandleMap_;
 
-		typedef boost::unordered_map<DWORD, bool> ClientCheckContainer;
+		typedef std::unordered_map<DWORD, bool> ClientCheckContainer;
 		ClientCheckContainer ClientCheckMap_;
 #endif
 };

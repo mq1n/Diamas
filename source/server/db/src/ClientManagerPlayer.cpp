@@ -245,7 +245,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 
 		pkLD->SetPlay(true);
 		SendLoginToBilling(pkLD, true);
-		thecore_memcpy(pTab->aiPremiumTimes, pkLD->GetPremiumPtr(), sizeof(pTab->aiPremiumTimes));
+		memcpy(pTab->aiPremiumTimes, pkLD->GetPremiumPtr(), sizeof(pTab->aiPremiumTimes));
 
 		peer->EncodeHeader(HEADER_DG_PLAYER_LOAD_SUCCESS, dwHandle, sizeof(TPlayerTable));
 		peer->Encode(pTab, sizeof(TPlayerTable));
@@ -290,7 +290,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 				TPlayerItem * p = c->Get();
 
 				if (p->vnum) // vnum이 없으면 삭제된 아이템이다.
-					thecore_memcpy(&s_items[dwCount++], p, sizeof(TPlayerItem));
+					memcpy(&s_items[dwCount++], p, sizeof(TPlayerItem));
 			}
 
 			if (g_test_server)
@@ -409,7 +409,7 @@ void CClientManager::ItemAward(CPeer * peer,char* login)
 	std::set<TItemAward *> * pSet = ItemAwardManager::instance().GetByLogin(login_t);	
 	if(pSet == NULL)
 		return;
-	typeof(pSet->begin()) it = pSet->begin();	//taken_time이 NULL인것들 읽어옴	
+	auto it = pSet->begin();	//taken_time이 NULL인것들 읽어옴	
 	while(it != pSet->end() )
 	{				
 		TItemAward * pItemAward = *(it++);		
@@ -491,14 +491,14 @@ bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab)
 	str_to_number(pkTab->parts[PART_HAIR], row[col++]);
 
 	if (row[col])
-		thecore_memcpy(pkTab->skills, row[col], sizeof(pkTab->skills));
+		memcpy(pkTab->skills, row[col], sizeof(pkTab->skills));
 	else
 		memset(&pkTab->skills, 0, sizeof(pkTab->skills));
 
 	col++;
 
 	if (row[col])
-		thecore_memcpy(pkTab->quickslot, row[col], sizeof(pkTab->quickslot));
+		memcpy(pkTab->quickslot, row[col], sizeof(pkTab->quickslot));
 	else
 		memset(pkTab->quickslot, 0, sizeof(pkTab->quickslot));
 
@@ -549,7 +549,7 @@ bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab)
 void CClientManager::RESULT_COMPOSITE_PLAYER(CPeer * peer, SQLMsg * pMsg, DWORD dwQID)
 {
 	CQueryInfo * qi = (CQueryInfo *) pMsg->pvUserData;
-	std::auto_ptr<ClientHandleInfo> info((ClientHandleInfo *) qi->pvData);
+	std::unique_ptr<ClientHandleInfo> info((ClientHandleInfo *) qi->pvData);
 	
 	MYSQL_RES * pSQLResult = pMsg->Get()->pSQLResult;
 	if (!pSQLResult)
@@ -652,7 +652,7 @@ void CClientManager::RESULT_PLAYER_LOAD(CPeer * peer, MYSQL_RES * pRes, ClientHa
 
 	pkLD->SetPlay(true);
 	SendLoginToBilling(pkLD, true);
-	thecore_memcpy(tab.aiPremiumTimes, pkLD->GetPremiumPtr(), sizeof(tab.aiPremiumTimes));
+	memcpy(tab.aiPremiumTimes, pkLD->GetPremiumPtr(), sizeof(tab.aiPremiumTimes));
 
 	peer->EncodeHeader(HEADER_DG_PLAYER_LOAD_SUCCESS, pkInfo->dwHandle, sizeof(TPlayerTable));
 	peer->Encode(&tab, sizeof(TPlayerTable));
@@ -813,7 +813,7 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 	queryLen = snprintf(queryStr, sizeof(queryStr), 
 			"SELECT pid%u FROM player_index%s WHERE id=%d", packet->account_index + 1, GetTablePostfix(), packet->account_id);
 
-	std::auto_ptr<SQLMsg> pMsg0(CDBManager::instance().DirectQuery(queryStr));
+	std::unique_ptr<SQLMsg> pMsg0(CDBManager::instance().DirectQuery(queryStr));
 
 	if (pMsg0->Get()->uiNumRows != 0)
 	{
@@ -847,7 +847,7 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 	snprintf(queryStr, sizeof(queryStr), 
 			"SELECT COUNT(*) as count FROM player%s WHERE name='%s'", GetTablePostfix(), packet->player_table.name);
 
-	std::auto_ptr<SQLMsg> pMsg1(CDBManager::instance().DirectQuery(queryStr));
+	std::unique_ptr<SQLMsg> pMsg1(CDBManager::instance().DirectQuery(queryStr));
 
 	if (pMsg1->Get()->uiNumRows)
 	{
@@ -905,7 +905,7 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 	CDBManager::instance().EscapeString(text, packet->player_table.quickslot, sizeof(packet->player_table.quickslot));
 	queryLen += snprintf(queryStr + queryLen, sizeof(queryStr) - queryLen, "'%s')", text);
 
-	std::auto_ptr<SQLMsg> pMsg2(CDBManager::instance().DirectQuery(queryStr));
+	std::unique_ptr<SQLMsg> pMsg2(CDBManager::instance().DirectQuery(queryStr));
 	if (g_test_server)
 		sys_log(0, "Create_Player queryLen[%d] TEXT[%s]", queryLen, text);
 
@@ -920,7 +920,7 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 
 	snprintf(queryStr, sizeof(queryStr), "UPDATE player_index%s SET pid%d=%d WHERE id=%d", 
 			GetTablePostfix(), packet->account_index + 1, player_id, packet->account_id);
-	std::auto_ptr<SQLMsg> pMsg3(CDBManager::instance().DirectQuery(queryStr));
+	std::unique_ptr<SQLMsg> pMsg3(CDBManager::instance().DirectQuery(queryStr));
 
 	if (pMsg3->Get()->uiAffectedRows <= 0)
 	{
@@ -1067,7 +1067,7 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 
 		snprintf(queryStr, sizeof(queryStr), "INSERT INTO player%s_deleted SELECT * FROM player%s WHERE id=%d", 
 				GetTablePostfix(), GetTablePostfix(), pi->player_id);
-		std::auto_ptr<SQLMsg> pIns(CDBManager::instance().DirectQuery(queryStr));
+		std::unique_ptr<SQLMsg> pIns(CDBManager::instance().DirectQuery(queryStr));
 
 		if (pIns->Get()->uiAffectedRows == 0 || pIns->Get()->uiAffectedRows == (uint32_t)-1)
 		{
@@ -1119,7 +1119,7 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 				pi->account_index + 1, 
 				pi->player_id);
 
-		std::auto_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(queryStr));
+		std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(queryStr));
 
 		if (pMsg->Get()->uiAffectedRows == 0 || pMsg->Get()->uiAffectedRows == (uint32_t)-1)
 		{

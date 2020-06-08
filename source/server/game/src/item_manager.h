@@ -94,7 +94,7 @@ class CSpecialItemGroup
 					idx_vec.push_back(0);
 					count++;
 				}
-				for (uint i = 1; i < m_vecProbs.size(); i++)
+				for (size_t i = 1; i < m_vecProbs.size(); i++)
 				{
 					if (number(1,100) <= m_vecProbs[i] - m_vecProbs[i-1])
 					{
@@ -114,7 +114,7 @@ class CSpecialItemGroup
 		int GetOneIndex() const
 		{
 			int n = number(1, m_vecProbs.back());
-			itertype(m_vecProbs) it = lower_bound(m_vecProbs.begin(), m_vecProbs.end(), n);
+			auto it = lower_bound(m_vecProbs.begin(), m_vecProbs.end(), n);
 			return std::distance(m_vecProbs.begin(), it);
 		}
 
@@ -149,7 +149,7 @@ class CSpecialItemGroup
 		{
 			if (CSpecialItemGroup::SPECIAL != m_bType)
 				return 0;
-			for (itertype(m_vecItems) it = m_vecItems.begin(); it != m_vecItems.end(); it++)
+			for (auto it = m_vecItems.begin(); it != m_vecItems.end(); it++)
 			{
 				if (it->vnum == dwVnum)
 				{
@@ -218,7 +218,7 @@ class CMobItemGroup
 		int GetOneIndex() const
 		{
 			int n = number(1, m_vecProbs.back());
-			itertype(m_vecProbs) it = lower_bound(m_vecProbs.begin(), m_vecProbs.end(), n);
+			auto it = lower_bound(m_vecProbs.begin(), m_vecProbs.end(), n);
 			return std::distance(m_vecProbs.begin(), it);
 		}
 		// END_OF_MOB_DROP_ITEM_BUG_FIX
@@ -412,7 +412,7 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 		const std::vector<TItemTable> & GetTable() { return m_vec_prototype; }
 
 		// CHECK_UNIQUE_GROUP
-		int			GetSpecialGroupFromItem(DWORD dwVnum) const { itertype(m_ItemToSpecialGroup) it = m_ItemToSpecialGroup.find(dwVnum); return (it == m_ItemToSpecialGroup.end()) ? 0 : it->second; }
+		int			GetSpecialGroupFromItem(DWORD dwVnum) const { auto it = m_ItemToSpecialGroup.find(dwVnum); return (it == m_ItemToSpecialGroup.end()) ? 0 : it->second; }
 		// END_OF_CHECK_UNIQUE_GROUP
 
 	protected:
@@ -433,7 +433,7 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 		TItemIDRangeTable	m_ItemIDRange;
 		TItemIDRangeTable	m_ItemIDSpareRange;
 
-		TR1_NS::unordered_set<LPITEM> m_set_pkItemForDelayedSave;
+		std::unordered_set<LPITEM> m_set_pkItemForDelayedSave;
 		std::map<DWORD, LPITEM>		m_map_pkItemByID;
 		std::map<DWORD, DWORD>		m_map_dwEtcItemDropProb;
 		std::map<DWORD, CDropItemGroup*> m_map_pkDropItemGroup;

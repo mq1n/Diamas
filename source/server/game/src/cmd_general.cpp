@@ -2,7 +2,6 @@
 #ifdef __FreeBSD__
 #include <md5.h>
 #else
-#include "../../libthecore/include/xmd5.h"
 #endif
 
 #include "utils.h"
@@ -112,8 +111,9 @@ ACMD(do_user_horse_feed)
 		ch->RemoveSpecifyItem(dwFood, 1);
 		ch->FeedHorse();
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("말에게 %s%s 주었습니다."), 
-				ITEM_MANAGER::instance().GetTable(dwFood)->szLocaleName,
-				g_iUseLocale ? "" : under_han(ITEM_MANAGER::instance().GetTable(dwFood)->szLocaleName) ? LC_TEXT("을") : LC_TEXT("를"));
+			ITEM_MANAGER::instance().GetTable(dwFood)->szLocaleName,
+			""
+		);
 	}
 	else
 	{
@@ -2273,111 +2273,7 @@ ACMD(do_cube)
 
 ACMD(do_in_game_mall)
 {
-	if (LC_IsYMIR() == true || LC_IsKorea() == true)
-	{
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "mall http://metin2.co.kr/04_mall/mall/login.htm");
-		return;
-	}
-
-	if (true == LC_IsTaiwan())
-	{
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "mall http://203.69.141.203/mall/mall/item_main.htm");
-		return;
-	}
-
-	// ㅠ_ㅠ 쾌도서버 아이템몰 URL 하드코딩 추가
-	if (true == LC_IsWE_Korea())
-	{
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "mall http://metin2.co.kr/50_we_mall/mall/login.htm");
-		return;
-	}
-
-	if (LC_IsJapan() == true)
-	{
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "mall http://mt2.oge.jp/itemmall/itemList.php");
-		return;
-	}
-	
-	if (LC_IsNewCIBN() == true && test_server)
-	{
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "mall http://218.99.6.51/04_mall/mall/login.htm");
-		return;
-	}
-	if (LC_IsSingapore() == true)
-	{
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "mall http://www.metin2.sg/ishop.php");
-		return;
-	}
-	/*
-	if (LC_IsCanada() == true)
-	{
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "mall http://mall.z8games.com/mall_entry.aspx?tb=m2");
-		return;
-	}*/
-
-	if (LC_IsEurope() == true)
-	{
-		char country_code[3];
-
-		switch (LC_GetLocalType())
-		{
-			case LC_GERMANY:	country_code[0] = 'd'; country_code[1] = 'e'; country_code[2] = '\0'; break;
-			case LC_FRANCE:		country_code[0] = 'f'; country_code[1] = 'r'; country_code[2] = '\0'; break;
-			case LC_ITALY:		country_code[0] = 'i'; country_code[1] = 't'; country_code[2] = '\0'; break;
-			case LC_SPAIN:		country_code[0] = 'e'; country_code[1] = 's'; country_code[2] = '\0'; break;
-			case LC_UK:			country_code[0] = 'e'; country_code[1] = 'n'; country_code[2] = '\0'; break;
-			case LC_TURKEY:		country_code[0] = 't'; country_code[1] = 'r'; country_code[2] = '\0'; break;
-			case LC_POLAND:		country_code[0] = 'p'; country_code[1] = 'l'; country_code[2] = '\0'; break;
-			case LC_PORTUGAL:	country_code[0] = 'p'; country_code[1] = 't'; country_code[2] = '\0'; break;
-			case LC_GREEK:		country_code[0] = 'g'; country_code[1] = 'r'; country_code[2] = '\0'; break;
-			case LC_RUSSIA:		country_code[0] = 'r'; country_code[1] = 'u'; country_code[2] = '\0'; break;
-			case LC_DENMARK:	country_code[0] = 'd'; country_code[1] = 'k'; country_code[2] = '\0'; break;
-			case LC_BULGARIA:	country_code[0] = 'b'; country_code[1] = 'g'; country_code[2] = '\0'; break;
-			case LC_CROATIA:	country_code[0] = 'h'; country_code[1] = 'r'; country_code[2] = '\0'; break;
-			case LC_MEXICO:		country_code[0] = 'm'; country_code[1] = 'x'; country_code[2] = '\0'; break;
-			case LC_ARABIA:		country_code[0] = 'a'; country_code[1] = 'e'; country_code[2] = '\0'; break;
-			case LC_CZECH:		country_code[0] = 'c'; country_code[1] = 'z'; country_code[2] = '\0'; break;
-			case LC_ROMANIA:	country_code[0] = 'r'; country_code[1] = 'o'; country_code[2] = '\0'; break;
-			case LC_HUNGARY:	country_code[0] = 'h'; country_code[1] = 'u'; country_code[2] = '\0'; break;
-			case LC_NETHERLANDS: country_code[0] = 'n'; country_code[1] = 'l'; country_code[2] = '\0'; break;
-			case LC_USA:		country_code[0] = 'u'; country_code[1] = 's'; country_code[2] = '\0'; break;
-			case LC_CANADA:	country_code[0] = 'c'; country_code[1] = 'a'; country_code[2] = '\0'; break;
-			default:
-				if (test_server == true)
-				{
-					country_code[0] = 'd'; country_code[1] = 'e'; country_code[2] = '\0';
-				}
-				break;
-		}
-
-		char buf[512+1];
-		char sas[33];
-		MD5_CTX ctx;
-		const char sas_key[] = "GF9001";
-
-		snprintf(buf, sizeof(buf), "%u%u%s", ch->GetPlayerID(), ch->GetAID(), sas_key);
-
-		MD5Init(&ctx);
-		MD5Update(&ctx, (const unsigned char *) buf, strlen(buf));
-#ifdef __FreeBSD__
-		MD5End(&ctx, sas);
-#else
-		static const char hex[] = "0123456789abcdef";
-		unsigned char digest[16];
-		MD5Final(digest, &ctx);
-		int i;
-		for (i = 0; i < 16; ++i) {
-			sas[i+i] = hex[digest[i] >> 4];
-			sas[i+i+1] = hex[digest[i] & 0x0f];
-		}
-		sas[i+i] = '\0';
-#endif
-
-		snprintf(buf, sizeof(buf), "mall http://%s/ishop?pid=%u&c=%s&sid=%d&sas=%s",
-				g_strWebMallURL.c_str(), ch->GetPlayerID(), country_code, g_server_id, sas);
-
-		ch->ChatPacket(CHAT_TYPE_COMMAND, buf);
-	}
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "TODOOOO");
 }
 
 // 주사위

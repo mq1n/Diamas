@@ -24,7 +24,7 @@ void CClientManager::QUERY_PARTY_CREATE(CPeer* peer, TPacketPartyCreate* p)
 void CClientManager::QUERY_PARTY_DELETE(CPeer* peer, TPacketPartyDelete* p)
 {
 	TPartyMap& pm = m_map_pkChannelParty[peer->GetChannel()];
-	itertype(pm) it = pm.find(p->dwLeaderPID);
+	auto it = pm.find(p->dwLeaderPID);
 
 	if (it == pm.end())
 	{
@@ -40,7 +40,7 @@ void CClientManager::QUERY_PARTY_DELETE(CPeer* peer, TPacketPartyDelete* p)
 void CClientManager::QUERY_PARTY_ADD(CPeer* peer, TPacketPartyAdd* p)
 {
 	TPartyMap & pm = m_map_pkChannelParty[peer->GetChannel()];
-	itertype(pm) it = pm.find(p->dwLeaderPID);
+	auto it = pm.find(p->dwLeaderPID);
 
 	if (it == pm.end())
 	{
@@ -61,7 +61,7 @@ void CClientManager::QUERY_PARTY_ADD(CPeer* peer, TPacketPartyAdd* p)
 void CClientManager::QUERY_PARTY_REMOVE(CPeer* peer, TPacketPartyRemove* p)
 {
 	TPartyMap & pm = m_map_pkChannelParty[peer->GetChannel()];
-	itertype(pm) it = pm.find(p->dwLeaderPID);
+	auto it = pm.find(p->dwLeaderPID);
 
 	if (it == pm.end())
 	{
@@ -69,7 +69,7 @@ void CClientManager::QUERY_PARTY_REMOVE(CPeer* peer, TPacketPartyRemove* p)
 		return;
 	}
 
-	itertype(it->second) pit = it->second.find(p->dwPID);
+	auto pit = it->second.find(p->dwPID);
 
 	if (pit != it->second.end())
 	{
@@ -84,7 +84,7 @@ void CClientManager::QUERY_PARTY_REMOVE(CPeer* peer, TPacketPartyRemove* p)
 void CClientManager::QUERY_PARTY_STATE_CHANGE(CPeer* peer, TPacketPartyStateChange* p)
 {
 	TPartyMap & pm = m_map_pkChannelParty[peer->GetChannel()];
-	itertype(pm) it = pm.find(p->dwLeaderPID);
+	auto it = pm.find(p->dwLeaderPID);
 
 	if (it == pm.end())
 	{
@@ -92,7 +92,7 @@ void CClientManager::QUERY_PARTY_STATE_CHANGE(CPeer* peer, TPacketPartyStateChan
 		return;
 	}
 
-	itertype(it->second) pit = it->second.find(p->dwPID);
+	auto pit = it->second.find(p->dwPID);
 
 	if (pit == it->second.end())
 	{
@@ -112,7 +112,7 @@ void CClientManager::QUERY_PARTY_STATE_CHANGE(CPeer* peer, TPacketPartyStateChan
 void CClientManager::QUERY_PARTY_SET_MEMBER_LEVEL(CPeer* peer, TPacketPartySetMemberLevel* p)
 {
 	TPartyMap & pm = m_map_pkChannelParty[peer->GetChannel()];
-	itertype(pm) it = pm.find(p->dwLeaderPID);
+	auto it = pm.find(p->dwLeaderPID);
 
 	if (it == pm.end())
 	{
@@ -120,7 +120,7 @@ void CClientManager::QUERY_PARTY_SET_MEMBER_LEVEL(CPeer* peer, TPacketPartySetMe
 		return;
 	}
 
-	itertype(it->second) pit = it->second.find(p->dwPID);
+	auto pit = it->second.find(p->dwPID);
 
 	if (pit == it->second.end())
 	{

@@ -217,7 +217,7 @@ void CPrivManager::RemoveCharacterPriv(DWORD pid, BYTE type)
 		return;
 	}
 
-	itertype(m_aPrivChar[type]) it = m_aPrivChar[type].find(pid);
+	auto it = m_aPrivChar[type].find(pid);
 
 	if (it != m_aPrivChar[type].end())
 		m_aPrivChar[type].erase(it);
@@ -271,7 +271,7 @@ int CPrivManager::GetPrivByGuild(DWORD guild_id, BYTE type)
 	if (type >= MAX_PRIV_NUM)
 		return 0;
 
-	itertype( m_aPrivGuild[ type ] ) itFind = m_aPrivGuild[ type ].find( guild_id );
+	auto itFind = m_aPrivGuild[ type ].find( guild_id );
 
 	if ( itFind == m_aPrivGuild[ type ].end() )
 		return 0;
@@ -284,7 +284,7 @@ const CPrivManager::SPrivGuildData* CPrivManager::GetPrivByGuildEx( DWORD dwGuil
 	if ( byType >= MAX_PRIV_NUM )
 		return NULL;
 
-	itertype( m_aPrivGuild[ byType ] ) itFind = m_aPrivGuild[ byType ].find( dwGuildID );
+	auto itFind = m_aPrivGuild[ byType ].find( dwGuildID );
 
 	if ( itFind == m_aPrivGuild[ byType ].end() )
 		return NULL;
@@ -297,7 +297,7 @@ int CPrivManager::GetPrivByCharacter(DWORD pid, BYTE type)
 	if (type >= MAX_PRIV_NUM)
 		return 0;
 
-	itertype(m_aPrivChar[type]) it = m_aPrivChar[type].find(pid);
+	auto it = m_aPrivChar[type].find(pid);
 
 	if (it != m_aPrivChar[type].end())
 		return it->second;

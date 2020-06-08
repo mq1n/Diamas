@@ -56,41 +56,20 @@
 #include "spam.h"
 #include "panama.h"
 #include "threeway_war.h"
-#include "auth_brazil.h"
 #include "DragonLair.h"
 #include "HackShield.h"
 #include "skill_power.h"
 #include "SpeedServer.h"
-#include "XTrapManager.h"
 #include "DragonSoul.h"
-#include <boost/bind.hpp>
-#ifndef __WIN32__
-	#include "limit_time.h"
-#endif
 
-//#define __FILEMONITOR__
-
-#if defined (__FreeBSD__) && defined(__FILEMONITOR__)
-	#include "FileMonitor_FreeBSD.h"
-#endif
 
 #ifdef __AUCTION__
 #include "auction_manager.h"
 #endif
 
-#ifndef __WIN32__
-#include <gtest/gtest.h>
-#endif
-
 #ifdef USE_STACKTRACE
 #include <execinfo.h>
 #endif
-
-// 윈도우에서 테스트할 때는 항상 서버키 체크
-#ifdef _WIN32
-	//#define _USE_SERVER_KEY_
-#endif
-#include "check_server.h"
 
 extern void WriteVersion();
 //extern const char * _malloc_options;
@@ -257,9 +236,6 @@ void heartbeat(LPHEART ht, int pulse)
 		}
 #endif
 
-		if (g_bAuthServer && LC_IsBrazil() && !test_server)
-			auth_brazil_log();
-
 		if (!g_bAuthServer)
 		{
 			TPlayerCountPacket pack;
@@ -278,7 +254,7 @@ void heartbeat(LPHEART ht, int pulse)
 
 		{
 			int count = 0;
-			itertype(g_sim) it = g_sim.begin();
+			auto it = g_sim.begin();
 
 			while (it != g_sim.end())
 			{
@@ -505,7 +481,6 @@ int main(int argc, char **argv)
 	CDragonLairManager	dl_manager;
 
 	CHackShieldManager	HSManager;
-	CXTrapManager		XTManager;
 
 	CSpeedServerManager SSManager;
 	DSManager dsManager;
@@ -562,26 +537,6 @@ int main(int argc, char **argv)
 				CleanUpForEarlyExit();
 				return 0;
 			}
-		}
-
-		//xtrap
-		if(bXTrapEnabled)
-		{
-			if (!XTManager.LoadXTrapModule())
-			{
-				CleanUpForEarlyExit();
-				return 0;
-			}
-#if defined (__FreeBSD__) && defined(__FILEMONITOR__)
-			//PFN_FileChangeListener pNotifyFunc = boost::bind( &CXTrapManager::NotifyMapFileChanged, CXTrapManager::instance(), _1 );
-			PFN_FileChangeListener pNotifyFunc = &(CXTrapManager::NotifyMapFileChanged);
-
-			const std::string strMap1Name = "map1.CS3";
-			const std::string strMap2Name = "map2.CS3";
-
-			FileMonitorFreeBSD::Instance().AddWatch( strMap1Name, pNotifyFunc );
-			FileMonitorFreeBSD::Instance().AddWatch( strMap2Name, pNotifyFunc );
-#endif
 		}
 	}
 
@@ -708,75 +663,6 @@ int start(int argc, char **argv)
 	}
 #endif
 
-	while ((ch = getopt(argc, argv, "npverltI")) != -1)
-	{
-		char* ep = NULL;
-
-		switch (ch)
-		{
-			case 'I': // IP
-				strlcpy(g_szPublicIP, argv[optind], sizeof(g_szPublicIP));
-
-				printf("IP %s\n", g_szPublicIP);
-
-				optind++;
-				optreset = 1;
-				break;
-
-			case 'p': // port
-				mother_port = strtol(argv[optind], &ep, 10);
-
-				if (mother_port <= 1024)
-				{
-					usage();
-					return 0;
-				}
-
-				printf("port %d\n", mother_port);
-
-				optind++;
-				optreset = 1;
-				break;
-
-			case 'l':
-				{
-					long l = strtol(argv[optind], &ep, 10);
-
-					log_set_level(l);
-
-					optind++;
-					optreset = 1;
-				}
-				break;
-
-				// LOCALE_SERVICE
-			case 'n': 
-				{
-					if (optind < argc)
-					{
-						st_localeServiceName = argv[optind++];
-						optreset = 1;
-					}
-				}
-				break;
-				// END_OF_LOCALE_SERVICE
-
-			case 'v': // verbose
-				bVerbose = true;
-				break;
-
-			case 'r':
-				g_bNoRegen = true;
-				break;
-
-				// TRAFFIC_PROFILER
-			case 't':
-				g_bTrafficProfileOn = true;
-				break;
-				// END_OF_TRAFFIC_PROFILER
-		}
-	}
-
 	// LOCALE_SERVICE
 	config_init(st_localeServiceName);
 	// END_OF_LOCALE_SERVICE
@@ -788,7 +674,8 @@ int start(int argc, char **argv)
 	if (!bVerbose)
 		freopen("stdout", "a", stdout);
 
-	bool is_thecore_initialized = thecore_init(25, heartbeat);
+	thecore_init();
+	bool is_thecore_initialized = thecore_set(25, heartbeat);
 
 	if (!is_thecore_initialized)
 	{
@@ -948,11 +835,10 @@ int idle()
 
 	if (now.tv_sec - pta.tv_sec > 0)
 	{
-		pt_log("[%3d] event %5d/%-5d idle %-4ld event %-4ld heartbeat %-4ld I/O %-4ld chrUpate %-4ld | WRITE: %-7d | PULSE: %d",
+		pt_log("[%3d] event %5d/%-5d event %-4ld heartbeat %-4ld I/O %-4ld chrUpate %-4ld | WRITE: %-7d | PULSE: %d",
 				process_time_count,
 				num_events_called,
 				event_count(),
-				thecore_profiler[PF_IDLE],
 				s_dwProfiler[PROF_EVENT],
 				s_dwProfiler[PROF_HEARTBEAT],
 				s_dwProfiler[PROF_IO],
@@ -966,7 +852,6 @@ int idle()
 		process_time_count = 0; 
 		gettimeofday(&pta, (struct timezone *) 0);
 
-		memset(&thecore_profiler[0], 0, sizeof(thecore_profiler));
 		memset(&s_dwProfiler[0], 0, sizeof(s_dwProfiler));
 	}
 #ifdef _USE_SERVER_KEY_

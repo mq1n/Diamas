@@ -667,8 +667,8 @@ namespace quest
 			if (test_server)
 			{
 				sys_log( 0, "Quest UseItem Start : itemVnum : %d PC : %d", item->GetOriginalVnum(), pc);
-				itertype(m_mapNPC) it = m_mapNPC.begin();
-				itertype(m_mapNPC) end = m_mapNPC.end();
+				auto it = m_mapNPC.begin();
+				auto end = m_mapNPC.end();
 				for( ; it != end ; ++it)
 				{
 					sys_log( 0, "Quest UseItem : vnum : %d item Vnum : %d", it->first, item->GetOriginalVnum());
@@ -852,7 +852,7 @@ namespace quest
 	///////////////////////////////////////////////////////////////////////////////////////////
 	void CQuestManager::LoadStartQuest(const string& quest_name, unsigned int idx)
 	{
-		for (itertype(g_setQuestObjectDir) it = g_setQuestObjectDir.begin(); it != g_setQuestObjectDir.end(); ++it)
+		for (auto it = g_setQuestObjectDir.begin(); it != g_setQuestObjectDir.end(); ++it)
 		{
 			const string& stQuestObjectDir = *it;
 			string full_name = stQuestObjectDir + "/begin_condition/" + quest_name;
@@ -1095,9 +1095,8 @@ namespace quest
 	{
 		assert(idx > 0);
 
-		itertype(m_hmQuestName) it;
-
-		if ((it = m_hmQuestName.find(stQuestName)) != m_hmQuestName.end())
+		auto it = m_hmQuestName.find(stQuestName);
+		if (it != m_hmQuestName.end())
 			return;
 
 		m_hmQuestName.insert(make_pair(stQuestName, idx));
@@ -1119,9 +1118,8 @@ namespace quest
 
 	const string & CQuestManager::GetQuestNameByIndex(unsigned int idx)
 	{
-		itertype(m_mapQuestNameByIndex) it;
-
-		if ((it = m_mapQuestNameByIndex.find(idx)) == m_mapQuestNameByIndex.end())
+		auto it = m_mapQuestNameByIndex.find(idx);
+		if (it == m_mapQuestNameByIndex.end())
 		{
 			sys_err("cannot find quest name by index %u", idx);
 			assert(!"cannot find quest name by index");
@@ -1135,8 +1133,7 @@ namespace quest
 
 	void CQuestManager::SendEventFlagList(LPCHARACTER ch)
 	{
-		itertype(m_mapEventFlag) it;
-		for (it = m_mapEventFlag.begin(); it != m_mapEventFlag.end(); ++it)
+		for (auto it = m_mapEventFlag.begin(); it != m_mapEventFlag.end(); ++it)
 		{
 			const string& flagname = it->first;
 			int value = it->second;
@@ -1226,7 +1223,7 @@ namespace quest
 		{
 			const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
 
-			for (itertype(c_ref_set) it = c_ref_set.begin(); it != c_ref_set.end(); ++it)
+			for (auto it = c_ref_set.begin(); it != c_ref_set.end(); ++it)
 			{
 				LPCHARACTER ch = (*it)->GetCharacter();
 
@@ -1251,7 +1248,7 @@ namespace quest
 			
 			const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
 
-			for (itertype(c_ref_set) it = c_ref_set.begin(); it != c_ref_set.end(); ++it)
+			for (auto it = c_ref_set.begin(); it != c_ref_set.end(); ++it)
 			{
 				LPCHARACTER ch = (*it)->GetCharacter();
 				if (!ch)
@@ -1264,7 +1261,7 @@ namespace quest
 		{
 			const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
 
-			for (itertype(c_ref_set) it = c_ref_set.begin(); it != c_ref_set.end(); ++it)
+			for (auto it = c_ref_set.begin(); it != c_ref_set.end(); ++it)
 			{
 				LPCHARACTER ch = (*it)->GetCharacter();
 				if (!ch)
@@ -1531,7 +1528,7 @@ namespace quest
 		L = NULL;
 		Initialize();
 
-		for (itertype(m_registeredNPCVnum) it = m_registeredNPCVnum.begin(); it != m_registeredNPCVnum.end(); ++it)
+		for (auto it = m_registeredNPCVnum.begin(); it != m_registeredNPCVnum.end(); ++it)
 		{
 			char buf[256];
 			DWORD dwVnum = *it;
@@ -1615,7 +1612,7 @@ namespace quest
 		char buf[256];
 		DIR* dir;
 
-		for (itertype(g_setQuestObjectDir) it = g_setQuestObjectDir.begin(); it != g_setQuestObjectDir.end(); ++it)
+		for (auto it = g_setQuestObjectDir.begin(); it != g_setQuestObjectDir.end(); ++it)
 		{
 			const string& stQuestObjectDir = *it;
 			snprintf(buf, sizeof(buf), "%s/%u", stQuestObjectDir.c_str(), dwVnum);
@@ -1637,7 +1634,7 @@ namespace quest
 		const char * state_name = GetQuestStateName(GetCurrentQuestName(), GetCurrentState()->st);
 
 		string event_index_name = "";
-		for (itertype(m_mapEventName) it = m_mapEventName.begin(); it != m_mapEventName.end(); ++it)
+		for (auto it = m_mapEventName.begin(); it != m_mapEventName.end(); ++it)
 		{
 			if (it->second == m_iRunningEventIndex)
 			{
@@ -1713,7 +1710,7 @@ namespace quest
 
 	void CQuestManager::ClearServerTimer(const std::string& name, DWORD arg)
 	{
-		itertype(m_mapServerTimer) it = m_mapServerTimer.find(make_pair(name, arg));
+		auto it = m_mapServerTimer.find(make_pair(name, arg));
 		if (it != m_mapServerTimer.end())
 		{
 			LPEVENT event = it->second;
@@ -1724,7 +1721,7 @@ namespace quest
 
 	void CQuestManager::CancelServerTimers(DWORD arg)
 	{
-		itertype(m_mapServerTimer) it = m_mapServerTimer.begin();
+		auto it = m_mapServerTimer.begin();
 		for ( ; it != m_mapServerTimer.end(); ++it) {
 			if (it->first.second == arg) {
 				LPEVENT event = it->second;

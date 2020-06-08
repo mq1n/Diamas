@@ -9,7 +9,6 @@
 #include "dragon_soul_table.h"
 #include "log.h"
 #include "DragonSoul.h"
-#include <boost/lexical_cast.hpp>
 
 typedef std::vector <std::string> TTokenVector;
 
@@ -355,7 +354,7 @@ bool DSManager::ExtractDragonHeart(LPCHARACTER ch, LPITEM pItem, LPITEM pExtract
 	}
 
 	float fCharge = vec_chargings[idx] * (100 + iBonus) / 100.f;
-	fCharge = std::MINMAX <float> (0.f, fCharge, 100.f);
+	fCharge = std::clamp(fCharge, 0.f, 100.f);
 
 	if (fCharge < FLT_EPSILON)
 	{
@@ -389,7 +388,7 @@ bool DSManager::ExtractDragonHeart(LPCHARACTER ch, LPITEM pItem, LPITEM pExtract
 		pDH->SetSocket(ITEM_SOCKET_CHARGING_AMOUNT_IDX, iCharge);
 		ch->AutoGiveItem(pDH, true);
 
-		std::string s = boost::lexical_cast <std::string> (iCharge);
+		std::string s = std::to_string(iCharge);
 		s += "%s";
 		LogManager::instance().ItemLog(ch, pItem, "DS_HEART_EXTRACT_SUCCESS", s.c_str());
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("용심 추출에 성공하였습니다."));

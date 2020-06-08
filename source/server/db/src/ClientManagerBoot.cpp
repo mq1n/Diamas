@@ -109,7 +109,7 @@ bool CClientManager::InitializeRefineTable()
 			"SELECT id, cost, prob, vnum0, count0, vnum1, count1, vnum2, count2,  vnum3, count3, vnum4, count4 FROM refine_proto%s",
 			GetTablePostfix());
 
-	std::auto_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!pRes->uiNumRows)
@@ -445,7 +445,7 @@ bool CClientManager::InitializeShopTable()
 		"FROM shop LEFT JOIN shop_item "
 		"ON shop.vnum = shop_item.shop_vnum ORDER BY shop.vnum, shop_item.item_vnum";
 
-	std::auto_ptr<SQLMsg> pkMsg2(CDBManager::instance().DirectQuery(s_szQuery));
+	std::unique_ptr<SQLMsg> pkMsg2(CDBManager::instance().DirectQuery(s_szQuery));
 
 	// shop의 vnum은 있는데 shop_item 이 없을경우... 실패로 처리되니 주의 요망.
 	// 고처야할부분
@@ -501,13 +501,12 @@ bool CClientManager::InitializeShopTable()
 	m_pShopTable = new TShopTable[map_shop.size()];
 	m_iShopTableSize = map_shop.size();
 
-	typeof(map_shop.begin()) it = map_shop.begin();
-
 	int i = 0;
 
+	auto it = map_shop.begin();
 	while (it != map_shop.end())
 	{
-		thecore_memcpy((m_pShopTable + i), (it++)->second, sizeof(TShopTable));
+		memcpy((m_pShopTable + i), (it++)->second, sizeof(TShopTable));
 		sys_log(0, "SHOP: #%d items: %d", (m_pShopTable + i)->dwVnum, (m_pShopTable + i)->byItemCount);
 		++i;
 	}
@@ -524,7 +523,7 @@ bool CClientManager::InitializeQuestItemTable()
 	char query[1024];
 	snprintf(query, sizeof(query), s_szQuery, g_stLocaleNameColumn.c_str());
 
-	std::auto_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!pRes->uiNumRows)
@@ -817,7 +816,7 @@ bool CClientManager::InitializeItemTable()
 
 	m_map_itemTableByVnum.clear();
 
-	itertype(m_vec_itemTable) it = m_vec_itemTable.begin();
+	auto it = m_vec_itemTable.begin();
 
 	while (it != m_vec_itemTable.end())
 	{
@@ -860,7 +859,7 @@ bool CClientManager::InitializeSkillTable()
 		"FROM skill_proto%s ORDER BY dwVnum",
 		GetTablePostfix());
 
-	std::auto_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!pRes->uiNumRows)
@@ -941,7 +940,7 @@ bool CClientManager::InitializeBanwordTable()
 {
 	m_vec_banwordTable.clear();
 
-	std::auto_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery("SELECT word FROM banword"));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery("SELECT word FROM banword"));
 
 	SQLResult * pRes = pkMsg->Get();
 
@@ -972,7 +971,7 @@ bool CClientManager::InitializeItemAttrTable()
 			"SELECT apply, apply+0, prob, lv1, lv2, lv3, lv4, lv5, weapon, body, wrist, foots, neck, head, shield, ear FROM item_attr%s ORDER BY apply",
 			GetTablePostfix());
 
-	std::auto_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!pRes->uiNumRows)
@@ -1046,7 +1045,7 @@ bool CClientManager::InitializeItemRareTable()
 			"SELECT apply, apply+0, prob, lv1, lv2, lv3, lv4, lv5, weapon, body, wrist, foots, neck, head, shield, ear FROM item_attr_rare%s ORDER BY apply",
 			GetTablePostfix());
 
-	std::auto_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!pRes->uiNumRows)
@@ -1124,7 +1123,7 @@ bool CClientManager::InitializeLandTable()
 		"FROM land%s WHERE enable='YES' ORDER BY id",
 		GetTablePostfix());
 
-	std::auto_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!m_vec_kLandTable.empty())
@@ -1227,7 +1226,7 @@ bool CClientManager::InitializeObjectProto()
 			"FROM object_proto%s ORDER BY vnum",
 			GetTablePostfix());
 
-	std::auto_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!m_vec_kObjectProto.empty())
@@ -1296,7 +1295,7 @@ bool CClientManager::InitializeObjectTable()
 	char query[4096];
 	snprintf(query, sizeof(query), "SELECT id, land_id, vnum, map_index, x, y, x_rot, y_rot, z_rot, life FROM object%s ORDER BY id", GetTablePostfix());
 
-	std::auto_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!m_map_pkObjectTable.empty())
@@ -1345,7 +1344,7 @@ bool CClientManager::InitializeMonarch()
 
 bool CClientManager::MirrorMobTableIntoDB()
 {
-	for (itertype(m_vec_mobTable) it = m_vec_mobTable.begin(); it != m_vec_mobTable.end(); it++)
+	for (auto it = m_vec_mobTable.begin(); it != m_vec_mobTable.end(); it++)
 	{
 		const TMobTable& t = *it;
 		char query[4096];
@@ -1461,7 +1460,7 @@ bool CClientManager::MirrorMobTableIntoDB()
 
 bool CClientManager::MirrorItemTableIntoDB()
 {
-	for (itertype(m_vec_itemTable) it = m_vec_itemTable.begin(); it != m_vec_itemTable.end(); it++)
+	for (auto it = m_vec_itemTable.begin(); it != m_vec_itemTable.end(); it++)
 	{
 		if (g_stLocaleNameColumn != "name")
 		{

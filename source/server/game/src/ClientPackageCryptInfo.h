@@ -1,7 +1,7 @@
 #ifndef __INC_CLIENTPACKAGE_CRYPTINFO_H
 #define __INC_CLIENTPACKAGE_CRYPTINFO_H
 
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 
 #pragma pack(1)
 
@@ -103,7 +103,7 @@ private:
 
 	} TPerFileSDBInfo;
 
-	typedef boost::unordered_map<std::string, TPerFileSDBInfo > TPackageSDBMap;	//key: related map name
+	typedef std::unordered_map<std::string, TPerFileSDBInfo > TPackageSDBMap;	//key: related map name
 	TPackageSDBMap	  m_mapPackageSDB;
 
 

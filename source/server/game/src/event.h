@@ -7,7 +7,7 @@
 #ifndef __INC_LIBTHECORE_EVENT_H__
 #define __INC_LIBTHECORE_EVENT_H__
 
-#include <boost/intrusive_ptr.hpp>
+#include <intrusive_ptr.h>
 
 #ifdef M2_USE_POOL
 #include "pool.h"
@@ -34,7 +34,7 @@ private:
 };
 	
 typedef struct event EVENT;
-typedef boost::intrusive_ptr<EVENT> LPEVENT;
+typedef eastl::intrusive_ptr<EVENT> LPEVENT;
 typedef long (*TEVENTFUNC) (LPEVENT event, long processing_time);
 
 #define EVENTFUNC(name)	long (name) (LPEVENT event, long processing_time)

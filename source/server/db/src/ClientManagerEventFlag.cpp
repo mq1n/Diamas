@@ -10,7 +10,7 @@ void CClientManager::LoadEventFlag()
 {
 	char szQuery[1024];
 	snprintf(szQuery, sizeof(szQuery), "SELECT szName, lValue FROM quest%s WHERE dwPID = 0", GetTablePostfix());
-	std::auto_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
 
 	SQLResult* pRes = pmsg->Get();
 	if (pRes->uiNumRows)
@@ -34,7 +34,7 @@ void CClientManager::SetEventFlag(TPacketSetEventFlag* p)
 
 	bool bChanged = false;
 
-	typeof(m_map_lEventFlag.begin()) it = m_map_lEventFlag.find(p->szFlagName);
+	auto it = m_map_lEventFlag.find(p->szFlagName);
 	if (it == m_map_lEventFlag.end())
 	{
 		bChanged = true;
@@ -64,8 +64,7 @@ void CClientManager::SetEventFlag(TPacketSetEventFlag* p)
 
 void CClientManager::SendEventFlagsOnSetup(CPeer* peer)
 {
-	typeof(m_map_lEventFlag.begin()) it;
-	for (it = m_map_lEventFlag.begin(); it != m_map_lEventFlag.end(); ++it)
+	for (auto it = m_map_lEventFlag.begin(); it != m_map_lEventFlag.end(); ++it)
 	{
 		TPacketSetEventFlag p;
 		strlcpy(p.szFlagName, it->first.c_str(), sizeof(p.szFlagName));

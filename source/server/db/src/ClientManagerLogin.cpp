@@ -18,7 +18,7 @@ bool CClientManager::InsertLogonAccount(const char * c_pszLogin, DWORD dwHandle,
 	char szLogin[LOGIN_MAX_LEN + 1];
 	trim_and_lower(c_pszLogin, szLogin, sizeof(szLogin));
 
-	itertype(m_map_kLogonAccount) it = m_map_kLogonAccount.find(szLogin);
+	auto it = m_map_kLogonAccount.find(szLogin);
 
 	if (m_map_kLogonAccount.end() != it)
 		return false;
@@ -40,7 +40,7 @@ bool CClientManager::DeleteLogonAccount(const char * c_pszLogin, DWORD dwHandle)
 	char szLogin[LOGIN_MAX_LEN + 1];
 	trim_and_lower(c_pszLogin, szLogin, sizeof(szLogin));
 
-	itertype(m_map_kLogonAccount) it = m_map_kLogonAccount.find(szLogin);
+	auto it = m_map_kLogonAccount.find(szLogin);
 
 	if (it == m_map_kLogonAccount.end())
 		return false;
@@ -180,7 +180,7 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 		DWORD account_id = info->pAccountTable->id;
 		char szQuery[QUERY_MAX_LEN];
 		snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), account_id);
-		std::auto_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(szQuery, SQL_PLAYER));
+		std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(szQuery, SQL_PLAYER));
 		
 		sys_log(0, "RESULT_LOGIN_BY_KEY FAIL player_index's NULL : ID:%d", account_id);
 
@@ -506,7 +506,7 @@ void CClientManager::QUERY_CHANGE_NAME(CPeer * peer, DWORD dwHandle, TPacketGDCh
 		snprintf(queryStr, sizeof(queryStr),
 			"SELECT COUNT(*) as count FROM player%s WHERE name='%s' AND id <> %u", GetTablePostfix(), p->name, p->pid);
 
-	std::auto_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(queryStr, SQL_PLAYER));
+	std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(queryStr, SQL_PLAYER));
 
 	if (pMsg->Get()->uiNumRows)
 	{
@@ -533,7 +533,7 @@ void CClientManager::QUERY_CHANGE_NAME(CPeer * peer, DWORD dwHandle, TPacketGDCh
 	snprintf(queryStr, sizeof(queryStr),
 			"UPDATE player%s SET name='%s',change_name=0 WHERE id=%u", GetTablePostfix(), p->name, p->pid);
 
-	std::auto_ptr<SQLMsg> pMsg0(CDBManager::instance().DirectQuery(queryStr, SQL_PLAYER));
+	std::unique_ptr<SQLMsg> pMsg0(CDBManager::instance().DirectQuery(queryStr, SQL_PLAYER));
 
 	TPacketDGChangeName pdg;
 	peer->EncodeHeader(HEADER_DG_CHANGE_NAME, dwHandle, sizeof(TPacketDGChangeName));

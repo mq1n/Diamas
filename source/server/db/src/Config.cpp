@@ -151,7 +151,7 @@ bool CConfig::LoadFile(const char* filename)
 
 std::string * CConfig::Search(const char* key)
 {
-	itertype(m_valueMap) i = m_valueMap.find(key); 
+	auto i = m_valueMap.find(key); 
 
 	if (i == m_valueMap.end())
 		return NULL;

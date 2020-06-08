@@ -8,7 +8,6 @@
 #include "matrix_card.h"
 #include "passpod.h"
 #include "locale_service.h"
-#include "auth_brazil.h"
 #include "db.h"
 
 #ifndef __WIN32__
@@ -172,28 +171,8 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 
 	sys_log(0, "InputAuth::Login : key %u:0x%x login %s", dwKey, dwPanamaKey, login);
 
-	// BRAZIL_AUTH
-	if (LC_IsBrazil() && !test_server)
-	{
-		int result = auth_brazil(login, passwd);
-
-		switch (result)
-		{
-			case AUTH_BRAZIL_SERVER_ERR:
-			case AUTH_BRAZIL_NOID:
-				LoginFailure(d, "NOID");
-				return;
-			case AUTH_BRAZIL_WRONGPWD:
-				LoginFailure(d, "WRONGPWD");
-				return;
-			case AUTH_BRAZIL_FLASHUSER:
-				LoginFailure(d, "FLASH");
-				return;
-		}
-	}
-
 	TPacketCGLogin3 * p = M2_NEW TPacketCGLogin3;
-	thecore_memcpy(p, pinfo, sizeof(TPacketCGLogin3));
+	memcpy(p, pinfo, sizeof(TPacketCGLogin3));
 
 	char szPasswd[PASSWD_MAX_LEN * 2 + 1];
 	DBManager::instance().EscapeString(szPasswd, sizeof(szPasswd), passwd, strlen(passwd));
@@ -324,28 +303,8 @@ void CInputAuth::LoginOpenID(LPDESC d, const char * c_pData)
 
 	sys_log(0, "InputAuth::Login : key %u:0x%x login %s", dwKey, dwPanamaKey, login);
 
-	// BRAZIL_AUTH
-	if (LC_IsBrazil() && !test_server)
-	{
-		int result = auth_brazil(login, passwd);
-
-		switch (result)
-		{
-			case AUTH_BRAZIL_SERVER_ERR:
-			case AUTH_BRAZIL_NOID:
-				LoginFailure(d, "NOID");
-				return;
-			case AUTH_BRAZIL_WRONGPWD:
-				LoginFailure(d, "WRONGPWD");
-				return;
-			case AUTH_BRAZIL_FLASHUSER:
-				LoginFailure(d, "FLASH");
-				return;
-		}
-	}
-
 	TPacketCGLogin3 * p = M2_NEW TPacketCGLogin3;
-	thecore_memcpy(p, pinfo, sizeof(TPacketCGLogin3));
+	memcpy(p, pinfo, sizeof(TPacketCGLogin3));
 
 	char szPasswd[PASSWD_MAX_LEN * 2 + 1];
 	DBManager::instance().EscapeString(szPasswd, sizeof(szPasswd), passwd, strlen(passwd));
@@ -415,7 +374,7 @@ int CInputAuth::auth_OpenID(const char *authKey, const char *ipAddr, char *rID)
 		return 1;
     }
 
-    socket_block(fd);
+    _socket_block(fd);
     socket_timeout(fd, 3, 0);
 
     // send request

@@ -185,7 +185,7 @@ namespace fishing
 void Initialize()
 {
 	SFishInfo fish_info_bak[MAX_FISH];
-	thecore_memcpy(fish_info_bak, fish_info, sizeof(fish_info));
+	memcpy(fish_info_bak, fish_info, sizeof(fish_info));
 
 	memset(fish_info, 0, sizeof(fish_info));
 
@@ -208,7 +208,7 @@ void Initialize()
 		// 백업에 이름이 있으면 리스토어 한다.
 		if (*fish_info_bak[0].name)
 		{
-			thecore_memcpy(fish_info, fish_info_bak, sizeof(fish_info));
+			memcpy(fish_info, fish_info_bak, sizeof(fish_info));
 			SendLog("  restoring to backup");
 		}
 		return;
@@ -237,7 +237,7 @@ void Initialize()
 
 			if (*fish_info_bak[0].name)
 			{
-				thecore_memcpy(fish_info, fish_info_bak, sizeof(fish_info));
+				memcpy(fish_info, fish_info_bak, sizeof(fish_info));
 				SendLog("  restoring to backup");
 			}
 			break;

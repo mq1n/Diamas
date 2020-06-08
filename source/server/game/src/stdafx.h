@@ -21,18 +21,9 @@
 #include <string>
 #include <vector>
 
-#ifdef __GNUC__
-#include <float.h>
-#include <tr1/unordered_map>
-#include <tr1/unordered_set>
-#define TR1_NS std::tr1
-#else
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
-#define TR1_NS boost
-#define isdigit iswdigit
-#define isspace iswspace
-#endif
+#include <cfloat>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "typedef.h"
 #include "locale.hpp"

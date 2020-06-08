@@ -81,7 +81,7 @@ DWORD CGuildManager::CreateGuild(TGuildCreateParameter& gcp)
 		return 0;
 	}
 
-	std::auto_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT COUNT(*) FROM guild%s WHERE name = '%s'",
+	std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT COUNT(*) FROM guild%s WHERE name = '%s'",
 				get_table_postfix(), gcp.name));
 
 	if (pmsg->Get()->uiNumRows > 0)
@@ -186,8 +186,7 @@ CGuild* CGuildManager::FindGuild(DWORD guild_id)
 
 CGuild*	CGuildManager::FindGuildByName(const std::string guild_name)
 {
-	itertype(m_mapGuild) it;
-	for (it = m_mapGuild.begin(); it!=m_mapGuild.end(); ++it)
+	for (auto it = m_mapGuild.begin(); it!=m_mapGuild.end(); ++it)
 	{
 		if (it->second->GetName()==guild_name)
 			return it->second;
@@ -205,12 +204,12 @@ void CGuildManager::Initialize()
 		return;
 	}
 
-	std::auto_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT id FROM guild%s", get_table_postfix()));
+	std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT id FROM guild%s", get_table_postfix()));
 
 	std::vector<DWORD> vecGuildID;
 	vecGuildID.reserve(pmsg->Get()->uiNumRows);
 
-	for (uint i = 0; i < pmsg->Get()->uiNumRows; i++)
+	for (size_t i = 0; i < pmsg->Get()->uiNumRows; i++)
 	{
 		MYSQL_ROW row = mysql_fetch_row(pmsg->Get()->pSQLResult);
 		DWORD guild_id = strtoul(row[0], (char**) NULL, 10);
@@ -273,7 +272,7 @@ int CGuildManager::GetRank(CGuild* g)
 	int point = g->GetLadderPoint();
 	int rank = 1;
 
-	for (itertype(m_mapGuild) it = m_mapGuild.begin(); it != m_mapGuild.end();++it)
+	for (auto it = m_mapGuild.begin(); it != m_mapGuild.end();++it)
 	{
 		CGuild * pg = it->second;
 
@@ -312,7 +311,7 @@ void CGuildManager::GetHighRankString(DWORD dwMyGuild, char * buffer, size_t buf
 	using namespace std;
 	vector<CGuild*> v;
 
-	for (itertype(m_mapGuild) it = m_mapGuild.begin(); it != m_mapGuild.end(); ++it)
+	for (auto it = m_mapGuild.begin(); it != m_mapGuild.end(); ++it)
 	{
 		if (it->second)
 			v.push_back(it->second);
@@ -386,7 +385,7 @@ void CGuildManager::GetAroundRankString(DWORD dwMyGuild, char * buffer, size_t b
 	using namespace std;
 	vector<CGuild*> v;
 
-	for (itertype(m_mapGuild) it = m_mapGuild.begin(); it != m_mapGuild.end(); ++it)
+	for (auto it = m_mapGuild.begin(); it != m_mapGuild.end(); ++it)
 	{
 		if (it->second)
 			v.push_back(it->second);
@@ -774,7 +773,7 @@ void CGuildManager::ReserveWar(DWORD dwGuild1, DWORD dwGuild2, BYTE bType) // fr
 
 void CGuildManager::ShowGuildWarList(LPCHARACTER ch)
 {
-	for (itertype(m_GuildWar) it = m_GuildWar.begin(); it != m_GuildWar.end(); ++it)
+	for (auto it = m_GuildWar.begin(); it != m_GuildWar.end(); ++it)
 	{
 		CGuild * A = TouchGuild(it->first);
 		CGuild * B = TouchGuild(it->second);
@@ -801,9 +800,7 @@ void CGuildManager::SendGuildWar(LPCHARACTER ch)
 	p.size = sizeof(p) + (sizeof(DWORD) * 2) * m_GuildWar.size();
 	buf.write(&p, sizeof(p));
 
-	itertype(m_GuildWar) it;
-
-	for (it = m_GuildWar.begin(); it != m_GuildWar.end(); ++it)
+	for (auto it = m_GuildWar.begin(); it != m_GuildWar.end(); ++it)
 	{
 		buf.write(&it->first, sizeof(DWORD));
 		buf.write(&it->second, sizeof(DWORD));
@@ -856,7 +853,7 @@ void CGuildManager::Kill(LPCHARACTER killer, LPCHARACTER victim)
 
 void CGuildManager::StopAllGuildWar()
 {
-	for (itertype(m_GuildWar) it = m_GuildWar.begin(); it != m_GuildWar.end(); ++it)
+	for (auto it = m_GuildWar.begin(); it != m_GuildWar.end(); ++it)
 	{
 		CGuild * g = CGuildManager::instance().TouchGuild(it->first);
 		CGuild * pg = CGuildManager::instance().TouchGuild(it->second);
@@ -869,7 +866,7 @@ void CGuildManager::StopAllGuildWar()
 
 void CGuildManager::ReserveWarAdd(TGuildWarReserve * p)
 {
-	itertype(m_map_kReserveWar) it = m_map_kReserveWar.find(p->dwID);
+	auto it = m_map_kReserveWar.find(p->dwID);
 
 	CGuildWarReserveForGame * pkReserve;
 
@@ -883,7 +880,7 @@ void CGuildManager::ReserveWarAdd(TGuildWarReserve * p)
 		m_vec_kReserveWar.push_back(pkReserve);
 	}
 
-	thecore_memcpy(&pkReserve->data, p, sizeof(TGuildWarReserve));
+	memcpy(&pkReserve->data, p, sizeof(TGuildWarReserve));
 
 	sys_log(0, "ReserveWarAdd %u gid1 %u power %d gid2 %u power %d handicap %d",
 			pkReserve->data.dwID, p->dwGuildFrom, p->lPowerFrom, p->dwGuildTo, p->lPowerTo, p->lHandicap);
@@ -891,7 +888,7 @@ void CGuildManager::ReserveWarAdd(TGuildWarReserve * p)
 
 void CGuildManager::ReserveWarBet(TPacketGDGuildWarBet * p)
 {
-	itertype(m_map_kReserveWar) it = m_map_kReserveWar.find(p->dwWarID);
+	auto it = m_map_kReserveWar.find(p->dwWarID);
 
 	if (it == m_map_kReserveWar.end())
 		return;
@@ -901,7 +898,7 @@ void CGuildManager::ReserveWarBet(TPacketGDGuildWarBet * p)
 
 bool CGuildManager::IsBet(DWORD dwID, const char * c_pszLogin)
 {
-	itertype(m_map_kReserveWar) it = m_map_kReserveWar.find(dwID);
+	auto it = m_map_kReserveWar.find(dwID);
 
 	if (it == m_map_kReserveWar.end())
 		return true;
@@ -912,12 +909,12 @@ bool CGuildManager::IsBet(DWORD dwID, const char * c_pszLogin)
 void CGuildManager::ReserveWarDelete(DWORD dwID)
 {
 	sys_log(0, "ReserveWarDelete %u", dwID);
-	itertype(m_map_kReserveWar) it = m_map_kReserveWar.find(dwID);
+	auto it = m_map_kReserveWar.find(dwID);
 
 	if (it == m_map_kReserveWar.end())
 		return;
 
-	itertype(m_vec_kReserveWar) it_vec = m_vec_kReserveWar.begin();
+	auto it_vec = m_vec_kReserveWar.begin();
 
 	while (it_vec != m_vec_kReserveWar.end())
 	{
@@ -945,16 +942,18 @@ std::vector<CGuildWarReserveForGame *> & CGuildManager::GetReserveWarRef()
 
 void CGuildManager::ChangeMaster(DWORD dwGID)
 {
-	TGuildMap::iterator iter = m_mapGuild.find(dwGID);
+	auto iter = m_mapGuild.find(dwGID);
 
-	if ( iter != m_mapGuild.end() )
-	{
-		iter->second->Load(dwGID);
-	}
+	if (iter == m_mapGuild.end())
+		return;
 
-	// 업데이트된 정보 보내주기
-	DBManager::instance().FuncQuery(std::bind1st(std::mem_fun(&CGuild::SendGuildDataUpdateToAllMember), iter->second), 
-			"SELECT 1");
+	CGuild* guild = iter->second;
 
+	if (!guild)
+		return;
+
+	guild->Load(dwGID);
+
+	guild->SendGuildDataUpdateToAllMember();
 }
 

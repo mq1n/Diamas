@@ -68,7 +68,7 @@ void CDungeon::Initialize()
 
 void CDungeon::SetFlag(std::string name, int value)
 {
-	itertype(m_map_Flag) it =  m_map_Flag.find(name);
+	auto it =  m_map_Flag.find(name);
 	if (it != m_map_Flag.end())
 		it->second = value;
 	else
@@ -77,7 +77,7 @@ void CDungeon::SetFlag(std::string name, int value)
 
 int CDungeon::GetFlag(std::string name)
 {
-	itertype(m_map_Flag) it =  m_map_Flag.find(name);
+	auto it =  m_map_Flag.find(name);
 	if (it != m_map_Flag.end())
 		return it->second;
 	else
@@ -214,7 +214,7 @@ void CDungeon::IncMember(LPCHARACTER ch)
 
 void CDungeon::DecMember(LPCHARACTER ch)
 {
-	itertype(m_set_pkCharacter) it = m_set_pkCharacter.find(ch);
+	auto it = m_set_pkCharacter.find(ch);
 
 	if (it == m_set_pkCharacter.end()) {
 		return;
@@ -412,7 +412,7 @@ void CDungeonManager::Destroy(CDungeon::IdType dungeon_id)
 
 LPDUNGEON CDungeonManager::Find(CDungeon::IdType dungeon_id)
 {
-	itertype(m_map_pkDungeon) it = m_map_pkDungeon.find(dungeon_id);
+	auto it = m_map_pkDungeon.find(dungeon_id);
 	if (it != m_map_pkDungeon.end())
 		return it->second;
 	return NULL;
@@ -420,7 +420,7 @@ LPDUNGEON CDungeonManager::Find(CDungeon::IdType dungeon_id)
 
 LPDUNGEON CDungeonManager::FindByMapIndex(long lMapIndex)
 {
-	itertype(m_map_pkMapDungeon) it = m_map_pkMapDungeon.find(lMapIndex);
+	auto it = m_map_pkMapDungeon.find(lMapIndex);
 	if (it != m_map_pkMapDungeon.end()) {
 		return it->second;
 	}
@@ -858,7 +858,7 @@ void CDungeon::AddRegen(LPREGEN regen)
 
 void CDungeon::ClearRegen()
 {
-	for (itertype(m_regen) it = m_regen.begin(); it != m_regen.end(); ++it)
+	for (auto it = m_regen.begin(); it != m_regen.end(); ++it)
 	{
 		LPREGEN regen = *it;
 
@@ -869,7 +869,7 @@ void CDungeon::ClearRegen()
 }
 
 bool CDungeon::IsValidRegen(LPREGEN regen, size_t regen_id) {
-	itertype(m_regen) it = std::find(m_regen.begin(), m_regen.end(), regen);
+	auto it = std::find(m_regen.begin(), m_regen.end(), regen);
 	if (it == m_regen.end()) {
 		return false;
 	}

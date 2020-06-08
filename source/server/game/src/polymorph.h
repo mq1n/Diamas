@@ -2,7 +2,7 @@
 #ifndef __POLYMORPH_UTILS__
 #define __POLYMORPH_UTILS__
 
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 
 #define POLYMORPH_SKILL_ID	129
 #define POLYMORPH_BOOK_ID	50322
@@ -18,9 +18,9 @@ enum POLYMORPH_BONUS_TYPE
 class CPolymorphUtils : public singleton<CPolymorphUtils>
 {
 	private :
-		boost::unordered_map<DWORD, DWORD> m_mapSPDType;
-		boost::unordered_map<DWORD, DWORD> m_mapATKType;
-		boost::unordered_map<DWORD, DWORD> m_mapDEFType;
+		std::unordered_map<DWORD, DWORD> m_mapSPDType;
+		std::unordered_map<DWORD, DWORD> m_mapATKType;
+		std::unordered_map<DWORD, DWORD> m_mapDEFType;
 
 	public :
 		CPolymorphUtils();

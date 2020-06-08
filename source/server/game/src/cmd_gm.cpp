@@ -3266,7 +3266,7 @@ ACMD(do_affect_remove)
 
 		const std::list<CAffect *> & cont = tch->GetAffectContainer();
 
-		itertype(cont) it = cont.begin();
+		auto it = cont.begin();
 
 		while (it != cont.end())
 		{

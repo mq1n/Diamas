@@ -532,7 +532,7 @@ namespace marriage
 
 	TMarriage* CManager::Get(DWORD dwPlayerID)
 	{
-		itertype(m_MarriageByPID) it = m_MarriageByPID.find(dwPlayerID);
+		auto it = m_MarriageByPID.find(dwPlayerID);
 
 		if (it != m_MarriageByPID.end())
 			return it->second;

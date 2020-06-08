@@ -39,7 +39,6 @@
 #include "OXEvent.h"
 #include "locale_service.h"
 #include "HackShield.h"
-#include "XTrapManager.h"
 #include "DragonSoul.h"
 
 extern void SendShout(const char * szText, BYTE bEmpire);
@@ -88,7 +87,7 @@ EVENTINFO(spam_event_info)
 	}
 };
 
-typedef boost::unordered_map<std::string, std::pair<unsigned int, LPEVENT> > spam_score_of_ip_t;
+typedef std::unordered_map<std::string, std::pair<unsigned int, LPEVENT> > spam_score_of_ip_t;
 spam_score_of_ip_t spam_score_of_ip;
 
 EVENTFUNC(block_chat_by_ip_event)
@@ -3250,12 +3249,6 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			}
 			break;
 
-		case HEADER_CG_XTRAP_ACK:
-			{
-				TPacketXTrapCSVerify* p = reinterpret_cast<TPacketXTrapCSVerify*>((void*)c_pData);
-				CXTrapManager::instance().Verify_CSStep3(d->GetCharacter(), p->bPacketData);
-			}
-			break;
 		case HEADER_CG_DRAGON_SOUL_REFINE:
 			{
 				TPacketCGDragonSoulRefine* p = reinterpret_cast <TPacketCGDragonSoulRefine*>((void*)c_pData);
