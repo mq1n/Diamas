@@ -39,7 +39,6 @@
 #include "log.h"
 
 #include "horsename_manager.h"
-#include "pcbang.h"
 #include "gm.h"
 #include "map_location.h"
 #include "HackShield.h"
@@ -426,16 +425,6 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 		snprintf(buf, sizeof(buf), "%s %d %d %ld %d", 
 				inet_ntoa(ch->GetDesc()->GetAddr().sin_addr), ch->GetGold(), g_bChannel, ch->GetMapIndex(), ch->GetAlignment());
 		LogManager::instance().CharLog(ch, 0, "LOGIN", buf);
-
-#ifdef ENABLE_PCBANG_FEATURE // @warme006
-		{
-			LogManager::instance().LoginLog(true,
-					ch->GetDesc()->GetAccountTable().id, ch->GetPlayerID(), ch->GetLevel(), ch->GetJob(), ch->GetRealPoint(POINT_PLAYTIME));
-
-			if (0)
-				ch->SetPCBang(CPCBangManager::instance().IsPCBangIP(ch->GetDesc()->GetHostName()));
-		}
-#endif
 	}
 
 	d->SetPhase(PHASE_LOADING);
@@ -1005,8 +994,6 @@ void CInputDB::Boot(const char* data)
 	{
 		CMobManager::instance().DumpRegenCount("mob_count");
 	}
-
-	CPCBangManager::instance().RequestUpdateIPList(0);
 
 	// castle_boot
 	castle_boot();

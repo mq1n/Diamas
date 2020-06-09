@@ -48,7 +48,6 @@
 #include "arena.h"
 #include "dev_log.h"
 #include "horsename_manager.h"
-#include "pcbang.h"
 #include "gm.h"
 #include "map_location.h"
 #include "BlueDragon_Binder.h"
@@ -356,8 +355,6 @@ void CHARACTER::Initialize()
 	// MOB_SKILL_COOLTIME
 	memset(m_adwMobSkillCooltime, 0, sizeof(m_adwMobSkillCooltime));
 	// END_OF_MOB_SKILL_COOLTIME
-
-	m_isinPCBang = false;
 
 	// ARENA
 	m_pArena = NULL;
@@ -1403,16 +1400,6 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 	strlcpy(p.szName, GetName(), sizeof(p.szName));
 	P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGLogout));
 	LogManager::instance().CharLog(this, 0, "LOGOUT", "");
-
-#ifdef ENABLE_PCBANG_FEATURE // @warme006
-	{
-		long playTime = GetRealPoint(POINT_PLAYTIME) - m_dwLoginPlayTime;
-		LogManager::instance().LoginLog(false, GetDesc()->GetAccountTable().id, GetPlayerID(), GetLevel(), GetJob(), playTime);
-
-		if (0)
-			CPCBangManager::instance().Log(GetDesc()->GetHostName(), GetPlayerID(), playTime);
-	}
-#endif
 
 	if (m_pWarMap)
 		SetWarMap(NULL);

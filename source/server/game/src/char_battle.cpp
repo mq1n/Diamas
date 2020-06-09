@@ -2412,11 +2412,6 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 		rateFactor += 50;
 	if (to->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_EXP))
 		rateFactor += 50;
-	if (to->GetPoint(POINT_PC_BANG_EXP_BONUS) > 0)
-	{
-		if (to->IsPCBang())
-			rateFactor += to->GetPoint(POINT_PC_BANG_EXP_BONUS);
-	}
 	rateFactor += to->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_EXP_BONUS);
 	rateFactor += to->GetPoint(POINT_RAMADAN_CANDY_BONUS_EXP);
 	rateFactor += to->GetPoint(POINT_MALL_EXPBONUS);
@@ -2531,14 +2526,6 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 		{
 			iExp += (iExp * 50 / 100);
 		}
-
-		
-		if (to->GetPoint(POINT_PC_BANG_EXP_BONUS) > 0)
-		{
-			if (to->IsPCBang() == true)
-				iExp += (iExp * to->GetPoint(POINT_PC_BANG_EXP_BONUS)/100);
-		}
-
 		
 		iExp += iExp * to->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_EXP_BONUS) / 100;
 	}
