@@ -489,12 +489,17 @@ void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 	memset(&packFailure, 0, sizeof(packFailure));
 	packFailure.header = HEADER_GC_CHARACTER_CREATE_FAILURE;
 
-	if (true == g_BlockCharCreation)
+	if (g_BlockCharCreation)
 	{
 		d->Packet(&packFailure, sizeof(packFailure));
 		return;
 	}
 
+	if (strlen(pinfo->name) > 12)
+	{
+		d->Packet(&packFailure, sizeof(packFailure));
+		return;
+	}
 	
 	if (!check_name(pinfo->name) || pinfo->shape > 1)
 	{

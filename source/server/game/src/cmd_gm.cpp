@@ -1817,7 +1817,7 @@ ACMD(do_set)
 			{
 				int	amount = 0;
 				str_to_number(amount, arg3);
-				tch->UpdateAlignment(amount - ch->GetRealAlignment());
+				tch->UpdateAlignment(amount - tch->GetRealAlignment());
 			}
 			break;
 	}
@@ -2812,7 +2812,7 @@ ACMD(do_polymorph_item)
 			else
 			{
 				M2_DESTROY_ITEM(item);
-				ch->ChatPacket(CHAT_TYPE_INFO, "Not enough inventory space.");
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Not enough inventory space."));
 			}
 		}
 		else

@@ -237,7 +237,7 @@ bool CMonarch::SetMonarch(const char * name)
 
 	//db¿¡ ÀÔ·Â
 	snprintf(szQuery, sizeof(szQuery),
-					"REPLACE INTO monarch (empire, name, windate, money) VALUES(%d, %d, now(), %lld)", Empire, p->pid[Empire], p->money[Empire]);
+					"REPLACE INTO monarch (empire, pid, windate, money) VALUES(%d, %d, now(), %lld)", Empire, p->pid[Empire], p->money[Empire]);
 
  	CDBManager::instance().AsyncQuery(szQuery, SQL_PLAYER);	
     return true;

@@ -172,11 +172,11 @@ void CPythonCharacterManager::Update()
 
 		if (pkInstMain)
 		{
-			if (pkInstEach->IsForceVisible())
+			/*if (pkInstEach->IsForceVisible())
 			{
 				dwForceVisibleInstCount++;
 				continue;
-			}
+			}*/
 
 			int nDistance = int(pkInstEach->NEW_GetDistanceFromDestInstance(*pkInstMain));
 			if (nDistance > CHAR_STAGE_VIEW_BOUND + 10)

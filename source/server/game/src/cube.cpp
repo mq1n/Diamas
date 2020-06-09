@@ -913,9 +913,18 @@ void Cube_request_result_list(LPCHARACTER ch)
 			resultText.erase(resultText.size() - 1);
 
 		// 채팅 패킷의 한계를 넘어가면 에러 남김... 기획자 분들 께 조정해달라고 요청하거나, 나중에 다른 방식으로 바꾸거나...
-		if (resultText.size() - 20 >= CHAT_MAX_LEN)
+		int fixedSize = 0;
+		if (resultText.size() < 20)
 		{
-			sys_err("[CubeInfo] Too long cube result list text. (NPC: %d, length: %d)", npcVNUM, resultText.size());
+			fixedSize = 20 - resultText.size();
+		}
+		else
+		{
+			fixedSize = resultText.size() - 20;
+		}
+		if (fixedSize >= CHAT_MAX_LEN)
+		{
+			sys_err("[CubeInfo] Too long cube result list text. (NPC: %d, fixedSize: %d, length: %d)", npcVNUM, fixedSize, resultText.size());
 			resultText.clear();
 			resultCount = 0;
 		}

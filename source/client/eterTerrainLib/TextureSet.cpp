@@ -140,6 +140,8 @@ bool CTextureSet::SetTexture(unsigned long ulIndex,
 	}
 
 	CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	if (!pResource)
+		return false;
 
 	if (!pResource->IsType(CGraphicImage::Type()))
 	{
@@ -208,6 +210,8 @@ bool CTextureSet::AddTexture(const char * c_szFileName,
 	}
 
 	CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	if (!pResource)
+		return false;
 
 	if (!pResource->IsType(CGraphicImage::Type()))
 	{

@@ -200,6 +200,9 @@ bool CHARACTER::Attack(LPCHARACTER pkVictim, BYTE bType)
 	if (!CanMove())
 		return false;
 
+	if (pkVictim->GetMyShop())
+		return false;
+
 	// CASTLE
 	if (IS_CASTLE_MAP(GetMapIndex()) && false == castle_can_attack(this, pkVictim))
 		return false;
@@ -3528,7 +3531,7 @@ struct FuncAggregateMonster
 				return;
 
 			if (number(1, 100) <= 50) // 임시로 50% 확률로 적을 끌어온다
-				if (DISTANCE_APPROX(ch->GetX() - m_ch->GetX(), ch->GetY() - m_ch->GetY()) < 5000)
+				if (DISTANCE_APPROX(ch->GetX() - m_ch->GetX(), ch->GetY() - m_ch->GetY()) < 10000)
 					if (ch->CanBeginFight())
 						ch->BeginFight(m_ch);
 		}

@@ -1064,7 +1064,7 @@ struct FCountMonster
 		if (ent->IsType(ENTITY_CHARACTER))
 		{
 			LPCHARACTER ch = (LPCHARACTER) ent;
-			if (!ch->IsPC())
+			if (ch->IsMonster() || ch->IsStone())
 				n++;
 		}
 	}
@@ -1131,7 +1131,8 @@ namespace
 			if (ent->IsType(ENTITY_CHARACTER))
 			{
 				LPCHARACTER ch = (LPCHARACTER) ent;
-				ch->ChatPacket(CHAT_TYPE_NOTICE, "%s", m_psz);
+				if (ch->IsPC())
+					ch->ChatPacket(CHAT_TYPE_NOTICE, "%s", m_psz);
 			}
 		}
 

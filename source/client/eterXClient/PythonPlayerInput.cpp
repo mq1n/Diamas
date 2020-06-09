@@ -336,8 +336,14 @@ void CPythonPlayer::__OnPressActor(CInstanceBase& rkInstMain, DWORD dwPickedActo
 	if (rkInstMain.IsBowMode())
 	{
 		if (rkInstMain.IsAttackableInstance(rkInstVictim))
+		{
 			if (!__CanShot(rkInstMain, rkInstVictim))
+			{
+				m_dwVIDReserved = 0;
+				__ClearAutoAttackTargetActorID();
 				return;
+			}
+		}
 	}
 
 	// @fixme014 BEGIN (moved below all the checks)

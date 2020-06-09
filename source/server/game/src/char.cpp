@@ -1704,6 +1704,12 @@ void CHARACTER::PointsPacket()
 
 bool CHARACTER::ChangeSex()
 {
+	if (GetWear(WEAR_COSTUME_BODY) || GetWear(WEAR_COSTUME_HAIR))
+	{
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Kostum varken bu islemi gerceklestiremezsin"));
+		return false;
+	}
+
 	int src_race = GetRaceNum();
 
 	switch (src_race)
@@ -3019,7 +3025,7 @@ int CHARACTER::GetPoint(BYTE type) const
 	}
 
 	if (val > max_val)
-		sys_err("POINT_ERROR: %s type %d val %d (max: %d)", GetName(), val, max_val);
+		sys_err("POINT_ERROR: %s type %d val %d (max: %d)", GetName(), type, val, max_val);
 
 	return (val);
 }
@@ -3071,7 +3077,7 @@ int CHARACTER::GetLimitPoint(BYTE type) const
 	}
 
 	if (val > max_val)
-		sys_err("POINT_ERROR: %s type %d val %d (max: %d)", GetName(), val, max_val);
+		sys_err("POINT_ERROR: %s type %d val %d (max: %d)", GetName(), type, val, max_val);
 
 	if (val > limit)
 		val = limit;
@@ -6384,6 +6390,12 @@ int CHARACTER::GetQuestFlag(const std::string& flag) const
 {
 	quest::CQuestManager& q = quest::CQuestManager::instance();
 	quest::PC* pPC = q.GetPC(GetPlayerID());
+	if (!pPC)
+	{
+		sys_err("Nullpointer in CHARACTER::GetQuestFlag %lu", GetPlayerID());
+		return 0;
+	}
+
 	return pPC->GetFlag(flag);
 }
 
@@ -6391,6 +6403,12 @@ void CHARACTER::SetQuestFlag(const std::string& flag, int value)
 {
 	quest::CQuestManager& q = quest::CQuestManager::instance();
 	quest::PC* pPC = q.GetPC(GetPlayerID());
+	if (!pPC)
+	{
+		sys_err("Nullpointer in CHARACTER::SetQuestFlag %lu", GetPlayerID());
+		return;
+	}
+
 	pPC->SetFlag(flag, value);
 }
 

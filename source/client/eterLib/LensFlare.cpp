@@ -285,7 +285,7 @@ void CLensFlare::DrawAfterFlare()
 	if (m_bEnabled && m_fAfterBright != 0.0f && m_bDrawBrightScreen)
 	{
 		SetDiffuseColor(m_afColor[0], m_afColor[1], m_afColor[2], m_fAfterBright);
-		RenderBar2d(0.0f, 0.0f, 1024.0f, 1024.0f);
+		RenderBar2d(0.0f, 0.0f, 3840.0f, 2400.0f);
 	}
 }
 

@@ -835,6 +835,10 @@ void CActorInstance::__HitGreate(CActorInstance& rVictim)
 		return;
 	// END_OF_DISABLE_KNOCKDOWN_ATTACK
 
+	extern bool IS_HUGE_RACE(unsigned int vnum);
+	if (IS_HUGE_RACE(rVictim.GetRace()))
+		return;
+
 	float fRotRad = D3DXToRadian(GetRotation());
 	float fVictimRotRad = D3DXToRadian(rVictim.GetRotation());
 

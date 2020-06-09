@@ -121,7 +121,8 @@ int CHARACTER::ChangeEmpire(BYTE empire)
 		{
 			// 5. 제국 변경 이력을 추가한다.
 			SetChangeEmpireCount();
-
+			SetEmpire(empire);
+			UpdatePacket();
 			return 999;
 		}
 	}

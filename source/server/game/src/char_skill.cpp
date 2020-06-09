@@ -410,7 +410,8 @@ bool CHARACTER::LearnSkillByBook(DWORD dwSkillVnum, BYTE bProb)
 
 	if (FN_should_check_exp(this))
 	{
-		need_exp = 20000;
+		if (GetLevel() < PLAYER_MAX_LEVEL_CONST)
+			need_exp = 20000;
 
 		if ( GetExp() < need_exp )
 		{
@@ -2439,6 +2440,9 @@ bool CHARACTER::UseSkill(DWORD dwVnum, LPCHARACTER pkVictim, bool bUseGrandMaste
 	}
 	// END_OF_NO_GRANDMASTER
 
+	if ((dwVnum == SKILL_GEOMKYUNG || dwVnum == SKILL_GWIGEOM) && !GetWear(WEAR_WEAPON))
+		return false;
+
 	if (g_bSkillDisable)
 		return false;
 
@@ -2652,6 +2656,8 @@ bool CHARACTER::UseSkill(DWORD dwVnum, LPCHARACTER pkVictim, bool bUseGrandMaste
 	else if (!IS_SET(pkSk->dwFlag, SKILL_FLAG_ATTACK))
 		ComputeSkill(dwVnum, pkVictim);
 	else if (dwVnum == SKILL_BYEURAK)
+		ComputeSkill(dwVnum, pkVictim);
+	else if (dwVnum == SKILL_PAERYONG)
 		ComputeSkill(dwVnum, pkVictim);
 	else if (dwVnum == SKILL_MUYEONG || pkSk->IsChargeSkill())
 		ComputeSkill(dwVnum, pkVictim);
@@ -3491,6 +3497,24 @@ void CHARACTER::ClearSkill()
 {
 	PointChange(POINT_SKILL, 4 + (GetLevel() - 5) - GetPoint(POINT_SKILL));
 
+	if (GetJob() == JOB_WARRIOR)
+	{
+		RemoveAffect(SKILL_JEONGWI);
+		RemoveAffect(SKILL_GEOMKYUNG);
+		RemoveAffect(SKILL_CHUNKEON);
+	}
+	else if (GetJob() == JOB_ASSASSIN)
+	{
+		RemoveAffect(SKILL_GYEONGGONG);
+	}
+	else if (GetJob() == JOB_SURA)
+	{
+		RemoveAffect(SKILL_GWIGEOM);
+		RemoveAffect(SKILL_TERROR);
+		RemoveAffect(SKILL_JUMAGAP);
+		RemoveAffect(SKILL_MANASHILED);
+	}
+
 	ResetSkill();
 }
 
@@ -3727,9 +3751,24 @@ bool CHARACTER::CanUseSkill(DWORD dwSkillVnum) const
 
 	switch( dwSkillVnum )
 	{
-		case 121: case 122: case 124: case 126: case 127: case 128: case 129: case 130:
+		case 121:
+		case 122:
+		case 124:
+		case 126:
+		case 127:
+		case 128:
+		case 129:
+		case 130:
 		case 131:
-		case 151: case 152: case 153: case 154: case 155: case 156: case 157: case 158: case 159:
+		case 151:
+		case 152:
+		case 153:
+		case 154:
+		case 155:
+		case 156:
+		case 157:
+		case 158:
+		case 159:
 			return true;
 	}
 

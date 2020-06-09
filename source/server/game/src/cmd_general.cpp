@@ -243,10 +243,11 @@ void Shutdown(int iSec)
 
 ACMD(do_shutdown)
 {
-	if (NULL == ch)
-	{
-		sys_err("Accept shutdown command from %s.", ch->GetName());
-	}
+	if (!ch)
+		return;
+
+	sys_err("Accept shutdown command from %s.", ch->GetName());
+	
 	TPacketGGShutdown p;
 	p.bHeader = HEADER_GG_SHUTDOWN;
 	P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGShutdown));
@@ -2008,7 +2009,7 @@ static const char* FN_point_string(int apply_number)
 #ifdef ENABLE_WOLFMAN_CHARACTER
 		case POINT_RESIST_WOLFMAN:	return LC_TEXT("무당공격에 %d%% 저항");
 #endif
-		default:					return NULL;
+		default:                    return "error %d";
 	}
 }
 

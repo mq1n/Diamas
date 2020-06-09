@@ -120,6 +120,19 @@ bool CHARACTER::UpdateAffect()
 		}
 	}
 
+	if (!GetWear(WEAR_WEAPON))
+	{
+		if (IsAffectFlag(AFF_GEOMGYEONG))
+		{
+			RemoveAffect(SKILL_GEOMKYUNG);
+		}
+
+		if (IsAffectFlag(AFF_GWIGUM))
+		{
+			RemoveAffect(SKILL_GWIGEOM);
+		}
+	}
+
 	if (GetPoint(POINT_HP_RECOVER_CONTINUE) > 0)
 	{
 		PointChange(POINT_HP, GetPoint(POINT_HP_RECOVER_CONTINUE));
@@ -684,7 +697,8 @@ bool CHARACTER::RemoveAffect(CAffect * pkAff)
 	// 따라서 AFFECT_REVIVE_INVISIBLE가 RemoveAffect로 삭제되는 경우만 수정한다.
 	// 시간이 다 되어 백기 효과가 풀리는 경우는 버그가 발생하지 않으므로 그와 똑같이 함.
 	//		(ProcessAffect를 보면 시간이 다 되어서 Affect가 삭제되는 경우, ComputePoints를 부르지 않는다.)
-	if (AFFECT_REVIVE_INVISIBLE != pkAff->dwType)
+
+	if (AFFECT_REVIVE_INVISIBLE != pkAff->dwType && AFFECT_MOUNT != pkAff->dwType)
 		ComputePoints();
 	else  // @fixme110
 		UpdatePacket();

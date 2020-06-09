@@ -1207,7 +1207,7 @@ namespace quest
 		{
 			CQuestManager & q = CQuestManager::Instance();
 			LPCHARACTER ch = q.GetCurrentCharacterPtr();
-
+			ch->RemoveGoodAffect();
 			ch->SetSkillGroup((BYTE) rint(lua_tonumber(L, 1)));
 		}
 		return 0;
@@ -2037,7 +2037,12 @@ teleport_area:
 	int pc_change_empire(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		
+		if (ch->GetParty())
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Gruptayken bayrak degisemezsin."));
+			lua_pushnumber(L, 4);
+			return 0;
+		}
 		lua_pushnumber(L, ch->ChangeEmpire((unsigned char)lua_tonumber(L, 1)));
 
 		return 1;

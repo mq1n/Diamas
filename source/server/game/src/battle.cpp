@@ -95,6 +95,9 @@ bool battle_is_attackable(LPCHARACTER ch, LPCHARACTER victim)
 	if (victim->IsDead())
 		return false;
 
+	if (victim->GetMyShop())
+		return false;
+
 	// 안전지대면 중단
 	{
 		SECTREE	*sectree = NULL;

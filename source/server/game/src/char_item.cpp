@@ -1704,13 +1704,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 		if (NULL == beltItem)
 		{
-			ChatPacket(CHAT_TYPE_INFO, "<Belt> You can't use this item if you have no equipped belt.");
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Belt> You can't use this item if you have no equipped belt."));
 			return false;
 		}
 
 		if (false == CBeltInventoryHelper::IsAvailableCell(item->GetCell() - BELT_INVENTORY_SLOT_START, beltItem->GetValue(0)))
 		{
-			ChatPacket(CHAT_TYPE_INFO, "<Belt> You can't use this item if you don't upgrade your belt.");
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Belt> You can't use this item if you don't upgrade your belt."));
 			return false;
 		}
 	}
@@ -2129,7 +2129,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			{
 				if (!item->GetSocket(0))
 				{
-					ITEM_MANAGER::instance().RemoveItem(item);
+					item->SetCount(item->GetCount() - 1);
 					return false;
 				}
 
@@ -2137,7 +2137,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 				if (SkillLevelDown(dwVnum))
 				{
-					ITEM_MANAGER::instance().RemoveItem(item);
+					item->SetCount(item->GetCount() - 1);
 					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("스킬 레벨을 내리는데 성공하였습니다."));
 				}
 				else
@@ -2167,7 +2167,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 				if (0 == dwVnum)
 				{
-					ITEM_MANAGER::instance().RemoveItem(item);
+					item->SetCount(item->GetCount() - 1);
 
 					return false;
 				}
@@ -3205,9 +3205,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
-							case 50314: case 50315: case 50316: // 변신 수련서
-							case 50323: case 50324: // 증혈 수련서
-							case 50325: case 50326: // 철통 수련서
+								case 50314:
+								case 50315:
+								case 50316:
+								case 50323:
+								case 50324:
+								case 50325:
+								case 50326:
 								{
 									if (IsPolymorphed() == true)
 									{
@@ -3223,15 +3227,19 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									
 									switch (item->GetVnum())
 									{
-										case 50314: case 50315: case 50316:
+										case 50314:
+										case 50315:
+										case 50316:
 											dwSkillVnum = SKILL_POLYMORPH;
 											break;
 
-										case 50323: case 50324:
+										case 50323:
+										case 50324:
 											dwSkillVnum = SKILL_ADD_HP;
 											break;
 
-										case 50325: case 50326:
+										case 50325:
+										case 50326:
 											dwSkillVnum = SKILL_RESIST_PENETRATE;
 											break;
 
@@ -3454,6 +3462,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									int val = item->GetValue(0);
 									int interval = item->GetValue(1);
 									quest::PC* pPC = quest::CQuestManager::instance().GetPC(GetPlayerID());
+									if (!pPC)
+										return false; 
 									int last_use_time = pPC->GetFlag("mythical_peach.last_use_time");
 
 									if (get_global_time() - last_use_time < interval * 60 * 60)
@@ -4381,6 +4391,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							switch (item->GetValue(0))
 							{
 								case APPLY_MOV_SPEED:
+									if (FindAffect(AFFECT_MOV_SPEED))
+										return false;
 									AddAffect(AFFECT_MOV_SPEED, POINT_MOV_SPEED, item->GetValue(2), AFF_MOV_SPEED_POTION, item->GetValue(1), 0, true);
 #ifdef ENABLE_EFFECT_EXTRAPOT
 									EffectPacket(SE_DXUP_PURPLE);
@@ -4388,6 +4400,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									break;
 
 								case APPLY_ATT_SPEED:
+									if (FindAffect(AFFECT_ATT_SPEED))
+										return false;
 									AddAffect(AFFECT_ATT_SPEED, POINT_ATT_SPEED, item->GetValue(2), AFF_ATT_SPEED_POTION, item->GetValue(1), 0, true);
 #ifdef ENABLE_EFFECT_EXTRAPOT
 									EffectPacket(SE_SPEEDUP_GREEN);
@@ -6300,7 +6314,7 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 		return false;
 
 	// 무언가를 탄 상태에서 턱시도 입기 금지
-	if (iWearCell == WEAR_BODY && IsRiding() && (item->GetVnum() >= 11901 && item->GetVnum() <= 11904))
+	if ((IsRiding() || GetWear(WEAR_COSTUME_BODY) || GetWear(WEAR_COSTUME_HAIR)) && (item->GetVnum() > 11900 && item->GetVnum() < 11915))
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("말을 탄 상태에서 예복을 입을 수 없습니다."));
 		return false;
@@ -6857,6 +6871,7 @@ LPITEM CHARACTER::AutoGiveItem(DWORD dwItemVnum, BYTE bCount, int iRarePct, bool
 							inv_item->GetCount() < g_bItemCountLimit)
 					{
 						inv_item->SetCount(inv_item->GetCount() + item->GetCount());
+						M2_DESTROY_ITEM(item); 
 						return inv_item;
 					}
 				}

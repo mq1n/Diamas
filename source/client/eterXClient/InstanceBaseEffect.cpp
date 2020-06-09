@@ -930,13 +930,15 @@ void CInstanceBase::__SetAffect(UINT eAffect, bool isVisible)
 			// 2004.07.17.levites.isShow를 ViewFrustumCheck로 변경
 			if (isVisible)
 			{
-				m_GraphicThingInstance.ClearAttachingEffect();
+				m_GraphicThingInstance.HideAllAttachingEffect();
+				// m_GraphicThingInstance.ClearAttachingEffect();
 				__EffectContainer_Destroy();
 				DetachTextTail();
 			}
 			else
 			{
 				m_GraphicThingInstance.BlendAlphaValue(1.0f, 1.0f);
+				m_GraphicThingInstance.ShowAllAttachingEffect();
 				AttachTextTail();
 				RefreshTextTail();
 			}

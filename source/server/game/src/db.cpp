@@ -85,7 +85,9 @@ void DBManager::Query(const char * c_pszFormat, ...)
 	vsnprintf(szQuery, sizeof(szQuery), c_pszFormat, args);
 	va_end(args);
 
-	m_sql.AsyncQuery(szQuery);
+//	m_sql.AsyncQuery(szQuery);
+	std::string sQuery(szQuery);
+	m_sql.AsyncQuery(sQuery.substr(0, sQuery.find_first_of(";") == std::string::npos ? sQuery.length() : sQuery.find_first_of(";")).c_str());
 }
 
 SQLMsg * DBManager::DirectQuery(const char * c_pszFormat, ...)
@@ -97,7 +99,9 @@ SQLMsg * DBManager::DirectQuery(const char * c_pszFormat, ...)
 	vsnprintf(szQuery, sizeof(szQuery), c_pszFormat, args);
 	va_end(args);
 
-	return m_sql_direct.DirectQuery(szQuery);
+//	return m_sql_direct.DirectQuery(szQuery);
+	std::string sQuery(szQuery);
+	return m_sql_direct.DirectQuery(sQuery.substr(0, sQuery.find_first_of(";") == std::string::npos ? sQuery.length() : sQuery.find_first_of(";")).c_str());
 }
 
 bool DBManager::IsConnected()
