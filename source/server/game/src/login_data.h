@@ -33,9 +33,6 @@ class CLoginData
 		void		SetRemainSecs(long l);
 		long		GetRemainSecs();
 
-		void		SetBilling(bool bOn);
-		bool		IsBilling();
-
 		void		SetDeleted(bool bSet);
 		bool		IsDeleted();
 
@@ -53,13 +50,9 @@ class CLoginData
 		DWORD           m_dwLogonTime;
 		long		m_lRemainSecs;
 		char		m_szIP[MAX_HOST_LENGTH+1];
-		bool		m_bBilling;
 		bool		m_bDeleted;
 		std::string	m_stLogin;
 		int		m_aiPremiumTimes[PREMIUM_MAX_NUM];
-
-		
-		
 };
 
 #endif

@@ -244,11 +244,6 @@ protected:
 
 	void		SetEventFlag(const char* c_pData);
 
-	void		BillingRepair(const char * c_pData);
-	void		BillingExpire(const char * c_pData);
-	void		BillingLogin(const char * c_pData);
-	void		BillingCheck(const char * c_pData);
-
 	void		CreateObject(const char * c_pData);
 	void		DeleteObject(const char * c_pData);
 	void		UpdateLand(const char * c_pData);

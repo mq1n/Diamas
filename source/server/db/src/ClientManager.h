@@ -342,12 +342,6 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	void		SetEventFlag(TPacketSetEventFlag* p);
 	void		SendEventFlagsOnSetup(CPeer* peer);
 
-	void		BillingExpire(TPacketBillingExpire * p);
-	void		BillingCheck(const char * data);
-
-	void		SendAllLoginToBilling();
-	void		SendLoginToBilling(CLoginData * pkLD, bool bLogin);
-
 	// ∞·»•
 	void		MarriageAdd(TPacketMarriageAdd * p);
 	void		MarriageUpdate(TPacketMarriageUpdate * p);

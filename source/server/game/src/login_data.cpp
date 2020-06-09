@@ -14,7 +14,6 @@ CLoginData::CLoginData()
 	m_dwLogonTime = 0;
 	m_lRemainSecs = 0;
 	memset(m_szIP, 0, sizeof(m_szIP));
-	m_bBilling = false;
 	m_bDeleted = false;
 	memset(m_aiPremiumTimes, 0, sizeof(m_aiPremiumTimes));
 }
@@ -98,24 +97,6 @@ void CLoginData::SetRemainSecs(long l)
 long CLoginData::GetRemainSecs()
 {
 	return m_lRemainSecs;
-}
-
-void CLoginData::SetBilling(bool bOn)
-{
-	if (bOn)
-	{
-		sys_log(0, "BILLING: ON %s key %u ptr %p", m_stLogin.c_str(), m_dwKey, this);
-		SetLogonTime();
-	}
-	else
-		sys_log(0, "BILLING: OFF %s key %u ptr %p", m_stLogin.c_str(), m_dwKey, this);
-
-	m_bBilling = bOn;
-}
-
-bool CLoginData::IsBilling()
-{
-	return m_bBilling;
 }
 
 void CLoginData::SetDeleted(bool bSet)
