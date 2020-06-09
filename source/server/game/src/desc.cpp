@@ -15,7 +15,6 @@
 #include "guild_manager.h"
 #include "TrafficProfiler.h"
 #include "locale_service.h"
-#include "HackShield.h"
 #include "log.h"
 #ifdef ENABLE_SEQUENCE_SYSTEM
 #include "sequence.h"

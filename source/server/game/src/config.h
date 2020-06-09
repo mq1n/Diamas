@@ -136,9 +136,6 @@ extern bool g_NoMountAtGuildWar;
 extern bool g_NoPotionsOnPVP;
 // #endif
 
-extern bool isHackShieldEnable;
-extern int  HackShield_FirstCheckWaitTime;
-extern int  HackShield_CheckCycleTime;
 extern bool bXTrapEnabled;
 
 extern int gPlayerMaxLevel;

@@ -4,7 +4,6 @@
 #include "PythonNetworkStream.h"
 #include "../eterBase/tea.h"
 
-#include "Hackshield.h"
 #include "WiseLogicXTrap.h"
 
 // CHINA_CRYPT_KEY
@@ -189,9 +188,6 @@ bool CAccountConnector::__AuthState_RecvPhase()
 		SetSecurityMode(true, key);
 #endif
 
-#ifdef USE_AHNLAB_HACKSHIELD
-		HackShield_SetUserInfo(m_strID.c_str());
-#endif
 #ifdef XTRAP_CLIENT_ENABLE
 		XTrap_SetUserInfo(m_strID.c_str(), NULL, NULL, NULL, NULL);
 #endif

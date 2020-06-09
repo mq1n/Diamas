@@ -20,7 +20,6 @@
 
 #include "CheckLatestFiles.h"
 
-#include "Hackshield.h"
 #include "NProtectGameGuard.h"
 #include "WiseLogicXTrap.h"
 
@@ -413,9 +412,6 @@ bool __IsLocaleVersion(LPSTR lpCmdLine)
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	if (strstr(lpCmdLine, "--hackshield") != 0)
-		return 0;
-
 #ifdef _DEBUG
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_LEAK_CHECK_DF );
 	//_CrtSetBreakAlloc( 110247 ); 
@@ -428,11 +424,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 #ifdef XTRAP_CLIENT_ENABLE
 	if (!XTrap_Init())
-		return 0;
-#endif
-
-#ifdef USE_AHNLAB_HACKSHIELD
-	if (!HackShield_Init())
 		return 0;
 #endif
 
@@ -545,9 +536,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		MessageBox(NULL, gs_szErrorString, ApplicationStringTable_GetStringz(IDS_APP_NAME, "APP_NAME"), MB_ICONSTOP);
 
 Clean:
-#ifdef USE_AHNLAB_HACKSHIELD
-	HackShield_Shutdown();
-#endif
 	SAFE_FREE_GLOBAL(szArgv);
 
 	return 0;

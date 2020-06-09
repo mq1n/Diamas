@@ -556,7 +556,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 #endif
 
 		//Security
-		bool RecvHSCheckRequest();
 		bool RecvXTrapVerifyRequest();
 
 		// @fixme007

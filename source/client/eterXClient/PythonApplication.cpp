@@ -12,7 +12,6 @@
 
 #include "ProcessScanner.h"
 
-#include "HackShield.h"
 #include "NProtectGameGuard.h"
 #include "WiseLogicXTrap.h"
 #include "CheckLatestFiles.h"
@@ -402,10 +401,7 @@ bool CPythonApplication::Process()
 	if (CheckLatestFiles_PollEvent())
 		return false;
 #endif
-#ifdef USE_AHNLAB_HACKSHIELD
-	if (HackShield_PollEvent())
-		return false;
-#endif
+
 #ifdef XTRAP_CLIENT_ENABLE
 	XTrap_PollEvent();
 #endif

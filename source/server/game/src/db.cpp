@@ -402,7 +402,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 						sys_log(0, "QID_AUTH_LOGIN: SUCCESS %s", pinfo->login);
 
-						M2_DELETE(pinfo); // CHECKME
+						M2_DELETE(pinfo);
 						break;
 					}
 				}

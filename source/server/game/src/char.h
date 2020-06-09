@@ -2002,17 +2002,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		DWORD GetLastBuySellTime() const { return m_dwLastBuySellTime; }
 		void SetLastBuySellTime(DWORD dwLastBuySellTime) { m_dwLastBuySellTime = dwLastBuySellTime; }
 #endif
-	public:
-		void StartHackShieldCheckCycle(int seconds);
-		void StopHackShieldCheckCycle();
-
-		bool GetHackShieldCheckMode() const { return m_HackShieldCheckMode; }
-		void SetHackShieldCheckMode(bool m) { m_HackShieldCheckMode = m; }
-
-		LPEVENT m_HackShieldCheckEvent;
-
-	private:
-		bool	m_HackShieldCheckMode;
 
 	public:
 		void AutoRecoveryItemProcess (const EAffectTypes);

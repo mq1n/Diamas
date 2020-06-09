@@ -54,7 +54,6 @@
 #include "spam.h"
 #include "threeway_war.h"
 #include "DragonLair.h"
-#include "HackShield.h"
 #include "skill_power.h"
 #include "SpeedServer.h"
 #include "DragonSoul.h"
@@ -370,8 +369,6 @@ int main(int argc, char **argv)
 	CThreeWayWar	threeway_war;
 	CDragonLairManager	dl_manager;
 
-	CHackShieldManager	HSManager;
-
 	CSpeedServerManager SSManager;
 	DSManager dsManager;
 
@@ -400,21 +397,6 @@ int main(int argc, char **argv)
 
 	if ( g_bTrafficProfileOn )
 		TrafficProfiler::instance().Initialize( TRAFFIC_PROFILE_FLUSH_CYCLE, "ProfileLog" );
-
-	//if game server
-	if (!g_bAuthServer)
-	{
-		//hackshield
-		if (isHackShieldEnable)
-		{
-			if (!HSManager.Initialize())
-			{
-				fprintf(stderr, "Failed To Initialize HS");
-				CleanUpForEarlyExit();
-				return 0;
-			}
-		}
-	}
 
 	while (idle());
 
@@ -473,15 +455,6 @@ int main(int argc, char **argv)
 	quest_manager.Destroy();
 	sys_log(0, "<shutdown> Destroying building::CManager...");
 	building_manager.Destroy();
-
-	if (!g_bAuthServer)
-	{
-		if (isHackShieldEnable)
-		{
-			sys_log(0, "<shutdown> Releasing HackShield manager...");
-			HSManager.Release();
-		}
-	}
 
 	sys_log(0, "<shutdown> Flushing TrafficProfiler...");
 	trafficProfiler.Flush();

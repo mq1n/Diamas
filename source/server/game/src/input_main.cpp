@@ -38,7 +38,6 @@
 #include "motion.h"
 #include "OXEvent.h"
 #include "locale_service.h"
-#include "HackShield.h"
 #include "DragonSoul.h"
 #include "belt_inventory_helper.h" // @fixme119
 #include "../../common/CommonDefines.h"
@@ -3336,13 +3335,6 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 
 		case HEADER_CG_REFINE:
 			Refine(ch, c_pData);
-			break;
-
-		case HEADER_CG_HS_ACK:
-			if (isHackShieldEnable)
-			{
-				CHackShieldManager::instance().VerifyAck(d->GetCharacter(), c_pData);
-			}
 			break;
 
 		case HEADER_CG_DRAGON_SOUL_REFINE:

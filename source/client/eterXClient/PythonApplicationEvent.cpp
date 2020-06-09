@@ -81,7 +81,6 @@ void CPythonApplication::OnMouseMove(int x, int y)
 			y = Point.y;
 			ClientToScreen(m_hWnd, &Point);
 
-			// 2004.07.26.myevan.안철수HackShield와 충돌
 			SetCursorPos(Point.x, Point.y);
 
 		}

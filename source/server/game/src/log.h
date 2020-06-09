@@ -51,7 +51,6 @@ class LogManager : public singleton<LogManager>
 		void		QuestRewardLog(const char * c_pszQuestName, DWORD dwPID, DWORD dwLevel, int iValue1, int iValue2);
 		void		DetailLoginLog(bool isLogin, LPCHARACTER ch);
 		void		DragonSlayLog(DWORD dwGuildID, DWORD dwDragonVnum, DWORD dwStartTime, DWORD dwEndTime);
-		void		HackShieldLog(unsigned long ErrorCode, LPCHARACTER ch);
 #ifdef ENABLE_ACCE_SYSTEM
 		void		AcceLog(DWORD dwPID, DWORD x, DWORD y, DWORD item_vnum, DWORD item_uid, int item_count, int abs_chance, bool success);
 #endif
