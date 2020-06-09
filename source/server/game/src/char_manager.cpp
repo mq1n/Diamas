@@ -228,14 +228,6 @@ LPCHARACTER CHARACTER_MANAGER::FindPC(const char * name)
 
 LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapIndex)
 {
-	// 왜구 스폰할지말지를 결정할 수 있게함
-	{
-		if (dwVnum == 5001 && !quest::CQuestManager::instance().GetEventFlag("japan_regen"))
-		{
-			sys_log(1, "WAEGU[5001] regen disabled.");
-			return NULL;
-		}
-	}
 
 	// 해태를 스폰할지 말지를 결정할 수 있게 함
 	{

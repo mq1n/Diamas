@@ -859,11 +859,6 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 		return;
 	}
 
-	if (g_stLocale == "sjis")
-		snprintf(queryStr, sizeof(queryStr),
-			"SELECT COUNT(*) as count FROM player%s WHERE name='%s' collate sjis_japanese_ci", 
-			GetTablePostfix(), packet->player_table.name);	
-	else
 	snprintf(queryStr, sizeof(queryStr), 
 			"SELECT COUNT(*) as count FROM player%s WHERE name='%s'", GetTablePostfix(), packet->player_table.name);
 

@@ -255,21 +255,11 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 
 bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 {
-#ifdef LOCALE_SERVICE_YMIR
-	extern bool g_isScreenShotKey;
-	g_isScreenShotKey = true;
-#endif
-
 	DWORD dwRandSeed=time(NULL)+DWORD(GetCurrentProcess());
 	srandom(dwRandSeed);
 	srand(random());
 
 	SetLogLevel(1);
-
-#ifdef LOCALE_SERVICE_VIETNAM_MILD
-	extern BOOL USE_VIETNAM_CONVERT_WEAPON_VNUM;
-	USE_VIETNAM_CONVERT_WEAPON_VNUM = true;
-#endif
 
 	if (_access("perf_game_update.txt", 0)==0)
 	{

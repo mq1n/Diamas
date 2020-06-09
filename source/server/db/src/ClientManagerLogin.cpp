@@ -518,14 +518,8 @@ void CClientManager::QUERY_LOGOUT(CPeer * peer, DWORD dwHandle,const char * data
 void CClientManager::QUERY_CHANGE_NAME(CPeer * peer, DWORD dwHandle, TPacketGDChangeName * p)
 {
 	char queryStr[QUERY_MAX_LEN];
-
-	if (g_stLocale == "sjis")
-		snprintf(queryStr, sizeof(queryStr),
-				"SELECT COUNT(*) as count FROM player%s WHERE name='%s' collate sjis_japanese_ci AND id <> %u", 
-				GetTablePostfix(), p->name, p->pid);
-	else
-		snprintf(queryStr, sizeof(queryStr),
-			"SELECT COUNT(*) as count FROM player%s WHERE name='%s' AND id <> %u", GetTablePostfix(), p->name, p->pid);
+	snprintf(queryStr, sizeof(queryStr),
+		"SELECT COUNT(*) as count FROM player%s WHERE name='%s' AND id <> %u", GetTablePostfix(), p->name, p->pid);
 
 	std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(queryStr, SQL_PLAYER));
 
