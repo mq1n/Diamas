@@ -5580,11 +5580,6 @@ bool CHARACTER::DropItem(TItemPos Cell, BYTE bCount)
 			return false;
 		}
 	
-		// check non-split items for china
-		//if (LC_IsNewCIBN())
-		//	if (item->GetVnum() == 71095 || item->GetVnum() == 71050 || item->GetVnum() == 70038)
-		//		return false;
-
 		item->SetCount(item->GetCount() - bCount);
 		ITEM_MANAGER::instance().FlushDelayedSave(item);
 
@@ -5808,15 +5803,6 @@ bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, BYTE count)
 		}
 		else if (count < item->GetCount())
 		{
-			//check non-split items 
-			//if (LC_IsNewCIBN())
-			//{
-			//	if (item->GetVnum() == 71095 || item->GetVnum() == 71050 || item->GetVnum() == 70038)
-			//	{
-			//		return false;
-			//	}
-			//}
-
 			sys_log(0, "%s: ITEM_SPLIT %s (window: %d, cell : %d) -> (window:%d, cell %d) count %d", GetName(), item->GetName(), Cell.window_type, Cell.cell, 
 				DestCell.window_type, DestCell.cell, count);
 

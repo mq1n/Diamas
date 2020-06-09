@@ -783,9 +783,8 @@ void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, BYTE
 		RemoveAffect(AFFECT_MOUNT);
 		RemoveAffect(AFFECT_MOUNT_BONUS);
 	}
-	//if (!LC_IsNewCIBN())
-		SetPolymorph(30000, true);
-
+	
+	SetPolymorph(30000, true);
 }
 
 void CHARACTER::CloseMyShop()

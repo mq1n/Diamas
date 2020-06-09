@@ -60,6 +60,8 @@ DWORD	g_dwSkillBookNextReadMax = 43200;
 std::string	g_stProxyIP = "";
 // #endif
 
+BYTE	PK_PROTECT_LEVEL = 15;
+
 // TRAFFIC_PROFILER
 bool		g_bTrafficProfileOn = false;
 DWORD		g_dwTrafficProfileFlushCycle = 3600;
@@ -1543,10 +1545,9 @@ void config_init(const string& st_localeServiceName)
 		exit(1);
 	}
 
-	// LOCALE_SERVICE 
-	LocaleService_LoadLocaleStringFile();
+	// LOCALE_SERVICE
+	Locale_Init();
 	LocaleService_TransferDefaultSetting();
-	LocaleService_LoadEmpireTextConvertTables();
 	// END_OF_LOCALE_SERVICE
 
 #ifdef ENABLE_EXPTABLE_FROMDB

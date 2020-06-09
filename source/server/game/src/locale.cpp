@@ -6,8 +6,6 @@ typedef std::map< std::string, std::string > LocaleStringMapType;
 
 LocaleStringMapType localeString;
 
-int g_iUseLocale = 0;
-
 void locale_add(const char **strings)
 {
 	LocaleStringMapType::const_iterator iter = localeString.find( strings[0] );
@@ -20,11 +18,6 @@ void locale_add(const char **strings)
 
 const char * locale_find(const char *string)
 {
-	if (0 == g_iUseLocale || LC_IsKorea() || LC_IsWE_Korea())
-	{
-		return (string);
-	}
-
 	LocaleStringMapType::const_iterator iter = localeString.find( string );
 
 	if( iter == localeString.end() )
@@ -33,7 +26,8 @@ const char * locale_find(const char *string)
 		strlcpy(s_line + 5, string, sizeof(s_line) - 5);
 
 		sys_err("LOCALE_ERROR: \"%s\";", string);
-		return s_line;
+		return string;
+//		return s_line;
 	}
 
 	return iter->second.c_str();
@@ -42,7 +36,7 @@ const char * locale_find(const char *string)
 const char *quote_find_end(const char *string)
 {
 	const char  *tmp = string;
-	int         quote = 0;
+	int32_t         quote = 0;
 
 	while (*tmp)
 	{
@@ -66,19 +60,19 @@ const char *quote_find_end(const char *string)
 		tmp++;
 	}
 
-	return (NULL);
+	return nullptr;
 }
 
-char *locale_convert(const char *src, int len)
+char *locale_convert(const char *src, int32_t len)
 {
 	const char	*tmp;
-	int		i, j;
+	int32_t		i, j;
 	char	*buf, *dest;
-	int		start = 0;
+	int32_t		start = 0;
 	char	last_char = 0;
 
 	if (!len)
-		return NULL;
+		return nullptr;
 
 	buf = M2_NEW char[len + 1];
 
@@ -120,7 +114,7 @@ ENCODE:
 	if (!j)
 	{
 		M2_DELETE_ARRAY(buf);
-		return NULL;
+		return nullptr;
 	}
 
 	*dest = '\0';
@@ -137,7 +131,7 @@ void locale_init(const char *filename)
 	if (!fp) return;
 
 	fseek(fp, 0L, SEEK_END);
-	int i = ftell(fp); 
+	int32_t i = ftell(fp);
 	fseek(fp, 0L, SEEK_SET);
 
 	i++;
@@ -166,7 +160,7 @@ void locale_init(const char *filename)
 	do
 	{
 		for (i = 0; i < NUM_LOCALES; i++)
-			strings[i] = NULL;
+			strings[i] = nullptr;
 
 		if (*tmp == '"')
 		{
@@ -190,7 +184,7 @@ void locale_init(const char *filename)
 				}
 			}
 
-			if (strings[0] == NULL || strings[1] == NULL)
+			if (strings[0] == nullptr || strings[1] == nullptr)
 				break;
 
 			locale_add((const char**)strings);

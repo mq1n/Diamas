@@ -79,7 +79,6 @@ extern std::string	g_stLocaleFilename;
 extern char		g_szPublicIP[16];
 extern char		g_szInternalIP[16];
 
-extern int (*is_twobyte) (const char * str);
 extern int (*check_name) (const char * str);
 
 extern bool		g_bSkillDisable;

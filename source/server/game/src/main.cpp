@@ -523,7 +523,7 @@ int start(int argc, char **argv)
 		}
 		else
 		{
-			fprintf(stderr, "MasterAuth %d\n", LC_GetLocalType());
+			fprintf(stderr, "MasterAuth\n");
 		}
 	}
 

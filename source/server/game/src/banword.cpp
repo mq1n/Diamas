@@ -30,7 +30,7 @@ bool CBanwordManager::Find(const char * c_pszString)
 	return m_hashmap_words.end() != m_hashmap_words.find(c_pszString);
 }
 
-bool CBanwordManager::CheckString(const char * c_pszString, size_t _len)
+bool CBanwordManager::CheckString(const char* c_pszString, size_t _len)
 {
 	if (m_hashmap_words.empty())
 		return false;
@@ -39,28 +39,17 @@ bool CBanwordManager::CheckString(const char * c_pszString, size_t _len)
 
 	while (it != m_hashmap_words.end())
 	{
-		const std::string & r = it->first;
-		const char * tmp = c_pszString;
+		const std::string& r = it->first;
+		const char* tmp = c_pszString;
 		ssize_t len = _len;
 
 		while (len > 0)
 		{
-			if (is_twobyte(tmp))
-			{
-				if (!strncmp(tmp, r.c_str(), r.size()))
-					return true;
+			if (!strncmp(tmp, r.c_str(), r.size()))
+				return true;
 
-				tmp += 2;
-				len -= 2;
-			}
-			else
-			{
-				if (!strncmp(tmp, r.c_str(), r.size()))
-					return true;
-
-				++tmp;
-				--len;
-			}
+			++tmp;
+			--len;
 		}
 
 		it++;
@@ -69,57 +58,41 @@ bool CBanwordManager::CheckString(const char * c_pszString, size_t _len)
 	return false;
 }
 
-void CBanwordManager::ConvertString(char * c_pszString, size_t _len)
+void CBanwordManager::ConvertString(char* c_pszString, size_t _len)
 {
 	auto it = m_hashmap_words.begin();
 
 	while (it != m_hashmap_words.end())
 	{
-		const std::string & r = it->first;
+		const std::string& r = it->first;
 
-		char * tmp = c_pszString;
+		char* tmp = c_pszString;
 		ssize_t len = _len;
 
 		while (len > 0)
 		{
-			if (is_twobyte(tmp))
+			if (*tmp == '*')
 			{
-				if (!strncmp(tmp, r.c_str(), r.size()))
-				{
-					memset(tmp, '*', r.size());
-					tmp += r.size();
-					len -= r.size();
-				}
-				else
-				{
-					tmp += 2;
-					len -= 2;
-				}
+				++tmp;
+				--len;
+				continue;
+			}
+
+			if (!strncmp(tmp, r.c_str(), r.size()))
+			{
+				memset(tmp, '*', r.size());
+				tmp += r.size();
+				len -= r.size();
 			}
 			else
 			{
-				if (*tmp == '*')
-				{
-					++tmp;
-					--len;
-					continue;
-				}
-
-				if (!strncmp(tmp, r.c_str(), r.size()))
-				{
-					memset(tmp, '*', r.size());
-					tmp += r.size();
-					len -= r.size();
-				}
-				else
-				{
-					++tmp;
-					--len;
-				}
+				++tmp;
+				--len;
 			}
 		}
 
-		it++;
+		++it;
 	}
 }
+
 
