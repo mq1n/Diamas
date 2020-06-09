@@ -114,7 +114,6 @@ enum
 	HEADER_GC_KEY_AGREEMENT			= 0xfb, // _IMPROVED_PACKET_ENCRYPTION_
 	HEADER_GC_TIME_SYNC				= 0xfc,
 	HEADER_GC_PHASE					= 0xfd,
-	HEADER_GC_BINDUDP				= 0xfe,
 	HEADER_GC_HANDSHAKE				= 0xff,
 
 	HEADER_GC_CHARACTER_ADD			= 1,
@@ -838,13 +837,6 @@ typedef struct packet_phase
 	BYTE	header;
 	BYTE	phase;
 } TPacketGCPhase;
-
-typedef struct packet_bindudp
-{
-	BYTE	header;
-	DWORD	addr;
-	WORD	port;
-} TPacketGCBindUDP;
 
 enum
 {

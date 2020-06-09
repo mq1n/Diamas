@@ -343,19 +343,7 @@ enum
 	HEADER_GC_KEY_AGREEMENT						= 0xfb, // _IMPROVED_PACKET_ENCRYPTION_
 	HEADER_GC_HANDSHAKE_OK						= 0xfc, // 252
 	HEADER_GC_PHASE								= 0xfd,	// 253
-    HEADER_GC_BINDUDP                           = 0xfe, // 254
     HEADER_GC_HANDSHAKE                         = 0xff, // 255
-
-	/////////////////////////////////////////////////
-	// Client To Client for UDP
-	/*
-	HEADER_CC_STATE_WAITING						= 1,
-	HEADER_CC_STATE_WALKING						= 2,
-	HEADER_CC_STATE_GOING						= 3,
-	HEADER_CC_EVENT_NORMAL_ATTACKING			= 4,
-	HEADER_CC_EVENT_COMBO_ATTACKING				= 5,
-	HEADER_CC_EVENT_HIT							= 6,
-	*/
 };
 
 enum
@@ -1110,13 +1098,6 @@ typedef struct packet_header_handshake
 	DWORD		dwTime;
 	LONG		lDelta;
 } TPacketGCHandshake;
-
-typedef struct packet_header_bindudp
-{
-	BYTE		header;
-	DWORD		addr;
-	WORD		port;
-} TPacketGCBindUDP;
 
 typedef struct packet_header_dynamic_size
 {

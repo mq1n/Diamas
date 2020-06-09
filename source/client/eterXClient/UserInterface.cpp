@@ -205,7 +205,6 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 	initgrpText();
 	initwndMgr();
 	/////////////////////////////////////////////
-	initudp();
 	initapp();
 	initsystemSetting();
 	initchr();

@@ -1252,12 +1252,7 @@ float CInstanceBase::GetLocalTime()
 	return m_GraphicThingInstance.GetLocalTime();
 }
 
-
-void CInstanceBase::PushUDPState(DWORD dwCmdTime, const TPixelPosition& c_rkPPosDst, float fDstRot, UINT eFunc, UINT uArg)
-{
-}
-
-DWORD	ELTimer_GetServerFrameMSec();
+DWORD ELTimer_GetServerFrameMSec();
 
 void CInstanceBase::PushTCPStateExpanded(DWORD dwCmdTime, const TPixelPosition& c_rkPPosDst, float fDstRot, UINT eFunc, UINT uArg, UINT uTargetVID)
 {

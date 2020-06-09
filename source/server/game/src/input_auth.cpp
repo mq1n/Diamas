@@ -7,11 +7,6 @@
 #include "protocol.h"
 #include "locale_service.h"
 #include "db.h"
-
-#ifndef __WIN32__
-	#include "limit_time.h"
-#endif
-
 #include "utils.h"
 
 bool FN_IS_VALID_LOGIN_STRING(const char *str)

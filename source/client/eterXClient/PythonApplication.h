@@ -25,7 +25,6 @@
 #include "PythonTextTail.h"
 #include "PythonSkill.h"
 #include "PythonSystem.h"
-//#include "PythonNetworkDatagram.h"
 #include "PythonNetworkStream.h"
 #include "PythonCharacterManager.h"
 #include "PythonQuest.h"
@@ -328,7 +327,6 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		CServerStateChecker			m_kServerStateChecker;
 		CPythonGraphic				m_pyGraphic;
 		CPythonNetworkStream		m_pyNetworkStream;
-		//CPythonNetworkDatagram		m_pyNetworkDatagram;
 		CPythonPlayer				m_pyPlayer;
 		CPythonIME					m_pyIme;
 		CPythonItem					m_pyItem;

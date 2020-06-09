@@ -706,7 +706,6 @@ const char * GetRecvHeaderName(BYTE header)
 #endif
 		stringList[0xfc] = "HEADER_GC_HANDSHAKE_OK";
 		stringList[0xfd] = "HEADER_GC_PHASE";
-		stringList[0xfe] = "HEADER_GC_BINDUDP";
 		stringList[0xff] = "HEADER_GC_HANDSHAKE";
 	}
 	return stringList[header].c_str();

@@ -115,8 +115,6 @@
 #include "NetAddress.h"
 // #include "NetStream.h"
 #include "NetPacketHeaderMap.h"
-#include "NetDatagramSender.h"
-#include "NetDatagramReceiver.h"
 
 #include "Input.h"
 #include "IME.h"

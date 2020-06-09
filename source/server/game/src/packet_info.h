@@ -55,12 +55,4 @@ class CPacketInfoGG : public CPacketInfo
 		virtual ~CPacketInfoGG();
 };
 
-/// Implemented in input_udp.cpp
-class CPacketInfoUDP : public CPacketInfo
-{
-	public:
-		CPacketInfoUDP();
-		virtual ~CPacketInfoUDP();
-};
-
 #endif

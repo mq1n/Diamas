@@ -47,7 +47,6 @@ enum
 #endif
 };
 
-void initudp();
 void initapp();
 void initime();
 void initsystemSetting();

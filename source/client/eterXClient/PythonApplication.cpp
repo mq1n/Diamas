@@ -456,7 +456,6 @@ bool CPythonApplication::Process()
 #endif
 	// Network I/O	
 	m_pyNetworkStream.Process();	
-	//m_pyNetworkDatagram.Process();
 
 	m_kGuildMarkUploader.Process();
 
@@ -1426,7 +1425,6 @@ void CPythonApplication::Destroy()
 	GrannyDestroySharedDeformBuffer();
 
 	m_pyGraphic.Destroy();
-	//m_pyNetworkDatagram.Destroy();	
 
 	m_pyRes.Destroy();
 
