@@ -249,14 +249,6 @@ void heartbeat(LPHEART ht, int pulse)
 	if (!(pulse % (passes_per_sec + 4)))
 		CHARACTER_MANAGER::instance().ProcessDelayedSave();
 
-	//4초 마다
-#if defined (__FreeBSD__) && defined(__FILEMONITOR__)
-	if (!(pulse % (passes_per_sec * 5)))
-	{
-		FileMonitorFreeBSD::Instance().Update(pulse); 
-	}
-#endif
-
 	// 약 5.08초마다
 	if (!(pulse % (passes_per_sec * 5 + 2)))
 	{
