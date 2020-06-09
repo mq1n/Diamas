@@ -1295,15 +1295,6 @@ void DBManager::StopAllBilling()
 	}
 }
 
-void DBManager::RequestBlockException(const char *login, int cmd)
-{
-	TPacketBlockException packet;
-
-	packet.cmd = cmd;
-	strlcpy(packet.login, login, sizeof(packet.login));
-	db_clientdesc->DBPacket(HEADER_GD_BLOCK_EXCEPTION, 0, &packet, sizeof(packet));
-}
-
 size_t DBManager::EscapeString(char* dst, size_t dstSize, const char *src, size_t srcSize)
 {
 	return m_sql_direct.EscapeString(dst, dstSize, src, srcSize);

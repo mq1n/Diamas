@@ -131,8 +131,6 @@ enum
 	HEADER_GD_DEC_MONARCH_MONEY = 125,
 
 	HEADER_GD_CHANGE_MONARCH_LORD = 126,
-	HEADER_GD_BLOCK_COUNTRY_IP		= 127,		// ±¤´ë¿ª IP-Block
-	HEADER_GD_BLOCK_EXCEPTION		= 128,		// ±¤´ë¿ª IP-Block ¿¹¿Ü
 
 	HEADER_GD_REQ_CHANGE_GUILD_MASTER	= 129,
 
@@ -274,8 +272,6 @@ enum
 
 	HEADER_DG_CHANGE_MONARCH_LORD_ACK = 169,
 	HEADER_DG_UPDATE_MONARCH_INFO	= 170,
-	HEADER_DG_BLOCK_COUNTRY_IP		= 171,		// ±¤´ë¿ª IP-Block
-	HEADER_DG_BLOCK_EXCEPTION		= 172,		// ±¤´ë¿ª IP-Block ¿¹¿Ü account
 
 	HEADER_DG_ACK_CHANGE_GUILD_MASTER = 173,
 
@@ -1413,26 +1409,6 @@ typedef struct tChangeMonarchLordACK
 	char szName[32];
 	char szDate[32];
 } TPacketChangeMonarchLordACK;
-
-// Block Country Ip
-typedef struct tBlockCountryIp
-{
-	DWORD	ip_from;
-	DWORD	ip_to;
-} TPacketBlockCountryIp;
-
-enum EBlockExceptionCommand
-{
-	BLOCK_EXCEPTION_CMD_ADD = 1,
-	BLOCK_EXCEPTION_CMD_DEL = 2,
-};
-
-// Block Exception Account
-typedef struct tBlockException
-{
-	BYTE	cmd;	// 1 == add, 2 == delete
-	char	login[LOGIN_MAX_LEN + 1];
-}TPacketBlockException;
 
 typedef struct tChangeGuildMaster
 {
