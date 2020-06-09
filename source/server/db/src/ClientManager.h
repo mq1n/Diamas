@@ -301,9 +301,6 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 
 	void		SendPartyOnSetup(CPeer * peer);
 
-	void		QUERY_HIGHSCORE_REGISTER(CPeer * peer, TPacketGDHighscore* data);
-	void		RESULT_HIGHSCORE_REGISTER(CPeer * pkPeer, SQLMsg * msg);
-
 	void		QUERY_FLUSH_CACHE(CPeer * pkPeer, const char * c_pData);
 
 	void		QUERY_PARTY_CREATE(CPeer * peer, TPacketPartyCreate* p);

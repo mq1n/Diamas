@@ -2301,10 +2301,6 @@ void CClientManager::ProcessPackets(CPeer * peer)
 				QUERY_REMOVE_AFFECT(peer, (TPacketGDRemoveAffect *) data);
 				break;
 
-			case HEADER_GD_HIGHSCORE_REGISTER:
-				QUERY_HIGHSCORE_REGISTER(peer, (TPacketGDHighscore *) data);
-				break;
-
 			case HEADER_GD_PARTY_CREATE:
 				QUERY_PARTY_CREATE(peer, (TPacketPartyCreate*) data);
 				break;
@@ -2621,11 +2617,6 @@ int CClientManager::AnalyzeQueryResult(SQLMsg * msg)
 		case QID_SAFEBOX_CHANGE_PASSWORD_SECOND:
 			sys_log(0, "QUERY_RESULT: HEADER_GD_SAFEBOX_CHANGE_PASSWORD %p", msg);
 			RESULT_SAFEBOX_CHANGE_PASSWORD_SECOND(peer, msg);
-			break;
-
-		case QID_HIGHSCORE_REGISTER:
-			sys_log(0, "QUERY_RESULT: HEADER_GD_HIGHSCORE_REGISTER %p", msg);
-			RESULT_HIGHSCORE_REGISTER(peer, msg);
 			break;
 
 		case QID_SAFEBOX_SAVE:

@@ -51,7 +51,6 @@ enum
 	HEADER_GD_ADD_AFFECT		= 32,
 	HEADER_GD_REMOVE_AFFECT		= 33,
 
-	HEADER_GD_HIGHSCORE_REGISTER	= 34,
 	HEADER_GD_ITEM_FLUSH		= 35,
 
 	HEADER_GD_PARTY_CREATE		= 36,
@@ -802,14 +801,6 @@ typedef struct SPacketGDRemoveAffect
 	DWORD	dwType;
 	BYTE	bApplyOn;
 } TPacketGDRemoveAffect;
-
-typedef struct SPacketGDHighscore
-{
-	DWORD	dwPID;
-	long	lValue;
-	char	cDir;
-	char	szBoard[21];
-} TPacketGDHighscore;
 
 typedef struct SPacketPartyCreate
 {

@@ -218,35 +218,6 @@ namespace quest
 		}
 	}
 
-	int highscore_show(lua_State* L)
-	{
-		CQuestManager & q = CQuestManager::instance();
-		const char * pszBoardName = lua_tostring(L, 1);
-		DWORD mypid = q.GetCurrentCharacterPtr()->GetPlayerID();
-		bool bOrder = (int) lua_tonumber(L, 2) != 0 ? true : false;
-
-		DBManager::instance().ReturnQuery(QID_HIGHSCORE_SHOW, mypid, NULL, 
-				"SELECT h.pid, p.name, h.value FROM highscore%s as h, player%s as p WHERE h.board = '%s' AND h.pid = p.id ORDER BY h.value %s LIMIT 10",
-				get_table_postfix(), get_table_postfix(), pszBoardName, bOrder ? "DESC" : "");
-		return 0;
-	}
-
-	int highscore_register(lua_State* L)
-	{
-		CQuestManager & q = CQuestManager::instance();
-
-		THighscoreRegisterQueryInfo * qi = M2_NEW THighscoreRegisterQueryInfo;
-
-		strlcpy(qi->szBoard, lua_tostring(L, 1), sizeof(qi->szBoard));
-		qi->dwPID = q.GetCurrentCharacterPtr()->GetPlayerID();
-		qi->iValue = (int) lua_tonumber(L, 2);
-		qi->bOrder = (int) lua_tonumber(L, 3);
-
-		DBManager::instance().ReturnQuery(QID_HIGHSCORE_REGISTER, qi->dwPID, qi, 
-				"SELECT value FROM highscore%s WHERE board='%s' AND pid=%u", get_table_postfix(), qi->szBoard, qi->dwPID);
-		return 1;
-	}
-
 	// 
 	// "member" Lua functions
 	//
@@ -524,17 +495,6 @@ namespace quest
 			};
 
 			AddLuaFunctionTable("member", member_functions);
-		}
-
-		{
-			luaL_reg highscore_functions[] = 
-			{
-				{ "register",			highscore_register	},
-				{ "show",			highscore_show		},
-				{ NULL,				NULL			}
-			};
-
-			AddLuaFunctionTable("highscore", highscore_functions);
 		}
 
 		{

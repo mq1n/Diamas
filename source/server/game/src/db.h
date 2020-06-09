@@ -15,8 +15,6 @@ enum
 {
 	QID_SAFEBOX_SIZE,
 	QID_AUTH_LOGIN,
-	QID_HIGHSCORE_REGISTER,
-	QID_HIGHSCORE_SHOW,
 	QID_BLOCK_CHAT_LIST,
 };
 
@@ -138,15 +136,6 @@ template <class Functor> void DBManager::FuncAfterQuery(Functor f, const char* c
 
 	m_sql.ReturnQuery(szQuery, p);
 }
-
-////////////////////////////////////////////////////////////////
-typedef struct SHighscoreRegisterQueryInfo
-{
-	char    szBoard[20+1]; 
-	DWORD   dwPID;
-	int     iValue;
-	bool    bOrder;
-} THighscoreRegisterQueryInfo;
 
 // ACCOUNT_DB
 class AccountDB : public singleton<AccountDB>

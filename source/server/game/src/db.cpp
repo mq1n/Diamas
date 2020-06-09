@@ -421,39 +421,6 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 			}
 			break;
 
-		case QID_HIGHSCORE_REGISTER:
-			{
-				THighscoreRegisterQueryInfo * info = (THighscoreRegisterQueryInfo *) qi->pvData;
-				bool bQuery = true;
-
-				if (pMsg->Get()->uiNumRows)
-				{
-					MYSQL_ROW row = mysql_fetch_row(pMsg->Get()->pSQLResult);
-
-					if (row && row[0])
-					{
-						int iCur = 0;
-						str_to_number(iCur, row[0]);
-
-						if ((info->bOrder && iCur >= info->iValue) ||
-								(!info->bOrder && iCur <= info->iValue))
-							bQuery = false;
-					}
-				}
-
-				if (bQuery)
-					Query("REPLACE INTO highscore%s VALUES('%s', %u, %d)",
-							get_table_postfix(), info->szBoard, info->dwPID, info->iValue);
-
-				M2_DELETE(info);
-			}
-			break;
-
-		case QID_HIGHSCORE_SHOW:
-			{
-			}
-			break;
-
 			// BLOCK_CHAT
 		case QID_BLOCK_CHAT_LIST:
 			{

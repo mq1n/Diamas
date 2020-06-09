@@ -643,26 +643,6 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 						{
 							ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이번에 잡은 물고기의 길이는 %.2fcm"), item->GetSocket(0)/100.f);
 						}
-
-						if (quest::CQuestManager::instance().GetEventFlag("fishevent") > 0 && (info->fish_id == 5 || info->fish_id == 6))
-						{
-							// 이벤트 중이므로 기록한다.
-
-							TPacketGDHighscore p;
-							p.dwPID = ch->GetPlayerID();
-							p.lValue = item->GetSocket(0);
-
-							if (info->fish_id == 5)
-							{
-								strlcpy(p.szBoard, LC_TEXT("낚시이벤트월척붕어"), sizeof(p.szBoard));
-							}
-							else if (info->fish_id == 6)
-							{
-								strlcpy(p.szBoard, LC_TEXT("낚시이벤트잉어"), sizeof(p.szBoard));
-							}
-
-							db_clientdesc->DBPacket(HEADER_GD_HIGHSCORE_REGISTER, 0, &p, sizeof(TPacketGDHighscore));
-						}
 					}
 
 					int map_idx = ch->GetMapIndex();
