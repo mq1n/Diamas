@@ -31,34 +31,32 @@ DWORD ELTimer_GetMSec()
 	return timeGetTime() - gs_dwBaseTime; //(liTickCount.QuadPart*1000  / gs_liTickCountPerSec.QuadPart)-gs_dwBaseTime;		
 }
 
-VOID	ELTimer_SetServerMSec(DWORD dwServerTime)
+VOID ELTimer_SetServerMSec(DWORD dwServerTime)
 {
-	NANOBEGIN
 	if (0 != dwServerTime) // nanomite를 위한 더미 if
 	{
 		gs_dwServerTime = dwServerTime;
 		gs_dwClientTime = CTimer::instance().GetCurrentMillisecond();
 	}
-	NANOEND
 }
 
-DWORD	ELTimer_GetServerMSec()
+DWORD ELTimer_GetServerMSec()
 {
 	return CTimer::instance().GetCurrentMillisecond() - gs_dwClientTime + gs_dwServerTime;
 	//return ELTimer_GetMSec() - gs_dwClientTime + gs_dwServerTime;
 }
 
-DWORD	ELTimer_GetFrameMSec()
+DWORD LTimer_GetFrameMSec()
 {
 	return gs_dwFrameTime;
 }
 
-DWORD	ELTimer_GetServerFrameMSec()
+DWORD ELTimer_GetServerFrameMSec()
 {
 	return ELTimer_GetFrameMSec() - gs_dwClientTime + gs_dwServerTime;
 }
 
-VOID	ELTimer_SetFrameMSec()
+VOID ELTimer_SetFrameMSec()
 {
 	gs_dwFrameTime = ELTimer_GetMSec();
 }
@@ -67,8 +65,7 @@ CTimer::CTimer()
 {
 	ELTimer_Init();
 
-	NANOBEGIN
-	if (this) // nanomite를 위한 더미 if
+	if (this)
 	{
 		m_dwCurrentTime = 0;
 		m_bUseRealTime = true;
@@ -78,7 +75,6 @@ CTimer::CTimer()
 
 		m_fCurrentTime = 0.0f;
 	}
-	NANOEND
 }
 
 CTimer::~CTimer()

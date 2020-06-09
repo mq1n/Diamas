@@ -999,8 +999,7 @@ void CPythonApplication::Loop()
 // SUPPORT_NEW_KOREA_SERVER
 bool LoadLocaleData(const char* localePath)
 {
-	NANOBEGIN
-		CPythonNonPlayer&	rkNPCMgr	= CPythonNonPlayer::Instance();
+	CPythonNonPlayer&	rkNPCMgr	= CPythonNonPlayer::Instance();
 	CItemManager&		rkItemMgr	= CItemManager::Instance();	
 	CPythonSkill&		rkSkillMgr	= CPythonSkill::Instance();
 	CPythonNetworkStream& rkNetStream = CPythonNetworkStream::Instance();
@@ -1087,8 +1086,7 @@ bool LoadLocaleData(const char* localePath)
 	}
 #endif
 
-	NANOEND
-		return true;
+	return true;
 }
 // END_OF_SUPPORT_NEW_KOREA_SERVER
 
@@ -1102,8 +1100,7 @@ unsigned __GetWindowMode(bool windowed)
 
 bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int width, int height, int Windowed)
 {
-	NANOBEGIN
-		Windowed = CPythonSystem::Instance().IsWindowed() ? 1 : 0;
+	Windowed = CPythonSystem::Instance().IsWindowed() ? 1 : 0;
 
 	bool bAnotherWindow = false;
 
@@ -1176,7 +1173,6 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int wi
 		}
 	}
 
-	NANOEND
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

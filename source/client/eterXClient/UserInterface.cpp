@@ -233,8 +233,6 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 	initguild();
 	initServerStateChecker();
 
-	NANOBEGIN
-
 	PyObject* builtins = PyImport_ImportModule("__builtin__");
 #ifdef _NDEBUG
 	PyModule_AddIntConstant(builtins, "__DEBUG__", 0);
@@ -258,7 +256,6 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 		return false;
 	}
 
-	NANOEND
 	return true;
 }
 

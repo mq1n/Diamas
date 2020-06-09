@@ -55,8 +55,6 @@ void CInputKeyboard::ResetKeyboard()
 
 bool CInputKeyboard::InitializeKeyboard(HWND hWnd)
 {
-	NANOBEGIN
-
 	if (ms_lpKeyboard)
 		return true;
 
@@ -82,7 +80,6 @@ bool CInputKeyboard::InitializeKeyboard(HWND hWnd)
 
 	ms_lpKeyboard->Acquire();
 
-	NANOEND
 	return true;
 }
 

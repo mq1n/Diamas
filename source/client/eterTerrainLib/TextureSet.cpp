@@ -24,7 +24,6 @@ void CTextureSet::Create()
 
 bool CTextureSet::Load(const char * c_szTextureSetFileName, float fTerrainTexCoordBase)
 {
-	NANOBEGIN
 	Clear();
 
 	CTokenVectorMap stTokenVectorMap;
@@ -91,7 +90,6 @@ bool CTextureSet::Load(const char * c_szTextureSetFileName, float fTerrainTexCoo
 	}
 
 	m_stFileName.assign(c_szTextureSetFileName);
-	NANOEND
 	return true;
 }
 

@@ -1119,7 +1119,6 @@ bool CPythonNetworkStream::SendMessengerRemovePacket(const char * c_szKey, const
 
 bool CPythonNetworkStream::SendCharacterStatePacket(const TPixelPosition& c_rkPPosDst, float fDstRot, UINT eFunc, UINT uArg)
 {
-	NANOBEGIN
 	if (!__CanActMainInstance())
 		return true;
 
@@ -1153,7 +1152,6 @@ bool CPythonNetworkStream::SendCharacterStatePacket(const TPixelPosition& c_rkPP
 			kStatePacket.bArg);
 		return false;
 	}
-	NANOEND
 	return SendSequence();
 }
 

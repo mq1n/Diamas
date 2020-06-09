@@ -19,7 +19,6 @@ int DrawCircle(int locx, int locy, int radius, int color);
 
 SpherePackFactory::SpherePackFactory(int maxspheres, float rootsize, float leafsize, float gravy)
 {
-	NANOBEGIN
 	maxspheres *= 4; // include room for both trees, the root node and leaf node tree, and the superspheres
 	mMaxRootSize      = rootsize;
 	mMaxLeafSize      = leafsize;
@@ -61,7 +60,6 @@ SpherePackFactory::SpherePackFactory(int maxspheres, float rootsize, float leafs
 	mColors[11] = 0x0080FFFF;
 	
 #endif
-	NANOEND
 }
 
 SpherePackFactory::~SpherePackFactory(void)

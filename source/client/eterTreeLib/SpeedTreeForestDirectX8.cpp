@@ -62,7 +62,6 @@ CSpeedTreeForestDirectX8::~CSpeedTreeForestDirectX8()
 //	CSpeedTreeForestDirectX8::InitVertexShaders
 bool CSpeedTreeForestDirectX8::InitVertexShaders(void)
 {
-	NANOBEGIN
 	// load the vertex shaders
 	if (!m_dwBranchVertexShader)
 		m_dwBranchVertexShader = LoadBranchShader(m_pDx);
@@ -76,7 +75,6 @@ bool CSpeedTreeForestDirectX8::InitVertexShaders(void)
 		return true;
 	}
 
-	NANOEND
 	return false;
 }
 

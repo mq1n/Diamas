@@ -124,7 +124,6 @@ void CFlyingData::DuplicateAttach(int iIndex)
 
 bool CFlyingData::LoadScriptFile(const char* c_szFilename)
 {
-	NANOBEGIN
 	Destroy();
 
 	m_strFilename = c_szFilename;
@@ -278,7 +277,6 @@ bool CFlyingData::LoadScriptFile(const char* c_szFilename)
 		}
 	}
 
-	NANOEND
 	return true;
 }
 

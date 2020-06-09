@@ -91,7 +91,6 @@ void __FreeDeformVertexBuffer(CGraphicVertexBuffer* pkDelVB)
 
 void __ReserveSharedVertexBuffers(unsigned index, unsigned count)
 {
-	NANOBEGIN
 	if (index >= SHARED_VB_NUM)
 		return;
 
@@ -107,7 +106,6 @@ void __ReserveSharedVertexBuffers(unsigned index, unsigned count)
 			D3DPOOL_MANAGED);	
 		gs_vbs[index].push_back(pkNewVB);
 	}
-	NANOEND
 }
 
 void GrannyCreateSharedDeformBuffer()

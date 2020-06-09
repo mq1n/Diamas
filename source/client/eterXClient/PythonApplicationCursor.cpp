@@ -4,7 +4,6 @@
 
 bool CPythonApplication::CreateCursors()
 {
-	NANOBEGIN
 	m_bCursorVisible = TRUE;
 	m_bLiarCursorOn = false;
 
@@ -41,7 +40,6 @@ bool CPythonApplication::CreateCursors()
 		m_CursorHandleMap.insert(TCursorHandleMap::value_type(i, hCursor));
 	}
 
-	NANOEND
 	return true;
 }
 

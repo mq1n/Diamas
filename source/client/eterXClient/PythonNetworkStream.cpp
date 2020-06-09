@@ -784,7 +784,6 @@ DWORD CPythonNetworkStream::GetEmpireID()
 
 void CPythonNetworkStream::__ClearSelectCharacterData()
 {
-	NANOBEGIN
 	memset(&m_akSimplePlayerInfo, 0, sizeof(m_akSimplePlayerInfo));
 
 	for (int i = 0; i < PLAYER_PER_ACCOUNT4; ++i)
@@ -792,7 +791,6 @@ void CPythonNetworkStream::__ClearSelectCharacterData()
 		m_adwGuildID[i] = 0;
 		m_astrGuildName[i] = "";
 	}
-	NANOEND
 }
 
 void CPythonNetworkStream::__DirectEnterMode_Initialize()
