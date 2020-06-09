@@ -54,7 +54,6 @@
 #include "pcbang.h"
 #include "MarkManager.h"
 #include "spam.h"
-#include "panama.h"
 #include "threeway_war.h"
 #include "DragonLair.h"
 #include "HackShield.h"
@@ -408,7 +407,6 @@ int main(int argc, char **argv)
 	Cube_init();
 	Blend_Item_init();
 	ani_init();
-	PanamaLoad();
 
 	if ( g_bTrafficProfileOn )
 		TrafficProfiler::instance().Initialize( TRAFFIC_PROFILE_FLUSH_CYCLE, "ProfileLog" );

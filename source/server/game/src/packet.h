@@ -271,8 +271,6 @@ enum
 
 	HEADER_GC_AUTH_SUCCESS			= 150,
 
-	HEADER_GC_PANAMA_PACK			= 151,
-
 	//HYBRID CRYPT
 	HEADER_GC_HYBRIDCRYPT_KEYS		= 152,
 	HEADER_GC_HYBRIDCRYPT_SDB		= 153, // SDB means Supplmentary Data Blocks
@@ -2200,13 +2198,6 @@ typedef struct SPacketGGCheckAwakeness
 {
 	BYTE bHeader;
 } TPacketGGCheckAwakeness;
-
-typedef struct SPacketGCPanamaPack
-{
-	BYTE	bHeader;
-	char	szPackName[256];
-	BYTE	abIV[32];
-} TPacketGCPanamaPack;
 
 //TODO :  아우 짱나..가변패킷 사이즈 받아들일수 있게 패킷 핸들러 Refactoring 하자. 
 typedef struct SPacketGCHybridCryptKeys
