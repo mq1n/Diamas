@@ -328,12 +328,6 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 	{
 		m_pkPC->SyncQuickslot(QUICKSLOT_TYPE_ITEM, item->GetCell(), 255);
 
-		if (item->GetVnum() == 90008 || item->GetVnum() == 90009) // VCARD
-		{
-			VCardUse(m_pkPC, ch, item);
-			item = NULL;
-		}
-		else
 		{
 			char buf[512];
 

@@ -248,7 +248,6 @@ protected:
 	void		BillingExpire(const char * c_pData);
 	void		BillingLogin(const char * c_pData);
 	void		BillingCheck(const char * c_pData);
-	void		VCard(const char * c_pData);
 
 	void		CreateObject(const char * c_pData);
 	void		DeleteObject(const char * c_pData);
