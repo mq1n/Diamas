@@ -27,7 +27,6 @@ namespace quest
 	extern void RegisterGlobalFunctionTable(lua_State* L);
 	extern void RegisterForkedFunctionTable();
 	extern void RegisterOXEventFunctionTable();
-	extern void RegisterBattleArenaFunctionTable();
 	extern void RegisterDanceEventFunctionTable();
 	extern void RegisterDragonLairFunctionTable();
 	extern void RegisterSpeedServerFunctionTable();

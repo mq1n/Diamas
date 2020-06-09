@@ -30,7 +30,6 @@
 #include "marriage.h"
 #include "polymorph.h"
 #include "blend_item.h"
-#include "BattleArena.h"
 #include "arena.h"
 #include "dev_log.h"
 #include "threeway_war.h"
@@ -137,8 +136,6 @@ bool IS_SUMMONABLE_ZONE(int map_index)
 		case 113 : // OX Event ¸Ê
 			return false;
 	}
-
-	if (CBattleArena::IsBattleArenaMap(map_index)) return false;
 
 	// ¸ğµç private ¸ÊÀ¸·Ğ ¿öÇÁ ºÒ°¡´É
 	if (map_index > 10000) return false;

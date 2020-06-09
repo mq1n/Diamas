@@ -27,7 +27,6 @@
 #include "arena.h"
 #include "start_position.h"
 #include "party.h"
-#include "BattleArena.h"
 #include "xmas_event.h"
 #include "log.h"
 #include "threeway_war.h"
@@ -3887,34 +3886,6 @@ ACMD(do_eclipse)
 	else
 	{
 		quest::CQuestManager::instance().RequestSetEventFlag("eclipse", 0);
-	}
-}
-
-ACMD(do_weeklyevent)
-{
-	char arg1[256];
-	int empire = 0;
-	
-	if (CBattleArena::instance().IsRunning() == false)
-	{
-		one_argument(argument, arg1, sizeof(arg1));
-
-		empire = strtol(arg1, NULL, 10);
-
-		if (empire == 1 || empire == 2 || empire == 3)
-		{
-			CBattleArena::instance().Start(empire);
-		}
-		else
-		{
-			CBattleArena::instance().Start(rand()%3 + 1);
-		}
-		ch->ChatPacket(CHAT_TYPE_INFO, "Weekly Event Start");
-	}
-	else
-	{
-		CBattleArena::instance().ForceEnd();
-		ch->ChatPacket(CHAT_TYPE_INFO, "Weekly Event End");
 	}
 }
 

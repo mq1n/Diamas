@@ -201,7 +201,6 @@ ACMD(do_reset_subskill );
 ACMD(do_flush);
 
 ACMD(do_eclipse);
-ACMD(do_weeklyevent);
 
 ACMD(do_event_helper);
 
@@ -491,8 +490,6 @@ struct command_info cmd_info[] =
 	{ "gift",				do_gift,				0,  POS_DEAD,   GM_PLAYER	},	//gift
 
 	{ "eclipse",			do_eclipse,				0,	POS_DEAD,	GM_HIGH_WIZARD	},
-
-	{ "weeklyevent",		do_weeklyevent,			0,	POS_DEAD,	GM_LOW_WIZARD	},
 
 	{ "eventhelper",		do_event_helper,		0,	POS_DEAD,	GM_HIGH_WIZARD	},
 

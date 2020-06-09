@@ -44,7 +44,6 @@
 #include "polymorph.h"
 #include "blend_item.h"
 #include "ani.h"
-#include "BattleArena.h"
 #include "over9refine.h"
 #include "horsename_manager.h"
 #include "MarkManager.h"
@@ -333,7 +332,6 @@ int main(int argc, char **argv)
 	CTableBySkill SkillPowerByLevel;
 	CPolymorphUtils polymorph_utils;
 	CProfiler		profiler;
-	CBattleArena	ba;
 	COver9RefineManager	o9r;
 	SpamManager		spam_mgr;
 	CThreeWayWar	threeway_war;

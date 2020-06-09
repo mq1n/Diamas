@@ -26,7 +26,6 @@
 #include "shop_manager.h"
 #include "dev_log.h"
 #include "ani.h"
-#include "BattleArena.h"
 #include "packet.h"
 #include "party.h"
 #include "affect.h"
@@ -299,11 +298,7 @@ void CHARACTER::DeathPenalty(BYTE bTown)
 #ifdef ENABLE_ACCE_SYSTEM
 	CloseAcce();
 #endif
-	if (CBattleArena::instance().IsBattleArenaMap(GetMapIndex()) == true)
-	{
-		return;
-	}
-	
+
 	if (GetLevel() < 10)
 	{
 		sys_log(0, "NO_DEATH_PENALTY_LESS_LV10(%s)", GetName());
@@ -831,7 +826,6 @@ void CHARACTER::Reward(bool bItemDrop)
 			item = s_vec_item[0];
 			item->AddToGround(GetMapIndex(), pos);
 
-			if (CBattleArena::instance().IsBattleArenaMap(pkAttacker->GetMapIndex()) == false)
 			{
 #ifdef ENABLE_DICE_SYSTEM
 				if (pkAttacker->GetParty())
@@ -939,7 +933,6 @@ void CHARACTER::Reward(bool bItemDrop)
 					if (it == v.end())
 						it = v.begin();
 
-					if (CBattleArena::instance().IsBattleArenaMap(ch->GetMapIndex()) == false)
 					{
 #ifdef ENABLE_DICE_SYSTEM
 						if (ch->GetParty())
@@ -999,11 +992,6 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 
 	if (GetLevel() < 50)
 		return;
-	
-	if (CBattleArena::instance().IsBattleArenaMap(GetMapIndex()) == true)
-	{
-		return;
-	}
 
 	struct TItemDropPenalty * table = &aItemDropPenalty_kor[0];
 
