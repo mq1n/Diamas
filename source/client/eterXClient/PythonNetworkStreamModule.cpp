@@ -2,8 +2,6 @@
 #include "PythonNetworkStream.h"
 #include "AccountConnector.h"
 #include "PythonGuild.h"
-#include "Test.h"
-
 #include "AbstractPlayer.h"
 
 static std::string gs_stServerInfo;
@@ -68,7 +66,7 @@ PyObject* netStartGame(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netIsTest(PyObject* poSelf, PyObject* poArgs)
 {
-	return Py_BuildValue("i", __IS_TEST_SERVER_MODE__);
+	return Py_BuildValue("i", 0);
 }
 
 PyObject* netWarp(PyObject* poSelf, PyObject* poArgs)
@@ -475,21 +473,6 @@ PyObject* netSendWhisperPacket(PyObject* poSelf, PyObject* poArgs)
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
 	rkNetStream.SendWhisperPacket(szName, szLine);
-	return Py_BuildNone();
-}
-
-PyObject* netSendMobileMessagePacket(PyObject* poSelf, PyObject* poArgs)
-{
-	char* szName;
-	char* szLine;
-	if (!PyTuple_GetString(poArgs, 0, &szName))
-		return Py_BuildException();
-
-	if (!PyTuple_GetString(poArgs, 1, &szLine))
-		return Py_BuildException();
-
-	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendMobileMessagePacket(szName, szLine);
 	return Py_BuildNone();
 }
 
@@ -1745,7 +1728,6 @@ void initnet()
 		{ "SendChatPacket",						netSendChatPacket,						METH_VARARGS },
 		{ "SendEmoticon",						netSendEmoticon,						METH_VARARGS },
 		{ "SendWhisperPacket",					netSendWhisperPacket,					METH_VARARGS },
-		{ "SendMobileMessagePacket",			netSendMobileMessagePacket,				METH_VARARGS },
 
 		{ "SendCharacterPositionPacket",		netSendCharacterPositionPacket,			METH_VARARGS },
 

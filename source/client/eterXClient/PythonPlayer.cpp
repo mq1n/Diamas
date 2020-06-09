@@ -1560,17 +1560,6 @@ DWORD CPythonPlayer::GetPKMode()
 	return pInstance->GetPKMode();
 }
 
-void CPythonPlayer::SetMobileFlag(BOOL bFlag)
-{
-	m_bMobileFlag = bFlag;
-	PyCallClassMemberFunc(m_ppyGameWindow, "RefreshMobile", Py_BuildValue("()"));
-}
-
-BOOL CPythonPlayer::HasMobilePhoneNumber()
-{
-	return m_bMobileFlag;
-}
-
 void CPythonPlayer::SetGameWindow(PyObject * ppyObject)
 {
 	m_ppyGameWindow = ppyObject;
@@ -1617,8 +1606,6 @@ void CPythonPlayer::ClearSkillDict()
 	m_isConsumingStamina = FALSE;
 	m_fConsumeStaminaPerSec = 0.0f;
 	m_fCurrentStamina = 0.0f;
-
-	m_bMobileFlag = FALSE;
 
 	__ClearAutoAttackTargetActorID();
 }
@@ -1690,8 +1677,6 @@ void CPythonPlayer::Clear()
 	m_fCurrentStamina = 0.0f;
 
 	m_inGuildAreaID = 0xffffffff;
-
-	m_bMobileFlag = FALSE;
 
 	__ClearAutoAttackTargetActorID();
 }

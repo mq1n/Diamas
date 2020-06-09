@@ -281,7 +281,6 @@ enum
 	HEADER_GG_MESSENGER_REMOVE                  = 11,
 	HEADER_GG_FIND_POSITION			= 12,
 	HEADER_GG_WARP_CHARACTER			= 13,
-	HEADER_GG_MESSENGER_MOBILE			= 14,
 	HEADER_GG_GUILD_WAR_ZONE_MAP_INDEX		= 15,
 	HEADER_GG_TRANSFER				= 16,
 	HEADER_GG_XMAS_WARP_SANTA			= 17,
@@ -420,24 +419,12 @@ typedef struct SPacketGGXmasWarpSantaReply
 	BYTE	bChannel;
 } TPacketGGXmasWarpSantaReply;
 
-typedef struct SMessengerData
-{
-	char        szMobile[MOBILE_MAX_LEN + 1];
-} TMessengerData;
-
 typedef struct SPacketGGMessenger
 {   
 	BYTE        bHeader;
 	char        szAccount[CHARACTER_NAME_MAX_LEN + 1];
 	char        szCompanion[CHARACTER_NAME_MAX_LEN + 1];
 } TPacketGGMessenger;
-
-typedef struct SPacketGGMessengerMobile
-{   
-	BYTE        bHeader;
-	char        szName[CHARACTER_NAME_MAX_LEN + 1];
-	char        szMobile[MOBILE_MAX_LEN + 1];
-} TPacketGGMessengerMobile;
 
 typedef struct SPacketGGFindPosition
 {
@@ -1426,7 +1413,6 @@ enum
 	MESSENGER_SUBHEADER_GC_LOGIN,
 	MESSENGER_SUBHEADER_GC_LOGOUT,
 	MESSENGER_SUBHEADER_GC_INVITE,
-	MESSENGER_SUBHEADER_GC_MOBILE
 };
 
 typedef struct packet_messenger

@@ -399,20 +399,6 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 		IAbstractPlayer& rPlayer=IAbstractPlayer::GetSingleton();
 		rPlayer.StopStaminaConsume(dwCurrentStamina);
 	}
-	else if (!strcmpi(szCmd, "sms"))
-	{
-		IAbstractPlayer& rPlayer=IAbstractPlayer::GetSingleton();
-		rPlayer.SetMobileFlag(TRUE);
-	}
-	else if (!strcmpi(szCmd, "nosms"))
-	{
-		IAbstractPlayer& rPlayer=IAbstractPlayer::GetSingleton();
-		rPlayer.SetMobileFlag(FALSE);
-	}
-	else if (!strcmpi(szCmd, "mobile_auth"))
-	{
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnMobileAuthority", Py_BuildValue("()"));
-	}
 	else if (!strcmpi(szCmd, "messenger_auth"))
 	{
 		const std::string & c_rstrName = TokenVector[1].c_str();

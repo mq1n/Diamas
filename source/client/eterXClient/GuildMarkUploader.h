@@ -1,34 +1,6 @@
 #pragma once
-
 #include "../eterLib/NetStream.h"
 #include "MarkImage.h"
-
-#ifdef __VTUNE__
-
-class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUploader>
-{
-	public:
-		enum
-		{
-			ERROR_NONE,
-			ERROR_CONNECT,
-			ERROR_LOAD,
-			ERROR_WIDTH,
-			ERROR_HEIGHT,
-		};
-
-	public:
-		CGuildMarkUploader() {}
-		virtual ~CGuildMarkUploader() {}
-
-		void Disconnect() {}
-		bool Connect(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey, DWORD dwGuildID, const char* c_szFileName, UINT* peError) {return false;}
-		bool ConnectToSendSymbol(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey, DWORD dwGuildID, const char* c_szFileName, UINT* peError) {return false;}
-		void Process() {}
-};
-
-#else
-
 #include <il/il.h>
 
 class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUploader>
@@ -114,5 +86,3 @@ class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUp
 		DWORD m_dwSymbolCRC32;
 		BYTE * m_pbySymbolBuf;
 };
-
-#endif

@@ -51,7 +51,6 @@ class IAbstractPlayer : public TAbstractSingleton<IAbstractPlayer>
 		virtual void	NotifyChangePKMode() = 0;
 				
 		virtual void	SetObserverMode(bool isEnable) = 0;
-		virtual void	SetMobileFlag(BOOL bFlag) = 0;
 		virtual void	SetComboSkillFlag(BOOL bFlag) = 0;
 
 		virtual void	StartEmotionProcess() = 0;

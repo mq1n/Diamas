@@ -336,16 +336,4 @@ void CCamera::Update()
 	float fNewTargetHeight = CAMERA_TARGET_STANDARD + CAMERA_TARGET_DELTA * fCameraCurMovableDistance / CAMERA_MOVABLE_DISTANCE;
 
 	SetTargetHeight(fNewTargetHeight);
-
-	// Cinematic
-#ifdef __20040725_CAMERA_WORK__
-	m_MovementPosition += m_MovementSpeed;
-	
-	if (0.0f != m_MovementPosition.m_fViewDir)
-		MoveFront(m_MovementPosition.m_fViewDir);
-	if (0.0f != m_MovementPosition.m_fCrossDir)
-		MoveAlongCross(m_MovementPosition.m_fCrossDir);
-	if (0.0f != m_MovementPosition.m_fUpDir)
-		MoveVertical(m_MovementPosition.m_fUpDir);
-#endif
 }

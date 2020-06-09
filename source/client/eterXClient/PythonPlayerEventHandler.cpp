@@ -106,15 +106,6 @@ void CPythonPlayerEventHandler::OnAttack(const SState& c_rkState, WORD wMotionIn
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
 	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_COMBO, wMotionIndex);
-
-#ifdef __ATTACK_SPEED_CHECK__
-	static DWORD s_dwLastTime=timeGetTime();
-
-	DWORD dwCurTime=timeGetTime();
-	Tracef("%d\n", dwCurTime-s_dwLastTime);
-	s_dwLastTime=dwCurTime;
-#endif
-
 }
 
 void CPythonPlayerEventHandler::OnUseSkill(const SState& c_rkState, UINT uMotSkill, UINT uArg)

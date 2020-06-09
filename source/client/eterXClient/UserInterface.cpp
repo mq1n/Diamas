@@ -29,7 +29,6 @@ volatile int _AVOID_FLOATING_POINT_LIBRARY_BUG = _fltused;
 };  
 
 #include <stdlib.h>
-bool __IS_TEST_SERVER_MODE__=false;
 
 extern bool SetDefaultCodePage(DWORD codePage);
 
@@ -282,9 +281,9 @@ bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 		system("patchupdater.exe");
 		return false;
 	}
-#ifndef __VTUNE__
+
 	ilInit();
-#endif
+
 	if (!Setup(lpCmdLine))
 		return false;
 
@@ -382,19 +381,7 @@ bool __IsTimeStampOption(LPSTR lpCmdLine)
 }
 
 void __PrintTimeStamp()
-{
-#ifdef	_DEBUG
-	if (__IS_TEST_SERVER_MODE__)
-		LogBoxf("METIN2 BINARY TEST DEBUG VERSION %s  ( MS C++ %d Compiled )", __TIMESTAMP__, _MSC_VER);
-	else
-		LogBoxf("METIN2 BINARY DEBUG VERSION %s ( MS C++ %d Compiled )", __TIMESTAMP__, _MSC_VER);
-	
-#else
-	if (__IS_TEST_SERVER_MODE__)
-		LogBoxf("METIN2 BINARY TEST VERSION %s  ( MS C++ %d Compiled )", __TIMESTAMP__, _MSC_VER);
-	else
-		LogBoxf("METIN2 BINARY DISTRIBUTE VERSION %s ( MS C++ %d Compiled )", __TIMESTAMP__, _MSC_VER);			
-#endif			
+{	
 }
 
 bool __IsLocaleOption(LPSTR lpCmdLine)

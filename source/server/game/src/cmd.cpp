@@ -116,8 +116,6 @@ ACMD(do_cancel_guild_war);
 ACMD(do_guild_state);
 
 ACMD(do_pkmode);
-ACMD(do_mobile);
-ACMD(do_mobile_auth);
 ACMD(do_messenger_auth);
 
 ACMD(do_getqf);

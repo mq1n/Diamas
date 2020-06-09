@@ -2,7 +2,6 @@
 #include "GuildMarkDownloader.h"
 #include "PythonCharacterManager.h"
 #include "Packet.h"
-#include "Test.h"
 
 // MARK_BUG_FIX
 struct SMarkIndex

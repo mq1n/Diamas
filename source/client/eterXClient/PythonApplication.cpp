@@ -564,9 +564,6 @@ bool CPythonApplication::Process()
 	if (m_isFrameSkipDisable)
 		s_bFrameSkip = false;
 
-#ifdef __VTUNE__
-	s_bFrameSkip = false;
-#endif
 	/*
 	static bool s_isPrevFrameSkip=false;
 	static DWORD s_dwFrameSkipCount=0;

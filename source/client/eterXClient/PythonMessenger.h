@@ -22,7 +22,6 @@ class CPythonMessenger : public CSingleton<CPythonMessenger>
 		void RemoveFriend(const char * c_szKey);
 		void OnFriendLogin(const char * c_szKey);
 		void OnFriendLogout(const char * c_szKey);
-		void SetMobile(const char * c_szKey, BYTE byState);
 		BOOL IsFriendByKey(const char * c_szKey);
 		BOOL IsFriendByName(const char * c_szName);
 
