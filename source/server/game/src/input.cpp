@@ -442,7 +442,6 @@ dev_log(LOG_DEB0, "DC : '%s'", msg.c_str());
 					{
 						LoadStateUserCount();
 						db_clientdesc->DBPacket(HEADER_GD_RELOAD_PROTO, 0, NULL, 0);
-						DBManager::instance().LoadDBString();
 					}
 					else
 					{
@@ -456,10 +455,6 @@ dev_log(LOG_DEB0, "DC : '%s'", msg.c_str());
 
 							case 'p':
 								db_clientdesc->DBPacket(HEADER_GD_RELOAD_PROTO, 0, NULL, 0);
-								break;
-
-							case 's':
-								DBManager::instance().LoadDBString();
 								break;
 
 							case 'q':

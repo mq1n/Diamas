@@ -789,7 +789,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		void			ChatPacket(BYTE type, const char *format, ...);
 		void			MonsterChat(BYTE bMonsterChatType);
-		void			SendGreetMessage();
 
 		void			ResetPoint(int iLv);
 
