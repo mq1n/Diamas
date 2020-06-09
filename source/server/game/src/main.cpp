@@ -426,20 +426,6 @@ int main(int argc, char **argv)
 		}
 	}
 
-	// Client PackageCrypt
-
-	//TODO : make it config
-	const std::string strPackageCryptInfoDir = "package/";
-	if( !desc_manager.LoadClientPackageCryptInfo( strPackageCryptInfoDir.c_str() ) )
-	{
-		sys_err("Failed to Load ClientPackageCryptInfo File(%s)", strPackageCryptInfoDir.c_str());	
-	}
-
-#if defined (__FreeBSD__) && defined(__FILEMONITOR__)
-	PFN_FileChangeListener pPackageNotifyFunc =  &(DESC_MANAGER::NotifyClientPackageFileChanged);
-	//FileMonitorFreeBSD::Instance().AddWatch( strPackageCryptInfoName, pPackageNotifyFunc );
-#endif
-
 	while (idle());
 
 	sys_log(0, "<shutdown> Starting...");
