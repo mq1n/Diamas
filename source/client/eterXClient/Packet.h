@@ -146,7 +146,6 @@ enum
 	HEADER_CG_GUILD_SYMBOL_CRC					= 113,
 	HEADER_CG_SCRIPT_SELECT_ITEM				= 114,
 	HEADER_CG_LOGIN4							= 115,
-	HEADER_CG_LOGIN5_OPENID						= 116,	//OpenID : 실행시 받은 인증키를 서버에 보냄.
 
 	HEADER_CG_RUNUP_MATRIX_ANSWER               = 201,
 	HEADER_CG_NEWCIBN_PASSPOD_ANSWER			= 202,
@@ -323,7 +322,6 @@ enum
 	// END_OF_SUPPORT_BGM
 
     HEADER_GC_AUTH_SUCCESS                      = 150,
-	HEADER_GC_AUTH_SUCCESS_OPENID				= 154,
 
 	HEADER_GC_RUNUP_MATRIX_QUIZ                 = 201,
 	HEADER_GC_NEWCIBN_PASSPOD_REQUEST			= 202,
@@ -420,8 +418,6 @@ enum
 	NEWCIBN_PASSPOD_FAILURE_MAX_LEN = 128,
 
 	WEAR_MAX_NUM = CItemData::WEAR_MAX_NUM,
-
-	OPENID_AUTHKEY_LEN = 32,
 
 	SHOP_TAB_NAME_MAX = 32,
 	SHOP_TAB_COUNT_MAX = 3,
@@ -557,13 +553,6 @@ typedef struct command_login3
     char	pwd[PASS_MAX_NUM + 1];
     DWORD	adwClientKey[4];
 } TPacketCGLogin3;
-
-typedef struct command_login5
-{
-    BYTE	header;
-    char	authKey[OPENID_AUTHKEY_LEN + 1];
-    DWORD	adwClientKey[4];
-} TPacketCGLogin5;
 // end - 권한 서버 접속을 위한 패킷들
 
 typedef struct command_direct_enter
@@ -2496,14 +2485,6 @@ typedef struct packet_auth_success
     DWORD       dwLoginKey;
     BYTE        bResult;
 } TPacketGCAuthSuccess;
-
-typedef struct packet_auth_success_openid
-{
-    BYTE        bHeader;
-    DWORD       dwLoginKey;
-    BYTE        bResult;
-	char		login[ID_MAX_NUM + 1];
-} TPacketGCAuthSuccessOpenID;
 
 typedef struct packet_channel
 {

@@ -163,11 +163,6 @@ bool gHackCheckEnable = false;
 bool g_BlockCharCreation = false;
 
 
-//OPENID
-int		openid_server = 0;
-char	openid_host[256];
-char	openid_uri[256];
-
 bool is_string_true(const char * string)
 {
 	bool	result = 0;
@@ -801,23 +796,6 @@ static bool __LoadGeneralConfigFile(const char* configName)
 	while (fgets(buf, 256, fp))
 	{
 		parse_token(buf, token_string, value_string);
-
-		//OPENID
-		TOKEN("WEB_AUTH")
-		{
-			two_arguments(value_string, openid_host, sizeof(openid_host), openid_uri, sizeof(openid_uri));
-
-			if (!*openid_host || !*openid_uri)
-			{
-				fprintf(stderr, "WEB_AUTH syntax error (ex: WEB_AUTH <host(metin2.co.kr) uri(/kyw/gameauth.php)>\n");
-				exit(1);
-			}
-
-			char buf[1024];
-			openid_server = 1;
-			snprintf(buf, sizeof(buf), "WEB_AUTH: %s %s", openid_host, openid_uri);
-			continue;
-		}
 
 		// DB_ONLY_BEGIN
 		TOKEN("BLOCK_LOGIN")

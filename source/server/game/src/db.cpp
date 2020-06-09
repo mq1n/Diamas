@@ -818,12 +818,6 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 					int nPasswordDiff = strcmp(szEncrytPassword, szPassword);
 
-					
-					if (openid_server)
-					{
-						nPasswordDiff = 0; // 브라질 버전에서는 비밀번호 체크를 하지 않는다.
-					}
-
 					if (nPasswordDiff)
 					{
 						LoginFailure(d, "WRONGPWD");

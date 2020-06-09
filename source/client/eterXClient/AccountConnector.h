@@ -52,9 +52,6 @@ class CAccountConnector : public CNetworkStream, public CSingleton<CAccountConne
 		bool __AuthState_RecvPing();
 		bool __AuthState_SendPong();
 		bool __AuthState_RecvAuthSuccess();
-#ifdef USE_OPENID
-		bool __AuthState_RecvAuthSuccess_OpenID();
-#endif /* USE_OPENID */
 		bool __AuthState_RecvAuthFailure();
 		bool __AuthState_RecvChinaMatrixCard();
 		bool __AuthState_RecvRunupMatrixQuiz();

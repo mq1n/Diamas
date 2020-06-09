@@ -159,7 +159,6 @@ extern bool g_BlockCharCreation;
 
 // missing begin
 extern int speed_server;
-extern int openid_server;
 extern bool	g_bNoPasspod;
 extern std::string g_stBlockDate;
 
