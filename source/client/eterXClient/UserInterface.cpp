@@ -20,8 +20,6 @@
 
 #include "CheckLatestFiles.h"
 
-#include "NProtectGameGuard.h"
-
 // d3dx8.lib(cleanmesh.obj) : error LNK2019: unresolved external symbol __vsnprintf referenced in function "void __cdecl OutputError
 int(WINAPIV* __vsnprintf)(char*, size_t, const char*, va_list) = _vsnprintf;
 
@@ -421,11 +419,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	LocaleService_LoadConfig("locale.cfg");
 	SetDefaultCodePage(LocaleService_GetCodePage());	
 
-#ifdef USE_NPROTECT_GAMEGUARD
-	if (!GameGuard_Init())
-		return 0;
-#endif
-
 #if defined(CHECK_LATEST_DATA_FILES)
 	if (!CheckLatestFiles())
 		return 0;
@@ -517,10 +510,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 
 	Main(hInstance, lpCmdLine);
-
-#ifdef USE_NPROTECT_GAMEGUARD
-	GameGuard_NoticeMessage();
-#endif
 
 	WebBrowser_Cleanup();
 
