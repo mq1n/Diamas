@@ -30,7 +30,6 @@
 #include "marriage.h"
 #include "polymorph.h"
 #include "blend_item.h"
-#include "castle.h"
 #include "BattleArena.h"
 #include "arena.h"
 #include "dev_log.h"
@@ -112,11 +111,7 @@ static bool IS_MONKEY_DUNGEON(int map_index)
 
 bool IS_SUMMONABLE_ZONE(int map_index)
 {
-	// 몽키던전
 	if (IS_MONKEY_DUNGEON(map_index))
-		return false;
-	// 성
-	if (IS_CASTLE_MAP(map_index))
 		return false;
 
 	switch (map_index)

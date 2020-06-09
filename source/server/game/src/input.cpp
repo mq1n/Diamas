@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include <sstream>
-
 #include "desc.h"
 #include "desc_manager.h"
 #include "char.h"
@@ -14,7 +13,6 @@
 #include "fishing.h"
 #include "TrafficProfiler.h"
 #include "priv_manager.h"
-#include "castle.h"
 #include "dev_log.h"
 #include "../../common/CommonDefines.h"
 #include "utils.h"

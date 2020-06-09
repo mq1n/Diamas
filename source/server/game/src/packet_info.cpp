@@ -259,12 +259,7 @@ CPacketInfoGG::CPacketInfoGG()
 	Set(HEADER_GG_XMAS_WARP_SANTA_REPLY, sizeof(TPacketGGXmasWarpSantaReply), "XmasWarpSantaReply", false);
 	Set(HEADER_GG_RELOAD_CRC_LIST,	sizeof(BYTE),			"ReloadCRCList", false);
 	Set(HEADER_GG_LOGIN_PING,		sizeof(TPacketGGLoginPing),	"LoginPing", false);
-
-	// BLOCK_CHAT
 	Set(HEADER_GG_BLOCK_CHAT,		sizeof(TPacketGGBlockChat),	"BlockChat", false);
-	// END_OF_BLOCK_CHAT
-	Set(HEADER_GG_SIEGE,	sizeof(TPacketGGSiege),	"Siege", false);
-
 	Set(HEADER_GG_CHECK_AWAKENESS,		sizeof(TPacketGGCheckAwakeness),	"CheckAwakeness",		false);
 }
 

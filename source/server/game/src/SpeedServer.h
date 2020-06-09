@@ -4,7 +4,6 @@
 #include "../../common/length.h"
 #include <list>
 
-// castle.cpp 에 있는 것을 복붙 하였다
 #define EMPIRE_NONE		0	// 아무국가 아님
 #define EMPIRE_RED		1	// 신수
 #define EMPIRE_YELLOW	2	// 천조

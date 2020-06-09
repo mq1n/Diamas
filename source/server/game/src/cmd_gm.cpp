@@ -27,7 +27,6 @@
 #include "arena.h"
 #include "start_position.h"
 #include "party.h"
-#include "castle.h"
 #include "BattleArena.h"
 #include "xmas_event.h"
 #include "log.h"
@@ -3857,73 +3856,6 @@ ACMD(do_reset_subskill)
 
 	tch->ClearSubSkill();
 	ch->ChatPacket(CHAT_TYPE_INFO, "Subskill of [%s] was reset", tch->GetName());
-}
-
-ACMD(do_siege)
-{
-	char arg1[256], arg2[256];
-	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
-
-	int	empire = strtol(arg1, NULL, 10);
-	int tower_count = strtol(arg2, NULL, 10);
-
-	if (empire == 0) empire = number(1, 3);
-	if (tower_count < 5 || tower_count > 10) tower_count = number(5, 10);
-
-	TPacketGGSiege packet;
-	packet.bHeader = HEADER_GG_SIEGE;
-	packet.bEmpire = empire;
-	packet.bTowerCount = tower_count;
-
-	P2P_MANAGER::instance().Send(&packet, sizeof(TPacketGGSiege));
-
-	switch (castle_siege(empire, tower_count))
-	{
-		case 0 :
-			ch->ChatPacket(CHAT_TYPE_INFO, "SIEGE FAILED");
-			break;
-		case 1 :
-			ch->ChatPacket(CHAT_TYPE_INFO, "SIEGE START Empire(%d) Tower(%d)", empire, tower_count);
-			break;
-		case 2 :
-			ch->ChatPacket(CHAT_TYPE_INFO, "SIEGE END");
-			break;
-	}
-}
-
-ACMD(do_frog)
-{
-	char	arg1[256];
-	one_argument(argument, arg1, sizeof(arg1));
-
-	if (0 == arg1[0])
-	{
-		ch->ChatPacket(CHAT_TYPE_INFO, "Usage: empire(1, 2, 3)");
-		return;
-	}
-
-	int	empire = 0;
-	str_to_number(empire, arg1);
-
-	switch (empire)
-	{
-		case 1:
-		case 2:
-		case 3:
-			if (IS_CASTLE_MAP(ch->GetMapIndex()))
-			{
-				castle_spawn_frog(empire);
-				castle_save();
-			}
-			else
-				ch->ChatPacket(CHAT_TYPE_INFO, "You must spawn frog in castle");
-			break;
-
-		default:
-			ch->ChatPacket(CHAT_TYPE_INFO, "Usage: empire(1, 2, 3)");
-			break;
-	}
-
 }
 
 ACMD(do_flush)

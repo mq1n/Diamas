@@ -196,9 +196,6 @@ ACMD(do_gift);
 ACMD(do_inventory);
 ACMD(do_cube);
 // °ø¼ºÀü
-ACMD(do_siege);
-ACMD(do_temp);
-ACMD(do_frog);
 
 ACMD(do_reset_subskill );
 ACMD(do_flush);
@@ -489,8 +486,6 @@ struct command_info cmd_info[] =
 	{ "hair",				do_hair,				0,	POS_DEAD,	GM_PLAYER	},
 	{ "inventory",			do_inventory,			0,	POS_DEAD,	GM_LOW_WIZARD	},
 	{ "cube",				do_cube,				0,	POS_DEAD,	GM_PLAYER	},
-	{ "siege",				do_siege,				0,	POS_DEAD,	GM_LOW_WIZARD	},
-	{ "frog",				do_frog,				0,	POS_DEAD,	GM_HIGH_WIZARD	},
 	{ "reset_subskill",		do_reset_subskill,		0,	POS_DEAD,	GM_HIGH_WIZARD },
 	{ "flush",				do_flush,				0,	POS_DEAD,	GM_IMPLEMENTOR },
 	{ "gift",				do_gift,				0,  POS_DEAD,   GM_PLAYER	},	//gift

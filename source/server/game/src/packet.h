@@ -288,9 +288,6 @@ enum
 	HEADER_GG_RELOAD_CRC_LIST			= 19,
 	HEADER_GG_LOGIN_PING			= 20,
 	HEADER_GG_BLOCK_CHAT			= 22,
-
-	HEADER_GG_SIEGE					= 25,
-
 	HEADER_GG_CHECK_AWAKENESS		= 29,
 #ifdef ENABLE_FULL_NOTICE
 	HEADER_GG_BIG_NOTICE			= 30,
@@ -2054,13 +2051,6 @@ typedef struct packet_damage_info
 	BYTE flag;
 	int damage;
 } TPacketGCDamageInfo;
-
-typedef struct tag_GGSiege
-{
-	BYTE	bHeader;
-	BYTE	bEmpire;
-	BYTE	bTowerCount;
-} TPacketGGSiege;
 
 typedef struct SPacketGGCheckAwakeness
 {

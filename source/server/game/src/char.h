@@ -1891,9 +1891,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void SetCubeNpc(LPCHARACTER npc)	{ m_pointsInstant.pCubeNpc = npc; }
 		bool CanDoCube() const;
 
-	public:
-		bool IsSiegeNPC() const;
-
 	private:
 		//중국 전용
 		//18세 미만 전용

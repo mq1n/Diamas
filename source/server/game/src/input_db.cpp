@@ -27,15 +27,10 @@
 #include "wedding.h"
 #include "login_data.h"
 #include "unique_item.h"
-
 #include "affect.h"
-#include "castle.h"
 #include "motion.h"
-
 #include "dev_log.h"
-
 #include "log.h"
-
 #include "horsename_manager.h"
 #include "gm.h"
 #include "map_location.h"
@@ -940,9 +935,6 @@ void CInputDB::Boot(const char* data)
 	{
 		CMobManager::instance().DumpRegenCount("mob_count");
 	}
-
-	// castle_boot
-	castle_boot();
 }
 
 EVENTINFO(quest_login_event_info)

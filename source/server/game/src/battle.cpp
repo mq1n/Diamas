@@ -17,7 +17,6 @@
 #include "unique_item.h"
 #include "lua_incl.h"
 #include "arena.h"
-#include "castle.h"
 #include "sectree.h"
 #include "ani.h"
 #include "locale_service.h"
@@ -128,9 +127,6 @@ bool battle_is_attackable(LPCHARACTER ch, LPCHARACTER victim)
 				return true;
 		}
 	}
-
-	if (IS_CASTLE_MAP(ch->GetMapIndex()) && false==castle_can_attack(ch, victim))
-			return false;
 
 	if (CArenaManager::instance().CanAttack(ch, victim) == true)
 		return true;
