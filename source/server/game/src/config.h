@@ -143,7 +143,6 @@ extern bool gHackCheckEnable;
 extern bool g_BlockCharCreation;
 
 // missing begin
-extern int speed_server;
 extern std::string g_stBlockDate;
 
 extern int g_iSpamBlockMaxLevel;
