@@ -65,10 +65,6 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 
 		template<class Func>	Func for_each_pc(Func f);
 
-		void			RegisterForMonsterLog(LPCHARACTER ch);
-		void			UnregisterForMonsterLog(LPCHARACTER ch);
-		void			PacketMonsterLog(LPCHARACTER ch, const void* buf, int size);
-
 		void			KillLog(DWORD dwVnum);
 
 		void			RegisterRaceNum(DWORD dwVnum);
@@ -126,7 +122,6 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 		char				dummy1[1024];	// memory barrier
 		CHARACTER_SET		m_set_pkChrState;	// FSM이 돌아가고 있는 놈들
 		CHARACTER_SET		m_set_pkChrForDelayedSave;
-		CHARACTER_SET		m_set_pkChrMonsterLog;
 
 		LPCHARACTER			m_pkChrSelectedStone;
 

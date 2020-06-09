@@ -171,9 +171,6 @@ DWORD CPetActor::Summon(const char* petName, LPITEM pSummonItem, bool bSpawnFar)
 
 	m_pkChar->SetPet();
 
-//	m_pkOwner->DetailLog();
-//	m_pkChar->DetailLog();
-
 	//펫의 국가를 주인의 국가로 설정함.
 	m_pkChar->SetEmpire(m_pkOwner->GetEmpire());
 

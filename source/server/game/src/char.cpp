@@ -290,9 +290,6 @@ void CHARACTER::Initialize()
 	m_bNowWalking = m_bWalking = false;
 	ResetChangeAttackPositionTime();
 
-	m_bDetailLog = false;
-	m_bMonsterLog = false;
-
 	m_bDisableCooltime = false;
 
 	m_iAlignment = 0;
@@ -602,9 +599,6 @@ void CHARACTER::Destroy()
 
 	if (GetSectree())
 		GetSectree()->RemoveEntity(this);
-
-	if (m_bMonsterLog)
-		CHARACTER_MANAGER::instance().UnregisterForMonsterLog(this);
 }
 
 const char * CHARACTER::GetName() const
@@ -1168,16 +1162,10 @@ void CHARACTER::SetPosition(int pos)
 		switch (pos)
 		{
 			case POS_FIGHTING:
-				if (!IsState(m_stateBattle))
-					MonsterLog("[BATTLE] 싸우는 상태");
-
 				GotoState(m_stateBattle);
 				break;
 
 			default:
-				if (!IsState(m_stateIdle))
-					MonsterLog("[IDLE] 쉬는 상태");
-
 				GotoState(m_stateIdle);
 				break;
 		}
@@ -2491,7 +2479,6 @@ EVENTFUNC(recovery_event)
 		}
 		else if (!ch->IsDoor())
 		{
-			ch->MonsterLog("HP_REGEN +%d", MAX(1, (ch->GetMaxHP() * ch->GetMobTable().bRegenPercent) / 100));
 			ch->PointChange(POINT_HP, MAX(1, (ch->GetMaxHP() * ch->GetMobTable().bRegenPercent) / 100));
 		}
 
@@ -2717,9 +2704,6 @@ bool CHARACTER::Sync(long x, long y)
 
 void CHARACTER::Stop()
 {
-	if (!IsState(m_stateIdle))
-		MonsterLog("[IDLE] 정지");
-
 	GotoState(m_stateIdle);
 
 	m_posDest.x = m_posStart.x = GetX();
@@ -2753,8 +2737,6 @@ bool CHARACTER::Goto(long x, long y)
 	
 	if (!IsState(m_stateMove))
 	{
-		MonsterLog("[MOVE] %s", GetVictim() ? "대상추적" : "그냥이동");
-
 		if (GetVictim())
 		{
 			//MonsterChat(MONSTER_CHAT_CHASE);
@@ -2874,10 +2856,6 @@ bool CHARACTER::Move(long x, long y)
 	// 같은 위치면 이동할 필요 없음 (자동 성공)
 	if (GetX() == x && GetY() == y)
 		return true;
-
-	if (test_server)
-		if (m_bDetailLog)
-			sys_log(0, "%s position %u %u", GetName(), x, y);
 
 	OnMove();
 	return Sync(x, y);
@@ -3934,51 +3912,6 @@ void CHARACTER::StartSaveEvent()
 	m_pkSaveEvent = event_create(save_event, info, save_event_second_cycle);
 }
 
-void CHARACTER::MonsterLog(const char* format, ...)
-{
-	if (!test_server)
-		return;
-
-	if (IsPC())
-		return;
-
-	char chatbuf[CHAT_MAX_LEN + 1];
-	int len = snprintf(chatbuf, sizeof(chatbuf), "%u)", (DWORD)GetVID());
-
-	if (len < 0 || len >= (int) sizeof(chatbuf))
-		len = sizeof(chatbuf) - 1;
-
-	va_list args;
-
-	va_start(args, format);
-
-	int len2 = vsnprintf(chatbuf + len, sizeof(chatbuf) - len, format, args);
-
-	if (len2 < 0 || len2 >= (int) sizeof(chatbuf) - len)
-		len += (sizeof(chatbuf) - len) - 1;
-	else
-		len += len2;
-
-	// \0 문자 포함
-	++len;
-
-	va_end(args);
-
-	TPacketGCChat pack_chat;
-
-	pack_chat.header    = HEADER_GC_CHAT;
-	pack_chat.size		= sizeof(TPacketGCChat) + len;
-	pack_chat.type      = CHAT_TYPE_TALKING;
-	pack_chat.id        = (DWORD)GetVID();
-	pack_chat.bEmpire	= 0;
-
-	TEMP_BUFFER buf;
-	buf.write(&pack_chat, sizeof(TPacketGCChat));
-	buf.write(chatbuf, len);
-
-	CHARACTER_MANAGER::instance().PacketMonsterLog(this, buf.read_peek(), buf.size());
-}
-
 void CHARACTER::ChatPacket(BYTE type, const char * format, ...)
 {
 	LPDESC d = GetDesc();
@@ -4168,9 +4101,6 @@ void CHARACTER::SetNextStatePulse(int iNextPulse)
 {
 	CHARACTER_MANAGER::instance().AddToStateList(this);
 	m_dwNextStatePulse = iNextPulse;
-
-	if (iNextPulse < 10)
-		MonsterLog("다음상태로어서가자");
 }
 
 
@@ -5890,14 +5820,6 @@ void CHARACTER::SetNowWalking(bool bWalkFlag)
 			PacketView(&p, sizeof(p));
 		}
 
-		if (IsNPC())
-		{
-			if (m_bNowWalking)
-				MonsterLog("걷는다");
-			else
-				MonsterLog("뛴다");
-		}
-
 		//sys_log(0, "%s is now %s", GetName(), m_bNowWalking?"walking.":"running.");
 	}
 }
@@ -6014,20 +5936,6 @@ void CHARACTER::ReviveInvisible(int iDur)
 	AddAffect(AFFECT_REVIVE_INVISIBLE, POINT_NONE, 0, AFF_REVIVE_INVISIBLE, iDur, 0, true);
 }
 
-void CHARACTER::ToggleMonsterLog()
-{
-	m_bMonsterLog = !m_bMonsterLog;
-
-	if (m_bMonsterLog)
-	{
-		CHARACTER_MANAGER::instance().RegisterForMonsterLog(this);
-	}
-	else
-	{
-		CHARACTER_MANAGER::instance().UnregisterForMonsterLog(this);
-	}
-}
-
 void CHARACTER::SetGuild(CGuild* pGuild)
 {
 	if (m_pGuild != pGuild)
@@ -6039,7 +5947,6 @@ void CHARACTER::SetGuild(CGuild* pGuild)
 
 void CHARACTER::BeginStateEmpty()
 {
-	MonsterLog("!");
 }
 
 void CHARACTER::EffectPacket(int enumEffectType)

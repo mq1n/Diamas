@@ -1643,15 +1643,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		BYTE				m_bSendHorseHealthGrade;
 		BYTE				m_bSendHorseStaminaGrade;
 
-		////////////////////////////////////////////////////////////////////////////////////////
-		// Detailed Log
-	public:
-		void				DetailLog() { m_bDetailLog = !m_bDetailLog; }
-		void				ToggleMonsterLog();
-		void				MonsterLog(const char* format, ...);
-	private:
-		bool				m_bDetailLog;
-		bool				m_bMonsterLog;
 
 		////////////////////////////////////////////////////////////////////////////////////////
 		// Empire

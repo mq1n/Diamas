@@ -752,32 +752,6 @@ bool CHARACTER_MANAGER::FlushDelayedSave(LPCHARACTER ch)
 	return true;
 }
 
-void CHARACTER_MANAGER::RegisterForMonsterLog(LPCHARACTER ch)
-{
-	m_set_pkChrMonsterLog.insert(ch);
-}
-
-void CHARACTER_MANAGER::UnregisterForMonsterLog(LPCHARACTER ch)
-{
-	m_set_pkChrMonsterLog.erase(ch);
-}
-
-void CHARACTER_MANAGER::PacketMonsterLog(LPCHARACTER ch, const void* buf, int size)
-{
-	for (auto it = m_set_pkChrMonsterLog.begin(); it!=m_set_pkChrMonsterLog.end();++it)
-	{
-		LPCHARACTER c = *it;
-
-		if (ch && DISTANCE_APPROX(c->GetX()-ch->GetX(), c->GetY()-ch->GetY())>6000)
-			continue;
-
-		LPDESC d = c->GetDesc();
-
-		if (d)
-			d->Packet(buf, size);
-	}
-}
-
 void CHARACTER_MANAGER::KillLog(DWORD dwVnum)
 {
 	const DWORD SEND_LIMIT = 10000;

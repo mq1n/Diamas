@@ -2241,11 +2241,6 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 					IsPenetrate ? "pene " : "",
 					IsDeathBlow ? "deathblow " : "");
 		}
-
-		if (m_bDetailLog)
-		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s[%d]가 공격 위치: %d %d"), pAttacker->GetName(), (DWORD) pAttacker->GetVID(), pAttacker->GetX(), pAttacker->GetY());
-		}
 	}
 
 	//
@@ -3291,17 +3286,11 @@ void CHARACTER::SetVictim(LPCHARACTER pkVictim)
 {
 	if (!pkVictim)
 	{
-		if (0 != (DWORD)m_kVIDVictim)
-			MonsterLog("공격 대상을 해제");
-
 		m_kVIDVictim.Reset();
 		battle_end(this);
 	}
 	else
 	{
-		if (m_kVIDVictim != pkVictim->GetVID())
-			MonsterLog("공격 대상을 설정: %s", pkVictim->GetName());
-
 		m_kVIDVictim = pkVictim->GetVID();
 		m_dwLastVictimSetTime = get_dword_time();
 	}

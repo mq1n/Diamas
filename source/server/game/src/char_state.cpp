@@ -687,7 +687,6 @@ void CHARACTER::__StateIdle_Monster()
 		{
 			if (Follow(pkChrProtege, number(150, 400)))
 			{
-				MonsterLog("[IDLE] 리더로부터 너무 멀리 떨어졌다! 복귀한다.");
 				return;
 			}
 		}
@@ -883,17 +882,11 @@ void CHARACTER::StateMove()
 		{
 			if (GetVictim() && !IsCoward())
 			{
-				if (!IsState(m_stateBattle))
-					MonsterLog("[BATTLE] 근처에 왔으니 공격시작 %s", GetVictim()->GetName());
-
 				GotoState(m_stateBattle);
 				m_dwStateDuration = 1;
 			}
 			else
 			{
-				if (!IsState(m_stateIdle))
-					MonsterLog("[IDLE] 대상이 없으니 쉬자");
-
 				GotoState(m_stateIdle);
 
 				//LPCHARACTER rider = GetRider();
@@ -1012,7 +1005,6 @@ void CHARACTER::StateBattle()
 
 		if (bPct && pParty->CountMemberByVnum(GetSummonVnum()) < SUMMON_MONSTER_COUNT)
 		{
-			MonsterLog("부하 몬스터 소환!");
 			// 모자라는 녀석을 불러내 채웁시다.
 			int sx = GetX() - 300;
 			int sy = GetY() - 300;
@@ -1035,7 +1027,6 @@ void CHARACTER::StateBattle()
 
 	if (fDist >= 4000.0f)   // 40미터 이상 멀어지면 포기
 	{
-		MonsterLog("타겟이 멀어서 포기");
 		SetVictim(NULL);
 
 		// 보호할 것(돌, 파티장) 주변으로 간다.

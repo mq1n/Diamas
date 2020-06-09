@@ -107,8 +107,6 @@ ACMD(do_set_run_mode);
 ACMD(do_set_skill_group);
 ACMD(do_set_skill_point);
 ACMD(do_cooltime);
-ACMD(do_detaillog);
-ACMD(do_monsterlog);
 
 ACMD(do_gwlist);
 ACMD(do_stop_guild_war);
@@ -376,12 +374,6 @@ struct command_info cmd_info[] =
 	{ "setqf",		do_setqf,		0,			POS_DEAD,	GM_LOW_WIZARD	},
 	{ "delqf",		do_delqf,		0,			POS_DEAD,	GM_LOW_WIZARD	},
 	{ "set_state",	do_set_state,		0,			POS_DEAD,	GM_LOW_WIZARD	},
-
-//	{ "로그를보여줘",	do_detaillog,		0,			POS_DEAD,	GM_LOW_WIZARD	},//@fixme105
-//	{ "몬스터보여줘",	do_monsterlog,		0,			POS_DEAD,	GM_LOW_WIZARD	},//@fixme105
-
-	{ "detaillog",	do_detaillog,		0,			POS_DEAD,	GM_LOW_WIZARD	},
-	{ "monsterlog",	do_monsterlog,		0,			POS_DEAD,	GM_LOW_WIZARD	},
 
 	{ "forgetme",	do_forgetme,		0,			POS_DEAD,	GM_LOW_WIZARD	},
 	{ "aggregate",	do_aggregate,		0,			POS_DEAD,	GM_LOW_WIZARD	},

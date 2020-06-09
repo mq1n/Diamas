@@ -1216,16 +1216,6 @@ ACMD(do_nowar)
 	g->RequestRefuseWar(opp_g->GetID());
 }
 
-ACMD(do_detaillog)
-{
-	ch->DetailLog();
-}
-
-ACMD(do_monsterlog)
-{
-	ch->ToggleMonsterLog();
-}
-
 ACMD(do_pkmode)
 {
 	char arg1[256];
