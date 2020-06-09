@@ -19,7 +19,6 @@ LPCLIENT_DESC db_clientdesc = NULL;
 LPCLIENT_DESC g_pkAuthMasterDesc = NULL;
 LPCLIENT_DESC g_NetmarbleDBDesc = NULL;
 LPCLIENT_DESC g_TeenDesc		= NULL;
-LPCLIENT_DESC g_PasspodDesc = NULL;
 
 static const char* GetKnownClientDescName(LPCLIENT_DESC desc) {
 	if (desc == db_clientdesc) {
@@ -30,8 +29,6 @@ static const char* GetKnownClientDescName(LPCLIENT_DESC desc) {
 		return "g_NetmarbleDBDesc";
 	} else if (desc == g_TeenDesc) {
 		return "g_TeenDesc";
-	} else if (desc == g_PasspodDesc) {
-		return "g_PasspodDesc";
 	}
 	return "unknown";
 }

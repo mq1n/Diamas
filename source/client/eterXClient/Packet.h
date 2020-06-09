@@ -146,8 +146,6 @@ enum
 	HEADER_CG_SCRIPT_SELECT_ITEM				= 114,
 	HEADER_CG_LOGIN4							= 115,
 
-	HEADER_CG_NEWCIBN_PASSPOD_ANSWER			= 202,
-
 	HEADER_CG_HS_ACK							= 203,
 	HEADER_CG_XTRAP_ACK							= 204,
 
@@ -320,8 +318,6 @@ enum
 
     HEADER_GC_AUTH_SUCCESS                      = 150,
 
-	HEADER_GC_NEWCIBN_PASSPOD_REQUEST			= 202,
-	HEADER_GC_NEWCIBN_PASSPOD_FAILURE			= 203,
 #if defined(GAIDEN)
 	HEADER_GC_ONTIME							= 204,
 	HEADER_GC_RESET_ONTIME						= 205,
@@ -405,9 +401,6 @@ enum
 	PRIVATE_CODE_LENGTH = 8,
 
 	REFINE_MATERIAL_MAX_NUM = 5,
-
-	NEWCIBN_PASSPOD_ANSWER_MAX_LEN = 8,
-	NEWCIBN_PASSPOD_FAILURE_MAX_LEN = 128,
 
 	WEAR_MAX_NUM = CItemData::WEAR_MAX_NUM,
 
@@ -1043,12 +1036,6 @@ typedef struct command_crc_report
 	DWORD dwProcessCRC32;
 	DWORD dwRootPackCRC32;
 } TPacketCGCRCReport;
-
-typedef struct command_newcibn_passpod_answer
-{
-	BYTE	bHeader;
-	char	szAnswer[NEWCIBN_PASSPOD_ANSWER_MAX_LEN + 1];
-} TPacketCGNEWCIBNPasspodAnswer;
 
 enum EPartyExpDistributionType
 {
@@ -2428,17 +2415,6 @@ enum EBlockAction
     BLOCK_MESSENGER_INVITE      = (1 << 4),
     BLOCK_PARTY_REQUEST         = (1 << 5),
 };
-
-typedef struct packet_newcibn_passpod_request
-{
-	BYTE	bHeader;
-} TPacketGCNEWCIBNPasspodRequest;
-
-typedef struct packet_newcibn_passpod_failure
-{
-	BYTE	bHeader;
-	char	szMessage[NEWCIBN_PASSPOD_FAILURE_MAX_LEN + 1];
-} TPacketGCNEWCIBNPasspodFailure;
 
 typedef struct packet_login_key
 {

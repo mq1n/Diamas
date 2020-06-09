@@ -301,13 +301,6 @@ int CInputHandshake::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			else
 				stResult = "YES";
 		}
-		else if (!stBuf.compare("IS_PASSPOD_UP"))
-		{
-			if (g_bNoPasspod)
-				stResult = "NO";
-			else
-				stResult = "YES";
-		}
 		//else if (!stBuf.compare("SHOWMETHEMONEY"))
 		else if (stBuf == g_stAdminPagePassword)
 		{
@@ -419,16 +412,6 @@ int CInputHandshake::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 					BroadcastNotice(msg.c_str(), true);
 				}
 #endif
-				else if (!stBuf.compare("CLOSE_PASSPOD"))
-				{
-					g_bNoPasspod = true;
-					stResult += "CLOSE_PASSPOD";
-				}
-				else if (!stBuf.compare("OPEN_PASSPOD"))
-				{
-					g_bNoPasspod = false;
-					stResult += "OPEN_PASSPOD";
-				}
 				else if (!stBuf.compare("SHUTDOWN"))
 				{
 					LogManager::instance().CharLog(0, 0, 0, 2, "SHUTDOWN", "", d->GetHostName());

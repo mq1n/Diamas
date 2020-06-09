@@ -418,13 +418,6 @@ PyObject* netSendLoginPacket(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
-PyObject* netSendNEWCIBNPasspodAnswerPacket(PyObject* poSelf, PyObject* poArgs)
-{
-
-	return Py_BuildNone();
-}
-
-
 PyObject* netDirectEnter(PyObject* poSelf, PyObject* poArgs)
 {
 	int nChrSlot;
@@ -1754,7 +1747,6 @@ void initnet()
 		{ "ConnectToAccountServer",				netConnectToAccountServer,				METH_VARARGS },
 
 		{ "SendLoginPacket",					netSendLoginPacket,						METH_VARARGS },
-		{ "SendNEWCIBNPasspodAnswerPacket",		netSendNEWCIBNPasspodAnswerPacket,		METH_VARARGS },
 		{ "SendSelectEmpirePacket",				netSendSelectEmpirePacket,				METH_VARARGS },
 		{ "SendSelectCharacterPacket",			netSendSelectCharacterPacket,			METH_VARARGS },
 		{ "SendChangeNamePacket",				netSendChangeNamePacket,				METH_VARARGS },

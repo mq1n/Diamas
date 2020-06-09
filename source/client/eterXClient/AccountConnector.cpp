@@ -86,20 +86,6 @@ void CAccountConnector::Disconnect()
 	__OfflineState_Set();
 }
 
-bool CAccountConnector::SendNEWCIBNPasspodAnswerPacket(const char * answer)
-{
-	TPacketCGNEWCIBNPasspodAnswer answerPacket;
-	answerPacket.bHeader = HEADER_CG_NEWCIBN_PASSPOD_ANSWER;
-	strncpy(answerPacket.szAnswer, answer, NEWCIBN_PASSPOD_ANSWER_MAX_LEN);
-	answerPacket.szAnswer[NEWCIBN_PASSPOD_ANSWER_MAX_LEN] = '\0';	
-	if (!Send(sizeof(answerPacket), &answerPacket))
-	{
-		TraceError("SendNEWCIBNPasspodAnswerPacket");
-		return false;
-	}
-	return SendSequence();
-}
-
 void CAccountConnector::Process()
 {
 	CNetworkStream::Process();
@@ -163,9 +149,6 @@ bool CAccountConnector::__AuthState_Process()
 		return true;
 
 	if (!__AnalyzePacket(HEADER_GC_LOGIN_FAILURE, sizeof(TPacketGCAuthSuccess), &CAccountConnector::__AuthState_RecvAuthFailure))
-		return true;
-
-	if (!__AnalyzePacket(HEADER_GC_NEWCIBN_PASSPOD_REQUEST, sizeof(TPacketGCNEWCIBNPasspodRequest), &CAccountConnector::__AuthState_RecvNEWCIBNPasspodRequest))
 		return true;
 
 	if (!__AnalyzePacket(HEADER_GC_HANDSHAKE, sizeof(TPacketGCHandshake), &CAccountConnector::__AuthState_RecvHandshake))
@@ -338,16 +321,6 @@ bool CAccountConnector::__AuthState_RecvAuthFailure()
 
 //	__OfflineState_Set();
 
-	return true;
-}
-
-bool CAccountConnector::__AuthState_RecvNEWCIBNPasspodRequest()
-{
-	TPacketGCNEWCIBNPasspodRequest kRequestPacket;
-	if (!Recv(sizeof(kRequestPacket), &kRequestPacket))
-		return false;
-
-	PyCallClassMemberFunc(m_poHandler, "BINARY_OnNEWCIBNPasspodRequest", Py_BuildValue("()"));	
 	return true;
 }
 

@@ -19,37 +19,6 @@
 #include "pcbang.h"
 #include "spam.h"
 
-
-//중국 passpod 전용 함수 
-bool CheckPasspod(const char * account)
-{
-	char szQuery[1024];
-
-	snprintf(szQuery, sizeof(szQuery), "SELECT ID FROM passpod WHERE Login='%s'", account); 
-	SQLMsg * pMsg = DBManager::instance().DirectQuery(szQuery);
- 	
-	if (!pMsg)
-	{
-		sys_log(0, "cannot get the PASSPOD");
-		delete pMsg;
-		return false;
-	}
-
-	if (pMsg->Get()->uiNumRows == 0)
-	{
-		puts(szQuery);
-		sys_log(0, "[PASSPOD]DirectQuery failed(%s)", szQuery);
-
-		delete pMsg;
-		return false;
-	}
-
-	delete pMsg;
-
-	return true;
-}
-
-
 DBManager::DBManager() : m_bIsConnect(false)
 {
 }
@@ -516,32 +485,7 @@ void DBManager::LoginPrepare(BYTE bBillType, DWORD dwBillID, long lRemainSecs, L
 
 	InsertLoginData(pkLD);
 
-	{
-#ifdef ENABLE_PASSPOD_FEATURE // @warme006
-		{
-			if (!g_bNoPasspod)
-			{
-				if (CheckPasspod(r.login))
-				{
-					BYTE id = HEADER_GC_REQUEST_PASSPOD;
-					d->Packet(&id, sizeof(BYTE));
-					sys_log(0, "%s request passpod", r.login);
-				}
-				else
-				{
-					SendAuthLogin(d);
-
-				}
-			}
-			else
-			{
-				SendAuthLogin(d);
-			}
-		}
-#else
-			SendAuthLogin(d);
-#endif
-	}
+	SendAuthLogin(d);
 }
 
 bool GetGameTimeIP(MYSQL_RES * pRes, BYTE & bBillType, DWORD & dwBillID, int & seconds, const char * c_pszIP)

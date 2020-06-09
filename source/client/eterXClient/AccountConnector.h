@@ -21,8 +21,6 @@ class CAccountConnector : public CNetworkStream, public CSingleton<CAccountConne
 		void SetLoginInfo(const char * c_szName, const char * c_szPwd);
 		void ClearLoginInfo( void );
 
-		bool SendNEWCIBNPasspodAnswerPacket(const char * answer);
-
 		bool Connect(const char * c_szAddr, int iPort, const char * c_szAccountAddr, int iAccountPort);
 		void Disconnect();
 		void Process();
@@ -51,7 +49,6 @@ class CAccountConnector : public CNetworkStream, public CSingleton<CAccountConne
 		bool __AuthState_SendPong();
 		bool __AuthState_RecvAuthSuccess();
 		bool __AuthState_RecvAuthFailure();
-		bool __AuthState_RecvNEWCIBNPasspodRequest();
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 		bool __AuthState_RecvKeyAgreement();
 		bool __AuthState_RecvKeyAgreementCompleted();
