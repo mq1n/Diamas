@@ -101,9 +101,7 @@ extern bool	IsValidFileCRC(DWORD dwCRC);
 extern std::string	g_stAuthMasterIP;
 extern WORD		g_wAuthMasterPort;
 
-extern std::string	g_stClientVersion;
-extern bool		g_bCheckClientVersion;
-extern void		CheckClientVersion();
+extern DWORD	g_dwClientVersion;
 
 extern std::string	g_stQuestDir;
 //extern std::string	g_stQuestObjectDir;

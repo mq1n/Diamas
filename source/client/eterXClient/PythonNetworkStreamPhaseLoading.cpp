@@ -203,7 +203,6 @@ bool CPythonNetworkStream::RecvMainCharacter()
 
 	//Tracef(" >> RecvMainCharacter\n");
 
-	SendClientVersionPacket();
 	return true;
 }
 
@@ -229,7 +228,6 @@ bool CPythonNetworkStream::RecvMainCharacter2_EMPIRE()
 
 	//Tracef(" >> RecvMainCharacterNew : %d\n", m_dwMainActorEmpire);
 
-	SendClientVersionPacket();
 	return true;
 }
 
@@ -256,7 +254,6 @@ bool CPythonNetworkStream::RecvMainCharacter3_BGM()
 
 	//Tracef(" >> RecvMainCharacterNew : %d\n", m_dwMainActorEmpire);
 
-	SendClientVersionPacket();
 	return true;
 }
 
@@ -283,7 +280,6 @@ bool CPythonNetworkStream::RecvMainCharacter4_BGM_VOL()
 
 	//Tracef(" >> RecvMainCharacterNew : %d\n", m_dwMainActorEmpire);
 
-	SendClientVersionPacket();
 	return true;
 }
 

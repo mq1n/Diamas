@@ -30,7 +30,6 @@ class CInputProcessor
 		void BindPacketInfo(CPacketInfo * pPacketInfo);
 		void Pong(LPDESC d);
 		void Handshake(LPDESC d, const char * c_pData);
-		void Version(LPCHARACTER ch, const char* c_pData);
 
 	protected:
 		virtual int	Analyze(LPDESC d, BYTE bHeader, const char * c_pData) = 0;
@@ -158,15 +157,6 @@ class CInputMain : public CInputProcessor
 		void		Acce(LPCHARACTER pkChar, const char* c_pData);
 #endif
 		void		Roulette(LPCHARACTER ch, const char* c_pData);
-};
-
-class CInputDead : public CInputMain
-{
-	public:
-		virtual BYTE	GetType() { return INPROC_DEAD; }
-
-	protected:
-		virtual int	Analyze(LPDESC d, BYTE bHeader, const char * c_pData);
 };
 
 class CInputDB : public CInputProcessor

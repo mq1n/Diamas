@@ -106,9 +106,6 @@ enum
 	HEADER_CG_DRAGON_SOUL_REFINE			= 205,
 	HEADER_CG_STATE_CHECKER					= 206,
 
-	HEADER_CG_CLIENT_VERSION			= 0xfd,
-	HEADER_CG_CLIENT_VERSION2			= 0xf1,
-
 	/********************************************************/
 	HEADER_GC_KEY_AGREEMENT_COMPLETED = 0xfa, // _IMPROVED_PACKET_ENCRYPTION_
 	HEADER_GC_KEY_AGREEMENT			= 0xfb, // _IMPROVED_PACKET_ENCRYPTION_
@@ -302,7 +299,6 @@ enum
 	HEADER_GG_XMAS_WARP_SANTA_REPLY		= 18,
 	HEADER_GG_RELOAD_CRC_LIST			= 19,
 	HEADER_GG_LOGIN_PING			= 20,
-	HEADER_GG_CHECK_CLIENT_VERSION		= 21,
 	HEADER_GG_BLOCK_CHAT			= 22,
 
 	HEADER_GG_SIEGE					= 25,
@@ -540,6 +536,7 @@ typedef struct command_login3
 	char	login[LOGIN_MAX_LEN + 1];
 	char	passwd[PASSWD_MAX_LEN + 1];
 	DWORD	adwClientKey[4];
+	DWORD	version;
 } TPacketCGLogin3;
 
 typedef struct packet_login_key
@@ -1983,21 +1980,6 @@ typedef struct SPacketGCChangeName
 	DWORD pid;
 	char name[CHARACTER_NAME_MAX_LEN+1];
 } TPacketGCChangeName;
-
-
-typedef struct command_client_version
-{
-	BYTE header;
-	char filename[32+1];
-	char timestamp[32+1];
-} TPacketCGClientVersion;
-
-typedef struct command_client_version2
-{
-	BYTE header;
-	char filename[32+1];
-	char timestamp[32+1];
-} TPacketCGClientVersion2;
 
 typedef struct packet_channel
 {

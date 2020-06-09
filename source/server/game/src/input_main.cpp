@@ -3137,7 +3137,6 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 
 		case HEADER_CG_MOVE:
 			Move(ch, c_pData);
-			// @fixme103 (removed CheckClientVersion since useless in here)
 			break;
 
 		case HEADER_CG_CHARACTER_POSITION:
@@ -3339,10 +3338,6 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			Refine(ch, c_pData);
 			break;
 
-		case HEADER_CG_CLIENT_VERSION:
-			Version(ch, c_pData);
-			break;
-
 		case HEADER_CG_HS_ACK:
 			if (isHackShieldEnable)
 			{
@@ -3380,49 +3375,3 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 	}
 	return (iExtraLen);
 }
-
-int CInputDead::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
-{
-	LPCHARACTER ch;
-
-	if (!(ch = d->GetCharacter()))
-	{
-		sys_err("no character on desc");
-		return 0;
-	}
-
-	int iExtraLen = 0;
-
-	switch (bHeader)
-	{
-		case HEADER_CG_PONG:
-			Pong(d); 
-			break;
-
-		case HEADER_CG_TIME_SYNC:
-			Handshake(d, c_pData);
-			break;
-
-		case HEADER_CG_CHAT:
-			if ((iExtraLen = Chat(ch, c_pData, m_iBufferLeft)) < 0)
-				return -1;
-
-			break;
-
-		case HEADER_CG_WHISPER:
-			if ((iExtraLen = Whisper(ch, c_pData, m_iBufferLeft)) < 0)
-				return -1;
-
-			break;
-
-		case HEADER_CG_HACK:
-			Hack(ch, c_pData);
-			break;
-
-		default:
-			return (0);
-	}
-
-	return (iExtraLen);
-}
-

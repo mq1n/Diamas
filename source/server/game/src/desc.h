@@ -163,9 +163,6 @@ class DESC
 
 		void			AssembleCRCMagicCube(BYTE bProcPiece, BYTE bFilePiece);
 
-		void			SetClientVersion(const char * c_pszTimestamp) { m_stClientVersion = c_pszTimestamp; }
-		const char *		GetClientVersion() { return m_stClientVersion.c_str(); }
-
 		bool			isChannelStatusRequested() const { return m_bChannelStatusRequested; }
 		void			SetChannelStatusRequested(bool bChannelStatusRequested) { m_bChannelStatusRequested = bChannelStatusRequested; }
 
@@ -178,7 +175,6 @@ class DESC
 		CInputHandshake	m_inputHandshake;
 		CInputLogin		m_inputLogin;
 		CInputMain		m_inputMain;
-		CInputDead		m_inputDead;
 		CInputAuth		m_inputAuth;
 
 
@@ -230,8 +226,6 @@ class DESC
 		DWORD                   m_dwProcCRC;
 		DWORD                   m_dwFileCRC;
 		bool			m_bHackCRCQuery;
-
-		std::string		m_stClientVersion;
 
 		std::string		m_Login;
 		int				m_outtime;

@@ -515,10 +515,6 @@ int CInputP2P::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			LoadValidCRCList();
 			break;
 
-		case HEADER_GG_CHECK_CLIENT_VERSION:
-			CheckClientVersion();
-			break;
-
 		case HEADER_GG_LOGIN_PING:
 			LoginPing(d, c_pData);
 			break;

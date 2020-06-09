@@ -571,7 +571,6 @@ const char * GetSendHeaderName(BYTE header)
 		stringList[0xfb] = "HEADER_CG_KEY_AGREEMENT";
 #endif
 		stringList[0xfc] = "HEADER_CG_TIME_SYNC";
-		stringList[0xfd] = "HEADER_CG_CLIENT_VERSION";
 		stringList[0xfe] = "HEADER_CG_PONG";
 		stringList[0xff] = "HEADER_CG_HANDSHAKE";
 	}

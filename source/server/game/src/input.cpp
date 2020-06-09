@@ -209,16 +209,6 @@ void CInputProcessor::Handshake(LPDESC d, const char * c_pData)
 	}
 }
 
-void CInputProcessor::Version(LPCHARACTER ch, const char* c_pData)
-{
-	if (!ch)
-		return;
-
-	TPacketCGClientVersion * p = (TPacketCGClientVersion *) c_pData;
-	sys_log(0, "VERSION: %s %s %s", ch->GetName(), p->timestamp, p->filename);
-	ch->GetDesc()->SetClientVersion(p->timestamp);
-}
-
 void LoginFailure(LPDESC d, const char * c_pszStatus)
 {
 	if (!d)
@@ -447,14 +437,6 @@ dev_log(LOG_DEB0, "DC : '%s'", msg.c_str());
 					LoadValidCRCList();
 
 					BYTE bHeader = HEADER_GG_RELOAD_CRC_LIST;
-					P2P_MANAGER::instance().Send(&bHeader, sizeof(BYTE));
-					stResult = "OK";
-				}
-				else if (!stBuf.compare(0, 20, "CHECK_CLIENT_VERSION"))
-				{
-					CheckClientVersion();
-
-					BYTE bHeader = HEADER_GG_CHECK_CLIENT_VERSION;
 					P2P_MANAGER::instance().Send(&bHeader, sizeof(BYTE));
 					stResult = "OK";
 				}

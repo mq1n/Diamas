@@ -254,9 +254,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool SendRefinePacket(BYTE byPos, BYTE byType);
 		bool SendSelectItemPacket(DWORD dwItemPos);
 
-		// Client Version
-		bool SendClientVersionPacket();
-
 		// CRC Report
 		bool __SendCRCReportPacket();
 

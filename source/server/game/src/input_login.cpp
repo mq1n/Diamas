@@ -663,36 +663,6 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		sys_log(0, "PREMIUM: %s type %d %dmin", ch->GetName(), i, remain);
 	}
 
-	if (g_bCheckClientVersion)
-	{
-		sys_log(0, "VERSION CHECK %s %s", g_stClientVersion.c_str(), d->GetClientVersion());
-
-		if (!d->GetClientVersion())
-		{
-			d->DelayedDisconnect(10);
-		}
-		else
-		{
-			if (0 != g_stClientVersion.compare(d->GetClientVersion())) // @fixme103 (version > date)
-			{
-				ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("클라이언트 버전이 틀려 로그아웃 됩니다. 정상적으로 패치 후 접속하세요."));
-				d->DelayedDisconnect(0); // @fixme103 (10);
-					LogManager::instance().HackLog("VERSION_CONFLICT", ch);
-
-					sys_log(0, "VERSION : WRONG VERSION USER : account:%s name:%s hostName:%s server_version:%s client_version:%s",
-							d->GetAccountTable().login,
-							ch->GetName(),
-							d->GetHostName(),
-							g_stClientVersion.c_str(),
-							d->GetClientVersion());
-				}
-			}
-		}
-		else
-		{
-			sys_log(0, "VERSION : NO CHECK");
-		}
-
 	if (ch->IsGM() == true)
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "ConsoleEnable");
 
@@ -1081,14 +1051,6 @@ int CInputLogin::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 
 		case HEADER_CG_CHANGE_NAME:
 			ChangeName(d, c_pData);
-			break;
-
-		case HEADER_CG_CLIENT_VERSION:
-			Version(d->GetCharacter(), c_pData);
-			break;
-
-		case HEADER_CG_CLIENT_VERSION2:
-			Version(d->GetCharacter(), c_pData);
 			break;
 
 		case HEADER_CG_HS_ACK:

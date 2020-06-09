@@ -4170,41 +4170,6 @@ bool CPythonNetworkStream::__SendCRCReportPacket()
 	return true;
 }
 
-bool CPythonNetworkStream::SendClientVersionPacket()
-{
-	std::string filename;
-
-	GetExcutedFileName(filename);
-
-	filename = CFileNameHelper::NoPath(filename);
-	CFileNameHelper::ChangeDosPath(filename);
-
-	if (LocaleService_IsEUROPE() && false == LocaleService_IsYMIR())
-	{
-		TPacketCGClientVersion2 kVersionPacket;
-		kVersionPacket.header = HEADER_CG_CLIENT_VERSION2;
-		strncpy(kVersionPacket.filename, filename.c_str(), sizeof(kVersionPacket.filename)-1);
-		strncpy(kVersionPacket.timestamp, "1215955205", sizeof(kVersionPacket.timestamp)-1); // # python time.time ¾ÕÀÚ¸®
-		//strncpy(kVersionPacket.timestamp, __TIMESTAMP__, sizeof(kVersionPacket.timestamp)-1); // old_string_ver
-		//strncpy(kVersionPacket.timestamp, "1218055205", sizeof(kVersionPacket.timestamp)-1); // new_future
-		//strncpy(kVersionPacket.timestamp, "1214055205", sizeof(kVersionPacket.timestamp)-1); // old_past
-
-		if (!Send(sizeof(kVersionPacket), &kVersionPacket))
-			Tracef("SendClientReportPacket Error");
-	}
-	else
-	{
-		TPacketCGClientVersion kVersionPacket;
-		kVersionPacket.header = HEADER_CG_CLIENT_VERSION;
-		strncpy(kVersionPacket.filename, filename.c_str(), sizeof(kVersionPacket.filename)-1);
-		strncpy(kVersionPacket.timestamp, __TIMESTAMP__, sizeof(kVersionPacket.timestamp)-1);
-
-		if (!Send(sizeof(kVersionPacket), &kVersionPacket))
-			Tracef("SendClientReportPacket Error");
-	}
-	return SendSequence();
-}
-
 bool CPythonNetworkStream::RecvAffectAddPacket()
 {
 	TPacketGCAffectAdd kAffectAdd;

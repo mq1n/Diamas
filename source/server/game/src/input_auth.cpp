@@ -94,6 +94,12 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 		return;
 	}
 
+	if (pinfo->version != g_dwClientVersion)
+	{
+		LoginFailure(d, "WVERS");
+		return;
+	}
+
 	if (g_bNoMoreClient)
 	{
 		TPacketGCLoginFailure failurePacket;

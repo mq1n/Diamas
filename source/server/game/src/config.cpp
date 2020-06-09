@@ -88,8 +88,7 @@ int			g_iBusyUserCount = 650;
 bool		g_bEmpireWhisper = true;
 BYTE		g_bAuthServer = false;
 
-bool		g_bCheckClientVersion = true;
-string	g_stClientVersion = "1215955205";
+DWORD	g_dwClientVersion = 1215955205;
 
 string	g_stAuthMasterIP;
 WORD		g_wAuthMasterPort = 0;
@@ -134,7 +133,6 @@ int			g_iSpamBlockMaxLevel = 10;
 
 void		LoadStateUserCount();
 void		LoadValidCRCList();
-bool		LoadClientVersion();
 bool            g_protectNormalPlayer   = false;        // 범법자가 "평화모드" 인 일반유저를 공격하지 못함
 bool            g_noticeBattleZone      = false;        // 중립지대에 입장하면 안내메세지를 알려줌
 
@@ -1136,20 +1134,13 @@ static bool __LoadGeneralConfigFile(const char* configName)
 			// continue;
 		// }
 
-		TOKEN("check_version_server")
-		{
-			int flag = 0;
-
-			str_to_number(flag, value_string);
-			g_bCheckClientVersion = !!flag;
-			fprintf(stdout, "CHECK_VERSION_SERVER: %d\n", g_bCheckClientVersion);
-			continue;
-		}
-
 		TOKEN("check_version_value")
 		{
-			g_stClientVersion = value_string;
-			fprintf(stdout, "CHECK_VERSION_VALUE: %s\n", g_stClientVersion.c_str());
+			DWORD version = 0;
+			str_to_number(version, value_string);
+
+			g_dwClientVersion = version;
+			fprintf(stdout, "CHECK_VERSION_VALUE: %u\n", g_dwClientVersion);
 			continue;
 		}
 
@@ -1689,46 +1680,6 @@ void LoadValidCRCList()
 		}
 
 		fclose(fp);
-	}
-}
-
-bool LoadClientVersion()
-{
-	FILE * fp = fopen("VERSION", "r");
-
-	if (!fp)
-		return false;
-
-	char buf[256];
-	fgets(buf, 256, fp);
-
-	char * p = strchr(buf, '\n');
-	if (p) *p = '\0';
-
-	fprintf(stderr, "VERSION: \"%s\"\n", buf);
-
-	g_stClientVersion = buf;
-	fclose(fp);
-	return true;
-}
-
-void CheckClientVersion()
-{
-	const DESC_MANAGER::DESC_SET & set = DESC_MANAGER::instance().GetClientSet();
-	DESC_MANAGER::DESC_SET::const_iterator it = set.begin();
-
-	while (it != set.end())
-	{
-		LPDESC d = *(it++);
-
-		if (!d->GetCharacter())
-			continue;
-
-		if (0 != g_stClientVersion.compare(d->GetClientVersion())) // @fixme103 (version > date)
-		{
-			d->GetCharacter()->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("클라이언트 버전이 틀려 로그아웃 됩니다. 정상적으로 패치 후 접속하세요."));
-			d->DelayedDisconnect(10);
-		}
 	}
 }
 

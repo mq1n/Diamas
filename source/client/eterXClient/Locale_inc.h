@@ -1,5 +1,7 @@
 #pragma once
 
+#define CLIENT_VERSION_TIMESTAMP 1234567
+
 //////////////////////////////////////////////////////////////////////////
 // ### Default Ymir Macros ###
 #define LOCALE_SERVICE_EUROPE

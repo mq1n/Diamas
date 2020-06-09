@@ -154,8 +154,6 @@ enum
 
 	HEADER_CG_KEY_AGREEMENT						= 0xfb, // _IMPROVED_PACKET_ENCRYPTION_
 	HEADER_CG_TIME_SYNC							= 0xfc,
-	HEADER_CG_CLIENT_VERSION					= 0xfd,
-	HEADER_CG_CLIENT_VERSION2					= 0xf1,
 	HEADER_CG_PONG								= 0xfe,
     HEADER_CG_HANDSHAKE                         = 0xff,
 	/////////////////////////////////////////////////
@@ -525,6 +523,7 @@ typedef struct command_login3
     char	name[ID_MAX_NUM + 1];
     char	pwd[PASS_MAX_NUM + 1];
     DWORD	adwClientKey[4];
+	DWORD	version;
 } TPacketCGLogin3;
 // end - 권한 서버 접속을 위한 패킷들
 
@@ -1001,20 +1000,6 @@ typedef struct SPacketCGChangeName
     BYTE index;
     char name[CHARACTER_NAME_MAX_LEN+1];
 } TPacketCGChangeName;
-
-typedef struct command_client_version
-{
-	BYTE header;
-	char filename[32+1];
-	char timestamp[32+1];
-} TPacketCGClientVersion;
-
-typedef struct command_client_version2
-{
-	BYTE header;
-	char filename[32+1];
-	char timestamp[32+1];
-} TPacketCGClientVersion2;
 
 typedef struct command_crc_report
 {
