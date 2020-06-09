@@ -11,7 +11,6 @@
 // Forward declaration
 class KeyAgreement;
 
-//THEMIDA
 // Communication channel encryption handler.
 class Cipher {
  public:

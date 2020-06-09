@@ -46,7 +46,7 @@ DWORD ELTimer_GetServerMSec()
 	//return ELTimer_GetMSec() - gs_dwClientTime + gs_dwServerTime;
 }
 
-DWORD LTimer_GetFrameMSec()
+DWORD ELTimer_GetFrameMSec()
 {
 	return gs_dwFrameTime;
 }
