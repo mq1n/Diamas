@@ -11,7 +11,6 @@
 #include "log.h"
 #include "db.h"
 #include "questmanager.h"
-#include "login_sim.h"
 #include "fishing.h"
 #include "TrafficProfiler.h"
 #include "priv_manager.h"
@@ -19,6 +18,7 @@
 #include "dev_log.h"
 #include "../../common/CommonDefines.h"
 #include "utils.h"
+#include "desc_client.h"
 
 bool IsEmptyAdminPage()
 {
@@ -240,9 +240,6 @@ CInputHandshake::~CInputHandshake()
 	}
 }
 
-
-std::map<DWORD, CLoginSim *> g_sim;
-std::map<DWORD, CLoginSim *> g_simByPID;
 std::vector<TPlayerTable> g_vec_save;
 
 // BLOCK_CHAT

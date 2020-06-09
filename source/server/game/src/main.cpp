@@ -32,7 +32,6 @@
 #include "priv_manager.h"
 #include "war_map.h"
 #include "building.h"
-#include "login_sim.h"
 #include "target.h"
 #include "marriage.h"
 #include "wedding.h"
@@ -57,6 +56,7 @@
 #include "skill_power.h"
 #include "SpeedServer.h"
 #include "DragonSoul.h"
+#include "desc_client.h"
 
 #ifdef USE_STACKTRACE
 #include <execinfo.h>
@@ -197,8 +197,6 @@ namespace
 	};
 }
 
-extern std::map<DWORD, CLoginSim *> g_sim; // first: AID
-extern std::map<DWORD, CLoginSim *> g_simByPID;
 extern std::vector<TPlayerTable> g_vec_save;
 unsigned int save_idx = 0;
 
@@ -230,23 +228,6 @@ void heartbeat(LPHEART ht, int pulse)
 
 		{
 			int count = 0;
-			auto it = g_sim.begin();
-
-			while (it != g_sim.end())
-			{
-				if (!it->second->IsCheck())
-				{
-					it->second->SendLogin();
-
-					if (++count > 50)
-					{
-						sys_log(0, "FLUSH_SENT");
-						break;
-					}
-				}
-
-				it++;
-			}
 
 			if (save_idx < g_vec_save.size())
 			{
