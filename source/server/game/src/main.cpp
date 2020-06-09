@@ -41,7 +41,6 @@
 #include "locale_service.h"
 #include "arena.h"
 #include "OXEvent.h"
-#include "monarch.h"
 #include "polymorph.h"
 #include "blend_item.h"
 #include "castle.h"
@@ -327,7 +326,6 @@ int main(int argc, char **argv)
 	CItemAddonManager	item_addon_manager;
 	CArenaManager arena_manager;
 	COXEventManager OXEvent_manager;
-	CMonarch		Monarch;
 	CHorseNameManager horsename_manager;
 
 	DESC_MANAGER	desc_manager;

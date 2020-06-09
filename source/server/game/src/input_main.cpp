@@ -886,10 +886,6 @@ void CInputMain::ItemDrop(LPCHARACTER ch, const char * data)
 {
 	struct command_item_drop * pinfo = (struct command_item_drop *) data;
 
-	//MONARCH_LIMIT
-	//if (ch->IsMonarch())	
-	//	return;
-	//END_MONARCH_LIMIT
 	if (!ch)
 		return;
 
@@ -902,11 +898,6 @@ void CInputMain::ItemDrop(LPCHARACTER ch, const char * data)
 
 void CInputMain::ItemDrop2(LPCHARACTER ch, const char * data)
 {
-	//MONARCH_LIMIT
-	//if (ch->IsMonarch())	
-	//	return;
-	//END_MONARCH_LIMIT
-
 	TPacketCGItemDrop2 * pinfo = (TPacketCGItemDrop2 *) data;
 
 	// 엘크가 0보다 크면 엘크를 버리는 것 이다.
@@ -1177,15 +1168,6 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 			{
 				if ((to_ch = CHARACTER_MANAGER::instance().Find(pinfo->arg1)))
 				{
-					//MONARCH_LIMIT
-					/*
-					if (to_ch->IsMonarch() || ch->IsMonarch())
-					{
-						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("군주와는 거래를 할수가 없습니다"), g_nPortalLimitTime);
-						return;
-					}
-					//END_MONARCH_LIMIT
-					*/
 					if (iPulse - ch->GetSafeboxLoadTime() < PASSES_PER_SEC(g_nPortalLimitTime))
 					{
 						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("창고를 연후 %d초 이내에는 거래를 할수 없습니다."), g_nPortalLimitTime);

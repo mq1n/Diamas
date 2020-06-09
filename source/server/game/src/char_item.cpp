@@ -28,7 +28,6 @@
 #include "war_map.h"
 #include "xmas_event.h"
 #include "marriage.h"
-#include "monarch.h"
 #include "polymorph.h"
 #include "blend_item.h"
 #include "castle.h"
@@ -3824,24 +3823,6 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									ITEM_MANAGER::instance().RemoveItem(item);
 									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("돈 %d 냥을 획득했습니다."), iGold);
 									PointChange(POINT_GOLD, iGold);
-								}
-								break;
-
-								//군주의 증표 
-							case 70021:
-								{
-									int HealPrice = quest::CQuestManager::instance().GetEventFlag("MonarchHealGold");
-									if (HealPrice == 0)
-										HealPrice = 2000000;
-
-									if (CMonarch::instance().HealMyEmpire(this, HealPrice))
-									{
-										char szNotice[256];
-										snprintf(szNotice, sizeof(szNotice), LC_TEXT("군주의 축복으로 이지역 %s 유저는 HP,SP가 모두 채워집니다."), EMPIRE_NAME(GetEmpire()));
-										SendNoticeMap(szNotice, GetMapIndex(), false);
-										
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("군주의 축복을 사용하였습니다."));
-									}
 								}
 								break;
 

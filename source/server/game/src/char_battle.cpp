@@ -22,7 +22,6 @@
 #include "marriage.h"
 #include "arena.h"
 #include "regen.h"
-#include "monarch.h"
 #include "exchange.h"
 #include "shop_manager.h"
 #include "castle.h"
@@ -2138,21 +2137,6 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			SET_BIT(m_pointsInstant.instant_flag, INSTANT_FLAG_NO_REWARD);
 			Stun();
 			return true;
-		}
-
-		//
-		// 군주의 금강권 & 사자후 
-		//
-		if (pAttacker->IsPC() && CMonarch::instance().IsPowerUp(pAttacker->GetEmpire()))
-		{
-			// 10% 피해 증가
-			dam += dam / 10;
-		}
-
-		if (IsPC() && CMonarch::instance().IsDefenceUp(GetEmpire()))
-		{
-			// 10% 피해 감소
-			dam -= dam / 10;
 		}
 	}
 	//puAttr.Pop();

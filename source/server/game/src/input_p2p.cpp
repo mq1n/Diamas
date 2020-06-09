@@ -128,46 +128,6 @@ int CInputP2P::Notice(LPDESC d, const char * c_pData, size_t uiBytes)
 	return (p->lSize);
 }
 
-int CInputP2P::MonarchNotice(LPDESC d, const char * c_pData, size_t uiBytes)
-{
-	TPacketGGMonarchNotice * p = (TPacketGGMonarchNotice *) c_pData;
-
-	if (uiBytes < p->lSize + sizeof(TPacketGGMonarchNotice))
-		return -1;
-
-	if (p->lSize < 0)
-	{
-		sys_err("invalid packet length %d", p->lSize);
-		d->SetPhase(PHASE_CLOSE);
-		return -1;
-	}
-
-	char szBuf[256+1];
-	strlcpy(szBuf, c_pData + sizeof(TPacketGGMonarchNotice), MIN(p->lSize + 1, sizeof(szBuf)));
-	SendMonarchNotice(p->bEmpire, szBuf);
-	return (p->lSize);
-}
-
-int CInputP2P::MonarchTransfer(LPDESC d, const char* c_pData)
-{
-	TPacketMonarchGGTransfer* p = (TPacketMonarchGGTransfer*) c_pData;
-	LPCHARACTER pTargetChar = CHARACTER_MANAGER::instance().FindByPID(p->dwTargetPID);
-
-	if (pTargetChar != NULL)
-	{
-		unsigned int qIndex = quest::CQuestManager::instance().GetQuestIndexByName("monarch_transfer");
-
-		if (qIndex != 0)
-		{
-			pTargetChar->SetQuestFlag("monarch_transfer.x", p->x);
-			pTargetChar->SetQuestFlag("monarch_transfer.y", p->y);
-			quest::CQuestManager::instance().Letter(pTargetChar->GetPlayerID(), qIndex, 0);
-		}
-	}
-
-	return 0;
-}
-
 int CInputP2P::Guild(LPDESC d, const char* c_pData, size_t uiBytes)
 {
 	TPacketGGGuild * p = (TPacketGGGuild *) c_pData;
@@ -520,15 +480,6 @@ int CInputP2P::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 				TPacketGGSiege* pSiege = (TPacketGGSiege*)c_pData;
 				castle_siege(pSiege->bEmpire, pSiege->bTowerCount);
 			}
-			break;
-
-		case HEADER_GG_MONARCH_NOTICE:
-			if ((iExtraLen = MonarchNotice(d, c_pData, m_iBufferLeft)) < 0)
-				return -1;
-			break;
-
-		case HEADER_GG_MONARCH_TRANSFER :
-			MonarchTransfer(d, c_pData);
 			break;
 
 		case HEADER_GG_CHECK_AWAKENESS:

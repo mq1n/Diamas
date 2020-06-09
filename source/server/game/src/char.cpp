@@ -43,7 +43,6 @@
 #include "wedding.h"
 #include "mob_manager.h"
 #include "mining.h"
-#include "monarch.h"
 #include "castle.h"
 #include "arena.h"
 #include "dev_log.h"
@@ -376,8 +375,6 @@ void CHARACTER::Initialize()
 	m_iSafeboxLoadTime = 0;
 
 	m_iMyShopTime = 0;
-
-	InitMC();
 
 	m_deposit_pulse = 0;
 
@@ -6850,16 +6847,6 @@ bool CHARACTER::IsHack(bool bSendMsg, bool bCheckShopOwner, int limittime)
 	return false;
 }
 
-BOOL CHARACTER::IsMonarch() const
-{
-	//MONARCH_LIMIT
-	if (CMonarch::instance().IsMonarch(GetPlayerID(), GetEmpire()))
-		return true;
-
-	return false;
-
-	//END_MONARCH_LIMIT
-}
 void CHARACTER::Say(const std::string & s)
 {
 	struct ::packet_script packet_script;
@@ -6878,72 +6865,6 @@ void CHARACTER::Say(const std::string & s)
 	{
 		GetDesc()->Packet(buf.read_peek(), buf.size());
 	}
-}
-
-//
-// Monarch
-//
-void CHARACTER::InitMC()
-{
-	for (int n = 0; n < MI_MAX; ++n)
-	{
-		m_dwMonarchCooltime[n] = thecore_pulse(); 
-	}
-
-	m_dwMonarchCooltimelimit[MI_HEAL] = PASSES_PER_SEC(MC_HEAL);
-	m_dwMonarchCooltimelimit[MI_WARP] = PASSES_PER_SEC(MC_WARP);
-	m_dwMonarchCooltimelimit[MI_TRANSFER] = PASSES_PER_SEC(MC_TRANSFER);
-	m_dwMonarchCooltimelimit[MI_TAX] = PASSES_PER_SEC(MC_TAX);
-	m_dwMonarchCooltimelimit[MI_SUMMON] = PASSES_PER_SEC(MC_SUMMON);
-
-	m_dwMonarchCooltime[MI_HEAL] -= PASSES_PER_SEC(GetMCL(MI_HEAL));
-	m_dwMonarchCooltime[MI_WARP] -= PASSES_PER_SEC(GetMCL(MI_WARP));
-	m_dwMonarchCooltime[MI_TRANSFER] -= PASSES_PER_SEC(GetMCL(MI_TRANSFER));
-	m_dwMonarchCooltime[MI_TAX] -= PASSES_PER_SEC(GetMCL(MI_TAX));
-	m_dwMonarchCooltime[MI_SUMMON] -= PASSES_PER_SEC(GetMCL(MI_SUMMON));
-}
-
-DWORD CHARACTER::GetMC(enum MONARCH_INDEX e) const
-{
-	return m_dwMonarchCooltime[e];
-}
-
-void CHARACTER::SetMC(enum MONARCH_INDEX e)
-{
-	m_dwMonarchCooltime[e] = thecore_pulse();
-}
-
-bool CHARACTER::IsMCOK(enum MONARCH_INDEX e) const
-{
-	int iPulse = thecore_pulse();
-
-	if ((iPulse -  GetMC(e)) <  GetMCL(e))
-	{
-		if (test_server)
-			sys_log(0, " Pulse %d cooltime %d, limit %d", iPulse, GetMC(e), GetMCL(e));
-		
-		return false;
-	}
-	
-	if (test_server)
-		sys_log(0, " Pulse %d cooltime %d, limit %d", iPulse, GetMC(e), GetMCL(e));
-
-	return true;
-}
-
-DWORD CHARACTER::GetMCL(enum MONARCH_INDEX e) const
-{
-	return m_dwMonarchCooltimelimit[e];
-}
-
-DWORD CHARACTER::GetMCLTime(enum MONARCH_INDEX e) const
-{
-	int iPulse = thecore_pulse();
-
-	if (test_server)
-		sys_log(0, " Pulse %d cooltime %d, limit %d", iPulse, GetMC(e), GetMCL(e));
-
-	return  (GetMCL(e)) / passes_per_sec   -  (iPulse - GetMC(e)) / passes_per_sec;
 }
 
 bool CHARACTER::IsSiegeNPC() const

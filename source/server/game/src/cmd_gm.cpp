@@ -27,7 +27,6 @@
 #include "arena.h"
 #include "start_position.h"
 #include "party.h"
-#include "monarch.h"
 #include "castle.h"
 #include "BattleArena.h"
 #include "xmas_event.h"
@@ -1218,28 +1217,6 @@ struct notice_packet_func
 	}
 };
 
-struct monarch_notice_packet_func
-{
-	const char * m_str;
-	BYTE m_bEmpire;
-
-	monarch_notice_packet_func(BYTE bEmpire, const char * str) : m_str(str), m_bEmpire(bEmpire)
-	{
-	}
-
-	void operator () (LPDESC d)
-	{
-		if (!d->GetCharacter())
-			return;
-
-		if (m_bEmpire == d->GetCharacter()->GetEmpire())
-		{
-			d->GetCharacter()->ChatPacket(CHAT_TYPE_NOTICE, "%s", m_str);
-		}
-	}
-};
-
-
 #ifdef ENABLE_FULL_NOTICE
 void SendNotice(const char * c_pszBuf, bool bBigFont)
 #else
@@ -1252,12 +1229,6 @@ void SendNotice(const char * c_pszBuf)
 #else
 	std::for_each(c_ref_set.begin(), c_ref_set.end(), notice_packet_func(c_pszBuf));
 #endif
-}
-
-void SendMonarchNotice(BYTE bEmpire, const char* c_pszBuf)
-{
-	const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
-	std::for_each(c_ref_set.begin(), c_ref_set.end(), monarch_notice_packet_func(bEmpire, c_pszBuf));
 }
 
 struct notice_map_packet_func
@@ -1337,21 +1308,6 @@ void BroadcastNotice(const char * c_pszBuf)
 #endif
 }
 
-void BroadcastMonarchNotice(BYTE bEmpire, const char * c_pszBuf)
-{
-	TPacketGGMonarchNotice p;
-	p.bHeader = HEADER_GG_MONARCH_NOTICE;
-	p.bEmpire = bEmpire;
-	p.lSize = strlen(c_pszBuf) + 1;
-
-	TEMP_BUFFER buf;
-	buf.write(&p, sizeof(p));
-	buf.write(c_pszBuf, p.lSize);
-
-	P2P_MANAGER::instance().Send(buf.read_peek(), buf.size());
-
-	SendMonarchNotice(bEmpire, c_pszBuf);
-}
 
 ACMD(do_notice)
 {
@@ -1388,18 +1344,6 @@ ACMD(do_big_notice_test)
 	ch->ChatPacket(CHAT_TYPE_BIG_NOTICE, "%s", argument);
 }
 #endif
-
-ACMD(do_monarch_notice)
-{
-	if (ch->IsMonarch() == true)
-	{
-		BroadcastMonarchNotice(ch->GetEmpire(), argument);
-	}
-	else
-	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("군주만이 사용 가능한 기능입니다"));
-	}
-}
 
 ACMD(do_who)
 {
@@ -3894,86 +3838,6 @@ ACMD(do_threeway_war_myinfo)
 			CThreeWayWar::instance().GetReviveTokenForPlayer(ch->GetPlayerID()));
 }
 
-ACMD(do_rmcandidacy)
-{
-	char arg1[256];
-
-	one_argument(argument, arg1, sizeof(arg1));
-
-	if (!*arg1)
-	{
-		ch->ChatPacket(CHAT_TYPE_INFO, "Usage: rmcandidacy <name>");
-		return;
-	}
-		
-	LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(arg1); 
-
-	if (!tch)
-	{
-		CCI * pkCCI = P2P_MANAGER::instance().Find(arg1);
-
-		if (pkCCI)
-		{
-			if (pkCCI->bChannel != g_bChannel)
-			{
-				ch->ChatPacket(CHAT_TYPE_INFO, "Target is in %d channel (my channel %d)", pkCCI->bChannel, g_bChannel);
-				return;
-			}
-		}
-	}
-
-	db_clientdesc->DBPacket(HEADER_GD_RMCANDIDACY, 0, NULL, 32);
-	db_clientdesc->Packet(arg1, 32); 
-}
-
-ACMD(do_setmonarch)
-{
-	char arg1[256];
-
-	one_argument(argument, arg1, sizeof(arg1));
-
-	if (!*arg1)
-	{
-		ch->ChatPacket(CHAT_TYPE_INFO, "Usage: setmonarch <name>");
-		return;
-	}
-
-	db_clientdesc->DBPacket(HEADER_GD_SETMONARCH, 0, NULL, 32);
-	db_clientdesc->Packet(arg1, 32); 
-}
-
-ACMD(do_rmmonarch)
-{
-	char arg1[256];
-
-	one_argument(argument, arg1, sizeof(arg1));
-
-	if (!*arg1)
-	{
-		ch->ChatPacket(CHAT_TYPE_INFO, "Usage: rmmonarch <name>");
-		return;
-	}
-
-	db_clientdesc->DBPacket(HEADER_GD_RMMONARCH, 0, NULL, 32);
-	db_clientdesc->Packet(arg1, 32); 
-}
-
-ACMD(do_check_monarch_money)
-{
-	char arg1[256];
-
-	one_argument(argument, arg1, sizeof(arg1));
-
-	if (!*arg1)
-		return;
-
-	int empire = 0;
-	str_to_number(empire, arg1);
-	int NationMoney = CMonarch::instance().GetMoney(empire);
-
-	ch->ChatPacket(CHAT_TYPE_INFO, "국고: %d 원", NationMoney);
-}
-
 ACMD(do_reset_subskill)
 {
 	char arg1[256];
@@ -4025,28 +3889,6 @@ ACMD(do_siege)
 			ch->ChatPacket(CHAT_TYPE_INFO, "SIEGE END");
 			break;
 	}
-}
-
-ACMD(do_temp)
-{
-	if (false == test_server)
-		return;
-
-	char	arg1[256], arg2[256];
-	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
-
-	if (0 == arg1[0] || 0 == arg2[0])
-	{
-		ch->ChatPacket(CHAT_TYPE_INFO, "Usage: empire money");
-		return;
-	}
-
-	int	empire = 0;
-	str_to_number(empire, arg1);
-	int	money = 0;
-	str_to_number(money, arg2);
-
-	CMonarch::instance().SendtoDBAddMoney(money, empire, ch);
 }
 
 ACMD(do_frog)

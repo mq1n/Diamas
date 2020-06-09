@@ -28,7 +28,6 @@
 #include "login_data.h"
 #include "unique_item.h"
 
-#include "monarch.h"
 #include "affect.h"
 #include "castle.h"
 #include "motion.h"
@@ -807,35 +806,6 @@ void CInputDB::Boot(const char* data)
 	}
 	
 	//END_ADMIN_MANAGER
-		
-	//MONARCH
-	data += 2;
-	data += 2;
-
-	TMonarchInfo& p = *(TMonarchInfo *) data;
-	data += sizeof(TMonarchInfo);
-
-	CMonarch::instance().SetMonarchInfo(&p);
-
-	for (int n = 1; n < 4; ++n)
-	{
-		if (p.name[n] && *p.name[n])
-			sys_log(0, "[MONARCH] Empire %d Pid %d Money %d %s", n, p.pid[n], p.money[n], p.name[n]);
-	}
-	
-	int CandidacySize = decode_2bytes(data);
-	data += 2;
-
-	int CandidacyCount = decode_2bytes(data);
-	data += 2;
-
-	if (test_server)
-		sys_log (0, "[MONARCH] Size %d Count %d", CandidacySize, CandidacyCount);
-
-	data += CandidacySize * CandidacyCount;
-
-	
-	//END_MONARCH
 
 	WORD endCheck=decode_2bytes(data);
 	if (endCheck != 0xffff)
@@ -2214,26 +2184,6 @@ int CInputDB::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 		break;
 	//END_RELOAD_ADMIN
 
-	case HEADER_DG_ADD_MONARCH_MONEY:
-		AddMonarchMoney(DESC_MANAGER::instance().FindByHandle(m_dwHandle), c_pData ); 
-		break;
-
-	case HEADER_DG_DEC_MONARCH_MONEY:
-		DecMonarchMoney(DESC_MANAGER::instance().FindByHandle(m_dwHandle), c_pData );
-		break;
-
-	case HEADER_DG_TAKE_MONARCH_MONEY:
-		TakeMonarchMoney(DESC_MANAGER::instance().FindByHandle(m_dwHandle), c_pData );
-		break;
-
-	case HEADER_DG_CHANGE_MONARCH_LORD_ACK :
-		ChangeMonarchLord((TPacketChangeMonarchLordACK*)c_pData);
-		break;
-
-	case HEADER_DG_UPDATE_MONARCH_INFO :
-		UpdateMonarchInfo((TMonarchInfo*)c_pData);
-		break;
-
 	case HEADER_DG_ACK_CHANGE_GUILD_MASTER :
 		this->GuildChangeMaster((TPacketChangeGuildMaster*) c_pData);
 		break;	
@@ -2306,81 +2256,6 @@ bool CInputDB::Process(LPDESC d, const void * orig, int bytes, int & r_iBytesPro
 	}
 
 	return true;
-}
-
-void CInputDB::AddMonarchMoney(LPDESC d, const char * data )
-{
-	int Empire = *(int *) data;
-	data += sizeof(int);
-
-	int Money = *(int *) data;
-	data += sizeof(int);
-	
-	CMonarch::instance().AddMoney(Money, Empire);
-
-	DWORD pid = CMonarch::instance().GetMonarchPID(Empire);	
-
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pid);
-
-	if (ch)
-	{
-		if (number(1, 100) > 95) 
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("현재 %s 국고에는 %u 의 돈이 있습니다"), EMPIRE_NAME(Empire), CMonarch::instance().GetMoney(Empire));
-	}
-}
-	
-void CInputDB::DecMonarchMoney(LPDESC d, const char * data)
-{
-	int Empire = *(int *) data;
-	data += sizeof(int);
-	
-	int Money = *(int *) data;
-	data += sizeof(int);
-
-	CMonarch::instance().DecMoney(Money, Empire);
-	
-	DWORD pid = CMonarch::instance().GetMonarchPID(Empire);	
-
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pid);
-
-	if (ch)
-	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("현재 %s 국고에는 %d 의 돈이 있습니다"), EMPIRE_NAME(Empire), CMonarch::instance().GetMoney(Empire));
-	}
-}
-
-void CInputDB::TakeMonarchMoney(LPDESC d, const char * data)
-{
-	int Empire = *(int *) data;
-	data += sizeof(int);
-	
-	int Money = *(int *) data;
-	data += sizeof(int);
-
-	if (!CMonarch::instance().DecMoney(Money, Empire))
-	{
-		if (!d)
-			return;
-
-		if (!d->GetCharacter())
-			return;
-
-		LPCHARACTER ch = d->GetCharacter();
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("국고에 돈이 부족하거나 돈을 가져올수 없는 상황입니다"));
-	}
-}
-
-void CInputDB::ChangeMonarchLord(TPacketChangeMonarchLordACK* info)
-{
-	char notice[256];
-	snprintf(notice, sizeof(notice), LC_TEXT("%s의 군주가 %s 님으로 교체되었습니다."), EMPIRE_NAME(info->bEmpire), info->szName);
-	SendNotice(notice);
-}
-
-void CInputDB::UpdateMonarchInfo(TMonarchInfo* info)
-{
-	CMonarch::instance().SetMonarchInfo(info);
-	sys_log(0, "MONARCH INFO UPDATED");
 }
 
 void CInputDB::GuildChangeMaster(TPacketChangeGuildMaster* p)

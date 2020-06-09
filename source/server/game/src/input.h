@@ -249,14 +249,6 @@ protected:
 	void		WeddingStart(TPacketWeddingStart* p);
 	void		WeddingEnd(TPacketWeddingEnd* p);
 
-	void		TakeMonarchMoney(LPDESC d, const char * data );
-	void		AddMonarchMoney(LPDESC d, const char * data );
-	void		DecMonarchMoney(LPDESC d, const char * data );
-	void		SetMonarch( LPDESC d, const char * data );
-
-	void		ChangeMonarchLord(TPacketChangeMonarchLordACK* data);
-	void		UpdateMonarchInfo(TMonarchInfo* data);
-
 	// MYSHOP_PRICE_LIST
 	/// 아이템 가격정보 리스트 요청에 대한 응답 패킷(HEADER_DG_MYSHOP_PRICELIST_RES) 처리함수
 	/**
@@ -299,8 +291,6 @@ class CInputP2P : public CInputProcessor
 #else
 		int			Notice(LPDESC d, const char * c_pData, size_t uiBytes);
 #endif
-		int			MonarchNotice(LPDESC d, const char * c_pData, size_t uiBytes);
-		int			MonarchTransfer(LPDESC d, const char * c_pData);
 		int			Guild(LPDESC d, const char* c_pData, size_t uiBytes);
 		void		Shout(const char * c_pData);
 		void		Disconnect(const char * c_pData);

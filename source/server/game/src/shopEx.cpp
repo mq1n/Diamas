@@ -15,7 +15,6 @@
 #include "log.h"
 #include "db.h"
 #include "questmanager.h"
-#include "monarch.h"
 #include "mob_manager.h"
 #include "locale_service.h"
 #include "desc_client.h"

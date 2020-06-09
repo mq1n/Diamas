@@ -1880,39 +1880,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// Hack 방지를 위한 체크.
 		bool	IsHack(bool bSendMsg = true, bool bCheckShopOwner = true, int limittime = g_nPortalLimitTime);
 
-		// MONARCH
-		BOOL	IsMonarch() const;
-		// END_MONARCH
 		void Say(const std::string & s);
-
-		enum MONARCH_COOLTIME
-		{
-			MC_HEAL = 10,
-			MC_WARP	= 60,
-			MC_TRANSFER = 60,
-			MC_TAX = (60 * 60 * 24 * 7),
-			MC_SUMMON = (60 * 60),
-		};
-
-		enum MONARCH_INDEX
-		{ 
-			MI_HEAL = 0,
-			MI_WARP,
-			MI_TRANSFER,
-			MI_TAX,
-			MI_SUMMON,
-			MI_MAX
-		};
-
-		DWORD m_dwMonarchCooltime[MI_MAX];
-		DWORD m_dwMonarchCooltimelimit[MI_MAX];
-
-		void  InitMC();
-		DWORD GetMC(enum MONARCH_INDEX e) const;
-		void SetMC(enum MONARCH_INDEX e);
-		bool IsMCOK(enum MONARCH_INDEX e) const;
-		DWORD GetMCL(enum MONARCH_INDEX e) const;
-		DWORD GetMCLTime(enum MONARCH_INDEX e) const;
 
 	public:
 		bool ItemProcess_Polymorph(LPITEM item);

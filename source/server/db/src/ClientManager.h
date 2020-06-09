@@ -185,7 +185,6 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	bool		InitializeLandTable();
 	bool		InitializeObjectProto();
 	bool		InitializeObjectTable();
-	bool		InitializeMonarch();
 
 	// mob_proto.txt, item_proto.txt에서 읽은 mob_proto, item_proto를 real db에 반영.
 	//	item_proto, mob_proto를 db에 반영하지 않아도, 게임 돌아가는데는 문제가 없지만,
@@ -510,22 +509,6 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	void UpdateItemCacheSet(DWORD pid);
 
 	void FlushPlayerCacheSet(DWORD pid);
-
-	//MONARCH
-	void Election(CPeer * peer, DWORD dwHandle, const char * p);
-	void Candidacy(CPeer * peer, DWORD dwHandle, const char * p);
-	void AddMonarchMoney(CPeer * peer, DWORD dwHandle, const char * p);
-	void TakeMonarchMoney(CPeer * peer, DWORD dwHandle, const char * p);
-	void ComeToVote(CPeer * peer, DWORD dwHandle, const char * p);
-	void RMCandidacy(CPeer * peer, DWORD dwHandle, const char * p);
-	void SetMonarch(CPeer * peer, DWORD dwHandle, const char * p);
-	void RMMonarch(CPeer * peer, DWORD dwHandle, const char * p);
-								
-
-	void DecMonarchMoney(CPeer * peer, DWORD dwHandle, const char * p);
-	//END_MONARCH
-
-	void ChangeMonarchLord(CPeer* peer, DWORD dwHandle, TPacketChangeMonarchLord* info);
 
 	void SendSpareItemIDRange(CPeer* peer);
 

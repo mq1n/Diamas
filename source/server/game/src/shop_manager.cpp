@@ -15,7 +15,6 @@
 #include "log.h"
 #include "db.h"
 #include "questmanager.h"
-#include "monarch.h"
 #include "mob_manager.h"
 #include "locale_service.h"
 #include "desc_client.h"
@@ -370,9 +369,6 @@ void CShopManager::Sell(LPCHARACTER ch, BYTE bCell, BYTE bCount)
 	else
 		item->SetCount(item->GetCount() - bCount);
 
-	//군주 시스템 : 세금 징수
-	CMonarch::instance().SendtoDBAddMoney(dwTax, ch->GetEmpire(), ch);
-
 	ch->PointChange(POINT_GOLD, dwPrice, false);
 }
 
@@ -382,8 +378,7 @@ bool CompareShopItemName(const SShopItemTable& lhs, const SShopItemTable& rhs)
 	TItemTable* rItem = ITEM_MANAGER::instance().GetTable(rhs.vnum);
 	if (lItem && rItem)
 		return strcmp(lItem->szLocaleName, rItem->szLocaleName) < 0;
-	else
-		return true;
+	return true;
 }
 
 bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
