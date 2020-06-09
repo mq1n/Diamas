@@ -2516,32 +2516,13 @@ bool CPythonNetworkStream::SendAttackPacket(UINT uMotAttack, DWORD dwVIDVictim)
 	kPacketAtk.bType = uMotAttack;
 	kPacketAtk.dwVictimVID = dwVIDVictim;
 
-	if (!SendSpecial(sizeof(kPacketAtk), &kPacketAtk))
+	if (!Send(sizeof(kPacketAtk), &kPacketAtk))
 	{
 		Tracen("Send Battle Attack Packet Error");
 		return false;
 	}
 
 	return SendSequence();
-}
-
-bool CPythonNetworkStream::SendSpecial(int nLen, void * pvBuf)
-{
-	BYTE bHeader = *(BYTE *) pvBuf;
-
-	switch (bHeader)
-	{
-		case HEADER_CG_ATTACK:
-			{
-				TPacketCGAttack * pkPacketAtk = (TPacketCGAttack *) pvBuf;
-				pkPacketAtk->bCRCMagicCubeProcPiece = GetProcessCRCMagicCubePiece();
-				pkPacketAtk->bCRCMagicCubeFilePiece = GetProcessCRCMagicCubePiece();
-				return Send(nLen, pvBuf);
-			}
-			break;
-	}
-
-	return Send(nLen, pvBuf);
 }
 
 bool CPythonNetworkStream::RecvAddFlyTargetingPacket()
@@ -4084,35 +4065,6 @@ bool CPythonNetworkStream::RecvNPCList()
 		CPythonMiniMap::Instance().RegisterAtlasMark(NPCPosition.bType, NPCPosition.name, NPCPosition.x, NPCPosition.y);
 	}
 
-	return true;
-}
-
-bool CPythonNetworkStream::__SendCRCReportPacket()
-{
-	/*
-	DWORD dwProcessCRC = 0;
-	DWORD dwFileCRC = 0;
-	CFilename exeFileName;
-	//LPCVOID c_pvBaseAddress = NULL;
-
-	GetExeCRC(dwProcessCRC, dwFileCRC);
-
-	CFilename strRootPackFileName = CEterPackManager::Instance().GetRootPacketFileName();
-	strRootPackFileName.ChangeDosPath();
-
-	TPacketCGCRCReport kReportPacket;
-
-	kReportPacket.header = HEADER_CG_CRC_REPORT;
-	kReportPacket.byPackMode = CEterPackManager::Instance().GetSearchMode();
-	kReportPacket.dwBinaryCRC32 = dwFileCRC;
-	kReportPacket.dwProcessCRC32 = dwProcessCRC;
-	kReportPacket.dwRootPackCRC32 = GetFileCRC32(strRootPackFileName.c_str());
-
-	if (!Send(sizeof(kReportPacket), &kReportPacket))
-		Tracef("SendClientReportPacket Error");
-
-	return SendSequence();
-	*/	
 	return true;
 }
 

@@ -161,8 +161,6 @@ class DESC
 		void			SetLoginKey(CLoginKey * pkKey);
 		DWORD			GetLoginKey();
 
-		void			AssembleCRCMagicCube(BYTE bProcPiece, BYTE bFilePiece);
-
 		bool			isChannelStatusRequested() const { return m_bChannelStatusRequested; }
 		void			SetChannelStatusRequested(bool bChannelStatusRequested) { m_bChannelStatusRequested = bChannelStatusRequested; }
 
@@ -221,11 +219,6 @@ class DESC
 
 		CLoginKey *		m_pkLoginKey;
 		DWORD			m_dwLoginKey;
-
-		BYTE                    m_bCRCMagicCubeIdx;
-		DWORD                   m_dwProcCRC;
-		DWORD                   m_dwFileCRC;
-		bool			m_bHackCRCQuery;
 
 		std::string		m_Login;
 		int				m_outtime;

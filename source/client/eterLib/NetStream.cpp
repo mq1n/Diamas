@@ -556,7 +556,6 @@ const char * GetSendHeaderName(BYTE header)
 		stringList[100] = "HEADER_CG_MARK_LOGIN";
 		stringList[101] = "HEADER_CG_MARK_CRCLIST";
 		stringList[102] = "HEADER_CG_MARK_UPLOAD";
-		stringList[103] = "HEADER_CG_CRC_REPORT";
 		stringList[105] = "HEADER_CG_HACK";
 		stringList[106] = "HEADER_CG_CHANGE_NAME";
 		stringList[109] = "HEADER_CG_LOGIN2";

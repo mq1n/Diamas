@@ -426,14 +426,6 @@ dev_log(LOG_DEB0, "DC : '%s'", msg.c_str());
 						db_clientdesc->DBPacket(HEADER_GD_DC, 0, &p, sizeof(p));
 					}
 				}
-				else if (!stBuf.compare(0, 10, "RELOAD_CRC"))
-				{
-					LoadValidCRCList();
-
-					BYTE bHeader = HEADER_GG_RELOAD_CRC_LIST;
-					P2P_MANAGER::instance().Send(&bHeader, sizeof(BYTE));
-					stResult = "OK";
-				}
 				else if (!stBuf.compare(0, 6, "RELOAD"))
 				{
 					if (stBuf.size() == 6)

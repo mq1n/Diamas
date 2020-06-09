@@ -113,8 +113,6 @@ enum
 	HEADER_CG_MARK_CRCLIST						= 101,
 	HEADER_CG_MARK_UPLOAD						= 102,
 	HEADER_CG_MARK_IDXLIST						= 104,
-
-	HEADER_CG_CRC_REPORT						= 103,
 	
 	HEADER_CG_HACK								= 105,
     HEADER_CG_CHANGE_NAME                       = 106,
@@ -498,8 +496,6 @@ typedef struct command_attack
 	BYTE	header;
 	BYTE	bType;			// 공격 유형
 	DWORD	dwVictimVID;	// 적 VID
-	BYTE	bCRCMagicCubeProcPiece;
-	BYTE	bCRCMagicCubeFilePiece;
 } TPacketCGAttack;
 
 typedef struct command_chat
@@ -943,15 +939,6 @@ typedef struct SPacketCGChangeName
     BYTE index;
     char name[CHARACTER_NAME_MAX_LEN+1];
 } TPacketCGChangeName;
-
-typedef struct command_crc_report
-{
-	BYTE header;
-	BYTE byPackMode;
-	DWORD dwBinaryCRC32;
-	DWORD dwProcessCRC32;
-	DWORD dwRootPackCRC32;
-} TPacketCGCRCReport;
 
 enum EPartyExpDistributionType
 {

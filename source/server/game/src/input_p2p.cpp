@@ -462,10 +462,6 @@ int CInputP2P::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			XmasWarpSantaReply(c_pData);
 			break;
 
-		case HEADER_GG_RELOAD_CRC_LIST:
-			LoadValidCRCList();
-			break;
-
 		case HEADER_GG_LOGIN_PING:
 			LoginPing(d, c_pData);
 			break;
