@@ -1593,27 +1593,6 @@ namespace quest
 		return 1;
 	}
 
-	int pc_give_lotto(lua_State* L)
-	{
-		CQuestManager& q = CQuestManager::instance();
-		LPCHARACTER ch = q.GetCurrentCharacterPtr();
-
-		sys_log(0, "TRY GIVE LOTTO TO pid %u", ch->GetPlayerID());
-
-		DWORD * pdw = M2_NEW DWORD[3];
-
-		pdw[0] = 50001;
-		pdw[1] = 1;
-		pdw[2] = q.GetEventFlag("lotto_round");
-
-		// 추첨서는 소켓을 설정한다
-		DBManager::instance().ReturnQuery(QID_LOTTO, ch->GetPlayerID(), pdw,
-				"INSERT INTO lotto_list VALUES(0, 'server%s', %u, NOW())",
-				get_table_postfix(), ch->GetPlayerID());
-
-		return 0;
-	}
-
 	int pc_aggregate_monster(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
@@ -2917,7 +2896,6 @@ teleport_area:
 			{ "get_equip_refine_level",	pc_get_equip_refine_level },
 			{ "refine_equip",		pc_refine_equip		},
 			{ "get_skill_level",	pc_get_skill_level	},
-			{ "give_lotto",		pc_give_lotto		},
 			{ "aggregate_monster",	pc_aggregate_monster	},
 			{ "forget_my_attacker",	pc_forget_my_attacker	},
 			{ "pc_attract_ranger",	pc_attract_ranger	},

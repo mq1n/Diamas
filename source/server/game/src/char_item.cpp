@@ -2778,21 +2778,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 												if (prob <= info[i].prob)
 												{
-													if (info[i].dwVnum == 50001)
-													{
-														DWORD * pdw = M2_NEW DWORD[2];
-
-														pdw[0] = info[i].dwVnum;
-														pdw[1] = info[i].count;
-
-														// 추첨서는 소켓을 설정한다
-														DBManager::instance().ReturnQuery(QID_LOTTO, GetPlayerID(), pdw,
-																"INSERT INTO lotto_list VALUES(0, 'server%s', %u, NOW())", 
-																get_table_postfix(), GetPlayerID());
-													}
-													else
-														AutoGiveItem(info[i].dwVnum, info[i].count);
-
+													AutoGiveItem(info[i].dwVnum, info[i].count);
 													break;
 												}
 												prob -= info[i].prob;

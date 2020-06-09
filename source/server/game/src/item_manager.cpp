@@ -685,68 +685,6 @@ bool ITEM_MANAGER::GetVnumByOriginalName(const char * c_pszName, DWORD & r_dwVnu
 	return false;
 }
 
-std::set<DWORD> g_set_lotto;
-
-void load_lotto()
-{
-	static int bLoaded = false;
-
-	if (bLoaded)
-		return;
-
-	bLoaded = true;
-	FILE * fp = fopen("lotto.txt", "r");
-
-	if (!fp)
-		return;
-
-	char buf[256];
-
-	while (fgets(buf, 256, fp))
-	{
-		char * psz = strchr(buf, '\n');
-
-		if (NULL != psz)
-			*psz = '\0';
-
-		DWORD dw = 0;
-		str_to_number(dw, buf);
-		g_set_lotto.insert(dw);
-	}
-
-	fclose(fp);
-}
-
-DWORD lotto()
-{
-	load_lotto();
-
-	char szBuf[6 + 1];
-
-	do
-	{
-		for (int i = 0; i < 6; ++i)
-			szBuf[i] = 48 + number(1, 9);
-
-		szBuf[6] = '\0';
-
-		DWORD dw = 0;
-		str_to_number(dw, szBuf);
-
-		if (g_set_lotto.end() == g_set_lotto.find(dw))
-		{
-			FILE * fp = fopen("lotto.txt", "a+");
-			if (fp)
-			{
-				fprintf(fp, "%u\n", dw);
-				fclose(fp);
-			}
-			return dw;
-		}
-	}
-	while (1);
-}
-
 
 class CItemDropInfo
 {
@@ -1031,20 +969,6 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 			vec_item.push_back(item);
 	}
 
-
-	if (GetDropPerKillPct(100, 1000, iDeltaPercent, "lotto_drop") >= number(1, iRandRange))
-	{
-		DWORD * pdw = M2_NEW DWORD[3];
-
-		pdw[0] = 50001;
-		pdw[1] = 1;
-		pdw[2] = quest::CQuestManager::instance().GetEventFlag("lotto_round");
-
-		// 행운의 서는 소켓을 설정한다
-		DBManager::instance().ReturnQuery(QID_LOTTO, pkKiller->GetPlayerID(), pdw,
-				"INSERT INTO lotto_list VALUES(0, 'server%s', %u, NOW())",
-				get_table_postfix(), pkKiller->GetPlayerID());
-	}
 
 	//
 	// 스페셜 드롭 아이템

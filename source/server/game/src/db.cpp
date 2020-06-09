@@ -421,38 +421,6 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 			}
 			break;
 
-		case QID_LOTTO:
-			{
-				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(qi->dwIdent);
-				DWORD * pdw = (DWORD *) qi->pvData;
-
-				if (ch)
-				{
-					if (pMsg->Get()->uiAffectedRows == 0 || pMsg->Get()->uiAffectedRows == (uint32_t)-1)
-					{
-						sys_log(0, "GIVE LOTTO FAIL TO pid %u", ch->GetPlayerID());
-					}
-					else
-					{
-						LPITEM pkItem = ch->AutoGiveItem(pdw[0], pdw[1]);
-
-						if (pkItem)
-						{
-							sys_log(0, "GIVE LOTTO SUCCESS TO %s (pid %u)", ch->GetName(), qi->dwIdent);
-							//ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("¾ÆÀÌÅÛ È¹µæ: %s"), pkItem->GetName());
-
-							pkItem->SetSocket(0, pMsg->Get()->uiInsertID);
-							pkItem->SetSocket(1, pdw[2]);
-						}
-						else
-							sys_log(0, "GIVE LOTTO FAIL2 TO pid %u", ch->GetPlayerID());
-					}
-				}
-
-				M2_DELETE_ARRAY(pdw);
-			}
-			break;
-
 		case QID_HIGHSCORE_REGISTER:
 			{
 				THighscoreRegisterQueryInfo * info = (THighscoreRegisterQueryInfo *) qi->pvData;
