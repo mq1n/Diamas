@@ -136,8 +136,6 @@ extern bool g_NoMountAtGuildWar;
 extern bool g_NoPotionsOnPVP;
 // #endif
 
-extern bool bXTrapEnabled;
-
 extern int gPlayerMaxLevel;
 extern int gShutdownAge;
 extern int gShutdownEnable;	

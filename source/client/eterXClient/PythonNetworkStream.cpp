@@ -171,8 +171,6 @@ class CMainPacketHeaderMap : public CNetworkPacketHeaderMap
 			Set(HEADER_GC_DIG_MOTION, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCDigMotion), STATIC_SIZE_PACKET));
 			Set(HEADER_GC_DAMAGE_INFO, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCDamageInfo), STATIC_SIZE_PACKET));
 
-			Set(HEADER_GC_XTRAP_CS1_REQUEST, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketXTrapCSVerify), STATIC_SIZE_PACKET));
-
 			Set(HEADER_GC_SPECIFIC_EFFECT,	CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCSpecificEffect), STATIC_SIZE_PACKET));
 			Set(HEADER_GC_DRAGON_SOUL_REFINE,		CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCDragonSoulRefine), STATIC_SIZE_PACKET));
 			

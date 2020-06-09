@@ -4,8 +4,6 @@
 #include "Test.h"
 #include "AccountConnector.h"
 
-#include "WiseLogicXTrap.h"
-
 // Login ---------------------------------------------------------------------------
 void CPythonNetworkStream::LoginPhase()
 {

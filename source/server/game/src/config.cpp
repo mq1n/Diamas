@@ -136,8 +136,6 @@ void		LoadValidCRCList();
 bool            g_protectNormalPlayer   = false;        // 범법자가 "평화모드" 인 일반유저를 공격하지 못함
 bool            g_noticeBattleZone      = false;        // 중립지대에 입장하면 안내메세지를 알려줌
 
-bool		bXTrapEnabled = false;
-
 int gPlayerMaxLevel = 99;
 int gShutdownAge = 0;
 int gShutdownEnable = 0;
@@ -1327,17 +1325,6 @@ static bool __LoadGeneralConfigFile(const char* configName)
 		TOKEN("notice_battle_zone")
 		{
 			str_to_number(g_noticeBattleZone, value_string);
-		}
-
-		TOKEN("xtrap_enable")
-		{
-			int flag = 0;
-			str_to_number(flag, value_string);
-
-			if (1 == flag )
-			{
-				bXTrapEnabled = true;
-			}
 		}
 
 		TOKEN("pk_protect_level")

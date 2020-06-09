@@ -2,7 +2,6 @@
 #include "PythonNetworkStream.h"
 #include "PythonApplication.h"
 #include "Packet.h"
-#include "WiseLogicXTrap.h"
 
 // HandShake ---------------------------------------------------------------------------
 void CPythonNetworkStream::HandShakePhase()
@@ -200,28 +199,3 @@ bool CPythonNetworkStream::RecvKeyAgreementCompletedPacket()
 	return true;
 }
 #endif // _IMPROVED_PACKET_ENCRYPTION_
-
-bool CPythonNetworkStream::RecvXTrapVerifyRequest()
-{
-	TPacketXTrapCSVerify packet;
-
-	if (!Recv(sizeof(packet), &packet))
-	{
-		TraceError("XTrap: Recv failed");
-
-		return false;
-	}
-
-	TPacketXTrapCSVerify packet_res;
-	packet_res.bHeader = HEADER_CG_XTRAP_ACK;
-
-	XTrap_ValidateCheckStream( packet.bPacketData, packet_res.bPacketData );
-
-	if (!Send(sizeof(packet_res), &packet_res))
-	{
-		TraceError("XTrap: Send failed");
-		return false;
-	}
-
-	return true;
-}

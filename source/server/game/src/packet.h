@@ -95,13 +95,6 @@ enum
 	
 //	HEADER_CG_ROULETTE				= 200,
 
-	//
-	//NOTE : 이런 개XXX 정말 이거 Packet설계한 사람은 누구냐. 이렇게 코딩하고 밥이 넘어가나.
-	//enum을 별도로 구별을 하던가. 아님 namepsace로 구별을 하던가..
-	//정말 packet generator까지는 바라지도 않는다. 이런 씨XX
-	//이러다가 숫자 겹치면 누가 책임지는데???
-	HEADER_CG_XTRAP_ACK				= 204,
-
 	HEADER_CG_DRAGON_SOUL_REFINE			= 205,
 	HEADER_CG_STATE_CHECKER					= 206,
 
@@ -266,8 +259,6 @@ enum
 	HEADER_GC_ROULETTE					= 200, 
 	// END_ROULETTE			
 	//
-
-	HEADER_GC_XTRAP_CS1_REQUEST				= 205,
 
 	HEADER_GC_SPECIFIC_EFFECT				= 208,
 

@@ -4,8 +4,6 @@
 #include "PythonNetworkStream.h"
 #include "../eterBase/tea.h"
 
-#include "WiseLogicXTrap.h"
-
 // CHINA_CRYPT_KEY
 DWORD g_adwEncryptKey[4];
 DWORD g_adwDecryptKey[4];
@@ -187,11 +185,6 @@ bool CAccountConnector::__AuthState_RecvPhase()
 		const char* key = LocaleService_GetSecurityKey();
 		SetSecurityMode(true, key);
 #endif
-
-#ifdef XTRAP_CLIENT_ENABLE
-		XTrap_SetUserInfo(m_strID.c_str(), NULL, NULL, NULL, NULL);
-#endif
-
 
 		TPacketCGLogin3 LoginPacket;
 		LoginPacket.header = HEADER_CG_LOGIN3;

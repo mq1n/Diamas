@@ -21,7 +21,6 @@
 #include "CheckLatestFiles.h"
 
 #include "NProtectGameGuard.h"
-#include "WiseLogicXTrap.h"
 
 // d3dx8.lib(cleanmesh.obj) : error LNK2019: unresolved external symbol __vsnprintf referenced in function "void __cdecl OutputError
 int(WINAPIV* __vsnprintf)(char*, size_t, const char*, va_list) = _vsnprintf;
@@ -421,11 +420,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	LocaleService_LoadConfig("locale.cfg");
 	SetDefaultCodePage(LocaleService_GetCodePage());	
-
-#ifdef XTRAP_CLIENT_ENABLE
-	if (!XTrap_Init())
-		return 0;
-#endif
 
 #ifdef USE_NPROTECT_GAMEGUARD
 	if (!GameGuard_Init())

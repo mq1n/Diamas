@@ -127,8 +127,6 @@ enum
 	HEADER_CG_SCRIPT_SELECT_ITEM				= 114,
 	HEADER_CG_LOGIN4							= 115,
 
-	HEADER_CG_XTRAP_ACK							= 204,
-
 	HEADER_CG_DRAGON_SOUL_REFINE			= 205,
 	HEADER_CG_STATE_CHECKER					= 206,
 
@@ -305,7 +303,6 @@ enum
 	// END_OF_AUTOBAN
 
 #else
-	HEADER_GC_XTRAP_CS1_REQUEST					= 205,
 #endif
 
 	HEADER_GC_SPECIFIC_EFFECT					= 208,
@@ -2517,13 +2514,6 @@ typedef struct packet_state
 	TPixelPosition	kPPos;
 } TPacketCCState;
 
-//NOTE : recv/send에 공통으로 생김, bPacketData의 내용만 바뀐다.
-typedef struct packet_xtrap_verify
-{
-	BYTE	bHeader;
-	BYTE	bPacketData[128];
-
-} TPacketXTrapCSVerify;
 // AUTOBAN
 typedef struct packet_autoban_quiz
 {

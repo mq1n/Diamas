@@ -555,9 +555,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool	RecvAccePacket(bool bReturn = false);
 #endif
 
-		//Security
-		bool RecvXTrapVerifyRequest();
-
 		// @fixme007
 		bool RecvUnk213();
 
