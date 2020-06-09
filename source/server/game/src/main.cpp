@@ -62,11 +62,6 @@
 #include "SpeedServer.h"
 #include "DragonSoul.h"
 
-
-#ifdef __AUCTION__
-#include "auction_manager.h"
-#endif
-
 #ifdef USE_STACKTRACE
 #include <execinfo.h>
 #endif
@@ -390,10 +385,6 @@ int main(int argc, char **argv)
 
 	CSpeedServerManager SSManager;
 	DSManager dsManager;
-
-#ifdef __AUCTION__
-	AuctionManager auctionManager;
-#endif
 
 	if (!start(argc, argv)) {
 		CleanUpForEarlyExit();

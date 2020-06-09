@@ -49,10 +49,6 @@
 
 #include "../../common/CommonDefines.h"
 
-#ifdef __AUCTION__
-#include "auction_manager.h"
-#endif
-
 #define MAPNAME_DEFAULT	"none"
 
 bool GetServerLocation(TAccountTable & rTab, BYTE bEmpire)
@@ -803,10 +799,7 @@ void CInputDB::Boot(const char* data)
 		for (WORD i = 0; i < size; ++i, ++kObj)
 			CManager::instance().LoadObject(kObj, true);
 	}
-#ifdef __AUCTION__	
-	// Auction
-	AuctionManager::instance().Boot(data);
-#endif
+
 	set_global_time(*(time_t *) data);
 	data += sizeof(time_t);
 
@@ -2516,12 +2509,6 @@ int CInputDB::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 	case HEADER_DG_RESPOND_CHANNELSTATUS:
 		RespondChannelStatus(DESC_MANAGER::instance().FindByHandle(m_dwHandle), c_pData);
 		break;
-#ifdef __AUCTION__
-	case HEADER_DG_AUCTION_RESULT:
-		if (auction_server)
-			AuctionManager::instance().recv_result_auction(m_dwHandle, (TPacketDGResultAuction*)c_pData);
-		break;
-#endif
 	default:
 		return (-1);
 	}

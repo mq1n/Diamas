@@ -51,10 +51,6 @@
 #include "belt_inventory_helper.h"
 #include "../../common/CommonDefines.h"
 
-//auction_temp
-#ifdef __AUCTION__
-#include "auction_manager.h"
-#endif
 const int ITEM_BROKEN_METIN_VNUM = 28960;
 #define ENABLE_EFFECT_EXTRAPOT
 #define ENABLE_BOOKS_STACKFIX

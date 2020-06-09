@@ -158,9 +158,6 @@ extern bool gHackCheckEnable;
 extern bool g_BlockCharCreation;
 
 // missing begin
-#ifdef __AUCTION__
-extern int auction_server;
-#endif
 extern int speed_server;
 extern int openid_server;
 extern bool	g_bNoPasspod;

@@ -11,9 +11,6 @@
 #include "Marriage.h"
 #include "Monarch.h"
 #include "ItemIDRangeManager.h"
-#ifdef __AUCTION__
-#include "AuctionManager.h"
-#endif
 #include <signal.h>
 
 void SetPlayerDBName(const char* c_pszPlayerDBName);
@@ -80,18 +77,13 @@ int main()
 	marriage::CManager MarriageManager;
 	CMonarch Monarch;
 	CItemIDRangeManager ItemIDRangeManager;
-#ifdef __AUCTION__
-	AuctionManager auctionManager;
-#endif
 	if (!Start())
 		return 1;
 
 	GuildManager.Initialize();
 	MarriageManager.Initialize();
 	ItemIDRangeManager.Build();
-#ifdef __AUCTION__
-	AuctionManager::instance().Initialize();
-#endif
+
 	sys_log(0, "Metin2DBCacheServer Start\n");
 
 	CClientManager::instance().MainLoop();
