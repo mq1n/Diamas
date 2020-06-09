@@ -3,29 +3,6 @@
 #include "ModelInstance.h"
 #include "Model.h"
 
-#ifdef _TEST
-
-#include "../eterlib/GrpScreen.h"
-
-void Granny_RenderBoxBones(const granny_skeleton* pkGrnSkeleton, const granny_world_pose* pkGrnWorldPose, const D3DXMATRIX& matBase)
-{
-	D3DXMATRIX matWorld;
-	CScreen screen;	
-	for (int iBone = 0; iBone != pkGrnSkeleton->BoneCount; ++iBone)
-	{
-		const granny_bone& rkGrnBone = pkGrnSkeleton->Bones[iBone];				
-		const D3DXMATRIX* c_matBone=(const D3DXMATRIX*)GrannyGetWorldPose4x4(pkGrnWorldPose, iBone);
-		
-		D3DXMatrixMultiply(&matWorld, c_matBone, &matBase);
-		
-		STATEMANAGER.SetTransform(D3DTS_WORLD, &matWorld);
-		screen.RenderBox3d(-5.0f, -5.0f, -5.0f, 5.0f, 5.0f, 5.0f);
-	}
-}
-
-#endif
-
-
 void CGrannyModelInstance::DeformNoSkin(const D3DXMATRIX * c_pWorldMatrix)
 {
 	if (IsEmpty())
@@ -50,13 +27,6 @@ void CGrannyModelInstance::RenderWithOneTexture()
 	// FIXME : Deform, Render, BlendRender를 묶어 상위에서 걸러주는 것이 더 나을 듯 - [levites]
 	if (IsEmpty())
 		return;
-
-#ifdef _TEST
-	Granny_RenderBoxBones(GrannyGetSourceSkeleton(m_pgrnModelInstance), m_pgrnWorldPose, TEST_matWorld);
-	if (GetAsyncKeyState('P'))
-		Tracef("render %x", m_pgrnModelInstance);	
-	return;
-#endif
 
 	STATEMANAGER.SetVertexShader(ms_pntVS);
 

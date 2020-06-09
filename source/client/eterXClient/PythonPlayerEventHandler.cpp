@@ -133,28 +133,6 @@ void CPythonPlayerEventHandler::OnHit(UINT uSkill, CActorInstance& rkActorVictim
 
 	if (isSendPacket)
 	{
-//#define ATTACK_TIME_LOG
-#ifdef ATTACK_TIME_LOG
-		static std::map<DWORD, float> s_prevTimed;
-		float curTime = timeGetTime() / 1000.0f;
-		bool isFirst = false;
-		if (s_prevTimed.end() == s_prevTimed.find(dwVIDVictim))
-		{
-			s_prevTimed[dwVIDVictim] = curTime;
-			isFirst = true;
-		}
-		float diffTime = curTime-s_prevTimed[dwVIDVictim];
-		if (diffTime < 0.1f && !isFirst)
-		{
-			TraceError("ATTACK(SPEED_HACK): %.4f(%.4f) %d", curTime, diffTime, dwVIDVictim);
-		}
-		else
-		{
-			TraceError("ATTACK: %.4f(%.4f) %d", curTime, diffTime, dwVIDVictim);
-		}
-		
-		s_prevTimed[dwVIDVictim] = curTime;
-#endif
 		CPythonNetworkStream& rkStream=CPythonNetworkStream::Instance();
 		rkStream.SendAttackPacket(uSkill, dwVIDVictim);
 	}

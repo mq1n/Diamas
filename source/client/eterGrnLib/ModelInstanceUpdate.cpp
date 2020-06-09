@@ -189,10 +189,6 @@ void CGrannyModelInstance::UpdateWorldMatrices(const D3DXMATRIX* c_pWorldMatrix)
 			D3DXMatrixMultiply(&rWorldMatrix, &boneMatrices[iBone], c_pWorldMatrix);
 		}
 	}
-
-#ifdef _TEST
-	TEST_matWorld = *c_pWorldMatrix;
-#endif
 }
 
 void CGrannyModelInstance::DeformPNTVertices(void * pvDest)

@@ -2179,10 +2179,6 @@ void CClientManager::ProcessPackets(CPeer * peer)
 		m_bLastHeader = header;
 		++iCount;
 
-#ifdef _TEST	
-		if (header != 10)
-			sys_log(0, " ProcessPacket Header [%d] Handle[%d] Length[%d] iCount[%d]", header, dwHandle, dwLength, iCount);
-#endif
 		if (g_test_server)
 		{
 			if (header != 10)
@@ -2643,10 +2639,6 @@ int CClientManager::AnalyzeQueryResult(SQLMsg * msg)
 	CQueryInfo * qi = (CQueryInfo *) msg->pvUserData;
 	CPeer * peer = GetPeer(qi->dwIdent);
 
-#ifdef _TEST
-	if (qi->iType != QID_ITEM_AWARD_LOAD)
-	sys_log(0, "AnalyzeQueryResult %d", qi->iType);
-#endif
 	switch (qi->iType)
 	{
 		case QID_ITEM_AWARD_LOAD:

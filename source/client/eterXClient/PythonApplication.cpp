@@ -160,11 +160,8 @@ void CPythonApplication::Exit()
 	PostQuitMessage(0);
 }
 
-bool PERF_CHECKER_RENDER_GAME = false;
-
 void CPythonApplication::RenderGame()
 {	
-	if (!PERF_CHECKER_RENDER_GAME)
 	{
 		float fAspect=m_kWndMgr.GetAspect();
 		float fFarClip=m_pyBackground.GetFarClip();
@@ -215,115 +212,15 @@ void CPythonApplication::RenderGame()
 		m_pyBackground.EndEnvironment();
 
 		m_pyBackground.RenderAfterLensFlare();
-
-		return;
 	}
-
-	//if (GetAsyncKeyState(VK_Z))
-	//	STATEMANAGER.SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-
-	DWORD t1=ELTimer_GetMSec();
-	m_kChrMgr.Deform();
-	DWORD t2=ELTimer_GetMSec();
-	m_kEftMgr.Update();
-	DWORD t3=ELTimer_GetMSec();
-	m_pyBackground.RenderCharacterShadowToTexture();
-	DWORD t4=ELTimer_GetMSec();
-
-	m_pyGraphic.SetGameRenderState();
-	m_pyGraphic.PushState();
-
-	float fAspect=m_kWndMgr.GetAspect();
-	float fFarClip=m_pyBackground.GetFarClip();
-
-	m_pyGraphic.SetPerspective(30.0f, fAspect, 100.0, fFarClip);
-
-	DWORD t5=ELTimer_GetMSec();
-
-	CCullingManager::Instance().Process();
-
-	DWORD t6=ELTimer_GetMSec();
-
-	{
-		long lx, ly;
-		m_kWndMgr.GetMousePosition(lx, ly);
-		m_pyGraphic.SetCursorPosition(lx, ly);
-	}
-
-	m_pyBackground.RenderSky();
-	DWORD t7=ELTimer_GetMSec();
-	m_pyBackground.RenderBeforeLensFlare();
-	DWORD t8=ELTimer_GetMSec();
-	m_pyBackground.RenderCloud();
-	DWORD t9=ELTimer_GetMSec();
-	m_pyBackground.BeginEnvironment();
-	m_pyBackground.Render();
-
-	m_pyBackground.SetCharacterDirLight();
-	DWORD t10=ELTimer_GetMSec();
-	m_kChrMgr.Render();
-	DWORD t11=ELTimer_GetMSec();
-
-	m_pyBackground.SetBackgroundDirLight();
-	m_pyBackground.RenderWater();
-	DWORD t12=ELTimer_GetMSec();
-	m_pyBackground.RenderEffect();
-	DWORD t13=ELTimer_GetMSec();
-	m_pyBackground.EndEnvironment();
-	m_kEftMgr.Render();
-	DWORD t14=ELTimer_GetMSec();
-	m_pyItem.Render();
-	DWORD t15=ELTimer_GetMSec();
-	m_FlyingManager.Render();
-	DWORD t16=ELTimer_GetMSec();
-	m_pyBackground.BeginEnvironment();
-	m_pyBackground.RenderPCBlocker();
-	m_pyBackground.EndEnvironment();
-	DWORD t17=ELTimer_GetMSec();
-	m_pyBackground.RenderAfterLensFlare();
-	DWORD t18=ELTimer_GetMSec();
-	DWORD tEnd=ELTimer_GetMSec();
-
-	if (GetAsyncKeyState(VK_Z))
-		STATEMANAGER.SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-
-	if (tEnd-t1<3)
-		return;
-
-	static FILE* fp=fopen("perf_game_render.txt", "w");
-
-	fprintf(fp, "GR.Total %d (Time %d)\n", tEnd-t1, ELTimer_GetMSec());
-	fprintf(fp, "GR.DFM %d\n", t2-t1);
-	fprintf(fp, "GR.EFT.UP %d\n", t3-t2);
-	fprintf(fp, "GR.SHW %d\n", t4-t3);
-	fprintf(fp, "GR.STT %d\n", t5-t4);
-	fprintf(fp, "GR.CLL %d\n", t6-t5);
-	fprintf(fp, "GR.BG.SKY %d\n", t7-t6);
-	fprintf(fp, "GR.BG.LEN %d\n", t8-t7);
-	fprintf(fp, "GR.BG.CLD %d\n", t9-t8);
-	fprintf(fp, "GR.BG.MAIN %d\n", t10-t9);		
-	fprintf(fp, "GR.CHR %d\n",	t11-t10);
-	fprintf(fp, "GR.BG.WTR %d\n", t12-t11);
-	fprintf(fp, "GR.BG.EFT %d\n", t13-t12);
-	fprintf(fp, "GR.EFT %d\n", t14-t13);
-	fprintf(fp, "GR.ITM %d\n", t15-t14);
-	fprintf(fp, "GR.FLY %d\n", t16-t15);
-	fprintf(fp, "GR.BG.BLK %d\n", t17-t16);
-	fprintf(fp, "GR.BG.LEN %d\n", t18-t17);
-
-
-	fflush(fp);
 }
 
 void CPythonApplication::UpdateGame()
 {
-	DWORD t1=ELTimer_GetMSec();
 	POINT ptMouse;
 	GetMousePosition(&ptMouse);
 
 	CGraphicTextInstance::Hyperlink_UpdateMousePos(ptMouse.x, ptMouse.y);
-
-	DWORD t2=ELTimer_GetMSec();
 
 	//!@# Alt+Tab 중 SetTransfor 에서 튕김 현상 해결을 위해 - [levites]
 	//if (m_isActivateWnd)
@@ -336,56 +233,28 @@ void CPythonApplication::UpdateGame()
 		s.BuildViewFrustum();
 	}
 
-	DWORD t3=ELTimer_GetMSec();
 	TPixelPosition kPPosMainActor;
 	m_pyPlayer.NEW_GetMainActorPosition(&kPPosMainActor);
 
-	DWORD t4=ELTimer_GetMSec();
 	m_pyBackground.Update(kPPosMainActor.x, kPPosMainActor.y, kPPosMainActor.z);
 
-	DWORD t5=ELTimer_GetMSec();
 	m_GameEventManager.SetCenterPosition(kPPosMainActor.x, kPPosMainActor.y, kPPosMainActor.z);
 	m_GameEventManager.Update();
 
-	DWORD t6=ELTimer_GetMSec();
 	m_kChrMgr.Update();	
-	DWORD t7=ELTimer_GetMSec();
+
 	m_kEftMgr.UpdateSound();
-	DWORD t8=ELTimer_GetMSec();
+
 	m_FlyingManager.Update();
-	DWORD t9=ELTimer_GetMSec();
+
 	m_pyItem.Update(ptMouse);
-	DWORD t10=ELTimer_GetMSec();
+
 	m_pyPlayer.Update();
-	DWORD t11=ELTimer_GetMSec();
 
 	// NOTE : Update 동안 위치 값이 바뀌므로 다시 얻어 옵니다 - [levites]
 	//        이 부분 때문에 메인 케릭터의 Sound가 이전 위치에서 플레이 되는 현상이 있었음.
 	m_pyPlayer.NEW_GetMainActorPosition(&kPPosMainActor);
 	SetCenterPosition(kPPosMainActor.x, kPPosMainActor.y, kPPosMainActor.z);
-	DWORD t12=ELTimer_GetMSec();
-
-	if (PERF_CHECKER_RENDER_GAME)
-	{
-		if (t12-t1>5)
-		{
-			static FILE* fp=fopen("perf_game_update.txt", "w");
-
-			fprintf(fp, "GU.Total %d (Time %d)\n", t12-t1, ELTimer_GetMSec());
-			fprintf(fp, "GU.GMP %d\n", t2-t1);
-			fprintf(fp, "GU.SCR %d\n", t3-t2);
-			fprintf(fp, "GU.MPS %d\n", t4-t3);
-			fprintf(fp, "GU.BG %d\n", t5-t4);
-			fprintf(fp, "GU.GEM %d\n", t6-t5);
-			fprintf(fp, "GU.CHR %d\n", t7-t6);
-			fprintf(fp, "GU.EFT %d\n", t8-t7);
-			fprintf(fp, "GU.FLY %d\n", t9-t8);
-			fprintf(fp, "GU.ITM %d\n", t10-t9);
-			fprintf(fp, "GU.PLR %d\n", t11-t10);
-			fprintf(fp, "GU.POS %d\n", t12-t11);
-			fflush(fp);
-		}
-	}
 }
 
 void CPythonApplication::SkipRenderBuffering(DWORD dwSleepMSec)

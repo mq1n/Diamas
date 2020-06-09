@@ -2510,13 +2510,6 @@ bool CPythonNetworkStream::SendAttackPacket(UINT uMotAttack, DWORD dwVIDVictim)
 	if (!__CanActMainInstance())
 		return true;
 
-#ifdef ATTACK_TIME_LOG
-	static DWORD prevTime = timeGetTime();
-	DWORD curTime = timeGetTime();
-	TraceError("TIME: %.4f(%.4f) ATTACK_PACKET: %d TARGET: %d", curTime/1000.0f, (curTime-prevTime)/1000.0f, uMotAttack, dwVIDVictim);
-	prevTime = curTime;
-#endif
-
 	TPacketCGAttack kPacketAtk;
 
 	kPacketAtk.header = HEADER_CG_ATTACK;
