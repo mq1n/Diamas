@@ -92,6 +92,11 @@ else()
 endif()
 add_definitions(-D_DIRECTORY_="${CMAKE_SOURCE_DIR}")
 
+add_definitions(-D__MAJOR_VERSION__="${MAJOR_VERSION}")
+add_definitions(-D__PRODUCT_VERSION__="${MAJOR_VERSION}.${gitVersion}")
+add_definitions(-D__FILE_VERSION__=${MAJOR_VERSION},${gitVersion},0,0)
+add_definitions(-D__DIAMAS_VERSION__=${MAJOR_VERSION}${gitVersion})
+
 # Until to build client x64 3rd libs, Disable client build for x64.
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(BUILD_CLIENT OFF)

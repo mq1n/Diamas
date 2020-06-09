@@ -205,6 +205,18 @@ void CShopManager::StopShopping(LPCHARACTER ch)
 // 아이템 구입
 void CShopManager::Buy(LPCHARACTER ch, BYTE pos)
 {
+#ifdef ENABLE_NEWSTUFF
+	if (0 != g_BuySellTimeLimitValue)
+	{
+		if (get_dword_time() < ch->GetLastBuySellTime()+g_BuySellTimeLimitValue)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 골드를 버릴 수 없습니다."));
+			return;
+		}
+	}
+
+	ch->SetLastBuySellTime(get_dword_time());
+#endif
 	if (!ch->GetShop())
 		return;
 
@@ -256,6 +268,18 @@ void CShopManager::Buy(LPCHARACTER ch, BYTE pos)
 
 void CShopManager::Sell(LPCHARACTER ch, BYTE bCell, BYTE bCount)
 {
+#ifdef ENABLE_NEWSTUFF
+	if (0 != g_BuySellTimeLimitValue)
+	{
+		if (get_dword_time() < ch->GetLastBuySellTime()+g_BuySellTimeLimitValue)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 골드를 버릴 수 없습니다."));
+			return;
+		}
+	}
+
+	ch->SetLastBuySellTime(get_dword_time());
+#endif
 	if (!ch->GetShop())
 		return;
 
@@ -315,13 +339,7 @@ void CShopManager::Sell(LPCHARACTER ch, BYTE bCell, BYTE bCount)
 	//세금 계산
 	DWORD dwTax = 0;
 	int iVal = 3;
-	
-	if (LC_IsYMIR() ||  LC_IsKorea())
-	{
-		dwTax = dwPrice * iVal / 100;
-		dwPrice -= dwTax;
-	}
-	else
+
 	{
 		dwTax = dwPrice * iVal/100;
 		dwPrice -= dwTax;
@@ -348,14 +366,7 @@ void CShopManager::Sell(LPCHARACTER ch, BYTE bCell, BYTE bCount)
 	DBManager::instance().SendMoneyLog(MONEY_LOG_SHOP, item->GetVnum(), dwPrice);
 
 	if (bCount == item->GetCount())
-	{
-		// 한국에는 아이템을 버리고 복구해달라는 진상유저들이 많아서
-		// 상점 판매시 속성로그를 남긴다.
-		if (LC_IsYMIR())
-			item->AttrLog();
-
 		ITEM_MANAGER::instance().RemoveItem(item, "SELL");
-	}
 	else
 		item->SetCount(item->GetCount() - bCount);
 
@@ -469,7 +480,7 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 
 	memset(&shopTable.items[0], 0, sizeof(shopTable.items));
 
-	for (int i = 0; i < shopItems.size(); i++)
+	for (size_t i = 0; i < shopItems.size(); i++)
 	{
 		TItemTable * item_table = ITEM_MANAGER::instance().GetTable(shopItems[i].vnum);
 		if (!item_table)

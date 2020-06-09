@@ -24,7 +24,6 @@
 
 #include "../../common/VnumHelper.h"
 
-BOOL g_test_server;
 extern LPCHARACTER FindVictim(LPCHARACTER pkChr, int iMaxDistance);
 
 namespace
@@ -389,7 +388,9 @@ void CHARACTER::__StateIdle_Stone()
 {
 	m_dwStateDuration = PASSES_PER_SEC(1);
 
-	int iPercent = (GetHP() * 100) / GetMaxHP();
+	int iPercent = 0; // @fixme136
+	if (GetMaxHP() >= 0)
+		iPercent = (GetHP() * 100) / GetMaxHP();
 	DWORD dwVnum = number(MIN(GetMobTable().sAttackSpeed, GetMobTable().sMovingSpeed ), MAX(GetMobTable().sAttackSpeed, GetMobTable().sMovingSpeed));
 
 	if (iPercent <= 10 && GetMaxSP() < 10)
@@ -555,11 +556,7 @@ void CHARACTER::__StateIdle_NPC()
 				{
 					// 이곳입니다.
 					M2_DESTROY_CHARACTER(this);
-					int iNextSpawnDelay = 0;
-					if (LC_IsYMIR())
-						iNextSpawnDelay = 20 * 60;
-					else
-						iNextSpawnDelay = 50 * 60;
+					int iNextSpawnDelay = 50 * 60;
 
 					xmas::SpawnSanta(lNextMapIndex, iNextSpawnDelay);
 				}
@@ -717,7 +714,7 @@ void CHARACTER::__StateIdle_Monster()
 
 			// NOTE: 몬스터가 IDLE 상태에서 주변을 서성거릴 때, 현재 무조건 뛰어가게 되어 있음. (절대로 걷지 않음)
 			// 그래픽 팀에서 몬스터가 걷는 모습도 보고싶다고 해서 임시로 특정확률로 걷거나 뛰게 함. (게임의 전반적인 느낌이 틀려지기 때문에 일단 테스트 모드에서만 작동)
-			if (g_test_server)
+			if (test_server) // @warme010
 			{
 				if (number(0, 100) < 60)
 					SetNowWalking(false);
@@ -800,7 +797,7 @@ void CHARACTER::StateMove()
 		}
 
 		// 전투 중이면서 뛰는 중이면
-		if (!IsWalking() && !IsRiding())
+		if (!IsWalking() && !IsRiding()){
 			if ((get_dword_time() - GetLastAttackTime()) < 20000)
 			{
 				StartAffectEvent();
@@ -828,6 +825,7 @@ void CHARACTER::StateMove()
 				StopStaminaConsume();
 			}
 	}
+	}
 	else
 	{
 		// XXX AGGRO 
@@ -836,7 +834,7 @@ void CHARACTER::StateMove()
 			LPCHARACTER victim = GetVictim();
 			UpdateAggrPoint(victim, DAMAGE_TYPE_NORMAL, -(victim->GetLevel() / 3 + 1));
 
-			if (g_test_server)
+			if (test_server) // @warme010
 			{
 				// 몬스터가 적을 쫓아가는 것이면 무조건 뛰어간다.
 				SetNowWalking(false);
@@ -898,7 +896,7 @@ void CHARACTER::StateMove()
 
 				GotoState(m_stateIdle);
 
-				LPCHARACTER rider = GetRider();
+				//LPCHARACTER rider = GetRider();
 
 				m_dwStateDuration = PASSES_PER_SEC(number(1, 3));
 			}

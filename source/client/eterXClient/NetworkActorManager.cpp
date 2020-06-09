@@ -78,6 +78,9 @@ void SNetworkActorData::__copy__(const SNetworkActorData& src)
 	m_dwWeapon = src.m_dwWeapon;
 	m_dwHair = src.m_dwHair;
 
+#ifdef ENABLE_ACCE_SYSTEM
+	m_dwAcce = src.m_dwAcce;
+#endif
 	m_dwOwnerVID = src.m_dwOwnerVID;
 
 	m_sAlignment = src.m_sAlignment;
@@ -104,6 +107,9 @@ SNetworkActorData::SNetworkActorData()
 	m_dwArmor=0;
 	m_dwWeapon=0;	
 	m_dwHair=0;
+#ifdef ENABLE_ACCE_SYSTEM
+	m_dwAcce = 0;
+#endif
 	m_dwEmpireID=0;
 
 	m_dwOwnerVID=0;
@@ -356,6 +362,9 @@ CInstanceBase* CNetworkActorManager::__AppendCharacterManagerActor(SNetworkActor
 	kCreateData.m_dwArmor=rkNetActorData.m_dwArmor;
 	kCreateData.m_dwWeapon=rkNetActorData.m_dwWeapon;
 	kCreateData.m_dwHair=rkNetActorData.m_dwHair;
+#ifdef ENABLE_ACCE_SYSTEM
+	kCreateData.m_dwAcce = rkNetActorData.m_dwAcce;
+#endif
 	kCreateData.m_isMain=__IsMainActorVID(dwVID);
 
 	CInstanceBase* pOldInstance = rkChrMgr.GetInstancePtr(dwVID);
@@ -364,7 +373,7 @@ CInstanceBase* CNetworkActorManager::__AppendCharacterManagerActor(SNetworkActor
 		TPixelPosition oldPos;
 		pOldInstance->GetGraphicThingInstancePtr()->GetPixelPosition( &oldPos );
 
-		bool bIsMountingHorse = pOldInstance->IsMountingHorse();
+		BOOL bIsMountingHorse = pOldInstance->IsMountingHorse();
 		if( (bIsMountingHorse && kCreateData.m_dwMountVnum == 0) ||  
 			(!bIsMountingHorse && kCreateData.m_dwMountVnum != 0) )
 		{
@@ -414,7 +423,7 @@ void CNetworkActorManager::AppendActor(const SNetworkActorData& c_rkNetActorData
 		CInstanceBase* pMainInstance = CPythonCharacterManager::Instance().GetInstancePtr(c_rkNetActorData.m_dwVID);
 		if( pMainInstance )
 		{
-			bool bIsMountingHorse = pMainInstance->IsMountingHorse();
+			BOOL bIsMountingHorse = pMainInstance->IsMountingHorse();
 			bChangeMountStatus = (bIsMountingHorse && c_rkNetActorData.m_dwMountVnum == 0) || (!bIsMountingHorse && c_rkNetActorData.m_dwMountVnum != 0);
 		}
 
@@ -473,6 +482,9 @@ void CNetworkActorManager::UpdateActor(const SNetworkUpdateActorData& c_rkNetUpd
 		pkInstFind->ChangeArmor(c_rkNetUpdateActorData.m_dwArmor);		
 		pkInstFind->ChangeWeapon(c_rkNetUpdateActorData.m_dwWeapon);
 		pkInstFind->ChangeHair(c_rkNetUpdateActorData.m_dwHair);		
+#ifdef ENABLE_ACCE_SYSTEM
+		pkInstFind->ChangeAcce(c_rkNetUpdateActorData.m_dwAcce);
+#endif
 		pkInstFind->ChangeGuild(c_rkNetUpdateActorData.m_dwGuildID);
 		pkInstFind->SetAffectFlagContainer(c_rkNetUpdateActorData.m_kAffectFlags);
 		pkInstFind->SetMoveSpeed(c_rkNetUpdateActorData.m_dwMovSpd);
@@ -502,6 +514,9 @@ void CNetworkActorManager::UpdateActor(const SNetworkUpdateActorData& c_rkNetUpd
 	rkNetActorData.m_dwArmor=c_rkNetUpdateActorData.m_dwArmor;
 	rkNetActorData.m_dwWeapon=c_rkNetUpdateActorData.m_dwWeapon;
 	rkNetActorData.m_dwHair=c_rkNetUpdateActorData.m_dwHair;
+#ifdef ENABLE_ACCE_SYSTEM
+	rkNetActorData.m_dwAcce = c_rkNetUpdateActorData.m_dwAcce;
+#endif
 	rkNetActorData.m_sAlignment=c_rkNetUpdateActorData.m_sAlignment;
 	rkNetActorData.m_byPKMode=c_rkNetUpdateActorData.m_byPKMode;
 }

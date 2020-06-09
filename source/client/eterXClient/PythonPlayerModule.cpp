@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "PythonPlayer.h"
 #include "PythonApplication.h"
+#include "../eterGameLib/GameLibDefines.h"
 
 extern const DWORD c_iSkillIndex_Tongsol	= 121;
 extern const DWORD c_iSkillIndex_Combo		= 122;
@@ -760,7 +761,7 @@ PyObject * playerMoveItem(PyObject* poSelf, PyObject* poArgs)
 	switch (PyTuple_Size(poArgs))
 	{
 	case 2:
-		int iSourceSlotIndex;
+		// int iSourceSlotIndex;
 		if (!PyTuple_GetInteger(poArgs, 0, &srcCell.cell))
 			return Py_BuildException();
 		if (!PyTuple_GetInteger(poArgs, 1, &dstCell.cell))
@@ -975,7 +976,7 @@ PyObject * playerGetItemMetinSocket(PyObject* poSelf, PyObject* poArgs)
 PyObject * playerGetItemAttribute(PyObject* poSelf, PyObject* poArgs)
 {
 	TItemPos Cell;
-	int iSlotPos;
+	// int iSlotPos;
 	int iAttributeSlotIndex;
 	switch (PyTuple_Size(poArgs))
 	{
@@ -1041,13 +1042,14 @@ PyObject * playerGetItemLink(PyObject * poSelf, PyObject * poArgs)
 				pPlayerItem->alSockets[0], pPlayerItem->alSockets[1], pPlayerItem->alSockets[2]);
 
 		for (int i = 0; i < ITEM_ATTRIBUTE_SLOT_MAX_NUM; ++i)
-			if (pPlayerItem->aAttr[i].bType != 0)
+		{
+			// if (pPlayerItem->aAttr[i].bType != 0) // @fixme009 (this line must be commented)
 			{
-				len += snprintf(itemlink + len, sizeof(itemlink) - len, ":%x:%d", 
+				len += snprintf(itemlink + len, sizeof(itemlink) - len, ":%x:%d",
 						pPlayerItem->aAttr[i].bType, pPlayerItem->aAttr[i].sValue);
 				isAttr = true;
 			}
-
+		}
 
 		if( GetDefaultCodePage() == CP_ARABIC ) {
 			if (isAttr)
@@ -1339,7 +1341,7 @@ PyObject * playerIsValuableItem(PyObject* poSelf, PyObject* poArgs)
 	case 2:
 		if (!PyTuple_GetInteger(poArgs, 0, &SlotIndex.window_type))
 			return Py_BuildException();
-		if (!PyTuple_GetInteger(poArgs, 0, &SlotIndex.cell))
+		if (!PyTuple_GetInteger(poArgs, 1, &SlotIndex.cell)) // @fixme013 arg idx from 0 to 1
 			return Py_BuildException();
 		break;
 	default:
@@ -1640,6 +1642,26 @@ PyObject * playerCanDetach(PyObject * poSelf, PyObject * poArgs)
 	CItemData * pTargetItemData = CItemManager::Instance().GetSelectedItemDataPointer();
 	if (!pTargetItemData)
 		return Py_BuildException("Can't find item data");
+
+#ifdef ENABLE_ACCE_SYSTEM
+	if (pScrollItemData->GetValue(0) == ACCE_CLEAN_ATTR_VALUE0)
+	{
+		if ((pTargetItemData->GetType() != CItemData::ITEM_TYPE_COSTUME) || (pTargetItemData->GetSubType() != CItemData::COSTUME_ACCE))
+			return Py_BuildValue("i", DETACH_METIN_CANT);
+
+		const TItemData * pPlayerItem = CPythonPlayer::Instance().GetItemData(TargetSlotIndex);
+		if (pPlayerItem)
+		{
+			if (pPlayerItem->alSockets[ACCE_ABSORBED_SOCKET] > 0)
+				return Py_BuildValue("i", DETACH_METIN_OK);
+			else
+				return Py_BuildValue("i", DETACH_METIN_CANT);
+		}
+		else
+			return Py_BuildValue("i", DETACH_METIN_CANT);
+	}
+#endif
+
 	//int iTargetType = pTargetItemData->GetType();
 	//int iTargetSubType = pTargetItemData->GetSubType();
 
@@ -2335,6 +2357,12 @@ void initPlayer()
 		{ "SlotTypeToInvenType",		playerSlotTypeToInvenType,			METH_VARARGS },
 		{ "SendDragonSoulRefine",		playerSendDragonSoulRefine,			METH_VARARGS },
 
+#ifdef ENABLE_SEALBIND_SYSTEM
+		{ "CanSealItem",				playerCanSealItem,					METH_VARARGS },
+		{ "GetItemSealDate",			playerGetItemSealDate,				METH_VARARGS },
+		{ "GetItemUnSealLeftTime",		GetItemUnSealLeftTime,				METH_VARARGS },
+#endif
+
 		{ NULL,							NULL,								NULL },
 	};
 
@@ -2409,6 +2437,8 @@ void initPlayer()
 	PyModule_AddIntConstant(poModule, "CATEGORY_ACTIVE",		CPythonPlayer::CATEGORY_ACTIVE);
 	PyModule_AddIntConstant(poModule, "CATEGORY_PASSIVE",		CPythonPlayer::CATEGORY_PASSIVE);
 
+	PyModule_AddIntConstant(poModule, "INVENTORY_PAGE_COLUMN",	c_Inventory_Page_Column);
+	PyModule_AddIntConstant(poModule, "INVENTORY_PAGE_ROW",		c_Inventory_Page_Row);
 	PyModule_AddIntConstant(poModule, "INVENTORY_PAGE_SIZE",	c_Inventory_Page_Size);
 	PyModule_AddIntConstant(poModule, "INVENTORY_PAGE_COUNT",	c_Inventory_Page_Count);
 	PyModule_AddIntConstant(poModule, "INVENTORY_SLOT_COUNT",	c_Inventory_Count);
@@ -2464,7 +2494,15 @@ void initPlayer()
 	PyModule_AddIntConstant(poModule, "METIN_SOCKET_TYPE_SILVER",				CPythonPlayer::METIN_SOCKET_TYPE_SILVER);
 	PyModule_AddIntConstant(poModule, "METIN_SOCKET_TYPE_GOLD",					CPythonPlayer::METIN_SOCKET_TYPE_GOLD);
 	PyModule_AddIntConstant(poModule, "METIN_SOCKET_MAX_NUM",					ITEM_SOCKET_SLOT_MAX_NUM);
-	PyModule_AddIntConstant(poModule, "ATTRIBUTE_SLOT_MAX_NUM",					ITEM_ATTRIBUTE_SLOT_MAX_NUM);
+	// refactored attribute slot begin
+	PyModule_AddIntConstant(poModule, "ATTRIBUTE_SLOT_NORM_NUM",					ITEM_ATTRIBUTE_SLOT_NORM_NUM);
+	PyModule_AddIntConstant(poModule, "ATTRIBUTE_SLOT_RARE_NUM",					ITEM_ATTRIBUTE_SLOT_RARE_NUM);
+	PyModule_AddIntConstant(poModule, "ATTRIBUTE_SLOT_NORM_START",					ITEM_ATTRIBUTE_SLOT_NORM_START);
+	PyModule_AddIntConstant(poModule, "ATTRIBUTE_SLOT_NORM_END",					ITEM_ATTRIBUTE_SLOT_NORM_END);
+	PyModule_AddIntConstant(poModule, "ATTRIBUTE_SLOT_RARE_START",					ITEM_ATTRIBUTE_SLOT_RARE_START);
+	PyModule_AddIntConstant(poModule, "ATTRIBUTE_SLOT_RARE_END",					ITEM_ATTRIBUTE_SLOT_RARE_END);
+	PyModule_AddIntConstant(poModule, "ATTRIBUTE_SLOT_MAX_NUM",						ITEM_ATTRIBUTE_SLOT_MAX_NUM);
+	// refactored attribute slot end
 
 	PyModule_AddIntConstant(poModule, "REFINE_CANT",							REFINE_CANT);
 	PyModule_AddIntConstant(poModule, "REFINE_OK",								REFINE_OK);

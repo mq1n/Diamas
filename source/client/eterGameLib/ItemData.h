@@ -5,6 +5,7 @@
 
 #include "../eterLib/GrpSubImage.h"
 #include "../eterGrnLib/Thing.h"
+#include "GameLibDefines.h"
 
 class CItemData
 {
@@ -17,7 +18,54 @@ class CItemData
 			ITEM_SMALL_DESCR_MAX_LEN = 256,
 			ITEM_APPLY_MAX_NUM = 3,
 			ITEM_SOCKET_MAX_NUM = 3,
+#ifdef __UNIMPLEMENTED__
+			ITEM_PICK_MAX_LEVEL = 9,
+			ITEM_ROD_MAX_LEVEL = 20,
+#endif
 		};
+
+#ifdef ENABLE_SOULBIND_SYSTEM
+		enum ESealBind
+		{
+			SEAL_BIND_FLAG_DROP,
+			SEAL_BIND_FLAG_UPGRADE,
+			SEAL_BIND_FLAG_SELL,
+			SEAL_BIND_FLAG_ENCHANT,
+			SEAL_BIND_FLAG_TRADE,
+			SEAL_BIND_FLAG_UNSEAL,
+			SEAL_BIND_FLAG_MAX,
+		};
+
+		enum ESealDate
+		{
+			SEAL_DATE_DEFAULT_TIMESTAMP = 0, // 2015/11/12 it's -1
+			SEAL_DATE_UNLIMITED_TIMESTAMP = -1, // 2015/11/12 it doesn't exist
+		};
+
+		enum ESealItem
+		{
+			SEAL_ITEM_BINDING_VNUM = 50263,
+			SEAL_ITEM_UNBINDING_VNUM = 50264,
+		};
+#endif
+
+#ifdef __UNIMPLEMENTED__
+		enum EPetData
+		{
+			EGG_USE_SUCCESS = 0,
+			EGG_USE_FAILED_TIMEOVER = 2,
+			EGG_USE_FAILED_BECAUSE_NAME = 1,
+			GROWTH_PET_ITEM_USE_COOL_TIME = 1,
+			PET_EGG_USE_TRUE = 0,
+			PET_EGG_USE_FAILED_BECAUSE_TRADING = 1,
+			PET_EGG_USE_FAILED_BECAUSE_SHOP_OPEN = 2,
+			PET_EGG_USE_FAILED_BECAUSE_MALL_OPEN = 3,
+			PET_EGG_USE_FAILED_BECAUSE_SAFEBOX_OPEN = 4,
+			PET_HATCHING_MONEY = 100000,
+			PET_NAME_MAX_SIZE = 20,
+			PET_NAME_MIN_SIZE = 4,
+		};
+#endif
 
 		enum EItemType
 		{
@@ -57,8 +105,46 @@ class CItemData
 			ITEM_TYPE_RING,						//33 반지 (유니크 슬롯이 아닌 순수 반지 슬롯)
 			ITEM_TYPE_BELT,						//34 벨트
 
+#ifdef __UNIMPLEMENTED__
+			ITEM_TYPE_PET,						//35
+			ITEM_TYPE_MEDIUM,					//36
+#endif
+
 			ITEM_TYPE_MAX_NUM,				
 		};
+
+#ifdef __UNIMPLEMENTED__
+		enum EResourceSubTypes
+		{
+			RESOURCE_FISHBONE = 0,
+			RESOURCE_WATERSTONEPIECE = 1,
+			RESOURCE_WATERSTONE = 2,
+			RESOURCE_BLOOD_PEARL = 3,
+			RESOURCE_BLUE_PEARL = 4,
+			RESOURCE_WHITE_PEARL = 5,
+			RESOURCE_BUCKET = 6,
+			RESOURCE_CRYSTAL = 7,
+			RESOURCE_GEM = 8,
+			RESOURCE_STONE = 9,
+			RESOURCE_METIN = 10,
+			RESOURCE_ORE = 11,
+		};
+
+		enum EPetSubTypes
+		{
+			PET_EGG = 0,
+			PET_UPBRINGING = 1,
+			PET_BAG = 2,
+			PET_FEEDSTUFF = 3,
+			PET_SKILL = 4,
+			PET_SKILL_DEL_BOOK = 5,
+		};
+
+		enum EMediumSubTypes
+		{
+			MEDIUM_MOVE_COSTUME_ATTR = 0,
+		};
+#endif
 
 		enum EWeaponSubTypes
 		{
@@ -69,6 +155,16 @@ class CItemData
 			WEAPON_BELL,
 			WEAPON_FAN,
 			WEAPON_ARROW,
+			WEAPON_MOUNT_SPEAR, //7
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			WEAPON_CLAW = 8, //8
+#endif
+#ifdef ENABLE_QUIVER_SYSTEM
+			WEAPON_QUIVER = 9, //9
+#endif
+#ifdef __UNIMPLEMENTED__
+			WEAPON_BOUQUET = 10, //10
+#endif
 			WEAPON_NUM_TYPES,
 
 			WEAPON_NONE = WEAPON_NUM_TYPES+1,
@@ -102,6 +198,15 @@ class CItemData
 		{
 			COSTUME_BODY,				//0	갑옷(main look)
 			COSTUME_HAIR,				//1	헤어(탈착가능)
+#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
+			COSTUME_MOUNT	= 2,		//2
+#endif
+#ifdef ENABLE_ACCE_SYSTEM
+			COSTUME_ACCE	= 3,		//3
+#endif
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+			COSTUME_WEAPON	= 4,		//4
+#endif
 			COSTUME_NUM_TYPES,
 		};
 
@@ -138,6 +243,10 @@ class CItemData
 			USE_TIME_CHARGE_FIX,				// 28
 			USE_PUT_INTO_BELT_SOCKET,			// 29 벨트 소켓에 사용할 수 있는 아이템 
 			USE_PUT_INTO_RING_SOCKET,			// 30 반지 소켓에 사용할 수 있는 아이템 (유니크 반지 말고, 새로 추가된 반지 슬롯)
+#ifdef ENABLE_USE_COSTUME_ATTR
+			USE_CHANGE_COSTUME_ATTR,			// 31
+			USE_RESET_COSTUME_ATTR,				// 32
+#endif
 		};
 
 		enum EDragonSoulSubType
@@ -202,6 +311,10 @@ class CItemData
 			ITEM_ANTIFLAG_PKDROP        = (1 << 14),	// PK시 떨어지지 않음
 			ITEM_ANTIFLAG_STACK         = (1 << 15),	// 합칠 수 없음
 			ITEM_ANTIFLAG_MYSHOP        = (1 << 16),	// 개인 상점에 올릴 수 없음
+			ITEM_ANTIFLAG_SAFEBOX		= (1 << 17),
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			ITEM_ANTIFLAG_WOLFMAN		= (1 << 18),
+#endif
 		};
 
 		enum EItemFlag
@@ -236,7 +349,35 @@ class CItemData
 			WEAR_UNIQUE2,       // 8
 			WEAR_ARROW,         // 9
 			WEAR_SHIELD,        // 10
-			WEAR_MAX_NUM,
+
+			WEAR_ABILITY1,  // 11
+			WEAR_ABILITY2,  // 12
+			WEAR_ABILITY3,  // 13
+			WEAR_ABILITY4,  // 14
+			WEAR_ABILITY5,  // 15
+			WEAR_ABILITY6,  // 16
+			WEAR_ABILITY7,  // 17
+			WEAR_ABILITY8,  // 18
+			WEAR_COSTUME_BODY,	// 19
+			WEAR_COSTUME_HAIR,	// 20
+
+			WEAR_RING1,			// 21	: 신규 반지슬롯1 (왼쪽)
+#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
+			WEAR_COSTUME_MOUNT = WEAR_RING1, // costume_mount == ring1
+#endif
+
+			WEAR_RING2,			// 22	: 신규 반지슬롯2 (오른쪽)
+#ifdef ENABLE_ACCE_SYSTEM
+			WEAR_COSTUME_ACCE = WEAR_RING2, // costume_acce == ring2
+#endif
+
+			WEAR_BELT,			// 23	: 신규 벨트슬롯
+
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+			WEAR_COSTUME_WEAPON,// 24
+#endif
+
+			WEAR_MAX_NUM = 32,
 		};
 
 		enum EItemWearableFlag
@@ -350,7 +491,23 @@ class CItemData
 			APPLY_ANTI_CRITICAL_PCT,	//90 크리티컬 저항
 			APPLY_ANTI_PENETRATE_PCT,	//91 관통타격 저항
 
-   			MAX_APPLY_NUM,              // 
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			APPLY_BLEEDING_REDUCE			= 92,	//92
+			APPLY_BLEEDING_PCT				= 93,	//93
+			APPLY_ATT_BONUS_TO_WOLFMAN		= 94,	//94
+			APPLY_RESIST_WOLFMAN			= 95,	//95
+			APPLY_RESIST_CLAW				= 96,	//96
+#endif
+
+#ifdef ENABLE_ACCE_SYSTEM
+			APPLY_ACCEDRAIN_RATE			= 97,	//97
+#endif
+
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+			APPLY_RESIST_MAGIC_REDUCTION	= 98,	//98
+#endif
+
+			MAX_APPLY_NUM					= 99,
 		};
 
 		enum EImmuneFlags
@@ -378,10 +535,9 @@ class CItemData
 			long        lValue;
 		} TItemApply;
 
-		typedef struct SItemTable
+		typedef struct SItemTable_r152
 		{
 			DWORD       dwVnum;
-			DWORD       dwVnumRange;
 			char        szName[ITEM_NAME_MAX_LEN + 1];
 			char        szLocaleName[ITEM_NAME_MAX_LEN + 1];
 			BYTE        bType;
@@ -407,28 +563,173 @@ class CItemData
 			BYTE        bAlterToMagicItemPct;
 			BYTE		bSpecular;
 			BYTE        bGainSocketPct;
-		} TItemTable;
+		} TItemTable_r152;
 
-//		typedef struct SItemTable
-//		{
-//			DWORD       dwVnum;
-//			char        szItemName[ITEM_NAME_MAX_LEN + 1];
-//			BYTE        bType;
-//			BYTE        bSubType;
-//			BYTE        bSize;
-//			DWORD       dwAntiFlags;
-//			DWORD       dwFlags;
-//			DWORD       dwWearFlags;
-//			DWORD       dwIBuyItemPrice;
-//			DWORD		dwISellItemPrice;
-//			TItemLimit  aLimits[ITEM_LIMIT_MAX_NUM];
-//			TItemApply  aApplies[ITEM_APPLY_MAX_NUM];
-//			long        alValues[ITEM_VALUES_MAX_NUM];
-//			long        alSockets[ITEM_SOCKET_MAX_NUM];
-//			DWORD       dwRefinedVnum;
-//			BYTE		bSpecular;
-//			DWORD		dwIconNumber;
-//		} TItemTable;
+		typedef struct SItemTable_r156
+		{
+			DWORD       dwVnum;
+			DWORD       dwVnumRange;
+			char        szName[ITEM_NAME_MAX_LEN + 1];
+			char        szLocaleName[ITEM_NAME_MAX_LEN + 1];
+			BYTE        bType;
+			BYTE        bSubType;
+
+			BYTE        bWeight;
+			BYTE        bSize;
+
+			DWORD       dwAntiFlags;
+			DWORD       dwFlags;
+			DWORD       dwWearFlags;
+			DWORD       dwImmuneFlag;
+
+			DWORD       dwIBuyItemPrice;
+			DWORD		dwISellItemPrice;
+
+			TItemLimit  aLimits[ITEM_LIMIT_MAX_NUM];
+			TItemApply  aApplies[ITEM_APPLY_MAX_NUM];
+			long        alValues[ITEM_VALUES_MAX_NUM];
+			long        alSockets[ITEM_SOCKET_MAX_NUM];
+			DWORD       dwRefinedVnum;
+			WORD		wRefineSet;
+			BYTE        bAlterToMagicItemPct;
+			BYTE		bSpecular;
+			BYTE        bGainSocketPct;
+		} TItemTable_r156;
+
+		typedef struct SItemTable_r158
+		{
+			DWORD       dwVnum;
+			DWORD       dwVnumRange;
+			char        szName[ITEM_NAME_MAX_LEN + 1];
+			char        szLocaleName[ITEM_NAME_MAX_LEN + 1];
+			BYTE        bType;
+			BYTE        bSubType;
+
+			BYTE        bWeight;
+			BYTE        bSize;
+
+			DWORD       dwAntiFlags;
+			DWORD       dwFlags;
+			DWORD       dwWearFlags;
+			DWORD       dwImmuneFlag;
+
+			DWORD       dwIBuyItemPrice;
+			DWORD		dwISellItemPrice;
+
+			TItemLimit  aLimits[ITEM_LIMIT_MAX_NUM];
+			TItemApply  aApplies[ITEM_APPLY_MAX_NUM];
+			long        alValues[ITEM_VALUES_MAX_NUM];
+			long        alSockets[ITEM_SOCKET_MAX_NUM];
+			DWORD       dwRefinedVnum;
+			WORD		wRefineSet;
+			BYTE        bAlterToMagicItemPct;
+			BYTE		bSpecular;
+			BYTE        bGainSocketPct;
+			WORD		wWearableFlag;
+		} TItemTable_r158;
+
+		typedef SItemTable_r156 SItemTable, TItemTable;
+
+#ifdef ENABLE_ACCE_SYSTEM
+		struct SScaleInfo
+		{
+			float	fScaleX, fScaleY, fScaleZ;
+			float	fPositionX, fPositionY, fPositionZ;
+		};
+
+		typedef struct SScaleTable
+		{
+			SScaleInfo	tInfo[10];
+		} TScaleTable;
+#endif
+
+#ifdef ENABLE_PROTOSTRUCT_AUTODETECT
+		typedef struct SItemTableAll
+		{
+			static bool IsValidStruct(DWORD structSize)
+			{
+				switch (structSize)
+				{
+					case sizeof(TItemTable_r152):
+					case sizeof(TItemTable_r156):
+					case sizeof(TItemTable_r158):
+						return true;
+						break;
+				}
+				return false;
+			}
+
+			static void Process(void* obj, DWORD structSize, DWORD i, CItemData::TItemTable& t)
+			{
+				#define ITABLE_COPY_STR(x) strncpy_s(t.##x##, sizeof(t.##x##), r.##x##, _TRUNCATE)
+				#define ITABLE_COPY_INT(x) t.##x## = r.##x
+				#define ITABLE_ZERO_STR(x) memset(t.##x##, 0, sizeof(t.##x##));
+				#define ITABLE_ZERO_INT(x) t.##x## = 0
+				#define ITABLE_COUNT(x) _countof(t.##x##)
+				#define ITABLE_PROCESS(len)\
+					CItemData::TItemTable_r##len## & r = *((CItemData::TItemTable_r##len## *) obj + i);\
+					ITABLE_COPY_INT(dwVnum);\
+					ITABLE_COPY_STR(szName);\
+					ITABLE_COPY_STR(szLocaleName);\
+					ITABLE_COPY_INT(bType);\
+					ITABLE_COPY_INT(bSubType);\
+					ITABLE_COPY_INT(bWeight);\
+					ITABLE_COPY_INT(bSize);\
+					ITABLE_COPY_INT(dwAntiFlags);\
+					ITABLE_COPY_INT(dwFlags);\
+					ITABLE_COPY_INT(dwWearFlags);\
+					ITABLE_COPY_INT(dwImmuneFlag);\
+					ITABLE_COPY_INT(dwIBuyItemPrice);\
+					ITABLE_COPY_INT(dwISellItemPrice);\
+					for (size_t i=0; i<ITABLE_COUNT(aLimits); ++i)\
+					{\
+						ITABLE_COPY_INT(aLimits[i].bType);\
+						ITABLE_COPY_INT(aLimits[i].lValue);\
+					}\
+					for (size_t i=0; i<CItemData::ITEM_APPLY_MAX_NUM; ++i)\
+					{\
+						ITABLE_COPY_INT(aApplies[i].bType);\
+						ITABLE_COPY_INT(aApplies[i].lValue);\
+					}\
+					for (size_t i=0; i<CItemData::ITEM_VALUES_MAX_NUM; ++i)\
+					{\
+						ITABLE_COPY_INT(alValues[i]);\
+					}\
+					for (size_t i=0; i<CItemData::ITEM_SOCKET_MAX_NUM; ++i)\
+					{\
+						ITABLE_COPY_INT(alSockets[i]);\
+					}\
+					ITABLE_COPY_INT(dwRefinedVnum);\
+					ITABLE_COPY_INT(wRefineSet);\
+					ITABLE_COPY_INT(bAlterToMagicItemPct);\
+					ITABLE_COPY_INT(bSpecular);\
+					ITABLE_COPY_INT(bGainSocketPct);
+
+				switch (structSize)
+				{
+					case sizeof(TItemTable_r152):
+						{
+							ITABLE_PROCESS(152);
+							ITABLE_ZERO_INT(dwVnumRange);
+						}
+						break;
+					case sizeof(TItemTable_r156):
+						{
+							ITABLE_PROCESS(156);
+							ITABLE_COPY_INT(dwVnumRange);
+						}
+						break;
+					case sizeof(TItemTable_r158):
+						{
+							ITABLE_PROCESS(158);
+							ITABLE_COPY_INT(dwVnumRange);
+						}
+						break;
+				}
+			}
+		} TItemTableAll;
+#endif //ENABLE_PROTOSTRUCT_AUTODETECT
+
 #pragma pack(pop)
 
 	public:
@@ -491,6 +792,11 @@ class CItemData
 		void SetDefaultItemData(const char * c_szIconFileName, const char * c_szModelFileName  = NULL);
 		void SetItemTableData(TItemTable * pItemTable);
 
+#ifdef ENABLE_ACCE_SYSTEM
+		void SetItemScale(const std::string strJob, const std::string strSex, const std::string strScaleX, const std::string strScaleY, const std::string strScaleZ, const std::string strPositionX, const std::string strPositionY, const std::string strPositionZ);
+		bool GetItemScale(DWORD dwPos, float & fScaleX, float & fScaleY, float & fScaleZ, float & fPositionX, float & fPositionY, float & fPositionZ);
+#endif
+
 	protected:
 		void __LoadFiles();
 		void __SetIconImage(const char * c_szFileName);
@@ -513,6 +819,9 @@ class CItemData
 		NRaceData::TAttachingDataVector m_AttachingDataVector;
 		DWORD		m_dwVnum;
 		TItemTable m_ItemTable;
+#ifdef ENABLE_ACCE_SYSTEM
+		TScaleTable	m_ScaleTable;
+#endif
 		
 	public:
 		static void DestroySystem();

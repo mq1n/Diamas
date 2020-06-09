@@ -37,10 +37,6 @@
 #include "auction_manager.h"
 #endif
 
-extern int g_server_id;
-
-extern int g_nPortalLimitTime;
-
 ACMD(do_user_horse_ride)
 {
 	if (ch->IsObserverMode())
@@ -278,23 +274,20 @@ EVENTFUNC(timed_event)
 	{
 		ch->m_pkTimedEvent = NULL;
 
-		if (true == LC_IsEurope() || true == LC_IsYMIR() || true == LC_IsKorea())
+		switch (info->subcmd)
 		{
-			switch (info->subcmd)
-			{
-				case SCMD_LOGOUT:
-				case SCMD_QUIT:
-				case SCMD_PHASE_SELECT:
-					{
-						TPacketNeedLoginLogInfo acc_info;
-						acc_info.dwPlayerID = ch->GetDesc()->GetAccountTable().id;
+			case SCMD_LOGOUT:
+			case SCMD_QUIT:
+			case SCMD_PHASE_SELECT:
+				{
+					TPacketNeedLoginLogInfo acc_info;
+					acc_info.dwPlayerID = ch->GetDesc()->GetAccountTable().id;
 
-						db_clientdesc->DBPacket( HEADER_GD_VALID_LOGOUT, 0, &acc_info, sizeof(acc_info) );
+					db_clientdesc->DBPacket( HEADER_GD_VALID_LOGOUT, 0, &acc_info, sizeof(acc_info) );
 
-						LogManager::instance().DetailLoginLog( false, ch );
-					}
-					break;
-			}
+					LogManager::instance().DetailLoginLog( false, ch );
+				}
+				break;
 		}
 
 		switch (info->subcmd)
@@ -502,10 +495,10 @@ ACMD(do_restart)
 					return;
 				}
 			}
-
-			if (iTimeToDead > 170)
+#define eFRS_HERESEC	170
+			if (iTimeToDead > eFRS_HERESEC)
 			{
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 재시작 할 수 없습니다. (%d초 남음)"), iTimeToDead - 170);
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 재시작 할 수 없습니다. (%d초 남음)"), iTimeToDead - eFRS_HERESEC);
 				return;
 			}
 		}
@@ -527,9 +520,10 @@ ACMD(do_restart)
 			}
 		}
 
-		if (iTimeToDead > 173)
+#define eFRS_TOWNSEC	173
+		if (iTimeToDead > eFRS_TOWNSEC)
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 마을에서 재시작 할 수 없습니다. (%d 초 남음)"), iTimeToDead - 173);
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 마을에서 재시작 할 수 없습니다. (%d 초 남음)"), iTimeToDead - eFRS_TOWNSEC);
 			return;
 		}
 	}
@@ -648,7 +642,7 @@ ACMD(do_restart)
 	}
 }
 
-#define MAX_STAT 90
+#define MAX_STAT g_iStatusPointSetMaxValue
 
 ACMD(do_stat_reset)
 {
@@ -910,21 +904,6 @@ ACMD(do_safebox_change_password)
 		return;
 	}
 
-	if (LC_IsBrazil() == true)
-	{
-		for (int i = 0; i < 6; ++i)
-		{
-			if (arg2[i] == '\0')
-				break;
-
-			if (isalpha(arg2[i]) == false)
-			{
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<창고> 비밀번호는 영문자만 가능합니다."));
-				return;
-			}
-		}
-	}
-
 	TSafeboxChangePasswordPacket p;
 
 	p.dwID = ch->GetDesc()->GetAccountTable().id;
@@ -1050,7 +1029,7 @@ ACMD(do_war)
 
 	//파라메터를 두배로 나누고
 	char arg1[256], arg2[256];
-	int type = GUILD_WAR_TYPE_FIELD;
+	DWORD type = GUILD_WAR_TYPE_FIELD; //fixme102 base int modded uint
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 
 	if (!*arg1)
@@ -1285,8 +1264,10 @@ ACMD(do_messenger_auth)
 		return;
 
 	char answer = LOWER(*arg1);
-
-	if (answer != 'y')
+	// @fixme130 AuthToAdd void -> bool
+	bool bIsDenied = answer != 'y';
+	bool bIsAdded = MessengerManager::instance().AuthToAdd(ch->GetName(), arg2, bIsDenied); // DENY
+	if (bIsAdded && bIsDenied)
 	{
 		LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(arg2);
 
@@ -1294,7 +1275,6 @@ ACMD(do_messenger_auth)
 			tch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님으로 부터 친구 등록을 거부 당했습니다."), ch->GetName());
 	}
 
-	MessengerManager::instance().AuthToAdd(ch->GetName(), arg2, answer == 'y' ? false : true); // DENY
 }
 
 ACMD(do_setblockmode)
@@ -1450,9 +1430,6 @@ ACMD(do_party_request_deny)
 
 ACMD(do_monarch_warpto)
 {
-	if (true == LC_IsYMIR() || true == LC_IsKorea())
-		return;
-
 	if (!CMonarch::instance().IsMonarch(ch->GetPlayerID(), ch->GetEmpire()))
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("군주만이 사용 가능한 기능입니다"));
@@ -1566,9 +1543,6 @@ ACMD(do_monarch_warpto)
 
 ACMD(do_monarch_transfer)
 {
-	if (true == LC_IsYMIR() || true == LC_IsKorea())
-		return;
-
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
@@ -1760,8 +1734,6 @@ struct GotoInfo
 	}
 };
 
-extern void BroadcastNotice(const char * c_pszBuf);
-
 ACMD(do_monarch_tax)
 {
 	char arg1[256];
@@ -1849,19 +1821,17 @@ ACMD(do_monarch_mob)
 		return;
 	}
 
+#ifdef ENABLE_MONARCH_MOB_CMD_MAP_CHECK // @warme006
 	BYTE pcEmpire = ch->GetEmpire();
 	BYTE mapEmpire = SECTREE_MANAGER::instance().GetEmpireFromMapIndex(ch->GetMapIndex());
-
-	if (LC_IsYMIR() == true || LC_IsKorea() == true)
+	if (mapEmpire != pcEmpire && mapEmpire != 0)
 	{
-		if (mapEmpire != pcEmpire && mapEmpire != 0)
-		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("자국 영토에서만 사용할 수 있는 기능입니다"));
-			return;
-		}
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("자국 영토에서만 사용할 수 있는 기능입니다"));
+		return;
 	}
+#endif
 
-	// 군주 몹 소환 비용 
+	
 	const int SummonPrice = 5000000;
 
 	// 군주 쿨타임 검사
@@ -1946,6 +1916,9 @@ static const char* FN_point_string(int apply_number)
 		case POINT_HP_REGEN:	return LC_TEXT("생명력 회복 +%d");
 		case POINT_SP_REGEN:	return LC_TEXT("정신력 회복 +%d");
 		case POINT_POISON_PCT:	return LC_TEXT("독공격 %d");
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case POINT_BLEEDING_PCT:	return LC_TEXT("독공격 %d");
+#endif
 		case POINT_STUN_PCT:	return LC_TEXT("스턴 +%d");
 		case POINT_SLOW_PCT:	return LC_TEXT("슬로우 +%d");
 		case POINT_CRITICAL_PCT:	return LC_TEXT("%d%% 확률로 치명타 공격");
@@ -1970,9 +1943,15 @@ static const char* FN_point_string(int apply_number)
 		case POINT_RESIST_BELL:		return LC_TEXT("방울 방어 %d%%");
 		case POINT_RESIST_FAN:		return LC_TEXT("부채 방어 %d%%");
 		case POINT_RESIST_BOW:		return LC_TEXT("활공격 저항 %d%%");
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case POINT_RESIST_CLAW:		return LC_TEXT("두손검 방어 %d%%");
+#endif
 		case POINT_RESIST_FIRE:		return LC_TEXT("화염 저항 %d%%");
 		case POINT_RESIST_ELEC:		return LC_TEXT("전기 저항 %d%%");
 		case POINT_RESIST_MAGIC:	return LC_TEXT("마법 저항 %d%%");
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+		case POINT_RESIST_MAGIC_REDUCTION:	return LC_TEXT("마법 저항 %d%%");
+#endif
 		case POINT_RESIST_WIND:		return LC_TEXT("바람 저항 %d%%");
 		case POINT_RESIST_ICE:		return LC_TEXT("냉기 저항 %d%%");
 		case POINT_RESIST_EARTH:	return LC_TEXT("대지 저항 %d%%");
@@ -1980,6 +1959,9 @@ static const char* FN_point_string(int apply_number)
 		case POINT_REFLECT_MELEE:	return LC_TEXT("직접 타격치 반사 확률 : %d%%");
 		case POINT_REFLECT_CURSE:	return LC_TEXT("저주 되돌리기 확률 %d%%");
 		case POINT_POISON_REDUCE:	return LC_TEXT("독 저항 %d%%");
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case POINT_BLEEDING_REDUCE:	return LC_TEXT("독 저항 %d%%");
+#endif
 		case POINT_KILL_SP_RECOVER:	return LC_TEXT("%d%% 확률로 적퇴치시 정신력 회복");
 		case POINT_EXP_DOUBLE_BONUS:	return LC_TEXT("%d%% 확률로 적퇴치시 경험치 추가 상승");
 		case POINT_GOLD_DOUBLE_BONUS:	return LC_TEXT("%d%% 확률로 적퇴치시 돈 2배 드롭");
@@ -2001,6 +1983,9 @@ static const char* FN_point_string(int apply_number)
 		case POINT_ATTBONUS_ASSASSIN:	return LC_TEXT("자객에게 강함 +%d%%");
 		case POINT_ATTBONUS_SURA:		return LC_TEXT("수라에게 강함 +%d%%");
 		case POINT_ATTBONUS_SHAMAN:		return LC_TEXT("무당에게 강함 +%d%%");
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case POINT_ATTBONUS_WOLFMAN:	return LC_TEXT("무당에게 강함 +%d%%");
+#endif
 		case POINT_ATTBONUS_MONSTER:	return LC_TEXT("몬스터에게 강함 +%d%%");
 		case POINT_MALL_ATTBONUS:		return LC_TEXT("공격력 +%d%%");
 		case POINT_MALL_DEFBONUS:		return LC_TEXT("방어력 +%d%%");
@@ -2020,6 +2005,9 @@ static const char* FN_point_string(int apply_number)
 		case POINT_RESIST_ASSASSIN:	return LC_TEXT("자객공격에 %d%% 저항");
 		case POINT_RESIST_SURA:		return LC_TEXT("수라공격에 %d%% 저항");
 		case POINT_RESIST_SHAMAN:	return LC_TEXT("무당공격에 %d%% 저항");
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case POINT_RESIST_WOLFMAN:	return LC_TEXT("무당공격에 %d%% 저항");
+#endif
 		default:					return NULL;
 	}
 }
@@ -2064,7 +2052,8 @@ static bool FN_hair_affect_string(LPCHARACTER ch, char *buf, size_t bufsiz)
 
 ACMD(do_costume)
 {
-	char buf[512];
+	char buf[768];
+
 	const size_t bufferSize = sizeof(buf);
 
 	char arg1[256];
@@ -2072,6 +2061,15 @@ ACMD(do_costume)
 
 	CItem* pBody = ch->GetWear(WEAR_COSTUME_BODY);
 	CItem* pHair = ch->GetWear(WEAR_COSTUME_HAIR);
+#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
+	CItem* pMount = ch->GetWear(WEAR_COSTUME_MOUNT);
+#endif
+#ifdef ENABLE_ACCE_SYSTEM
+	CItem* pAcce = ch->GetWear(WEAR_COSTUME_ACCE);
+#endif
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+	CItem* pWeapon = ch->GetWear(WEAR_COSTUME_WEAPON);
+#endif
 
 	ch->ChatPacket(CHAT_TYPE_INFO, "COSTUME status:");
 
@@ -2102,6 +2100,39 @@ ACMD(do_costume)
 		if (pBody->IsEquipped() && arg1[0] == 'b')
 			ch->UnequipItem(pBody);
 	}
+
+#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
+	if (pMount)
+	{
+		const char* itemName = pMount->GetName();
+		ch->ChatPacket(CHAT_TYPE_INFO, "  MOUNT : %s", itemName);
+
+		if (pMount->IsEquipped() && arg1[0] == 'm')
+			ch->UnequipItem(pMount);
+	}
+#endif
+
+#ifdef ENABLE_ACCE_SYSTEM
+	if (pAcce)
+	{
+		const char* itemName = pAcce->GetName();
+		ch->ChatPacket(CHAT_TYPE_INFO, "  ACCE : %s", itemName);
+
+		if (pAcce->IsEquipped() && arg1[0] == 'a')
+			ch->UnequipItem(pAcce);
+	}
+#endif
+
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+	if (pWeapon)
+	{
+		const char* itemName = pWeapon->GetName();
+		ch->ChatPacket(CHAT_TYPE_INFO, "  WEAPON : %s", itemName);
+
+		if (pWeapon->IsEquipped() && arg1[0] == 'w')
+			ch->UnequipItem(pWeapon);
+	}
+#endif
 }
 
 ACMD(do_hair)
@@ -2300,11 +2331,39 @@ ACMD(do_dice)
 
 	int n = number(start, end);
 	
+#ifdef ENABLE_DICE_SYSTEM
+	if (ch->GetParty())
+		ch->GetParty()->ChatPacketToAllMember(CHAT_TYPE_DICE_INFO, LC_TEXT("%s님이 주사위를 굴려 %d가 나왔습니다. (%d-%d)"), ch->GetName(), n, start, end);
+	else
+		ch->ChatPacket(CHAT_TYPE_DICE_INFO, LC_TEXT("당신이 주사위를 굴려 %d가 나왔습니다. (%d-%d)"), n, start, end);
+#else
 	if (ch->GetParty())
 		ch->GetParty()->ChatPacketToAllMember(CHAT_TYPE_INFO, LC_TEXT("%s님이 주사위를 굴려 %d가 나왔습니다. (%d-%d)"), ch->GetName(), n, start, end);
 	else
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("당신이 주사위를 굴려 %d가 나왔습니다. (%d-%d)"), n, start, end);
+#endif
 }
+
+#ifdef ENABLE_NEWSTUFF
+ACMD(do_click_safebox)
+{
+	if ((ch->GetGMLevel() <= GM_PLAYER) && (ch->GetDungeon() || ch->GetWarMap()))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot open the safebox in dungeon or at war."));
+		return;
+	}
+
+	ch->SetSafeboxOpenPosition();
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "ShowMeSafeboxPassword");
+}
+ACMD(do_force_logout)
+{
+	LPDESC pDesc=DESC_MANAGER::instance().FindByCharacterName(ch->GetName());
+	if (!pDesc)
+		return;
+	pDesc->DelayedDisconnect(0);
+}
+#endif
 
 ACMD(do_click_mall)
 {
@@ -2352,7 +2411,13 @@ ACMD(do_ride)
 	    // 유니크 탈것 아이템
 		if (item->IsRideItem())
 		{
-			if (NULL==ch->GetWear(WEAR_UNIQUE1) || NULL==ch->GetWear(WEAR_UNIQUE2))
+			if (
+				NULL==ch->GetWear(WEAR_UNIQUE1)
+				|| NULL==ch->GetWear(WEAR_UNIQUE2)
+#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
+				|| NULL==ch->GetWear(WEAR_COSTUME_MOUNT)
+#endif
+			)
 			{
 				dev_log(LOG_DEB0, "[DO_RIDE] USE UNIQUE ITEM");
 				//ch->EquipItem(item);

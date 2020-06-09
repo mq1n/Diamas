@@ -4,7 +4,7 @@
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 
-//#pragma warning(push)
+#pragma warning(push)
 //#pragma warning(disable: 4100 4127 4189 4231 4512 4706)
 
 #include <cryptopp/modes.h>
@@ -377,7 +377,7 @@ size_t DH2KeyAgreement::Prepare(void* buffer, size_t* length) {
 		return 0;
 	}
 
-	size_t count = 0;
+	// size_t count = 0;
 
 	p = dh_.GetGroupParameters().GetModulus();
 	q = dh_.GetGroupParameters().GetSubgroupOrder();

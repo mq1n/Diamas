@@ -86,6 +86,17 @@ namespace quest
 		void operator() (LPENTITY ent);
 	};
 
+#ifdef ENABLE_NEWSTUFF
+	struct FSendChatPacket
+	{
+		DWORD m_chat_type;
+		std::string m_text;
+
+		FSendChatPacket(DWORD chat_type, std::string text) : m_chat_type(chat_type), m_text(text) {}
+		void operator() (LPENTITY ent);
+	};
+#endif
+
 	struct FSendPacketToEmpire
 	{
 		TEMP_BUFFER buf;

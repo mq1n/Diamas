@@ -306,10 +306,17 @@ void CPythonItem::CreateItem(DWORD dwVirtualID, DWORD dwVirtualNumber, float x, 
 	{
 		z = CPythonBackground::Instance().GetHeight(x, y) + 10.0f;
 
-		if (pItemData->GetType()==CItemData::ITEM_TYPE_WEAPON && 
-			(pItemData->GetWeaponType() == CItemData::WEAPON_SWORD || 
-			 pItemData->GetWeaponType() == CItemData::WEAPON_ARROW))
+#ifdef __OBSOLETE__
+		if (pItemData->GetType()==CItemData::ITEM_TYPE_WEAPON &&
+			(pItemData->GetWeaponType() == CItemData::WEAPON_SWORD ||
+				pItemData->GetWeaponType() == CItemData::WEAPON_ARROW
+			)
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+			|| (pItemData->GetType()==CItemData::ITEM_TYPE_COSTUME && pItemData->GetSubType()==CItemData::COSTUME_WEAPON)
+#endif
+		)
 			bStabGround = true;
+#endif
 
 		bStabGround = false;
 		pGroundItemInstance->bAnimEnded = false;
@@ -579,11 +586,11 @@ bool CPythonItem::GetCloseItem(const TPixelPosition & c_rPixelPosition, DWORD * 
 	{
 		TGroundItemInstance * pInstance = i->second;
 
-		DWORD dwxDistance = DWORD(c_rPixelPosition.x-pInstance->v3EndPosition.x);
-		DWORD dwyDistance = DWORD(c_rPixelPosition.y-(-pInstance->v3EndPosition.y));
-		DWORD dwDistance = DWORD(dwxDistance*dwxDistance + dwyDistance*dwyDistance);
+		DWORD dwxDistance = DWORD(c_rPixelPosition.x)-DWORD(pInstance->v3EndPosition.x); // @fixme022
+		DWORD dwyDistance = DWORD(c_rPixelPosition.y)-DWORD(-pInstance->v3EndPosition.y); // @fixme022
+		DWORD dwDistance = dwxDistance*dwxDistance + dwyDistance*dwyDistance;
 
-		if (dwxDistance*dwxDistance + dwyDistance*dwyDistance < dwCloseItemDistance)
+		if (dwDistance < dwCloseItemDistance)
 		{
 			dwCloseItemID = i->first;
 			dwCloseItemDistance = dwDistance;

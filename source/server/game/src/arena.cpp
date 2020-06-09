@@ -1101,37 +1101,71 @@ bool CArena::RegisterObserverPtr(LPCHARACTER pChar)
 	return true;
 }
 
-bool CArenaManager::IsLimitedItem( long lMapIndex, DWORD dwVnum )
+// #ifdef ENABLE_NEWSTUFF
+bool IsAllowedPotionOnPVP(DWORD dwVnum)
 {
-	if ( IsArenaMap( lMapIndex ) == true )
+	switch (dwVnum)
 	{
-		if ( LC_IsCanada() == true )
-		{
-			switch ( dwVnum )
-			{
-				case 50020:
-				case 50021:
-				case 50022:
-				case 50801:
-				case 50802:
-				case 50813:
-				case 50814:
-				case 50817:
-				case 50818:
-				case 50819:
-				case 50820:
-				case 50821:
-				case 50822:
-				case 50823:
-				case 50824:
-				case 50825:
-				case 50826:
-				case 71044:
-				case 71055:
-					return true;
-			}
-		}
+		// blue potions
+		case 27004:
+		case 27005:
+		case 27006:
+		// auto blue potions
+		case 39040:
+		case 39041:
+		case 39042:
+		case 72727:
+		case 72728:
+		case 72729:
+		case 72730:
+			return true;
 	}
+	return false;
+}
+
+bool IsLimitedPotionOnPVP(DWORD dwVnum)
+{
+	return IsLimitedPotion(dwVnum) && !IsAllowedPotionOnPVP(dwVnum);
+}
+
+bool IsLimitedPotion(DWORD dwVnum)
+{
+	// @fixme122
+	if ((50801 <= dwVnum) && (dwVnum <= 50826))
+		return true;
+
+	// @warme005
+	switch (dwVnum)
+	{
+		case 50020:
+		case 50021:
+		case 50022:
+		case 50801:
+		case 50802:
+		case 50813:
+		case 50814:
+		case 50817:
+		case 50818:
+		case 50819:
+		case 50820:
+		case 50821:
+		case 50822:
+		case 50823:
+		case 50824:
+		case 50825:
+		case 50826:
+		case 71044:
+		case 71055:
+			return true;
+	}
+	return false;
+}
+// #endif
+
+bool CArenaManager::IsLimitedItem(long lMapIndex, DWORD dwVnum)
+{
+	if (IsArenaMap(lMapIndex) && IsLimitedPotion(dwVnum))
+		return true;
 
 	return false;
 }

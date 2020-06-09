@@ -2,6 +2,8 @@
 #define __INC_TABLES_H__
 
 #include "length.h"
+#include "item_length.h"
+#include "CommonDefines.h"
 
 typedef	DWORD IDENT;
 
@@ -355,6 +357,9 @@ typedef struct SSimplePlayer
 	WORD		wMainPart;
 	BYTE		bChangeName;
 	WORD		wHairPart;
+#ifdef ENABLE_ACCE_SYSTEM
+	WORD		wAccePart;
+#endif
 	BYTE		bDummy[4];
 	long		x, y;
 	long		lAddr;
@@ -446,8 +451,9 @@ typedef struct SPlayerTable
 	long	lExitX, lExitY;
 	long	lExitMapIndex;
 
-	short       hp;
-	short       sp;
+	// @fixme301
+	int		hp;
+	int		sp;
 
 	short	sRandomHP;
 	short	sRandomSP;
@@ -690,7 +696,7 @@ struct TItemAttrTable
 	char    szApply[APPLY_NAME_MAX_LEN + 1];
 	DWORD   dwApplyIndex;
 	DWORD   dwProb;
-	long    lValues[5];
+	long    lValues[ITEM_ATTRIBUTE_MAX_LEVEL];
 	BYTE    bMaxLevelBySet[ATTRIBUTE_SET_MAX_NUM];
 };
 
@@ -790,7 +796,7 @@ typedef struct SPacketGDSetup
 	BYTE	bChannel;	// 채널
 	WORD	wListenPort;	// 클라이언트가 접속하는 포트 번호
 	WORD	wP2PPort;	// 서버끼리 연결 시키는 P2P 포트 번호
-	long	alMaps[32];
+	long	alMaps[MAP_ALLOW_LIMIT];
 	DWORD	dwLoginCount;
 	BYTE	bAuthServer;
 } TPacketGDSetup;
@@ -802,7 +808,7 @@ typedef struct SPacketDGMapLocations
 
 typedef struct SMapLocation
 {
-	long	alMaps[32];
+	long	alMaps[MAP_ALLOW_LIMIT];
 	char	szHost[MAX_HOST_LENGTH + 1];
 	WORD	wPort;
 } TMapLocation;

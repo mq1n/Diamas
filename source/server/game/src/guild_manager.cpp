@@ -81,8 +81,15 @@ DWORD CGuildManager::CreateGuild(TGuildCreateParameter& gcp)
 		return 0;
 	}
 
+	// @fixme143 BEGIN
+	static char	__guild_name[GUILD_NAME_MAX_LEN*2+1];
+	DBManager::instance().EscapeString(__guild_name, sizeof(__guild_name), gcp.name, strnlen(gcp.name, sizeof(gcp.name)));
+	if (strncmp(__guild_name, gcp.name, strnlen(gcp.name, sizeof(gcp.name))))
+		return 0;
+	// @fixme143 END
+
 	std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT COUNT(*) FROM guild%s WHERE name = '%s'",
-				get_table_postfix(), gcp.name));
+				get_table_postfix(), __guild_name));
 
 	if (pmsg->Get()->uiNumRows > 0)
 	{
@@ -537,7 +544,7 @@ void CGuildManager::DeclareWar(DWORD guild_id1, DWORD guild_id2, BYTE bType)
 	if (g1->DeclareWar(guild_id2, bType, GUILD_WAR_SEND_DECLARE) &&
 		g2->DeclareWar(guild_id1, bType, GUILD_WAR_RECV_DECLARE))
 	{
-		if (false == LC_IsGermany())
+		// @warme005
 		{
 			char buf[256];
 			snprintf(buf, sizeof(buf), LC_TEXT("%s 길드가 %s 길드에 선전포고를 하였습니다!"), TouchGuild(guild_id1)->GetName(), TouchGuild(guild_id2)->GetName());

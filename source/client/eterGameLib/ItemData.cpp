@@ -199,12 +199,18 @@ void CItemData::__LoadFiles()
 	}
 }
 
+#define ENABLE_LOAD_ALTER_ITEMICON
 void CItemData::__SetIconImage(const char * c_szFileName)
 {
 	if (!CResourceManager::Instance().IsFileExist(c_szFileName))
 	{
-		TraceError("%s 파일이 없습니다.CItemData::__SetIconImage",c_szFileName);
+		TraceError("%s not found. CItemData::__SetIconImage",c_szFileName);
 		m_pIconImage = NULL;
+#ifdef ENABLE_LOAD_ALTER_ITEMICON
+		static const char* c_szAlterIconImage = "icon/item/27995.tga";
+		if (CResourceManager::Instance().IsFileExist(c_szAlterIconImage))
+			m_pIconImage = (CGraphicSubImage *)CResourceManager::Instance().GetResourcePointer(c_szAlterIconImage);
+#endif
 	}
 	else if (m_pIconImage == NULL) 
 		m_pIconImage = (CGraphicSubImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
@@ -214,6 +220,47 @@ void CItemData::SetItemTableData(TItemTable * pItemTable)
 {
 	memcpy(&m_ItemTable, pItemTable, sizeof(TItemTable));
 }
+
+#ifdef ENABLE_ACCE_SYSTEM
+void CItemData::SetItemScale(const std::string strJob, const std::string strSex, const std::string strScaleX, const std::string strScaleY, const std::string strScaleZ, const std::string strPositionX, const std::string strPositionY, const std::string strPositionZ)
+{
+	DWORD dwPos=0;
+	if (strJob == "JOB_WARRIOR")
+		dwPos = NRaceData::JOB_WARRIOR;
+	else if (strJob == "JOB_ASSASSIN")
+		dwPos = NRaceData::JOB_ASSASSIN;
+	else if (strJob == "JOB_SURA")
+		dwPos = NRaceData::JOB_SURA;
+	else if (strJob == "JOB_SHAMAN")
+		dwPos = NRaceData::JOB_SHAMAN;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	else
+		dwPos = NRaceData::JOB_WOLFMAN;
+#endif
+
+	dwPos += 1;
+	if (strSex == "F")
+		dwPos += 5;
+
+	m_ScaleTable.tInfo[dwPos].fScaleX = float(atof(strScaleX.c_str()) / 100.0f);
+	m_ScaleTable.tInfo[dwPos].fScaleY = float(atof(strScaleY.c_str()) / 100.0f);
+	m_ScaleTable.tInfo[dwPos].fScaleZ = float(atof(strScaleZ.c_str()) / 100.0f);
+	m_ScaleTable.tInfo[dwPos].fPositionX = float(atof(strPositionX.c_str()) * 100.0f);
+	m_ScaleTable.tInfo[dwPos].fPositionY = float(atof(strPositionY.c_str()) * 100.0f);
+	m_ScaleTable.tInfo[dwPos].fPositionZ = float(atof(strPositionZ.c_str()) * 100.0f);
+}
+
+bool CItemData::GetItemScale(DWORD dwPos, float & fScaleX, float & fScaleY, float & fScaleZ, float & fPositionX, float & fPositionY, float & fPositionZ)
+{
+	fScaleX = m_ScaleTable.tInfo[dwPos].fScaleX;
+	fScaleY = m_ScaleTable.tInfo[dwPos].fScaleY;
+	fScaleZ = m_ScaleTable.tInfo[dwPos].fScaleZ;
+	fPositionX = m_ScaleTable.tInfo[dwPos].fPositionX;
+	fPositionY = m_ScaleTable.tInfo[dwPos].fPositionY;
+	fPositionZ = m_ScaleTable.tInfo[dwPos].fPositionZ;
+	return true;
+}
+#endif
 
 const CItemData::TItemTable* CItemData::GetTable() const
 {
@@ -280,6 +327,12 @@ const char* CItemData::GetUseTypeString() const
 			return DEF_STR(USE_PUT_INTO_BELT_SOCKET);
 		case USE_PUT_INTO_RING_SOCKET:
 			return DEF_STR(USE_PUT_INTO_RING_SOCKET);
+#ifdef ENABLE_USE_COSTUME_ATTR
+		case USE_CHANGE_COSTUME_ATTR:
+			return DEF_STR(USE_CHANGE_COSTUME_ATTR);
+		case USE_RESET_COSTUME_ATTR:
+			return DEF_STR(USE_RESET_COSTUME_ATTR);
+#endif
 	}
 	return "USE_UNKNOWN_TYPE";
 }
@@ -287,6 +340,10 @@ const char* CItemData::GetUseTypeString() const
 
 DWORD CItemData::GetWeaponType() const
 {
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+	if (GetType()==CItemData::ITEM_TYPE_COSTUME && GetSubType()==CItemData::COSTUME_WEAPON)
+		return GetValue(3);
+#endif
 	return m_ItemTable.bSubType;
 }
 
@@ -452,6 +509,9 @@ void CItemData::Clear()
 	m_pLODModelThingVector.clear();
 
 	memset(&m_ItemTable, 0, sizeof(m_ItemTable));
+#ifdef ENABLE_ACCE_SYSTEM
+	memset(&m_ScaleTable, 0, sizeof(m_ScaleTable));
+#endif
 }
 
 CItemData::CItemData()

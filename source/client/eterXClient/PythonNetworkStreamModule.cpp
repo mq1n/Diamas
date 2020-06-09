@@ -1123,14 +1123,29 @@ PyObject* netSendPartyExitPacket(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
-PyObject* netSendPartyRemovePacket(PyObject* poSelf, PyObject* poArgs)
+PyObject* netSendPartyRemovePacketPID(PyObject* poSelf, PyObject* poArgs)
+{
+	int pid;
+	if (!PyTuple_GetInteger(poArgs, 0, &pid))
+		return Py_BuildException();
+
+	CPythonNetworkStream& rns=CPythonNetworkStream::Instance();
+	rns.SendPartyRemovePacket(pid);
+
+	return Py_BuildNone();
+}
+
+PyObject* netSendPartyRemovePacketVID(PyObject* poSelf, PyObject* poArgs)
 {
 	int vid;
 	if (!PyTuple_GetInteger(poArgs, 0, &vid))
 		return Py_BuildException();
 
+	IAbstractPlayer& rPlayer=IAbstractPlayer::GetSingleton();
 	CPythonNetworkStream& rns=CPythonNetworkStream::Instance();
-	rns.SendPartyRemovePacket(vid);
+	DWORD dwPID;
+	if (rPlayer.PartyMemberVIDToPID(vid, &dwPID))
+		rns.SendPartyRemovePacket(dwPID);
 
 	return Py_BuildNone();
 }
@@ -1566,7 +1581,7 @@ PyObject* netSendRequestRefineInfoPacket(PyObject* poSelf, PyObject* poArgs)
 
 //	CPythonNetworkStream& rns=CPythonNetworkStream::Instance();
 //	rns.SendRequestRefineInfoPacket(iSlotIndex);
-	assert(!"netSendRequestRefineInfoPacket - 더이상 사용하지 않는 함수 입니다");
+	assert(!"netSendRequestRefineInfoPacket - This function is not used anymore");
 
 	return Py_BuildNone();
 }
@@ -1690,10 +1705,14 @@ PyObject* netRecvGuildSymbol(PyObject* poSelf, PyObject* poArgs)
 	kVec_dwGuildID.clear();
 	kVec_dwGuildID.push_back(iGuildID);
 
-	CGuildMarkDownloader& rkGuildMarkDownloader=CGuildMarkDownloader::Instance();
-	if (!rkGuildMarkDownloader.ConnectToRecvSymbol(kAddress, 0, 0, kVec_dwGuildID))
+	// @fixme006
+	if (kVec_dwGuildID.size()>0)
 	{
-		assert(!"Failed connecting to recv symbol");
+		CGuildMarkDownloader& rkGuildMarkDownloader=CGuildMarkDownloader::Instance();
+		if (!rkGuildMarkDownloader.ConnectToRecvSymbol(kAddress, 0, 0, kVec_dwGuildID))
+		{
+			assert(!"Failed connecting to recv symbol");
+		}
 	}
 
 	return Py_BuildNone();
@@ -1819,7 +1838,9 @@ void initnet()
 		{ "SendPartyInvitePacket",				netSendPartyInvitePacket,				METH_VARARGS },
 		{ "SendPartyInviteAnswerPacket",		netSendPartyInviteAnswerPacket,			METH_VARARGS },
 		{ "SendPartyExitPacket",				netSendPartyExitPacket,					METH_VARARGS },
-		{ "SendPartyRemovePacket",				netSendPartyRemovePacket,				METH_VARARGS },
+		{ "SendPartyRemovePacket",				netSendPartyRemovePacketPID,			METH_VARARGS },
+		{ "SendPartyRemovePacketPID",			netSendPartyRemovePacketPID,			METH_VARARGS },
+		{ "SendPartyRemovePacketVID",			netSendPartyRemovePacketVID,			METH_VARARGS },
 		{ "SendPartySetStatePacket",			netSendPartySetStatePacket,				METH_VARARGS },
 		{ "SendPartyUseSkillPacket",			netSendPartyUseSkillPacket,				METH_VARARGS },
 		{ "SendPartyParameterPacket",			netSendPartyParameterPacket,			METH_VARARGS },
@@ -1914,7 +1935,9 @@ void initnet()
 	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_GUILD_NAME", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_GUILD_NAME);
 	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_CHANGE_NAME_FLAG", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_CHANGE_NAME_FLAG);
 	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_HAIR", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_HAIR);
-
+#ifdef ENABLE_ACCE_SYSTEM
+	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_ACCE", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_ACCE);
+#endif
 	PyModule_AddIntConstant(poModule, "SERVER_COMMAND_LOG_OUT",	CPythonNetworkStream::SERVER_COMMAND_LOG_OUT);
 	PyModule_AddIntConstant(poModule, "SERVER_COMMAND_RETURN_TO_SELECT_CHARACTER",	CPythonNetworkStream::SERVER_COMMAND_RETURN_TO_SELECT_CHARACTER);
 	PyModule_AddIntConstant(poModule, "SERVER_COMMAND_QUIT",	CPythonNetworkStream::SERVER_COMMAND_QUIT);

@@ -335,6 +335,13 @@ namespace quest
 		}
 	}
 
+#ifdef ENABLE_QUEST_DIE_EVENT
+	bool NPC::OnDie(PC& pc)
+	{
+		return HandleReceiveAllEvent(pc, QUEST_DIE_EVENT);
+	}
+#endif
+
 	bool NPC::OnLevelUp(PC& pc)
 	{
 		return HandleReceiveAllEvent(pc, QUEST_LEVELUP_EVENT);
@@ -495,9 +502,9 @@ namespace quest
 			for (int i = 0; i < fMatch.size; i++)
 			{
 				if ( i != 0 ) {
-					//2012.05.14 <김용욱> : 퀘스트 매니저의 m_pCurrentPC가 바뀌는 경우가 발생하여,
-					//두개 이상의 스크립트를 실행시, 두번째 부터는 퀘스트 매니저의 PC 값을 새로 셋팅한다.
-					PC * pPC = CQuestManager::instance().GetPC(pc.GetID());		
+					
+					
+					//PC * pPC = CQuestManager::instance().GetPC(pc.GetID());
 				}
 				
 				CQuestManager::ExecuteQuestScript(pc, fMatch.vdwQuesIndices[i], fMatch.viPCStates[i],
@@ -918,7 +925,7 @@ namespace quest
 			{
 				os << ",\"" << ScriptToString(AvailScript[i]->arg.c_str()) << '"';
 			}
-			os << ", '"<<LC_TEXT("닫기")<<"'";
+			os << ", '"<<LC_TEXT("´Y±a")<<"'";
 			os << ")";
 
 			CQuestManager::ExecuteQuestScript(pc, "QUEST_CHAT_TEMP_QUEST", 0, os.str().c_str(), os.str().size(), &AvailScript, false);

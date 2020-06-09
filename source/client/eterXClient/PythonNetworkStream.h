@@ -58,6 +58,9 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 			ACCOUNT_CHARACTER_SLOT_GUILD_NAME,
 			ACCOUNT_CHARACTER_SLOT_CHANGE_NAME_FLAG,
 			ACCOUNT_CHARACTER_SLOT_HAIR,
+#ifdef ENABLE_ACCE_SYSTEM
+			ACCOUNT_CHARACTER_SLOT_ACCE,
+#endif
 		};
 
 		enum
@@ -277,6 +280,12 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		void SetEmpireID(DWORD dwEmpireID);
 		DWORD GetEmpireID();
 		void __TEST_SetSkillGroupFake(int iIndex);
+#ifdef ENABLE_ACCE_SYSTEM
+		bool	SendAcceClosePacket();
+		bool	SendAcceAddPacket(TItemPos tPos, BYTE bPos);
+		bool	SendAcceRemovePacket(BYTE bPos);
+		bool	SendAcceRefinePacket();
+#endif
 
 	//////////////////////////////////////////////////////////////////////////
 	// Phase 관련
@@ -552,9 +561,16 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		// Channel
 		bool RecvChannelPacket();
 
+#ifdef ENABLE_ACCE_SYSTEM
+		bool	RecvAccePacket(bool bReturn = false);
+#endif
+
 		//Security
 		bool RecvHSCheckRequest();
 		bool RecvXTrapVerifyRequest();
+
+		// @fixme007
+		bool RecvUnk213();
 
 	protected:
 		// 이모티콘

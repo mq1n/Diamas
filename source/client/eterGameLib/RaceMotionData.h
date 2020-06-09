@@ -2,6 +2,7 @@
 
 #include "../eterSoundLib/Type.h"
 #include "RaceMotionDataEvent.h"
+#include "GameLibDefines.h"
 
 class CRaceMotionData
 {
@@ -50,7 +51,10 @@ class CRaceMotionData
 			MODE_HORSE_BELL,
 
 			MODE_WEDDING_DRESS,
-
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			MODE_CLAW,
+			MODE_HORSE_CLAW,
+#endif
 			MODE_MAX_NUM,
 		};
 
@@ -111,6 +115,9 @@ class CRaceMotionData
 			NAME_KISS_WITH_ASSASSIN = NAME_KISS_START + 1,
 			NAME_KISS_WITH_SURA = NAME_KISS_START + 2,
 			NAME_KISS_WITH_SHAMAN = NAME_KISS_START + 3,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			NAME_KISS_WITH_WOLFMAN = NAME_KISS_START + 4,
+#endif
 
 			// FRENCH_KISS
 			NAME_FRENCH_KISS_START,
@@ -118,6 +125,9 @@ class CRaceMotionData
 			NAME_FRENCH_KISS_WITH_ASSASSIN = NAME_FRENCH_KISS_START + 1,
 			NAME_FRENCH_KISS_WITH_SURA = NAME_FRENCH_KISS_START + 2,
 			NAME_FRENCH_KISS_WITH_SHAMAN = NAME_FRENCH_KISS_START + 3,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			NAME_FRENCH_KISS_WITH_WOLFMAN = NAME_FRENCH_KISS_START + 4,
+#endif
 
 			// SLAP
 			NAME_SLAP_HIT_START,
@@ -125,12 +135,18 @@ class CRaceMotionData
 			NAME_SLAP_HIT_WITH_ASSASSIN = NAME_SLAP_HIT_START + 1,
 			NAME_SLAP_HIT_WITH_SURA = NAME_SLAP_HIT_START + 2,
 			NAME_SLAP_HIT_WITH_SHAMAN = NAME_SLAP_HIT_START + 3,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			NAME_SLAP_HIT_WITH_WOLFMAN = NAME_SLAP_HIT_START + 4,
+#endif
 
 			NAME_SLAP_HURT_START,
 			NAME_SLAP_HURT_WITH_WARRIOR = NAME_SLAP_HURT_START + 0,
 			NAME_SLAP_HURT_WITH_ASSASSIN = NAME_SLAP_HURT_START + 1,
 			NAME_SLAP_HURT_WITH_SURA = NAME_SLAP_HURT_START + 2,
 			NAME_SLAP_HURT_WITH_SHAMAN = NAME_SLAP_HURT_START + 3,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			NAME_SLAP_HURT_WITH_WOLFMAN = NAME_SLAP_HURT_START + 4,
+#endif
 
 			NAME_DIG,
 
@@ -170,6 +186,10 @@ class CRaceMotionData
 			MOTION_EVENT_TYPE_CHARACTER_HIDE,
 			MOTION_EVENT_TYPE_WARP,
 			MOTION_EVENT_TYPE_EFFECT_TO_TARGET,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			MOTION_EVENT_TYPE_UNK11,
+			MOTION_EVENT_TYPE_UNK12,
+#endif
 
 			MOTION_EVENT_TYPE_MAX_NUM,
 		};
@@ -192,6 +212,10 @@ class CRaceMotionData
 		typedef struct NMotionEvent::SMotionEventDataCharacterHide	TMotionCharacterHideEventData;
 		typedef struct NMotionEvent::SMotionEventDataWarp			TMotionWarpEventData;
 		typedef struct NMotionEvent::SMotionEventDataEffectToTarget	TMotionEffectToTargetEventData;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		typedef struct NMotionEvent::SMotionEventDataUnk11			TMotionUnk11EventData;
+		typedef struct NMotionEvent::SMotionEventDataUnk12			TMotionUnk12EventData;
+#endif
 		typedef std::vector<TMotionEventData*> TMotionEventDataVector;
 
 	public:

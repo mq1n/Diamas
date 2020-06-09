@@ -29,10 +29,12 @@ void CPacketInfo::Set(int header, int iSize, const char * c_pszName, bool bSeq)
 	element->iCalled = 0;
 	element->dwLoad = 0;
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 	element->bSequencePacket = bSeq;
 
 	if (element->bSequencePacket)
 		element->iSize += sizeof(BYTE);
+#endif
 
 	m_pPacketMap.insert(std::map<int, TPacketElement *>::value_type(header, element));
 }
@@ -51,6 +53,7 @@ bool CPacketInfo::Get(int header, int * size, const char ** c_ppszName)
 	return true;
 }
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 bool CPacketInfo::IsSequence(int header)
 {
 	TPacketElement * pkElement = GetElement(header);
@@ -77,6 +80,7 @@ void CPacketInfo::SetSequence(int header, bool bSeq)
 		pkElem->bSequencePacket = bSeq;
 	}
 }
+#endif
 
 TPacketElement * CPacketInfo::GetElement(int header)
 {
@@ -226,7 +230,9 @@ CPacketInfoCG::CPacketInfoCG()
 	Set(HEADER_CG_HS_ACK, sizeof(TPacketGCHSCheck), "HackShieldResponse", false);
 	Set(HEADER_CG_DRAGON_SOUL_REFINE, sizeof(TPacketCGDragonSoulRefine), "DragonSoulRefine", false);
 	Set(HEADER_CG_STATE_CHECKER, sizeof(BYTE), "ServerStateCheck", false);
-	
+#ifdef ENABLE_ACCE_SYSTEM
+	Set(HEADER_CG_ACCE, sizeof(TPacketAcce), "Acce", true);
+#endif
 }
 
 CPacketInfoCG::~CPacketInfoCG()
@@ -242,6 +248,9 @@ CPacketInfoGG::CPacketInfoGG()
 	Set(HEADER_GG_LOGOUT,		sizeof(TPacketGGLogout),	"Logout", false);
 	Set(HEADER_GG_RELAY,		sizeof(TPacketGGRelay),		"Relay", false);
 	Set(HEADER_GG_NOTICE,		sizeof(TPacketGGNotice),	"Notice", false);
+#ifdef ENABLE_FULL_NOTICE
+	Set(HEADER_GG_BIG_NOTICE,	sizeof(TPacketGGNotice),	"BigNotice", false);
+#endif
 	Set(HEADER_GG_SHUTDOWN,		sizeof(TPacketGGShutdown),	"Shutdown", false);
 	Set(HEADER_GG_GUILD,		sizeof(TPacketGGGuild),		"Guild", false);
 	Set(HEADER_GG_SHOUT,		sizeof(TPacketGGShout),		"Shout", false);

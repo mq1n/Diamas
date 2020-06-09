@@ -4,6 +4,7 @@
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
+#include "../eterXClient/Locale_inc.h"
 
 #define _WIN32_DCOM
 

@@ -119,7 +119,7 @@ void CSoundInstance3D::SetPosition(float x, float y, float z) const
 void CSoundInstance3D::SetOrientation(float x_face, float y_face, float z_face, 
 									  float x_normal, float y_normal, float z_normal) const
 {
-	assert(!" CSoundInstance3D::SetOrientation - 사용 하지 않는 함수");
+	assert(!" CSoundInstance3D::SetOrientation - Don't use this function");
 //	AIL_set_3D_orientation(m_sample, 
 //						   x_face, y_face, z_face,
 //						   x_normal, y_normal, z_normal);

@@ -3,6 +3,7 @@
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
+#include "../eterXClient/Locale_inc.h"
 #include "../eterLib/StdAfx.h"
 #include "../eterScriptLib/StdAfx.h"
 

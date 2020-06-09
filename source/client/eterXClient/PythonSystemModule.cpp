@@ -211,6 +211,60 @@ PyObject * systemSetShowSalesTextFlag(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
+#ifdef WJ_SHOW_MOB_INFO
+#include "PythonCharacterManager.h"
+#include "PythonNonPlayer.h"
+#include "PythonSystem.h"
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
+PyObject * systemIsShowMobAIFlag(PyObject * poSelf, PyObject * poArgs)
+{
+	return Py_BuildValue("i", CPythonSystem::Instance().IsShowMobAIFlag());
+}
+PyObject * systemSetShowMobAIFlag(PyObject * poSelf, PyObject * poArgs)
+{
+	int iFlag;
+	if (!PyTuple_GetInteger(poArgs, 0, &iFlag))
+		return Py_BuildException();
+
+	CPythonSystem::Instance().SetShowMobAIFlagFlag(iFlag);
+
+	for (CPythonCharacterManager::CharacterIterator it=CPythonCharacterManager::Instance().CharacterInstanceBegin(), ti=CPythonCharacterManager::Instance().CharacterInstanceEnd();
+			it!=ti;
+			++it)
+	{
+		CInstanceBase * pkInst = *it;
+		if (pkInst && pkInst->IsEnemy())
+			pkInst->MobInfoAiFlagRefresh();
+	}
+	return Py_BuildNone();
+}
+#endif
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
+PyObject * systemIsShowMobLevel(PyObject * poSelf, PyObject * poArgs)
+{
+	return Py_BuildValue("i", CPythonSystem::Instance().IsShowMobLevel());
+}
+PyObject * systemSetShowMobLevel(PyObject * poSelf, PyObject * poArgs)
+{
+	int iFlag;
+	if (!PyTuple_GetInteger(poArgs, 0, &iFlag))
+		return Py_BuildException();
+
+	CPythonSystem::Instance().SetShowMobLevelFlag(iFlag);
+
+	for (CPythonCharacterManager::CharacterIterator it=CPythonCharacterManager::Instance().CharacterInstanceBegin(), ti=CPythonCharacterManager::Instance().CharacterInstanceEnd();
+			it!=ti;
+			++it)
+	{
+		CInstanceBase * pkInst = *it;
+		if (pkInst && pkInst->IsEnemy())
+			pkInst->MobInfoLevelRefresh();
+	}
+	return Py_BuildNone();
+}
+#endif
+#endif
+
 PyObject * systemIsAlwaysShowName(PyObject * poSelf, PyObject * poArgs)
 {
 	return Py_BuildValue("i", CPythonSystem::Instance().IsAlwaysShowName());
@@ -372,7 +426,7 @@ PyObject * systemSetShadowLevel(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
-void initsystem()
+void initsystemSetting()
 {
 	static PyMethodDef s_methods[] =
 	{
@@ -425,6 +479,14 @@ void initsystem()
 
 		{ "GetShadowLevel",				systemGetShadowLevel,			METH_VARARGS },
 		{ "SetShadowLevel",				systemSetShadowLevel,			METH_VARARGS },
+
+#ifdef WJ_SHOW_MOB_INFO
+		{ "IsShowMobAIFlag",			systemIsShowMobAIFlag,			METH_VARARGS },
+		{ "SetShowMobAIFlag",			systemSetShowMobAIFlag,			METH_VARARGS },
+
+		{ "IsShowMobLevel",				systemIsShowMobLevel,			METH_VARARGS },
+		{ "SetShowMobLevel",			systemSetShowMobLevel,			METH_VARARGS },
+#endif
 
 		{ NULL,							NULL,							NULL }
 	};

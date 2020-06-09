@@ -1,3 +1,7 @@
-#define VER_FILE_VERSION   1,0,28249,0
-#define VER_FILE_VERSION_STR   "1.0.28249.1"
-int METIN2_GET_VERSION() { return 28249; }
+#pragma once
+#define VER_FILE_VERSION __FILE_VERSION__
+#define VER_FILE_VERSION_STR __PRODUCT_VERSION__
+static inline std::string METIN2_GET_VERSION()
+{
+	return _GIT_VERSION_;
+}

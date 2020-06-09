@@ -4,7 +4,7 @@
 
 //#include <crtdbg.h>
 #include <granny2/granny2.11.8.0.h>
-
+#include "../eterXClient/Locale_inc.h"
 #include "../eterBase/Utils.h"
 #include "../eterBase/Debug.h"
 #include "../eterBase/Stl.h"

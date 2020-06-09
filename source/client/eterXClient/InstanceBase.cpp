@@ -10,6 +10,12 @@
 
 #include "../eterlib/StateManager.h"
 #include "../eterGameLib/ItemManager.h"
+#include "../eterGameLib/GameLibDefines.h"
+
+#ifdef WJ_SHOW_MOB_INFO
+#include "PythonSystem.h"
+#include "PythonTextTail.h"
+#endif
 
 BOOL HAIR_COLOR_ENABLE=FALSE;
 BOOL USE_ARMOR_SPECULAR=FALSE;
@@ -121,86 +127,128 @@ CActorInstance* CInstanceBase::SHORSE::GetActorPtr()
 	return m_pkActor;
 }
 
+enum eMountType {MOUNT_TYPE_NONE=0, MOUNT_TYPE_NORMAL=1, MOUNT_TYPE_COMBAT=2, MOUNT_TYPE_MILITARY=3};
+eMountType GetMountLevelByVnum(DWORD dwMountVnum, bool IsNew)
+{
+	if (!dwMountVnum)
+		return MOUNT_TYPE_NONE;
+
+	switch (dwMountVnum)
+	{
+		// ### YES SKILL
+		// @fixme116 begin
+		case 20107: // normal military horse (no guild)
+		case 20108: // normal military horse (guild member)
+		case 20109: // normal military horse (guild master)
+			if (IsNew)
+				return MOUNT_TYPE_NONE;
+		// @fixme116 end
+		// Classic
+		case 20110: // Classic Boar
+		case 20111: // Classic Wolf
+		case 20112: // Classic Tiger
+		case 20113: // Classic Lion
+		case 20114: // White Lion
+		// Special Lv2
+		case 20115: // Wild Battle Boar
+		case 20116: // Fight Wolf
+		case 20117: // Storm Tiger
+		case 20118: // Battle Lion (bugged)
+		case 20205: // Wild Battle Boar (alternative)
+		case 20206: // Fight Wolf (alternative)
+		case 20207: // Storm Tiger (alternative)
+		case 20208: // Battle Lion (bugged) (alternative)
+		// Royal Tigers
+		case 20120: // blue
+		case 20121: // dark red
+		case 20122: // gold
+		case 20123: // green
+		case 20124: // pied
+		case 20125: // white
+		// Royal mounts (Special Lv3)
+		case 20209: // Royal Boar
+		case 20210: // Royal Wolf
+		case 20211: // Royal Tiger
+		case 20212: // Royal Lion
+		//
+		case 20215: // Rudolph m Lv3 (yes skill, yes atk)
+		case 20218: // Rudolph f Lv3 (yes skill, yes atk)
+		case 20225: // Dyno Lv3 (yes skill, yes atk)
+		case 20230: // Turkey Lv3 (yes skill, yes atk)
+			return MOUNT_TYPE_MILITARY;
+			break;
+		// ### NO SKILL YES ATK
+		// @fixme116 begin
+		case 20104: // normal combat horse (no guild)
+		case 20105: // normal combat horse (guild member)
+		case 20106: // normal combat horse (guild master)
+			if (IsNew)
+				return MOUNT_TYPE_NONE;
+		// @fixme116 end
+		case 20119: // Black Horse (no skill, yes atk)
+		case 20214: // Rudolph m Lv2 (no skill, yes atk)
+		case 20217: // Rudolph f Lv2 (no skill, yes atk)
+		case 20219: // Equus Porphyreus (no skill, yes atk)
+		case 20220: // Comet (no skill, yes atk)
+		case 20221: // Polar Predator (no skill, yes atk)
+		case 20222: // Armoured Panda (no skill, yes atk)
+		case 20224: // Dyno Lv2 (no skill, yes atk)
+		case 20226: // Nightmare (no skill, yes atk)
+		case 20227: // Unicorn (no skill, yes atk)
+		case 20229: // Turkey Lv2 (no skill, yes atk)
+		case 20231: // Leopard (no skill, yes atk)
+		case 20232: // Black Panther (no skill, yes atk)
+			return MOUNT_TYPE_COMBAT;
+			break;
+		// ### NO SKILL NO ATK
+		// @fixme116 begin
+		case 20101: // normal beginner horse (no guild)
+		case 20102: // normal beginner horse (guild member)
+		case 20103: // normal beginner horse (guild master)
+			if (IsNew)
+				return MOUNT_TYPE_NONE;
+		// @fixme116 end
+		case 20213: // Rudolph m Lv1 (no skill, no atk)
+		case 20216: // Rudolph f Lv1 (no skill, no atk)
+		// Special Lv1
+		case 20201: // Boar Lv1 (no skill, no atk)
+		case 20202: // Wolf Lv1 (no skill, no atk)
+		case 20203: // Tiger Lv1 (no skill, no atk)
+		case 20204: // Lion Lv1 (no skill, no atk)
+		//
+		case 20223: // Dyno Lv1 (no skill, no atk)
+		case 20228: // Turkey Lv1 (no skill, no atk)
+			return MOUNT_TYPE_NORMAL;
+			break;
+		default:
+			return MOUNT_TYPE_NONE;
+			break;
+	}
+}
+
 UINT CInstanceBase::SHORSE::GetLevel()
 {
 	if (m_pkActor)
 	{
-		DWORD mount = m_pkActor->GetRace();
-		switch (mount)
-		{
-			case 20101:
-			case 20102:
-			case 20103:
-				return 1;
-			case 20104:
-			case 20105:
-			case 20106:
-				return 2;
-			case 20107:
-			case 20108:
-			case 20109:
-			case 20110: // #0000673: [M2EU] 새로운 탈것 타고 공격 안됨 
-			case 20111: // #0000673: [M2EU] 새로운 탈것 타고 공격 안됨 
-			case 20112: // #0000673: [M2EU] 새로운 탈것 타고 공격 안됨 
-			case 20113: // #0000673: [M2EU] 새로운 탈것 타고 공격 안됨 
-			case 20114:
-			case 20115:
-			case 20116:
-			case 20117:
-			case 20118:
-			case 20120:
-			case 20121:
-			case 20122:
-			case 20123:
-			case 20124:
-			case 20125:
-				return 3;
-			case 20119: // 라마단 이벤트용 흑마는 스킬불가, 공격가능한 레벨2로 설정
-			case 20219: // 할로윈 이벤트용 흑마는 스킬불가, 공격가능한 레벨2로 설정 (=라마단 흑마 클론)
-			case 20220:
-			case 20221:
-			case 20222:
-				return 2;
-		}
-
-		// 마운트 확장 시스템용 특수 처리 (20201 ~ 20212 대역을 사용하고 순서대로 4개씩 나눠서 초급, 중급, 고급임)
-		//	-- 탈것 레벨을 클라에서 측정하고 공격/스킬 사용가능 여부도 클라에서 처리하는 것 자체에 문제가 있는 듯.. [hyo]
-		{
-			// 중급 탈것은 레벨2 (공격 가능, 스킬 불가)
-			if ((20205 <= mount &&  20208 >= mount) ||
-				(20214 == mount) || (20217 == mount)			// 난폭한 전갑순순록, 난폭한 전갑암순록
-				)
-				return 2;
-
-			// 고급 탈것은 레벨3 (공격 가능, 스킬 가능)
-			if ((20209 <= mount &&  20212 >= mount) || 
-				(20215 == mount) || (20218 == mount) ||			// 용맹한 전갑순순록, 용맹한 전갑암순록
-				(20220 == mount)
-				)
-				return 3;
-		}
+#ifndef ENABLE_NO_MOUNT_CHECK
+		return static_cast<UINT>(GetMountLevelByVnum(m_pkActor->GetRace(), false));
+#else
+		return (m_pkActor->GetRace()) ? MOUNT_TYPE_MILITARY : MOUNT_TYPE_NONE;
+#endif
 	}
 	return 0;
 }
 
 bool CInstanceBase::SHORSE::IsNewMount()
 {
-	if (!m_pkActor)
-		return false;
-	DWORD mount = m_pkActor->GetRace();
-
-	if ((20205 <= mount &&  20208 >= mount) ||
-		(20214 == mount) || (20217 == mount)			// 난폭한 전갑순순록, 난폭한 전갑암순록
-		)
-		return true;
-
-	// 고급 탈것
-	if ((20209 <= mount &&  20212 >= mount) || 
-		(20215 == mount) || (20218 == mount) ||			// 용맹한 전갑순순록, 용맹한 전갑암순록
-		(20220 == mount)
-		)
-		return true;
-
+#ifndef ENABLE_NO_MOUNT_CHECK
+	if (m_pkActor)
+	{
+		DWORD dwMountVnum = m_pkActor->GetRace();
+		eMountType mountType = GetMountLevelByVnum(dwMountVnum, true);
+		return (mountType != MOUNT_TYPE_NONE) && (mountType != MOUNT_TYPE_NORMAL);
+	}
+#endif
 	return false;
 }
 bool CInstanceBase::SHORSE::CanUseSkill()
@@ -410,7 +458,7 @@ void CInstanceBase::__EnableSkipCollision()
 {
 	if (__IsMainInstance())
 	{
-		TraceError("CInstanceBase::__EnableSkipCollision - 자신은 충돌검사스킵이 되면 안된다!!");
+		TraceError("CInstanceBase::__EnableSkipCollision - You should not skip your own collisions!!");
 		return;
 	}
 	m_GraphicThingInstance.EnableSkipCollision();
@@ -437,8 +485,13 @@ float CInstanceBase::__GetBackgroundHeight(float x, float y)
 
 BOOL CInstanceBase::IsMovieMode()
 {
+#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
+	if (IsAffect(AFFECT_INVISIBILITY) && !__MainCanSeeHiddenThing())
+		return true;
+#else
 	if (IsAffect(AFFECT_INVISIBILITY))
 		return true;
+#endif
 
 	return false;
 }
@@ -447,8 +500,13 @@ BOOL CInstanceBase::IsMovieMode()
 
 BOOL CInstanceBase::IsInvisibility()
 {
+#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
+	if (IsAffect(AFFECT_INVISIBILITY) && !__MainCanSeeHiddenThing())
+		return true;
+#else
 	if (IsAffect(AFFECT_INVISIBILITY))
 		return true;
+#endif
 
 	return false;
 }
@@ -685,9 +743,12 @@ bool CInstanceBase::__IsExistMainInstance()
 
 bool CInstanceBase::__MainCanSeeHiddenThing()
 {
+#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
+	CInstanceBase * pInstance = __GetMainInstancePtr();
+	return (pInstance) ? TRUE == pInstance->IsGameMaster() : false;
+#else
 	return false;
-//	CInstanceBase * pInstance = __GetMainInstancePtr();
-//	return pInstance->IsAffect(AFFECT_GAMJI);
+#endif
 }
 
 float CInstanceBase::__GetBowRange()
@@ -754,11 +815,22 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 	{
 		SetHair(c_rkCreateData.m_dwHair);
 		SetWeapon(c_rkCreateData.m_dwWeapon);
+#ifdef ENABLE_ACCE_SYSTEM
+		SetAcce(c_rkCreateData.m_dwAcce);
+#endif
 	}
 
 	__Create_SetName(c_rkCreateData);
 
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
+	if (IsEnemy() && CPythonSystem::Instance().IsShowMobLevel())
+		m_dwLevel = CPythonNonPlayer::Instance().GetMonsterLevel(GetRace());
+	else
+		m_dwLevel = c_rkCreateData.m_dwLevel;
+#else
 	m_dwLevel = c_rkCreateData.m_dwLevel;
+#endif
+
 	m_dwGuildID = c_rkCreateData.m_dwGuildID;
 	m_dwEmpireID = c_rkCreateData.m_dwEmpireID;
 
@@ -839,6 +911,11 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 			m_GraphicThingInstance.ChangeMaterial(strFileName.c_str());
 	}
 
+#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
+	if (IsAffect(AFFECT_INVISIBILITY) && __MainCanSeeHiddenThing())
+		m_GraphicThingInstance.BlendAlphaValue(0.5f, 0.5f);
+#endif
+
 	return true;
 }
 
@@ -855,8 +932,18 @@ void CInstanceBase::__Create_SetName(const SCreateData& c_rkCreateData)
 		__Create_SetWarpName(c_rkCreateData);
 		return;
 	}
-
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
+	if (IsEnemy() && CPythonSystem::Instance().IsShowMobAIFlag() && CPythonNonPlayer::Instance().IsAggressive(GetRace()))
+	{
+		std::string strName = c_rkCreateData.m_stName;
+		strName += "*";
+		SetNameString(strName.c_str(), strName.length());
+	}
+	else
+		SetNameString(c_rkCreateData.m_stName.c_str(), c_rkCreateData.m_stName.length());
+#else
 	SetNameString(c_rkCreateData.m_stName.c_str(), c_rkCreateData.m_stName.length());
+#endif
 }
 
 void CInstanceBase::__Create_SetWarpName(const SCreateData& c_rkCreateData)
@@ -1190,7 +1277,7 @@ void CInstanceBase::PushTCPState(DWORD dwCmdTime, const TPixelPosition& c_rkPPos
 	if (__IsMainInstance())
 	{
 		//assert(!"CInstanceBase::PushTCPState 플레이어 자신에게 이동패킷은 오면 안된다!");
-		TraceError("CInstanceBase::PushTCPState 플레이어 자신에게 이동패킷은 오면 안된다!");
+		TraceError("CInstanceBase::PushTCPState You can't send move packets to yourself!");
 		return;
 	}
 
@@ -1317,7 +1404,7 @@ void CInstanceBase::StateProcess()
 
 		if (!__CanProcessNetworkStatePacket())
 		{
-			Lognf(0, "vid=%d 움직일 수 없는 상태라 스킵 IsDead=%d, IsKnockDown=%d", uVID, m_GraphicThingInstance.IsDead(), m_GraphicThingInstance.IsKnockDown());
+			Lognf(0, "vid=%d Skip State as unable to process IsDead=%d, IsKnockDown=%d", uVID, m_GraphicThingInstance.IsDead(), m_GraphicThingInstance.IsKnockDown());
 			return;
 		}
 
@@ -2106,6 +2193,50 @@ const char * CInstanceBase::GetNameString()
 	return m_stName.c_str();
 }
 
+#ifdef ENABLE_LEVEL_IN_TRADE
+DWORD CInstanceBase::GetLevel()
+{
+	return m_dwLevel;
+}
+#endif
+
+#ifdef ENABLE_TEXT_LEVEL_REFRESH
+void CInstanceBase::SetLevel(DWORD dwLevel)
+{
+	m_dwLevel = dwLevel;
+}
+#endif
+
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
+void CInstanceBase::MobInfoAiFlagRefresh()
+{
+	// set
+	std::string strName = CPythonNonPlayer::Instance().GetMonsterName(GetRace());
+	if (CPythonSystem::Instance().IsShowMobAIFlag() && CPythonNonPlayer::Instance().IsAggressive(GetRace()))
+		strName += "*";
+	SetNameString(strName.c_str(), strName.length());
+	// refresh
+	DetachTextTail();
+	AttachTextTail();
+	RefreshTextTail();
+}
+#endif
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
+void CInstanceBase::MobInfoLevelRefresh()
+{
+	// set
+	if (CPythonSystem::Instance().IsShowMobLevel())
+		m_dwLevel = CPythonNonPlayer::Instance().GetMonsterLevel(GetRace());
+	else
+		m_dwLevel = 0;
+	// refresh
+	if (m_dwLevel)
+		UpdateTextTailLevel(m_dwLevel);
+	else
+		CPythonTextTail::Instance().DetachLevel(GetVirtualID());
+}
+#endif
+
 DWORD CInstanceBase::GetRace()
 {
 	return m_dwRace;
@@ -2277,10 +2408,21 @@ bool CInstanceBase::CanPickInstance()
 			if (!__MainCanSeeHiddenThing())
 				return false;
 		}
+#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
+		if (IsAffect(AFFECT_REVIVE_INVISIBILITY) && !__MainCanSeeHiddenThing())
+			return false;
+#else
 		if (IsAffect(AFFECT_REVIVE_INVISIBILITY))
 			return false;
+#endif
+#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
+		if (IsAffect(AFFECT_INVISIBILITY) && !__MainCanSeeHiddenThing())
+			return false;
+#else
 		if (IsAffect(AFFECT_INVISIBILITY))
 			return false;
+#endif
+
 	}
 
 	if (IsDead())
@@ -2355,6 +2497,7 @@ BOOL CInstanceBase::IsResource()
 		case 30303:
 		case 30304:
 		case 30305:
+		case 30306:
 			return TRUE;
 	}
 
@@ -2457,8 +2600,14 @@ bool CInstanceBase::__CanRender()
 {
 	if (!__IsInViewFrustum())
 		return false;
+
+#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
+	if (IsAffect(AFFECT_INVISIBILITY) && !__MainCanSeeHiddenThing())
+		return false;
+#else
 	if (IsAffect(AFFECT_INVISIBILITY))
 		return false;
+#endif
 
 	return true;
 }
@@ -2609,6 +2758,76 @@ void CInstanceBase::SetArmor(DWORD dwArmor)
 	SetShape(dwArmor);
 }
 
+
+#ifdef ENABLE_ACCE_SYSTEM
+void CInstanceBase::SetAcce(DWORD dwAcce)
+{
+	if (!IsPC())
+		return;
+
+	if (IsPoly())
+		return;
+
+	dwAcce += 85000;
+	ClearAcceEffect();
+
+		
+	float fSpecular = 65.0f;
+	if (dwAcce > 86000)
+	{
+		dwAcce -= 1000;
+		fSpecular += 35;
+
+		m_dwAcceEffect = EFFECT_REFINED + EFFECT_ACCE;
+		__EffectContainer_AttachEffect(m_dwAcceEffect);
+	}
+
+	fSpecular /= 100.0f;
+	
+
+
+	m_awPart[CRaceData::PART_ACCE] = dwAcce;
+
+	CItemData * pItemData = NULL;
+	CItemManager::Instance().GetItemDataPointer(dwAcce, &pItemData);
+
+	m_GraphicThingInstance.AttachAcce(pItemData, fSpecular);
+#ifdef ENABLE_OBJ_SCALLING
+	DWORD dwRace = GetRace(), dwPos = RaceToJob(dwRace), dwSex = RaceToSex(dwRace);
+	dwPos += 1;
+	if (dwSex == 0)
+		dwPos += 5;
+
+	float fScaleX, fScaleY, fScaleZ, fPositionX, fPositionY, fPositionZ;
+	if (pItemData && pItemData->GetItemScale(dwPos, fScaleX, fScaleY, fScaleZ, fPositionX, fPositionY, fPositionZ))
+	{
+		m_GraphicThingInstance.SetScale(fScaleX, fScaleY, fScaleZ, true);
+		if (m_kHorse.IsMounting())
+			fPositionZ += 10.0f;
+
+		m_GraphicThingInstance.SetScalePosition(fPositionX, fPositionY, fPositionZ);
+	}
+#endif
+}
+
+void CInstanceBase::ChangeAcce(DWORD dwAcce)
+{
+	if (!IsPC())
+		return;
+
+	SetAcce(dwAcce);
+}
+
+void CInstanceBase::ClearAcceEffect()
+{
+	if (!m_dwAcceEffect)
+		return;
+
+	__EffectContainer_DetachEffect(m_dwAcceEffect);
+	m_dwAcceEffect = 0;
+}
+#endif
+
 void CInstanceBase::SetShape(DWORD eShape, float fSpecular)
 {
 	if (IsPoly())
@@ -2684,7 +2903,11 @@ void CInstanceBase::__ClearArmorRefineEffect()
 
 UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 {
+#ifdef ENABLE_SIMPLE_REFINED_EFFECT_CHECK
+	DWORD refine = pItem->GetRefine();
+#else
 	DWORD refine = std::max<DWORD>(pItem->GetRefine() + pItem->GetSocketCount(),CItemData::ITEM_SOCKET_MAX_NUM) - CItemData::ITEM_SOCKET_MAX_NUM;
+#endif
 	switch (pItem->GetType())
 	{
 	case CItemData::ITEM_TYPE_WEAPON:
@@ -2707,6 +2930,12 @@ UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 		case CItemData::WEAPON_BOW:
 			m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_BOW_REFINED7+refine-7;
 			break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case CItemData::WEAPON_CLAW:
+			m_swordRefineEffectRight = EFFECT_REFINED + EFFECT_SMALLSWORD_REFINED7 + refine - 7;
+			m_swordRefineEffectLeft = EFFECT_REFINED + EFFECT_SMALLSWORD_REFINED7_LEFT + refine - 7;
+			break;
+#endif
 		default:
 			m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_SWORD_REFINED7+refine-7;
 		}
@@ -2723,11 +2952,22 @@ UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 		{
 			DWORD vnum = pItem->GetIndex();
 
-			if (12010 <= vnum && vnum <= 12049)
+			if (
+				(12010 <= vnum && vnum <= 12049)
+#ifdef ENABLE_WOLFMAN_CHARACTER
+				|| (21080 <= vnum && vnum <= 21089)
+#endif
+			)
 			{
 				__AttachEffect(EFFECT_REFINED+EFFECT_BODYARMOR_SPECIAL);
 				__AttachEffect(EFFECT_REFINED+EFFECT_BODYARMOR_SPECIAL2);
 			}
+#ifdef ENABLE_LVL115_ARMOR_EFFECT
+			else if (20760 <= vnum && vnum <= 20959)
+			{
+				__AttachEffect(EFFECT_REFINED+EFFECT_BODYARMOR_SPECIAL3);
+			}
+#endif //ENABLE_LVL115_ARMOR_EFFECT
 		}
 
 		if (refine < 7)	//현재 제련도 7 이상만 이펙트가 있습니다.
@@ -2738,6 +2978,68 @@ UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 			m_armorRefineEffect = EFFECT_REFINED+EFFECT_BODYARMOR_REFINED7+refine-7;
 			__AttachEffect(m_armorRefineEffect);
 		}
+		break;
+	case CItemData::ITEM_TYPE_COSTUME:
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+		if (pItem->GetSubType() == CItemData::COSTUME_WEAPON)
+		{
+			__ClearWeaponRefineEffect();
+
+#ifdef USE_WEAPON_COSTUME_WITH_EFFECT
+			switch(pItem->GetValue(3))
+			{
+				case CItemData::WEAPON_DAGGER:
+					m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_SMALLSWORD_REFINED9;
+					m_swordRefineEffectLeft = EFFECT_REFINED+EFFECT_SMALLSWORD_REFINED9_LEFT;
+					break;
+				case CItemData::WEAPON_FAN:
+					m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_FANBELL_REFINED9;
+					break;
+				case CItemData::WEAPON_ARROW:
+				case CItemData::WEAPON_BELL:
+					m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_SMALLSWORD_REFINED9;
+					break;
+				case CItemData::WEAPON_BOW:
+					m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_BOW_REFINED9;
+					break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+				case CItemData::WEAPON_CLAW:
+					m_swordRefineEffectRight = EFFECT_REFINED + EFFECT_SMALLSWORD_REFINED9;
+					m_swordRefineEffectLeft = EFFECT_REFINED + EFFECT_SMALLSWORD_REFINED9_LEFT;
+					break;
+#endif
+				default:
+					m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_SWORD_REFINED9;
+			}
+			if (m_swordRefineEffectRight)
+				m_swordRefineEffectRight = __AttachEffect(m_swordRefineEffectRight);
+			if (m_swordRefineEffectLeft)
+				m_swordRefineEffectLeft = __AttachEffect(m_swordRefineEffectLeft);
+#endif //USE_WEAPON_COSTUME_WITH_EFFECT
+			break;
+		}
+#endif
+#ifdef USE_BODY_COSTUME_WITH_EFFECT
+		if (pItem->GetSubType() == CItemData::COSTUME_BODY)
+		{
+			__ClearArmorRefineEffect();
+
+			// lvl80 armor's effect (blue smoke+bubbles)
+			// {
+				// __AttachEffect(EFFECT_REFINED+EFFECT_BODYARMOR_SPECIAL);
+				// __AttachEffect(EFFECT_REFINED+EFFECT_BODYARMOR_SPECIAL2);
+			// }
+
+			// lvl105 armor's effect (sparkles)
+			// {
+				// __AttachEffect(EFFECT_REFINED+EFFECT_BODYARMOR_SPECIAL3);
+			// }
+
+			m_armorRefineEffect = EFFECT_REFINED+EFFECT_BODYARMOR_REFINED9;
+			__AttachEffect(m_armorRefineEffect);
+			break;
+		}
+#endif //USE_BODY_COSTUME_WITH_EFFECT
 		break;
 	}
 	return 0;
@@ -2790,6 +3092,9 @@ bool CInstanceBase::ChangeArmor(DWORD dwArmor)
 	DWORD dwVID = GetVirtualID();
 	DWORD dwRace = GetRace();
 	DWORD eHair = GetPart(CRaceData::PART_HAIR);
+#ifdef ENABLE_ACCE_SYSTEM
+	DWORD dwAcce = GetPart(CRaceData::PART_ACCE);
+#endif
 	DWORD eWeapon = GetPart(CRaceData::PART_WEAPON);
 	float fRot = GetRotation();
 	float fAdvRot = GetAdvancingRotation();
@@ -2811,7 +3116,9 @@ bool CInstanceBase::ChangeArmor(DWORD dwArmor)
 	SetArmor(dwArmor);
 	SetHair(eHair);
 	SetWeapon(eWeapon);
-
+#ifdef ENABLE_ACCE_SYSTEM
+	SetAcce(dwAcce);
+#endif
 	SetRotation(fRot);
 	SetAdvancingRotation(fAdvRot);
 
@@ -2920,7 +3227,11 @@ void CInstanceBase::RefreshState(DWORD dwMotIndex, bool isLoop)
 			case CItemData::WEAPON_BOW:
 				SetMotionMode(CRaceMotionData::MODE_HORSE_BOW); // Only Shaman
 				break;
-
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			case CItemData::WEAPON_CLAW:
+				SetMotionMode(CRaceMotionData::MODE_HORSE_CLAW); // Only Wolfman
+				break;
+#endif
 			default:
 				SetMotionMode(CRaceMotionData::MODE_HORSE);
 				break;
@@ -2953,7 +3264,11 @@ void CInstanceBase::RefreshState(DWORD dwMotIndex, bool isLoop)
 			case CItemData::WEAPON_BELL:
 				SetMotionMode(CRaceMotionData::MODE_BELL); // Only Shaman
 				break;
-
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			case CItemData::WEAPON_CLAW:
+				SetMotionMode(CRaceMotionData::MODE_CLAW); // Only Wolfman
+				break;
+#endif
 			case CItemData::WEAPON_ARROW:
 			default:
 				SetMotionMode(CRaceMotionData::MODE_GENERAL);
@@ -3076,6 +3391,9 @@ void CInstanceBase::__Initialize()
 	m_swordRefineEffectRight = 0;
 	m_swordRefineEffectLeft = 0;
 	m_armorRefineEffect = 0;
+#ifdef ENABLE_ACCE_SYSTEM
+	m_dwAcceEffect = 0;
+#endif
 
 	m_sAlignment = 0;
 	m_byPKMode = 0;

@@ -126,12 +126,12 @@ void CMonsterAreaInfo::RemoveAllMonsters()
 
 	SetMonsterGroupID(0);
 	
-	m_strGroupName.assign("이름없음");
-	m_strLeaderName.assign("이름없음");
+	m_strGroupName.assign("Noname");
+	m_strLeaderName.assign("Noname");
 	SetMonsterGroupFollowerCount(0);
 	
 	SetMonsterVID(0);
-	m_strMonsterName.assign("이름없음");
+	m_strMonsterName.assign("Noname");
 
 	SetMonsterCount(0);
 	SetMonsterDirection(DIR_NORTH);

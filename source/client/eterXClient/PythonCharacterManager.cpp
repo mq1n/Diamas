@@ -548,7 +548,7 @@ CInstanceBase * CPythonCharacterManager::CreateInstance(const CInstanceBase::SCr
 	CInstanceBase * pCharacterInstance = RegisterInstance(c_rkCreateData.m_dwVID);
 	if (!pCharacterInstance)
 	{
-		TraceError("CPythonCharacterManager::CreateInstance: VID[%d] - ALREADY EXIST\n", c_rkCreateData);
+		TraceError("CPythonCharacterManager::CreateInstance: VID[%d] - ALREADY EXIST\n", c_rkCreateData.m_dwVID); // @fixme010
 		return NULL;
 	}
 

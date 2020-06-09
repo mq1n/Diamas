@@ -8,6 +8,7 @@
 #define _dev_log_cpp_
 
 #include "stdafx.h"
+#include "config.h"
 #include "dev_log.h"
 
 #ifndef IS_SET
@@ -26,7 +27,6 @@
 #	define TOGGLE_BIT(var,bit)		((var) = (var) ^ (bit))
 #endif	// TOGGLE_BIT
 
-extern int test_server;
 static int	s_log_mask = 0xffffffff;
 
 void dev_log(const char *file, int line, const char *function, int level, const char *fmt, ...)

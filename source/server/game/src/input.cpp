@@ -22,9 +22,9 @@
 #ifndef __WIN32__
 	#include "limit_time.h"
 #endif
+#include "../../common/CommonDefines.h"
 
-extern time_t get_global_time();
-extern bool g_bNoPasspod;
+#include "utils.h"
 
 bool IsEmptyAdminPage()
 {
@@ -115,6 +115,7 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int iBytes, 
 			TrafficProfiler::instance().Report(TrafficProfiler::IODIR_INPUT, bHeader, iPacketLen);
 		// END_OF_TRAFFIC_PROFILER
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 		if (bHeader == HEADER_CG_PONG)
 			sys_log(0, "PONG! %u %u", m_pPacketInfo->IsSequence(bHeader), *(BYTE *) (c_pData + iPacketLen - sizeof(BYTE)));
 
@@ -162,6 +163,7 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int iBytes, 
 				//sys_err("SEQUENCE %x match %u next %u header %u", lpDesc, bSeq, lpDesc->GetSequence(), bHeader);
 			}
 		}
+#endif
 
 		c_pData	+= iPacketLen;
 		m_iBufferLeft -= iPacketLen;
@@ -180,17 +182,6 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int iBytes, 
 void CInputProcessor::Pong(LPDESC d)
 {
 	d->SetPong(true);
-
-	extern bool Metin2Server_IsInvalid();
-
-#ifdef ENABLE_LIMIT_TIME
-	if (Metin2Server_IsInvalid())
-	{
-		extern bool g_bShutdown;
-		g_bShutdown = true;
-		ClearAdminPages();
-	}
-#endif
 }
 
 void CInputProcessor::Handshake(LPDESC d, const char * c_pData)
@@ -249,8 +240,9 @@ void LoginFailure(LPDESC d, const char * c_pszStatus)
 CInputHandshake::CInputHandshake()
 {
 	CPacketInfoCG * pkPacketInfo = M2_NEW CPacketInfoCG;
+#ifdef ENABLE_SEQUENCE_SYSTEM
 	pkPacketInfo->SetSequence(HEADER_CG_PONG, false);
-
+#endif
 	m_pMainPacketInfo = m_pPacketInfo;
 	BindPacketInfo(pkPacketInfo);
 }
@@ -280,6 +272,13 @@ int CInputHandshake::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 
 	if (bHeader == HEADER_CG_TEXT)
 	{
+#ifdef ENABLE_PORT_SECURITY
+		if (IsEmptyAdminPage() || !IsAdminPage(inet_ntoa(d->GetAddr().sin_addr))) // block if adminpage is not set or if not admin
+		{
+			sys_log(0, "SOCKET_CMD: BLOCK FROM(%s)", d->GetHostName());
+			return -1;
+		}
+#endif
 		++c_pData;
 		const char * c_pSep;
 
@@ -412,6 +411,14 @@ int CInputHandshake::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 					LogManager::instance().CharLog(0, 0, 0, 1, "NOTICE", msg.c_str(), d->GetHostName());
 					BroadcastNotice(msg.c_str());
 				}
+#ifdef ENABLE_FULL_NOTICE
+				else if (!stBuf.compare(0, 11, "BIG_NOTICE "))
+				{
+					std::string msg = stBuf.substr(11, 50);
+					LogManager::instance().CharLog(0, 0, 0, 1, "BIG_NOTICE", msg.c_str(), d->GetHostName());
+					BroadcastNotice(msg.c_str(), true);
+				}
+#endif
 				else if (!stBuf.compare("CLOSE_PASSPOD"))
 				{
 					g_bNoPasspod = true;

@@ -86,7 +86,11 @@ bool CShopEx::AddGuest(LPCHARACTER ch,DWORD owner_vid, bool bOtherEmpire)
 			switch(shop_tab.coinType)
 			{
 			case SHOP_COIN_TYPE_GOLD:
+#ifdef ENABLE_NEWSTUFF
+				if (bOtherEmpire && !g_bEmpireShopPriceTripleDisable) // no empire price penalty for pc shop
+#else
 				if (bOtherEmpire) // no empire price penalty for pc shop
+#endif
 					pack_tab.items[i].price = shop_tab.items[i].price * 3;
 				else
 					pack_tab.items[i].price = shop_tab.items[i].price;
@@ -155,7 +159,7 @@ int CShopEx::Buy(LPCHARACTER ch, BYTE pos)
 		break;
 	case SHOP_COIN_TYPE_SECONDARY_COIN:
 		{
-			int count = ch->CountSpecifyTypeItem(ITEM_SECONDARY_COIN);
+			DWORD count = ch->CountSpecifyTypeItem(ITEM_SECONDARY_COIN);
 			if (count < dwPrice)
 			{
 				sys_log(1, "ShopEx::Buy : Not enough myeongdojun : %s has %d, price %d", ch->GetName(), count, dwPrice);
@@ -218,17 +222,18 @@ int CShopEx::Buy(LPCHARACTER ch, BYTE pos)
 	if (item)
 		sys_log(0, "ShopEx: BUY: name %s %s(x %d):%u price %u", ch->GetName(), item->GetName(), item->GetCount(), item->GetID(), dwPrice);
 
-	if (LC_IsBrazil())
+#ifdef ENABLE_FLUSH_CACHE_FEATURE // @warme006
 	{
 		ch->SaveReal();
 		db_clientdesc->DBPacketHeader(HEADER_GD_FLUSH_CACHE, 0, sizeof(DWORD));
 		DWORD pid = ch->GetPlayerID();
 		db_clientdesc->Packet(&pid, sizeof(DWORD));
 	}
-	else
+#else
 	{
 		ch->Save();
 	}
+#endif
 
     return (SHOP_SUBHEADER_GC_OK);
 }

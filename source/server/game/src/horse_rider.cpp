@@ -124,13 +124,13 @@ bool CHorseRider::ReviveHorse()
 	return true;
 }
 
-short CHorseRider::GetHorseMaxHealth()
+short CHorseRider::GetHorseMaxHealth() const
 {
 	int level = GetHorseLevel();
 	return c_aHorseStat[level].iMaxHealth;
 }
 
-short CHorseRider::GetHorseMaxStamina()
+short CHorseRider::GetHorseMaxStamina() const
 {
 	int level = GetHorseLevel();
 	return c_aHorseStat[level].iMaxStamina;

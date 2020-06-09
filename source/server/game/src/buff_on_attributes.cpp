@@ -13,7 +13,6 @@ CBuffOnAttributes::CBuffOnAttributes(LPCHARACTER pOwner, BYTE point_type, std::v
 
 CBuffOnAttributes::~CBuffOnAttributes()
 {
-	Off();
 }
 
 void CBuffOnAttributes::Initialize()
@@ -105,30 +104,16 @@ void CBuffOnAttributes::ChangeBuffValue(BYTE bNewValue)
 		Off();
 	else
 	{
-		// 기존에, m_map_additional_attrs의 값의 (m_bBuffValue)%만큼이 버프로 들어가 있었으므로,
-		// (bNewValue)%만큼으로 값을 변경함.
+
 		for (TMapAttr::iterator it = m_map_additional_attrs.begin(); it != m_map_additional_attrs.end(); it++)
 		{
 			int& sum_of_attr_value = it->second;
-			int old_value = sum_of_attr_value * m_bBuffValue / 100;
-			int new_value = sum_of_attr_value * bNewValue / 100;
-			
+			//int old_value = sum_of_attr_value * m_bBuffValue / 100;
+			//int new_value = sum_of_attr_value * bNewValue / 100;
+
 			m_pBuffOwner->ApplyPoint(it->first, -sum_of_attr_value * m_bBuffValue / 100);
 		}
 		m_bBuffValue = bNewValue;
-	}
-}
-
-void CBuffOnAttributes::GiveAllAttributes()
-{
-	if (0 == m_bBuffValue)
-		return;
-	for (TMapAttr::iterator it = m_map_additional_attrs.begin(); it != m_map_additional_attrs.end(); it++)
-	{
-		BYTE apply_type = it->first;
-		int apply_value = it->second * m_bBuffValue / 100;
-		
-		m_pBuffOwner->ApplyPoint(apply_type, apply_value);
 	}
 }
 
@@ -136,7 +121,7 @@ bool CBuffOnAttributes::On(BYTE bValue)
 {
 	if (0 != m_bBuffValue || 0 == bValue)
 		return false;
-	
+
 	int n = m_p_vec_buff_wear_targets->size();
 	m_map_additional_attrs.clear();
 	for (int i = 0; i < n; i++)

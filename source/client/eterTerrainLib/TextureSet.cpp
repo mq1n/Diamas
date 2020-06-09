@@ -194,7 +194,7 @@ bool CTextureSet::AddTexture(const char * c_szFileName,
 {
 	if (GetTextureCount() >= 256)
 	{
-		LogBox("텍스처를 더 이상 추가할 수 없습니다.", "최대 텍스처 개수 255개");
+		LogBox("You cannot add more than 255 texture.");
 		return false;
 	}
 
@@ -202,7 +202,7 @@ bool CTextureSet::AddTexture(const char * c_szFileName,
 	{
 		if (0 == m_Textures[i].stFilename.compare(c_szFileName))
 		{
-			LogBox("동일한 이름의 텍스처가 이미 있습니다.", "중복");
+			LogBox("Texture of the same name already exists.", "Duplicate");
 			return false;
 		}
 	}
@@ -211,12 +211,14 @@ bool CTextureSet::AddTexture(const char * c_szFileName,
 
 	if (!pResource->IsType(CGraphicImage::Type()))
 	{
-		LogBox("CTerrainImpl::GenerateTexture : 이미지 파일이 아닙니다. %s", pResource->GetFileName());
+		LogBox("CTerrainImpl::GenerateTexture : It's not an image file. %s", pResource->GetFileName());
 		return false;
 	}
 	
 	m_Textures.reserve(m_Textures.size() + 1);
 
+	// @fixme003
+	AddEmptyTexture();
 	SetTexture(m_Textures.size() - 1,
 			   c_szFileName,
 			   fuScale,
@@ -251,7 +253,8 @@ bool CTextureSet::Save(const char * c_pszFileName)
 	fprintf(pFile, "TextureSet\n");
 	fprintf(pFile, "\n");
 	
-	fprintf(pFile, "TextureCount %ld\n", GetTextureCount() - 1);	// -1 을 하는 이유는 지우개 때문임
+	// @fixme004
+	fprintf(pFile, "TextureCount %ld\n", GetTextureCount()?(GetTextureCount() - 1):0);	// -1 을 하는 이유는 지우개 때문임
 	fprintf(pFile, "\n");
 
 	for (DWORD i = 1; i < GetTextureCount(); ++i)

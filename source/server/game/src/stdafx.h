@@ -1,3 +1,6 @@
+#ifndef __GAME_SRC_STDAFX_H__
+#define __GAME_SRC_STDAFX_H__
+
 // Basic features
 // Enable or disable memory pooling for specific object types
 //#define M2_USE_POOL
@@ -11,6 +14,7 @@
 #include "../../common/singleton.h"
 #include "../../common/utils.h"
 #include "../../common/service.h"
+#include "../../common/CommonDefines.h"
 
 #include <algorithm>
 #include <math.h>
@@ -40,3 +44,5 @@
 
 #define IN
 #define OUT
+
+#endif

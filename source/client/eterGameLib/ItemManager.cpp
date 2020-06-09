@@ -271,7 +271,12 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 			TraceError("CPythonItem::LoadItemTable: invalid item_proto[%s] VERSION[%d]", c_szFileName, dwVersion);
 			return false;
 		}
+
+#ifdef ENABLE_PROTOSTRUCT_AUTODETECT
+		if (!CItemData::TItemTableAll::IsValidStruct(dwStride))
+#else
 		if (dwStride != sizeof(CItemData::TItemTable))
+#endif
 		{
 			TraceError("CPythonItem::LoadItemTable: invalid item_proto[%s] STRIDE[%d] != sizeof(SItemTable)", 
 				c_szFileName, dwStride, sizeof(CItemData::TItemTable));
@@ -303,12 +308,18 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 	/////
 
 	char szName[64+1];
-	
-	CItemData::TItemTable * table = (CItemData::TItemTable *) zObj.GetBuffer();
 	std::map<DWORD,DWORD> itemNameMap;
 
-	for (DWORD i = 0; i < dwElements; ++i, ++table)
+	for (DWORD i = 0; i < dwElements; ++i)
 	{
+#ifdef ENABLE_PROTOSTRUCT_AUTODETECT
+		CItemData::TItemTable t = {0};
+		CItemData::TItemTableAll::Process(zObj.GetBuffer(), dwStride, i, t);
+#else
+		CItemData::TItemTable & t = *((CItemData::TItemTable *) zObj.GetBuffer() + i);
+#endif
+		CItemData::TItemTable * table = &t;
+
 		CItemData * pItemData;
 		DWORD dwVnum = table->dwVnum;
 
@@ -389,6 +400,48 @@ void CItemManager::Destroy()
 
 	m_ItemMap.clear();
 }
+
+#ifdef ENABLE_ACCE_SYSTEM
+bool CItemManager::LoadItemScale(const char * c_szFileName)
+{
+	CFile kFile;
+	if (!FileSystemManager::Instance().OpenFile(c_szFileName, kFile))
+		return false;
+
+	CMemoryTextFileLoader kTextFileLoader;
+	kTextFileLoader.Bind(kFile.GetSize(), kFile.GetData());
+
+	CTokenVector kTokenVector;
+	for (DWORD i = 0; i < kTextFileLoader.GetLineCount(); ++i)
+	{
+		if (!kTextFileLoader.SplitLineByTab(i, &kTokenVector))
+			continue;
+
+		if (kTokenVector.size() < ITEMSCALE_NUM)
+		{
+			TraceError("LoadItemScale: invalid line %d (%s).", i, c_szFileName);
+			continue;
+		}
+
+		const std::string & strJob = kTokenVector[ITEMSCALE_JOB];
+		const std::string & strSex = kTokenVector[ITEMSCALE_SEX];
+		const std::string & strScaleX = kTokenVector[ITEMSCALE_SCALE_X];
+		const std::string & strScaleY = kTokenVector[ITEMSCALE_SCALE_Y];
+		const std::string & strScaleZ = kTokenVector[ITEMSCALE_SCALE_Z];
+		const std::string & strPositionX = kTokenVector[ITEMSCALE_POSITION_X];
+		const std::string & strPositionY = kTokenVector[ITEMSCALE_POSITION_Y];
+		const std::string & strPositionZ = kTokenVector[ITEMSCALE_POSITION_Z];
+
+		for (int j = 0; j < 5; ++j)
+		{
+			CItemData * pItemData = MakeItemData(atoi(kTokenVector[ITEMSCALE_VNUM].c_str()) + j);
+			pItemData->SetItemScale(strJob, strSex, strScaleX, strScaleY, strScaleZ, strPositionX, strPositionY, strPositionZ);
+		}
+	}
+
+	return true;
+}
+#endif
 
 CItemManager::CItemManager() : m_pSelectedItemData(NULL)
 {

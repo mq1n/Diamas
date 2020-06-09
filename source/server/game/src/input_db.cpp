@@ -48,17 +48,11 @@
 
 #include "DragonSoul.h"
 
+#include "../../common/CommonDefines.h"
+
 #ifdef __AUCTION__
 #include "auction_manager.h"
 #endif
-extern BYTE		g_bAuthServer;
-#ifdef __AUCTION__
-extern int auction_server;
-#endif
-extern void gm_insert(const char * name, BYTE level);
-extern BYTE	gm_get_level(const char * name, const char * host, const char* account );
-extern void gm_host_insert(const char * host);
-extern int openid_server;
 
 #define MAPNAME_DEFAULT	"none"
 
@@ -95,11 +89,17 @@ bool GetServerLocation(TAccountTable & rTab, BYTE bEmpire)
 						rTab.players[i].x,
 						rTab.players[i].y,
 						rTab.players[i].szName);
-
+#ifdef ENABLE_NEWSTUFF
+				if (!g_stProxyIP.empty())
+					rTab.players[i].lAddr=inet_addr(g_stProxyIP.c_str());
+#endif
 				continue;
 			}
 		}
-
+#ifdef ENABLE_NEWSTUFF
+		if (!g_stProxyIP.empty())
+			rTab.players[i].lAddr=inet_addr(g_stProxyIP.c_str());
+#endif
 		struct in_addr in;
 		in.s_addr = rTab.players[i].lAddr;
 		sys_log(0, "success to %s:%d", inet_ntoa(in), rTab.players[i].wPort);
@@ -231,7 +231,10 @@ void CInputDB::PlayerCreateSuccess(LPDESC d, const char * data)
 	pack.header = HEADER_GC_CHARACTER_CREATE_SUCCESS;
 	pack.bAccountCharacterIndex = pPacketDB->bAccountCharacterIndex;
 	pack.player = pPacketDB->player;
-
+#ifdef ENABLE_NEWSTUFF
+	if (!g_stProxyIP.empty())
+		pack.player.lAddr=inet_addr(g_stProxyIP.c_str());
+#endif
 	d->Packet(&pack, sizeof(TPacketGCPlayerCreateSuccess));
 
 	// 기본 무기와 귀환부를 지급
@@ -263,6 +266,9 @@ void CInputDB::PlayerCreateSuccess(LPDESC d, const char * data)
 			{ {11443,	0}, {12363,	3}, {15103,	4}, { 1053,	2}, { 2083,	1}, {16083,	7}, {17083,	8}, {13193,	9}, {14103,	10}, },
 			{ {11643,	0}, {12503,	2}, {15103,	3}, {   93,	1}, {16123,	4}, {17143,	7}, {13193,	8}, {14103,	9}, {    0,	0}, },
 			{ {11843,	0}, {12643,	1}, {15103,	2}, { 7083,	3}, { 5053,	4}, {16123,	6}, {17143,	7}, {13193,	8}, {14103,	9}, },
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			{ {21023,	2}, {12223,	3}, {21513,	4}, { 6023,	1}, {16143,	8}, {17103,	9}, { 0,	0}, {13193,	11}, {14103, 12}, }, 
+#endif
 		};
 
 		int job = pPacketDB->player.byJob;
@@ -336,6 +342,7 @@ void CInputDB::ChangeName(LPDESC d, const char * data)
 		}
 }
 
+#define ENABLE_GOHOME_IF_MAP_NOT_EXIST
 void CInputDB::PlayerLoad(LPDESC d, const char * data)
 {
 	TPlayerTable * pTab = (TPlayerTable *) data;
@@ -373,8 +380,14 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 	if (!SECTREE_MANAGER::instance().GetValidLocation(pTab->lMapIndex, pTab->x, pTab->y, lMapIndex, pos, d->GetEmpire()))
 	{
 		sys_err("InputDB::PlayerLoad : cannot find valid location %d x %d (name: %s)", pTab->x, pTab->y, pTab->name);
+#ifdef ENABLE_GOHOME_IF_MAP_NOT_EXIST
+		lMapIndex = EMPIRE_START_MAP(d->GetAccountTable().bEmpire);
+		pos.x = EMPIRE_START_X(d->GetAccountTable().bEmpire);
+		pos.y = EMPIRE_START_Y(d->GetAccountTable().bEmpire);
+#else
 		d->SetPhase(PHASE_CLOSE);
 		return;
+#endif
 	}
 
 	pTab->x = pos.x;
@@ -420,16 +433,15 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 				inet_ntoa(ch->GetDesc()->GetAddr().sin_addr), ch->GetGold(), g_bChannel, ch->GetMapIndex(), ch->GetAlignment());
 		LogManager::instance().CharLog(ch, 0, "LOGIN", buf);
 
-		if (LC_IsYMIR() || LC_IsKorea() || LC_IsBrazil() || LC_IsJapan())
+#ifdef ENABLE_PCBANG_FEATURE // @warme006
 		{
-			LogManager::instance().LoginLog(true, 
+			LogManager::instance().LoginLog(true,
 					ch->GetDesc()->GetAccountTable().id, ch->GetPlayerID(), ch->GetLevel(), ch->GetJob(), ch->GetRealPoint(POINT_PLAYTIME));
 
-			if (LC_IsBrazil() != true )
-			{
+			if (0)
 				ch->SetPCBang(CPCBangManager::instance().IsPCBangIP(ch->GetDesc()->GetHostName()));
-			}
 		}
+#endif
 	}
 
 	d->SetPhase(PHASE_LOADING);
@@ -931,12 +943,7 @@ void CInputDB::Boot(const char* data)
 			"%s/dragon_soul_table.txt", LocaleService_GetBasePath().c_str());
 
 	sys_log(0, "Initializing Informations of Cube System");
-	if (!Cube_InformationInitialize())
-	{
-		sys_err("cannot init cube infomation.");
-		thecore_shutdown();
-		return;
-	}
+	Cube_InformationInitialize();
 
 	sys_log(0, "LoadLocaleFile: CommonDropItem: %s", szCommonDropItemFileName);
 	if (!ITEM_MANAGER::instance().ReadCommonDropItemFile(szCommonDropItemFileName))
@@ -1326,7 +1333,7 @@ void CInputDB::MapLocations(const char * c_pData)
 
 	while (bCount--)
 	{
-		for (int i = 0; i < 32; ++i)
+		for (int i = 0; i < MAP_ALLOW_LIMIT; ++i)
 		{
 			if (0 == pLoc->alMaps[i])
 				break;
@@ -1529,6 +1536,18 @@ void CInputDB::ItemLoad(LPDESC d, const char * c_pData)
 		item->SetSkipSave(true);
 		item->SetSockets(p->alSockets);
 		item->SetAttributes(p->aAttr);
+
+#ifdef ENABLE_HIGHLIGHT_NEW_ITEM
+		item->SetLastOwnerPID(p->owner);
+#endif
+
+#ifdef ENABLE_BELT_INVENTORY_EX
+		if (p->window == BELT_INVENTORY)
+		{
+			p->window = INVENTORY;
+			p->pos = p->pos + BELT_INVENTORY_SLOT_START;
+		}
+#endif
 
 		if ((p->window == INVENTORY && ch->GetInventoryItem(p->pos)) ||
 				(p->window == EQUIPMENT && ch->GetWear(p->pos)))
@@ -1975,8 +1994,6 @@ void CInputDB::BillingCheck(const char * c_pData)
 
 void CInputDB::Notice(const char * c_pData)
 {
-	extern void SendNotice(const char * c_pszBuf);
-
 	char szBuf[256+1];
 	strlcpy(szBuf, c_pData, sizeof(szBuf));
 
@@ -2661,18 +2678,15 @@ void CInputDB::GuildChangeMaster(TPacketChangeGuildMaster* p)
 
 void CInputDB::DetailLog(const TPacketNeedLoginLogInfo* info)
 {
-	if (true == LC_IsEurope() || true == LC_IsYMIR() || true == LC_IsKorea() )
+	LPCHARACTER pChar = CHARACTER_MANAGER::instance().FindByPID( info->dwPlayerID );
+
+	if (NULL != pChar)
 	{
-		LPCHARACTER pChar = CHARACTER_MANAGER::instance().FindByPID( info->dwPlayerID );
+		LogManager::instance().DetailLoginLog(true, pChar);
 
-		if (NULL != pChar)
+		if (isHackShieldEnable)
 		{
-			LogManager::instance().DetailLoginLog(true, pChar);
-
-			if (isHackShieldEnable)
-			{
-				pChar->StartHackShieldCheckCycle( HackShield_FirstCheckWaitTime );
-			}
+			pChar->StartHackShieldCheckCycle( HackShield_FirstCheckWaitTime );
 		}
 	}
 }

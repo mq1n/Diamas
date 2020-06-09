@@ -222,6 +222,10 @@ void CPythonNetworkStream::GamePhase()
 		DWORD timeBeginPacket=timeGetTime();
 #endif
 
+#if defined(_DEBUG) && defined(ENABLE_PRINT_RECV_PACKET_DEBUG)
+		Tracenf("RECV HEADER : %u , phase %s ", header, m_strPhase.c_str());
+#endif
+
 		switch (header)
 		{
 			case HEADER_GC_OBSERVER_ADD:
@@ -618,7 +622,15 @@ void CPythonNetworkStream::GamePhase()
 			case HEADER_GC_DRAGON_SOUL_REFINE:
 				ret = RecvDragonSoulRefine();
 				break;
+			case HEADER_GC_UNK_213: // @fixme007
+				ret = RecvUnk213();
+				break;
 
+#ifdef ENABLE_ACCE_SYSTEM
+			case HEADER_GC_ACCE:
+				ret = RecvAccePacket();
+				break;
+#endif
 			default:
 				ret = RecvDefaultPacket(header);
 				break;
@@ -878,6 +890,14 @@ bool CPythonNetworkStream::RecvObserverAddPacket()
 		kObserverAddPacket.x*100.0f, 
 		kObserverAddPacket.y*100.0f);
 
+	return true;
+}
+
+bool CPythonNetworkStream::RecvUnk213() // @fixme007
+{
+	TPacketGCUnk213 kUnk213Packet;
+	if (!Recv(sizeof(TPacketGCUnk213)), &kUnk213Packet)
+		return false;
 	return true;
 }
 
@@ -1353,6 +1373,10 @@ bool CPythonNetworkStream::RecvChatPacket()
 		case CHAT_TYPE_INFO:     /* 정보 (아이템을 집었다, 경험치를 얻었다. 등) */
 		case CHAT_TYPE_NOTICE:   /* 공지사항 */
 		case CHAT_TYPE_BIG_NOTICE:
+		// case CHAT_TYPE_UNK_10:
+#ifdef ENABLE_DICE_SYSTEM
+		case CHAT_TYPE_DICE_INFO:
+#endif
 		case CHAT_TYPE_MAX_NUM:
 		default:
 			_snprintf(line, sizeof(line), "%s", buf);
@@ -1482,8 +1506,7 @@ bool CPythonNetworkStream::RecvPointChange()
 	CInstanceBase * pInstance = CPythonCharacterManager::Instance().GetMainInstancePtr();
 
 	// 자신의 Point가 변경되었을 경우..
-	if (pInstance)
-	if (PointChange.dwVID == pInstance->GetVirtualID())
+	if (pInstance && PointChange.dwVID == pInstance->GetVirtualID())
 	{
 		CPythonPlayer & rkPlayer = CPythonPlayer::Instance();
 		rkPlayer.SetStatus(PointChange.Type, PointChange.value);
@@ -1526,6 +1549,18 @@ bool CPythonNetworkStream::RecvPointChange()
 			}
 		}
 	}
+#ifdef ENABLE_TEXT_LEVEL_REFRESH
+	else
+	{
+		// the /advance command will provide no global refresh! it sends the pointchange only to the specific player and not all
+		pInstance = CPythonCharacterManager::Instance().GetInstancePtr(PointChange.dwVID);
+		if (pInstance && PointChange.Type == POINT_LEVEL)
+		{
+			pInstance->SetLevel(PointChange.value);
+			pInstance->UpdateTextTailLevel(PointChange.value);
+		}
+	}
+#endif
 
 	return true;
 }
@@ -1572,7 +1607,7 @@ bool CPythonNetworkStream::RecvDeadPacket()
 		CInstanceBase* pkInstMain=rkChrMgr.GetMainInstancePtr();
 		if (pkInstMain==pkChrInstSel)
 		{
-			Tracenf("주인공 사망");
+			Tracenf("On MainActor");
 			if (false == pkInstMain->GetDuelMode())
 			{
 				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnGameOver", Py_BuildValue("()"));
@@ -1780,12 +1815,21 @@ bool CPythonNetworkStream::RecvExchangePacket()
 			CPythonExchange::Instance().Clear();
 			CPythonExchange::Instance().Start();
 			CPythonExchange::Instance().SetSelfName(CPythonPlayer::Instance().GetName());
+#ifdef ENABLE_LEVEL_IN_TRADE
+			//CPythonExchange::Instance().SetSelfLevel(CPythonPlayer::Instance().GetLevel());
+			CPythonExchange::Instance().SetSelfLevel(CPythonPlayer::Instance().GetStatus(POINT_LEVEL));
+#endif
 
 			{
 				CInstanceBase * pCharacterInstance = CPythonCharacterManager::Instance().GetInstancePtr(exchange_packet.arg1);
 
 				if (pCharacterInstance)
+				{
 					CPythonExchange::Instance().SetTargetName(pCharacterInstance->GetNameString());
+#ifdef ENABLE_LEVEL_IN_TRADE
+					CPythonExchange::Instance().SetTargetLevel(pCharacterInstance->GetLevel());
+#endif
+				}
 			}
 
 			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "StartExchange", Py_BuildValue("()"));
@@ -2317,7 +2361,7 @@ bool CPythonNetworkStream::RecvSkillCoolTimeEnd()
 
 bool CPythonNetworkStream::RecvSkillLevel()
 {
-	assert(!"CPythonNetworkStream::RecvSkillLevel - 사용하지 않는 함수");
+	assert(!"CPythonNetworkStream::RecvSkillLevel - Don't use this function");
 	TPacketGCSkillLevel packet;
 	if (!Recv(sizeof(TPacketGCSkillLevel), &packet))
 	{
@@ -2543,7 +2587,7 @@ bool CPythonNetworkStream::RecvAddFlyTargetingPacket()
 
 	__GlobalPositionToLocalPosition(kPacket.lX, kPacket.lY);
 
-	Tracef("VID [%d]가 타겟을 추가 설정\n",kPacket.dwShooterVID);
+	Tracef("VID [%d] Added to target settings\n",kPacket.dwShooterVID);
 
 	CPythonCharacterManager & rpcm = CPythonCharacterManager::Instance();
 
@@ -4266,8 +4310,9 @@ bool CPythonNetworkStream::RecvLandPacket()
 		if (0 != kElement.dwGuildID)
 			kVec_dwGuildID.push_back(kElement.dwGuildID);
 	}
-
-	__DownloadSymbol(kVec_dwGuildID);
+	// @fixme006
+	if (kVec_dwGuildID.size()>0)
+		__DownloadSymbol(kVec_dwGuildID);
 
 	return true;
 }
@@ -4427,3 +4472,168 @@ bool CPythonNetworkStream::SendDragonSoulRefinePacket(BYTE bRefineType, TItemPos
 	}
 	return true;
 }
+
+
+#ifdef ENABLE_ACCE_SYSTEM
+bool CPythonNetworkStream::RecvAccePacket(bool bReturn)
+{
+	TPacketAcce sPacket;
+	if (!Recv(sizeof(sPacket), &sPacket))
+		return bReturn;
+
+	bReturn = true;
+	switch (sPacket.subheader)
+	{
+		case ACCE_SUBHEADER_GC_OPEN:
+			CPythonAcce::Instance().Clear();
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ActAcce", Py_BuildValue("(ib)", 1, sPacket.bWindow));
+			break;
+
+
+		case ACCE_SUBHEADER_GC_CLOSE:
+			CPythonAcce::Instance().Clear();
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ActAcce", Py_BuildValue("(ib)", 2, sPacket.bWindow));
+			break;
+
+
+		case ACCE_SUBHEADER_GC_ADDED:
+			CPythonAcce::Instance().AddMaterial(sPacket.dwPrice, sPacket.bPos, sPacket.tPos);
+			if (sPacket.bPos == 1)
+			{
+				CPythonAcce::Instance().AddResult(sPacket.dwItemVnum, sPacket.dwMinAbs, sPacket.dwMaxAbs);
+				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "AlertAcce", Py_BuildValue("(b)", sPacket.bWindow));
+			}
+
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ActAcce", Py_BuildValue("(ib)", 3, sPacket.bWindow));
+			break;
+
+
+
+		case ACCE_SUBHEADER_GC_REMOVED:
+			CPythonAcce::Instance().RemoveMaterial(sPacket.dwPrice, sPacket.bPos);
+			if (sPacket.bPos == 0)
+				CPythonAcce::Instance().RemoveMaterial(sPacket.dwPrice, 1);
+
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ActAcce", Py_BuildValue("(ib)", 4, sPacket.bWindow));
+			break;
+
+
+
+		case ACCE_SUBHEADER_CG_REFINED:
+			if (sPacket.dwMaxAbs == 0)
+				CPythonAcce::Instance().RemoveMaterial(sPacket.dwPrice, 1);
+			else
+			{
+				CPythonAcce::Instance().RemoveMaterial(sPacket.dwPrice, 0);
+				CPythonAcce::Instance().RemoveMaterial(sPacket.dwPrice, 1);
+			}
+
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ActAcce", Py_BuildValue("(ib)", 4, sPacket.bWindow));
+			break;
+
+
+
+		default:
+			TraceError("CPythonNetworkStream::RecvAccePacket: unknown subheader %d\n.", sPacket.subheader);
+			break;
+	}
+
+	return bReturn;
+}
+
+bool CPythonNetworkStream::SendAcceClosePacket()
+{
+	if (!__CanActMainInstance())
+		return true;
+
+	TItemPos tPos;
+	tPos.window_type	= INVENTORY;
+	tPos.cell			= 0;
+
+	TPacketAcce sPacket;
+	sPacket.header		= HEADER_CG_ACCE;
+	sPacket.subheader	= ACCE_SUBHEADER_CG_CLOSE;
+	sPacket.dwPrice		= 0;
+	sPacket.bPos		= 0;
+	sPacket.tPos		= tPos;
+	sPacket.dwItemVnum	= 0;
+	sPacket.dwMinAbs	= 0;
+	sPacket.dwMaxAbs	= 0;
+
+	if (!Send(sizeof(sPacket), &sPacket))
+		return false;
+
+	return SendSequence();
+}
+
+bool CPythonNetworkStream::SendAcceAddPacket(TItemPos tPos, BYTE bPos)
+{
+	if (!__CanActMainInstance())
+		return true;
+
+	TPacketAcce sPacket;
+	sPacket.header		= HEADER_CG_ACCE;
+	sPacket.subheader	= ACCE_SUBHEADER_CG_ADD;
+	sPacket.dwPrice		= 0;
+	sPacket.bPos		= bPos;
+	sPacket.tPos		= tPos;
+	sPacket.dwItemVnum	= 0;
+	sPacket.dwMinAbs	= 0;
+	sPacket.dwMaxAbs	= 0;
+
+	if (!Send(sizeof(sPacket), &sPacket))
+		return false;
+
+	return SendSequence();
+}
+
+bool CPythonNetworkStream::SendAcceRemovePacket(BYTE bPos)
+{
+	if (!__CanActMainInstance())
+		return true;
+
+	TItemPos tPos;
+	tPos.window_type = INVENTORY;
+	tPos.cell = 0;
+
+	TPacketAcce sPacket;
+	sPacket.header		= HEADER_CG_ACCE;
+	sPacket.subheader	= ACCE_SUBHEADER_CG_REMOVE;
+	sPacket.dwPrice		= 0;
+	sPacket.bPos		= bPos;
+	sPacket.tPos		= tPos;
+	sPacket.dwItemVnum	= 0;
+	sPacket.dwMinAbs	= 0;
+	sPacket.dwMaxAbs	= 0;
+
+	if (!Send(sizeof(sPacket), &sPacket))
+		return false;
+
+	return SendSequence();
+}
+
+bool CPythonNetworkStream::SendAcceRefinePacket()
+{
+	if (!__CanActMainInstance())
+		return true;
+
+	TItemPos tPos;
+	tPos.window_type = INVENTORY;
+	tPos.cell = 0;
+
+	TPacketAcce sPacket;
+	sPacket.header		= HEADER_CG_ACCE;
+	sPacket.subheader	= ACCE_SUBHEADER_CG_REFINE;
+	sPacket.dwPrice		= 0;
+	sPacket.bPos		= 0;
+	sPacket.tPos		= tPos;
+	sPacket.dwItemVnum	= 0;
+	sPacket.dwMinAbs	= 0;
+	sPacket.dwMaxAbs	= 0;
+
+	if (!Send(sizeof(sPacket), &sPacket))
+		return false;
+
+	return SendSequence();
+}
+#endif

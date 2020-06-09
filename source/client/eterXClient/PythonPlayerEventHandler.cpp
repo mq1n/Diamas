@@ -260,7 +260,7 @@ void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnEx
 {
 	return;
 
-	Tracef("Shoot : 다른 target에 맞았습니다 : %d, %d\n", dwSkillIndex, dwVID);
+	Tracef("Shoot : Hitting another target : %d, %d\n", dwSkillIndex, dwVID);
 
 	CPythonNetworkStream& rkStream=CPythonNetworkStream::Instance();
 	rkStream.SendAttackPacket(dwSkillIndex, dwVID);

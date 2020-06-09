@@ -12,6 +12,12 @@ enum MEMBER_IDENTITY
 	MEMBER_MAX
 };
 
+// #ifdef ENABLE_NEWSTUFF
+extern bool IsAllowedPotionOnPVP(DWORD dwVnum);
+extern bool IsLimitedPotionOnPVP(DWORD dwVnum);
+extern bool IsLimitedPotion(DWORD dwVnum);
+// #endif
+
 class CArena
 {
 	friend class CArenaMap;

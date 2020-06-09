@@ -23,7 +23,7 @@ int Start();
 
 std::string g_stTablePostfix;
 std::string g_stLocaleNameColumn = "name";
-std::string g_stLocale = "euckr";
+std::string g_stLocale = "latin1"; // default: euckr
 std::string g_stPlayerDBName = "";
 
 
@@ -44,7 +44,7 @@ int g_log = 1;
 int g_iItemPriceListTableCacheFlushSeconds = 540;
 // END_OF_MYSHOP_PRICE_LIST
 
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version<1000000
 extern const char * _malloc_options;
 #endif
 
@@ -65,7 +65,7 @@ int main()
 {
 	WriteVersion();
 
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version<1000000
 	_malloc_options = "A";
 #endif
 
@@ -209,7 +209,7 @@ int Start()
 
 	if (!CConfig::instance().GetValue("TABLE_POSTFIX", szBuf, 256))
 	{
-		sys_err("TABLE_POSTFIX not configured use default");
+		sys_log(0, "TABLE_POSTFIX not configured use default"); // @warme012
 		szBuf[0] = '\0';
 	}
 

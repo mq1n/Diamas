@@ -16,6 +16,9 @@ class CPythonExchange : public CSingleton<CPythonExchange>
 		typedef struct trade
 		{
 			char					name[CHARACTER_NAME_MAX_LEN + 1];
+#ifdef ENABLE_LEVEL_IN_TRADE
+			DWORD					level;
+#endif
 
 			DWORD					item_vnum[EXCHANGE_ITEM_MAX_NUM];
 			BYTE					item_count[EXCHANGE_ITEM_MAX_NUM];
@@ -43,6 +46,14 @@ class CPythonExchange : public CSingleton<CPythonExchange>
 
 		char			*GetNameFromSelf();
 		char			*GetNameFromTarget();
+
+#ifdef ENABLE_LEVEL_IN_TRADE
+		void			SetSelfLevel(DWORD level);
+		void			SetTargetLevel(DWORD level);
+
+		DWORD			GetLevelFromSelf();
+		DWORD			GetLevelFromTarget();
+#endif
 
 		void			SetElkToTarget(DWORD elk);
 		void			SetElkToSelf(DWORD elk);

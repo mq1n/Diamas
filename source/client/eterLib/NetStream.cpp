@@ -395,7 +395,9 @@ void CNetworkStream::Clear()
 	m_sendBufInputPos = 0;	
 	m_sendBufOutputPos = 0;
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 	m_iSequence = 0;
+#endif
 }
 
 bool CNetworkStream::Connect(const CNetworkAddress& c_rkNetAddr, int limitSec)
@@ -828,11 +830,14 @@ bool CNetworkStream::IsOnline()
 
 void CNetworkStream::SetPacketSequenceMode(bool isOn)
 {
+#ifdef ENABLE_SEQUENCE_SYSTEM
 	m_bUseSequence = isOn;
+#endif
 }
 
 bool CNetworkStream::SendSequence()
 {
+#ifdef ENABLE_SEQUENCE_SYSTEM
 	if (!m_bUseSequence)
 		return true;
 
@@ -843,6 +848,9 @@ bool CNetworkStream::SendSequence()
 		m_iSequence = 0;
 
 	return bRet;
+#else
+	return true;
+#endif
 }
 
 bool CNetworkStream::OnProcess()
@@ -2958,10 +2966,12 @@ CNetworkStream::CNetworkStream()
 	m_sendBufOutputPos = 0;
 	m_sendBufInputPos = 0;
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 	m_iSequence = 0;
 	m_bUseSequence = false;
 	m_kVec_bSequenceTable.resize(SEQUENCE_TABLE_SIZE);
 	memcpy(&m_kVec_bSequenceTable[0], s_bSequenceTable, sizeof(BYTE) * SEQUENCE_TABLE_SIZE);
+#endif
 }
 
 CNetworkStream::~CNetworkStream()

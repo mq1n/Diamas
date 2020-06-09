@@ -31,6 +31,9 @@ struct SNetworkActorData
 	DWORD	m_dwArmor;
 	DWORD	m_dwWeapon;
 	DWORD	m_dwHair;
+#ifdef ENABLE_ACCE_SYSTEM
+	DWORD	m_dwAcce;
+#endif
 
 	DWORD	m_dwOwnerVID;
 
@@ -85,6 +88,9 @@ struct SNetworkUpdateActorData
 	DWORD m_dwArmor;
 	DWORD m_dwWeapon;
 	DWORD m_dwHair;
+#ifdef ENABLE_ACCE_SYSTEM
+	DWORD	m_dwAcce;
+#endif
 	DWORD m_dwMovSpd;
 	DWORD m_dwAtkSpd;
 	short m_sAlignment;
@@ -100,6 +106,9 @@ struct SNetworkUpdateActorData
 		m_dwArmor=0;
 		m_dwWeapon=0;
 		m_dwHair=0;
+#ifdef ENABLE_ACCE_SYSTEM
+		m_dwAcce = 0;
+#endif
 		m_dwMovSpd=0;
 		m_dwAtkSpd=0;
 		m_sAlignment=0;

@@ -53,6 +53,9 @@ namespace quest
 			bool	OnClick(PC& pc);
 			bool	OnKill(PC& pc);
 			bool	OnPartyKill(PC& pc);
+#ifdef ENABLE_QUEST_DIE_EVENT
+			bool	OnDie(PC& pc);
+#endif
 			bool	OnTimer(PC& pc);
 			bool	OnLevelUp(PC& pc);
 			bool	OnLogin(PC& pc, const char * c_pszQuestName = NULL);

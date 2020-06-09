@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "PeerBase.h"
+#include "../../common/CommonDefines.h"
 
 CPeerBase::CPeerBase() : m_fd(INVALID_SOCKET), m_BytesRemain(0), m_outBuffer(NULL), m_inBuffer(NULL)
 {
@@ -46,13 +47,26 @@ bool CPeerBase::Accept(socket_t fd_accept)
 	{
 		Destroy();
 		return false;
-	} 
+	}
+
+#ifdef ENABLE_PORT_SECURITY
+	// refuse if remote host != localhost (only the same machine must be able to connect in here)
+	std::string targetIP = inet_ntoa(peer.sin_addr);
+	if (targetIP.rfind("127.0.0.1", 0) && targetIP.rfind("192.168.", 0) && targetIP.rfind("10.", 0))
+	{
+		sys_log(0, "BLOCK CONNECTION FROM %s", inet_ntoa(peer.sin_addr));
+		Destroy();
+		return false;
+	}
+#endif
 
 	//socket_block(m_fd);
 	socket_sndbuf(m_fd, 233016);
 	socket_rcvbuf(m_fd, 233016);
 
 	strlcpy(m_host, inet_ntoa(peer.sin_addr), sizeof(m_host));
+	m_wPort = peer.sin_port;
+
 	m_outBuffer = buffer_new(DEFAULT_PACKET_BUFFER_SIZE);
 	m_inBuffer = buffer_new(MAX_INPUT_LEN);
 
@@ -72,6 +86,7 @@ bool CPeerBase::Accept(socket_t fd_accept)
 bool CPeerBase::Connect(const char* host, WORD port)
 {
 	strlcpy(m_host, host, sizeof(m_host));
+	m_wPort = port;
 
 	if ((m_fd = socket_connect(host, port)) == INVALID_SOCKET)
 		return false;

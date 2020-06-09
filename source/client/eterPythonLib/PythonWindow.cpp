@@ -19,6 +19,9 @@ namespace UI
 		m_pParent(NULL),
 		m_dwFlag(0),
 		m_isUpdatingChildren(FALSE)
+#ifdef ENABLE_MOUSEWHEEL_EVENT
+		,m_bIsScrollable(false)
+#endif
 	{			
 #ifdef _DEBUG
 		static DWORD DEBUG_dwGlobalCounter=0;
@@ -639,6 +642,25 @@ namespace UI
 
 		return FALSE;
 	}
+
+
+#ifdef ENABLE_MOUSEWHEEL_EVENT
+	BOOL CWindow::OnMouseWheelScroll(short wDelta)
+	{
+#ifdef _DEBUG
+		Tracenf("Mouse Wheel Scroll : wDelta %d ",wDelta);
+#endif
+		
+		PyCallClassMemberFunc(m_poHandler , "OnMouseWheelScroll" , Py_BuildValue("(s)" , wDelta > 0? "UP":"DOWN") );
+		return m_bIsScrollable;
+	}
+
+
+	void CWindow::SetScrollable()
+	{
+		m_bIsScrollable = true;
+	}
+#endif
 
 	BOOL CWindow::OnIMETabEvent()
 	{
@@ -1497,15 +1519,23 @@ namespace UI
 	{
 		m_byDelay = iDelay;
 	}
+	
+#ifdef ENABLE_ACCE_SYSTEM
+	void CAniImageBox::AppendImage(const char * c_szFileName, float r, float g, float b, float a)
+#else
 	void CAniImageBox::AppendImage(const char * c_szFileName)
+#endif
 	{
 		CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
 		if (!pResource->IsType(CGraphicImage::Type()))
 			return;
 
 		CGraphicExpandedImageInstance * pImageInstance = CGraphicExpandedImageInstance::New();
-
 		pImageInstance->SetImagePointer(static_cast<CGraphicImage*>(pResource));
+#ifdef ENABLE_ACCE_SYSTEM
+		pImageInstance->SetDiffuseColor(r, g, b, a);
+#endif
+
 		if (pImageInstance->IsEmpty())
 		{
 			CGraphicExpandedImageInstance::Delete(pImageInstance);

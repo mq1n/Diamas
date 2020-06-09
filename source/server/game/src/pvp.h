@@ -55,6 +55,11 @@ class CPVPManager : public singleton<CPVPManager>
 	CPVPManager();
 	virtual ~CPVPManager();
 
+#ifdef ENABLE_NEWSTUFF
+	bool			IsFighting(LPCHARACTER pkChr);
+	bool			IsFighting(DWORD dwPID);
+#endif
+
 	void			Insert(LPCHARACTER pkChr, LPCHARACTER pkVictim);
 	bool			CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim);
 	bool			Dead(LPCHARACTER pkChr, DWORD dwKillerPID);	// PVP에 있었나 없었나를 리턴

@@ -399,6 +399,41 @@ class CGuild
 		typedef std::map< DWORD, LPEVENT >	EventMap;
 		EventMap	m_GuildInviteEventMap;	///< 길드 초청 Event map. key: 초대받은 캐릭터의 PID
 		// END_OF_GUILD_JOIN_BUG_FIX
+#ifdef ENABLE_D_NJGUILD
+	private:
+		LPDUNGEON	m_pkDungeon_for_Only_guild;
+	public:
+		template <class Func> void ForEachOnMapMember (Func & f, long lMapIndex);
+		void SetDungeon_for_Only_guild(LPDUNGEON pDungeon);
+		LPDUNGEON GetDungeon_for_Only_guild();
+#endif
+#ifdef ENABLE_NEWSTUFF
+	public:
+		void SetSkillLevel(DWORD dwVnum, BYTE level, BYTE point = 0);
+		DWORD GetSkillPoint();
+		void SetSkillPoint(BYTE point);
+#endif
 };
+
+
+// #define ENABLE_NEWGUILDMAKE
+
+#ifdef ENABLE_D_NJGUILD
+#include "char.h"
+template <class Func> void CGuild::ForEachOnMapMember (Func & f, long lMapIndex)
+{
+	TGuildMemberOnlineContainer::iterator it;
+
+	for (it = m_memberOnline.begin(); it!=m_memberOnline.end();++it)
+	{
+		LPCHARACTER ch = *it;
+		if (ch)
+		{
+			if (ch->GetMapIndex () == lMapIndex)
+				f(ch);
+		}
+	}
+}
+#endif
 
 #endif

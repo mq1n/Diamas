@@ -2,6 +2,11 @@
 
 #include "../eterGameLib/RaceData.h"
 #include "../eterGameLib/ActorInstance.h"
+#include "../eterGameLib/GameLibDefines.h"
+
+#ifdef ENABLE_ACCE_SYSTEM
+#include "../eterLib/GrpObjectInstance.h"
+#endif
 
 #include "AffectFlagContainer.h"
 
@@ -25,6 +30,9 @@ class CInstanceBase
 			DWORD	m_dwArmor;
 			DWORD	m_dwWeapon;
 			DWORD	m_dwHair;
+#ifdef ENABLE_ACCE_SYSTEM
+			DWORD	m_dwAcce;
+#endif
 			DWORD	m_dwMountVnum;
 			
 			short	m_sAlignment;
@@ -113,6 +121,11 @@ class CInstanceBase
 			AFFECT_PREMIUM_SILVER,
 			AFFECT_PREMIUM_GOLD,
 			AFFECT_RAMADAN_RING,			// 41 ÃÊ½Â´Þ ¹ÝÁö Âø¿ë Affect
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			AFFECT_BLEEDING,				// 42
+			AFFECT_RED_POSSESSION,			// 43
+			AFFECT_BLUE_POSSESSION,			// 44
+#endif
 
 			AFFECT_NUM = 64,
 
@@ -294,6 +307,13 @@ class CInstanceBase
 			EFFECT_BODYARMOR_SPECIAL,	// °©¿Ê 4-2-1
 			EFFECT_BODYARMOR_SPECIAL2,	// °©¿Ê 4-2-2
 
+#ifdef ENABLE_LVL115_ARMOR_EFFECT
+			EFFECT_BODYARMOR_SPECIAL3,	// 5-1
+#endif
+#ifdef ENABLE_ACCE_SYSTEM
+			EFFECT_ACCE,
+#endif
+
 			EFFECT_REFINED_NUM,
 		};
 		
@@ -371,6 +391,10 @@ class CInstanceBase
 			EFFECT_HAPPINESS_RING_EQUIP,				// Çàº¹ÀÇ ¹ÝÁö Âø¿ë ¼ø°£¿¡ ¹ßµ¿ÇÏ´Â ÀÌÆåÆ®
 			EFFECT_LOVE_PENDANT_EQUIP,				// Çàº¹ÀÇ ¹ÝÁö Âø¿ë ¼ø°£¿¡ ¹ßµ¿ÇÏ´Â ÀÌÆåÆ®
 			EFFECT_TEMP,
+#ifdef ENABLE_ACCE_SYSTEM
+			EFFECT_ACCE_SUCCEDED,
+			EFFECT_ACCE_EQUIP,
+#endif
 			EFFECT_NUM,
 		};
 
@@ -494,6 +518,10 @@ class CInstanceBase
 		void					SetArmor(DWORD dwArmor);
 		void					SetShape(DWORD eShape, float fSpecular=0.0f);
 		void					SetHair(DWORD eHair);
+#ifdef ENABLE_ACCE_SYSTEM
+		void					SetAcce(DWORD dwAcce);
+		void					ChangeAcce(DWORD dwAcce);
+#endif
 		bool					SetWeapon(DWORD eWeapon);
 		bool					ChangeArmor(DWORD dwArmor);
 		void					ChangeWeapon(DWORD eWeapon);
@@ -507,6 +535,12 @@ class CInstanceBase
 		void					SetRotationSpeed(float fRotSpd);
 
 		const char *			GetNameString();
+#ifdef ENABLE_LEVEL_IN_TRADE
+		DWORD					GetLevel();
+#endif
+#ifdef ENABLE_TEXT_LEVEL_REFRESH
+		void					SetLevel(DWORD dwLevel);
+#endif
 		int						GetInstanceType();
 		DWORD					GetPart(CRaceData::EParts part);
 		DWORD					GetShape();
@@ -908,6 +942,10 @@ class CInstanceBase
 		void	__ClearWeaponRefineEffect();
 		void	__ClearArmorRefineEffect();
 
+#ifdef ENABLE_ACCE_SYSTEM
+		void	ClearAcceEffect();
+#endif
+
 	protected:
 		void __AttachSelectEffect();
 		void __DetachSelectEffect();
@@ -975,6 +1013,10 @@ class CInstanceBase
 		DWORD					m_swordRefineEffectRight;
 		DWORD					m_swordRefineEffectLeft;
 		DWORD					m_armorRefineEffect;
+
+#ifdef ENABLE_ACCE_SYSTEM
+		DWORD					m_dwAcceEffect;
+#endif
 
 		struct SMoveAfterFunc
 		{
@@ -1101,10 +1143,23 @@ class CInstanceBase
 	protected:
 		DWORD					m_dwDuelMode;
 		DWORD					m_dwEmoticonTime;
+
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
+	public:
+		void					MobInfoAiFlagRefresh();
+#endif
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
+	public:
+		void					MobInfoLevelRefresh();
+#endif
 };
 
 inline int RaceToJob(int race)
 {
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	if (race==8)
+		return 4;
+#endif
 	const int JOB_NUM = 4;
 	return race % JOB_NUM;
 }
@@ -1117,6 +1172,9 @@ inline int RaceToSex(int race)
 		case 2:
 		case 5:
 		case 7:
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case 8:
+#endif
 			return 1;
 		case 1:
 		case 3:

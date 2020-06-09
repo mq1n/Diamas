@@ -2,6 +2,7 @@
 #include "../eterEffectLib/EffectManager.h"
 #include "FlyingObjectManager.h"
 #include "RaceMotionData.h"
+#include "GameLibDefines.h"
 
 CDynamicPool<CRaceMotionData> CRaceMotionData::ms_kPool;
 
@@ -89,18 +90,30 @@ void CRaceMotionData::SetName(UINT eName)
 		case NAME_KISS_WITH_ASSASSIN:
 		case NAME_KISS_WITH_SURA:
 		case NAME_KISS_WITH_SHAMAN:
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case NAME_KISS_WITH_WOLFMAN:
+#endif
 		case NAME_FRENCH_KISS_WITH_WARRIOR:
 		case NAME_FRENCH_KISS_WITH_ASSASSIN:
 		case NAME_FRENCH_KISS_WITH_SURA:
 		case NAME_FRENCH_KISS_WITH_SHAMAN:
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case NAME_FRENCH_KISS_WITH_WOLFMAN:
+#endif
 		case NAME_SLAP_HIT_WITH_WARRIOR:
 		case NAME_SLAP_HIT_WITH_ASSASSIN:
 		case NAME_SLAP_HIT_WITH_SURA:
 		case NAME_SLAP_HIT_WITH_SHAMAN:
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case NAME_SLAP_HIT_WITH_WOLFMAN:
+#endif
 		case NAME_SLAP_HURT_WITH_WARRIOR:
 		case NAME_SLAP_HURT_WITH_ASSASSIN:
 		case NAME_SLAP_HURT_WITH_SURA:
 		case NAME_SLAP_HURT_WITH_SHAMAN:
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case NAME_SLAP_HURT_WITH_WOLFMAN:
+#endif
 		case NAME_DIG:
 			SetType(TYPE_EVENT);
 			break;
@@ -436,6 +449,14 @@ bool CRaceMotionData::LoadMotionData(const char * c_szFileName)
 					case MOTION_EVENT_TYPE_EFFECT_TO_TARGET:
 						pData = new TMotionEffectToTargetEventData;
 						break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+					case MOTION_EVENT_TYPE_UNK11:
+						pData = new TMotionUnk11EventData;
+						break;
+					case MOTION_EVENT_TYPE_UNK12:
+						pData = new TMotionUnk12EventData;
+						break;
+#endif
 					default:
 						assert(!" CRaceMotionData::LoadMotionData - Strange Event Type");
 						return false;

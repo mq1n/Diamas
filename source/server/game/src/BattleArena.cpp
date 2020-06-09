@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "config.h"
 #include "constants.h"
 #include "BattleArena.h"
 #include "start_position.h"
@@ -7,9 +8,6 @@
 #include "sectree_manager.h"
 #include "regen.h"
 #include "questmanager.h"
-
-extern int passes_per_sec;
-extern int test_server;
 
 CBattleArena::CBattleArena()
 	: m_pEvent(NULL),

@@ -8,7 +8,7 @@
 #pragma warning(disable:4710)	// not inlined
 #pragma warning(disable:4786)	// character 255 넘어가는거 끄기
 #pragma warning(disable:4244)	// type conversion possible lose of data
-
+#include "../eterXClient/Locale_inc.h"
 #include <windows.h>
 #include <assert.h>
 #include <stdio.h>

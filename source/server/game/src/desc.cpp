@@ -11,13 +11,15 @@
 #include "sectree_manager.h"
 #include "p2p.h"
 #include "buffer_manager.h"
-#include "sequence.h"
 #include "guild.h"
 #include "guild_manager.h"
 #include "TrafficProfiler.h"
 #include "locale_service.h"
 #include "HackShield.h"
 #include "log.h"
+#ifdef ENABLE_SEQUENCE_SYSTEM
+#include "sequence.h"
+#endif
 
 extern int max_bytes_written;
 extern int current_bytes_written;
@@ -77,7 +79,9 @@ void DESC::Initialize()
 	m_bPong = true;
 	m_bChannelStatusRequested = false;
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 	m_iCurrentSequence = 0;
+#endif
 
 	m_dwMatrixRows = m_dwMatrixCols = 0;
 	m_bMatrixTryCount = 0;
@@ -104,7 +108,9 @@ void DESC::Initialize()
 
 	m_pkDisconnectEvent = NULL;
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 	m_seq_vector.clear();
+#endif
 }
 
 void DESC::Destroy()
@@ -165,7 +171,9 @@ void DESC::Destroy()
 		m_sock = INVALID_SOCKET;
 	}
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 	m_seq_vector.clear();
+#endif
 }
 
 EVENTFUNC(ping_event)
@@ -198,16 +206,6 @@ EVENTFUNC(ping_event)
 		desc->Packet(&p, sizeof(struct packet_ping));
 		desc->SetPong(false);
 	}
-
-#ifdef ENABLE_LIMIT_TIME
-	if ((unsigned)get_global_time() >= GLOBAL_LIMIT_TIME)
-	{
-		extern void ClearAdminPages();
-		ClearAdminPages();
-		extern g_bShutdown;
-		g_bShutdown = true;
-	}
-#endif
 
 	desc->SendHandshake(get_dword_time(), 0);
 
@@ -255,16 +253,8 @@ bool DESC::Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSoc
 	m_pkPingEvent = event_create(ping_event, info, ping_event_second_cycle);
 
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
-	if (LC_IsEurope())	
-	{
-		memcpy(m_adwEncryptionKey, "1234abcd5678efgh", sizeof(DWORD) * 4);
-		memcpy(m_adwDecryptionKey, "1234abcd5678efgh", sizeof(DWORD) * 4);
-	}
-	else
-	{
-		memcpy(m_adwEncryptionKey, "testtesttesttest", sizeof(DWORD) * 4);
-		memcpy(m_adwDecryptionKey, "testtesttesttest", sizeof(DWORD) * 4);
-	}
+	memcpy(m_adwEncryptionKey, "1234abcd5678efgh", sizeof(DWORD) * 4);
+	memcpy(m_adwDecryptionKey, "1234abcd5678efgh", sizeof(DWORD) * 4);
 #endif // _IMPROVED_PACKET_ENCRYPTION_
 
 	// Set Phase to handshake
@@ -434,6 +424,11 @@ void DESC::Packet(const void * c_pvData, int iSize)
 
 	if (m_iPhase == PHASE_CLOSE) // 끊는 상태면 보내지 않는다.
 		return;
+
+#ifdef ENABLE_SYSLOG_PACKET_SENT
+	std::string stName = GetCharacter()? GetCharacter()->GetName() : GetHostName();
+	sys_log(0, "SENT HEADER : %u to %s  (size %d) ", *(static_cast<const BYTE*>(c_pvData)) , stName.c_str(), iSize );
+#endif
 
 	if (m_stRelayName.length() != 0)
 	{
@@ -911,6 +906,7 @@ bool DESC::IsAdminMode()
 	return m_bAdminMode;
 }
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 BYTE DESC::GetSequence()
 {
 	return gc_abSequence[m_iCurrentSequence];
@@ -921,6 +917,7 @@ void DESC::SetNextSequence()
 	if (++m_iCurrentSequence == SEQUENCE_MAX_NUM)
 		m_iCurrentSequence = 0;
 }
+#endif
 
 void DESC::SendLoginSuccessPacket()
 {
@@ -936,6 +933,10 @@ void DESC::SendLoginSuccessPacket()
 
 	for (int i = 0; i < PLAYER_PER_ACCOUNT; ++i)
 	{   
+#ifdef ENABLE_NEWSTUFF
+		if (!g_stProxyIP.empty())
+			rTable.players[i].lAddr=inet_addr(g_stProxyIP.c_str());
+#endif
 		CGuild* g = CGuildManager::instance().GetLinkedGuild(rTable.players[i].dwID);
 
 		if (g)
@@ -1044,8 +1045,7 @@ void DESC::SetSecurityKey(const DWORD * c_pdwKey)
 {
 	const BYTE * c_pszKey = (const BYTE *) "JyTxtHljHJlVJHorRM301vf@4fvj10-v";
 
-	if (g_iUseLocale && !LC_IsKorea())
-		c_pszKey = GetKey_20050304Myevan() + 37;
+	c_pszKey = GetKey_20050304Myevan() + 37;
 
 	memcpy(&m_adwDecryptionKey, c_pdwKey, 16);
 	TEA_Encrypt(&m_adwEncryptionKey[0], &m_adwDecryptionKey[0], (const DWORD *) c_pszKey, 16);
@@ -1092,6 +1092,7 @@ DWORD DESC::GetBillingExpireSecond()
 	return m_dwBillingExpireSecond;
 }
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 void DESC::push_seq(BYTE hdr, BYTE seq)
 {
 	if (m_seq_vector.size()>=20)
@@ -1102,6 +1103,7 @@ void DESC::push_seq(BYTE hdr, BYTE seq)
 	seq_t info = { hdr, seq };
 	m_seq_vector.push_back(info);
 }
+#endif
 
 BYTE DESC::GetEmpire()
 {

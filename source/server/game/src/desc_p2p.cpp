@@ -2,6 +2,7 @@
 #include "desc_p2p.h"
 #include "protocol.h"
 #include "p2p.h"
+#include "../../common/CommonDefines.h"
 
 DESC_P2P::~DESC_P2P()
 {
@@ -26,6 +27,9 @@ void DESC_P2P::Destroy()
 	DESC::Destroy();
 }
 
+#ifdef ENABLE_PORT_SECURITY
+#include "config.h"
+#endif
 bool DESC_P2P::Setup(LPFDWATCH fdw, socket_t fd, const char * host, WORD wPort)
 {
 	m_lpFdw = fdw;
@@ -42,7 +46,14 @@ bool DESC_P2P::Setup(LPFDWATCH fdw, socket_t fd, const char * host, WORD wPort)
 	fdwatch_add_fd(m_lpFdw, m_sock, this, FDW_READ, false);
 
 	m_iMinInputBufferLen = 1024 * 1024;
-
+#ifdef ENABLE_PORT_SECURITY
+	if (strcmp(host, g_szPublicIP)) // refuse if remote host != public ip (only the same machine must be able to connect in here)
+	{
+		sys_log(0, "SYSTEM: new p2p connection from [%s] to [%s] fd: %d BLOCKED", host, g_szPublicIP, m_sock);
+		SetPhase(PHASE_CLOSE);
+		return true;
+	}
+#endif
 	SetPhase(PHASE_P2P);
 
 	sys_log(0, "SYSTEM: new p2p connection from [%s] fd: %d", host, m_sock);

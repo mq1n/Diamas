@@ -281,7 +281,7 @@ const float * CGrannyModelInstance::GetCompositeBoneMatrixPointer(int iBone) con
 
 void CGrannyModelInstance::ReloadTexture()
 {
-	assert("현재 사용하지 않음 - CGrannyModelInstance::ReloadTexture()");
+	assert("Not currently used - CGrannyModelInstance::ReloadTexture()");
 /*
 	assert(m_pModel != NULL);
 	const CGrannyMaterialPalette & c_rGrannyMaterialPalette = m_pModel->GetMaterialPalette();

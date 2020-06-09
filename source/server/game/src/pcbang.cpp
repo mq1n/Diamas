@@ -41,7 +41,7 @@ bool CPCBangManager::Log(const char* c_szIP, DWORD pid, time_t playTime)
 
 void CPCBangManager::RequestUpdateIPList(PCBang_ID id)
 {
-	if ( LC_IsYMIR() == true || LC_IsKorea() == true )
+#ifdef ENABLE_PCBANG_FEATURE // @warme006
 	{
 		if ( id == 0 )
 		{
@@ -52,6 +52,7 @@ void CPCBangManager::RequestUpdateIPList(PCBang_ID id)
 			DBManager::instance().ReturnQuery(QID_PCBANG_IP_LIST_SELECT, 0, NULL, "SELECT pcbang_id, ip FROM pcbang_ip WHERE pcbang_id=%u", id);
 		}
 	}
+#endif
 }
 
 bool CPCBangManager::IsPCBangIP(const char* c_szIP)

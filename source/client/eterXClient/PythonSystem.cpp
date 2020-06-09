@@ -307,6 +307,12 @@ void CPythonSystem::SetDefaultConfig()
 	m_Config.bAlwaysShowName	= DEFAULT_VALUE_ALWAYS_SHOW_NAME;
 	m_Config.bShowDamage		= true;
 	m_Config.bShowSalesText		= true;
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
+	m_Config.bShowMobAIFlag		= true;
+#endif
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
+	m_Config.bShowMobLevel		= true;
+#endif
 }
 
 bool CPythonSystem::IsWindowed()
@@ -353,6 +359,29 @@ void CPythonSystem::SetShowSalesTextFlag(int iFlag)
 {
 	m_Config.bShowSalesText = iFlag == 1 ? true : false;
 }
+
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
+bool CPythonSystem::IsShowMobAIFlag()
+{
+	return m_Config.bShowMobAIFlag;
+}
+
+void CPythonSystem::SetShowMobAIFlagFlag(int iFlag)
+{
+	m_Config.bShowMobAIFlag = iFlag == 1 ? true : false;
+}
+#endif
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
+bool CPythonSystem::IsShowMobLevel()
+{
+	return m_Config.bShowMobLevel;
+}
+
+void CPythonSystem::SetShowMobLevelFlag(int iFlag)
+{
+	m_Config.bShowMobLevel = iFlag == 1 ? true : false;
+}
+#endif
 
 bool CPythonSystem::IsAutoTiling()
 {
@@ -452,6 +481,14 @@ bool CPythonSystem::LoadConfig()
 			m_Config.bShowDamage = atoi(value) == 1 ? true : false;
 		else if (!stricmp(command, "SHOW_SALESTEXT"))
 			m_Config.bShowSalesText = atoi(value) == 1 ? true : false;
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
+		else if (!stricmp(command, "SHOW_MOBAIFLAG"))
+			m_Config.bShowMobAIFlag = atoi(value) == 1 ? true : false;
+#endif
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
+		else if (!stricmp(command, "SHOW_MOBLEVEL"))
+			m_Config.bShowMobLevel = atoi(value) == 1 ? true : false;
+#endif
 	}
 
 	if (m_Config.bWindowed)
@@ -532,6 +569,14 @@ bool CPythonSystem::SaveConfig()
 		fprintf(fp, "SHOW_DAMAGE		%d\n", m_Config.bShowDamage);
 	if (m_Config.bShowSalesText == 0)
 		fprintf(fp, "SHOW_SALESTEXT		%d\n", m_Config.bShowSalesText);
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
+	if (m_Config.bShowMobAIFlag == 0)
+		fprintf(fp, "SHOW_MOBAIFLAG		%d\n", m_Config.bShowMobAIFlag);
+#endif
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
+	if (m_Config.bShowMobLevel == 0)
+		fprintf(fp, "SHOW_MOBLEVEL		%d\n", m_Config.bShowMobLevel);
+#endif
 
 	fprintf(fp, "USE_DEFAULT_IME		%d\n", m_Config.bUseDefaultIME);
 	fprintf(fp, "SOFTWARE_TILING		%d\n", m_Config.bSoftwareTiling);

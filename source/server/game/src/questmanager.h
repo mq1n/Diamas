@@ -41,7 +41,7 @@ namespace quest
 
 			bool		InitializeLua();
 			lua_State *		GetLuaState() { return L; }
-			void		AddLuaFunctionTable(const char * c_pszName, luaL_reg * preg);
+			void		AddLuaFunctionTable(const char * c_pszName, luaL_reg * preg, bool bCheckIfExists = false);
 
 			TEventNameMap	m_mapEventName;
 
@@ -84,6 +84,9 @@ namespace quest
 			bool		Timer(unsigned int pc, unsigned int npc);
 			bool		Click(unsigned int pc, LPCHARACTER pkNPC);
 			void		Kill(unsigned int pc, unsigned int npc);
+#ifdef ENABLE_QUEST_DIE_EVENT
+			void		Die(unsigned int pc, unsigned int npc);
+#endif
 			void		LevelUp(unsigned int pc);
 			void		AttrIn(unsigned int pc, LPCHARACTER ch, int attr);
 			void		AttrOut(unsigned int pc, LPCHARACTER ch, int attr);
@@ -109,6 +112,7 @@ namespace quest
 			// event occurs in one state
 			void		Select(unsigned int pc, unsigned int selection);
 			void		Resume(unsigned int pc);
+			int		ReadQuestCategoryFile(WORD q_index);
 			void		Input(unsigned int pc, const char* msg);
 			void		Confirm(unsigned int pc, EQuestConfirmType confirm, unsigned int pc2 = 0);
 			void		SelectItem(unsigned int pc, unsigned int selection);
@@ -212,6 +216,7 @@ namespace quest
 			PC*				m_pCurrentPC;
 
 			string			m_strScript;
+			bool			m_bQuestInfoFlag;
 
 			int				m_iCurrentSkin;
 

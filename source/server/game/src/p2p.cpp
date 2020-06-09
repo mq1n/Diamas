@@ -141,10 +141,7 @@ void P2P_MANAGER::Login(LPDESC d, const TPacketGGLogin * p)
 		UpdateP2P = true;
 		pkCCI = M2_NEW CCI;
 
-		if (false == LC_IsBrazil())
-			strlcpy(pkCCI->szName, p->szName, sizeof(pkCCI->szName));
-		else
-			trim_and_lower(p->szName, pkCCI->szName, sizeof(pkCCI->szName));
+		strlcpy(pkCCI->szName, p->szName, sizeof(pkCCI->szName));
 
 		pkCCI->dwPID = p->dwPID;
 		pkCCI->bEmpire = p->bEmpire;
@@ -233,17 +230,7 @@ CCI * P2P_MANAGER::Find(const char * c_pszName)
 {
 	TCCIMap::const_iterator it;
 
-	if( false == LC_IsBrazil() )
-	{
-		it = m_map_pkCCI.find(c_pszName);
-	}
-	else
-	{
-		char szName[CHARACTER_NAME_MAX_LEN + 1];
-		trim_and_lower(c_pszName, szName, sizeof(szName));
-
-		it = m_map_pkCCI.find(szName);
-	}
+	it = m_map_pkCCI.find(c_pszName);
 
 	if (it == m_map_pkCCI.end())
 		return NULL;

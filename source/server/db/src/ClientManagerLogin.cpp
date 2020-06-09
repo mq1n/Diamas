@@ -1,5 +1,6 @@
 
 #include "stdafx.h"
+#include "../../common/CommonDefines.h"
 
 #include "ClientManager.h"
 
@@ -157,7 +158,11 @@ void CClientManager::QUERY_LOGIN_BY_KEY(CPeer * pkPeer, DWORD dwHandle, TPacketG
 
 	sys_log(0, "LOGIN_BY_KEY success %s %lu %s", r.login, p->dwLoginKey, info->ip);
 	char szQuery[QUERY_MAX_LEN];
+#ifdef ENABLE_PLAYER_PER_ACCOUNT5
+	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), r.id);
+#else
 	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), r.id);
+#endif
 	CDBManager::instance().ReturnQuery(szQuery, QID_LOGIN_BY_KEY, pkPeer->GetHandle(), info);
 }
 
@@ -179,7 +184,11 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 	{
 		DWORD account_id = info->pAccountTable->id;
 		char szQuery[QUERY_MAX_LEN];
+#ifdef ENABLE_PLAYER_PER_ACCOUNT5
+		snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), account_id);
+#else
 		snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), account_id);
+#endif
 		std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(szQuery, SQL_PLAYER));
 		
 		sys_log(0, "RESULT_LOGIN_BY_KEY FAIL player_index's NULL : ID:%d", account_id);
@@ -211,13 +220,22 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 	if (g_stLocale == "gb2312")
 	{
 		snprintf(szQuery, sizeof(szQuery),
-				"SELECT id, name, job, level, alignment, st, ht, dx, iq, part_main, part_hair, x, y, skill_group, change_name FROM player%s WHERE account_id=%u",
+				"SELECT id, name, job, level, alignment, st, ht, dx, iq, part_main, part_hair,"
+#ifdef ENABLE_ACCE_SYSTEM
+				"part_acce,"
+#endif
+			
+				" x, y, skill_group, change_name FROM player%s WHERE account_id=%u",
 				GetTablePostfix(), info->pAccountTable->id);
 	}
 	else
 	{
 		snprintf(szQuery, sizeof(szQuery),
-				"SELECT id, name, job, level, playtime, st, ht, dx, iq, part_main, part_hair, x, y, skill_group, change_name FROM player%s WHERE account_id=%u",
+				"SELECT id, name, job, level, playtime, st, ht, dx, iq, part_main, part_hair,"
+#ifdef ENABLE_ACCE_SYSTEM
+				"part_acce,"
+#endif
+			" x, y, skill_group, change_name FROM player%s WHERE account_id=%u",
 				GetTablePostfix(), info->pAccountTable->id);
 	}
 
@@ -231,8 +249,13 @@ void CClientManager::RESULT_PLAYER_INDEX_CREATE(CPeer * pkPeer, SQLMsg * msg)
 	ClientHandleInfo * info = (ClientHandleInfo *) qi->pvData;
 
 	char szQuery[QUERY_MAX_LEN];
+#ifdef ENABLE_PLAYER_PER_ACCOUNT5
+	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index%s WHERE id=%u", GetTablePostfix(),
+			info->pAccountTable->id);
+#else
 	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), 
 			info->pAccountTable->id);
+#endif
 	CDBManager::instance().ReturnQuery(szQuery, QID_LOGIN_BY_KEY, pkPeer->GetHandle(), info);
 }
 // END_PLAYER_INDEX_CREATE_BUG_FIX
@@ -309,6 +332,9 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 					pkTab->players[j].byIQ			= pt->iq;
 					pkTab->players[j].wMainPart			= pt->parts[PART_MAIN];
 					pkTab->players[j].wHairPart			= pt->parts[PART_HAIR];
+#ifdef ENABLE_ACCE_SYSTEM
+					pkTab->players[j].wAccePart			= pt->parts[PART_ACCE];
+#endif
 					pkTab->players[j].x				= pt->x;
 					pkTab->players[j].y				= pt->y;
 					pkTab->players[j].skill_group		= pt->skill_group;
@@ -330,6 +356,9 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 					pkTab->players[j].byIQ			= 0;
 					pkTab->players[j].wMainPart		= 0;
 					pkTab->players[j].wHairPart		= 0;
+#ifdef ENABLE_ACCE_SYSTEM
+					pkTab->players[j].wAccePart		= 0;
+#endif
 					pkTab->players[j].x				= 0;
 					pkTab->players[j].y				= 0;
 					pkTab->players[j].skill_group	= 0;
@@ -344,6 +373,9 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 					str_to_number(pkTab->players[j].byIQ, row[col++]);
 					str_to_number(pkTab->players[j].wMainPart, row[col++]);
 					str_to_number(pkTab->players[j].wHairPart, row[col++]);
+#ifdef ENABLE_ACCE_SYSTEM
+					str_to_number(pkTab->players[j].wAccePart, row[col++]);
+#endif
 					str_to_number(pkTab->players[j].x, row[col++]);
 					str_to_number(pkTab->players[j].y, row[col++]);
 					str_to_number(pkTab->players[j].skill_group, row[col++]);
@@ -399,13 +431,21 @@ void CClientManager::RESULT_LOGIN(CPeer * peer, SQLMsg * msg)
 			if (g_stLocale == "gb2312")
 			{
 				snprintf(queryStr, sizeof(queryStr),
-						"SELECT id, name, job, level, alignment, st, ht, dx, iq, part_main, part_hair, x, y, skill_group, change_name FROM player%s WHERE account_id=%u",
+						"SELECT id, name, job, level, alignment, st, ht, dx, iq, part_main, part_hair,"
+#ifdef ENABLE_ACCE_SYSTEM
+						"part_acce, "
+#endif
+						" x, y, skill_group, change_name FROM player%s WHERE account_id=%u",
 						GetTablePostfix(), info->pAccountTable->id);
 			}
 			else
 			{
 				snprintf(queryStr, sizeof(queryStr),
-						"SELECT id, name, job, level, playtime, st, ht, dx, iq, part_main, part_hair, x, y, skill_group, change_name FROM player%s WHERE account_id=%u",
+						"SELECT id, name, job, level, playtime, st, ht, dx, iq, part_main, part_hair,"
+#ifdef ENABLE_ACCE_SYSTEM
+						"part_acce, "
+#endif
+						" x, y, skill_group, change_name FROM player%s WHERE account_id=%u",
 						GetTablePostfix(), info->pAccountTable->id);
 			}
 

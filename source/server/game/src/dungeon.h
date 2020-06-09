@@ -4,6 +4,9 @@
 #include "sectree_manager.h"
 
 class CParty;
+#ifdef ENABLE_D_NJGUILD
+class CGuild;
+#endif
 
 class CDungeon
 {
@@ -92,6 +95,9 @@ class CDungeon
 	void	JumpAll(long lFromMapIndex, int x, int y);
 	void	WarpAll(long lFromMapIndex, int x, int y);
 	void	JumpParty(LPPARTY pParty, long lFromMapIndex, int x, int y);
+#ifdef ENABLE_D_NJGUILD
+	void	JumpGuild(CGuild* pGuild, long lFromMapIndex, int x, int y);
+#endif
 
 	void	ExitAll();
 	void	ExitAllToStartPosition();
@@ -164,10 +170,13 @@ class CDungeon
 	friend EVENTFUNC(dungeon_jump_to_event);
 
 	// 파티 단위 던전 입장을 위한 임시 변수.
-	// m_map_pkParty는 관리가 부실하여 사용할 수 없다고 판단하여,
-	// 임시로 한 파티에 대한 관리를 하는 변수 생성.
 	
+	
+
 	LPPARTY m_pParty;
+#ifdef ENABLE_D_NJGUILD
+	CGuild* m_pGuild;
+#endif
 	public :
 	void SetPartyNull();
 };

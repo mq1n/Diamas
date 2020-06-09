@@ -330,7 +330,8 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 		
 		DWORD dwTextureFactor = STATEMANAGER.GetRenderState(D3DRS_TEXTUREFACTOR);
 		
-		int TextureCountThreshold = 8;
+		static int DefaultTCT = 8;
+		int TextureCountThreshold = DefaultTCT;
 		DWORD dwTFactor = 0xFFFFFFFF;
 		
 		if (GetAsyncKeyState(VK_LSHIFT) & 0x8000)
@@ -364,6 +365,17 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 			{
 				TextureCountThreshold = 7;
 				dwTFactor = 0xFFFF00ff;
+			}
+			// new stuff
+			else if (GetAsyncKeyState(VK_8) & 0x8000)
+			{
+				TextureCountThreshold = DefaultTCT = 8;
+				dwTFactor = 0xFFFFFFFF;
+			}
+			else if (GetAsyncKeyState(VK_0) & 0x8000)
+			{
+				TextureCountThreshold = DefaultTCT = 255;
+				dwTFactor = 0xFFFFFFFF;
 			}
 			
 		}

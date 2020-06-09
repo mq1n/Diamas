@@ -25,6 +25,7 @@
 #include "unique_item.h"
 #endif
 
+#define ENABLE_FISHINGROD_RENEWAL
 namespace fishing
 {
 	enum
@@ -387,14 +388,7 @@ int DetermineFish(LPCHARACTER ch)
 	int * p = std::lower_bound(g_prob_accumulate[prob_idx], g_prob_accumulate[prob_idx] + MAX_FISH, rv);
 	int fish_idx = p - g_prob_accumulate[prob_idx];
 
-	//if (!g_iUseLocale)
-	if ( LC_IsYMIR() )
-	{
-		if (fish_info[fish_idx].vnum >= 70040 && fish_info[fish_idx].vnum <= 70052)
-			return 0;
-	}
-
-	if (g_iUseLocale) // 중국에서는 금덩어리, 금열쇠, 은열쇠 나오지 않게 함
+	
 	{
 		DWORD vnum = fish_info[fish_idx].vnum;
 
@@ -792,11 +786,6 @@ void UseFish(LPCHARACTER ch, LPITEM item)
 				break;
 
 			case USED_SHELLFISH:	// 1
-				if ( LC_IsCanada() == true )
-				{
-					if ( number(0, 2) != 2 ) return;
-				}
-
 				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("배 속에서 조개가 나왔습니다."));
 				ch->AutoGiveItem(SHELLFISH_VNUM);
 				break;
@@ -892,6 +881,17 @@ int RealRefineRod(LPCHARACTER ch, LPITEM item)
 	{
 		LogManager::instance().RefineLog(ch->GetPlayerID(), rod->GetName(), rod->GetID(), iAdv, 0, "ROD");
 
+#ifdef ENABLE_FISHINGROD_RENEWAL
+		{
+			// if (test_server) ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<FishRod> PRE %u"), rod->GetSocket(0));
+			int cur = rod->GetSocket(0);
+			rod->SetSocket(0, (cur > 0) ? (cur - (cur * 10 / 100)) : 0);
+			// if (test_server) ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<FishRod> POST %u"), rod->GetSocket(0));
+			// ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<FishRod> The upgrade has failed, and the fishrod has lost 10%% of its mastery points."));
+			LogManager::instance().ItemLog(ch, rod, "REFINE FISH_ROD FAIL", rod->GetName());
+			return 0;
+		}
+#else
 		LPITEM pkNewItem = ITEM_MANAGER::instance().CreateItem(rod->GetValue(4), 1);
 		if (pkNewItem)
 		{
@@ -902,7 +902,7 @@ int RealRefineRod(LPCHARACTER ch, LPITEM item)
 			LogManager::instance().ItemLog(ch, pkNewItem, "REFINE FISH_ROD FAIL", pkNewItem->GetName());
 			return 0;
 		}
-
+#endif
 		// 낚시대 개량 실패
 		return 2;
 	}

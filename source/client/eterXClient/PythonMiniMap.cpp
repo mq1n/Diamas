@@ -799,6 +799,10 @@ void CPythonMiniMap::DeleteTarget(int iID)
 	RemoveWayPoint(iID);
 }
 
+#define ENABLE_NEW_ATLAS_MARK_INFO
+#ifdef ENABLE_NEW_ATLAS_MARK_INFO
+	#include "PythonNonPlayer.h"
+#endif
 void CPythonMiniMap::__LoadAtlasMarkInfo()
 {
 	ClearAtlasMarkInfo();
@@ -835,21 +839,37 @@ void CPythonMiniMap::__LoadAtlasMarkInfo()
 
 		const CTokenVector & rVector = stTokenVectorMap[szMarkInfoName];
 
-		const std::string & c_rstrType = rVector[0].c_str();
-		const std::string & c_rstrPositionX = rVector[1].c_str();
-		const std::string & c_rstrPositionY = rVector[2].c_str();
-		const std::string & c_rstrText = rVector[3].c_str();
-
 		TAtlasMarkInfo aAtlasMarkInfo;
-
-		for ( int i = 0; i < TYPE_COUNT; ++i)
+#ifdef ENABLE_NEW_ATLAS_MARK_INFO
+		if (rVector.size() == 3)
 		{
-			if (0 == c_rstrType.compare(strType[i]))
-				aAtlasMarkInfo.m_byType = (BYTE)i;
+			const std::string & c_rstrType = strType[3]; // FULL NPC
+			const std::string & c_rstrPositionX = rVector[0].c_str();
+			const std::string & c_rstrPositionY = rVector[1].c_str();
+			const std::string & c_rstrText = rVector[2].c_str();
+			int iVNum = atoi(c_rstrText.c_str());
+
+			aAtlasMarkInfo.m_fX = atof(c_rstrPositionX.c_str());
+			aAtlasMarkInfo.m_fY = atof(c_rstrPositionY.c_str());
+			aAtlasMarkInfo.m_strText = CPythonNonPlayer::Instance().GetMonsterName(iVNum);
 		}
-		aAtlasMarkInfo.m_fX = atof(c_rstrPositionX.c_str());
-		aAtlasMarkInfo.m_fY = atof(c_rstrPositionY.c_str());
-		aAtlasMarkInfo.m_strText = c_rstrText;
+		else
+#endif
+		{
+			const std::string & c_rstrType = rVector[0].c_str();
+			const std::string & c_rstrPositionX = rVector[1].c_str();
+			const std::string & c_rstrPositionY = rVector[2].c_str();
+			const std::string & c_rstrText = rVector[3].c_str();
+			for (int i = 0; i < TYPE_COUNT; ++i)
+			{
+				if (0 == c_rstrType.compare(strType[i]))
+					aAtlasMarkInfo.m_byType = (BYTE)i;
+			}
+
+			aAtlasMarkInfo.m_fX = atof(c_rstrPositionX.c_str());
+			aAtlasMarkInfo.m_fY = atof(c_rstrPositionY.c_str());
+			aAtlasMarkInfo.m_strText = c_rstrText;
+		}
 
 		aAtlasMarkInfo.m_fScreenX = aAtlasMarkInfo.m_fX / m_fAtlasMaxX * m_fAtlasImageSizeX - (float)m_WhiteMark.GetWidth() / 2.0f;
 		aAtlasMarkInfo.m_fScreenY = aAtlasMarkInfo.m_fY / m_fAtlasMaxY * m_fAtlasImageSizeY - (float)m_WhiteMark.GetHeight() / 2.0f;

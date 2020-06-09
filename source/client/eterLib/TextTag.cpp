@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TextTag.h"
+#include "Util.h"
 
 int GetTextTag(const wchar_t * src, int maxLen, int & tagLen, std::wstring & extraInfo)
 {
@@ -154,8 +155,17 @@ int FindColorTagStartPosition(const wchar_t * src, int src_len)
 
     const wchar_t * cur = src;
 
+	// @fixme012
+	wchar_t wcStarts = L'c';
+	wchar_t wcEnds = L'r';
+	if (GetDefaultCodePage() == CP_ARABIC)
+	{
+		wcStarts = L'h';
+		wcEnds = L'h';
+	}
+
     // |r의 경우
-    if (*cur == L'r' && *(cur - 1) == L'|')
+    if (*cur == wcEnds && *(cur - 1) == L'|')
     {
 	    int len = src_len;
 
@@ -169,7 +179,7 @@ int FindColorTagStartPosition(const wchar_t * src, int src_len)
         // |c까지 찾아서 |위치까지 리턴한다.
         while (len > 1) // 최소 2자를 검사해야 된다.
         {
-            if (*cur == L'c' && *(cur - 1) == L'|')
+            if (*cur == wcStarts && *(cur - 1) == L'|')
                 return (src - cur) + 1;
 
             --cur;
@@ -188,14 +198,23 @@ int FindColorTagEndPosition(const wchar_t * src, int src_len)
 {
 	const wchar_t * cur = src;
 
-	if (src_len >= 4 && *cur == L'|' && *(cur + 1) == L'c')
+	// @fixme012
+	wchar_t wcStarts = L'c';
+	wchar_t wcEnds = L'r';
+	if (GetDefaultCodePage() == CP_ARABIC)
+	{
+		wcStarts = L'h';
+		wcEnds = L'h';
+	}
+
+	if (src_len >= 4 && *cur == L'|' && *(cur + 1) == wcStarts)
 	{
 		int left = src_len - 2;
 		cur += 2;
 
 		while (left > 1)
 		{
-			if (*cur == L'|' && *(cur + 1) == L'r')
+			if (*cur == L'|' && *(cur + 1) == wcEnds)
 				return (cur - src) + 1;
 
 			--left;

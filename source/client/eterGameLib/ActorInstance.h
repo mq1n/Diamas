@@ -12,6 +12,7 @@
 #include "ActorInstanceInterface.h"
 #include "Interface.h"
 //#include "../eterGrnLib/ThingInstance.h"
+#include "GameLibDefines.h"
 
 class CItemData;
 class CWeaponTrace;
@@ -243,6 +244,9 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 
 		bool SetRace(DWORD eRace);
 		void SetHair(DWORD eHair);
+#ifdef ENABLE_ACCE_SYSTEM
+		void AttachAcce(CItemData * pItemData, float fSpecular = 0.0f);
+#endif
 		void SetVirtualID(DWORD dwVID);
 
 		void SetShape(DWORD eShape, float fSpecular=0.0f);
@@ -578,6 +582,10 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		void ProcessMotionEventSound(const CRaceMotionData::TMotionEventData * c_pData);
 		void ProcessMotionEventFly(const CRaceMotionData::TMotionEventData * c_pData);
 		void ProcessMotionEventWarp(const CRaceMotionData::TMotionEventData * c_pData);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		void ProcessMotionEventUnk11(DWORD dwcurFrame, int iIndex, const CRaceMotionData::TMotionEventData * c_pData);
+		void ProcessMotionEventUnk12(DWORD dwcurFrame, int iIndex, const CRaceMotionData::TMotionEventData * c_pData);
+#endif
 
 		void AddMovement(float fx, float fy, float fz);
 		

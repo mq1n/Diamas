@@ -102,7 +102,11 @@ int CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
 	return (p->lSize);
 }
 
+#ifdef ENABLE_FULL_NOTICE
+int CInputP2P::Notice(LPDESC d, const char * c_pData, size_t uiBytes, bool bBigFont)
+#else
 int CInputP2P::Notice(LPDESC d, const char * c_pData, size_t uiBytes)
+#endif
 {
 	TPacketGGNotice * p = (TPacketGGNotice *) c_pData;
 
@@ -118,7 +122,11 @@ int CInputP2P::Notice(LPDESC d, const char * c_pData, size_t uiBytes)
 
 	char szBuf[256+1];
 	strlcpy(szBuf, c_pData + sizeof(TPacketGGNotice), MIN(p->lSize + 1, sizeof(szBuf)));
+#ifdef ENABLE_FULL_NOTICE
+	SendNotice(szBuf, bBigFont);
+#else
 	SendNotice(szBuf);
+#endif
 	return (p->lSize);
 }
 
@@ -217,9 +225,13 @@ struct FuncShout
 
 	void operator () (LPDESC d)
 	{
+#ifdef ENABLE_NEWSTUFF
+		if (!d->GetCharacter() || (!g_bGlobalShoutEnable && d->GetCharacter()->GetGMLevel() == GM_PLAYER && d->GetEmpire() != m_bEmpire))
+			return;
+#else
 		if (!d->GetCharacter() || (d->GetCharacter()->GetGMLevel() == GM_PLAYER && d->GetEmpire() != m_bEmpire))
 			return;
-
+#endif
 		d->GetCharacter()->ChatPacket(CHAT_TYPE_SHOUT, "%s", m_str);
 	}
 };
@@ -278,13 +290,20 @@ void CInputP2P::FindPosition(LPDESC d, const char* c_pData)
 {
 	TPacketGGFindPosition* p = (TPacketGGFindPosition*) c_pData;
 	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(p->dwTargetPID);
+#ifdef ENABLE_CMD_WARP_IN_DUNGEON
+	if (ch)
+#else
 	if (ch && ch->GetMapIndex() < 10000)
+#endif
 	{
 		TPacketGGWarpCharacter pw;
 		pw.header = HEADER_GG_WARP_CHARACTER;
 		pw.pid = p->dwFromPID;
 		pw.x = ch->GetX();
 		pw.y = ch->GetY();
+#ifdef ENABLE_CMD_WARP_IN_DUNGEON
+		pw.mapIndex = (ch->GetMapIndex() < 10000) ? 0 : ch->GetMapIndex();
+#endif
 		d->Packet(&pw, sizeof(pw));
 	}
 }
@@ -293,10 +312,13 @@ void CInputP2P::WarpCharacter(const char* c_pData)
 {
 	TPacketGGWarpCharacter* p = (TPacketGGWarpCharacter*) c_pData;
 	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(p->pid);
+#ifdef ENABLE_CMD_WARP_IN_DUNGEON
 	if (ch)
-	{
+		ch->WarpSet(p->x, p->y, p->mapIndex);
+#else
+	if (ch)
 		ch->WarpSet(p->x, p->y);
-	}
+#endif
 }
 
 void CInputP2P::GuildWarZoneMapIndex(const char* c_pData)
@@ -332,12 +354,7 @@ void CInputP2P::XmasWarpSanta(const char * c_pData)
 
 	if (p->bChannel == g_bChannel && map_allow_find(p->lMapIndex))
 	{
-		int	iNextSpawnDelay = 60;
-
-		if (LC_IsYMIR())
-			iNextSpawnDelay = 20 * 60;
-		else
-			iNextSpawnDelay = 50 * 60;
+		int	iNextSpawnDelay = 50 * 60;
 
 		xmas::SpawnSanta(p->lMapIndex, iNextSpawnDelay); // 50분있다가 새로운 산타가 나타남 (한국은 20분)
 
@@ -436,7 +453,12 @@ int CInputP2P::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			if ((iExtraLen = Relay(d, c_pData, m_iBufferLeft)) < 0)
 				return -1;
 			break;
-
+#ifdef ENABLE_FULL_NOTICE
+		case HEADER_GG_BIG_NOTICE:
+			if ((iExtraLen = Notice(d, c_pData, m_iBufferLeft, true)) < 0)
+				return -1;
+			break;
+#endif
 		case HEADER_GG_NOTICE:
 			if ((iExtraLen = Notice(d, c_pData, m_iBufferLeft)) < 0)
 				return -1;

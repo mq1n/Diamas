@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PythonWindow.h"
+#include "../eterXClient/Locale_inc.h" // ENABLE_HIGHLIGHT_NEW_ITEM
 
 namespace UI 
 {
@@ -72,6 +73,9 @@ namespace UI
 				CSlotButton * pSlotButton;
 				CImageBox * pSignImage;
 				CAniImageBox * pFinishCoolTimeEffect;
+#ifdef ENABLE_ACCE_SYSTEM
+				CAniImageBox*	pActiveSlotEffect[3];
+#endif
 			} TSlot;
 			typedef std::list<TSlot> TSlotList;
 			typedef TSlotList::iterator TSlotListIterator;
@@ -111,6 +115,11 @@ namespace UI
 			void DeactivateSlot(DWORD dwIndex);
 			void RefreshSlot();
 
+#ifdef ENABLE_SLOT_WINDOW_EX
+			float GetSlotCoolTime(DWORD dwIndex, float * fElapsedTime);
+			bool IsActivatedSlot(DWORD dwIndex);
+#endif
+
 			DWORD GetSlotCount();
 
 			void LockSlot(DWORD dwIndex);
@@ -149,6 +158,11 @@ namespace UI
 
 			// CallBack
 			void ReserveDestroyCoolTimeFinishEffect(DWORD dwSlotIndex);
+
+#ifdef ENABLE_ACCE_SYSTEM
+			void ActivateEffect(DWORD dwSlotIndex, float r, float g, float b, float a);
+			void DeactivateEffect(DWORD dwSlotIndex);
+#endif
 
 		protected:
 			void __Initialize();
@@ -206,6 +220,10 @@ namespace UI
 			CGraphicImageInstance * m_pBaseImageInstance;
 			CImageBox * m_pToggleSlotImage;
 			CAniImageBox * m_pSlotActiveEffect;
+#ifdef ENABLE_HIGHLIGHT_NEW_ITEM
+			CAniImageBox * m_pSlotActiveEffectSlot2;
+			CAniImageBox * m_pSlotActiveEffectSlot3;
+#endif
 			std::deque<DWORD> m_ReserveDestroyEffectDeque;
 	};
 };

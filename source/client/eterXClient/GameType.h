@@ -37,8 +37,14 @@ const DWORD c_Name_Max_Length = 64;
 const DWORD c_FileName_Max_Length = 128;
 const DWORD c_Short_Name_Max_Length = 32;
 
-const DWORD c_Inventory_Page_Size = 5*9; // x*y
+const DWORD c_Inventory_Page_Column = 5;
+const DWORD c_Inventory_Page_Row = 9;
+const DWORD c_Inventory_Page_Size = c_Inventory_Page_Column*c_Inventory_Page_Row; // x*y
+#ifdef ENABLE_EXTEND_INVEN_SYSTEM
+const DWORD c_Inventory_Page_Count = 4;
+#else
 const DWORD c_Inventory_Page_Count = 2;
+#endif
 const DWORD c_ItemSlot_Count = c_Inventory_Page_Size * c_Inventory_Page_Count;
 const DWORD c_Equipment_Count = 12;
 
@@ -67,7 +73,7 @@ const DWORD c_Equipment_Shield	= c_Equipment_Start + 10;
 	const DWORD c_New_Equipment_Count = 3;
 	const DWORD c_Equipment_Ring1 = c_New_Equipment_Start + 0;
 	const DWORD c_Equipment_Ring2 = c_New_Equipment_Start + 1;
-	const DWORD c_Equipment_Belt  = c_New_Equipment_Start + 2;;
+	const DWORD c_Equipment_Belt  = c_New_Equipment_Start + 2;
 #endif
 
 enum EDragonSoulDeckType
@@ -102,10 +108,28 @@ enum EDragonSoulStepTypes
 	const DWORD c_Costume_Slot_Start	= c_Equipment_Start + 19;	// [주의] 숫자(19) 하드코딩 주의. 현재 서버에서 코스츔 슬롯은 19부터임. 서버 common/length.h 파일의 EWearPositions 열거형 참고.
 	const DWORD	c_Costume_Slot_Body		= c_Costume_Slot_Start + 0;
 	const DWORD	c_Costume_Slot_Hair		= c_Costume_Slot_Start + 1;
-	const DWORD c_Costume_Slot_Count	= 2;
-	const DWORD c_Costume_Slot_End		= c_Costume_Slot_Start + c_Costume_Slot_Count;
+#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
+	const DWORD	c_Costume_Slot_Mount	= c_Costume_Slot_Start + 2;
+#endif
+#ifdef ENABLE_ACCE_SYSTEM
+	const DWORD	c_Costume_Slot_Acce		= c_Costume_Slot_Start + 3;
 #endif
 
+#if defined(ENABLE_WEAPON_COSTUME_SYSTEM) || defined(ENABLE_ACCE_SYSTEM)
+	const DWORD c_Costume_Slot_Count	= 4;
+#elif defined(ENABLE_MOUNT_COSTUME_SYSTEM)
+	const DWORD c_Costume_Slot_Count	= 3;
+#else
+	const DWORD c_Costume_Slot_Count	= 2;
+#endif
+
+	const DWORD c_Costume_Slot_End		= c_Costume_Slot_Start + c_Costume_Slot_Count;
+
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+	const DWORD	c_Costume_Slot_Weapon	= c_Costume_Slot_End + 1;
+#endif
+
+#endif
 
 // [주의] 숫자(32) 하드코딩 주의. 현재 서버에서 용혼석 슬롯은 32부터임. 
 // 서버 common/length.h 파일의 EWearPositions 열거형이 32까지 확장될 것을 염두하고(32 이상은 확장 하기 힘들게 되어있음.), 
@@ -297,7 +321,18 @@ const float c_fRunDistance = 310.0f;
 enum
 {
 	ITEM_SOCKET_SLOT_MAX_NUM = 3,
-	ITEM_ATTRIBUTE_SLOT_MAX_NUM = 7,
+	// refactored attribute slot begin
+	ITEM_ATTRIBUTE_SLOT_NORM_NUM	= 5,
+	ITEM_ATTRIBUTE_SLOT_RARE_NUM	= 2,
+
+	ITEM_ATTRIBUTE_SLOT_NORM_START	= 0,
+	ITEM_ATTRIBUTE_SLOT_NORM_END	= ITEM_ATTRIBUTE_SLOT_NORM_START + ITEM_ATTRIBUTE_SLOT_NORM_NUM,
+
+	ITEM_ATTRIBUTE_SLOT_RARE_START	= ITEM_ATTRIBUTE_SLOT_NORM_END,
+	ITEM_ATTRIBUTE_SLOT_RARE_END	= ITEM_ATTRIBUTE_SLOT_RARE_START + ITEM_ATTRIBUTE_SLOT_RARE_NUM,
+
+	ITEM_ATTRIBUTE_SLOT_MAX_NUM		= ITEM_ATTRIBUTE_SLOT_RARE_END, // 7
+	// refactored attribute slot end
 };
 
 #pragma pack(push)

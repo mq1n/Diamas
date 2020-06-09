@@ -75,7 +75,7 @@ namespace quest
 			return false;
 
 		PC * pPC = CQuestManager::instance().GetPCForce(ch->GetPlayerID());
-		bool returnBool;
+		bool returnBool = false;
 		if (pPC)
 		{
 			int flagValue = pPC->GetFlag(flagname);
@@ -114,6 +114,17 @@ namespace quest
 			}
 		}
 	}
+
+#ifdef ENABLE_NEWSTUFF
+	void FSendChatPacket::operator() (LPENTITY ent)
+	{
+		if (ent->IsType(ENTITY_CHARACTER))
+		{
+			LPCHARACTER ch = (LPCHARACTER) ent;
+			ch->ChatPacket(m_chat_type, "%s", m_text.c_str());
+		}
+	}
+#endif
 
 	void FSendPacketToEmpire::operator() (LPENTITY ent)
 	{
@@ -406,9 +417,25 @@ namespace quest
 	//
 	// Registers Lua function table
 	//
-	void CQuestManager::AddLuaFunctionTable(const char * c_pszName, luaL_reg * preg)
+	void CQuestManager::AddLuaFunctionTable(const char * c_pszName, luaL_reg * preg, bool bCheckIfExists)
 	{
+#ifdef ENABLE_NEWSTUFF
+		bool bIsExists = false;
+		if (bCheckIfExists)
+		{
+			int x = lua_gettop(L);
+			lua_getglobal(L, c_pszName);
+			if (!lua_istable(L, -1))
+			{
+				lua_settop(L, x);
+				bIsExists = true;
+			}
+		}
+		if (!bIsExists)
+			lua_newtable(L);
+#else
 		lua_newtable(L);
+#endif
 
 		while ((preg->name))
 		{
@@ -557,7 +584,8 @@ namespace quest
 			}
 		}
 
-		if (LC_IsEurope())
+#define ENABLE_TRANSLATE_LUA
+#ifdef ENABLE_TRANSLATE_LUA
 		{
 			char translateFileName[256];
 			snprintf(translateFileName, sizeof(translateFileName), "%s/translate.lua", LocaleService_GetBasePath().c_str());
@@ -570,17 +598,11 @@ namespace quest
 				return false;
 			}
 		}
+#endif
 
 		{
 			char questLocaleFileName[256];
-			if (LC_IsEurope())
-			{
-				snprintf(questLocaleFileName, sizeof(questLocaleFileName), "%s/locale.lua", g_stQuestDir.c_str());
-			}
-			else
-			{
-				snprintf(questLocaleFileName, sizeof(questLocaleFileName), "%s/locale_%s.lua", g_stQuestDir.c_str(), g_stLocale.c_str());
-			}
+			snprintf(questLocaleFileName, sizeof(questLocaleFileName), "%s/locale.lua", g_stQuestDir.c_str());
 
 			int questLocaleLoadingResult = lua_dofile(L, questLocaleFileName);
 			sys_log(0, "LoadQuestLocale(%s), returns %d", questLocaleFileName, questLocaleLoadingResult);

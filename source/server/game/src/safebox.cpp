@@ -7,6 +7,7 @@
 #include "desc_client.h"
 #include "item.h"
 #include "item_manager.h"
+#include "config.h"
 
 CSafebox::CSafebox(LPCHARACTER pkChrOwner, int iSize, DWORD dwGold) : m_pkChrOwner(pkChrOwner), m_iSize(iSize), m_lGold(dwGold)
 {
@@ -198,7 +199,7 @@ bool CSafebox::MoveItem(BYTE bCell, BYTE bDestCell, BYTE count)
 			if (count == 0)
 				count = item->GetCount();
 
-			count = MIN(200 - item2->GetCount(), count);
+			count = MIN(g_bItemCountLimit - item2->GetCount(), count);
 
 			if (item->GetCount() >= count)
 				Remove(bCell);

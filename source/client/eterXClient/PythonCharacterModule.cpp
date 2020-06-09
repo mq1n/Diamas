@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "PythonCharacterManager.h"
 #include "PythonNonPlayer.h"
+#include "../eterGameLib/GameLibDefines.h"
 
 PyObject * chrRaceToJob(PyObject * poSelf, PyObject * poArgs)
 {
@@ -84,6 +85,9 @@ PyObject * chrCreateInstance(PyObject* poSelf, PyObject* poArgs)
 		kCreateData.m_dwArmor=8;
 		kCreateData.m_dwWeapon=0;
 		kCreateData.m_dwHair=0;
+#ifdef ENABLE_ACCE_SYSTEM
+		kCreateData.m_dwAcce = 0;
+#endif
 		kCreateData.m_isMain=false;
 
 		PyObject* poHorse=PyDict_GetItemString(poDict, "horse");
@@ -1211,6 +1215,9 @@ PyObject * chrtestSetRideMan(PyObject* poSelf, PyObject* poArgs)
 	kCreateData.m_dwRace = 0;
 	kCreateData.m_dwArmor = 0;
 	kCreateData.m_dwHair = 100;
+#ifdef ENABLE_ACCE_SYSTEM
+	kCreateData.m_dwAcce		= 0;
+#endif
 	kCreateData.m_dwMovSpd = 100;
 	kCreateData.m_dwAtkSpd = 100;
 	kCreateData.m_dwMountVnum = imount;
@@ -1220,6 +1227,23 @@ PyObject * chrtestSetRideMan(PyObject* poSelf, PyObject* poArgs)
 
 	return Py_BuildNone();
 }
+
+#ifdef ENABLE_ACCE_SYSTEM
+PyObject * chrSetAcce(PyObject* poSelf, PyObject* poArgs)
+{
+	int dwAcce;
+	if (!PyTuple_GetInteger(poArgs, 0, &dwAcce))
+		return Py_BuildException();
+
+	CInstanceBase * pkInst = CPythonCharacterManager::Instance().GetSelectedInstancePtr();
+	if (!pkInst)
+		return Py_BuildNone();
+
+	pkInst->SetAcce(dwAcce);
+	return Py_BuildNone();
+}
+#endif
+
 
 void initchr()
 {
@@ -1318,6 +1342,9 @@ void initchr()
 		{ "testSetSpecularRenderMode2",		chrtestSetSpecularRenderMode2,		METH_VARARGS },
 		{ "testRestoreRenderMode",			chrtestRestoreRenderMode,			METH_VARARGS },
 		{ "testSetRideMan",					chrtestSetRideMan,					METH_VARARGS },
+#ifdef ENABLE_ACCE_SYSTEM
+		{ "SetAcce",						chrSetAcce,							METH_VARARGS },
+#endif
 
 		{ NULL,								NULL,								NULL		 },
 	};
@@ -1388,18 +1415,30 @@ void initchr()
 	PyModule_AddIntConstant(poModule, "MOTION_KISS_WITH_ASSASSIN",			CRaceMotionData::NAME_KISS_WITH_ASSASSIN);
 	PyModule_AddIntConstant(poModule, "MOTION_KISS_WITH_SURA",				CRaceMotionData::NAME_KISS_WITH_SURA);
 	PyModule_AddIntConstant(poModule, "MOTION_KISS_WITH_SHAMAN",			CRaceMotionData::NAME_KISS_WITH_SHAMAN);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	PyModule_AddIntConstant(poModule, "MOTION_KISS_WITH_WOLFMAN",			CRaceMotionData::NAME_KISS_WITH_WOLFMAN);
+#endif
 	PyModule_AddIntConstant(poModule, "MOTION_FRENCH_KISS_WITH_WARRIOR",	CRaceMotionData::NAME_FRENCH_KISS_WITH_WARRIOR);
 	PyModule_AddIntConstant(poModule, "MOTION_FRENCH_KISS_WITH_ASSASSIN",	CRaceMotionData::NAME_FRENCH_KISS_WITH_ASSASSIN);
 	PyModule_AddIntConstant(poModule, "MOTION_FRENCH_KISS_WITH_SURA",		CRaceMotionData::NAME_FRENCH_KISS_WITH_SURA);
 	PyModule_AddIntConstant(poModule, "MOTION_FRENCH_KISS_WITH_SHAMAN",		CRaceMotionData::NAME_FRENCH_KISS_WITH_SHAMAN);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	PyModule_AddIntConstant(poModule, "MOTION_FRENCH_KISS_WITH_WOLFMAN",			CRaceMotionData::NAME_FRENCH_KISS_WITH_WOLFMAN);
+#endif
 	PyModule_AddIntConstant(poModule, "MOTION_SLAP_HIT_WITH_WARRIOR",		CRaceMotionData::NAME_SLAP_HIT_WITH_WARRIOR);
 	PyModule_AddIntConstant(poModule, "MOTION_SLAP_HIT_WITH_ASSASSIN",		CRaceMotionData::NAME_SLAP_HIT_WITH_ASSASSIN);
 	PyModule_AddIntConstant(poModule, "MOTION_SLAP_HIT_WITH_SURA",			CRaceMotionData::NAME_SLAP_HIT_WITH_SURA);
 	PyModule_AddIntConstant(poModule, "MOTION_SLAP_HIT_WITH_SHAMAN",		CRaceMotionData::NAME_SLAP_HIT_WITH_SHAMAN);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	PyModule_AddIntConstant(poModule, "MOTION_SLAP_HIT_WITH_WOLFMAN",			CRaceMotionData::NAME_SLAP_HIT_WITH_WOLFMAN);
+#endif
 	PyModule_AddIntConstant(poModule, "MOTION_SLAP_HURT_WITH_WARRIOR",		CRaceMotionData::NAME_SLAP_HURT_WITH_WARRIOR);
 	PyModule_AddIntConstant(poModule, "MOTION_SLAP_HURT_WITH_ASSASSIN",		CRaceMotionData::NAME_SLAP_HURT_WITH_ASSASSIN);
 	PyModule_AddIntConstant(poModule, "MOTION_SLAP_HURT_WITH_SURA",			CRaceMotionData::NAME_SLAP_HURT_WITH_SURA);
 	PyModule_AddIntConstant(poModule, "MOTION_SLAP_HURT_WITH_SHAMAN",		CRaceMotionData::NAME_SLAP_HURT_WITH_SHAMAN);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	PyModule_AddIntConstant(poModule, "MOTION_SLAP_HURT_WITH_WOLFMAN",			CRaceMotionData::NAME_SLAP_HURT_WITH_WOLFMAN);
+#endif
 	PyModule_AddIntConstant(poModule, "MOTION_DIG",							CRaceMotionData::NAME_DIG);
 
 	PyModule_AddIntConstant(poModule, "MOTION_MODE_RESERVED",				CRaceMotionData::MODE_RESERVED);
@@ -1419,6 +1458,10 @@ void initchr()
 	PyModule_AddIntConstant(poModule, "MOTION_MODE_HORSE_FAN",				CRaceMotionData::MODE_HORSE_FAN);
 	PyModule_AddIntConstant(poModule, "MOTION_MODE_HORSE_BELL",				CRaceMotionData::MODE_HORSE_BELL);
 	PyModule_AddIntConstant(poModule, "MOTION_MODE_WEDDING_DRESS",			CRaceMotionData::MODE_WEDDING_DRESS);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	PyModule_AddIntConstant(poModule, "MOTION_MODE_CLAW",			CRaceMotionData::MODE_CLAW);
+	PyModule_AddIntConstant(poModule, "MOTION_MODE_HORSE_CLAW",			CRaceMotionData::MODE_HORSE_CLAW);
+#endif
 
 	PyModule_AddIntConstant(poModule, "DIR_NORTH",							CInstanceBase::DIR_NORTH);
 	PyModule_AddIntConstant(poModule, "DIR_NORTHEAST",						CInstanceBase::DIR_NORTHEAST);
@@ -1466,6 +1509,11 @@ void initchr()
 	PyModule_AddIntConstant(poModule, "AFFECT_PABEOP",						CInstanceBase::AFFECT_PABEOP);
 	PyModule_AddIntConstant(poModule, "AFFECT_FALLEN_CHEONGEUN",			CInstanceBase::AFFECT_FALLEN_CHEONGEUN);
 	PyModule_AddIntConstant(poModule, "AFFECT_CHINA_FIREWORK",				CInstanceBase::AFFECT_CHINA_FIREWORK);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	PyModule_AddIntConstant(poModule, "AFFECT_BLEEDING",					CInstanceBase::AFFECT_BLEEDING);
+	PyModule_AddIntConstant(poModule, "AFFECT_RED_POSSESSION",				CInstanceBase::AFFECT_RED_POSSESSION);
+	PyModule_AddIntConstant(poModule, "AFFECT_BLUE_POSSESSION",				CInstanceBase::AFFECT_BLUE_POSSESSION);
+#endif
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_MALL",					CInstanceBase::NEW_AFFECT_MALL);
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_NO_DEATH_PENALTY",		CInstanceBase::NEW_AFFECT_NO_DEATH_PENALTY);
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_SKILL_BOOK_BONUS",		CInstanceBase::NEW_AFFECT_SKILL_BOOK_BONUS);
@@ -1487,5 +1535,7 @@ void initchr()
 
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_DRAGON_SOUL_DECK1",		CInstanceBase::NEW_AFFECT_DRAGON_SOUL_DECK1);
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_DRAGON_SOUL_DECK2",		CInstanceBase::NEW_AFFECT_DRAGON_SOUL_DECK2);
-
+#ifdef ENABLE_ACCE_SYSTEM
+	PyModule_AddIntConstant(poModule, "PART_ACCE",							CRaceData::PART_ACCE);
+#endif
 }

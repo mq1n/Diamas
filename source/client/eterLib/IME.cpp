@@ -641,7 +641,18 @@ void CIME::PasteTextFromClipBoard()
 		return;
 
 	HANDLE handle = GetClipboardData(CF_TEXT);
+	if (!handle) // @fixme008
+	{
+		CloseClipboard();
+		return;
+	}
 	char * buffer = (char*)GlobalLock(handle);
+	if (!buffer) // @fixme008
+	{
+		GlobalUnlock(handle);
+		CloseClipboard();
+		return;
+	}
 	std::string strClipboard = buffer;
 	GlobalUnlock(handle);
 	CloseClipboard();
@@ -653,6 +664,8 @@ void CIME::PasteTextFromClipBoard()
 	const char* end = begin + strClipboard.length();
 	wchar_t m_wText[IMESTR_MAXLEN];
 	int wstrLen = MultiByteToWideChar(ms_uInputCodePage, 0, begin, end-begin, m_wText, IMESTR_MAXLEN);
+	if (wstrLen <= 0) // @fixme008
+		return;
 
 	InsertString(m_wText, wstrLen);
 	if(ms_pEvent)
@@ -867,6 +880,9 @@ void CIME::OnChar(wchar_t c)
 	if (m_bOnlyNumberMode)
 		if (!iswdigit(c))
 			return;
+
+	if ((c >= 0x00 && c<=0x1f) || (c == 0x7f)) // @fixme011
+		return;
 
 	if (!__IsWritable(c))
 		return;

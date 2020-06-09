@@ -26,7 +26,7 @@ bool NSound::LoadSoundInformationPiece(const char * c_szFileName, NSound::TSound
 	CTextFileLoader& rkTextFileLoader=*pkTextFileLoader;
 	if (rkTextFileLoader.IsEmpty())
 	{
-		SetResultString((strResult + " 읽기용 파일을 열 수 없음").c_str());
+		SetResultString((strResult + " Can not open file for reading").c_str());
 		return false;
 	}
 
@@ -35,7 +35,7 @@ bool NSound::LoadSoundInformationPiece(const char * c_szFileName, NSound::TSound
 	int iCount;
 	if (!rkTextFileLoader.GetTokenInteger("sounddatacount", &iCount))
 	{
-		SetResultString((strResult + " 파일 포멧 에러, SoundDataCount를 찾을 수 없음").c_str());
+		SetResultString((strResult + " File format error, SoundDataCount Unable to find.").c_str());
 		return false;
 	}
 
@@ -49,13 +49,13 @@ bool NSound::LoadSoundInformationPiece(const char * c_szFileName, NSound::TSound
 		CTokenVector * pTokenVector;
 		if (!rkTextFileLoader.GetTokenVector(szSoundDataHeader, &pTokenVector))
 		{
-			SetResultString((strResult + " 파일 포멧 에러: " + szSoundDataHeader + " 를 찾을 수 없음").c_str());
+			SetResultString((strResult + " File format error: " + szSoundDataHeader + " Unable to find").c_str());
 			return false;
 		}
 
 		if (2 != pTokenVector->size())
 		{
-			SetResultString((strResult + " 파일 포멧 에러: 벡터 크기가 2가 아님").c_str());
+			SetResultString((strResult + " File format error: The size of the vector is not 2").c_str());
 			return false;
 		}
 
@@ -71,7 +71,7 @@ bool NSound::LoadSoundInformationPiece(const char * c_szFileName, NSound::TSound
 		}
 	}
 
-	SetResultString((strResult + " 불러옴").c_str());
+	SetResultString((strResult + " Loaded").c_str());
 	return true;
 }
 
@@ -95,8 +95,8 @@ bool NSound::SaveSoundInformationPiece(const char * c_szFileName, NSound::TSound
 	{
 		char szErrorText[256+1];
 		_snprintf(szErrorText, sizeof(szErrorText), "Failed to save file (%s).\nPlease check if it is read-only or you have no space on the disk.\n", c_szFileName);
-		LogBox(szErrorText, "에러");
-		SetResultString((strResult + " 쓰기용 파일을 열 수 없음").c_str());
+		LogBox(szErrorText, "Error");
+		SetResultString((strResult + " Cannot open file for writing").c_str());
 		return false;
 	}
 

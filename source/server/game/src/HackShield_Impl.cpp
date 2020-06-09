@@ -11,6 +11,7 @@
 
 bool CHackShieldImpl::Initialize()
 {
+#ifdef ENABLE_HSHIELD_SYSTEM
 	handle_ = _AhnHS_CreateServerObject("metin2client.bin.hsb");
 
 	if (ANTICPX_INVALID_HANDLE_VALUE == handle_)
@@ -19,25 +20,28 @@ bool CHackShieldImpl::Initialize()
 	}
 
 	sys_log(0, "HShield: Success to CreateServerObject");
-
+#endif
 	return true;
 }
 
 void CHackShieldImpl::Release()
 {
+#ifdef ENABLE_HSHIELD_SYSTEM
 	_AhnHS_CloseServerHandle(handle_);
 
 	sys_log(0, "HShield: Server Handle Closed");
+#endif
 }
 
 bool CHackShieldImpl::CreateClientHandle(DWORD dwPlayerID)
 {
+#ifdef ENABLE_HSHIELD_SYSTEM
 	ClientHandleContainer::const_iterator iter = CliehtHandleMap_.find( dwPlayerID );
 
 	if (iter != CliehtHandleMap_.end())
 	{
 		sys_log(0, "HShield: Client Handle is already created for Player(%u)", dwPlayerID);
-		
+
 		return false;
 	}
 
@@ -53,12 +57,13 @@ bool CHackShieldImpl::CreateClientHandle(DWORD dwPlayerID)
 	CliehtHandleMap_.insert( std::make_pair(dwPlayerID, handle) );
 
 	sys_log(0, "HShield: Success to create client handle for Player(%u)", dwPlayerID);
-
+#endif
 	return true;
 }
 
 void CHackShieldImpl::DeleteClientHandle(DWORD dwPlayerID)
 {
+#ifdef ENABLE_HSHIELD_SYSTEM
 	ClientHandleContainer::iterator iter = CliehtHandleMap_.find( dwPlayerID );
 
 	if (iter == CliehtHandleMap_.end())
@@ -73,10 +78,12 @@ void CHackShieldImpl::DeleteClientHandle(DWORD dwPlayerID)
 	CliehtHandleMap_.erase(iter);
 
 	sys_log(0, "HShield: client handle deleted for Player(%u)", dwPlayerID);
+#endif
 }
 
 bool CHackShieldImpl::SendCheckPacket(LPCHARACTER ch)
 {
+#ifdef ENABLE_HSHIELD_SYSTEM
 	if (NULL == ch)
 	{
 		return false;
@@ -117,10 +124,14 @@ bool CHackShieldImpl::SendCheckPacket(LPCHARACTER ch)
 	sys_log(0, "HShield: Failed to get DESC for Player(%u)", ch->GetPlayerID());
 
 	return false;
+#else
+	return true;
+#endif
 }
 
 bool CHackShieldImpl::VerifyAck(LPCHARACTER ch, TPacketGCHSCheck* buf)
 {
+#ifdef ENABLE_HSHIELD_SYSTEM
 	if (NULL == ch)
 	{
 		return false;
@@ -164,7 +175,7 @@ bool CHackShieldImpl::VerifyAck(LPCHARACTER ch, TPacketGCHSCheck* buf)
 	}
 
 	sys_log(0, "HShield: Valid Ack from Player(%u)", ch->GetPlayerID());
-
+#endif
 	return true;
 }
 

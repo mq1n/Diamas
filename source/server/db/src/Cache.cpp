@@ -88,12 +88,12 @@ void CItemCache::OnFlush()
 		char szValues[QUERY_MAX_LEN];
 		char szUpdate[QUERY_MAX_LEN];
 
-		int iLen = snprintf(szColumns, sizeof(szColumns), "id, owner_id, window, pos, count, vnum");
+		int iLen = snprintf(szColumns, sizeof(szColumns), "id, owner_id, `window`, pos, count, vnum");
 
 		int iValueLen = snprintf(szValues, sizeof(szValues), "%u, %u, %d, %d, %u, %u",
 				p->id, p->owner, p->window, p->pos, p->count, p->vnum);
 
-		int iUpdateLen = snprintf(szUpdate, sizeof(szUpdate), "owner_id=%u, window=%d, pos=%d, count=%u, vnum=%u",
+		int iUpdateLen = snprintf(szUpdate, sizeof(szUpdate), "owner_id=%u, `window`=%d, pos=%d, count=%u, vnum=%u",
 				p->owner, p->window, p->pos, p->count, p->vnum);
 
 		if (isSocket)
@@ -227,10 +227,11 @@ void CItemPriceListTableCache::UpdateList(const TItemPriceListTable* pUpdateList
 
 		if (tmpvec.size() < sizeAddOldDataSize)
 			sizeAddOldDataSize = tmpvec.size();
-
-		memcpy(m_data.aPriceInfo + pUpdateList->byCount, &tmpvec[0], sizeof(TItemPriceInfo) * sizeAddOldDataSize);
-		m_data.byCount += sizeAddOldDataSize;
-
+		if (tmpvec.size() != 0)
+		{
+			memcpy(m_data.aPriceInfo + pUpdateList->byCount, &tmpvec[0], sizeof(TItemPriceInfo) * sizeAddOldDataSize);
+			m_data.byCount += sizeAddOldDataSize;
+		}
 		nDeletedNum = tmpvec.size() - sizeAddOldDataSize;
 	}
 	else
@@ -261,7 +262,7 @@ void CItemPriceListTableCache::OnFlush()
 	for (int idx = 0; idx < m_data.byCount; ++idx)
 	{
 		snprintf(szQuery, sizeof(szQuery),
-				"INSERT INTO myshop_pricelist%s(owner_id, item_vnum, price) VALUES(%u, %u, %u)", 
+				"REPLACE myshop_pricelist%s(owner_id, item_vnum, price) VALUES(%u, %u, %u)", // @fixme204 (INSERT INTO -> REPLACE)
 				GetTablePostfix(), m_data.dwOwnerID, m_data.aPriceInfo[idx].dwVnum, m_data.aPriceInfo[idx].dwPrice);
 		CDBManager::instance().ReturnQuery(szQuery, QID_ITEMPRICE_SAVE, 0, NULL);
 	}
@@ -270,6 +271,11 @@ void CItemPriceListTableCache::OnFlush()
 	
 	m_bNeedQuery = false;
 }
+
+CItemPriceListTableCache::~CItemPriceListTableCache()
+{
+}
+
 // END_OF_MYSHOP_PRICE_LIST
 #ifdef __AUCTION__
 CAuctionItemInfoCache::CAuctionItemInfoCache()

@@ -1006,6 +1006,19 @@ namespace UI
 		m_pMiddleCaptureWindow = NULL;
 	}
 
+
+#ifdef ENABLE_MOUSEWHEEL_EVENT
+	bool CWindowManager::RunMouseWheelScroll(long x, long y, short wDelta)
+	{
+		SetMousePosition(x, y);
+		CWindow * pWin = GetPointWindow();
+		if (!pWin)
+			return false;
+
+		return pWin->OnMouseWheelScroll(wDelta) == TRUE;
+	}
+#endif
+
 	// IME
 	void CWindowManager::RunIMEUpdate()
 	{

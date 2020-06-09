@@ -24,6 +24,8 @@ class LogManager : public singleton<LogManager>
 
 		bool		Connect(const char * host, const int port, const char * user, const char * pwd, const char * db);
 
+		size_t		EscapeString(char* dst, size_t dstSize, const char* src, size_t srcSize);
+
 		void		ItemLog(DWORD dwPID, DWORD x, DWORD y, DWORD dwItemID, const char * c_pszText, const char * c_pszHint, const char * c_pszIP, DWORD dwVnum);
 		void		ItemLog(LPCHARACTER ch, LPITEM item, const char * c_pszText, const char * c_pszHint);
 		void		ItemLog(LPCHARACTER ch, int itemID, int itemVnum, const char * c_pszText, const char * c_pszHint);
@@ -52,6 +54,10 @@ class LogManager : public singleton<LogManager>
 		void		DetailLoginLog(bool isLogin, LPCHARACTER ch);
 		void		DragonSlayLog(DWORD dwGuildID, DWORD dwDragonVnum, DWORD dwStartTime, DWORD dwEndTime);
 		void		HackShieldLog(unsigned long ErrorCode, LPCHARACTER ch);
+#ifdef ENABLE_ACCE_SYSTEM
+		void		AcceLog(DWORD dwPID, DWORD x, DWORD y, DWORD item_vnum, DWORD item_uid, int item_count, int abs_chance, bool success);
+#endif
+		void		ChatLog(DWORD where, DWORD who_id, const char* who_name, DWORD whom_id, const char* whom_name, const char* type, const char* msg, const char* ip);
 
 	private:
 		void		Query(const char * c_pszFormat, ...);

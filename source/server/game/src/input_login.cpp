@@ -31,6 +31,39 @@
 #include "horsename_manager.h"
 #include "MarkManager.h"
 #include "HackShield.h"
+#include "../../common/CommonDefines.h"
+
+#ifdef ENABLE_WOLFMAN_CHARACTER
+
+// #define USE_LYCAN_CREATE_POSITION
+#ifdef USE_LYCAN_CREATE_POSITION
+
+DWORD g_lycan_create_position[4][2] =
+{
+	{		0,		0 },
+	{ 768000+38300, 896000+35500 },
+	{ 819200+38300, 896000+35500 },
+	{ 870400+38300, 896000+35500 },
+};
+
+inline DWORD LYCAN_CREATE_START_X(BYTE e, BYTE job)
+{
+	if (1 <= e && e <= 3)
+		return (job==JOB_WOLFMAN)?g_lycan_create_position[e][0]:g_create_position[e][0];
+	return 0;
+}
+
+inline DWORD LYCAN_CREATE_START_Y(BYTE e, BYTE job)
+{
+	if (1 <= e && e <= 3)
+		return (job==JOB_WOLFMAN)?g_lycan_create_position[e][1]:g_create_position[e][1];
+	return 0;
+}
+
+#endif
+
+
+#endif
 
 static void _send_bonus_info(LPCHARACTER ch)
 {
@@ -94,7 +127,7 @@ void CInputLogin::Login(LPDESC d, const char * data)
 
 	TPacketGCLoginFailure failurePacket;
 
-	if (g_iUseLocale && !test_server)
+	if (!test_server)
 	{
 		failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 		strlcpy(failurePacket.szStatus, "VERSION", sizeof(failurePacket.szStatus));
@@ -299,8 +332,13 @@ bool NewPlayerTable(TPlayerTable * table,
 	table->sp = JobInitialPoints[job].max_sp + table->iq * JobInitialPoints[job].sp_per_iq;
 	table->stamina = JobInitialPoints[job].max_stamina;
 
+#if defined(ENABLE_WOLFMAN_CHARACTER) && defined(USE_LYCAN_CREATE_POSITION)
+	table->x 	= LYCAN_CREATE_START_X(bEmpire, job) + number(-300, 300);
+	table->y 	= LYCAN_CREATE_START_Y(bEmpire, job) + number(-300, 300);
+#else
 	table->x 	= CREATE_START_X(bEmpire) + number(-300, 300);
 	table->y 	= CREATE_START_Y(bEmpire) + number(-300, 300);
+#endif
 	table->z	= 0;
 	table->dir	= 0;
 	table->playtime = 0;
@@ -370,7 +408,11 @@ bool RaceToJob(unsigned race, unsigned* ret_job)
 		case MAIN_RACE_SHAMAN_W:
 			*ret_job = JOB_SHAMAN;
 			break;
-
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case MAIN_RACE_WOLFMAN_M:
+			*ret_job = JOB_WOLFMAN;
+			break;
+#endif
 		default:
 			return false;
 			break;
@@ -415,8 +457,13 @@ bool NewPlayerTable2(TPlayerTable * table, const char * name, BYTE race, BYTE sh
 	table->sp		= JobInitialPoints[job].max_sp + table->iq * JobInitialPoints[job].sp_per_iq;
 	table->stamina	= JobInitialPoints[job].max_stamina;
 
+#if defined(ENABLE_WOLFMAN_CHARACTER) && defined(USE_LYCAN_CREATE_POSITION)
+	table->x 		= LYCAN_CREATE_START_X(bEmpire, job) + number(-300, 300);
+	table->y 		= LYCAN_CREATE_START_Y(bEmpire, job) + number(-300, 300);
+#else
 	table->x		= CREATE_START_X(bEmpire) + number(-300, 300);
 	table->y		= CREATE_START_Y(bEmpire) + number(-300, 300);
+#endif
 	table->z		= 0;
 	table->dir		= 0;
 	table->playtime = 0;
@@ -448,36 +495,23 @@ void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 		return;
 	}
 
-	// 사용할 수 없는 이름이거나, 잘못된 평상복이면 생설 실패
+	
 	if (!check_name(pinfo->name) || pinfo->shape > 1)
 	{
-		if (LC_IsCanada() == true)
-		{
-			TPacketGCCreateFailure pack;
-			pack.header = HEADER_GC_CHARACTER_CREATE_FAILURE;
-			pack.bType = 1;
-
-			d->Packet(&pack, sizeof(pack));
-			return;
-		}
-
 		d->Packet(&packFailure, sizeof(packFailure));
 		return;
 	}
 
-	if (LC_IsEurope() == true)
+	const TAccountTable & c_rAccountTable = d->GetAccountTable();
+
+	if (0 == strcmp(c_rAccountTable.login, pinfo->name))
 	{
-		const TAccountTable & c_rAccountTable = d->GetAccountTable();
+		TPacketGCCreateFailure pack;
+		pack.header = HEADER_GC_CHARACTER_CREATE_FAILURE;
+		pack.bType = 1;
 
-		if (0 == strcmp(c_rAccountTable.login, pinfo->name))
-		{
-			TPacketGCCreateFailure pack;
-			pack.header = HEADER_GC_CHARACTER_CREATE_FAILURE;
-			pack.bType = 1;
-
-			d->Packet(&pack, sizeof(pack));
-			return;
-		}
+		d->Packet(&pack, sizeof(pack));
+		return;
 	}
 
 	memset(&player_create_packet, 0, sizeof(TPlayerCreatePacket));
@@ -488,8 +522,6 @@ void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 		d->Packet(&packFailure, sizeof(packFailure));
 		return;
 	}
-
-	const TAccountTable & c_rAccountTable = d->GetAccountTable();
 
 	trim_and_lower(c_rAccountTable.login, player_create_packet.login, sizeof(player_create_packet.login));
 	strlcpy(player_create_packet.passwd, c_rAccountTable.passwd, sizeof(player_create_packet.passwd));
@@ -642,26 +674,20 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		sys_log(0, "PREMIUM: %s type %d %dmin", ch->GetName(), i, remain);
 	}
 
-	if (LC_IsEurope())
+	if (g_bCheckClientVersion)
 	{
-		if (g_bCheckClientVersion)
+		sys_log(0, "VERSION CHECK %s %s", g_stClientVersion.c_str(), d->GetClientVersion());
+
+		if (!d->GetClientVersion())
 		{
-			int version = atoi(g_stClientVersion.c_str());
-			int date = atoi(d->GetClientVersion());
-
-			sys_log(0, "VERSION CHECK %d %d %s %s", version, date, g_stClientVersion.c_str(), d->GetClientVersion());
-
-			if (!d->GetClientVersion())
+			d->DelayedDisconnect(10);
+		}
+		else
+		{
+			if (0 != g_stClientVersion.compare(d->GetClientVersion())) // @fixme103 (version > date)
 			{
-				d->DelayedDisconnect(10);
-			}
-			else
-			{
-				//if (0 != g_stClientVersion.compare(d->GetClientVersion()))
-				if (version > date)
-				{
-					ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("클라이언트 버전이 틀려 로그아웃 됩니다. 정상적으로 패치 후 접속하세요."));
-					d->DelayedDisconnect(10);
+				ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("클라이언트 버전이 틀려 로그아웃 됩니다. 정상적으로 패치 후 접속하세요."));
+				d->DelayedDisconnect(0); // @fixme103 (10);
 					LogManager::instance().HackLog("VERSION_CONFLICT", ch);
 
 					sys_log(0, "VERSION : WRONG VERSION USER : account:%s name:%s hostName:%s server_version:%s client_version:%s",
@@ -677,17 +703,9 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		{
 			sys_log(0, "VERSION : NO CHECK");
 		}
-	}
-	else
-	{
-		sys_log(0, "VERSION : NO LOGIN");
-	}
 
-	if (LC_IsEurope() == true)
-	{
-		if (ch->IsGM() == true)
-			ch->ChatPacket(CHAT_TYPE_COMMAND, "ConsoleEnable");
-	}
+	if (ch->IsGM() == true)
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "ConsoleEnable");
 
 	if (ch->GetMapIndex() >= 10000)
 	{
@@ -1102,6 +1120,11 @@ int CInputLogin::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			{
 				CHackShieldManager::instance().VerifyAck(d->GetCharacter(), c_pData);
 			}
+			break;
+
+		// @fixme120
+		case HEADER_CG_ITEM_USE:
+		case HEADER_CG_TARGET:
 			break;
 
 		default:

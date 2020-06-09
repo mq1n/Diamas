@@ -104,7 +104,7 @@ protected:
 	typedef std::vector<CSkyObjectQuad> TSkyObjectQuadVector;
 	typedef TSkyObjectQuadVector::iterator TSkyObjectQuadIterator;
 	
-	typedef struct
+	typedef struct SSkyObjectFace
 	{
 		void StartTransition();
 		bool Update();

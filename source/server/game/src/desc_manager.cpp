@@ -539,6 +539,11 @@ void DESC_MANAGER::SendClientPackageCryptKey( LPDESC desc )
 
 	if( packet.KeyStreamLen > 0 )
 	{
+		if (test_server)
+		{
+			
+			sys_log(0, "[PackageCryptInfo] send to %s. (keys: %s, len: %d)", desc->GetAccountTable().login, std::string((char*)packet.pDataKeyStream).c_str(), packet.KeyStreamLen);
+		}
 		desc->Packet( packet.GetStreamData(), packet.GetStreamSize() );
 	}
 }
@@ -555,6 +560,8 @@ void DESC_MANAGER::SendClientPackageSDBToLoadMap( LPDESC desc, const char* pMapN
 		packet.bHeader      = HEADER_GC_HYBRIDCRYPT_SDB;
 		if( !m_pPackageCrypt->GetRelatedMapSDBStreams( pMapName, &(packet.m_pDataSDBStream), packet.iStreamLen ) )
 			return; 
+		if (test_server)
+			sys_log(0, "[PackageCryptInfo] send to %s from map %s. (SDB len: %d)", desc->GetAccountTable().login, pMapName, packet.iStreamLen);
 	}
 
 	if( packet.iStreamLen > 0 )

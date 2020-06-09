@@ -21,6 +21,7 @@
 #include "sectree.h"
 #include "ani.h"
 #include "locale_service.h"
+#include "../../common/CommonDefines.h"
 
 int battle_hit(LPCHARACTER ch, LPCHARACTER victim, int & iRetDam);
 
@@ -59,9 +60,38 @@ bool timed_event_cancel(LPCHARACTER ch)
 	return false;
 }
 
+#ifdef NEW_ICEDAMAGE_SYSTEM
+bool battle_is_icedamage(LPCHARACTER pAttacker, LPCHARACTER pVictim)
+{
+	if (pAttacker && pAttacker->IsPC())
+	{
+		DWORD race = pAttacker->GetRaceNum();
+		const DWORD tmp_dwNDRFlag = pVictim->GetNoDamageRaceFlag();
+		if (tmp_dwNDRFlag &&
+			(race < MAIN_RACE_MAX_NUM) &&
+			(IS_SET(tmp_dwNDRFlag, 1<<race))
+		)
+		{
+			return false;
+		}
+		const std::set<DWORD> & tmp_setNDAFlag = pVictim->GetNoDamageAffectFlag();
+		if (tmp_setNDAFlag.size())
+		{
+			for (std::set<DWORD>::iterator it = tmp_setNDAFlag.begin(); it != tmp_setNDAFlag.end(); ++it)
+			{
+				if (!pAttacker->IsAffectFlag(*it))
+				{
+					return false;
+				}
+			}
+		}
+	}
+	return true;
+}
+#endif
+
 bool battle_is_attackable(LPCHARACTER ch, LPCHARACTER victim)
 {
-	// 상대방이 죽었으면 중단한다.
 	if (victim->IsDead())
 		return false;
 
@@ -77,9 +107,10 @@ bool battle_is_attackable(LPCHARACTER ch, LPCHARACTER victim)
 		if (sectree && sectree->IsAttr(victim->GetX(), victim->GetY(), ATTR_BANPK))
 			return false;
 	}
-	
-
-	// 내가 죽었으면 중단한다.
+#ifdef NEW_ICEDAMAGE_SYSTEM
+	if (!battle_is_icedamage(ch, victim))
+		return false;
+#endif
 	if (ch->IsStun() || ch->IsDead())
 		return false;
 
@@ -213,12 +244,6 @@ float CalcAttackRating(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, bool bIgnor
 	int iARSrc;
 	int iERSrc;
 
-	if (LC_IsYMIR()) // 천마
-	{
-		iARSrc = MIN(90, pkAttacker->GetPolymorphPoint(POINT_DX));
-		iERSrc = MIN(90, pkVictim->GetPolymorphPoint(POINT_DX));
-	}
-	else 
 	{
 		int attacker_dx = pkAttacker->GetPolymorphPoint(POINT_DX);
 		int attacker_lv = pkAttacker->GetLevel();
@@ -307,6 +332,11 @@ int CalcAttBonus(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, int iAtk)
 			case JOB_SHAMAN:
 				iAtk += (iAtk * pkAttacker->GetPoint(POINT_ATTBONUS_SHAMAN)) / 100;
 				break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			case JOB_WOLFMAN:
+				iAtk += (iAtk * pkAttacker->GetPoint(POINT_ATTBONUS_WOLFMAN)) / 100;
+				break;
+#endif
 		}
 	}
 
@@ -329,6 +359,11 @@ int CalcAttBonus(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, int iAtk)
 			case JOB_SHAMAN:
 				iAtk -= (iAtk * pkVictim->GetPoint(POINT_RESIST_SHAMAN)) / 100;
 				break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			case JOB_WOLFMAN:
+				iAtk -= (iAtk * pkVictim->GetPoint(POINT_RESIST_WOLFMAN)) / 100;
+				break;
+#endif
 		}
 	}
 
@@ -395,6 +430,9 @@ int CalcMeleeDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, bool bIgnoreDe
 			case WEAPON_BELL:
 			case WEAPON_FAN:
 			case WEAPON_MOUNT_SPEAR:
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			case WEAPON_CLAW:
+#endif
 				break;
 
 			case WEAPON_BOW:
@@ -624,7 +662,13 @@ void NormalAttackAffect(LPCHARACTER pkAttacker, LPCHARACTER pkVictim)
 		if (number(1, 100) <= pkAttacker->GetPoint(POINT_POISON_PCT))
 			pkVictim->AttackedByPoison(pkAttacker);
 	}
-
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	if (pkAttacker->GetPoint(POINT_BLEEDING_PCT) && !pkVictim->IsAffectFlag(AFF_BLEEDING))
+	{
+		if (number(1, 100) <= pkAttacker->GetPoint(POINT_BLEEDING_PCT))
+			pkVictim->AttackedByBleeding(pkAttacker);
+	}
+#endif
 	int iStunDuration = 2;
 	if (pkAttacker->IsPC() && !pkVictim->IsPC())
 		iStunDuration = 4;
@@ -676,6 +720,14 @@ int battle_hit(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, int & iRetDam)
 			case WEAPON_BOW:
 				iDam = iDam * (100 - pkVictim->GetPoint(POINT_RESIST_BOW)) / 100;
 				break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			case WEAPON_CLAW:
+				iDam = iDam * (100 - pkVictim->GetPoint(POINT_RESIST_CLAW)) / 100;
+#if defined(ENABLE_WOLFMAN_CHARACTER) && defined(USE_ITEM_CLAW_AS_DAGGER)
+				iDam = iDam * (100 - pkVictim->GetPoint(POINT_RESIST_DAGGER)) / 100;
+#endif
+				break;
+#endif
 		}
 
 
@@ -714,6 +766,10 @@ DWORD GET_ATTACK_SPEED(LPCHARACTER ch)
 	// 단검의 경우 공속 2배
 	if (item && item->GetSubType() == WEAPON_DAGGER)
 		real_speed /= 2;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	else if (item && item->GetSubType() == WEAPON_CLAW)
+		real_speed /= 2;
+#endif
 
     return real_speed;
 
@@ -745,6 +801,8 @@ void SET_ATTACKED_TIME(LPCHARACTER ch, LPCHARACTER victim, DWORD current_time)
 
 bool IS_SPEED_HACK(LPCHARACTER ch, LPCHARACTER victim, DWORD current_time)
 {
+	if(!gHackCheckEnable) return false;
+
 	if (ch->m_kAttackLog.dwVID == victim->GetVID())
 	{
 		if (current_time - ch->m_kAttackLog.dwTime < GET_ATTACK_SPEED(ch))

@@ -178,7 +178,7 @@ void CInstanceBase::ProcessDamage()
 	{
 		if(index > 7)
 		{
-			TraceError("ProcessDamage무한루프 가능성");
+			TraceError("ProcessDamage Possibility of endless loop");
 			break;
 		}
 		num = damage%10;
@@ -813,6 +813,10 @@ void CInstanceBase::__Assassin_SetEunhyeongAffect(bool isVisible)
 	}
 	else
 	{
+#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
+		if (IsAffect(AFFECT_INVISIBILITY) && __MainCanSeeHiddenThing())
+			return;
+#endif
 		m_GraphicThingInstance.BlendAlphaValue(1.0f, 1.0f);	
 		m_GraphicThingInstance.ShowAllAttachingEffect();
 	}
@@ -855,8 +859,13 @@ void CInstanceBase::__SetAffect(UINT eAffect, bool isVisible)
 	switch (eAffect)
 	{
 		case AFFECT_YMIR:
+#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
+			if (IsAffect(AFFECT_INVISIBILITY) && !__MainCanSeeHiddenThing())
+				return;
+#else
 			if (IsAffect(AFFECT_INVISIBILITY))
 				return;
+#endif
 			break;
 /*
 		case AFFECT_GWIGEOM: // 전기 속성 공격으로 바뀔 예정
@@ -908,6 +917,16 @@ void CInstanceBase::__SetAffect(UINT eAffect, bool isVisible)
 					return;
 			break;
 		case AFFECT_INVISIBILITY:
+#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
+			if (__MainCanSeeHiddenThing())
+			{
+				if (isVisible)
+					m_GraphicThingInstance.BlendAlphaValue(0.5f, 1.0f);
+				else
+					m_GraphicThingInstance.BlendAlphaValue(1.0f, 1.0f);
+				break;
+			}
+#endif
 			// 2004.07.17.levites.isShow를 ViewFrustumCheck로 변경
 			if (isVisible)
 			{
@@ -1027,8 +1046,13 @@ void CInstanceBase::__DetachEffect(DWORD dwEID)
 DWORD CInstanceBase::__AttachEffect(UINT eEftType)
 {
 	// 2004.07.17.levites.isShow를 ViewFrustumCheck로 변경
+#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
+	if (IsAffect(AFFECT_INVISIBILITY) && !__MainCanSeeHiddenThing())
+		return 0;
+#else
 	if (IsAffect(AFFECT_INVISIBILITY))
 		return 0;
+#endif
 
 	if (eEftType>=EFFECT_NUM)
 		return 0;

@@ -196,7 +196,13 @@ void CPythonShop::Clear()
 	m_bTabCount = 1;
 
 	for (int i = 0; i < SHOP_TAB_COUNT_MAX; i++)
+	{
+		// @fixme016 BEGIN
+		m_aShoptabs[i].coinType = SHOP_COIN_TYPE_GOLD;
+		m_aShoptabs[i].name = "";
+		// @fixme016 END
 		memset (m_aShoptabs[i].items, 0, sizeof(TShopItemData) * SHOP_HOST_ITEM_MAX_NUM);
+	}
 }
 
 CPythonShop::CPythonShop(void)

@@ -57,7 +57,7 @@ bool CMapBase::LoadProperty()
 	
 	if (!LoadMultipleTextData(strFileName.c_str(), stTokenVectorMap))
 	{
-		TraceError("CMapBase::LoadProperty(FileName=%s) - LoadMultipleTextData ERROR 파일이 없을 가능성이 많습니다.", strFileName.c_str());
+		TraceError("CMapBase::LoadProperty(FileName=%s) - LoadMultipleTextData ERROR File not found.", strFileName.c_str());
 		return false;
 	}
 

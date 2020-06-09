@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../eterXClient/Locale_inc.h"
+
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 #include "../eterBase/cipher.h"
 #endif
@@ -106,8 +108,10 @@ class CNetworkStream
 
 		CNetworkAddress m_addr;
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 		// Sequence
 		DWORD					m_iSequence;
 		bool					m_bUseSequence;
 		std::vector<BYTE>		m_kVec_bSequenceTable;
+#endif
 };

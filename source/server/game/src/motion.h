@@ -2,6 +2,7 @@
 #define __INC_GAME_MOTION_H__
 
 #include "../../common/d3dtype.h"
+#include "../../common/CommonDefines.h"
 
 enum EMotionMode
 {
@@ -13,6 +14,9 @@ enum EMotionMode
 	MOTION_MODE_BELL,
 	MOTION_MODE_FAN,
 	MOTION_MODE_HORSE,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	MOTION_MODE_CLAW,
+#endif
 	MOTION_MODE_MAX_NUM
 };
 

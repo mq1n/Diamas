@@ -2,6 +2,7 @@
 #define __INC_METIN_II_GAME_CSkillManager_H__
 
 #include "../../libthecore/include/poly.h"
+#include "../../common/CommonDefines.h"
 
 enum ESkillFlags
 {
@@ -32,6 +33,10 @@ enum ESkillFlags
 	SKILL_FLAG_WIND		= (1 << 24),	// 官恩 加己 
 	SKILL_FLAG_ELEC		= (1 << 25),	// 傈扁 加己
 	SKILL_FLAG_FIRE		= (1 << 26),	// 阂 加己
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	SKILL_FLAG_BLEEDING	= (1 << 27),
+	SKILL_FLAG_PARTY	= (1 << 28),
+#endif
 };
 
 enum
@@ -169,7 +174,14 @@ enum ESkillIndexes
 	GUILD_SKILL_END = 162,
 
 	GUILD_SKILL_COUNT = GUILD_SKILL_END - GUILD_SKILL_START + 1,
-
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	SKILL_CHAYEOL		= 170,			
+	SKILL_SALPOONG		= 171,			
+	SKILL_GONGDAB		= 172,			
+	SKILL_PASWAE		= 173,			
+	SKILL_JEOKRANG		= 174,			
+	SKILL_CHEONGRANG	= 175,			
+#endif
 };
 
 class CSkillProto

@@ -21,6 +21,28 @@ char * CPythonExchange::GetNameFromTarget()
 	return m_victim.name;
 }
 
+#ifdef ENABLE_LEVEL_IN_TRADE
+void CPythonExchange::SetSelfLevel(DWORD level)
+{
+	m_self.level = level;
+}
+
+void CPythonExchange::SetTargetLevel(DWORD level)
+{
+	m_victim.level = level;
+}
+
+DWORD CPythonExchange::GetLevelFromSelf()
+{
+	return m_self.level;
+}
+
+DWORD CPythonExchange::GetLevelFromTarget()
+{
+	return m_victim.level;
+}
+#endif
+
 void CPythonExchange::SetElkToTarget(DWORD	elk)
 {	
 	m_victim.elk = elk;

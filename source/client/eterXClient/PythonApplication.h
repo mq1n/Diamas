@@ -41,6 +41,9 @@
 #include "ServerStateChecker.h"
 #include "AbstractApplication.h"
 #include "MovieMan.h"
+#ifdef ENABLE_ACCE_SYSTEM
+#include "PythonAcce.h"
+#endif
 
 class CPythonApplication : public CMSApplication, public CInputKeyboard, public IAbstractApplication
 {
@@ -289,6 +292,9 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		void OnMouseLeftButtonDoubleClick(int x, int y);
 		void OnMouseRightButtonDown(int x, int y);
 		void OnMouseRightButtonUp(int x, int y);
+#ifdef ENABLE_MOUSEWHEEL_EVENT
+		bool OnMouseWheelScroll(long x, long y , short wDelta);
+#endif
 		void OnSizeChange(int width, int height);
 		void OnKeyDown(int iIndex);
 		void OnKeyUp(int iIndex);
@@ -338,6 +344,9 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		CPythonResource				m_pyRes;
 		CPythonQuest				m_pyQuest;
 		CPythonMessenger			m_pyManager;
+#ifdef ENABLE_ACCE_SYSTEM
+		CPythonAcce	m_pyAcce;
+#endif
 		CPythonSafeBox				m_pySafeBox;
 		CPythonGuild				m_pyGuild;
 

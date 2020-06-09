@@ -183,6 +183,10 @@ class CMainPacketHeaderMap : public CNetworkPacketHeaderMap
 			Set(HEADER_GC_SPECIFIC_EFFECT,	CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCSpecificEffect), STATIC_SIZE_PACKET));
 			Set(HEADER_GC_DRAGON_SOUL_REFINE,		CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCDragonSoulRefine), STATIC_SIZE_PACKET));
 			
+#ifdef ENABLE_ACCE_SYSTEM
+			Set(HEADER_GC_ACCE, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketAcce), STATIC_SIZE_PACKET));
+#endif
+			Set(HEADER_GC_UNK_213,			CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCUnk213), STATIC_SIZE_PACKET)); // @fixme007
 		}
 };
 
@@ -412,6 +416,12 @@ UINT CPythonNetworkStream::GetAccountCharacterSlotDatau(UINT iSlot, UINT eType)
 		case ACCOUNT_CHARACTER_SLOT_HAIR:
 			return rkSimplePlayerInfo.wHairPart;
 			break;
+
+#ifdef ENABLE_ACCE_SYSTEM
+		case ACCOUNT_CHARACTER_SLOT_ACCE:
+			return rkSimplePlayerInfo.wAccePart;
+			break;
+#endif
 	}
 	return 0;
 }
@@ -660,7 +670,7 @@ bool CPythonNetworkStream::RecvDefaultPacket(int header)
 	if (!header)
 		return true;
 
-	TraceError("처리되지 않은 패킷 헤더 %d, state %s\n", header, m_strPhase.c_str());
+	TraceError("Unprocessed packet header %d, state %s\n", header, m_strPhase.c_str());
 	ClearRecvBuffer();
 	return true;
 }

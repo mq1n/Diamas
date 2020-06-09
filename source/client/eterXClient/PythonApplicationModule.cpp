@@ -2,6 +2,7 @@
 #include "Resource.h"
 #include "PythonApplication.h"
 #include "../eterLib/Camera.h"
+#include "Locale.h"
 #include <FileSystemIncl.hpp>
 
 extern bool PERF_CHECKER_RENDER_GAME;
@@ -1514,6 +1515,160 @@ void initapp()
 	PyModule_AddIntConstant(poModule, "ENABLE_NEW_EQUIPMENT_SYSTEM",	0);
 #endif
 
+#ifdef ENABLE_SOULBIND_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_SOULBIND_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_SOULBIND_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_PLAYER_PER_ACCOUNT5
+	PyModule_AddIntConstant(poModule, "ENABLE_PLAYER_PER_ACCOUNT5",	1);
+	PyModule_AddIntConstant(poModule, "PLAYER_PER_ACCOUNT",	PLAYER_PER_ACCOUNT5);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_PLAYER_PER_ACCOUNT5",	0);
+	PyModule_AddIntConstant(poModule, "PLAYER_PER_ACCOUNT",	PLAYER_PER_ACCOUNT4);
+#endif
+
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	PyModule_AddIntConstant(poModule, "ENABLE_WOLFMAN_CHARACTER",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_WOLFMAN_CHARACTER",	0);
+#endif
+
+#ifdef ENABLE_QUIVER_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_QUIVER_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_QUIVER_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_LEVEL_IN_TRADE
+	PyModule_AddIntConstant(poModule, "ENABLE_LEVEL_IN_TRADE",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_LEVEL_IN_TRADE",	0);
+#endif
+
+#ifdef ENABLE_678TH_SKILL
+	PyModule_AddIntConstant(poModule, "ENABLE_678TH_SKILL",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_678TH_SKILL",	0);
+#endif
+
+#ifdef LOGIN_COUNT_DOWN_UI_MODIFY
+	PyModule_AddIntConstant(poModule, "LOGIN_COUNT_DOWN_UI_MODIFY",	1);
+#else
+	PyModule_AddIntConstant(poModule, "LOGIN_COUNT_DOWN_UI_MODIFY",	0);
+#endif
+
+#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_MOUNT_COSTUME_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_MOUNT_COSTUME_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_ACCE_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_ACCE_SYSTEM",	1);
+	PyModule_AddIntConstant(poModule, "ENABLE_ACCE_COSTUME_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_ACCE_SYSTEM",	0);
+	PyModule_AddIntConstant(poModule, "ENABLE_ACCE_COSTUME_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_ENVIRONMENT_EFFECT_OPTION
+	PyModule_AddIntConstant(poModule, "ENABLE_ENVIRONMENT_EFFECT_OPTION",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_ENVIRONMENT_EFFECT_OPTION",	0);
+#endif
+
+#ifdef WJ_SHOW_MOB_INFO
+	PyModule_AddIntConstant(poModule, "WJ_SHOW_MOB_INFO",	1);
+#else
+	PyModule_AddIntConstant(poModule, "WJ_SHOW_MOB_INFO",	0);
+#endif
+
+#ifdef NEW_SELECT_CHARACTER
+	PyModule_AddIntConstant(poModule, "NEW_SELECT_CHARACTER",	1);
+#else
+	PyModule_AddIntConstant(poModule, "NEW_SELECT_CHARACTER",	0);
+#endif
+
+#ifdef ENABLE_GROWTH_PET_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_GROWTH_PET_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_GROWTH_PET_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_AUTO_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_AUTO_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_AUTO_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_MONSTER_CARD
+	PyModule_AddIntConstant(poModule, "ENABLE_MONSTER_CARD",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_MONSTER_CARD",	0);
+#endif
+
+#ifdef ENABLE_HELP_RENEWAL
+	PyModule_AddIntConstant(poModule, "ENABLE_HELP_RENEWAL",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_HELP_RENEWAL",	0);
+#endif
+
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_MAGIC_REDUCTION_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_MAGIC_REDUCTION_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_DICE_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_DICE_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_DICE_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_CHEQUE_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_CHEQUE_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_CHEQUE_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_EXTEND_INVEN_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_EXTEND_INVEN_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_EXTEND_INVEN_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_WEAPON_COSTUME_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_WEAPON_COSTUME_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_LVL115_ARMOR_EFFECT
+	PyModule_AddIntConstant(poModule, "ENABLE_LVL115_ARMOR_EFFECT",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_LVL115_ARMOR_EFFECT",	0);
+#endif
+
+#ifdef ENABLE_USE_COSTUME_ATTR
+	PyModule_AddIntConstant(poModule, "ENABLE_USE_COSTUME_ATTR",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_USE_COSTUME_ATTR",	0);
+#endif
+
+#ifdef ENABLE_SLOT_WINDOW_EX
+	PyModule_AddIntConstant(poModule, "ENABLE_SLOT_WINDOW_EX",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_SLOT_WINDOW_EX",	0);
+#endif
+
+#ifdef ENABLE_USE_COSTUME_ATTR
+	PyModule_AddIntConstant(poModule, "ENABLE_USE_COSTUME_ATTR",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_USE_COSTUME_ATTR",	0);
+#endif
+
 #ifdef USE_OPENID
 	PyModule_AddIntConstant(poModule, "USE_OPENID",	1);
 	if (openid_test)
@@ -1524,4 +1679,18 @@ void initapp()
 	PyModule_AddIntConstant(poModule, "USE_OPENID",	0);
 	PyModule_AddIntConstant(poModule, "OPENID_TEST",	0);
 #endif /* USE_OPENID */
+
+#ifdef ENABLE_HIGHLIGHT_NEW_ITEM
+	PyModule_AddIntConstant(poModule, "ENABLE_HIGHLIGHT_NEW_ITEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_HIGHLIGHT_NEW_ITEM",	0);
+#endif
+
+
+
+#ifdef ENABLE_MOUSEWHEEL_EVENT
+	PyModule_AddIntConstant(poModule, "ENABLE_MOUSEWHEEL_EVENT",   1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_MOUSEWHEEL_EVENT",   0);
+#endif
 }

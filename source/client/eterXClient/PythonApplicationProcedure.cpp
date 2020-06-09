@@ -179,13 +179,26 @@ LRESULT CPythonApplication::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam
 			}
 			return 0;
 
-		case 0x20a:
+
+
+		case WM_MOUSEWHEEL:
 			if (WebBrowser_IsVisible())
 			{
 				// 웹브라우저 상태일때는 휠 작동 안되도록 처리
 			}
 			else
 			{
+#ifdef ENABLE_MOUSEWHEEL_EVENT
+				
+				long  xPos		= GET_X_LPARAM(lParam);
+				long  yPos		= GET_Y_LPARAM(lParam);
+				short zDelta	= GET_WHEEL_DELTA_WPARAM(wParam);
+
+				if(OnMouseWheelScroll(xPos, yPos, zDelta))
+					break;
+				
+#endif
+
 				OnMouseWheel(short(HIWORD(wParam)));
 			}
 			break;

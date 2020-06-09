@@ -25,7 +25,12 @@ bool LogManager::Connect(const char * host, const int port, const char * user, c
 
 	return m_bIsConnect;
 }
-
+#ifdef ENABLE_ACCE_SYSTEM
+void LogManager::AcceLog(DWORD dwPID, DWORD x, DWORD y, DWORD item_vnum, DWORD item_uid, int item_count, int abs_chance, bool success)
+{
+	Query("INSERT DELAYED INTO acce%s (pid, time, x, y, item_vnum, item_uid, item_count, item_abs_chance, success) VALUES(%u, NOW(), %u, %u, %u, %u, %d, %d, %d)", get_table_postfix(), dwPID, x, y, item_vnum, item_uid, item_count, abs_chance, success ? 1 : 0);
+}
+#endif
 void LogManager::Query(const char * c_pszFormat, ...)
 {
 	char szQuery[4096];
@@ -44,6 +49,11 @@ void LogManager::Query(const char * c_pszFormat, ...)
 bool LogManager::IsConnected()
 {
 	return m_bIsConnect;
+}
+
+size_t LogManager::EscapeString(char* dst, size_t dstSize, const char* src, size_t srcSize)
+{
+	return m_sql.EscapeString(dst, dstSize, src, srcSize);
 }
 
 void LogManager::ItemLog(DWORD dwPID, DWORD x, DWORD y, DWORD dwItemID, const char * c_pszText, const char * c_pszHint, const char * c_pszIP, DWORD dwVnum)
@@ -226,23 +236,15 @@ void LogManager::ShoutLog(BYTE bChannel, BYTE bEmpire, const char * pszText)
 
 void LogManager::LevelLog(LPCHARACTER pChar, unsigned int level, unsigned int playhour)
 {
-	if (true == LC_IsEurope())
-	{
-		DWORD aid = 0;
+	DWORD aid = 0;
 
-		if (NULL != pChar->GetDesc())
-		{
-			aid = pChar->GetDesc()->GetAccountTable().id;
-		}
-
-		Query("REPLACE INTO levellog%s (name, level, time, account_id, pid, playtime) VALUES('%s', %u, NOW(), %u, %u, %d)",
-				get_table_postfix(), pChar->GetName(), level, aid, pChar->GetPlayerID(), playhour);
-	}
-	else
+	if (NULL != pChar->GetDesc())
 	{
-		Query("REPLACE INTO levellog%s (name, level, time, playtime) VALUES('%s', %u, NOW(), %d)",
-				get_table_postfix(), pChar->GetName(), level, playhour);
+		aid = pChar->GetDesc()->GetAccountTable().id;
 	}
+
+	Query("REPLACE INTO levellog%s (name, level, time, account_id, pid, playtime) VALUES('%s', %u, NOW(), %u, %u, %d)",
+			get_table_postfix(), pChar->GetName(), level, aid, pChar->GetPlayerID(), playhour);
 }
 
 void LogManager::BootLog(const char * c_pszHostName, BYTE bChannel)
@@ -344,3 +346,10 @@ void LogManager::HackShieldLog(unsigned long ErrorCode, LPCHARACTER ch)
 	}
 }
 
+void LogManager::ChatLog(DWORD where, DWORD who_id, const char* who_name, DWORD whom_id, const char* whom_name, const char* type, const char* msg, const char* ip)
+{
+	Query("INSERT DELAYED INTO `chat_log%s` (`where`, `who_id`, `who_name`, `whom_id`, `whom_name`, `type`, `msg`, `when`, `ip`) "
+		"VALUES (%u, %u, '%s', %u, '%s', '%s', '%s', NOW(), '%s');",
+		get_table_postfix(),
+		where, who_id, who_name, whom_id, whom_name, type, msg, ip);
+}

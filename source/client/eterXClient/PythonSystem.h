@@ -75,6 +75,12 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 			bool			bAlwaysShowName;
 			bool			bShowDamage;
 			bool			bShowSalesText;
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
+			bool			bShowMobAIFlag;
+#endif
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
+			bool			bShowMobLevel;
+#endif
 		} TConfig;
 
 	public:
@@ -119,6 +125,14 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 		void							SetAlwaysShowNameFlag(int iFlag);
 		void							SetShowDamageFlag(int iFlag);
 		void							SetShowSalesTextFlag(int iFlag);
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
+		bool							IsShowMobAIFlag();
+		void							SetShowMobAIFlagFlag(int iFlag);
+#endif
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
+		bool							IsShowMobLevel();
+		void							SetShowMobLevelFlag(int iFlag);
+#endif
 
 		// Window
 		void							SaveWindowStatus(int iIndex, int iVisible, int iMinimized, int ix, int iy, int iHeight);

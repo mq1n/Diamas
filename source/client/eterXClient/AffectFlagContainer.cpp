@@ -65,7 +65,7 @@ void CAffectFlagContainer::Set(UINT uPos, bool isSet)
 		return;
 	}
 
-	BYTE& rElement=m_aElement[uPos/8];
+	BYTE& rElement=(BYTE)m_aElement[uPos/8];
 
 	BYTE bMask=BYTE(1<<(uPos&7));
 	if (isSet)

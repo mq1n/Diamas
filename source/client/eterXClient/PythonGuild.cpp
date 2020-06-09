@@ -515,7 +515,7 @@ PyObject * guildGetDragonPowerPoint(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * guildGetGuildSkillLevel(PyObject * poSelf, PyObject * poArgs)
 {
-	assert(FALSE && !"guildGetGuildSkillLevel - 사용하지 않는 함수입니다.");
+	assert(FALSE && !"guildGetGuildSkillLevel - The function is not used.");
 
 	int iSkillIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSkillIndex))

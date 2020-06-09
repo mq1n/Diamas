@@ -230,6 +230,34 @@ void CPVPManager::Insert(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	// END_OF_NOTIFY_PVP_MESSAGE
 }
 
+#ifdef ENABLE_NEWSTUFF
+bool CPVPManager::IsFighting(LPCHARACTER pkChr)
+{
+	if (!pkChr)
+		return false;
+
+	return IsFighting(pkChr->GetPlayerID());
+}
+
+bool CPVPManager::IsFighting(DWORD dwPID)
+{
+	CPVPSetMap::iterator it = m_map_pkPVPSetByID.find(dwPID);
+
+	if (it == m_map_pkPVPSetByID.end())
+		return false;
+
+	auto it2 = it->second.begin();
+	while (it2 != it->second.end())
+	{
+		CPVP * pkPVP = *it2++;
+		if (pkPVP->IsFight())
+			return true;
+	}
+
+	return false;
+}
+#endif
+
 void CPVPManager::ConnectEx(LPCHARACTER pkChr, bool bDisconnect)
 {
 	CPVPSetMap::iterator it = m_map_pkPVPSetByID.find(pkChr->GetPlayerID());
@@ -367,51 +395,19 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	}
 	else
 	{
-		switch( pkChr->GetMountVnum() )
+		eMountType eIsMount = GetMountLevelByVnum(pkChr->GetMountVnum(), false);
+		switch (eIsMount)
 		{
-			case 0:
-			case 20030:
-			case 20110:
-			case 20111:
-			case 20112:
-			case 20113:
-			case 20114:
-			case 20115:
-			case 20116:
-			case 20117:
-			case 20118:
-				//½Å±Ô Å»°Í °í±Þ
-			case 20205:
-			case 20206:
-			case 20207:
-			case 20208:
-			case 20209:
-			case 20210:
-			case 20211:
-			case 20212:
-			case 20119:		// ¶ó¸¶´Ü Èæ¸¶
-			case 20219:		// ¶ó¸¶´Ü Èæ¸¶ Å¬·Ð (ÇÒ·ÎÀ©¿ë)
-			case 20220:		// Å©¸®½º¸¶½º Å»°Í
-			case 20221:		// Àü°© ¹é¿õ
-			case 20222:		// Àü°© ÆÒ´õ
-			case 20120:
-			case 20121:
-			case 20122:
-			case 20123:
-			case 20124:
-			case 20125:
-			case 20214:		// ³­ÆøÇÑ Àü°©¼ø¼ø·Ï	
-			case 20215:		// ¿ë¸ÍÇÑ Àü°©¼ø¼ø·Ï	
-			case 20217:		// ³­ÆøÇÑ Àü°©¾Ï¼ø·Ï	
-			case 20218:		// ¿ë¸ÍÇÑ Àü°©¾Ï¼ø·Ï
-			case 20224:		// ³­ÆøÇÑ Àü°©¼®·æÀÚ
-			case 20225:		// ¿ë¸ÍÇÑ Àü°©¼®·æÀÚ
-			case 20226:		//	À¯´ÏÄÜ
-			case 20227:
+			case MOUNT_TYPE_NONE:
+			case MOUNT_TYPE_COMBAT:
+			case MOUNT_TYPE_MILITARY:
 				break;
-
+			case MOUNT_TYPE_NORMAL:
 			default:
+				if (test_server)
+					sys_log(0, "CanUseSkill: Mount can't attack. vnum(%u) type(%d)", pkChr->GetMountVnum(), static_cast<int>(eIsMount));
 				return false;
+				break;
 		}
 	}
 
@@ -426,8 +422,8 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	{
 		BYTE bMapEmpire = SECTREE_MANAGER::instance().GetEmpireFromMapIndex(pkChr->GetMapIndex());
 
-		if ( pkChr->GetPKMode() == PK_MODE_PROTECT && pkChr->GetEmpire() == bMapEmpire ||
-				pkVictim->GetPKMode() == PK_MODE_PROTECT && pkVictim->GetEmpire() == bMapEmpire )
+		if ( ((pkChr->GetPKMode() == PK_MODE_PROTECT) && (pkChr->GetEmpire() == bMapEmpire)) ||
+				((pkVictim->GetPKMode() == PK_MODE_PROTECT) && (pkVictim->GetEmpire() == bMapEmpire)) )
 		{
 			return false;
 		}
@@ -435,7 +431,7 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 
 	if (pkChr->GetEmpire() != pkVictim->GetEmpire())
 	{
-		if ( LC_IsYMIR() == true || LC_IsKorea() == true )
+		// @warme005
 		{
 			if ( pkChr->GetPKMode() == PK_MODE_PROTECT || pkVictim->GetPKMode() == PK_MODE_PROTECT )
 			{
@@ -464,7 +460,7 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 		{
 		    if (g_protectNormalPlayer)
 		    {
-			// ¹ü¹ýÀÚ´Â ÆòÈ­¸ðµåÀÎ ÂøÇÑ»ç¶÷À» °ø°ÝÇÒ ¼ö ¾ø´Ù.
+			
 			if (PK_MODE_PEACE == pkVictim->GetPKMode())
 			    return false;
 		    }
@@ -481,51 +477,19 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 
 				if (pkChr->GetPKMode() == PK_MODE_REVENGE)
 				{
-					//if (!g_iUseLocale)
-					if (1)
+					if (pkChr->GetAlignment() < 0 && pkVictim->GetAlignment() >= 0)
 					{
-						if (pkChr->GetAlignment() < 0 && pkVictim->GetAlignment() >= 0)
-						{
-							pkChr->SetKillerMode(true);
-							return true;
-						}
-						else if (pkChr->GetAlignment() >= 0 && pkVictim->GetAlignment() < 0)
-							return true;
+						pkChr->SetKillerMode(true);
+						return true;
 					}
-					else
-					{
-						if (pkChr->GetAlignment() < 0 && pkVictim->GetAlignment() < 0)
-							break;
-						else if (pkChr->GetAlignment() >= 0 && pkVictim->GetAlignment() >= 0)
-							break;
-
-						beKillerMode = true;
-					}
+					else if (pkChr->GetAlignment() >= 0 && pkVictim->GetAlignment() < 0)
+						return true;
 				}
 				break;
 
 			case PK_MODE_GUILD:
 				// Same implementation from PK_MODE_FREE except for attacking same guild
 				if (!pkChr->GetGuild() || (pkVictim->GetGuild() != pkChr->GetGuild()))
-				{
-					if (1)
-					//if (!g_iUseLocale)
-					{
-						if (pkVictim->GetAlignment() >= 0)
-							pkChr->SetKillerMode(true);
-						else if (pkChr->GetAlignment() < 0 && pkVictim->GetAlignment() < 0)
-							pkChr->SetKillerMode(true);
-
-						return true;
-					}
-					else
-						beKillerMode = true;
-				}
-				break;
-
-			case PK_MODE_FREE:
-				//if (!g_iUseLocale)
-				if (1)
 				{
 					if (pkVictim->GetAlignment() >= 0)
 						pkChr->SetKillerMode(true);
@@ -534,8 +498,14 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 
 					return true;
 				}
-				else
-					beKillerMode = true;
+				break;
+
+			case PK_MODE_FREE:
+				if (pkVictim->GetAlignment() >= 0)
+					pkChr->SetKillerMode(true);
+				else if (pkChr->GetAlignment() < 0 && pkVictim->GetAlignment() < 0)
+					pkChr->SetKillerMode(true);
+				return true;
 				break;
 		}
 	}

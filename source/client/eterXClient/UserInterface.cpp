@@ -211,7 +211,7 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 	/////////////////////////////////////////////
 	initudp();
 	initapp();
-	initsystem();
+	initsystemSetting();
 	initchr();
 	initchrmgr();
 	initPlayer();
@@ -485,8 +485,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			FILE* fp = fopen(szVersionPath, "wt");
 			if (fp)
 			{
-				extern int METIN2_GET_VERSION();
-				fprintf(fp, "r%d\n", METIN2_GET_VERSION());
+				extern std::string METIN2_GET_VERSION();
+				fprintf(fp, "r%s\n", METIN2_GET_VERSION().c_str());
 				fclose(fp);
 			}
 			bQuit = true;

@@ -33,6 +33,11 @@ ACMD(do_state);
 ACMD(do_notice);
 ACMD(do_map_notice);
 ACMD(do_big_notice);
+#ifdef ENABLE_FULL_NOTICE
+ACMD(do_notice_test);
+ACMD(do_big_notice_test);
+ACMD(do_map_big_notice);
+#endif
 ACMD(do_who);
 ACMD(do_user);
 ACMD(do_disconnect);
@@ -276,6 +281,20 @@ ACMD (do_dragon_soul);
 ACMD (do_ds_list);
 ACMD (do_clear_affect);
 
+#ifdef ENABLE_NEWSTUFF
+ACMD(do_change_rare_attr);
+ACMD(do_add_rare_attr);
+
+ACMD(do_click_safebox);
+ACMD(do_force_logout);
+
+ACMD(do_poison);
+ACMD(do_rewarp);
+#endif
+#ifdef ENABLE_WOLFMAN_CHARACTER
+ACMD(do_bleeding);
+#endif
+
 struct command_info cmd_info[] =
 {
 	{ "!RESERVED!",	NULL,			0,			POS_DEAD,	GM_IMPLEMENTOR	}, /* 반드시 이 것이 처음이어야 한다. */
@@ -286,6 +305,11 @@ struct command_info cmd_info[] =
 	{ "notice",		do_notice,		0,			POS_DEAD,	GM_HIGH_WIZARD	},
 	{ "notice_map",	do_map_notice,	0,			POS_DEAD,	GM_LOW_WIZARD	},
 	{ "big_notice",	do_big_notice,	0,			POS_DEAD,	GM_HIGH_WIZARD	},
+#ifdef ENABLE_FULL_NOTICE
+	{ "big_notice_map",	do_map_big_notice,	0,	POS_DEAD,	GM_HIGH_WIZARD	},
+	{ "notice_test",	do_notice_test,		0,	POS_DEAD,	GM_HIGH_WIZARD	},
+	{ "big_notice_test",do_big_notice_test,	0,	POS_DEAD,	GM_HIGH_WIZARD	},
+#endif
 	{ "nowar",		do_nowar,		0,			POS_DEAD,	GM_PLAYER	},
 	{ "purge",		do_purge,		0,			POS_DEAD,	GM_WIZARD	},
 	{ "weaken",		do_weaken,		0,			POS_DEAD,	GM_GOD		},
@@ -397,8 +421,8 @@ struct command_info cmd_info[] =
 	{ "delqf",		do_delqf,		0,			POS_DEAD,	GM_LOW_WIZARD	},
 	{ "set_state",	do_set_state,		0,			POS_DEAD,	GM_LOW_WIZARD	},
 
-	{ "로그를보여줘",	do_detaillog,		0,			POS_DEAD,	GM_LOW_WIZARD	},
-	{ "몬스터보여줘",	do_monsterlog,		0,			POS_DEAD,	GM_LOW_WIZARD	},
+//	{ "로그를보여줘",	do_detaillog,		0,			POS_DEAD,	GM_LOW_WIZARD	},//@fixme105
+//	{ "몬스터보여줘",	do_monsterlog,		0,			POS_DEAD,	GM_LOW_WIZARD	},//@fixme105
 
 	{ "detaillog",	do_detaillog,		0,			POS_DEAD,	GM_LOW_WIZARD	},
 	{ "monsterlog",	do_monsterlog,		0,			POS_DEAD,	GM_LOW_WIZARD	},
@@ -538,7 +562,7 @@ struct command_info cmd_info[] =
 	{ "get_mob_count",		do_get_mob_count,		0,	POS_DEAD,	GM_LOW_WIZARD	},
 
 	{ "dice",				do_dice,				0,	POS_DEAD,	GM_PLAYER		},
-	{ "주사위",				do_dice,				0,	POS_DEAD,	GM_PLAYER		},
+//	{ "주사위",				do_dice,				0,	POS_DEAD,	GM_PLAYER		},//@fixme105
 	{ "special_item",			do_special_item,	0,	POS_DEAD,	GM_IMPLEMENTOR		},
 
 	{ "click_mall",			do_click_mall,			0,	POS_DEAD,	GM_PLAYER		},
@@ -587,7 +611,19 @@ struct command_info cmd_info[] =
 	{ "dragon_soul",				do_dragon_soul,				0,	POS_DEAD,	GM_PLAYER	},
 	{ "ds_list",				do_ds_list,				0,	POS_DEAD,	GM_PLAYER	},
 	{ "do_clear_affect", do_clear_affect, 	0, POS_DEAD,		GM_LOW_WIZARD},
-
+#ifdef ENABLE_NEWSTUFF
+	//item
+	{ "add_rare_attr",		do_add_rare_attr,			0,			POS_DEAD,	GM_IMPLEMENTOR	},
+	{ "change_rare_attr",	do_change_rare_attr,		0,			POS_DEAD,	GM_IMPLEMENTOR	},
+	//player
+	{ "click_safebox",		do_click_safebox,			0,			POS_DEAD,	GM_IMPLEMENTOR	},
+	{ "force_logout",		do_force_logout,			0,			POS_DEAD,	GM_IMPLEMENTOR	},
+	{ "poison",				do_poison,					0,			POS_DEAD,	GM_IMPLEMENTOR	},
+	{ "rewarp",				do_rewarp,					0,			POS_DEAD,	GM_LOW_WIZARD	},
+#endif
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	{ "bleeding",			do_bleeding,				0,			POS_DEAD,	GM_IMPLEMENTOR	},
+#endif
 	{ "\n",		NULL,			0,			POS_DEAD,	GM_IMPLEMENTOR	}  /* 반드시 이 것이 마지막이어야 한다. */
 };
 
@@ -640,6 +676,21 @@ void double_dollar(const char *src, size_t src_len, char *dest, size_t dest_len)
 
 void interpret_command(LPCHARACTER ch, const char * argument, size_t len)
 {
+#ifdef ENABLE_ANTI_CMD_FLOOD
+	if (ch && !ch->IsGM())
+	{
+		if (thecore_pulse() > ch->GetCmdAntiFloodPulse() + PASSES_PER_SEC(1))
+		{
+			ch->SetCmdAntiFloodCount(0);
+			ch->SetCmdAntiFloodPulse(thecore_pulse());
+		}
+		if (ch->IncreaseCmdAntiFloodCount()>=10)
+		{
+			ch->GetDesc()->DelayedDisconnect(0);
+			return;
+		}
+	}
+#endif
 	if (NULL == ch)
 	{
 		sys_err ("NULL CHRACTER");
@@ -666,7 +717,11 @@ void interpret_command(LPCHARACTER ch, const char * argument, size_t len)
 			if (!strcmp(cmd_info[icmd].command, cmd)) // do_cmd는 모든 명령어를 쳐야 할 수 있다.
 				break;
 		}
+#ifdef ENABLE_BLOCK_CMD_SHORTCUT
+		else if (!strcmp(cmd_info[icmd].command, cmd))
+#else
 		else if (!strncmp(cmd_info[icmd].command, cmd, cmdlen))
+#endif
 			break;
 	}
 
@@ -709,7 +764,7 @@ void interpret_command(LPCHARACTER ch, const char * argument, size_t len)
 		return;
 	}
 
-	if (cmd_info[icmd].gm_level && cmd_info[icmd].gm_level > ch->GetGMLevel())
+	if (cmd_info[icmd].gm_level && (cmd_info[icmd].gm_level > ch->GetGMLevel() || cmd_info[icmd].gm_level == GM_DISABLE))
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("그런 명령어는 없습니다"));
 		return;
@@ -724,13 +779,10 @@ void interpret_command(LPCHARACTER ch, const char * argument, size_t len)
 	{
 		if (cmd_info[icmd].gm_level >= GM_LOW_WIZARD)
 		{
-			if (LC_IsEurope() == true || /*LC_IsNewCIBN() == true || */LC_IsCanada() == true || LC_IsBrazil() == true)
-			{
-				char buf[1024];
-				snprintf( buf, sizeof(buf), "%s", argument );
+			char buf[1024];
+			snprintf( buf, sizeof(buf), "%s", argument );
 
-				LogManager::instance().GMCommandLog(ch->GetPlayerID(), ch->GetName(), ch->GetDesc()->GetHostName(), g_bChannel, buf);
-			}
+			LogManager::instance().GMCommandLog(ch->GetPlayerID(), ch->GetName(), ch->GetDesc()->GetHostName(), g_bChannel, buf);
 		}
 	}
 }

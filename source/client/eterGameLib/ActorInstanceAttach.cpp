@@ -6,6 +6,7 @@
 #include "ItemManager.h"
 #include "RaceData.h"
 #include "WeaponTrace.h"
+#include "GameLibDefines.h"
 
 BOOL USE_WEAPON_SPECULAR = TRUE;
 
@@ -107,6 +108,10 @@ bool CActorInstance::__IsLeftHandWeapon(DWORD type)
 		return true;
 	else if (CItemData::WEAPON_BOW == type)
 		return true;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	else if (CItemData::WEAPON_CLAW == type)
+		return true;
+#endif
 	else
 		return false;
 }
@@ -117,6 +122,10 @@ bool CActorInstance::__IsRightHandWeapon(DWORD type)
 		return true;
 	else if (CItemData::WEAPON_BOW == type)
 		return false;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	else if (CItemData::WEAPON_CLAW == type)
+		return true;
+#endif
 	else 
 		return true;
 }
@@ -171,16 +180,26 @@ BOOL CActorInstance::GetAttachingBoneName(DWORD dwPartIndex, const char ** c_psz
 	return m_pkCurRaceData->GetAttachingBoneName(dwPartIndex, c_pszBoneName);
 }
 
-
+#define AUTODETECT_LYCAN_RODNPICK_BONE
 void CActorInstance::AttachWeapon(DWORD dwParentPartIndex, DWORD dwPartIndex, CItemData * pItemData)
 {
 //	assert(m_pkCurRaceData);
 	if (!pItemData)
 		return;
 
+#if defined(ENABLE_WOLFMAN_CHARACTER) && defined(AUTODETECT_LYCAN_RODNPICK_BONE)
+	const char * szBoneName;
+	if ((GetRace()==8) && (pItemData->GetType()==CItemData::ITEM_TYPE_ROD || pItemData->GetType()==CItemData::ITEM_TYPE_PICK))
+	{
+		szBoneName = "equip_right";
+	}
+	else if (!GetAttachingBoneName(dwPartIndex, &szBoneName))
+		return;
+#else
 	const char * szBoneName;
 	if (!GetAttachingBoneName(dwPartIndex, &szBoneName))
 		return;
+#endif
 
 	// NOTE : (이도류처리)단도일 경우 형태가 다른 것으로 얻는다. 없을 경우 디폴트를 리턴
 	if (CRaceData::PART_WEAPON_LEFT == dwPartIndex)
@@ -604,3 +623,30 @@ void CActorInstance::__ClearAttachingEffect()
 	}
 	m_AttachingEffectList.clear();
 }
+
+#ifdef ENABLE_ACCE_SYSTEM
+void CActorInstance::AttachAcce(CItemData * pItemData, float fSpecular)
+{
+	if (!pItemData)
+	{
+		RegisterModelThing(CRaceData::PART_ACCE, NULL);
+		SetModelInstance(CRaceData::PART_ACCE, CRaceData::PART_ACCE, 0);
+		RefreshActorInstance();
+		return;
+	}
+
+	RegisterModelThing(CRaceData::PART_ACCE, pItemData->GetModelThing());
+	SetModelInstance(CRaceData::PART_ACCE, CRaceData::PART_ACCE, 0);
+	AttachModelInstance(CRaceData::PART_MAIN, "Bip01 Spine2", CRaceData::PART_ACCE);
+
+	if (fSpecular > 0.0f)
+	{
+		SMaterialData kMaterialData;
+		kMaterialData.pImage = NULL;
+		kMaterialData.isSpecularEnable = TRUE;
+		kMaterialData.fSpecularPower = fSpecular;
+		kMaterialData.bSphereMapIndex = 1;
+		SetMaterialData(CRaceData::PART_ACCE, NULL, kMaterialData);
+	}
+}
+#endif

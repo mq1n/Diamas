@@ -20,9 +20,6 @@
 #include "pcbang.h"
 #include "spam.h"
 
-extern bool g_bNoPasspod;
-extern std::string g_stBlockDate;
-extern int openid_server;
 
 //중국 passpod 전용 함수 
 bool CheckPasspod(const char * account)
@@ -546,7 +543,7 @@ void DBManager::LoginPrepare(BYTE bBillType, DWORD dwBillID, long lRemainSecs, L
 	}
 	else
 	{
-		if (LC_IsNewCIBN())
+#ifdef ENABLE_PASSPOD_FEATURE // @warme006
 		{
 			if (!g_bNoPasspod)
 			{
@@ -567,8 +564,9 @@ void DBManager::LoginPrepare(BYTE bBillType, DWORD dwBillID, long lRemainSecs, L
 				SendAuthLogin(d);
 			}
 		}
-		else
+#else
 			SendAuthLogin(d);
+#endif
 	}
 }
 
@@ -697,22 +695,23 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 				if (pMsg->Get()->uiNumRows == 0)
 				{
-					if (true == LC_IsBrazil())
+#ifdef ENABLE_BRAZIL_AUTH_FEATURE // @warme006
 					{
 						// 계정이 없으면 새로 만들어야 한다
 						ReturnQuery(QID_BRAZIL_CREATE_ID, qi->dwIdent, pinfo,
 								"INSERT INTO account(login, password, social_id, create_time) "
-								"VALUES('%s', password('%s'), '0000000', NOW()) ;",
+								"VALUES('%s', PASSWORD('%s'), '0000000', NOW()) ;",
 								pinfo->login, pinfo->passwd);
 
 						sys_log(0, "[AUTH_BRAZIL] : Create A new AccountID From OnGame");
 					}
-					else
+#else
 					{
 						sys_log(0, "   NOID");
 						LoginFailure(d, "NOID");
 						M2_DELETE(pinfo);
 					}
+#endif
 				}
 				else
 				{
@@ -720,11 +719,11 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 					int col = 0;
 
 					// PASSWORD('%s'), password, securitycode, social_id, id, status
-					char szEncrytPassword[45 + 1];
-					char szPassword[45 + 1];
-					char szMatrixCode[MATRIX_CODE_MAX_LEN + 1];
-					char szSocialID[SOCIAL_ID_MAX_LEN + 1];
-					char szStatus[ACCOUNT_STATUS_MAX_LEN + 1];
+					char szEncrytPassword[45 + 1] = {0, };
+					char szPassword[45 + 1] = {0, };
+					char szMatrixCode[MATRIX_CODE_MAX_LEN + 1] = {0, };
+					char szSocialID[SOCIAL_ID_MAX_LEN + 1] = {0, };
+					char szStatus[ACCOUNT_STATUS_MAX_LEN + 1] = {0, };
 					DWORD dwID = 0;
 
 					if (!row[col]) 
@@ -790,17 +789,6 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 					char szCreateDate[256] = "00000000";
 
-					if (!g_iUseLocale)
-					{
-						str_to_number(aiPremiumTimes[PREMIUM_EXP], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_ITEM], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_SAFEBOX], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_AUTOLOOT], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_FISH_MIND], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_MARRIAGE_FAST], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_GOLD], row[col++]);
-					}
-					else
 					{
 						str_to_number(aiPremiumTimes[PREMIUM_EXP], row[col++]);
 						str_to_number(aiPremiumTimes[PREMIUM_ITEM], row[col++]);
@@ -810,7 +798,6 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 						str_to_number(aiPremiumTimes[PREMIUM_MARRIAGE_FAST], row[col++]);
 						str_to_number(aiPremiumTimes[PREMIUM_GOLD], row[col++]);
 
-						if (LC_IsEurope() || test_server)
 						{
 							long retValue = 0;
 							str_to_number(retValue, row[col]);
@@ -827,7 +814,8 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 					int nPasswordDiff = strcmp(szEncrytPassword, szPassword);
 
-					if (true == LC_IsBrazil())
+					
+					if (openid_server)
 					{
 						nPasswordDiff = 0; // 브라질 버전에서는 비밀번호 체크를 하지 않는다.
 					}
@@ -858,7 +846,6 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 					}
 					else
 					{
-						if (LC_IsEurope())
 						{
 							//stBlockData >= 0 == 날짜가 BlockDate 보다 미래 
 							if (strncmp(szCreateDate, g_stBlockDate.c_str(), 8) >= 0)
@@ -893,238 +880,6 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 						}
 
 						sys_log(0, "QID_AUTH_LOGIN: SUCCESS %s", pinfo->login);
-					}
-				}
-			}
-			break;
-		case QID_AUTH_LOGIN_OPENID:
-			{
-				TPacketCGLogin3 * pinfo = (TPacketCGLogin3 *) qi->pvData;
-				LPDESC d = DESC_MANAGER::instance().FindByLoginKey(qi->dwIdent);
-
-				if (!d)
-				{
-					M2_DELETE(pinfo);
-					break;
-				}
-				//위치 변경 - By SeMinZ
-				d->SetLogin(pinfo->login);
-
-				sys_log(0, "QID_AUTH_LOGIN_OPENID: START %u %p", qi->dwIdent, get_pointer(d));
-
-				if (pMsg->Get()->uiNumRows == 0)
-				{
-					if (true == LC_IsBrazil())
-					{
-						// 계정이 없으면 새로 만들어야 한다
-						ReturnQuery(QID_BRAZIL_CREATE_ID, qi->dwIdent, pinfo,
-								"INSERT INTO account(login, password, social_id, create_time) "
-								"VALUES('%s', password('%s'), '0000000', NOW()) ;",
-								pinfo->login, pinfo->passwd);
-
-						sys_log(0, "[AUTH_BRAZIL] : Create A new AccountID From OnGame");
-					} else if (true == LC_IsJapan())
-					{
-						// 계정이 없으면 새로 만들어야 한다
-						ReturnQuery(QID_JAPAN_CREATE_ID, qi->dwIdent, pinfo,
-								"INSERT INTO account(login, password, social_id, create_time) "
-								"VALUES('%s', password('%s'), '0000000', NOW()) ;",
-								pinfo->login, "^Aasl@(!$)djl!231fj!&#");
-
-						sys_log(0, "[AUTH_JAPAN] : Create A new AccountID From OGE");
-					}
-					else
-					{
-						sys_log(0, "   NOID");
-						LoginFailure(d, "NOID");
-						M2_DELETE(pinfo);
-					}
-				}
-				else
-				{
-					MYSQL_ROW row = mysql_fetch_row(pMsg->Get()->pSQLResult);
-					int col = 0;
-
-					// PASSWORD('%s'), password, securitycode, social_id, id, status
-					char szEncrytPassword[45 + 1];
-					char szPassword[45 + 1];
-					char szMatrixCode[MATRIX_CODE_MAX_LEN + 1];
-					char szSocialID[SOCIAL_ID_MAX_LEN + 1];
-					char szStatus[ACCOUNT_STATUS_MAX_LEN + 1];
-					DWORD dwID = 0;
-
-					if (!row[col]) 
-					{ 
-						sys_err("error column %d", col);
-						M2_DELETE(pinfo);
-					   	break; 
-					}
-					
-					strlcpy(szEncrytPassword, row[col++], sizeof(szEncrytPassword));
-
-					if (!row[col]) 
-					{
-					   	sys_err("error column %d", col);
-						M2_DELETE(pinfo);
-					   	break;
-				   	}
-				
-					strlcpy(szPassword, row[col++], sizeof(szPassword));
-
-					if (!row[col]) 
-					{
-						*szMatrixCode = '\0'; 
-						col++;
-					}
-					else
-					{
-						strlcpy(szMatrixCode, row[col++], sizeof(szMatrixCode));
-					}
-
-					if (!row[col])
-				   	{ 
-						sys_err("error column %d", col); 
-						M2_DELETE(pinfo);
-						break;
-				   	}
-
-					strlcpy(szSocialID, row[col++], sizeof(szSocialID));
-
-					if (!row[col])
-				   	{
-					   	sys_err("error column %d", col);
-						M2_DELETE(pinfo);
-					   	break;
-				   	}
-				
-					str_to_number(dwID, row[col++]);
-					
-					if (!row[col]) 
-					{
-					   	sys_err("error column %d", col); 
-						M2_DELETE(pinfo);
-						break;
-				   	}
-
-					strlcpy(szStatus, row[col++], sizeof(szStatus));
-
-					BYTE bNotAvail = 0;
-					str_to_number(bNotAvail, row[col++]);
-
-					int aiPremiumTimes[PREMIUM_MAX_NUM];
-					memset(&aiPremiumTimes, 0, sizeof(aiPremiumTimes));
-
-					char szCreateDate[256] = "00000000";
-
-					if (!g_iUseLocale)
-					{
-						str_to_number(aiPremiumTimes[PREMIUM_EXP], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_ITEM], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_SAFEBOX], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_AUTOLOOT], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_FISH_MIND], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_MARRIAGE_FAST], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_GOLD], row[col++]);
-					}
-					else
-					{
-						str_to_number(aiPremiumTimes[PREMIUM_EXP], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_ITEM], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_SAFEBOX], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_AUTOLOOT], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_FISH_MIND], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_MARRIAGE_FAST], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_GOLD], row[col++]);
-
-						if (LC_IsEurope() || test_server)
-						{
-							long retValue = 0;
-							str_to_number(retValue, row[col]);
-
-							time_t create_time = retValue;
-							struct tm * tm1;
-							tm1 = localtime(&create_time);
-							strftime(szCreateDate, 255, "%Y%m%d", tm1);
-
-							sys_log(0, "Create_Time %d %s", retValue, szCreateDate);
-							sys_log(0, "Block Time %d ", strncmp(szCreateDate, g_stBlockDate.c_str(), 8));
-						}
-					}
-
-					int nPasswordDiff = strcmp(szEncrytPassword, szPassword);
-
-					if (true == LC_IsBrazil())
-					{
-						nPasswordDiff = 0; // 브라질 버전에서는 비밀번호 체크를 하지 않는다.
-					}
-
-					//OpenID : OpenID 의 경우, 비밀번호 체크를 하지 않는다.
-					if (openid_server)
-					{
-						nPasswordDiff = 0;
-					}
-
-					if (nPasswordDiff)
-					{
-						LoginFailure(d, "WRONGPWD");
-						sys_log(0, "   WRONGPWD");
-						M2_DELETE(pinfo);
-					}
-					else if (bNotAvail)
-					{
-						LoginFailure(d, "NOTAVAIL");
-						sys_log(0, "   NOTAVAIL");
-						M2_DELETE(pinfo);
-					}
-					else if (DESC_MANAGER::instance().FindByLoginName(pinfo->login))
-					{
-						LoginFailure(d, "ALREADY");
-						sys_log(0, "   ALREADY");
-						M2_DELETE(pinfo);
-					}
-					else if (strcmp(szStatus, "OK"))
-					{
-						LoginFailure(d, szStatus);
-						sys_log(0, "   STATUS: %s", szStatus);
-						M2_DELETE(pinfo);
-					}
-					else
-					{
-						if (LC_IsEurope())
-						{
-							//stBlockData >= 0 == 날짜가 BlockDate 보다 미래 
-							if (strncmp(szCreateDate, g_stBlockDate.c_str(), 8) >= 0)
-							{
-								LoginFailure(d, "BLKLOGIN");
-								sys_log(0, "   BLKLOGIN");
-								M2_DELETE(pinfo);
-								break;
-							}
-
-							char szQuery[1024];
-							snprintf(szQuery, sizeof(szQuery), "UPDATE account SET last_play=NOW() WHERE id=%u", dwID);
-							std::unique_ptr<SQLMsg> msg( DBManager::instance().DirectQuery(szQuery) );
-						}
-
-						TAccountTable & r = d->GetAccountTable();
-
-						r.id = dwID;
-						trim_and_lower(pinfo->login, r.login, sizeof(r.login));
-						strlcpy(r.passwd, pinfo->passwd, sizeof(r.passwd));
-						strlcpy(r.social_id, szSocialID, sizeof(r.social_id));
-						DESC_MANAGER::instance().ConnectAccount(r.login, d);
-
-						d->SetMatrixCode(szMatrixCode);
-
-						if (!g_bBilling)
-						{
-							LoginPrepare(BILLING_FREE, 0, 0, d, pinfo->adwClientKey, aiPremiumTimes);
-							//By SeMinZ
-							M2_DELETE(pinfo);
-							break;
-						}
-
-						sys_log(0, "QID_AUTH_LOGIN_OPENID: SUCCESS %s", pinfo->login);
 					}
 				}
 			}
@@ -1466,37 +1221,6 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 				}
 			}
 			break;
-		case QID_JAPAN_CREATE_ID :
-			{
-				TPacketCGLogin3 * pinfo = (TPacketCGLogin3 *) qi->pvData ;
-
-				if( pMsg->Get()->uiAffectedRows == 0 || pMsg->Get()->uiAffectedRows == (uint32_t)-1 )
-				{
-					LPDESC d = DESC_MANAGER::instance().FindByLoginKey(qi->dwIdent) ;
-					sys_log(0, "[AUTH_JAPAN]   NOID") ;
-					sys_log(0, "[AUTH_JAPAN] : Failed to create a new account %s", pinfo->login) ;
-					LoginFailure(d, "NOID") ;
-					M2_DELETE(pinfo);
-				}
-				else
-				{
-					sys_log(0, "[AUTH_JAPAN] : Succeed to create a new account %s", pinfo->login) ;
-
-					ReturnQuery(QID_AUTH_LOGIN_OPENID, qi->dwIdent, pinfo,
-							"SELECT PASSWORD('%s'),password,securitycode,social_id,id,status,availDt - NOW() > 0,"
-							"UNIX_TIMESTAMP(silver_expire),"
-							"UNIX_TIMESTAMP(gold_expire),"
-							"UNIX_TIMESTAMP(safebox_expire),"
-							"UNIX_TIMESTAMP(autoloot_expire),"
-							"UNIX_TIMESTAMP(fish_mind_expire),"
-							"UNIX_TIMESTAMP(marriage_fast_expire),"
-							"UNIX_TIMESTAMP(money_drop_rate_expire),"
-							"UNIX_TIMESTAMP(create_time)"
-							" FROM account WHERE login='%s'",
-							pinfo->passwd, pinfo->login) ;
-				}
-			}
-			break;
 
 		default:
 			sys_err("FATAL ERROR!!! Unhandled return query id %d", qi->iType);
@@ -1701,12 +1425,13 @@ EVENTFUNC(reload_spam_event)
 void LoadSpamDB()
 {
 	AccountDB::instance().ReturnQuery(QID_SPAM_DB, 0, NULL, "SELECT word, score FROM spam_db WHERE type='SPAM'");
-
+#ifdef ENABLE_SPAMDB_REFRESH
 	if (NULL == s_pkReloadSpamEvent)
 	{
 		reload_spam_event_info* info = AllocEventInfo<reload_spam_event_info>();
 		s_pkReloadSpamEvent = event_create(reload_spam_event, info, PASSES_PER_SEC(g_uiSpamReloadCycle));
 	}
+#endif
 }
 
 void CancelReloadSpamEvent() {

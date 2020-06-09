@@ -14,8 +14,8 @@
 	#include "limit_time.h"
 #endif
 
-extern time_t get_global_time();
-extern int openid_server;
+#include "utils.h"
+
 
 bool FN_IS_VALID_LOGIN_STRING(const char *str)
 {
@@ -33,62 +33,27 @@ bool FN_IS_VALID_LOGIN_STRING(const char *str)
 		if (isdigit(*tmp) || isalpha(*tmp))
 			continue;
 
-		// 캐나다는 몇몇 특수문자 허용
-		if (LC_IsCanada())
+#ifdef ENABLE_ACCOUNT_W_SPECIALCHARS
+		
+		switch (*tmp)
 		{
-			switch (*tmp)
-			{
-				case ' ':
-				case '_':
-				case '-':
-				case '.':
-				case '!':
-				case '@':
-				case '#':
-				case '$':
-				case '%':
-				case '^':
-				case '&':
-				case '*':
-				case '(':
-				case ')':
-					continue;
-			}
+			case ' ':
+			case '_':
+			case '-':
+			case '.':
+			case '!':
+			case '@':
+			case '#':
+			case '$':
+			case '%':
+			case '^':
+			case '&':
+			case '*':
+			case '(':
+			case ')':
+				continue;
 		}
-
-		if (LC_IsYMIR() == true || LC_IsKorea() == true)
-		{
-			switch (*tmp)
-			{
-				case '-' :
-				case '_' :
-					continue;
-			}
-		}
-
-		if (LC_IsBrazil() == true)
-		{
-			switch (*tmp)
-			{
-				case '_' :
-				case '-' :
-				case '=' :
-					continue;
-			}
-		}
-
-		if (LC_IsJapan() == true)
-		{
-			switch (*tmp)
-			{
-				case '-' :
-				case '_' :
-				case '@':
-				case '#':
-					continue;
-			}
-		}
-
+#endif
 		return false;
 	}
 
@@ -108,17 +73,6 @@ CInputAuth::CInputAuth()
 
 void CInputAuth::Login(LPDESC d, const char * c_pData)
 {
-	extern bool Metin2Server_IsInvalid();
-
-#ifdef ENABLE_LIMIT_TIME
-	if (Metin2Server_IsInvalid())
-	{
-		extern void ClearAdminPages();
-		ClearAdminPages();
-		exit(1);
-		return;
-	}
-#endif
 	TPacketCGLogin3 * pinfo = (TPacketCGLogin3 *) c_pData;
 
 	if (!g_bAuthServer)
@@ -219,17 +173,6 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 
 void CInputAuth::LoginOpenID(LPDESC d, const char * c_pData)
 {
-	extern bool Metin2Server_IsInvalid();
-
-#ifdef ENABLE_LIMIT_TIME
-	if (Metin2Server_IsInvalid())
-	{
-		extern void ClearAdminPages();
-		ClearAdminPages();
-		exit(1);
-		return;
-	}
-#endif
 	//OpenID test code.
 	TPacketCGLogin5 *tempInfo1 = (TPacketCGLogin5 *)c_pData;
 
@@ -317,35 +260,12 @@ void CInputAuth::LoginOpenID(LPDESC d, const char * c_pData)
 	{
 		sys_log(0, "ChannelServiceLogin [%s]", szLogin);
 
-		DBManager::instance().ReturnQuery(QID_AUTH_LOGIN_OPENID, dwKey, p,
-				"SELECT '%s',password,securitycode,social_id,id,status,availDt - NOW() > 0,"
-				"UNIX_TIMESTAMP(silver_expire),"
-				"UNIX_TIMESTAMP(gold_expire),"
-				"UNIX_TIMESTAMP(safebox_expire),"
-				"UNIX_TIMESTAMP(autoloot_expire),"
-				"UNIX_TIMESTAMP(fish_mind_expire),"
-				"UNIX_TIMESTAMP(marriage_fast_expire),"
-				"UNIX_TIMESTAMP(money_drop_rate_expire),"
-				"UNIX_TIMESTAMP(create_time)"
-				" FROM account WHERE login='%s'",
 
-				szPasswd, szLogin);
 	}
 	// END_OF_CHANNEL_SERVICE_LOGIN
 	else
 	{
-		DBManager::instance().ReturnQuery(QID_AUTH_LOGIN_OPENID, dwKey, p, 
-				"SELECT PASSWORD('%s'),password,securitycode,social_id,id,status,availDt - NOW() > 0,"
-				"UNIX_TIMESTAMP(silver_expire),"
-				"UNIX_TIMESTAMP(gold_expire),"
-				"UNIX_TIMESTAMP(safebox_expire),"
-				"UNIX_TIMESTAMP(autoloot_expire),"
-				"UNIX_TIMESTAMP(fish_mind_expire),"
-				"UNIX_TIMESTAMP(marriage_fast_expire),"
-				"UNIX_TIMESTAMP(money_drop_rate_expire),"
-				"UNIX_TIMESTAMP(create_time)"
-				" FROM account WHERE login='%s'",
-				szPasswd, szLogin);
+
 	}
 }
 
@@ -403,6 +323,7 @@ int CInputAuth::auth_OpenID(const char *authKey, const char *ipAddr, char *rID)
     }
 
     // read reply
+    {
 	char reply[1024] = {0};
 	int len;
 //#ifndef __WIN32__
@@ -423,7 +344,7 @@ int CInputAuth::auth_OpenID(const char *authKey, const char *ipAddr, char *rID)
 	strcpy(buffer, reply);
 
 	const char *delim = "\r\n";
-	char *last = 0;
+	//char *last = 0;
 	char *v = strtok(buffer, delim);
 	char *result = 0;
 
@@ -469,14 +390,15 @@ int CInputAuth::auth_OpenID(const char *authKey, const char *ipAddr, char *rID)
 			break;
 		default:
 			break;
+		}
 
 		return 5;
-		}
 	}
 
 	strcpy(rID, id);
 
 	return 0;
+    }
 }
 
 

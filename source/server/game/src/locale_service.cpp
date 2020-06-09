@@ -7,6 +7,7 @@
 #include "empire_text_convert.h"
 #include "config.h"
 #include "skill_power.h"
+#include "../../common/CommonDefines.h"
 
 using namespace std;
 
@@ -467,7 +468,6 @@ static void __LocaleService_Init_JAPAN()
 
 	check_name = check_name_sjis;
 	is_twobyte = is_twobyte_sjis;
-	exp_table = exp_table_euckr;
 }
 
 static void __LocaleService_Init_English()
@@ -549,7 +549,6 @@ static void __LocaleService_Init_Korea()
 	g_setQuestObjectDir.insert("locale/korea/quest/object");
 
 	g_iUseLocale = TRUE;
-	exp_table = exp_table_euckr;
 }
 
 static void __LocaleService_Init_France()
@@ -741,7 +740,6 @@ static void __LocaleService_Init_YMIR()
 
 	PK_PROTECT_LEVEL = 30;
 
-	exp_table = exp_table_euckr;
 }
 
 static void __LocaleService_Init_Russia() 
@@ -938,7 +936,6 @@ static void __LocaleService_Init_Singapore()
 	check_name	= check_name_alphabet;
 
 	g_iUseLocale = TRUE;
-	exp_table = exp_table_newcibn;
 }
 
 static void __LocaleService_Init_Vietnam()
@@ -955,8 +952,6 @@ static void __LocaleService_Init_Vietnam()
 	check_name	= check_name_alphabet;
 
 	g_iUseLocale = TRUE;
-	exp_table = exp_table_newcibn;
-
 }
 
 static void __LocaleService_Init_Thailand()
@@ -1030,11 +1025,13 @@ static void __LocaleService_Init_Taiwan()
 
 static void __CheckPlayerSlot(const std::string& service_name)
 {
+#ifndef ENABLE_PLAYER_PER_ACCOUNT5
 	if (PLAYER_PER_ACCOUNT != 4)
 	{
 		printf("<ERROR> PLAYER_PER_ACCOUNT = %d\n", PLAYER_PER_ACCOUNT);
 		exit(0);
 	}
+#endif
 }
 
 bool LocaleService_Init(const std::string& c_rstServiceName)

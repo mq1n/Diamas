@@ -3,7 +3,7 @@
 #include "group_text_parse_tree.h"
 
 CGroupTextParseTreeLoader::CGroupTextParseTreeLoader()
-	: m_dwcurLineIndex(0), m_pRootGroupNode(NULL)
+	: m_pRootGroupNode(NULL), m_dwcurLineIndex(0)
 {
 }
 
@@ -96,7 +96,7 @@ bool CGroupTextParseTreeLoader::LoadGroup(CGroupNode * pGroupNode)
 		// Column Names
 		else if (0 == stTokenVector[0].compare("#--#"))
 		{
-			for (int i = 1; i < stTokenVector.size(); i++)
+			for (TTokenVector::size_type i = 1; i < stTokenVector.size(); i++)
 			{
 				stl_lowers(stTokenVector[i]);
 				pGroupNode->m_map_columnNameToIndex.insert(TMapNameToIndex::value_type (stTokenVector[i], i - 1));
@@ -203,7 +203,7 @@ bool CGroupNode::GetRow(const std::string & c_rstrRowKey, OUT const CGroupNode::
 // 참고로, idx랑 txt에 쓰여진 순서랑 관계 없음.
 bool CGroupNode::GetRow(int idx, OUT const CGroupNode::CGroupNodeRow ** ppRow) const
 {
-	if (idx >= m_map_rows.size())
+	if ((TMapRow::size_type)idx >= m_map_rows.size())
 		return false;
 
 	TMapRow::const_iterator row_it = m_map_rows.begin();

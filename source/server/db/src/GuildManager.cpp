@@ -1133,10 +1133,7 @@ void CGuildManager::ProcessReserveWar()
 				{
 					pk->SetLastNoticeMin(iMin);
 
-					if (!g_stLocale.compare("euckr"))
-						CClientManager::instance().SendNotice("%s 辨靛客 %s 辨靛狼 傈里捞 距 %d盒 饶 矫累 邓聪促!", r_1.szName, r_2.szName, iMin);
-					else if (!g_stLocale.compare("gb2312"))
-						CClientManager::instance().SendNotice("%s 帮会和 %s 帮会的帮会战争将在 %d分钟后开始!", r_1.szName, r_2.szName, iMin);
+					CClientManager::instance().SendNotice("The war between %s and %s will start after %d minutes!", r_1.szName, r_2.szName, iMin);
 				}
 			}
 		}

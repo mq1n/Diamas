@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "config.h"
 #include "constants.h"
 #include "questmanager.h"
 #include "packet.h"
@@ -6,8 +7,6 @@
 #include "char.h"
 #include "desc_client.h"
 #include "questevent.h"
-
-extern int test_server;
 
 namespace quest
 {
@@ -240,6 +239,9 @@ namespace quest
 		qi.size = sizeof(struct packet_quest_info);
 		qi.index = m_RunningQuestState->iIndex;
 		qi.flag = m_iSendToClient;
+#ifdef ENABLE_QUEST_CATEGORY
+		qi.c_index = CQuestManager::instance().ReadQuestCategoryFile(qi.index);
+#endif
 
 		TEMP_BUFFER buf;
 		buf.write(&qi, sizeof(qi));

@@ -129,7 +129,7 @@ bool CMonarch::AddMoney(int Empire, int64_t Money)
 	int64_t Money64 = m_MonarchInfo.money[Empire];
 
 	char szQuery[1024];	
-	snprintf(szQuery, sizeof(szQuery), "UPDATE monarch set money=%lld where empire=%d", Money64, Empire);
+	snprintf(szQuery, sizeof(szQuery), "UPDATE monarch SET money=%lld WHERE empire=%d", Money64, Empire);
 
 	CDBManager::instance().AsyncQuery(szQuery);
 
@@ -145,7 +145,7 @@ bool CMonarch::DecMoney(int Empire, int64_t Money)
 	int64_t Money64 = m_MonarchInfo.money[Empire];
 
 	char szQuery[1024];	
-	snprintf(szQuery, sizeof(szQuery), "UPDATE monarch set money=%lld where empire=%d", Money64, Empire);
+	snprintf(szQuery, sizeof(szQuery), "UPDATE monarch SET money=%lld WHERE empire=%d", Money64, Empire);
 
 	CDBManager::instance().AsyncQuery(szQuery);
 	return true;
@@ -163,7 +163,7 @@ bool CMonarch::TakeMoney(int Empire, DWORD pid, int64_t Money)
 
 	char szQuery[1024];	
 	snprintf(szQuery, sizeof(szQuery), 
-			"UPDATE monarch set money=%lld; where empire=%d", m_MonarchInfo.money[Empire], Empire);
+			"UPDATE monarch SET money=%lld WHERE empire=%d", m_MonarchInfo.money[Empire], Empire);
 
 	CDBManager::instance().AsyncQuery(szQuery);
 
@@ -176,7 +176,7 @@ bool CMonarch::LoadMonarch()
 {
 	MonarchInfo * p = &m_MonarchInfo;
     char szQuery[256];
-	snprintf(szQuery, sizeof(szQuery), "SELECT empire, pid, name, money, windate FROM monarch a, player%s b where a.pid=b.id", GetTablePostfix());
+	snprintf(szQuery, sizeof(szQuery), "SELECT a.empire, a.pid, b.name, a.money, a.windate FROM monarch a, player%s b WHERE a.pid=b.id", GetTablePostfix());
     SQLMsg * pMsg = CDBManager::instance().DirectQuery(szQuery, SQL_PLAYER);
 
     if (pMsg->Get()->uiNumRows == 0)
@@ -210,7 +210,7 @@ bool CMonarch::SetMonarch(const char * name)
 	MonarchInfo * p = &m_MonarchInfo;
     char szQuery[256];
 
-	snprintf(szQuery, sizeof(szQuery), "SELECT empire, pid, name FROM player a where a.name = '%s'", name);
+	snprintf(szQuery, sizeof(szQuery), "SELECT player_index.empire, player.id, player.name, player.gold FROM player JOIN player_index ON player_index.id = player.account_id WHERE player.name = '%s'", name);
     SQLMsg * pMsg = CDBManager::instance().DirectQuery(szQuery, SQL_PLAYER);
 
     if (pMsg->Get()->uiNumRows == 0)
@@ -247,7 +247,7 @@ bool CMonarch::DelMonarch(int Empire)
 {
 	char szQuery[256];
 
-	snprintf(szQuery, sizeof(szQuery), "DELETE from monarch where empire=%d", Empire);
+	snprintf(szQuery, sizeof(szQuery), "DELETE FROM monarch WHERE empire=%d", Empire);
 	SQLMsg * pMsg = CDBManager::instance().DirectQuery(szQuery, SQL_PLAYER);
 
 	if (pMsg->Get()->uiNumRows == 0)
@@ -273,7 +273,7 @@ bool CMonarch::DelMonarch(const char * name)
 			char szQuery[256];
 
 			int Empire = n;
-			snprintf(szQuery, sizeof(szQuery), "DELETE from monarch where name=%d", Empire);
+			snprintf(szQuery, sizeof(szQuery), "DELETE FROM monarch WHERE empire=%d", Empire);
 			SQLMsg * pMsg = CDBManager::instance().DirectQuery(szQuery, SQL_PLAYER);
 
 			if (pMsg->Get()->uiNumRows == 0)

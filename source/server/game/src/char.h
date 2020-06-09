@@ -2,7 +2,6 @@
 #define __INC_METIN_II_CHAR_H__
 
 #include <unordered_map>
-
 #include "../../common/stl.h"
 #include "entity.h"
 #include "FSM.h"
@@ -13,6 +12,12 @@
 #include "affect_flag.h"
 #include "cube.h"
 #include "mining.h"
+#include "../../common/CommonDefines.h"
+#define ENABLE_ANTI_CMD_FLOOD
+#define ENABLE_OPEN_SHOP_WITH_ARMOR
+enum eMountType {MOUNT_TYPE_NONE=0, MOUNT_TYPE_NORMAL=1, MOUNT_TYPE_COMBAT=2, MOUNT_TYPE_MILITARY=3};
+eMountType GetMountLevelByVnum(DWORD dwMountVnum, bool IsNew);
+const DWORD GetRandomSkillVnum(BYTE bJob = JOB_MAX_NUM);
 
 class CBuffOnAttributes;
 class CPetSystem;
@@ -43,12 +48,18 @@ enum
 	MAIN_RACE_ASSASSIN_M,
 	MAIN_RACE_SURA_W,
 	MAIN_RACE_SHAMAN_M,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	MAIN_RACE_WOLFMAN_M,
+#endif
 	MAIN_RACE_MAX_NUM,
 };
 
 enum
 {
 	POISON_LENGTH = 30,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	BLEEDING_LENGTH = 30,
+#endif
 	STAMINA_PER_STEP = 1,
 	SAFEBOX_PAGE_SIZE = 9,
 	AI_CHANGE_ATTACK_POISITION_TIME_NEAR = 10000,
@@ -92,6 +103,22 @@ enum EDamageType
 	DAMAGE_TYPE_MAGIC,
 	DAMAGE_TYPE_POISON,
 	DAMAGE_TYPE_SPECIAL,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	DAMAGE_TYPE_BLEEDING,
+#endif
+};
+
+enum DamageFlag
+{
+	DAMAGE_NORMAL	= (1 << 0),
+	DAMAGE_POISON	= (1 << 1),
+	DAMAGE_DODGE	= (1 << 2),
+	DAMAGE_BLOCK	= (1 << 3),
+	DAMAGE_PENETRATE= (1 << 4),
+	DAMAGE_CRITICAL = (1 << 5),
+#if defined(ENABLE_WOLFMAN_CHARACTER) && !defined(USE_MOB_BLEEDING_AS_POISON)
+	DAMAGE_BLEEDING	= (1 << 6),
+#endif
 };
 
 enum EPointTypes
@@ -285,6 +312,22 @@ enum EPointTypes
 	POINT_RESIST_CRITICAL = 136,		// 크리티컬 저항	: 상대의 크리티컬 확률을 감소
 	POINT_RESIST_PENETRATE = 137,		// 관통타격 저항	: 상대의 관통타격 확률을 감소
 
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	POINT_BLEEDING_REDUCE = 138,
+	POINT_BLEEDING_PCT = 139,
+
+	POINT_ATTBONUS_WOLFMAN = 140,				
+	POINT_RESIST_WOLFMAN = 141,				
+	POINT_RESIST_CLAW = 142,					
+#endif
+
+#ifdef ENABLE_ACCE_SYSTEM
+	POINT_ACCEDRAIN_RATE = 143,
+#endif
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+	POINT_RESIST_MAGIC_REDUCTION = 144,
+#endif
+
 	//POINT_MAX_NUM = 129	common/length.h
 };
 
@@ -404,7 +447,9 @@ typedef struct character_point_instant
 	// by mhh
 	LPITEM			pCubeItems[CUBE_MAX_NUM];
 	LPCHARACTER		pCubeNpc;
-
+#ifdef ENABLE_ACCE_SYSTEM
+	LPITEM				pAcceMaterials[ACCE_WINDOW_MAX_MATERIALS];
+#endif
 	LPCHARACTER			battle_victim;
 
 	BYTE			gm_level;
@@ -503,6 +548,7 @@ enum e_overtime
 	OT_5HOUR,
 };
 
+#define NEW_ICEDAMAGE_SYSTEM
 class CHARACTER : public CEntity, public CFSM, public CHorseRider
 {
 	protected:
@@ -637,6 +683,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		LPCHARACTER		DistributeExp();	// 제일 많이 때린 사람을 리턴한다.
 		void			DistributeHP(LPCHARACTER pkKiller);
 		void			DistributeSP(LPCHARACTER pkKiller, int iMethod=0);
+#ifdef __ENABLE_KILL_EVENT_FIX__
+		LPCHARACTER		GetMostAttacked();
+#endif
 
 		void			SetPosition(int pos);
 		bool			IsPosition(int pos) const	{ return m_pointsInstant.position == pos ? true : false; }
@@ -1052,7 +1101,11 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			SetItemLoaded()	{ m_bItemLoaded = true; }
 
 		void			ClearItem();
+#ifdef ENABLE_HIGHLIGHT_NEW_ITEM
+		void			SetItem(TItemPos Cell, LPITEM item, bool bWereMine = false);
+#else
 		void			SetItem(TItemPos Cell, LPITEM item);
+#endif
 		LPITEM			GetItem(TItemPos Cell) const;
 		LPITEM			GetInventoryItem(WORD wCell) const;
 		bool			IsEmptyItemGrid(TItemPos Cell, BYTE size, int iExceptionCell = -1) const;
@@ -1261,7 +1314,10 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		void				AttackedByPoison(LPCHARACTER pkAttacker);
 		void				RemovePoison();
-
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		void				AttackedByBleeding(LPCHARACTER pkAttacker);
+		void				RemoveBleeding();
+#endif
 		void				AttackedByFire(LPCHARACTER pkAttacker, int amount, int count);
 		void				RemoveFire();
 
@@ -1383,6 +1439,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		void				ComputePassiveSkill(DWORD dwVnum);
 		int					ComputeSkill(DWORD dwVnum, LPCHARACTER pkVictim, BYTE bSkillLevel = 0);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		int					ComputeSkillParty(DWORD dwVnum, LPCHARACTER pkVictim, BYTE bSkillLevel = 0);
+#endif
 		int					ComputeSkillAtPosition(DWORD dwVnum, const PIXEL_POSITION& posTarget, BYTE bSkillLevel = 0);
 		void				ComputeSkillPoints();
 
@@ -1708,6 +1767,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		LPEVENT				m_pkFishingEvent;
 		LPEVENT				m_pkAffectEvent;
 		LPEVENT				m_pkPoisonEvent;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		LPEVENT				m_pkBleedingEvent;
+#endif
 		LPEVENT				m_pkFireEvent;
 		LPEVENT				m_pkWarpNPCEvent;
 		//DELAYED_WARP
@@ -1724,6 +1786,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool IsWarping() const { return m_pkWarpEvent ? true : false; }
 
 		bool				m_bHasPoisoned;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		bool				m_bHasBled;
+#endif
 
 		const CMob *		m_pkMobData;
 		CMobInstance *		m_pkMobInst;
@@ -1741,9 +1806,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		int				m_aiPremiumTimes[PREMIUM_MAX_NUM];
 
 		// CHANGE_ITEM_ATTRIBUTES
-		static const DWORD		msc_dwDefaultChangeItemAttrCycle;	///< 디폴트 아이템 속성변경 가능 주기
+		// static const DWORD		msc_dwDefaultChangeItemAttrCycle;	///< 디폴트 아이템 속성변경 가능 주기
 		static const char		msc_szLastChangeItemAttrFlag[];		///< 최근 아이템 속성을 변경한 시간의 Quest Flag 이름
-		static const char		msc_szChangeItemAttrCycleFlag[];		///< 아이템 속성병경 가능 주기의 Quest Flag 이름
+		// static const char		msc_szChangeItemAttrCycleFlag[];		///< 아이템 속성병경 가능 주기의 Quest Flag 이름
 		// END_OF_CHANGE_ITEM_ATTRIBUTES
 
 		// PC_BANG_ITEM_ADD
@@ -1938,7 +2003,14 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 	private:
 		DWORD m_dwLastGoldDropTime;
-
+#ifdef ENABLE_NEWSTUFF
+		DWORD m_dwLastItemDropTime;
+		DWORD m_dwLastBoxUseTime;
+		DWORD m_dwLastBuySellTime;
+	public:
+		DWORD GetLastBuySellTime() const { return m_dwLastBuySellTime; }
+		void SetLastBuySellTime(DWORD dwLastBuySellTime) { m_dwLastBuySellTime = dwLastBuySellTime; }
+#endif
 	public:
 		void StartHackShieldCheckCycle(int seconds);
 		void StopHackShieldCheckCycle();
@@ -1978,8 +2050,22 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void SetPet() { m_bIsPet = true; }
 		bool IsPet() { return m_bIsPet; }
 #endif
+#ifdef NEW_ICEDAMAGE_SYSTEM
+	private:
+		DWORD m_dwNDRFlag;
+		std::set<DWORD> m_setNDAFlag;
+	public:
+		const DWORD GetNoDamageRaceFlag();
+		void SetNoDamageRaceFlag(DWORD dwRaceFlag);
+		void UnsetNoDamageRaceFlag(DWORD dwRaceFlag);
+		void ResetNoDamageRaceFlag();
+		const std::set<DWORD> & GetNoDamageAffectFlag();
+		void SetNoDamageAffectFlag(DWORD dwAffectFlag);
+		void UnsetNoDamageAffectFlag(DWORD dwAffectFlag);
+		void ResetNoDamageAffectFlag();
+#endif
 
-	//최종 데미지 보정.
+	
 	private:
 		float m_fAttMul;
 		float m_fDamMul;
@@ -1992,7 +2078,38 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	private:
 		bool IsValidItemPosition(TItemPos Pos) const;
 
-		//독일 선물 기능 패킷 임시 저장
+	public:
+		
+
+		
+		
+		void	DragonSoul_Initialize();
+
+		bool	DragonSoul_IsQualified() const;
+		void	DragonSoul_GiveQualification();
+
+		int		DragonSoul_GetActiveDeck() const;
+		bool	DragonSoul_IsDeckActivated() const;
+		bool	DragonSoul_ActivateDeck(int deck_idx);
+
+		void	DragonSoul_DeactivateAll();
+		
+		
+		
+		
+		//
+		
+		
+		
+		
+		void	DragonSoul_CleanUp();
+		
+	public:
+		bool		DragonSoul_RefineWindow_Open(LPENTITY pEntity);
+		bool		DragonSoul_RefineWindow_Close();
+		LPENTITY	DragonSoul_RefineWindow_GetOpener() { return  m_pointsInstant.m_pDragonSoulRefineWindowOpener; }
+		bool		DragonSoul_RefineWindow_CanRefine();
+
 	private:
 		unsigned int itemAward_vnum;
 		char		 itemAward_cmd[20];
@@ -2004,42 +2121,20 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void		 SetItemAward_vnum(unsigned int vnum) { itemAward_vnum = vnum; }
 		void		 SetItemAward_cmd(char* cmd) { strcpy(itemAward_cmd,cmd); }
 		//void		 SetItemAward_flag(bool flag) { itemAward_flag = flag; }
-
-	public:
-		//용혼석
-		
-		// 캐릭터의 affect, quest가 load 되기 전에 DragonSoul_Initialize를 호출하면 안된다.
-		// affect가 가장 마지막에 로드되어 LoadAffect에서 호출함.
-		void	DragonSoul_Initialize();
-
-		bool	DragonSoul_IsQualified() const;
-		void	DragonSoul_GiveQualification();
-
-		int		DragonSoul_GetActiveDeck() const;
-		bool	DragonSoul_IsDeckActivated() const;
-		bool	DragonSoul_ActivateDeck(int deck_idx);
-
-		void	DragonSoul_DeactivateAll();
-		// 반드시 ClearItem 전에 불러야 한다.
-		// 왜냐하면....
-		// 용혼석 하나 하나를 deactivate할 때마다 덱에 active인 용혼석이 있는지 확인하고,
-		// active인 용혼석이 하나도 없다면, 캐릭터의 용혼석 affect와, 활성 상태를 제거한다.
-		// 
-		// 하지만 ClearItem 시, 캐릭터가 착용하고 있는 모든 아이템을 unequip하는 바람에,
-		// 용혼석 Affect가 제거되고, 결국 로그인 시, 용혼석이 활성화되지 않는다.
-		// (Unequip할 때에는 로그아웃 상태인지, 아닌지 알 수 없다.)
-		// 용혼석만 deactivate시키고 캐릭터의 용혼석 덱 활성 상태는 건드리지 않는다.
-		void	DragonSoul_CleanUp();
-		// 용혼석 강화창
-	public:
-		bool		DragonSoul_RefineWindow_Open(LPENTITY pEntity);
-		bool		DragonSoul_RefineWindow_Close();
-		LPENTITY	DragonSoul_RefineWindow_GetOpener() { return  m_pointsInstant.m_pDragonSoulRefineWindowOpener; }
-		bool		DragonSoul_RefineWindow_CanRefine();
-
+#ifdef ENABLE_ANTI_CMD_FLOOD
 	private:
-		// SyncPosition을 악용하여 타유저를 이상한 곳으로 보내는 핵 방어하기 위하여,
-		// SyncPosition이 일어날 때를 기록.
+		int m_dwCmdAntiFloodPulse;
+		DWORD m_dwCmdAntiFloodCount;
+	public:
+		int GetCmdAntiFloodPulse(){return m_dwCmdAntiFloodPulse;}
+		DWORD GetCmdAntiFloodCount(){return m_dwCmdAntiFloodCount;}
+		DWORD IncreaseCmdAntiFloodCount(){return ++m_dwCmdAntiFloodCount;}
+		void SetCmdAntiFloodPulse(int dwPulse){m_dwCmdAntiFloodPulse=dwPulse;}
+		void SetCmdAntiFloodCount(DWORD dwCount){m_dwCmdAntiFloodCount=dwCount;}
+#endif
+	private:
+		
+		
 		timeval		m_tvLastSyncTime;
 		int			m_iSyncHackCount;
 	public:
@@ -2047,6 +2142,28 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		const timeval&	GetLastSyncTime() { return m_tvLastSyncTime; }
 		void			SetSyncHackCount(int iCount) { m_iSyncHackCount = iCount;}
 		int				GetSyncHackCount() { return m_iSyncHackCount; }
+
+#ifdef ENABLE_ACCE_SYSTEM
+	protected:
+		bool	m_bAcceCombination, m_bAcceAbsorption;
+
+	public:
+		bool	isAcceOpened(bool bCombination) {return bCombination ? m_bAcceCombination : m_bAcceAbsorption;}
+		void	OpenAcce(bool bCombination);
+		void	CloseAcce();
+		void	ClearAcceMaterials();
+		bool	CleanAcceAttr(LPITEM pkItem, LPITEM pkTarget);
+		LPITEM*	GetAcceMaterials() {return m_pointsInstant.pAcceMaterials;}
+		bool	AcceIsSameGrade(long lGrade);
+		DWORD	GetAcceCombinePrice(long lGrade);
+		void	GetAcceCombineResult(DWORD & dwItemVnum, DWORD & dwMinAbs, DWORD & dwMaxAbs);
+		BYTE	CheckEmptyMaterialSlot();
+		void	AddAcceMaterial(TItemPos tPos, BYTE bPos);
+		void	RemoveAcceMaterial(BYTE bPos);
+		BYTE	CanRefineAcceMaterials();
+		void	RefineAcceMaterials();
+#endif
+
 };
 
 ESex GET_SEX(LPCHARACTER ch);

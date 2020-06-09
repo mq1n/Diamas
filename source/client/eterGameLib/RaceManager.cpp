@@ -29,6 +29,7 @@ void __GetRaceResourcePathes(unsigned race, std::vector <std::string>& vec_stPat
 		vec_stPathes.push_back ("d:/ymir work/guild/");
 		vec_stPathes.push_back ("d:/ymir work/npc/");
 		vec_stPathes.push_back ("d:/ymir work/npc2/");
+		vec_stPathes.push_back ("d:/ymir work/npc_pet/");
 		vec_stPathes.push_back ("d:/ymir work/monster/");
 		vec_stPathes.push_back ("d:/ymir work/monster2/");
 	}
@@ -36,16 +37,36 @@ void __GetRaceResourcePathes(unsigned race, std::vector <std::string>& vec_stPat
 	{
 		if (race >= 30000)
 		{
-			vec_stPathes.push_back ("d:/ymir work/npc2/");
+			if (race>=34028 && race<=34099) // last known 34072
+			{
+				vec_stPathes.push_back ("d:/ymir work/npc_pet/");
+				vec_stPathes.push_back ("d:/ymir work/npc2/");
+			}
+			else
+			{
+				vec_stPathes.push_back ("d:/ymir work/npc2/");
+				vec_stPathes.push_back ("d:/ymir work/npc_pet/");
+			}
 			vec_stPathes.push_back ("d:/ymir work/npc/");
+			vec_stPathes.push_back ("d:/ymir work/npc_mount/");
 			vec_stPathes.push_back ("d:/ymir work/monster/");
 			vec_stPathes.push_back ("d:/ymir work/monster2/");
 			vec_stPathes.push_back ("d:/ymir work/guild/");
 		}
 		else
 		{
-			vec_stPathes.push_back ("d:/ymir work/npc/");
+			if (race>=20233 && race<=20299) // last known 20247
+			{
+				vec_stPathes.push_back ("d:/ymir work/npc_mount/");
+				vec_stPathes.push_back ("d:/ymir work/npc/");
+			}
+			else
+			{
+				vec_stPathes.push_back ("d:/ymir work/npc/");
+				vec_stPathes.push_back ("d:/ymir work/npc_mount/");
+			}
 			vec_stPathes.push_back ("d:/ymir work/npc2/");
+			vec_stPathes.push_back ("d:/ymir work/npc_pet/");
 			vec_stPathes.push_back ("d:/ymir work/monster/");
 			vec_stPathes.push_back ("d:/ymir work/monster2/");
 			vec_stPathes.push_back ("d:/ymir work/guild/");
@@ -58,6 +79,8 @@ void __GetRaceResourcePathes(unsigned race, std::vector <std::string>& vec_stPat
 		vec_stPathes.push_back ("d:/ymir work/monster/");
 		vec_stPathes.push_back ("d:/ymir work/npc/");
 		vec_stPathes.push_back ("d:/ymir work/npc2/");
+		vec_stPathes.push_back ("d:/ymir work/npc_pet/");
+		vec_stPathes.push_back ("d:/ymir work/npc_mount/");
 		vec_stPathes.push_back ("d:/ymir work/guild/");
 	}
 	else if (race > 8000)
@@ -66,6 +89,8 @@ void __GetRaceResourcePathes(unsigned race, std::vector <std::string>& vec_stPat
 		vec_stPathes.push_back ("d:/ymir work/monster2/");
 		vec_stPathes.push_back ("d:/ymir work/npc/");
 		vec_stPathes.push_back ("d:/ymir work/npc2/");
+		vec_stPathes.push_back ("d:/ymir work/npc_pet/");
+		vec_stPathes.push_back ("d:/ymir work/npc_mount/");
 		vec_stPathes.push_back ("d:/ymir work/guild/");
 	}
 	else if (race > 2000)
@@ -74,6 +99,8 @@ void __GetRaceResourcePathes(unsigned race, std::vector <std::string>& vec_stPat
 		vec_stPathes.push_back ("d:/ymir work/monster/");
 		vec_stPathes.push_back ("d:/ymir work/npc/");
 		vec_stPathes.push_back ("d:/ymir work/npc2/");
+		vec_stPathes.push_back ("d:/ymir work/npc_pet/");
+		vec_stPathes.push_back ("d:/ymir work/npc_mount/");
 		vec_stPathes.push_back ("d:/ymir work/guild/");
 	}
 	else if (race>=1400 && race<=1700)
@@ -82,6 +109,8 @@ void __GetRaceResourcePathes(unsigned race, std::vector <std::string>& vec_stPat
 		vec_stPathes.push_back ("d:/ymir work/monster/");
 		vec_stPathes.push_back ("d:/ymir work/npc/");
 		vec_stPathes.push_back ("d:/ymir work/npc2/");
+		vec_stPathes.push_back ("d:/ymir work/npc_pet/");
+		vec_stPathes.push_back ("d:/ymir work/npc_mount/");
 		vec_stPathes.push_back ("d:/ymir work/guild/");
 	}
 	else
@@ -90,9 +119,15 @@ void __GetRaceResourcePathes(unsigned race, std::vector <std::string>& vec_stPat
 		vec_stPathes.push_back ("d:/ymir work/monster2/");
 		vec_stPathes.push_back ("d:/ymir work/npc/");
 		vec_stPathes.push_back ("d:/ymir work/npc2/");
+		vec_stPathes.push_back ("d:/ymir work/npc_pet/");
+		vec_stPathes.push_back ("d:/ymir work/npc_mount/");
 		vec_stPathes.push_back ("d:/ymir work/guild/");
 	}
-	return;
+	// @fixme021 add season folders
+	vec_stPathes.emplace_back("#season1/npc/");
+	vec_stPathes.emplace_back("#season2/npc/");
+	vec_stPathes.emplace_back("#season1/monster/");
+	vec_stPathes.emplace_back("#season2/monster/");
 }
 
 CRaceData* CRaceManager::__LoadRaceData(DWORD dwRaceIndex)
@@ -149,8 +184,17 @@ CRaceData* CRaceManager::__LoadRaceData(DWORD dwRaceIndex)
 		stFullPathName+="/";
 
 		string stMSMFileName=stFullPathName;
-		stMSMFileName+=c_rstRaceName;
-		stMSMFileName+=".msm";
+		if (stFullPathName[0] == '#') // @fixme021 #season reads shape.msm only
+		{
+			stMSMFileName += "shape.msm";
+			stFullPathName.erase(0, 1);
+			stMSMFileName.erase(0, 1);
+		}
+		else
+		{
+			stMSMFileName += c_rstRaceName;
+			stMSMFileName += ".msm";
+		}
 
 		if (!pRaceData->LoadRaceData(stMSMFileName.c_str()))
 		{

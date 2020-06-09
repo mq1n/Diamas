@@ -73,7 +73,8 @@ void CClientManager::GuildRemoveMember(CPeer* peer, TPacketGuild* p)
 	snprintf(szQuery, sizeof(szQuery), "DELETE FROM guild_member%s WHERE pid=%u and guild_id=%u", GetTablePostfix(), p->dwInfo, p->dwGuild);
 	CDBManager::instance().AsyncQuery(szQuery);
 
-	snprintf(szQuery, sizeof(szQuery), "REPLACE INTO quest%s (dwPID, szName, szState, lValue) VALUES(%u, 'guild_manage', 'withdraw_time', %u)", GetTablePostfix(), p->dwInfo, (DWORD) GetCurrentTime());
+	// @fixme202 new_+withdraw_time
+	snprintf(szQuery, sizeof(szQuery), "REPLACE INTO quest%s (dwPID, szName, szState, lValue) VALUES(%u, 'guild_manage', 'new_withdraw_time', %u)", GetTablePostfix(), p->dwInfo, (DWORD) GetCurrentTime());
 	CDBManager::instance().AsyncQuery(szQuery);
 
 	ForwardPacket(HEADER_DG_GUILD_REMOVE_MEMBER, p, sizeof(TPacketGuild));
@@ -109,7 +110,8 @@ void CClientManager::GuildDisband(CPeer* peer, TPacketGuild* p)
 	snprintf(szQuery, sizeof(szQuery), "DELETE FROM guild_grade%s WHERE guild_id=%u", GetTablePostfix(), p->dwGuild);
 	CDBManager::instance().AsyncQuery(szQuery);
 
-	snprintf(szQuery, sizeof(szQuery), "REPLACE INTO quest%s (dwPID, szName, szState, lValue) SELECT pid, 'guild_manage', 'withdraw_time', %u FROM guild_member%s WHERE guild_id = %u", GetTablePostfix(), (DWORD) GetCurrentTime(), GetTablePostfix(), p->dwGuild);
+	// @fixme401 (withdraw -> new_disband)_time
+	snprintf(szQuery, sizeof(szQuery), "REPLACE INTO quest%s (dwPID, szName, szState, lValue) SELECT pid, 'guild_manage', 'new_disband_time', %u FROM guild_member%s WHERE guild_id = %u", GetTablePostfix(), (DWORD) GetCurrentTime(), GetTablePostfix(), p->dwGuild);
 	CDBManager::instance().AsyncQuery(szQuery);
 
 	snprintf(szQuery, sizeof(szQuery), "DELETE FROM guild_member%s WHERE guild_id=%u", GetTablePostfix(), p->dwGuild);
@@ -126,13 +128,13 @@ const char* __GetWarType(int n)
 	switch (n)
 	{
 		case 0 :
-			return "ÆĞ¿Õ";
+			return "Field";
 		case 1 :
-			return "¸ÍÀå";
+			return "Theater";
 		case 2 :
-			return "¼öÈ£";
+			return "CTF"; //Capture The Flag
 		default :
-			return "¾ø´Â ¹øÈ£";
+			return "Wrong number";
 	}
 }
 

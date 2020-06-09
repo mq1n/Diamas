@@ -46,17 +46,29 @@ bool CPythonNonPlayer::LoadNonPlayerData(const char * c_szFileName)
 		return false;
 	}
 
+	DWORD structSize = zObj.GetSize() / dwElements;
+	DWORD structDiff = zObj.GetSize() % dwElements;
+#ifdef ENABLE_PROTOSTRUCT_AUTODETECT
+	if (structDiff!=0 && !CPythonNonPlayer::TMobTableAll::IsValidStruct(structSize))
+#else
 	if ((zObj.GetSize() % sizeof(TMobTable)) != 0)
+#endif
 	{
-		TraceError("CPythonNonPlayer::LoadNonPlayerData: invalid size %u check data format.", zObj.GetSize());
+		TraceError("CPythonNonPlayer::LoadNonPlayerData: invalid size %u check data format. structSize %u, structDiff %u", zObj.GetSize(), structSize, structDiff);
 		return false;
 	}
 
-	TMobTable * pTable = (TMobTable *) zObj.GetBuffer();
-    for (DWORD i = 0; i < dwElements; ++i, ++pTable)
+    for (DWORD i = 0; i < dwElements; ++i)
 	{
-		TMobTable * pNonPlayerData = new TMobTable;
+#ifdef ENABLE_PROTOSTRUCT_AUTODETECT
+		CPythonNonPlayer::TMobTable t = {0};
+		CPythonNonPlayer::TMobTableAll::Process(zObj.GetBuffer(), structSize, i, t);
+#else
+		CPythonNonPlayer::TMobTable & t = *((CPythonNonPlayer::TMobTable *) zObj.GetBuffer() + i);
+#endif
+		TMobTable * pTable = &t;
 
+		TMobTable * pNonPlayerData = new TMobTable;
 		memcpy(pNonPlayerData, pTable, sizeof(TMobTable));
 
 		//TraceError("%d : %s type[%d] color[%d]", pNonPlayerData->dwVnum, pNonPlayerData->szLocaleName, pNonPlayerData->bType, pNonPlayerData->dwMonsterColor);
@@ -114,6 +126,28 @@ BYTE CPythonNonPlayer::GetEventType(DWORD dwVnum)
 
 	return p->bOnClickType;
 }
+
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
+DWORD CPythonNonPlayer::GetMonsterLevel(DWORD dwVnum)
+{
+	const CPythonNonPlayer::TMobTable * c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+		return 0;
+
+	return c_pTable->bLevel;
+}
+#endif
+
+#if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
+bool CPythonNonPlayer::IsAggressive(DWORD dwVnum)
+{
+	const CPythonNonPlayer::TMobTable * c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+		return 0;
+
+	return (IS_SET(c_pTable->dwAIFlag, AIFLAG_AGGRESSIVE));
+}
+#endif
 
 BYTE CPythonNonPlayer::GetEventTypeByVID(DWORD dwVID)
 {

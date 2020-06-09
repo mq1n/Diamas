@@ -32,10 +32,15 @@ class CHorseRider
 		
 		BYTE		GetHorseLevel() const { return m_Horse.bLevel; }
 		BYTE		GetHorseGrade();
+		short		GetHorseMaxHealth() const;
+		short		GetHorseMaxStamina() const;
+#ifdef ENABLE_INFINITE_HORSE_HEALTH_STAMINA
+		short		GetHorseHealth() const	{ return GetHorseMaxHealth(); }
+		short		GetHorseStamina() const	{ return GetHorseMaxStamina(); }
+#else
 		short		GetHorseHealth() const	{ return m_Horse.sHealth; }
 		short		GetHorseStamina() const	{ return m_Horse.sStamina; }
-		short		GetHorseMaxHealth();
-		short		GetHorseMaxStamina();
+#endif
 
 		int		GetHorseST()		{ return c_aHorseStat[GetHorseLevel()].iST; }
 		int		GetHorseDX()		{ return c_aHorseStat[GetHorseLevel()].iDX; }

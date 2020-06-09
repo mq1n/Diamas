@@ -4,6 +4,7 @@
 
 #include "../eterLib/TextFileLoader.h"
 #include "../eterLib/CollisionData.h"
+#include "GameLibDefines.h"
 
 extern float g_fGameFPS;
 
@@ -32,6 +33,9 @@ namespace NRaceData
 		JOB_ASSASSIN,
 		JOB_SURA,
 		JOB_SHAMAN,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		JOB_WOLFMAN,
+#endif
 		JOB_MAX_NUM
 	};
 

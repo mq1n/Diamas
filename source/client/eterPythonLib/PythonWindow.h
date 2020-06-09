@@ -147,7 +147,10 @@ namespace UI
 			virtual BOOL	OnMouseRightButtonDoubleClick();
 			virtual BOOL	OnMouseMiddleButtonDown();
 			virtual BOOL	OnMouseMiddleButtonUp();
-
+#ifdef ENABLE_MOUSEWHEEL_EVENT
+			virtual BOOL	OnMouseWheelScroll(short wDelta);
+			virtual void	SetScrollable();
+#endif
 			virtual BOOL	OnKeyDown(int ikey);
 			virtual BOOL	OnKeyUp(int ikey);
 			virtual BOOL	OnPressEscapeKey();
@@ -183,7 +186,11 @@ namespace UI
 
 			BOOL				m_isUpdatingChildren;
 			TWindowContainer	m_pReserveChildList;
-		
+
+#ifdef ENABLE_MOUSEWHEEL_EVENT
+			bool				m_bIsScrollable;
+#endif
+
 #ifdef _DEBUG
 		public:
 			DWORD				DEBUG_dwCounter;
@@ -406,7 +413,11 @@ namespace UI
 			virtual ~CAniImageBox();
 
 			void SetDelay(int iDelay);
-			void AppendImage(const char * c_szFileName);
+#ifdef ENABLE_ACCE_SYSTEM
+			void	AppendImage(const char * c_szFileName, float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0);
+#else
+			void	AppendImage(const char * c_szFileName);
+#endif
 			void SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom);
 			void SetRenderingMode(int iMode);
 

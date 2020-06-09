@@ -525,7 +525,7 @@ PyObject * chrmgrAppendShapeSkin(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrSetMovingSpeed(PyObject* poSelf, PyObject* poArgs)
 {
-#ifndef _DISTRIBUTE
+#ifndef NDEBUG // @warme601 _DISTRIBUTE -> NDEBUG
 	int	nMovSpd;
 	if (!PyTuple_GetInteger(poArgs, 0, &nMovSpd))
 		return Py_BadArgument();
@@ -841,4 +841,8 @@ void initchrmgr()
 	PyModule_AddIntConstant(poModule, "EFFECT_HAPPINESS_RING_EQUIP",		CInstanceBase::EFFECT_HAPPINESS_RING_EQUIP);
 	PyModule_AddIntConstant(poModule, "EFFECT_LOVE_PENDANT_EQUIP",		CInstanceBase::EFFECT_LOVE_PENDANT_EQUIP);
 	
+#ifdef ENABLE_ACCE_SYSTEM
+	PyModule_AddIntConstant(poModule, "EFFECT_ACCE_SUCCEDED", CInstanceBase::EFFECT_ACCE_SUCCEDED);
+	PyModule_AddIntConstant(poModule, "EFFECT_ACCE_EQUIP", CInstanceBase::EFFECT_ACCE_EQUIP);
+#endif
 }

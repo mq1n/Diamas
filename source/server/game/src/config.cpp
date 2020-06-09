@@ -33,6 +33,33 @@ int		ping_event_second_cycle = passes_per_sec * 60;
 bool	g_bNoMoreClient = false;
 bool	g_bNoRegen = false;
 bool	g_bNoPasspod = false;
+// #ifdef ENABLE_NEWSTUFF
+bool	g_bEmpireShopPriceTripleDisable = false;
+bool	g_bShoutAddonEnable = false;
+bool	g_bGlobalShoutEnable = false;
+bool	g_bDisablePrismNeed = false;
+bool	g_bDisableEmotionMask = false;
+BYTE	g_bItemCountLimit = 200;
+DWORD	g_dwItemBonusChangeTime = 60;
+bool	g_bAllMountAttack = false;
+bool	g_bEnableBootaryCheck = false;
+bool	g_bGMHostCheck = false;
+bool	g_bGuildInviteLimit = false;
+bool	g_bGuildInfiniteMembers = false;
+bool	g_bChinaIntoxicationCheck = false;
+bool	g_bEnableSpeedHackCrash = false;
+int		g_iStatusPointGetLevelLimit = 90;
+int		g_iStatusPointSetMaxValue = 90;
+int		g_iShoutLimitLevel = 15;
+// int		g_iShoutLimitTime = 15;
+int		g_iDbLogLevel = 3;
+int		g_iSysLogLevel = 3;
+int		g_aiItemDestroyTime[ITEM_DESTROY_TIME_MAX] = {300, 150, 300}; // autoitem, dropgold, dropitem
+bool	g_bDisableEmpireLanguageCheck = false;
+DWORD	g_dwSkillBookNextReadMin = 28800;
+DWORD	g_dwSkillBookNextReadMax = 43200;
+std::string	g_stProxyIP = "";
+// #endif
 
 // TRAFFIC_PROFILER
 bool		g_bTrafficProfileOn = false;
@@ -127,6 +154,14 @@ int			HackShield_CheckCycleTime = passes_per_sec * 180;
 bool		bXTrapEnabled = false;
 
 int gPlayerMaxLevel = 99;
+int gShutdownAge = 0;
+int gShutdownEnable = 0;
+
+/*
+ * NOTE : 핵 체크 On/Off. CheckIn할때 false로 수정했으면 반드시 확인하고 고쳐놓을것!
+ * 이걸로 생길수있는 똥은 책임안짐 ~ ity ~
+ */
+bool gHackCheckEnable = false;
 
 bool g_BlockCharCreation = false;
 
@@ -224,7 +259,7 @@ static void FN_log_adminpage()
 	dev_log(LOG_DEB0, "ADMIN_PAGE_PASSWORD = %s", g_stAdminPagePassword.c_str());
 }
 
-
+#define ENABLE_AUTODETECT_INTERNAL_IP
 bool GetIPInfo()
 {
 #ifndef __WIN32__
@@ -302,41 +337,27 @@ bool GetIPInfo()
 	if (g_szPublicIP[0] != '0')
 		return true;
 	else
+	{
+#ifdef ENABLE_AUTODETECT_INTERNAL_IP
+		if (g_szInternalIP[0] == '0')
+			return false;
+		else
+		{
+			strlcpy(g_szPublicIP, g_szInternalIP, sizeof(g_szPublicIP));
+			fprintf(stderr, "INTERNAL_IP -> PUBLIC_IP: %s\n", g_szPublicIP);
+			return true;
+		}
+#else
 		return false;
+#endif
+	}
 }
 
-void config_init(const string& st_localeServiceName)
-{
-	FILE	*fp;
-
+static bool __LoadConnectConfigFile(const char* configName)
+	{
 	char	buf[256];
 	char	token_string[256];
 	char	value_string[256];
-
-	// LOCALE_SERVICE
-	string	st_configFileName;
-
-	st_configFileName.reserve(32);
-	st_configFileName = "CONFIG";
-
-	if (!st_localeServiceName.empty())
-	{
-		st_configFileName += ".";
-		st_configFileName += st_localeServiceName;
-	}
-	// END_OF_LOCALE_SERVICE
-
-	if (!(fp = fopen(st_configFileName.c_str(), "r")))
-	{
-		fprintf(stderr, "Can not open [%s]\n", st_configFileName.c_str());
-		exit(1);
-	}
-
-	if (!GetIPInfo())
-	{
-		fprintf(stderr, "Can not get public ip address\n");
-		exit(1);
-	}
 
 	char db_host[2][64], db_user[2][64], db_pwd[2][64], db_db[2][64];
 	// ... 아... db_port는 이미 있는데... 네이밍 어찌해야함...
@@ -369,49 +390,15 @@ void config_init(const string& st_localeServiceName)
 
 	FILE* fpOnlyForDB;
 
-	if (!(fpOnlyForDB = fopen(st_configFileName.c_str(), "r")))
+	if (!(fpOnlyForDB = fopen(configName, "r")))
 	{
-		fprintf(stderr, "Can not open [%s]\n", st_configFileName.c_str());
+		fprintf(stderr, "Can not open [%s]\n", configName);
 		exit(1);
 	}
 
 	while (fgets(buf, 256, fpOnlyForDB))
 	{
 		parse_token(buf, token_string, value_string);
-
-		TOKEN("BLOCK_LOGIN")
-		{
-			g_stBlockDate = value_string;
-		}
-
-		TOKEN("adminpage_ip")
-		{
-			FN_add_adminpageIP(value_string);
-			//g_stAdminPageIP[0] = value_string;
-		}
-
-		TOKEN("adminpage_ip1")
-		{
-			FN_add_adminpageIP(value_string);
-			//g_stAdminPageIP[0] = value_string;
-		}
-
-		TOKEN("adminpage_ip2")
-		{
-			FN_add_adminpageIP(value_string);
-			//g_stAdminPageIP[1] = value_string;
-		}
-
-		TOKEN("adminpage_ip3")
-		{
-			FN_add_adminpageIP(value_string);
-			//g_stAdminPageIP[2] = value_string;
-		}
-
-		TOKEN("adminpage_password")
-		{
-			g_stAdminPagePassword = value_string;
-		}
 
 		TOKEN("hostname")
 		{
@@ -431,7 +418,7 @@ void config_init(const string& st_localeServiceName)
 			const char * line = two_arguments(value_string, db_host[0], sizeof(db_host[0]), db_user[0], sizeof(db_user[0]));
 			line = two_arguments(line, db_pwd[0], sizeof(db_pwd[0]), db_db[0], sizeof(db_db[0]));
 
-			if (NULL != line[0])
+			if ('\0' != line[0])
 			{
 				char buf[256];
 				one_argument(line, buf, sizeof(buf));
@@ -455,7 +442,7 @@ void config_init(const string& st_localeServiceName)
 			const char * line = two_arguments(value_string, db_host[1], sizeof(db_host[1]), db_user[1], sizeof(db_user[1]));
 			line = two_arguments(line, db_pwd[1], sizeof(db_pwd[1]), db_db[1], sizeof(db_db[1]));
 
-			if (NULL != line[0])
+			if ('\0' != line[0])
 			{
 				char buf[256];
 				one_argument(line, buf, sizeof(buf));
@@ -479,7 +466,7 @@ void config_init(const string& st_localeServiceName)
 			const char * line = two_arguments(value_string, log_host, sizeof(log_host), log_user, sizeof(log_user));
 			line = two_arguments(line, log_pwd, sizeof(log_pwd), log_db, sizeof(log_db));
 
-			if (NULL != line[0])
+			if ('\0' != line[0])
 			{
 				char buf[256];
 				one_argument(line, buf, sizeof(buf));
@@ -496,27 +483,9 @@ void config_init(const string& st_localeServiceName)
 			snprintf(buf, sizeof(buf), "LOG_SQL: %s %s %s %s %d", log_host, log_user, log_pwd, log_db, log_port);
 			continue;
 		}
-
-		
-		//OPENID		
-		TOKEN("WEB_AUTH")
-		{
-			const char * line = two_arguments(value_string, openid_host, sizeof(openid_host), openid_uri, sizeof(openid_uri));
-
-			if (!*openid_host || !*openid_uri)
-			{
-				fprintf(stderr, "WEB_AUTH syntax error (ex: WEB_AUTH <host(metin2.co.kr) uri(/kyw/gameauth.php)>\n");
-				exit(1);
-			}
-
-			char buf[1024];
-			openid_server = 1;
-			snprintf(buf, sizeof(buf), "WEB_AUTH: %s %s", openid_host, openid_uri);
-			continue;
-		}
 	}
 
-	//처리가 끝났으니 파일을 닫자.
+	
 	fclose(fpOnlyForDB);
 
 	// CONFIG_SQL_INFO_ERROR
@@ -707,10 +676,204 @@ void config_init(const string& st_localeServiceName)
 	// LOG_KEEP_DAYS_EXTEND
 	log_set_expiration_days(2);
 	// END_OF_LOG_KEEP_DAYS_EXTEND
+	return true;
+}
+
+static bool __LoadDefaultConfigFile(const char* configName)
+{
+	FILE	*fp;
+
+	char	buf[256];
+	char	token_string[256];
+	char	value_string[256];
+
+	if (!(fp = fopen(configName, "r")))
+		return false;
 
 	while (fgets(buf, 256, fp))
 	{
 		parse_token(buf, token_string, value_string);
+
+		TOKEN("port")
+		{
+			str_to_number(mother_port, value_string);
+			continue;
+		}
+
+		TOKEN("p2p_port")
+		{
+			str_to_number(p2p_port, value_string);
+			continue;
+		}
+
+		TOKEN("map_allow")
+		{
+			char * p = value_string;
+			string stNum;
+
+			for (; *p; p++)
+			{
+				if (isnhspace(*p))
+				{
+					if (stNum.length())
+					{
+						int	index = 0;
+						str_to_number(index, stNum.c_str());
+						map_allow_add(index);
+						stNum.clear();
+					}
+				}
+				else
+					stNum += *p;
+			}
+
+			if (stNum.length())
+		{
+				int	index = 0;
+				str_to_number(index, stNum.c_str());
+				map_allow_add(index);
+			}
+
+			continue;
+		}
+
+		TOKEN("auth_server")
+		{
+			char szIP[32];
+			char szPort[32];
+
+			two_arguments(value_string, szIP, sizeof(szIP), szPort, sizeof(szPort));
+
+			if (!*szIP || (!*szPort && strcasecmp(szIP, "master")))
+			{
+				fprintf(stderr, "AUTH_SERVER: syntax error: <ip|master> <port>\n");
+				exit(1);
+			}
+
+			g_bAuthServer = true;
+
+			LoadBanIP("BANIP");
+
+			if (!strcasecmp(szIP, "master"))
+				fprintf(stdout, "AUTH_SERVER: I am the master\n");
+			else
+		{
+				g_stAuthMasterIP = szIP;
+				str_to_number(g_wAuthMasterPort, szPort);
+
+				fprintf(stdout, "AUTH_SERVER: master %s %u\n", g_stAuthMasterIP.c_str(), g_wAuthMasterPort);
+			}
+			continue;
+		}
+
+		TOKEN("teen_addr")
+		{
+			strlcpy(teen_addr, value_string, sizeof(teen_addr));
+
+			for (int n =0; n < ADDRESS_MAX_LEN; ++n)
+		{
+				if (teen_addr[n] == ' ')
+					teen_addr[n] = '\0';
+			}
+
+			continue;
+		}
+
+		TOKEN("teen_port")
+		{
+			str_to_number(teen_port, value_string);
+		}
+
+	}
+
+	fclose(fp);
+	return true;
+}
+
+static bool __LoadGeneralConfigFile(const char* configName)
+{
+	FILE	*fp;
+
+	char	buf[256];
+	char	token_string[256];
+	char	value_string[256];
+
+	if (!(fp = fopen(configName, "r")))
+		return false;
+
+	while (fgets(buf, 256, fp))
+	{
+		parse_token(buf, token_string, value_string);
+
+		//OPENID
+		TOKEN("WEB_AUTH")
+		{
+			two_arguments(value_string, openid_host, sizeof(openid_host), openid_uri, sizeof(openid_uri));
+
+			if (!*openid_host || !*openid_uri)
+			{
+				fprintf(stderr, "WEB_AUTH syntax error (ex: WEB_AUTH <host(metin2.co.kr) uri(/kyw/gameauth.php)>\n");
+				exit(1);
+			}
+
+			char buf[1024];
+			openid_server = 1;
+			snprintf(buf, sizeof(buf), "WEB_AUTH: %s %s", openid_host, openid_uri);
+			continue;
+		}
+
+		// DB_ONLY_BEGIN
+		TOKEN("BLOCK_LOGIN")
+		{
+			g_stBlockDate = value_string;
+		}
+
+		TOKEN("adminpage_ip")
+		{
+			FN_add_adminpageIP(value_string);
+		}
+
+		TOKEN("adminpage_ip1")
+		{
+			FN_add_adminpageIP(value_string);
+		}
+
+		TOKEN("adminpage_ip2")
+		{
+			FN_add_adminpageIP(value_string);
+		}
+
+		TOKEN("adminpage_ip3")
+		{
+			FN_add_adminpageIP(value_string);
+		}
+
+		TOKEN("adminpage_password")
+		{
+			g_stAdminPagePassword = value_string;
+		}
+		// DB_ONLY_END
+
+		// CONNECTION_BEGIN
+		TOKEN("db_port")
+		{
+			str_to_number(db_port, value_string);
+			continue;
+		}
+
+		TOKEN("db_addr")
+		{
+			strlcpy(db_addr, value_string, sizeof(db_addr));
+
+			for (int n =0; n < ADDRESS_MAX_LEN; ++n)
+			{
+				if (db_addr[n] == ' ')
+					db_addr[n] = '\0';
+			}
+
+			continue;
+		}
+		// CONNECTION_END
 
 		TOKEN("empire_whisper")
 		{
@@ -733,12 +896,6 @@ void config_init(const string& st_localeServiceName)
 			continue;
 		}
 
-		TOKEN("port")
-		{
-			str_to_number(mother_port, value_string);
-			continue;
-		}
-
 		TOKEN("log_keep_days")
 		{
 			int i = 0;
@@ -750,31 +907,6 @@ void config_init(const string& st_localeServiceName)
 		TOKEN("passes_per_sec")
 		{
 			str_to_number(passes_per_sec, value_string);
-			continue;
-		}
-
-		TOKEN("p2p_port")
-		{
-			str_to_number(p2p_port, value_string);
-			continue;
-		}
-
-		TOKEN("db_port")
-		{
-			str_to_number(db_port, value_string);
-			continue;
-		}
-
-		TOKEN("db_addr")
-		{
-			strlcpy(db_addr, value_string, sizeof(db_addr));
-
-			for (int n =0; n < ADDRESS_MAX_LEN; ++n)
-			{
-				if (db_addr[n] == ' ')
-					db_addr[n] = '\0';
-			}
-
 			continue;
 		}
 
@@ -851,41 +983,311 @@ void config_init(const string& st_localeServiceName)
 			continue;
 		}
 
-		TOKEN("traffic_profile")
+#ifdef ENABLE_NEWSTUFF
+		TOKEN("item_count_limit")
 		{
-			g_bTrafficProfileOn = true;
+			str_to_number(g_bItemCountLimit, value_string);
+			fprintf(stdout, "ITEM_COUNT_LIMIT: %d\n", g_bItemCountLimit);
 			continue;
 		}
 
-
-		TOKEN("map_allow")
+		TOKEN("disable_shop_price_3x")
 		{
-			char * p = value_string;
-			string stNum;
+			g_bEmpireShopPriceTripleDisable = true;
+			fprintf(stdout, "EMPIRE_SHOP_PRICE_3x: DISABLED\n");
+			continue;
+		}
 
-			for (; *p; p++)
-			{   
-				if (isnhspace(*p))
-				{
-					if (stNum.length())
-					{
-						int	index = 0;
-						str_to_number(index, stNum.c_str());
-						map_allow_add(index);
-						stNum.clear();
-					}
-				}
-				else
-					stNum += *p;
-			}
+		TOKEN("shop_price_3x_tax") //alternative
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+			g_bEmpireShopPriceTripleDisable = !flag;
+			fprintf(stdout, "SHOP_PRICE_3X_TAX: %s\n", (!g_bEmpireShopPriceTripleDisable)?"ENABLED":"DISABLED");
+			continue;
+		}
 
-			if (stNum.length())
-			{
-				int	index = 0;
-				str_to_number(index, stNum.c_str());
-				map_allow_add(index);
-			}
+		//unused
+		TOKEN("enable_shout_addon")
+		{
+			g_bShoutAddonEnable = true;
+			continue;
+		}
 
+		//unused
+		TOKEN("enable_all_mount_attack")
+		{
+			g_bAllMountAttack = true;
+			continue;
+		}
+
+		TOKEN("disable_change_attr_time")
+		{
+			g_dwItemBonusChangeTime = 0;
+			fprintf(stdout, "CHANGE_ATTR_TIME_LIMIT: DISABLED\n");
+			continue;
+		}
+
+		TOKEN("change_attr_time_limit") //alternative
+		{
+			DWORD flag = 0;
+			str_to_number(flag, value_string);
+			g_dwItemBonusChangeTime = flag;
+			fprintf(stdout, "CHANGE_ATTR_TIME_LIMIT: %u\n", g_dwItemBonusChangeTime);
+			continue;
+		}
+
+		TOKEN("disable_prism_item")
+		{
+			g_bDisablePrismNeed = true;
+			fprintf(stdout, "PRISM_ITEM_REQUIREMENT: DISABLED\n");
+			continue;
+		}
+
+		TOKEN("prism_item_require") //alternative
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+			g_bDisablePrismNeed = !flag;
+			fprintf(stdout, "PRISM_ITEM_REQUIRE: %s\n", (!g_bDisablePrismNeed)?"ENABLED":"DISABLED");
+			continue;
+		}
+
+		TOKEN("enable_global_shout")
+		{
+			g_bGlobalShoutEnable = true;
+			fprintf(stdout, "GLOBAL_SHOUT: ENABLED\n");
+			continue;
+		}
+
+		TOKEN("global_shout") //alternative
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+			g_bGlobalShoutEnable = !!flag;
+			fprintf(stdout, "GLOBAL_SHOUT: %s\n", (g_bGlobalShoutEnable)?"ENABLED":"DISABLED");
+			continue;
+		}
+
+		TOKEN("disable_emotion_mask")
+		{
+			g_bDisableEmotionMask = true;
+			fprintf(stdout, "EMOTION_MASK_REQUIREMENT: DISABLED\n");
+			continue;
+		}
+
+		TOKEN("emotion_mask_require") //alternative
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+			g_bDisableEmotionMask = !flag;
+			fprintf(stdout, "EMOTION_MASK_REQUIRE: %s\n", (g_bDisableEmotionMask)?"ENABLED":"DISABLED");
+			continue;
+		}
+
+		TOKEN("enable_bootary_check")
+		{
+			g_bEnableBootaryCheck = true;
+			fprintf(stdout, "ENABLE_BOOTARY_CHECK: ENABLED\n");
+			continue;
+		}
+
+		TOKEN("bootary_check") //alternative
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+			g_bEnableBootaryCheck = !!flag;
+			fprintf(stdout, "BOOTARY_CHECK: %s\n", (g_bEnableBootaryCheck)?"ENABLED":"DISABLED");
+			continue;
+		}
+
+		TOKEN("status_point_get_level_limit")
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+			if (flag <= 0) continue;
+
+			g_iStatusPointGetLevelLimit = MINMAX(0, flag, PLAYER_MAX_LEVEL_CONST);
+			fprintf(stdout, "STATUS_POINT_GET_LEVEL_LIMIT: %d\n", g_iStatusPointGetLevelLimit);
+			continue;
+		}
+
+		TOKEN("status_point_set_max_value")
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+			if (flag <= 0) continue;
+
+			g_iStatusPointSetMaxValue = flag;
+			fprintf(stdout, "STATUS_POINT_SET_MAX_VALUE: %d\n", g_iStatusPointSetMaxValue);
+			continue;
+		}
+
+		TOKEN("shout_limit_level")
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+			if (flag <= 0) continue;
+
+			g_iShoutLimitLevel = flag;
+			fprintf(stdout, "SHOUT_LIMIT_LEVEL: %d\n", g_iShoutLimitLevel);
+			continue;
+		}
+
+		TOKEN("db_log_level")
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+
+			g_iDbLogLevel = flag;
+			fprintf(stdout, "DB_LOG_LEVEL: %d\n", g_iDbLogLevel);
+			continue;
+		}
+
+		TOKEN("sys_log_level")
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+
+			g_iSysLogLevel = flag;
+			fprintf(stdout, "SYS_LOG_LEVEL: %d\n", g_iSysLogLevel);
+			continue;
+		}
+
+		TOKEN("item_destroy_time_autogive")
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+
+			g_aiItemDestroyTime[ITEM_DESTROY_TIME_AUTOGIVE] = flag;
+			fprintf(stdout, "ITEM_DESTROY_TIME_AUTOGIVE: %d\n", g_aiItemDestroyTime[ITEM_DESTROY_TIME_AUTOGIVE]);
+			continue;
+		}
+
+		TOKEN("item_destroy_time_dropgold")
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+
+			g_aiItemDestroyTime[ITEM_DESTROY_TIME_DROPGOLD] = flag;
+			fprintf(stdout, "ITEM_DESTROY_TIME_DROPGOLD: %d\n", g_aiItemDestroyTime[ITEM_DESTROY_TIME_DROPGOLD]);
+			continue;
+		}
+
+		TOKEN("item_destroy_time_dropitem")
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+
+			g_aiItemDestroyTime[ITEM_DESTROY_TIME_DROPITEM] = flag;
+			fprintf(stdout, "ITEM_DESTROY_TIME_DROPITEM: %d\n", g_aiItemDestroyTime[ITEM_DESTROY_TIME_DROPITEM]);
+			continue;
+		}
+
+		// TOKEN("shout_limit_time")
+		// {
+			// int flag = 0;
+			// str_to_number(flag, value_string);
+			// if (flag <= 0) continue;
+
+			// g_iShoutLimitTime = flag;
+			// fprintf(stdout, "SHOUT_LIMIT_TIME: %d\n", g_iShoutLimitTime);
+			// continue;
+		// }
+
+		TOKEN("check_version_server")
+		{
+			int flag = 0;
+
+			str_to_number(flag, value_string);
+			g_bCheckClientVersion = !!flag;
+			fprintf(stdout, "CHECK_VERSION_SERVER: %d\n", g_bCheckClientVersion);
+			continue;
+		}
+
+		TOKEN("check_version_value")
+		{
+			g_stClientVersion = value_string;
+			fprintf(stdout, "CHECK_VERSION_VALUE: %s\n", g_stClientVersion.c_str());
+			continue;
+		}
+
+		TOKEN("enable_hack_check")
+		{
+			DWORD flag = 0;
+			str_to_number(flag, value_string);
+
+			gHackCheckEnable = !!flag;
+			fprintf(stdout, "ENABLE_HACK_CHECK: %d\n", gHackCheckEnable);
+			continue;
+		}
+
+		TOKEN("gm_host_check")
+		{
+			DWORD flag = 0;
+			str_to_number(flag, value_string);
+
+			g_bGMHostCheck = !!flag;
+			fprintf(stdout, "GM_HOST_CHECK: %d\n", g_bGMHostCheck);
+			continue;
+		}
+
+		TOKEN("guild_invite_limit")
+		{
+			DWORD flag = 0;
+			str_to_number(flag, value_string);
+
+			g_bGuildInviteLimit = !!flag;
+			fprintf(stdout, "GUILD_INVITE_LIMIT: %d\n", g_bGuildInviteLimit);
+			continue;
+		}
+
+		TOKEN("guild_infinite_members")
+		{
+			DWORD flag = 0;
+			str_to_number(flag, value_string);
+
+			g_bGuildInfiniteMembers = !!flag;
+			fprintf(stdout, "GUILD_INFINITE_MEMBERS: %d\n", g_bGuildInfiniteMembers);
+			continue;
+		}
+
+		TOKEN("empire_language_check")
+		{
+			int flag = 0;
+			str_to_number(flag, value_string);
+			g_bDisableEmpireLanguageCheck = !flag;
+			fprintf(stdout, "EMPIRE_LANGUAGE_CHECK: %s\n", (g_bDisableEmpireLanguageCheck)?"DISABLED":"ENABLED");
+			continue;
+		}
+
+		TOKEN("skillbook_nextread_min")
+		{
+			DWORD flag = 0;
+			str_to_number(flag, value_string);
+			g_dwSkillBookNextReadMin = flag;
+			fprintf(stdout, "SKILLBOOK_NEXTREAD_MIN: %u\n", g_dwSkillBookNextReadMin);
+			continue;
+		}
+
+		TOKEN("skillbook_nextread_max")
+		{
+			DWORD flag = 0;
+			str_to_number(flag, value_string);
+			g_dwSkillBookNextReadMax = flag;
+			fprintf(stdout, "SKILLBOOK_NEXTREAD_MAX: %u\n", g_dwSkillBookNextReadMax);
+			continue;
+		}
+
+		TOKEN("proxy_ip")
+		{
+			g_stProxyIP = value_string;
+		}
+#endif
+
+		TOKEN("traffic_profile")
+		{
+			g_bTrafficProfileOn = true;
 			continue;
 		}
 
@@ -904,35 +1306,6 @@ void config_init(const string& st_localeServiceName)
 		TOKEN("skill_disable")
 		{
 			str_to_number(g_bSkillDisable, value_string);
-			continue;
-		}
-
-		TOKEN("auth_server")
-		{
-			char szIP[32];
-			char szPort[32];
-
-			two_arguments(value_string, szIP, sizeof(szIP), szPort, sizeof(szPort));
-
-			if (!*szIP || (!*szPort && strcasecmp(szIP, "master")))
-			{
-				fprintf(stderr, "AUTH_SERVER: syntax error: <ip|master> <port>\n");
-				exit(1);
-			}
-
-			g_bAuthServer = true;
-
-			LoadBanIP("BANIP");
-
-			if (!strcasecmp(szIP, "master"))
-				fprintf(stdout, "AUTH_SERVER: I am the master\n");
-			else
-			{
-				g_stAuthMasterIP = szIP;
-				str_to_number(g_wAuthMasterPort, szPort);
-
-				fprintf(stdout, "AUTH_SERVER: master %s %u\n", g_stAuthMasterIP.c_str(), g_wAuthMasterPort);
-			}
 			continue;
 		}
 
@@ -961,24 +1334,6 @@ void config_init(const string& st_localeServiceName)
 				g_setQuestObjectDir.insert(dir);
 				sys_log(0, "QUEST_OBJECT_DIR INSERT : %s", dir .c_str());
 			}
-		}
-
-		TOKEN("teen_addr")
-		{
-			strlcpy(teen_addr, value_string, sizeof(teen_addr));
-
-			for (int n =0; n < ADDRESS_MAX_LEN; ++n)
-			{
-				if (teen_addr[n] == ' ')
-					teen_addr[n] = '\0';
-			}
-
-			continue;
-		}
-
-		TOKEN("teen_port")
-		{
-			str_to_number(teen_port, value_string);
 		}
 
 		TOKEN("synchack_limit_count")
@@ -1106,6 +1461,19 @@ void config_init(const string& st_localeServiceName)
 			fprintf(stderr, "PLAYER_MAX_LEVEL: %d\n", gPlayerMaxLevel);
 		}
 
+		TOKEN("shutdown_age")
+		{
+			str_to_number(gShutdownAge, value_string);
+			fprintf(stderr, "SHUTDOWN_AGE: %d\n", gShutdownAge);
+
+		}
+
+		TOKEN("shutdown_enable")
+		{
+			str_to_number(gShutdownEnable, value_string);
+			fprintf(stderr, "SHUTDOWN_ENABLE: %d\n", gShutdownEnable);
+		}
+
 		TOKEN("block_char_creation")
 		{
 			int tmp = 0;
@@ -1120,6 +1488,158 @@ void config_init(const string& st_localeServiceName)
 			continue;
 		}
 	}
+	fclose(fp);
+	return true;
+	}
+
+#define ENABLE_CMD_PLAYER
+static bool __LoadDefaultCMDFile(const char* cmdName)
+	{
+	FILE	*fp;
+	char	buf[256];
+
+	if ((fp = fopen(cmdName, "r")))
+	{
+		while (fgets(buf, 256, fp))
+		{
+			char cmd[32], levelname[32];
+			int level;
+
+			two_arguments(buf, cmd, sizeof(cmd), levelname, sizeof(levelname));
+
+			if (!*cmd || !*levelname)
+			{
+#ifdef ENABLE_CMD_PLAYER
+				fprintf(stderr, "CMD syntax error: <cmd> <PLAYER | LOW_WIZARD | WIZARD | HIGH_WIZARD | GOD | IMPLEMENTOR | DISABLE>\n");
+#else
+				fprintf(stderr, "CMD syntax error: <cmd> <LOW_WIZARD | WIZARD | HIGH_WIZARD | GOD | IMPLEMENTOR | DISABLE>\n");
+#endif
+				exit(1);
+			}
+
+			if (!strcasecmp(levelname, "LOW_WIZARD"))
+				level = GM_LOW_WIZARD;
+			else if (!strcasecmp(levelname, "WIZARD"))
+				level = GM_WIZARD;
+			else if (!strcasecmp(levelname, "HIGH_WIZARD"))
+				level = GM_HIGH_WIZARD;
+			else if (!strcasecmp(levelname, "GOD"))
+				level = GM_GOD;
+			else if (!strcasecmp(levelname, "IMPLEMENTOR"))
+				level = GM_IMPLEMENTOR;
+#ifdef ENABLE_CMD_PLAYER
+			else if (!strcasecmp(levelname, "PLAYER"))
+				level = GM_PLAYER;
+#endif
+			else if (!strcasecmp(levelname, "DISABLE"))
+				level = GM_DISABLE;
+			else
+			{
+#ifdef ENABLE_CMD_PLAYER
+				fprintf(stderr, "CMD syntax error: <cmd> <PLAYER | LOW_WIZARD | WIZARD | HIGH_WIZARD | GOD | IMPLEMENTOR | DISABLE>\n");
+#else
+				fprintf(stderr, "CMD syntax error: <cmd> <LOW_WIZARD | WIZARD | HIGH_WIZARD | GOD | IMPLEMENTOR | DISABLE>\n");
+#endif
+				exit(1);
+			}
+
+			if (test_server)
+				fprintf(stdout, "CMD_REWRITE: [%s] [%s:%d]\n", cmd, levelname, level);
+			interpreter_set_privilege(cmd, level);
+		}
+
+		fclose(fp);
+		return true;
+	}
+	return false;
+}
+
+#define ENABLE_EXPTABLE_FROMDB
+#ifdef ENABLE_EXPTABLE_FROMDB
+static bool __LoadExpTableFromDB(void)
+{
+	std::unique_ptr<SQLMsg> pMsg(AccountDB::instance().DirectQuery("SELECT level, exp FROM exp_table"));
+	if (pMsg->Get()->uiNumRows == 0)
+		return false;
+
+	static DWORD new_exp_table[PLAYER_MAX_LEVEL_CONST+1];
+	if (exp_table != NULL)
+		memcpy(new_exp_table, exp_table, (PLAYER_MAX_LEVEL_CONST+1)*sizeof(DWORD));
+
+	MYSQL_ROW row = NULL;
+	while ((row = mysql_fetch_row(pMsg->Get()->pSQLResult)))
+	{
+		DWORD level = 0;
+		DWORD exp = 0;
+		str_to_number(level, row[0]);
+		str_to_number(exp, row[1]);
+		if (level > PLAYER_MAX_LEVEL_CONST)
+			continue;
+		new_exp_table[level] = exp;
+		// printf("new_exp_table[%u] = %u;\n", level, exp);
+	}
+	exp_table = new_exp_table;
+	return true;
+}
+#endif
+
+// #define ENABLE_GENERAL_CMD
+// #define ENABLE_GENERAL_CONFIG
+void config_init(const string& st_localeServiceName)
+{
+	// LOCALE_SERVICE
+	string	st_configFileName;
+
+	st_configFileName.reserve(32);
+	st_configFileName = "CONFIG";
+
+	if (!st_localeServiceName.empty())
+	{
+		st_configFileName += ".";
+		st_configFileName += st_localeServiceName;
+	}
+	// END_OF_LOCALE_SERVICE
+
+	
+	
+	if (!GetIPInfo())
+	{
+	//	fprintf(stderr, "Can not get public ip address\n");
+	//	exit(1);
+	}
+
+	// default config load (REQUIRED)
+	if (!__LoadConnectConfigFile(st_configFileName.c_str()) ||
+		!__LoadDefaultConfigFile(st_configFileName.c_str()) ||
+		!__LoadGeneralConfigFile(st_configFileName.c_str())
+	)
+	{
+		fprintf(stderr, "Can not open [%s]\n", st_configFileName.c_str());
+		exit(1);
+	}
+#ifdef ENABLE_GENERAL_CONFIG
+	// general config - locale based
+	{
+		char szFileName[256];
+		snprintf(szFileName, sizeof(szFileName), "%s/conf/GENERAL_%s", LocaleService_GetBasePath().c_str(), st_configFileName.c_str());
+		if (__LoadGeneralConfigFile(szFileName))
+			fprintf(stderr, "GENERAL CONFIG LOAD OK [%s]\n", szFileName);
+	}
+	// general config - locale n channel based
+	{
+		char szFileName[256];
+		snprintf(szFileName, sizeof(szFileName), "%s/conf/GENERAL_%s_CHANNEL_%d", LocaleService_GetBasePath().c_str(), st_configFileName.c_str(), g_bChannel);
+		if (__LoadGeneralConfigFile(szFileName))
+			fprintf(stderr, "GENERAL CONFIG LOAD OK [%s]\n", szFileName);
+	}
+	// general config - locale n channel n hostname based
+	{
+		char szFileName[256];
+		snprintf(szFileName, sizeof(szFileName), "%s/conf/GENERAL_%s_CHANNEL_%d_HOSTNAME_%s", LocaleService_GetBasePath().c_str(), st_configFileName.c_str(), g_bChannel, g_stHostname.c_str());
+		if (__LoadGeneralConfigFile(szFileName))
+			fprintf(stderr, "GENERAL CONFIG LOAD OK [%s]\n", szFileName);
+	}
+#endif
 
 	if (g_setQuestObjectDir.empty())
 		g_setQuestObjectDir.insert(g_stDefaultQuestObjectDir);
@@ -1148,45 +1668,44 @@ void config_init(const string& st_localeServiceName)
 	LocaleService_LoadEmpireTextConvertTables();
 	// END_OF_LOCALE_SERVICE
 
-	fclose(fp);
-
-	if ((fp = fopen("CMD", "r")))
+#ifdef ENABLE_EXPTABLE_FROMDB
+	if (!__LoadExpTableFromDB())
 	{
-		while (fgets(buf, 256, fp))
-		{
-			char cmd[32], levelname[32];
-			int level;
+		// do as you please to manage this
+		fprintf(stderr, "Failed to Load ExpTable from DB so exit\n");
+		// exit(1);
+	}
+#endif
 
-			two_arguments(buf, cmd, sizeof(cmd), levelname, sizeof(levelname));
+	std::string st_cmdFileName("CMD");
+	__LoadDefaultCMDFile(st_cmdFileName.c_str());
+#ifdef ENABLE_GENERAL_CMD
+	// general cmd - locale based
+	{
+		char szFileName[256];
+		snprintf(szFileName, sizeof(szFileName), "%s/conf/GENERAL_%s", LocaleService_GetBasePath().c_str(), st_cmdFileName.c_str());
+		if (__LoadDefaultCMDFile(szFileName))
+			fprintf(stdout, "GENERAL CMD LOAD OK [%s]\n", szFileName);
+	}
+	// general cmd - locale n channel based
+	{
+		char szFileName[256];
+		snprintf(szFileName, sizeof(szFileName), "%s/conf/GENERAL_%s_CHANNEL_%d", LocaleService_GetBasePath().c_str(), st_cmdFileName.c_str(), g_bChannel);
+		if (__LoadDefaultCMDFile(szFileName))
+			fprintf(stdout, "GENERAL CMD LOAD OK [%s]\n", szFileName);
+	}
+	// general cmd - locale n channel n hostname based
+	{
+		char szFileName[256];
+		snprintf(szFileName, sizeof(szFileName), "%s/conf/GENERAL_%s_CHANNEL_%d_HOSTNAME_%s", LocaleService_GetBasePath().c_str(), st_cmdFileName.c_str(), g_bChannel, g_stHostname.c_str());
+		if (__LoadDefaultCMDFile(szFileName))
+			fprintf(stdout, "GENERAL CMD LOAD OK [%s]\n", szFileName);
+	}
+#endif
 
-			if (!*cmd || !*levelname)
-			{
-				fprintf(stderr, "CMD syntax error: <cmd> <DISABLE | LOW_WIZARD | WIZARD | HIGH_WIZARD | GOD>\n");
-				exit(1);
-			}
-
-			if (!strcasecmp(levelname, "LOW_WIZARD"))
-				level = GM_LOW_WIZARD;
-			else if (!strcasecmp(levelname, "WIZARD"))
-				level = GM_WIZARD;
-			else if (!strcasecmp(levelname, "HIGH_WIZARD"))
-				level = GM_HIGH_WIZARD;
-			else if (!strcasecmp(levelname, "GOD"))
-				level = GM_GOD;
-			else if (!strcasecmp(levelname, "IMPLEMENTOR"))
-				level = GM_IMPLEMENTOR;
-			else if (!strcasecmp(levelname, "DISABLE"))
-				level = GM_IMPLEMENTOR + 1;
-			else
-			{
-				fprintf(stderr, "CMD syntax error: <cmd> <DISABLE | LOW_WIZARD | WIZARD | HIGH_WIZARD | GOD>\n");
-				exit(1);
-			}
-
-			interpreter_set_privilege(cmd, level);
-		}
-
-		fclose(fp);
+	if(!gHackCheckEnable)	
+	{
+		assert(test_server);	
 	}
 
 	LoadValidCRCList();
@@ -1195,6 +1714,11 @@ void config_init(const string& st_localeServiceName)
 	CWarMapManager::instance().LoadWarMapInfo(NULL);
 
 	FN_log_adminpage();
+	if (g_szPublicIP[0] == '0')
+	{
+		fprintf(stderr, "Can not get public ip address\n");
+		exit(1);
+	}
 }
 
 const char* get_table_postfix()
@@ -1254,15 +1778,6 @@ bool LoadClientVersion()
 
 void CheckClientVersion()
 {
-	if (LC_IsEurope())
-	{
-		g_bCheckClientVersion = true;
-	}
-	else
-	{
-		g_bCheckClientVersion = false;
-	}
-
 	const DESC_MANAGER::DESC_SET & set = DESC_MANAGER::instance().GetClientSet();
 	DESC_MANAGER::DESC_SET::const_iterator it = set.begin();
 
@@ -1273,12 +1788,7 @@ void CheckClientVersion()
 		if (!d->GetCharacter())
 			continue;
 
-
-		int version = atoi(g_stClientVersion.c_str());
-		int date	= atoi(d->GetClientVersion() );
-
-		//if (0 != g_stClientVersion.compare(d->GetClientVersion()) )
-		if (version > date)
+		if (0 != g_stClientVersion.compare(d->GetClientVersion())) // @fixme103 (version > date)
 		{
 			d->GetCharacter()->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("클라이언트 버전이 틀려 로그아웃 됩니다. 정상적으로 패치 후 접속하세요."));
 			d->DelayedDisconnect(10);
@@ -1293,8 +1803,7 @@ void LoadStateUserCount()
 	if (!fp)
 		return;
 
-	if (!LC_IsHongKong())
-		fscanf(fp, " %d %d ", &g_iFullUserCount, &g_iBusyUserCount);
+	fscanf(fp, " %d %d ", &g_iFullUserCount, &g_iBusyUserCount);
 
 	fclose(fp);
 }

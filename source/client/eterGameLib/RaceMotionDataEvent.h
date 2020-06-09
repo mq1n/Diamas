@@ -2,6 +2,7 @@
 
 #include "../eterEffectLib/EffectManager.h"
 #include "FlyingObjectManager.h"
+#include "GameLibDefines.h"
 
 namespace NMotionEvent
 {
@@ -287,4 +288,40 @@ namespace NMotionEvent
 		void Save(FILE * File, int iTabs) {}
 		void Load() {}
 	} TMotionWarpEventData;
+
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	// Unk11 AniSpeed (new type 11)
+	typedef struct SMotionEventDataUnk11 : public SMotionEventData
+	{
+		int iAniSpeed;
+
+		SMotionEventDataUnk11() {}
+		virtual ~SMotionEventDataUnk11() {}
+
+		void Save(FILE * File, int iTabs)
+		{
+			PrintfTabs(File, iTabs, "\n");
+			PrintfTabs(File, iTabs, "BaseVelocity        \"%d\"\n", iAniSpeed);
+		}
+		bool Load(CTextFileLoader & rTextFileLoader)
+		{
+			if (!rTextFileLoader.GetTokenInteger("basevelocity", &iAniSpeed))
+				return false;
+
+			return true;
+		}
+	} TMotionEventDataUnk11;
+
+	// Unk12 (new type 12)
+	typedef struct SMotionEventDataUnk12 : public SMotionEventData
+	{
+		int iAniSpeed;
+
+		SMotionEventDataUnk12() {}
+		virtual ~SMotionEventDataUnk12() {}
+
+		void Save(FILE * File, int iTabs) {}
+		void Load() {}
+	} TMotionEventDataUnk12;
+#endif
 };

@@ -13,6 +13,7 @@
 #include "../../common/length.h"
 #include "exchange.h"
 #include "DragonSoul.h"
+#include "questmanager.h" // @fixme150
 
 void exchange_packet(LPCHARACTER ch, BYTE sub_header, bool is_me, DWORD arg1, TItemPos arg2, DWORD arg3, void * pvData = NULL);
 
@@ -253,13 +254,8 @@ bool CExchange::AddGold(long gold)
 		return false;
 	}
 
-	if ( LC_IsCanada() == true || LC_IsEurope() == true )
-	{
-		if ( m_lGold > 0 )
-		{
-			return false;
-		}
-	}
+	if (m_lGold > 0)
+		return false;
 
 	Accept(false);
 	GetCompany()->Accept(false);
@@ -299,33 +295,56 @@ bool CExchange::Check(int * piItemCount)
 
 bool CExchange::CheckSpace()
 {
-	static CGrid s_grid1(5, INVENTORY_MAX_NUM/5 / 2); // inven page 1
-	static CGrid s_grid2(5, INVENTORY_MAX_NUM/5 / 2); // inven page 2
+	static CGrid s_grid1(INVENTORY_PAGE_COLUMN, INVENTORY_PAGE_ROW); // inven page 1
+	static CGrid s_grid2(INVENTORY_PAGE_COLUMN, INVENTORY_PAGE_ROW); // inven page 2
+#ifdef ENABLE_EXTEND_INVEN_SYSTEM
+	static CGrid s_grid3(INVENTORY_PAGE_COLUMN, INVENTORY_PAGE_ROW); // inven page 3
+	static CGrid s_grid4(INVENTORY_PAGE_COLUMN, INVENTORY_PAGE_ROW); // inven page 4
+#endif
 
 	s_grid1.Clear();
 	s_grid2.Clear();
+#ifdef ENABLE_EXTEND_INVEN_SYSTEM
+	s_grid3.Clear();
+	s_grid4.Clear();
+#endif
 
 	LPCHARACTER	victim = GetCompany()->GetOwner();
 	LPITEM item;
 
 	int i;
 
-	for (i = 0; i < INVENTORY_MAX_NUM / 2; ++i)
+	for (i = 0; i < INVENTORY_PAGE_SIZE*1; ++i)
 	{
 		if (!(item = victim->GetInventoryItem(i)))
 			continue;
 
 		s_grid1.Put(i, 1, item->GetSize());
 	}
-	for (i = INVENTORY_MAX_NUM / 2; i < INVENTORY_MAX_NUM; ++i)
+	for (i = INVENTORY_PAGE_SIZE*1; i < INVENTORY_PAGE_SIZE*2; ++i)
 	{
 		if (!(item = victim->GetInventoryItem(i)))
 			continue;
 
-		s_grid2.Put(i - INVENTORY_MAX_NUM / 2, 1, item->GetSize());
+		s_grid2.Put(i - INVENTORY_PAGE_SIZE*1, 1, item->GetSize());
 	}
+#ifdef ENABLE_EXTEND_INVEN_SYSTEM
+	for (i = INVENTORY_PAGE_SIZE*2; i < INVENTORY_PAGE_SIZE*3; ++i)
+	{
+		if (!(item = victim->GetInventoryItem(i)))
+			continue;
 
-	// 아... 뭔가 개병신 같지만... 용혼석 인벤을 노멀 인벤 보고 따라 만든 내 잘못이다 ㅠㅠ
+		s_grid3.Put(i - INVENTORY_PAGE_SIZE*2, 1, item->GetSize());
+	}
+	for (i = INVENTORY_PAGE_SIZE*3; i < INVENTORY_PAGE_SIZE*4; ++i)
+	{
+		if (!(item = victim->GetInventoryItem(i)))
+			continue;
+
+		s_grid4.Put(i - INVENTORY_PAGE_SIZE*3, 1, item->GetSize());
+	}
+#endif
+
 	static std::vector <WORD> s_vDSGrid(DRAGON_SOUL_INVENTORY_MAX_NUM);
 	
 	// 일단 용혼석을 교환하지 않을 가능성이 크므로, 용혼석 인벤 복사는 용혼석이 있을 때 하도록 한다.
@@ -357,7 +376,7 @@ bool CExchange::CheckSpace()
 			for (int i = 0; i < DRAGON_SOUL_BOX_SIZE; i++)
 			{
 				WORD wPos = wBasePos + i;
-				if (0 == s_vDSGrid[wBasePos])
+				if (0 == s_vDSGrid[wPos]) // @fixme159 (wBasePos to wPos)
 				{
 					bool bEmpty = true;
 					for (int j = 1; j < item->GetSize(); j++)
@@ -386,25 +405,28 @@ bool CExchange::CheckSpace()
 		}
 		else
 		{
-			int iPos = s_grid1.FindBlank(1, item->GetSize());
+			int iPos;
 
-			if (iPos >= 0)
+			if ((iPos = s_grid1.FindBlank(1, item->GetSize())) >= 0)
 			{
 				s_grid1.Put(iPos, 1, item->GetSize());
 			}
-			else
+			else if ((iPos = s_grid2.FindBlank(1, item->GetSize())) >= 0)
 			{
-				iPos = s_grid2.FindBlank(1, item->GetSize());
-
-				if (iPos >= 0)
-				{
-					s_grid2.Put(iPos, 1, item->GetSize());
-				}
-				else
-				{
-					return false;
-				}
+				s_grid2.Put(iPos, 1, item->GetSize());
 			}
+#ifdef ENABLE_EXTEND_INVEN_SYSTEM
+			else if ((iPos = s_grid3.FindBlank(1, item->GetSize())) >= 0)
+			{
+				s_grid3.Put(iPos, 1, item->GetSize());
+			}
+			else if ((iPos = s_grid4.FindBlank(1, item->GetSize())) >= 0)
+			{
+				s_grid4.Put(iPos, 1, item->GetSize());
+			}
+#endif
+			else
+				return false;
 		}
 	}
 
@@ -513,8 +535,20 @@ bool CExchange::Accept(bool bAccept)
 		victim->SetExchangeTime();		
 		//END_PREVENT_PORTAL_AFTER_EXCHANGE
 
-		// exchange_check 에서는 교환할 아이템들이 제자리에 있나 확인하고,
-		// 엘크도 충분히 있나 확인한다, 두번째 인자로 교환할 아이템 개수
+		// @fixme150 BEGIN
+		if (quest::CQuestManager::instance().GetPCForce(GetOwner()->GetPlayerID())->IsRunning() == true)
+		{
+			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot trade if you're using quests"));
+			victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot trade if the other part using quests"));
+			goto EXCHANGE_END;
+		}
+		else if (quest::CQuestManager::instance().GetPCForce(victim->GetPlayerID())->IsRunning() == true)
+		{
+			victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot trade if you're using quests"));
+			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot trade if the other part using quests"));
+			goto EXCHANGE_END;
+		}
+		// @fixme150 END
 		// 를 리턴한다.
 		if (!Check(&iItemCount))
 		{

@@ -220,7 +220,7 @@ bool DragonSoulTable::ReadAdditionalApplys()
 		return false;
 	}
 
-	for (int i = 0; i < m_vecDragonSoulNames.size(); i++)
+	for (size_t i = 0; i < m_vecDragonSoulNames.size(); i++)
 	{
 		CGroupNode* pChild;
 		if (NULL == (pChild = pGroupNode->GetChildNode(m_vecDragonSoulNames[i])))
@@ -280,7 +280,7 @@ bool DragonSoulTable::CheckApplyNumSettings ()
 	}
 	else
 	{
-		for (int i = 0; i < m_vecDragonSoulTypes.size(); i++)
+		for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 		{
 			for (int j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
 			{
@@ -308,7 +308,7 @@ bool DragonSoulTable::CheckWeightTables ()
 	}
 	else
 	{
-		for (int i = 0; i < m_vecDragonSoulTypes.size(); i++)
+		for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 		{
 			for (int j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
 			{
@@ -340,7 +340,7 @@ bool DragonSoulTable::CheckRefineGradeTables()
 	}
 	else
 	{
-		for (int i = 0; i < m_vecDragonSoulTypes.size(); i++)
+		for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 		{
 			for (int j = 0; j < DRAGON_SOUL_GRADE_MAX - 1; j++)
 			{
@@ -369,7 +369,7 @@ bool DragonSoulTable::CheckRefineGradeTables()
 					sys_err ("In %s group of RefineGradeTables, probability list size is not %d.", DRAGON_SOUL_GRADE_MAX);
 					return false;
 				}
-				for (int k = 0; k < vec_probs.size(); k++)
+				for (size_t k = 0; k < vec_probs.size(); k++)
 				{
 					if (vec_probs[k] < 0.f)
 					{
@@ -394,7 +394,7 @@ bool DragonSoulTable::CheckRefineStepTables ()
 	}
 	else
 	{
-		for (int i = 0; i < m_vecDragonSoulTypes.size(); i++)
+		for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 		{
 			for (int j = 0; j < DRAGON_SOUL_STEP_MAX - 1; j++)
 			{
@@ -424,7 +424,7 @@ bool DragonSoulTable::CheckRefineStepTables ()
 						m_vecDragonSoulNames[i].c_str(), DRAGON_SOUL_GRADE_MAX);
 					return false;
 				}
-				for (int k = 0; k < vec_probs.size(); k++)
+				for (size_t k = 0; k < vec_probs.size(); k++)
 				{
 					if (vec_probs[k] < 0.f)
 					{
@@ -450,7 +450,7 @@ bool DragonSoulTable::CheckRefineStrengthTables()
 		sys_err ("dragon_soul_table.txt need RefineStrengthTables.");
 		return false;
 	}
-	for (int i = 0; i < m_vecDragonSoulTypes.size(); i++)
+	for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 	{
 		for (int j = MATERIAL_DS_REFINE_NORMAL; j <= MATERIAL_DS_REFINE_HOLLY; j++)
 		{
@@ -491,7 +491,7 @@ bool DragonSoulTable::CheckDragonHeartExtTables()
 		sys_err ("dragon_soul_table.txt need DragonHeartExtTables.");
 		return false;
 	}
-	for (int i = 0; i < m_vecDragonSoulTypes.size(); i++)
+	for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 	{
 		for (int j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
 		{
@@ -510,7 +510,7 @@ bool DragonSoulTable::CheckDragonHeartExtTables()
 					m_vecDragonSoulNames[i].c_str(), vec_chargings.size(), vec_probs.size());
 				return false;
 			}
-			for (int k = 0; k < vec_chargings.size(); k++)
+			for (size_t k = 0; k < vec_chargings.size(); k++)
 			{
 				if (vec_chargings[k] < 0.f)
 				{
@@ -519,7 +519,7 @@ bool DragonSoulTable::CheckDragonHeartExtTables()
 					return false;
 				}
 			}
-			for (int k = 0; k < vec_probs.size(); k++)
+			for (size_t k = 0; k < vec_probs.size(); k++)
 			{
 				if (vec_probs[k] < 0.f)
 				{
@@ -542,7 +542,7 @@ bool DragonSoulTable::CheckDragonSoulExtTables()
 		sys_err ("dragon_soul_table.txt need DragonSoulExtTables.");
 		return false;
 	}
-	for (int i = 0; i < m_vecDragonSoulTypes.size(); i++)
+	for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 	{
 		for (int j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
 		{

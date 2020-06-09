@@ -427,7 +427,6 @@ bool regen_do(const char* filename, long lMapIndex, int base_x, int base_y, LPDU
 	while (true)
 	{
 		REGEN tmp;
-
 		memset(&tmp, 0, sizeof(tmp));
 
 		if (!read_line(fp, &tmp))
@@ -478,7 +477,7 @@ bool regen_do(const char* filename, long lMapIndex, int base_x, int base_y, LPDU
 
 				if (!p)
 				{
-					sys_err("No mob data by vnum %u", regen->vnum);
+					sys_err("In %s, No mob data by vnum %u", filename, regen->vnum);
 					if (!bOnce) {
 						M2_DELETE(regen);
 					}
@@ -527,7 +526,6 @@ bool regen_load_in_file(const char* filename, long lMapIndex, int base_x, int ba
 	while (true)
 	{
 		REGEN tmp;
-
 		memset(&tmp, 0, sizeof(tmp));
 
 		if (!read_line(fp, &tmp))
@@ -571,7 +569,7 @@ bool regen_load_in_file(const char* filename, long lMapIndex, int base_x, int ba
 
 				if (!p)
 				{
-					sys_err("No mob data by vnum %u", regen->vnum);
+					sys_err("In %s, No mob data by vnum %u", filename, regen->vnum);
 					continue;
 				}
 			}
@@ -621,7 +619,6 @@ bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
 	while (true)
 	{
 		REGEN tmp;
-
 		memset(&tmp, 0, sizeof(tmp));
 
 		if (!read_line(fp, &tmp))
@@ -670,7 +667,7 @@ bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
 
 				if (!p)
 				{
-					sys_err("No mob data by vnum %u", regen->vnum);
+					sys_err("In %s, No mob data by vnum %u", filename, regen->vnum);
 				}
 				else if (p->m_table.bType == CHAR_TYPE_NPC || p->m_table.bType == CHAR_TYPE_WARP || p->m_table.bType == CHAR_TYPE_GOTO)
 				{

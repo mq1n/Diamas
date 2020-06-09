@@ -8,7 +8,7 @@ void WriteVersion()
 
 	if (NULL != fp)
 	{
-		fprintf(fp, "game perforce revision: %s\n", __P4_VERSION__);
+		fprintf(fp, "__DB_VERSION__: %s\n", __DB_VERSION__);
 		fprintf(fp, "%s@%s:%s\n", __USER__, __HOSTNAME__, __PWD__);
 		fclose(fp);
 	}

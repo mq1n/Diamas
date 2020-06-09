@@ -2,8 +2,7 @@
 #include "constants.h"
 #include "banword.h"
 #include "config.h"
-
-extern void SendLog(const char * c_pszBuf);		// 운영자에게만 공지
+#include "cmd.h"
 
 CBanwordManager::CBanwordManager()
 {

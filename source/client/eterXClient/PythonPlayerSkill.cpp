@@ -572,7 +572,7 @@ bool CPythonPlayer::__UseSkill(DWORD dwSlotIndex)
 					if (pSkillData->CanUseForMe())
 					{
 						pkInstTarget = pkInstMain;
-						Tracef(" [ALERT] 동료에게 사용하는 기술임에도 적에게 타겟팅 되어있어서 자신에게로 재설정\n");
+						Tracef(" [ALERT] Used on you, and the enemy target is changed to yourself\n");
 					}
 					else
 					{
@@ -636,7 +636,7 @@ bool CPythonPlayer::__UseSkill(DWORD dwSlotIndex)
 			{
 				pkInstTarget = pkInstMain;
 				pkInstMain->SetFlyTargetInstance(*pkInstMain);
-				Tracef(" [ALERT] 타겟이 없어서 플레이어에게 사용합니다\n");
+				Tracef(" [ALERT] The target is set to yourself\n");
 			}
 			else if (pSkillData->IsNeedCorpse())
 			{
@@ -672,7 +672,7 @@ bool CPythonPlayer::__UseSkill(DWORD dwSlotIndex)
 		}
 		else
 		{
-			Tracenf("CPythonPlayer::__UseSkill(%d) - 화면 기준 방향 설정을 해야함", dwSlotIndex);
+			Tracenf("CPythonPlayer::__UseSkill(%d) - The screen direction settings should be as standard", dwSlotIndex);
 		}
 	}
 

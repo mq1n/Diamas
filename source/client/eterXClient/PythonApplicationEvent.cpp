@@ -127,6 +127,14 @@ void CPythonApplication::OnMouseRightButtonUp(int x, int y)
 	rkWndMgr.RunMouseRightButtonUp(x, y);
 }
 
+#ifdef ENABLE_MOUSEWHEEL_EVENT
+bool CPythonApplication::OnMouseWheelScroll(long x , long y , short wDelta)
+{
+	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
+	return rkWndMgr.RunMouseWheelScroll(x, y, wDelta);
+}
+#endif 
+
 void CPythonApplication::OnKeyDown(int iIndex)
 {
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();

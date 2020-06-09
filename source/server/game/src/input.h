@@ -18,7 +18,7 @@ enum
 };
 
 void LoginFailure(LPDESC d, const char * c_pszStatus);
-
+extern void SendShout(const char * szText, BYTE bEmpire);
 
 class CInputProcessor
 {
@@ -156,7 +156,9 @@ class CInputMain : public CInputProcessor
 		int			MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes);
 
 		void		Refine(LPCHARACTER ch, const char* c_pData);
-
+#ifdef ENABLE_ACCE_SYSTEM
+		void		Acce(LPCHARACTER pkChar, const char* c_pData);
+#endif
 		void		Roulette(LPCHARACTER ch, const char* c_pData);
 };
 
@@ -334,7 +336,11 @@ class CInputP2P : public CInputProcessor
 		void		Login(LPDESC d, const char * c_pData);
 		void		Logout(LPDESC d, const char * c_pData);
 		int			Relay(LPDESC d, const char * c_pData, size_t uiBytes);
+#ifdef ENABLE_FULL_NOTICE
+		int			Notice(LPDESC d, const char * c_pData, size_t uiBytes, bool bBigFont=false);
+#else
 		int			Notice(LPDESC d, const char * c_pData, size_t uiBytes);
+#endif
 		int			MonarchNotice(LPDESC d, const char * c_pData, size_t uiBytes);
 		int			MonarchTransfer(LPDESC d, const char * c_pData);
 		int			Guild(LPDESC d, const char* c_pData, size_t uiBytes);

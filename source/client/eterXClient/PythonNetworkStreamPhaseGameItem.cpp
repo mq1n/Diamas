@@ -13,7 +13,7 @@
 
 bool CPythonNetworkStream::SendSafeBoxMoneyPacket(BYTE byState, DWORD dwMoney)
 {
-	assert(!"CPythonNetworkStream::SendSafeBoxMoneyPacket - 사용하지 않는 함수");
+	assert(!"CPythonNetworkStream::SendSafeBoxMoneyPacket - Don't use this function");
 	return false;
 
 //	TPacketCGSafeboxMoney kSafeboxMoney;
@@ -859,9 +859,18 @@ bool CPythonNetworkStream::RecvSpecialEffect()
 			effect = CInstanceBase::EFFECT_LOVE_PENDANT_EQUIP;
 			break;
 
-		
+#ifdef ENABLE_ACCE_SYSTEM
+		case SE_EFFECT_ACCE_SUCCEDED:
+			effect = CInstanceBase::EFFECT_ACCE_SUCCEDED;
+			break;
+
+		case SE_EFFECT_ACCE_EQUIP:
+			effect = CInstanceBase::EFFECT_ACCE_EQUIP;
+			break;
+#endif
+
 		default:
-			TraceError("%d 는 없는 스페셜 이펙트 번호입니다.TPacketGCSpecialEffect",kSpecialEffect.type);
+			TraceError("%d is not a special effect number. TPacketGCSpecialEffect",kSpecialEffect.type);
 			break;
 	}
 

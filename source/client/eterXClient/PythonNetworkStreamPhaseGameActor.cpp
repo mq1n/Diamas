@@ -57,6 +57,20 @@ void __SetWeaponPower(IAbstractPlayer& rkPlayer, DWORD dwWeaponID)
 			maxMagicPower=pkWeapon->GetValue(2);
 			addPower=pkWeapon->GetValue(5);
 		}
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+		else if (pkWeapon->GetType()==CItemData::ITEM_TYPE_COSTUME && pkWeapon->GetSubType()==CItemData::COSTUME_WEAPON)
+		{
+			CItemData* pkRealWeapon;
+			if (CItemManager::Instance().GetItemDataPointer(CPythonPlayer::Instance().GetItemIndex(TItemPos(INVENTORY, c_Equipment_Weapon)), &pkRealWeapon))
+			{
+				minPower=pkRealWeapon->GetValue(3);
+				maxPower=pkRealWeapon->GetValue(4);
+				minMagicPower=pkRealWeapon->GetValue(1);
+				maxMagicPower=pkRealWeapon->GetValue(2);
+				addPower=pkRealWeapon->GetValue(5);
+			}
+		}
+#endif
 	}
 
 	rkPlayer.SetWeaponPower(minPower, maxPower, minMagicPower, maxMagicPower, addPower);
@@ -113,6 +127,9 @@ bool CPythonNetworkStream::RecvCharacterAppendPacket()
 	kNetActorData.m_dwArmor=0;/*chrAddPacket.awPart[CHR_EQUIPPART_ARMOR]*/;
 	kNetActorData.m_dwWeapon=0;/*chrAddPacket.awPart[CHR_EQUIPPART_WEAPON]*/;
 	kNetActorData.m_dwHair=0;/*chrAddPacket.awPart[CHR_EQUIPPART_HAIR]*/;	
+#ifdef ENABLE_ACCE_SYSTEM
+	kNetActorData.m_dwAcce = 0;
+#endif
 	kNetActorData.m_dwMountVnum=0;/*chrAddPacket.dwMountVnum*/;	
 
 	kNetActorData.m_dwLevel = 0; // 몬스터 레벨 표시 안함
@@ -160,6 +177,9 @@ bool CPythonNetworkStream::RecvCharacterAdditionalInfo()
 		kNetActorData.m_dwArmor=chrInfoPacket.awPart[CHR_EQUIPPART_ARMOR];
 		kNetActorData.m_dwWeapon=chrInfoPacket.awPart[CHR_EQUIPPART_WEAPON];
 		kNetActorData.m_dwHair=chrInfoPacket.awPart[CHR_EQUIPPART_HAIR];	
+#ifdef ENABLE_ACCE_SYSTEM
+		kNetActorData.m_dwAcce		= chrInfoPacket.awPart[CHR_EQUIPPART_ACCE];
+#endif
 		kNetActorData.m_dwMountVnum=chrInfoPacket.dwMountVnum;
 
 		__RecvCharacterAppendPacket(&kNetActorData);
@@ -173,7 +193,7 @@ bool CPythonNetworkStream::RecvCharacterAdditionalInfo()
 
 bool CPythonNetworkStream::RecvCharacterAppendPacketNew()
 {
-	TraceError("TPacketGCCharacterAdd2는 쓰지 않는 패킷입니다.");
+	TraceError("TPacketGCCharacterAdd2 is packet that doesn't write.");
 	TPacketGCCharacterAdd2 chrAddPacket;
 	if (!Recv(sizeof(chrAddPacket), &chrAddPacket))
 		return false;
@@ -193,6 +213,9 @@ bool CPythonNetworkStream::RecvCharacterAppendPacketNew()
 	kNetActorData.m_dwArmor=chrAddPacket.awPart[CHR_EQUIPPART_ARMOR];
 	kNetActorData.m_dwWeapon=chrAddPacket.awPart[CHR_EQUIPPART_WEAPON];
 	kNetActorData.m_dwHair=chrAddPacket.awPart[CHR_EQUIPPART_HAIR];
+#ifdef ENABLE_ACCE_SYSTEM
+	kNetActorData.m_dwAcce		= chrAddPacket.awPart[CHR_EQUIPPART_ACCE];
+#endif
 	kNetActorData.m_dwStateFlags=chrAddPacket.bStateFlag;
 	kNetActorData.m_dwVID=chrAddPacket.dwVID;
 	kNetActorData.m_dwMountVnum=chrAddPacket.dwMountVnum;
@@ -221,6 +244,9 @@ bool CPythonNetworkStream::RecvCharacterUpdatePacket()
 	kNetUpdateActorData.m_dwArmor=chrUpdatePacket.awPart[CHR_EQUIPPART_ARMOR];
 	kNetUpdateActorData.m_dwWeapon=chrUpdatePacket.awPart[CHR_EQUIPPART_WEAPON];
 	kNetUpdateActorData.m_dwHair=chrUpdatePacket.awPart[CHR_EQUIPPART_HAIR];
+#ifdef ENABLE_ACCE_SYSTEM
+	kNetUpdateActorData.m_dwAcce		= chrUpdatePacket.awPart[CHR_EQUIPPART_ACCE];
+#endif
 	kNetUpdateActorData.m_dwVID=chrUpdatePacket.dwVID;	
 	kNetUpdateActorData.m_kAffectFlags.CopyData(0, sizeof(chrUpdatePacket.dwAffectFlag[0]), &chrUpdatePacket.dwAffectFlag[0]);
 	kNetUpdateActorData.m_kAffectFlags.CopyData(32, sizeof(chrUpdatePacket.dwAffectFlag[1]), &chrUpdatePacket.dwAffectFlag[1]);
@@ -246,6 +272,9 @@ bool CPythonNetworkStream::RecvCharacterUpdatePacketNew()
 	kNetUpdateActorData.m_dwArmor=chrUpdatePacket.awPart[CHR_EQUIPPART_ARMOR];
 	kNetUpdateActorData.m_dwWeapon=chrUpdatePacket.awPart[CHR_EQUIPPART_WEAPON];
 	kNetUpdateActorData.m_dwHair=chrUpdatePacket.awPart[CHR_EQUIPPART_HAIR];
+#ifdef ENABLE_ACCE_SYSTEM
+	kNetUpdateActorData.m_dwAcce	= chrUpdatePacket.awPart[CHR_EQUIPPART_ACCE];
+#endif
 	kNetUpdateActorData.m_dwVID=chrUpdatePacket.dwVID;
 	kNetUpdateActorData.m_kAffectFlags.CopyData(0, sizeof(chrUpdatePacket.dwAffectFlag[0]), &chrUpdatePacket.dwAffectFlag[0]);
 	kNetUpdateActorData.m_kAffectFlags.CopyData(32, sizeof(chrUpdatePacket.dwAffectFlag[1]), &chrUpdatePacket.dwAffectFlag[1]);

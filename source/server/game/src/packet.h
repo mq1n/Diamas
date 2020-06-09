@@ -1,5 +1,6 @@
 #ifndef __INC_PACKET_H__
 #define __INC_PACKET_H__
+#include "stdafx.h"
 
 enum
 {
@@ -329,6 +330,9 @@ enum
 	HEADER_GG_PCBANG_UPDATE			= 28,
 
 	HEADER_GG_CHECK_AWAKENESS		= 29,
+#ifdef ENABLE_FULL_NOTICE
+	HEADER_GG_BIG_NOTICE			= 30,
+#endif
 };
 
 #pragma pack(1)
@@ -483,6 +487,9 @@ typedef struct SPacketGGWarpCharacter
 	DWORD pid;
 	long x;
 	long y;
+#ifdef ENABLE_CMD_WARP_IN_DUNGEON
+	int mapIndex;
+#endif
 } TPacketGGWarpCharacter;
 
 //  HEADER_GG_GUILD_WAR_ZONE_MAP_INDEX	    = 15,
@@ -942,6 +949,9 @@ enum ECharacterEquipmentPart
 	CHR_EQUIPPART_WEAPON,
 	CHR_EQUIPPART_HEAD,
 	CHR_EQUIPPART_HAIR,
+#ifdef ENABLE_ACCE_SYSTEM
+	CHR_EQUIPPART_ACCE,
+#endif
 	CHR_EQUIPPART_NUM,
 };
 
@@ -1328,6 +1338,9 @@ struct packet_script
 	WORD	size;
 	BYTE	skin;
 	WORD	src_size;
+#ifdef ENABLE_QUEST_CATEGORY
+	BYTE	quest_flag;
+#endif
 };
 
 typedef struct packet_change_speed
@@ -1472,6 +1485,9 @@ struct packet_quest_info
 	BYTE header;
 	WORD size;
 	WORD index;
+#ifdef ENABLE_QUEST_CATEGORY
+	WORD c_index;
+#endif
 	BYTE flag;
 };
 
@@ -2045,16 +2061,19 @@ typedef struct packet_channel
 	BYTE channel;
 } TPacketGCChannel;
 
+typedef struct SEquipmentItemSet
+{
+	DWORD   vnum;
+	BYTE    count;
+	long    alSockets[ITEM_SOCKET_MAX_NUM];
+	TPlayerItemAttribute aAttr[ITEM_ATTRIBUTE_MAX_NUM];
+} TEquipmentItemSet;
+
 typedef struct pakcet_view_equip
 {
 	BYTE  header;
 	DWORD vid;
-	struct {
-		DWORD	vnum;
-		BYTE	count;
-		long	alSockets[ITEM_SOCKET_MAX_NUM];
-		TPlayerItemAttribute aAttr[ITEM_ATTRIBUTE_MAX_NUM];
-	} equips[WEAR_MAX_NUM];
+	TEquipmentItemSet equips[WEAR_MAX_NUM];
 } TPacketViewEquip;
 
 typedef struct 
@@ -2387,6 +2406,38 @@ typedef struct SPacketGCStateCheck
 	unsigned long index;
 	unsigned char state;
 } TPacketGCStateCheck;
+
+
+
+#ifdef ENABLE_ACCE_SYSTEM
+enum
+{
+	HEADER_CG_ACCE = 211,
+	HEADER_GC_ACCE = 215,
+	ACCE_SUBHEADER_GC_OPEN = 0,
+	ACCE_SUBHEADER_GC_CLOSE,
+	ACCE_SUBHEADER_GC_ADDED,
+	ACCE_SUBHEADER_GC_REMOVED,
+	ACCE_SUBHEADER_CG_REFINED,
+	ACCE_SUBHEADER_CG_CLOSE = 0,
+	ACCE_SUBHEADER_CG_ADD,
+	ACCE_SUBHEADER_CG_REMOVE,
+	ACCE_SUBHEADER_CG_REFINE,
+};
+
+typedef struct SPacketAcce
+{
+	BYTE	header;
+	BYTE	subheader;
+	bool	bWindow;
+	DWORD	dwPrice;
+	BYTE	bPos;
+	TItemPos	tPos;
+	DWORD	dwItemVnum;
+	DWORD	dwMinAbs;
+	DWORD	dwMaxAbs;
+} TPacketAcce;
+#endif
 
 #pragma pack()
 #endif

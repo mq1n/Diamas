@@ -643,6 +643,10 @@ void CPythonChat::__Initialize()
 	m_akD3DXClrChat[CHAT_TYPE_SHOUT]		= D3DXCOLOR(0.658f, 1.0f, 0.835f, 1.0f);
 	m_akD3DXClrChat[CHAT_TYPE_WHISPER]		= D3DXCOLOR(0xff4AE14A);
 	m_akD3DXClrChat[CHAT_TYPE_BIG_NOTICE]	= D3DXCOLOR(1.0f, 0.902f, 0.730f, 1.0f);
+	m_akD3DXClrChat[CHAT_TYPE_MONARCH_NOTICE]	= D3DXCOLOR(1.0f, 0.902f, 0.730f, 1.0f);
+#ifdef ENABLE_DICE_SYSTEM
+	m_akD3DXClrChat[CHAT_TYPE_DICE_INFO]	= D3DXCOLOR(0xFFcc00cc);
+#endif
 }
 
 CPythonChat::CPythonChat()

@@ -5,6 +5,7 @@
 #include <FileSystemIncl.hpp>
 #include "InstanceBase.h"
 #include "PythonPlayer.h"
+#include "../eterGameLib/GameLibDefines.h"
 
 std::map<std::string, DWORD> CPythonSkill::SSkillData::ms_StatusNameMap;
 std::map<std::string, DWORD> CPythonSkill::SSkillData::ms_NewMinStatusNameMap;
@@ -494,7 +495,7 @@ bool CPythonSkill::RegisterSkillDesc(const char * c_szFileName)
 			int numGrade = atoi(TokenVector[DESC_TOKEN_TYPE_MOTION_INDEX_GRADE_NUM].c_str());
 			if (SKILL_EFFECT_COUNT < numGrade)
 			{
-				TraceError("%s[%s] 가 등급 제한[%d]을 넘어갔습니다.",rSkillData.strName.c_str(), TokenVector[DESC_TOKEN_TYPE_MOTION_INDEX_GRADE_NUM].c_str(), SKILL_EFFECT_COUNT);
+				TraceError("%s[%s] Skill grade motion [%d] Out Of Range.",rSkillData.strName.c_str(), TokenVector[DESC_TOKEN_TYPE_MOTION_INDEX_GRADE_NUM].c_str(), SKILL_EFFECT_COUNT);
 				return false;
 			}
 			for (int iGrade = 0; iGrade < numGrade; iGrade++)
@@ -904,52 +905,59 @@ void CPythonSkill::TEST()
 
 CPythonSkill::CPythonSkill()
 {
-	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type("none", SKILL_TYPE_NONE));
-	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type("active", SKILL_TYPE_ACTIVE));
-	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type("support", SKILL_TYPE_SUPPORT));
-	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type("guild", SKILL_TYPE_GUILD));
-	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type("horse", SKILL_TYPE_HORSE));
-	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type("warrior", SKILL_TYPE_ACTIVE));
-	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type("assassin", SKILL_TYPE_ACTIVE));
-	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type("sura", SKILL_TYPE_ACTIVE));
-	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type("shaman", SKILL_TYPE_ACTIVE));
-	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type("passive", SKILL_TYPE_ACTIVE));
+	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("none"), SKILL_TYPE_NONE));
+	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("active"), SKILL_TYPE_ACTIVE));
+	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("support"), SKILL_TYPE_SUPPORT));
+	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("guild"), SKILL_TYPE_GUILD));
+	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("horse"), SKILL_TYPE_HORSE));
+	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("warrior"), SKILL_TYPE_ACTIVE));
+	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("assassin"), SKILL_TYPE_ACTIVE));
+	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("sura"), SKILL_TYPE_ACTIVE));
+	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("shaman"), SKILL_TYPE_ACTIVE));
+	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("passive"), SKILL_TYPE_ACTIVE));
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("78skill"), SKILL_TYPE_ACTIVE));
+	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("wolfman"), SKILL_TYPE_ACTIVE));
+#endif
 
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("NEED_POISON_BOTTLE", SKILL_ATTRIBUTE_NEED_POISON_BOTTLE));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("NEED_EMPTY_BOTTLE", SKILL_ATTRIBUTE_NEED_EMPTY_BOTTLE));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("CAN_USE_IF_NOT_ENOUGH", SKILL_ATTRIBUTE_CAN_USE_IF_NOT_ENOUGH));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("FAN_RANGE", SKILL_ATTRIBUTE_FAN_RANGE));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("NEED_CORPSE", SKILL_ATTRIBUTE_NEED_CORPSE));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("NEED_TARGET", SKILL_ATTRIBUTE_NEED_TARGET));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("TOGGLE", SKILL_ATTRIBUTE_TOGGLE));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("WEAPON_LIMITATION", SKILL_ATTRIBUTE_WEAPON_LIMITATION));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("MELEE_ATTACK", SKILL_ATTRIBUTE_MELEE_ATTACK));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("CHARGE_ATTACK", SKILL_ATTRIBUTE_CHARGE_ATTACK));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("USE_HP", SKILL_ATTRIBUTE_USE_HP));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("CAN_CHANGE_DIRECTION", SKILL_ATTRIBUTE_CAN_CHANGE_DIRECTION));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("STANDING_SKILL", SKILL_ATTRIBUTE_STANDING_SKILL));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("ONLY_FOR_ALLIANCE", SKILL_ATTRIBUTE_ONLY_FOR_ALLIANCE));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("CAN_USE_FOR_ME", SKILL_ATTRIBUTE_CAN_USE_FOR_ME));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("ATTACK_SKILL", SKILL_ATTRIBUTE_ATTACK_SKILL));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("MOVING_SKILL", SKILL_ATTRIBUTE_MOVING_SKILL));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("HORSE_SKILL", SKILL_ATTRIBUTE_HORSE_SKILL));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("TIME_INCREASE_SKILL", SKILL_ATTRIBUTE_TIME_INCREASE_SKILL));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("PASSIVE", SKILL_ATTRIBUTE_PASSIVE));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("CANNOT_LEVEL_UP", SKILL_ATTRIBUTE_CANNOT_LEVEL_UP));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("ONLY_FOR_GUILD_WAR", SKILL_ATTRIBUTE_ONLY_FOR_GUILD_WAR));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("CIRCLE_RANGE", SKILL_ATTRIBUTE_CIRCLE_RANGE));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("SEARCH_TARGET", SKILL_ATTRIBUTE_SEARCH_TARGET));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("NEED_POISON_BOTTLE"), SKILL_ATTRIBUTE_NEED_POISON_BOTTLE));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("NEED_EMPTY_BOTTLE"), SKILL_ATTRIBUTE_NEED_EMPTY_BOTTLE));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("CAN_USE_IF_NOT_ENOUGH"), SKILL_ATTRIBUTE_CAN_USE_IF_NOT_ENOUGH));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("FAN_RANGE"), SKILL_ATTRIBUTE_FAN_RANGE));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("NEED_CORPSE"), SKILL_ATTRIBUTE_NEED_CORPSE));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("NEED_TARGET"), SKILL_ATTRIBUTE_NEED_TARGET));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("TOGGLE"), SKILL_ATTRIBUTE_TOGGLE));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("WEAPON_LIMITATION"), SKILL_ATTRIBUTE_WEAPON_LIMITATION));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("MELEE_ATTACK"), SKILL_ATTRIBUTE_MELEE_ATTACK));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("CHARGE_ATTACK"), SKILL_ATTRIBUTE_CHARGE_ATTACK));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("USE_HP"), SKILL_ATTRIBUTE_USE_HP));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("CAN_CHANGE_DIRECTION"), SKILL_ATTRIBUTE_CAN_CHANGE_DIRECTION));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("STANDING_SKILL"), SKILL_ATTRIBUTE_STANDING_SKILL));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("ONLY_FOR_ALLIANCE"), SKILL_ATTRIBUTE_ONLY_FOR_ALLIANCE));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("CAN_USE_FOR_ME"), SKILL_ATTRIBUTE_CAN_USE_FOR_ME));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("ATTACK_SKILL"), SKILL_ATTRIBUTE_ATTACK_SKILL));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("MOVING_SKILL"), SKILL_ATTRIBUTE_MOVING_SKILL));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("HORSE_SKILL"), SKILL_ATTRIBUTE_HORSE_SKILL));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("TIME_INCREASE_SKILL"), SKILL_ATTRIBUTE_TIME_INCREASE_SKILL));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("PASSIVE"), SKILL_ATTRIBUTE_PASSIVE));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("CANNOT_LEVEL_UP"), SKILL_ATTRIBUTE_CANNOT_LEVEL_UP));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("ONLY_FOR_GUILD_WAR"), SKILL_ATTRIBUTE_ONLY_FOR_GUILD_WAR));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("CIRCLE_RANGE"), SKILL_ATTRIBUTE_CIRCLE_RANGE));
+	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("SEARCH_TARGET"), SKILL_ATTRIBUTE_SEARCH_TARGET));
 
-	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type("SWORD", SKILL_NEED_WEAPON_SWORD));
-	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type("DAGGER", SKILL_NEED_WEAPON_DAGGER));
-	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type("BOW", SKILL_NEED_WEAPON_BOW));
-	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type("TWO_HANDED", SKILL_NEED_WEAPON_TWO_HANDED));
-	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type("DOUBLE_SWORD", SKILL_NEED_WEAPON_DOUBLE_SWORD));
-	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type("BELL", SKILL_NEED_WEAPON_BELL));
-	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type("FAN", SKILL_NEED_WEAPON_FAN));
-	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type("ARROW", SKILL_NEED_WEAPON_ARROW));
-	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type("EMPTY_HAND", SKILL_NEED_WEAPON_EMPTY_HAND));
-
+	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("SWORD"), SKILL_NEED_WEAPON_SWORD));
+	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("DAGGER"), SKILL_NEED_WEAPON_DAGGER));
+	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("BOW"), SKILL_NEED_WEAPON_BOW));
+	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("TWO_HANDED"), SKILL_NEED_WEAPON_TWO_HANDED));
+	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("DOUBLE_SWORD"), SKILL_NEED_WEAPON_DOUBLE_SWORD));
+	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("BELL"), SKILL_NEED_WEAPON_BELL));
+	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("FAN"), SKILL_NEED_WEAPON_FAN));
+	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("ARROW"), SKILL_NEED_WEAPON_ARROW));
+	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("EMPTY_HAND"), SKILL_NEED_WEAPON_EMPTY_HAND));
+	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("MOUNT_SPEAR"), SKILL_NEED_WEAPON_MOUNT_SPEAR));
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type(std::string("CLAW"), SKILL_NEED_WEAPON_CLAW));
+#endif
 	m_SkillWeaponTypeIndexMap.insert(make_pair(std::string("SWORD"), CItemData::WEAPON_SWORD));
 	m_SkillWeaponTypeIndexMap.insert(make_pair(std::string("DAGGER"), CItemData::WEAPON_DAGGER));
 	m_SkillWeaponTypeIndexMap.insert(make_pair(std::string("BOW"), CItemData::WEAPON_BOW));
@@ -958,7 +966,10 @@ CPythonSkill::CPythonSkill()
 	m_SkillWeaponTypeIndexMap.insert(make_pair(std::string("BELL"), CItemData::WEAPON_BELL));
 	m_SkillWeaponTypeIndexMap.insert(make_pair(std::string("FAN"), CItemData::WEAPON_FAN));
 	m_SkillWeaponTypeIndexMap.insert(make_pair(std::string("ARROW"), CItemData::WEAPON_ARROW));
-
+	m_SkillWeaponTypeIndexMap.insert(make_pair(std::string("MOUNT_SPEAR"), CItemData::WEAPON_MOUNT_SPEAR));
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	m_SkillWeaponTypeIndexMap.insert(make_pair(std::string("CLAW"), CItemData::WEAPON_CLAW));
+#endif
 	SSkillData::ms_StatusNameMap.insert(make_pair(std::string("chain"), POINT_NONE));
 	SSkillData::ms_StatusNameMap.insert(make_pair(std::string("HR"), POINT_HIT_RATE));
 	SSkillData::ms_StatusNameMap.insert(make_pair(std::string("LV"), POINT_LEVEL));
@@ -1034,6 +1045,10 @@ CPythonSkill::CPythonSkill()
 	m_PathNameMap.insert(make_pair(std::string("SURA"), std::string("sura")));
 	m_PathNameMap.insert(make_pair(std::string("SHAMAN"), std::string("shaman")));
 	m_PathNameMap.insert(make_pair(std::string("PASSIVE"), std::string("passive")));
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	m_PathNameMap.insert(make_pair(std::string("78SKILL"), std::string("78skill")));
+	m_PathNameMap.insert(make_pair(std::string("WOLFMAN"), std::string("wolfman")));
+#endif
 	m_PathNameMap.insert(make_pair(std::string("SUPPORT"), std::string("common/support")));
 	m_PathNameMap.insert(make_pair(std::string("GUILD"), std::string("common/guild")));
 	m_PathNameMap.insert(make_pair(std::string("HORSE"), std::string("common/horse")));

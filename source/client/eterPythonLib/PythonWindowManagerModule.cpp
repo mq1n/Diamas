@@ -406,6 +406,20 @@ PyObject * wndMgrIsRTL(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildValue("i", pWin->IsFlag(UI::CWindow::FLAG_RTL));
 }
 
+#ifdef ENABLE_MOUSEWHEEL_EVENT
+PyObject* wndMgrSetScrollable(PyObject* poSelf, PyObject* poArgs)
+{
+	UI::CWindow * pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	if(pWin)
+		pWin->SetScrollable();
+
+	return Py_BuildNone();
+}
+#endif
+
 PyObject * wndMgrSetScreenSize(PyObject * poSelf, PyObject * poArgs)
 {
 	int width;
@@ -1260,7 +1274,7 @@ PyObject * wndMgrSetSlotCoolTime(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * wndMgrSetToggleSlot(PyObject * poSelf, PyObject * poArgs)
 {
-	assert(!"wndMgrSetToggleSlot - 사용하지 않는 함수");
+	assert(!"wndMgrSetToggleSlot - Don't use such function");
 	return Py_BuildNone();
 }
 
@@ -2296,6 +2310,99 @@ PyObject * wndMgrShowOverInWindowName(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
+#ifdef ENABLE_SLOT_WINDOW_EX
+PyObject * wndMgrIsActivatedSlot(PyObject * poSelf, PyObject * poArgs)
+{
+	UI::CWindow * pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	int iSlotIndex;
+	if (!PyTuple_GetInteger(poArgs, 1, &iSlotIndex))
+		return Py_BuildException();
+
+	if (!pWin->IsType(UI::CSlotWindow::Type()))
+		return Py_BuildException();
+
+	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWin;
+	return Py_BuildValue("i", pSlotWin->IsActivatedSlot(iSlotIndex));
+}
+
+PyObject * wndMgrGetSlotCoolTime(PyObject * poSelf, PyObject * poArgs)
+{
+	UI::CWindow * pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	int iSlotIndex;
+	if (!PyTuple_GetInteger(poArgs, 1, &iSlotIndex))
+		return Py_BuildException();
+
+	if (!pWin->IsType(UI::CSlotWindow::Type()))
+		return Py_BuildException();
+
+	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWin;
+
+	float fElapsedTime = 0.0f;
+	float fCoolTime = pSlotWin->GetSlotCoolTime(iSlotIndex, &fElapsedTime);
+	return Py_BuildValue("ff", fCoolTime, fElapsedTime);
+}
+#endif
+
+
+
+#ifdef ENABLE_ACCE_SYSTEM
+PyObject * wndMgrActivateEffect(PyObject * poSelf, PyObject * poArgs)
+{
+	UI::CWindow * pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	int iSlotIndex;
+	if (!PyTuple_GetInteger(poArgs, 1, &iSlotIndex))
+		return Py_BuildException();
+
+	if (!pWin->IsType(UI::CSlotWindow::Type()))
+		return Py_BuildException();
+
+	float r, g, b, a;
+	if (!PyTuple_GetFloat(poArgs, 2, &r))
+		return Py_BuildException();
+
+	if (!PyTuple_GetFloat(poArgs, 3, &g))
+		return Py_BuildException();
+
+	if (!PyTuple_GetFloat(poArgs, 4, &b))
+		return Py_BuildException();
+
+	if (!PyTuple_GetFloat(poArgs, 5, &a))
+		return Py_BuildException();
+
+	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWin;
+	pSlotWin->ActivateEffect(iSlotIndex, r, g, b, a);
+	return Py_BuildNone();
+}
+
+PyObject * wndMgrDeactivateEffect(PyObject * poSelf, PyObject * poArgs)
+{
+	UI::CWindow * pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	int iSlotIndex;
+	if (!PyTuple_GetInteger(poArgs, 1, &iSlotIndex))
+		return Py_BuildException();
+
+	if (!pWin->IsType(UI::CSlotWindow::Type()))
+		return Py_BuildException();
+
+	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWin;
+	pSlotWin->DeactivateEffect(iSlotIndex);
+	return Py_BuildNone();
+}
+#endif
+
+
 void initwndMgr()
 {
 	static PyMethodDef s_methods[] =
@@ -2333,6 +2440,10 @@ void initwndMgr()
 		{ "Destroy",					wndMgrDestroy,						METH_VARARGS },
 		{ "AddFlag",					wndMgrAddFlag,						METH_VARARGS },
 		{ "IsRTL",						wndMgrIsRTL,						METH_VARARGS },
+
+#ifdef ENABLE_MOUSEWHEEL_EVENT
+		{ "SetScrollable",				wndMgrSetScrollable,				METH_VARARGS },
+#endif
 
 		// Base Window
 		{ "SetName",					wndMgrSetName,						METH_VARARGS },
@@ -2489,6 +2600,16 @@ void initwndMgr()
 		// For Debug
 		{ "SetOutlineFlag",				wndMgrSetOutlineFlag,				METH_VARARGS },
 		{ "ShowOverInWindowName",		wndMgrShowOverInWindowName,			METH_VARARGS },
+
+#ifdef ENABLE_SLOT_WINDOW_EX
+		{ "IsActivatedSlot",			wndMgrIsActivatedSlot, METH_VARARGS },
+		{ "GetSlotCoolTime",			wndMgrGetSlotCoolTime, METH_VARARGS },
+#endif
+
+#ifdef ENABLE_ACCE_SYSTEM
+		{"ActivateEffect",				wndMgrActivateEffect,				METH_VARARGS },
+		{"DeactivateEffect",			wndMgrDeactivateEffect,				METH_VARARGS },
+#endif
 
 		{ NULL,							NULL,								NULL },
 	};

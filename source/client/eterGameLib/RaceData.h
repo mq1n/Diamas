@@ -23,7 +23,11 @@ class CRaceData
 			PART_HEAD,
 			PART_WEAPON_LEFT,
 			PART_HAIR,
-			
+
+#ifdef ENABLE_ACCE_SYSTEM
+			PART_ACCE,
+#endif
+
 			PART_MAX_NUM,
 		};
 		

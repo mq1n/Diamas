@@ -108,6 +108,9 @@ size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * p
 			"ip = '%s', "
 			"part_main = %d, "
 			"part_hair = %d, "
+#ifdef ENABLE_ACCE_SYSTEM
+			"part_acce = %d, "
+#endif
 			"last_play = NOW(), "
 			"skill_group = %d, "
 			"alignment = %ld, "
@@ -150,6 +153,9 @@ size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * p
 		pkTab->ip,
 		pkTab->parts[PART_MAIN],
 		pkTab->parts[PART_HAIR],
+#ifdef ENABLE_ACCE_SYSTEM
+		pkTab->parts[PART_ACCE],
+#endif
 		pkTab->skill_group,
 		pkTab->lAlignment,
 		pkTab->horse.bLevel,
@@ -313,7 +319,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 			snprintf(szQuery, sizeof(szQuery),
 					"SELECT dwPID,bType,bApplyOn,lApplyValue,dwFlag,lDuration,lSPCost FROM affect%s WHERE dwPID=%d",
 					GetTablePostfix(), pTab->id);
-			CDBManager::instance().ReturnQuery(szQuery, QID_AFFECT, peer->GetHandle(), new ClientHandleInfo(dwHandle));
+			CDBManager::instance().ReturnQuery(szQuery, QID_AFFECT, peer->GetHandle(), new ClientHandleInfo(dwHandle, pTab->id));
 		}
 		/////////////////////////////////////////////
 		// 2) 아이템이 DBCache 에 없음 : DB 에서 가져옴 
@@ -321,9 +327,9 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 		else
 		{
 			snprintf(szQuery, sizeof(szQuery), 
-					"SELECT id,window+0,pos,count,vnum,socket0,socket1,socket2,attrtype0,attrvalue0,attrtype1,attrvalue1,attrtype2,attrvalue2,attrtype3,attrvalue3,attrtype4,attrvalue4,attrtype5,attrvalue5,attrtype6,attrvalue6 "
-					"FROM item%s WHERE owner_id=%d AND (window < %d or window = %d)",
-					GetTablePostfix(), pTab->id, SAFEBOX, DRAGON_SOUL_INVENTORY);
+					"SELECT id,`window`+0,pos,count,vnum,socket0,socket1,socket2,attrtype0,attrvalue0,attrtype1,attrvalue1,attrtype2,attrvalue2,attrtype3,attrvalue3,attrtype4,attrvalue4,attrtype5,attrvalue5,attrtype6,attrvalue6 "
+					"FROM item%s WHERE owner_id=%d AND (`window` in ('INVENTORY','EQUIPMENT','DRAGON_SOUL_INVENTORY','BELT_INVENTORY'))",
+					GetTablePostfix(), pTab->id);
 
 			CDBManager::instance().ReturnQuery(szQuery,
 					QID_ITEM,
@@ -366,6 +372,9 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 				"id,name,job,voice,dir,x,y,z,map_index,exit_x,exit_y,exit_map_index,hp,mp,stamina,random_hp,random_sp,playtime,"
 				"gold,level,level_step,st,ht,dx,iq,exp,"
 				"stat_point,skill_point,sub_skill_point,stat_reset_count,part_base,part_hair,"
+#ifdef ENABLE_ACCE_SYSTEM
+				"part_acce, "
+#endif
 				"skill_level,quickslot,skill_group,alignment,mobile,horse_level,horse_riding,horse_hp,horse_hp_droptime,horse_stamina,"
 				"UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(last_play),horse_skill_point FROM player%s WHERE id=%d",
 				GetTablePostfix(), packet->player_id);
@@ -378,9 +387,9 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 		// 아이템 가져오기 
 		//--------------------------------------------------------------
 		snprintf(queryStr, sizeof(queryStr),
-				"SELECT id,window+0,pos,count,vnum,socket0,socket1,socket2,attrtype0,attrvalue0,attrtype1,attrvalue1,attrtype2,attrvalue2,attrtype3,attrvalue3,attrtype4,attrvalue4,attrtype5,attrvalue5,attrtype6,attrvalue6 "
-				"FROM item%s WHERE owner_id=%d AND (window < %d or window = %d)",
-				GetTablePostfix(), packet->player_id, SAFEBOX, DRAGON_SOUL_INVENTORY);
+				"SELECT id,`window`+0,pos,count,vnum,socket0,socket1,socket2,attrtype0,attrvalue0,attrtype1,attrvalue1,attrtype2,attrvalue2,attrtype3,attrvalue3,attrtype4,attrvalue4,attrtype5,attrvalue5,attrtype6,attrvalue6 "
+				"FROM item%s WHERE owner_id=%d AND (`window` in ('INVENTORY','EQUIPMENT','DRAGON_SOUL_INVENTORY','BELT_INVENTORY'))",
+				GetTablePostfix(), packet->player_id);
 		CDBManager::instance().ReturnQuery(queryStr, QID_ITEM, peer->GetHandle(), new ClientHandleInfo(dwHandle, packet->player_id));
 
 		//--------------------------------------------------------------
@@ -417,7 +426,8 @@ void CClientManager::ItemAward(CPeer * peer,char* login)
 		char cmdStr[100] = "";	//why콜룸에서 읽은 값을 임시 문자열에 복사해둠
 		strcpy(cmdStr,whyStr);	//명령어 얻는 과정에서 토큰쓰면 원본도 토큰화 되기 때문
 		char command[20] = "";
-		strcpy(command,GetCommand(cmdStr));	// command 얻기		
+		// @fixme203 directly GetCommand instead of strcpy
+		GetCommand(cmdStr, command);			// command 얻기
 		if( !(strcmp(command,"GIFT") ))	// command 가 GIFT이면
 		{
 			TPacketItemAwardInfromer giftData;
@@ -428,9 +438,8 @@ void CClientManager::ItemAward(CPeer * peer,char* login)
 		}
 	}
 }
-char* CClientManager::GetCommand(char* str)
+char* CClientManager::GetCommand(char* str, char* command) // @fixme203
 {
-	char command[20] = "";
 	char* tok;
 
 	if( str[0] == '[' )
@@ -489,6 +498,9 @@ bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab)
 	str_to_number(pkTab->stat_reset_count, row[col++]);
 	str_to_number(pkTab->part_base, row[col++]);
 	str_to_number(pkTab->parts[PART_HAIR], row[col++]);
+#ifdef ENABLE_ACCE_SYSTEM
+	str_to_number(pkTab->parts[PART_ACCE], row[col++]);
+#endif
 
 	if (row[col])
 		memcpy(pkTab->skills, row[col], sizeof(pkTab->skills));
@@ -593,7 +605,8 @@ void CClientManager::RESULT_COMPOSITE_PLAYER(CPeer * peer, SQLMsg * pMsg, DWORD 
 
 		case QID_AFFECT:
 			sys_log(0, "QID_AFFECT %u", info->dwHandle);
-			RESULT_AFFECT_LOAD(peer, pSQLResult, info->dwHandle);
+			// @fixme402 RESULT_AFFECT_LOAD+info->player_id
+			RESULT_AFFECT_LOAD(peer, pSQLResult, info->dwHandle, info->player_id);
 			break;
 			/*
 			   case QID_PLAYER_ITEM_QUEST_AFFECT:
@@ -695,12 +708,28 @@ void CClientManager::RESULT_ITEM_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwHa
 	}
 }
 
-void CClientManager::RESULT_AFFECT_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwHandle)
+// @fixme402 (RESULT_AFFECT_LOAD +dwRealPID)
+void CClientManager::RESULT_AFFECT_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwHandle, DWORD dwRealPID)
 {
 	int iNumRows;
 
-	if ((iNumRows = mysql_num_rows(pRes)) == 0) // 데이터 없음
+	if ((iNumRows = mysql_num_rows(pRes)) == 0) 
+	{
+		// @fixme402 begin
+		static DWORD dwPID;
+		static DWORD dwCount = 0; //1;
+		static TPacketAffectElement paeTable = {0};
+
+		dwPID = dwRealPID;
+		sys_log(0, "AFFECT_LOAD: count %u PID %u RealPID %u", dwCount, dwPID, dwRealPID);
+
+		peer->EncodeHeader(HEADER_DG_AFFECT_LOAD, dwHandle, sizeof(DWORD) + sizeof(DWORD) + sizeof(TPacketAffectElement) * dwCount);
+		peer->Encode(&dwPID, sizeof(DWORD));
+		peer->Encode(&dwCount, sizeof(DWORD));
+		peer->Encode(&paeTable, sizeof(TPacketAffectElement) * dwCount);
+		// @fixme402 end
 		return;
+	}
 
 	static std::vector<TPacketAffectElement> s_elements;
 	s_elements.resize(iNumRows);
@@ -876,11 +905,20 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 			"INSERT INTO player%s "
 			"(id, account_id, name, level, st, ht, dx, iq, "
 			"job, voice, dir, x, y, z, "
-			"hp, mp, random_hp, random_sp, stat_point, stamina, part_base, part_main, part_hair, gold, playtime, "
+			"hp, mp, random_hp, random_sp, stat_point, stamina, part_base, part_main, part_hair,"
+#ifdef ENABLE_ACCE_SYSTEM
+			"part_acce, "
+#endif
+			" gold, playtime, "
 			"skill_level, quickslot) "
 			"VALUES(0, %u, '%s', %d, %d, %d, %d, %d, "
 			"%d, %d, %d, %d, %d, %d, %d, "
-			"%d, %d, %d, %d, %d, %d, %d, 0, %d, 0, ",
+			"%d, %d, %d, %d, %d, %d, %d, 0, "
+			
+#ifdef ENABLE_ACCE_SYSTEM
+			"0, "
+#endif
+			"%d, 0, ",
 			GetTablePostfix(),
 			packet->account_id, packet->player_table.name, packet->player_table.level, packet->player_table.st, packet->player_table.ht, packet->player_table.dx, packet->player_table.iq,
 			packet->player_table.job, packet->player_table.voice, packet->player_table.dir, packet->player_table.x, packet->player_table.y, packet->player_table.z,
@@ -1132,7 +1170,7 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM player%s WHERE id=%d", GetTablePostfix(), pi->player_id);
 		delete CDBManager::instance().DirectQuery(queryStr);
 
-		snprintf(queryStr, sizeof(queryStr), "DELETE FROM item%s WHERE owner_id=%d AND (window < %d or window = %d)", GetTablePostfix(), pi->player_id, SAFEBOX, DRAGON_SOUL_INVENTORY);
+		snprintf(queryStr, sizeof(queryStr), "DELETE FROM item%s WHERE owner_id=%d AND (`window` in ('INVENTORY','EQUIPMENT','DRAGON_SOUL_INVENTORY','BELT_INVENTORY'))", GetTablePostfix(), pi->player_id);
 		delete CDBManager::instance().DirectQuery(queryStr);
 
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM quest%s WHERE dwPID=%d", GetTablePostfix(), pi->player_id);
@@ -1259,7 +1297,7 @@ void CClientManager::RESULT_HIGHSCORE_REGISTER(CPeer * pkPeer, SQLMsg * msg)
 		if (row && row[0])
 		{
 			int current_value = 0; str_to_number(current_value, row[0]);
-			if (pi->account_index && current_value >= value || !pi->account_index && current_value <= value)
+			if (((pi->account_index)&&(current_value >= value)) || ((!pi->account_index)&&(current_value <= value)))
 			{
 				value = current_value;
 			}

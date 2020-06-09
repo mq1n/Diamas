@@ -6,7 +6,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+#define ENABLE_SKIN_EXTENDED
 BOOL CRaceData::LoadRaceData(const char * c_szFileName)
 {
 	CTextFileLoader TextFileLoader;
@@ -102,7 +102,10 @@ BOOL CRaceData::LoadRaceData(const char * c_szFileName)
 
 				std::string strSourceSkin;
 				std::string strTargetSkin;
-
+#ifdef ENABLE_SKIN_EXTENDED
+				static char __szSkin1[11+1];
+				static char __szSkin2[11+1];
+#endif
 				// LOCAL_PATH_SUPPORT
 				if (TextFileLoader.GetTokenString("local_sourceskin", &strSourceSkin) &&
 					TextFileLoader.GetTokenString("local_targetskin", &strTargetSkin))
@@ -116,13 +119,24 @@ BOOL CRaceData::LoadRaceData(const char * c_szFileName)
 				{
 					AppendShapeSkin(dwShapeIndex, 0, (strPathName + strSourceSkin).c_str(), (strPathName + strTargetSkin).c_str());
 				}
-
+#ifdef ENABLE_SKIN_EXTENDED
+				for (DWORD i=2; i<=9; i++)
+				{
+					_snprintf(__szSkin1, sizeof(__szSkin1), "sourceskin%u", i);
+					_snprintf(__szSkin2, sizeof(__szSkin2), "targetskin%u", i);
+					if (TextFileLoader.GetTokenString(__szSkin1, &strSourceSkin) &&
+						TextFileLoader.GetTokenString(__szSkin2, &strTargetSkin))
+					{
+						AppendShapeSkin(dwShapeIndex, 0, (strPathName + strSourceSkin).c_str(), (strPathName + strTargetSkin).c_str());
+					}
+				}
+#else
 				if (TextFileLoader.GetTokenString("sourceskin2", &strSourceSkin) &&
 					TextFileLoader.GetTokenString("targetskin2", &strTargetSkin))
 				{
 					AppendShapeSkin(dwShapeIndex, 0, (strPathName + strSourceSkin).c_str(), (strPathName + strTargetSkin).c_str());
 				}
-
+#endif
 				TextFileLoader.SetParentNode();
 			}
 		}

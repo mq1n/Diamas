@@ -624,7 +624,7 @@ PCHAR* CommandLineToArgv( PCHAR CmdLine, int* _argc )
 	i = 0;
 	j = 0;
 
-	while( a = CmdLine[i] ) {
+	while( (a = CmdLine[i]) != 0 ) {
 		if(in_QM) {
 			if(a == '\"') {
 				in_QM = FALSE;

@@ -45,7 +45,7 @@ class CLoginKey
 		LPDESC  m_pkDesc;
 };
 
-
+#ifdef ENABLE_SEQUENCE_SYSTEM
 // sequence 버그 찾기용 데이타
 struct seq_t
 {
@@ -54,6 +54,7 @@ struct seq_t
 };
 typedef std::vector<seq_t>	seq_vector_t;
 // sequence 버그 찾기용 데이타
+#endif
 
 class DESC
 {
@@ -151,8 +152,10 @@ class DESC
 		void			SetPong(bool b);
 		bool			IsPong();
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 		BYTE			GetSequence();
 		void			SetNextSequence();
+#endif
 
 		void			SendLoginSuccessPacket();
 		//void			SendServerStatePacket(int nIndex);
@@ -234,7 +237,9 @@ class DESC
 		bool			m_bAdminMode; // Handshake 에서 어드민 명령을 쓸수있나?
 		bool			m_bPong;
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 		int			m_iCurrentSequence;
+#endif
 
 		DWORD			m_dwMatrixRows;
 		DWORD			m_dwMatrixCols;
@@ -294,10 +299,11 @@ class DESC
 		void RawPacket(const void * c_pvData, int iSize);
 		void ChatPacket(BYTE type, const char * format, ...);
 
-		/* 시퀀스 버그 찾기용 코드 */
+#ifdef ENABLE_SEQUENCE_SYSTEM
 	public:
 		seq_vector_t	m_seq_vector;
 		void			push_seq (BYTE hdr, BYTE seq);
+#endif
 		
 };
 

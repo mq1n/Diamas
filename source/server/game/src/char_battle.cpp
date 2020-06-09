@@ -40,9 +40,24 @@
 #include "BlueDragon.h"
 #include "DragonLair.h"
 
+#define ENABLE_EFFECT_PENETRATE
+static DWORD __GetPartyExpNP(const DWORD level)
+{
+	if (!level || level > PLAYER_EXP_TABLE_MAX)
+		return 14000;
+	return party_exp_distribute_table[level];
+}
+
+static int __GetExpLossPerc(const DWORD level)
+{
+	if (!level || level > PLAYER_EXP_TABLE_MAX)
+		return 1;
+	return aiExpLossPercents[level];
+}
+
 DWORD AdjustExpByLevel(const LPCHARACTER ch, const DWORD exp)
 {
-	if (PLAYER_EXP_TABLE_MAX < ch->GetLevel())
+	if (PLAYER_MAX_LEVEL_CONST < ch->GetLevel())
 	{
 		double ret = 0.95;
 		double factor = 0.1;
@@ -190,6 +205,10 @@ bool CHARACTER::Attack(LPCHARACTER pkVictim, BYTE bType)
 		return false;
 	// CASTLE
 
+	// @fixme131
+	if (!battle_is_attackable(this, pkVictim))
+		return false;
+
 	DWORD dwCurrentTime = get_dword_time();
 
 	if (IsPC())
@@ -281,7 +300,9 @@ void CHARACTER::DeathPenalty(BYTE bTown)
 	sys_log(1, "DEATH_PERNALY_CHECK(%s) town(%d)", GetName(), bTown);
 
 	Cube_close(this);
-
+#ifdef ENABLE_ACCE_SYSTEM
+	CloseAcce();
+#endif
 	if (CBattleArena::instance().IsBattleArenaMap(GetMapIndex()) == true)
 	{
 		return;
@@ -305,18 +326,8 @@ void CHARACTER::DeathPenalty(BYTE bTown)
 	{
 		REMOVE_BIT(m_pointsInstant.instant_flag, INSTANT_FLAG_DEATH_PENALTY);
 
-		// NO_DEATH_PENALTY_BUG_FIX 
-		if (LC_IsYMIR()) // 천마 버전에서는 언제나 용신의 가호 아이템을 체크한다.
-		{
-			if (FindAffect(AFFECT_NO_DEATH_PENALTY))
-			{
-				sys_log(0, "NO_DEATH_PENALTY_AFFECT(%s)", GetName());
-				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("용신의 가호로 경험치가 떨어지지 않았습니다."));
-				RemoveAffect(AFFECT_NO_DEATH_PENALTY);
-				return;
-			}
-		}
-		else if (!bTown) // 국제 버전에서는 제자리 부활시만 용신의 가호를 사용한다. (마을 복귀시는 경험치 패널티 없음)
+		// NO_DEATH_PENALTY_BUG_FIX
+		if (!bTown) 
 		{
 			if (FindAffect(AFFECT_NO_DEATH_PENALTY))
 			{
@@ -328,40 +339,17 @@ void CHARACTER::DeathPenalty(BYTE bTown)
 		}
 		// END_OF_NO_DEATH_PENALTY_BUG_FIX
 
-		int iLoss = ((GetNextExp() * aiExpLossPercents[MINMAX(1, GetLevel(), PLAYER_EXP_TABLE_MAX)]) / 100);
+		int iLoss = ((GetNextExp() * __GetExpLossPerc(GetLevel())) / 100);
 
-		if (true == LC_IsYMIR())
-		{
-			if (PLAYER_EXP_TABLE_MAX < GetLevel())
-			{
-				iLoss = MIN(500000, iLoss);
-			}
-			else
-			{
-				iLoss = MIN(200000, iLoss);
-			}
-		}
-		else if (true == LC_IsEurope())
-		{
-			iLoss = MIN(800000, iLoss);
-		}
+		iLoss = MIN(800000, iLoss);
 
 		if (bTown)
-		{
-			if (g_iUseLocale)
-			{
-				iLoss = 0;
-			}
-			else
-			{
-				iLoss -= iLoss / 3;
-			}
-		}
+			iLoss = 0;
 
 		if (IsEquipUniqueItem(UNIQUE_ITEM_TEARDROP_OF_GODNESS))
 			iLoss /= 2;
 
-		sys_log(0, "DEATH_PENALTY(%s) EXP_LOSS: %d percent %d%%", GetName(), iLoss, aiExpLossPercents[MIN(gPlayerMaxLevel, GetLevel())]);
+		sys_log(0, "DEATH_PENALTY(%s) EXP_LOSS: %d percent %d%%", GetName(), iLoss, __GetExpLossPerc(GetLevel()));
 
 		PointChange(POINT_EXP, -iLoss, true);
 	}
@@ -689,7 +677,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 
 		int iSplitCount;
 
-		if (iGold >= 3 && !LC_IsYMIR()) 
+		if (iGold >= 3)
 			iSplitCount = number(1, 3);
 		else if (GetMobRank() >= MOB_RANK_BOSS)
 		{
@@ -766,13 +754,19 @@ void CHARACTER::Reward(bool bItemDrop)
 	//PROF_UNIT puReward("Reward");
    	LPCHARACTER pkAttacker = DistributeExp();
 
+#ifdef __ENABLE_KILL_EVENT_FIX__
+	if (!pkAttacker && !(pkAttacker = GetMostAttacked()))
+		return;
+#else
 	if (!pkAttacker)
 		return;
+#endif
 
 	//PROF_UNIT pu1("r1");
 	if (pkAttacker->IsPC())
 	{
-		if (GetLevel() - pkAttacker->GetLevel() >= -10)
+		if ((GetLevel() - pkAttacker->GetLevel()) >= -10)
+		{
 			if (pkAttacker->GetRealAlignment() < 0)
 			{
 				if (pkAttacker->IsEquipUniqueItem(UNIQUE_ITEM_FASTER_ALIGNMENT_UP_BY_KILL))
@@ -782,6 +776,7 @@ void CHARACTER::Reward(bool bItemDrop)
 			}
 			else
 				pkAttacker->UpdateAlignment(2);
+		}
 
 		pkAttacker->SetQuestNPCID(GetVID());
 		quest::CQuestManager::instance().Kill(pkAttacker->GetPlayerID(), GetRaceNum());
@@ -842,7 +837,17 @@ void CHARACTER::Reward(bool bItemDrop)
 
 			if (CBattleArena::instance().IsBattleArenaMap(pkAttacker->GetMapIndex()) == false)
 			{
+#ifdef ENABLE_DICE_SYSTEM
+				if (pkAttacker->GetParty())
+				{
+					FPartyDropDiceRoll f(item, pkAttacker);
+					f.Process(this);
+				}
+				else
+					item->SetOwnership(pkAttacker);
+#else
 				item->SetOwnership(pkAttacker);
+#endif
 			}
 
 			item->StartDestroyEvent();
@@ -940,7 +945,17 @@ void CHARACTER::Reward(bool bItemDrop)
 
 					if (CBattleArena::instance().IsBattleArenaMap(ch->GetMapIndex()) == false)
 					{
+#ifdef ENABLE_DICE_SYSTEM
+						if (ch->GetParty())
+						{
+							FPartyDropDiceRoll f(item, ch);
+							f.Process(this);
+						}
+						else
+							item->SetOwnership(ch);
+#else
 						item->SetOwnership(ch);
+#endif
 					}
 
 					item->StartDestroyEvent();
@@ -986,11 +1001,8 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 	if (GetMyShop())
 		return;
 
-	if (false == LC_IsYMIR())
-	{
-		if (GetLevel() < 50)
-			return;
-	}
+	if (GetLevel() < 50)
+		return;
 	
 	if (CBattleArena::instance().IsBattleArenaMap(GetMapIndex()) == true)
 	{
@@ -1194,7 +1206,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 {
 	if (IsDead())
 		return;
-
+#ifndef DISABLE_STOP_RIDING_WHEN_DIE
 	{
 		if (IsHorseRiding())
 		{
@@ -1209,6 +1221,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 			UpdatePacket();
 		}
 	}
+#endif	
 
 	if (!pkKiller && m_dwKillerPID)
 		pkKiller = CHARACTER_MANAGER::instance().FindByPID(m_dwKillerPID);
@@ -1245,6 +1258,16 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 			CGuildManager::instance().Kill(pkKiller, this);
 		}
 	}
+
+#ifdef ENABLE_QUEST_DIE_EVENT
+	if (IsPC())
+	{
+		if (pkKiller)
+			SetQuestNPCID(pkKiller->GetVID());
+		// quest::CQuestManager::instance().Die(GetPlayerID(), quest::QUEST_NO_NPC);
+		quest::CQuestManager::instance().Die(GetPlayerID(), (pkKiller)?pkKiller->GetRaceNum():quest::QUEST_NO_NPC);
+	}
+#endif
 
 	//CHECK_FORKEDROAD_WAR
 	if (IsPC())
@@ -1330,19 +1353,16 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 				{
 					int iNoPenaltyProb = 0;
 
-					if (g_iUseLocale)
-					{
-						if (pkKiller->GetAlignment() >= 0)	// 1/3 percent down
-							iNoPenaltyProb = 33;
-						else				// 4/5 percent down
-							iNoPenaltyProb = 20;
-					}
+					if (pkKiller->GetAlignment() >= 0)	// 1/3 percent down
+						iNoPenaltyProb = 33;
+					else				// 4/5 percent down
+						iNoPenaltyProb = 20;
 
 					if (number(1, 100) < iNoPenaltyProb)
 						pkKiller->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("용신의 보호로 아이템이 떨어지지 않았습니다."));
 					else
 					{
-						if (g_iUseLocale && pkKiller->GetParty())
+						if (pkKiller->GetParty())
 						{
 							FPartyAlignmentCompute f(-20000, pkKiller->GetX(), pkKiller->GetY());
 							pkKiller->GetParty()->ForEachOnlineMember(f);
@@ -1517,7 +1537,10 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 	{
 		Cube_close(this);
 	}
-	
+#ifdef ENABLE_ACCE_SYSTEM
+	if (IsPC())
+		CloseAcce();
+#endif
 	CShopManager::instance().StopShopping(this);
 	CloseMyShop();
 	CloseSafebox();
@@ -1601,6 +1624,16 @@ void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int Damage, BYTE DamageF
 // 
 bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // returns true if dead
 {
+#ifdef ENABLE_NEWSTUFF
+	if (pAttacker && IsStone() && pAttacker->IsPC())
+	{
+		if (GetEmpire() && GetEmpire() == pAttacker->GetEmpire())
+		{
+			SendDamagePacket(pAttacker, 0, DAMAGE_BLOCK);
+			return false;
+		}
+	}
+#endif
 	if (DAMAGE_TYPE_MAGIC == type)
 	{
 		dam = (int)((float)dam * (100 + (pAttacker->GetPoint(POINT_MAGIC_ATT_BONUS_PER) + pAttacker->GetPoint(POINT_MELEE_MAGIC_ATT_BONUS_PER))) / 100.f + 0.5f);
@@ -1608,7 +1641,9 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 	if (GetRaceNum() == 5001)
 	{
 		bool bDropMoney = false;
-		int iPercent = (GetHP() * 100) / GetMaxHP();
+		int iPercent = 0; // @fixme136
+		if (GetMaxHP() >= 0)
+			iPercent = (GetHP() * 100) / GetMaxHP();
 
 		if (iPercent <= 10 && GetMaxSP() < 5)
 		{
@@ -1684,16 +1719,6 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 	bool IsCritical = false;
 	bool IsPenetrate = false;
 	bool IsDeathBlow = false;
-
-	enum DamageFlag
-	{
-		DAMAGE_NORMAL	= (1 << 0),
-		DAMAGE_POISON	= (1 << 1),
-		DAMAGE_DODGE	= (1 << 2),
-		DAMAGE_BLOCK	= (1 << 3),
-		DAMAGE_PENETRATE= (1 << 4),
-		DAMAGE_CRITICAL = (1 << 5),
-	};
 
 	//PROF_UNIT puAttr("Attr");
 
@@ -1786,6 +1811,9 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 					{
 						RemoveAffect(AFF_MANASHIELD);
 					}
+#ifdef ENABLE_EFFECT_PENETRATE
+					EffectPacket(SE_PENETRATE);
+#endif
 				}
 			}
 		}
@@ -1906,6 +1934,9 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 					if (test_server)
 						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("관통 추가 데미지 %d"), GetPoint(POINT_DEF_GRADE) * (100 + GetPoint(POINT_DEF_BONUS)) / 100);
 					dam += GetPoint(POINT_DEF_GRADE) * (100 + GetPoint(POINT_DEF_BONUS)) / 100;
+#ifdef ENABLE_EFFECT_PENETRATE
+					EffectPacket(SE_PENETRATE);
+#endif
 				}
 			}
 
@@ -1968,7 +1999,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			// 칠 때마다 HP회복
 			if (pAttacker->GetPoint(POINT_HIT_HP_RECOVERY) && number(0, 4) > 0) // 80% 확률
 			{
-				int i = MIN(dam, iCurHP) * pAttacker->GetPoint(POINT_HIT_HP_RECOVERY) / 100;
+				int i = ((iCurHP>=0)?MIN(dam, iCurHP):dam) * pAttacker->GetPoint(POINT_HIT_HP_RECOVERY) / 100; //@fixme107
 
 				if (i)
 				{
@@ -1980,7 +2011,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			// 칠 때마다 SP회복
 			if (pAttacker->GetPoint(POINT_HIT_SP_RECOVERY) && number(0, 4) > 0) // 80% 확률
 			{
-				int i = MIN(dam, iCurHP) * pAttacker->GetPoint(POINT_HIT_SP_RECOVERY) / 100;
+				int i = ((iCurHP>=0)?MIN(dam, iCurHP):dam) * pAttacker->GetPoint(POINT_HIT_SP_RECOVERY) / 100; //@fixme107
 
 				if (i)
 				{
@@ -2073,48 +2104,16 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			dam += add_dam;
 		}
 
-		//
-		// 제국으로 인한 보너스 (한국 올드 버전만 적용)
-		//
-		int iEmpire = GetEmpire();
-		long lMapIndex = GetMapIndex();
-		int iMapEmpire = SECTREE_MANAGER::instance().GetEmpireFromMapIndex(lMapIndex);
-
-		if (LC_IsYMIR() == true)
-		{
-			if (iEmpire && iMapEmpire && iEmpire != iMapEmpire)
-			{
-				dam += (dam * 30) / 100;
-			}
-		}
-
 		if (pAttacker->IsPC())
 		{
-			iEmpire = pAttacker->GetEmpire();
-			lMapIndex = pAttacker->GetMapIndex();
-			iMapEmpire = SECTREE_MANAGER::instance().GetEmpireFromMapIndex(lMapIndex);
+			int iEmpire = pAttacker->GetEmpire();
+			long lMapIndex = pAttacker->GetMapIndex();
+			int iMapEmpire = SECTREE_MANAGER::instance().GetEmpireFromMapIndex(lMapIndex);
 
-			// 다른 제국 사람인 경우 데미지 10% 감소
+			
 			if (iEmpire && iMapEmpire && iEmpire != iMapEmpire)
 			{
-				int percent = 10;
-				
-				if (184 <= lMapIndex && lMapIndex <= 189)
-				{
-					if (LC_IsYMIR() == true)
-						percent = 7;
-					else
-						percent = 9;
-				}
-				else
-				{
-					if (LC_IsYMIR() == true)
-						percent = 8;
-					else
-						percent = 9;
-				}
-
-				dam = dam * percent / 10;
+				dam = dam * 9 / 10;
 			}
 
 			if (!IsPC() && GetMonsterDrainSPPoint())
@@ -2186,11 +2185,19 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			dam = GetHP() - 1;
 		}
 	}
-
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	else if (type == DAMAGE_TYPE_BLEEDING)
+	{
+		if (GetHP() - dam <= 0)
+		{
+			dam = GetHP();
+		}
+	}
+#endif
 	// ------------------------
 	// 독일 프리미엄 모드 
 	// -----------------------
-	if (LC_IsGermany() && pAttacker && pAttacker->IsPC())
+	if (pAttacker && pAttacker->IsPC())
 	{
 		int iDmgPct = CHARACTER_MANAGER::instance().GetUserDamageRate(pAttacker);
 		dam = dam * iDmgPct / 100;
@@ -2225,6 +2232,13 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 
 		if (type == DAMAGE_TYPE_POISON)
 			damageFlag = DAMAGE_POISON;
+#if defined(ENABLE_WOLFMAN_CHARACTER) && !defined(USE_MOB_BLEEDING_AS_POISON)
+		else if (type == DAMAGE_TYPE_BLEEDING)
+			damageFlag = DAMAGE_BLEEDING;
+#elif defined(ENABLE_WOLFMAN_CHARACTER) && defined(USE_MOB_BLEEDING_AS_POISON)
+		else if (type == DAMAGE_TYPE_BLEEDING)
+			damageFlag = DAMAGE_POISON;
+#endif
 		else
 			damageFlag = DAMAGE_NORMAL;
 
@@ -2246,13 +2260,17 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 
 		if (test_server)
 		{
+			int iTmpPercent = 0; // @fixme136
+			if (GetMaxHP() >= 0)
+				iTmpPercent = (GetHP() * 100) / GetMaxHP();
+
 			if(pAttacker)
 			{
 				pAttacker->ChatPacket(CHAT_TYPE_INFO, "-> %s, DAM %d HP %d(%d%%) %s%s",
 						GetName(), 
 						dam, 
 						GetHP(),
-						(GetHP() * 100) / GetMaxHP(),
+						iTmpPercent,
 						IsCritical ? "crit " : "",
 						IsPenetrate ? "pene " : "",
 						IsDeathBlow ? "deathblow " : "");
@@ -2262,7 +2280,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 					pAttacker ? pAttacker->GetName() : 0,
 					dam, 
 					GetHP(),
-					(GetHP() * 100) / GetMaxHP(),
+					iTmpPercent,
 					IsCritical ? "crit " : "",
 					IsPenetrate ? "pene " : "",
 					IsDeathBlow ? "deathblow " : "");
@@ -2279,6 +2297,8 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 	//
 	if (!cannot_dead)
 	{
+		if (GetHP() - dam <= 0) // @fixme137
+			dam = GetHP();
 		PointChange(POINT_HP, -dam, false);
 	}
 
@@ -2330,10 +2350,116 @@ void CHARACTER::DistributeHP(LPCHARACTER pkKiller)
 	if (pkKiller->GetDungeon()) // 던젼내에선 만두가나오지않는다
 		return;
 }
-
+#define ENABLE_NEWEXP_CALCULATION
+#ifdef ENABLE_NEWEXP_CALCULATION
+#define NEW_GET_LVDELTA(me, victim) aiPercentByDeltaLev[MINMAX(0, (victim + 15) - me, MAX_EXP_DELTA_OF_LEV - 1)]
+typedef long double rate_t;
 static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 {
-	// 레벨차 경험치 가감비율
+	if (test_server && iExp < 0)
+	{
+		to->ChatPacket(CHAT_TYPE_INFO, "exp(%d) overflow", iExp);
+		return;
+	}
+	// decrease/increase exp based on player<>mob level
+	rate_t lvFactor = static_cast<rate_t>(NEW_GET_LVDELTA(to->GetLevel(), from->GetLevel())) / 100.0L;
+	iExp *= lvFactor;
+	// start calculating rate exp bonus
+	int iBaseExp = iExp;
+	rate_t rateFactor = 100;
+	if (distribution_test_server)
+		rateFactor *= 3;
+
+	rateFactor += CPrivManager::instance().GetPriv(to, PRIV_EXP_PCT);
+	if (to->IsEquipUniqueItem(UNIQUE_ITEM_LARBOR_MEDAL))
+		rateFactor += 20;
+	if (to->GetMapIndex() >= 660000 && to->GetMapIndex() < 670000)
+		rateFactor += 20;
+	if (to->GetPoint(POINT_EXP_DOUBLE_BONUS))
+		if (number(1, 100) <= to->GetPoint(POINT_EXP_DOUBLE_BONUS))
+			rateFactor += 30;
+	if (to->IsEquipUniqueItem(UNIQUE_ITEM_DOUBLE_EXP))
+		rateFactor += 50;
+
+	switch (to->GetMountVnum())
+	{
+		case 20110:
+		case 20111:
+		case 20112:
+		case 20113:
+			if (to->IsEquipUniqueItem(71115) || to->IsEquipUniqueItem(71117) || to->IsEquipUniqueItem(71119) ||
+					to->IsEquipUniqueItem(71121) )
+			{
+				rateFactor += 10;
+			}
+			break;
+
+		case 20114:
+		case 20120:
+		case 20121:
+		case 20122:
+		case 20123:
+		case 20124:
+		case 20125:
+			rateFactor += 30;
+			break;
+	}
+
+	if (to->GetPremiumRemainSeconds(PREMIUM_EXP) > 0)
+		rateFactor += 50;
+	if (to->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_EXP))
+		rateFactor += 50;
+	if (to->GetPoint(POINT_PC_BANG_EXP_BONUS) > 0)
+	{
+		if (to->IsPCBang())
+			rateFactor += to->GetPoint(POINT_PC_BANG_EXP_BONUS);
+	}
+	rateFactor += to->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_EXP_BONUS);
+	rateFactor += to->GetPoint(POINT_RAMADAN_CANDY_BONUS_EXP);
+	rateFactor += to->GetPoint(POINT_MALL_EXPBONUS);
+	rateFactor += to->GetPoint(POINT_EXP);
+	// useless (never used except for china intoxication) = always 100
+	rateFactor = rateFactor * static_cast<rate_t>(CHARACTER_MANAGER::instance().GetMobExpRate(to))/100.0L;
+	// fix underflow formula
+	iExp = std::max<int>(0, iExp);
+	rateFactor = std::max<rate_t>(100.0L, rateFactor);
+	// apply calculated rate bonus
+	iExp *= (rateFactor/100.0L);
+	if (test_server)
+		to->ChatPacket(CHAT_TYPE_INFO, "base_exp(%d) * rate(%Lf) = exp(%d)", iBaseExp, rateFactor/100.0L, iExp);
+	// you can get at maximum only 10% of the total required exp at once (so, you need to kill at least 10 mobs to level up) (useless)
+	iExp = MIN(to->GetNextExp() / 10, iExp);
+	// it recalculate the given exp if the player level is greater than the exp_table size (useless)
+	iExp = AdjustExpByLevel(to, iExp);
+	if (test_server)
+		to->ChatPacket(CHAT_TYPE_INFO, "exp+minGNE+adjust(%d)", iExp);
+	// set
+	to->PointChange(POINT_EXP, iExp, true);
+	from->CreateFly(FLY_EXP, to);
+	// marriage
+	{
+		LPCHARACTER you = to->GetMarryPartner();
+		if (you)
+		{
+			// sometimes, this overflows
+			DWORD dwUpdatePoint = (2000.0L/to->GetLevel()/to->GetLevel()/3)*iExp;
+
+			if (to->GetPremiumRemainSeconds(PREMIUM_MARRIAGE_FAST) > 0 ||
+					you->GetPremiumRemainSeconds(PREMIUM_MARRIAGE_FAST) > 0)
+				dwUpdatePoint *= 3;
+
+			marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(to->GetPlayerID());
+
+			// DIVORCE_NULL_BUG_FIX
+			if (pMarriage && pMarriage->IsNear())
+				pMarriage->Update(dwUpdatePoint);
+			// END_OF_DIVORCE_NULL_BUG_FIX
+		}
+	}
+}
+#else
+static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
+{
 	iExp = CALCULATE_VALUE_LVDELTA(to->GetLevel(), from->GetLevel(), iExp);
 
 	// 외부 테스트 서버 경험치 3배 보너스
@@ -2391,7 +2517,6 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 	}
 
 	// 아이템 몰 판매 경험치 보너스
-	if (LC_IsHongKong() || LC_IsEurope() || LC_IsCanada())
 	{
 		// 아이템 몰: 경험치 결제
 		if (to->GetPremiumRemainSeconds(PREMIUM_EXP) > 0)
@@ -2404,60 +2529,14 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 			iExp += (iExp * 50 / 100);
 		}
 
-		// PC방 아템 경치 보너스
+		
 		if (to->GetPoint(POINT_PC_BANG_EXP_BONUS) > 0)
 		{
 			if (to->IsPCBang() == true)
 				iExp += (iExp * to->GetPoint(POINT_PC_BANG_EXP_BONUS)/100);
 		}
 
-		// 결혼 보너스
-		iExp += iExp * to->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_EXP_BONUS) / 100;
-	}
-	else if (/*LC_IsNewCIBN() || */LC_IsBrazil())
-	{
-		// 아이템 몰: 경험치 결제
-		if (to->GetPremiumRemainSeconds(PREMIUM_EXP) > 0)
-		{
-			iExp += iExp;
-		}
-
-		if (to->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_EXP) == true)
-		{
-			iExp += iExp;
-		}
-
-		// PC방 아템 경치 보너스
-		if (to->GetPoint(POINT_PC_BANG_EXP_BONUS) > 0)
-		{
-			if (to->IsPCBang() == true)
-				iExp += (iExp * to->GetPoint(POINT_PC_BANG_EXP_BONUS)/100);
-		}
-
-		// 결혼 보너스
-		iExp += iExp * to->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_EXP_BONUS) / 100;
-	}
-	else
-	{
-		// 아이템 몰: 경험치 결제
-		if (to->GetPremiumRemainSeconds(PREMIUM_EXP) > 0)
-		{
-			iExp += (iExp * 20 / 100);
-		}
-
-		if (to->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_EXP) == true)
-		{
-			iExp += (iExp * 20 / 100);
-		}
-
-		// PC방 아템 경치 보너스
-		if (to->GetPoint(POINT_PC_BANG_EXP_BONUS) > 0)
-		{
-			if (to->IsPCBang() == true)
-				iExp += (iExp * to->GetPoint(POINT_PC_BANG_EXP_BONUS)/100);
-		}
-
-		// 결혼 보너스
+		
 		iExp += iExp * to->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_EXP_BONUS) / 100;
 	}
 
@@ -2490,6 +2569,7 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 	{
 		if (quest::CQuestManager::instance().GetEventFlag("exp_bonus_log") && iBaseExp>0)
 			to->ChatPacket(CHAT_TYPE_INFO, "exp bonus %d%%", (iExp-iBaseExp)*100/iBaseExp);
+		to->ChatPacket(CHAT_TYPE_INFO, "exp(%d) base_exp(%d)", iExp, iBaseExp);
 	}
 
 	iExp = AdjustExpByLevel(to, iExp);
@@ -2518,6 +2598,7 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 		}
 	}
 }
+#endif
 
 namespace NPartyExpDistribute
 {
@@ -2535,10 +2616,7 @@ namespace NPartyExpDistribute
 		{
 			if (DISTANCE_APPROX(ch->GetX() - x, ch->GetY() - y) <= PARTY_DEFAULT_RANGE)
 			{
-				if (LC_IsYMIR())
-					total += ch->GetLevel();
-				else
-					total += party_exp_distribute_table[ch->GetLevel()];
+				total += __GetPartyExpNP(ch->GetLevel());
 
 				++member_count;
 			}
@@ -2570,10 +2648,7 @@ namespace NPartyExpDistribute
 				switch (m_iMode)
 				{
 					case PARTY_EXP_DISTRIBUTION_NON_PARITY:
-						if (LC_IsYMIR())
-							iExp2 = (DWORD) ((_iExp * ch->GetLevel()) / total);
-						else
-							iExp2 = (DWORD) (_iExp * (float) party_exp_distribute_table[ch->GetLevel()] / total);
+						iExp2 = (DWORD) (_iExp * (float) __GetPartyExpNP(ch->GetLevel()) / total);
 						break;
 
 					case PARTY_EXP_DISTRIBUTION_PARITY:
@@ -2640,6 +2715,47 @@ typedef struct SDamageInfo
 		}
 	}
 } TDamageInfo;
+
+
+#ifdef __ENABLE_KILL_EVENT_FIX__
+LPCHARACTER CHARACTER::GetMostAttacked() {
+
+	int iMostDam=-1;
+	LPCHARACTER pkChrMostAttacked = NULL;
+	auto it = m_map_kDamage.begin();
+
+	while (it != m_map_kDamage.end()){
+		//* getting information from the iterator
+		const VID & c_VID = it->first;
+		const int iDam    = it->second.iTotalDamage;
+
+		//* increasing the iterator
+		++it;
+
+		//* finding the character from his vid
+		LPCHARACTER pAttacker = CHARACTER_MANAGER::instance().Find(c_VID);
+
+		//* if the attacked is now offline
+		if (!pAttacker)
+			continue;
+		
+		//* if the attacker is not a player
+		if( pAttacker->IsNPC())
+			continue;
+		
+		//* if the player is too far
+		if(DISTANCE_APPROX(GetX()-pAttacker->GetX(), GetY()-pAttacker->GetY())>5000)
+			continue;
+
+		if (iDam > iMostDam){
+			pkChrMostAttacked = pAttacker;
+			iMostDam = iDam;
+		}
+	}
+
+	return pkChrMostAttacked;
+}
+#endif
 
 LPCHARACTER CHARACTER::DistributeExp()
 {
@@ -2951,7 +3067,14 @@ class CFuncShoot
 						NormalAttackAffect(m_me, pkVictim);
 
 						// 데미지 계산
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+						const int resist_magic = MINMAX(0, pkVictim->GetPoint(POINT_RESIST_MAGIC), 100);
+						const int resist_magic_reduction = MINMAX(0, (m_me->GetJob()==JOB_SURA) ? m_me->GetPoint(POINT_RESIST_MAGIC_REDUCTION)/2 : m_me->GetPoint(POINT_RESIST_MAGIC_REDUCTION), 50);
+						const int total_res_magic = MINMAX(0, resist_magic - resist_magic_reduction, 100);
+						iDam = iDam * (100 - total_res_magic) / 100;
+#else
 						iDam = iDam * (100 - pkVictim->GetPoint(POINT_RESIST_MAGIC)) / 100;
+#endif
 
 						//sys_log(0, "%s arrow %s dam %d", m_me->GetName(), pkVictim->GetName(), iDam);
 
@@ -3339,9 +3462,7 @@ void CHARACTER::UpdateKillerMode()
 	if (!IsKillerMode())
 		return;
 
-	int iKillerSeconds = ! LC_IsYMIR() ? 30 : 60;
-
-	if (thecore_pulse() - m_iKillerModePulse >= PASSES_PER_SEC(iKillerSeconds))
+	if (thecore_pulse() - m_iKillerModePulse >= PASSES_PER_SEC(30))
 		SetKillerMode(false);
 }
 

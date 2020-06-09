@@ -82,6 +82,18 @@ PyObject * exchangeGetNameFromTarget(PyObject * poTarget, PyObject * poArgs)
 	return Py_BuildValue("s", CPythonExchange::Instance().GetNameFromTarget());
 }
 
+#ifdef ENABLE_LEVEL_IN_TRADE
+PyObject * exchangeGetLevelFromSelf(PyObject * poTarget, PyObject * poArgs)
+{
+	return Py_BuildValue("I", CPythonExchange::Instance().GetLevelFromSelf());
+}
+
+PyObject * exchangeGetLevelFromTarget(PyObject * poTarget, PyObject * poArgs)
+{
+	return Py_BuildValue("I", CPythonExchange::Instance().GetLevelFromTarget());
+}
+#endif
+
 PyObject * exchangeGetItemMetinSocketFromTarget(PyObject * poTarget, PyObject * poArgs)
 {
 	int pos;
@@ -173,6 +185,11 @@ void initTrade()
 
 		{"GetNameFromSelf",				exchangeGetNameFromSelf,			METH_VARARGS},
 		{"GetNameFromTarget",			exchangeGetNameFromTarget,			METH_VARARGS},
+
+#ifdef ENABLE_LEVEL_IN_TRADE
+		{"GetLevelFromSelf",			exchangeGetLevelFromSelf,			METH_VARARGS},
+		{"GetLevelFromTarget",			exchangeGetLevelFromTarget,			METH_VARARGS},
+#endif
 
 		{"GetItemMetinSocketFromTarget",	exchangeGetItemMetinSocketFromTarget,	METH_VARARGS},
 		{"GetItemMetinSocketFromSelf",		exchangeGetItemMetinSocketFromSelf,		METH_VARARGS},

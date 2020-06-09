@@ -127,10 +127,6 @@ int g_shutdown_disconnect_force_pulse;
 int g_shutdown_core_pulse;
 bool g_bShutdown=false;
 
-extern int speed_server;
-#ifdef __AUCTION__
-extern int auction_server;
-#endif
 extern void CancelReloadSpamEvent();
 
 void ContinueOnFatalError()
@@ -229,12 +225,7 @@ void heartbeat(LPHEART ht, int pulse)
 	// 1초마다
 	if (!(pulse % ht->passes_per_sec))
 	{
-#ifdef ENABLE_LIMIT_TIME
-		if ((unsigned)get_global_time() >= GLOBAL_LIMIT_TIME)
-		{
-			g_bShutdown = true;
-		}
-#endif
+
 
 		if (!g_bAuthServer)
 		{
@@ -333,80 +324,6 @@ void heartbeat(LPHEART ht, int pulse)
 	}
 }
 
-static bool g_isInvalidServer = false;
-
-bool Metin2Server_IsInvalid()
-{
-	return g_isInvalidServer;
-}
-
-void Metin2Server_Check()
-{
-#ifdef _USE_SERVER_KEY_
-	if (false == CheckServer::CheckIp(g_szPublicIP))
-	{
-#ifdef _WIN32
-		fprintf(stderr, "check ip failed\n");
-#endif
-		g_isInvalidServer = true;
-	}
-	return;
-#endif
-
-	if (LC_IsEurope() || test_server)
-		return;
-
-
-	// 브라질 ip
-	if (strncmp (g_szPublicIP, "189.112.1", 9) == 0)
-	{
-		return;
-	}
-
-	// 캐나다 ip
-	if (strncmp (g_szPublicIP, "74.200.6", 8) == 0)
-	{
-		return;
-	}
-
-	return;
-
-	static const size_t CheckServerListSize = 1;
-	static const char* CheckServerList[] = { "202.31.178.251"};
-	static const int CheckServerPort = 7120;
-
-	socket_t sockConnector = INVALID_SOCKET;
-
-	for (size_t i = 0 ; i < CheckServerListSize ; i++)
-	{
-		sockConnector = socket_connect( CheckServerList[i], CheckServerPort );
-
-		if (0 < sockConnector)
-			break;
-	}
-
-	if (0 > sockConnector)
-	{
-		if (true != LC_IsEurope()) // 유럽은 접속을 하지 못하면 인증된 것으로 간주
-			g_isInvalidServer = true;
-
-		return;
-	}
-
-	char buf[256] = { 0, };
-
-	socket_read(sockConnector, buf, sizeof(buf) - 1);
-
-	sys_log(0, "recv[%s]", buf);
-	
-	if (strncmp(buf, "OK", 2) == 0)
-		g_isInvalidServer = false;
-	else if (strncmp(buf, "CK", 2) == 0)
-		g_isInvalidServer = true;
-
-	socket_close(sockConnector);
-}
-
 static void CleanUpForEarlyExit() {
 	CancelReloadSpamEvent();
 }
@@ -417,17 +334,6 @@ int main(int argc, char **argv)
 	DebugAllocator::StaticSetUp();
 #endif
 
-#ifndef __WIN32__
-	// <Factor> start unit tests if option is set
-	if ( argc > 1 ) 
-	{
-		if ( strcmp( argv[1], "unittest" ) == 0 )
-		{
-			::testing::InitGoogleTest(&argc, argv);
-			return RUN_ALL_TESTS();
-		}
-	}
-#endif
 
 	ilInit(); // DevIL Initialize
 
@@ -512,15 +418,6 @@ int main(int argc, char **argv)
 	Blend_Item_init();
 	ani_init();
 	PanamaLoad();
-
-	Metin2Server_Check();
-
-#if defined(_WIN32) && defined(_USE_SERVER_KEY_)
-	if (CheckServer::IsFail())
-	{
-		return 1;
-	}
-#endif
 
 	if ( g_bTrafficProfileOn )
 		TrafficProfiler::instance().Initialize( TRAFFIC_PROFILE_FLUSH_CYCLE, "ProfileLog" );
@@ -635,15 +532,6 @@ int main(int argc, char **argv)
 	return 1;
 }
 
-void usage()
-{
-	printf("Option list\n"
-			"-p <port>    : bind port number (port must be over 1024)\n"
-			"-l <level>   : sets log level\n"
-			"-v           : log to stdout\n"
-			"-r           : do not load regen tables\n"
-			"-t           : traffic proflie on\n");
-}
 
 int start(int argc, char **argv)
 {
@@ -656,12 +544,7 @@ int start(int argc, char **argv)
 #if defined(__FreeBSD__) && defined(DEBUG_ALLOC)
 	_malloc_message = WriteMallocMessage;
 #endif
-#ifdef ENABLE_LIMIT_TIME
-	if ((unsigned)get_global_time() >= GLOBAL_LIMIT_TIME)
-	{
-		return 0;
-	}
-#endif
+
 
 	// LOCALE_SERVICE
 	config_init(st_localeServiceName);
@@ -742,7 +625,7 @@ int start(int argc, char **argv)
 		}
 		else
 		{
-			fprintf(stderr, "MasterAuth %d", LC_GetLocalType());
+			fprintf(stderr, "MasterAuth %d\n", LC_GetLocalType());
 		}
 	}
 	/* game server to teen server */
@@ -750,10 +633,6 @@ int start(int argc, char **argv)
 	{
 		if (teen_addr[0] && teen_port)
 			g_TeenDesc = DESC_MANAGER::instance().CreateConnectionDesc(main_fdw, teen_addr, teen_port, PHASE_TEEN, true);
-
-		extern unsigned int g_uiSpamBlockDuration;
-		extern unsigned int g_uiSpamBlockScore;
-		extern unsigned int g_uiSpamReloadCycle;
 
 		sys_log(0, "SPAM_CONFIG: duration %u score %u reload cycle %u\n",
 				g_uiSpamBlockDuration, g_uiSpamBlockScore, g_uiSpamReloadCycle);
@@ -854,12 +733,6 @@ int idle()
 
 		memset(&s_dwProfiler[0], 0, sizeof(s_dwProfiler));
 	}
-#ifdef _USE_SERVER_KEY_
-	if (Metin2Server_IsInvalid() && 0 == (thecore_random() % 7146))
-	{
-		return 0; // shutdown
-	}
-#endif
 
 #ifdef __WIN32__
 	if (_kbhit()) {

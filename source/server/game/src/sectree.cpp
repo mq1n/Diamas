@@ -88,8 +88,11 @@ void SECTREE::IncreasePC()
 
 void SECTREE::DecreasePC()
 {
+#ifdef __clang__
+	LPSECTREE_LIST::const_iterator it_tree = m_neighbor_list.begin();
+#else
 	LPSECTREE_LIST::iterator it_tree = m_neighbor_list.begin();
-
+#endif
 	while (it_tree != m_neighbor_list.end())
 	{
 		LPSECTREE tree = *it_tree++;

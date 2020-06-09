@@ -124,7 +124,7 @@ void CGraphicTextInstance::Update()
 
 	if (m_roText.IsNull())
 	{
-		Tracef("CGraphicTextInstance::Update - 폰트가 설정되지 않았습니다\n");
+		Tracef("CGraphicTextInstance::Update - Font has not been set\n");
 		return;
 	}
 

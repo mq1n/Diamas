@@ -215,9 +215,9 @@ public:
 	
 	const Vector3d& GetPos(void) const { return mCenter; };
 	
-	inline void Render(unsigned int color);
+	void Render(unsigned int color);
 	
-	inline bool Recompute(float gravy);
+	bool Recompute(float gravy);
 	
 	int GetChildCount(void) const { return mChildCount; };
 	

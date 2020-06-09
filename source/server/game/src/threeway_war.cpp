@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "config.h"
 
 #include "threeway_war.h"
 
@@ -15,9 +16,6 @@
 #include "sectree_manager.h"
 #include "regen.h"
 #include "log.h"
-
-extern int test_server;
-extern int passes_per_sec;
 
 EVENTINFO(regen_mob_event_info)
 {
@@ -268,25 +266,12 @@ int GetKillValue(int level)
 	int iMinLevelFor1Point, iMaxLevelFor1Point;
 	int iMinLevelFor2Point, iMaxLevelFor2Point;
 	int iMinLevelFor3Point, iMaxLevelFor3Point;
+	int iMinLevelFor4Point, iMaxLevelFor4Point; // @fixme153
 
-	if (LC_IsBrazil() == true)
-	{
-		iMinLevelFor1Point = 35; iMaxLevelFor1Point = 50;
-		iMinLevelFor2Point = 51; iMaxLevelFor2Point = 70;
-		iMinLevelFor3Point = 71; iMaxLevelFor3Point = 99;
-	}
-	else if (LC_IsYMIR() == false)
-	{
-		iMinLevelFor1Point = 30; iMaxLevelFor1Point = 39;
-		iMinLevelFor2Point = 40; iMaxLevelFor2Point = 49;
-		iMinLevelFor3Point = 50; iMaxLevelFor3Point = 99;
-	}
-	else
-	{
-		iMinLevelFor1Point = 50; iMaxLevelFor1Point = 59;
-		iMinLevelFor2Point = 60; iMaxLevelFor2Point = 69;
-		iMinLevelFor3Point = 70; iMaxLevelFor3Point = 99;
-	}
+	iMinLevelFor1Point = 30; iMaxLevelFor1Point = 39;
+	iMinLevelFor2Point = 40; iMaxLevelFor2Point = 49;
+	iMinLevelFor3Point = 50; iMaxLevelFor3Point = 99;
+	iMinLevelFor4Point = 100; iMaxLevelFor4Point = gPlayerMaxLevel; // @fixme153
 
 	if (iMinLevelFor1Point <= level && level <= iMaxLevelFor1Point)
 	{
@@ -299,6 +284,10 @@ int GetKillValue(int level)
 	else if (iMinLevelFor3Point <= level && level <= iMaxLevelFor3Point)
 	{
 		return 3;
+	}
+	else if (iMinLevelFor4Point <= level && level <= iMaxLevelFor4Point)  // @fixme153
+	{
+		return 4;
 	}
 
 	return 0;

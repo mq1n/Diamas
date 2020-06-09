@@ -82,7 +82,11 @@ bool ITEM_MANAGER::Initialize(TItemTable * table, int size)
 			m_map_ItemRefineFrom.insert(std::make_pair(m_vec_prototype[i].dwRefinedVnum, m_vec_prototype[i].dwVnum));
 
 		// NOTE : QUEST_GIVE 플래그는 npc 이벤트로 발생.
-		if (m_vec_prototype[i].bType == ITEM_QUEST || IS_SET(m_vec_prototype[i].dwFlags, ITEM_FLAG_QUEST_USE | ITEM_FLAG_QUEST_USE_MULTIPLE))
+		if (m_vec_prototype[i].bType == ITEM_QUEST || IS_SET(m_vec_prototype[i].dwFlags, ITEM_FLAG_QUEST_USE | ITEM_FLAG_QUEST_USE_MULTIPLE)
+#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
+			|| (m_vec_prototype[i].bType == ITEM_COSTUME && m_vec_prototype[i].bSubType == COSTUME_MOUNT)
+#endif
+		)
 			quest::CQuestManager::instance().RegisterNPCVnum(m_vec_prototype[i].dwVnum);
 
 		m_map_vid.insert( std::map<DWORD,TItemTable>::value_type( m_vec_prototype[i].dwVnum, m_vec_prototype[i] ) ); 
@@ -153,29 +157,6 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 	if (GetMaskVnum(vnum))
 	{
 		dwMaskVnum = GetMaskVnum(vnum);
-	}
-
-	if (LC_IsKorea() || LC_IsYMIR())
-	{
-		if (vnum == 50300 && bTryMagic)
-		{
-			// 수련서를 아이템 번호를 다르게 만들어 준다.
-			DWORD dwSkillVnum;
-
-			do
-			{
-				dwSkillVnum = number(1, 111);
-
-				CSkillProto * pkSk = CSkillManager::instance().Get(dwSkillVnum);
-
-				if (!pkSk)
-					continue;
-
-				break;
-			} while (1);
-
-			vnum = 50400 + dwSkillVnum;
-		}
 	}
 
 	const TItemTable* table = GetTable(vnum);
@@ -263,7 +244,7 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 		;
 	else if (item->IsStackable())  // 합칠 수 있는 아이템의 경우
 	{
-		count = MINMAX(1, count, ITEM_MAX_COUNT);
+		count = MINMAX(1, count, g_bItemCountLimit);
 
 		if (bTryMagic && count <= 1 && IS_SET(item->GetFlag(), ITEM_FLAG_MAKECOUNT))
 			count = item->GetValue(1);
@@ -359,17 +340,8 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 		// 50300 == 기술 수련서
 		if (vnum == 50300 || vnum == ITEM_SKILLFORGET_VNUM)
 		{
-			DWORD dwSkillVnum;
-
-			do
-			{
-				dwSkillVnum = number(1, 111);
-
-				if (NULL != CSkillManager::instance().Get(dwSkillVnum))
-					break;
-			} while (true);
-
-			item->SetSocket(0, dwSkillVnum);
+			extern const DWORD GetRandomSkillVnum(BYTE bJob = JOB_MAX_NUM);
+			item->SetSocket(0, GetRandomSkillVnum());
 		}
 		else if (ITEM_SKILLFORGET2_VNUM == vnum)
 		{
@@ -384,6 +356,14 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 			} while (true);
 
 			item->SetSocket(0, dwSkillVnum);
+		}
+	}
+	else
+	{
+		
+		if (100 == table->bAlterToMagicItemPct && 0 == item->GetAttributeCount())
+		{
+			item->AlterToMagicItem();
 		}
 	}
 
@@ -456,10 +436,36 @@ void ITEM_MANAGER::SaveSingleItem(LPITEM item)
 
 	t.id = item->GetID();
 	t.window = item->GetWindow();
-	t.pos = t.window == EQUIPMENT ? item->GetCell() - INVENTORY_MAX_NUM : item->GetCell();
+	switch (t.window)
+	{
+		case EQUIPMENT:
+			t.pos = item->GetCell() - INVENTORY_MAX_NUM;
+			break;
+#ifdef ENABLE_BELT_INVENTORY_EX
+		case INVENTORY:
+			if (BELT_INVENTORY_SLOT_START <= item->GetCell() && BELT_INVENTORY_SLOT_END > item->GetCell())
+			{
+				t.window = BELT_INVENTORY;
+				t.pos = item->GetCell() - BELT_INVENTORY_SLOT_START;
+				break;
+			}
+#endif
+		default:
+			t.pos = item->GetCell();
+			break;
+	}
 	t.count = item->GetCount();
 	t.vnum = item->GetOriginalVnum();
-	t.owner = (t.window == SAFEBOX || t.window == MALL) ? item->GetOwner()->GetDesc()->GetAccountTable().id : item->GetOwner()->GetPlayerID();
+	switch (t.window)
+	{
+		case SAFEBOX:
+		case MALL:
+			t.owner = item->GetOwner()->GetDesc()->GetAccountTable().id;
+			break;
+		default:
+			t.owner = item->GetOwner()->GetPlayerID();
+			break;
+	}
 	memcpy(t.alSockets, item->GetSockets(), sizeof(t.alSockets));
 	memcpy(t.aAttr, item->GetAttributes(), sizeof(t.aAttr));
 
@@ -601,7 +607,7 @@ TItemTable * ITEM_MANAGER::GetTable(DWORD vnum)
 
 	if (rnum < 0)
 	{
-		for (int i = 0; i < m_vec_item_vnum_range_info.size(); i++)
+		for (size_t i = 0; i < m_vec_item_vnum_range_info.size(); i++)
 		{
 			TItemTable* p = m_vec_item_vnum_range_info[i];
 			if ((p->dwVnum < vnum) &&
@@ -772,7 +778,7 @@ int GetDropPerKillPct(int iMinimum, int iDefault, int iDeltaPercent, const char 
 
 	if ((iVal = quest::CQuestManager::instance().GetEventFlag(c_pszFlag)))
 	{
-		if (!test_server && !LC_IsJapan())
+		if (!test_server)
 		{
 			if (iVal < iMinimum)
 				iVal = iDefault;
@@ -833,7 +839,7 @@ bool ITEM_MANAGER::GetDropPct(LPCHARACTER pkChr, LPCHARACTER pkKiller, OUT int& 
 	iRandRange = iRandRange * 100 / 
 		(100 + 
 		 CPrivManager::instance().GetPriv(pkKiller, PRIV_ITEM_DROP) + 
-		 pkKiller->IsEquipUniqueItem(UNIQUE_ITEM_DOUBLE_ITEM)?100:0);
+		 (pkKiller->IsEquipUniqueItem(UNIQUE_ITEM_DOUBLE_ITEM)?100:0));
 
 	if (distribution_test_server) iRandRange /= 3;
 
@@ -1059,55 +1065,6 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 		DBManager::instance().SendMoneyLog(MONEY_LOG_DROP, item->GetVnum(), item->GetCount());
 	}
 
-	//
-	// 승룡곡 천의동굴 2층에서만 수룡방 입장권
-	//
-	if (LC_IsYMIR() || LC_IsKorea())
-	{
-		if (73 == pkKiller->GetMapIndex())
-		{
-			int per = 25;	// 0.25%
-			if (number(1, 10000) <= per)
-			{
-				LPITEM item = 0;
-				if ((item = CreateItem(71122, 1, 0, true)))
-					vec_item.push_back(item);
-			}
-		}
-	}
-
-	//
-	// 승룡곡 1층, 2층에서만 7,8 스킬입문서 드롭
-	//
-	if (LC_IsYMIR() || LC_IsKorea())
-	{
-		switch (pkKiller->GetMapIndex())
-		{
-			case 72:	// 천의동굴 1층
-			case 73:	// 천의동굴 2층
-				{
-					int vnum = 0;
-
-					if (2403 == pkChr->GetRaceNum())	// 천의법사
-						vnum = 69200;	// 7스킬 입문서
-					else if (2411 == pkChr->GetRaceNum())	// 진천의병사
-						vnum = 69201;	// 8스킬 입문서
-					else
-						break;
-
-					int per = 5;	// 0.05%
-					if (number(1, 10000) <= per)
-					{
-						LPITEM item = 0;
-						item = CreateItem(vnum, 1, 0, true);
-						if (item)
-							vec_item.push_back(item);
-					}
-				}
-				break;
-		}
-	}
-
 	return vec_item.size();
 }
 
@@ -1178,9 +1135,6 @@ static void __DropEvent_CharStone_DropItem(CHARACTER & killer, CHARACTER & victi
 	int dropPercent = __DropEvent_CharStone_GetDropPercent(killer_level);
 
 	int MaxRange = 10000;
-
-	if (LC_IsCanada() == true)
-		MaxRange = 20000;
 
 	if (number(1, MaxRange) <= dropPercent)
 	{
@@ -1394,16 +1348,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	// 크리스마스 양말
 	if (quest::CQuestManager::instance().GetEventFlag("xmas_sock"))
 	{
-		//const DWORD SOCK_ITEM_VNUM = 50010;
-		DWORD	SOCK_ITEM_VNUM	= 0;
-		if (LC_IsKorea() || LC_IsYMIR())
-		{
-			SOCK_ITEM_VNUM = (number(1,100)<=50) ? 50010 : 71111;
-		}
-		else
-		{
-			SOCK_ITEM_VNUM = 50010;
-		}
+		const DWORD SOCK_ITEM_VNUM = 50010;
 
 		int iDropPerKill[MOB_RANK_MAX_NUM] =
 		{
@@ -1418,11 +1363,6 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 		if ( iDropPerKill[pkChr->GetMobRank()] != 0 )
 		{
 			int iPercent = 40000 * iDeltaPercent / iDropPerKill[pkChr->GetMobRank()];
-
-			if ( LC_IsHongKong() )
-			{
-				iPercent *= 10;
-			}
 
 			sys_log(0, "SOCK DROP %d %d", iPercent, iRandRange);
 			if (iPercent >= number(1, iRandRange))
@@ -1460,29 +1400,26 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 		}
 	}
 
-	if (LC_IsEurope())
+	if (pkKiller->GetLevel() >= 15 && abs(pkKiller->GetLevel() - pkChr->GetLevel()) <= 5)
 	{
-		if (pkKiller->GetLevel() >= 15 && abs(pkKiller->GetLevel() - pkChr->GetLevel()) <= 5)
+		int pct = quest::CQuestManager::instance().GetEventFlag("hc_drop");
+
+		if (pct > 0)
 		{
-			int pct = quest::CQuestManager::instance().GetEventFlag("hc_drop");
+			const DWORD ITEM_VNUM = 30178;
 
-			if (pct > 0)
+			if (number(1,100) <= pct)
 			{
-				const DWORD ITEM_VNUM = 30178;
-
-				if (number(1,100) <= pct)
-				{
-					if ((item = CreateItem(ITEM_VNUM, 1, 0, true)))
-						vec_item.push_back(item);
-				}
+				if ((item = CreateItem(ITEM_VNUM, 1, 0, true)))
+					vec_item.push_back(item);
 			}
 		}
 	}
 
-	//육각보합
-	if (GetDropPerKillPct(100, g_iUseLocale ? 2000 : 800, iDeltaPercent, "2006_drop") >= number(1, iRandRange))
+	
+	if (GetDropPerKillPct(100, 2000, iDeltaPercent, "2006_drop") >= number(1, iRandRange))
 	{
-		sys_log(0, "육각보합 DROP EVENT ");
+		sys_log(0, "A°°￠º¸CO DROP EVENT ");
 
 		const static DWORD dwVnum = 50037;
 
@@ -1492,9 +1429,9 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	}
 
 	//육각보합+
-	if (GetDropPerKillPct(100, g_iUseLocale ? 2000 : 800, iDeltaPercent, "2007_drop") >= number(1, iRandRange))
+	if (GetDropPerKillPct(100, 2000, iDeltaPercent, "2007_drop") >= number(1, iRandRange))
 	{
-		sys_log(0, "육각보합 DROP EVENT ");
+		sys_log(0, "A°°￠º¸CO DROP EVENT ");
 
 		const static DWORD dwVnum = 50043;
 
@@ -1506,7 +1443,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	if (GetDropPerKillPct(/* minimum */ 100, /* default */ 1000, iDeltaPercent, "newyear_fire") >= number(1, iRandRange))
 	{
 		// 중국은 폭죽, 한국 팽이
-		const DWORD ITEM_VNUM_FIRE = g_iUseLocale ? 50107 : 50108;
+		const DWORD ITEM_VNUM_FIRE = 50107;
 
 		if ((item = CreateItem(ITEM_VNUM_FIRE, 1, 0, true)))
 			vec_item.push_back(item);
@@ -1525,7 +1462,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	}
 
 	// 발렌타인 데이 이벤트. OGE의 요구에 따라 event 최소값을 1로 변경.(다른 이벤트는 일단 그대로 둠.)
-	if (GetDropPerKillPct(1, g_iUseLocale ? 2000 : 800, iDeltaPercent, "valentine_drop") >= number(1, iRandRange))
+	if (GetDropPerKillPct(1, 2000, iDeltaPercent, "valentine_drop") >= number(1, iRandRange))
 	{
 		sys_log(0, "EVENT VALENTINE_DROP");
 
@@ -1537,7 +1474,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	}
 
 	// 아이스크림 이벤트
-	if (GetDropPerKillPct(100, g_iUseLocale ? 2000 : 800, iDeltaPercent, "icecream_drop") >= number(1, iRandRange))
+	if (GetDropPerKillPct(100, 2000, iDeltaPercent, "icecream_drop") >= number(1, iRandRange))
 	{
 		const static DWORD icecream = 50123;
 
@@ -1566,7 +1503,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	//		vec_item.push_back(item);
 	//}
 
-	if ( GetDropPerKillPct(100, g_iUseLocale ? 2000 : 800, iDeltaPercent, "halloween_drop") >= number(1, iRandRange) )
+	if ( GetDropPerKillPct(100, 2000, iDeltaPercent, "halloween_drop") >= number(1, iRandRange) )
 	{
 		const static DWORD halloween_item = 30321;
 
@@ -1574,7 +1511,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 			vec_item.push_back(item);
 	}
 	
-	if ( GetDropPerKillPct(100, g_iUseLocale ? 2000 : 800, iDeltaPercent, "ramadan_drop") >= number(1, iRandRange) )
+	if ( GetDropPerKillPct(100, 2000, iDeltaPercent, "ramadan_drop") >= number(1, iRandRange) )
 	{
 		const static DWORD ramadan_item = 30315;
 
@@ -1582,7 +1519,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 			vec_item.push_back(item);
 	}
 
-	if ( GetDropPerKillPct(100, g_iUseLocale ? 2000 : 800, iDeltaPercent, "easter_drop") >= number(1, iRandRange) )
+	if ( GetDropPerKillPct(100, 2000, iDeltaPercent, "easter_drop") >= number(1, iRandRange) )
 	{
 		const static DWORD easter_item_base = 50160;
 
@@ -1591,7 +1528,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	}
 
 	// 월드컵 이벤트
-	if ( GetDropPerKillPct(100, g_iUseLocale ? 2000 : 800, iDeltaPercent, "football_drop") >= number(1, iRandRange) )
+	if ( GetDropPerKillPct(100, 2000, iDeltaPercent, "football_drop") >= number(1, iRandRange) )
 	{
 		const static DWORD football_item = 50096;
 
@@ -1600,7 +1537,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	}
 
 	// 화이트 데이 이벤트
-	if (GetDropPerKillPct(100, g_iUseLocale ? 2000 : 800, iDeltaPercent, "whiteday_drop") >= number(1, iRandRange))
+	if (GetDropPerKillPct(100, 2000, iDeltaPercent, "whiteday_drop") >= number(1, iRandRange))
 	{
 		sys_log(0, "EVENT WHITEDAY_DROP");
 		const static DWORD whiteday_items[2] = { ITEM_WHITEDAY_ROSE, ITEM_WHITEDAY_CANDY };

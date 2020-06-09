@@ -16,6 +16,7 @@
 #include "questlua.h"
 #include "locale_service.h"
 #include "log.h"
+#include "../../common/CommonDefines.h"
 
 CHARACTER_MANAGER::CHARACTER_MANAGER() :
 	m_iVIDCount(0),
@@ -696,7 +697,7 @@ void CHARACTER_MANAGER::Update(int32_t iPulse)
 
 	// The test server counts the number of characters every 60 seconds
 	if (test_server && 0 == (iPulse % PASSES_PER_SEC(60)))
-		sys_log(0, "CHARACTER COUNT vid %u pid %u", m_map_pkChrByVID.size(), m_map_pkChrByPID.size());
+		sys_log(0, "CHARACTER COUNT vid %zu pid %zu", m_map_pkChrByVID.size(), m_map_pkChrByPID.size());
 
 	// Delayed DestroyCharacter
 	FlushPendingDestroy();
@@ -859,6 +860,12 @@ bool CHARACTER_MANAGER::GetCharactersByRaceNum(DWORD dwRaceNum, CharacterVectorI
 #define FIND_JOB_SHAMAN_1	(1 << 13)
 #define FIND_JOB_SHAMAN_2	(1 << 14)
 #define FIND_JOB_SHAMAN		(FIND_JOB_SHAMAN_0 | FIND_JOB_SHAMAN_1 | FIND_JOB_SHAMAN_2)
+#ifdef ENABLE_WOLFMAN_CHARACTER
+#define FIND_JOB_WOLFMAN_0	(1 << 15)
+#define FIND_JOB_WOLFMAN_1	(1 << 16)
+#define FIND_JOB_WOLFMAN_2	(1 << 17)
+#define FIND_JOB_WOLFMAN		(FIND_JOB_WOLFMAN_0 | FIND_JOB_WOLFMAN_1 | FIND_JOB_WOLFMAN_2)
+#endif
 
 //
 // (job+1)*3+(skill_group)
@@ -902,7 +909,7 @@ LPCHARACTER CHARACTER_MANAGER::FindSpecifyPC(unsigned int uiJobFlag, long lMapIn
 int CHARACTER_MANAGER::GetMobItemRate(LPCHARACTER ch)	
 { 
 	//PREVENT_TOXICATION_FOR_CHINA
-	if ( LC_IsNewCIBN() )
+	if (g_bChinaIntoxicationCheck)
 	{
 		if ( ch->IsOverTime( OT_3HOUR ) )
 		{
@@ -932,7 +939,7 @@ int CHARACTER_MANAGER::GetMobGoldAmountRate(LPCHARACTER ch)
 		return m_iMobGoldAmountRate;
 
 	//PREVENT_TOXICATION_FOR_CHINA
-	if ( LC_IsNewCIBN() )
+	if (g_bChinaIntoxicationCheck)
 	{
 		if ( ch->IsOverTime( OT_3HOUR ) )
 		{
@@ -957,7 +964,7 @@ int CHARACTER_MANAGER::GetMobGoldDropRate(LPCHARACTER ch)
 		return m_iMobGoldDropRate;
 
 	//PREVENT_TOXICATION_FOR_CHINA
-	if ( LC_IsNewCIBN() )
+	if (g_bChinaIntoxicationCheck)
 	{
 		if ( ch->IsOverTime( OT_3HOUR ) )
 		{
@@ -982,7 +989,8 @@ int CHARACTER_MANAGER::GetMobExpRate(LPCHARACTER ch)
 	if ( !ch )
 		return m_iMobExpRate;
 
-	if ( LC_IsNewCIBN() )
+	//PREVENT_TOXICATION_FOR_CHINA
+	if (g_bChinaIntoxicationCheck)
 	{
 		if ( ch->IsOverTime( OT_3HOUR ) )
 		{
@@ -1066,12 +1074,12 @@ void CHARACTER_MANAGER::FlushPendingDestroy()
 CharacterVectorInteractor::CharacterVectorInteractor(const CHARACTER_SET & r)
 {
 	using namespace std;
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__) && !defined(CXX11_ENABLED)
 	using namespace __gnu_cxx;
 #endif
 
 	reserve(r.size());
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__) && !defined(CXX11_ENABLED)
 	transform(r.begin(), r.end(), back_inserter(*this), identity<CHARACTER_SET::value_type>());
 #else
 	insert(end(), r.begin(), r.end());

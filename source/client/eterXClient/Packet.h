@@ -18,7 +18,9 @@ typedef struct _AHNHS_TRANS_BUFFER
 #pragma pack(pop) // 기존 alignment 복구.
 #endif /* !USE_AHNLAB_HACKSHIELD */
 
+#include "Locale.h"
 #include "../eterGameLib/RaceData.h"
+#include "../eterGameLib/ItemData.h"
 
 typedef BYTE TPacketHeader;
 
@@ -352,6 +354,9 @@ enum
 	HEADER_GC_DRAGON_SOUL_REFINE						= 209,
 	HEADER_GC_RESPOND_CHANNELSTATUS				= 210,
 
+	// @fixme007
+	HEADER_GC_UNK_213							= 213,
+
 	HEADER_GC_KEY_AGREEMENT_COMPLETED			= 0xfa, // _IMPROVED_PACKET_ENCRYPTION_
 	HEADER_GC_KEY_AGREEMENT						= 0xfb, // _IMPROVED_PACKET_ENCRYPTION_
 	HEADER_GC_HANDSHAKE_OK						= 0xfc, // 252
@@ -380,7 +385,12 @@ enum
 	SHOP_SIGN_MAX_LEN = 32,
 
 	PLAYER_PER_ACCOUNT3 = 3,
+#ifndef ENABLE_PLAYER_PER_ACCOUNT5
 	PLAYER_PER_ACCOUNT4 = 4,
+#else
+	PLAYER_PER_ACCOUNT4 = 5,
+	PLAYER_PER_ACCOUNT5 = 5,
+#endif
 
 	PLAYER_ITEM_SLOT_MAX_NUM = 20,		// 플래이어의 슬롯당 들어가는 갯수.
 
@@ -417,7 +427,7 @@ enum
 	NEWCIBN_PASSPOD_ANSWER_MAX_LEN = 8,
 	NEWCIBN_PASSPOD_FAILURE_MAX_LEN = 128,
 
-	WEAR_MAX_NUM = 11,
+	WEAR_MAX_NUM = CItemData::WEAR_MAX_NUM,
 
 	OPENID_AUTHKEY_LEN = 32,
 
@@ -1178,6 +1188,9 @@ typedef struct SSimplePlayerInformation
     WORD                wMainPart;
     BYTE                bChangeName;
 	WORD				wHairPart;
+#ifdef ENABLE_ACCE_SYSTEM
+	WORD				wAccePart;
+#endif
     BYTE                bDummy[4];
 	long				x, y;
 	LONG				lAddr;
@@ -1205,6 +1218,17 @@ typedef struct packet_login_success4
 	DWORD random_key;
 } TPacketGCLoginSuccess4;
 
+#ifdef ENABLE_PLAYER_PER_ACCOUNT5
+typedef struct packet_login_success5
+{
+	BYTE						header;
+	TSimplePlayerInformation	akSimplePlayerInformation[PLAYER_PER_ACCOUNT5];
+    DWORD						guild_id[PLAYER_PER_ACCOUNT5];
+    char						guild_name[PLAYER_PER_ACCOUNT5][GUILD_NAME_MAX_LEN+1];
+	DWORD handle;
+	DWORD random_key;
+} TPacketGCLoginSuccess5;
+#endif
 
 enum { LOGIN_STATUS_MAX_LEN = 8 };
 typedef struct packet_login_failure
@@ -1279,6 +1303,9 @@ enum ECharacterEquipmentPart
 	CHR_EQUIPPART_HEAD,
 	CHR_EQUIPPART_HAIR,
 
+#ifdef ENABLE_ACCE_SYSTEM
+	CHR_EQUIPPART_ACCE,
+#endif
 	CHR_EQUIPPART_NUM,		
 };
 
@@ -1412,6 +1439,10 @@ enum EChatType
 	CHAT_TYPE_SHOUT,	/* 외치기 */
 	CHAT_TYPE_WHISPER,	// 서버와는 연동되지 않는 Only Client Enum
 	CHAT_TYPE_BIG_NOTICE,
+	CHAT_TYPE_MONARCH_NOTICE,
+#ifdef ENABLE_DICE_SYSTEM
+	CHAT_TYPE_DICE_INFO, //11
+#endif
 	CHAT_TYPE_MAX_NUM,
 };
 
@@ -2392,6 +2423,10 @@ enum SPECIAL_EFFECT
 	SE_EQUIP_HALLOWEEN_CANDY,		// 할로윈 사탕을 착용(-_-;)한 순간에 발동하는 이펙트
 	SE_EQUIP_HAPPINESS_RING,		// 크리스마스 행복의 반지를 착용하는 순간에 발동하는 이펙트
 	SE_EQUIP_LOVE_PENDANT,		// 발렌타인 사랑의 팬던트(71145) 착용할 때 이펙트 (발동이펙트임, 지속이펙트 아님)
+#ifdef ENABLE_ACCE_SYSTEM
+	SE_EFFECT_ACCE_SUCCEDED,
+	SE_EFFECT_ACCE_EQUIP,
+#endif
 };
 
 typedef struct SPacketGCSpecialEffect
@@ -2736,5 +2771,65 @@ typedef struct SChannelStatus
 	short nPort;
 	BYTE bStatus;
 } TChannelStatus;
+
+
+#ifdef ENABLE_ACCE_SYSTEM
+enum EAcceInfo
+{
+	ACCE_ABSORPTION_SOCKET = 0,
+	ACCE_ABSORBED_SOCKET = 1,
+	ACCE_CLEAN_ATTR_VALUE0 = 7,
+	ACCE_WINDOW_MAX_MATERIALS = 2,
+};
+
+enum
+{
+	HEADER_CG_ACCE = 211,
+	HEADER_GC_ACCE = 215,
+	ACCE_SUBHEADER_GC_OPEN = 0,
+	ACCE_SUBHEADER_GC_CLOSE,
+	ACCE_SUBHEADER_GC_ADDED,
+	ACCE_SUBHEADER_GC_REMOVED,
+	ACCE_SUBHEADER_CG_REFINED,
+	ACCE_SUBHEADER_CG_CLOSE = 0,
+	ACCE_SUBHEADER_CG_ADD,
+	ACCE_SUBHEADER_CG_REMOVE,
+	ACCE_SUBHEADER_CG_REFINE,
+};
+
+typedef struct SPacketAcce
+{
+	BYTE	header;
+	BYTE	subheader;
+	bool	bWindow;
+	DWORD	dwPrice;
+	BYTE	bPos;
+	TItemPos	tPos;
+	DWORD	dwItemVnum;
+	DWORD	dwMinAbs;
+	DWORD	dwMaxAbs;
+} TPacketAcce;
+
+typedef struct SAcceMaterial
+{
+	BYTE	bHere;
+	WORD	wCell;
+} TAcceMaterial;
+
+typedef struct SAcceResult
+{
+	DWORD	dwItemVnum;
+	DWORD	dwMinAbs;
+	DWORD	dwMaxAbs;
+} TAcceResult;
+#endif
+
+
+// @fixme007 length 2
+typedef struct packet_unk_213
+{
+	BYTE bHeader;
+	BYTE bUnk2;
+} TPacketGCUnk213;
 
 #pragma pack(pop)

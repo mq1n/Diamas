@@ -277,8 +277,6 @@ void CGuild::NotifyGuildMaster(const char* msg)
 		ch->ChatPacket(CHAT_TYPE_INFO, msg);
 }
 
-extern void map_allow_log();
-
 //
 // War State Relative
 //
@@ -662,7 +660,15 @@ void CGuild::GuildWarEntryAccept(DWORD dwOppGID, LPCHARACTER ch)
 
 	if (!CWarMapManager::instance().GetStartPosition(gw.map_index, GetID() < dwOppGID ? 0 : 1, pos))
 		return;
-
+#ifdef ENABLE_NEWSTUFF
+	if (g_NoMountAtGuildWar)
+	{
+		ch->RemoveAffect(AFFECT_MOUNT);
+		ch->RemoveAffect(AFFECT_MOUNT_BONUS);
+		if (ch->IsRiding())
+			ch->StopRiding();
+	}
+#endif
 	quest::PC * pPC = quest::CQuestManager::instance().GetPC(ch->GetPlayerID());
 	pPC->SetFlag("war.is_war_member", 1);
 

@@ -8,6 +8,7 @@
 #define _cube_cpp_
 
 #include "stdafx.h"
+#include "config.h"
 #include "constants.h"
 #include "utils.h"
 #include "log.h"
@@ -18,8 +19,6 @@
 #include "item_manager.h"
 
 #include <sstream>
-
-extern int test_server;
 
 
 #define RETURN_IF_CUBE_IS_NOT_OPENED(ch) if (!(ch)->IsCubeOpen()) return
@@ -540,8 +539,8 @@ bool Cube_make (LPCHARACTER ch)
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("제조 재료가 부족합니다"));
 		return false;
 	}
-
-	if (ch->GetGold() < cube_proto->gold)
+	int cube_gold = cube_proto->gold;
+	if (cube_gold < 0 || ch->GetGold() < cube_gold)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("돈이 부족하거나 아이템이 제자리에 없습니다."));	// 이 텍스트는 이미 널리 쓰이는거라 추가번역 필요 없음
 		return false;
@@ -713,7 +712,7 @@ void Cube_MakeCubeInformationText()
 	// 이제 정리된 큐브 결과 및 재료들의 정보로 클라이언트에 보내 줄 정보로 변환함.
 	for (TCubeMapByNPC::iterator iter = cube_info_map.begin(); cube_info_map.end() != iter; ++iter)
 	{
-		const DWORD& npcVNUM = iter->first;
+		//const DWORD& npcVNUM = iter->first;
 		TCubeResultList& resultList = iter->second;
 
 		for (TCubeResultList::iterator resultIter = resultList.begin(); resultList.end() != resultIter; ++resultIter)
@@ -778,9 +777,9 @@ void Cube_MakeCubeInformationText()
 	} // for npc
 }
 
-bool Cube_InformationInitialize()
+void Cube_InformationInitialize()
 {
-	for (int i = 0; i < s_cube_proto.size(); ++i)
+	for (size_t i = 0; i < s_cube_proto.size(); ++i)
 	{
 		CUBE_DATA* cubeData = s_cube_proto[i];
 
@@ -829,7 +828,7 @@ bool Cube_InformationInitialize()
 					if (NULL == existMaterialProto)
 					{
 						sys_err("There is no item(%u)", existMaterialIter->vnum);
-						return false;
+						return;
 					}
 					SItemNameAndLevel existItemInfo = SplitItemNameAndLevelFromName(existMaterialProto->szName);
 
@@ -869,7 +868,6 @@ bool Cube_InformationInitialize()
 	Cube_MakeCubeInformationText();
 
 	s_isInitializedCubeMaterialInformation = true;
-	return true;
 }
 
 // 클라이언트에서 서버로 : 현재 NPC가 만들 수 있는 아이템들의 정보(목록)를 요청
@@ -882,6 +880,14 @@ void Cube_request_result_list(LPCHARACTER ch)
 		return;
 
 	DWORD npcVNUM = npc->GetRaceNum();
+
+	if (!FN_check_valid_npc(npcVNUM)) // @fixme127
+	{
+		if (test_server)
+			dev_log(LOG_DEB0, "cube not valid NPC");
+		return;
+	}
+
 	size_t resultCount = 0;
 
 	std::string& resultText = cube_result_info_map_by_npc[npcVNUM];
@@ -903,7 +909,8 @@ void Cube_request_result_list(LPCHARACTER ch)
 
 		resultCount = resultList.size();
 
-		resultText.erase(resultText.size() - 1);
+		if (resultText.size() != 0) // @fixme127
+			resultText.erase(resultText.size() - 1);
 
 		// 채팅 패킷의 한계를 넘어가면 에러 남김... 기획자 분들 께 조정해달라고 요청하거나, 나중에 다른 방식으로 바꾸거나...
 		if (resultText.size() - 20 >= CHAT_MAX_LEN)
@@ -932,6 +939,12 @@ void Cube_request_material_info(LPCHARACTER ch, int requestStartIndex, int reque
 		return;
 
 	DWORD npcVNUM = npc->GetRaceNum();
+	if (!FN_check_valid_npc(npcVNUM)) // @fixme127
+	{
+		if (test_server)
+			dev_log(LOG_DEB0, "cube not valid NPC");
+		return;
+	}
 	std::string materialInfoText = "";
 
 	int index = 0;
@@ -962,7 +975,8 @@ void Cube_request_material_info(LPCHARACTER ch, int requestStartIndex, int reque
 		return;
 	}
 
-	materialInfoText.erase(materialInfoText.size() - 1);
+	if (materialInfoText.size() != 0) // @fixme127
+		materialInfoText.erase(materialInfoText.size() - 1);
 
 	// 
 	// (Server -> Client) /cube m_info start_index count 125,1|126,2|127,2|123,5&555,5&555,4/120000

@@ -6,6 +6,7 @@
 #include "db.h"
 #include "guild_manager.h"
 #include "marriage.h"
+#include "../../common/CommonDefines.h"
 
 /*
    Return Value
@@ -28,10 +29,15 @@ int CHARACTER::ChangeEmpire(BYTE empire)
 
 	{
 		// 1. 내 계정의 모든 pid를 얻어 온다
-		snprintf(szQuery, sizeof(szQuery), 
-				"SELECT id, pid1, pid2, pid3, pid4 FROM player_index%s WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u AND empire=%u", 
+#ifdef ENABLE_PLAYER_PER_ACCOUNT5
+		snprintf(szQuery, sizeof(szQuery),
+				"SELECT id, pid1, pid2, pid3, pid4, pid5 FROM player_index%s WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
+				get_table_postfix(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
+#else
+		snprintf(szQuery, sizeof(szQuery),
+				"SELECT id, pid1, pid2, pid3, pid4 FROM player_index%s WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u AND empire=%u",
 				get_table_postfix(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
-
+#endif
 		std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
 
 		if (msg->Get()->uiNumRows == 0)
@@ -102,9 +108,13 @@ int CHARACTER::ChangeEmpire(BYTE empire)
 	
 	{
 		// 4. db의 제국 정보를 업데이트 한다.
-		snprintf(szQuery, sizeof(szQuery), "UPDATE player_index%s SET empire=%u WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u AND empire=%u", 
+#ifdef ENABLE_PLAYER_PER_ACCOUNT5
+		snprintf(szQuery, sizeof(szQuery), "UPDATE player_index%s SET empire=%u WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
+				get_table_postfix(), empire, GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
+#else
+		snprintf(szQuery, sizeof(szQuery), "UPDATE player_index%s SET empire=%u WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u AND empire=%u",
 				get_table_postfix(), empire, GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
-
+#endif
 		std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
 
 		if (msg->Get()->uiAffectedRows > 0)
@@ -180,10 +190,13 @@ DWORD CHARACTER::GetAID() const
 {
 	char szQuery[1024+1];
 	DWORD dwAID = 0;
-
-	snprintf(szQuery, sizeof(szQuery), "SELECT id FROM player_index%s WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u AND empire=%u", 
+#ifdef ENABLE_PLAYER_PER_ACCOUNT5
+	snprintf(szQuery, sizeof(szQuery), "SELECT id FROM player_index%s WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
+			get_table_postfix(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
+#else
+	snprintf(szQuery, sizeof(szQuery), "SELECT id FROM player_index%s WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u AND empire=%u",
 			get_table_postfix(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
-
+#endif
 	SQLMsg* pMsg = DBManager::instance().DirectQuery(szQuery);
 
 	if (pMsg != NULL)

@@ -88,6 +88,7 @@ bool CHARACTER::DragonSoul_ActivateDeck(int deck_idx)
 		if (NULL != pItem)
 			DSManager::instance().ActivateDragonSoul(pItem);
 	}
+	return true;
 }
 
 void CHARACTER::DragonSoul_DeactivateAll()

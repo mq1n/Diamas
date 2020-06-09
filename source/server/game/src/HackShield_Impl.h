@@ -7,7 +7,9 @@
 #ifdef __FreeBSD__
 // Live build only
 #define UNIX
+#ifdef ENABLE_HSHIELD_SYSTEM
 #include <AntiCpXSvr.h>
+#endif
 #undef UNIX
 #endif
 
@@ -17,7 +19,9 @@ typedef struct SPacketGCHSCheck
 {
 	BYTE	bHeader;
 #ifdef __FreeBSD__
+#ifdef ENABLE_HSHIELD_SYSTEM
 	AHNHS_TRANS_BUFFER Req;
+#endif
 #endif
 } TPacketGCHSCheck;
 
@@ -37,6 +41,7 @@ class CHackShieldImpl
 
 	private:
 #ifdef __FreeBSD__
+#ifdef ENABLE_HSHIELD_SYSTEM
 		AHNHS_SERVER_HANDLE handle_;
 
 		typedef std::unordered_map<DWORD, AHNHS_CLIENT_HANDLE> ClientHandleContainer;
@@ -44,6 +49,7 @@ class CHackShieldImpl
 
 		typedef std::unordered_map<DWORD, bool> ClientCheckContainer;
 		ClientCheckContainer ClientCheckMap_;
+#endif
 #endif
 };
 

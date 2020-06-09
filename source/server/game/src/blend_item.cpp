@@ -106,7 +106,8 @@ bool	Blend_Item_load(char *file)
 				return false;
 			}
 
-			if (0 == (blend_item_info->apply_type = FN_get_apply_type(v)))
+			blend_item_info->apply_type = FN_get_apply_type(v);
+			if (!blend_item_info->apply_type)
 			{
 				sys_err ("Invalid apply_type(%s)", v);
 				return false;

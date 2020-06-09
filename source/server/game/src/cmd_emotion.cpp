@@ -106,9 +106,17 @@ ACMD(do_emotion_allow)
 	s_emotion_set.insert(std::make_pair(ch->GetVID(), val));
 }
 
+#ifdef ENABLE_NEWSTUFF
+#include "config.h"
+#endif
+
 bool CHARACTER_CanEmotion(CHARACTER& rch)
 {
-	// 결혼식 맵에서는 사용할 수 있다.
+#ifdef ENABLE_NEWSTUFF
+	if (g_bDisableEmotionMask)
+		return true;
+#endif
+	
 	if (marriage::WeddingManager::instance().IsWeddingMap(rch.GetMapIndex()))
 		return true;
 

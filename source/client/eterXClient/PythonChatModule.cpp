@@ -507,6 +507,11 @@ void initChat()
 	PyModule_AddIntConstant(poModule, "CHAT_TYPE_COMMAND",		CHAT_TYPE_COMMAND);
 	PyModule_AddIntConstant(poModule, "CHAT_TYPE_SHOUT",		CHAT_TYPE_SHOUT);
 	PyModule_AddIntConstant(poModule, "CHAT_TYPE_WHISPER",		CHAT_TYPE_WHISPER);
+	PyModule_AddIntConstant(poModule, "CHAT_TYPE_BIG_NOTICE",	CHAT_TYPE_BIG_NOTICE);
+	PyModule_AddIntConstant(poModule, "CHAT_TYPE_MONARCH_NOTICE",	CHAT_TYPE_MONARCH_NOTICE);
+#ifdef ENABLE_DICE_SYSTEM
+	PyModule_AddIntConstant(poModule, "CHAT_TYPE_DICE_INFO",	CHAT_TYPE_DICE_INFO);
+#endif
 	PyModule_AddIntConstant(poModule, "WHISPER_TYPE_CHAT",		CPythonChat::WHISPER_TYPE_CHAT);
 	PyModule_AddIntConstant(poModule, "WHISPER_TYPE_SYSTEM",	CPythonChat::WHISPER_TYPE_SYSTEM);
 	PyModule_AddIntConstant(poModule, "WHISPER_TYPE_GM",		CPythonChat::WHISPER_TYPE_GM);

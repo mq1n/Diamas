@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "config.h"
 #include "utils.h"
 #include "vector.h"
 #include "char.h"
@@ -11,8 +12,6 @@
 #include "item_manager.h"
 #include "item.h"
 
-
-extern int passes_per_sec;
 EVENTINFO(petsystem_event_info)
 {
 	CPetSystem* pPetSystem;
@@ -243,7 +242,7 @@ bool CPetActor::_UpdateFollowAI()
 	float	RESPAWN_DISTANCE = 4500.f;			// 이 거리 이상 멀어지면 주인 옆으로 소환함.
 	int		APPROACH = 200;						// 접근 거리
 
-	bool bDoMoveAlone = true;					// 캐릭터와 가까이 있을 때 혼자 여기저기 움직일건지 여부 -_-;
+	
 	bool bRun = false;							// 뛰어야 하나?
 
 	DWORD currentTime = get_dword_time();
@@ -365,16 +364,26 @@ void CPetActor::SetSummonItem (LPITEM pItem)
 	m_dwSummonItemVnum = pItem->GetVnum();
 }
 
+bool __PetCheckBuff(const CPetActor* pPetActor)
+{
+	bool bMustHaveBuff = true;
+	switch (pPetActor->GetVnum())
+	{
+		case 34004:
+		case 34009:
+			if (NULL == pPetActor->GetOwner()->GetDungeon())
+				bMustHaveBuff = false;
+		default:
+			break;
+	}
+	return bMustHaveBuff;
+}
+
 void CPetActor::GiveBuff()
 {
-	// 파황 펫 버프는 던전에서만 발생함.
-	if (34004 == m_dwVnum || 34009 == m_dwVnum)
-	{
-		if (NULL == m_pkOwner->GetDungeon())
-		{
-			return;
-		}
-	}
+	
+	if (!__PetCheckBuff(this))
+		return;
 	LPITEM item = ITEM_MANAGER::instance().FindByVID(m_dwSummonItemVID);
 	if (NULL != item)
 		item->ModifyPoints(true);
@@ -387,6 +396,8 @@ void CPetActor::ClearBuff()
 		return ;
 	TItemTable* item_proto = ITEM_MANAGER::instance().GetTable(m_dwSummonItemVnum);
 	if (NULL == item_proto)
+		return;
+	if (!__PetCheckBuff(this)) // @fixme129
 		return;
 	for (int i = 0; i < ITEM_APPLY_MAX_NUM; i++)
 	{
@@ -549,7 +560,11 @@ CPetActor* CPetSystem::Summon(DWORD mobVnum, LPITEM pSummonItem, const char* pet
 		m_petActorMap.insert(std::make_pair(mobVnum, petActor));
 	}
 
+#ifdef ENABLE_NEWSTUFF
 	DWORD petVID = petActor->Summon(petName, pSummonItem, bSpawnFar);
+	if (!petVID)
+		sys_err("[CPetSystem::Summon(%d)] Null Pointer (petVID)", pSummonItem);
+#endif
 
 	if (NULL == m_pkPetSystemUpdateEvent)
 	{

@@ -228,10 +228,8 @@ bool CGuild::RemoveMember(DWORD pid)
 		ch->SetGuild(NULL);
 	}
 
-	if ( LC_IsBrazil() == true )
-	{
+	if (g_bGuildInviteLimit)
 		DBManager::instance().Query("REPLACE INTO guild_invite_limit VALUES(%d, %d)", GetID(), get_global_time());
-	}
 
 	return true;
 }
@@ -985,7 +983,8 @@ void CGuild::Disband()
 		LPCHARACTER ch = *it;
 		ch->SetGuild(NULL);
 		SendOnlineRemoveOnePacket(ch->GetPlayerID());
-		ch->SetQuestFlag("guild_manage.new_withdraw_time", get_global_time());
+		// @fixme401
+		ch->SetQuestFlag("guild_manage.new_disband_time", get_global_time());
 	}
 
 	for (TGuildMemberContainer::iterator it = m_member.begin(); it != m_member.end(); ++it)
@@ -1473,14 +1472,7 @@ void CGuild::UpdateSkill(BYTE skill_point, BYTE* skill_levels)
 
 static DWORD __guild_levelup_exp(int level)
 {
-	if (LC_IsYMIR())
-	{
-		return guild_exp_table[level];
-	}
-	else
-	{
-		return guild_exp_table2[level];
-	}
+	return guild_exp_table2[level];
 }
 
 void CGuild::GuildPointChange(BYTE type, int amount, bool save)
@@ -1779,18 +1771,8 @@ int CGuild::GetMaxMemberCount()
 		m_iMemberCountBonus = 0;
 	// END_GUILD_IS_FULL_BUG_FIX
 
-	if ( LC_IsHongKong() == true )
-	{
-		quest::PC* pPC = quest::CQuestManager::instance().GetPC(GetMasterPID());
-
-		if ( pPC != NULL )
-		{
-			if ( pPC->GetFlag("guild.is_unlimit_member") == 1 )
-			{
-				return INT_MAX;
-			}
-		}
-	}
+	if (g_bGuildInfiniteMembers)
+		return INT_MAX;
 
 	return 32 + 2 * (m_data.level-1) + m_iMemberCountBonus;
 }
@@ -2089,7 +2071,7 @@ CGuild::GuildJoinErrCode CGuild::VerifyGuildJoinableCondition( const LPCHARACTER
 	{
 		return GERR_GUILD_IS_IN_WAR;
 	}
-	else if ( LC_IsBrazil() == true )
+	else if (g_bGuildInviteLimit)
 	{
 		std::unique_ptr<SQLMsg> pMsg( DBManager::instance().DirectQuery("SELECT value FROM guild_invite_limit WHERE id=%d", GetID()) );
 
@@ -2140,4 +2122,68 @@ void CGuild::SendGuildDataUpdateToAllMember()
 		SendAllGradePacket(*iter);
 	}
 }
+
+#ifdef ENABLE_D_NJGUILD
+void CGuild::SetDungeon_for_Only_guild(LPDUNGEON pDungeon)
+{
+	m_pkDungeon_for_Only_guild = pDungeon;
+}
+
+LPDUNGEON CGuild::GetDungeon_for_Only_guild()
+{
+	return m_pkDungeon_for_Only_guild;
+}
+
+#endif
+
+#ifdef ENABLE_NEWSTUFF
+void CGuild::SetSkillLevel(DWORD dwVnum, BYTE level, BYTE point)
+{
+	DWORD dwRealVnum = dwVnum - GUILD_SKILL_START;
+
+	if (dwRealVnum >= GUILD_SKILL_COUNT)
+		return;
+
+	CSkillProto* pkSk = CSkillManager::instance().Get(dwVnum);
+
+	if (!pkSk)
+	{
+		sys_err("There is no such guild skill by number %u", dwVnum);
+		return;
+	}
+
+	if (level > pkSk->bMaxLevel)
+		return;
+
+	if (point)
+	{
+		if (m_data.skill_point < point)
+			return;
+		m_data.skill_point -= point;
+	}
+
+	m_data.abySkill[dwRealVnum] = level;
+
+	ComputeGuildPoints();
+	SaveSkill();
+	SendDBSkillUpdate();
+
+	std::for_each(m_memberOnline.begin(), m_memberOnline.end(), std::bind(&CGuild::SendSkillInfoPacket, this, std::placeholders::_1));
+
+	sys_log(0, "Guild SetSkillLevel: %s %d level %d type %u", GetName(), pkSk->dwVnum, m_data.abySkill[dwRealVnum], pkSk->dwType);
+}
+
+DWORD CGuild::GetSkillPoint()
+{
+	return m_data.skill_point;
+}
+
+void CGuild::SetSkillPoint(BYTE point)
+{
+	m_data.skill_point = point;
+	SendDBSkillUpdate();
+	std::for_each(m_memberOnline.begin(), m_memberOnline.end(), std::bind(&CGuild::SendSkillInfoPacket, this, std::placeholders::_1));
+}
+
+#endif
 

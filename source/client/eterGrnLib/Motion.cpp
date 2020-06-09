@@ -63,7 +63,7 @@ void CGrannyMotion::GetTextTrack(const char * c_szTextTrackName, int * pCount, f
 		granny_text_track & rTextTrack = pTrack->TextTracks[i];
 
 		for (int j = 0; j < rTextTrack.EntryCount; ++j)
-			if (!stricmp(c_szTextTrackName, rTextTrack.Entries[j].Text))
+			if (!_stricmp(c_szTextTrackName, rTextTrack.Entries[j].Text))
 				pArray[(*pCount)++] = rTextTrack.Entries[j].TimeStamp;
 	}
 }

@@ -5,6 +5,7 @@
 #include "../eterbase/Timer.h"
 
 #include "AbstractPlayer.h"
+#include "../eterGameLib/GameLibDefines.h"
 
 enum
 {
@@ -16,6 +17,9 @@ enum
 	MAIN_RACE_ASSASSIN_M,
 	MAIN_RACE_SURA_W,
 	MAIN_RACE_SHAMAN_M,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	MAIN_RACE_WOLFMAN_M,
+#endif
 	MAIN_RACE_MAX_NUM,
 };
 
@@ -345,6 +349,11 @@ DWORD CPythonPlayer::__GetRaceStat()
 		case MAIN_RACE_SHAMAN_W:
 			return GetStatus(POINT_IQ);
 			break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case MAIN_RACE_WOLFMAN_M:
+			return GetStatus(POINT_DX);
+			break;
+#endif
 	}	
 	return GetStatus(POINT_ST);
 }
@@ -437,7 +446,13 @@ void CPythonPlayer::SetStatus(DWORD dwType, long lValue)
 		CInstanceBase* pkPlayer = NEW_GetMainActorPtr();
 
 		if (pkPlayer)
+		{
+#ifdef ENABLE_TEXT_LEVEL_REFRESH
+			// basically, just for the /level command to refresh locally
+			pkPlayer->SetLevel(lValue);
+#endif
 			pkPlayer->UpdateTextTailLevel(lValue);
+		}
 	}
 
 	switch (dwType)
@@ -978,7 +993,7 @@ float CPythonPlayer::GetSkillNextEfficientPercentage(DWORD dwSlotIndex)
 
 void CPythonPlayer::SetSkillLevel(DWORD dwSlotIndex, DWORD dwSkillLevel)
 {
-	assert(!"CPythonPlayer::SetSkillLevel - 사용하지 않는 함수");
+	assert(!"CPythonPlayer::SetSkillLevel - Don't use this function");
 	if (dwSlotIndex >= SKILL_MAX_NUM)
 		return;
 
@@ -1151,18 +1166,21 @@ DWORD CPythonPlayer::GetPlayTime()
 	return m_dwPlayTime;
 }
 
+#define ENABLE_NO_PICKUP_LIMIT
 void CPythonPlayer::SendClickItemPacket(DWORD dwIID)
 {
 	if (IsObserverMode())
 		return;
 
+#ifndef ENABLE_NO_PICKUP_LIMIT
 	static DWORD s_dwNextTCPTime = 0;
-
 	DWORD dwCurTime=ELTimer_GetMSec();
-
 	if (dwCurTime >= s_dwNextTCPTime)
+#endif
 	{
+#ifndef ENABLE_NO_PICKUP_LIMIT
 		s_dwNextTCPTime=dwCurTime + 500;
+#endif
 
 		const char * c_szOwnerName;
 		if (!CPythonItem::Instance().GetOwnership(dwIID, &c_szOwnerName))
@@ -1701,6 +1719,11 @@ CPythonPlayer::CPythonPlayer(void)
 	m_kMap_dwAffectIndexToSkillIndex.insert(make_pair(int(CInstanceBase::AFFECT_GWIGEOM), 63));
 	m_kMap_dwAffectIndexToSkillIndex.insert(make_pair(int(CInstanceBase::AFFECT_MUYEONG), 78));
 	m_kMap_dwAffectIndexToSkillIndex.insert(make_pair(int(CInstanceBase::AFFECT_HEUKSIN), 79));
+
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	m_kMap_dwAffectIndexToSkillIndex.insert(make_pair(int(CInstanceBase::AFFECT_RED_POSSESSION), 174));
+	m_kMap_dwAffectIndexToSkillIndex.insert(make_pair(int(CInstanceBase::AFFECT_BLUE_POSSESSION), 175));
+#endif
 
 	m_ppyGameWindow = NULL;
 

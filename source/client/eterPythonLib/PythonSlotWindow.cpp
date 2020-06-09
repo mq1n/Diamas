@@ -218,7 +218,9 @@ void CSlotWindow::AppendSlot(DWORD dwIndex, int ixPosition, int iyPosition, int 
 	Slot.pSlotButton = NULL;
 	Slot.pSignImage = NULL;
 	Slot.pFinishCoolTimeEffect = NULL;
-
+#ifdef ENABLE_ACCE_SYSTEM
+	memset(Slot.pActiveSlotEffect, 0, sizeof(Slot.pActiveSlotEffect));
+#endif
 	ClearSlot(&Slot);
 	Slot.dwSlotNumber = dwIndex;
 	Slot.dwCenterSlotNumber = dwIndex;
@@ -514,10 +516,12 @@ void CSlotWindow::ActivateSlot(DWORD dwIndex)
 
 	pSlot->bActive = TRUE;
 
-	if (!m_pSlotActiveEffect)
-	{
+	if (!m_pSlotActiveEffect
+#ifdef ENABLE_HIGHLIGHT_NEW_ITEM
+		|| !m_pSlotActiveEffectSlot2 || !m_pSlotActiveEffectSlot3
+#endif
+	)
 		__CreateSlotEnableEffect();
-	}
 }
 
 void CSlotWindow::DeactivateSlot(DWORD dwIndex)
@@ -528,6 +532,26 @@ void CSlotWindow::DeactivateSlot(DWORD dwIndex)
 
 	pSlot->bActive = FALSE;
 }
+
+#ifdef ENABLE_SLOT_WINDOW_EX
+float CSlotWindow::GetSlotCoolTime(DWORD dwIndex, float * fElapsedTime)
+{
+	TSlot * pSlot;
+	if (!GetSlotPointer(dwIndex, &pSlot))
+		return 0.0;
+
+	*fElapsedTime = CTimer::Instance().GetCurrentSecond() - pSlot->fStartCoolTime;
+	return pSlot->fCoolTime;
+}
+
+bool CSlotWindow::IsActivatedSlot(DWORD dwIndex)
+{
+	TSlot * pSlot;
+	if (!GetSlotPointer(dwIndex, &pSlot))
+		return false;
+	return pSlot->bActive;
+}
+#endif
 
 void CSlotWindow::ClearSlot(DWORD dwIndex)
 {
@@ -574,6 +598,12 @@ void CSlotWindow::ClearSlot(TSlot * pSlot)
 	{
 		pSlot->pFinishCoolTimeEffect->Hide();
 	}
+
+#ifdef ENABLE_ACCE_SYSTEM
+	for (auto& pEff : pSlot->pActiveSlotEffect)
+		if(pEff)
+			pEff->Hide();
+#endif
 }
 
 void CSlotWindow::ClearAllSlot()
@@ -965,11 +995,28 @@ void CSlotWindow::OnUpdate()
 			continue;
 
 		__DestroyFinishCoolTimeEffect(pSlot);
+
+#ifdef ENABLE_ACCE_SYSTEM
+		for (auto& pEff : pSlot->pActiveSlotEffect)
+		{
+			if (pEff)
+			{
+				delete pEff;
+				pEff = NULL;
+			}
+		}
+#endif
 	}
 	m_ReserveDestroyEffectDeque.clear();
 
 	if (m_pSlotActiveEffect)
 		m_pSlotActiveEffect->Update();
+#ifdef ENABLE_HIGHLIGHT_NEW_ITEM
+	if (m_pSlotActiveEffectSlot2)
+		m_pSlotActiveEffectSlot2->Update();
+	if (m_pSlotActiveEffectSlot3)
+		m_pSlotActiveEffectSlot3->Update();
+#endif
 }
 
 void CSlotWindow::OnRender()
@@ -1087,13 +1134,48 @@ void CSlotWindow::OnRender()
 			rSlot.pFinishCoolTimeEffect->Render();
 		}
 
-		if (rSlot.bActive)
-		if (m_pSlotActiveEffect)
+#ifdef ENABLE_ACCE_SYSTEM
 		{
-			int ix = m_rect.left + rSlot.ixPosition;
-			int iy = m_rect.top + rSlot.iyPosition;
-			m_pSlotActiveEffect->SetPosition(ix, iy);
-			m_pSlotActiveEffect->Render();
+			int iX = m_rect.left + rSlot.ixPosition, iY = m_rect.top + rSlot.iyPosition, iItemYSize = rSlot.byyPlacedItemSize;
+			for (int i = 0; i < 3; ++i)
+			{
+				auto& pEff = rSlot.pActiveSlotEffect[i];
+				if ((pEff) && (iItemYSize == i + 1))
+				{
+					pEff->Show();
+					pEff->SetPosition(iX, iY);
+					pEff->Update();
+					pEff->Render();
+				}
+			}
+		}
+#endif
+
+		if (rSlot.bActive)
+		{
+			if (m_pSlotActiveEffect && rSlot.byyPlacedItemSize==1)
+			{
+				int ix = m_rect.left + rSlot.ixPosition;
+				int iy = m_rect.top + rSlot.iyPosition;
+				m_pSlotActiveEffect->SetPosition(ix, iy);
+				m_pSlotActiveEffect->Render();
+			}
+#ifdef ENABLE_HIGHLIGHT_NEW_ITEM
+			else if (m_pSlotActiveEffectSlot2 && rSlot.byyPlacedItemSize==2)
+			{
+				int ix = m_rect.left + rSlot.ixPosition;
+				int iy = m_rect.top + rSlot.iyPosition;
+				m_pSlotActiveEffectSlot2->SetPosition(ix, iy);
+				m_pSlotActiveEffectSlot2->Render();
+			}
+			else if (m_pSlotActiveEffectSlot3 && rSlot.byyPlacedItemSize==3)
+			{
+				int ix = m_rect.left + rSlot.ixPosition;
+				int iy = m_rect.top + rSlot.iyPosition;
+				m_pSlotActiveEffectSlot3->SetPosition(ix, iy);
+				m_pSlotActiveEffectSlot3->Render();
+			}
+#endif
 		}
 	}
 
@@ -1268,6 +1350,54 @@ DWORD CSlotWindow::Type()
 	return s_Type;
 }
 
+#ifdef ENABLE_ACCE_SYSTEM
+void CSlotWindow::ActivateEffect(DWORD dwSlotIndex, float r, float g, float b, float a)
+{
+	TSlot * pSlot;
+	if (!GetSlotPointer(dwSlotIndex, &pSlot))
+		return;
+
+	for (int i = 0; i < 3; ++i)
+	{
+		auto& pActiveEff = pSlot->pActiveSlotEffect[i];
+
+		if (pActiveEff)
+		{
+			delete pActiveEff;
+			pActiveEff = NULL;
+		}
+
+		const int ciImageCount = 12;
+
+		pActiveEff = new CAniImageBox(NULL);
+		for (int j = 0; j <= ciImageCount ; ++j)
+		{
+			char cBuf[72];
+			snprintf(cBuf, sizeof(cBuf), "d:/ymir work/ui/public/slotactiveeffect/slot%d/%02d.sub", (i + 1), j);
+			pActiveEff->AppendImage(cBuf, r, g, b, a);
+		}
+
+		pActiveEff->SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
+	}
+}
+
+void CSlotWindow::DeactivateEffect(DWORD dwSlotIndex)
+{
+	TSlot * pSlot;
+	if (!GetSlotPointer(dwSlotIndex, &pSlot))
+		return;
+
+	for (auto& pActiveEff : pSlot->pActiveSlotEffect)
+	{
+		if (pActiveEff)
+		{
+			delete pActiveEff;
+			pActiveEff = NULL;
+		}
+	}
+}
+#endif
+
 BOOL CSlotWindow::OnIsType(DWORD dwType)
 {
 	if (CSlotWindow::Type() == dwType)
@@ -1305,6 +1435,42 @@ void CSlotWindow::__CreateSlotEnableEffect()
 	m_pSlotActiveEffect->AppendImage("d:/ymir work/ui/public/slotactiveeffect/12.sub");
 	m_pSlotActiveEffect->SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
 	m_pSlotActiveEffect->Show();
+
+#ifdef ENABLE_HIGHLIGHT_NEW_ITEM
+	m_pSlotActiveEffectSlot2 = new CAniImageBox(NULL);
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/00.sub");
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/01.sub");
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/02.sub");
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/03.sub");
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/04.sub");
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/05.sub");
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/06.sub");
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/07.sub");
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/08.sub");
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/09.sub");
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/10.sub");
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/11.sub");
+	m_pSlotActiveEffectSlot2->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot2/12.sub");
+	m_pSlotActiveEffectSlot2->SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
+	m_pSlotActiveEffectSlot2->Show();
+
+	m_pSlotActiveEffectSlot3 = new CAniImageBox(NULL);
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/00.sub");
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/01.sub");
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/02.sub");
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/03.sub");
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/04.sub");
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/05.sub");
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/06.sub");
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/07.sub");
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/08.sub");
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/09.sub");
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/10.sub");
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/11.sub");
+	m_pSlotActiveEffectSlot3->AppendImage("d:/ymir work/ui/public/slotactiveeffect/slot3/12.sub");
+	m_pSlotActiveEffectSlot3->SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
+	m_pSlotActiveEffectSlot3->Show();
+#endif
 }
 
 void CSlotWindow::__CreateFinishCoolTimeEffect(TSlot * pSlot)
@@ -1357,6 +1523,18 @@ void CSlotWindow::__DestroySlotEnableEffect()
 		delete m_pSlotActiveEffect;
 		m_pSlotActiveEffect = NULL;
 	}
+#ifdef ENABLE_HIGHLIGHT_NEW_ITEM
+	if (m_pSlotActiveEffectSlot2)
+	{
+		delete m_pSlotActiveEffectSlot2;
+		m_pSlotActiveEffectSlot2 = NULL;
+	}
+	if (m_pSlotActiveEffectSlot3)
+	{
+		delete m_pSlotActiveEffectSlot3;
+		m_pSlotActiveEffectSlot3 = NULL;
+	}
+#endif
 }
 
 void CSlotWindow::__DestroyFinishCoolTimeEffect(TSlot * pSlot)
@@ -1388,6 +1566,10 @@ void CSlotWindow::__Initialize()
 
 	m_pToggleSlotImage = NULL;
 	m_pSlotActiveEffect = NULL;
+#ifdef ENABLE_HIGHLIGHT_NEW_ITEM
+	m_pSlotActiveEffectSlot2 = NULL;
+	m_pSlotActiveEffectSlot3 = NULL;
+#endif
 	m_pBaseImageInstance = NULL;
 }
 
@@ -1420,6 +1602,12 @@ void CSlotWindow::Destroy()
 		{
 			CWindowManager::Instance().DestroyWindow(rSlot.pFinishCoolTimeEffect);
 		}
+
+#ifdef ENABLE_ACCE_SYSTEM
+		for (auto& pEff: rSlot.pActiveSlotEffect )
+			if (pEff)
+				CWindowManager::Instance().DestroyWindow(pEff);
+#endif
 	}
 
 	m_SlotList.clear();

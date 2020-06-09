@@ -41,8 +41,15 @@ bool LoadEmpireTextConvertTable(DWORD dwEmpireID, const char* c_szFileName)
 	return true;
 }
 
+#ifdef ENABLE_NEWSTUFF
+#include "config.h"
+#endif
 void ConvertEmpireText(DWORD dwEmpireID, char* szText, size_t len, int iPct)
 {
+#ifdef ENABLE_NEWSTUFF
+	if(g_bGlobalShoutEnable || g_bDisableEmpireLanguageCheck)
+		return;
+#endif
 	if (dwEmpireID < 1 || dwEmpireID > 3 || len == 0)
 		return;
 
@@ -54,35 +61,10 @@ void ConvertEmpireText(DWORD dwEmpireID, char* szText, size_t len, int iPct)
 		{
 			if (*pbText & 0x80)
 			{
-				if (g_iUseLocale)
-				{
-					static char s_cChinaTable[][3] = {"¡ò","££","£¤","¡ù","¡ð" };
-					int n = number(0, 4);
-					pbText[0] = s_cChinaTable[n][0];
-					pbText[1] = s_cChinaTable[n][1];
-				}
-				else
-				{
-					if (pbText[0] >= 0xB0 && pbText[0] <= 0xC8 && pbText[1] >= 0xA1 && pbText[1] <= 0xFE)
-					{
-						UINT uHanPos = (pbText[0] - 0xB0) * (0xFE - 0xA1 + 1) + (pbText[1] - 0xA1);
-						pbText[0] = rkTextConvTable.aacHan[uHanPos][0];
-						pbText[1] = rkTextConvTable.aacHan[uHanPos][1];
-					}
-					else if ( pbText[0] == 0xA4 )
-					{
-						if ( pbText[1] >=0xA1 && pbText[1] <= 0xBE )
-						{
-							pbText[0] = rkTextConvTable.aacJaum[pbText[1]-0xA1][0];
-							pbText[1] = rkTextConvTable.aacJaum[pbText[1]-0xA1][1];
-						}
-						else if ( pbText[1] >= 0xBF && pbText[1] <= 0xD3 )
-						{
-							pbText[0] = rkTextConvTable.aacMoum[pbText[1]-0xBF][0];
-							pbText[1] = rkTextConvTable.aacMoum[pbText[1]-0xBF][1];
-						}
-					}
-				}
+				static char s_cChinaTable[][3] = {"¡ò","££","£¤","¡ù","¡ð" };
+				int n = number(0, 4);
+				pbText[0] = s_cChinaTable[n][0];
+				pbText[1] = s_cChinaTable[n][1];
 
 				++pbText;
 				--len;

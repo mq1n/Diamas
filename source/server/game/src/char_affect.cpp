@@ -17,8 +17,9 @@
 #include "horsename_manager.h"
 #include "item.h"
 #include "DragonSoul.h"
+#include "../../common/CommonDefines.h"
 
-#define IS_NO_SAVE_AFFECT(type) ((type) == AFFECT_WAR_FLAG || (type) == AFFECT_REVIVE_INVISIBLE || ((type) >= AFFECT_PREMIUM_START && (type) <= AFFECT_PREMIUM_END))
+#define IS_NO_SAVE_AFFECT(type) ((type) == AFFECT_WAR_FLAG || (type) == AFFECT_REVIVE_INVISIBLE || ((type) >= AFFECT_PREMIUM_START && (type) <= AFFECT_PREMIUM_END) || (type) == AFFECT_MOUNT_BONUS) // @fixme156 added MOUNT_BONUS (if the game core crashes, the bonus would double if present in player.affect)
 #define IS_NO_CLEAR_ON_DEATH_AFFECT(type) ((type) == AFFECT_BLOCK_CHAT || ((type) >= 500 && (type) < 600))
 
 void SendAffectRemovePacket(LPDESC d, DWORD pid, DWORD type, BYTE point)
@@ -99,16 +100,7 @@ bool CHARACTER::UpdateAffect()
 		}
 		else
 		{
-			int iVal = 0;
-
-			if (LC_IsYMIR())
-			{
-				iVal = MIN(GetPoint(POINT_HP_RECOVERY), GetMaxHP() * 9 / 100);
-			}
-			else
-			{
-				iVal = MIN(GetPoint(POINT_HP_RECOVERY), GetMaxHP() * 7 / 100);
-			}
+			int iVal = MIN(GetPoint(POINT_HP_RECOVERY), GetMaxHP() * 7 / 100);
 
 			PointChange(POINT_HP, iVal);
 			PointChange(POINT_HP_RECOVERY, -iVal);
@@ -121,12 +113,7 @@ bool CHARACTER::UpdateAffect()
 			PointChange(POINT_SP_RECOVERY, -GetPoint(POINT_SP_RECOVERY));
 		else 
 		{
-			int iVal;
-
-			if (!g_iUseLocale)
-				iVal = MIN(GetPoint(POINT_SP_RECOVERY), GetMaxSP() * 7 / 100);
-			else
-				iVal = MIN(GetPoint(POINT_SP_RECOVERY), GetMaxSP() * 7 / 100);
+			int iVal = MIN(GetPoint(POINT_SP_RECOVERY), GetMaxSP() * 7 / 100);
 
 			PointChange(POINT_SP, iVal);
 			PointChange(POINT_SP_RECOVERY, -iVal);
@@ -526,8 +513,16 @@ void CHARACTER::LoadAffect(DWORD dwCount, TPacketAffectElement * pElements)
 
 	m_bIsLoadedAffect = true;
 
-	// 용혼석 셋팅 로드 및 초기화
+	ComputePoints(); // @fixme156
 	DragonSoul_Initialize();
+
+	// @fixme118 BEGIN (regain affect hp/mp)
+	if (!IsDead())
+	{
+		PointChange(POINT_HP, GetMaxHP() - GetHP());
+		PointChange(POINT_SP, GetMaxSP() - GetSP());
+	}
+	// @fixme118 END
 }
 
 bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD dwFlag, long lDuration, long lSPCost, bool bOverride, bool IsCube )
@@ -690,9 +685,10 @@ bool CHARACTER::RemoveAffect(CAffect * pkAff)
 	// 시간이 다 되어 백기 효과가 풀리는 경우는 버그가 발생하지 않으므로 그와 똑같이 함.
 	//		(ProcessAffect를 보면 시간이 다 되어서 Affect가 삭제되는 경우, ComputePoints를 부르지 않는다.)
 	if (AFFECT_REVIVE_INVISIBLE != pkAff->dwType)
-	{
 		ComputePoints();
-	}
+	else  // @fixme110
+		UpdatePacket();
+
 	CheckMaximumPoints();
 
 	if (test_server)
@@ -758,6 +754,10 @@ void CHARACTER::RemoveGoodAffect()
 	RemoveAffect(SKILL_KWAESOK);
 	RemoveAffect(SKILL_JEUNGRYEOK);
 	RemoveAffect(SKILL_GICHEON);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	RemoveAffect(SKILL_JEOKRANG);
+	RemoveAffect(SKILL_CHEONGRANG);
+#endif
 }
 
 bool CHARACTER::IsGoodAffect(BYTE bAffectType) const
@@ -786,6 +786,10 @@ bool CHARACTER::IsGoodAffect(BYTE bAffectType) const
 		case (SKILL_KWAESOK):
 		case (SKILL_JEUNGRYEOK):
 		case (SKILL_GICHEON):
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case (SKILL_JEOKRANG):
+		case (SKILL_CHEONGRANG):
+#endif
 			return true;
 	}
 	return false;
@@ -796,6 +800,9 @@ void CHARACTER::RemoveBadAffect()
 	sys_log(0, "RemoveBadAffect %s", GetName());
 	// 독
 	RemovePoison();
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	RemoveBleeding();
+#endif
 	RemoveFire();
 
 	// 스턴           : Value%로 상대방을 5초간 머리 위에 별이 돌아간다. (때리면 1/2 확률로 풀림)               AFF_STUN

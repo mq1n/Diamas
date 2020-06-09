@@ -9,11 +9,12 @@
 #include "log.h"
 #include "skill.h"
 
+#define ENABLE_PICKAXE_RENEWAL
 namespace mining
 {
 	enum
 	{
-		MAX_ORE = 18,
+		MAX_ORE = 19,
 		MAX_FRACTION_COUNT = 9,
 		ORE_COUNT_FOR_REFINE = 100,
 	};
@@ -45,6 +46,7 @@ namespace mining
 		{ 30303, 50616, 50636 },
 		{ 30304, 50617, 50637 },
 		{ 30305, 50618, 50638 },
+		{ 30306, 50619, 50639 },
 	};
 
 	int fraction_info[MAX_FRACTION_COUNT][3] =
@@ -197,6 +199,13 @@ namespace mining
 		pick.SetSocket(0, cur + 1);
 	}
 
+#ifdef ENABLE_PICKAXE_RENEWAL
+	void Pick_SetPenaltyExp(CItem& pick)
+	{
+		int cur = Pick_GetCurExp(pick);
+		pick.SetSocket(0, (cur > 0) ? (cur - (cur * 10 / 100)) : 0);
+	}
+#endif
 	void Pick_MaxCurExp(CItem& pick)
 	{
 		int max = Pick_GetMaxExp(pick);
@@ -266,6 +275,16 @@ namespace mining
 		{
 			rkLogMgr.RefineLog(ch->GetPlayerID(), rkOldPick.GetName(), rkOldPick.GetID(), iAdv, 0, "PICK");
 
+#ifdef ENABLE_PICKAXE_RENEWAL
+			{
+				// if (test_server) ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Pickax> PRE %u"), Pick_GetCurExp(*item));
+				Pick_SetPenaltyExp(*item);
+				// if (test_server) ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Pickax> POST %u"), Pick_GetCurExp(*item));
+				// ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Pickax> The upgrade has failed, and the pickax has lost 10%% of its mastery points."));
+				rkLogMgr.ItemLog(ch, item, "REFINE PICK FAIL", item->GetName());
+				return 0;
+			}
+#else
 			LPITEM pkNewPick = ITEM_MANAGER::instance().CreateItem(rkOldPick.GetValue(4), 1);
 
 			if (pkNewPick)
@@ -276,7 +295,7 @@ namespace mining
 				rkLogMgr.ItemLog(ch, pkNewPick, "REFINE PICK FAIL", pkNewPick->GetName());
 				return 0;
 			}
-
+#endif
 			return 2;
 		}
 	}

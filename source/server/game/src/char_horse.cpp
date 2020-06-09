@@ -15,6 +15,16 @@
 
 bool CHARACTER::StartRiding()
 {
+#ifdef ENABLE_NEWSTUFF
+	if (g_NoMountAtGuildWar && GetWarMap())
+	{
+		RemoveAffect(AFFECT_MOUNT);
+		RemoveAffect(AFFECT_MOUNT_BONUS);
+		if (IsRiding())
+			StopRiding();
+		return false;
+	}
+#endif
 	if (IsDead() == true)
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("쓰러진 상태에서는 말에 탈 수 없습니다."));
@@ -36,11 +46,9 @@ bool CHARACTER::StartRiding()
 		return false;
 	}
 
-	if (LC_IsCanada() == true)
-	{
-		if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
-			return false;
-	}
+	// @warme005
+	if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
+		return false;
 
 
 	DWORD dwMountVnum = m_chHorse ? m_chHorse->GetRaceNum() : GetMyHorseVnum();
@@ -234,6 +242,8 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, DWORD dwVnum, const cha
 
 		chHorse->SetRider(NULL); // m_chHorse assign to NULL
 
+		if ((GetHorseHealth() <= 0))
+			bFromFar = false;
 		if (!bFromFar)
 		{
 			M2_DESTROY_CHARACTER(chHorse);

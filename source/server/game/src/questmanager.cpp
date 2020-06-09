@@ -8,6 +8,7 @@
 #include "char.h"
 #include "char_manager.h"
 #include "questmanager.h"
+#include "text_file_loader.h"
 #include "lzo_manager.h"
 #include "item.h"
 #include "config.h"
@@ -15,10 +16,17 @@
 #include "target.h"
 #include "party.h"
 #include "locale_service.h"
-
 #include "dungeon.h"
 
 DWORD g_GoldDropTimeLimitValue = 0;
+#ifdef ENABLE_NEWSTUFF
+DWORD g_ItemDropTimeLimitValue = 0;
+DWORD g_BoxUseTimeLimitValue = 0;
+DWORD g_BuySellTimeLimitValue = 0;
+bool g_NoDropMetinStone = false;
+bool g_NoMountAtGuildWar = false;
+bool g_NoPotionsOnPVP = false;
+#endif
 extern bool DropEvent_CharStone_SetValue(const std::string& name, int value);
 extern bool DropEvent_RefineBox_SetValue (const std::string& name, int value);
 
@@ -80,6 +88,9 @@ namespace quest
 		m_mapEventName.insert(TEventNameMap::value_type("pick", QUEST_ITEM_PICK_EVENT));	// 떨어져있는 아이템을 습득함.
 		m_mapEventName.insert(TEventNameMap::value_type("sig_use", QUEST_SIG_USE_EVENT));		// Special item group에 속한 아이템을 사용함.
 		m_mapEventName.insert(TEventNameMap::value_type("item_informer", QUEST_ITEM_INFORMER_EVENT));	// 독일선물기능테스트
+#ifdef ENABLE_QUEST_DIE_EVENT
+		m_mapEventName.insert(TEventNameMap::value_type("die", QUEST_DIE_EVENT));
+#endif
 
 		m_bNoSend = false;
 
@@ -135,16 +146,8 @@ namespace quest
 			m_mapNPC[0].Set(0, "notarget");
 		}
 
-		if (g_iUseLocale)
-		{
-			SetEventFlag("guild_withdraw_delay", 1);
-			SetEventFlag("guild_disband_delay", 1);
-		}
-		else
-		{
-			SetEventFlag("guild_withdraw_delay", 3);
-			SetEventFlag("guild_disband_delay", 7);
-		}
+		SetEventFlag("guild_withdraw_delay", 1);
+		SetEventFlag("guild_disband_delay", 1);
 		return true;
 	}
 
@@ -212,6 +215,79 @@ namespace quest
 
 	}
 
+	int CQuestManager::ReadQuestCategoryFile(WORD q_index)
+	{
+
+		ifstream inf((g_stQuestDir + "/questcategory.txt").c_str());
+		int line = 0;
+		int c_qi = 99;
+
+		if (!inf.is_open())
+			sys_err( "QUEST Cannot open 'questcategory.txt'");
+		else
+			sys_log(0, "QUEST can open 'questcategory.txt' (%s)", g_stQuestDir.c_str() );
+
+		while (1)
+		{
+			
+			string qn = CQuestManager::instance().GetQuestNameByIndex(q_index);
+
+			unsigned int category_num;
+
+			//enum
+			//{
+			//	MAIN_QUEST,		//0
+			//	SUB_QUEST,		//1
+			//	COLLECT_QUEST,	//2
+			//	LEVELUP_QUEST,	//3
+			//	SCROLL_QUEST,	//4
+			//	SYSTEM_QUEST,	//5
+			//};
+
+			inf >> category_num;
+
+			line++;
+
+			if (inf.fail())
+				break;
+
+			string s;
+			getline(inf, s);
+			unsigned int li = 0, ri = s.size()-1;
+			while (li < s.size() && isspace(s[li])) li++;
+			while (ri > 0 && isspace(s[ri])) ri--;
+
+			if (ri < li)
+			{
+				sys_err("QUEST questcategory.txt:%d:npc name error",line);
+				continue;
+			}
+
+			s = s.substr(li, ri-li+1);
+
+			int	n = 0;
+			str_to_number(n, s.c_str());
+			if (n)
+				continue;
+
+			//cout << '-' << s << '-' << endl;
+			if ( test_server )
+				sys_log(0, "QUEST reading script of %s(%d)", s.c_str(), category_num);
+
+			if (qn == s)
+			{
+				c_qi = category_num;
+				break;
+			}
+		}
+
+		// notarget quest
+		//m_mapNPC[0].Set(0, "notarget");
+
+
+		
+		return c_qi;
+	}
 	void CQuestManager::Input(unsigned int pc, const char* msg)
 	{
 		PC* pPC = GetPC(pc);
@@ -417,6 +493,7 @@ namespace quest
 			sys_err("QUEST no such pc id : %d", pc);
 	}
 
+#define ENABLE_PARTYKILL
 	void CQuestManager::Kill(unsigned int pc, unsigned int npc)
 	{
 		//m_CurrentNPCRace = npc;
@@ -429,44 +506,55 @@ namespace quest
 			if (!CheckQuestLoaded(pPC))
 				return;
 
-			/* [hyo] 몹 kill시 중복 카운팅 이슈 관련한 수정사항
-			   quest script에 when 171.kill begin ... 등의 코드로 인하여 스크립트가 처리되었더라도
-			   바로 return하지 않고 다른 검사도 수행하도록 변경함. (2011/07/21)
-			*/   
-			// call script
-			m_mapNPC[npc].OnKill(*pPC);
+			// kill call script
+			if (npc >= MAIN_RACE_MAX_NUM) //@fixme109
+				m_mapNPC[npc].OnKill(*pPC); //@warme004
+			m_mapNPC[QUEST_NO_NPC].OnKill(*pPC);
 
+#ifdef ENABLE_PARTYKILL
+			// party_kill call script
 			LPCHARACTER ch = GetCurrentCharacterPtr();
 			LPPARTY pParty = ch->GetParty();
 			LPCHARACTER leader = pParty ? pParty->GetLeaderCharacter() : ch;
-
 			if (leader)
 			{
 				m_pCurrentPartyMember = ch;
-
-				if (m_mapNPC[npc].OnPartyKill(*GetPC(leader->GetPlayerID())))
-					return;
+				if (npc >= MAIN_RACE_MAX_NUM) //@fixme109
+					m_mapNPC[npc].OnPartyKill(*GetPC(leader->GetPlayerID())); //@warme004
+				m_mapNPC[QUEST_NO_NPC].OnPartyKill(*GetPC(leader->GetPlayerID()));
 
 				pPC = GetPC(pc);
 			}
-
-			if (m_mapNPC[QUEST_NO_NPC].OnKill(*pPC))
-				return;
-
-			if (leader)
-			{
-				m_pCurrentPartyMember = ch;
-				m_mapNPC[QUEST_NO_NPC].OnPartyKill(*GetPC(leader->GetPlayerID()));
-			}
+#endif
 		}
 		else
 			sys_err("QUEST: no such pc id : %d", pc);
 	}
 
+#ifdef ENABLE_QUEST_DIE_EVENT
+	void CQuestManager::Die(unsigned int pc, unsigned int npc)
+	{
+		PC * pPC;
+
+		sys_log(0, "CQuestManager::Kill QUEST_DIE_EVENT (pc=%d, npc=%d)", pc, npc);
+
+		if ((pPC = GetPC(pc)))
+		{
+			if (!CheckQuestLoaded(pPC))
+				return;
+
+			m_mapNPC[QUEST_NO_NPC].OnDie(*pPC);
+
+		}
+		else
+			sys_err("QUEST: no such pc id : %d", pc);
+	}
+#endif
+
 	bool CQuestManager::ServerTimer(unsigned int npc, unsigned int arg)
 	{
 		SetServerTimerArg(arg);
-		sys_log(0, "XXX ServerTimer Call NPC %p", GetPCForce(0));
+		sys_log(0, "XXX ServerTimer Call NPC %p vnum %u arg %u", GetPCForce(0), npc, arg);
 		m_pCurrentPC = GetPCForce(0);
 		m_pCurrentCharacter = NULL;
 		m_pSelectedDungeon = NULL;
@@ -584,6 +672,7 @@ namespace quest
 				return;
 			}
 
+			m_bQuestInfoFlag = 1;
 			m_mapNPC[QUEST_NO_NPC].OnInfo(*pPC, quest_index);
 		}
 		else
@@ -781,7 +870,7 @@ namespace quest
 
 				if (it == m_mapNPC.end())
 				{
-					sys_err("CQuestManager::Click(pid=%d, target_npc_name=%s) - NOT EXIST NPC RACE VNUM[%d]",
+					sys_log(0, "CQuestManager::Click(pid=%d, target_npc_name=%s) - NOT EXIST NPC RACE VNUM[%d]",
 							pc, 
 							pkChrTarget->GetName(), 
 							dwCurrentNPCRace);
@@ -966,6 +1055,13 @@ namespace quest
 		packet_script.skin = m_iCurrentSkin;
 		packet_script.src_size = m_strScript.size();
 		packet_script.size = packet_script.src_size + sizeof(struct packet_script);
+#ifdef ENABLE_QUEST_CATEGORY
+		packet_script.quest_flag = 0;
+
+		
+		if(m_bQuestInfoFlag == 1)
+			packet_script.quest_flag = 1;
+#endif
 
 		TEMP_BUFFER buf;
 		buf.write(&packet_script, sizeof(struct packet_script));
@@ -975,8 +1071,12 @@ namespace quest
 
 		if (test_server)
 			sys_log(0, "m_strScript %s size %d", m_strScript.c_str(), buf.size());
+#ifdef ENABLE_QUEST_CATEGORY
+			sys_log(0, "SendScript=====================On Quest flag %d", packet_script.quest_flag);
+#endif
 
 		ClearScript();
+		m_bQuestInfoFlag = 0;
 	}
 
 	const char* CQuestManager::GetQuestStateName(const string& quest_name, const int state_index)
@@ -1329,7 +1429,7 @@ namespace quest
 				}
 			}
 		}
-		else if (name == "pre_event_hc" && true == LC_IsEurope())
+		else if (name == "pre_event_hc")
 		{
 			const DWORD EventNPC = 20090;
 
@@ -1403,6 +1503,32 @@ namespace quest
 		{
 			g_GoldDropTimeLimitValue = value * 1000;
 		}
+#ifdef ENABLE_NEWSTUFF
+		else if (name == "item_drop_limit_time")
+		{
+			g_ItemDropTimeLimitValue = value * 1000;
+		}
+		else if (name == "box_use_limit_time")
+		{
+			g_BoxUseTimeLimitValue = value * 1000;
+		}
+		else if (name == "buysell_limit_time")
+		{
+			g_BuySellTimeLimitValue = value * 1000;
+		}
+		else if (name == "no_drop_metin_stone")
+		{
+			g_NoDropMetinStone = !!value;
+		}
+		else if (name == "no_mount_at_guild_war")
+		{
+			g_NoMountAtGuildWar = !!value;
+		}
+		else if (name == "no_potions_on_pvp")
+		{
+			g_NoPotionsOnPVP = !!value;
+		}
+#endif
 		else if (name == "new_xmas_event")
 		{
 			// 20126 new산타.
@@ -1722,11 +1848,14 @@ namespace quest
 	void CQuestManager::CancelServerTimers(DWORD arg)
 	{
 		auto it = m_mapServerTimer.begin();
-		for ( ; it != m_mapServerTimer.end(); ++it) {
+		for ( ; it != m_mapServerTimer.end();) {
 			if (it->first.second == arg) {
 				LPEVENT event = it->second;
 				event_cancel(&event);
-				m_mapServerTimer.erase(it);
+				m_mapServerTimer.erase(it++);
+			}
+			else {
+				++it;
 			}
 		}
 	}

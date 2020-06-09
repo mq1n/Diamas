@@ -14,6 +14,22 @@ class CItemManager : public CSingleton<CItemManager>
 			ITEMDESC_COL_NUM,
 		};
 
+#ifdef ENABLE_ACCE_SYSTEM
+		enum EItemScaleColumn
+		{
+			ITEMSCALE_VNUM,
+			ITEMSCALE_JOB,
+			ITEMSCALE_SEX,
+			ITEMSCALE_SCALE_X,
+			ITEMSCALE_SCALE_Y,
+			ITEMSCALE_SCALE_Z,
+			ITEMSCALE_POSITION_X,
+			ITEMSCALE_POSITION_Y,
+			ITEMSCALE_POSITION_Z,
+			ITEMSCALE_NUM,
+		};
+#endif
+
 	public:
 		typedef std::map<DWORD, CItemData*> TItemMap;
 		typedef std::map<std::string, CItemData*> TItemNameMap;
@@ -34,6 +50,10 @@ class CItemManager : public CSingleton<CItemManager>
 		bool			LoadItemList(const char* c_szFileName);
 		bool			LoadItemTable(const char* c_szFileName);
 		CItemData *		MakeItemData(DWORD dwIndex);
+
+#ifdef ENABLE_ACCE_SYSTEM
+		bool			LoadItemScale(const char* c_szFileName);
+#endif
 
 	protected:
 		TItemMap m_ItemMap;

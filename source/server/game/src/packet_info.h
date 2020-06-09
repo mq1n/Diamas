@@ -26,8 +26,10 @@ class CPacketInfo
 
 		void Log(const char * c_pszFileName);
 
+#ifdef ENABLE_SEQUENCE_SYSTEM
 		bool IsSequence(int header);
 		void SetSequence(int header, bool bSeq);
+#endif
 
 	private:
 		TPacketElement * GetElement(int header);

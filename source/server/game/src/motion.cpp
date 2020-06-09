@@ -5,6 +5,7 @@
 #include "text_file_loader.h"
 #include "mob_manager.h"
 #include "char.h"
+#include "../../common/CommonDefines.h"
 
 // POLYMORPH_BUG_FIX
 static float MSA_GetNormalAttackDuration(const char* msaPath)
@@ -272,7 +273,10 @@ bool CMotionManager::Build()
 		"data/pc2/warrior",
 		"data/pc2/assassin",
 		"data/pc2/sura",
-		"data/pc2/shaman"
+		"data/pc2/shaman",
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		"data/pc3/wolfman",
+#endif
 	};
 	
 	for (int i = 0; i < MAIN_RACE_MAX_NUM; ++i)
@@ -321,6 +325,12 @@ bool CMotionManager::Build()
 		pkMotionSet->Load(sz, MOTION_MODE_HORSE, MOTION_RUN);
 		snprintf(sz, sizeof(sz), "%s/horse/walk.msa", c_apszFolderName[i]);
 		pkMotionSet->Load(sz, MOTION_MODE_HORSE, MOTION_WALK);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		snprintf(sz, sizeof(sz), "%s/claw/run.msa", c_apszFolderName[i]);
+		pkMotionSet->Load(sz, MOTION_MODE_CLAW, MOTION_RUN);
+		snprintf(sz, sizeof(sz), "%s/claw/walk.msa", c_apszFolderName[i]);
+		pkMotionSet->Load(sz, MOTION_MODE_CLAW, MOTION_WALK);
+#endif
 	}
 
 	CMobManager::iterator it = CMobManager::instance().begin();

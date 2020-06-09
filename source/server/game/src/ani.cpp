@@ -12,6 +12,7 @@
 #include "item.h"
 #include "ani.h"
 #include "dev_log.h"
+#include "../../common/CommonDefines.h"
 
 const char* FN_race_name(int race)
 {
@@ -26,6 +27,9 @@ const char* FN_race_name(int race)
 		FN_NAME(MAIN_RACE_ASSASSIN_M);
 		FN_NAME(MAIN_RACE_SURA_W);
 		FN_NAME(MAIN_RACE_SHAMAN_M);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		FN_NAME(MAIN_RACE_WOLFMAN_M);
+#endif
 		FN_NAME(MAIN_RACE_MAX_NUM);
 	}
 
@@ -46,6 +50,9 @@ const char* FN_weapon_type(int weapon)
 		FN_NAME(WEAPON_FAN);
 		FN_NAME(WEAPON_ARROW);
 		FN_NAME(WEAPON_MOUNT_SPEAR);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		FN_NAME(WEAPON_CLAW);
+#endif
 		FN_NAME(WEAPON_NUM_TYPES);
 	}
 
@@ -127,14 +134,17 @@ ANI::ANI()
 bool ANI::load()
 {
 	const char*	dir_name[MAIN_RACE_MAX_NUM] = {
-		"data/pc/warrior",		// 무사(남)
-		"data/pc/assassin",		// 자객(여)
-		"data/pc/sura",			// 수라(남)
-		"data/pc/shaman",		// 무당(여)
-		"data/pc2/warrior",		// 무사(여)
-		"data/pc2/assassin",	// 자객(남)
-		"data/pc2/sura",		// 수라(여)
-		"data/pc2/shaman"		// 무당(남)
+		"data/pc/warrior",		
+		"data/pc/assassin",
+		"data/pc/sura",	
+		"data/pc/shaman",
+		"data/pc2/warrior",
+		"data/pc2/assassin",
+		"data/pc2/sura",
+		"data/pc2/shaman",
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		"data/pc3/wolfman",
+#endif
 	};
 
 	for (int race = 0; race <MAIN_RACE_MAX_NUM; ++race)
@@ -179,6 +189,12 @@ DWORD ANI::load_one_weapon(const char *dir_name, int weapon, BYTE combo, bool ho
 		case WEAPON_FAN:
 			strlcpy(format, "%s/%sfan/combo_%02d.msa", sizeof(format));
 			break;
+
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case WEAPON_CLAW:
+			strlcpy(format, "%s/%sclaw/combo_%02d.msa", sizeof(format));
+			break;
+#endif
 
 		default:
 			return 1000;
@@ -234,6 +250,9 @@ DWORD ANI::attack_speed(int race, int weapon, BYTE combo, bool horse)
 		case MAIN_RACE_ASSASSIN_M:
 		case MAIN_RACE_SURA_W:
 		case MAIN_RACE_SHAMAN_M:
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case MAIN_RACE_WOLFMAN_M:
+#endif
 			break;
 		default:
 			return 1000;
@@ -249,6 +268,9 @@ DWORD ANI::attack_speed(int race, int weapon, BYTE combo, bool horse)
 		case WEAPON_FAN:
 		case WEAPON_ARROW:
 		case WEAPON_MOUNT_SPEAR:
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case WEAPON_CLAW:
+#endif
 			break;
 		default:
 			return 1000;
@@ -270,6 +292,9 @@ const char* FN_race_string(int race)
 		case MAIN_RACE_ASSASSIN_M:	return "ASSASSIN_M";
 		case MAIN_RACE_SURA_W:		return "SURA_W";
 		case MAIN_RACE_SHAMAN_M:	return "SHAMAN_M";
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case MAIN_RACE_WOLFMAN_M:	return "WOLFMAN_M";
+#endif
 	}
 
 	return "UNKNOWN_RACE";
@@ -287,6 +312,9 @@ const char* FN_weapon_string(int weapon)
 		case WEAPON_FAN:		return "FAN";
 		case WEAPON_ARROW:		return "ARROW";
 		case WEAPON_MOUNT_SPEAR:return "WEAPON_MOUNT_SPEAR";
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case WEAPON_CLAW:		return "CLAW";
+#endif
 	}
 
 	return "UNKNOWN";

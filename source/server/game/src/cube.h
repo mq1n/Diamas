@@ -59,7 +59,7 @@ void Cube_request_material_info(LPCHARACTER ch, int request_start_index, int req
 // test print code
 void Cube_print();
 
-bool Cube_InformationInitialize();
+void Cube_InformationInitialize();
 
 #endif	/* _cube_h_ */
 

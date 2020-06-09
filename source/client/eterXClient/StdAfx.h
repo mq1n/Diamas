@@ -12,7 +12,7 @@
 //if don't use below, time_t is 64bit
 #define _USE_32BIT_TIME_T
 #endif
-
+#include <iterator>
 #include "../eterLib/StdAfx.h"
 #include "../eterPythonLib/StdAfx.h"
 #include "../eterGameLib/StdAfx.h"
@@ -50,7 +50,7 @@ enum
 void initudp();
 void initapp();
 void initime();
-void initsystem();
+void initsystemSetting();
 void initchr();
 void initchrmgr();
 void initChat();
@@ -79,6 +79,9 @@ void initquest();
 void initsafebox();
 void initguild();
 void initMessenger();
+#ifdef ENABLE_ACCE_SYSTEM
+void initAcce();
+#endif
 
 extern const std::string& ApplicationStringTable_GetString(DWORD dwID);
 extern const std::string& ApplicationStringTable_GetString(DWORD dwID, LPCSTR szKey);

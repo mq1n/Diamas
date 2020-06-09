@@ -196,6 +196,8 @@ class CParty
 		void		RequestSetMemberLevel(DWORD pid, BYTE level);
 		void		P2PSetMemberLevel(DWORD pid, BYTE level);
 
+		bool		IsPartyInDungeon(int mapIndex);
+
 	protected:
 		void		IncreaseOwnership();
 
@@ -361,4 +363,74 @@ inline int CParty::ComputePartyBonusDefenseGrade()
 	 */
 	return 0;
 }
+
+#ifdef ENABLE_DICE_SYSTEM
+#include "item.h"
+
+struct FPartyDropDiceRoll
+{
+	const LPITEM m_itemDrop;
+	LPCHARACTER m_itemOwner;
+	int m_lastNumber;
+
+	FPartyDropDiceRoll(const LPITEM itemDrop, LPCHARACTER itemOwner) : m_itemDrop(itemDrop), m_itemOwner(itemOwner), m_lastNumber(0)
+	{
+	};
+
+	void Process(const LPCHARACTER mobVictim)
+	{
+		if ((!mobVictim || (mobVictim->GetMobRank() >= MOB_RANK_BOSS && mobVictim->GetMobRank() <= MOB_RANK_KING)) && m_itemOwner->GetParty() && m_itemOwner->GetParty()->GetNearMemberCount() > 1)
+		{
+			LPPARTY pParty = m_itemOwner->GetParty();
+			pParty->ChatPacketToAllMember(CHAT_TYPE_DICE_INFO, LC_TEXT("*** Rolling for the following item: %16s ***"), m_itemDrop->GetName());
+
+			pParty->ForEachNearMember(*this);
+			if (m_itemOwner)
+			{
+				m_itemDrop->SetOwnership(m_itemOwner);
+				pParty->ChatPacketToAllMember(CHAT_TYPE_DICE_INFO, LC_TEXT("*** Rolling of %s: %16s ***"), m_itemDrop->GetName(), m_itemOwner->GetName());
+			}
+		}
+		else
+			m_itemDrop->SetOwnership(m_itemOwner);
+	}
+	LPCHARACTER GetItemOwner()
+	{
+		return m_itemOwner;
+	}
+	const LPITEM GetItemDrop()
+	{
+		return m_itemDrop;
+	}
+	void operator () (LPCHARACTER ch)
+	{
+		if (!ch)
+			return;
+
+		LPPARTY pParty = ch->GetParty();
+		if (!pParty)
+			return;
+
+		while (true)
+		{
+			int pickedNumber = number(10000, 99999);
+			if (pickedNumber > m_lastNumber)
+			{
+				m_lastNumber = pickedNumber;
+				m_itemOwner = ch;
+			}
+			else if (pickedNumber == m_lastNumber)
+			{
+				continue;
+			}
+			else // if (pickedNumber < m_lastNumber)
+			{
+			}
+			pParty->ChatPacketToAllMember(CHAT_TYPE_DICE_INFO, LC_TEXT("*** -> %16s - Dice score: %05d ***"), ch->GetName(), pickedNumber);
+			break;
+		}
+	}
+};
+#endif
+
 #endif

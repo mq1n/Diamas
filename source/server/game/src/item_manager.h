@@ -41,6 +41,9 @@ class CSpecialItemGroup
 			DRAIN_HP,
 			POISON,
 			MOB_GROUP,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			BLEEDING,
+#endif
 		};
 
 		// QUEST 타입은 퀘스트 스크립트에서 vnum.sig_use를 사용할 수 있는 그룹이다.
@@ -467,8 +470,8 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 		std::map<DWORD, TItemTable>&  GetVIDMap() { return m_map_vid; }
 		std::vector<TItemTable>& GetVecProto() { return m_vec_prototype; }	
 		
-		const static int MAX_NORM_ATTR_NUM = 5;
-		const static int MAX_RARE_ATTR_NUM = 2;
+		const static int MAX_NORM_ATTR_NUM = ITEM_ATTRIBUTE_NORM_NUM;
+		const static int MAX_RARE_ATTR_NUM = ITEM_ATTRIBUTE_RARE_NUM;
 		bool ReadItemVnumMaskTable(const char * c_pszFileName);
 	private:
 #ifdef M2_USE_POOL

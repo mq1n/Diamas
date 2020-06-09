@@ -217,7 +217,7 @@ template <typename T>
 bool CGroupNode::CGroupNodeRow::GetValue(const std::string & stColKey, OUT T& value) const
 {
 	int idx = m_pOwnerGroupNode->GetColumnIndexFromName(stColKey);
-	if (idx < 0 || idx >= m_vec_values.size())
+	if (idx < 0 || (TTokenVectorMap::size_type)idx >= m_vec_values.size())
 		return false;
 	return from_string(value, m_vec_values[idx]);
 }
@@ -225,7 +225,7 @@ bool CGroupNode::CGroupNodeRow::GetValue(const std::string & stColKey, OUT T& va
 template <typename T>
 bool CGroupNode::CGroupNodeRow::GetValue(int idx, OUT T& value) const
 {
-	if (idx < 0 || idx >= m_vec_values.size())
+	if (idx < 0 || (TTokenVectorMap::size_type)idx >= m_vec_values.size())
 		return false;
 	return from_string(value, m_vec_values[idx]);
 }

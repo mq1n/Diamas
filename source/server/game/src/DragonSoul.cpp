@@ -15,13 +15,13 @@ typedef std::vector <std::string> TTokenVector;
 int Gamble(std::vector<float>& vec_probs)
 {
 	float range = 0.f;
-	for (int i = 0; i < vec_probs.size(); i++)
+	for (size_t i = 0; i < vec_probs.size(); i++)
 	{
 		range += vec_probs[i];
 	}
 	float fProb = fnumber(0.f, range);
 	float sum = 0.f;
-	for (int idx = 0; idx < vec_probs.size(); idx++)
+	for (size_t idx = 0; idx < vec_probs.size(); idx++)
 	{
 		sum += vec_probs[idx];
 		if (sum >= fProb)
@@ -199,7 +199,7 @@ bool DSManager::RefreshItemAttributes(LPITEM pDS)
 		short sValue = 0;
 		if (APPLY_NONE == bType)
 			continue;
-		for (int j = 0; j < vec_addtional_applys.size(); j++)
+		for (size_t j = 0; j < vec_addtional_applys.size(); j++)
 		{
 			if (vec_addtional_applys[j].apply_type == bType)
 			{
@@ -269,7 +269,7 @@ bool DSManager::PutAttributes(LPITEM pDS)
 	{
 		random_set.resize(additional_attr_num);
 		std::list <float> list_probs;
-		for (int i = 0; i < vec_addtional_applys.size(); i++)
+		for (size_t i = 0; i < vec_addtional_applys.size(); i++)
 		{
 			list_probs.push_back(vec_addtional_applys[i].prob);
 		}
@@ -346,7 +346,7 @@ bool DSManager::ExtractDragonHeart(LPCHARACTER ch, LPITEM pItem, LPITEM pExtract
 
 	int idx = Gamble(vec_probs);
 
-	float sum = 0.f;
+	//float sum = 0.f;
 	if (-1 == idx)
 	{
 		sys_err ("Gamble is failed. ds_type(%d), grade_idx(%d)", ds_type, grade_idx);
@@ -405,8 +405,7 @@ bool DSManager::PullOut(LPCHARACTER ch, TItemPos DestCell, LPITEM& pItem, LPITEM
 		return false;
 	}
 
-	// 목표 위치가 valid한지 검사 후, valid하지 않다면 임의의 빈 공간을 찾는다.
-	if (!IsValidCellForThisItem(pItem, DestCell))
+	if (!IsValidCellForThisItem(pItem, DestCell) || ch->GetItem(DestCell)) // @fixme160 (added GetItem check)
 	{
 		int iEmptyCell = ch->GetEmptyDragonSoulInventory(pItem);
 		if (iEmptyCell < 0)
@@ -431,7 +430,7 @@ bool DSManager::PullOut(LPCHARACTER ch, TItemPos DestCell, LPITEM& pItem, LPITEM
 	float fDice;
 	// 용혼석 추출 성공 여부 결정.
 	{
-		DWORD dwVnum = pItem->GetVnum(); 
+		//DWORD dwVnum = pItem->GetVnum();
 
 		BYTE ds_type, grade_idx, step_idx, strength_idx;
 		GetDragonSoulInfo(pItem->GetVnum(), ds_type, grade_idx, step_idx, strength_idx);
@@ -465,7 +464,7 @@ bool DSManager::PullOut(LPCHARACTER ch, TItemPos DestCell, LPITEM& pItem, LPITEM
 			}
 			else
 			{
-				sprintf(buf, "dice(%d) prob(%d)", fDice, fProb);
+				sprintf(buf, "dice(%d) prob(%d)", (int)fDice, (int)fProb);
 			}
 			LogManager::instance().ItemLog(ch, pItem, "DS_PULL_OUT_SUCCESS", buf);
 			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("용혼석 추출에 성공하였습니다."));
@@ -551,7 +550,7 @@ bool DSManager::DoRefineGrade(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_SOUL
 	int need_count = 0;
 	int fee = 0;
 	std::vector <float> vec_probs;
-	float prob_sum;
+	//float prob_sum;
 
 	BYTE ds_type, grade_idx, step_idx, strength_idx;
 	int result_grade;
@@ -759,7 +758,7 @@ bool DSManager::DoRefineStep(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_SOUL_
 		return false;
 	}
 	
-	float sum = 0.f;
+	//float sum = 0.f;
 
 	if (-1 == (result_step = Gamble(vec_probs)))
 	{

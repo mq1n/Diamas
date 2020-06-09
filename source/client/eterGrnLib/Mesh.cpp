@@ -195,7 +195,7 @@ bool CGrannyMesh::LoadTriGroupNodeList(CGrannyMaterialPalette& rkMtrlPal)
 
 void CGrannyMesh::RebuildTriGroupNodeList()
 {
-	assert(!"CGrannyMesh::RebuildTriGroupNodeList() - 왜 리빌드를 하는가- -?");
+	assert(!"CGrannyMesh::RebuildTriGroupNodeList() - Why should you rebuild it -?");
 	/*
 	int mtrlCount = m_pgrnMesh->MaterialBindingCount;
 	int GroupNodeCount = GrannyGetMeshTriangleGroupCount(m_pgrnMesh);

@@ -548,7 +548,7 @@ bool CPythonApplication::Process()
 		if ( dt >= 500 )
 		{
 			s_uiNextFrameTime += nAdjustTime; 
-			printf("FrameSkip º¸Á¤ %d\n",nAdjustTime);
+			printf("FrameSkip Adjusting... %d\n",nAdjustTime);
 			CTimer::Instance().Adjust(nAdjustTime);
 		}
 
@@ -1075,6 +1075,17 @@ bool LoadLocaleData(const char* localePath)
 			}
 		}
 	}
+
+#ifdef ENABLE_ACCE_SYSTEM
+	char szItemScale[256]{};
+	snprintf(szItemScale, sizeof(szItemScale), "acce/item_scale.txt");
+
+	if (!rkItemMgr.LoadItemScale(szItemScale))
+	{
+		Tracenf("LoadLocaleData: error while loading %s.", szItemScale);
+		return false;
+	}
+#endif
 
 	NANOEND
 		return true;

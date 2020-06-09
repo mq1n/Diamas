@@ -18,6 +18,9 @@ extern int	CalcMagicDamage(LPCHARACTER pAttacker, LPCHARACTER pVictim);
 extern int	CalcArrowDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, LPITEM pkBow, LPITEM pkArrow, bool bIgnoreDefense = false);
 extern float	CalcAttackRating(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, bool bIgnoreTargetRating = false);
 
+#ifdef NEW_ICEDAMAGE_SYSTEM
+extern bool battle_is_icedamage(LPCHARACTER pAttacker, LPCHARACTER pVictim);
+#endif
 extern bool	battle_is_attackable(LPCHARACTER ch, LPCHARACTER victim);
 extern int	battle_melee_attack(LPCHARACTER ch, LPCHARACTER victim);
 extern void	battle_end(LPCHARACTER ch);

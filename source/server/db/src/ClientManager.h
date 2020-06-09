@@ -13,6 +13,8 @@
 #include "DBManager.h"
 #include "LoginData.h"
 
+#define ENABLE_PROTO_FROM_DB
+
 class CPlayerTableCache;
 class CItemCache;
 class CItemPriceListTableCache;
@@ -99,6 +101,7 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	void	MainLoop();
 	void	Quit();
 
+	void	GetPeerP2PHostNames(std::string& peerHostNames);
 	void	SetTablePostfix(const char* c_pszTablePostfix);
 	void	SetPlayerIDStart(int iIDStart);
 	int	GetPlayerIDStart() { return m_iPlayerIDStart; }
@@ -162,7 +165,8 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 
 	void			SendNotice(const char * c_pszFormat, ...);
 
-	char*			GetCommand(char* str);					//독일선물기능에서 명령어 얻는 함수
+	// @fixme203 directly GetCommand instead of strcpy
+	char*			GetCommand(char* str, char* command);		
 	void			ItemAward(CPeer * peer, char* login);	//독일 선물 기능
 
     protected:
@@ -244,7 +248,8 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	void		RESULT_PLAYER_LOAD(CPeer * peer, MYSQL_RES * pRes, ClientHandleInfo * pkInfo);
 	void		RESULT_ITEM_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwHandle, DWORD dwPID);
 	void		RESULT_QUEST_LOAD(CPeer * pkPeer, MYSQL_RES * pRes, DWORD dwHandle, DWORD dwPID);
-	void		RESULT_AFFECT_LOAD(CPeer * pkPeer, MYSQL_RES * pRes, DWORD dwHandle);
+	// @fixme402 (RESULT_AFFECT_LOAD +dwRealPID)
+	void		RESULT_AFFECT_LOAD(CPeer * pkPeer, MYSQL_RES * pRes, DWORD dwHandle, DWORD dwRealPID);
 
 	// PLAYER_INDEX_CREATE_BUG_FIX
 	void		RESULT_PLAYER_INDEX_CREATE(CPeer *pkPeer, SQLMsg *msg);
@@ -360,7 +365,7 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	/**
 	 * @param [in]	pPacket 패킷 데이터의 포인터
 	 */
-	void		MyshopPricelistUpdate(const TPacketMyshopPricelistHeader* pPacket);
+	void		MyshopPricelistUpdate(const TItemPriceListTable* pPacket); // @fixme403 (TPacketMyshopPricelistHeader to TItemPriceListTable)
 
 	/// 아이템 가격정보 리스트 요청 패킷(HEADER_GD_MYSHOP_PRICELIST_REQ) 처리함수
 	/**
@@ -562,6 +567,13 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	void AuctionDeleteSaleItem (CPeer * peer, DWORD actor_id, DWORD item_id);
 	void AuctionReBid (CPeer * peer, DWORD bidder_id, AuctionBidInfo* data);
 	void AuctionBidCancel (CPeer * peer, DWORD bidder_id, DWORD item_id);
+#endif
+#ifdef ENABLE_PROTO_FROM_DB
+	public:
+	bool		InitializeMobTableFromDB();
+	bool		InitializeItemTableFromDB();
+	protected:
+	bool		bIsProtoReadFromDB;
 #endif
 };
 

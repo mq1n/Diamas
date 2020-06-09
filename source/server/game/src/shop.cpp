@@ -220,7 +220,7 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 					ch->GetPlayerID(),
 					m_pkPC->GetPlayerID());
 
-			return false;
+			return SHOP_SUBHEADER_GC_SOLD_OUT; // @fixme132 false to SHOP_SUBHEADER_GC_SOLD_OUT
 		}
 
 		if ((pkSelectedItem->GetOwner() != m_pkPC))
@@ -229,14 +229,14 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 					ch->GetPlayerID(),
 					m_pkPC->GetPlayerID());
 
-			return false;
+			return SHOP_SUBHEADER_GC_SOLD_OUT; // @fixme132 false to SHOP_SUBHEADER_GC_SOLD_OUT
 		}
 	}
 
 	DWORD dwPrice = r_item.price;
 
-	if (it->second)	// if other empire, price is triple
-		dwPrice *= 3;
+	//if (it->second)	// if other empire, price is triple
+	//	dwPrice *= 3;
 
 	if (ch->GetGold() < (int) dwPrice)
 	{
@@ -254,6 +254,7 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 	if (!item)
 		return SHOP_SUBHEADER_GC_SOLD_OUT;
 
+#ifdef ENABLE_SHOP_BLACKLIST
 	if (!m_pkPC)
 	{
 		if (quest::CQuestManager::instance().GetEventFlag("hivalue_item_sell") == 0)
@@ -265,6 +266,7 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 			}
 		}
 	}
+#endif
 
 	int iEmptyPos;
 	if (item->IsDragonSoul())
@@ -297,24 +299,6 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 	DWORD dwTax = 0;
 	int iVal = 0;
 
-	if (LC_IsYMIR() ||  LC_IsKorea())
-	{
-		if (0 < (iVal = quest::CQuestManager::instance().GetEventFlag("trade_tax")))
-		{
-			if (iVal > 100)
-				iVal = 100;
-
-			dwTax = dwPrice * iVal / 100;
-			dwPrice = dwPrice - dwTax;
-		}
-		else
-		{
-			iVal = 3;
-			dwTax = dwPrice * iVal / 100;
-			dwPrice = dwPrice - dwTax;			
-		}
-	}
-	else
 	{
 		iVal = quest::CQuestManager::instance().GetEventFlag("personal_shop");
 
@@ -439,25 +423,35 @@ bool CShop::AddGuest(LPCHARACTER ch, DWORD owner_vid, bool bOtherEmpire)
 	{
 		const SHOP_ITEM & item = m_itemVector[i];
 
+#ifdef ENABLE_SHOP_BLACKLIST
 		//HIVALUE_ITEM_EVENT
 		if (quest::CQuestManager::instance().GetEventFlag("hivalue_item_sell") == 0)
 		{
-			//축복의 구슬 && 만년한철 이벤트 
+			
 			if (item.vnum == 70024 || item.vnum == 70035)
-			{				
+			{
 				continue;
 			}
 		}
+#endif
 		//END_HIVALUE_ITEM_EVENT
 		if (m_pkPC && !item.pkItem)
 			continue;
 
 		pack2.items[i].vnum = item.vnum;
 
+		// REMOVED_EMPIRE_PRICE_LIFT
+#ifdef ENABLE_NEWSTUFF
+		if (bOtherEmpire && !g_bEmpireShopPriceTripleDisable) // no empire price penalty for pc shop
+#else
 		if (bOtherEmpire) // no empire price penalty for pc shop
+#endif
+		{
 			pack2.items[i].price = item.price * 3;
+		}
 		else
 			pack2.items[i].price = item.price;
+		// END_REMOVED_EMPIRE_PRICE_LIFT
 
 		pack2.items[i].count = item.count;
 
@@ -573,7 +567,7 @@ bool CShop::IsSellingItem(DWORD itemID)
 
 	for (DWORD i = 0; i < m_itemVector.size() && i < SHOP_HOST_ITEM_MAX_NUM; ++i)
 	{
-		if (m_itemVector[i].itemid == itemID)
+		if ((unsigned int)(m_itemVector[i].itemid) == itemID)
 		{
 			isSelling = true;
 			break;

@@ -9,6 +9,8 @@
 
 #include "lua_incl.h"
 
+#define ENABLE_QUEST_DIE_EVENT
+
 namespace quest
 {
 	enum
@@ -58,6 +60,9 @@ namespace quest
 		QUEST_ITEM_PICK_EVENT,
 		QUEST_SIG_USE_EVENT,
 		QUEST_ITEM_INFORMER_EVENT,
+#ifdef ENABLE_QUEST_DIE_EVENT
+		QUEST_DIE_EVENT,
+#endif
 		QUEST_EVENT_COUNT
 	};
 

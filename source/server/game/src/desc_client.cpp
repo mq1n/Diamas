@@ -11,6 +11,7 @@
 #include "db.h"
 
 #include "party.h"
+#include "../../common/CommonDefines.h"
 
 extern LPFDWATCH	main_fdw;
 
@@ -164,7 +165,7 @@ void CLIENT_DESC::SetPhase(int iPhase)
 					p.wListenPort = mother_port;
 					p.wP2PPort	= p2p_port;
 					p.bAuthServer = false;
-					map_allow_copy(p.alMaps, 32);
+					map_allow_copy(p.alMaps, MAP_ALLOW_LIMIT);
 
 					const DESC_MANAGER::DESC_SET & c_set = DESC_MANAGER::instance().GetClientSet();
 					DESC_MANAGER::DESC_SET::const_iterator it;
@@ -296,7 +297,8 @@ void CLIENT_DESC::UpdateChannelStatus(DWORD t, bool fForce)
 	enum {
 		CHANNELSTATUS_UPDATE_PERIOD = 5*60*1000,	// 5ºÐ¸¶´Ù
 	};
-	if (fForce || m_tLastChannelStatusUpdateTime+CHANNELSTATUS_UPDATE_PERIOD < t) {
+	DWORD tLCSUP = m_tLastChannelStatusUpdateTime+CHANNELSTATUS_UPDATE_PERIOD;
+	if (fForce || tLCSUP < t) {
 		int iTotal; 
 		int * paiEmpireUserCount;
 		int iLocal;

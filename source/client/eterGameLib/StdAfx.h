@@ -18,6 +18,8 @@
 #pragma warning(disable:4201 4512 4238 4239)
 #endif
 
+#include "../eterXClient/Locale_inc.h"
+
 #include "../eterBase/Utils.h"
 #include "../eterBase/CRC32.h"
 #include "../eterBase/Random.h"

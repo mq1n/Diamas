@@ -5,6 +5,9 @@
 #include "char.h"
 #include "desc.h"
 #include "item_manager.h"
+#ifdef ENABLE_NEWSTUFF
+#include "config.h"
+#endif
 
 const int MAX_NORM_ATTR_NUM = ITEM_MANAGER::MAX_NORM_ATTR_NUM;
 const int MAX_RARE_ATTR_NUM = ITEM_MANAGER::MAX_RARE_ATTR_NUM;
@@ -19,12 +22,11 @@ int CItem::GetAttributeSetIndex()
 		return ATTRIBUTE_SET_WEAPON;
 	}
 
-	if (GetType() == ITEM_ARMOR || GetType() == ITEM_COSTUME)
+	if (GetType() == ITEM_ARMOR)
 	{
 		switch (GetSubType())
 		{
 			case ARMOR_BODY:
-//			case COSTUME_BODY: // ÄÚ½ºÃõ °©¿ÊÀº ÀÏ¹Ý °©¿Ê°ú µ¿ÀÏÇÑ Attribute SetÀ» ÀÌ¿ëÇÏ¿© ·£´ý¼Ó¼º ºÙÀ½ (ARMOR_BODY == COSTUME_BODY)
 				return ATTRIBUTE_SET_BODY;
 
 			case ARMOR_WRIST:
@@ -45,6 +47,39 @@ int CItem::GetAttributeSetIndex()
 
 			case ARMOR_EAR:
 				return ATTRIBUTE_SET_EAR;
+		}
+	}
+	else if (GetType() == ITEM_COSTUME)
+	{
+		switch (GetSubType())
+		{
+			case COSTUME_BODY: 
+#ifdef ENABLE_ITEM_ATTR_COSTUME
+				return ATTRIBUTE_SET_COSTUME_BODY;
+#else
+				return ATTRIBUTE_SET_BODY;
+#endif
+
+			case COSTUME_HAIR: 
+#ifdef ENABLE_ITEM_ATTR_COSTUME
+				return ATTRIBUTE_SET_COSTUME_HAIR;
+#else
+				return ATTRIBUTE_SET_HEAD;
+#endif
+
+#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
+			case COSTUME_MOUNT:
+				break;
+#endif
+
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+			case COSTUME_WEAPON:
+#ifdef ENABLE_ITEM_ATTR_COSTUME
+				return ATTRIBUTE_SET_COSTUME_WEAPON;
+#else
+				return ATTRIBUTE_SET_WEAPON;
+#endif
+#endif
 		}
 	}
 
@@ -339,11 +374,11 @@ int CItem::GetRareAttrCount()
 {
 	int ret = 0;
 
-	if (m_aAttr[5].bType != 0)
-		ret++;
-
-	if (m_aAttr[6].bType != 0)
-		ret++;
+	for (DWORD dwIdx = ITEM_ATTRIBUTE_RARE_START; dwIdx < ITEM_ATTRIBUTE_RARE_END; dwIdx++)
+	{
+		if (m_aAttr[dwIdx].bType != 0)
+			ret++;
+	}
 
 	return ret;
 }
@@ -357,8 +392,8 @@ bool CItem::ChangeRareAttribute()
 
 	for (int i = 0; i < cnt; ++i)
 	{
-		m_aAttr[i + 5].bType = 0;
-		m_aAttr[i + 5].sValue = 0;
+		m_aAttr[i + ITEM_ATTRIBUTE_RARE_START].bType = 0;
+		m_aAttr[i + ITEM_ATTRIBUTE_RARE_START].sValue = 0;
 	}
 
 	if (GetOwner() && GetOwner()->GetDesc())
@@ -378,10 +413,10 @@ bool CItem::AddRareAttribute()
 {
 	int count = GetRareAttrCount();
 
-	if (count >= 2)
+	if (count >= ITEM_ATTRIBUTE_RARE_NUM)
 		return false;
 
-	int pos = count + 5;
+	int pos = count + ITEM_ATTRIBUTE_RARE_START;
 	TPlayerItemAttribute & attr = m_aAttr[pos];
 
 	int nAttrSet = GetAttributeSetIndex();
@@ -417,5 +452,113 @@ bool CItem::AddRareAttribute()
 
 	LogManager::instance().ItemLog(pos, attr.bType, attr.sValue, GetID(), "SET_RARE", "", pszIP ? pszIP : "", GetOriginalVnum());
 	return true;
+}
+
+void CItem::AddRareAttribute2(const int * aiAttrPercentTable)
+{
+	static const int aiItemAddAttributePercent[ITEM_ATTRIBUTE_MAX_LEVEL] =
+	{
+		40, 50, 10, 0, 0
+	};
+	if (aiAttrPercentTable == NULL)
+		aiAttrPercentTable = aiItemAddAttributePercent;
+
+	if (GetRareAttrCount() < MAX_RARE_ATTR_NUM)
+		PutRareAttribute(aiAttrPercentTable);
+}
+
+void CItem::PutRareAttribute(const int * aiAttrPercentTable)
+{
+	int iAttrLevelPercent = number(1, 100);
+	int i;
+
+	for (i = 0; i < ITEM_ATTRIBUTE_MAX_LEVEL; ++i)
+	{
+		if (iAttrLevelPercent <= aiAttrPercentTable[i])
+			break;
+
+		iAttrLevelPercent -= aiAttrPercentTable[i];
+	}
+
+	PutRareAttributeWithLevel(i + 1);
+}
+
+void CItem::PutRareAttributeWithLevel(BYTE bLevel)
+{
+	int iAttributeSet = GetAttributeSetIndex();
+	if (iAttributeSet < 0)
+		return;
+
+	if (bLevel > ITEM_ATTRIBUTE_MAX_LEVEL)
+		return;
+
+	std::vector<int> avail;
+
+	int total = 0;
+
+	
+	for (int i = 0; i < MAX_APPLY_NUM; ++i)
+	{
+		const TItemAttrTable & r = g_map_itemRare[i];
+
+		if (r.bMaxLevelBySet[iAttributeSet] && !HasRareAttr(i))
+		{
+			avail.push_back(i);
+			total += r.dwProb;
+		}
+	}
+
+	
+	unsigned int prob = number(1, total);
+	int attr_idx = APPLY_NONE;
+
+	for (DWORD i = 0; i < avail.size(); ++i)
+	{
+		const TItemAttrTable & r = g_map_itemRare[avail[i]];
+
+		if (prob <= r.dwProb)
+		{
+			attr_idx = avail[i];
+			break;
+		}
+
+		prob -= r.dwProb;
+	}
+
+	if (!attr_idx)
+	{
+		sys_err("Cannot put item rare attribute %d %d", iAttributeSet, bLevel);
+		return;
+	}
+
+	const TItemAttrTable & r = g_map_itemRare[attr_idx];
+
+	
+	if (bLevel > r.bMaxLevelBySet[iAttributeSet])
+		bLevel = r.bMaxLevelBySet[iAttributeSet];
+
+	AddRareAttr(attr_idx, bLevel);
+}
+
+void CItem::AddRareAttr(BYTE bApply, BYTE bLevel)
+{
+	if (HasRareAttr(bApply))
+		return;
+
+	if (bLevel <= 0)
+		return;
+
+	int i = ITEM_ATTRIBUTE_RARE_START + GetRareAttrCount();
+
+	if (i == ITEM_ATTRIBUTE_RARE_END)
+		sys_err("item rare attribute overflow!");
+	else
+	{
+		const TItemAttrTable & r = g_map_itemRare[bApply];
+		long lVal = r.lValues[MIN(4, bLevel - 1)];
+
+		if (lVal)
+			SetForceAttribute(i, bApply, lVal);
+	}
 }
 

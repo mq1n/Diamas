@@ -1361,7 +1361,7 @@ void CParty::Update()
 	bool bLongTimeExpBonusChanged = false;
 
 	// 파티 결성 후 충분한 시간이 지나면 경험치 보너스를 받는다.
-	if (!m_iLongTimeExpBonus && (get_dword_time() - m_dwPartyStartTime > PARTY_ENOUGH_MINUTE_FOR_EXP_BONUS * 60 * 1000 / (g_iUseLocale?1:2)))
+	if (!m_iLongTimeExpBonus && (get_dword_time() - m_dwPartyStartTime > PARTY_ENOUGH_MINUTE_FOR_EXP_BONUS * 60 * 1000 / 1))
 	{
 		bLongTimeExpBonusChanged = true;
 		m_iLongTimeExpBonus = 5;
@@ -1689,21 +1689,39 @@ int CParty::ComputePartyBonusExpPercent()
 	if (leader && (leader->IsEquipUniqueItem(UNIQUE_ITEM_PARTY_BONUS_EXP) || leader->IsEquipUniqueItem(UNIQUE_ITEM_PARTY_BONUS_EXP_MALL)
 		|| leader->IsEquipUniqueItem(UNIQUE_ITEM_PARTY_BONUS_EXP_GIFT) || leader->IsEquipUniqueGroup(10010)))
 	{
-		// 중국측 육도 적용을 확인해야한다.
-		if (g_iUseLocale)
-		{
-			iBonusPartyExpFromItem = 30;
-		}
-		else
-		{
-			iBonusPartyExpFromItem = KOR_aiUniqueItemPartyBonusExpPercentByMemberCount[iMemberCount];
-		}
+		
+		iBonusPartyExpFromItem = 30;
 	}
 
-	if (g_iUseLocale)
-		return iBonusPartyExpFromItem + CHN_aiPartyBonusExpPercentByMemberCount[iMemberCount];
-	else
-		return iBonusPartyExpFromItem + KOR_aiPartyBonusExpPercentByMemberCount[iMemberCount];
+	return iBonusPartyExpFromItem + CHN_aiPartyBonusExpPercentByMemberCount[iMemberCount];
 	// END_OF_UPGRADE_PARTY_BONUS
 }
 
+bool CParty::IsPartyInDungeon(int mapIndex)
+{
+	
+	for(TMemberMap::iterator it = m_memberMap.begin(); it != m_memberMap.end(); ++it)
+	{
+		LPCHARACTER ch = it->second.pCharacter;
+
+		if(NULL == ch)
+		{
+			continue;
+		}
+
+		LPDUNGEON d = ch->GetDungeon();
+
+		if(NULL == d)
+		{
+			sys_log(0,"not in dungeon");
+			continue;
+		}
+
+		if( mapIndex == (d->GetMapIndex())/10000 )
+		{
+			return true;
+		}
+
+	}
+	return false;
+}

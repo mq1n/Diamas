@@ -3,6 +3,9 @@
 #include "char.h"
 #include "char_manager.h"
 #include "party.h"
+#ifdef ENABLE_D_NJGUILD
+#include "guild.h"
+#endif
 #include "affect.h"
 #include "packet.h"
 #include "desc.h"
@@ -352,6 +355,40 @@ void CDungeon::WarpAll(long lFromMapIndex, int x, int y)
 	// <Factor> SECTREE::for_each -> SECTREE::for_each_entity
 	pMap->for_each(f);
 }
+
+#ifdef ENABLE_D_NJGUILD
+void CDungeon::JumpGuild(CGuild* pGuild, long lFromMapIndex, int x, int y)
+{
+	x *= 100;
+	y *= 100;
+
+	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(lFromMapIndex);
+
+	if (!pMap)
+	{
+		sys_err("cannot find map by index %d", lFromMapIndex);
+		return;
+	}
+
+	if (pGuild->GetDungeon_for_Only_guild() == NULL)
+	{
+		if (m_pGuild == NULL)
+		{
+			m_pGuild = pGuild;
+		}
+		else if (m_pGuild != pGuild)
+		{
+			sys_err ("Dungeon already has guild. Another guild cannot jump in dungeon : index %d", GetMapIndex());
+			return;
+		}
+		pGuild->SetDungeon_for_Only_guild (this);
+	}
+
+	FWarpToPosition f(m_lMapIndex, x, y);
+
+	pGuild->ForEachOnMapMember(f, lFromMapIndex);
+}
+#endif
 
 void CDungeon::JumpParty(LPPARTY pParty, long lFromMapIndex, int x, int y)
 {

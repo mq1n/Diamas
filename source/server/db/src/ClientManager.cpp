@@ -1,5 +1,6 @@
 
 #include "stdafx.h"
+#include "../../common/CommonDefines.h"
 
 #include "../../common/billing.h"
 #include "../../common/building.h"
@@ -21,6 +22,7 @@
 #include "BlockCountry.h"
 #include "ItemIDRangeManager.h"
 #include "Cache.h"
+#include <sstream>
 #ifdef __AUCTION__
 #include "AuctionManager.h"
 #endif
@@ -40,6 +42,9 @@ CPacketInfo g_item_info;
 
 int g_item_count = 0;
 int g_query_count[2];
+#ifdef ENABLE_PROTO_FROM_DB
+bool g_bMirror2DB = false;
+#endif
 
 CClientManager::CClientManager() :
 	m_pkAuthPeer(NULL),
@@ -60,6 +65,9 @@ CClientManager::CClientManager() :
 	m_itemRange.dwUsableItemIDMin = 0;
 
 	memset(g_query_count, 0, sizeof(g_query_count));
+#ifdef ENABLE_PROTO_FROM_DB
+	bIsProtoReadFromDB = false;
+#endif
 }
 
 CClientManager::~CClientManager()
@@ -70,6 +78,19 @@ CClientManager::~CClientManager()
 void CClientManager::SetPlayerIDStart(int iIDStart)
 {
 	m_iPlayerIDStart = iIDStart;
+}
+
+void CClientManager::GetPeerP2PHostNames(std::string& peerHostNames)
+{
+	std::ostringstream oss(std::ostringstream::out);
+
+	for (auto it = m_peerList.begin(); it != m_peerList.end(); ++it)
+	{
+		CPeer * peer = *it;
+		oss << peer->GetHost() << " " << peer->GetP2PPort() << " channel : " << (int)(peer->GetChannel()) << "\n";
+	}
+
+	peerHostNames += oss.str();
 }
 
 void CClientManager::Destroy()
@@ -87,6 +108,102 @@ void CClientManager::Destroy()
 	}
 }
 
+#define ENABLE_DEFAULT_PRIV
+#ifdef ENABLE_DEFAULT_PRIV
+static bool bCleanOldPriv = true;
+static bool __InitializeDefaultPriv()
+{
+	if (bCleanOldPriv)
+	{
+		std::unique_ptr<SQLMsg> pCleanStuff(CDBManager::instance().DirectQuery("DELETE FROM priv_settings WHERE value <= 0 OR duration <= NOW();", SQL_COMMON));
+		printf("DEFAULT_PRIV_EMPIRE: removed %u expired priv settings.\n", pCleanStuff->Get()->uiAffectedRows);
+	}
+	std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery("SELECT priv_type, id, type, value, UNIX_TIMESTAMP(duration) FROM priv_settings", SQL_COMMON));
+	if (pMsg->Get()->uiNumRows == 0)
+		return false;
+	MYSQL_ROW row = NULL;
+	while ((row = mysql_fetch_row(pMsg->Get()->pSQLResult)))
+	{
+		if (!strcmp(row[0], "EMPIRE"))
+		{
+			// init
+			BYTE empire = 0;
+			BYTE type = 1;
+			int value = 0;
+			time_t duration_sec = 0;
+			// set
+			str_to_number(empire, row[1]);
+			str_to_number(type, row[2]);
+			str_to_number(value, row[3]);
+			str_to_number(duration_sec, row[4]);
+			// recalibrate time
+			time_t now_time_sec = CClientManager::instance().GetCurrentTime();
+			if (now_time_sec>duration_sec)
+				duration_sec = 0;
+			else
+				duration_sec -= now_time_sec;
+			// send priv
+			printf("DEFAULT_PRIV_EMPIRE: set empire(%u), type(%u), value(%d), duration(%u)\n", empire, type, value, duration_sec);
+			CPrivManager::instance().AddEmpirePriv(empire, type, value, duration_sec);
+		}
+		else if (!strcmp(row[0], "GUILD"))
+		{
+			// init
+			DWORD guild_id = 0;
+			BYTE type = 1;
+			int value = 0;
+			time_t duration_sec = 0;
+			// set
+			str_to_number(guild_id, row[1]);
+			str_to_number(type, row[2]);
+			str_to_number(value, row[3]);
+			str_to_number(duration_sec, row[4]);
+			// recalibrate time
+			time_t now_time_sec = CClientManager::instance().GetCurrentTime();
+			if (now_time_sec>duration_sec)
+				duration_sec = 0;
+			else
+				duration_sec -= now_time_sec;
+			// send priv
+			if (guild_id)
+			{
+				printf("DEFAULT_PRIV_GUILD: set guild_id(%u), type(%u), value(%d), duration(%u)\n", guild_id, type, value, duration_sec);
+				CPrivManager::instance().AddGuildPriv(guild_id, type, value, duration_sec);
+			}
+		}
+		else if (!strcmp(row[0], "PLAYER"))
+		{
+			// init
+			DWORD pid = 0;
+			BYTE type = 1;
+			int value = 0;
+			// set
+			str_to_number(pid, row[1]);
+			str_to_number(type, row[2]);
+			str_to_number(value, row[3]);
+			// send priv
+			if (pid)
+			{
+				printf("DEFAULT_PRIV_PLAYER: set pid(%u), type(%u), value(%d)\n", pid, type, value);
+				CPrivManager::instance().AddCharPriv(pid, type, value);
+			}
+		}
+	}
+	return true;
+}
+
+static bool __UpdateDefaultPriv(const char* priv_type, DWORD id, BYTE type, int value, time_t duration_sec)
+{
+	char szQuery[1024];
+	snprintf(szQuery, 1024,
+		"REPLACE INTO priv_settings SET priv_type='%s', id=%u, type=%u, value=%d, duration=DATE_ADD(NOW(), INTERVAL %u SECOND);",
+		priv_type, id, type, value, duration_sec
+	);
+	std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(szQuery, SQL_COMMON));
+	return pMsg->Get()->uiAffectedRows;
+}
+#endif
+
 bool CClientManager::Initialize()
 {
 	int tmpValue;
@@ -97,7 +214,13 @@ bool CClientManager::Initialize()
 		fprintf(stderr, "Failed Localization Infomation so exit\n");
 		return false;
 	}
-		
+#ifdef ENABLE_DEFAULT_PRIV
+	if (!__InitializeDefaultPriv())
+	{
+		fprintf(stderr, "Failed Default Priv Setting so exit\n");
+		// return false;
+	}
+#endif
 	//END_BOOT_LOCALIZATION
 	//ITEM_UNIQUE_ID
 	
@@ -108,6 +231,19 @@ bool CClientManager::Initialize()
 	}
 	//END_ITEM_UNIQUE_ID
 
+#ifdef ENABLE_PROTO_FROM_DB
+	int iTemp;
+	if (CConfig::instance().GetValue("PROTO_FROM_DB", &iTemp))
+	{
+		bIsProtoReadFromDB = !!iTemp;
+		fprintf(stdout, "PROTO_FROM_DB: %s\n", (bIsProtoReadFromDB)?"Enabled":"Disabled");
+	}
+	if (!bIsProtoReadFromDB && CConfig::instance().GetValue("MIRROR2DB", &iTemp))
+	{
+		g_bMirror2DB = !!iTemp;
+		fprintf(stdout, "MIRROR2DB: %s\n", (g_bMirror2DB)?"Enabled":"Disabled");
+	}
+#endif
 	if (!InitializeTables())
 	{
 		sys_err("Table Initialize FAILED");
@@ -569,7 +705,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 
 		char szQuery[512];
 		snprintf(szQuery, sizeof(szQuery), 
-				"SELECT id, window+0, pos, count, vnum, socket0, socket1, socket2, "
+				"SELECT id, `window`+0, pos, count, vnum, socket0, socket1, socket2, "
 				"attrtype0, attrvalue0, "
 				"attrtype1, attrvalue1, "
 				"attrtype2, attrvalue2, "
@@ -577,7 +713,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 				"attrtype4, attrvalue4, "
 				"attrtype5, attrvalue5, "
 				"attrtype6, attrvalue6 "
-				"FROM item%s WHERE owner_id=%d AND window='%s'",
+				"FROM item%s WHERE owner_id=%d AND `window`='%s'",
 				GetTablePostfix(), pi->account_id, pi->ip[0] == 0 ? "SAFEBOX" : "MALL");
 
 		pi->account_index = 1;
@@ -690,9 +826,6 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 
 							dwSkillVnum = m_vec_skillTable[dwSkillIdx].dwVnum;
 
-							if (!dwSkillVnum > 120)
-								continue;
-
 							break;
 						} while (1);
 
@@ -765,7 +898,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 						}
 
 						snprintf(szQuery, sizeof(szQuery), 
-								"INSERT INTO item%s (id, owner_id, window, pos, vnum, count, socket0, socket1, socket2) "
+								"INSERT INTO item%s (id, owner_id, `window`, pos, vnum, count, socket0, socket1, socket2) "
 								"VALUES(%u, %u, '%s', %d, %u, %u, %u, %u, %u)",
 								GetTablePostfix(),
 								GainItemID(),
@@ -868,7 +1001,7 @@ void CClientManager::RESULT_SAFEBOX_CHANGE_PASSWORD(CPeer * pkPeer, SQLMsg * msg
 	{
 		MYSQL_ROW row = mysql_fetch_row(msg->Get()->pSQLResult);
 
-		if (row[0] && *row[0] && !strcasecmp(row[0], p->login) || (!row[0] || !*row[0]) && !strcmp("000000", p->login))
+		if ((row[0] && *row[0] && !strcasecmp(row[0], p->login)) || ((!row[0] || !*row[0]) && !strcmp("000000", p->login)))
 		{
 			char szQuery[QUERY_MAX_LEN];
 			char escape_pwd[64];
@@ -993,8 +1126,13 @@ void CClientManager::QUERY_EMPIRE_SELECT(CPeer * pkPeer, DWORD dwHandle, TEmpire
 
 	sys_log(0, "EmpireSelect: %s", szQuery);
 	{
+#ifdef ENABLE_PLAYER_PER_ACCOUNT5
+		snprintf(szQuery, sizeof(szQuery),
+				"SELECT pid1, pid2, pid3, pid4, pid5 FROM player_index%s WHERE id=%u", GetTablePostfix(), p->dwAccountID);
+#else
 		snprintf(szQuery, sizeof(szQuery),
 				"SELECT pid1, pid2, pid3, pid4 FROM player_index%s WHERE id=%u", GetTablePostfix(), p->dwAccountID);
+#endif
 
 		std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
 
@@ -1303,7 +1441,7 @@ void CClientManager::QUERY_ITEM_SAVE(CPeer * pkPeer, const char * c_pData)
 		char szQuery[512];
 
 		snprintf(szQuery, sizeof(szQuery), 
-			"REPLACE INTO item%s (id, owner_id, window, pos, count, vnum, socket0, socket1, socket2, "
+			"REPLACE INTO item%s (id, owner_id, `window`, pos, count, vnum, socket0, socket1, socket2, "
 			"attrtype0, attrvalue0, "
 			"attrtype1, attrvalue1, "
 			"attrtype2, attrvalue2, "
@@ -1678,17 +1816,26 @@ void CClientManager::QUERY_RELOAD_PROTO()
 void CClientManager::AddGuildPriv(TPacketGiveGuildPriv* p)
 {
 	CPrivManager::instance().AddGuildPriv(p->guild_id, p->type, p->value, p->duration_sec);
+#ifdef ENABLE_DEFAULT_PRIV
+	__UpdateDefaultPriv("GUILD", p->guild_id, p->type, p->value, p->duration_sec);
+#endif
 }
 
 void CClientManager::AddEmpirePriv(TPacketGiveEmpirePriv* p)
 {
 	CPrivManager::instance().AddEmpirePriv(p->empire, p->type, p->value, p->duration_sec);
+#ifdef ENABLE_DEFAULT_PRIV
+	__UpdateDefaultPriv("EMPIRE", p->empire, p->type, p->value, p->duration_sec);
+#endif
 }
 // END_OF_ADD_GUILD_PRIV_TIME
 
 void CClientManager::AddCharacterPriv(TPacketGiveCharacterPriv* p)
 {
 	CPrivManager::instance().AddCharPriv(p->pid, p->type, p->value);
+#ifdef ENABLE_DEFAULT_PRIV
+	__UpdateDefaultPriv("PLAYER", p->pid, p->type, p->value, 0);
+#endif
 }
 
 void CClientManager::MoneyLog(TPacketMoneyLog* p)
@@ -2157,7 +2304,7 @@ void CClientManager::WeddingEnd(TPacketWeddingEnd * p)
 // 캐시에 가격정보가 있으면 캐시를 업데이트 하고 캐시에 가격정보가 없다면
 // 우선 기존의 데이터를 로드한 뒤에 기존의 정보로 캐시를 만들고 새로 받은 가격정보를 업데이트 한다.
 //
-void CClientManager::MyshopPricelistUpdate(const TPacketMyshopPricelistHeader* pPacket)
+void CClientManager::MyshopPricelistUpdate(const TItemPriceListTable* pPacket) // @fixme403 (TPacketMyshopPricelistHeader to TItemPriceListTable)
 {
 	if (pPacket->byCount > SHOP_PRICELIST_MAX_NUM)
 	{
@@ -2174,8 +2321,7 @@ void CClientManager::MyshopPricelistUpdate(const TPacketMyshopPricelistHeader* p
 		table.dwOwnerID = pPacket->dwOwnerID;
 		table.byCount = pPacket->byCount;
 
-		const TItemPriceInfo * pInfo = reinterpret_cast<const TItemPriceInfo*>(pPacket + sizeof(TPacketMyshopPricelistHeader));
-		memcpy(table.aPriceInfo, pInfo, sizeof(TItemPriceInfo) * pPacket->byCount);
+		memcpy(table.aPriceInfo, pPacket->aPriceInfo, sizeof(TItemPriceInfo) * pPacket->byCount);
 
 		pCache->UpdateList(&table);
 	}
@@ -2186,8 +2332,7 @@ void CClientManager::MyshopPricelistUpdate(const TPacketMyshopPricelistHeader* p
 		pUpdateTable->dwOwnerID = pPacket->dwOwnerID;
 		pUpdateTable->byCount = pPacket->byCount;
 
-		const TItemPriceInfo * pInfo = reinterpret_cast<const TItemPriceInfo*>(pPacket + sizeof(TPacketMyshopPricelistHeader));
-		memcpy(pUpdateTable->aPriceInfo, pInfo, sizeof(TItemPriceInfo) * pPacket->byCount);
+		memcpy(pUpdateTable->aPriceInfo, pPacket->aPriceInfo, sizeof(TItemPriceInfo) * pPacket->byCount);
 
 		char szQuery[QUERY_MAX_LEN];
 		snprintf(szQuery, sizeof(szQuery), "SELECT item_vnum, price FROM myshop_pricelist%s WHERE owner_id=%u", GetTablePostfix(), pPacket->dwOwnerID);
@@ -2566,7 +2711,7 @@ void CClientManager::ProcessPackets(CPeer * peer)
 
 				// MYSHOP_PRICE_LIST
 			case HEADER_GD_MYSHOP_PRICELIST_UPDATE:
-				MyshopPricelistUpdate((TPacketMyshopPricelistHeader*)data);
+				MyshopPricelistUpdate((TItemPriceListTable*)data); // @fixme403 (TPacketMyshopPricelistHeader to TItemPriceListTable)
 				break;
 
 			case HEADER_GD_MYSHOP_PRICELIST_REQ:
@@ -2951,6 +3096,7 @@ void UsageLog()
 	g_dwUsageMax = g_dwUsageAvg = 0;
 }
 
+#define ENABLE_ITEMAWARD_REFRESH
 int CClientManager::Process()
 {
 	int pulses;
@@ -3046,12 +3192,12 @@ int CClientManager::Process()
 			CPrivManager::instance().Update();
 			marriage::CManager::instance().Update();
 		}
-
+#ifdef ENABLE_ITEMAWARD_REFRESH
 		if (!(thecore_heart->pulse % (thecore_heart->passes_per_sec * 5)))
 		{
 			ItemAwardManager::instance().RequestLoad();
 		}
-
+#endif
 		if (!(thecore_heart->pulse % (thecore_heart->passes_per_sec * 10)))
 		{
 			/*
@@ -3108,6 +3254,10 @@ int CClientManager::Process()
 		{
 			// 유니크 아이템을 위한 시간을 보낸다.
 			CClientManager::instance().SendTime();
+			
+			std::string st;
+			CClientManager::instance().GetPeerP2PHostNames(st);
+			sys_log(0, "Current Peer host names...\n%s", st.c_str());
 		}
 
 		if (!(thecore_heart->pulse % (thecore_heart->passes_per_sec * 3600)))	// 한시간에 한번
@@ -3666,8 +3816,10 @@ bool CClientManager::InitializeLocalization()
 				sys_err("locale[LOCALE] = UNKNOWN(%s)", locale.szValue);
 				exit(0);
 			}
-
-			CDBManager::instance().SetLocale(g_stLocale.c_str());
+			// @warme007
+			// sys_log(0,"before call SetLocale: %s",g_stLocale.c_str());
+			// CDBManager::instance().SetLocale(g_stLocale.c_str());
+			// sys_log(0,"Called SetLocale");
 		}
 		else if (strcmp(locale.szKey, "DB_NAME_COLUMN") == 0)
 		{
@@ -3700,7 +3852,7 @@ bool CClientManager::__GetAdminInfo(const char *szIP, std::vector<tAdminInfo> & 
 
 	if (pMsg->Get()->uiNumRows == 0)
 	{
-		sys_err("__GetAdminInfo() ==> DirectQuery failed(%s)", szQuery);
+		// sys_err("__GetAdminInfo() ==> DirectQuery failed(%s)", szQuery); // @warme013
 		delete pMsg;
 		return false;
 	}
@@ -3752,7 +3904,7 @@ bool CClientManager::__GetHostInfo(std::vector<std::string> & rIPVec)
 
 	if (pMsg->Get()->uiNumRows == 0)
 	{
-		sys_err("__GetHostInfo() ==> DirectQuery failed(%s)", szQuery);
+		// sys_err("__GetHostInfo() ==> DirectQuery failed(%s)", szQuery); // @warme013
 		delete pMsg;
 		return false;
 	}
@@ -4168,9 +4320,17 @@ void CClientManager::ChangeMonarchLord(CPeer * peer, DWORD dwHandle, TPacketChan
 	char szQuery[1024];
 	snprintf(szQuery, sizeof(szQuery), 
 			"SELECT a.name, NOW() FROM player%s AS a, player_index%s AS b WHERE (a.account_id=b.id AND a.id=%u AND b.empire=%u) AND "
-		    "(b.pid1=%u OR b.pid2=%u OR b.pid3=%u OR b.pid4=%u)", 
+#ifdef ENABLE_PLAYER_PER_ACCOUNT5
+		    "(b.pid1=%u OR b.pid2=%u OR b.pid3=%u OR b.pid4=%u OR b.pid5=%u)",
+#else
+		    "(b.pid1=%u OR b.pid2=%u OR b.pid3=%u OR b.pid4=%u)",
+#endif
 			GetTablePostfix(), GetTablePostfix(), info->dwPID, info->bEmpire,
+#ifdef ENABLE_PLAYER_PER_ACCOUNT5
+		   	info->dwPID, info->dwPID, info->dwPID, info->dwPID, info->dwPID);
+#else
 		   	info->dwPID, info->dwPID, info->dwPID, info->dwPID);
+#endif
 
 	SQLMsg * pMsg = CDBManager::instance().DirectQuery(szQuery, SQL_PLAYER);
 
@@ -4329,9 +4489,9 @@ void CClientManager::ChargeCash(const TRequestChargeCash* packet)
 	char szQuery[512];
 
 	if (ERequestCharge_Cash == packet->eChargeType)
-		sprintf(szQuery, "update account set `cash` = `cash` + %d where id = %d limit 1", packet->dwAmount, packet->dwAID);
+		sprintf(szQuery, "update account set cash = cash + %d where id = %d limit 1", packet->dwAmount, packet->dwAID);
 	else if(ERequestCharge_Mileage == packet->eChargeType)
-		sprintf(szQuery, "update account set `mileage` = `mileage` + %d where id = %d limit 1", packet->dwAmount, packet->dwAID);
+		sprintf(szQuery, "update account set mileage = mileage + %d where id = %d limit 1", packet->dwAmount, packet->dwAID);
 	else
 	{
 		sys_err ("Invalid request charge type (type : %d, amount : %d, aid : %d)", packet->eChargeType, packet->dwAmount, packet->dwAID);

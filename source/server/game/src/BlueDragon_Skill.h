@@ -1,4 +1,6 @@
-
+#ifndef _INC_BLUE_DRAGON_SKILL_H__INC_
+#define _INC_BLUE_DRAGON_SKILL_H__INC_
+#include "../../common/CommonDefines.h"
 struct FSkillBreath
 {
 	EJobs Set1;
@@ -47,6 +49,9 @@ struct FSkillBreath
 							case JOB_ASSASSIN:	ptr = "assa";	break;
 							case JOB_SURA:		ptr = "sura";	break;
 							case JOB_SHAMAN:	ptr = "muda";	break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+							case JOB_WOLFMAN:	ptr = "wolf";	break;
+#endif
 
 							default:
 							case JOB_MAX_NUM:	return;
@@ -70,6 +75,9 @@ struct FSkillBreath
 							case JOB_ASSASSIN:	ptr = "assa";	break;
 							case JOB_SURA:		ptr = "sura";	break;
 							case JOB_SHAMAN:	ptr = "muda";	break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+							case JOB_WOLFMAN:	ptr = "wolf";	break;
+#endif
 
 							default:
 							case JOB_MAX_NUM:	return;
@@ -225,6 +233,9 @@ struct FSkillEarthQuake
 							case JOB_ASSASSIN:	ptr = "assa";	break;
 							case JOB_SURA:		ptr = "sura";	break;
 							case JOB_SHAMAN:	ptr = "muda";	break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+							case JOB_WOLFMAN:	ptr = "wolf";	break;
+#endif
 
 							default:
 							case JOB_MAX_NUM:	return;
@@ -243,6 +254,9 @@ struct FSkillEarthQuake
 							case JOB_ASSASSIN:	ptr = "assa";	break;
 							case JOB_SURA:		ptr = "sura";	break;
 							case JOB_SHAMAN:	ptr = "muda";	break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+							case JOB_WOLFMAN:	ptr = "wolf";	break;	
+#endif
 
 							default:
 							case JOB_MAX_NUM:	return;
@@ -339,4 +353,5 @@ struct FSkillEarthQuake
 		}
 	}
 };
+#endif
 

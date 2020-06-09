@@ -119,6 +119,9 @@ namespace UI
 			void		RunMouseRightButtonDoubleClick(long x, long y);
 			void		RunMouseMiddleButtonDown(long x, long y);
 			void		RunMouseMiddleButtonUp(long x, long y);
+#ifdef ENABLE_MOUSEWHEEL_EVENT
+			bool		RunMouseWheelScroll(long x, long y , short wDelta);
+#endif
 
 			void		RunIMEUpdate();
 			void		RunIMETabEvent();
