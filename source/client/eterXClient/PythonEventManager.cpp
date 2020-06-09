@@ -137,7 +137,7 @@ int CPythonEventManager::RegisterEventSet(const char * c_szFileName)
 	return iEmptySlotIndex;
 }
 
-int CPythonEventManager::RegisterEventSetFromString(const string& strScript)
+int CPythonEventManager::RegisterEventSetFromString(const std::string& strScript)
 {
 	TEventSet* pEventSet = m_EventSetPool.Alloc();
 	if (!pEventSet)
@@ -1103,7 +1103,7 @@ bool CPythonEventManager::GetScriptEventIndex(const char * c_szName, int * pEven
 		c_szEventName = &c_szName[0];
 	}
 	
-	std::map<string,int>::iterator it = EventTypeMap.find(c_szEventName);
+	std::map<std::string,int>::iterator it = EventTypeMap.find(c_szEventName);
 	if (it == EventTypeMap.end())
 	{
 		Tracef(" !! PARSING ERROR - Strange Command : %s\n", c_szEventName);

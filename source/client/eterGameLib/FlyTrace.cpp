@@ -185,7 +185,7 @@ void CFlyTrace::Render()
 		const D3DXVECTOR3& rkNew=it2->second;
 		D3DXVECTOR3 B = rkNew - rkOld;
 		
-		float radius = max(fabs(B.x),max(fabs(B.y),fabs(B.z)))/2;
+		float radius = std::max(fabs(B.x), std::max(fabs(B.y),fabs(B.z)))/2;
 		Vector3d c(it1->second.x+B.x*0.5f,
 			it1->second.y+B.y*0.5f,
 			it1->second.z+B.z*0.5f
@@ -263,7 +263,7 @@ void CFlyTrace::Render()
 		//for(i=0;i<6;i++)
 		//	Tracenf("#%d:%f %f %f", i, v[i].p.x,v[i].p.y,v[i].p.z);
 		
-		VSVector.push_back(make_pair(-D3DXVec3Dot(&E,&pCurrentCamera->GetView()),TFlyVertexSet(v)));
+		VSVector.push_back(std::make_pair(-D3DXVec3Dot(&E,&pCurrentCamera->GetView()),TFlyVertexSet(v)));
 		//OLD: STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 4, v, sizeof(TVertex));
 		//OLD: STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, v+1, sizeof(TVertex));		
 	}

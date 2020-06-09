@@ -1120,7 +1120,7 @@ void CTerrain::_CalculateTerrainPatch(BYTE byPatchNumX, BYTE byPatchNumY)
 		fY += float(CELLSCALE);
     }
 	
-	if (wNumPlainType <= max(wNumHillType, wNumCliffType))
+	if (wNumPlainType <= std::max(wNumHillType, wNumCliffType))
 	{
 		if (wNumCliffType <= wNumHillType)
 			rkTerrainPatch.SetType(CTerrainPatch::PATCH_TYPE_HILL);

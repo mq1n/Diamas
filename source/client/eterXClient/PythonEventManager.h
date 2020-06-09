@@ -92,7 +92,7 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 		};
 
 	private:
-		std::map<string, int> EventTypeMap;
+		std::map<std::string, int> EventTypeMap;
 
 	public:
 		typedef struct SEventSet
@@ -154,7 +154,7 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 		void Destroy();
 
 		int RegisterEventSet(const char * c_szFileName);
-		int RegisterEventSetFromString(const string& strScript);
+		int RegisterEventSetFromString(const std::string& strScript);
 		void ClearEventSeti(int iIndex);
 		void __ClearEventSetp(TEventSet * pEventSet);
 

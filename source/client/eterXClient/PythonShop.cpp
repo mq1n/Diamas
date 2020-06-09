@@ -116,7 +116,7 @@ void CPythonShop::AddPrivateShopItemStock(TItemPos ItemPos, BYTE dwDisplayPos, D
 	SellingItem.pos = ItemPos;
 	SellingItem.price = dwPrice;
 	SellingItem.display_pos = dwDisplayPos;
-	m_PrivateShopItemStock.insert(make_pair(ItemPos, SellingItem));
+	m_PrivateShopItemStock.insert(std::make_pair(ItemPos, SellingItem));
 }
 void CPythonShop::DelPrivateShopItemStock(TItemPos ItemPos)
 {

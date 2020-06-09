@@ -247,7 +247,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 			D3DXVECTOR2 v2Pos;
 			unsigned int id;
 		};
-		vector<TSignalPoint>				m_SignalPointVector;
+		std::vector<TSignalPoint>				m_SignalPointVector;
 
 		PyObject*							m_poHandler;
 };

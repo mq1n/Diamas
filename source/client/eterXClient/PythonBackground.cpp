@@ -832,8 +832,8 @@ void CPythonBackground::SetXMaxTree(int iGrade)
 	//////////////////////////////////////////////////////////////////////
 
 	iGrade -= 1;
-	iGrade = max(iGrade, 0);
-	iGrade = min(iGrade, 2);
+	iGrade = std::max(iGrade, 0);
+	iGrade = std::min(iGrade, 2);
 
 	static std::string s_strTreeName[3] = {
 		"d:/ymir work/tree/christmastree1.spt",
@@ -850,7 +850,7 @@ void CPythonBackground::SetXMaxTree(int iGrade)
 
 void CPythonBackground::CreateTargetEffect(DWORD dwID, DWORD dwChrVID)
 {
-	m_kMap_dwTargetID_dwChrID.insert(make_pair(dwID, dwChrVID));
+	m_kMap_dwTargetID_dwChrID.insert(std::make_pair(dwID, dwChrVID));
 }
 
 void CPythonBackground::CreateTargetEffect(DWORD dwID, long lx, long ly)
@@ -874,7 +874,7 @@ void CPythonBackground::CreateTargetEffect(DWORD dwID, long lx, long ly)
 		SReserveTargetEffect ReserveTargetEffect;
 		ReserveTargetEffect.ilx = ilx;
 		ReserveTargetEffect.ily = ily;
-		m_kMap_dwID_kReserveTargetEffect.insert(make_pair(dwID, ReserveTargetEffect));
+		m_kMap_dwID_kReserveTargetEffect.insert(std::make_pair(dwID, ReserveTargetEffect));
 		return;
 	}
 

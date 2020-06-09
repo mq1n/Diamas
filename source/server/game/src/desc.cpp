@@ -83,9 +83,6 @@ void DESC::Initialize()
 	m_iCurrentSequence = 0;
 #endif
 
-	m_dwMatrixRows = m_dwMatrixCols = 0;
-	m_bMatrixTryCount = 0;
-
 	m_pkLoginKey = NULL;
 	m_dwLoginKey = 0;
 
@@ -951,51 +948,6 @@ void DESC::SendLoginSuccessPacket()
 	}
 
 	Packet(&p, sizeof(TPacketGCLoginSuccess));
-}
-
-//void DESC::SendServerStatePacket(int nIndex)
-//{
-//	TPacketGCStateCheck rp;
-//
-//	int iTotal; 
-//	int * paiEmpireUserCount;
-//	int iLocal;
-//
-//	DESC_MANAGER::instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
-//
-//	rp.header	= 1; 
-//	rp.key		= 0;
-//	rp.index	= nIndex;
-//
-//	if (g_bNoMoreClient) rp.state = 0;
-//	else rp.state = iTotal > g_iFullUserCount ? 3 : iTotal > g_iBusyUserCount ? 2 : 1;
-//	
-//	this->Packet(&rp, sizeof(rp));
-//	//printf("STATE_CHECK PACKET PROCESSED.\n");
-//}
-
-void DESC::SetMatrixCardRowsAndColumns(unsigned long rows, unsigned long cols)
-{
-	m_dwMatrixRows = rows;
-	m_dwMatrixCols = cols;
-}
-
-unsigned long DESC::GetMatrixRows()
-{
-	return m_dwMatrixRows;
-}
-
-unsigned long DESC::GetMatrixCols()
-{
-	return m_dwMatrixCols;
-}
-
-bool DESC::CheckMatrixTryCount()
-{
-	if (++m_bMatrixTryCount >= 3)
-		return false;
-
-	return true;
 }
 
 void DESC::SetLoginKey(DWORD dwKey)

@@ -1190,7 +1190,7 @@ namespace UI
 		if (m_pLockWindow)
 		{
 			m_pLockWindow->OnKeyDown(vkey);
-			m_KeyCaptureWindowMap.insert(make_pair(vkey, m_pLockWindow));
+			m_KeyCaptureWindowMap.insert(std::make_pair(vkey, m_pLockWindow));
 			return;
 		}
 		if (m_pActiveWindow)
@@ -1198,7 +1198,7 @@ namespace UI
 		{
 			if (m_pActiveWindow->OnKeyDown(vkey))
 			{
-				m_KeyCaptureWindowMap.insert(make_pair(vkey, m_pActiveWindow));
+				m_KeyCaptureWindowMap.insert(std::make_pair(vkey, m_pActiveWindow));
 				return;
 			}
 		}

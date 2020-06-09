@@ -55,10 +55,10 @@ void CGridSlotWindow::OnRenderPickingSlot()
 		for (std::list<TSlot*>::iterator itor = SlotList.begin(); itor != SlotList.end(); ++itor)
 		{
 			TSlot * pSlot = *itor;
-			Rect.left = min(Rect.left, m_rect.left + pSlot->ixPosition);
-			Rect.top = min(Rect.top, m_rect.top + pSlot->iyPosition);
-			Rect.right = max(Rect.right, m_rect.left + pSlot->ixPosition + pSlot->byxPlacedItemSize*ITEM_WIDTH);
-			Rect.bottom = max(Rect.bottom, m_rect.top + pSlot->iyPosition + pSlot->byxPlacedItemSize*ITEM_HEIGHT);
+			Rect.left = std::min(Rect.left, m_rect.left + pSlot->ixPosition);
+			Rect.top = std::min(Rect.top, m_rect.top + pSlot->iyPosition);
+			Rect.right = std::max(Rect.right, m_rect.left + pSlot->ixPosition + pSlot->byxPlacedItemSize*ITEM_WIDTH);
+			Rect.bottom = std::max(Rect.bottom, m_rect.top + pSlot->iyPosition + pSlot->byxPlacedItemSize*ITEM_HEIGHT);
 		}
 
 		CPythonGraphic::Instance().RenderBar2d(Rect.left, Rect.top, Rect.right, Rect.bottom);

@@ -84,7 +84,7 @@ CPythonChat::SChatLine::~SChatLine()
 
 int CPythonChat::CreateChatSet(DWORD dwID)
 {
-	m_ChatSetMap.insert(make_pair(dwID, TChatSet()));
+	m_ChatSetMap.insert(std::make_pair(dwID, TChatSet()));
 	return dwID;
 }
 
@@ -146,7 +146,7 @@ void CPythonChat::UpdateEditMode(DWORD dwID)
 	if (!pChatSet)
 		return;
 
-	const int c_iAlphaLine = max(0, GetVisibleLineCount(dwID) - GetEditableLineCount(dwID) + 2);
+	const int c_iAlphaLine = std::max(0, GetVisibleLineCount(dwID) - GetEditableLineCount(dwID) + 2);
 
 	int iLineIndex = 0;
 	float fAlpha = 0.0f;
@@ -322,8 +322,8 @@ void CPythonChat::SetEndPos(DWORD dwID, float fPos)
 	if (!pChatSet)
 		return;
 
-	fPos = max(0.0f, fPos);
-	fPos = min(1.0f, fPos);
+	fPos = std::max(0.0f, fPos);
+	fPos = std::min(1.0f, fPos);
 	if (pChatSet->m_fEndPos != fPos)
 	{
 		pChatSet->m_fEndPos = fPos;
@@ -414,13 +414,13 @@ void CPythonChat::ArrangeShowingChat(DWORD dwID)
 	}
 
 	int icurLineCount = TempChatLineDeque.size();
-	int iVisibleLineCount = min(icurLineCount, (pChatSet->m_iHeight + pChatSet->m_iStep) / pChatSet->m_iStep);
+	int iVisibleLineCount = std::min(icurLineCount, (pChatSet->m_iHeight + pChatSet->m_iStep) / pChatSet->m_iStep);
 	int iEndLine = iVisibleLineCount + int(float(icurLineCount - iVisibleLineCount - 1) * pChatSet->m_fEndPos);
 
 	/////
 
 	int iHeight = 12;
-	for (int i = min(icurLineCount-1, iEndLine); i >= 0; --i)
+	for (int i = std::min(icurLineCount-1, iEndLine); i >= 0; --i)
 	{
 		if (!pChatSet->CheckMode(TempChatLineDeque[i]->iType))
 			continue;

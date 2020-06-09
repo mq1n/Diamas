@@ -167,7 +167,7 @@ bool CInstanceBase::NEW_GetFrontInstance(CInstanceBase ** ppoutTargetInstance, f
 			if (NEW_GetDistanceFromDestInstance(*pkInstEach) > fDistance)
 				continue;
 
-			float fEachInstDistance=min(NEW_GetDistanceFromDestInstance(*pkInstEach), HALF_FAN_ROT_MIN_DISTANCE);
+			float fEachInstDistance= std::min(NEW_GetDistanceFromDestInstance(*pkInstEach), HALF_FAN_ROT_MIN_DISTANCE);
 			float fEachInstDirRot=NEW_GetRotationFromDestInstance(*pkInstEach);
 
 			float fHalfFanRot=(HALF_FAN_ROT_MAX-HALF_FAN_ROT_MIN)-RPM*fEachInstDistance+HALF_FAN_ROT_MIN;
@@ -216,7 +216,7 @@ bool CInstanceBase::NEW_GetInstanceVectorInFanRange(float fSkillDistance, CInsta
 			// 2004.07.21.levites - 비파부 다중 타겟 지원
 			if (m_GraphicThingInstance.IsClickableDistanceDestInstance(pkInstEach->m_GraphicThingInstance, fSkillDistance))
 			{
-				float fEachInstDistance=min(NEW_GetDistanceFromDestInstance(*pkInstEach), HALF_FAN_ROT_MIN_DISTANCE);
+				float fEachInstDistance= std::min(NEW_GetDistanceFromDestInstance(*pkInstEach), HALF_FAN_ROT_MIN_DISTANCE);
 				float fEachInstDirRot=NEW_GetRotationFromDestInstance(*pkInstEach);
 
 				float fHalfFanRot=(HALF_FAN_ROT_MAX-HALF_FAN_ROT_MIN)-RPM*fEachInstDistance+HALF_FAN_ROT_MIN;
@@ -264,7 +264,7 @@ bool CInstanceBase::NEW_GetInstanceVectorInCircleRange(float fSkillDistance, std
 			if (m_GraphicThingInstance.IsClickableDistanceDestInstance(pkInstEach->m_GraphicThingInstance, fSkillDistance))
 			{
 				float fEachInstDistance=NEW_GetDistanceFromDestInstance(*pkInstEach);
-				kMap_pkInstNear.insert(make_pair(fEachInstDistance, pkInstEach));
+				kMap_pkInstNear.insert(std::make_pair(fEachInstDistance, pkInstEach));
 			}
 		}
 	}

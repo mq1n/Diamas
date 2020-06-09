@@ -192,12 +192,12 @@ void CDungeonBlock::GetBoundBox(D3DXVECTOR3 * pv3Min, D3DXVECTOR3 * pv3Max)
 		D3DXVECTOR3 v3Max;
 		pInstance->GetBoundBox(&v3Min, &v3Max);
 
-		pv3Min->x = min(v3Min.x, pv3Min->x);
-		pv3Min->y = min(v3Min.x, pv3Min->y);
-		pv3Min->z = min(v3Min.x, pv3Min->z);
-		pv3Max->x = max(v3Max.x, pv3Max->x);
-		pv3Max->y = max(v3Max.x, pv3Max->y);
-		pv3Max->z = max(v3Max.x, pv3Max->z);
+		pv3Min->x = std::min(v3Min.x, pv3Min->x);
+		pv3Min->y = std::min(v3Min.x, pv3Min->y);
+		pv3Min->z = std::min(v3Min.x, pv3Min->z);
+		pv3Max->x = std::max(v3Max.x, pv3Max->x);
+		pv3Max->y = std::max(v3Max.x, pv3Max->y);
+		pv3Max->z = std::max(v3Max.x, pv3Max->z);
 	}
 }
 

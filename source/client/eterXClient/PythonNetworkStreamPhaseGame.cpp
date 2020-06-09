@@ -2243,7 +2243,7 @@ bool CPythonNetworkStream::RecvScriptPacket()
 
 	ScriptPacket.size -= sizeof(TPacketGCScript);
 	
-	static string str;
+	static std::string str;
 	str = "";
 	str.resize(ScriptPacket.size+1);
 

@@ -103,10 +103,10 @@ void CMapOutdoor::AssignTerrainPtr()
 	OnPreAssignTerrainPtr();
 
 	short sReferenceCoordMinX, sReferenceCoordMaxX, sReferenceCoordMinY, sReferenceCoordMaxY;
-	sReferenceCoordMinX = max(m_CurCoordinate.m_sTerrainCoordX - LOAD_SIZE_WIDTH, 0);
-	sReferenceCoordMaxX = min(m_CurCoordinate.m_sTerrainCoordX + LOAD_SIZE_WIDTH, m_sTerrainCountX - 1);
-	sReferenceCoordMinY = max(m_CurCoordinate.m_sTerrainCoordY - LOAD_SIZE_WIDTH, 0);
-	sReferenceCoordMaxY = min(m_CurCoordinate.m_sTerrainCoordY + LOAD_SIZE_WIDTH, m_sTerrainCountY - 1);
+	sReferenceCoordMinX = std::max(m_CurCoordinate.m_sTerrainCoordX - LOAD_SIZE_WIDTH, 0);
+	sReferenceCoordMaxX = std::min(m_CurCoordinate.m_sTerrainCoordX + LOAD_SIZE_WIDTH, m_sTerrainCountX - 1);
+	sReferenceCoordMinY = std::max(m_CurCoordinate.m_sTerrainCoordY - LOAD_SIZE_WIDTH, 0);
+	sReferenceCoordMaxY = std::min(m_CurCoordinate.m_sTerrainCoordY + LOAD_SIZE_WIDTH, m_sTerrainCountY - 1);
 
 	DWORD i;
 	for (i = 0; i < AROUND_AREA_NUM; ++i)

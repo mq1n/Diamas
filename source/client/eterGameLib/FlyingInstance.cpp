@@ -361,7 +361,7 @@ bool CFlyingInstance::Update()
 	m_v3Velocity.z+=m_pData->m_fGravity * CTimer::Instance().GetElapsedSecond();
 	D3DXVECTOR3 v3Movement = m_v3Velocity * CTimer::Instance().GetElapsedSecond();
 	float _fMoveDistance = D3DXVec3Length(&v3Movement);
-	float fCollisionSphereRadius = max(_fMoveDistance*2, m_pData->m_fCollisionSphereRadius);
+	float fCollisionSphereRadius = std::max(_fMoveDistance*2, m_pData->m_fCollisionSphereRadius);
 	m_fRemainRange -= _fMoveDistance;
 	m_v3Position += v3Movement;
 

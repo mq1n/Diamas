@@ -1312,8 +1312,8 @@ BOOL CSlotWindow::GetPickedSlotPointer(TSlot ** ppSlot)
 		// NOTE : Item이 Hide 되어있을 경우를 위한..
 		if (rSlot.isItem)
 		{
-			ixCellSize = max(rSlot.ixCellSize, int(rSlot.byxPlacedItemSize * ITEM_WIDTH));
-			iyCellSize = max(rSlot.iyCellSize, int(rSlot.byyPlacedItemSize * ITEM_HEIGHT));
+			ixCellSize = std::max(rSlot.ixCellSize, int(rSlot.byxPlacedItemSize * ITEM_WIDTH));
+			iyCellSize = std::max(rSlot.iyCellSize, int(rSlot.byyPlacedItemSize * ITEM_HEIGHT));
 		}
 
 		if (ixLocal >= rSlot.ixPosition)

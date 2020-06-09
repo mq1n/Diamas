@@ -570,7 +570,7 @@ PyObject * guildSetSkillIndex(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetInteger(poArgs, 1, &iSkillIndex))
 		return Py_BuildException();
 
-	g_GuildSkillSlotToIndexMap.insert(make_pair(iSlotIndex, iSkillIndex));
+	g_GuildSkillSlotToIndexMap.insert(std::make_pair(iSlotIndex, iSkillIndex));
 
 	return Py_BuildNone();
 }

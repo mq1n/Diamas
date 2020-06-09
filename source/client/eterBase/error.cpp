@@ -1,9 +1,8 @@
 #include "StdAfx.h"
-
 #include <stdio.h>
 #include <time.h>
 #include <winsock.h>
-#include <imagehlp.h>
+#include <DbgHelp.h>
 
 FILE * fException;
 

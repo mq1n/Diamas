@@ -365,9 +365,9 @@ void CPythonItem::CreateItem(DWORD dwVirtualID, DWORD dwVirtualNumber, float x, 
 
 		std::pair<float,int> f[3] = 
 			{
-				make_pair(vMax.x - vMin.x,0), 
-				make_pair(vMax.y - vMin.y,1), 
-				make_pair(vMax.z - vMin.z,2)
+				std::make_pair(vMax.x - vMin.x,0),
+				std::make_pair(vMax.y - vMin.y,1),
+				std::make_pair(vMax.z - vMin.z,2)
 			};
 
 		std::sort(f,f+3);

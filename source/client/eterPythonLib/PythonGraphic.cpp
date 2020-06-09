@@ -299,7 +299,7 @@ void CPythonGraphic::RenderCoolTimeBox(float fxCenter, float fyCenter, float fRa
 	if (fTime >= 1.0f)
 		return;
 
-	fTime = max(0.0f, fTime);
+	fTime = std::max(0.0f, fTime);
 
 	static D3DXCOLOR color = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f);
 	static WORD s_wBoxIndicies[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };

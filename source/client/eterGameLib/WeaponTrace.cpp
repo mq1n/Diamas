@@ -145,7 +145,7 @@ bool CWeaponTrace::BuildVertex()
   */
 	std::vector<TPDTVertex> m_ShortVertexVector, m_LongVertexVector;
 	
-	float length = min(m_fLifeTime, m_LongTimePointList.back().first);
+	float length = std::min(m_fLifeTime, m_LongTimePointList.back().first);
 	
 	int n = m_LongTimePointList.size()-1;
 	assert(n<max_size-1);
@@ -226,7 +226,7 @@ bool CWeaponTrace::BuildVertex()
 			
 			TPDTVertex v;
 			//v.diffuse = D3DXCOLOR(0.3f,0.8f,1.0f, (loop)?max(1.0f-(t/m_fLifeTime),0.0f)/2:0.0f );
-			float ttt = min(max((t+Input[0].first)/m_fLifeTime,0.0f),1.0f);
+			float ttt = std::min(std::max((t+Input[0].first)/m_fLifeTime,0.0f),1.0f);
 			v.diffuse = D3DXCOLOR(0.3f, 0.8f, 1.0f,
 				(loop) ? std::min(std::max<float>((1.0f - ttt) * (1.0f - ttt) / 2.5 - 0.1f, 0.0f), 1.0f) : 0.0f);
 			//v.diffuse = D3DXCOLOR(0.0f,0.0f,0.0f, (loop)?min(max((1.0f-ttt)*(1.0f-ttt)-0.1f,0.0f),1.0f):0.0f );

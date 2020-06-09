@@ -14,7 +14,7 @@ int CHAR_STAGE_VIEW_BOUND = 200*100;
 
 struct FCharacterManagerCharacterInstanceUpdate
 {
-	inline void operator () (const pair<DWORD,CInstanceBase *>& cr_Pair)
+	inline void operator () (const std::pair<DWORD,CInstanceBase *>& cr_Pair)
 	{
 		cr_Pair.second->Update();
 	}
@@ -354,7 +354,7 @@ void CPythonCharacterManager::UpdateDeleting()
 
 struct FCharacterManagerCharacterInstanceDeform
 {
-	inline void operator () (const pair<DWORD,CInstanceBase *>& cr_Pair)
+	inline void operator () (const std::pair<DWORD,CInstanceBase *>& cr_Pair)
 	{
 		cr_Pair.second->Deform();
 		//pInstance->Update();
@@ -430,7 +430,7 @@ struct LessCharacterInstancePtrRenderOrder
 
 struct FCharacterManagerCharacterInstanceRender
 {
-	inline void operator () (const pair<DWORD,CInstanceBase *>& cr_Pair)
+	inline void operator () (const std::pair<DWORD,CInstanceBase *>& cr_Pair)
 	{
 		cr_Pair.second->Render();
 		cr_Pair.second->RenderTrace();
@@ -516,7 +516,7 @@ void CPythonCharacterManager::RenderShadowMainInstance()
 
 struct FCharacterManagerCharacterInstanceRenderToShadowMap
 {
-	inline void operator () (const pair<DWORD,CInstanceBase *>& cr_Pair)
+	inline void operator () (const std::pair<DWORD,CInstanceBase *>& cr_Pair)
 	{
 		cr_Pair.second->RenderToShadowMap();
 	}
@@ -529,7 +529,7 @@ void CPythonCharacterManager::RenderShadowAllInstances()
 
 struct FCharacterManagerCharacterInstanceRenderCollision
 {
-	inline void operator () (const pair<DWORD,CInstanceBase *>& cr_Pair)
+	inline void operator () (const std::pair<DWORD,CInstanceBase *>& cr_Pair)
 	{
 		cr_Pair.second->RenderCollision();
 	}

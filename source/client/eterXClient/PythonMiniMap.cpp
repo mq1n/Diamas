@@ -1367,7 +1367,7 @@ void CPythonMiniMap::AddSignalPoint(float fX, float fY)
 
 void CPythonMiniMap::ClearAllSignalPoint()
 {
-	vector<TSignalPoint>::iterator it;
+	std::vector<TSignalPoint>::iterator it;
 	for(it = m_SignalPointVector.begin();it!=m_SignalPointVector.end();++it)
 	{
 		RemoveWayPoint(it->id);

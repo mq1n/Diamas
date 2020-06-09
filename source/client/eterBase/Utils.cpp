@@ -250,7 +250,7 @@ bool GetLocalFileName(const char * c_szGlobalPath, const char * c_szFullPathFile
 	if (strGlobalPath.length() >= strFullPathFileName.length())
 		return false;
 
-	DWORD length = min(strGlobalPath.length(), strFullPathFileName.length());
+	DWORD length = std::min(strGlobalPath.length(), strFullPathFileName.length());
 	for (DWORD dwPos = 0; dwPos < length; ++dwPos)
 	{
 		if (strGlobalPath[dwPos] != strFullPathFileName[dwPos])

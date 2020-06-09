@@ -183,7 +183,7 @@ CRaceData* CRaceManager::__LoadRaceData(DWORD dwRaceIndex)
 
 		stFullPathName+="/";
 
-		string stMSMFileName=stFullPathName;
+		std::string stMSMFileName=stFullPathName;
 		if (stFullPathName[0] == '#') // @fixme021 #season reads shape.msm only
 		{
 			stMSMFileName += "shape.msm";

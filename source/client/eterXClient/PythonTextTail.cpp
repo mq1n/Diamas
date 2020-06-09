@@ -718,7 +718,7 @@ void CPythonTextTail::SetItemTextTailOwner(DWORD dwVID, const char * c_szName)
 		}
 
 		std::string strName = c_szName;
-		static const string & strOwnership = ApplicationStringTable_GetString(IDS_POSSESSIVE_MORPHENE) == "" ? "'s" : ApplicationStringTable_GetString(IDS_POSSESSIVE_MORPHENE);
+		static const std::string & strOwnership = ApplicationStringTable_GetString(IDS_POSSESSIVE_MORPHENE) == "" ? "'s" : ApplicationStringTable_GetString(IDS_POSSESSIVE_MORPHENE);
 		strName += strOwnership;
 
 

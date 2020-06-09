@@ -98,9 +98,9 @@ bool CPythonSkill::RegisterSkillTable(const char * c_szFileName)
 	textFileLoader.Bind(kFile.GetSize(), kFile.GetData());
 
 	// OVERWRITE_SKILLPROTO_POLY
-	string src_poly_rand;
-	string src_poly_atk;
-	string src_poly_mwep;
+	std::string src_poly_rand;
+	std::string src_poly_atk;
+	std::string src_poly_mwep;
 	// END_OF_OVERWRITE_SKILLPROTO_POLY
 
 	CTokenVector TokenVector;
@@ -311,7 +311,7 @@ bool CPythonSkill::RegisterSkillDesc(const char * c_szFileName)
 			continue;
 		}
 
-		m_SkillDataMap.insert(make_pair(iSkillIndex, TSkillData()));
+		m_SkillDataMap.insert(std::make_pair(iSkillIndex, TSkillData()));
 		TSkillData & rSkillData = m_SkillDataMap[iSkillIndex];
 
 		// Vnum

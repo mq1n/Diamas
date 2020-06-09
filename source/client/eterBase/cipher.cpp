@@ -227,7 +227,7 @@ bool Cipher::SetUp(bool polarity)
 
 	key_0.Assign(shared, key_length_0);
 	offset = key_length_0;
-	offset = min(key_length_0, shared.size() - key_length_1);
+	offset = std::min(key_length_0, shared.size() - key_length_1);
 	key_1.Assign(shared.BytePtr() + offset, key_length_1);
 
 	offset = shared.size() - iv_length_0;

@@ -138,7 +138,7 @@ void CInstanceBase::ProcessDamage()
 		//return; 숫자도 표시.
 	}
 
-	string strDamageType;
+	std::string strDamageType;
 	DWORD rdwCRCEft = 0;
 	/*
 	if ( (flag & DAMAGE_POISON) )
@@ -173,7 +173,7 @@ void CInstanceBase::ProcessDamage()
 	
 	DWORD index = 0;
 	DWORD num = 0;
-	vector<string> textures;
+	std::vector<std::string> textures;
 	while(damage>0)
 	{
 		if(index > 7)
@@ -1132,7 +1132,7 @@ bool CInstanceBase::RegisterEffect(UINT eEftType, const char* c_szEftAttachBone,
 
 void CInstanceBase::RegisterTitleName(int iIndex, const char * c_szTitleName)
 {
-	g_TitleNameMap.insert(make_pair(iIndex, c_szTitleName));
+	g_TitleNameMap.insert(std::make_pair(iIndex, c_szTitleName));
 }
 
 D3DXCOLOR __RGBToD3DXColoru(UINT r, UINT g, UINT b)

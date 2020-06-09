@@ -47,7 +47,7 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 	int icurEmissionCount = GetEmissionCount();
 	int iMaxEmissionCount = int(m_pEmitterProperty->GetMaxEmissionCount());
 	int iNextEmissionCount = int(icurEmissionCount + iCreatingCount);
-	iCreatingCount -= max(0, iNextEmissionCount - iMaxEmissionCount);
+	iCreatingCount -= std::max(0, iNextEmissionCount - iMaxEmissionCount);
 
 	float fLifeTime = 0.0f;
 	float fEmittingSize = 0.0f;

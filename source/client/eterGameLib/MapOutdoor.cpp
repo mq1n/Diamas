@@ -1409,7 +1409,7 @@ void CMapOutdoor::SpecialEffect_Create(DWORD dwID, float x, float y, float z, co
 	DWORD dwEffectID = rkEffMgr.CreateEffect(c_szEffName,
 											 D3DXVECTOR3(x, y, z),
 											 D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	m_kMap_dwID_iEffectID.insert(make_pair(dwID, dwEffectID));
+	m_kMap_dwID_iEffectID.insert(std::make_pair(dwID, dwEffectID));
 }
 
 void CMapOutdoor::SpecialEffect_Delete(DWORD dwID)
