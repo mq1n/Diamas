@@ -9,7 +9,6 @@
 #include "guild_manager.h"
 #include "party.h"
 #include "messenger_manager.h"
-#include "empire_text_convert.h"
 #include "unique_item.h"
 #include "xmas_event.h"
 #include "affect.h"
@@ -80,15 +79,6 @@ int CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
 		if(p2->bType == 0x0F) {
 			// 시스템 메세지 귓속말은 bType의 상위비트까지 모두 사용함.
 			p2->bType = WHISPER_TYPE_SYSTEM;
-		} else {
-			if (!pkChr->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_LANGUAGE))
-				if (bToEmpire >= 1 && bToEmpire <= 3 && pkChr->GetEmpire() != bToEmpire)
-				{
-					ConvertEmpireText(bToEmpire,
-							buf + sizeof(TPacketGCWhisper), 
-							p2->wSize - sizeof(TPacketGCWhisper),
-							10+2*pkChr->GetSkillPower(SKILL_LANGUAGE1 + bToEmpire - 1));
-				}
 		}
 
 		pkChr->GetDesc()->Packet(buf, p->lSize);

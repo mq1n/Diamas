@@ -593,8 +593,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		// DELETEME
 		//void __SendWarpPacket();
 
-		void __ConvertEmpireText(DWORD dwEmpireID, char* szText);
-
 		void __RecvCharacterAppendPacket(SNetworkActorData * pkNetActorData);
 		void __RecvCharacterUpdatePacket(SNetworkUpdateActorData * pkNetUpdateActorData);
 

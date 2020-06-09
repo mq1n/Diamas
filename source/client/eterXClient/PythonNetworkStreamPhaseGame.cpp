@@ -1236,43 +1236,6 @@ bool CPythonNetworkStream::ParseEmoticon(const char * pChatMsg, DWORD * pdwEmoti
 // Emoticon
 //////////////////////////////////////////////////////////////////////////
 
-void CPythonNetworkStream::__ConvertEmpireText(DWORD dwEmpireID, char* szText)
-{
-	if (dwEmpireID<1 || dwEmpireID>3)
-		return;
-
-	UINT uHanPos;
-
-	STextConvertTable& rkTextConvTable=m_aTextConvTable[dwEmpireID-1];
-
-	BYTE* pbText=(BYTE*)szText;
-	while (*pbText)
-	{
-		if (*pbText & 0x80)
-		{
-			if (pbText[0]>=0xb0 && pbText[0]<=0xc8 && pbText[1]>=0xa1 && pbText[1]<=0xfe)
-			{
-				uHanPos=(pbText[0]-0xb0)*(0xfe-0xa1+1)+(pbText[1]-0xa1);
-				pbText[0]=rkTextConvTable.aacHan[uHanPos][0];
-				pbText[1]=rkTextConvTable.aacHan[uHanPos][1];
-			}
-			pbText+=2;
-		}
-		else
-		{
-			if (*pbText>='a' && *pbText<='z')
-			{
-				*pbText=rkTextConvTable.acLower[*pbText-'a'];
-			}
-			else if (*pbText>='A' && *pbText<='Z')
-			{
-				*pbText=rkTextConvTable.acUpper[*pbText-'A'];
-			}
-			pbText++;
-		}
-	}
-}
-
 bool CPythonNetworkStream::RecvChatPacket()
 {
 	TPacketGCChat kChat;
@@ -1339,14 +1302,6 @@ bool CPythonNetworkStream::RecvChatPacket()
 				}
 				else
 				{
-					if (gs_bEmpireLanuageEnable)
-					{
-						CInstanceBase* pkInstMain=rkChrMgr.GetMainInstancePtr();
-						if (pkInstMain)
-							if (!pkInstMain->IsSameEmpire(*pkInstChatter))
-								__ConvertEmpireText(pkInstChatter->GetEmpireID(), p);
-					}
-
 					if (m_isEnableChatInsultFilter)
 					{
 						if (false == pkInstChatter->IsNPC() && false == pkInstChatter->IsEnemy())

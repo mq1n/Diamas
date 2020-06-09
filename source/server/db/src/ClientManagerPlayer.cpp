@@ -1007,10 +1007,7 @@ void CClientManager::__QUERY_PLAYER_DELETE(CPeer* peer, DWORD dwHandle, TPlayerD
 
 	TAccountTable & r = ld->GetAccountRef();
 
-	// block for japan 
-	if (g_stLocale != "sjis")
 	{
-		if (!IsChinaEventServer())
 		{
 			if (strlen(r.social_id) < 7 || strncmp(packet->private_code, r.social_id + strlen(r.social_id) - 7, 7))
 			{
@@ -1076,7 +1073,7 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 		char szName[64];
 		strlcpy(szName, row[2], sizeof(szName));
 
-		if (deletedLevelLimit >= m_iPlayerDeleteLevelLimit && !IsChinaEventServer())
+		if (deletedLevelLimit >= m_iPlayerDeleteLevelLimit)
 		{
 			sys_log(0, "PLAYER_DELETE FAILED LEVEL %u >= DELETE LIMIT %d", deletedLevelLimit, m_iPlayerDeleteLevelLimit);
 			peer->EncodeHeader(HEADER_DG_PLAYER_DELETE_FAILED, pi->dwHandle, 1);

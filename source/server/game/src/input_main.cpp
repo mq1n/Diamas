@@ -28,7 +28,6 @@
 #include "guild_manager.h"
 #include "log.h"
 #include "banword.h"
-#include "empire_text_convert.h"
 #include "unique_item.h"
 #include "building.h"
 #include "locale_service.h"
@@ -426,24 +425,6 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 			CBanwordManager::instance().ConvertString(buf, buflen);
 
-			if (g_bEmpireWhisper)
-				if (!ch->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_LANGUAGE))
-					if (!(pkChr && pkChr->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_LANGUAGE)))
-						if (bOpponentEmpire != ch->GetEmpire() && ch->GetEmpire() && bOpponentEmpire // 서로 제국이 다르면서
-								&& ch->GetGMLevel() == GM_PLAYER && gm_get_level(pinfo->szNameTo) == GM_PLAYER) // 둘다 일반 플레이어이면
-							// 이름 밖에 모르니 gm_get_level 함수를 사용
-						{
-							if (!pkChr)
-							{
-								// 다른 서버에 있으니 제국 표시만 한다. bType의 상위 4비트를 Empire번호로 사용한다.
-								bType = ch->GetEmpire() << 4;
-							}
-							else
-							{
-								ConvertEmpireText(ch->GetEmpire(), buf, buflen, 10 + 2 * pkChr->GetSkillPower(SKILL_LANGUAGE1 + ch->GetEmpire() - 1)/*변환확률*/);
-							}
-						}
-
 			int processReturn = ProcessTextTag(ch, buf, buflen);
 			if (0!=processReturn)
 			{
@@ -547,7 +528,6 @@ struct FEmpireChatPacket
 	packet_chat& p;
 	const char* orig_msg;
 	int orig_len;
-	char converted_msg[CHAT_MAX_LEN+1];
 
 	BYTE bEmpire;
 	int iMapIndex;
@@ -556,7 +536,6 @@ struct FEmpireChatPacket
 	FEmpireChatPacket(packet_chat& p, const char* chat_msg, int len, BYTE bEmpire, int iMapIndex, int iNameLen)
 		: p(p), orig_msg(chat_msg), orig_len(len), bEmpire(bEmpire), iMapIndex(iMapIndex), namelen(iNameLen)
 	{
-		memset( converted_msg, 0, sizeof(converted_msg) );
 	}
 
 	void operator () (LPDESC d)
@@ -568,89 +547,7 @@ struct FEmpireChatPacket
 			return;
 
 		d->BufferedPacket(&p, sizeof(packet_chat));
-
-		if (d->GetEmpire() == bEmpire ||
-			bEmpire == 0 ||
-			d->GetCharacter()->GetGMLevel() > GM_PLAYER ||
-			d->GetCharacter()->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_LANGUAGE))
-		{
-			d->Packet(orig_msg, orig_len);
-		}
-		else
-		{
-			// 사람마다 스킬레벨이 다르니 매번 해야합니다
-			size_t len = strlcpy(converted_msg, orig_msg, sizeof(converted_msg));
-
-			if (len >= sizeof(converted_msg))
-				len = sizeof(converted_msg) - 1;
-
-			ConvertEmpireText(bEmpire, converted_msg + namelen, len - namelen, 10 + 2 * d->GetCharacter()->GetSkillPower(SKILL_LANGUAGE1 + bEmpire - 1));
-			d->Packet(converted_msg, orig_len);
-		}
-	}
-};
-
-struct FYmirChatPacket
-{
-	packet_chat& packet;
-	const char* m_szChat;
-	size_t m_lenChat;
-	const char* m_szName;
-	
-	int m_iMapIndex;
-	BYTE m_bEmpire;
-	bool m_ring;
-
-	char m_orig_msg[CHAT_MAX_LEN+1];
-	int m_len_orig_msg;
-	char m_conv_msg[CHAT_MAX_LEN+1];
-	int m_len_conv_msg;
-
-	FYmirChatPacket(packet_chat& p, const char* chat, size_t len_chat, const char* name, size_t len_name, int iMapIndex, BYTE empire, bool ring)
-		: packet(p),
-		m_szChat(chat), m_lenChat(len_chat),
-		m_szName(name), 
-		m_iMapIndex(iMapIndex), m_bEmpire(empire),
-		m_ring(ring)
-	{
-		m_len_orig_msg = snprintf(m_orig_msg, sizeof(m_orig_msg), "%s : %s", m_szName, m_szChat) + 1; // 널 문자 포함
-
-		if (m_len_orig_msg < 0 || m_len_orig_msg >= (int) sizeof(m_orig_msg))
-			m_len_orig_msg = sizeof(m_orig_msg) - 1;
-
-		m_len_conv_msg = snprintf(m_conv_msg, sizeof(m_conv_msg), "??? : %s", m_szChat) + 1; // 널 문자 미포함
-
-		if (m_len_conv_msg < 0 || m_len_conv_msg >= (int) sizeof(m_conv_msg))
-			m_len_conv_msg = sizeof(m_conv_msg) - 1;
-
-		ConvertEmpireText(m_bEmpire, m_conv_msg + 6, m_len_conv_msg - 6, 10); // 6은 "??? : "의 길이
-	}
-
-	void operator() (LPDESC d)
-	{
-		if (!d->GetCharacter())
-			return;
-
-		if (d->GetCharacter()->GetMapIndex() != m_iMapIndex)
-			return;
-
-		if (m_ring ||
-			d->GetEmpire() == m_bEmpire ||
-			d->GetCharacter()->GetGMLevel() > GM_PLAYER ||
-			d->GetCharacter()->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_LANGUAGE))
-		{
-			packet.size = m_len_orig_msg + sizeof(TPacketGCChat);
-
-			d->BufferedPacket(&packet, sizeof(packet_chat));
-			d->Packet(m_orig_msg, m_len_orig_msg);
-		}
-		else
-		{
-			packet.size = m_len_conv_msg + sizeof(TPacketGCChat);
-
-			d->BufferedPacket(&packet, sizeof(packet_chat));
-			d->Packet(m_conv_msg, m_len_conv_msg);
-		}
+		d->Packet(orig_msg, orig_len);
 	}
 };
 
@@ -788,19 +685,7 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 			{
 				const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
 
-				if (false)
-				{
-					std::for_each(c_ref_set.begin(), c_ref_set.end(), 
-							FYmirChatPacket(pack_chat,
-								buf,
-								strlen(buf),
-								ch->GetName(),
-								strlen(ch->GetName()),
-								ch->GetMapIndex(),
-								ch->GetEmpire(),
-								ch->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_LANGUAGE)));
-				}
-				else
+
 				{
 					std::for_each(c_ref_set.begin(), c_ref_set.end(), 
 							FEmpireChatPacket(pack_chat,

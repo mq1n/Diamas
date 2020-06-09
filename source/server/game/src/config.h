@@ -26,7 +26,6 @@ extern int test_server;
 extern bool	guild_mark_server;
 extern BYTE guild_mark_min_level;
 extern bool	distribution_test_server;
-extern bool	china_event_server;
 
 extern bool	g_bNoMoreClient;
 extern bool	g_bNoRegen;
@@ -44,7 +43,6 @@ extern bool	g_bEnableBootaryCheck;
 extern bool	g_bGMHostCheck;
 extern bool	g_bGuildInviteLimit;
 extern bool	g_bGuildInfiniteMembers;
-extern bool	g_bChinaIntoxicationCheck;
 extern bool	g_bEnableSpeedHackCrash;
 extern int g_iStatusPointGetLevelLimit;
 extern int g_iStatusPointSetMaxValue;

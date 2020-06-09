@@ -377,8 +377,6 @@ void CHARACTER::Initialize()
 
 	m_deposit_pulse = 0;
 
-	SET_OVER_TIME(this, OT_NONE);
-
 	m_strNewName = "";
 
 	m_known_guild.clear();
@@ -3128,24 +3126,6 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 				DWORD exp = GetExp();
 				DWORD next_exp = GetNextExp();
 
-				if (g_bChinaIntoxicationCheck)
-				{
-					if (IsOverTime(OT_NONE))
-					{
-						dev_log(LOG_DEB0, "<EXP_LOG> %s = NONE", GetName());
-					}
-					else if (IsOverTime(OT_3HOUR))
-					{
-						amount = (amount / 2);
-						dev_log(LOG_DEB0, "<EXP_LOG> %s = 3HOUR", GetName());
-					}
-					else if (IsOverTime(OT_5HOUR))
-					{
-						amount = 0;
-						dev_log(LOG_DEB0, "<EXP_LOG> %s = 5HOUR", GetName());
-					}
-				}
-
 				if ((amount < 0) && (exp < (DWORD)(-amount)))
 				{
 					sys_log(1, "%s AMOUNT < 0 %d, CUR EXP: %d", GetName(), -amount, exp);
@@ -3399,24 +3379,6 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 					sys_err("[OVERFLOW_GOLD] OriGold %d AddedGold %d id %u Name %s ", GetGold(), amount, GetPlayerID(), GetName());
 					LogManager::instance().CharLog(this, GetGold() + amount, "OVERFLOW_GOLD", "");
 					return;
-				}
-
-				if (g_bChinaIntoxicationCheck && amount > 0)
-				{
-					if (IsOverTime(OT_NONE))
-					{
-						dev_log(LOG_DEB0, "<GOLD_LOG> %s = NONE", GetName());
-					}
-					else if (IsOverTime(OT_3HOUR))
-					{
-						amount = (amount / 2);
-						dev_log(LOG_DEB0, "<GOLD_LOG> %s = 3HOUR", GetName());
-					}
-					else if (IsOverTime(OT_5HOUR))
-					{
-						amount = 0;
-						dev_log(LOG_DEB0, "<GOLD_LOG> %s = 5HOUR", GetName());
-					}
 				}
 
 				SetGold(GetGold() + amount);

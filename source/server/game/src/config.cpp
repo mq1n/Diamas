@@ -45,7 +45,6 @@ bool	g_bEnableBootaryCheck = false;
 bool	g_bGMHostCheck = false;
 bool	g_bGuildInviteLimit = false;
 bool	g_bGuildInfiniteMembers = false;
-bool	g_bChinaIntoxicationCheck = false;
 bool	g_bEnableSpeedHackCrash = false;
 int		g_iStatusPointGetLevelLimit = 90;
 int		g_iStatusPointSetMaxValue = 90;
@@ -69,7 +68,6 @@ DWORD		g_dwTrafficProfileFlushCycle = 3600;
 
 int			test_server = 0;
 bool		distribution_test_server = false;
-bool		china_event_server = false;
 bool		guild_mark_server = true;
 BYTE		guild_mark_min_level = 3;
 bool		no_wander = false;
@@ -883,12 +881,6 @@ static bool __LoadGeneralConfigFile(const char* configName)
 		TOKEN("distribution_test_server")
 		{
 			str_to_number(distribution_test_server, value_string);
-			continue;
-		}
-
-		TOKEN("china_event_server")
-		{
-			str_to_number(china_event_server, value_string);
 			continue;
 		}
 

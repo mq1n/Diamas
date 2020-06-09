@@ -4,7 +4,6 @@
 #include "banword.h"
 #include "utils.h"
 #include "mob_manager.h"
-#include "empire_text_convert.h"
 #include "config.h"
 #include "skill_power.h"
 #include "../../common/CommonDefines.h"

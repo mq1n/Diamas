@@ -908,23 +908,9 @@ LPCHARACTER CHARACTER_MANAGER::FindSpecifyPC(unsigned int uiJobFlag, long lMapIn
 
 int CHARACTER_MANAGER::GetMobItemRate(LPCHARACTER ch)	
 { 
-	//PREVENT_TOXICATION_FOR_CHINA
-	if (g_bChinaIntoxicationCheck)
-	{
-		if ( ch->IsOverTime( OT_3HOUR ) )
-		{
-			if (ch && ch->GetPremiumRemainSeconds(PREMIUM_ITEM) > 0)
-				return m_iMobItemRatePremium/2;
-			return m_iMobItemRate/2; 
-		}
-		else if ( ch->IsOverTime( OT_5HOUR ) )
-		{
-			return 0;
-		}
-	}
-	//END_PREVENT_TOXICATION_FOR_CHINA
 	if (ch && ch->GetPremiumRemainSeconds(PREMIUM_ITEM) > 0)
 		return m_iMobItemRatePremium;
+
 	return m_iMobItemRate; 
 }
 
@@ -938,23 +924,9 @@ int CHARACTER_MANAGER::GetMobGoldAmountRate(LPCHARACTER ch)
 	if ( !ch )
 		return m_iMobGoldAmountRate;
 
-	//PREVENT_TOXICATION_FOR_CHINA
-	if (g_bChinaIntoxicationCheck)
-	{
-		if ( ch->IsOverTime( OT_3HOUR ) )
-		{
-			if (ch && ch->GetPremiumRemainSeconds(PREMIUM_GOLD) > 0)
-				return m_iMobGoldAmountRatePremium/2;
-			return m_iMobGoldAmountRate/2; 
-		}
-		else if ( ch->IsOverTime( OT_5HOUR ) )
-		{
-			return 0;
-		}
-	}
-	//END_PREVENT_TOXICATION_FOR_CHINA
 	if (ch && ch->GetPremiumRemainSeconds(PREMIUM_GOLD) > 0)
 		return m_iMobGoldAmountRatePremium;
+
 	return m_iMobGoldAmountRate; 
 }
 
@@ -962,25 +934,10 @@ int CHARACTER_MANAGER::GetMobGoldDropRate(LPCHARACTER ch)
 {
 	if ( !ch )
 		return m_iMobGoldDropRate;
-
-	//PREVENT_TOXICATION_FOR_CHINA
-	if (g_bChinaIntoxicationCheck)
-	{
-		if ( ch->IsOverTime( OT_3HOUR ) )
-		{
-			if (ch && ch->GetPremiumRemainSeconds(PREMIUM_GOLD) > 0)
-				return m_iMobGoldDropRatePremium/2;
-			return m_iMobGoldDropRate/2;
-		}
-		else if ( ch->IsOverTime( OT_5HOUR ) )
-		{
-			return 0;
-		}
-	}
-	//END_PREVENT_TOXICATION_FOR_CHINA
 	
 	if (ch && ch->GetPremiumRemainSeconds(PREMIUM_GOLD) > 0)
 		return m_iMobGoldDropRatePremium;
+
 	return m_iMobGoldDropRate;
 }
 
@@ -989,22 +946,9 @@ int CHARACTER_MANAGER::GetMobExpRate(LPCHARACTER ch)
 	if ( !ch )
 		return m_iMobExpRate;
 
-	//PREVENT_TOXICATION_FOR_CHINA
-	if (g_bChinaIntoxicationCheck)
-	{
-		if ( ch->IsOverTime( OT_3HOUR ) )
-		{
-			if (ch && ch->GetPremiumRemainSeconds(PREMIUM_EXP) > 0)
-				return m_iMobExpRatePremium/2;
-			return m_iMobExpRate/2; 
-		}
-		else if ( ch->IsOverTime( OT_5HOUR ) )
-		{
-			return 0;
-		}
-	}
 	if (ch && ch->GetPremiumRemainSeconds(PREMIUM_EXP) > 0)
 		return m_iMobExpRatePremium;
+
 	return m_iMobExpRate; 
 }
 

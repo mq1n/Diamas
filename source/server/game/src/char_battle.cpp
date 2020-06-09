@@ -2369,7 +2369,6 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 	rateFactor += to->GetPoint(POINT_RAMADAN_CANDY_BONUS_EXP);
 	rateFactor += to->GetPoint(POINT_MALL_EXPBONUS);
 	rateFactor += to->GetPoint(POINT_EXP);
-	// useless (never used except for china intoxication) = always 100
 	rateFactor = rateFactor * static_cast<rate_t>(CHARACTER_MANAGER::instance().GetMobExpRate(to))/100.0L;
 	// fix underflow formula
 	iExp = std::max<int>(0, iExp);
