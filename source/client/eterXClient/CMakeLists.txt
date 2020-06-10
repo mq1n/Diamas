@@ -59,6 +59,15 @@ add_executable(${EXE_NAME} WIN32 ${ETERCLIENT_HEADERS} ${ETERCLIENT_SOURCES} ${E
 SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES LINK_FLAGS    "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:WINDOWS")
 target_link_libraries(${EXE_NAME} eterBase eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterTerrainLib eterTreeLib eterWebBrowser ${EXTRA_LIBS})
 
+if (ENABLE_STATIC_ANALYSIS)
+	pvs_studio_add_target(
+		TARGET client.analyze ALL
+        OUTPUT FORMAT errorfile
+        ANALYZE ${EXE_NAME} eterBase eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterSecurity eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterTerrainLib eterTreeLib eterWebBrowser
+		LOG client_analysis.err
+	)
+endif()
+
 ADD_CUSTOM_COMMAND(TARGET ${EXE_NAME}
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../../Diamas_client/${EXE_NAME}.exe

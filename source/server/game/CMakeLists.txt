@@ -102,6 +102,14 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL
 	set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS) 
 endif()
 
+if (ENABLE_STATIC_ANALYSIS)
+	pvs_studio_add_target(
+		TARGET game_server.analyze ALL
+        OUTPUT FORMAT errorfile
+        ANALYZE ${EXE_NAME} gamelib sqllib thecorelib
+		LOG game_server_analysis.err
+	)
+endif()
 
 if (WIN32)
     add_custom_command(

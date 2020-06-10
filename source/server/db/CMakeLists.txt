@@ -80,6 +80,15 @@ else()
 
 endif()
 
+if (ENABLE_STATIC_ANALYSIS)
+	pvs_studio_add_target(
+		TARGET db_cache.analyze ALL
+        OUTPUT FORMAT errorfile
+        ANALYZE ${EXE_NAME}
+		LOG db_cache_analysis.err
+	)
+endif()
+
 SET_TARGET_PROPERTIES(${exe} PROPERTIES COMPILE_DEFINITIONS "${_definitions}") 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	SET_TARGET_PROPERTIES(${exe} PROPERTIES LINK_SEARCH_END_STATIC 1) #STATIC LINKING for clang
