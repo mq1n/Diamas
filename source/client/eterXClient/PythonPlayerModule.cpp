@@ -130,6 +130,51 @@ PyObject * playerSetGameWindow(PyObject* poSelf, PyObject* poArgs)
 }
 
 
+PyObject * playerGetItemTypeBySlot(PyObject * poSelf, PyObject * poArgs)
+{
+	TItemPos Cell;
+	switch (PyTuple_Size(poArgs))
+	{
+	case 1:
+		if (!PyTuple_GetInteger(poArgs, 0, &Cell.cell))
+			return Py_BadArgument();
+		break;
+	case 2:
+		if (!PyTuple_GetByte(poArgs, 0, &Cell.window_type))
+			return Py_BadArgument();
+		if (!PyTuple_GetInteger(poArgs, 1, &Cell.cell))
+			return Py_BadArgument();
+		break;
+	default:
+		return Py_BuildException();
+	}
+
+	return Py_BuildValue("i", CPythonPlayer::Instance().GetItemTypeBySlot(Cell));
+}
+
+PyObject * playerGetItemSubTypeBySlot(PyObject * poSelf, PyObject * poArgs)
+{
+	TItemPos Cell;
+	switch (PyTuple_Size(poArgs))
+	{
+	case 1:
+		if (!PyTuple_GetInteger(poArgs, 0, &Cell.cell))
+			return Py_BadArgument();
+		break;
+	case 2:
+		if (!PyTuple_GetByte(poArgs, 0, &Cell.window_type))
+			return Py_BadArgument();
+		if (!PyTuple_GetInteger(poArgs, 1, &Cell.cell))
+			return Py_BadArgument();
+		break;
+	default:
+		return Py_BuildException();
+	}
+
+	return Py_BuildValue("i", CPythonPlayer::Instance().GetItemSubTypeBySlot(Cell));
+}
+
+
 PyObject * playerSetQuickCameraMode(PyObject* poSelf, PyObject* poArgs)
 {
 	int nIsEnable;
@@ -2287,6 +2332,9 @@ void initPlayer()
 		{ "IsEquippingBelt",				playerIsEquippingBelt,				METH_VARARGS },		
 		{ "IsAvailableBeltInventoryCell",	playerIsAvailableBeltInventoryCell,	METH_VARARGS },		
 #endif
+
+		{ "GetItemTypeBySlot",			playerGetItemTypeBySlot,			METH_VARARGS },
+		{ "GetItemSubTypeBySlot",		playerGetItemSubTypeBySlot,			METH_VARARGS },
 
 		// Refine
 		{ "GetItemGrade",				playerGetItemGrade,					METH_VARARGS },

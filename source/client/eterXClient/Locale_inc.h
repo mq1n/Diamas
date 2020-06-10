@@ -2,6 +2,7 @@
 
 #define CLIENT_VERSION_TIMESTAMP 1215955205
 #define LSS_SECURITY_KEY	"1234abcd5678efgh"
+#define _IMPROVED_PACKET_ENCRYPTION_
 
 //////////////////////////////////////////////////////////////////////////
 // ### Default Ymir Macros ###

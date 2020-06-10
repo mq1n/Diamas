@@ -3,7 +3,7 @@
 #define __INC_PEER_H__
 
 #include "PeerBase.h"
-#include "../../common/CommonDefines.h"
+#include "../../common/service.h"
 
 class CPeer : public CPeerBase
 {

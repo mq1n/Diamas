@@ -35,4 +35,3 @@ using namespace std::string_literals;
 
 #include "vk.h"
 #include "filename.h"
-#include "ServiceDefs.h"

@@ -51,12 +51,10 @@
 #include "BlueDragon_Binder.h"
 #include "skill_power.h"
 #include "buff_on_attributes.h"
-
 #ifdef __PET_SYSTEM__
 #include "PetSystem.h"
 #endif
 #include "DragonSoul.h"
-#include "../../common/CommonDefines.h"
 
 extern const BYTE g_aBuffOnAttrPoints;
 extern bool RaceToJob(unsigned race, unsigned *ret_job);

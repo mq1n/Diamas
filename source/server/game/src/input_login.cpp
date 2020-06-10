@@ -28,7 +28,6 @@
 #include "log.h"
 #include "horsename_manager.h"
 #include "MarkManager.h"
-#include "../../common/CommonDefines.h"
 
 #ifdef ENABLE_WOLFMAN_CHARACTER
 

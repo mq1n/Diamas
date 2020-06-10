@@ -9,9 +9,7 @@
 #include "buffer_manager.h"
 #include "guild_manager.h"
 #include "db.h"
-
 #include "party.h"
-#include "../../common/CommonDefines.h"
 
 extern LPFDWATCH	main_fdw;
 

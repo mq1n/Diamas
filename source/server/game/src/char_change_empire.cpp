@@ -6,7 +6,6 @@
 #include "db.h"
 #include "guild_manager.h"
 #include "marriage.h"
-#include "../../common/CommonDefines.h"
 
 /*
    Return Value

@@ -14,7 +14,6 @@
 #include "TrafficProfiler.h"
 #include "priv_manager.h"
 #include "dev_log.h"
-#include "../../common/CommonDefines.h"
 #include "utils.h"
 #include "desc_client.h"
 

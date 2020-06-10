@@ -12,7 +12,8 @@
 #include "affect_flag.h"
 #include "cube.h"
 #include "mining.h"
-#include "../../common/CommonDefines.h"
+#include "../../common/service.h"
+
 #define ENABLE_ANTI_CMD_FLOOD
 #define ENABLE_OPEN_SHOP_WITH_ARMOR
 enum eMountType {MOUNT_TYPE_NONE=0, MOUNT_TYPE_NORMAL=1, MOUNT_TYPE_COMBAT=2, MOUNT_TYPE_MILITARY=3};

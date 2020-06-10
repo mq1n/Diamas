@@ -16,7 +16,6 @@
 #include "questlua.h"
 #include "locale_service.h"
 #include "log.h"
-#include "../../common/CommonDefines.h"
 
 CHARACTER_MANAGER::CHARACTER_MANAGER() :
 	m_iVIDCount(0),

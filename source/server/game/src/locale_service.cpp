@@ -6,7 +6,6 @@
 #include "mob_manager.h"
 #include "config.h"
 #include "skill_power.h"
-#include "../../common/CommonDefines.h"
 
 extern std::string				g_stQuestDir;
 extern std::set <std::string> 	g_setQuestObjectDir;

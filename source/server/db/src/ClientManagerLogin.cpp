@@ -1,9 +1,6 @@
 
 #include "stdafx.h"
-#include "../../common/CommonDefines.h"
-
 #include "ClientManager.h"
-
 #include "Main.h"
 #include "Config.h"
 #include "QID.h"

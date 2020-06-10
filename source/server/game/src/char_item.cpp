@@ -33,19 +33,13 @@
 #include "arena.h"
 #include "dev_log.h"
 #include "threeway_war.h"
-
 #include "safebox.h"
 #include "shop.h"
-
-#ifdef ENABLE_NEWSTUFF
 #include "pvp.h"
-#endif
-
 #include "../../common/VnumHelper.h"
 #include "DragonSoul.h"
 #include "buff_on_attributes.h"
 #include "belt_inventory_helper.h"
-#include "../../common/CommonDefines.h"
 
 const int ITEM_BROKEN_METIN_VNUM = 28960;
 #define ENABLE_EFFECT_EXTRAPOT

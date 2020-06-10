@@ -3,7 +3,7 @@
 
 #include "length.h"
 #include "item_length.h"
-#include "CommonDefines.h"
+#include "service.h"
 
 typedef	DWORD IDENT;
 

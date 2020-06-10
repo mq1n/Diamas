@@ -2,7 +2,6 @@
 #include "desc_p2p.h"
 #include "protocol.h"
 #include "p2p.h"
-#include "../../common/CommonDefines.h"
 
 DESC_P2P::~DESC_P2P()
 {

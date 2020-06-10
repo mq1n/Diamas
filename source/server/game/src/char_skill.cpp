@@ -21,7 +21,6 @@
 #include "log.h"
 #include "unique_item.h"
 #include "questmanager.h"
-#include "../../common/CommonDefines.h"
 
 #define ENABLE_FORCE2MASTERSKILL
 // #define ENABLE_MOUNTSKILL_CHECK

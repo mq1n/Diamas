@@ -34,11 +34,9 @@
 #include "horsename_manager.h"
 #include "gm.h"
 #include "map_location.h"
-
 #include "DragonSoul.h"
 #include "desc_client.h"
 
-#include "../../common/CommonDefines.h"
 
 #define MAPNAME_DEFAULT	"none"
 

@@ -1,6 +1,5 @@
 
 #include "stdafx.h"
-
 #include "config.h"
 #include "char.h"
 #include "char_manager.h"
@@ -17,7 +16,6 @@
 #include "horsename_manager.h"
 #include "item.h"
 #include "DragonSoul.h"
-#include "../../common/CommonDefines.h"
 
 #define IS_NO_SAVE_AFFECT(type) ((type) == AFFECT_WAR_FLAG || (type) == AFFECT_REVIVE_INVISIBLE || ((type) >= AFFECT_PREMIUM_START && (type) <= AFFECT_PREMIUM_END) || (type) == AFFECT_MOUNT_BONUS) // @fixme156 added MOUNT_BONUS (if the game core crashes, the bonus would double if present in player.affect)
 #define IS_NO_CLEAR_ON_DEATH_AFFECT(type) ((type) == AFFECT_BLOCK_CHAT || ((type) >= 500 && (type) < 600))

@@ -155,6 +155,9 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 	initsafebox();
 	initguild();
 	initServerStateChecker();
+#ifdef ENABLE_ACCE_SYSTEM
+	initAcce();
+#endif
 
 	PyObject* builtins = PyImport_ImportModule("__builtin__");
 #ifdef _NDEBUG

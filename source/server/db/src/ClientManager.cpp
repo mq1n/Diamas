@@ -1,6 +1,5 @@
 
 #include "stdafx.h"
-#include "../../common/CommonDefines.h"
 
 #include "../../common/building.h"
 #include "../../common/VnumHelper.h"

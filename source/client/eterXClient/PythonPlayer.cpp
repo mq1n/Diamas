@@ -616,6 +616,35 @@ DWORD CPythonPlayer::GetItemFlags(TItemPos Cell)
 	return pItem->flags;
 }
 
+uint8_t CPythonPlayer::GetItemTypeBySlot(TItemPos Cell)
+{
+	if (!Cell.IsValidCell())
+		return 0;
+
+	CItemData * pItemDataPtr = nullptr;
+	if (CItemManager::Instance().GetItemDataPointer(GetItemIndex(Cell), &pItemDataPtr))
+		return pItemDataPtr->GetType();
+	else
+	{
+		TraceError("FAILED\t\tCPythonPlayer::GetItemTypeBySlot()\t\tCell(%d, %d) item is null", Cell.window_type, Cell.cell);
+		return 0;
+	}
+}
+uint8_t CPythonPlayer::GetItemSubTypeBySlot(TItemPos Cell)
+{
+	if (!Cell.IsValidCell())
+		return 0;
+
+	CItemData * pItemDataPtr = nullptr;
+	if (CItemManager::Instance().GetItemDataPointer(GetItemIndex(Cell), &pItemDataPtr))
+		return pItemDataPtr->GetSubType();
+	else
+	{
+		TraceError("FAILED\t\tCPythonPlayer::GetItemSubTypeBySlot()\t\tCell(%d, %d) item is null", Cell.window_type, Cell.cell);
+		return 0;
+	}
+}
+
 DWORD CPythonPlayer::GetItemCount(TItemPos Cell)
 {
 	if (!Cell.IsValidCell())
