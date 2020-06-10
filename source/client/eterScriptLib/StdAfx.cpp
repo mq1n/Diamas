@@ -3,8 +3,3 @@
 //	stdafx.obj will contain the pre-compiled type information
 
 #include "stdafx.h"
-
-void SetExceptionSender(IPythonExceptionSender * pkExceptionSender)
-{
-	g_pkExceptionSender = pkExceptionSender;
-}

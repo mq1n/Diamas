@@ -73,7 +73,7 @@ namespace FileSystem
 
 		assert(!gs_pFSLogInstance);
 
-		DeleteFileA(CUSTOM_LOG_FILENAME);
+		CreateDirectoryA("logs", nullptr);
 		gs_pFSLogInstance = new CLog("FSLogger", CUSTOM_LOG_FILENAME);
 
 		if (!gs_pFSLogInstance)
@@ -117,6 +117,8 @@ namespace FileSystem
 
 	void FileSystemManager::CloseArchives()
 	{
+		std::lock_guard <std::recursive_mutex> __lock(m_fsMutex);
+
 		for (const auto& archive : m_archives)
 		{
 			archive->GetArchiveFileStream().Close();

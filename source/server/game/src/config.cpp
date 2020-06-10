@@ -1563,11 +1563,6 @@ void config_init(const string& st_localeServiceName)
 	}
 #endif
 
-	if(!gHackCheckEnable)	
-	{
-		assert(test_server);	
-	}
-
 	LoadStateUserCount();
 
 	CWarMapManager::instance().LoadWarMapInfo(NULL);

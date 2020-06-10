@@ -22,7 +22,7 @@ void CGuildMarkManager::__DeleteImage(CGuildMarkImage * pkImgDel)
 CGuildMarkManager::CGuildMarkManager()
 {
 #if _MSC_VER >= 1200
-	_mkdir("mark");
+	_mkdir("guild_logo");
 #endif
 	// 남은 mark id 셋을 만든다. (서버용)
 	for (DWORD i = 0; i < MAX_IMAGE_COUNT * CGuildMarkImage::MARK_TOTAL_COUNT; ++i)

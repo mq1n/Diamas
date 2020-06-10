@@ -61,5 +61,5 @@ target_link_libraries(${EXE_NAME} eterBase eterEffectLib eterGameLib eterGrnLib 
 
 ADD_CUSTOM_COMMAND(TARGET ${EXE_NAME}
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../../M2020_Client/${EXE_NAME}.exe
+    COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../../Diamas_client/${EXE_NAME}.exe
 )

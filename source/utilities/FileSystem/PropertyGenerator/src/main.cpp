@@ -5,8 +5,10 @@
 
 #ifdef _DEBUG
 	#pragma comment( lib, "cryptopp-static_debug.lib" )
+	#pragma comment( lib, "fmt_debug.lib" )
 #else
 	#pragma comment( lib, "cryptopp-static.lib" )
+	#pragma comment( lib, "fmt.lib" )
 #endif
 
 int32_t main(int32_t argc, char* argv[])

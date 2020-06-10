@@ -9,12 +9,7 @@ time_t get_global_time()
 
 void set_global_time(time_t t)
 {
-	global_time_gap = t - time(0);
-
-	char time_str_buf[32];
-	snprintf(time_str_buf, sizeof(time_str_buf), "%s", time_str(get_global_time()));
-
-	sys_log(0, "GLOBAL_TIME: %s time_gap %d", time_str_buf, global_time_gap);
+	global_time_gap = t - time(nullptr);
 }
 
 int dice(int number, int size)

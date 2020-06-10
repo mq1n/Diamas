@@ -2,6 +2,7 @@
 #include "../eterbase/Debug.h"
 #include "Thing.h"
 #include "ThingInstance.h"
+#include <FileSystemIncl.hpp>
 
 CGraphicThing::CGraphicThing(const char* c_szFileName) : CResource(c_szFileName)
 {
@@ -159,15 +160,39 @@ bool CGraphicThing::OnLoad(int iSize, const void * c_pvBuf)
 	if (!c_pvBuf)
 		return false;
 
-	m_pgrnFile = GrannyReadEntireFileFromMemory(iSize, (void *) c_pvBuf);
+#ifdef ENABLE_LAYER2_FILE_ENCRYPTION
+	auto decryptedBufer = FileSystemManager::Instance().DecryptLayer2Protection(reinterpret_cast<const uint8_t*>(c_pvBuf), iSize);
+	if (decryptedBufer.empty())
+	{
+		DEBUG_LOG(LL_ERR, "GR2 Layer2 decryption fail!");
+		return false;
+	}
+
+	m_pgrnFile = GrannyReadEntireFileFromMemory(decryptedBufer.size(), reinterpret_cast<void *>(decryptedBufer.data()));
+#else
+	m_pgrnFile = GrannyReadEntireFileFromMemory(iSize, const_cast<void *>(c_pvBuf));
+#endif
 
 	if (!m_pgrnFile)
+	{
+		DEBUG_LOG(LL_ERR, "Granny read mem fail!");
+
+#ifdef ENABLE_LAYER2_FILE_ENCRYPTION
+		decryptedBufer.clear();
+#endif
 		return false;
+	}
+
+#ifdef ENABLE_LAYER2_FILE_ENCRYPTION
+	decryptedBufer.clear();
+#endif
 
     m_pgrnFileInfo = GrannyGetFileInfo(m_pgrnFile);
-
 	if (!m_pgrnFileInfo)
+	{
+		DEBUG_LOG(LL_ERR, "Granny read file info fail!");
 		return false;
+	}
 
 	LoadModels();
 	LoadMotions();

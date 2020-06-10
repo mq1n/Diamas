@@ -42,10 +42,6 @@ m_fGlobalElapsedTime(0.0f),
 m_dwLButtonDownTime(0),
 m_dwLastIdleTime(0)
 {
-#ifndef _DEBUG
-	SetEterExceptionHandler();
-#endif
-
 	CTimer::Instance().UseCustomTime();
 	m_dwWidth = 800;
 	m_dwHeight = 600;
@@ -754,8 +750,8 @@ bool CPythonApplication::CreateDevice(int width, int height, int Windowed, int b
 	int iRet;
 
 	m_grpDevice.InitBackBufferCount(2);
-	m_grpDevice.RegisterWarningString(CGraphicDevice::CREATE_BAD_DRIVER, ApplicationStringTable_GetStringz(IDS_WARN_BAD_DRIVER, "WARN_BAD_DRIVER"));
-	m_grpDevice.RegisterWarningString(CGraphicDevice::CREATE_NO_TNL, ApplicationStringTable_GetStringz(IDS_WARN_NO_TNL, "WARN_NO_TNL"));
+	m_grpDevice.RegisterWarningString(CGraphicDevice::CREATE_BAD_DRIVER,"WARN_BAD_DRIVER");
+	m_grpDevice.RegisterWarningString(CGraphicDevice::CREATE_NO_TNL,"WARN_NO_TNL");
 
 	iRet = m_grpDevice.Create(GetWindowHandle(), width, height, Windowed ? true : false, bit,frequency);
 
@@ -809,14 +805,9 @@ bool CPythonApplication::CreateDevice(int width, int height, int Windowed, int b
 	default:
 		if (iRet & CGraphicDevice::CREATE_OK)
 		{
-			//if (iRet & CGraphicDevice::CREATE_BAD_DRIVER)
-			//{
-			//	LogBox(ApplicationStringTable_GetStringz(IDS_WARN_BAD_DRIVER), NULL, GetWindowHandle());
-			//}
 			if (iRet & CGraphicDevice::CREATE_NO_TNL)
 			{
 				CGrannyLODController::SetMinLODMode(true);
-				//LogBox(ApplicationStringTable_GetStringz(IDS_WARN_NO_TNL), NULL, GetWindowHandle());
 			}
 			return true;
 		}
@@ -1020,7 +1011,7 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int wi
 			if (!m_SoundManager.Create())
 			{
 				// NOTE : 중국측의 요청으로 생략
-				//		LogBox(ApplicationStringTable_GetStringz(IDS_WARN_NO_SOUND_DEVICE));
+				//		LogBox((IDS_WARN_NO_SOUND_DEVICE));
 			}
 		}
 

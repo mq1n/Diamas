@@ -117,7 +117,7 @@ void CAnticheatManager::InitializeAnticheatRoutines(HINSTANCE hInstance, HWND hW
 
 	LoadDllFilter();
 
-	ParentProcessCheck(xorstr("Letarie.exe").crypt_get());
+	ParentProcessCheck(xorstr("Diamas.exe").crypt_get());
 
 	InitializeWindowWatcherThread();
 //	m_pWmiMonitorMgr->InitializeWMIWatcherThread();

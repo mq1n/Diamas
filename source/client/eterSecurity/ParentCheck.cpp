@@ -223,7 +223,7 @@ void CAnticheatManager::ParentProcessCheck(const std::string& stPatcherName)
 		if (!strcmp(stParentProcessName.c_str(), XOR("devenv.exe")) ||!strcmp(stParentProcessName.c_str(), XOR("vsdbg.exe")))
 			return;
 #endif
-		if (0 == _access(xorstr("LetarieDeveloper.exe").crypt_get(), 0))
+		if (0 == _access(xorstr("Diamas.exe").crypt_get(), 0))
 			return;
 
 		auto stExePath = ExePath();

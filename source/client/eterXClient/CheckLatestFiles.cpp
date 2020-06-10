@@ -26,14 +26,14 @@ bool CheckFileCRC32( LPCSTR szFileName, DWORD dwCRC32 )
 	char szMessage[256];
 
 	if (_access( szFileName, 4 ) != 0) {
-		_snprintf(szMessage, sizeof(szMessage)/sizeof(szMessage[0])-1, ApplicationStringTable_GetStringz(IDS_ERR_CANNOT_READ_FILE, "ERR_CANNOT_READ_FILE"), szFileName);
+		_snprintf(szMessage, sizeof(szMessage)/sizeof(szMessage[0])-1, (IDS_ERR_CANNOT_READ_FILE, "ERR_CANNOT_READ_FILE"), szFileName);
 		ApplicationSetErrorString(szMessage);
 		return false;
 	}
 	DWORD dwLocalCRC32 = GetFileCRC32(szFileName);
 
 	if (dwCRC32 != dwLocalCRC32) {
-		_snprintf(szMessage, sizeof(szMessage)/sizeof(szMessage[0])-1, ApplicationStringTable_GetStringz(IDS_ERR_NOT_LATEST_FILE, "ERR_NOT_LATEST_FILE"), szFileName);
+		_snprintf(szMessage, sizeof(szMessage)/sizeof(szMessage[0])-1, (IDS_ERR_NOT_LATEST_FILE, "ERR_NOT_LATEST_FILE"), szFileName);
 		ApplicationSetErrorString(szMessage);
 		return false;
 	}

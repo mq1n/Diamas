@@ -48,7 +48,7 @@ void CSoundBase::Initialize()
 	if (ms_iRefCount > 1)
 		return;
 	
-	AIL_set_redist_directory("miles");
+	AIL_set_redist_directory("sound_lib");
 	AIL_startup();
 
 	ms_ProviderVector.clear();

@@ -36,12 +36,8 @@ PyObject * packGet(PyObject * poSelf, PyObject * poArgs)
 {
 	char szFormat[] = { 's', '#', 0x0 };
 
-	bool bIsSystem = false;
-	if (!PyTuple_GetBoolean(poArgs, 0, &bIsSystem) || !bIsSystem)
-		return Py_BuildException();
-
 	char* szFileName;
-	if (!PyTuple_GetString(poArgs, 1, &szFileName))
+	if (!PyTuple_GetString(poArgs, 0, &szFileName))
 		return Py_BuildException();
 
 	CFile file;
@@ -55,7 +51,9 @@ PyObject * packGet(PyObject * poSelf, PyObject * poArgs)
 			);
 			if (decryptedBuffer.empty())
 			{
-				//DEBUG_LOG(LL_ERR, "PY Layer2 decryption fail! File: %s", file);
+#ifdef _DEBUG
+				TraceError("Layer2 decryption fail! File: %s", szFileName);
+#endif
 				return Py_BuildException();
 			}
 

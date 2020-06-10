@@ -1,8 +1,6 @@
 #include "StdAfx.h"
 #include "PythonUtils.h"
 
-IPythonExceptionSender * g_pkExceptionSender = NULL;
-
 bool __PyCallClassMemberFunc_ByCString(PyObject* poClass, const char* c_szFunc, PyObject* poArgs, PyObject** poRet);
 bool __PyCallClassMemberFunc_ByPyString(PyObject* poClass, PyObject* poFuncName, PyObject* poArgs, PyObject** poRet);
 bool __PyCallClassMemberFunc(PyObject* poClass, PyObject* poFunc, PyObject* poArgs, PyObject** poRet);
@@ -13,10 +11,13 @@ PyObject * Py_BadArgument()
 	return NULL;
 }
 
-PyObject * Py_BuildException(const char * c_pszErr, ...)
+PyObject * __Py_BuildException(const char* c_pszFunc, int32_t iLine, const char * c_pszErr, ...)
 {
 	if (!c_pszErr)
+	{
+		TraceError("%s [%d]: Unknown PythonException", c_pszFunc, iLine);
 		PyErr_Clear();
+	}
 	else
 	{
 		char szErrBuf[512+1];
@@ -25,11 +26,12 @@ PyObject * Py_BuildException(const char * c_pszErr, ...)
 		vsnprintf(szErrBuf, sizeof(szErrBuf), c_pszErr, args);
 		va_end(args);
 
+		TraceError("%s [%d]: PythonException: %s", c_pszFunc, iLine, szErrBuf);
 		PyErr_SetString(PyExc_RuntimeError, szErrBuf);
 	}
 
 	return Py_BuildNone();
-	//return NULL;
+	//return nullptr;
 }
 
 PyObject * Py_BuildNone()
@@ -137,6 +139,20 @@ bool PyTuple_GetInteger(PyObject* poArgs, int pos, int* ret)
 	return true;
 }
 
+bool PyTuple_GetLongLong(PyObject* poArgs, int pos, long long* ret)
+{
+	if (pos >= PyTuple_Size(poArgs))
+		return false;
+
+	PyObject * poItem = PyTuple_GetItem(poArgs, pos);
+	
+	if (!poItem)
+		return false;
+	
+	*ret = PyLong_AsLongLong(poItem);
+	return true;
+}
+
 bool PyTuple_GetUnsignedLong(PyObject* poArgs, int pos, unsigned long* ret)
 {
 	if (pos >= PyTuple_Size(poArgs))
@@ -148,6 +164,20 @@ bool PyTuple_GetUnsignedLong(PyObject* poArgs, int pos, unsigned long* ret)
 		return false;
 	
 	*ret = PyLong_AsUnsignedLong(poItem);
+	return true;
+}
+
+bool PyTuple_GetUnsignedLongLong(PyObject* poArgs, int pos, unsigned long long* ret)
+{
+	if (pos >= PyTuple_Size(poArgs))
+		return false;
+
+	PyObject * poItem = PyTuple_GetItem(poArgs, pos);
+
+	if (!poItem)
+		return false;
+
+	*ret = PyLong_AsUnsignedLongLong(poItem);
 	return true;
 }
 
@@ -317,13 +347,7 @@ bool __PyCallClassMemberFunc_ByCString(PyObject* poClass, const char* c_szFunc, 
 
 	if (!poRet)
 	{
-		if (g_pkExceptionSender)
-			g_pkExceptionSender->Clear();
-
 		PyErr_Print();
-
-		if (g_pkExceptionSender)
-			g_pkExceptionSender->Send();
 
 		Py_DECREF(poFunc);
 		Py_XDECREF(poArgs);
@@ -365,13 +389,7 @@ bool __PyCallClassMemberFunc_ByPyString(PyObject* poClass, PyObject* poFuncName,
 
 	if (!poRet)
 	{
-		if (g_pkExceptionSender)
-			g_pkExceptionSender->Clear();
-
 		PyErr_Print();
-
-		if (g_pkExceptionSender)
-			g_pkExceptionSender->Send();
 
 		Py_DECREF(poFunc);
 		Py_XDECREF(poArgs);

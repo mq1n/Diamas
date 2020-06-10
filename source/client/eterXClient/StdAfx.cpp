@@ -21,14 +21,17 @@
 	#pragma comment( lib, "cryptopp-static_debug.lib" )
 	#pragma comment( lib, "python27_debug.lib" )
 	#pragma comment( lib, "DevIL_debug.lib" )
+	#pragma comment( lib, "fmt_debug.lib" )
 #else
 	#pragma comment( lib, "cryptopp-static.lib" )
 	#pragma comment( lib, "python27.lib" )
 	#pragma comment( lib, "DevIL.lib" )
+	#pragma comment( lib, "fmt.lib" )
 #endif
 
 #pragma comment( lib, "FSLib.lib" )
 #pragma comment( lib, "granny2.11.8.0_static.lib" )
+#pragma comment( lib, "CrashRpt1403.lib" )
 
 #pragma comment(lib, "d3d8/d3d8.lib")
 #pragma comment(lib, "d3d8/d3dx8.lib")

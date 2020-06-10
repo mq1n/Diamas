@@ -72,7 +72,18 @@ bool CGraphicSubImage::OnLoad(int iSize, const void* c_pvBuf)
 
 	CMemoryTextFileLoader textFileLoader;
 
+#ifdef ENABLE_LAYER2_FILE_ENCRYPTION
+	auto decryptedBufer = FileSystemManager::Instance().DecryptLayer2Protection(reinterpret_cast<const uint8_t*>(c_pvBuf), iSize);
+	if (decryptedBufer.empty())
+	{
+		DEBUG_LOG(LL_ERR, "SUB Layer2 decryption fail!");
+		return false;
+	}
+
+	textFileLoader.Bind(decryptedBufer.size(), decryptedBufer.data());
+#else
 	textFileLoader.Bind(iSize, c_pvBuf);
+#endif
 
 	for (DWORD i = 0; i < textFileLoader.GetLineCount(); ++i)
 	{
@@ -97,7 +108,13 @@ bool CGraphicSubImage::OnLoad(int iSize, const void* c_pvBuf)
 	const std::string& c_rstBottom = stTokenMap["bottom"];
 
 	if (c_rstTitle != "subimage")
+	{
+		DEBUG_LOG(LL_ERR, "Title is not a subimage");
+#ifdef ENABLE_LAYER2_FILE_ENCRYPTION
+		decryptedBufer.clear();
+#endif
 		return false;
+	}
 	
 	char szFileName[256];
 	if ("2.0"==c_rstVersion)
@@ -129,6 +146,9 @@ bool CGraphicSubImage::OnLoad(int iSize, const void* c_pvBuf)
 					atoi(c_rstRight.c_str()),
 					atoi(c_rstBottom.c_str()));
 
+#ifdef ENABLE_LAYER2_FILE_ENCRYPTION
+	decryptedBufer.clear();
+#endif
 	return true;
 }
 

@@ -320,8 +320,8 @@ int DESC::ProcessInput()
 			LPBUFFER lpBufferDecrypt = tempbuf.getptr();
 			buffer_adjust_size(lpBufferDecrypt, iSizeBuffer);
 
-			int iSizeAfter = TEA_Decrypt((DWORD *) buffer_write_peek(lpBufferDecrypt),
-					(DWORD *) buffer_read_peek(m_lpInputBuffer),
+			int iSizeAfter = TEA_Decrypt((uint32_t *) buffer_write_peek(lpBufferDecrypt),
+					(uint32_t *) buffer_read_peek(m_lpInputBuffer),
 					GetDecryptionKey(),
 					iSizeBuffer);
 
@@ -409,7 +409,7 @@ void DESC::Packet(const void * c_pvData, int iSize)
 		return;
 
 #ifdef ENABLE_SYSLOG_PACKET_SENT
-	std::string stName = GetCharacter()? GetCharacter()->GetName() : GetHostName();
+	std::string stName = GetCharacter() ? GetCharacter()->GetName() : GetHostName();
 	sys_log(0, "SENT HEADER : %u to %s  (size %d) ", *(static_cast<const BYTE*>(c_pvData)) , stName.c_str(), iSize );
 #endif
 
@@ -486,7 +486,7 @@ void DESC::Packet(const void * c_pvData, int iSize)
 			{
 				// 암호화에 필요한 충분한 버퍼 크기를 확보한다.
 				/* buffer_adjust_size(m_lpOutputBuffer, iSize + 8); */
-				DWORD * pdwWritePoint = (DWORD *) buffer_write_peek(m_lpOutputBuffer);
+				uint32_t * pdwWritePoint = (uint32_t *) buffer_write_peek(m_lpOutputBuffer);
 
 				if (packet_encode(m_lpOutputBuffer, c_pvData, iSize))
 				{
@@ -966,14 +966,14 @@ const BYTE* GetKey_20050304Myevan()
 }
 
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
-void DESC::SetSecurityKey(const DWORD * c_pdwKey)
+void DESC::SetSecurityKey(const uint32_t * c_pdwKey)
 {
 	const BYTE * c_pszKey = (const BYTE *) "JyTxtHljHJlVJHorRM301vf@4fvj10-v";
 
 	c_pszKey = GetKey_20050304Myevan() + 37;
 
 	memcpy(&m_adwDecryptionKey, c_pdwKey, 16);
-	TEA_Encrypt(&m_adwEncryptionKey[0], &m_adwDecryptionKey[0], (const DWORD *) c_pszKey, 16);
+	TEA_Encrypt(&m_adwEncryptionKey[0], &m_adwDecryptionKey[0], (const uint32_t *) c_pszKey, 16);
 
 	sys_log(0, "SetSecurityKey decrypt %u %u %u %u encrypt %u %u %u %u", 
 			m_adwDecryptionKey[0], m_adwDecryptionKey[1], m_adwDecryptionKey[2], m_adwDecryptionKey[3],

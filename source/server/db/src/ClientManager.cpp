@@ -1835,8 +1835,6 @@ void CClientManager::QUERY_AUTH_LOGIN(CPeer * pkPeer, DWORD dwHandle, TPacketGDA
 
 		pkLD->SetKey(p->dwLoginKey);
 		pkLD->SetClientKey(p->adwClientKey);
-		pkLD->SetBillType(p->bBillType);
-		pkLD->SetBillID(p->dwBillID);
 		pkLD->SetPremium(p->iPremiumTimes);
 
 		TAccountTable & r = pkLD->GetAccountRef();

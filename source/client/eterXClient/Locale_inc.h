@@ -1,6 +1,7 @@
 #pragma once
 
-#define CLIENT_VERSION_TIMESTAMP 1234567
+#define CLIENT_VERSION_TIMESTAMP 1215955205
+#define LSS_SECURITY_KEY	"1234abcd5678efgh"
 
 //////////////////////////////////////////////////////////////////////////
 // ### Default Ymir Macros ###
@@ -13,14 +14,13 @@
 
 //////////////////////////////////////////////////////////////////////////
 // ### New From LocaleInc ###
-#define ENABLE_PACK_GET_CHECK
 #define ENABLE_CANSEEHIDDENTHING_FOR_GM
 #define ENABLE_PROTOSTRUCT_AUTODETECT
 
 #define ENABLE_PLAYER_PER_ACCOUNT5
 #define ENABLE_LEVEL_IN_TRADE
 #define ENABLE_DICE_SYSTEM
-#define ENABLE_EXTEND_INVEN_SYSTEM
+//#define ENABLE_EXTEND_INVEN_SYSTEM
 #define ENABLE_LVL115_ARMOR_EFFECT
 #define ENABLE_SLOT_WINDOW_EX
 #define ENABLE_TEXT_LEVEL_REFRESH

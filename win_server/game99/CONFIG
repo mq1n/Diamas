@@ -9,9 +9,9 @@ TABLE_POSTFIX:
 PASSES_PER_SEC: 25
 SAVE_EVENT_SECOND_CYCLE: 180
 PING_EVENT_SECOND_CYCLE: 180
-PLAYER_SQL: 127.0.0.1 qry_sql_acc_xas C+2=&a+B%^6+_tU7(/Gn player
-COMMON_SQL: 127.0.0.1 qry_sql_acc_xas C+2=&a+B%^6+_tU7(/Gn common
-LOG_SQL: 127.0.0.1 qry_sql_acc_xas C+2=&a+B%^6+_tU7(/Gn log
+PLAYER_SQL: 127.0.0.1 mt2 mt2 player
+COMMON_SQL: 127.0.0.1 mt2 mt2 common
+LOG_SQL: 127.0.0.1 mt2 mt2 log
 VIEW_RANGE: 8000
 CHECK_MULTIHACK: 1
 LOCALE_SERVICE: turkey

@@ -1,2 +1,3 @@
 #pragma once
-extern void SetEterExceptionHandler();
+extern bool SetEterExceptionHandler();
+extern bool RemoveEterException();

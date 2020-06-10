@@ -426,7 +426,7 @@ long CItemData::GetValue(BYTE byIndex) const
 
 long CItemData::SetSocket(BYTE byIndex,DWORD value)
 {
-	if (byIndex >= ITEM_SOCKET_MAX_NUM)
+	if (byIndex > ITEM_SOCKET_MAX_NUM)
 	{
 		assert(byIndex < ITEM_SOCKET_MAX_NUM);
 		return -1;
@@ -437,7 +437,7 @@ long CItemData::SetSocket(BYTE byIndex,DWORD value)
 
 long CItemData::GetSocket(BYTE byIndex) const
 {
-	if (byIndex >= ITEM_SOCKET_MAX_NUM)
+	if (byIndex > ITEM_SOCKET_MAX_NUM)
 	{
 		assert(byIndex < ITEM_SOCKET_MAX_NUM);
 		return -1;

@@ -195,8 +195,6 @@ void DBManager::SendAuthLogin(LPDESC d)
 	trim_and_lower(r.login, ptod.szLogin, sizeof(ptod.szLogin));
 	strlcpy(ptod.szSocialID, r.social_id, sizeof(ptod.szSocialID));
 	ptod.dwLoginKey = d->GetLoginKey();
-	ptod.bBillType = pkLD->GetBillType();
-	ptod.dwBillID = pkLD->GetBillID();
 
 	memcpy(ptod.iPremiumTimes, pkLD->GetPremiumPtr(), sizeof(ptod.iPremiumTimes));
 	memcpy(&ptod.adwClientKey, pkLD->GetClientKey(), sizeof(DWORD) * 4);
@@ -207,7 +205,7 @@ void DBManager::SendAuthLogin(LPDESC d)
 	SendLoginPing(r.login);
 }
 
-void DBManager::LoginPrepare(BYTE bBillType, DWORD dwBillID, long lRemainSecs, LPDESC d, DWORD * pdwClientKey, int * paiPremiumTimes)
+void DBManager::LoginPrepare(LPDESC d, DWORD * pdwClientKey, int * paiPremiumTimes)
 {
 	const TAccountTable & r = d->GetAccountTable();
 
@@ -215,9 +213,6 @@ void DBManager::LoginPrepare(BYTE bBillType, DWORD dwBillID, long lRemainSecs, L
 
 	pkLD->SetKey(d->GetLoginKey());
 	pkLD->SetLogin(r.login);
-	pkLD->SetBillType(bBillType);
-	pkLD->SetBillID(dwBillID);
-	pkLD->SetRemainSecs(lRemainSecs);
 	pkLD->SetIP(d->GetHostName());
 	pkLD->SetClientKey(pdwClientKey);
 
@@ -396,7 +391,8 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 						DESC_MANAGER::instance().ConnectAccount(r.login, d);
 
 						sys_log(0, "QID_AUTH_LOGIN: SUCCESS %s", pinfo->login);
-
+				
+						LoginPrepare(d, pinfo->adwClientKey, aiPremiumTimes);
 						M2_DELETE(pinfo);
 						break;
 					}

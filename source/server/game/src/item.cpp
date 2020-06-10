@@ -1347,7 +1347,7 @@ bool CItem::AddSocket()
 
 void CItem::AlterToSocketItem(int iSocketCount)
 {
-	if (iSocketCount >= ITEM_SOCKET_MAX_NUM)
+	if (iSocketCount > ITEM_SOCKET_MAX_NUM)
 	{
 		sys_log(0, "Invalid Socket Count %d, set to maximum", ITEM_SOCKET_MAX_NUM);
 		iSocketCount = ITEM_SOCKET_MAX_NUM;

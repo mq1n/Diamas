@@ -2,8 +2,6 @@
 #include "resource.h"
 #include "Version.h"
 #include "PythonApplication.h"
-#include "ProcessScanner.h"
-#include "PythonExceptionSender.h"
 
 #include <cstdlib>
 #include <fstream>
@@ -13,135 +11,66 @@
 #include <filesystem>
 
 #include <FileSystemIncl.hpp>
+#include "../eterBase/error.h"
+#include "../eterBase/lzo.h"
 #include "../eterLib/Util.h"
 #include "../eterWebBrowser/CWebBrowser.h"
-#include "../eterBase/CPostIt.h"
-#include "../eterBase/lzo.h"
-
-#include "CheckLatestFiles.h"
 
 // d3dx8.lib(cleanmesh.obj) : error LNK2019: unresolved external symbol __vsnprintf referenced in function "void __cdecl OutputError
 int(WINAPIV* __vsnprintf)(char*, size_t, const char*, va_list) = _vsnprintf;
 
-extern "C" {  
-extern int _fltused;  
-volatile int _AVOID_FLOATING_POINT_LIBRARY_BUG = _fltused;  
-};  
-
-#include <stdlib.h>
-
-extern bool SetDefaultCodePage(DWORD codePage);
-
-static const char * sc_apszPythonLibraryFilenames[] =
+extern "C"
 {
-	"UserDict.pyc",
-	"__future__.pyc",
-	"copy_reg.pyc",
-	"linecache.pyc",
-	"ntpath.pyc",
-	"os.pyc",
-	"site.pyc",
-	"stat.pyc",
-	"string.pyc",
-	"traceback.pyc",
-	"types.pyc",
-	"\n",
+	// extern int32_t _fltused;
+	// volatile int32_t _AVOID_FLOATING_POINT_LIBRARY_BUG = _fltused;
+	_declspec (dllexport) uint32_t NvOptimusEnablement = 0x00000001;
+	__declspec (dllexport) int32_t AmdPowerXpressRequestHighPerformance = 1;
+	// FILE __iob_func[3] = { *stdin,*stdout,*stderr };
 };
 
-char gs_szErrorString[512] = "";
-
-void ApplicationSetErrorString(const char* szErrorString)
+class TimerPeriod
 {
-	strcpy(gs_szErrorString, szErrorString);
-}
-
-bool CheckPythonLibraryFilenames()
-{
-	for (int i = 0; *sc_apszPythonLibraryFilenames[i] != '\n'; ++i)
+public:
+	TimerPeriod()
 	{
-		std::string stFilename = "lib\\";
-		stFilename += sc_apszPythonLibraryFilenames[i];
-
-		if (_access(stFilename.c_str(), 0) != 0)
+		TIMECAPS tc;
+		if (timeGetDevCaps(&tc, sizeof(TIMECAPS)) != TIMERR_NOERROR)
 		{
-			return false;
+			// Unlikely to ever occur
+			TraceError("Failed to get timer capabilities");
+			tc.wPeriodMax = tc.wPeriodMin = 15; // default
 		}
 
-		MoveFile(stFilename.c_str(), stFilename.c_str());
+		m_period = std::min<uint32_t>(std::max<uint32_t>(tc.wPeriodMin, 5u), tc.wPeriodMax);
+		timeBeginPeriod(m_period);
+	}
+	~TimerPeriod()
+	{
+		timeEndPeriod(m_period);
 	}
 
-	return true;
-}
+private:
+	uint32_t m_period;
+};
 
-struct ApplicationStringTable 
+static void GrannyError(granny_log_message_type Type, granny_log_message_origin Origin, char const * File, granny_int32x Line, char const * Error, void * UserData)
 {
-	HINSTANCE m_hInstance;
-	std::map<DWORD, std::string> m_kMap_dwID_stLocale;
-} gs_kAppStrTable;
+	//Origin==GrannyFileReadingLogMessage for granny run-time tag& revision warning (Type==GrannyWarningLogMessage)
+	//Origin==GrannyControlLogMessage for miss track_group on static models as weapons warning (Type==GrannyWarningLogMessage)
+	//Origin==GrannyMeshBindingLogMessage for miss bone ToSkeleton on new ymir models error (Type==GrannyErrorLogMessage)
 
-void ApplicationStringTable_Initialize(HINSTANCE hInstance)
-{
-	gs_kAppStrTable.m_hInstance=hInstance;
+	if (Origin == GrannyFileReadingLogMessage || Origin == GrannyControlLogMessage || Origin == GrannyMeshBindingLogMessage)
+		return;
+
+	TraceError("GRANNY: %s(%d): ERROR: %s --- [%d] %s --- [%d] %s",
+		File, Line, Error, Type, GrannyGetLogMessageTypeString(Type), Origin, GrannyGetLogMessageOriginString(Origin));
 }
-
-const std::string& ApplicationStringTable_GetString(DWORD dwID, LPCSTR szKey)
-{
-	char szBuffer[512];
-	char szIniFileName[256];
-	char szLocale[256];
-
-	::GetCurrentDirectory(sizeof(szIniFileName), szIniFileName);
-	if(szIniFileName[lstrlen(szIniFileName)-1] != '\\')
-		strcat(szIniFileName, "\\");
-	strcat(szIniFileName, "metin2client.dat");
-
-	strcpy(szLocale, LocaleService_GetLocalePath());
-	if(strnicmp(szLocale, "locale/", strlen("locale/")) == 0)
-		strcpy(szLocale, LocaleService_GetLocalePath() + strlen("locale/"));
-	::GetPrivateProfileString(szLocale, szKey, NULL, szBuffer, sizeof(szBuffer)-1, szIniFileName);
-	if(szBuffer[0] == '\0')
-		LoadString(gs_kAppStrTable.m_hInstance, dwID, szBuffer, sizeof(szBuffer)-1);
-	if(szBuffer[0] == '\0')
-		::GetPrivateProfileString("en", szKey, NULL, szBuffer, sizeof(szBuffer)-1, szIniFileName);
-	if(szBuffer[0] == '\0')
-		strcpy(szBuffer, szKey);
-
-	std::string& rstLocale=gs_kAppStrTable.m_kMap_dwID_stLocale[dwID];
-	rstLocale=szBuffer;
-
-	return rstLocale;
-}
-
-const std::string& ApplicationStringTable_GetString(DWORD dwID)
-{
-	char szBuffer[512];
-
-	LoadString(gs_kAppStrTable.m_hInstance, dwID, szBuffer, sizeof(szBuffer)-1);
-	std::string& rstLocale=gs_kAppStrTable.m_kMap_dwID_stLocale[dwID];
-	rstLocale=szBuffer;
-
-	return rstLocale;
-}
-
-const char* ApplicationStringTable_GetStringz(DWORD dwID, LPCSTR szKey)
-{
-	return ApplicationStringTable_GetString(dwID, szKey).c_str();
-}
-
-const char* ApplicationStringTable_GetStringz(DWORD dwID)
-{
-	return ApplicationStringTable_GetString(dwID).c_str();
-}
-
-////////////////////////////////////////////
-
-int Setup(LPSTR lpCmdLine); // Internal function forward
 
 bool PackInitialize(const char* c_pszFolder)
 {
 	if (!std::filesystem::exists(c_pszFolder))
 	{
-		TraceError("pack folder not exist");
+		TraceError("%s folder not exist", c_pszFolder);
 		return false;
 	}
 
@@ -178,7 +107,7 @@ bool PackInitialize(const char* c_pszFolder)
 			continue;
 		}
 
-		const std::wstring archiveTarget = L"pack/" + std::wstring(ArchiveName.begin(), ArchiveName.end());
+		const std::wstring archiveTarget = L"data/" + std::wstring(ArchiveName.begin(), ArchiveName.end());
 
 		if (FileSystemManager::Instance().AddArchive(archiveTarget, DEFAULT_ARCHIVE_KEY))
 			Tracenf("%ls succesfully loaded!", archiveTarget.c_str());
@@ -241,7 +170,7 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 
 	PyModule_AddStringConstant(builtins, "__COMMAND_LINE__", "");
 
-	char szSystemPy[] = { 's', 'y', 's', 't', 'e', 'm', '_', 'p', 'y', 't', 'h', 'o', 'n', 0x0 }; // system_python
+	char szSystemPy[] = { 's', 'y', 's', 't', 'e', 'm', '_', 'p', 'y', 't', 'h', 'o', 'n', '.', 'p', 'y', 0x0 }; // system_python.py
 	char szSystemPyFailMsg[] = { 'M', 'a', 'i', 'n', ' ', 's', 'c', 'r', 'i', 'p', 't', ' ', 'i', 'n', 'i', 't', 'i', 'l', 'i', 'z', 'a', 't', 'i', 'o', 'n', ' ', 'f', 'a', 'i', 'l', 'e', 'd', '!', 0x0 }; // Main script initilization failed!
 
 	if (!pyLauncher.RunFile(szSystemPy, szSystemPy))
@@ -255,34 +184,20 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 
 bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 {
+	bool ret = false;
+
 	DWORD dwRandSeed=time(NULL)+DWORD(GetCurrentProcess());
 	srandom(dwRandSeed);
 	srand(random());
 
-	SetLogLevel(1);
-
-	if (_access("perf_game_update.txt", 0)==0)
-	{
-		DeleteFile("perf_game_update.txt");
-	}
-
-	if (_access("newpatch.exe", 0)==0)
-	{		
-		system("patchupdater.exe");
-		return false;
-	}
-
 	ilInit();
 
-	if (!Setup(lpCmdLine))
-		return false;
+	GrannyFilterMessage(GrannyFileReadingLogMessage, false);
 
-#ifdef _DEBUG
-	OpenConsoleWindow();
-	OpenLogFile(true); // true == uses syserr.txt and log.txt
-#else
-	OpenLogFile(false); // false == uses syserr.txt only
-#endif
+	granny_log_callback Callback;
+	Callback.Function = GrannyError;
+	Callback.UserData = nullptr;
+	GrannySetLogCallback(&Callback);
 
 	static CLZO	lzo;
 	static FileSystemManager fileSystem;
@@ -300,9 +215,9 @@ bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 	fileSystem.AddToDiskBlacklist("py");
 	fileSystem.AddToDiskBlacklist("pyc");
 
-	if (!PackInitialize("pack"))
+	if (!PackInitialize("data"))
 	{
-		LogBox("Pack Initialization failed. Check log.txt file..");
+		LogBox("Data Initialization failed. Check log.txt file..");
 		return false;
 	}
 
@@ -313,228 +228,68 @@ bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 
 	app->Initialize(hInstance);
 
-	bool ret=false;
-	{
-		CPythonLauncher pyLauncher;
-		CPythonExceptionSender pyExceptionSender;
-		SetExceptionSender(&pyExceptionSender);
+	auto period = std::make_unique<TimerPeriod>();
 
-		if (pyLauncher.Create("pyApi"))
-		{
-			ret=RunMainScript(pyLauncher, lpCmdLine);	//게임 실행중엔 함수가 끝나지 않는다.
-		}
+	CPythonLauncher pyLauncher;
 
-		//ProcessScanner_ReleaseQuitEvent();
-		
-		//게임 종료시.
-		app->Clear();
+	char __pyApi[] = { 'p', 'y', 'A', 'p', 'i', 0x0 }; // pyApi
 
-		timeEndPeriod(1);
-		pyLauncher.Clear();
-	}
+	if (pyLauncher.Create(__pyApi))
+		ret=RunMainScript(pyLauncher, lpCmdLine);
+
+	app->Clear();
+
+	pyLauncher.Clear();
 
 	app->Destroy();
-	delete app;
-	
+
+	fileSystem.FinalizeFSManager();
+
 	return ret;
-}
-
-HANDLE CreateMetin2GameMutex()
-{
-	SECURITY_ATTRIBUTES sa;
-	ZeroMemory(&sa, sizeof(SECURITY_ATTRIBUTES));
-	sa.nLength				= sizeof(sa);
-	sa.lpSecurityDescriptor	= NULL;
-	sa.bInheritHandle		= FALSE;
-
-	return CreateMutex(&sa, FALSE, "Metin2GameMutex");
-}
-
-void DestroyMetin2GameMutex(HANDLE hMutex)
-{
-	if (hMutex)
-	{
-		ReleaseMutex(hMutex);
-		hMutex = NULL;
-	}
-}
-
-void __ErrorPythonLibraryIsNotExist()
-{
-	LogBoxf("FATAL ERROR!! Python Library file not exist!");
-}
-
-bool __IsTimeStampOption(LPSTR lpCmdLine)
-{
-	const char* TIMESTAMP = "/timestamp";
-	return (strncmp(lpCmdLine, TIMESTAMP, strlen(TIMESTAMP))==0);
-}
-
-void __PrintTimeStamp()
-{	
-}
-
-bool __IsLocaleOption(LPSTR lpCmdLine)
-{
-	return (strcmp(lpCmdLine, "--locale") == 0);
-}
-
-bool __IsLocaleVersion(LPSTR lpCmdLine)
-{
-	return (strcmp(lpCmdLine, "--perforce-revision") == 0);
 }
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	SetEterExceptionHandler();
+
+	CreateDirectoryA("logs", nullptr);
 #ifdef _DEBUG
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_LEAK_CHECK_DF );
-	//_CrtSetBreakAlloc( 110247 ); 
+
+	OpenConsoleWindow();
+	OpenLogFile(true); // true == uses syserr.txt and log.txt
+#else
+	OpenLogFile(true); // true == uses syserr.txt and log.txt
 #endif
 
-	ApplicationStringTable_Initialize(hInstance);
-
-	LocaleService_LoadConfig("locale.cfg");
-	SetDefaultCodePage(LocaleService_GetCodePage());	
-
-#if defined(CHECK_LATEST_DATA_FILES)
-	if (!CheckLatestFiles())
-		return 0;
+#ifndef _DEBUG
+	SetLogLevel(2);
+#else
+	SetLogLevel(1);
 #endif
 
-	bool bQuit = false;
-	bool bAuthKeyChecked = false;
-	int nArgc = 0;
-	PCHAR* szArgv = CommandLineToArgv( lpCmdLine, &nArgc );
-
-	for( int i=0; i < nArgc; i++ ) {
-		if(szArgv[i] == 0)
-			continue;
-		if (__IsLocaleVersion(szArgv[i])) // #0000829: [M2EU] 버전 파일이 항상 생기지 않도록 수정 
-		{
-			char szModuleName[MAX_PATH];
-			char szVersionPath[MAX_PATH];
-			GetModuleFileName(NULL, szModuleName, sizeof(szModuleName));
-			sprintf(szVersionPath, "%s.version", szModuleName);
-			FILE* fp = fopen(szVersionPath, "wt");
-			if (fp)
-			{
-				extern std::string METIN2_GET_VERSION();
-				fprintf(fp, "r%s\n", METIN2_GET_VERSION().c_str());
-				fclose(fp);
-			}
-			bQuit = true;
-		} else if (__IsLocaleOption(szArgv[i]))
-		{
-			FILE* fp=fopen("locale.txt", "wt");
-			fprintf(fp, "service[%s] code_page[%d]", 
-				LocaleService_GetName(), LocaleService_GetCodePage());
-			fclose(fp);
-			bQuit = true;
-		} else if (__IsTimeStampOption(szArgv[i]))
-		{
-			__PrintTimeStamp();
-			bQuit = true;
-		} else if ((strcmp(szArgv[i], "--force-set-locale") == 0))
-		{
-			// locale 설정엔 인자가 두 개 더 필요함 (로케일 명칭, 데이터 경로)
-			if (nArgc <= i + 2)
-			{
-				MessageBox(NULL, "Invalid arguments", ApplicationStringTable_GetStringz(IDS_APP_NAME, "APP_NAME"), MB_ICONSTOP);
-				goto Clean;
-			}
-
-			const char* localeName = szArgv[++i];
-			const char* localePath = szArgv[++i];
-
-			LocaleService_ForceSetLocale(localeName, localePath);
-		}
-	}
-
-	if(bQuit)
-		goto Clean;
-
-#if defined(NEEDED_COMMAND_ARGUMENT)
-	// 옵션이 없으면 비정상 실행으로 간주, 프로그램 종료
-	if (strstr(lpCmdLine, NEEDED_COMMAND_ARGUMENT) == 0) {
-		MessageBox(NULL, ApplicationStringTable_GetStringz(IDS_ERR_MUST_LAUNCH_FROM_PATCHER, "ERR_MUST_LAUNCH_FROM_PATCHER"), ApplicationStringTable_GetStringz(IDS_APP_NAME, "APP_NAME"), MB_ICONSTOP);
-			goto Clean;
-	}
+#ifdef LEAK_DETECT
+	SymInitialize(GetCurrentProcess(), 0, true);
+	SymSetOptions(SYMOPT_LOAD_LINES);
 #endif
 
-#if defined(NEEDED_COMMAND_CLIPBOARD)
-	{
-		CHAR szSecKey[256];
-		CPostIt cPostIt( "VOLUME1" );
-
-		if( cPostIt.Get( "SEC_KEY", szSecKey, sizeof(szSecKey) ) == FALSE ) {
-			MessageBox(NULL, ApplicationStringTable_GetStringz(IDS_ERR_MUST_LAUNCH_FROM_PATCHER, "ERR_MUST_LAUNCH_FROM_PATCHER"), ApplicationStringTable_GetStringz(IDS_APP_NAME, "APP_NAME"), MB_ICONSTOP);
-			goto Clean;
-		}
-		if( strstr(szSecKey, NEEDED_COMMAND_CLIPBOARD) == 0 ) {
-			MessageBox(NULL, ApplicationStringTable_GetStringz(IDS_ERR_MUST_LAUNCH_FROM_PATCHER, "ERR_MUST_LAUNCH_FROM_PATCHER"), ApplicationStringTable_GetStringz(IDS_APP_NAME, "APP_NAME"), MB_ICONSTOP);
-			goto Clean;
-		}
-		cPostIt.Empty();
-	}
-#endif
+	LocaleService_LoadConfig("config/locale.cfg");
+	SetDefaultCodePage(LocaleService_GetCodePage());
 
 	WebBrowser_Startup(hInstance);
 
-	if (!CheckPythonLibraryFilenames())
-	{
-		__ErrorPythonLibraryIsNotExist();
-		goto Clean;
-	}
-
+	// Main routine
 	Main(hInstance, lpCmdLine);
 
+	// Cleanup Web Browser
 	WebBrowser_Cleanup();
 
+	// Cleanup COM
 	::CoUninitialize();
 
-	if(gs_szErrorString[0])
-		MessageBox(NULL, gs_szErrorString, ApplicationStringTable_GetStringz(IDS_APP_NAME, "APP_NAME"), MB_ICONSTOP);
+#ifndef _DEBUG
+	RemoveEterException();
+#endif
 
-Clean:
-	SAFE_FREE_GLOBAL(szArgv);
-
-	return 0;
-}
-
-static void GrannyError(granny_log_message_type Type, granny_log_message_origin Origin, char const* File, granny_int32x Line, char const* Error, void* UserData)
-{
-	//Origin==GrannyFileReadingLogMessage for granny run-time tag& revision warning (Type==GrannyWarningLogMessage)
-	//Origin==GrannyControlLogMessage for miss track_group on static models as weapons warning (Type==GrannyWarningLogMessage)
-	//Origin==GrannyMeshBindingLogMessage for miss bone ToSkeleton on new ymir models error (Type==GrannyErrorLogMessage)
-
-	if (Origin == GrannyFileReadingLogMessage || Origin == GrannyControlLogMessage || Origin == GrannyMeshBindingLogMessage)
-		return;
-
-	TraceError("GRANNY: %s(%d): ERROR: %s --- [%d] %s --- [%d] %s",
-		File, Line, Error, Type, GrannyGetLogMessageTypeString(Type), Origin, GrannyGetLogMessageOriginString(Origin));
-}
-
-int Setup(LPSTR lpCmdLine)
-{
-	/* 
-	 *	타이머 정밀도를 올린다.
-	 */
-	TIMECAPS tc; 
-	UINT wTimerRes; 
-
-	if (timeGetDevCaps(&tc, sizeof(TIMECAPS)) != TIMERR_NOERROR) 
-		return 0;
-
-	wTimerRes = MINMAX(tc.wPeriodMin, 1, tc.wPeriodMax); 
-	timeBeginPeriod(wTimerRes); 
-
-	/*
-	 *	그래니 에러 핸들링
-	 */
-
-	granny_log_callback Callback;
-    Callback.Function = GrannyError;
-    Callback.UserData = 0;
-    GrannySetLogCallback(&Callback);
-	return 1;
+	return EXIT_SUCCESS;
 }

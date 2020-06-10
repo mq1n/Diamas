@@ -28,9 +28,11 @@ using namespace rapidjson;
 #ifdef _DEBUG
 	#pragma comment( lib, "tbb.lib" )
 	#pragma comment( lib, "cryptopp-static_debug.lib" )
+	#pragma comment( lib, "fmt_debug.lib" )
 #else
 	#pragma comment( lib, "tbb_debug.lib" )
 	#pragma comment( lib, "cryptopp-static.lib" )
+	#pragma comment( lib, "fmt.lib" )
 #endif
 
 // Beautifier: https://jsonformatter.curiousconcept.com

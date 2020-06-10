@@ -8,7 +8,7 @@
 	(uint32_t(uint8_t(b0)) | (uint32_t(uint8_t(b1)) << 8) | \
 	(uint32_t(uint8_t(b2)) << 16) | (uint32_t(uint8_t(b3)) << 24))
 
-// #define SHOW_FILE_NAMES
+#define SHOW_FILE_NAMES
 #define ENABLE_LAYER2_FILE_ENCRYPTION
 
 namespace FileSystem
@@ -16,7 +16,7 @@ namespace FileSystem
 	static constexpr auto ARCHIVE_VERSION		= 5U;
 	static constexpr auto ARCHIVE_KEY_LENGTH	= 64;
 	static constexpr auto LAYER2_KEY_LENGTH		= 32;
-	static constexpr auto ARCHIVE_MAGIC 		= FS_CREATEMAGIC('R', 'H', 'N', '2');
+	static constexpr auto ARCHIVE_MAGIC 		= FS_CREATEMAGIC('D', 'I', 'A', 'M');
 
 	static constexpr auto FILE_HASH_MAGIC  = 3889535852L;
 	static constexpr auto FILE_NAME_MAGIC  = 3586454764L;

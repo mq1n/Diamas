@@ -1,15 +1,20 @@
 #include "StdAfx.h"
-
 #include <time.h>
 #include <stdio.h>
 #include "Debug.h"
 #include "Singleton.h"
 #include "Timer.h"
+#include <chrono>
+#include <ctime>
+#include <fmt/format.h>
 
 const DWORD DEBUG_STRING_MAX_LEN = 1024;
 
 static int isLogFile = false;
 HWND g_PopupHwnd = NULL;
+
+auto g_stSyserrFileName = ""s;
+auto g_stLogFileName = ""s;
 
 class CLogFile : public CSingleton<CLogFile>
 {
@@ -28,7 +33,11 @@ class CLogFile : public CSingleton<CLogFile>
 
 		void Initialize()
 		{
-			m_fp = fopen("log.txt", "w");
+			auto st = std::time(nullptr);
+			auto timestamp = static_cast<std::chrono::seconds>(st).count();
+			g_stLogFileName = fmt::format("logs/sys_log_{}_{}.txt", GetCurrentProcessId(), static_cast<uint64_t>(timestamp));
+
+			m_fp = fopen(g_stLogFileName.c_str(), "w");
 		}
 
 		void Write(const char * c_pszMsg)
@@ -307,8 +316,12 @@ void LogFilef(const char * c_szMessage, ...)
 void OpenLogFile(bool bUseLogFIle)
 {
 #ifndef _DISTRIBUTE 
-	freopen("syserr.txt", "w", stderr);
+    auto st = std::time(nullptr);
+    auto timestamp = static_cast<std::chrono::seconds>(st).count();
+	g_stSyserrFileName = fmt::format("logs/sys_err_{}_{}.txt", GetCurrentProcessId(), static_cast<uint64_t>(timestamp));
 
+    freopen(g_stSyserrFileName.c_str(), "w", stderr);
+	
 	if (bUseLogFIle)
 	{
 		isLogFile = true;

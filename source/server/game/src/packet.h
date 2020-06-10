@@ -482,7 +482,7 @@ typedef struct command_login2
 	BYTE	header;
 	char	login[LOGIN_MAX_LEN + 1];
 	DWORD	dwLoginKey;
-	DWORD	adwClientKey[4];
+	uint32_t	adwClientKey[4];
 } TPacketCGLogin2;
 
 typedef struct command_login3

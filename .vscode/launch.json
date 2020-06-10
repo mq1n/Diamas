@@ -66,7 +66,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/win_server/db/",
             "environment": [],
-            "externalConsole": false
+            "externalConsole": true
         },
         {
             "name": "Auth Server/Debug",
@@ -77,7 +77,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/win_server/auth/",
             "environment": [],
-            "externalConsole": false
+            "externalConsole": true
         },
         {
             "name": "Game Server/Debug",
@@ -94,10 +94,10 @@
             "name": "Client (x86) / Debug",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/../Diamas_Client/Diamas_Debug_x86.exe",
+            "program": "${workspaceFolder}/../Diamas_client/client_debug_86.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/../Diamas_Client/",
+            "cwd": "${workspaceFolder}/../Diamas_client/",
             "environment": [],
             "externalConsole": false
         },

@@ -6,11 +6,15 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <fmt/format.h>
 
 namespace FileSystem
 {
-    static constexpr auto CUSTOM_LOG_FILENAME = "FileSystem.log";
-    static constexpr auto CUSTOM_LOG_ERROR_FILENAME = "FileSystemError.log";
+ 	static const auto st = std::time(nullptr);
+	static const auto timestamp = static_cast<std::chrono::seconds>(st).count();
+    
+    static const auto CUSTOM_LOG_FILENAME = fmt::format("logs/fs_log_{}_{}.txt", GetCurrentProcessId(), static_cast<uint64_t>(timestamp));
+    static const auto CUSTOM_LOG_ERROR_FILENAME = fmt::format("logs/fs_err_{}_{}.txt", GetCurrentProcessId(), static_cast<uint64_t>(timestamp));
 
     enum ELogLevels
     {

@@ -22,7 +22,6 @@ typedef struct SUseTime
 {
 	DWORD	dwLoginKey;
 	char        szLogin[LOGIN_MAX_LEN+1];
-	BYTE        bBillType;
 	DWORD       dwUseSec;
 	char        szIP[MAX_HOST_LENGTH+1];
 } TUseTime;
@@ -75,7 +74,7 @@ class DBManager : public singleton<DBManager>
 
 		void			SendMoneyLog(BYTE type, DWORD vnum, int gold);
 
-		void			LoginPrepare(BYTE bBillType, DWORD dwBillID, long lRemainSecs, LPDESC d, DWORD * pdwClientKey, int * paiPremiumTimes = NULL);
+		void			LoginPrepare(LPDESC d, DWORD * pdwClientKey, int * paiPremiumTimes = NULL);
 		void			SendAuthLogin(LPDESC d);
 		void			SendLoginPing(const char * c_pszLogin);
 

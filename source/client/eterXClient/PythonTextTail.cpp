@@ -718,9 +718,7 @@ void CPythonTextTail::SetItemTextTailOwner(DWORD dwVID, const char * c_szName)
 		}
 
 		std::string strName = c_szName;
-		static const std::string & strOwnership = ApplicationStringTable_GetString(IDS_POSSESSIVE_MORPHENE) == "" ? "'s" : ApplicationStringTable_GetString(IDS_POSSESSIVE_MORPHENE);
-		strName += strOwnership;
-
+		strName += "'s";
 
 		pTextTail->pOwnerTextInstance->SetTextPointer(ms_pFont);
 		pTextTail->pOwnerTextInstance->SetHorizonalAlign(CGraphicTextInstance::HORIZONTAL_ALIGN_CENTER);

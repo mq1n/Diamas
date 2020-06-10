@@ -34,8 +34,6 @@
 #include "GameType.h"
 extern DWORD __DEFAULT_CODE_PAGE__;
 
-#define APP_NAME	"Metin 2"
-
 enum
 {
 	POINT_MAX_NUM = 255,	
@@ -77,11 +75,3 @@ void initMessenger();
 #ifdef ENABLE_ACCE_SYSTEM
 void initAcce();
 #endif
-
-extern const std::string& ApplicationStringTable_GetString(DWORD dwID);
-extern const std::string& ApplicationStringTable_GetString(DWORD dwID, LPCSTR szKey);
-
-extern const char* ApplicationStringTable_GetStringz(DWORD dwID);
-extern const char* ApplicationStringTable_GetStringz(DWORD dwID, LPCSTR szKey);
-
-extern void ApplicationSetErrorString(const char* szErrorString);

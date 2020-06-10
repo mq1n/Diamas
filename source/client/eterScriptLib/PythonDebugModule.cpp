@@ -1,7 +1,5 @@
 #include "StdAfx.h"
 
-extern IPythonExceptionSender * g_pkExceptionSender;
-
 PyObject* dbgLogBox(PyObject* poSelf, PyObject* poArgs)
 {	
 	char* szMsg;
@@ -54,9 +52,6 @@ PyObject* dbgRegisterExceptionString(PyObject* poSelf, PyObject* poArgs)
 	char* szMsg;
 	if (!PyTuple_GetString(poArgs, 0, &szMsg)) 
 		return Py_BuildException();
-
-	if (g_pkExceptionSender)
-		g_pkExceptionSender->RegisterExceptionString(szMsg);
 
 	return Py_BuildNone();
 }

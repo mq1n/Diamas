@@ -130,9 +130,9 @@ class DESC
 		bool IsCipherPrepared();
 #else
 		// Obsolete encryption stuff here
-		void			SetSecurityKey(const DWORD * c_pdwKey);
-		const DWORD *	GetEncryptionKey() const { return &m_adwEncryptionKey[0]; }
-		const DWORD *	GetDecryptionKey() const { return &m_adwDecryptionKey[0]; }
+		void			SetSecurityKey(const uint32_t * c_pdwKey);
+		const uint32_t *	GetEncryptionKey() const { return &m_adwEncryptionKey[0]; }
+		const uint32_t *	GetDecryptionKey() const { return &m_adwDecryptionKey[0]; }
 #endif
 
 		// Á¦±¹
@@ -233,8 +233,8 @@ class DESC
 #else
 		// Obsolete encryption stuff here
 		bool			m_bEncrypted;
-		DWORD			m_adwDecryptionKey[4];
-		DWORD			m_adwEncryptionKey[4];
+		uint32_t			m_adwDecryptionKey[4];
+		uint32_t			m_adwEncryptionKey[4];
 #endif
 
 	public:

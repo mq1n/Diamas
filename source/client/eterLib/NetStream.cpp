@@ -6,7 +6,7 @@
 #include "../eterBase/tea.h"
 #endif
 
-//#define _PACKETDUMP
+// #define _PACKETDUMP
 
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
 void CNetworkStream::SetSecurityMode(bool isSecurityMode, const char* c_szTeaKey)
@@ -115,7 +115,7 @@ bool CNetworkStream::__RecvInternalBuffer()
 #else
 	if (IsSecurityMode())
 	{		
-		int restSize = min(m_recvTEABufSize - m_recvTEABufInputPos, m_recvBufSize - m_recvBufInputPos);
+		int restSize = std::min(m_recvTEABufSize - m_recvTEABufInputPos, m_recvBufSize - m_recvBufInputPos);
  
 		if (restSize > 0)
 		{
@@ -491,7 +491,7 @@ bool CNetworkStream::Peek(int size, char * pDestBuf)
 const char * GetSendHeaderName(BYTE header)
 {
 	static bool b = false;
-	static string stringList[UCHAR_MAX+1];
+	static std::string stringList[UCHAR_MAX+1];
 	if (b==false)
 	{
 		for (DWORD i = 0; i < UCHAR_MAX+1; i++)
@@ -577,7 +577,7 @@ const char * GetSendHeaderName(BYTE header)
 const char * GetRecvHeaderName(BYTE header)
 {
 	static bool b = false;
-	static string stringList[UCHAR_MAX+1];
+	static std::string stringList[UCHAR_MAX+1];
 	if (b==false)
 	{
 		for (DWORD i = 0; i < UCHAR_MAX+1; i++)
@@ -695,7 +695,7 @@ const char * GetRecvHeaderName(BYTE header)
 		stringList[134] = "HEADER_GC_DIG_MOTION";
 		stringList[135] = "HEADER_GC_DAMAGE_INFO";
 		stringList[136] = "HEADER_GC_CHAR_ADDITIONAL_INFO";
-		stringList[150] = "HEADER_GC_AUTH_SUCCESS"
+		stringList[150] = "HEADER_GC_AUTH_SUCCESS";
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 		stringList[0xfa] = "HEADER_GC_KEY_AGREEMENT_COMPLETED";
 		stringList[0xfb] = "HEADER_GC_KEY_AGREEMENT";
@@ -727,7 +727,7 @@ bool CNetworkStream::Recv(int size, char * pDestBuf)
 	if (*pDestBuf != 0 )
 	{
 		TraceError("RECV< %s (%d)", GetRecvHeaderName(*pDestBuf), size);
-		string contents;
+		std::string contents;
 		char buf[10];
 		for(int i = 1; i < size; i++)
 		{
@@ -762,7 +762,7 @@ bool CNetworkStream::Send(int size, const char * pSrcBuf)
 	if (*pSrcBuf != 0 )
 	{
 		TraceError("SEND> %s (%d)", GetSendHeaderName(*pSrcBuf), size);
-		string contents;
+		std::string contents;
 		char buf[10];
 		for(int i = 1; i < size; i++)
 		{

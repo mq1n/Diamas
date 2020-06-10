@@ -1,72 +1,72 @@
-#include "StdAfx.h"
-#include <stdio.h>
-#include <time.h>
-#include <winsock.h>
+#include <Windows.h>
 #include <DbgHelp.h>
+#include <CrashRpt143/CrashRpt.h>
+#include <tchar.h>
+#include <string>
 
-FILE * fException;
+extern std::string g_stSyserrFileName;
+extern std::string g_stLogFileName;
 
-#define ENABLE_CRASH_MINIDUMP
-#ifdef ENABLE_CRASH_MINIDUMP
-#include "../eterXClient/Version.h"
-#include <iomanip>
-#include <sstream>
-void make_minidump(EXCEPTION_POINTERS* e)
+//extern LONG WINAPI sehFilter(PEXCEPTION_POINTERS ExceptionInfo);
+
+int CALLBACK CrashCallback(CR_CRASH_CALLBACK_INFO * pInfo)
 {
-	auto hDbgHelp = LoadLibraryA("dbghelp");
-	if (hDbgHelp == nullptr)
-		return;
-	auto pMiniDumpWriteDump = (decltype(&MiniDumpWriteDump))GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
-	if (pMiniDumpWriteDump == nullptr)
-		return;
-	// folder name
-	std::string folder = "logs";
-	CreateDirectoryA(folder.c_str(), nullptr);
-	// time format
-	auto t = std::time(nullptr);
-	std::ostringstream timefmt;
-	timefmt << std::put_time(std::localtime(&t), "%Y%m%d_%H%M%S");
-	// filename
-	std::string filename = folder + "\\"s + "metin2client_"s + METIN2_GET_VERSION() + "_"s + timefmt.str() + ".dmp";
+//	if (pInfo && pInfo->pExceptionInfo && pInfo->pExceptionInfo->pexcptrs)
+//		sehFilter(pInfo->pExceptionInfo->pexcptrs);
 
-	auto hFile = CreateFileA(filename.c_str(), GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-	if (hFile == INVALID_HANDLE_VALUE)
-		return;
-
-	MINIDUMP_EXCEPTION_INFORMATION exceptionInfo;
-	exceptionInfo.ThreadId = GetCurrentThreadId();
-	exceptionInfo.ExceptionPointers = e;
-	exceptionInfo.ClientPointers = FALSE;
-
-	auto dumped = pMiniDumpWriteDump(
-		GetCurrentProcess(),
-		GetCurrentProcessId(),
-		hFile,
-		MINIDUMP_TYPE(MiniDumpWithIndirectlyReferencedMemory | MiniDumpScanMemory),
-		e ? &exceptionInfo : nullptr,
-		nullptr,
-		nullptr);
-
-	CloseHandle(hFile);
-
-	// std::string errMsg = "The application crashed. Send the generated file to the staff: "s + name;
-	// MessageBox(nullptr, errMsg.c_str(), "Metin2Client", MB_ICONSTOP);
-
-	return;
-}
-#endif
-
-LONG __stdcall EterExceptionFilter(_EXCEPTION_POINTERS * pExceptionInfo)
-{
-#ifdef ENABLE_CRASH_MINIDUMP
-	make_minidump(pExceptionInfo);
-#else
-	// eterlog trash
-#endif
-	return EXCEPTION_EXECUTE_HANDLER;
+	return CR_CB_DODEFAULT;
 }
 
-void SetEterExceptionHandler()
+// Install crash reporting
+bool SetEterExceptionHandler()
 {
-	SetUnhandledExceptionFilter(EterExceptionFilter);
+	CR_INSTALL_INFO info{};
+	info.cb = sizeof(CR_INSTALL_INFO);
+
+	info.pszAppName = _T("Diamas"); // Define application name.
+	info.pszAppVersion = _T("1.0.0"); // Define application version.
+	info.pszEmailSubject = _T("Client Error Report");
+	info.pszEmailTo = _T("info@diamas.com");
+	info.pszUrl = _T("http://diamas.to/crashrpt.php");
+
+	// Install all available exception handlers
+	info.dwFlags |= CR_INST_ALL_POSSIBLE_HANDLERS;
+
+//	info.dwFlags |= CR_INST_APP_RESTART; // Restarts the app after crash
+	info.dwFlags |= CR_INST_SEND_QUEUED_REPORTS;
+//	info.pszRestartCmdLine = "/restart";
+
+	// Provide privacy policy URL
+	info.pszPrivacyPolicyURL = _T("http://diamas.to/err_privacy.html");
+
+	info.uPriorities[CR_HTTP] = 3; // First try send report over HTTP
+	info.uPriorities[CR_SMTP] = 2; // Second try send report over SMTP
+	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI
+
+	auto nResult = crInstall(&info);
+	if (nResult != 0)
+	{
+		TCHAR buff[256];
+		crGetLastErrorMsg(buff, 256);
+
+		MessageBox(nullptr, buff, _T("crInstall error"), MB_OK);
+		return false;
+	}
+
+	// Set crash callback function
+	crSetCrashCallback(CrashCallback, nullptr);
+
+	// Take screenshot of the app window at the moment of crash
+	crAddScreenshot2(CR_AS_VIRTUAL_SCREEN | CR_AS_USE_JPEG_FORMAT, CR_AV_QUALITY_LOW);
+#ifdef _DEBUG
+	crAddFile2A(g_stLogFileName.c_str(), nullptr, _T("Log File"), CR_AF_MAKE_FILE_COPY);
+#endif
+	crAddFile2A(g_stSyserrFileName.c_str(), nullptr, _T("ErrorLog File"), CR_AF_MAKE_FILE_COPY);
+	return true;
+}
+
+bool RemoveEterException()
+{
+	crUninstall();
+	return true;
 }

@@ -251,13 +251,13 @@ class M2FilesHelper:
 			return		
 		
 		if (self.Environment == "64"):
-			symlink_targets_file.append(["auth\\DevIL.dll", "..\\share\\bin\\DevIL_x64.dll"])
-			symlink_targets_file.append(["game99\\DevIL.dll", "..\\share\\bin\\DevIL_x64.dll"])
-			symlink_targets_file.append(["kanal\\DevIL.dll", "..\\share\\bin\\DevIL_x64.dll"])
+			symlink_targets_file.append(["auth\\DevIL.dll", "..\\extern\\bin\\DevIL_x64.dll"])
+			symlink_targets_file.append(["game99\\DevIL.dll", "..\\extern\\bin\\DevIL_x64.dll"])
+			symlink_targets_file.append(["kanal\\DevIL.dll", "..\\extern\\bin\\DevIL_x64.dll"])
 		elif (self.Environment == "86"):
-			symlink_targets_file.append(["auth\\DevIL.dll", "..\\share\\bin\\DevIL_x86.dll"])
-			symlink_targets_file.append(["game99\\DevIL.dll", "..\\share\\bin\\DevIL_x86.dll"])
-			symlink_targets_file.append(["kanal\\DevIL.dll", "..\\share\\bin\\DevIL_x86.dll"])
+			symlink_targets_file.append(["auth\\DevIL.dll", "..\\extern\\bin\\DevIL.dll"])
+			symlink_targets_file.append(["game99\\DevIL.dll", "..\\extern\\bin\\DevIL.dll"])
+			symlink_targets_file.append(["kanal\\DevIL.dll", "..\\extern\\bin\\DevIL.dll"])
 		else:
 			print LOCALE("Tanimsiz Islem")
 			return
