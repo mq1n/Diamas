@@ -66,12 +66,12 @@ void CFlyingData::SetBombEffect(const char* szEffectName)
 
 }
 
-CFlyingData::TFlyingAttachData & CFlyingData::GetAttachDataReference(int iIndex)
+CFlyingData::TFlyingAttachData & CFlyingData::GetAttachDataReference(int32_t iIndex)
 {
 	return m_AttachDataVector[iIndex];
 }
 
-DWORD CFlyingData::AttachFlyEffect(int iType, const std::string & strFilename, float fRoll, float fArg1, float fArg2)
+uint32_t CFlyingData::AttachFlyEffect(int32_t iType, const std::string & strFilename, float fRoll, float fArg1, float fArg2)
 {
 	TFlyingAttachData fad;
 	memset(&fad,0, sizeof(fad));
@@ -105,9 +105,9 @@ DWORD CFlyingData::AttachFlyEffect(int iType, const std::string & strFilename, f
 	return m_AttachDataVector.size()-1;
 }
 
-void CFlyingData::RemoveAttach(int iIndex)
+void CFlyingData::RemoveAttach(int32_t iIndex)
 {
-	assert(0<=iIndex && iIndex<(int)m_AttachDataVector.size());
+	assert(0<=iIndex && iIndex<(int32_t)m_AttachDataVector.size());
 	m_AttachDataVector.erase(m_AttachDataVector.begin()+iIndex);
 }
 
@@ -116,9 +116,9 @@ void CFlyingData::RemoveAllAttach()
 	m_AttachDataVector.clear();
 }
 
-void CFlyingData::DuplicateAttach(int iIndex)
+void CFlyingData::DuplicateAttach(int32_t iIndex)
 {
-	assert(0<=iIndex && iIndex<(int)m_AttachDataVector.size());
+	assert(0<=iIndex && iIndex<(int32_t)m_AttachDataVector.size());
 	m_AttachDataVector.push_back(m_AttachDataVector[iIndex]);
 }
 
@@ -133,7 +133,7 @@ bool CFlyingData::LoadScriptFile(const char* c_szFilename)
 		return false;	
 
 	TextFileLoader.SetTop();
-	int temp;
+	int32_t temp;
 
 	if (!TextFileLoader.GetTokenInteger("spreadingflag",&temp))
 	{
@@ -222,7 +222,7 @@ bool CFlyingData::LoadScriptFile(const char* c_szFilename)
 	if (!TextFileLoader.GetTokenVector3("acceleration",&m_v3Accel))
 		m_v3Accel = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
-	DWORD i;
+	uint32_t i;
 	for(i=0;i<TextFileLoader.GetChildNodeCount();i++)
 	{
 		CTextFileLoader::CGotoChild GotoChild(&TextFileLoader, i);

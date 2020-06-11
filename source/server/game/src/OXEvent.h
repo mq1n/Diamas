@@ -21,9 +21,9 @@ enum OXEventStatus
 class COXEventManager : public singleton<COXEventManager>
 {
 	private :
-		std::map<DWORD, DWORD> m_map_char;
-		std::map<DWORD, DWORD> m_map_attender;
-		std::map<DWORD, DWORD> m_map_miss;
+		std::map<uint32_t, uint32_t> m_map_char;
+		std::map<uint32_t, uint32_t> m_map_attender;
+		std::map<uint32_t, uint32_t> m_map_miss;
 
 		std::vector<std::vector<tag_Quiz> > m_vec_quiz;
 
@@ -49,17 +49,17 @@ class COXEventManager : public singleton<COXEventManager>
 		bool CloseEvent();
 
 		void ClearQuiz();
-		bool AddQuiz(unsigned char level, const char* pszQuestion, bool answer);
+		bool AddQuiz(uint8_t level, const char* pszQuestion, bool answer);
 		bool ShowQuizList(LPCHARACTER pChar);
 
-		bool Quiz(unsigned char level, int timelimit);
-		bool GiveItemToAttender(DWORD dwItemVnum, BYTE count);
+		bool Quiz(uint8_t level, int32_t timelimit);
+		bool GiveItemToAttender(uint32_t dwItemVnum, uint8_t count);
 
 		bool CheckAnswer(bool answer);
 		void WarpToAudience();
 
 		bool LogWinner();
 
-		DWORD GetAttenderCount() { return m_map_attender.size(); }
+		uint32_t GetAttenderCount() { return m_map_attender.size(); }
 };
 

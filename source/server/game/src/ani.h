@@ -10,9 +10,9 @@
 
 
 void ani_init();
-DWORD ani_attack_speed(LPCHARACTER ch);
+uint32_t ani_attack_speed(LPCHARACTER ch);
 void ani_print_attack_speed();
-DWORD ani_combo_speed(LPCHARACTER ch, BYTE combo);
+uint32_t ani_combo_speed(LPCHARACTER ch, uint8_t combo);
 
 #endif	/* _ani_h_ */
 

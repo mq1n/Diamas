@@ -282,7 +282,7 @@ bool IsCCWAcuteAngle(float begin, float end)
 {
 	// abs(360 - dest + src) 	// 시계 방향
 	// dest - src				// 시계 반대 방향
-	int fValue = abs((int) (360.0f - end + begin));
+	int32_t fValue = abs((int32_t) (360.0f - end + begin));
 	return fValue >= (end - begin) ? true : false;
 }
 
@@ -361,7 +361,7 @@ float GetDegreeDifference(float fSource, float fTarget)
 		return fSource - fTarget;
 	}
 }
-int GetRotatingDirection(float fSource, float fTarget)
+int32_t GetRotatingDirection(float fSource, float fTarget)
 {
 	if (fSource < 180.0f)
 	{

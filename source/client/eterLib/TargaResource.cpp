@@ -23,9 +23,9 @@ bool CTargaResource::OnIsType(TType type)
 	return CResource::OnIsType(type);
 }
 
-bool CTargaResource::OnLoad(int iSize, const void * c_pvBuf)
+bool CTargaResource::OnLoad(int32_t iSize, const void * c_pvBuf)
 {
-	return image.LoadFromMemory(iSize, static_cast<const BYTE *>(c_pvBuf));
+	return image.LoadFromMemory(iSize, static_cast<const uint8_t *>(c_pvBuf));
 }
 
 void CTargaResource::OnClear()
@@ -38,13 +38,13 @@ bool CTargaResource::OnIsEmpty() const
 	return image.IsEmpty();
 }
 
-void CTargaResource::GetRect(DWORD & w, DWORD & h)
+void CTargaResource::GetRect(uint32_t & w, uint32_t & h)
 {
 	w = image.GetWidth();
 	h = image.GetHeight();
 }
 
-DWORD * CTargaResource::GetMemPtr()
+uint32_t * CTargaResource::GetMemPtr()
 {
 	return image.GetBasePointer();
 }

@@ -85,7 +85,7 @@ namespace quest
 
 	struct AStateScriptType
 	{
-		int		GetSize() const { return m_code.size(); }
+		int32_t		GetSize() const { return m_code.size(); }
 		const char*	GetCode() const { return &m_code[0]; }
 
 		std::vector<char> m_code;
@@ -102,8 +102,8 @@ namespace quest
 		std::string arg;  // <--+             |
 		std::vector<char> when_condition;// <-+
 		AStateScriptType script;
-		unsigned int quest_index;
-		int state_index;
+		uint32_t quest_index;
+		int32_t state_index;
 
 		AArgScript()
 			: quest_index(0), state_index(0)
@@ -113,24 +113,24 @@ namespace quest
 	struct QuestState
 	{
 		lua_State *	co;
-		int		ico;
-		short int	args;
-		BYTE		suspend_state;
-		int		iIndex;
+		int32_t		ico;
+		int16_t	args;
+		uint8_t		suspend_state;
+		int32_t		iIndex;
 		bool		bStart;
-		int		st;
+		int32_t		st;
 
 		std::string	_title;
 		std::string	_clock_name;
 		std::string	_counter_name;
-		int		_clock_value;
-		int		_counter_value;
+		int32_t		_clock_value;
+		int32_t		_counter_value;
 		std::string	_icon_file;
 
 		std::vector<AArgScript *> chat_scripts;
 
 		QuestState()
-			: co(NULL), ico(0), args(0), suspend_state(SUSPEND_STATE_NONE), iIndex(0), bStart(false), st(-1),
+			: co(nullptr), ico(0), args(0), suspend_state(SUSPEND_STATE_NONE), iIndex(0), bStart(false), st(-1),
 			_clock_value(0), _counter_value(0)
 		{}
 	};

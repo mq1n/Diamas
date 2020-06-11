@@ -27,7 +27,7 @@ EVENTINFO(petsystem_event_info)
 EVENTFUNC(petsystem_update_event)
 {
 	petsystem_event_info* info = dynamic_cast<petsystem_event_info*>( event->info );
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "check_speedhack_event> <Factor> Null pointer" );
 		return 0;
@@ -35,7 +35,7 @@ EVENTFUNC(petsystem_update_event)
 
 	CPetSystem*	pPetSystem = info->pPetSystem;
 
-	if (NULL == pPetSystem)
+	if (nullptr == pPetSystem)
 		return 0;
 
 	
@@ -52,7 +52,7 @@ const float PET_COUNT_LIMIT = 3;
 //  CPetActor
 ///////////////////////////////////////////////////////////////////////////////////////
 
-CPetActor::CPetActor(LPCHARACTER owner, DWORD vnum, DWORD options)
+CPetActor::CPetActor(LPCHARACTER owner, uint32_t vnum, uint32_t options)
 {
 	m_dwVnum = vnum;
 	m_dwVID = 0;
@@ -120,11 +120,11 @@ void CPetActor::Unsummon()
 	{
 		// 버프 삭제
 		this->ClearBuff();
-		this->SetSummonItem(NULL);
-		if (NULL != m_pkOwner)
+		this->SetSummonItem(nullptr);
+		if (nullptr != m_pkOwner)
 			m_pkOwner->ComputePoints();
 
-		if (NULL != m_pkChar)
+		if (nullptr != m_pkChar)
 			M2_DESTROY_CHARACTER(m_pkChar);
 
 		m_pkChar = 0;
@@ -132,11 +132,11 @@ void CPetActor::Unsummon()
 	}
 }
 
-DWORD CPetActor::Summon(const char* petName, LPITEM pSummonItem, bool bSpawnFar)
+uint32_t CPetActor::Summon(const char* petName, LPITEM pSummonItem, bool bSpawnFar)
 {
-	long x = m_pkOwner->GetX();
-	long y = m_pkOwner->GetY();
-	long z = m_pkOwner->GetZ();
+	int32_t x = m_pkOwner->GetX();
+	int32_t y = m_pkOwner->GetY();
+	int32_t z = m_pkOwner->GetZ();
 
 	if (true == bSpawnFar)
 	{
@@ -161,7 +161,7 @@ DWORD CPetActor::Summon(const char* petName, LPITEM pSummonItem, bool bSpawnFar)
 				m_dwVnum, 
 				m_pkOwner->GetMapIndex(), 
 				x, y, z,
-				false, (int)(m_pkOwner->GetRotation()+180), false);
+				false, (int32_t)(m_pkOwner->GetRotation()+180), false);
 
 	if (0 == m_pkChar)
 	{
@@ -198,13 +198,13 @@ bool CPetActor::_UpdatAloneActionAI(float fMinDist, float fMaxDist)
 	//GetDeltaByDegree(m_pkChar->GetRotation(), fDist, &fx, &fy);
 
 	// 느슨한 못감 속성 체크; 최종 위치와 중간 위치가 갈수없다면 가지 않는다.
-	//if (!(SECTREE_MANAGER::instance().IsMovablePosition(m_pkChar->GetMapIndex(), m_pkChar->GetX() + (int) fx, m_pkChar->GetY() + (int) fy) 
-	//			&& SECTREE_MANAGER::instance().IsMovablePosition(m_pkChar->GetMapIndex(), m_pkChar->GetX() + (int) fx/2, m_pkChar->GetY() + (int) fy/2)))
+	//if (!(SECTREE_MANAGER::instance().IsMovablePosition(m_pkChar->GetMapIndex(), m_pkChar->GetX() + (int32_t) fx, m_pkChar->GetY() + (int32_t) fy) 
+	//			&& SECTREE_MANAGER::instance().IsMovablePosition(m_pkChar->GetMapIndex(), m_pkChar->GetX() + (int32_t) fx/2, m_pkChar->GetY() + (int32_t) fy/2)))
 	//	return true;
 
 	m_pkChar->SetNowWalking(true);
 
-	//if (m_pkChar->Goto(m_pkChar->GetX() + (int) fx, m_pkChar->GetY() + (int) fy))
+	//if (m_pkChar->Goto(m_pkChar->GetX() + (int32_t) fx, m_pkChar->GetY() + (int32_t) fy))
 	//	m_pkChar->SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
 	if (!m_pkChar->IsStateMove() && m_pkChar->Goto(dest_x, dest_y))
 		m_pkChar->SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
@@ -219,7 +219,7 @@ bool CPetActor::_UpdateFollowAI()
 {
 	if (0 == m_pkChar->m_pkMobData)
 	{
-		//sys_err("[CPetActor::_UpdateFollowAI] m_pkChar->m_pkMobData is NULL");
+		//sys_err("[CPetActor::_UpdateFollowAI] m_pkChar->m_pkMobData is nullptr");
 		return false;
 	}
 	
@@ -237,15 +237,15 @@ bool CPetActor::_UpdateFollowAI()
 	float	START_RUN_DISTANCE = 900.0f;		// 이 거리 이상 떨어지면 뛰어서 쫓아감.
 
 	float	RESPAWN_DISTANCE = 4500.f;			// 이 거리 이상 멀어지면 주인 옆으로 소환함.
-	int		APPROACH = 200;						// 접근 거리
+	int32_t		APPROACH = 200;						// 접근 거리
 
 	
 	bool bRun = false;							// 뛰어야 하나?
 
-	DWORD currentTime = get_dword_time();
+	uint32_t currentTime = get_dword_time();
 
-	long ownerX = m_pkOwner->GetX();		long ownerY = m_pkOwner->GetY();
-	long charX = m_pkChar->GetX();			long charY = m_pkChar->GetY();
+	int32_t ownerX = m_pkOwner->GetX();		int32_t ownerY = m_pkOwner->GetY();
+	int32_t charX = m_pkChar->GetX();			int32_t charY = m_pkChar->GetY();
 
 	float fDist = DISTANCE_APPROX(charX - ownerX, charY - ownerY);
 
@@ -295,14 +295,14 @@ bool CPetActor::_UpdateFollowAI()
 	return true;
 }
 
-bool CPetActor::Update(DWORD deltaTime)
+bool CPetActor::Update(uint32_t deltaTime)
 {
 	bool bResult = true;
 
 	// 펫 주인이 죽었거나, 소환된 펫의 상태가 이상하다면 펫을 없앰. (NOTE: 가끔가다 이런 저런 이유로 소환된 펫이 DEAD 상태에 빠지는 경우가 있음-_-;)
 	// 펫을 소환한 아이템이 없거나, 내가 가진 상태가 아니라면 펫을 없앰.
 	if (m_pkOwner->IsDead() || (IsSummoned() && m_pkChar->IsDead()) 
-		|| NULL == ITEM_MANAGER::instance().FindByVID(this->GetSummonItemVID())
+		|| nullptr == ITEM_MANAGER::instance().FindByVID(this->GetSummonItemVID())
 		|| ITEM_MANAGER::instance().FindByVID(this->GetSummonItemVID())->GetOwner() != this->GetOwner()
 		)
 	{
@@ -340,7 +340,7 @@ bool CPetActor::Follow(float fMinDistance)
 	float fDistToGo = fDist - fMinDistance;
 	GetDeltaByDegree(m_pkChar->GetRotation(), fDistToGo, &fx, &fy);
 	
-	if (!m_pkChar->Goto((int)(fPetX+fx+0.5f), (int)(fPetY+fy+0.5f)) )
+	if (!m_pkChar->Goto((int32_t)(fPetX+fx+0.5f), (int32_t)(fPetY+fy+0.5f)) )
 		return false;
 
 	m_pkChar->SendMovePacket(FUNC_WAIT, 0, 0, 0, 0, 0);
@@ -350,7 +350,7 @@ bool CPetActor::Follow(float fMinDistance)
 
 void CPetActor::SetSummonItem (LPITEM pItem)
 {
-	if (NULL == pItem)
+	if (nullptr == pItem)
 	{
 		m_dwSummonItemVID = 0;
 		m_dwSummonItemVnum = 0;
@@ -368,7 +368,7 @@ bool __PetCheckBuff(const CPetActor* pPetActor)
 	{
 		case 34004:
 		case 34009:
-			if (NULL == pPetActor->GetOwner()->GetDungeon())
+			if (nullptr == pPetActor->GetOwner()->GetDungeon())
 				bMustHaveBuff = false;
 		default:
 			break;
@@ -382,21 +382,21 @@ void CPetActor::GiveBuff()
 	if (!__PetCheckBuff(this))
 		return;
 	LPITEM item = ITEM_MANAGER::instance().FindByVID(m_dwSummonItemVID);
-	if (NULL != item)
+	if (nullptr != item)
 		item->ModifyPoints(true);
 	return ;
 }
 
 void CPetActor::ClearBuff()
 {
-	if (NULL == m_pkOwner)
+	if (nullptr == m_pkOwner)
 		return ;
 	TItemTable* item_proto = ITEM_MANAGER::instance().GetTable(m_dwSummonItemVnum);
-	if (NULL == item_proto)
+	if (nullptr == item_proto)
 		return;
 	if (!__PetCheckBuff(this)) // @fixme129
 		return;
-	for (int i = 0; i < ITEM_APPLY_MAX_NUM; i++)
+	for (int32_t i = 0; i < ITEM_APPLY_MAX_NUM; i++)
 	{
 		if (item_proto->aApplies[i].bType == APPLY_NONE)
 			continue;
@@ -441,11 +441,11 @@ void CPetSystem::Destroy()
 }
 
 /// 펫 시스템 업데이트. 등록된 펫들의 AI 처리 등을 함.
-bool CPetSystem::Update(DWORD deltaTime)
+bool CPetSystem::Update(uint32_t deltaTime)
 {
 	bool bResult = true;
 
-	DWORD currentTime = get_dword_time();
+	uint32_t currentTime = get_dword_time();
 
 	// CHARACTER_MANAGER에서 캐릭터류 Update할 때 매개변수로 주는 (Pulse라고 되어있는)값이 이전 프레임과의 시간차이인줄 알았는데
 	// 전혀 다른 값이라서-_-; 여기에 입력으로 들어오는 deltaTime은 의미가 없음ㅠㅠ	
@@ -463,7 +463,7 @@ bool CPetSystem::Update(DWORD deltaTime)
 		{
 			LPCHARACTER pPet = petActor->GetCharacter();
 			
-			if (NULL == CHARACTER_MANAGER::instance().Find(pPet->GetVID()))
+			if (nullptr == CHARACTER_MANAGER::instance().Find(pPet->GetVID()))
 			{
 				v_garbageActor.push_back(petActor);
 			}
@@ -482,7 +482,7 @@ bool CPetSystem::Update(DWORD deltaTime)
 }
 
 /// 관리 목록에서 펫을 지움
-void CPetSystem::DeletePet(DWORD mobVnum)
+void CPetSystem::DeletePet(uint32_t mobVnum)
 {
 	TPetActorMap::iterator iter = m_petActorMap.find(mobVnum);
 
@@ -519,7 +519,7 @@ void CPetSystem::DeletePet(CPetActor* petActor)
 	sys_err("[CPetSystem::DeletePet] Can't find petActor(0x%x) on my list(size: %d) ", petActor, m_petActorMap.size());
 }
 
-void CPetSystem::Unsummon(DWORD vnum, bool bDeleteFromList)
+void CPetSystem::Unsummon(uint32_t vnum, bool bDeleteFromList)
 {
 	CPetActor* actor = this->GetByVnum(vnum);
 
@@ -541,12 +541,12 @@ void CPetSystem::Unsummon(DWORD vnum, bool bDeleteFromList)
 	if (false == bActive)
 	{
 		event_cancel(&m_pkPetSystemUpdateEvent);
-		m_pkPetSystemUpdateEvent = NULL;
+		m_pkPetSystemUpdateEvent = nullptr;
 	}
 }
 
 
-CPetActor* CPetSystem::Summon(DWORD mobVnum, LPITEM pSummonItem, const char* petName, bool bSpawnFar, DWORD options)
+CPetActor* CPetSystem::Summon(uint32_t mobVnum, LPITEM pSummonItem, const char* petName, bool bSpawnFar, uint32_t options)
 {
 	CPetActor* petActor = this->GetByVnum(mobVnum);
 
@@ -558,12 +558,12 @@ CPetActor* CPetSystem::Summon(DWORD mobVnum, LPITEM pSummonItem, const char* pet
 	}
 
 #ifdef ENABLE_NEWSTUFF
-	DWORD petVID = petActor->Summon(petName, pSummonItem, bSpawnFar);
+	uint32_t petVID = petActor->Summon(petName, pSummonItem, bSpawnFar);
 	if (!petVID)
 		sys_err("[CPetSystem::Summon(%d)] Null Pointer (petVID)", pSummonItem);
 #endif
 
-	if (NULL == m_pkPetSystemUpdateEvent)
+	if (nullptr == m_pkPetSystemUpdateEvent)
 	{
 		petsystem_event_info* info = AllocEventInfo<petsystem_event_info>();
 
@@ -576,7 +576,7 @@ CPetActor* CPetSystem::Summon(DWORD mobVnum, LPITEM pSummonItem, const char* pet
 }
 
 
-CPetActor* CPetSystem::GetByVID(DWORD vid) const
+CPetActor* CPetSystem::GetByVID(uint32_t vid) const
 {
 	CPetActor* petActor = 0;
 
@@ -602,7 +602,7 @@ CPetActor* CPetSystem::GetByVID(DWORD vid) const
 }
 
 /// 등록 된 펫 중에서 주어진 몹 VNUM을 가진 액터를 반환하는 함수.
-CPetActor* CPetSystem::GetByVnum(DWORD vnum) const
+CPetActor* CPetSystem::GetByVnum(uint32_t vnum) const
 {
 	CPetActor* petActor = 0;
 

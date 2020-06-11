@@ -33,10 +33,10 @@ public:
 	CGraphicDevice();
 	virtual ~CGraphicDevice();
 
-	void			InitBackBufferCount(UINT uBackBufferCount);
+	void			InitBackBufferCount(uint32_t uBackBufferCount);
 
 	void			Destroy();
-	int				Create(HWND hWnd, int hres, int vres, bool Windowed = true, int bit = 32, int ReflashRate = 0);
+	int32_t				Create(HWND hWnd, int32_t hres, int32_t vres, bool Windowed = true, int32_t bit = 32, int32_t ReflashRate = 0);
 
 	EDeviceState	GetDeviceState();
 	bool			Reset();
@@ -45,30 +45,30 @@ public:
 	void			DisableWebBrowserMode();
 	void			MoveWebBrowserRect(const RECT& c_rcWebPage);
 
-	bool			ResizeBackBuffer(UINT uWidth, UINT uHeight);
-	void			RegisterWarningString(UINT uiMsg, const char * c_szString);
+	bool			ResizeBackBuffer(uint32_t uWidth, uint32_t uHeight);
+	void			RegisterWarningString(uint32_t uiMsg, const char * c_szString);
 
 protected:
 	void __Initialize();
 	bool __IsInDriverBlackList(D3D_CAdapterInfo& rkD3DAdapterInfo);
-	void __WarningMessage(HWND hWnd, UINT uiMsg);
+	void __WarningMessage(HWND hWnd, uint32_t uiMsg);
 
 	void __InitializeDefaultIndexBufferList();
 	void __DestroyDefaultIndexBufferList();	
 	bool __CreateDefaultIndexBufferList();
-	bool __CreateDefaultIndexBuffer(UINT eDefIB, UINT uIdxCount, const WORD* c_awIndices);
+	bool __CreateDefaultIndexBuffer(uint32_t eDefIB, uint32_t uIdxCount, const uint16_t* c_awIndices);
 
 	void __InitializePDTVertexBufferList();
 	void __DestroyPDTVertexBufferList();
 	bool __CreatePDTVertexBufferList();
 
-	DWORD CreatePTStreamVertexShader();
-	DWORD CreatePNTStreamVertexShader();
-	DWORD CreatePNT2StreamVertexShader();
-	DWORD CreateDoublePNTStreamVertexShader();
+	uint32_t CreatePTStreamVertexShader();
+	uint32_t CreatePNTStreamVertexShader();
+	uint32_t CreatePNT2StreamVertexShader();
+	uint32_t CreateDoublePNTStreamVertexShader();
 
 protected:
-	DWORD						m_uBackBufferCount;
-	std::map<UINT, std::string>	m_kMap_strWarningMessage;
+	uint32_t						m_uBackBufferCount;
+	std::map<uint32_t, std::string>	m_kMap_strWarningMessage;
 	CStateManager*				m_pStateManager;
 };

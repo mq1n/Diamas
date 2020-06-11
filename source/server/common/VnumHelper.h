@@ -20,35 +20,35 @@ class CItemVnumHelper
 {
 public:
 	/// 독일 DVD용 불사조 소환권
-	static	const bool	IsPhoenix(DWORD vnum)				{ return 53001 == vnum; }		// NOTE: 불사조 소환 아이템은 53001 이지만 mob-vnum은 34001 입니다.
+	static	const bool	IsPhoenix(uint32_t vnum)				{ return 53001 == vnum; }		// NOTE: 불사조 소환 아이템은 53001 이지만 mob-vnum은 34001 입니다.
 
 	/// 라마단 이벤트 초승달의 반지 (원래는 라마단 이벤트용 특수 아이템이었으나 앞으로 여러 방향으로 재활용해서 계속 쓴다고 함)
-	static	const bool	IsRamadanMoonRing(DWORD vnum)		{ return 71135 == vnum; }
+	static	const bool	IsRamadanMoonRing(uint32_t vnum)		{ return 71135 == vnum; }
 
 	/// 할로윈 사탕 (스펙은 초승달의 반지와 동일)
-	static	const bool	IsHalloweenCandy(DWORD vnum)		{ return 71136 == vnum; }
+	static	const bool	IsHalloweenCandy(uint32_t vnum)		{ return 71136 == vnum; }
 
 	/// 크리스마스 행복의 반지
-	static	const bool	IsHappinessRing(DWORD vnum)		{ return 71143 == vnum; }
+	static	const bool	IsHappinessRing(uint32_t vnum)		{ return 71143 == vnum; }
 
 	/// 발렌타인 사랑의 팬던트 
-	static	const bool	IsLovePendant(DWORD vnum)		{ return 71145 == vnum; }
+	static	const bool	IsLovePendant(uint32_t vnum)		{ return 71145 == vnum; }
 };
 
 class CMobVnumHelper
 {
 public:
 	/// 독일 DVD용 불사조 몹 번호
-	static	bool	IsPhoenix(DWORD vnum)				{ return 34001 == vnum; }
-	static	bool	IsIcePhoenix(DWORD vnum)				{ return 34003 == vnum; }
+	static	bool	IsPhoenix(uint32_t vnum)				{ return 34001 == vnum; }
+	static	bool	IsIcePhoenix(uint32_t vnum)				{ return 34003 == vnum; }
 	/// PetSystem이 관리하는 펫인가?
-	static	bool	IsPetUsingPetSystem(DWORD vnum)	{ return (IsPhoenix(vnum) || IsReindeerYoung(vnum)) || IsIcePhoenix(vnum); }
+	static	bool	IsPetUsingPetSystem(uint32_t vnum)	{ return (IsPhoenix(vnum) || IsReindeerYoung(vnum)) || IsIcePhoenix(vnum); }
 
 	/// 2011년 크리스마스 이벤트용 펫 (아기 순록)
-	static	bool	IsReindeerYoung(DWORD vnum)	{ return 34002 == vnum; }
+	static	bool	IsReindeerYoung(uint32_t vnum)	{ return 34002 == vnum; }
 
 	/// 라마단 이벤트 보상용 흑마(20119) .. 할로윈 이벤트용 라마단 흑마 클론(스펙은 같음, 20219)
-	static	bool	IsRamadanBlackHorse(DWORD vnum)		{ return 20119 == vnum || 20219 == vnum || 22022 == vnum; }
+	static	bool	IsRamadanBlackHorse(uint32_t vnum)		{ return 20119 == vnum || 20219 == vnum || 22022 == vnum; }
 };
 
 class CVnumHelper

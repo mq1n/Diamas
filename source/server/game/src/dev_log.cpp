@@ -27,22 +27,22 @@
 #	define TOGGLE_BIT(var,bit)		((var) = (var) ^ (bit))
 #endif	// TOGGLE_BIT
 
-static int	s_log_mask = 0xffffffff;
+static int32_t	s_log_mask = 0xffffffff;
 
-void dev_log(const char *file, int line, const char *function, int level, const char *fmt, ...)
+void dev_log(const char *file, int32_t line, const char *function, int32_t level, const char *fmt, ...)
 {
 	// 테스트 서버에서만 남기며, 마스크가 꺼져있으면 남기지 않는다.
 	if (!test_server || !IS_SET(s_log_mask, level))
 		return;
 
 	static char	buf[1024*1024];	// 1M
-	int			fd;
+	int32_t			fd;
     char        strtime[64+1];
     const char        *strlevel;
     struct      timeval tv;
     struct      tm      ltm;
-    int         mon, day, hour, min, sec, usec;
-    int         nlen;
+    int32_t         mon, day, hour, min, sec, usec;
+    int32_t         nlen;
     va_list     args;
 
 	// ---------------------------------------
@@ -60,7 +60,7 @@ void dev_log(const char *file, int line, const char *function, int level, const 
     // ---------------------------------------
     // set time string
     // ---------------------------------------
-    gettimeofday (&tv, NULL);
+    gettimeofday (&tv, nullptr);
 
     localtime_r((time_t*) &tv.tv_sec, &ltm);
 
@@ -73,7 +73,7 @@ void dev_log(const char *file, int line, const char *function, int level, const 
 
 	nlen = snprintf(strtime, sizeof(strtime), "%02d%02d %02d:%02d.%02d.%06d", mon, day, hour, min, sec, usec);
 
-	if (nlen < 0 || nlen >= (int) sizeof(strtime))
+	if (nlen < 0 || nlen >= (int32_t) sizeof(strtime))
 		nlen = sizeof(strtime) - 1;
 
 	strtime[nlen - 2] = '\0';
@@ -113,17 +113,17 @@ void dev_log(const char *file, int line, const char *function, int level, const 
 	nlen = snprintf(buf, sizeof(buf), "%s %-4s (%-15s,%4d,%-24s) ",
 			strtime, strlevel, file, line, function);
 
-	if (nlen < 0 || nlen >= (int) sizeof(buf))
+	if (nlen < 0 || nlen >= (int32_t) sizeof(buf))
 		return;
 
 	// ---------------------------------------
 	// write_log
 	// ---------------------------------------
 	va_start(args, fmt);
-	int vlen = vsnprintf(buf + nlen, sizeof(buf) - (nlen + 2), fmt, args);
+	int32_t vlen = vsnprintf(buf + nlen, sizeof(buf) - (nlen + 2), fmt, args);
 	va_end(args);
 
-	if (vlen < 0 || vlen >= (int) sizeof(buf) - (nlen + 2))
+	if (vlen < 0 || vlen >= (int32_t) sizeof(buf) - (nlen + 2))
 		nlen += (sizeof(buf) - (nlen + 2)) - 1;
 	else
 		nlen += vlen;
@@ -135,17 +135,17 @@ void dev_log(const char *file, int line, const char *function, int level, const 
 	::close(fd);
 }
 
-void dev_log_add_level(int level)
+void dev_log_add_level(int32_t level)
 {
 	SET_BIT(s_log_mask, level);
 }
 
-void dev_log_del_level(int level)
+void dev_log_del_level(int32_t level)
 {
 	REMOVE_BIT(s_log_mask, level);
 }
 
-void dev_log_set_level(int mask)
+void dev_log_set_level(int32_t mask)
 {
 	s_log_mask = mask;
 }

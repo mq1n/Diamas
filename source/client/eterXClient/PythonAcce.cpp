@@ -25,7 +25,7 @@ void CPythonAcce::Clear()
 
 	// @ikd
 
-	/*for (BYTE bPos = 0; bPos < m_vAcceMaterials.size(); ++bPos)
+	/*for (uint8_t bPos = 0; bPos < m_vAcceMaterials.size(); ++bPos)
 	{
 		TAcceMaterial tMaterial;
 		tMaterial.bHere = 0;
@@ -36,7 +36,7 @@ void CPythonAcce::Clear()
 	ZeroMemory(m_vAcceMaterials.data() , m_vAcceMaterials.size() * sizeof(m_vAcceMaterials[0]));
 }
 
-void CPythonAcce::AddMaterial(DWORD dwRefPrice, BYTE bPos, TItemPos tPos)
+void CPythonAcce::AddMaterial(uint32_t dwRefPrice, uint8_t bPos, TItemPos tPos)
 {
 	if (bPos >= ACCE_WINDOW_MAX_MATERIALS)
 		return;
@@ -58,7 +58,7 @@ void CPythonAcce::AddMaterial(DWORD dwRefPrice, BYTE bPos, TItemPos tPos)
 	tMaterial.wCell = tPos.cell;
 }
 
-void CPythonAcce::AddResult(DWORD dwItemVnum, DWORD dwMinAbs, DWORD dwMaxAbs)
+void CPythonAcce::AddResult(uint32_t dwItemVnum, uint32_t dwMinAbs, uint32_t dwMaxAbs)
 {
 	// @ikd
 	/*
@@ -75,7 +75,7 @@ void CPythonAcce::AddResult(DWORD dwItemVnum, DWORD dwMinAbs, DWORD dwMaxAbs)
 	tResult.dwMaxAbs = dwMaxAbs;
 }
 
-void CPythonAcce::RemoveMaterial(DWORD dwRefPrice, BYTE bPos)
+void CPythonAcce::RemoveMaterial(uint32_t dwRefPrice, uint8_t bPos)
 {
 	if (bPos >= ACCE_WINDOW_MAX_MATERIALS)
 		return;
@@ -95,7 +95,7 @@ void CPythonAcce::RemoveMaterial(DWORD dwRefPrice, BYTE bPos)
 	memset(&m_vAcceMaterials[bPos], 0, sizeof(TAcceMaterial));
 }
 
-bool CPythonAcce::GetAttachedItem(BYTE bPos, BYTE & bHere, WORD & wCell)
+bool CPythonAcce::GetAttachedItem(uint8_t bPos, uint8_t & bHere, uint16_t & wCell)
 {
 	if (bPos >= ACCE_WINDOW_MAX_MATERIALS)
 		return false;
@@ -105,7 +105,7 @@ bool CPythonAcce::GetAttachedItem(BYTE bPos, BYTE & bHere, WORD & wCell)
 	return true;
 }
 
-void CPythonAcce::GetResultItem(DWORD & dwItemVnum, DWORD & dwMinAbs, DWORD & dwMaxAbs)
+void CPythonAcce::GetResultItem(uint32_t & dwItemVnum, uint32_t & dwMinAbs, uint32_t & dwMaxAbs)
 {
 	dwItemVnum = m_vAcceResult.dwItemVnum;
 	dwMinAbs = m_vAcceResult.dwMinAbs;
@@ -121,7 +121,7 @@ PyObject * SendAcceCloseRequest(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * SendAcceAdd(PyObject * poSelf, PyObject * poArgs)
 {
-	BYTE bPos=0;
+	uint8_t bPos=0;
 	TItemPos tPos;
 	if (!PyTuple_GetInteger(poArgs, 0, &tPos.window_type))
 		return Py_BuildException();
@@ -137,7 +137,7 @@ PyObject * SendAcceAdd(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * SendAcceRemove(PyObject * poSelf, PyObject * poArgs)
 {
-	BYTE bPos;
+	uint8_t bPos;
 	if (!PyTuple_GetInteger(poArgs, 0, &bPos))
 		return Py_BuildException();
 
@@ -153,12 +153,12 @@ PyObject * GetAccePrice(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * GetAcceAttachedItem(PyObject * poSelf, PyObject * poArgs)
 {
-	BYTE bPos;
+	uint8_t bPos;
 	if (!PyTuple_GetInteger(poArgs, 0, &bPos))
 		return Py_BuildException();
 
-	BYTE bHere;
-	WORD wCell;
+	uint8_t bHere;
+	uint16_t wCell;
 	bool bGet = CPythonAcce::Instance().GetAttachedItem(bPos, bHere, wCell);
 	if (!bGet)
 	{
@@ -171,15 +171,15 @@ PyObject * GetAcceAttachedItem(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * GetAcceResultItem(PyObject * poSelf, PyObject * poArgs)
 {
-	DWORD dwItemVnum, dwMinAbs, dwMaxAbs;
+	uint32_t dwItemVnum, dwMinAbs, dwMaxAbs;
 	CPythonAcce::Instance().GetResultItem(dwItemVnum, dwMinAbs, dwMaxAbs);
 	return Py_BuildValue("iii", dwItemVnum, dwMinAbs, dwMaxAbs);
 }
 
 PyObject * SendAcceRefineRequest(PyObject * poSelf, PyObject * poArgs)
 {
-	BYTE bHere;
-	WORD wCell;
+	uint8_t bHere;
+	uint16_t wCell;
 	bool bGet = CPythonAcce::Instance().GetAttachedItem(1, bHere, wCell);
 	if (bGet)
 	{
@@ -204,7 +204,7 @@ void initAcce()
 		{"GetResultItem",			GetAcceResultItem,			METH_VARARGS},
 		{"SendRefineRequest",		SendAcceRefineRequest,		METH_VARARGS},
 
-		{NULL, NULL, NULL},
+		{nullptr, nullptr, 0},
 	};
 
 	PyObject* pModule = Py_InitModule("acce", functions);

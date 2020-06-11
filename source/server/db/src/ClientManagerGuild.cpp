@@ -8,10 +8,10 @@
 #include "GuildManager.h"
 
 
-void CClientManager::GuildCreate(CPeer * peer, DWORD dwGuildID)
+void CClientManager::GuildCreate(CPeer * peer, uint32_t dwGuildID)
 {
 	sys_log(0, "GuildCreate %u", dwGuildID);
-	ForwardPacket(HEADER_DG_GUILD_LOAD, &dwGuildID, sizeof(DWORD));
+	ForwardPacket(HEADER_DG_GUILD_LOAD, &dwGuildID, sizeof(uint32_t));
 
 	CGuildManager::instance().Load(dwGuildID);
 }
@@ -74,7 +74,7 @@ void CClientManager::GuildRemoveMember(CPeer* peer, TPacketGuild* p)
 	CDBManager::instance().AsyncQuery(szQuery);
 
 	// @fixme202 new_+withdraw_time
-	snprintf(szQuery, sizeof(szQuery), "REPLACE INTO quest%s (dwPID, szName, szState, lValue) VALUES(%u, 'guild_manage', 'new_withdraw_time', %u)", GetTablePostfix(), p->dwInfo, (DWORD) GetCurrentTime());
+	snprintf(szQuery, sizeof(szQuery), "REPLACE INTO quest%s (dwPID, szName, szState, lValue) VALUES(%u, 'guild_manage', 'new_withdraw_time', %u)", GetTablePostfix(), p->dwInfo, (uint32_t) GetCurrentTime());
 	CDBManager::instance().AsyncQuery(szQuery);
 
 	ForwardPacket(HEADER_DG_GUILD_REMOVE_MEMBER, p, sizeof(TPacketGuild));
@@ -111,7 +111,7 @@ void CClientManager::GuildDisband(CPeer* peer, TPacketGuild* p)
 	CDBManager::instance().AsyncQuery(szQuery);
 
 	// @fixme401 (withdraw -> new_disband)_time
-	snprintf(szQuery, sizeof(szQuery), "REPLACE INTO quest%s (dwPID, szName, szState, lValue) SELECT pid, 'guild_manage', 'new_disband_time', %u FROM guild_member%s WHERE guild_id = %u", GetTablePostfix(), (DWORD) GetCurrentTime(), GetTablePostfix(), p->dwGuild);
+	snprintf(szQuery, sizeof(szQuery), "REPLACE INTO quest%s (dwPID, szName, szState, lValue) SELECT pid, 'guild_manage', 'new_disband_time', %u FROM guild_member%s WHERE guild_id = %u", GetTablePostfix(), (uint32_t) GetCurrentTime(), GetTablePostfix(), p->dwGuild);
 	CDBManager::instance().AsyncQuery(szQuery);
 
 	snprintf(szQuery, sizeof(szQuery), "DELETE FROM guild_member%s WHERE guild_id=%u", GetTablePostfix(), p->dwGuild);
@@ -123,7 +123,7 @@ void CClientManager::GuildDisband(CPeer* peer, TPacketGuild* p)
 	ForwardPacket(HEADER_DG_GUILD_DISBAND, p, sizeof(TPacketGuild));
 }
 
-const char* __GetWarType(int n)
+const char* __GetWarType(int32_t n)
 {
 	switch (n)
 	{
@@ -218,7 +218,7 @@ void CClientManager::GuildUseSkill(TPacketGuildUseSkill* p)
 	SendGuildSkillUsable(p->dwGuild, p->dwSkillVnum, false);
 }
 
-void CClientManager::SendGuildSkillUsable(DWORD guild_id, DWORD dwSkillVnum, bool bUsable)
+void CClientManager::SendGuildSkillUsable(uint32_t guild_id, uint32_t dwSkillVnum, bool bUsable)
 {
 	sys_log(0, "SendGuildSkillUsable Send %u %d %s", guild_id, dwSkillVnum, bUsable?"true":"false");
 

@@ -4,12 +4,12 @@
 class CAffect
 {
 	public:
-		DWORD	dwType;
-		BYTE    bApplyOn;
-		long    lApplyValue;
-		DWORD   dwFlag;
-		long	lDuration;
-		long	lSPCost;
+		uint32_t	dwType;
+		uint8_t    bApplyOn;
+		int32_t    lApplyValue;
+		uint32_t   dwFlag;
+		int32_t	lDuration;
+		int32_t	lSPCost;
 
 		static CAffect* Acquire();
 		static void Release(CAffect* p);

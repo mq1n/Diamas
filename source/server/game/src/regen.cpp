@@ -6,8 +6,8 @@
 #include "mob_manager.h"
 #include "dungeon.h"
 
-LPREGEN	regen_list = NULL;
-LPREGEN_EXCEPTION regen_exception_list = NULL;
+LPREGEN	regen_list = nullptr;
+LPREGEN_EXCEPTION regen_exception_list = nullptr;
 
 enum ERegenModes
 {
@@ -26,10 +26,10 @@ enum ERegenModes
 
 static bool get_word(FILE *fp, char *buf) // 워드단위로 받는다.
 {
-	int i = 0;
-	int c;
+	int32_t i = 0;
+	int32_t c;
 
-	int semicolon_mode = 0;
+	int32_t semicolon_mode = 0;
 
 	while ((c = fgetc(fp)) != EOF)
 	{
@@ -79,7 +79,7 @@ static bool get_word(FILE *fp, char *buf) // 워드단위로 받는다.
 
 static void next_line(FILE *fp)
 {
-	int c;
+	int32_t c;
 
 	while ((c = fgetc(fp)) != EOF)
 		if (c == '\n')
@@ -90,9 +90,9 @@ static bool read_line(FILE *fp, LPREGEN regen)
 {
 	char szTmp[256];
 
-	int mode = MODE_TYPE;
-	int tmpTime;
-	DWORD i;
+	int32_t mode = MODE_TYPE;
+	int32_t tmpTime;
+	uint32_t i;
 
 	while (get_word(fp, szTmp))
 	{
@@ -141,7 +141,7 @@ static bool read_line(FILE *fp, LPREGEN regen)
 
 			case MODE_EX:
 				{
-					int iX = 0;
+					int32_t iX = 0;
 					str_to_number(iX, szTmp);
 
 					regen->sx -= iX;
@@ -156,7 +156,7 @@ static bool read_line(FILE *fp, LPREGEN regen)
 
 			case MODE_EY:
 				{
-					int iY = 0;
+					int32_t iY = 0;
 					str_to_number(iY, szTmp);
 
 					regen->sy -= iY;
@@ -239,7 +239,7 @@ static bool read_line(FILE *fp, LPREGEN regen)
 	return false;
 }
 
-bool is_regen_exception(long x, long y)
+bool is_regen_exception(int32_t x, int32_t y)
 {
 	LPREGEN_EXCEPTION exc;
 
@@ -255,8 +255,8 @@ bool is_regen_exception(long x, long y)
 
 static void regen_spawn_dungeon(LPREGEN regen, LPDUNGEON pDungeon, bool bOnce)
 {
-	DWORD	num;
-	DWORD	i;
+	uint32_t	num;
+	uint32_t	i;
 
 	num = (regen->max_count - regen->count);
 
@@ -265,7 +265,7 @@ static void regen_spawn_dungeon(LPREGEN regen, LPDUNGEON pDungeon, bool bOnce)
 
 	for (i = 0; i < num; ++i)
 	{
-		LPCHARACTER ch = NULL;
+		LPCHARACTER ch = nullptr;
 
 		if (regen->type == REGEN_TYPE_ANYWHERE)
 		{
@@ -307,12 +307,12 @@ static void regen_spawn_dungeon(LPREGEN regen, LPDUNGEON pDungeon, bool bOnce)
 			}
 			else if (regen->type == REGEN_TYPE_GROUP)
 			{
-				if (CHARACTER_MANAGER::Instance().SpawnGroup(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, bOnce ? NULL : regen, regen->is_aggressive, pDungeon))
+				if (CHARACTER_MANAGER::Instance().SpawnGroup(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, bOnce ? nullptr : regen, regen->is_aggressive, pDungeon))
 					++regen->count;
 			}
 			else if (regen->type == REGEN_TYPE_GROUP_GROUP)
 			{
-				if (CHARACTER_MANAGER::Instance().SpawnGroupGroup(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, bOnce ? NULL : regen, regen->is_aggressive, pDungeon))
+				if (CHARACTER_MANAGER::Instance().SpawnGroupGroup(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, bOnce ? nullptr : regen, regen->is_aggressive, pDungeon))
 					++regen->count;
 			}
 		}
@@ -324,8 +324,8 @@ static void regen_spawn_dungeon(LPREGEN regen, LPDUNGEON pDungeon, bool bOnce)
 
 static void regen_spawn(LPREGEN regen, bool bOnce)
 {
-	DWORD	num;
-	DWORD	i;
+	uint32_t	num;
+	uint32_t	i;
 
 	num = (regen->max_count - regen->count);
 
@@ -334,7 +334,7 @@ static void regen_spawn(LPREGEN regen, bool bOnce)
 
 	for (i = 0; i < num; ++i)
 	{
-		LPCHARACTER ch = NULL;
+		LPCHARACTER ch = nullptr;
 
 		if (regen->type == REGEN_TYPE_ANYWHERE)
 		{
@@ -367,12 +367,12 @@ static void regen_spawn(LPREGEN regen, bool bOnce)
 			}
 			else if (regen->type == REGEN_TYPE_GROUP)
 			{
-				if (CHARACTER_MANAGER::Instance().SpawnGroup(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, bOnce ? NULL : regen, regen->is_aggressive))
+				if (CHARACTER_MANAGER::Instance().SpawnGroup(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, bOnce ? nullptr : regen, regen->is_aggressive))
 					++regen->count;
 			}
 			else if (regen->type == REGEN_TYPE_GROUP_GROUP)
 			{
-				if (CHARACTER_MANAGER::Instance().SpawnGroupGroup(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, bOnce ? NULL : regen, regen->is_aggressive))
+				if (CHARACTER_MANAGER::Instance().SpawnGroupGroup(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, bOnce ? nullptr : regen, regen->is_aggressive))
 					++regen->count;
 			}
 		}
@@ -386,28 +386,28 @@ EVENTFUNC(dungeon_regen_event)
 {
 	dungeon_regen_event_info* info = dynamic_cast<dungeon_regen_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "dungeon_regen_event> <Factor> Null pointer" );
 		return 0;
 	}
 
 	LPDUNGEON pDungeon = CDungeonManager::instance().Find(info->dungeon_id);
-	if (pDungeon == NULL) {
+	if (pDungeon == nullptr) {
 		return 0;
 	}
 
 	LPREGEN	regen = info->regen;
 	if (regen->time == 0)
 	{
-		regen->event = NULL;
+		regen->event = nullptr;
 	}
 
 	regen_spawn_dungeon(regen, pDungeon, false);
 	return PASSES_PER_SEC(regen->time);
 }
 
-bool regen_do(const char* filename, long lMapIndex, int base_x, int base_y, LPDUNGEON pDungeon, bool bOnce)
+bool regen_do(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t base_y, LPDUNGEON pDungeon, bool bOnce)
 {
 	if (g_bNoRegen)
 		return true;
@@ -415,10 +415,10 @@ bool regen_do(const char* filename, long lMapIndex, int base_x, int base_y, LPDU
 	if ( lMapIndex >= 114 && lMapIndex <= 117 )
 		return true;
 
-	LPREGEN regen = NULL;
+	LPREGEN regen = nullptr;
 	FILE* fp = fopen(filename, "rt");
 
-	if (NULL == fp)
+	if (nullptr == fp)
 	{
 		sys_err("SYSTEM: regen_do: %s: file not found", filename);
 		return false;
@@ -485,7 +485,7 @@ bool regen_do(const char* filename, long lMapIndex, int base_x, int base_y, LPDU
 				}
 			}
 
-			if (!bOnce && pDungeon != NULL)
+			if (!bOnce && pDungeon != nullptr)
 			{
 				dungeon_regen_event_info* info = AllocEventInfo<dungeon_regen_event_info>();
 
@@ -509,15 +509,15 @@ bool regen_do(const char* filename, long lMapIndex, int base_x, int base_y, LPDU
 	return true;
 }
 
-bool regen_load_in_file(const char* filename, long lMapIndex, int base_x, int base_y)
+bool regen_load_in_file(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t base_y)
 {
 	if (g_bNoRegen)
 		return true;
 
-	LPREGEN regen = NULL;
+	LPREGEN regen = nullptr;
 	FILE * fp = fopen(filename, "rt");
 
-	if (NULL == fp)
+	if (nullptr == fp)
 	{
 		sys_err("SYSTEM: regen_do: %s: file not found", filename);
 		return false;
@@ -587,7 +587,7 @@ EVENTFUNC(regen_event)
 {
 	regen_event_info* info = dynamic_cast<regen_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "regen_event> <Factor> Null pointer" );
 		return 0;
@@ -596,21 +596,21 @@ EVENTFUNC(regen_event)
 	LPREGEN	regen = info->regen;
 
 	if (regen->time == 0)
-		regen->event = NULL;
+		regen->event = nullptr;
 
 	regen_spawn(regen, false);
 	return PASSES_PER_SEC(regen->time);
 }
 
-bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
+bool regen_load(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t base_y)
 {
 	if (g_bNoRegen)
 		return true;
 
-	LPREGEN regen = NULL;
+	LPREGEN regen = nullptr;
 	FILE* fp = fopen(filename, "rt");
 
-	if (NULL == fp)
+	if (nullptr == fp)
 	{
 		sys_log(0, "SYSTEM: regen_load: %s: file not found", filename);
 		return false;
@@ -728,7 +728,7 @@ void regen_free(void)
 		M2_DELETE(regen);
 	}
 
-	regen_list = NULL;
+	regen_list = nullptr;
 
 	for (exc = regen_exception_list; exc; exc = next_exc)
 	{
@@ -737,10 +737,10 @@ void regen_free(void)
 		M2_DELETE(exc);
 	}
 
-	regen_exception_list = NULL;
+	regen_exception_list = nullptr;
 }
 
-void regen_reset(int x, int y)
+void regen_reset(int32_t x, int32_t y)
 {
 	LPREGEN regen;
 

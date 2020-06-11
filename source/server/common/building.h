@@ -10,53 +10,53 @@ namespace building
 
 	typedef struct SLand
 	{
-		DWORD	dwID;
-		long	lMapIndex;
-		long	x, y;
-		long	width, height;
-		DWORD	dwGuildID;
-		BYTE	bGuildLevelLimit;
-		DWORD	dwPrice;
+		uint32_t	dwID;
+		int32_t	lMapIndex;
+		int32_t	x, y;
+		int32_t	width, height;
+		uint32_t	dwGuildID;
+		uint8_t	bGuildLevelLimit;
+		uint32_t	dwPrice;
 	} TLand;
 
 	typedef struct SObjectMaterial
 	{
-		DWORD	dwItemVnum;
-		DWORD	dwCount;
+		uint32_t	dwItemVnum;
+		uint32_t	dwCount;
 	} TObjectMaterial;
 
 	typedef struct SObjectProto
 	{
-		DWORD	dwVnum;
-		DWORD	dwPrice;
+		uint32_t	dwVnum;
+		uint32_t	dwPrice;
 
 		TObjectMaterial kMaterials[OBJECT_MATERIAL_MAX_NUM];
 
-		DWORD	dwUpgradeVnum;
-		DWORD	dwUpgradeLimitTime;
-		long	lLife;
-		long	lRegion[4];
+		uint32_t	dwUpgradeVnum;
+		uint32_t	dwUpgradeLimitTime;
+		int32_t	lLife;
+		int32_t	lRegion[4];
 
-		DWORD	dwNPCVnum;
-		long	lNPCX;
-		long	lNPCY;
+		uint32_t	dwNPCVnum;
+		int32_t	lNPCX;
+		int32_t	lNPCY;
 
-		DWORD	dwGroupVnum; // 같은 그룹은 하나만 건설가능
-		DWORD	dwDependOnGroupVnum; // 지어져 있어야하는 그룹
+		uint32_t	dwGroupVnum; // 같은 그룹은 하나만 건설가능
+		uint32_t	dwDependOnGroupVnum; // 지어져 있어야하는 그룹
 	} TObjectProto;
 
 	typedef struct SObject
 	{
-		DWORD	dwID;
-		DWORD	dwLandID;
-		DWORD	dwVnum;
-		long	lMapIndex;
-		long	x, y;
+		uint32_t	dwID;
+		uint32_t	dwLandID;
+		uint32_t	dwVnum;
+		int32_t	lMapIndex;
+		int32_t	x, y;
 
 		float	xRot;
 		float	yRot;
 		float	zRot;
-		long	lLife;
+		int32_t	lLife;
 	} TObject;
 };
 

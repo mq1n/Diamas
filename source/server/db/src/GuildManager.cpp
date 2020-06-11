@@ -8,7 +8,7 @@
 
 extern std::string g_stLocale;
 
-const int GUILD_RANK_MAX_NUM = 20;
+const int32_t GUILD_RANK_MAX_NUM = 20;
 
 bool isEurope()
 {
@@ -30,19 +30,19 @@ bool isEurope()
 	return true;
 }
 
-DWORD GetGuildWarWaitStartDuration()
+uint32_t GetGuildWarWaitStartDuration()
 {
-	// const int GUILD_WAR_WAIT_START_DURATION = 60;
-	// const int GUILD_WAR_WAIT_START_DURATION = 5; 
+	// const int32_t GUILD_WAR_WAIT_START_DURATION = 60;
+	// const int32_t GUILD_WAR_WAIT_START_DURATION = 5; 
 
 	if (isEurope() == true) return 60;
 	else return 5;
 }
 
-DWORD GetGuildWarReserveSeconds()
+uint32_t GetGuildWarReserveSeconds()
 {
-	// const int GUILD_WAR_RESERVE_SECONDS = 180;
-	// const int GUILD_WAR_RESERVE_SECONDS = 10;
+	// const int32_t GUILD_WAR_RESERVE_SECONDS = 180;
+	// const int32_t GUILD_WAR_RESERVE_SECONDS = 10;
 
 	if (isEurope() == true) return 180;
 	else return 10;
@@ -52,7 +52,7 @@ namespace
 {
 	struct FSendPeerWar
 	{
-		FSendPeerWar(BYTE bType, BYTE bWar, DWORD GID1, DWORD GID2)
+		FSendPeerWar(uint8_t bType, uint8_t bWar, uint32_t GID1, uint32_t GID2)
 		{
 			if (number(0, 1))
 				std::swap(GID1, GID2);
@@ -79,7 +79,7 @@ namespace
 
 	struct FSendGuildWarScore
 	{
-		FSendGuildWarScore(DWORD guild_gain, DWORD dwOppGID, int iScore, int iBetScore)
+		FSendGuildWarScore(uint32_t guild_gain, uint32_t dwOppGID, int32_t iScore, int32_t iBetScore)
 		{
 			pck.dwGuildGainPoint = guild_gain;
 			pck.dwGuildOpponent = dwOppGID;
@@ -115,7 +115,7 @@ CGuildManager::~CGuildManager()
 	}
 }
 
-TGuild & CGuildManager::TouchGuild(DWORD GID)
+TGuild & CGuildManager::TouchGuild(uint32_t GID)
 {
 	auto it = m_map_kGuild.find(GID);
 
@@ -123,7 +123,7 @@ TGuild & CGuildManager::TouchGuild(DWORD GID)
 		return it->second;
 
 	TGuild info;
-	m_map_kGuild.insert(std::map<DWORD, TGuild>::value_type(GID, info));
+	m_map_kGuild.insert(std::map<uint32_t, TGuild>::value_type(GID, info));
 	return m_map_kGuild[GID];
 }
 
@@ -133,7 +133,7 @@ void CGuildManager::ParseResult(SQLResult * pRes)
 
 	while ((row = mysql_fetch_row(pRes->pSQLResult)))
 	{
-		DWORD GID = strtoul(row[0], NULL, 10);
+		uint32_t GID = strtoul(row[0], nullptr, 10);
 
 		TGuild & r_info = TouchGuild(GID);
 
@@ -185,7 +185,7 @@ void CGuildManager::Initialize()
 	QueryRanking();
 }
 
-void CGuildManager::Load(DWORD dwGuildID)
+void CGuildManager::Load(uint32_t dwGuildID)
 {
 	char szQuery[1024];
 
@@ -204,7 +204,7 @@ void CGuildManager::QueryRanking()
 	CDBManager::instance().ReturnQuery(szQuery, QID_GUILD_RANKING, 0, 0);
 }
 
-int CGuildManager::GetRanking(DWORD dwGID)
+int32_t CGuildManager::GetRanking(uint32_t dwGID)
 {
 	auto it = map_kLadderPointRankingByGID.find(dwGID);
 
@@ -219,8 +219,8 @@ void CGuildManager::ResultRanking(MYSQL_RES * pRes)
 	if (!pRes)
 		return;
 
-	int iLastLadderPoint = -1;
-	int iRank = 0;
+	int32_t iLastLadderPoint = -1;
+	int32_t iRank = 0;
 
 	map_kLadderPointRankingByGID.clear();
 
@@ -228,8 +228,8 @@ void CGuildManager::ResultRanking(MYSQL_RES * pRes)
 
 	while ((row = mysql_fetch_row(pRes)))
 	{
-		DWORD	dwGID = 0; str_to_number(dwGID, row[0]);
-		int	iLadderPoint = 0; str_to_number(iLadderPoint, row[2]);
+		uint32_t	dwGID = 0; str_to_number(dwGID, row[0]);
+		int32_t	iLadderPoint = 0; str_to_number(iLadderPoint, row[2]);
 
 		if (iLadderPoint != iLastLadderPoint)
 			++iRank;
@@ -318,8 +318,8 @@ void CGuildManager::OnSetup(CPeer* peer)
 	for_all(m_WarMap, it_cont)
 		for_all(it_cont->second, it)
 		{
-			DWORD g1 = it_cont->first;
-			DWORD g2 = it->first;
+			uint32_t g1 = it_cont->first;
+			uint32_t g2 = it->first;
 			TGuildWarPQElement* p = it->second.pElement;
 
 			if (!p || p->bEnd)
@@ -341,7 +341,7 @@ void CGuildManager::OnSetup(CPeer* peer)
 	}
 }
 
-void CGuildManager::GuildWarWin(DWORD GID)
+void CGuildManager::GuildWarWin(uint32_t GID)
 {
 	auto it = m_map_kGuild.find(GID);
 
@@ -355,7 +355,7 @@ void CGuildManager::GuildWarWin(DWORD GID)
 	CDBManager::instance().AsyncQuery(buf);
 }
 
-void CGuildManager::GuildWarLose(DWORD GID)
+void CGuildManager::GuildWarLose(uint32_t GID)
 {
 	auto it = m_map_kGuild.find(GID);
 
@@ -369,7 +369,7 @@ void CGuildManager::GuildWarLose(DWORD GID)
 	CDBManager::instance().AsyncQuery(buf);
 }
 
-void CGuildManager::GuildWarDraw(DWORD GID)
+void CGuildManager::GuildWarDraw(uint32_t GID)
 {
 	auto it = m_map_kGuild.find(GID);
 
@@ -383,10 +383,10 @@ void CGuildManager::GuildWarDraw(DWORD GID)
 	CDBManager::instance().AsyncQuery(buf);
 }
 
-bool CGuildManager::IsHalfWinLadderPoint(DWORD dwGuildWinner, DWORD dwGuildLoser)
+bool CGuildManager::IsHalfWinLadderPoint(uint32_t dwGuildWinner, uint32_t dwGuildLoser)
 {
-	DWORD GID1 = dwGuildWinner;
-	DWORD GID2 = dwGuildLoser;
+	uint32_t GID1 = dwGuildWinner;
+	uint32_t GID2 = dwGuildLoser;
 
 	if (GID1 > GID2)
 		std::swap(GID1, GID2);
@@ -400,7 +400,7 @@ bool CGuildManager::IsHalfWinLadderPoint(DWORD dwGuildWinner, DWORD dwGuildLoser
 	return false;
 }
 
-void CGuildManager::ProcessDraw(DWORD dwGuildID1, DWORD dwGuildID2)
+void CGuildManager::ProcessDraw(uint32_t dwGuildID1, uint32_t dwGuildID2)
 {
 	sys_log(0, "GuildWar: \tThe war between %d and %d is ended in draw", dwGuildID1, dwGuildID2);
 
@@ -412,15 +412,15 @@ void CGuildManager::ProcessDraw(DWORD dwGuildID1, DWORD dwGuildID2)
 	QueryRanking();
 }
 
-void CGuildManager::ProcessWinLose(DWORD dwGuildWinner, DWORD dwGuildLoser)
+void CGuildManager::ProcessWinLose(uint32_t dwGuildWinner, uint32_t dwGuildLoser)
 {
 	GuildWarWin(dwGuildWinner);
 	GuildWarLose(dwGuildLoser);
 	sys_log(0, "GuildWar: \tWinner : %d Loser : %d", dwGuildWinner, dwGuildLoser);
 
-	int iPoint = GetLadderPoint(dwGuildLoser);
-	int gain = (int)(iPoint * 0.05);
-	int loss = (int)(iPoint * 0.07);
+	int32_t iPoint = GetLadderPoint(dwGuildLoser);
+	int32_t gain = (int32_t)(iPoint * 0.05);
+	int32_t loss = (int32_t)(iPoint * 0.07);
 
 	if (IsHalfWinLadderPoint(dwGuildWinner, dwGuildLoser))
 		gain /= 2;
@@ -433,7 +433,7 @@ void CGuildManager::ProcessWinLose(DWORD dwGuildWinner, DWORD dwGuildLoser)
 	QueryRanking();
 }
 
-void CGuildManager::RemoveWar(DWORD GID1, DWORD GID2)
+void CGuildManager::RemoveWar(uint32_t GID1, uint32_t GID2)
 {
 	sys_log(0, "GuildWar: RemoveWar(%d, %d)", GID1, GID2);
 
@@ -464,7 +464,7 @@ void CGuildManager::RemoveWar(DWORD GID1, DWORD GID2)
 //
 // 길드전 비정상 종료 및 필드전 종료
 //
-void CGuildManager::WarEnd(DWORD GID1, DWORD GID2, bool bForceDraw)
+void CGuildManager::WarEnd(uint32_t GID1, uint32_t GID2, bool bForceDraw)
 {
 	if (GID1 > GID2)
 		std::swap(GID2, GID1);
@@ -488,8 +488,8 @@ void CGuildManager::WarEnd(DWORD GID1, DWORD GID2, bool bForceDraw)
 		return;
 	}
 
-	DWORD win_guild = pData->GID[0];
-	DWORD lose_guild = pData->GID[1];
+	uint32_t win_guild = pData->GID[0];
+	uint32_t lose_guild = pData->GID[1];
 
 	bool bDraw = false;
 
@@ -525,12 +525,12 @@ void CGuildManager::WarEnd(DWORD GID1, DWORD GID2, bool bForceDraw)
 //
 // 길드전 정상 종료
 // 
-void CGuildManager::RecvWarOver(DWORD dwGuildWinner, DWORD dwGuildLoser, bool bDraw, long lWarPrice)
+void CGuildManager::RecvWarOver(uint32_t dwGuildWinner, uint32_t dwGuildLoser, bool bDraw, int32_t lWarPrice)
 {
 	sys_log(0, "GuildWar: RecvWarOver : winner %u vs %u draw? %d war_price %d", dwGuildWinner, dwGuildLoser, bDraw ? 1 : 0, lWarPrice);
 
-	DWORD GID1 = dwGuildWinner;
-	DWORD GID2 = dwGuildLoser;
+	uint32_t GID1 = dwGuildWinner;
+	uint32_t GID2 = dwGuildLoser;
 
 	if (GID1 > GID2)
 		std::swap(GID1, GID2);
@@ -568,13 +568,13 @@ void CGuildManager::RecvWarOver(DWORD dwGuildWinner, DWORD dwGuildLoser, bool bD
 	RemoveWar(GID1, GID2);
 }
 
-void CGuildManager::RecvWarEnd(DWORD GID1, DWORD GID2)
+void CGuildManager::RecvWarEnd(uint32_t GID1, uint32_t GID2)
 {
 	sys_log(0, "GuildWar: RecvWarEnded : %u vs %u", GID1, GID2);
 	WarEnd(GID1, GID2, true); // 무조건 비정상 종료 시켜야 한다.
 }
 
-void CGuildManager::StartWar(BYTE bType, DWORD GID1, DWORD GID2, CGuildWarReserve * pkReserve)
+void CGuildManager::StartWar(uint8_t bType, uint32_t GID1, uint32_t GID2, CGuildWarReserve * pkReserve)
 {
 	sys_log(0, "GuildWar: StartWar(%d,%d,%d)", bType, GID1, GID2);
 
@@ -594,10 +594,10 @@ void CGuildManager::StartWar(BYTE bType, DWORD GID1, DWORD GID2, CGuildWarReserv
 	m_pqOnWar.push(std::make_pair(gw.tEndTime, gw.pElement));
 }
 
-void CGuildManager::UpdateScore(DWORD dwGainGID, DWORD dwOppGID, int iScoreDelta, int iBetScoreDelta)
+void CGuildManager::UpdateScore(uint32_t dwGainGID, uint32_t dwOppGID, int32_t iScoreDelta, int32_t iBetScoreDelta)
 {
-	DWORD GID1 = dwGainGID;
-	DWORD GID2 = dwOppGID;
+	uint32_t GID1 = dwGainGID;
+	uint32_t GID2 = dwOppGID;
 
 	if (GID1 > GID2)
 		std::swap(GID1, GID2);
@@ -614,8 +614,8 @@ void CGuildManager::UpdateScore(DWORD dwGainGID, DWORD dwOppGID, int iScoreDelta
 			return;
 		}
 
-		int iNewScore = 0;
-		int iNewBetScore = 0;
+		int32_t iNewScore = 0;
+		int32_t iNewBetScore = 0;
 
 		if (p->GID[0] == dwGainGID)
 		{
@@ -641,7 +641,7 @@ void CGuildManager::UpdateScore(DWORD dwGainGID, DWORD dwOppGID, int iScoreDelta
 	}
 }
 
-void CGuildManager::AddDeclare(BYTE bType, DWORD guild_from, DWORD guild_to)
+void CGuildManager::AddDeclare(uint8_t bType, uint32_t guild_from, uint32_t guild_to)
 {
 	TGuildDeclareInfo di(bType, guild_from, guild_to);
 
@@ -651,7 +651,7 @@ void CGuildManager::AddDeclare(BYTE bType, DWORD guild_from, DWORD guild_to)
 	sys_log(0, "GuildWar: AddDeclare(Type:%d,from:%d,to:%d)", bType, guild_from, guild_to);
 }
 
-void CGuildManager::RemoveDeclare(DWORD guild_from, DWORD guild_to)
+void CGuildManager::RemoveDeclare(uint32_t guild_from, uint32_t guild_to)
 {
 	auto it = m_DeclareMap.find(TGuildDeclareInfo(0, guild_from, guild_to));
 	if (it != m_DeclareMap.end())
@@ -665,7 +665,7 @@ void CGuildManager::RemoveDeclare(DWORD guild_from, DWORD guild_to)
 	sys_log(0, "GuildWar: RemoveDeclare(from:%d,to:%d)", guild_from, guild_to);
 }
 
-bool CGuildManager::TakeBetPrice(DWORD dwGuildTo, DWORD dwGuildFrom, long lWarPrice)
+bool CGuildManager::TakeBetPrice(uint32_t dwGuildTo, uint32_t dwGuildFrom, int32_t lWarPrice)
 {
 	auto it_from = m_map_kGuild.find(dwGuildFrom);
 	auto it_to = m_map_kGuild.find(dwGuildTo);
@@ -698,9 +698,9 @@ bool CGuildManager::WaitStart(TPacketGuildWar * p)
 		if (!TakeBetPrice(p->dwGuildFrom, p->dwGuildTo, p->lWarPrice))
 			return false;
 
-	DWORD dwCurTime = CClientManager::instance().GetCurrentTime();
+	uint32_t dwCurTime = CClientManager::instance().GetCurrentTime();
 
-	TGuildWaitStartInfo info(p->bType, p->dwGuildFrom, p->dwGuildTo, p->lWarPrice, p->lInitialScore, NULL);
+	TGuildWaitStartInfo info(p->bType, p->dwGuildFrom, p->dwGuildTo, p->lWarPrice, p->lInitialScore, nullptr);
 	m_pqWaitStart.push(std::make_pair(dwCurTime + GetGuildWarWaitStartDuration(), info));
 
 	sys_log(0, 
@@ -713,7 +713,7 @@ bool CGuildManager::WaitStart(TPacketGuildWar * p)
 	return true;
 }
 
-int CGuildManager::GetLadderPoint(DWORD GID)
+int32_t CGuildManager::GetLadderPoint(uint32_t GID)
 {
 	auto it = m_map_kGuild.find(GID);
 
@@ -723,7 +723,7 @@ int CGuildManager::GetLadderPoint(DWORD GID)
 	return it->second.ladder_point;
 }
 
-void CGuildManager::ChangeLadderPoint(DWORD GID, int change)
+void CGuildManager::ChangeLadderPoint(uint32_t GID, int32_t change)
 {
 	auto it = m_map_kGuild.find(GID);
 
@@ -756,7 +756,7 @@ void CGuildManager::ChangeLadderPoint(DWORD GID, int change)
 	CClientManager::instance().ForwardPacket(HEADER_DG_GUILD_LADDER, &p, sizeof(TPacketGuildLadder));
 }
 
-void CGuildManager::UseSkill(DWORD GID, DWORD dwSkillVnum, DWORD dwCooltime)
+void CGuildManager::UseSkill(uint32_t GID, uint32_t dwSkillVnum, uint32_t dwCooltime)
 {
 	// GUILD_SKILL_COOLTIME_BUG_FIX
 	sys_log(0, "UseSkill(gid=%d, skill=%d) CoolTime(%d:%d)", GID, dwSkillVnum, dwCooltime, CClientManager::instance().GetCurrentTime() + dwCooltime);
@@ -764,7 +764,7 @@ void CGuildManager::UseSkill(DWORD GID, DWORD dwSkillVnum, DWORD dwCooltime)
 	// END_OF_GUILD_SKILL_COOLTIME_BUG_FIX
 }
 
-void CGuildManager::MoneyChange(DWORD dwGuild, DWORD dwGold)
+void CGuildManager::MoneyChange(uint32_t dwGuild, uint32_t dwGold)
 {
 	sys_log(0, "GuildManager::MoneyChange %d %d", dwGuild, dwGold);
 
@@ -778,7 +778,7 @@ void CGuildManager::MoneyChange(DWORD dwGuild, DWORD dwGold)
 	CDBManager::instance().AsyncQuery(buf);
 }
 
-void CGuildManager::DepositMoney(DWORD dwGuild, INT iGold)
+void CGuildManager::DepositMoney(uint32_t dwGuild, INT iGold)
 {
 	if (iGold <= 0)
 		return;
@@ -797,7 +797,7 @@ void CGuildManager::DepositMoney(DWORD dwGuild, INT iGold)
 	MoneyChange(dwGuild, it->second.gold);
 }
 
-void CGuildManager::WithdrawMoney(CPeer* peer, DWORD dwGuild, INT iGold)
+void CGuildManager::WithdrawMoney(CPeer* peer, uint32_t dwGuild, INT iGold)
 {
 	auto it = m_map_kGuild.find(dwGuild);
 
@@ -822,7 +822,7 @@ void CGuildManager::WithdrawMoney(CPeer* peer, DWORD dwGuild, INT iGold)
 	}
 }
 
-void CGuildManager::WithdrawMoneyReply(DWORD dwGuild, BYTE bGiveSuccess, INT iGold)
+void CGuildManager::WithdrawMoneyReply(uint32_t dwGuild, uint8_t bGiveSuccess, INT iGold)
 {
 	auto it = m_map_kGuild.find(dwGuild);
 
@@ -840,7 +840,7 @@ void CGuildManager::WithdrawMoneyReply(DWORD dwGuild, BYTE bGiveSuccess, INT iGo
 //
 // 예약 길드전(관전자가 배팅할 수 있다)
 //
-const int c_aiScoreByLevel[GUILD_MAX_LEVEL+1] =
+const int32_t c_aiScoreByLevel[GUILD_MAX_LEVEL+1] =
 {
 	500,	// level 0 = 500 probably error
 	500,	// 1
@@ -865,7 +865,7 @@ const int c_aiScoreByLevel[GUILD_MAX_LEVEL+1] =
 	55000,
 };
 
-const int c_aiScoreByRanking[GUILD_RANK_MAX_NUM+1] =
+const int32_t c_aiScoreByRanking[GUILD_RANK_MAX_NUM+1] =
 {
 	0,
 	55000,	// 1위
@@ -898,7 +898,7 @@ void CGuildManager::BootReserveWar()
 		"SELECT id, guild1, guild2, UNIX_TIMESTAMP(time), type, warprice, initscore, bet_from, bet_to, power1, power2, handicap FROM guild_war_reservation WHERE started=0"
 	};
 
-	for (int i = 0; i < 2; ++i)
+	for (int32_t i = 0; i < 2; ++i)
 	{
 		std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(c_apszQuery[i]));
 
@@ -909,7 +909,7 @@ void CGuildManager::BootReserveWar()
 
 		while ((row = mysql_fetch_row(pmsg->Get()->pSQLResult)))
 		{
-			int col = 0;
+			int32_t col = 0;
 
 			TGuildWarReserve t;
 
@@ -933,8 +933,8 @@ void CGuildManager::BootReserveWar()
 			snprintf(buf, sizeof(buf), "GuildWar: BootReserveWar : step %d id %u GID1 %u GID2 %u", i, t.dwID, t.dwGuildFrom, t.dwGuildTo);
 			// i == 0 이면 길드전 도중 DB가 튕긴 것이므로 무승부 처리한다.
 			// 또는, 5분 이하 남은 예약 길드전도 무승부 처리한다. (각자의 배팅액을 돌려준다)
-			//if (i == 0 || (int) t.dwTime - CClientManager::instance().GetCurrentTime() < 60 * 5)
-			if (i == 0 || (int) t.dwTime - CClientManager::instance().GetCurrentTime() < 0)
+			//if (i == 0 || (int32_t) t.dwTime - CClientManager::instance().GetCurrentTime() < 60 * 5)
+			if (i == 0 || (int32_t) t.dwTime - CClientManager::instance().GetCurrentTime() < 0)
 			{
 				if (i == 0)
 					sys_log(0, "%s : DB was shutdowned while war is being.", buf);
@@ -953,7 +953,7 @@ void CGuildManager::BootReserveWar()
 	}
 }
 
-int GetAverageGuildMemberLevel(DWORD dwGID)
+int32_t GetAverageGuildMemberLevel(uint32_t dwGID)
 {
 	char szQuery[QUERY_MAX_LEN];
 
@@ -966,11 +966,11 @@ int GetAverageGuildMemberLevel(DWORD dwGID)
 	MYSQL_ROW row;
 	row = mysql_fetch_row(msg->Get()->pSQLResult);
 
-	int nAverageLevel = 0; str_to_number(nAverageLevel, row[0]);
+	int32_t nAverageLevel = 0; str_to_number(nAverageLevel, row[0]);
 	return nAverageLevel;
 }
 
-int GetGuildMemberCount(DWORD dwGID)
+int32_t GetGuildMemberCount(uint32_t dwGID)
 {
 	char szQuery[QUERY_MAX_LEN];
 
@@ -981,14 +981,14 @@ int GetGuildMemberCount(DWORD dwGID)
 	MYSQL_ROW row;
 	row = mysql_fetch_row(msg->Get()->pSQLResult);
 
-	DWORD dwCount = 0; str_to_number(dwCount, row[0]);
+	uint32_t dwCount = 0; str_to_number(dwCount, row[0]);
 	return dwCount;
 }
 
 bool CGuildManager::ReserveWar(TPacketGuildWar * p)
 {
-	DWORD GID1 = p->dwGuildFrom;
-	DWORD GID2 = p->dwGuildTo;
+	uint32_t GID1 = p->dwGuildFrom;
+	uint32_t GID2 = p->dwGuildTo;
 
 	if (GID1 > GID2)
 		std::swap(GID1, GID2);
@@ -1007,7 +1007,7 @@ bool CGuildManager::ReserveWar(TPacketGuildWar * p)
 	t.lWarPrice = p->lWarPrice;
 	t.lInitialScore = p->lInitialScore;
 
-	int lvp, rkp, alv, mc;
+	int32_t lvp, rkp, alv, mc;
 
 	// 파워 계산
 	TGuild & k1 = TouchGuild(GID1);
@@ -1022,7 +1022,7 @@ bool CGuildManager::ReserveWar(TPacketGuildWar * p)
 	polyPower.SetVar("alv", alv);
 	polyPower.SetVar("mc", mc);
 
-	t.lPowerFrom = (long) polyPower.Eval();
+	t.lPowerFrom = (int32_t) polyPower.Eval();
 	sys_log(0, "GuildWar: %u lvp %d rkp %d alv %d mc %d power %d", GID1, lvp, rkp, alv, mc, t.lPowerFrom);
 
 	// 파워 계산
@@ -1038,7 +1038,7 @@ bool CGuildManager::ReserveWar(TPacketGuildWar * p)
 	polyPower.SetVar("alv", alv);
 	polyPower.SetVar("mc", mc);
 
-	t.lPowerTo = (long) polyPower.Eval();
+	t.lPowerTo = (int32_t) polyPower.Eval();
 	sys_log(0, "GuildWar: %u lvp %d rkp %d alv %d mc %d power %d", GID2, lvp, rkp, alv, mc, t.lPowerTo);
 
 	// 핸디캡 계산
@@ -1053,7 +1053,7 @@ bool CGuildManager::ReserveWar(TPacketGuildWar * p)
 		polyHandicap.SetVar("pB", t.lPowerTo);
 	}
 
-	t.lHandicap = (long) polyHandicap.Eval();
+	t.lHandicap = (int32_t) polyHandicap.Eval();
 	sys_log(0, "GuildWar: handicap %d", t.lHandicap);
 
 	// 쿼리
@@ -1082,7 +1082,7 @@ bool CGuildManager::ReserveWar(TPacketGuildWar * p)
 
 void CGuildManager::ProcessReserveWar()
 {
-	DWORD dwCurTime = CClientManager::instance().GetCurrentTime();
+	uint32_t dwCurTime = CClientManager::instance().GetCurrentTime();
 
 	auto it = m_map_kWarReserve.begin();
 
@@ -1095,7 +1095,7 @@ void CGuildManager::ProcessReserveWar()
 
 		if (!r.bStarted && r.dwTime - 1800 <= dwCurTime) // 30분 전부터 알린다.
 		{
-			int iMin = (int) ceil((int)(r.dwTime - dwCurTime) / 60.0);
+			int32_t iMin = (int32_t) ceil((int32_t)(r.dwTime - dwCurTime) / 60.0);
 
 			TGuild & r_1 = m_map_kGuild[r.dwGuildFrom];
 			TGuild & r_2 = m_map_kGuild[r.dwGuildTo];
@@ -1108,7 +1108,7 @@ void CGuildManager::ProcessReserveWar()
 				snprintf(szQuery, sizeof(szQuery), "UPDATE guild_war_reservation SET started=1 WHERE id=%u", r.dwID);
 				CDBManager::instance().AsyncQuery(szQuery);
 
-				CClientManager::instance().ForwardPacket(HEADER_DG_GUILD_WAR_RESERVE_DEL, &r.dwID, sizeof(DWORD));
+				CClientManager::instance().ForwardPacket(HEADER_DG_GUILD_WAR_RESERVE_DEL, &r.dwID, sizeof(uint32_t));
 
 				r.bStarted = true;
 
@@ -1140,7 +1140,7 @@ void CGuildManager::ProcessReserveWar()
 	}
 }
 
-bool CGuildManager::Bet(DWORD dwID, const char * c_pszLogin, DWORD dwGold, DWORD dwGuild)
+bool CGuildManager::Bet(uint32_t dwID, const char * c_pszLogin, uint32_t dwGold, uint32_t dwGuild)
 {
 	auto it = m_map_kWarReserve.find(dwID);
 
@@ -1167,13 +1167,13 @@ bool CGuildManager::Bet(DWORD dwID, const char * c_pszLogin, DWORD dwGold, DWORD
 	return true;
 }
 
-void CGuildManager::CancelWar(DWORD GID1, DWORD GID2)
+void CGuildManager::CancelWar(uint32_t GID1, uint32_t GID2)
 {
 	RemoveDeclare(GID1, GID2);
 	RemoveWar(GID1, GID2);
 }
 
-bool CGuildManager::ChangeMaster(DWORD dwGID, DWORD dwFrom, DWORD dwTo)
+bool CGuildManager::ChangeMaster(uint32_t dwGID, uint32_t dwFrom, uint32_t dwTo)
 {
 	auto iter = m_map_kGuild.find(dwGID);
 
@@ -1218,8 +1218,8 @@ void CGuildWarReserve::Initialize()
 		MYSQL_ROW row;
 
 		char szLogin[LOGIN_MAX_LEN+1];
-		DWORD dwGuild;
-		DWORD dwGold;
+		uint32_t dwGuild;
+		uint32_t dwGold;
 
 		while ((row = mysql_fetch_row(res)))
 		{
@@ -1261,7 +1261,7 @@ void CGuildWarReserve::OnSetup(CPeer * peer)
 	}
 }
 
-bool CGuildWarReserve::Bet(const char * pszLogin, DWORD dwGold, DWORD dwGuild)
+bool CGuildWarReserve::Bet(const char * pszLogin, uint32_t dwGold, uint32_t dwGuild)
 {
 	char szQuery[1024];
 
@@ -1340,8 +1340,8 @@ void CGuildWarReserve::Draw()
 
 	while (1)
 	{
-		int iLen = 0;
-		int iRow = 0;
+		int32_t iLen = 0;
+		int32_t iRow = 0;
 
 		iLen += snprintf(szQuery, sizeof(szQuery) - iLen, "INSERT INTO item_award (login, vnum, socket0, given_time) VALUES");
 
@@ -1373,9 +1373,9 @@ void CGuildWarReserve::Draw()
 	}
 }
 
-void CGuildWarReserve::End(int iScoreFrom, int iScoreTo)
+void CGuildWarReserve::End(int32_t iScoreFrom, int32_t iScoreTo)
 {
-	DWORD dwWinner;
+	uint32_t dwWinner;
 
 	sys_log(0, "WAR_REWARD: End: From %u %d To %u %d", m_data.dwGuildFrom, iScoreFrom, m_data.dwGuildTo, iScoreTo);
 
@@ -1414,8 +1414,8 @@ void CGuildWarReserve::End(int iScoreFrom, int iScoreTo)
 	if (mapBet.empty())
 		return;
 
-	DWORD dwTotalBet = m_data.dwBetFrom + m_data.dwBetTo;
-	DWORD dwWinnerBet = 0;
+	uint32_t dwTotalBet = m_data.dwBetFrom + m_data.dwBetTo;
+	uint32_t dwWinnerBet = 0;
 
 	if (dwWinner == m_data.dwGuildFrom)
 		dwWinnerBet = m_data.dwBetFrom;
@@ -1439,8 +1439,8 @@ void CGuildWarReserve::End(int iScoreFrom, int iScoreTo)
 
 	while (1)
 	{
-		int iLen = 0;
-		int iRow = 0;
+		int32_t iLen = 0;
+		int32_t iRow = 0;
 
 		iLen += snprintf(szQuery, sizeof(szQuery) - iLen, "INSERT INTO item_award (login, vnum, socket0, given_time) VALUES");
 
@@ -1457,7 +1457,7 @@ void CGuildWarReserve::End(int iScoreFrom, int iScoreTo)
 			// 10% 세금 공제 후 분배
 			sys_log(0, "WAR_REWARD: %s %u ratio %f", it->first.c_str(), it->second.second, ratio);
 
-			DWORD dwGold = (DWORD) (dwTotalBet * ratio * 0.9);
+			uint32_t dwGold = (uint32_t) (dwTotalBet * ratio * 0.9);
 
 			if (iRow == 0)
 				iLen += snprintf(szQuery + iLen, sizeof(szQuery) - iLen, "('%s', %d, %u, NOW())",

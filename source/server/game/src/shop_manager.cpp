@@ -33,12 +33,12 @@ CShopManager::~CShopManager()
 	Destroy();
 }
 
-bool CShopManager::Initialize(TShopTable * table, int size)
+bool CShopManager::Initialize(TShopTable * table, int32_t size)
 {
 	if (!m_map_pkShop.empty())
 		return false;
 
-	int i; 
+	int32_t i; 
 
 	for (i = 0; i < size; ++i, ++table)
 	{
@@ -74,22 +74,22 @@ void CShopManager::Destroy()
 	m_map_pkShop.clear();
 }
 
-LPSHOP CShopManager::Get(DWORD dwVnum)
+LPSHOP CShopManager::Get(uint32_t dwVnum)
 {
 	TShopMap::const_iterator it = m_map_pkShop.find(dwVnum);
 
 	if (it == m_map_pkShop.end())
-		return NULL;
+		return nullptr;
 
 	return (it->second);
 }
 
-LPSHOP CShopManager::GetByNPCVnum(DWORD dwVnum)
+LPSHOP CShopManager::GetByNPCVnum(uint32_t dwVnum)
 {
 	TShopMap::const_iterator it = m_map_pkShopByNPCVnum.find(dwVnum);
 
 	if (it == m_map_pkShopByNPCVnum.end())
-		return NULL;
+		return nullptr;
 
 	return (it->second);
 }
@@ -99,7 +99,7 @@ LPSHOP CShopManager::GetByNPCVnum(DWORD dwVnum)
  */
 
 // 상점 거래를 시작
-bool CShopManager::StartShopping(LPCHARACTER pkChr, LPCHARACTER pkChrShopKeeper, int iShopVnum)
+bool CShopManager::StartShopping(LPCHARACTER pkChr, LPCHARACTER pkChrShopKeeper, int32_t iShopVnum)
 {
 	if (pkChr->GetShopOwner() == pkChrShopKeeper)
 		return false;
@@ -115,7 +115,7 @@ bool CShopManager::StartShopping(LPCHARACTER pkChr, LPCHARACTER pkChrShopKeeper,
 	}
 	//END_PREVENT_TRADE_WINDOW
 
-	long distance = DISTANCE_APPROX(pkChr->GetX() - pkChrShopKeeper->GetX(), pkChr->GetY() - pkChrShopKeeper->GetY());
+	int32_t distance = DISTANCE_APPROX(pkChr->GetX() - pkChrShopKeeper->GetX(), pkChr->GetY() - pkChrShopKeeper->GetY());
 
 	if (distance >= SHOP_MAX_DISTANCE)
 	{
@@ -147,20 +147,20 @@ bool CShopManager::StartShopping(LPCHARACTER pkChr, LPCHARACTER pkChrShopKeeper,
 	return true;
 }
 
-LPSHOP CShopManager::FindPCShop(DWORD dwVID)
+LPSHOP CShopManager::FindPCShop(uint32_t dwVID)
 {
 	TShopMap::iterator it = m_map_pkShopByPC.find(dwVID);
 
 	if (it == m_map_pkShopByPC.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
 
-LPSHOP CShopManager::CreatePCShop(LPCHARACTER ch, TShopItemTable * pTable, BYTE bItemCount)
+LPSHOP CShopManager::CreatePCShop(LPCHARACTER ch, TShopItemTable * pTable, uint8_t bItemCount)
 {
 	if (FindPCShop(ch->GetVID()))
-		return NULL;
+		return nullptr;
 
 	LPSHOP pkShop = M2_NEW CShop;
 	pkShop->SetPCShop(ch);
@@ -202,7 +202,7 @@ void CShopManager::StopShopping(LPCHARACTER ch)
 }
 
 // 아이템 구입
-void CShopManager::Buy(LPCHARACTER ch, BYTE pos)
+void CShopManager::Buy(LPCHARACTER ch, uint8_t pos)
 {
 #ifdef ENABLE_NEWSTUFF
 	if (0 != g_BuySellTimeLimitValue)
@@ -251,7 +251,7 @@ void CShopManager::Buy(LPCHARACTER ch, BYTE pos)
 	ch->SetMyShopTime();
 	//END_PREVENT_ITEM_COPY
 
-	int ret = pkShop->Buy(ch, pos);
+	int32_t ret = pkShop->Buy(ch, pos);
 
 	if (SHOP_SUBHEADER_GC_OK != ret) // 문제가 있었으면 보낸다.
 	{
@@ -265,7 +265,7 @@ void CShopManager::Buy(LPCHARACTER ch, BYTE pos)
 	}
 }
 
-void CShopManager::Sell(LPCHARACTER ch, BYTE bCell, BYTE bCount)
+void CShopManager::Sell(LPCHARACTER ch, uint8_t bCell, uint8_t bCount)
 {
 #ifdef ENABLE_NEWSTUFF
 	if (0 != g_BuySellTimeLimitValue)
@@ -316,7 +316,7 @@ void CShopManager::Sell(LPCHARACTER ch, BYTE bCell, BYTE bCount)
 	if (IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_SELL))
 		return;
 
-	DWORD dwPrice;
+	uint32_t dwPrice;
 
 	if (bCount == 0 || bCount > item->GetCount())
 		bCount = item->GetCount();
@@ -336,8 +336,8 @@ void CShopManager::Sell(LPCHARACTER ch, BYTE bCell, BYTE bCount)
 	dwPrice /= 5;
 	
 	//세금 계산
-	DWORD dwTax = 0;
-	int iVal = 3;
+	uint32_t dwTax = 0;
+	int32_t iVal = 3;
 
 	{
 		dwTax = dwPrice * iVal/100;
@@ -428,7 +428,7 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 		return false;
 	}
 
-	int itemGroupSize = pItemGroup->GetRowCount();
+	int32_t itemGroupSize = pItemGroup->GetRowCount();
 	std::vector <TShopItemTable> shopItems(itemGroupSize);
 	if (itemGroupSize >= SHOP_HOST_ITEM_MAX_NUM)
 	{
@@ -436,7 +436,7 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 		return false;
 	}
 
-	for (int i = 0; i < itemGroupSize; i++)
+	for (int32_t i = 0; i < itemGroupSize; i++)
 	{
 		if (!pItemGroup->GetValue(i, "vnum", shopItems[i].vnum))
 		{
@@ -471,7 +471,7 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 	}
 
 	CGrid grid = CGrid(5, 9);
-	int iPos;
+	int32_t iPos;
 
 	memset(&shopTable.items[0], 0, sizeof(shopTable.items));
 
@@ -499,7 +499,7 @@ bool CShopManager::ReadShopTableEx(const char* stFileName)
 	// file 유무 체크.
 	// 없는 경우는 에러로 처리하지 않는다.
 	FILE* fp = fopen(stFileName, "rb");
-	if (NULL == fp)
+	if (nullptr == fp)
 		return true;
 	fclose(fp);
 
@@ -511,24 +511,24 @@ bool CShopManager::ReadShopTableEx(const char* stFileName)
 	}
 
 	CGroupNode* pShopNPCGroup = loader.GetGroup("shopnpc");
-	if (NULL == pShopNPCGroup)
+	if (nullptr == pShopNPCGroup)
 	{
 		sys_err("Group ShopNPC is not exist.");
 		return false;
 	}
 
-	typedef std::multimap <DWORD, TShopTableEx> TMapNPCshop;
+	typedef std::multimap <uint32_t, TShopTableEx> TMapNPCshop;
 	TMapNPCshop map_npcShop;
-	for (int i = 0; i < pShopNPCGroup->GetRowCount(); i++)
+	for (int32_t i = 0; i < pShopNPCGroup->GetRowCount(); i++)
 	{
-		DWORD npcVnum;
+		uint32_t npcVnum;
 		std::string shopName;
 		if (!pShopNPCGroup->GetValue(i, "npc", npcVnum) || !pShopNPCGroup->GetValue(i, "group", shopName))
 		{
 			sys_err("Invalid row(%d). Group ShopNPC rows must have 'npc', 'group' columns", i);
 			return false;
 		}
-		std::transform(shopName.begin(), shopName.end(), shopName.begin(), (int(*)(int))std::tolower);
+		std::transform(shopName.begin(), shopName.end(), shopName.begin(), (int32_t(*)(int32_t))std::tolower);
 		CGroupNode* pShopGroup = loader.GetGroup(shopName.c_str());
 		if (!pShopGroup)
 		{
@@ -552,7 +552,7 @@ bool CShopManager::ReadShopTableEx(const char* stFileName)
 
 	for (TMapNPCshop::iterator it = map_npcShop.begin(); it != map_npcShop.end(); ++it)
 	{
-		DWORD npcVnum = it->first;
+		uint32_t npcVnum = it->first;
 		TShopTableEx& table = it->second;
 		if (m_map_pkShop.find(table.dwVnum) != m_map_pkShop.end())
 		{
@@ -561,7 +561,7 @@ bool CShopManager::ReadShopTableEx(const char* stFileName)
 		}
 		TShopMap::iterator shop_it = m_map_pkShopByNPCVnum.find(npcVnum);
 		
-		LPSHOPEX pkShopEx = NULL;
+		LPSHOPEX pkShopEx = nullptr;
 		if (m_map_pkShopByNPCVnum.end() == shop_it)
 		{
 			pkShopEx = M2_NEW CShopEx;
@@ -571,7 +571,7 @@ bool CShopManager::ReadShopTableEx(const char* stFileName)
 		else
 		{
 			pkShopEx = dynamic_cast <CShopEx*> (shop_it->second);
-			if (NULL == pkShopEx)
+			if (nullptr == pkShopEx)
 			{
 				sys_err("WTF!!! It can't be happend. NPC(%d) Shop is not extended version.", shop_it->first);
 				return false;

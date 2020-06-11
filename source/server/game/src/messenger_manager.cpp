@@ -62,10 +62,10 @@ void MessengerManager::Login(MessengerManager::keyA account)
 
 void MessengerManager::LoadList(SQLMsg * msg)
 {
-	if (NULL == msg)
+	if (nullptr == msg)
 		return;
 
-	if (NULL == msg->Get())
+	if (nullptr == msg->Get())
 		return;
 
 	if (msg->Get()->uiNumRows == 0)
@@ -136,12 +136,12 @@ void MessengerManager::RequestToAdd(LPCHARACTER ch, LPCHARACTER target)
 	if (quest::CQuestManager::instance().GetPCForce(target->GetPlayerID())->IsRunning() == true)
 		return;
 
-	DWORD dw1 = GetCRC32(ch->GetName(), strlen(ch->GetName()));
-	DWORD dw2 = GetCRC32(target->GetName(), strlen(target->GetName()));
+	uint32_t dw1 = GetCRC32(ch->GetName(), strlen(ch->GetName()));
+	uint32_t dw2 = GetCRC32(target->GetName(), strlen(target->GetName()));
 
 	char buf[64];
 	snprintf(buf, sizeof(buf), "%u:%u", dw1, dw2);
-	DWORD dwComplex = GetCRC32(buf, strlen(buf));
+	uint32_t dwComplex = GetCRC32(buf, strlen(buf));
 
 	m_set_requestToAdd.insert(dwComplex);
 
@@ -151,12 +151,12 @@ void MessengerManager::RequestToAdd(LPCHARACTER ch, LPCHARACTER target)
 // @fixme130 void -> bool
 bool MessengerManager::AuthToAdd(MessengerManager::keyA account, MessengerManager::keyA companion, bool bDeny)
 {
-	DWORD dw1 = GetCRC32(companion.c_str(), companion.length());
-	DWORD dw2 = GetCRC32(account.c_str(), account.length());
+	uint32_t dw1 = GetCRC32(companion.c_str(), companion.length());
+	uint32_t dw2 = GetCRC32(account.c_str(), account.length());
 
 	char buf[64];
 	snprintf(buf, sizeof(buf), "%u:%u", dw1, dw2);
-	DWORD dwComplex = GetCRC32(buf, strlen(buf));
+	uint32_t dwComplex = GetCRC32(buf, strlen(buf));
 
 	if (m_set_requestToAdd.find(dwComplex) == m_set_requestToAdd.end())
 	{
@@ -180,7 +180,7 @@ void MessengerManager::__AddToList(MessengerManager::keyA account, MessengerMana
 	m_InverseRelation[companion].insert(account);
 
 	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(account.c_str());
-	LPDESC d = ch ? ch->GetDesc() : NULL;
+	LPDESC d = ch ? ch->GetDesc() : nullptr;
 
 	if (d)
 	{
@@ -230,7 +230,7 @@ void MessengerManager::__RemoveFromList(MessengerManager::keyA account, Messenge
 	m_InverseRelation[companion].erase(account);
 
 	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(account.c_str());
-	LPDESC d = ch ? ch->GetDesc() : NULL;
+	LPDESC d = ch ? ch->GetDesc() : nullptr;
 
 	if (d)
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<메신져> %s 님을 메신저에서 삭제하였습니다."), companion.c_str());
@@ -362,7 +362,7 @@ void MessengerManager::SendList(MessengerManager::keyA account)
 void MessengerManager::SendLogin(MessengerManager::keyA account, MessengerManager::keyA companion)
 {
 	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(account.c_str());
-	LPDESC d = ch ? ch->GetDesc() : NULL;
+	LPDESC d = ch ? ch->GetDesc() : nullptr;
 
 	if (!d)
 		return;
@@ -373,16 +373,16 @@ void MessengerManager::SendLogin(MessengerManager::keyA account, MessengerManage
 	if (ch->GetGMLevel() == GM_PLAYER && gm_get_level(companion.c_str()) != GM_PLAYER)
 		return;
 
-	BYTE bLen = companion.size();
+	uint8_t bLen = companion.size();
 
 	TPacketGCMessenger pack;
 
 	pack.header			= HEADER_GC_MESSENGER;
 	pack.subheader		= MESSENGER_SUBHEADER_GC_LOGIN;
-	pack.size			= sizeof(TPacketGCMessenger) + sizeof(BYTE) + bLen;
+	pack.size			= sizeof(TPacketGCMessenger) + sizeof(uint8_t) + bLen;
 
 	d->BufferedPacket(&pack, sizeof(TPacketGCMessenger));
-	d->BufferedPacket(&bLen, sizeof(BYTE));
+	d->BufferedPacket(&bLen, sizeof(uint8_t));
 	d->Packet(companion.c_str(), companion.size());
 }
 
@@ -392,21 +392,21 @@ void MessengerManager::SendLogout(MessengerManager::keyA account, MessengerManag
 		return;
 
 	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(account.c_str());
-	LPDESC d = ch ? ch->GetDesc() : NULL;
+	LPDESC d = ch ? ch->GetDesc() : nullptr;
 
 	if (!d)
 		return;
 
-	BYTE bLen = companion.size();
+	uint8_t bLen = companion.size();
 
 	TPacketGCMessenger pack;
 
 	pack.header		= HEADER_GC_MESSENGER;
 	pack.subheader	= MESSENGER_SUBHEADER_GC_LOGOUT;
-	pack.size		= sizeof(TPacketGCMessenger) + sizeof(BYTE) + bLen;
+	pack.size		= sizeof(TPacketGCMessenger) + sizeof(uint8_t) + bLen;
 
 	d->BufferedPacket(&pack, sizeof(TPacketGCMessenger));
-	d->BufferedPacket(&bLen, sizeof(BYTE));
+	d->BufferedPacket(&bLen, sizeof(uint8_t));
 	d->Packet(companion.c_str(), companion.size());
 }
 

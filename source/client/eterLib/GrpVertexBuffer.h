@@ -9,14 +9,14 @@ class CGraphicVertexBuffer : public CGraphicBase
 		virtual ~CGraphicVertexBuffer();
 
 		void	Destroy();
-		virtual bool	Create(int vtxCount, DWORD fvf, DWORD usage, D3DPOOL d3dPool);
+		virtual bool	Create(int32_t vtxCount, uint32_t fvf, uint32_t usage, D3DPOOL d3dPool);
 
 		bool	CreateDeviceObjects();
 		void	DestroyDeviceObjects();
 
-		bool	Copy(int bufSize, const void* srcVertices);
+		bool	Copy(int32_t bufSize, const void* srcVertices);
 
-		bool	LockRange(unsigned count, void** pretVertices) const;
+		bool	LockRange(uint32_t count, void** pretVertices) const;
 		bool	Lock(void** pretVertices) const;
 		bool	Unlock() const;
 
@@ -24,14 +24,14 @@ class CGraphicVertexBuffer : public CGraphicBase
 		virtual bool	Lock(void** pretVertices);
 		bool	Unlock();
 
-		void	SetStream(int stride, int layer=0) const;
+		void	SetStream(int32_t stride, int32_t layer=0) const;
 			
-		int		GetVertexCount() const;
-		int		GetVertexStride() const;
-		DWORD	GetFlexibleVertexFormat() const;
+		int32_t		GetVertexCount() const;
+		int32_t		GetVertexStride() const;
+		uint32_t	GetFlexibleVertexFormat() const;
 
 		inline	LPDIRECT3DVERTEXBUFFER8 GetD3DVertexBuffer() const	{ return m_lpd3dVB; }
-		inline	DWORD GetBufferSize() const	{ return m_dwBufferSize; }
+		inline	uint32_t GetBufferSize() const	{ return m_dwBufferSize; }
 
 		bool	IsEmpty() const;
 
@@ -41,10 +41,10 @@ class CGraphicVertexBuffer : public CGraphicBase
 	protected:
 		LPDIRECT3DVERTEXBUFFER8 m_lpd3dVB;
 
-		DWORD					m_dwBufferSize;
-		DWORD					m_dwFVF;
-		DWORD					m_dwUsage;
+		uint32_t					m_dwBufferSize;
+		uint32_t					m_dwFVF;
+		uint32_t					m_dwUsage;
 		D3DPOOL					m_d3dPool;
-		int						m_vtxCount;
-		DWORD					m_dwLockFlag;
+		int32_t						m_vtxCount;
+		uint32_t					m_dwLockFlag;
 };

@@ -28,26 +28,26 @@ void stl_lowers(std::string& rstRet)
 		rstRet[i] = korean_tolower(rstRet[i]);
 }
 
-int split_string(const std::string& input, const std::string& delimiter, std::vector<std::string>& results, bool includeEmpties)
+int32_t split_string(const std::string& input, const std::string& delimiter, std::vector<std::string>& results, bool includeEmpties)
 {
-	int iPos = 0;
-	int newPos = -1;
-	UINT sizeS2 = delimiter.size();
-	UINT isize = input.size();
+	int32_t iPos = 0;
+	int32_t newPos = -1;
+	uint32_t sizeS2 = delimiter.size();
+	uint32_t isize = input.size();
 
 	if ((isize == 0) || (sizeS2 == 0))
 	{
 		return 0;
 	}
 
-	std::vector<int> positions;
+	std::vector<int32_t> positions;
 
 	newPos = input.find(delimiter, 0);
 
 	if (newPos < 0)
 		return 0; 
 
-	int numFound = 0;
+	int32_t numFound = 0;
 
 	while (newPos >= iPos)
 	{
@@ -60,7 +60,7 @@ int split_string(const std::string& input, const std::string& delimiter, std::ve
 	if (numFound == 0)
 		return 0;
 
-	for (UINT i = 0; i <= positions.size(); ++i)
+	for (uint32_t i = 0; i <= positions.size(); ++i)
 	{
 		std::string s("");
 		if (i == 0) 
@@ -69,7 +69,7 @@ int split_string(const std::string& input, const std::string& delimiter, std::ve
 		}
 		else
 		{
-			UINT offset = positions[i-1] + sizeS2;
+			uint32_t offset = positions[i-1] + sizeS2;
 
 			if (offset < isize)
 			{

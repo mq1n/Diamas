@@ -15,7 +15,7 @@ void CActorInstance::ShowDirectionLine(bool isVisible)
 	ms_isDirLine=isVisible;
 }
 
-void CActorInstance::SetMaterialColor(DWORD dwColor)
+void CActorInstance::SetMaterialColor(uint32_t dwColor)
 {
 	if (m_pkHorse)
 		m_pkHorse->SetMaterialColor(dwColor);
@@ -24,7 +24,7 @@ void CActorInstance::SetMaterialColor(DWORD dwColor)
 	m_dwMtrlColor|=(dwColor&0x00ffffff);
 }
 
-void CActorInstance::SetMaterialAlpha(DWORD dwAlpha)
+void CActorInstance::SetMaterialAlpha(uint32_t dwAlpha)
 {
 	m_dwMtrlAlpha=dwAlpha;	
 }
@@ -235,7 +235,7 @@ void CActorInstance::SetAddRenderMode()
 	}
 }
 
-void CActorInstance::SetRenderMode(int iRenderMode)
+void CActorInstance::SetRenderMode(int32_t iRenderMode)
 {
 	m_iRenderMode = iRenderMode;
 	if (m_kBlendAlpha.m_isBlending)
@@ -292,7 +292,7 @@ void CActorInstance::RenderCollisionData()
 	STATEMANAGER.SaveRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	if (m_pAttributeInstance)
 	{
-		for (DWORD col=0; col < GetCollisionInstanceCount(); ++col)
+		for (uint32_t col=0; col < GetCollisionInstanceCount(); ++col)
 		{
 			CBaseCollisionInstance * pInstance = GetCollisionInstanceData(col);
 			pInstance->Render();
@@ -307,7 +307,7 @@ void CActorInstance::RenderCollisionData()
 	for (; itor != m_AttackingPointInstanceList.end(); ++itor)
 	{
 		const TCollisionPointInstance & c_rInstance = *itor;
-		for (DWORD i = 0; i < c_rInstance.SphereInstanceVector.size(); ++i)
+		for (uint32_t i = 0; i < c_rInstance.SphereInstanceVector.size(); ++i)
 		{
 			const CDynamicSphereInstance & c_rSphereInstance = c_rInstance.SphereInstanceVector[i];
 			s_Screen.RenderCircle3d(c_rSphereInstance.v3Position.x,
@@ -327,7 +327,7 @@ void CActorInstance::RenderCollisionData()
 	for (; itor != m_DefendingPointInstanceList.end(); ++itor)
 	{
 		const TCollisionPointInstance & c_rInstance = *itor;
-		for (DWORD i = 0; i < c_rInstance.SphereInstanceVector.size(); ++i)
+		for (uint32_t i = 0; i < c_rInstance.SphereInstanceVector.size(); ++i)
 		{
 			const CDynamicSphereInstance & c_rSphereInstance = c_rInstance.SphereInstanceVector[i];
 			s_Screen.RenderCircle3d(c_rSphereInstance.v3Position.x,
@@ -342,7 +342,7 @@ void CActorInstance::RenderCollisionData()
 	for (; itor != m_BodyPointInstanceList.end(); ++itor)
 	{
 		const TCollisionPointInstance & c_rInstance = *itor;
-		for (DWORD i = 0; i < c_rInstance.SphereInstanceVector.size(); ++i)
+		for (uint32_t i = 0; i < c_rInstance.SphereInstanceVector.size(); ++i)
 		{
 			const CDynamicSphereInstance & c_rSphereInstance = c_rInstance.SphereInstanceVector[i];
 			s_Screen.RenderCircle3d(c_rSphereInstance.v3Position.x,

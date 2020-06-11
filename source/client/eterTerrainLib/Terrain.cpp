@@ -7,7 +7,7 @@
 //////////////////////////////////////////////////////////////////////////
 // Texture Set
 //////////////////////////////////////////////////////////////////////////
-CTextureSet * CTerrainImpl::ms_pTextureSet = NULL;
+CTextureSet * CTerrainImpl::ms_pTextureSet = nullptr;
 
 void CTerrainImpl::SetTextureSet(CTextureSet * pTextureSet)
 {
@@ -22,7 +22,7 @@ void CTerrainImpl::SetTextureSet(CTextureSet * pTextureSet)
 CTextureSet * CTerrainImpl::GetTextureSet()
 {
 	if (!ms_pTextureSet)
-		SetTextureSet(NULL);
+		SetTextureSet(nullptr);
 
 	return ms_pTextureSet;
 }
@@ -44,7 +44,7 @@ void CTerrainImpl::Initialize()
 	m_byNumWater = 0;
 	memset(&m_HeightMapHeader, 0, sizeof(TGA_HEADER));
 	memset(&m_awShadowMap, 0xFFFF, sizeof(m_awShadowMap));
-	memset(&m_lpAlphaTexture, NULL, sizeof(m_lpAlphaTexture));
+	memset(&m_lpAlphaTexture, 0, sizeof(m_lpAlphaTexture));
 	
 	m_lViewRadius = 0;
 
@@ -52,7 +52,7 @@ void CTerrainImpl::Initialize()
 
 	m_fHeightScale = 0.0f;
 	
-	m_lpShadowTexture = NULL;
+	m_lpShadowTexture = nullptr;
 
 	m_lSplatTilesX = 0;
 	m_lSplatTilesY = 0;	
@@ -60,12 +60,12 @@ void CTerrainImpl::Initialize()
 
 void CTerrainImpl::Clear()
 {
-	for (DWORD i = 0; i < GetTextureSet()->GetTextureCount(); ++i)
+	for (uint32_t i = 0; i < GetTextureSet()->GetTextureCount(); ++i)
 	{
 		if (m_lpAlphaTexture[i])
 		{
 			m_lpAlphaTexture[i]->Release();
-			m_lpAlphaTexture[i] = NULL;
+			m_lpAlphaTexture[i] = nullptr;
 		}
 	}
 	
@@ -91,7 +91,7 @@ bool CTerrainImpl::LoadHeightMap(const char*c_szFileName)
 
 bool CTerrainImpl::LoadAttrMap(const char *c_szFileName)
 {
-	DWORD dwStart = ELTimer_GetMSec();
+	uint32_t dwStart = ELTimer_GetMSec();
 	Tracef("LoadAttrMapFile %s ", c_szFileName);
 
 	CFile kMappedFile;
@@ -110,9 +110,9 @@ bool CTerrainImpl::LoadAttrMap(const char *c_szFileName)
 #pragma pack(1)
 		struct SAttrMapHeader
 		{
-			WORD m_wMagic;
-			WORD m_wWidth;
-			WORD m_wHeight;
+			uint16_t m_wMagic;
+			uint16_t m_wWidth;
+			uint16_t m_wHeight;
 		};
 #pragma pack(pop)
 		
@@ -125,7 +125,7 @@ bool CTerrainImpl::LoadAttrMap(const char *c_szFileName)
 		SAttrMapHeader kAttrMapHeader;
 		memcpy(&kAttrMapHeader, abFileData, sizeof(kAttrMapHeader));
 
-		const WORD c_wAttrMapMagic = 2634;
+		const uint16_t c_wAttrMapMagic = 2634;
 		if (c_wAttrMapMagic != kAttrMapHeader.m_wMagic)
 		{
 			TraceError("CTerrainImpl::LoadAttrMap - %s MAGIC NUMBER(%d!=MAGIC[%d]) ERROR", c_szFileName, kAttrMapHeader.m_wMagic, kAttrMapHeader.m_wMagic);
@@ -144,15 +144,15 @@ bool CTerrainImpl::LoadAttrMap(const char *c_szFileName)
 			return false;
 		}
 
-		DWORD dwFileRestSize=dwFileSize-sizeof(kAttrMapHeader);
-		DWORD dwFileNeedSize=sizeof(m_abyAttrMap);
+		uint32_t dwFileRestSize=dwFileSize-sizeof(kAttrMapHeader);
+		uint32_t dwFileNeedSize=sizeof(m_abyAttrMap);
 		if (dwFileRestSize != dwFileNeedSize)
 		{
 			TraceError("CTerrainImpl::LoadAttrMap - %s FILE DATA SIZE(rest %d != need %d) ERROR", c_szFileName, dwFileRestSize, dwFileNeedSize);
 			return false;
 		}
 
-		BYTE* abSrcAttrData= abFileData+sizeof(kAttrMapHeader);
+		uint8_t* abSrcAttrData= abFileData+sizeof(kAttrMapHeader);
 		memcpy(m_abyAttrMap, abSrcAttrData, sizeof(m_abyAttrMap));		
 	}
 
@@ -180,7 +180,7 @@ bool CTerrainImpl::RAW_LoadTileMap(const char * c_szFileName)
 
 bool CTerrainImpl::LoadWaterMap(const char * c_szFileName)
 {	
-	DWORD dwStart = ELTimer_GetMSec();
+	uint32_t dwStart = ELTimer_GetMSec();
 
 	if (!LoadWaterMapFile(c_szFileName))
 	{
@@ -216,10 +216,10 @@ bool CTerrainImpl::LoadWaterMapFile(const char * c_szFileName)
 #pragma pack(1)
 		struct SWaterMapHeader
 		{
-			WORD m_wMagic;
-			WORD m_wWidth;
-			WORD m_wHeight;
-			BYTE m_byLayerCount;
+			uint16_t m_wMagic;
+			uint16_t m_wWidth;
+			uint16_t m_wHeight;
+			uint8_t m_byLayerCount;
 		};
 #pragma pack(pop)
 		
@@ -232,7 +232,7 @@ bool CTerrainImpl::LoadWaterMapFile(const char * c_szFileName)
 		SWaterMapHeader kWaterMapHeader;
 		memcpy(&kWaterMapHeader, abFileData, sizeof(kWaterMapHeader));		
 
-		const WORD c_wWaterMapMagic = 5426;
+		const uint16_t c_wWaterMapMagic = 5426;
 		
 		if (c_wWaterMapMagic != kWaterMapHeader.m_wMagic)
 		{
@@ -254,24 +254,24 @@ bool CTerrainImpl::LoadWaterMapFile(const char * c_szFileName)
 
 		m_byNumWater = kWaterMapHeader.m_byLayerCount;
 
-		DWORD dwFileRestSize = dwFileSize - sizeof(kWaterMapHeader);
-		DWORD dwFileNeedSize = sizeof(m_abyWaterMap) + sizeof(long) * m_byNumWater;
-		DWORD dwFileNeedSize2 = sizeof(m_abyWaterMap) + sizeof(WORD) * m_byNumWater;
+		uint32_t dwFileRestSize = dwFileSize - sizeof(kWaterMapHeader);
+		uint32_t dwFileNeedSize = sizeof(m_abyWaterMap) + sizeof(int32_t) * m_byNumWater;
+		uint32_t dwFileNeedSize2 = sizeof(m_abyWaterMap) + sizeof(uint16_t) * m_byNumWater;
 		if (dwFileRestSize == dwFileNeedSize2)
 		{
-			WORD wWaterHeight[MAX_WATER_NUM + 1];
+			uint16_t wWaterHeight[MAX_WATER_NUM + 1];
 			
-			BYTE * abSrcWaterData = abFileData + sizeof(kWaterMapHeader);
+			uint8_t * abSrcWaterData = abFileData + sizeof(kWaterMapHeader);
 			memcpy(m_abyWaterMap, abSrcWaterData, sizeof(m_abyWaterMap));	
 
-			BYTE * abSrcWaterHeight = abSrcWaterData + sizeof(m_abyWaterMap);
+			uint8_t * abSrcWaterHeight = abSrcWaterData + sizeof(m_abyWaterMap);
 
 			m_byNumWater = MIN(MAX_WATER_NUM, m_byNumWater);
 			if (m_byNumWater)
 			{
-				memcpy(wWaterHeight, abSrcWaterHeight, sizeof(WORD) * m_byNumWater);
+				memcpy(wWaterHeight, abSrcWaterHeight, sizeof(uint16_t) * m_byNumWater);
 
-				for (int i = 0; i < m_byNumWater; ++i)
+				for (int32_t i = 0; i < m_byNumWater; ++i)
 					m_lWaterHeight[i] = wWaterHeight[i];
 			}
 		}
@@ -281,19 +281,19 @@ bool CTerrainImpl::LoadWaterMapFile(const char * c_szFileName)
 			return false;
 		}
 	
-		BYTE * abSrcWaterData = abFileData + sizeof(kWaterMapHeader);
+		uint8_t * abSrcWaterData = abFileData + sizeof(kWaterMapHeader);
 		memcpy(m_abyWaterMap, abSrcWaterData, sizeof(m_abyWaterMap));	
 
-		BYTE * abSrcWaterHeight = abSrcWaterData + sizeof(m_abyWaterMap);
+		uint8_t * abSrcWaterHeight = abSrcWaterData + sizeof(m_abyWaterMap);
 
 		if (m_byNumWater)
-			memcpy(m_lWaterHeight, abSrcWaterHeight, sizeof(long) * m_byNumWater);
+			memcpy(m_lWaterHeight, abSrcWaterHeight, sizeof(int32_t) * m_byNumWater);
 	}
 
 	return true;
 }
 
-DWORD CTerrainImpl::GetShadowMapColor(float fx, float fy)
+uint32_t CTerrainImpl::GetShadowMapColor(float fx, float fy)
 {
 	float fMapSize = (float)(TERRAIN_XSIZE);
 	float fooMapSize = 1.0f / fMapSize;
@@ -302,15 +302,15 @@ DWORD CTerrainImpl::GetShadowMapColor(float fx, float fy)
 
 	fx = fx * fooMapSize * (float)(SHADOWMAP_XSIZE - 1);
 	fy = fy * fooMapSize * (float)(SHADOWMAP_YSIZE - 1);
-	int ix, iy;
+	int32_t ix, iy;
 	PR_FLOAT_TO_INT(fx, ix);
 	PR_FLOAT_TO_INT(fy, iy);
 
-	WORD w = *(m_awShadowMap + (iy * SHADOWMAP_XSIZE) + ix);
+	uint16_t w = *(m_awShadowMap + (iy * SHADOWMAP_XSIZE) + ix);
 
-	int b = w & 0x1f; w >>= 5; b <<= 3;
-	int g = w & 0x1f; w >>= 5; g <<= 3;
-	int r = w & 0x1f;		   r <<= 3;
+	int32_t b = w & 0x1f; w >>= 5; b <<= 3;
+	int32_t g = w & 0x1f; w >>= 5; g <<= 3;
+	int32_t r = w & 0x1f;		   r <<= 3;
 
-	return (DWORD) (0xff << 24) | (g << 16) | (g << 8) | r;
+	return (uint32_t) (0xff << 24) | (g << 16) | (g << 8) | r;
 }

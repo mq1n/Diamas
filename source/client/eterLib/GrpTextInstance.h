@@ -24,8 +24,8 @@ class CGraphicTextInstance
 		};
 
 	public:
-		static void Hyperlink_UpdateMousePos(int x, int y);
-		static int  Hyperlink_GetText(char* buf, int len);
+		static void Hyperlink_UpdateMousePos(int32_t x, int32_t y);
+		static int32_t  Hyperlink_GetText(char* buf, int32_t len);
 
 	public:
 		CGraphicTextInstance();
@@ -34,7 +34,7 @@ class CGraphicTextInstance
 		void Destroy();
 		
 		void Update();
-		void Render(RECT * pClipRect = NULL);
+		void Render(RECT * pClipRect = nullptr);
 
 		void ShowCursor();
 		void HideCursor();
@@ -42,15 +42,15 @@ class CGraphicTextInstance
 		void ShowOutLine();
 		void HideOutLine();
 
-		void SetColor(DWORD color);
+		void SetColor(uint32_t color);
 		void SetColor(float r, float g, float b, float a = 1.0f);
 
-		void SetOutLineColor(DWORD color);
+		void SetOutLineColor(uint32_t color);
 		void SetOutLineColor(float r, float g, float b, float a = 1.0f);
 
-		void SetHorizonalAlign(int hAlign);
-		void SetVerticalAlign(int vAlign);
-		void SetMax(int iMax);
+		void SetHorizonalAlign(int32_t hAlign);
+		void SetVerticalAlign(int32_t vAlign);
+		void SetMax(int32_t iMax);
 		void SetTextPointer(CGraphicText* pText);
 		void SetValueString(const std::string& c_stValue);
 		void SetValue(const char* c_szValue, size_t len = -1);
@@ -61,40 +61,40 @@ class CGraphicTextInstance
 		void SetMultiLine(bool Value);
 		void SetLimitWidth(float fWidth);
 
-		void GetTextSize(int* pRetWidth, int* pRetHeight);
+		void GetTextSize(int32_t* pRetWidth, int32_t* pRetHeight);
 		const std::string& GetValueStringReference();
-		WORD GetTextLineCount();
+		uint16_t GetTextLineCount();
 
-		int PixelPositionToCharacterPosition(int iPixelPosition);
-		int GetHorizontalAlign();
+		int32_t PixelPositionToCharacterPosition(int32_t iPixelPosition);
+		int32_t GetHorizontalAlign();
 
 	protected:
 		void __Initialize();
-		int  __DrawCharacter(CGraphicFontTexture * pFontTexture, WORD codePage, wchar_t text, DWORD dwColor);
-		void __GetTextPos(DWORD index, float* x, float* y);
-		int __GetTextTag(const wchar_t * src, int maxLen, int & tagLen, std::wstring & extraInfo);
+		int32_t  __DrawCharacter(CGraphicFontTexture * pFontTexture, uint16_t codePage, wchar_t text, uint32_t dwColor);
+		void __GetTextPos(uint32_t index, float* x, float* y);
+		int32_t __GetTextTag(const wchar_t * src, int32_t maxLen, int32_t & tagLen, std::wstring & extraInfo);
 
 	protected:
 		struct SHyperlink
 		{
-			short sx;
-			short ex;
+			int16_t sx;
+			int16_t ex;
 			std::wstring text;
 
 			SHyperlink() : sx(0), ex(0) { }
 		};
 
 	protected:
-		DWORD m_dwTextColor;
-		DWORD m_dwOutLineColor;
+		uint32_t m_dwTextColor;
+		uint32_t m_dwOutLineColor;
 
-		WORD m_textWidth;
-		WORD m_textHeight;
+		uint16_t m_textWidth;
+		uint16_t m_textHeight;
 
-		BYTE m_hAlign;
-		BYTE m_vAlign;
+		uint8_t m_hAlign;
+		uint8_t m_vAlign;
 
-		WORD m_iMax;
+		uint16_t m_iMax;
 		float m_fLimitWidth;
 
 		bool m_isCursor;
@@ -115,11 +115,11 @@ class CGraphicTextInstance
 		
 		CGraphicText::TRef m_roText;
 		CGraphicFontTexture::TPCharacterInfomationVector m_pCharInfoVector;
-		std::vector<DWORD> m_dwColorInfoVector;
+		std::vector<uint32_t> m_dwColorInfoVector;
 		std::vector<SHyperlink> m_hyperlinkVector;
 
 	public:
-		static void CreateSystem(UINT uCapacity);
+		static void CreateSystem(uint32_t uCapacity);
 		static void DestroySystem();
 
 		static CGraphicTextInstance* New();
@@ -129,6 +129,6 @@ class CGraphicTextInstance
 };
 
 extern const char* FindToken(const char* begin, const char* end);
-extern int ReadToken(const char* token);
+extern int32_t ReadToken(const char* token);
 
 #endif

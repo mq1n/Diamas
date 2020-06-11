@@ -15,32 +15,32 @@ CLoginData::CLoginData()
 	memset(m_aiPremiumTimes, 0, sizeof(m_aiPremiumTimes));
 }
 
-void CLoginData::SetClientKey(const DWORD * c_pdwClientKey)
+void CLoginData::SetClientKey(const uint32_t * c_pdwClientKey)
 {
-	memcpy(&m_adwClientKey, c_pdwClientKey, sizeof(DWORD) * 4);
+	memcpy(&m_adwClientKey, c_pdwClientKey, sizeof(uint32_t) * 4);
 }
 
-const DWORD * CLoginData::GetClientKey()
+const uint32_t * CLoginData::GetClientKey()
 {
 	return &m_adwClientKey[0];
 }
 
-void CLoginData::SetKey(DWORD dwKey)
+void CLoginData::SetKey(uint32_t dwKey)
 {
 	m_dwKey = dwKey;
 }
 
-DWORD CLoginData::GetKey()
+uint32_t CLoginData::GetKey()
 {
 	return m_dwKey;
 }
 
-void CLoginData::SetConnectedPeerHandle(DWORD dwHandle)
+void CLoginData::SetConnectedPeerHandle(uint32_t dwHandle)
 {
 	m_dwConnectedPeerHandle = dwHandle;
 }
 
-DWORD CLoginData::GetConnectedPeerHandle()
+uint32_t CLoginData::GetConnectedPeerHandle()
 {
 	return m_dwConnectedPeerHandle;
 }
@@ -50,7 +50,7 @@ void CLoginData::SetLogonTime()
 	m_dwLogonTime = get_dword_time();
 }
 
-DWORD CLoginData::GetLogonTime()
+uint32_t CLoginData::GetLogonTime()
 {
 	return m_dwLogonTime;
 }
@@ -85,12 +85,12 @@ const char * CLoginData::GetLogin()
 	return m_stLogin.c_str();
 }
 
-void CLoginData::SetPremium(int * paiPremiumTimes)
+void CLoginData::SetPremium(int32_t * paiPremiumTimes)
 {
 	memcpy(m_aiPremiumTimes, paiPremiumTimes, sizeof(m_aiPremiumTimes));
 }
 
-int CLoginData::GetPremium(BYTE type)
+int32_t CLoginData::GetPremium(uint8_t type)
 {
 	if (type >= PREMIUM_MAX_NUM)
 		return 0;
@@ -98,7 +98,7 @@ int CLoginData::GetPremium(BYTE type)
 	return m_aiPremiumTimes[type];
 }
 
-int * CLoginData::GetPremiumPtr()
+int32_t * CLoginData::GetPremiumPtr()
 {
 	return &m_aiPremiumTimes[0];
 }

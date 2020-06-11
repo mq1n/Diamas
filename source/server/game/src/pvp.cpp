@@ -14,7 +14,7 @@
 
 using namespace std;
 
-CPVP::CPVP(DWORD dwPID1, DWORD dwPID2)
+CPVP::CPVP(uint32_t dwPID1, uint32_t dwPID2)
 {
 	if (dwPID1 > dwPID2)
 	{
@@ -29,7 +29,7 @@ CPVP::CPVP(DWORD dwPID1, DWORD dwPID2)
 		m_players[1].bAgree = true;
 	}
 
-	DWORD adwID[2];
+	uint32_t adwID[2];
 	adwID[0] = m_players[0].dwPID;
 	adwID[1] = m_players[1].dwPID;
 	m_dwCRC = GetFastHash((const char *) &adwID, 8);
@@ -107,7 +107,7 @@ void CPVP::Packet(bool bDelete)
 	}
 }
 
-bool CPVP::Agree(DWORD dwPID)
+bool CPVP::Agree(uint32_t dwPID)
 {
 	m_players[m_players[0].dwPID != dwPID ? 1 : 0].bAgree = true;
 
@@ -125,9 +125,9 @@ bool CPVP::IsFight()
 	return (m_players[0].bAgree == m_players[1].bAgree) && m_players[0].bAgree;
 }
 
-void CPVP::Win(DWORD dwPID)
+void CPVP::Win(uint32_t dwPID)
 {
-	int iSlot = m_players[0].dwPID != dwPID ? 1 : 0;
+	int32_t iSlot = m_players[0].dwPID != dwPID ? 1 : 0;
 
 	m_bRevenge = true;
 
@@ -138,12 +138,12 @@ void CPVP::Win(DWORD dwPID)
 	Packet();
 }
 
-bool CPVP::CanRevenge(DWORD dwPID)
+bool CPVP::CanRevenge(uint32_t dwPID)
 {
 	return m_players[m_players[0].dwPID != dwPID ? 1 : 0].bCanRevenge;
 }
 
-void CPVP::SetVID(DWORD dwPID, DWORD dwVID)
+void CPVP::SetVID(uint32_t dwPID, uint32_t dwVID)
 {
 	if (m_players[0].dwPID == dwPID)
 		m_players[0].dwVID = dwVID;
@@ -156,7 +156,7 @@ void CPVP::SetLastFightTime()
 	m_dwLastFightTime = get_dword_time();
 }
 
-DWORD CPVP::GetLastFightTime()
+uint32_t CPVP::GetLastFightTime()
 {
 	return m_dwLastFightTime;
 }
@@ -194,7 +194,7 @@ void CPVPManager::Insert(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	pkPVP->SetVID(pkChr->GetPlayerID(), pkChr->GetVID());
 	pkPVP->SetVID(pkVictim->GetPlayerID(), pkVictim->GetVID());
 
-	m_map_pkPVP.insert(map<DWORD, CPVP *>::value_type(pkPVP->m_dwCRC, pkPVP));
+	m_map_pkPVP.insert(map<uint32_t, CPVP *>::value_type(pkPVP->m_dwCRC, pkPVP));
 
 	m_map_pkPVPSetByID[pkChr->GetPlayerID()].insert(pkPVP);
 	m_map_pkPVPSetByID[pkVictim->GetPlayerID()].insert(pkPVP);
@@ -213,7 +213,7 @@ void CPVPManager::Insert(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	{
 		TPacketGCWhisper pack;
 
-		int len = MIN(CHAT_MAX_LEN, strlen(msg) + 1);
+		int32_t len = MIN(CHAT_MAX_LEN, strlen(msg) + 1);
 
 		pack.bHeader = HEADER_GC_WHISPER;
 		pack.wSize = sizeof(TPacketGCWhisper) + len;
@@ -239,7 +239,7 @@ bool CPVPManager::IsFighting(LPCHARACTER pkChr)
 	return IsFighting(pkChr->GetPlayerID());
 }
 
-bool CPVPManager::IsFighting(DWORD dwPID)
+bool CPVPManager::IsFighting(uint32_t dwPID)
 {
 	CPVPSetMap::iterator it = m_map_pkPVPSetByID.find(dwPID);
 
@@ -265,7 +265,7 @@ void CPVPManager::ConnectEx(LPCHARACTER pkChr, bool bDisconnect)
 	if (it == m_map_pkPVPSetByID.end())
 		return;
 
-	DWORD dwVID = bDisconnect ? 0 : pkChr->GetVID();
+	uint32_t dwVID = bDisconnect ? 0 : pkChr->GetVID();
 
 	std::unordered_set<CPVP*>::iterator it2 = it->second.begin();
 
@@ -286,7 +286,7 @@ void CPVPManager::Disconnect(LPCHARACTER pkChr)
 	//ConnectEx(pkChr, true);
 }
 
-void CPVPManager::GiveUp(LPCHARACTER pkChr, DWORD dwKillerPID) // This method is calling from no where yet.
+void CPVPManager::GiveUp(LPCHARACTER pkChr, uint32_t dwKillerPID) // This method is calling from no where yet.
 {
 	CPVPSetMap::iterator it = m_map_pkPVPSetByID.find(pkChr->GetPlayerID());
 
@@ -300,7 +300,7 @@ void CPVPManager::GiveUp(LPCHARACTER pkChr, DWORD dwKillerPID) // This method is
 	{
 		CPVP * pkPVP = *it2++;
 
-		DWORD dwCompanionPID;
+		uint32_t dwCompanionPID;
 
 		if (pkPVP->m_players[0].dwPID == pkChr->GetPlayerID())
 			dwCompanionPID = pkPVP->m_players[1].dwPID;
@@ -329,7 +329,7 @@ void CPVPManager::GiveUp(LPCHARACTER pkChr, DWORD dwKillerPID) // This method is
 
 // 리턴값: 0 = PK, 1 = PVP
 // PVP를 리턴하면 경험치나 아이템을 떨구고 PK면 떨구지 않는다.
-bool CPVPManager::Dead(LPCHARACTER pkChr, DWORD dwKillerPID)
+bool CPVPManager::Dead(LPCHARACTER pkChr, uint32_t dwKillerPID)
 {
 	CPVPSetMap::iterator it = m_map_pkPVPSetByID.find(pkChr->GetPlayerID());
 
@@ -345,7 +345,7 @@ bool CPVPManager::Dead(LPCHARACTER pkChr, DWORD dwKillerPID)
 	{
 		CPVP * pkPVP = *it2++;
 
-		DWORD dwCompanionPID;
+		uint32_t dwCompanionPID;
 
 		if (pkPVP->m_players[0].dwPID == pkChr->GetPlayerID())
 			dwCompanionPID = pkPVP->m_players[1].dwPID;
@@ -405,7 +405,7 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 			case MOUNT_TYPE_NORMAL:
 			default:
 				if (test_server)
-					sys_log(0, "CanUseSkill: Mount can't attack. vnum(%u) type(%d)", pkChr->GetMountVnum(), static_cast<int>(eIsMount));
+					sys_log(0, "CanUseSkill: Mount can't attack. vnum(%u) type(%d)", pkChr->GetMountVnum(), static_cast<int32_t>(eIsMount));
 				return false;
 				break;
 		}
@@ -420,7 +420,7 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 		return false;
 
 	{
-		BYTE bMapEmpire = SECTREE_MANAGER::instance().GetEmpireFromMapIndex(pkChr->GetMapIndex());
+		uint8_t bMapEmpire = SECTREE_MANAGER::instance().GetEmpireFromMapIndex(pkChr->GetMapIndex());
 
 		if ( ((pkChr->GetPKMode() == PK_MODE_PROTECT) && (pkChr->GetEmpire() == bMapEmpire)) ||
 				((pkVictim->GetPKMode() == PK_MODE_PROTECT) && (pkVictim->GetEmpire() == bMapEmpire)) )
@@ -525,19 +525,19 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	return true;
 }
 
-CPVP * CPVPManager::Find(DWORD dwCRC)
+CPVP * CPVPManager::Find(uint32_t dwCRC)
 {
-	map<DWORD, CPVP *>::iterator it = m_map_pkPVP.find(dwCRC);
+	map<uint32_t, CPVP *>::iterator it = m_map_pkPVP.find(dwCRC);
 
 	if (it == m_map_pkPVP.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
 
 void CPVPManager::Delete(CPVP * pkPVP)
 {
-	map<DWORD, CPVP *>::iterator it = m_map_pkPVP.find(pkPVP->m_dwCRC);
+	map<uint32_t, CPVP *>::iterator it = m_map_pkPVP.find(pkPVP->m_dwCRC);
 
 	if (it == m_map_pkPVP.end())
 		return;
@@ -551,9 +551,9 @@ void CPVPManager::Delete(CPVP * pkPVP)
 
 void CPVPManager::SendList(LPDESC d)
 {
-	map<DWORD, CPVP *>::iterator it = m_map_pkPVP.begin();
+	map<uint32_t, CPVP *>::iterator it = m_map_pkPVP.begin();
 
-	DWORD dwVID = d->GetCharacter()->GetVID();
+	uint32_t dwVID = d->GetCharacter()->GetVID();
 
 	TPacketGCPVP pack;
 
@@ -615,7 +615,7 @@ void CPVPManager::SendList(LPDESC d)
 
 void CPVPManager::Process()
 {
-	map<DWORD, CPVP *>::iterator it = m_map_pkPVP.begin();
+	map<uint32_t, CPVP *>::iterator it = m_map_pkPVP.begin();
 
 	while (it != m_map_pkPVP.end())
 	{

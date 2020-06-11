@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef SAFE_RELEASE
-#define SAFE_RELEASE(p)		{ if (p) { (p)->Release(); (p)=NULL; } }
+#define SAFE_RELEASE(p)		{ if (p) { (p)->Release(); (p)=nullptr; } }
 #endif
 
 class CInputDevice
@@ -26,13 +26,13 @@ class CInputKeyboard : public CInputDevice
 		void			UpdateKeyboard();
 		void			ResetKeyboard();
 
-		bool			IsPressed(int iIndex);
-		void			KeyDown(int iIndex);
-		void			KeyUp(int iIndex);
+		bool			IsPressed(int32_t iIndex);
+		void			KeyDown(int32_t iIndex);
+		void			KeyUp(int32_t iIndex);
 
 	protected:
-		virtual void	OnKeyDown(int iIndex) = 0;
-		virtual void	OnKeyUp(int iIndex) = 0;
+		virtual void	OnKeyDown(int32_t iIndex) = 0;
+		virtual void	OnKeyUp(int32_t iIndex) = 0;
 
 	protected:
 		static LPDIRECTINPUTDEVICE8	ms_lpKeyboard;

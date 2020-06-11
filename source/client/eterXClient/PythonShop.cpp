@@ -3,7 +3,7 @@
 
 #include "PythonNetworkStream.h"
 
-//BOOL CPythonShop::GetSlotItemID(DWORD dwSlotPos, DWORD* pdwItemID)
+//BOOL CPythonShop::GetSlotItemID(uint32_t dwSlotPos, uint32_t* pdwItemID)
 //{
 //	if (!CheckSlotIndex(dwSlotPos))
 //		return FALSE;
@@ -13,7 +13,7 @@
 //	*pdwItemID=itemData->vnum;
 //	return TRUE;
 //}
-void CPythonShop::SetTabCoinType(BYTE tabIdx, BYTE coinType)
+void CPythonShop::SetTabCoinType(uint8_t tabIdx, uint8_t coinType)
 {
 	if (tabIdx >= m_bTabCount)
 	{	
@@ -23,7 +23,7 @@ void CPythonShop::SetTabCoinType(BYTE tabIdx, BYTE coinType)
 	m_aShoptabs[tabIdx].coinType = coinType;
 }
 
-BYTE CPythonShop::GetTabCoinType(BYTE tabIdx)
+uint8_t CPythonShop::GetTabCoinType(uint8_t tabIdx)
 {
 	if (tabIdx >= m_bTabCount)
 	{
@@ -33,7 +33,7 @@ BYTE CPythonShop::GetTabCoinType(BYTE tabIdx)
 	return m_aShoptabs[tabIdx].coinType;
 }
 
-void CPythonShop::SetTabName(BYTE tabIdx, const char* name)
+void CPythonShop::SetTabName(uint8_t tabIdx, const char* name)
 {
 	if (tabIdx >= m_bTabCount)
 	{	
@@ -43,34 +43,34 @@ void CPythonShop::SetTabName(BYTE tabIdx, const char* name)
 	m_aShoptabs[tabIdx].name = name;
 }
 
-const char* CPythonShop::GetTabName(BYTE tabIdx)
+const char* CPythonShop::GetTabName(uint8_t tabIdx)
 {
 	if (tabIdx >= m_bTabCount)
 	{
 		TraceError("Out of Index. tabIdx(%d) must be less than %d.", tabIdx, SHOP_TAB_COUNT_MAX);
-		return NULL;
+		return nullptr;
 	}
 
 	return m_aShoptabs[tabIdx].name.c_str();
 }
 
-void CPythonShop::SetItemData(DWORD dwIndex, const TShopItemData & c_rShopItemData)
+void CPythonShop::SetItemData(uint32_t dwIndex, const TShopItemData & c_rShopItemData)
 {
-	BYTE tabIdx = dwIndex / SHOP_HOST_ITEM_MAX_NUM;
-	DWORD dwSlotPos = dwIndex % SHOP_HOST_ITEM_MAX_NUM;
+	uint8_t tabIdx = dwIndex / SHOP_HOST_ITEM_MAX_NUM;
+	uint32_t dwSlotPos = dwIndex % SHOP_HOST_ITEM_MAX_NUM;
 	
 	SetItemData(tabIdx, dwSlotPos, c_rShopItemData);
 }
 
-BOOL CPythonShop::GetItemData(DWORD dwIndex, const TShopItemData ** c_ppItemData)
+BOOL CPythonShop::GetItemData(uint32_t dwIndex, const TShopItemData ** c_ppItemData)
 {
-	BYTE tabIdx = dwIndex / SHOP_HOST_ITEM_MAX_NUM;
-	DWORD dwSlotPos = dwIndex % SHOP_HOST_ITEM_MAX_NUM;
+	uint8_t tabIdx = dwIndex / SHOP_HOST_ITEM_MAX_NUM;
+	uint32_t dwSlotPos = dwIndex % SHOP_HOST_ITEM_MAX_NUM;
 
 	return GetItemData(tabIdx, dwSlotPos, c_ppItemData);
 }
 
-void CPythonShop::SetItemData(BYTE tabIdx, DWORD dwSlotPos, const TShopItemData & c_rShopItemData)
+void CPythonShop::SetItemData(uint8_t tabIdx, uint32_t dwSlotPos, const TShopItemData & c_rShopItemData)
 {
 	if (tabIdx >= SHOP_TAB_COUNT_MAX || dwSlotPos >= SHOP_HOST_ITEM_MAX_NUM)
 	{
@@ -81,7 +81,7 @@ void CPythonShop::SetItemData(BYTE tabIdx, DWORD dwSlotPos, const TShopItemData 
 	m_aShoptabs[tabIdx].items[dwSlotPos] = c_rShopItemData;
 }
 
-BOOL CPythonShop::GetItemData(BYTE tabIdx, DWORD dwSlotPos, const TShopItemData ** c_ppItemData)
+BOOL CPythonShop::GetItemData(uint8_t tabIdx, uint32_t dwSlotPos, const TShopItemData ** c_ppItemData)
 {
 	if (tabIdx >= SHOP_TAB_COUNT_MAX || dwSlotPos >= SHOP_HOST_ITEM_MAX_NUM)
 	{
@@ -94,7 +94,7 @@ BOOL CPythonShop::GetItemData(BYTE tabIdx, DWORD dwSlotPos, const TShopItemData 
 	return TRUE;
 }
 //
-//BOOL CPythonShop::CheckSlotIndex(DWORD dwSlotPos)
+//BOOL CPythonShop::CheckSlotIndex(uint32_t dwSlotPos)
 //{
 //	if (dwSlotPos >= SHOP_HOST_ITEM_MAX_NUM * SHOP_TAB_COUNT_MAX)
 //		return FALSE;
@@ -106,7 +106,7 @@ void CPythonShop::ClearPrivateShopStock()
 {
 	m_PrivateShopItemStock.clear();
 }
-void CPythonShop::AddPrivateShopItemStock(TItemPos ItemPos, BYTE dwDisplayPos, DWORD dwPrice)
+void CPythonShop::AddPrivateShopItemStock(TItemPos ItemPos, uint8_t dwDisplayPos, uint32_t dwPrice)
 {
 	DelPrivateShopItemStock(ItemPos);
 
@@ -125,7 +125,7 @@ void CPythonShop::DelPrivateShopItemStock(TItemPos ItemPos)
 
 	m_PrivateShopItemStock.erase(ItemPos);
 }
-int CPythonShop::GetPrivateShopItemPrice(TItemPos ItemPos)
+int32_t CPythonShop::GetPrivateShopItemPrice(TItemPos ItemPos)
 {
 	TPrivateShopItemStock::iterator itor = m_PrivateShopItemStock.find(ItemPos);
 
@@ -195,7 +195,7 @@ void CPythonShop::Clear()
 	ClearPrivateShopStock();
 	m_bTabCount = 1;
 
-	for (int i = 0; i < SHOP_TAB_COUNT_MAX; i++)
+	for (int32_t i = 0; i < SHOP_TAB_COUNT_MAX; i++)
 	{
 		// @fixme016 BEGIN
 		m_aShoptabs[i].coinType = SHOP_COIN_TYPE_GOLD;
@@ -216,9 +216,9 @@ CPythonShop::~CPythonShop(void)
 
 PyObject * shopOpen(PyObject * poSelf, PyObject * poArgs)
 {
-	int isPrivateShop = false;
+	int32_t isPrivateShop = false;
 	PyTuple_GetInteger(poArgs, 0, &isPrivateShop);
-	int isMainPrivateShop = false;
+	int32_t isMainPrivateShop = false;
 	PyTuple_GetInteger(poArgs, 1, &isMainPrivateShop);
 
 	CPythonShop& rkShop=CPythonShop::Instance();
@@ -253,7 +253,7 @@ PyObject * shopIsMainPlayerPrivateShop(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * shopGetItemID(PyObject * poSelf, PyObject * poArgs)
 {
-	int nPos;
+	int32_t nPos;
 	if (!PyTuple_GetInteger(poArgs, 0, &nPos))
 		return Py_BuildException();
 
@@ -266,7 +266,7 @@ PyObject * shopGetItemID(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * shopGetItemCount(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -279,7 +279,7 @@ PyObject * shopGetItemCount(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * shopGetItemPrice(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -292,10 +292,10 @@ PyObject * shopGetItemPrice(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * shopGetItemMetinSocket(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
-	int iMetinSocketIndex;
+	int32_t iMetinSocketIndex;
 	if (!PyTuple_GetInteger(poArgs, 1, &iMetinSocketIndex))
 		return Py_BuildException();
 
@@ -308,10 +308,10 @@ PyObject * shopGetItemMetinSocket(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * shopGetItemAttribute(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
-	int iAttrSlotIndex;
+	int32_t iAttrSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 1, &iAttrSlotIndex))
 		return Py_BuildException();
 
@@ -332,16 +332,16 @@ PyObject * shopClearPrivateShopStock(PyObject * poSelf, PyObject * poArgs)
 }
 PyObject * shopAddPrivateShopItemStock(PyObject * poSelf, PyObject * poArgs)
 {
-	BYTE bItemWindowType;
+	uint8_t bItemWindowType;
 	if (!PyTuple_GetInteger(poArgs, 0, &bItemWindowType))
 		return Py_BuildException();
-	WORD wItemSlotIndex;
+	uint16_t wItemSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 1, &wItemSlotIndex))
 		return Py_BuildException();
-	int iDisplaySlotIndex;
+	int32_t iDisplaySlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 2, &iDisplaySlotIndex))
 		return Py_BuildException();
-	int iPrice;
+	int32_t iPrice;
 	if (!PyTuple_GetInteger(poArgs, 3, &iPrice))
 		return Py_BuildException();
 
@@ -350,10 +350,10 @@ PyObject * shopAddPrivateShopItemStock(PyObject * poSelf, PyObject * poArgs)
 }
 PyObject * shopDelPrivateShopItemStock(PyObject * poSelf, PyObject * poArgs)
 {
-	BYTE bItemWindowType;
+	uint8_t bItemWindowType;
 	if (!PyTuple_GetInteger(poArgs, 0, &bItemWindowType))
 		return Py_BuildException();
-	WORD wItemSlotIndex;
+	uint16_t wItemSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 1, &wItemSlotIndex))
 		return Py_BuildException();
 
@@ -362,14 +362,14 @@ PyObject * shopDelPrivateShopItemStock(PyObject * poSelf, PyObject * poArgs)
 }
 PyObject * shopGetPrivateShopItemPrice(PyObject * poSelf, PyObject * poArgs)
 {
-	BYTE bItemWindowType;
+	uint8_t bItemWindowType;
 	if (!PyTuple_GetInteger(poArgs, 0, &bItemWindowType))
 		return Py_BuildException();
-	WORD wItemSlotIndex;
+	uint16_t wItemSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 1, &wItemSlotIndex))
 		return Py_BuildException();
 
-	int iValue = CPythonShop::Instance().GetPrivateShopItemPrice(TItemPos(bItemWindowType, wItemSlotIndex));
+	int32_t iValue = CPythonShop::Instance().GetPrivateShopItemPrice(TItemPos(bItemWindowType, wItemSlotIndex));
 	return Py_BuildValue("i", iValue);
 }
 PyObject * shopBuildPrivateShop(PyObject * poSelf, PyObject * poArgs)
@@ -389,7 +389,7 @@ PyObject * shopGetTabCount(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * shopGetTabName(PyObject * poSelf, PyObject * poArgs)
 {
-	BYTE bTabIdx;
+	uint8_t bTabIdx;
 	if (!PyTuple_GetInteger(poArgs, 0, &bTabIdx))
 		return Py_BuildException();
 
@@ -398,7 +398,7 @@ PyObject * shopGetTabName(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * shopGetTabCoinType(PyObject * poSelf, PyObject * poArgs)
 {
-	BYTE bTabIdx;
+	uint8_t bTabIdx;
 	if (!PyTuple_GetInteger(poArgs, 0, &bTabIdx))
 		return Py_BuildException();
 
@@ -430,7 +430,7 @@ void initshop()
 		{ "DelPrivateShopItemStock",	shopDelPrivateShopItemStock,	METH_VARARGS },
 		{ "GetPrivateShopItemPrice",	shopGetPrivateShopItemPrice,	METH_VARARGS },
 		{ "BuildPrivateShop",			shopBuildPrivateShop,			METH_VARARGS },
-		{ NULL,							NULL,							NULL },
+		{ nullptr,							nullptr,							0 },
 	};
 	PyObject * poModule = Py_InitModule("shop", s_methods);
 

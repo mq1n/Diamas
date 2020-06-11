@@ -4,24 +4,24 @@
 void CMapOutdoor::SetIndexBuffer()
 {
 	void * pIndices;
-	long x, y;
+	int32_t x, y;
 	
-	DWORD dwIndexNum = TERRAIN_PATCHSIZE * TERRAIN_PATCHSIZE * 4;
+	uint32_t dwIndexNum = TERRAIN_PATCHSIZE * TERRAIN_PATCHSIZE * 4;
 
 #ifdef WORLD_EDITOR
-	m_pwIndices = new WORD[dwIndexNum];
+	m_pwIndices = new uint16_t[dwIndexNum];
 	if (!m_pwIndices)
-		TraceError("CMapOutdoor::SetIndexBuffer() IndexBuffer is NULL");
+		TraceError("CMapOutdoor::SetIndexBuffer() IndexBuffer is nullptr");
 
-	memset(m_pwIndices, 0, sizeof(WORD) * dwIndexNum);
+	memset(m_pwIndices, 0, sizeof(uint16_t) * dwIndexNum);
 	if (!m_IndexBuffer.Create(dwIndexNum, D3DFMT_INDEX16))
 		TraceError("CMapOutdoor::SetIndexBuffer() IndexBuffer Create Error");
 	
-	WORD count = 0;
-	WORD count2 = 0;
-	long ry = 0;
+	uint16_t count = 0;
+	uint16_t count2 = 0;
+	int32_t ry = 0;
 	
-	BYTE ucNumLineWarp = TERRAIN_PATCHSIZE + 1;
+	uint8_t ucNumLineWarp = TERRAIN_PATCHSIZE + 1;
 	
 	for (y = 0; y < TERRAIN_PATCHSIZE; y++)
 	{
@@ -40,22 +40,22 @@ void CMapOutdoor::SetIndexBuffer()
 		{
 			if (ry % 2 == 1)
 			{
-				m_pwIndices[count++] = (WORD) (count2+ucNumLineWarp-1);
-				m_pwIndices[count++] = (WORD) (count2-1);
-				count2 -= (short) 1;
+				m_pwIndices[count++] = (uint16_t) (count2+ucNumLineWarp-1);
+				m_pwIndices[count++] = (uint16_t) (count2-1);
+				count2 -= (int16_t) 1;
 			}
 			else
 			{
-				m_pwIndices[count++] = (WORD) (count2+1);
-				m_pwIndices[count++] = (WORD) (count2+ucNumLineWarp+1);
-				count2 += (short) 1;
+				m_pwIndices[count++] = (uint16_t) (count2+1);
+				m_pwIndices[count++] = (uint16_t) (count2+ucNumLineWarp+1);
+				count2 += (int16_t) 1;
 			}
 		}
 		
 		if (y < TERRAIN_PATCHSIZE-1)
 		{
-			m_pwIndices[count++] = (WORD) (count2+ucNumLineWarp);
-			m_pwIndices[count++] = (WORD) (count2+ucNumLineWarp);
+			m_pwIndices[count++] = (uint16_t) (count2+ucNumLineWarp);
+			m_pwIndices[count++] = (uint16_t) (count2+ucNumLineWarp);
 			count2 += ucNumLineWarp;
 		}
 		ry++;
@@ -64,25 +64,25 @@ void CMapOutdoor::SetIndexBuffer()
 	m_wNumIndices = count;
 	if (!m_IndexBuffer.Lock((void **) &pIndices))
 		TraceError("CMapOutdoor::SetIndexBuffer() IndexBuffer Unlock Error");
-	memcpy(pIndices, m_pwIndices, count * sizeof(WORD));
+	memcpy(pIndices, m_pwIndices, count * sizeof(uint16_t));
 	m_IndexBuffer.Unlock();
 	
 	delete [] m_pwIndices;
-	m_pwIndices = NULL;
+	m_pwIndices = nullptr;
 #else
-	WORD	count[TERRAINPATCH_LODMAX], count2[TERRAINPATCH_LODMAX];
-	BYTE uci;
+	uint16_t	count[TERRAINPATCH_LODMAX], count2[TERRAINPATCH_LODMAX];
+	uint8_t uci;
 	for (uci = 0; uci < TERRAINPATCH_LODMAX; ++uci)
 	{		
-		m_pwaIndices[uci] = new WORD[dwIndexNum];
-		memset(m_pwaIndices[uci], 0, sizeof(WORD) * dwIndexNum);
+		m_pwaIndices[uci] = new uint16_t[dwIndexNum];
+		memset(m_pwaIndices[uci], 0, sizeof(uint16_t) * dwIndexNum);
 		count[uci] = 0;
 		count2[uci] = 0;
 		if ( !m_IndexBuffer[uci].Create(dwIndexNum, D3DFMT_INDEX16) )
 			TraceError("CMapOutdoor::SetIndexBuffer() IndexBuffer Create Error");
 	}
 
-	BYTE ucNumLineWarp = TERRAIN_PATCHSIZE + 1;
+	uint8_t ucNumLineWarp = TERRAIN_PATCHSIZE + 1;
 	
 	for (y = 0; y < TERRAIN_PATCHSIZE; y++)
 	{
@@ -101,15 +101,15 @@ void CMapOutdoor::SetIndexBuffer()
 		{
 			if (y%2 == 0)
 			{
-				m_pwaIndices[0][(count[0])++] = (WORD) (count2[0]+1);
-				m_pwaIndices[0][(count[0])++] = (WORD) (count2[0]+ucNumLineWarp+1);
-				count2[0] += (short) 1;
+				m_pwaIndices[0][(count[0])++] = (uint16_t) (count2[0]+1);
+				m_pwaIndices[0][(count[0])++] = (uint16_t) (count2[0]+ucNumLineWarp+1);
+				count2[0] += (int16_t) 1;
 			}
 			else
 			{
-				m_pwaIndices[0][(count[0])++] = (WORD) (count2[0]+ucNumLineWarp-1);
-				m_pwaIndices[0][(count[0])++] = (WORD) (count2[0]-1);
-				count2[0] -= (short) 1;
+				m_pwaIndices[0][(count[0])++] = (uint16_t) (count2[0]+ucNumLineWarp-1);
+				m_pwaIndices[0][(count[0])++] = (uint16_t) (count2[0]-1);
+				count2[0] -= (int16_t) 1;
 			}
 			
 			if (0 == x%2)
@@ -179,8 +179,8 @@ void CMapOutdoor::SetIndexBuffer()
 		
 		if (y < TERRAIN_PATCHSIZE-1)
 		{
-			m_pwaIndices[0][(count[0])++] = (WORD) (count2[0]+ucNumLineWarp);
-			m_pwaIndices[0][(count[0])++] = (WORD) (count2[0]+ucNumLineWarp);
+			m_pwaIndices[0][(count[0])++] = (uint16_t) (count2[0]+ucNumLineWarp);
+			m_pwaIndices[0][(count[0])++] = (uint16_t) (count2[0]+ucNumLineWarp);
 			count2[0] += ucNumLineWarp;
 			if (0 == y%2)
 				count2[1] += 2;
@@ -194,15 +194,15 @@ void CMapOutdoor::SetIndexBuffer()
 		m_wNumIndices[uci] = count[uci];
 		if( !m_IndexBuffer[uci].Lock((void **) &pIndices) )
 			TraceError("CMapOutdoor::SetIndexBuffer() IndexBuffer Unlock Error");
-		memcpy(pIndices, m_pwaIndices[uci], count[uci] * sizeof(WORD));
+		memcpy(pIndices, m_pwaIndices[uci], count[uci] * sizeof(uint16_t));
 		m_IndexBuffer[uci].Unlock();
 		delete [] m_pwaIndices[uci];
-		m_pwaIndices[uci] = NULL;
+		m_pwaIndices[uci] = nullptr;
 	}
 #endif
 }
 
-void CMapOutdoor::ADDLvl1TL(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl1TL(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	pIndices[rwCount++] = c_rwCurCount;
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp;
@@ -229,7 +229,7 @@ void CMapOutdoor::ADDLvl1TL(WORD * pIndices, WORD & rwCount, const WORD & c_rwCu
 	pIndices[rwCount++] = c_rwCurCount;
 }
 
-void CMapOutdoor::ADDLvl1T(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl1T(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	pIndices[rwCount++] = c_rwCurCount;
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp * 2;
@@ -252,7 +252,7 @@ void CMapOutdoor::ADDLvl1T(WORD * pIndices, WORD & rwCount, const WORD & c_rwCur
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp + 1;
 }
 
-void CMapOutdoor::ADDLvl1TR(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl1TR(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	pIndices[rwCount++] = c_rwCurCount;
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp * 2;
@@ -279,7 +279,7 @@ void CMapOutdoor::ADDLvl1TR(WORD * pIndices, WORD & rwCount, const WORD & c_rwCu
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp + 1;
 }
 
-void CMapOutdoor::ADDLvl1L(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl1L(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	pIndices[rwCount++] = c_rwCurCount;
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp;
@@ -302,7 +302,7 @@ void CMapOutdoor::ADDLvl1L(WORD * pIndices, WORD & rwCount, const WORD & c_rwCur
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp + 1;
 }
 
-void CMapOutdoor::ADDLvl1R(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl1R(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	pIndices[rwCount++] = c_rwCurCount;
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp * 2;
@@ -325,7 +325,7 @@ void CMapOutdoor::ADDLvl1R(WORD * pIndices, WORD & rwCount, const WORD & c_rwCur
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp + 1;
 }
 
-void CMapOutdoor::ADDLvl1BL(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl1BL(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	pIndices[rwCount++] = c_rwCurCount;
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp;
@@ -352,7 +352,7 @@ void CMapOutdoor::ADDLvl1BL(WORD * pIndices, WORD & rwCount, const WORD & c_rwCu
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp + 1;
 }
 
-void CMapOutdoor::ADDLvl1B(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl1B(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	pIndices[rwCount++] = c_rwCurCount;
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp * 2;
@@ -375,7 +375,7 @@ void CMapOutdoor::ADDLvl1B(WORD * pIndices, WORD & rwCount, const WORD & c_rwCur
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp + 1;
 }
 
-void CMapOutdoor::ADDLvl1BR(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl1BR(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	pIndices[rwCount++] = c_rwCurCount;
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp * 2;
@@ -402,7 +402,7 @@ void CMapOutdoor::ADDLvl1BR(WORD * pIndices, WORD & rwCount, const WORD & c_rwCu
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp + 1;
 }
 
-void CMapOutdoor::ADDLvl1M(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl1M(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	pIndices[rwCount++] = c_rwCurCount;
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp * 2;
@@ -413,7 +413,7 @@ void CMapOutdoor::ADDLvl1M(WORD * pIndices, WORD & rwCount, const WORD & c_rwCur
 	pIndices[rwCount++] = c_rwCurCount + 2;
 }
 
-void CMapOutdoor::ADDLvl2TL(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl2TL(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	ADDLvl1TL(pIndices, rwCount, c_rwCurCount, c_rucNumLineWarp);
 	ADDLvl1T(pIndices, rwCount, c_rwCurCount + 2, c_rucNumLineWarp);
@@ -421,7 +421,7 @@ void CMapOutdoor::ADDLvl2TL(WORD * pIndices, WORD & rwCount, const WORD & c_rwCu
 	ADDLvl1M(pIndices, rwCount, c_rwCurCount + c_rucNumLineWarp * 2 + 2, c_rucNumLineWarp);
 }
 
-void CMapOutdoor::ADDLvl2T(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl2T(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	ADDLvl1T(pIndices, rwCount, c_rwCurCount, c_rucNumLineWarp);
 	ADDLvl1T(pIndices, rwCount, c_rwCurCount + 2, c_rucNumLineWarp);
@@ -439,7 +439,7 @@ void CMapOutdoor::ADDLvl2T(WORD * pIndices, WORD & rwCount, const WORD & c_rwCur
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp * 2 + 2;
 }
 
-void CMapOutdoor::ADDLvl2TR(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl2TR(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	ADDLvl1T(pIndices, rwCount, c_rwCurCount, c_rucNumLineWarp);
 	ADDLvl1TR(pIndices, rwCount, c_rwCurCount + 2, c_rucNumLineWarp);
@@ -447,7 +447,7 @@ void CMapOutdoor::ADDLvl2TR(WORD * pIndices, WORD & rwCount, const WORD & c_rwCu
 	ADDLvl1R(pIndices, rwCount, c_rwCurCount + c_rucNumLineWarp * 2 + 2, c_rucNumLineWarp);
 }
 
-void CMapOutdoor::ADDLvl2L(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl2L(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	ADDLvl1L(pIndices, rwCount, c_rwCurCount, c_rucNumLineWarp);
 	ADDLvl1L(pIndices, rwCount, c_rwCurCount + c_rucNumLineWarp * 2, c_rucNumLineWarp);
@@ -465,7 +465,7 @@ void CMapOutdoor::ADDLvl2L(WORD * pIndices, WORD & rwCount, const WORD & c_rwCur
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp * 4 + 2;
 }
 
-void CMapOutdoor::ADDLvl2R(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl2R(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	ADDLvl1R(pIndices, rwCount, c_rwCurCount + 2, c_rucNumLineWarp);
 	ADDLvl1R(pIndices, rwCount, c_rwCurCount + c_rucNumLineWarp * 2 + 2, c_rucNumLineWarp);
@@ -483,7 +483,7 @@ void CMapOutdoor::ADDLvl2R(WORD * pIndices, WORD & rwCount, const WORD & c_rwCur
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp * 4 + 2;
 }
 
-void CMapOutdoor::ADDLvl2BL(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl2BL(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	ADDLvl1L(pIndices, rwCount, c_rwCurCount, c_rucNumLineWarp);
 	ADDLvl1M(pIndices, rwCount, c_rwCurCount + 2, c_rucNumLineWarp);
@@ -491,7 +491,7 @@ void CMapOutdoor::ADDLvl2BL(WORD * pIndices, WORD & rwCount, const WORD & c_rwCu
 	ADDLvl1B(pIndices, rwCount, c_rwCurCount + c_rucNumLineWarp * 2 + 2, c_rucNumLineWarp);
 }
 
-void CMapOutdoor::ADDLvl2B(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl2B(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp * 2;
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp * 2 + 2;
@@ -509,7 +509,7 @@ void CMapOutdoor::ADDLvl2B(WORD * pIndices, WORD & rwCount, const WORD & c_rwCur
 	ADDLvl1B(pIndices, rwCount, c_rwCurCount + c_rucNumLineWarp * 2 + 2, c_rucNumLineWarp);
 }
 
-void CMapOutdoor::ADDLvl2BR(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl2BR(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	ADDLvl1M(pIndices, rwCount, c_rwCurCount, c_rucNumLineWarp);
 	ADDLvl1R(pIndices, rwCount, c_rwCurCount + 2, c_rucNumLineWarp);
@@ -517,7 +517,7 @@ void CMapOutdoor::ADDLvl2BR(WORD * pIndices, WORD & rwCount, const WORD & c_rwCu
 	ADDLvl1BR(pIndices, rwCount, c_rwCurCount + c_rucNumLineWarp * 2 + 2, c_rucNumLineWarp);
 }
 
-void CMapOutdoor::ADDLvl2M(WORD * pIndices, WORD & rwCount, const WORD & c_rwCurCount, const BYTE & c_rucNumLineWarp)
+void CMapOutdoor::ADDLvl2M(uint16_t * pIndices, uint16_t & rwCount, const uint16_t & c_rwCurCount, const uint8_t & c_rucNumLineWarp)
 {
 	pIndices[rwCount++] = c_rwCurCount;
 	pIndices[rwCount++] = c_rwCurCount + c_rucNumLineWarp * 4;

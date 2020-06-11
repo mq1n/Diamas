@@ -7,20 +7,20 @@
 #include "affect.h"
 #include "shop_manager.h"
 
-int	OnClickShop(TRIGGERPARAM);
-int	OnClickTalk(TRIGGERPARAM);
+int32_t	OnClickShop(TRIGGERPARAM);
+int32_t	OnClickTalk(TRIGGERPARAM);
 
-int	OnIdleDefault(TRIGGERPARAM);
-int	OnAttackDefault(TRIGGERPARAM);
+int32_t	OnIdleDefault(TRIGGERPARAM);
+int32_t	OnAttackDefault(TRIGGERPARAM);
 
 typedef struct STriggerFunction
 {
-	int (*func) (TRIGGERPARAM);
+	int32_t (*func) (TRIGGERPARAM);
 } TTriggerFunction;
 
 TTriggerFunction OnClickTriggers[ON_CLICK_MAX_NUM] =
 {
-	{ NULL,          	},	// ON_CLICK_NONE,
+	{ nullptr,          	},	// ON_CLICK_NONE,
 	{ OnClickShop,	},	// ON_CLICK_SHOP,
 };
 
@@ -39,7 +39,7 @@ void CHARACTER::AssignTriggers(const TMobTable * table)
 /*
  * ON_CLICK
  */
-int OnClickShop(TRIGGERPARAM)
+int32_t OnClickShop(TRIGGERPARAM)
 {
 	CShopManager::instance().StartShopping(causer, ch);
 	return 1;
@@ -48,7 +48,7 @@ int OnClickShop(TRIGGERPARAM)
 /*
  * 몬스터 AI 함수들을 BattleAI 클래스로 수정
  */
-int OnIdleDefault(TRIGGERPARAM)
+int32_t OnIdleDefault(TRIGGERPARAM)
 {
 	if (ch->OnIdle())
 		return PASSES_PER_SEC(1);
@@ -59,14 +59,14 @@ int OnIdleDefault(TRIGGERPARAM)
 class FuncFindMobVictim
 {
 	public:
-		FuncFindMobVictim(LPCHARACTER pkChr, int iMaxDistance) :
+		FuncFindMobVictim(LPCHARACTER pkChr, int32_t iMaxDistance) :
 			m_pkChr(pkChr),
 			m_iMinDistance(~(1L << 31)),
 			m_iMaxDistance(iMaxDistance),
 			m_lx(pkChr->GetX()),
 			m_ly(pkChr->GetY()),
-			m_pkChrVictim(NULL),
-			m_pkChrBuilding(NULL)
+			m_pkChrVictim(nullptr),
+			m_pkChrBuilding(nullptr)
 	{
 	};
 
@@ -125,7 +125,7 @@ class FuncFindMobVictim
 					return false;
 			}
 
-			int iDistance = DISTANCE_APPROX(m_lx - pkChr->GetX(), m_ly - pkChr->GetY());
+			int32_t iDistance = DISTANCE_APPROX(m_lx - pkChr->GetX(), m_ly - pkChr->GetY());
 
 			if (iDistance < m_iMinDistance && iDistance <= m_iMaxDistance)
 			{
@@ -149,19 +149,19 @@ class FuncFindMobVictim
 	private:
 		LPCHARACTER	m_pkChr;
 
-		int		m_iMinDistance;
-		int		m_iMaxDistance;
-		long		m_lx;
-		long		m_ly;
+		int32_t		m_iMinDistance;
+		int32_t		m_iMaxDistance;
+		int32_t		m_lx;
+		int32_t		m_ly;
 
 		LPCHARACTER	m_pkChrVictim;
 		LPCHARACTER	m_pkChrBuilding;
 };
 
-LPCHARACTER FindVictim(LPCHARACTER pkChr, int iMaxDistance)
+LPCHARACTER FindVictim(LPCHARACTER pkChr, int32_t iMaxDistance)
 {
 	FuncFindMobVictim f(pkChr, iMaxDistance);
-	if (pkChr->GetSectree() != NULL) {
+	if (pkChr->GetSectree() != nullptr) {
 		pkChr->GetSectree()->ForEachAround(f);	
 	}
 	return f.GetVictim();

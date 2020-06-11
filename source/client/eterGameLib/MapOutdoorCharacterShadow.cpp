@@ -4,9 +4,9 @@
 
 #include "MapOutdoor.h"
 
-static int recreate = false;
+static int32_t recreate = false;
 
-void CMapOutdoor::SetShadowTextureSize(WORD size)
+void CMapOutdoor::SetShadowTextureSize(uint16_t size)
 {
 	if (m_wShadowMapSize != size)
 	{
@@ -62,7 +62,7 @@ void CMapOutdoor::ReleaseCharacterShadowTexture()
 	SAFE_RELEASE(m_lpCharacterShadowMapTexture);
 }
 
-DWORD dwLightEnable = FALSE;
+uint32_t dwLightEnable = FALSE;
 
 bool CMapOutdoor::BeginRenderCharacterShadowToTexture()
 {
@@ -125,7 +125,7 @@ bool CMapOutdoor::BeginRenderCharacterShadowToTexture()
 		bSuccess = false;
 	}
 	
-	if (FAILED(ms_lpd3dDevice->Clear(0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0xFF, 0xFF, 0xFF), 1.0f, 0)))
+	if (FAILED(ms_lpd3dDevice->Clear(0L, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0xFF, 0xFF, 0xFF), 1.0f, 0)))
 	{
 		TraceError("CMapOutdoor::BeginRenderCharacterShadowToTexture : Unable to Clear Render Target");
 		bSuccess = false;

@@ -24,9 +24,9 @@ float SPixelPosition_CalculateDistanceSq3d(const TPixelPosition& c_rkPPosLeft, c
 namespace prt
 {
 
-DWORD GetPropertyType(const char * c_szTypeName)
+uint32_t GetPropertyType(const char * c_szTypeName)
 {
-	for (DWORD i = 0; i < PROPERTY_TYPE_MAX_NUM; ++i)
+	for (uint32_t i = 0; i < PROPERTY_TYPE_MAX_NUM; ++i)
 	{
 		if (!strcmp(c_szPropertyTypeName[i], c_szTypeName))
 			return i;
@@ -35,7 +35,7 @@ DWORD GetPropertyType(const char * c_szTypeName)
 	return PROPERTY_TYPE_NONE;
 }
 
-const char * GetPropertyExtension(DWORD dwType)
+const char * GetPropertyExtension(uint32_t dwType)
 {
 	if (dwType >= PROPERTY_TYPE_MAX_NUM)
 		return c_szPropertyExtension[0];
@@ -43,7 +43,7 @@ const char * GetPropertyExtension(DWORD dwType)
 	return c_szPropertyExtension[dwType];
 }
 
-const char * IntegerNumberToString(int iNumber)
+const char * IntegerNumberToString(int32_t iNumber)
 {
 	static char szString[16+1];
 	_snprintf(szString, sizeof(szString), "%d", iNumber);
@@ -234,7 +234,7 @@ bool PropertyAmbienceStringToData(CProperty * pProperty, TPropertyAmbience * pDa
 	const char * c_pszPlayType;
 	const char * c_pszPlayInterval;
 	const char * c_pszPlayIntervalVariation;
-	const char * c_pszMaxVolumeAreaPercentage = NULL;
+	const char * c_pszMaxVolumeAreaPercentage = nullptr;
 	CTokenVector AmbienceSoundVector;
 	if (!pProperty->GetString("PlayType", &c_pszPlayType))
 		return false;
@@ -286,7 +286,7 @@ bool PropertyDungeonBlockStringToData(CProperty * pProperty, TPropertyDungeonBlo
 
 	///////////////////////////////////////////////////////////////////////////////////
 
-	const char * c_pszDungeonBlockFileName = NULL;
+	const char * c_pszDungeonBlockFileName = nullptr;
 	if (!pProperty->GetString("dungeonblockfile", &c_pszDungeonBlockFileName))
 		return false;
 

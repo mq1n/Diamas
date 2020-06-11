@@ -10,7 +10,7 @@
 
 namespace xmas
 {
-	void ProcessEventFlag(const std::string& name, int prev_value, int value)
+	void ProcessEventFlag(const std::string& name, int32_t prev_value, int32_t value)
 	{
 		if (name == "xmas_snow" || name == "xmas_boom" || name == "xmas_song" || name == "xmas_tree")
 		{
@@ -104,7 +104,7 @@ namespace xmas
 
 	EVENTINFO(spawn_santa_info)
 	{
-		long lMapIndex;
+		int32_t lMapIndex;
 
 		spawn_santa_info() 
 		: lMapIndex( 0 )
@@ -116,13 +116,13 @@ namespace xmas
 	{
 		spawn_santa_info* info = dynamic_cast<spawn_santa_info*>( event->info );
 
-		if ( info == NULL )
+		if ( info == nullptr )
 		{
 			sys_err( "spawn_santa_event> <Factor> Null pointer" );
 			return 0;
 		}
 
-		long lMapIndex = info->lMapIndex;
+		int32_t lMapIndex = info->lMapIndex;
 
 		if (quest::CQuestManager::instance().GetEventFlag("xmas_santa") == 0)
 			return 0;
@@ -141,7 +141,7 @@ namespace xmas
 		return PASSES_PER_SEC(5);
 	}
 
-	void SpawnSanta(long lMapIndex, int iTimeGapSec)
+	void SpawnSanta(int32_t lMapIndex, int32_t iTimeGapSec)
 	{
 		if (test_server)
 		{
@@ -163,9 +163,9 @@ namespace xmas
 			// 없으면 만들어준다
 			struct SNPCSellFireworkPosition
 			{
-				long lMapIndex;
-				int x;
-				int y;
+				int32_t lMapIndex;
+				int32_t x;
+				int32_t y;
 			} positions[] = {
 				{  1,	615,	618 },
 				{  3,	500,	625 },

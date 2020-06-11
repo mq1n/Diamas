@@ -6,5 +6,5 @@
 
 /* Fast Float<->Integer conversion */
 float	PR_FCNV;        
-long	PR_ICNV;
+int32_t	PR_ICNV;
 

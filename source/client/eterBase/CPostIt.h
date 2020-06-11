@@ -38,7 +38,7 @@ public:
 	 * @param [in]	lpszData	: 불러올 데이타의 버퍼
 	 * @param [in]	nSize		: lpszData 버퍼의 최대사이즈
 	 */
-	BOOL	Get( LPCSTR lpszKeyName, LPSTR lpszData, DWORD nSize );
+	BOOL	Get( LPCSTR lpszKeyName, LPSTR lpszData, uint32_t nSize );
 
 	/**
 	 * @brief	저장할 데이타를 넣는다.
@@ -54,11 +54,11 @@ public:
 	BOOL	Set( LPCSTR lpszKeyName, LPCSTR lpszData );
 
 	/**
-	 * @brief	저장할 데이타(DWORD)를 넣는다.
+	 * @brief	저장할 데이타(uint32_t)를 넣는다.
 	 * @param [in]	lpBuffer	: 저장할 데이타. "KEY=DATA" 식의 데이타를 넣는다.
-	 * @param [in]	dwValue		: 저장할 데이타. (DWORD)
+	 * @param [in]	dwValue		: 저장할 데이타. (uint32_t)
 	 */
-	BOOL	Set( LPCSTR lpszKeyName, DWORD dwValue );
+	BOOL	Set( LPCSTR lpszKeyName, uint32_t dwValue );
 
 	/**
 	 * @brief	CPostIt class를 복사한다. (클래스 constructor에 이름 인자가 있기 때문에, 새 이름을 지정해야함)

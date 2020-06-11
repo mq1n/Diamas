@@ -53,12 +53,12 @@ static char	__escape_string[1024];
 static char	__escape_string2[1024];
 #endif
 
-static int __deposit_limit()
+static int32_t __deposit_limit()
 {
 	return (1000*10000); // 1천만
 }
 
-void SendBlockChatInfo(LPCHARACTER ch, int sec)
+void SendBlockChatInfo(LPCHARACTER ch, int32_t sec)
 {
 	if (sec <= 0)
 	{
@@ -66,10 +66,10 @@ void SendBlockChatInfo(LPCHARACTER ch, int sec)
 		return;
 	}
 
-	long hour = sec / 3600;
+	int32_t hour = sec / 3600;
 	sec -= hour * 3600;
 
-	long min = (sec / 60);
+	int32_t min = (sec / 60);
 	sec -= min * 60;
 
 	char buf[128+1];
@@ -96,14 +96,14 @@ EVENTINFO(spam_event_info)
 	}
 };
 
-typedef std::unordered_map<std::string, std::pair<unsigned int, LPEVENT> > spam_score_of_ip_t;
+typedef std::unordered_map<std::string, std::pair<uint32_t, LPEVENT> > spam_score_of_ip_t;
 spam_score_of_ip_t spam_score_of_ip;
 
 EVENTFUNC(block_chat_by_ip_event)
 {
 	spam_event_info* info = dynamic_cast<spam_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "block_chat_by_ip_event> <Factor> Null pointer" );
 		return 0;
@@ -116,7 +116,7 @@ EVENTFUNC(block_chat_by_ip_event)
 	if (it != spam_score_of_ip.end())
 	{
 		it->second.first = 0;
-		it->second.second = NULL;
+		it->second.second = nullptr;
 	}
 
 	return 0;
@@ -130,7 +130,7 @@ bool SpamBlockCheck(LPCHARACTER ch, const char* const buf, const size_t buflen)
 
 		if (it == spam_score_of_ip.end())
 		{
-			spam_score_of_ip.insert(std::make_pair(ch->GetDesc()->GetHostName(), std::make_pair(0, (LPEVENT) NULL)));
+			spam_score_of_ip.insert(std::make_pair(ch->GetDesc()->GetHostName(), std::make_pair(0, (LPEVENT) nullptr)));
 			it = spam_score_of_ip.find(ch->GetDesc()->GetHostName());
 		}
 
@@ -140,7 +140,7 @@ bool SpamBlockCheck(LPCHARACTER ch, const char* const buf, const size_t buflen)
 			return true;
 		}
 
-		unsigned int score;
+		uint32_t score;
 		const char * word = SpamManager::instance().GetSpamScore(buf, buflen, score);
 
 		it->second.first += score;
@@ -177,7 +177,7 @@ enum
 	TEXT_TAG_RESTORE_COLOR,
 };
 
-int GetTextTag(const char * src, int maxLen, int & tagLen, std::string & extraInfo)
+int32_t GetTextTag(const char * src, int32_t maxLen, int32_t & tagLen, std::string & extraInfo)
 {
 	tagLen = 1;
 
@@ -210,17 +210,17 @@ int GetTextTag(const char * src, int maxLen, int & tagLen, std::string & extraIn
 	return TEXT_TAG_PLAIN;
 }
 
-void GetTextTagInfo(const char * src, int src_len, int & hyperlinks, bool & colored)
+void GetTextTagInfo(const char * src, int32_t src_len, int32_t & hyperlinks, bool & colored)
 {
 	colored = false;
 	hyperlinks = 0;
 
-	int len;
+	int32_t len;
 	std::string extraInfo;
 
-	for (int i = 0; i < src_len;)
+	for (int32_t i = 0; i < src_len;)
 	{
-		int tag = GetTextTag(&src[i], src_len - i, len, extraInfo);
+		int32_t tag = GetTextTag(&src[i], src_len - i, len, extraInfo);
 
 		if (tag == TEXT_TAG_HYPERLINK_START)
 			++hyperlinks;
@@ -232,7 +232,7 @@ void GetTextTagInfo(const char * src, int src_len, int & hyperlinks, bool & colo
 	}
 }
 
-int ProcessTextTag(LPCHARACTER ch, const char * c_pszText, size_t len)
+int32_t ProcessTextTag(LPCHARACTER ch, const char * c_pszText, size_t len)
 {
 	//2012.05.17 김용욱
 	//0 : 정상적으로 사용
@@ -240,7 +240,7 @@ int ProcessTextTag(LPCHARACTER ch, const char * c_pszText, size_t len)
 	//2 : 금강경이 있으나, 개인상점에서 사용중
 	//3 : 교환중
 	//4 : 에러
-	int hyperlinks;
+	int32_t hyperlinks;
 	bool colored;
 	
 	GetTextTagInfo(c_pszText, len, hyperlinks, colored);
@@ -253,7 +253,7 @@ int ProcessTextTag(LPCHARACTER ch, const char * c_pszText, size_t len)
 		return 0;
 #endif
 
-	int nPrismCount = ch->CountSpecifyItem(ITEM_PRISM);
+	int32_t nPrismCount = ch->CountSpecifyItem(ITEM_PRISM);
 
 	if (nPrismCount < hyperlinks)
 		return 1;
@@ -265,7 +265,7 @@ int ProcessTextTag(LPCHARACTER ch, const char * c_pszText, size_t len)
 		return 0;
 	} else
 	{
-		int sellingNumber = ch->GetMyShop()->GetNumberByVnum(ITEM_PRISM);
+		int32_t sellingNumber = ch->GetMyShop()->GetNumberByVnum(ITEM_PRISM);
 		if(nPrismCount - sellingNumber < hyperlinks)
 		{
 			return 2;
@@ -279,14 +279,14 @@ int ProcessTextTag(LPCHARACTER ch, const char * c_pszText, size_t len)
 	return 4;
 }
 
-int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
+int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 {
 	const TPacketCGWhisper* pinfo = reinterpret_cast<const TPacketCGWhisper*>(data);
 
 	if (uiBytes < pinfo->wSize)
 		return -1;
 
-	int iExtraLen = pinfo->wSize - sizeof(TPacketCGWhisper);
+	int32_t iExtraLen = pinfo->wSize - sizeof(TPacketCGWhisper);
 
 	if (iExtraLen < 0)
 	{
@@ -314,9 +314,9 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 	if (pkChr == ch)
 		return (iExtraLen);
 
-	LPDESC pkDesc = NULL;
+	LPDESC pkDesc = nullptr;
 
-	BYTE bOpponentEmpire = 0;
+	uint8_t bOpponentEmpire = 0;
 
 	if (test_server)
 	{
@@ -402,7 +402,7 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 		}
 		else
 		{
-			BYTE bType = WHISPER_TYPE_NORMAL;
+			uint8_t bType = WHISPER_TYPE_NORMAL;
 
 			char buf[CHAT_MAX_LEN + 1];
 			strlcpy(buf, data + sizeof(TPacketCGWhisper), MIN(iExtraLen + 1, sizeof(buf)));
@@ -424,7 +424,7 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 			CBanwordManager::instance().ConvertString(buf, buflen);
 
-			int processReturn = ProcessTextTag(ch, buf, buflen);
+			int32_t processReturn = ProcessTextTag(ch, buf, buflen);
 			if (0!=processReturn)
 			{
 				if (ch->GetDesc())
@@ -434,13 +434,13 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 					if (pTable)
 					{
 						char buf[128];
-						int len;
+						int32_t len;
 						if (3==processReturn) //교환중
 							len = snprintf(buf, sizeof(buf), LC_TEXT("사용할수 없습니다."), pTable->szLocaleName);
 						else
 							len = snprintf(buf, sizeof(buf), LC_TEXT("%s이 필요합니다."), pTable->szLocaleName);
 
-						if (len < 0 || len >= (int) sizeof(buf))
+						if (len < 0 || len >= (int32_t) sizeof(buf))
 							len = sizeof(buf) - 1;
 
 						++len;  // \0 문자 포함
@@ -507,9 +507,9 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 struct RawPacketToCharacterFunc
 {
 	const void * m_buf;
-	int	m_buf_len;
+	int32_t	m_buf_len;
 
-	RawPacketToCharacterFunc(const void * buf, int buf_len) : m_buf(buf), m_buf_len(buf_len)
+	RawPacketToCharacterFunc(const void * buf, int32_t buf_len) : m_buf(buf), m_buf_len(buf_len)
 	{
 	}
 
@@ -526,13 +526,13 @@ struct FEmpireChatPacket
 {
 	packet_chat& p;
 	const char* orig_msg;
-	int orig_len;
+	int32_t orig_len;
 
-	BYTE bEmpire;
-	int iMapIndex;
-	int namelen;
+	uint8_t bEmpire;
+	int32_t iMapIndex;
+	int32_t namelen;
 
-	FEmpireChatPacket(packet_chat& p, const char* chat_msg, int len, BYTE bEmpire, int iMapIndex, int iNameLen)
+	FEmpireChatPacket(packet_chat& p, const char* chat_msg, int32_t len, uint8_t bEmpire, int32_t iMapIndex, int32_t iNameLen)
 		: p(p), orig_msg(chat_msg), orig_len(len), bEmpire(bEmpire), iMapIndex(iMapIndex), namelen(iNameLen)
 	{
 	}
@@ -550,14 +550,14 @@ struct FEmpireChatPacket
 	}
 };
 
-int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
+int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 {
 	const TPacketCGChat* pinfo = reinterpret_cast<const TPacketCGChat*>(data);
 
 	if (uiBytes < pinfo->size)
 		return -1;
 
-	const int iExtraLen = pinfo->size - sizeof(TPacketCGChat);
+	const int32_t iExtraLen = pinfo->size - sizeof(TPacketCGChat);
 
 	if (iExtraLen < 0)
 	{
@@ -597,7 +597,7 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 	// 채팅 금지 Affect 처리
 	const CAffect* pAffect = ch->FindAffect(AFFECT_BLOCK_CHAT);
 
-	if (pAffect != NULL)
+	if (pAffect != nullptr)
 	{
 		SendBlockChatInfo(ch, pAffect->lDuration);
 		return iExtraLen;
@@ -611,12 +611,12 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 	// @fixme133 begin
 	CBanwordManager::instance().ConvertString(buf, buflen);
 
-	int processReturn = ProcessTextTag(ch, buf, buflen);
+	int32_t processReturn = ProcessTextTag(ch, buf, buflen);
 	if (0!=processReturn)
 	{
 		const TItemTable* pTable = ITEM_MANAGER::instance().GetTable(ITEM_PRISM);
 
-		if (NULL != pTable)
+		if (nullptr != pTable)
 		{
 			if (3==processReturn) 
 				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("사용할수 없습니다."), pTable->szLocaleName);
@@ -631,21 +631,21 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 	char chatbuf[CHAT_MAX_LEN + 1];
 #ifdef ENABLE_CHAT_COLOR_SYSTEM
 	static const char* colorbuf[] = {"|cFFffa200|H|h[Staff]|h|r", "|cFFff0000|H|h[Shinsoo]|h|r", "|cFFffc700|H|h[Chunjo]|h|r", "|cFF000bff|H|h[Jinno]|h|r"};
-	int len = snprintf(chatbuf, sizeof(chatbuf), "%s %s : %s", (ch->IsGM()?colorbuf[0]:colorbuf[MINMAX(0, ch->GetEmpire(), 3)]), ch->GetName(), buf);
+	int32_t len = snprintf(chatbuf, sizeof(chatbuf), "%s %s : %s", (ch->IsGM()?colorbuf[0]:colorbuf[MINMAX(0, ch->GetEmpire(), 3)]), ch->GetName(), buf);
 #else
-	int len = snprintf(chatbuf, sizeof(chatbuf), "%s : %s", ch->GetName(), buf);
+	int32_t len = snprintf(chatbuf, sizeof(chatbuf), "%s : %s", ch->GetName(), buf);
 #endif
 	if (CHAT_TYPE_SHOUT == pinfo->type)
 	{
 		LogManager::instance().ShoutLog(g_bChannel, ch->GetEmpire(), chatbuf);
 	}
 
-	if (len < 0 || len >= (int) sizeof(chatbuf))
+	if (len < 0 || len >= (int32_t) sizeof(chatbuf))
 		len = sizeof(chatbuf) - 1;
 
 	if (pinfo->type == CHAT_TYPE_SHOUT)
 	{
-		// const int SHOUT_LIMIT_LEVEL = 15;
+		// const int32_t SHOUT_LIMIT_LEVEL = 15;
 
 		if (ch->GetLevel() < g_iShoutLimitLevel)
 		{
@@ -653,7 +653,7 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 			return (iExtraLen);
 		}
 
-		if (thecore_heart->pulse - (int) ch->GetLastShoutPulse() < passes_per_sec * 15)
+		if (thecore_heart->pulse - (int32_t) ch->GetLastShoutPulse() < passes_per_sec * 15)
 			return (iExtraLen);
 
 		ch->SetLastShoutPulse(thecore_heart->pulse);
@@ -827,7 +827,7 @@ void CInputMain::QuickslotSwap(LPCHARACTER ch, const char * data)
 	ch->SwapQuickslot(pinfo->pos, pinfo->change_pos);
 }
 
-int CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
+int32_t CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
 {
 	TPacketCGMessenger* p = (TPacketCGMessenger*) c_pData;
 	
@@ -935,7 +935,7 @@ int CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
 	return 0;
 }
 
-int CInputMain::Shop(LPCHARACTER ch, const char * data, size_t uiBytes)
+int32_t CInputMain::Shop(LPCHARACTER ch, const char * data, size_t uiBytes)
 {
 	TPacketCGShop * p = (TPacketCGShop *) data;
 
@@ -957,38 +957,38 @@ int CInputMain::Shop(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 		case SHOP_SUBHEADER_CG_BUY:
 			{
-				if (uiBytes < sizeof(BYTE) + sizeof(BYTE))
+				if (uiBytes < sizeof(uint8_t) + sizeof(uint8_t))
 					return -1;
 
-				BYTE bPos = *(c_pData + 1);
+				uint8_t bPos = *(c_pData + 1);
 				sys_log(1, "INPUT: %s SHOP: BUY %d", ch->GetName(), bPos);
 				CShopManager::instance().Buy(ch, bPos);
-				return (sizeof(BYTE) + sizeof(BYTE));
+				return (sizeof(uint8_t) + sizeof(uint8_t));
 			}
 
 		case SHOP_SUBHEADER_CG_SELL:
 			{
-				if (uiBytes < sizeof(BYTE))
+				if (uiBytes < sizeof(uint8_t))
 					return -1;
 
-				BYTE pos = *c_pData;
+				uint8_t pos = *c_pData;
 
 				sys_log(0, "INPUT: %s SHOP: SELL", ch->GetName());
 				CShopManager::instance().Sell(ch, pos);
-				return sizeof(BYTE);
+				return sizeof(uint8_t);
 			}
 
 		case SHOP_SUBHEADER_CG_SELL2:
 			{
-				if (uiBytes < sizeof(BYTE) + sizeof(BYTE))
+				if (uiBytes < sizeof(uint8_t) + sizeof(uint8_t))
 					return -1;
 
-				BYTE pos = *(c_pData++);
-				BYTE count = *(c_pData);
+				uint8_t pos = *(c_pData++);
+				uint8_t count = *(c_pData);
 
 				sys_log(0, "INPUT: %s SHOP: SELL2", ch->GetName());
 				CShopManager::instance().Sell(ch, pos, count);
-				return sizeof(BYTE) + sizeof(BYTE);
+				return sizeof(uint8_t) + sizeof(uint8_t);
 			}
 
 		default:
@@ -1015,12 +1015,12 @@ void CInputMain::OnClick(LPCHARACTER ch, const char * data)
 void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 {
 	struct command_exchange * pinfo = (struct command_exchange *) data;
-	LPCHARACTER	to_ch = NULL;
+	LPCHARACTER	to_ch = nullptr;
 
 	if (!ch->CanHandleItem())
 		return;
 
-	int iPulse = thecore_pulse(); 
+	int32_t iPulse = thecore_pulse(); 
 	
 	if ((to_ch = CHARACTER_MANAGER::instance().Find(pinfo->arg1)))
 	{
@@ -1174,7 +1174,7 @@ void CInputMain::Position(LPCHARACTER ch, const char * data)
 	}
 }
 
-static const int ComboSequenceBySkillLevel[3][8] = 
+static const int32_t ComboSequenceBySkillLevel[3][8] = 
 {
 	// 0   1   2   3   4   5   6   7
 	{ 14, 15, 16, 17,  0,  0,  0,  0 },
@@ -1184,7 +1184,7 @@ static const int ComboSequenceBySkillLevel[3][8] =
 
 #define COMBO_HACK_ALLOWABLE_MS	100
 
-bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack)
+bool CheckComboHack(LPCHARACTER ch, uint8_t bArg, uint32_t dwTime, bool CheckSpeedHack)
 {
 	if(!gHackCheckEnable) return false;
 
@@ -1196,8 +1196,8 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 	//	최소화하기 위해 이렇게 땜빵 코드를 써놓는다.
 	if (ch->IsStun() || ch->IsDead())
 		return false;
-	int ComboInterval = dwTime - ch->GetLastComboTime();
-	int HackScalar = 0; // 기본 스칼라 단위 1
+	int32_t ComboInterval = dwTime - ch->GetLastComboTime();
+	int32_t HackScalar = 0; // 기본 스칼라 단위 1
 #if 0	
 	sys_log(0, "COMBO: %s arg:%u seq:%u delta:%d checkspeedhack:%d",
 			ch->GetName(), bArg, ch->GetComboSequence(), ComboInterval - ch->GetValidComboInterval(), CheckSpeedHack);
@@ -1226,12 +1226,12 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 		}
 
 		ch->SetComboSequence(1);
-		ch->SetValidComboInterval((int) (ani_combo_speed(ch, 1) / (ch->GetPoint(POINT_ATT_SPEED) / 100.f)));
+		ch->SetValidComboInterval((int32_t) (ani_combo_speed(ch, 1) / (ch->GetPoint(POINT_ATT_SPEED) / 100.f)));
 		ch->SetLastComboTime(dwTime);
 	}
 	else if (bArg > 14 && bArg < 22)
 	{
-		int idx = MIN(2, ch->GetComboIndex());
+		int32_t idx = MIN(2, ch->GetComboIndex());
 
 		if (ch->GetComboSequence() > 5) // 현재 6콤보 이상은 없다.
 		{
@@ -1285,7 +1285,7 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 			else
 				ch->SetComboSequence(ch->GetComboSequence() + 1);
 
-			ch->SetValidComboInterval((int) (ani_combo_speed(ch, bArg - 13) / (ch->GetPoint(POINT_ATT_SPEED) / 100.f)));
+			ch->SetValidComboInterval((int32_t) (ani_combo_speed(ch, bArg - 13) / (ch->GetPoint(POINT_ATT_SPEED) / 100.f)));
 			ch->SetLastComboTime(dwTime);
 		}
 	}
@@ -1320,13 +1320,13 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 			{
 				// 정상적 계산이라면 1000.f를 곱해야 하지만 클라이언트가 애니메이션 속도의 90%에서
 				// 다음 애니메이션 블렌딩을 허용하므로 900.f를 곱한다.
-				int k = (int) (pkMotion->GetDuration() / ((float) ch->GetPoint(POINT_ATT_SPEED) / 100.f) * 900.f);
+				int32_t k = (int32_t) (pkMotion->GetDuration() / ((float) ch->GetPoint(POINT_ATT_SPEED) / 100.f) * 900.f);
 				ch->SetValidComboInterval(k);
 				ch->SetLastComboTime(dwTime);
 			}
 			*/
 			float normalAttackDuration = CMotionManager::instance().GetNormalAttackDuration(ch->GetRaceNum());
-			int k = (int) (normalAttackDuration / ((float) ch->GetPoint(POINT_ATT_SPEED) / 100.f) * 900.f);
+			int32_t k = (int32_t) (normalAttackDuration / ((float) ch->GetPoint(POINT_ATT_SPEED) / 100.f) * 900.f);
 			ch->SetValidComboInterval(k);
 			ch->SetLastComboTime(dwTime);
 			// END_OF_POLYMORPH_BUG_FIX
@@ -1440,16 +1440,16 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 		//
 		// 스피드핵(SPEEDHACK) Check
 		//
-		DWORD dwCurTime = get_dword_time();
+		uint32_t dwCurTime = get_dword_time();
 		// 시간을 Sync하고 7초 후 부터 검사한다. (20090702 이전엔 5초였음)
 		bool CheckSpeedHack = (false == ch->GetDesc()->IsHandshaking() && dwCurTime - ch->GetDesc()->GetClientTime() > 7000);
 
 		if (CheckSpeedHack)
 		{
-			int iDelta = (int) (pinfo->dwTime - ch->GetDesc()->GetClientTime());
-			int iServerDelta = (int) (dwCurTime - ch->GetDesc()->GetClientTime());
+			int32_t iDelta = (int32_t) (pinfo->dwTime - ch->GetDesc()->GetClientTime());
+			int32_t iServerDelta = (int32_t) (dwCurTime - ch->GetDesc()->GetClientTime());
 
-			iDelta = (int) (dwCurTime - pinfo->dwTime);
+			iDelta = (int32_t) (dwCurTime - pinfo->dwTime);
 
 			// 시간이 늦게간다. 일단 로그만 해둔다. 진짜 이런 사람들이 많은지 체크해야함. TODO
 			if (iDelta >= 30000)
@@ -1490,14 +1490,14 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 			ch->OnMove(true);
 		else if (pinfo->bFunc & FUNC_SKILL)
 		{
-			const int MASK_SKILL_MOTION = 0x7F;
-			unsigned int motion = pinfo->bFunc & MASK_SKILL_MOTION;
+			const int32_t MASK_SKILL_MOTION = 0x7F;
+			uint32_t motion = pinfo->bFunc & MASK_SKILL_MOTION;
 
 			if (!ch->IsUsableSkillMotion(motion))
 			{
 				const char* name = ch->GetName();
-				unsigned int job = ch->GetJob();
-				unsigned int group = ch->GetSkillGroup();
+				uint32_t job = ch->GetJob();
+				uint32_t group = ch->GetSkillGroup();
 
 				char szBuf[256];
 				snprintf(szBuf, sizeof(szBuf), "SKILL_HACK: name=%s, job=%d, group=%d, motion=%d", name, job, group, motion);
@@ -1565,15 +1565,15 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 	*/
 }
 
-void CInputMain::Attack(LPCHARACTER ch, const BYTE header, const char* data)
+void CInputMain::Attack(LPCHARACTER ch, const uint8_t header, const char* data)
 {
-	if (NULL == ch)
+	if (nullptr == ch)
 		return;
 
 	struct type_identifier
 	{
-		BYTE header;
-		BYTE type;
+		uint8_t header;
+		uint8_t type;
 	};
 
 	const struct type_identifier* const type = reinterpret_cast<const struct type_identifier*>(data);
@@ -1615,14 +1615,14 @@ void CInputMain::Attack(LPCHARACTER ch, const BYTE header, const char* data)
 	{
 		case HEADER_CG_ATTACK:
 			{
-				if (NULL == ch->GetDesc())
+				if (nullptr == ch->GetDesc())
 					return;
 
 				const TPacketCGAttack* const packMelee = reinterpret_cast<const TPacketCGAttack*>(data);
 
 				LPCHARACTER	victim = CHARACTER_MANAGER::instance().Find(packMelee->dwVID);
 
-				if (NULL == victim || ch == victim)
+				if (nullptr == victim || ch == victim)
 					return;
 
 				switch (victim->GetCharType())
@@ -1655,14 +1655,14 @@ void CInputMain::Attack(LPCHARACTER ch, const BYTE header, const char* data)
 	}
 }
 
-int CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t uiBytes)
+int32_t CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t uiBytes)
 {
 	const TPacketCGSyncPosition* pinfo = reinterpret_cast<const TPacketCGSyncPosition*>( c_pcData );
 
 	if (uiBytes < pinfo->wSize)
 		return -1;
 
-	int iExtraLen = pinfo->wSize - sizeof(TPacketCGSyncPosition);
+	int32_t iExtraLen = pinfo->wSize - sizeof(TPacketCGSyncPosition);
 
 	if (iExtraLen < 0)
 	{
@@ -1677,12 +1677,12 @@ int CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t uiByt
 		return iExtraLen;
 	}
 
-	int iCount = iExtraLen / sizeof(TPacketCGSyncPositionElement);
+	int32_t iCount = iExtraLen / sizeof(TPacketCGSyncPositionElement);
 
 	if (iCount <= 0)
 		return iExtraLen;
 
-	static const int nCountLimit = 16;
+	static const int32_t nCountLimit = 16;
 
 	if( iCount > nCountLimit )
 	{
@@ -1703,9 +1703,9 @@ int CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t uiByt
 		reinterpret_cast<const TPacketCGSyncPositionElement*>(c_pcData + sizeof(TPacketCGSyncPosition));
 
 	timeval tvCurTime;
-	gettimeofday(&tvCurTime, NULL);
+	gettimeofday(&tvCurTime, nullptr);
 
-	for (int i = 0; i < iCount; ++i, ++e)
+	for (int32_t i = 0; i < iCount; ++i, ++e)
 	{
 		LPCHARACTER victim = CHARACTER_MANAGER::instance().Find(e->dwVID);
 
@@ -1754,7 +1754,7 @@ int CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t uiByt
 		}
 
 		const float fDist = DISTANCE_SQRT( (victim->GetX() - e->lX) / 100, (victim->GetY() - e->lY) / 100 );
-		static const long g_lValidSyncInterval = 100 * 1000; // 100ms
+		static const int32_t g_lValidSyncInterval = 100 * 1000; // 100ms
 		const timeval &tvLastSyncTime = victim->GetLastSyncTime();
 		timeval *tvDiff = timediff(&tvCurTime, &tvLastSyncTime);
 		
@@ -1812,7 +1812,7 @@ int CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t uiByt
 	return iExtraLen;
 }
 
-void CInputMain::FlyTarget(LPCHARACTER ch, const char * pcData, BYTE bHeader)
+void CInputMain::FlyTarget(LPCHARACTER ch, const char * pcData, uint8_t bHeader)
 {
 	TPacketCGFlyTargeting * p = (TPacketCGFlyTargeting *) pcData;
 	ch->FlyTarget(p->dwTargetVID, p->x, p->y, bHeader);
@@ -1970,7 +1970,7 @@ void CInputMain::SafeboxCheckin(LPCHARACTER ch, const char * c_pData)
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
 	if (pkItem->IsEquipped())
 	{
-		int iWearCell = pkItem->FindEquipCell(ch);
+		int32_t iWearCell = pkItem->FindEquipCell(ch);
 		if (iWearCell == WEAR_WEAPON)
 		{
 			LPITEM costumeWeapon = ch->GetWear(WEAR_COSTUME_WEAPON);
@@ -2045,7 +2045,7 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 		TItemPos DestPos = p->ItemPos;
 		if (!DSManager::instance().IsValidCellForThisItem(pkItem, DestPos))
 		{
-			int iCell = ch->GetEmptyDragonSoulInventory(pkItem);
+			int32_t iCell = ch->GetEmptyDragonSoulInventory(pkItem);
 			if (iCell < 0)
 			{
 				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<창고> 옮길 수 없는 위치입니다."));
@@ -2077,9 +2077,9 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 		ITEM_MANAGER::instance().FlushDelayedSave(pkItem);
 	}
 
-	DWORD dwID = pkItem->GetID();
-	db_clientdesc->DBPacketHeader(HEADER_GD_ITEM_FLUSH, 0, sizeof(DWORD));
-	db_clientdesc->Packet(&dwID, sizeof(DWORD));
+	uint32_t dwID = pkItem->GetID();
+	db_clientdesc->DBPacketHeader(HEADER_GD_ITEM_FLUSH, 0, sizeof(uint32_t));
+	db_clientdesc->Packet(&dwID, sizeof(uint32_t));
 
 	char szHint[128];
 	snprintf(szHint, sizeof(szHint), "%s %u", pkItem->GetName(), pkItem->GetCount());
@@ -2178,7 +2178,7 @@ void CInputMain::PartySetState(LPCHARACTER ch, const char* c_pData)
 		return;
 	}
 
-	DWORD pid = p->pid;
+	uint32_t pid = p->pid;
 	sys_log(0, "PARTY SetRole pid %d to role %d state %s", pid, p->byRole, p->flag ? "on" : "off");
 
 	switch (p->byRole)
@@ -2266,7 +2266,7 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 					//pParty->SendPartyRemoveOneToAll(B);
 					B->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 파티에서 추방당하셨습니다."));
 					//pParty->Unlink(B);
-					//CPartyManager::instance().SetPartyMember(B->GetPlayerID(), NULL);
+					//CPartyManager::instance().SetPartyMember(B->GetPlayerID(), nullptr);
 				}
 				pParty->Quit(p->pid);
 			}
@@ -2294,7 +2294,7 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 					//pParty->SendPartyRemoveOneToAll(ch);
 					pParty->Quit(ch->GetPlayerID());
 					//pParty->SendPartyRemoveAllToOne(ch);
-					//CPartyManager::instance().SetPartyMember(ch->GetPlayerID(), NULL);
+					//CPartyManager::instance().SetPartyMember(ch->GetPlayerID(), nullptr);
 				}
 			}
 		}
@@ -2345,13 +2345,13 @@ void CInputMain::AnswerMakeGuild(LPCHARACTER ch, const char* c_pData)
 		return;
 	}
 
-	DWORD dwGuildID = gm.CreateGuild(cp);
+	uint32_t dwGuildID = gm.CreateGuild(cp);
 
 	if (dwGuildID)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> [%s] 길드가 생성되었습니다."), cp.name);
 
-		int GuildCreateFee = 200000;
+		int32_t GuildCreateFee = 200000;
 
 		ch->PointChange(POINT_GOLD, -GuildCreateFee);
 		DBManager::instance().SendMoneyLog(MONEY_LOG_GUILD, ch->GetPlayerID(), -GuildCreateFee);
@@ -2408,27 +2408,27 @@ size_t GetSubPacketSize(const GUILD_SUBHEADER_CG& header)
 {
 	switch (header)
 	{
-		case GUILD_SUBHEADER_CG_DEPOSIT_MONEY:				return sizeof(int);
-		case GUILD_SUBHEADER_CG_WITHDRAW_MONEY:				return sizeof(int);
-		case GUILD_SUBHEADER_CG_ADD_MEMBER:					return sizeof(DWORD);
-		case GUILD_SUBHEADER_CG_REMOVE_MEMBER:				return sizeof(DWORD);
+		case GUILD_SUBHEADER_CG_DEPOSIT_MONEY:				return sizeof(int32_t);
+		case GUILD_SUBHEADER_CG_WITHDRAW_MONEY:				return sizeof(int32_t);
+		case GUILD_SUBHEADER_CG_ADD_MEMBER:					return sizeof(uint32_t);
+		case GUILD_SUBHEADER_CG_REMOVE_MEMBER:				return sizeof(uint32_t);
 		case GUILD_SUBHEADER_CG_CHANGE_GRADE_NAME:			return 10;
-		case GUILD_SUBHEADER_CG_CHANGE_GRADE_AUTHORITY:		return sizeof(BYTE) + sizeof(BYTE);
-		case GUILD_SUBHEADER_CG_OFFER:						return sizeof(DWORD);
-		case GUILD_SUBHEADER_CG_CHARGE_GSP:					return sizeof(int);
+		case GUILD_SUBHEADER_CG_CHANGE_GRADE_AUTHORITY:		return sizeof(uint8_t) + sizeof(uint8_t);
+		case GUILD_SUBHEADER_CG_OFFER:						return sizeof(uint32_t);
+		case GUILD_SUBHEADER_CG_CHARGE_GSP:					return sizeof(int32_t);
 		case GUILD_SUBHEADER_CG_POST_COMMENT:				return 1;
-		case GUILD_SUBHEADER_CG_DELETE_COMMENT:				return sizeof(DWORD);
+		case GUILD_SUBHEADER_CG_DELETE_COMMENT:				return sizeof(uint32_t);
 		case GUILD_SUBHEADER_CG_REFRESH_COMMENT:			return 0;
-		case GUILD_SUBHEADER_CG_CHANGE_MEMBER_GRADE:		return sizeof(DWORD) + sizeof(BYTE);
+		case GUILD_SUBHEADER_CG_CHANGE_MEMBER_GRADE:		return sizeof(uint32_t) + sizeof(uint8_t);
 		case GUILD_SUBHEADER_CG_USE_SKILL:					return sizeof(TPacketCGGuildUseSkill);
-		case GUILD_SUBHEADER_CG_CHANGE_MEMBER_GENERAL:		return sizeof(DWORD) + sizeof(BYTE);
-		case GUILD_SUBHEADER_CG_GUILD_INVITE_ANSWER:		return sizeof(DWORD) + sizeof(BYTE);
+		case GUILD_SUBHEADER_CG_CHANGE_MEMBER_GENERAL:		return sizeof(uint32_t) + sizeof(uint8_t);
+		case GUILD_SUBHEADER_CG_GUILD_INVITE_ANSWER:		return sizeof(uint32_t) + sizeof(uint8_t);
 	}
 
 	return 0;
 }
 
-int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
+int32_t CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 {
 	if (uiBytes < sizeof(TPacketCGGuild))
 		return -1;
@@ -2448,7 +2448,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 	CGuild* pGuild = ch->GetGuild();
 
-	if (NULL == pGuild)
+	if (nullptr == pGuild)
 	{
 		if (SubHeader != GUILD_SUBHEADER_CG_GUILD_INVITE_ANSWER)
 		{
@@ -2464,7 +2464,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 				// by mhh : 길드자금은 당분간 넣을 수 없다.
 				return SubPacketLen;
 
-				const int gold = MIN(*reinterpret_cast<const int*>(c_pData), __deposit_limit());
+				const int32_t gold = MIN(*reinterpret_cast<const int32_t*>(c_pData), __deposit_limit());
 
 				if (gold < 0)
 				{
@@ -2487,7 +2487,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 				// by mhh : 길드자금은 당분간 뺄 수 없다.
 				return SubPacketLen;
 
-				const int gold = MIN(*reinterpret_cast<const int*>(c_pData), 500000);
+				const int32_t gold = MIN(*reinterpret_cast<const int32_t*>(c_pData), 500000);
 
 				if (gold < 0)
 				{
@@ -2501,7 +2501,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 		case GUILD_SUBHEADER_CG_ADD_MEMBER:
 			{
-				const DWORD vid = *reinterpret_cast<const DWORD*>(c_pData);
+				const uint32_t vid = *reinterpret_cast<const uint32_t*>(c_pData);
 				LPCHARACTER newmember = CHARACTER_MANAGER::instance().Find(vid);
 
 				if (!newmember)
@@ -2527,10 +2527,10 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 					return SubPacketLen;
 				}
 
-				const DWORD pid = *reinterpret_cast<const DWORD*>(c_pData);
+				const uint32_t pid = *reinterpret_cast<const uint32_t*>(c_pData);
 				const TGuildMember* m = pGuild->GetMember(ch->GetPlayerID());
 
-				if (NULL == m)
+				if (nullptr == m)
 					return -1;
 
 				LPCHARACTER member = CHARACTER_MANAGER::instance().FindByPID(pid);
@@ -2580,7 +2580,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 				const TGuildMember * m = pGuild->GetMember(ch->GetPlayerID());
 
-				if (NULL == m)
+				if (nullptr == m)
 					return -1;
 
 				if (m->grade != GUILD_LEADER_GRADE)
@@ -2606,7 +2606,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 			{
 				const TGuildMember* m = pGuild->GetMember(ch->GetPlayerID());
 
-				if (NULL == m)
+				if (nullptr == m)
 					return -1;
 
 				if (m->grade != GUILD_LEADER_GRADE)
@@ -2626,7 +2626,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 		case GUILD_SUBHEADER_CG_OFFER:
 			{
-				DWORD offer = *reinterpret_cast<const DWORD*>(c_pData);
+				uint32_t offer = *reinterpret_cast<const uint32_t*>(c_pData);
 
 				if (pGuild->GetLevel() >= GUILD_MAX_LEVEL)
 				{
@@ -2651,8 +2651,8 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 		case GUILD_SUBHEADER_CG_CHARGE_GSP:
 			{
-				const int offer = *reinterpret_cast<const int*>(c_pData);
-				const int gold = offer * 100;
+				const int32_t offer = *reinterpret_cast<const int32_t*>(c_pData);
+				const int32_t gold = offer * 100;
 
 				if (offer < 0 || gold < offer || gold < 0 || ch->GetGold() < gold)
 				{
@@ -2674,7 +2674,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 				if (length > GUILD_COMMENT_MAX_LEN)
 				{
 					// 잘못된 길이.. 끊어주자.
-					sys_err("POST_COMMENT: %s comment too long (length: %u)", ch->GetName(), length);
+					sys_err("POST_COMMENT: %s comment too int32_t (length: %u)", ch->GetName(), length);
 					ch->GetDesc()->SetPhase(PHASE_CLOSE);
 					return -1;
 				}
@@ -2684,7 +2684,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 				const TGuildMember* m = pGuild->GetMember(ch->GetPlayerID());
 
-				if (NULL == m)
+				if (nullptr == m)
 					return -1;
 
 				if (length && !pGuild->HasGradeAuth(m->grade, GUILD_AUTH_NOTICE) && *(c_pData + 1) == '!')
@@ -2702,7 +2702,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 		case GUILD_SUBHEADER_CG_DELETE_COMMENT:
 			{
-				const DWORD comment_id = *reinterpret_cast<const DWORD*>(c_pData);
+				const uint32_t comment_id = *reinterpret_cast<const uint32_t*>(c_pData);
 
 				pGuild->DeleteComment(ch, comment_id);
 			}
@@ -2714,11 +2714,11 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 		case GUILD_SUBHEADER_CG_CHANGE_MEMBER_GRADE:
 			{
-				const DWORD pid = *reinterpret_cast<const DWORD*>(c_pData);
-				const BYTE grade = *(c_pData + sizeof(DWORD));
+				const uint32_t pid = *reinterpret_cast<const uint32_t*>(c_pData);
+				const uint8_t grade = *(c_pData + sizeof(uint32_t));
 				const TGuildMember* m = pGuild->GetMember(ch->GetPlayerID());
 
-				if (NULL == m)
+				if (nullptr == m)
 					return -1;
 
 				if (m->grade != GUILD_LEADER_GRADE)
@@ -2742,11 +2742,11 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 		case GUILD_SUBHEADER_CG_CHANGE_MEMBER_GENERAL:
 			{
-				const DWORD pid = *reinterpret_cast<const DWORD*>(c_pData);
-				const BYTE is_general = *(c_pData + sizeof(DWORD));
+				const uint32_t pid = *reinterpret_cast<const uint32_t*>(c_pData);
+				const uint8_t is_general = *(c_pData + sizeof(uint32_t));
 				const TGuildMember* m = pGuild->GetMember(ch->GetPlayerID());
 
-				if (NULL == m)
+				if (nullptr == m)
 					return -1;
 
 				if (m->grade != GUILD_LEADER_GRADE)
@@ -2765,8 +2765,8 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 		case GUILD_SUBHEADER_CG_GUILD_INVITE_ANSWER:
 			{
-				const DWORD guild_id = *reinterpret_cast<const DWORD*>(c_pData);
-				const BYTE accept = *(c_pData + sizeof(DWORD));
+				const uint32_t guild_id = *reinterpret_cast<const uint32_t*>(c_pData);
+				const uint8_t accept = *(c_pData + sizeof(uint32_t));
 
 				CGuild * g = CGuildManager::instance().FindGuild(guild_id);
 
@@ -2817,10 +2817,10 @@ void CInputMain::Hack(LPCHARACTER ch, const char * c_pData)
 	ch->GetDesc()->SetPhase(PHASE_CLOSE);
 }
 
-int CInputMain::MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes)
+int32_t CInputMain::MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes)
 {
 	TPacketCGMyShop * p = (TPacketCGMyShop *) c_pData;
-	int iExtraLen = p->bCount * sizeof(TShopItemTable);
+	int32_t iExtraLen = p->bCount * sizeof(TShopItemTable);
 
 	if (uiBytes < sizeof(TPacketCGMyShop) + iExtraLen)
 		return -1;
@@ -2894,7 +2894,7 @@ void CInputMain::Refine(LPCHARACTER ch, const char* c_pData)
 	{
 		const LPITEM item = ch->GetInventoryItem(p->pos);
 
-		if (NULL != item)
+		if (nullptr != item)
 		{
 			if (500 <= item->GetRefineSet())
 			{
@@ -2956,7 +2956,7 @@ void CInputMain::Acce(LPCHARACTER pkChar, const char* c_pData)
 #endif
 
 
-int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
+int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 {
 	LPCHARACTER ch;
 
@@ -2967,7 +2967,7 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 		return (0);
 	}
 
-	int iExtraLen = 0;
+	int32_t iExtraLen = 0;
 	
 	if (test_server && bHeader != HEADER_CG_MOVE)
 		sys_log(0, "CInputMain::Analyze() ==> Header [%d] ", bHeader);

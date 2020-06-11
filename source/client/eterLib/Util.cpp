@@ -3,7 +3,7 @@
 
 #include "TextFileLoader.h"
 
-void PrintfTabs(FILE * File, int iTabCount, const char * c_szString, ...)
+void PrintfTabs(FILE * File, int32_t iTabCount, const char * c_szString, ...)
 {
 	va_list args;
 	va_start(args, c_szString);
@@ -12,7 +12,7 @@ void PrintfTabs(FILE * File, int iTabCount, const char * c_szString, ...)
 	_vsnprintf(szBuf, sizeof(szBuf), c_szString, args);
 	va_end(args);
 
-	for (int i = 0; i < iTabCount; ++i)
+	for (int32_t i = 0; i < iTabCount; ++i)
 		fprintf(File, "    ");
 
 	fprintf(File, szBuf);
@@ -29,7 +29,7 @@ bool LoadTextData(const char * c_szFileName, CTokenMap & rstTokenMap)
 
 	textFileLoader.Bind(File.GetSize(), File.GetData());
 
-	for (DWORD i = 0; i < textFileLoader.GetLineCount(); ++i)
+	for (uint32_t i = 0; i < textFileLoader.GetLineCount(); ++i)
 	{
 		if (!textFileLoader.SplitLine(i, &stTokenVector))
 			continue;
@@ -87,7 +87,7 @@ bool LoadMultipleTextData(const char * c_szFileName, CTokenVectorMap & rstTokenV
 					break;
 				}
 
-				for (DWORD j = 0; j < stSubTokenVector.size(); ++j)
+				for (uint32_t j = 0; j < stSubTokenVector.size(); ++j)
 				{
 					stTokenVector.push_back(stSubTokenVector[j]);
 				}
@@ -136,14 +136,14 @@ D3DXCOLOR TokenToColor(CTokenVector & rVector)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 static std::string	gs_fontFace="";
-static DWORD		gs_codePage=0;
+static uint32_t		gs_codePage=0;
 
-int CALLBACK EnumFontFamExProc(CONST LOGFONT* plogFont, CONST TEXTMETRIC* /*textMetric*/, DWORD /*dwWord*/, LPARAM lParam)
+int32_t CALLBACK EnumFontFamExProc(CONST LOGFONT* plogFont, CONST TEXTMETRIC* /*textMetric*/, uint32_t /*dwWord*/, LPARAM lParam)
 {
 	return stricmp((const char*)lParam, plogFont->lfFaceName);
 }
 
-int GetCharsetFromCodePage(WORD codePage)
+int32_t GetCharsetFromCodePage(uint16_t codePage)
 {
 	switch( codePage )
 	{
@@ -179,7 +179,7 @@ int GetCharsetFromCodePage(WORD codePage)
 }
 
 
-const char* GetFontFaceFromCodePageNT(WORD codePage)
+const char* GetFontFaceFromCodePageNT(uint16_t codePage)
 {
 	switch( codePage )
 	{
@@ -205,7 +205,7 @@ const char* GetFontFaceFromCodePageNT(WORD codePage)
 		return "Arial";
 	}
 }
-const char* GetFontFaceFromCodePage9x(WORD codePage)
+const char* GetFontFaceFromCodePage9x(uint16_t codePage)
 {
 	switch( codePage )
 	{
@@ -232,7 +232,7 @@ const char* GetFontFaceFromCodePage9x(WORD codePage)
 	}
 }
 
-DWORD GetDefaultCodePage()
+uint32_t GetDefaultCodePage()
 {
 	return gs_codePage;
 }
@@ -242,7 +242,7 @@ const char * GetDefaultFontFace()
 	return gs_fontFace.c_str();
 }
 
-const char*	GetFontFaceFromCodePage(WORD codePage)
+const char*	GetFontFaceFromCodePage(uint16_t codePage)
 {
 	LOGFONT logFont;
 
@@ -252,23 +252,23 @@ const char*	GetFontFaceFromCodePage(WORD codePage)
 
 	const char* fontFace = GetFontFaceFromCodePage9x(codePage);
 
-	HDC hDC=GetDC(NULL);
+	HDC hDC=GetDC(nullptr);
 
-	if(EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (LONG)fontFace, 0) == 0)
+	if(EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (int32_t)fontFace, 0) == 0)
 	{
-		ReleaseDC(NULL, hDC);
+		ReleaseDC(nullptr, hDC);
 		return fontFace;
 	}
 
 	fontFace = GetFontFaceFromCodePageNT(codePage);
 
-	if(EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (LONG)fontFace, 0) == 0)
+	if(EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (int32_t)fontFace, 0) == 0)
 	{
-		ReleaseDC(NULL, hDC);
+		ReleaseDC(nullptr, hDC);
 		return fontFace;
 	}
 
-	ReleaseDC(NULL, hDC);
+	ReleaseDC(nullptr, hDC);
 
 	return GetDefaultFontFace();
 }
@@ -278,7 +278,7 @@ void SetDefaultFontFace(const char* fontFace)
 	gs_fontFace=fontFace;
 }
 
-bool SetDefaultCodePage(DWORD codePage)
+bool SetDefaultCodePage(uint32_t codePage)
 {
 	gs_codePage=codePage;
 
@@ -292,7 +292,7 @@ bool SetDefaultCodePage(DWORD codePage)
 }
 
 
-int __base64_get( const int c )
+int32_t __base64_get( const int32_t c )
 {
 	if( 'A' <= c && c <= 'Z' )
 		return c-'A';
@@ -309,18 +309,18 @@ int __base64_get( const int c )
 	return -2;	// non value;
 }
 
-void __strcat1(char * str,int i)
+void __strcat1(char * str,int32_t i)
 {
 	char result[2];
 	result[0] = i;
-	result[1] = NULL;
+	result[1] = '\0';
 	strcat(str,result);
 }
 
 void base64_decode(const char * str,char * resultStr)
 {
-	int nCount=0, i=0, r, result;
-	int length = strlen(str);
+	int32_t nCount=0, i=0, r, result;
+	int32_t length = strlen(str);
 	char szDest[5]="";
 
 	strcpy(resultStr,"");
@@ -379,7 +379,7 @@ void base64_decode(const char * str,char * resultStr)
 	for (i = 0; i < strlen(resultStr); i++) 
 	{
 		char c = resultStr[i];
-		int xor = i + 5;
+		int32_t xor = i + 5;
 		resultStr[i] = char(c ^ xor);
 	}	
 	// E

@@ -31,7 +31,7 @@ enum EItemMisc
 	ITEM_ELK_VNUM				= 50026,
 };
 
-const BYTE ITEM_SOCKET_REMAIN_SEC = 0;
+const uint8_t ITEM_SOCKET_REMAIN_SEC = 0;
 enum EItemValueIdice
 {
 	ITEM_VALUE_DRAGON_SOUL_POLL_OUT_BONUS_IDX = 0,

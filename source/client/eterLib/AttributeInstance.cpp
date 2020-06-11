@@ -17,8 +17,8 @@ bool CAttributeInstance::Picking(const D3DXVECTOR3 & v, const D3DXVECTOR3 & dir,
 	float nx = 0;
 	float ny = 0;
 
-	for (DWORD i = 0; i < m_v3HeightDataVector.size(); ++i)
-		for (DWORD j = 0; j < m_v3HeightDataVector[i].size(); j+=3)
+	for (uint32_t i = 0; i < m_v3HeightDataVector.size(); ++i)
+		for (uint32_t j = 0; j < m_v3HeightDataVector[i].size(); j+=3)
 		{
 			const D3DXVECTOR3 & cv0 = m_v3HeightDataVector[i][j];
 			const D3DXVECTOR3 & cv2 = m_v3HeightDataVector[i][j+1];
@@ -75,8 +75,8 @@ BOOL CAttributeInstance::GetHeight(float fx, float fy, float * pfHeight)
 
 	BOOL bFlag = FALSE;
 
-	for (DWORD i = 0; i < m_v3HeightDataVector.size(); ++i)
-	for (DWORD j = 0; j < m_v3HeightDataVector[i].size(); j+=3)
+	for (uint32_t i = 0; i < m_v3HeightDataVector.size(); ++i)
+	for (uint32_t j = 0; j < m_v3HeightDataVector[i].size(); j+=3)
 	{
 		const D3DXVECTOR3 & c_rv3Vertex0 = m_v3HeightDataVector[i][j];
 		const D3DXVECTOR3 & c_rv3Vertex1 = m_v3HeightDataVector[i][j+1];
@@ -144,19 +144,19 @@ void CAttributeInstance::RefreshObject(const D3DXMATRIX & c_rmatGlobal)
 	// Height
 	m_fHeightRadius = m_roAttributeData->GetMaximizeRadius();
 
-	DWORD dwHeightDataCount = m_roAttributeData->GetHeightDataCount();
+	uint32_t dwHeightDataCount = m_roAttributeData->GetHeightDataCount();
 	m_v3HeightDataVector.clear();
 	m_v3HeightDataVector.resize(dwHeightDataCount);
-	for (DWORD i = 0; i < dwHeightDataCount; ++i)
+	for (uint32_t i = 0; i < dwHeightDataCount; ++i)
 	{
 		const THeightData * c_pHeightData;
 		if (!m_roAttributeData->GetHeightDataPointer(i, &c_pHeightData))
 			continue;
 
-		DWORD dwVertexCount = c_pHeightData->v3VertexVector.size();
+		uint32_t dwVertexCount = c_pHeightData->v3VertexVector.size();
 		m_v3HeightDataVector[i].clear();
 		m_v3HeightDataVector[i].resize(dwVertexCount);
-		for (DWORD j = 0; j < dwVertexCount; ++j)
+		for (uint32_t j = 0; j < dwVertexCount; ++j)
 		{
 			D3DXVec3TransformCoord(&m_v3HeightDataVector[i][j], &c_pHeightData->v3VertexVector[j], &m_matGlobal);
 		}
@@ -168,7 +168,7 @@ const char * CAttributeInstance::GetDataFileName() const
 	return m_roAttributeData->GetFileName();
 }
 
-void CAttributeInstance::CreateSystem(UINT uCapacity)
+void CAttributeInstance::CreateSystem(uint32_t uCapacity)
 {
 	ms_kPool.Create(uCapacity);
 }
@@ -204,7 +204,7 @@ void CAttributeInstance::Clear()
 
 	m_v3HeightDataVector.clear();
 
-	m_roAttributeData.SetPointer(NULL);
+	m_roAttributeData.SetPointer(nullptr);
 }
 
 CAttributeInstance::CAttributeInstance()

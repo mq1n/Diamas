@@ -25,13 +25,13 @@ struct SoftwareTransformPatch_SSourceVertex
 {
 	D3DXVECTOR3 kPosition;
 	D3DXVECTOR3 kNormal;
-	DWORD		dwDiffuse;
+	uint32_t		dwDiffuse;
 };
 
 struct SWaterVertex
 {
     float x, y, z;          // position
-	DWORD dwDiffuse;
+	uint32_t dwDiffuse;
 };
 #pragma pack(pop)
 
@@ -84,21 +84,21 @@ public:
 	bool IsWaterExist()										{ return m_bWaterExist; }
 	void SetWaterExist(bool bWaterExist)					{ m_bWaterExist = bWaterExist; }
 	
-	DWORD GetID()											{ return m_dwID; }
-	void SetID(DWORD dwID)									{ m_dwID = dwID; }
+	uint32_t GetID()											{ return m_dwID; }
+	void SetID(uint32_t dwID)									{ m_dwID = dwID; }
 	
-	void SetType(BYTE byType)								{ m_byType = byType; }
-	BYTE GetType()											{ return m_byType; }
+	void SetType(uint8_t byType)								{ m_byType = byType; }
+	uint8_t GetType()											{ return m_byType; }
 
 	void NeedUpdate(bool bNeedUpdate)						{ m_bNeedUpdate = bNeedUpdate;}
 	bool NeedUpdate()										{ return m_bNeedUpdate; }
 
-	UINT GetWaterFaceCount();
+	uint32_t GetWaterFaceCount();
 
-	void SoftwareTransformPatch_UpdateTerrainLighting(DWORD dwVersion, const D3DLIGHT8& c_rkLight, const D3DMATERIAL8& c_rkMtrl);
+	void SoftwareTransformPatch_UpdateTerrainLighting(uint32_t dwVersion, const D3DLIGHT8& c_rkLight, const D3DMATERIAL8& c_rkMtrl);
 	
 	void BuildTerrainVertexBuffer(HardwareTransformPatch_SSourceVertex* akSrcVertex);
-	void BuildWaterVertexBuffer(SWaterVertex* akSrcVertex, UINT uWaterVertexCount);
+	void BuildWaterVertexBuffer(SWaterVertex* akSrcVertex, uint32_t uWaterVertexCount);
 	
 protected:
 	void __BuildHardwareTerrainVertexBuffer(HardwareTransformPatch_SSourceVertex* akSrcVertex);
@@ -113,14 +113,14 @@ private:
 	float					m_fMaxZ;
 	bool					m_bUse;
 	bool					m_bWaterExist;
-	DWORD					m_dwID;
-	DWORD m_dwWaterPriCount;
+	uint32_t					m_dwID;
+	uint32_t m_dwWaterPriCount;
 	
 	CGraphicVertexBuffer	m_WaterVertexBuffer;
-	BYTE					m_byType;
+	uint8_t					m_byType;
 
 	bool					m_bNeedUpdate;
-	DWORD					m_dwVersion;
+	uint32_t					m_dwVersion;
 
 public:
 	CGraphicVertexBuffer* GetWaterVertexBufferPointer()	{ return &m_WaterVertexBuffer;}
@@ -170,17 +170,17 @@ public:
 	bool isUsed()																	{ return m_bUsed; }
 	void SetUsed(bool bUsed)														{ m_bUsed = bUsed; }
 
-	short GetPatchNum()																{ return m_sPatchNum; }
-	void SetPatchNum(short sPatchNum)												{ m_sPatchNum = sPatchNum; }
+	int16_t GetPatchNum()																{ return m_sPatchNum; }
+	void SetPatchNum(int16_t sPatchNum)												{ m_sPatchNum = sPatchNum; }
 
-	BYTE GetTerrainNum()															{ return m_byTerrainNum; }
-	void SetTerrainNum(BYTE byTerrainNum)											{ m_byTerrainNum = byTerrainNum; }
+	uint8_t GetTerrainNum()															{ return m_byTerrainNum; }
+	void SetTerrainNum(uint8_t byTerrainNum)											{ m_byTerrainNum = byTerrainNum; }
 
 	void SetTerrainPatch(CTerrainPatch * pTerrainPatch)								{ m_pTerrainPatch = pTerrainPatch;}
 
 	bool isWaterExists();
 
-	UINT GetWaterFaceCount();
+	uint32_t GetWaterFaceCount();
 
 	float GetMinX();
 	float GetMaxX();
@@ -194,13 +194,13 @@ public:
 	SoftwareTransformPatch_SSourceVertex* SoftwareTransformPatch_GetTerrainVertexDataPtr();
 	CGraphicVertexBuffer* HardwareTransformPatch_GetVertexBufferPtr();
 
-	void SoftwareTransformPatch_UpdateTerrainLighting(DWORD dwVersion, const D3DLIGHT8& c_rkLight, const D3DMATERIAL8& c_rkMtrl);
+	void SoftwareTransformPatch_UpdateTerrainLighting(uint32_t dwVersion, const D3DLIGHT8& c_rkLight, const D3DMATERIAL8& c_rkMtrl);
 	
 protected:
 	bool					m_bUsed;
-	short					m_sPatchNum;	// Patch Number
+	int16_t					m_sPatchNum;	// Patch Number
 
-	BYTE					m_byTerrainNum;	
+	uint8_t					m_byTerrainNum;	
 
 	CTerrainPatch *			m_pTerrainPatch;
 

@@ -10,11 +10,11 @@ class CGraphicShadowTexture : public CGraphicTexture
 		
 		void Destroy();
 		
-		bool Create(int width, int height);
+		bool Create(int32_t width, int32_t height);
 
 		void Begin();
 		void End();
-		void Set(int stage = 0) const;
+		void Set(int32_t stage = 0) const;
 
 		const D3DXMATRIX& GetLightVPMatrixReference() const;
 		LPDIRECT3DTEXTURE8 GetD3DTexture() const;

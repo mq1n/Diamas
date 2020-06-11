@@ -6,18 +6,18 @@
 class CDragonLair
 {
 	public:
-		CDragonLair (DWORD dwGuildID, long BaseMapID, long PrivateMapID);
+		CDragonLair (uint32_t dwGuildID, int32_t BaseMapID, int32_t PrivateMapID);
 		virtual ~CDragonLair ();
 
-		DWORD GetEstimatedTime () const;
+		uint32_t GetEstimatedTime () const;
 
 		void OnDragonDead (LPCHARACTER pDragon);
 
 	private:
-		DWORD StartTime_;
-		DWORD GuildID_;
-		long BaseMapIndex_;
-		long PrivateMapIndex_;
+		uint32_t StartTime_;
+		uint32_t GuildID_;
+		int32_t BaseMapIndex_;
+		int32_t PrivateMapIndex_;
 };
 
 class CDragonLairManager : public singleton<CDragonLairManager>
@@ -26,12 +26,12 @@ class CDragonLairManager : public singleton<CDragonLairManager>
 		CDragonLairManager ();
 		virtual ~CDragonLairManager ();
 
-		bool Start (long MapIndexFrom, long BaseMapIndex, DWORD GuildID);
-		void OnDragonDead (LPCHARACTER pDragon, DWORD KillerGuildID);
+		bool Start (int32_t MapIndexFrom, int32_t BaseMapIndex, uint32_t GuildID);
+		void OnDragonDead (LPCHARACTER pDragon, uint32_t KillerGuildID);
 
 		size_t GetLairCount () const { return LairMap_.size(); }
 
 	private:
-		std::unordered_map<DWORD, CDragonLair*> LairMap_;
+		std::unordered_map<uint32_t, CDragonLair*> LairMap_;
 };
 

@@ -29,7 +29,7 @@ void DESC_P2P::Destroy()
 #ifdef ENABLE_PORT_SECURITY
 #include "config.h"
 #endif
-bool DESC_P2P::Setup(LPFDWATCH fdw, socket_t fd, const char * host, WORD wPort)
+bool DESC_P2P::Setup(LPFDWATCH fdw, socket_t fd, const char * host, uint16_t wPort)
 {
 	m_lpFdw = fdw;
 	m_stHost = host;
@@ -59,7 +59,7 @@ bool DESC_P2P::Setup(LPFDWATCH fdw, socket_t fd, const char * host, WORD wPort)
 	return true;
 }
 
-void DESC_P2P::SetPhase(int iPhase)
+void DESC_P2P::SetPhase(int32_t iPhase)
 {
 	static CInputP2P s_inputP2P;
 
@@ -78,7 +78,7 @@ void DESC_P2P::SetPhase(int iPhase)
 			break;
 
 		case PHASE_CLOSE:
-			m_pInputProcessor = NULL;
+			m_pInputProcessor = nullptr;
 			break;
 
 		default:

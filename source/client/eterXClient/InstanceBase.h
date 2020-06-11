@@ -15,28 +15,28 @@ class CInstanceBase
 	public:
 		struct SCreateData
 		{
-			BYTE	m_bType;
-			DWORD	m_dwStateFlags;
-			DWORD	m_dwEmpireID;
-			DWORD	m_dwGuildID;
-			DWORD	m_dwLevel;
-			DWORD	m_dwVID;
-			DWORD	m_dwRace;
-			DWORD	m_dwMovSpd;
-			DWORD	m_dwAtkSpd;
-			LONG	m_lPosX;
-			LONG	m_lPosY;
-			FLOAT	m_fRot;
-			DWORD	m_dwArmor;
-			DWORD	m_dwWeapon;
-			DWORD	m_dwHair;
+			uint8_t	m_bType;
+			uint32_t	m_dwStateFlags;
+			uint32_t	m_dwEmpireID;
+			uint32_t	m_dwGuildID;
+			uint32_t	m_dwLevel;
+			uint32_t	m_dwVID;
+			uint32_t	m_dwRace;
+			uint32_t	m_dwMovSpd;
+			uint32_t	m_dwAtkSpd;
+			int32_t	m_lPosX;
+			int32_t	m_lPosY;
+			float	m_fRot;
+			uint32_t	m_dwArmor;
+			uint32_t	m_dwWeapon;
+			uint32_t	m_dwHair;
 #ifdef ENABLE_ACCE_SYSTEM
-			DWORD	m_dwAcce;
+			uint32_t	m_dwAcce;
 #endif
-			DWORD	m_dwMountVnum;
+			uint32_t	m_dwMountVnum;
 			
-			short	m_sAlignment;
-			BYTE	m_byPKMode;
+			int16_t	m_sAlignment;
+			uint8_t	m_byPKMode;
 			CAffectFlagContainer	m_kAffectFlags;
 
 			std::string m_stName;
@@ -45,7 +45,7 @@ class CInstanceBase
 		};
 
 	public:
-		typedef DWORD TType;
+		typedef uint32_t TType;
 
 		enum EDirection
 		{
@@ -407,18 +407,18 @@ class CInstanceBase
 
 	public:
 		static void DestroySystem();
-		static void CreateSystem(UINT uCapacity);
-		static bool RegisterEffect(UINT eEftType, const char* c_szEftAttachBone, const char* c_szEftName, bool isCache);
-		static void RegisterTitleName(int iIndex, const char * c_szTitleName);
-		static bool RegisterNameColor(UINT uIndex, UINT r, UINT g, UINT b);
-		static bool RegisterTitleColor(UINT uIndex, UINT r, UINT g, UINT b);
-		static bool ChangeEffectTexture(UINT eEftType, const char* c_szSrcFileName, const char* c_szDstFileName);
+		static void CreateSystem(uint32_t uCapacity);
+		static bool RegisterEffect(uint32_t eEftType, const char* c_szEftAttachBone, const char* c_szEftName, bool isCache);
+		static void RegisterTitleName(int32_t iIndex, const char * c_szTitleName);
+		static bool RegisterNameColor(uint32_t uIndex, uint32_t r, uint32_t g, uint32_t b);
+		static bool RegisterTitleColor(uint32_t uIndex, uint32_t r, uint32_t g, uint32_t b);
+		static bool ChangeEffectTexture(uint32_t eEftType, const char* c_szSrcFileName, const char* c_szDstFileName);
 
 		static void SetDustGap(float fDustGap);
 		static void SetHorseDustGap(float fDustGap);
 
 		static void SetEmpireNameMode(bool isEnable);
-		static const D3DXCOLOR& GetIndexedNameColor(UINT eNameColor);
+		static const D3DXCOLOR& GetIndexedNameColor(uint32_t eNameColor);
 
 	public:
 		void SetMainInstance();
@@ -435,17 +435,17 @@ class CInstanceBase
 		float __GetBowRange();
 
 	protected:
-		DWORD	__AttachEffect(UINT eEftType);
-		DWORD	__AttachEffect(char filename[128]);
-		void	__DetachEffect(DWORD dwEID);
+		uint32_t	__AttachEffect(uint32_t eEftType);
+		uint32_t	__AttachEffect(char filename[128]);
+		void	__DetachEffect(uint32_t dwEID);
 
 	public:		
-		void CreateSpecialEffect(DWORD iEffectIndex);
-		void AttachSpecialEffect(DWORD effect);
+		void CreateSpecialEffect(uint32_t iEffectIndex);
+		void AttachSpecialEffect(uint32_t effect);
 
 	protected:
 		static std::string ms_astAffectEffectAttachBone[EFFECT_NUM];
-		static DWORD ms_adwCRCAffectEffect[EFFECT_NUM];
+		static uint32_t ms_adwCRCAffectEffect[EFFECT_NUM];
 		static float ms_fDustGap;
 		static float ms_fHorseDustGap;
 
@@ -455,11 +455,11 @@ class CInstanceBase
 
 		bool LessRenderOrder(CInstanceBase* pkInst);
 
-		void MountHorse(UINT eRace);
+		void MountHorse(uint32_t eRace);
 		void DismountHorse();		
 
 		// 스크립트용 테스트 함수. 나중에 없에자
-		void SCRIPT_SetAffect(UINT eAffect, bool isVisible); 
+		void SCRIPT_SetAffect(uint32_t eAffect, bool isVisible); 
 
 		float CalculateDistanceSq3d(const TPixelPosition& c_rkPPosDst);
 
@@ -478,7 +478,7 @@ class CInstanceBase
 
 		void					AttachTextTail();
 		void					DetachTextTail();
-		void					UpdateTextTailLevel(DWORD level);
+		void					UpdateTextTailLevel(uint32_t level);
 
 		void					RefreshTextTail();
 		void					RefreshTextTailTitle();
@@ -504,60 +504,60 @@ class CInstanceBase
 		// Temporary
 		void					GetBoundBox(D3DXVECTOR3 * vtMin, D3DXVECTOR3 * vtMax);
 
-		void					SetNameString(const char* c_szName, int len);
-		bool					SetRace(DWORD dwRaceIndex);
-		void					SetVirtualID(DWORD wVirtualNumber);
-		void					SetVirtualNumber(DWORD dwVirtualNumber);
-		void					SetInstanceType(int iInstanceType);
-		void					SetAlignment(short sAlignment);
-		void					SetPKMode(BYTE byPKMode);
+		void					SetNameString(const char* c_szName, int32_t len);
+		bool					SetRace(uint32_t dwRaceIndex);
+		void					SetVirtualID(uint32_t wVirtualNumber);
+		void					SetVirtualNumber(uint32_t dwVirtualNumber);
+		void					SetInstanceType(int32_t iInstanceType);
+		void					SetAlignment(int16_t sAlignment);
+		void					SetPKMode(uint8_t byPKMode);
 		void					SetKiller(bool bFlag);
 		void					SetPartyMemberFlag(bool bFlag);
-		void					SetStateFlags(DWORD dwStateFlags);
+		void					SetStateFlags(uint32_t dwStateFlags);
 
-		void					SetArmor(DWORD dwArmor);
-		void					SetShape(DWORD eShape, float fSpecular=0.0f);
-		void					SetHair(DWORD eHair);
+		void					SetArmor(uint32_t dwArmor);
+		void					SetShape(uint32_t eShape, float fSpecular=0.0f);
+		void					SetHair(uint32_t eHair);
 #ifdef ENABLE_ACCE_SYSTEM
-		void					SetAcce(DWORD dwAcce);
-		void					ChangeAcce(DWORD dwAcce);
+		void					SetAcce(uint32_t dwAcce);
+		void					ChangeAcce(uint32_t dwAcce);
 #endif
-		bool					SetWeapon(DWORD eWeapon);
-		bool					ChangeArmor(DWORD dwArmor);
-		void					ChangeWeapon(DWORD eWeapon);
-		void					ChangeHair(DWORD eHair);
-		void					ChangeGuild(DWORD dwGuildID);
-		DWORD					GetWeaponType();
+		bool					SetWeapon(uint32_t eWeapon);
+		bool					ChangeArmor(uint32_t dwArmor);
+		void					ChangeWeapon(uint32_t eWeapon);
+		void					ChangeHair(uint32_t eHair);
+		void					ChangeGuild(uint32_t dwGuildID);
+		uint32_t					GetWeaponType();
 
-		void					SetComboType(UINT uComboType);
-		void					SetAttackSpeed(UINT uAtkSpd);
-		void					SetMoveSpeed(UINT uMovSpd);
+		void					SetComboType(uint32_t uComboType);
+		void					SetAttackSpeed(uint32_t uAtkSpd);
+		void					SetMoveSpeed(uint32_t uMovSpd);
 		void					SetRotationSpeed(float fRotSpd);
 
 		const char *			GetNameString();
 #ifdef ENABLE_LEVEL_IN_TRADE
-		DWORD					GetLevel();
+		uint32_t					GetLevel();
 #endif
 #ifdef ENABLE_TEXT_LEVEL_REFRESH
-		void					SetLevel(DWORD dwLevel);
+		void					SetLevel(uint32_t dwLevel);
 #endif
-		int						GetInstanceType();
-		DWORD					GetPart(CRaceData::EParts part);
-		DWORD					GetShape();
-		DWORD					GetRace();
-		DWORD					GetVirtualID();
-		DWORD					GetVirtualNumber();
-		DWORD					GetEmpireID();
-		DWORD					GetGuildID();
-		int						GetAlignment();
-		UINT					GetAlignmentGrade();
-		int						GetAlignmentType();
-		BYTE					GetPKMode();
+		int32_t						GetInstanceType();
+		uint32_t					GetPart(CRaceData::EParts part);
+		uint32_t					GetShape();
+		uint32_t					GetRace();
+		uint32_t					GetVirtualID();
+		uint32_t					GetVirtualNumber();
+		uint32_t					GetEmpireID();
+		uint32_t					GetGuildID();
+		int32_t						GetAlignment();
+		uint32_t					GetAlignmentGrade();
+		int32_t						GetAlignmentType();
+		uint8_t					GetPKMode();
 		bool					IsKiller();
 		bool					IsPartyMember();
 
-		void					ActDualEmotion(CInstanceBase & rkDstInst, WORD dwMotionNumber1, WORD dwMotionNumber2);
-		void					ActEmotion(DWORD dwMotionNumber);
+		void					ActDualEmotion(CInstanceBase & rkDstInst, uint16_t dwMotionNumber1, uint16_t dwMotionNumber2);
+		void					ActEmotion(uint32_t dwMotionNumber);
 		void					LevelUp();
 		void					SkillUp();
 		void					UseSpinTop();
@@ -589,7 +589,7 @@ class CInstanceBase
 		void					SetRunMode();
 		void					SetWalkMode();
 
-		bool					IsAffect(UINT uAffect);
+		bool					IsAffect(uint32_t uAffect);
 		BOOL					IsInvisibility();
 		BOOL					IsParalysis();
 		BOOL					IsGameMaster();
@@ -653,12 +653,12 @@ class CInstanceBase
 		// Battle
 		void					SetEventHandler(CActorInstance::IEventHandler* pkEventHandler);
 
-		void					PushTCPState(DWORD dwCmdTime, const TPixelPosition& c_rkPPosDst, float fDstRot, UINT eFunc, UINT uArg);
-		void					PushTCPStateExpanded(DWORD dwCmdTime, const TPixelPosition& c_rkPPosDst, float fDstRot, UINT eFunc, UINT uArg, UINT uTargetVID);
+		void					PushTCPState(uint32_t dwCmdTime, const TPixelPosition& c_rkPPosDst, float fDstRot, uint32_t eFunc, uint32_t uArg);
+		void					PushTCPStateExpanded(uint32_t dwCmdTime, const TPixelPosition& c_rkPPosDst, float fDstRot, uint32_t eFunc, uint32_t uArg, uint32_t uTargetVID);
 
 		void					NEW_Stop();
 
-		bool					NEW_UseSkill(UINT uSkill, UINT uMot, UINT uMotLoopCount, bool isMovingSkill);
+		bool					NEW_UseSkill(uint32_t uSkill, uint32_t uMot, uint32_t uMotLoopCount, bool isMovingSkill);
 		void					NEW_Attack();
 		void					NEW_Attack(float fDirRot);
 		void					NEW_AttackToDestPixelPositionDirection(const TPixelPosition& c_rkPPosDst);
@@ -690,8 +690,8 @@ class CInstanceBase
 		bool					NEW_GetInstanceVectorInFanRange(float fSkillDistance, CInstanceBase& rkInstTarget, std::vector<CInstanceBase*>* pkVct_pkInst);
 		bool					NEW_GetInstanceVectorInCircleRange(float fSkillDistance, std::vector<CInstanceBase*>* pkVct_pkInst);
 
-		void					NEW_SetOwner(DWORD dwOwnerVID);
-		void					NEW_SyncPixelPosition(long & nPPosX, long & nPPosY);
+		void					NEW_SetOwner(uint32_t dwOwnerVID);
+		void					NEW_SyncPixelPosition(int32_t & nPPosX, int32_t & nPPosY);
 		void					NEW_SyncCurrentPixelPosition();
 
 		void					NEW_SetPixelPosition(const TPixelPosition& c_rkPPosDst);
@@ -704,13 +704,13 @@ class CInstanceBase
 		BOOL					isNormalAttacking();
 		BOOL					isComboAttacking();
 		MOTION_KEY				GetNormalAttackIndex();
-		DWORD					GetComboIndex();
+		uint32_t					GetComboIndex();
 		float					GetAttackingElapsedTime();
 		void					InputNormalAttack(float fAtkDirRot);
 		void					InputComboAttack(float fAtkDirRot);
 
 		void					RunNormalAttack(float fAtkDirRot);
-		void					RunComboAttack(float fAtkDirRot, DWORD wMotionIndex);
+		void					RunComboAttack(float fAtkDirRot, uint32_t wMotionIndex);
 
 		CInstanceBase*			FindNearestVictim();
 		BOOL					CheckAdvancing();
@@ -722,8 +722,8 @@ class CInstanceBase
 
 	public:
 		BOOL					CheckAttacking(CInstanceBase& rkInstVictim);
-		void					ProcessHitting(DWORD dwMotionKey, CInstanceBase * pVictimInstance);
-		void					ProcessHitting(DWORD dwMotionKey, BYTE byEventIndex, CInstanceBase * pVictimInstance);
+		void					ProcessHitting(uint32_t dwMotionKey, CInstanceBase * pVictimInstance);
+		void					ProcessHitting(uint32_t dwMotionKey, uint8_t byEventIndex, CInstanceBase * pVictimInstance);
 		void					GetBlendingPosition(TPixelPosition * pPixelPosition);
 		void					SetBlendingPosition(const TPixelPosition & c_rPixelPosition);
 
@@ -733,13 +733,13 @@ class CInstanceBase
 		void					ReactFishing();
 		void					CatchSuccess();
 		void					CatchFail();
-		BOOL					GetFishingRot(int * pirot);
+		BOOL					GetFishingRot(int32_t * pirot);
 
 		// Render Mode
 		void					RestoreRenderMode();
 		void					SetAddRenderMode();
 		void					SetModulateRenderMode();
-		void					SetRenderMode(int iRenderMode);
+		void					SetRenderMode(int32_t iRenderMode);
 		void					SetAddColor(const D3DXCOLOR & c_rColor);
 
 		// Position
@@ -756,23 +756,23 @@ class CInstanceBase
 		void					SetRotation(float fRotation);
 		void					BlendRotation(float fRotation, float fBlendTime = 0.1f);
 
-		void					SetDirection(int dir);
-		void					BlendDirection(int dir, float blendTime);
-		float					GetDegreeFromDirection(int dir);
+		void					SetDirection(int32_t dir);
+		void					BlendDirection(int32_t dir, float blendTime);
+		float					GetDegreeFromDirection(int32_t dir);
 
 		// Motion
 		//	Motion Deque
 		BOOL					isLock();
 
-		void					SetMotionMode(int iMotionMode);
-		int						GetMotionMode(DWORD dwMotionIndex);
+		void					SetMotionMode(int32_t iMotionMode);
+		int32_t						GetMotionMode(uint32_t dwMotionIndex);
 
 		// Motion
 		//	Pushing Motion
 		void					ResetLocalTime();
-		void					SetLoopMotion(WORD wMotion, float fBlendTime=0.1f, float fSpeedRatio=1.0f);
-		void					PushOnceMotion(WORD wMotion, float fBlendTime=0.1f, float fSpeedRatio=1.0f);
-		void					PushLoopMotion(WORD wMotion, float fBlendTime=0.1f, float fSpeedRatio=1.0f);
+		void					SetLoopMotion(uint16_t wMotion, float fBlendTime=0.1f, float fSpeedRatio=1.0f);
+		void					PushOnceMotion(uint16_t wMotion, float fBlendTime=0.1f, float fSpeedRatio=1.0f);
+		void					PushLoopMotion(uint16_t wMotion, float fBlendTime=0.1f, float fSpeedRatio=1.0f);
 		void					SetEndStopMotion();
 
 		// Intersect
@@ -780,11 +780,11 @@ class CInstanceBase
 		bool					IntersectBoundingBox();
 
 		// Part
-		//void					SetParts(const WORD * c_pParts);
-		void					Refresh(DWORD dwMotIndex, bool isLoop);
+		//void					SetParts(const uint16_t * c_pParts);
+		void					Refresh(uint32_t dwMotIndex, bool isLoop);
 
-		//void					AttachEffectByID(DWORD dwParentPartIndex, const char * c_pszBoneName, DWORD dwEffectID, int dwLife = CActorInstance::EFFECT_LIFE_INFINITE ); // 수명은 ms단위입니다.
-		//void					AttachEffectByName(DWORD dwParentPartIndex, const char * c_pszBoneName, const char * c_pszEffectName, int dwLife = CActorInstance::EFFECT_LIFE_INFINITE ); // 수명은 ms단위입니다.
+		//void					AttachEffectByID(uint32_t dwParentPartIndex, const char * c_pszBoneName, uint32_t dwEffectID, int32_t dwLife = CActorInstance::EFFECT_LIFE_INFINITE ); // 수명은 ms단위입니다.
+		//void					AttachEffectByName(uint32_t dwParentPartIndex, const char * c_pszBoneName, const char * c_pszEffectName, int32_t dwLife = CActorInstance::EFFECT_LIFE_INFINITE ); // 수명은 ms단위입니다.
 
 		float					GetDistance(CInstanceBase * pkTargetInst);
 		float					GetDistance(const TPixelPosition & c_rPixelPosition);
@@ -802,19 +802,19 @@ class CInstanceBase
 		void __ClearAffects();
 		/////////////////////////////////////////////////////////////
 
-		void __SetAffect(UINT eAffect, bool isVisible);
+		void __SetAffect(uint32_t eAffect, bool isVisible);
 		
 		void SetAffectFlagContainer(const CAffectFlagContainer& c_rkAffectFlagContainer);
 
 		void __SetNormalAffectFlagContainer(const CAffectFlagContainer& c_rkAffectFlagContainer);		
 		void __SetStoneSmokeFlagContainer(const CAffectFlagContainer& c_rkAffectFlagContainer);
 
-		void SetEmoticon(UINT eEmoticon);		
+		void SetEmoticon(uint32_t eEmoticon);		
 		void SetFishEmoticon();
 		bool IsPossibleEmoticon();
 
 	protected:
-		UINT					__LessRenderOrder_GetLODLevel();
+		uint32_t					__LessRenderOrder_GetLODLevel();
 		void					__Initialize();
 		void					__InitializeRotationSpeed();
 
@@ -822,13 +822,13 @@ class CInstanceBase
 		void					__Create_SetWarpName(const SCreateData& c_rkCreateData);
 
 		CInstanceBase*			__GetMainInstancePtr();
-		CInstanceBase*			__FindInstancePtr(DWORD dwVID);
+		CInstanceBase*			__FindInstancePtr(uint32_t dwVID);
 
-		bool  __FindRaceType(DWORD dwRace, BYTE* pbType);
-		DWORD __GetRaceType();
+		bool  __FindRaceType(uint32_t dwRace, uint8_t* pbType);
+		uint32_t __GetRaceType();
 
 		bool __IsShapeAnimalWear();
-		BOOL __IsChangableWeapon(int iWeaponID);
+		BOOL __IsChangableWeapon(int32_t iWeaponID);
 
 		void __EnableSkipCollision();
 		void __DisableSkipCollision();
@@ -845,10 +845,10 @@ class CInstanceBase
 		bool __IsInDustRange();
 
 		// Emotion
-		void __ProcessFunctionEmotion(DWORD dwMotionNumber, DWORD dwTargetVID, const TPixelPosition & c_rkPosDst);
+		void __ProcessFunctionEmotion(uint32_t dwMotionNumber, uint32_t dwTargetVID, const TPixelPosition & c_rkPosDst);
 		void __EnableChangingTCPState();
 		void __DisableChangingTCPState();
-		BOOL __IsEnableTCPProcess(UINT eCurFunc);
+		BOOL __IsEnableTCPProcess(uint32_t eCurFunc);
 
 		// 2004.07.17.levites.isShow를 ViewFrustumCheck로 변경
 		bool __CanRender();
@@ -867,10 +867,10 @@ class CInstanceBase
 			~SHORSE();
 			
 			void Destroy();
-			void Create(const TPixelPosition& c_rkPPos, UINT eRace, UINT eHitEffect);
+			void Create(const TPixelPosition& c_rkPPos, uint32_t eRace, uint32_t eHitEffect);
 			
-			void SetAttackSpeed(UINT uAtkSpd);
-			void SetMoveSpeed(UINT uMovSpd);
+			void SetAttackSpeed(uint32_t uAtkSpd);
+			void SetMoveSpeed(uint32_t uMovSpd);
 			void Deform();
 			void Render();
 			CActorInstance& GetActorRef();
@@ -880,7 +880,7 @@ class CInstanceBase
 			bool CanAttack();
 			bool CanUseSkill();
 
-			UINT GetLevel();
+			uint32_t GetLevel();
 			bool IsNewMount();
 
 			void __Initialize();
@@ -902,7 +902,7 @@ class CInstanceBase
 		void					StartWalking();
 		float					GetLocalTime();
 
-		void					RefreshState(DWORD dwMotIndex, bool isLoop);
+		void					RefreshState(uint32_t dwMotIndex, bool isLoop);
 		void					RefreshActorInstance();
 
 	protected:
@@ -913,7 +913,7 @@ class CInstanceBase
 		void					NEW_SetCurPixelPosition(const TPixelPosition& c_rkPPosDst);
 		void					NEW_SetSrcPixelPosition(const TPixelPosition& c_rkPPosDst);
 		void					NEW_SetDstPixelPosition(const TPixelPosition& c_rkPPosDst);
-		void					NEW_SetDstPixelPositionZ(FLOAT z);
+		void					NEW_SetDstPixelPositionZ(float z);
 
 		const TPixelPosition&	NEW_GetCurPixelPositionRef();
 		const TPixelPosition&	NEW_GetSrcPixelPositionRef();
@@ -927,17 +927,17 @@ class CInstanceBase
 		// Instance Data
 		std::string				m_stName;
 
-		DWORD					m_awPart[CRaceData::PART_MAX_NUM];
+		uint32_t					m_awPart[CRaceData::PART_MAX_NUM];
 
-		DWORD					m_dwLevel;
-		DWORD					m_dwEmpireID;
-		DWORD					m_dwGuildID;
+		uint32_t					m_dwLevel;
+		uint32_t					m_dwEmpireID;
+		uint32_t					m_dwGuildID;
 
 	protected:		
 		CAffectFlagContainer	m_kAffectFlagContainer;
-		DWORD					m_adwCRCAffectEffect[AFFECT_NUM];
+		uint32_t					m_adwCRCAffectEffect[AFFECT_NUM];
 		
-		UINT	__GetRefinedEffect(CItemData* pItem);		
+		uint32_t	__GetRefinedEffect(CItemData* pItem);		
 		void	__ClearWeaponRefineEffect();
 		void	__ClearArmorRefineEffect();
 
@@ -952,78 +952,78 @@ class CInstanceBase
 		void __AttachTargetEffect();
 		void __DetachTargetEffect();
 
-		void __AttachEmpireEffect(DWORD eEmpire);
+		void __AttachEmpireEffect(uint32_t eEmpire);
 
 	protected:
 		struct SEffectContainer
 		{
-			typedef std::map<DWORD, DWORD> Dict;
+			typedef std::map<uint32_t, uint32_t> Dict;
 			Dict m_kDct_dwEftID;
 		} m_kEffectContainer;
 
 		void __EffectContainer_Initialize();
 		void __EffectContainer_Destroy();
 
-		DWORD __EffectContainer_AttachEffect(DWORD eEffect);
-		void __EffectContainer_DetachEffect(DWORD eEffect);
+		uint32_t __EffectContainer_AttachEffect(uint32_t eEffect);
+		void __EffectContainer_DetachEffect(uint32_t eEffect);
 
 		SEffectContainer::Dict& __EffectContainer_GetDict();
 
 	protected:
 		struct SStoneSmoke 
 		{
-			DWORD m_dwEftID;
+			uint32_t m_dwEftID;
 		} m_kStoneSmoke;
 
 		void __StoneSmoke_Inialize();
 		void __StoneSmoke_Destroy();
-		void __StoneSmoke_Create(DWORD eSmoke);
+		void __StoneSmoke_Create(uint32_t eSmoke);
 
 
 	protected:
 		// Emoticon
-		//DWORD					m_adwCRCEmoticonEffect[EMOTICON_NUM];
+		//uint32_t					m_adwCRCEmoticonEffect[EMOTICON_NUM];
 
-		BYTE					m_eType;
-		BYTE					m_eRaceType;
-		DWORD					m_eShape;
-		DWORD					m_dwRace;
-		DWORD					m_dwVirtualNumber;
-		short					m_sAlignment;
-		BYTE					m_byPKMode;
+		uint8_t					m_eType;
+		uint8_t					m_eRaceType;
+		uint32_t					m_eShape;
+		uint32_t					m_dwRace;
+		uint32_t					m_dwVirtualNumber;
+		int16_t					m_sAlignment;
+		uint8_t					m_byPKMode;
 		bool					m_isKiller;
 		bool					m_isPartyMember;
 
 		// Movement
-		int						m_iRotatingDirection;
+		int32_t						m_iRotatingDirection;
 
-		DWORD					m_dwAdvActorVID;
-		DWORD					m_dwLastDmgActorVID;
+		uint32_t					m_dwAdvActorVID;
+		uint32_t					m_dwLastDmgActorVID;
 
-		LONG					m_nAverageNetworkGap;
-		DWORD					m_dwNextUpdateHeightTime;
+		int32_t					m_nAverageNetworkGap;
+		uint32_t					m_dwNextUpdateHeightTime;
 
 		bool					m_isGoing;
 
 		TPixelPosition			m_kPPosDust;
 
-		DWORD					m_dwLastComboIndex;
+		uint32_t					m_dwLastComboIndex;
 
-		DWORD					m_swordRefineEffectRight;
-		DWORD					m_swordRefineEffectLeft;
-		DWORD					m_armorRefineEffect;
+		uint32_t					m_swordRefineEffectRight;
+		uint32_t					m_swordRefineEffectLeft;
+		uint32_t					m_armorRefineEffect;
 
 #ifdef ENABLE_ACCE_SYSTEM
-		DWORD					m_dwAcceEffect;
+		uint32_t					m_dwAcceEffect;
 #endif
 
 		struct SMoveAfterFunc
 		{
-			UINT eFunc;
-			UINT uArg;
+			uint32_t eFunc;
+			uint32_t uArg;
 
 			// For Emotion Function
-			UINT uArgExpanded;
+			uint32_t uArgExpanded;
 			TPixelPosition kPosDst;
 		};
 
@@ -1043,21 +1043,21 @@ class CInstanceBase
 	protected:
 		struct SCommand
 		{
-			DWORD	m_dwChkTime;
-			DWORD	m_dwCmdTime;
+			uint32_t	m_dwChkTime;
+			uint32_t	m_dwCmdTime;
 			float	m_fDstRot;
-			UINT 	m_eFunc;
-			UINT 	m_uArg;
-			UINT	m_uTargetVID;
+			uint32_t 	m_eFunc;
+			uint32_t 	m_uArg;
+			uint32_t	m_uTargetVID;
 			TPixelPosition m_kPPosDst;
 		};
 
 		typedef std::list<SCommand> CommandQueue;
 
-		DWORD		m_dwBaseChkTime;
-		DWORD		m_dwBaseCmdTime;
+		uint32_t		m_dwBaseChkTime;
+		uint32_t		m_dwBaseCmdTime;
 
-		DWORD		m_dwSkipTime;
+		uint32_t		m_dwSkipTime;
 
 		CommandQueue m_kQue_kCmdNew;
 
@@ -1065,8 +1065,8 @@ class CInstanceBase
 
 		struct SEffectDamage
 		{
-			DWORD damage;
-			BYTE flag;
+			uint32_t damage;
+			uint8_t flag;
 			BOOL bSelf;
 			BOOL bTarget;
 		};
@@ -1077,12 +1077,12 @@ class CInstanceBase
 		void ProcessDamage();
 
 	public:
-		void AddDamageEffect(DWORD damage,BYTE flag,BOOL bSelf,BOOL bTarget);
+		void AddDamageEffect(uint32_t damage,uint8_t flag,BOOL bSelf,BOOL bTarget);
 
 	protected:
 		struct SWarrior
 		{
-			DWORD m_dwGeomgyeongEffect;
+			uint32_t m_dwGeomgyeongEffect;
 		};
 
 		SWarrior m_kWarrior;
@@ -1092,26 +1092,26 @@ class CInstanceBase
 	public:
 		static void ClearPVPKeySystem();
 
-		static void InsertPVPKey(DWORD dwSrcVID, DWORD dwDstVID);
-		static void InsertPVPReadyKey(DWORD dwSrcVID, DWORD dwDstVID);
-		static void RemovePVPKey(DWORD dwSrcVID, DWORD dwDstVID);
+		static void InsertPVPKey(uint32_t dwSrcVID, uint32_t dwDstVID);
+		static void InsertPVPReadyKey(uint32_t dwSrcVID, uint32_t dwDstVID);
+		static void RemovePVPKey(uint32_t dwSrcVID, uint32_t dwDstVID);
 
-		static void InsertGVGKey(DWORD dwSrcGuildVID, DWORD dwDstGuildVID);
-		static void RemoveGVGKey(DWORD dwSrcGuildVID, DWORD dwDstGuildVID);
+		static void InsertGVGKey(uint32_t dwSrcGuildVID, uint32_t dwDstGuildVID);
+		static void RemoveGVGKey(uint32_t dwSrcGuildVID, uint32_t dwDstGuildVID);
 
-		static void InsertDUELKey(DWORD dwSrcVID, DWORD dwDstVID);
+		static void InsertDUELKey(uint32_t dwSrcVID, uint32_t dwDstVID);
 
-		UINT GetNameColorIndex();
+		uint32_t GetNameColorIndex();
 
 		const D3DXCOLOR& GetNameColor();
 		const D3DXCOLOR& GetTitleColor();
 
 	protected:
-		static DWORD __GetPVPKey(DWORD dwSrcVID, DWORD dwDstVID);
-		static bool __FindPVPKey(DWORD dwSrcVID, DWORD dwDstVID);
-		static bool __FindPVPReadyKey(DWORD dwSrcVID, DWORD dwDstVID);
-		static bool __FindGVGKey(DWORD dwSrcGuildID, DWORD dwDstGuildID);
-		static bool __FindDUELKey(DWORD dwSrcGuildID, DWORD dwDstGuildID);
+		static uint32_t __GetPVPKey(uint32_t dwSrcVID, uint32_t dwDstVID);
+		static bool __FindPVPKey(uint32_t dwSrcVID, uint32_t dwDstVID);
+		static bool __FindPVPReadyKey(uint32_t dwSrcVID, uint32_t dwDstVID);
+		static bool __FindGVGKey(uint32_t dwSrcGuildID, uint32_t dwDstGuildID);
+		static bool __FindDUELKey(uint32_t dwSrcGuildID, uint32_t dwDstGuildID);
 
 	protected:
 		CActorInstance::IEventHandler* GetEventHandlerPtr();
@@ -1119,7 +1119,7 @@ class CInstanceBase
 
 	protected:
 		static float __GetBackgroundHeight(float x, float y);
-		static DWORD __GetShadowMapColor(float x, float y);
+		static uint32_t __GetShadowMapColor(float x, float y);
 
 	public:
 		static void ResetPerformanceCounter();
@@ -1132,16 +1132,16 @@ class CInstanceBase
 		static CDynamicPool<CInstanceBase>	ms_kPool;
 
 	protected:
-		static DWORD ms_dwUpdateCounter;
-		static DWORD ms_dwRenderCounter;
-		static DWORD ms_dwDeformCounter;
+		static uint32_t ms_dwUpdateCounter;
+		static uint32_t ms_dwRenderCounter;
+		static uint32_t ms_dwDeformCounter;
 
 	public:		
-		DWORD					GetDuelMode();
-		void					SetDuelMode(DWORD type);
+		uint32_t					GetDuelMode();
+		void					SetDuelMode(uint32_t type);
 	protected:
-		DWORD					m_dwDuelMode;
-		DWORD					m_dwEmoticonTime;
+		uint32_t					m_dwDuelMode;
+		uint32_t					m_dwEmoticonTime;
 
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
 	public:
@@ -1153,17 +1153,17 @@ class CInstanceBase
 #endif
 };
 
-inline int RaceToJob(int race)
+inline int32_t RaceToJob(int32_t race)
 {
 #ifdef ENABLE_WOLFMAN_CHARACTER
 	if (race==8)
 		return 4;
 #endif
-	const int JOB_NUM = 4;
+	const int32_t JOB_NUM = 4;
 	return race % JOB_NUM;
 }
 
-inline int RaceToSex(int race)
+inline int32_t RaceToSex(int32_t race)
 {
 	switch (race)
 	{

@@ -19,7 +19,7 @@ class CGraphicSubImage : public CGraphicImage
 
 		bool SetImageFileName(const char* c_szFileName);
 
-		void SetRectPosition(int left, int top, int right, int bottom);
+		void SetRectPosition(int32_t left, int32_t top, int32_t right, int32_t bottom);
 
 		void SetRectReference(const RECT& c_rRect);
 
@@ -28,7 +28,7 @@ class CGraphicSubImage : public CGraphicImage
 	protected:
 		void SetImagePointer(CGraphicImage* pImage);
 
-		bool OnLoad(int iSize, const void* c_pvBuf);
+		bool OnLoad(int32_t iSize, const void* c_pvBuf);
 		void OnClear();		
 		bool OnIsEmpty() const;
 		bool OnIsType(TType type);

@@ -16,7 +16,7 @@ enum
 };
 
 void LoginFailure(LPDESC d, const char * c_pszStatus);
-extern void SendShout(const char * szText, BYTE bEmpire);
+extern void SendShout(const char * szText, uint8_t bEmpire);
 
 class CInputProcessor
 {
@@ -24,18 +24,18 @@ class CInputProcessor
 		CInputProcessor();
 		virtual ~CInputProcessor() {};
 
-		virtual bool Process(LPDESC d, const void * c_pvOrig, int iBytes, int & r_iBytesProceed);
-		virtual BYTE GetType() = 0;
+		virtual bool Process(LPDESC d, const void * c_pvOrig, int32_t iBytes, int32_t & r_iBytesProceed);
+		virtual uint8_t GetType() = 0;
 
 		void BindPacketInfo(CPacketInfo * pPacketInfo);
 		void Pong(LPDESC d);
 		void Handshake(LPDESC d, const char * c_pData);
 
 	protected:
-		virtual int	Analyze(LPDESC d, BYTE bHeader, const char * c_pData) = 0;
+		virtual int32_t	Analyze(LPDESC d, uint8_t bHeader, const char * c_pData) = 0;
 
 		CPacketInfo * m_pPacketInfo;
-		int	m_iBufferLeft;
+		int32_t	m_iBufferLeft;
 
 		CPacketInfoCG 	m_packetInfoCG;
 };
@@ -43,10 +43,10 @@ class CInputProcessor
 class CInputClose : public CInputProcessor
 {
 	public:
-		virtual BYTE	GetType() { return INPROC_CLOSE; }
+		virtual uint8_t	GetType() { return INPROC_CLOSE; }
 
 	protected:
-		virtual int	Analyze(LPDESC d, BYTE bHeader, const char * c_pData) { return m_iBufferLeft; }
+		virtual int32_t	Analyze(LPDESC d, uint8_t bHeader, const char * c_pData) { return m_iBufferLeft; }
 };
 
 class CInputHandshake : public CInputProcessor
@@ -55,10 +55,10 @@ class CInputHandshake : public CInputProcessor
 		CInputHandshake();
 		virtual ~CInputHandshake();
 
-		virtual BYTE	GetType() { return INPROC_HANDSHAKE; }
+		virtual uint8_t	GetType() { return INPROC_HANDSHAKE; }
 
 	protected:
-		virtual int	Analyze(LPDESC d, BYTE bHeader, const char * c_pData);
+		virtual int32_t	Analyze(LPDESC d, uint8_t bHeader, const char * c_pData);
 
 	protected:
 		void		GuildMarkLogin(LPDESC d, const char* c_pData);
@@ -69,10 +69,10 @@ class CInputHandshake : public CInputProcessor
 class CInputLogin : public CInputProcessor
 {
 	public:
-		virtual BYTE	GetType() { return INPROC_LOGIN; }
+		virtual uint8_t	GetType() { return INPROC_LOGIN; }
 
 	protected:
-		virtual int	Analyze(LPDESC d, BYTE bHeader, const char * c_pData);
+		virtual int32_t	Analyze(LPDESC d, uint8_t bHeader, const char * c_pData);
 
 	protected:
 		void		Login(LPDESC d, const char * data);
@@ -88,7 +88,7 @@ class CInputLogin : public CInputProcessor
 		void		GuildMarkIDXList(LPDESC d, const char* c_pData);
 		// END_OF_MARK_BUG_FIX
 		void		GuildMarkUpload(LPDESC d, const char* c_pData);
-		int			GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiBytes);
+		int32_t			GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiBytes);
 		void		GuildSymbolCRC(LPDESC d, const char* c_pData);
 		void		ChangeName(LPDESC d, const char * data);
 };
@@ -96,16 +96,16 @@ class CInputLogin : public CInputProcessor
 class CInputMain : public CInputProcessor
 {
 	public:
-		virtual BYTE	GetType() { return INPROC_MAIN; }
+		virtual uint8_t	GetType() { return INPROC_MAIN; }
 
 	protected:
-		virtual int	Analyze(LPDESC d, BYTE bHeader, const char * c_pData);
+		virtual int32_t	Analyze(LPDESC d, uint8_t bHeader, const char * c_pData);
 
 	protected:
-		void		Attack(LPCHARACTER ch, const BYTE header, const char* data);
+		void		Attack(LPCHARACTER ch, const uint8_t header, const char* data);
 
-		int			Whisper(LPCHARACTER ch, const char * data, size_t uiBytes);
-		int			Chat(LPCHARACTER ch, const char * data, size_t uiBytes);
+		int32_t			Whisper(LPCHARACTER ch, const char * data, size_t uiBytes);
+		int32_t			Chat(LPCHARACTER ch, const char * data, size_t uiBytes);
 		void		ItemUse(LPCHARACTER ch, const char * data);
 		void		ItemDrop(LPCHARACTER ch, const char * data);
 		void		ItemDrop2(LPCHARACTER ch, const char * data);
@@ -115,13 +115,13 @@ class CInputMain : public CInputProcessor
 		void		QuickslotAdd(LPCHARACTER ch, const char * data);
 		void		QuickslotDelete(LPCHARACTER ch, const char * data);
 		void		QuickslotSwap(LPCHARACTER ch, const char * data);
-		int			Shop(LPCHARACTER ch, const char * data, size_t uiBytes);
+		int32_t			Shop(LPCHARACTER ch, const char * data, size_t uiBytes);
 		void		OnClick(LPCHARACTER ch, const char * data);
 		void		Exchange(LPCHARACTER ch, const char * data);
 		void		Position(LPCHARACTER ch, const char * data);
 		void		Move(LPCHARACTER ch, const char * data);
-		int			SyncPosition(LPCHARACTER ch, const char * data, size_t uiBytes);
-		void		FlyTarget(LPCHARACTER ch, const char * pcData, BYTE bHeader);
+		int32_t			SyncPosition(LPCHARACTER ch, const char * data, size_t uiBytes);
+		void		FlyTarget(LPCHARACTER ch, const char * pcData, uint8_t bHeader);
 		void		UseSkill(LPCHARACTER ch, const char * pcData);
 		
 		void		ScriptAnswer(LPCHARACTER ch, const void * pvData);
@@ -135,7 +135,7 @@ class CInputMain : public CInputProcessor
 		void		SafeboxCheckin(LPCHARACTER ch, const char * c_pData);
 		void		SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMall);
 		void		SafeboxItemMove(LPCHARACTER ch, const char * data);
-		int			Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes);
+		int32_t			Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes);
 
 		void 		PartyInvite(LPCHARACTER ch, const char * c_pData);
 		void 		PartyInviteAnswer(LPCHARACTER ch, const char * c_pData);
@@ -144,13 +144,13 @@ class CInputMain : public CInputProcessor
 		void		PartyUseSkill(LPCHARACTER ch, const char * c_pData);
 		void		PartyParameter(LPCHARACTER ch, const char * c_pData);
 
-		int			Guild(LPCHARACTER ch, const char * data, size_t uiBytes);
+		int32_t			Guild(LPCHARACTER ch, const char * data, size_t uiBytes);
 		void		AnswerMakeGuild(LPCHARACTER ch, const char* c_pData);
 
 		void		Fishing(LPCHARACTER ch, const char* c_pData);
 		void		ItemGive(LPCHARACTER ch, const char* c_pData);
 		void		Hack(LPCHARACTER ch, const char * c_pData);
-		int			MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes);
+		int32_t			MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes);
 
 		void		Refine(LPCHARACTER ch, const char* c_pData);
 #ifdef ENABLE_ACCE_SYSTEM
@@ -161,16 +161,16 @@ class CInputMain : public CInputProcessor
 class CInputDB : public CInputProcessor
 {
 public:
-	virtual bool Process(LPDESC d, const void * c_pvOrig, int iBytes, int & r_iBytesProceed);
-	virtual BYTE GetType() { return INPROC_DB; }
+	virtual bool Process(LPDESC d, const void * c_pvOrig, int32_t iBytes, int32_t & r_iBytesProceed);
+	virtual uint8_t GetType() { return INPROC_DB; }
 
 protected:
-	virtual int	Analyze(LPDESC d, BYTE bHeader, const char * c_pData);
+	virtual int32_t	Analyze(LPDESC d, uint8_t bHeader, const char * c_pData);
 
 protected:
 	void		MapLocations(const char * c_pData);
-	void		LoginSuccess(DWORD dwHandle, const char *data);
-	void		PlayerCreateFailure(LPDESC d, BYTE bType);	// 0 = 일반 실패 1 = 이미 있음
+	void		LoginSuccess(uint32_t dwHandle, const char *data);
+	void		PlayerCreateFailure(LPDESC d, uint8_t bType);	// 0 = 일반 실패 1 = 이미 있음
 	void		PlayerDeleteSuccess(LPDESC d, const char * data);
 	void		PlayerDeleteFail(LPDESC d);
 	void		PlayerLoad(LPDESC d, const char* data);
@@ -204,7 +204,7 @@ protected:
 	void		GuildWithdrawMoney(const char* c_pData);
 	void		GuildWarReserveAdd(TGuildWarReserve * p);
 	void		GuildWarReserveUpdate(TGuildWarReserve * p);
-	void		GuildWarReserveDelete(DWORD dwID);
+	void		GuildWarReserveDelete(uint32_t dwID);
 	void		GuildWarBet(TPacketGDGuildWarBet * p);
 	void		GuildChangeMaster(TPacketChangeGuildMaster* p);
 
@@ -268,29 +268,29 @@ protected:
 	void		RespondChannelStatus(LPDESC desc, const char* pcData);
 
 	protected:
-		DWORD		m_dwHandle;
+		uint32_t		m_dwHandle;
 };
 
 class CInputP2P : public CInputProcessor
 {
 	public:
 		CInputP2P();
-		virtual BYTE	GetType() { return INPROC_P2P; }
+		virtual uint8_t	GetType() { return INPROC_P2P; }
 
 	protected:
-		virtual int	Analyze(LPDESC d, BYTE bHeader, const char * c_pData);
+		virtual int32_t	Analyze(LPDESC d, uint8_t bHeader, const char * c_pData);
 
 	public:
 		void		Setup(LPDESC d, const char * c_pData);
 		void		Login(LPDESC d, const char * c_pData);
 		void		Logout(LPDESC d, const char * c_pData);
-		int			Relay(LPDESC d, const char * c_pData, size_t uiBytes);
+		int32_t			Relay(LPDESC d, const char * c_pData, size_t uiBytes);
 #ifdef ENABLE_FULL_NOTICE
-		int			Notice(LPDESC d, const char * c_pData, size_t uiBytes, bool bBigFont=false);
+		int32_t			Notice(LPDESC d, const char * c_pData, size_t uiBytes, bool bBigFont=false);
 #else
-		int			Notice(LPDESC d, const char * c_pData, size_t uiBytes);
+		int32_t			Notice(LPDESC d, const char * c_pData, size_t uiBytes);
 #endif
-		int			Guild(LPDESC d, const char* c_pData, size_t uiBytes);
+		int32_t			Guild(LPDESC d, const char* c_pData, size_t uiBytes);
 		void		Shout(const char * c_pData);
 		void		Disconnect(const char * c_pData);
 		void		MessengerAdd(const char * c_pData);
@@ -313,10 +313,10 @@ class CInputAuth : public CInputProcessor
 {
 	public:
 		CInputAuth();
-		virtual BYTE GetType() { return INPROC_AUTH; }
+		virtual uint8_t GetType() { return INPROC_AUTH; }
 
 	protected:
-		virtual int	Analyze(LPDESC d, BYTE bHeader, const char * c_pData);
+		virtual int32_t	Analyze(LPDESC d, uint8_t bHeader, const char * c_pData);
 
 	public:
 		void		Login(LPDESC d, const char * c_pData);

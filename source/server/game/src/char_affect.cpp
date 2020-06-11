@@ -20,7 +20,7 @@
 #define IS_NO_SAVE_AFFECT(type) ((type) == AFFECT_WAR_FLAG || (type) == AFFECT_REVIVE_INVISIBLE || ((type) >= AFFECT_PREMIUM_START && (type) <= AFFECT_PREMIUM_END) || (type) == AFFECT_MOUNT_BONUS) // @fixme156 added MOUNT_BONUS (if the game core crashes, the bonus would double if present in player.affect)
 #define IS_NO_CLEAR_ON_DEATH_AFFECT(type) ((type) == AFFECT_BLOCK_CHAT || ((type) >= 500 && (type) < 600))
 
-void SendAffectRemovePacket(LPDESC d, DWORD pid, DWORD type, BYTE point)
+void SendAffectRemovePacket(LPDESC d, uint32_t pid, uint32_t type, uint8_t point)
 {
 	TPacketGCAffectRemove ptoc;
 	ptoc.bHeader	= HEADER_GC_AFFECT_REMOVE;
@@ -49,7 +49,7 @@ void SendAffectAddPacket(LPDESC d, CAffect * pkAff)
 }
 ////////////////////////////////////////////////////////////////////
 // Affect
-CAffect * CHARACTER::FindAffect(DWORD dwType, BYTE bApply) const
+CAffect * CHARACTER::FindAffect(uint32_t dwType, uint8_t bApply) const
 {
 	auto it = m_list_pkAffect.begin();
 
@@ -61,14 +61,14 @@ CAffect * CHARACTER::FindAffect(DWORD dwType, BYTE bApply) const
 			return pkAffect;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 EVENTFUNC(affect_event)
 {
 	char_event_info* info = dynamic_cast<char_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "affect_event> <Factor> Null pointer" );
 		return 0;
@@ -76,7 +76,7 @@ EVENTFUNC(affect_event)
 
 	LPCHARACTER ch = info->ch;
 
-	if (ch == NULL) { // <Factor>
+	if (ch == nullptr) { // <Factor>
 		return 0;
 	}
 
@@ -98,7 +98,7 @@ bool CHARACTER::UpdateAffect()
 		}
 		else
 		{
-			int iVal = MIN(GetPoint(POINT_HP_RECOVERY), GetMaxHP() * 7 / 100);
+			int32_t iVal = MIN(GetPoint(POINT_HP_RECOVERY), GetMaxHP() * 7 / 100);
 
 			PointChange(POINT_HP, iVal);
 			PointChange(POINT_HP_RECOVERY, -iVal);
@@ -111,7 +111,7 @@ bool CHARACTER::UpdateAffect()
 			PointChange(POINT_SP_RECOVERY, -GetPoint(POINT_SP_RECOVERY));
 		else 
 		{
-			int iVal = MIN(GetPoint(POINT_SP_RECOVERY), GetMaxSP() * 7 / 100);
+			int32_t iVal = MIN(GetPoint(POINT_SP_RECOVERY), GetMaxSP() * 7 / 100);
 
 			PointChange(POINT_SP, iVal);
 			PointChange(POINT_SP_RECOVERY, -iVal);
@@ -147,7 +147,7 @@ bool CHARACTER::UpdateAffect()
 	// 스테미나 회복
 	if (GetMaxStamina() > GetStamina())
 	{
-		int iSec = (get_dword_time() - GetStopTime()) / 3000;
+		int32_t iSec = (get_dword_time() - GetStopTime()) / 3000;
 		if (iSec)
 			PointChange(POINT_STAMINA, GetMaxStamina()/1);    
 	}
@@ -157,7 +157,7 @@ bool CHARACTER::UpdateAffect()
 	if (ProcessAffect())
 		if (GetPoint(POINT_HP_RECOVERY) == 0 && GetPoint(POINT_SP_RECOVERY) == 0 && GetStamina() == GetMaxStamina())
 		{
-			m_pkAffectEvent = NULL;
+			m_pkAffectEvent = nullptr;
 			return false;
 		}
 
@@ -178,8 +178,8 @@ void CHARACTER::StartAffectEvent()
 void CHARACTER::ClearAffect(bool bSave)
 {
 	TAffectFlag afOld = m_afAffectFlag;
-	WORD	wMovSpd = GetPoint(POINT_MOV_SPEED);
-	WORD	wAttSpd = GetPoint(POINT_ATT_SPEED);
+	uint16_t	wMovSpd = GetPoint(POINT_MOV_SPEED);
+	uint16_t	wAttSpd = GetPoint(POINT_ATT_SPEED);
 
 	auto it = m_list_pkAffect.begin();
 
@@ -218,24 +218,24 @@ void CHARACTER::ClearAffect(bool bSave)
 		event_cancel(&m_pkAffectEvent);
 }
 
-int CHARACTER::ProcessAffect()
+int32_t CHARACTER::ProcessAffect()
 {
 	bool	bDiff	= false;
-	CAffect	*pkAff	= NULL;
+	CAffect	*pkAff	= nullptr;
 
 	//
 	// 프리미엄 처리
 	//
-	for (int i = 0; i <= PREMIUM_MAX_NUM; ++i)
+	for (int32_t i = 0; i <= PREMIUM_MAX_NUM; ++i)
 	{
-		int aff_idx = i + AFFECT_PREMIUM_START;
+		int32_t aff_idx = i + AFFECT_PREMIUM_START;
 
 		pkAff = FindAffect(aff_idx);
 
 		if (!pkAff)
 			continue;
 
-		int remain = GetPremiumRemainSeconds(i);
+		int32_t remain = GetPremiumRemainSeconds(i);
 
 		if (remain < 0)
 		{
@@ -270,8 +270,8 @@ int CHARACTER::ProcessAffect()
 	CHorseNameManager::instance().Validate(this);
 
 	TAffectFlag afOld = m_afAffectFlag;
-	long lMovSpd = GetPoint(POINT_MOV_SPEED);
-	long lAttSpd = GetPoint(POINT_ATT_SPEED);
+	int32_t lMovSpd = GetPoint(POINT_MOV_SPEED);
+	int32_t lAttSpd = GetPoint(POINT_ATT_SPEED);
 
 	auto it = m_list_pkAffect.begin();
 	while (it != m_list_pkAffect.end())
@@ -367,8 +367,8 @@ void CHARACTER::SaveAffect()
 
 EVENTINFO(load_affect_login_event_info)
 {
-	DWORD pid;
-	DWORD count;
+	uint32_t pid;
+	uint32_t count;
 	char* data;
 
 	load_affect_login_event_info()
@@ -383,13 +383,13 @@ EVENTFUNC(load_affect_login_event)
 {
 	load_affect_login_event_info* info = dynamic_cast<load_affect_login_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "load_affect_login_event_info> <Factor> Null pointer" );
 		return 0;
 	}
 
-	DWORD dwPID = info->pid;
+	uint32_t dwPID = info->pid;
 	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(dwPID);
 
 	if (!ch)
@@ -434,7 +434,7 @@ EVENTFUNC(load_affect_login_event)
 	}
 }
 
-void CHARACTER::LoadAffect(DWORD dwCount, TPacketAffectElement * pElements)
+void CHARACTER::LoadAffect(uint32_t dwCount, TPacketAffectElement * pElements)
 {
 	m_bIsLoadedAffect = false;
 
@@ -462,10 +462,10 @@ void CHARACTER::LoadAffect(DWORD dwCount, TPacketAffectElement * pElements)
 
 	TAffectFlag afOld = m_afAffectFlag;
 
-	long lMovSpd = GetPoint(POINT_MOV_SPEED);
-	long lAttSpd = GetPoint(POINT_ATT_SPEED);
+	int32_t lMovSpd = GetPoint(POINT_MOV_SPEED);
+	int32_t lAttSpd = GetPoint(POINT_ATT_SPEED);
 
-	for (DWORD i = 0; i < dwCount; ++i, ++pElements)
+	for (uint32_t i = 0; i < dwCount; ++i, ++pElements)
 	{
 		// 무영진은 로드하지않는다.
 		if (pElements->dwType == SKILL_MUYEONG)
@@ -475,7 +475,7 @@ void CHARACTER::LoadAffect(DWORD dwCount, TPacketAffectElement * pElements)
 		{
 			LPITEM item = FindItemByID( pElements->dwFlag );
 
-			if (NULL == item)
+			if (nullptr == item)
 				continue;
 
 			item->Lock(true);
@@ -536,7 +536,7 @@ void CHARACTER::LoadAffect(DWORD dwCount, TPacketAffectElement * pElements)
 	// @fixme118 END
 }
 
-bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD dwFlag, long lDuration, long lSPCost, bool bOverride, bool IsCube )
+bool CHARACTER::AddAffect(uint32_t dwType, uint8_t bApplyOn, int32_t lApplyValue, uint32_t dwFlag, int32_t lDuration, int32_t lSPCost, bool bOverride, bool IsCube )
 {
 	// CHAT_BLOCK
 	if (dwType == AFFECT_BLOCK_CHAT && lDuration > 1)
@@ -551,7 +551,7 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 		lDuration = 1;
 	}
 
-	CAffect * pkAff = NULL;
+	CAffect * pkAff = nullptr;
 
 	if (IsCube)
 		pkAff = FindAffect(dwType,bApplyOn);
@@ -600,8 +600,8 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 	pkAff->lDuration	= lDuration;
 	pkAff->lSPCost	= lSPCost;
 
-	WORD wMovSpd = GetPoint(POINT_MOV_SPEED);
-	WORD wAttSpd = GetPoint(POINT_ATT_SPEED);
+	uint16_t wMovSpd = GetPoint(POINT_MOV_SPEED);
+	uint16_t wAttSpd = GetPoint(POINT_ATT_SPEED);
 
 	ComputeAffect(pkAff, true);
 
@@ -715,7 +715,7 @@ bool CHARACTER::RemoveAffect(CAffect * pkAff)
 	return true;
 }
 
-bool CHARACTER::RemoveAffect(DWORD dwType)
+bool CHARACTER::RemoveAffect(uint32_t dwType)
 {
 	// CHAT_BLOCK
 	if (dwType == AFFECT_BLOCK_CHAT)
@@ -737,7 +737,7 @@ bool CHARACTER::RemoveAffect(DWORD dwType)
 	return flag;
 }
 
-bool CHARACTER::IsAffectFlag(DWORD dwAff) const
+bool CHARACTER::IsAffectFlag(uint32_t dwAff) const
 {
 	return m_afAffectFlag.IsSet(dwAff);
 }
@@ -772,7 +772,7 @@ void CHARACTER::RemoveGoodAffect()
 #endif
 }
 
-bool CHARACTER::IsGoodAffect(BYTE bAffectType) const
+bool CHARACTER::IsGoodAffect(uint8_t bAffectType) const
 {
 	switch (bAffectType)
 	{

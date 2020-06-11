@@ -7,7 +7,7 @@ enum BLUEDRAGON_STONE_EFFECT
 	REGEN_PECT_BONUS	=	4,
 };
 
-extern unsigned int BlueDragon_GetRangeFactor (const char* key, const int val);
-extern unsigned int BlueDragon_GetSkillFactor (const size_t cnt, ...);
-extern unsigned int BlueDragon_GetIndexFactor (const char* container, const size_t idx, const char* key);
+extern uint32_t BlueDragon_GetRangeFactor (const char* key, const int32_t val);
+extern uint32_t BlueDragon_GetSkillFactor (const size_t cnt, ...);
+extern uint32_t BlueDragon_GetIndexFactor (const char* container, const size_t idx, const char* key);
 

@@ -6,11 +6,11 @@
 #include "InstanceBase.h"
 #include "AbstractApplication.h"
 
-extern int TWOHANDED_WEWAPON_ATT_SPEED_DECREASE_VALUE;
+extern int32_t TWOHANDED_WEWAPON_ATT_SPEED_DECREASE_VALUE;
 
 PyObject * itemSetUseSoundFileName(PyObject * poSelf, PyObject * poArgs)
 {
-	int iUseSound;
+	int32_t iUseSound;
 	if (!PyTuple_GetInteger(poArgs, 0, &iUseSound))
 		return Py_BadArgument();
 	
@@ -25,7 +25,7 @@ PyObject * itemSetUseSoundFileName(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemSetDropSoundFileName(PyObject * poSelf, PyObject * poArgs)
 {
-	int iDropSound;
+	int32_t iDropSound;
 	if (!PyTuple_GetInteger(poArgs, 0, &iDropSound))
 		return Py_BadArgument();
 	
@@ -40,7 +40,7 @@ PyObject * itemSetDropSoundFileName(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemSelectItem(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BadArgument();
 
@@ -159,7 +159,7 @@ PyObject * itemGetISellItemPrice(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemIsAntiFlag(PyObject * poSelf, PyObject * poArgs)
 {
-	int iFlag;
+	int32_t iFlag;
 	if (!PyTuple_GetInteger(poArgs, 0, &iFlag))
 		return Py_BadArgument();
 
@@ -172,7 +172,7 @@ PyObject * itemIsAntiFlag(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemIsFlag(PyObject * poSelf, PyObject * poArgs)
 {
-	int iFlag;
+	int32_t iFlag;
 	if (!PyTuple_GetInteger(poArgs, 0, &iFlag))
 		return Py_BadArgument();
 
@@ -185,7 +185,7 @@ PyObject * itemIsFlag(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemIsWearableFlag(PyObject * poSelf, PyObject * poArgs)
 {
-	int iFlag;
+	int32_t iFlag;
 	if (!PyTuple_GetInteger(poArgs, 0, &iFlag))
 		return Py_BadArgument();
 
@@ -207,7 +207,7 @@ PyObject * itemIs1GoldItem(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemGetLimit(PyObject * poSelf, PyObject * poArgs)
 {
-	int iValueIndex;
+	int32_t iValueIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iValueIndex))
 		return Py_BadArgument();
 
@@ -224,7 +224,7 @@ PyObject * itemGetLimit(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemGetAffect(PyObject * poSelf, PyObject * poArgs)
 {
-	int iValueIndex;
+	int32_t iValueIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iValueIndex))
 		return Py_BadArgument();
 
@@ -246,7 +246,7 @@ PyObject * itemGetAffect(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemGetValue(PyObject * poSelf, PyObject * poArgs)
 {
-	int iValueIndex;
+	int32_t iValueIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iValueIndex))
 		return Py_BadArgument();
 
@@ -259,7 +259,7 @@ PyObject * itemGetValue(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemGetSocket(PyObject * poSelf, PyObject * poArgs)
 {
-	int iValueIndex;
+	int32_t iValueIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iValueIndex))
 		return Py_BadArgument();
 
@@ -288,7 +288,7 @@ PyObject * itemGetIconInstance(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemDeleteIconInstance(PyObject * poSelf, PyObject * poArgs)
 {
-	int iHandle;
+	int32_t iHandle;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BadArgument();
 
@@ -299,7 +299,7 @@ PyObject * itemDeleteIconInstance(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemIsEquipmentVID(PyObject * poSelf, PyObject * poArgs)
 {
-	int iItemVID;
+	int32_t iItemVID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iItemVID))
 		return Py_BadArgument();
 
@@ -314,7 +314,7 @@ PyObject * itemIsEquipmentVID(PyObject * poSelf, PyObject * poArgs)
 // 2005.05.20.myevan.통합 USE_TYPE 체크
 PyObject* itemGetUseType(PyObject * poSelf, PyObject * poArgs)
 {
-	int iItemVID;
+	int32_t iItemVID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iItemVID))
 		return Py_BadArgument();
 
@@ -328,7 +328,7 @@ PyObject* itemGetUseType(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemIsRefineScroll(PyObject * poSelf, PyObject * poArgs)
 {
-	int iItemIndex;
+	int32_t iItemIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iItemIndex))
 		return Py_BadArgument();
 
@@ -352,7 +352,7 @@ PyObject * itemIsRefineScroll(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemIsDetachScroll(PyObject * poSelf, PyObject * poArgs)
 {
-	int iItemIndex;
+	int32_t iItemIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iItemIndex))
 		return Py_BadArgument();
 
@@ -361,8 +361,8 @@ PyObject * itemIsDetachScroll(PyObject * poSelf, PyObject * poArgs)
 	if (!pItemData)
 		return Py_BuildException("Can't find select item data");
 
-	int iType = pItemData->GetType();
-	int iSubType = pItemData->GetSubType();
+	int32_t iType = pItemData->GetType();
+	int32_t iSubType = pItemData->GetSubType();
 	if (iType == CItemData::ITEM_TYPE_USE)
 	if (iSubType == CItemData::USE_DETACHMENT)
 	{
@@ -374,7 +374,7 @@ PyObject * itemIsDetachScroll(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemCanAddToQuickSlotItem(PyObject * poSelf, PyObject * poArgs)
 {
-	int iItemIndex;
+	int32_t iItemIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iItemIndex))
 		return Py_BadArgument();
 
@@ -393,7 +393,7 @@ PyObject * itemCanAddToQuickSlotItem(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemIsKey(PyObject * poSelf, PyObject * poArgs)
 {
-	int iItemIndex;
+	int32_t iItemIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iItemIndex))
 		return Py_BadArgument();
 
@@ -412,7 +412,7 @@ PyObject * itemIsKey(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemIsMetin(PyObject * poSelf, PyObject * poArgs)
 {
-	int iItemIndex;
+	int32_t iItemIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iItemIndex))
 		return Py_BadArgument();
 
@@ -448,10 +448,10 @@ PyObject * itemUpdate(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemCreateItem(PyObject * poSelf, PyObject * poArgs)
 {
-	int iVirtualID;
+	int32_t iVirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iVirtualID))
 		return Py_BadArgument();
-	int iVirtualNumber;
+	int32_t iVirtualNumber;
 	if (!PyTuple_GetInteger(poArgs, 1, &iVirtualNumber))
 		return Py_BadArgument();
 
@@ -475,7 +475,7 @@ PyObject * itemCreateItem(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemDeleteItem(PyObject * poSelf, PyObject * poArgs)
 {
-	int iVirtualID;
+	int32_t iVirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iVirtualID))
 		return Py_BadArgument();
 
@@ -485,7 +485,7 @@ PyObject * itemDeleteItem(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * itemPick(PyObject * poSelf, PyObject * poArgs)
 {
-	DWORD dwItemID;
+	uint32_t dwItemID;
 	if (CPythonItem::Instance().GetPickedItemID(&dwItemID))
 		return Py_BuildValue("i", dwItemID);
 	else
@@ -552,7 +552,7 @@ void initItem()
 		{ "GetUnlimitedSealDate",			itemGetUnlimitedSealDate,				METH_VARARGS },
 #endif
 
-		{ NULL,								NULL,									NULL		 },
+		{ nullptr,								nullptr,									0		 },
 	};
 
 	PyObject * poModule = Py_InitModule("item", s_methods);

@@ -34,7 +34,7 @@
 // #define USE_LYCAN_CREATE_POSITION
 #ifdef USE_LYCAN_CREATE_POSITION
 
-DWORD g_lycan_create_position[4][2] =
+uint32_t g_lycan_create_position[4][2] =
 {
 	{		0,		0 },
 	{ 768000+38300, 896000+35500 },
@@ -42,14 +42,14 @@ DWORD g_lycan_create_position[4][2] =
 	{ 870400+38300, 896000+35500 },
 };
 
-inline DWORD LYCAN_CREATE_START_X(BYTE e, BYTE job)
+inline uint32_t LYCAN_CREATE_START_X(uint8_t e, uint8_t job)
 {
 	if (1 <= e && e <= 3)
 		return (job==JOB_WOLFMAN)?g_lycan_create_position[e][0]:g_create_position[e][0];
 	return 0;
 }
 
-inline DWORD LYCAN_CREATE_START_Y(BYTE e, BYTE job)
+inline uint32_t LYCAN_CREATE_START_Y(uint8_t e, uint8_t job)
 {
 	if (1 <= e && e <= 3)
 		return (job==JOB_WOLFMAN)?g_lycan_create_position[e][1]:g_create_position[e][1];
@@ -63,10 +63,10 @@ inline DWORD LYCAN_CREATE_START_Y(BYTE e, BYTE job)
 
 static void _send_bonus_info(LPCHARACTER ch)
 {
-	int	item_drop_bonus = 0;
-	int gold_drop_bonus = 0;
-	int gold10_drop_bonus	= 0;
-	int exp_bonus		= 0;
+	int32_t	item_drop_bonus = 0;
+	int32_t gold_drop_bonus = 0;
+	int32_t gold10_drop_bonus	= 0;
+	int32_t exp_bonus		= 0;
 
 	item_drop_bonus		= CPrivManager::instance().GetPriv(ch, PRIV_ITEM_DROP);
 	gold_drop_bonus		= CPrivManager::instance().GetPriv(ch, PRIV_GOLD_DROP);
@@ -141,9 +141,9 @@ void CInputLogin::Login(LPDESC d, const char * data)
 
 	if (g_iUserLimit > 0)
 	{
-		int iTotal;
-		int * paiEmpireUserCount;
-		int iLocal;
+		int32_t iTotal;
+		int32_t * paiEmpireUserCount;
+		int32_t iLocal;
 
 		DESC_MANAGER::instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
 
@@ -183,9 +183,9 @@ void CInputLogin::LoginByKey(LPDESC d, const char * data)
 
 	if (g_iUserLimit > 0)
 	{
-		int iTotal;
-		int * paiEmpireUserCount;
-		int iLocal;
+		int32_t iTotal;
+		int32_t * paiEmpireUserCount;
+		int32_t iLocal;
 
 		DESC_MANAGER::instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
 
@@ -212,7 +212,7 @@ void CInputLogin::LoginByKey(LPDESC d, const char * data)
 
 	strlcpy(ptod.szLogin, login, sizeof(ptod.szLogin));
 	ptod.dwLoginKey = pinfo->dwLoginKey;
-	memcpy(ptod.adwClientKey, pinfo->adwClientKey, sizeof(DWORD) * 4);
+	memcpy(ptod.adwClientKey, pinfo->adwClientKey, sizeof(uint32_t) * 4);
 	strlcpy(ptod.szIP, d->GetHostName(), sizeof(ptod.szIP));
 
 	db_clientdesc->DBPacket(HEADER_GD_LOGIN_BY_KEY, d->GetHandle(), &ptod, sizeof(TPacketGDLoginByKey));
@@ -285,13 +285,13 @@ void CInputLogin::CharacterSelect(LPDESC d, const char * data)
 
 bool NewPlayerTable(TPlayerTable * table,
 		const char * name,
-		BYTE job,
-		BYTE shape,
-		BYTE bEmpire,
-		BYTE bCon,
-		BYTE bInt,
-		BYTE bStr,
-		BYTE bDex)
+		uint8_t job,
+		uint8_t shape,
+		uint8_t bEmpire,
+		uint8_t bCon,
+		uint8_t bInt,
+		uint8_t bStr,
+		uint8_t bDex)
 {
 	if (job >= JOB_MAX_NUM)
 		return false;
@@ -331,7 +331,7 @@ bool NewPlayerTable(TPlayerTable * table,
 	return true;
 }
 
-bool RaceToJob(unsigned race, unsigned* ret_job)
+bool RaceToJob(uint32_t race, uint32_t* ret_job)
 {
 	*ret_job = 0;
 
@@ -384,7 +384,7 @@ bool RaceToJob(unsigned race, unsigned* ret_job)
 }
 
 // 신규 캐릭터 지원
-bool NewPlayerTable2(TPlayerTable * table, const char * name, BYTE race, BYTE shape, BYTE bEmpire)
+bool NewPlayerTable2(TPlayerTable * table, const char * name, uint8_t race, uint8_t shape, uint8_t bEmpire)
 {
 	if (race >= MAIN_RACE_MAX_NUM)
 	{
@@ -392,7 +392,7 @@ bool NewPlayerTable2(TPlayerTable * table, const char * name, BYTE race, BYTE sh
 		return false;
 	}
 
-	unsigned job;
+	uint32_t job;
 
 	if (!RaceToJob(race, &job))
 	{	
@@ -545,9 +545,9 @@ void CInputLogin::CharacterDelete(LPDESC d, const char * data)
 #pragma pack(1)
 typedef struct SPacketGTLogin
 {
-	BYTE header;
-	WORD empty;
-	DWORD id;
+	uint8_t header;
+	uint16_t empty;
+	uint32_t id;
 } TPacketGTLogin;
 #pragma pack()
 
@@ -629,9 +629,9 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 
 	_send_bonus_info(ch);
 	
-	for (int i = 0; i <= PREMIUM_MAX_NUM; ++i)
+	for (int32_t i = 0; i <= PREMIUM_MAX_NUM; ++i)
 	{
-		int remain = ch->GetPremiumRemainSeconds(i);
+		int32_t remain = ch->GetPremiumRemainSeconds(i);
 
 		if (remain <= 0)
 			continue;
@@ -655,7 +655,7 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	}
 	else if (CArenaManager::instance().IsArenaMap(ch->GetMapIndex()) == true)
 	{
-		int memberFlag = CArenaManager::instance().IsMember(ch->GetMapIndex(), ch->GetPlayerID());
+		int32_t memberFlag = CArenaManager::instance().IsMember(ch->GetMapIndex(), ch->GetPlayerID());
 		if (memberFlag == MEMBER_OBSERVER)
 		{
 			ch->SetObserverMode(true);
@@ -686,7 +686,7 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 			}
 
 			LPPARTY pParty = ch->GetParty();
-			if (pParty != NULL)
+			if (pParty != nullptr)
 			{
 				if (pParty->GetMemberCount() == 2)
 				{
@@ -730,10 +730,10 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 
 	if (ch->GetHorseLevel() > 0)
 	{
-		DWORD pid = ch->GetPlayerID();
+		uint32_t pid = ch->GetPlayerID();
 
-		if (pid != 0 && CHorseNameManager::instance().GetHorseName(pid) == NULL)
-			db_clientdesc->DBPacket(HEADER_GD_REQ_HORSE_NAME, 0, &pid, sizeof(DWORD));
+		if (pid != 0 && CHorseNameManager::instance().GetHorseName(pid) == nullptr)
+			db_clientdesc->DBPacket(HEADER_GD_REQ_HORSE_NAME, 0, &pid, sizeof(uint32_t));
 	}
 
 	// 중립맵에 들어갔을때 안내하기
@@ -762,7 +762,7 @@ void CInputLogin::Empire(LPDESC d, const char * c_pData)
 
 	if (r.bEmpire != 0)
 	{
-		for (int i = 0; i < PLAYER_PER_ACCOUNT; ++i)
+		for (int32_t i = 0; i < PLAYER_PER_ACCOUNT; ++i)
 		{
 			if (0 != r.players[i].dwID)
 			{
@@ -780,7 +780,7 @@ void CInputLogin::Empire(LPDESC d, const char * c_pData)
 	db_clientdesc->DBPacket(HEADER_GD_EMPIRE_SELECT, d->GetHandle(), &pd, sizeof(pd));
 }
 
-int CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiBytes)
+int32_t CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiBytes)
 {
 	if (uiBytes < sizeof(TPacketCGGuildSymbolUpload))
 		return -1;
@@ -792,7 +792,7 @@ int CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiBytes
 	if (uiBytes < p->size)
 		return -1;
 
-	int iSymbolSize = p->size - sizeof(TPacketCGGuildSymbolUpload);
+	int32_t iSymbolSize = p->size - sizeof(TPacketCGGuildSymbolUpload);
 
 	if (iSymbolSize <= 0 || iSymbolSize > 64 * 1024)
 	{
@@ -812,7 +812,7 @@ int CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiBytes
 
 	sys_log(0, "GuildSymbolUpload Do Upload %02X%02X%02X%02X %d", c_pData[7], c_pData[8], c_pData[9], c_pData[10], sizeof(*p));
 
-	CGuildMarkManager::instance().UploadSymbol(p->guild_id, iSymbolSize, (const BYTE*)(c_pData + sizeof(*p)));
+	CGuildMarkManager::instance().UploadSymbol(p->guild_id, iSymbolSize, (const uint8_t*)(c_pData + sizeof(*p)));
 	CGuildMarkManager::instance().SaveSymbol(GUILD_SYMBOL_FILENAME);
 	return iSymbolSize;
 }
@@ -870,8 +870,8 @@ void CInputLogin::GuildMarkUpload(LPDESC d, const char* c_pData)
 
 	bool isEmpty = true;
 
-	for (DWORD iPixel = 0; iPixel < SGuildMark::SIZE; ++iPixel)
-		if (*((DWORD *) p->image + iPixel) != 0x00000000)
+	for (uint32_t iPixel = 0; iPixel < SGuildMark::SIZE; ++iPixel)
+		if (*((uint32_t *) p->image + iPixel) != 0x00000000)
 			isEmpty = false;
 
 	if (isEmpty)
@@ -884,8 +884,8 @@ void CInputLogin::GuildMarkIDXList(LPDESC d, const char* c_pData)
 {
 	CGuildMarkManager & rkMarkMgr = CGuildMarkManager::instance();
 	
-	DWORD bufSize = sizeof(WORD) * 2 * rkMarkMgr.GetMarkCount();
-	char * buf = NULL;
+	uint32_t bufSize = sizeof(uint16_t) * 2 * rkMarkMgr.GetMarkCount();
+	char * buf = nullptr;
 
 	if (bufSize > 0)
 	{
@@ -914,19 +914,19 @@ void CInputLogin::GuildMarkCRCList(LPDESC d, const char* c_pData)
 {
 	TPacketCGMarkCRCList * pCG = (TPacketCGMarkCRCList *) c_pData;
 
-	std::map<BYTE, const SGuildMarkBlock *> mapDiffBlocks;
+	std::map<uint8_t, const SGuildMarkBlock *> mapDiffBlocks;
 	CGuildMarkManager::instance().GetDiffBlocks(pCG->imgIdx, pCG->crclist, mapDiffBlocks);
 
-	DWORD blockCount = 0;
+	uint32_t blockCount = 0;
 	TEMP_BUFFER buf(1024 * 1024); // 1M 버퍼
 
 	for (auto it = mapDiffBlocks.begin(); it != mapDiffBlocks.end(); ++it)
 	{
-		BYTE posBlock = it->first;
+		uint8_t posBlock = it->first;
 		const SGuildMarkBlock & rkBlock = *it->second;
 
-		buf.write(&posBlock, sizeof(BYTE));
-		buf.write(&rkBlock.m_sizeCompBuf, sizeof(DWORD));
+		buf.write(&posBlock, sizeof(uint8_t));
+		buf.write(&rkBlock.m_sizeCompBuf, sizeof(uint32_t));
 		buf.write(rkBlock.m_abCompBuf, rkBlock.m_sizeCompBuf);
 
 		++blockCount;
@@ -950,9 +950,9 @@ void CInputLogin::GuildMarkCRCList(LPDESC d, const char* c_pData)
 		d->Packet(&pGC, sizeof(TPacketGCMarkBlock));
 }
 
-int CInputLogin::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
+int32_t CInputLogin::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 {
-	int iExtraLen = 0;
+	int32_t iExtraLen = 0;
 
 	switch (bHeader)
 	{

@@ -3,7 +3,7 @@
 
 #include "questpc.h"
 
-extern int test_server;
+extern int32_t test_server;
 
 namespace quest
 {
@@ -23,20 +23,20 @@ namespace quest
 		public:
 			// 인자가 없는 스크립트들
 			// first: state number
-			typedef map<int, AStateScriptType> AQuestScriptType;
+			typedef map<int32_t, AStateScriptType> AQuestScriptType;
 			// first: quest number
-			typedef map<unsigned int, AQuestScriptType> QuestMapType;
+			typedef map<uint32_t, AQuestScriptType> QuestMapType;
 
 			// 인자가 있는 스크립트들
 			// first: state number
-			typedef map<int, vector<AArgScript> > AArgQuestScriptType;
+			typedef map<int32_t, vector<AArgScript> > AArgQuestScriptType;
 			// first: quest number
-			typedef map<unsigned int, AArgQuestScriptType> ArgQuestMapType;
+			typedef map<uint32_t, AArgQuestScriptType> ArgQuestMapType;
 
 			NPC();
 			~NPC();
 
-			void	Set(unsigned int vnum, const string & script_name);
+			void	Set(uint32_t vnum, const string & script_name);
 
 			static bool HasStartState(const AQuestScriptType & q)
 			{
@@ -58,23 +58,23 @@ namespace quest
 #endif
 			bool	OnTimer(PC& pc);
 			bool	OnLevelUp(PC& pc);
-			bool	OnLogin(PC& pc, const char * c_pszQuestName = NULL);
+			bool	OnLogin(PC& pc, const char * c_pszQuestName = nullptr);
 			bool	OnLogout(PC& pc);
-			bool	OnButton(PC& pc, unsigned int quest_index);
-			bool	OnInfo(PC& pc, unsigned int quest_index);
+			bool	OnButton(PC& pc, uint32_t quest_index);
+			bool	OnInfo(PC& pc, uint32_t quest_index);
 			bool	OnAttrIn(PC& pc);
 			bool	OnAttrOut(PC& pc);
 			bool	OnUseItem(PC& pc, bool bReceiveAll);
 			bool	OnTakeItem(PC& pc);
-			bool	OnEnterState(PC& pc, DWORD quest_index, int state);
-			bool	OnLeaveState(PC& pc, DWORD quest_index, int state);
-			bool	OnLetter(PC& pc, DWORD quest_index, int state);
+			bool	OnEnterState(PC& pc, uint32_t quest_index, int32_t state);
+			bool	OnLeaveState(PC& pc, uint32_t quest_index, int32_t state);
+			bool	OnLetter(PC& pc, uint32_t quest_index, int32_t state);
 			bool	OnChat(PC& pc);
 			bool	HasChat();
 
-			bool	OnItemInformer(PC& pc,unsigned int vnum);	// 독일 선물 기능 테스트
+			bool	OnItemInformer(PC& pc,uint32_t vnum);	// 독일 선물 기능 테스트
 
-			bool	OnTarget(PC& pc, DWORD dwQuestIndex, const char * c_pszTargetName, const char * c_pszVerb, bool & bRet);
+			bool	OnTarget(PC& pc, uint32_t dwQuestIndex, const char * c_pszTargetName, const char * c_pszVerb, bool & bRet);
 			bool	OnUnmount(PC& pc);
 
 			// ITEM_PICK EVENT
@@ -83,13 +83,13 @@ namespace quest
 			bool	OnSIGUse(PC& pc, bool bReceiveAll);
 
 
-			bool	HandleEvent(PC& pc, int EventIndex);
-			bool	HandleReceiveAllEvent(PC& pc, int EventIndex);
-			bool	HandleReceiveAllNoWaitEvent(PC& pc, int EventIndex);
+			bool	HandleEvent(PC& pc, int32_t EventIndex);
+			bool	HandleReceiveAllEvent(PC& pc, int32_t EventIndex);
+			bool	HandleReceiveAllNoWaitEvent(PC& pc, int32_t EventIndex);
 
-			bool	ExecuteEventScript(PC& pc, int EventIndex, DWORD dwQuestIndex, int iState);
+			bool	ExecuteEventScript(PC& pc, int32_t EventIndex, uint32_t dwQuestIndex, int32_t iState);
 
-			unsigned int GetVnum() { return m_vnum; }
+			uint32_t GetVnum() { return m_vnum; }
 
 
 		protected:
@@ -98,9 +98,9 @@ namespace quest
 
 			// true if quest still running, false if ended
 
-			void LoadStateScript(int idx, const char* filename, const char* script_name);
+			void LoadStateScript(int32_t idx, const char* filename, const char* script_name);
 
-			unsigned int m_vnum;
+			uint32_t m_vnum;
 			QuestMapType m_mapOwnQuest[QUEST_EVENT_COUNT];
 			ArgQuestMapType m_mapOwnArgQuest[QUEST_EVENT_COUNT];
 			//map<string, AStartConditionScriptType> m_mapStartCondition[QUEST_EVENT_COUNT];

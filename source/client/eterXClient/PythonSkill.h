@@ -161,21 +161,21 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 		} TAffectDataNew;
 		typedef struct SRequireStatData
 		{
-			BYTE byPoint;
-			BYTE byLevel;
+			uint8_t byPoint;
+			uint8_t byLevel;
 		} TRequireStatData;
 		typedef struct SGradeData
 		{
 			std::string strName;
 			CGraphicImage * pImage;
-			WORD wMotionIndex;
+			uint16_t wMotionIndex;
 		} TGradeData;
 		typedef struct SSkillData
 		{
-			static DWORD MELEE_SKILL_TARGET_RANGE;
+			static uint32_t MELEE_SKILL_TARGET_RANGE;
 			// Functions
 			SSkillData();
-			DWORD GetTargetRange() const;
+			uint32_t GetTargetRange() const;
 			BOOL CanChangeDirection();
 			BOOL IsFanRange();
 			BOOL IsCircleRange();
@@ -185,7 +185,7 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 			BOOL IsToggleSkill();
 			BOOL IsUseHPSkill();
 			BOOL IsStandingSkill();
-			BOOL CanUseWeaponType(DWORD dwWeaponType);
+			BOOL CanUseWeaponType(uint32_t dwWeaponType);
 			BOOL IsOnlyForAlliance();
 			BOOL CanUseForMe();
 			BOOL CanUseIfNotEnough();
@@ -200,33 +200,33 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 			BOOL IsChargeSkill();
 			BOOL IsOnlyForGuildWar();
 
-			bool GetState(const char * c_szStateName, int * piState, int iMinMaxType = VALUE_TYPE_FREE);
-			float ProcessFormula(CPoly * pPoly, float fSkillLevel = 0.0f, int iMinMaxType = VALUE_TYPE_FREE);
-			const char * GetAffectDescription(DWORD dwIndex, float fSkillLevel);
-			DWORD GetSkillCoolTime(float fSkillPoint);
-			int GetNeedSP(float fSkillPoint);
-			DWORD GetContinuationSP(float fSkillPoint);
-			DWORD GetMotionLoopCount(float fSkillPoint);
-			DWORD GetTargetCount(float fSkillPoint);
-			DWORD GetDuration(float fSkillPoint);
-			DWORD GetSkillMotionIndex(int iGrade=-1);
-			BYTE GetMaxLevel();
-			BYTE GetLevelUpPoint();
+			bool GetState(const char * c_szStateName, int32_t * piState, int32_t iMinMaxType = VALUE_TYPE_FREE);
+			float ProcessFormula(CPoly * pPoly, float fSkillLevel = 0.0f, int32_t iMinMaxType = VALUE_TYPE_FREE);
+			const char * GetAffectDescription(uint32_t dwIndex, float fSkillLevel);
+			uint32_t GetSkillCoolTime(float fSkillPoint);
+			int32_t GetNeedSP(float fSkillPoint);
+			uint32_t GetContinuationSP(float fSkillPoint);
+			uint32_t GetMotionLoopCount(float fSkillPoint);
+			uint32_t GetTargetCount(float fSkillPoint);
+			uint32_t GetDuration(float fSkillPoint);
+			uint32_t GetSkillMotionIndex(int32_t iGrade=-1);
+			uint8_t GetMaxLevel();
+			uint8_t GetLevelUpPoint();
 			bool IsCanUseSkill();
 			BOOL IsNoMotion();
 
 			const std::string GetName() const;
-			BYTE GetType() const;
+			uint8_t GetType() const;
 
 			///////////////////////////////////////////////////////////////////////////////////////
 			///////////////////////////////////////////////////////////////////////////////////////
 
 			// Variable
-			BYTE byType;
-			DWORD dwSkillIndex;
-			BYTE byMaxLevel;
-			BYTE byLevelUpPoint;
-			BYTE byLevelLimit;
+			uint8_t byType;
+			uint32_t dwSkillIndex;
+			uint8_t byMaxLevel;
+			uint8_t byLevelUpPoint;
+			uint8_t byLevelLimit;
 			BOOL bNoMotion;
 
 			std::string strName;
@@ -245,15 +245,15 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 			std::string strContinuationSPFormula;
 			std::string strDuration;
 
-			DWORD dwSkillAttribute;
-			DWORD dwNeedWeapon;
-			DWORD dwTargetRange;
-			WORD wMotionIndex; // 없어질 변수
-			WORD wMotionIndexForMe; // 없어질 변수
+			uint32_t dwSkillAttribute;
+			uint32_t dwNeedWeapon;
+			uint32_t dwTargetRange;
+			uint16_t wMotionIndex; // 없어질 변수
+			uint16_t wMotionIndexForMe; // 없어질 변수
 
 			BOOL isRequirement;
 			std::string strRequireSkillName;
-			BYTE byRequireSkillLevel;
+			uint8_t byRequireSkillLevel;
 
 			TGradeData GradeData[SKILL_EFFECT_COUNT];
 
@@ -261,14 +261,14 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 
 			/////
 
-			static std::map<std::string, DWORD> ms_StatusNameMap;
-			static std::map<std::string, DWORD> ms_NewMinStatusNameMap;
-			static std::map<std::string, DWORD> ms_NewMaxStatusNameMap;
-			static DWORD ms_dwTimeIncreaseSkillNumber;
+			static std::map<std::string, uint32_t> ms_StatusNameMap;
+			static std::map<std::string, uint32_t> ms_NewMinStatusNameMap;
+			static std::map<std::string, uint32_t> ms_NewMaxStatusNameMap;
+			static uint32_t ms_dwTimeIncreaseSkillNumber;
 		} TSkillData;
 
-		typedef std::map<DWORD, TSkillData> TSkillDataMap;
-		typedef std::map<DWORD, DWORD> TSkillMotionIndexMap;
+		typedef std::map<uint32_t, TSkillData> TSkillDataMap;
+		typedef std::map<uint32_t, uint32_t> TSkillMotionIndexMap;
 		typedef std::map<std::string, std::string> TPathNameMap;
 
 	public:
@@ -276,10 +276,10 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 		virtual ~CPythonSkill();
 
 		void Destroy();
-		bool RegisterSkill(DWORD dwSkillIndex, const char * c_szFileName);
+		bool RegisterSkill(uint32_t dwSkillIndex, const char * c_szFileName);
 		bool RegisterSkillTable(const char * c_szFileName);
 		bool RegisterSkillDesc(const char * c_szFileName);
-		BOOL GetSkillData(DWORD dwSkillIndex, TSkillData ** ppSkillData);
+		BOOL GetSkillData(uint32_t dwSkillIndex, TSkillData ** ppSkillData);
 		bool GetSkillDataByName(const char * c_szName, TSkillData ** ppSkillData);
 
 		void SetPathName(const char * c_szFileName);
@@ -296,9 +296,9 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 
 		std::string m_strPathName;
 
-		std::map<std::string, DWORD> m_SkillTypeIndexMap;
-		std::map<std::string, DWORD> m_SkillAttributeIndexMap;
-		std::map<std::string, DWORD> m_SkillNeedWeaponIndexMap;
-		std::map<std::string, DWORD> m_SkillWeaponTypeIndexMap;
+		std::map<std::string, uint32_t> m_SkillTypeIndexMap;
+		std::map<std::string, uint32_t> m_SkillAttributeIndexMap;
+		std::map<std::string, uint32_t> m_SkillNeedWeaponIndexMap;
+		std::map<std::string, uint32_t> m_SkillWeaponTypeIndexMap;
 		TPathNameMap m_PathNameMap;
 };

@@ -12,7 +12,7 @@ void CGraphicObjectInstance::Clear()
 	if (m_CullingHandle)
 	{
 		CCullingManager::Instance().Unregister(m_CullingHandle);
-		m_CullingHandle = NULL;
+		m_CullingHandle = nullptr;
 	}
 
 	ClearHeightInstance();
@@ -251,7 +251,7 @@ bool CGraphicObjectInstance::isShow()
 
 //////////////////////////////////////////////////////////////////////////
 
-D3DXVECTOR4 & CGraphicObjectInstance::GetWTBBoxVertex(const unsigned char & c_rucNumTBBoxVertex)
+D3DXVECTOR4 & CGraphicObjectInstance::GetWTBBoxVertex(const uint8_t & c_rucNumTBBoxVertex)
 {
 	return m_v4TBBox[c_rucNumTBBoxVertex];
 }
@@ -281,8 +281,8 @@ bool CGraphicObjectInstance::isIntersect(const CRay & c_rRay, float * pu, float 
 						  3, 2, 7, 2, 6, 7,
 						  4, 5, 6, 5, 7, 6};
 
-	int triCount = 12;
-	WORD* pcurIdx = (WORD*)Indices;
+	int32_t triCount = 12;
+	uint16_t* pcurIdx = (uint16_t*)Indices;
 
 	while (triCount--)
 	{
@@ -313,7 +313,7 @@ void CGraphicObjectInstance::Initialize()
 		CCullingManager::Instance().Unregister(m_CullingHandle);
 	m_CullingHandle = 0;
 
-	m_pHeightAttributeInstance = NULL;
+	m_pHeightAttributeInstance = nullptr;
 	
 	m_isVisible = TRUE;	
 
@@ -423,12 +423,12 @@ void CGraphicObjectInstance::UpdateCollisionData(const CStaticCollisionDataVecto
 	OnUpdateCollisionData(pscdVector);
 }
 
-DWORD CGraphicObjectInstance::GetCollisionInstanceCount()
+uint32_t CGraphicObjectInstance::GetCollisionInstanceCount()
 {
 	return m_StaticCollisionInstanceVector.size();
 }
 
-CBaseCollisionInstance * CGraphicObjectInstance::GetCollisionInstanceData(DWORD dwIndex)
+CBaseCollisionInstance * CGraphicObjectInstance::GetCollisionInstanceData(uint32_t dwIndex)
 {
 	if (dwIndex>m_StaticCollisionInstanceVector.size())
 	{
@@ -447,7 +447,7 @@ void CGraphicObjectInstance::SetHeightInstance(CAttributeInstance * pAttributeIn
 
 void CGraphicObjectInstance::ClearHeightInstance()
 {
-	m_pHeightAttributeInstance = NULL;
+	m_pHeightAttributeInstance = nullptr;
 }
 
 void CGraphicObjectInstance::UpdateHeightInstance(CAttributeInstance * pAttributeInstance)
@@ -472,7 +472,7 @@ bool CGraphicObjectInstance::GetObjectHeight(float fX, float fY, float * pfHeigh
 	return OnGetObjectHeight(fX, fY, pfHeight);
 }
 
-void CGraphicObjectInstance::SetPortal(DWORD dwIndex, int iID)
+void CGraphicObjectInstance::SetPortal(uint32_t dwIndex, int32_t iID)
 {
 	if (dwIndex >= PORTAL_ID_MAX_NUM)
 	{
@@ -483,7 +483,7 @@ void CGraphicObjectInstance::SetPortal(DWORD dwIndex, int iID)
 	m_abyPortalID[dwIndex] = iID;
 }
 
-int CGraphicObjectInstance::GetPortal(DWORD dwIndex)
+int32_t CGraphicObjectInstance::GetPortal(uint32_t dwIndex)
 {
 	if (dwIndex >= PORTAL_ID_MAX_NUM)
 	{

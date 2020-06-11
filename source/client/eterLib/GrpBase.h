@@ -9,7 +9,7 @@ void D3DXVECTOR3ToPixelPosition(const D3DXVECTOR3& c_rv3Src, D3DXVECTOR3* pv3Dst
 
 class CGraphicTexture;
 
-typedef WORD TIndex;
+typedef uint16_t TIndex;
 
 typedef struct SFace
 {
@@ -22,21 +22,21 @@ typedef D3DXVECTOR3 TNormal;
 
 typedef D3DXVECTOR2 TTextureCoordinate;
 
-typedef DWORD TDiffuse;
-typedef DWORD TAmbient;
-typedef DWORD TSpecular;
+typedef uint32_t TDiffuse;
+typedef uint32_t TAmbient;
+typedef uint32_t TSpecular;
 
 typedef union UDepth
 {
 	float	f;
-	long	l;
-	DWORD	dw;
+	int32_t	l;
+	uint32_t	dw;
 } TDepth;
 
 typedef struct SVertex
 {
 	float x, y, z;
-	DWORD color;
+	uint32_t color;
 	float u, v;
 } TVertex;
 
@@ -53,13 +53,13 @@ struct SPVertex
 typedef struct SPDVertex
 {
 	float x, y, z;
-	DWORD color;
+	uint32_t color;
 } TPDVertex;
 
 struct SPDTVertexRaw
 {
 	float px, py, pz;
-	DWORD diffuse;
+	uint32_t diffuse;
 	float u, v;
 };
 
@@ -94,14 +94,14 @@ typedef struct SPNT2Vertex
 typedef struct SPDT2Vertex
 {	
 	TPosition	position;
-	DWORD		diffuse;	
+	uint32_t		diffuse;	
 	TTextureCoordinate texCoord;
 	TTextureCoordinate texCoord2;
 } TPDT2Vertex;
 
 typedef struct SNameInfo
 {
-	DWORD	name;
+	uint32_t	name;
 	TDepth	depth;
 } TNameInfo;
 
@@ -109,11 +109,11 @@ typedef struct SBoundBox
 {
 	float sx, sy, sz;
 	float ex, ey, ez;
-	int meshIndex;
-	int boneIndex;
+	int32_t meshIndex;
+	int32_t boneIndex;
 } TBoundBox;
 
-const WORD c_FillRectIndices[6] = { 0, 2, 1, 2, 3, 1 };
+const uint16_t c_FillRectIndices[6] = { 0, 2, 1, 2, 3, 1 };
 
 /*
 enum EIndexCount
@@ -131,7 +131,7 @@ enum EIndexCount
 class CGraphicBase
 {
 	public:
-		static DWORD GetAvailableTextureMemory();
+		static uint32_t GetAvailableTextureMemory();
 		static const D3DXMATRIX& GetViewMatrix();
 		static const D3DXMATRIX & GetIdentityMatrix();
 
@@ -190,29 +190,29 @@ class CGraphicBase
 
 		////////////////////////////////////////////////////////////////////////
 		void		InitScreenEffect();
-		void		SetScreenEffectWaving(float fDuringTime, int iPower);
+		void		SetScreenEffectWaving(float fDuringTime, int32_t iPower);
 		void		SetScreenEffectFlashing(float fDuringTime, const D3DXCOLOR & c_rColor);
 
 		////////////////////////////////////////////////////////////////////////
-		DWORD		GetColor(float r, float g, float b, float a = 1.0f);
+		uint32_t		GetColor(float r, float g, float b, float a = 1.0f);
 
-		DWORD		GetFaceCount();
+		uint32_t		GetFaceCount();
 		void		ResetFaceCount();
 		HRESULT		GetLastResult();
 
 		void		UpdateProjMatrix();
 		void		UpdateViewMatrix();
 		
-		void		SetViewport(DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwHeight, float fMinZ, float fMaxZ);
-		static void		GetBackBufferSize(UINT* puWidth, UINT* puHeight);
+		void		SetViewport(uint32_t dwX, uint32_t dwY, uint32_t dwWidth, uint32_t dwHeight, float fMinZ, float fMaxZ);
+		static void		GetBackBufferSize(uint32_t* puWidth, uint32_t* puHeight);
 		static bool		IsTLVertexClipping();
 		static bool		IsFastTNL();
 		static bool		IsLowTextureMemory();
 		static bool		IsHighTextureMemory();
 
-		static void SetDefaultIndexBuffer(UINT eDefIB);
-		static bool SetPDTStream(SPDTVertexRaw* pVertices, UINT uVtxCount);
-		static bool SetPDTStream(SPDTVertex* pVertices, UINT uVtxCount);
+		static void SetDefaultIndexBuffer(uint32_t eDefIB);
+		static bool SetPDTStream(SPDTVertexRaw* pVertices, uint32_t uVtxCount);
+		static bool SetPDTStream(SPDTVertex* pVertices, uint32_t uVtxCount);
 		
 	protected:
 		static D3DXMATRIX				ms_matIdentity;
@@ -237,12 +237,12 @@ class CGraphicBase
 	protected:
 		static HRESULT					ms_hLastResult;
 
-		static int						ms_iWidth;
-		static int						ms_iHeight;
+		static int32_t						ms_iWidth;
+		static int32_t						ms_iHeight;
 
-		static UINT						ms_iD3DAdapterInfo;
-		static UINT						ms_iD3DDevInfo;
-		static UINT						ms_iD3DModeInfo;		
+		static uint32_t						ms_iD3DAdapterInfo;
+		static uint32_t						ms_iD3DDevInfo;
+		static uint32_t						ms_iD3DModeInfo;		
 		static D3D_CDisplayModeAutoDetector				ms_kD3DDetector;
 
 		static HWND						ms_hWnd;
@@ -252,14 +252,14 @@ class CGraphicBase
 		static ID3DXMatrixStack*		ms_lpd3dMatStack;
 		static D3DVIEWPORT8				ms_Viewport;
 
-		static DWORD					ms_faceCount;
+		static uint32_t					ms_faceCount;
 		static D3DCAPS8					ms_d3dCaps;
 		static D3DPRESENT_PARAMETERS	ms_d3dPresentParameter;
 		
-		static DWORD					ms_dwD3DBehavior;
-		static DWORD					ms_ptVS;
-		static DWORD					ms_pntVS;
-		static DWORD					ms_pnt2VS;
+		static uint32_t					ms_dwD3DBehavior;
+		static uint32_t					ms_ptVS;
+		static uint32_t					ms_pntVS;
+		static uint32_t					ms_pnt2VS;
 
 		static D3DXMATRIX				ms_matScreen0;
 		static D3DXMATRIX				ms_matScreen1;
@@ -287,9 +287,9 @@ class CGraphicBase
 		*/
 
 		// Screen Effect - Waving, Flashing and so on..
-		static DWORD					ms_dwWavingEndTime;
-		static int						ms_iWavingPower;
-		static DWORD					ms_dwFlashingEndTime;
+		static uint32_t					ms_dwWavingEndTime;
+		static int32_t						ms_iWavingPower;
+		static uint32_t					ms_dwFlashingEndTime;
 		static D3DXCOLOR				ms_FlashingColor;
 
 		// Terrain picking용 Ray... CCamera 이용하는 버전.. 기존의 Ray와 통합 필요...

@@ -26,8 +26,8 @@ class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUp
 		virtual ~CGuildMarkUploader();
 
 		void Disconnect();
-		bool Connect(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey, DWORD dwGuildID, const char* c_szFileName, UINT* peError);
-		bool ConnectToSendSymbol(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey, DWORD dwGuildID, const char* c_szFileName, UINT* peError);
+		bool Connect(const CNetworkAddress& c_rkNetAddr, uint32_t dwHandle, uint32_t dwRandomKey, uint32_t dwGuildID, const char* c_szFileName, uint32_t* peError);
+		bool ConnectToSendSymbol(const CNetworkAddress& c_rkNetAddr, uint32_t dwHandle, uint32_t dwRandomKey, uint32_t dwGuildID, const char* c_szFileName, uint32_t* peError);
 		bool IsCompleteUploading();
 
 		void Process();
@@ -46,8 +46,8 @@ class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUp
 		void OnRemoteDisconnect();
 		void OnDisconnect();
 
-		bool __Load(const char* c_szFileName, UINT* peError);
-		bool __LoadSymbol(const char* c_szFileName, UINT* peError);
+		bool __Load(const char* c_szFileName, uint32_t* peError);
+		bool __LoadSymbol(const char* c_szFileName, uint32_t* peError);
 
 		bool __Save(const char* c_szFileName);
 
@@ -67,22 +67,22 @@ class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUp
 		bool __LoginState_RecvKeyAgreementCompleted();
 #endif
 
-		bool __AnalyzePacket(UINT uHeader, UINT uPacketSize, bool (CGuildMarkUploader::*pfnDispatchPacket)());
+		bool __AnalyzePacket(uint32_t uHeader, uint32_t uPacketSize, bool (CGuildMarkUploader::*pfnDispatchPacket)());
 
 		bool __SendMarkPacket();
 		bool __SendSymbolPacket();
 
 	private:
-		UINT m_eState;
+		uint32_t m_eState;
 
-		DWORD m_dwSendType;
-		DWORD m_dwHandle;
-		DWORD m_dwRandomKey;
-		DWORD m_dwGuildID;
+		uint32_t m_dwSendType;
+		uint32_t m_dwHandle;
+		uint32_t m_dwRandomKey;
+		uint32_t m_dwGuildID;
 
 		SGuildMark m_kMark;
 
-		DWORD m_dwSymbolBufSize;
-		DWORD m_dwSymbolCRC32;
-		BYTE * m_pbySymbolBuf;
+		uint32_t m_dwSymbolBufSize;
+		uint32_t m_dwSymbolCRC32;
+		uint8_t * m_pbySymbolBuf;
 };

@@ -6,18 +6,18 @@
 
 PyObject* grpCreateTextBar(PyObject* poSelf, PyObject* poArgs)
 {
-	int iWidth;
+	int32_t iWidth;
 	if (!PyTuple_GetInteger(poArgs, 0, &iWidth))
 		return Py_BuildException();
-	int iHeight;
+	int32_t iHeight;
 	if (!PyTuple_GetInteger(poArgs, 1, &iHeight))
 		return Py_BuildException();
 
 	CTextBar * pTextBar = new CTextBar(12, false);
-	if (!pTextBar->Create(NULL, iWidth, iHeight))
+	if (!pTextBar->Create(nullptr, iWidth, iHeight))
 	{
 		delete pTextBar;
-		return Py_BuildValue("i", NULL);
+		return Py_BuildValue("i", nullptr);
 	}
 
 	return Py_BuildValue("i", pTextBar);
@@ -25,22 +25,22 @@ PyObject* grpCreateTextBar(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpCreateBigTextBar(PyObject* poSelf, PyObject* poArgs)
 {
-	int iWidth;
+	int32_t iWidth;
 	if (!PyTuple_GetInteger(poArgs, 0, &iWidth))
 		return Py_BuildException();
-	int iHeight;
+	int32_t iHeight;
 	if (!PyTuple_GetInteger(poArgs, 1, &iHeight))
 		return Py_BuildException();
 
-	int iFontSize;
+	int32_t iFontSize;
 	if (!PyTuple_GetInteger(poArgs, 2, &iFontSize))
 		return Py_BuildException();
 
 	CTextBar * pTextBar = new CTextBar(iFontSize, true);
-	if (!pTextBar->Create(NULL, iWidth, iHeight))
+	if (!pTextBar->Create(nullptr, iWidth, iHeight))
 	{
 		delete pTextBar;
-		return Py_BuildValue("i", NULL);
+		return Py_BuildValue("i", nullptr);
 	}
 
 	return Py_BuildValue("i", pTextBar);
@@ -48,7 +48,7 @@ PyObject* grpCreateBigTextBar(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpDestroyTextBar(PyObject* poSelf, PyObject* poArgs)
 {
-	int iHandle;
+	int32_t iHandle;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
 
@@ -60,13 +60,13 @@ PyObject* grpDestroyTextBar(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpRenderTextBar(PyObject* poSelf, PyObject* poArgs)
 {
-	int iHandle;
+	int32_t iHandle;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
-	int ix;
+	int32_t ix;
 	if (!PyTuple_GetInteger(poArgs, 1, &ix))
 		return Py_BuildException();
-	int iy;
+	int32_t iy;
 	if (!PyTuple_GetInteger(poArgs, 2, &iy))
 		return Py_BuildException();
 
@@ -79,16 +79,16 @@ PyObject* grpRenderTextBar(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpTextBarSetTextColor(PyObject* poSelf, PyObject* poArgs)
 {
-	int iHandle;
+	int32_t iHandle;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
-	int r;
+	int32_t r;
 	if (!PyTuple_GetInteger(poArgs, 1, &r))
 		return Py_BuildException();
-	int g;
+	int32_t g;
 	if (!PyTuple_GetInteger(poArgs, 2, &g))
 		return Py_BuildException();
-	int b;
+	int32_t b;
 	if (!PyTuple_GetInteger(poArgs, 3, &b))
 		return Py_BuildException();
 	
@@ -101,7 +101,7 @@ PyObject* grpTextBarSetTextColor(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpTextBarGetTextExtent(PyObject* poSelf, PyObject* poArgs)
 {
-	int iHandle;
+	int32_t iHandle;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
 	char * szText;
@@ -118,13 +118,13 @@ PyObject* grpTextBarGetTextExtent(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpTextBarTextOut(PyObject* poSelf, PyObject* poArgs)
 {
-	int iHandle;
+	int32_t iHandle;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
-	int ix;
+	int32_t ix;
 	if (!PyTuple_GetInteger(poArgs, 1, &ix))
 		return Py_BuildException();
-	int iy;
+	int32_t iy;
 	if (!PyTuple_GetInteger(poArgs, 2, &iy))
 		return Py_BuildException();
 	char * szText;
@@ -140,7 +140,7 @@ PyObject* grpTextBarTextOut(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpClearTextBar(PyObject* poSelf, PyObject* poArgs)
 {
-	int iHandle;
+	int32_t iHandle;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
 
@@ -153,19 +153,19 @@ PyObject* grpClearTextBar(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpSetTextBarClipRect(PyObject* poSelf, PyObject* poArgs)
 {
-	int iHandle;
+	int32_t iHandle;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
-	int isx;
+	int32_t isx;
 	if (!PyTuple_GetInteger(poArgs, 1, &isx))
 		return Py_BuildException();
-	int isy;
+	int32_t isy;
 	if (!PyTuple_GetInteger(poArgs, 2, &isy))
 		return Py_BuildException();
-	int iex;
+	int32_t iex;
 	if (!PyTuple_GetInteger(poArgs, 3, &iex))
 		return Py_BuildException();
-	int iey;
+	int32_t iey;
 	if (!PyTuple_GetInteger(poArgs, 4, &iey))
 		return Py_BuildException();
 
@@ -456,11 +456,11 @@ PyObject* grpGenerateColor(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpSetColor(PyObject* poSelf, PyObject* poArgs)
 {
-	int color;
+	int32_t color;
 	if (!PyTuple_GetInteger(poArgs, 0, &color))
 		return Py_BuildException();
 
-	CPythonGraphic::Instance().SetDiffuseColor(DWORD(color));
+	CPythonGraphic::Instance().SetDiffuseColor(uint32_t(color));
 	return Py_BuildNone();
 }
 
@@ -483,10 +483,10 @@ PyObject* grpGetCursorPosition3d(PyObject * poSelf, PyObject * poArgs)
 
 PyObject* grpSetCursorPosition(PyObject * poSelf, PyObject * poArgs)
 {
-	int ix;
+	int32_t ix;
 	if (!PyTuple_GetInteger(poArgs, 0, &ix))
 		return Py_BuildException();
-	int iy;
+	int32_t iy;
 	if (!PyTuple_GetInteger(poArgs, 1, &iy))
 		return Py_BuildException();
 
@@ -496,19 +496,19 @@ PyObject* grpSetCursorPosition(PyObject * poSelf, PyObject * poArgs)
 
 PyObject* grpRenderLine(PyObject* poSelf, PyObject* poArgs)
 {
-	int x;
+	int32_t x;
 	if (!PyTuple_GetInteger(poArgs, 0, &x))
 		return Py_BuildException();
 
-	int y;
+	int32_t y;
 	if (!PyTuple_GetInteger(poArgs, 1, &y))
 		return Py_BuildException();
 
-	int width;
+	int32_t width;
 	if (!PyTuple_GetInteger(poArgs, 2, &width))
 		return Py_BuildException();
 
-	int height;
+	int32_t height;
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BuildException();
 
@@ -518,19 +518,19 @@ PyObject* grpRenderLine(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpRenderRoundBox(PyObject* poSelf, PyObject* poArgs)
 {
-	int x;
+	int32_t x;
 	if (!PyTuple_GetInteger(poArgs, 0, &x))
 		return Py_BuildException();
 
-	int y;
+	int32_t y;
 	if (!PyTuple_GetInteger(poArgs, 1, &y))
 		return Py_BuildException();
 
-	int width;
+	int32_t width;
 	if (!PyTuple_GetInteger(poArgs, 2, &width))
 		return Py_BuildException();
 
-	int height;
+	int32_t height;
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BuildException();
 
@@ -552,19 +552,19 @@ PyObject* grpRenderRoundBox(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpRenderBox(PyObject* poSelf, PyObject* poArgs)
 {
-	int x;
+	int32_t x;
 	if (!PyTuple_GetInteger(poArgs, 0, &x))
 		return Py_BuildException();
 
-	int y;
+	int32_t y;
 	if (!PyTuple_GetInteger(poArgs, 1, &y))
 		return Py_BuildException();
 
-	int width;
+	int32_t width;
 	if (!PyTuple_GetInteger(poArgs, 2, &width))
 		return Py_BuildException();
 
-	int height;
+	int32_t height;
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BuildException();
 
@@ -574,19 +574,19 @@ PyObject* grpRenderBox(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpRenderBar(PyObject* poSelf, PyObject* poArgs)
 {
-	int x;
+	int32_t x;
 	if (!PyTuple_GetInteger(poArgs, 0, &x))
 		return Py_BuildException();
 
-	int y;
+	int32_t y;
 	if (!PyTuple_GetInteger(poArgs, 1, &y))
 		return Py_BuildException();
 
-	int width;
+	int32_t width;
 	if (!PyTuple_GetInteger(poArgs, 2, &width))
 		return Py_BuildException();
 
-	int height;
+	int32_t height;
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BuildException();
 
@@ -626,27 +626,27 @@ PyObject* grpRenderCube(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpRenderBar3d(PyObject* poSelf, PyObject* poArgs)
 {
-	int sx;
+	int32_t sx;
 	if (!PyTuple_GetInteger(poArgs, 0, &sx))
 		return Py_BuildException();
 
-	int sy;
+	int32_t sy;
 	if (!PyTuple_GetInteger(poArgs, 1, &sy))
 		return Py_BuildException();
 
-	int sz;
+	int32_t sz;
 	if (!PyTuple_GetInteger(poArgs, 2, &sz))
 		return Py_BuildException();
 
-	int ex;
+	int32_t ex;
 	if (!PyTuple_GetInteger(poArgs, 3, &ex))
 		return Py_BuildException();
 
-	int ey;
+	int32_t ey;
 	if (!PyTuple_GetInteger(poArgs, 4, &ey))
 		return Py_BuildException();
 
-	int ez;
+	int32_t ez;
 	if (!PyTuple_GetInteger(poArgs, 5, &ez))
 		return Py_BuildException();
 
@@ -656,27 +656,27 @@ PyObject* grpRenderBar3d(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * grpRenderGradationBar(PyObject* poSelf, PyObject* poArgs)
 {
-	int x;
+	int32_t x;
 	if (!PyTuple_GetInteger(poArgs, 0, &x))
 		return Py_BadArgument();
 
-	int y;
+	int32_t y;
 	if (!PyTuple_GetInteger(poArgs, 1, &y))
 		return Py_BadArgument();
 
-	int width;
+	int32_t width;
 	if (!PyTuple_GetInteger(poArgs, 2, &width))
 		return Py_BadArgument();
 
-	int height;
+	int32_t height;
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BadArgument();
 
-	int iStartColor;
+	int32_t iStartColor;
 	if (!PyTuple_GetInteger(poArgs, 4, &iStartColor))
 		return Py_BadArgument();
 
-	int iEndColor;
+	int32_t iEndColor;
 	if (!PyTuple_GetInteger(poArgs, 5, &iEndColor))
 		return Py_BadArgument();
 
@@ -686,19 +686,19 @@ PyObject * grpRenderGradationBar(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpRenderDownButton(PyObject* poSelf, PyObject* poArgs)
 {
-	int x;
+	int32_t x;
 	if (!PyTuple_GetInteger(poArgs, 0, &x))
 		return Py_BuildException();
 
-	int y;
+	int32_t y;
 	if (!PyTuple_GetInteger(poArgs, 1, &y))
 		return Py_BuildException();
 
-	int width;
+	int32_t width;
 	if (!PyTuple_GetInteger(poArgs, 2, &width))
 		return Py_BuildException();
 
-	int height;
+	int32_t height;
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BuildException();
 
@@ -708,19 +708,19 @@ PyObject* grpRenderDownButton(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpRenderUpButton(PyObject* poSelf, PyObject* poArgs)
 {
-	int x;
+	int32_t x;
 	if (!PyTuple_GetInteger(poArgs, 0, &x))
 		return Py_BuildException();
 
-	int y;
+	int32_t y;
 	if (!PyTuple_GetInteger(poArgs, 1, &y))
 		return Py_BuildException();
 
-	int width;
+	int32_t width;
 	if (!PyTuple_GetInteger(poArgs, 2, &width))
 		return Py_BuildException();
 
-	int height;
+	int32_t height;
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BuildException();
 
@@ -806,7 +806,7 @@ PyObject * grpIdentity(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * grpGetAvailableMemory(PyObject * poSelf, PyObject * poArgs)
 {
-	int iValue = CPythonGraphic::Instance().GetAvailableMemory();
+	int32_t iValue = CPythonGraphic::Instance().GetAvailableMemory();
 	return Py_BuildValue("i", iValue);
 }
 
@@ -846,12 +846,12 @@ PyObject * grpSaveScreenShot(PyObject * poSelf, PyObject * poArgs)
 	tmNow = localtime(&ct);
 
 	char szPath[MAX_PATH + 256];
-	SHGetSpecialFolderPath(NULL, szPath, CSIDL_PERSONAL, TRUE);
+	SHGetSpecialFolderPath(nullptr, szPath, CSIDL_PERSONAL, TRUE);
 	//GetTempPath();
 	strcat(szPath, "\\METIN2\\");
 
 	if (-1 == _access(szPath, 0))
-		if (!CreateDirectory(szPath, NULL))
+		if (!CreateDirectory(szPath, nullptr))
 		{
 			TraceError("Failed to create directory [%s]\n", szPath);
 			return Py_BuildValue("(is)", FALSE, "");
@@ -907,8 +907,8 @@ PyObject * grpSetViewport(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetFloat(poArgs, 3, &fHeight))
 		return Py_BuildException();
 
-	UINT uWidth;
-	UINT uHeight;
+	uint32_t uWidth;
+	uint32_t uHeight;
 	CPythonGraphic::Instance().GetBackBufferSize(&uWidth, &uHeight);
 	CPythonGraphic::Instance().SetViewport(fx*uWidth, fy*uHeight, fWidth*uWidth, fHeight*uHeight);
 	return Py_BuildNone();
@@ -998,7 +998,7 @@ void initgrp()
 		{ "ClearTextBar",				grpClearTextBar,				METH_VARARGS },
 		{ "SetTextBarClipRect",			grpSetTextBarClipRect,			METH_VARARGS },
 
-		{ NULL,							NULL,							NULL		},
+		{ nullptr,							nullptr,							0		},
 	};
 
 	Py_InitModule("grp", s_methods);

@@ -8,7 +8,7 @@
 
 using namespace std;
 
-extern int g_test_server;
+extern int32_t g_test_server;
 extern std::string g_stLocaleNameColumn;
 
 bool CClientManager::InitializeTables()
@@ -124,7 +124,7 @@ bool CClientManager::InitializeRefineTable()
 	{
 		sys_log(0, "RELOAD: refine_proto");
 		delete [] m_pRefineTable;
-		m_pRefineTable = NULL;
+		m_pRefineTable = nullptr;
 	}
 
 	m_iRefineTableSize = pRes->uiNumRows;
@@ -140,7 +140,7 @@ bool CClientManager::InitializeRefineTable()
 		//const char* s_szQuery = "SELECT src_vnum, result_vnum, cost, prob, "
 		//"vnum0, count0, vnum1, count1, vnum2, count2,  vnum3, count3, vnum4, count4 "
 
-		int col = 0;
+		int32_t col = 0;
 		//prt->src_vnum = atoi(data[col++]);
 		//prt->result_vnum = atoi(data[col++]);
 		str_to_number(prt->id, data[col++]);
@@ -150,7 +150,7 @@ bool CClientManager::InitializeRefineTable()
 		//@ikd tofix material == 0 
 		prt->material_count = REFINE_MATERIAL_MAX_NUM;
 
-		for (int i = 0; i < REFINE_MATERIAL_MAX_NUM; i++)
+		for (int32_t i = 0; i < REFINE_MATERIAL_MAX_NUM; i++)
 		{
 			str_to_number(prt->materials[i].vnum, data[col++]);
 			str_to_number(prt->materials[i].count, data[col++]);
@@ -205,7 +205,7 @@ bool CClientManager::InitializeMobTable()
 	//===============================================//
 	//	1) 'mob_names.txt' 파일을 읽어서 (a)[localMap] 맵을 만든다.
 	//<(a)localMap 맵 생성>
-	map<int,const char*> localMap;
+	map<int32_t,const char*> localMap;
 	//bool isNameFile = true;
 	//<파일 읽기>
 	cCsvTable nameData;
@@ -259,7 +259,7 @@ bool CClientManager::InitializeMobTable()
 bool CClientManager::InitializeShopTable()
 {
 	MYSQL_ROW	data;
-	int		col;
+	int32_t		col;
 
 	static const char * s_szQuery = 
 		"SELECT "
@@ -282,12 +282,12 @@ bool CClientManager::InitializeShopTable()
 		return false;
 	}
 
-	std::map<int, TShopTable *> map_shop;
+	std::map<int32_t, TShopTable *> map_shop;
 
 	if (m_pShopTable)
 	{
 		delete [] (m_pShopTable);
-		m_pShopTable = NULL;
+		m_pShopTable = nullptr;
 	}
 
 	TShopTable * shop_table = m_pShopTable;
@@ -296,7 +296,7 @@ bool CClientManager::InitializeShopTable()
 	{
 		col = 0;
 
-		int iShopVnum = 0;
+		int32_t iShopVnum = 0;
 		str_to_number(iShopVnum, data[col++]);
 
 		if (map_shop.end() == map_shop.find(iShopVnum))
@@ -326,7 +326,7 @@ bool CClientManager::InitializeShopTable()
 	m_pShopTable = new TShopTable[map_shop.size()];
 	m_iShopTableSize = map_shop.size();
 
-	int i = 0;
+	int32_t i = 0;
 
 	auto it = map_shop.begin();
 	while (it != map_shop.end())
@@ -361,7 +361,7 @@ bool CClientManager::InitializeQuestItemTable()
 
 	while ((row = mysql_fetch_row(pRes->pSQLResult)))
 	{
-		int col = 0;
+		int32_t col = 0;
 
 		TItemTable tbl;
 		memset(&tbl, 0, sizeof(tbl));
@@ -422,7 +422,7 @@ bool CClientManager::InitializeItemTable()
 	//=================================================================================//
 	//	1) 'item_names.txt' 파일을 읽어서 (a)[localMap](vnum:name) 맵을 만든다.
 	//=================================================================================//
-	map<int,const char*> localMap;
+	map<int32_t,const char*> localMap;
 	cCsvTable nameData;
 	if(!nameData.Load("item_names.txt",'\t'))
 	{
@@ -474,7 +474,7 @@ bool CClientManager::InitializeItemTable()
 			fprintf(stderr, "Failed to load item_proto table.\n");
 		}
 
-		m_map_itemTableByVnum.insert(std::map<DWORD, TItemTable *>::value_type(item_table->dwVnum, item_table));
+		m_map_itemTableByVnum.insert(std::map<uint32_t, TItemTable *>::value_type(item_table->dwVnum, item_table));
 		++item_table;
 	}
 	//_______________________________________________________________________//
@@ -508,7 +508,7 @@ bool CClientManager::InitializeItemTable()
 				item_table->wRefineSet,
 				item_table->bAlterToMagicItemPct);
 
-		m_map_itemTableByVnum.insert(std::map<DWORD, TItemTable *>::value_type(item_table->dwVnum, item_table));
+		m_map_itemTableByVnum.insert(std::map<uint32_t, TItemTable *>::value_type(item_table->dwVnum, item_table));
 	}
 	sort(m_vec_itemTable.begin(), m_vec_itemTable.end(), FCompareVnum());
 	return true;
@@ -546,7 +546,7 @@ bool CClientManager::InitializeSkillTable()
 	m_vec_skillTable.reserve(pRes->uiNumRows);
 
 	MYSQL_ROW	data;
-	int		col;
+	int32_t		col;
 
 	while ((data = mysql_fetch_row(pRes->pSQLResult)))
 	{
@@ -671,7 +671,7 @@ bool CClientManager::InitializeItemAttrTable()
 		TItemAttrTable t;
 		memset(&t, 0, sizeof(TItemAttrTable));
 
-		int col = 0;
+		int32_t col = 0;
 
 		strlcpy(t.szApply, data[col++], sizeof(t.szApply));
 		str_to_number(t.dwApplyIndex, data[col++]);
@@ -773,7 +773,7 @@ bool CClientManager::InitializeItemRareTable()
 		TItemAttrTable t;
 		memset(&t, 0, sizeof(TItemAttrTable));
 
-		int col = 0;
+		int32_t col = 0;
 
 		strlcpy(t.szApply, data[col++], sizeof(t.szApply));
 		str_to_number(t.dwApplyIndex, data[col++]);
@@ -868,7 +868,7 @@ bool CClientManager::InitializeLandTable()
 
 			memset(&t, 0, sizeof(t));
 
-			int col = 0;
+			int32_t col = 0;
 
 			str_to_number(t.dwID, data[col++]);
 			str_to_number(t.lMapIndex, data[col++]);
@@ -888,12 +888,12 @@ bool CClientManager::InitializeLandTable()
 	return true;
 }
 
-void parse_pair_number_string(const char * c_pszString, std::vector<std::pair<int, int> > & vec)
+void parse_pair_number_string(const char * c_pszString, std::vector<std::pair<int32_t, int32_t> > & vec)
 {
 	// format: 10,1/20,3/300,50
 	const char * t = c_pszString;
 	const char * p = strchr(t, '/');
-	std::pair<int, int> k;
+	std::pair<int32_t, int32_t> k;
 
 	char szNum[32 + 1];
 	char * comma;
@@ -971,17 +971,17 @@ bool CClientManager::InitializeObjectProto()
 
 			memset(&t, 0, sizeof(t));
 
-			int col = 0;
+			int32_t col = 0;
 
 			str_to_number(t.dwVnum, data[col++]);
 			str_to_number(t.dwPrice, data[col++]);
 
-			std::vector<std::pair<int, int> > vec;
+			std::vector<std::pair<int32_t, int32_t> > vec;
 			parse_pair_number_string(data[col++], vec);
 
-			for (unsigned int i = 0; i < OBJECT_MATERIAL_MAX_NUM && i < vec.size(); ++i)
+			for (uint32_t i = 0; i < OBJECT_MATERIAL_MAX_NUM && i < vec.size(); ++i)
 			{
-				std::pair<int, int> & r = vec[i];
+				std::pair<int32_t, int32_t> & r = vec[i];
 
 				t.kMaterials[i].dwItemVnum = r.first;
 				t.kMaterials[i].dwCount = r.second;
@@ -1038,7 +1038,7 @@ bool CClientManager::InitializeObjectTable()
 
 			memset(k, 0, sizeof(TObject));
 
-			int col = 0;
+			int32_t col = 0;
 
 			str_to_number(k->dwID, data[col++]);
 			str_to_number(k->dwLandID, data[col++]);
@@ -1242,8 +1242,8 @@ bool CClientManager::MirrorItemTableIntoDB()
 
 
 #ifdef ENABLE_PROTO_FROM_DB
-#define VERIFY_IFIELD(x,y) if (data[x]!=NULL && data[x][0]!='\0') str_to_number(y, data[x]);
-#define VERIFY_SFIELD(x,y) if (data[x]!=NULL && data[x][0]!='\0') strlcpy(y, data[x], sizeof(y));
+#define VERIFY_IFIELD(x,y) if (data[x]!=nullptr && data[x][0]!='\0') str_to_number(y, data[x]);
+#define VERIFY_SFIELD(x,y) if (data[x]!=nullptr && data[x][0]!='\0') strlcpy(y, data[x], sizeof(y));
 
 #define ENABLE_AUTODETECT_VNUMRANGE
 
@@ -1304,7 +1304,7 @@ bool CClientManager::InitializeMobTableFromDB()
 	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
-	DWORD addNumber = pRes->uiNumRows;
+	uint32_t addNumber = pRes->uiNumRows;
 	if (addNumber == 0)
 		return false;
 
@@ -1318,10 +1318,10 @@ bool CClientManager::InitializeMobTableFromDB()
 	memset(&m_vec_mobTable[0], 0, sizeof(TMobTable) * m_vec_mobTable.size());
 	TMobTable * mob_table = &m_vec_mobTable[0];
 
-	MYSQL_ROW data = NULL;
+	MYSQL_ROW data = nullptr;
 	while ((data = mysql_fetch_row(pRes->pSQLResult)))
 	{
-		// check whether or not the field is NULL or that contains an empty string
+		// check whether or not the field is nullptr or that contains an empty string
 		// ## GENERAL
 		VERIFY_IFIELD(MProto::vnum,				mob_table->dwVnum);
 		VERIFY_SFIELD(MProto::name,				mob_table->szName);
@@ -1469,7 +1469,7 @@ bool CClientManager::InitializeItemTableFromDB()
 	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
-	DWORD addNumber = pRes->uiNumRows;
+	uint32_t addNumber = pRes->uiNumRows;
 	if (addNumber == 0)
 		return false;
 
@@ -1484,10 +1484,10 @@ bool CClientManager::InitializeItemTableFromDB()
 	memset(&m_vec_itemTable[0], 0, sizeof(TItemTable) * m_vec_itemTable.size());
 	TItemTable * item_table = &m_vec_itemTable[0];
 
-	MYSQL_ROW data = NULL;
+	MYSQL_ROW data = nullptr;
 	while ((data = mysql_fetch_row(pRes->pSQLResult)))
 	{
-		// check whether or not the field is NULL or that contains an empty string
+		// check whether or not the field is nullptr or that contains an empty string
 		// ## GENERAL
 		VERIFY_IFIELD(IProto::vnum,				item_table->dwVnum);
 		VERIFY_SFIELD(IProto::name,				item_table->szName);
@@ -1554,7 +1554,7 @@ bool CClientManager::InitializeItemTableFromDB()
 			item_table->dwVnumRange = 99;
 #endif
 
-		m_map_itemTableByVnum.insert(std::map<DWORD, TItemTable *>::value_type(item_table->dwVnum, item_table));
+		m_map_itemTableByVnum.insert(std::map<uint32_t, TItemTable *>::value_type(item_table->dwVnum, item_table));
 		sys_log(0, "ITEM: #%-5lu %-24s %-24s VAL: %d %ld %d %d %d %d WEAR %d ANTI %d IMMUNE %d REFINE %lu REFINE_SET %u MAGIC_PCT %u",
 			item_table->dwVnum,
 			item_table->szName,

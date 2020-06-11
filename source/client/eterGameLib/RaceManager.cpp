@@ -3,7 +3,7 @@
 #include "RaceMotionData.h"
 #include <FileSystemIncl.hpp>
 
-bool __IsGuildRace(unsigned race)
+bool __IsGuildRace(uint32_t race)
 {
 	if (race >= 14000 && race < 15000)
 		return true;
@@ -14,7 +14,7 @@ bool __IsGuildRace(unsigned race)
 	return false;
 }
 
-bool __IsNPCRace(unsigned race)
+bool __IsNPCRace(uint32_t race)
 {
 	if (race > 9000)
 		return true;
@@ -22,7 +22,7 @@ bool __IsNPCRace(unsigned race)
 	return false;
 }
 
-void __GetRaceResourcePathes(unsigned race, std::vector <std::string>& vec_stPathes)
+void __GetRaceResourcePathes(uint32_t race, std::vector <std::string>& vec_stPathes)
 {
 	if (__IsGuildRace(race))
 	{
@@ -130,16 +130,16 @@ void __GetRaceResourcePathes(unsigned race, std::vector <std::string>& vec_stPat
 	vec_stPathes.emplace_back("#season2/monster/");
 }
 
-CRaceData* CRaceManager::__LoadRaceData(DWORD dwRaceIndex)
+CRaceData* CRaceManager::__LoadRaceData(uint32_t dwRaceIndex)
 {
-	std::map<DWORD, std::string>::iterator fRaceName=m_kMap_dwRaceKey_stRaceName.find(dwRaceIndex);
+	std::map<uint32_t, std::string>::iterator fRaceName=m_kMap_dwRaceKey_stRaceName.find(dwRaceIndex);
 	if (m_kMap_dwRaceKey_stRaceName.end()==fRaceName)
-		return NULL;
+		return nullptr;
 
 	const std::string& c_rstRaceName=fRaceName->second;
 
 	if (c_rstRaceName.empty())
-		return NULL;
+		return nullptr;
 	
 	// LOAD_LOCAL_RESOURCE
 	if (c_rstRaceName[0] == '#')
@@ -156,7 +156,7 @@ CRaceData* CRaceManager::__LoadRaceData(DWORD dwRaceIndex)
 		{
 			TraceError("CRaceManager::RegisterRacePath(race=%u).LoadRaceData(%s)", dwRaceIndex, shapeFileName);
 			CRaceData::Delete(pRaceData);
-			return NULL;
+			return nullptr;
 		}
 
 		__LoadRaceMotionList(*pRaceData, pathName, motionListFileName);		
@@ -170,7 +170,7 @@ CRaceData* CRaceManager::__LoadRaceData(DWORD dwRaceIndex)
 	CRaceData * pRaceData = CRaceData::New();
 	pRaceData->SetRace(dwRaceIndex);
 	
-	for (int i = 0; i < vec_stFullPathName.size(); i++)
+	for (int32_t i = 0; i < vec_stFullPathName.size(); i++)
 	{
 		std::string stFullPathName = vec_stFullPathName[i];
 		{
@@ -206,7 +206,7 @@ CRaceData* CRaceManager::__LoadRaceData(DWORD dwRaceIndex)
 			
 			TraceError("CRaceManager::RegisterRacePath : RACE[%u] LOAD MSMFILE[%s] ERROR", dwRaceIndex, stMSMFileName.c_str());
 			CRaceData::Delete(pRaceData);
-			return NULL;
+			return nullptr;
 		}
 
 		std::string stMotionListFileName=stFullPathName;
@@ -218,67 +218,67 @@ CRaceData* CRaceManager::__LoadRaceData(DWORD dwRaceIndex)
 	}
 	TraceError("CRaceManager::RegisterRacePath : RACE[%u] HAVE NO PATH ERROR", dwRaceIndex);
 	CRaceData::Delete(pRaceData);
-	return NULL;
+	return nullptr;
 }
 
 bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathName, const char* motionListFileName)
 {
-	static std::map<std::string, DWORD> s_kMap_stType_dwIndex;
+	static std::map<std::string, uint32_t> s_kMap_stType_dwIndex;
 	static bool s_isInit=false;
 
 	if (!s_isInit)
 	{
 		s_isInit=true;
 
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SPAWN", CRaceMotionData::NAME_SPAWN));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("WAIT", CRaceMotionData::NAME_WAIT));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("WAIT1", CRaceMotionData::NAME_WAIT));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("WAIT2", CRaceMotionData::NAME_WAIT));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("WALK", CRaceMotionData::NAME_WALK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("WALK1", CRaceMotionData::NAME_WALK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("WALK2", CRaceMotionData::NAME_WALK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("RUN", CRaceMotionData::NAME_RUN));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("RUN1", CRaceMotionData::NAME_RUN));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("RUN2", CRaceMotionData::NAME_RUN));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("STOP", CRaceMotionData::NAME_STOP));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("DEAD", CRaceMotionData::NAME_DEAD));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("COMBO_ATTACK", CRaceMotionData::NAME_COMBO_ATTACK_1));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("COMBO_ATTACK1", CRaceMotionData::NAME_COMBO_ATTACK_2));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("COMBO_ATTACK2", CRaceMotionData::NAME_COMBO_ATTACK_3));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("NORMAL_ATTACK", CRaceMotionData::NAME_NORMAL_ATTACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("NORMAL_ATTACK1", CRaceMotionData::NAME_NORMAL_ATTACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("NORMAL_ATTACK2", CRaceMotionData::NAME_NORMAL_ATTACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("FRONT_DAMAGE", CRaceMotionData::NAME_DAMAGE));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("FRONT_DAMAGE1", CRaceMotionData::NAME_DAMAGE));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("FRONT_DAMAGE2", CRaceMotionData::NAME_DAMAGE));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("FRONT_DAMAGE3", CRaceMotionData::NAME_DAMAGE));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("FRONT_DEAD", CRaceMotionData::NAME_DEAD));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("FRONT_DEAD1", CRaceMotionData::NAME_DEAD));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("FRONT_DEAD2", CRaceMotionData::NAME_DEAD));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("FRONT_KNOCKDOWN", CRaceMotionData::NAME_DAMAGE_FLYING));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("FRONT_KNOCKDOWN1", CRaceMotionData::NAME_DAMAGE_FLYING));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("FRONT_STANDUP", CRaceMotionData::NAME_STAND_UP));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("FRONT_STANDUP1", CRaceMotionData::NAME_STAND_UP));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("BACK_DAMAGE", CRaceMotionData::NAME_DAMAGE_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("BACK_DAMAGE1", CRaceMotionData::NAME_DAMAGE_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("BACK_DEAD", CRaceMotionData::NAME_DEAD_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("BACK_DEAD1", CRaceMotionData::NAME_DEAD_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("BACK_DEAD2", CRaceMotionData::NAME_DEAD_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("BACK_KNOCKDOWN", CRaceMotionData::NAME_DAMAGE_FLYING_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("BACK_KNOCKDOWN1", CRaceMotionData::NAME_DAMAGE_FLYING_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("BACK_STANDUP", CRaceMotionData::NAME_STAND_UP_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("BACK_STANDUP1", CRaceMotionData::NAME_STAND_UP_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SPECIAL", CRaceMotionData::NAME_SPECIAL_1));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SPECIAL1", CRaceMotionData::NAME_SPECIAL_2));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SPECIAL2", CRaceMotionData::NAME_SPECIAL_3));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SPECIAL3", CRaceMotionData::NAME_SPECIAL_4));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SPECIAL4", CRaceMotionData::NAME_SPECIAL_5));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SPECIAL5", CRaceMotionData::NAME_SPECIAL_6));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SKILL1", CRaceMotionData::NAME_SKILL+121));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SKILL2", CRaceMotionData::NAME_SKILL+122));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SKILL3", CRaceMotionData::NAME_SKILL+123));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SKILL4", CRaceMotionData::NAME_SKILL+124));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, DWORD>::value_type("SKILL5", CRaceMotionData::NAME_SKILL+125));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPAWN", CRaceMotionData::NAME_SPAWN));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("WAIT", CRaceMotionData::NAME_WAIT));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("WAIT1", CRaceMotionData::NAME_WAIT));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("WAIT2", CRaceMotionData::NAME_WAIT));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("WALK", CRaceMotionData::NAME_WALK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("WALK1", CRaceMotionData::NAME_WALK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("WALK2", CRaceMotionData::NAME_WALK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("RUN", CRaceMotionData::NAME_RUN));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("RUN1", CRaceMotionData::NAME_RUN));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("RUN2", CRaceMotionData::NAME_RUN));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("STOP", CRaceMotionData::NAME_STOP));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("DEAD", CRaceMotionData::NAME_DEAD));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("COMBO_ATTACK", CRaceMotionData::NAME_COMBO_ATTACK_1));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("COMBO_ATTACK1", CRaceMotionData::NAME_COMBO_ATTACK_2));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("COMBO_ATTACK2", CRaceMotionData::NAME_COMBO_ATTACK_3));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("NORMAL_ATTACK", CRaceMotionData::NAME_NORMAL_ATTACK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("NORMAL_ATTACK1", CRaceMotionData::NAME_NORMAL_ATTACK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("NORMAL_ATTACK2", CRaceMotionData::NAME_NORMAL_ATTACK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DAMAGE", CRaceMotionData::NAME_DAMAGE));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DAMAGE1", CRaceMotionData::NAME_DAMAGE));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DAMAGE2", CRaceMotionData::NAME_DAMAGE));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DAMAGE3", CRaceMotionData::NAME_DAMAGE));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DEAD", CRaceMotionData::NAME_DEAD));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DEAD1", CRaceMotionData::NAME_DEAD));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DEAD2", CRaceMotionData::NAME_DEAD));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_KNOCKDOWN", CRaceMotionData::NAME_DAMAGE_FLYING));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_KNOCKDOWN1", CRaceMotionData::NAME_DAMAGE_FLYING));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_STANDUP", CRaceMotionData::NAME_STAND_UP));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_STANDUP1", CRaceMotionData::NAME_STAND_UP));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_DAMAGE", CRaceMotionData::NAME_DAMAGE_BACK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_DAMAGE1", CRaceMotionData::NAME_DAMAGE_BACK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_DEAD", CRaceMotionData::NAME_DEAD_BACK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_DEAD1", CRaceMotionData::NAME_DEAD_BACK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_DEAD2", CRaceMotionData::NAME_DEAD_BACK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_KNOCKDOWN", CRaceMotionData::NAME_DAMAGE_FLYING_BACK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_KNOCKDOWN1", CRaceMotionData::NAME_DAMAGE_FLYING_BACK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_STANDUP", CRaceMotionData::NAME_STAND_UP_BACK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_STANDUP1", CRaceMotionData::NAME_STAND_UP_BACK));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPECIAL", CRaceMotionData::NAME_SPECIAL_1));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPECIAL1", CRaceMotionData::NAME_SPECIAL_2));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPECIAL2", CRaceMotionData::NAME_SPECIAL_3));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPECIAL3", CRaceMotionData::NAME_SPECIAL_4));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPECIAL4", CRaceMotionData::NAME_SPECIAL_5));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPECIAL5", CRaceMotionData::NAME_SPECIAL_6));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SKILL1", CRaceMotionData::NAME_SKILL+121));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SKILL2", CRaceMotionData::NAME_SKILL+122));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SKILL3", CRaceMotionData::NAME_SKILL+123));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SKILL4", CRaceMotionData::NAME_SKILL+124));
+		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SKILL5", CRaceMotionData::NAME_SKILL+125));
 	}
 	
 	CFile kMappedFile;
@@ -293,7 +293,7 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 	char szMode[256];
 	char szType[256];
 	char szFile[256];
-	int nPercent = 0;
+	int32_t nPercent = 0;
 
 	bool isSpawn=false;
 
@@ -303,15 +303,15 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 	stSpawnMotionFileName = "";
 	stMotionFileName = "";
 
-	UINT uLineCount=kTextFileLoader.GetLineCount();
-	for (UINT uLineIndex=0; uLineIndex<uLineCount; ++uLineIndex)
+	uint32_t uLineCount=kTextFileLoader.GetLineCount();
+	for (uint32_t uLineIndex=0; uLineIndex<uLineCount; ++uLineIndex)
 	{
-		DWORD motionType = CRaceMotionData::NAME_NONE;
+		uint32_t motionType = CRaceMotionData::NAME_NONE;
 
 		const std::string& c_rstLine=kTextFileLoader.GetLineString(uLineIndex);
 		sscanf(c_rstLine.c_str(), "%s %s %s %d", szMode, szType, szFile, &nPercent);
 
-		std::map<std::string, DWORD>::iterator fTypeIndex=s_kMap_stType_dwIndex.find(szType);
+		std::map<std::string, uint32_t>::iterator fTypeIndex=s_kMap_stType_dwIndex.find(szType);
 
 		if (s_kMap_stType_dwIndex.end() == fTypeIndex)
 		{
@@ -372,12 +372,12 @@ void CRaceManager::RegisterRaceSrcName(const char * c_szName, const char * c_szS
 	m_kMap_stRaceName_stSrcName.insert(std::map<std::string, std::string>::value_type(c_szName, c_szSrcName));
 }
 
-void CRaceManager::RegisterRaceName(DWORD dwRaceIndex, const char * c_szName)
+void CRaceManager::RegisterRaceName(uint32_t dwRaceIndex, const char * c_szName)
 {	
-	m_kMap_dwRaceKey_stRaceName.insert(std::map<DWORD, std::string>::value_type(dwRaceIndex, c_szName));
+	m_kMap_dwRaceKey_stRaceName.insert(std::map<uint32_t, std::string>::value_type(dwRaceIndex, c_szName));
 }
 
-void CRaceManager::CreateRace(DWORD dwRaceIndex)
+void CRaceManager::CreateRace(uint32_t dwRaceIndex)
 {
 	if (m_RaceDataMap.end() != m_RaceDataMap.find(dwRaceIndex))
 	{
@@ -392,7 +392,7 @@ void CRaceManager::CreateRace(DWORD dwRaceIndex)
 	Tracenf("CRaceManager::CreateRace(dwRaceIndex=%d)", dwRaceIndex);
 }
 
-void CRaceManager::SelectRace(DWORD dwRaceIndex)
+void CRaceManager::SelectRace(uint32_t dwRaceIndex)
 {
 	TRaceDataIterator itor = m_RaceDataMap.find(dwRaceIndex);
 	if (m_RaceDataMap.end() == itor)
@@ -409,7 +409,7 @@ CRaceData * CRaceManager::GetSelectedRaceDataPointer()
 	return m_pSelectedRaceData;
 }
 
-BOOL CRaceManager::GetRaceDataPointer(DWORD dwRaceIndex, CRaceData ** ppRaceData)
+BOOL CRaceManager::GetRaceDataPointer(uint32_t dwRaceIndex, CRaceData ** ppRaceData)
 {
 	TRaceDataIterator itor = m_RaceDataMap.find(dwRaceIndex);
 
@@ -463,7 +463,7 @@ void CRaceManager::Create()
 
 void CRaceManager::__Initialize()
 {
-	m_pSelectedRaceData = NULL;
+	m_pSelectedRaceData = nullptr;
 }
 
 void CRaceManager::__DestroyRaceDataMap()

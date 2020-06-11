@@ -7,14 +7,14 @@
 
 CMapLocation g_mapLocations;
 
-bool CMapLocation::Get(long x, long y, long & lIndex, long & lAddr, WORD & wPort)
+bool CMapLocation::Get(int32_t x, int32_t y, int32_t & lIndex, int32_t & lAddr, uint16_t & wPort)
 {
 	lIndex = SECTREE_MANAGER::instance().GetMapIndex(x, y);
 
 	return Get(lIndex, lAddr, wPort);
 }
 
-bool CMapLocation::Get(int iIndex, long & lAddr, WORD & wPort)
+bool CMapLocation::Get(int32_t iIndex, int32_t & lAddr, uint16_t & wPort)
 {
 	if (iIndex == 0)
 	{
@@ -22,12 +22,12 @@ bool CMapLocation::Get(int iIndex, long & lAddr, WORD & wPort)
 		return false;
 	}
 
-	std::map<long, TLocation>::iterator it = m_map_address.find(iIndex);
+	std::map<int32_t, TLocation>::iterator it = m_map_address.find(iIndex);
 
 	if (m_map_address.end() == it)
 	{
 		sys_log(0, "CMapLocation::Get - Error MapIndex[%d]", iIndex);
-		std::map<long, TLocation>::iterator i;
+		std::map<int32_t, TLocation>::iterator i;
 		for ( i	= m_map_address.begin(); i != m_map_address.end(); ++i)
 		{
 			sys_log(0, "Map(%d): Server(%x:%d)", i->first, i->second.addr, i->second.port);
@@ -40,7 +40,7 @@ bool CMapLocation::Get(int iIndex, long & lAddr, WORD & wPort)
 	return true;
 }
 
-void CMapLocation::Insert(long lIndex, const char * c_pszHost, WORD wPort)
+void CMapLocation::Insert(int32_t lIndex, const char * c_pszHost, uint16_t wPort)
 {
 	TLocation loc;
 

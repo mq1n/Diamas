@@ -16,11 +16,11 @@ CDBManager::~CDBManager()
 
 void CDBManager::Initialize()
 {
-	for (int i = 0; i < SQL_MAX_NUM; ++i)
+	for (int32_t i = 0; i < SQL_MAX_NUM; ++i)
 	{
-		m_mainSQL[i] = NULL;
-		m_directSQL[i] = NULL;
-		m_asyncSQL[i] = NULL;
+		m_mainSQL[i] = nullptr;
+		m_directSQL[i] = nullptr;
+		m_asyncSQL[i] = nullptr;
 	}
 }
 
@@ -31,24 +31,24 @@ void CDBManager::Destroy()
 
 void CDBManager::Clear()
 {
-	for (int i = 0; i < SQL_MAX_NUM; ++i)
+	for (int32_t i = 0; i < SQL_MAX_NUM; ++i)
 	{
 		if (m_mainSQL[i])
 		{
 			delete m_mainSQL[i];
-			m_mainSQL[i] = NULL;
+			m_mainSQL[i] = nullptr;
 		}
 
 		if (m_directSQL[i])
 		{
 			delete m_directSQL[i];
-			m_directSQL[i] = NULL;
+			m_directSQL[i] = nullptr;
 		}
 
 		if (m_asyncSQL[i])
 		{
 			delete m_asyncSQL[i];
-			m_asyncSQL[i] = NULL;
+			m_asyncSQL[i] = nullptr;
 		}
 	}
 
@@ -57,7 +57,7 @@ void CDBManager::Clear()
 
 void CDBManager::Quit()
 {
-	for (int i = 0; i < SQL_MAX_NUM; ++i)
+	for (int32_t i = 0; i < SQL_MAX_NUM; ++i)
 	{
 		if (m_mainSQL[i])
 			m_mainSQL[i]->Quit();
@@ -74,11 +74,11 @@ SQLMsg * CDBManager::PopResult()
 {
 	SQLMsg * p;
 
-	for (int i = 0; i < SQL_MAX_NUM; ++i)
+	for (int32_t i = 0; i < SQL_MAX_NUM; ++i)
 		if (m_mainSQL[i] && m_mainSQL[i]->PopResult(&p))
 			return p;
 
-	return NULL;
+	return nullptr;
 }
 
 SQLMsg * CDBManager::PopResult(eSQL_SLOT slot)
@@ -88,11 +88,11 @@ SQLMsg * CDBManager::PopResult(eSQL_SLOT slot)
 	if (m_mainSQL[slot] && m_mainSQL[slot]->PopResult(&p))
 			return p;
 
-	return NULL;
+	return nullptr;
 }
-int CDBManager::Connect(int iSlot, const char * db_address, const int db_port, const char * db_name, const char * user, const char * pwd)
+int32_t CDBManager::Connect(int32_t iSlot, const char * db_address, const int32_t db_port, const char * db_name, const char * user, const char * pwd)
 {
-	if (db_address == NULL || db_name == NULL)
+	if (db_address == nullptr || db_name == nullptr)
 		return false;
 
 	if (iSlot < 0 || iSlot >= SQL_MAX_NUM)
@@ -126,15 +126,15 @@ int CDBManager::Connect(int iSlot, const char * db_address, const int db_port, c
 	return true;
 }
 
-SQLMsg * CDBManager::DirectQuery(const char * c_pszQuery, int iSlot)
+SQLMsg * CDBManager::DirectQuery(const char * c_pszQuery, int32_t iSlot)
 {
 	return m_directSQL[iSlot]->DirectQuery(c_pszQuery);
 }
 
 extern CPacketInfo g_query_info;
-extern int g_query_count[2];
+extern int32_t g_query_count[2];
 
-void CDBManager::ReturnQuery(const char * c_pszQuery, int iType, IDENT dwIdent, void * udata, int iSlot)
+void CDBManager::ReturnQuery(const char * c_pszQuery, int32_t iType, IDENT dwIdent, void * udata, int32_t iSlot)
 {
 	assert(iSlot < SQL_MAX_NUM);
 	//sys_log(0, "ReturnQuery %s", c_pszQuery);
@@ -150,14 +150,14 @@ void CDBManager::ReturnQuery(const char * c_pszQuery, int iType, IDENT dwIdent, 
 	++g_query_count[0];
 }
 
-void CDBManager::AsyncQuery(const char * c_pszQuery, int iSlot)
+void CDBManager::AsyncQuery(const char * c_pszQuery, int32_t iSlot)
 {
 	assert(iSlot < SQL_MAX_NUM);
 	m_asyncSQL[iSlot]->AsyncQuery(c_pszQuery);
 	++g_query_count[1];
 }
 
-unsigned long CDBManager::EscapeString(void *to, const void *from, unsigned long length, int iSlot)
+uint32_t CDBManager::EscapeString(void *to, const void *from, uint32_t length, int32_t iSlot)
 {
 	assert(iSlot < SQL_MAX_NUM);
 	return mysql_real_escape_string(m_directSQL[iSlot]->GetSQLHandle(), (char *) to, (const char *) from, length);
@@ -167,7 +167,7 @@ void CDBManager::SetLocale(const char * szLocale)
 {
 	const std::string stLocale(szLocale);
 	sys_log(0, "SetLocale start %s", szLocale);
-	for (int n = 0; n < SQL_MAX_NUM; ++n)
+	for (int32_t n = 0; n < SQL_MAX_NUM; ++n)
 	{
 		m_mainSQL[n]->SetLocale(stLocale);
 		m_directSQL[n]->SetLocale(stLocale);

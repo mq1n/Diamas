@@ -8,7 +8,7 @@
 
 #include <deque>
 
-typedef DWORD TLightID;
+typedef uint32_t TLightID;
 
 enum ELightType
 {
@@ -106,8 +106,8 @@ class CLightManager : public CGraphicBase, public CLightBase, public CSingleton<
 		/////
 
 		void		SetCenterPosition(const D3DXVECTOR3 & c_rv3Position);
-		void		SetLimitLightCount(DWORD dwLightCount);
-		void		SetSkipIndex(DWORD dwSkipIndex);
+		void		SetLimitLightCount(uint32_t dwLightCount);
+		void		SetSkipIndex(uint32_t dwSkipIndex);
 
 	protected:
 		TLightIDDeque			m_NonUsingLightIDDeque;
@@ -116,8 +116,8 @@ class CLightManager : public CGraphicBase, public CLightBase, public CSingleton<
 		TLightSortVector		m_LightSortVector;
 
 		D3DXVECTOR3				m_v3CenterPosition;
-		DWORD					m_dwLimitLightCount;
-		DWORD					m_dwSkipIndex;
+		uint32_t					m_dwLimitLightCount;
+		uint32_t					m_dwSkipIndex;
 
 	protected:
 		TLightID				NewLightID();

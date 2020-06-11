@@ -10,8 +10,8 @@ class CPoolNode : public T
 	public:
 		CPoolNode()
 		{
-			m_pNext = NULL;
-			m_pPrev = NULL;
+			m_pNext = nullptr;
+			m_pPrev = nullptr;
 		}
 
 		virtual ~CPoolNode()
@@ -37,18 +37,18 @@ class CDynamicPool
 
 		virtual ~CDynamicPool()
 		{
-			assert(m_pFreeList==NULL && "CDynamicPool::~CDynamicPool() - NOT Clear");
-			assert(m_pUsedList==NULL && "CDynamicPool::~CDynamicPool() - NOT Clear");
+			assert(m_pFreeList==nullptr && "CDynamicPool::~CDynamicPool() - NOT Clear");
+			assert(m_pUsedList==nullptr && "CDynamicPool::~CDynamicPool() - NOT Clear");
 			Clear();
 		}
 
 		void Initialize()
 		{
-			m_nodes = NULL;
+			m_nodes = nullptr;
 			m_nodeCount = 0;
 
-			m_pFreeList = NULL;
-			m_pUsedList = NULL;
+			m_pFreeList = nullptr;
+			m_pUsedList = nullptr;
 		}
 
 		void SetName(const char* c_szName)
@@ -56,7 +56,7 @@ class CDynamicPool
 			m_stName = c_szName;
 		}
 
-		DWORD GetCapacity()
+		uint32_t GetCapacity()
 		{
 			return m_nodeCount;
 		}
@@ -76,18 +76,18 @@ class CDynamicPool
 			}
 
 			if (!pnewNode)
-				return NULL;		
+				return nullptr;		
 
 			if (!m_pUsedList)
 			{
 				m_pUsedList = pnewNode;
-				m_pUsedList->m_pPrev = m_pUsedList->m_pNext = NULL;
+				m_pUsedList->m_pPrev = m_pUsedList->m_pNext = nullptr;
 			}
 			else
 			{
 				m_pUsedList->m_pPrev = pnewNode;
 				pnewNode->m_pNext = m_pUsedList;
-				pnewNode->m_pPrev = NULL;
+				pnewNode->m_pPrev = nullptr;
 				m_pUsedList = pnewNode;
 			}
 			//Tracef("%s Pool Alloc %p\n", m_stName.c_str(), pnewNode);
@@ -100,8 +100,8 @@ class CDynamicPool
 
 			if (pfreeNode == m_pUsedList)
 			{
-				if (NULL != (m_pUsedList = m_pUsedList->m_pNext))
-					m_pUsedList->m_pPrev = NULL;
+				if (nullptr != (m_pUsedList = m_pUsedList->m_pNext))
+					m_pUsedList->m_pPrev = nullptr;
 			}
 			else
 			{
@@ -112,7 +112,7 @@ class CDynamicPool
 					pfreeNode->m_pPrev->m_pNext = pfreeNode->m_pNext;
 			}
 
-			pfreeNode->m_pPrev = NULL;
+			pfreeNode->m_pPrev = nullptr;
 			pfreeNode->m_pNext = m_pFreeList;
 			m_pFreeList = pfreeNode;
 			//Tracef("%s Pool Free\n", m_stName.c_str());
@@ -138,7 +138,7 @@ class CDynamicPool
 			TNode* pcurNode;
 			TNode* pnextNode;
 
-			DWORD count = 0;
+			uint32_t count = 0;
 
 			pcurNode = m_pFreeList;
 			while (pcurNode)
@@ -148,7 +148,7 @@ class CDynamicPool
 				pcurNode = pnextNode;
 				++count;
 			}
-			m_pFreeList = NULL;
+			m_pFreeList = nullptr;
 
 			pcurNode = m_pUsedList;
 			while (pcurNode)
@@ -159,7 +159,7 @@ class CDynamicPool
 				++count;
 			}
 
-			m_pUsedList = NULL;
+			m_pUsedList = nullptr;
 
 			assert(count==m_nodeCount && "CDynamicPool::Clear()");
 
@@ -178,7 +178,7 @@ class CDynamicPool
 		TNode *		m_pFreeList;
 		TNode *		m_pUsedList;
 
-		DWORD		m_nodeCount;
+		uint32_t		m_nodeCount;
 		std::string	m_stName;
 };
 

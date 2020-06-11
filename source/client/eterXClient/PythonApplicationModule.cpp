@@ -8,7 +8,7 @@
 extern D3DXCOLOR g_fSpecularColor;
 extern BOOL bVisibleNotice = true;
 extern BOOL bTestServerFlag = FALSE;
-extern int TWOHANDED_WEWAPON_ATT_SPEED_DECREASE_VALUE = 0;
+extern int32_t TWOHANDED_WEWAPON_ATT_SPEED_DECREASE_VALUE = 0;
 
 PyObject* appShowWebPage(PyObject* poSelf, PyObject* poArgs)
 {
@@ -76,7 +76,7 @@ extern BOOL RIDE_HORSE_ENABLE;
 extern double g_specularSpd;
 
 // TEXTTAIL_LIVINGTIME_CONTROL
-extern void TextTail_SetLivingTime(long livingTime);
+extern void TextTail_SetLivingTime(int32_t livingTime);
 
 PyObject* appSetTextTailLivingTime(PyObject* poSelf, PyObject* poArgs)
 {
@@ -92,7 +92,7 @@ PyObject* appSetTextTailLivingTime(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* appSetHairColorEnable(PyObject* poSelf, PyObject* poArgs)
 {
-	int nEnable;
+	int32_t nEnable;
 	if (!PyTuple_GetInteger(poArgs, 0, &nEnable))
 		return Py_BuildException();
 
@@ -103,7 +103,7 @@ PyObject* appSetHairColorEnable(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* appSetArmorSpecularEnable(PyObject* poSelf, PyObject* poArgs)
 {
-	int nEnable;
+	int32_t nEnable;
 	if (!PyTuple_GetInteger(poArgs, 0, &nEnable))
 		return Py_BuildException();
 
@@ -114,7 +114,7 @@ PyObject* appSetArmorSpecularEnable(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* appSetWeaponSpecularEnable(PyObject* poSelf, PyObject* poArgs)
 {
-	int nEnable;
+	int32_t nEnable;
 	if (!PyTuple_GetInteger(poArgs, 0, &nEnable))
 		return Py_BuildException();
 
@@ -125,7 +125,7 @@ PyObject* appSetWeaponSpecularEnable(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* appSetSkillEffectUpgradeEnable(PyObject* poSelf, PyObject* poArgs)
 {
-	int nEnable;
+	int32_t nEnable;
 	if (!PyTuple_GetInteger(poArgs, 0, &nEnable))
 		return Py_BuildException();
 
@@ -136,7 +136,7 @@ PyObject* appSetSkillEffectUpgradeEnable(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* SetTwoHandedWeaponAttSpeedDecreaseValue(PyObject* poSelf, PyObject* poArgs)
 {
-	int iValue;
+	int32_t iValue;
 	if (!PyTuple_GetInteger(poArgs, 0, &iValue))
 		return Py_BuildException();
 
@@ -147,7 +147,7 @@ PyObject* SetTwoHandedWeaponAttSpeedDecreaseValue(PyObject* poSelf, PyObject* po
 
 PyObject* appSetRideHorseEnable(PyObject* poSelf, PyObject* poArgs)
 {
-	int nEnable;
+	int32_t nEnable;
 	if (!PyTuple_GetInteger(poArgs, 0, &nEnable))
 		return Py_BuildException();
 
@@ -195,7 +195,7 @@ PyObject * appSetMinFog(PyObject * poSelf, PyObject * poArgs)
 
 PyObject* appSetFrameSkip(PyObject* poSelf, PyObject* poArgs)
 {
-	int nFrameSkip;
+	int32_t nFrameSkip;
 	if (!PyTuple_GetInteger(poArgs, 0, &nFrameSkip))
 		return Py_BuildException();
 
@@ -230,7 +230,7 @@ bool LoadLocaleData(const char* localePath);
 
 PyObject* appSetCHEONMA(PyObject* poSelf, PyObject* poArgs)
 {
-	int enable;
+	int32_t enable;
 	if (!PyTuple_GetInteger(poArgs, 0, &enable))
 		return Py_BuildException();
 	
@@ -257,13 +257,13 @@ PyObject* appLoadLocaleAddr(PyObject* poSelf, PyObject* poArgs)
 
 	fseek(fp, 0, SEEK_END);
 
-	int size = ftell(fp);
+	int32_t size = ftell(fp);
 	char* enc = (char*)_alloca(size);
 	fseek(fp, 0, SEEK_SET);
 	fread(enc, size, 1, fp);
 	fclose(fp);
 
-	static const unsigned char key[16] = {
+	static const uint8_t key[16] = {
 		0x82, 0x1b, 0x34, 0xae,
 		0x12, 0x3b, 0xfb, 0x17,
 		0xd7, 0x2c, 0x39, 0xae,
@@ -271,10 +271,10 @@ PyObject* appLoadLocaleAddr(PyObject* poSelf, PyObject* poArgs)
 	};
 
 	char* buf = (char*)_alloca(size);
-	//int decSize = 
-	tea_decrypt((unsigned long*)buf, (const unsigned long*)enc, (const unsigned long*)key, size);
-	unsigned int retSize = *(unsigned int*)buf;
-	char* ret = buf + sizeof(unsigned int);
+	//int32_t decSize = 
+	tea_decrypt((uint32_t*)buf, (const uint32_t*)enc, (const uint32_t*)key, size);
+	uint32_t retSize = *(uint32_t*)buf;
+	char* ret = buf + sizeof(uint32_t);
 	return Py_BuildValue("s#", ret, retSize);
 }
 
@@ -400,15 +400,15 @@ PyObject* appCreate(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szName))
 		return Py_BuildException();
 
-	int width;
+	int32_t width;
 	if (!PyTuple_GetInteger(poArgs, 1, &width))
 		return Py_BuildException();
 
-	int height;
+	int32_t height;
 	if (!PyTuple_GetInteger(poArgs, 2, &height))
 		return Py_BuildException();
 
-	int Windowed;
+	int32_t Windowed;
 	if (!PyTuple_GetInteger(poArgs, 3, &Windowed))
 		return Py_BuildException();
 
@@ -416,7 +416,7 @@ PyObject* appCreate(PyObject* poSelf, PyObject* poArgs)
 	if (!rkApp.Create(poSelf, szName, width, height, Windowed))
 	{
 		//return Py_BuildNone();			
-		return NULL;
+		return nullptr;
 	}
 
 	return Py_BuildNone();
@@ -431,7 +431,7 @@ PyObject* appLoop(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* appGetInfo(PyObject* poSelf, PyObject* poArgs)
 {
-	int nInfo;
+	int32_t nInfo;
 	if (!PyTuple_GetInteger(poArgs, 0, &nInfo))
 		return Py_BuildException();
 
@@ -527,7 +527,7 @@ PyObject * appGetRenderFPS(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appRotateCamera(PyObject * poSelf, PyObject * poArgs)
 {
-	int iDirection;
+	int32_t iDirection;
 	if (!PyTuple_GetInteger(poArgs, 0, &iDirection))
 		return Py_BuildException();
 	CPythonApplication::Instance().RotateCamera(iDirection);
@@ -536,7 +536,7 @@ PyObject * appRotateCamera(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appPitchCamera(PyObject * poSelf, PyObject * poArgs)
 {
-	int iDirection;
+	int32_t iDirection;
 	if (!PyTuple_GetInteger(poArgs, 0, &iDirection))
 		return Py_BuildException();
 	CPythonApplication::Instance().PitchCamera(iDirection);
@@ -545,7 +545,7 @@ PyObject * appPitchCamera(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appZoomCamera(PyObject * poSelf, PyObject * poArgs)
 {
-	int iDirection;
+	int32_t iDirection;
 	if (!PyTuple_GetInteger(poArgs, 0, &iDirection))
 		return Py_BuildException();
 	CPythonApplication::Instance().ZoomCamera(iDirection);
@@ -554,7 +554,7 @@ PyObject * appZoomCamera(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appMovieRotateCamera(PyObject * poSelf, PyObject * poArgs)
 {
-	int iDirection;
+	int32_t iDirection;
 	if (!PyTuple_GetInteger(poArgs, 0, &iDirection))
 		return Py_BuildException();
 	CPythonApplication::Instance().MovieRotateCamera(iDirection);
@@ -563,7 +563,7 @@ PyObject * appMovieRotateCamera(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appMoviePitchCamera(PyObject * poSelf, PyObject * poArgs)
 {
-	int iDirection;
+	int32_t iDirection;
 	if (!PyTuple_GetInteger(poArgs, 0, &iDirection))
 		return Py_BuildException();
 	CPythonApplication::Instance().MoviePitchCamera(iDirection);
@@ -572,7 +572,7 @@ PyObject * appMoviePitchCamera(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appMovieZoomCamera(PyObject * poSelf, PyObject * poArgs)
 {
-	int iDirection;
+	int32_t iDirection;
 	if (!PyTuple_GetInteger(poArgs, 0, &iDirection))
 		return Py_BuildException();
 	CPythonApplication::Instance().MovieZoomCamera(iDirection);
@@ -618,7 +618,7 @@ PyObject * appGetAvaiableTextureMememory(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appSetFPS(PyObject * poSelf, PyObject * poArgs)
 {
-	int	iFPS;
+	int32_t	iFPS;
 	if (!PyTuple_GetInteger(poArgs, 0, &iFPS))
 		return Py_BuildException();
 
@@ -629,11 +629,11 @@ PyObject * appSetFPS(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appSetGlobalCenterPosition(PyObject * poSelf, PyObject * poArgs)
 {
-	int x;
+	int32_t x;
 	if (!PyTuple_GetInteger(poArgs, 0, &x))
 		return Py_BuildException();
 
-	int y;
+	int32_t y;
 	if (!PyTuple_GetInteger(poArgs, 1, &y))
 		return Py_BuildException();
 
@@ -662,7 +662,7 @@ PyObject * appSetCenterPosition(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appGetCursorPosition(PyObject * poSelf, PyObject * poArgs)
 {
-	long lx, ly;
+	int32_t lx, ly;
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 	rkWndMgr.GetMousePosition(lx, ly);
 
@@ -680,7 +680,7 @@ PyObject * appRunPythonFile(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appIsPressed(PyObject * poSelf, PyObject * poArgs)
 {
-	int iKey;
+	int32_t iKey;
 	if (!PyTuple_GetInteger(poArgs, 0, &iKey))
 		return Py_BuildException();
 
@@ -697,7 +697,7 @@ PyObject * appSetCursor(PyObject * poSelf, PyObject * poArgs)
 	if (!CPythonApplication::Instance().SetHardwareCursor(szName))
 		return Py_BuildException("Wrong Cursor Name [%s]", szName);
 */
-	int iCursorNum;
+	int32_t iCursorNum;
 	if (!PyTuple_GetInteger(poArgs, 0, &iCursorNum))
 		return Py_BuildException();
 	
@@ -754,7 +754,7 @@ PyObject * appSetConnectData(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szIP))
 		return Py_BuildException();
 
-	int	iPort;
+	int32_t	iPort;
 	if (!PyTuple_GetInteger(poArgs, 1, &iPort))
 		return Py_BuildException();
 
@@ -766,7 +766,7 @@ PyObject * appSetConnectData(PyObject * poSelf, PyObject * poArgs)
 PyObject * appGetConnectData(PyObject * poSelf, PyObject * poArgs)
 {
 	std::string strIP;
-	int iPort;
+	int32_t iPort;
 
 	CPythonApplication::Instance().GetConnectData(strIP, iPort);
 
@@ -775,17 +775,17 @@ PyObject * appGetConnectData(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appGetRandom(PyObject * poSelf, PyObject * poArgs)
 {
-	int from;
+	int32_t from;
 	if (!PyTuple_GetInteger(poArgs, 0, &from))
 		return Py_BuildException();
 
-	int	to;
+	int32_t	to;
 	if (!PyTuple_GetInteger(poArgs, 1, &to))
 		return Py_BuildException();
 
 	if (from > to)
 	{
-		int tmp = from;
+		int32_t tmp = from;
 		from = to;
 		to = tmp;
 	}
@@ -819,7 +819,7 @@ PyObject * appGetDegreeDifference(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appSleep(PyObject * poSelf, PyObject * poArgs)
 {
-	int	iTime;
+	int32_t	iTime;
 	if (!PyTuple_GetInteger(poArgs, 0, &iTime))
 		return Py_BuildException();
 
@@ -860,7 +860,7 @@ PyObject * appEnableSpecialCameraMode(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appSetCameraSpeed(PyObject * poSelf, PyObject * poArgs)
 {
-	int iPercentage;
+	int32_t iPercentage;
 	if (!PyTuple_GetInteger(poArgs, 0, &iPercentage))
 		return Py_BuildException();
 
@@ -883,23 +883,23 @@ PyObject * appIsFileExist(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appSetCameraSetting(PyObject * poSelf, PyObject * poArgs)
 {
-	int ix;
+	int32_t ix;
 	if (!PyTuple_GetInteger(poArgs, 0, &ix))
 		return Py_BuildException();
-	int iy;
+	int32_t iy;
 	if (!PyTuple_GetInteger(poArgs, 1, &iy))
 		return Py_BuildException();
-	int iz;
+	int32_t iz;
 	if (!PyTuple_GetInteger(poArgs, 2, &iz))
 		return Py_BuildException();
 
-	int iZoom;
+	int32_t iZoom;
 	if (!PyTuple_GetInteger(poArgs, 3, &iZoom))
 		return Py_BuildException();
-	int iRotation;
+	int32_t iRotation;
 	if (!PyTuple_GetInteger(poArgs, 4, &iRotation))
 		return Py_BuildException();
-	int iPitch;
+	int32_t iPitch;
 	if (!PyTuple_GetInteger(poArgs, 5, &iPitch))
 		return Py_BuildException();
 
@@ -943,7 +943,7 @@ PyObject * appSetDefaultCamera(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appSetSightRange(PyObject * poSelf, PyObject * poArgs)
 {
-	int iRange;
+	int32_t iRange;
 	if (!PyTuple_GetInteger(poArgs, 0, &iRange))
 		return Py_BuildException();
 
@@ -951,7 +951,7 @@ PyObject * appSetSightRange(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
-extern int g_iAccumulationTime;
+extern int32_t g_iAccumulationTime;
 
 PyObject * apptestGetAccumulationTime(PyObject * poSelf, PyObject * poArgs)
 {
@@ -981,7 +981,7 @@ PyObject * apptestSetSpecularColor(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appSetVisibleNotice(PyObject * poSelf, PyObject * poArgs)
 {
-	int iFlag;
+	int32_t iFlag;
 	if (!PyTuple_GetInteger(poArgs, 0, &iFlag))
 		return Py_BuildException();
 	bVisibleNotice = iFlag;
@@ -1016,12 +1016,12 @@ class CTextLineLoader
 			m_kTextFileLoader.Bind(kFile.GetSize(), kFile.GetData());
 		}
 
-		DWORD GetLineCount()
+		uint32_t GetLineCount()
 		{
 			return m_kTextFileLoader.GetLineCount();
 		}
 
-		const char * GetLine(DWORD dwIndex)
+		const char * GetLine(uint32_t dwIndex)
 		{
 			if (dwIndex >= GetLineCount())
 				return "";
@@ -1041,12 +1041,12 @@ PyObject * appOpenTextFile(PyObject * poSelf, PyObject * poArgs)
 
 	CTextLineLoader * pTextLineLoader = new CTextLineLoader(szFileName);
 
-	return Py_BuildValue("i", (int)pTextLineLoader);
+	return Py_BuildValue("i", (int32_t)pTextLineLoader);
 }
 
 PyObject * appCloseTextFile(PyObject * poSelf, PyObject * poArgs)
 {
-	int iHandle;
+	int32_t iHandle;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
 
@@ -1058,7 +1058,7 @@ PyObject * appCloseTextFile(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appGetTextFileLineCount(PyObject * poSelf, PyObject * poArgs)
 {
-	int iHandle;
+	int32_t iHandle;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
 
@@ -1068,10 +1068,10 @@ PyObject * appGetTextFileLineCount(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appGetTextFileLine(PyObject * poSelf, PyObject * poArgs)
 {
-	int iHandle;
+	int32_t iHandle;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
-	int iLineIndex;
+	int32_t iLineIndex;
 	if (!PyTuple_GetInteger(poArgs, 1, &iLineIndex))
 		return Py_BuildException();
 
@@ -1090,7 +1090,7 @@ PyObject * appSetGuildMarkPath(PyObject * poSelf, PyObject * poArgs)
 
     if (ext)
     {
-		int extPos = ext - path;
+		int32_t extPos = ext - path;
         strncpy(newPath, path, extPos);
         newPath[extPos] = '\0';
     }
@@ -1103,19 +1103,19 @@ PyObject * appSetGuildMarkPath(PyObject * poSelf, PyObject * poArgs)
 
 PyObject* appIsDevStage(PyObject* poSelf, PyObject* poArgs)
 {
-	int nIsDevelopmentStage = 0;
+	int32_t nIsDevelopmentStage = 0;
 	return Py_BuildValue("i", nIsDevelopmentStage);
 }
 
 PyObject* appIsTestStage(PyObject* poSelf, PyObject* poArgs)
 {
-	int nIsTestStage = 0;
+	int32_t nIsTestStage = 0;
 	return Py_BuildValue("i", nIsTestStage);
 }
 
 PyObject* appIsLiveStage(PyObject* poSelf, PyObject* poArgs)
 {
-	int nIsLiveStage = 1;
+	int32_t nIsLiveStage = 1;
 	return Py_BuildValue("i", nIsLiveStage);
 }
 
@@ -1125,7 +1125,7 @@ PyObject* appLogoOpen(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szName))
 		return Py_BuildException();
 
-	int nIsSuccess = 1; //CPythonApplication::Instance().OnLogoOpen(szName);
+	int32_t nIsSuccess = 1; //CPythonApplication::Instance().OnLogoOpen(szName);
 	CMovieMan::Instance().PlayLogo(szName);
 
 	return Py_BuildValue("i", nIsSuccess);
@@ -1133,7 +1133,7 @@ PyObject* appLogoOpen(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* appLogoUpdate(PyObject* poSelf, PyObject* poArgs)
 {
-	int nIsRun = 0; //CPythonApplication::Instance().OnLogoUpdate();
+	int32_t nIsRun = 0; //CPythonApplication::Instance().OnLogoUpdate();
 	return Py_BuildValue("i", nIsRun);
 }
 
@@ -1290,7 +1290,7 @@ void initapp()
 		{ "OnLogoClose",				appLogoClose,					METH_VARARGS },
 	
 
-		{ NULL, NULL },
+		{ nullptr, nullptr },
 	};
 
 	PyObject * poModule = Py_InitModule("app", s_methods);

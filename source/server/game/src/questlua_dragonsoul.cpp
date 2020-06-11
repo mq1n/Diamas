@@ -13,12 +13,12 @@
 
 namespace quest 
 {
-	int ds_open_refine_window(lua_State* L)
+	int32_t ds_open_refine_window(lua_State* L)
 	{
 		const LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		if (NULL == ch)
+		if (nullptr == ch)
 		{
-			sys_err ("NULL POINT ERROR");
+			sys_err ("nullptr POINT ERROR");
 			return 0;
 		}
 		if (ch->DragonSoul_IsQualified())
@@ -27,12 +27,12 @@ namespace quest
 		return 0;
 	}
 
-	int ds_give_qualification(lua_State* L)
+	int32_t ds_give_qualification(lua_State* L)
 	{
 		const LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		if (NULL == ch)
+		if (nullptr == ch)
 		{
-			sys_err ("NULL POINT ERROR");
+			sys_err ("nullptr POINT ERROR");
 			return 0;
 		}
 		ch->DragonSoul_GiveQualification();
@@ -40,12 +40,12 @@ namespace quest
 		return 0;
 	}
 
-	int ds_is_qualified(lua_State* L)
+	int32_t ds_is_qualified(lua_State* L)
 	{
 		const LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		if (NULL == ch)
+		if (nullptr == ch)
 		{
-			sys_err ("NULL POINT ERROR");
+			sys_err ("nullptr POINT ERROR");
 			lua_pushnumber(L, 0);
 			return 1;
 		}
@@ -61,7 +61,7 @@ namespace quest
 			{ "open_refine_window"	, ds_open_refine_window },
 			{ "give_qualification"	, ds_give_qualification },
 			{ "is_qualified"		, ds_is_qualified		},
-			{ NULL					, NULL					}
+			{ nullptr					, nullptr					}
 		};
 
 		CQuestManager::instance().AddLuaFunctionTable("ds", ds_functions);

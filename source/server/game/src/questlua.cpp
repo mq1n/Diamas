@@ -33,9 +33,9 @@ namespace quest
 	string ScriptToString(const string& str)
 	{
 		lua_State* L = CQuestManager::instance().GetLuaState();
-		int x = lua_gettop(L);
+		int32_t x = lua_gettop(L);
 
-		int errcode = lua_dobuffer(L, ("return "+str).c_str(), str.size()+7, "ScriptToString");
+		int32_t errcode = lua_dobuffer(L, ("return "+str).c_str(), str.size()+7, "ScriptToString");
 		string retstr;
 		if (!errcode)
 		{
@@ -78,7 +78,7 @@ namespace quest
 		bool returnBool = false;
 		if (pPC)
 		{
-			int flagValue = pPC->GetFlag(flagname);
+			int32_t flagValue = pPC->GetFlag(flagname);
 			if (value > flagValue)
 				returnBool = true;
 			else
@@ -88,7 +88,7 @@ namespace quest
 		return returnBool;
 	}
 
-	FPartyChat::FPartyChat(int ChatType, const char* str) : iChatType(ChatType), str(str)
+	FPartyChat::FPartyChat(int32_t ChatType, const char* str) : iChatType(ChatType), str(str)
 	{
 	}
 
@@ -158,7 +158,7 @@ namespace quest
 		lua_newtable(lua_state);
 	}
 
-	void FBuildLuaGuildWarList::operator() (DWORD g1, DWORD g2)
+	void FBuildLuaGuildWarList::operator() (uint32_t g1, uint32_t g2)
 	{
 		CGuild* g = CGuildManager::instance().FindGuild(g1);
 
@@ -179,15 +179,15 @@ namespace quest
 		lua_rawseti(L, -2, m_count++);
 	}
 
-	bool IsScriptTrue(const char* code, int size)
+	bool IsScriptTrue(const char* code, int32_t size)
 	{
 		if (size==0)
 			return true;
 
 		lua_State* L = CQuestManager::instance().GetLuaState();
-		int x = lua_gettop(L);
-		int errcode = lua_dobuffer(L, code, size, "IsScriptTrue");
-		int bStart = lua_toboolean(L, -1);
+		int32_t x = lua_gettop(L);
+		int32_t errcode = lua_dobuffer(L, code, size, "IsScriptTrue");
+		int32_t bStart = lua_toboolean(L, -1);
 		if (errcode)
 		{
 			char buf[100];
@@ -202,8 +202,8 @@ namespace quest
 	{
 		char buf[32];
 
-		int n = lua_gettop(L);
-		int i;
+		int32_t n = lua_gettop(L);
+		int32_t i;
 
 		for (i = 1; i <= n; ++i)
 		{
@@ -221,7 +221,7 @@ namespace quest
 	// 
 	// "member" Lua functions
 	//
-	int member_chat(lua_State* L)
+	int32_t member_chat(lua_State* L)
 	{
 		ostringstream s;
 		combine_lua_string(L, s);
@@ -229,21 +229,21 @@ namespace quest
 		return 0;
 	}
 
-	int member_clear_ready(lua_State* L)
+	int32_t member_clear_ready(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentPartyMember();
 		ch->RemoveAffect(AFFECT_DUNGEON_READY);
 		return 0;
 	}
 
-	int member_set_ready(lua_State* L)
+	int32_t member_set_ready(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentPartyMember();
 		ch->AddAffect(AFFECT_DUNGEON_READY, POINT_NONE, 0, AFF_DUNGEON_READY, 65535, 0, true);
 		return 0;
 	}
 
-	int mob_spawn(lua_State* L)
+	int32_t mob_spawn(lua_State* L)
 	{
 		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2) || !lua_isnumber(L, 3) || !lua_isnumber(L, 4))
 		{
@@ -251,12 +251,12 @@ namespace quest
 			return 0;
 		}
 
-		DWORD mob_vnum = (DWORD)lua_tonumber(L, 1);
-		long local_x = (long) lua_tonumber(L, 2)*100;
-		long local_y = (long) lua_tonumber(L, 3)*100;
+		uint32_t mob_vnum = (uint32_t)lua_tonumber(L, 1);
+		int32_t local_x = (int32_t) lua_tonumber(L, 2)*100;
+		int32_t local_y = (int32_t) lua_tonumber(L, 3)*100;
 		float radius = (float) lua_tonumber(L, 4)*100;
 		bool bAggressive = lua_toboolean(L, 5);
-		DWORD count = (lua_isnumber(L, 6))?(DWORD) lua_tonumber(L, 6):1;
+		uint32_t count = (lua_isnumber(L, 6))?(uint32_t) lua_tonumber(L, 6):1;
 
 		if (count == 0)
 			count = 1;
@@ -268,23 +268,23 @@ namespace quest
 
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(ch->GetMapIndex());
-		if (pMap == NULL) {
+		if (pMap == nullptr) {
 			return 0;
 		}
-		DWORD dwQuestIdx = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
+		uint32_t dwQuestIdx = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
 
 		bool ret = false;
-		LPCHARACTER mob = NULL;
+		LPCHARACTER mob = nullptr;
 
 		while (count--)
 		{
-			for (int loop = 0; loop < 8; ++loop)
+			for (int32_t loop = 0; loop < 8; ++loop)
 			{
 				float angle = number(0, 999) * M_PI * 2 / 1000;
 				float r = number(0, 999) * radius / 1000;
 
-				long x = local_x + pMap->m_setting.iBaseX + (long)(r * cos(angle));
-				long y = local_y + pMap->m_setting.iBaseY + (long)(r * sin(angle));
+				int32_t x = local_x + pMap->m_setting.iBaseX + (int32_t)(r * cos(angle));
+				int32_t y = local_y + pMap->m_setting.iBaseY + (int32_t)(r * sin(angle));
 
 				mob = CHARACTER_MANAGER::instance().SpawnMob(mob_vnum, ch->GetMapIndex(), x, y, 0);
 
@@ -302,7 +302,7 @@ namespace quest
 				if (!ret)
 				{
 					ret = true;
-					lua_pushnumber(L, (DWORD) mob->GetVID());
+					lua_pushnumber(L, (uint32_t) mob->GetVID());
 				}
 			}
 		}
@@ -313,7 +313,7 @@ namespace quest
 		return 1;
 	}
 
-	int mob_spawn_group(lua_State* L)
+	int32_t mob_spawn_group(lua_State* L)
 	{
 		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2) || !lua_isnumber(L, 3) || !lua_isnumber(L, 4) || !lua_isnumber(L, 6))
 		{
@@ -322,12 +322,12 @@ namespace quest
 			return 1;
 		}
 
-		DWORD group_vnum = (DWORD)lua_tonumber(L, 1);
-		long local_x = (long) lua_tonumber(L, 2) * 100;
-		long local_y = (long) lua_tonumber(L, 3) * 100;
+		uint32_t group_vnum = (uint32_t)lua_tonumber(L, 1);
+		int32_t local_x = (int32_t) lua_tonumber(L, 2) * 100;
+		int32_t local_y = (int32_t) lua_tonumber(L, 3) * 100;
 		float radius = (float) lua_tonumber(L, 4) * 100;
 		bool bAggressive = lua_toboolean(L, 5);
-		DWORD count = (DWORD) lua_tonumber(L, 6);
+		uint32_t count = (uint32_t) lua_tonumber(L, 6);
 
 		if (count == 0)
 			count = 1;
@@ -339,26 +339,26 @@ namespace quest
 
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(ch->GetMapIndex());
-		if (pMap == NULL) {
+		if (pMap == nullptr) {
 			lua_pushnumber(L, 0);
 			return 1;
 		}
-		DWORD dwQuestIdx = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
+		uint32_t dwQuestIdx = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
 
 		bool ret = false;
-		LPCHARACTER mob = NULL;
+		LPCHARACTER mob = nullptr;
 
 		while (count--)
 		{
-			for (int loop = 0; loop < 8; ++loop)
+			for (int32_t loop = 0; loop < 8; ++loop)
 			{
 				float angle = number(0, 999) * M_PI * 2 / 1000;
 				float r = number(0, 999)*radius/1000;
 
-				long x = local_x + pMap->m_setting.iBaseX + (long)(r * cos(angle));
-				long y = local_y + pMap->m_setting.iBaseY + (long)(r * sin(angle));
+				int32_t x = local_x + pMap->m_setting.iBaseX + (int32_t)(r * cos(angle));
+				int32_t y = local_y + pMap->m_setting.iBaseY + (int32_t)(r * sin(angle));
 
-				mob = CHARACTER_MANAGER::instance().SpawnGroup(group_vnum, ch->GetMapIndex(), x, y, x, y, NULL, bAggressive);
+				mob = CHARACTER_MANAGER::instance().SpawnGroup(group_vnum, ch->GetMapIndex(), x, y, x, y, nullptr, bAggressive);
 
 				if (mob)
 					break;
@@ -371,7 +371,7 @@ namespace quest
 				if (!ret)
 				{
 					ret = true;
-					lua_pushnumber(L, (DWORD) mob->GetVID());
+					lua_pushnumber(L, (uint32_t) mob->GetVID());
 				}
 			}
 		}
@@ -394,7 +394,7 @@ namespace quest
 		bool bIsExists = false;
 		if (bCheckIfExists)
 		{
-			int x = lua_gettop(L);
+			int32_t x = lua_gettop(L);
 			lua_getglobal(L, c_pszName);
 			if (!lua_istable(L, -1))
 			{
@@ -421,7 +421,7 @@ namespace quest
 
 	void CQuestManager::BuildStateIndexToName(const char* questName)
 	{
-		int x = lua_gettop(L);
+		int32_t x = lua_gettop(L);
 		lua_getglobal(L, questName);
 
 		if (lua_isnil(L,-1))
@@ -491,7 +491,7 @@ namespace quest
 				{ "chat",			member_chat		},
 				{ "set_ready",			member_set_ready	},
 				{ "clear_ready",		member_clear_ready	},
-				{ NULL,				NULL			}
+				{ nullptr,				nullptr			}
 			};
 
 			AddLuaFunctionTable("member", member_functions);
@@ -502,7 +502,7 @@ namespace quest
 			{
 				{ "spawn",			mob_spawn		},
 				{ "spawn_group",		mob_spawn_group		},
-				{ NULL,				NULL			}
+				{ nullptr,				nullptr			}
 			};
 
 			AddLuaFunctionTable("mob", mob_functions);
@@ -518,7 +518,7 @@ namespace quest
 			char settingsFileName[256];
 			snprintf(settingsFileName, sizeof(settingsFileName), "%s/settings.lua", LocaleService_GetBasePath().c_str());
 
-			int settingsLoadingResult = lua_dofile(L, settingsFileName);
+			int32_t settingsLoadingResult = lua_dofile(L, settingsFileName);
 			sys_log(0, "LoadSettings(%s), returns %d", settingsFileName, settingsLoadingResult);
 			if (settingsLoadingResult != 0)
 			{
@@ -531,7 +531,7 @@ namespace quest
 			char questlibFileName[256];
 			snprintf(questlibFileName, sizeof(questlibFileName), "%s/questlib.lua", LocaleService_GetQuestPath().c_str());
 
-			int questlibLoadingResult = lua_dofile(L, questlibFileName);
+			int32_t questlibLoadingResult = lua_dofile(L, questlibFileName);
 			sys_log(0, "LoadQuestlib(%s), returns %d", questlibFileName, questlibLoadingResult);
 			if (questlibLoadingResult != 0)
 			{
@@ -546,7 +546,7 @@ namespace quest
 			char translateFileName[256];
 			snprintf(translateFileName, sizeof(translateFileName), "%s/translate.lua", LocaleService_GetBasePath().c_str());
 
-			int translateLoadingResult = lua_dofile(L, translateFileName);
+			int32_t translateLoadingResult = lua_dofile(L, translateFileName);
 			sys_log(0, "LoadTranslate(%s), returns %d", translateFileName, translateLoadingResult);
 			if (translateLoadingResult != 0)
 			{
@@ -560,7 +560,7 @@ namespace quest
 			char questLocaleFileName[256];
 			snprintf(questLocaleFileName, sizeof(questLocaleFileName), "%s/locale.lua", g_stQuestDir.c_str());
 
-			int questLocaleLoadingResult = lua_dofile(L, questLocaleFileName);
+			int32_t questLocaleLoadingResult = lua_dofile(L, questLocaleFileName);
 			sys_log(0, "LoadQuestLocale(%s), returns %d", questLocaleFileName, questLocaleLoadingResult);
 			if (questLocaleLoadingResult != 0)
 			{
@@ -576,7 +576,7 @@ namespace quest
 			char buf[PATH_MAX];
 			snprintf(buf, sizeof(buf), "%s/state/", stQuestObjectDir.c_str());
 			DIR * pdir = opendir(buf);
-			int iQuestIdx = 0;
+			int32_t iQuestIdx = 0;
 
 			if (pdir)
 			{
@@ -590,7 +590,7 @@ namespace quest
 					snprintf(buf + 11, sizeof(buf) - 11, "%s", pde->d_name);
 
 					RegisterQuest(pde->d_name, ++iQuestIdx);
-					int ret = lua_dofile(L, (stQuestObjectDir + "/state/" + pde->d_name).c_str());
+					int32_t ret = lua_dofile(L, (stQuestObjectDir + "/state/" + pde->d_name).c_str());
 					sys_log(0, "QUEST: loading %s, returns %d", (stQuestObjectDir + "/state/" + pde->d_name).c_str(), ret);
 
 					BuildStateIndexToName(pde->d_name);
@@ -611,8 +611,8 @@ namespace quest
 	{
 		lua_checkstack(qs.co, 1);
 
-		//int n = lua_gettop(L);
-		int n = luaL_getn(qs.co, -1);
+		//int32_t n = lua_gettop(L);
+		int32_t n = luaL_getn(qs.co, -1);
 		qs.args = n;
 		//cout << "select here (1-" << qs.args << ")" << endl;
 		//
@@ -620,7 +620,7 @@ namespace quest
 		ostringstream os;
 		os << "[QUESTION ";
 
-		for (int i=1; i<=n; i++)
+		for (int32_t i=1; i<=n; i++)
 		{
 			lua_rawgeti(qs.co,-1,i);
 			if (lua_isstring(qs.co,-1))
@@ -649,8 +649,8 @@ namespace quest
 
 	EVENTINFO(confirm_timeout_event_info)
 	{
-		DWORD dwWaitPID;
-		DWORD dwReplyPID;
+		uint32_t dwWaitPID;
+		uint32_t dwReplyPID;
 
 		confirm_timeout_event_info()
 		: dwWaitPID( 0 )
@@ -663,14 +663,14 @@ namespace quest
 	{
 		confirm_timeout_event_info * info = dynamic_cast<confirm_timeout_event_info *>(event->info);
 
-		if ( info == NULL )
+		if ( info == nullptr )
 		{
 			sys_err( "confirm_timeout_event> <Factor> Null pointer" );
 			return 0;
 		}
 
 		LPCHARACTER chWait = CHARACTER_MANAGER::instance().FindByPID(info->dwWaitPID);
-		LPCHARACTER chReply = NULL; //CHARACTER_MANAGER::info().FindByPID(info->dwReplyPID);
+		LPCHARACTER chReply = nullptr; //CHARACTER_MANAGER::info().FindByPID(info->dwReplyPID);
 
 		if (chReply)
 		{
@@ -688,9 +688,9 @@ namespace quest
 	void CQuestManager::GotoConfirmState(QuestState & qs)
 	{
 		qs.suspend_state = SUSPEND_STATE_CONFIRM;
-		DWORD dwVID = (DWORD) lua_tonumber(qs.co, -3);
+		uint32_t dwVID = (uint32_t) lua_tonumber(qs.co, -3);
 		const char* szMsg = lua_tostring(qs.co, -2);
-		int iTimeout = (int) lua_tonumber(qs.co, -1);
+		int32_t iTimeout = (int32_t) lua_tonumber(qs.co, -1);
 
 		sys_log(0, "GotoConfirmState vid %u msg '%s', timeout %d", dwVID, szMsg, iTimeout);
 
@@ -758,7 +758,7 @@ namespace quest
 	// The beginning of script
 	// 
 
-	QuestState CQuestManager::OpenState(const string& quest_name, int state_index)
+	QuestState CQuestManager::OpenState(const string& quest_name, int32_t state_index)
 	{
 		QuestState qs;
 		qs.args=0;
@@ -778,7 +778,7 @@ namespace quest
 		ClearError();
 
 		m_CurrentRunningState = &qs;
-		int ret = lua_resume(qs.co, qs.args);
+		int32_t ret = lua_resume(qs.co, qs.args);
 
 		if (ret == 0)
 		{

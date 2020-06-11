@@ -8,17 +8,17 @@ class CLoginData
 	CLoginData();
 
 	TAccountTable & GetAccountRef();
-	void            SetClientKey(const DWORD * c_pdwClientKey);
+	void            SetClientKey(const uint32_t * c_pdwClientKey);
 
-	const DWORD *   GetClientKey();
-	void            SetKey(DWORD dwKey);
-	DWORD           GetKey();
+	const uint32_t *   GetClientKey();
+	void            SetKey(uint32_t dwKey);
+	uint32_t           GetKey();
 
-	void            SetConnectedPeerHandle(DWORD dwHandle);
-	DWORD		GetConnectedPeerHandle();
+	void            SetConnectedPeerHandle(uint32_t dwHandle);
+	uint32_t		GetConnectedPeerHandle();
 
 	void            SetLogonTime();
-	DWORD		GetLogonTime();
+	uint32_t		GetLogonTime();
 
 	void		SetIP(const char * c_pszIP);
 	const char *	GetIP();
@@ -31,26 +31,26 @@ class CLoginData
 
 	time_t		GetLastPlayTime() { return m_lastPlayTime; }
 
-	void            SetPremium(int * paiPremiumTimes);
-	int             GetPremium(BYTE type);
-	int *           GetPremiumPtr();
+	void            SetPremium(int32_t * paiPremiumTimes);
+	int32_t             GetPremium(uint8_t type);
+	int32_t *           GetPremiumPtr();
 
-	DWORD		GetLastPlayerID() const { return m_dwLastPlayerID; }
-	void		SetLastPlayerID(DWORD id) { m_dwLastPlayerID = id; }
+	uint32_t		GetLastPlayerID() const { return m_dwLastPlayerID; }
+	void		SetLastPlayerID(uint32_t id) { m_dwLastPlayerID = id; }
 
     private:
-	DWORD           m_dwKey;
-	DWORD           m_adwClientKey[4];
-	DWORD           m_dwConnectedPeerHandle;
-	DWORD           m_dwLogonTime;
+	uint32_t           m_dwKey;
+	uint32_t           m_adwClientKey[4];
+	uint32_t           m_dwConnectedPeerHandle;
+	uint32_t           m_dwLogonTime;
 	char		m_szIP[MAX_HOST_LENGTH+1];
 	bool		m_bPlay;
 	bool		m_bDeleted;
 
 	time_t		m_lastPlayTime;
-	int		m_aiPremiumTimes[PREMIUM_MAX_NUM];
+	int32_t		m_aiPremiumTimes[PREMIUM_MAX_NUM];
 
-	DWORD		m_dwLastPlayerID;
+	uint32_t		m_dwLastPlayerID;
 
 	TAccountTable   m_data;
 };

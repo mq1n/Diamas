@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SoundManager2D.h"
 
-CSoundInstance2D::CSoundInstance2D() : m_sample(NULL), m_pSoundData(NULL)
+CSoundInstance2D::CSoundInstance2D() : m_sample(nullptr), m_pSoundData(nullptr)
 {
 }
 
@@ -17,7 +17,7 @@ void CSoundInstance2D::Destroy()
 	if (m_sample)
 	{
 		AIL_release_sample_handle(m_sample);
-		m_sample = NULL;
+		m_sample = nullptr;
 	}
 }
 
@@ -32,7 +32,7 @@ bool CSoundInstance2D::Initialize()
 
 bool CSoundInstance2D::SetSound(CSoundData * pSoundData)
 {
-	assert(m_sample != NULL && pSoundData != NULL);
+	assert(m_sample != nullptr && pSoundData != nullptr);
 
 	// 레퍼런스 카운트가 1이 될 때 로드를 해야 제대로 사이즈가 리턴
 	// 되므로 반드시 Get을 호출 하고 진행해야 한다.
@@ -43,12 +43,12 @@ bool CSoundInstance2D::SetSound(CSoundData * pSoundData)
 
 	AIL_init_sample(m_sample);
 	
-    if (AIL_set_sample_file(m_sample, lpData, pSoundData->GetSize()) == NULL)
+    if (AIL_set_sample_file(m_sample, lpData, pSoundData->GetSize()) == 0)
 	{
-		if (m_pSoundData != NULL)
+		if (m_pSoundData != nullptr)
 		{
 			m_pSoundData->Release();
-			m_pSoundData = NULL;
+			m_pSoundData = nullptr;
 		}
 
 		pSoundData->Release();
@@ -56,10 +56,10 @@ bool CSoundInstance2D::SetSound(CSoundData * pSoundData)
 		return false;
 	}
 
-	if (m_pSoundData != NULL)
+	if (m_pSoundData != nullptr)
 	{
 		m_pSoundData->Release();
-		m_pSoundData = NULL;
+		m_pSoundData = nullptr;
 	}
 	
 	m_pSoundData = pSoundData;
@@ -71,7 +71,7 @@ bool CSoundInstance2D::IsDone() const
 	return AIL_sample_status(m_sample) == SMP_DONE;
 }
 
-void CSoundInstance2D::Play(int iLoopCount, DWORD dwPlayCycleTimeLimit) const
+void CSoundInstance2D::Play(int32_t iLoopCount, uint32_t dwPlayCycleTimeLimit) const
 {
     AIL_set_sample_loop_count(m_sample, iLoopCount);
 	AIL_start_sample(m_sample);
@@ -90,12 +90,12 @@ void CSoundInstance2D::Resume() const
 void CSoundInstance2D::Stop()
 {
 	AIL_end_sample(m_sample);
-	m_sample = NULL;
+	m_sample = nullptr;
 }
 
 void CSoundInstance2D::GetVolume(float& rfVolume) const
 {
-	AIL_sample_volume_pan(m_sample, &rfVolume, NULL);
+	AIL_sample_volume_pan(m_sample, &rfVolume, nullptr);
 }
 
 void CSoundInstance2D::SetVolume(float volume) const

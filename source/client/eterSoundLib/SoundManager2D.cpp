@@ -18,7 +18,7 @@ bool CSoundManager2D::Initialize()
 
 	ms_DIGDriver = AIL_open_digital_driver(44100, 16, 2, 0);
 	
-	for (int i = 0; i < INSTANCE_MAX_COUNT; ++i)
+	for (int32_t i = 0; i < INSTANCE_MAX_COUNT; ++i)
 		ms_Instances[i].Initialize();
 /*	ms_DIGDriver = AIL_open_digital_driver(44100,
 										   (DIG_F_STEREO_16 & DIG_F_16BITS_MASK) ? 16 : 8,
@@ -30,13 +30,13 @@ bool CSoundManager2D::Initialize()
 
 void CSoundManager2D::Destroy()
 {	
-	for (int i = 0; i < INSTANCE_MAX_COUNT; ++i)
+	for (int32_t i = 0; i < INSTANCE_MAX_COUNT; ++i)
 		ms_Instances[i].Destroy();
 	
-	if (ms_DIGDriver != NULL)
+	if (ms_DIGDriver != nullptr)
 	{
 		AIL_close_digital_driver(ms_DIGDriver);
-		ms_DIGDriver = NULL;
+		ms_DIGDriver = nullptr;
 	}	
 
 	CSoundBase::Destroy();
@@ -44,7 +44,7 @@ void CSoundManager2D::Destroy()
 
 ISoundInstance * CSoundManager2D::GetInstance(const char * c_pszFileName)
 {
-	DWORD dwFileCRC = GetFileCRC(c_pszFileName);
+	uint32_t dwFileCRC = GetFileCRC(c_pszFileName);
 	TSoundDataMap::iterator itor = ms_dataMap.find(dwFileCRC);
 
 	CSoundData * pkSoundData;
@@ -54,12 +54,12 @@ ISoundInstance * CSoundManager2D::GetInstance(const char * c_pszFileName)
 	else
 		pkSoundData = itor->second;
 
-	assert(pkSoundData != NULL);
+	assert(pkSoundData != nullptr);
 
-	static DWORD k = 0;
+	static uint32_t k = 0;
 
-	DWORD start = k++;
-	DWORD end = start + INSTANCE_MAX_COUNT;
+	uint32_t start = k++;
+	uint32_t end = start + INSTANCE_MAX_COUNT;
 
 	while (start < end)
 	{
@@ -75,5 +75,5 @@ ISoundInstance * CSoundManager2D::GetInstance(const char * c_pszFileName)
 		++start;
 	}
 
-	return NULL;
+	return nullptr;
 }

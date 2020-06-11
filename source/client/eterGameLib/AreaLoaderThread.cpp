@@ -14,7 +14,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-TEMP_CAreaLoaderThread::TEMP_CAreaLoaderThread() : m_bShutdowned(false), m_pArg(NULL), m_hThread(NULL), m_uThreadID(0)
+TEMP_CAreaLoaderThread::TEMP_CAreaLoaderThread() : m_bShutdowned(false), m_pArg(nullptr), m_hThread(nullptr), m_uThreadID(0)
 {
 
 }
@@ -27,7 +27,7 @@ TEMP_CAreaLoaderThread::~TEMP_CAreaLoaderThread()
 bool TEMP_CAreaLoaderThread::Create(void * arg)
 {
 	Arg(arg);
-	m_hThread = (HANDLE) _beginthreadex(NULL, 0, EntryPoint, this, 0, &m_uThreadID);
+	m_hThread = (HANDLE) _beginthreadex(nullptr, 0, EntryPoint, this, 0, &m_uThreadID);
 
 	if (!m_hThread)
 		return false;
@@ -36,7 +36,7 @@ bool TEMP_CAreaLoaderThread::Create(void * arg)
 	return true;
 }
 
-UINT TEMP_CAreaLoaderThread::Run(void * arg)
+uint32_t TEMP_CAreaLoaderThread::Run(void * arg)
 {
 	if (!Setup())
 		return 0;
@@ -45,7 +45,7 @@ UINT TEMP_CAreaLoaderThread::Run(void * arg)
 }
 
 /* Static */
-UINT CALLBACK TEMP_CAreaLoaderThread::EntryPoint(void * pThis)
+uint32_t CALLBACK TEMP_CAreaLoaderThread::EntryPoint(void * pThis)
 {
 	TEMP_CAreaLoaderThread * pThread = (TEMP_CAreaLoaderThread *) pThis;
 	return pThread->Run(pThread->Arg());
@@ -57,7 +57,7 @@ void TEMP_CAreaLoaderThread::Destroy()
 	if (m_hSemaphore)
 	{
 		CloseHandle(m_hSemaphore);
-		m_hSemaphore = NULL;
+		m_hSemaphore = nullptr;
 	}
 
 /*
@@ -65,7 +65,7 @@ void TEMP_CAreaLoaderThread::Destroy()
 	{
 		CTerrain * pTerrain = m_pTerrainRequestDeque.front();
 		delete pTerrain;
-		pTerrain = NULL;
+		pTerrain = nullptr;
 		m_pTerrainRequestDeque.pop_front();
 	}
 
@@ -73,7 +73,7 @@ void TEMP_CAreaLoaderThread::Destroy()
 	{
 		CTerrain * pTerrain = m_pTerrainCompleteDeque.front();
 		delete pTerrain;
-		pTerrain = NULL;
+		pTerrain = nullptr;
 		m_pTerrainCompleteDeque.pop_front();
 	}
 */
@@ -84,12 +84,12 @@ void TEMP_CAreaLoaderThread::Destroy()
 	stl_wipe(m_pAreaCompleteDeque);*/
 }
 
-UINT TEMP_CAreaLoaderThread::Setup()
+uint32_t TEMP_CAreaLoaderThread::Setup()
 {
-	m_hSemaphore = CreateSemaphore(NULL,		// no security attributes
+	m_hSemaphore = CreateSemaphore(nullptr,		// no security attributes
 								   0,			// initial count
 								   65535,		// maximum count
-								   NULL);		// unnamed semaphore
+								   nullptr);		// unnamed semaphore
 	if (!m_hSemaphore)
 		return 0;
 
@@ -107,19 +107,19 @@ void TEMP_CAreaLoaderThread::Shutdown()
 
 	do
 	{
-		bRet = ReleaseSemaphore(m_hSemaphore, 1, NULL);
+		bRet = ReleaseSemaphore(m_hSemaphore, 1, nullptr);
 	}
 	while (!bRet);
 
 	WaitForSingleObject(m_hThread, 10000);	// 쓰레드가 종료 되기를 10초 기다림
 }
 
-UINT TEMP_CAreaLoaderThread::Execute(void * pvArg)
+uint32_t TEMP_CAreaLoaderThread::Execute(void * pvArg)
 {
 	bool bProcessTerrain = true;
 	while (!m_bShutdowned)
 	{
-		DWORD dwWaitResult; 
+		uint32_t dwWaitResult; 
 
 		dwWaitResult = WaitForSingleObject(m_hSemaphore, INFINITE);
 
@@ -152,7 +152,7 @@ void TEMP_CAreaLoaderThread::Request(CTerrain * pTerrain)	// called in main thre
 
 	++m_iRestSemCount;
 
-	if (!ReleaseSemaphore(m_hSemaphore, m_iRestSemCount, NULL))
+	if (!ReleaseSemaphore(m_hSemaphore, m_iRestSemCount, nullptr))
 		TraceError("TEMP_CAreaLoaderThread::Request: ReleaseSemaphore error");
 
 	--m_iRestSemCount;
@@ -183,7 +183,7 @@ void TEMP_CAreaLoaderThread::Request(CArea * pArea)	// called in main thread
 
 	++m_iRestSemCount;
 
-	if (!ReleaseSemaphore(m_hSemaphore, m_iRestSemCount, NULL))
+	if (!ReleaseSemaphore(m_hSemaphore, m_iRestSemCount, nullptr))
 		TraceError("TEMP_CAreaLoaderThread::Request: ReleaseSemaphore error");
 
 	--m_iRestSemCount;
@@ -222,12 +222,12 @@ void TEMP_CAreaLoaderThread::ProcessArea()	// called in loader thread
 	Tracef("TEMP_CAreaLoaderThread::ProcessArea() RequestDeque Size : %d\n", m_pAreaRequestDeque.size());
 	m_AreaRequestMutex.Unlock();
 
-	DWORD dwStartTime = ELTimer_GetMSec();
+	uint32_t dwStartTime = ELTimer_GetMSec();
 
 	// Area Load
-	WORD wAreaCoordX, wAreaCoordY;
+	uint16_t wAreaCoordX, wAreaCoordY;
 	pArea->GetCoordinate(&wAreaCoordX, &wAreaCoordY);
-	DWORD dwID = (DWORD) (wAreaCoordX) * 1000L + (DWORD) (wAreaCoordY);
+	uint32_t dwID = (uint32_t) (wAreaCoordX) * 1000L + (uint32_t) (wAreaCoordY);
 
 	const std::string & c_rStrMapName = pArea->GetOwner()->GetName();
 
@@ -261,12 +261,12 @@ void TEMP_CAreaLoaderThread::ProcessTerrain()	// called in loader thread
 	Tracef("TEMP_CAreaLoaderThread::ProcessTerrain() RequestDeque Size : %d\n", m_pTerrainRequestDeque.size());
 	m_TerrainRequestMutex.Unlock();
 
-	DWORD dwStartTime = ELTimer_GetMSec();
+	uint32_t dwStartTime = ELTimer_GetMSec();
 
 	// Terrain Load
-	WORD wCoordX, wCoordY;
+	uint16_t wCoordX, wCoordY;
 	pTerrain->GetCoordinate(&wCoordX, &wCoordY);
-	DWORD dwID = (DWORD) (wCoordX) * 1000L + (DWORD) (wCoordY);
+	uint32_t dwID = (uint32_t) (wCoordX) * 1000L + (uint32_t) (wCoordY);
 
 	const std::string & c_rStrMapName = pTerrain->GetOwner()->GetName();
 	char filename[256];

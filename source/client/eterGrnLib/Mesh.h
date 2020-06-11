@@ -25,9 +25,9 @@ class CGrannyMesh
 		typedef struct STriGroupNode
 		{
 			STriGroupNode *		pNextTriGroupNode;
-			int					idxPos;
-			int					triCount;
-			DWORD				mtrlIndex;						
+			int32_t					idxPos;
+			int32_t					triCount;
+			uint32_t				mtrlIndex;						
 		} TTriGroupNode;
 
 	public:
@@ -35,7 +35,7 @@ class CGrannyMesh
 		virtual ~CGrannyMesh();
 
 		bool					IsEmpty() const;
-		bool					CreateFromGrannyMeshPointer(granny_skeleton* pgrnSkeleton, granny_mesh* pgrnMesh, int vtxBasePos, int idxBasePos, CGrannyMaterialPalette& rkMtrlPal);			
+		bool					CreateFromGrannyMeshPointer(granny_skeleton* pgrnSkeleton, granny_mesh* pgrnMesh, int32_t vtxBasePos, int32_t idxBasePos, CGrannyMaterialPalette& rkMtrlPal);			
 		void					LoadIndices(void* dstBaseIndices);
  		void					LoadPNTVertices(void* dstBaseVertices);
 		void					NEW_LoadVertices(void* dstBaseVertices);
@@ -47,14 +47,14 @@ class CGrannyMesh
 		bool					CanDeformPNTVertices() const;
 		bool					IsTwoSide() const;
 
-		int						GetVertexCount() const;
+		int32_t						GetVertexCount() const;
 		
 		// WORK
 		const granny_int32x*	GetDefaultBoneIndices() const;
 		// END_OF_WORK
 
-		int						GetVertexBasePosition() const; 
-		int						GetIndexBasePosition() const;
+		int32_t						GetVertexBasePosition() const; 
+		int32_t						GetIndexBasePosition() const;
 
 		const granny_mesh *					GetGrannyMeshPointer() const;
 		const CGrannyMesh::TTriGroupNode *	GetTriGroupNodeList(CGrannyMaterial::EType eMtrlType) const;
@@ -80,14 +80,14 @@ class CGrannyMesh
 		granny_mesh_deformer *	m_pgrnMeshDeformer;
 
 		// Granny Material Data
-		std::vector<DWORD>		m_mtrlIndexVector;
+		std::vector<uint32_t>		m_mtrlIndexVector;
 		
 		// TriGroups Data
 		TTriGroupNode *			m_triGroupNodes;
 		TTriGroupNode *			m_triGroupNodeLists[CGrannyMaterial::TYPE_MAX_NUM];
 
-		int						m_vtxBasePos;
-		int						m_idxBasePos;
+		int32_t						m_vtxBasePos;
+		int32_t						m_idxBasePos;
 
 		bool					m_canDeformPNTVertex;
 		bool					m_isTwoSide;

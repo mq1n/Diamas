@@ -11,19 +11,19 @@
 class CSpecialAttrGroup
 {
 public:
-	CSpecialAttrGroup(DWORD vnum)
+	CSpecialAttrGroup(uint32_t vnum)
 		: m_dwVnum(vnum)
 	{}
 	struct CSpecialAttrInfo
 	{
-		CSpecialAttrInfo (DWORD _apply_type, DWORD _apply_value)
+		CSpecialAttrInfo (uint32_t _apply_type, uint32_t _apply_value)
 			: apply_type(_apply_type), apply_value(_apply_value)
 		{}
-		DWORD apply_type;
-		DWORD apply_value;
+		uint32_t apply_type;
+		uint32_t apply_value;
 
 	};
-	DWORD m_dwVnum;
+	uint32_t m_dwVnum;
 	std::string	m_stEffectFileName;
 	std::vector<CSpecialAttrInfo> m_vecAttrs;
 };
@@ -54,20 +54,20 @@ class CSpecialItemGroup
 
 		struct CSpecialItemInfo
 		{
-			DWORD vnum;
-			int count;
-			int rare;
+			uint32_t vnum;
+			int32_t count;
+			int32_t rare;
 
-			CSpecialItemInfo(DWORD _vnum, int _count, int _rare)
+			CSpecialItemInfo(uint32_t _vnum, int32_t _count, int32_t _rare)
 				: vnum(_vnum), count(_count), rare(_rare)
 				{}
 		};
 
-		CSpecialItemGroup(DWORD vnum, BYTE type=0)
+		CSpecialItemGroup(uint32_t vnum, uint8_t type=0)
 			: m_dwVnum(vnum), m_bType(type)
 			{}
 
-		void AddItem(DWORD vnum, int count, int prob, int rare)
+		void AddItem(uint32_t vnum, int32_t count, int32_t prob, int32_t rare)
 		{
 			if (!prob)
 				return;
@@ -86,12 +86,12 @@ class CSpecialItemGroup
 		// 확률을 더해가지 않고, 독립적으로 계산하여 아이템을 생성한다.
 		// 따라서 여러 개의 아이템이 생성될 수 있다.
 		// by rtsummit
-		int GetMultiIndex(std::vector <int> &idx_vec) const
+		int32_t GetMultiIndex(std::vector <int32_t> &idx_vec) const
 		{
 			idx_vec.clear();
 			if (m_bType == PCT)
 			{
-				int count = 0;
+				int32_t count = 0;
 				if (number(1,100) <= m_vecProbs[0])
 				{
 					idx_vec.push_back(0);
@@ -114,31 +114,31 @@ class CSpecialItemGroup
 			}
 		}
 
-		int GetOneIndex() const
+		int32_t GetOneIndex() const
 		{
-			int n = number(1, m_vecProbs.back());
+			int32_t n = number(1, m_vecProbs.back());
 			auto it = lower_bound(m_vecProbs.begin(), m_vecProbs.end(), n);
 			return std::distance(m_vecProbs.begin(), it);
 		}
 
-		int GetVnum(int idx) const
+		int32_t GetVnum(int32_t idx) const
 		{
 			return m_vecItems[idx].vnum;
 		}
 
-		int GetCount(int idx) const
+		int32_t GetCount(int32_t idx) const
 		{
 			return m_vecItems[idx].count;
 		}
 
-		int GetRarePct(int idx) const
+		int32_t GetRarePct(int32_t idx) const
 		{
 			return m_vecItems[idx].rare;
 		}
 
-		bool Contains(DWORD dwVnum) const
+		bool Contains(uint32_t dwVnum) const
 		{
-			for (DWORD i = 0; i < m_vecItems.size(); i++)
+			for (uint32_t i = 0; i < m_vecItems.size(); i++)
 			{
 				if (m_vecItems[i].vnum == dwVnum)
 					return true;
@@ -148,7 +148,7 @@ class CSpecialItemGroup
 		
 		// Group의 Type이 Special인 경우에
 		// dwVnum에 매칭되는 AttrVnum을 return해준다.
-		DWORD GetAttrVnum(DWORD dwVnum) const
+		uint32_t GetAttrVnum(uint32_t dwVnum) const
 		{
 			if (CSpecialItemGroup::SPECIAL != m_bType)
 				return 0;
@@ -163,14 +163,14 @@ class CSpecialItemGroup
 		}
 
 		// Group의 Size를 return해준다.
-		int GetGroupSize() const
+		int32_t GetGroupSize() const
 		{
 			return m_vecProbs.size();
 		}
 
-		DWORD m_dwVnum;
-		BYTE	m_bType;
-		std::vector<int> m_vecProbs;
+		uint32_t m_dwVnum;
+		uint8_t	m_bType;
+		std::vector<int32_t> m_vecProbs;
 		std::vector<CSpecialItemInfo> m_vecItems; // vnum, count
 };
 
@@ -179,11 +179,11 @@ class CMobItemGroup
 	public:
 		struct SMobItemGroupInfo
 		{
-			DWORD dwItemVnum;
-			int iCount;
-			int iRarePct;
+			uint32_t dwItemVnum;
+			int32_t iCount;
+			int32_t iRarePct;
 
-			SMobItemGroupInfo(DWORD dwItemVnum, int iCount, int iRarePct)
+			SMobItemGroupInfo(uint32_t dwItemVnum, int32_t iCount, int32_t iRarePct)
 				: dwItemVnum(dwItemVnum),
 			iCount(iCount),
 			iRarePct(iRarePct)
@@ -191,7 +191,7 @@ class CMobItemGroup
 			}
 		};
 
-		CMobItemGroup(DWORD dwMobVnum, int iKillDrop, const std::string& r_stName)
+		CMobItemGroup(uint32_t dwMobVnum, int32_t iKillDrop, const std::string& r_stName)
 			:
 			m_dwMobVnum(dwMobVnum),
 		m_iKillDrop(iKillDrop),
@@ -199,12 +199,12 @@ class CMobItemGroup
 		{
 		}
 
-		int GetKillPerDrop() const
+		int32_t GetKillPerDrop() const
 		{
 			return m_iKillDrop;
 		}
 
-		void AddItem(DWORD dwItemVnum, int iCount, int iPartPct, int iRarePct)
+		void AddItem(uint32_t dwItemVnum, int32_t iCount, int32_t iPartPct, int32_t iRarePct)
 		{
 			if (!m_vecProbs.empty())
 				iPartPct += m_vecProbs.back();
@@ -218,9 +218,9 @@ class CMobItemGroup
 			return m_vecProbs.empty();
 		}
 
-		int GetOneIndex() const
+		int32_t GetOneIndex() const
 		{
-			int n = number(1, m_vecProbs.back());
+			int32_t n = number(1, m_vecProbs.back());
 			auto it = lower_bound(m_vecProbs.begin(), m_vecProbs.end(), n);
 			return std::distance(m_vecProbs.begin(), it);
 		}
@@ -232,10 +232,10 @@ class CMobItemGroup
 		}
 
 	private:
-		DWORD m_dwMobVnum;
-		int m_iKillDrop;
+		uint32_t m_dwMobVnum;
+		int32_t m_iKillDrop;
 		std::string m_stName;
-		std::vector<int> m_vecProbs;
+		std::vector<int32_t> m_vecProbs;
 		std::vector<SMobItemGroupInfo> m_vecItems;
 };
 
@@ -243,17 +243,17 @@ class CDropItemGroup
 {
 	struct SDropItemGroupInfo
 	{
-		DWORD	dwVnum;
-		DWORD	dwPct;
-		int	iCount;
+		uint32_t	dwVnum;
+		uint32_t	dwPct;
+		int32_t	iCount;
 
-		SDropItemGroupInfo(DWORD dwVnum, DWORD dwPct, int iCount)
+		SDropItemGroupInfo(uint32_t dwVnum, uint32_t dwPct, int32_t iCount)
 			: dwVnum(dwVnum), dwPct(dwPct), iCount(iCount)
 			{}
 	};
 
 	public:
-	CDropItemGroup(DWORD dwVnum, DWORD dwMobVnum, const std::string& r_stName)
+	CDropItemGroup(uint32_t dwVnum, uint32_t dwMobVnum, const std::string& r_stName)
 		:
 		m_dwVnum(dwVnum),
 	m_dwMobVnum(dwMobVnum),
@@ -266,14 +266,14 @@ class CDropItemGroup
 		return m_vec_items;
 	}
 
-	void AddItem(DWORD dwItemVnum, DWORD dwPct, int iCount)
+	void AddItem(uint32_t dwItemVnum, uint32_t dwPct, int32_t iCount)
 	{
 		m_vec_items.push_back(SDropItemGroupInfo(dwItemVnum, dwPct, iCount));
 	}
 
 	private:
-	DWORD m_dwVnum;
-	DWORD m_dwMobVnum;
+	uint32_t m_dwVnum;
+	uint32_t m_dwMobVnum;
 	std::string m_stName;
 	std::vector<SDropItemGroupInfo> m_vec_items;
 };
@@ -282,28 +282,28 @@ class CLevelItemGroup
 {
 	struct SLevelItemGroupInfo
 	{
-		DWORD dwVNum;
-		DWORD dwPct;
-		int iCount;
+		uint32_t dwVNum;
+		uint32_t dwPct;
+		int32_t iCount;
 
-		SLevelItemGroupInfo(DWORD dwVnum, DWORD dwPct, int iCount)
+		SLevelItemGroupInfo(uint32_t dwVnum, uint32_t dwPct, int32_t iCount)
 			: dwVNum(dwVnum), dwPct(dwPct), iCount(iCount)
 		{ }
 	};
 
 	private :
-		DWORD m_dwLevelLimit;
+		uint32_t m_dwLevelLimit;
 		std::string m_stName;
 		std::vector<SLevelItemGroupInfo> m_vec_items;
 
 	public :
-		CLevelItemGroup(DWORD dwLevelLimit)
+		CLevelItemGroup(uint32_t dwLevelLimit)
 			: m_dwLevelLimit(dwLevelLimit)
 		{}
 
-		DWORD GetLevelLimit() { return m_dwLevelLimit; }
+		uint32_t GetLevelLimit() { return m_dwLevelLimit; }
 
-		void AddItem(DWORD dwItemVnum, DWORD dwPct, int iCount)
+		void AddItem(uint32_t dwItemVnum, uint32_t dwPct, int32_t iCount)
 		{
 			m_vec_items.push_back(SLevelItemGroupInfo(dwItemVnum, dwPct, iCount));
 		}
@@ -318,17 +318,17 @@ class CBuyerThiefGlovesItemGroup
 {
 	struct SThiefGroupInfo
 	{
-		DWORD	dwVnum;
-		DWORD	dwPct;
-		int	iCount;
+		uint32_t	dwVnum;
+		uint32_t	dwPct;
+		int32_t	iCount;
 
-		SThiefGroupInfo(DWORD dwVnum, DWORD dwPct, int iCount)
+		SThiefGroupInfo(uint32_t dwVnum, uint32_t dwPct, int32_t iCount)
 			: dwVnum(dwVnum), dwPct(dwPct), iCount(iCount)
 			{}
 	};
 
 	public:
-	CBuyerThiefGlovesItemGroup(DWORD dwVnum, DWORD dwMobVnum, const std::string& r_stName)
+	CBuyerThiefGlovesItemGroup(uint32_t dwVnum, uint32_t dwMobVnum, const std::string& r_stName)
 		:
 		m_dwVnum(dwVnum),
 	m_dwMobVnum(dwMobVnum),
@@ -341,14 +341,14 @@ class CBuyerThiefGlovesItemGroup
 		return m_vec_items;
 	}
 
-	void AddItem(DWORD dwItemVnum, DWORD dwPct, int iCount)
+	void AddItem(uint32_t dwItemVnum, uint32_t dwPct, int32_t iCount)
 	{
 		m_vec_items.push_back(SThiefGroupInfo(dwItemVnum, dwPct, iCount));
 	}
 
 	private:
-	DWORD m_dwVnum;
-	DWORD m_dwMobVnum;
+	uint32_t m_dwVnum;
+	uint32_t m_dwMobVnum;
 	std::string m_stName;
 	std::vector<SThiefGroupInfo> m_vec_items;
 };
@@ -361,12 +361,12 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 		ITEM_MANAGER();
 		virtual ~ITEM_MANAGER();
 
-		bool                    Initialize(TItemTable * table, int size);
+		bool                    Initialize(TItemTable * table, int32_t size);
 		void			Destroy();
 		void			Update();	// 매 루프마다 부른다.
 		void			GracefulShutdown();
 
-		DWORD			GetNewID();
+		uint32_t			GetNewID();
 		bool			SetMaxItemID(TItemIDRangeTable range); // 최대 고유 아이디를 지정
 		bool			SetMaxSpareItemID(TItemIDRangeTable range);
 
@@ -377,21 +377,21 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 		void			FlushDelayedSave(LPITEM item); // Delayed 리스트에 있다면 지우고 저장한다. 끊김 처리시 사용 됨.
 		void			SaveSingleItem(LPITEM item);
 
-		LPITEM                  CreateItem(DWORD vnum, DWORD count = 1, DWORD dwID = 0, bool bTryMagic = false, int iRarePct = -1, bool bSkipSave = false);
+		LPITEM                  CreateItem(uint32_t vnum, uint32_t count = 1, uint32_t dwID = 0, bool bTryMagic = false, int32_t iRarePct = -1, bool bSkipSave = false);
 #ifndef DEBUG_ALLOC
 		void DestroyItem(LPITEM item);
 #else
 		void DestroyItem(LPITEM item, const char* file, size_t line);
 #endif
-		void			RemoveItem(LPITEM item, const char * c_pszReason=NULL); // 사용자로 부터 아이템을 제거
+		void			RemoveItem(LPITEM item, const char * c_pszReason=nullptr); // 사용자로 부터 아이템을 제거
 
-		LPITEM			Find(DWORD id);
-		LPITEM                  FindByVID(DWORD vid);
-		TItemTable *            GetTable(DWORD vnum);
-		bool			GetVnum(const char * c_pszName, DWORD & r_dwVnum);
-		bool			GetVnumByOriginalName(const char * c_pszName, DWORD & r_dwVnum);
+		LPITEM			Find(uint32_t id);
+		LPITEM                  FindByVID(uint32_t vid);
+		TItemTable *            GetTable(uint32_t vnum);
+		bool			GetVnum(const char * c_pszName, uint32_t & r_dwVnum);
+		bool			GetVnumByOriginalName(const char * c_pszName, uint32_t & r_dwVnum);
 
-		bool			GetDropPct(LPCHARACTER pkChr, LPCHARACTER pkKiller, OUT int& iDeltaPercent, OUT int& iRandRange);
+		bool			GetDropPct(LPCHARACTER pkChr, LPCHARACTER pkKiller, OUT int32_t& iDeltaPercent, OUT int32_t& iRandRange);
 		bool			CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::vector<LPITEM> & vec_item);
 
 		bool			ReadCommonDropItemFile(const char * c_pszFileName);
@@ -404,51 +404,51 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 		bool			ConvSpecialDropItemFile();
 		// convert name -> vnum special_item_group.txt
 
-		DWORD			GetRefineFromVnum(DWORD dwVnum);
+		uint32_t			GetRefineFromVnum(uint32_t dwVnum);
 
 		static void		CopyAllAttrTo(LPITEM pkOldItem, LPITEM pkNewItem);		// pkNewItem으로 모든 속성과 소켓 값들을 목사하는 함수.
 
 
-		const CSpecialItemGroup* GetSpecialItemGroup(DWORD dwVnum);
-		const CSpecialAttrGroup* GetSpecialAttrGroup(DWORD dwVnum);
+		const CSpecialItemGroup* GetSpecialItemGroup(uint32_t dwVnum);
+		const CSpecialAttrGroup* GetSpecialAttrGroup(uint32_t dwVnum);
 
 		const std::vector<TItemTable> & GetTable() { return m_vec_prototype; }
 
 		// CHECK_UNIQUE_GROUP
-		int			GetSpecialGroupFromItem(DWORD dwVnum) const { auto it = m_ItemToSpecialGroup.find(dwVnum); return (it == m_ItemToSpecialGroup.end()) ? 0 : it->second; }
+		int32_t			GetSpecialGroupFromItem(uint32_t dwVnum) const { auto it = m_ItemToSpecialGroup.find(dwVnum); return (it == m_ItemToSpecialGroup.end()) ? 0 : it->second; }
 		// END_OF_CHECK_UNIQUE_GROUP
 
 	protected:
-		int                     RealNumber(DWORD vnum);
-		void			CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::vector<LPITEM> & vec_item, int iDeltaPercent, int iRandRange);
+		int32_t                     RealNumber(uint32_t vnum);
+		void			CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::vector<LPITEM> & vec_item, int32_t iDeltaPercent, int32_t iRandRange);
 
 	protected:
-		typedef std::map<DWORD, LPITEM> ITEM_VID_MAP;		
+		typedef std::map<uint32_t, LPITEM> ITEM_VID_MAP;		
 
 		std::vector<TItemTable>		m_vec_prototype;
 		std::vector<TItemTable*> m_vec_item_vnum_range_info;
-		std::map<DWORD, DWORD>		m_map_ItemRefineFrom;
-		int				m_iTopOfTable;
+		std::map<uint32_t, uint32_t>		m_map_ItemRefineFrom;
+		int32_t				m_iTopOfTable;
 
 		ITEM_VID_MAP			m_VIDMap;			///< m_dwVIDCount 의 값단위로 아이템을 저장한다.
-		DWORD				m_dwVIDCount;			///< 이녀석 VID가 아니라 그냥 프로세스 단위 유니크 번호다.
-		DWORD				m_dwCurrentID;
+		uint32_t				m_dwVIDCount;			///< 이녀석 VID가 아니라 그냥 프로세스 단위 유니크 번호다.
+		uint32_t				m_dwCurrentID;
 		TItemIDRangeTable	m_ItemIDRange;
 		TItemIDRangeTable	m_ItemIDSpareRange;
 
 		std::unordered_set<LPITEM> m_set_pkItemForDelayedSave;
-		std::map<DWORD, LPITEM>		m_map_pkItemByID;
-		std::map<DWORD, DWORD>		m_map_dwEtcItemDropProb;
-		std::map<DWORD, CDropItemGroup*> m_map_pkDropItemGroup;
-		std::map<DWORD, CSpecialItemGroup*> m_map_pkSpecialItemGroup;
-		std::map<DWORD, CSpecialItemGroup*> m_map_pkQuestItemGroup;
-		std::map<DWORD, CSpecialAttrGroup*> m_map_pkSpecialAttrGroup;
-		std::map<DWORD, CMobItemGroup*> m_map_pkMobItemGroup;
-		std::map<DWORD, CLevelItemGroup*> m_map_pkLevelItemGroup;
-		std::map<DWORD, CBuyerThiefGlovesItemGroup*> m_map_pkGloveItemGroup;
+		std::map<uint32_t, LPITEM>		m_map_pkItemByID;
+		std::map<uint32_t, uint32_t>		m_map_dwEtcItemDropProb;
+		std::map<uint32_t, CDropItemGroup*> m_map_pkDropItemGroup;
+		std::map<uint32_t, CSpecialItemGroup*> m_map_pkSpecialItemGroup;
+		std::map<uint32_t, CSpecialItemGroup*> m_map_pkQuestItemGroup;
+		std::map<uint32_t, CSpecialAttrGroup*> m_map_pkSpecialAttrGroup;
+		std::map<uint32_t, CMobItemGroup*> m_map_pkMobItemGroup;
+		std::map<uint32_t, CLevelItemGroup*> m_map_pkLevelItemGroup;
+		std::map<uint32_t, CBuyerThiefGlovesItemGroup*> m_map_pkGloveItemGroup;
 
 		// CHECK_UNIQUE_GROUP
-		std::map<DWORD, int>		m_ItemToSpecialGroup;
+		std::map<uint32_t, int32_t>		m_ItemToSpecialGroup;
 		// END_OF_CHECK_UNIQUE_GROUP
 	
 	private:
@@ -461,17 +461,17 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 		// 그래서 새 vnum의 아이템이면, 서버에서 돌아갈 때는 오리지널 아이템 vnum으로 바꿔서 돌고 하고,
 		// 저장할 때에 본래 vnum으로 바꿔주도록 한다.
 		// 이를 위해 오리지널 vnum과 새로운 vnum을 연결시켜주는 맵을 만듦.
-		typedef std::map <DWORD, DWORD> TMapDW2DW;
+		typedef std::map <uint32_t, uint32_t> TMapDW2DW;
 		TMapDW2DW	m_map_new_to_ori;
 
 	public:	
-		DWORD	GetMaskVnum(DWORD dwVnum);
-		std::map<DWORD, TItemTable>  m_map_vid;
-		std::map<DWORD, TItemTable>&  GetVIDMap() { return m_map_vid; }
+		uint32_t	GetMaskVnum(uint32_t dwVnum);
+		std::map<uint32_t, TItemTable>  m_map_vid;
+		std::map<uint32_t, TItemTable>&  GetVIDMap() { return m_map_vid; }
 		std::vector<TItemTable>& GetVecProto() { return m_vec_prototype; }	
 		
-		const static int MAX_NORM_ATTR_NUM = ITEM_ATTRIBUTE_NORM_NUM;
-		const static int MAX_RARE_ATTR_NUM = ITEM_ATTRIBUTE_RARE_NUM;
+		const static int32_t MAX_NORM_ATTR_NUM = ITEM_ATTRIBUTE_NORM_NUM;
+		const static int32_t MAX_RARE_ATTR_NUM = ITEM_ATTRIBUTE_RARE_NUM;
 		bool ReadItemVnumMaskTable(const char * c_pszFileName);
 	private:
 #ifdef M2_USE_POOL

@@ -100,7 +100,7 @@ CSpeedGrassRT::CSpeedGrassRT( ) :
 	m_nNumRegions(0),
 	m_nNumRegionCols(0),
 	m_nNumRegionRows(0),
-	m_pRegions(NULL),
+	m_pRegions(nullptr),
 	m_bAllRegionsCulled(false)
 {
 	m_afBoundingBox[0] = m_afBoundingBox[1] = m_afBoundingBox[2] = 0.0f;
@@ -122,7 +122,7 @@ CSpeedGrassRT::~CSpeedGrassRT( )
 void CSpeedGrassRT::DeleteRegions(void)
 {
 	delete[] m_pRegions;
-	m_pRegions = NULL;
+	m_pRegions = nullptr;
 	m_nNumRegions = 0;
 }
 
@@ -130,7 +130,7 @@ void CSpeedGrassRT::DeleteRegions(void)
 ///////////////////////////////////////////////////////////////////////  
 //	CSpeedGrassRT::GetRegions
 
-const CSpeedGrassRT::SRegion* CSpeedGrassRT::GetRegions(unsigned int& uiNumRegions)
+const CSpeedGrassRT::SRegion* CSpeedGrassRT::GetRegions(uint32_t& uiNumRegions)
 {
 	uiNumRegions = m_nNumRegions;
 
@@ -140,13 +140,13 @@ const CSpeedGrassRT::SRegion* CSpeedGrassRT::GetRegions(unsigned int& uiNumRegio
 ///////////////////////////////////////////////////////////////////////  
 //	CSpeedGrassRT::ParseBsfFile
 
-bool CSpeedGrassRT::ParseBsfFile(const char* pFilename, unsigned int nNumBlades, unsigned int uiRows, unsigned int uiCols, float fCollisionDistance)
+bool CSpeedGrassRT::ParseBsfFile(const char* pFilename, uint32_t nNumBlades, uint32_t uiRows, uint32_t uiCols, float fCollisionDistance)
 {
 	bool bSuccess = false;
 
 	// copy region settings
-	m_nNumRegionCols = int(uiCols);
-	m_nNumRegionRows = int(uiRows);
+	m_nNumRegionCols = int32_t(uiCols);
+	m_nNumRegionRows = int32_t(uiRows);
 
 	// initialize bounding box
 	m_afBoundingBox[0] = m_afBoundingBox[1] = m_afBoundingBox[2] = FLT_MAX;
@@ -157,7 +157,7 @@ bool CSpeedGrassRT::ParseBsfFile(const char* pFilename, unsigned int nNumBlades,
 
 	if (cManager.LoadBsfFile(pFilename))
 	{
-		for (unsigned int i = 0; i < nNumBlades; ++i)
+		for (uint32_t i = 0; i < nNumBlades; ++i)
 		{
 			SBlade sBlade;
 
@@ -178,7 +178,7 @@ bool CSpeedGrassRT::ParseBsfFile(const char* pFilename, unsigned int nNumBlades,
 				sBlade.m_afNormal[2] = v3Normal.z;
 
 				// check against overall scene bounding box
-				for (int nAxis = 0; nAxis < 3; ++nAxis)
+				for (int32_t nAxis = 0; nAxis < 3; ++nAxis)
 				{
 					m_afBoundingBox[nAxis] = min(m_afBoundingBox[nAxis], sBlade.m_afPos[nAxis]);
 					m_afBoundingBox[nAxis + 3] = max(m_afBoundingBox[nAxis + 3], sBlade.m_afPos[nAxis]);
@@ -219,11 +219,11 @@ bool CSpeedGrassRT::ParseBsfFile(const char* pFilename, unsigned int nNumBlades,
 //	to add parameters as necessary but be sure to call CreateRegions( )
 //	at the end of the function to set up the SpeedGrass region system.
 
-bool CSpeedGrassRT::CustomPlacement(unsigned int uiRows, unsigned int uiCols)
+bool CSpeedGrassRT::CustomPlacement(uint32_t uiRows, uint32_t uiCols)
 {
 	// copy region settings (do not remove)
-	m_nNumRegionCols = int(uiCols);
-	m_nNumRegionRows = int(uiRows);
+	m_nNumRegionCols = int32_t(uiCols);
+	m_nNumRegionRows = int32_t(uiRows);
 
 	// initialize bounding box (do not remove)
 	m_afBoundingBox[0] = m_afBoundingBox[1] = m_afBoundingBox[2] = FLT_MAX;
@@ -243,7 +243,7 @@ bool CSpeedGrassRT::CustomPlacement(unsigned int uiRows, unsigned int uiCols)
 	sBlade.m_afNormal[2] = 1.0f;
 
 	// check against overall scene bounding box (always do this)
-	for (int nAxis = 0; nAxis < 3; ++nAxis)
+	for (int32_t nAxis = 0; nAxis < 3; ++nAxis)
 	{
 		m_afBoundingBox[nAxis] = min(m_afBoundingBox[nAxis], sBlade.m_afPos[nAxis]);
 		m_afBoundingBox[nAxis + 3] = max(m_afBoundingBox[nAxis + 3], sBlade.m_afPos[nAxis]);
@@ -303,15 +303,15 @@ void CSpeedGrassRT::SetLodParams(float fFarDistance, float fTransitionLength)
 void CSpeedGrassRT::Cull(void)
 {
 	// convert raw frustum min and max values into min and max region cell indices
-	int anFrustumCellsMin[2], anFrustumCellsMax[2];
+	int32_t anFrustumCellsMin[2], anFrustumCellsMax[2];
 	ConvertCoordsToCell(m_afFrustumMin, anFrustumCellsMin);
 	ConvertCoordsToCell(m_afFrustumMax, anFrustumCellsMax);
 
 	// set all regions to culled, modify later
-	for (int i = 0; i < m_nNumRegions; ++i)
+	for (int32_t i = 0; i < m_nNumRegions; ++i)
 		m_pRegions[i].m_bCulled = true;
 	
-	int nRegionsDrawn = 0;
+	int32_t nRegionsDrawn = 0;
 
 	// is the entire set of regions culled?
 	if ((anFrustumCellsMin[0] < 0 && anFrustumCellsMax[0] < 0) ||
@@ -328,7 +328,7 @@ void CSpeedGrassRT::Cull(void)
 		anFrustumCellsMax[1] = min(anFrustumCellsMax[1], m_nNumRegionRows - 1);
 
 		for (i = anFrustumCellsMin[0]; i <= anFrustumCellsMax[0]; ++i)
-			for (int j = anFrustumCellsMin[1]; j <= anFrustumCellsMax[1]; ++j)
+			for (int32_t j = anFrustumCellsMin[1]; j <= anFrustumCellsMax[1]; ++j)
 			{
 				SRegion* pRegion = m_pRegions + GetRegionIndex(j, i);
 				pRegion->m_bCulled = OutsideFrustum(pRegion);
@@ -414,7 +414,7 @@ void CSpeedGrassRT::CreateRegions(const vector<SBlade>& vSceneBlades, float fCol
 {
 	// create regions based on overall extents
 	DeleteRegions( );
-	m_nNumRegions = int(m_nNumRegionRows * m_nNumRegionCols);
+	m_nNumRegions = int32_t(m_nNumRegionRows * m_nNumRegionCols);
 	m_pRegions = new SRegion[m_nNumRegions];
 
 	// run through all regions, computing extents for each
@@ -422,10 +422,10 @@ void CSpeedGrassRT::CreateRegions(const vector<SBlade>& vSceneBlades, float fCol
 	float fCellHeight = (m_afBoundingBox[4] - m_afBoundingBox[1]) / m_nNumRegionRows;
 
 	float fY = m_afBoundingBox[1];
-	for (int nRow = 0; nRow < m_nNumRegionRows; ++nRow)
+	for (int32_t nRow = 0; nRow < m_nNumRegionRows; ++nRow)
 	{
 		float fX = m_afBoundingBox[0];
-		for (int nCol = 0; nCol < m_nNumRegionCols; ++nCol)
+		for (int32_t nCol = 0; nCol < m_nNumRegionCols; ++nCol)
 		{
 			SRegion* pRegion = m_pRegions + GetRegionIndex(nRow, nCol);
 
@@ -459,14 +459,14 @@ void CSpeedGrassRT::CreateRegions(const vector<SBlade>& vSceneBlades, float fCol
 		float fPercentAlongY = (iBlade->m_afPos[1] - m_afBoundingBox[1]) / (m_afBoundingBox[4] - m_afBoundingBox[1]);
 
 		// clip values
-		unsigned int uiCol = min(fPercentAlongX * m_nNumRegionCols, m_nNumRegionCols - 1);
-		unsigned int uiRow = min(fPercentAlongY * m_nNumRegionRows, m_nNumRegionRows - 1);
+		uint32_t uiCol = min(fPercentAlongX * m_nNumRegionCols, m_nNumRegionCols - 1);
+		uint32_t uiRow = min(fPercentAlongY * m_nNumRegionRows, m_nNumRegionRows - 1);
 
 		m_pRegions[GetRegionIndex(uiRow, uiCol)].m_vBlades.push_back(*iBlade);
 	}
 
 	// compute z extents (now that the blades are in)
-	for (int i = 0; i < m_nNumRegions; ++i)
+	for (int32_t i = 0; i < m_nNumRegions; ++i)
 	{
 		SRegion* pRegion = m_pRegions + i;
 
@@ -494,20 +494,20 @@ void CSpeedGrassRT::CreateRegions(const vector<SBlade>& vSceneBlades, float fCol
 	if (fCollisionDistance > 0.0f)
 	{
 		fCollisionDistance *= fCollisionDistance;
-		for (int nRow = 0; nRow < m_nNumRegionRows; ++nRow)
+		for (int32_t nRow = 0; nRow < m_nNumRegionRows; ++nRow)
 		{
 			float fX = m_afBoundingBox[0];
-			for (int nCol = 0; nCol < m_nNumRegionCols; ++nCol)
+			for (int32_t nCol = 0; nCol < m_nNumRegionCols; ++nCol)
 			{
 				SRegion* pRegion = m_pRegions + GetRegionIndex(nRow, nCol);
 
 				// check each blade against all other blades in the region
-				for (DWORD i = 0; i < pRegion->m_vBlades.size( ); ++i)
+				for (uint32_t i = 0; i < pRegion->m_vBlades.size( ); ++i)
 				{
 					float fX = pRegion->m_vBlades[i].m_afPos[0];
 					float fY = pRegion->m_vBlades[i].m_afPos[1];
 					bool bCollision = false;
-					for (DWORD j = 0; j < pRegion->m_vBlades.size( ) && !bCollision; ++j)
+					for (uint32_t j = 0; j < pRegion->m_vBlades.size( ) && !bCollision; ++j)
 					{
 						if (i != j)
 						{
@@ -656,7 +656,7 @@ void CSpeedGrassRT::ComputeFrustum(void)
 	// find min/max (x,y) coordinates
 	m_afFrustumMin[0] = m_afFrustumMin[1] = FLT_MAX;
 	m_afFrustumMax[0] = m_afFrustumMax[1] = -FLT_MAX;
-	for (int i = 0; i < 5; ++i)
+	for (int32_t i = 0; i < 5; ++i)
 	{
 		m_afFrustumMin[0] = min(m_afFrustumMin[0], acFrustum[i][0]);
 		m_afFrustumMax[0] = max(m_afFrustumMax[0], acFrustum[i][0]);
@@ -728,7 +728,7 @@ void CSpeedGrassRT::ComputeUnitBillboard(void)
 ///////////////////////////////////////////////////////////////////////  
 //	CSpeedGrassRT::ConvertCoordsToCell
 
-void CSpeedGrassRT::ConvertCoordsToCell(const float* pCoords, int* pGridCoords) const
+void CSpeedGrassRT::ConvertCoordsToCell(const float* pCoords, int32_t* pGridCoords) const
 {
     float fPercentAlongX = (pCoords[0] - m_afBoundingBox[0]) / (m_afBoundingBox[3] - m_afBoundingBox[0]);
     float fPercentAlongY = (pCoords[1] - m_afBoundingBox[1]) / (m_afBoundingBox[4] - m_afBoundingBox[1]);
@@ -756,7 +756,7 @@ __forceinline bool CSpeedGrassRT::OutsideFrustum(CSpeedGrassRT::SRegion* pRegion
 {
 	bool bOutside = false;
 
-	for (int i = 0; i < 5 && !bOutside; ++i)
+	for (int32_t i = 0; i < 5 && !bOutside; ++i)
 		if (m_afFrustumPlanes[i][0] * pRegion->m_afCenter[0] + 
 			m_afFrustumPlanes[i][1] * pRegion->m_afCenter[1] + 
 			m_afFrustumPlanes[i][2] * pRegion->m_afCenter[2] +

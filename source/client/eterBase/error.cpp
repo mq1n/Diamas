@@ -7,9 +7,9 @@
 extern std::string g_stSyserrFileName;
 extern std::string g_stLogFileName;
 
-//extern LONG WINAPI sehFilter(PEXCEPTION_POINTERS ExceptionInfo);
+//extern int32_t WINAPI sehFilter(PEXCEPTION_POINTERS ExceptionInfo);
 
-int CALLBACK CrashCallback(CR_CRASH_CALLBACK_INFO * pInfo)
+int32_t CALLBACK CrashCallback(CR_CRASH_CALLBACK_INFO * pInfo)
 {
 //	if (pInfo && pInfo->pExceptionInfo && pInfo->pExceptionInfo->pexcptrs)
 //		sehFilter(pInfo->pExceptionInfo->pexcptrs);

@@ -16,13 +16,13 @@ class CTargaResource : public CResource
 		CTargaResource(const char * c_pszFileName);
 		virtual ~CTargaResource();
 		
-		DWORD *			GetMemPtr();
-		void			GetRect(DWORD & w, DWORD & h);
+		uint32_t *			GetMemPtr();
+		void			GetRect(uint32_t & w, uint32_t & h);
 		
 		TGA_HEADER &	GetTgaHeader();
 
 	protected:
-		virtual bool OnLoad(int iSize, const void * c_pvBuf);
+		virtual bool OnLoad(int32_t iSize, const void * c_pvBuf);
 		virtual void OnClear();	
 		virtual bool OnIsEmpty() const;
 		virtual bool OnIsType(TType type);

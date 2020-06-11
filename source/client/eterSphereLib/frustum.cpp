@@ -13,7 +13,7 @@
 
 //#include "frustum.h"
 
-/*void Frustum::Set(int x1,int y1,int x2,int y2)
+/*void Frustum::Set(int32_t x1,int32_t y1,int32_t x2,int32_t y2)
 {
   mX1 = x1;
   mY1 = y1;
@@ -37,12 +37,12 @@ ViewState Frustum::ViewVolumeTest(const Vector3d &c_v3Center,const float c_fRadi
 		}
 	}	
 	
-	const int count=6;
+	const int32_t count=6;
 
 	D3DXVECTOR3 center = c_v3Center;
 	//center.y *=-1;
 
-	int i;
+	int32_t i;
 
 	float distance[count];
 	for(i=0;i<count;i++)
@@ -74,7 +74,7 @@ void Frustum::BuildViewFrustum(D3DXMATRIX & mat)
 	m_plane[4] = D3DXPLANE(mat._14 + mat._12, mat._24 + mat._22, mat._34 + mat._32, mat._44 + mat._42);
 	m_plane[5] = D3DXPLANE(mat._14 - mat._12, mat._24 - mat._22, mat._34 - mat._32, mat._44 - mat._42);
 
-	for(int i=0;i<6;i++)
+	for(int32_t i=0;i<6;i++)
 		D3DXPlaneNormalize(&m_plane[i],&m_plane[i]);
 }
 

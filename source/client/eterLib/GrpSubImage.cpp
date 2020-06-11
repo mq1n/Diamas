@@ -18,7 +18,7 @@ CGraphicSubImage::CGraphicSubImage(const char* c_szFileName) : CGraphicImage(c_s
 
 CGraphicSubImage::~CGraphicSubImage()
 {
-	m_roImage = NULL;
+	m_roImage = nullptr;
 }
 
 bool CGraphicSubImage::CreateDeviceObjects()
@@ -44,7 +44,7 @@ bool CGraphicSubImage::SetImageFileName(const char* c_szFileName)
 	return true;
 }
 
-void CGraphicSubImage::SetRectPosition(int left, int top, int right, int bottom)
+void CGraphicSubImage::SetRectPosition(int32_t left, int32_t top, int32_t right, int32_t bottom)
 {
 	m_rect.left = left;
 	m_rect.top = top;
@@ -62,7 +62,7 @@ void CGraphicSubImage::SetSearchPath(const char * c_szFileName)
 	strncpy(m_SearchPath, c_szFileName, sizeof(m_SearchPath)-1);
 }
 
-bool CGraphicSubImage::OnLoad(int iSize, const void* c_pvBuf)
+bool CGraphicSubImage::OnLoad(int32_t iSize, const void* c_pvBuf)
 {
 	if (!c_pvBuf)
 		return false;
@@ -85,7 +85,7 @@ bool CGraphicSubImage::OnLoad(int iSize, const void* c_pvBuf)
 	textFileLoader.Bind(iSize, c_pvBuf);
 #endif
 
-	for (DWORD i = 0; i < textFileLoader.GetLineCount(); ++i)
+	for (uint32_t i = 0; i < textFileLoader.GetLineCount(); ++i)
 	{
 		if (!textFileLoader.SplitLine(i, &stTokenVector))
 			continue;
@@ -120,7 +120,7 @@ bool CGraphicSubImage::OnLoad(int iSize, const void* c_pvBuf)
 	if ("2.0"==c_rstVersion)
 	{	
 		const std::string& c_rstSubFileName=GetFileNameString();
-		int nPos=c_rstSubFileName.find_last_of('\\', -1);
+		int32_t nPos=c_rstSubFileName.find_last_of('\\', -1);
 		if (nPos>=0)
 		{
 			nPos++;
@@ -154,7 +154,7 @@ bool CGraphicSubImage::OnLoad(int iSize, const void* c_pvBuf)
 
 void CGraphicSubImage::OnClear()
 {
-	m_roImage = NULL;
+	m_roImage = nullptr;
 	memset(&m_rect, 0, sizeof(m_rect));
 }
 

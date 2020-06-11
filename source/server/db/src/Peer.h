@@ -16,9 +16,9 @@ class CPeer : public CPeerBase
 #pragma pack(1)
 	typedef struct _header
 	{   
-	    BYTE    bHeader;
-	    DWORD   dwHandle;
-	    DWORD   dwSize;
+	    uint8_t    bHeader;
+	    uint32_t   dwHandle;
+	    uint32_t   dwSize;
 	} HEADER;
 #pragma pack()
 	enum EState
@@ -30,31 +30,31 @@ class CPeer : public CPeerBase
 	CPeer();
 	virtual ~CPeer();
 
-	void	EncodeHeader(BYTE header, DWORD dwHandle, DWORD dwSize);
-	bool 	PeekPacket(int & iBytesProceed, BYTE & header, DWORD & dwHandle, DWORD & dwLength, const char ** data);
-	void	EncodeReturn(BYTE header, DWORD dwHandle);
+	void	EncodeHeader(uint8_t header, uint32_t dwHandle, uint32_t dwSize);
+	bool 	PeekPacket(int32_t & iBytesProceed, uint8_t & header, uint32_t & dwHandle, uint32_t & dwLength, const char ** data);
+	void	EncodeReturn(uint8_t header, uint32_t dwHandle);
 
 	void	ProcessInput();
-	int	Send();
+	int32_t	Send();
 
-	DWORD	GetHandle();
-	DWORD	GetUserCount();
-	void	SetUserCount(DWORD dwCount);
+	uint32_t	GetHandle();
+	uint32_t	GetUserCount();
+	void	SetUserCount(uint32_t dwCount);
 
 	void	SetPublicIP(const char * ip)	{ m_stPublicIP = ip; }
 	const char * GetPublicIP()		{ return m_stPublicIP.c_str(); }
 
-	void	SetChannel(BYTE bChannel)	{ m_bChannel = bChannel; }
-	BYTE	GetChannel()			{ return m_bChannel; }
+	void	SetChannel(uint8_t bChannel)	{ m_bChannel = bChannel; }
+	uint8_t	GetChannel()			{ return m_bChannel; }
 
-	void	SetListenPort(WORD wPort) { m_wListenPort = wPort; }
-	WORD	GetListenPort() { return m_wListenPort; }
+	void	SetListenPort(uint16_t wPort) { m_wListenPort = wPort; }
+	uint16_t	GetListenPort() { return m_wListenPort; }
 
-	void	SetP2PPort(WORD wPort);
-	WORD	GetP2PPort() { return m_wP2PPort; }
+	void	SetP2PPort(uint16_t wPort);
+	uint16_t	GetP2PPort() { return m_wP2PPort; }
 
-	void	SetMaps(long* pl);
-	long *	GetMaps() { return &m_alMaps[0]; }
+	void	SetMaps(int32_t* pl);
+	int32_t *	GetMaps() { return &m_alMaps[0]; }
 
 	bool	SetItemIDRange(TItemIDRangeTable itemRange);
 	bool	SetSpareItemIDRange(TItemIDRangeTable itemRange);
@@ -62,14 +62,14 @@ class CPeer : public CPeerBase
 	void	SendSpareItemIDRange();
 
     private:
-	int	m_state;
+	int32_t	m_state;
 
-	BYTE	m_bChannel;
-	DWORD	m_dwHandle;
-	DWORD	m_dwUserCount;
-	WORD	m_wListenPort;	// 게임서버가 클라이언트를 위해 listen 하는 포트
-	WORD	m_wP2PPort;	// 게임서버가 게임서버 P2P 접속을 위해 listen 하는 포트
-	long	m_alMaps[MAP_ALLOW_LIMIT];	
+	uint8_t	m_bChannel;
+	uint32_t	m_dwHandle;
+	uint32_t	m_dwUserCount;
+	uint16_t	m_wListenPort;	// 게임서버가 클라이언트를 위해 listen 하는 포트
+	uint16_t	m_wP2PPort;	// 게임서버가 게임서버 P2P 접속을 위해 listen 하는 포트
+	int32_t	m_alMaps[MAP_ALLOW_LIMIT];	
 
 	TItemIDRangeTable m_itemRange;
 	TItemIDRangeTable m_itemSpareRange;

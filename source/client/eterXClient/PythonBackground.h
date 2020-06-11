@@ -61,20 +61,20 @@ public:
 	void Destroy();
 	void Create();
 
-	void GlobalPositionToLocalPosition(LONG& rGlobalX, LONG& rGlobalY);
-	void LocalPositionToGlobalPosition(LONG& rLocalX, LONG& rLocalY);
+	void GlobalPositionToLocalPosition(int32_t& rGlobalX, int32_t& rGlobalY);
+	void LocalPositionToGlobalPosition(int32_t& rLocalX, int32_t& rLocalY);
 
 	void EnableTerrainOnlyForHeight();
-	bool SetSplatLimit(int iSplatNum);
-	bool SetVisiblePart(int ePart, bool isVisible);
-	bool SetShadowLevel(int eLevel);
+	bool SetSplatLimit(int32_t iSplatNum);
+	bool SetVisiblePart(int32_t ePart, bool isVisible);
+	bool SetShadowLevel(int32_t eLevel);
 	void RefreshShadowLevel();
-	void SelectViewDistanceNum(int eNum);
-	void SetViewDistanceSet(int eNum, float fFarClip);
+	void SelectViewDistanceNum(int32_t eNum);
+	void SetViewDistanceSet(int32_t eNum, float fFarClip);
 	float GetFarClip();
 
-	DWORD GetRenderShadowTime();
-	void GetDistanceSetInfo(int * peNum, float * pfStart, float * pfEnd, float * pfFarClip);
+	uint32_t GetRenderShadowTime();
+	void GetDistanceSetInfo(int32_t * peNum, float * pfStart, float * pfEnd, float * pfFarClip);
 
 	bool GetPickingPoint(D3DXVECTOR3 * v3IntersectPt);
 	bool GetPickingPointWithRay(const CRay & rRay, D3DXVECTOR3 * v3IntersectPt);
@@ -106,30 +106,30 @@ public:
 	void ChangeToNight();
 	void EnableSnowEnvironment();
 	void DisableSnowEnvironment();
-	void SetXMaxTree(int iGrade);
+	void SetXMaxTree(int32_t iGrade);
 
 	void ClearGuildArea();
-	void RegisterGuildArea(int isx, int isy, int iex, int iey);
+	void RegisterGuildArea(int32_t isx, int32_t isy, int32_t iex, int32_t iey);
 
-	void CreateTargetEffect(DWORD dwID, DWORD dwChrVID);
-	void CreateTargetEffect(DWORD dwID, long lx, long ly);
-	void DeleteTargetEffect(DWORD dwID);
+	void CreateTargetEffect(uint32_t dwID, uint32_t dwChrVID);
+	void CreateTargetEffect(uint32_t dwID, int32_t lx, int32_t ly);
+	void DeleteTargetEffect(uint32_t dwID);
 
-	void CreateSpecialEffect(DWORD dwID, float fx, float fy, float fz, const char * c_szFileName);
-	void DeleteSpecialEffect(DWORD dwID);
+	void CreateSpecialEffect(uint32_t dwID, float fx, float fy, float fz, const char * c_szFileName);
+	void DeleteSpecialEffect(uint32_t dwID);
 
-	void Warp(DWORD dwX, DWORD dwY);
+	void Warp(uint32_t dwX, uint32_t dwY);
 
 	void VisibleGuildArea();
 	void DisableGuildArea();
 
 	void RegisterDungeonMapName(const char * c_szMapName);
-	TMapInfo* GlobalPositionToMapInfo(DWORD dwGlobalX, DWORD dwGlobalY);
+	TMapInfo* GlobalPositionToMapInfo(uint32_t dwGlobalX, uint32_t dwGlobalY);
 	const char* GetWarpMapName();
 
 protected:
 	void __CreateProperty();
-	bool __IsSame(std::set<int> & rleft, std::set<int> & rright);
+	bool __IsSame(std::set<int32_t> & rleft, std::set<int32_t> & rright);
 
 protected:
 	std::string m_strMapName;
@@ -137,36 +137,36 @@ protected:
 private:
 	CSnowEnvironment m_SnowEnvironment;
 
-	int m_iDayMode;
-	int m_iXMasTreeGrade;
+	int32_t m_iDayMode;
+	int32_t m_iXMasTreeGrade;
 
-	int m_eShadowLevel;
-	int m_eViewDistanceNum;
+	int32_t m_eShadowLevel;
+	int32_t m_eViewDistanceNum;
 
 	BOOL m_bVisibleGuildArea;
 
-	DWORD m_dwRenderShadowTime;
+	uint32_t m_dwRenderShadowTime;
 
-	DWORD m_dwBaseX;
-	DWORD m_dwBaseY;
+	uint32_t m_dwBaseX;
+	uint32_t m_dwBaseY;
 
 	TVIEWDISTANCESET m_ViewDistanceSet[NUM_DISTANCE_SET];
 
-	std::set<int> m_kSet_iShowingPortalID;
+	std::set<int32_t> m_kSet_iShowingPortalID;
 	std::set<std::string> m_kSet_strDungeonMapName;
-	std::map<DWORD, DWORD> m_kMap_dwTargetID_dwChrID;
+	std::map<uint32_t, uint32_t> m_kMap_dwTargetID_dwChrID;
 
 	struct SReserveTargetEffect
 	{
-		int ilx;
-		int ily;
+		int32_t ilx;
+		int32_t ily;
 	};
-	std::map<DWORD, SReserveTargetEffect> m_kMap_dwID_kReserveTargetEffect;
+	std::map<uint32_t, SReserveTargetEffect> m_kMap_dwID_kReserveTargetEffect;
 
 	struct FFindWarpMapName
 	{
-		DWORD m_dwX, m_dwY;
-		FFindWarpMapName::FFindWarpMapName(DWORD dwX, DWORD dwY)
+		uint32_t m_dwX, m_dwY;
+		FFindWarpMapName::FFindWarpMapName(uint32_t dwX, uint32_t dwY)
 		{
 			m_dwX = dwX;
 			m_dwY = dwY;

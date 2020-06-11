@@ -8,46 +8,46 @@ struct SNetworkActorData
 	
 	CAffectFlagContainer	m_kAffectFlags;
 
-	BYTE	m_bType;
-	DWORD	m_dwVID;
-	DWORD	m_dwStateFlags;
-	DWORD	m_dwEmpireID;
-	DWORD	m_dwRace;
-	DWORD	m_dwMovSpd;
-	DWORD	m_dwAtkSpd;
-	FLOAT	m_fRot;
-	LONG	m_lCurX;
-	LONG	m_lCurY;
-	LONG	m_lSrcX;
-	LONG	m_lSrcY;
-	LONG	m_lDstX;
-	LONG	m_lDstY;
+	uint8_t	m_bType;
+	uint32_t	m_dwVID;
+	uint32_t	m_dwStateFlags;
+	uint32_t	m_dwEmpireID;
+	uint32_t	m_dwRace;
+	uint32_t	m_dwMovSpd;
+	uint32_t	m_dwAtkSpd;
+	float	m_fRot;
+	int32_t	m_lCurX;
+	int32_t	m_lCurY;
+	int32_t	m_lSrcX;
+	int32_t	m_lSrcY;
+	int32_t	m_lDstX;
+	int32_t	m_lDstY;
 	
 
-	DWORD	m_dwServerSrcTime;
-	DWORD	m_dwClientSrcTime;
-	DWORD	m_dwDuration;
+	uint32_t	m_dwServerSrcTime;
+	uint32_t	m_dwClientSrcTime;
+	uint32_t	m_dwDuration;
 
-	DWORD	m_dwArmor;
-	DWORD	m_dwWeapon;
-	DWORD	m_dwHair;
+	uint32_t	m_dwArmor;
+	uint32_t	m_dwWeapon;
+	uint32_t	m_dwHair;
 #ifdef ENABLE_ACCE_SYSTEM
-	DWORD	m_dwAcce;
+	uint32_t	m_dwAcce;
 #endif
 
-	DWORD	m_dwOwnerVID;
+	uint32_t	m_dwOwnerVID;
 
-	short	m_sAlignment;
-	BYTE	m_byPKMode;
-	DWORD	m_dwMountVnum;
+	int16_t	m_sAlignment;
+	uint8_t	m_byPKMode;
+	uint32_t	m_dwMountVnum;
 
-	DWORD	m_dwGuildID;
-	DWORD	m_dwLevel;
+	uint32_t	m_dwGuildID;
+	uint32_t	m_dwLevel;
 	
 	SNetworkActorData();
 
-	void SetDstPosition(DWORD dwServerTime, LONG lDstX, LONG lDstY, DWORD dwDuration);
-	void SetPosition(LONG lPosX, LONG lPosY);
+	void SetDstPosition(uint32_t dwServerTime, int32_t lDstX, int32_t lDstY, uint32_t dwDuration);
+	void SetPosition(int32_t lPosX, int32_t lPosY);
 	void UpdatePosition();	
 
 	// NETWORK_ACTOR_DATA_COPY
@@ -59,14 +59,14 @@ struct SNetworkActorData
 
 struct SNetworkMoveActorData
 {
-	DWORD	m_dwVID;
-	DWORD	m_dwTime;
-	LONG	m_lPosX;
-	LONG	m_lPosY;
+	uint32_t	m_dwVID;
+	uint32_t	m_dwTime;
+	int32_t	m_lPosX;
+	int32_t	m_lPosY;
 	float	m_fRot;
-	DWORD	m_dwFunc;
-	DWORD	m_dwArg;
-	DWORD	m_dwDuration;
+	uint32_t	m_dwFunc;
+	uint32_t	m_dwArg;
+	uint32_t	m_dwDuration;
 
 	SNetworkMoveActorData()
 	{
@@ -83,20 +83,20 @@ struct SNetworkMoveActorData
 
 struct SNetworkUpdateActorData
 {
-	DWORD m_dwVID;
-	DWORD m_dwGuildID;
-	DWORD m_dwArmor;
-	DWORD m_dwWeapon;
-	DWORD m_dwHair;
+	uint32_t m_dwVID;
+	uint32_t m_dwGuildID;
+	uint32_t m_dwArmor;
+	uint32_t m_dwWeapon;
+	uint32_t m_dwHair;
 #ifdef ENABLE_ACCE_SYSTEM
-	DWORD	m_dwAcce;
+	uint32_t	m_dwAcce;
 #endif
-	DWORD m_dwMovSpd;
-	DWORD m_dwAtkSpd;
-	short m_sAlignment;
-	BYTE m_byPKMode;
-	DWORD m_dwMountVnum;
-	DWORD m_dwStateFlags; // 본래 Create 때만 쓰이는 변수임
+	uint32_t m_dwMovSpd;
+	uint32_t m_dwAtkSpd;
+	int16_t m_sAlignment;
+	uint8_t m_byPKMode;
+	uint32_t m_dwMountVnum;
+	uint32_t m_dwStateFlags; // 본래 Create 때만 쓰이는 변수임
 	CAffectFlagContainer m_kAffectFlags;
 
 	SNetworkUpdateActorData()
@@ -129,15 +129,15 @@ class CNetworkActorManager : public CReferenceObject
 
 		void Destroy();
 
-		void SetMainActorVID(DWORD dwVID);
+		void SetMainActorVID(uint32_t dwVID);
 
-		void RemoveActor(DWORD dwVID);
+		void RemoveActor(uint32_t dwVID);
 		void AppendActor(const SNetworkActorData& c_rkNetActorData);
 		void UpdateActor(const SNetworkUpdateActorData& c_rkNetUpdateActorData);
 		void MoveActor(const SNetworkMoveActorData& c_rkNetMoveActorData);
 
-		void SyncActor(DWORD dwVID, LONG lPosX, LONG lPosY);
-		void SetActorOwner(DWORD dwOwnerVID, DWORD dwVictimVID);
+		void SyncActor(uint32_t dwVID, int32_t lPosX, int32_t lPosY);
+		void SetActorOwner(uint32_t dwOwnerVID, uint32_t dwVictimVID);
 
 		void Update();
 
@@ -146,28 +146,28 @@ class CNetworkActorManager : public CReferenceObject
 
 		void __UpdateMainActor();
 
-		bool __IsVisiblePos(LONG lPosX, LONG lPosY);
+		bool __IsVisiblePos(int32_t lPosX, int32_t lPosY);
 		bool __IsVisibleActor(const SNetworkActorData& c_rkNetActorData);
-		bool __IsMainActorVID(DWORD dwVID);
+		bool __IsMainActorVID(uint32_t dwVID);
 
 		void __RemoveAllGroundItems();
 		void __RemoveAllActors();
 		void __RemoveDynamicActors();
 		void __RemoveCharacterManagerActor(SNetworkActorData& rkNetActorData);
 
-		SNetworkActorData* __FindActorData(DWORD dwVID);
+		SNetworkActorData* __FindActorData(uint32_t dwVID);
 
 		CInstanceBase* __AppendCharacterManagerActor(SNetworkActorData& rkNetActorData);
 		CInstanceBase* __FindActor(SNetworkActorData& rkNetActorData);
-		CInstanceBase* __FindActor(SNetworkActorData& rkNetActorData, LONG lDstX, LONG lDstY);
+		CInstanceBase* __FindActor(SNetworkActorData& rkNetActorData, int32_t lDstX, int32_t lDstY);
 
 		CPythonCharacterManager& __GetCharacterManager();
 
 	protected:
-		DWORD m_dwMainVID;
+		uint32_t m_dwMainVID;
 
-		LONG m_lMainPosX;
-		LONG m_lMainPosY;
+		int32_t m_lMainPosX;
+		int32_t m_lMainPosY;
 
-		std::map<DWORD, SNetworkActorData> m_kNetActorDict;
+		std::map<uint32_t, SNetworkActorData> m_kNetActorDict;
 };

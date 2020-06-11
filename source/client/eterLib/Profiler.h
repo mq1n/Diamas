@@ -15,17 +15,17 @@ class CProfiler : public CSingleton<CProfiler>
 	public:
 		typedef struct SProfileStackData
 		{
-			int iCallStep;
-			long iStartTime;
-			long iEndTime;
+			int32_t iCallStep;
+			int32_t iStartTime;
+			int32_t iEndTime;
 
 			std::string strName;
 		} TProfileStackData;
 		typedef struct SProfileAccumulationData
 		{
-			int iStartTime;
-			int iCallingCount;
-			int iCollapsedTime;
+			int32_t iStartTime;
+			int32_t iCallingCount;
+			int32_t iCollapsedTime;
 
 			std::string strName;
 		} TProfileAccumulationData;
@@ -139,11 +139,11 @@ class CProfiler : public CSingleton<CProfiler>
 
 		void ProfileByConsole()
 		{
-			for (int i = 0; i < m_ProfileStackDataCount; ++i)
+			for (int32_t i = 0; i < m_ProfileStackDataCount; ++i)
 			{
 				TProfileStackData & rProfileStackData = m_ProfileStackDatas[i];
 
-//				for (int i = 0; i < rProfileStackData.iCallStep; ++i)
+//				for (int32_t i = 0; i < rProfileStackData.iCallStep; ++i)
 //					Tracef("\t");
 
 				Tracef("%-10s: %2d\t", rProfileStackData.strName.c_str(), rProfileStackData.iEndTime - rProfileStackData.iStartTime);
@@ -182,7 +182,7 @@ class CProfiler : public CSingleton<CProfiler>
 
 			char szText[128];
 
-			for (int i = 0; i < m_ProfileStackDataCount; ++i)
+			for (int32_t i = 0; i < m_ProfileStackDataCount; ++i)
 			{
 				TProfileStackData & rProfileStackData = m_ProfileStackDatas[i];
 
@@ -236,7 +236,7 @@ class CProfiler : public CSingleton<CProfiler>
 	protected:
 		bool GetProfileStackDataPointer(const char * c_szName, TProfileStackData ** ppProfileStackData)
 		{
-			for (int i = 0; i < m_ProfileStackDataCount; ++i)
+			for (int32_t i = 0; i < m_ProfileStackDataCount; ++i)
 			{
 				if (0 == m_ProfileStackDatas[i].strName.compare(c_szName))
 				{
@@ -251,13 +251,13 @@ class CProfiler : public CSingleton<CProfiler>
 
 	protected:
 		// Profile Stack Data
-		int m_ProfileStackDataCount;
+		int32_t m_ProfileStackDataCount;
 		TProfileStackData m_ProfileStackDatas[STACK_DATA_MAX_NUM];
 
 		// Profile Increase Data
 		TProfileAccumulationDataMap m_ProfileAccumulationDataMap;
 
-		int m_iCallStep;
+		int32_t m_iCallStep;
 
 		TGraphicTextInstanceMap m_GraphicTextInstanceMap;
 };

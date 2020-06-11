@@ -8,9 +8,9 @@ enum
 	TEXT_TAG_RESTORE_COLOR,
 };
 
-extern int GetTextTag(const wchar_t * src, int maxLen, int & tagLen, std::wstring & extraInfo);
-extern std::wstring GetTextTagOutputString(const wchar_t * src, int src_len);
-extern int GetTextTagOutputLen(const wchar_t * src, int len);
-extern int FindColorTagEndPosition(const wchar_t * src, int src_len);
-extern int FindColorTagStartPosition(const wchar_t * src, int src_len);
-extern int GetTextTagInternalPosFromRenderPos(const wchar_t * src, int src_len, int offset);
+extern int32_t GetTextTag(const wchar_t * src, int32_t maxLen, int32_t & tagLen, std::wstring & extraInfo);
+extern std::wstring GetTextTagOutputString(const wchar_t * src, int32_t src_len);
+extern int32_t GetTextTagOutputLen(const wchar_t * src, int32_t len);
+extern int32_t FindColorTagEndPosition(const wchar_t * src, int32_t src_len);
+extern int32_t FindColorTagStartPosition(const wchar_t * src, int32_t src_len);
+extern int32_t GetTextTagInternalPosFromRenderPos(const wchar_t * src, int32_t src_len, int32_t offset);

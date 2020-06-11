@@ -16,8 +16,8 @@ class CEffectManager : public CScreen, public CSingleton<CEffectManager>
 			EFFECT_TYPE_MAX_NUM				= 4,
 		};
 
-		typedef std::map<DWORD, CEffectData*> TEffectDataMap;
-		typedef std::map<DWORD, CEffectInstance*> TEffectInstanceMap;
+		typedef std::map<uint32_t, CEffectData*> TEffectDataMap;
+		typedef std::map<uint32_t, CEffectInstance*> TEffectInstanceMap;
 
 	public:
 		CEffectManager();
@@ -31,24 +31,24 @@ class CEffectManager : public CScreen, public CSingleton<CEffectManager>
 
 		void GetInfo(std::string* pstInfo);
 
-		bool IsAliveEffect(DWORD dwInstanceIndex);
+		bool IsAliveEffect(uint32_t dwInstanceIndex);
 
 		// Register
 		BOOL RegisterEffect(const char * c_szFileName,bool isExistDelete=false,bool isNeedCache=false);
-		BOOL RegisterEffect2(const char * c_szFileName, DWORD* pdwRetCRC, bool isNeedCache=false);
+		BOOL RegisterEffect2(const char * c_szFileName, uint32_t* pdwRetCRC, bool isNeedCache=false);
 
 		void DeleteAllInstances();
 
 		// Usage
-		int CreateEffect(DWORD dwID, const D3DXVECTOR3 & c_rv3Position, const D3DXVECTOR3 & c_rv3Rotation);
-		int CreateEffect(const char * c_szFileName, const D3DXVECTOR3 & c_rv3Position, const D3DXVECTOR3 & c_rv3Rotation);
+		int32_t CreateEffect(uint32_t dwID, const D3DXVECTOR3 & c_rv3Position, const D3DXVECTOR3 & c_rv3Rotation);
+		int32_t CreateEffect(const char * c_szFileName, const D3DXVECTOR3 & c_rv3Position, const D3DXVECTOR3 & c_rv3Rotation);
 
-		void CreateEffectInstance(DWORD dwInstanceIndex, DWORD dwID);
-		BOOL SelectEffectInstance(DWORD dwInstanceIndex);
-		bool DestroyEffectInstance(DWORD dwInstanceIndex);
-		void DeactiveEffectInstance(DWORD dwInstanceIndex);
+		void CreateEffectInstance(uint32_t dwInstanceIndex, uint32_t dwID);
+		BOOL SelectEffectInstance(uint32_t dwInstanceIndex);
+		bool DestroyEffectInstance(uint32_t dwInstanceIndex);
+		void DeactiveEffectInstance(uint32_t dwInstanceIndex);
 
-		void SetEffectTextures(DWORD dwID, std::vector<std::string> textures);
+		void SetEffectTextures(uint32_t dwID, std::vector<std::string> textures);
 		void SetEffectInstancePosition(const D3DXVECTOR3 & c_rv3Position);
 		void SetEffectInstanceRotation(const D3DXVECTOR3 & c_rv3Rotation);
 		void SetEffectInstanceGlobalMatrix(const D3DXMATRIX & c_rmatGlobal);
@@ -57,17 +57,17 @@ class CEffectManager : public CScreen, public CSingleton<CEffectManager>
 		void HideEffect();
 
 		// Temporary function
-		DWORD GetRandomEffect();
-		int GetEmptyIndex();
-		bool GetEffectData(DWORD dwID, CEffectData ** ppEffect);
-		bool GetEffectData(DWORD dwID, const CEffectData ** c_ppEffect);
+		uint32_t GetRandomEffect();
+		int32_t GetEmptyIndex();
+		bool GetEffectData(uint32_t dwID, CEffectData ** ppEffect);
+		bool GetEffectData(uint32_t dwID, const CEffectData ** c_ppEffect);
 
 		// Area에 직접 찍는 Effect용 함수... EffectInstance의 Pointer를 반환한다.
 		// EffectManager 내부 EffectInstanceMap을 이용하지 않는다.
-		void CreateUnsafeEffectInstance(DWORD dwEffectDataID, CEffectInstance ** ppEffectInstance);
+		void CreateUnsafeEffectInstance(uint32_t dwEffectDataID, CEffectInstance ** ppEffectInstance);
 		bool DestroyUnsafeEffectInstance(CEffectInstance * pEffectInstance);
 
-		int GetRenderingEffectCount();
+		int32_t GetRenderingEffectCount();
 
 	protected:
 		void __Initialize();

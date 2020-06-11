@@ -216,11 +216,11 @@ bool CDungeonBlock::Load(const char * c_szFileName)
 
 	m_ModelInstanceContainer.reserve(m_pThing->GetModelCount());
 
-	for (int i = 0; i < m_pThing->GetModelCount(); ++i)
+	for (int32_t i = 0; i < m_pThing->GetModelCount(); ++i)
 	{
 		CDungeonModelInstance * pModelInstance = new CDungeonModelInstance;
 		pModelInstance->SetMainModelPointer(m_pThing->GetModelPointer(i), &m_kDeformableVertexBuffer);
-		DWORD dwVertexCount = pModelInstance->GetVertexCount();
+		uint32_t dwVertexCount = pModelInstance->GetVertexCount();
 		m_kDeformableVertexBuffer.Destroy();
 		m_kDeformableVertexBuffer.Create(
 			dwVertexCount, 
@@ -238,7 +238,7 @@ void CDungeonBlock::__Initialize()
 	m_v3Center = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_fRadius = 0.0f;
 
-	m_pThing = NULL;
+	m_pThing = nullptr;
 }
 
 void CDungeonBlock::Destroy()
@@ -246,7 +246,7 @@ void CDungeonBlock::Destroy()
 	if (m_pThing)
 	{
 		m_pThing->Release();
-		m_pThing = NULL;
+		m_pThing = nullptr;
 	}
 
 	stl_wipe(m_ModelInstanceContainer);

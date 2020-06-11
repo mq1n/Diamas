@@ -6,8 +6,8 @@
 // MARK_BUG_FIX
 struct SMarkIndex
 {
-	WORD guild_id;
-	WORD mark_id;
+	uint16_t guild_id;
+	uint16_t mark_id;
 };
 
 // END_OFMARK_BUG_FIX
@@ -24,7 +24,7 @@ CGuildMarkDownloader::~CGuildMarkDownloader()
 	__OfflineState_Set();
 }
 
-bool CGuildMarkDownloader::Connect(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey)
+bool CGuildMarkDownloader::Connect(const CNetworkAddress& c_rkNetAddr, uint32_t dwHandle, uint32_t dwRandomKey)
 {
 	__OfflineState_Set();
 
@@ -34,7 +34,7 @@ bool CGuildMarkDownloader::Connect(const CNetworkAddress& c_rkNetAddr, DWORD dwH
 	return CNetworkStream::Connect(c_rkNetAddr);
 }
 
-bool CGuildMarkDownloader::ConnectToRecvSymbol(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey, const std::vector<DWORD> & c_rkVec_dwGuildID)
+bool CGuildMarkDownloader::ConnectToRecvSymbol(const CNetworkAddress& c_rkNetAddr, uint32_t dwHandle, uint32_t dwRandomKey, const std::vector<uint32_t> & c_rkVec_dwGuildID)
 {
 	__OfflineState_Set();
 
@@ -79,7 +79,7 @@ void CGuildMarkDownloader::OnDisconnect()
 void CGuildMarkDownloader::__Initialize()
 {
 	m_eState=STATE_OFFLINE;
-	m_pkMarkMgr=NULL;
+	m_pkMarkMgr=nullptr;
 	m_currentRequestingImageIndex=0;
 	m_dwBlockIndex=0;
 	m_dwBlockDataPos=0;
@@ -123,9 +123,9 @@ void CGuildMarkDownloader::__LoginState_Set()
 
 bool CGuildMarkDownloader::__LoginState_Process()
 {
-	BYTE header;
+	uint8_t header;
 
-	if (!Peek(sizeof(BYTE), &header))
+	if (!Peek(sizeof(uint8_t), &header))
 		return true;
 
 	if (IsSecurityMode())
@@ -139,7 +139,7 @@ bool CGuildMarkDownloader::__LoginState_Process()
 		}
 	}
 	
-	UINT needPacketSize = __GetPacketSize(header);
+	uint32_t needPacketSize = __GetPacketSize(header);
 
 	if (!needPacketSize)
 		return false;
@@ -152,7 +152,7 @@ bool CGuildMarkDownloader::__LoginState_Process()
 }
 
 // MARK_BUG_FIX
-UINT CGuildMarkDownloader::__GetPacketSize(UINT header)
+uint32_t CGuildMarkDownloader::__GetPacketSize(uint32_t header)
 {
 	switch (header)
 	{
@@ -169,7 +169,7 @@ UINT CGuildMarkDownloader::__GetPacketSize(UINT header)
 		case HEADER_GC_GUILD_SYMBOL_DATA:
 			return sizeof(TPacketGCGuildSymbolData);
 		case HEADER_GC_MARK_DIFF_DATA:	// 사용하지 않음
-			return sizeof(BYTE);
+			return sizeof(uint8_t);
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 		case HEADER_GC_KEY_AGREEMENT:
 			return sizeof(TPacketKeyAgreement);
@@ -181,7 +181,7 @@ UINT CGuildMarkDownloader::__GetPacketSize(UINT header)
 	return 0;
 }
 
-bool CGuildMarkDownloader::__DispatchPacket(UINT header)
+bool CGuildMarkDownloader::__DispatchPacket(uint32_t header)
 {
 	switch (header)
 	{
@@ -306,19 +306,19 @@ bool CGuildMarkDownloader::__LoginState_RecvMarkIndex()
 	if (!Peek(sizeof(kPacketMarkIndex), &kPacketMarkIndex))
 		return false;
 
-	//DWORD bufSize = sizeof(WORD) * 2 * kPacketMarkIndex.count;
+	//uint32_t bufSize = sizeof(uint16_t) * 2 * kPacketMarkIndex.count;
 
 	if (!Peek(kPacketMarkIndex.bufSize))
 		return false;
 
 	Recv(sizeof(kPacketMarkIndex));
 
-	WORD guildID, markID;
+	uint16_t guildID, markID;
 
-	for (DWORD i = 0; i < kPacketMarkIndex.count; ++i)
+	for (uint32_t i = 0; i < kPacketMarkIndex.count; ++i)
 	{
-		Recv(sizeof(WORD), &guildID);
-		Recv(sizeof(WORD), &markID);
+		Recv(sizeof(uint16_t), &guildID);
+		Recv(sizeof(uint16_t), &markID);
 
 		// 길드ID -> 마크ID 인덱스 등록
 		CGuildMarkManager::Instance().AddMarkIDByGuildID(guildID, markID);
@@ -362,14 +362,14 @@ bool CGuildMarkDownloader::__LoginState_RecvMarkBlock()
 
 	Recv(sizeof(kPacket));
 
-	BYTE posBlock;
-	DWORD compSize;
+	uint8_t posBlock;
+	uint32_t compSize;
 	char compBuf[SGuildMarkBlock::MAX_COMP_SIZE];
 
-	for (DWORD i = 0; i < kPacket.count; ++i)
+	for (uint32_t i = 0; i < kPacket.count; ++i)
 	{
-		Recv(sizeof(BYTE), &posBlock);
-		Recv(sizeof(DWORD), &compSize);
+		Recv(sizeof(uint8_t), &posBlock);
+		Recv(sizeof(uint32_t), &compSize);
 
 		if (compSize > SGuildMarkBlock::MAX_COMP_SIZE)
 		{
@@ -380,7 +380,7 @@ bool CGuildMarkDownloader::__LoginState_RecvMarkBlock()
 		{
 			Recv(compSize, compBuf);
 			// 압축된 이미지를 실제로 저장한다. CRC등 여러가지 정보가 함께 빌드된다.
-			CGuildMarkManager::Instance().SaveBlockFromCompressedData(kPacket.imgIdx, posBlock, (const BYTE *) compBuf, compSize);
+			CGuildMarkManager::Instance().SaveBlockFromCompressedData(kPacket.imgIdx, posBlock, (const uint8_t *) compBuf, compSize);
 		}
 	}
 
@@ -439,8 +439,8 @@ bool CGuildMarkDownloader::__LoginState_RecvKeyAgreement()
 	{
 		// Key agreement 성공, 응답 전송
 		packetToSend.bHeader = HEADER_CG_KEY_AGREEMENT;
-		packetToSend.wAgreedLength = (WORD)agreedLength;
-		packetToSend.wDataLength = (WORD)dataLength;
+		packetToSend.wAgreedLength = (uint16_t)agreedLength;
+		packetToSend.wDataLength = (uint16_t)dataLength;
 
 		if (!Send(sizeof(packetToSend), &packetToSend))
 		{
@@ -476,7 +476,7 @@ bool CGuildMarkDownloader::__LoginState_RecvKeyAgreementCompleted()
 
 bool CGuildMarkDownloader::__SendSymbolCRCList()
 {
-	for (DWORD i=0; i<m_kVec_dwGuildID.size(); ++i)
+	for (uint32_t i=0; i<m_kVec_dwGuildID.size(); ++i)
 	{
 		TPacketCGSymbolCRC kSymbolCRCPacket;
 		kSymbolCRCPacket.header = HEADER_CG_GUILD_SYMBOL_CRC;
@@ -513,9 +513,9 @@ bool CGuildMarkDownloader::__LoginState_RecvSymbolData()
 	if (!Recv(sizeof(kPacketSymbolData), &kPacketSymbolData))
 		return false;
 
-	WORD wDataSize = kPacketSymbolData.size - sizeof(kPacketSymbolData);
-	DWORD dwGuildID = kPacketSymbolData.guild_id;
-	BYTE * pbyBuf = new BYTE [wDataSize];
+	uint16_t wDataSize = kPacketSymbolData.size - sizeof(kPacketSymbolData);
+	uint32_t dwGuildID = kPacketSymbolData.guild_id;
+	uint8_t * pbyBuf = new uint8_t [wDataSize];
 
 	if (!Recv(wDataSize, pbyBuf))
 	{

@@ -51,7 +51,7 @@ bool CHARACTER::StartRiding()
 		return false;
 
 
-	DWORD dwMountVnum = m_chHorse ? m_chHorse->GetRaceNum() : GetMyHorseVnum();
+	uint32_t dwMountVnum = m_chHorse ? m_chHorse->GetRaceNum() : GetMyHorseVnum();
 
 	if (false == CHorseRider::StartRiding())
 	{
@@ -84,7 +84,7 @@ bool CHARACTER::StopRiding()
 
 		if (!IsDead() && !IsStun())
 		{
-			DWORD dwOldVnum = GetMountVnum();
+			uint32_t dwOldVnum = GetMountVnum();
 			MountVnum(0);
 
 			// [NOTE] 말에서 내릴 땐 자기가 탔던걸 소환하도록 수정
@@ -112,7 +112,7 @@ EVENTFUNC(horse_dead_event)
 {
 	char_event_info* info = dynamic_cast<char_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "horse_dead_event> <Factor> Null pointer" );
 		return 0;
@@ -120,7 +120,7 @@ EVENTFUNC(horse_dead_event)
 
 	// <Factor>
 	LPCHARACTER ch = info->ch;
-	if (ch == NULL) {
+	if (ch == nullptr) {
 		return 0;
 	}
 	ch->HorseSummon(false);
@@ -144,12 +144,12 @@ LPCHARACTER CHARACTER::GetRider() const
 }
 
 
-void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, DWORD dwVnum, const char* pPetName)
+void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, uint32_t dwVnum, const char* pPetName)
 {
 	if ( bSummon )
 	{
 		//NOTE : summon했는데 이미 horse가 있으면 아무것도 안한다.
-		if( m_chHorse != NULL )
+		if( m_chHorse != nullptr )
 			return;
 
 		if (GetHorseLevel() <= 0)
@@ -161,8 +161,8 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, DWORD dwVnum, const cha
 
 		sys_log(0, "HorseSummon : %s lv:%d bSummon:%d fromFar:%d", GetName(), GetLevel(), bSummon, bFromFar);
 
-		long x = GetX();
-		long y = GetY();
+		int32_t x = GetX();
+		int32_t y = GetY();
 
 		if (GetHorseHealth() <= 0)
 			bFromFar = false;
@@ -182,7 +182,7 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, DWORD dwVnum, const cha
 				(0 == dwVnum) ? GetMyHorseVnum() : dwVnum, 
 				GetMapIndex(), 
 				x, y,
-				GetZ(), false, (int)(GetRotation()+180), false);
+				GetZ(), false, (int32_t)(GetRotation()+180), false);
 
 		if (!m_chHorse)
 		{
@@ -205,7 +205,7 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, DWORD dwVnum, const cha
 
 		const char* pHorseName = CHorseNameManager::instance().GetHorseName(GetPlayerID());
 
-		if ( pHorseName != NULL && strlen(pHorseName) != 0 )
+		if ( pHorseName != nullptr && strlen(pHorseName) != 0 )
 		{
 			m_chHorse->m_stName = pHorseName;
 		}
@@ -219,7 +219,7 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, DWORD dwVnum, const cha
 		{
 			M2_DESTROY_CHARACTER(m_chHorse);
 			sys_err("cannot show monster");
-			m_chHorse = NULL;
+			m_chHorse = nullptr;
 			return;
 		}
 
@@ -240,7 +240,7 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, DWORD dwVnum, const cha
 
 		LPCHARACTER chHorse = m_chHorse;
 
-		chHorse->SetRider(NULL); // m_chHorse assign to NULL
+		chHorse->SetRider(nullptr); // m_chHorse assign to nullptr
 
 		if ((GetHorseHealth() <= 0))
 			bFromFar = false;
@@ -255,17 +255,17 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, DWORD dwVnum, const cha
 			float fx, fy;
 			chHorse->SetRotation(GetDegreeFromPositionXY(chHorse->GetX(), chHorse->GetY(), GetX(), GetY())+180);
 			GetDeltaByDegree(chHorse->GetRotation(), 3500, &fx, &fy);
-			chHorse->Goto((long)(chHorse->GetX()+fx), (long) (chHorse->GetY()+fy));
+			chHorse->Goto((int32_t)(chHorse->GetX()+fx), (int32_t) (chHorse->GetY()+fy));
 			chHorse->SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
 		}
 
-		m_chHorse = NULL;
+		m_chHorse = nullptr;
 	}
 }
 
-DWORD CHARACTER::GetMyHorseVnum() const
+uint32_t CHARACTER::GetMyHorseVnum() const
 {
-	int delta = 0;
+	int32_t delta = 0;
 
 	if (GetGuild())
 	{
@@ -306,7 +306,7 @@ void CHARACTER::ClearHorseInfo()
 		m_bSendHorseStaminaGrade = 0;
 	}
 
-	m_chHorse = NULL;
+	m_chHorse = nullptr;
 
 }
 
@@ -314,8 +314,8 @@ void CHARACTER::SendHorseInfo()
 {
 	if (m_chHorse || IsHorseRiding())
 	{
-		int iHealthGrade;
-		int iStaminaGrade;
+		int32_t iHealthGrade;
+		int32_t iStaminaGrade;
 		/*
 		   HP	
 3: 70% < ~ <= 100%
@@ -389,7 +389,7 @@ bool CHARACTER::CanUseHorseSkill()
 	return false;
 }
 
-void CHARACTER::SetHorseLevel(int iLevel)
+void CHARACTER::SetHorseLevel(int32_t iLevel)
 {
 	CHorseRider::SetHorseLevel(iLevel);
 	SetSkillLevel(SKILL_HORSE, GetHorseLevel());

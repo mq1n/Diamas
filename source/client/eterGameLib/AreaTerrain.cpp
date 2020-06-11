@@ -59,8 +59,8 @@ bool CTerrain::Initialize()
 	m_bReady = false;
 	m_bMarked = false;
 
-	for (BYTE byY = 0; byY < PATCH_YCOUNT; ++byY)
-		for (BYTE byX = 0; byX < PATCH_XCOUNT; ++byX)
+	for (uint8_t byY = 0; byY < PATCH_YCOUNT; ++byY)
+		for (uint8_t byX = 0; byX < PATCH_XCOUNT; ++byX)
 			m_TerrainPatchList[byY * PATCH_XCOUNT + byX].Clear();
 	
 	return true;
@@ -68,7 +68,7 @@ bool CTerrain::Initialize()
 
 void CTerrain::LoadMiniMapTexture(const char * c_pchMiniMapFileName)
 {
-	DWORD dwStart = ELTimer_GetMSec();
+	uint32_t dwStart = ELTimer_GetMSec();
 	CGraphicImage * pImage = (CGraphicImage *) CResourceManager::Instance().GetResourcePointer(c_pchMiniMapFileName);
 	m_MiniMapGraphicImageInstance.SetImagePointer(pImage);
 	
@@ -80,13 +80,13 @@ void CTerrain::LoadMiniMapTexture(const char * c_pchMiniMapFileName)
 	else
 	{
 		Tracef(" CTerrain::LoadMiniMapTexture - MiniMapTexture Error");
-		m_lpMiniMapTexture = NULL;
+		m_lpMiniMapTexture = nullptr;
 	}
 }
 
 void CTerrain::LoadShadowTexture(const char * ShadowFileName)
 {
-	DWORD dwStart = ELTimer_GetMSec();
+	uint32_t dwStart = ELTimer_GetMSec();
 	CGraphicImage * pImage = (CGraphicImage *) CResourceManager::Instance().GetResourcePointer(ShadowFileName);
 	m_ShadowGraphicImageInstance.SetImagePointer(pImage);
 
@@ -95,7 +95,7 @@ void CTerrain::LoadShadowTexture(const char * ShadowFileName)
 	else
 	{
 		TraceError(" CTerrain::LoadShadowTexture - ShadowTexture is Empty");
-		m_lpShadowTexture = NULL;
+		m_lpShadowTexture = nullptr;
 	}
 	Tracef("CTerrain::LoadShadowTexture %d ms\n", ELTimer_GetMSec() - dwStart);
 }
@@ -136,22 +136,22 @@ void CTerrain::CopySettingFromGlobalSetting()
 	m_fHeightScale	= m_pOwnerOutdoorMap->GetHeightScale();
 }
 
-WORD CTerrain::WE_GetHeightMapValue(short sX, short sY)
+uint16_t CTerrain::WE_GetHeightMapValue(int16_t sX, int16_t sY)
 {
 	if (sX>=-1 && sY>=-1 && sX<HEIGHTMAP_RAW_XSIZE-1 && sY<HEIGHTMAP_RAW_YSIZE-1)
 		return GetHeightMapValue(sX,sY);
 
-	BYTE byTerrainNum;
+	uint8_t byTerrainNum;
 	if ( !m_pOwnerOutdoorMap->GetTerrainNumFromCoord(m_wX, m_wY, &byTerrainNum) )
 	{
 		Tracef("CTerrain::WE_GetHeightMapValue : Can't Get TerrainNum from Coord %d, %d", m_wX, m_wY);
 		byTerrainNum = 4;
 	}
 	
-	short sTerrainCouuntX, sTerrainCouuntY;
+	int16_t sTerrainCouuntX, sTerrainCouuntY;
 	m_pOwnerOutdoorMap->GetTerrainCount(&sTerrainCouuntX, &sTerrainCouuntY);
 
-	CTerrain * pTerrain = NULL;
+	CTerrain * pTerrain = nullptr;
 
 	if (sY < -1)
 	{
@@ -336,10 +336,10 @@ WORD CTerrain::WE_GetHeightMapValue(short sX, short sY)
 	}
 }
 
-bool CTerrain::GetNormal(int ix, int iy, D3DXVECTOR3 * pv3Normal)
+bool CTerrain::GetNormal(int32_t ix, int32_t iy, D3DXVECTOR3 * pv3Normal)
 {
-	long lMapWidth = XSIZE * CELLSCALE;
-	long lMapHeight = YSIZE * CELLSCALE;
+	int32_t lMapWidth = XSIZE * CELLSCALE;
+	int32_t lMapHeight = YSIZE * CELLSCALE;
 	while (ix < 0)
 		ix += lMapWidth;
 	
@@ -364,7 +364,7 @@ bool CTerrain::GetNormal(int ix, int iy, D3DXVECTOR3 * pv3Normal)
 	return true;
 }
 // Returns the height of the terrain at the given world coordinate
-float CTerrain::GetHeight(int x, int y)
+float CTerrain::GetHeight(int32_t x, int32_t y)
 {
 	//if (0 == CELLSCALE)
 		//return 0.0f;
@@ -375,12 +375,12 @@ float CTerrain::GetHeight(int x, int y)
 	if (x < 0 || y < 0 || x > XSIZE * CELLSCALE || y > XSIZE * CELLSCALE)
 		return 0.0f;
 
-	long	xdist;				/* x mod size of tile */
-	long	ydist;				/* y mod size of tile */
+	int32_t	xdist;				/* x mod size of tile */
+	int32_t	ydist;				/* y mod size of tile */
 	float	xslope, yslope;		/* slopes of heights between vertices */
 	
 	float	h1, h2, h3;
-	long	x2, y2;
+	int32_t	x2, y2;
 	float	ooscale;
 
 	/* Find out the distance relative to the top left vertex of a tile */
@@ -433,7 +433,7 @@ float CTerrain::GetHeight(int x, int y)
 //////////////////////////////////////////////////////////////////////////
 // HeightMapCoord -> TileMapCoord
 
-void CTerrain::CalculateNormal(long x, long y)
+void CTerrain::CalculateNormal(int32_t x, int32_t y)
 {
 	D3DXVECTOR3 normal;
 
@@ -443,7 +443,7 @@ void CTerrain::CalculateNormal(long x, long y)
 	normal.z = 2.0f * CELLSCALE;
 	normal *= 127.0f / D3DXVec3Length(&normal);
 
-	int ix, iy, iz;
+	int32_t ix, iy, iz;
 	PR_FLOAT_TO_INT(normal.x, ix);
 	PR_FLOAT_TO_INT(normal.y, iy);
 	PR_FLOAT_TO_INT(normal.z, iz);
@@ -458,7 +458,7 @@ void CTerrain::CalculateNormal(long x, long y)
 bool CTerrain::RAW_LoadTileMap(const char * c_pszFileName, bool bBGLoading)
 {
 	CTerrainImpl::RAW_LoadTileMap(c_pszFileName);
-	DWORD dwStart = ELTimer_GetMSec();
+	uint32_t dwStart = ELTimer_GetMSec();
 	RAW_AllocateSplats(bBGLoading);
 	Tracef("CTerrain::RAW_AllocateSplats %d\n", ELTimer_GetMSec() - dwStart);
 	return true;
@@ -467,9 +467,9 @@ bool CTerrain::RAW_LoadTileMap(const char * c_pszFileName, bool bBGLoading)
 bool CTerrain::LoadHeightMap(const char * c_pszFileName)
 {
 	CTerrainImpl::LoadHeightMap(c_pszFileName);
-	DWORD dwStart = ELTimer_GetMSec();
-	for (WORD y = 0; y < NORMALMAP_YSIZE; ++y)
-		for (WORD x = 0; x < NORMALMAP_XSIZE; ++x)
+	uint32_t dwStart = ELTimer_GetMSec();
+	for (uint16_t y = 0; y < NORMALMAP_YSIZE; ++y)
+		for (uint16_t x = 0; x < NORMALMAP_XSIZE; ++x)
 			CalculateNormal(x, y);
 		
 	Tracef("LoadHeightMap::CalculateNormal %d ms\n", ELTimer_GetMSec() - dwStart);
@@ -481,7 +481,7 @@ bool CTerrain::LoadAttrMap(const char *c_pszFileName)
 	return CTerrainImpl::LoadAttrMap(c_pszFileName);
 }
 
-bool CTerrain::isAttrOn(WORD wCoordX, WORD wCoordY, BYTE byAttrFlag)
+bool CTerrain::isAttrOn(uint16_t wCoordX, uint16_t wCoordY, uint8_t byAttrFlag)
 {
 	if (wCoordX >= ATTRMAP_XSIZE || wCoordY >= ATTRMAP_YSIZE)
 	{
@@ -489,7 +489,7 @@ bool CTerrain::isAttrOn(WORD wCoordX, WORD wCoordY, BYTE byAttrFlag)
 		return false;
 	}
 	
-	BYTE byMapAttr = m_abyAttrMap[wCoordY * ATTRMAP_XSIZE + wCoordX];
+	uint8_t byMapAttr = m_abyAttrMap[wCoordY * ATTRMAP_XSIZE + wCoordX];
 
 	if ( byAttrFlag < 16 )
 		return (byMapAttr & byAttrFlag) ? true : false;
@@ -502,7 +502,7 @@ bool CTerrain::isAttrOn(WORD wCoordX, WORD wCoordY, BYTE byAttrFlag)
 	}
 }
 
-BYTE CTerrain::GetAttr(WORD wCoordX, WORD wCoordY)
+uint8_t CTerrain::GetAttr(uint16_t wCoordX, uint16_t wCoordY)
 {
 	if (wCoordX >= ATTRMAP_XSIZE || wCoordY >= ATTRMAP_YSIZE)
 	{
@@ -513,7 +513,7 @@ BYTE CTerrain::GetAttr(WORD wCoordX, WORD wCoordY)
 	return m_abyAttrMap[wCoordY * ATTRMAP_XSIZE + wCoordX];
 }
 
-void CTerrain::GetWaterHeight(BYTE byWaterNum, long * plWaterHeight)
+void CTerrain::GetWaterHeight(uint8_t byWaterNum, int32_t * plWaterHeight)
 {
 	if (byWaterNum > m_byNumWater)
 	{
@@ -523,9 +523,9 @@ void CTerrain::GetWaterHeight(BYTE byWaterNum, long * plWaterHeight)
 	*plWaterHeight = m_lWaterHeight[byWaterNum];
 }
 
-bool CTerrain::GetWaterHeight(WORD wCoordX, WORD wCoordY, long * plWaterHeight)
+bool CTerrain::GetWaterHeight(uint16_t wCoordX, uint16_t wCoordY, int32_t * plWaterHeight)
 {
-	BYTE byWaterNum = *(m_abyWaterMap + (wCoordY * WATERMAP_XSIZE) + wCoordX);
+	uint8_t byWaterNum = *(m_abyWaterMap + (wCoordY * WATERMAP_XSIZE) + wCoordX);
 	if (byWaterNum > m_byNumWater)
 	{
 		Tracef("CTerrain::GetWaterHeight (X %d, Y %d) ERROR!", wCoordX, wCoordY, m_byNumWater);
@@ -538,20 +538,20 @@ bool CTerrain::GetWaterHeight(WORD wCoordX, WORD wCoordY, long * plWaterHeight)
 
 void CTerrain::RAW_DeallocateSplats(bool bBGLoading)
 {
-	for (DWORD i = 1; i < GetTextureSet()->GetTextureCount(); ++i)
+	for (uint32_t i = 1; i < GetTextureSet()->GetTextureCount(); ++i)
 	{
 		TTerainSplat & rSplat = m_TerrainSplatPatch.Splats[i];
 
 		if (m_lpAlphaTexture[i])
 		{
-			ULONG ulRef;
+			uint32_t ulRef;
 			do
 			{
 				ulRef = m_lpAlphaTexture[i]->Release();
 			} while(ulRef > 0);
 		}
 
-		rSplat.pd3dTexture = m_lpAlphaTexture[i] = NULL;
+		rSplat.pd3dTexture = m_lpAlphaTexture[i] = nullptr;
  	}
 
 	memset(&m_TerrainSplatPatch, 0, sizeof(m_TerrainSplatPatch));
@@ -560,11 +560,11 @@ void CTerrain::RAW_DeallocateSplats(bool bBGLoading)
 void CTerrain::RAW_AllocateSplats(bool bBGLoading)
 {
 	RAW_DeallocateSplats(bBGLoading);
-	DWORD dwTexCount = GetTextureSet()->GetTextureCount();
+	uint32_t dwTexCount = GetTextureSet()->GetTextureCount();
 	
 	m_TerrainSplatPatch.m_bNeedsUpdate = true;
 
-	for (DWORD t = 0; t < dwTexCount; ++t)
+	for (uint32_t t = 0; t < dwTexCount; ++t)
 		m_TerrainSplatPatch.Splats[t].NeedsUpdate = 1;
 	
 	RAW_CountTiles();
@@ -644,10 +644,10 @@ void CTerrain::RAW_GenerateSplat(bool bBGLoading)
 
 	m_TerrainSplatPatch.m_bNeedsUpdate = false;
 
-	BYTE abyAlphaMap[SPLATALPHA_RAW_XSIZE * SPLATALPHA_RAW_YSIZE];
-	BYTE * aptr;
+	uint8_t abyAlphaMap[SPLATALPHA_RAW_XSIZE * SPLATALPHA_RAW_YSIZE];
+	uint8_t * aptr;
 	
-	for (DWORD i = 1; i < GetTextureSet()->GetTextureCount(); ++i)
+	for (uint32_t i = 1; i < GetTextureSet()->GetTextureCount(); ++i)
 	{
 		TTerainSplat & rSplat = m_TerrainSplatPatch.Splats[i];
 		
@@ -659,7 +659,7 @@ void CTerrain::RAW_GenerateSplat(bool bBGLoading)
 				{
 					if (m_lpAlphaTexture[i])
 					{
-						ULONG ulRef;
+						uint32_t ulRef;
 						do
 						{
 							ulRef = m_lpAlphaTexture[i]->Release();
@@ -668,7 +668,7 @@ void CTerrain::RAW_GenerateSplat(bool bBGLoading)
 						} while(ulRef > 0);
 					}
 
-					rSplat.pd3dTexture = m_lpAlphaTexture[i] = NULL;
+					rSplat.pd3dTexture = m_lpAlphaTexture[i] = nullptr;
  				}
 
 				rSplat.Active = 1;
@@ -676,18 +676,18 @@ void CTerrain::RAW_GenerateSplat(bool bBGLoading)
 
 				aptr = abyAlphaMap;
 
-				for (long y = 0; y < SPLATALPHA_RAW_YSIZE; ++y)
+				for (int32_t y = 0; y < SPLATALPHA_RAW_YSIZE; ++y)
 				{
-					for (long x = 0; x < SPLATALPHA_RAW_XSIZE; ++x)
+					for (int32_t x = 0; x < SPLATALPHA_RAW_XSIZE; ++x)
 					{
-						long lTileMapOffset = y * TILEMAP_RAW_XSIZE + x;
+						int32_t lTileMapOffset = y * TILEMAP_RAW_XSIZE + x;
 						 
-						BYTE byTileNum = m_abyTileMap[lTileMapOffset];
+						uint8_t byTileNum = m_abyTileMap[lTileMapOffset];
 						if (byTileNum == i)
  							*aptr = 0xFF;
 						else if (byTileNum > i)
 						{
-							BYTE byTileTL, byTileTR, byTileBL, byTileBR, byTileT, byTileB, byTileL, byTileR;
+							uint8_t byTileTL, byTileTR, byTileBL, byTileBR, byTileT, byTileB, byTileL, byTileR;
 
 							if ( x > 0 && y > 0 )
 								byTileTL = m_abyTileMap[lTileMapOffset - TILEMAP_RAW_YSIZE - 1];
@@ -744,7 +744,7 @@ void CTerrain::RAW_GenerateSplat(bool bBGLoading)
 				{
 					if (m_lpAlphaTexture[i])
 					{
-						ULONG ulRef;
+						uint32_t ulRef;
 						do
 						{
 							ulRef = m_lpAlphaTexture[i]->Release();
@@ -753,7 +753,7 @@ void CTerrain::RAW_GenerateSplat(bool bBGLoading)
 						} while(ulRef > 0);
 					}
 					
-					rSplat.pd3dTexture = m_lpAlphaTexture[i] = NULL;
+					rSplat.pd3dTexture = m_lpAlphaTexture[i] = nullptr;
  				}
 				rSplat.NeedsUpdate = 0;
 				rSplat.Active = 0;
@@ -762,14 +762,14 @@ void CTerrain::RAW_GenerateSplat(bool bBGLoading)
 	}
 }
 
-LPDIRECT3DTEXTURE8 CTerrain::AddTexture32(BYTE byImageNum, BYTE * pbyImage, long lTextureWidth, long lTextureHeight)
+LPDIRECT3DTEXTURE8 CTerrain::AddTexture32(uint8_t byImageNum, uint8_t * pbyImage, int32_t lTextureWidth, int32_t lTextureHeight)
 {
-	assert(NULL==m_lpAlphaTexture[byImageNum]);
+	assert(nullptr==m_lpAlphaTexture[byImageNum]);
 
 	if (m_lpAlphaTexture[byImageNum])
 		m_lpAlphaTexture[byImageNum]->Release();
 
-	m_lpAlphaTexture[byImageNum]=NULL;
+	m_lpAlphaTexture[byImageNum]=nullptr;
 
 	HRESULT hr;
 	D3DFORMAT format;
@@ -782,28 +782,28 @@ LPDIRECT3DTEXTURE8 CTerrain::AddTexture32(BYTE byImageNum, BYTE * pbyImage, long
 
 	bool bResizedAndSuccess = false;
 
-	IDirect3DTexture8* pkTex=NULL;
+	IDirect3DTexture8* pkTex=nullptr;
 
-	UINT uiNewWidth = 256;
-	UINT uiNewHeight = 256;
+	uint32_t uiNewWidth = 256;
+	uint32_t uiNewHeight = 256;
 	hr = ms_lpd3dDevice->CreateTexture(
 		uiNewWidth, uiNewHeight, 5, 0, 
 		format, D3DPOOL_MANAGED, &pkTex);
 	if (FAILED(hr))
 	{
 		TraceError("CTerrain::AddTexture32 - CreateTexture Error");
-		return NULL;
+		return nullptr;
 	}
 	
 
-	BYTE abResizeImage[256*256];
+	uint8_t abResizeImage[256*256];
 	{
-		BYTE* pbDstPixel=abResizeImage;
-		BYTE* pbSrcPixel;
-		BYTE* abCurLine=pbyImage;
-		for (UINT y=0; y<256; ++y, abCurLine+=258)
+		uint8_t* pbDstPixel=abResizeImage;
+		uint8_t* pbSrcPixel;
+		uint8_t* abCurLine=pbyImage;
+		for (uint32_t y=0; y<256; ++y, abCurLine+=258)
 		{
-			for (UINT x=0; x<256; ++x)
+			for (uint32_t x=0; x<256; ++x)
 			{
 				pbSrcPixel=abCurLine+x;
 				*pbDstPixel++=
@@ -819,34 +819,34 @@ LPDIRECT3DTEXTURE8 CTerrain::AddTexture32(BYTE byImageNum, BYTE * pbyImage, long
 		if (FAILED(hr))
 		{
 			pkTex->Release();
-			return NULL;
+			return nullptr;
 		}
 		
 		if(ms_bSupportDXT)
-			PutImage32(abResizeImage, (BYTE*) d3dlr.pBits, 256, d3dlr.Pitch, 256, 256, bResizedAndSuccess);
+			PutImage32(abResizeImage, (uint8_t*) d3dlr.pBits, 256, d3dlr.Pitch, 256, 256, bResizedAndSuccess);
 		else
-			PutImage16(abResizeImage, (BYTE*) d3dlr.pBits, 256, d3dlr.Pitch, 256, 256, bResizedAndSuccess);
+			PutImage16(abResizeImage, (uint8_t*) d3dlr.pBits, 256, d3dlr.Pitch, 256, 256, bResizedAndSuccess);
 
 		pkTex->UnlockRect(0);
 	}
 
-	BYTE abResizeImage2[128*128];
+	uint8_t abResizeImage2[128*128];
 
-	BYTE* pbSrcBuffer=abResizeImage;
-	BYTE* pbDstBuffer=abResizeImage2;
+	uint8_t* pbSrcBuffer=abResizeImage;
+	uint8_t* pbDstBuffer=abResizeImage2;
 
-	UINT uSrcSize=256;
+	uint32_t uSrcSize=256;
 	
-	for (UINT uMipMapLevel=1; uMipMapLevel!=pkTex->GetLevelCount(); ++uMipMapLevel)
+	for (uint32_t uMipMapLevel=1; uMipMapLevel!=pkTex->GetLevelCount(); ++uMipMapLevel)
 	{
-		UINT uDstSize=uSrcSize>>1;
+		uint32_t uDstSize=uSrcSize>>1;
 
-		BYTE* pbDstPixel=pbDstBuffer;
-		BYTE* pbSrcPixel;
-		BYTE* abCurLine=pbSrcBuffer;
-		for (UINT y=0; y!=uSrcSize; y+=2, abCurLine+=uSrcSize*2)
+		uint8_t* pbDstPixel=pbDstBuffer;
+		uint8_t* pbSrcPixel;
+		uint8_t* abCurLine=pbSrcBuffer;
+		for (uint32_t y=0; y!=uSrcSize; y+=2, abCurLine+=uSrcSize*2)
 		{
-			for (UINT x=0; x!=uSrcSize; x+=2)
+			for (uint32_t x=0; x!=uSrcSize; x+=2)
 			{
 				pbSrcPixel=abCurLine+x;
 				*pbDstPixel++=(pbSrcPixel[0]+pbSrcPixel[1]+pbSrcPixel[uSrcSize+0]+pbSrcPixel[uSrcSize+1])>>2;
@@ -860,9 +860,9 @@ LPDIRECT3DTEXTURE8 CTerrain::AddTexture32(BYTE byImageNum, BYTE * pbyImage, long
 			continue;
 
 		if(ms_bSupportDXT)
-			PutImage32(pbDstBuffer, (BYTE*) d3dlr.pBits, uDstSize, d3dlr.Pitch, uDstSize, uDstSize, bResizedAndSuccess);
+			PutImage32(pbDstBuffer, (uint8_t*) d3dlr.pBits, uDstSize, d3dlr.Pitch, uDstSize, uDstSize, bResizedAndSuccess);
 		else
-			PutImage16(pbDstBuffer, (BYTE*) d3dlr.pBits, uDstSize, d3dlr.Pitch, uDstSize, uDstSize, bResizedAndSuccess);
+			PutImage16(pbDstBuffer, (uint8_t*) d3dlr.pBits, uDstSize, d3dlr.Pitch, uDstSize, uDstSize, bResizedAndSuccess);
 
 		hr = pkTex->UnlockRect(uMipMapLevel);
 		
@@ -875,14 +875,14 @@ LPDIRECT3DTEXTURE8 CTerrain::AddTexture32(BYTE byImageNum, BYTE * pbyImage, long
 	return pkTex;
 }
 
-void CTerrain::PutImage32(BYTE *src, BYTE *dst, long src_pitch, long dst_pitch, long texturewidth, long textureheight, bool bResize)
+void CTerrain::PutImage32(uint8_t *src, uint8_t *dst, int32_t src_pitch, int32_t dst_pitch, int32_t texturewidth, int32_t textureheight, bool bResize)
 {
-	for (int y = 0; y < textureheight; ++y)
+	for (int32_t y = 0; y < textureheight; ++y)
     {
-		for (int x = 0; x < texturewidth; ++x)
+		for (int32_t x = 0; x < texturewidth; ++x)
 		{
-			DWORD packed_pixel = src[x] << 24;
-			*((DWORD*)(dst+x*4)) = packed_pixel;
+			uint32_t packed_pixel = src[x] << 24;
+			*((uint32_t*)(dst+x*4)) = packed_pixel;
 
 		}
 
@@ -891,16 +891,16 @@ void CTerrain::PutImage32(BYTE *src, BYTE *dst, long src_pitch, long dst_pitch, 
     }
 }
 
-void CTerrain::PutImage16(BYTE *src, BYTE *dst, long src_pitch, long dst_pitch, long texturewidth, long textureheight, bool bResize)
+void CTerrain::PutImage16(uint8_t *src, uint8_t *dst, int32_t src_pitch, int32_t dst_pitch, int32_t texturewidth, int32_t textureheight, bool bResize)
 {
-	for (int y = 0; y < textureheight; ++y)
+	for (int32_t y = 0; y < textureheight; ++y)
     {
-		for (int x = 0; x < texturewidth; ++x)
+		for (int32_t x = 0; x < texturewidth; ++x)
 		{
-			WORD packed_pixel = src[x] << 8;
+			uint16_t packed_pixel = src[x] << 8;
 			//& 연산 한번이 아깝다
-			//WORD packed_pixel = (src[x]&0xF0) << 8;
-			*((WORD*)(dst+x*2)) = packed_pixel;
+			//uint16_t packed_pixel = (src[x]&0xF0) << 8;
+			*((uint16_t*)(dst+x*2)) = packed_pixel;
 		}
 
 		dst += dst_pitch;
@@ -908,7 +908,7 @@ void CTerrain::PutImage16(BYTE *src, BYTE *dst, long src_pitch, long dst_pitch, 
     }
 }
 
-void CTerrain::SetCoordinate(WORD wCoordX, WORD wCoordY)
+void CTerrain::SetCoordinate(uint16_t wCoordX, uint16_t wCoordY)
 {
 	m_wX = wCoordX;
 	m_wY = wCoordY;
@@ -916,27 +916,27 @@ void CTerrain::SetCoordinate(WORD wCoordX, WORD wCoordY)
 
 void CTerrain::CalculateTerrainPatch()
 {
-	for (BYTE byPatchNumY = 0; byPatchNumY < PATCH_YCOUNT; ++byPatchNumY)
-		for (BYTE byPatchNumX = 0; byPatchNumX < PATCH_XCOUNT; ++byPatchNumX)
+	for (uint8_t byPatchNumY = 0; byPatchNumY < PATCH_YCOUNT; ++byPatchNumY)
+		for (uint8_t byPatchNumX = 0; byPatchNumX < PATCH_XCOUNT; ++byPatchNumX)
 			_CalculateTerrainPatch(byPatchNumX, byPatchNumY);
 }
 
-CTerrainPatch * CTerrain::GetTerrainPatchPtr(BYTE byPatchNumX, BYTE byPatchNumY)
+CTerrainPatch * CTerrain::GetTerrainPatchPtr(uint8_t byPatchNumX, uint8_t byPatchNumY)
 {
 	if (byPatchNumX < 0 || byPatchNumX >= PATCH_XCOUNT || byPatchNumY < 0 || byPatchNumY >= PATCH_YCOUNT)
-		return NULL;
+		return nullptr;
 
 	return &m_TerrainPatchList[byPatchNumY * PATCH_XCOUNT + byPatchNumX];
 }
 
 
 
-void CTerrain::_CalculateTerrainPatch(BYTE byPatchNumX, BYTE byPatchNumY)
+void CTerrain::_CalculateTerrainPatch(uint8_t byPatchNumX, uint8_t byPatchNumY)
 {
 	if (!m_awRawHeightMap || !m_acNormalMap || !m_abyWaterMap)
 		return;
 
-	DWORD dwPatchNum = byPatchNumY * PATCH_XCOUNT + byPatchNumX;
+	uint32_t dwPatchNum = byPatchNumY * PATCH_XCOUNT + byPatchNumX;
 
 	CTerrainPatch& rkTerrainPatch=m_TerrainPatchList[dwPatchNum];
 	if (!rkTerrainPatch.NeedUpdate())
@@ -951,13 +951,13 @@ void CTerrain::_CalculateTerrainPatch(BYTE byPatchNumX, BYTE byPatchNumY)
 	HardwareTransformPatch_SSourceVertex akSrcTerrainVertex[CTerrainPatch::TERRAIN_VERTEX_COUNT];
 	SWaterVertex akSrcWaterVertex[PATCH_XSIZE * PATCH_YSIZE * 6];
 		
-	DWORD dwNormalWidth = CTerrainImpl::NORMALMAP_XSIZE * 3;
-	DWORD dwStartX = byPatchNumX * PATCH_XSIZE;
-	DWORD dwStartY = byPatchNumY * PATCH_YSIZE;
+	uint32_t dwNormalWidth = CTerrainImpl::NORMALMAP_XSIZE * 3;
+	uint32_t dwStartX = byPatchNumX * PATCH_XSIZE;
+	uint32_t dwStartY = byPatchNumY * PATCH_YSIZE;
 	
-	WORD * wOrigRawHeightPtr = m_awRawHeightMap + ((dwStartY+1) * HEIGHTMAP_RAW_XSIZE) + dwStartX+1;
+	uint16_t * wOrigRawHeightPtr = m_awRawHeightMap + ((dwStartY+1) * HEIGHTMAP_RAW_XSIZE) + dwStartX+1;
 	char * chOrigNormalPtr = m_acNormalMap + (dwStartY * dwNormalWidth) + dwStartX * 3;
-	BYTE * byOrigWaterPtr = m_abyWaterMap + (dwStartY * WATERMAP_XSIZE) + dwStartX;
+	uint8_t * byOrigWaterPtr = m_abyWaterMap + (dwStartY * WATERMAP_XSIZE) + dwStartX;
 	
 	float fX, fY, fOrigX, fOrigY;
 	fOrigX = fX = (float)(m_wX * XSIZE * CELLSCALE) + (float)(dwStartX * CELLSCALE);
@@ -970,30 +970,30 @@ void CTerrain::_CalculateTerrainPatch(BYTE byPatchNumX, BYTE byPatchNumY)
 	
 	float fMinZ =  999999.0f;
 	float fMaxZ = -999999.0f;
-	WORD wNumPlainType = 0;
-	WORD wNumHillType = 0;
-	WORD wNumCliffType = 0;
+	uint16_t wNumPlainType = 0;
+	uint16_t wNumHillType = 0;
+	uint16_t wNumCliffType = 0;
 
 	bool bWaterExist=false;
 	
 	SWaterVertex*	lpWaterVertex=akSrcWaterVertex;
-	UINT uWaterVertexCount=0;
+	uint32_t uWaterVertexCount=0;
 	
 	HardwareTransformPatch_SSourceVertex*	lpTerrainVertex=akSrcTerrainVertex;	
-	UINT uTerrainVertexCount=0;
+	uint32_t uTerrainVertexCount=0;
 
 	D3DXVECTOR3 kNormal;
 	D3DXVECTOR3 kPosition;
-	for (DWORD dwY = dwStartY; dwY <= dwStartY + PATCH_YSIZE; ++dwY)
+	for (uint32_t dwY = dwStartY; dwY <= dwStartY + PATCH_YSIZE; ++dwY)
     {
-		WORD * pwRawHeight	= wOrigRawHeightPtr;
+		uint16_t * pwRawHeight	= wOrigRawHeightPtr;
 		char * pchNormal	= chOrigNormalPtr;
-		BYTE * pbyWater		= byOrigWaterPtr;
+		uint8_t * pbyWater		= byOrigWaterPtr;
 		fX = fOrigX;
 		
-		for (DWORD dwX = dwStartX; dwX <= dwStartX + PATCH_XSIZE; ++dwX)
+		for (uint32_t dwX = dwStartX; dwX <= dwStartX + PATCH_XSIZE; ++dwX)
 		{
-			WORD hgt = (*pwRawHeight++);
+			uint16_t hgt = (*pwRawHeight++);
 			
 			kNormal.x = -(*pchNormal++) * 0.0078740f;
 			kNormal.y = (*pchNormal++) * 0.0078740f;
@@ -1020,48 +1020,48 @@ void CTerrain::_CalculateTerrainPatch(BYTE byPatchNumX, BYTE byPatchNumY)
 			if (0 <= dwX && 0 <= dwY && XSIZE > dwX && YSIZE > dwY && 
 				(dwStartX + PATCH_XSIZE) != dwX && (dwStartY + PATCH_YSIZE) != dwY)
 			{
-				BYTE byNumWater = (*pbyWater++);
+				uint8_t byNumWater = (*pbyWater++);
 
 				if (byNumWater != 0xFF)
 				{
-					long lWaterHeight = m_lWaterHeight[byNumWater];
+					int32_t lWaterHeight = m_lWaterHeight[byNumWater];
 					if (-1 != lWaterHeight)
 					{
-						float fWaterTerrainHeightDifference0 = (float)(lWaterHeight - (long)hgt);
+						float fWaterTerrainHeightDifference0 = (float)(lWaterHeight - (int32_t)hgt);
 						if (fWaterTerrainHeightDifference0 >= fTransparentWaterDepth)
 							fWaterTerrainHeightDifference0 = fTransparentWaterDepth;
 						if (fWaterTerrainHeightDifference0 <= 0.0f)
 							fWaterTerrainHeightDifference0 = 0.0f;
 
-						float fWaterTerrainHeightDifference1 = (float)(lWaterHeight - (long)(*(pwRawHeight + CTerrainImpl::HEIGHTMAP_RAW_XSIZE - 1)));
+						float fWaterTerrainHeightDifference1 = (float)(lWaterHeight - (int32_t)(*(pwRawHeight + CTerrainImpl::HEIGHTMAP_RAW_XSIZE - 1)));
 						if (fWaterTerrainHeightDifference1 >= fTransparentWaterDepth)
 							fWaterTerrainHeightDifference1 = fTransparentWaterDepth;
 						if (fWaterTerrainHeightDifference1 <= 0.0f)
 							fWaterTerrainHeightDifference1 = 0.0f;
 
-						float fWaterTerrainHeightDifference2 = (float)(lWaterHeight - (long)(*(pwRawHeight)));
+						float fWaterTerrainHeightDifference2 = (float)(lWaterHeight - (int32_t)(*(pwRawHeight)));
 						if (fWaterTerrainHeightDifference2 >= fTransparentWaterDepth)
 							fWaterTerrainHeightDifference2 = fTransparentWaterDepth;
 						if (fWaterTerrainHeightDifference2 <= 0.0f)
 							fWaterTerrainHeightDifference2 = 0.0f;
 
-						float fWaterTerrainHeightDifference3 = (float)(lWaterHeight - (long)(*(pwRawHeight + CTerrainImpl::HEIGHTMAP_RAW_XSIZE)));
+						float fWaterTerrainHeightDifference3 = (float)(lWaterHeight - (int32_t)(*(pwRawHeight + CTerrainImpl::HEIGHTMAP_RAW_XSIZE)));
 						if (fWaterTerrainHeightDifference3 >= fTransparentWaterDepth)
 							fWaterTerrainHeightDifference3 = fTransparentWaterDepth;
 						if (fWaterTerrainHeightDifference3 <= 0.0f)
 							fWaterTerrainHeightDifference3 = 0.0f;
 
-						DWORD dwAlpha0;
-						DWORD dwAlpha1;
-						DWORD dwAlpha2;
-						DWORD dwAlpha3;
+						uint32_t dwAlpha0;
+						uint32_t dwAlpha1;
+						uint32_t dwAlpha2;
+						uint32_t dwAlpha3;
 
 						PR_FLOAT_TO_INT(fWaterTerrainHeightDifference0 * fOOOpaqueWaterDepth * 255.0f, dwAlpha0);
 						PR_FLOAT_TO_INT(fWaterTerrainHeightDifference1 * fOOOpaqueWaterDepth * 255.0f, dwAlpha1);
 						PR_FLOAT_TO_INT(fWaterTerrainHeightDifference2 * fOOOpaqueWaterDepth * 255.0f, dwAlpha2);
 						PR_FLOAT_TO_INT(fWaterTerrainHeightDifference3 * fOOOpaqueWaterDepth * 255.0f, dwAlpha3);
 
-						DWORD dwAlphaKey=(dwAlpha0<<24)|(dwAlpha1<<16)|(dwAlpha2<<8)|dwAlpha3;
+						uint32_t dwAlphaKey=(dwAlpha0<<24)|(dwAlpha1<<16)|(dwAlpha2<<8)|dwAlpha3;
 						if (dwAlphaKey!=0)
 						{							
 							assert(lpWaterVertex<akSrcWaterVertex+PATCH_XSIZE * PATCH_YSIZE * 6);
@@ -1142,14 +1142,14 @@ void CTerrain::_CalculateTerrainPatch(BYTE byPatchNumX, BYTE byPatchNumY)
 	rkTerrainPatch.NeedUpdate(false);
 }
 
-void CTerrain::AllocateMarkedSplats(BYTE * pbyAlphaMap)
+void CTerrain::AllocateMarkedSplats(uint8_t * pbyAlphaMap)
 {
 	TTerainSplat & rAttrSplat = m_MarkedSplatPatch.Splats[0];
 	HRESULT hr;
 
 	if (m_lpMarkedTexture)
 	{
-		ULONG ulRef;
+		uint32_t ulRef;
 		do
 		{
 			ulRef = m_lpMarkedTexture->Release();
@@ -1167,7 +1167,7 @@ void CTerrain::AllocateMarkedSplats(BYTE * pbyAlphaMap)
 		hr = m_lpMarkedTexture->LockRect(0, &d3dlr, 0, 0);
 	} while(FAILED(hr));
 
-	PutImage32(pbyAlphaMap, (BYTE*) d3dlr.pBits, ATTRMAP_XSIZE, d3dlr.Pitch, ATTRMAP_XSIZE, ATTRMAP_YSIZE);
+	PutImage32(pbyAlphaMap, (uint8_t*) d3dlr.pBits, ATTRMAP_XSIZE, d3dlr.Pitch, ATTRMAP_XSIZE, ATTRMAP_YSIZE);
 
 	do
 	{
@@ -1183,15 +1183,15 @@ void CTerrain::DeallocateMarkedSplats()
 	TTerainSplat & rSplat = m_MarkedSplatPatch.Splats[0];
 	if (m_lpMarkedTexture)
 	{
-		ULONG ulRef;
+		uint32_t ulRef;
 		do
 		{
 			ulRef = m_lpMarkedTexture->Release();
 		} while(ulRef > 0);
 	}
 
-	rSplat.pd3dTexture = NULL;
-	m_lpMarkedTexture = NULL;
+	rSplat.pd3dTexture = nullptr;
+	m_lpMarkedTexture = nullptr;
 	m_bMarked = FALSE;
 
 	memset(&m_MarkedSplatPatch, 0, sizeof(m_MarkedSplatPatch));

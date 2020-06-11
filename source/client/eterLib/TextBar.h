@@ -5,15 +5,15 @@
 class CTextBar : public CDibBar
 {
 	public:
-		CTextBar(int fontSize, bool isBold);
+		CTextBar(int32_t fontSize, bool isBold);
 		virtual ~CTextBar();
 		
-		void TextOut(int ix, int iy, const char * c_szText);
-		void SetTextColor(int r, int g, int b);
+		void TextOut(int32_t ix, int32_t iy, const char * c_szText);
+		void SetTextColor(int32_t r, int32_t g, int32_t b);
 		void GetTextExtent(const char * c_szText, SIZE* p_size);
 
 	protected:
-		void __SetFont(int fontSize, bool isBold);
+		void __SetFont(int32_t fontSize, bool isBold);
 
 		void OnCreate();
 
@@ -21,6 +21,6 @@ class CTextBar : public CDibBar
 		HFONT m_hFont;
 		HFONT m_hOldFont;
 		
-		int		m_fontSize;
+		int32_t		m_fontSize;
 		bool	m_isBold;
 };

@@ -87,9 +87,9 @@ public:
 	{ Vector3d Negated(-x, -y, -z);
 	return(Negated); };
 	
-    float operator [] (const int i) const         // ALLOWS VECTOR ACCESS AS AN ARRAY.
+    float operator [] (const int32_t i) const         // ALLOWS VECTOR ACCESS AS AN ARRAY.
 	{ return( (i==0)?x:((i==1)?y:z) ); };
-    float & operator [] (const int i)
+    float & operator [] (const int32_t i)
 	{ return( (i==0)?x:((i==1)?y:z) ); };
 	//
 	

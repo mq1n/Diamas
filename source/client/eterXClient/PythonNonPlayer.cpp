@@ -7,7 +7,7 @@
 
 bool CPythonNonPlayer::LoadNonPlayerData(const char * c_szFileName)
 {
-	static DWORD s_adwMobProtoKey[4] =
+	static uint32_t s_adwMobProtoKey[4] =
 	{   
 		4813894,
 		18955,
@@ -21,9 +21,9 @@ bool CPythonNonPlayer::LoadNonPlayerData(const char * c_szFileName)
 	if (!FileSystemManager::Instance().OpenFile(c_szFileName, file))
 		return false;
 
-	DWORD dwFourCC, dwElements, dwDataSize;
+	uint32_t dwFourCC, dwElements, dwDataSize;
 
-	file.Read(&dwFourCC, sizeof(DWORD));
+	file.Read(&dwFourCC, sizeof(uint32_t));
 
 	if (dwFourCC != MAKEFOURCC('M', 'M', 'P', 'T'))
 	{
@@ -31,10 +31,10 @@ bool CPythonNonPlayer::LoadNonPlayerData(const char * c_szFileName)
 		return false;
 	}
 
-	file.Read(&dwElements, sizeof(DWORD));
-	file.Read(&dwDataSize, sizeof(DWORD));
+	file.Read(&dwElements, sizeof(uint32_t));
+	file.Read(&dwDataSize, sizeof(uint32_t));
 
-	BYTE * pbData = new BYTE[dwDataSize];
+	uint8_t * pbData = new uint8_t[dwDataSize];
 	file.Read(pbData, dwDataSize);
 	/////
 
@@ -46,8 +46,8 @@ bool CPythonNonPlayer::LoadNonPlayerData(const char * c_szFileName)
 		return false;
 	}
 
-	DWORD structSize = zObj.GetSize() / dwElements;
-	DWORD structDiff = zObj.GetSize() % dwElements;
+	uint32_t structSize = zObj.GetSize() / dwElements;
+	uint32_t structDiff = zObj.GetSize() % dwElements;
 #ifdef ENABLE_PROTOSTRUCT_AUTODETECT
 	if (structDiff!=0 && !CPythonNonPlayer::TMobTableAll::IsValidStruct(structSize))
 #else
@@ -58,7 +58,7 @@ bool CPythonNonPlayer::LoadNonPlayerData(const char * c_szFileName)
 		return false;
 	}
 
-    for (DWORD i = 0; i < dwElements; ++i)
+    for (uint32_t i = 0; i < dwElements; ++i)
 	{
 #ifdef ENABLE_PROTOSTRUCT_AUTODETECT
 		CPythonNonPlayer::TMobTable t = {0};
@@ -79,7 +79,7 @@ bool CPythonNonPlayer::LoadNonPlayerData(const char * c_szFileName)
 	return true;
 }
 
-bool CPythonNonPlayer::GetName(DWORD dwVnum, const char ** c_pszName)
+bool CPythonNonPlayer::GetName(uint32_t dwVnum, const char ** c_pszName)
 {
 	const TMobTable * p = GetTable(dwVnum);
 
@@ -91,7 +91,7 @@ bool CPythonNonPlayer::GetName(DWORD dwVnum, const char ** c_pszName)
 	return true;
 }
 
-bool CPythonNonPlayer::GetInstanceType(DWORD dwVnum, BYTE* pbType)
+bool CPythonNonPlayer::GetInstanceType(uint32_t dwVnum, uint8_t* pbType)
 {
 	const TMobTable * p = GetTable(dwVnum);
 
@@ -104,17 +104,17 @@ bool CPythonNonPlayer::GetInstanceType(DWORD dwVnum, BYTE* pbType)
 	return true;
 }
 
-const CPythonNonPlayer::TMobTable * CPythonNonPlayer::GetTable(DWORD dwVnum)
+const CPythonNonPlayer::TMobTable * CPythonNonPlayer::GetTable(uint32_t dwVnum)
 {
 	TNonPlayerDataMap::iterator itor = m_NonPlayerDataMap.find(dwVnum);
 
 	if (itor == m_NonPlayerDataMap.end())
-		return NULL;
+		return nullptr;
 
 	return itor->second;
 }
 
-BYTE CPythonNonPlayer::GetEventType(DWORD dwVnum)
+uint8_t CPythonNonPlayer::GetEventType(uint32_t dwVnum)
 {
 	const TMobTable * p = GetTable(dwVnum);
 
@@ -128,7 +128,7 @@ BYTE CPythonNonPlayer::GetEventType(DWORD dwVnum)
 }
 
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
-DWORD CPythonNonPlayer::GetMonsterLevel(DWORD dwVnum)
+uint32_t CPythonNonPlayer::GetMonsterLevel(uint32_t dwVnum)
 {
 	const CPythonNonPlayer::TMobTable * c_pTable = GetTable(dwVnum);
 	if (!c_pTable)
@@ -139,7 +139,7 @@ DWORD CPythonNonPlayer::GetMonsterLevel(DWORD dwVnum)
 #endif
 
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
-bool CPythonNonPlayer::IsAggressive(DWORD dwVnum)
+bool CPythonNonPlayer::IsAggressive(uint32_t dwVnum)
 {
 	const CPythonNonPlayer::TMobTable * c_pTable = GetTable(dwVnum);
 	if (!c_pTable)
@@ -149,21 +149,21 @@ bool CPythonNonPlayer::IsAggressive(DWORD dwVnum)
 }
 #endif
 
-BYTE CPythonNonPlayer::GetEventTypeByVID(DWORD dwVID)
+uint8_t CPythonNonPlayer::GetEventTypeByVID(uint32_t dwVID)
 {
 	CInstanceBase * pInstance = CPythonCharacterManager::Instance().GetInstancePtr(dwVID);
 
-	if (NULL == pInstance)
+	if (nullptr == pInstance)
 	{
 		//Tracef("CPythonNonPlayer::GetEventTypeByVID - There is no Virtual Number\n");
 		return ON_CLICK_EVENT_NONE;
 	}
 
-	WORD dwVnum = pInstance->GetVirtualNumber();
+	uint16_t dwVnum = pInstance->GetVirtualNumber();
 	return GetEventType(dwVnum);
 }
 
-const char*	CPythonNonPlayer::GetMonsterName(DWORD dwVnum)
+const char*	CPythonNonPlayer::GetMonsterName(uint32_t dwVnum)
 {	
 	const CPythonNonPlayer::TMobTable * c_pTable = GetTable(dwVnum);
 	if (!c_pTable)
@@ -175,7 +175,7 @@ const char*	CPythonNonPlayer::GetMonsterName(DWORD dwVnum)
 	return c_pTable->szLocaleName;
 }
 
-DWORD CPythonNonPlayer::GetMonsterColor(DWORD dwVnum)
+uint32_t CPythonNonPlayer::GetMonsterColor(uint32_t dwVnum)
 {
 	const CPythonNonPlayer::TMobTable * c_pTable = GetTable(dwVnum);
 	if (!c_pTable)
@@ -184,7 +184,7 @@ DWORD CPythonNonPlayer::GetMonsterColor(DWORD dwVnum)
 	return c_pTable->dwMonsterColor;
 }
 
-void CPythonNonPlayer::GetMatchableMobList(int iLevel, int iInterval, TMobTableList * pMobTableList)
+void CPythonNonPlayer::GetMatchableMobList(int32_t iLevel, int32_t iInterval, TMobTableList * pMobTableList)
 {
 /*
 	pMobTableList->clear();
@@ -194,8 +194,8 @@ void CPythonNonPlayer::GetMatchableMobList(int iLevel, int iInterval, TMobTableL
 	{
 		TMobTable * pMobTable = itor->second;
 
-		int iLowerLevelLimit = iLevel-iInterval;
-		int iUpperLevelLimit = iLevel+iInterval;
+		int32_t iLowerLevelLimit = iLevel-iInterval;
+		int32_t iUpperLevelLimit = iLevel+iInterval;
 
 		if ((pMobTable->abLevelRange[0] >= iLowerLevelLimit && pMobTable->abLevelRange[0] <= iUpperLevelLimit) ||
 			(pMobTable->abLevelRange[1] >= iLowerLevelLimit && pMobTable->abLevelRange[1] <= iUpperLevelLimit))

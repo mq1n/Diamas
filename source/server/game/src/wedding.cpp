@@ -16,7 +16,7 @@ namespace marriage
 	EVENTINFO(wedding_map_info)
 	{
 		WeddingMap * pWeddingMap;
-		int iStep;
+		int32_t iStep;
 
 		wedding_map_info()
 		: pWeddingMap( 0 )
@@ -29,7 +29,7 @@ namespace marriage
 	{
 		wedding_map_info* info = dynamic_cast<wedding_map_info*>( event->info );
 
-		if ( info == NULL )
+		if ( info == nullptr )
 		{
 			sys_err( "wedding_end_event> <Factor> Null pointer" );
 			return 0;
@@ -48,9 +48,9 @@ namespace marriage
 	}
 
 	// Map instance
-	WeddingMap::WeddingMap(DWORD dwMapIndex, DWORD dwPID1, DWORD dwPID2) :
+	WeddingMap::WeddingMap(uint32_t dwMapIndex, uint32_t dwPID1, uint32_t dwPID2) :
 		m_dwMapIndex(dwMapIndex),
-		m_pEndEvent(NULL),
+		m_pEndEvent(nullptr),
 		m_isDark(false),
 		m_isSnow(false),
 		m_isMusic(false),
@@ -197,7 +197,7 @@ namespace marriage
 		return m_set_pkChr.find(ch) != m_set_pkChr.end();
 	}
 
-	void WeddingMap::ShoutInMap(BYTE type, const char* msg)
+	void WeddingMap::ShoutInMap(uint8_t type, const char* msg)
 	{
 		for (auto it = m_set_pkChr.begin(); it != m_set_pkChr.end(); ++it)
 		{
@@ -268,7 +268,7 @@ namespace marriage
 			ch->ChatPacket(CHAT_TYPE_COMMAND, __BuildCommandPlayMusic(szCommand, sizeof(szCommand), 1, m_stMusicFileName.c_str()));	
 	}
 
-	const char* WeddingMap::__BuildCommandPlayMusic(char* szCommand, size_t nCmdLen, BYTE bSet, const char* c_szMusicFileName)
+	const char* WeddingMap::__BuildCommandPlayMusic(char* szCommand, size_t nCmdLen, uint8_t bSet, const char* c_szMusicFileName)
 	{
 		if (nCmdLen < 1)
 		{
@@ -289,26 +289,26 @@ namespace marriage
 	{
 	}
 
-	bool WeddingManager::IsWeddingMap(DWORD dwMapIndex)
+	bool WeddingManager::IsWeddingMap(uint32_t dwMapIndex)
 	{
 		return (dwMapIndex == WEDDING_MAP_INDEX || dwMapIndex / 10000 == WEDDING_MAP_INDEX);
 	}
 
-	WeddingMap* WeddingManager::Find(DWORD dwMapIndex)
+	WeddingMap* WeddingManager::Find(uint32_t dwMapIndex)
 	{
 		auto it = m_mapWedding.find(dwMapIndex);
 
 		if (it == m_mapWedding.end())
-			return NULL;
+			return nullptr;
 
 		return it->second;
 	}
 
-	DWORD WeddingManager::__CreateWeddingMap(DWORD dwPID1, DWORD dwPID2)
+	uint32_t WeddingManager::__CreateWeddingMap(uint32_t dwPID1, uint32_t dwPID2)
 	{
 		SECTREE_MANAGER& rkSecTreeMgr = SECTREE_MANAGER::instance();
 
-		DWORD dwMapIndex = rkSecTreeMgr.CreatePrivateMap(WEDDING_MAP_INDEX);
+		uint32_t dwMapIndex = rkSecTreeMgr.CreatePrivateMap(WEDDING_MAP_INDEX);
 
 		if (!dwMapIndex)
 		{
@@ -321,7 +321,7 @@ namespace marriage
 
 		// LOCALE_SERVICE
 		LPSECTREE_MAP pkSectreeMap = rkSecTreeMgr.GetMap(dwMapIndex);
-		if (pkSectreeMap == NULL) {
+		if (pkSectreeMap == nullptr) {
 			return 0;
 		}
 		string st_weddingMapRegenFileName;
@@ -329,7 +329,7 @@ namespace marriage
 		st_weddingMapRegenFileName  = LocaleService_GetMapPath();
 		st_weddingMapRegenFileName += "/metin2_map_wedding_01/npc.txt";
 
-		if (!regen_do(st_weddingMapRegenFileName.c_str(), dwMapIndex, pkSectreeMap->m_setting.iBaseX, pkSectreeMap->m_setting.iBaseY, NULL, true))
+		if (!regen_do(st_weddingMapRegenFileName.c_str(), dwMapIndex, pkSectreeMap->m_setting.iBaseX, pkSectreeMap->m_setting.iBaseY, nullptr, true))
 		{
 			sys_err("CreateWeddingMap(pid1=%d, pid2=%d) / regen_do(fileName=%s, mapIndex=%d, basePos=(%d, %d)) FAILED", dwPID1, dwPID2, st_weddingMapRegenFileName.c_str(), dwMapIndex, pkSectreeMap->m_setting.iBaseX, pkSectreeMap->m_setting.iBaseY);
 		}
@@ -351,7 +351,7 @@ namespace marriage
 		M2_DELETE(pMap);
 	}
 
-	bool WeddingManager::End(DWORD dwMapIndex)
+	bool WeddingManager::End(uint32_t dwMapIndex)
 	{
 		auto it = m_mapWedding.find(dwMapIndex);
 
@@ -362,11 +362,11 @@ namespace marriage
 		return true;
 	}
 
-	void WeddingManager::Request(DWORD dwPID1, DWORD dwPID2)
+	void WeddingManager::Request(uint32_t dwPID1, uint32_t dwPID2)
 	{
 		if (map_allow_find(WEDDING_MAP_INDEX))
 		{
-			DWORD dwMapIndex = __CreateWeddingMap(dwPID1, dwPID2);
+			uint32_t dwMapIndex = __CreateWeddingMap(dwPID1, dwPID2);
 
 			if (!dwMapIndex)
 			{

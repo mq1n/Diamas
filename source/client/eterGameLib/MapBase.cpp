@@ -15,7 +15,7 @@ void CMapBase::Clear()
 {
 	m_strName = "";
 	m_eType = MAPTYPE_INVALID;
-	mc_pEnvironmentData = NULL;
+	mc_pEnvironmentData = nullptr;
 	Leave();
 }
 

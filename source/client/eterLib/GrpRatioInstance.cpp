@@ -29,7 +29,7 @@ void CGraphicRatioInstance::SetRatioReference(const float& c_rRatio)
 	m_dstRatio = m_curRatio;
 }
 
-void CGraphicRatioInstance::BlendRatioReference(DWORD blendTime, const float& c_rDstRatio)
+void CGraphicRatioInstance::BlendRatioReference(uint32_t blendTime, const float& c_rDstRatio)
 {
 	m_baseTime = GetTime();
 	m_blendTime = blendTime;
@@ -40,8 +40,8 @@ void CGraphicRatioInstance::BlendRatioReference(DWORD blendTime, const float& c_
 
 void CGraphicRatioInstance::Update()
 {
-	DWORD curTime = GetTime();
-	DWORD elapsedTime = curTime - m_baseTime;
+	uint32_t curTime = GetTime();
+	uint32_t elapsedTime = curTime - m_baseTime;
 
 	if (elapsedTime < m_blendTime)
 	{
@@ -55,7 +55,7 @@ void CGraphicRatioInstance::Update()
 	}
 }
 
-DWORD CGraphicRatioInstance::GetTime()
+uint32_t CGraphicRatioInstance::GetTime()
 {
 	return CTimer::Instance().GetCurrentMillisecond();
 }

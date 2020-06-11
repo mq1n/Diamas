@@ -2,9 +2,9 @@
 #define __INC_ETERBASE_STL_H__
 
 #pragma warning(disable:4786)	// identifier was truncated to '255' characters in the browser information
-#pragma warning(disable:4018)	// signed <-> unsigned mismatch
+#pragma warning(disable:4018)	// signed <-> uint32_t mismatch
 #pragma warning(disable:4503)	// decorated name length exceeded, name was truncated
-#pragma warning(disable:4018)	// '<' : signed/unsigned mismatch
+#pragma warning(disable:4018)	// '<' : signed/uint32_t mismatch
 
 #include <assert.h>
 
@@ -27,7 +27,7 @@
 extern char korean_tolower(const char c);
 extern std::string& stl_static_string(const char* c_sz);
 extern void stl_lowers(std::string& rstRet);
-extern int split_string(const std::string & input, const std::string & delimiter, std::vector<std::string>& results, bool includeEmpties);
+extern int32_t split_string(const std::string & input, const std::string & delimiter, std::vector<std::string>& results, bool includeEmpties);
 
 namespace std
 {
@@ -113,29 +113,29 @@ inline void stl_wipe(TContainer& container)
 	for (TContainer::iterator i = container.begin(); i != container.end(); ++i)
 	{
 		delete *i;
-		*i = NULL;
+		*i = nullptr;
 	}
 	
 	container.clear();
 }
 
 template<typename TString>
-inline int hex2dec(TString szhex)
+inline int32_t hex2dec(TString szhex)
 {
-	int hex0 = toupper(szhex[0]);
-	int hex1 = toupper(szhex[1]);
+	int32_t hex0 = toupper(szhex[0]);
+	int32_t hex1 = toupper(szhex[1]);
 
 	return (hex1 >= 'A' ? hex1 - 'A' + 10 : hex1 - '0') +
 		   (hex0 >= 'A' ? hex0 - 'A' + 10 : hex0 - '0') * 16;
 }
 
 template<typename TString>
-inline unsigned long htmlColorStringToARGB(TString str)
+inline uint32_t htmlColorStringToARGB(TString str)
 {
-	unsigned long alp	= hex2dec(str);
-	unsigned long red	= hex2dec(str + 2);
-	unsigned long green	= hex2dec(str + 4);
-	unsigned long blue	= hex2dec(str + 6);
+	uint32_t alp	= hex2dec(str);
+	uint32_t red	= hex2dec(str + 2);
+	uint32_t green	= hex2dec(str + 4);
+	uint32_t blue	= hex2dec(str + 6);
 	return (alp << 24 | red << 16 | green << 8 | blue);
 }
 
@@ -157,11 +157,11 @@ inline void safe_release(T& rpObject)
 		return;
 	
 	rpObject->Release();
-	rpObject = NULL;
+	rpObject = nullptr;
 }
 
 template <typename T>
-void DeleteVectorItem(std::vector<T> * pVector, unsigned long dwIndex)
+void DeleteVectorItem(std::vector<T> * pVector, uint32_t dwIndex)
 {
 	if (dwIndex >= pVector->size())
 	{
@@ -175,14 +175,14 @@ void DeleteVectorItem(std::vector<T> * pVector, unsigned long dwIndex)
 	}
 
 	std::vector<T>::iterator itor = pVector->begin();
-	for (unsigned long i = 0; i < dwIndex; ++i)
+	for (uint32_t i = 0; i < dwIndex; ++i)
 		++itor;
 
 	pVector->erase(itor);
 }
 
 template <typename T>
-void DeleteVectorItem(T * pVector, unsigned long dwStartIndex, unsigned long dwEndIndex)
+void DeleteVectorItem(T * pVector, uint32_t dwStartIndex, uint32_t dwEndIndex)
 {
 	if (dwStartIndex >= pVector->size())
 	{
@@ -196,10 +196,10 @@ void DeleteVectorItem(T * pVector, unsigned long dwStartIndex, unsigned long dwE
 	}
 
 	T::iterator itorStart = pVector->begin();
-	for (unsigned long i = 0; i < dwStartIndex; ++i)
+	for (uint32_t i = 0; i < dwStartIndex; ++i)
 		++itorStart;
 	T::iterator itorEnd = pVector->begin();
-	for (unsigned long j = 0; j < dwEndIndex; ++j)
+	for (uint32_t j = 0; j < dwEndIndex; ++j)
 		++itorEnd;
 
 	pVector->erase(itorStart, itorEnd);
@@ -263,7 +263,7 @@ class stl_stack_pool
 			m_pos = 0;
 		}
 		
-		stl_stack_pool(int capacity)
+		stl_stack_pool(int32_t capacity)
 		{
 			m_pos = 0;
 			initialize(capacity);
@@ -273,7 +273,7 @@ class stl_stack_pool
 		{
 		}
 
-		void initialize(int capacity)
+		void initialize(int32_t capacity)
 		{
 			m_dataVector.clear();
 			m_dataVector.resize(capacity);
@@ -288,7 +288,7 @@ class stl_stack_pool
 		{
 			assert(!m_dataVector.empty() && "stl_stack_pool::alloc you MUST run stl_stack_pool::initialize");
 
-			int max = m_dataVector.size();
+			int32_t max = m_dataVector.size();
 
 			if (m_pos >= max)
 			{
@@ -304,18 +304,18 @@ class stl_stack_pool
 			return &m_dataVector[0];
 		}
 		
-		int size()
+		int32_t size()
 		{
 			return m_pos;
 		}
 
 	private:
-		int m_pos;
+		int32_t m_pos;
 
 		std::vector<TData>	m_dataVector;
 };
 
-template<typename TData, typename THandle=int>
+template<typename TData, typename THandle=int32_t>
 class stl_circle_pool
 {
 	public:
@@ -335,15 +335,15 @@ class stl_circle_pool
 			if (m_datas)
 			{
 				delete [] m_datas;
-				m_datas=NULL;
+				m_datas=nullptr;
 			}
 			if (m_flags)
 			{
 				delete [] m_flags;
-				m_flags=NULL;
+				m_flags=nullptr;
 			}
 		}
-		void create(int size)
+		void create(int32_t size)
 		{
 			destroy();
 
@@ -353,7 +353,7 @@ class stl_circle_pool
 			m_datas=new TData[m_size];
 			m_flags=new TFlag[m_size];
 
-			for (int i=0; i<m_size; ++i)
+			for (int32_t i=0; i<m_size; ++i)
 				m_flags[i]=false;
 		}
 		THandle alloc()
@@ -363,7 +363,7 @@ class stl_circle_pool
 			THandle loop=max;
 			while (loop--)
 			{
-				int cur=m_pos%max;++m_pos;
+				int32_t cur=m_pos%max;++m_pos;
 				if (!m_flags[cur])				
 				{				
 					m_flags[cur]=true;
@@ -385,7 +385,7 @@ class stl_circle_pool
 			if (handle>=m_size) return false;
 			return true;
 		}
-		inline int size()
+		inline int32_t size()
 		{
 			return m_size;
 		}
@@ -398,8 +398,8 @@ class stl_circle_pool
 	protected:
 		void initialize()
 		{
-			m_datas=NULL;
-			m_flags=NULL;
+			m_datas=nullptr;
+			m_flags=nullptr;
 			m_pos=0;
 			m_size=0;
 		}
@@ -492,14 +492,14 @@ struct stringhash
 {
 	size_t GetHash(const std::string & str) const
 	{
-       const unsigned char * s = (const unsigned char*) str.c_str();
-       const unsigned char * end = s + str.size();
+       const uint8_t * s = (const uint8_t*) str.c_str();
+       const uint8_t * end = s + str.size();
        size_t h = 0;
 
        while (s < end)
        {
            h *= 16777619;
-           h ^= (unsigned char) *(unsigned char *) (s++);
+           h ^= (uint8_t) *(uint8_t *) (s++);
        }
 
        return h;

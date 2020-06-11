@@ -34,7 +34,7 @@ LPVOID CSoundData::Get()
 		return (m_data);
 }
  
-ULONG CSoundData::GetSize()
+uint32_t CSoundData::GetSize()
 {
 	return m_size;
 }
@@ -46,17 +46,17 @@ void CSoundData::Release()
 	m_dwAccessTime = ELTimer_GetMSec();
 }
 
-DWORD CSoundData::GetPlayTime()
+uint32_t CSoundData::GetPlayTime()
 {
 	return m_dwPlayTime;
 }
 
-void CSoundData::SetPlayTime(DWORD dwPlayTime)
+void CSoundData::SetPlayTime(uint32_t dwPlayTime)
 {
 	m_dwPlayTime = dwPlayTime;
 }
 
-DWORD CSoundData::GetAccessTime()
+uint32_t CSoundData::GetAccessTime()
 {
 	return m_dwAccessTime;
 }
@@ -70,7 +70,7 @@ bool CSoundData::ReadFromDisk()
 
 	U32* s = (U32 *) AIL_file_read(m_filename, FILE_READ_WITH_SIZE);
 
-	if (s == NULL)
+	if (s == nullptr)
 		return false;
 
 	S32 type = AIL_file_type(s + 1, s[0]);
@@ -110,7 +110,7 @@ bool CSoundData::ReadFromDisk()
 	return true;
 }
 
-bool CSoundData::isSlotIndex(DWORD dwIndex)
+bool CSoundData::isSlotIndex(uint32_t dwIndex)
 {
 	if (dwIndex >= SOUND_FILE_MAX_NUM)
 		return false;
@@ -121,9 +121,9 @@ bool CSoundData::isSlotIndex(DWORD dwIndex)
 	return true;
 }
 
-int CSoundData::GetEmptySlotIndex()
+int32_t CSoundData::GetEmptySlotIndex()
 {
-	for (int i = 0; i < SOUND_FILE_MAX_NUM; ++i)
+	for (int32_t i = 0; i < SOUND_FILE_MAX_NUM; ++i)
 	{
 		if (!ms_isSoundFile[i])
 			return i;
@@ -134,7 +134,7 @@ int CSoundData::GetEmptySlotIndex()
 
 U32 AILCALLBACK CSoundData::open_callback(char const * filename, U32 *file_handle)
 {
-	int iIndex = GetEmptySlotIndex();
+	int32_t iIndex = GetEmptySlotIndex();
 
 	if (-1 == iIndex)
 		return 0;
@@ -173,7 +173,7 @@ U32 AILCALLBACK CSoundData::read_callback(U32 file_handle, void * buffer, U32 by
 	if (!isSlotIndex(file_handle))
 		return 0;
 
-	DWORD dwRealSize = std::min<DWORD>(ms_SoundFile[file_handle].GetSize(), bytes);
+	uint32_t dwRealSize = std::min<uint32_t>(ms_SoundFile[file_handle].GetSize(), bytes);
 	ms_SoundFile[file_handle].Read(buffer, dwRealSize);
 	return dwRealSize;
 }
@@ -183,7 +183,7 @@ void CSoundData::SetPackMode()
 	// if sound data reads from pack file, the callbacks of the MSS should be changed.
 	AIL_set_file_callbacks(open_callback, close_callback, seek_callback, read_callback);
 
-	for (int i = 0; i < SOUND_FILE_MAX_NUM; ++i)
+	for (int32_t i = 0; i < SOUND_FILE_MAX_NUM; ++i)
 		ms_isSoundFile[i] = false;
 }
 
@@ -192,7 +192,7 @@ void CSoundData::Destroy()
 	if (m_data)
 	{
 		AIL_mem_free_lock(m_data);
-		m_data = NULL;
+		m_data = nullptr;
 	}
 }
 
@@ -202,7 +202,7 @@ m_iRefCount(0),
 m_dwPlayTime(0),
 m_dwAccessTime(ELTimer_GetMSec()),
 m_size(0),
-m_data(NULL),
+m_data(nullptr),
 m_flag(0)
 {
 }

@@ -38,7 +38,7 @@ CFlyTarget::~CFlyTarget()
 void CFlyTarget::__Initialize()
 {
 	m_v3FlyTargetPosition=D3DXVECTOR3(0.0f,0.0f,0.0f);	
-	m_pFlyTarget=NULL;
+	m_pFlyTarget=nullptr;
 	m_eType=TYPE_NONE;
 }
 

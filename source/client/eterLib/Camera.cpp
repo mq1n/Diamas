@@ -87,7 +87,7 @@ void CCamera::SetResistance(float fResistance)
 	m_fResistance = c_fDefaultResistance * fResistance;
 }
 
-void CCamera::Wheel(int nLen)
+void CCamera::Wheel(int32_t nLen)
 {
 	if (IsLock())
 		return;
@@ -95,7 +95,7 @@ void CCamera::Wheel(int nLen)
 	m_v3AngularVelocity.y = (float)(nLen) * m_fResistance;
 }
 
-void CCamera::BeginDrag(int nMouseX, int nMouseY)
+void CCamera::BeginDrag(int32_t nMouseX, int32_t nMouseY)
 {
 	if (IsLock())
 		return;
@@ -133,7 +133,7 @@ bool CCamera::EndDrag()
 	return true;
 }
 
-bool CCamera::Drag(int nMouseX, int nMouseY, LPPOINT lpReturnPoint)
+bool CCamera::Drag(int32_t nMouseX, int32_t nMouseY, LPPOINT lpReturnPoint)
 {
 	if (IsLock())
 		return false;
@@ -147,8 +147,8 @@ bool CCamera::Drag(int nMouseX, int nMouseY, LPPOINT lpReturnPoint)
 		return false;
 	}
 	
-	long lMouseX = nMouseX;
-	long lMouseY = nMouseY;
+	int32_t lMouseX = nMouseX;
+	int32_t lMouseY = nMouseY;
 	
 	float fNewPitchVelocity = (float)(lMouseY - m_lMousePosY) * m_fResistance;
 	float fNewRotationVelocity = (float)(lMouseX - m_lMousePosX) * m_fResistance;
@@ -374,7 +374,7 @@ void CCamera::MoveAlongCross(float fDistance)
 	SetViewMatrix();
 }
 
-void CCamera::MoveAlongUp(FLOAT fDistance) 
+void CCamera::MoveAlongUp(float fDistance) 
 {
 	if (IsLock())
 		return;
@@ -545,8 +545,8 @@ void CCamera::CalculateRoll()
 //////////////////////////////////////////////////////////////////////////
 
 CCameraManager::CCameraManager() :
-m_pCurrentCamera(NULL),
-m_pPreviousCamera(NULL)
+m_pCurrentCamera(nullptr),
+m_pPreviousCamera(nullptr)
 {
 	AddCamera(DEFAULT_PERSPECTIVE_CAMERA);
 	AddCamera(DEFAULT_ORTHO_CAMERA);
@@ -570,7 +570,7 @@ CCamera * CCameraManager::GetCurrentCamera()
 	return m_pCurrentCamera;
 }
 
-void CCameraManager::SetCurrentCamera(unsigned char ucCameraNum)
+void CCameraManager::SetCurrentCamera(uint8_t ucCameraNum)
 {
 	if (m_pCurrentCamera != m_CameraMap[ucCameraNum])
 		m_pPreviousCamera = m_pCurrentCamera;
@@ -583,10 +583,10 @@ void CCameraManager::ResetToPreviousCamera()
 	if (!m_pPreviousCamera)
 		assert(false);
 	m_pCurrentCamera = m_pPreviousCamera;
-	m_pPreviousCamera = NULL;
+	m_pPreviousCamera = nullptr;
 }
 
-bool CCameraManager::isCurrentCamera(unsigned char ucCameraNum)
+bool CCameraManager::isCurrentCamera(uint8_t ucCameraNum)
 {
 	if (m_CameraMap[ucCameraNum] == m_pCurrentCamera)
 		return true;
@@ -594,7 +594,7 @@ bool CCameraManager::isCurrentCamera(unsigned char ucCameraNum)
 }
 
 // 잡스러운 함수들...
-bool CCameraManager::AddCamera(unsigned char ucCameraNum)
+bool CCameraManager::AddCamera(uint8_t ucCameraNum)
 {
 	if(m_CameraMap.end() != m_CameraMap.find(ucCameraNum))
 		return false;
@@ -602,7 +602,7 @@ bool CCameraManager::AddCamera(unsigned char ucCameraNum)
 	return true;
 }
 
-bool CCameraManager::RemoveCamera(unsigned char ucCameraNum)
+bool CCameraManager::RemoveCamera(uint8_t ucCameraNum)
 {
 	TCameraMap::iterator itor = m_CameraMap.find(ucCameraNum);
 	if(m_CameraMap.end() == itor)
@@ -611,7 +611,7 @@ bool CCameraManager::RemoveCamera(unsigned char ucCameraNum)
 	return true;
 }
 
-unsigned char CCameraManager::GetCurrentCameraNum()
+uint8_t CCameraManager::GetCurrentCameraNum()
 {
 	if (!m_pCurrentCamera)
 		return NO_CURRENT_CAMERA;

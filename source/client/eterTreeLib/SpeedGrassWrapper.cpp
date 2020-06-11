@@ -40,7 +40,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////  
 //	CSpeedGrassWrapper::CSpeedGrassWrapper
 
-CSpeedGrassWrapper::CSpeedGrassWrapper() : m_pMapOutdoor(NULL), m_lpD3DTexure8(NULL)//m_uiTexture(0)
+CSpeedGrassWrapper::CSpeedGrassWrapper() : m_pMapOutdoor(nullptr), m_lpD3DTexure8(nullptr)//m_uiTexture(0)
 {
 }
 
@@ -56,9 +56,9 @@ CSpeedGrassWrapper::~CSpeedGrassWrapper( )
 ///////////////////////////////////////////////////////////////////////  
 //	CSpeedGrassWrapper::Draw
 
-int CSpeedGrassWrapper::Draw(float fDensity)
+int32_t CSpeedGrassWrapper::Draw(float fDensity)
 {
-	int nTriangleCount = 0;
+	int32_t nTriangleCount = 0;
 
 //	// determine which regions are visible
 //	Cull( );
@@ -77,8 +77,8 @@ int CSpeedGrassWrapper::Draw(float fDensity)
 //	glAlphaFunc(GL_GREATER, 0.4f);
 //	glDisable(GL_LIGHTING);
 //
-//	unsigned int uiCount = 0;
-//	unsigned int uiNumRegions = 0;
+//	uint32_t uiCount = 0;
+//	uint32_t uiNumRegions = 0;
 //	const SRegion* pRegions = GetRegions(uiNumRegions);
 //
 //	// setup for vertex buffer rendering (enable client buffers)
@@ -87,12 +87,12 @@ int CSpeedGrassWrapper::Draw(float fDensity)
 //		pRegions[0].m_pVertexBuffer->EnableClientStates( );
 //
 //	// run through the regions and render those that aren't culled
-//	for (unsigned int i = 0; i < uiNumRegions; ++i)
+//	for (uint32_t i = 0; i < uiNumRegions; ++i)
 //	{
 //		if (!pRegions[i].m_bCulled)
 //		{
 //			pRegions[i].m_pVertexBuffer->Bind( );
-//			unsigned int uiNumBlades = int(fDensity * pRegions[i].m_vBlades.size( )); 
+//			uint32_t uiNumBlades = int32_t(fDensity * pRegions[i].m_vBlades.size( )); 
 //			glDrawArrays(GL_QUADS, 0, uiNumBlades * 4);
 //			nTriangleCount += uiNumBlades * 2;
 //		}
@@ -113,9 +113,9 @@ int CSpeedGrassWrapper::Draw(float fDensity)
 //	CSpeedGrassWrapper::InitFromBsfFile
 
 bool CSpeedGrassWrapper::InitFromBsfFile(const char* pFilename, 
-										 unsigned int nNumBlades, 
-										 unsigned int uiRows, 
-										 unsigned int uiCols, 
+										 uint32_t nNumBlades, 
+										 uint32_t uiRows, 
+										 uint32_t uiCols, 
 										 float fCollisionDistance)
 {
 	bool bSuccess = false;
@@ -203,22 +203,22 @@ void CSpeedGrassWrapper::InitGraphics(void)
 	m_lpD3DTexure8 = m_GrassImageInstance.GetTexturePointer()->GetD3DTexture();
 
 	// prepare static vertex buffers
-	for (int i = 0; i < m_nNumRegions; ++i)
+	for (int32_t i = 0; i < m_nNumRegions; ++i)
 	{
 		SRegion* pRegion = m_pRegions + i;
 
 //		pRegion->m_pVertexBuffer = new CIdvVertexBuffer;
 
 		// setup up temporary buffer to copy later
-		const int c_nNumCorners = 4;
-		unsigned int uiNumBlades = pRegion->m_vBlades.size( );
-		unsigned int uiBufferSize = uiNumBlades * c_nNumCorners * c_nGrassVertexTotalSize;
-		unsigned char* pBuffer = new unsigned char[uiBufferSize];
+		const int32_t c_nNumCorners = 4;
+		uint32_t uiNumBlades = pRegion->m_vBlades.size( );
+		uint32_t uiBufferSize = uiNumBlades * c_nNumCorners * c_nGrassVertexTotalSize;
+		uint8_t* pBuffer = new uint8_t[uiBufferSize];
 
 		// setup initial pointers for individual attribute copying
 		float* pTexCoords0 = reinterpret_cast<float*>(pBuffer + 0);
 		float* pTexCoords1 = reinterpret_cast<float*>(pTexCoords0 + c_nGrassVertexTexture0Size * uiNumBlades * c_nNumCorners / sizeof(float));
-		unsigned char* pColors = (unsigned char*) pTexCoords1 + c_nGrassVertexTexture1Size * uiNumBlades * c_nNumCorners;
+		uint8_t* pColors = (uint8_t*) pTexCoords1 + c_nGrassVertexTexture1Size * uiNumBlades * c_nNumCorners;
 		float* pPositions = reinterpret_cast<float*>(pColors + c_nGrassVertexColorSize * uiNumBlades * c_nNumCorners);
 
 		for (vector<SBlade>::const_iterator iBlade = pRegion->m_vBlades.begin( ); iBlade != pRegion->m_vBlades.end( ); ++iBlade)
@@ -226,7 +226,7 @@ void CSpeedGrassWrapper::InitGraphics(void)
 			float fS1 = float(iBlade->m_ucWhichTexture) / c_nNumBladeMaps;
 			float fS2 = float(iBlade->m_ucWhichTexture + 1) / c_nNumBladeMaps;
 
-			for (int nCorner = 0; nCorner < c_nNumCorners; ++nCorner)
+			for (int32_t nCorner = 0; nCorner < c_nNumCorners; ++nCorner)
 			{
 				// texcoord 0
 				switch (nCorner)
@@ -280,16 +280,16 @@ void CSpeedGrassWrapper::InitGraphics(void)
 				pTexCoords1 += c_nGrassVertexTexture1Size / sizeof(float);
 
 				// color
-				unsigned long ulColor = 0;
+				uint32_t ulColor = 0;
 				if (nCorner == 0 || nCorner == 1)
-					ulColor = (int(iBlade->m_afTopColor[0] * 255.0f) << 0) +
-						      (int(iBlade->m_afTopColor[1] * 255.0f) << 8) +
-						      (int(iBlade->m_afTopColor[2] * 255.0f) << 16) +
+					ulColor = (int32_t(iBlade->m_afTopColor[0] * 255.0f) << 0) +
+						      (int32_t(iBlade->m_afTopColor[1] * 255.0f) << 8) +
+						      (int32_t(iBlade->m_afTopColor[2] * 255.0f) << 16) +
 						      0xff000000;
 				else
-					ulColor = (int(iBlade->m_afBottomColor[0] * 255.0f) << 0) +
-						      (int(iBlade->m_afBottomColor[1] * 255.0f) << 8) +
-						      (int(iBlade->m_afBottomColor[2] * 255.0f) << 16) +
+					ulColor = (int32_t(iBlade->m_afBottomColor[0] * 255.0f) << 0) +
+						      (int32_t(iBlade->m_afBottomColor[1] * 255.0f) << 8) +
+						      (int32_t(iBlade->m_afBottomColor[2] * 255.0f) << 16) +
 						      0xff000000;
 				memcpy(pColors, &ulColor, c_nGrassVertexColorSize);
 				pColors += c_nGrassVertexColorSize;
@@ -300,18 +300,18 @@ void CSpeedGrassWrapper::InitGraphics(void)
 			}
 		}
 
-//		assert((unsigned char*) pTexCoords0 - pBuffer == c_nGrassVertexTexture0Size * uiNumBlades * c_nNumCorners);
+//		assert((uint8_t*) pTexCoords0 - pBuffer == c_nGrassVertexTexture0Size * uiNumBlades * c_nNumCorners);
 //		assert(pTexCoords1 - pTexCoords0 == (c_nGrassVertexTexture1Size * uiNumBlades * c_nNumCorners) / sizeof(float));
-//		assert(pColors - (unsigned char*) pTexCoords1 == c_nGrassVertexColorSize * uiNumBlades * c_nNumCorners);
-//		assert((unsigned char*) pPositions - pColors == c_nGrassVertexPositionSize * uiNumBlades * c_nNumCorners);
+//		assert(pColors - (uint8_t*) pTexCoords1 == c_nGrassVertexColorSize * uiNumBlades * c_nNumCorners);
+//		assert((uint8_t*) pPositions - pColors == c_nGrassVertexPositionSize * uiNumBlades * c_nNumCorners);
 
 //		pRegion->m_pVertexBuffer->SetBuffer(pBuffer, uiBufferSize, true);
 //		pRegion->m_pVertexBuffer->SetStride(CIdvVertexBuffer::VERTEX_TEXCOORD0, 2, GL_FLOAT, 0, 0);
-//		pRegion->m_pVertexBuffer->SetStride(CIdvVertexBuffer::VERTEX_TEXCOORD1, 4, GL_FLOAT, 0, (unsigned char*) pTexCoords0 - pBuffer);
-//		pRegion->m_pVertexBuffer->SetStride(CIdvVertexBuffer::VERTEX_COLOR, 4, GL_UNSIGNED_BYTE, 0, (unsigned char*) pTexCoords1 - pBuffer);
+//		pRegion->m_pVertexBuffer->SetStride(CIdvVertexBuffer::VERTEX_TEXCOORD1, 4, GL_FLOAT, 0, (uint8_t*) pTexCoords0 - pBuffer);
+//		pRegion->m_pVertexBuffer->SetStride(CIdvVertexBuffer::VERTEX_COLOR, 4, GL_UNSIGNED_BYTE, 0, (uint8_t*) pTexCoords1 - pBuffer);
 //		pRegion->m_pVertexBuffer->SetStride(CIdvVertexBuffer::VERTEX_POSITION, 3, GL_FLOAT, 0, pColors - pBuffer);
 
- 		DWORD dwFVF = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
+ 		uint32_t dwFVF = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
 // 		pRegion->m_VertexBuffer.Create();
 		
 		delete[] pBuffer;

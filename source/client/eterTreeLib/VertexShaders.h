@@ -37,7 +37,7 @@
 ///////////////////////////////////////////////////////////////////////  
 //	Branch & Frond Vertex Formats
 
-static DWORD D3DFVF_SPEEDTREE_BRANCH_VERTEX =
+static uint32_t D3DFVF_SPEEDTREE_BRANCH_VERTEX =
 		D3DFVF_XYZ |							// always have the position
 	#ifdef WRAPPER_USE_DYNAMIC_LIGHTING			// precomputed colors or geometric normals
 		D3DFVF_NORMAL |
@@ -63,15 +63,15 @@ struct SFVFBranchVertex
 #ifdef WRAPPER_USE_DYNAMIC_LIGHTING			
 	D3DXVECTOR3		m_vNormal;				// Dynamic Lighting Only			
 #else										     
-	DWORD			m_dwDiffuseColor;		// Static Lighting Only	
+	uint32_t			m_dwDiffuseColor;		// Static Lighting Only	
 #endif	
-	FLOAT			m_fTexCoords[2];		// Always Used
+	float			m_fTexCoords[2];		// Always Used
 #ifdef WRAPPER_RENDER_SELF_SHADOWS
-	FLOAT			m_fShadowCoords[2];		// Texture coordinates for the shadows
+	float			m_fShadowCoords[2];		// Texture coordinates for the shadows
 #endif
 #ifdef WRAPPER_USE_GPU_WIND		
-	FLOAT			m_fWindIndex;			// GPU Only
-	FLOAT			m_fWindWeight;			
+	float			m_fWindIndex;			// GPU Only
+	float			m_fWindWeight;			
 #endif
 };
 
@@ -126,7 +126,7 @@ static const char g_achSimpleVertexProgram[] =
 ///////////////////////////////////////////////////////////////////////  
 //	LoadBranchShader
 
-static DWORD LoadBranchShader(LPDIRECT3DDEVICE8 pDx)
+static uint32_t LoadBranchShader(LPDIRECT3DDEVICE8 pDx)
 {
 	#ifndef WRAPPER_USE_GPU_WIND
 		return D3DFVF_SPEEDTREE_BRANCH_VERTEX;
@@ -156,20 +156,20 @@ static DWORD LoadBranchShader(LPDIRECT3DDEVICE8 pDx)
 	DWORD dwShader;
 	LPD3DXBUFFER pCode, pError;
 
-    if (D3DXAssembleShader(g_achSimpleVertexProgram, sizeof(g_achSimpleVertexProgram) - 1, 0, NULL, &pCode, &pError) == D3D_OK)
+    if (D3DXAssembleShader(g_achSimpleVertexProgram, sizeof(g_achSimpleVertexProgram) - 1, 0, nullptr, &pCode, &pError) == D3D_OK)
 	{
 		if (pDx->CreateVertexShader(pBranchShaderDecl, (DWORD*) pCode->GetBufferPointer( ), &dwShader, 0) != D3D_OK)
 		{
 			char szError[1024];
 			sprintf(szError, "Failed to create branch vertex shader.");
-			MessageBox(NULL, szError, "Vertex Shader Error", MB_ICONSTOP);
+			MessageBox(nullptr, szError, "Vertex Shader Error", MB_ICONSTOP);
 		}
 	}
 	else
     {
         char szError[1024];
-	    sprintf(szError, "Failed to assemble branch vertex shader.\nThe error reported is [ %s ].\n", pError->GetBufferPointer( ));
-	    MessageBox(NULL, szError, "Vertex Shader Error", MB_ICONSTOP);
+	    sprintf(szError, "Failed to assemble branch vertex shader.\nThe error reported is [ %p ].\n", pError->GetBufferPointer( ));
+	    MessageBox(nullptr, szError, "Vertex Shader Error", MB_ICONSTOP);
     }
 
 	if (pCode)
@@ -181,7 +181,7 @@ static DWORD LoadBranchShader(LPDIRECT3DDEVICE8 pDx)
 ///////////////////////////////////////////////////////////////////////  
 //	Leaf Vertex Formats
 
-static DWORD D3DFVF_SPEEDTREE_LEAF_VERTEX =
+static uint32_t D3DFVF_SPEEDTREE_LEAF_VERTEX =
 		D3DFVF_XYZ |							// always have the position
 	#ifdef WRAPPER_USE_DYNAMIC_LIGHTING			// precomputed colors or geometric normals
 		D3DFVF_NORMAL |
@@ -204,14 +204,14 @@ struct SFVFLeafVertex
 	#ifdef WRAPPER_USE_DYNAMIC_LIGHTING			
 		D3DXVECTOR3		m_vNormal;				// Dynamic Lighting Only			
 	#else										     
-		DWORD			m_dwDiffuseColor;		// Static Lighting Only	
+		uint32_t			m_dwDiffuseColor;		// Static Lighting Only	
 	#endif											
-		FLOAT			m_fTexCoords[2];		// Always Used
+		float			m_fTexCoords[2];		// Always Used
 	#if defined WRAPPER_USE_GPU_WIND || defined WRAPPER_USE_GPU_LEAF_PLACEMENT
-		FLOAT			m_fWindIndex;			// Only used when GPU is involved
-		FLOAT			m_fWindWeight;					
-		FLOAT			m_fLeafPlacementIndex;
-		FLOAT			m_fLeafScalarValue;
+		float			m_fWindIndex;			// Only used when GPU is involved
+		float			m_fWindWeight;					
+		float			m_fLeafPlacementIndex;
+		float			m_fLeafScalarValue;
 	#endif
 };
 
@@ -272,14 +272,14 @@ static const char g_achLeafVertexProgram[] =
 ///////////////////////////////////////////////////////////////////////  
 //	LoadLeafShader
 
-static DWORD LoadLeafShader(LPDIRECT3DDEVICE8 pDx)
+static uint32_t LoadLeafShader(LPDIRECT3DDEVICE8 pDx)
 {
-	DWORD dwShader = D3DFVF_SPEEDTREE_LEAF_VERTEX;
+	uint32_t dwShader = D3DFVF_SPEEDTREE_LEAF_VERTEX;
 
 	#if defined WRAPPER_USE_GPU_LEAF_PLACEMENT || defined WRAPPER_USE_GPU_WIND
 
 		// leaf shader declaration
-		DWORD pLeafShaderDecl[ ] = 
+		uint32_t pLeafShaderDecl[ ] = 
 		{
 				D3DVSD_STREAM(0),
 				D3DVSD_REG(D3DVSDE_POSITION,        D3DVSDT_FLOAT3),
@@ -296,15 +296,15 @@ static DWORD LoadLeafShader(LPDIRECT3DDEVICE8 pDx)
 		// assemble shader
 		LPD3DXBUFFER pCode, pError;
 
-		if (D3DXAssembleShader(g_achLeafVertexProgram, sizeof(g_achLeafVertexProgram) - 1, 0, NULL, &pCode, &pError) == D3D_OK)
+		if (D3DXAssembleShader(g_achLeafVertexProgram, sizeof(g_achLeafVertexProgram) - 1, 0, nullptr, &pCode, &pError) == D3D_OK)
 		{
-			if (pDx->CreateVertexShader(pLeafShaderDecl, (DWORD*) pCode->GetBufferPointer( ), &dwShader, 0) != D3D_OK)
+			if (pDx->CreateVertexShader(pLeafShaderDecl, (uint32_t*) pCode->GetBufferPointer( ), &dwShader, 0) != D3D_OK)
 			{
 				Tracef("Failed to create leaf vertex shader.");
 				/*
 				char szError[1024];
 				sprintf(szError, "Failed to create leaf vertex shader.");
-				MessageBox(NULL, szError, "Vertex Shader Error", MB_ICONSTOP);
+				MessageBox(nullptr, szError, "Vertex Shader Error", MB_ICONSTOP);
 				*/
 			}
 		}
@@ -314,7 +314,7 @@ static DWORD LoadLeafShader(LPDIRECT3DDEVICE8 pDx)
 			/*
 			char szError[1024];
 			sprintf(szError, "Failed to assemble leaf vertex shader. The error reported is [ %s ].\n", pError->GetBufferPointer( ));
-			MessageBox(NULL, szError, "Vertex Shader Error", MB_ICONSTOP);
+			MessageBox(nullptr, szError, "Vertex Shader Error", MB_ICONSTOP);
 			*/
 		}
 

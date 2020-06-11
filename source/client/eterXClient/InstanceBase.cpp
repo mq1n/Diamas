@@ -24,7 +24,7 @@ const float c_fDefaultRotationSpeed = 1200.0f;
 const float c_fDefaultHorseRotationSpeed = 300.0f;
 
 
-bool IsWall(unsigned race)
+bool IsWall(uint32_t race)
 {
 	switch (race)
 	{
@@ -48,16 +48,16 @@ CInstanceBase::SHORSE::SHORSE()
 
 CInstanceBase::SHORSE::~SHORSE()
 {
-	assert(m_pkActor==NULL);
+	assert(m_pkActor==nullptr);
 }
 
 void CInstanceBase::SHORSE::__Initialize()
 {
 	m_isMounting=false;
-	m_pkActor=NULL;
+	m_pkActor=nullptr;
 }
 
-void CInstanceBase::SHORSE::SetAttackSpeed(UINT uAtkSpd)
+void CInstanceBase::SHORSE::SetAttackSpeed(uint32_t uAtkSpd)
 {
 	if (!IsMounting())
 		return;
@@ -66,7 +66,7 @@ void CInstanceBase::SHORSE::SetAttackSpeed(UINT uAtkSpd)
 	rkActor.SetAttackSpeed(uAtkSpd/100.0f);	
 }
 
-void CInstanceBase::SHORSE::SetMoveSpeed(UINT uMovSpd)
+void CInstanceBase::SHORSE::SetMoveSpeed(uint32_t uMovSpd)
 {	
 	if (!IsMounting())
 		return;
@@ -75,9 +75,9 @@ void CInstanceBase::SHORSE::SetMoveSpeed(UINT uMovSpd)
 	rkActor.SetMoveSpeed(uMovSpd/100.0f);
 }
 
-void CInstanceBase::SHORSE::Create(const TPixelPosition& c_rkPPos, UINT eRace, UINT eHitEffect)
+void CInstanceBase::SHORSE::Create(const TPixelPosition& c_rkPPos, uint32_t eRace, uint32_t eHitEffect)
 {
-	assert(NULL==m_pkActor && "CInstanceBase::SHORSE::Create - ALREADY MOUNT");
+	assert(nullptr==m_pkActor && "CInstanceBase::SHORSE::Create - ALREADY MOUNT");
 
 	m_pkActor=new CActorInstance;
 
@@ -86,7 +86,7 @@ void CInstanceBase::SHORSE::Create(const TPixelPosition& c_rkPPos, UINT eRace, U
 	if (!rkActor.SetRace(eRace))
 	{
 		delete m_pkActor;
-		m_pkActor=NULL;
+		m_pkActor=nullptr;
 		return;
 	}
 
@@ -118,7 +118,7 @@ void CInstanceBase::SHORSE::Destroy()
 
 CActorInstance& CInstanceBase::SHORSE::GetActorRef()
 {
-	assert(NULL!=m_pkActor && "CInstanceBase::SHORSE::GetActorRef");
+	assert(nullptr!=m_pkActor && "CInstanceBase::SHORSE::GetActorRef");
 	return *m_pkActor;
 }
 
@@ -128,7 +128,7 @@ CActorInstance* CInstanceBase::SHORSE::GetActorPtr()
 }
 
 enum eMountType {MOUNT_TYPE_NONE=0, MOUNT_TYPE_NORMAL=1, MOUNT_TYPE_COMBAT=2, MOUNT_TYPE_MILITARY=3};
-eMountType GetMountLevelByVnum(DWORD dwMountVnum, bool IsNew)
+eMountType GetMountLevelByVnum(uint32_t dwMountVnum, bool IsNew)
 {
 	if (!dwMountVnum)
 		return MOUNT_TYPE_NONE;
@@ -226,12 +226,12 @@ eMountType GetMountLevelByVnum(DWORD dwMountVnum, bool IsNew)
 	}
 }
 
-UINT CInstanceBase::SHORSE::GetLevel()
+uint32_t CInstanceBase::SHORSE::GetLevel()
 {
 	if (m_pkActor)
 	{
 #ifndef ENABLE_NO_MOUNT_CHECK
-		return static_cast<UINT>(GetMountLevelByVnum(m_pkActor->GetRace(), false));
+		return static_cast<uint32_t>(GetMountLevelByVnum(m_pkActor->GetRace(), false));
 #else
 		return (m_pkActor->GetRace()) ? MOUNT_TYPE_MILITARY : MOUNT_TYPE_NONE;
 #endif
@@ -244,7 +244,7 @@ bool CInstanceBase::SHORSE::IsNewMount()
 #ifndef ENABLE_NO_MOUNT_CHECK
 	if (m_pkActor)
 	{
-		DWORD dwMountVnum = m_pkActor->GetRace();
+		uint32_t dwMountVnum = m_pkActor->GetRace();
 		eMountType mountType = GetMountLevelByVnum(dwMountVnum, true);
 		return (mountType != MOUNT_TYPE_NONE) && (mountType != MOUNT_TYPE_NORMAL);
 	}
@@ -325,7 +325,7 @@ bool CInstanceBase::AvoidObject(const CGraphicObjectInstance& c_rkBGObj)
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-bool __ArmorVnumToShape(int iVnum, DWORD * pdwShape)
+bool __ArmorVnumToShape(int32_t iVnum, uint32_t * pdwShape)
 {
 	*pdwShape = iVnum;
 
@@ -357,7 +357,7 @@ class CActorInstanceBackground : public IBackground
 	public:
 		CActorInstanceBackground() {}
 		virtual ~CActorInstanceBackground() {}
-		bool IsBlock(int x, int y)
+		bool IsBlock(int32_t x, int32_t y)
 		{
 			CPythonBackground& rkBG=CPythonBackground::Instance();
 			return rkBG.isAttrOn(x, y, CTerrainImpl::ATTRIBUTE_BLOCK);
@@ -368,8 +368,8 @@ static CActorInstanceBackground gs_kActorInstBG;
 
 bool CInstanceBase::LessRenderOrder(CInstanceBase* pkInst)
 {
-	int nMainAlpha=(__GetAlphaValue() < 1.0f) ? 1 : 0;
-	int nTestAlpha=(pkInst->__GetAlphaValue() < 1.0f) ? 1 : 0;
+	int32_t nMainAlpha=(__GetAlphaValue() < 1.0f) ? 1 : 0;
+	int32_t nTestAlpha=(pkInst->__GetAlphaValue() < 1.0f) ? 1 : 0;
 	if (nMainAlpha < nTestAlpha)
 		return true;
 	if (nMainAlpha > nTestAlpha)
@@ -386,8 +386,8 @@ bool CInstanceBase::LessRenderOrder(CInstanceBase* pkInst)
 	if (GetShape()>pkInst->GetShape())
 		return false;
 
-	UINT uLeftLODLevel=__LessRenderOrder_GetLODLevel();
-	UINT uRightLODLevel=pkInst->__LessRenderOrder_GetLODLevel();
+	uint32_t uLeftLODLevel=__LessRenderOrder_GetLODLevel();
+	uint32_t uRightLODLevel=pkInst->__LessRenderOrder_GetLODLevel();
 	if (uLeftLODLevel<uRightLODLevel)
 		return true;
 	if (uLeftLODLevel>uRightLODLevel)
@@ -399,7 +399,7 @@ bool CInstanceBase::LessRenderOrder(CInstanceBase* pkInst)
 	return false;
 }
 
-UINT CInstanceBase::__LessRenderOrder_GetLODLevel()
+uint32_t CInstanceBase::__LessRenderOrder_GetLODLevel()
 {
 	CGrannyLODController* pLODCtrl=m_GraphicThingInstance.GetLODControllerPointer(0);
 	if (!pLODCtrl)
@@ -410,8 +410,8 @@ UINT CInstanceBase::__LessRenderOrder_GetLODLevel()
 
 bool CInstanceBase::__Background_GetWaterHeight(const TPixelPosition& c_rkPPos, float* pfHeight)
 {
-	long lHeight;
-	if (!CPythonBackground::Instance().GetWaterHeight(int(c_rkPPos.x), int(c_rkPPos.y), &lHeight))
+	int32_t lHeight;
+	if (!CPythonBackground::Instance().GetWaterHeight(int32_t(c_rkPPos.x), int32_t(c_rkPPos.y), &lHeight))
 		return false;
 
 	*pfHeight = float(lHeight);
@@ -427,9 +427,9 @@ bool CInstanceBase::__Background_IsWaterPixelPosition(const TPixelPosition& c_rk
 const float PC_DUST_RANGE = 2000.0f;
 const float NPC_DUST_RANGE = 1000.0f;
 
-DWORD CInstanceBase::ms_dwUpdateCounter=0;
-DWORD CInstanceBase::ms_dwRenderCounter=0;
-DWORD CInstanceBase::ms_dwDeformCounter=0;
+uint32_t CInstanceBase::ms_dwUpdateCounter=0;
+uint32_t CInstanceBase::ms_dwRenderCounter=0;
+uint32_t CInstanceBase::ms_dwDeformCounter=0;
 
 CDynamicPool<CInstanceBase> CInstanceBase::ms_kPool;
 
@@ -469,7 +469,7 @@ void CInstanceBase::__DisableSkipCollision()
 	m_GraphicThingInstance.DisableSkipCollision();
 }
 
-DWORD CInstanceBase::__GetShadowMapColor(float x, float y)
+uint32_t CInstanceBase::__GetShadowMapColor(float x, float y)
 {
 	CPythonBackground& rkBG=CPythonBackground::Instance();
 	return rkBG.GetShadowMapColor(x, y);
@@ -541,22 +541,22 @@ BOOL CInstanceBase::IsSameEmpire(CInstanceBase& rkInstDst)
 	return FALSE;
 }
 
-DWORD CInstanceBase::GetEmpireID()
+uint32_t CInstanceBase::GetEmpireID()
 {
 	return m_dwEmpireID;
 }
 
-DWORD CInstanceBase::GetGuildID()
+uint32_t CInstanceBase::GetGuildID()
 {
 	return m_dwGuildID;
 }
 
-int CInstanceBase::GetAlignment()
+int32_t CInstanceBase::GetAlignment()
 {
 	return m_sAlignment;
 }
 
-UINT CInstanceBase::GetAlignmentGrade()
+uint32_t CInstanceBase::GetAlignmentGrade()
 {
 	if (m_sAlignment >= 12000)
 		return 0;
@@ -578,7 +578,7 @@ UINT CInstanceBase::GetAlignmentGrade()
 	return 8;
 }
 
-int CInstanceBase::GetAlignmentType()
+int32_t CInstanceBase::GetAlignmentType()
 {
 	switch (GetAlignmentGrade())
 	{
@@ -604,7 +604,7 @@ int CInstanceBase::GetAlignmentType()
 	return ALIGNMENT_TYPE_NORMAL;
 }
 
-BYTE CInstanceBase::GetPKMode()
+uint8_t CInstanceBase::GetPKMode()
 {
 	return m_byPKMode;
 }
@@ -681,7 +681,7 @@ void CInstanceBase::DestroySystem()
 	ms_kPool.Clear();
 }
 
-void CInstanceBase::CreateSystem(UINT uCapacity)
+void CInstanceBase::CreateSystem(uint32_t uCapacity)
 {
 	ms_kPool.Create(uCapacity);
 
@@ -706,7 +706,7 @@ void CInstanceBase::SetMainInstance()
 {
 	CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
 
-	DWORD dwVID=GetVirtualID();
+	uint32_t dwVID=GetVirtualID();
 	rkChrMgr.SetMainInstance(dwVID);
 
 	m_GraphicThingInstance.SetMainInstance();
@@ -764,13 +764,13 @@ float CInstanceBase::__GetBowRange()
 	return fRange;
 }
 
-CInstanceBase* CInstanceBase::__FindInstancePtr(DWORD dwVID)
+CInstanceBase* CInstanceBase::__FindInstancePtr(uint32_t dwVID)
 {
 	CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
 	return rkChrMgr.GetInstancePtr(dwVID);
 }
 
-bool CInstanceBase::__FindRaceType(DWORD dwRace, BYTE* pbType)
+bool CInstanceBase::__FindRaceType(uint32_t dwRace, uint8_t* pbType)
 {
 	CPythonNonPlayer& rkNonPlayer=CPythonNonPlayer::Instance();
 	return rkNonPlayer.GetInstanceType(dwRace, pbType);
@@ -793,8 +793,8 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 
 	if (IsGuildWall())
 	{
-		unsigned center_x;
-		unsigned center_y;
+		uint32_t center_x;
+		uint32_t center_y;
 
 		c_rkCreateData.m_kAffectFlags.ConvertToPosition(&center_x, &center_y);
 		
@@ -892,7 +892,7 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 
 	if (!IsPC())
 	{
-		DWORD dwBodyColor = CPythonNonPlayer::Instance().GetMonsterColor(c_rkCreateData.m_dwRace);
+		uint32_t dwBodyColor = CPythonNonPlayer::Instance().GetMonsterColor(c_rkCreateData.m_dwRace);
 		if (0 != dwBodyColor)
 		{
 			SetModulateRenderMode();
@@ -903,7 +903,7 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 	__AttachHorseSaddle();
 
 	// 길드 심볼을 위한 임시 코드, 적정 위치를 찾는 중
-	const int c_iGuildSymbolRace = 14200;
+	const int32_t c_iGuildSymbolRace = 14200;
 	if (c_iGuildSymbolRace == GetRace())
 	{
 		std::string strFileName = GetGuildSymbolFileName(m_dwGuildID);
@@ -952,7 +952,7 @@ void CInstanceBase::__Create_SetWarpName(const SCreateData& c_rkCreateData)
 	if (CPythonNonPlayer::Instance().GetName(c_rkCreateData.m_dwRace, &c_szName))
 	{
 		std::string strName = c_szName;
-		int iFindingPos = strName.find_first_of(" ", 0);
+		int32_t iFindingPos = strName.find_first_of(" ", 0);
 		if (iFindingPos > 0)
 		{
 			strName.resize(iFindingPos);
@@ -965,13 +965,13 @@ void CInstanceBase::__Create_SetWarpName(const SCreateData& c_rkCreateData)
 	}
 }
 
-void CInstanceBase::SetNameString(const char* c_szName, int len)
+void CInstanceBase::SetNameString(const char* c_szName, int32_t len)
 {
 	m_stName.assign(c_szName, len);
 }
 
 
-bool CInstanceBase::SetRace(DWORD eRace)
+bool CInstanceBase::SetRace(uint32_t eRace)
 {
 	m_dwRace = eRace;
 
@@ -984,12 +984,12 @@ bool CInstanceBase::SetRace(DWORD eRace)
 	return true;
 }
 
-BOOL CInstanceBase::__IsChangableWeapon(int iWeaponID)
+BOOL CInstanceBase::__IsChangableWeapon(int32_t iWeaponID)
 {	
 	// 드레스 입고 있을때는 부케외의 장비는 나오지 않게..
 	if (IsWearingDress())
 	{
-		const int c_iBouquets[] =
+		const int32_t c_iBouquets[] =
 		{
 			50201,	// Bouquet for Assassin
 			50202,	// Bouquet for Shaman
@@ -998,7 +998,7 @@ BOOL CInstanceBase::__IsChangableWeapon(int iWeaponID)
 			0, // #0000545: [M2CN] 웨딩 드레스와 장비 착용 문제
 		};
 
-		for (int i = 0; c_iBouquets[i] != 0; ++i)
+		for (int32_t i = 0; c_iBouquets[i] != 0; ++i)
 			if (iWeaponID == c_iBouquets[i])
 				return true;
 
@@ -1010,14 +1010,14 @@ BOOL CInstanceBase::__IsChangableWeapon(int iWeaponID)
 
 BOOL CInstanceBase::IsWearingDress()
 {
-	const int c_iWeddingDressShape = 201;
+	const int32_t c_iWeddingDressShape = 201;
 	return c_iWeddingDressShape == m_eShape;
 }
 
 BOOL CInstanceBase::IsHoldingPickAxe()
 {
-	const int c_iPickAxeStart = 29101;
-	const int c_iPickAxeEnd = 29110;
+	const int32_t c_iPickAxeStart = 29101;
+	const int32_t c_iPickAxeEnd = 29110;
 	return m_awPart[CRaceData::PART_WEAPON] >= c_iPickAxeStart && m_awPart[CRaceData::PART_WEAPON] <= c_iPickAxeEnd;
 }
 
@@ -1031,7 +1031,7 @@ BOOL CInstanceBase::IsMountingHorse()
 	return m_kHorse.IsMounting();
 }
 
-void CInstanceBase::MountHorse(UINT eRace)
+void CInstanceBase::MountHorse(uint32_t eRace)
 {
 	m_kHorse.Destroy();
 	m_kHorse.Create(m_GraphicThingInstance.NEW_GetCurPixelPositionRef(), eRace, ms_adwCRCAffectEffect[EFFECT_HIT]);
@@ -1078,7 +1078,7 @@ const TPixelPosition& CInstanceBase::NEW_GetLastPixelPositionRef()
 	return m_GraphicThingInstance.NEW_GetLastPixelPositionRef();
 }
 
-void CInstanceBase::NEW_SetDstPixelPositionZ(FLOAT z)
+void CInstanceBase::NEW_SetDstPixelPositionZ(float z)
 {
 	m_GraphicThingInstance.NEW_SetDstPixelPositionZ(z);
 }
@@ -1124,7 +1124,7 @@ void CInstanceBase::OnMoving()
 	m_GraphicThingInstance.__OnMoving();
 }
 
-void CInstanceBase::ChangeGuild(DWORD dwGuildID)
+void CInstanceBase::ChangeGuild(uint32_t dwGuildID)
 {
 	m_dwGuildID=dwGuildID;
 
@@ -1133,13 +1133,13 @@ void CInstanceBase::ChangeGuild(DWORD dwGuildID)
 	RefreshTextTail();
 }
 
-DWORD CInstanceBase::GetPart(CRaceData::EParts part)
+uint32_t CInstanceBase::GetPart(CRaceData::EParts part)
 {
 	assert(part >= 0 && part < CRaceData::PART_MAX_NUM);
 	return m_awPart[part];
 }
 
-DWORD CInstanceBase::GetShape()
+uint32_t CInstanceBase::GetShape()
 {
 	return m_eShape;
 }
@@ -1242,7 +1242,7 @@ BOOL CInstanceBase::__IsSyncing()
 
 
 
-void CInstanceBase::NEW_SetOwner(DWORD dwVIDOwner)
+void CInstanceBase::NEW_SetOwner(uint32_t dwVIDOwner)
 {
 	m_GraphicThingInstance.SetOwner(dwVIDOwner);
 }
@@ -1252,9 +1252,9 @@ float CInstanceBase::GetLocalTime()
 	return m_GraphicThingInstance.GetLocalTime();
 }
 
-DWORD ELTimer_GetServerFrameMSec();
+uint32_t ELTimer_GetServerFrameMSec();
 
-void CInstanceBase::PushTCPStateExpanded(DWORD dwCmdTime, const TPixelPosition& c_rkPPosDst, float fDstRot, UINT eFunc, UINT uArg, UINT uTargetVID)
+void CInstanceBase::PushTCPStateExpanded(uint32_t dwCmdTime, const TPixelPosition& c_rkPPosDst, float fDstRot, uint32_t eFunc, uint32_t uArg, uint32_t uTargetVID)
 {
 	SCommand kCmdNew;
 	kCmdNew.m_kPPosDst = c_rkPPosDst;
@@ -1267,7 +1267,7 @@ void CInstanceBase::PushTCPStateExpanded(DWORD dwCmdTime, const TPixelPosition& 
 	m_kQue_kCmdNew.push_back(kCmdNew);
 }
 
-void CInstanceBase::PushTCPState(DWORD dwCmdTime, const TPixelPosition& c_rkPPosDst, float fDstRot, UINT eFunc, UINT uArg)
+void CInstanceBase::PushTCPState(uint32_t dwCmdTime, const TPixelPosition& c_rkPPosDst, float fDstRot, uint32_t eFunc, uint32_t uArg)
 {	
 	if (__IsMainInstance())
 	{
@@ -1276,7 +1276,7 @@ void CInstanceBase::PushTCPState(DWORD dwCmdTime, const TPixelPosition& c_rkPPos
 		return;
 	}
 
-	int nNetworkGap=ELTimer_GetServerFrameMSec()-dwCmdTime;
+	int32_t nNetworkGap=ELTimer_GetServerFrameMSec()-dwCmdTime;
 	
 	m_nAverageNetworkGap=(m_nAverageNetworkGap*70+nNetworkGap*30)/100;
 	
@@ -1301,14 +1301,14 @@ void CInstanceBase::PushTCPState(DWORD dwCmdTime, const TPixelPosition& c_rkPPos
 	kCmdNew.m_uArg = uArg;
 	m_kQue_kCmdNew.push_back(kCmdNew);
 
-	//int nApplyGap=kCmdNew.m_dwChkTime-ELTimer_GetServerFrameMSec();
+	//int32_t nApplyGap=kCmdNew.m_dwChkTime-ELTimer_GetServerFrameMSec();
 
 	//if (nApplyGap<-500 || nApplyGap>500)
 	//	Tracenf("VID[%d] NAME[%s] 네트웍갭 [cur:%d ave:%d] 작동시간 (%d)", GetVirtualID(), GetNameString(), nNetworkGap, m_nAverageNetworkGap, nApplyGap);
 }
 
 /*
-CInstanceBase::TStateQueue::iterator CInstanceBase::FindSameState(TStateQueue& rkQuekStt, DWORD dwCmdTime, UINT eFunc, UINT uArg)
+CInstanceBase::TStateQueue::iterator CInstanceBase::FindSameState(TStateQueue& rkQuekStt, uint32_t dwCmdTime, uint32_t eFunc, uint32_t uArg)
 {
 	TStateQueue::iterator i=rkQuekStt.begin();
 	while (rkQuekStt.end()!=i)
@@ -1338,7 +1338,7 @@ BOOL CInstanceBase::__CanProcessNetworkStatePacket()
 	return TRUE;
 }
 
-BOOL CInstanceBase::__IsEnableTCPProcess(UINT eCurFunc)
+BOOL CInstanceBase::__IsEnableTCPProcess(uint32_t eCurFunc)
 {
 	if (m_GraphicThingInstance.IsActEmotion())
 	{
@@ -1363,8 +1363,8 @@ void CInstanceBase::StateProcess()
 		if (m_kQue_kCmdNew.empty())
 			return;	
 
-		DWORD dwDstChkTime = m_kQue_kCmdNew.front().m_dwChkTime;
-		DWORD dwCurChkTime = ELTimer_GetServerFrameMSec();	
+		uint32_t dwDstChkTime = m_kQue_kCmdNew.front().m_dwChkTime;
+		uint32_t dwCurChkTime = ELTimer_GetServerFrameMSec();	
 
 		if (dwCurChkTime < dwDstChkTime)
 			return;
@@ -1373,12 +1373,12 @@ void CInstanceBase::StateProcess()
 		m_kQue_kCmdNew.pop_front();	
 
 		TPixelPosition kPPosDst = kCmdTop.m_kPPosDst;
-		//DWORD dwCmdTime = kCmdTop.m_dwCmdTime;	
-		FLOAT fRotDst = kCmdTop.m_fDstRot;
-		UINT eFunc = kCmdTop.m_eFunc;
-		UINT uArg = kCmdTop.m_uArg;
-		UINT uVID = GetVirtualID();	
-		UINT uTargetVID = kCmdTop.m_uTargetVID;
+		//uint32_t dwCmdTime = kCmdTop.m_dwCmdTime;	
+		float fRotDst = kCmdTop.m_fDstRot;
+		uint32_t eFunc = kCmdTop.m_eFunc;
+		uint32_t uArg = kCmdTop.m_uArg;
+		uint32_t uVID = GetVirtualID();	
+		uint32_t uTargetVID = kCmdTop.m_uTargetVID;
 
 		TPixelPosition kPPosCur;
 		NEW_GetPixelPosition(&kPPosCur);
@@ -1694,8 +1694,8 @@ void CInstanceBase::MovementProcess()
 
 				if (FUNC_EMOTION == m_kMovAfterFunc.eFunc)
 				{
-					DWORD dwMotionNumber = m_kMovAfterFunc.uArg;
-					DWORD dwTargetVID = m_kMovAfterFunc.uArgExpanded;
+					uint32_t dwMotionNumber = m_kMovAfterFunc.uArg;
+					uint32_t dwTargetVID = m_kMovAfterFunc.uArgExpanded;
 					__ProcessFunctionEmotion(dwMotionNumber, dwTargetVID, m_kMovAfterFunc.kPosDst);
 					m_kMovAfterFunc.eFunc = FUNC_WAIT;
 					return;
@@ -1781,8 +1781,8 @@ void CInstanceBase::MovementProcess()
 							__DisableSkipCollision();
 							BlockMovement();
 
-							DWORD dwMotionNumber = m_kMovAfterFunc.uArg;
-							DWORD dwTargetVID = m_kMovAfterFunc.uArgExpanded;
+							uint32_t dwMotionNumber = m_kMovAfterFunc.uArg;
+							uint32_t dwTargetVID = m_kMovAfterFunc.uArgExpanded;
 							__ProcessFunctionEmotion(dwMotionNumber, dwTargetVID, m_kMovAfterFunc.kPosDst);
 							break;
 						}
@@ -1849,7 +1849,7 @@ void CInstanceBase::MovementProcess()
 	{
 		float fRotation = m_GraphicThingInstance.GetRotation();
 		float fAdvancingRotation = m_GraphicThingInstance.GetAdvancingRotation();
-		int iDirection = GetRotatingDirection(fRotation, fAdvancingRotation);
+		int32_t iDirection = GetRotatingDirection(fRotation, fAdvancingRotation);
 
 		if (DEGREE_DIRECTION_SAME != m_iRotatingDirection)
 		{
@@ -1894,7 +1894,7 @@ void CInstanceBase::MovementProcess()
 	}
 }
 
-void CInstanceBase::__ProcessFunctionEmotion(DWORD dwMotionNumber, DWORD dwTargetVID, const TPixelPosition & c_rkPosDst)
+void CInstanceBase::__ProcessFunctionEmotion(uint32_t dwMotionNumber, uint32_t dwTargetVID, const TPixelPosition & c_rkPosDst)
 {
 	if (IsWalking())
 		EndWalkingWithoutBlending();
@@ -1910,11 +1910,11 @@ void CInstanceBase::__ProcessFunctionEmotion(DWORD dwMotionNumber, DWORD dwTarge
 		if (pTargetInstance->IsWalking())
 			pTargetInstance->EndWalkingWithoutBlending();
 
-		WORD wMotionNumber1 = HIWORD(dwMotionNumber);
-		WORD wMotionNumber2 = LOWORD(dwMotionNumber);
+		uint16_t wMotionNumber1 = HIWORD(dwMotionNumber);
+		uint16_t wMotionNumber2 = LOWORD(dwMotionNumber);
 
-		int src_job = RaceToJob(GetRace());
-		int dst_job = RaceToJob(pTargetInstance->GetRace());
+		int32_t src_job = RaceToJob(GetRace());
+		int32_t dst_job = RaceToJob(pTargetInstance->GetRace());
 
 		NEW_LookAtDestInstance(*pTargetInstance);
 		m_GraphicThingInstance.InterceptOnceMotion(wMotionNumber1 + dst_job);
@@ -1943,7 +1943,7 @@ void CInstanceBase::__ProcessFunctionEmotion(DWORD dwMotionNumber, DWORD dwTarge
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Update & Deform & Render
 
-int g_iAccumulationTime = 0;
+int32_t g_iAccumulationTime = 0;
 
 void CInstanceBase::Update()
 {
@@ -1960,7 +1960,7 @@ void CInstanceBase::Update()
 		TPixelPosition kPPosCur;
 		NEW_GetPixelPosition(&kPPosCur);
 
-		DWORD dwCurTime=ELTimer_GetFrameMSec();
+		uint32_t dwCurTime=ELTimer_GetFrameMSec();
 		//if (m_dwNextUpdateHeightTime<dwCurTime)
 		{
 			m_dwNextUpdateHeightTime=dwCurTime;
@@ -1970,7 +1970,7 @@ void CInstanceBase::Update()
 
 		// SetMaterialColor
 		{
-			DWORD dwMtrlColor=__GetShadowMapColor(kPPosCur.x, kPPosCur.y);
+			uint32_t dwMtrlColor=__GetShadowMapColor(kPPosCur.x, kPPosCur.y);
 			m_GraphicThingInstance.SetMaterialColor(dwMtrlColor);
 		}
 	}
@@ -2116,28 +2116,28 @@ void CInstanceBase::RenderCollision()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Setting & Getting Data
 
-void CInstanceBase::SetVirtualID(DWORD dwVirtualID)
+void CInstanceBase::SetVirtualID(uint32_t dwVirtualID)
 {
 	m_GraphicThingInstance.SetVirtualID(dwVirtualID);		
 }
 
-void CInstanceBase::SetVirtualNumber(DWORD dwVirtualNumber)
+void CInstanceBase::SetVirtualNumber(uint32_t dwVirtualNumber)
 {
 	m_dwVirtualNumber = dwVirtualNumber;
 }
 
-void CInstanceBase::SetInstanceType(int iInstanceType)
+void CInstanceBase::SetInstanceType(int32_t iInstanceType)
 {
 	m_GraphicThingInstance.SetActorType(iInstanceType);
 }
 
-void CInstanceBase::SetAlignment(short sAlignment)
+void CInstanceBase::SetAlignment(int16_t sAlignment)
 {
 	m_sAlignment = sAlignment;
 	RefreshTextTailTitle();
 }
 
-void CInstanceBase::SetPKMode(BYTE byPKMode)
+void CInstanceBase::SetPKMode(uint8_t byPKMode)
 {
 	if (m_byPKMode == byPKMode)
 		return;
@@ -2165,7 +2165,7 @@ void CInstanceBase::SetPartyMemberFlag(bool bFlag)
 	m_isPartyMember = bFlag;
 }
 
-void CInstanceBase::SetStateFlags(DWORD dwStateFlags)
+void CInstanceBase::SetStateFlags(uint32_t dwStateFlags)
 {
 	if (dwStateFlags & ADD_CHARACTER_STATE_KILLER)
 		SetKiller(TRUE);
@@ -2178,7 +2178,7 @@ void CInstanceBase::SetStateFlags(DWORD dwStateFlags)
 		SetPartyMemberFlag(FALSE);
 }
 
-void CInstanceBase::SetComboType(UINT uComboType)
+void CInstanceBase::SetComboType(uint32_t uComboType)
 {
 	m_GraphicThingInstance.SetComboType(uComboType);
 }
@@ -2189,14 +2189,14 @@ const char * CInstanceBase::GetNameString()
 }
 
 #ifdef ENABLE_LEVEL_IN_TRADE
-DWORD CInstanceBase::GetLevel()
+uint32_t CInstanceBase::GetLevel()
 {
 	return m_dwLevel;
 }
 #endif
 
 #ifdef ENABLE_TEXT_LEVEL_REFRESH
-void CInstanceBase::SetLevel(DWORD dwLevel)
+void CInstanceBase::SetLevel(uint32_t dwLevel)
 {
 	m_dwLevel = dwLevel;
 }
@@ -2232,7 +2232,7 @@ void CInstanceBase::MobInfoLevelRefresh()
 }
 #endif
 
-DWORD CInstanceBase::GetRace()
+uint32_t CInstanceBase::GetRace()
 {
 	return m_dwRace;
 }
@@ -2259,12 +2259,12 @@ bool CInstanceBase::IsConflictAlignmentInstance(CInstanceBase& rkInstVictim)
 	return false;
 }
 
-void CInstanceBase::SetDuelMode(DWORD type)
+void CInstanceBase::SetDuelMode(uint32_t type)
 {
 	m_dwDuelMode = type;
 }
 
-DWORD CInstanceBase::GetDuelMode()
+uint32_t CInstanceBase::GetDuelMode()
 {
 	return m_dwDuelMode;
 }
@@ -2528,7 +2528,7 @@ BOOL CInstanceBase::IsWoodenDoor()
 {
 	if (m_GraphicThingInstance.IsDoor())
 	{
-		int vnum = GetVirtualNumber();
+		int32_t vnum = GetVirtualNumber();
 		if (vnum == 13000) // 나무문
 			return true;
 		else if (vnum >= 30111 && vnum <= 30119) // 사귀문
@@ -2570,17 +2570,17 @@ BOOL CInstanceBase::IsForceVisible()
 	return FALSE;
 }
 
-int	CInstanceBase::GetInstanceType()
+int32_t	CInstanceBase::GetInstanceType()
 {
 	return m_GraphicThingInstance.GetActorType();
 }
 
-DWORD CInstanceBase::GetVirtualID()
+uint32_t CInstanceBase::GetVirtualID()
 {
 	return m_GraphicThingInstance.GetVirtualID();
 }
 
-DWORD CInstanceBase::GetVirtualNumber()
+uint32_t CInstanceBase::GetVirtualNumber()
 {
 	return m_dwVirtualNumber;
 }
@@ -2655,7 +2655,7 @@ void CInstanceBase::RefreshActorInstance()
 	m_GraphicThingInstance.RefreshActorInstance();
 }
 
-void CInstanceBase::Refresh(DWORD dwMotIndex, bool isLoop)
+void CInstanceBase::Refresh(uint32_t dwMotIndex, bool isLoop)
 {
 	RefreshState(dwMotIndex, isLoop);
 }
@@ -2675,7 +2675,7 @@ void CInstanceBase::SetModulateRenderMode()
 	m_GraphicThingInstance.SetModulateRenderMode();
 }
 
-void CInstanceBase::SetRenderMode(int iRenderMode)
+void CInstanceBase::SetRenderMode(int32_t iRenderMode)
 {
 	m_GraphicThingInstance.SetRenderMode(iRenderMode);
 }
@@ -2703,7 +2703,7 @@ float CInstanceBase::__GetAlphaValue()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Part
 
-void CInstanceBase::SetHair(DWORD eHair)
+void CInstanceBase::SetHair(uint32_t eHair)
 {
 	if (!HAIR_COLOR_ENABLE)
 		return;
@@ -2714,7 +2714,7 @@ void CInstanceBase::SetHair(DWORD eHair)
 	m_GraphicThingInstance.SetHair(eHair);
 }
 
-void CInstanceBase::ChangeHair(DWORD eHair)
+void CInstanceBase::ChangeHair(uint32_t eHair)
 {
 	if (!HAIR_COLOR_ENABLE)
 		return;
@@ -2727,15 +2727,15 @@ void CInstanceBase::ChangeHair(DWORD eHair)
 
 	SetHair(eHair);
 
-	//int type = m_GraphicThingInstance.GetMotionMode();
+	//int32_t type = m_GraphicThingInstance.GetMotionMode();
 
 	RefreshState(CRaceMotionData::NAME_WAIT, true);
 	//RefreshState(type, true);
 }
 
-void CInstanceBase::SetArmor(DWORD dwArmor)
+void CInstanceBase::SetArmor(uint32_t dwArmor)
 {
-	DWORD dwShape;
+	uint32_t dwShape;
 	if (__ArmorVnumToShape(dwArmor, &dwShape))
 	{
 		CItemData * pItemData;
@@ -2755,7 +2755,7 @@ void CInstanceBase::SetArmor(DWORD dwArmor)
 
 
 #ifdef ENABLE_ACCE_SYSTEM
-void CInstanceBase::SetAcce(DWORD dwAcce)
+void CInstanceBase::SetAcce(uint32_t dwAcce)
 {
 	if (!IsPC())
 		return;
@@ -2783,12 +2783,12 @@ void CInstanceBase::SetAcce(DWORD dwAcce)
 
 	m_awPart[CRaceData::PART_ACCE] = dwAcce;
 
-	CItemData * pItemData = NULL;
+	CItemData * pItemData = nullptr;
 	CItemManager::Instance().GetItemDataPointer(dwAcce, &pItemData);
 
 	m_GraphicThingInstance.AttachAcce(pItemData, fSpecular);
 #ifdef ENABLE_OBJ_SCALLING
-	DWORD dwRace = GetRace(), dwPos = RaceToJob(dwRace), dwSex = RaceToSex(dwRace);
+	uint32_t dwRace = GetRace(), dwPos = RaceToJob(dwRace), dwSex = RaceToSex(dwRace);
 	dwPos += 1;
 	if (dwSex == 0)
 		dwPos += 5;
@@ -2805,7 +2805,7 @@ void CInstanceBase::SetAcce(DWORD dwAcce)
 #endif
 }
 
-void CInstanceBase::ChangeAcce(DWORD dwAcce)
+void CInstanceBase::ChangeAcce(uint32_t dwAcce)
 {
 	if (!IsPC())
 		return;
@@ -2823,7 +2823,7 @@ void CInstanceBase::ClearAcceEffect()
 }
 #endif
 
-void CInstanceBase::SetShape(DWORD eShape, float fSpecular)
+void CInstanceBase::SetShape(uint32_t eShape, float fSpecular)
 {
 	if (IsPoly())
 	{
@@ -2839,9 +2839,9 @@ void CInstanceBase::SetShape(DWORD eShape, float fSpecular)
 
 
 
-DWORD CInstanceBase::GetWeaponType()
+uint32_t CInstanceBase::GetWeaponType()
 {
-	DWORD dwWeapon = GetPart(CRaceData::PART_WEAPON);
+	uint32_t dwWeapon = GetPart(CRaceData::PART_WEAPON);
 	CItemData * pItemData;
 	if (!CItemManager::Instance().GetItemDataPointer(dwWeapon, &pItemData))
 		return CItemData::WEAPON_NONE;
@@ -2850,7 +2850,7 @@ DWORD CInstanceBase::GetWeaponType()
 }
 
 /*
-void CInstanceBase::SetParts(const WORD * c_pParts)
+void CInstanceBase::SetParts(const uint16_t * c_pParts)
 {
 	if (IsPoly())
 		return;
@@ -2858,7 +2858,7 @@ void CInstanceBase::SetParts(const WORD * c_pParts)
 	if (__IsShapeAnimalWear())
 		return;
 
-	UINT eWeapon=c_pParts[CRaceData::PART_WEAPON];
+	uint32_t eWeapon=c_pParts[CRaceData::PART_WEAPON];
 
 	if (__IsChangableWeapon(eWeapon) == false)
 			eWeapon = 0;
@@ -2896,12 +2896,12 @@ void CInstanceBase::__ClearArmorRefineEffect()
 	}
 }
 
-UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
+uint32_t CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 {
 #ifdef ENABLE_SIMPLE_REFINED_EFFECT_CHECK
-	DWORD refine = pItem->GetRefine();
+	uint32_t refine = pItem->GetRefine();
 #else
-	DWORD refine = std::max<DWORD>(pItem->GetRefine() + pItem->GetSocketCount(),CItemData::ITEM_SOCKET_MAX_NUM) - CItemData::ITEM_SOCKET_MAX_NUM;
+	uint32_t refine = std::max<uint32_t>(pItem->GetRefine() + pItem->GetSocketCount(),CItemData::ITEM_SOCKET_MAX_NUM) - CItemData::ITEM_SOCKET_MAX_NUM;
 #endif
 	switch (pItem->GetType())
 	{
@@ -2945,7 +2945,7 @@ UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 		// 갑옷 특화 이펙트
 		if (pItem->GetSubType() == CItemData::ARMOR_BODY)
 		{
-			DWORD vnum = pItem->GetIndex();
+			uint32_t vnum = pItem->GetIndex();
 
 			if (
 				(12010 <= vnum && vnum <= 12049)
@@ -3040,7 +3040,7 @@ UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 	return 0;
 }
 
-bool CInstanceBase::SetWeapon(DWORD eWeapon)
+bool CInstanceBase::SetWeapon(uint32_t eWeapon)
 {
 	if (IsPoly())
 		return false;
@@ -3064,7 +3064,7 @@ bool CInstanceBase::SetWeapon(DWORD eWeapon)
 	return true;
 }
 
-void CInstanceBase::ChangeWeapon(DWORD eWeapon)
+void CInstanceBase::ChangeWeapon(uint32_t eWeapon)
 {
 	if (eWeapon == m_GraphicThingInstance.GetPartItemID(CRaceData::PART_WEAPON))
 		return;
@@ -3073,9 +3073,9 @@ void CInstanceBase::ChangeWeapon(DWORD eWeapon)
 		RefreshState(CRaceMotionData::NAME_WAIT, true);
 }
 
-bool CInstanceBase::ChangeArmor(DWORD dwArmor)
+bool CInstanceBase::ChangeArmor(uint32_t dwArmor)
 {
-	DWORD eShape;
+	uint32_t eShape;
 	__ArmorVnumToShape(dwArmor, &eShape);
 
 	if (GetShape()==eShape)
@@ -3084,13 +3084,13 @@ bool CInstanceBase::ChangeArmor(DWORD dwArmor)
 	CAffectFlagContainer kAffectFlagContainer;
 	kAffectFlagContainer.CopyInstance(m_kAffectFlagContainer);
 
-	DWORD dwVID = GetVirtualID();
-	DWORD dwRace = GetRace();
-	DWORD eHair = GetPart(CRaceData::PART_HAIR);
+	uint32_t dwVID = GetVirtualID();
+	uint32_t dwRace = GetRace();
+	uint32_t eHair = GetPart(CRaceData::PART_HAIR);
 #ifdef ENABLE_ACCE_SYSTEM
-	DWORD dwAcce = GetPart(CRaceData::PART_ACCE);
+	uint32_t dwAcce = GetPart(CRaceData::PART_ACCE);
 #endif
-	DWORD eWeapon = GetPart(CRaceData::PART_WEAPON);
+	uint32_t eWeapon = GetPart(CRaceData::PART_WEAPON);
 	float fRot = GetRotation();
 	float fAdvRot = GetAdvancingRotation();
 
@@ -3143,18 +3143,18 @@ bool CInstanceBase::__IsShapeAnimalWear()
 	return false;
 }
 
-DWORD CInstanceBase::__GetRaceType()
+uint32_t CInstanceBase::__GetRaceType()
 {
 	return m_eRaceType;
 }
 
 
-void CInstanceBase::RefreshState(DWORD dwMotIndex, bool isLoop)
+void CInstanceBase::RefreshState(uint32_t dwMotIndex, bool isLoop)
 {
-	DWORD dwPartItemID = m_GraphicThingInstance.GetPartItemID(CRaceData::PART_WEAPON);
+	uint32_t dwPartItemID = m_GraphicThingInstance.GetPartItemID(CRaceData::PART_WEAPON);
 
-	BYTE byItemType = 0xff;
-	BYTE bySubType = 0xff;
+	uint8_t byItemType = 0xff;
+	uint8_t bySubType = 0xff;
 
 	CItemManager & rkItemMgr = CItemManager::Instance();
 	CItemData * pItemData;

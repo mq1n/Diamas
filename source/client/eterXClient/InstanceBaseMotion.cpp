@@ -3,30 +3,30 @@
 #include "AbstractPlayer.h"
 #include "../eterGameLib/ActorInstance.h"
 
-const int c_iFishingRotStep = 8;
+const int32_t c_iFishingRotStep = 8;
 const float c_fFishingDistance = 600.0f;
 
-void CInstanceBase::SetMotionMode(int iMotionMode)
+void CInstanceBase::SetMotionMode(int32_t iMotionMode)
 {
 	m_GraphicThingInstance.SetMotionMode(iMotionMode);
 }
 
-int CInstanceBase::GetMotionMode(DWORD dwMotionIndex)
+int32_t CInstanceBase::GetMotionMode(uint32_t dwMotionIndex)
 {
 	return m_GraphicThingInstance.GetMotionMode();
 }
 
-void CInstanceBase::SetLoopMotion(WORD wMotion, float fBlendTime/* =0.1f */, float fSpeedRatio)
+void CInstanceBase::SetLoopMotion(uint16_t wMotion, float fBlendTime/* =0.1f */, float fSpeedRatio)
 {
 	m_GraphicThingInstance.SetLoopMotion(wMotion, fBlendTime, fSpeedRatio);
 }
 
-void CInstanceBase::PushOnceMotion(WORD wMotion, float fBlendTime, float fSpeedRatio)
+void CInstanceBase::PushOnceMotion(uint16_t wMotion, float fBlendTime, float fSpeedRatio)
 {
 	m_GraphicThingInstance.PushOnceMotion(wMotion, fBlendTime, fSpeedRatio);
 }
 
-void CInstanceBase::PushLoopMotion(WORD wMotion, float fBlendTime, float fSpeedRatio)
+void CInstanceBase::PushLoopMotion(uint16_t wMotion, float fBlendTime, float fSpeedRatio)
 {
 	m_GraphicThingInstance.PushLoopMotion(wMotion, fBlendTime, fSpeedRatio);
 }
@@ -87,7 +87,7 @@ void CInstanceBase::CatchFail()
 	PushLoopMotion(CRaceMotionData::NAME_WAIT);
 }
 
-BOOL CInstanceBase::GetFishingRot(int * pirot)
+BOOL CInstanceBase::GetFishingRot(int32_t * pirot)
 {
 	const TPixelPosition& c_rkPPosCur=m_GraphicThingInstance.NEW_GetCurPixelPositionRef();
 	float fCharacterRot = m_GraphicThingInstance.GetRotation();
@@ -126,7 +126,7 @@ void CInstanceBase::__DisableChangingTCPState()
 	m_bEnableTCPState = FALSE;
 }
 
-void CInstanceBase::ActDualEmotion(CInstanceBase & rkDstInst, WORD wMotionNumber1, WORD wMotionNumber2)
+void CInstanceBase::ActDualEmotion(CInstanceBase & rkDstInst, uint16_t wMotionNumber1, uint16_t wMotionNumber2)
 {
 	if (!IsWaiting())
 	{
@@ -146,7 +146,7 @@ void CInstanceBase::ActDualEmotion(CInstanceBase & rkDstInst, WORD wMotionNumber
 	kDstPosition.x = c_rTargetPosition.x + (kDirection.x/fDistance)*c_fEmotionDistance;
 	kDstPosition.y = c_rTargetPosition.y + (kDirection.y/fDistance)*c_fEmotionDistance;
 
-	DWORD dwCurTime = ELTimer_GetServerMSec() + 500;
+	uint32_t dwCurTime = ELTimer_GetServerMSec() + 500;
 	PushTCPStateExpanded(dwCurTime, kDstPosition, 0.0f, FUNC_EMOTION, MAKELONG(wMotionNumber1, wMotionNumber2), rkDstInst.GetVirtualID());
 
 	__DisableChangingTCPState();
@@ -159,7 +159,7 @@ void CInstanceBase::ActDualEmotion(CInstanceBase & rkDstInst, WORD wMotionNumber
 	}
 }
 
-void CInstanceBase::ActEmotion(DWORD dwMotionNumber)
+void CInstanceBase::ActEmotion(uint32_t dwMotionNumber)
 {
 	PushOnceMotion(dwMotionNumber);
 }

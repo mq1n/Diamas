@@ -17,16 +17,16 @@ class CPythonExchange : public CSingleton<CPythonExchange>
 		{
 			char					name[CHARACTER_NAME_MAX_LEN + 1];
 #ifdef ENABLE_LEVEL_IN_TRADE
-			DWORD					level;
+			uint32_t					level;
 #endif
 
-			DWORD					item_vnum[EXCHANGE_ITEM_MAX_NUM];
-			BYTE					item_count[EXCHANGE_ITEM_MAX_NUM];
-			DWORD					item_metin[EXCHANGE_ITEM_MAX_NUM][ITEM_SOCKET_SLOT_MAX_NUM];
+			uint32_t					item_vnum[EXCHANGE_ITEM_MAX_NUM];
+			uint8_t					item_count[EXCHANGE_ITEM_MAX_NUM];
+			uint32_t					item_metin[EXCHANGE_ITEM_MAX_NUM][ITEM_SOCKET_SLOT_MAX_NUM];
 			TPlayerItemAttribute	item_attr[EXCHANGE_ITEM_MAX_NUM][ITEM_ATTRIBUTE_SLOT_MAX_NUM];
 
-			BYTE					accept;
-			DWORD					elk;
+			uint8_t					accept;
+			uint32_t					elk;
 		} TExchangeData;
 
 	public:
@@ -48,45 +48,45 @@ class CPythonExchange : public CSingleton<CPythonExchange>
 		char			*GetNameFromTarget();
 
 #ifdef ENABLE_LEVEL_IN_TRADE
-		void			SetSelfLevel(DWORD level);
-		void			SetTargetLevel(DWORD level);
+		void			SetSelfLevel(uint32_t level);
+		void			SetTargetLevel(uint32_t level);
 
-		DWORD			GetLevelFromSelf();
-		DWORD			GetLevelFromTarget();
+		uint32_t			GetLevelFromSelf();
+		uint32_t			GetLevelFromTarget();
 #endif
 
-		void			SetElkToTarget(DWORD elk);
-		void			SetElkToSelf(DWORD elk);
+		void			SetElkToTarget(uint32_t elk);
+		void			SetElkToSelf(uint32_t elk);
 
-		DWORD			GetElkFromTarget();
-		DWORD			GetElkFromSelf();
+		uint32_t			GetElkFromTarget();
+		uint32_t			GetElkFromSelf();
 
-		void			SetItemToTarget(DWORD pos, DWORD vnum, BYTE count);
-		void			SetItemToSelf(DWORD pos, DWORD vnum, BYTE count);
+		void			SetItemToTarget(uint32_t pos, uint32_t vnum, uint8_t count);
+		void			SetItemToSelf(uint32_t pos, uint32_t vnum, uint8_t count);
 
-		void			SetItemMetinSocketToTarget(int pos, int imetinpos, DWORD vnum);
-		void			SetItemMetinSocketToSelf(int pos, int imetinpos, DWORD vnum);
+		void			SetItemMetinSocketToTarget(int32_t pos, int32_t imetinpos, uint32_t vnum);
+		void			SetItemMetinSocketToSelf(int32_t pos, int32_t imetinpos, uint32_t vnum);
 
-		void			SetItemAttributeToTarget(int pos, int iattrpos, BYTE byType, short sValue);
-		void			SetItemAttributeToSelf(int pos, int iattrpos, BYTE byType, short sValue);
+		void			SetItemAttributeToTarget(int32_t pos, int32_t iattrpos, uint8_t byType, int16_t sValue);
+		void			SetItemAttributeToSelf(int32_t pos, int32_t iattrpos, uint8_t byType, int16_t sValue);
 
-		void			DelItemOfTarget(BYTE pos);
-		void			DelItemOfSelf(BYTE pos);
+		void			DelItemOfTarget(uint8_t pos);
+		void			DelItemOfSelf(uint8_t pos);
 
-		DWORD			GetItemVnumFromTarget(BYTE pos);
-		DWORD			GetItemVnumFromSelf(BYTE pos);
+		uint32_t			GetItemVnumFromTarget(uint8_t pos);
+		uint32_t			GetItemVnumFromSelf(uint8_t pos);
 
-		BYTE			GetItemCountFromTarget(BYTE pos);
-		BYTE			GetItemCountFromSelf(BYTE pos);
+		uint8_t			GetItemCountFromTarget(uint8_t pos);
+		uint8_t			GetItemCountFromSelf(uint8_t pos);
 
-		DWORD			GetItemMetinSocketFromTarget(BYTE pos, int iMetinSocketPos);
-		DWORD			GetItemMetinSocketFromSelf(BYTE pos, int iMetinSocketPos);
+		uint32_t			GetItemMetinSocketFromTarget(uint8_t pos, int32_t iMetinSocketPos);
+		uint32_t			GetItemMetinSocketFromSelf(uint8_t pos, int32_t iMetinSocketPos);
 
-		void			GetItemAttributeFromTarget(BYTE pos, int iAttrPos, BYTE * pbyType, short * psValue);
-		void			GetItemAttributeFromSelf(BYTE pos, int iAttrPos, BYTE * pbyType, short * psValue);
+		void			GetItemAttributeFromTarget(uint8_t pos, int32_t iAttrPos, uint8_t * pbyType, int16_t * psValue);
+		void			GetItemAttributeFromSelf(uint8_t pos, int32_t iAttrPos, uint8_t * pbyType, int16_t * psValue);
 
-		void			SetAcceptToTarget(BYTE Accept);
-		void			SetAcceptToSelf(BYTE Accept);
+		void			SetAcceptToTarget(uint8_t Accept);
+		void			SetAcceptToSelf(uint8_t Accept);
 
 		bool			GetAcceptFromTarget();
 		bool			GetAcceptFromSelf();

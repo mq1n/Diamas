@@ -44,7 +44,7 @@ bool CEffectData::LoadScript(const char * c_szFileName)
 		m_v3BoundingSpherePosition.x = m_v3BoundingSpherePosition.y = m_v3BoundingSpherePosition.z = 0.0f;
 	}
 
-	for (DWORD i = 0; i < TextFileLoader.GetChildNodeCount(); ++i)
+	for (uint32_t i = 0; i < TextFileLoader.GetChildNodeCount(); ++i)
 	{
 		if (!TextFileLoader.SetChildNode(i))
 			continue;
@@ -79,7 +79,7 @@ bool CEffectData::LoadScript(const char * c_szFileName)
 	// Load Sound
 	std::string strPathHeader = "d:/ymir work/";
 	std::string strNoExtensionName = CFileNameHelper::NoExtension(m_strFileName);
-	int iPos = strNoExtensionName.find(strPathHeader.c_str());
+	int32_t iPos = strNoExtensionName.find(strPathHeader.c_str());
 	if (iPos >= 0)
 	if (strNoExtensionName.size() > strPathHeader.size())
 	{
@@ -128,37 +128,37 @@ CLightData * CEffectData::AllocLight()
 	return pLight;
 }
 
-DWORD CEffectData::GetLightCount()
+uint32_t CEffectData::GetLightCount()
 {
 	return m_LightVector.size();
 }
 
-CLightData * CEffectData::GetLightPointer(DWORD dwPosition)
+CLightData * CEffectData::GetLightPointer(uint32_t dwPosition)
 {
 	assert(dwPosition < m_LightVector.size());
 	return m_LightVector[dwPosition];
 }
 
-DWORD CEffectData::GetParticleCount()
+uint32_t CEffectData::GetParticleCount()
 {
 	return m_ParticleVector.size();
 }
-CParticleSystemData * CEffectData::GetParticlePointer(DWORD dwPosition)
+CParticleSystemData * CEffectData::GetParticlePointer(uint32_t dwPosition)
 {
 	if(dwPosition < m_ParticleVector.size())
 		return m_ParticleVector[dwPosition];
 	else
 	{
 		assert(false);
-		return NULL;
+		return nullptr;
 	}
 }
 
-DWORD CEffectData::GetMeshCount()
+uint32_t CEffectData::GetMeshCount()
 {
 	return m_MeshVector.size();
 }
-CEffectMeshScript * CEffectData::GetMeshPointer(DWORD dwPosition)
+CEffectMeshScript * CEffectData::GetMeshPointer(uint32_t dwPosition)
 {
 	assert(dwPosition < m_MeshVector.size());
 	return m_MeshVector[dwPosition];

@@ -3,7 +3,7 @@
 #include "PythonBackground.h"
 #include "../eterLib/GrpMath.h"
 
-void CInstanceBase::SetAttackSpeed(UINT uAtkSpd)
+void CInstanceBase::SetAttackSpeed(uint32_t uAtkSpd)
 {
 	if (uAtkSpd > 1100)
 		uAtkSpd = 0;
@@ -12,7 +12,7 @@ void CInstanceBase::SetAttackSpeed(UINT uAtkSpd)
 	m_kHorse.SetAttackSpeed(uAtkSpd);
 }
 
-void CInstanceBase::SetMoveSpeed(UINT uMovSpd)
+void CInstanceBase::SetMoveSpeed(uint32_t uMovSpd)
 {
 	if (uMovSpd > 1100)
 		uMovSpd = 0;
@@ -44,7 +44,7 @@ void CInstanceBase::NEW_Stop()
 	m_GraphicThingInstance.__OnStop();
 }
 
-void CInstanceBase::NEW_SyncPixelPosition(long & nPPosX, long & nPPosY)
+void CInstanceBase::NEW_SyncPixelPosition(int32_t & nPPosX, int32_t & nPPosY)
 {
 	m_GraphicThingInstance.TEMP_Push(nPPosX, nPPosY);
 }

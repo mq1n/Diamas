@@ -22,12 +22,12 @@ public:
 
 	struct TFlyingAttachData
 	{
-		int iType;
-		int iFlyType;
+		int32_t iType;
+		int32_t iFlyType;
 		std::string strFilename;
 
 		bool bHasTail;
-		DWORD dwTailColor;
+		uint32_t dwTailColor;
 		float fTailLength;
 		float fTailSize;
 		bool bRectShape;
@@ -58,13 +58,13 @@ public:
 
 	void SetBombEffect(const char* szEffectName);
 
-	DWORD AttachFlyEffect(int iType, const std::string & strFilename, float fRoll, float fArg1, float fArg2);
+	uint32_t AttachFlyEffect(int32_t iType, const std::string & strFilename, float fRoll, float fArg1, float fArg2);
 
-	TFlyingAttachData & GetAttachDataReference(int iIndex);
-	int GetAttachDataCount() { return m_AttachDataVector.size(); } 
+	TFlyingAttachData & GetAttachDataReference(int32_t iIndex);
+	int32_t GetAttachDataCount() { return m_AttachDataVector.size(); } 
 
-	void DuplicateAttach(int iIndex);
-	void RemoveAttach(int iIndex);
+	void DuplicateAttach(int32_t iIndex);
+	void RemoveAttach(int32_t iIndex);
 	void RemoveAllAttach();
 
 protected:
@@ -85,7 +85,7 @@ protected:
 
 	float m_fBombRange;
 	std::string m_strBombEffectName;
-	DWORD m_dwBombEffectID;
+	uint32_t m_dwBombEffectID;
 
 	bool m_bIsHoming;
 	float m_fHomingMaxAngle;
@@ -93,7 +93,7 @@ protected:
 
 	bool m_bHitOnBackground;
 	bool m_bHitOnAnotherMonster;
-	int m_iPierceCount;
+	int32_t m_iPierceCount;
 	float m_fCollisionSphereRadius;
 
 	float m_fRange;

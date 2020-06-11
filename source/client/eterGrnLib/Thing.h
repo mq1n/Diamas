@@ -18,13 +18,13 @@ class CGraphicThing : public CResource
 		virtual bool			CreateDeviceObjects();
 		virtual void			DestroyDeviceObjects();
 
-		bool					CheckModelIndex(int iModel) const;
-		CGrannyModel *			GetModelPointer(int iModel);
-		int						GetModelCount() const;
+		bool					CheckModelIndex(int32_t iModel) const;
+		CGrannyModel *			GetModelPointer(int32_t iModel);
+		int32_t						GetModelCount() const;
 
-		bool					CheckMotionIndex(int iMotion) const;
-		CGrannyMotion *			GetMotionPointer(int iMotion);
-		int						GetMotionCount() const;
+		bool					CheckMotionIndex(int32_t iMotion) const;
+		CGrannyMotion *			GetMotionPointer(int32_t iMotion);
+		int32_t						GetMotionCount() const;
 
 	protected:
 		void					Initialize();
@@ -33,7 +33,7 @@ class CGraphicThing : public CResource
 		bool					LoadMotions();
 
 	protected:
-		bool					OnLoad(int iSize, const void* c_pvBuf);
+		bool					OnLoad(int32_t iSize, const void* c_pvBuf);
 		void					OnClear();
 		bool					OnIsEmpty() const;
 		bool					OnIsType(TType type);

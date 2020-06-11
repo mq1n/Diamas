@@ -46,15 +46,15 @@
 #include "../eterLib/GrpImageInstance.h"
 
 #ifndef SAFE_DELETE
-#define SAFE_DELETE(p)       { if (p) { delete (p);     (p) = NULL; } }
+#define SAFE_DELETE(p)       { if (p) { delete (p);     (p) = nullptr; } }
 #endif
 
 #ifndef SAFE_DELETE_ARRAY
-#define SAFE_DELETE_ARRAY(p) { if (p) { delete[] (p);   (p) = NULL; } }
+#define SAFE_DELETE_ARRAY(p) { if (p) { delete[] (p);   (p) = nullptr; } }
 #endif
 
 #ifndef SAFE_RELEASE
-#define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p) = NULL; } }
+#define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p) = nullptr; } }
 #endif
 
 ///////////////////////////////////////////////////////////////////////  
@@ -68,7 +68,7 @@ class CSpeedTreeWrapper : public CGraphicObjectInstance
 	{
 		ID = TREE_OBJECT
 	};
-	int GetType() const { return ID; }
+	int32_t GetType() const { return ID; }
 	
 	// Collision Data
 protected:
@@ -99,14 +99,14 @@ public:
 	virtual	~CSpeedTreeWrapper();
 	
 	const float *				GetPosition();
-	static void					SetVertexShaders(DWORD dwBranchVertexShader, DWORD dwLeafVertexShader);
+	static void					SetVertexShaders(uint32_t dwBranchVertexShader, uint32_t dwLeafVertexShader);
 
 	// geometry 
-	bool                        LoadTree(const char * pszSptFile, const BYTE * c_pbBlock = NULL, unsigned int uiBlockSize = 0, unsigned int nSeed = 1, float fSize = -1.0f, float fSizeVariance = -1.0f);
+	bool                        LoadTree(const char * pszSptFile, const uint8_t * c_pbBlock = nullptr, uint32_t uiBlockSize = 0, uint32_t nSeed = 1, float fSize = -1.0f, float fSizeVariance = -1.0f);
 	const float *				GetBoundingBox(void) const						{ return m_afBoundingBox; }
 	void						GetTreeSize(float & r_fSize, float & r_fVariance);
-	UINT						GetCollisionObjectCount();
-	void						GetCollisionObject(unsigned int nIndex, CSpeedTreeRT::ECollisionObjectType& eType, float* pPosition, float* pDimensions);
+	uint32_t						GetCollisionObjectCount();
+	void						GetCollisionObject(uint32_t nIndex, CSpeedTreeRT::ECollisionObjectType& eType, float* pPosition, float* pDimensions);
 
 	// rendering
 	void						SetupBranchForTreeType(void) const;
@@ -115,7 +115,7 @@ public:
 	void						EndLeafForTreeType(void);
 	
 #ifdef WRAPPER_USE_GPU_LEAF_PLACEMENT
-	void						UploadLeafTables(unsigned int uiLocation) const;
+	void						UploadLeafTables(uint32_t uiLocation) const;
 #endif
 	
 	void						RenderBranches(void) const;
@@ -124,7 +124,7 @@ public:
 	void						RenderBillboards(void) const;
 	
 	// instancing
-	CSpeedTreeWrapper **		GetInstances(unsigned int& nCount);
+	CSpeedTreeWrapper **		GetInstances(uint32_t& nCount);
 	CSpeedTreeWrapper *			InstanceOf(void) const							{ return m_pInstanceOf; }
 	CSpeedTreeWrapper * 		MakeInstance();								
 	void						DeleteInstance(CSpeedTreeWrapper * pInstance);
@@ -167,18 +167,18 @@ private:
 
 	// branch buffers
 	LPDIRECT3DVERTEXBUFFER8			m_pBranchVertexBuffer;			// branch vertex buffer
-	unsigned int					m_unBranchVertexCount;			// number of vertices in branches
+	uint32_t					m_unBranchVertexCount;			// number of vertices in branches
 	LPDIRECT3DINDEXBUFFER8			m_pBranchIndexBuffer;			// branch index buffer
-	unsigned short*					m_pBranchIndexCounts;			// number of indexes per branch LOD level
+	uint16_t*					m_pBranchIndexCounts;			// number of indexes per branch LOD level
 	
 	// frond buffers
 	LPDIRECT3DVERTEXBUFFER8			m_pFrondVertexBuffer;			// frond vertex buffer
-	unsigned int					m_unFrondVertexCount;			// number of vertices in frond
+	uint32_t					m_unFrondVertexCount;			// number of vertices in frond
 	LPDIRECT3DINDEXBUFFER8			m_pFrondIndexBuffer;			// frond index buffer
-	unsigned short*					m_pFrondIndexCounts;			// number of indexes per frond LOD level
+	uint16_t*					m_pFrondIndexCounts;			// number of indexes per frond LOD level
 	
 	// leaf buffers
-	unsigned short					m_usNumLeafLods;				// the number of leaf LODs
+	uint16_t					m_usNumLeafLods;				// the number of leaf LODs
 	LPDIRECT3DVERTEXBUFFER8*		m_pLeafVertexBuffer;			// leaf vertex buffer
 	bool*							m_pLeavesUpdatedByCpu;			// stores which LOD's have been updated already per frame
 	
@@ -196,8 +196,8 @@ private:
 	CGraphicImageInstance			m_ShadowImageInstance;			// shadow texture object (used if shadows are enabled)
 	CGraphicImageInstance			m_CompositeImageInstance;
 
-	static DWORD					ms_dwBranchVertexShader;
-	static DWORD					ms_dwLeafVertexShader;
+	static uint32_t					ms_dwBranchVertexShader;
+	static uint32_t					ms_dwLeafVertexShader;
 };
 
 #pragma warning(pop)

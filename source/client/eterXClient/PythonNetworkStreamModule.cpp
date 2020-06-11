@@ -71,11 +71,11 @@ PyObject* netIsTest(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netWarp(PyObject* poSelf, PyObject* poArgs)
 {
-	int nX;
+	int32_t nX;
 	if (!PyTuple_GetInteger(poArgs, 0, &nX))
 		return Py_BuildException();
 
-	int nY;
+	int32_t nY;
 	if (!PyTuple_GetInteger(poArgs, 1, &nY))
 		return Py_BuildException();
 
@@ -160,26 +160,26 @@ PyObject* netIsSelectedEmpire(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netGetAccountCharacterSlotDataInteger(PyObject* poSelf, PyObject* poArgs)
 {
-	int nIndex;
+	int32_t nIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &nIndex))
 		return Py_BuildException();
 
-	int nType;
+	int32_t nType;
 	if (!PyTuple_GetInteger(poArgs, 1, &nType))
 		return Py_BuildException();
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	UINT uResult=rkNetStream.GetAccountCharacterSlotDatau(nIndex, nType);
+	uint32_t uResult=rkNetStream.GetAccountCharacterSlotDatau(nIndex, nType);
 	return Py_BuildValue("i", uResult);
 }
 
 PyObject* netGetAccountCharacterSlotDataString(PyObject* poSelf, PyObject* poArgs)
 {
-	int nIndex;
+	int32_t nIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &nIndex))
 		return Py_BuildException();
 
-	int nType;
+	int32_t nType;
 	if (!PyTuple_GetInteger(poArgs, 1, &nType))
 		return Py_BuildException();
 
@@ -203,7 +203,7 @@ PyObject* netGetFieldMusicVolume(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSetPhaseWindow(PyObject* poSelf, PyObject* poArgs)
 {
-	int ePhaseWnd;
+	int32_t ePhaseWnd;
 	if (!PyTuple_GetInteger(poArgs, 0, &ePhaseWnd))
 		return Py_BuildException();
 
@@ -218,7 +218,7 @@ PyObject* netSetPhaseWindow(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netClearPhaseWindow(PyObject* poSelf, PyObject* poArgs)
 {
-	int ePhaseWnd;
+	int32_t ePhaseWnd;
 	if (!PyTuple_GetInteger(poArgs, 0, &ePhaseWnd))
 		return Py_BuildException();
 
@@ -267,7 +267,7 @@ PyObject* netSetHandler(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSetTCPRecvBufferSize(PyObject* poSelf, PyObject* poArgs)
 {
-	int bufSize;
+	int32_t bufSize;
 	if (!PyTuple_GetInteger(poArgs, 0, &bufSize))
 		return Py_BuildException();
 
@@ -278,7 +278,7 @@ PyObject* netSetTCPRecvBufferSize(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSetTCPSendBufferSize(PyObject* poSelf, PyObject* poArgs)
 {
-	int bufSize;
+	int32_t bufSize;
 	if (!PyTuple_GetInteger(poArgs, 0, &bufSize))
 		return Py_BuildException();
 
@@ -293,7 +293,7 @@ PyObject* netSetMarkServer(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szAddr))
 		return Py_BuildException();
 
-	int port;
+	int32_t port;
 	if (!PyTuple_GetInteger(poArgs, 1, &port))
 		return Py_BuildException();
 
@@ -308,7 +308,7 @@ PyObject* netConnectTCP(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szAddr))
 		return Py_BuildException();
 
-	int port;
+	int32_t port;
 	if (!PyTuple_GetInteger(poArgs, 1, &port))
 		return Py_BuildException();
 
@@ -323,7 +323,7 @@ PyObject* netConnectToAccountServer(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &addr))
 		return Py_BuildException();
 
-	int port;
+	int32_t port;
 	if (!PyTuple_GetInteger(poArgs, 1, &port))
 		return Py_BuildException();
 
@@ -331,7 +331,7 @@ PyObject* netConnectToAccountServer(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 2, &account_addr))
 		return Py_BuildException();
 
-	int account_port;
+	int32_t account_port;
 	if (!PyTuple_GetInteger(poArgs, 3, &account_port))
 		return Py_BuildException();
 
@@ -368,7 +368,7 @@ PyObject* netSetOfflinePhase(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendSelectEmpirePacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iEmpireIndex;
+	int32_t iEmpireIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iEmpireIndex))
 		return Py_BuildException();
 
@@ -394,7 +394,7 @@ PyObject* netSendLoginPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netDirectEnter(PyObject* poSelf, PyObject* poArgs)
 {
-	int nChrSlot;
+	int32_t nChrSlot;
 	if (!PyTuple_GetInteger(poArgs, 0, &nChrSlot))
 		return Py_BuildException();
 
@@ -405,18 +405,18 @@ PyObject* netDirectEnter(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendSelectCharacterPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int Index;
+	int32_t Index;
 	if (!PyTuple_GetInteger(poArgs, 0, &Index))
 		return Py_BuildException();
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendSelectCharacterPacket((BYTE) Index);
+	rkNetStream.SendSelectCharacterPacket((uint8_t) Index);
 	return Py_BuildNone();
 }
 
 PyObject* netSendChangeNamePacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 	char* szName;
@@ -424,13 +424,13 @@ PyObject* netSendChangeNamePacket(PyObject* poSelf, PyObject* poArgs)
 		return Py_BuildException();
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendChangeNamePacket((BYTE)iIndex, szName);
+	rkNetStream.SendChangeNamePacket((uint8_t)iIndex, szName);
 	return Py_BuildNone();
 }
 
 PyObject* netEnableChatInsultFilter(PyObject* poSelf, PyObject* poArgs)
 {
-	int nEnable;
+	int32_t nEnable;
 	if (!PyTuple_GetInteger(poArgs, 0, &nEnable))
 		return Py_BuildException();
 
@@ -478,12 +478,12 @@ PyObject* netSendWhisperPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendCharacterPositionPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iPosition;
+	int32_t iPosition;
 	if (!PyTuple_GetInteger(poArgs, 0, &iPosition))
 		return Py_BuildException();
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendCharacterPositionPacket((BYTE) iPosition);
+	rkNetStream.SendCharacterPositionPacket((uint8_t) iPosition);
 	return Py_BuildNone();
 }
 
@@ -492,7 +492,7 @@ PyObject* netSendChatPacket(PyObject* poSelf, PyObject* poArgs)
 	char* szLine;
 	if (!PyTuple_GetString(poArgs, 0, &szLine))
 		return Py_BuildException();
-	int iType;
+	int32_t iType;
 	if (!PyTuple_GetInteger(poArgs, 1, &iType))
 	{
 		iType = CHAT_TYPE_TALKING;
@@ -505,7 +505,7 @@ PyObject* netSendChatPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendEmoticon(PyObject* poSelf, PyObject* poArgs)
 {
-	int eEmoticon;
+	int32_t eEmoticon;
 	if (!PyTuple_GetInteger(poArgs, 0, &eEmoticon))
 		return Py_BuildException();
 
@@ -516,7 +516,7 @@ PyObject* netSendEmoticon(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendCreateCharacterPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int index;
+	int32_t index;
 	if (!PyTuple_GetInteger(poArgs, 0, &index))
 		return Py_BuildException();
 
@@ -524,24 +524,24 @@ PyObject* netSendCreateCharacterPacket(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 1, &name))
 		return Py_BuildException();
 
-	int job;
+	int32_t job;
 	if (!PyTuple_GetInteger(poArgs, 2, &job))
 		return Py_BuildException();
 
-	int shape;
+	int32_t shape;
 	if (!PyTuple_GetInteger(poArgs, 3, &shape))
 		return Py_BuildException();
 
-	int stat1;
+	int32_t stat1;
 	if (!PyTuple_GetInteger(poArgs, 4, &stat1))
 		return Py_BuildException();
-	int stat2;
+	int32_t stat2;
 	if (!PyTuple_GetInteger(poArgs, 5, &stat2))
 		return Py_BuildException();
-	int stat3;
+	int32_t stat3;
 	if (!PyTuple_GetInteger(poArgs, 6, &stat3))
 		return Py_BuildException();
-	int stat4;
+	int32_t stat4;
 	if (!PyTuple_GetInteger(poArgs, 7, &stat4))
 		return Py_BuildException();
 
@@ -549,13 +549,13 @@ PyObject* netSendCreateCharacterPacket(PyObject* poSelf, PyObject* poArgs)
 		return Py_BuildException();
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendCreateCharacterPacket((BYTE) index, name, (BYTE) job, (BYTE) shape, stat1, stat2, stat3, stat4);
+	rkNetStream.SendCreateCharacterPacket((uint8_t) index, name, (uint8_t) job, (uint8_t) shape, stat1, stat2, stat3, stat4);
 	return Py_BuildNone();
 }
 
 PyObject* netSendDestroyCharacterPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int index;
+	int32_t index;
 	if (!PyTuple_GetInteger(poArgs, 0, &index))
 		return Py_BuildException();
 
@@ -567,7 +567,7 @@ PyObject* netSendDestroyCharacterPacket(PyObject* poSelf, PyObject* poArgs)
 		return Py_BuildException();
 	
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendDestroyCharacterPacket((BYTE) index, szPrivateCode);
+	rkNetStream.SendDestroyCharacterPacket((uint8_t) index, szPrivateCode);
 	return Py_BuildNone();
 }
 
@@ -580,7 +580,7 @@ PyObject* netSendEnterGamePacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netOnClickPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int index;
+	int32_t index;
 	if (!PyTuple_GetInteger(poArgs, 0, &index))
 		return Py_BuildException();
 
@@ -676,7 +676,7 @@ PyObject* netSendItemDropPacket(PyObject* poSelf, PyObject* poArgs)
 PyObject* netSendItemDropPacketNew(PyObject* poSelf, PyObject* poArgs)
 {
 	TItemPos Cell;
-	int count;
+	int32_t count;
 	switch (PyTuple_Size(poArgs))
 	{
 	case 2:
@@ -705,23 +705,23 @@ PyObject* netSendItemDropPacketNew(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendElkDropPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iElk;
+	int32_t iElk;
 	if (!PyTuple_GetInteger(poArgs, 0, &iElk))
 		return Py_BuildException();
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendItemDropPacket(TItemPos(RESERVED_WINDOW, 0), (DWORD) iElk);
+	rkNetStream.SendItemDropPacket(TItemPos(RESERVED_WINDOW, 0), (uint32_t) iElk);
 	return Py_BuildNone();
 }
 
 PyObject* netSendGoldDropPacketNew(PyObject* poSelf, PyObject* poArgs)
 {
-	int iElk;
+	int32_t iElk;
 	if (!PyTuple_GetInteger(poArgs, 0, &iElk))
 		return Py_BuildException();
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendItemDropPacketNew(TItemPos (RESERVED_WINDOW, 0), (DWORD) iElk, 0);
+	rkNetStream.SendItemDropPacketNew(TItemPos (RESERVED_WINDOW, 0), (uint32_t) iElk, 0);
 	return Py_BuildNone();
 }
 
@@ -729,7 +729,7 @@ PyObject* netSendItemMovePacket(PyObject* poSelf, PyObject* poArgs)
 {
 	TItemPos Cell;
 	TItemPos ChangeCell;
-	int num;
+	int32_t num;
 
 	switch (PyTuple_Size(poArgs))
 	{
@@ -760,13 +760,13 @@ PyObject* netSendItemMovePacket(PyObject* poSelf, PyObject* poArgs)
 	}
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendItemMovePacket(Cell, ChangeCell, (BYTE) num);
+	rkNetStream.SendItemMovePacket(Cell, ChangeCell, (uint8_t) num);
 	return Py_BuildNone();
 }
 
 PyObject* netSendItemPickUpPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int vid;
+	int32_t vid;
 	if (!PyTuple_GetInteger(poArgs, 0, &vid))
 		return Py_BuildException();
 
@@ -777,9 +777,9 @@ PyObject* netSendItemPickUpPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendGiveItemPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iTargetVID;
+	int32_t iTargetVID;
 	TItemPos Cell;
-	int iItemCount;
+	int32_t iItemCount;
 	switch (PyTuple_Size(poArgs))
 	{
 	case 3:
@@ -818,7 +818,7 @@ PyObject* netSendShopEndPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendShopBuyPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iCount;
+	int32_t iCount;
 	if (!PyTuple_GetInteger(poArgs, 0, &iCount))
 		return Py_BuildException();
 
@@ -829,7 +829,7 @@ PyObject* netSendShopBuyPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendShopSellPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iSlotNumber;
+	int32_t iSlotNumber;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSlotNumber))
 		return Py_BuildException();
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
@@ -839,10 +839,10 @@ PyObject* netSendShopSellPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendShopSellPacketNew(PyObject* poSelf, PyObject* poArgs)
 {
-	int iSlotNumber;
+	int32_t iSlotNumber;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSlotNumber))
 		return Py_BuildException();
-	int iCount;
+	int32_t iCount;
 	if (!PyTuple_GetInteger(poArgs, 1, &iCount))
 		return Py_BuildException();
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
@@ -852,7 +852,7 @@ PyObject* netSendShopSellPacketNew(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendExchangeStartPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int vid;
+	int32_t vid;
 	if (!PyTuple_GetInteger(poArgs, 0, &vid))
 		return Py_BuildException();
 
@@ -863,7 +863,7 @@ PyObject* netSendExchangeStartPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendExchangeElkAddPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iElk;
+	int32_t iElk;
 	if (!PyTuple_GetInteger(poArgs, 0, &iElk))
 		return Py_BuildException();
 
@@ -874,13 +874,13 @@ PyObject* netSendExchangeElkAddPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendExchangeItemAddPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	BYTE bWindowType;
+	uint8_t bWindowType;
 	if (!PyTuple_GetInteger(poArgs, 0, &bWindowType))
 		return Py_BuildException();
-	WORD wSlotIndex;
+	uint16_t wSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 1, &wSlotIndex))
 		return Py_BuildException();
-	int iDisplaySlotIndex;
+	int32_t iDisplaySlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 2, &iDisplaySlotIndex))
 		return Py_BuildException();
 
@@ -891,12 +891,12 @@ PyObject* netSendExchangeItemAddPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendExchangeItemDelPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int pos;
+	int32_t pos;
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendExchangeItemDelPacket((BYTE) pos);
+	rkNetStream.SendExchangeItemDelPacket((uint8_t) pos);
 	return Py_BuildNone();
 }
 
@@ -970,7 +970,7 @@ PyObject* netRegisterEmoticonString(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendMessengerAddByVIDPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int vid;
+	int32_t vid;
 	if (!PyTuple_GetInteger(poArgs, 0, &vid))
 		return Py_BuildException();
 
@@ -1009,7 +1009,7 @@ PyObject* netSendMessengerRemovePacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendPartyInvitePacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int vid;
+	int32_t vid;
 	if (!PyTuple_GetInteger(poArgs, 0, &vid))
 		return Py_BuildException();
 
@@ -1021,10 +1021,10 @@ PyObject* netSendPartyInvitePacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendPartyInviteAnswerPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int vid;
+	int32_t vid;
 	if (!PyTuple_GetInteger(poArgs, 0, &vid))
 		return Py_BuildException();
-	int answer;
+	int32_t answer;
 	if (!PyTuple_GetInteger(poArgs, 1, &answer))
 		return Py_BuildException();
 
@@ -1040,8 +1040,8 @@ PyObject* netSendPartyExitPacket(PyObject* poSelf, PyObject* poArgs)
 
 	CPythonNetworkStream& rns=CPythonNetworkStream::Instance();
 
-	DWORD dwVID = rPlayer.GetMainCharacterIndex();
-	DWORD dwPID;
+	uint32_t dwVID = rPlayer.GetMainCharacterIndex();
+	uint32_t dwPID;
 	if (rPlayer.PartyMemberVIDToPID(dwVID, &dwPID))
 		rns.SendPartyRemovePacket(dwPID);
 
@@ -1050,7 +1050,7 @@ PyObject* netSendPartyExitPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendPartyRemovePacketPID(PyObject* poSelf, PyObject* poArgs)
 {
-	int pid;
+	int32_t pid;
 	if (!PyTuple_GetInteger(poArgs, 0, &pid))
 		return Py_BuildException();
 
@@ -1062,13 +1062,13 @@ PyObject* netSendPartyRemovePacketPID(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendPartyRemovePacketVID(PyObject* poSelf, PyObject* poArgs)
 {
-	int vid;
+	int32_t vid;
 	if (!PyTuple_GetInteger(poArgs, 0, &vid))
 		return Py_BuildException();
 
 	IAbstractPlayer& rPlayer=IAbstractPlayer::GetSingleton();
 	CPythonNetworkStream& rns=CPythonNetworkStream::Instance();
-	DWORD dwPID;
+	uint32_t dwPID;
 	if (rPlayer.PartyMemberVIDToPID(vid, &dwPID))
 		rns.SendPartyRemovePacket(dwPID);
 
@@ -1077,13 +1077,13 @@ PyObject* netSendPartyRemovePacketVID(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendPartySetStatePacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iVID;
+	int32_t iVID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iVID))
 		return Py_BuildException();
-	int iState;
+	int32_t iState;
 	if (!PyTuple_GetInteger(poArgs, 1, &iState))
 		return Py_BuildException();
-	int iFlag;
+	int32_t iFlag;
 	if (!PyTuple_GetInteger(poArgs, 2, &iFlag))
 		return Py_BuildException();
 
@@ -1095,10 +1095,10 @@ PyObject* netSendPartySetStatePacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendPartyUseSkillPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iSkillIndex;
+	int32_t iSkillIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSkillIndex))
 		return Py_BuildException();
-	int iVID;
+	int32_t iVID;
 	if (!PyTuple_GetInteger(poArgs, 1, &iVID))
 		return Py_BuildException();
 
@@ -1110,7 +1110,7 @@ PyObject* netSendPartyUseSkillPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendPartyParameterPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMode;
+	int32_t iMode;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMode))
 		return Py_BuildException();
 
@@ -1122,7 +1122,7 @@ PyObject* netSendPartyParameterPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendSafeboxSaveMoneyPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMoney;
+	int32_t iMoney;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMoney))
 		return Py_BuildException();
 
@@ -1134,7 +1134,7 @@ PyObject* netSendSafeboxSaveMoneyPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendSafeboxWithdrawMoneyPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMoney;
+	int32_t iMoney;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMoney))
 		return Py_BuildException();
 
@@ -1147,7 +1147,7 @@ PyObject* netSendSafeboxWithdrawMoneyPacket(PyObject* poSelf, PyObject* poArgs)
 PyObject* netSendSafeboxCheckinPacket(PyObject* poSelf, PyObject* poArgs)
 {
 	TItemPos InventoryPos;
-	int iSafeBoxPos;
+	int32_t iSafeBoxPos;
 
 	switch (PyTuple_Size(poArgs))
 	{
@@ -1177,7 +1177,7 @@ PyObject* netSendSafeboxCheckinPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendSafeboxCheckoutPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iSafeBoxPos;
+	int32_t iSafeBoxPos;
 	TItemPos InventoryPos;
 	
 	switch (PyTuple_Size(poArgs))
@@ -1208,13 +1208,13 @@ PyObject* netSendSafeboxCheckoutPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendSafeboxItemMovePacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iSourcePos;
+	int32_t iSourcePos;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSourcePos))
 		return Py_BuildException();
-	int iTargetPos;
+	int32_t iTargetPos;
 	if (!PyTuple_GetInteger(poArgs, 1, &iTargetPos))
 		return Py_BuildException();
-	int iCount;
+	int32_t iCount;
 	if (!PyTuple_GetInteger(poArgs, 2, &iCount))
 		return Py_BuildException();
 
@@ -1226,7 +1226,7 @@ PyObject* netSendSafeboxItemMovePacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendMallCheckoutPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMallPos;
+	int32_t iMallPos;
 	TItemPos InventoryPos;
 
 	switch (PyTuple_Size(poArgs))
@@ -1280,10 +1280,10 @@ PyObject* netSendQuestInputStringPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendQuestConfirmPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iAnswer;
+	int32_t iAnswer;
 	if (!PyTuple_GetInteger(poArgs, 0, &iAnswer))
 		return Py_BuildException();
-	int iPID;
+	int32_t iPID;
 	if (!PyTuple_GetInteger(poArgs, 1, &iPID))
 		return Py_BuildException();
 
@@ -1295,7 +1295,7 @@ PyObject* netSendQuestConfirmPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendGuildAddMemberPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iVID;
+	int32_t iVID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iVID))
 		return Py_BuildException();
 
@@ -1326,7 +1326,7 @@ PyObject* netSendGuildRemoveMemberPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendGuildChangeGradeNamePacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iGradeNumber;
+	int32_t iGradeNumber;
 	if (!PyTuple_GetInteger(poArgs, 0, &iGradeNumber))
 		return Py_BuildException();
 	char * szGradeName;
@@ -1341,10 +1341,10 @@ PyObject* netSendGuildChangeGradeNamePacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendGuildChangeGradeAuthorityPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iGradeNumber;
+	int32_t iGradeNumber;
 	if (!PyTuple_GetInteger(poArgs, 0, &iGradeNumber))
 		return Py_BuildException();
-	int iAuthority;
+	int32_t iAuthority;
 	if (!PyTuple_GetInteger(poArgs, 1, &iAuthority))
 		return Py_BuildException();
 
@@ -1356,7 +1356,7 @@ PyObject* netSendGuildChangeGradeAuthorityPacket(PyObject* poSelf, PyObject* poA
 
 PyObject* netSendGuildOfferPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iExperience;
+	int32_t iExperience;
 	if (!PyTuple_GetInteger(poArgs, 0, &iExperience))
 		return Py_BuildException();
 
@@ -1380,7 +1380,7 @@ PyObject* netSnedGuildPostCommentPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSnedGuildDeleteCommentPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -1392,7 +1392,7 @@ PyObject* netSnedGuildDeleteCommentPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendGuildRefreshCommentsPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iHightestIndex;
+	int32_t iHightestIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHightestIndex))
 		return Py_BuildException();
 
@@ -1404,10 +1404,10 @@ PyObject* netSendGuildRefreshCommentsPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendGuildChangeMemberGradePacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iPID;
+	int32_t iPID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iPID))
 		return Py_BuildException();
-	int iGradeNumber;
+	int32_t iGradeNumber;
 	if (!PyTuple_GetInteger(poArgs, 1, &iGradeNumber))
 		return Py_BuildException();
 
@@ -1419,10 +1419,10 @@ PyObject* netSendGuildChangeMemberGradePacket(PyObject* poSelf, PyObject* poArgs
 
 PyObject* netSendGuildUseSkillPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iSkillID;
+	int32_t iSkillID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSkillID))
 		return Py_BuildException();
-	int iTargetVID;
+	int32_t iTargetVID;
 	if (!PyTuple_GetInteger(poArgs, 1, &iTargetVID))
 		return Py_BuildException();
 
@@ -1434,10 +1434,10 @@ PyObject* netSendGuildUseSkillPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendGuildChangeMemberGeneralPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iPID;
+	int32_t iPID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iPID))
 		return Py_BuildException();
-	int iFlag;
+	int32_t iFlag;
 	if (!PyTuple_GetInteger(poArgs, 1, &iFlag))
 		return Py_BuildException();
 
@@ -1449,10 +1449,10 @@ PyObject* netSendGuildChangeMemberGeneralPacket(PyObject* poSelf, PyObject* poAr
 
 PyObject* netSendGuildInviteAnswerPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iGuildID;
+	int32_t iGuildID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iGuildID))
 		return Py_BuildException();
-	int iAnswer;
+	int32_t iAnswer;
 	if (!PyTuple_GetInteger(poArgs, 1, &iAnswer))
 		return Py_BuildException();
 
@@ -1464,7 +1464,7 @@ PyObject* netSendGuildInviteAnswerPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendGuildChargeGSPPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iGSP;
+	int32_t iGSP;
 	if (!PyTuple_GetInteger(poArgs, 0, &iGSP))
 		return Py_BuildException();
 
@@ -1476,7 +1476,7 @@ PyObject* netSendGuildChargeGSPPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendGuildDepositMoneyPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iGSP;
+	int32_t iGSP;
 	if (!PyTuple_GetInteger(poArgs, 0, &iGSP))
 		return Py_BuildException();
 
@@ -1488,7 +1488,7 @@ PyObject* netSendGuildDepositMoneyPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendGuildWithdrawMoneyPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iGSP;
+	int32_t iGSP;
 	if (!PyTuple_GetInteger(poArgs, 0, &iGSP))
 		return Py_BuildException();
 
@@ -1500,7 +1500,7 @@ PyObject* netSendGuildWithdrawMoneyPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendRequestRefineInfoPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iSlotIndex;
+	int32_t iSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSlotIndex))
 		return Py_BuildException();
 
@@ -1513,10 +1513,10 @@ PyObject* netSendRequestRefineInfoPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendRefinePacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iSlotIndex;
+	int32_t iSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSlotIndex))
 		return Py_BuildException();
-	int iType;
+	int32_t iType;
 	if (!PyTuple_GetInteger(poArgs, 1, &iType))
 		return Py_BuildException();
 
@@ -1528,7 +1528,7 @@ PyObject* netSendRefinePacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendSelectItemPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int iItemPos;
+	int32_t iItemPos;
 	if (!PyTuple_GetInteger(poArgs, 0, &iItemPos))
 		return Py_BuildException();
 
@@ -1550,7 +1550,7 @@ PyObject* netSetPacketSequenceMode(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSetEmpireLanguageMode(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMode;
+	int32_t iMode;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMode))
 		return Py_BuildException();
 
@@ -1562,7 +1562,7 @@ PyObject* netSetEmpireLanguageMode(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSetSkillGroupFake(PyObject* poSelf, PyObject* poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -1580,20 +1580,20 @@ PyObject* netSendGuildSymbol(PyObject* poSelf, PyObject* poArgs)
 	char * szIP;
 	if (!PyTuple_GetString(poArgs, 0, &szIP))
 		return Py_BuildException();
-	int iPort;
+	int32_t iPort;
 	if (!PyTuple_GetInteger(poArgs, 1, &iPort))
 		return Py_BuildException();
 	char * szFileName;
 	if (!PyTuple_GetString(poArgs, 2, &szFileName))
 		return Py_BuildException();
-	int iGuildID;
+	int32_t iGuildID;
 	if (!PyTuple_GetInteger(poArgs, 3, &iGuildID))
 		return Py_BuildException();
 
 	CNetworkAddress kAddress;
 	kAddress.Set(szIP, iPort);
 
-	UINT uiError;
+	uint32_t uiError;
 
 	CGuildMarkUploader& rkGuildMarkUploader=CGuildMarkUploader::Instance();
 	if (!rkGuildMarkUploader.ConnectToSendSymbol(kAddress, 0, 0, iGuildID, szFileName, &uiError))
@@ -1616,17 +1616,17 @@ PyObject* netRecvGuildSymbol(PyObject* poSelf, PyObject* poArgs)
 	char * szIP;
 	if (!PyTuple_GetString(poArgs, 0, &szIP))
 		return Py_BuildException();
-	int iPort;
+	int32_t iPort;
 	if (!PyTuple_GetInteger(poArgs, 1, &iPort))
 		return Py_BuildException();
-	int iGuildID;
+	int32_t iGuildID;
 	if (!PyTuple_GetInteger(poArgs, 2, &iGuildID))
 		return Py_BuildException();
 
 	CNetworkAddress kAddress;
 	kAddress.Set(szIP, iPort);
 
-	std::vector<DWORD> kVec_dwGuildID;
+	std::vector<uint32_t> kVec_dwGuildID;
 	kVec_dwGuildID.clear();
 	kVec_dwGuildID.push_back(iGuildID);
 
@@ -1814,7 +1814,7 @@ void initnet()
 		// Log
 		{ "RegisterErrorLog",						netRegisterErrorLog,						METH_VARARGS },
 
-		{ NULL,										NULL,										NULL },
+		{ nullptr,										nullptr,										0 },
 	};
 
 	PyObject* poModule = Py_InitModule("net", s_methods);

@@ -82,7 +82,7 @@ bool DragonSoulTable::ReadDragonSoulTableFile(const char * c_pszFileName)
 	}
 }
 
-bool DragonSoulTable::GetDragonSoulGroupName(BYTE bType, std::string& stGroupName) const
+bool DragonSoulTable::GetDragonSoulGroupName(uint8_t bType, std::string& stGroupName) const
 {
 	DragonSoulTable::TMapTypeToName::const_iterator it = m_map_type_to_name.find (bType);
 	if (it != m_map_type_to_name.end())
@@ -104,28 +104,28 @@ bool DragonSoulTable::ReadVnumMapper()
 	// Group VnumMapper Reading.
 	CGroupNode* pGroupNode = m_pLoader->GetGroup("vnummapper");
 
-	if (NULL == pGroupNode)
+	if (nullptr == pGroupNode)
 	{
 		sys_err ("dragon_soul_table.txt need VnumMapper.");
 		return false;
 	}
 	{
-		int n = pGroupNode->GetRowCount();
+		int32_t n = pGroupNode->GetRowCount();
 		if (0 == n)
 		{
 			sys_err	("Group VnumMapper is Empty.");
 			return false;
 		}
 
-		std::set <BYTE> setTypes;
+		std::set <uint8_t> setTypes;
 
-		for (int i = 0; i < n; i++)
+		for (int32_t i = 0; i < n; i++)
 		{
 			const CGroupNode::CGroupNodeRow* pRow;
 			pGroupNode->GetRow(i, &pRow);
 			
 			std::string stDragonSoulName;
-			BYTE bType;
+			uint8_t bType;
 			if (!pRow->GetValue("dragonsoulname", stDragonSoulName))
 			{
 				sys_err ("In Group VnumMapper, No DragonSoulName column.");
@@ -155,7 +155,7 @@ bool DragonSoulTable::ReadBasicApplys()
 {
 	CGroupNode* pGroupNode = m_pLoader->GetGroup("basicapplys");
 
-	if (NULL == pGroupNode)
+	if (nullptr == pGroupNode)
 	{
 		sys_err ("dragon_soul_table.txt need BasicApplys.");
 		return false;
@@ -164,28 +164,28 @@ bool DragonSoulTable::ReadBasicApplys()
 	for (size_t i = 0; i < m_vecDragonSoulNames.size(); i++)
 	{
 		CGroupNode* pChild;
-		if (NULL == (pChild = pGroupNode->GetChildNode(m_vecDragonSoulNames[i])))
+		if (nullptr == (pChild = pGroupNode->GetChildNode(m_vecDragonSoulNames[i])))
 		{
 			sys_err ("In Group BasicApplys, %s group is not defined.", m_vecDragonSoulNames[i].c_str());
 			return false;
 		}
 		TVecApplys vecApplys;
-		int n = pChild->GetRowCount();
+		int32_t n = pChild->GetRowCount();
 		
 		// BasicApply Group은 Key가 1부터 시작함.
-		for (int j = 1; j <= n; j++)
+		for (int32_t j = 1; j <= n; j++)
 		{
 			std::stringstream ss;
 			ss << j;
-			const CGroupNode::CGroupNodeRow* pRow = NULL;
+			const CGroupNode::CGroupNodeRow* pRow = nullptr;
 
 			pChild->GetRow(ss.str(), &pRow);
-			if (NULL == pRow)
+			if (nullptr == pRow)
 			{
 				sys_err("In Group BasicApplys, No %d row.", j);
 			}
 			EApplyTypes at;
-			int av;
+			int32_t av;
 
 			std::string stTypeName;
 			if (!pRow->GetValue("apply_type", stTypeName))
@@ -214,7 +214,7 @@ bool DragonSoulTable::ReadBasicApplys()
 bool DragonSoulTable::ReadAdditionalApplys()
 {
 	CGroupNode* pGroupNode = m_pLoader->GetGroup("additionalapplys");
-	if (NULL == pGroupNode)
+	if (nullptr == pGroupNode)
 	{
 		sys_err ("dragon_soul_table.txt need AdditionalApplys.");
 		return false;
@@ -223,23 +223,23 @@ bool DragonSoulTable::ReadAdditionalApplys()
 	for (size_t i = 0; i < m_vecDragonSoulNames.size(); i++)
 	{
 		CGroupNode* pChild;
-		if (NULL == (pChild = pGroupNode->GetChildNode(m_vecDragonSoulNames[i])))
+		if (nullptr == (pChild = pGroupNode->GetChildNode(m_vecDragonSoulNames[i])))
 		{
 			sys_err ("In Group AdditionalApplys, %s group is not defined.", m_vecDragonSoulNames[i].c_str());
 			return false;
 		}
 		TVecApplys vecApplys;
 		
-		int n = pChild->GetRowCount();
+		int32_t n = pChild->GetRowCount();
 
-		for (int j = 0; j < n; j++)
+		for (int32_t j = 0; j < n; j++)
 		{
 			const CGroupNode::CGroupNodeRow* pRow;
 
 			pChild->GetRow(j, &pRow);
 
 			EApplyTypes at;
-			int av;
+			int32_t av;
 			float prob;
 			std::string stTypeName;
 			if (!pRow->GetValue("apply_type", stTypeName))
@@ -273,7 +273,7 @@ bool DragonSoulTable::ReadAdditionalApplys()
 bool DragonSoulTable::CheckApplyNumSettings ()
 {
 	// Group ApplyNumSettings Reading.
-	if (NULL == m_pApplyNumSettingNode)
+	if (nullptr == m_pApplyNumSettingNode)
 	{
 		sys_err ("dragon_soul_table.txt need ApplyNumSettings.");
 		return false;
@@ -282,9 +282,9 @@ bool DragonSoulTable::CheckApplyNumSettings ()
 	{
 		for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 		{
-			for (int j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
+			for (int32_t j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
 			{
-				int basis, add_min, add_max;
+				int32_t basis, add_min, add_max;
 				if (!GetApplyNumSettings(m_vecDragonSoulTypes[i], j, basis, add_min, add_max))
 				{
 					sys_err ("In %s group of ApplyNumSettings, values in Grade(%s) row is invalid.", 
@@ -301,7 +301,7 @@ bool DragonSoulTable::CheckApplyNumSettings ()
 bool DragonSoulTable::CheckWeightTables ()
 {
 	// Group WeightTables Reading.
-	if (NULL == m_pWeightTableNode)
+	if (nullptr == m_pWeightTableNode)
 	{
 		sys_err ("dragon_soul_table.txt need WeightTables.");
 		return false;
@@ -310,11 +310,11 @@ bool DragonSoulTable::CheckWeightTables ()
 	{
 		for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 		{
-			for (int j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
+			for (int32_t j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
 			{
-				for (int k = 0; k < DRAGON_SOUL_STEP_MAX; k++)
+				for (int32_t k = 0; k < DRAGON_SOUL_STEP_MAX; k++)
 				{
-					for (int l = 0; l < DRAGON_SOUL_STRENGTH_MAX; l++)
+					for (int32_t l = 0; l < DRAGON_SOUL_STRENGTH_MAX; l++)
 					{
 						float fWeight;
 						if (!GetWeight(m_vecDragonSoulTypes[i], j, k, l, fWeight))
@@ -333,7 +333,7 @@ bool DragonSoulTable::CheckWeightTables ()
 bool DragonSoulTable::CheckRefineGradeTables()
 {
 	// Group UpgradeTables Reading.
-	if (NULL == m_pRefineGradeTableNode)
+	if (nullptr == m_pRefineGradeTableNode)
 	{
 		sys_err ("dragon_soul_table.txt need RefineGradeTables.");
 		return false;
@@ -342,9 +342,9 @@ bool DragonSoulTable::CheckRefineGradeTables()
 	{
 		for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 		{
-			for (int j = 0; j < DRAGON_SOUL_GRADE_MAX - 1; j++)
+			for (int32_t j = 0; j < DRAGON_SOUL_GRADE_MAX - 1; j++)
 			{
-				int need_count, fee;
+				int32_t need_count, fee;
 				std::vector <float> vec_probs;
 				if (!GetRefineGradeValues(m_vecDragonSoulTypes[i], j, need_count, fee, vec_probs))
 				{
@@ -387,7 +387,7 @@ bool DragonSoulTable::CheckRefineGradeTables()
 bool DragonSoulTable::CheckRefineStepTables ()
 {
 	// Group ImproveTables Reading.
-	if (NULL == m_pRefineStrengthTableNode)
+	if (nullptr == m_pRefineStrengthTableNode)
 	{
 		sys_err ("dragon_soul_table.txt need RefineStepTables.");
 		return false;
@@ -396,9 +396,9 @@ bool DragonSoulTable::CheckRefineStepTables ()
 	{
 		for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 		{
-			for (int j = 0; j < DRAGON_SOUL_STEP_MAX - 1; j++)
+			for (int32_t j = 0; j < DRAGON_SOUL_STEP_MAX - 1; j++)
 			{
-				int need_count, fee;
+				int32_t need_count, fee;
 				std::vector <float> vec_probs;
 				if (!GetRefineStepValues(m_vecDragonSoulTypes[i], j, need_count, fee, vec_probs))
 				{
@@ -445,18 +445,18 @@ bool DragonSoulTable::CheckRefineStrengthTables()
 {
 	CGroupNode* pGroupNode = m_pRefineStrengthTableNode;
 	// Group RefineTables Reading.
-	if (NULL == pGroupNode)
+	if (nullptr == pGroupNode)
 	{
 		sys_err ("dragon_soul_table.txt need RefineStrengthTables.");
 		return false;
 	}
 	for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 	{
-		for (int j = MATERIAL_DS_REFINE_NORMAL; j <= MATERIAL_DS_REFINE_HOLLY; j++)
+		for (int32_t j = MATERIAL_DS_REFINE_NORMAL; j <= MATERIAL_DS_REFINE_HOLLY; j++)
 		{
-			int fee;
+			int32_t fee;
 			float prob;
-			for (int k = 0; k < DRAGON_SOUL_STRENGTH_MAX -1; k++)
+			for (int32_t k = 0; k < DRAGON_SOUL_STRENGTH_MAX -1; k++)
 			{
 				if (!GetRefineStrengthValues(m_vecDragonSoulTypes[i], j, k, fee, prob))
 				{
@@ -486,14 +486,14 @@ bool DragonSoulTable::CheckRefineStrengthTables()
 bool DragonSoulTable::CheckDragonHeartExtTables()
 {
 	// Group DragonHeartExtTables Reading.
-	if (NULL == m_pDragonHeartExtTableNode)
+	if (nullptr == m_pDragonHeartExtTableNode)
 	{
 		sys_err ("dragon_soul_table.txt need DragonHeartExtTables.");
 		return false;
 	}
 	for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 	{
-		for (int j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
+		for (int32_t j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
 		{
 			std::vector <float> vec_chargings;
 			std::vector <float> vec_probs;
@@ -537,17 +537,17 @@ bool DragonSoulTable::CheckDragonHeartExtTables()
 bool DragonSoulTable::CheckDragonSoulExtTables()
 {
 	// Group DragonSoulExtTables Reading.
-	if (NULL == m_pDragonSoulExtTableNode)
+	if (nullptr == m_pDragonSoulExtTableNode)
 	{
 		sys_err ("dragon_soul_table.txt need DragonSoulExtTables.");
 		return false;
 	}
 	for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 	{
-		for (int j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
+		for (int32_t j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
 		{
 			float prob;
-			DWORD by_product;
+			uint32_t by_product;
 			if (!GetDragonSoulExtValues(m_vecDragonSoulTypes[i], j, prob, by_product))
 			{
 				sys_err ("In %s group of DragonSoulExtTables, Grade(%s) row is invalid.", 
@@ -560,7 +560,7 @@ bool DragonSoulTable::CheckDragonSoulExtTables()
 					m_vecDragonSoulNames[i].c_str(), g_astGradeName[j].c_str());
 				return false;
 			}
-			if (0 != by_product && NULL == ITEM_MANAGER::instance().GetTable(by_product))
+			if (0 != by_product && nullptr == ITEM_MANAGER::instance().GetTable(by_product))
 			{
 				sys_err ("In %s group of DragonSoulExtTables, ByProduct(%d) of Grade %s is not exist.", 
 					m_vecDragonSoulNames[i].c_str(), by_product, g_astGradeName[j].c_str());
@@ -571,7 +571,7 @@ bool DragonSoulTable::CheckDragonSoulExtTables()
 	return true;
 }
 
-bool DragonSoulTable::GetBasicApplys(BYTE ds_type, OUT TVecApplys& vec_basic_applys)
+bool DragonSoulTable::GetBasicApplys(uint8_t ds_type, OUT TVecApplys& vec_basic_applys)
 {
 	TMapApplyGroup::iterator it = m_map_basic_applys_group.find(ds_type);
 	if (m_map_basic_applys_group.end() == it)
@@ -582,7 +582,7 @@ bool DragonSoulTable::GetBasicApplys(BYTE ds_type, OUT TVecApplys& vec_basic_app
 	return true;
 }
 
-bool DragonSoulTable::GetAdditionalApplys(BYTE ds_type, OUT TVecApplys& vec_additional_applys)
+bool DragonSoulTable::GetAdditionalApplys(uint8_t ds_type, OUT TVecApplys& vec_additional_applys)
 {
 	TMapApplyGroup::iterator it = m_map_additional_applys_group.find(ds_type);
 	if (m_map_additional_applys_group.end() == it)
@@ -593,7 +593,7 @@ bool DragonSoulTable::GetAdditionalApplys(BYTE ds_type, OUT TVecApplys& vec_addi
 	return true;
 }
 
-bool DragonSoulTable::GetApplyNumSettings(BYTE ds_type, BYTE grade_idx, OUT int& basis, OUT int& add_min, OUT int& add_max)
+bool DragonSoulTable::GetApplyNumSettings(uint8_t ds_type, uint8_t grade_idx, OUT int32_t& basis, OUT int32_t& add_min, OUT int32_t& add_max)
 {
 	if (grade_idx >= DRAGON_SOUL_GRADE_MAX)
 	{
@@ -630,7 +630,7 @@ bool DragonSoulTable::GetApplyNumSettings(BYTE ds_type, BYTE grade_idx, OUT int&
 	return true;
 }
 
-bool DragonSoulTable::GetWeight(BYTE ds_type, BYTE grade_idx, BYTE step_index, BYTE strength_idx, OUT float& fWeight)
+bool DragonSoulTable::GetWeight(uint8_t ds_type, uint8_t grade_idx, uint8_t step_index, uint8_t strength_idx, OUT float& fWeight)
 {
 	if (grade_idx >= DRAGON_SOUL_GRADE_MAX || step_index >= DRAGON_SOUL_STEP_MAX || strength_idx >= DRAGON_SOUL_STRENGTH_MAX)
 	{
@@ -647,7 +647,7 @@ bool DragonSoulTable::GetWeight(BYTE ds_type, BYTE grade_idx, BYTE step_index, B
 	}
 
 	CGroupNode* pDragonSoulGroup = m_pWeightTableNode->GetChildNode(stDragonSoulName);
-	if (NULL != pDragonSoulGroup)
+	if (nullptr != pDragonSoulGroup)
 	{
 		if (pDragonSoulGroup->GetGroupValue(g_astGradeName[grade_idx], g_astStepName[step_index], strength_idx, fWeight))
 		{
@@ -656,7 +656,7 @@ bool DragonSoulTable::GetWeight(BYTE ds_type, BYTE grade_idx, BYTE step_index, B
 	}
 	// default group을 살펴봄.
 	pDragonSoulGroup = m_pWeightTableNode->GetChildNode("default");
-	if (NULL != pDragonSoulGroup)
+	if (nullptr != pDragonSoulGroup)
 	{
 		if (!pDragonSoulGroup->GetGroupValue(g_astGradeName[grade_idx], g_astStepName[step_index], strength_idx, fWeight))
 		{
@@ -670,7 +670,7 @@ bool DragonSoulTable::GetWeight(BYTE ds_type, BYTE grade_idx, BYTE step_index, B
 	return false;
 }
 
-bool DragonSoulTable::GetRefineGradeValues(BYTE ds_type, BYTE grade_idx, OUT int& need_count, OUT int& fee, OUT std::vector<float>& vec_probs)
+bool DragonSoulTable::GetRefineGradeValues(uint8_t ds_type, uint8_t grade_idx, OUT int32_t& need_count, OUT int32_t& fee, OUT std::vector<float>& vec_probs)
 {
 	if (grade_idx >= DRAGON_SOUL_GRADE_MAX -1)
 	{
@@ -706,7 +706,7 @@ bool DragonSoulTable::GetRefineGradeValues(BYTE ds_type, BYTE grade_idx, OUT int
 	}
 
 	vec_probs.resize(DRAGON_SOUL_GRADE_MAX);
-	for (int i = 0; i < DRAGON_SOUL_GRADE_MAX; i++)
+	for (int32_t i = 0; i < DRAGON_SOUL_GRADE_MAX; i++)
 	{
 		if (!pRow->GetValue(g_astGradeName[i], vec_probs[i]))
 		{
@@ -718,7 +718,7 @@ bool DragonSoulTable::GetRefineGradeValues(BYTE ds_type, BYTE grade_idx, OUT int
 	return true;
 }
 
-bool DragonSoulTable::GetRefineStepValues(BYTE ds_type, BYTE step_idx, OUT int& need_count, OUT int& fee, OUT std::vector<float>& vec_probs)
+bool DragonSoulTable::GetRefineStepValues(uint8_t ds_type, uint8_t step_idx, OUT int32_t& need_count, OUT int32_t& fee, OUT std::vector<float>& vec_probs)
 {
 	if (step_idx >= DRAGON_SOUL_STEP_MAX - 1)
 	{
@@ -754,7 +754,7 @@ bool DragonSoulTable::GetRefineStepValues(BYTE ds_type, BYTE step_idx, OUT int& 
 	}
 
 	vec_probs.resize(DRAGON_SOUL_STEP_MAX);
-	for (int i = 0; i < DRAGON_SOUL_STEP_MAX; i++)
+	for (int32_t i = 0; i < DRAGON_SOUL_STEP_MAX; i++)
 	{
 		if (!pRow->GetValue(g_astStepName[i], vec_probs[i]))
 		{
@@ -766,7 +766,7 @@ bool DragonSoulTable::GetRefineStepValues(BYTE ds_type, BYTE step_idx, OUT int& 
 	return true;
 }
 
-bool DragonSoulTable::GetRefineStrengthValues(BYTE ds_type, BYTE material_type, BYTE strength_idx, OUT int& fee, OUT float& prob)
+bool DragonSoulTable::GetRefineStrengthValues(uint8_t ds_type, uint8_t material_type, uint8_t strength_idx, OUT int32_t& fee, OUT float& prob)
 {
 	if (material_type < MATERIAL_DS_REFINE_NORMAL || material_type > MATERIAL_DS_REFINE_HOLLY)
 	{
@@ -800,7 +800,7 @@ bool DragonSoulTable::GetRefineStrengthValues(BYTE ds_type, BYTE material_type, 
 	return true;
 }
 
-bool DragonSoulTable::GetDragonHeartExtValues(BYTE ds_type, BYTE grade_idx, OUT std::vector<float>& vec_chargings, OUT std::vector<float>& vec_probs)
+bool DragonSoulTable::GetDragonHeartExtValues(uint8_t ds_type, uint8_t grade_idx, OUT std::vector<float>& vec_chargings, OUT std::vector<float>& vec_probs)
 {
 	if (grade_idx >= DRAGON_SOUL_GRADE_MAX)
 	{
@@ -821,9 +821,9 @@ bool DragonSoulTable::GetDragonHeartExtValues(BYTE ds_type, BYTE grade_idx, OUT 
 		sys_err ("Invalid CHARGING row. DragonSoulGroup(%s)", stDragonSoulName.c_str());
 		return false;
 	}
-	int n = pRow->GetSize();
+	int32_t n = pRow->GetSize();
 	vec_chargings.resize(n);
-	for (int i = 0; i < n; i++)
+	for (int32_t i = 0; i < n; i++)
 	{
 		if (!pRow->GetValue(i, vec_chargings[i]))
 		{
@@ -838,7 +838,7 @@ bool DragonSoulTable::GetDragonHeartExtValues(BYTE ds_type, BYTE grade_idx, OUT 
 		return false;
 	}
 
-	int m = pRow->GetSize();
+	int32_t m = pRow->GetSize();
 	if (n != m)
 	{
 		sys_err ("Invalid row size(%d). It must be same CHARGING row size(%d). DragonSoulGroup(%s) Grade(%s)", m, n, 
@@ -846,7 +846,7 @@ bool DragonSoulTable::GetDragonHeartExtValues(BYTE ds_type, BYTE grade_idx, OUT 
 		return false;
 	}
 	vec_probs.resize(m);
-	for (int i = 0; i < m; i++)
+	for (int32_t i = 0; i < m; i++)
 	{
 		if (!pRow->GetValue(i, vec_probs[i]))
 		{
@@ -858,7 +858,7 @@ bool DragonSoulTable::GetDragonHeartExtValues(BYTE ds_type, BYTE grade_idx, OUT 
 	return true;
 }
 
-bool DragonSoulTable::GetDragonSoulExtValues(BYTE ds_type, BYTE grade_idx, OUT float& prob, OUT DWORD& by_product)
+bool DragonSoulTable::GetDragonSoulExtValues(uint8_t ds_type, uint8_t grade_idx, OUT float& prob, OUT uint32_t& by_product)
 {
 	if (grade_idx >= DRAGON_SOUL_GRADE_MAX)
 	{
@@ -893,7 +893,7 @@ bool DragonSoulTable::GetDragonSoulExtValues(BYTE ds_type, BYTE grade_idx, OUT f
 
 DragonSoulTable::DragonSoulTable()
 {
-	m_pLoader = NULL;
+	m_pLoader = nullptr;
 }
 DragonSoulTable::~DragonSoulTable ()
 {

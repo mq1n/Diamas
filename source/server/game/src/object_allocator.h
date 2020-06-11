@@ -64,7 +64,7 @@ public:
 	// Deallocates a memory block.
 	static void Free(void* p) 
 	{
-		if ( p == NULL )
+		if ( p == nullptr )
 		{
 			return;
 		}
@@ -137,7 +137,7 @@ public:
 	{
 		void* p = m_allocator.Alloc( size );
 #ifdef DEBUG_ALLOC
-		if (p != NULL) 
+		if (p != nullptr) 
 		{
 			size_t age = DebugAllocator::MarkAcquired(p, f, l, "new_obj");
 			*(reinterpret_cast<size_t*>(p) - 1) = age;

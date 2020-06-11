@@ -15,7 +15,7 @@ void CActorInstance::MotionEventProcess()
 	if (!m_pkCurRaceMotionData)
 		return;
 
-	for (DWORD i = 0; i < m_pkCurRaceMotionData->GetMotionEventDataCount(); ++i)
+	for (uint32_t i = 0; i < m_pkCurRaceMotionData->GetMotionEventDataCount(); ++i)
 	{
 		const CRaceMotionData::TMotionEventData * c_pData;
 		if (!m_pkCurRaceMotionData->GetMotionEventDataPointer(i, &c_pData))
@@ -35,7 +35,7 @@ void CActorInstance::SoundEventProcess(BOOL bCheckFrequency)
 	rkSndMgr.UpdateSoundInstance(m_x, m_y, m_z, m_kCurMotNode.dwcurFrame, c_pkVct_kSndInst, bCheckFrequency);
 }
 
-void CActorInstance::MotionEventProcess(DWORD dwcurFrame, int iIndex, const CRaceMotionData::TMotionEventData * c_pData)
+void CActorInstance::MotionEventProcess(uint32_t dwcurFrame, int32_t iIndex, const CRaceMotionData::TMotionEventData * c_pData)
 {
 	if (c_pData->dwFrame != dwcurFrame)
 		return;
@@ -122,7 +122,7 @@ void CActorInstance::ProcessMotionEventEffectEvent(const CRaceMotionData::TMotio
 
 	if (c_pEffectData->isIndependent)
 	{
-		int iIndex = CEffectManager::Instance().CreateEffect(c_pEffectData->dwEffectIndex, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+		int32_t iIndex = CEffectManager::Instance().CreateEffect(c_pEffectData->dwEffectIndex, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 		D3DXMATRIX matLocalPosition;
 		D3DXMatrixTranslation(&matLocalPosition, c_pEffectData->v3EffectPosition.x, c_pEffectData->v3EffectPosition.y, c_pEffectData->v3EffectPosition.z);
@@ -147,8 +147,8 @@ void CActorInstance::ProcessMotionEventEffectEvent(const CRaceMotionData::TMotio
 		}
 		else
 		{
-			int iBoneIndex;
-			DWORD dwPartIndex = 0;
+			int32_t iBoneIndex;
+			uint32_t dwPartIndex = 0;
 			if (FindBoneIndex(dwPartIndex, c_pEffectData->strAttachingBoneName.c_str(), &iBoneIndex))
 			{
 				D3DXMATRIX * pBoneMat;
@@ -164,7 +164,7 @@ void CActorInstance::ProcessMotionEventEffectEvent(const CRaceMotionData::TMotio
 				matWorld *= m_worldMatrix;
 				/////////////////////////////////////////////////////////////////////
 
-				int iIndex = CEffectManager::Instance().CreateEffect(c_pEffectData->dwEffectIndex,
+				int32_t iIndex = CEffectManager::Instance().CreateEffect(c_pEffectData->dwEffectIndex,
 														c_pEffectData->v3EffectPosition,
 														D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 				CEffectManager::Instance().SelectEffectInstance(iIndex);
@@ -174,7 +174,7 @@ void CActorInstance::ProcessMotionEventEffectEvent(const CRaceMotionData::TMotio
 	}
 	else
 	{
-		AttachEffectByID(0, NULL, c_pEffectData->dwEffectIndex, &c_pEffectData->v3EffectPosition);
+		AttachEffectByID(0, nullptr, c_pEffectData->dwEffectIndex, &c_pEffectData->v3EffectPosition);
 	}
 }
 
@@ -207,7 +207,7 @@ void CActorInstance::ProcessMotionEventEffectToTargetEvent(const CRaceMotionData
 			D3DXVECTOR3 v3Position(	c_pEffectToTargetData->v3EffectPosition.x,
 									c_pEffectToTargetData->v3EffectPosition.y,
 									c_pEffectToTargetData->v3EffectPosition.z);
-			pTargetInstance->AttachEffectByID(0, NULL, c_pEffectToTargetData->dwEffectIndex, &v3Position);
+			pTargetInstance->AttachEffectByID(0, nullptr, c_pEffectToTargetData->dwEffectIndex, &v3Position);
 		}
 		else
 		{
@@ -220,7 +220,7 @@ void CActorInstance::ProcessMotionEventEffectToTargetEvent(const CRaceMotionData
 	}
 }
 
-void CActorInstance::ProcessMotionEventSpecialAttacking(int iMotionEventIndex, const CRaceMotionData::TMotionEventData * c_pData)
+void CActorInstance::ProcessMotionEventSpecialAttacking(int32_t iMotionEventIndex, const CRaceMotionData::TMotionEventData * c_pData)
 {
 	if (CRaceMotionData::MOTION_EVENT_TYPE_SPECIAL_ATTACKING != c_pData->iType)
 		return;
@@ -237,7 +237,7 @@ void CActorInstance::ProcessMotionEventSpecialAttacking(int iMotionEventIndex, c
 
 	m_kSplashArea.SphereInstanceVector.clear();
 	m_kSplashArea.SphereInstanceVector.resize(c_pAttackingData->CollisionData.SphereDataVector.size());
-	for (DWORD i = 0; i < c_pAttackingData->CollisionData.SphereDataVector.size(); ++i)
+	for (uint32_t i = 0; i < c_pAttackingData->CollisionData.SphereDataVector.size(); ++i)
 	{
 		const TSphereData & c_rSphereData = c_pAttackingData->CollisionData.SphereDataVector[i].GetAttribute();
 		CDynamicSphereInstance & rSphereInstance = m_kSplashArea.SphereInstanceVector[i];
@@ -280,8 +280,8 @@ void CActorInstance::ProcessMotionEventFly(const CRaceMotionData::TMotionEventDa
 		if (c_pFlyData->isAttaching)
 		{
 			D3DXMATRIX * pBoneMat;
-			int iBoneIndex;
-			DWORD dwPartIndex = 0;
+			int32_t iBoneIndex;
+			uint32_t dwPartIndex = 0;
 
 			if (FindBoneIndex(dwPartIndex, c_pFlyData->strAttachingBoneName.c_str(), &iBoneIndex))
 			if (GetBoneMatrix(dwPartIndex,iBoneIndex,&pBoneMat))
@@ -344,7 +344,7 @@ void CActorInstance::ProcessMotionEventWarp(const CRaceMotionData::TMotionEventD
 }
 
 #ifdef ENABLE_WOLFMAN_CHARACTER
-void CActorInstance::ProcessMotionEventUnk11(DWORD dwcurFrame, int iIndex, const CRaceMotionData::TMotionEventData * c_pData) // AniSpeed ON
+void CActorInstance::ProcessMotionEventUnk11(uint32_t dwcurFrame, int32_t iIndex, const CRaceMotionData::TMotionEventData * c_pData) // AniSpeed ON
 {
 	if (CRaceMotionData::MOTION_EVENT_TYPE_UNK11 != c_pData->iType)
 		return;
@@ -378,7 +378,7 @@ void CActorInstance::ProcessMotionEventUnk11(DWORD dwcurFrame, int iIndex, const
 	return;
 }
 
-void CActorInstance::ProcessMotionEventUnk12(DWORD dwcurFrame, int iIndex, const CRaceMotionData::TMotionEventData * c_pData) // AniSpeed OFF
+void CActorInstance::ProcessMotionEventUnk12(uint32_t dwcurFrame, int32_t iIndex, const CRaceMotionData::TMotionEventData * c_pData) // AniSpeed OFF
 {
 	if (CRaceMotionData::MOTION_EVENT_TYPE_UNK12 != c_pData->iType)
 		return;

@@ -10,10 +10,10 @@
 typedef struct _CCI
 {
 	char	szName[CHARACTER_NAME_MAX_LEN + 1];
-	DWORD	dwPID;
-	BYTE	bEmpire;
-	long	lMapIndex;
-	BYTE	bChannel;
+	uint32_t	dwPID;
+	uint8_t	bEmpire;
+	int32_t	lMapIndex;
+	uint8_t	bChannel;
 
 	LPDESC	pkDesc;
 } CCI;
@@ -38,32 +38,32 @@ class P2P_MANAGER : public singleton<P2P_MANAGER>
 
 		void			Boot(LPDESC d);	// p2p 처리에 필요한 정보를 보내준다. (전 캐릭터의 로그인 정보 등)
 
-		void			Send(const void * c_pvData, int iSize, LPDESC except = NULL);
+		void			Send(const void * c_pvData, int32_t iSize, LPDESC except = nullptr);
 
 		void			Login(LPDESC d, const TPacketGGLogin * p);
 		void			Logout(const char * c_pszName);
 
 		CCI *			Find(const char * c_pszName);
-		CCI *			FindByPID(DWORD pid);
+		CCI *			FindByPID(uint32_t pid);
 
-		int				GetCount();
-		int				GetEmpireUserCount(int idx);
-		int				GetDescCount();
+		int32_t				GetCount();
+		int32_t				GetEmpireUserCount(int32_t idx);
+		int32_t				GetDescCount();
 		void			GetP2PHostNames(std::string& hostNames);
 
 	private:
 		void			Logout(CCI * pkCCI);
 
 		CInputProcessor *	m_pkInputProcessor;
-		int			m_iHandleCount;
+		int32_t			m_iHandleCount;
 
 		typedef std::unordered_map<std::string, CCI *, stringhash> TCCIMap;
-		typedef std::unordered_map<DWORD, CCI*> TPIDCCIMap;
+		typedef std::unordered_map<uint32_t, CCI*> TPIDCCIMap;
 
 		std::unordered_set<LPDESC> m_set_pkPeers;
 		TCCIMap			m_map_pkCCI;
 		TPIDCCIMap		m_map_dwPID_pkCCI;
-		int			m_aiEmpireUserCount[EMPIRE_MAX_NUM];
+		int32_t			m_aiEmpireUserCount[EMPIRE_MAX_NUM];
 };
 
 #endif /* P2P_MANAGER_H_ */

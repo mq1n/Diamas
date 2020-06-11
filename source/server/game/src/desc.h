@@ -24,7 +24,7 @@ enum EDescType
 class CLoginKey
 {
 	public:
-		CLoginKey(DWORD dwKey, LPDESC pkDesc) : m_dwKey(dwKey), m_pkDesc(pkDesc)
+		CLoginKey(uint32_t dwKey, LPDESC pkDesc) : m_dwKey(dwKey), m_pkDesc(pkDesc)
 		{
 			m_dwExpireTime = 0;
 		}
@@ -32,16 +32,16 @@ class CLoginKey
 		void Expire()
 		{
 			m_dwExpireTime = get_dword_time();
-			m_pkDesc = NULL;
+			m_pkDesc = nullptr;
 		}
 
-		operator DWORD() const
+		operator uint32_t() const
 		{
 			return m_dwKey;
 		}
 
-		DWORD   m_dwKey;
-		DWORD   m_dwExpireTime;
+		uint32_t   m_dwKey;
+		uint32_t   m_dwExpireTime;
 		LPDESC  m_pkDesc;
 };
 
@@ -49,8 +49,8 @@ class CLoginKey
 // sequence 버그 찾기용 데이타
 struct seq_t
 {
-	BYTE	hdr;
-	BYTE	seq;
+	uint8_t	hdr;
+	uint8_t	seq;
 };
 typedef std::vector<seq_t>	seq_vector_t;
 // sequence 버그 찾기용 데이타
@@ -73,33 +73,33 @@ class DESC
 		DESC();
 		virtual ~DESC();
 
-		virtual BYTE		GetType() { return DESC_TYPE_ACCEPTOR; }
+		virtual uint8_t		GetType() { return DESC_TYPE_ACCEPTOR; }
 		virtual void		Destroy();
-		virtual void		SetPhase(int _phase);
+		virtual void		SetPhase(int32_t _phase);
 
 		void			FlushOutput();
 
-		bool			Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSockAddr, DWORD _handle, DWORD _handshake);
+		bool			Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSockAddr, uint32_t _handle, uint32_t _handshake);
 
 		socket_t		GetSocket() const	{ return m_sock; }
 		const char *	GetHostName()		{ return m_stHost.c_str(); }
-		WORD			GetPort()	{ return m_wPort; }
+		uint16_t			GetPort()	{ return m_wPort; }
 
-		void			SetP2P(const char * h, WORD w, BYTE b) { m_stP2PHost = h; m_wP2PPort = w; m_bP2PChannel = b; }
+		void			SetP2P(const char * h, uint16_t w, uint8_t b) { m_stP2PHost = h; m_wP2PPort = w; m_bP2PChannel = b; }
 		const char *	GetP2PHost()		{ return m_stP2PHost.c_str();	}
-		WORD			GetP2PPort() const		{ return m_wP2PPort; }
-		BYTE			GetP2PChannel() const	{ return m_bP2PChannel;	}
+		uint16_t			GetP2PPort() const		{ return m_wP2PPort; }
+		uint8_t			GetP2PChannel() const	{ return m_bP2PChannel;	}
 
-		void			BufferedPacket(const void * c_pvData, int iSize);
-		void			Packet(const void * c_pvData, int iSize);
-		void			LargePacket(const void * c_pvData, int iSize);
+		void			BufferedPacket(const void * c_pvData, int32_t iSize);
+		void			Packet(const void * c_pvData, int32_t iSize);
+		void			LargePacket(const void * c_pvData, int32_t iSize);
 
-		int			ProcessInput();		// returns -1 if error
-		int			ProcessOutput();	// returns -1 if error
+		int32_t			ProcessInput();		// returns -1 if error
+		int32_t			ProcessOutput();	// returns -1 if error
 
 		CInputProcessor	*	GetInputProcessor()	{ return m_pInputProcessor; }
 
-		DWORD			GetHandle() const	{ return m_dwHandle; }
+		uint32_t			GetHandle() const	{ return m_dwHandle; }
 		LPBUFFER		GetOutputBuffer()	{ return m_lpOutputBuffer; }
 
 		void			BindAccountTable(TAccountTable * pTable);
@@ -108,20 +108,20 @@ class DESC
 		void			BindCharacter(LPCHARACTER ch);
 		LPCHARACTER		GetCharacter()		{ return m_lpCharacter; }
 
-		bool			IsPhase(int phase) const	{ return m_iPhase == phase ? true : false; }
+		bool			IsPhase(int32_t phase) const	{ return m_iPhase == phase ? true : false; }
 
 		const struct sockaddr_in & GetAddr()		{ return m_SockAddr;	}
 
 		void			Log(const char * format, ...);
 
 		// 핸드쉐이크 (시간 동기화)
-		void			StartHandshake(DWORD _dw);
-		void			SendHandshake(DWORD dwCurTime, long lNewDelta);
-		bool			HandshakeProcess(DWORD dwTime, long lDelta, bool bInfiniteRetry=false);
+		void			StartHandshake(uint32_t _dw);
+		void			SendHandshake(uint32_t dwCurTime, int32_t lNewDelta);
+		bool			HandshakeProcess(uint32_t dwTime, int32_t lDelta, bool bInfiniteRetry=false);
 		bool			IsHandshaking();
 
-		DWORD			GetHandshake() const	{ return m_dwHandshake; }
-		DWORD			GetClientTime();
+		uint32_t			GetHandshake() const	{ return m_dwHandshake; }
+		uint32_t			GetClientTime();
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 		void SendKeyAgreement();
@@ -136,11 +136,11 @@ class DESC
 #endif
 
 		// 제국
-		BYTE			GetEmpire();
+		uint8_t			GetEmpire();
 
 		// for p2p
 		void			SetRelay(const char * c_pszName);
-		bool			DelayedDisconnect(int iSec);
+		bool			DelayedDisconnect(int32_t iSec);
 		void			DisconnectOfSameLogin();
 
 		void			SetAdminMode();
@@ -150,16 +150,16 @@ class DESC
 		bool			IsPong();
 
 #ifdef ENABLE_SEQUENCE_SYSTEM
-		BYTE			GetSequence();
+		uint8_t			GetSequence();
 		void			SetNextSequence();
 #endif
 
 		void			SendLoginSuccessPacket();
-		//void			SendServerStatePacket(int nIndex);
+		//void			SendServerStatePacket(int32_t nIndex);
 
-		void			SetLoginKey(DWORD dwKey);
+		void			SetLoginKey(uint32_t dwKey);
 		void			SetLoginKey(CLoginKey * pkKey);
-		DWORD			GetLoginKey();
+		uint32_t			GetLoginKey();
 
 		bool			isChannelStatusRequested() const { return m_bChannelStatusRequested; }
 		void			SetChannelStatusRequested(bool bChannelStatusRequested) { m_bChannelStatusRequested = bChannelStatusRequested; }
@@ -178,20 +178,20 @@ class DESC
 
 		LPFDWATCH		m_lpFdw;
 		socket_t		m_sock;
-		int				m_iPhase;
-		DWORD			m_dwHandle;
+		int32_t				m_iPhase;
+		uint32_t			m_dwHandle;
 
 		std::string		m_stHost;
-		WORD			m_wPort;
+		uint16_t			m_wPort;
 		time_t			m_LastTryToConnectTime;
 
 		LPBUFFER		m_lpInputBuffer;
-		int				m_iMinInputBufferLen;
+		int32_t				m_iMinInputBufferLen;
 	
-		DWORD			m_dwHandshake;
-		DWORD			m_dwHandshakeSentTime;
-		int				m_iHandshakeRetry;
-		DWORD			m_dwClientTime;
+		uint32_t			m_dwHandshake;
+		uint32_t			m_dwHandshakeSentTime;
+		int32_t				m_iHandshakeRetry;
+		uint32_t			m_dwClientTime;
 		bool			m_bHandshaking;
 
 		LPBUFFER		m_lpBufferedOutputBuffer;
@@ -207,23 +207,23 @@ class DESC
 		std::string		m_stRelayName;
 
 		std::string		m_stP2PHost;
-		WORD			m_wP2PPort;
-		BYTE			m_bP2PChannel;
+		uint16_t			m_wP2PPort;
+		uint8_t			m_bP2PChannel;
 
 		bool			m_bAdminMode; // Handshake 에서 어드민 명령을 쓸수있나?
 		bool			m_bPong;
 
 #ifdef ENABLE_SEQUENCE_SYSTEM
-		int			m_iCurrentSequence;
+		int32_t			m_iCurrentSequence;
 #endif
 
 		CLoginKey *		m_pkLoginKey;
-		DWORD			m_dwLoginKey;
+		uint32_t			m_dwLoginKey;
 
 		std::string		m_Login;
-		int				m_outtime;
-		int				m_playtime;
-		int				m_offtime;
+		int32_t				m_outtime;
+		int32_t				m_playtime;
+		int32_t				m_offtime;
 
 		bool			m_bDestroyed;
 		bool			m_bChannelStatusRequested;
@@ -245,17 +245,17 @@ class DESC
 		void SetLogin( const char * login ) { m_Login = login; }
 		const std::string& GetLogin() { return m_Login; }
 
-		void SetOutTime( int outtime ) { m_outtime = outtime; }
-		void SetOffTime( int offtime ) { m_offtime = offtime; }
-		void SetPlayTime( int playtime ) { m_playtime = playtime; }
+		void SetOutTime( int32_t outtime ) { m_outtime = outtime; }
+		void SetOffTime( int32_t offtime ) { m_offtime = offtime; }
+		void SetPlayTime( int32_t playtime ) { m_playtime = playtime; }
 
-		void RawPacket(const void * c_pvData, int iSize);
-		void ChatPacket(BYTE type, const char * format, ...);
+		void RawPacket(const void * c_pvData, int32_t iSize);
+		void ChatPacket(uint8_t type, const char * format, ...);
 
 #ifdef ENABLE_SEQUENCE_SYSTEM
 	public:
 		seq_vector_t	m_seq_vector;
-		void			push_seq (BYTE hdr, BYTE seq);
+		void			push_seq (uint8_t hdr, uint8_t seq);
 #endif
 		
 };

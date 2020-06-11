@@ -42,33 +42,33 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 
 		void			CopySettingFromGlobalSetting();
 
-		WORD			WE_GetHeightMapValue(short sX, short sY);
+		uint16_t			WE_GetHeightMapValue(int16_t sX, int16_t sY);
 
 		bool			IsReady()						{ return m_bReady; }
 		void			SetReady(bool bReady = true)	{ m_bReady = bReady; }
 		
 		// Height Map
-		WORD *			GetHeightMap()			{ return m_awRawHeightMap; }
-		float			GetHeight(int x, int y);
+		uint16_t *			GetHeightMap()			{ return m_awRawHeightMap; }
+		float			GetHeight(int32_t x, int32_t y);
 
 		// Normal Map
-		bool			GetNormal(int ix, int iy, D3DXVECTOR3 * pv3Normal);
+		bool			GetNormal(int32_t ix, int32_t iy, D3DXVECTOR3 * pv3Normal);
 
 		// TileMap
-		BYTE *			RAW_GetTileMap()		{ return m_abyTileMap; }
+		uint8_t *			RAW_GetTileMap()		{ return m_abyTileMap; }
 		char *			GetNormalMap()			{ return m_acNormalMap; }
 
 		// Attr
 		bool			LoadAttrMap(const char * c_pszFileName);
-		BYTE *			GetAttrMap()			{ return m_abyAttrMap; }
-		BYTE 			GetAttr(WORD wCoordX, WORD wCoordY);
-		bool			isAttrOn(WORD wCoordX, WORD wCoordY, BYTE byAttrFlag);
+		uint8_t *			GetAttrMap()			{ return m_abyAttrMap; }
+		uint8_t 			GetAttr(uint16_t wCoordX, uint16_t wCoordY);
+		bool			isAttrOn(uint16_t wCoordX, uint16_t wCoordY, uint8_t byAttrFlag);
 
 		//////////////////////////////////////////////////////////////////////////
 		// Water
-		BYTE *			GetWaterMap()	{ return m_abyWaterMap; }
-		void			GetWaterHeight(BYTE byWaterNum, long * plWaterHeight);
-		bool			GetWaterHeight(WORD wCoordX, WORD wCoordY, long * plWaterHeight);
+		uint8_t *			GetWaterMap()	{ return m_abyWaterMap; }
+		void			GetWaterHeight(uint8_t byWaterNum, int32_t * plWaterHeight);
+		bool			GetWaterHeight(uint16_t wCoordX, uint16_t wCoordY, int32_t * plWaterHeight);
 
 		// Shadow Texture
 		void				LoadShadowTexture(const char * c_pszFileName);
@@ -82,18 +82,18 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 
 		// Marked Area
 		BOOL						IsMarked() { return m_bMarked; }
-		void						AllocateMarkedSplats(BYTE * pbyAlphaMap);
+		void						AllocateMarkedSplats(uint8_t * pbyAlphaMap);
 		void						DeallocateMarkedSplats();
 		TTerrainSplatPatch &		GetMarkedSplatPatch() { return m_MarkedSplatPatch; }
 
 		// Coordinate
-		void			GetCoordinate(WORD * usCoordX, WORD * usCoordY)
+		void			GetCoordinate(uint16_t * usCoordX, uint16_t * usCoordY)
 		{
 			*usCoordX = m_wX;
 			*usCoordY = m_wY;
 		}
 
-		void			SetCoordinate(WORD wCoordX, WORD wCoordY);
+		void			SetCoordinate(uint16_t wCoordX, uint16_t wCoordY);
 
 		std::string &	GetName() { return m_strName; }
 		void			SetName(const std::string c_strName) { m_strName = c_strName; }
@@ -107,17 +107,17 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 		void	RAW_DeallocateSplats(bool bBGLoading = false);
 		virtual void RAW_CountTiles();
 
-		LPDIRECT3DTEXTURE8 AddTexture32(BYTE byImageNum, BYTE * pbyImage, long lTextureWidth, long lTextureHeight);
-		void PutImage32(BYTE * pbySrc, BYTE * pbyDst, long src_pitch, long dst_pitch, long lTextureWidth, long lTextureHeight, bool bResize = false);
-		void PutImage16(BYTE * pbySrc, BYTE * pbyDst, long src_pitch, long dst_pitch, long lTextureWidth, long lTextureHeight, bool bResize = false);
+		LPDIRECT3DTEXTURE8 AddTexture32(uint8_t byImageNum, uint8_t * pbyImage, int32_t lTextureWidth, int32_t lTextureHeight);
+		void PutImage32(uint8_t * pbySrc, uint8_t * pbyDst, int32_t src_pitch, int32_t dst_pitch, int32_t lTextureWidth, int32_t lTextureHeight, bool bResize = false);
+		void PutImage16(uint8_t * pbySrc, uint8_t * pbyDst, int32_t src_pitch, int32_t dst_pitch, int32_t lTextureWidth, int32_t lTextureHeight, bool bResize = false);
 
 	protected:
-		void CalculateNormal(long x, long y);
+		void CalculateNormal(int32_t x, int32_t y);
 
 	protected:
 		std::string				m_strName;
-		WORD					m_wX;
-		WORD					m_wY;
+		uint16_t					m_wX;
+		uint16_t					m_wY;
 
 	protected:
 		bool					m_bReady;
@@ -135,8 +135,8 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 		// Picking
 		D3DXVECTOR3				m_v3Pick;
 
-		DWORD					m_dwNumTexturesShow;
-		std::vector<DWORD>		m_VectorNumShowTexture;
+		uint32_t					m_dwNumTexturesShow;
+		std::vector<uint32_t>		m_VectorNumShowTexture;
 
 		CTerrainPatch			m_TerrainPatchList[PATCH_XCOUNT * PATCH_YCOUNT];
 
@@ -145,10 +145,10 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 		LPDIRECT3DTEXTURE8		m_lpMarkedTexture;
 
 	public:
-		CTerrainPatch *	GetTerrainPatchPtr(BYTE byPatchNumX, BYTE byPatchNumY);
+		CTerrainPatch *	GetTerrainPatchPtr(uint8_t byPatchNumX, uint8_t byPatchNumY);
 
 	protected:
-		void _CalculateTerrainPatch(BYTE byPatchNumX, BYTE byPatchNumY);
+		void _CalculateTerrainPatch(uint8_t byPatchNumX, uint8_t byPatchNumY);
 
 	public:
 		static void DestroySystem();

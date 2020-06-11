@@ -57,19 +57,19 @@ float CInstanceBase::GetAdvancingRotation()
 	return m_GraphicThingInstance.GetAdvancingRotation();
 }
 
-void CInstanceBase::SetDirection(int dir)
+void CInstanceBase::SetDirection(int32_t dir)
 {
 	float fDegree = GetDegreeFromDirection(dir);
 	SetRotation(fDegree);
 	SetAdvancingRotation(fDegree);
 }
 
-void CInstanceBase::BlendDirection(int dir, float blendTime)
+void CInstanceBase::BlendDirection(int32_t dir, float blendTime)
 {
 	m_GraphicThingInstance.BlendRotation(GetDegreeFromDirection(dir), blendTime);
 }
 
-float CInstanceBase::GetDegreeFromDirection(int dir)
+float CInstanceBase::GetDegreeFromDirection(int32_t dir)
 {
 	if (dir < 0)
 		return 0.0f;

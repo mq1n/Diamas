@@ -11,12 +11,12 @@ void CBlockTexture::SetClipRect(const RECT & c_rRect)
 	m_clipRect = c_rRect;
 }
 
-void CBlockTexture::Render(int ix, int iy)
+void CBlockTexture::Render(int32_t ix, int32_t iy)
 {
-	int isx = ix + m_rect.left;
-	int isy = iy + m_rect.top;
-	int iex = ix + m_rect.left + m_dwWidth;
-	int iey = iy + m_rect.top + m_dwHeight;
+	int32_t isx = ix + m_rect.left;
+	int32_t isy = iy + m_rect.top;
+	int32_t iex = ix + m_rect.left + m_dwWidth;
+	int32_t iey = iy + m_rect.top + m_dwHeight;
 
 	float su = 0.0f;
 	float sv = 0.0f;
@@ -37,26 +37,26 @@ void CBlockTexture::Render(int ix, int iy)
 
 		if (m_clipRect.left > isx)
 		{
-			int idx = m_clipRect.left - isx;
+			int32_t idx = m_clipRect.left - isx;
 			isx += idx;
 			su += float(idx) / float(m_dwWidth);
 		}
 		if (iex > m_clipRect.right)
 		{
-			int idx = iex - m_clipRect.right;
+			int32_t idx = iex - m_clipRect.right;
 			iex -= idx;
 			eu -= float(idx) / float(m_dwWidth);
 		}
 
 		if (m_clipRect.top > isy)
 		{
-			int idy = m_clipRect.top - isy;
+			int32_t idy = m_clipRect.top - isy;
 			isy += idy;
 			sv += float(idy) / float(m_dwHeight);
 		}
 		if (iey > m_clipRect.bottom)
 		{
-			int idy = iey - m_clipRect.bottom;
+			int32_t idy = iey - m_clipRect.bottom;
 			iey -= idy;
 			ev -= float(idy) / float(m_dwHeight);
 		}
@@ -92,7 +92,7 @@ void CBlockTexture::Render(int ix, int iy)
 		CGraphicBase::SetDefaultIndexBuffer(CGraphicBase::DEFAULT_IB_FILL_RECT);
 
 		STATEMANAGER.SetTexture(0, m_lpd3dTexture);
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_TEX1|D3DFVF_DIFFUSE);
 		STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);
 	}
@@ -121,8 +121,8 @@ void CBlockTexture::InvalidateRect(const RECT & c_rsrcRect)
 	// END_OF_DIBBAR_LONGSIZE_BUGFIX
 
 
-	DWORD * pdwSrc;
-	pdwSrc = (DWORD *)m_pDIB->GetPointer();
+	uint32_t * pdwSrc;
+	pdwSrc = (uint32_t *)m_pDIB->GetPointer();
 	pdwSrc += dstRect.left + dstRect.top*m_pDIB->GetWidth();
 
 	D3DLOCKED_RECT lockedRect;
@@ -132,14 +132,14 @@ void CBlockTexture::InvalidateRect(const RECT & c_rsrcRect)
 		return;
 	}
 
-	int iclipWidth = clipRect.right - clipRect.left;
-	int iclipHeight = clipRect.bottom - clipRect.top;
-	DWORD * pdwDst = (DWORD *)lockedRect.pBits;
-	DWORD dwDstWidth = lockedRect.Pitch>>2;
-	DWORD dwSrcWidth = m_pDIB->GetWidth();
-	for (int i = 0; i < iclipHeight; ++i)
+	int32_t iclipWidth = clipRect.right - clipRect.left;
+	int32_t iclipHeight = clipRect.bottom - clipRect.top;
+	uint32_t * pdwDst = (uint32_t *)lockedRect.pBits;
+	uint32_t dwDstWidth = lockedRect.Pitch>>2;
+	uint32_t dwSrcWidth = m_pDIB->GetWidth();
+	for (int32_t i = 0; i < iclipHeight; ++i)
 	{
-		for (int i = 0; i < iclipWidth; ++i)
+		for (int32_t i = 0; i < iclipWidth; ++i)
 		{
 			if (pdwSrc[i])
 				pdwDst[i] = pdwSrc[i] | 0xff000000;
@@ -153,7 +153,7 @@ void CBlockTexture::InvalidateRect(const RECT & c_rsrcRect)
 	m_lpd3dTexture->UnlockRect(0);
 }
 
-bool CBlockTexture::Create(CGraphicDib * pDIB, const RECT & c_rRect, DWORD dwWidth, DWORD dwHeight)
+bool CBlockTexture::Create(CGraphicDib * pDIB, const RECT & c_rRect, uint32_t dwWidth, uint32_t dwHeight)
 {	
 	if (FAILED(ms_lpd3dDevice->CreateTexture(dwWidth, dwHeight, 0, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &m_lpd3dTexture)))
 	{
@@ -172,12 +172,12 @@ bool CBlockTexture::Create(CGraphicDib * pDIB, const RECT & c_rRect, DWORD dwWid
 
 CBlockTexture::CBlockTexture()
 {
-	m_pDIB = NULL;
-	m_lpd3dTexture = NULL;
+	m_pDIB = nullptr;
+	m_lpd3dTexture = nullptr;
 }
 
 CBlockTexture::~CBlockTexture()
 {
 	safe_release(m_lpd3dTexture);
-	m_lpd3dTexture = NULL;
+	m_lpd3dTexture = nullptr;
 }

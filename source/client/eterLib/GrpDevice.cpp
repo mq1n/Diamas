@@ -30,25 +30,25 @@ void CGraphicDevice::__Initialize()
 	ms_iD3DDevInfo=D3DADAPTER_DEFAULT;
 	ms_iD3DModeInfo=D3DADAPTER_DEFAULT;
 
-	ms_lpd3d			= NULL;
-	ms_lpd3dDevice		= NULL;
-	ms_lpd3dMatStack	= NULL;
+	ms_lpd3d			= nullptr;
+	ms_lpd3dDevice		= nullptr;
+	ms_lpd3dMatStack	= nullptr;
 
 	ms_dwWavingEndTime = 0;
 	ms_dwFlashingEndTime = 0;
 
-	m_pStateManager		= NULL;
+	m_pStateManager		= nullptr;
 
 	__InitializeDefaultIndexBufferList();
 	__InitializePDTVertexBufferList();
 }
 
-void CGraphicDevice::RegisterWarningString(UINT uiMsg, const char * c_szString)
+void CGraphicDevice::RegisterWarningString(uint32_t uiMsg, const char * c_szString)
 {
 	m_kMap_strWarningMessage[uiMsg] = c_szString;
 }
 
-void CGraphicDevice::__WarningMessage(HWND hWnd, UINT uiMsg)
+void CGraphicDevice::__WarningMessage(HWND hWnd, uint32_t uiMsg)
 {
 	if (m_kMap_strWarningMessage.end() == m_kMap_strWarningMessage.find(uiMsg))
 		return;
@@ -107,7 +107,7 @@ void CGraphicDevice::DisableWebBrowserMode()
 	STATEMANAGER.SetDefaultState();	
 }
 		
-bool CGraphicDevice::ResizeBackBuffer(UINT uWidth, UINT uHeight)
+bool CGraphicDevice::ResizeBackBuffer(uint32_t uWidth, uint32_t uHeight)
 {
 	if (!ms_lpd3dDevice)
 		return false;
@@ -135,9 +135,9 @@ bool CGraphicDevice::ResizeBackBuffer(UINT uWidth, UINT uHeight)
 	return true;
 }
 
-DWORD CGraphicDevice::CreatePNTStreamVertexShader()
+uint32_t CGraphicDevice::CreatePNTStreamVertexShader()
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 	
 	DWORD declVector[] =
 	{
@@ -149,16 +149,15 @@ DWORD CGraphicDevice::CreatePNTStreamVertexShader()
 	};
 	
 	DWORD ret;
-	
-	if (FAILED(ms_lpd3dDevice->CreateVertexShader(&declVector[0], NULL, &ret, 0)))
+	if (FAILED(ms_lpd3dDevice->CreateVertexShader(&declVector[0], nullptr, &ret, 0)))
 		return 0;
 	
 	return ret;
 }
 
-DWORD CGraphicDevice::CreatePNT2StreamVertexShader()
+uint32_t CGraphicDevice::CreatePNT2StreamVertexShader()
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 
 	DWORD declVector[] =
 	{
@@ -172,18 +171,17 @@ DWORD CGraphicDevice::CreatePNT2StreamVertexShader()
 	};
 
 	DWORD ret;
-
-	if (FAILED(ms_lpd3dDevice->CreateVertexShader(&declVector[0], NULL, &ret, 0)))
+	if (FAILED(ms_lpd3dDevice->CreateVertexShader(&declVector[0], nullptr, &ret, 0)))
 		return 0;
 
 	return ret;
 }
 
-DWORD CGraphicDevice::CreatePTStreamVertexShader()
+uint32_t CGraphicDevice::CreatePTStreamVertexShader()
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 
-	DWORD declVector[] = 
+	DWORD declVector[] =
 	{
 		D3DVSD_STREAM(0),
 		D3DVSD_REG(0, D3DVSDT_FLOAT3),
@@ -193,18 +191,17 @@ DWORD CGraphicDevice::CreatePTStreamVertexShader()
 	};
 
 	DWORD ret;
-
-	if (FAILED(ms_lpd3dDevice->CreateVertexShader(&declVector[0], NULL, &ret, 0)))
+	if (FAILED(ms_lpd3dDevice->CreateVertexShader(&declVector[0], nullptr, &ret, 0)))
 		return 0;
 
 	return (ret);
 }
 
-DWORD CGraphicDevice::CreateDoublePNTStreamVertexShader()
+uint32_t CGraphicDevice::CreateDoublePNTStreamVertexShader()
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 
-	DWORD declVector[] = 
+	DWORD declVector[] =
 	{
 		D3DVSD_STREAM(0),
 		D3DVSD_REG(0, D3DVSDT_FLOAT3),
@@ -218,8 +215,7 @@ DWORD CGraphicDevice::CreateDoublePNTStreamVertexShader()
 	};
 
 	DWORD ret;
-
-	if (FAILED(ms_lpd3dDevice->CreateVertexShader(&declVector[0], NULL, &ret, 0)))
+	if (FAILED(ms_lpd3dDevice->CreateVertexShader(&declVector[0], nullptr, &ret, 0)))
 		return 0;
 
 	return ret;
@@ -257,9 +253,9 @@ bool CGraphicDevice::Reset()
 }
 
 static LPDIRECT3DSURFACE8 s_lpStencil;
-static DWORD   s_MaxTextureWidth, s_MaxTextureHeight;
+static uint32_t   s_MaxTextureWidth, s_MaxTextureHeight;
 
-BOOL EL3D_ConfirmDevice(D3DCAPS8& rkD3DCaps, UINT uBehavior, D3DFORMAT /*eD3DFmt*/)
+BOOL EL3D_ConfirmDevice(D3DCAPS8& rkD3DCaps, uint32_t uBehavior, D3DFORMAT /*eD3DFmt*/)
 {
 	// PUREDEVICE는 GetTransform / GetViewport 등이 되지 않는다.
 	if (uBehavior & D3DCREATE_PUREDEVICE) 
@@ -295,12 +291,12 @@ BOOL EL3D_ConfirmDevice(D3DCAPS8& rkD3DCaps, UINT uBehavior, D3DFORMAT /*eD3DFmt
 	return TRUE;
 }
 
-DWORD GetMaxTextureWidth()
+uint32_t GetMaxTextureWidth()
 {
 	return s_MaxTextureWidth;
 }
 
-DWORD GetMaxTextureHeight()
+uint32_t GetMaxTextureHeight()
 {
 	return s_MaxTextureHeight;
 }
@@ -311,16 +307,16 @@ bool CGraphicDevice::__IsInDriverBlackList(D3D_CAdapterInfo& rkD3DAdapterInfo)
 
 	char szSrcDriver[256];
 	strncpy(szSrcDriver, rkD3DAdapterIdentifier.Driver, sizeof(szSrcDriver)-1);
-	DWORD dwSrcHighVersion=rkD3DAdapterIdentifier.DriverVersion.QuadPart>>32;
-	DWORD dwSrcLowVersion=rkD3DAdapterIdentifier.DriverVersion.QuadPart&0xffffffff;
+	uint32_t dwSrcHighVersion=rkD3DAdapterIdentifier.DriverVersion.QuadPart>>32;
+	uint32_t dwSrcLowVersion=rkD3DAdapterIdentifier.DriverVersion.QuadPart&0xffffffff;
 
 	bool ret=false;
 		
 	FILE* fp=fopen("grpblk.txt", "r");
 	if (fp)
 	{
-		DWORD dwChkHighVersion;
-		DWORD dwChkLowVersion;
+		uint32_t dwChkHighVersion;
+		uint32_t dwChkLowVersion;
 
 		char szChkDriver[256];
 
@@ -345,9 +341,9 @@ bool CGraphicDevice::__IsInDriverBlackList(D3D_CAdapterInfo& rkD3DAdapterInfo)
 	return ret;
 }
 
-int CGraphicDevice::Create(HWND hWnd, int iHres, int iVres, bool Windowed, int /*iBit*/, int iReflashRate)
+int32_t CGraphicDevice::Create(HWND hWnd, int32_t iHres, int32_t iVres, bool Windowed, int32_t /*iBit*/, int32_t iReflashRate)
 {
-	int iRet = CREATE_OK;
+	int32_t iRet = CREATE_OK;
 
 	Destroy();
 
@@ -415,7 +411,7 @@ int CGraphicDevice::Create(HWND hWnd, int iHres, int iVres, bool Windowed, int /
 
 	//Tracen(stModeInfo.c_str());
 
-	int ErrorCorrection = 0;
+	int32_t ErrorCorrection = 0;
 
 RETRY:
 	ZeroMemory(&ms_d3dPresentParameter, sizeof(ms_d3dPresentParameter));
@@ -521,7 +517,7 @@ RETRY:
 	if (!Windowed)
 		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, iHres, iVres, SWP_SHOWWINDOW);
 
-	//Tracef("vertex shader version : %X\n",(DWORD)ms_d3dCaps.VertexShaderVersion);
+	//Tracef("vertex shader version : %X\n",(uint32_t)ms_d3dCaps.VertexShaderVersion);
 
 	ms_lpd3dDevice->GetViewport(&ms_Viewport);
 
@@ -552,10 +548,10 @@ RETRY:
 	ms_matScreen2._11 = (float) iHres / 2;
 	ms_matScreen2._22 = (float) iVres / 2;
 	
-	D3DXCreateSphere(ms_lpd3dDevice, 1.0f, 32, 32, &ms_lpSphereMesh, NULL);
-	D3DXCreateCylinder(ms_lpd3dDevice, 1.0f, 1.0f, 1.0f, 8, 8, &ms_lpCylinderMesh, NULL);
+	D3DXCreateSphere(ms_lpd3dDevice, 1.0f, 32, 32, &ms_lpSphereMesh, nullptr);
+	D3DXCreateCylinder(ms_lpd3dDevice, 1.0f, 1.0f, 1.0f, 8, 8, &ms_lpCylinderMesh, nullptr);
 
-	ms_lpd3dDevice->Clear(0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff000000, 1.0f, 0);
+	ms_lpd3dDevice->Clear(0L, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff000000, 1.0f, 0);
 
 	if (!__CreateDefaultIndexBufferList())
 		return false;
@@ -563,7 +559,7 @@ RETRY:
 	if (!__CreatePDTVertexBufferList())
 		return false;
 	
-	DWORD dwTexMemSize = GetAvailableTextureMemory();
+	uint32_t dwTexMemSize = GetAvailableTextureMemory();
 
 	if (dwTexMemSize < 64 * 1024 * 1024)
 		ms_isLowTextureMemory = true;
@@ -600,25 +596,25 @@ RETRY:
 
 void CGraphicDevice::__InitializePDTVertexBufferList()
 {
-	for (UINT i=0; i<PDT_VERTEXBUFFER_NUM; ++i)
-		ms_alpd3dPDTVB[i]=NULL;	
+	for (uint32_t i=0; i<PDT_VERTEXBUFFER_NUM; ++i)
+		ms_alpd3dPDTVB[i]=nullptr;	
 }
 		
 void CGraphicDevice::__DestroyPDTVertexBufferList()
 {
-	for (UINT i=0; i<PDT_VERTEXBUFFER_NUM; ++i)
+	for (uint32_t i=0; i<PDT_VERTEXBUFFER_NUM; ++i)
 	{
 		if (ms_alpd3dPDTVB[i])
 		{
 			ms_alpd3dPDTVB[i]->Release();
-			ms_alpd3dPDTVB[i]=NULL;
+			ms_alpd3dPDTVB[i]=nullptr;
 		}
 	}
 }
 
 bool CGraphicDevice::__CreatePDTVertexBufferList()
 {
-	for (UINT i=0; i<PDT_VERTEXBUFFER_NUM; ++i)
+	for (uint32_t i=0; i<PDT_VERTEXBUFFER_NUM; ++i)
 	{
 		if (FAILED(
 			ms_lpd3dDevice->CreateVertexBuffer(
@@ -635,39 +631,39 @@ bool CGraphicDevice::__CreatePDTVertexBufferList()
 
 void CGraphicDevice::__InitializeDefaultIndexBufferList()
 {
-	for (UINT i=0; i<DEFAULT_IB_NUM; ++i)
-		ms_alpd3dDefIB[i]=NULL;
+	for (uint32_t i=0; i<DEFAULT_IB_NUM; ++i)
+		ms_alpd3dDefIB[i]=nullptr;
 }
 
 void CGraphicDevice::__DestroyDefaultIndexBufferList()
 {
-	for (UINT i=0; i<DEFAULT_IB_NUM; ++i)
+	for (uint32_t i=0; i<DEFAULT_IB_NUM; ++i)
 		if (ms_alpd3dDefIB[i])
 		{
 			ms_alpd3dDefIB[i]->Release();
-			ms_alpd3dDefIB[i]=NULL;
+			ms_alpd3dDefIB[i]=nullptr;
 		}	
 }
 
-bool CGraphicDevice::__CreateDefaultIndexBuffer(UINT eDefIB, UINT uIdxCount, const WORD* c_awIndices)
+bool CGraphicDevice::__CreateDefaultIndexBuffer(uint32_t eDefIB, uint32_t uIdxCount, const uint16_t* c_awIndices)
 {
-	assert(ms_alpd3dDefIB[eDefIB]==NULL);
+	assert(ms_alpd3dDefIB[eDefIB]==nullptr);
 
 	if (FAILED(
 		ms_lpd3dDevice->CreateIndexBuffer(
-			sizeof(WORD)*uIdxCount, 
+			sizeof(uint16_t)*uIdxCount, 
 			D3DUSAGE_WRITEONLY, 
 			D3DFMT_INDEX16,
 			D3DPOOL_MANAGED,
 			&ms_alpd3dDefIB[eDefIB])
 	)) return false;
 	
-	WORD* dstIndices;
+	uint16_t* dstIndices;
 	if (FAILED(
-		ms_alpd3dDefIB[eDefIB]->Lock(0, 0, (BYTE**)&dstIndices, 0)
+		ms_alpd3dDefIB[eDefIB]->Lock(0, 0, (uint8_t**)&dstIndices, 0)
 	)) return false;
 
-	memcpy(dstIndices, c_awIndices, sizeof(WORD)*uIdxCount);
+	memcpy(dstIndices, c_awIndices, sizeof(uint16_t)*uIdxCount);
 
 	ms_alpd3dDefIB[eDefIB]->Unlock();
 
@@ -676,17 +672,17 @@ bool CGraphicDevice::__CreateDefaultIndexBuffer(UINT eDefIB, UINT uIdxCount, con
 
 bool CGraphicDevice::__CreateDefaultIndexBufferList()
 {
-	static const WORD c_awLineIndices[2] = { 0, 1, };
-	static const WORD c_awLineTriIndices[6] = { 0, 1, 0, 2, 1, 2, };
-	static const WORD c_awLineRectIndices[8] = { 0, 1, 0, 2, 1, 3, 2, 3,};
-	static const WORD c_awLineCubeIndices[24] = { 
+	static const uint16_t c_awLineIndices[2] = { 0, 1, };
+	static const uint16_t c_awLineTriIndices[6] = { 0, 1, 0, 2, 1, 2, };
+	static const uint16_t c_awLineRectIndices[8] = { 0, 1, 0, 2, 1, 3, 2, 3,};
+	static const uint16_t c_awLineCubeIndices[24] = { 
 		0, 1, 0, 2, 1, 3, 2, 3,
 		0, 4, 1, 5, 2, 6, 3, 7,
 		4, 5, 4, 6, 5, 7, 6, 7,
 	};
-	static const WORD c_awFillTriIndices[3]= { 0, 1, 2, };
-	static const WORD c_awFillRectIndices[6] = { 0, 2, 1, 2, 3, 1, };
-	static const WORD c_awFillCubeIndices[36] = { 
+	static const uint16_t c_awFillTriIndices[3]= { 0, 1, 2, };
+	static const uint16_t c_awFillRectIndices[6] = { 0, 2, 1, 2, 3, 1, };
+	static const uint16_t c_awFillCubeIndices[36] = { 
 		0, 1, 2, 1, 3, 2,
 		2, 0, 6, 0, 4, 6,
 		0, 1, 4, 1, 5, 4,
@@ -713,7 +709,7 @@ bool CGraphicDevice::__CreateDefaultIndexBufferList()
 	return true;
 }
 
-void CGraphicDevice::InitBackBufferCount(UINT uBackBufferCount)
+void CGraphicDevice::InitBackBufferCount(uint32_t uBackBufferCount)
 {
 	m_uBackBufferCount=uBackBufferCount;
 }
@@ -726,7 +722,7 @@ void CGraphicDevice::Destroy()
 	if (ms_hDC)
 	{
 		ReleaseDC(ms_hWnd, ms_hDC);
-		ms_hDC = NULL;
+		ms_hDC = nullptr;
 	}
 
 	if (ms_ptVS)
@@ -757,7 +753,7 @@ void CGraphicDevice::Destroy()
 	if (m_pStateManager)
 	{
 		delete m_pStateManager;
-		m_pStateManager = NULL;
+		m_pStateManager = nullptr;
 	}
 
 	__Initialize();

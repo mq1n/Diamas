@@ -12,8 +12,8 @@
 
 #include "PythonMiniMap.h"
 
-const long c_lNormal_Waiting_Time = 10;
-const int c_fLine_Temp = 16;
+const int32_t c_lNormal_Waiting_Time = 10;
+const int32_t c_fLine_Temp = 16;
 
 void ShowArgument(script::TArgList & rArgumentList)
 {
@@ -47,15 +47,15 @@ const char * GetArgument(const char * c_szName, script::TArgList & rArgumentList
 
 void GetCameraSettingFromArgList(script::TArgList & rArgList, IAbstractApplication::SCameraSetting * pCameraSetting)
 {
-	int ix = atoi(GetArgument("x", rArgList));
-	int iy = atoi(GetArgument("y", rArgList));
-	int iz = atoi(GetArgument("z", rArgList));
-	int iUpDir = atoi(GetArgument("up", rArgList));
-	int iViewDir = atoi(GetArgument("view", rArgList));
-	int iCrossDir = atoi(GetArgument("cross", rArgList));
-	int iDistance = atoi(GetArgument("distance", rArgList));
-	int iRot = atoi(GetArgument("rot", rArgList));
-	int iPitch = atoi(GetArgument("pitch", rArgList));
+	int32_t ix = atoi(GetArgument("x", rArgList));
+	int32_t iy = atoi(GetArgument("y", rArgList));
+	int32_t iz = atoi(GetArgument("z", rArgList));
+	int32_t iUpDir = atoi(GetArgument("up", rArgList));
+	int32_t iViewDir = atoi(GetArgument("view", rArgList));
+	int32_t iCrossDir = atoi(GetArgument("cross", rArgList));
+	int32_t iDistance = atoi(GetArgument("distance", rArgList));
+	int32_t iRot = atoi(GetArgument("rot", rArgList));
+	int32_t iPitch = atoi(GetArgument("pitch", rArgList));
 
 	ZeroMemory(pCameraSetting, sizeof(IAbstractApplication::SCameraSetting));
 	pCameraSetting->v3CenterPosition.x = float(ix);
@@ -82,11 +82,11 @@ void CPythonEventManager::__InitEventSet(TEventSet& rEventSet)
 	rEventSet.CurrentColor = D3DXCOLOR(1, 1, 1, 1);
 	rEventSet.strCurrentLine = "";
 
-	rEventSet.pCurrentTextLine = NULL;
+	rEventSet.pCurrentTextLine = nullptr;
 	rEventSet.ScriptTextLineList.clear();
 
 	rEventSet.isConfirmWait = FALSE;
-	rEventSet.pConfirmTimeTextLine = NULL;
+	rEventSet.pConfirmTimeTextLine = nullptr;
 	rEventSet.iConfirmEndTime = 0;
 
 	rEventSet.DiffuseColor = D3DXCOLOR(1, 1, 1, 1);
@@ -104,7 +104,7 @@ void CPythonEventManager::__InitEventSet(TEventSet& rEventSet)
 	__InsertLine(rEventSet);
 }
 
-int CPythonEventManager::RegisterEventSet(const char * c_szFileName)
+int32_t CPythonEventManager::RegisterEventSet(const char * c_szFileName)
 {
 	CFile File;
 	if (!FileSystemManager::Instance().OpenFile(c_szFileName, File))
@@ -127,24 +127,24 @@ int CPythonEventManager::RegisterEventSet(const char * c_szFileName)
 
 	strncpy(pEventSet->szFileName, c_szFileName, 32);
 
-	pEventSet->pCurrentTextLine = NULL;
-	pEventSet->poEventHandler = NULL;
+	pEventSet->pCurrentTextLine = nullptr;
+	pEventSet->poEventHandler = nullptr;
 
 	__InitEventSet(*pEventSet);
 
-	int iEmptySlotIndex = GetEmptyEventSetSlot();
+	int32_t iEmptySlotIndex = GetEmptyEventSetSlot();
 	m_EventSetVector[iEmptySlotIndex] = pEventSet;
 	return iEmptySlotIndex;
 }
 
-int CPythonEventManager::RegisterEventSetFromString(const std::string& strScript)
+int32_t CPythonEventManager::RegisterEventSetFromString(const std::string& strScript)
 {
 	TEventSet* pEventSet = m_EventSetPool.Alloc();
 	if (!pEventSet)
 		return -1;
 
 	// SCRIPT_PARSING_FAILURE_CLEAR_BUG 스크립트 파싱 실패시 __ClearEventSetp 에서 에러 발생
-	pEventSet->pCurrentTextLine = NULL;
+	pEventSet->pCurrentTextLine = nullptr;
 	// END_OF_SCRIPT_PARSING_FAILURE_CLEAR_BUG
 	
 	if (!pEventSet->ScriptGroup.Create(strScript))
@@ -154,13 +154,13 @@ int CPythonEventManager::RegisterEventSetFromString(const std::string& strScript
 	}
 
 	pEventSet->szFileName[0] = 0;
-	pEventSet->poEventHandler = NULL;
+	pEventSet->poEventHandler = nullptr;
 	__InitEventSet(*pEventSet);
 
 	// NOTE : 만약 단순한 스크립트 이벤트 실행 커맨드라면 다시 만든다.
 	script::TCmd ScriptCommand;
-	int pEventPosition;
-	int iEventType;
+	int32_t pEventPosition;
+	int32_t iEventType;
 	if (pEventSet->ScriptGroup.ReadCmd(ScriptCommand))
 	{
 		if (GetScriptEventIndex(ScriptCommand.name.c_str(), &pEventPosition, &iEventType))
@@ -176,18 +176,18 @@ int CPythonEventManager::RegisterEventSetFromString(const std::string& strScript
 		}
 	}
 
-	int iEmptySlotIndex = GetEmptyEventSetSlot();
+	int32_t iEmptySlotIndex = GetEmptyEventSetSlot();
 	m_EventSetVector[iEmptySlotIndex] = pEventSet;
 	return iEmptySlotIndex;
 }
 
-void CPythonEventManager::ClearEventSeti(int iIndex)
+void CPythonEventManager::ClearEventSeti(int32_t iIndex)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
 
 	__ClearEventSetp(m_EventSetVector[iIndex]);
-	m_EventSetVector[iIndex] = NULL;
+	m_EventSetVector[iIndex] = nullptr;
 }
 
 void CPythonEventManager::__ClearEventSetp(TEventSet * pEventSet)
@@ -208,28 +208,28 @@ void CPythonEventManager::__ClearEventSetp(TEventSet * pEventSet)
 		pEventSet->pCurrentTextLine->Destroy();
 		m_ScriptTextLinePool.Free(pEventSet->pCurrentTextLine);
 	}
-	pEventSet->pCurrentTextLine = NULL;
+	pEventSet->pCurrentTextLine = nullptr;
 	pEventSet->strCurrentLine = "";
 	pEventSet->iCurrentLetter = 0;
 
 	m_EventSetPool.Free(pEventSet);
 }
 
-DWORD CPythonEventManager::GetEmptyEventSetSlot()
+uint32_t CPythonEventManager::GetEmptyEventSetSlot()
 {
-	for (DWORD i = 0; i < m_EventSetVector.size(); ++i)
+	for (uint32_t i = 0; i < m_EventSetVector.size(); ++i)
 	{
-		if (NULL == m_EventSetVector[i])
+		if (nullptr == m_EventSetVector[i])
 		{
 			return i;
 		}
 	}
 
-	m_EventSetVector.push_back(NULL);
+	m_EventSetVector.push_back(nullptr);
 	return m_EventSetVector.size()-1;
 }
 
-void CPythonEventManager::SetRestrictedCount(int iIndex, int iCount)
+void CPythonEventManager::SetRestrictedCount(int32_t iIndex, int32_t iCount)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
@@ -237,14 +237,14 @@ void CPythonEventManager::SetRestrictedCount(int iIndex, int iCount)
 	TEventSet * pEventSet = m_EventSetVector[iIndex];
 	if (!pEventSet)
 	{
-		TraceError("CPythonEventManager::SetRestrictedCount m_EventSetVector[iIndex=%d]==NULL", iIndex);
+		TraceError("CPythonEventManager::SetRestrictedCount m_EventSetVector[iIndex=%d]==nullptr", iIndex);
 		return;
 	}
 
 	pEventSet->iRestrictedCharacterCount = iCount;
 }
 
-void CPythonEventManager::SetEventHandler(int iIndex, PyObject * poEventHandler)
+void CPythonEventManager::SetEventHandler(int32_t iIndex, PyObject * poEventHandler)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
@@ -252,14 +252,14 @@ void CPythonEventManager::SetEventHandler(int iIndex, PyObject * poEventHandler)
 	TEventSet * pEventSet = m_EventSetVector[iIndex];
 	if (!pEventSet)
 	{
-		TraceError("CPythonEventManager::SetEventHandler m_EventSetVector[iIndex=%d]==NULL", iIndex);
+		TraceError("CPythonEventManager::SetEventHandler m_EventSetVector[iIndex=%d]==nullptr", iIndex);
 		return;
 	}
 
 	pEventSet->poEventHandler = poEventHandler;
 }
 
-int CPythonEventManager::GetEventSetLocalYPosition(int iIndex)
+int32_t CPythonEventManager::GetEventSetLocalYPosition(int32_t iIndex)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return 0;
@@ -271,7 +271,7 @@ int CPythonEventManager::GetEventSetLocalYPosition(int iIndex)
 	return pEventSet->iyLocal;
 }
 
-void CPythonEventManager::AddEventSetLocalYPosition(int iIndex, int iAddValue)
+void CPythonEventManager::AddEventSetLocalYPosition(int32_t iIndex, int32_t iAddValue)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
@@ -283,7 +283,7 @@ void CPythonEventManager::AddEventSetLocalYPosition(int iIndex, int iAddValue)
 	pEventSet->iyLocal += iAddValue;
 }
 
-void CPythonEventManager::InsertText(int iIndex, const char * c_szText,int iX_pos)
+void CPythonEventManager::InsertText(int32_t iIndex, const char * c_szText,int32_t iX_pos)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
@@ -307,7 +307,7 @@ void CPythonEventManager::InsertText(int iIndex, const char * c_szText,int iX_po
 }
 
 
-void CPythonEventManager::UpdateEventSet(int iIndex, int ix, int iy)
+void CPythonEventManager::UpdateEventSet(int32_t iIndex, int32_t ix, int32_t iy)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
@@ -323,7 +323,7 @@ void CPythonEventManager::UpdateEventSet(int iIndex, int ix, int iy)
 
 	if (pEventSet->isConfirmWait)
 	{
-		int iLeftTime = std::max<int>(0, pEventSet->iConfirmEndTime - timeGetTime()/1000);
+		int32_t iLeftTime = std::max<int32_t>(0, pEventSet->iConfirmEndTime - timeGetTime()/1000);
 		pEventSet->pConfirmTimeTextLine->SetValue(_getf(m_strLeftTimeString.c_str(), iLeftTime));
 	}
 
@@ -333,9 +333,9 @@ void CPythonEventManager::UpdateEventSet(int iIndex, int ix, int iy)
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
 	// Process EventSet
-	long lElapsedTime = CTimer::Instance().GetElapsedMilliecond();
+	int32_t lElapsedTime = CTimer::Instance().GetElapsedMilliecond();
 
-	pEventSet->lLastDelayTime = std::max<long>(0, pEventSet->lLastDelayTime - lElapsedTime);
+	pEventSet->lLastDelayTime = std::max<int32_t>(0, pEventSet->lLastDelayTime - lElapsedTime);
 
 	while (lElapsedTime > 0)
 	{
@@ -360,7 +360,7 @@ void CPythonEventManager::UpdateEventSet(int iIndex, int ix, int iy)
 	}
 }
 
-void CPythonEventManager::SetEventSetWidth(int iIndex, int iWidth)
+void CPythonEventManager::SetEventSetWidth(int32_t iIndex, int32_t iWidth)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
@@ -387,8 +387,8 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 		return;
 	}
 
-	int pEventPosition;
-	int iEventType;
+	int32_t pEventPosition;
+	int32_t iEventType;
 	if (!GetScriptEventIndex(ScriptCommand.name.c_str(), &pEventPosition, &iEventType))
 		return;
 
@@ -519,8 +519,8 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 
 		case EVENT_TYPE_IMAGE:
 		{
-			int x = atoi(GetArgument("x", ScriptCommand.argList));
-			int y = atoi(GetArgument("y", ScriptCommand.argList));
+			int32_t x = atoi(GetArgument("x", ScriptCommand.argList));
+			int32_t y = atoi(GetArgument("y", ScriptCommand.argList));
 			const char * src = GetArgument("src", ScriptCommand.argList);
 
 			PyCallClassMemberFunc(pEventSet->poEventHandler, "OnImage", Py_BuildValue("(iis)", x, y, src));
@@ -532,13 +532,13 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 			const std::string & imageFile = GetArgumentString("image_name", ScriptCommand.argList);
 			const char * title = GetArgument("title", ScriptCommand.argList);
 			const char * desc = GetArgument("desc", ScriptCommand.argList);
-			int index = atoi(GetArgument("index", ScriptCommand.argList));
-			int total = atoi(GetArgument("total", ScriptCommand.argList));
+			int32_t index = atoi(GetArgument("index", ScriptCommand.argList));
+			int32_t total = atoi(GetArgument("total", ScriptCommand.argList));
 
 			if (imageFile.empty())
 			{
 				const char * imageType = GetArgument("image_type", ScriptCommand.argList);
-				int iItemIndex = atoi(GetArgument("idx", ScriptCommand.argList));
+				int32_t iItemIndex = atoi(GetArgument("idx", ScriptCommand.argList));
 				PyCallClassMemberFunc(pEventSet->poEventHandler, "OnInsertItemIcon", Py_BuildValue("(sissii)", imageType, iItemIndex, title, desc, index, total));
 			}
 			else
@@ -579,7 +579,7 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 			const std::string& c_rstType = GetArgumentString("icon_type", ScriptCommand.argList);
 			const std::string& c_rstFile = GetArgumentString("icon_name", ScriptCommand.argList);
 
-			int idx = atoi(GetArgument("idx", ScriptCommand.argList));
+			int32_t idx = atoi(GetArgument("idx", ScriptCommand.argList));
 			const char * name = GetArgument("name", ScriptCommand.argList);
 			
 			// 퀘스트 UI 리뉴얼이 되면 해결 되므로 일단 용혼석만 땜빵 by chrislee
@@ -681,15 +681,15 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 		}
 		case EVENT_TYPE_DUNGEON_RESULT:
 		{
-			int killstone_count = atoi(GetArgument("killstone_count", ScriptCommand.argList));
-			int killmob_count = atoi(GetArgument("killmob_count", ScriptCommand.argList));
-			int find_hidden = atoi(GetArgument("find_hidden", ScriptCommand.argList));
-			int hidden_total = atoi(GetArgument("hidden_total", ScriptCommand.argList));
-			int use_potion = atoi(GetArgument("use_potion", ScriptCommand.argList));
-			int is_revived = atoi(GetArgument("is_revived", ScriptCommand.argList));
-			int killallmob = atoi(GetArgument("killallmob", ScriptCommand.argList));
-			int total_time = atoi(GetArgument("total_time", ScriptCommand.argList));
-			int bonus_exp = atoi(GetArgument("bonus_exp", ScriptCommand.argList));
+			int32_t killstone_count = atoi(GetArgument("killstone_count", ScriptCommand.argList));
+			int32_t killmob_count = atoi(GetArgument("killmob_count", ScriptCommand.argList));
+			int32_t find_hidden = atoi(GetArgument("find_hidden", ScriptCommand.argList));
+			int32_t hidden_total = atoi(GetArgument("hidden_total", ScriptCommand.argList));
+			int32_t use_potion = atoi(GetArgument("use_potion", ScriptCommand.argList));
+			int32_t is_revived = atoi(GetArgument("is_revived", ScriptCommand.argList));
+			int32_t killallmob = atoi(GetArgument("killallmob", ScriptCommand.argList));
+			int32_t total_time = atoi(GetArgument("total_time", ScriptCommand.argList));
+			int32_t bonus_exp = atoi(GetArgument("bonus_exp", ScriptCommand.argList));
 
 			PyCallClassMemberFunc(m_poInterface, "ShowDungeonResult", 
 								  Py_BuildValue("(iiiiiiiii)",
@@ -706,7 +706,7 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 		}
 		case EVENT_TYPE_ITEM_NAME:
 		{
-			int iIndex = atoi(GetArgument("value", ScriptCommand.argList));
+			int32_t iIndex = atoi(GetArgument("value", ScriptCommand.argList));
 			CItemData * pItemData;
 			if (CItemManager::Instance().GetItemDataPointer(iIndex, &pItemData))
 			{
@@ -725,7 +725,7 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 		}
 		case EVENT_TYPE_MONSTER_NAME:
 		{
-			int iIndex = atoi(GetArgument("value", ScriptCommand.argList));
+			int32_t iIndex = atoi(GetArgument("value", ScriptCommand.argList));
 			const char * c_szName;
 
 			CPythonNonPlayer& rkNonPlayer=CPythonNonPlayer::Instance();
@@ -745,8 +745,8 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 		}
 		case EVENT_TYPE_WINDOW_SIZE:
 		{
-			int iWidth = atoi(GetArgument("width", ScriptCommand.argList));
-			int iHeight = atoi(GetArgument("height", ScriptCommand.argList));
+			int32_t iWidth = atoi(GetArgument("width", ScriptCommand.argList));
+			int32_t iHeight = atoi(GetArgument("height", ScriptCommand.argList));
 			PyCallClassMemberFunc(pEventSet->poEventHandler, "OnSize", Py_BuildValue("(ii)", iWidth, iHeight));
 			break;
 		}
@@ -758,7 +758,7 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 		}
 		case EVENT_TYPE_CONFIRM_WAIT:
 		{
-			int iTimeOut = atoi(GetArgument("timeout", ScriptCommand.argList));
+			int32_t iTimeOut = atoi(GetArgument("timeout", ScriptCommand.argList));
 			pEventSet->isConfirmWait = TRUE;
 			pEventSet->pConfirmTimeTextLine = pEventSet->pCurrentTextLine;
 			pEventSet->iConfirmEndTime = timeGetTime()/1000 + iTimeOut;
@@ -768,9 +768,9 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 		}
 		case EVENT_TYPE_END_CONFIRM_WAIT:
 		{
-			for (DWORD i = 0; i < m_EventSetVector.size(); ++i)
+			for (uint32_t i = 0; i < m_EventSetVector.size(); ++i)
 			{
-				if (NULL == m_EventSetVector[i])
+				if (nullptr == m_EventSetVector[i])
 					continue;
 
 				TEventSet * pSet = m_EventSetVector[i];
@@ -778,7 +778,7 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 					continue;
 
 				pSet->isConfirmWait = FALSE;
-				pSet->pConfirmTimeTextLine = NULL;
+				pSet->pConfirmTimeTextLine = nullptr;
 				pSet->iConfirmEndTime = 0;
 
 				PyCallClassMemberFunc(pSet->poEventHandler, "CloseSelf", Py_BuildValue("()"));
@@ -793,7 +793,7 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 	}
 }
 
-void CPythonEventManager::RenderEventSet(int iIndex)
+void CPythonEventManager::RenderEventSet(int32_t iIndex)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
@@ -802,7 +802,7 @@ void CPythonEventManager::RenderEventSet(int iIndex)
 	if (!pEventSet)
 		return;
 
-	int iCount = 0;
+	int32_t iCount = 0;
 
 	for (TScriptTextLineList::iterator itor = pEventSet->ScriptTextLineList.begin(); itor != pEventSet->ScriptTextLineList.end(); ++itor, ++iCount)
 	{
@@ -827,7 +827,7 @@ void CPythonEventManager::RenderEventSet(int iIndex)
 	}
 }
 
-void CPythonEventManager::Skip(int iIndex)
+void CPythonEventManager::Skip(int32_t iIndex)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
@@ -845,7 +845,7 @@ void CPythonEventManager::Skip(int iIndex)
 	}
 }
 
-bool CPythonEventManager::IsWait(int iIndex)
+bool CPythonEventManager::IsWait(int32_t iIndex)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return false;
@@ -859,7 +859,7 @@ bool CPythonEventManager::IsWait(int iIndex)
 	return pEventSet->isLock;
 }
 
-void CPythonEventManager::EndEventProcess(int iIndex)
+void CPythonEventManager::EndEventProcess(int32_t iIndex)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
@@ -873,7 +873,7 @@ void CPythonEventManager::EndEventProcess(int iIndex)
 	pEventSet->isWaitFlag = false;
 }
 
-void CPythonEventManager::MakeNextButton(TEventSet * pEventSet, int iButtonType)
+void CPythonEventManager::MakeNextButton(TEventSet * pEventSet, int32_t iButtonType)
 {
 	__AddSpace(*pEventSet, c_fLine_Temp+5);
 	PyCallClassMemberFunc(pEventSet->poEventHandler, "MakeNextButton", Py_BuildValue("(i)", iButtonType));
@@ -887,7 +887,7 @@ void CPythonEventManager::MakeQuestion(TEventSet * pEventSet, script::TArgList &
 	PyCallClassMemberFunc(pEventSet->poEventHandler, "MakeQuestion", Py_BuildValue("(i)", rArgumentList.size()));
 	pEventSet->nAnswer = rArgumentList.size();
 
-	int iIndex = 0;
+	int32_t iIndex = 0;
 	for (script::TArgList::iterator itor=rArgumentList.begin(); itor!=rArgumentList.end(); ++itor)
 	{
 		script::TArg & rArgument = *itor;
@@ -897,7 +897,7 @@ void CPythonEventManager::MakeQuestion(TEventSet * pEventSet, script::TArgList &
 }
 
 
-void CPythonEventManager::SelectAnswer(int iIndex, int iAnswer)
+void CPythonEventManager::SelectAnswer(int32_t iIndex, int32_t iAnswer)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
@@ -907,20 +907,20 @@ void CPythonEventManager::SelectAnswer(int iIndex, int iAnswer)
 	CPythonNetworkStream::Instance().SendScriptAnswerPacket(iAnswer);
 }
 
-void CPythonEventManager::SetVisibleStartLine(int iIndex, int iStartLine)
+void CPythonEventManager::SetVisibleStartLine(int32_t iIndex, int32_t iStartLine)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
 
 	TEventSet * pEventSet = m_EventSetVector[iIndex];
 
-	if (DWORD(iStartLine) > pEventSet->ScriptTextLineList.size())
+	if (uint32_t(iStartLine) > pEventSet->ScriptTextLineList.size())
 		return;
 
 	pEventSet->iVisibleStartLine = iStartLine;
 }
 
-void CPythonEventManager::SetVisibleLineCount(int iIndex, int iLineCount)
+void CPythonEventManager::SetVisibleLineCount(int32_t iIndex, int32_t iLineCount)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return;
@@ -930,7 +930,7 @@ void CPythonEventManager::SetVisibleLineCount(int iIndex, int iLineCount)
 	pEventSet->iVisibleLineCount = iLineCount;
 }
 
-int CPythonEventManager::GetVisibleStartLine(int iIndex)
+int32_t CPythonEventManager::GetVisibleStartLine(int32_t iIndex)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return 0;
@@ -939,7 +939,7 @@ int CPythonEventManager::GetVisibleStartLine(int iIndex)
 	return pEventSet->iVisibleStartLine;
 }
 
-int CPythonEventManager::GetLineCount(int iIndex)
+int32_t CPythonEventManager::GetLineCount(int32_t iIndex)
 {
 	if (!CheckEventSetIndex(iIndex))
 		return 0;
@@ -965,13 +965,13 @@ void CPythonEventManager::ClearLine(TEventSet * pEventSet)
 	pEventSet->pCurrentTextLine->Update();
 
 	// clear
-	pEventSet->pCurrentTextLine = NULL;
+	pEventSet->pCurrentTextLine = nullptr;
 	pEventSet->ScriptTextLineList.clear();
 
 	__InsertLine(*pEventSet);
 }
 
-void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int iX_pos)
+void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int32_t iX_pos)
 {
 	if (rEventSet.pCurrentTextLine)
 	{
@@ -984,8 +984,8 @@ void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int 
 		}
 		else
 		{
-			int textWidth;
-			int textHeight;
+			int32_t textWidth;
+			int32_t textHeight;
 			rEventSet.pCurrentTextLine->GetTextSize(&textWidth,&textHeight);
 			if (GetDefaultCodePage() == CP_1256)
 			{
@@ -1060,7 +1060,7 @@ void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int 
 
 void CPythonEventManager::RefreshLinePosition(TEventSet * pEventSet)
 {
-	//int iCount = 0;
+	//int32_t iCount = 0;
 	for (TScriptTextLineList::iterator itor = pEventSet->ScriptTextLineList.begin(); itor != pEventSet->ScriptTextLineList.end(); ++itor)
 	{
 		TTextLine & rkLine = *itor;
@@ -1068,7 +1068,7 @@ void CPythonEventManager::RefreshLinePosition(TEventSet * pEventSet)
 		pInstance->SetPosition(pEventSet->ix + rkLine.ixLocal, pEventSet->iy + rkLine.iyLocal);
 	}
 
-	int ixTextPos;
+	int32_t ixTextPos;
 	if (CGraphicTextInstance::HORIZONTAL_ALIGN_CENTER == pEventSet->pCurrentTextLine->GetHorizontalAlign())
 	{
 		ixTextPos = pEventSet->ix+pEventSet->iWidth/2;
@@ -1083,12 +1083,12 @@ void CPythonEventManager::RefreshLinePosition(TEventSet * pEventSet)
 	pEventSet->pCurrentTextLine->SetPosition(ixTextPos, pEventSet->iy + pEventSet->iyLocal);
 }
 
-void CPythonEventManager::__AddSpace(TEventSet& rEventSet, int iSpace)
+void CPythonEventManager::__AddSpace(TEventSet& rEventSet, int32_t iSpace)
 {
 	rEventSet.iyLocal += iSpace;
 }
 
-bool CPythonEventManager::GetScriptEventIndex(const char * c_szName, int * pEventPosition, int * pEventType)
+bool CPythonEventManager::GetScriptEventIndex(const char * c_szName, int32_t * pEventPosition, int32_t * pEventType)
 {
 	const char * c_szEventName;
 
@@ -1103,7 +1103,7 @@ bool CPythonEventManager::GetScriptEventIndex(const char * c_szName, int * pEven
 		c_szEventName = &c_szName[0];
 	}
 	
-	std::map<std::string,int>::iterator it = EventTypeMap.find(c_szEventName);
+	std::map<std::string,int32_t>::iterator it = EventTypeMap.find(c_szEventName);
 	if (it == EventTypeMap.end())
 	{
 		Tracef(" !! PARSING ERROR - Strange Command : %s\n", c_szEventName);
@@ -1115,12 +1115,12 @@ bool CPythonEventManager::GetScriptEventIndex(const char * c_szName, int * pEven
 	return true;
 }
 
-bool CPythonEventManager::CheckEventSetIndex(int iIndex)
+bool CPythonEventManager::CheckEventSetIndex(int32_t iIndex)
 {
 	if (iIndex < 0)
 		return false;
 
-	if ((DWORD) iIndex >= m_EventSetVector.size())
+	if ((uint32_t) iIndex >= m_EventSetVector.size())
 		return false;
 
 	return true;

@@ -4,7 +4,7 @@
 #include "../eterBase/lzo.h"
 #include "ItemManager.h"
 
-static DWORD s_adwItemProtoKey[4] =
+static uint32_t s_adwItemProtoKey[4] =
 {
 	173217,
 	72619434,
@@ -12,14 +12,14 @@ static DWORD s_adwItemProtoKey[4] =
 	27973291
 };
 
-BOOL CItemManager::SelectItemData(DWORD dwIndex)
+BOOL CItemManager::SelectItemData(uint32_t dwIndex)
 {
 	TItemMap::iterator f = m_ItemMap.find(dwIndex);
 
 	if (m_ItemMap.end() == f)
 	{
-		int n = m_vec_ItemRange.size();
-		for (int i = 0; i < n; i++)
+		int32_t n = m_vec_ItemRange.size();
+		for (int32_t i = 0; i < n; i++)
 		{
 			CItemData * p = m_vec_ItemRange[i];
 			const CItemData::TItemTable * pTable = p->GetTable(); 
@@ -44,7 +44,7 @@ CItemData * CItemManager::GetSelectedItemDataPointer()
 	return m_pSelectedItemData;
 }
 
-BOOL CItemManager::GetItemDataPointer(DWORD dwItemID, CItemData ** ppItemData)
+BOOL CItemManager::GetItemDataPointer(uint32_t dwItemID, CItemData ** ppItemData)
 {
 	if (0 == dwItemID)
 		return FALSE;
@@ -53,8 +53,8 @@ BOOL CItemManager::GetItemDataPointer(DWORD dwItemID, CItemData ** ppItemData)
 
 	if (m_ItemMap.end() == f)
 	{
-		int n = m_vec_ItemRange.size();
-		for (int i = 0; i < n; i++)
+		int32_t n = m_vec_ItemRange.size();
+		for (int32_t i = 0; i < n; i++)
 		{
 			CItemData * p = m_vec_ItemRange[i];
 			const CItemData::TItemTable * pTable = p->GetTable(); 
@@ -74,7 +74,7 @@ BOOL CItemManager::GetItemDataPointer(DWORD dwItemID, CItemData ** ppItemData)
 	return TRUE;
 }
 
-CItemData * CItemManager::MakeItemData(DWORD dwIndex)
+CItemData * CItemManager::MakeItemData(uint32_t dwIndex)
 {
 	TItemMap::iterator f = m_ItemMap.find(dwIndex);
 
@@ -103,7 +103,7 @@ bool CItemManager::LoadItemList(const char * c_szFileName)
 	textFileLoader.Bind(File.GetSize(), File.GetData());
 
 	CTokenVector TokenVector;
-    for (DWORD i = 0; i < textFileLoader.GetLineCount(); ++i)
+    for (uint32_t i = 0; i < textFileLoader.GetLineCount(); ++i)
 	{
 		if (!textFileLoader.SplitLine(i, &TokenVector, "\t"))
 			continue;
@@ -118,15 +118,15 @@ bool CItemManager::LoadItemList(const char * c_szFileName)
 		//const std::string & c_rstrType = TokenVector[1];
 		const std::string & c_rstrIcon = TokenVector[2];
 
-		DWORD dwItemVNum=atoi(c_rstrID.c_str());
+		uint32_t dwItemVNum=atoi(c_rstrID.c_str());
 
 		CItemData * pItemData = MakeItemData(dwItemVNum);
 
 		extern BOOL USE_VIETNAM_CONVERT_WEAPON_VNUM;
 		if (USE_VIETNAM_CONVERT_WEAPON_VNUM)
 		{
-			extern DWORD Vietnam_ConvertWeaponVnum(DWORD vnum);
-			DWORD dwMildItemVnum = Vietnam_ConvertWeaponVnum(dwItemVNum);
+			extern uint32_t Vietnam_ConvertWeaponVnum(uint32_t vnum);
+			uint32_t dwMildItemVnum = Vietnam_ConvertWeaponVnum(dwItemVNum);
 			if (dwMildItemVnum == dwItemVNum)
 			{
 				if (4 == TokenVector.size())
@@ -141,7 +141,7 @@ bool CItemManager::LoadItemList(const char * c_szFileName)
 			}
 			else
 			{
-				DWORD dwMildBaseVnum = dwMildItemVnum / 10 * 10;
+				uint32_t dwMildBaseVnum = dwMildItemVnum / 10 * 10;
 				char szMildIconPath[MAX_PATH];				
 				sprintf(szMildIconPath, "icon/item/%.5d.tga", dwMildBaseVnum);
 				if (4 == TokenVector.size())
@@ -175,16 +175,16 @@ bool CItemManager::LoadItemList(const char * c_szFileName)
 
 const std::string& __SnapString(const std::string& c_rstSrc, std::string& rstTemp)
 {
-	UINT uSrcLen=c_rstSrc.length();
+	uint32_t uSrcLen=c_rstSrc.length();
 	if (uSrcLen<2)
 		return c_rstSrc;
 
 	if (c_rstSrc[0]!='"')
 		return c_rstSrc;
 
-	UINT uLeftCut=1;
+	uint32_t uLeftCut=1;
 	
-	UINT uRightCut=uSrcLen;
+	uint32_t uRightCut=uSrcLen;
 	if (c_rstSrc[uSrcLen-1]=='"')
 		uRightCut=uSrcLen-1;	
 
@@ -207,7 +207,7 @@ bool CItemManager::LoadItemDesc(const char* c_szFileName)
 	std::string stTemp;
 
 	CTokenVector kTokenVector;
-	for (DWORD i = 0; i < kTextFileLoader.GetLineCount(); ++i)
+	for (uint32_t i = 0; i < kTextFileLoader.GetLineCount(); ++i)
 	{
 		if (!kTextFileLoader.SplitLineByTab(i, &kTokenVector))
 			continue;
@@ -217,7 +217,7 @@ bool CItemManager::LoadItemDesc(const char* c_szFileName)
 
 		//assert(kTokenVector.size()==ITEMDESC_COL_NUM);
 		
-		DWORD dwVnum=atoi(kTokenVector[ITEMDESC_COL_VNUM].c_str());
+		uint32_t dwVnum=atoi(kTokenVector[ITEMDESC_COL_VNUM].c_str());
 		const std::string& c_rstDesc=kTokenVector[ITEMDESC_COL_DESC];
 		const std::string& c_rstSumm=kTokenVector[ITEMDESC_COL_SUMM];
 		TItemMap::iterator f = m_ItemMap.find(dwVnum);
@@ -232,17 +232,17 @@ bool CItemManager::LoadItemDesc(const char* c_szFileName)
 	return true;
 }
 
-DWORD GetHashCode( const char* pString )
+uint32_t GetHashCode( const char* pString )
 {
-	   unsigned long i,len;
-	   unsigned long ch;
-	   unsigned long result;
+	   uint32_t i,len;
+	   uint32_t ch;
+	   uint32_t result;
 	   
 	   len     = strlen( pString );
 	   result = 5381;
 	   for( i=0; i<len; i++ )
 	   {
-	   	   ch = (unsigned long)pString[i];
+	   	   ch = (uint32_t)pString[i];
 	   	   result = ((result<< 5) + result) + ch; // hash * 33 + ch
 	   }	  
 
@@ -255,16 +255,16 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 	if (!FileSystemManager::Instance().OpenFile(c_szFileName, file))
 		return false;
 
-	DWORD dwFourCC, dwElements, dwDataSize;
-	DWORD dwVersion=0;
-	DWORD dwStride=0;
+	uint32_t dwFourCC, dwElements, dwDataSize;
+	uint32_t dwVersion=0;
+	uint32_t dwStride=0;
 
-	file.Read(&dwFourCC, sizeof(DWORD));
+	file.Read(&dwFourCC, sizeof(uint32_t));
 
 	if (dwFourCC == MAKEFOURCC('M', 'I', 'P', 'X'))
 	{
-		file.Read(&dwVersion, sizeof(DWORD));
-		file.Read(&dwStride, sizeof(DWORD));
+		file.Read(&dwVersion, sizeof(uint32_t));
+		file.Read(&dwStride, sizeof(uint32_t));
 	
 		if (dwVersion != 1)
 		{
@@ -289,10 +289,10 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 		return false;
 	}
 
-	file.Read(&dwElements, sizeof(DWORD));
-	file.Read(&dwDataSize, sizeof(DWORD));
+	file.Read(&dwElements, sizeof(uint32_t));
+	file.Read(&dwDataSize, sizeof(uint32_t));
 
-	BYTE * pbData = new BYTE[dwDataSize];
+	uint8_t * pbData = new uint8_t[dwDataSize];
 	file.Read(pbData, dwDataSize);
 
 	/////
@@ -308,9 +308,9 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 	/////
 
 	char szName[64+1];
-	std::map<DWORD,DWORD> itemNameMap;
+	std::map<uint32_t,uint32_t> itemNameMap;
 
-	for (DWORD i = 0; i < dwElements; ++i)
+	for (uint32_t i = 0; i < dwElements; ++i)
 	{
 #ifdef ENABLE_PROTOSTRUCT_AUTODETECT
 		CItemData::TItemTable t = {0};
@@ -321,7 +321,7 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 		CItemData::TItemTable * table = &t;
 
 		CItemData * pItemData;
-		DWORD dwVnum = table->dwVnum;
+		uint32_t dwVnum = table->dwVnum;
 
 		TItemMap::iterator f = m_ItemMap.find(dwVnum);
 		if (m_ItemMap.end() == f)
@@ -330,7 +330,7 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 
 			if (CResourceManager::Instance().IsFileExist(szName) == false)
 			{
-				std::map<DWORD, DWORD>::iterator itVnum = itemNameMap.find(GetHashCode(table->szName));
+				std::map<uint32_t, uint32_t>::iterator itVnum = itemNameMap.find(GetHashCode(table->szName));
 				
 				if (itVnum != itemNameMap.end())
 					_snprintf(szName, sizeof(szName), "icon/item/%05d.tga", itVnum->second);
@@ -342,7 +342,7 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 					#ifdef _DEBUG
 					TraceError("%16s(#%-5d) cannot find icon file. setting to default.", table->szName, dwVnum);
 					#endif
-					const DWORD EmptyBowl = 27995;
+					const uint32_t EmptyBowl = 27995;
 					_snprintf(szName, sizeof(szName), "icon/item/%05d.tga", EmptyBowl);
 				}
 			}
@@ -357,7 +357,7 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 			pItemData = f->second;
 		}	
 		if (itemNameMap.find(GetHashCode(table->szName)) == itemNameMap.end())
-			itemNameMap.insert(std::map<DWORD,DWORD>::value_type(GetHashCode(table->szName),table->dwVnum));
+			itemNameMap.insert(std::map<uint32_t,uint32_t>::value_type(GetHashCode(table->szName),table->dwVnum));
 		pItemData->SetItemTableData(table);
 		if (0 != table->dwVnumRange)
 		{
@@ -367,10 +367,10 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 
 //!@#
 //	CItemData::TItemTable * table = (CItemData::TItemTable *) zObj.GetBuffer();
-//	for (DWORD i = 0; i < dwElements; ++i, ++table)
+//	for (uint32_t i = 0; i < dwElements; ++i, ++table)
 //	{
 //		CItemData * pItemData;
-//		DWORD dwVnum = table->dwVnum;
+//		uint32_t dwVnum = table->dwVnum;
 //
 //		TItemMap::iterator f = m_ItemMap.find(dwVnum);
 //
@@ -412,7 +412,7 @@ bool CItemManager::LoadItemScale(const char * c_szFileName)
 	kTextFileLoader.Bind(kFile.GetSize(), kFile.GetData());
 
 	CTokenVector kTokenVector;
-	for (DWORD i = 0; i < kTextFileLoader.GetLineCount(); ++i)
+	for (uint32_t i = 0; i < kTextFileLoader.GetLineCount(); ++i)
 	{
 		if (!kTextFileLoader.SplitLineByTab(i, &kTokenVector))
 			continue;
@@ -432,7 +432,7 @@ bool CItemManager::LoadItemScale(const char * c_szFileName)
 		const std::string & strPositionY = kTokenVector[ITEMSCALE_POSITION_Y];
 		const std::string & strPositionZ = kTokenVector[ITEMSCALE_POSITION_Z];
 
-		for (int j = 0; j < 5; ++j)
+		for (int32_t j = 0; j < 5; ++j)
 		{
 			CItemData * pItemData = MakeItemData(atoi(kTokenVector[ITEMSCALE_VNUM].c_str()) + j);
 			pItemData->SetItemScale(strJob, strSex, strScaleX, strScaleY, strScaleZ, strPositionX, strPositionY, strPositionZ);
@@ -443,7 +443,7 @@ bool CItemManager::LoadItemScale(const char * c_szFileName)
 }
 #endif
 
-CItemManager::CItemManager() : m_pSelectedItemData(NULL)
+CItemManager::CItemManager() : m_pSelectedItemData(nullptr)
 {
 }
 CItemManager::~CItemManager()

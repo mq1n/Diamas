@@ -49,14 +49,14 @@ class CAttributeInstance
 			float fyMin;
 			float fxMax;
 			float fyMax;
-			DWORD dwxStep;
-			DWORD dwyStep;
+			uint32_t dwxStep;
+			uint32_t dwyStep;
 			std::vector<float> kVec_fHeight;
 		} m_kHeightCacheData;
 		*/
 
 	public:
-		static void CreateSystem(UINT uCapacity);
+		static void CreateSystem(uint32_t uCapacity);
 		static void DestroySystem();
 
 		static CAttributeInstance* New();

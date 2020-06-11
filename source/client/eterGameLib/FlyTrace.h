@@ -26,7 +26,7 @@ class CFlyTrace : public CScreen
 		//LPDIRECT3DTEXTURE8 m_lpTexture;
 
 		bool m_bRectShape;
-		DWORD m_dwColor;
+		uint32_t m_dwColor;
 		float m_fSize;
 		float m_fTailLength;
 

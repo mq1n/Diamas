@@ -4,9 +4,9 @@
 #include <windowsx.h>
 
 CMSWindow::TWindowClassSet CMSWindow::ms_stWCSet;
-HINSTANCE CMSWindow::ms_hInstance = NULL;
+HINSTANCE CMSWindow::ms_hInstance = nullptr;
 
-LRESULT CALLBACK MSWindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK MSWindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wParam, LPARAM lParam)
 {	
 	CMSWindow * pWnd = (CMSWindow *) GetWindowLong(hWnd, GWL_USERDATA);
 
@@ -16,7 +16,7 @@ LRESULT CALLBACK MSWindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM 
 	return DefWindowProc(hWnd, uiMsg, wParam, lParam);
 }
 
-LRESULT CMSWindow::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CMSWindow::WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uiMsg)
 	{
@@ -36,7 +36,7 @@ void CMSWindow::OnSize(WPARAM wParam, LPARAM /*lParam*/)
 {
 	if (wParam == SIZE_MINIMIZED) 
 	{
-		InvalidateRect(m_hWnd, NULL, true);
+		InvalidateRect(m_hWnd, nullptr, true);
 		m_isActive = false;        
 		m_isVisible = false;
 	}
@@ -55,13 +55,13 @@ void CMSWindow::Destroy()
 	if (IsWindow(m_hWnd))
 		DestroyWindow(m_hWnd);
 	
-	m_hWnd = NULL;
+	m_hWnd = nullptr;
 	m_isVisible = false;
 }
 
-bool CMSWindow::Create(const char* c_szName, int brush, DWORD cs, DWORD ws, HICON hIcon, int iCursorResource)
+bool CMSWindow::Create(const char* c_szName, int32_t brush, uint32_t cs, uint32_t ws, HICON hIcon, int32_t iCursorResource)
 {
-	//assert(ms_hInstance != NULL);
+	//assert(ms_hInstance != nullptr);
 	Destroy();
 		
 	const char* c_szClassName = RegisterWindowClass(cs, brush, MSWindowProcedure, hIcon, iCursorResource);
@@ -71,15 +71,15 @@ bool CMSWindow::Create(const char* c_szName, int brush, DWORD cs, DWORD ws, HICO
 						c_szName,
 						ws, 
 						0, 0, 0, 0, 
-						NULL,
-						NULL, 
+						nullptr,
+						nullptr, 
 						ms_hInstance,
-						NULL);
+						nullptr);
 
 	if (!m_hWnd)
 		return false;
 
-	SetWindowLong(m_hWnd, GWL_USERDATA, (DWORD) this);
+	SetWindowLong(m_hWnd, GWL_USERDATA, (uint32_t) this);
 	//DestroyWindow(ImmGetDefaultIMEWnd(m_hWnd));
 
 	return true;
@@ -131,12 +131,12 @@ HWND CMSWindow::GetWindowHandle()
 	return m_hWnd;
 }
 
-int	CMSWindow::GetScreenWidth()
+int32_t	CMSWindow::GetScreenWidth()
 {
 	return GetSystemMetrics(SM_CXSCREEN);
 }
 
-int	CMSWindow::GetScreenHeight()
+int32_t	CMSWindow::GetScreenHeight()
 {
 	return GetSystemMetrics(SM_CYSCREEN);
 }
@@ -158,9 +158,9 @@ void CMSWindow::GetMousePosition(POINT* ppt)
 	ScreenToClient(m_hWnd, ppt);
 }
 
-void CMSWindow::SetPosition(int x, int y)
+void CMSWindow::SetPosition(int32_t x, int32_t y)
 {
-	SetWindowPos(m_hWnd, NULL, x, y, 0, 0, SWP_NOZORDER|SWP_NOSIZE);
+	SetWindowPos(m_hWnd, nullptr, x, y, 0, 0, SWP_NOZORDER|SWP_NOSIZE);
 }
 
 void CMSWindow::SetCenterPosition()
@@ -169,19 +169,19 @@ void CMSWindow::SetCenterPosition()
 
 	GetClientRect(&rc);
 
-	int windowWidth = rc.right - rc.left;
-	int windowHeight = rc.bottom - rc.top;
+	int32_t windowWidth = rc.right - rc.left;
+	int32_t windowHeight = rc.bottom - rc.top;
 
 	SetPosition((GetScreenWidth()-windowWidth)/2, (GetScreenHeight()-windowHeight)/2);
 }
 
-void CMSWindow::AdjustSize(int width, int height)
+void CMSWindow::AdjustSize(int32_t width, int32_t height)
 {
 	SetRect(&m_rect, 0, 0, width, height);
 
 	AdjustWindowRectEx(&m_rect,
 						GetWindowStyle(m_hWnd),     
-						GetMenu(m_hWnd ) != NULL,    
+						GetMenu(m_hWnd ) != nullptr,    
 						GetWindowExStyle(m_hWnd ) ); 
 
 	MoveWindow
@@ -200,15 +200,15 @@ void CMSWindow::SetText(const char* c_szText)
 	SetWindowText(m_hWnd, c_szText);
 }
 
-void CMSWindow::SetSize(int width, int height)
+void CMSWindow::SetSize(int32_t width, int32_t height)
 {	
-	SetWindowPos(m_hWnd, NULL, 0, 0, width, height, SWP_NOZORDER|SWP_NOMOVE);
+	SetWindowPos(m_hWnd, nullptr, 0, 0, width, height, SWP_NOZORDER|SWP_NOMOVE);
 }
 
-const char * CMSWindow::RegisterWindowClass(DWORD style, int brush, WNDPROC pfnWndProc, HICON hIcon, int iCursorResource)
+const char * CMSWindow::RegisterWindowClass(uint32_t style, int32_t brush, WNDPROC pfnWndProc, HICON hIcon, int32_t iCursorResource)
 {
 	char szClassName[1024];
-	sprintf(szClassName, "eter - s%x:b%x:p:%x", style, brush, (DWORD) pfnWndProc);
+	sprintf(szClassName, "eter - s%x:b%x:p:%x", style, brush, (uint32_t) pfnWndProc);
 
 	TWindowClassSet::iterator f = ms_stWCSet.find((char*) szClassName);
 
@@ -240,7 +240,7 @@ const char * CMSWindow::RegisterWindowClass(DWORD style, int brush, WNDPROC pfnW
 
 CMSWindow::CMSWindow()
 {
-	m_hWnd=NULL;
+	m_hWnd=nullptr;
 	m_isVisible=false;
 }
 

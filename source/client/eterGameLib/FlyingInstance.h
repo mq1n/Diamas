@@ -21,8 +21,8 @@ public:
 
 	struct TAttachEffectInstance
 	{
-		int iAttachIndex;
-		DWORD dwEffectInstanceIndex;
+		int32_t iAttachIndex;
+		uint32_t dwEffectInstanceIndex;
 
 		CFlyTrace * pFlyTrace; 
 	};
@@ -52,15 +52,15 @@ public:
 	void SetEventHandler(IFlyEventHandler * pHandler) { m_pHandler = pHandler; }
 	void ClearEventHandler() { m_pHandler = 0; }
 
-	void SetPierceCount(int iCount) { m_iPierceCount = iCount; }
+	void SetPierceCount(int32_t iCount) { m_iPierceCount = iCount; }
 	void SetOwner(IActorInstance * pOwner) { m_pOwner = pOwner; }
-	void SetSkillIndex(DWORD dwIndex) { m_dwSkillIndex = dwIndex; }
+	void SetSkillIndex(uint32_t dwIndex) { m_dwSkillIndex = dwIndex; }
 
 	// FIXME : 툴에서 사용하고 있습니다. 임시로 위로.. - [levites]
 	void __Explode(bool bBomb=true);
 	void __Bomb();
 
-	DWORD ID;
+	uint32_t ID;
 
 protected:
 	void __Initialize();
@@ -79,8 +79,8 @@ protected:
 	bool m_bAlive;
 	bool m_canAttack;
 
-	int m_iPierceCount;
-	DWORD m_dwSkillIndex;
+	int32_t m_iPierceCount;
+	uint32_t m_dwSkillIndex;
 
 	D3DXVECTOR3 m_v3Position;
 	D3DXVECTOR3 m_v3Velocity;

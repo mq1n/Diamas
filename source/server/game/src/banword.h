@@ -10,7 +10,7 @@ class CBanwordManager : public singleton<CBanwordManager>
 		CBanwordManager();
 		virtual ~CBanwordManager();
 
-		bool Initialize(TBanwordTable * p, WORD wSize);
+		bool Initialize(TBanwordTable * p, uint16_t wSize);
 		bool Find(const char * c_pszString);
 		bool CheckString(const char * c_pszString, size_t _len);
 		void ConvertString(char * c_pszString, size_t _len);

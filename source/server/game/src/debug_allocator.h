@@ -42,7 +42,7 @@ inline void* operator new(size_t size, const char* file, size_t line) {
 	void* p = DebugAllocator::Alloc(size + sizeof(size_t));
 	p = reinterpret_cast<size_t*>(p) + 1;
 #endif
-	if (p != NULL) {
+	if (p != nullptr) {
 		size_t age = DebugAllocator::MarkAcquired(p, file, line, "new");
 #ifdef USE_DEBUG_PTR
 		*(reinterpret_cast<size_t*>(p) - 1) = age;
@@ -57,7 +57,7 @@ inline void* operator new[](size_t size, const char* file, size_t line) {
 	void* p = DebugAllocator::Alloc(size + sizeof(size_t));
 	p = reinterpret_cast<size_t*>(p) + 1;
 #endif
-	if (p != NULL) {
+	if (p != nullptr) {
 		size_t age = DebugAllocator::MarkAcquired(p, file, line, "new[]");
 #ifdef USE_DEBUG_PTR
 		*(reinterpret_cast<size_t*>(p) - 1) = age;
@@ -67,7 +67,7 @@ inline void* operator new[](size_t size, const char* file, size_t line) {
 }
 template<typename T>
 inline void debug_delete(T* p, const char* file, size_t line) {
-	if (p != NULL) {
+	if (p != nullptr) {
 		DebugAllocator::VerifyDeletion(p, file, line, false);
 		p->~T();
 #ifndef USE_DEBUG_PTR
@@ -84,7 +84,7 @@ inline void debug_delete(T* p, const char* file, size_t line) {
 template<typename T>
 inline void debug_delete(DebugPtr<T> ptr, const char* file, size_t line) {
 	T* p = ptr.Get();
-	if (p != NULL) {
+	if (p != nullptr) {
 		DebugAllocator::VerifyDeletion(ptr.Get(), file, line, true, ptr.GetAge());
 		p->~T();
 		size_t* px = reinterpret_cast<size_t*>(p) - 1;
@@ -96,7 +96,7 @@ inline void debug_delete(DebugPtr<T> ptr, const char* file, size_t line) {
 #endif
 template<typename T>
 inline void debug_delete_array(T* p, const char* file, size_t line) {
-	if (p != NULL) {
+	if (p != nullptr) {
 		DebugAllocator::VerifyDeletion(p, file, line, false);
 		// Caution: no destructor call here!
 		// It means that no serious destructor-equipped class should be
@@ -115,7 +115,7 @@ inline void debug_delete_array(T* p, const char* file, size_t line) {
 template<typename T>
 inline void debug_delete_array(DebugPtr<T> ptr, const char* file, size_t line) {
 	T* p = ptr.Get();
-	if (p != NULL) {
+	if (p != nullptr) {
 		DebugAllocator::VerifyDeletion(ptr.Get(), file, line, true, ptr.GetAge());
 		// Caution: no destructor call here!
 		// It means that no serious destructor-equipped class should be
@@ -137,7 +137,7 @@ inline void debug_delete_array(DebugPtr<T> ptr, const char* file, size_t line) {
 #ifdef _MSC_VER
 // To surpress warning C4291
 inline void operator delete(void* p, const char* file, size_t line) {
-	if (p != NULL) {
+	if (p != nullptr) {
 		DebugAllocator::VerifyDeletion(p, file, line, false);
 #ifndef USE_DEBUG_PTR
 		DebugAllocator::Free(p);

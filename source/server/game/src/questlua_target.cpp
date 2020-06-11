@@ -9,10 +9,10 @@ namespace quest
 	//
 	// "target" Lua functions
 	//
-	int target_pos(lua_State* L)
+	int32_t target_pos(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		int iQuestIndex = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
+		int32_t iQuestIndex = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
 
 		if (!lua_isstring(L, 1) || !lua_isnumber(L, 2) || !lua_isnumber(L, 3))
 		{
@@ -28,8 +28,8 @@ namespace quest
 			return 0;
 		}
 
-		int x = pos.x + (int) lua_tonumber(L, 2) * 100;
-		int y = pos.y + (int) lua_tonumber(L, 3) * 100;
+		int32_t x = pos.x + (int32_t) lua_tonumber(L, 2) * 100;
+		int32_t y = pos.y + (int32_t) lua_tonumber(L, 3) * 100;
 
 		CTargetManager::instance().CreateTarget(ch->GetPlayerID(),
 				iQuestIndex,
@@ -37,17 +37,17 @@ namespace quest
 				TARGET_TYPE_POS,
 				x,
 				y,
-				(int) lua_tonumber(L, 4),
-				lua_isstring(L, 5) ? lua_tostring(L, 5) : NULL,
-				lua_isnumber(L, 6) ? (int)lua_tonumber(L, 6): 1);
+				(int32_t) lua_tonumber(L, 4),
+				lua_isstring(L, 5) ? lua_tostring(L, 5) : nullptr,
+				lua_isnumber(L, 6) ? (int32_t)lua_tonumber(L, 6): 1);
 
 		return 0;
 	}
 
-	int target_vid(lua_State* L)
+	int32_t target_vid(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		int iQuestIndex = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
+		int32_t iQuestIndex = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
 
 		if (!lua_isstring(L, 1) || !lua_isnumber(L, 2))
 		{
@@ -60,20 +60,20 @@ namespace quest
 				iQuestIndex,
 				lua_tostring(L, 1),
 				TARGET_TYPE_VID,
-				(int) lua_tonumber(L, 2),
+				(int32_t) lua_tonumber(L, 2),
 				0,
 				ch->GetMapIndex(),
-				lua_isstring(L, 3) ? lua_tostring(L, 3) : NULL,
-				lua_isnumber(L, 4) ? (int)lua_tonumber(L, 4): 1);
+				lua_isstring(L, 3) ? lua_tostring(L, 3) : nullptr,
+				lua_isnumber(L, 4) ? (int32_t)lua_tonumber(L, 4): 1);
 
 		return 0;
 	}
 
 	// 현재 퀘스트에 등록된 타겟을 삭제 한다.
-	int target_delete(lua_State* L)
+	int32_t target_delete(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		int iQuestIndex = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
+		int32_t iQuestIndex = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
 
 		if (!lua_isstring(L, 1))
 		{
@@ -87,20 +87,20 @@ namespace quest
 	}
 
 	// 현재 퀘스트 인덱스로 되어있는 타겟을 모두 삭제한다.
-	int target_clear(lua_State* L)
+	int32_t target_clear(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		int iQuestIndex = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
+		int32_t iQuestIndex = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
 
-		CTargetManager::instance().DeleteTarget(ch->GetPlayerID(), iQuestIndex, NULL);
+		CTargetManager::instance().DeleteTarget(ch->GetPlayerID(), iQuestIndex, nullptr);
 
 		return 0;
 	}
 
-	int target_id(lua_State* L)
+	int32_t target_id(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		DWORD dwQuestIndex = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
+		uint32_t dwQuestIndex = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
 
 		if (!lua_isstring(L, 1))
 		{
@@ -115,7 +115,7 @@ namespace quest
 		{
 			TargetInfo * pInfo = dynamic_cast<TargetInfo *>(pkEvent->info);
 
-			if ( pInfo == NULL )
+			if ( pInfo == nullptr )
 			{
 				sys_err( "target_id> <Factor> Null pointer" );
 				lua_pushnumber(L, 0);
@@ -144,7 +144,7 @@ namespace quest
 			{ "delete",			target_delete		},
 			{ "clear",			target_clear		},
 			{ "id",			target_id		},
-			{ NULL,			NULL			},
+			{ nullptr,			nullptr			},
 		};
 
 		CQuestManager::instance().AddLuaFunctionTable("target", target_functions);

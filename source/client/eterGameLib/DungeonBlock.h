@@ -15,7 +15,7 @@ class CDungeonBlock : public CGraphicObjectInstance
 		{
 			ID = THING_OBJECT
 		};
-		int GetType() const { return ID; }
+		int32_t GetType() const { return ID; }
 
 	public:
 		CDungeonBlock();

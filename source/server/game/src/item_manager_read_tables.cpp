@@ -34,7 +34,7 @@ bool ITEM_MANAGER::ReadCommonDropItemFile(const char * c_pszFileName)
 
 	char buf[1024];
 
-	int lines = 0;
+	int32_t lines = 0;
 
 	while (fgets(buf, 1024, fp))
 	{
@@ -51,9 +51,9 @@ bool ITEM_MANAGER::ReadCommonDropItemFile(const char * c_pszFileName)
 		char * p = buf;
 		char * p2;
 
-		for (int i = 0; i <= MOB_RANK_S_KNIGHT; ++i)
+		for (int32_t i = 0; i <= MOB_RANK_S_KNIGHT; ++i)
 		{
-			for (int j = 0; j < 6; ++j)
+			for (int32_t j = 0; j < 6; ++j)
 			{
 				p2 = strchr(p, '\t');
 
@@ -74,8 +74,8 @@ bool ITEM_MANAGER::ReadCommonDropItemFile(const char * c_pszFileName)
 				}
 			}
 
-			DWORD dwPct = (DWORD) (d[i].fPercent * 10000.0f);
-			DWORD dwItemVnum = 0;
+			uint32_t dwPct = (uint32_t) (d[i].fPercent * 10000.0f);
+			uint32_t dwItemVnum = 0;
 
 			if (!ITEM_MANAGER::instance().GetVnumByOriginalName(d[i].szItemName, dwItemVnum))
 			{
@@ -98,7 +98,7 @@ bool ITEM_MANAGER::ReadCommonDropItemFile(const char * c_pszFileName)
 
 	fclose(fp);
 
-	for (int i = 0; i < MOB_RANK_MAX_NUM; ++i)
+	for (int32_t i = 0; i < MOB_RANK_MAX_NUM; ++i)
 	{
 		std::vector<CItemDropInfo> & v = g_vec_pkCommonDropItem[i];
 		std::sort(v.begin(), v.end());
@@ -126,13 +126,13 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName)
 
 	std::string stName;
 
-	for (DWORD i = 0; i < loader.GetChildNodeCount(); ++i)
+	for (uint32_t i = 0; i < loader.GetChildNodeCount(); ++i)
 	{
 		loader.SetChildNode(i);
 
 		loader.GetCurrentNodeName(&stName);
 
-		int iVnum;
+		int32_t iVnum;
 
 		if (!loader.GetTokenInteger("vnum", &iVnum))
 		{
@@ -147,7 +147,7 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName)
 
 		//
 		std::string stType;
-		int type = CSpecialItemGroup::NORMAL;
+		int32_t type = CSpecialItemGroup::NORMAL;
 		if (loader.GetTokenString("type", &stType))
 		{
 			stl_lowers(stType);
@@ -169,15 +169,15 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName)
 		if ("attr" == stType)
 		{
 			CSpecialAttrGroup * pkGroup = M2_NEW CSpecialAttrGroup(iVnum);
-			for (int k = 1; k < 1024; ++k) // @fixme148 256 -> 1024
+			for (int32_t k = 1; k < 1024; ++k) // @fixme148 256 -> 1024
 			{
 				char buf[4];
 				snprintf(buf, sizeof(buf), "%d", k);
 
 				if (loader.GetTokenVector(buf, &pTok))
 				{
-					DWORD apply_type = 0;
-					int	apply_value = 0;
+					uint32_t apply_type = 0;
+					int32_t	apply_value = 0;
 					str_to_number(apply_type, pTok->at(0).c_str());
 					if (0 == apply_type)
 					{
@@ -212,7 +212,7 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName)
 		else
 		{
 			CSpecialItemGroup * pkGroup = M2_NEW CSpecialItemGroup(iVnum, type);
-			for (int k = 1; k < 1024; ++k) // @fixme148 256 -> 1024
+			for (int32_t k = 1; k < 1024; ++k) // @fixme148 256 -> 1024
 			{
 				char buf[4];
 				snprintf(buf, sizeof(buf), "%d", k);
@@ -220,7 +220,7 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName)
 				if (loader.GetTokenVector(buf, &pTok))
 				{
 					const std::string& name = pTok->at(0);
-					DWORD dwVnum = 0;
+					uint32_t dwVnum = 0;
 
 					if (!GetVnumByOriginalName(name.c_str(), dwVnum))
 					{
@@ -267,12 +267,12 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName)
 						}
 					}
 
-					int iCount = 0;
+					int32_t iCount = 0;
 					str_to_number(iCount, pTok->at(1).c_str());
-					int iProb = 0;
+					int32_t iProb = 0;
 					str_to_number(iProb, pTok->at(2).c_str());
 
-					int iRarePct = 0;
+					int32_t iRarePct = 0;
 					if (pTok->size() > 3)
 					{
 						str_to_number(iRarePct, pTok->at(3).c_str());
@@ -332,13 +332,13 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 
 	std::string stName;
 
-	for (DWORD i = 0; i < loader.GetChildNodeCount(); ++i)
+	for (uint32_t i = 0; i < loader.GetChildNodeCount(); ++i)
 	{
 		loader.SetChildNode(i);
 
 		loader.GetCurrentNodeName(&stName);
 
-		int iVnum;
+		int32_t iVnum;
 
 		if (!loader.GetTokenInteger("vnum", &iVnum))
 		{
@@ -349,7 +349,7 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 		}
 
 		std::string str;
-		int type = 0;
+		int32_t type = 0;
 		if (loader.GetTokenString("type", &str))
 		{
 			stl_lowers(str);
@@ -381,7 +381,7 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 			fprintf(fp, "	Type	ATTR\n");
 			// @fixme148 END
 
-		for (int k = 1; k < 1024; ++k) // @fixme148 256 -> 1024
+		for (int32_t k = 1; k < 1024; ++k) // @fixme148 256 -> 1024
 		{
 			char buf[4];
 			snprintf(buf, sizeof(buf), "%d", k);
@@ -389,7 +389,7 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 			if (loader.GetTokenVector(buf, &pTok))
 			{
 				std::string& name = pTok->at(0);
-				DWORD dwVnum = 0;
+				uint32_t dwVnum = 0;
 
 				if (!GetVnumByOriginalName(name.c_str(), dwVnum))
 				{
@@ -426,15 +426,15 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 					}
 				}
 
-				int iCount = 0;
+				int32_t iCount = 0;
 				str_to_number(iCount, pTok->at(1).c_str());
-				int iProb = 0;
+				int32_t iProb = 0;
 				// @fixme148 BEGIN
 				if (pTok->size() > 2)
 					str_to_number(iProb, pTok->at(2).c_str());
 				// @fixme148 END
 
-				int iRarePct = 0;
+				int32_t iRarePct = 0;
 				if (pTok->size() > 3)
 					str_to_number(iRarePct, pTok->at(3).c_str());
 
@@ -481,7 +481,7 @@ bool ITEM_MANAGER::ReadEtcDropItemFile(const char * c_pszFileName)
 
 	char buf[512];
 
-	int lines = 0;
+	int32_t lines = 0;
 
 	while (fgets(buf, 512, fp))
 	{
@@ -505,7 +505,7 @@ bool ITEM_MANAGER::ReadEtcDropItemFile(const char * c_pszFileName)
 		if (!*szItemName || fProb == 0.0f)
 			continue;
 
-		DWORD dwItemVnum;
+		uint32_t dwItemVnum;
 
 		if (!ITEM_MANAGER::instance().GetVnumByOriginalName(szItemName, dwItemVnum))
 		{
@@ -514,7 +514,7 @@ bool ITEM_MANAGER::ReadEtcDropItemFile(const char * c_pszFileName)
 			return false;
 		}
 
-		m_map_dwEtcItemDropProb[dwItemVnum] = (DWORD) (fProb * 10000.0f);
+		m_map_dwEtcItemDropProb[dwItemVnum] = (uint32_t) (fProb * 10000.0f);
 		sys_log(0, "ETC_DROP_ITEM: %s prob %f", szItemName, fProb);
 	}
 
@@ -529,7 +529,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 	if (!loader.Load(c_pszFileName))
 		return false;
 
-	for (DWORD i = 0; i < loader.GetChildNodeCount(); ++i)
+	for (uint32_t i = 0; i < loader.GetChildNodeCount(); ++i)
 	{
 		std::string stName("");
 
@@ -540,9 +540,9 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 
 		loader.SetChildNode(i);
 
-		int iMobVnum = 0;
-		int iKillDrop = 0;
-		int iLevelLimit = 0;
+		int32_t iMobVnum = 0;
+		int32_t iKillDrop = 0;
+		int32_t iLevelLimit = 0;
 
 		std::string strType("");
 
@@ -596,13 +596,13 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 			continue;
 		}
 
-		TTokenVector* pTok = NULL;
+		TTokenVector* pTok = nullptr;
 
 		if (strType == "kill")
 		{
 			CMobItemGroup * pkGroup = M2_NEW CMobItemGroup(iMobVnum, iKillDrop, stName);
 
-			for (int k = 1; k < 256; ++k)
+			for (int32_t k = 1; k < 256; ++k)
 			{
 				char buf[4];
 				snprintf(buf, sizeof(buf), "%d", k);
@@ -611,7 +611,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				{
 					//sys_log(1, "               %s %s", pTok->at(0).c_str(), pTok->at(1).c_str());
 					std::string& name = pTok->at(0);
-					DWORD dwVnum = 0;
+					uint32_t dwVnum = 0;
 
 					if (!GetVnumByOriginalName(name.c_str(), dwVnum))
 					{
@@ -623,7 +623,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 						}
 					}
 
-					int iCount = 0;
+					int32_t iCount = 0;
 					str_to_number(iCount, pTok->at(1).c_str());
 
 					if (iCount<1)
@@ -632,7 +632,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 						return false;
 					}
 
-					int iPartPct = 0;
+					int32_t iPartPct = 0;
 					str_to_number(iPartPct, pTok->at(2).c_str());
 
 					if (iPartPct == 0)
@@ -641,7 +641,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 						return false;
 					}
 
-					int iRarePct = 0;
+					int32_t iRarePct = 0;
 					str_to_number(iRarePct, pTok->at(3).c_str());
 					iRarePct = MINMAX(0, iRarePct, 100);
 
@@ -652,7 +652,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 
 				break;
 			}
-			m_map_pkMobItemGroup.insert(std::map<DWORD, CMobItemGroup*>::value_type(iMobVnum, pkGroup));
+			m_map_pkMobItemGroup.insert(std::map<uint32_t, CMobItemGroup*>::value_type(iMobVnum, pkGroup));
 
 		}
 		else if (strType == "drop")
@@ -670,7 +670,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				pkGroup = it->second;
 			}
 
-			for (int k = 1; k < 256; ++k)
+			for (int32_t k = 1; k < 256; ++k)
 			{
 				char buf[4];
 				snprintf(buf, sizeof(buf), "%d", k);
@@ -678,7 +678,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				if (loader.GetTokenVector(buf, &pTok))
 				{
 					std::string& name = pTok->at(0);
-					DWORD dwVnum = 0;
+					uint32_t dwVnum = 0;
 
 					if (!GetVnumByOriginalName(name.c_str(), dwVnum))
 					{
@@ -692,7 +692,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 						}
 					}
 
-					int iCount = 0;
+					int32_t iCount = 0;
 					str_to_number(iCount, pTok->at(1).c_str());
 
 					if (iCount < 1)
@@ -705,7 +705,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 
 					float fPercent = atof(pTok->at(2).c_str());
 
-					DWORD dwPct = (DWORD)(10000.0f * fPercent);
+					uint32_t dwPct = (uint32_t)(10000.0f * fPercent);
 
 					sys_log(0,"        name %s pct %d count %d", name.c_str(), dwPct, iCount);
 					pkGroup->AddItem(dwVnum, dwPct, iCount);
@@ -716,14 +716,14 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				break;
 			}
 			if (bNew)
-				m_map_pkDropItemGroup.insert(std::map<DWORD, CDropItemGroup*>::value_type(iMobVnum, pkGroup));
+				m_map_pkDropItemGroup.insert(std::map<uint32_t, CDropItemGroup*>::value_type(iMobVnum, pkGroup));
 
 		}
 		else if ( strType == "limit" )
 		{
 			CLevelItemGroup* pkLevelItemGroup = M2_NEW CLevelItemGroup(iLevelLimit);
 
-			for ( int k=1; k < 256; k++ )
+			for ( int32_t k=1; k < 256; k++ )
 			{
 				char buf[4];
 				snprintf(buf, sizeof(buf), "%d", k);
@@ -731,7 +731,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				if ( loader.GetTokenVector(buf, &pTok) )
 				{
 					std::string& name = pTok->at(0);
-					DWORD dwItemVnum = 0;
+					uint32_t dwItemVnum = 0;
 
 					if (false == GetVnumByOriginalName(name.c_str(), dwItemVnum))
 					{
@@ -744,7 +744,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 						}
 					}
 
-					int iCount = 0;
+					int32_t iCount = 0;
 					str_to_number(iCount, pTok->at(1).c_str());
 
 					if (iCount < 1)
@@ -755,7 +755,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 					}
 
 					float fPct = atof(pTok->at(2).c_str());
-					DWORD dwPct = (DWORD)(10000.0f * fPct);
+					uint32_t dwPct = (uint32_t)(10000.0f * fPct);
 
 					sys_log(0,"        name %s pct %d count %d", name.c_str(), dwPct, iCount);
 					pkLevelItemGroup->AddItem(dwItemVnum, dwPct, iCount);
@@ -766,13 +766,13 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				break;
 			}
 
-			m_map_pkLevelItemGroup.insert(std::map<DWORD, CLevelItemGroup*>::value_type(iMobVnum, pkLevelItemGroup));
+			m_map_pkLevelItemGroup.insert(std::map<uint32_t, CLevelItemGroup*>::value_type(iMobVnum, pkLevelItemGroup));
 		}
 		else if (strType == "thiefgloves")
 		{
 			CBuyerThiefGlovesItemGroup* pkGroup = M2_NEW CBuyerThiefGlovesItemGroup(0, iMobVnum, stName);
 
-			for (int k = 1; k < 256; ++k)
+			for (int32_t k = 1; k < 256; ++k)
 			{
 				char buf[4];
 				snprintf(buf, sizeof(buf), "%d", k);
@@ -780,7 +780,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				if (loader.GetTokenVector(buf, &pTok))
 				{
 					std::string& name = pTok->at(0);
-					DWORD dwVnum = 0;
+					uint32_t dwVnum = 0;
 
 					if (!GetVnumByOriginalName(name.c_str(), dwVnum))
 					{
@@ -794,7 +794,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 						}
 					}
 
-					int iCount = 0;
+					int32_t iCount = 0;
 					str_to_number(iCount, pTok->at(1).c_str());
 
 					if (iCount < 1)
@@ -807,7 +807,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 
 					float fPercent = atof(pTok->at(2).c_str());
 
-					DWORD dwPct = (DWORD)(10000.0f * fPercent);
+					uint32_t dwPct = (uint32_t)(10000.0f * fPercent);
 
 					sys_log(0,"        name %s pct %d count %d", name.c_str(), dwPct, iCount);
 					pkGroup->AddItem(dwVnum, dwPct, iCount);
@@ -818,7 +818,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				break;
 			}
 
-			m_map_pkGloveItemGroup.insert(std::map<DWORD, CBuyerThiefGlovesItemGroup*>::value_type(iMobVnum, pkGroup));
+			m_map_pkGloveItemGroup.insert(std::map<uint32_t, CBuyerThiefGlovesItemGroup*>::value_type(iMobVnum, pkGroup));
 		}
 		else
 		{
@@ -842,14 +842,14 @@ bool ITEM_MANAGER::ReadDropItemGroup(const char * c_pszFileName)
 
 	std::string stName;
 
-	for (DWORD i = 0; i < loader.GetChildNodeCount(); ++i)
+	for (uint32_t i = 0; i < loader.GetChildNodeCount(); ++i)
 	{
 		loader.SetChildNode(i);
 
 		loader.GetCurrentNodeName(&stName);
 
-		int iVnum;
-		int iMobVnum;
+		int32_t iVnum;
+		int32_t iMobVnum;
 
 		if (!loader.GetTokenInteger("vnum", &iVnum))
 		{
@@ -878,7 +878,7 @@ bool ITEM_MANAGER::ReadDropItemGroup(const char * c_pszFileName)
 		else
 			pkGroup = it->second;
 
-		for (int k = 1; k < 256; ++k)
+		for (int32_t k = 1; k < 256; ++k)
 		{
 			char buf[4];
 			snprintf(buf, sizeof(buf), "%d", k);
@@ -886,7 +886,7 @@ bool ITEM_MANAGER::ReadDropItemGroup(const char * c_pszFileName)
 			if (loader.GetTokenVector(buf, &pTok))
 			{
 				std::string& name = pTok->at(0);
-				DWORD dwVnum = 0;
+				uint32_t dwVnum = 0;
 
 				if (!GetVnumByOriginalName(name.c_str(), dwVnum))
 				{
@@ -904,9 +904,9 @@ bool ITEM_MANAGER::ReadDropItemGroup(const char * c_pszFileName)
 
 				float fPercent = atof(pTok->at(1).c_str());
 
-				DWORD dwPct = (DWORD)(10000.0f * fPercent);
+				uint32_t dwPct = (uint32_t)(10000.0f * fPercent);
 
-				int iCount = 1;
+				int32_t iCount = 1;
 				if (pTok->size() > 2)
 					str_to_number(iCount, pTok->at(2).c_str());
 
@@ -929,7 +929,7 @@ bool ITEM_MANAGER::ReadDropItemGroup(const char * c_pszFileName)
 		}
 
 		if (it == m_map_pkDropItemGroup.end())
-			m_map_pkDropItemGroup.insert(std::map<DWORD, CDropItemGroup*>::value_type(iMobVnum, pkGroup));
+			m_map_pkDropItemGroup.insert(std::map<uint32_t, CDropItemGroup*>::value_type(iMobVnum, pkGroup));
 
 		loader.SetParentNode();
 	}
@@ -945,7 +945,7 @@ bool ITEM_MANAGER::ReadItemVnumMaskTable(const char * c_pszFileName)
 		return false;
 	}
 
-	int ori_vnum, new_vnum;
+	int32_t ori_vnum, new_vnum;
 	while (fscanf(fp, "%u %u", &ori_vnum, &new_vnum) != EOF)
 	{
 		m_map_new_to_ori.insert (TMapDW2DW::value_type (new_vnum, ori_vnum));

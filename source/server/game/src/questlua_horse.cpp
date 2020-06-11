@@ -15,14 +15,14 @@
 #define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
-extern int (*check_name) (const char * str);
+extern int32_t (*check_name) (const char * str);
 
 namespace quest
 {
 	//
 	// "horse" Lua functions
 	//
-	int horse_is_riding(lua_State* L)
+	int32_t horse_is_riding(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
@@ -34,13 +34,13 @@ namespace quest
 		return 1;
 	}
 
-	int horse_is_summon(lua_State* L)
+	int32_t horse_is_summon(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
-		if (NULL != ch)
+		if (nullptr != ch)
 		{
-			lua_pushboolean(L, (ch->GetHorse() != NULL) ? true : false);
+			lua_pushboolean(L, (ch->GetHorse() != nullptr) ? true : false);
 		}
 		else
 		{
@@ -50,21 +50,21 @@ namespace quest
 		return 1;
 	}
 
-	int horse_ride(lua_State* L)
+	int32_t horse_ride(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		ch->StartRiding();
 		return 0;
 	}
 
-	int horse_unride(lua_State* L)
+	int32_t horse_unride(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		ch->StopRiding();
 		return 0;
 	}
 
-	int horse_summon(lua_State* L)
+	int32_t horse_summon(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
@@ -72,21 +72,21 @@ namespace quest
 		bool bFromFar = lua_isboolean(L, 1) ? lua_toboolean(L, 1) : false;
 
 		// 소환수의 vnum
-		DWORD horseVnum= lua_isnumber(L, 2) ? lua_tonumber(L, 2) : 0;
+		uint32_t horseVnum= lua_isnumber(L, 2) ? lua_tonumber(L, 2) : 0;
 
 		const char* name = lua_isstring(L, 3) ? lua_tostring(L, 3) : 0;
 		ch->HorseSummon(true, bFromFar, horseVnum, name);
 		return 0;
 	}
 
-	int horse_unsummon(lua_State* L)
+	int32_t horse_unsummon(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		ch->HorseSummon(false);
 		return 0;
 	}
 
-	int horse_is_mine(lua_State* L)
+	int32_t horse_is_mine(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		LPCHARACTER horse = CQuestManager::instance().GetCurrentNPCCharacterPtr();
@@ -95,28 +95,28 @@ namespace quest
 		return 1;
 	}
 
-	int horse_set_level(lua_State* L)
+	int32_t horse_set_level(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
 		if (!lua_isnumber(L, 1))
 			return 0;
 
-		int newlevel = MINMAX(0, (int)lua_tonumber(L, 1), HORSE_MAX_LEVEL);
+		int32_t newlevel = MINMAX(0, (int32_t)lua_tonumber(L, 1), HORSE_MAX_LEVEL);
 		ch->SetHorseLevel(newlevel);
 		ch->ComputePoints();
 		ch->SkillLevelPacket();
 		return 0;
 	}
 
-	int horse_get_level(lua_State* L)
+	int32_t horse_get_level(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		lua_pushnumber(L, ch->GetHorseLevel());
 		return 1;
 	}
 
-	int horse_advance(lua_State* L)
+	int32_t horse_advance(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
@@ -129,7 +129,7 @@ namespace quest
 		return 0;
 	}
 
-	int horse_get_health(lua_State* L)
+	int32_t horse_get_health(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
@@ -141,11 +141,11 @@ namespace quest
 		return 1;
 	}
 
-	int horse_get_health_pct(lua_State* L)
+	int32_t horse_get_health_pct(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
-		int pct = MINMAX(0, ch->GetHorseHealth() * 100 / ch->GetHorseMaxHealth(), 100);
+		int32_t pct = MINMAX(0, ch->GetHorseHealth() * 100 / ch->GetHorseMaxHealth(), 100);
 		sys_log(1, "horse.get_health_pct %d", pct);
 
 		if (ch->GetHorseLevel())
@@ -156,7 +156,7 @@ namespace quest
 		return 1;
 	}
 
-	int horse_get_stamina(lua_State* L)
+	int32_t horse_get_stamina(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
@@ -168,10 +168,10 @@ namespace quest
 		return 1;
 	}
 
-	int horse_get_stamina_pct(lua_State* L)
+	int32_t horse_get_stamina_pct(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		int pct = MINMAX(0, ch->GetHorseStamina() * 100 / ch->GetHorseMaxStamina(), 100);
+		int32_t pct = MINMAX(0, ch->GetHorseStamina() * 100 / ch->GetHorseMaxStamina(), 100);
 		sys_log(1, "horse.get_stamina_pct %d", pct);
 
 		if (ch->GetHorseLevel())
@@ -182,21 +182,21 @@ namespace quest
 		return 1;
 	}
 
-	int horse_get_grade(lua_State* L)
+	int32_t horse_get_grade(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		lua_pushnumber(L, ch->GetHorseGrade());
 		return 1;
 	}
 
-	int horse_is_dead(lua_State* L)
+	int32_t horse_is_dead(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		lua_pushboolean(L, ch->GetHorseHealth()<=0);
 		return 1;
 	}
 
-	int horse_revive(lua_State* L)
+	int32_t horse_revive(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		if (ch->GetHorseLevel() > 0 && ch->GetHorseHealth() <= 0)
@@ -206,10 +206,10 @@ namespace quest
 		return 0;
 	}
 
-	int horse_feed(lua_State* L)
+	int32_t horse_feed(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		//DWORD dwHorseFood = ch->GetHorseLevel() + ITEM_HORSE_FOOD_1 - 1;
+		//uint32_t dwHorseFood = ch->GetHorseLevel() + ITEM_HORSE_FOOD_1 - 1;
 		if (ch->GetHorseLevel() > 0 && ch->GetHorseHealth() > 0)
 		{
 			ch->FeedHorse();
@@ -217,7 +217,7 @@ namespace quest
 		return 0;
 	}
 
-	int horse_set_name(lua_State* L)
+	int32_t horse_set_name(lua_State* L)
 	{
 		// 리턴값
 		// 0 : 소유한 말이 없다
@@ -232,13 +232,13 @@ namespace quest
 		{
 			const char* pHorseName = lua_tostring(L, -1);
 
-			if ( pHorseName == NULL || check_name(pHorseName) == 0 )
+			if ( pHorseName == nullptr || check_name(pHorseName) == 0 )
 			{
 				lua_pushnumber(L, 1);
 			}
 			else
 			{
-				int nHorseNameDuration = test_server == true ? 60*5 : 60*60*24*30;
+				int32_t nHorseNameDuration = test_server == true ? 60*5 : 60*60*24*30;
 
 				ch->SetQuestFlag("horse_name.valid_till", get_global_time() + nHorseNameDuration);
 				ch->AddAffect(AFFECT_HORSE_NAME, 0, 0, 0, PASSES_PER_SEC(nHorseNameDuration), 0, true);
@@ -259,15 +259,15 @@ namespace quest
 		return 1;
 	}
 
-	int horse_get_name(lua_State* L)
+	int32_t horse_get_name(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
-		if ( ch != NULL )
+		if ( ch != nullptr )
 		{
 			const char* pHorseName = CHorseNameManager::instance().GetHorseName(ch->GetPlayerID());
 
-			if ( pHorseName != NULL )
+			if ( pHorseName != nullptr )
 			{
 				lua_pushstring(L, pHorseName);
 				return 1;
@@ -304,7 +304,7 @@ namespace quest
 			{ "set_name",		horse_set_name			},
 			{ "get_name",		horse_get_name			},
 
-			{ NULL,				NULL					}
+			{ nullptr,				nullptr					}
 		};
 
 		CQuestManager::instance().AddLuaFunctionTable("horse", horse_functions);

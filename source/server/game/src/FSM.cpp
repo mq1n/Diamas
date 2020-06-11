@@ -13,7 +13,7 @@ CFSM::CFSM()
 
 	// Initialize State Machine
 	m_pCurrentState = static_cast<CState *>(&m_stateInitial);
-	m_pNewState = NULL;
+	m_pNewState = nullptr;
 }
 
 //======================================================================================================

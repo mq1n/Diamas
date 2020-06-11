@@ -12,9 +12,9 @@ CHorseNameManager::CHorseNameManager()
 	m_mapHorseNames.clear();
 }
 
-const char* CHorseNameManager::GetHorseName(DWORD dwPlayerID)
+const char* CHorseNameManager::GetHorseName(uint32_t dwPlayerID)
 {
-	std::map<DWORD, std::string>::iterator iter;
+	std::map<uint32_t, std::string>::iterator iter;
 
 	iter = m_mapHorseNames.find(dwPlayerID);
 
@@ -24,15 +24,15 @@ const char* CHorseNameManager::GetHorseName(DWORD dwPlayerID)
 	}
 	else
 	{
-		return NULL;
+		return nullptr;
 	}
 }
 
-void CHorseNameManager::UpdateHorseName(DWORD dwPlayerID, const char* szHorseName, bool broadcast)
+void CHorseNameManager::UpdateHorseName(uint32_t dwPlayerID, const char* szHorseName, bool broadcast)
 {
-	if ( szHorseName == NULL )
+	if ( szHorseName == nullptr )
 	{
-		sys_err("HORSE_NAME: NULL NAME (%u)", dwPlayerID);
+		sys_err("HORSE_NAME: nullptr NAME (%u)", dwPlayerID);
 		szHorseName = "";
 	}
 
@@ -46,7 +46,7 @@ void CHorseNameManager::UpdateHorseName(DWORD dwPlayerID, const char* szHorseNam
 	}
 }
 
-void CHorseNameManager::BroadcastHorseName(DWORD dwPlayerID, const char* szHorseName)
+void CHorseNameManager::BroadcastHorseName(uint32_t dwPlayerID, const char* szHorseName)
 {
 	TPacketUpdateHorseName packet;
 	packet.dwPlayerID = dwPlayerID;
@@ -59,7 +59,7 @@ void CHorseNameManager::Validate(LPCHARACTER pChar)
 {
 	CAffect *pkAff = pChar->FindAffect(AFFECT_HORSE_NAME);
 
-	if ( pkAff != NULL )
+	if ( pkAff != nullptr )
 	{
 		if ( pChar->GetQuestFlag("horse_name.valid_till") < get_global_time() )
 		{

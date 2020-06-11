@@ -7,7 +7,7 @@
 void CPythonSystem::SetInterfaceHandler(PyObject * poHandler)
 {
 // NOTE : 레퍼런스 카운트는 바꾸지 않는다. 레퍼런스가 남아 있어 Python에서 완전히 지워지지 않기 때문.
-//        대신에 __del__때 Destroy를 호출해 Handler를 NULL로 셋팅한다. - [levites]
+//        대신에 __del__때 Destroy를 호출해 Handler를 nullptr로 셋팅한다. - [levites]
 //	if (m_poInterfaceHandler)
 //		Py_DECREF(m_poInterfaceHandler);
 
@@ -19,10 +19,10 @@ void CPythonSystem::SetInterfaceHandler(PyObject * poHandler)
 
 void CPythonSystem::DestroyInterfaceHandler()
 {
-	m_poInterfaceHandler = NULL;
+	m_poInterfaceHandler = nullptr;
 }
 
-void CPythonSystem::SaveWindowStatus(int iIndex, int iVisible, int iMinimized, int ix, int iy, int iHeight)
+void CPythonSystem::SaveWindowStatus(int32_t iIndex, int32_t iVisible, int32_t iMinimized, int32_t ix, int32_t iy, int32_t iHeight)
 {
 	m_WindowStatus[iIndex].isVisible	= iVisible;
 	m_WindowStatus[iIndex].isMinimized	= iMinimized;
@@ -45,13 +45,13 @@ void CPythonSystem::GetDisplaySettings()
 	lpD3D->GetAdapterDisplayMode(0, &d3ddmDesktop);
 
 	// 이 어뎁터가 가지고 있는 디스플래이 모드갯수를 나열한다..
-	DWORD dwNumAdapterModes = lpD3D->GetAdapterModeCount(0);
+	uint32_t dwNumAdapterModes = lpD3D->GetAdapterModeCount(0);
 
-	for (UINT iMode = 0; iMode < dwNumAdapterModes; iMode++)
+	for (uint32_t iMode = 0; iMode < dwNumAdapterModes; iMode++)
 	{
 		D3DDISPLAYMODE DisplayMode;
 		lpD3D->EnumAdapterModes(0, iMode, &DisplayMode);
-		DWORD bpp = 0;
+		uint32_t bpp = 0;
 
 		// 800 600 이상만 걸러낸다.
 		if (DisplayMode.Width < 800 || DisplayMode.Height < 600)
@@ -66,19 +66,19 @@ void CPythonSystem::GetDisplaySettings()
 		else
 			continue;
 
-		int check_res = false;
+		int32_t check_res = false;
 
-		for (int i = 0; !check_res && i < m_ResolutionCount; ++i)
+		for (int32_t i = 0; !check_res && i < m_ResolutionCount; ++i)
 		{
 			if (m_ResolutionList[i].bpp != bpp ||
 				m_ResolutionList[i].width != DisplayMode.Width ||
 				m_ResolutionList[i].height != DisplayMode.Height)
 				continue;
 
-			int check_fre = false;
+			int32_t check_fre = false;
 
 			// 프리퀀시만 다르므로 프리퀀시만 셋팅해준다.
-			for (int j = 0; j < m_ResolutionList[i].frequency_count; ++j)
+			for (int32_t j = 0; j < m_ResolutionList[i].frequency_count; ++j)
 			{
 				if (m_ResolutionList[i].frequency[j] == DisplayMode.RefreshRate)
 				{
@@ -111,12 +111,12 @@ void CPythonSystem::GetDisplaySettings()
 	}
 }
 
-int	CPythonSystem::GetResolutionCount()
+int32_t	CPythonSystem::GetResolutionCount()
 {
 	return m_ResolutionCount;
 }
 
-int CPythonSystem::GetFrequencyCount(int index)
+int32_t CPythonSystem::GetFrequencyCount(int32_t index)
 {
 	if (index >= m_ResolutionCount)
 		return 0;
@@ -124,7 +124,7 @@ int CPythonSystem::GetFrequencyCount(int index)
     return m_ResolutionList[index].frequency_count;
 }
 
-bool CPythonSystem::GetResolution(int index, OUT DWORD *width, OUT DWORD *height, OUT DWORD *bpp)
+bool CPythonSystem::GetResolution(int32_t index, OUT uint32_t *width, OUT uint32_t *height, OUT uint32_t *bpp)
 {
 	if (index >= m_ResolutionCount)
 		return false;
@@ -135,7 +135,7 @@ bool CPythonSystem::GetResolution(int index, OUT DWORD *width, OUT DWORD *height
 	return true;
 }
 
-bool CPythonSystem::GetFrequency(int index, int freq_index, OUT DWORD *frequncy)
+bool CPythonSystem::GetFrequency(int32_t index, int32_t freq_index, OUT uint32_t *frequncy)
 {
 	if (index >= m_ResolutionCount)
 		return false;
@@ -147,10 +147,10 @@ bool CPythonSystem::GetFrequency(int index, int freq_index, OUT DWORD *frequncy)
 	return true;
 }
 
-int	CPythonSystem::GetResolutionIndex(DWORD width, DWORD height, DWORD bit)
+int32_t	CPythonSystem::GetResolutionIndex(uint32_t width, uint32_t height, uint32_t bit)
 {
-	DWORD re_width, re_height, re_bit;
-	int i = 0;
+	uint32_t re_width, re_height, re_bit;
+	int32_t i = 0;
 
 	while (GetResolution(i, &re_width, &re_height, &re_bit))
 	{
@@ -164,10 +164,10 @@ int	CPythonSystem::GetResolutionIndex(DWORD width, DWORD height, DWORD bit)
 	return 0;
 }
 
-int	CPythonSystem::GetFrequencyIndex(int res_index, DWORD frequency)
+int32_t	CPythonSystem::GetFrequencyIndex(int32_t res_index, uint32_t frequency)
 {
-	DWORD re_frequency;
-	int i = 0;
+	uint32_t re_frequency;
+	int32_t i = 0;
 
 	while (GetFrequency(res_index, i, &re_frequency))
 	{
@@ -180,20 +180,20 @@ int	CPythonSystem::GetFrequencyIndex(int res_index, DWORD frequency)
 	return 0;
 }
 
-DWORD CPythonSystem::GetWidth()
+uint32_t CPythonSystem::GetWidth()
 {
 	return m_Config.width;
 }
 
-DWORD CPythonSystem::GetHeight()
+uint32_t CPythonSystem::GetHeight()
 {
 	return m_Config.height;
 }
-DWORD CPythonSystem::GetBPP()
+uint32_t CPythonSystem::GetBPP()
 {
 	return m_Config.bpp;
 }
-DWORD CPythonSystem::GetFrequency()
+uint32_t CPythonSystem::GetFrequency()
 {
 	return m_Config.frequency;
 }
@@ -213,7 +213,7 @@ float CPythonSystem::GetMusicVolume()
 	return m_Config.music_volume;
 }
 
-int CPythonSystem::GetSoundVolume()
+int32_t CPythonSystem::GetSoundVolume()
 {
 	return m_Config.voice_volume;
 }
@@ -225,26 +225,26 @@ void CPythonSystem::SetMusicVolume(float fVolume)
 
 void CPythonSystem::SetSoundVolumef(float fVolume)
 {
-	m_Config.voice_volume = int(5 * fVolume);
+	m_Config.voice_volume = int32_t(5 * fVolume);
 }
 
-int CPythonSystem::GetDistance()
+int32_t CPythonSystem::GetDistance()
 {
 	return m_Config.iDistance;
 }
 
-int CPythonSystem::GetShadowLevel()
+int32_t CPythonSystem::GetShadowLevel()
 {
 	return m_Config.iShadowLevel;
 }
 
-void CPythonSystem::SetShadowLevel(unsigned int level)
+void CPythonSystem::SetShadowLevel(uint32_t level)
 {
 	m_Config.iShadowLevel = MIN(level, 5);
 	CPythonBackground::instance().RefreshShadowLevel();
 }
 
-int CPythonSystem::IsSaveID()
+int32_t CPythonSystem::IsSaveID()
 {
 	return m_Config.isSaveID;
 }
@@ -259,7 +259,7 @@ bool CPythonSystem::isViewCulling()
 	return m_Config.is_object_culling;
 }
 
-void CPythonSystem::SetSaveID(int iValue, const char * c_szSaveID)
+void CPythonSystem::SetSaveID(int32_t iValue, const char * c_szSaveID)
 {
 	if (iValue != 1)
 		return;
@@ -320,7 +320,7 @@ bool CPythonSystem::IsViewChat()
 	return m_Config.bViewChat;
 }
 
-void CPythonSystem::SetViewChatFlag(int iFlag)
+void CPythonSystem::SetViewChatFlag(int32_t iFlag)
 {
 	m_Config.bViewChat = iFlag == 1 ? true : false;
 }
@@ -330,7 +330,7 @@ bool CPythonSystem::IsAlwaysShowName()
 	return m_Config.bAlwaysShowName;
 }
 
-void CPythonSystem::SetAlwaysShowNameFlag(int iFlag)
+void CPythonSystem::SetAlwaysShowNameFlag(int32_t iFlag)
 {
 	m_Config.bAlwaysShowName = iFlag == 1 ? true : false;
 }
@@ -340,7 +340,7 @@ bool CPythonSystem::IsShowDamage()
 	return m_Config.bShowDamage;
 }
 
-void CPythonSystem::SetShowDamageFlag(int iFlag)
+void CPythonSystem::SetShowDamageFlag(int32_t iFlag)
 {
 	m_Config.bShowDamage = iFlag == 1 ? true : false;
 }
@@ -350,7 +350,7 @@ bool CPythonSystem::IsShowSalesText()
 	return m_Config.bShowSalesText;
 }
 
-void CPythonSystem::SetShowSalesTextFlag(int iFlag)
+void CPythonSystem::SetShowSalesTextFlag(int32_t iFlag)
 {
 	m_Config.bShowSalesText = iFlag == 1 ? true : false;
 }
@@ -361,7 +361,7 @@ bool CPythonSystem::IsShowMobAIFlag()
 	return m_Config.bShowMobAIFlag;
 }
 
-void CPythonSystem::SetShowMobAIFlagFlag(int iFlag)
+void CPythonSystem::SetShowMobAIFlagFlag(int32_t iFlag)
 {
 	m_Config.bShowMobAIFlag = iFlag == 1 ? true : false;
 }
@@ -372,7 +372,7 @@ bool CPythonSystem::IsShowMobLevel()
 	return m_Config.bShowMobLevel;
 }
 
-void CPythonSystem::SetShowMobLevelFlag(int iFlag)
+void CPythonSystem::SetShowMobLevelFlag(int32_t iFlag)
 {
 	m_Config.bShowMobLevel = iFlag == 1 ? true : false;
 }
@@ -409,9 +409,9 @@ bool CPythonSystem::IsUseDefaultIME()
 
 bool CPythonSystem::LoadConfig()
 {
-	FILE * fp = NULL;
+	FILE * fp = nullptr;
 
-	if (NULL == (fp = fopen("config/settings.cfg", "rt")))
+	if (nullptr == (fp = fopen("config/settings.cfg", "rt")))
 		return false;
 
 	char buf[256];
@@ -488,8 +488,8 @@ bool CPythonSystem::LoadConfig()
 
 	if (m_Config.bWindowed)
 	{
-		unsigned screen_width = GetSystemMetrics(SM_CXFULLSCREEN);
-		unsigned screen_height = GetSystemMetrics(SM_CYFULLSCREEN);
+		uint32_t screen_width = GetSystemMetrics(SM_CXFULLSCREEN);
+		uint32_t screen_height = GetSystemMetrics(SM_CYFULLSCREEN);
 
 		if (m_Config.width >= screen_width)
 		{
@@ -522,7 +522,7 @@ bool CPythonSystem::SaveConfig()
 {
 	FILE *fp;
 
-	if (NULL == (fp = fopen("config/settings.cfg", "wt")))
+	if (nullptr == (fp = fopen("config/settings.cfg", "wt")))
 		return false;
 
 	fprintf(fp, "WIDTH						%d\n"
@@ -621,7 +621,7 @@ bool CPythonSystem::isInterfaceConfig()
 	return m_isInterfaceConfig;
 }
 
-const CPythonSystem::TWindowStatus & CPythonSystem::GetWindowStatusReference(int iIndex)
+const CPythonSystem::TWindowStatus & CPythonSystem::GetWindowStatusReference(int32_t iIndex)
 {
 	return m_WindowStatus[iIndex];
 }
@@ -688,14 +688,14 @@ void CPythonSystem::ChangeSystem()
 
 void CPythonSystem::Clear()
 {
-	SetInterfaceHandler(NULL);
+	SetInterfaceHandler(nullptr);
 }
 
 CPythonSystem::CPythonSystem()
 {
 	memset(&m_Config, 0, sizeof(TConfig));
 
-	m_poInterfaceHandler = NULL;
+	m_poInterfaceHandler = nullptr;
 
 	SetDefaultConfig();
 
@@ -711,5 +711,5 @@ CPythonSystem::CPythonSystem()
 
 CPythonSystem::~CPythonSystem()
 {
-	assert(m_poInterfaceHandler==NULL && "CPythonSystem MUST CLEAR!");
+	assert(m_poInterfaceHandler==nullptr && "CPythonSystem MUST CLEAR!");
 }

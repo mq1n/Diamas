@@ -10,7 +10,7 @@ BOOL g_bShowOverInWindowName = FALSE;
 
 namespace UI
 {	
-	static PyObject* gs_poEmptyTuple = NULL;
+	static PyObject* gs_poEmptyTuple = nullptr;
 
 	PyObject * BuildEmptyTuple()
 	{
@@ -22,30 +22,30 @@ namespace UI
 	
 	CWindowManager::CWindowManager()
 		: 
-		m_pActiveWindow(NULL),
-		m_pPointWindow(NULL),
-		m_pLeftCaptureWindow(NULL),
-		m_pMiddleCaptureWindow(NULL),
-		m_pRightCaptureWindow(NULL),
-		m_pLockWindow(NULL),
+		m_pActiveWindow(nullptr),
+		m_pPointWindow(nullptr),
+		m_pLeftCaptureWindow(nullptr),
+		m_pMiddleCaptureWindow(nullptr),
+		m_pRightCaptureWindow(nullptr),
+		m_pLockWindow(nullptr),
 		m_bAttachingFlag(FALSE),
 		m_dwAttachingType(0),
 		m_dwAttachingIndex(0),
 		m_dwAttachingSlotNumber(0),
-		m_poMouseHandler(NULL),
+		m_poMouseHandler(nullptr),
 		m_iHres(0),
 		m_iVres(0),
 		m_bOnceIgnoreMouseLeftButtonUpEventFlag(FALSE)
 	{		
-		m_pRootWindow = new CWindow(NULL);
+		m_pRootWindow = new CWindow(nullptr);
 		m_pRootWindow->SetName("root");
 		m_pRootWindow->Show();
 
 		const char * layerTbl[] = {"GAME","UI_BOTTOM","UI","TOP_MOST","CURTAIN"};
 
-		for(DWORD layer = 0; layer < sizeof(layerTbl)/sizeof(layerTbl[0]); layer++)
+		for(uint32_t layer = 0; layer < sizeof(layerTbl)/sizeof(layerTbl[0]); layer++)
 		{
-			CWindow * pLayer = new CLayer(NULL);
+			CWindow * pLayer = new CLayer(nullptr);
 			pLayer->SetName(layerTbl[layer]);
 			pLayer->Show();
 			m_LayerWindowMap.insert(TLayerContainer::value_type(layerTbl[layer], pLayer));
@@ -69,7 +69,7 @@ namespace UI
 		m_KeyCaptureWindowMap.clear();
 
 		delete m_pRootWindow;
-		m_pRootWindow = NULL;
+		m_pRootWindow = nullptr;
 	}
 
 	void CWindowManager::Destroy()
@@ -103,7 +103,7 @@ namespace UI
 		return (pWin);
 	}
 
-	CWindow *	CWindowManager::__NewWindow(PyObject * po, DWORD dwWndType)
+	CWindow *	CWindowManager::__NewWindow(PyObject * po, uint32_t dwWndType)
 	{
 		switch(dwWndType)
 		{
@@ -162,7 +162,7 @@ namespace UI
 		return new CWindow(po);				
 	}
 
-	CWindow *	CWindowManager::RegisterTypeWindow(PyObject * po, DWORD dwWndType, const char * c_szLayer)
+	CWindow *	CWindowManager::RegisterTypeWindow(PyObject * po, uint32_t dwWndType, const char * c_szLayer)
 	{
 		assert(m_LayerWindowMap.end() != m_LayerWindowMap.find(c_szLayer));
 
@@ -386,22 +386,22 @@ namespace UI
 	void CWindowManager::NotifyDestroyWindow(CWindow * pWindow)
 	{
 		if (pWindow == m_pActiveWindow)
-			m_pActiveWindow = NULL;
+			m_pActiveWindow = nullptr;
 
 		if (pWindow == m_pPointWindow)
-			m_pPointWindow = NULL;
+			m_pPointWindow = nullptr;
 
 		if (pWindow == m_pLeftCaptureWindow)
-			m_pLeftCaptureWindow = NULL;
+			m_pLeftCaptureWindow = nullptr;
 
 		if (pWindow == m_pMiddleCaptureWindow)
-			m_pMiddleCaptureWindow = NULL;
+			m_pMiddleCaptureWindow = nullptr;
 
 		if (pWindow == m_pRightCaptureWindow)
-			m_pRightCaptureWindow = NULL;
+			m_pRightCaptureWindow = nullptr;
 
 		if (pWindow == m_pLockWindow)
-			m_pLockWindow = NULL;
+			m_pLockWindow = nullptr;
 
 		m_LockWindowList.remove(pWindow);
 		m_ActiveWindowList.remove(pWindow);
@@ -435,8 +435,8 @@ namespace UI
 
 	BOOL CWindowManager::IsDragging()
 	{
-		long ldx = abs(m_lMouseX - m_lPickedX);
-		long ldy = abs(m_lMouseY - m_lPickedY);
+		int32_t ldx = abs(m_lMouseX - m_lPickedX);
+		int32_t ldy = abs(m_lMouseY - m_lPickedY);
 		if (ldx+ldy < 10)
 			return FALSE;
 
@@ -448,28 +448,28 @@ namespace UI
 		return m_bAttachingFlag;
 	}
 
-	DWORD CWindowManager::GetAttachingType()
+	uint32_t CWindowManager::GetAttachingType()
 	{
 		return m_dwAttachingType;
 	}
 
-	DWORD CWindowManager::GetAttachingIndex()
+	uint32_t CWindowManager::GetAttachingIndex()
 	{
 		return m_dwAttachingIndex;
 	}
 
-	DWORD CWindowManager::GetAttachingSlotNumber()
+	uint32_t CWindowManager::GetAttachingSlotNumber()
 	{
 		return m_dwAttachingSlotNumber;
 	}
 
-	void CWindowManager::GetAttachingIconSize(BYTE * pbyWidth, BYTE * pbyHeight)
+	void CWindowManager::GetAttachingIconSize(uint8_t * pbyWidth, uint8_t * pbyHeight)
 	{
 		*pbyWidth = m_byAttachingIconWidth;
 		*pbyHeight = m_byAttachingIconHeight;
 	}
 
-	void CWindowManager::AttachIcon(DWORD dwType, DWORD dwIndex, DWORD dwSlotNumber, BYTE byWidth, BYTE byHeight)
+	void CWindowManager::AttachIcon(uint32_t dwType, uint32_t dwIndex, uint32_t dwSlotNumber, uint8_t byWidth, uint8_t byHeight)
 	{
 		m_bAttachingFlag = TRUE;
 		m_dwAttachingType = dwType;
@@ -554,7 +554,7 @@ namespace UI
 		{
 			if (m_LockWindowList.empty())
 			{
-				m_pLockWindow = NULL;
+				m_pLockWindow = nullptr;
 				if (m_pActiveWindow)
 					m_pActiveWindow->OnSetFocus();
 			}
@@ -596,7 +596,7 @@ namespace UI
 			if (m_ActiveWindowList.empty())
 			{
 				m_pActiveWindow->OnKillFocus();
-				m_pActiveWindow = NULL;
+				m_pActiveWindow = nullptr;
 			}
 			else
 			{
@@ -647,12 +647,12 @@ namespace UI
 
 	void CWindowManager::ResetCapture()
 	{
-		m_pLeftCaptureWindow = NULL;
-		m_pMiddleCaptureWindow = NULL;
-		m_pRightCaptureWindow = NULL;
+		m_pLeftCaptureWindow = nullptr;
+		m_pMiddleCaptureWindow = nullptr;
+		m_pRightCaptureWindow = nullptr;
 	}
 
-	void CWindowManager::SetResolution(int hres, int vres)
+	void CWindowManager::SetResolution(int32_t hres, int32_t vres)
 	{
 		if (hres<=0 || vres<=0)
 			return;
@@ -666,7 +666,7 @@ namespace UI
 		return (m_iHres)/float(m_iVres);
 	}
 
-	void CWindowManager::SetScreenSize(long lWidth, long lHeight)
+	void CWindowManager::SetScreenSize(int32_t lWidth, int32_t lHeight)
 	{
 		m_lWidth	= lWidth;
 		m_lHeight	= lHeight;
@@ -703,7 +703,7 @@ namespace UI
 		m_pRootWindow->Render();
 	}
 
-	CWindow * CWindowManager::__PickWindow(long x, long y)
+	CWindow * CWindowManager::__PickWindow(int32_t x, int32_t y)
 	{
 		if (m_pLockWindow)
 		{
@@ -727,10 +727,10 @@ namespace UI
 				return pPickedWindow;
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
-	void CWindowManager::SetMousePosition(long x, long y)
+	void CWindowManager::SetMousePosition(int32_t x, int32_t y)
 	{
 		if (m_iHres==0)
 			return;
@@ -742,13 +742,13 @@ namespace UI
 		m_lMouseY = m_lHeight * y / m_iVres;
 	}
 
-	void CWindowManager::GetMousePosition(long & rx, long & ry)
+	void CWindowManager::GetMousePosition(int32_t & rx, int32_t & ry)
 	{
 		rx = m_lMouseX;
 		ry = m_lMouseY;
 	}
 
-	void CWindowManager::RunMouseMove(long x, long y)
+	void CWindowManager::RunMouseMove(int32_t x, int32_t y)
 	{
 		if (IsAttaching())
 		{
@@ -780,15 +780,15 @@ namespace UI
 
 			if (pWin->IsFlag(CWindow::FLAG_MOVABLE))
 			{
-				long x = m_lMouseX - m_lDragX;
-				long y = m_lMouseY - m_lDragY;
+				int32_t x = m_lMouseX - m_lDragX;
+				int32_t y = m_lMouseY - m_lDragY;
 				if (pWin->HasParent())
 				{
 					x -= pWin->GetParent()->GetRect().left;
 					y -= pWin->GetParent()->GetRect().top;
 				}
 
-				long lx, ly;
+				int32_t lx, ly;
 				pWin->GetPosition(&lx, &ly);
 				if (pWin->IsFlag(CWindow::FLAG_RESTRICT_X))
 				{
@@ -822,8 +822,8 @@ namespace UI
 			}
 			else if (m_pLeftCaptureWindow->IsFlag(CWindow::FLAG_DRAGABLE))
 			{
-				long x = m_lMouseX - m_lDragX;
-				long y = m_lMouseY - m_lDragY;
+				int32_t x = m_lMouseX - m_lDragX;
+				int32_t y = m_lMouseY - m_lDragY;
 				m_pLeftCaptureWindow->OnMouseDrag(x, y);
 			}
 		}
@@ -849,7 +849,7 @@ namespace UI
 		}
 	}
 
-	void CWindowManager::RunMouseLeftButtonDown(long x, long y)
+	void CWindowManager::RunMouseLeftButtonDown(int32_t x, int32_t y)
 	{
 		SetTopUIWindow();
 
@@ -878,7 +878,7 @@ namespace UI
 		pWin->OnMouseLeftButtonDown();
 	}
 
-	void CWindowManager::RunMouseLeftButtonUp(long x, long y)
+	void CWindowManager::RunMouseLeftButtonUp(int32_t x, int32_t y)
 	{
 		if (m_bOnceIgnoreMouseLeftButtonUpEventFlag)
 		{
@@ -896,8 +896,8 @@ namespace UI
 		{
 			if (m_pLeftCaptureWindow->OnMouseLeftButtonUp())
 			{
-				// NOTE : 여기서 m_pLeftCaptureWindow가 NULL 일 수 있습니다!! - [levites]
-				m_pLeftCaptureWindow = NULL;
+				// NOTE : 여기서 m_pLeftCaptureWindow가 nullptr 일 수 있습니다!! - [levites]
+				m_pLeftCaptureWindow = nullptr;
 				return;
 			}
 		}
@@ -906,10 +906,10 @@ namespace UI
 		if (pWin)
 			pWin->OnMouseLeftButtonUp();
 
-		m_pLeftCaptureWindow = NULL;
+		m_pLeftCaptureWindow = nullptr;
 	}
 
-	void CWindowManager::RunMouseLeftButtonDoubleClick(long x, long y)
+	void CWindowManager::RunMouseLeftButtonDoubleClick(int32_t x, int32_t y)
 	{
 		SetMousePosition(x, y);
 
@@ -920,7 +920,7 @@ namespace UI
 		pWin->OnMouseLeftButtonDoubleClick();
 	}
 
-	void CWindowManager::RunMouseRightButtonDown(long x, long y)
+	void CWindowManager::RunMouseRightButtonDown(int32_t x, int32_t y)
 	{
 		SetTopUIWindow();
 
@@ -942,13 +942,13 @@ namespace UI
 		pWin->OnMouseRightButtonDown();
 	}
 
-	void CWindowManager::RunMouseRightButtonUp(long x, long y)
+	void CWindowManager::RunMouseRightButtonUp(int32_t x, int32_t y)
 	{
 		if (m_pRightCaptureWindow)
 		{
 			if (m_pRightCaptureWindow->OnMouseRightButtonUp())
 			{
-				m_pRightCaptureWindow = NULL;
+				m_pRightCaptureWindow = nullptr;
 				return;
 			}
 		}
@@ -957,11 +957,11 @@ namespace UI
 		if (pWin)
 			pWin->OnMouseRightButtonUp();
 
-		m_pRightCaptureWindow = NULL;
+		m_pRightCaptureWindow = nullptr;
 		DeattachIcon();
 	}
 
-	void CWindowManager::RunMouseRightButtonDoubleClick(long x, long y)
+	void CWindowManager::RunMouseRightButtonDoubleClick(int32_t x, int32_t y)
 	{
 		SetMousePosition(x, y);
 
@@ -972,7 +972,7 @@ namespace UI
 		}
 	}
 
-	void CWindowManager::RunMouseMiddleButtonDown(long x, long y)
+	void CWindowManager::RunMouseMiddleButtonDown(int32_t x, int32_t y)
 	{
 		SetMousePosition(x, y);
 
@@ -985,7 +985,7 @@ namespace UI
 		pWin->OnMouseMiddleButtonDown();
 	}
 
-	void CWindowManager::RunMouseMiddleButtonUp(long x, long y)
+	void CWindowManager::RunMouseMiddleButtonUp(int32_t x, int32_t y)
 	{
 		SetMousePosition(x, y);
 
@@ -993,7 +993,7 @@ namespace UI
 		{
 			if (m_pMiddleCaptureWindow->OnMouseMiddleButtonUp())
 			{
-				m_pMiddleCaptureWindow = NULL;
+				m_pMiddleCaptureWindow = nullptr;
 				return;
 			}
 		}
@@ -1003,12 +1003,12 @@ namespace UI
 			return;
 
 		pWin->OnMouseMiddleButtonUp();
-		m_pMiddleCaptureWindow = NULL;
+		m_pMiddleCaptureWindow = nullptr;
 	}
 
 
 #ifdef ENABLE_MOUSEWHEEL_EVENT
-	bool CWindowManager::RunMouseWheelScroll(long x, long y, short wDelta)
+	bool CWindowManager::RunMouseWheelScroll(int32_t x, int32_t y, int16_t wDelta)
 	{
 		SetMousePosition(x, y);
 		CWindow * pWin = GetPointWindow();
@@ -1062,8 +1062,8 @@ namespace UI
 				CWindow * pParentWindow = pWindow;
 				CWindow * pCurrentWindow = pWindow->GetParent();
 
-				DWORD dwMaxLoopCount = 20;
-				for (DWORD i = 0; i < dwMaxLoopCount; ++i)
+				uint32_t dwMaxLoopCount = 20;
+				for (uint32_t i = 0; i < dwMaxLoopCount; ++i)
 				{
 					if (!pParentWindow)
 						break;
@@ -1098,7 +1098,7 @@ namespace UI
 		m_pRootWindow->RunIMEReturnEvent();
 	}
 
-	void CWindowManager::RunIMEKeyDown(int vkey)
+	void CWindowManager::RunIMEKeyDown(int32_t vkey)
 	{
 		if (m_pLockWindow)
 		{
@@ -1185,7 +1185,7 @@ namespace UI
 	}
 	// IME
 
-	void CWindowManager::RunKeyDown(int vkey)
+	void CWindowManager::RunKeyDown(int32_t vkey)
 	{
 		if (m_pLockWindow)
 		{
@@ -1211,7 +1211,7 @@ namespace UI
 		}
 	}
 
-	void CWindowManager::RunKeyUp(int vkey)
+	void CWindowManager::RunKeyUp(int32_t vkey)
 	{
 		TKeyCaptureWindowMap::iterator itor = m_KeyCaptureWindowMap.find(vkey);
 		if (m_KeyCaptureWindowMap.end() != itor)

@@ -12,18 +12,18 @@ const CGrannyModel::TMeshNode* CGrannyModel::GetMeshNodeList(CGrannyMesh::EType 
 	return m_meshNodeLists[eMeshType][eMtrlType];
 }
 
-CGrannyMesh * CGrannyModel::GetMeshPointer(int iMesh)
+CGrannyMesh * CGrannyModel::GetMeshPointer(int32_t iMesh)
 {
 	assert(CheckMeshIndex(iMesh));
-	assert(m_meshs != NULL);
+	assert(m_meshs != nullptr);
 
 	return m_meshs + iMesh;
 }
 
-const CGrannyMesh* CGrannyModel::GetMeshPointer(int iMesh) const
+const CGrannyMesh* CGrannyModel::GetMeshPointer(int32_t iMesh) const
 {
 	assert(CheckMeshIndex(iMesh));
-	assert(m_meshs != NULL);
+	assert(m_meshs != nullptr);
 
 	return m_meshs + iMesh;
 }
@@ -35,9 +35,9 @@ bool CGrannyModel::CanDeformPNTVertices() const
 
 void CGrannyModel::DeformPNTVertices(void * dstBaseVertices, D3DXMATRIX * boneMatrices, const std::vector<granny_mesh_binding*>& c_rvct_pgrnMeshBinding) const
 {
-	int meshCount = GetMeshCount();
+	int32_t meshCount = GetMeshCount();
 
-	for (int iMesh = 0; iMesh < meshCount; ++iMesh)
+	for (int32_t iMesh = 0; iMesh < meshCount; ++iMesh)
 	{
 		assert(iMesh < c_rvct_pgrnMeshBinding.size());
 
@@ -47,22 +47,22 @@ void CGrannyModel::DeformPNTVertices(void * dstBaseVertices, D3DXMATRIX * boneMa
 	}
 }
 
-int CGrannyModel::GetRigidVertexCount() const
+int32_t CGrannyModel::GetRigidVertexCount() const
 {
 	return m_rigidVtxCount;
 }
 
-int CGrannyModel::GetDeformVertexCount() const
+int32_t CGrannyModel::GetDeformVertexCount() const
 {
 	return m_deformVtxCount;
 }
 
-int CGrannyModel::GetVertexCount() const
+int32_t CGrannyModel::GetVertexCount() const
 {
 	return m_vtxCount;
 }
 
-int CGrannyModel::GetMeshCount() const
+int32_t CGrannyModel::GetMeshCount() const
 {
 	return m_pgrnModel ? m_pgrnModel->MeshBindingCount : 0;
 }
@@ -107,7 +107,7 @@ bool CGrannyModel::LoadPNTVertices()
 	if (m_rigidVtxCount <= 0)
 		return true;
 
-	assert(m_meshs != NULL);
+	assert(m_meshs != nullptr);
 
 	if (!m_pntVtxBuf.Create(m_rigidVtxCount, m_dwFvF, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED))
 		return false;
@@ -116,7 +116,7 @@ bool CGrannyModel::LoadPNTVertices()
 	if (!m_pntVtxBuf.Lock(&vertices))
 		return false;
 
-	for (int m = 0; m < m_pgrnModel->MeshBindingCount; ++m)
+	for (int32_t m = 0; m < m_pgrnModel->MeshBindingCount; ++m)
 	{
 		CGrannyMesh& rMesh = m_meshs[m];
 		rMesh.LoadPNTVertices(vertices);
@@ -140,7 +140,7 @@ bool CGrannyModel::LoadIndices()
 	if (!m_idxBuf.Lock((void**)&indices))
 		return false;
 
-	for (int m = 0; m < m_pgrnModel->MeshBindingCount; ++m)
+	for (int32_t m = 0; m < m_pgrnModel->MeshBindingCount; ++m)
 	{
 		CGrannyMesh& rMesh = m_meshs[m];
 		rMesh.LoadIndices(indices);
@@ -152,29 +152,29 @@ bool CGrannyModel::LoadIndices()
 
 bool CGrannyModel::LoadMeshs()
 {
-	assert(m_meshs == NULL);
-	assert(m_pgrnModel != NULL);
+	assert(m_meshs == nullptr);
+	assert(m_pgrnModel != nullptr);
 
 	if (m_pgrnModel->MeshBindingCount <= 0)	// 메쉬가 없는 모델
 		return true;
 
 	granny_skeleton * pgrnSkeleton = m_pgrnModel->Skeleton;
 
-	int vtxRigidPos = 0;
-	int vtxDeformPos = 0;
-	int vtxPos = 0;
-	int idxPos = 0;
+	int32_t vtxRigidPos = 0;
+	int32_t vtxDeformPos = 0;
+	int32_t vtxPos = 0;
+	int32_t idxPos = 0;
 
-	int diffusePNTMeshNodeCount = 0;
-	int blendPNTMeshNodeCount = 0;
-	int blendPNT2MeshNodeCount = 0;
+	int32_t diffusePNTMeshNodeCount = 0;
+	int32_t blendPNTMeshNodeCount = 0;
+	int32_t blendPNT2MeshNodeCount = 0;
 
-	int meshCount = GetMeshCount();
+	int32_t meshCount = GetMeshCount();
 	m_meshs = new CGrannyMesh[meshCount];
 
 	m_dwFvF = 0;
 
-	for (int m = 0; m < meshCount; ++m)
+	for (int32_t m = 0; m < meshCount; ++m)
 	{
 		CGrannyMesh& rMesh = m_meshs[m];
 		granny_mesh* pgrnMesh = m_pgrnModel->MeshBindings[m].Mesh;
@@ -197,10 +197,10 @@ bool CGrannyModel::LoadMeshs()
 		m_bHaveBlendThing |= rMesh.HaveBlendThing();
 
 		granny_int32x grni32xTypeCount = GrannyGetTotalTypeSize(pgrnMesh->PrimaryVertexData->VertexType) / 32;
-		int i = 0;
+		int32_t i = 0;
 		while (i < grni32xTypeCount)
 		{
-			if (NULL == pgrnMesh->PrimaryVertexData->VertexType[i].Name || 0 == strlen(pgrnMesh->PrimaryVertexData->VertexType[i].Name))
+			if (nullptr == pgrnMesh->PrimaryVertexData->VertexType[i].Name || 0 == strlen(pgrnMesh->PrimaryVertexData->VertexType[i].Name))
 			{
 				++i;
 				continue;
@@ -229,7 +229,7 @@ bool CGrannyModel::LoadMeshs()
 	m_meshNodeCapacity = diffusePNTMeshNodeCount + blendPNTMeshNodeCount + blendPNT2MeshNodeCount;
 	m_meshNodes = new TMeshNode[m_meshNodeCapacity];
 
-	for (int n = 0; n < meshCount; ++n)
+	for (int32_t n = 0; n < meshCount; ++n)
 	{
 		CGrannyMesh& rMesh = m_meshs[n];
 		granny_mesh* pgrnMesh = m_pgrnModel->MeshBindings[n].Mesh;
@@ -246,7 +246,7 @@ bool CGrannyModel::LoadMeshs()
 	// For Dungeon Block
 	if ((D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1|D3DFVF_TEX2) == m_dwFvF)
 	{
-		for (int n = 0; n < meshCount; ++n)
+		for (int32_t n = 0; n < meshCount; ++n)
 		{
 			CGrannyMesh& rMesh = m_meshs[n];
 			rMesh.SetPNT2Mesh();
@@ -261,7 +261,7 @@ bool CGrannyModel::LoadMeshs()
 	return true;
 }
 
-BOOL CGrannyModel::CheckMeshIndex(int iIndex) const
+BOOL CGrannyModel::CheckMeshIndex(int32_t iIndex) const
 {
 	if (iIndex < 0)
 		return FALSE;
@@ -271,7 +271,7 @@ BOOL CGrannyModel::CheckMeshIndex(int iIndex) const
 	return TRUE;
 }
 
-void CGrannyModel::AppendMeshNode(CGrannyMesh::EType eMeshType, CGrannyMaterial::EType eMtrlType, int iMesh)
+void CGrannyModel::AppendMeshNode(CGrannyMesh::EType eMeshType, CGrannyMaterial::EType eMtrlType, int32_t iMesh)
 {
 	assert(m_meshNodeSize < m_meshNodeCapacity);
 
@@ -303,7 +303,7 @@ bool CGrannyModel::CreateFromGrannyModelPointer(granny_model* pgrnModel)
 	return true;
 }
 
-int CGrannyModel::GetIdxCount()
+int32_t CGrannyModel::GetIdxCount()
 {
 	return m_idxCount;
 }
@@ -318,9 +318,9 @@ bool CGrannyModel::CreateDeviceObjects()
 		if (!m_idxBuf.CreateDeviceObjects())
 			return false;
 
-	int meshCount = GetMeshCount();
+	int32_t meshCount = GetMeshCount();
 
-	for (int i = 0; i < meshCount; ++i)
+	for (int32_t i = 0; i < meshCount; ++i)
 	{
 		CGrannyMesh& rMesh = m_meshs[i];
 		rMesh.RebuildTriGroupNodeList();
@@ -364,7 +364,7 @@ bool CGrannyModel::__LoadVertices()
 	if (m_rigidVtxCount <= 0)
 		return true;
 	
-	assert(m_meshs != NULL);
+	assert(m_meshs != nullptr);
 
 //	assert((m_dwFvF & (D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1)) == m_dwFvF);
 
@@ -376,7 +376,7 @@ bool CGrannyModel::__LoadVertices()
 	if (!m_pntVtxBuf.Lock(&vertices))
 		return false;
 	
-	for (int m = 0; m < m_pgrnModel->MeshBindingCount; ++m)
+	for (int32_t m = 0; m < m_pgrnModel->MeshBindingCount; ++m)
 	{
 		CGrannyMesh& rMesh = m_meshs[m];
 		rMesh.NEW_LoadVertices(vertices);
@@ -390,9 +390,9 @@ void CGrannyModel::Initialize()
 {
 	memset(m_meshNodeLists, 0, sizeof(m_meshNodeLists));
 	
-	m_pgrnModel = NULL;
-	m_meshs = NULL;
-	m_meshNodes = NULL;
+	m_pgrnModel = nullptr;
+	m_meshs = nullptr;
+	m_meshNodes = nullptr;
 
 	m_meshNodeSize = 0;
 	m_meshNodeCapacity = 0;

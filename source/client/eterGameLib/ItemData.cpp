@@ -5,7 +5,7 @@
 
 CDynamicPool<CItemData>		CItemData::ms_kPool;
 
-extern DWORD GetDefaultCodePage();
+extern uint32_t GetDefaultCodePage();
 
 CItemData* CItemData::New()
 {
@@ -43,17 +43,17 @@ CGraphicThing * CItemData::GetDropModelThing()
 
 CGraphicSubImage * CItemData::GetIconImage()
 {
-	if(m_pIconImage == NULL && m_strIconFileName.empty() == false)
+	if(m_pIconImage == nullptr && m_strIconFileName.empty() == false)
 		__SetIconImage(m_strIconFileName.c_str());
 	return m_pIconImage;
 }
 
-DWORD CItemData::GetLODModelThingCount()
+uint32_t CItemData::GetLODModelThingCount()
 {
 	return m_pLODModelThingVector.size();
 }
 
-BOOL CItemData::GetLODModelThingPointer(DWORD dwIndex, CGraphicThing ** ppModelThing)
+BOOL CItemData::GetLODModelThingPointer(uint32_t dwIndex, CGraphicThing ** ppModelThing)
 {
 	if (dwIndex >= m_pLODModelThingVector.size())
 		return FALSE;
@@ -63,12 +63,12 @@ BOOL CItemData::GetLODModelThingPointer(DWORD dwIndex, CGraphicThing ** ppModelT
 	return TRUE;
 }
 
-DWORD CItemData::GetAttachingDataCount()
+uint32_t CItemData::GetAttachingDataCount()
 {
 	return m_AttachingDataVector.size();
 }
 
-BOOL CItemData::GetCollisionDataPointer(DWORD dwIndex, const NRaceData::TAttachingData ** c_ppAttachingData)
+BOOL CItemData::GetCollisionDataPointer(uint32_t dwIndex, const NRaceData::TAttachingData ** c_ppAttachingData)
 {
 	if (dwIndex >= GetAttachingDataCount())
 		return FALSE;
@@ -80,7 +80,7 @@ BOOL CItemData::GetCollisionDataPointer(DWORD dwIndex, const NRaceData::TAttachi
 	return TRUE;
 }
 
-BOOL CItemData::GetAttachingDataPointer(DWORD dwIndex, const NRaceData::TAttachingData ** c_ppAttachingData)
+BOOL CItemData::GetAttachingDataPointer(uint32_t dwIndex, const NRaceData::TAttachingData ** c_ppAttachingData)
 {
 	if (dwIndex >= GetAttachingDataCount())
 		return FALSE;
@@ -130,7 +130,7 @@ BOOL CItemData::LoadItemData(const char * c_szFileName)
 		m_strLODModelFileNameVector.clear();
 		m_strLODModelFileNameVector.resize(pLODModelList->size());
 
-		for (DWORD i = 0; i < pLODModelList->size(); ++i)
+		for (uint32_t i = 0; i < pLODModelList->size(); ++i)
 		{
 			m_strLODModelFileNameVector[i] = pLODModelList->at(0);
 		}
@@ -191,7 +191,7 @@ void CItemData::__LoadFiles()
 		m_pLODModelThingVector.clear();
 		m_pLODModelThingVector.resize(m_strLODModelFileNameVector.size());
 
-		for (DWORD i = 0; i < m_strLODModelFileNameVector.size(); ++i)
+		for (uint32_t i = 0; i < m_strLODModelFileNameVector.size(); ++i)
 		{
 			const std::string & c_rstrLODModelFileName = m_strLODModelFileNameVector[i];
 			m_pLODModelThingVector[i] = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(c_rstrLODModelFileName.c_str());
@@ -205,14 +205,14 @@ void CItemData::__SetIconImage(const char * c_szFileName)
 	if (!CResourceManager::Instance().IsFileExist(c_szFileName))
 	{
 		TraceError("%s not found. CItemData::__SetIconImage",c_szFileName);
-		m_pIconImage = NULL;
+		m_pIconImage = nullptr;
 #ifdef ENABLE_LOAD_ALTER_ITEMICON
 		static const char* c_szAlterIconImage = "icon/item/27995.tga";
 		if (CResourceManager::Instance().IsFileExist(c_szAlterIconImage))
 			m_pIconImage = (CGraphicSubImage *)CResourceManager::Instance().GetResourcePointer(c_szAlterIconImage);
 #endif
 	}
-	else if (m_pIconImage == NULL) 
+	else if (m_pIconImage == nullptr) 
 		m_pIconImage = (CGraphicSubImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
 }
 
@@ -224,7 +224,7 @@ void CItemData::SetItemTableData(TItemTable * pItemTable)
 #ifdef ENABLE_ACCE_SYSTEM
 void CItemData::SetItemScale(const std::string strJob, const std::string strSex, const std::string strScaleX, const std::string strScaleY, const std::string strScaleZ, const std::string strPositionX, const std::string strPositionY, const std::string strPositionZ)
 {
-	DWORD dwPos=0;
+	uint32_t dwPos=0;
 	if (strJob == "JOB_WARRIOR")
 		dwPos = NRaceData::JOB_WARRIOR;
 	else if (strJob == "JOB_ASSASSIN")
@@ -250,7 +250,7 @@ void CItemData::SetItemScale(const std::string strJob, const std::string strSex,
 	m_ScaleTable.tInfo[dwPos].fPositionZ = float(atof(strPositionZ.c_str()) * 100.0f);
 }
 
-bool CItemData::GetItemScale(DWORD dwPos, float & fScaleX, float & fScaleY, float & fScaleZ, float & fPositionX, float & fPositionY, float & fPositionZ)
+bool CItemData::GetItemScale(uint32_t dwPos, float & fScaleX, float & fScaleY, float & fScaleZ, float & fPositionX, float & fPositionY, float & fPositionZ)
 {
 	fScaleX = m_ScaleTable.tInfo[dwPos].fScaleX;
 	fScaleY = m_ScaleTable.tInfo[dwPos].fScaleY;
@@ -267,7 +267,7 @@ const CItemData::TItemTable* CItemData::GetTable() const
 	return &m_ItemTable;
 }
 
-DWORD CItemData::GetIndex() const
+uint32_t CItemData::GetIndex() const
 {
 	return m_ItemTable.dwVnum;
 }
@@ -288,12 +288,12 @@ const char * CItemData::GetSummary() const
 }
 
 
-BYTE CItemData::GetType() const
+uint8_t CItemData::GetType() const
 {
 	return m_ItemTable.bType;
 }
 
-BYTE CItemData::GetSubType() const
+uint8_t CItemData::GetSubType() const
 {
 	return m_ItemTable.bSubType;
 }
@@ -338,7 +338,7 @@ const char* CItemData::GetUseTypeString() const
 }
 
 
-DWORD CItemData::GetWeaponType() const
+uint32_t CItemData::GetWeaponType() const
 {
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
 	if (GetType()==CItemData::ITEM_TYPE_COSTUME && GetSubType()==CItemData::COSTUME_WEAPON)
@@ -347,22 +347,22 @@ DWORD CItemData::GetWeaponType() const
 	return m_ItemTable.bSubType;
 }
 
-BYTE CItemData::GetSize() const
+uint8_t CItemData::GetSize() const
 {
 	return m_ItemTable.bSize;
 }
 
-BOOL CItemData::IsAntiFlag(DWORD dwFlag) const
+BOOL CItemData::IsAntiFlag(uint32_t dwFlag) const
 {
 	return (dwFlag & m_ItemTable.dwAntiFlags) != 0;
 }
 
-BOOL CItemData::IsFlag(DWORD dwFlag) const
+BOOL CItemData::IsFlag(uint32_t dwFlag) const
 {
 	return (dwFlag & m_ItemTable.dwFlags) != 0;
 }
 
-BOOL CItemData::IsWearableFlag(DWORD dwFlag) const
+BOOL CItemData::IsWearableFlag(uint32_t dwFlag) const
 {
 	return (dwFlag & m_ItemTable.dwWearFlags) != 0;
 }
@@ -372,23 +372,23 @@ BOOL CItemData::HasNextGrade() const
 	return 0 != m_ItemTable.dwRefinedVnum;
 }
 
-DWORD CItemData::GetWearFlags() const
+uint32_t CItemData::GetWearFlags() const
 {
 	return m_ItemTable.dwWearFlags;
 }
 
-DWORD CItemData::GetIBuyItemPrice() const
+uint32_t CItemData::GetIBuyItemPrice() const
 {
 	return m_ItemTable.dwIBuyItemPrice;
 }
 
-DWORD CItemData::GetISellItemPrice() const
+uint32_t CItemData::GetISellItemPrice() const
 {
 	return m_ItemTable.dwISellItemPrice;
 }
 
 
-BOOL CItemData::GetLimit(BYTE byIndex, TItemLimit * pItemLimit) const
+BOOL CItemData::GetLimit(uint8_t byIndex, TItemLimit * pItemLimit) const
 {
 	if (byIndex >= ITEM_LIMIT_MAX_NUM)
 	{
@@ -401,7 +401,7 @@ BOOL CItemData::GetLimit(BYTE byIndex, TItemLimit * pItemLimit) const
 	return TRUE;
 }
 
-BOOL CItemData::GetApply(BYTE byIndex, TItemApply * pItemApply) const
+BOOL CItemData::GetApply(uint8_t byIndex, TItemApply * pItemApply) const
 {
 	if (byIndex >= ITEM_APPLY_MAX_NUM)
 	{
@@ -413,7 +413,7 @@ BOOL CItemData::GetApply(BYTE byIndex, TItemApply * pItemApply) const
 	return TRUE;
 }
 
-long CItemData::GetValue(BYTE byIndex) const
+int32_t CItemData::GetValue(uint8_t byIndex) const
 {
 	if (byIndex >= ITEM_VALUES_MAX_NUM)
 	{
@@ -424,7 +424,7 @@ long CItemData::GetValue(BYTE byIndex) const
 	return m_ItemTable.alValues[byIndex];
 }
 
-long CItemData::SetSocket(BYTE byIndex,DWORD value)
+int32_t CItemData::SetSocket(uint8_t byIndex,uint32_t value)
 {
 	if (byIndex > ITEM_SOCKET_MAX_NUM)
 	{
@@ -435,7 +435,7 @@ long CItemData::SetSocket(BYTE byIndex,DWORD value)
 	return m_ItemTable.alSockets[byIndex] = value;
 }
 
-long CItemData::GetSocket(BYTE byIndex) const
+int32_t CItemData::GetSocket(uint8_t byIndex) const
 {
 	if (byIndex > ITEM_SOCKET_MAX_NUM)
 	{
@@ -450,32 +450,32 @@ long CItemData::GetSocket(BYTE byIndex) const
 //SocketCount = 1 이면 초급무기
 //SocketCount = 2 이면 중급무기
 //SocketCount = 3 이면 고급무기
-int CItemData::GetSocketCount() const		
+int32_t CItemData::GetSocketCount() const		
 {
 	return m_ItemTable.bGainSocketPct;
 }
 
-DWORD CItemData::GetIconNumber() const
+uint32_t CItemData::GetIconNumber() const
 {
 	return m_ItemTable.dwVnum;
 //!@#
 //	return m_ItemTable.dwIconNumber;
 }
 
-UINT CItemData::GetSpecularPoweru() const
+uint32_t CItemData::GetSpecularPoweru() const
 {
 	return m_ItemTable.bSpecular;
 }
 
 float CItemData::GetSpecularPowerf() const
 {
-	UINT uSpecularPower=GetSpecularPoweru();
+	uint32_t uSpecularPower=GetSpecularPoweru();
 
 	return float(uSpecularPower) / 100.0f;	
 }
 
 //refine 값은 아이템번호 끝자리와 일치한다-_-(테이블이용으로 바꿀 예정)
-UINT CItemData::GetRefine() const
+uint32_t CItemData::GetRefine() const
 {
 	return GetIndex()%10;
 }
@@ -502,10 +502,10 @@ void CItemData::Clear()
 	m_strIconFileName = "";
 	m_strLODModelFileNameVector.clear();
 
-	m_pModelThing = NULL;
-	m_pSubModelThing = NULL;
-	m_pDropModelThing = NULL;
-	m_pIconImage = NULL;
+	m_pModelThing = nullptr;
+	m_pSubModelThing = nullptr;
+	m_pDropModelThing = nullptr;
+	m_pIconImage = nullptr;
 	m_pLODModelThingVector.clear();
 
 	memset(&m_ItemTable, 0, sizeof(m_ItemTable));

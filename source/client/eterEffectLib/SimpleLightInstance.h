@@ -23,11 +23,11 @@ class CLightInstance : public CEffectElementBaseInstance
 		bool OnUpdate(float fElapsedTime);
 		void OnRender();
 		
-		DWORD			m_LightID;
+		uint32_t			m_LightID;
 		CLightData *	m_pData;
-		DWORD			m_dwRangeIndex;
+		uint32_t			m_dwRangeIndex;
 
-		DWORD			m_iLoopCount;
+		uint32_t			m_iLoopCount;
 		
 	public:
 		static void DestroySystem();

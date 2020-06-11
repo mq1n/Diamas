@@ -10,13 +10,13 @@
 class CGraphicFontTexture : public CGraphicTexture
 {
 public:
-	typedef std::pair<WORD,wchar_t> TCharacterKey;
+	typedef std::pair<uint16_t,wchar_t> TCharacterKey;
 
 	typedef struct SCharacterInfomation
 	{
-		short index;
-		short width;
-		short height;
+		int16_t index;
+		int16_t width;
+		int16_t height;
 		float left;
 		float top;
 		float right;
@@ -31,17 +31,17 @@ public:
 	virtual ~CGraphicFontTexture();
 
 	void Destroy();
-	bool Create(const char* c_szFontName, int fontSize, bool bItalic);
+	bool Create(const char* c_szFontName, int32_t fontSize, bool bItalic);
 
 	bool CreateDeviceObjects();
 	void DestroyDeviceObjects();
 
-	bool CheckTextureIndex(DWORD dwTexture);
-	void SelectTexture(DWORD dwTexture);
+	bool CheckTextureIndex(uint32_t dwTexture);
+	void SelectTexture(uint32_t dwTexture);
 
 	bool UpdateTexture();
 
-	TCharacterInfomation* GetCharacterInfomation(WORD codePage, wchar_t keyValue);
+	TCharacterInfomation* GetCharacterInfomation(uint16_t codePage, wchar_t keyValue);
 	TCharacterInfomation* UpdateCharacterInfomation(TCharacterKey code);
 
 	bool IsEmpty() const;
@@ -51,12 +51,12 @@ protected:
 
 	bool AppendTexture();
 
-	HFONT GetFont(WORD codePage);
+	HFONT GetFont(uint16_t codePage);
 
 protected:		
 	typedef std::vector<CGraphicImageTexture*>				TGraphicImageTexturePointerVector;
 	typedef std::map<TCharacterKey, TCharacterInfomation>	TCharacterInfomationMap;
-	typedef std::map<WORD, HFONT>							TFontMap;
+	typedef std::map<uint16_t, HFONT>							TFontMap;
 
 protected:		
 	CGraphicDib	m_dib;
@@ -70,12 +70,12 @@ protected:
 
 	TFontMap m_fontMap;
 
-	int m_x;
-	int m_y;
-	int m_step;		
+	int32_t m_x;
+	int32_t m_y;
+	int32_t m_step;		
 	bool m_isDirty;
 
 	TCHAR	m_fontName[LF_FACESIZE];
-	LONG	m_fontSize;
+	int32_t	m_fontSize;
 	bool	m_bItalic;
 };

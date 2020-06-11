@@ -6,31 +6,31 @@
 #include <string>
 
 #ifndef SAFE_DELETE
-#define SAFE_DELETE(p)			{ if (p) { delete (p);		(p) = NULL; } }
+#define SAFE_DELETE(p)			{ if (p) { delete (p);		(p) = nullptr; } }
 #endif
 
 #ifndef SAFE_DELETE_ARRAY
-#define SAFE_DELETE_ARRAY(p)	{ if (p) { delete[] (p);	(p) = NULL; } }
+#define SAFE_DELETE_ARRAY(p)	{ if (p) { delete[] (p);	(p) = nullptr; } }
 #endif
 
 #ifndef SAFE_RELEASE
-#define SAFE_RELEASE(p)			{ if (p) { (p)->Release();	(p) = NULL; } }
+#define SAFE_RELEASE(p)			{ if (p) { (p)->Release();	(p) = nullptr; } }
 #endif
 
 #ifndef SAFE_FREE_GLOBAL
-#define SAFE_FREE_GLOBAL(p)		{ if (p) { ::GlobalFree(p);	(p) = NULL; } }
+#define SAFE_FREE_GLOBAL(p)		{ if (p) { ::GlobalFree(p);	(p) = nullptr; } }
 #endif
 
 #ifndef SAFE_FREE_LIBRARY
-#define SAFE_FREE_LIBRARY(p)	{ if (p) { ::FreeLibrary(p); (p) = NULL; } }
+#define SAFE_FREE_LIBRARY(p)	{ if (p) { ::FreeLibrary(p); (p) = nullptr; } }
 #endif
 
 #define AssertLog(str)	TraceError(str); assert(!str)
 
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)                                      \
-				((DWORD)(BYTE) (ch0       ) | ((DWORD)(BYTE) (ch1) <<  8) | \
-				((DWORD)(BYTE) (ch2) << 16) | ((DWORD)(BYTE) (ch3) << 24))
+				((uint32_t)(uint8_t) (ch0       ) | ((uint32_t)(uint8_t) (ch1) <<  8) | \
+				((uint32_t)(uint8_t) (ch2) << 16) | ((uint32_t)(uint8_t) (ch3) << 24))
 #endif // defined(MAKEFOURCC)
 
 #ifndef IS_SET
@@ -49,12 +49,12 @@
 #define TOGGLE_BIT(var,bit)             ((var) = (var) ^ (bit))
 #endif
 
-extern const char * CreateTempFileName(const char * c_pszPrefix = NULL);
-extern void			GetFilePathNameExtension(const char* c_szFile, int len, std::string* pstPath, std::string* pstName, std::string* pstExt);
-extern void			GetFileExtension(const char* c_szFile, int len, std::string* pstExt);
-extern void			GetFileNameParts(const char* c_szFile, int len, char* pszPath, char* pszName, char* pszExt);
-extern void			GetOldIndexingName(char * szName, int Index);
-extern void			GetIndexingName(char * szName, DWORD Index);
+extern const char * CreateTempFileName(const char * c_pszPrefix = nullptr);
+extern void			GetFilePathNameExtension(const char* c_szFile, int32_t len, std::string* pstPath, std::string* pstName, std::string* pstExt);
+extern void			GetFileExtension(const char* c_szFile, int32_t len, std::string* pstExt);
+extern void			GetFileNameParts(const char* c_szFile, int32_t len, char* pszPath, char* pszName, char* pszExt);
+extern void			GetOldIndexingName(char * szName, int32_t Index);
+extern void			GetIndexingName(char * szName, uint32_t Index);
 extern void			stl_lowers(std::string& rstRet);
 extern void			GetOnlyFileName(const char * sz_Name, std::string & strFileName);
 extern void			GetOnlyPathName(const char * sz_Name, std::string & OnlyPathName);
@@ -67,12 +67,12 @@ extern void			StringPath(std::string & rString);
 extern void			StringPath(char * pString);	// 모두 소문자로 만들고, \는 /로 바꾼다.
 extern void			StringPath(const char * c_szSrc, char * szDest);	// 모두 소문자로 만들고, \는 /로 바꾼다.
 extern void			StringPath(const char * c_szSrc, std::string & rString);	// 모두 소문자로 만들고, \는 /로 바꾼다.
-extern void			PrintAsciiData(const void* data, int bytes);
+extern void			PrintAsciiData(const void* data, int32_t bytes);
 bool				IsFile(const char* filename);
 bool				IsGlobalFileName(const char * c_szFileName);
-int					MIN(int a, int b);
-int					MAX(int a, int b);
-int					MINMAX(int min, int value, int max);
+int32_t					MIN(int32_t a, int32_t b);
+int32_t					MAX(int32_t a, int32_t b);
+int32_t					MINMAX(int32_t min, int32_t value, int32_t max);
 float				fMIN(float a, float b);
 float				fMAX(float a, float b);
 float				fMINMAX(float min, float value, float max);
@@ -80,7 +80,7 @@ void				MyCreateDirectory(const char* path);
 void				RemoveAllDirectory(const char * c_szDirectoryName);
 bool				SplitLine(const char * c_szLine, const char * c_szDelimeter, std::vector<std::string> * pkVec_strToken);
 const char *		_getf(const char* c_szFormat, ...);
-PCHAR*				CommandLineToArgv( PCHAR CmdLine, int* _argc );
+PCHAR*				CommandLineToArgv( PCHAR CmdLine, int32_t* _argc );
 
 template<typename T>
 T EL_DegreeToRadian(T degree)
@@ -115,7 +115,7 @@ T ELRightCoord_ConvertToPlainCoordDegree(T srcDegree)
 template<typename C>
 void string_join(const std::string& sep, const C& container, std::string* ret)
 {
-	unsigned int capacity = sep.length() * container.size() - 1;
+	uint32_t capacity = sep.length() * container.size() - 1;
     
     // calculate string sequence
     {
@@ -143,10 +143,10 @@ void string_join(const std::string& sep, const C& container, std::string* ret)
     swap(*ret, buf);
 }
 
-__forceinline int htoi(const wchar_t *s, int size)
+__forceinline int32_t htoi(const wchar_t *s, int32_t size)
 {
     const wchar_t *t = s;
-    int x = 0, y = 1;
+    int32_t x = 0, y = 1;
     s += size;
 
     while (t <= --s)
@@ -165,10 +165,10 @@ __forceinline int htoi(const wchar_t *s, int size)
     return x;
 }
 
-__forceinline int htoi(const char *s, int size)
+__forceinline int32_t htoi(const char *s, int32_t size)
 {
     const char *t = s;
-    int x = 0, y = 1;
+    int32_t x = 0, y = 1;
     s += size;
 
     while (t <= --s)
@@ -187,10 +187,10 @@ __forceinline int htoi(const char *s, int size)
     return x;
 }
 
-__forceinline int htoi(const char *s)
+__forceinline int32_t htoi(const char *s)
 {
     const char *t = s;
-    int x = 0, y = 1;
+    int32_t x = 0, y = 1;
     s += strlen(s);
 
     while (t <= --s)

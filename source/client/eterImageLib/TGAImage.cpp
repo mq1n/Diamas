@@ -20,8 +20,8 @@ CTGAImage::CTGAImage(CImageC &image) : m_dwFlag(0)
 
 	Create(w, h);
 
-	DWORD * pdwDest = GetBasePointer();
-	memcpy(pdwDest, image.GetBasePointer(), w * h * sizeof(DWORD));
+	uint32_t * pdwDest = GetBasePointer();
+	memcpy(pdwDest, image.GetBasePointer(), w * h * sizeof(uint32_t));
 	FlipTopToBottom();
 }
 
@@ -46,11 +46,11 @@ bool CTGAImage::LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem)
 
 	CImageC::Create(m_Header.width, m_Header.height);
 
-	DWORD hxw = m_Header.width * m_Header.height;
+	uint32_t hxw = m_Header.width * m_Header.height;
 	uint8_t r, g, b, a;
-	DWORD i;
+	uint32_t i;
 
-	DWORD * pdwDest = GetBasePointer();
+	uint32_t * pdwDest = GetBasePointer();
 
 	switch (m_Header.imgType)
 	{
@@ -243,9 +243,9 @@ bool CTGAImage::LoadFromDiskFile(const std::string& stFileName)
 	return LoadFromMemory(file.GetSize(), file.GetData());
 }
 
-int32_t CTGAImage::GetRLEPixelCount(const DWORD * data)
+int32_t CTGAImage::GetRLEPixelCount(const uint32_t * data)
 {
-	DWORD pixel;
+	uint32_t pixel;
 
     int32_t r = 1;
 
@@ -265,7 +265,7 @@ int32_t CTGAImage::GetRLEPixelCount(const DWORD * data)
 	return r;
 }
 
-int32_t CTGAImage::GetRawPixelCount(const DWORD * data)
+int32_t CTGAImage::GetRawPixelCount(const uint32_t * data)
 {
     int32_t i = 0;
     
@@ -314,7 +314,7 @@ bool CTGAImage::SaveToDiskFile(const char* c_szFileName)
 	
 	if (m_Header.imgType == 10)	// RLE 압축으로 저장
 	{
-		DWORD * data = GetBasePointer();
+		uint32_t * data = GetBasePointer();
 		
 		while (data < m_pdwEndPtr)
 		{
@@ -331,7 +331,7 @@ bool CTGAImage::SaveToDiskFile(const char* c_szFileName)
 				
 				while (raw)
 				{
-					fwrite(data, sizeof(DWORD), 1, fp);
+					fwrite(data, sizeof(uint32_t), 1, fp);
 					data++;
 					raw--;
 				}
@@ -339,7 +339,7 @@ bool CTGAImage::SaveToDiskFile(const char* c_szFileName)
 			else
 			{
 				fputc((rle - 1) | 0x80, fp);
-				fwrite(data, sizeof(DWORD), 1, fp);
+				fwrite(data, sizeof(uint32_t), 1, fp);
 				data += rle;
 			}
 		}

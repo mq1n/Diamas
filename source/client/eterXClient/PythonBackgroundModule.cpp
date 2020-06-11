@@ -12,7 +12,7 @@ PyObject * backgroundIsSoftwareTiling(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundEnableSoftwareTiling(PyObject * poSelf, PyObject * poArgs)
 {
-	int nIsEnable;
+	int32_t nIsEnable;
 	if (!PyTuple_GetInteger(poArgs, 0, &nIsEnable))
 		return Py_BadArgument();
 
@@ -28,7 +28,7 @@ PyObject * backgroundEnableSoftwareTiling(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundEnableSnow(PyObject * poSelf, PyObject * poArgs)
 {
-	int nIsEnable;
+	int32_t nIsEnable;
 	if (!PyTuple_GetInteger(poArgs, 0, &nIsEnable))
 		return Py_BadArgument();
 
@@ -81,7 +81,7 @@ PyObject * backgroundDestroy(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundRegisterEnvironmentData(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BadArgument();
 
@@ -103,7 +103,7 @@ PyObject * backgroundRegisterEnvironmentData(PyObject * poSelf, PyObject * poArg
 
 PyObject * backgroundSetEnvironmentData(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BadArgument();
 
@@ -268,26 +268,26 @@ PyObject * backgroundGetHeight(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundGetRenderedSplatNum(PyObject * poSelf, PyObject * poArgs)
 {
-	int iPatch;
-	int iSplat;
+	int32_t iPatch;
+	int32_t iSplat;
 	float fSplatRatio;
 
-	std::vector<int> & aTextureNumVector = CPythonBackground::Instance().GetRenderedSplatNum(&iPatch, &iSplat, &fSplatRatio);
+	std::vector<int32_t> & aTextureNumVector = CPythonBackground::Instance().GetRenderedSplatNum(&iPatch, &iSplat, &fSplatRatio);
 
 	char szOutput[MAX_PATH] = "";
-	int iOutput = 0;
-	for( std::vector<int>::iterator it = aTextureNumVector.begin(); it != aTextureNumVector.end(); it++ ) {
+	int32_t iOutput = 0;
+	for( std::vector<int32_t>::iterator it = aTextureNumVector.begin(); it != aTextureNumVector.end(); it++ ) {
 		iOutput += snprintf(szOutput + iOutput, sizeof(szOutput) - iOutput, "%d ", *it);
 	}
-	//std::copy(aTextureNumVector.begin(),aTextureNumVector.end(),std::ostream_iterator<int>(ostr," "));
+	//std::copy(aTextureNumVector.begin(),aTextureNumVector.end(),std::ostream_iterator<int32_t>(ostr," "));
 
 	return Py_BuildValue("iifs", iPatch, iSplat, fSplatRatio, szOutput);
 }
 
 PyObject * backgroundGetRenderedGTINum(PyObject * poSelf, PyObject * poArgs)
 {
-	DWORD dwGraphicThingInstanceNum;
-	DWORD dwCRCNum;
+	uint32_t dwGraphicThingInstanceNum;
+	uint32_t dwCRCNum;
 
 	/*CArea::TCRCWithNumberVector & rCRCWithNumberVector = */
 	CPythonBackground::Instance().GetRenderedGraphicThingInstanceNum(&dwGraphicThingInstanceNum, &dwCRCNum);
@@ -317,13 +317,13 @@ PyObject * backgroundGetShadowMapcolor(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetFloat(poArgs, 1, &fy))
 		return Py_BadArgument();
 
-	DWORD dwColor = CPythonBackground::Instance().GetShadowMapColor(fx, fy);
+	uint32_t dwColor = CPythonBackground::Instance().GetShadowMapColor(fx, fy);
 	return Py_BuildValue("i", dwColor);
 }
 
 PyObject * backgroundSetShadowLevel(PyObject * poSelf, PyObject * poArgs)
 {
-	int iLevel;
+	int32_t iLevel;
 
 	if (!PyTuple_GetInteger(poArgs, 0, &iLevel))
 		return Py_BadArgument();
@@ -335,11 +335,11 @@ PyObject * backgroundSetShadowLevel(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundSetVisiblePart(PyObject * poSelf, PyObject * poArgs)
 {
-	int ePart;
+	int32_t ePart;
 	if (!PyTuple_GetInteger(poArgs, 0, &ePart))
 		return Py_BadArgument();
 
-	int isVisible;
+	int32_t isVisible;
 	if (!PyTuple_GetInteger(poArgs, 1, &isVisible))
 		return Py_BadArgument();
 
@@ -354,7 +354,7 @@ PyObject * backgroundSetVisiblePart(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundSetSpaltLimit(PyObject * poSelf, PyObject * poArgs)
 {
-	int iSplatNum;
+	int32_t iSplatNum;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSplatNum))
 		return Py_BadArgument();
 
@@ -369,7 +369,7 @@ PyObject * backgroundSetSpaltLimit(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundSelectViewDistanceNum(PyObject * poSelf, PyObject * poArgs)
 {
-	int iNum;
+	int32_t iNum;
 
 	if (!PyTuple_GetInteger(poArgs, 0, &iNum))
 		return Py_BadArgument();
@@ -382,7 +382,7 @@ PyObject * backgroundSelectViewDistanceNum(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundSetViewDistanceSet(PyObject * poSelf, PyObject * poArgs)
 {
-	int iNum;
+	int32_t iNum;
 	if (!PyTuple_GetInteger(poArgs, 0, &iNum))
 		return Py_BadArgument();
 
@@ -403,7 +403,7 @@ PyObject * backgroundGetFarClip(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundGetDistanceSetInfo(PyObject * poSelf, PyObject * poArgs)
 {
-	int iNum;
+	int32_t iNum;
 	float fStart, fEnd, fFarClip;
 	CPythonBackground::Instance().GetDistanceSetInfo(&iNum, &fStart, &fEnd, &fFarClip);
 	return Py_BuildValue("ifff", iNum, fStart, fEnd, fFarClip);
@@ -421,7 +421,7 @@ PyObject * backgroundSetBGLoading(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundSetRenderSort(PyObject * poSelf, PyObject * poArgs)
 {
-	int eSort;
+	int32_t eSort;
 	if (!PyTuple_GetInteger(poArgs, 0, &eSort))
 		return Py_BadArgument();
 
@@ -431,7 +431,7 @@ PyObject * backgroundSetRenderSort(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundSetTransparentTree(PyObject * poSelf, PyObject * poArgs)
 {
-	int bTransparent;
+	int32_t bTransparent;
 	if (!PyTuple_GetInteger(poArgs, 0, &bTransparent))
 		return Py_BadArgument();
 
@@ -441,16 +441,16 @@ PyObject * backgroundSetTransparentTree(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundGlobalPositionToLocalPosition(PyObject * poSelf, PyObject * poArgs)
 {
-	int iX;
+	int32_t iX;
 	if (!PyTuple_GetInteger(poArgs, 0, &iX))
 		return Py_BadArgument();
 
-	int iY;
+	int32_t iY;
 	if (!PyTuple_GetInteger(poArgs, 1, &iY))
 		return Py_BadArgument();
 
-	LONG lX=iX;
-	LONG lY=iY;	
+	int32_t lX=iX;
+	int32_t lY=iY;	
 	CPythonBackground& rkBG=CPythonBackground::Instance();
 	rkBG.GlobalPositionToLocalPosition(lX, lY);
 
@@ -459,11 +459,11 @@ PyObject * backgroundGlobalPositionToLocalPosition(PyObject * poSelf, PyObject *
 
 PyObject * backgroundGlobalPositionToMapInfo(PyObject * poSelf, PyObject * poArgs)
 {
-	int iX;
+	int32_t iX;
 	if (!PyTuple_GetInteger(poArgs, 0, &iX))
 		return Py_BadArgument();
 
-	int iY;
+	int32_t iY;
 	if (!PyTuple_GetInteger(poArgs, 1, &iY))
 		return Py_BadArgument();
 
@@ -479,21 +479,21 @@ PyObject * backgroundGlobalPositionToMapInfo(PyObject * poSelf, PyObject * poArg
 
 PyObject * backgroundWarpTest(PyObject * poSelf, PyObject * poArgs)
 {
-	int iX;
+	int32_t iX;
 	if (!PyTuple_GetInteger(poArgs, 0, &iX))
 		return Py_BadArgument();
 
-	int iY;
+	int32_t iY;
 	if (!PyTuple_GetInteger(poArgs, 1, &iY))
 		return Py_BadArgument();
 
-	CPythonBackground::Instance().Warp((DWORD)iX * 100 , (DWORD)iY * 100);
+	CPythonBackground::Instance().Warp((uint32_t)iX * 100 , (uint32_t)iY * 100);
 	return Py_BuildNone();
 }
 
 PyObject * backgroundSetXMasTree(PyObject * poSelf, PyObject * poArgs)
 {
-	int iGrade;
+	int32_t iGrade;
 	if (!PyTuple_GetInteger(poArgs, 0, &iGrade))
 		return Py_BadArgument();
 
@@ -582,7 +582,7 @@ void initBackground()
 
 		{ "WarpTest",							backgroundWarpTest,							METH_VARARGS },
 
-		{ NULL, NULL, NULL },
+		{ nullptr, nullptr, 0 },
 	};
 
 	PyObject * poModule = Py_InitModule("background", s_methods);

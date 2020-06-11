@@ -41,7 +41,7 @@ CSkillManager::~CSkillManager()
 struct SPointOnType
 {
 	const char * c_pszName;
-	int		 iPointOn;
+	int32_t		 iPointOn;
 } kPointOnTypes[] = {
 	{ "NONE",		POINT_NONE		},
 	{ "MAX_HP",		POINT_MAX_HP		},
@@ -81,9 +81,9 @@ struct SPointOnType
 	{ "\n",		POINT_NONE		},
 };
 
-int FindPointType(const char * c_sz)
+int32_t FindPointType(const char * c_sz)
 {
-	for (int i = 0; *kPointOnTypes[i].c_pszName != '\n'; ++i)
+	for (int32_t i = 0; *kPointOnTypes[i].c_pszName != '\n'; ++i)
 	{
 		if (!strcasecmp(c_sz, kPointOnTypes[i].c_pszName))
 			return kPointOnTypes[i].iPointOn;
@@ -91,15 +91,15 @@ int FindPointType(const char * c_sz)
 	return -1;
 }
 
-bool CSkillManager::Initialize(TSkillTable * pTab, int iSize)
+bool CSkillManager::Initialize(TSkillTable * pTab, int32_t iSize)
 {
 	char buf[1024];
-	std::map<DWORD, CSkillProto *> map_pkSkillProto;
+	std::map<uint32_t, CSkillProto *> map_pkSkillProto;
 
 	TSkillTable * t = pTab;
 	bool bError = false;
 
-	for (int i = 0; i < iSize; ++i, ++t)
+	for (int32_t i = 0; i < iSize; ++i, ++t)
 	{
 		CSkillProto * pkProto = M2_NEW CSkillProto;
 
@@ -122,7 +122,7 @@ bool CSkillManager::Initialize(TSkillTable * pTab, int iSize)
 
 		pkProto->bSkillAttrType = t->bSkillAttrType;
 
-		int iIdx = FindPointType(t->szPointOn);
+		int32_t iIdx = FindPointType(t->szPointOn);
 
 		if (iIdx < 0)
 		{
@@ -136,7 +136,7 @@ bool CSkillManager::Initialize(TSkillTable * pTab, int iSize)
 
 		pkProto->bPointOn = iIdx;
 
-		int iIdx2 = FindPointType(t->szPointOn2);
+		int32_t iIdx2 = FindPointType(t->szPointOn2);
 
 		if (iIdx2 < 0)
 		{
@@ -150,7 +150,7 @@ bool CSkillManager::Initialize(TSkillTable * pTab, int iSize)
 
 		pkProto->bPointOn2 = iIdx2;
 
-		int iIdx3 = FindPointType(t->szPointOn3);
+		int32_t iIdx3 = FindPointType(t->szPointOn3);
 
 		if (iIdx3 < 0)
 		{
@@ -295,7 +295,7 @@ bool CSkillManager::Initialize(TSkillTable * pTab, int iSize)
 		sys_log(0, "#%-3d %-24s type %u flag %u affect %u point_poly: %s", 
 				pkProto->dwVnum, pkProto->szName, pkProto->dwType, pkProto->dwFlag, pkProto->dwAffectFlag, t->szPointPoly);
 
-		map_pkSkillProto.insert(std::map<DWORD, CSkillProto *>::value_type(pkProto->dwVnum, pkProto));
+		map_pkSkillProto.insert(std::map<uint32_t, CSkillProto *>::value_type(pkProto->dwVnum, pkProto));
 	}
 
 	if (!bError)
@@ -315,7 +315,7 @@ bool CSkillManager::Initialize(TSkillTable * pTab, int iSize)
 
 		while (it != map_pkSkillProto.end())
 		{
-			m_map_pkSkillProto.insert(std::map<DWORD, CSkillProto *>::value_type(it->first, it->second));
+			m_map_pkSkillProto.insert(std::map<uint32_t, CSkillProto *>::value_type(it->first, it->second));
 			++it;
 		}
 
@@ -327,19 +327,19 @@ bool CSkillManager::Initialize(TSkillTable * pTab, int iSize)
 	return !bError;
 }
 
-CSkillProto * CSkillManager::Get(DWORD dwVnum)
+CSkillProto * CSkillManager::Get(uint32_t dwVnum)
 {
-	std::map<DWORD, CSkillProto *>::iterator it = m_map_pkSkillProto.find(dwVnum);
+	std::map<uint32_t, CSkillProto *>::iterator it = m_map_pkSkillProto.find(dwVnum);
 
 	if (it == m_map_pkSkillProto.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
 
 CSkillProto * CSkillManager::Get(const char * c_pszSkillName)
 {
-	std::map<DWORD, CSkillProto *>::iterator it = m_map_pkSkillProto.begin();
+	std::map<uint32_t, CSkillProto *>::iterator it = m_map_pkSkillProto.begin();
 
 	while (it != m_map_pkSkillProto.end())
 	{
@@ -349,6 +349,6 @@ CSkillProto * CSkillManager::Get(const char * c_pszSkillName)
 		it++;
 	}
 
-	return NULL;
+	return nullptr;
 }
 

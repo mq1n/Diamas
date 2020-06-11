@@ -188,14 +188,14 @@ class CSkillProto
 {
 	public:
 		char	szName[64];
-		DWORD	dwVnum;			// 번호
+		uint32_t	dwVnum;			// 번호
 
-		DWORD	dwType;			// 0: 전직업, 1: 무사, 2: 자객, 3: 수라, 4: 무당
-		BYTE	bMaxLevel;		// 최대 수련도
-		BYTE	bLevelLimit;		// 레벨제한
-		int	iSplashRange;		// 스플래쉬 거리 제한
+		uint32_t	dwType;			// 0: 전직업, 1: 무사, 2: 자객, 3: 수라, 4: 무당
+		uint8_t	bMaxLevel;		// 최대 수련도
+		uint8_t	bLevelLimit;		// 레벨제한
+		int32_t	iSplashRange;		// 스플래쉬 거리 제한
 
-		BYTE	bPointOn;		// 어디에 결과값을 적용 시키는가? (타격치, MAX HP, HP REGEN 등등등)
+		uint8_t	bPointOn;		// 어디에 결과값을 적용 시키는가? (타격치, MAX HP, HP REGEN 등등등)
 		CPoly	kPointPoly;		// 결과값 만드는 공식
 
 		CPoly	kSPCostPoly;		// 사용 SP 공식
@@ -205,25 +205,25 @@ class CSkillProto
 		CPoly	kMasterBonusPoly;	// 마스터일 때 보너스 공식
 		CPoly	kSplashAroundDamageAdjustPoly;	// 스플래쉬 공격일 경우 주위 적에게 입히는 데미지 감소 비율
 
-		DWORD	dwFlag;			// 스킬옵션
-		DWORD	dwAffectFlag;		// 스킬에 맞은 경우 적용되는 Affect
+		uint32_t	dwFlag;			// 스킬옵션
+		uint32_t	dwAffectFlag;		// 스킬에 맞은 경우 적용되는 Affect
 
-		BYTE	bLevelStep;		// 한번에 올리는데 필요한 스킬 포인트 수
-		DWORD	preSkillVnum;		// 배우는데 필요한 이전에 배워야할 스킬
-		BYTE	preSkillLevel;		// 이전에 배워야할 스킬의 레벨
+		uint8_t	bLevelStep;		// 한번에 올리는데 필요한 스킬 포인트 수
+		uint32_t	preSkillVnum;		// 배우는데 필요한 이전에 배워야할 스킬
+		uint8_t	preSkillLevel;		// 이전에 배워야할 스킬의 레벨
 
-		long	lMaxHit;
+		int32_t	lMaxHit;
 
-		BYTE	bSkillAttrType;
+		uint8_t	bSkillAttrType;
 
 		// 2차 적용
-		BYTE	bPointOn2;		
+		uint8_t	bPointOn2;		
 		CPoly	kPointPoly2;		
 		CPoly	kDurationPoly2;		
-		DWORD	dwFlag2;			
-		DWORD	dwAffectFlag2;		
+		uint32_t	dwFlag2;			
+		uint32_t	dwAffectFlag2;		
 
-		DWORD   dwTargetRange;
+		uint32_t   dwTargetRange;
 
 		bool	IsChargeSkill()
 		{
@@ -231,7 +231,7 @@ class CSkillProto
 		}
 
 		// 3차 적용
-		BYTE bPointOn3;
+		uint8_t bPointOn3;
 		CPoly kPointPoly3;
 		CPoly kDurationPoly3;
 
@@ -248,12 +248,12 @@ class CSkillManager : public singleton<CSkillManager>
 		CSkillManager();
 		virtual ~CSkillManager();
 
-		bool Initialize(TSkillTable * pTab, int iSize);
-		CSkillProto * Get(DWORD dwVnum);
+		bool Initialize(TSkillTable * pTab, int32_t iSize);
+		CSkillProto * Get(uint32_t dwVnum);
 		CSkillProto * Get(const char * c_pszSkillName);
 
 	protected:
-		std::map<DWORD, CSkillProto *> m_map_pkSkillProto;
+		std::map<uint32_t, CSkillProto *> m_map_pkSkillProto;
 };
 
 #endif

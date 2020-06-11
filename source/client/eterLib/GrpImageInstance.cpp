@@ -10,7 +10,7 @@
 
 CDynamicPool<CGraphicImageInstance>		CGraphicImageInstance::ms_kPool;
 
-void CGraphicImageInstance::CreateSystem(UINT uCapacity)
+void CGraphicImageInstance::CreateSystem(uint32_t uCapacity)
 {
 	ms_kPool.Create(uCapacity);
 }
@@ -89,7 +89,7 @@ void CGraphicImageInstance::OnRender()
 		CGraphicBase::SetDefaultIndexBuffer(CGraphicBase::DEFAULT_IB_FILL_RECT);
 
 		STATEMANAGER.SetTexture(0, pTexture->GetD3DTexture());
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);		
 		STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);	
 	}
@@ -105,7 +105,7 @@ const CGraphicTexture & CGraphicImageInstance::GetTextureReference() const
 CGraphicTexture * CGraphicImageInstance::GetTexturePointer()
 {
 	CGraphicImage* pkImage = m_roImage.GetPointer();
-	return pkImage ? pkImage->GetTexturePointer() : NULL;
+	return pkImage ? pkImage->GetTexturePointer() : nullptr;
 }
 
 CGraphicImage * CGraphicImageInstance::GetGraphicImagePointer()
@@ -113,7 +113,7 @@ CGraphicImage * CGraphicImageInstance::GetGraphicImagePointer()
 	return m_roImage.GetPointer();
 }
 
-int CGraphicImageInstance::GetWidth()
+int32_t CGraphicImageInstance::GetWidth()
 {
 	if (IsEmpty())
 		return 0;
@@ -121,7 +121,7 @@ int CGraphicImageInstance::GetWidth()
 	return m_roImage->GetWidth();
 }
 
-int CGraphicImageInstance::GetHeight()
+int32_t CGraphicImageInstance::GetHeight()
 {
 	if (IsEmpty())
 		return 0;
@@ -176,18 +176,18 @@ bool CGraphicImageInstance::operator == (const CGraphicImageInstance & rhs) cons
 	return (m_roImage.GetPointer() == rhs.m_roImage.GetPointer());
 }
 
-DWORD CGraphicImageInstance::Type()
+uint32_t CGraphicImageInstance::Type()
 {
-	static DWORD s_dwType = GetCRC32("CGraphicImageInstance", strlen("CGraphicImageInstance"));
+	static uint32_t s_dwType = GetCRC32("CGraphicImageInstance", strlen("CGraphicImageInstance"));
 	return (s_dwType);
 }
 
-BOOL CGraphicImageInstance::IsType(DWORD dwType)
+BOOL CGraphicImageInstance::IsType(uint32_t dwType)
 {
 	return OnIsType(dwType);
 }
 
-BOOL CGraphicImageInstance::OnIsType(DWORD dwType)
+BOOL CGraphicImageInstance::OnIsType(uint32_t dwType)
 {
 	if (CGraphicImageInstance::Type() == dwType)
 		return TRUE;
@@ -207,7 +207,7 @@ void CGraphicImageInstance::Initialize()
 
 void CGraphicImageInstance::Destroy()
 {
-	m_roImage.SetPointer(NULL); // CRef 에서 레퍼런스 카운트가 떨어져야 함.
+	m_roImage.SetPointer(nullptr); // CRef 에서 레퍼런스 카운트가 떨어져야 함.
 	Initialize();
 }
 

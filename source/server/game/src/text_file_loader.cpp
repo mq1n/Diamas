@@ -10,12 +10,12 @@ void CTextFileLoader::DestroySystem()
 }
 
 CTextFileLoader::CTextFileLoader()
-	: m_dwcurLineIndex(0), mc_pData(NULL)
+	: m_dwcurLineIndex(0), mc_pData(nullptr)
 {
 	SetTop();
 
 	m_globalNode.strGroupName = "global";
-	m_globalNode.pParentNode = NULL;
+	m_globalNode.pParentNode = nullptr;
 }
 
 CTextFileLoader::~CTextFileLoader()
@@ -35,7 +35,7 @@ bool CTextFileLoader::Load(const char * c_szFileName)
 
 	FILE* fp = fopen(c_szFileName, "rb");
 
-	if (NULL == fp)
+	if (nullptr == fp)
 		return false;
 
 	fseek(fp, 0L, SEEK_END);
@@ -75,7 +75,7 @@ bool CTextFileLoader::LoadGroup(TGroupNode * pGroupNode)
 			if (2 != stTokenVector.size())
 			{
 				sys_err("Invalid group syntax token size: %u != 2 (DO NOT SPACE IN NAME)", stTokenVector.size());
-				for (unsigned int i = 0; i < stTokenVector.size(); ++i)
+				for (uint32_t i = 0; i < stTokenVector.size(); ++i)
 					sys_err("  %u %s", i, stTokenVector[i].c_str());
 				exit(1);
 				continue;
@@ -118,7 +118,7 @@ bool CTextFileLoader::LoadGroup(TGroupNode * pGroupNode)
 				if ('}' == stSubTokenVector[0][0])
 					break;
 
-				for (DWORD j = 0; j < stSubTokenVector.size(); ++j)
+				for (uint32_t j = 0; j < stSubTokenVector.size(); ++j)
 				{
 					stTokenVector.push_back(stSubTokenVector[j]);
 				}
@@ -152,7 +152,7 @@ void CTextFileLoader::SetTop()
 	m_pcurNode = &m_globalNode;
 }
 
-DWORD CTextFileLoader::GetChildNodeCount()
+uint32_t CTextFileLoader::GetChildNodeCount()
 {
 	if (!m_pcurNode)
 	{
@@ -171,7 +171,7 @@ BOOL CTextFileLoader::SetChildNode(const char * c_szKey)
 		return FALSE;
 	}
 
-	for (DWORD i = 0; i < m_pcurNode->ChildNodeVector.size(); ++i)
+	for (uint32_t i = 0; i < m_pcurNode->ChildNodeVector.size(); ++i)
 	{
 		TGroupNode * pGroupNode = m_pcurNode->ChildNodeVector[i];
 		if (0 == pGroupNode->strGroupName.compare(c_szKey))
@@ -184,14 +184,14 @@ BOOL CTextFileLoader::SetChildNode(const char * c_szKey)
 	return FALSE;
 }
 
-BOOL CTextFileLoader::SetChildNode(const std::string & c_rstrKeyHead, DWORD dwIndex)
+BOOL CTextFileLoader::SetChildNode(const std::string & c_rstrKeyHead, uint32_t dwIndex)
 {
 	char szKey[32];
-	snprintf(szKey, sizeof(szKey), "%s%02u", c_rstrKeyHead.c_str(), (unsigned int) dwIndex);
+	snprintf(szKey, sizeof(szKey), "%s%02u", c_rstrKeyHead.c_str(), (uint32_t) dwIndex);
 	return SetChildNode(szKey);
 }
 
-BOOL CTextFileLoader::SetChildNode(DWORD dwIndex)
+BOOL CTextFileLoader::SetChildNode(uint32_t dwIndex)
 {
 	if (!m_pcurNode)
 	{
@@ -218,7 +218,7 @@ BOOL CTextFileLoader::SetParentNode()
 		return FALSE;
 	}
 
-	if (NULL == m_pcurNode->pParentNode)
+	if (nullptr == m_pcurNode->pParentNode)
 	{
 		assert(!"Current group node is already top!");
 		return FALSE;
@@ -233,7 +233,7 @@ BOOL CTextFileLoader::GetCurrentNodeName(std::string * pstrName)
 {
 	if (!m_pcurNode)
 		return FALSE;
-	if (NULL == m_pcurNode->pParentNode)
+	if (nullptr == m_pcurNode->pParentNode)
 		return FALSE;
 
 	*pstrName = m_pcurNode->strGroupName;
@@ -291,7 +291,7 @@ BOOL CTextFileLoader::GetTokenBoolean(const std::string & c_rstrKey, BOOL * pDat
 	return TRUE;
 }
 
-BOOL CTextFileLoader::GetTokenByte(const std::string & c_rstrKey, BYTE * pData)
+BOOL CTextFileLoader::GetTokenByte(const std::string & c_rstrKey, uint8_t * pData)
 {
 	TTokenVector * pTokenVector;
 	if (!GetTokenVector(c_rstrKey, &pTokenVector))
@@ -303,14 +303,14 @@ BOOL CTextFileLoader::GetTokenByte(const std::string & c_rstrKey, BYTE * pData)
 		return FALSE;
 	}
 
-	BYTE out = 0;
+	uint8_t out = 0;
 	str_to_number(out, pTokenVector->at(0).c_str());
 	*pData = out;
 
 	return TRUE;
 }
 
-BOOL CTextFileLoader::GetTokenWord(const std::string & c_rstrKey, WORD * pData)
+BOOL CTextFileLoader::GetTokenWord(const std::string & c_rstrKey, uint16_t * pData)
 {
 	TTokenVector * pTokenVector;
 	if (!GetTokenVector(c_rstrKey, &pTokenVector))
@@ -322,14 +322,14 @@ BOOL CTextFileLoader::GetTokenWord(const std::string & c_rstrKey, WORD * pData)
 		return FALSE;
 	}
 
-	WORD out = 0;
+	uint16_t out = 0;
 	str_to_number(out, pTokenVector->at(0).c_str());
 	*pData = out;
 
 	return TRUE;
 }
 
-BOOL CTextFileLoader::GetTokenInteger(const std::string & c_rstrKey, int * pData)
+BOOL CTextFileLoader::GetTokenInteger(const std::string & c_rstrKey, int32_t * pData)
 {
 	TTokenVector * pTokenVector;
 	if (!GetTokenVector(c_rstrKey, &pTokenVector))
@@ -341,16 +341,16 @@ BOOL CTextFileLoader::GetTokenInteger(const std::string & c_rstrKey, int * pData
 		return FALSE;
 	}
 
-	int out = 0;
+	int32_t out = 0;
 	str_to_number(out, pTokenVector->at(0).c_str());
 	*pData = out;
 
 	return TRUE;
 }
 
-BOOL CTextFileLoader::GetTokenDoubleWord(const std::string & c_rstrKey, DWORD * pData)
+BOOL CTextFileLoader::GetTokenDoubleWord(const std::string & c_rstrKey, uint32_t * pData)
 {
-	return GetTokenInteger(c_rstrKey, (int *) pData);
+	return GetTokenInteger(c_rstrKey, (int32_t *) pData);
 }
 
 BOOL CTextFileLoader::GetTokenFloat(const std::string & c_rstrKey, float * pData)

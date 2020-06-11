@@ -8,7 +8,7 @@ PyObject * eventRegisterEventSet(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szFileName))
 		return Py_BuildException();
 
-	int iEventIndex = CPythonEventManager::Instance().RegisterEventSet(szFileName);
+	int32_t iEventIndex = CPythonEventManager::Instance().RegisterEventSet(szFileName);
 	return Py_BuildValue("i", iEventIndex);
 }
 
@@ -18,13 +18,13 @@ PyObject * eventRegisterEventSetFromString(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szEventString))
 		return Py_BuildException();
 
-	int iEventIndex = CPythonEventManager::Instance().RegisterEventSetFromString(szEventString);
+	int32_t iEventIndex = CPythonEventManager::Instance().RegisterEventSetFromString(szEventString);
 	return Py_BuildValue("i", iEventIndex);
 }
 
 PyObject * eventClearEventSet(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -34,11 +34,11 @@ PyObject * eventClearEventSet(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventSetRestrictedCount(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
-	int iCount;
+	int32_t iCount;
 	if (!PyTuple_GetInteger(poArgs, 1, &iCount))
 		return Py_BuildException();
 
@@ -48,7 +48,7 @@ PyObject * eventSetRestrictedCount(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventGetEventSetLocalYPosition(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -57,10 +57,10 @@ PyObject * eventGetEventSetLocalYPosition(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventAddEventSetLocalYPosition(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
-	int iPos;
+	int32_t iPos;
 	if (!PyTuple_GetInteger(poArgs, 1, &iPos))
 		return Py_BuildException();
 
@@ -70,7 +70,7 @@ PyObject * eventAddEventSetLocalYPosition(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventInsertText(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 	char * szText;
@@ -83,13 +83,13 @@ PyObject * eventInsertText(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventInsertTextInline(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 	char * szText;
 	if (!PyTuple_GetString(poArgs, 1, &szText))
 		return Py_BuildException();
-	int iXIndex;
+	int32_t iXIndex;
 	if (!PyTuple_GetInteger(poArgs, 2, &iXIndex))
 		return Py_BuildException();
 
@@ -99,15 +99,15 @@ PyObject * eventInsertTextInline(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventUpdateEventSet(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
-	int ix;
+	int32_t ix;
 	if (!PyTuple_GetInteger(poArgs, 1, &ix))
 		return Py_BuildException();
 
-	int iy;
+	int32_t iy;
 	if (!PyTuple_GetInteger(poArgs, 2, &iy))
 		return Py_BuildException();
 
@@ -117,7 +117,7 @@ PyObject * eventUpdateEventSet(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventRenderEventSet(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -127,10 +127,10 @@ PyObject * eventRenderEventSet(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventSetEventSetWidth(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
-	int iWidth;
+	int32_t iWidth;
 	if (!PyTuple_GetInteger(poArgs, 1, &iWidth))
 		return Py_BuildException();
 
@@ -140,7 +140,7 @@ PyObject * eventSetEventSetWidth(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventSkip(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -150,7 +150,7 @@ PyObject * eventSkip(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventIsWait(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -159,7 +159,7 @@ PyObject * eventIsWait(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventEndEventProcess(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -170,7 +170,7 @@ PyObject * eventEndEventProcess(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventSetEventHandler(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -184,11 +184,11 @@ PyObject * eventSetEventHandler(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventSelectAnswer(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
-	int iAnswer;
+	int32_t iAnswer;
 	if (!PyTuple_GetInteger(poArgs, 1, &iAnswer))
 		return Py_BuildException();
 
@@ -198,21 +198,21 @@ PyObject * eventSelectAnswer(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventGetLineCount(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
-	int iLineCount = CPythonEventManager::Instance().GetLineCount(iIndex);
+	int32_t iLineCount = CPythonEventManager::Instance().GetLineCount(iIndex);
 	return Py_BuildValue("i", iLineCount);
 }
 
 PyObject * eventSetVisibleStartLine(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
-	int iStartLine;
+	int32_t iStartLine;
 	if (!PyTuple_GetInteger(poArgs, 1, &iStartLine))
 		return Py_BuildException();
 
@@ -222,7 +222,7 @@ PyObject * eventSetVisibleStartLine(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventGetVisibleStartLine(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -231,7 +231,7 @@ PyObject * eventGetVisibleStartLine(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventQuestButtonClick(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 	
@@ -303,7 +303,7 @@ void initEvent()
 
 		{ "QuestButtonClick",			eventQuestButtonClick,				METH_VARARGS },
 		{ "Destroy",					eventDestroy,						METH_VARARGS },
-		{ NULL,							NULL,								NULL         },
+		{ nullptr,							nullptr,								0         },
 	};
 
 	PyObject * poModule = Py_InitModule("event", s_methods);

@@ -69,10 +69,10 @@
 
 
 
-void dev_log(const char *file, int line, const char *function, int level, const char *fmt, ...);
-void dev_log_add_level(int level);
-void dev_log_del_level(int level);
-void dev_log_set_level(int mask);
+void dev_log(const char *file, int32_t line, const char *function, int32_t level, const char *fmt, ...);
+void dev_log_add_level(int32_t level);
+void dev_log_del_level(int32_t level);
+void dev_log_set_level(int32_t mask);
 
 
 #endif	/* _dev_log_h_ */

@@ -3,10 +3,10 @@
 
 typedef struct SMobSplashAttackInfo
 {
-	DWORD	dwTiming; // 스킬 사용 후 실제로 데미지 먹힐때까지 기다리는 시간 (ms)
-	DWORD	dwHitDistance; // 스킬 사용시 실제로 스킬 계산이 되는 거리 (전방 몇cm)
+	uint32_t	dwTiming; // 스킬 사용 후 실제로 데미지 먹힐때까지 기다리는 시간 (ms)
+	uint32_t	dwHitDistance; // 스킬 사용시 실제로 스킬 계산이 되는 거리 (전방 몇cm)
 
-	SMobSplashAttackInfo(DWORD dwTiming, DWORD dwHitDistance)
+	SMobSplashAttackInfo(uint32_t dwTiming, uint32_t dwHitDistance)
 		: dwTiming(dwTiming)
 		, dwHitDistance(dwHitDistance)
 		{}
@@ -14,8 +14,8 @@ typedef struct SMobSplashAttackInfo
 
 typedef struct SMobSkillInfo
 {
-	DWORD	dwSkillVnum;
-	BYTE	bSkillLevel;
+	uint32_t	dwSkillVnum;
+	uint8_t	bSkillLevel;
 	std::vector<TMobSplashAttackInfo> vecSplashAttack;
 } TMobSkillInfo;
 
@@ -29,7 +29,7 @@ class CMob
 		TMobTable	m_table;
 		TMobSkillInfo	m_mobSkillInfo[MOB_SKILL_MAX_NUM];
 
-		void AddSkillSplash(int iIndex, DWORD dwTiming, DWORD dwHitDistance);
+		void AddSkillSplash(int32_t iIndex, uint32_t dwTiming, uint32_t dwHitDistance);
 };
 
 class CMobInstance
@@ -38,8 +38,8 @@ class CMobInstance
 		CMobInstance();
 
 		PIXEL_POSITION	m_posLastAttacked;	// 마지막 맞은 위치
-		DWORD		m_dwLastAttackedTime;	// 마지막 맞은 시간
-		DWORD		m_dwLastWarpTime;
+		uint32_t		m_dwLastAttackedTime;	// 마지막 맞은 시간
+		uint32_t		m_dwLastWarpTime;
 
 		bool m_IsBerserk;
 		bool m_IsGodSpeed;
@@ -49,13 +49,13 @@ class CMobInstance
 class CMobGroupGroup
 {
 	public:
-		CMobGroupGroup(DWORD dwVnum)
+		CMobGroupGroup(uint32_t dwVnum)
 		{
 			m_dwVnum = dwVnum;
 		}
 
 		// ADD_MOB_GROUP_GROUP_PROB
-		void AddMember(DWORD dwVnum, int prob = 1)
+		void AddMember(uint32_t dwVnum, int32_t prob = 1)
 		{   
 			if (prob == 0)
 				return;
@@ -68,13 +68,13 @@ class CMobGroupGroup
 		}
 		// END_OF_ADD_MOB_GROUP_GROUP_PROB
 
-		DWORD GetMember()
+		uint32_t GetMember()
 		{
 			if (m_vec_dwMemberVnum.empty())
 				return 0;
 
 			// ADD_MOB_GROUP_GROUP_PROB
-			int n = number(1, m_vec_iProbs.back());
+			int32_t n = number(1, m_vec_iProbs.back());
 			auto it = lower_bound(m_vec_iProbs.begin(), m_vec_iProbs.end(), n);
 
 			return m_vec_dwMemberVnum[std::distance(m_vec_iProbs.begin(), it)];
@@ -82,61 +82,61 @@ class CMobGroupGroup
 			//return m_vec_dwMemberVnum[number(1, m_vec_dwMemberVnum.size())-1];
 		}
 
-		DWORD                   m_dwVnum;
-		std::vector<DWORD>      m_vec_dwMemberVnum;
+		uint32_t                   m_dwVnum;
+		std::vector<uint32_t>      m_vec_dwMemberVnum;
 
 		// ADD_MOB_GROUP_GROUP_PROB
-		std::vector<int>	m_vec_iProbs;
+		std::vector<int32_t>	m_vec_iProbs;
 		// END_OF_ADD_MOB_GROUP_GROUP_PROB
 };
 
 class CMobGroup
 {
 	public:
-		void Create(DWORD dwVnum, std::string & r_stName)
+		void Create(uint32_t dwVnum, std::string & r_stName)
 		{
 			m_dwVnum = dwVnum;
 			m_stName = r_stName;
 		}
 
-		const std::vector<DWORD> & GetMemberVector()
+		const std::vector<uint32_t> & GetMemberVector()
 		{
 			return m_vec_dwMemberVnum;
 		}
 
-		int GetMemberCount()
+		int32_t GetMemberCount()
 		{   
 			return m_vec_dwMemberVnum.size();
 		}
 
-		void AddMember(DWORD dwVnum)
+		void AddMember(uint32_t dwVnum)
 		{   
 			m_vec_dwMemberVnum.push_back(dwVnum);
 		}
 
 	protected:                  
-		DWORD                   m_dwVnum;
+		uint32_t                   m_dwVnum;
 		std::string             m_stName;
-		std::vector<DWORD>      m_vec_dwMemberVnum;
+		std::vector<uint32_t>      m_vec_dwMemberVnum;
 };
 
 class CMobManager : public singleton<CMobManager>
 {
 	public:
-		typedef std::map<DWORD, CMob *>::iterator iterator;
+		typedef std::map<uint32_t, CMob *>::iterator iterator;
 
 		CMobManager();
 		virtual ~CMobManager();
 
-		bool		Initialize(TMobTable * table, int size);
+		bool		Initialize(TMobTable * table, int32_t size);
 		void		Destroy();
 
 		bool		LoadGroup(const char * c_pszFileName);
 		bool		LoadGroupGroup(const char * c_pszFileName);
-		CMobGroup *	GetGroup(DWORD dwVnum);
-		DWORD		GetGroupFromGroupGroup(DWORD dwVnum);
+		CMobGroup *	GetGroup(uint32_t dwVnum);
+		uint32_t		GetGroupFromGroupGroup(uint32_t dwVnum);
 
-		const CMob *	Get(DWORD dwVnum);
+		const CMob *	Get(uint32_t dwVnum);
 		const CMob *	Get(const char * c_pszName, bool bIsAbbrev);
 
 		const iterator	begin()	{ return m_map_pkMobByVnum.begin();	}
@@ -144,16 +144,16 @@ class CMobManager : public singleton<CMobManager>
 
 		void RebindMobProto(LPCHARACTER ch);
 
-		void			IncRegenCount(BYTE bRegenType, DWORD dwVnum, int iCount, int iTime);
+		void			IncRegenCount(uint8_t bRegenType, uint32_t dwVnum, int32_t iCount, int32_t iTime);
 		void			DumpRegenCount(const char* c_szFilename);
 
 	private:
-		std::map<DWORD, CMob *> m_map_pkMobByVnum;
+		std::map<uint32_t, CMob *> m_map_pkMobByVnum;
 		std::map<std::string, CMob *> m_map_pkMobByName;
-		std::map<DWORD, CMobGroup *> m_map_pkMobGroup;
-		std::map<DWORD, CMobGroupGroup *> m_map_pkMobGroupGroup;
+		std::map<uint32_t, CMobGroup *> m_map_pkMobGroup;
+		std::map<uint32_t, CMobGroupGroup *> m_map_pkMobGroupGroup;
 
-		std::map<DWORD, double> m_mapRegenCount;
+		std::map<uint32_t, double> m_mapRegenCount;
 };
 
 #endif

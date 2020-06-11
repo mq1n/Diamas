@@ -5,7 +5,7 @@
 class CRaceManager : public CSingleton<CRaceManager>
 {
 	public:
-		typedef std::map<DWORD, CRaceData *> TRaceDataMap;
+		typedef std::map<uint32_t, CRaceData *> TRaceDataMap;
 		typedef TRaceDataMap::iterator TRaceDataIterator;
 
 	public:
@@ -15,23 +15,23 @@ class CRaceManager : public CSingleton<CRaceManager>
 		void Create();
 		void Destroy();
 		
-		void RegisterRaceName(DWORD dwRaceIndex, const char * c_szName);
+		void RegisterRaceName(uint32_t dwRaceIndex, const char * c_szName);
 		void RegisterRaceSrcName(const char * c_szName, const char * c_szSrcName);
 		
 		void SetPathName(const char * c_szPathName);
 		const char * GetFullPathFileName(const char* c_szFileName);
 
 		// Handling
-		void CreateRace(DWORD dwRaceIndex);
-		void SelectRace(DWORD dwRaceIndex);
+		void CreateRace(uint32_t dwRaceIndex);
+		void SelectRace(uint32_t dwRaceIndex);
 		CRaceData * GetSelectedRaceDataPointer();
 		// Handling
 
-		BOOL GetRaceDataPointer(DWORD dwRaceIndex, CRaceData ** ppRaceData);
+		BOOL GetRaceDataPointer(uint32_t dwRaceIndex, CRaceData ** ppRaceData);
 
 
 	protected:
-		CRaceData* __LoadRaceData(DWORD dwRaceIndex);
+		CRaceData* __LoadRaceData(uint32_t dwRaceIndex);
 		bool __LoadRaceMotionList(CRaceData& rkRaceData, const char* pathName, const char* motionListFileName);
 
 		void __Initialize();
@@ -41,7 +41,7 @@ class CRaceManager : public CSingleton<CRaceManager>
 		TRaceDataMap					m_RaceDataMap;
 
 		std::map<std::string, std::string> m_kMap_stRaceName_stSrcName;
-		std::map<DWORD, std::string>	m_kMap_dwRaceKey_stRaceName;
+		std::map<uint32_t, std::string>	m_kMap_dwRaceKey_stRaceName;
 
 	private:
 		std::string						m_strPathName;

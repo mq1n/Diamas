@@ -9,7 +9,7 @@ void CMapOutdoor::LoadWaterTexture()
 {
 	UnloadWaterTexture();
 	char buf[256];
-	for (int i = 0; i < 30; ++i)
+	for (int32_t i = 0; i < 30; ++i)
 	{
 		sprintf(buf, "d:/ymir Work/special/water/%02d.dds", i+1);
 		m_WaterInstances[i].SetImagePointer((CGraphicImage *) CResourceManager::Instance().GetResourcePointer(buf));
@@ -18,7 +18,7 @@ void CMapOutdoor::LoadWaterTexture()
 
 void CMapOutdoor::UnloadWaterTexture()
 {
-	for (int i = 0; i < 30; ++i)
+	for (int32_t i = 0; i < 30; ++i)
 		m_WaterInstances[i].Destroy();
 }
 
@@ -62,7 +62,7 @@ void CMapOutdoor::RenderWater()
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
 	
 
-	STATEMANAGER.SetTexture(1,NULL);
+	STATEMANAGER.SetTexture(1,nullptr);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
@@ -73,8 +73,8 @@ void CMapOutdoor::RenderWater()
 	static float s_fWaterHeightCurrent = 0;
 	static float s_fWaterHeightBegin = 0;
 	static float s_fWaterHeightEnd = 0;
-	static DWORD s_dwLastHeightChangeTime = CTimer::Instance().GetCurrentMillisecond();
-	static DWORD s_dwBlendtime = 300;
+	static uint32_t s_dwLastHeightChangeTime = CTimer::Instance().GetCurrentMillisecond();
+	static uint32_t s_dwBlendtime = 300;
 
 	// 1.5초 마다 변경
 	if ((CTimer::Instance().GetCurrentMillisecond() - s_dwLastHeightChangeTime) > s_dwBlendtime)
@@ -99,7 +99,7 @@ void CMapOutdoor::RenderWater()
 	
 	float fFogDistance = __GetFogDistance();
 
-	std::vector<std::pair<float, long> >::iterator i;
+	std::vector<std::pair<float, int32_t> >::iterator i;
 
 	for(i = m_PatchVector.begin();i != m_PatchVector.end(); ++i)
 	{
@@ -107,7 +107,7 @@ void CMapOutdoor::RenderWater()
 			DrawWater(i->second);
 	}
 
-	STATEMANAGER.SetTexture(0, NULL);
+	STATEMANAGER.SetTexture(0, nullptr);
 	STATEMANAGER.SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 
 	for(i = m_PatchVector.begin();i != m_PatchVector.end(); ++i)
@@ -138,9 +138,9 @@ void CMapOutdoor::RenderWater()
 	STATEMANAGER.RestoreRenderState(D3DRS_CULLMODE);	
 }
 
-void CMapOutdoor::DrawWater(long patchnum)
+void CMapOutdoor::DrawWater(int32_t patchnum)
 {
-	assert(NULL!=m_pTerrainPatchProxyList);
+	assert(nullptr!=m_pTerrainPatchProxyList);
 	if (!m_pTerrainPatchProxyList)
 		return;
 
@@ -159,7 +159,7 @@ void CMapOutdoor::DrawWater(long patchnum)
 	if (!pkVB->GetD3DVertexBuffer())
 		return;
 
-	UINT uPriCount=rkTerrainPatchProxy.GetWaterFaceCount();
+	uint32_t uPriCount=rkTerrainPatchProxy.GetWaterFaceCount();
 	if (!uPriCount)
 		return;
 	

@@ -16,7 +16,7 @@ void CMoneyLog::Save()
 	CPeer* peer = CClientManager::instance().GetAnyPeer();
 	if (!peer)
 		return;
-	for (BYTE bType = 0; bType < MONEY_LOG_TYPE_MAX_NUM; bType ++)
+	for (uint8_t bType = 0; bType < MONEY_LOG_TYPE_MAX_NUM; bType ++)
 	{
 		for (auto it = m_MoneyLogContainer[bType].begin(); it != m_MoneyLogContainer[bType].end(); ++it)
 		{
@@ -32,7 +32,7 @@ void CMoneyLog::Save()
 	}
 }
 
-void CMoneyLog::AddLog(BYTE bType, DWORD dwVnum, int iGold)
+void CMoneyLog::AddLog(uint8_t bType, uint32_t dwVnum, int32_t iGold)
 {
 	m_MoneyLogContainer[bType][dwVnum] += iGold;
 }

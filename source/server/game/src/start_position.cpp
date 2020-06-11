@@ -14,7 +14,7 @@ char g_nation_name[4][32] =
 //	LC_TEXT("천조국")
 //	LC_TEXT("진노국")
 
-long g_start_map[4] =
+int32_t g_start_map[4] =
 {
 	0,	// reserved
 	1,	// 신수국
@@ -22,7 +22,7 @@ long g_start_map[4] =
 	41	// 진노국
 };
 
-DWORD g_start_position[4][2] =
+uint32_t g_start_position[4][2] =
 {
 	{      0,      0 },	// reserved
 	{ 469300, 964200 },	// 신수국
@@ -31,7 +31,7 @@ DWORD g_start_position[4][2] =
 };
 
 
-DWORD arena_return_position[4][2] =
+uint32_t arena_return_position[4][2] =
 {
 	{       0,  0       },
 	{   347600, 882700  }, // 자양현
@@ -40,7 +40,7 @@ DWORD arena_return_position[4][2] =
 };
 
 
-DWORD g_create_position[4][2] = 
+uint32_t g_create_position[4][2] = 
 {
 	{		0,		0 },
 	{ 459800, 953900 },
@@ -48,7 +48,7 @@ DWORD g_create_position[4][2] =
 	{ 957300, 255200 },	
 };
 
-DWORD g_create_position_canada[4][2] = 
+uint32_t g_create_position_canada[4][2] = 
 {
 	{		0,		0 },
 	{ 457100, 946900 },

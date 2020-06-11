@@ -10,11 +10,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Frame Process
 
-int CHAR_STAGE_VIEW_BOUND = 200*100;
+int32_t CHAR_STAGE_VIEW_BOUND = 200*100;
 
 struct FCharacterManagerCharacterInstanceUpdate
 {
-	inline void operator () (const std::pair<DWORD,CInstanceBase *>& cr_Pair)
+	inline void operator () (const std::pair<uint32_t,CInstanceBase *>& cr_Pair)
 	{
 		cr_Pair.second->Update();
 	}
@@ -55,7 +55,7 @@ void CPythonCharacterManager::EnableSortRendering(bool isEnable)
 {
 }
 
-void CPythonCharacterManager::InsertPVPKey(DWORD dwVIDSrc, DWORD dwVIDDst)
+void CPythonCharacterManager::InsertPVPKey(uint32_t dwVIDSrc, uint32_t dwVIDDst)
 {
 	CInstanceBase::InsertPVPKey(dwVIDSrc, dwVIDDst);
 
@@ -68,7 +68,7 @@ void CPythonCharacterManager::InsertPVPKey(DWORD dwVIDSrc, DWORD dwVIDDst)
 		pkInstDst->RefreshTextTail();
 }
 
-void CPythonCharacterManager::RemovePVPKey(DWORD dwVIDSrc, DWORD dwVIDDst)
+void CPythonCharacterManager::RemovePVPKey(uint32_t dwVIDSrc, uint32_t dwVIDDst)
 {
 	CInstanceBase::RemovePVPKey(dwVIDSrc, dwVIDDst);
 
@@ -81,14 +81,14 @@ void CPythonCharacterManager::RemovePVPKey(DWORD dwVIDSrc, DWORD dwVIDDst)
 		pkInstDst->RefreshTextTail();
 }
 
-void CPythonCharacterManager::ChangeGVG(DWORD dwSrcGuildID, DWORD dwDstGuildID)
+void CPythonCharacterManager::ChangeGVG(uint32_t dwSrcGuildID, uint32_t dwDstGuildID)
 {
 	TCharacterInstanceMap::iterator itor;
 	for (itor = m_kAliveInstMap.begin(); itor != m_kAliveInstMap.end(); itor++)
 	{
 		CInstanceBase * pInstance = itor->second;
 
-		DWORD dwInstanceGuildID = pInstance->GetGuildID();
+		uint32_t dwInstanceGuildID = pInstance->GetGuildID();
 		if (dwSrcGuildID == dwInstanceGuildID || dwDstGuildID == dwInstanceGuildID)
 		{
 			pInstance->RefreshTextTail();
@@ -98,10 +98,10 @@ void CPythonCharacterManager::ChangeGVG(DWORD dwSrcGuildID, DWORD dwDstGuildID)
 
 void CPythonCharacterManager::ClearMainInstance()
 {
-	m_pkInstMain=NULL;
+	m_pkInstMain=nullptr;
 }
 
-bool CPythonCharacterManager::SetMainInstance(DWORD dwVID)
+bool CPythonCharacterManager::SetMainInstance(uint32_t dwVID)
 {
 	m_pkInstMain=GetInstancePtr(dwVID);
 
@@ -151,16 +151,16 @@ bool CPythonCharacterManager::IsCacheMode()
 void CPythonCharacterManager::Update()
 {
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t1=timeGetTime();
+	uint32_t t1=timeGetTime();
 #endif
 	CInstanceBase::ResetPerformanceCounter();
 
 	CInstanceBase* pkInstMain=GetMainInstancePtr();
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t2=timeGetTime();
+	uint32_t t2=timeGetTime();
 #endif
-	DWORD dwDeadInstCount=0;
-	DWORD dwForceVisibleInstCount=0;
+	uint32_t dwDeadInstCount=0;
+	uint32_t dwForceVisibleInstCount=0;
 
 	TCharacterInstanceMap::iterator i=m_kAliveInstMap.begin(); 
 	while (m_kAliveInstMap.end()!=i)
@@ -178,7 +178,7 @@ void CPythonCharacterManager::Update()
 				continue;
 			}*/
 
-			int nDistance = int(pkInstEach->NEW_GetDistanceFromDestInstance(*pkInstMain));
+			int32_t nDistance = int32_t(pkInstEach->NEW_GetDistanceFromDestInstance(*pkInstMain));
 			if (nDistance > CHAR_STAGE_VIEW_BOUND + 10)
 			{
 				__DeleteBlendOutInstance(pkInstEach);
@@ -188,21 +188,21 @@ void CPythonCharacterManager::Update()
 		}
 	}
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t3=timeGetTime();
+	uint32_t t3=timeGetTime();
 #endif
 	UpdateTransform();
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t4=timeGetTime();
+	uint32_t t4=timeGetTime();
 #endif
 
 	UpdateDeleting();
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t5=timeGetTime();
+	uint32_t t5=timeGetTime();
 #endif
 
 	__NEW_Pick();
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t6=timeGetTime();
+	uint32_t t6=timeGetTime();
 #endif
 
 #ifdef __PERFORMANCE_CHECKER__
@@ -230,7 +230,7 @@ void CPythonCharacterManager::Update()
 #endif
 }
 
-void CPythonCharacterManager::ShowPointEffect(DWORD ePoint, DWORD dwVID)
+void CPythonCharacterManager::ShowPointEffect(uint32_t ePoint, uint32_t dwVID)
 {
 	CInstanceBase * pkInstSel = (dwVID == 0xffffffff) ? GetMainInstancePtr() : GetInstancePtr(dwVID);
 
@@ -248,7 +248,7 @@ void CPythonCharacterManager::ShowPointEffect(DWORD ePoint, DWORD dwVID)
 	}
 }
 
-bool CPythonCharacterManager::RegisterPointEffect(DWORD ePoint, const char* c_szFileName)
+bool CPythonCharacterManager::RegisterPointEffect(uint32_t ePoint, const char* c_szFileName)
 {
 	if (ePoint>=POINT_MAX_NUM)
 		return false;
@@ -262,8 +262,8 @@ bool CPythonCharacterManager::RegisterPointEffect(DWORD ePoint, const char* c_sz
 void CPythonCharacterManager::UpdateTransform()
 {
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t1=timeGetTime();
-	DWORD t2=timeGetTime();
+	uint32_t t1=timeGetTime();
+	uint32_t t2=timeGetTime();
 #endif
 
 	CInstanceBase * pMainInstance = GetMainInstancePtr();
@@ -296,7 +296,7 @@ void CPythonCharacterManager::UpdateTransform()
 	}
 
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t3=timeGetTime();
+	uint32_t t3=timeGetTime();
 #endif
 
 	{
@@ -308,7 +308,7 @@ void CPythonCharacterManager::UpdateTransform()
 	}
 
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t4=timeGetTime();
+	uint32_t t4=timeGetTime();
 #endif
 
 #ifdef __PERFORMANCE_CHECKER__
@@ -354,7 +354,7 @@ void CPythonCharacterManager::UpdateDeleting()
 
 struct FCharacterManagerCharacterInstanceDeform
 {
-	inline void operator () (const std::pair<DWORD,CInstanceBase *>& cr_Pair)
+	inline void operator () (const std::pair<uint32_t,CInstanceBase *>& cr_Pair)
 	{
 		cr_Pair.second->Deform();
 		//pInstance->Update();
@@ -377,7 +377,7 @@ void CPythonCharacterManager::Deform()
 
 
 
-bool CPythonCharacterManager::OLD_GetPickedInstanceVID(DWORD* pdwPickedActorID)
+bool CPythonCharacterManager::OLD_GetPickedInstanceVID(uint32_t* pdwPickedActorID)
 {
 	if (!m_pkInstPick)
 		return false;
@@ -396,7 +396,7 @@ D3DXVECTOR2 & CPythonCharacterManager::OLD_GetPickedInstPosReference()
 	return m_v2PickedInstProjPos;
 }
 
-bool CPythonCharacterManager::IsRegisteredVID(DWORD dwVID)
+bool CPythonCharacterManager::IsRegisteredVID(uint32_t dwVID)
 {
 	if (m_kAliveInstMap.end()==m_kAliveInstMap.find(dwVID))
 		return false;
@@ -404,12 +404,12 @@ bool CPythonCharacterManager::IsRegisteredVID(DWORD dwVID)
 	return true;
 }
 
-bool CPythonCharacterManager::IsAliveVID(DWORD dwVID)
+bool CPythonCharacterManager::IsAliveVID(uint32_t dwVID)
 {
 	return m_kAliveInstMap.find(dwVID)!=m_kAliveInstMap.end();
 }
 
-bool CPythonCharacterManager::IsDeadVID(DWORD dwVID)
+bool CPythonCharacterManager::IsDeadVID(uint32_t dwVID)
 {
 	for (TCharacterInstanceList::iterator f=m_kDeadInstList.begin(); f!=m_kDeadInstList.end(); ++f)
 	{
@@ -430,7 +430,7 @@ struct LessCharacterInstancePtrRenderOrder
 
 struct FCharacterManagerCharacterInstanceRender
 {
-	inline void operator () (const std::pair<DWORD,CInstanceBase *>& cr_Pair)
+	inline void operator () (const std::pair<uint32_t,CInstanceBase *>& cr_Pair)
 	{
 		cr_Pair.second->Render();
 		cr_Pair.second->RenderTrace();
@@ -484,14 +484,14 @@ void CPythonCharacterManager::__RenderSortedDeadActorList()
 
 void CPythonCharacterManager::Render()
 {
-	STATEMANAGER.SetTexture(0, NULL);	
+	STATEMANAGER.SetTexture(0, nullptr);	
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1,	D3DTA_TEXTURE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG2,	D3DTA_CURRENT);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP,	D3DTOP_MODULATE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG1,	D3DTA_TEXTURE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP,	D3DTOP_SELECTARG1);
 
-	STATEMANAGER.SetTexture(1, NULL);
+	STATEMANAGER.SetTexture(1, nullptr);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_COLOROP,	D3DTOP_DISABLE);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAOP,	D3DTOP_DISABLE);
 
@@ -516,7 +516,7 @@ void CPythonCharacterManager::RenderShadowMainInstance()
 
 struct FCharacterManagerCharacterInstanceRenderToShadowMap
 {
-	inline void operator () (const std::pair<DWORD,CInstanceBase *>& cr_Pair)
+	inline void operator () (const std::pair<uint32_t,CInstanceBase *>& cr_Pair)
 	{
 		cr_Pair.second->RenderToShadowMap();
 	}
@@ -529,7 +529,7 @@ void CPythonCharacterManager::RenderShadowAllInstances()
 
 struct FCharacterManagerCharacterInstanceRenderCollision
 {
-	inline void operator () (const std::pair<DWORD,CInstanceBase *>& cr_Pair)
+	inline void operator () (const std::pair<uint32_t,CInstanceBase *>& cr_Pair)
 	{
 		cr_Pair.second->RenderCollision();
 	}
@@ -549,14 +549,14 @@ CInstanceBase * CPythonCharacterManager::CreateInstance(const CInstanceBase::SCr
 	if (!pCharacterInstance)
 	{
 		TraceError("CPythonCharacterManager::CreateInstance: VID[%d] - ALREADY EXIST\n", c_rkCreateData.m_dwVID); // @fixme010
-		return NULL;
+		return nullptr;
 	}
 
 	if (!pCharacterInstance->Create(c_rkCreateData))
 	{
 		TraceError("CPythonCharacterManager::CreateInstance VID[%d] Race[%d]", c_rkCreateData.m_dwVID, c_rkCreateData.m_dwRace);
 		DeleteInstance(c_rkCreateData.m_dwVID);
-		return NULL;
+		return nullptr;
 	}
 
 	if (c_rkCreateData.m_isMain)
@@ -565,13 +565,13 @@ CInstanceBase * CPythonCharacterManager::CreateInstance(const CInstanceBase::SCr
 	return (pCharacterInstance);
 }
 
-CInstanceBase * CPythonCharacterManager::RegisterInstance(DWORD VirtualID)
+CInstanceBase * CPythonCharacterManager::RegisterInstance(uint32_t VirtualID)
 {
 	TCharacterInstanceMap::iterator itor = m_kAliveInstMap.find(VirtualID);
 
 	if (m_kAliveInstMap.end() != itor)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	CInstanceBase * pCharacterInstance = CInstanceBase::New();
@@ -580,7 +580,7 @@ CInstanceBase * CPythonCharacterManager::RegisterInstance(DWORD VirtualID)
 	return (pCharacterInstance);
 }
 
-void CPythonCharacterManager::DeleteInstance(DWORD dwDelVID)
+void CPythonCharacterManager::DeleteInstance(uint32_t dwDelVID)
 {
 	TCharacterInstanceMap::iterator itor = m_kAliveInstMap.find(dwDelVID);
 
@@ -593,13 +593,13 @@ void CPythonCharacterManager::DeleteInstance(DWORD dwDelVID)
 	CInstanceBase * pkInstDel = itor->second;
 
 	if (pkInstDel == m_pkInstBind)
-		m_pkInstBind = NULL;
+		m_pkInstBind = nullptr;
 
 	if (pkInstDel == m_pkInstMain)
-		m_pkInstMain = NULL;
+		m_pkInstMain = nullptr;
 
 	if (pkInstDel == m_pkInstPick)
-		m_pkInstPick = NULL;
+		m_pkInstPick = nullptr;
 
 	CInstanceBase::Delete(pkInstDel);
 
@@ -615,7 +615,7 @@ void CPythonCharacterManager::__DeleteBlendOutInstance(CInstanceBase* pkInstDel)
 	rkPlayer.NotifyCharacterDead(pkInstDel->GetVirtualID());
 }
 
-void CPythonCharacterManager::DeleteInstanceByFade(DWORD dwVID)
+void CPythonCharacterManager::DeleteInstanceByFade(uint32_t dwVID)
 {
 	TCharacterInstanceMap::iterator f = m_kAliveInstMap.find(dwVID);
 	if (m_kAliveInstMap.end() == f)
@@ -626,7 +626,7 @@ void CPythonCharacterManager::DeleteInstanceByFade(DWORD dwVID)
 	m_kAliveInstMap.erase(f);	
 }
 
-void CPythonCharacterManager::SelectInstance(DWORD VirtualID)
+void CPythonCharacterManager::SelectInstance(uint32_t VirtualID)
 {
 	TCharacterInstanceMap::iterator itor = m_kAliveInstMap.find(VirtualID);
 
@@ -639,12 +639,12 @@ void CPythonCharacterManager::SelectInstance(DWORD VirtualID)
 	m_pkInstBind = itor->second;
 }
 
-CInstanceBase * CPythonCharacterManager::GetInstancePtr(DWORD VirtualID)
+CInstanceBase * CPythonCharacterManager::GetInstancePtr(uint32_t VirtualID)
 {
 	TCharacterInstanceMap::iterator itor = m_kAliveInstMap.find(VirtualID);
 
 	if (m_kAliveInstMap.end() == itor)
-		return NULL;
+		return nullptr;
 
 	return itor->second;
 }
@@ -661,7 +661,7 @@ CInstanceBase * CPythonCharacterManager::GetInstancePtrByName(const char *name)
 			return pInstance;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 CInstanceBase * CPythonCharacterManager::GetSelectedInstancePtr()
@@ -671,7 +671,7 @@ CInstanceBase * CPythonCharacterManager::GetSelectedInstancePtr()
 
 CInstanceBase* CPythonCharacterManager::FindClickableInstancePtr()
 {
-	return NULL;
+	return nullptr;
 }
 
 void CPythonCharacterManager::__UpdateSortPickedActorList()
@@ -711,8 +711,8 @@ struct CInstanceBase_SLessCameraDistance
 
 	bool operator() (CInstanceBase* pkInstLeft, CInstanceBase* pkInstRight)
 	{
-		int nLeftDeadPoint=pkInstLeft->IsDead();
-		int nRightDeadPoint=pkInstRight->IsDead();
+		int32_t nLeftDeadPoint=pkInstLeft->IsDead();
+		int32_t nRightDeadPoint=pkInstRight->IsDead();
 
 		if (nLeftDeadPoint<nRightDeadPoint)
 			return true;
@@ -811,7 +811,7 @@ void CPythonCharacterManager::__NEW_Pick()
 	if (m_pkInstPick)
 	{
 		m_pkInstPick->OnUnselected();	
-		m_pkInstPick=NULL;
+		m_pkInstPick=nullptr;
 	}
 }
 
@@ -840,11 +840,11 @@ void CPythonCharacterManager::__OLD_Pick()
 	if (m_pkInstPick)
 	{
 		m_pkInstPick->OnUnselected();	
-		m_pkInstPick=NULL;
+		m_pkInstPick=nullptr;
 	}
 }
 
-int CPythonCharacterManager::PickAll()
+int32_t CPythonCharacterManager::PickAll()
 {
 	for (TCharacterInstanceMap::iterator itor = m_kAliveInstMap.begin(); itor != m_kAliveInstMap.end(); ++itor)
 	{
@@ -860,7 +860,7 @@ int CPythonCharacterManager::PickAll()
 CInstanceBase * CPythonCharacterManager::GetCloseInstance(CInstanceBase * pInstance)
 {
 	float fMinDistance = 10000.0f;
-	CInstanceBase * pCloseInstance = NULL;
+	CInstanceBase * pCloseInstance = nullptr;
 
 	TCharacterInstanceMap::iterator itor = m_kAliveInstMap.begin();
 	for (; itor != m_kAliveInstMap.end(); ++itor)
@@ -870,7 +870,7 @@ CInstanceBase * CPythonCharacterManager::GetCloseInstance(CInstanceBase * pInsta
 		if (pTargetInstance == pInstance)
 			continue;
 
-		DWORD dwVirtualNumber = pTargetInstance->GetVirtualNumber();
+		uint32_t dwVirtualNumber = pTargetInstance->GetVirtualNumber();
 		if (CPythonNonPlayer::ON_CLICK_EVENT_BATTLE != CPythonNonPlayer::Instance().GetEventType(dwVirtualNumber))
 			continue;
 
@@ -947,9 +947,9 @@ void CPythonCharacterManager::Destroy()
 void CPythonCharacterManager::__Initialize()
 {
 	memset(m_adwPointEffect, 0, sizeof(m_adwPointEffect));
-	m_pkInstMain = NULL;
-	m_pkInstBind = NULL;
-	m_pkInstPick = NULL;
+	m_pkInstMain = nullptr;
+	m_pkInstBind = nullptr;
+	m_pkInstPick = nullptr;
 	m_v2PickedInstProjPos = D3DXVECTOR2(0.0f, 0.0f);
 }
 

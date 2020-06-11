@@ -13,45 +13,45 @@ enum EMonsterChatState
 
 typedef struct SMobRankStat
 {
-	int iGoldPercent;   // µ·ÀÌ ³ª¿Ã È®·ü
+	int32_t iGoldPercent;   // µ·ÀÌ ³ª¿Ã È®·ü
 } TMobRankStat;
 
 typedef struct SMobStat
 {
-	BYTE	byLevel;
-	WORD	HP;
-	DWORD	dwExp;
-	WORD	wDefGrade;
+	uint8_t	byLevel;
+	uint16_t	HP;
+	uint32_t	dwExp;
+	uint16_t	wDefGrade;
 } TMobStat;
 
 typedef struct SBattleTypeStat
 {
-	int		AttGradeBias;
-	int		DefGradeBias;
-	int		MagicAttGradeBias;
-	int		MagicDefGradeBias;
+	int32_t		AttGradeBias;
+	int32_t		DefGradeBias;
+	int32_t		MagicAttGradeBias;
+	int32_t		MagicDefGradeBias;
 } TBattleTypeStat;
 
 typedef struct SJobInitialPoints
 {
-	int		st, ht, dx, iq;
-	int		max_hp, max_sp;
-	int		hp_per_ht, sp_per_iq;
-	int		hp_per_lv_begin, hp_per_lv_end;
-	int		sp_per_lv_begin, sp_per_lv_end;
-	int		max_stamina;
-	int		stamina_per_con;
-	int		stamina_per_lv_begin, stamina_per_lv_end;
+	int32_t		st, ht, dx, iq;
+	int32_t		max_hp, max_sp;
+	int32_t		hp_per_ht, sp_per_iq;
+	int32_t		hp_per_lv_begin, hp_per_lv_end;
+	int32_t		sp_per_lv_begin, sp_per_lv_end;
+	int32_t		max_stamina;
+	int32_t		stamina_per_con;
+	int32_t		stamina_per_lv_begin, stamina_per_lv_end;
 } TJobInitialPoints;
 
 typedef struct __coord
 {
-	int		x, y;
+	int32_t		x, y;
 } Coord;
 
 typedef struct SApplyInfo
 {
-	BYTE	bPointType;                          // APPLY -> POINT
+	uint8_t	bPointType;                          // APPLY -> POINT
 } TApplyInfo;
 
 enum {
@@ -65,22 +65,22 @@ enum {
 	FORTUNE_MAX_NUM,
 };
 
-const int STONE_INFO_MAX_NUM = 10;
-const int STONE_LEVEL_MAX_NUM = 4;
+const int32_t STONE_INFO_MAX_NUM = 10;
+const int32_t STONE_LEVEL_MAX_NUM = 4;
 
 struct SStoneDropInfo
 {
-	DWORD dwMobVnum;
-	int iDropPct;
-	int iLevelPct[STONE_LEVEL_MAX_NUM+1];
+	uint32_t dwMobVnum;
+	int32_t iDropPct;
+	int32_t iLevelPct[STONE_LEVEL_MAX_NUM+1];
 };
 
-inline bool operator < (const SStoneDropInfo& l, DWORD r)
+inline bool operator < (const SStoneDropInfo& l, uint32_t r)
 {
 	return l.dwMobVnum < r;
 }
 
-inline bool operator < (DWORD l, const SStoneDropInfo& r)
+inline bool operator < (uint32_t l, const SStoneDropInfo& r)
 {
 	return l < r.dwMobVnum;
 }
@@ -95,63 +95,63 @@ extern const TMobRankStat       MobRankStats[MOB_RANK_MAX_NUM];
 
 extern TBattleTypeStat		BattleTypeStats[BATTLE_TYPE_MAX_NUM];
 
-extern const DWORD		party_exp_distribute_table[PLAYER_EXP_TABLE_MAX + 1];
+extern const uint32_t		party_exp_distribute_table[PLAYER_EXP_TABLE_MAX + 1];
 
-extern const DWORD		exp_table_common[PLAYER_EXP_TABLE_MAX + 1];
+extern const uint32_t		exp_table_common[PLAYER_EXP_TABLE_MAX + 1];
 
-extern const DWORD*		exp_table;
+extern const uint32_t*		exp_table;
 
-extern const DWORD		guild_exp_table[GUILD_MAX_LEVEL + 1];
-extern const DWORD		guild_exp_table2[GUILD_MAX_LEVEL + 1];
+extern const uint32_t		guild_exp_table[GUILD_MAX_LEVEL + 1];
+extern const uint32_t		guild_exp_table2[GUILD_MAX_LEVEL + 1];
 
 #define MAX_EXP_DELTA_OF_LEV	31
 #define PERCENT_LVDELTA(me, victim) aiPercentByDeltaLev[MINMAX(0, (victim + 15) - me, MAX_EXP_DELTA_OF_LEV - 1)]
 #define PERCENT_LVDELTA_BOSS(me, victim) aiPercentByDeltaLevForBoss[MINMAX(0, (victim + 15) - me, MAX_EXP_DELTA_OF_LEV - 1)]
 #define CALCULATE_VALUE_LVDELTA(me, victim, val) ((val * PERCENT_LVDELTA(me, victim)) / 100)
-extern const int		aiPercentByDeltaLev_euckr[MAX_EXP_DELTA_OF_LEV];
-extern const int		aiPercentByDeltaLevForBoss_euckr[MAX_EXP_DELTA_OF_LEV];
-extern const int *		aiPercentByDeltaLev;
-extern const int *		aiPercentByDeltaLevForBoss;
+extern const int32_t		aiPercentByDeltaLev_euckr[MAX_EXP_DELTA_OF_LEV];
+extern const int32_t		aiPercentByDeltaLevForBoss_euckr[MAX_EXP_DELTA_OF_LEV];
+extern const int32_t *		aiPercentByDeltaLev;
+extern const int32_t *		aiPercentByDeltaLevForBoss;
 
 #define ARROUND_COORD_MAX_NUM	161
 extern Coord			aArroundCoords[ARROUND_COORD_MAX_NUM];
 extern TJobInitialPoints	JobInitialPoints[JOB_MAX_NUM];
 
-extern const int		aiMobEnchantApplyIdx[MOB_ENCHANTS_MAX_NUM];
-extern const int		aiMobResistsApplyIdx[MOB_RESISTS_MAX_NUM];
+extern const int32_t		aiMobEnchantApplyIdx[MOB_ENCHANTS_MAX_NUM];
+extern const int32_t		aiMobResistsApplyIdx[MOB_RESISTS_MAX_NUM];
 
-extern const int		aSkillAttackAffectProbByRank[MOB_RANK_MAX_NUM];
+extern const int32_t		aSkillAttackAffectProbByRank[MOB_RANK_MAX_NUM];
 
-extern const int aiItemMagicAttributePercentHigh[ITEM_ATTRIBUTE_MAX_LEVEL]; // 1°³±îÁö
-extern const int aiItemMagicAttributePercentLow[ITEM_ATTRIBUTE_MAX_LEVEL];
+extern const int32_t aiItemMagicAttributePercentHigh[ITEM_ATTRIBUTE_MAX_LEVEL]; // 1°³±îÁö
+extern const int32_t aiItemMagicAttributePercentLow[ITEM_ATTRIBUTE_MAX_LEVEL];
 
-extern const int aiItemAttributeAddPercent[ITEM_ATTRIBUTE_MAX_NUM];
+extern const int32_t aiItemAttributeAddPercent[ITEM_ATTRIBUTE_MAX_NUM];
 
-extern const int aiWeaponSocketQty[WEAPON_NUM_TYPES];
-extern const int aiArmorSocketQty[ARMOR_NUM_TYPES];
-extern const int aiSocketPercentByQty[5][4];
+extern const int32_t aiWeaponSocketQty[WEAPON_NUM_TYPES];
+extern const int32_t aiArmorSocketQty[ARMOR_NUM_TYPES];
+extern const int32_t aiSocketPercentByQty[5][4];
 
-extern const int aiExpLossPercents[PLAYER_EXP_TABLE_MAX + 1];
+extern const int32_t aiExpLossPercents[PLAYER_EXP_TABLE_MAX + 1];
 
-extern const int * aiSkillPowerByLevel;
-extern const int aiSkillPowerByLevel_euckr[SKILL_MAX_LEVEL + 1];
+extern const int32_t * aiSkillPowerByLevel;
+extern const int32_t aiSkillPowerByLevel_euckr[SKILL_MAX_LEVEL + 1];
 
-extern const int aiPolymorphPowerByLevel[SKILL_MAX_LEVEL + 1];
+extern const int32_t aiPolymorphPowerByLevel[SKILL_MAX_LEVEL + 1];
 
-extern const int aiSkillBookCountForLevelUp[10];
-extern const int aiGrandMasterSkillBookCountForLevelUp[10];
-extern const int aiGrandMasterSkillBookMinCount[10];
-extern const int aiGrandMasterSkillBookMaxCount[10];
-extern const int CHN_aiPartyBonusExpPercentByMemberCount[9];
-extern const int KOR_aiPartyBonusExpPercentByMemberCount[9];
-extern const int KOR_aiUniqueItemPartyBonusExpPercentByMemberCount[9];
+extern const int32_t aiSkillBookCountForLevelUp[10];
+extern const int32_t aiGrandMasterSkillBookCountForLevelUp[10];
+extern const int32_t aiGrandMasterSkillBookMinCount[10];
+extern const int32_t aiGrandMasterSkillBookMaxCount[10];
+extern const int32_t CHN_aiPartyBonusExpPercentByMemberCount[9];
+extern const int32_t KOR_aiPartyBonusExpPercentByMemberCount[9];
+extern const int32_t KOR_aiUniqueItemPartyBonusExpPercentByMemberCount[9];
 
-typedef std::map<DWORD, TItemAttrTable> TItemAttrMap;
+typedef std::map<uint32_t, TItemAttrTable> TItemAttrMap;
 extern TItemAttrMap g_map_itemAttr;
 extern TItemAttrMap g_map_itemRare;
 
-extern const int * aiChainLightningCountBySkillLevel;
-extern const int aiChainLightningCountBySkillLevel_euckr[SKILL_MAX_LEVEL + 1];
+extern const int32_t * aiChainLightningCountBySkillLevel;
+extern const int32_t aiChainLightningCountBySkillLevel_euckr[SKILL_MAX_LEVEL + 1];
 
 extern const char * c_apszEmpireNames[EMPIRE_MAX_NUM];
 extern const char * c_apszPrivNames[MAX_PRIV_NUM];
@@ -159,12 +159,12 @@ extern const SStoneDropInfo aStoneDrop[STONE_INFO_MAX_NUM];
 
 typedef struct
 {
-	long lMapIndex;
-	int iWarPrice;
-	int iWinnerPotionRewardPctToWinner;
-	int iLoserPotionRewardPctToWinner;
-	int iInitialScore;
-	int iEndScore;
+	int32_t lMapIndex;
+	int32_t iWarPrice;
+	int32_t iWinnerPotionRewardPctToWinner;
+	int32_t iLoserPotionRewardPctToWinner;
+	int32_t iInitialScore;
+	int32_t iEndScore;
 } TGuildWarInfo;
 
 extern TGuildWarInfo KOR_aGuildWarInfo[GUILD_WAR_TYPE_MAX_NUM];
@@ -175,14 +175,14 @@ enum
 	ITEM_ACCESSORY_SOCKET_MAX_NUM = 3
 };
 
-extern const int aiAccessorySocketAddPct[ITEM_ACCESSORY_SOCKET_MAX_NUM];
-extern const int aiAccessorySocketEffectivePct[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1];
-extern const int aiAccessorySocketDegradeTime[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1];
-extern const int aiAccessorySocketPutPct[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1];
-long FN_get_apply_type(const char *apply_type_string);
+extern const int32_t aiAccessorySocketAddPct[ITEM_ACCESSORY_SOCKET_MAX_NUM];
+extern const int32_t aiAccessorySocketEffectivePct[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1];
+extern const int32_t aiAccessorySocketDegradeTime[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1];
+extern const int32_t aiAccessorySocketPutPct[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1];
+int32_t FN_get_apply_type(const char *apply_type_string);
 
 // END_OF_ACCESSORY_REFINE
 
-long FN_get_apply_type(const char *apply_type_string);
+int32_t FN_get_apply_type(const char *apply_type_string);
 #endif
 

@@ -4,18 +4,18 @@
 TJobInitialPoints JobInitialPoints[JOB_MAX_NUM] = 
 /*
    {
-   int st, ht, dx, iq;
-   int max_hp, max_sp;
-   int hp_per_ht, sp_per_iq;
-   int hp_per_lv_begin, hp_per_lv_end;
-   int sp_per_lv_begin, sp_per_lv_end;
-   int max_stamina;
-   int stamina_per_con;
-   int stamina_per_lv_begin, stamina_per_lv_end;
+   int32_t st, ht, dx, iq;
+   int32_t max_hp, max_sp;
+   int32_t hp_per_ht, sp_per_iq;
+   int32_t hp_per_lv_begin, hp_per_lv_end;
+   int32_t sp_per_lv_begin, sp_per_lv_end;
+   int32_t max_stamina;
+   int32_t stamina_per_con;
+   int32_t stamina_per_lv_begin, stamina_per_lv_end;
    }
  */
 {
-	// str con dex int 초기HP 초기SP  CON/HP INT/SP  HP랜덤/lv   MP랜덤/lv  초기stam  stam/con stam/lv
+	// str con dex int32_t 초기HP 초기SP  CON/HP INT/SP  HP랜덤/lv   MP랜덤/lv  초기stam  stam/con stam/lv
 	{   6,  4,  3,  3,  600,   200,     40,    20,    44, 44,     22, 22,     800,      5,      1, 3  }, // JOB_WARRIOR  16 
 	{   4,  3,  6,  3,  650,   200,     40,    20,    44, 44,     22, 22,     800,      5,      1, 3  }, // JOB_ASSASSIN 16
 	{   5,  3,  3,  5,  650,   200,     40,    20,    44, 44,     22, 22,     800,      5,      1, 3  }, // JOB_SURA	 16
@@ -28,7 +28,7 @@ TJobInitialPoints JobInitialPoints[JOB_MAX_NUM] =
 const TMobRankStat MobRankStats[MOB_RANK_MAX_NUM] =
 /*
    {
-   int         iGoldPercent;
+   int32_t         iGoldPercent;
    }
  */
 {
@@ -43,10 +43,10 @@ const TMobRankStat MobRankStats[MOB_RANK_MAX_NUM] =
 TBattleTypeStat BattleTypeStats[BATTLE_TYPE_MAX_NUM] =
 /*
    {
-   int         AttGradeBias;
-   int         DefGradeBias;
-   int         MagicAttGradeBias;
-   int         MagicDefGradeBias;
+   int32_t         AttGradeBias;
+   int32_t         DefGradeBias;
+   int32_t         MagicAttGradeBias;
+   int32_t         MagicDefGradeBias;
    }
  */
 {
@@ -60,9 +60,9 @@ TBattleTypeStat BattleTypeStats[BATTLE_TYPE_MAX_NUM] =
 	{	-20,	 20,	-10,	  0	}, // BATTLE_TYPE_SUPER_TANKER,
 };
 
-const DWORD * exp_table = NULL;
+const uint32_t * exp_table = nullptr;
 
-const DWORD exp_table_common[PLAYER_EXP_TABLE_MAX + 1] =
+const uint32_t exp_table_common[PLAYER_EXP_TABLE_MAX + 1] =
 {
 	0,	//	0
 	300,
@@ -187,12 +187,12 @@ const DWORD exp_table_common[PLAYER_EXP_TABLE_MAX + 1] =
 	2500000000u	//	120
 };
 
-const int * aiPercentByDeltaLev = NULL;
-const int * aiPercentByDeltaLevForBoss = NULL;
+const int32_t * aiPercentByDeltaLev = nullptr;
+const int32_t * aiPercentByDeltaLevForBoss = nullptr;
 
 // 적과 나와의 레벨차이에 의한 계산에 사용되는 테이블
 // MIN(MAX_EXP_DELTA_OF_LEV - 1, (적렙 + 15) - 내렙))
-const int aiPercentByDeltaLevForBoss_euckr[MAX_EXP_DELTA_OF_LEV] =
+const int32_t aiPercentByDeltaLevForBoss_euckr[MAX_EXP_DELTA_OF_LEV] =
 {
 	1,      // -15  0
 	3,          // -14  1
@@ -229,7 +229,7 @@ const int aiPercentByDeltaLevForBoss_euckr[MAX_EXP_DELTA_OF_LEV] =
 
 
 
-const int aiPercentByDeltaLev_euckr[MAX_EXP_DELTA_OF_LEV] =
+const int32_t aiPercentByDeltaLev_euckr[MAX_EXP_DELTA_OF_LEV] =
 {
 	1,  //  -15 0
 	5,  //  -14 1
@@ -264,7 +264,7 @@ const int aiPercentByDeltaLev_euckr[MAX_EXP_DELTA_OF_LEV] =
 	180,    //  15  30
 };
 
-const DWORD party_exp_distribute_table[PLAYER_EXP_TABLE_MAX + 1] =
+const uint32_t party_exp_distribute_table[PLAYER_EXP_TABLE_MAX + 1] =
 {
 	0,
 	10,		10,		10,		10,		15,		15,		20,		25,		30,		40,		// 1 - 10
@@ -446,7 +446,7 @@ Coord aArroundCoords[ARROUND_COORD_MAX_NUM] =
 	{       -707,   707     },
 };
 
-const DWORD guild_exp_table[GUILD_MAX_LEVEL+1] =
+const uint32_t guild_exp_table[GUILD_MAX_LEVEL+1] =
 {
 	0,
 	15000UL,
@@ -472,7 +472,7 @@ const DWORD guild_exp_table[GUILD_MAX_LEVEL+1] =
 };
 
 // INTERNATIONAL_VERSION 길드경험치
-const DWORD guild_exp_table2[GUILD_MAX_LEVEL+1] =
+const uint32_t guild_exp_table2[GUILD_MAX_LEVEL+1] =
 {
 	0,	
 	6000UL,
@@ -498,7 +498,7 @@ const DWORD guild_exp_table2[GUILD_MAX_LEVEL+1] =
 };
 // END_OF_INTERNATIONAL_VERSION 길드경험치
 
-const int aiMobEnchantApplyIdx[MOB_ENCHANTS_MAX_NUM] =
+const int32_t aiMobEnchantApplyIdx[MOB_ENCHANTS_MAX_NUM] =
 {
 	APPLY_CURSE_PCT,
 	APPLY_SLOW_PCT,
@@ -511,7 +511,7 @@ const int aiMobEnchantApplyIdx[MOB_ENCHANTS_MAX_NUM] =
 #endif
 };
 
-const int aiMobResistsApplyIdx[MOB_RESISTS_MAX_NUM] =
+const int32_t aiMobResistsApplyIdx[MOB_RESISTS_MAX_NUM] =
 {
 	APPLY_RESIST_SWORD,
 	APPLY_RESIST_TWOHAND,
@@ -532,7 +532,7 @@ const int aiMobResistsApplyIdx[MOB_RESISTS_MAX_NUM] =
 #endif
 };
 
-const int aiSocketPercentByQty[5][4] =
+const int32_t aiSocketPercentByQty[5][4] =
 {
 	{  0,  0,  0,  0 },
 	{  3,  0,  0,  0 },
@@ -541,7 +541,7 @@ const int aiSocketPercentByQty[5][4] =
 	{ 20, 15, 10,  1 }
 };
 
-const int aiWeaponSocketQty[WEAPON_NUM_TYPES] =
+const int32_t aiWeaponSocketQty[WEAPON_NUM_TYPES] =
 {
 	3, // WEAPON_SWORD,
 	3, // WEAPON_DAGGER,
@@ -556,7 +556,7 @@ const int aiWeaponSocketQty[WEAPON_NUM_TYPES] =
 #endif
 };
 
-const int aiArmorSocketQty[ARMOR_NUM_TYPES] =
+const int32_t aiArmorSocketQty[ARMOR_NUM_TYPES] =
 {
 	3, // ARMOR_BODY,
 	1, // ARMOR_HEAD,
@@ -572,7 +572,7 @@ TItemAttrMap g_map_itemRare;
 const TApplyInfo aApplyInfo[MAX_APPLY_NUM] =
 /*
 {
-   DWORD dwPointType;
+   uint32_t dwPointType;
 }
  */
 {
@@ -705,26 +705,26 @@ const TApplyInfo aApplyInfo[MAX_APPLY_NUM] =
 #endif
 };
 
-const int aiItemMagicAttributePercentHigh[ITEM_ATTRIBUTE_MAX_LEVEL] =
+const int32_t aiItemMagicAttributePercentHigh[ITEM_ATTRIBUTE_MAX_LEVEL] =
 {
 	//25, 25, 40, 8, 2,
 	30, 40, 20, 8, 2
 };
 
-const int aiItemMagicAttributePercentLow[ITEM_ATTRIBUTE_MAX_LEVEL] =
+const int32_t aiItemMagicAttributePercentLow[ITEM_ATTRIBUTE_MAX_LEVEL] =
 {
 	//45, 25, 20, 10, 0,
 	50, 40, 10, 0, 0
 };
 
 // ADD_ITEM_ATTRIBUTE
-const int aiItemAttributeAddPercent[ITEM_ATTRIBUTE_MAX_NUM] =
+const int32_t aiItemAttributeAddPercent[ITEM_ATTRIBUTE_MAX_NUM] =
 {
 	100, 80, 60, 50, 30, 0, 0, 
 };
 // END_OF_ADD_ITEM_ATTRIBUTE
 
-const int aiExpLossPercents[PLAYER_EXP_TABLE_MAX + 1] =
+const int32_t aiExpLossPercents[PLAYER_EXP_TABLE_MAX + 1] =
 {
 	0,
 	5, 5, 5, 5, 5, 5, 5, 5, 5, 4, // 1 - 10
@@ -741,25 +741,25 @@ const int aiExpLossPercents[PLAYER_EXP_TABLE_MAX + 1] =
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 111 - 120
 };
 
-const int aiSkillBookCountForLevelUp[10] =
+const int32_t aiSkillBookCountForLevelUp[10] =
 {
 	3, 3, 3, 3, 3, 4, 4, 5, 5, 6
 };
 
 // ADD_GRANDMASTER_SKILL
-const int aiGrandMasterSkillBookCountForLevelUp[10] =
+const int32_t aiGrandMasterSkillBookCountForLevelUp[10] =
 {
 	3, 3, 5, 5, 7, 7, 10, 10, 10, 20, 
 };
 
-const int aiGrandMasterSkillBookMinCount[10] = 
+const int32_t aiGrandMasterSkillBookMinCount[10] = 
 {
 //	1, 1, 3, 5, 10, 15, 20, 30, 40, 50, 
 //	3, 3, 5, 5, 10, 10, 15, 15, 20, 30
 	1, 1, 1, 2,  2,  3,  3,  4,  5,  6
 };
 
-const int aiGrandMasterSkillBookMaxCount[10] = 
+const int32_t aiGrandMasterSkillBookMaxCount[10] = 
 {
 //	6, 15, 30, 45, 60, 80, 100, 120, 160, 200,
 //	6, 10, 15, 20, 30, 40, 50, 60, 70, 80
@@ -767,14 +767,14 @@ const int aiGrandMasterSkillBookMaxCount[10] =
 };
 // END_OF_ADD_GRANDMASTER_SKILL
 
-const int CHN_aiPartyBonusExpPercentByMemberCount[9] =
+const int32_t CHN_aiPartyBonusExpPercentByMemberCount[9] =
 {
 	0, 0, 12, 18, 26, 40, 53, 70, 100
 };
 
 
 // UPGRADE_PARTY_BONUS
-const int KOR_aiPartyBonusExpPercentByMemberCount[9] =
+const int32_t KOR_aiPartyBonusExpPercentByMemberCount[9] =
 {
 	0, 
 	0, 
@@ -787,7 +787,7 @@ const int KOR_aiPartyBonusExpPercentByMemberCount[9] =
 	140, // 30% * 8 - 100
 };
 
-const int KOR_aiUniqueItemPartyBonusExpPercentByMemberCount[9] =
+const int32_t KOR_aiUniqueItemPartyBonusExpPercentByMemberCount[9] =
 {
 	0, 
 	0, 
@@ -801,9 +801,9 @@ const int KOR_aiUniqueItemPartyBonusExpPercentByMemberCount[9] =
 };
 // END_OF_UPGRADE_PARTY_BONUS
 
-const int * aiChainLightningCountBySkillLevel = NULL;
+const int32_t * aiChainLightningCountBySkillLevel = nullptr;
 
-const int aiChainLightningCountBySkillLevel_euckr[SKILL_MAX_LEVEL+1] =
+const int32_t aiChainLightningCountBySkillLevel_euckr[SKILL_MAX_LEVEL+1] =
 {
 	0,	// 0
 	2,	// 1
@@ -880,7 +880,7 @@ const char * c_apszPrivNames[MAX_PRIV_NUM] =
 	"경험치 배율",
 };
 
-const int aiPolymorphPowerByLevel[SKILL_MAX_LEVEL + 1] =
+const int32_t aiPolymorphPowerByLevel[SKILL_MAX_LEVEL + 1] =
 {
 	10,   // 1
 	11,   // 2
@@ -927,12 +927,12 @@ const int aiPolymorphPowerByLevel[SKILL_MAX_LEVEL + 1] =
 TGuildWarInfo KOR_aGuildWarInfo[GUILD_WAR_TYPE_MAX_NUM] =
 /*
    {
-   long lMapIndex;
-   int iWarPrice;
-   int iWinnerPotionRewardPctToWinner;
-   int iLoserPotionRewardPctToWinner;
-   int iInitialScore;
-   int iEndScore;
+   int32_t lMapIndex;
+   int32_t iWarPrice;
+   int32_t iWinnerPotionRewardPctToWinner;
+   int32_t iLoserPotionRewardPctToWinner;
+   int32_t iInitialScore;
+   int32_t iEndScore;
    };
  */
 {
@@ -946,25 +946,25 @@ TGuildWarInfo KOR_aGuildWarInfo[GUILD_WAR_TYPE_MAX_NUM] =
 //
 
 // 다이아몬드로 소켓을 추가할 때 확률
-const int aiAccessorySocketAddPct[ITEM_ACCESSORY_SOCKET_MAX_NUM] =
+const int32_t aiAccessorySocketAddPct[ITEM_ACCESSORY_SOCKET_MAX_NUM] =
 {
 	50, 50, 50
 };
 
 // 악세서리 수치 값의 몇%만큼의 성능을 추가하는지
-const int aiAccessorySocketEffectivePct[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1] = 
+const int32_t aiAccessorySocketEffectivePct[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1] = 
 {
 	0, 10, 20, 40
 };
 
 // 소켓 지속시간 24, 12, 6
-const int aiAccessorySocketDegradeTime[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1] =
+const int32_t aiAccessorySocketDegradeTime[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1] =
 {
 	0, 3600 * 24, 3600 * 12, 3600 * 6
 };
 
 // 소켓 장착 성공률
-const int aiAccessorySocketPutPct[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1] =
+const int32_t aiAccessorySocketPutPct[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1] =
 {
 	90, 80, 70, 0
 };
@@ -975,7 +975,7 @@ const int aiAccessorySocketPutPct[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1] =
 typedef struct SValueName
 {
     const char *	c_pszName;
-    long		lValue;
+    int32_t		lValue;
 } TValueName;
 
 TValueName c_aApplyTypeNames[] =
@@ -1084,11 +1084,11 @@ TValueName c_aApplyTypeNames[] =
 #ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
 	{ "RESIST_MAGIC_REDUCTION",APPLY_RESIST_MAGIC_REDUCTION },
 #endif
-    { NULL,		0			}
+    { nullptr,		0			}
 };
 // from import_item_proto.c
 
-long FN_get_apply_type(const char *apply_type_string)
+int32_t FN_get_apply_type(const char *apply_type_string)
 {
 	TValueName	*value_name;
 	for (value_name = c_aApplyTypeNames; value_name->c_pszName; ++value_name)

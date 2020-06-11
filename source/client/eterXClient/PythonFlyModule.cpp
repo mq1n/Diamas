@@ -19,7 +19,7 @@ void initfly()
 		{ "Update",						flyUpdate,					METH_VARARGS },
 		{ "Render",						flyRender,					METH_VARARGS },
 		
-		{ NULL,							NULL,							NULL         },
+		{ nullptr,							nullptr,							0         },
 	};
 	
 	Py_InitModule("fly", s_methods);

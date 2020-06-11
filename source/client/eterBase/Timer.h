@@ -10,32 +10,32 @@ class CTimer : public CSingleton<CTimer>
 		virtual ~CTimer();
 
 		void	Advance();
-		void	Adjust(int iTimeGap);
+		void	Adjust(int32_t iTimeGap);
 		void	SetBaseTime();
 
 		float	GetCurrentSecond();
-		DWORD	GetCurrentMillisecond();
+		uint32_t	GetCurrentMillisecond();
 
 		float	GetElapsedSecond();
-		DWORD	GetElapsedMilliecond();
+		uint32_t	GetElapsedMilliecond();
 
 		void	UseCustomTime();
 
 	protected:
 		bool	m_bUseRealTime;
-		DWORD	m_dwBaseTime;
-		DWORD	m_dwCurrentTime;
+		uint32_t	m_dwBaseTime;
+		uint32_t	m_dwCurrentTime;
 		float	m_fCurrentTime;
-		DWORD	m_dwElapsedTime;
-		int		m_index;
+		uint32_t	m_dwElapsedTime;
+		int32_t		m_index;
 };
 
 BOOL	ELTimer_Init();
 
-DWORD	ELTimer_GetMSec();
+uint32_t	ELTimer_GetMSec();
 
-VOID	ELTimer_SetServerMSec(DWORD dwServerTime);
-DWORD	ELTimer_GetServerMSec();
+VOID	ELTimer_SetServerMSec(uint32_t dwServerTime);
+uint32_t	ELTimer_GetServerMSec();
 
 VOID	ELTimer_SetFrameMSec();
-DWORD	ELTimer_GetFrameMSec();
+uint32_t	ELTimer_GetFrameMSec();

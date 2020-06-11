@@ -7,7 +7,7 @@
 #include "char.h"
 
 // questpc.h: PC::typedef Quest
-// questpc.h: PC::typedef map<unsigned long, QuestState> QuestInfo;
+// questpc.h: PC::typedef map<uint32_t, QuestState> QuestInfo;
 // typedef 
 
 
@@ -22,7 +22,7 @@ namespace quest
 	{
 	}
 
-	void NPC::Set(unsigned int vnum, const string & script_name)
+	void NPC::Set(uint32_t vnum, const string & script_name)
 	{
 		m_vnum = vnum;
 
@@ -37,13 +37,13 @@ namespace quest
 
 			for (auto itObjectDir = g_setQuestObjectDir.begin(); itObjectDir != g_setQuestObjectDir.end(); ++itObjectDir)
 			{	
-				int is = snprintf(buf, sizeof(buf), "%s/%s/%s/", itObjectDir->c_str(), script_name.c_str(), it->first.c_str());
+				int32_t is = snprintf(buf, sizeof(buf), "%s/%s/%s/", itObjectDir->c_str(), script_name.c_str(), it->first.c_str());
 
-				if (is < 0 || is >= (int) sizeof(buf))
+				if (is < 0 || is >= (int32_t) sizeof(buf))
 					is = sizeof(buf) - 1;
 
 				//sys_log(0, "XXX %s", buf);
-				int event_index = it->second;
+				int32_t event_index = it->second;
 
 				DIR * pdir = opendir(buf);
 
@@ -70,7 +70,7 @@ namespace quest
 		}
 	}
 
-	void NPC::LoadStateScript(int event_index, const char* filename, const char* script_name)
+	void NPC::LoadStateScript(int32_t event_index, const char* filename, const char* script_name)
 	{
 		ifstream inf(filename);
 		const string s(script_name);
@@ -91,7 +91,7 @@ namespace quest
 		// Quest name
 		const string stQuestName = s.substr(0, i); 
 
-		int quest_index = q.GetQuestIndexByName(stQuestName);
+		int32_t quest_index = q.GetQuestIndexByName(stQuestName);
 
 		if (quest_index == 0)
 		{
@@ -112,7 +112,7 @@ namespace quest
 		else
 			stStateName = s.substr(j + 1, i - j - 1);
 
-		int state_index = q.GetQuestStateIndex(stQuestName, stStateName);
+		int32_t state_index = q.GetQuestStateIndex(stQuestName, stStateName);
 		///////////////////////////////////////////////////////////////////////////
 
 		sys_log(0, "QUEST loading %s : %s [STATE] %s", 
@@ -142,7 +142,7 @@ namespace quest
 				return;
 			}
 
-			const int index = strtol(s.substr(j + 1, i - j - 1).c_str(), NULL, 10); 
+			const int32_t index = strtol(s.substr(j + 1, i - j - 1).c_str(), nullptr, 10); 
 			///////////////////////////////////////////////////////////////////////////
 			// Type name
 			j = i;
@@ -185,22 +185,22 @@ namespace quest
 		}
 	}
 
-	bool NPC::OnEnterState(PC& pc, DWORD quest_index, int state)
+	bool NPC::OnEnterState(PC& pc, uint32_t quest_index, int32_t state)
 	{
 		return ExecuteEventScript(pc, QUEST_ENTER_STATE_EVENT, quest_index, state);
 	}
 
-	bool NPC::OnLeaveState(PC& pc, DWORD quest_index, int state)
+	bool NPC::OnLeaveState(PC& pc, uint32_t quest_index, int32_t state)
 	{
 		return ExecuteEventScript(pc, QUEST_LEAVE_STATE_EVENT, quest_index, state);
 	}
 
-	bool NPC::OnLetter(PC& pc, DWORD quest_index, int state)
+	bool NPC::OnLetter(PC& pc, uint32_t quest_index, int32_t state)
 	{
 		return ExecuteEventScript(pc, QUEST_LETTER_EVENT, quest_index, state);
 	}
 
-	bool NPC::OnTarget(PC & pc, DWORD dwQuestIndex, const char * c_pszTargetName, const char * c_pszVerb, bool & bRet)
+	bool NPC::OnTarget(PC & pc, uint32_t dwQuestIndex, const char * c_pszTargetName, const char * c_pszVerb, bool & bRet)
 	{
 		sys_log(1, "OnTarget begin %s verb %s qi %u", c_pszTargetName, c_pszVerb, dwQuestIndex);
 
@@ -214,7 +214,7 @@ namespace quest
 			return false;
 		}
 
-		int iState = itPCQuest->second.st;
+		int32_t iState = itPCQuest->second.st;
 
 		AArgQuestScriptType & r = m_mapOwnArgQuest[QUEST_TARGET_EVENT][dwQuestIndex];
 		AArgQuestScriptType::iterator it = r.find(iState);
@@ -227,7 +227,7 @@ namespace quest
 
 		vector<AArgScript>::iterator it_vec = it->second.begin();
 
-		int iTargetLen = strlen(c_pszTargetName);
+		int32_t iTargetLen = strlen(c_pszTargetName);
 
 		while (it_vec != it->second.end())
 		{
@@ -352,7 +352,7 @@ namespace quest
 		/*
 		   if (c_pszQuestName)
 		   {
-		   DWORD dwQI = CQuestManager::instance().GetQuestIndexByName(c_pszQuestName);
+		   uint32_t dwQI = CQuestManager::instance().GetQuestIndexByName(c_pszQuestName);
 
 		   if (dwQI)
 		   {
@@ -370,13 +370,13 @@ namespace quest
 		   continue;
 		   }
 
-		   int iState = pc.GetFlag(stQuestName + "__status");
+		   int32_t iState = pc.GetFlag(stQuestName + "__status");
 
 		   AQuestScriptType::iterator qsit;
 
 		   if ((qsit = qmit->second.find(iState)) != qmit->second.end())
 		   {
-		   return q.ExecuteQuestScript(pc, stQuestName, iState, qsit->second.GetCode(), qsit->second.GetSize(), NULL, true);
+		   return q.ExecuteQuestScript(pc, stQuestName, iState, qsit->second.GetCode(), qsit->second.GetSize(), nullptr, true);
 		   }
 
 		   ++qmit;
@@ -405,8 +405,8 @@ namespace quest
 
 	struct FuncMissHandleEvent
 	{
-		std::vector <DWORD> vdwNewStartQuestIndices;
-		int size;
+		std::vector <uint32_t> vdwNewStartQuestIndices;
+		int32_t size;
 
 		FuncMissHandleEvent() : vdwNewStartQuestIndices(0), size(0)
 		{}
@@ -419,7 +419,7 @@ namespace quest
 		void operator()(PC::QuestInfoIterator& itPCQuest, NPC::QuestMapType::iterator& itQuestMap)
 		{
 			// 없으니 새로 시작
-			DWORD dwQuestIndex = itQuestMap->first;
+			uint32_t dwQuestIndex = itQuestMap->first;
 
 			if (NPC::HasStartState(itQuestMap->second) && CQuestManager::instance().CanStartQuest(dwQuestIndex))
 			{
@@ -433,16 +433,16 @@ namespace quest
 	{
 		bool bMatched;
 
-		std::vector <DWORD> vdwQuesIndices;
-		std::vector <int> viPCStates;
+		std::vector <uint32_t> vdwQuesIndices;
+		std::vector <int32_t> viPCStates;
 		std::vector <const char*> vcodes;
-		std::vector <int> vcode_sizes;
-		int size;
+		std::vector <int32_t> vcode_sizes;
+		int32_t size;
 
-		//DWORD dwQuestIndex;
-		//int iPCState;
+		//uint32_t dwQuestIndex;
+		//int32_t iPCState;
 		//const char* code;
-		//int code_size;
+		//int32_t code_size;
 
 		FuncMatchHandleEvent()
 			: bMatched(false), vdwQuesIndices(0), viPCStates(0), vcodes(0), vcode_sizes(0), size(0)
@@ -457,7 +457,7 @@ namespace quest
 		{
 			NPC::AQuestScriptType::iterator itQuestScript;
 
-			int iState = itPCQuest->second.st;
+			int32_t iState = itPCQuest->second.st;
 			if ((itQuestScript = itQuestMap->second.find(iState)) != itQuestMap->second.end())
 			{
 				bMatched = true;
@@ -470,7 +470,7 @@ namespace quest
 		}
 	};
 
-	bool NPC::HandleEvent(PC& pc, int EventIndex)
+	bool NPC::HandleEvent(PC& pc, int32_t EventIndex)
 	{
 		if (EventIndex < 0 || EventIndex >= QUEST_EVENT_COUNT)
 		{
@@ -499,7 +499,7 @@ namespace quest
 		bool r = false;
 		if (fMatch.Matched())
 		{
-			for (int i = 0; i < fMatch.size; i++)
+			for (int32_t i = 0; i < fMatch.size; i++)
 			{
 				if ( i != 0 ) {
 					
@@ -516,7 +516,7 @@ namespace quest
 		{
 			QuestMapType& rmapEventOwnQuest = m_mapOwnQuest[EventIndex];
 			
-			for (int i = 0; i < fMiss.size; i++)
+			for (int32_t i = 0; i < fMiss.size; i++)
 			{
 				AStateScriptType& script = rmapEventOwnQuest[fMiss.vdwNewStartQuestIndices[i]][0];
 				CQuestManager::ExecuteQuestScript(pc, fMiss.vdwNewStartQuestIndices[i], 0, script.GetCode(), script.GetSize());
@@ -541,7 +541,7 @@ namespace quest
 
 		void operator() (PC::QuestInfoIterator& itPCQuest, NPC::QuestMapType::iterator& itQuestMap)
 		{
-			DWORD dwQuestIndex = itQuestMap->first;
+			uint32_t dwQuestIndex = itQuestMap->first;
 
 			if (NPC::HasStartState(itQuestMap->second) && CQuestManager::instance().CanStartQuest(dwQuestIndex))
 			{
@@ -574,7 +574,7 @@ namespace quest
 		void operator() (PC::QuestInfoIterator& itPCQuest, NPC::QuestMapType::iterator& itQuestMap)
 		{
 			const NPC::AQuestScriptType& QuestScript = itQuestMap->second;
-			int iPCState = itPCQuest->second.st;
+			int32_t iPCState = itPCQuest->second.st;
 			auto itQuestScript = QuestScript.find(iPCState);
 
 			if (itQuestScript != QuestScript.end())
@@ -591,7 +591,7 @@ namespace quest
 		}
 	};
 
-	bool NPC::HandleReceiveAllEvent(PC& pc, int EventIndex)
+	bool NPC::HandleReceiveAllEvent(PC& pc, int32_t EventIndex)
 	{
 		if (EventIndex < 0 || EventIndex >= QUEST_EVENT_COUNT)
 		{
@@ -639,7 +639,7 @@ namespace quest
 
 		void operator()(PC::QuestInfoIterator& itPCQuest, NPC::QuestMapType::iterator& itQuestMap)
 		{
-			DWORD dwQuestIndex = itQuestMap->first;
+			uint32_t dwQuestIndex = itQuestMap->first;
 
 			if (NPC::HasStartState(itQuestMap->second) && CQuestManager::instance().CanStartQuest(dwQuestIndex))
 			{
@@ -680,7 +680,7 @@ namespace quest
 		void operator()(PC::QuestInfoIterator & itPCQuest, NPC::QuestMapType::iterator & itQuestMap)
 		{
 			const NPC::AQuestScriptType & QuestScript = itQuestMap->second;
-			int iPCState = itPCQuest->second.st;
+			int32_t iPCState = itPCQuest->second.st;
 			auto itQuestScript = QuestScript.find(iPCState);
 
 			if (itQuestScript != QuestScript.end())
@@ -706,7 +706,7 @@ namespace quest
 		}
 	};
 
-	bool NPC::HandleReceiveAllNoWaitEvent(PC& pc, int EventIndex)
+	bool NPC::HandleReceiveAllNoWaitEvent(PC& pc, int32_t EventIndex)
 	{
 		//cerr << EventIndex << endl;
 		if (EventIndex<0 || EventIndex>=QUEST_EVENT_COUNT)
@@ -741,9 +741,9 @@ namespace quest
 		return fMatch.bHandled || fMiss.bHandled;
 	}
 
-	bool NPC::OnInfo(PC & pc, unsigned int quest_index)
+	bool NPC::OnInfo(PC & pc, uint32_t quest_index)
 	{
-		const int EventIndex = QUEST_INFO_EVENT;
+		const int32_t EventIndex = QUEST_INFO_EVENT;
 
 		if (pc.IsRunning()) 
 		{
@@ -790,9 +790,9 @@ namespace quest
 		return true;
 	}
 
-	bool NPC::OnButton(PC & pc, unsigned int quest_index)
+	bool NPC::OnButton(PC & pc, uint32_t quest_index)
 	{
-		const int EventIndex = QUEST_BUTTON_EVENT;
+		const int32_t EventIndex = QUEST_BUTTON_EVENT;
 
 		if (pc.IsRunning()) 
 		{
@@ -817,7 +817,7 @@ namespace quest
 		if (itQuestMap == rmapEventOwnQuest.end())
 			return false;
 
-		int iState = 0;
+		int32_t iState = 0;
 
 		if (itPCQuest != pc.quest_end())
 		{
@@ -872,8 +872,8 @@ namespace quest
 
 		void operator()(PC::QuestInfoIterator& itPCQuest, NPC::ArgQuestMapType::iterator& itQuestMap)
 		{
-			int iState = itPCQuest->second.st;
-			map<int,vector<AArgScript> >::iterator itQuestScript = itQuestMap->second.find(iState);
+			int32_t iState = itPCQuest->second.st;
+			map<int32_t,vector<AArgScript> >::iterator itQuestScript = itQuestMap->second.find(iState);
 			if (itQuestScript != itQuestMap->second.end())
 			{
 				size_t i;
@@ -905,7 +905,7 @@ namespace quest
 			return false;
 		}
 
-		const int EventIndex = QUEST_CHAT_EVENT;
+		const int32_t EventIndex = QUEST_CHAT_EVENT;
 		vector<AArgScript*> AvailScript;
 
 		FuncMatchChatEvent fMatch(AvailScript);
@@ -939,7 +939,7 @@ namespace quest
 		return !m_mapOwnArgQuest[QUEST_CHAT_EVENT].empty();
 	}
 
-	bool NPC::ExecuteEventScript(PC& pc, int EventIndex, DWORD dwQuestIndex, int iState)
+	bool NPC::ExecuteEventScript(PC& pc, int32_t EventIndex, uint32_t dwQuestIndex, int32_t iState)
 	{
 		QuestMapType& rQuest = m_mapOwnQuest[EventIndex];
 
@@ -971,7 +971,7 @@ namespace quest
 			return HandleEvent(pc, QUEST_ITEM_PICK_EVENT);
 	}
 	//독일 선물 기능 테스트
-	bool NPC::OnItemInformer(PC& pc, unsigned int vnum)
+	bool NPC::OnItemInformer(PC& pc, uint32_t vnum)
 	{
 		return HandleEvent(pc, QUEST_ITEM_INFORMER_EVENT);
 	}

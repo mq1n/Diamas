@@ -32,7 +32,7 @@ class CWeaponTrace
 		void UseTexture();
 
 		void SetTexture(const char * c_szFileName);
-		bool SetWeaponInstance(CGraphicThingInstance * pInstance, DWORD dwModelIndex, const char * c_szBoneName);
+		bool SetWeaponInstance(CGraphicThingInstance * pInstance, uint32_t dwModelIndex, const char * c_szBoneName);
 		void SetPosition(float fx, float fy, float fz);
 		void SetRotation(float fRotation);
 
@@ -66,7 +66,7 @@ class CWeaponTrace
 		//std::vector<TSplineValue> m_SplineValueVector;
 
 		CGraphicThingInstance * m_pInstance;
-		DWORD m_dwModelInstanceIndex;
+		uint32_t m_dwModelInstanceIndex;
 
 		CGraphicImageInstance m_ImageInstance;
 		
@@ -79,7 +79,7 @@ class CWeaponTrace
 		BOOL m_isPlaying;
 		bool m_bUseTexture;
 
-		int m_iBoneIndex;
+		int32_t m_iBoneIndex;
 
 	protected:
 		static CDynamicPool<CWeaponTrace> ms_kPool;

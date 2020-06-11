@@ -43,8 +43,8 @@ protected:
 	D3DXPLANE		m_v4BackPlane;
 
 	// 개수
-	DWORD			m_dwVertexCount;
-	DWORD			m_dwPrimitiveCount;
+	uint32_t			m_dwVertexCount;
+	uint32_t			m_dwPrimitiveCount;
 
 	// 버택스 버퍼와 인댁스 버퍼
 //	CGraphicVertexBuffer	m_GraphicVertexBuffer;
@@ -53,29 +53,29 @@ protected:
 	// 버택스 버퍼와 인댁스 버퍼 대신에 배열 만들고 DrawIndexedPrimitiveUP로 그리자.
 	typedef struct 
 	{
-		WORD			m_wMinIndex;
-		DWORD			m_dwVertexCount;
-		DWORD			m_dwPrimitiveCount;
-		DWORD			m_dwVBOffset;
+		uint16_t			m_wMinIndex;
+		uint32_t			m_dwVertexCount;
+		uint32_t			m_dwPrimitiveCount;
+		uint32_t			m_dwVBOffset;
 	} TTRIANGLEFANSTRUCT;
 	
 	std::vector<TTRIANGLEFANSTRUCT> m_TriangleFanStructVector;
 
 	TPDTVertex		m_Vertices[MAX_DECAL_VERTICES];
-	WORD			m_Indices[MAX_DECAL_VERTICES];
+	uint16_t			m_Indices[MAX_DECAL_VERTICES];
 	
 	const float m_cfDecalEpsilon;
 
 protected:
-	bool AddPolygon(DWORD dwAddCount, const D3DXVECTOR3 *c_pv3Vertex, const D3DXVECTOR3 *c_pv3Normal);
-	void ClipMesh(DWORD dwPrimitiveCount, const D3DXVECTOR3 *c_pv3Vertex, const D3DXVECTOR3 *c_pv3Normal);
-	DWORD ClipPolygon(DWORD dwVertexCount, 
+	bool AddPolygon(uint32_t dwAddCount, const D3DXVECTOR3 *c_pv3Vertex, const D3DXVECTOR3 *c_pv3Normal);
+	void ClipMesh(uint32_t dwPrimitiveCount, const D3DXVECTOR3 *c_pv3Vertex, const D3DXVECTOR3 *c_pv3Normal);
+	uint32_t ClipPolygon(uint32_t dwVertexCount, 
 		const D3DXVECTOR3 *c_pv3Vertex, 
 		const D3DXVECTOR3 *c_pv3Normal, 
 		D3DXVECTOR3 *c_pv3NewVertex, 
 		D3DXVECTOR3 *c_pv3NewNormal) const;
-	static DWORD ClipPolygonAgainstPlane(const D3DXPLANE& v4Plane, 
-		DWORD dwVertexCount,
+	static uint32_t ClipPolygonAgainstPlane(const D3DXPLANE& v4Plane, 
+		uint32_t dwVertexCount,
 		const D3DXVECTOR3 *c_pv3Vertex, 
 		const D3DXVECTOR3 *c_pv3Normal, 
 		D3DXVECTOR3 *c_pv3NewVertex, 

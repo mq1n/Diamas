@@ -21,7 +21,7 @@
 #include "shopEx.h"
 #include "group_text_parse_tree.h"
 
-bool CShopEx::Create(DWORD dwVnum, DWORD dwNPCVnum)
+bool CShopEx::Create(uint32_t dwVnum, uint32_t dwNPCVnum)
 {
 	m_dwVnum = dwVnum;
 	m_dwNPCVnum = dwNPCVnum;
@@ -42,7 +42,7 @@ bool CShopEx::AddShopTable(TShopTableEx& shopTable)
 	return true;
 }
 
-bool CShopEx::AddGuest(LPCHARACTER ch,DWORD owner_vid, bool bOtherEmpire)
+bool CShopEx::AddGuest(LPCHARACTER ch,uint32_t owner_vid, bool bOtherEmpire)
 {
 	if (!ch)
 		return false;
@@ -78,7 +78,7 @@ bool CShopEx::AddGuest(LPCHARACTER ch,DWORD owner_vid, bool bOtherEmpire)
 		pack_tab.coin_type = shop_tab.coinType;
 		memcpy(pack_tab.name, shop_tab.name.c_str(), SHOP_TAB_NAME_MAX);
 		
-		for (BYTE i = 0; i < SHOP_HOST_ITEM_MAX_NUM; i++)
+		for (uint8_t i = 0; i < SHOP_HOST_ITEM_MAX_NUM; i++)
 		{
 			pack_tab.items[i].vnum = shop_tab.items[i].vnum;
 			pack_tab.items[i].count = shop_tab.items[i].count;
@@ -116,10 +116,10 @@ bool CShopEx::AddGuest(LPCHARACTER ch,DWORD owner_vid, bool bOtherEmpire)
 	return true;
 }
 
-int CShopEx::Buy(LPCHARACTER ch, BYTE pos)
+int32_t CShopEx::Buy(LPCHARACTER ch, uint8_t pos)
 {
-	BYTE tabIdx = pos / SHOP_HOST_ITEM_MAX_NUM;
-	BYTE slotPos = pos % SHOP_HOST_ITEM_MAX_NUM;
+	uint8_t tabIdx = pos / SHOP_HOST_ITEM_MAX_NUM;
+	uint8_t slotPos = pos % SHOP_HOST_ITEM_MAX_NUM;
 	if (tabIdx >= GetTabCount())
 	{
 		sys_log(0, "ShopEx::Buy : invalid position %d : %s", pos, ch->GetName());
@@ -142,7 +142,7 @@ int CShopEx::Buy(LPCHARACTER ch, BYTE pos)
 		return SHOP_SUBHEADER_GC_NOT_ENOUGH_MONEY;
 	}
 
-	DWORD dwPrice = r_item.price;
+	uint32_t dwPrice = r_item.price;
 
 	switch (shopTab.coinType)
 	{
@@ -150,7 +150,7 @@ int CShopEx::Buy(LPCHARACTER ch, BYTE pos)
 		if (it->second)	// if other empire, price is triple
 			dwPrice *= 3;
 
-		if (ch->GetGold() < (int) dwPrice)
+		if (ch->GetGold() < (int32_t) dwPrice)
 		{
 			sys_log(1, "ShopEx::Buy : Not enough money : %s has %d, price %d", ch->GetName(), ch->GetGold(), dwPrice);
 			return SHOP_SUBHEADER_GC_NOT_ENOUGH_MONEY;
@@ -158,7 +158,7 @@ int CShopEx::Buy(LPCHARACTER ch, BYTE pos)
 		break;
 	case SHOP_COIN_TYPE_SECONDARY_COIN:
 		{
-			DWORD count = ch->CountSpecifyTypeItem(ITEM_SECONDARY_COIN);
+			uint32_t count = ch->CountSpecifyTypeItem(ITEM_SECONDARY_COIN);
 			if (count < dwPrice)
 			{
 				sys_log(1, "ShopEx::Buy : Not enough myeongdojun : %s has %d, price %d", ch->GetName(), count, dwPrice);
@@ -175,7 +175,7 @@ int CShopEx::Buy(LPCHARACTER ch, BYTE pos)
 	if (!item)
 		return SHOP_SUBHEADER_GC_SOLD_OUT;
 
-	int iEmptyPos;
+	int32_t iEmptyPos;
 	if (item->IsDragonSoul())
 	{
 		iEmptyPos = ch->GetEmptyDragonSoulInventory(item);
@@ -224,9 +224,9 @@ int CShopEx::Buy(LPCHARACTER ch, BYTE pos)
 #ifdef ENABLE_FLUSH_CACHE_FEATURE // @warme006
 	{
 		ch->SaveReal();
-		db_clientdesc->DBPacketHeader(HEADER_GD_FLUSH_CACHE, 0, sizeof(DWORD));
-		DWORD pid = ch->GetPlayerID();
-		db_clientdesc->Packet(&pid, sizeof(DWORD));
+		db_clientdesc->DBPacketHeader(HEADER_GD_FLUSH_CACHE, 0, sizeof(uint32_t));
+		uint32_t pid = ch->GetPlayerID();
+		db_clientdesc->Packet(&pid, sizeof(uint32_t));
 	}
 #else
 	{

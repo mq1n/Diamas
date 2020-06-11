@@ -12,12 +12,12 @@
 #include "spherepack.h"
 
 #if DEMO
-int PrintText(int x, int y, int color, char* output, ...);
-int DrawLine(int x1, int y1, int x2, int y2, int color);
-int DrawCircle(int locx, int locy, int radius, int color);
+int32_t PrintText(int32_t x, int32_t y, int32_t color, char* output, ...);
+int32_t DrawLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color);
+int32_t DrawCircle(int32_t locx, int32_t locy, int32_t radius, int32_t color);
 #endif
 
-SpherePackFactory::SpherePackFactory(int maxspheres, float rootsize, float leafsize, float gravy)
+SpherePackFactory::SpherePackFactory(int32_t maxspheres, float rootsize, float leafsize, float gravy)
 {
 	maxspheres *= 4; // include room for both trees, the root node and leaf node tree, and the superspheres
 	mMaxRootSize      = rootsize;
@@ -75,8 +75,8 @@ void SpherePackFactory::Process(void)
 		// When leaf node spheres exit their parent sphere, then the parent sphere needs to be rebalanced.  In fact,it may now be empty and
 		// need to be removed.
 		// This is the location where (n) number of spheres in the recomputation FIFO are allowed to be rebalanced in the tree.
-		int maxrecompute = mRecompute->GetCount();
-		for (int i = 0; i < maxrecompute; ++i)
+		int32_t maxrecompute = mRecompute->GetCount();
+		for (int32_t i = 0; i < maxrecompute; ++i)
 		{
 			SpherePack * pack = mRecompute->Pop();
 			if (!pack) break;
@@ -88,9 +88,9 @@ void SpherePackFactory::Process(void)
 	
 	{
 		// Now, process the integration step.	
-		int maxintegrate = mIntegrate->GetCount();
+		int32_t maxintegrate = mIntegrate->GetCount();
 		
-		for (int i = 0; i < maxintegrate; ++i)
+		for (int32_t i = 0; i < maxintegrate; ++i)
 		{
 			SpherePack * pack = mIntegrate->Pop();
 			if (!pack)
@@ -111,7 +111,7 @@ SpherePack * SpherePackFactory::AddSphere_(const Vector3d &pos,
                                           float radius,
                                           void *userdata,
 										  bool isSphere,
-                                          int flags)
+                                          int32_t flags)
 {
 	
 	SpherePack *pack = mSpheres.GetFreeLink();
@@ -175,7 +175,7 @@ void SpherePackFactory::Render(void)
 }
 
 
-void SpherePack::Render(unsigned int /*color*/)
+void SpherePack::Render(uint32_t /*color*/)
 {
 #if DEMO
 	if (!HasSpherePackFlag(SPF_ROOTNODE))
@@ -190,7 +190,7 @@ void SpherePack::Render(unsigned int /*color*/)
 			if (mParent->HasSpherePackFlag(SPF_ROOTNODE)) color = 0x00FFFFFF;
 		}
 #if DEMO
-		DrawCircle(int(mCenter.x), int(mCenter.y),int(GetRadius()),color);
+		DrawCircle(int32_t(mCenter.x), int32_t(mCenter.y),int32_t(GetRadius()),color);
 #endif
 		if (HasSpherePackFlag(SPF_SUPERSPHERE))
 		{
@@ -198,7 +198,7 @@ void SpherePack::Render(unsigned int /*color*/)
 			{
 				
 #if DEMO
-				DrawCircle(int(mCenter.x), int(mCenter.y),int(GetRadius()),color);
+				DrawCircle(int32_t(mCenter.x), int32_t(mCenter.y),int32_t(GetRadius()),color);
 #endif
 #ifdef SPHERELIB_STRICT
 		if (!sphere->IS_SPHERE)
@@ -210,15 +210,15 @@ void SpherePack::Render(unsigned int /*color*/)
 				
 				if (link && !link->HasSpherePackFlag(SPF_ROOTNODE))
 				{
-					DrawLine(int(mCenter.x), int(mCenter.y),
-						int(link->mCenter.x), int(link->mCenter.y),
+					DrawLine(int32_t(mCenter.x), int32_t(mCenter.y),
+						int32_t(link->mCenter.x), int32_t(link->mCenter.y),
 						link->GetColor());
 				}
 			}
 			else
 			{
 #if DEMO
-				DrawCircle(int(mCenter.x), int(mCenter.y),int(GetRadius())+3,color);
+				DrawCircle(int32_t(mCenter.x), int32_t(mCenter.y),int32_t(GetRadius())+3,color);
 #endif
 			}
 			
@@ -247,7 +247,7 @@ bool SpherePack::Recompute(float gravy)
 #if 1
 	// recompute bounding sphere!
 	Vector3d total(0,0,0);
-	int count=0;
+	int32_t count=0;
 	SpherePack *pack = mChildren;
 	while (pack)
 	{
@@ -383,9 +383,9 @@ void SpherePackFactory::Remove(SpherePack*pack)
 }
 
 #if DEMO
-unsigned int SpherePackFactory::GetColor(void)
+uint32_t SpherePackFactory::GetColor(void)
 {
-	unsigned int ret = mColors[mColorCount];
+	uint32_t ret = mColors[mColorCount];
 	mColorCount++;
 	if (mColorCount == MAXCOLORS) mColorCount = 0;
 	return ret;
@@ -407,7 +407,7 @@ void SpherePackFactory::Integrate(SpherePack *pack,
 	SpherePack *nearest2 = 0; // supersphere we must grow the least to
 	float neardist2 = 1e38f;    // add ourselves to.
 	
-	//int scount = 1;
+	//int32_t scount = 1;
 	
 	while (search)
 	{
@@ -565,7 +565,7 @@ void SpherePack::VisibilityTest(const Frustum &f,SpherePackCallback *callback,Vi
 #if DEMO
 		if (state != VS_OUTSIDE)
 		{
-			DrawCircle(int(mCenter.x), int(mCenter.y), int(GetRadius()), 0x404040);
+			DrawCircle(int32_t(mCenter.x), int32_t(mCenter.y), int32_t(GetRadius()), 0x404040);
 		}
 #endif
 	}
@@ -708,7 +708,7 @@ void SpherePack::RangeTest(const Vector3d &p,
 #if DEMO
 		if (state == VS_PARTIAL)
 		{
-			DrawCircle(int(mCenter.x), int(mCenter.y), int(GetRadius()), 0x404040);
+			DrawCircle(int32_t(mCenter.x), int32_t(mCenter.y), int32_t(GetRadius()), 0x404040);
 		}
 #endif
 		SpherePack *pack = mChildren;
@@ -744,7 +744,7 @@ void SpherePack::PointTest2d(const Vector3d &p,
 #if DEMO
 		if (state == VS_PARTIAL)
 		{
-			DrawCircle(int(mCenter.x), int(mCenter.y), int(GetRadius()), 0x404040);
+			DrawCircle(int32_t(mCenter.x), int32_t(mCenter.y), int32_t(GetRadius()), 0x404040);
 		}
 #endif
 		SpherePack *pack = mChildren;
@@ -806,7 +806,7 @@ void SpherePack::RayTrace(const Vector3d &p1,
 		if (hit)
 		{
 #if DEMO
-			DrawCircle(int(mCenter.x), int(mCenter.y), int(GetRadius()), 0x404040);
+			DrawCircle(int32_t(mCenter.x), int32_t(mCenter.y), int32_t(GetRadius()), 0x404040);
 #endif
 			SpherePack *pack = mChildren;
 			

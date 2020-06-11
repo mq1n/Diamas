@@ -16,14 +16,14 @@
 #include "packet.h"
 #include "motion.h"
 
-time_t UseBlueDragonSkill(LPCHARACTER pChar, unsigned int idx)
+time_t UseBlueDragonSkill(LPCHARACTER pChar, uint32_t idx)
 {
 	LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap( pChar->GetMapIndex() );
 
-	if (NULL == pSecMap)
+	if (nullptr == pSecMap)
 		return 0;
 
-	int nextUsingTime = 0;
+	int32_t nextUsingTime = 0;
 
 	switch (idx)
 	{
@@ -61,7 +61,7 @@ time_t UseBlueDragonSkill(LPCHARACTER pChar, unsigned int idx)
 
 				nextUsingTime = number(BlueDragon_GetSkillFactor(3, "Skill2", "period", "min"), BlueDragon_GetSkillFactor(3, "Skill2", "period", "max"));
 
-				if (NULL != f.pFarthestChar)
+				if (nullptr != f.pFarthestChar)
 				{
 					pChar->BeginFight( f.pFarthestChar );
 				}
@@ -73,20 +73,20 @@ time_t UseBlueDragonSkill(LPCHARACTER pChar, unsigned int idx)
 			return 0;
 	}
 
-	int addPct = BlueDragon_GetRangeFactor("hp_period", pChar->GetHPPct());
+	int32_t addPct = BlueDragon_GetRangeFactor("hp_period", pChar->GetHPPct());
 
 	nextUsingTime += (nextUsingTime * addPct) / 100;
 
 	return nextUsingTime;
 }
 
-int BlueDragon_StateBattle(LPCHARACTER pChar)
+int32_t BlueDragon_StateBattle(LPCHARACTER pChar)
 {
 	if (pChar->GetHPPct() > 98)
 		return PASSES_PER_SEC(1);
 
-	const int SkillCount = 3;
-	int SkillPriority[SkillCount];
+	const int32_t SkillCount = 3;
+	int32_t SkillPriority[SkillCount];
 	static time_t timeSkillCanUseTime[SkillCount];
 
 	if (pChar->GetHPPct() > 76)
@@ -110,14 +110,14 @@ int BlueDragon_StateBattle(LPCHARACTER pChar)
 
 	time_t timeNow = static_cast<time_t>(get_dword_time());
 
-	for (int i=0 ; i < SkillCount ; ++i)
+	for (int32_t i=0 ; i < SkillCount ; ++i)
 	{
-		const int SkillIndex = SkillPriority[i];
+		const int32_t SkillIndex = SkillPriority[i];
 
 		if (timeSkillCanUseTime[SkillIndex] < timeNow)
 		{
-			int SkillUsingDuration =
-				static_cast<int>(CMotionManager::instance().GetMotionDuration( pChar->GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_SPECIAL_1 + SkillIndex) ));
+			int32_t SkillUsingDuration =
+				static_cast<int32_t>(CMotionManager::instance().GetMotionDuration( pChar->GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_SPECIAL_1 + SkillIndex) ));
 
 			timeSkillCanUseTime[SkillIndex] = timeNow + (UseBlueDragonSkill( pChar, SkillIndex ) * 1000) + SkillUsingDuration + 3000;
 
@@ -130,18 +130,18 @@ int BlueDragon_StateBattle(LPCHARACTER pChar)
 	return PASSES_PER_SEC(1);
 }
 
-int BlueDragon_Damage (LPCHARACTER me, LPCHARACTER pAttacker, int dam)
+int32_t BlueDragon_Damage (LPCHARACTER me, LPCHARACTER pAttacker, int32_t dam)
 {
-	if (NULL == me || NULL == pAttacker)
+	if (nullptr == me || nullptr == pAttacker)
 		return dam;
 
 	if (true == pAttacker->IsMonster() && 2493 == pAttacker->GetMobTable().dwVnum)
 	{
-		for (int i=1 ; i <= 4 ; ++i)
+		for (int32_t i=1 ; i <= 4 ; ++i)
 		{
 			if (ATK_BONUS == BlueDragon_GetIndexFactor("DragonStone", i, "effect_type"))
 			{
-				DWORD dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
+				uint32_t dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
 				size_t val = BlueDragon_GetIndexFactor("DragonStone", i, "val");
 				size_t cnt = SECTREE_MANAGER::instance().GetMonsterCountInMap( pAttacker->GetMapIndex(), dwDragonStoneID );
 
@@ -154,11 +154,11 @@ int BlueDragon_Damage (LPCHARACTER me, LPCHARACTER pAttacker, int dam)
 
 	if (true == me->IsMonster() && 2493 == me->GetMobTable().dwVnum)
 	{
-		for (int i=1 ; i <= 4 ; ++i)
+		for (int32_t i=1 ; i <= 4 ; ++i)
 		{
 			if (DEF_BONUS == BlueDragon_GetIndexFactor("DragonStone", i, "effect_type"))
 			{
-				DWORD dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
+				uint32_t dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
 				size_t val = BlueDragon_GetIndexFactor("DragonStone", i, "val");
 				size_t cnt = SECTREE_MANAGER::instance().GetMonsterCountInMap( me->GetMapIndex(), dwDragonStoneID );
 
@@ -174,7 +174,7 @@ int BlueDragon_Damage (LPCHARACTER me, LPCHARACTER pAttacker, int dam)
 
 	if (true == me->IsStone() && 0 != pAttacker->GetMountVnum())
 	{
-		for (int i=1 ; i <= 4 ; ++i)
+		for (int32_t i=1 ; i <= 4 ; ++i)
 		{
 			if (me->GetMobTable().dwVnum == BlueDragon_GetIndexFactor("DragonStone", i, "vnum"))
 			{

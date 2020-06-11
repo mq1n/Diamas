@@ -65,7 +65,7 @@ void initdbg()
 		{ "Tracen",						dbgTracen,					METH_VARARGS },
 		{ "TraceError",					dbgTraceError,				METH_VARARGS },
 		{ "RegisterExceptionString",	dbgRegisterExceptionString,	METH_VARARGS },
-		{ NULL, NULL},
+		{ nullptr, nullptr},
 	};	
 
 	Py_InitModule("dbg", s_methods);

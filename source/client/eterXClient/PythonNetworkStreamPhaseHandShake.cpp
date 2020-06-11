@@ -131,7 +131,7 @@ bool CPythonNetworkStream::RecvHandshakeOKPacket()
 	if (!Recv(sizeof(TPacketGCBlank), &kBlankPacket))
 		return false;
 
-	DWORD dwDelta=ELTimer_GetMSec()-m_kServerTimeSync.m_dwChangeClientTime;
+	uint32_t dwDelta=ELTimer_GetMSec()-m_kServerTimeSync.m_dwChangeClientTime;
 	ELTimer_SetServerMSec(m_kServerTimeSync.m_dwChangeServerTime+dwDelta);
 
 	Tracenf("HANDSHAKE OK RECV %u %u", m_kServerTimeSync.m_dwChangeServerTime, dwDelta);
@@ -165,8 +165,8 @@ bool CPythonNetworkStream::RecvKeyAgreementPacket()
 	{
 		// Key agreement 성공, 응답 전송
 		packetToSend.bHeader = HEADER_CG_KEY_AGREEMENT;
-		packetToSend.wAgreedLength = (WORD)agreedLength;
-		packetToSend.wDataLength = (WORD)dataLength;
+		packetToSend.wAgreedLength = (uint16_t)agreedLength;
+		packetToSend.wDataLength = (uint16_t)dataLength;
 
 		if (!Send(sizeof(packetToSend), &packetToSend))
 		{

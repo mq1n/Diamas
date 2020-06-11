@@ -10,7 +10,7 @@ class CReferenceObject
 		void AddReferenceOnly();
 		void Release();
 		
-		int GetReferenceCount();
+		int32_t GetReferenceCount();
 
 		bool canDestroy();
 		
@@ -19,6 +19,6 @@ class CReferenceObject
 		virtual void OnSelfDestruct();
 
 	private:
-		int m_refCount;
+		int32_t m_refCount;
 		bool m_destructed;
 };

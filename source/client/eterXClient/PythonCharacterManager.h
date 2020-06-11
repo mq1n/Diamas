@@ -9,7 +9,7 @@ class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, publ
 	public:
 		// Character List
 		typedef std::list<CInstanceBase *>			TCharacterInstanceList;
-		typedef std::map<DWORD, CInstanceBase *>	TCharacterInstanceMap;
+		typedef std::map<uint32_t, CInstanceBase *>	TCharacterInstanceMap;
 
 		class CharacterIterator;
 
@@ -21,32 +21,32 @@ class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, publ
 
 		void EnableSortRendering(bool isEnable);
 
-		bool IsRegisteredVID(DWORD dwVID);
-		bool IsAliveVID(DWORD dwVID);
-		bool IsDeadVID(DWORD dwVID);
+		bool IsRegisteredVID(uint32_t dwVID);
+		bool IsAliveVID(uint32_t dwVID);
+		bool IsDeadVID(uint32_t dwVID);
 		bool IsCacheMode();
 
-		bool OLD_GetPickedInstanceVID(DWORD* pdwPickedActorID);
+		bool OLD_GetPickedInstanceVID(uint32_t* pdwPickedActorID);
 		CInstanceBase* OLD_GetPickedInstancePtr();
 		D3DXVECTOR2& OLD_GetPickedInstPosReference();
 
 		CInstanceBase* FindClickableInstancePtr();
 
-		void InsertPVPKey(DWORD dwVIDSrc, DWORD dwVIDDst);
-		void RemovePVPKey(DWORD dwVIDSrc, DWORD dwVIDDst);
-		void ChangeGVG(DWORD dwSrcGuildID, DWORD dwDstGuildID);
+		void InsertPVPKey(uint32_t dwVIDSrc, uint32_t dwVIDDst);
+		void RemovePVPKey(uint32_t dwVIDSrc, uint32_t dwVIDDst);
+		void ChangeGVG(uint32_t dwSrcGuildID, uint32_t dwDstGuildID);
 
 		void GetInfo(std::string* pstInfo);
 
 		void ClearMainInstance();
-		bool SetMainInstance(DWORD dwVID);
+		bool SetMainInstance(uint32_t dwVID);
 		CInstanceBase* GetMainInstancePtr();
 
-		void								SCRIPT_SetAffect(DWORD dwVID, DWORD eAffect, BOOL isVisible);
-		void								SetEmoticon(DWORD dwVID, DWORD eEmoticon);
-		bool								IsPossibleEmoticon(DWORD dwVID);
-		void								ShowPointEffect(DWORD dwVID, DWORD ePoint);
-		bool								RegisterPointEffect(DWORD ePoint, const char* c_szFileName);
+		void								SCRIPT_SetAffect(uint32_t dwVID, uint32_t eAffect, BOOL isVisible);
+		void								SetEmoticon(uint32_t dwVID, uint32_t eEmoticon);
+		bool								IsPossibleEmoticon(uint32_t dwVID);
+		void								ShowPointEffect(uint32_t dwVID, uint32_t ePoint);
+		bool								RegisterPointEffect(uint32_t ePoint, const char* c_szFileName);
 
 		// System
 		void								Destroy();
@@ -65,11 +65,11 @@ class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, publ
 
 		// Create/Delete Instance
 		CInstanceBase *						CreateInstance(const CInstanceBase::SCreateData& c_rkCreateData);
-		CInstanceBase *						RegisterInstance(DWORD VirtualID);
+		CInstanceBase *						RegisterInstance(uint32_t VirtualID);
 
-		void								DeleteInstance(DWORD VirtualID);
-		void								DeleteInstanceByFade(DWORD VirtualID);
-		void								DeleteVehicleInstance(DWORD VirtualID);
+		void								DeleteInstance(uint32_t VirtualID);
+		void								DeleteInstanceByFade(uint32_t VirtualID);
+		void								DeleteVehicleInstance(uint32_t VirtualID);
 
 		void 								DestroyAliveInstanceMap();
 		void 								DestroyDeadInstanceList();
@@ -78,14 +78,14 @@ class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, publ
 		inline CharacterIterator			CharacterInstanceEnd() { return CharacterIterator(m_kAliveInstMap.end());}
 
 		// Access Instance
-		void								SelectInstance(DWORD VirtualID);
+		void								SelectInstance(uint32_t VirtualID);
 		CInstanceBase *						GetSelectedInstancePtr();
 
-		CInstanceBase *						GetInstancePtr(DWORD VirtualID);
+		CInstanceBase *						GetInstancePtr(uint32_t VirtualID);
 		CInstanceBase *						GetInstancePtrByName(const char *name);
 
 		// Pick		
-		int									PickAll();
+		int32_t									PickAll();
 		CInstanceBase *						GetCloseInstance(CInstanceBase * pInstance);
 
 		// Refresh TextTail
@@ -122,7 +122,7 @@ class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, publ
 
 		std::vector<CInstanceBase*>			m_kVct_pkInstPicked;
 
-		DWORD								m_adwPointEffect[POINT_MAX_NUM];
+		uint32_t								m_adwPointEffect[POINT_MAX_NUM];
 
 	public:
 		class CharacterIterator
@@ -139,7 +139,7 @@ class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, publ
 				return *this;
 			}
 
-			inline CharacterIterator operator ++(int)
+			inline CharacterIterator operator ++(int32_t)
 			{
 				CharacterIterator new_it = *this;
 				++(*this);

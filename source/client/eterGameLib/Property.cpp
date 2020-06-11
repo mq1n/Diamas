@@ -133,7 +133,7 @@ void GetTimeString(char * str, time_t ct)
 #pragma pack(push, 1)
 struct PropertyHeader
 {
-	DWORD fourCc;
+	uint32_t fourCc;
 	char sep[2];
 };
 #pragma pack(pop)

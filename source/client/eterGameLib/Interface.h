@@ -7,5 +7,5 @@ class IBackground : public CSingleton<IBackground>
 		IBackground() {}
 		virtual ~IBackground() {}
 
-		virtual bool IsBlock(int x, int y) = 0;
+		virtual bool IsBlock(int32_t x, int32_t y) = 0;
 };

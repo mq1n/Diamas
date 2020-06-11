@@ -24,7 +24,7 @@
 #include "../eterXClient/Locale_inc.h"
 /* Fast Float<->Integer conversion */
 extern float		PR_FCNV;        
-extern long			PR_ICNV;
+extern int32_t			PR_ICNV;
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

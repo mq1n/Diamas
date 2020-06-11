@@ -38,24 +38,24 @@ public:
 	CSkyObjectQuad();
 	virtual ~CSkyObjectQuad();
 
-	void Clear(const unsigned char & c_rucNumVertex,
+	void Clear(const uint8_t & c_rucNumVertex,
 		const float & c_rfRed,
 		const float & c_rfGreen,
 		const float & c_rfBlue,
 		const float & c_rfAlpha);
-	void SetSrcColor(const unsigned char & c_rucNumVertex,
+	void SetSrcColor(const uint8_t & c_rucNumVertex,
 		const float & c_rfRed,
 		const float & c_rfGreen,
 		const float & c_rfBlue,
 		const float & c_rfAlpha);
-	void SetTransition(const unsigned char & c_rucNumVertex,
+	void SetTransition(const uint8_t & c_rucNumVertex,
 		const float & c_rfRed,
 		const float & c_rfGreen,
 		const float & c_rfBlue,
 		const float & c_rfAlpha,
-		DWORD dwDuration);
+		uint32_t dwDuration);
 	
-	void SetVertex(const unsigned char & c_rucNumVertex, const TPDTVertex & c_rPDTVertex);
+	void SetVertex(const uint8_t & c_rucNumVertex, const TPDTVertex & c_rPDTVertex);
 	
 	void StartTransition();
 	bool Update();
@@ -89,7 +89,7 @@ public:
 	virtual void Update() = 0;
 	virtual void StartTransition();
 
-	void SetRenderMode(unsigned char ucRenderMode) { m_ucRenderMode = ucRenderMode;	}
+	void SetRenderMode(uint8_t ucRenderMode) { m_ucRenderMode = ucRenderMode;	}
 
 	const bool & isTransitionStarted() { return m_bTransitionStarted; }
 
@@ -127,7 +127,7 @@ protected:
 	float m_fCloudScrollSpeedU, m_fCloudScrollSpeedV;
 	float m_fCloudPositionU, m_fCloudPositionV;
 
-	DWORD m_dwlastTime;
+	uint32_t m_dwlastTime;
 
 	// 스카이 박스 이미지...
 	TGraphicImageInstanceMap m_GraphicImageInstanceMap;
@@ -138,7 +138,7 @@ protected:
 	float m_fScaleX, m_fScaleY, m_fScaleZ;
 
 	// 랜더링 관련... 임시 변수..
-	unsigned char m_ucRenderMode;
+	uint8_t m_ucRenderMode;
 
 	std::string m_strCurTime;
 	bool m_bTransitionStarted;
@@ -161,16 +161,16 @@ public:
 	void Unload();
 
 	void SetSkyBoxScale(const D3DXVECTOR3 & c_rv3Scale);
-	void SetGradientLevel(BYTE byUpper, BYTE byLower);
-	void SetFaceTexture( const char* c_szFileName, int iFaceIndex );
+	void SetGradientLevel(uint8_t byUpper, uint8_t byLower);
+	void SetFaceTexture( const char* c_szFileName, int32_t iFaceIndex );
 	void SetCloudTexture(const char * c_szFileName);
 	void SetCloudScale(const D3DXVECTOR2 & c_rv2CloudScale);
 	void SetCloudHeight(float fHeight);
 	void SetCloudTextureScale(const D3DXVECTOR2 & c_rv2CloudTextureScale);
 	void SetCloudScrollSpeed(const D3DXVECTOR2 & c_rv2CloudScrollSpeed);
-	void SetCloudColor(const TGradientColor & c_rColor, const TGradientColor & c_rNextColor, const DWORD & dwTransitionTime);
+	void SetCloudColor(const TGradientColor & c_rColor, const TGradientColor & c_rNextColor, const uint32_t & dwTransitionTime);
 	void Refresh();
-	void SetSkyColor(const TVectorGradientColor & c_rColorVector, const TVectorGradientColor & c_rNextColorVector, long lTransitionTime);
+	void SetSkyColor(const TVectorGradientColor & c_rColorVector, const TVectorGradientColor & c_rNextColorVector, int32_t lTransitionTime);
 	void StartTransition();
 
 protected:
@@ -180,8 +180,8 @@ protected:
 	//void UpdateSkyFaceQuadTransform(D3DXVECTOR3 * c_pv3QuadPoints);
 
 protected:
-	unsigned char m_ucVirticalGradientLevelUpper;
-	unsigned char m_ucVirticalGradientLevelLower;
+	uint8_t m_ucVirticalGradientLevelUpper;
+	uint8_t m_ucVirticalGradientLevelLower;
 	TSkyObjectFace m_Faces[6];
 };
 

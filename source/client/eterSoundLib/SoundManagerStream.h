@@ -19,11 +19,11 @@ class CSoundManagerStream : public CSoundBase
 		bool					Initialize();
 		void					Destroy();
 
-		bool					SetInstance(DWORD dwIndex, const char* filename);
-		CSoundInstanceStream *	GetInstance(DWORD dwIndex);
+		bool					SetInstance(uint32_t dwIndex, const char* filename);
+		CSoundInstanceStream *	GetInstance(uint32_t dwIndex);
 
 	protected:
-		bool					CheckInstanceIndex(DWORD dwIndex);
+		bool					CheckInstanceIndex(uint32_t dwIndex);
 
 	protected:
 		CSoundInstanceStream	m_Instances[MUSIC_INSTANCE_MAX_NUM];

@@ -12,7 +12,7 @@ public:
 	virtual bool	Initialize() = 0;
 	virtual void	Destroy() = 0;
 	virtual bool	SetSound(CSoundData* pSound) = 0;
-	virtual void	Play(int iLoopCount = 1, DWORD dwPlayCycleTimeLimit = 0) const = 0;
+	virtual void	Play(int32_t iLoopCount = 1, uint32_t dwPlayCycleTimeLimit = 0) const = 0;
 	virtual void	Pause() const = 0;
 	virtual void	Resume() const = 0;
 	virtual void	Stop() = 0;
@@ -36,7 +36,7 @@ public: // from interface
 	void	Destroy();
 
 	bool	SetSound(CSoundData* pSound);
-	void	Play(int iLoopCount = 1, DWORD dwPlayCycleTimeLimit = 0) const;
+	void	Play(int32_t iLoopCount = 1, uint32_t dwPlayCycleTimeLimit = 0) const;
 	void	Pause() const;
 	void	Resume() const;
 	void	Stop();
@@ -64,7 +64,7 @@ class CSoundInstance3D : public ISoundInstance
 		void	Destroy();
 
 		bool	SetSound(CSoundData * pSound);
-		void	Play(int iLoopCount = 1, DWORD dwPlayCycleTimeLimit = 0) const;
+		void	Play(int32_t iLoopCount = 1, uint32_t dwPlayCycleTimeLimit = 0) const;
 		void	Pause() const;
 		void	Resume() const;
 		void	Stop();
@@ -97,7 +97,7 @@ public: // from interface
 	void	SetStream(HSTREAM stream);
 	bool	SetSound(CSoundData* pSound);
 
-	void	Play(int iLoopCount = 1, DWORD dwPlayCycleTimeLimit = 0) const;
+	void	Play(int32_t iLoopCount = 1, uint32_t dwPlayCycleTimeLimit = 0) const;
 	void	Pause() const;
 	void	Resume() const;
 	void	Stop();

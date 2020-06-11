@@ -251,7 +251,7 @@ ACMD(do_bleeding);
 
 struct command_info cmd_info[] =
 {
-	{ "!RESERVED!",	NULL,			0,			POS_DEAD,	GM_IMPLEMENTOR	}, /* 반드시 이 것이 처음이어야 한다. */
+	{ "!RESERVED!",	nullptr,			0,			POS_DEAD,	GM_IMPLEMENTOR	}, /* 반드시 이 것이 처음이어야 한다. */
 	{ "who",		do_who,			0,			POS_DEAD,	GM_IMPLEMENTOR	},
 	{ "war",		do_war,			0,			POS_DEAD,	GM_PLAYER	},
 	{ "warp",		do_warp,		0,			POS_DEAD,	GM_LOW_WIZARD	},
@@ -460,7 +460,7 @@ struct command_info cmd_info[] =
 	{ "duel",				do_duel,				0,		POS_DEAD,	GM_LOW_WIZARD	},
 
 	{ "con+",			do_stat_plus_amount,	POINT_HT,	POS_DEAD,	GM_LOW_WIZARD	},
-	{ "int+",			do_stat_plus_amount,	POINT_IQ,	POS_DEAD,	GM_LOW_WIZARD	},
+	{ "int32_t+",			do_stat_plus_amount,	POINT_IQ,	POS_DEAD,	GM_LOW_WIZARD	},
 	{ "str+",			do_stat_plus_amount,	POINT_ST,	POS_DEAD,	GM_LOW_WIZARD	},
 	{ "dex+",			do_stat_plus_amount,	POINT_DX,	POS_DEAD,	GM_LOW_WIZARD	},
 
@@ -532,12 +532,12 @@ struct command_info cmd_info[] =
 #ifdef ENABLE_WOLFMAN_CHARACTER
 	{ "bleeding",			do_bleeding,				0,			POS_DEAD,	GM_IMPLEMENTOR	},
 #endif
-	{ "\n",		NULL,			0,			POS_DEAD,	GM_IMPLEMENTOR	}  /* 반드시 이 것이 마지막이어야 한다. */
+	{ "\n",		nullptr,			0,			POS_DEAD,	GM_IMPLEMENTOR	}  /* 반드시 이 것이 마지막이어야 한다. */
 };
 
-void interpreter_set_privilege(const char *cmd, int lvl)
+void interpreter_set_privilege(const char *cmd, int32_t lvl)
 {
-	int i;
+	int32_t i;
 
 	for (i = 0; *cmd_info[i].command != '\n'; ++i)
 	{
@@ -599,16 +599,16 @@ void interpret_command(LPCHARACTER ch, const char * argument, size_t len)
 		}
 	}
 #endif
-	if (NULL == ch)
+	if (nullptr == ch)
 	{
-		sys_err ("NULL CHRACTER");
+		sys_err ("nullptr CHRACTER");
 		return ;
 	}
 
 	char cmd[128 + 1];  // buffer overflow 문제가 생기지 않도록 일부러 길이를 짧게 잡음
 	char new_line[256 + 1];
 	const char * line;
-	int icmd;
+	int32_t icmd;
 
 	if (len == 0 || !*argument)
 		return;

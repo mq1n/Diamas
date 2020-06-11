@@ -24,11 +24,11 @@ void CPythonApplication::OnUIRender()
 	rkUIMgr.Render();
 }
 
-void CPythonApplication::OnSizeChange(int width, int height)
+void CPythonApplication::OnSizeChange(int32_t width, int32_t height)
 {	
 }
 
-void CPythonApplication::OnMouseMiddleButtonDown(int x, int y)
+void CPythonApplication::OnMouseMiddleButtonDown(int32_t x, int32_t y)
 {
 	CCameraManager& rkCmrMgr=CCameraManager::Instance();
 	CCamera* pkCmrCur=rkCmrMgr.GetCurrentCamera();
@@ -43,7 +43,7 @@ void CPythonApplication::OnMouseMiddleButtonDown(int x, int y)
 		SetCursorVisible(FALSE, true);
 }
 
-void CPythonApplication::OnMouseMiddleButtonUp(int x, int y)
+void CPythonApplication::OnMouseMiddleButtonUp(int32_t x, int32_t y)
 {
 	CCameraManager& rkCmrMgr=CCameraManager::Instance();
 	CCamera* pkCmrCur=rkCmrMgr.GetCurrentCamera();
@@ -58,7 +58,7 @@ void CPythonApplication::OnMouseMiddleButtonUp(int x, int y)
 		SetCursorVisible(TRUE);
 }
 
-void CPythonApplication::OnMouseWheel(int nLen)
+void CPythonApplication::OnMouseWheel(int32_t nLen)
 {
 	CCameraManager& rkCmrMgr=CCameraManager::Instance();
 	CCamera* pkCmrCur=rkCmrMgr.GetCurrentCamera();
@@ -67,7 +67,7 @@ void CPythonApplication::OnMouseWheel(int nLen)
 }
 
 
-void CPythonApplication::OnMouseMove(int x, int y)
+void CPythonApplication::OnMouseMove(int32_t x, int32_t y)
 {
 	CCameraManager& rkCmrMgr=CCameraManager::Instance();
 	CCamera* pkCmrCur=rkCmrMgr.GetCurrentCamera();
@@ -95,46 +95,46 @@ void CPythonApplication::OnMouseMove(int x, int y)
 	rkWndMgr.RunMouseMove(x, y);
 }
 
-void CPythonApplication::OnMouseLeftButtonDown(int x, int y)
+void CPythonApplication::OnMouseLeftButtonDown(int32_t x, int32_t y)
 {
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 	rkWndMgr.RunMouseLeftButtonDown(x, y);
 }
 
-void CPythonApplication::OnMouseLeftButtonUp(int x, int y)
+void CPythonApplication::OnMouseLeftButtonUp(int32_t x, int32_t y)
 {
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 	rkWndMgr.RunMouseLeftButtonUp(x, y);
 }
 
-void CPythonApplication::OnMouseLeftButtonDoubleClick(int x, int y)
+void CPythonApplication::OnMouseLeftButtonDoubleClick(int32_t x, int32_t y)
 {
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 	rkWndMgr.RunMouseLeftButtonDown(x, y);
 	rkWndMgr.RunMouseLeftButtonDoubleClick(x, y);
 }
 
-void CPythonApplication::OnMouseRightButtonDown(int x, int y)
+void CPythonApplication::OnMouseRightButtonDown(int32_t x, int32_t y)
 {
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 	rkWndMgr.RunMouseRightButtonDown(x, y);
 }
 
-void CPythonApplication::OnMouseRightButtonUp(int x, int y)
+void CPythonApplication::OnMouseRightButtonUp(int32_t x, int32_t y)
 {
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 	rkWndMgr.RunMouseRightButtonUp(x, y);
 }
 
 #ifdef ENABLE_MOUSEWHEEL_EVENT
-bool CPythonApplication::OnMouseWheelScroll(long x , long y , short wDelta)
+bool CPythonApplication::OnMouseWheelScroll(int32_t x , int32_t y , int16_t wDelta)
 {
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 	return rkWndMgr.RunMouseWheelScroll(x, y, wDelta);
 }
 #endif 
 
-void CPythonApplication::OnKeyDown(int iIndex)
+void CPythonApplication::OnKeyDown(int32_t iIndex)
 {
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 
@@ -146,7 +146,7 @@ void CPythonApplication::OnKeyDown(int iIndex)
 	rkWndMgr.RunKeyDown(iIndex);
 }
 
-void CPythonApplication::OnKeyUp(int iIndex)
+void CPythonApplication::OnKeyUp(int32_t iIndex)
 {
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 	rkWndMgr.RunKeyUp(iIndex);
@@ -167,7 +167,7 @@ void CPythonApplication::RunIMEReturnEvent()
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 	rkWndMgr.RunIMEReturnEvent();
 }
-void CPythonApplication::OnIMEKeyDown(int iIndex)
+void CPythonApplication::OnIMEKeyDown(int32_t iIndex)
 {
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 	rkWndMgr.RunIMEKeyDown(iIndex);
@@ -219,7 +219,7 @@ void CPythonApplication::OnMouseUpdate()
 #endif _DEBUG
 
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
-	long lx, ly;
+	int32_t lx, ly;
 	rkWndMgr.GetMousePosition(lx, ly);
 	PyCallClassMemberFunc(m_poMouseHandler, "Update", Py_BuildValue("(ii)", lx, ly));
 }

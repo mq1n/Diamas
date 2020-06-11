@@ -9,8 +9,8 @@
 #include "Cache.h"
 
 extern std::string g_stLocale;
-extern int g_test_server;
-extern int g_log;
+extern int32_t g_test_server;
+extern int32_t g_log;
 
 //
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -19,7 +19,7 @@ extern int g_log;
 //
 // Check all SELECT syntax on item table before change this function!!!
 //
-bool CreateItemTableFromRes(MYSQL_RES * res, std::vector<TPlayerItem> * pVec, DWORD dwPID)
+bool CreateItemTableFromRes(MYSQL_RES * res, std::vector<TPlayerItem> * pVec, uint32_t dwPID)
 {
 	if (!res)
 	{
@@ -27,7 +27,7 @@ bool CreateItemTableFromRes(MYSQL_RES * res, std::vector<TPlayerItem> * pVec, DW
 		return true;
 	}
 
-	int rows;
+	int32_t rows;
 
 	if ((rows = mysql_num_rows(res)) <= 0)	// 데이터 없음
 	{
@@ -37,12 +37,12 @@ bool CreateItemTableFromRes(MYSQL_RES * res, std::vector<TPlayerItem> * pVec, DW
 
 	pVec->resize(rows);
 
-	for (int i = 0; i < rows; ++i)
+	for (int32_t i = 0; i < rows; ++i)
 	{
 		MYSQL_ROW row = mysql_fetch_row(res);
 		TPlayerItem & item = pVec->at(i);
 
-		int cur = 0;
+		int32_t cur = 0;
 
 		// Check all SELECT syntax on item table before change this function!!!
 		// Check all SELECT syntax on item table before change this function!!!
@@ -56,7 +56,7 @@ bool CreateItemTableFromRes(MYSQL_RES * res, std::vector<TPlayerItem> * pVec, DW
 		str_to_number(item.alSockets[1], row[cur++]);
 		str_to_number(item.alSockets[2], row[cur++]);
 
-		for (int j = 0; j < ITEM_ATTRIBUTE_MAX_NUM; j++)
+		for (int32_t j = 0; j < ITEM_ATTRIBUTE_MAX_NUM; j++)
 		{
 			str_to_number(item.aAttr[j].bType, row[cur++]);
 			str_to_number(item.aAttr[j].sValue, row[cur++]);
@@ -175,12 +175,12 @@ size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * p
 	return queryLen;
 }
 
-CPlayerTableCache * CClientManager::GetPlayerCache(DWORD id)
+CPlayerTableCache * CClientManager::GetPlayerCache(uint32_t id)
 {
 	TPlayerTableCacheMap::iterator it = m_map_playerCache.find(id);
 
 	if (it == m_map_playerCache.end())
-		return NULL;
+		return nullptr;
 
 	TPlayerTable* pTable = it->second->Get(false);
 	pTable->logoff_interval = GetCurrentTime() - it->second->GetLastUpdateTime();
@@ -205,7 +205,7 @@ void CClientManager::PutPlayerCache(TPlayerTable * pNew)
 /*
  * PLAYER LOAD
  */
-void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoadPacket * packet)
+void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, uint32_t dwHandle, TPlayerLoadPacket * packet)
 {
 	CPlayerTableCache * c;
 	TPlayerTable * pTab;
@@ -217,7 +217,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 
 	if (pLoginData)
 	{
-		for (int n = 0; n < PLAYER_PER_ACCOUNT; ++n)
+		for (int32_t n = 0; n < PLAYER_PER_ACCOUNT; ++n)
 			if (pLoginData->GetAccountRef().players[n].dwID != 0)
 				DeleteLogoutPlayer(pLoginData->GetAccountRef().players[n].dwID);
 	}
@@ -280,7 +280,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 			static std::vector<TPlayerItem> s_items;
 			s_items.resize(pSet->size());
 
-			DWORD dwCount = 0;
+			uint32_t dwCount = 0;
 			TItemCacheSet::iterator it = pSet->begin();
 
 			while (it != pSet->end())
@@ -295,7 +295,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 			if (g_test_server)
 				sys_log(0, "ITEM_CACHE: HIT! %s count: %u", pTab->name, dwCount);
 
-			peer->EncodeHeader(HEADER_DG_ITEM_LOAD, dwHandle, sizeof(DWORD) + sizeof(TPlayerItem) * dwCount);
+			peer->EncodeHeader(HEADER_DG_ITEM_LOAD, dwHandle, sizeof(uint32_t) + sizeof(TPlayerItem) * dwCount);
 			peer->EncodeDWORD(dwCount);
 
 			if (dwCount)
@@ -409,7 +409,7 @@ void CClientManager::ItemAward(CPeer * peer,char* login)
 	char login_t[LOGIN_MAX_LEN + 1] = "";
 	strlcpy(login_t,login,LOGIN_MAX_LEN + 1);	
 	std::set<TItemAward *> * pSet = ItemAwardManager::instance().GetByLogin(login_t);	
-	if(pSet == NULL)
+	if(pSet == nullptr)
 		return;
 	auto it = pSet->begin();	//taken_time이 NULL인것들 읽어옴	
 	while(it != pSet->end() )
@@ -453,7 +453,7 @@ bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab)
 
 	MYSQL_ROW row = mysql_fetch_row(res);
 
-	int	col = 0;
+	int32_t	col = 0;
 
 	// "id,name,job,voice,dir,x,y,z,map_index,exit_x,exit_y,exit_map_index,hp,mp,stamina,random_hp,random_sp,playtime,"
 	// "gold,level,level_step,st,ht,dx,iq,exp,"
@@ -526,9 +526,9 @@ bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab)
 
 		if (pkTab->level > 9)
 		{
-			int max_point = pkTab->level - 9;
+			int32_t max_point = pkTab->level - 9;
 
-			int skill_point = 
+			int32_t skill_point = 
 				MIN(20, pkTab->skills[121].bLevel) +	// SKILL_LEADERSHIP			통솔력
 				MIN(20, pkTab->skills[124].bLevel) +	// SKILL_MINING				채광
 				MIN(10, pkTab->skills[131].bLevel) +	// SKILL_HORSE_SUMMON		말소환
@@ -544,7 +544,7 @@ bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab)
 	return true;
 }
 
-void CClientManager::RESULT_COMPOSITE_PLAYER(CPeer * peer, SQLMsg * pMsg, DWORD dwQID)
+void CClientManager::RESULT_COMPOSITE_PLAYER(CPeer * peer, SQLMsg * pMsg, uint32_t dwQID)
 {
 	CQueryInfo * qi = (CQueryInfo *) pMsg->pvUserData;
 	std::unique_ptr<ClientHandleInfo> info((ClientHandleInfo *) qi->pvData);
@@ -575,14 +575,14 @@ void CClientManager::RESULT_COMPOSITE_PLAYER(CPeer * peer, SQLMsg * pMsg, DWORD 
 				RESULT_QUEST_LOAD(peer, pSQLResult, info->dwHandle, info->player_id);
 				//aid얻기
 				ClientHandleInfo*  temp1 = info.get();
-				if (temp1 == NULL)
+				if (temp1 == nullptr)
 					break;
 				
 				CLoginData* pLoginData1 = GetLoginDataByAID(temp1->account_id);	//				
 				//독일 선물 기능
-				if( pLoginData1->GetAccountRef().login == NULL)
+				if( pLoginData1->GetAccountRef().login == nullptr)
 					break;
-				if( pLoginData1 == NULL )
+				if( pLoginData1 == nullptr )
 					break;
 				sys_log(0,"info of pLoginData1 before call ItemAwardfunction %d",pLoginData1);
 				ItemAward(peer,pLoginData1->GetAccountRef().login);
@@ -667,14 +667,14 @@ void CClientManager::RESULT_PLAYER_LOAD(CPeer * peer, MYSQL_RES * pRes, ClientHa
 	}
 }
 
-void CClientManager::RESULT_ITEM_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwHandle, DWORD dwPID)
+void CClientManager::RESULT_ITEM_LOAD(CPeer * peer, MYSQL_RES * pRes, uint32_t dwHandle, uint32_t dwPID)
 {
 	static std::vector<TPlayerItem> s_items;
 	//DB에서 아이템 정보를 읽어온다.
 	CreateItemTableFromRes(pRes, &s_items, dwPID);
-	DWORD dwCount = s_items.size();
+	uint32_t dwCount = s_items.size();
 
-	peer->EncodeHeader(HEADER_DG_ITEM_LOAD, dwHandle, sizeof(DWORD) + sizeof(TPlayerItem) * dwCount);
+	peer->EncodeHeader(HEADER_DG_ITEM_LOAD, dwHandle, sizeof(uint32_t) + sizeof(TPlayerItem) * dwCount);
 	peer->EncodeDWORD(dwCount);
 
 	//CacheSet을 만든다  
@@ -688,29 +688,29 @@ void CClientManager::RESULT_ITEM_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwHa
 	{
 		peer->Encode(&s_items[0], sizeof(TPlayerItem) * dwCount);
 
-		for (DWORD i = 0; i < dwCount; ++i)
+		for (uint32_t i = 0; i < dwCount; ++i)
 			PutItemCache(&s_items[i], true); // 로드한 것은 따로 저장할 필요 없으므로, 인자 bSkipQuery에 true를 넣는다.
 	}
 }
 
 // @fixme402 (RESULT_AFFECT_LOAD +dwRealPID)
-void CClientManager::RESULT_AFFECT_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwHandle, DWORD dwRealPID)
+void CClientManager::RESULT_AFFECT_LOAD(CPeer * peer, MYSQL_RES * pRes, uint32_t dwHandle, uint32_t dwRealPID)
 {
-	int iNumRows;
+	int32_t iNumRows;
 
 	if ((iNumRows = mysql_num_rows(pRes)) == 0) 
 	{
 		// @fixme402 begin
-		static DWORD dwPID;
-		static DWORD dwCount = 0; //1;
+		static uint32_t dwPID;
+		static uint32_t dwCount = 0; //1;
 		static TPacketAffectElement paeTable = {0};
 
 		dwPID = dwRealPID;
 		sys_log(0, "AFFECT_LOAD: count %u PID %u RealPID %u", dwCount, dwPID, dwRealPID);
 
-		peer->EncodeHeader(HEADER_DG_AFFECT_LOAD, dwHandle, sizeof(DWORD) + sizeof(DWORD) + sizeof(TPacketAffectElement) * dwCount);
-		peer->Encode(&dwPID, sizeof(DWORD));
-		peer->Encode(&dwCount, sizeof(DWORD));
+		peer->EncodeHeader(HEADER_DG_AFFECT_LOAD, dwHandle, sizeof(uint32_t) + sizeof(uint32_t) + sizeof(TPacketAffectElement) * dwCount);
+		peer->Encode(&dwPID, sizeof(uint32_t));
+		peer->Encode(&dwCount, sizeof(uint32_t));
 		peer->Encode(&paeTable, sizeof(TPacketAffectElement) * dwCount);
 		// @fixme402 end
 		return;
@@ -719,11 +719,11 @@ void CClientManager::RESULT_AFFECT_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dw
 	static std::vector<TPacketAffectElement> s_elements;
 	s_elements.resize(iNumRows);
 
-	DWORD dwPID = 0;
+	uint32_t dwPID = 0;
 
 	MYSQL_ROW row;
 
-	for (int i = 0; i < iNumRows; ++i)
+	for (int32_t i = 0; i < iNumRows; ++i)
 	{
 		TPacketAffectElement & r = s_elements[i];
 		row = mysql_fetch_row(pRes);
@@ -741,23 +741,23 @@ void CClientManager::RESULT_AFFECT_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dw
 
 	sys_log(0, "AFFECT_LOAD: count %d PID %u", s_elements.size(), dwPID);
 
-	DWORD dwCount = s_elements.size();
+	uint32_t dwCount = s_elements.size();
 
-	peer->EncodeHeader(HEADER_DG_AFFECT_LOAD, dwHandle, sizeof(DWORD) + sizeof(DWORD) + sizeof(TPacketAffectElement) * dwCount);
-	peer->Encode(&dwPID, sizeof(DWORD));
-	peer->Encode(&dwCount, sizeof(DWORD));
+	peer->EncodeHeader(HEADER_DG_AFFECT_LOAD, dwHandle, sizeof(uint32_t) + sizeof(uint32_t) + sizeof(TPacketAffectElement) * dwCount);
+	peer->Encode(&dwPID, sizeof(uint32_t));
+	peer->Encode(&dwCount, sizeof(uint32_t));
 	peer->Encode(&s_elements[0], sizeof(TPacketAffectElement) * dwCount);
 }
 
-void CClientManager::RESULT_QUEST_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwHandle, DWORD pid)
+void CClientManager::RESULT_QUEST_LOAD(CPeer * peer, MYSQL_RES * pRes, uint32_t dwHandle, uint32_t pid)
 {
-	int iNumRows;
+	int32_t iNumRows;
 
 	if ((iNumRows = mysql_num_rows(pRes)) == 0)
 	{
-		DWORD dwCount = 0; 
-		peer->EncodeHeader(HEADER_DG_QUEST_LOAD, dwHandle, sizeof(DWORD));
-		peer->Encode(&dwCount, sizeof(DWORD));
+		uint32_t dwCount = 0; 
+		peer->EncodeHeader(HEADER_DG_QUEST_LOAD, dwHandle, sizeof(uint32_t));
+		peer->Encode(&dwCount, sizeof(uint32_t));
 		return;
 	}
 
@@ -766,7 +766,7 @@ void CClientManager::RESULT_QUEST_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwH
 
 	MYSQL_ROW row;
 
-	for (int i = 0; i < iNumRows; ++i)
+	for (int32_t i = 0; i < iNumRows; ++i)
 	{
 		TQuestTable & r = s_table[i];
 
@@ -780,17 +780,17 @@ void CClientManager::RESULT_QUEST_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwH
 
 	sys_log(0, "QUEST_LOAD: count %d PID %u", s_table.size(), s_table[0].dwPID);
 
-	DWORD dwCount = s_table.size();
+	uint32_t dwCount = s_table.size();
 
-	peer->EncodeHeader(HEADER_DG_QUEST_LOAD, dwHandle, sizeof(DWORD) + sizeof(TQuestTable) * dwCount);
-	peer->Encode(&dwCount, sizeof(DWORD));
+	peer->EncodeHeader(HEADER_DG_QUEST_LOAD, dwHandle, sizeof(uint32_t) + sizeof(TQuestTable) * dwCount);
+	peer->Encode(&dwCount, sizeof(uint32_t));
 	peer->Encode(&s_table[0], sizeof(TQuestTable) * dwCount);
 }
 
 /*
  * PLAYER SAVE
  */
-void CClientManager::QUERY_PLAYER_SAVE(CPeer * peer, DWORD dwHandle, TPlayerTable * pkTab)
+void CClientManager::QUERY_PLAYER_SAVE(CPeer * peer, uint32_t dwHandle, TPlayerTable * pkTab)
 {
 	if (g_test_server)
 		sys_log(0, "PLAYER_SAVE: %s", pkTab->name);
@@ -798,17 +798,17 @@ void CClientManager::QUERY_PLAYER_SAVE(CPeer * peer, DWORD dwHandle, TPlayerTabl
 	PutPlayerCache(pkTab);
 }
 
-typedef std::map<DWORD, time_t> time_by_id_map_t;
+typedef std::map<uint32_t, time_t> time_by_id_map_t;
 static time_by_id_map_t s_createTimeByAccountID;
 
 /*
  * PLAYER CREATE
  */
-void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerCreatePacket* packet)
+void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, uint32_t dwHandle, TPlayerCreatePacket* packet)
 {
 	char	queryStr[QUERY_MAX_LEN];
-	int		queryLen;
-	int		player_id;
+	int32_t		queryLen;
+	int32_t		player_id;
 
 	// 한 계정에 X초 내로 캐릭터 생성을 할 수 없다.
 	time_by_id_map_t::iterator it = s_createTimeByAccountID.find(packet->account_id);
@@ -839,7 +839,7 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 
 		MYSQL_ROW row = mysql_fetch_row(pMsg0->Get()->pSQLResult);
 
-		DWORD dwPID = 0; str_to_number(dwPID, row[0]);
+		uint32_t dwPID = 0; str_to_number(dwPID, row[0]);
 		if (row[0] && dwPID > 0)
 		{
 			peer->EncodeHeader(HEADER_DG_PLAYER_CREATE_ALREADY, dwHandle, 0);
@@ -980,7 +980,7 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 /*
  * PLAYER DELETE
  */
-void CClientManager::__QUERY_PLAYER_DELETE(CPeer* peer, DWORD dwHandle, TPlayerDeletePacket* packet)
+void CClientManager::__QUERY_PLAYER_DELETE(CPeer* peer, uint32_t dwHandle, TPlayerDeletePacket* packet)
 {
 	if (!packet->login[0] || !packet->player_id || packet->account_index >= PLAYER_PER_ACCOUNT)
 		return;
@@ -1053,10 +1053,10 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 	{
 		MYSQL_ROW row = mysql_fetch_row(msg->Get()->pSQLResult);
 
-		DWORD dwPID = 0;
+		uint32_t dwPID = 0;
 		str_to_number(dwPID, row[0]);
 
-		int deletedLevelLimit = 0;
+		int32_t deletedLevelLimit = 0;
 		str_to_number(deletedLevelLimit, row[1]);
 
 		char szName[64];
@@ -1226,7 +1226,7 @@ void CClientManager::QUERY_REMOVE_AFFECT(CPeer * peer, TPacketGDRemoveAffect * p
 	CDBManager::instance().AsyncQuery(queryStr);
 }
 
-void CClientManager::InsertLogoutPlayer(DWORD pid)
+void CClientManager::InsertLogoutPlayer(uint32_t pid)
 {
 	TLogoutPlayerMap::iterator it = m_map_logout.find(pid);
 
@@ -1250,7 +1250,7 @@ void CClientManager::InsertLogoutPlayer(DWORD pid)
 		sys_log(0, "LOGOUT: Insert player pid(%d)", pid);
 }
 
-void CClientManager::DeleteLogoutPlayer(DWORD pid)
+void CClientManager::DeleteLogoutPlayer(uint32_t pid)
 {
 	TLogoutPlayerMap::iterator it = m_map_logout.find(pid);
 
@@ -1261,7 +1261,7 @@ void CClientManager::DeleteLogoutPlayer(DWORD pid)
 	}
 }
 
-extern int g_iLogoutSeconds;
+extern int32_t g_iLogoutSeconds;
 
 void CClientManager::UpdateLogoutPlayer()
 {
@@ -1286,7 +1286,7 @@ void CClientManager::UpdateLogoutPlayer()
 	}
 }
 
-void CClientManager::FlushPlayerCacheSet(DWORD pid)
+void CClientManager::FlushPlayerCacheSet(uint32_t pid)
 {
 	TPlayerTableCacheMap::iterator it = m_map_playerCache.find(pid);
 

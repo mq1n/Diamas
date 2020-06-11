@@ -33,7 +33,7 @@
 #include "unique_item.h"
 #include "DragonSoul.h"
 
-extern bool DropEvent_RefineBox_SetValue(const std::string& name, int value);
+extern bool DropEvent_RefineBox_SetValue(const std::string& name, int32_t value);
 
 // ADD_COMMAND_SLOW_STUN
 enum
@@ -42,7 +42,7 @@ enum
 	COMMANDAFFECT_SLOW,
 };
 
-void Command_ApplyAffect(LPCHARACTER ch, const char* argument, const char* affectName, int cmdAffect)
+void Command_ApplyAffect(LPCHARACTER ch, const char* argument, const char* affectName, int32_t cmdAffect)
 {
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
@@ -143,9 +143,9 @@ struct GotoInfo
 {
 	std::string 	st_name;
 
-	BYTE 	empire;
-	int 	mapIndex;
-	DWORD 	x, y;
+	uint8_t 	empire;
+	int32_t 	mapIndex;
+	uint32_t 	x, y;
 
 	GotoInfo()
 	{
@@ -177,7 +177,7 @@ struct GotoInfo
 
 static std::vector<GotoInfo> gs_vec_gotoInfo;
 
-void CHARACTER_AddGotoInfo(const std::string& c_st_name, BYTE empire, int mapIndex, DWORD x, DWORD y)
+void CHARACTER_AddGotoInfo(const std::string& c_st_name, uint8_t empire, int32_t mapIndex, uint32_t x, uint32_t y)
 {
 	GotoInfo newGotoInfo;
 	newGotoInfo.st_name = c_st_name;
@@ -222,7 +222,7 @@ bool FindInString(const char * c_pszFind, const char * c_pszIn)
 	return false;
 }
 
-bool CHARACTER_GoToName(LPCHARACTER ch, BYTE empire, int mapIndex, const char* gotoName)
+bool CHARACTER_GoToName(LPCHARACTER ch, uint8_t empire, int32_t mapIndex, const char* gotoName)
 {
 	std::vector<GotoInfo>::iterator i;
 	for (i = gs_vec_gotoInfo.begin(); i != gs_vec_gotoInfo.end(); ++i)
@@ -239,8 +239,8 @@ bool CHARACTER_GoToName(LPCHARACTER ch, BYTE empire, int mapIndex, const char* g
 
 		if (c_eachGotoInfo.empire == 0 || c_eachGotoInfo.empire == empire)
 		{
-			int x = c_eachGotoInfo.x * 100;
-			int y = c_eachGotoInfo.y * 100;
+			int32_t x = c_eachGotoInfo.x * 100;
+			int32_t y = c_eachGotoInfo.y * 100;
 
 			ch->ChatPacket(CHAT_TYPE_INFO, "You warp to ( %d, %d )", x, y);
 			ch->WarpSet(x, y);
@@ -294,7 +294,7 @@ bool CHARACTER_GoToName(LPCHARACTER ch, BYTE empire, int mapIndex, const char* g
 { "사귀타워입구",		2, 65, 5905, 1108 },
 { "사귀타워입구",		3, 65, 5905, 1108 },
 
-{ NULL,			0,  0,    0,    0 },
+{ nullptr,			0,  0,    0,    0 },
 };
  */
 
@@ -302,7 +302,7 @@ bool CHARACTER_GoToName(LPCHARACTER ch, BYTE empire, int mapIndex, const char* g
 ACMD(do_goto)
 {
 	char arg1[256], arg2[256];
-	int x = 0, y = 0, z = 0;
+	int32_t x = 0, y = 0, z = 0;
 
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 
@@ -329,8 +329,8 @@ ACMD(do_goto)
 	}
 	else
 	{
-		int mapIndex = 0;
-		BYTE empire = 0;
+		int32_t mapIndex = 0;
+		uint8_t empire = 0;
 
 		if (*arg1 == '#')
 			str_to_number(mapIndex,  (arg1 + 1));
@@ -352,8 +352,8 @@ ACMD(do_goto)
 		return;
 
 		/*
-		   int iMapIndex = 0;
-		   for (int i = 0; aWarpInfo[i].c_pszName != NULL; ++i)
+		   int32_t iMapIndex = 0;
+		   for (int32_t i = 0; aWarpInfo[i].c_pszName != nullptr; ++i)
 		   {
 		   if (iMapIndex != 0)
 		   {
@@ -397,9 +397,9 @@ ACMD(do_warp)
 		return;
 	}
 
-	int x = 0, y = 0;
+	int32_t x = 0, y = 0;
 #ifdef ENABLE_CMD_WARP_IN_DUNGEON
-	int mapIndex = 0;
+	int32_t mapIndex = 0;
 #endif
 
 	if (isnhdigit(*arg1) && isnhdigit(*arg2))
@@ -411,11 +411,11 @@ ACMD(do_warp)
 	{
 		LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(arg1);
 
-		if (NULL == tch)
+		if (nullptr == tch)
 		{
 			const CCI* pkCCI = P2P_MANAGER::instance().Find(arg1);
 
-			if (NULL != pkCCI)
+			if (nullptr != pkCCI)
 			{
 				if (pkCCI->bChannel != g_bChannel)
 				{
@@ -475,7 +475,7 @@ ACMD(do_item)
 		return;
 	}
 
-	int iCount = 1;
+	int32_t iCount = 1;
 
 	if (*arg2)
 	{
@@ -483,7 +483,7 @@ ACMD(do_item)
 		iCount = MINMAX(1, iCount, g_bItemCountLimit);
 	}
 
-	DWORD dwVnum;
+	uint32_t dwVnum;
 
 	if (isnhdigit(*arg1))
 		str_to_number(dwVnum, arg1);
@@ -502,7 +502,7 @@ ACMD(do_item)
 	{
 		if (item->IsDragonSoul())
 		{
-			int iEmptyPos = ch->GetEmptyDragonSoulInventory(item);
+			int32_t iEmptyPos = ch->GetEmptyDragonSoulInventory(item);
 
 			if (iEmptyPos != -1)
 			{
@@ -522,7 +522,7 @@ ACMD(do_item)
 		}
 		else
 		{
-			int iEmptyPos = ch->GetEmptyInventory(item->GetSize());
+			int32_t iEmptyPos = ch->GetEmptyInventory(item->GetSize());
 
 			if (iEmptyPos != -1)
 			{
@@ -553,7 +553,7 @@ ACMD(do_group_random)
 		return;
 	}
 
-	DWORD dwVnum = 0;
+	uint32_t dwVnum = 0;
 	str_to_number(dwVnum, arg1);
 	CHARACTER_MANAGER::instance().SpawnGroupGroup(dwVnum, ch->GetMapIndex(), ch->GetX() - 500, ch->GetY() - 500, ch->GetX() + 500, ch->GetY() + 500);
 }
@@ -569,7 +569,7 @@ ACMD(do_group)
 		return;
 	}
 
-	DWORD dwVnum = 0;
+	uint32_t dwVnum = 0;
 	str_to_number(dwVnum, arg1);
 
 	if (test_server)
@@ -581,7 +581,7 @@ ACMD(do_group)
 ACMD(do_mob_coward)
 {
 	char	arg1[256], arg2[256];
-	DWORD	vnum = 0;
+	uint32_t	vnum = 0;
 	LPCHARACTER	tch;
 
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
@@ -598,7 +598,7 @@ ACMD(do_mob_coward)
 	{
 		str_to_number(vnum, arg1);
 
-		if ((pkMob = CMobManager::instance().Get(vnum)) == NULL)
+		if ((pkMob = CMobManager::instance().Get(vnum)) == nullptr)
 			vnum = 0;
 	}
 	else
@@ -615,7 +615,7 @@ ACMD(do_mob_coward)
 		return;
 	}
 
-	int iCount = 0;
+	int32_t iCount = 0;
 
 	if (*arg2)
 		str_to_number(iCount, arg2);
@@ -650,7 +650,7 @@ ACMD(do_mob_map)
 		return;
 	}
 
-	DWORD vnum = 0;
+	uint32_t vnum = 0;
 	str_to_number(vnum, arg1);
 	LPCHARACTER tch = CHARACTER_MANAGER::instance().SpawnMobRandomPosition(vnum, ch->GetMapIndex());
 
@@ -663,7 +663,7 @@ ACMD(do_mob_map)
 ACMD(do_mob_aggresive)
 {
 	char	arg1[256], arg2[256];
-	DWORD	vnum = 0;
+	uint32_t	vnum = 0;
 	LPCHARACTER	tch;
 
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
@@ -680,7 +680,7 @@ ACMD(do_mob_aggresive)
 	{
 		str_to_number(vnum, arg1);
 
-		if ((pkMob = CMobManager::instance().Get(vnum)) == NULL)
+		if ((pkMob = CMobManager::instance().Get(vnum)) == nullptr)
 			vnum = 0;
 	}
 	else
@@ -697,7 +697,7 @@ ACMD(do_mob_aggresive)
 		return;
 	}
 
-	int iCount = 0;
+	int32_t iCount = 0;
 
 	if (*arg2)
 		str_to_number(iCount, arg2);
@@ -724,7 +724,7 @@ ACMD(do_mob_aggresive)
 ACMD(do_mob)
 {
 	char	arg1[256], arg2[256];
-	DWORD	vnum = 0;
+	uint32_t	vnum = 0;
 
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 
@@ -734,13 +734,13 @@ ACMD(do_mob)
 		return;
 	}
 
-	const CMob* pkMob = NULL;
+	const CMob* pkMob = nullptr;
 
 	if (isnhdigit(*arg1))
 	{
 		str_to_number(vnum, arg1);
 
-		if ((pkMob = CMobManager::instance().Get(vnum)) == NULL)
+		if ((pkMob = CMobManager::instance().Get(vnum)) == nullptr)
 			vnum = 0;
 	}
 	else
@@ -757,7 +757,7 @@ ACMD(do_mob)
 		return;
 	}
 
-	int iCount = 0;
+	int32_t iCount = 0;
 
 	if (*arg2)
 		str_to_number(iCount, arg2);
@@ -785,7 +785,7 @@ ACMD(do_mob)
 ACMD(do_mob_ld)
 {
 	char	arg1[256], arg2[256], arg3[256], arg4[256];
-	DWORD	vnum = 0;
+	uint32_t	vnum = 0;
 
 	two_arguments(two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2)), arg3, sizeof(arg3), arg4, sizeof(arg4));
 
@@ -795,13 +795,13 @@ ACMD(do_mob_ld)
 		return;
 	}
 
-	const CMob* pkMob = NULL;
+	const CMob* pkMob = nullptr;
 
 	if (isnhdigit(*arg1))
 	{
 		str_to_number(vnum, arg1);
 
-		if ((pkMob = CMobManager::instance().Get(vnum)) == NULL)
+		if ((pkMob = CMobManager::instance().Get(vnum)) == nullptr)
 			vnum = 0;
 	}
 	else
@@ -818,8 +818,8 @@ ACMD(do_mob_ld)
 		return;
 	}
 
-	int dir = 1;
-	long x=0,y=0;
+	int32_t dir = 1;
+	int32_t x=0,y=0;
 
 	if (*arg2)
 		str_to_number(x, arg2);
@@ -854,14 +854,14 @@ struct FuncPurge
 
 		LPCHARACTER pkChr = (LPCHARACTER) ent;
 
-		int iDist = DISTANCE_APPROX(pkChr->GetX() - m_pkGM->GetX(), pkChr->GetY() - m_pkGM->GetY());
+		int32_t iDist = DISTANCE_APPROX(pkChr->GetX() - m_pkGM->GetX(), pkChr->GetY() - m_pkGM->GetY());
 
 		if (!m_bAll && iDist >= 1000)	// 10미터 이상에 있는 것들은 purge 하지 않는다.
 			return;
 
 		sys_log(0, "PURGE: %s %d", pkChr->GetName(), iDist);
 
-		if (pkChr->IsNPC() && !pkChr->IsPet() && pkChr->GetRider() == NULL)
+		if (pkChr->IsNPC() && !pkChr->IsPet() && pkChr->GetRider() == nullptr)
 		{
 			M2_DESTROY_CHARACTER(pkChr);
 		}
@@ -903,7 +903,7 @@ ACMD(do_item_purge)
 		return;
 	}
 
-	int         i;
+	int32_t         i;
 	LPITEM      item;
 
 	std::string strArg(arg1);
@@ -969,7 +969,7 @@ ACMD(do_item_purge)
 		}
 	}
 #else
-	int         i;
+	int32_t         i;
 	LPITEM      item;
 
 	for (i = 0; i < INVENTORY_AND_EQUIP_SLOT_MAX; ++i)
@@ -1001,14 +1001,14 @@ ACMD(do_state)
 	{
 		if (arg1[0] == '#')
 		{
-			tch = CHARACTER_MANAGER::instance().Find(strtoul(arg1+1, NULL, 10));
+			tch = CHARACTER_MANAGER::instance().Find(strtoul(arg1+1, nullptr, 10));
 		}
 		else
 		{
 			LPDESC d = DESC_MANAGER::instance().FindByCharacterName(arg1);
 
 			if (!d)
-				tch = NULL;
+				tch = nullptr;
 			else
 				tch = d->GetCharacter();
 		}
@@ -1038,11 +1038,11 @@ ACMD(do_state)
 
 	ch->ChatPacket(CHAT_TYPE_INFO, "%s", buf);
 
-	int len;
+	int32_t len;
 	len = snprintf(buf, sizeof(buf), "Coordinate %ldx%ld (%ldx%ld)", 
 			tch->GetX(), tch->GetY(), tch->GetX() / 100, tch->GetY() / 100);
 
-	if (len < 0 || len >= (int) sizeof(buf))
+	if (len < 0 || len >= (int32_t) sizeof(buf))
 		len = sizeof(buf) - 1;
 
 	LPSECTREE pSec = SECTREE_MANAGER::instance().Get(tch->GetMapIndex(), tch->GetX(), tch->GetY());
@@ -1168,16 +1168,16 @@ ACMD(do_state)
 		tch->GetPoint(POINT_IMMUNE_SLOW),
 		tch->GetPoint(POINT_IMMUNE_FALL));
 
-	for (int i = 0; i < MAX_PRIV_NUM; ++i)
+	for (int32_t i = 0; i < MAX_PRIV_NUM; ++i)
 		if (CPrivManager::instance().GetPriv(tch, i))
 		{
-			int iByEmpire = CPrivManager::instance().GetPrivByEmpire(tch->GetEmpire(), i);
-			int iByGuild = 0;
+			int32_t iByEmpire = CPrivManager::instance().GetPrivByEmpire(tch->GetEmpire(), i);
+			int32_t iByGuild = 0;
 
 			if (tch->GetGuild())
 				iByGuild = CPrivManager::instance().GetPrivByGuild(tch->GetGuild()->GetID(), i);
 
-			int iByPlayer = CPrivManager::instance().GetPrivByCharacter(tch->GetPlayerID(), i);
+			int32_t iByPlayer = CPrivManager::instance().GetPrivByCharacter(tch->GetPlayerID(), i);
 
 			if (iByEmpire)
 				ch->ChatPacket(CHAT_TYPE_INFO, "%s for empire : %d", LC_TEXT(c_apszPrivNames[i]), iByEmpire);
@@ -1231,23 +1231,23 @@ void SendNotice(const char * c_pszBuf)
 struct notice_map_packet_func
 {
 	const char* m_str;
-	int m_mapIndex;
+	int32_t m_mapIndex;
 	bool m_bBigFont;
 
-	notice_map_packet_func(const char* str, int idx, bool bBigFont) : m_str(str), m_mapIndex(idx), m_bBigFont(bBigFont)
+	notice_map_packet_func(const char* str, int32_t idx, bool bBigFont) : m_str(str), m_mapIndex(idx), m_bBigFont(bBigFont)
 	{
 	}
 
 	void operator() (LPDESC d)
 	{
-		if (d->GetCharacter() == NULL) return;
+		if (d->GetCharacter() == nullptr) return;
 		if (d->GetCharacter()->GetMapIndex() != m_mapIndex) return;
 
 		d->GetCharacter()->ChatPacket(m_bBigFont == true ? CHAT_TYPE_BIG_NOTICE : CHAT_TYPE_NOTICE, "%s", m_str);
 	}
 };
 
-void SendNoticeMap(const char* c_pszBuf, int nMapIndex, bool bBigFont)
+void SendNoticeMap(const char* c_pszBuf, int32_t nMapIndex, bool bBigFont)
 {
 	const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
 	std::for_each(c_ref_set.begin(), c_ref_set.end(), notice_map_packet_func(c_pszBuf, nMapIndex, bBigFont));
@@ -1344,9 +1344,9 @@ ACMD(do_big_notice_test)
 
 ACMD(do_who)
 {
-	int iTotal;
-	int * paiEmpireUserCount;
-	int iLocal;
+	int32_t iTotal;
+	int32_t * paiEmpireUserCount;
+	int32_t iLocal;
 
 	DESC_MANAGER::instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
 
@@ -1358,12 +1358,12 @@ class user_func
 {
 	public:
 		LPCHARACTER	m_ch;
-		static int count;
+		static int32_t count;
 		static char str[128];
-		static int str_len;
+		static int32_t str_len;
 
 		user_func()
-			: m_ch(NULL)
+			: m_ch(nullptr)
 		{}
 
 		void initialize(LPCHARACTER ch)
@@ -1379,9 +1379,9 @@ class user_func
 			if (!d->GetCharacter())
 				return;
 
-			int len = snprintf(str + str_len, sizeof(str) - str_len, "%-16s ", d->GetCharacter()->GetName());
+			int32_t len = snprintf(str + str_len, sizeof(str) - str_len, "%-16s ", d->GetCharacter()->GetName());
 
-			if (len < 0 || len >= (int) sizeof(str) - str_len)
+			if (len < 0 || len >= (int32_t) sizeof(str) - str_len)
 				len = (sizeof(str) - str_len) - 1;
 
 			str_len += len;
@@ -1397,9 +1397,9 @@ class user_func
 		}
 };
 
-int	user_func::count = 0;
+int32_t	user_func::count = 0;
 char user_func::str[128] = { 0, };
-int	user_func::str_len = 0;
+int32_t	user_func::str_len = 0;
 
 ACMD(do_user)
 {
@@ -1427,7 +1427,7 @@ ACMD(do_disconnect)
 	}
 
 	LPDESC d = DESC_MANAGER::instance().FindByCharacterName(arg1);
-	LPCHARACTER	tch = d ? d->GetCharacter() : NULL;
+	LPCHARACTER	tch = d ? d->GetCharacter() : nullptr;
 
 	if (!tch)
 	{
@@ -1456,7 +1456,7 @@ ACMD(do_kill)
 	}
 
 	LPDESC	d = DESC_MANAGER::instance().FindByCharacterName(arg1);
-	LPCHARACTER tch = d ? d->GetCharacter() : NULL;
+	LPCHARACTER tch = d ? d->GetCharacter() : nullptr;
 
 	if (!tch)
 	{
@@ -1480,7 +1480,7 @@ ACMD(do_poison)
 	}
 
 	LPDESC	d = DESC_MANAGER::instance().FindByCharacterName(arg1);
-	LPCHARACTER tch = d ? d->GetCharacter() : NULL;
+	LPCHARACTER tch = d ? d->GetCharacter() : nullptr;
 
 	if (!tch)
 	{
@@ -1488,7 +1488,7 @@ ACMD(do_poison)
 		return;
 	}
 
-	tch->AttackedByPoison(NULL);
+	tch->AttackedByPoison(nullptr);
 }
 #endif
 #ifdef ENABLE_WOLFMAN_CHARACTER
@@ -1504,7 +1504,7 @@ ACMD(do_bleeding)
 	}
 
 	LPDESC	d = DESC_MANAGER::instance().FindByCharacterName(arg1);
-	LPCHARACTER tch = d ? d->GetCharacter() : NULL;
+	LPCHARACTER tch = d ? d->GetCharacter() : nullptr;
 
 	if (!tch)
 	{
@@ -1512,7 +1512,7 @@ ACMD(do_bleeding)
 		return;
 	}
 
-	tch->AttackedByBleeding(NULL);
+	tch->AttackedByBleeding(nullptr);
 }
 #endif
 
@@ -1530,7 +1530,7 @@ const struct set_struct
 	const char type;
 	const char * help;
 } set_fields[] = {
-	{ "gold",		NUMBER,	NULL	},
+	{ "gold",		NUMBER,	nullptr	},
 #ifdef ENABLE_WOLFMAN_CHARACTER
 	{ "race",		NUMBER,	"0. Warrior, 1. Ninja, 2. Sura, 3. Shaman, 4. Lycan"		},
 #else
@@ -1538,22 +1538,22 @@ const struct set_struct
 #endif
 	{ "sex",		NUMBER,	"0. Male, 1. Female"	},
 	{ "job",		NUMBER,	"0. None, 1. First, 2. Second"	},
-	{ "exp",		NUMBER,	NULL	},
-	{ "max_hp",		NUMBER,	NULL	},
-	{ "max_sp",		NUMBER,	NULL	},
-	{ "skill",		NUMBER,	NULL	},
-	{ "alignment",	NUMBER,	NULL	},
-	{ "align",		NUMBER,	NULL	},
-	{ "\n",			MISC,	NULL	}
+	{ "exp",		NUMBER,	nullptr	},
+	{ "max_hp",		NUMBER,	nullptr	},
+	{ "max_sp",		NUMBER,	nullptr	},
+	{ "skill",		NUMBER,	nullptr	},
+	{ "alignment",	NUMBER,	nullptr	},
+	{ "align",		NUMBER,	nullptr	},
+	{ "\n",			MISC,	nullptr	}
 };
 
 ACMD(do_set)
 {
 	char arg1[256], arg2[256], arg3[256];
 
-	LPCHARACTER tch = NULL;
+	LPCHARACTER tch = nullptr;
 
-	int i, len;
+	int32_t i, len;
 	const char* line;
 
 	line = two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
@@ -1567,7 +1567,7 @@ ACMD(do_set)
 		for (i = 0; *(set_fields[i].cmd) != '\n'; i++)
 		{
 			ch->ChatPacket(CHAT_TYPE_INFO, " %d. %s", i+1, set_fields[i].cmd);
-			if (set_fields[i].help != NULL)
+			if (set_fields[i].help != nullptr)
 				ch->ChatPacket(CHAT_TYPE_INFO, "  Help: %s", set_fields[i].help);
 		}
 #endif
@@ -1592,7 +1592,7 @@ ACMD(do_set)
 	{
 		case DoSetTypes::GOLD:	// gold
 			{
-				int gold = 0;
+				int32_t gold = 0;
 				str_to_number(gold, arg3);
 				DBManager::instance().SendMoneyLog(MONEY_LOG_MISC, 3, gold);
 				tch->PointChange(POINT_GOLD, gold, true);
@@ -1602,11 +1602,11 @@ ACMD(do_set)
 		case DoSetTypes::RACE: // race
 #ifdef ENABLE_NEWSTUFF
 			{
-				int amount = 0;
+				int32_t amount = 0;
 				str_to_number(amount, arg3);
 				amount = MINMAX(0, amount, JOB_MAX_NUM);
 				ESex mySex = GET_SEX(tch);
-				DWORD dwRace = MAIN_RACE_WARRIOR_M;
+				uint32_t dwRace = MAIN_RACE_WARRIOR_M;
 				switch (amount)
 				{
 					case JOB_WARRIOR:
@@ -1644,7 +1644,7 @@ ACMD(do_set)
 		case DoSetTypes::SEX: // sex
 #ifdef ENABLE_NEWSTUFF
 			{
-				int amount = 0;
+				int32_t amount = 0;
 				str_to_number(amount, arg3);
 				amount = MINMAX(SEX_MALE, amount, SEX_FEMALE);
 				if (amount != GET_SEX(tch))
@@ -1662,7 +1662,7 @@ ACMD(do_set)
 		case DoSetTypes::JOB: // job
 #ifdef ENABLE_NEWSTUFF
 			{
-				int amount = 0;
+				int32_t amount = 0;
 				str_to_number(amount, arg3);
 				amount = MINMAX(0, amount, 2);
 				if (amount != tch->GetSkillGroup())
@@ -1676,7 +1676,7 @@ ACMD(do_set)
 
 		case DoSetTypes::EXP: // exp
 			{
-				int amount = 0;
+				int32_t amount = 0;
 				str_to_number(amount, arg3);
 				tch->PointChange(POINT_EXP, amount, true);
 			}
@@ -1684,7 +1684,7 @@ ACMD(do_set)
 
 		case DoSetTypes::MAX_HP: // max_hp
 			{
-				int amount = 0;
+				int32_t amount = 0;
 				str_to_number(amount, arg3);
 				tch->PointChange(POINT_MAX_HP, amount, true);
 			}
@@ -1692,7 +1692,7 @@ ACMD(do_set)
 
 		case DoSetTypes::MAX_SP: // max_sp
 			{
-				int amount = 0;
+				int32_t amount = 0;
 				str_to_number(amount, arg3);
 				tch->PointChange(POINT_MAX_SP, amount, true);
 			}
@@ -1700,7 +1700,7 @@ ACMD(do_set)
 
 		case DoSetTypes::SKILL: // active skill point
 			{
-				int amount = 0;
+				int32_t amount = 0;
 				str_to_number(amount, arg3);
 				tch->PointChange(POINT_SKILL, amount, true);
 			}
@@ -1709,7 +1709,7 @@ ACMD(do_set)
 		case DoSetTypes::ALIGN: // alignment
 		case DoSetTypes::ALIGNMENT: // alignment
 			{
-				int	amount = 0;
+				int32_t	amount = 0;
 				str_to_number(amount, arg3);
 				tch->UpdateAlignment(amount - tch->GetRealAlignment());
 			}
@@ -1718,7 +1718,7 @@ ACMD(do_set)
 
 	if (set_fields[i].type == NUMBER)
 	{
-		int	amount = 0;
+		int32_t	amount = 0;
 		str_to_number(amount, arg3);
 		ch->ChatPacket(CHAT_TYPE_INFO, "%s's %s set to [%d]", tch->GetName(), set_fields[i].cmd, amount);
 	}
@@ -1750,7 +1750,7 @@ ACMD(do_advance)
 		return;
 	}
 
-	int level = 0;
+	int32_t level = 0;
 	str_to_number(level, arg2);
 
 	tch->ResetPoint(MINMAX(0, level, gPlayerMaxLevel));
@@ -1779,7 +1779,7 @@ ACMD(do_safebox_size)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
-	int size = 0;
+	int32_t size = 0;
 
 	if (*arg1)
 		str_to_number(size, arg1);
@@ -1835,7 +1835,7 @@ ACMD(do_refine_rod)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
-	BYTE cell = 0;
+	uint8_t cell = 0;
 	str_to_number(cell, arg1);
 	LPITEM item = ch->GetInventoryItem(cell);
 	if (item)
@@ -1849,7 +1849,7 @@ ACMD(do_refine_pick)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
-	BYTE cell = 0;
+	uint8_t cell = 0;
 	str_to_number(cell, arg1);
 	LPITEM item = ch->GetInventoryItem(cell);
 	if (item)
@@ -1864,7 +1864,7 @@ ACMD(do_max_pick)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
-	BYTE cell = 0;
+	uint8_t cell = 0;
 	str_to_number(cell, arg1);
 	LPITEM item = ch->GetInventoryItem(cell);
 	if (item)
@@ -1883,9 +1883,9 @@ ACMD(do_fishing_simul)
 	argument = one_argument(argument, arg1, sizeof(arg1));
 	two_arguments(argument, arg2, sizeof(arg2), arg3, sizeof(arg3));
 
-	int count = 1000;
-	int prob_idx = 0;
-	int level = 100;
+	int32_t count = 1000;
+	int32_t prob_idx = 0;
+	int32_t level = 100;
 
 	ch->ChatPacket(CHAT_TYPE_INFO, "Usage: fishing_simul <level> <prob index> <count>");
 
@@ -1923,7 +1923,7 @@ ACMD(do_event_flag)
 	if (!(*arg1) || !(*arg2))
 		return;
 
-	int value = 0;
+	int32_t value = 0;
 	str_to_number(value, arg2);
 
 	if (!strcmp(arg1, "mob_item") || 
@@ -1960,8 +1960,8 @@ ACMD(do_private)
 		return;
 	}
 
-	long lMapIndex;
-	long map_index = 0;
+	int32_t lMapIndex;
+	int32_t map_index = 0;
 	str_to_number(map_index, arg1);
 	if ((lMapIndex = SECTREE_MANAGER::instance().CreatePrivateMap(map_index)))
 	{
@@ -1988,13 +1988,13 @@ ACMD(do_qf)
 
 	if (!questname.empty())
 	{
-		int value = quest::CQuestManager::Instance().GetQuestStateIndex(questname, arg1);
+		int32_t value = quest::CQuestManager::Instance().GetQuestStateIndex(questname, arg1);
 
 		pPC->SetFlag(questname + ".__status", value);
 		pPC->ClearTimer();
 
 		quest::PC::QuestInfoIterator it = pPC->quest_begin();
-		unsigned int questindex = quest::CQuestManager::instance().GetQuestIndexByName(questname);
+		uint32_t questindex = quest::CQuestManager::instance().GetQuestIndexByName(questname);
 
 		while (it!= pPC->quest_end())
 		{
@@ -2024,35 +2024,35 @@ ACMD(do_b1)
 	chHori->AddAffect(AFFECT_DUNGEON_UNIQUE, POINT_NONE, 0, AFF_BUILDING_CONSTRUCTION_SMALL, 65535, 0, true);
 	chHori->AddAffect(AFFECT_DUNGEON_UNIQUE, POINT_NONE, 0, AFF_DUNGEON_UNIQUE, 65535, 0, true);
 
-	for (int i = 0; i < 30; ++i)
+	for (int32_t i = 0; i < 30; ++i)
 	{
-		int rot = number(0, 359);
+		int32_t rot = number(0, 359);
 		float fx, fy;
 		GetDeltaByDegree(rot, 800, &fx, &fy);
 
 		LPCHARACTER tch = CHARACTER_MANAGER::instance().SpawnMobRange(number(701, 706), 
 				ch->GetMapIndex(),
-				304222 + (int)fx,
-				742858 + (int)fy,
-				304222 + (int)fx,
-				742858 + (int)fy,
+				304222 + (int32_t)fx,
+				742858 + (int32_t)fy,
+				304222 + (int32_t)fx,
+				742858 + (int32_t)fy,
 				true,
 				false);
 		tch->SetAggressive();
 	}
 
-	for (int i = 0; i < 5; ++i)
+	for (int32_t i = 0; i < 5; ++i)
 	{
-		int rot = number(0, 359);
+		int32_t rot = number(0, 359);
 		float fx, fy;
 		GetDeltaByDegree(rot, 800, &fx, &fy);
 
 		LPCHARACTER tch = CHARACTER_MANAGER::instance().SpawnMobRange(8009, 
 				ch->GetMapIndex(),
-				304222 + (int)fx,
-				742858 + (int)fy,
-				304222 + (int)fx,
-				742858 + (int)fy,
+				304222 + (int32_t)fx,
+				742858 + (int32_t)fy,
+				304222 + (int32_t)fx,
+				742858 + (int32_t)fy,
 				true,
 				false);
 		tch->SetAggressive();
@@ -2093,35 +2093,35 @@ ACMD(do_b4)
 {
 	chLib->AddAffect(AFFECT_DUNGEON_UNIQUE, POINT_NONE, 0, AFF_BUILDING_UPGRADE, 65535, 0, true);
 
-	for (int i = 0; i < 30; ++i)
+	for (int32_t i = 0; i < 30; ++i)
 	{
-		int rot = number(0, 359);
+		int32_t rot = number(0, 359);
 		float fx, fy;
 		GetDeltaByDegree(rot, 1200, &fx, &fy);
 
 		LPCHARACTER tch = CHARACTER_MANAGER::instance().SpawnMobRange(number(701, 706), 
 				ch->GetMapIndex(),
-				307900 + (int)fx,
-				744500 + (int)fy,
-				307900 + (int)fx,
-				744500 + (int)fy,
+				307900 + (int32_t)fx,
+				744500 + (int32_t)fy,
+				307900 + (int32_t)fx,
+				744500 + (int32_t)fy,
 				true,
 				false);
 		tch->SetAggressive();
 	}
 
-	for (int i = 0; i < 5; ++i)
+	for (int32_t i = 0; i < 5; ++i)
 	{
-		int rot = number(0, 359);
+		int32_t rot = number(0, 359);
 		float fx, fy;
 		GetDeltaByDegree(rot, 1200, &fx, &fy);
 
 		LPCHARACTER tch = CHARACTER_MANAGER::instance().SpawnMobRange(8009, 
 				ch->GetMapIndex(),
-				307900 + (int)fx,
-				744500 + (int)fy,
-				307900 + (int)fx,
-				744500 + (int)fy,
+				307900 + (int32_t)fx,
+				744500 + (int32_t)fy,
+				307900 + (int32_t)fx,
+				744500 + (int32_t)fy,
 				true,
 				false);
 		tch->SetAggressive();
@@ -2159,7 +2159,7 @@ ACMD(do_book)
 
 	if (isnhdigit(*arg1))
 	{
-		DWORD vnum = 0;
+		uint32_t vnum = 0;
 		str_to_number(vnum, arg1);
 		pkProto = CSkillManager::instance().Get(vnum);
 	}
@@ -2202,7 +2202,7 @@ ACMD(do_setskillother)
 
 	if (isdigit(*arg2))
 	{
-		DWORD vnum = 0;
+		uint32_t vnum = 0;
 		str_to_number(vnum, arg2);
 		pk = CSkillManager::instance().Get(vnum);
 	}
@@ -2215,7 +2215,7 @@ ACMD(do_setskillother)
 		return;
 	}
 
-	BYTE level = 0;
+	uint8_t level = 0;
 	str_to_number(level, arg3);
 	tch->SetSkillLevel(pk->dwVnum, level);
 	tch->ComputePoints();
@@ -2237,7 +2237,7 @@ ACMD(do_setskill)
 
 	if (isdigit(*arg1))
 	{
-		DWORD vnum = 0;
+		uint32_t vnum = 0;
 		str_to_number(vnum, arg1);
 		pk = CSkillManager::instance().Get(vnum);
 	}
@@ -2251,7 +2251,7 @@ ACMD(do_setskill)
 		return;
 	}
 
-	BYTE level = 0;
+	uint8_t level = 0;
 	str_to_number(level, arg2);
 	ch->SetSkillLevel(pk->dwVnum, level);
 	ch->ComputePoints();
@@ -2263,7 +2263,7 @@ ACMD(do_set_skill_point)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
-	int skill_point = 0;
+	int32_t skill_point = 0;
 	if (*arg1)
 		str_to_number(skill_point, arg1);
 
@@ -2277,7 +2277,7 @@ ACMD(do_set_skill_group)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
-	int skill_group = 0;
+	int32_t skill_group = 0;
 	if (*arg1)
 		str_to_number(skill_group, arg1);
 
@@ -2303,7 +2303,7 @@ ACMD(do_reload)
 
 			case 'p':
 				ch->ChatPacket(CHAT_TYPE_INFO, "Reloading prototype tables,");
-				db_clientdesc->DBPacket(HEADER_GD_RELOAD_PROTO, 0, NULL, 0);
+				db_clientdesc->DBPacket(HEADER_GD_RELOAD_PROTO, 0, nullptr, 0);
 				break;
 
 			case 'q':
@@ -2318,7 +2318,7 @@ ACMD(do_reload)
 				//RELOAD_ADMIN
 			case 'a':
 				ch->ChatPacket(CHAT_TYPE_INFO, "Reloading Admin infomation.");
-				db_clientdesc->DBPacket(HEADER_GD_RELOAD_ADMIN, 0, NULL, 0);
+				db_clientdesc->DBPacket(HEADER_GD_RELOAD_ADMIN, 0, nullptr, 0);
 				sys_log(0, "Reloading admin infomation.");
 				break;
 				//END_RELOAD_ADMIN
@@ -2334,7 +2334,7 @@ ACMD(do_reload)
 		LoadStateUserCount();
 
 		ch->ChatPacket(CHAT_TYPE_INFO, "Reloading prototype tables,");
-		db_clientdesc->DBPacket(HEADER_GD_RELOAD_PROTO, 0, NULL, 0);
+		db_clientdesc->DBPacket(HEADER_GD_RELOAD_PROTO, 0, nullptr, 0);
 	}
 }
 
@@ -2354,7 +2354,7 @@ ACMD(do_level)
 		return;
 	}
 
-	int	level = 0;
+	int32_t	level = 0;
 	str_to_number(level, arg2);
 
 	ch->ResetPoint(MINMAX(1, level, gPlayerMaxLevel));
@@ -2377,7 +2377,7 @@ ACMD(do_stop_guild_war)
 	if (!*arg1 || !*arg2)
 		return;
 
-	int id1 = 0, id2 = 0;
+	int32_t id1 = 0, id2 = 0;
 
 	str_to_number(id1, arg1);
 	str_to_number(id2, arg2);
@@ -2399,7 +2399,7 @@ ACMD(do_cancel_guild_war)
 	char arg1[256], arg2[256];
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 
-	int id1 = 0, id2 = 0;
+	int32_t id1 = 0, id2 = 0;
 	str_to_number(id1, arg1);
 	str_to_number(id2, arg2);
 
@@ -2415,7 +2415,7 @@ ACMD(do_guild_state)
 	one_argument(argument, arg1, sizeof(arg1));
 
 	CGuild* pGuild = CGuildManager::instance().FindGuildByName(arg1);
-	if (pGuild != NULL)
+	if (pGuild != nullptr)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "GuildID: %d", pGuild->GetID());
 		ch->ChatPacket(CHAT_TYPE_INFO, "GuildMasterPID: %d", pGuild->GetMasterPID());
@@ -2443,7 +2443,7 @@ struct FuncWeaken
 
 		LPCHARACTER pkChr = (LPCHARACTER) ent;
 
-		int iDist = DISTANCE_APPROX(pkChr->GetX() - m_pkGM->GetX(), pkChr->GetY() - m_pkGM->GetY());
+		int32_t iDist = DISTANCE_APPROX(pkChr->GetX() - m_pkGM->GetX(), pkChr->GetY() - m_pkGM->GetY());
 
 		if (!m_bAll && iDist >= 1000)	// 10미터 이상에 있는 것들은 purge 하지 않는다.
 			return;
@@ -2534,13 +2534,13 @@ ACMD(do_set_state)
 
 	if (!questname.empty())
 	{
-		int value = quest::CQuestManager::Instance().GetQuestStateIndex(questname, statename);
+		int32_t value = quest::CQuestManager::Instance().GetQuestStateIndex(questname, statename);
 
 		pPC->SetFlag(questname + ".__status", value);
 		pPC->ClearTimer();
 
 		quest::PC::QuestInfoIterator it = pPC->quest_begin();
-		unsigned int questindex = quest::CQuestManager::instance().GetQuestIndexByName(questname);
+		uint32_t questindex = quest::CQuestManager::instance().GetQuestIndexByName(questname);
 
 		while (it!= pPC->quest_end())
 		{
@@ -2590,7 +2590,7 @@ ACMD(do_setqf)
 
 	if (pPC)
 	{
-		int value = 0;
+		int32_t value = 0;
 		str_to_number(value, arg2);
 		pPC->SetFlag(arg1, value);
 		ch->ChatPacket(CHAT_TYPE_INFO, "Quest flag set: %s %d", arg1, value);
@@ -2659,12 +2659,12 @@ ACMD(do_polymorph)
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 	if (*arg1)
 	{
-		DWORD dwVnum = 0;
+		uint32_t dwVnum = 0;
 		str_to_number(dwVnum, arg1);
 		bool bMaintainStat = false;
 		if (*arg2)
 		{
-			int value = 0;
+			int32_t value = 0;
 			str_to_number(value, arg2);
 			bMaintainStat = (value>0);
 		}
@@ -2681,14 +2681,14 @@ ACMD(do_polymorph_item)
 
 	if (*arg1)
 	{
-		DWORD dwVnum = 0;
+		uint32_t dwVnum = 0;
 		str_to_number(dwVnum, arg1);
 
 		LPITEM item = ITEM_MANAGER::instance().CreateItem(70104, 1, 0, true);
 		if (item)
 		{
 			item->SetSocket(0, dwVnum);
-			int iEmptyPos = ch->GetEmptyInventory(item->GetSize());
+			int32_t iEmptyPos = ch->GetEmptyInventory(item->GetSize());
 
 			if (iEmptyPos != -1)
 			{
@@ -2715,10 +2715,10 @@ ACMD(do_priv_empire)
 	char arg2[256] = {0};
 	char arg3[256] = {0};
 	char arg4[256] = {0};
-	int empire = 0;
-	int type = 0;
-	int value = 0;
-	int duration = 0;
+	int32_t empire = 0;
+	int32_t type = 0;
+	int32_t value = 0;
+	int32_t duration = 0;
 
 	const char* line = two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 
@@ -2784,7 +2784,7 @@ ACMD(do_priv_guild)
 
 		if (!g)
 		{
-			DWORD guild_id = 0;
+			uint32_t guild_id = 0;
 			str_to_number(guild_id, arg1);
 			g = CGuildManager::instance().FindGuild(guild_id);
 		}
@@ -2822,7 +2822,7 @@ ACMD(do_mount_test)
 
 	if (*arg1)
 	{
-		DWORD vnum = 0;
+		uint32_t vnum = 0;
 		str_to_number(vnum, arg1);
 		ch->MountVnum(vnum);
 	}
@@ -2840,10 +2840,10 @@ ACMD(do_socket_item)
 
 	if (*arg1)
 	{
-		DWORD dwVnum = 0;
+		uint32_t dwVnum = 0;
 		str_to_number(dwVnum, arg1);
 	
-		int iSocketCount = 0;
+		int32_t iSocketCount = 0;
 		str_to_number(iSocketCount, arg2);
 	
 		if (!iSocketCount || iSocketCount >= ITEM_SOCKET_MAX_NUM)
@@ -2862,7 +2862,7 @@ ACMD(do_socket_item)
 	
 		if (item)
 		{
-			for (int i = 0; i < iSocketCount; ++i)
+			for (int32_t i = 0; i < iSocketCount; ++i)
 				item->SetSocket(i, 1);
 		}
 		else
@@ -2877,7 +2877,7 @@ ACMD(do_xmas)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
-	int flag = 0;
+	int32_t flag = 0;
 
 	if (*arg1)
 		str_to_number(flag, arg1);
@@ -2909,7 +2909,7 @@ ACMD(do_block_chat_list)
 		return;
 	}
 
-	DBManager::instance().ReturnQuery(QID_BLOCK_CHAT_LIST, ch->GetPlayerID(), NULL, 
+	DBManager::instance().ReturnQuery(QID_BLOCK_CHAT_LIST, ch->GetPlayerID(), nullptr, 
 			"SELECT p.name, a.lDuration FROM affect%s as a, player%s as p WHERE a.bType = %d AND a.dwPID = p.id",
 			get_table_postfix(), get_table_postfix(), AFFECT_BLOCK_CHAT);
 }
@@ -2928,7 +2928,7 @@ ACMD(do_vote_block_chat)
 	}
 
 	const char* name = arg1;
-	long lBlockDuration = 10;
+	int32_t lBlockDuration = 10;
 	sys_log(0, "vote_block_chat %s %d", name, lBlockDuration);
 
 	LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(name);
@@ -2987,7 +2987,7 @@ ACMD(do_block_chat)
 	}
 
 	const char* name = arg1;
-	long lBlockDuration = parse_time_str(argument);
+	int32_t lBlockDuration = parse_time_str(argument);
 
 	if (lBlockDuration < 0)
 	{
@@ -3043,7 +3043,7 @@ ACMD(do_build)
 
 	char arg1[256], arg2[256], arg3[256], arg4[256];
 	const char * line = one_argument(argument, arg1, sizeof(arg1));
-	BYTE GMLevel = ch->GetGMLevel();
+	uint8_t GMLevel = ch->GetGMLevel();
 
 	CLand * pkLand = CManager::instance().FindLand(ch->GetMapIndex(), ch->GetX(), ch->GetY());
 
@@ -3094,7 +3094,7 @@ ACMD(do_build)
 					return;
 				}
 
-				DWORD dwVnum = 0;
+				uint32_t dwVnum = 0;
 				str_to_number(dwVnum,  arg1);
 
 				using namespace building;
@@ -3106,7 +3106,7 @@ ACMD(do_build)
 					return;
 				}
 
-				const DWORD BUILDING_MAX_PRICE = 100000000;
+				const uint32_t BUILDING_MAX_PRICE = 100000000;
 
 				if (t->dwGroupVnum)
 				{
@@ -3142,7 +3142,7 @@ ACMD(do_build)
 						return;
 					}
 
-					if (ch->GetGold() < (int)t->dwPrice)
+					if (ch->GetGold() < (int32_t)t->dwPrice)
 					{
 						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("건설 비용이 부족합니다."));
 						return;
@@ -3150,16 +3150,16 @@ ACMD(do_build)
 
 					// 아이템 자재 개수 체크
 
-					int i;
+					int32_t i;
 					for (i = 0; i < OBJECT_MATERIAL_MAX_NUM; ++i)
 					{
-						DWORD dwItemVnum = t->kMaterials[i].dwItemVnum;
-						DWORD dwItemCount = t->kMaterials[i].dwCount;
+						uint32_t dwItemVnum = t->kMaterials[i].dwItemVnum;
+						uint32_t dwItemCount = t->kMaterials[i].dwCount;
 
 						if (dwItemVnum == 0)
 							break;
 
-						if ((int) dwItemCount > ch->CountSpecifyItem(dwItemVnum))
+						if ((int32_t) dwItemCount > ch->CountSpecifyItem(dwItemVnum))
 						{
 							ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("자재가 부족하여 건설할 수 없습니다."));
 							return;
@@ -3179,9 +3179,9 @@ ACMD(do_build)
 				   }
 				 */
 
-				long map_x = 0;
+				int32_t map_x = 0;
 				str_to_number(map_x, arg2);
-				long map_y = 0;
+				int32_t map_y = 0;
 				str_to_number(map_y, arg3);
 
 				bool isSuccess = pkLand->RequestCreateObject(dwVnum, 
@@ -3207,11 +3207,11 @@ ACMD(do_build)
 
 					// 아이템 자재 사용하기 
 					{
-						int i;
+						int32_t i;
 						for (i = 0; i < OBJECT_MATERIAL_MAX_NUM; ++i)
 						{
-							DWORD dwItemVnum = t->kMaterials[i].dwItemVnum;
-							DWORD dwItemCount = t->kMaterials[i].dwCount;
+							uint32_t dwItemVnum = t->kMaterials[i].dwItemVnum;
+							uint32_t dwItemCount = t->kMaterials[i].dwCount;
 
 							if (dwItemVnum == 0)
 								break;
@@ -3235,7 +3235,7 @@ ACMD(do_build)
 					return;
 				}
 
-				DWORD vid = 0;
+				uint32_t vid = 0;
 				str_to_number(vid, arg1);
 				pkLand->RequestDeleteObjectByVID(vid);
 			}
@@ -3247,7 +3247,7 @@ ACMD(do_build)
 		case 'w' :
 			if (GMLevel > GM_PLAYER) 
 			{
-				int mapIndex = ch->GetMapIndex();
+				int32_t mapIndex = ch->GetMapIndex();
 
 				one_argument(line, arg1, sizeof(arg1));
 				
@@ -3289,7 +3289,7 @@ ACMD(do_build)
 
 			if (GMLevel >  GM_PLAYER) 
 			{
-				int setID = 0, wallSize = 0;
+				int32_t setID = 0, wallSize = 0;
 				char arg5[256], arg6[256];
 				line = two_arguments(line, arg1, sizeof(arg1), arg2, sizeof(arg2));
 				line = two_arguments(line, arg3, sizeof(arg3), arg4, sizeof(arg4));
@@ -3324,7 +3324,7 @@ ACMD(do_build)
 			if (GMLevel > GM_PLAYER) 
 			{
 				one_argument(line, arg1, sizeof(arg1));
-				DWORD id = 0;
+				uint32_t id = 0;
 				str_to_number(id, arg1);
 				pkLand->RequestDeleteWallBlocks(id);
 			}
@@ -3363,7 +3363,7 @@ ACMD(do_horse_level)
 	char arg1[256] = {0};
 	char arg2[256] = {0};
 	LPCHARACTER victim;
-	int	level = 0;
+	int32_t	level = 0;
 
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 
@@ -3375,7 +3375,7 @@ ACMD(do_horse_level)
 
 	victim = CHARACTER_MANAGER::instance().FindPC(arg1);
 
-	if (NULL == victim)
+	if (nullptr == victim)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("존재하지 않는 캐릭터 입니다."));
 		return;
@@ -3395,7 +3395,7 @@ ACMD(do_horse_level)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
-	int level = MINMAX(0, atoi(arg1), HORSE_MAX_LEVEL);
+	int32_t level = MINMAX(0, atoi(arg1), HORSE_MAX_LEVEL);
 
 	ch->ChatPacket(CHAT_TYPE_INFO, "horse level set to %d.", level);
 	ch->SetHorseLevel(level);
@@ -3431,9 +3431,9 @@ ACMD(do_horse_set_stat)
 
 	if (*arg1 && *arg2)
 	{
-		int hp = 0;
+		int32_t hp = 0;
 		str_to_number(hp, arg1);
-		int stam = 0;
+		int32_t stam = 0;
 		str_to_number(stam, arg2);
 		ch->UpdateHorseHealth(hp - ch->GetHorseHealth());
 		ch->UpdateHorseStamina(stam - ch->GetHorseStamina());
@@ -3457,7 +3457,7 @@ ACMD(do_save_attribute_to_image) // command "/saveati" for alias
 		return;
 	}
 
-	long lMapIndex = 0;
+	int32_t lMapIndex = 0;
 	str_to_number(lMapIndex, szMapIndex);
 
 	if (SECTREE_MANAGER::instance().SaveAttributeToImage(lMapIndex, szFileName))
@@ -3505,9 +3505,9 @@ ACMD(do_affect_remove)
 
 	CAffect * af;
 
-	DWORD	type = 0;
+	uint32_t	type = 0;
 	str_to_number(type, arg1);
-	BYTE	point = 0;
+	uint8_t	point = 0;
 	str_to_number(point, arg2);
 	while ((af = ch->FindAffect(type, point)))
 	{
@@ -3574,7 +3574,7 @@ ACMD(do_end_duel)
 	one_argument(argument, szName, sizeof(szName));
 
 	LPCHARACTER pChar = CHARACTER_MANAGER::instance().FindPC(szName);
-	if (pChar == NULL)
+	if (pChar == nullptr)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("존재하지 않는 캐릭터 입니다."));
 		return;
@@ -3596,8 +3596,8 @@ ACMD(do_duel)
 	char szName2[256];
 	char szSet[256];
 	char szMinute[256];
-	int set = 0;
-	int minute = 0;
+	int32_t set = 0;
+	int32_t minute = 0;
 
 	argument = two_arguments(argument, szName1, sizeof(szName1), szName2, sizeof(szName2));
 	two_arguments(argument, szSet, sizeof(szSet), szMinute, sizeof(szMinute));
@@ -3616,7 +3616,7 @@ ACMD(do_duel)
 	LPCHARACTER pChar1 = CHARACTER_MANAGER::instance().FindPC(szName1);
 	LPCHARACTER pChar2 = CHARACTER_MANAGER::instance().FindPC(szName2);
 
-	if (pChar1 != NULL && pChar2 != NULL)
+	if (pChar1 != nullptr && pChar2 != nullptr)
 	{
 		pChar1->RemoveGoodAffect();
 		pChar2->RemoveGoodAffect();
@@ -3625,7 +3625,7 @@ ACMD(do_duel)
 		pChar2->RemoveBadAffect();
 
 		LPPARTY pParty = pChar1->GetParty();
-		if (pParty != NULL)
+		if (pParty != nullptr)
 		{
 			if (pParty->GetMemberCount() == 2)
 			{
@@ -3639,7 +3639,7 @@ ACMD(do_duel)
 		}
 	
 		pParty = pChar2->GetParty();
-		if (pParty != NULL)
+		if (pParty != nullptr)
 		{
 			if (pParty->GetMemberCount() == 2)
 			{
@@ -3683,7 +3683,7 @@ ACMD(do_stat_plus_amount)
 		return;
 	}
 
-	int nRemainPoint = ch->GetPoint(POINT_STAT);
+	int32_t nRemainPoint = ch->GetPoint(POINT_STAT);
 
 	if (nRemainPoint <= 0)
 	{
@@ -3691,7 +3691,7 @@ ACMD(do_stat_plus_amount)
 		return;
 	}
 
-	int nPoint = 0;
+	int32_t nPoint = 0;
 	str_to_number(nPoint, szPoint);
 
 	if (nRemainPoint < nPoint)
@@ -3758,8 +3758,8 @@ ACMD(do_stat_plus_amount)
 
 struct tTwoPID
 {
-	int pid1;
-	int pid2;
+	int32_t pid1;
+	int32_t pid2;
 };
 
 ACMD(do_break_marriage)
@@ -3782,7 +3782,7 @@ ACMD(do_effect)
 
 	one_argument(argument, arg1, sizeof(arg1));
 
-	int	effect_type = 0;
+	int32_t	effect_type = 0;
 	str_to_number(effect_type, arg1);
 	ch->EffectPacket(effect_type);
 }
@@ -3790,8 +3790,8 @@ ACMD(do_effect)
 
 struct FCountInMap
 {
-	int m_Count[4];
-	FCountInMap() { memset(m_Count, 0, sizeof(int) * 4); }
+	int32_t m_Count[4];
+	FCountInMap() { memset(m_Count, 0, sizeof(int32_t) * 4); }
 	void operator()(LPENTITY ent)
 	{
 		if (ent->IsType(ENTITY_CHARACTER))
@@ -3801,7 +3801,7 @@ struct FCountInMap
 				++m_Count[ch->GetEmpire()];
 		}
 	}
-	int GetCount(BYTE bEmpire) { return m_Count[bEmpire]; } 
+	int32_t GetCount(uint8_t bEmpire) { return m_Count[bEmpire]; } 
 };
 
 ACMD(do_threeway_war_info)
@@ -3810,7 +3810,7 @@ ACMD(do_threeway_war_info)
 	ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("선택 맵 정보 성지 %d 통로 %d %d %d"), GetSungziMapIndex(), GetPassMapIndex(1), GetPassMapIndex(2), GetPassMapIndex(3)); 
 	ch->ChatPacket(CHAT_TYPE_INFO, "ThreewayPhase %d", CThreeWayWar::instance().GetRegenFlag());
 
-	for (int n = 1; n < 4; ++n)
+	for (int32_t n = 1; n < 4; ++n)
 	{
 		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap(GetSungziMapIndex());
 
@@ -3849,7 +3849,7 @@ ACMD(do_reset_subskill)
 	
 	LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(arg1);
 	
-	if (tch == NULL)
+	if (tch == nullptr)
 		return;
 
 	tch->ClearSubSkill();
@@ -3867,10 +3867,10 @@ ACMD(do_flush)
 		return;
 	}
 
-	DWORD pid = (DWORD) strtoul(arg1, NULL, 10);
+	uint32_t pid = (uint32_t) strtoul(arg1, nullptr, 10);
 
-	db_clientdesc->DBPacketHeader(HEADER_GD_FLUSH_CACHE, 0, sizeof(DWORD));
-	db_clientdesc->Packet(&pid, sizeof(DWORD));
+	db_clientdesc->DBPacketHeader(HEADER_GD_FLUSH_CACHE, 0, sizeof(uint32_t));
+	db_clientdesc->Packet(&pid, sizeof(uint32_t));
 }
 
 ACMD(do_eclipse)
@@ -3878,7 +3878,7 @@ ACMD(do_eclipse)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
-	if (strtol(arg1, NULL, 10) == 1)
+	if (strtol(arg1, nullptr, 10) == 1)
 	{
 		quest::CQuestManager::instance().RequestSetEventFlag("eclipse", 1);
 	}
@@ -3891,7 +3891,7 @@ ACMD(do_eclipse)
 ACMD(do_event_helper)
 {
 	char arg1[256];
-	int mode = 0;
+	int32_t mode = 0;
 
 	one_argument(argument, arg1, sizeof(arg1));
 	str_to_number(mode, arg1);
@@ -3910,7 +3910,7 @@ ACMD(do_event_helper)
 
 struct FMobCounter
 {
-	int nCount;
+	int32_t nCount;
 
 	void operator () (LPENTITY ent)
 	{
@@ -3930,7 +3930,7 @@ ACMD(do_get_mob_count)
 {
 	LPSECTREE_MAP pSectree = SECTREE_MANAGER::instance().GetMap(ch->GetMapIndex());
 
-	if (pSectree == NULL)
+	if (pSectree == nullptr)
 		return;
 
 	FMobCounter f;
@@ -3945,7 +3945,7 @@ ACMD(do_clear_land)
 {
 	const building::CLand* pLand = building::CManager::instance().FindLand(ch->GetMapIndex(), ch->GetX(), ch->GetY());
 
-	if( NULL == pLand )
+	if( nullptr == pLand )
 	{
 		return;
 	}
@@ -4003,13 +4003,13 @@ ACMD(do_set_stat)
 			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("명령어의 서브 커맨드가 잘못 되었습니다."));
 			return;
 		}
-		int nRemainPoint = tch->GetPoint(POINT_STAT);
-		int nCurPoint = tch->GetRealPoint(subcmd);
-		int nChangeAmount = 0;
+		int32_t nRemainPoint = tch->GetPoint(POINT_STAT);
+		int32_t nCurPoint = tch->GetRealPoint(subcmd);
+		int32_t nChangeAmount = 0;
 		str_to_number(nChangeAmount, szChangeAmount);
-		int nPoint = nCurPoint + nChangeAmount;
+		int32_t nPoint = nCurPoint + nChangeAmount;
 		
-		int n = -1;
+		int32_t n = -1;
 		switch (subcmd)
 		{
 		case POINT_HT:
@@ -4066,7 +4066,7 @@ ACMD(do_set_stat)
 		tch->PointChange(POINT_STAT, -nChangeAmount);
 		tch->ComputePoints();
 
-		const char* stat_name[4] = {"con", "int", "str", "dex"};
+		const char* stat_name[4] = {"con", "int32_t", "str", "dex"};
 		if (-1 == n)
 			return;
 		ch->ChatPacket(CHAT_TYPE_INFO, "%s's %s change %d to %d", szName, stat_name[n], nCurPoint, nPoint);
@@ -4075,10 +4075,10 @@ ACMD(do_set_stat)
 
 ACMD(do_get_item_id_list)
 {
-	for (int i = 0; i < INVENTORY_AND_EQUIP_SLOT_MAX; i++)
+	for (int32_t i = 0; i < INVENTORY_AND_EQUIP_SLOT_MAX; i++)
 	{
 		LPITEM item = ch->GetInventoryItem(i);
-		if (item != NULL)
+		if (item != nullptr)
 			ch->ChatPacket(CHAT_TYPE_INFO, "cell : %d, name : %s, id : %d", item->GetCell(), item->GetName(), item->GetID());
 	}
 }
@@ -4091,7 +4091,7 @@ ACMD(do_set_socket)
 
 	one_argument (two_arguments (argument, arg1, sizeof (arg1), arg2, sizeof(arg2)), arg3, sizeof (arg3));
 	
-	int item_id, socket_num, value;
+	int32_t item_id, socket_num, value;
 	if (!str_to_number (item_id, arg1) || !str_to_number (socket_num, arg2) || !str_to_number (value, arg3))
 		return;
 	
@@ -4111,7 +4111,7 @@ ACMD (do_can_dead)
 ACMD (do_all_skill_master)
 {
 	ch->SetHorseLevel(SKILL_MAX_LEVEL);
-	for (int i = 0; i < SKILL_MAX_NUM; i++)
+	for (int32_t i = 0; i < SKILL_MAX_NUM; i++)
 	{
 		if (true == ch->CanUseSkill(i))
 		{
@@ -4166,16 +4166,16 @@ ACMD (do_all_skill_master)
 
 ACMD (do_item_full_set)
 {
-	BYTE job = ch->GetJob();
+	uint8_t job = ch->GetJob();
 	LPITEM item;
-	for (int i = 0; i < 6; i++)
+	for (int32_t i = 0; i < 6; i++)
 	{
 		item = ch->GetWear(i);
-		if (item != NULL)
+		if (item != nullptr)
 			ch->UnequipItem(item);
 	}
 	item = ch->GetWear(WEAR_SHIELD);
-	if (item != NULL)
+	if (item != nullptr)
 		ch->UnequipItem(item);
 
 	switch (job)
@@ -4332,7 +4332,7 @@ ACMD (do_item_full_set)
 
 ACMD (do_attr_full_set)
 {
-	BYTE job = ch->GetJob();
+	uint8_t job = ch->GetJob();
 	LPITEM item;
 
 	switch (job)
@@ -4348,7 +4348,7 @@ ACMD (do_attr_full_set)
 			// 무사 몸빵 셋팅.
 			// 이것만 나와 있어서 임시로 모든 직군 다 이런 속성 따름.
 			item = ch->GetWear(WEAR_HEAD);
-			if (item != NULL)
+			if (item != nullptr)
 			{
 				item->ClearAttribute();
 				item->SetForceAttribute( 0, APPLY_ATT_SPEED, 8);
@@ -4359,7 +4359,7 @@ ACMD (do_attr_full_set)
 			}
 
 			item = ch->GetWear(WEAR_WEAPON);
-			if (item != NULL)
+			if (item != nullptr)
 			{
 				item->ClearAttribute();
 				item->SetForceAttribute( 0, APPLY_CAST_SPEED, 20);
@@ -4370,7 +4370,7 @@ ACMD (do_attr_full_set)
 			}
 
 			item = ch->GetWear(WEAR_SHIELD);
-			if (item != NULL)
+			if (item != nullptr)
 			{
 				item->ClearAttribute();
 				item->SetForceAttribute( 0, APPLY_CON, 12);
@@ -4381,7 +4381,7 @@ ACMD (do_attr_full_set)
 			}
 
 			item = ch->GetWear(WEAR_BODY);
-			if (item != NULL)
+			if (item != nullptr)
 			{
 				item->ClearAttribute();
 				item->SetForceAttribute( 0, APPLY_MAX_HP, 2000);
@@ -4392,7 +4392,7 @@ ACMD (do_attr_full_set)
 			}
 
 			item = ch->GetWear(WEAR_FOOTS);
-			if (item != NULL)
+			if (item != nullptr)
 			{
 				item->ClearAttribute();
 				item->SetForceAttribute( 0, APPLY_MAX_HP, 2000);
@@ -4403,7 +4403,7 @@ ACMD (do_attr_full_set)
 			}
 
 			item = ch->GetWear(WEAR_WRIST);
-			if (item != NULL)
+			if (item != nullptr)
 			{
 				item->ClearAttribute();
 				item->SetForceAttribute( 0, APPLY_MAX_HP, 2000);
@@ -4413,7 +4413,7 @@ ACMD (do_attr_full_set)
 				item->SetForceAttribute( 4, APPLY_MANA_BURN_PCT, 10);
 			}
 			item = ch->GetWear(WEAR_NECK);
-			if (item != NULL)
+			if (item != nullptr)
 			{
 				item->ClearAttribute();
 				item->SetForceAttribute( 0, APPLY_MAX_HP, 2000);
@@ -4423,7 +4423,7 @@ ACMD (do_attr_full_set)
 				item->SetForceAttribute( 4, APPLY_STEAL_SP, 10);
 			}
 			item = ch->GetWear(WEAR_EAR);
-			if (item != NULL)
+			if (item != nullptr)
 			{
 				item->ClearAttribute();
 				item->SetForceAttribute( 0, APPLY_MOV_SPEED, 20);
@@ -4439,9 +4439,9 @@ ACMD (do_attr_full_set)
 
 ACMD (do_full_set)
 {
-	do_all_skill_master(ch, NULL, 0, 0);
-	do_item_full_set(ch, NULL, 0, 0);
-	do_attr_full_set(ch, NULL, 0, 0);
+	do_all_skill_master(ch, nullptr, 0, 0);
+	do_item_full_set(ch, nullptr, 0, 0);
+	do_attr_full_set(ch, nullptr, 0, 0);
 }
 
 ACMD (do_use_item)
@@ -4450,7 +4450,7 @@ ACMD (do_use_item)
 
 	one_argument (argument, arg1, sizeof (arg1));
 
-	int cell = 0;
+	int32_t cell = 0;
 	str_to_number(cell, arg1);
 	
 	LPITEM item = ch->GetInventoryItem(cell);
@@ -4478,7 +4478,7 @@ ACMD (do_dragon_soul)
 	case 'a':
 		{
 			one_argument (rest, arg1, sizeof(arg1));
-			int deck_idx;
+			int32_t deck_idx;
 			if (str_to_number(deck_idx, arg1) == false)
 			{
 				return;
@@ -4496,12 +4496,12 @@ ACMD (do_dragon_soul)
 
 ACMD (do_ds_list)
 {
-	for (int i = 0; i < DRAGON_SOUL_INVENTORY_MAX_NUM; i++)
+	for (int32_t i = 0; i < DRAGON_SOUL_INVENTORY_MAX_NUM; i++)
 	{
 		TItemPos cell(DRAGON_SOUL_INVENTORY, i);
 		
 		LPITEM item = ch->GetItem(cell);
-		if (item != NULL)
+		if (item != nullptr)
 			ch->ChatPacket(CHAT_TYPE_INFO, "cell : %d, name : %s, id : %d", item->GetCell(), item->GetName(), item->GetID());
 	}
 }

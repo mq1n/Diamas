@@ -13,13 +13,13 @@ namespace NSound
 	} TSoundData;
 	typedef struct SSoundInstance
 	{
-		DWORD dwFrame;
+		uint32_t dwFrame;
 		std::string strSoundFileName;
 	} TSoundInstance;
 	typedef std::vector<TSoundData> TSoundDataVector;
 	typedef std::vector<TSoundInstance> TSoundInstanceVector;
 
-	bool			LoadSoundInformationPiece(const char * c_szFileName, TSoundDataVector & rSoundDataVector, const char * c_szPathHeader = NULL);
+	bool			LoadSoundInformationPiece(const char * c_szFileName, TSoundDataVector & rSoundDataVector, const char * c_szPathHeader = nullptr);
 	bool			SaveSoundInformationPiece(const char * c_szFileName, TSoundDataVector & rSoundDataVector);
 	void			DataToInstance(const TSoundDataVector & c_rSoundDataVector, TSoundInstanceVector * pSoundInstanceVector);
 

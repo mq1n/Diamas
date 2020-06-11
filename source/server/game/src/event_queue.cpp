@@ -28,7 +28,7 @@ void CEventQueue::Destroy()
 	}
 }
 
-TQueueElement * CEventQueue::Enqueue(LPEVENT pvData, int duration, int pulse)
+TQueueElement * CEventQueue::Enqueue(LPEVENT pvData, int32_t duration, int32_t pulse)
 {
 #ifdef M2_USE_POOL
 	TQueueElement * pElem = pool_.Construct();
@@ -48,7 +48,7 @@ TQueueElement * CEventQueue::Enqueue(LPEVENT pvData, int duration, int pulse)
 TQueueElement * CEventQueue::Dequeue()
 {
 	if (m_pq_queue.empty())
-		return NULL;
+		return nullptr;
 
 	TQueueElement * pElem = m_pq_queue.top();
 	m_pq_queue.pop();
@@ -64,7 +64,7 @@ void CEventQueue::Delete(TQueueElement * pElem)
 #endif
 }
 
-int CEventQueue::GetTopKey()
+int32_t CEventQueue::GetTopKey()
 {
 	if (m_pq_queue.empty())
 		return INT_MAX;
@@ -72,7 +72,7 @@ int CEventQueue::GetTopKey()
 	return m_pq_queue.top()->iKey;
 }
 
-int CEventQueue::Size()
+int32_t CEventQueue::Size()
 {
 	return m_pq_queue.size();
 }

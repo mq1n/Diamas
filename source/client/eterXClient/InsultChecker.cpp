@@ -26,14 +26,14 @@ void CInsultChecker::AppendInsult(const std::string& c_rstInsult)
 		m_kList_stInsult.push_back(c_rstInsult);
 }
 
-bool CInsultChecker::__GetInsultLength(const char* c_szWord, UINT* puInsultLen)
+bool CInsultChecker::__GetInsultLength(const char* c_szWord, uint32_t* puInsultLen)
 {
 	std::list<std::string>::iterator i;
 	for (i=m_kList_stInsult.begin(); i!=m_kList_stInsult.end(); ++i)
 	{
 		std::string& rstInsult=*i;
 
-		int ret=LocaleService_StringCompareCI(c_szWord, rstInsult.c_str(), rstInsult.length());		
+		int32_t ret=LocaleService_StringCompareCI(c_szWord, rstInsult.c_str(), rstInsult.length());		
 		if (0==ret)
 		{
 			*puInsultLen=rstInsult.length();
@@ -46,17 +46,17 @@ bool CInsultChecker::__GetInsultLength(const char* c_szWord, UINT* puInsultLen)
 
 bool CInsultChecker::__IsInsult(const char* c_szWord)
 {
-	UINT uInsultLen;
+	uint32_t uInsultLen;
 	return __GetInsultLength(c_szWord, &uInsultLen);
 }
 
-void CInsultChecker::FilterInsult(char* szLine, UINT uLineLen)
+void CInsultChecker::FilterInsult(char* szLine, uint32_t uLineLen)
 {
 	const char INSULT_FILTER_CHAR = '*'; 
-	for (UINT uPos=0; uPos<uLineLen;)
+	for (uint32_t uPos=0; uPos<uLineLen;)
 	{
-		BYTE bChr=szLine[uPos];
-		UINT uInsultLen;
+		uint8_t bChr=szLine[uPos];
+		uint32_t uInsultLen;
 		if (__GetInsultLength(szLine+uPos, &uInsultLen))
 		{
 			memset(szLine+uPos, INSULT_FILTER_CHAR, uInsultLen);
@@ -72,11 +72,11 @@ void CInsultChecker::FilterInsult(char* szLine, UINT uLineLen)
 	}
 }
 
-bool CInsultChecker::IsInsultIn(const char* c_szLine, UINT uLineLen)
+bool CInsultChecker::IsInsultIn(const char* c_szLine, uint32_t uLineLen)
 {
-	for (UINT uPos=0; uPos<uLineLen;)
+	for (uint32_t uPos=0; uPos<uLineLen;)
 	{
-		BYTE bChr=c_szLine[uPos];
+		uint8_t bChr=c_szLine[uPos];
 		if (bChr & 0x80)
 		{
 			if (__IsInsult(c_szLine+uPos))

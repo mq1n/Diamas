@@ -1,5 +1,5 @@
 
-extern int BlueDragon_StateBattle (LPCHARACTER);
-extern time_t UseBlueDragonSkill (LPCHARACTER, unsigned int);
-extern int BlueDragon_Damage (LPCHARACTER me, LPCHARACTER attacker, int dam);
+extern int32_t BlueDragon_StateBattle (LPCHARACTER);
+extern time_t UseBlueDragonSkill (LPCHARACTER, uint32_t);
+extern int32_t BlueDragon_Damage (LPCHARACTER me, LPCHARACTER attacker, int32_t dam);
 

@@ -6,11 +6,11 @@
 class CSymTable  
 {
     public:
-	CSymTable(int aTok, std::string aStr);
+	CSymTable(int32_t aTok, std::string aStr);
 	virtual ~CSymTable();
 
 	double		dVal;
-	int		token;
+	int32_t		token;
 	std::string	strlex;
 };
 

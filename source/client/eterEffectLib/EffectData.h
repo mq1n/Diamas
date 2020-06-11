@@ -21,14 +21,14 @@ class CEffectData
 		bool							LoadScript(const char * c_szFileName);
 		bool							LoadSoundScriptData(const char * c_szFileName);
 
-		DWORD							GetParticleCount();
-		CParticleSystemData *			GetParticlePointer(DWORD dwPosition);
+		uint32_t							GetParticleCount();
+		CParticleSystemData *			GetParticlePointer(uint32_t dwPosition);
 
-		DWORD							GetMeshCount();
-		CEffectMeshScript *				GetMeshPointer(DWORD dwPosition);
+		uint32_t							GetMeshCount();
+		CEffectMeshScript *				GetMeshPointer(uint32_t dwPosition);
 
-		DWORD							GetLightCount();
-		CLightData *					GetLightPointer(DWORD dwPosition);
+		uint32_t							GetLightCount();
+		CLightData *					GetLightPointer(uint32_t dwPosition);
 
 		NSound::TSoundInstanceVector *	GetSoundInstanceVector();
 

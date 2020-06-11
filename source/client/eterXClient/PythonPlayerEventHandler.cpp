@@ -19,12 +19,12 @@ void CPythonPlayerEventHandler::OnClearAffects()
 	CPythonPlayer::Instance().ClearAffects();
 }
 
-void CPythonPlayerEventHandler::OnSetAffect(UINT uAffect)
+void CPythonPlayerEventHandler::OnSetAffect(uint32_t uAffect)
 {
 	CPythonPlayer::Instance().SetAffect(uAffect);
 }
 
-void CPythonPlayerEventHandler::OnResetAffect(UINT uAffect)
+void CPythonPlayerEventHandler::OnResetAffect(uint32_t uAffect)
 {
 	CPythonPlayer::Instance().ResetAffect(uAffect);
 }
@@ -37,7 +37,7 @@ void CPythonPlayerEventHandler::OnSyncing(const SState& c_rkState)
 
 void CPythonPlayerEventHandler::OnWaiting(const SState& c_rkState)
 {
-	DWORD dwCurTime=ELTimer_GetMSec();
+	uint32_t dwCurTime=ELTimer_GetMSec();
 	if (m_dwNextWaitingNotifyTime>dwCurTime)
 		return;
 
@@ -61,7 +61,7 @@ void CPythonPlayerEventHandler::OnWaiting(const SState& c_rkState)
 
 void CPythonPlayerEventHandler::OnMoving(const SState& c_rkState)
 {
-	DWORD dwCurTime=ELTimer_GetMSec();		
+	uint32_t dwCurTime=ELTimer_GetMSec();		
 	if (m_dwNextMovingNotifyTime>dwCurTime)
 		return;
 	
@@ -75,7 +75,7 @@ void CPythonPlayerEventHandler::OnMoving(const SState& c_rkState)
 
 void CPythonPlayerEventHandler::OnMove(const SState& c_rkState)
 {
-	DWORD dwCurTime=ELTimer_GetMSec();
+	uint32_t dwCurTime=ELTimer_GetMSec();
 	m_dwNextWaitingNotifyTime=dwCurTime+100;
 	m_dwNextMovingNotifyTime=dwCurTime+300;
 
@@ -99,7 +99,7 @@ void CPythonPlayerEventHandler::OnWarp(const SState& c_rkState)
 	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_WAIT, 0);
 }
 
-void CPythonPlayerEventHandler::OnAttack(const SState& c_rkState, WORD wMotionIndex)
+void CPythonPlayerEventHandler::OnAttack(const SState& c_rkState, uint16_t wMotionIndex)
 {
 //	Tracef("CPythonPlayerEventHandler::OnAttack [%d]\n", wMotionIndex);
 	assert(wMotionIndex < 255);
@@ -108,7 +108,7 @@ void CPythonPlayerEventHandler::OnAttack(const SState& c_rkState, WORD wMotionIn
 	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_COMBO, wMotionIndex);
 }
 
-void CPythonPlayerEventHandler::OnUseSkill(const SState& c_rkState, UINT uMotSkill, UINT uArg)
+void CPythonPlayerEventHandler::OnUseSkill(const SState& c_rkState, uint32_t uMotSkill, uint32_t uArg)
 {
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
 	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_SKILL|uMotSkill, uArg);
@@ -123,9 +123,9 @@ void CPythonPlayerEventHandler::OnChangeShape()
 	CPythonPlayer::Instance().NEW_Stop();
 }
 
-void CPythonPlayerEventHandler::OnHit(UINT uSkill, CActorInstance& rkActorVictim, BOOL isSendPacket)
+void CPythonPlayerEventHandler::OnHit(uint32_t uSkill, CActorInstance& rkActorVictim, BOOL isSendPacket)
 {
-	DWORD dwVIDVictim=rkActorVictim.GetVirtualID();
+	uint32_t dwVIDVictim=rkActorVictim.GetVirtualID();
 
 	// Update Target
 	CPythonPlayer::Instance().SetTarget(dwVIDVictim, FALSE);
@@ -141,7 +141,7 @@ void CPythonPlayerEventHandler::OnHit(UINT uSkill, CActorInstance& rkActorVictim
 		return;
 
 	// 거대 몬스터 밀림 제외
-	extern bool IS_HUGE_RACE(unsigned int vnum);
+	extern bool IS_HUGE_RACE(uint32_t vnum);
 	if (IS_HUGE_RACE(rkActorVictim.GetRace()))
 		return;
 
@@ -152,8 +152,8 @@ void CPythonPlayerEventHandler::OnHit(UINT uSkill, CActorInstance& rkActorVictim
 
 	SVictim kVictim;
 	kVictim.m_dwVID=dwVIDVictim;
-	kVictim.m_lPixelX=long(kPPosLast.x);
-	kVictim.m_lPixelY=long(kPPosLast.y);
+	kVictim.m_lPixelX=int32_t(kPPosLast.x);
+	kVictim.m_lPixelY=int32_t(kPPosLast.y);
 
 	rkActorVictim.TEMP_Push(kVictim.m_lPixelX, kVictim.m_lPixelY);
 
@@ -166,8 +166,8 @@ void CPythonPlayerEventHandler::FlushVictimList()
 		return;
 
 	// #0000682: [M2EU] 대진각 스킬 사용시 튕김 
-	unsigned int SYNC_POSITION_COUNT_LIMIT = 16;
-	unsigned int uiVictimCount = m_kVctkVictim.size();
+	uint32_t SYNC_POSITION_COUNT_LIMIT = 16;
+	uint32_t uiVictimCount = m_kVctkVictim.size();
 
 	CPythonNetworkStream& rkStream=CPythonNetworkStream::Instance();
 
@@ -177,7 +177,7 @@ void CPythonPlayerEventHandler::FlushVictimList()
 
 	rkStream.Send(sizeof(kPacketSyncPos), &kPacketSyncPos);
 
-	for (unsigned int i = 0; i < uiVictimCount; ++i)
+	for (uint32_t i = 0; i < uiVictimCount; ++i)
 	{
 		const SVictim& rkVictim =  m_kVctkVictim[i];
 		rkStream.SendSyncPositionElementPacket(rkVictim.m_dwVID, rkVictim.m_lPixelX, rkVictim.m_lPixelY);		
@@ -207,7 +207,7 @@ void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnSe
 	CPythonNetworkStream& rpns=CPythonNetworkStream::Instance();
 	rpns.SendFlyTargetingPacket(m_pInstTarget->GetVirtualID(), m_pInstTarget->GetGraphicThingInstancePtr()->OnGetFlyTargetPosition());
 }
-void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnShoot(DWORD dwSkillIndex)
+void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnShoot(uint32_t dwSkillIndex)
 {
 	CPythonNetworkStream& rpns=CPythonNetworkStream::Instance();
 	rpns.SendShootPacket(dwSkillIndex);
@@ -225,7 +225,7 @@ void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::SetT
 	m_pInstTarget = pInstTarget;
 }
 
-void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnExplodingAtAnotherTarget(DWORD dwSkillIndex, DWORD dwVID)
+void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnExplodingAtAnotherTarget(uint32_t dwSkillIndex, uint32_t dwVID)
 {
 	return;
 
@@ -241,7 +241,7 @@ void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnEx
 		pInstance->GetGraphicThingInstanceRef().OnShootDamage();
 	}
 }
-void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnExplodingAtTarget(DWORD dwSkillIndex)
+void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnExplodingAtTarget(uint32_t dwSkillIndex)
 {
 //	Tracef("Shoot : 원하는 target에 맞았습니다 : %d, %d\n", dwSkillIndex, m_pInstTarget->GetVirtualID());
 //	CPythonNetworkStream& rkStream=CPythonNetworkStream::Instance();

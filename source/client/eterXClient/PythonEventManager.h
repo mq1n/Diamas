@@ -10,12 +10,12 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 	public:
 		typedef struct STextLine
 		{
-			int ixLocal, iyLocal;
+			int32_t ixLocal, iyLocal;
 			CGraphicTextInstance * pInstance;
 		} TTextLine;
 
 		typedef std::list<TTextLine> TScriptTextLineList;
-		typedef std::map<int, std::string> TEventAnswerMap;
+		typedef std::map<int32_t, std::string> TEventAnswerMap;
 
 		enum
 		{
@@ -92,21 +92,21 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 		};
 
 	private:
-		std::map<std::string, int> EventTypeMap;
+		std::map<std::string, int32_t> EventTypeMap;
 
 	public:
 		typedef struct SEventSet
 		{
-			int ix, iy;
-			int iWidth;
-			int iyLocal;
+			int32_t ix, iy;
+			int32_t iWidth;
+			int32_t iyLocal;
 
 			// State
 			bool isLock;
 
-			long lLastDelayTime;
+			int32_t lLastDelayTime;
 
-			int iCurrentLetter;
+			int32_t iCurrentLetter;
 
 			D3DXCOLOR CurrentColor;
 			std::string strCurrentLine;
@@ -116,7 +116,7 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 
 			BOOL isConfirmWait;
 			CGraphicTextInstance * pConfirmTimeTextLine;
-			int iConfirmEndTime;
+			int32_t iConfirmEndTime;
 
 			// Group Data
 			script::Group ScriptGroup;
@@ -124,16 +124,16 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 			// Static Data
 			char szFileName[32+1];
 
-			int iVisibleStartLine;
-			int iVisibleLineCount;
+			int32_t iVisibleStartLine;
+			int32_t iVisibleLineCount;
 
-			int iAdjustLine;
+			int32_t iAdjustLine;
 
 			D3DXCOLOR DiffuseColor;
-			long lWaitingTime;
-			int iRestrictedCharacterCount;
+			int32_t lWaitingTime;
+			int32_t iRestrictedCharacterCount;
 
-			int nAnswer;
+			int32_t nAnswer;
 
 			bool isTextCenterMode;
 			bool isWaitFlag;
@@ -153,52 +153,52 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 
 		void Destroy();
 
-		int RegisterEventSet(const char * c_szFileName);
-		int RegisterEventSetFromString(const std::string& strScript);
-		void ClearEventSeti(int iIndex);
+		int32_t RegisterEventSet(const char * c_szFileName);
+		int32_t RegisterEventSetFromString(const std::string& strScript);
+		void ClearEventSeti(int32_t iIndex);
 		void __ClearEventSetp(TEventSet * pEventSet);
 
-		void SetEventHandler(int iIndex, PyObject * poEventHandler);
-		void SetRestrictedCount(int iIndex, int iCount);
+		void SetEventHandler(int32_t iIndex, PyObject * poEventHandler);
+		void SetRestrictedCount(int32_t iIndex, int32_t iCount);
 
-		int GetEventSetLocalYPosition(int iIndex);
-		void AddEventSetLocalYPosition(int iIndex, int iAddValue);
-		void InsertText(int iIndex, const char * c_szText, int iX_pos = 0);
+		int32_t GetEventSetLocalYPosition(int32_t iIndex);
+		void AddEventSetLocalYPosition(int32_t iIndex, int32_t iAddValue);
+		void InsertText(int32_t iIndex, const char * c_szText, int32_t iX_pos = 0);
 
-		void UpdateEventSet(int iIndex, int ix, int iy);
-		void RenderEventSet(int iIndex);
-		void SetEventSetWidth(int iIndex, int iWidth);
+		void UpdateEventSet(int32_t iIndex, int32_t ix, int32_t iy);
+		void RenderEventSet(int32_t iIndex);
+		void SetEventSetWidth(int32_t iIndex, int32_t iWidth);
 
-		void Skip(int iIndex);
-		bool IsWait(int iIndex);
-		void EndEventProcess(int iIndex);
+		void Skip(int32_t iIndex);
+		bool IsWait(int32_t iIndex);
+		void EndEventProcess(int32_t iIndex);
 
-		void SelectAnswer(int iIndex, int iAnswer);
-		void SetVisibleStartLine(int iIndex, int iStartLine);
-		int GetVisibleStartLine(int iIndex);
-		int GetLineCount(int iIndex);
-		void SetVisibleLineCount(int iIndex, int iLineCount);
+		void SelectAnswer(int32_t iIndex, int32_t iAnswer);
+		void SetVisibleStartLine(int32_t iIndex, int32_t iStartLine);
+		int32_t GetVisibleStartLine(int32_t iIndex);
+		int32_t GetLineCount(int32_t iIndex);
+		void SetVisibleLineCount(int32_t iIndex, int32_t iLineCount);
 
 		void SetInterfaceWindow(PyObject * poInterface);
 		void SetLeftTimeString(const char * c_szString);
 
 	protected:
 		void __InitEventSet(TEventSet& rEventSet);
-		void __InsertLine(TEventSet& rEventSet, BOOL isCenter=FALSE, int iX_pos=0);
-		void __AddSpace(TEventSet& pEventSet, int iSpace);
+		void __InsertLine(TEventSet& rEventSet, BOOL isCenter=FALSE, int32_t iX_pos=0);
+		void __AddSpace(TEventSet& pEventSet, int32_t iSpace);
 
-		DWORD GetEmptyEventSetSlot();
+		uint32_t GetEmptyEventSetSlot();
 
-		bool CheckEventSetIndex(int iIndex);
+		bool CheckEventSetIndex(int32_t iIndex);
 
 		void ProcessEventSet(TEventSet * pEventSet);
 
 		void ClearLine(TEventSet * pEventSet);		
 		void RefreshLinePosition(TEventSet * pEventSet);		
-		bool GetScriptEventIndex(const char * c_szName, int * pEventPosition, int * pEventType);
+		bool GetScriptEventIndex(const char * c_szName, int32_t * pEventPosition, int32_t * pEventType);
 
 		void MakeQuestion(TEventSet * pEventSet, script::TArgList & rArgumentList);
-		void MakeNextButton(TEventSet * pEventSet, int iButtonType);
+		void MakeNextButton(TEventSet * pEventSet, int32_t iButtonType);
 
 	protected:
 		TEventSetVector m_EventSetVector;

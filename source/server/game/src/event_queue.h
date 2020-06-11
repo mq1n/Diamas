@@ -10,8 +10,8 @@
 struct TQueueElement
 {
 	LPEVENT	pvData;
-	int		iStartTime;
-	int		iKey;
+	int32_t		iStartTime;
+	int32_t		iKey;
 	bool	bCancel;
 };
 
@@ -30,12 +30,12 @@ class CEventQueue
 		CEventQueue();
 		~CEventQueue();
 
-		TQueueElement *	Enqueue(LPEVENT data, int duration, int pulse);
+		TQueueElement *	Enqueue(LPEVENT data, int32_t duration, int32_t pulse);
 		TQueueElement *	Dequeue();
 		void		Delete(TQueueElement * pElem);
-		void		Requeue(TQueueElement *, int key);
-		int		GetTopKey();
-		int		Size();
+		void		Requeue(TQueueElement *, int32_t key);
+		int32_t		GetTopKey();
+		int32_t		Size();
 
 	protected:
 		void		Destroy();

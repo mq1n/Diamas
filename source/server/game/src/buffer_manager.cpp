@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "buffer_manager.h"
 
-TEMP_BUFFER::TEMP_BUFFER(int Size, bool bForceDelete)
+TEMP_BUFFER::TEMP_BUFFER(int32_t Size, bool bForceDelete)
 {
 	forceDelete = bForceDelete;
 
@@ -21,12 +21,12 @@ const void * TEMP_BUFFER::read_peek()
 	return (buffer_read_peek(buf));
 }
 
-void TEMP_BUFFER::write(const void * data, int size)
+void TEMP_BUFFER::write(const void * data, int32_t size)
 {
 	buffer_write(buf, data, size);
 }
 
-int TEMP_BUFFER::size()
+int32_t TEMP_BUFFER::size()
 {
 	return buffer_size(buf);
 }

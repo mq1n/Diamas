@@ -24,17 +24,17 @@ bool CSymbol::Less(CSymbol dif)
     return false;
 }
 
-int CSymbol::GetType()
+int32_t CSymbol::GetType()
 {
     return iType;
 }
 
-void CSymbol::SetType(int Type)
+void CSymbol::SetType(int32_t Type)
 {
     iType=Type;
 }
 
-int CSymbol::issymbol(int ch)
+int32_t CSymbol::issymbol(int32_t ch)
 {
     switch(ch)
     {

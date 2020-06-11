@@ -14,19 +14,19 @@ class CProfiler : public singleton<CProfiler>
 	public:
 		typedef struct SProfileStackData
 		{
-			int iCallStep;
-			long iStartTime;
-			long iEndTime;
+			int32_t iCallStep;
+			int32_t iStartTime;
+			int32_t iEndTime;
 
 			std::string strName;
 		} TProfileStackData;
 
 		typedef struct SProfileAccumData
 		{
-			int iStartTime;
-			int iCallingCount;
-			int iCollapsedTime;
-			int iDepth;
+			int32_t iStartTime;
+			int32_t iCallingCount;
+			int32_t iCollapsedTime;
+			int32_t iDepth;
 
 			std::string strName;
 		} TProfileAccumData;
@@ -35,14 +35,14 @@ class CProfiler : public singleton<CProfiler>
 		{
 			size_t operator () (const std::string& str) const
 			{
-				const unsigned char * s = (const unsigned char *) str.c_str();
-				const unsigned char * end = s + str.size();
+				const uint8_t * s = (const uint8_t *) str.c_str();
+				const uint8_t * end = s + str.size();
 				size_t h = 0;
 
 				while (s < end)
 				{
 					h *= 16777619;
-					h ^= (unsigned char) *(unsigned char *) (s++);
+					h ^= (uint8_t) *(uint8_t *) (s++);
 				}
 
 				return h;
@@ -158,11 +158,11 @@ class CProfiler : public singleton<CProfiler>
 
 		void Print(FILE * fp = stderr)
 		{
-			for (int i = 0; i < m_ProfileStackDataCount; ++i)
+			for (int32_t i = 0; i < m_ProfileStackDataCount; ++i)
 			{
 				TProfileStackData & rProfileStackData = m_ProfileStackDatas[i];
 
-				for (int i = 0; i < rProfileStackData.iCallStep; ++i)
+				for (int32_t i = 0; i < rProfileStackData.iCallStep; ++i)
 					fprintf(fp, "\t");
 
 				fprintf(fp, "%-24s: %lu\n", rProfileStackData.strName.c_str(), rProfileStackData.iEndTime - rProfileStackData.iStartTime);
@@ -172,7 +172,7 @@ class CProfiler : public singleton<CProfiler>
 
 			std::string stLine;
 
-			for (DWORD k = 0; k < m_vec_Accum.size(); ++k)
+			for (uint32_t k = 0; k < m_vec_Accum.size(); ++k)
 			{
 				TProfileAccumData * p = m_vec_Accum[k];
 
@@ -214,7 +214,7 @@ class CProfiler : public singleton<CProfiler>
 	protected:
 		bool GetProfileStackDataPointer(const char * c_szName, TProfileStackData ** ppProfileStackData)
 		{
-			for (int i = 0; i < m_ProfileStackDataCount; ++i)
+			for (int32_t i = 0; i < m_ProfileStackDataCount; ++i)
 			{
 				if (0 == m_ProfileStackDatas[i].strName.compare(c_szName))
 				{
@@ -229,15 +229,15 @@ class CProfiler : public singleton<CProfiler>
 
 	protected:
 		// Profile Stack Data
-		int m_ProfileStackDataCount;
+		int32_t m_ProfileStackDataCount;
 		TProfileStackData m_ProfileStackDatas[STACK_DATA_MAX_NUM];
 
 		// Profile Accum Data
 		TProfileAccumDataMap			m_ProfileAccumDataMap;
 		std::vector<TProfileAccumData *>	m_vec_Accum;
-		int					m_iAccumDepth;
+		int32_t					m_iAccumDepth;
 
-		int					m_iCallStep;
+		int32_t					m_iCallStep;
 };
 
 template <typename T> class CProfileUnit

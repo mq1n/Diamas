@@ -46,14 +46,14 @@ bool CGrannyModelInstance::Intersect(const D3DXMATRIX * c_pMatrix,
 	static stl_stack_pool<TBoundBox> s_boundBoxPool(1024);
 	s_boundBoxPool.clear();
 
-	int meshCount = m_pModel->GetMeshCount();
+	int32_t meshCount = m_pModel->GetMeshCount();
 
-	for (int m = 0; m < meshCount; ++m)
+	for (int32_t m = 0; m < meshCount; ++m)
 	{
 		//const CGrannyMesh * pMesh = m_pModel->GetMeshPointer(m);
 		const granny_mesh * pgrnMesh = m_pModel->GetGrannyModelPointer()->MeshBindings[m].Mesh;
 
-		for (int b = 0; b < pgrnMesh->BoneBindingCount; ++b)
+		for (int32_t b = 0; b < pgrnMesh->BoneBindingCount; ++b)
 		{
 			const granny_bone_binding& rgrnBoneBinding = pgrnMesh->BoneBindings[b];
 
@@ -88,7 +88,7 @@ bool CGrannyModelInstance::Intersect(const D3DXMATRIX * c_pMatrix,
 
 /*
 	TBoundBox* boundBoxs = s_boundBoxPool.base();
-	for (int i = 0; i < s_boundBoxPool.size(); ++i)
+	for (int32_t i = 0; i < s_boundBoxPool.size(); ++i)
 	{
 		TBoundBox& rcurBoundBox=boundBoxs[i];
 
@@ -107,13 +107,13 @@ bool CGrannyModelInstance::Intersect(const D3DXMATRIX * c_pMatrix,
 		else
 		{
 			D3DXMATRIX matMesh;
-			int* toBoneIndices = c_pMesh->GetBoneIndices();
+			int32_t* toBoneIndices = c_pMesh->GetBoneIndices();
 			D3DXMatrixMultiply(&matMesh, (D3DXMATRIX*) pgrnMatCompositeBuffer[toBoneIndices[0]], c_pMatrix);
 
 			granny_tri_material_group* pgrnTriGroups = GrannyGetMeshTriangleGroups(c_pgrnMesh);
-			int mtrlCount = c_pMesh->GetGrannyMeshPointer()->MaterialBindingCount;
-			int vtxCount = GrannyGetMeshVertexCount(c_pgrnMesh);
-			int groupCount = GrannyGetMeshTriangleGroupCount(c_pgrnMesh);
+			int32_t mtrlCount = c_pMesh->GetGrannyMeshPointer()->MaterialBindingCount;
+			int32_t vtxCount = GrannyGetMeshVertexCount(c_pgrnMesh);
+			int32_t groupCount = GrannyGetMeshTriangleGroupCount(c_pgrnMesh);
 
 			TIndex*	modelIndices;
 			TPNTVertex*	modelVertices;
@@ -123,7 +123,7 @@ bool CGrannyModelInstance::Intersect(const D3DXMATRIX * c_pMatrix,
 				TIndex* meshIndices = modelIndices + c_pMesh->GetIndexBasePosition();
 				TPNTVertex* meshVertices = modelVertices + c_pMesh->GetVertexBasePosition();
 
-				for (int i = 0; i < groupCount; ++i)
+				for (int32_t i = 0; i < groupCount; ++i)
 				{
 					granny_tri_material_group& rgrnTriGroup = pgrnTriGroups[i];
 
@@ -184,8 +184,8 @@ void CGrannyModelInstance::GetBoundBox(D3DXVECTOR3* vtMin, D3DXVECTOR3* vtMax)
 	vtMin->x = vtMin->y = vtMin->z = +100000.0f;
 	vtMax->x = vtMax->y = vtMax->z = -100000.0f;
 
-	int meshCount = m_pModel->GetMeshCount();
-	for (int m = 0; m < meshCount; ++m)
+	int32_t meshCount = m_pModel->GetMeshCount();
+	for (int32_t m = 0; m < meshCount; ++m)
 	{
 		//const CGrannyMesh* pMesh = m_pModel->GetMeshPointer(m);
 		const granny_mesh* pgrnMesh = m_pModel->GetGrannyModelPointer()->MeshBindings[m].Mesh;
@@ -193,7 +193,7 @@ void CGrannyModelInstance::GetBoundBox(D3DXVECTOR3* vtMin, D3DXVECTOR3* vtMax)
 		// WORK
 		const granny_int32x* boneIndices = __GetMeshBoneIndices(m);
 		// END_OF_WORK
-		for (int b = 0; b < pgrnMesh->BoneBindingCount; ++b)
+		for (int32_t b = 0; b < pgrnMesh->BoneBindingCount; ++b)
 		{
 			const granny_bone_binding& rgrnBoneBinding = pgrnMesh->BoneBindings[b];
 
@@ -204,12 +204,12 @@ void CGrannyModelInstance::GetBoundBox(D3DXVECTOR3* vtMin, D3DXVECTOR3* vtMax)
 	}
 }
 
-bool CGrannyModelInstance::GetMeshMatrixPointer(int iMesh, const D3DXMATRIX ** c_ppMatrix) const
+bool CGrannyModelInstance::GetMeshMatrixPointer(int32_t iMesh, const D3DXMATRIX ** c_ppMatrix) const
 {
 	if (!m_pgrnModelInstance)
 		return false;
 
-	int meshCount = m_pModel->GetMeshCount();
+	int32_t meshCount = m_pModel->GetMeshCount();
 
 	if (meshCount <= 0)
 		return false;
@@ -245,11 +245,11 @@ void CGraphicThingInstance::DrawBoundBox()
     {
         const CThing::TMesh& rmesh=mc_pMeshVector->at(m);
 
-		for (int b=0; b<rmesh.pgrnMesh->BoneBindingCount; ++b)
+		for (int32_t b=0; b<rmesh.pgrnMesh->BoneBindingCount; ++b)
 		{
 			granny_bone_binding& rgrnBoneBinding=rmesh.pgrnMesh->BoneBindings[b];
 
-			int* toBoneIndices=GrannyGetMeshBindingToBoneIndices(rmesh.pgrnMeshBinding);
+			int32_t* toBoneIndices=GrannyGetMeshBindingToBoneIndices(rmesh.pgrnMeshBinding);
 
 			D3DXMATRIX* pmat=(D3DXMATRIX*)GrannyGetWorldPose4x4(m_pgrnWorldPose, toBoneIndices[b]);
 

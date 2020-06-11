@@ -21,7 +21,7 @@ SECTREE::~SECTREE()
 void SECTREE::Initialize()
 {
 	m_id.package = 0;
-	m_pkAttribute = NULL;
+	m_pkAttribute = nullptr;
 	m_iPCCount = 0;
 	isClone = false;
 }
@@ -66,7 +66,7 @@ void SECTREE::Destroy()
 	if (!isClone && m_pkAttribute)
 	{
 		M2_DELETE(m_pkAttribute);
-		m_pkAttribute = NULL;
+		m_pkAttribute = nullptr;
 	}
 }
 
@@ -170,7 +170,7 @@ void SECTREE::RemoveEntity(LPENTITY pkEnt)
 	}
 	m_set_entity.erase(it);
 
-	pkEnt->SetSectree(NULL);
+	pkEnt->SetSectree(nullptr);
 
 	if (pkEnt->IsType(ENTITY_CHARACTER))
 	{
@@ -190,25 +190,25 @@ void SECTREE::CloneAttribute(LPSECTREE tree)
 	isClone = true;
 }
 
-void SECTREE::SetAttribute(DWORD x, DWORD y, DWORD dwAttr)
+void SECTREE::SetAttribute(uint32_t x, uint32_t y, uint32_t dwAttr)
 {
-	assert(m_pkAttribute != NULL);
+	assert(m_pkAttribute != nullptr);
 	m_pkAttribute->Set(x, y, dwAttr);
 }
 
-void SECTREE::RemoveAttribute(DWORD x, DWORD y, DWORD dwAttr)
+void SECTREE::RemoveAttribute(uint32_t x, uint32_t y, uint32_t dwAttr)
 {
-	assert(m_pkAttribute != NULL);
+	assert(m_pkAttribute != nullptr);
 	m_pkAttribute->Remove(x, y, dwAttr);
 }
 
-DWORD SECTREE::GetAttribute(long x, long y)
+uint32_t SECTREE::GetAttribute(int32_t x, int32_t y)
 {
-	assert(m_pkAttribute != NULL);
+	assert(m_pkAttribute != nullptr);
 	return m_pkAttribute->Get((x % SECTREE_SIZE) / CELL_SIZE, (y % SECTREE_SIZE) / CELL_SIZE);
 }
 
-bool SECTREE::IsAttr(long x, long y, DWORD dwFlag)
+bool SECTREE::IsAttr(int32_t x, int32_t y, uint32_t dwFlag)
 {
 	if (IS_SET(GetAttribute(x, y), dwFlag))
 		return true;
@@ -216,7 +216,7 @@ bool SECTREE::IsAttr(long x, long y, DWORD dwFlag)
 	return false;
 }
 
-int SECTREE::GetEventAttribute(long x, long y)
+int32_t SECTREE::GetEventAttribute(int32_t x, int32_t y)
 {
 	return GetAttribute(x, y) >> 8;
 }

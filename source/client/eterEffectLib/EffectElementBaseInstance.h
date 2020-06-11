@@ -36,7 +36,7 @@ class CEffectElementBaseInstance
 		bool									m_isActive;
 
 		float									m_fLocalTime;
-		DWORD									m_dwStartTime;
+		uint32_t									m_dwStartTime;
 		float									m_fElapsedTime;
 		float									m_fRemainingTime;
 		bool									m_bStart;

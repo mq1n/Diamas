@@ -30,7 +30,7 @@ void CGrannyModelInstance::CopyMotion(CGrannyModelInstance * pModelInstance, boo
 	if (bIsFreeSourceControl)
 	{
 		GrannyFreeControl(pModelInstance->m_pgrnCtrl);
-		pModelInstance->m_pgrnCtrl = NULL;
+		pModelInstance->m_pgrnCtrl = nullptr;
 	}
 }
 
@@ -45,7 +45,7 @@ bool CGrannyModelInstance::IsMotionPlaying()
 	return true;
 }
 
-void CGrannyModelInstance::SetMotionPointer(const CGrannyMotion * pMotion, float blendTime, int loopCount, float speedRatio)
+void CGrannyModelInstance::SetMotionPointer(const CGrannyMotion * pMotion, float blendTime, int32_t loopCount, float speedRatio)
 {
 	// TEST
 	if (!m_pgrnWorldPoseReal)
@@ -106,7 +106,7 @@ void CGrannyModelInstance::SetMotionPointer(const CGrannyMotion * pMotion, float
 	//Tracef("easeIn %f\n", blendTime);
 }
 
-void CGrannyModelInstance::ChangeMotionPointer(const CGrannyMotion* pMotion, int loopCount, float speedRatio)
+void CGrannyModelInstance::ChangeMotionPointer(const CGrannyMotion* pMotion, int32_t loopCount, float speedRatio)
 {
 	granny_model_instance * pgrnModelInstance = m_pgrnModelInstance;
 	if (!pgrnModelInstance)

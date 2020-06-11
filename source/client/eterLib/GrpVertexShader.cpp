@@ -37,7 +37,7 @@ bool CVertexShader::CreateFromDiskFile(const char* c_szFileName, const DWORD* c_
 	LPD3DXBUFFER lpd3dxErrorBuffer;
 	
 	if (FAILED(
-		D3DXAssembleShaderFromFile(c_szFileName, 0, NULL, &lpd3dxShaderBuffer, &lpd3dxErrorBuffer)
+		D3DXAssembleShaderFromFile(c_szFileName, 0, nullptr, &lpd3dxShaderBuffer, &lpd3dxErrorBuffer)
 	)) return false;
 
 	CDirect3DXBuffer shaderBuffer(lpd3dxShaderBuffer);

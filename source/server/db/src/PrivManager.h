@@ -8,15 +8,15 @@
 
 struct TPrivEmpireData
 {
-    BYTE type;
-    int value;
+    uint8_t type;
+    int32_t value;
     bool bRemoved;
-    BYTE empire;
+    uint8_t empire;
 
 	// ADD_EMPIRE_PRIV_TIME
     time_t end_time_sec;
 
-    TPrivEmpireData(BYTE type, int value, BYTE empire, time_t end_time_sec)
+    TPrivEmpireData(uint8_t type, int32_t value, uint8_t empire, time_t end_time_sec)
 	: type(type), value(value), bRemoved(false), empire(empire), end_time_sec(end_time_sec)
     {}
 	// END_OF_ADD_EMPIRE_PRIV_TIME
@@ -27,15 +27,15 @@ struct TPrivEmpireData
  */
 struct TPrivGuildData
 {
-    BYTE type;
-    int value;
+    uint8_t type;
+    int32_t value;
     bool bRemoved;
-    DWORD guild_id;
+    uint32_t guild_id;
 
 	// ADD_GUILD_PRIV_TIME
     time_t end_time_sec;	///< 지속시간
 
-    TPrivGuildData(BYTE type, int value, DWORD guild_id, time_t _end_time_sec)
+    TPrivGuildData(uint8_t type, int32_t value, uint32_t guild_id, time_t _end_time_sec)
 	: type(type), value(value), bRemoved(false), guild_id(guild_id), end_time_sec(_end_time_sec )
     {}
 	// END_OF_ADD_GUILD_PRIV_TIME
@@ -43,11 +43,11 @@ struct TPrivGuildData
 
 struct TPrivCharData
 {
-    BYTE type;
-    int value;
+    uint8_t type;
+    int32_t value;
     bool bRemoved;
-    DWORD pid;
-    TPrivCharData(BYTE type, int value, DWORD pid)
+    uint32_t pid;
+    TPrivCharData(uint8_t type, int32_t value, uint32_t pid)
 	: type(type), value(value), bRemoved(false), pid(pid)
     {}
 };
@@ -62,14 +62,14 @@ class CPrivManager : public singleton<CPrivManager>
 	virtual ~CPrivManager();
 
 	// ADD_GUILD_PRIV_TIME
-	void AddGuildPriv(DWORD guild_id, BYTE type, int value, time_t time_sec);
+	void AddGuildPriv(uint32_t guild_id, uint8_t type, int32_t value, time_t time_sec);
 	// END_OF_ADD_GUILD_PRIV_TIME
 
 	// ADD_EMPIRE_PRIV_TIME	
-	void AddEmpirePriv(BYTE empire, BYTE type, int value, time_t time_sec);
+	void AddEmpirePriv(uint8_t empire, uint8_t type, int32_t value, time_t time_sec);
 	// END_OF_ADD_EMPIRE_PRIV_TIME
 	
-	void AddCharPriv(DWORD pid, BYTE type, int value);
+	void AddCharPriv(uint32_t pid, uint8_t type, int32_t value);
 
 	void Update();
 
@@ -78,14 +78,14 @@ class CPrivManager : public singleton<CPrivManager>
     private:
 
 	// ADD_GUILD_PRIV_TIME
-	void SendChangeGuildPriv(DWORD guild_id, BYTE type, int value, time_t end_time_sec);
+	void SendChangeGuildPriv(uint32_t guild_id, uint8_t type, int32_t value, time_t end_time_sec);
 	// END_OF_ADD_GUILD_PRIV_TIME
 
 	// ADD_EMPIRE_PRIV_TIME	
-	void SendChangeEmpirePriv(BYTE empire, BYTE type, int value, time_t end_time_sec);
+	void SendChangeEmpirePriv(uint8_t empire, uint8_t type, int32_t value, time_t end_time_sec);
 	// END_OF_ADD_EMPIRE_PRIV_TIME
 
-	void SendChangeCharPriv(DWORD pid, BYTE type, int value);
+	void SendChangeCharPriv(uint32_t pid, uint8_t type, int32_t value);
 
 	typedef std::pair<time_t, TPrivCharData *> stPairChar;
 	typedef std::pair<time_t, TPrivGuildData*> stPairGuild;
@@ -99,8 +99,8 @@ class CPrivManager : public singleton<CPrivManager>
 	    m_pqPrivEmpire;
 
 	TPrivEmpireData* m_aaPrivEmpire[MAX_PRIV_NUM][EMPIRE_MAX_NUM];
-	std::map<DWORD, TPrivGuildData*> m_aPrivGuild[MAX_PRIV_NUM];
-	std::map<DWORD, TPrivCharData*> m_aPrivChar[MAX_PRIV_NUM];
+	std::map<uint32_t, TPrivGuildData*> m_aPrivGuild[MAX_PRIV_NUM];
+	std::map<uint32_t, TPrivCharData*> m_aPrivChar[MAX_PRIV_NUM];
 };
 
 #endif

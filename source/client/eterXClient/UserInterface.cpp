@@ -17,7 +17,7 @@
 #include "../eterWebBrowser/CWebBrowser.h"
 
 // d3dx8.lib(cleanmesh.obj) : error LNK2019: unresolved external symbol __vsnprintf referenced in function "void __cdecl OutputError
-int(WINAPIV* __vsnprintf)(char*, size_t, const char*, va_list) = _vsnprintf;
+int32_t(WINAPIV* __vsnprintf)(char*, size_t, const char*, va_list) = _vsnprintf;
 
 extern "C"
 {
@@ -189,7 +189,7 @@ bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 {
 	bool ret = false;
 
-	DWORD dwRandSeed=time(NULL)+DWORD(GetCurrentProcess());
+	uint32_t dwRandSeed=time(nullptr)+uint32_t(GetCurrentProcess());
 	srandom(dwRandSeed);
 	srand(random());
 
@@ -251,7 +251,7 @@ bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 	return ret;
 }
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int32_t APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int32_t nCmdShow)
 {
 	SetEterExceptionHandler();
 

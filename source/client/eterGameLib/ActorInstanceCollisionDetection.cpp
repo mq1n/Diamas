@@ -34,7 +34,7 @@ void CActorInstance::UpdatePointInstance(TCollisionPointInstance * pPointInstanc
 {
 	if (!pPointInstance)
 	{
-		assert(!"CActorInstance::UpdatePointInstance - pPointInstance is NULL"); // 레퍼런스로 교체하시오
+		assert(!"CActorInstance::UpdatePointInstance - pPointInstance is nullptr"); // 레퍼런스로 교체하시오
 		return;
 	}
 
@@ -52,14 +52,14 @@ void CActorInstance::UpdatePointInstance(TCollisionPointInstance * pPointInstanc
 		CGrannyLODController* pGrnLODController=m_LODControllerVector[pPointInstance->dwModelIndex];
 		if (!pGrnLODController)
 		{
-			//Tracenf("CActorInstance::UpdatePointInstance - m_LODControllerVector[pPointInstance->dwModelIndex=%d] is NULL", pPointInstance->dwModelIndex);
+			//Tracenf("CActorInstance::UpdatePointInstance - m_LODControllerVector[pPointInstance->dwModelIndex=%d] is nullptr", pPointInstance->dwModelIndex);
 			return;
 		}
 
 		CGrannyModelInstance * pModelInstance = pGrnLODController->GetModelInstance();
 		if (!pModelInstance)
 		{
-			//Tracenf("CActorInstance::UpdatePointInstance - pGrnLODController->GetModelInstance() is NULL");
+			//Tracenf("CActorInstance::UpdatePointInstance - pGrnLODController->GetModelInstance() is nullptr");
 			return;
 		}
 
@@ -124,14 +124,14 @@ void CActorInstance::UpdateAdvancingPointInstance()
 			CGrannyLODController* pGrnLODController=m_LODControllerVector[rInstance.dwModelIndex];
 			if (!pGrnLODController)
 			{
-				Tracenf("CActorInstance::UpdateAdvancingPointInstance - m_LODControllerVector[rInstance.dwModelIndex=%d] is NULL", rInstance.dwModelIndex);
+				Tracenf("CActorInstance::UpdateAdvancingPointInstance - m_LODControllerVector[rInstance.dwModelIndex=%d] is nullptr", rInstance.dwModelIndex);
 				continue;
 			}
 
 			CGrannyModelInstance * pModelInstance = pGrnLODController->GetModelInstance();
 			if (!pModelInstance)
 			{
-				//Tracenf("CActorInstance::UpdateAdvancingPointInstance - pGrnLODController->GetModelInstance() is NULL");
+				//Tracenf("CActorInstance::UpdateAdvancingPointInstance - pGrnLODController->GetModelInstance() is nullptr");
 				continue;
 			}
 
@@ -147,7 +147,7 @@ void CActorInstance::UpdateAdvancingPointInstance()
 		const NRaceData::TCollisionData * c_pCollisionData = rInstance.c_pCollisionData;
 		if (c_pCollisionData)
 		{
-			for (DWORD j = 0; j < c_pCollisionData->SphereDataVector.size(); ++j)
+			for (uint32_t j = 0; j < c_pCollisionData->SphereDataVector.size(); ++j)
 			{
 				const TSphereData & c = c_pCollisionData->SphereDataVector[j].GetAttribute();
 				CDynamicSphereInstance & rSphereInstance = rInstance.SphereInstanceVector[j];
@@ -169,7 +169,7 @@ bool CActorInstance::CheckCollisionDetection(const CDynamicSphereInstanceVector 
 {
 	if (!c_pAttackingSphereVector)
 	{
-		assert(!"CActorInstance::CheckCollisionDetection - c_pAttackingSphereVector is NULL"); // 레퍼런스로 교체하시오
+		assert(!"CActorInstance::CheckCollisionDetection - c_pAttackingSphereVector is nullptr"); // 레퍼런스로 교체하시오
 		return false;
 	}
 
@@ -178,8 +178,8 @@ bool CActorInstance::CheckCollisionDetection(const CDynamicSphereInstanceVector 
 	{
 		const CDynamicSphereInstanceVector * c_pDefendingSphereVector = &(*itor).SphereInstanceVector;
 
-		for (DWORD i = 0; i < c_pAttackingSphereVector->size(); ++i)
-		for (DWORD j = 0; j < c_pDefendingSphereVector->size(); ++j)
+		for (uint32_t i = 0; i < c_pAttackingSphereVector->size(); ++i)
+		for (uint32_t j = 0; j < c_pDefendingSphereVector->size(); ++j)
 		{
 			const CDynamicSphereInstance & c_rAttackingSphere = c_pAttackingSphereVector->at(i);
 			const CDynamicSphereInstance & c_rDefendingSphere = c_pDefendingSphereVector->at(j);
@@ -196,23 +196,23 @@ bool CActorInstance::CheckCollisionDetection(const CDynamicSphereInstanceVector 
 	return false;
 }
 
-bool CActorInstance::CreateCollisionInstancePiece(DWORD dwAttachingModelIndex, const NRaceData::TAttachingData * c_pAttachingData, TCollisionPointInstance * pPointInstance)
+bool CActorInstance::CreateCollisionInstancePiece(uint32_t dwAttachingModelIndex, const NRaceData::TAttachingData * c_pAttachingData, TCollisionPointInstance * pPointInstance)
 {
 	if (!c_pAttachingData)
 	{
-		assert(!"CActorInstance::CreateCollisionInstancePiece - c_pAttachingData is NULL"); // 레퍼런스로 교체하시오
+		assert(!"CActorInstance::CreateCollisionInstancePiece - c_pAttachingData is nullptr"); // 레퍼런스로 교체하시오
 		return false;
 	}
 
 	if (!c_pAttachingData->pCollisionData)
 	{
-		assert(!"CActorInstance::CreateCollisionInstancePiece - c_pAttachingData->pCollisionData is NULL"); // 레퍼런스로 교체하시오
+		assert(!"CActorInstance::CreateCollisionInstancePiece - c_pAttachingData->pCollisionData is nullptr"); // 레퍼런스로 교체하시오
 		return false;
 	}
 
 	if (!pPointInstance)
 	{
-		assert(!"CActorInstance::CreateCollisionInstancePiece - pPointInstance is NULL"); // 레퍼런스로 교체하시오
+		assert(!"CActorInstance::CreateCollisionInstancePiece - pPointInstance is nullptr"); // 레퍼런스로 교체하시오
 		return false;
 	}
 
@@ -223,7 +223,7 @@ bool CActorInstance::CreateCollisionInstancePiece(DWORD dwAttachingModelIndex, c
 
 	if (c_pAttachingData->isAttaching)
 	{
-		int iAttachingBoneIndex;
+		int32_t iAttachingBoneIndex;
 
 		CGrannyModelInstance * pModelInstance = m_LODControllerVector[dwAttachingModelIndex]->GetModelInstance();
 
@@ -312,8 +312,8 @@ BOOL CActorInstance::__SplashAttackProcess(CActorInstance & rVictim)
 	{
 		rHittedInstanceMap.insert(std::make_pair(&rVictim, GetLocalTime()+c_rAttackData.fInvisibleTime));
 
-		int iCurrentHitCount = rHittedInstanceMap.size();
-		int iMaxHitCount = (0 == c_rAttackData.iHitLimitCount ? 16 : c_rAttackData.iHitLimitCount);
+		int32_t iCurrentHitCount = rHittedInstanceMap.size();
+		int32_t iMaxHitCount = (0 == c_rAttackData.iHitLimitCount ? 16 : c_rAttackData.iHitLimitCount);
 		//Tracef(" ------------------- Splash Hit : %d\n", iCurrentHitCount);
 
 		if (iCurrentHitCount > iMaxHitCount)
@@ -337,7 +337,7 @@ BOOL CActorInstance::__NormalAttackProcess(CActorInstance & rVictim)
 	D3DXVECTOR3 v3Distance(rVictim.m_x - m_x, rVictim.m_z - m_z, rVictim.m_z - m_z);
 	float fDistance = D3DXVec3LengthSq(&v3Distance);
 
-	extern bool IS_HUGE_RACE(unsigned int vnum);
+	extern bool IS_HUGE_RACE(uint32_t vnum);
 	if (IS_HUGE_RACE(rVictim.GetRace()))
 	{
 		if (fDistance >= 500.0f*500.0f)
@@ -411,7 +411,7 @@ BOOL CActorInstance::__NormalAttackProcess(CActorInstance & rVictim)
 			TCollisionPointInstanceList::iterator cpit;
 			for(cpit = rVictim.m_DefendingPointInstanceList.begin(); cpit!=rVictim.m_DefendingPointInstanceList.end();++cpit)
 			{
-				int index = 0;
+				int32_t index = 0;
 				const CDynamicSphereInstanceVector & c_DefendingSphereVector = cpit->SphereInstanceVector;
 				CDynamicSphereInstanceVector::const_iterator dsit;
 				for(dsit = c_DefendingSphereVector.begin(); dsit!= c_DefendingSphereVector.end();++dsit, ++index)
@@ -436,7 +436,7 @@ BOOL CActorInstance::__NormalAttackProcess(CActorInstance & rVictim)
 
 							//Tracef(" ----------- Next Hit : %d\n", itHitData->second.size());
 
-							int iCurrentHitCount = itHitData->second.size();
+							int32_t iCurrentHitCount = itHitData->second.size();
 							// NOTE : 보통 공격은 16명이 한계
 							if (NRaceData::MOTION_TYPE_COMBO == pad->iMotionType || NRaceData::MOTION_TYPE_NORMAL == pad->iMotionType)
 							{
@@ -459,7 +459,7 @@ BOOL CActorInstance::__NormalAttackProcess(CActorInstance & rVictim)
 						D3DXVECTOR3 v3HitPosition = (GetPosition() + rVictim.GetPosition()) *0.5f;
 
 						// #0000780: [M2KR] 수룡 타격구 문제
-						extern bool IS_HUGE_RACE(unsigned int vnum);
+						extern bool IS_HUGE_RACE(uint32_t vnum);
 						if (IS_HUGE_RACE(rVictim.GetRace()))
 						{
 							v3HitPosition = (GetPosition() + sub.v3Position) * 0.5f;							
@@ -522,7 +522,7 @@ BOOL CActorInstance::TestPhysicsBlendingCollision(CActorInstance & rVictim)
 	m_PhysicsObject.GetLastPosition(&kPDelta);
 
 	D3DXVECTOR3 prevLastPosition, prevPosition;
-	const int nSubCheckCount = 50;
+	const int32_t nSubCheckCount = 50;
 
 	TCollisionPointInstanceListIterator itorMain = pMainList->begin();
 	TCollisionPointInstanceListIterator itorVictim = pVictimList->begin();
@@ -533,7 +533,7 @@ BOOL CActorInstance::TestPhysicsBlendingCollision(CActorInstance & rVictim)
 			CDynamicSphereInstanceVector & c_rMainSphereVector = (*itorMain).SphereInstanceVector;
 			CDynamicSphereInstanceVector & c_rVictimSphereVector = (*itorVictim).SphereInstanceVector;
 
-			for (DWORD i = 0; i < c_rMainSphereVector.size(); ++i)
+			for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
 			{
 				CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
 				//adjust main sphere center
@@ -542,11 +542,11 @@ BOOL CActorInstance::TestPhysicsBlendingCollision(CActorInstance & rVictim)
 
 				c_rMainSphere.v3LastPosition = prevPosition;
 
-				for( int i = 1; i <= nSubCheckCount; ++ i )
+				for( int32_t i = 1; i <= nSubCheckCount; ++ i )
 				{
 					c_rMainSphere.v3Position = prevPosition + (float)(i/(float)nSubCheckCount) * kPDelta;
 
-					for (DWORD j = 0; j < c_rVictimSphereVector.size(); ++j)
+					for (uint32_t j = 0; j < c_rVictimSphereVector.size(); ++j)
 					{
 						CDynamicSphereInstance & c_rVictimSphere = c_rVictimSphereVector[j];
 
@@ -621,8 +621,8 @@ BOOL CActorInstance::TestActorCollision(CActorInstance & rVictim)
 		const CDynamicSphereInstanceVector & c_rMainSphereVector = (*itorMain).SphereInstanceVector;
 		const CDynamicSphereInstanceVector & c_rVictimSphereVector = (*itorVictim).SphereInstanceVector;
 
-		for (DWORD i = 0; i < c_rMainSphereVector.size(); ++i)
-		for (DWORD j = 0; j < c_rVictimSphereVector.size(); ++j)
+		for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
+		for (uint32_t j = 0; j < c_rVictimSphereVector.size(); ++j)
 		{
 			const CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
 			const CDynamicSphereInstance & c_rVictimSphere = c_rVictimSphereVector[j];
@@ -701,7 +701,7 @@ BOOL CActorInstance::__TestObjectCollision(const CGraphicObjectInstance * c_pObj
 	for (; itorMain != m_BodyPointInstanceList.end(); ++itorMain)
 	{
 		const CDynamicSphereInstanceVector & c_rMainSphereVector = (*itorMain).SphereInstanceVector;
-		for (DWORD i = 0; i < c_rMainSphereVector.size(); ++i)
+		for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
 		{
 			const CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
 
@@ -729,7 +729,7 @@ bool CActorInstance::TestCollisionWithDynamicSphere(const CDynamicSphereInstance
 	for (; itorMain != m_BodyPointInstanceList.end(); ++itorMain)
 	{
 		const CDynamicSphereInstanceVector & c_rMainSphereVector = (*itorMain).SphereInstanceVector;
-		for (DWORD i = 0; i < c_rMainSphereVector.size(); ++i)
+		for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
 		{
 			const CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
 			

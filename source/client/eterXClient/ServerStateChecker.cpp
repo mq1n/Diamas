@@ -7,10 +7,10 @@
 #pragma pack(push)
 #pragma pack(1)
 
-typedef unsigned char ServerStateChecker_Header;
-typedef unsigned long ServerStateChecker_Key;
-typedef unsigned long ServerStateChecker_Index;
-typedef unsigned char ServerStateChecker_State;
+typedef uint8_t ServerStateChecker_Header;
+typedef uint32_t ServerStateChecker_Key;
+typedef uint32_t ServerStateChecker_Index;
+typedef uint8_t ServerStateChecker_State;
 
 #pragma pack(pop)
 
@@ -22,7 +22,7 @@ CServerStateChecker::CServerStateChecker()
 CServerStateChecker::~CServerStateChecker()
 {
 	Initialize();
-	m_poWnd = NULL;
+	m_poWnd = nullptr;
 }
 
 void CServerStateChecker::Create(PyObject* poWnd)
@@ -30,7 +30,7 @@ void CServerStateChecker::Create(PyObject* poWnd)
 	m_poWnd = poWnd;
 }
 
-void CServerStateChecker::AddChannel(UINT uServerIndex, const char* c_szAddr, UINT uPort)
+void CServerStateChecker::AddChannel(uint32_t uServerIndex, const char* c_szAddr, uint32_t uPort)
 {
 	TChannel c;
 	c.uServerIndex = uServerIndex;
@@ -57,7 +57,7 @@ void CServerStateChecker::Request()
 	m_kStream.SetSendBufferSize(1024);
 	m_kStream.SetRecvBufferSize(1024);
 
-	BYTE bHeader = HEADER_CG_STATE_CHECKER;
+	uint8_t bHeader = HEADER_CG_STATE_CHECKER;
 	if (!m_kStream.Send(sizeof(bHeader), &bHeader))
 	{
 		for (std::list<TChannel>::const_iterator it = m_lstChannel.begin(); it != m_lstChannel.end(); ++it) {
@@ -72,18 +72,18 @@ void CServerStateChecker::Update()
 {
 	m_kStream.Process();
 
-	BYTE bHeader;
+	uint8_t bHeader;
 	if (!m_kStream.Recv(sizeof(bHeader), &bHeader)) {
 		return;
 	}
 	if (HEADER_GC_RESPOND_CHANNELSTATUS != bHeader) {
 		return;
 	}
-	int nSize;
+	int32_t nSize;
 	if (!m_kStream.Recv(sizeof(nSize), &nSize)) {
 		return;
 	}
-	for (int i = 0; i < nSize; i++) {
+	for (int32_t i = 0; i < nSize; i++) {
 		TChannelStatus channelStatus;
 		if (!m_kStream.Recv(sizeof(channelStatus), &channelStatus)) {
 			return;

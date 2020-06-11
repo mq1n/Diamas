@@ -47,7 +47,7 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		void	DestroyDeviceObjects();
 
 		// Update & Render
-		void	Update(DWORD dwAniFPS);
+		void	Update(uint32_t dwAniFPS);
 		void	UpdateLocalTime(float fElapsedTime);
 		void	UpdateTransform(D3DXMATRIX * pMatrix, float fSecondsElapsed);
 
@@ -77,8 +77,8 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		void	SetLinkedModelPointer(CGrannyModel* pkModel, CGraphicVertexBuffer* pkSharedDefromableVertexBuffer, CGrannyModelInstance** ppkSkeletonInst);
 
 		// Motion
-		void	SetMotionPointer(const CGrannyMotion* pMotion, float blendTime=0.0f, int loopCount=0, float speedRatio=1.0f);
-		void	ChangeMotionPointer(const CGrannyMotion* pMotion, int loopCount=0, float speedRatio=1.0f);
+		void	SetMotionPointer(const CGrannyMotion* pMotion, float blendTime=0.0f, int32_t loopCount=0, float speedRatio=1.0f);
+		void	ChangeMotionPointer(const CGrannyMotion* pMotion, int32_t loopCount=0, float speedRatio=1.0f);
 		void	SetMotionAtEnd();		
 		bool	IsMotionPlaying();
 		
@@ -86,23 +86,23 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 
 		// Time
 		void	SetLocalTime(float fLocalTime);
-		int		ResetLocalTime();
+		int32_t		ResetLocalTime();
 		float	GetLocalTime();
 		float	GetNextTime();
 
 		// WORK
-		DWORD	GetDeformableVertexCount();
-		DWORD	GetVertexCount();
+		uint32_t	GetDeformableVertexCount();
+		uint32_t	GetVertexCount();
 
 		// END_OF_WORK
 
 		// Bone & Attaching
-		const float *	GetBoneMatrixPointer(int iBone) const;
-		const float *	GetCompositeBoneMatrixPointer(int iBone) const;
-		bool			GetMeshMatrixPointer(int iMesh, const D3DXMATRIX ** c_ppMatrix) const;
-		bool			GetBoneIndexByName(const char * c_szBoneName, int * pBoneIndex) const;
+		const float *	GetBoneMatrixPointer(int32_t iBone) const;
+		const float *	GetCompositeBoneMatrixPointer(int32_t iBone) const;
+		bool			GetMeshMatrixPointer(int32_t iMesh, const D3DXMATRIX ** c_ppMatrix) const;
+		bool			GetBoneIndexByName(const char * c_szBoneName, int32_t * pBoneIndex) const;
 		void			SetParentModelInstance(const CGrannyModelInstance* c_pParentModelInstance, const char * c_szBoneName);
-		void			SetParentModelInstance(const CGrannyModelInstance* c_pParentModelInstance, int iBone);
+		void			SetParentModelInstance(const CGrannyModelInstance* c_pParentModelInstance, int32_t iBone);
 
 		// Collision Detection
 		bool	Intersect(const D3DXMATRIX * c_pMatrix, float * pu, float * pv, float * pt);
@@ -132,7 +132,7 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		bool	__CreateMeshBindingVector(CGrannyModelInstance* pkDstModelInst);
 		void	__DestroyMeshBindingVector();
 		
-		const granny_int32x*	__GetMeshBoneIndices(unsigned int iMeshBinding) const;
+		const granny_int32x*	__GetMeshBoneIndices(uint32_t iMeshBinding) const;
 
 		bool	__IsDeformableVertexBuffer();
 		void	__SetSharedDeformableVertexBuffer(CGraphicVertexBuffer* pkSharedDeformableVertexBuffer);
@@ -171,13 +171,13 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		
 		// Attaching Data
 		const CGrannyModelInstance *	mc_pParentInstance;
-		int								m_iParentBoneIndex;
+		int32_t								m_iParentBoneIndex;
 
 		// Game Data
 		float							m_fLocalTime;
 		float							m_fSecondsElapsed;	
 
-		DWORD							m_dwOldUpdateFrame;
+		uint32_t							m_dwOldUpdateFrame;
 
 		CGrannyMaterialPalette			m_kMtrlPal;
 

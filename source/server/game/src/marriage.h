@@ -5,15 +5,15 @@ namespace marriage
 {
 	struct TWeddingInfo
 	{
-		DWORD dwMapIndex;
+		uint32_t dwMapIndex;
 	};
 
-	extern const int MARRIAGE_POINT_PER_DAY;
+	extern const int32_t MARRIAGE_POINT_PER_DAY;
 	struct TMarriage
 	{
-		DWORD m_pid1;
-		DWORD m_pid2;
-		int   love_point;
+		uint32_t m_pid1;
+		uint32_t m_pid2;
+		int32_t   love_point;
 		time_t marry_time;
 		LPCHARACTER ch1;
 		LPCHARACTER ch2;
@@ -24,7 +24,7 @@ namespace marriage
 
 		TWeddingInfo * pWeddingInfo;
 
-		TMarriage(DWORD pid1, DWORD pid2, int _love_point, time_t _marry_time, const char* name1, const char* name2) : 
+		TMarriage(uint32_t pid1, uint32_t pid2, int32_t _love_point, time_t _marry_time, const char* name1, const char* name2) : 
 			m_pid1(pid1), 
 			m_pid2(pid2), 
 			love_point(_love_point),
@@ -32,10 +32,10 @@ namespace marriage
 			is_married(false),
 			name1(name1),
 			name2(name2),
-			pWeddingInfo(NULL),
-			eventNearCheck(NULL)
+			pWeddingInfo(nullptr),
+			eventNearCheck(nullptr)
 		{
-			ch1 = ch2 = NULL;
+			ch1 = ch2 = nullptr;
 			bSave = false;
 			isLastNear = false;
 			byLastLovePoint = 0;
@@ -44,7 +44,7 @@ namespace marriage
 		~TMarriage();
 
 		void Login(LPCHARACTER ch);
-		void Logout(DWORD pid);
+		void Logout(uint32_t pid);
 
 		bool IsOnline()
 		{
@@ -53,7 +53,7 @@ namespace marriage
 
 		bool IsNear();
 
-		DWORD GetOther(DWORD PID) const
+		uint32_t GetOther(uint32_t PID) const
 		{
 			if (m_pid1 == PID)
 				return m_pid2;
@@ -64,16 +64,16 @@ namespace marriage
 			return 0;
 		}
 
-		int GetMarriagePoint();
-		int GetMarriageGrade();
+		int32_t GetMarriagePoint();
+		int32_t GetMarriageGrade();
 
-		int GetBonus(DWORD dwItemVnum, bool bShare = true, LPCHARACTER me = NULL);
+		int32_t GetBonus(uint32_t dwItemVnum, bool bShare = true, LPCHARACTER me = nullptr);
 
-		void WarpToWeddingMap(DWORD dwPID);
+		void WarpToWeddingMap(uint32_t dwPID);
 		void Save();
 		void SetMarried();
 
-		void Update(DWORD point);
+		void Update(uint32_t point);
 		void RequestEndWedding();
 
 		void StartNearCheckEvent();
@@ -81,7 +81,7 @@ namespace marriage
 		void NearCheck();
 
 		bool isLastNear;
-		BYTE byLastLovePoint;
+		uint8_t byLastLovePoint;
 		LPEVENT eventNearCheck;
 	};
 
@@ -94,44 +94,44 @@ namespace marriage
 			bool	Initialize();
 			void	Destroy();
 
-			TMarriage*	Get(DWORD dwPlayerID);
+			TMarriage*	Get(uint32_t dwPlayerID);
 
-			bool	IsMarriageUniqueItem(DWORD dwItemVnum);
+			bool	IsMarriageUniqueItem(uint32_t dwItemVnum);
 
-			bool	IsMarried(DWORD dwPlayerID);
-			bool	IsEngaged(DWORD dwPlayerID);
-			bool	IsEngagedOrMarried(DWORD dwPlayerID);
+			bool	IsMarried(uint32_t dwPlayerID);
+			bool	IsEngaged(uint32_t dwPlayerID);
+			bool	IsEngagedOrMarried(uint32_t dwPlayerID);
 
-			void	RequestAdd(DWORD dwPID1, DWORD dwPID2, const char* szName1, const char* szName2);
-			void	Add(DWORD dwPID1, DWORD dwPID2, time_t tMarryTime, const char* szName1, const char* szName2);
+			void	RequestAdd(uint32_t dwPID1, uint32_t dwPID2, const char* szName1, const char* szName2);
+			void	Add(uint32_t dwPID1, uint32_t dwPID2, time_t tMarryTime, const char* szName1, const char* szName2);
 
-			void	RequestUpdate(DWORD dwPID1, DWORD dwPID2, int iUpdatePoint, BYTE byMarried);
-			void	Update(DWORD dwPID1, DWORD dwPID2, long lTotalPoint, BYTE byMarried);
+			void	RequestUpdate(uint32_t dwPID1, uint32_t dwPID2, int32_t iUpdatePoint, uint8_t byMarried);
+			void	Update(uint32_t dwPID1, uint32_t dwPID2, int32_t lTotalPoint, uint8_t byMarried);
 
-			void	RequestRemove(DWORD dwPID1, DWORD dwPID2);
-			void	Remove(DWORD dwPID1, DWORD dwPID2);
+			void	RequestRemove(uint32_t dwPID1, uint32_t dwPID2);
+			void	Remove(uint32_t dwPID1, uint32_t dwPID2);
 
-			//void	P2PLogin(DWORD dwPID);
-			//void	P2PLogout(DWORD dwPID);
+			//void	P2PLogin(uint32_t dwPID);
+			//void	P2PLogout(uint32_t dwPID);
 
 			void	Login(LPCHARACTER ch);
 
-			void	Logout(DWORD pid);
+			void	Logout(uint32_t pid);
 			void	Logout(LPCHARACTER ch);
 
-			void	WeddingReady(DWORD dwPID1, DWORD dwPID2, DWORD dwMapIndex);
-			void	WeddingStart(DWORD dwPID1, DWORD dwPID2);
-			void	WeddingEnd(DWORD dwPID1, DWORD dwPID2);
+			void	WeddingReady(uint32_t dwPID1, uint32_t dwPID2, uint32_t dwMapIndex);
+			void	WeddingStart(uint32_t dwPID1, uint32_t dwPID2);
+			void	WeddingEnd(uint32_t dwPID1, uint32_t dwPID2);
 
-			void	RequestEndWedding(DWORD dwPID1, DWORD dwPID2);
+			void	RequestEndWedding(uint32_t dwPID1, uint32_t dwPID2);
 
 			template <typename Func>
 				Func	for_each_wedding(Func f);
 
 		private:
 			std::unordered_set<TMarriage*> m_Marriages;
-			std::map<DWORD, TMarriage *> m_MarriageByPID;
-			std::set<std::pair<DWORD, DWORD> > m_setWedding;
+			std::map<uint32_t, TMarriage *> m_MarriageByPID;
+			std::set<std::pair<uint32_t, uint32_t> > m_setWedding;
 	};
 
 	template <typename Func>

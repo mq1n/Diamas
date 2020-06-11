@@ -16,7 +16,7 @@ namespace UI
 		m_lHeight(0),
 		m_poHandler(ppyObject),
 		m_bShow(false),
-		m_pParent(NULL),
+		m_pParent(nullptr),
 		m_dwFlag(0),
 		m_isUpdatingChildren(FALSE)
 #ifdef ENABLE_MOUSEWHEEL_EVENT
@@ -24,12 +24,12 @@ namespace UI
 #endif
 	{			
 #ifdef _DEBUG
-		static DWORD DEBUG_dwGlobalCounter=0;
+		static uint32_t DEBUG_dwGlobalCounter=0;
 		DEBUG_dwCounter=DEBUG_dwGlobalCounter++;	
 
 		m_strName = "!!debug";
 #endif
-		//assert(m_poHandler != NULL);
+		//assert(m_poHandler != nullptr);
 		m_HorizontalAlign = HORIZONTAL_ALIGN_LEFT;
 		m_VerticalAlign = VERTICAL_ALIGN_TOP;
 		m_rect.bottom = m_rect.left = m_rect.right = m_rect.top = 0;
@@ -40,18 +40,18 @@ namespace UI
 	{
 	}
 
-	DWORD CWindow::Type()
+	uint32_t CWindow::Type()
 	{
-		static DWORD s_dwType = GetCRC32("CWindow", strlen("CWindow"));
+		static uint32_t s_dwType = GetCRC32("CWindow", strlen("CWindow"));
 		return (s_dwType);
 	}
 
-	BOOL CWindow::IsType(DWORD dwType)
+	BOOL CWindow::IsType(uint32_t dwType)
 	{
 		return OnIsType(dwType);
 	}
 
-	BOOL CWindow::OnIsType(DWORD dwType)
+	BOOL CWindow::OnIsType(uint32_t dwType)
 	{
 		if (CWindow::Type() == dwType)
 			return TRUE;
@@ -76,14 +76,14 @@ namespace UI
 		std::for_each(m_pChildList.begin(), m_pChildList.end(), FClear());
 		m_pChildList.clear();
 
-		m_pParent = NULL;
+		m_pParent = nullptr;
 		DestroyHandle();
 		Hide();
 	}
 
 	void CWindow::DestroyHandle()
 	{
-		m_poHandler = NULL;
+		m_poHandler = nullptr;
 	}
 
 	void CWindow::Show()
@@ -191,7 +191,7 @@ namespace UI
 		m_strName = c_szName;
 	}
 
-	void CWindow::SetSize(long width, long height)
+	void CWindow::SetSize(int32_t width, int32_t height)
 	{
 		m_lWidth = width;
 		m_lHeight = height;
@@ -200,19 +200,19 @@ namespace UI
 		m_rect.bottom = m_rect.top + m_lHeight;
 	}
 
-	void CWindow::SetHorizontalAlign(DWORD dwAlign)
+	void CWindow::SetHorizontalAlign(uint32_t dwAlign)
 	{
 		m_HorizontalAlign = (EHorizontalAlign)dwAlign;
 		UpdateRect();
 	}
 
-	void CWindow::SetVerticalAlign(DWORD dwAlign)
+	void CWindow::SetVerticalAlign(uint32_t dwAlign)
 	{
 		m_VerticalAlign = (EVerticalAlign)dwAlign;
 		UpdateRect();
 	}
 
-	void CWindow::SetPosition(long x, long y)
+	void CWindow::SetPosition(int32_t x, int32_t y)
 	{
 		m_x = x;
 		m_y = y; 
@@ -220,13 +220,13 @@ namespace UI
 		UpdateRect();
 	}
 
-	void CWindow::GetPosition(long * plx, long * ply)
+	void CWindow::GetPosition(int32_t * plx, int32_t * ply)
 	{
 		*plx = m_x;
 		*ply = m_y;
 	}
 
-	long CWindow::UpdateRect()
+	int32_t CWindow::UpdateRect()
 	{
 		m_rect.top		= m_y;
 		if (m_pParent)
@@ -245,7 +245,7 @@ namespace UI
 		m_rect.bottom	= m_rect.top + m_lHeight;
 
 #if defined( _USE_CPP_RTL_FLIP )
-		if( m_pParent == NULL ) {
+		if( m_pParent == nullptr ) {
 			m_rect.left		= m_x;
 			m_rect.right	= m_rect.left + m_lWidth;
 		} else {
@@ -301,13 +301,13 @@ namespace UI
 		return 1;
 	}
 
-	void CWindow::GetLocalPosition(long & rlx, long & rly)
+	void CWindow::GetLocalPosition(int32_t & rlx, int32_t & rly)
 	{
 		rlx = rlx - m_rect.left;
 		rly = rly - m_rect.top;
 	}
 
-	void CWindow::GetMouseLocalPosition(long & rlx, long & rly)
+	void CWindow::GetMouseLocalPosition(int32_t & rlx, int32_t & rly)
 	{
 		CWindowManager::Instance().GetMousePosition(rlx, rly);
 		rlx = rlx - m_rect.left;
@@ -380,12 +380,12 @@ namespace UI
 		}
 	}
 
-	void CWindow::OnMouseDrag(long lx, long ly)
+	void CWindow::OnMouseDrag(int32_t lx, int32_t ly)
 	{
 		PyCallClassMemberFunc(m_poHandler, "OnMouseDrag", Py_BuildValue("(ii)", lx, ly));
 	}
 
-	void CWindow::OnMoveWindow(long lx, long ly)
+	void CWindow::OnMoveWindow(int32_t lx, int32_t ly)
 	{
 		PyCallClassMemberFunc(m_poHandler, "OnMoveWindow", Py_BuildValue("(ii)", lx, ly));
 	}
@@ -470,7 +470,7 @@ namespace UI
 		return FALSE;
 	}
 
-	BOOL CWindow::RunIMEKeyDownEvent(int ikey)
+	BOOL CWindow::RunIMEKeyDownEvent(int32_t ikey)
 	{
 		if (!IsRendering())
 			return FALSE;
@@ -490,7 +490,7 @@ namespace UI
 		return FALSE;
 	}
 
-	CWindow * CWindow::RunKeyDownEvent(int ikey)
+	CWindow * CWindow::RunKeyDownEvent(int32_t ikey)
 	{
 		if (OnKeyDown(ikey))
 			return this;
@@ -503,17 +503,17 @@ namespace UI
 			if (pWindow->IsShow())
 			{
 				CWindow * pProcessedWindow = pWindow->RunKeyDownEvent(ikey);
-				if (NULL != pProcessedWindow)
+				if (nullptr != pProcessedWindow)
 				{
 					return pProcessedWindow;
 				}
 			}
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
-	BOOL CWindow::RunKeyUpEvent(int ikey)
+	BOOL CWindow::RunKeyUpEvent(int32_t ikey)
 	{
 		if (OnKeyUp(ikey))
 			return TRUE;
@@ -569,7 +569,7 @@ namespace UI
 
 	BOOL CWindow::OnMouseLeftButtonDown()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnMouseLeftButtonDown", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -585,7 +585,7 @@ namespace UI
 
 	BOOL CWindow::OnMouseLeftButtonDoubleClick()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnMouseLeftButtonDoubleClick", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -595,7 +595,7 @@ namespace UI
 
 	BOOL CWindow::OnMouseRightButtonDown()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnMouseRightButtonDown", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -605,7 +605,7 @@ namespace UI
 
 	BOOL CWindow::OnMouseRightButtonUp()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnMouseRightButtonUp", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -615,7 +615,7 @@ namespace UI
 
 	BOOL CWindow::OnMouseRightButtonDoubleClick()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnMouseRightButtonDoubleClick", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -625,7 +625,7 @@ namespace UI
 
 	BOOL CWindow::OnMouseMiddleButtonDown()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnMouseMiddleButtonDown", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -635,7 +635,7 @@ namespace UI
 
 	BOOL CWindow::OnMouseMiddleButtonUp()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnMouseMiddleButtonUp", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -645,7 +645,7 @@ namespace UI
 
 
 #ifdef ENABLE_MOUSEWHEEL_EVENT
-	BOOL CWindow::OnMouseWheelScroll(short wDelta)
+	BOOL CWindow::OnMouseWheelScroll(int16_t wDelta)
 	{
 #ifdef _DEBUG
 		Tracenf("Mouse Wheel Scroll : wDelta %d ",wDelta);
@@ -664,7 +664,7 @@ namespace UI
 
 	BOOL CWindow::OnIMETabEvent()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnIMETab", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -674,7 +674,7 @@ namespace UI
 
 	BOOL CWindow::OnIMEReturnEvent()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnIMEReturn", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -682,9 +682,9 @@ namespace UI
 		return FALSE;
 	}
 
-	BOOL CWindow::OnIMEKeyDownEvent(int ikey)
+	BOOL CWindow::OnIMEKeyDownEvent(int32_t ikey)
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnIMEKeyDown", Py_BuildValue("(i)", ikey), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -694,7 +694,7 @@ namespace UI
 
 	BOOL CWindow::OnIMEChangeCodePage()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnIMEChangeCodePage", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -704,7 +704,7 @@ namespace UI
 
 	BOOL CWindow::OnIMEOpenCandidateListEvent()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnIMEOpenCandidateList", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -714,7 +714,7 @@ namespace UI
 
 	BOOL CWindow::OnIMECloseCandidateListEvent()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnIMECloseCandidateList", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -724,7 +724,7 @@ namespace UI
 
 	BOOL CWindow::OnIMEOpenReadingWndEvent()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnIMEOpenReadingWnd", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -734,7 +734,7 @@ namespace UI
 
 	BOOL CWindow::OnIMECloseReadingWndEvent()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnIMECloseReadingWnd", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -742,9 +742,9 @@ namespace UI
 		return FALSE;
 	}
 
-	BOOL CWindow::OnKeyDown(int ikey)
+	BOOL CWindow::OnKeyDown(int32_t ikey)
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnKeyDown", Py_BuildValue("(i)", ikey), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -752,9 +752,9 @@ namespace UI
 		return FALSE;
 	}
 
-	BOOL CWindow::OnKeyUp(int ikey)
+	BOOL CWindow::OnKeyUp(int32_t ikey)
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnKeyUp", Py_BuildValue("(i)", ikey), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -764,7 +764,7 @@ namespace UI
 
 	BOOL CWindow::OnPressEscapeKey()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnPressEscapeKey", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -774,7 +774,7 @@ namespace UI
 
 	BOOL CWindow::OnPressExitKey()
 	{
-		long lValue;
+		int32_t lValue;
 		if (PyCallClassMemberFunc(m_poHandler, "OnPressExitKey", BuildEmptyTuple(), &lValue))
 		if (0 != lValue)
 			return TRUE;
@@ -784,7 +784,7 @@ namespace UI
 
 	/////
 
-	bool CWindow::IsIn(long x, long y)
+	bool CWindow::IsIn(int32_t x, int32_t y)
 	{
 		if (x >= m_rect.left && x <= m_rect.right)
 			if (y >= m_rect.top && y <= m_rect.bottom)
@@ -795,13 +795,13 @@ namespace UI
 
 	bool CWindow::IsIn()
 	{
-		long lx, ly;
+		int32_t lx, ly;
 		UI::CWindowManager::Instance().GetMousePosition(lx, ly);
 
 		return IsIn(lx, ly);
 	}
 
-	CWindow * CWindow::PickWindow(long x, long y)
+	CWindow * CWindow::PickWindow(int32_t x, int32_t y)
 	{
 		std::list<CWindow *>::reverse_iterator ritor = m_pChildList.rbegin();
 		for (; ritor != m_pChildList.rend(); ++ritor)
@@ -825,12 +825,12 @@ namespace UI
 		}
 
 		if (IsFlag(CWindow::FLAG_NOT_PICK))
-			return NULL;
+			return nullptr;
 
 		return (this);
 	}
 
-	CWindow * CWindow::PickTopWindow(long x, long y)
+	CWindow * CWindow::PickTopWindow(int32_t x, int32_t y)
 	{
 		std::list<CWindow *>::reverse_iterator ritor = m_pChildList.rbegin();
 		for (; ritor != m_pChildList.rend(); ++ritor)
@@ -842,7 +842,7 @@ namespace UI
 						return pWin;
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -856,7 +856,7 @@ namespace UI
 	{
 	}
 
-	void CBox::SetColor(DWORD dwColor)
+	void CBox::SetColor(uint32_t dwColor)
 	{
 		m_dwColor = dwColor;
 	}
@@ -878,7 +878,7 @@ namespace UI
 	{
 	}
 
-	void CBar::SetColor(DWORD dwColor)
+	void CBar::SetColor(uint32_t dwColor)
 	{
 		m_dwColor = dwColor;
 	}
@@ -900,7 +900,7 @@ namespace UI
 	{
 	}
 
-	void CLine::SetColor(DWORD dwColor)
+	void CLine::SetColor(uint32_t dwColor)
 	{
 		m_dwColor = dwColor;
 	}
@@ -916,9 +916,9 @@ namespace UI
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	DWORD CBar3D::Type()
+	uint32_t CBar3D::Type()
 	{
-		static DWORD s_dwType = GetCRC32("CBar3D", strlen("CBar3D"));
+		static uint32_t s_dwType = GetCRC32("CBar3D", strlen("CBar3D"));
 		return (s_dwType);
 	}
 
@@ -932,7 +932,7 @@ namespace UI
 	{
 	}
 
-	void CBar3D::SetColor(DWORD dwLeft, DWORD dwRight, DWORD dwCenter)
+	void CBar3D::SetColor(uint32_t dwLeft, uint32_t dwRight, uint32_t dwCenter)
 	{
 		m_dwLeftColor = dwLeft;
 		m_dwRightColor = dwRight;
@@ -970,15 +970,15 @@ namespace UI
 		m_TextInstance.Destroy();
 	}
 
-	void CTextLine::SetMax(int iMax)
+	void CTextLine::SetMax(int32_t iMax)
 	{
 		m_TextInstance.SetMax(iMax);
 	}
-	void CTextLine::SetHorizontalAlign(int iType)
+	void CTextLine::SetHorizontalAlign(int32_t iType)
 	{
 		m_TextInstance.SetHorizonalAlign(iType);
 	}
-	void CTextLine::SetVerticalAlign(int iType)
+	void CTextLine::SetVerticalAlign(int32_t iType)
 	{
 		m_TextInstance.SetVerticalAlign(iType);
 	}
@@ -1008,7 +1008,7 @@ namespace UI
 		CGraphicText* pkResFont=static_cast<CGraphicText*>(pkRes);
 		m_TextInstance.SetTextPointer(pkResFont);
 	}
-	void CTextLine::SetFontColor(DWORD dwColor)
+	void CTextLine::SetFontColor(uint32_t dwColor)
 	{
 		m_TextInstance.SetColor(dwColor);
 	}
@@ -1020,7 +1020,7 @@ namespace UI
 	{
 		OnSetText(c_szText);
 	}
-	void CTextLine::GetTextSize(int* pnWidth, int* pnHeight)
+	void CTextLine::GetTextSize(int32_t* pnWidth, int32_t* pnHeight)
 	{
 		m_TextInstance.GetTextSize(pnWidth, pnHeight);
 	}
@@ -1036,9 +1036,9 @@ namespace UI
 	{
 		m_TextInstance.HideCursor();
 	}
-	int CTextLine::GetCursorPosition()
+	int32_t CTextLine::GetCursorPosition()
 	{
-		long lx, ly;
+		int32_t lx, ly;
 		CWindow::GetMouseLocalPosition(lx, ly);
 		return m_TextInstance.PixelPositionToCharacterPosition(lx);
 	}
@@ -1084,7 +1084,7 @@ namespace UI
 		m_iHorizontalAlign = HORIZONTAL_ALIGN_LEFT;
 		m_dwWidthSummary = 0;
 	}
-	CNumberLine::CNumberLine(CWindow * pParent) : CWindow(NULL)
+	CNumberLine::CNumberLine(CWindow * pParent) : CWindow(nullptr)
 	{
 		m_strPath = "d:/ymir work/ui/game/taskbar/";
 		m_iHorizontalAlign = HORIZONTAL_ALIGN_LEFT;
@@ -1101,7 +1101,7 @@ namespace UI
 	{
 		m_strPath = c_szPath;
 	}
-	void CNumberLine::SetHorizontalAlign(int iType)
+	void CNumberLine::SetHorizontalAlign(int32_t iType)
 	{
 		m_iHorizontalAlign = iType;
 	}
@@ -1114,7 +1114,7 @@ namespace UI
 
 		m_strNumber = c_szNumber;
 
-		for (DWORD i = 0; i < m_strNumber.size(); ++i)
+		for (uint32_t i = 0; i < m_strNumber.size(); ++i)
 		{
 			char cChar = m_strNumber[i];
 			std::string strImageFileName;
@@ -1182,7 +1182,7 @@ namespace UI
 
 	void CNumberLine::OnRender()
 	{
-		for (DWORD i = 0; i < m_ImageInstanceVector.size(); ++i)
+		for (uint32_t i = 0; i < m_ImageInstanceVector.size(); ++i)
 		{
 			m_ImageInstanceVector[i]->Render();
 		}
@@ -1190,8 +1190,8 @@ namespace UI
 
 	void CNumberLine::OnChangePosition()
 	{
-		int ix = m_x;
-		int iy = m_y;
+		int32_t ix = m_x;
+		int32_t iy = m_y;
 
 		if (m_pParent)
 		{
@@ -1204,14 +1204,14 @@ namespace UI
 			case HORIZONTAL_ALIGN_LEFT:
 				break;
 			case HORIZONTAL_ALIGN_CENTER:
-				ix -= int(m_dwWidthSummary) / 2;
+				ix -= int32_t(m_dwWidthSummary) / 2;
 				break;
 			case HORIZONTAL_ALIGN_RIGHT:
-				ix -= int(m_dwWidthSummary);
+				ix -= int32_t(m_dwWidthSummary);
 				break;
 		}
 
-		for (DWORD i = 0; i < m_ImageInstanceVector.size(); ++i)
+		for (uint32_t i = 0; i < m_ImageInstanceVector.size(); ++i)
 		{
 			m_ImageInstanceVector[i]->SetPosition(ix, iy);
 			ix += m_ImageInstanceVector[i]->GetWidth();
@@ -1224,7 +1224,7 @@ namespace UI
 
 	CImageBox::CImageBox(PyObject * ppyObject) : CWindow(ppyObject)
 	{
-		m_pImageInstance = NULL;
+		m_pImageInstance = nullptr;
 	}
 	CImageBox::~CImageBox()
 	{
@@ -1242,7 +1242,7 @@ namespace UI
 		if (m_pImageInstance)
 		{
 			CGraphicImageInstance::Delete(m_pImageInstance);
-			m_pImageInstance=NULL;
+			m_pImageInstance=nullptr;
 		}
 	}
 
@@ -1277,7 +1277,7 @@ namespace UI
 		m_pImageInstance->SetDiffuseColor(fr, fg, fb, fa);
 	}
 
-	int CImageBox::GetWidth()
+	int32_t CImageBox::GetWidth()
 	{
 		if (!m_pImageInstance)
 			return 0;
@@ -1285,7 +1285,7 @@ namespace UI
 		return m_pImageInstance->GetWidth();
 	}
 
-	int CImageBox::GetHeight()
+	int32_t CImageBox::GetHeight()
 	{
 		if (!m_pImageInstance)
 			return 0;
@@ -1317,7 +1317,7 @@ namespace UI
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	CMarkBox::CMarkBox(PyObject * ppyObject) : CWindow(ppyObject)
 	{
-		m_pMarkInstance = NULL;
+		m_pMarkInstance = nullptr;
 	}
 
 	CMarkBox::~CMarkBox()
@@ -1336,7 +1336,7 @@ namespace UI
 		if (m_pMarkInstance)
 		{
 			CGraphicMarkInstance::Delete(m_pMarkInstance);
-			m_pMarkInstance=NULL;
+			m_pMarkInstance=nullptr;
 		}
 	}
 
@@ -1351,7 +1351,7 @@ namespace UI
 		UpdateRect();
 	}
 
-	void CMarkBox::SetScale(FLOAT fScale)
+	void CMarkBox::SetScale(float fScale)
 	{
 		if (!m_pMarkInstance)
 			return;
@@ -1359,7 +1359,7 @@ namespace UI
 		m_pMarkInstance->SetScale(fScale);
 	}
 
-	void CMarkBox::SetIndex(UINT uIndex)
+	void CMarkBox::SetIndex(uint32_t uIndex)
 	{
 		if (!m_pMarkInstance)
 			return;
@@ -1400,13 +1400,13 @@ namespace UI
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	DWORD CExpandedImageBox::Type()
+	uint32_t CExpandedImageBox::Type()
 	{
-		static DWORD s_dwType = GetCRC32("CExpandedImageBox", strlen("CExpandedImageBox"));
+		static uint32_t s_dwType = GetCRC32("CExpandedImageBox", strlen("CExpandedImageBox"));
 		return (s_dwType);
 	}
 
-	BOOL CExpandedImageBox::OnIsType(DWORD dwType)
+	BOOL CExpandedImageBox::OnIsType(uint32_t dwType)
 	{
 		if (CExpandedImageBox::Type() == dwType)
 			return TRUE;
@@ -1433,7 +1433,7 @@ namespace UI
 		if (m_pImageInstance)
 		{
 			CGraphicExpandedImageInstance::Delete((CGraphicExpandedImageInstance*)m_pImageInstance);
-			m_pImageInstance=NULL;
+			m_pImageInstance=nullptr;
 		}
 	}
 
@@ -1443,7 +1443,7 @@ namespace UI
 			return;
 
 		((CGraphicExpandedImageInstance*)m_pImageInstance)->SetScale(fx, fy);
-		CWindow::SetSize(long(float(GetWidth())*fx), long(float(GetHeight())*fy));
+		CWindow::SetSize(int32_t(float(GetWidth())*fx), int32_t(float(GetHeight())*fy));
 	}
 	void CExpandedImageBox::SetOrigin(float fx, float fy)
 	{
@@ -1467,7 +1467,7 @@ namespace UI
 		((CGraphicExpandedImageInstance*)m_pImageInstance)->SetRenderingRect(fLeft, fTop, fRight, fBottom);
 	}
 
-	void CExpandedImageBox::SetRenderingMode(int iMode)
+	void CExpandedImageBox::SetRenderingMode(int32_t iMode)
 	{
 		((CGraphicExpandedImageInstance*)m_pImageInstance)->SetRenderingMode(iMode);
 	}
@@ -1488,13 +1488,13 @@ namespace UI
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	DWORD CAniImageBox::Type()
+	uint32_t CAniImageBox::Type()
 	{
-		static DWORD s_dwType = GetCRC32("CAniImageBox", strlen("CAniImageBox"));
+		static uint32_t s_dwType = GetCRC32("CAniImageBox", strlen("CAniImageBox"));
 		return (s_dwType);
 	}
 
-	BOOL CAniImageBox::OnIsType(DWORD dwType)
+	BOOL CAniImageBox::OnIsType(uint32_t dwType)
 	{
 		if (CAniImageBox::Type() == dwType)
 			return TRUE;
@@ -1515,7 +1515,7 @@ namespace UI
 		for_each(m_ImageVector.begin(), m_ImageVector.end(), CGraphicExpandedImageInstance::DeleteExpandedImageInstance);
 	}
 
-	void CAniImageBox::SetDelay(int iDelay)
+	void CAniImageBox::SetDelay(int32_t iDelay)
 	{
 		m_byDelay = iDelay;
 	}
@@ -1569,13 +1569,13 @@ namespace UI
 
 	struct FSetRenderingMode
 	{
-		int iMode;
+		int32_t iMode;
 		void operator () (CGraphicExpandedImageInstance * pInstance)
 		{
 			pInstance->SetRenderingMode(iMode);
 		}
 	};
-	void CAniImageBox::SetRenderingMode(int iMode)
+	void CAniImageBox::SetRenderingMode(int32_t iMode)
 	{
 		FSetRenderingMode setRenderingMode;
 		setRenderingMode.iMode = iMode;
@@ -1640,7 +1640,7 @@ namespace UI
 
 	CButton::CButton(PyObject * ppyObject)
 		:	CWindow(ppyObject),
-			m_pcurVisual(NULL),
+			m_pcurVisual(nullptr),
 			m_bEnable(TRUE),
 			m_isPressed(FALSE),
 			m_isFlash(FALSE)
@@ -1784,7 +1784,7 @@ namespace UI
 		{
 			if (m_isFlash)
 			if (!IsIn())
-			if (int(timeGetTime() / 500)%2)
+			if (int32_t(timeGetTime() / 500)%2)
 			{
 				return;
 			}
@@ -1996,7 +1996,7 @@ namespace UI
 	{
 	}
 
-	void CDragButton::SetRestrictMovementArea(int ix, int iy, int iwidth, int iheight)
+	void CDragButton::SetRestrictMovementArea(int32_t ix, int32_t iy, int32_t iwidth, int32_t iheight)
 	{
 		m_restrictArea.left = ix;
 		m_restrictArea.top = iy;

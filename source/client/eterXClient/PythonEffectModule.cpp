@@ -33,14 +33,14 @@ PyObject * effectCreateEffect(PyObject * poSelf, PyObject * poArgs)
 	CInstanceBase * pInstance = CPythonCharacterManager::Instance().GetSelectedInstancePtr();
 	TPixelPosition PixelPosition;
 	pInstance->NEW_GetPixelPosition(&PixelPosition);
-	int iIndex = CEffectManager::Instance().CreateEffect(szEffectName, PixelPosition, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	int32_t iIndex = CEffectManager::Instance().CreateEffect(szEffectName, PixelPosition, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	return Py_BuildValue("i", iIndex);
 }
 
 PyObject * effectDeleteEffect(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 
@@ -51,7 +51,7 @@ PyObject * effectDeleteEffect(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * effectSetPosition(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
 	float fx;
@@ -72,10 +72,10 @@ PyObject * effectSetPosition(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * effectRegisterIndexedFlyData(PyObject * poSelf, PyObject * poArgs)
 {
-	int iIndex;
+	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
-	int iType;
+	int32_t iType;
 	if (!PyTuple_GetInteger(poArgs, 1, &iType))
 		return Py_BuildException();
 	char * szFlyDataName;
@@ -101,7 +101,7 @@ void initeffect()
 		{ "Update",						effectUpdate,					METH_VARARGS },
 		{ "Render",						effectRender,					METH_VARARGS },
 
-		{ NULL,							NULL,							NULL         },
+		{ nullptr,							nullptr,							0         },
 	};
 
 	PyObject * poModule = Py_InitModule("effect", s_methods);

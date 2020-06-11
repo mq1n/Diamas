@@ -8,12 +8,12 @@ class CDynamicVertexBuffer : public CGraphicVertexBuffer
 		CDynamicVertexBuffer();
 		virtual ~CDynamicVertexBuffer();
 
-		bool Create(int vtxCount, int fvf);
+		bool Create(int32_t vtxCount, int32_t fvf);
 
 
 
 	protected:
-		int m_vtxCount;
-		int m_fvf;
+		int32_t m_vtxCount;
+		int32_t m_fvf;
 };
 

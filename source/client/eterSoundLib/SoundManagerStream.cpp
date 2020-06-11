@@ -18,7 +18,7 @@ bool CSoundManagerStream::Initialize()
 
 	ms_DIGDriver = AIL_open_digital_driver(44100, 16, 2, 0);
 
-	for (int i = 0; i < MUSIC_INSTANCE_MAX_NUM; ++i)
+	for (int32_t i = 0; i < MUSIC_INSTANCE_MAX_NUM; ++i)
 		m_Instances[i].Initialize();
 
 	return true;
@@ -26,20 +26,20 @@ bool CSoundManagerStream::Initialize()
 
 void CSoundManagerStream::Destroy()
 {	
-	for (int i=0; i<MUSIC_INSTANCE_MAX_NUM; ++i)
+	for (int32_t i=0; i<MUSIC_INSTANCE_MAX_NUM; ++i)
 		m_Instances[i].Stop();
 
 	CSoundBase::Destroy();
 }
 
-bool CSoundManagerStream::SetInstance(DWORD dwIndex, const char* filename)
+bool CSoundManagerStream::SetInstance(uint32_t dwIndex, const char* filename)
 {
 	if (!CheckInstanceIndex(dwIndex))
 		return false;
 
 	HSTREAM hStream = AIL_open_stream(ms_DIGDriver, filename, 0);
 
-	if (NULL == hStream)
+	if (nullptr == hStream)
 		return false;
 
 	m_Instances[dwIndex].SetStream(hStream);
@@ -47,17 +47,17 @@ bool CSoundManagerStream::SetInstance(DWORD dwIndex, const char* filename)
 	return true;
 }
 
-CSoundInstanceStream * CSoundManagerStream::GetInstance(DWORD dwIndex)
+CSoundInstanceStream * CSoundManagerStream::GetInstance(uint32_t dwIndex)
 {
 	if (!CheckInstanceIndex(dwIndex))
-		return NULL;
+		return nullptr;
 
 	return &m_Instances[dwIndex];
 }
 
-bool CSoundManagerStream::CheckInstanceIndex(DWORD dwIndex)
+bool CSoundManagerStream::CheckInstanceIndex(uint32_t dwIndex)
 {
-	if (dwIndex >= DWORD(MUSIC_INSTANCE_MAX_NUM))
+	if (dwIndex >= uint32_t(MUSIC_INSTANCE_MAX_NUM))
 		return false;
 
 	return true;

@@ -9,12 +9,12 @@
 /////////////////////////////////////////////////////////////////////////////
 // QUICKSLOT HANDLING
 /////////////////////////////////////////////////////////////////////////////
-void CHARACTER::SyncQuickslot(BYTE bType, BYTE bOldPos, BYTE bNewPos) // bNewPos == 255 ¸é DELETE
+void CHARACTER::SyncQuickslot(uint8_t bType, uint8_t bOldPos, uint8_t bNewPos) // bNewPos == 255 ¸é DELETE
 {
 	if (bOldPos == bNewPos)
 		return;
 
-	for (int i = 0; i < QUICKSLOT_MAX_NUM; ++i)
+	for (int32_t i = 0; i < QUICKSLOT_MAX_NUM; ++i)
 	{
 		if (m_quickslot[i].type == bType && m_quickslot[i].pos == bOldPos)
 		{
@@ -33,7 +33,7 @@ void CHARACTER::SyncQuickslot(BYTE bType, BYTE bOldPos, BYTE bNewPos) // bNewPos
 	}
 }
 
-bool CHARACTER::GetQuickslot(BYTE pos, TQuickslot ** ppSlot)
+bool CHARACTER::GetQuickslot(uint8_t pos, TQuickslot ** ppSlot)
 {
 	if (pos >= QUICKSLOT_MAX_NUM)
 		return false;
@@ -42,7 +42,7 @@ bool CHARACTER::GetQuickslot(BYTE pos, TQuickslot ** ppSlot)
 	return true;
 }
 
-bool CHARACTER::SetQuickslot(BYTE pos, TQuickslot & rSlot)
+bool CHARACTER::SetQuickslot(uint8_t pos, TQuickslot & rSlot)
 {
 	struct packet_quickslot_add pack_quickslot_add;
 
@@ -52,7 +52,7 @@ bool CHARACTER::SetQuickslot(BYTE pos, TQuickslot & rSlot)
 	if (rSlot.type >= QUICKSLOT_TYPE_MAX_NUM)
 		return false;
 
-	for (int i = 0; i < QUICKSLOT_MAX_NUM; ++i)
+	for (int32_t i = 0; i < QUICKSLOT_MAX_NUM; ++i)
 	{
 		if (rSlot.type == 0)
 			continue;
@@ -71,7 +71,7 @@ bool CHARACTER::SetQuickslot(BYTE pos, TQuickslot & rSlot)
 			break;
 
 		case QUICKSLOT_TYPE_SKILL:
-			if ((int) rSlot.pos >= SKILL_MAX_NUM)
+			if ((int32_t) rSlot.pos >= SKILL_MAX_NUM)
 				return false;
 
 			break;
@@ -97,7 +97,7 @@ bool CHARACTER::SetQuickslot(BYTE pos, TQuickslot & rSlot)
 	return true;
 }
 
-bool CHARACTER::DelQuickslot(BYTE pos)
+bool CHARACTER::DelQuickslot(uint8_t pos)
 {
 	struct packet_quickslot_del pack_quickslot_del;
 
@@ -113,7 +113,7 @@ bool CHARACTER::DelQuickslot(BYTE pos)
 	return true;
 }
 
-bool CHARACTER::SwapQuickslot(BYTE a, BYTE b)
+bool CHARACTER::SwapQuickslot(uint8_t a, uint8_t b)
 {
 	struct packet_quickslot_swap pack_quickslot_swap;
 	TQuickslot quickslot;
@@ -135,11 +135,11 @@ bool CHARACTER::SwapQuickslot(BYTE a, BYTE b)
 	return true;
 }
 
-void CHARACTER::ChainQuickslotItem(LPITEM pItem, BYTE bType, BYTE bOldPos)
+void CHARACTER::ChainQuickslotItem(LPITEM pItem, uint8_t bType, uint8_t bOldPos)
 {
 	if (pItem->IsDragonSoul())
 		return;
-	for ( int i=0; i < QUICKSLOT_MAX_NUM; ++i )
+	for ( int32_t i=0; i < QUICKSLOT_MAX_NUM; ++i )
 	{
 		if ( m_quickslot[i].type == bType && m_quickslot[i].pos == bOldPos )
 		{

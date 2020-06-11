@@ -307,7 +307,7 @@ BOOL CInstanceBase::NEW_IsClickableDistanceDestInstance(CInstanceBase& rkInstDst
 	return m_GraphicThingInstance.IsClickableDistanceDestInstance(rkInstDst.m_GraphicThingInstance, fDistance);
 }
 
-bool CInstanceBase::NEW_UseSkill(UINT uSkill, UINT uMot, UINT uMotLoopCount, bool isMovingSkill)
+bool CInstanceBase::NEW_UseSkill(uint32_t uSkill, uint32_t uMot, uint32_t uMotLoopCount, bool isMovingSkill)
 {
 	if (IsDead())
 		return false;
@@ -415,7 +415,7 @@ void CInstanceBase::AttackProcess()
 	if (!m_GraphicThingInstance.CanCheckAttacking())
 		return;
    
-	CInstanceBase * pkInstLast = NULL;
+	CInstanceBase * pkInstLast = nullptr;
 	CPythonCharacterManager& rkChrMgr = CPythonCharacterManager::Instance();
 	CPythonCharacterManager::CharacterIterator i = rkChrMgr.CharacterInstanceBegin();
 	while (rkChrMgr.CharacterInstanceEnd()!=i)
@@ -459,7 +459,7 @@ void CInstanceBase::RunNormalAttack(float fAtkDirRot)
 	m_GraphicThingInstance.NormalAttack(fAtkDirRot);
 }
 
-void CInstanceBase::RunComboAttack(float fAtkDirRot, DWORD wMotionIndex)
+void CInstanceBase::RunComboAttack(float fAtkDirRot, uint32_t wMotionIndex)
 {
 	EndGoing();
 	m_GraphicThingInstance.ComboAttack(wMotionIndex, fAtkDirRot);
@@ -505,7 +505,7 @@ BOOL CInstanceBase::CheckAdvancing()
 	BOOL bUsingSkill = m_GraphicThingInstance.IsUsingSkill();
 
 	m_dwAdvActorVID = 0;
-	UINT uCollisionCount=0;
+	uint32_t uCollisionCount=0;
 
 	CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
 	for(CPythonCharacterManager::CharacterIterator i = rkChrMgr.CharacterInstanceBegin(); i!=rkChrMgr.CharacterInstanceEnd();++i)
@@ -551,10 +551,10 @@ BOOL CInstanceBase::CheckAdvancing()
 
 	// NOTE : 만약 이동 거리가 크다면 쪼개서 구간 별로 속성을 체크해 본다
 	//        현재 설정해 놓은 10.0f는 임의의 거리 - [levites]
-	int iStep = int(D3DXVec3Length(&rv3MoveDirection) / 10.0f);
+	int32_t iStep = int32_t(D3DXVec3Length(&rv3MoveDirection) / 10.0f);
 	D3DXVECTOR3 v3CheckStep = rv3MoveDirection / float(iStep);
 	D3DXVECTOR3 v3CheckPosition = rv3Position;
-	for (int j = 0; j < iStep; ++j)
+	for (int32_t j = 0; j < iStep; ++j)
 	{
 		v3CheckPosition += v3CheckStep;
 
@@ -628,7 +628,7 @@ BOOL CInstanceBase::CanAttackHorseLevel()
 	return m_kHorse.CanAttack();
 }
 
-bool CInstanceBase::IsAffect(UINT uAffect)
+bool CInstanceBase::IsAffect(uint32_t uAffect)
 {
 	return m_kAffectFlagContainer.IsSet(uAffect);
 }
@@ -638,7 +638,7 @@ MOTION_KEY CInstanceBase::GetNormalAttackIndex()
 	return m_GraphicThingInstance.GetNormalAttackIndex();
 }
 
-DWORD CInstanceBase::GetComboIndex()
+uint32_t CInstanceBase::GetComboIndex()
 {
 	return m_GraphicThingInstance.GetComboIndex();
 }
@@ -648,13 +648,13 @@ float CInstanceBase::GetAttackingElapsedTime()
 	return m_GraphicThingInstance.GetAttackingElapsedTime();
 }
 
-void CInstanceBase::ProcessHitting(DWORD dwMotionKey, CInstanceBase * pVictimInstance)
+void CInstanceBase::ProcessHitting(uint32_t dwMotionKey, CInstanceBase * pVictimInstance)
 {
 	assert(!"-_-" && "CInstanceBase::ProcessHitting");
 	//m_GraphicThingInstance.ProcessSucceedingAttacking(dwMotionKey, pVictimInstance->m_GraphicThingInstance);
 }
 
-void CInstanceBase::ProcessHitting(DWORD dwMotionKey, BYTE byEventIndex, CInstanceBase * pVictimInstance)
+void CInstanceBase::ProcessHitting(uint32_t dwMotionKey, uint8_t byEventIndex, CInstanceBase * pVictimInstance)
 {
 	assert(!"-_-" && "CInstanceBase::ProcessHitting");
 	//m_GraphicThingInstance.ProcessSucceedingAttacking(dwMotionKey, byEventIndex, pVictimInstance->m_GraphicThingInstance);

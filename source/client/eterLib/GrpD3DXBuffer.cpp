@@ -4,7 +4,7 @@
 
 CDirect3DXBuffer::CDirect3DXBuffer()
 {
-	m_lpd3dxBuffer=NULL;
+	m_lpd3dxBuffer=nullptr;
 }
 
 CDirect3DXBuffer::CDirect3DXBuffer(LPD3DXBUFFER lpd3dxBuffer)
@@ -30,12 +30,12 @@ void CDirect3DXBuffer::Create(LPD3DXBUFFER lpd3dxBuffer)
 
 void*CDirect3DXBuffer::GetPointer()
 {
-	assert(m_lpd3dxBuffer!=NULL);
+	assert(m_lpd3dxBuffer!=nullptr);
 	return m_lpd3dxBuffer->GetBufferPointer();
 }
 
-int  CDirect3DXBuffer::GetSize()
+int32_t  CDirect3DXBuffer::GetSize()
 {
-	assert(m_lpd3dxBuffer!=NULL);
+	assert(m_lpd3dxBuffer!=nullptr);
 	return m_lpd3dxBuffer->GetBufferSize();
 }

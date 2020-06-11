@@ -3,14 +3,14 @@
 #include "AttributeData.h"
 
 const char c_szAttributeDataFileHeader[] = "AttributeData";
-const int c_iAttributeDataFileHeaderLength = 13;
+const int32_t c_iAttributeDataFileHeaderLength = 13;
 
-/*DWORD CAttributeData::GetCollisionDataCount() const
+/*uint32_t CAttributeData::GetCollisionDataCount() const
 {
 	return m_CollisionDataVector.size();
 }
 
-BOOL CAttributeData::GetCollisionDataPointer(DWORD dwIndex, const TCollisionData ** c_ppCollisionData) const
+BOOL CAttributeData::GetCollisionDataPointer(uint32_t dwIndex, const TCollisionData ** c_ppCollisionData) const
 {
 	if (dwIndex >= GetCollisionDataCount())
 		return FALSE;
@@ -31,12 +31,12 @@ const THeightDataVector & CAttributeData::GetHeightDataVector() const
 	return m_HeightDataVector;
 }
 
-DWORD CAttributeData::GetHeightDataCount() const
+uint32_t CAttributeData::GetHeightDataCount() const
 {
 	return m_HeightDataVector.size();
 }
 
-BOOL CAttributeData::GetHeightDataPointer(DWORD dwIndex, const THeightData ** c_ppHeightData) const
+BOOL CAttributeData::GetHeightDataPointer(uint32_t dwIndex, const THeightData ** c_ppHeightData) const
 {
 	if (dwIndex >= GetHeightDataCount())
 		return FALSE;
@@ -57,7 +57,7 @@ size_t CAttributeData::AddCollisionData(const CStaticCollisionData& data)
 	return m_StaticCollisionDataVector.size();
 }
 
-bool CAttributeData::OnLoad(int /*iSize*/, const void * c_pvBuf)
+bool CAttributeData::OnLoad(int32_t /*iSize*/, const void * c_pvBuf)
 {
 	if (!c_pvBuf)
 	{
@@ -65,7 +65,7 @@ bool CAttributeData::OnLoad(int /*iSize*/, const void * c_pvBuf)
 		return true;
 	}
 
-	const BYTE * c_pbBuf = static_cast<const BYTE *> (c_pvBuf);
+	const uint8_t * c_pbBuf = static_cast<const uint8_t *> (c_pvBuf);
 
 	char szHeader[c_iAttributeDataFileHeaderLength+1];
 	memcpy(szHeader, c_pbBuf, c_iAttributeDataFileHeaderLength+1);
@@ -73,23 +73,23 @@ bool CAttributeData::OnLoad(int /*iSize*/, const void * c_pvBuf)
 	if (strcmp(szHeader, c_szAttributeDataFileHeader))
 		return FALSE;
 
-	DWORD dwCollisionDataCount;
-	DWORD dwHeightDataCount;
-	memcpy(&dwCollisionDataCount, c_pbBuf, sizeof(DWORD));
-	c_pbBuf += sizeof(DWORD);
-	memcpy(&dwHeightDataCount, c_pbBuf, sizeof(DWORD));
-	c_pbBuf += sizeof(DWORD);
+	uint32_t dwCollisionDataCount;
+	uint32_t dwHeightDataCount;
+	memcpy(&dwCollisionDataCount, c_pbBuf, sizeof(uint32_t));
+	c_pbBuf += sizeof(uint32_t);
+	memcpy(&dwHeightDataCount, c_pbBuf, sizeof(uint32_t));
+	c_pbBuf += sizeof(uint32_t);
 
 	m_StaticCollisionDataVector.clear();
 	m_StaticCollisionDataVector.resize(dwCollisionDataCount);
 	m_HeightDataVector.clear();
 	m_HeightDataVector.resize(dwHeightDataCount);
 
-	for (DWORD i = 0; i < dwCollisionDataCount; ++i)
+	for (uint32_t i = 0; i < dwCollisionDataCount; ++i)
 	{
 		CStaticCollisionData & rCollisionData = m_StaticCollisionDataVector[i];
-		memcpy(&rCollisionData.dwType, c_pbBuf, sizeof(DWORD));
-		c_pbBuf += sizeof(DWORD);
+		memcpy(&rCollisionData.dwType, c_pbBuf, sizeof(uint32_t));
+		c_pbBuf += sizeof(uint32_t);
 		memcpy(rCollisionData.szName, c_pbBuf, 32);
 		c_pbBuf += 32;
 		memcpy(&rCollisionData.v3Position, c_pbBuf, sizeof(D3DXVECTOR3));
@@ -127,15 +127,15 @@ bool CAttributeData::OnLoad(int /*iSize*/, const void * c_pvBuf)
 		c_pbBuf += sizeof(D3DXQUATERNION);
 	}
 
-	for (DWORD j = 0; j < dwHeightDataCount; ++j)
+	for (uint32_t j = 0; j < dwHeightDataCount; ++j)
 	{
 		THeightData & rHeightData = m_HeightDataVector[j];
 		memcpy(rHeightData.szName, c_pbBuf, 32);
 		c_pbBuf += 32;
 
-		DWORD dwPrimitiveCount;
-		memcpy(&dwPrimitiveCount, c_pbBuf, sizeof(DWORD));
-		c_pbBuf += sizeof(DWORD);
+		uint32_t dwPrimitiveCount;
+		memcpy(&dwPrimitiveCount, c_pbBuf, sizeof(uint32_t));
+		c_pbBuf += sizeof(uint32_t);
 
 		rHeightData.v3VertexVector.clear();
 		rHeightData.v3VertexVector.resize(dwPrimitiveCount);
@@ -143,7 +143,7 @@ bool CAttributeData::OnLoad(int /*iSize*/, const void * c_pvBuf)
 		c_pbBuf += dwPrimitiveCount*sizeof(D3DXVECTOR3);
 
 		// Getting Maximize Radius
-		for (DWORD k = 0; k < rHeightData.v3VertexVector.size(); ++k)
+		for (uint32_t k = 0; k < rHeightData.v3VertexVector.size(); ++k)
 		{
 			m_fMaximizeRadius = fMAX(m_fMaximizeRadius, fabs(rHeightData.v3VertexVector[k].x)+50.0f);
 			m_fMaximizeRadius = fMAX(m_fMaximizeRadius, fabs(rHeightData.v3VertexVector[k].y)+50.0f);

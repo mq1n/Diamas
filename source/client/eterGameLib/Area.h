@@ -28,8 +28,8 @@ class CArea
 		typedef struct SObjectData
 		{
 			TObjectPosition		Position;
-			DWORD				dwCRC;
-			BYTE				abyPortalID[PORTAL_ID_MAX_NUM];
+			uint32_t				dwCRC;
+			uint8_t				abyPortalID[PORTAL_ID_MAX_NUM];
 
 			// For Tree
 			//  - Nothing
@@ -44,7 +44,7 @@ class CArea
 			//  - Nothing
 
 			// For Ambience
-			DWORD				dwRange;
+			uint32_t				dwRange;
 			float				fMaxVolumeAreaPercentage;
 
 			void InitializeRotation();
@@ -66,9 +66,9 @@ class CArea
 		typedef struct SAmbienceInstance : public CScreen
 		{
 			float fx, fy, fz;
-			DWORD dwRange;
+			uint32_t dwRange;
 			float fMaxVolumeAreaPercentage;
-			int iPlaySoundIndex;
+			int32_t iPlaySoundIndex;
 			float fNextPlayTime;
 			prt::TPropertyAmbience AmbienceData;
 
@@ -86,7 +86,7 @@ class CArea
 
 		typedef struct SObjectInstance
 		{
-			DWORD						dwType;
+			uint32_t						dwType;
 			CAttributeInstance *		pAttributeInstance;
 
 			// Data For Tree
@@ -97,8 +97,8 @@ class CArea
 			CGraphicThingInstance *		pThingInstance;
 
 			// Data for Effect
-			DWORD						dwEffectID;
-			DWORD						dwEffectInstanceIndex;
+			uint32_t						dwEffectID;
+			uint32_t						dwEffectInstanceIndex;
 
 			// Data For Ambience
 			TAmbienceInstance *			pAmbienceInstance;
@@ -126,7 +126,7 @@ class CArea
 				__Initialize();
 			}
 
-			void SetTree(float x, float y, float z, DWORD dwTreeCRC, const char* c_szTreeName);
+			void SetTree(float x, float y, float z, uint32_t dwTreeCRC, const char* c_szTreeName);
 
 			void __Initialize()
 			{
@@ -136,11 +136,11 @@ class CArea
 				dwEffectInstanceIndex = 0xffffffff;
 				isShadowFlag = false;
 
-				pTree=NULL;
-				pThingInstance=NULL;
-				pAttributeInstance=NULL;
-				pAmbienceInstance=NULL;
-				pDungeonBlock=NULL;
+				pTree=nullptr;
+				pThingInstance=nullptr;
+				pAttributeInstance=nullptr;
+				pAmbienceInstance=nullptr;
+				pDungeonBlock=nullptr;
 			}
 
 			SObjectInstance()
@@ -157,13 +157,13 @@ class CArea
 		typedef std::vector<CDungeonBlock *>				TDungeonBlockInstanceVector;
 		typedef std::vector<TObjectInstance *>				TObjectInstanceVector;
 		typedef std::vector<TAmbienceInstance *>			TAmbienceInstanceVector;
-		typedef std::map<CGraphicThingInstance *, DWORD>	TGraphicThingInstanceCRCMap;	// 최적화용 by 동현
-		typedef std::set<int>								TShowingPortalIDSet;
+		typedef std::map<CGraphicThingInstance *, uint32_t>	TGraphicThingInstanceCRCMap;	// 최적화용 by 동현
+		typedef std::set<int32_t>								TShowingPortalIDSet;
 
 		typedef struct SCRCWithNumber
 		{
-			DWORD dwCRC;
-			DWORD dwNumber;
+			uint32_t dwCRC;
+			uint32_t dwNumber;
 		} TCRCWithNumber;
 
 		typedef std::vector<TCRCWithNumber> TCRCWithNumberVector;
@@ -171,7 +171,7 @@ class CArea
 		struct FFindIfCRC
 		{
 
-			FFindIfCRC(DWORD dwCRC) { m_dwCRC = dwCRC; }
+			FFindIfCRC(uint32_t dwCRC) { m_dwCRC = dwCRC; }
 			
 			bool operator() (TCRCWithNumber & rCRCWithNumber)
 			{
@@ -180,7 +180,7 @@ class CArea
 				return false;
 			}
 
-			DWORD m_dwCRC;
+			uint32_t m_dwCRC;
 		};
 
 		struct CRCNumComp
@@ -203,15 +203,15 @@ class CArea
 
 		bool			Load(const char * c_szPathName);
 
-		DWORD			GetObjectDataCount();
-		bool			GetObjectDataPointer(DWORD dwIndex, const TObjectData ** ppObjectData) const;
+		uint32_t			GetObjectDataCount();
+		bool			GetObjectDataPointer(uint32_t dwIndex, const TObjectData ** ppObjectData) const;
 
-		const DWORD		GetObjectInstanceCount() const;
-		const bool		GetObjectInstancePointer(const DWORD & dwIndex, const TObjectInstance ** ppObjectInstance) const;
+		const uint32_t		GetObjectInstanceCount() const;
+		const bool		GetObjectInstancePointer(const uint32_t & dwIndex, const TObjectInstance ** ppObjectInstance) const;
 
 		void			EnablePortal(BOOL bFlag=TRUE);
 		void			ClearPortal();
-		void			AddShowingPortalID(int iNum);
+		void			AddShowingPortalID(int32_t iNum);
 		void			RefreshPortal();
 
 		//////////////////////////////////////////////////////////////////////////
@@ -228,20 +228,20 @@ class CArea
 
 		//////////////////////////////////////////////////////////////////////////
 
-		void			SetCoordinate(const WORD & c_usCoordX, const WORD & c_usCoordY);
-		void			GetCoordinate(WORD * usCoordX, WORD * usCoordY);
+		void			SetCoordinate(const uint16_t & c_usCoordX, const uint16_t & c_usCoordY);
+		void			GetCoordinate(uint16_t * usCoordX, uint16_t * usCoordY);
 
 		//////////////////////////////////////////////////////////////////////////
 
-		DWORD			DEBUG_GetRenderedCRCNum();
+		uint32_t			DEBUG_GetRenderedCRCNum();
 		TCRCWithNumberVector & DEBUG_GetRenderedCRCWithNumVector();
-		DWORD			DEBUG_GetRenderedGrapphicThingInstanceNum();
+		uint32_t			DEBUG_GetRenderedGrapphicThingInstanceNum();
 
 		CMapOutdoor *	GetOwner() { return m_pOwnerOutdoorMap; }
 
 	protected:
 
-		bool			CheckObjectIndex(DWORD dwIndex) const;
+		bool			CheckObjectIndex(uint32_t dwIndex) const;
 
 		bool			__Load_LoadObject(const char * c_szFileName);
 		bool			__Load_LoadAmbience(const char * c_szFileName);
@@ -281,8 +281,8 @@ class CArea
 		TThingInstanceVector			m_kRenderedGrapphicThingInstanceVector;
 
 		// 좌표 : 심리스 맵 전체 중에서의 좌표... 둘다 0~999
-		WORD							m_wX;
-		WORD							m_wY;
+		uint16_t							m_wX;
+		uint16_t							m_wY;
 
 		// Owner COutdoorMap poineter
 		CMapOutdoor *					m_pOwnerOutdoorMap;
@@ -293,7 +293,7 @@ class CArea
 		static CDynamicPool<TAmbienceInstance>			ms_AmbienceInstancePool;
 		static CDynamicPool<CDungeonBlock>				ms_DungeonBlockInstancePool;
 
-		typedef std::map<DWORD, CEffectInstance*>		TEffectInstanceMap;
+		typedef std::map<uint32_t, CEffectInstance*>		TEffectInstanceMap;
 		typedef TEffectInstanceMap::iterator			TEffectInstanceIterator;
 		TEffectInstanceMap								m_EffectInstanceMap;
 

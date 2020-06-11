@@ -8,10 +8,10 @@
 
 extern std::string g_stLocale;
 extern bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab);
-extern int g_test_server;
-extern int g_log;
+extern int32_t g_test_server;
+extern int32_t g_log;
 
-bool CClientManager::InsertLogonAccount(const char * c_pszLogin, DWORD dwHandle, const char * c_pszIP)
+bool CClientManager::InsertLogonAccount(const char * c_pszLogin, uint32_t dwHandle, const char * c_pszIP)
 {
 	char szLogin[LOGIN_MAX_LEN + 1];
 	trim_and_lower(c_pszLogin, szLogin, sizeof(szLogin));
@@ -33,7 +33,7 @@ bool CClientManager::InsertLogonAccount(const char * c_pszLogin, DWORD dwHandle,
 	return true;
 }
 
-bool CClientManager::DeleteLogonAccount(const char * c_pszLogin, DWORD dwHandle)
+bool CClientManager::DeleteLogonAccount(const char * c_pszLogin, uint32_t dwHandle)
 {
 	char szLogin[LOGIN_MAX_LEN + 1];
 	trim_and_lower(c_pszLogin, szLogin, sizeof(szLogin));
@@ -76,7 +76,7 @@ bool CClientManager::FindLogonAccount(const char * c_pszLogin)
 	return true;
 }
 
-void CClientManager::QUERY_LOGIN_BY_KEY(CPeer * pkPeer, DWORD dwHandle, TPacketGDLoginByKey * p)
+void CClientManager::QUERY_LOGIN_BY_KEY(CPeer * pkPeer, uint32_t dwHandle, TPacketGDLoginByKey * p)
 {
 	CLoginData * pkLoginData = GetLoginData(p->dwLoginKey);
 	char szLogin[LOGIN_MAX_LEN + 1];
@@ -108,9 +108,9 @@ void CClientManager::QUERY_LOGIN_BY_KEY(CPeer * pkPeer, DWORD dwHandle, TPacketG
 		return;
 	}
 
-	if (memcmp(pkLoginData->GetClientKey(), p->adwClientKey, sizeof(DWORD) * 4))
+	if (memcmp(pkLoginData->GetClientKey(), p->adwClientKey, sizeof(uint32_t) * 4))
 	{
-		const DWORD * pdwClientKey = pkLoginData->GetClientKey();
+		const uint32_t * pdwClientKey = pkLoginData->GetClientKey();
 
 		sys_log(0, "LOGIN_BY_KEY client key differ %s %lu %lu %lu %lu, %lu %lu %lu %lu",
 				r.login,
@@ -160,7 +160,7 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 
 	if (msg->Get()->uiNumRows == 0)
 	{
-		DWORD account_id = info->pAccountTable->id;
+		uint32_t account_id = info->pAccountTable->id;
 		char szQuery[QUERY_MAX_LEN];
 #ifdef ENABLE_PLAYER_PER_ACCOUNT5
 		snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), account_id);
@@ -169,11 +169,11 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 #endif
 		std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(szQuery, SQL_PLAYER));
 		
-		sys_log(0, "RESULT_LOGIN_BY_KEY FAIL player_index's NULL : ID:%d", account_id);
+		sys_log(0, "RESULT_LOGIN_BY_KEY FAIL player_index's nullptr : ID:%d", account_id);
 
 		if (pMsg->Get()->uiNumRows == 0)
 		{
-			sys_log(0, "RESULT_LOGIN_BY_KEY FAIL player_index's NULL : ID:%d", account_id);
+			sys_log(0, "RESULT_LOGIN_BY_KEY FAIL player_index's nullptr : ID:%d", account_id);
 
 			// PLAYER_INDEX_CREATE_BUG_FIX
 			//snprintf(szQuery, sizeof(szQuery), "INSERT IGNORE INTO player_index%s (id) VALUES(%lu)", GetTablePostfix(), info->pAccountTable->id);
@@ -186,7 +186,7 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 
 	MYSQL_ROW row = mysql_fetch_row(msg->Get()->pSQLResult);
 
-	int col = 0;
+	int32_t col = 0;
 
 	for (; col < PLAYER_PER_ACCOUNT; ++col)
 		str_to_number(info->pAccountTable->players[col].dwID, row[col]);
@@ -241,8 +241,8 @@ void CClientManager::RESULT_PLAYER_INDEX_CREATE(CPeer * pkPeer, SQLMsg * msg)
 TAccountTable * CreateAccountTableFromRes(MYSQL_RES * res)
 {
 	char input_pwd[PASSWD_MAX_LEN + 1];
-	MYSQL_ROW row = NULL;
-	DWORD col;
+	MYSQL_ROW row = nullptr;
+	uint32_t col;
 
 	row = mysql_fetch_row(res);
 	col = 0;
@@ -258,7 +258,7 @@ TAccountTable * CreateAccountTableFromRes(MYSQL_RES * res)
 	strlcpy(pkTab->social_id, row[col++], sizeof(pkTab->social_id));
 	str_to_number(pkTab->bEmpire, row[col++]);
 
-	for (int j = 0; j < PLAYER_PER_ACCOUNT; ++j)
+	for (int32_t j = 0; j < PLAYER_PER_ACCOUNT; ++j)
 		str_to_number(pkTab->players[j].dwID, row[col++]);
 
 	strlcpy(pkTab->status, row[col++], sizeof(pkTab->status));
@@ -266,7 +266,7 @@ TAccountTable * CreateAccountTableFromRes(MYSQL_RES * res)
 	if (strcmp(pkTab->passwd, input_pwd))
 	{
 		delete pkTab;
-		return NULL;
+		return nullptr;
 	}
 
 	return pkTab;
@@ -277,25 +277,25 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 	if (!pRes)
 		return;
 
-	for (DWORD i = 0; i < mysql_num_rows(pRes); ++i)
+	for (uint32_t i = 0; i < mysql_num_rows(pRes); ++i)
 	{
 		MYSQL_ROW row = mysql_fetch_row(pRes);
-		int col = 0;
+		int32_t col = 0;
 
-		DWORD player_id = 0;
+		uint32_t player_id = 0;
 		!row[col++] ? 0 : str_to_number(player_id, row[col - 1]);
 
 		if (!player_id)
 			continue;
 
-		int j;
+		int32_t j;
 
 		for (j = 0; j < PLAYER_PER_ACCOUNT; ++j)
 		{
 			if (pkTab->players[j].dwID == player_id)
 			{
 				CPlayerTableCache * pc = CClientManager::instance().GetPlayerCache(player_id);
-				TPlayerTable * pt = pc ? pc->Get(false) : NULL;
+				TPlayerTable * pt = pc ? pc->Get(false) : nullptr;
 
 				if (pt)
 				{
@@ -469,12 +469,12 @@ void CClientManager::RESULT_LOGIN(CPeer * peer, SQLMsg * msg)
 		}
 
 		delete info->pAccountTable;
-		info->pAccountTable = NULL;
+		info->pAccountTable = nullptr;
 		delete info;
 	}
 }
 
-void CClientManager::QUERY_LOGOUT(CPeer * peer, DWORD dwHandle,const char * data)
+void CClientManager::QUERY_LOGOUT(CPeer * peer, uint32_t dwHandle,const char * data)
 {
 	TLogoutPacket* packet = (TLogoutPacket*)data;
 
@@ -483,12 +483,12 @@ void CClientManager::QUERY_LOGOUT(CPeer * peer, DWORD dwHandle,const char * data
 
 	CLoginData * pLoginData = GetLoginDataByLogin(packet->login);
 
-	if (pLoginData == NULL)
+	if (pLoginData == nullptr)
 		return;
 
-	int pid[PLAYER_PER_ACCOUNT];
+	int32_t pid[PLAYER_PER_ACCOUNT];
 
-	for (int n = 0; n < PLAYER_PER_ACCOUNT; ++n)
+	for (int32_t n = 0; n < PLAYER_PER_ACCOUNT; ++n)
 	{
 		if (pLoginData->GetAccountRef().players[n].dwID == 0)
 		{
@@ -512,7 +512,7 @@ void CClientManager::QUERY_LOGOUT(CPeer * peer, DWORD dwHandle,const char * data
 	}
 }
 
-void CClientManager::QUERY_CHANGE_NAME(CPeer * peer, DWORD dwHandle, TPacketGDChangeName * p)
+void CClientManager::QUERY_CHANGE_NAME(CPeer * peer, uint32_t dwHandle, TPacketGDChangeName * p)
 {
 	char queryStr[QUERY_MAX_LEN];
 	snprintf(queryStr, sizeof(queryStr),

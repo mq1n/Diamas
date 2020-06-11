@@ -40,11 +40,11 @@ class CCamera
 		void Unlock();
 		bool IsLock();
 
-		void Wheel(int nWheelLen);
-		bool Drag(int nMouseX, int nMouseY, LPPOINT lpReturnPoint);
+		void Wheel(int32_t nWheelLen);
+		bool Drag(int32_t nMouseX, int32_t nMouseY, LPPOINT lpReturnPoint);
 
 		bool EndDrag();
-		void BeginDrag(int nMouseX, int nMouseY);
+		void BeginDrag(int32_t nMouseX, int32_t nMouseY);
 
 		bool IsDraging();
 
@@ -64,7 +64,7 @@ class CCamera
 
 		D3DXVECTOR3 m_v3EyeBackup;
 
-		unsigned long m_ulNumScreenBuilding;
+		uint32_t m_ulNumScreenBuilding;
 
 // 	protected:
 
@@ -118,8 +118,8 @@ class CCamera
 		float			m_fPitchSum;
 		float			m_fRollSum;
 
-		long			m_lMousePosX;
-		long			m_lMousePosY;
+		int32_t			m_lMousePosX;
+		int32_t			m_lMousePosY;
 		
 		bool			m_bDrag;
 
@@ -155,7 +155,7 @@ class CCamera
 		void SetCameraState(eCameraState eNewCameraState);
 		void IncreaseNumSrcreenBuilding();
 		void ResetNumScreenBuilding();
-		unsigned long & GetNumScreenBuilding() { return m_ulNumScreenBuilding; }
+		uint32_t & GetNumScreenBuilding() { return m_ulNumScreenBuilding; }
 
 		const float & GetPitchBackUp() { return m_fPitchBackup; }
 		const float & GetRollBackUp() { return m_fRollBackup; }
@@ -245,7 +245,7 @@ class CCamera
 		static float CAMERA_MAX_DISTANCE;
 };
 
-typedef std::map<BYTE, CCamera *> TCameraMap;
+typedef std::map<uint8_t, CCamera *> TCameraMap;
 
 class CCameraManager : public CSingleton<CCameraManager>
 {
@@ -261,16 +261,16 @@ class CCameraManager : public CSingleton<CCameraManager>
 		CCameraManager();
 		virtual ~CCameraManager();
 
-		bool AddCamera(unsigned char ucCameraNum);
-		bool RemoveCamera(unsigned char ucCameraNum);
+		bool AddCamera(uint8_t ucCameraNum);
+		bool RemoveCamera(uint8_t ucCameraNum);
 
 		CCamera * GetCurrentCamera();
-		void SetCurrentCamera(unsigned char ucCameraNum);
+		void SetCurrentCamera(uint8_t ucCameraNum);
 		void ResetToPreviousCamera();
 
-		bool isCurrentCamera(unsigned char ucCameraNum);
+		bool isCurrentCamera(uint8_t ucCameraNum);
 
-		unsigned char GetCurrentCameraNum();
+		uint8_t GetCurrentCameraNum();
 
 		bool isTerrainCollisionEnable();
 		void SetTerrainCollision(bool bEnable);

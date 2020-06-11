@@ -143,7 +143,7 @@ extern RPC_IF_HANDLE __MIDL_itf_dimm_0000_v0_0_s_ifspec;
 
 #include <imm.h>
 #if 0
-typedef WORD LANGID;
+typedef uint16_t LANGID;
 
 typedef /* [public][public][public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0001
     {
@@ -159,108 +159,108 @@ typedef /* [public][public][public][public][public] */ struct __MIDL___MIDL_itf_
 
 typedef /* [public][public][public][public][public][public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0003
     {
-    LONG lfHeight;
-    LONG lfWidth;
-    LONG lfEscapement;
-    LONG lfOrientation;
-    LONG lfWeight;
-    BYTE lfItalic;
-    BYTE lfUnderline;
-    BYTE lfStrikeOut;
-    BYTE lfCharSet;
-    BYTE lfOutPrecision;
-    BYTE lfClipPrecision;
-    BYTE lfQuality;
-    BYTE lfPitchAndFamily;
+    int32_t lfHeight;
+    int32_t lfWidth;
+    int32_t lfEscapement;
+    int32_t lfOrientation;
+    int32_t lfWeight;
+    uint8_t lfItalic;
+    uint8_t lfUnderline;
+    uint8_t lfStrikeOut;
+    uint8_t lfCharSet;
+    uint8_t lfOutPrecision;
+    uint8_t lfClipPrecision;
+    uint8_t lfQuality;
+    uint8_t lfPitchAndFamily;
     CHAR lfFaceName[ 32 ];
     } 	LOGFONTA;
 
 typedef /* [public][public][public][public][public][public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0004
     {
-    LONG lfHeight;
-    LONG lfWidth;
-    LONG lfEscapement;
-    LONG lfOrientation;
-    LONG lfWeight;
-    BYTE lfItalic;
-    BYTE lfUnderline;
-    BYTE lfStrikeOut;
-    BYTE lfCharSet;
-    BYTE lfOutPrecision;
-    BYTE lfClipPrecision;
-    BYTE lfQuality;
-    BYTE lfPitchAndFamily;
+    int32_t lfHeight;
+    int32_t lfWidth;
+    int32_t lfEscapement;
+    int32_t lfOrientation;
+    int32_t lfWeight;
+    uint8_t lfItalic;
+    uint8_t lfUnderline;
+    uint8_t lfStrikeOut;
+    uint8_t lfCharSet;
+    uint8_t lfOutPrecision;
+    uint8_t lfClipPrecision;
+    uint8_t lfQuality;
+    uint8_t lfPitchAndFamily;
     WCHAR lfFaceName[ 32 ];
     } 	LOGFONTW;
 
-typedef DWORD HIMC;
+typedef uint32_t HIMC;
 
-typedef DWORD HIMCC;
+typedef uint32_t HIMCC;
 
 typedef /* [public][public][public][public][public][public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0005
     {
-    DWORD dwIndex;
-    DWORD dwStyle;
+    uint32_t dwIndex;
+    uint32_t dwStyle;
     POINT ptCurrentPos;
     RECT rcArea;
     } 	CANDIDATEFORM;
 
 typedef /* [public][public][public][public][public][public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0006
     {
-    DWORD dwStyle;
+    uint32_t dwStyle;
     POINT ptCurrentPos;
     RECT rcArea;
     } 	COMPOSITIONFORM;
 
 typedef /* [public][public][public][public][public][public][public][public][public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0007
     {
-    DWORD dwSize;
-    DWORD dwStyle;
-    DWORD dwCount;
-    DWORD dwSelection;
-    DWORD dwPageStart;
-    DWORD dwPageSize;
-    DWORD dwOffset[ 1 ];
+    uint32_t dwSize;
+    uint32_t dwStyle;
+    uint32_t dwCount;
+    uint32_t dwSelection;
+    uint32_t dwPageStart;
+    uint32_t dwPageSize;
+    uint32_t dwOffset[ 1 ];
     } 	CANDIDATELIST;
 
 typedef /* [public][public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0008
     {
-    DWORD dwStyle;
+    uint32_t dwStyle;
     CHAR szDescription[ 32 ];
     } 	STYLEBUFA;
 
 typedef /* [public][public][public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0009
     {
-    DWORD dwStyle;
+    uint32_t dwStyle;
     WCHAR szDescription[ 32 ];
     } 	STYLEBUFW;
 
-typedef WORD ATOM;
+typedef uint16_t ATOM;
 
 #endif
 #if (WINVER < 0x040A)
 typedef /* [public][public][public][public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0010
     {
-    UINT cbSize;
-    UINT fType;
-    UINT fState;
-    UINT wID;
+    uint32_t cbSize;
+    uint32_t fType;
+    uint32_t fState;
+    uint32_t wID;
     HBITMAP hbmpChecked;
     HBITMAP hbmpUnchecked;
-    DWORD dwItemData;
+    uint32_t dwItemData;
     CHAR szString[ 80 ];
     HBITMAP hbmpItem;
     } 	IMEMENUITEMINFOA;
 
 typedef /* [public][public][public][public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0011
     {
-    UINT cbSize;
-    UINT fType;
-    UINT fState;
-    UINT wID;
+    uint32_t cbSize;
+    uint32_t fType;
+    uint32_t fState;
+    uint32_t wID;
     HBITMAP hbmpChecked;
     HBITMAP hbmpUnchecked;
-    DWORD dwItemData;
+    uint32_t dwItemData;
     WCHAR szString[ 80 ];
     HBITMAP hbmpItem;
     } 	IMEMENUITEMINFOW;
@@ -273,8 +273,8 @@ typedef /* [public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0012
     BOOL fOpen;
     POINT ptStatusWndPos;
     POINT ptSoftKbdPos;
-    DWORD fdwConversion;
-    DWORD fdwSentence;
+    uint32_t fdwConversion;
+    uint32_t fdwSentence;
     union 
         {
         LOGFONTA A;
@@ -286,21 +286,21 @@ typedef /* [public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0012
     HIMCC hCandInfo;
     HIMCC hGuideLine;
     HIMCC hPrivate;
-    DWORD dwNumMsgBuf;
+    uint32_t dwNumMsgBuf;
     HIMCC hMsgBuf;
-    DWORD fdwInit;
-    DWORD dwReserve[ 3 ];
+    uint32_t fdwInit;
+    uint32_t dwReserve[ 3 ];
     } 	INPUTCONTEXT;
 
 typedef /* [public][public] */ struct __MIDL___MIDL_itf_dimm_0000_0014
     {
-    DWORD dwPrivateDataSize;
-    DWORD fdwProperty;
-    DWORD fdwConversionCaps;
-    DWORD fdwSentenceCaps;
-    DWORD fdwUICaps;
-    DWORD fdwSCSCaps;
-    DWORD fdwSelectCaps;
+    uint32_t dwPrivateDataSize;
+    uint32_t fdwProperty;
+    uint32_t fdwConversionCaps;
+    uint32_t fdwSentenceCaps;
+    uint32_t fdwUICaps;
+    uint32_t fdwSCSCaps;
+    uint32_t fdwSelectCaps;
     } 	IMEINFO;
 
 #endif
@@ -326,14 +326,14 @@ EXTERN_C const IID IID_IEnumRegisterWordA;
             /* [out] */ IEnumRegisterWordA **ppEnum) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Next( 
-            /* [in] */ ULONG ulCount,
+            /* [in] */ uint32_t ulCount,
             /* [out] */ REGISTERWORDA *rgRegisterWord,
-            /* [out] */ ULONG *pcFetched) = 0;
+            /* [out] */ uint32_t *pcFetched) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Reset( void) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Skip( 
-            /* [in] */ ULONG ulCount) = 0;
+            /* [in] */ uint32_t ulCount) = 0;
         
     };
     
@@ -348,10 +348,10 @@ EXTERN_C const IID IID_IEnumRegisterWordA;
             /* [in] */ REFIID riid,
             /* [iid_is][out] */ void **ppvObject);
         
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+        uint32_t ( STDMETHODCALLTYPE *AddRef )( 
             IEnumRegisterWordA * This);
         
-        ULONG ( STDMETHODCALLTYPE *Release )( 
+        uint32_t ( STDMETHODCALLTYPE *Release )( 
             IEnumRegisterWordA * This);
         
         HRESULT ( STDMETHODCALLTYPE *Clone )( 
@@ -360,16 +360,16 @@ EXTERN_C const IID IID_IEnumRegisterWordA;
         
         HRESULT ( STDMETHODCALLTYPE *Next )( 
             IEnumRegisterWordA * This,
-            /* [in] */ ULONG ulCount,
+            /* [in] */ uint32_t ulCount,
             /* [out] */ REGISTERWORDA *rgRegisterWord,
-            /* [out] */ ULONG *pcFetched);
+            /* [out] */ uint32_t *pcFetched);
         
         HRESULT ( STDMETHODCALLTYPE *Reset )( 
             IEnumRegisterWordA * This);
         
         HRESULT ( STDMETHODCALLTYPE *Skip )( 
             IEnumRegisterWordA * This,
-            /* [in] */ ULONG ulCount);
+            /* [in] */ uint32_t ulCount);
         
         END_INTERFACE
     } IEnumRegisterWordAVtbl;
@@ -422,21 +422,21 @@ void __RPC_STUB IEnumRegisterWordA_Clone_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IEnumRegisterWordA_Next_Proxy( 
     IEnumRegisterWordA * This,
-    /* [in] */ ULONG ulCount,
+    /* [in] */ uint32_t ulCount,
     /* [out] */ REGISTERWORDA *rgRegisterWord,
-    /* [out] */ ULONG *pcFetched);
+    /* [out] */ uint32_t *pcFetched);
 
 
 void __RPC_STUB IEnumRegisterWordA_Next_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IEnumRegisterWordA_Reset_Proxy( 
@@ -447,19 +447,19 @@ void __RPC_STUB IEnumRegisterWordA_Reset_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IEnumRegisterWordA_Skip_Proxy( 
     IEnumRegisterWordA * This,
-    /* [in] */ ULONG ulCount);
+    /* [in] */ uint32_t ulCount);
 
 
 void __RPC_STUB IEnumRegisterWordA_Skip_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 
@@ -485,14 +485,14 @@ EXTERN_C const IID IID_IEnumRegisterWordW;
             /* [out] */ IEnumRegisterWordW **ppEnum) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Next( 
-            /* [in] */ ULONG ulCount,
+            /* [in] */ uint32_t ulCount,
             /* [out] */ REGISTERWORDW *rgRegisterWord,
-            /* [out] */ ULONG *pcFetched) = 0;
+            /* [out] */ uint32_t *pcFetched) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Reset( void) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Skip( 
-            /* [in] */ ULONG ulCount) = 0;
+            /* [in] */ uint32_t ulCount) = 0;
         
     };
     
@@ -507,10 +507,10 @@ EXTERN_C const IID IID_IEnumRegisterWordW;
             /* [in] */ REFIID riid,
             /* [iid_is][out] */ void **ppvObject);
         
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+        uint32_t ( STDMETHODCALLTYPE *AddRef )( 
             IEnumRegisterWordW * This);
         
-        ULONG ( STDMETHODCALLTYPE *Release )( 
+        uint32_t ( STDMETHODCALLTYPE *Release )( 
             IEnumRegisterWordW * This);
         
         HRESULT ( STDMETHODCALLTYPE *Clone )( 
@@ -519,16 +519,16 @@ EXTERN_C const IID IID_IEnumRegisterWordW;
         
         HRESULT ( STDMETHODCALLTYPE *Next )( 
             IEnumRegisterWordW * This,
-            /* [in] */ ULONG ulCount,
+            /* [in] */ uint32_t ulCount,
             /* [out] */ REGISTERWORDW *rgRegisterWord,
-            /* [out] */ ULONG *pcFetched);
+            /* [out] */ uint32_t *pcFetched);
         
         HRESULT ( STDMETHODCALLTYPE *Reset )( 
             IEnumRegisterWordW * This);
         
         HRESULT ( STDMETHODCALLTYPE *Skip )( 
             IEnumRegisterWordW * This,
-            /* [in] */ ULONG ulCount);
+            /* [in] */ uint32_t ulCount);
         
         END_INTERFACE
     } IEnumRegisterWordWVtbl;
@@ -581,21 +581,21 @@ void __RPC_STUB IEnumRegisterWordW_Clone_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IEnumRegisterWordW_Next_Proxy( 
     IEnumRegisterWordW * This,
-    /* [in] */ ULONG ulCount,
+    /* [in] */ uint32_t ulCount,
     /* [out] */ REGISTERWORDW *rgRegisterWord,
-    /* [out] */ ULONG *pcFetched);
+    /* [out] */ uint32_t *pcFetched);
 
 
 void __RPC_STUB IEnumRegisterWordW_Next_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IEnumRegisterWordW_Reset_Proxy( 
@@ -606,19 +606,19 @@ void __RPC_STUB IEnumRegisterWordW_Reset_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IEnumRegisterWordW_Skip_Proxy( 
     IEnumRegisterWordW * This,
-    /* [in] */ ULONG ulCount);
+    /* [in] */ uint32_t ulCount);
 
 
 void __RPC_STUB IEnumRegisterWordW_Skip_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 
@@ -644,14 +644,14 @@ EXTERN_C const IID IID_IEnumInputContext;
             /* [out] */ IEnumInputContext **ppEnum) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Next( 
-            /* [in] */ ULONG ulCount,
+            /* [in] */ uint32_t ulCount,
             /* [out] */ HIMC *rgInputContext,
-            /* [out] */ ULONG *pcFetched) = 0;
+            /* [out] */ uint32_t *pcFetched) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Reset( void) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Skip( 
-            /* [in] */ ULONG ulCount) = 0;
+            /* [in] */ uint32_t ulCount) = 0;
         
     };
     
@@ -666,10 +666,10 @@ EXTERN_C const IID IID_IEnumInputContext;
             /* [in] */ REFIID riid,
             /* [iid_is][out] */ void **ppvObject);
         
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+        uint32_t ( STDMETHODCALLTYPE *AddRef )( 
             IEnumInputContext * This);
         
-        ULONG ( STDMETHODCALLTYPE *Release )( 
+        uint32_t ( STDMETHODCALLTYPE *Release )( 
             IEnumInputContext * This);
         
         HRESULT ( STDMETHODCALLTYPE *Clone )( 
@@ -678,16 +678,16 @@ EXTERN_C const IID IID_IEnumInputContext;
         
         HRESULT ( STDMETHODCALLTYPE *Next )( 
             IEnumInputContext * This,
-            /* [in] */ ULONG ulCount,
+            /* [in] */ uint32_t ulCount,
             /* [out] */ HIMC *rgInputContext,
-            /* [out] */ ULONG *pcFetched);
+            /* [out] */ uint32_t *pcFetched);
         
         HRESULT ( STDMETHODCALLTYPE *Reset )( 
             IEnumInputContext * This);
         
         HRESULT ( STDMETHODCALLTYPE *Skip )( 
             IEnumInputContext * This,
-            /* [in] */ ULONG ulCount);
+            /* [in] */ uint32_t ulCount);
         
         END_INTERFACE
     } IEnumInputContextVtbl;
@@ -740,21 +740,21 @@ void __RPC_STUB IEnumInputContext_Clone_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IEnumInputContext_Next_Proxy( 
     IEnumInputContext * This,
-    /* [in] */ ULONG ulCount,
+    /* [in] */ uint32_t ulCount,
     /* [out] */ HIMC *rgInputContext,
-    /* [out] */ ULONG *pcFetched);
+    /* [out] */ uint32_t *pcFetched);
 
 
 void __RPC_STUB IEnumInputContext_Next_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IEnumInputContext_Reset_Proxy( 
@@ -765,19 +765,19 @@ void __RPC_STUB IEnumInputContext_Reset_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IEnumInputContext_Skip_Proxy( 
     IEnumInputContext * This,
-    /* [in] */ ULONG ulCount);
+    /* [in] */ uint32_t ulCount);
 
 
 void __RPC_STUB IEnumInputContext_Skip_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 
@@ -821,10 +821,10 @@ EXTERN_C const IID IID_IActiveIMMRegistrar;
             /* [in] */ REFIID riid,
             /* [iid_is][out] */ void **ppvObject);
         
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+        uint32_t ( STDMETHODCALLTYPE *AddRef )( 
             IActiveIMMRegistrar * This);
         
-        ULONG ( STDMETHODCALLTYPE *Release )( 
+        uint32_t ( STDMETHODCALLTYPE *Release )( 
             IActiveIMMRegistrar * This);
         
         HRESULT ( STDMETHODCALLTYPE *RegisterIME )( 
@@ -886,7 +886,7 @@ void __RPC_STUB IActiveIMMRegistrar_RegisterIME_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMRegistrar_UnregisterIME_Proxy( 
@@ -898,7 +898,7 @@ void __RPC_STUB IActiveIMMRegistrar_UnregisterIME_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 
@@ -928,10 +928,10 @@ EXTERN_C const IID IID_IActiveIMMMessagePumpOwner;
             /* [in] */ const MSG *pMsg) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Pause( 
-            /* [out] */ DWORD *pdwCookie) = 0;
+            /* [out] */ uint32_t *pdwCookie) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Resume( 
-            /* [in] */ DWORD dwCookie) = 0;
+            /* [in] */ uint32_t dwCookie) = 0;
         
     };
     
@@ -946,10 +946,10 @@ EXTERN_C const IID IID_IActiveIMMMessagePumpOwner;
             /* [in] */ REFIID riid,
             /* [iid_is][out] */ void **ppvObject);
         
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+        uint32_t ( STDMETHODCALLTYPE *AddRef )( 
             IActiveIMMMessagePumpOwner * This);
         
-        ULONG ( STDMETHODCALLTYPE *Release )( 
+        uint32_t ( STDMETHODCALLTYPE *Release )( 
             IActiveIMMMessagePumpOwner * This);
         
         HRESULT ( STDMETHODCALLTYPE *Start )( 
@@ -964,11 +964,11 @@ EXTERN_C const IID IID_IActiveIMMMessagePumpOwner;
         
         HRESULT ( STDMETHODCALLTYPE *Pause )( 
             IActiveIMMMessagePumpOwner * This,
-            /* [out] */ DWORD *pdwCookie);
+            /* [out] */ uint32_t *pdwCookie);
         
         HRESULT ( STDMETHODCALLTYPE *Resume )( 
             IActiveIMMMessagePumpOwner * This,
-            /* [in] */ DWORD dwCookie);
+            /* [in] */ uint32_t dwCookie);
         
         END_INTERFACE
     } IActiveIMMMessagePumpOwnerVtbl;
@@ -1023,7 +1023,7 @@ void __RPC_STUB IActiveIMMMessagePumpOwner_Start_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMMessagePumpOwner_End_Proxy( 
@@ -1034,7 +1034,7 @@ void __RPC_STUB IActiveIMMMessagePumpOwner_End_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMMessagePumpOwner_OnTranslateMessage_Proxy( 
@@ -1046,31 +1046,31 @@ void __RPC_STUB IActiveIMMMessagePumpOwner_OnTranslateMessage_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMMessagePumpOwner_Pause_Proxy( 
     IActiveIMMMessagePumpOwner * This,
-    /* [out] */ DWORD *pdwCookie);
+    /* [out] */ uint32_t *pdwCookie);
 
 
 void __RPC_STUB IActiveIMMMessagePumpOwner_Pause_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMMessagePumpOwner_Resume_Proxy( 
     IActiveIMMMessagePumpOwner * This,
-    /* [in] */ DWORD dwCookie);
+    /* [in] */ uint32_t dwCookie);
 
 
 void __RPC_STUB IActiveIMMMessagePumpOwner_Resume_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 
@@ -1100,13 +1100,13 @@ EXTERN_C const IID IID_IActiveIMMApp;
         virtual HRESULT STDMETHODCALLTYPE ConfigureIMEA( 
             /* [in] */ HKL hKL,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwMode,
+            /* [in] */ uint32_t dwMode,
             /* [in] */ REGISTERWORDA *pData) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE ConfigureIMEW( 
             /* [in] */ HKL hKL,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwMode,
+            /* [in] */ uint32_t dwMode,
             /* [in] */ REGISTERWORDW *pData) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE CreateContext( 
@@ -1118,7 +1118,7 @@ EXTERN_C const IID IID_IActiveIMMApp;
         virtual HRESULT STDMETHODCALLTYPE EnumRegisterWordA( 
             /* [in] */ HKL hKL,
             /* [in] */ LPSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPSTR szRegister,
             /* [in] */ LPVOID pData,
             /* [out] */ IEnumRegisterWordA **pEnum) = 0;
@@ -1126,7 +1126,7 @@ EXTERN_C const IID IID_IActiveIMMApp;
         virtual HRESULT STDMETHODCALLTYPE EnumRegisterWordW( 
             /* [in] */ HKL hKL,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szRegister,
             /* [in] */ LPVOID pData,
             /* [out] */ IEnumRegisterWordW **pEnum) = 0;
@@ -1134,44 +1134,44 @@ EXTERN_C const IID IID_IActiveIMMApp;
         virtual HRESULT STDMETHODCALLTYPE EscapeA( 
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uEscape,
+            /* [in] */ uint32_t uEscape,
             /* [out][in] */ LPVOID pData,
             /* [out] */ LRESULT *plResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE EscapeW( 
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uEscape,
+            /* [in] */ uint32_t uEscape,
             /* [out][in] */ LPVOID pData,
             /* [out] */ LRESULT *plResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCandidateListA( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ CANDIDATELIST *pCandList,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCandidateListW( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ CANDIDATELIST *pCandList,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCandidateListCountA( 
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwListSize,
-            /* [out] */ DWORD *pdwBufLen) = 0;
+            /* [out] */ uint32_t *pdwListSize,
+            /* [out] */ uint32_t *pdwBufLen) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCandidateListCountW( 
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwListSize,
-            /* [out] */ DWORD *pdwBufLen) = 0;
+            /* [out] */ uint32_t *pdwListSize,
+            /* [out] */ uint32_t *pdwBufLen) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCandidateWindow( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [out] */ CANDIDATEFORM *pCandidate) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCompositionFontA( 
@@ -1184,16 +1184,16 @@ EXTERN_C const IID IID_IActiveIMMApp;
         
         virtual HRESULT STDMETHODCALLTYPE GetCompositionStringA( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
-            /* [out] */ LONG *plCopied,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
+            /* [out] */ int32_t *plCopied,
             /* [out] */ LPVOID pBuf) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCompositionStringW( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
-            /* [out] */ LONG *plCopied,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
+            /* [out] */ int32_t *plCopied,
             /* [out] */ LPVOID pBuf) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCompositionWindow( 
@@ -1208,24 +1208,24 @@ EXTERN_C const IID IID_IActiveIMMApp;
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
             /* [in] */ LPSTR pSrc,
-            /* [in] */ UINT uBufLen,
-            /* [in] */ UINT uFlag,
+            /* [in] */ uint32_t uBufLen,
+            /* [in] */ uint32_t uFlag,
             /* [out] */ CANDIDATELIST *pDst,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetConversionListW( 
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
             /* [in] */ LPWSTR pSrc,
-            /* [in] */ UINT uBufLen,
-            /* [in] */ UINT uFlag,
+            /* [in] */ uint32_t uBufLen,
+            /* [in] */ uint32_t uFlag,
             /* [out] */ CANDIDATELIST *pDst,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetConversionStatus( 
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pfdwConversion,
-            /* [out] */ DWORD *pfdwSentence) = 0;
+            /* [out] */ uint32_t *pfdwConversion,
+            /* [out] */ uint32_t *pfdwSentence) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetDefaultIMEWnd( 
             /* [in] */ HWND hWnd,
@@ -1233,61 +1233,61 @@ EXTERN_C const IID IID_IActiveIMMApp;
         
         virtual HRESULT STDMETHODCALLTYPE GetDescriptionA( 
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPSTR szDescription,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetDescriptionW( 
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPWSTR szDescription,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetGuideLineA( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
             /* [out] */ LPSTR pBuf,
-            /* [out] */ DWORD *pdwResult) = 0;
+            /* [out] */ uint32_t *pdwResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetGuideLineW( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
             /* [out] */ LPWSTR pBuf,
-            /* [out] */ DWORD *pdwResult) = 0;
+            /* [out] */ uint32_t *pdwResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetIMEFileNameA( 
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPSTR szFileName,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetIMEFileNameW( 
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPWSTR szFileName,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetOpenStatus( 
             /* [in] */ HIMC hIMC) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetProperty( 
             /* [in] */ HKL hKL,
-            /* [in] */ DWORD fdwIndex,
-            /* [out] */ DWORD *pdwProperty) = 0;
+            /* [in] */ uint32_t fdwIndex,
+            /* [out] */ uint32_t *pdwProperty) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetRegisterWordStyleA( 
             /* [in] */ HKL hKL,
-            /* [in] */ UINT nItem,
+            /* [in] */ uint32_t nItem,
             /* [out] */ STYLEBUFA *pStyleBuf,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetRegisterWordStyleW( 
             /* [in] */ HKL hKL,
-            /* [in] */ UINT nItem,
+            /* [in] */ uint32_t nItem,
             /* [out] */ STYLEBUFW *pStyleBuf,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetStatusWindowPos( 
             /* [in] */ HIMC hIMC,
@@ -1295,7 +1295,7 @@ EXTERN_C const IID IID_IActiveIMMApp;
         
         virtual HRESULT STDMETHODCALLTYPE GetVirtualKey( 
             /* [in] */ HWND hWnd,
-            /* [out] */ UINT *puVirtualKey) = 0;
+            /* [out] */ uint32_t *puVirtualKey) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE InstallIMEA( 
             /* [in] */ LPSTR szIMEFileName,
@@ -1312,32 +1312,32 @@ EXTERN_C const IID IID_IActiveIMMApp;
         
         virtual HRESULT STDMETHODCALLTYPE IsUIMessageA( 
             /* [in] */ HWND hWndIME,
-            /* [in] */ UINT msg,
+            /* [in] */ uint32_t msg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE IsUIMessageW( 
             /* [in] */ HWND hWndIME,
-            /* [in] */ UINT msg,
+            /* [in] */ uint32_t msg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE NotifyIME( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwAction,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwValue) = 0;
+            /* [in] */ uint32_t dwAction,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwValue) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE RegisterWordA( 
             /* [in] */ HKL hKL,
             /* [in] */ LPSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPSTR szRegister) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE RegisterWordW( 
             /* [in] */ HKL hKL,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szRegister) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE ReleaseContext( 
@@ -1358,19 +1358,19 @@ EXTERN_C const IID IID_IActiveIMMApp;
         
         virtual HRESULT STDMETHODCALLTYPE SetCompositionStringA( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [in] */ LPVOID pComp,
-            /* [in] */ DWORD dwCompLen,
+            /* [in] */ uint32_t dwCompLen,
             /* [in] */ LPVOID pRead,
-            /* [in] */ DWORD dwReadLen) = 0;
+            /* [in] */ uint32_t dwReadLen) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE SetCompositionStringW( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [in] */ LPVOID pComp,
-            /* [in] */ DWORD dwCompLen,
+            /* [in] */ uint32_t dwCompLen,
             /* [in] */ LPVOID pRead,
-            /* [in] */ DWORD dwReadLen) = 0;
+            /* [in] */ uint32_t dwReadLen) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE SetCompositionWindow( 
             /* [in] */ HIMC hIMC,
@@ -1378,8 +1378,8 @@ EXTERN_C const IID IID_IActiveIMMApp;
         
         virtual HRESULT STDMETHODCALLTYPE SetConversionStatus( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD fdwConversion,
-            /* [in] */ DWORD fdwSentence) = 0;
+            /* [in] */ uint32_t fdwConversion,
+            /* [in] */ uint32_t fdwSentence) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE SetOpenStatus( 
             /* [in] */ HIMC hIMC,
@@ -1391,18 +1391,18 @@ EXTERN_C const IID IID_IActiveIMMApp;
         
         virtual HRESULT STDMETHODCALLTYPE SimulateHotKey( 
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwHotKeyID) = 0;
+            /* [in] */ uint32_t dwHotKeyID) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE UnregisterWordA( 
             /* [in] */ HKL hKL,
             /* [in] */ LPSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPSTR szUnregister) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE UnregisterWordW( 
             /* [in] */ HKL hKL,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szUnregister) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Activate( 
@@ -1412,18 +1412,18 @@ EXTERN_C const IID IID_IActiveIMMApp;
         
         virtual HRESULT STDMETHODCALLTYPE OnDefWindowProc( 
             /* [in] */ HWND hWnd,
-            /* [in] */ UINT Msg,
+            /* [in] */ uint32_t Msg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam,
             /* [out] */ LRESULT *plResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE FilterClientWindows( 
             /* [in] */ ATOM *aaClassList,
-            /* [in] */ UINT uSize) = 0;
+            /* [in] */ uint32_t uSize) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCodePageA( 
             /* [in] */ HKL hKL,
-            /* [out] */ UINT *uCodePage) = 0;
+            /* [out] */ uint32_t *uCodePage) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetLangId( 
             /* [in] */ HKL hKL,
@@ -1432,31 +1432,31 @@ EXTERN_C const IID IID_IActiveIMMApp;
         virtual HRESULT STDMETHODCALLTYPE AssociateContextEx( 
             /* [in] */ HWND hWnd,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwFlags) = 0;
+            /* [in] */ uint32_t dwFlags) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE DisableIME( 
-            /* [in] */ DWORD idThread) = 0;
+            /* [in] */ uint32_t idThread) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetImeMenuItemsA( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwFlags,
-            /* [in] */ DWORD dwType,
+            /* [in] */ uint32_t dwFlags,
+            /* [in] */ uint32_t dwType,
             /* [in] */ IMEMENUITEMINFOA *pImeParentMenu,
             /* [out] */ IMEMENUITEMINFOA *pImeMenu,
-            /* [in] */ DWORD dwSize,
-            /* [out] */ DWORD *pdwResult) = 0;
+            /* [in] */ uint32_t dwSize,
+            /* [out] */ uint32_t *pdwResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetImeMenuItemsW( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwFlags,
-            /* [in] */ DWORD dwType,
+            /* [in] */ uint32_t dwFlags,
+            /* [in] */ uint32_t dwType,
             /* [in] */ IMEMENUITEMINFOW *pImeParentMenu,
             /* [out] */ IMEMENUITEMINFOW *pImeMenu,
-            /* [in] */ DWORD dwSize,
-            /* [out] */ DWORD *pdwResult) = 0;
+            /* [in] */ uint32_t dwSize,
+            /* [out] */ uint32_t *pdwResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE EnumInputContext( 
-            /* [in] */ DWORD idThread,
+            /* [in] */ uint32_t idThread,
             /* [out] */ IEnumInputContext **ppEnum) = 0;
         
     };
@@ -1472,10 +1472,10 @@ EXTERN_C const IID IID_IActiveIMMApp;
             /* [in] */ REFIID riid,
             /* [iid_is][out] */ void **ppvObject);
         
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+        uint32_t ( STDMETHODCALLTYPE *AddRef )( 
             IActiveIMMApp * This);
         
-        ULONG ( STDMETHODCALLTYPE *Release )( 
+        uint32_t ( STDMETHODCALLTYPE *Release )( 
             IActiveIMMApp * This);
         
         HRESULT ( STDMETHODCALLTYPE *AssociateContext )( 
@@ -1488,14 +1488,14 @@ EXTERN_C const IID IID_IActiveIMMApp;
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwMode,
+            /* [in] */ uint32_t dwMode,
             /* [in] */ REGISTERWORDA *pData);
         
         HRESULT ( STDMETHODCALLTYPE *ConfigureIMEW )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwMode,
+            /* [in] */ uint32_t dwMode,
             /* [in] */ REGISTERWORDW *pData);
         
         HRESULT ( STDMETHODCALLTYPE *CreateContext )( 
@@ -1510,7 +1510,7 @@ EXTERN_C const IID IID_IActiveIMMApp;
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
             /* [in] */ LPSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPSTR szRegister,
             /* [in] */ LPVOID pData,
             /* [out] */ IEnumRegisterWordA **pEnum);
@@ -1519,7 +1519,7 @@ EXTERN_C const IID IID_IActiveIMMApp;
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szRegister,
             /* [in] */ LPVOID pData,
             /* [out] */ IEnumRegisterWordW **pEnum);
@@ -1528,7 +1528,7 @@ EXTERN_C const IID IID_IActiveIMMApp;
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uEscape,
+            /* [in] */ uint32_t uEscape,
             /* [out][in] */ LPVOID pData,
             /* [out] */ LRESULT *plResult);
         
@@ -1536,42 +1536,42 @@ EXTERN_C const IID IID_IActiveIMMApp;
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uEscape,
+            /* [in] */ uint32_t uEscape,
             /* [out][in] */ LPVOID pData,
             /* [out] */ LRESULT *plResult);
         
         HRESULT ( STDMETHODCALLTYPE *GetCandidateListA )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ CANDIDATELIST *pCandList,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetCandidateListW )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ CANDIDATELIST *pCandList,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetCandidateListCountA )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwListSize,
-            /* [out] */ DWORD *pdwBufLen);
+            /* [out] */ uint32_t *pdwListSize,
+            /* [out] */ uint32_t *pdwBufLen);
         
         HRESULT ( STDMETHODCALLTYPE *GetCandidateListCountW )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwListSize,
-            /* [out] */ DWORD *pdwBufLen);
+            /* [out] */ uint32_t *pdwListSize,
+            /* [out] */ uint32_t *pdwBufLen);
         
         HRESULT ( STDMETHODCALLTYPE *GetCandidateWindow )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [out] */ CANDIDATEFORM *pCandidate);
         
         HRESULT ( STDMETHODCALLTYPE *GetCompositionFontA )( 
@@ -1587,17 +1587,17 @@ EXTERN_C const IID IID_IActiveIMMApp;
         HRESULT ( STDMETHODCALLTYPE *GetCompositionStringA )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
-            /* [out] */ LONG *plCopied,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
+            /* [out] */ int32_t *plCopied,
             /* [out] */ LPVOID pBuf);
         
         HRESULT ( STDMETHODCALLTYPE *GetCompositionStringW )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
-            /* [out] */ LONG *plCopied,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
+            /* [out] */ int32_t *plCopied,
             /* [out] */ LPVOID pBuf);
         
         HRESULT ( STDMETHODCALLTYPE *GetCompositionWindow )( 
@@ -1615,26 +1615,26 @@ EXTERN_C const IID IID_IActiveIMMApp;
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
             /* [in] */ LPSTR pSrc,
-            /* [in] */ UINT uBufLen,
-            /* [in] */ UINT uFlag,
+            /* [in] */ uint32_t uBufLen,
+            /* [in] */ uint32_t uFlag,
             /* [out] */ CANDIDATELIST *pDst,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetConversionListW )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
             /* [in] */ LPWSTR pSrc,
-            /* [in] */ UINT uBufLen,
-            /* [in] */ UINT uFlag,
+            /* [in] */ uint32_t uBufLen,
+            /* [in] */ uint32_t uFlag,
             /* [out] */ CANDIDATELIST *pDst,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetConversionStatus )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pfdwConversion,
-            /* [out] */ DWORD *pfdwSentence);
+            /* [out] */ uint32_t *pfdwConversion,
+            /* [out] */ uint32_t *pfdwSentence);
         
         HRESULT ( STDMETHODCALLTYPE *GetDefaultIMEWnd )( 
             IActiveIMMApp * This,
@@ -1644,46 +1644,46 @@ EXTERN_C const IID IID_IActiveIMMApp;
         HRESULT ( STDMETHODCALLTYPE *GetDescriptionA )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPSTR szDescription,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetDescriptionW )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPWSTR szDescription,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetGuideLineA )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
             /* [out] */ LPSTR pBuf,
-            /* [out] */ DWORD *pdwResult);
+            /* [out] */ uint32_t *pdwResult);
         
         HRESULT ( STDMETHODCALLTYPE *GetGuideLineW )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
             /* [out] */ LPWSTR pBuf,
-            /* [out] */ DWORD *pdwResult);
+            /* [out] */ uint32_t *pdwResult);
         
         HRESULT ( STDMETHODCALLTYPE *GetIMEFileNameA )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPSTR szFileName,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetIMEFileNameW )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPWSTR szFileName,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetOpenStatus )( 
             IActiveIMMApp * This,
@@ -1692,22 +1692,22 @@ EXTERN_C const IID IID_IActiveIMMApp;
         HRESULT ( STDMETHODCALLTYPE *GetProperty )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
-            /* [in] */ DWORD fdwIndex,
-            /* [out] */ DWORD *pdwProperty);
+            /* [in] */ uint32_t fdwIndex,
+            /* [out] */ uint32_t *pdwProperty);
         
         HRESULT ( STDMETHODCALLTYPE *GetRegisterWordStyleA )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
-            /* [in] */ UINT nItem,
+            /* [in] */ uint32_t nItem,
             /* [out] */ STYLEBUFA *pStyleBuf,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetRegisterWordStyleW )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
-            /* [in] */ UINT nItem,
+            /* [in] */ uint32_t nItem,
             /* [out] */ STYLEBUFW *pStyleBuf,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetStatusWindowPos )( 
             IActiveIMMApp * This,
@@ -1717,7 +1717,7 @@ EXTERN_C const IID IID_IActiveIMMApp;
         HRESULT ( STDMETHODCALLTYPE *GetVirtualKey )( 
             IActiveIMMApp * This,
             /* [in] */ HWND hWnd,
-            /* [out] */ UINT *puVirtualKey);
+            /* [out] */ uint32_t *puVirtualKey);
         
         HRESULT ( STDMETHODCALLTYPE *InstallIMEA )( 
             IActiveIMMApp * This,
@@ -1738,36 +1738,36 @@ EXTERN_C const IID IID_IActiveIMMApp;
         HRESULT ( STDMETHODCALLTYPE *IsUIMessageA )( 
             IActiveIMMApp * This,
             /* [in] */ HWND hWndIME,
-            /* [in] */ UINT msg,
+            /* [in] */ uint32_t msg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam);
         
         HRESULT ( STDMETHODCALLTYPE *IsUIMessageW )( 
             IActiveIMMApp * This,
             /* [in] */ HWND hWndIME,
-            /* [in] */ UINT msg,
+            /* [in] */ uint32_t msg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam);
         
         HRESULT ( STDMETHODCALLTYPE *NotifyIME )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwAction,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwValue);
+            /* [in] */ uint32_t dwAction,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwValue);
         
         HRESULT ( STDMETHODCALLTYPE *RegisterWordA )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
             /* [in] */ LPSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPSTR szRegister);
         
         HRESULT ( STDMETHODCALLTYPE *RegisterWordW )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szRegister);
         
         HRESULT ( STDMETHODCALLTYPE *ReleaseContext )( 
@@ -1793,20 +1793,20 @@ EXTERN_C const IID IID_IActiveIMMApp;
         HRESULT ( STDMETHODCALLTYPE *SetCompositionStringA )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [in] */ LPVOID pComp,
-            /* [in] */ DWORD dwCompLen,
+            /* [in] */ uint32_t dwCompLen,
             /* [in] */ LPVOID pRead,
-            /* [in] */ DWORD dwReadLen);
+            /* [in] */ uint32_t dwReadLen);
         
         HRESULT ( STDMETHODCALLTYPE *SetCompositionStringW )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [in] */ LPVOID pComp,
-            /* [in] */ DWORD dwCompLen,
+            /* [in] */ uint32_t dwCompLen,
             /* [in] */ LPVOID pRead,
-            /* [in] */ DWORD dwReadLen);
+            /* [in] */ uint32_t dwReadLen);
         
         HRESULT ( STDMETHODCALLTYPE *SetCompositionWindow )( 
             IActiveIMMApp * This,
@@ -1816,8 +1816,8 @@ EXTERN_C const IID IID_IActiveIMMApp;
         HRESULT ( STDMETHODCALLTYPE *SetConversionStatus )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD fdwConversion,
-            /* [in] */ DWORD fdwSentence);
+            /* [in] */ uint32_t fdwConversion,
+            /* [in] */ uint32_t fdwSentence);
         
         HRESULT ( STDMETHODCALLTYPE *SetOpenStatus )( 
             IActiveIMMApp * This,
@@ -1832,20 +1832,20 @@ EXTERN_C const IID IID_IActiveIMMApp;
         HRESULT ( STDMETHODCALLTYPE *SimulateHotKey )( 
             IActiveIMMApp * This,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwHotKeyID);
+            /* [in] */ uint32_t dwHotKeyID);
         
         HRESULT ( STDMETHODCALLTYPE *UnregisterWordA )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
             /* [in] */ LPSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPSTR szUnregister);
         
         HRESULT ( STDMETHODCALLTYPE *UnregisterWordW )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szUnregister);
         
         HRESULT ( STDMETHODCALLTYPE *Activate )( 
@@ -1858,7 +1858,7 @@ EXTERN_C const IID IID_IActiveIMMApp;
         HRESULT ( STDMETHODCALLTYPE *OnDefWindowProc )( 
             IActiveIMMApp * This,
             /* [in] */ HWND hWnd,
-            /* [in] */ UINT Msg,
+            /* [in] */ uint32_t Msg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam,
             /* [out] */ LRESULT *plResult);
@@ -1866,12 +1866,12 @@ EXTERN_C const IID IID_IActiveIMMApp;
         HRESULT ( STDMETHODCALLTYPE *FilterClientWindows )( 
             IActiveIMMApp * This,
             /* [in] */ ATOM *aaClassList,
-            /* [in] */ UINT uSize);
+            /* [in] */ uint32_t uSize);
         
         HRESULT ( STDMETHODCALLTYPE *GetCodePageA )( 
             IActiveIMMApp * This,
             /* [in] */ HKL hKL,
-            /* [out] */ UINT *uCodePage);
+            /* [out] */ uint32_t *uCodePage);
         
         HRESULT ( STDMETHODCALLTYPE *GetLangId )( 
             IActiveIMMApp * This,
@@ -1882,35 +1882,35 @@ EXTERN_C const IID IID_IActiveIMMApp;
             IActiveIMMApp * This,
             /* [in] */ HWND hWnd,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwFlags);
+            /* [in] */ uint32_t dwFlags);
         
         HRESULT ( STDMETHODCALLTYPE *DisableIME )( 
             IActiveIMMApp * This,
-            /* [in] */ DWORD idThread);
+            /* [in] */ uint32_t idThread);
         
         HRESULT ( STDMETHODCALLTYPE *GetImeMenuItemsA )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwFlags,
-            /* [in] */ DWORD dwType,
+            /* [in] */ uint32_t dwFlags,
+            /* [in] */ uint32_t dwType,
             /* [in] */ IMEMENUITEMINFOA *pImeParentMenu,
             /* [out] */ IMEMENUITEMINFOA *pImeMenu,
-            /* [in] */ DWORD dwSize,
-            /* [out] */ DWORD *pdwResult);
+            /* [in] */ uint32_t dwSize,
+            /* [out] */ uint32_t *pdwResult);
         
         HRESULT ( STDMETHODCALLTYPE *GetImeMenuItemsW )( 
             IActiveIMMApp * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwFlags,
-            /* [in] */ DWORD dwType,
+            /* [in] */ uint32_t dwFlags,
+            /* [in] */ uint32_t dwType,
             /* [in] */ IMEMENUITEMINFOW *pImeParentMenu,
             /* [out] */ IMEMENUITEMINFOW *pImeMenu,
-            /* [in] */ DWORD dwSize,
-            /* [out] */ DWORD *pdwResult);
+            /* [in] */ uint32_t dwSize,
+            /* [out] */ uint32_t *pdwResult);
         
         HRESULT ( STDMETHODCALLTYPE *EnumInputContext )( 
             IActiveIMMApp * This,
-            /* [in] */ DWORD idThread,
+            /* [in] */ uint32_t idThread,
             /* [out] */ IEnumInputContext **ppEnum);
         
         END_INTERFACE
@@ -2158,14 +2158,14 @@ void __RPC_STUB IActiveIMMApp_AssociateContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_ConfigureIMEA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
     /* [in] */ HWND hWnd,
-    /* [in] */ DWORD dwMode,
+    /* [in] */ uint32_t dwMode,
     /* [in] */ REGISTERWORDA *pData);
 
 
@@ -2173,14 +2173,14 @@ void __RPC_STUB IActiveIMMApp_ConfigureIMEA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_ConfigureIMEW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
     /* [in] */ HWND hWnd,
-    /* [in] */ DWORD dwMode,
+    /* [in] */ uint32_t dwMode,
     /* [in] */ REGISTERWORDW *pData);
 
 
@@ -2188,7 +2188,7 @@ void __RPC_STUB IActiveIMMApp_ConfigureIMEW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_CreateContext_Proxy( 
@@ -2200,7 +2200,7 @@ void __RPC_STUB IActiveIMMApp_CreateContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_DestroyContext_Proxy( 
@@ -2212,14 +2212,14 @@ void __RPC_STUB IActiveIMMApp_DestroyContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_EnumRegisterWordA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
     /* [in] */ LPSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPSTR szRegister,
     /* [in] */ LPVOID pData,
     /* [out] */ IEnumRegisterWordA **pEnum);
@@ -2229,14 +2229,14 @@ void __RPC_STUB IActiveIMMApp_EnumRegisterWordA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_EnumRegisterWordW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
     /* [in] */ LPWSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPWSTR szRegister,
     /* [in] */ LPVOID pData,
     /* [out] */ IEnumRegisterWordW **pEnum);
@@ -2246,14 +2246,14 @@ void __RPC_STUB IActiveIMMApp_EnumRegisterWordW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_EscapeA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
     /* [in] */ HIMC hIMC,
-    /* [in] */ UINT uEscape,
+    /* [in] */ uint32_t uEscape,
     /* [out][in] */ LPVOID pData,
     /* [out] */ LRESULT *plResult);
 
@@ -2262,14 +2262,14 @@ void __RPC_STUB IActiveIMMApp_EscapeA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_EscapeW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
     /* [in] */ HIMC hIMC,
-    /* [in] */ UINT uEscape,
+    /* [in] */ uint32_t uEscape,
     /* [out][in] */ LPVOID pData,
     /* [out] */ LRESULT *plResult);
 
@@ -2278,73 +2278,73 @@ void __RPC_STUB IActiveIMMApp_EscapeW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetCandidateListA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ CANDIDATELIST *pCandList,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMApp_GetCandidateListA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetCandidateListW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ CANDIDATELIST *pCandList,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMApp_GetCandidateListW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetCandidateListCountA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [out] */ DWORD *pdwListSize,
-    /* [out] */ DWORD *pdwBufLen);
+    /* [out] */ uint32_t *pdwListSize,
+    /* [out] */ uint32_t *pdwBufLen);
 
 
 void __RPC_STUB IActiveIMMApp_GetCandidateListCountA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetCandidateListCountW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [out] */ DWORD *pdwListSize,
-    /* [out] */ DWORD *pdwBufLen);
+    /* [out] */ uint32_t *pdwListSize,
+    /* [out] */ uint32_t *pdwBufLen);
 
 
 void __RPC_STUB IActiveIMMApp_GetCandidateListCountW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetCandidateWindow_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
+    /* [in] */ uint32_t dwIndex,
     /* [out] */ CANDIDATEFORM *pCandidate);
 
 
@@ -2352,7 +2352,7 @@ void __RPC_STUB IActiveIMMApp_GetCandidateWindow_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetCompositionFontA_Proxy( 
@@ -2365,7 +2365,7 @@ void __RPC_STUB IActiveIMMApp_GetCompositionFontA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetCompositionFontW_Proxy( 
@@ -2378,15 +2378,15 @@ void __RPC_STUB IActiveIMMApp_GetCompositionFontW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetCompositionStringA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ DWORD dwBufLen,
-    /* [out] */ LONG *plCopied,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t dwBufLen,
+    /* [out] */ int32_t *plCopied,
     /* [out] */ LPVOID pBuf);
 
 
@@ -2394,15 +2394,15 @@ void __RPC_STUB IActiveIMMApp_GetCompositionStringA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetCompositionStringW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ DWORD dwBufLen,
-    /* [out] */ LONG *plCopied,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t dwBufLen,
+    /* [out] */ int32_t *plCopied,
     /* [out] */ LPVOID pBuf);
 
 
@@ -2410,7 +2410,7 @@ void __RPC_STUB IActiveIMMApp_GetCompositionStringW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetCompositionWindow_Proxy( 
@@ -2423,7 +2423,7 @@ void __RPC_STUB IActiveIMMApp_GetCompositionWindow_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetContext_Proxy( 
@@ -2436,7 +2436,7 @@ void __RPC_STUB IActiveIMMApp_GetContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetConversionListA_Proxy( 
@@ -2444,17 +2444,17 @@ HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetConversionListA_Proxy(
     /* [in] */ HKL hKL,
     /* [in] */ HIMC hIMC,
     /* [in] */ LPSTR pSrc,
-    /* [in] */ UINT uBufLen,
-    /* [in] */ UINT uFlag,
+    /* [in] */ uint32_t uBufLen,
+    /* [in] */ uint32_t uFlag,
     /* [out] */ CANDIDATELIST *pDst,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMApp_GetConversionListA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetConversionListW_Proxy( 
@@ -2462,31 +2462,31 @@ HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetConversionListW_Proxy(
     /* [in] */ HKL hKL,
     /* [in] */ HIMC hIMC,
     /* [in] */ LPWSTR pSrc,
-    /* [in] */ UINT uBufLen,
-    /* [in] */ UINT uFlag,
+    /* [in] */ uint32_t uBufLen,
+    /* [in] */ uint32_t uFlag,
     /* [out] */ CANDIDATELIST *pDst,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMApp_GetConversionListW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetConversionStatus_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [out] */ DWORD *pfdwConversion,
-    /* [out] */ DWORD *pfdwSentence);
+    /* [out] */ uint32_t *pfdwConversion,
+    /* [out] */ uint32_t *pfdwSentence);
 
 
 void __RPC_STUB IActiveIMMApp_GetConversionStatus_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetDefaultIMEWnd_Proxy( 
@@ -2499,99 +2499,99 @@ void __RPC_STUB IActiveIMMApp_GetDefaultIMEWnd_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetDescriptionA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ LPSTR szDescription,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMApp_GetDescriptionA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetDescriptionW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ LPWSTR szDescription,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMApp_GetDescriptionW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetGuideLineA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ DWORD dwBufLen,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t dwBufLen,
     /* [out] */ LPSTR pBuf,
-    /* [out] */ DWORD *pdwResult);
+    /* [out] */ uint32_t *pdwResult);
 
 
 void __RPC_STUB IActiveIMMApp_GetGuideLineA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetGuideLineW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ DWORD dwBufLen,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t dwBufLen,
     /* [out] */ LPWSTR pBuf,
-    /* [out] */ DWORD *pdwResult);
+    /* [out] */ uint32_t *pdwResult);
 
 
 void __RPC_STUB IActiveIMMApp_GetGuideLineW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetIMEFileNameA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ LPSTR szFileName,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMApp_GetIMEFileNameA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetIMEFileNameW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ LPWSTR szFileName,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMApp_GetIMEFileNameW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetOpenStatus_Proxy( 
@@ -2603,51 +2603,51 @@ void __RPC_STUB IActiveIMMApp_GetOpenStatus_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetProperty_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
-    /* [in] */ DWORD fdwIndex,
-    /* [out] */ DWORD *pdwProperty);
+    /* [in] */ uint32_t fdwIndex,
+    /* [out] */ uint32_t *pdwProperty);
 
 
 void __RPC_STUB IActiveIMMApp_GetProperty_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetRegisterWordStyleA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
-    /* [in] */ UINT nItem,
+    /* [in] */ uint32_t nItem,
     /* [out] */ STYLEBUFA *pStyleBuf,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMApp_GetRegisterWordStyleA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetRegisterWordStyleW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
-    /* [in] */ UINT nItem,
+    /* [in] */ uint32_t nItem,
     /* [out] */ STYLEBUFW *pStyleBuf,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMApp_GetRegisterWordStyleW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetStatusWindowPos_Proxy( 
@@ -2660,20 +2660,20 @@ void __RPC_STUB IActiveIMMApp_GetStatusWindowPos_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetVirtualKey_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HWND hWnd,
-    /* [out] */ UINT *puVirtualKey);
+    /* [out] */ uint32_t *puVirtualKey);
 
 
 void __RPC_STUB IActiveIMMApp_GetVirtualKey_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_InstallIMEA_Proxy( 
@@ -2687,7 +2687,7 @@ void __RPC_STUB IActiveIMMApp_InstallIMEA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_InstallIMEW_Proxy( 
@@ -2701,7 +2701,7 @@ void __RPC_STUB IActiveIMMApp_InstallIMEW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_IsIME_Proxy( 
@@ -2713,13 +2713,13 @@ void __RPC_STUB IActiveIMMApp_IsIME_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_IsUIMessageA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HWND hWndIME,
-    /* [in] */ UINT msg,
+    /* [in] */ uint32_t msg,
     /* [in] */ WPARAM wParam,
     /* [in] */ LPARAM lParam);
 
@@ -2728,13 +2728,13 @@ void __RPC_STUB IActiveIMMApp_IsUIMessageA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_IsUIMessageW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HWND hWndIME,
-    /* [in] */ UINT msg,
+    /* [in] */ uint32_t msg,
     /* [in] */ WPARAM wParam,
     /* [in] */ LPARAM lParam);
 
@@ -2743,29 +2743,29 @@ void __RPC_STUB IActiveIMMApp_IsUIMessageW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_NotifyIME_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwAction,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ DWORD dwValue);
+    /* [in] */ uint32_t dwAction,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t dwValue);
 
 
 void __RPC_STUB IActiveIMMApp_NotifyIME_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_RegisterWordA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
     /* [in] */ LPSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPSTR szRegister);
 
 
@@ -2773,14 +2773,14 @@ void __RPC_STUB IActiveIMMApp_RegisterWordA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_RegisterWordW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
     /* [in] */ LPWSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPWSTR szRegister);
 
 
@@ -2788,7 +2788,7 @@ void __RPC_STUB IActiveIMMApp_RegisterWordW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_ReleaseContext_Proxy( 
@@ -2801,7 +2801,7 @@ void __RPC_STUB IActiveIMMApp_ReleaseContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_SetCandidateWindow_Proxy( 
@@ -2814,7 +2814,7 @@ void __RPC_STUB IActiveIMMApp_SetCandidateWindow_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_SetCompositionFontA_Proxy( 
@@ -2827,7 +2827,7 @@ void __RPC_STUB IActiveIMMApp_SetCompositionFontA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_SetCompositionFontW_Proxy( 
@@ -2840,41 +2840,41 @@ void __RPC_STUB IActiveIMMApp_SetCompositionFontW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_SetCompositionStringA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
+    /* [in] */ uint32_t dwIndex,
     /* [in] */ LPVOID pComp,
-    /* [in] */ DWORD dwCompLen,
+    /* [in] */ uint32_t dwCompLen,
     /* [in] */ LPVOID pRead,
-    /* [in] */ DWORD dwReadLen);
+    /* [in] */ uint32_t dwReadLen);
 
 
 void __RPC_STUB IActiveIMMApp_SetCompositionStringA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_SetCompositionStringW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
+    /* [in] */ uint32_t dwIndex,
     /* [in] */ LPVOID pComp,
-    /* [in] */ DWORD dwCompLen,
+    /* [in] */ uint32_t dwCompLen,
     /* [in] */ LPVOID pRead,
-    /* [in] */ DWORD dwReadLen);
+    /* [in] */ uint32_t dwReadLen);
 
 
 void __RPC_STUB IActiveIMMApp_SetCompositionStringW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_SetCompositionWindow_Proxy( 
@@ -2887,21 +2887,21 @@ void __RPC_STUB IActiveIMMApp_SetCompositionWindow_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_SetConversionStatus_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD fdwConversion,
-    /* [in] */ DWORD fdwSentence);
+    /* [in] */ uint32_t fdwConversion,
+    /* [in] */ uint32_t fdwSentence);
 
 
 void __RPC_STUB IActiveIMMApp_SetConversionStatus_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_SetOpenStatus_Proxy( 
@@ -2914,7 +2914,7 @@ void __RPC_STUB IActiveIMMApp_SetOpenStatus_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_SetStatusWindowPos_Proxy( 
@@ -2927,27 +2927,27 @@ void __RPC_STUB IActiveIMMApp_SetStatusWindowPos_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_SimulateHotKey_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HWND hWnd,
-    /* [in] */ DWORD dwHotKeyID);
+    /* [in] */ uint32_t dwHotKeyID);
 
 
 void __RPC_STUB IActiveIMMApp_SimulateHotKey_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_UnregisterWordA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
     /* [in] */ LPSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPSTR szUnregister);
 
 
@@ -2955,14 +2955,14 @@ void __RPC_STUB IActiveIMMApp_UnregisterWordA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_UnregisterWordW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
     /* [in] */ LPWSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPWSTR szUnregister);
 
 
@@ -2970,7 +2970,7 @@ void __RPC_STUB IActiveIMMApp_UnregisterWordW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_Activate_Proxy( 
@@ -2982,7 +2982,7 @@ void __RPC_STUB IActiveIMMApp_Activate_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_Deactivate_Proxy( 
@@ -2993,13 +2993,13 @@ void __RPC_STUB IActiveIMMApp_Deactivate_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_OnDefWindowProc_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HWND hWnd,
-    /* [in] */ UINT Msg,
+    /* [in] */ uint32_t Msg,
     /* [in] */ WPARAM wParam,
     /* [in] */ LPARAM lParam,
     /* [out] */ LRESULT *plResult);
@@ -3009,33 +3009,33 @@ void __RPC_STUB IActiveIMMApp_OnDefWindowProc_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_FilterClientWindows_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ ATOM *aaClassList,
-    /* [in] */ UINT uSize);
+    /* [in] */ uint32_t uSize);
 
 
 void __RPC_STUB IActiveIMMApp_FilterClientWindows_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetCodePageA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HKL hKL,
-    /* [out] */ UINT *uCodePage);
+    /* [out] */ uint32_t *uCodePage);
 
 
 void __RPC_STUB IActiveIMMApp_GetCodePageA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetLangId_Proxy( 
@@ -3048,74 +3048,74 @@ void __RPC_STUB IActiveIMMApp_GetLangId_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_AssociateContextEx_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HWND hWnd,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwFlags);
+    /* [in] */ uint32_t dwFlags);
 
 
 void __RPC_STUB IActiveIMMApp_AssociateContextEx_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_DisableIME_Proxy( 
     IActiveIMMApp * This,
-    /* [in] */ DWORD idThread);
+    /* [in] */ uint32_t idThread);
 
 
 void __RPC_STUB IActiveIMMApp_DisableIME_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetImeMenuItemsA_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwFlags,
-    /* [in] */ DWORD dwType,
+    /* [in] */ uint32_t dwFlags,
+    /* [in] */ uint32_t dwType,
     /* [in] */ IMEMENUITEMINFOA *pImeParentMenu,
     /* [out] */ IMEMENUITEMINFOA *pImeMenu,
-    /* [in] */ DWORD dwSize,
-    /* [out] */ DWORD *pdwResult);
+    /* [in] */ uint32_t dwSize,
+    /* [out] */ uint32_t *pdwResult);
 
 
 void __RPC_STUB IActiveIMMApp_GetImeMenuItemsA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_GetImeMenuItemsW_Proxy( 
     IActiveIMMApp * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwFlags,
-    /* [in] */ DWORD dwType,
+    /* [in] */ uint32_t dwFlags,
+    /* [in] */ uint32_t dwType,
     /* [in] */ IMEMENUITEMINFOW *pImeParentMenu,
     /* [out] */ IMEMENUITEMINFOW *pImeMenu,
-    /* [in] */ DWORD dwSize,
-    /* [out] */ DWORD *pdwResult);
+    /* [in] */ uint32_t dwSize,
+    /* [out] */ uint32_t *pdwResult);
 
 
 void __RPC_STUB IActiveIMMApp_GetImeMenuItemsW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMApp_EnumInputContext_Proxy( 
     IActiveIMMApp * This,
-    /* [in] */ DWORD idThread,
+    /* [in] */ uint32_t idThread,
     /* [out] */ IEnumInputContext **ppEnum);
 
 
@@ -3123,7 +3123,7 @@ void __RPC_STUB IActiveIMMApp_EnumInputContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 
@@ -3153,13 +3153,13 @@ EXTERN_C const IID IID_IActiveIMMIME;
         virtual HRESULT STDMETHODCALLTYPE ConfigureIMEA( 
             /* [in] */ HKL hKL,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwMode,
+            /* [in] */ uint32_t dwMode,
             /* [in] */ REGISTERWORDA *pData) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE ConfigureIMEW( 
             /* [in] */ HKL hKL,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwMode,
+            /* [in] */ uint32_t dwMode,
             /* [in] */ REGISTERWORDW *pData) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE CreateContext( 
@@ -3171,7 +3171,7 @@ EXTERN_C const IID IID_IActiveIMMIME;
         virtual HRESULT STDMETHODCALLTYPE EnumRegisterWordA( 
             /* [in] */ HKL hKL,
             /* [in] */ LPSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPSTR szRegister,
             /* [in] */ LPVOID pData,
             /* [out] */ IEnumRegisterWordA **pEnum) = 0;
@@ -3179,7 +3179,7 @@ EXTERN_C const IID IID_IActiveIMMIME;
         virtual HRESULT STDMETHODCALLTYPE EnumRegisterWordW( 
             /* [in] */ HKL hKL,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szRegister,
             /* [in] */ LPVOID pData,
             /* [out] */ IEnumRegisterWordW **pEnum) = 0;
@@ -3187,44 +3187,44 @@ EXTERN_C const IID IID_IActiveIMMIME;
         virtual HRESULT STDMETHODCALLTYPE EscapeA( 
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uEscape,
+            /* [in] */ uint32_t uEscape,
             /* [out][in] */ LPVOID pData,
             /* [out] */ LRESULT *plResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE EscapeW( 
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uEscape,
+            /* [in] */ uint32_t uEscape,
             /* [out][in] */ LPVOID pData,
             /* [out] */ LRESULT *plResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCandidateListA( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ CANDIDATELIST *pCandList,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCandidateListW( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ CANDIDATELIST *pCandList,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCandidateListCountA( 
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwListSize,
-            /* [out] */ DWORD *pdwBufLen) = 0;
+            /* [out] */ uint32_t *pdwListSize,
+            /* [out] */ uint32_t *pdwBufLen) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCandidateListCountW( 
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwListSize,
-            /* [out] */ DWORD *pdwBufLen) = 0;
+            /* [out] */ uint32_t *pdwListSize,
+            /* [out] */ uint32_t *pdwBufLen) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCandidateWindow( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [out] */ CANDIDATEFORM *pCandidate) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCompositionFontA( 
@@ -3237,16 +3237,16 @@ EXTERN_C const IID IID_IActiveIMMIME;
         
         virtual HRESULT STDMETHODCALLTYPE GetCompositionStringA( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
-            /* [out] */ LONG *plCopied,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
+            /* [out] */ int32_t *plCopied,
             /* [out] */ LPVOID pBuf) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCompositionStringW( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
-            /* [out] */ LONG *plCopied,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
+            /* [out] */ int32_t *plCopied,
             /* [out] */ LPVOID pBuf) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCompositionWindow( 
@@ -3261,24 +3261,24 @@ EXTERN_C const IID IID_IActiveIMMIME;
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
             /* [in] */ LPSTR pSrc,
-            /* [in] */ UINT uBufLen,
-            /* [in] */ UINT uFlag,
+            /* [in] */ uint32_t uBufLen,
+            /* [in] */ uint32_t uFlag,
             /* [out] */ CANDIDATELIST *pDst,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetConversionListW( 
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
             /* [in] */ LPWSTR pSrc,
-            /* [in] */ UINT uBufLen,
-            /* [in] */ UINT uFlag,
+            /* [in] */ uint32_t uBufLen,
+            /* [in] */ uint32_t uFlag,
             /* [out] */ CANDIDATELIST *pDst,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetConversionStatus( 
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pfdwConversion,
-            /* [out] */ DWORD *pfdwSentence) = 0;
+            /* [out] */ uint32_t *pfdwConversion,
+            /* [out] */ uint32_t *pfdwSentence) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetDefaultIMEWnd( 
             /* [in] */ HWND hWnd,
@@ -3286,61 +3286,61 @@ EXTERN_C const IID IID_IActiveIMMIME;
         
         virtual HRESULT STDMETHODCALLTYPE GetDescriptionA( 
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPSTR szDescription,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetDescriptionW( 
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPWSTR szDescription,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetGuideLineA( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
             /* [out] */ LPSTR pBuf,
-            /* [out] */ DWORD *pdwResult) = 0;
+            /* [out] */ uint32_t *pdwResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetGuideLineW( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
             /* [out] */ LPWSTR pBuf,
-            /* [out] */ DWORD *pdwResult) = 0;
+            /* [out] */ uint32_t *pdwResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetIMEFileNameA( 
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPSTR szFileName,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetIMEFileNameW( 
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPWSTR szFileName,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetOpenStatus( 
             /* [in] */ HIMC hIMC) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetProperty( 
             /* [in] */ HKL hKL,
-            /* [in] */ DWORD fdwIndex,
-            /* [out] */ DWORD *pdwProperty) = 0;
+            /* [in] */ uint32_t fdwIndex,
+            /* [out] */ uint32_t *pdwProperty) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetRegisterWordStyleA( 
             /* [in] */ HKL hKL,
-            /* [in] */ UINT nItem,
+            /* [in] */ uint32_t nItem,
             /* [out] */ STYLEBUFA *pStyleBuf,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetRegisterWordStyleW( 
             /* [in] */ HKL hKL,
-            /* [in] */ UINT nItem,
+            /* [in] */ uint32_t nItem,
             /* [out] */ STYLEBUFW *pStyleBuf,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetStatusWindowPos( 
             /* [in] */ HIMC hIMC,
@@ -3348,7 +3348,7 @@ EXTERN_C const IID IID_IActiveIMMIME;
         
         virtual HRESULT STDMETHODCALLTYPE GetVirtualKey( 
             /* [in] */ HWND hWnd,
-            /* [out] */ UINT *puVirtualKey) = 0;
+            /* [out] */ uint32_t *puVirtualKey) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE InstallIMEA( 
             /* [in] */ LPSTR szIMEFileName,
@@ -3365,32 +3365,32 @@ EXTERN_C const IID IID_IActiveIMMIME;
         
         virtual HRESULT STDMETHODCALLTYPE IsUIMessageA( 
             /* [in] */ HWND hWndIME,
-            /* [in] */ UINT msg,
+            /* [in] */ uint32_t msg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE IsUIMessageW( 
             /* [in] */ HWND hWndIME,
-            /* [in] */ UINT msg,
+            /* [in] */ uint32_t msg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE NotifyIME( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwAction,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwValue) = 0;
+            /* [in] */ uint32_t dwAction,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwValue) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE RegisterWordA( 
             /* [in] */ HKL hKL,
             /* [in] */ LPSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPSTR szRegister) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE RegisterWordW( 
             /* [in] */ HKL hKL,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szRegister) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE ReleaseContext( 
@@ -3411,19 +3411,19 @@ EXTERN_C const IID IID_IActiveIMMIME;
         
         virtual HRESULT STDMETHODCALLTYPE SetCompositionStringA( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [in] */ LPVOID pComp,
-            /* [in] */ DWORD dwCompLen,
+            /* [in] */ uint32_t dwCompLen,
             /* [in] */ LPVOID pRead,
-            /* [in] */ DWORD dwReadLen) = 0;
+            /* [in] */ uint32_t dwReadLen) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE SetCompositionStringW( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [in] */ LPVOID pComp,
-            /* [in] */ DWORD dwCompLen,
+            /* [in] */ uint32_t dwCompLen,
             /* [in] */ LPVOID pRead,
-            /* [in] */ DWORD dwReadLen) = 0;
+            /* [in] */ uint32_t dwReadLen) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE SetCompositionWindow( 
             /* [in] */ HIMC hIMC,
@@ -3431,8 +3431,8 @@ EXTERN_C const IID IID_IActiveIMMIME;
         
         virtual HRESULT STDMETHODCALLTYPE SetConversionStatus( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD fdwConversion,
-            /* [in] */ DWORD fdwSentence) = 0;
+            /* [in] */ uint32_t fdwConversion,
+            /* [in] */ uint32_t fdwSentence) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE SetOpenStatus( 
             /* [in] */ HIMC hIMC,
@@ -3444,18 +3444,18 @@ EXTERN_C const IID IID_IActiveIMMIME;
         
         virtual HRESULT STDMETHODCALLTYPE SimulateHotKey( 
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwHotKeyID) = 0;
+            /* [in] */ uint32_t dwHotKeyID) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE UnregisterWordA( 
             /* [in] */ HKL hKL,
             /* [in] */ LPSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPSTR szUnregister) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE UnregisterWordW( 
             /* [in] */ HKL hKL,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szUnregister) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GenerateMessage( 
@@ -3470,10 +3470,10 @@ EXTERN_C const IID IID_IActiveIMMIME;
         
         virtual HRESULT STDMETHODCALLTYPE GetIMCLockCount( 
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwLockCount) = 0;
+            /* [out] */ uint32_t *pdwLockCount) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE CreateIMCC( 
-            /* [in] */ DWORD dwSize,
+            /* [in] */ uint32_t dwSize,
             /* [out] */ HIMCC *phIMCC) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE DestroyIMCC( 
@@ -3488,34 +3488,34 @@ EXTERN_C const IID IID_IActiveIMMIME;
         
         virtual HRESULT STDMETHODCALLTYPE ReSizeIMCC( 
             /* [in] */ HIMCC hIMCC,
-            /* [in] */ DWORD dwSize,
+            /* [in] */ uint32_t dwSize,
             /* [out] */ HIMCC *phIMCC) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetIMCCSize( 
             /* [in] */ HIMCC hIMCC,
-            /* [out] */ DWORD *pdwSize) = 0;
+            /* [out] */ uint32_t *pdwSize) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetIMCCLockCount( 
             /* [in] */ HIMCC hIMCC,
-            /* [out] */ DWORD *pdwLockCount) = 0;
+            /* [out] */ uint32_t *pdwLockCount) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetHotKey( 
-            /* [in] */ DWORD dwHotKeyID,
-            /* [out] */ UINT *puModifiers,
-            /* [out] */ UINT *puVKey,
+            /* [in] */ uint32_t dwHotKeyID,
+            /* [out] */ uint32_t *puModifiers,
+            /* [out] */ uint32_t *puVKey,
             /* [out] */ HKL *phKL) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE SetHotKey( 
-            /* [in] */ DWORD dwHotKeyID,
-            /* [in] */ UINT uModifiers,
-            /* [in] */ UINT uVKey,
+            /* [in] */ uint32_t dwHotKeyID,
+            /* [in] */ uint32_t uModifiers,
+            /* [in] */ uint32_t uVKey,
             /* [in] */ HKL hKL) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE CreateSoftKeyboard( 
-            /* [in] */ UINT uType,
+            /* [in] */ uint32_t uType,
             /* [in] */ HWND hOwner,
-            /* [in] */ int x,
-            /* [in] */ int y,
+            /* [in] */ int32_t x,
+            /* [in] */ int32_t y,
             /* [out] */ HWND *phSoftKbdWnd) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE DestroySoftKeyboard( 
@@ -3523,11 +3523,11 @@ EXTERN_C const IID IID_IActiveIMMIME;
         
         virtual HRESULT STDMETHODCALLTYPE ShowSoftKeyboard( 
             /* [in] */ HWND hSoftKbdWnd,
-            /* [in] */ int nCmdShow) = 0;
+            /* [in] */ int32_t nCmdShow) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCodePageA( 
             /* [in] */ HKL hKL,
-            /* [out] */ UINT *uCodePage) = 0;
+            /* [out] */ uint32_t *uCodePage) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetLangId( 
             /* [in] */ HKL hKL,
@@ -3535,10 +3535,10 @@ EXTERN_C const IID IID_IActiveIMMIME;
         
         virtual HRESULT STDMETHODCALLTYPE KeybdEvent( 
             /* [in] */ LANGID lgidIME,
-            /* [in] */ BYTE bVk,
-            /* [in] */ BYTE bScan,
-            /* [in] */ DWORD dwFlags,
-            /* [in] */ DWORD dwExtraInfo) = 0;
+            /* [in] */ uint8_t bVk,
+            /* [in] */ uint8_t bScan,
+            /* [in] */ uint32_t dwFlags,
+            /* [in] */ uint32_t dwExtraInfo) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE LockModal( void) = 0;
         
@@ -3547,31 +3547,31 @@ EXTERN_C const IID IID_IActiveIMMIME;
         virtual HRESULT STDMETHODCALLTYPE AssociateContextEx( 
             /* [in] */ HWND hWnd,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwFlags) = 0;
+            /* [in] */ uint32_t dwFlags) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE DisableIME( 
-            /* [in] */ DWORD idThread) = 0;
+            /* [in] */ uint32_t idThread) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetImeMenuItemsA( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwFlags,
-            /* [in] */ DWORD dwType,
+            /* [in] */ uint32_t dwFlags,
+            /* [in] */ uint32_t dwType,
             /* [in] */ IMEMENUITEMINFOA *pImeParentMenu,
             /* [out] */ IMEMENUITEMINFOA *pImeMenu,
-            /* [in] */ DWORD dwSize,
-            /* [out] */ DWORD *pdwResult) = 0;
+            /* [in] */ uint32_t dwSize,
+            /* [out] */ uint32_t *pdwResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetImeMenuItemsW( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwFlags,
-            /* [in] */ DWORD dwType,
+            /* [in] */ uint32_t dwFlags,
+            /* [in] */ uint32_t dwType,
             /* [in] */ IMEMENUITEMINFOW *pImeParentMenu,
             /* [out] */ IMEMENUITEMINFOW *pImeMenu,
-            /* [in] */ DWORD dwSize,
-            /* [out] */ DWORD *pdwResult) = 0;
+            /* [in] */ uint32_t dwSize,
+            /* [out] */ uint32_t *pdwResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE EnumInputContext( 
-            /* [in] */ DWORD idThread,
+            /* [in] */ uint32_t idThread,
             /* [out] */ IEnumInputContext **ppEnum) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE RequestMessageA( 
@@ -3588,14 +3588,14 @@ EXTERN_C const IID IID_IActiveIMMIME;
         
         virtual HRESULT STDMETHODCALLTYPE SendIMCA( 
             /* [in] */ HWND hWnd,
-            /* [in] */ UINT uMsg,
+            /* [in] */ uint32_t uMsg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam,
             /* [out] */ LRESULT *plResult) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE SendIMCW( 
             /* [in] */ HWND hWnd,
-            /* [in] */ UINT uMsg,
+            /* [in] */ uint32_t uMsg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam,
             /* [out] */ LRESULT *plResult) = 0;
@@ -3615,10 +3615,10 @@ EXTERN_C const IID IID_IActiveIMMIME;
             /* [in] */ REFIID riid,
             /* [iid_is][out] */ void **ppvObject);
         
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+        uint32_t ( STDMETHODCALLTYPE *AddRef )( 
             IActiveIMMIME * This);
         
-        ULONG ( STDMETHODCALLTYPE *Release )( 
+        uint32_t ( STDMETHODCALLTYPE *Release )( 
             IActiveIMMIME * This);
         
         HRESULT ( STDMETHODCALLTYPE *AssociateContext )( 
@@ -3631,14 +3631,14 @@ EXTERN_C const IID IID_IActiveIMMIME;
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwMode,
+            /* [in] */ uint32_t dwMode,
             /* [in] */ REGISTERWORDA *pData);
         
         HRESULT ( STDMETHODCALLTYPE *ConfigureIMEW )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwMode,
+            /* [in] */ uint32_t dwMode,
             /* [in] */ REGISTERWORDW *pData);
         
         HRESULT ( STDMETHODCALLTYPE *CreateContext )( 
@@ -3653,7 +3653,7 @@ EXTERN_C const IID IID_IActiveIMMIME;
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
             /* [in] */ LPSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPSTR szRegister,
             /* [in] */ LPVOID pData,
             /* [out] */ IEnumRegisterWordA **pEnum);
@@ -3662,7 +3662,7 @@ EXTERN_C const IID IID_IActiveIMMIME;
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szRegister,
             /* [in] */ LPVOID pData,
             /* [out] */ IEnumRegisterWordW **pEnum);
@@ -3671,7 +3671,7 @@ EXTERN_C const IID IID_IActiveIMMIME;
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uEscape,
+            /* [in] */ uint32_t uEscape,
             /* [out][in] */ LPVOID pData,
             /* [out] */ LRESULT *plResult);
         
@@ -3679,42 +3679,42 @@ EXTERN_C const IID IID_IActiveIMMIME;
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uEscape,
+            /* [in] */ uint32_t uEscape,
             /* [out][in] */ LPVOID pData,
             /* [out] */ LRESULT *plResult);
         
         HRESULT ( STDMETHODCALLTYPE *GetCandidateListA )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ CANDIDATELIST *pCandList,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetCandidateListW )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ CANDIDATELIST *pCandList,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetCandidateListCountA )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwListSize,
-            /* [out] */ DWORD *pdwBufLen);
+            /* [out] */ uint32_t *pdwListSize,
+            /* [out] */ uint32_t *pdwBufLen);
         
         HRESULT ( STDMETHODCALLTYPE *GetCandidateListCountW )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwListSize,
-            /* [out] */ DWORD *pdwBufLen);
+            /* [out] */ uint32_t *pdwListSize,
+            /* [out] */ uint32_t *pdwBufLen);
         
         HRESULT ( STDMETHODCALLTYPE *GetCandidateWindow )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [out] */ CANDIDATEFORM *pCandidate);
         
         HRESULT ( STDMETHODCALLTYPE *GetCompositionFontA )( 
@@ -3730,17 +3730,17 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *GetCompositionStringA )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
-            /* [out] */ LONG *plCopied,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
+            /* [out] */ int32_t *plCopied,
             /* [out] */ LPVOID pBuf);
         
         HRESULT ( STDMETHODCALLTYPE *GetCompositionStringW )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
-            /* [out] */ LONG *plCopied,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
+            /* [out] */ int32_t *plCopied,
             /* [out] */ LPVOID pBuf);
         
         HRESULT ( STDMETHODCALLTYPE *GetCompositionWindow )( 
@@ -3758,26 +3758,26 @@ EXTERN_C const IID IID_IActiveIMMIME;
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
             /* [in] */ LPSTR pSrc,
-            /* [in] */ UINT uBufLen,
-            /* [in] */ UINT uFlag,
+            /* [in] */ uint32_t uBufLen,
+            /* [in] */ uint32_t uFlag,
             /* [out] */ CANDIDATELIST *pDst,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetConversionListW )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
             /* [in] */ HIMC hIMC,
             /* [in] */ LPWSTR pSrc,
-            /* [in] */ UINT uBufLen,
-            /* [in] */ UINT uFlag,
+            /* [in] */ uint32_t uBufLen,
+            /* [in] */ uint32_t uFlag,
             /* [out] */ CANDIDATELIST *pDst,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetConversionStatus )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pfdwConversion,
-            /* [out] */ DWORD *pfdwSentence);
+            /* [out] */ uint32_t *pfdwConversion,
+            /* [out] */ uint32_t *pfdwSentence);
         
         HRESULT ( STDMETHODCALLTYPE *GetDefaultIMEWnd )( 
             IActiveIMMIME * This,
@@ -3787,46 +3787,46 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *GetDescriptionA )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPSTR szDescription,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetDescriptionW )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPWSTR szDescription,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetGuideLineA )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
             /* [out] */ LPSTR pBuf,
-            /* [out] */ DWORD *pdwResult);
+            /* [out] */ uint32_t *pdwResult);
         
         HRESULT ( STDMETHODCALLTYPE *GetGuideLineW )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwBufLen,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwBufLen,
             /* [out] */ LPWSTR pBuf,
-            /* [out] */ DWORD *pdwResult);
+            /* [out] */ uint32_t *pdwResult);
         
         HRESULT ( STDMETHODCALLTYPE *GetIMEFileNameA )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPSTR szFileName,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetIMEFileNameW )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ LPWSTR szFileName,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetOpenStatus )( 
             IActiveIMMIME * This,
@@ -3835,22 +3835,22 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *GetProperty )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
-            /* [in] */ DWORD fdwIndex,
-            /* [out] */ DWORD *pdwProperty);
+            /* [in] */ uint32_t fdwIndex,
+            /* [out] */ uint32_t *pdwProperty);
         
         HRESULT ( STDMETHODCALLTYPE *GetRegisterWordStyleA )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
-            /* [in] */ UINT nItem,
+            /* [in] */ uint32_t nItem,
             /* [out] */ STYLEBUFA *pStyleBuf,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetRegisterWordStyleW )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
-            /* [in] */ UINT nItem,
+            /* [in] */ uint32_t nItem,
             /* [out] */ STYLEBUFW *pStyleBuf,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *GetStatusWindowPos )( 
             IActiveIMMIME * This,
@@ -3860,7 +3860,7 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *GetVirtualKey )( 
             IActiveIMMIME * This,
             /* [in] */ HWND hWnd,
-            /* [out] */ UINT *puVirtualKey);
+            /* [out] */ uint32_t *puVirtualKey);
         
         HRESULT ( STDMETHODCALLTYPE *InstallIMEA )( 
             IActiveIMMIME * This,
@@ -3881,36 +3881,36 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *IsUIMessageA )( 
             IActiveIMMIME * This,
             /* [in] */ HWND hWndIME,
-            /* [in] */ UINT msg,
+            /* [in] */ uint32_t msg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam);
         
         HRESULT ( STDMETHODCALLTYPE *IsUIMessageW )( 
             IActiveIMMIME * This,
             /* [in] */ HWND hWndIME,
-            /* [in] */ UINT msg,
+            /* [in] */ uint32_t msg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam);
         
         HRESULT ( STDMETHODCALLTYPE *NotifyIME )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwAction,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwValue);
+            /* [in] */ uint32_t dwAction,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwValue);
         
         HRESULT ( STDMETHODCALLTYPE *RegisterWordA )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
             /* [in] */ LPSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPSTR szRegister);
         
         HRESULT ( STDMETHODCALLTYPE *RegisterWordW )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szRegister);
         
         HRESULT ( STDMETHODCALLTYPE *ReleaseContext )( 
@@ -3936,20 +3936,20 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *SetCompositionStringA )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [in] */ LPVOID pComp,
-            /* [in] */ DWORD dwCompLen,
+            /* [in] */ uint32_t dwCompLen,
             /* [in] */ LPVOID pRead,
-            /* [in] */ DWORD dwReadLen);
+            /* [in] */ uint32_t dwReadLen);
         
         HRESULT ( STDMETHODCALLTYPE *SetCompositionStringW )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [in] */ LPVOID pComp,
-            /* [in] */ DWORD dwCompLen,
+            /* [in] */ uint32_t dwCompLen,
             /* [in] */ LPVOID pRead,
-            /* [in] */ DWORD dwReadLen);
+            /* [in] */ uint32_t dwReadLen);
         
         HRESULT ( STDMETHODCALLTYPE *SetCompositionWindow )( 
             IActiveIMMIME * This,
@@ -3959,8 +3959,8 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *SetConversionStatus )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD fdwConversion,
-            /* [in] */ DWORD fdwSentence);
+            /* [in] */ uint32_t fdwConversion,
+            /* [in] */ uint32_t fdwSentence);
         
         HRESULT ( STDMETHODCALLTYPE *SetOpenStatus )( 
             IActiveIMMIME * This,
@@ -3975,20 +3975,20 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *SimulateHotKey )( 
             IActiveIMMIME * This,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwHotKeyID);
+            /* [in] */ uint32_t dwHotKeyID);
         
         HRESULT ( STDMETHODCALLTYPE *UnregisterWordA )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
             /* [in] */ LPSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPSTR szUnregister);
         
         HRESULT ( STDMETHODCALLTYPE *UnregisterWordW )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szUnregister);
         
         HRESULT ( STDMETHODCALLTYPE *GenerateMessage )( 
@@ -4007,11 +4007,11 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *GetIMCLockCount )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwLockCount);
+            /* [out] */ uint32_t *pdwLockCount);
         
         HRESULT ( STDMETHODCALLTYPE *CreateIMCC )( 
             IActiveIMMIME * This,
-            /* [in] */ DWORD dwSize,
+            /* [in] */ uint32_t dwSize,
             /* [out] */ HIMCC *phIMCC);
         
         HRESULT ( STDMETHODCALLTYPE *DestroyIMCC )( 
@@ -4030,39 +4030,39 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *ReSizeIMCC )( 
             IActiveIMMIME * This,
             /* [in] */ HIMCC hIMCC,
-            /* [in] */ DWORD dwSize,
+            /* [in] */ uint32_t dwSize,
             /* [out] */ HIMCC *phIMCC);
         
         HRESULT ( STDMETHODCALLTYPE *GetIMCCSize )( 
             IActiveIMMIME * This,
             /* [in] */ HIMCC hIMCC,
-            /* [out] */ DWORD *pdwSize);
+            /* [out] */ uint32_t *pdwSize);
         
         HRESULT ( STDMETHODCALLTYPE *GetIMCCLockCount )( 
             IActiveIMMIME * This,
             /* [in] */ HIMCC hIMCC,
-            /* [out] */ DWORD *pdwLockCount);
+            /* [out] */ uint32_t *pdwLockCount);
         
         HRESULT ( STDMETHODCALLTYPE *GetHotKey )( 
             IActiveIMMIME * This,
-            /* [in] */ DWORD dwHotKeyID,
-            /* [out] */ UINT *puModifiers,
-            /* [out] */ UINT *puVKey,
+            /* [in] */ uint32_t dwHotKeyID,
+            /* [out] */ uint32_t *puModifiers,
+            /* [out] */ uint32_t *puVKey,
             /* [out] */ HKL *phKL);
         
         HRESULT ( STDMETHODCALLTYPE *SetHotKey )( 
             IActiveIMMIME * This,
-            /* [in] */ DWORD dwHotKeyID,
-            /* [in] */ UINT uModifiers,
-            /* [in] */ UINT uVKey,
+            /* [in] */ uint32_t dwHotKeyID,
+            /* [in] */ uint32_t uModifiers,
+            /* [in] */ uint32_t uVKey,
             /* [in] */ HKL hKL);
         
         HRESULT ( STDMETHODCALLTYPE *CreateSoftKeyboard )( 
             IActiveIMMIME * This,
-            /* [in] */ UINT uType,
+            /* [in] */ uint32_t uType,
             /* [in] */ HWND hOwner,
-            /* [in] */ int x,
-            /* [in] */ int y,
+            /* [in] */ int32_t x,
+            /* [in] */ int32_t y,
             /* [out] */ HWND *phSoftKbdWnd);
         
         HRESULT ( STDMETHODCALLTYPE *DestroySoftKeyboard )( 
@@ -4072,12 +4072,12 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *ShowSoftKeyboard )( 
             IActiveIMMIME * This,
             /* [in] */ HWND hSoftKbdWnd,
-            /* [in] */ int nCmdShow);
+            /* [in] */ int32_t nCmdShow);
         
         HRESULT ( STDMETHODCALLTYPE *GetCodePageA )( 
             IActiveIMMIME * This,
             /* [in] */ HKL hKL,
-            /* [out] */ UINT *uCodePage);
+            /* [out] */ uint32_t *uCodePage);
         
         HRESULT ( STDMETHODCALLTYPE *GetLangId )( 
             IActiveIMMIME * This,
@@ -4087,10 +4087,10 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *KeybdEvent )( 
             IActiveIMMIME * This,
             /* [in] */ LANGID lgidIME,
-            /* [in] */ BYTE bVk,
-            /* [in] */ BYTE bScan,
-            /* [in] */ DWORD dwFlags,
-            /* [in] */ DWORD dwExtraInfo);
+            /* [in] */ uint8_t bVk,
+            /* [in] */ uint8_t bScan,
+            /* [in] */ uint32_t dwFlags,
+            /* [in] */ uint32_t dwExtraInfo);
         
         HRESULT ( STDMETHODCALLTYPE *LockModal )( 
             IActiveIMMIME * This);
@@ -4102,35 +4102,35 @@ EXTERN_C const IID IID_IActiveIMMIME;
             IActiveIMMIME * This,
             /* [in] */ HWND hWnd,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwFlags);
+            /* [in] */ uint32_t dwFlags);
         
         HRESULT ( STDMETHODCALLTYPE *DisableIME )( 
             IActiveIMMIME * This,
-            /* [in] */ DWORD idThread);
+            /* [in] */ uint32_t idThread);
         
         HRESULT ( STDMETHODCALLTYPE *GetImeMenuItemsA )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwFlags,
-            /* [in] */ DWORD dwType,
+            /* [in] */ uint32_t dwFlags,
+            /* [in] */ uint32_t dwType,
             /* [in] */ IMEMENUITEMINFOA *pImeParentMenu,
             /* [out] */ IMEMENUITEMINFOA *pImeMenu,
-            /* [in] */ DWORD dwSize,
-            /* [out] */ DWORD *pdwResult);
+            /* [in] */ uint32_t dwSize,
+            /* [out] */ uint32_t *pdwResult);
         
         HRESULT ( STDMETHODCALLTYPE *GetImeMenuItemsW )( 
             IActiveIMMIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwFlags,
-            /* [in] */ DWORD dwType,
+            /* [in] */ uint32_t dwFlags,
+            /* [in] */ uint32_t dwType,
             /* [in] */ IMEMENUITEMINFOW *pImeParentMenu,
             /* [out] */ IMEMENUITEMINFOW *pImeMenu,
-            /* [in] */ DWORD dwSize,
-            /* [out] */ DWORD *pdwResult);
+            /* [in] */ uint32_t dwSize,
+            /* [out] */ uint32_t *pdwResult);
         
         HRESULT ( STDMETHODCALLTYPE *EnumInputContext )( 
             IActiveIMMIME * This,
-            /* [in] */ DWORD idThread,
+            /* [in] */ uint32_t idThread,
             /* [out] */ IEnumInputContext **ppEnum);
         
         HRESULT ( STDMETHODCALLTYPE *RequestMessageA )( 
@@ -4150,7 +4150,7 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *SendIMCA )( 
             IActiveIMMIME * This,
             /* [in] */ HWND hWnd,
-            /* [in] */ UINT uMsg,
+            /* [in] */ uint32_t uMsg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam,
             /* [out] */ LRESULT *plResult);
@@ -4158,7 +4158,7 @@ EXTERN_C const IID IID_IActiveIMMIME;
         HRESULT ( STDMETHODCALLTYPE *SendIMCW )( 
             IActiveIMMIME * This,
             /* [in] */ HWND hWnd,
-            /* [in] */ UINT uMsg,
+            /* [in] */ uint32_t uMsg,
             /* [in] */ WPARAM wParam,
             /* [in] */ LPARAM lParam,
             /* [out] */ LRESULT *plResult);
@@ -4471,14 +4471,14 @@ void __RPC_STUB IActiveIMMIME_AssociateContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_ConfigureIMEA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
     /* [in] */ HWND hWnd,
-    /* [in] */ DWORD dwMode,
+    /* [in] */ uint32_t dwMode,
     /* [in] */ REGISTERWORDA *pData);
 
 
@@ -4486,14 +4486,14 @@ void __RPC_STUB IActiveIMMIME_ConfigureIMEA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_ConfigureIMEW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
     /* [in] */ HWND hWnd,
-    /* [in] */ DWORD dwMode,
+    /* [in] */ uint32_t dwMode,
     /* [in] */ REGISTERWORDW *pData);
 
 
@@ -4501,7 +4501,7 @@ void __RPC_STUB IActiveIMMIME_ConfigureIMEW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_CreateContext_Proxy( 
@@ -4513,7 +4513,7 @@ void __RPC_STUB IActiveIMMIME_CreateContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_DestroyContext_Proxy( 
@@ -4525,14 +4525,14 @@ void __RPC_STUB IActiveIMMIME_DestroyContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_EnumRegisterWordA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
     /* [in] */ LPSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPSTR szRegister,
     /* [in] */ LPVOID pData,
     /* [out] */ IEnumRegisterWordA **pEnum);
@@ -4542,14 +4542,14 @@ void __RPC_STUB IActiveIMMIME_EnumRegisterWordA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_EnumRegisterWordW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
     /* [in] */ LPWSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPWSTR szRegister,
     /* [in] */ LPVOID pData,
     /* [out] */ IEnumRegisterWordW **pEnum);
@@ -4559,14 +4559,14 @@ void __RPC_STUB IActiveIMMIME_EnumRegisterWordW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_EscapeA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
     /* [in] */ HIMC hIMC,
-    /* [in] */ UINT uEscape,
+    /* [in] */ uint32_t uEscape,
     /* [out][in] */ LPVOID pData,
     /* [out] */ LRESULT *plResult);
 
@@ -4575,14 +4575,14 @@ void __RPC_STUB IActiveIMMIME_EscapeA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_EscapeW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
     /* [in] */ HIMC hIMC,
-    /* [in] */ UINT uEscape,
+    /* [in] */ uint32_t uEscape,
     /* [out][in] */ LPVOID pData,
     /* [out] */ LRESULT *plResult);
 
@@ -4591,73 +4591,73 @@ void __RPC_STUB IActiveIMMIME_EscapeW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetCandidateListA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ CANDIDATELIST *pCandList,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMIME_GetCandidateListA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetCandidateListW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ CANDIDATELIST *pCandList,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMIME_GetCandidateListW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetCandidateListCountA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [out] */ DWORD *pdwListSize,
-    /* [out] */ DWORD *pdwBufLen);
+    /* [out] */ uint32_t *pdwListSize,
+    /* [out] */ uint32_t *pdwBufLen);
 
 
 void __RPC_STUB IActiveIMMIME_GetCandidateListCountA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetCandidateListCountW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [out] */ DWORD *pdwListSize,
-    /* [out] */ DWORD *pdwBufLen);
+    /* [out] */ uint32_t *pdwListSize,
+    /* [out] */ uint32_t *pdwBufLen);
 
 
 void __RPC_STUB IActiveIMMIME_GetCandidateListCountW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetCandidateWindow_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
+    /* [in] */ uint32_t dwIndex,
     /* [out] */ CANDIDATEFORM *pCandidate);
 
 
@@ -4665,7 +4665,7 @@ void __RPC_STUB IActiveIMMIME_GetCandidateWindow_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetCompositionFontA_Proxy( 
@@ -4678,7 +4678,7 @@ void __RPC_STUB IActiveIMMIME_GetCompositionFontA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetCompositionFontW_Proxy( 
@@ -4691,15 +4691,15 @@ void __RPC_STUB IActiveIMMIME_GetCompositionFontW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetCompositionStringA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ DWORD dwBufLen,
-    /* [out] */ LONG *plCopied,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t dwBufLen,
+    /* [out] */ int32_t *plCopied,
     /* [out] */ LPVOID pBuf);
 
 
@@ -4707,15 +4707,15 @@ void __RPC_STUB IActiveIMMIME_GetCompositionStringA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetCompositionStringW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ DWORD dwBufLen,
-    /* [out] */ LONG *plCopied,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t dwBufLen,
+    /* [out] */ int32_t *plCopied,
     /* [out] */ LPVOID pBuf);
 
 
@@ -4723,7 +4723,7 @@ void __RPC_STUB IActiveIMMIME_GetCompositionStringW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetCompositionWindow_Proxy( 
@@ -4736,7 +4736,7 @@ void __RPC_STUB IActiveIMMIME_GetCompositionWindow_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetContext_Proxy( 
@@ -4749,7 +4749,7 @@ void __RPC_STUB IActiveIMMIME_GetContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetConversionListA_Proxy( 
@@ -4757,17 +4757,17 @@ HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetConversionListA_Proxy(
     /* [in] */ HKL hKL,
     /* [in] */ HIMC hIMC,
     /* [in] */ LPSTR pSrc,
-    /* [in] */ UINT uBufLen,
-    /* [in] */ UINT uFlag,
+    /* [in] */ uint32_t uBufLen,
+    /* [in] */ uint32_t uFlag,
     /* [out] */ CANDIDATELIST *pDst,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMIME_GetConversionListA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetConversionListW_Proxy( 
@@ -4775,31 +4775,31 @@ HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetConversionListW_Proxy(
     /* [in] */ HKL hKL,
     /* [in] */ HIMC hIMC,
     /* [in] */ LPWSTR pSrc,
-    /* [in] */ UINT uBufLen,
-    /* [in] */ UINT uFlag,
+    /* [in] */ uint32_t uBufLen,
+    /* [in] */ uint32_t uFlag,
     /* [out] */ CANDIDATELIST *pDst,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMIME_GetConversionListW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetConversionStatus_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [out] */ DWORD *pfdwConversion,
-    /* [out] */ DWORD *pfdwSentence);
+    /* [out] */ uint32_t *pfdwConversion,
+    /* [out] */ uint32_t *pfdwSentence);
 
 
 void __RPC_STUB IActiveIMMIME_GetConversionStatus_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetDefaultIMEWnd_Proxy( 
@@ -4812,99 +4812,99 @@ void __RPC_STUB IActiveIMMIME_GetDefaultIMEWnd_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetDescriptionA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ LPSTR szDescription,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMIME_GetDescriptionA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetDescriptionW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ LPWSTR szDescription,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMIME_GetDescriptionW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetGuideLineA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ DWORD dwBufLen,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t dwBufLen,
     /* [out] */ LPSTR pBuf,
-    /* [out] */ DWORD *pdwResult);
+    /* [out] */ uint32_t *pdwResult);
 
 
 void __RPC_STUB IActiveIMMIME_GetGuideLineA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetGuideLineW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ DWORD dwBufLen,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t dwBufLen,
     /* [out] */ LPWSTR pBuf,
-    /* [out] */ DWORD *pdwResult);
+    /* [out] */ uint32_t *pdwResult);
 
 
 void __RPC_STUB IActiveIMMIME_GetGuideLineW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetIMEFileNameA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ LPSTR szFileName,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMIME_GetIMEFileNameA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetIMEFileNameW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ LPWSTR szFileName,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMIME_GetIMEFileNameW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetOpenStatus_Proxy( 
@@ -4916,51 +4916,51 @@ void __RPC_STUB IActiveIMMIME_GetOpenStatus_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetProperty_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
-    /* [in] */ DWORD fdwIndex,
-    /* [out] */ DWORD *pdwProperty);
+    /* [in] */ uint32_t fdwIndex,
+    /* [out] */ uint32_t *pdwProperty);
 
 
 void __RPC_STUB IActiveIMMIME_GetProperty_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetRegisterWordStyleA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
-    /* [in] */ UINT nItem,
+    /* [in] */ uint32_t nItem,
     /* [out] */ STYLEBUFA *pStyleBuf,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMIME_GetRegisterWordStyleA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetRegisterWordStyleW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
-    /* [in] */ UINT nItem,
+    /* [in] */ uint32_t nItem,
     /* [out] */ STYLEBUFW *pStyleBuf,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIMMIME_GetRegisterWordStyleW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetStatusWindowPos_Proxy( 
@@ -4973,20 +4973,20 @@ void __RPC_STUB IActiveIMMIME_GetStatusWindowPos_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetVirtualKey_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HWND hWnd,
-    /* [out] */ UINT *puVirtualKey);
+    /* [out] */ uint32_t *puVirtualKey);
 
 
 void __RPC_STUB IActiveIMMIME_GetVirtualKey_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_InstallIMEA_Proxy( 
@@ -5000,7 +5000,7 @@ void __RPC_STUB IActiveIMMIME_InstallIMEA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_InstallIMEW_Proxy( 
@@ -5014,7 +5014,7 @@ void __RPC_STUB IActiveIMMIME_InstallIMEW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_IsIME_Proxy( 
@@ -5026,13 +5026,13 @@ void __RPC_STUB IActiveIMMIME_IsIME_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_IsUIMessageA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HWND hWndIME,
-    /* [in] */ UINT msg,
+    /* [in] */ uint32_t msg,
     /* [in] */ WPARAM wParam,
     /* [in] */ LPARAM lParam);
 
@@ -5041,13 +5041,13 @@ void __RPC_STUB IActiveIMMIME_IsUIMessageA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_IsUIMessageW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HWND hWndIME,
-    /* [in] */ UINT msg,
+    /* [in] */ uint32_t msg,
     /* [in] */ WPARAM wParam,
     /* [in] */ LPARAM lParam);
 
@@ -5056,29 +5056,29 @@ void __RPC_STUB IActiveIMMIME_IsUIMessageW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_NotifyIME_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwAction,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ DWORD dwValue);
+    /* [in] */ uint32_t dwAction,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t dwValue);
 
 
 void __RPC_STUB IActiveIMMIME_NotifyIME_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_RegisterWordA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
     /* [in] */ LPSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPSTR szRegister);
 
 
@@ -5086,14 +5086,14 @@ void __RPC_STUB IActiveIMMIME_RegisterWordA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_RegisterWordW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
     /* [in] */ LPWSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPWSTR szRegister);
 
 
@@ -5101,7 +5101,7 @@ void __RPC_STUB IActiveIMMIME_RegisterWordW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_ReleaseContext_Proxy( 
@@ -5114,7 +5114,7 @@ void __RPC_STUB IActiveIMMIME_ReleaseContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SetCandidateWindow_Proxy( 
@@ -5127,7 +5127,7 @@ void __RPC_STUB IActiveIMMIME_SetCandidateWindow_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SetCompositionFontA_Proxy( 
@@ -5140,7 +5140,7 @@ void __RPC_STUB IActiveIMMIME_SetCompositionFontA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SetCompositionFontW_Proxy( 
@@ -5153,41 +5153,41 @@ void __RPC_STUB IActiveIMMIME_SetCompositionFontW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SetCompositionStringA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
+    /* [in] */ uint32_t dwIndex,
     /* [in] */ LPVOID pComp,
-    /* [in] */ DWORD dwCompLen,
+    /* [in] */ uint32_t dwCompLen,
     /* [in] */ LPVOID pRead,
-    /* [in] */ DWORD dwReadLen);
+    /* [in] */ uint32_t dwReadLen);
 
 
 void __RPC_STUB IActiveIMMIME_SetCompositionStringA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SetCompositionStringW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
+    /* [in] */ uint32_t dwIndex,
     /* [in] */ LPVOID pComp,
-    /* [in] */ DWORD dwCompLen,
+    /* [in] */ uint32_t dwCompLen,
     /* [in] */ LPVOID pRead,
-    /* [in] */ DWORD dwReadLen);
+    /* [in] */ uint32_t dwReadLen);
 
 
 void __RPC_STUB IActiveIMMIME_SetCompositionStringW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SetCompositionWindow_Proxy( 
@@ -5200,21 +5200,21 @@ void __RPC_STUB IActiveIMMIME_SetCompositionWindow_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SetConversionStatus_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD fdwConversion,
-    /* [in] */ DWORD fdwSentence);
+    /* [in] */ uint32_t fdwConversion,
+    /* [in] */ uint32_t fdwSentence);
 
 
 void __RPC_STUB IActiveIMMIME_SetConversionStatus_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SetOpenStatus_Proxy( 
@@ -5227,7 +5227,7 @@ void __RPC_STUB IActiveIMMIME_SetOpenStatus_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SetStatusWindowPos_Proxy( 
@@ -5240,27 +5240,27 @@ void __RPC_STUB IActiveIMMIME_SetStatusWindowPos_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SimulateHotKey_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HWND hWnd,
-    /* [in] */ DWORD dwHotKeyID);
+    /* [in] */ uint32_t dwHotKeyID);
 
 
 void __RPC_STUB IActiveIMMIME_SimulateHotKey_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_UnregisterWordA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
     /* [in] */ LPSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPSTR szUnregister);
 
 
@@ -5268,14 +5268,14 @@ void __RPC_STUB IActiveIMMIME_UnregisterWordA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_UnregisterWordW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
     /* [in] */ LPWSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPWSTR szUnregister);
 
 
@@ -5283,7 +5283,7 @@ void __RPC_STUB IActiveIMMIME_UnregisterWordW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GenerateMessage_Proxy( 
@@ -5295,7 +5295,7 @@ void __RPC_STUB IActiveIMMIME_GenerateMessage_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_LockIMC_Proxy( 
@@ -5308,7 +5308,7 @@ void __RPC_STUB IActiveIMMIME_LockIMC_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_UnlockIMC_Proxy( 
@@ -5320,25 +5320,25 @@ void __RPC_STUB IActiveIMMIME_UnlockIMC_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetIMCLockCount_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [out] */ DWORD *pdwLockCount);
+    /* [out] */ uint32_t *pdwLockCount);
 
 
 void __RPC_STUB IActiveIMMIME_GetIMCLockCount_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_CreateIMCC_Proxy( 
     IActiveIMMIME * This,
-    /* [in] */ DWORD dwSize,
+    /* [in] */ uint32_t dwSize,
     /* [out] */ HIMCC *phIMCC);
 
 
@@ -5346,7 +5346,7 @@ void __RPC_STUB IActiveIMMIME_CreateIMCC_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_DestroyIMCC_Proxy( 
@@ -5358,7 +5358,7 @@ void __RPC_STUB IActiveIMMIME_DestroyIMCC_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_LockIMCC_Proxy( 
@@ -5371,7 +5371,7 @@ void __RPC_STUB IActiveIMMIME_LockIMCC_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_UnlockIMCC_Proxy( 
@@ -5383,13 +5383,13 @@ void __RPC_STUB IActiveIMMIME_UnlockIMCC_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_ReSizeIMCC_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMCC hIMCC,
-    /* [in] */ DWORD dwSize,
+    /* [in] */ uint32_t dwSize,
     /* [out] */ HIMCC *phIMCC);
 
 
@@ -5397,40 +5397,40 @@ void __RPC_STUB IActiveIMMIME_ReSizeIMCC_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetIMCCSize_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMCC hIMCC,
-    /* [out] */ DWORD *pdwSize);
+    /* [out] */ uint32_t *pdwSize);
 
 
 void __RPC_STUB IActiveIMMIME_GetIMCCSize_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetIMCCLockCount_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMCC hIMCC,
-    /* [out] */ DWORD *pdwLockCount);
+    /* [out] */ uint32_t *pdwLockCount);
 
 
 void __RPC_STUB IActiveIMMIME_GetIMCCLockCount_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetHotKey_Proxy( 
     IActiveIMMIME * This,
-    /* [in] */ DWORD dwHotKeyID,
-    /* [out] */ UINT *puModifiers,
-    /* [out] */ UINT *puVKey,
+    /* [in] */ uint32_t dwHotKeyID,
+    /* [out] */ uint32_t *puModifiers,
+    /* [out] */ uint32_t *puVKey,
     /* [out] */ HKL *phKL);
 
 
@@ -5438,14 +5438,14 @@ void __RPC_STUB IActiveIMMIME_GetHotKey_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SetHotKey_Proxy( 
     IActiveIMMIME * This,
-    /* [in] */ DWORD dwHotKeyID,
-    /* [in] */ UINT uModifiers,
-    /* [in] */ UINT uVKey,
+    /* [in] */ uint32_t dwHotKeyID,
+    /* [in] */ uint32_t uModifiers,
+    /* [in] */ uint32_t uVKey,
     /* [in] */ HKL hKL);
 
 
@@ -5453,15 +5453,15 @@ void __RPC_STUB IActiveIMMIME_SetHotKey_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_CreateSoftKeyboard_Proxy( 
     IActiveIMMIME * This,
-    /* [in] */ UINT uType,
+    /* [in] */ uint32_t uType,
     /* [in] */ HWND hOwner,
-    /* [in] */ int x,
-    /* [in] */ int y,
+    /* [in] */ int32_t x,
+    /* [in] */ int32_t y,
     /* [out] */ HWND *phSoftKbdWnd);
 
 
@@ -5469,7 +5469,7 @@ void __RPC_STUB IActiveIMMIME_CreateSoftKeyboard_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_DestroySoftKeyboard_Proxy( 
@@ -5481,33 +5481,33 @@ void __RPC_STUB IActiveIMMIME_DestroySoftKeyboard_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_ShowSoftKeyboard_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HWND hSoftKbdWnd,
-    /* [in] */ int nCmdShow);
+    /* [in] */ int32_t nCmdShow);
 
 
 void __RPC_STUB IActiveIMMIME_ShowSoftKeyboard_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetCodePageA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HKL hKL,
-    /* [out] */ UINT *uCodePage);
+    /* [out] */ uint32_t *uCodePage);
 
 
 void __RPC_STUB IActiveIMMIME_GetCodePageA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetLangId_Proxy( 
@@ -5520,23 +5520,23 @@ void __RPC_STUB IActiveIMMIME_GetLangId_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_KeybdEvent_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ LANGID lgidIME,
-    /* [in] */ BYTE bVk,
-    /* [in] */ BYTE bScan,
-    /* [in] */ DWORD dwFlags,
-    /* [in] */ DWORD dwExtraInfo);
+    /* [in] */ uint8_t bVk,
+    /* [in] */ uint8_t bScan,
+    /* [in] */ uint32_t dwFlags,
+    /* [in] */ uint32_t dwExtraInfo);
 
 
 void __RPC_STUB IActiveIMMIME_KeybdEvent_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_LockModal_Proxy( 
@@ -5547,7 +5547,7 @@ void __RPC_STUB IActiveIMMIME_LockModal_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_UnlockModal_Proxy( 
@@ -5558,74 +5558,74 @@ void __RPC_STUB IActiveIMMIME_UnlockModal_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_AssociateContextEx_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HWND hWnd,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwFlags);
+    /* [in] */ uint32_t dwFlags);
 
 
 void __RPC_STUB IActiveIMMIME_AssociateContextEx_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_DisableIME_Proxy( 
     IActiveIMMIME * This,
-    /* [in] */ DWORD idThread);
+    /* [in] */ uint32_t idThread);
 
 
 void __RPC_STUB IActiveIMMIME_DisableIME_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetImeMenuItemsA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwFlags,
-    /* [in] */ DWORD dwType,
+    /* [in] */ uint32_t dwFlags,
+    /* [in] */ uint32_t dwType,
     /* [in] */ IMEMENUITEMINFOA *pImeParentMenu,
     /* [out] */ IMEMENUITEMINFOA *pImeMenu,
-    /* [in] */ DWORD dwSize,
-    /* [out] */ DWORD *pdwResult);
+    /* [in] */ uint32_t dwSize,
+    /* [out] */ uint32_t *pdwResult);
 
 
 void __RPC_STUB IActiveIMMIME_GetImeMenuItemsA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_GetImeMenuItemsW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwFlags,
-    /* [in] */ DWORD dwType,
+    /* [in] */ uint32_t dwFlags,
+    /* [in] */ uint32_t dwType,
     /* [in] */ IMEMENUITEMINFOW *pImeParentMenu,
     /* [out] */ IMEMENUITEMINFOW *pImeMenu,
-    /* [in] */ DWORD dwSize,
-    /* [out] */ DWORD *pdwResult);
+    /* [in] */ uint32_t dwSize,
+    /* [out] */ uint32_t *pdwResult);
 
 
 void __RPC_STUB IActiveIMMIME_GetImeMenuItemsW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_EnumInputContext_Proxy( 
     IActiveIMMIME * This,
-    /* [in] */ DWORD idThread,
+    /* [in] */ uint32_t idThread,
     /* [out] */ IEnumInputContext **ppEnum);
 
 
@@ -5633,7 +5633,7 @@ void __RPC_STUB IActiveIMMIME_EnumInputContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_RequestMessageA_Proxy( 
@@ -5648,7 +5648,7 @@ void __RPC_STUB IActiveIMMIME_RequestMessageA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_RequestMessageW_Proxy( 
@@ -5663,13 +5663,13 @@ void __RPC_STUB IActiveIMMIME_RequestMessageW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SendIMCA_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HWND hWnd,
-    /* [in] */ UINT uMsg,
+    /* [in] */ uint32_t uMsg,
     /* [in] */ WPARAM wParam,
     /* [in] */ LPARAM lParam,
     /* [out] */ LRESULT *plResult);
@@ -5679,13 +5679,13 @@ void __RPC_STUB IActiveIMMIME_SendIMCA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_SendIMCW_Proxy( 
     IActiveIMMIME * This,
     /* [in] */ HWND hWnd,
-    /* [in] */ UINT uMsg,
+    /* [in] */ uint32_t uMsg,
     /* [in] */ WPARAM wParam,
     /* [in] */ LPARAM lParam,
     /* [out] */ LRESULT *plResult);
@@ -5695,7 +5695,7 @@ void __RPC_STUB IActiveIMMIME_SendIMCW_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIMMIME_IsSleeping_Proxy( 
@@ -5706,7 +5706,7 @@ void __RPC_STUB IActiveIMMIME_IsSleeping_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 
@@ -5729,31 +5729,31 @@ EXTERN_C const IID IID_IActiveIME;
     {
     public:
         virtual HRESULT STDMETHODCALLTYPE Inquire( 
-            /* [in] */ DWORD dwSystemInfoFlags,
+            /* [in] */ uint32_t dwSystemInfoFlags,
             /* [out] */ IMEINFO *pIMEInfo,
             /* [out] */ LPWSTR szWndClass,
-            /* [out] */ DWORD *pdwPrivate) = 0;
+            /* [out] */ uint32_t *pdwPrivate) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE ConversionList( 
             /* [in] */ HIMC hIMC,
             /* [in] */ LPWSTR szSource,
-            /* [in] */ UINT uFlag,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uFlag,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ CANDIDATELIST *pDest,
-            /* [out] */ UINT *puCopied) = 0;
+            /* [out] */ uint32_t *puCopied) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Configure( 
             /* [in] */ HKL hKL,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwMode,
+            /* [in] */ uint32_t dwMode,
             /* [in] */ REGISTERWORDW *pRegisterWord) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Destroy( 
-            /* [in] */ UINT uReserved) = 0;
+            /* [in] */ uint32_t uReserved) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Escape( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uEscape,
+            /* [in] */ uint32_t uEscape,
             /* [out][in] */ void *pData,
             /* [out] */ LRESULT *plResult) = 0;
         
@@ -5763,15 +5763,15 @@ EXTERN_C const IID IID_IActiveIME;
         
         virtual HRESULT STDMETHODCALLTYPE ProcessKey( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uVirKey,
-            /* [in] */ DWORD lParam,
-            /* [in] */ BYTE *pbKeyState) = 0;
+            /* [in] */ uint32_t uVirKey,
+            /* [in] */ uint32_t lParam,
+            /* [in] */ uint8_t *pbKeyState) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Notify( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwAction,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwValue) = 0;
+            /* [in] */ uint32_t dwAction,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwValue) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE Select( 
             /* [in] */ HIMC hIMC,
@@ -5779,45 +5779,45 @@ EXTERN_C const IID IID_IActiveIME;
         
         virtual HRESULT STDMETHODCALLTYPE SetCompositionString( 
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [in] */ void *pComp,
-            /* [in] */ DWORD dwCompLen,
+            /* [in] */ uint32_t dwCompLen,
             /* [in] */ void *pRead,
-            /* [in] */ DWORD dwReadLen) = 0;
+            /* [in] */ uint32_t dwReadLen) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE ToAsciiEx( 
-            /* [in] */ UINT uVirKey,
-            /* [in] */ UINT uScanCode,
-            /* [in] */ BYTE *pbKeyState,
-            /* [in] */ UINT fuState,
+            /* [in] */ uint32_t uVirKey,
+            /* [in] */ uint32_t uScanCode,
+            /* [in] */ uint8_t *pbKeyState,
+            /* [in] */ uint32_t fuState,
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwTransBuf,
-            /* [out] */ UINT *puSize) = 0;
+            /* [out] */ uint32_t *pdwTransBuf,
+            /* [out] */ uint32_t *puSize) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE RegisterWord( 
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szString) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE UnregisterWord( 
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szString) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetRegisterWordStyle( 
-            /* [in] */ UINT nItem,
+            /* [in] */ uint32_t nItem,
             /* [out] */ STYLEBUFW *pStyleBuf,
-            /* [out] */ UINT *puBufSize) = 0;
+            /* [out] */ uint32_t *puBufSize) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE EnumRegisterWord( 
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szRegister,
             /* [in] */ LPVOID pData,
             /* [out] */ IEnumRegisterWordW **ppEnum) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetCodePageA( 
-            /* [out] */ UINT *uCodePage) = 0;
+            /* [out] */ uint32_t *uCodePage) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetLangId( 
             /* [out] */ LANGID *plid) = 0;
@@ -5835,43 +5835,43 @@ EXTERN_C const IID IID_IActiveIME;
             /* [in] */ REFIID riid,
             /* [iid_is][out] */ void **ppvObject);
         
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+        uint32_t ( STDMETHODCALLTYPE *AddRef )( 
             IActiveIME * This);
         
-        ULONG ( STDMETHODCALLTYPE *Release )( 
+        uint32_t ( STDMETHODCALLTYPE *Release )( 
             IActiveIME * This);
         
         HRESULT ( STDMETHODCALLTYPE *Inquire )( 
             IActiveIME * This,
-            /* [in] */ DWORD dwSystemInfoFlags,
+            /* [in] */ uint32_t dwSystemInfoFlags,
             /* [out] */ IMEINFO *pIMEInfo,
             /* [out] */ LPWSTR szWndClass,
-            /* [out] */ DWORD *pdwPrivate);
+            /* [out] */ uint32_t *pdwPrivate);
         
         HRESULT ( STDMETHODCALLTYPE *ConversionList )( 
             IActiveIME * This,
             /* [in] */ HIMC hIMC,
             /* [in] */ LPWSTR szSource,
-            /* [in] */ UINT uFlag,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uFlag,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ CANDIDATELIST *pDest,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *Configure )( 
             IActiveIME * This,
             /* [in] */ HKL hKL,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwMode,
+            /* [in] */ uint32_t dwMode,
             /* [in] */ REGISTERWORDW *pRegisterWord);
         
         HRESULT ( STDMETHODCALLTYPE *Destroy )( 
             IActiveIME * This,
-            /* [in] */ UINT uReserved);
+            /* [in] */ uint32_t uReserved);
         
         HRESULT ( STDMETHODCALLTYPE *Escape )( 
             IActiveIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uEscape,
+            /* [in] */ uint32_t uEscape,
             /* [out][in] */ void *pData,
             /* [out] */ LRESULT *plResult);
         
@@ -5883,16 +5883,16 @@ EXTERN_C const IID IID_IActiveIME;
         HRESULT ( STDMETHODCALLTYPE *ProcessKey )( 
             IActiveIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uVirKey,
-            /* [in] */ DWORD lParam,
-            /* [in] */ BYTE *pbKeyState);
+            /* [in] */ uint32_t uVirKey,
+            /* [in] */ uint32_t lParam,
+            /* [in] */ uint8_t *pbKeyState);
         
         HRESULT ( STDMETHODCALLTYPE *Notify )( 
             IActiveIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwAction,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwValue);
+            /* [in] */ uint32_t dwAction,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwValue);
         
         HRESULT ( STDMETHODCALLTYPE *Select )( 
             IActiveIME * This,
@@ -5902,51 +5902,51 @@ EXTERN_C const IID IID_IActiveIME;
         HRESULT ( STDMETHODCALLTYPE *SetCompositionString )( 
             IActiveIME * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [in] */ void *pComp,
-            /* [in] */ DWORD dwCompLen,
+            /* [in] */ uint32_t dwCompLen,
             /* [in] */ void *pRead,
-            /* [in] */ DWORD dwReadLen);
+            /* [in] */ uint32_t dwReadLen);
         
         HRESULT ( STDMETHODCALLTYPE *ToAsciiEx )( 
             IActiveIME * This,
-            /* [in] */ UINT uVirKey,
-            /* [in] */ UINT uScanCode,
-            /* [in] */ BYTE *pbKeyState,
-            /* [in] */ UINT fuState,
+            /* [in] */ uint32_t uVirKey,
+            /* [in] */ uint32_t uScanCode,
+            /* [in] */ uint8_t *pbKeyState,
+            /* [in] */ uint32_t fuState,
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwTransBuf,
-            /* [out] */ UINT *puSize);
+            /* [out] */ uint32_t *pdwTransBuf,
+            /* [out] */ uint32_t *puSize);
         
         HRESULT ( STDMETHODCALLTYPE *RegisterWord )( 
             IActiveIME * This,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szString);
         
         HRESULT ( STDMETHODCALLTYPE *UnregisterWord )( 
             IActiveIME * This,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szString);
         
         HRESULT ( STDMETHODCALLTYPE *GetRegisterWordStyle )( 
             IActiveIME * This,
-            /* [in] */ UINT nItem,
+            /* [in] */ uint32_t nItem,
             /* [out] */ STYLEBUFW *pStyleBuf,
-            /* [out] */ UINT *puBufSize);
+            /* [out] */ uint32_t *puBufSize);
         
         HRESULT ( STDMETHODCALLTYPE *EnumRegisterWord )( 
             IActiveIME * This,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szRegister,
             /* [in] */ LPVOID pData,
             /* [out] */ IEnumRegisterWordW **ppEnum);
         
         HRESULT ( STDMETHODCALLTYPE *GetCodePageA )( 
             IActiveIME * This,
-            /* [out] */ UINT *uCodePage);
+            /* [out] */ uint32_t *uCodePage);
         
         HRESULT ( STDMETHODCALLTYPE *GetLangId )( 
             IActiveIME * This,
@@ -6035,41 +6035,41 @@ EXTERN_C const IID IID_IActiveIME;
 
 HRESULT STDMETHODCALLTYPE IActiveIME_Inquire_Proxy( 
     IActiveIME * This,
-    /* [in] */ DWORD dwSystemInfoFlags,
+    /* [in] */ uint32_t dwSystemInfoFlags,
     /* [out] */ IMEINFO *pIMEInfo,
     /* [out] */ LPWSTR szWndClass,
-    /* [out] */ DWORD *pdwPrivate);
+    /* [out] */ uint32_t *pdwPrivate);
 
 
 void __RPC_STUB IActiveIME_Inquire_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_ConversionList_Proxy( 
     IActiveIME * This,
     /* [in] */ HIMC hIMC,
     /* [in] */ LPWSTR szSource,
-    /* [in] */ UINT uFlag,
-    /* [in] */ UINT uBufLen,
+    /* [in] */ uint32_t uFlag,
+    /* [in] */ uint32_t uBufLen,
     /* [out] */ CANDIDATELIST *pDest,
-    /* [out] */ UINT *puCopied);
+    /* [out] */ uint32_t *puCopied);
 
 
 void __RPC_STUB IActiveIME_ConversionList_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_Configure_Proxy( 
     IActiveIME * This,
     /* [in] */ HKL hKL,
     /* [in] */ HWND hWnd,
-    /* [in] */ DWORD dwMode,
+    /* [in] */ uint32_t dwMode,
     /* [in] */ REGISTERWORDW *pRegisterWord);
 
 
@@ -6077,25 +6077,25 @@ void __RPC_STUB IActiveIME_Configure_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_Destroy_Proxy( 
     IActiveIME * This,
-    /* [in] */ UINT uReserved);
+    /* [in] */ uint32_t uReserved);
 
 
 void __RPC_STUB IActiveIME_Destroy_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_Escape_Proxy( 
     IActiveIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ UINT uEscape,
+    /* [in] */ uint32_t uEscape,
     /* [out][in] */ void *pData,
     /* [out] */ LRESULT *plResult);
 
@@ -6104,7 +6104,7 @@ void __RPC_STUB IActiveIME_Escape_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_SetActiveContext_Proxy( 
@@ -6117,37 +6117,37 @@ void __RPC_STUB IActiveIME_SetActiveContext_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_ProcessKey_Proxy( 
     IActiveIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ UINT uVirKey,
-    /* [in] */ DWORD lParam,
-    /* [in] */ BYTE *pbKeyState);
+    /* [in] */ uint32_t uVirKey,
+    /* [in] */ uint32_t lParam,
+    /* [in] */ uint8_t *pbKeyState);
 
 
 void __RPC_STUB IActiveIME_ProcessKey_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_Notify_Proxy( 
     IActiveIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwAction,
-    /* [in] */ DWORD dwIndex,
-    /* [in] */ DWORD dwValue);
+    /* [in] */ uint32_t dwAction,
+    /* [in] */ uint32_t dwIndex,
+    /* [in] */ uint32_t dwValue);
 
 
 void __RPC_STUB IActiveIME_Notify_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_Select_Proxy( 
@@ -6160,48 +6160,48 @@ void __RPC_STUB IActiveIME_Select_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_SetCompositionString_Proxy( 
     IActiveIME * This,
     /* [in] */ HIMC hIMC,
-    /* [in] */ DWORD dwIndex,
+    /* [in] */ uint32_t dwIndex,
     /* [in] */ void *pComp,
-    /* [in] */ DWORD dwCompLen,
+    /* [in] */ uint32_t dwCompLen,
     /* [in] */ void *pRead,
-    /* [in] */ DWORD dwReadLen);
+    /* [in] */ uint32_t dwReadLen);
 
 
 void __RPC_STUB IActiveIME_SetCompositionString_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_ToAsciiEx_Proxy( 
     IActiveIME * This,
-    /* [in] */ UINT uVirKey,
-    /* [in] */ UINT uScanCode,
-    /* [in] */ BYTE *pbKeyState,
-    /* [in] */ UINT fuState,
+    /* [in] */ uint32_t uVirKey,
+    /* [in] */ uint32_t uScanCode,
+    /* [in] */ uint8_t *pbKeyState,
+    /* [in] */ uint32_t fuState,
     /* [in] */ HIMC hIMC,
-    /* [out] */ DWORD *pdwTransBuf,
-    /* [out] */ UINT *puSize);
+    /* [out] */ uint32_t *pdwTransBuf,
+    /* [out] */ uint32_t *puSize);
 
 
 void __RPC_STUB IActiveIME_ToAsciiEx_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_RegisterWord_Proxy( 
     IActiveIME * This,
     /* [in] */ LPWSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPWSTR szString);
 
 
@@ -6209,13 +6209,13 @@ void __RPC_STUB IActiveIME_RegisterWord_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_UnregisterWord_Proxy( 
     IActiveIME * This,
     /* [in] */ LPWSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPWSTR szString);
 
 
@@ -6223,27 +6223,27 @@ void __RPC_STUB IActiveIME_UnregisterWord_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_GetRegisterWordStyle_Proxy( 
     IActiveIME * This,
-    /* [in] */ UINT nItem,
+    /* [in] */ uint32_t nItem,
     /* [out] */ STYLEBUFW *pStyleBuf,
-    /* [out] */ UINT *puBufSize);
+    /* [out] */ uint32_t *puBufSize);
 
 
 void __RPC_STUB IActiveIME_GetRegisterWordStyle_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_EnumRegisterWord_Proxy( 
     IActiveIME * This,
     /* [in] */ LPWSTR szReading,
-    /* [in] */ DWORD dwStyle,
+    /* [in] */ uint32_t dwStyle,
     /* [in] */ LPWSTR szRegister,
     /* [in] */ LPVOID pData,
     /* [out] */ IEnumRegisterWordW **ppEnum);
@@ -6253,19 +6253,19 @@ void __RPC_STUB IActiveIME_EnumRegisterWord_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_GetCodePageA_Proxy( 
     IActiveIME * This,
-    /* [out] */ UINT *uCodePage);
+    /* [out] */ uint32_t *uCodePage);
 
 
 void __RPC_STUB IActiveIME_GetCodePageA_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME_GetLangId_Proxy( 
@@ -6277,7 +6277,7 @@ void __RPC_STUB IActiveIME_GetLangId_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 
@@ -6317,43 +6317,43 @@ EXTERN_C const IID IID_IActiveIME2;
             /* [in] */ REFIID riid,
             /* [iid_is][out] */ void **ppvObject);
         
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+        uint32_t ( STDMETHODCALLTYPE *AddRef )( 
             IActiveIME2 * This);
         
-        ULONG ( STDMETHODCALLTYPE *Release )( 
+        uint32_t ( STDMETHODCALLTYPE *Release )( 
             IActiveIME2 * This);
         
         HRESULT ( STDMETHODCALLTYPE *Inquire )( 
             IActiveIME2 * This,
-            /* [in] */ DWORD dwSystemInfoFlags,
+            /* [in] */ uint32_t dwSystemInfoFlags,
             /* [out] */ IMEINFO *pIMEInfo,
             /* [out] */ LPWSTR szWndClass,
-            /* [out] */ DWORD *pdwPrivate);
+            /* [out] */ uint32_t *pdwPrivate);
         
         HRESULT ( STDMETHODCALLTYPE *ConversionList )( 
             IActiveIME2 * This,
             /* [in] */ HIMC hIMC,
             /* [in] */ LPWSTR szSource,
-            /* [in] */ UINT uFlag,
-            /* [in] */ UINT uBufLen,
+            /* [in] */ uint32_t uFlag,
+            /* [in] */ uint32_t uBufLen,
             /* [out] */ CANDIDATELIST *pDest,
-            /* [out] */ UINT *puCopied);
+            /* [out] */ uint32_t *puCopied);
         
         HRESULT ( STDMETHODCALLTYPE *Configure )( 
             IActiveIME2 * This,
             /* [in] */ HKL hKL,
             /* [in] */ HWND hWnd,
-            /* [in] */ DWORD dwMode,
+            /* [in] */ uint32_t dwMode,
             /* [in] */ REGISTERWORDW *pRegisterWord);
         
         HRESULT ( STDMETHODCALLTYPE *Destroy )( 
             IActiveIME2 * This,
-            /* [in] */ UINT uReserved);
+            /* [in] */ uint32_t uReserved);
         
         HRESULT ( STDMETHODCALLTYPE *Escape )( 
             IActiveIME2 * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uEscape,
+            /* [in] */ uint32_t uEscape,
             /* [out][in] */ void *pData,
             /* [out] */ LRESULT *plResult);
         
@@ -6365,16 +6365,16 @@ EXTERN_C const IID IID_IActiveIME2;
         HRESULT ( STDMETHODCALLTYPE *ProcessKey )( 
             IActiveIME2 * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ UINT uVirKey,
-            /* [in] */ DWORD lParam,
-            /* [in] */ BYTE *pbKeyState);
+            /* [in] */ uint32_t uVirKey,
+            /* [in] */ uint32_t lParam,
+            /* [in] */ uint8_t *pbKeyState);
         
         HRESULT ( STDMETHODCALLTYPE *Notify )( 
             IActiveIME2 * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwAction,
-            /* [in] */ DWORD dwIndex,
-            /* [in] */ DWORD dwValue);
+            /* [in] */ uint32_t dwAction,
+            /* [in] */ uint32_t dwIndex,
+            /* [in] */ uint32_t dwValue);
         
         HRESULT ( STDMETHODCALLTYPE *Select )( 
             IActiveIME2 * This,
@@ -6384,51 +6384,51 @@ EXTERN_C const IID IID_IActiveIME2;
         HRESULT ( STDMETHODCALLTYPE *SetCompositionString )( 
             IActiveIME2 * This,
             /* [in] */ HIMC hIMC,
-            /* [in] */ DWORD dwIndex,
+            /* [in] */ uint32_t dwIndex,
             /* [in] */ void *pComp,
-            /* [in] */ DWORD dwCompLen,
+            /* [in] */ uint32_t dwCompLen,
             /* [in] */ void *pRead,
-            /* [in] */ DWORD dwReadLen);
+            /* [in] */ uint32_t dwReadLen);
         
         HRESULT ( STDMETHODCALLTYPE *ToAsciiEx )( 
             IActiveIME2 * This,
-            /* [in] */ UINT uVirKey,
-            /* [in] */ UINT uScanCode,
-            /* [in] */ BYTE *pbKeyState,
-            /* [in] */ UINT fuState,
+            /* [in] */ uint32_t uVirKey,
+            /* [in] */ uint32_t uScanCode,
+            /* [in] */ uint8_t *pbKeyState,
+            /* [in] */ uint32_t fuState,
             /* [in] */ HIMC hIMC,
-            /* [out] */ DWORD *pdwTransBuf,
-            /* [out] */ UINT *puSize);
+            /* [out] */ uint32_t *pdwTransBuf,
+            /* [out] */ uint32_t *puSize);
         
         HRESULT ( STDMETHODCALLTYPE *RegisterWord )( 
             IActiveIME2 * This,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szString);
         
         HRESULT ( STDMETHODCALLTYPE *UnregisterWord )( 
             IActiveIME2 * This,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szString);
         
         HRESULT ( STDMETHODCALLTYPE *GetRegisterWordStyle )( 
             IActiveIME2 * This,
-            /* [in] */ UINT nItem,
+            /* [in] */ uint32_t nItem,
             /* [out] */ STYLEBUFW *pStyleBuf,
-            /* [out] */ UINT *puBufSize);
+            /* [out] */ uint32_t *puBufSize);
         
         HRESULT ( STDMETHODCALLTYPE *EnumRegisterWord )( 
             IActiveIME2 * This,
             /* [in] */ LPWSTR szReading,
-            /* [in] */ DWORD dwStyle,
+            /* [in] */ uint32_t dwStyle,
             /* [in] */ LPWSTR szRegister,
             /* [in] */ LPVOID pData,
             /* [out] */ IEnumRegisterWordW **ppEnum);
         
         HRESULT ( STDMETHODCALLTYPE *GetCodePageA )( 
             IActiveIME2 * This,
-            /* [out] */ UINT *uCodePage);
+            /* [out] */ uint32_t *uCodePage);
         
         HRESULT ( STDMETHODCALLTYPE *GetLangId )( 
             IActiveIME2 * This,
@@ -6537,7 +6537,7 @@ void __RPC_STUB IActiveIME2_Sleep_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IActiveIME2_Unsleep_Proxy( 
@@ -6549,7 +6549,7 @@ void __RPC_STUB IActiveIME2_Unsleep_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
+    uint32_t *_pdwStubPhase);
 
 
 

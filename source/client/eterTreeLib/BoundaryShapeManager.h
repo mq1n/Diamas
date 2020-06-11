@@ -29,7 +29,7 @@
 //	SPoint
 struct SPoint
 {
-		float&      operator[](int i) { return m_afData[i]; }     
+		float&      operator[](int32_t i) { return m_afData[i]; }     
 		float       m_afData[3];
 };
 

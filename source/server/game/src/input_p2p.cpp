@@ -37,7 +37,7 @@ void CInputP2P::Logout(LPDESC d, const char * c_pData)
 	P2P_MANAGER::instance().Logout(p->szName);
 }
 
-int CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
+int32_t CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
 {
 	TPacketGGRelay * p = (TPacketGGRelay *) c_pData;
 
@@ -55,7 +55,7 @@ int CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
 
 	LPCHARACTER pkChr = CHARACTER_MANAGER::instance().FindPC(p->szName);
 
-	const BYTE* c_pbData = (const BYTE *) (c_pData + sizeof(TPacketGGRelay));
+	const uint8_t* c_pbData = (const uint8_t *) (c_pData + sizeof(TPacketGGRelay));
 
 	if (!pkChr)
 		return p->lSize;
@@ -74,7 +74,7 @@ int CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
 		TPacketGCWhisper* p2 = (TPacketGCWhisper*) buf;
 		// bType 상위 4비트: Empire 번호
 		// bType 하위 4비트: EWhisperType
-		BYTE bToEmpire = (p2->bType >> 4);
+		uint8_t bToEmpire = (p2->bType >> 4);
 		p2->bType = p2->bType & 0x0F;
 		if(p2->bType == 0x0F) {
 			// 시스템 메세지 귓속말은 bType의 상위비트까지 모두 사용함.
@@ -90,9 +90,9 @@ int CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
 }
 
 #ifdef ENABLE_FULL_NOTICE
-int CInputP2P::Notice(LPDESC d, const char * c_pData, size_t uiBytes, bool bBigFont)
+int32_t CInputP2P::Notice(LPDESC d, const char * c_pData, size_t uiBytes, bool bBigFont)
 #else
-int CInputP2P::Notice(LPDESC d, const char * c_pData, size_t uiBytes)
+int32_t CInputP2P::Notice(LPDESC d, const char * c_pData, size_t uiBytes)
 #endif
 {
 	TPacketGGNotice * p = (TPacketGGNotice *) c_pData;
@@ -117,7 +117,7 @@ int CInputP2P::Notice(LPDESC d, const char * c_pData, size_t uiBytes)
 	return (p->lSize);
 }
 
-int CInputP2P::Guild(LPDESC d, const char* c_pData, size_t uiBytes)
+int32_t CInputP2P::Guild(LPDESC d, const char* c_pData, size_t uiBytes)
 {
 	TPacketGGGuild * p = (TPacketGGGuild *) c_pData;
 	uiBytes -= sizeof(TPacketGGGuild);
@@ -142,16 +142,16 @@ int CInputP2P::Guild(LPDESC d, const char* c_pData, size_t uiBytes)
 			
 		case GUILD_SUBHEADER_GG_SET_MEMBER_COUNT_BONUS:
 			{
-				if (uiBytes < sizeof(int))
+				if (uiBytes < sizeof(int32_t))
 					return -1;
 
-				int iBonus = *((int *) c_pData);
+				int32_t iBonus = *((int32_t *) c_pData);
 				CGuild* pGuild = CGuildManager::instance().FindGuild(p->dwGuild);
 				if (pGuild)
 				{
 					pGuild->SetMemberCountBonus(iBonus);
 				}
-				return sizeof(int);
+				return sizeof(int32_t);
 			}
 		default:
 			sys_err ("UNKNOWN GUILD SUB PACKET");
@@ -164,9 +164,9 @@ int CInputP2P::Guild(LPDESC d, const char* c_pData, size_t uiBytes)
 struct FuncShout
 {
 	const char * m_str;
-	BYTE m_bEmpire;
+	uint8_t m_bEmpire;
 
-	FuncShout(const char * str, BYTE bEmpire) : m_str(str), m_bEmpire(bEmpire)
+	FuncShout(const char * str, uint8_t bEmpire) : m_str(str), m_bEmpire(bEmpire)
 	{
 	}   
 
@@ -183,7 +183,7 @@ struct FuncShout
 	}
 };
 
-void SendShout(const char * szText, BYTE bEmpire)
+void SendShout(const char * szText, uint8_t bEmpire)
 {
 	const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
 	std::for_each(c_ref_set.begin(), c_ref_set.end(), FuncShout(szText, bEmpire));
@@ -301,7 +301,7 @@ void CInputP2P::XmasWarpSanta(const char * c_pData)
 
 	if (p->bChannel == g_bChannel && map_allow_find(p->lMapIndex))
 	{
-		int	iNextSpawnDelay = 50 * 60;
+		int32_t	iNextSpawnDelay = 50 * 60;
 
 		xmas::SpawnSanta(p->lMapIndex, iNextSpawnDelay); // 50분있다가 새로운 산타가 나타남 (한국은 20분)
 
@@ -366,12 +366,12 @@ void CInputP2P::IamAwake(LPDESC d, const char * c_pData)
 	sys_log(0, "P2P Awakeness check from %s. My P2P connection number is %d. and details...\n%s", d->GetHostName(), P2P_MANAGER::instance().GetDescCount(), hostNames.c_str());
 }
 
-int CInputP2P::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
+int32_t CInputP2P::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 {
 	if (test_server)
 		sys_log(0, "CInputP2P::Anlayze[Header %d]", bHeader);
 
-	int iExtraLen = 0;
+	int32_t iExtraLen = 0;
 
 	switch (bHeader)
 	{

@@ -11,10 +11,10 @@ class CMoneyLog : public singleton<CMoneyLog>
 	virtual ~CMoneyLog();
 
 	void Save();
-	void AddLog(BYTE bType, DWORD dwVnum, int iGold);
+	void AddLog(uint8_t bType, uint32_t dwVnum, int32_t iGold);
 
     private:
-	std::map<DWORD, int> m_MoneyLogContainer[MONEY_LOG_TYPE_MAX_NUM];
+	std::map<uint32_t, int32_t> m_MoneyLogContainer[MONEY_LOG_TYPE_MAX_NUM];
 };
 
 #endif

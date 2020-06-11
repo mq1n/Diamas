@@ -252,7 +252,7 @@ void CLensFlare::DrawBeforeFlare()
 	vertices[3].v = 1.0f;
 
 	STATEMANAGER.SetTexture(0, m_SunFlareImageInstance.GetTexturePointer()->GetD3DTexture());
-	STATEMANAGER.SetTexture(1, NULL);
+	STATEMANAGER.SetTexture(1, nullptr);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
@@ -338,8 +338,8 @@ void CLensFlare::DrawFlare()
 		m_cFlare.Draw(m_fAfterBright,
 					  ms_Viewport.Width,
 					  ms_Viewport.Height,
-					  static_cast<int>(m_afFlareWinPos[0]),
-					  static_cast<int>(m_afFlareWinPos[1]));
+					  static_cast<int32_t>(m_afFlareWinPos[0]),
+					  static_cast<int32_t>(m_afFlareWinPos[1]));
 
 		STATEMANAGER.RestoreRenderState(D3DRS_LIGHTING); // glDisable(GL_LIGHTING);
 		STATEMANAGER.RestoreRenderState(D3DRS_ZENABLE); // glDisable(GL_DEPTH_TEST);
@@ -426,9 +426,9 @@ void CLensFlare::AdjustBrightness()
 	{
 		ReadDepthPixels(m_pTestPixels);
 
-		int nDifferent = 0;
+		int32_t nDifferent = 0;
 
-		for (int i = 0; i < c_nDepthTestDimension * c_nDepthTestDimension; ++i)
+		for (int32_t i = 0; i < c_nDepthTestDimension * c_nDepthTestDimension; ++i)
 			if (m_pTestPixels[i] != m_pControlPixels[i])
 				++nDifferent;
 
@@ -450,7 +450,7 @@ void CLensFlare::ReadDepthPixels(float * /*pPixels*/)
 		assert(false);
 
 	D3DLOCKED_RECT rect;
-	lpSurface->LockRect(&rect, NULL, D3DLOCK_READONLY | D3DLOCK_NO_DIRTY_UPDATE);
+	lpSurface->LockRect(&rect, nullptr, D3DLOCK_READONLY | D3DLOCK_NO_DIRTY_UPDATE);
 
 	lpSurface->UnlockRect();
 	*/
@@ -508,7 +508,7 @@ CFlare::~CFlare()
 
 void CFlare::Init(std::string strPath)
 {
-	int i = 0;
+	int32_t i = 0;
 
 	while (g_strFiles[i] != "")
 	{
@@ -532,14 +532,14 @@ void CFlare::Init(std::string strPath)
 
 ///////////////////////////////////////////////////////////////////////  
 //	CFlare::Draw
-void CFlare::Draw(float fBrightScale, int nWidth, int nHeight, int nX, int nY)
+void CFlare::Draw(float fBrightScale, int32_t nWidth, int32_t nHeight, int32_t nX, int32_t nY)
 {
 	STATEMANAGER.SaveRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 
 	float fDX = float(nX) - float(nWidth) / 2.0f;
 	float fDY = float(nY) - float(nHeight) / 2.0f;
 
-	STATEMANAGER.SetTexture(1, NULL);
+	STATEMANAGER.SetTexture(1, nullptr);
 	STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1,	D3DTA_TEXTURE);
@@ -549,7 +549,7 @@ void CFlare::Draw(float fBrightScale, int nWidth, int nHeight, int nX, int nY)
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG2,	D3DTA_DIFFUSE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP,	D3DTOP_MODULATE);
 
-	for (unsigned int i = 0; i < m_vFlares.size(); i++)
+	for (uint32_t i = 0; i < m_vFlares.size(); i++)
 	{
 		float fCenterX = float(nX) - (m_vFlares[i]->m_fPosition + 1.0f) * fDX;
 		float fCenterY = float(nY) - (m_vFlares[i]->m_fPosition + 1.0f) * fDY;

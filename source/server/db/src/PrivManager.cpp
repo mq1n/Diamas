@@ -2,15 +2,15 @@
 #include "PrivManager.h"
 #include "ClientManager.h"
 
-const int PRIV_DURATION = 60*60*12;
-const int CHARACTER_GOOD_PRIV_DURATION = 2*60*60;
-const int CHARACTER_BAD_PRIV_DURATION = 60*60;
+const int32_t PRIV_DURATION = 60*60*12;
+const int32_t CHARACTER_GOOD_PRIV_DURATION = 2*60*60;
+const int32_t CHARACTER_BAD_PRIV_DURATION = 60*60;
 
 CPrivManager::CPrivManager()
 {
-	for (int type = 0; type < MAX_PRIV_NUM; ++type)
+	for (int32_t type = 0; type < MAX_PRIV_NUM; ++type)
 	{
-		for (int empire = 0; empire < EMPIRE_MAX_NUM; ++empire)
+		for (int32_t empire = 0; empire < EMPIRE_MAX_NUM; ++empire)
 			m_aaPrivEmpire[type][empire] = 0;
 	}
 }
@@ -79,7 +79,7 @@ void CPrivManager::Update()
 	}
 }
 
-void CPrivManager::AddCharPriv(DWORD pid, BYTE type, int value)
+void CPrivManager::AddCharPriv(uint32_t pid, uint8_t type, int32_t value)
 {
 	if (MAX_PRIV_NUM <= type)
 	{
@@ -98,7 +98,7 @@ void CPrivManager::AddCharPriv(DWORD pid, BYTE type, int value)
 	time_t now = CClientManager::instance().GetCurrentTime();
 	TPrivCharData* p = new TPrivCharData(type, value, pid);
 
-	int iDuration = CHARACTER_BAD_PRIV_DURATION;
+	int32_t iDuration = CHARACTER_BAD_PRIV_DURATION;
 
 	if (value > 0)
 		iDuration = CHARACTER_GOOD_PRIV_DURATION;
@@ -114,7 +114,7 @@ void CPrivManager::AddCharPriv(DWORD pid, BYTE type, int value)
 //
 // @version 05/06/07	Bang2ni - 이미 보너스가 적용 된 길드에 보너스 설정
 //
-void CPrivManager::AddGuildPriv(DWORD guild_id, BYTE type, int value, time_t duration_sec)
+void CPrivManager::AddGuildPriv(uint32_t guild_id, uint8_t type, int32_t value, time_t duration_sec)
 {
 	if (MAX_PRIV_NUM <= type)
 	{
@@ -143,7 +143,7 @@ void CPrivManager::AddGuildPriv(DWORD guild_id, BYTE type, int value, time_t dur
 	sys_log(0, "Guild Priv guild(%d) type(%d) value(%d) duration_sec(%d)", guild_id, type, value, duration_sec);
 }
 
-void CPrivManager::AddEmpirePriv(BYTE empire, BYTE type, int value, time_t duration_sec)
+void CPrivManager::AddEmpirePriv(uint8_t empire, uint8_t type, int32_t value, time_t duration_sec)
 {
 	if (MAX_PRIV_NUM <= type)
 	{
@@ -180,7 +180,7 @@ void CPrivManager::AddEmpirePriv(BYTE empire, BYTE type, int value, time_t durat
  */
 struct FSendChangeGuildPriv
 {
-	FSendChangeGuildPriv(DWORD guild_id, BYTE type, int value, time_t end_time_sec)
+	FSendChangeGuildPriv(uint32_t guild_id, uint8_t type, int32_t value, time_t end_time_sec)
 	{
 		p.guild_id = guild_id;
 		p.type = type;
@@ -203,7 +203,7 @@ struct FSendChangeGuildPriv
 
 struct FSendChangeEmpirePriv
 {
-	FSendChangeEmpirePriv(BYTE empire, BYTE type, int value, time_t end_time_sec)
+	FSendChangeEmpirePriv(uint8_t empire, uint8_t type, int32_t value, time_t end_time_sec)
 	{
 		p.empire = empire;
 		p.type = type;
@@ -226,7 +226,7 @@ struct FSendChangeEmpirePriv
 
 struct FSendChangeCharPriv
 {
-	FSendChangeCharPriv(DWORD pid, BYTE type, int value)
+	FSendChangeCharPriv(uint32_t pid, uint8_t type, int32_t value)
 	{
 		p.pid = pid;
 		p.type = type;
@@ -243,29 +243,29 @@ struct FSendChangeCharPriv
 };
 
 // ADD_GUILD_PRIV_TIME
-void CPrivManager::SendChangeGuildPriv(DWORD guild_id, BYTE type, int value, time_t end_time_sec)
+void CPrivManager::SendChangeGuildPriv(uint32_t guild_id, uint8_t type, int32_t value, time_t end_time_sec)
 {
 	CClientManager::instance().for_each_peer(FSendChangeGuildPriv(guild_id, type, value, end_time_sec));
 }
 // END_OF_ADD_GUILD_PRIV_TIME
 
 // ADD_EMPIRE_PRIV_TIME
-void CPrivManager::SendChangeEmpirePriv(BYTE empire, BYTE type, int value, time_t end_time_sec)
+void CPrivManager::SendChangeEmpirePriv(uint8_t empire, uint8_t type, int32_t value, time_t end_time_sec)
 {
 	CClientManager::instance().for_each_peer(FSendChangeEmpirePriv(empire, type, value, end_time_sec));
 }
 // END_OF_ADD_EMPIRE_PRIV_TIME
 
-void CPrivManager::SendChangeCharPriv(DWORD pid, BYTE type, int value)
+void CPrivManager::SendChangeCharPriv(uint32_t pid, uint8_t type, int32_t value)
 {
 	CClientManager::instance().for_each_peer(FSendChangeCharPriv(pid, type, value));
 }
 
 void CPrivManager::SendPrivOnSetup(CPeer* peer)
 {
-	for (int i = 1; i < MAX_PRIV_NUM; ++i)
+	for (int32_t i = 1; i < MAX_PRIV_NUM; ++i)
 	{
-		for (int e = 0; e < EMPIRE_MAX_NUM; ++e)
+		for (int32_t e = 0; e < EMPIRE_MAX_NUM; ++e)
 		{
 			// ADD_EMPIRE_PRIV_TIME
 			TPrivEmpireData* pPrivEmpireData = m_aaPrivEmpire[i][e];

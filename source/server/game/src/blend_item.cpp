@@ -20,10 +20,10 @@
 
 struct BLEND_ITEM_INFO
 {
-	DWORD	item_vnum;
-	int		apply_type;
-	int		apply_value[MAX_BLEND_ITEM_VALUE];
-	int		apply_duration[MAX_BLEND_ITEM_VALUE];
+	uint32_t	item_vnum;
+	int32_t		apply_type;
+	int32_t		apply_value[MAX_BLEND_ITEM_VALUE];
+	int32_t		apply_duration[MAX_BLEND_ITEM_VALUE];
 };
 
 
@@ -32,7 +32,7 @@ T_BLEND_ITEM_INFO	s_blend_info;
 
 bool	Blend_Item_init()
 {
-	BLEND_ITEM_INFO	*blend_item_info = NULL;
+	BLEND_ITEM_INFO	*blend_item_info = nullptr;
 	T_BLEND_ITEM_INFO::iterator			iter;
 	char	file_name[256];
 	snprintf (file_name, sizeof(file_name), "%s/blend.txt", LocaleService_GetBasePath().c_str());
@@ -76,7 +76,7 @@ bool	Blend_Item_load(char *file)
 
 		const char* token_string = strtok(one_line, delim);
 
-		if (NULL==token_string)
+		if (nullptr==token_string)
 			continue;
 
 		TOKEN("section")
@@ -86,9 +86,9 @@ bool	Blend_Item_load(char *file)
 		}
 		else TOKEN("item_vnum")
 		{
-			v = strtok(NULL, delim);
+			v = strtok(nullptr, delim);
 
-			if (NULL==v)
+			if (nullptr==v)
 			{
 				fclose(fp);
 				return false;
@@ -98,9 +98,9 @@ bool	Blend_Item_load(char *file)
 		}
 		else TOKEN("apply_type")
 		{
-			v = strtok(NULL, delim);
+			v = strtok(nullptr, delim);
 
-			if (NULL==v)
+			if (nullptr==v)
 			{
 				fclose(fp);
 				return false;
@@ -115,11 +115,11 @@ bool	Blend_Item_load(char *file)
 		}
 		else TOKEN("apply_value")
 		{
-			for (int i=0; i<MAX_BLEND_ITEM_VALUE; ++i)
+			for (int32_t i=0; i<MAX_BLEND_ITEM_VALUE; ++i)
 			{
-				v = strtok(NULL, delim);
+				v = strtok(nullptr, delim);
 
-				if (NULL==v)
+				if (nullptr==v)
 				{
 					fclose(fp);
 					return false;
@@ -130,11 +130,11 @@ bool	Blend_Item_load(char *file)
 		}
 		else TOKEN("apply_duration")
 		{
-			for (int i=0; i<MAX_BLEND_ITEM_VALUE; ++i)
+			for (int32_t i=0; i<MAX_BLEND_ITEM_VALUE; ++i)
 			{
-				v = strtok(NULL, delim);
+				v = strtok(nullptr, delim);
 
-				if (NULL==v)
+				if (nullptr==v)
 				{
 					fclose(fp);
 					return false;
@@ -154,9 +154,9 @@ bool	Blend_Item_load(char *file)
 	return true;
 }
 
-static int FN_random_index()
+static int32_t FN_random_index()
 {
-	int	percent = number(1,100);
+	int32_t	percent = number(1,100);
 
 	if (percent<=10)			// level 1 :10%
 		return 0;
@@ -178,9 +178,9 @@ static int FN_random_index()
 // 혼란이 올 수 있어 이렇게 추가한다.
 // by rtsummit
 
-static int FN_ECS_random_index()
+static int32_t FN_ECS_random_index()
 {
-	int	percent = number(1,100);
+	int32_t	percent = number(1,100);
 
 	if (percent<=5)			// level 1 : 5%
 		return 0;
@@ -207,9 +207,9 @@ bool	Blend_Item_set_value(LPITEM item)
 		blend_info = *iter;
 		if (blend_info->item_vnum == item->GetVnum())
 		{
-			int	apply_type;
-			int	apply_value;
-			int	apply_duration;
+			int32_t	apply_type;
+			int32_t	apply_value;
+			int32_t	apply_duration;
 	
 			if (item->GetVnum() == 51002)
 			{
@@ -234,7 +234,7 @@ bool	Blend_Item_set_value(LPITEM item)
 	return false;
 }
 
-bool	Blend_Item_find(DWORD item_vnum)
+bool	Blend_Item_find(uint32_t item_vnum)
 {
 	BLEND_ITEM_INFO	*blend_info;
 	T_BLEND_ITEM_INFO::iterator	iter;

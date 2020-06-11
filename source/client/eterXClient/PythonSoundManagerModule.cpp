@@ -119,7 +119,7 @@ PyObject * sndSetSoundVolumef(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * sndSetSoundVolume(PyObject * poSelf, PyObject * poArgs)
 {
-	int iVolume;
+	int32_t iVolume;
 	if (!PyTuple_GetInteger(poArgs, 0, &iVolume))
 		return Py_BuildException();
 
@@ -169,7 +169,7 @@ void initsnd()
 		{ "SetSoundVolume",			sndSetSoundVolume,			METH_VARARGS },
 		{ "SetSoundScale",			sndSetSoundScale,			METH_VARARGS },
 		{ "SetAmbienceSoundScale",	sndSetAmbienceSoundScale,	METH_VARARGS },
-		{ NULL,						NULL,						NULL },
+		{ nullptr,						nullptr,						0 },
 	};
 
 	Py_InitModule("snd", s_methods);

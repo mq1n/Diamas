@@ -23,15 +23,15 @@
 class CSymbol : public CBase   
 {
     private:
-	int	iType;
+	int32_t	iType;
 
     public:
 	CSymbol();
 	virtual ~CSymbol();
 
-	static int	issymbol(int ch);
-	void		SetType(int Type);
-	int		GetType();
+	static int32_t	issymbol(int32_t ch);
+	void		SetType(int32_t Type);
+	int32_t		GetType();
 	bool		Equal(CSymbol dif);
 	bool		Less(CSymbol dif);
 };

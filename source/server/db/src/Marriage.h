@@ -12,10 +12,10 @@ namespace marriage
 {
 	struct TWeddingInfo
 	{
-		DWORD dwTime;
-		DWORD dwPID1;
-		DWORD dwPID2;
-		TWeddingInfo(DWORD time, DWORD pid1, DWORD pid2)
+		uint32_t dwTime;
+		uint32_t dwPID1;
+		uint32_t dwPID2;
+		TWeddingInfo(uint32_t time, uint32_t pid1, uint32_t pid2)
 			: dwTime(time),
 			dwPID1(pid1),
 			dwPID2(pid2)
@@ -25,12 +25,12 @@ namespace marriage
 
 	struct TWedding
 	{
-		DWORD dwTime;
-		DWORD dwMapIndex;
-		DWORD dwPID1;
-		DWORD dwPID2;
+		uint32_t dwTime;
+		uint32_t dwMapIndex;
+		uint32_t dwPID1;
+		uint32_t dwPID2;
 
-		TWedding(DWORD time, DWORD dwMapIndex, DWORD pid1, DWORD pid2)
+		TWedding(uint32_t time, uint32_t dwMapIndex, uint32_t pid1, uint32_t pid2)
 			: dwTime(time),
 			dwMapIndex(dwMapIndex),
 			dwPID1(pid1),
@@ -45,20 +45,20 @@ namespace marriage
 
 	struct TMarriage
 	{
-		DWORD pid1;
-		DWORD pid2;
-		int   love_point;
-		DWORD time;
-		BYTE is_married; // false : æ‡»• ªÛ≈¬, true : ∞·»• ªÛ≈¬
+		uint32_t pid1;
+		uint32_t pid2;
+		int32_t   love_point;
+		uint32_t time;
+		uint8_t is_married; // false : æ‡»• ªÛ≈¬, true : ∞·»• ªÛ≈¬
 		std::string name1;
 		std::string name2;
 
-		TMarriage(DWORD _pid1, DWORD _pid2, int _love_point, DWORD _time, BYTE _is_married, const char* name1, const char* name2)
+		TMarriage(uint32_t _pid1, uint32_t _pid2, int32_t _love_point, uint32_t _time, uint8_t _is_married, const char* name1, const char* name2)
 			: pid1(_pid1), pid2(_pid2), love_point(_love_point), time(_time), is_married(_is_married), name1(name1), name2(name2)
 		{
 		}
 
-		DWORD GetOther(DWORD PID)
+		uint32_t GetOther(uint32_t PID)
 		{
 			if (pid1 == PID)
 				return pid2;
@@ -78,21 +78,21 @@ namespace marriage
 
 			bool Initialize();
 
-			TMarriage* Get(DWORD dwPlayerID);
-			bool IsMarried(DWORD dwPlayerID)
+			TMarriage* Get(uint32_t dwPlayerID);
+			bool IsMarried(uint32_t dwPlayerID)
 			{
-				return Get(dwPlayerID) != NULL;
+				return Get(dwPlayerID) != nullptr;
 			}
 
-			//void	Reserve(DWORD dwPID1, DWORD dwPID2);
-			void	Add(DWORD dwPID1, DWORD dwPID2, const char* szName1, const char* szName2);
-			void	Remove(DWORD dwPID1, DWORD dwPID2);
-			void	Update(DWORD dwPID1, DWORD dwPID2, INT iLovePoint, BYTE byMarried);
+			//void	Reserve(uint32_t dwPID1, uint32_t dwPID2);
+			void	Add(uint32_t dwPID1, uint32_t dwPID2, const char* szName1, const char* szName2);
+			void	Remove(uint32_t dwPID1, uint32_t dwPID2);
+			void	Update(uint32_t dwPID1, uint32_t dwPID2, INT iLovePoint, uint8_t byMarried);
 
-			void	EngageToMarriage(DWORD dwPID1, DWORD dwPID2);
+			void	EngageToMarriage(uint32_t dwPID1, uint32_t dwPID2);
 
-			void	ReadyWedding(DWORD dwMapIndex, DWORD dwPID1, DWORD dwPID2);
-			void	EndWedding(DWORD dwPID1, DWORD dwPID2);
+			void	ReadyWedding(uint32_t dwMapIndex, uint32_t dwPID1, uint32_t dwPID2);
+			void	EndWedding(uint32_t dwPID1, uint32_t dwPID2);
 
 			void	OnSetup(CPeer* peer);
 
@@ -100,13 +100,13 @@ namespace marriage
 
 		private:
 			std::set<TMarriage *> m_Marriages;
-			std::map<DWORD, TMarriage *> m_MarriageByPID;
+			std::map<uint32_t, TMarriage *> m_MarriageByPID;
 
 			std::priority_queue<TWedding, std::vector<TWedding>, std::greater<TWedding> > m_pqWeddingStart;
 
 			std::priority_queue<TWeddingInfo, std::vector<TWeddingInfo>, std::greater<TWeddingInfo> > m_pqWeddingEnd;
 
-			std::map<std::pair<DWORD, DWORD>, TWedding> m_mapRunningWedding;
+			std::map<std::pair<uint32_t, uint32_t>, TWedding> m_mapRunningWedding;
 	};
 }
 

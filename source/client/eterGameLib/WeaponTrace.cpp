@@ -13,7 +13,7 @@ void CWeaponTrace::DestroySystem()
 
 void CWeaponTrace::Delete(CWeaponTrace* pkWTDel)
 {
-	assert(pkWTDel!=NULL && "CWeaponTrace::Delete");
+	assert(pkWTDel!=nullptr && "CWeaponTrace::Delete");
 
 	pkWTDel->Clear();
 	ms_kPool.Free(pkWTDel);
@@ -122,11 +122,11 @@ void CWeaponTrace::Update(float fReachScale)
 
 bool CWeaponTrace::BuildVertex()
 {
-	const int max_size = 300;
+	const int32_t max_size = 300;
 	// calculate speed
 	float h[max_size];
 	float stk[max_size];
-	int sp=0;
+	int32_t sp=0;
 	D3DXVECTOR3 r[max_size];
 
 	if (m_LongTimePointList.size()<=1) 
@@ -147,17 +147,17 @@ bool CWeaponTrace::BuildVertex()
 	
 	float length = std::min(m_fLifeTime, m_LongTimePointList.back().first);
 	
-	int n = m_LongTimePointList.size()-1;
+	int32_t n = m_LongTimePointList.size()-1;
 	assert(n<max_size-1);
 
 	// cubic spline
 
-	for(int loop = 0; loop<=1; ++loop)
+	for(int32_t loop = 0; loop<=1; ++loop)
 	{
 		TTimePointList & Input = (loop) ? m_LongTimePointList : m_ShortTimePointList;
 		std::vector<TPDTVertex> & Output = (loop) ? m_LongVertexVector : m_ShortVertexVector;
 		TTimePointList::iterator it;
-		int i;
+		int32_t i;
 		
 		for(i=0;i<n;++i)
 		{
@@ -189,7 +189,7 @@ bool CWeaponTrace::BuildVertex()
 			r[i] -= stk[--sp] * r[i+1];
 		}
 		
-		int base = 0;
+		int32_t base = 0;
 		D3DXVECTOR3 a,b,c,d;
 		D3DXVECTOR3 v3Tmp = Input[base+1].second-Input[base].second;
 		float timebase=0,timenext=h[base], dt=m_fSamplingTime;
@@ -291,7 +291,7 @@ void CWeaponTrace::Render()
 		return;
 
 
-	LPDIRECT3DTEXTURE8 lpTexture=NULL;
+	LPDIRECT3DTEXTURE8 lpTexture=nullptr;
 
 	// Have to optimize
 	D3DXMATRIX matWorld;
@@ -326,9 +326,9 @@ void CWeaponTrace::Render()
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, FALSE);
 	STATEMANAGER.SetTexture(0, lpTexture);
-	STATEMANAGER.SetTexture(1, NULL);
+	STATEMANAGER.SetTexture(1, nullptr);
 	STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP,
-								 int(m_PDTVertexVector.size() - 2),
+								 int32_t(m_PDTVertexVector.size() - 2),
 								 &m_PDTVertexVector[0],
 								 sizeof(TPDTVertex));
 	
@@ -370,7 +370,7 @@ void CWeaponTrace::SetTexture(const char * c_szFileName)
 	//m_lpTexture = pTexture->GetD3DTexture();
 }
 
-bool CWeaponTrace::SetWeaponInstance(CGraphicThingInstance * pInstance, DWORD dwModelIndex, const char * c_szBoneName)
+bool CWeaponTrace::SetWeaponInstance(CGraphicThingInstance * pInstance, uint32_t dwModelIndex, const char * c_szBoneName)
 {
 	pInstance->Update();
 	pInstance->DeformNoSkin();
@@ -443,7 +443,7 @@ void CWeaponTrace::Clear()
 
 void CWeaponTrace::Initialize()
 {
-	m_pInstance = NULL;
+	m_pInstance = nullptr;
 	m_dwModelInstanceIndex = 0;
 	
 	m_fx = 0.0f;
@@ -466,11 +466,11 @@ void CWeaponTrace::Initialize()
 	m_fLastUpdate = CTimer::Instance().GetCurrentSecond();
 	///////////////////////////////////////////////////////////////////////
 	
-	//const int c_iSplineCount = 8;
+	//const int32_t c_iSplineCount = 8;
 	//m_SplineValueVector.clear();
 	//m_SplineValueVector.resize(c_iSplineCount);
 	
-	//for (int i = 0; i < c_iSplineCount; ++i)
+	//for (int32_t i = 0; i < c_iSplineCount; ++i)
 	//{
 	//	float fValue = float(i) / float(c_iSplineCount);
 	//	m_SplineValueVector[i].fValue1 = fValue;

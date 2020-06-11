@@ -9,8 +9,8 @@ namespace UI
 		public:
 			typedef std::list<CWindow *> TWindowContainer;
 
-			static DWORD Type();
-			BOOL IsType(DWORD dwType);
+			static uint32_t Type();
+			BOOL IsType(uint32_t dwType);
 
 			enum EHorizontalAlign
 			{
@@ -55,23 +55,23 @@ namespace UI
 
 			void			SetName(const char * c_szName);
 			const char *	GetName()		{ return m_strName.c_str(); }
-			void			SetSize(long width, long height);
-			long			GetWidth()		{ return m_lWidth; }
-			long			GetHeight()		{ return m_lHeight; }
+			void			SetSize(int32_t width, int32_t height);
+			int32_t			GetWidth()		{ return m_lWidth; }
+			int32_t			GetHeight()		{ return m_lHeight; }
 
-			void			SetHorizontalAlign(DWORD dwAlign);
-			void			SetVerticalAlign(DWORD dwAlign);
-			void			SetPosition(long x, long y);
-			void			GetPosition(long * plx, long * ply);
-			long			GetPositionX( void ) const		{ return m_x; }
-			long			GetPositionY( void ) const		{ return m_y; }
+			void			SetHorizontalAlign(uint32_t dwAlign);
+			void			SetVerticalAlign(uint32_t dwAlign);
+			void			SetPosition(int32_t x, int32_t y);
+			void			GetPosition(int32_t * plx, int32_t * ply);
+			int32_t			GetPositionX( void ) const		{ return m_x; }
+			int32_t			GetPositionY( void ) const		{ return m_y; }
 			RECT &			GetRect()		{ return m_rect; }
-			void			GetLocalPosition(long & rlx, long & rly);
-			void			GetMouseLocalPosition(long & rlx, long & rly);
-			long			UpdateRect();
+			void			GetLocalPosition(int32_t & rlx, int32_t & rly);
+			void			GetMouseLocalPosition(int32_t & rlx, int32_t & rly);
+			int32_t			UpdateRect();
 
 			RECT &			GetLimitBias()	{ return m_limitBiasRect; }
-			void			SetLimitBias(long l, long r, long t, long b) { m_limitBiasRect.left = l, m_limitBiasRect.right = r, m_limitBiasRect.top = t, m_limitBiasRect.bottom = b; }
+			void			SetLimitBias(int32_t l, int32_t r, int32_t t, int32_t b) { m_limitBiasRect.left = l, m_limitBiasRect.right = r, m_limitBiasRect.top = t, m_limitBiasRect.bottom = b; }
 
 			void			Show();
 			void			Hide();
@@ -80,7 +80,7 @@ namespace UI
 
 			bool			HasParent()		{ return m_pParent ? true : false; }
 			bool			HasChild()		{ return m_pChildList.empty() ? false : true; }
-			int				GetChildCount()	{ return m_pChildList.size(); }
+			int32_t				GetChildCount()	{ return m_pChildList.size(); }
 
 			CWindow *		GetRoot();
 			CWindow *		GetParent();
@@ -88,17 +88,17 @@ namespace UI
 			void			DeleteChild(CWindow * pWin);
 			void			SetTop(CWindow * pWin);
 
-			bool			IsIn(long x, long y);
+			bool			IsIn(int32_t x, int32_t y);
 			bool			IsIn();
-			CWindow *		PickWindow(long x, long y);
-			CWindow *		PickTopWindow(long x, long y);	// NOTE : Children으로 내려가지 않고 상위에서만 
+			CWindow *		PickWindow(int32_t x, int32_t y);
+			CWindow *		PickTopWindow(int32_t x, int32_t y);	// NOTE : Children으로 내려가지 않고 상위에서만 
 															//        체크 하는 특화된 함수
 
 			void			__RemoveReserveChildren();
 
-			void			AddFlag(DWORD flag)		{ SET_BIT(m_dwFlag, flag);		}
-			void			RemoveFlag(DWORD flag)	{ REMOVE_BIT(m_dwFlag, flag);	}
-			bool			IsFlag(DWORD flag)		{ return (m_dwFlag & flag) ? true : false;	}
+			void			AddFlag(uint32_t flag)		{ SET_BIT(m_dwFlag, flag);		}
+			void			RemoveFlag(uint32_t flag)	{ REMOVE_BIT(m_dwFlag, flag);	}
+			bool			IsFlag(uint32_t flag)		{ return (m_dwFlag & flag) ? true : false;	}
 			/////////////////////////////////////
 
 			virtual void	OnRender();
@@ -108,7 +108,7 @@ namespace UI
 			virtual void	OnSetFocus();
 			virtual void	OnKillFocus();
 
-			virtual void	OnMouseDrag(long lx, long ly);
+			virtual void	OnMouseDrag(int32_t lx, int32_t ly);
 			virtual void	OnMouseOverIn();
 			virtual void	OnMouseOverOut();
 			virtual void	OnMouseOver();
@@ -116,22 +116,22 @@ namespace UI
 			virtual void	OnTop();
 			virtual void	OnIMEUpdate();
 
-			virtual void	OnMoveWindow(long x, long y);
+			virtual void	OnMoveWindow(int32_t x, int32_t y);
 
 			///////////////////////////////////////
 
 			BOOL			RunIMETabEvent();
 			BOOL			RunIMEReturnEvent();
-			BOOL			RunIMEKeyDownEvent(int ikey);
+			BOOL			RunIMEKeyDownEvent(int32_t ikey);
 
-			CWindow *		RunKeyDownEvent(int ikey);
-			BOOL			RunKeyUpEvent(int ikey);
+			CWindow *		RunKeyDownEvent(int32_t ikey);
+			BOOL			RunKeyUpEvent(int32_t ikey);
 			BOOL			RunPressEscapeKeyEvent();
 			BOOL			RunPressExitKeyEvent();
 
 			virtual BOOL	OnIMETabEvent();
 			virtual BOOL	OnIMEReturnEvent();
-			virtual BOOL	OnIMEKeyDownEvent(int ikey);
+			virtual BOOL	OnIMEKeyDownEvent(int32_t ikey);
 
 			virtual BOOL	OnIMEChangeCodePage();
 			virtual BOOL	OnIMEOpenCandidateListEvent();
@@ -148,17 +148,17 @@ namespace UI
 			virtual BOOL	OnMouseMiddleButtonDown();
 			virtual BOOL	OnMouseMiddleButtonUp();
 #ifdef ENABLE_MOUSEWHEEL_EVENT
-			virtual BOOL	OnMouseWheelScroll(short wDelta);
+			virtual BOOL	OnMouseWheelScroll(int16_t wDelta);
 			virtual void	SetScrollable();
 #endif
-			virtual BOOL	OnKeyDown(int ikey);
-			virtual BOOL	OnKeyUp(int ikey);
+			virtual BOOL	OnKeyDown(int32_t ikey);
+			virtual BOOL	OnKeyUp(int32_t ikey);
 			virtual BOOL	OnPressEscapeKey();
 			virtual BOOL	OnPressExitKey();
 			///////////////////////////////////////
 
-			virtual void	SetColor(DWORD dwColor){}
-			virtual BOOL	OnIsType(DWORD dwType);
+			virtual void	SetColor(uint32_t dwColor){}
+			virtual BOOL	OnIsType(uint32_t dwType);
 			/////////////////////////////////////
 
 			virtual BOOL	IsWindow() { return TRUE; }
@@ -169,15 +169,15 @@ namespace UI
 
 			EHorizontalAlign	m_HorizontalAlign;
 			EVerticalAlign		m_VerticalAlign;
-			long				m_x, m_y;				// X,Y 상대좌표
-			long				m_lWidth, m_lHeight;	// 크기
+			int32_t				m_x, m_y;				// X,Y 상대좌표
+			int32_t				m_lWidth, m_lHeight;	// 크기
 			RECT				m_rect;					// Global 좌표
 			RECT				m_limitBiasRect;		// limit bias 값
 
 			bool				m_bMovable;
 			bool				m_bShow;
 
-			DWORD				m_dwFlag;			
+			uint32_t				m_dwFlag;			
 
 			PyObject *			m_poHandler;
 
@@ -193,7 +193,7 @@ namespace UI
 
 #ifdef _DEBUG
 		public:
-			DWORD				DEBUG_dwCounter;
+			uint32_t				DEBUG_dwCounter;
 #endif
 	};
 
@@ -212,13 +212,13 @@ namespace UI
 			CBox(PyObject * ppyObject);
 			virtual ~CBox();
 
-			void SetColor(DWORD dwColor);
+			void SetColor(uint32_t dwColor);
 
 		protected:
 			void OnRender();
 
 		protected:
-			DWORD m_dwColor;
+			uint32_t m_dwColor;
 	};
 
 	class CBar : public CWindow
@@ -227,13 +227,13 @@ namespace UI
 			CBar(PyObject * ppyObject);
 			virtual ~CBar();
 
-			void SetColor(DWORD dwColor);
+			void SetColor(uint32_t dwColor);
 
 		protected:
 			void OnRender();
 
 		protected:
-			DWORD m_dwColor;
+			uint32_t m_dwColor;
 	};
 
 	class CLine : public CWindow
@@ -242,33 +242,33 @@ namespace UI
 			CLine(PyObject * ppyObject);
 			virtual ~CLine();
 
-			void SetColor(DWORD dwColor);
+			void SetColor(uint32_t dwColor);
 
 		protected:
 			void OnRender();
 
 		protected:
-			DWORD m_dwColor;
+			uint32_t m_dwColor;
 	};
 
 	class CBar3D : public CWindow
 	{
 		public:
-			static DWORD Type();
+			static uint32_t Type();
 
 		public:
 			CBar3D(PyObject * ppyObject);
 			virtual ~CBar3D();
 
-			void SetColor(DWORD dwLeft, DWORD dwRight, DWORD dwCenter);
+			void SetColor(uint32_t dwLeft, uint32_t dwRight, uint32_t dwCenter);
 
 		protected:
 			void OnRender();
 
 		protected:
-			DWORD m_dwLeftColor;
-			DWORD m_dwRightColor;
-			DWORD m_dwCenterColor;
+			uint32_t m_dwLeftColor;
+			uint32_t m_dwRightColor;
+			uint32_t m_dwCenterColor;
 	};
 
 	// Text
@@ -278,25 +278,25 @@ namespace UI
 			CTextLine(PyObject * ppyObject);
 			virtual ~CTextLine();
 
-			void SetMax(int iMax);
-			void SetHorizontalAlign(int iType);
-			void SetVerticalAlign(int iType);
+			void SetMax(int32_t iMax);
+			void SetHorizontalAlign(int32_t iType);
+			void SetVerticalAlign(int32_t iType);
 			void SetSecret(BOOL bFlag);
 			void SetOutline(BOOL bFlag);
 			void SetFeather(BOOL bFlag);
 			void SetMultiLine(BOOL bFlag);
 			void SetFontName(const char * c_szFontName);
-			void SetFontColor(DWORD dwColor);
+			void SetFontColor(uint32_t dwColor);
 			void SetLimitWidth(float fWidth);
 
 			void ShowCursor();
 			void HideCursor();
-			int GetCursorPosition();
+			int32_t GetCursorPosition();
 
 			void SetText(const char * c_szText);
 			const char * GetText();
 			
-			void GetTextSize(int* pnWidth, int* pnHeight);
+			void GetTextSize(int32_t* pnWidth, int32_t* pnHeight);
 
 		protected:
 			void OnUpdate();
@@ -317,7 +317,7 @@ namespace UI
 			virtual ~CNumberLine();
 
 			void SetPath(const char * c_szPath);
-			void SetHorizontalAlign(int iType);
+			void SetHorizontalAlign(int32_t iType);
 			void SetNumber(const char * c_szNumber);
 
 		protected:
@@ -330,8 +330,8 @@ namespace UI
 			std::string m_strNumber;
 			std::vector<CGraphicImageInstance *> m_ImageInstanceVector;
 
-			int m_iHorizontalAlign;
-			DWORD m_dwWidthSummary;
+			int32_t m_iHorizontalAlign;
+			uint32_t m_dwWidthSummary;
 	};
 
 	// Image
@@ -344,8 +344,8 @@ namespace UI
 			BOOL LoadImage(const char * c_szFileName);
 			void SetDiffuseColor(float fr, float fg, float fb, float fa);
 
-			int GetWidth();
-			int GetHeight();
+			int32_t GetWidth();
+			int32_t GetHeight();
 
 		protected:
 			virtual void OnCreateInstance();
@@ -366,8 +366,8 @@ namespace UI
 
 			void LoadImage(const char * c_szFilename);
 			void SetDiffuseColor(float fr, float fg, float fb, float fa);
-			void SetIndex(UINT uIndex);
-			void SetScale(FLOAT fScale);
+			void SetIndex(uint32_t uIndex);
+			void SetScale(float fScale);
 
 		protected:
 			virtual void OnCreateInstance();
@@ -382,7 +382,7 @@ namespace UI
 	class CExpandedImageBox : public CImageBox
 	{
 		public:
-			static DWORD Type();
+			static uint32_t Type();
 
 		public:
 			CExpandedImageBox(PyObject * ppyObject);
@@ -392,7 +392,7 @@ namespace UI
 			void SetOrigin(float fx, float fy);
 			void SetRotation(float fRotation);
 			void SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom);
-			void SetRenderingMode(int iMode);
+			void SetRenderingMode(int32_t iMode);
 
 		protected:
 			void OnCreateInstance();
@@ -401,25 +401,25 @@ namespace UI
 			virtual void OnUpdate();
 			virtual void OnRender();
 
-			BOOL OnIsType(DWORD dwType);
+			BOOL OnIsType(uint32_t dwType);
 	};
 	class CAniImageBox : public CWindow
 	{
 		public:
-			static DWORD Type();
+			static uint32_t Type();
 
 		public:
 			CAniImageBox(PyObject * ppyObject);
 			virtual ~CAniImageBox();
 
-			void SetDelay(int iDelay);
+			void SetDelay(int32_t iDelay);
 #ifdef ENABLE_ACCE_SYSTEM
 			void	AppendImage(const char * c_szFileName, float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0);
 #else
 			void	AppendImage(const char * c_szFileName);
 #endif
 			void SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom);
-			void SetRenderingMode(int iMode);
+			void SetRenderingMode(int32_t iMode);
 
 			void ResetFrame();
 
@@ -429,12 +429,12 @@ namespace UI
 			void OnChangePosition();
 			virtual void OnEndFrame();
 
-			BOOL OnIsType(DWORD dwType);
+			BOOL OnIsType(uint32_t dwType);
 
 		protected:
-			BYTE m_bycurDelay;
-			BYTE m_byDelay;
-			BYTE m_bycurIndex;
+			uint8_t m_bycurDelay;
+			uint8_t m_byDelay;
+			uint8_t m_bycurIndex;
 			std::vector<CGraphicExpandedImageInstance*> m_ImageVector;
 	};
 
@@ -521,7 +521,7 @@ namespace UI
 			CDragButton(PyObject * ppyObject);
 			virtual ~CDragButton();
 
-			void SetRestrictMovementArea(int ix, int iy, int iwidth, int iheight);
+			void SetRestrictMovementArea(int32_t ix, int32_t iy, int32_t iwidth, int32_t iheight);
 
 		protected:
 			void OnChangePosition();

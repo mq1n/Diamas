@@ -17,12 +17,12 @@ CGraphicThing::~CGraphicThing()
 
 void CGraphicThing::Initialize()
 {
-	m_pgrnFile = NULL;
-	m_pgrnFileInfo = NULL;
-	m_pgrnAni = NULL;
+	m_pgrnFile = nullptr;
+	m_pgrnFileInfo = nullptr;
+	m_pgrnAni = nullptr;
 
-	m_models = NULL;
-	m_motions = NULL;
+	m_models = nullptr;
+	m_motions = nullptr;
 }
 
 void CGraphicThing::OnClear()
@@ -63,7 +63,7 @@ bool CGraphicThing::CreateDeviceObjects()
 	if (!m_pgrnFileInfo)
 		return true;
 	
-	for (int m = 0; m < m_pgrnFileInfo->ModelCount; ++m)
+	for (int32_t m = 0; m < m_pgrnFileInfo->ModelCount; ++m)
 	{
 		CGrannyModel & rModel = m_models[m];
 		rModel.CreateDeviceObjects();
@@ -77,22 +77,22 @@ void CGraphicThing::DestroyDeviceObjects()
 	if (!m_pgrnFileInfo)
 		return;
 
-	for (int m = 0; m < m_pgrnFileInfo->ModelCount; ++m)
+	for (int32_t m = 0; m < m_pgrnFileInfo->ModelCount; ++m)
 	{
 		CGrannyModel & rModel = m_models[m];
 		rModel.DestroyDeviceObjects();
 	}
 }
 
-bool CGraphicThing::CheckModelIndex(int iModel) const
+bool CGraphicThing::CheckModelIndex(int32_t iModel) const
 {
 	if (!m_pgrnFileInfo)
 	{
-		Tracef("m_pgrnFileInfo == NULL: %s\n", GetFileName());
+		Tracef("m_pgrnFileInfo == nullptr: %s\n", GetFileName());
 		return false;
 	}
 
-	assert(m_pgrnFileInfo != NULL);
+	assert(m_pgrnFileInfo != nullptr);
 
 	if (iModel < 0)
 		return false;
@@ -103,14 +103,14 @@ bool CGraphicThing::CheckModelIndex(int iModel) const
 	return true;
 }
 
-bool CGraphicThing::CheckMotionIndex(int iMotion) const
+bool CGraphicThing::CheckMotionIndex(int32_t iMotion) const
 {
 	// Temporary
 	if (!m_pgrnFileInfo)
 		return false;
 	// Temporary
 
-	assert(m_pgrnFileInfo != NULL);
+	assert(m_pgrnFileInfo != nullptr);
 
 	if (iMotion < 0)
 		return false;
@@ -121,25 +121,25 @@ bool CGraphicThing::CheckMotionIndex(int iMotion) const
 	return true;
 }
 
-CGrannyModel * CGraphicThing::GetModelPointer(int iModel)
+CGrannyModel * CGraphicThing::GetModelPointer(int32_t iModel)
 {	
 	assert(CheckModelIndex(iModel));
-	assert(m_models != NULL);
+	assert(m_models != nullptr);
 	return m_models + iModel;
 }
 
-CGrannyMotion * CGraphicThing::GetMotionPointer(int iMotion)
+CGrannyMotion * CGraphicThing::GetMotionPointer(int32_t iMotion)
 {
 	assert(CheckMotionIndex(iMotion));
 
 	if (iMotion >= m_pgrnFileInfo->AnimationCount)
-		return NULL;
+		return nullptr;
 
-	assert(m_motions != NULL);
+	assert(m_motions != nullptr);
 	return (m_motions + iMotion);
 }
 
-int CGraphicThing::GetModelCount() const
+int32_t CGraphicThing::GetModelCount() const
 {
 	if (!m_pgrnFileInfo)
 		return 0;
@@ -147,7 +147,7 @@ int CGraphicThing::GetModelCount() const
 	return (m_pgrnFileInfo->ModelCount);
 }
 
-int CGraphicThing::GetMotionCount() const
+int32_t CGraphicThing::GetMotionCount() const
 {
 	if (!m_pgrnFileInfo)
 		return 0;
@@ -155,7 +155,7 @@ int CGraphicThing::GetMotionCount() const
 	return (m_pgrnFileInfo->AnimationCount);
 }
 
-bool CGraphicThing::OnLoad(int iSize, const void * c_pvBuf)
+bool CGraphicThing::OnLoad(int32_t iSize, const void * c_pvBuf)
 {
 	if (!c_pvBuf)
 		return false;
@@ -210,8 +210,8 @@ const std::string& GetModelLocalPath()
 
 bool CGraphicThing::LoadModels()
 {
-	assert(m_pgrnFile != NULL);
-	assert(m_models == NULL);
+	assert(m_pgrnFile != nullptr);
+	assert(m_models == nullptr);
 	
 	if (m_pgrnFileInfo->ModelCount <= 0)
 		return false;	
@@ -222,16 +222,16 @@ bool CGraphicThing::LoadModels()
 	//char localPath[256] = "";
 	if (fileName.length() > 2 && fileName[1] != ':')
 	{				
-		int sepPos = fileName.rfind('\\');
+		int32_t sepPos = fileName.rfind('\\');
 		gs_modelLocalPath.assign(fileName, 0, sepPos+1);
 	}
 	// END_OF_SUPPORT_LOCAL_TEXTURE
 
-	int modelCount = m_pgrnFileInfo->ModelCount;
+	int32_t modelCount = m_pgrnFileInfo->ModelCount;
 
 	m_models = new CGrannyModel[modelCount];
 
-	for (int m = 0; m < modelCount; ++m)
+	for (int32_t m = 0; m < modelCount; ++m)
 	{
 		CGrannyModel & rModel = m_models[m];
 		granny_model * pgrnModel = m_pgrnFileInfo->Models[m];
@@ -249,17 +249,17 @@ bool CGraphicThing::LoadModels()
 
 bool CGraphicThing::LoadMotions()
 {
-	assert(m_pgrnFile != NULL);
-	assert(m_motions == NULL);
+	assert(m_pgrnFile != nullptr);
+	assert(m_motions == nullptr);
 
 	if (m_pgrnFileInfo->AnimationCount <= 0)
 		return false;
 	
-	int motionCount = m_pgrnFileInfo->AnimationCount;
+	int32_t motionCount = m_pgrnFileInfo->AnimationCount;
 
 	m_motions = new CGrannyMotion[motionCount];
 	
-	for (int m = 0; m < motionCount; ++m)
+	for (int32_t m = 0; m < motionCount; ++m)
 		if (!m_motions[m].BindGrannyAnimation(m_pgrnFileInfo->Animations[m]))
 			return false;
 

@@ -25,7 +25,7 @@ enum
 // 
 // Packet
 //
-void CGuild::GuildWarPacket(DWORD dwOppGID, BYTE bWarType, BYTE bWarState)
+void CGuild::GuildWarPacket(uint32_t dwOppGID, uint8_t bWarType, uint8_t bWarState)
 {
 	TPacketGCGuild pack;
 	TPacketGCGuildWar pack2;
@@ -74,7 +74,7 @@ void CGuild::SendEnemyGuild(LPCHARACTER ch)
 	TPacketGCGuild p;
 	p.header = HEADER_GC_GUILD;
 	p.subheader = GUILD_SUBHEADER_GC_WAR_SCORE;
-	p.size = sizeof(p) + sizeof(DWORD) + sizeof(DWORD) + sizeof(long);
+	p.size = sizeof(p) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(int32_t);
 
 	for (auto it = m_EnemyGuild.begin(); it != m_EnemyGuild.end(); ++it)
 	{
@@ -89,21 +89,21 @@ void CGuild::SendEnemyGuild(LPCHARACTER ch)
 
 		if (it->second.state == GUILD_WAR_ON_WAR)
 		{
-			long lScore;
+			int32_t lScore;
 
 			lScore = GetWarScoreAgainstTo(pack2.dwGuildOpp);
 
 			d->BufferedPacket(&p, sizeof(p));
-			d->BufferedPacket(&pack2.dwGuildSelf, sizeof(DWORD));
-			d->BufferedPacket(&pack2.dwGuildOpp, sizeof(DWORD));
-			d->Packet(&lScore, sizeof(long));
+			d->BufferedPacket(&pack2.dwGuildSelf, sizeof(uint32_t));
+			d->BufferedPacket(&pack2.dwGuildOpp, sizeof(uint32_t));
+			d->Packet(&lScore, sizeof(int32_t));
 
 			lScore = CGuildManager::instance().TouchGuild(pack2.dwGuildOpp)->GetWarScoreAgainstTo(pack2.dwGuildSelf);
 
 			d->BufferedPacket(&p, sizeof(p));
-			d->BufferedPacket(&pack2.dwGuildOpp, sizeof(DWORD));
-			d->BufferedPacket(&pack2.dwGuildSelf, sizeof(DWORD));
-			d->Packet(&lScore, sizeof(long));
+			d->BufferedPacket(&pack2.dwGuildOpp, sizeof(uint32_t));
+			d->BufferedPacket(&pack2.dwGuildSelf, sizeof(uint32_t));
+			d->Packet(&lScore, sizeof(int32_t));
 		}
 	}
 }
@@ -111,7 +111,7 @@ void CGuild::SendEnemyGuild(LPCHARACTER ch)
 //
 // War Login
 //
-int CGuild::GetGuildWarState(DWORD dwOppGID)
+int32_t CGuild::GetGuildWarState(uint32_t dwOppGID)
 {
 	if (dwOppGID == GetID())
 		return GUILD_WAR_NONE;
@@ -120,7 +120,7 @@ int CGuild::GetGuildWarState(DWORD dwOppGID)
 	return (it != m_EnemyGuild.end()) ? (it->second.state) : GUILD_WAR_NONE;
 } 
 
-int CGuild::GetGuildWarType(DWORD dwOppGID)
+int32_t CGuild::GetGuildWarType(uint32_t dwOppGID)
 {
 	auto git = m_EnemyGuild.find(dwOppGID);
 
@@ -130,7 +130,7 @@ int CGuild::GetGuildWarType(DWORD dwOppGID)
 	return git->second.type;
 }
 
-DWORD CGuild::GetGuildWarMapIndex(DWORD dwOppGID)
+uint32_t CGuild::GetGuildWarMapIndex(uint32_t dwOppGID)
 {
 	auto git = m_EnemyGuild.find(dwOppGID);
 
@@ -140,7 +140,7 @@ DWORD CGuild::GetGuildWarMapIndex(DWORD dwOppGID)
 	return git->second.map_index;
 }
 
-bool CGuild::CanStartWar(BYTE bGuildWarType) // 타입에 따라 다른 조건이 생길 수도 있음
+bool CGuild::CanStartWar(uint8_t bGuildWarType) // 타입에 따라 다른 조건이 생길 수도 있음
 {
 	if (bGuildWarType >= GUILD_WAR_TYPE_MAX_NUM)
 		return false;
@@ -152,7 +152,7 @@ bool CGuild::CanStartWar(BYTE bGuildWarType) // 타입에 따라 다른 조건이 생길 수�
 	return GetLadderPoint() > 0 && GetMemberCount() >= GUILD_WAR_MIN_MEMBER_COUNT;
 }
 
-bool CGuild::UnderWar(DWORD dwOppGID)
+bool CGuild::UnderWar(uint32_t dwOppGID)
 {
 	if (dwOppGID == GetID())
 		return false;
@@ -161,7 +161,7 @@ bool CGuild::UnderWar(DWORD dwOppGID)
 	return (it != m_EnemyGuild.end()) && (it->second.IsWarBegin());
 } 
 
-DWORD CGuild::UnderAnyWar(BYTE bType)
+uint32_t CGuild::UnderAnyWar(uint8_t bType)
 {
 	for (auto it = m_EnemyGuild.begin(); it != m_EnemyGuild.end(); ++it)
 	{
@@ -176,9 +176,9 @@ DWORD CGuild::UnderAnyWar(BYTE bType)
 	return 0;
 }
 
-void CGuild::SetWarScoreAgainstTo(DWORD dwOppGID, int iScore)
+void CGuild::SetWarScoreAgainstTo(uint32_t dwOppGID, int32_t iScore)
 {
-	DWORD dwSelfGID = GetID();
+	uint32_t dwSelfGID = GetID();
 
 	sys_log(0, "GuildWarScore Set %u from %u %d", dwSelfGID, dwOppGID, iScore);
 	auto it = m_EnemyGuild.find(dwOppGID);
@@ -201,14 +201,14 @@ void CGuild::SetWarScoreAgainstTo(DWORD dwOppGID, int iScore)
 
 			p.header = HEADER_GC_GUILD;
 			p.subheader = GUILD_SUBHEADER_GC_WAR_SCORE;
-			p.size = sizeof(p) + sizeof(DWORD) + sizeof(DWORD) + sizeof(long);
+			p.size = sizeof(p) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(int32_t);
 
 			TEMP_BUFFER buf;
 			buf.write(&p, sizeof(p));
 
-			buf.write(&dwSelfGID, sizeof(DWORD));
-			buf.write(&dwOppGID, sizeof(DWORD));
-			buf.write(&iScore, sizeof(long));
+			buf.write(&dwSelfGID, sizeof(uint32_t));
+			buf.write(&dwOppGID, sizeof(uint32_t));
+			buf.write(&iScore, sizeof(int32_t));
 
 			Packet(buf.read_peek(), buf.size());
 
@@ -220,7 +220,7 @@ void CGuild::SetWarScoreAgainstTo(DWORD dwOppGID, int iScore)
 	}
 }
 
-int CGuild::GetWarScoreAgainstTo(DWORD dwOppGID)
+int32_t CGuild::GetWarScoreAgainstTo(uint32_t dwOppGID)
 {
 	auto it = m_EnemyGuild.find(dwOppGID);
 
@@ -234,7 +234,7 @@ int CGuild::GetWarScoreAgainstTo(DWORD dwOppGID)
 	return 0;
 }
 
-DWORD CGuild::GetWarStartTime(DWORD dwOppGID)
+uint32_t CGuild::GetWarStartTime(uint32_t dwOppGID)
 {
 	if (dwOppGID == GetID())
 		return 0;
@@ -247,22 +247,22 @@ DWORD CGuild::GetWarStartTime(DWORD dwOppGID)
 	return it->second.war_start_time;
 }
 
-const TGuildWarInfo& GuildWar_GetTypeInfo(unsigned type)
+const TGuildWarInfo& GuildWar_GetTypeInfo(uint32_t type)
 {
 	return KOR_aGuildWarInfo[type];
 }
 
-unsigned GuildWar_GetTypeMapIndex(unsigned type)
+uint32_t GuildWar_GetTypeMapIndex(uint32_t type)
 {
 	return GuildWar_GetTypeInfo(type).lMapIndex;
 }
 
-bool GuildWar_IsWarMap(unsigned type)
+bool GuildWar_IsWarMap(uint32_t type)
 {
 	if (type == GUILD_WAR_TYPE_FIELD)
 		return true;
 
-	unsigned mapIndex = GuildWar_GetTypeMapIndex(type);
+	uint32_t mapIndex = GuildWar_GetTypeMapIndex(type);
 
 	if (SECTREE_MANAGER::instance().GetMapRegion(mapIndex))
 		return true;
@@ -288,7 +288,7 @@ void CGuild::NotifyGuildMaster(const char* msg)
 //           -> B Declare -> WaitStart -> Fail
 //                                     -> StartWar -> EndWar
 //
-void CGuild::RequestDeclareWar(DWORD dwOppGID, BYTE type)
+void CGuild::RequestDeclareWar(uint32_t dwOppGID, uint8_t type)
 {
 	if (dwOppGID == GetID())
 	{
@@ -330,7 +330,7 @@ void CGuild::RequestDeclareWar(DWORD dwOppGID, BYTE type)
 	{	
 		case GUILD_WAR_RECV_DECLARE:
 			{
-				const unsigned saved_type = it->second.type;
+				const uint32_t saved_type = it->second.type;
 
 				if (saved_type == GUILD_WAR_TYPE_FIELD)
 				{
@@ -387,7 +387,7 @@ void CGuild::RequestDeclareWar(DWORD dwOppGID, BYTE type)
 	}
 }
 
-bool CGuild::DeclareWar(DWORD dwOppGID, BYTE type, BYTE state)
+bool CGuild::DeclareWar(uint32_t dwOppGID, uint8_t type, uint8_t state)
 {
 	if (m_EnemyGuild.find(dwOppGID) != m_EnemyGuild.end())
 		return false;
@@ -401,7 +401,7 @@ bool CGuild::DeclareWar(DWORD dwOppGID, BYTE type, BYTE state)
 	return true;
 }
 
-bool CGuild::CheckStartWar(DWORD dwOppGID)
+bool CGuild::CheckStartWar(uint32_t dwOppGID)
 {
 	auto it = m_EnemyGuild.find(dwOppGID);
 
@@ -416,7 +416,7 @@ bool CGuild::CheckStartWar(DWORD dwOppGID)
 	return true;
 }
 
-void CGuild::StartWar(DWORD dwOppGID)
+void CGuild::StartWar(uint32_t dwOppGID)
 {
 	auto it = m_EnemyGuild.find(dwOppGID);
 
@@ -437,7 +437,7 @@ void CGuild::StartWar(DWORD dwOppGID)
 		GuildWarEntryAsk(dwOppGID);
 }
 
-bool CGuild::WaitStartWar(DWORD dwOppGID)
+bool CGuild::WaitStartWar(uint32_t dwOppGID)
 {
 	//자기자신이면 
 	if (dwOppGID == GetID())
@@ -497,14 +497,14 @@ bool CGuild::WaitStartWar(DWORD dwOppGID)
 	}
 
 
-	DWORD id1 = GetID();
-	DWORD id2 = dwOppGID;
+	uint32_t id1 = GetID();
+	uint32_t id2 = dwOppGID;
 
 	if (id1 > id2)
 		std::swap(id1, id2);
 
 	//워프 맵을 생성
-	DWORD lMapIndex = CWarMapManager::instance().CreateWarMap(rkGuildWarInfo, id1, id2);
+	uint32_t lMapIndex = CWarMapManager::instance().CreateWarMap(rkGuildWarInfo, id1, id2);
 	if (!lMapIndex) 
 	{
 		sys_err("GuildWar.WaitStartWar.CREATE_WARMAP_ERROR id(%u vs %u), type(%u), map(%d)", id1, id2, gw.type, rkGuildWarInfo.lMapIndex);
@@ -535,7 +535,7 @@ bool CGuild::WaitStartWar(DWORD dwOppGID)
 	return true;
 }
 
-void CGuild::RequestRefuseWar(DWORD dwOppGID)
+void CGuild::RequestRefuseWar(uint32_t dwOppGID)
 {
 	if (dwOppGID == GetID())
 		return;
@@ -554,7 +554,7 @@ void CGuild::RequestRefuseWar(DWORD dwOppGID)
 	}
 }
 
-void CGuild::RefuseWar(DWORD dwOppGID)
+void CGuild::RefuseWar(uint32_t dwOppGID)
 {
 	if (dwOppGID == GetID())
 		return;
@@ -563,14 +563,14 @@ void CGuild::RefuseWar(DWORD dwOppGID)
 
 	if (it != m_EnemyGuild.end() && (it->second.state == GUILD_WAR_SEND_DECLARE || it->second.state == GUILD_WAR_RECV_DECLARE))
 	{
-		BYTE type = it->second.type;
+		uint8_t type = it->second.type;
 		m_EnemyGuild.erase(dwOppGID);
 
 		GuildWarPacket(dwOppGID, type, GUILD_WAR_END);
 	}
 }
 
-void CGuild::ReserveWar(DWORD dwOppGID, BYTE type)
+void CGuild::ReserveWar(uint32_t dwOppGID, uint8_t type)
 {
 	if (dwOppGID == GetID())
 		return;
@@ -589,7 +589,7 @@ void CGuild::ReserveWar(DWORD dwOppGID, BYTE type)
 	sys_log(0, "Guild::ReserveWar %u", dwOppGID);
 }
 
-void CGuild::EndWar(DWORD dwOppGID)
+void CGuild::EndWar(uint32_t dwOppGID)
 {
 	if (dwOppGID == GetID())
 		return;
@@ -624,7 +624,7 @@ void CGuild::EndWar(DWORD dwOppGID)
 	}
 }
 
-void CGuild::SetGuildWarMapIndex(DWORD dwOppGID, long lMapIndex)
+void CGuild::SetGuildWarMapIndex(uint32_t dwOppGID, int32_t lMapIndex)
 {
 	auto it = m_EnemyGuild.find(dwOppGID);
 
@@ -635,7 +635,7 @@ void CGuild::SetGuildWarMapIndex(DWORD dwOppGID, long lMapIndex)
 	sys_log(0, "GuildWar.SetGuildWarMapIndex id(%d -> %d), map(%d)", GetID(), dwOppGID, lMapIndex);
 }
 
-void CGuild::GuildWarEntryAccept(DWORD dwOppGID, LPCHARACTER ch)
+void CGuild::GuildWarEntryAccept(uint32_t dwOppGID, LPCHARACTER ch)
 {
 	auto git = m_EnemyGuild.find(dwOppGID);
 
@@ -676,7 +676,7 @@ void CGuild::GuildWarEntryAccept(DWORD dwOppGID, LPCHARACTER ch)
 	ch->WarpSet(pos.x, pos.y, gw.map_index);
 }
 
-void CGuild::GuildWarEntryAsk(DWORD dwOppGID)
+void CGuild::GuildWarEntryAsk(uint32_t dwOppGID)
 {
 	auto git = m_EnemyGuild.find(dwOppGID);
 	if (git == m_EnemyGuild.end())
@@ -710,7 +710,7 @@ void CGuild::GuildWarEntryAsk(DWORD dwOppGID)
 		LPCHARACTER ch = *it++;
 
 		using namespace quest;
-		unsigned int questIndex=CQuestManager::instance().GetQuestIndexByName("guild_war_join");
+		uint32_t questIndex=CQuestManager::instance().GetQuestIndexByName("guild_war_join");
 		if (questIndex)
 		{
 			sys_log(0, "GuildWar.GuildWarEntryAsk.SendLetterToMember pid(%d), qid(%d)", ch->GetPlayerID(), questIndex);
@@ -728,7 +728,7 @@ void CGuild::GuildWarEntryAsk(DWORD dwOppGID)
 //
 // LADDER POINT
 //
-void CGuild::SetLadderPoint(int point) 
+void CGuild::SetLadderPoint(int32_t point) 
 { 
 	if (m_data.ladder_point != point)
 	{
@@ -743,7 +743,7 @@ void CGuild::SetLadderPoint(int point)
 	m_data.ladder_point = point; 
 }
 
-void CGuild::ChangeLadderPoint(int iChange)
+void CGuild::ChangeLadderPoint(int32_t iChange)
 {
 	TPacketGuildLadderPoint p;
 	p.dwGuild = GetID();

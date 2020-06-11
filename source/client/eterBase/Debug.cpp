@@ -8,10 +8,10 @@
 #include <ctime>
 #include <fmt/format.h>
 
-const DWORD DEBUG_STRING_MAX_LEN = 1024;
+const uint32_t DEBUG_STRING_MAX_LEN = 1024;
 
-static int isLogFile = false;
-HWND g_PopupHwnd = NULL;
+static int32_t isLogFile = false;
+HWND g_PopupHwnd = nullptr;
 
 auto g_stSyserrFileName = ""s;
 auto g_stLogFileName = ""s;
@@ -19,7 +19,7 @@ auto g_stLogFileName = ""s;
 class CLogFile : public CSingleton<CLogFile>
 {
 	public:
-		CLogFile() : m_fp(NULL)
+		CLogFile() : m_fp(nullptr)
 		{
 		}
 
@@ -28,7 +28,7 @@ class CLogFile : public CSingleton<CLogFile>
 			if (m_fp)
 				fclose(m_fp);
 
-			m_fp = NULL;
+			m_fp = nullptr;
 		}
 
 		void Initialize()
@@ -65,26 +65,26 @@ class CLogFile : public CSingleton<CLogFile>
 
 static CLogFile gs_logfile;
 
-static UINT gs_uLevel=0;
+static uint32_t gs_uLevel=0;
 
-void SetLogLevel(UINT uLevel)
+void SetLogLevel(uint32_t uLevel)
 {
 	gs_uLevel=uLevel;
 }
 
-void Log(UINT uLevel, const char* c_szMsg)
+void Log(uint32_t uLevel, const char* c_szMsg)
 {
 	if (uLevel>=gs_uLevel)
 		Trace(c_szMsg);
 }
 
-void Logn(UINT uLevel, const char* c_szMsg)
+void Logn(uint32_t uLevel, const char* c_szMsg)
 {
 	if (uLevel>=gs_uLevel)
 		Tracen(c_szMsg);
 }
 
-void Logf(UINT uLevel, const char* c_szFormat, ...)
+void Logf(uint32_t uLevel, const char* c_szFormat, ...)
 {
 	if (uLevel<gs_uLevel)
 		return;
@@ -104,7 +104,7 @@ void Logf(UINT uLevel, const char* c_szFormat, ...)
 		LogFile(szBuf);
 }
 
-void Lognf(UINT uLevel, const char* c_szFormat, ...)
+void Lognf(uint32_t uLevel, const char* c_szFormat, ...)
 {
 	if (uLevel<gs_uLevel)
 		return;
@@ -113,7 +113,7 @@ void Lognf(UINT uLevel, const char* c_szFormat, ...)
 	va_start(args, c_szFormat);
 
 	char szBuf[DEBUG_STRING_MAX_LEN+2];
-	int len = _vsnprintf(szBuf, sizeof(szBuf)-1, c_szFormat, args);
+	int32_t len = _vsnprintf(szBuf, sizeof(szBuf)-1, c_szFormat, args);
 
 	if (len > 0)
 	{
@@ -170,7 +170,7 @@ void Tracenf(const char* c_szFormat, ...)
 	va_start(args, c_szFormat);
 
 	char szBuf[DEBUG_STRING_MAX_LEN+2];
-	int len = _vsnprintf(szBuf, sizeof(szBuf)-1, c_szFormat, args);
+	int32_t len = _vsnprintf(szBuf, sizeof(szBuf)-1, c_szFormat, args);
 
 	if (len > 0)
 	{
@@ -212,7 +212,7 @@ void TraceError(const char* c_szFormat, ...)
 	char szBuf[DEBUG_STRING_MAX_LEN+2];
 
 	strncpy(szBuf, "SYSERR: ", DEBUG_STRING_MAX_LEN);
-	int len = strlen(szBuf);
+	int32_t len = strlen(szBuf);
 
 	va_list args;
 	va_start(args, c_szFormat);

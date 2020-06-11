@@ -110,7 +110,7 @@ bool CSpeedTreeForestDirectX8::SetRenderingDevice(LPDIRECT3DDEVICE8 lpDevice)
 ///////////////////////////////////////////////////////////////////////  
 //	CSpeedTreeForestDirectX8::UploadWindMatrix
 
-void CSpeedTreeForestDirectX8::UploadWindMatrix(UINT uiLocation, const float* pMatrix) const
+void CSpeedTreeForestDirectX8::UploadWindMatrix(uint32_t uiLocation, const float* pMatrix) const
 {
 	STATEMANAGER.SetVertexShaderConstant(uiLocation, pMatrix, 4);
 }
@@ -137,7 +137,7 @@ void CSpeedTreeForestDirectX8::UpdateCompundMatrix(const D3DXVECTOR3 & c_rEyeVec
 ///////////////////////////////////////////////////////////////////////  
 //	CSpeedTreeForestDirectX8::Render
 
-void CSpeedTreeForestDirectX8::Render(unsigned long ulRenderBitVector)
+void CSpeedTreeForestDirectX8::Render(uint32_t ulRenderBitVector)
 {
 	UpdateSystem(CTimer::Instance().GetCurrentSecond());
 
@@ -147,9 +147,9 @@ void CSpeedTreeForestDirectX8::Render(unsigned long ulRenderBitVector)
 	if (!(ulRenderBitVector & Forest_RenderToShadow) && !(ulRenderBitVector & Forest_RenderToMiniMap))
 		UpdateCompundMatrix(CCameraManager::Instance().GetCurrentCamera()->GetEye(), ms_matView, ms_matProj);
 
-	DWORD dwLightState = STATEMANAGER.GetRenderState(D3DRS_LIGHTING);
-	DWORD dwColorVertexState = STATEMANAGER.GetRenderState(D3DRS_COLORVERTEX);
-	DWORD dwFogVertexMode = STATEMANAGER.GetRenderState(D3DRS_FOGVERTEXMODE);
+	uint32_t dwLightState = STATEMANAGER.GetRenderState(D3DRS_LIGHTING);
+	uint32_t dwColorVertexState = STATEMANAGER.GetRenderState(D3DRS_COLORVERTEX);
+	uint32_t dwFogVertexMode = STATEMANAGER.GetRenderState(D3DRS_FOGVERTEXMODE);
 
 #ifdef WRAPPER_USE_DYNAMIC_LIGHTING
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, TRUE);
@@ -159,7 +159,7 @@ void CSpeedTreeForestDirectX8::Render(unsigned long ulRenderBitVector)
 #endif
 
 	TTreeMap::iterator itor;
-	UINT uiCount;
+	uint32_t uiCount;
 	
 	itor = m_pMainTreeMap.begin();
 
@@ -168,7 +168,7 @@ void CSpeedTreeForestDirectX8::Render(unsigned long ulRenderBitVector)
 		CSpeedTreeWrapper * pMainTree = (itor++)->second;
 		CSpeedTreeWrapper ** ppInstances = pMainTree->GetInstances(uiCount);
 
-		for (UINT i = 0; i < uiCount; ++i)
+		for (uint32_t i = 0; i < uiCount; ++i)
 		{
 			ppInstances[i]->Advance();
 		}
@@ -231,7 +231,7 @@ void CSpeedTreeForestDirectX8::Render(unsigned long ulRenderBitVector)
 			
 			pMainTree->SetupBranchForTreeType();
 
-			for (UINT i = 0; i < uiCount; ++i)
+			for (uint32_t i = 0; i < uiCount; ++i)
 				if (ppInstances[i]->isShow())
 					ppInstances[i]->RenderBranches();
 		}
@@ -252,7 +252,7 @@ void CSpeedTreeForestDirectX8::Render(unsigned long ulRenderBitVector)
 
 			pMainTree->SetupFrondForTreeType();
 
-			for (UINT i = 0; i < uiCount; ++i)
+			for (uint32_t i = 0; i < uiCount; ++i)
 				if (ppInstances[i]->isShow())
 					ppInstances[i]->RenderFronds();
 		}
@@ -285,7 +285,7 @@ void CSpeedTreeForestDirectX8::Render(unsigned long ulRenderBitVector)
 
 			pMainTree->SetupLeafForTreeType();
 
-			for (UINT i = 0; i < uiCount; ++i)
+			for (uint32_t i = 0; i < uiCount; ++i)
 				if (ppInstances[i]->isShow())
 					ppInstances[i]->RenderLeaves();
 		}
@@ -316,7 +316,7 @@ void CSpeedTreeForestDirectX8::Render(unsigned long ulRenderBitVector)
 
 				pMainTree->SetupBranchForTreeType();
 
-				for (UINT i = 0; i < uiCount; ++i)
+				for (uint32_t i = 0; i < uiCount; ++i)
 					if (ppInstances[i]->isShow())
 						ppInstances[i]->RenderBillboards();
 			}

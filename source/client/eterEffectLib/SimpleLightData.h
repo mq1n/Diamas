@@ -20,7 +20,7 @@ class CLightData : public CEffectElementBase
 		{
 			return m_bLoopFlag;
 		}
-		int GetLoopCount()
+		int32_t GetLoopCount()
 		{
 			return m_iLoopCount;
 		}
@@ -41,7 +41,7 @@ class CLightData : public CEffectElementBase
 		D3DXCOLOR m_cDiffuse;
 
 		BOOL m_bLoopFlag;
-		int m_iLoopCount;
+		int32_t m_iLoopCount;
 
 		float m_fAttenuation0;
 		float m_fAttenuation1;

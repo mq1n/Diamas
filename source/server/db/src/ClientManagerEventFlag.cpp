@@ -54,7 +54,7 @@ void CClientManager::SetEventFlag(TPacketSetEventFlag* p)
 				GetTablePostfix(), p->szFlagName, p->lValue);
 		szQuery[1023] = '\0';
 
-		//CDBManager::instance().ReturnQuery(szQuery, QID_QUEST_SAVE, 0, NULL);
+		//CDBManager::instance().ReturnQuery(szQuery, QID_QUEST_SAVE, 0, nullptr);
 		CDBManager::instance().AsyncQuery(szQuery);
 		sys_log(0, "HEADER_GD_SET_EVENT_FLAG : Changed CClientmanager::SetEventFlag(%s %d) ", p->szFlagName, p->lValue);
 		return;

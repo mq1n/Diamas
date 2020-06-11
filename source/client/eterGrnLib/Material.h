@@ -14,7 +14,7 @@ class CGrannyMaterial : public CReferenceObject
 	public:
 		typedef CRef<CGrannyMaterial> TRef;
 
-		static void CreateSphereMap(UINT uMapIndex, const char* c_szSphereMapImageFileName);
+		static void CreateSphereMap(uint32_t uMapIndex, const char* c_szSphereMapImageFileName);
 		static void DestroySphereMap();
 
 	public:
@@ -39,8 +39,8 @@ class CGrannyMaterial : public CReferenceObject
 		void					Destroy();
 		void					Copy(CGrannyMaterial& rkMtrl);
 		bool					IsEqual(granny_material * pgrnMaterial) const;
-		bool					IsIn(const char* c_szImageName, int* iStage);
-		void					SetSpecularInfo(BOOL bFlag, float fPower, BYTE uSphereMapIndex);
+		bool					IsIn(const char* c_szImageName, int32_t* iStage);
+		void					SetSpecularInfo(BOOL bFlag, float fPower, uint8_t uSphereMapIndex);
 
 		void					ApplyRenderState();
 		void					RestoreRenderState();
@@ -50,15 +50,15 @@ class CGrannyMaterial : public CReferenceObject
 
 	public:
 		bool					CreateFromGrannyMaterialPointer(granny_material* pgrnMaterial);
-		void					SetImagePointer(int iStage, CGraphicImage* pImage);
+		void					SetImagePointer(int32_t iStage, CGraphicImage* pImage);
 
 		CGrannyMaterial::EType	GetType() const;		
-		CGraphicImage *			GetImagePointer(int iStage) const;
+		CGraphicImage *			GetImagePointer(int32_t iStage) const;
 
 		const CGraphicTexture * GetDiffuseTexture() const;
 		const CGraphicTexture * GetOpacityTexture() const;
 
-		LPDIRECT3DTEXTURE8		GetD3DTexture(int iStage) const;
+		LPDIRECT3DTEXTURE8		GetD3DTexture(int32_t iStage) const;
 
 		bool					IsTwoSided() const		{ return m_bTwoSideRender; }
 
@@ -82,8 +82,8 @@ class CGrannyMaterial : public CReferenceObject
 		float					m_fSpecularPower;
 		BOOL					m_bSpecularEnable;
 		bool					m_bTwoSideRender;
-		DWORD					m_dwLastCullRenderStateForTwoSideRendering;
-		BYTE					m_bSphereMapIndex;
+		uint32_t					m_dwLastCullRenderStateForTwoSideRendering;
+		uint8_t					m_bSphereMapIndex;
 		
 
 		void (CGrannyMaterial::*m_pfnApplyRenderState)();
@@ -106,14 +106,14 @@ class CGrannyMaterialPalette
 		void	Clear();
 		void	Copy(const CGrannyMaterialPalette& rkMtrlPalSrc);
 
-		DWORD	RegisterMaterial(granny_material* pgrnMaterial);
+		uint32_t	RegisterMaterial(granny_material* pgrnMaterial);
 		void	SetMaterialImagePointer(const char* c_szMtrlName, CGraphicImage* pImage);
 		void	SetMaterialData(const char* c_szMtrlName, const SMaterialData& c_rkMaterialData);
 		void	SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower);
 
-		CGrannyMaterial& GetMaterialRef(DWORD mtrlIndex);
+		CGrannyMaterial& GetMaterialRef(uint32_t mtrlIndex);
 
-		DWORD	GetMaterialCount() const;
+		uint32_t	GetMaterialCount() const;
 
 	protected:
 		std::vector<CGrannyMaterial::TRef> m_mtrlVector;

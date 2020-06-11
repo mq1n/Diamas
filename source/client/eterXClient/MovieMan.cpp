@@ -41,7 +41,7 @@ void CMovieMan::ClearToBlack()
 	// Get the repaint DC and then fill the window with black.
 	//
 	HWND window =  CPythonApplication::Instance().GetWindowHandle();//CFFClientApp::GetInstance()->GetMainWindow();
-	InvalidateRect( window, NULL, FALSE );
+	InvalidateRect( window, nullptr, FALSE );
 	dc = BeginPaint( window, &ps );
 
 	PatBlt( dc, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom, BLACKNESS);
@@ -49,7 +49,7 @@ void CMovieMan::ClearToBlack()
 	EndPaint( window, &ps );
 }
 
-void CMovieMan::FillRect( RECT& fillRect, DWORD fillColor )
+void CMovieMan::FillRect( RECT& fillRect, uint32_t fillColor )
 {
 	assert(m_pPrimarySurface);
 
@@ -62,14 +62,14 @@ void CMovieMan::FillRect( RECT& fillRect, DWORD fillColor )
 	DDBLTFX colorFillBltFX;
 	colorFillBltFX.dwSize = sizeof(DDBLTFX);
 	colorFillBltFX.dwFillColor = fillColor;
-	if (!m_usingRGB32 || FAILED(m_pPrimarySurface->Blt(&fillRect, NULL, NULL, DDBLT_WAIT | DDBLT_COLORFILL, &colorFillBltFX)))
+	if (!m_usingRGB32 || FAILED(m_pPrimarySurface->Blt(&fillRect, nullptr, nullptr, DDBLT_WAIT | DDBLT_COLORFILL, &colorFillBltFX)))
 	{
 		GDIFillRect(fillRect, fillColor);
 		return;
 	}
 }
 
-inline void CMovieMan::GDIFillRect( RECT& fillRect, DWORD fillColor )
+inline void CMovieMan::GDIFillRect( RECT& fillRect, uint32_t fillColor )
 {
 	HBRUSH fillBrush = CreateSolidBrush(
 		RGB((fillColor >> 16) & 255, (fillColor >> 8) & 255, fillColor & 255)
@@ -109,7 +109,7 @@ void CMovieMan::PlayIntro()
 	PlayMovie( INTRO_FILE, MOVIEMAN_SKIPPABLE_YES, MOVIEMAN_POSTEFFECT_FADEOUT, 0xFFFFFF );
 }
 
-BOOL CMovieMan::PlayTutorial(LONG nIdx)
+BOOL CMovieMan::PlayTutorial(int32_t nIdx)
 {
 	BOOL bRet = FALSE;
 	ClearToBlack();
@@ -127,12 +127,12 @@ BOOL CMovieMan::PlayTutorial(LONG nIdx)
 	return bRet;
 }
 
-BOOL CMovieMan::PlayMovie( const char *cpFileName, const bool bSkipAllowed, const int nPostEffectID, const DWORD dwPostEffectData )
+BOOL CMovieMan::PlayMovie( const char *cpFileName, const bool bSkipAllowed, const int32_t nPostEffectID, const uint32_t dwPostEffectData )
 {
 	HWND hWnd = CPythonApplication::Instance().GetWindowHandle();
 
-	IDirectDraw *pDD = NULL;
-	DirectDrawCreate(NULL, &pDD, NULL);
+	IDirectDraw *pDD = nullptr;
+	DirectDrawCreate(nullptr, &pDD, nullptr);
 	pDD->SetCooperativeLevel(hWnd, DDSCL_NORMAL);
 
 	DDSURFACEDESC ddsd;
@@ -140,7 +140,7 @@ BOOL CMovieMan::PlayMovie( const char *cpFileName, const bool bSkipAllowed, cons
 	ddsd.dwSize = sizeof(ddsd);
 	ddsd.dwFlags = DDSD_CAPS;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
-	if (FAILED(pDD->CreateSurface(&ddsd, &m_pPrimarySurface, NULL)))
+	if (FAILED(pDD->CreateSurface(&ddsd, &m_pPrimarySurface, nullptr)))
 	{
 		pDD->Release();
 		return FALSE;
@@ -154,28 +154,28 @@ BOOL CMovieMan::PlayMovie( const char *cpFileName, const bool bSkipAllowed, cons
 	ddsd.ddpfPixelFormat.dwSize = sizeof(ddsd.ddpfPixelFormat);
 	m_usingRGB32 = (ddsd.ddpfPixelFormat.dwRGBBitCount == 32);
 
-	IDirectDrawClipper *pDDClipper = NULL;
-	HRESULT hr = pDD->CreateClipper(0, &pDDClipper, NULL);
+	IDirectDrawClipper *pDDClipper = nullptr;
+	HRESULT hr = pDD->CreateClipper(0, &pDDClipper, nullptr);
 	if (SUCCEEDED(hr))
 	{
 		pDDClipper->SetHWnd(0, hWnd);
 		m_pPrimarySurface->SetClipper(pDDClipper);
 	}
 
-	IMultiMediaStream *pMMStream = NULL;
+	IMultiMediaStream *pMMStream = nullptr;
 	hr = RenderFileToMMStream(cpFileName, &pMMStream, pDD);
 	if (SUCCEEDED(hr))
 	{
-		IMediaStream *pPrimaryVidStream = NULL;
+		IMediaStream *pPrimaryVidStream = nullptr;
 		HRESULT hr = pMMStream->GetMediaStream(MSPID_PrimaryVideo, &pPrimaryVidStream);
 		if (SUCCEEDED(hr))
 		{
-			IDirectDrawMediaStream *pDDStream = NULL;
+			IDirectDrawMediaStream *pDDStream = nullptr;
 			pPrimaryVidStream->QueryInterface(IID_IDirectDrawMediaStream, (void **) &pDDStream);
 			pPrimaryVidStream->Release();
 
 			ddsd.dwSize = sizeof(ddsd);
-			hr = pDDStream->GetFormat(&ddsd, NULL, NULL, NULL);
+			hr = pDDStream->GetFormat(&ddsd, nullptr, nullptr, nullptr);
 			if (SUCCEEDED(hr))
 			{
 				// 동영상 크기와 윈도우 크기를 기준으로 동영상 재생될 적당한 영역을 설정
@@ -199,7 +199,7 @@ BOOL CMovieMan::PlayMovie( const char *cpFileName, const bool bSkipAllowed, cons
 				ddsdBackSurface.dwWidth = m_movieWidth;
 
 				IDirectDrawSurface *pSurface;
-				hr = pDD->CreateSurface(&ddsdBackSurface, &pSurface, NULL);
+				hr = pDD->CreateSurface(&ddsdBackSurface, &pSurface, nullptr);
 				if (SUCCEEDED(hr))
 				{ 
 					RenderStreamToSurface(pSurface, pDDStream, pMMStream, bSkipAllowed, nPostEffectID, dwPostEffectData);
@@ -212,18 +212,18 @@ BOOL CMovieMan::PlayMovie( const char *cpFileName, const bool bSkipAllowed, cons
 	}
 
 	m_pPrimarySurface->Release();
-	m_pPrimarySurface = NULL;
+	m_pPrimarySurface = nullptr;
 
 	if (m_pBasicAudio)
 	{
 		m_pBasicAudio->Release();
-		m_pBasicAudio = NULL;
+		m_pBasicAudio = nullptr;
 	}
 
 	if (pDDClipper)
 	{
 		pDDClipper->Release();
-		pDDClipper = NULL;
+		pDDClipper = nullptr;
 	}
 
 	pDD->Release(); 
@@ -263,12 +263,12 @@ void CMovieMan::GetWindowRect(RECT& windowRect)
 //----------------------------------------------------------------------------------------------------
 // 메인 윈도우에 동영상을 꽉채우는 RECT 반환(가로/세로 비율 유지)
 //
-void CMovieMan::CalcMovieRect(int srcWidth, int srcHeight, RECT& movieRect)
+void CMovieMan::CalcMovieRect(int32_t srcWidth, int32_t srcHeight, RECT& movieRect)
 {
 	RECT windowRect;
 	GetWindowRect(windowRect);
 
-	int nMovieWidth, nMovieHeight;
+	int32_t nMovieWidth, nMovieHeight;
 	if (srcWidth >= srcHeight)
 	{
 		nMovieWidth = (windowRect.right - windowRect.left);
@@ -314,12 +314,12 @@ void CMovieMan::CalcBackgroundRect(const RECT& movieRect, RECT& upperRect, RECT&
 //----------------------------------------------------------------------------------------------------
 // 특정 서피스에 Blocking으로 동영상을 그린다
 //
-HRESULT CMovieMan::RenderStreamToSurface(IDirectDrawSurface *pSurface, IDirectDrawMediaStream *pDDStream, IMultiMediaStream *pMMStream, bool bSkipAllowed, int nPostEffectID, DWORD dwPostEffectData)
+HRESULT CMovieMan::RenderStreamToSurface(IDirectDrawSurface *pSurface, IDirectDrawMediaStream *pDDStream, IMultiMediaStream *pMMStream, bool bSkipAllowed, int32_t nPostEffectID, uint32_t dwPostEffectData)
 {    
 	#define KEY_DOWN(vk)	(GetAsyncKeyState(vk) & 0x8000)
 
-	IDirectDrawStreamSample *pSample = NULL;
-	HRESULT hr = pDDStream->CreateSample(pSurface, NULL, 0, &pSample);
+	IDirectDrawStreamSample *pSample = nullptr;
+	HRESULT hr = pDDStream->CreateSample(pSurface, nullptr, 0, &pSample);
 	if (SUCCEEDED(hr))
 	{
 		// 최초 한번 검은색으로 배경을 칠해준다
@@ -331,11 +331,11 @@ HRESULT CMovieMan::RenderStreamToSurface(IDirectDrawSurface *pSurface, IDirectDr
 		FillRect(lowerRect, 0);
 
 		pMMStream->SetState(STREAMSTATE_RUN);
-		while (pSample->Update(0, NULL, NULL, NULL) == S_OK)
+		while (pSample->Update(0, nullptr, nullptr, 0) == S_OK)
 		{
 			// 윈도우 중앙을 기준으로 꽉차게 그린다
 			CalcMovieRect(m_movieWidth, m_movieHeight, movieRect);
-			if (FAILED(m_pPrimarySurface->Blt(&movieRect, pSurface, NULL, DDBLT_WAIT, NULL)))
+			if (FAILED(m_pPrimarySurface->Blt(&movieRect, pSurface, nullptr, DDBLT_WAIT, nullptr)))
 			{
 				GDIBlt(pSurface, &movieRect);
 			}
@@ -365,7 +365,7 @@ HRESULT CMovieMan::RenderStreamToSurface(IDirectDrawSurface *pSurface, IDirectDr
 HRESULT CMovieMan::RenderFileToMMStream(const char *cpFilename, IMultiMediaStream **ppMMStream, IDirectDraw *pDD)
 {
 	IAMMultiMediaStream *pAMStream;
-	HRESULT hr = CoCreateInstance(CLSID_AMMultiMediaStream, NULL, CLSCTX_INPROC_SERVER, IID_IAMMultiMediaStream, (void **) &pAMStream);
+	HRESULT hr = CoCreateInstance(CLSID_AMMultiMediaStream, nullptr, CLSCTX_INPROC_SERVER, IID_IAMMultiMediaStream, (void **) &pAMStream);
 	if (FAILED(hr))
 	{
 		return hr;
@@ -383,9 +383,9 @@ HRESULT CMovieMan::RenderFileToMMStream(const char *cpFilename, IMultiMediaStrea
 	::wcsncpy( wPath, wsDir, sizeof(WCHAR)*::wcsnlen(wsDir, MAX_PATH) );
 	//
 
-	pAMStream->Initialize(STREAMTYPE_READ, AMMSF_NOGRAPHTHREAD, NULL);
-	pAMStream->AddMediaStream(pDD, &MSPID_PrimaryVideo, 0, NULL);
-	pAMStream->AddMediaStream(NULL, &MSPID_PrimaryAudio, AMMSF_ADDDEFAULTRENDERER, NULL);
+	pAMStream->Initialize(STREAMTYPE_READ, AMMSF_NOGRAPHTHREAD, nullptr);
+	pAMStream->AddMediaStream(pDD, &MSPID_PrimaryVideo, 0, nullptr);
+	pAMStream->AddMediaStream(nullptr, &MSPID_PrimaryAudio, AMMSF_ADDDEFAULTRENDERER, nullptr);
 
 	std::string ext;
 	GetFileExtension(cpFilename, strlen(cpFilename), &ext);
@@ -423,19 +423,19 @@ HRESULT CMovieMan::RenderFileToMMStream(const char *cpFilename, IMultiMediaStrea
 //----------------------------------------------------------------------------------------------------
 // 특정색으로 화면이 밝아지거나 어두워짐
 //
-HRESULT CMovieMan::RenderPostEffectFadeOut(IDirectDrawSurface *pSurface, int fadeOutDuration, DWORD fadeOutColor)
+HRESULT CMovieMan::RenderPostEffectFadeOut(IDirectDrawSurface *pSurface, int32_t fadeOutDuration, uint32_t fadeOutColor)
 {
 	// Lock 걸기 위해 초기화
 	DDSURFACEDESC lockedSurfaceDesc;
 
-	int *pCopiedSrcSurBuf = NULL;
-	LONG fadeBegin = GetTickCount();
+	int32_t *pCopiedSrcSurBuf = nullptr;
+	int32_t fadeBegin = GetTickCount();
 	float fadeProgress = 0.0;
-	while ((fadeProgress = ((float)((LONG)GetTickCount()) - fadeBegin) / fadeOutDuration) < 1.0)
+	while ((fadeProgress = ((float)((int32_t)GetTickCount()) - fadeBegin) / fadeOutDuration) < 1.0)
 	{
 		ZeroMemory(&lockedSurfaceDesc, sizeof(lockedSurfaceDesc));
 		lockedSurfaceDesc.dwSize = sizeof(lockedSurfaceDesc);
-		HRESULT hr = pSurface->Lock(NULL, &lockedSurfaceDesc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK | DDLOCK_READONLY, NULL);
+		HRESULT hr = pSurface->Lock(nullptr, &lockedSurfaceDesc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK | DDLOCK_READONLY, nullptr);
 		if (FAILED(hr))
 		{
 			return hr;
@@ -444,26 +444,26 @@ HRESULT CMovieMan::RenderPostEffectFadeOut(IDirectDrawSurface *pSurface, int fad
 		// 최초 1회에 서피스 복사하고 복사본에 FadeOut 처리한다
 		if (!pCopiedSrcSurBuf)
 		{
-			if (!(pCopiedSrcSurBuf = (int*)malloc((LONG)lockedSurfaceDesc.lPitch * m_movieHeight)))
+			if (!(pCopiedSrcSurBuf = (int32_t*)malloc((int32_t)lockedSurfaceDesc.lPitch * m_movieHeight)))
 			{
 				pSurface->Unlock(lockedSurfaceDesc.lpSurface);
 				return E_OUTOFMEMORY;
 			}
-			CopyMemory(pCopiedSrcSurBuf, lockedSurfaceDesc.lpSurface, (LONG)lockedSurfaceDesc.lPitch * m_movieHeight);
+			CopyMemory(pCopiedSrcSurBuf, lockedSurfaceDesc.lpSurface, (int32_t)lockedSurfaceDesc.lPitch * m_movieHeight);
 		}
 
 		// 픽셀 플랏팅(32비트)
-		int *pSrcSurfaceBuf = pCopiedSrcSurBuf;
-		int *pDestSurfaceBuf = (int*)lockedSurfaceDesc.lpSurface;
+		int32_t *pSrcSurfaceBuf = pCopiedSrcSurBuf;
+		int32_t *pDestSurfaceBuf = (int32_t*)lockedSurfaceDesc.lpSurface;
 
-		int fadeOutColorRed = (int)(((fadeOutColor >> 16) & 255) * fadeProgress);
-		int fadeOutColorGreen = (int)(((fadeOutColor >> 8) & 255) * fadeProgress);
-		int fadeOutColorBlue = (int)((fadeOutColor & 255) * fadeProgress);
-		for(int y = 0; y < m_movieHeight; ++y)
+		int32_t fadeOutColorRed = (int32_t)(((fadeOutColor >> 16) & 255) * fadeProgress);
+		int32_t fadeOutColorGreen = (int32_t)(((fadeOutColor >> 8) & 255) * fadeProgress);
+		int32_t fadeOutColorBlue = (int32_t)((fadeOutColor & 255) * fadeProgress);
+		for(int32_t y = 0; y < m_movieHeight; ++y)
 		{
-			for(int x = 0; x < m_movieWidth; ++x)
+			for(int32_t x = 0; x < m_movieWidth; ++x)
 			{
-				DWORD srcPixel = *pSrcSurfaceBuf;
+				uint32_t srcPixel = *pSrcSurfaceBuf;
 				*pDestSurfaceBuf = RGB(
 					(srcPixel & 255) * (1 - fadeProgress) + fadeOutColorBlue,
 					((srcPixel >> 8) & 255) * (1 - fadeProgress) + fadeOutColorGreen,
@@ -479,7 +479,7 @@ HRESULT CMovieMan::RenderPostEffectFadeOut(IDirectDrawSurface *pSurface, int fad
 		// 색상이 바뀐 동영상 이미지 그리기
 		RECT movieRect;
 		CalcMovieRect(m_movieWidth, m_movieHeight, movieRect);
-		if (FAILED(m_pPrimarySurface->Blt(&movieRect, pSurface, NULL, DDBLT_WAIT, NULL)))
+		if (FAILED(m_pPrimarySurface->Blt(&movieRect, pSurface, nullptr, DDBLT_WAIT, nullptr)))
 		{
 			GDIBlt(pSurface, &movieRect);
 		}
@@ -493,7 +493,7 @@ HRESULT CMovieMan::RenderPostEffectFadeOut(IDirectDrawSurface *pSurface, int fad
 		// 음량 조절
 		if (m_pBasicAudio)
 		{
-			m_pBasicAudio->put_Volume((long)(-10000 * fadeProgress));
+			m_pBasicAudio->put_Volume((int32_t)(-10000 * fadeProgress));
 		}
 	}
 
@@ -518,31 +518,31 @@ HRESULT CMovieMan::BuildFilterGraphManually(
 	const GUID FAR clsidVideoCodec,
 	const GUID FAR clsidAudioCodec)
 {
-	IGraphBuilder* pGraphBuilder = NULL;
+	IGraphBuilder* pGraphBuilder = nullptr;
 	pAMStream->GetFilterGraph(&pGraphBuilder);
 
 	assert(pGraphBuilder);
 
 //#ifdef _DEBUG
-//	DWORD dwRegister;
+//	uint32_t dwRegister;
 //	AddToRot(pGraphBuilder, &dwRegister);
 //#endif
 
-	IBaseFilter *pSourceFilter = NULL;
-	IBaseFilter *pSplitterFilter = NULL;
-	IBaseFilter *pVideoFilter = NULL;
-	IBaseFilter *pAudioFilter = NULL;
+	IBaseFilter *pSourceFilter = nullptr;
+	IBaseFilter *pSplitterFilter = nullptr;
+	IBaseFilter *pVideoFilter = nullptr;
+	IBaseFilter *pAudioFilter = nullptr;
 
-	CoCreateInstance(clsidSplitter, NULL, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (void **) &pSplitterFilter);
-	CoCreateInstance(clsidVideoCodec, NULL, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (void **) &pVideoFilter);
-	CoCreateInstance(clsidAudioCodec, NULL, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (void **) &pAudioFilter);
+	CoCreateInstance(clsidSplitter, nullptr, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (void **) &pSplitterFilter);
+	CoCreateInstance(clsidVideoCodec, nullptr, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (void **) &pVideoFilter);
+	CoCreateInstance(clsidAudioCodec, nullptr, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (void **) &pAudioFilter);
 
 	// 만약 MP43 디코더가 없다면 DMO 코덱을 대신 넣어준다
 	// MONSTER팀에서 발견된 케이스(코덱을 누군가 강제로 삭제)
 	if (!pVideoFilter && IsEqualGUID(clsidVideoCodec, CLSID_MP4VideoCodec))
 	{
 		// Create the DMO Wrapper filter.
-		HRESULT hr = CoCreateInstance(CLSID_DMOWrapperFilter, NULL, CLSCTX_INPROC, IID_IBaseFilter, (void **)&pVideoFilter);
+		HRESULT hr = CoCreateInstance(CLSID_DMOWrapperFilter, nullptr, CLSCTX_INPROC, IID_IBaseFilter, (void **)&pVideoFilter);
 		if (SUCCEEDED(hr)) 
 		{
 			IDMOWrapperFilter *pWrap;
@@ -560,20 +560,20 @@ HRESULT CMovieMan::BuildFilterGraphManually(
 	pGraphBuilder->AddFilter(pVideoFilter, L"Video Decoder");
 	pGraphBuilder->AddFilter(pAudioFilter, L"Audio Decoder");
 
-	assert(m_pBasicAudio == NULL);
+	assert(m_pBasicAudio == nullptr);
 	pGraphBuilder->QueryInterface(IID_IBasicAudio, (void**) &m_pBasicAudio);
 
 	// Connect "Source" -> "Splitter"
-	IPin *pInPin = NULL;
-	IPin *pOutPin = NULL;
-	IPin *pSplitterVideoOutPin = NULL;
-	IPin *pSplitterAudioOutPin = NULL;
-	IEnumPins *pEnumPins = NULL;
+	IPin *pInPin = nullptr;
+	IPin *pOutPin = nullptr;
+	IPin *pSplitterVideoOutPin = nullptr;
+	IPin *pSplitterAudioOutPin = nullptr;
+	IEnumPins *pEnumPins = nullptr;
 	pSourceFilter->EnumPins(&pEnumPins);
-	pEnumPins->Next(1, &pOutPin, NULL);
+	pEnumPins->Next(1, &pOutPin, nullptr);
 	pEnumPins->Release();
 	pSplitterFilter->EnumPins(&pEnumPins);
-	pEnumPins->Next(1, &pInPin, NULL);
+	pEnumPins->Next(1, &pInPin, nullptr);
 	pEnumPins->Release();
 	HRESULT hr = pGraphBuilder->Connect(pOutPin, pInPin);
 	pInPin->Release();
@@ -583,7 +583,7 @@ HRESULT CMovieMan::BuildFilterGraphManually(
 		// 연결후에만 Output 핀들이 나타난다
 		pSplitterFilter->EnumPins(&pEnumPins);
 		PIN_INFO pinInfo;
-		while( SUCCEEDED(pEnumPins->Next(1, &pInPin, NULL)) )
+		while( SUCCEEDED(pEnumPins->Next(1, &pInPin, nullptr)) )
 		{
 			pInPin->QueryPinInfo(&pinInfo);
 			pinInfo.pFilter->Release();
@@ -591,7 +591,7 @@ HRESULT CMovieMan::BuildFilterGraphManually(
 			{
 				// Pin의 순서를 비디오-오디오로 가정
 				pSplitterVideoOutPin = pInPin;
-				pEnumPins->Next(1, &pSplitterAudioOutPin, NULL);
+				pEnumPins->Next(1, &pSplitterAudioOutPin, nullptr);
 				break;
 			}
 			pInPin->Release();
@@ -600,8 +600,8 @@ HRESULT CMovieMan::BuildFilterGraphManually(
 
 		// Splitter -> Video/Audio codecs
 		pVideoFilter->EnumPins(&pEnumPins);
-		pEnumPins->Next(1, &pInPin, NULL);
-		pEnumPins->Next(1, &pOutPin, NULL);
+		pEnumPins->Next(1, &pInPin, nullptr);
+		pEnumPins->Next(1, &pOutPin, nullptr);
 		pEnumPins->Release();
 		hr = pGraphBuilder->Connect(pSplitterVideoOutPin, pInPin);
 		if (SUCCEEDED(hr))
@@ -615,8 +615,8 @@ HRESULT CMovieMan::BuildFilterGraphManually(
 			if (pSplitterAudioOutPin && pAudioFilter)
 			{
 				pAudioFilter->EnumPins(&pEnumPins);
-				pEnumPins->Next(1, &pInPin, NULL);
-				pEnumPins->Next(1, &pOutPin, NULL);
+				pEnumPins->Next(1, &pInPin, nullptr);
+				pEnumPins->Next(1, &pOutPin, nullptr);
 				pEnumPins->Release();
 				pGraphBuilder->Connect(pSplitterAudioOutPin, pInPin);
 				// 오디오 렌더는 실패해도 넘어갈 수 있음
@@ -653,7 +653,7 @@ HRESULT CMovieMan::BuildFilterGraphManually(
 }
 
 //#ifdef _DEBUG
-//HRESULT	CMovieMan::AddToRot(IGraphBuilder* pGraphBuilder, DWORD *pdwRegister)
+//HRESULT	CMovieMan::AddToRot(IGraphBuilder* pGraphBuilder, uint32_t *pdwRegister)
 //{
 //	assert(pGraphBuilder);
 //
@@ -675,7 +675,7 @@ HRESULT CMovieMan::BuildFilterGraphManually(
 //	return hr;
 //}
 //
-//void CMovieMan::RemoveFromRot(DWORD pdwRegister)
+//void CMovieMan::RemoveFromRot(uint32_t pdwRegister)
 //{
 //	IRunningObjectTable *pROT;
 //	if (SUCCEEDED(GetRunningObjectTable(0, &pROT))) {

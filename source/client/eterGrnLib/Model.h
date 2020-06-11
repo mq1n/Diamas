@@ -10,7 +10,7 @@ class CGrannyModel : public CReferenceObject
 	public:
 		typedef struct SMeshNode
 		{
-			int					iMesh;
+			int32_t					iMesh;
 			const CGrannyMesh * pMesh;
 			SMeshNode *			pNextMeshNode;
 		} TMeshNode;
@@ -25,18 +25,18 @@ class CGrannyModel : public CReferenceObject
 		void DestroyDeviceObjects();
 		void Destroy();
 
-		int GetRigidVertexCount() const;
-		int GetDeformVertexCount() const;
-		int GetVertexCount() const;
+		int32_t GetRigidVertexCount() const;
+		int32_t GetDeformVertexCount() const;
+		int32_t GetVertexCount() const;
 
 		bool CanDeformPNTVertices() const;
 		void DeformPNTVertices(void* dstBaseVertices, D3DXMATRIX* boneMatrices, const std::vector<granny_mesh_binding*>& c_rvct_pgrnMeshBinding) const;
 
-		int GetIdxCount();
-		int GetMeshCount() const;
-		CGrannyMesh * GetMeshPointer(int iMesh);
+		int32_t GetIdxCount();
+		int32_t GetMeshCount() const;
+		CGrannyMesh * GetMeshPointer(int32_t iMesh);
 		granny_model * GetGrannyModelPointer();
-		const CGrannyMesh* GetMeshPointer(int iMesh) const;
+		const CGrannyMesh* GetMeshPointer(int32_t iMesh) const;
 
 		LPDIRECT3DVERTEXBUFFER8 GetPNTD3DVertexBuffer() const;
 		LPDIRECT3DINDEXBUFFER8 GetD3DIndexBuffer() const;
@@ -54,8 +54,8 @@ class CGrannyModel : public CReferenceObject
 		bool LoadIndices();
 		void Initialize();
 
-		BOOL CheckMeshIndex(int iIndex) const;
-		void AppendMeshNode(CGrannyMesh::EType eMeshType, CGrannyMaterial::EType eMtrlType, int iMesh);
+		BOOL CheckMeshIndex(int32_t iIndex) const;
+		void AppendMeshNode(CGrannyMesh::EType eMeshType, CGrannyMaterial::EType eMtrlType, int32_t iMesh);
 
 	protected:
 		// Granny Data
@@ -70,13 +70,13 @@ class CGrannyModel : public CReferenceObject
 		TMeshNode *				m_meshNodes;
 		TMeshNode *				m_meshNodeLists[CGrannyMesh::TYPE_MAX_NUM][CGrannyMaterial::TYPE_MAX_NUM];
 
-		int						m_deformVtxCount;
-		int						m_rigidVtxCount;
-		int						m_vtxCount;
-		int						m_idxCount;
+		int32_t						m_deformVtxCount;
+		int32_t						m_rigidVtxCount;
+		int32_t						m_vtxCount;
+		int32_t						m_idxCount;
 
-		int						m_meshNodeSize;
-		int						m_meshNodeCapacity;
+		int32_t						m_meshNodeSize;
+		int32_t						m_meshNodeCapacity;
 
 		bool					m_canDeformPNVertices;
 		
@@ -91,7 +91,7 @@ class CGrannyModel : public CReferenceObject
 	protected:
 		bool __LoadVertices();
 	protected:
-		DWORD m_dwFvF;
+		uint32_t m_dwFvF;
 	// New members to support PNT2 type models
 	//////////////////////////////////////////////////////////////////////////
 

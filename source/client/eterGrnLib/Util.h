@@ -11,6 +11,6 @@ struct SMaterialData
 	CGraphicImage * pImage;
 	float fSpecularPower;
 	BOOL isSpecularEnable;	
-	BYTE bSphereMapIndex;
+	uint8_t bSphereMapIndex;
 };
 

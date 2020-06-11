@@ -12,36 +12,36 @@ class CPrivManager : public singleton<CPrivManager>
 	public:
 		CPrivManager();
 
-		void RequestGiveGuildPriv(DWORD guild_id, BYTE type, int value, time_t dur_time_sec);
-		void RequestGiveEmpirePriv(BYTE empire, BYTE type, int value, time_t dur_time_sec);
-		void RequestGiveCharacterPriv(DWORD pid, BYTE type, int value);
+		void RequestGiveGuildPriv(uint32_t guild_id, uint8_t type, int32_t value, time_t dur_time_sec);
+		void RequestGiveEmpirePriv(uint8_t empire, uint8_t type, int32_t value, time_t dur_time_sec);
+		void RequestGiveCharacterPriv(uint32_t pid, uint8_t type, int32_t value);
 
-		void GiveGuildPriv(DWORD guild_id, BYTE type, int value, BYTE bLog, time_t end_time_sec);
-		void GiveEmpirePriv(BYTE empire, BYTE type, int value, BYTE bLog, time_t end_time_sec);
-		void GiveCharacterPriv(DWORD pid, BYTE type, int value, BYTE bLog);
+		void GiveGuildPriv(uint32_t guild_id, uint8_t type, int32_t value, uint8_t bLog, time_t end_time_sec);
+		void GiveEmpirePriv(uint8_t empire, uint8_t type, int32_t value, uint8_t bLog, time_t end_time_sec);
+		void GiveCharacterPriv(uint32_t pid, uint8_t type, int32_t value, uint8_t bLog);
 
-		void RemoveGuildPriv(DWORD guild_id, BYTE type);
-		void RemoveEmpirePriv(BYTE empire, BYTE type);
-		void RemoveCharacterPriv(DWORD pid, BYTE type);
+		void RemoveGuildPriv(uint32_t guild_id, uint8_t type);
+		void RemoveEmpirePriv(uint8_t empire, uint8_t type);
+		void RemoveCharacterPriv(uint32_t pid, uint8_t type);
 
-		int GetPriv(LPCHARACTER ch, BYTE type);
-		int GetPrivByEmpire(BYTE bEmpire, BYTE type);
-		int GetPrivByGuild(DWORD guild_id, BYTE type);
-		int GetPrivByCharacter(DWORD pid, BYTE type);
+		int32_t GetPriv(LPCHARACTER ch, uint8_t type);
+		int32_t GetPrivByEmpire(uint8_t bEmpire, uint8_t type);
+		int32_t GetPrivByGuild(uint32_t guild_id, uint8_t type);
+		int32_t GetPrivByCharacter(uint32_t pid, uint8_t type);
 
 	public:
 		struct SPrivEmpireData
 		{
-			int m_value;
+			int32_t m_value;
 			time_t m_end_time_sec;
 		};
 
-		SPrivEmpireData* GetPrivByEmpireEx(BYTE bEmpire, BYTE type);
+		SPrivEmpireData* GetPrivByEmpireEx(uint8_t bEmpire, uint8_t type);
 
 		/// 길드 보너스 데이터
 		struct SPrivGuildData
 		{
-			int		value;		///< 보너스 수치
+			int32_t		value;		///< 보너스 수치
 			time_t	end_time_sec;	///< 지속 시간
 		};
 
@@ -49,13 +49,13 @@ class CPrivManager : public singleton<CPrivManager>
 		/**
 		 * @param [in]	dwGuildID 얻어올 길드의 ID
 		 * @param [in]	byType 보너스 타잎
-		 * @return	대상 길드의 길드 보너스 데이터의 포인터, 해당하는 보너스 타잎과 길드의 ID 에 대해 보너스 데이터가 없을 경우 NULL
+		 * @return	대상 길드의 길드 보너스 데이터의 포인터, 해당하는 보너스 타잎과 길드의 ID 에 대해 보너스 데이터가 없을 경우 nullptr
 		 */
-		const SPrivGuildData*	GetPrivByGuildEx( DWORD dwGuildID, BYTE byType ) const;
+		const SPrivGuildData*	GetPrivByGuildEx( uint32_t dwGuildID, uint8_t byType ) const;
 
 	private:
 		SPrivEmpireData m_aakPrivEmpireData[MAX_PRIV_NUM][EMPIRE_MAX_NUM];
-		std::map<DWORD, SPrivGuildData> m_aPrivGuild[MAX_PRIV_NUM];
-		std::map<DWORD, int> m_aPrivChar[MAX_PRIV_NUM];
+		std::map<uint32_t, SPrivGuildData> m_aPrivGuild[MAX_PRIV_NUM];
+		std::map<uint32_t, int32_t> m_aPrivChar[MAX_PRIV_NUM];
 };
 #endif

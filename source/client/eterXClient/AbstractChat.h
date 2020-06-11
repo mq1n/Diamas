@@ -8,5 +8,5 @@ class IAbstractChat : public TAbstractSingleton<IAbstractChat>
 		IAbstractChat() {}
 		virtual ~IAbstractChat() {}
 
-		virtual void AppendChat(int iType, const char * c_szChat) = 0;
+		virtual void AppendChat(int32_t iType, const char * c_szChat) = 0;
 };

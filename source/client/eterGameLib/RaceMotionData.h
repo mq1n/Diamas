@@ -222,7 +222,7 @@ class CRaceMotionData
 		static CRaceMotionData* New();
 		static void Delete(CRaceMotionData* pkData);
 
-		static void CreateSystem(UINT uCapacity);
+		static void CreateSystem(uint32_t uCapacity);
 		static void DestroySystem();
 
 	public:
@@ -232,12 +232,12 @@ class CRaceMotionData
 		void			Initialize();
 		void			Destroy();
 
-		void			SetName(UINT eName);
+		void			SetName(uint32_t eName);
 
-		UINT			GetType() const;		// 모션 타입 얻기
+		uint32_t			GetType() const;		// 모션 타입 얻기
 		bool			IsLock() const;			// 락된 모션 인가? (다른 모션에 캔슬되지 않음)
 
-		int				GetLoopCount() const;
+		int32_t				GetLoopCount() const;
 
 		const char *	GetMotionFileName() const;
 		const char *	GetSoundScriptFileName() const;
@@ -270,11 +270,11 @@ class CRaceMotionData
 		float			GetLoopEndTime() const;
 
 		// Motion Event Data
-		DWORD			GetMotionEventDataCount() const;
-		BOOL			GetMotionEventDataPointer(BYTE byIndex, const CRaceMotionData::TMotionEventData ** c_ppData) const;
-		BOOL			GetMotionAttackingEventDataPointer(BYTE byIndex, const CRaceMotionData::TMotionAttackingEventData ** c_ppMotionEventData) const;
-		int				GetEventType(DWORD dwIndex) const;
-		float			GetEventStartTime(DWORD dwIndex) const;
+		uint32_t			GetMotionEventDataCount() const;
+		BOOL			GetMotionEventDataPointer(uint8_t byIndex, const CRaceMotionData::TMotionEventData ** c_ppData) const;
+		BOOL			GetMotionAttackingEventDataPointer(uint8_t byIndex, const CRaceMotionData::TMotionAttackingEventData ** c_ppMotionEventData) const;
+		int32_t				GetEventType(uint32_t dwIndex) const;
+		float			GetEventStartTime(uint32_t dwIndex) const;
 
 		// Sound Data
 		const NSound::TSoundInstanceVector * GetSoundInstanceVectorPointer() const;
@@ -287,13 +287,13 @@ class CRaceMotionData
 		bool			LoadSoundScriptData(const char * c_szFileName);
 
 	protected:
-		void			SetType(UINT eType);
+		void			SetType(uint32_t eType);
 
 	protected:
-		UINT							m_eType;
-		UINT							m_eName;
+		uint32_t							m_eType;
+		uint32_t							m_eName;
 		BOOL							m_isLock;
-		int								m_iLoopCount;
+		int32_t								m_iLoopCount;
 
 		std::string						m_strMotionFileName;
 		std::string						m_strSoundScriptDataFileName;

@@ -155,9 +155,9 @@ void Sphere::Compute(const SphereInterface &source)
   zmin.Set(BIGNUMBER,BIGNUMBER,BIGNUMBER);
   zmax.Set(-BIGNUMBER,-BIGNUMBER,-BIGNUMBER);
 
-  int count = source.GetVertexCount();
+  int32_t count = source.GetVertexCount();
 
-  for (int i=0; i<count; i++)
+  for (int32_t i=0; i<count; i++)
 	{
     Vector3d caller_p;
     source.GetVertex(i,caller_p);
@@ -220,7 +220,7 @@ void Sphere::Compute(const SphereInterface &source)
 
   /* SECOND PASS: increment current sphere */
 
-  for (int j=0; j<count; j++)
+  for (int32_t j=0; j<count; j++)
 	{
     Vector3d caller_p;
     source.GetVertex(j,caller_p);

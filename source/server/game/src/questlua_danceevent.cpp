@@ -25,11 +25,11 @@ namespace quest
 		};
 	};
 
-	int dance_event_go_home( lua_State* L )
+	int32_t dance_event_go_home( lua_State* L )
 	{
 		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap( 115 );
 
-		if ( pSecMap != NULL )
+		if ( pSecMap != nullptr )
 		{
 			FWarpToHome f;
 			pSecMap->for_each( f );
@@ -44,7 +44,7 @@ namespace quest
 		{
 			{ "gohome",		dance_event_go_home	},
 
-			{	NULL,	NULL}
+			{	nullptr,	nullptr}
 		};
 		
 		CQuestManager::instance().AddLuaFunctionTable("dance_event", dance_event_functions);

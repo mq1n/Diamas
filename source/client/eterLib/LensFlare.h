@@ -40,7 +40,7 @@
 
 const   float	c_fHalfMaxBright = 0.45f;
 const   float	c_fDistanceScale = 1.0f;
-const   int     c_nDepthTestDimension = 15;
+const   int32_t     c_nDepthTestDimension = 15;
 
 
 ///////////////////////////////////////////////////////////////////////  
@@ -49,7 +49,7 @@ const   int     c_nDepthTestDimension = 15;
 class CFlare 
 {
 public:
-	void Draw(float fBrightScale, int nWidth, int nHeight, int nX, int nY);
+	void Draw(float fBrightScale, int32_t nWidth, int32_t nHeight, int32_t nX, int32_t nY);
 	void Init(std::string strPath);
 	
 	CFlare();
@@ -61,7 +61,7 @@ private:
 		SFlarePiece() :
 	m_fPosition(0.0f),
 		m_fWidth(0.0f),
-		m_pColor(NULL)
+		m_pColor(nullptr)
 	{
 	}
 	CGraphicImageInstance m_imageInstance;

@@ -14,22 +14,22 @@ public:
 	void Clear();
 	bool Begin();
 	void End();
-	void Show(HWND hWnd = NULL);
+	void Show(HWND hWnd = nullptr);
 	void Show(RECT * pSrcRect);
 	void Show(RECT * pSrcRect, HWND hWnd);
 
 	void RenderLine2d(float sx, float sy, float ex, float ey, float z=0.0f);
 	void RenderBox2d(float sx, float sy, float ex, float ey, float z=0.0f);
 	void RenderBar2d(float sx, float sy, float ex, float ey, float z=0.0f);
-	void RenderGradationBar2d(float sx, float sy, float ex, float ey, DWORD dwStartColor, DWORD dwEndColor, float ez=0.0f);
-	void RenderCircle2d(float fx, float fy, float fz, float fRadius, int iStep = 50);
-	void RenderCircle3d(float fx, float fy, float fz, float fRadius, int iStep = 50);
+	void RenderGradationBar2d(float sx, float sy, float ex, float ey, uint32_t dwStartColor, uint32_t dwEndColor, float ez=0.0f);
+	void RenderCircle2d(float fx, float fy, float fz, float fRadius, int32_t iStep = 50);
+	void RenderCircle3d(float fx, float fy, float fz, float fRadius, int32_t iStep = 50);
 
 	void RenderLine3d(float sx, float sy, float sz, float ex, float ey, float ez);
 	void RenderBox3d(float sx, float sy, float sz, float ex, float ey, float ez);
 	void RenderBar3d(float sx, float sy, float sz, float ex, float ey, float ez);
 	void RenderBar3d(const D3DXVECTOR3 * c_pv3Positions);
-	void RenderGradationBar3d(float sx, float sy, float sz, float ex, float ey, float ez, DWORD dwStartColor, DWORD dwEndColor);
+	void RenderGradationBar3d(float sx, float sy, float sz, float ex, float ey, float ez, uint32_t dwStartColor, uint32_t dwEndColor);
 
 	void RenderLineCube(float sx, float sy, float sz, float ex, float ey, float ez);
 	void RenderCube(float sx, float sy, float sz, float ex, float ey, float ez);
@@ -49,13 +49,13 @@ public:
 	void SetBlendOperation();
 	void SetOneColorOperation(D3DXCOLOR & rColor);
 	void SetAddColorOperation(D3DXCOLOR & rColor);
-	void SetDiffuseColor(DWORD diffuseColor);
+	void SetDiffuseColor(uint32_t diffuseColor);
 	void SetDiffuseColor(float r, float g, float b, float a=1.0f);
 	void SetClearColor(float r, float g, float b, float a=1.0f);
 	void SetClearDepth(float depth);
-	void SetClearStencil(DWORD stencil);
+	void SetClearStencil(uint32_t stencil);
 
-	void SetCursorPosition(int x, int y, int hres, int vres);	// creates picking ray
+	void SetCursorPosition(int32_t x, int32_t y, int32_t hres, int32_t vres);	// creates picking ray
 	bool GetCursorPosition(float* px, float* py, float* pz);
 	bool GetCursorXYPosition(float* px, float* py);
 	bool GetCursorZPosition(float* pz); 
@@ -73,9 +73,9 @@ public:
 	static Frustum & GetFrustum() { return ms_frustum; }
 
 protected:
-	static DWORD		ms_diffuseColor;
-	static DWORD		ms_clearColor;
-	static DWORD		ms_clearStencil;
+	static uint32_t		ms_diffuseColor;
+	static uint32_t		ms_clearColor;
+	static uint32_t		ms_clearStencil;
 	static float		ms_clearDepth;
 
 	static Frustum ms_frustum;

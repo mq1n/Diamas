@@ -15,7 +15,7 @@ class CGrannyMotion
 
 		const char *		GetName() const;
 		float				GetDuration() const;
-		void				GetTextTrack(const char * c_szTextTrackName, int * pCount, float * pArray) const;
+		void				GetTextTrack(const char * c_szTextTrackName, int32_t * pCount, float * pArray) const;
 
 	protected:
 		void				Initialize();

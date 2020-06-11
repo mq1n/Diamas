@@ -44,9 +44,9 @@ class CMapManager : public CScreen, public IPhysicsWorld
 		void					UpdateAroundAmbience(float fx, float fy, float fz);
 		float					GetHeight(float fx, float fy);
 		float					GetTerrainHeight(float fx, float fy);
-		bool					GetWaterHeight(int iX, int iY, long * plWaterHeight);
+		bool					GetWaterHeight(int32_t iX, int32_t iY, int32_t * plWaterHeight);
 		
-		bool					GetNormal(int ix, int iy, D3DXVECTOR3 * pv3Normal);
+		bool					GetNormal(int32_t ix, int32_t iy, D3DXVECTOR3 * pv3Normal);
 
 		//////////////////////////////////////////////////////////////////////////
 		// Environment
@@ -56,38 +56,38 @@ class CMapManager : public CScreen, public IPhysicsWorld
 		//        MapManager에 TimeControl 부분을 구현하도록 한다. - [levites]
 		void					SetEnvironmentDataPtr(const TEnvironmentData * c_pEnvironmentData);
 		void					ResetEnvironmentDataPtr(const TEnvironmentData * c_pEnvironmentData);
-		void					SetEnvironmentData(int nEnvDataIndex);
+		void					SetEnvironmentData(int32_t nEnvDataIndex);
 
 		void					BeginEnvironment();
 		void					EndEnvironment();
 
-		void					BlendEnvironmentData(const TEnvironmentData * c_pEnvironmentData, int iTransitionTime);
+		void					BlendEnvironmentData(const TEnvironmentData * c_pEnvironmentData, int32_t iTransitionTime);
 
 		void					GetCurrentEnvironmentData(const TEnvironmentData ** c_ppEnvironmentData);
-		bool					RegisterEnvironmentData(DWORD dwIndex, const char * c_szFileName);
-		bool					GetEnvironmentData(DWORD dwIndex, const TEnvironmentData ** c_ppEnvironmentData);
+		bool					RegisterEnvironmentData(uint32_t dwIndex, const char * c_szFileName);
+		bool					GetEnvironmentData(uint32_t dwIndex, const TEnvironmentData ** c_ppEnvironmentData);
 
 		// Portal
 		void					RefreshPortal();
 		void					ClearPortal();
-		void					AddShowingPortalID(int iID);
+		void					AddShowingPortalID(int32_t iID);
 
 		// External interface
 		void					LoadProperty();
 
-		DWORD					GetShadowMapColor(float fx, float fy);
+		uint32_t					GetShadowMapColor(float fx, float fy);
 
 		// VICITM_COLLISION_TEST
 		virtual bool isPhysicalCollision(const D3DXVECTOR3 & c_rvCheckPosition);
 		// VICITM_COLLISION_TEST_END
 		
-		bool					isAttrOn(float fX, float fY, BYTE byAttr);
-		bool					GetAttr(float fX, float fY, BYTE * pbyAttr);
-		bool					isAttrOn(int iX, int iY, BYTE byAttr);
-		bool					GetAttr(int iX, int iY, BYTE * pbyAttr);
+		bool					isAttrOn(float fX, float fY, uint8_t byAttr);
+		bool					GetAttr(float fX, float fY, uint8_t * pbyAttr);
+		bool					isAttrOn(int32_t iX, int32_t iY, uint8_t byAttr);
+		bool					GetAttr(int32_t iX, int32_t iY, uint8_t * pbyAttr);
 
-		std::vector<int> &		GetRenderedSplatNum(int * piPatch, int * piSplat, float * pfSplatRatio);
-		CArea::TCRCWithNumberVector & GetRenderedGraphicThingInstanceNum(DWORD * pdwGraphicThingInstanceNum, DWORD * pdwCRCNum);
+		std::vector<int32_t> &		GetRenderedSplatNum(int32_t * piPatch, int32_t * piSplat, float * pfSplatRatio);
+		CArea::TCRCWithNumberVector & GetRenderedGraphicThingInstanceNum(uint32_t * pdwGraphicThingInstanceNum, uint32_t * pdwCRCNum);
 
 	protected:
 		TEnvironmentData *		AllocEnvironmentData();
@@ -116,7 +116,7 @@ class CMapManager : public CScreen, public IPhysicsWorld
 		void	SetTerrainRenderSort(CMapOutdoor::ETerrainRenderSort eTerrainRenderSort);
 		CMapOutdoor::ETerrainRenderSort	GetTerrainRenderSort();
 		
-		void	GetBaseXY(DWORD * pdwBaseX, DWORD * pdwBaseY);
+		void	GetBaseXY(uint32_t * pdwBaseX, uint32_t * pdwBaseY);
 		
 	public:
 		void	SetTransparentTree(bool bTransparenTree);
@@ -125,12 +125,12 @@ class CMapManager : public CScreen, public IPhysicsWorld
 		typedef struct 
 		{
 			std::string	m_strName;
-			DWORD		m_dwBaseX;
-			DWORD		m_dwBaseY;
-			DWORD		m_dwSizeX;
-			DWORD		m_dwSizeY;
-			DWORD		m_dwEndX;
-			DWORD		m_dwEndY;
+			uint32_t		m_dwBaseX;
+			uint32_t		m_dwBaseY;
+			uint32_t		m_dwSizeX;
+			uint32_t		m_dwSizeY;
+			uint32_t		m_dwEndX;
+			uint32_t		m_dwEndY;
 		} TMapInfo;
 		typedef std::vector<TMapInfo>		TMapInfoVector;
 		typedef TMapInfoVector::iterator	TMapInfoVectorIterator;

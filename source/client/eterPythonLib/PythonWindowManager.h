@@ -9,7 +9,7 @@ namespace UI
 		public:
 			typedef std::map<std::string, CWindow *> TLayerContainer;
 			typedef std::list<CWindow *> TWindowContainer;
-			typedef std::map<int, CWindow *> TKeyCaptureWindowMap;
+			typedef std::map<int32_t, CWindow *> TKeyCaptureWindowMap;
 
 		public:
 			CWindowManager();
@@ -18,19 +18,19 @@ namespace UI
 			void		Destroy();
 
 			float		GetAspect();
-			void		SetScreenSize(long lWidth, long lHeight);
-			void		SetResolution(int hres, int vres);
+			void		SetScreenSize(int32_t lWidth, int32_t lHeight);
+			void		SetResolution(int32_t hres, int32_t vres);
 
-			void		GetResolution(long & rx, long & ry)
+			void		GetResolution(int32_t & rx, int32_t & ry)
 			{
 				rx=m_iHres;
 				ry=m_iVres;
 			}
 
 			void		SetMouseHandler(PyObject * poMouseHandler);
-			long		GetScreenWidth()		{ return m_lWidth; }
-			long		GetScreenHeight()		{ return m_lHeight; }
-			void		GetMousePosition(long & rx, long & ry);
+			int32_t		GetScreenWidth()		{ return m_lWidth; }
+			int32_t		GetScreenHeight()		{ return m_lHeight; }
+			void		GetMousePosition(int32_t & rx, int32_t & ry);
 			BOOL		IsDragging();
 
 			CWindow *	GetLockWindow()		{ return m_pLockWindow; }
@@ -63,7 +63,7 @@ namespace UI
 			};
 
 			CWindow *	RegisterWindow(PyObject * po, const char * c_szLayer);
-			CWindow *	RegisterTypeWindow(PyObject * po, DWORD dwWndType, const char * c_szLayer);
+			CWindow *	RegisterTypeWindow(PyObject * po, uint32_t dwWndType, const char * c_szLayer);
 
 			CWindow *	RegisterSlotWindow(PyObject * po, const char * c_szLayer);
 			CWindow *	RegisterGridSlotWindow(PyObject * po, const char * c_szLayer);
@@ -87,11 +87,11 @@ namespace UI
 
 			// Attaching Icon
 			BOOL		IsAttaching();
-			DWORD		GetAttachingType();
-			DWORD		GetAttachingIndex();
-			DWORD		GetAttachingSlotNumber();
-			void		GetAttachingIconSize(BYTE * pbyWidth, BYTE * pbyHeight);
-			void		AttachIcon(DWORD dwType, DWORD dwIndex, DWORD dwSlotNumber, BYTE byWidth, BYTE byHeight);
+			uint32_t		GetAttachingType();
+			uint32_t		GetAttachingIndex();
+			uint32_t		GetAttachingSlotNumber();
+			void		GetAttachingIconSize(uint8_t * pbyWidth, uint8_t * pbyHeight);
+			void		AttachIcon(uint32_t dwType, uint32_t dwIndex, uint32_t dwSlotNumber, uint8_t byWidth, uint8_t byHeight);
 			void		DeattachIcon();
 			void		SetAttachingFlag(BOOL bFlag);
 			// Attaching Icon
@@ -110,63 +110,63 @@ namespace UI
 			void		Update();
 			void		Render();
 
-			void		RunMouseMove(long x, long y);
-			void		RunMouseLeftButtonDown(long x, long y);
-			void		RunMouseLeftButtonUp(long x, long y);
-			void		RunMouseLeftButtonDoubleClick(long x, long y);
-			void		RunMouseRightButtonDown(long x, long y);
-			void		RunMouseRightButtonUp(long x, long y);
-			void		RunMouseRightButtonDoubleClick(long x, long y);
-			void		RunMouseMiddleButtonDown(long x, long y);
-			void		RunMouseMiddleButtonUp(long x, long y);
+			void		RunMouseMove(int32_t x, int32_t y);
+			void		RunMouseLeftButtonDown(int32_t x, int32_t y);
+			void		RunMouseLeftButtonUp(int32_t x, int32_t y);
+			void		RunMouseLeftButtonDoubleClick(int32_t x, int32_t y);
+			void		RunMouseRightButtonDown(int32_t x, int32_t y);
+			void		RunMouseRightButtonUp(int32_t x, int32_t y);
+			void		RunMouseRightButtonDoubleClick(int32_t x, int32_t y);
+			void		RunMouseMiddleButtonDown(int32_t x, int32_t y);
+			void		RunMouseMiddleButtonUp(int32_t x, int32_t y);
 #ifdef ENABLE_MOUSEWHEEL_EVENT
-			bool		RunMouseWheelScroll(long x, long y , short wDelta);
+			bool		RunMouseWheelScroll(int32_t x, int32_t y , int16_t wDelta);
 #endif
 
 			void		RunIMEUpdate();
 			void		RunIMETabEvent();
 			void		RunIMEReturnEvent();
-			void		RunIMEKeyDown(int vkey);
+			void		RunIMEKeyDown(int32_t vkey);
 			void		RunChangeCodePage();
 			void		RunOpenCandidate();
 			void		RunCloseCandidate();
 			void		RunOpenReading();
 			void		RunCloseReading();
 
-			void		RunKeyDown(int vkey);
-			void		RunKeyUp(int vkey);
+			void		RunKeyDown(int32_t vkey);
+			void		RunKeyUp(int32_t vkey);
 			void		RunPressEscapeKey();
 			void		RunPressExitKey();
 
 		private:
-			void		SetMousePosition(long x, long y);
-			CWindow *	__PickWindow(long x, long y);
+			void		SetMousePosition(int32_t x, int32_t y);
+			CWindow *	__PickWindow(int32_t x, int32_t y);
 			
-			CWindow *	__NewWindow(PyObject * po, DWORD dwWndType);
+			CWindow *	__NewWindow(PyObject * po, uint32_t dwWndType);
 			void		__ClearReserveDeleteWindowList();
 
 		private:
-			long					m_lWidth;
-			long					m_lHeight;
+			int32_t					m_lWidth;
+			int32_t					m_lHeight;
 
-			int						m_iVres;
-			int						m_iHres;
+			int32_t						m_iVres;
+			int32_t						m_iHres;
 
-			long					m_lMouseX, m_lMouseY;
-			long					m_lDragX, m_lDragY;
-			long					m_lPickedX, m_lPickedY;
+			int32_t					m_lMouseX, m_lMouseY;
+			int32_t					m_lDragX, m_lDragY;
+			int32_t					m_lPickedX, m_lPickedY;
 
 			BOOL					m_bOnceIgnoreMouseLeftButtonUpEventFlag;
-			int						m_iIgnoreEndTime;
+			int32_t						m_iIgnoreEndTime;
 
 			// Attaching Icon
 			PyObject *				m_poMouseHandler;
 			BOOL					m_bAttachingFlag;
-			DWORD					m_dwAttachingType;
-			DWORD					m_dwAttachingIndex;
-			DWORD					m_dwAttachingSlotNumber;
-			BYTE					m_byAttachingIconWidth;
-			BYTE					m_byAttachingIconHeight;
+			uint32_t					m_dwAttachingType;
+			uint32_t					m_dwAttachingIndex;
+			uint32_t					m_dwAttachingSlotNumber;
+			uint8_t					m_byAttachingIconWidth;
+			uint8_t					m_byAttachingIconHeight;
 			// Attaching Icon
 
 			CWindow	*				m_pActiveWindow;

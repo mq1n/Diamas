@@ -15,7 +15,7 @@ public:
 	LPSTR Find( LPCSTR lpszKeyName );
 	BOOL Put( LPCSTR lpBuffer );
 	BOOL Put( LPCSTR lpszKeyName, LPCSTR lpBuffer );
-	BOOL Get( LPCSTR lpszKeyName, LPSTR lpBuffer, DWORD nSize );
+	BOOL Get( LPCSTR lpszKeyName, LPSTR lpBuffer, uint32_t nSize );
 
 protected:
 	typedef std::list<CHAR *>	StrList;
@@ -25,7 +25,7 @@ protected:
 	StrList m_StrList;
 };
 
-CPostIt::CPostIt( LPCSTR szAppName ) : m_pMemoryBlock(NULL), m_bModified(FALSE)
+CPostIt::CPostIt( LPCSTR szAppName ) : m_pMemoryBlock(nullptr), m_bModified(FALSE)
 {
 	Init( szAppName );
 }
@@ -37,7 +37,7 @@ CPostIt::~CPostIt( void )
 
 BOOL CPostIt::Init( LPCSTR szAppName )
 {
-	if( szAppName == NULL || !*szAppName ) {
+	if( szAppName == nullptr || !*szAppName ) {
 		strcpy( m_szClipFormatName, "YMCF" );
 	} else {
 		strcpy( m_szClipFormatName, "YMCF_" );
@@ -48,10 +48,10 @@ BOOL CPostIt::Init( LPCSTR szAppName )
 
 BOOL CPostIt::CopyTo( CPostIt *pPostIt, LPCSTR lpszKeyName )
 {
-	if( m_pMemoryBlock == NULL )
+	if( m_pMemoryBlock == nullptr )
 		return FALSE;
 	LPSTR szText = m_pMemoryBlock->Find( lpszKeyName );
-	if( szText == NULL )
+	if( szText == nullptr )
 		return FALSE;
 	return pPostIt->Set( szText );
 }
@@ -60,15 +60,15 @@ BOOL CPostIt::Flush( void )
 {
 	if( m_bModified == FALSE )
 		return FALSE;
-	if( m_pMemoryBlock == NULL )
+	if( m_pMemoryBlock == nullptr )
 		return FALSE;
-	UINT	uDGPFormat;
+	uint32_t	uDGPFormat;
 
 	uDGPFormat = ::RegisterClipboardFormatA( m_szClipFormatName );
-	if( ::OpenClipboard( NULL ) == FALSE )
+	if( ::OpenClipboard( nullptr ) == FALSE )
 		return FALSE;
-	if( ::SetClipboardData( uDGPFormat, m_pMemoryBlock->CreateHandle() ) == NULL ) {
-//		DWORD dwLastError = ::GetLastError();
+	if( ::SetClipboardData( uDGPFormat, m_pMemoryBlock->CreateHandle() ) == nullptr ) {
+//		uint32_t dwLastError = ::GetLastError();
 		m_pMemoryBlock->DestroyHandle();
 		::CloseClipboard();
 		m_bModified = FALSE;
@@ -83,15 +83,15 @@ void CPostIt::Empty( void )
 {
 	SAFE_DELETE( m_pMemoryBlock );
 
-	UINT	uDGPFormat;
+	uint32_t	uDGPFormat;
 
 	uDGPFormat = ::RegisterClipboardFormatA( m_szClipFormatName );
-	if( ::OpenClipboard( NULL ) == FALSE )
+	if( ::OpenClipboard( nullptr ) == FALSE )
 		return;
 	HANDLE hClipboardMemory = ::GetClipboardData( uDGPFormat );
 	if( hClipboardMemory ) {
 //		::GlobalFree( hClipboardMemory );
-		::SetClipboardData( uDGPFormat, NULL );
+		::SetClipboardData( uDGPFormat, nullptr );
 	}
 	::CloseClipboard();
 
@@ -106,14 +106,14 @@ void CPostIt::Destroy( void )
 
 BOOL CPostIt::Set( LPCSTR lpszKeyName, LPCSTR lpBuffer )
 {
-	if( m_pMemoryBlock == NULL )
+	if( m_pMemoryBlock == nullptr )
 		m_pMemoryBlock = new _CPostItMemoryBlock;
 	m_pMemoryBlock->Put( lpszKeyName, lpBuffer );
 	m_bModified = TRUE;
 	return TRUE;
 }
 
-BOOL CPostIt::Set( LPCSTR lpszKeyName, DWORD dwValue )
+BOOL CPostIt::Set( LPCSTR lpszKeyName, uint32_t dwValue )
 {
 	CHAR szValue[12];
 
@@ -123,27 +123,27 @@ BOOL CPostIt::Set( LPCSTR lpszKeyName, DWORD dwValue )
 
 BOOL CPostIt::Set( LPCSTR lpBuffer )
 {
-	if( lpBuffer == NULL )
+	if( lpBuffer == nullptr )
 		return FALSE;
-	if( m_pMemoryBlock == NULL )
+	if( m_pMemoryBlock == nullptr )
 		m_pMemoryBlock = new _CPostItMemoryBlock;
 	m_pMemoryBlock->Put( lpBuffer );
 	m_bModified = TRUE;
 	return TRUE;
 }
 
-BOOL CPostIt::Get( LPCSTR lpszKeyName, LPSTR lpBuffer, DWORD nSize )
+BOOL CPostIt::Get( LPCSTR lpszKeyName, LPSTR lpBuffer, uint32_t nSize )
 {
-	if( m_pMemoryBlock == NULL ) {
-		UINT	uDGPFormat;
+	if( m_pMemoryBlock == nullptr ) {
+		uint32_t	uDGPFormat;
 
 		uDGPFormat = ::RegisterClipboardFormatA( m_szClipFormatName );
-		if( ::OpenClipboard( NULL ) == FALSE )
+		if( ::OpenClipboard( nullptr ) == FALSE )
 			return FALSE;
 
 		HANDLE hClipboardMemory = ::GetClipboardData( uDGPFormat );
 
-		if( hClipboardMemory == NULL ) {
+		if( hClipboardMemory == nullptr ) {
 			::CloseClipboard();
 			return FALSE;
 		}
@@ -156,7 +156,7 @@ BOOL CPostIt::Get( LPCSTR lpszKeyName, LPSTR lpBuffer, DWORD nSize )
 	return m_pMemoryBlock->Get( lpszKeyName, lpBuffer, nSize );
 }
 
-_CPostItMemoryBlock::_CPostItMemoryBlock( void ) : m_hHandle( NULL )
+_CPostItMemoryBlock::_CPostItMemoryBlock( void ) : m_hHandle( nullptr )
 {
 }
 
@@ -171,15 +171,15 @@ _CPostItMemoryBlock::~_CPostItMemoryBlock( void )
 
 BOOL _CPostItMemoryBlock::Assign( HANDLE hBlock )
 {
-	if( hBlock == NULL || hBlock == INVALID_HANDLE_VALUE )
+	if( hBlock == nullptr || hBlock == INVALID_HANDLE_VALUE )
 		return FALSE;
 	LPBYTE lpBuffer = (LPBYTE) ::GlobalLock( hBlock );
 
-	if( lpBuffer == NULL )
+	if( lpBuffer == nullptr )
 		return FALSE;
-	DWORD dwCount = *((LPDWORD) lpBuffer);				lpBuffer += sizeof( DWORD );
-	for( DWORD dwI=0; dwI < dwCount; dwI++ ) {
-		WORD	wLen = *((LPWORD) lpBuffer);			lpBuffer += sizeof( WORD );
+	uint32_t dwCount = *((LPDWORD) lpBuffer);				lpBuffer += sizeof( uint32_t );
+	for( uint32_t dwI=0; dwI < dwCount; dwI++ ) {
+		uint16_t	wLen = *((LPWORD) lpBuffer);			lpBuffer += sizeof( uint16_t );
 
 		LPSTR	lpszText = new CHAR[ wLen + 1 ];
 		::CopyMemory( lpszText, lpBuffer, wLen );
@@ -197,26 +197,26 @@ HANDLE _CPostItMemoryBlock::CreateHandle( void )
 {
 	if( m_StrList.size() == 0 )
 		return INVALID_HANDLE_VALUE;
-	DWORD dwBlockSize = sizeof( DWORD );
+	uint32_t dwBlockSize = sizeof( uint32_t );
 	StrListItr itr;
 
 	// Calculation for Memory Block Size
 	for( itr = m_StrList.begin(); itr != m_StrList.end(); ++itr ) {
-		dwBlockSize += sizeof( WORD );
-		dwBlockSize += (DWORD) strlen( *itr );
+		dwBlockSize += sizeof( uint16_t );
+		dwBlockSize += (uint32_t) strlen( *itr );
 	}
 
 	HANDLE hBlock = ::GlobalAlloc( GMEM_ZEROINIT | GMEM_MOVEABLE, dwBlockSize );
-	if( hBlock == NULL )
+	if( hBlock == nullptr )
 		return INVALID_HANDLE_VALUE;
 	LPBYTE lpBuffer = (LPBYTE) ::GlobalLock( hBlock );
-	if( lpBuffer == NULL ) {
+	if( lpBuffer == nullptr ) {
 		::GlobalFree( hBlock );
 		return INVALID_HANDLE_VALUE;
 	}
-	*((LPDWORD) lpBuffer) = (DWORD) m_StrList.size();	lpBuffer += sizeof( DWORD );
+	*((LPDWORD) lpBuffer) = (uint32_t) m_StrList.size();	lpBuffer += sizeof( uint32_t );
 	for( itr = m_StrList.begin(); itr != m_StrList.end(); ++itr ) {
-		*((LPWORD) lpBuffer) = (WORD) strlen( *itr );	lpBuffer += sizeof( WORD );
+		*((LPWORD) lpBuffer) = (uint16_t) strlen( *itr );	lpBuffer += sizeof( uint16_t );
 		::CopyMemory( lpBuffer, *itr, strlen( *itr ) );	lpBuffer += strlen( *itr );
 	}
 	::GlobalUnlock( hBlock );
@@ -228,7 +228,7 @@ HANDLE _CPostItMemoryBlock::CreateHandle( void )
 BOOL _CPostItMemoryBlock::DestroyHandle( void )
 {
 	::GlobalFree( m_hHandle );
-	m_hHandle = NULL;
+	m_hHandle = nullptr;
 	return TRUE;
 }
 
@@ -243,14 +243,14 @@ LPSTR _CPostItMemoryBlock::Find( LPCSTR lpszKeyName )
 			continue;
 		return lpszText;
 	}
-	return NULL;
+	return nullptr;
 }
 
 BOOL _CPostItMemoryBlock::Put( LPCSTR lpszKeyName, LPCSTR lpBuffer )
 {
 	LPSTR	lpszText;
 
-	if( (lpszText = Find( lpszKeyName )) != NULL ) {
+	if( (lpszText = Find( lpszKeyName )) != nullptr ) {
 		for( StrListItr itr = m_StrList.begin(); itr != m_StrList.end(); ++itr ) {
 			if( lpszText == *itr ) {
 				SAFE_DELETE_ARRAY( lpszText );
@@ -259,7 +259,7 @@ BOOL _CPostItMemoryBlock::Put( LPCSTR lpszKeyName, LPCSTR lpBuffer )
 			}
 		}
 	}
-	if( lpBuffer == NULL || !*lpBuffer )
+	if( lpBuffer == nullptr || !*lpBuffer )
 		return TRUE;
 	size_t nStrLen	= strlen( lpszKeyName ) + 1 /* '=' */ + strlen( lpBuffer );
 	lpszText = new CHAR[ nStrLen + 1 ];
@@ -276,7 +276,7 @@ BOOL _CPostItMemoryBlock::Put( LPCSTR lpBuffer )
 {
 	LPSTR	lpszText;
 
-	if( lpBuffer == NULL || !*lpBuffer )
+	if( lpBuffer == nullptr || !*lpBuffer )
 		return TRUE;
 	size_t nStrLen	= strlen( lpBuffer );
 	lpszText = new CHAR[ nStrLen + 1 ];
@@ -287,10 +287,10 @@ BOOL _CPostItMemoryBlock::Put( LPCSTR lpBuffer )
 	return TRUE;
 }
 
-BOOL _CPostItMemoryBlock::Get( LPCSTR lpszKeyName, LPSTR lpBuffer, DWORD nSize )
+BOOL _CPostItMemoryBlock::Get( LPCSTR lpszKeyName, LPSTR lpBuffer, uint32_t nSize )
 {
 	LPSTR lpszText = Find( lpszKeyName );
-	if( lpszText == NULL )
+	if( lpszText == nullptr )
 		return FALSE;
 	lpszText += (strlen( lpszKeyName ) + 1);
 	::ZeroMemory( lpBuffer, nSize );

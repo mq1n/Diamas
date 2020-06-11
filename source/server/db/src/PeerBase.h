@@ -21,7 +21,7 @@ class CPeerBase : public CNetBase
 
     public:
 	bool		Accept(socket_t accept_fd);
-	bool		Connect(const char* host, WORD port);
+	bool		Connect(const char* host, uint16_t port);
 	void		Close();
 
     public:
@@ -33,29 +33,29 @@ class CPeerBase : public CNetBase
 
 	socket_t	GetFd() { return m_fd; }
 
-	void		EncodeBYTE(BYTE b);
-	void		EncodeWORD(WORD w);
-	void		EncodeDWORD(DWORD dw);
-	void		Encode(const void* data, DWORD size);
-	int		Send();
+	void		EncodeBYTE(uint8_t b);
+	void		EncodeWORD(uint16_t w);
+	void		EncodeDWORD(uint32_t dw);
+	void		Encode(const void* data, uint32_t size);
+	int32_t		Send();
 
-	int		Recv();
-	void		RecvEnd(int proceed_bytes);
-	int		GetRecvLength();
+	int32_t		Recv();
+	void		RecvEnd(int32_t proceed_bytes);
+	int32_t		GetRecvLength();
 	const void *	GetRecvBuffer();
 
-	int		GetSendLength();
+	int32_t		GetSendLength();
 
 	const char *	GetHost() { return m_host; }
-	WORD	GetPort() { return m_wPort; }
+	uint16_t	GetPort() { return m_wPort; }
 
     protected:
 	char		m_host[MAX_HOST_LENGTH + 1];
 	socket_t	m_fd;
-	WORD		m_wPort;
+	uint16_t		m_wPort;
 
     private:
-	int		m_BytesRemain;
+	int32_t		m_BytesRemain;
 	LPBUFFER	m_outBuffer;
 	LPBUFFER	m_inBuffer;
 };

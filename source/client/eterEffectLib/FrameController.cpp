@@ -5,7 +5,7 @@ void CFrameController::Update(float fElapsedTime)
 {
 	m_fLastFrameTime -= fElapsedTime;
 
-	for (int i = 0; i < 20; ++i)
+	for (int32_t i = 0; i < 20; ++i)
 	{
 		if (m_fLastFrameTime < 0.0f)
 		{
@@ -36,17 +36,17 @@ void CFrameController::Update(float fElapsedTime)
 	}
 }
 
-void CFrameController::SetCurrentFrame(DWORD dwFrame)
+void CFrameController::SetCurrentFrame(uint32_t dwFrame)
 {
 	m_dwcurFrame = dwFrame;
 }
 
-BYTE CFrameController::GetCurrentFrame()
+uint8_t CFrameController::GetCurrentFrame()
 {
 	return m_dwcurFrame;
 }
 
-void CFrameController::SetMaxFrame(DWORD dwMaxFrame)
+void CFrameController::SetMaxFrame(uint32_t dwMaxFrame)
 {
 	m_dwMaxFrame = dwMaxFrame;
 }
@@ -55,7 +55,7 @@ void CFrameController::SetFrameTime(float fTime)
 	m_fFrameTime = fTime;
 	m_fLastFrameTime = fTime;
 }
-void CFrameController::SetStartFrame(DWORD dwStartFrame)
+void CFrameController::SetStartFrame(uint32_t dwStartFrame)
 {
 	m_dwStartFrame = dwStartFrame;
 }
@@ -65,7 +65,7 @@ void CFrameController::SetLoopFlag(BOOL bFlag)
 	m_isLoop = bFlag;
 }
 
-void CFrameController::SetLoopCount(int iLoopCount)
+void CFrameController::SetLoopCount(int32_t iLoopCount)
 {
 	m_iLoopCount = iLoopCount;
 }
@@ -75,7 +75,7 @@ void CFrameController::SetActive(BOOL bFlag)
 	m_isActive = bFlag;
 }
 
-BOOL CFrameController::isActive(DWORD dwMainFrame)
+BOOL CFrameController::isActive(uint32_t dwMainFrame)
 {
 	if (dwMainFrame < m_dwStartFrame)
 		return FALSE;

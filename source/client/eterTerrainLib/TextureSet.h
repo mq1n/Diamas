@@ -5,7 +5,7 @@
 
 typedef struct STerrainTexture
 {
-	STerrainTexture() :	pd3dTexture(NULL),
+	STerrainTexture() :	pd3dTexture(nullptr),
 		UScale(4.0f),
 		VScale(4.0f),
 		UOffset(0.0f),
@@ -28,7 +28,7 @@ typedef struct STerrainTexture
 	float						UOffset;
 	float						VOffset;
 	bool						bSplat;
-	unsigned short				Begin, End;	// 0 ~ 65535 의 16bit heightfield 높이값.
+	uint16_t				Begin, End;	// 0 ~ 65535 의 16bit heightfield 높이값.
 	D3DXMATRIX					m_matTransform;
 } TTerrainTexture;
 
@@ -48,20 +48,20 @@ class CTextureSet
 		bool			Load(const char * c_pszFileName, float fTerrainTexCoordBase);
 		bool			Save(const char * c_pszFileName);
 		
-		unsigned long	GetTextureCount();
+		uint32_t	GetTextureCount();
 		
-		TTerrainTexture	& GetTexture(unsigned long ulIndex);
-		bool			RemoveTexture(unsigned long ulIndex);
+		TTerrainTexture	& GetTexture(uint32_t ulIndex);
+		bool			RemoveTexture(uint32_t ulIndex);
 
-		bool			SetTexture(unsigned long ulIndex,
+		bool			SetTexture(uint32_t ulIndex,
 								   const char * c_szFileName,
 			 					   float fuScale,
 							       float fvScale,
 								   float fuOffset,
 								   float fvOffset,
 								   bool bSplat,
-								   unsigned short usBegin,
-								   unsigned short usEnd,
+								   uint16_t usBegin,
+								   uint16_t usEnd,
 								   float fTerrainTexCoordBase);
 
 		void			Reload(float fTerrainTexCoordBase);
@@ -72,8 +72,8 @@ class CTextureSet
 								   float fuOffset,
 								   float fvOffset,
 								   bool bSplat,
-								   unsigned short usBegin,
-								   unsigned short usEnd,
+								   uint16_t usBegin,
+								   uint16_t usEnd,
 								   float fTerrainTexCoordBase);
 
 		const char *	GetFileName()	{ return m_stFileName.c_str(); }

@@ -13,7 +13,7 @@
 
 void SetPlayerDBName(const char* c_pszPlayerDBName);
 void SetTablePostfix(const char* c_pszTablePostfix);
-int Start();
+int32_t Start();
 
 std::string g_stTablePostfix;
 std::string g_stLocaleNameColumn = "name";
@@ -24,17 +24,17 @@ std::string g_stPlayerDBName = "";
 BOOL g_test_server = false;
 
 //단위 초
-int g_iPlayerCacheFlushSeconds = 60*7;
-int g_iItemCacheFlushSeconds = 60*5;
+int32_t g_iPlayerCacheFlushSeconds = 60*7;
+int32_t g_iItemCacheFlushSeconds = 60*5;
 
 //g_iLogoutSeconds 수치는 g_iPlayerCacheFlushSeconds 와 g_iItemCacheFlushSeconds 보다 길어야 한다.
-int g_iLogoutSeconds = 60*10;
+int32_t g_iLogoutSeconds = 60*10;
 
-int g_log = 1;
+int32_t g_log = 1;
 
 
 // MYSHOP_PRICE_LIST
-int g_iItemPriceListTableCacheFlushSeconds = 540;
+int32_t g_iItemPriceListTableCacheFlushSeconds = 540;
 // END_OF_MYSHOP_PRICE_LIST
 
 #if defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version<1000000
@@ -43,7 +43,7 @@ extern const char * _malloc_options;
 
 extern void WriteVersion();
 
-void emergency_sig(int sig)
+void emergency_sig(int32_t sig)
 {
 	if (sig == SIGSEGV)
 		sys_log(0, "SIGNAL: SIGSEGV");
@@ -54,7 +54,7 @@ void emergency_sig(int sig)
 		abort();
 }
 
-int main()
+int32_t main()
 {
 	WriteVersion();
 
@@ -86,7 +86,7 @@ int main()
 	signal_timer_disable();
 
 	DBManager.Quit();
-	int iCount;
+	int32_t iCount;
 
 	while (1)
 	{
@@ -105,7 +105,7 @@ int main()
 	return 1;
 }
 
-void emptybeat(LPHEART heart, int pulse)
+void emptybeat(LPHEART heart, int32_t pulse)
 {
 	if (!(pulse % heart->passes_per_sec))	// 1초에 한번
 	{
@@ -115,7 +115,7 @@ void emptybeat(LPHEART heart, int pulse)
 //
 // @version	05/06/13 Bang2ni - 아이템 가격정보 캐시 flush timeout 설정 추가.
 //
-int Start()
+int32_t Start()
 {
 	if (!CConfig::instance().LoadFile("conf.txt"))
 	{
@@ -142,9 +142,9 @@ int Start()
 	}
 	
 	
-	int tmpValue;
+	int32_t tmpValue;
 
-	int heart_beat = 50;
+	int32_t heart_beat = 50;
 	if (!CConfig::instance().GetValue("CLIENT_HEART_FPS", &heart_beat))
 	{
 		fprintf(stderr, "Cannot find CLIENT_HEART_FPS configuration.\n");
@@ -202,11 +202,11 @@ int Start()
 	//
 	if (CConfig::instance().GetValue("CACHE_FLUSH_LIMIT_PER_SECOND", szBuf, 256))
 	{
-		DWORD dwVal = 0; str_to_number(dwVal, szBuf);
+		uint32_t dwVal = 0; str_to_number(dwVal, szBuf);
 		CClientManager::instance().SetCacheFlushCountLimit(dwVal);
 	}
 
-	int iIDStart;
+	int32_t iIDStart;
 	if (!CConfig::instance().GetValue("PLAYER_ID_START", &iIDStart))
 	{
 		sys_err("PLAYER_ID_START not configured");
@@ -222,7 +222,7 @@ int Start()
 	}
 
 	char szAddr[64], szDB[64], szUser[64], szPassword[64];
-	int iPort;
+	int32_t iPort;
 	char line[256+1];
 
 	if (CConfig::instance().GetValue("SQL_PLAYER", line, 256))
@@ -230,7 +230,7 @@ int Start()
 		sscanf(line, " %s %s %s %s %d ", szAddr, szDB, szUser, szPassword, &iPort);
 		sys_log(0, "connecting to MySQL server (player)");
 
-		int iRetry = 5;
+		int32_t iRetry = 5;
 
 		do
 		{
@@ -258,7 +258,7 @@ int Start()
 		sscanf(line, " %s %s %s %s %d ", szAddr, szDB, szUser, szPassword, &iPort);
 		sys_log(0, "connecting to MySQL server (account)");
 
-		int iRetry = 5;
+		int32_t iRetry = 5;
 
 		do
 		{
@@ -285,7 +285,7 @@ int Start()
 		sscanf(line, " %s %s %s %s %d ", szAddr, szDB, szUser, szPassword, &iPort);
 		sys_log(0, "connecting to MySQL server (common)");
 
-		int iRetry = 5;
+		int32_t iRetry = 5;
 
 		do
 		{

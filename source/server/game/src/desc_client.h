@@ -9,22 +9,22 @@ class CLIENT_DESC : public DESC
 		CLIENT_DESC();
 		virtual ~CLIENT_DESC();
 
-		virtual BYTE	GetType() { return DESC_TYPE_CONNECTOR; }
+		virtual uint8_t	GetType() { return DESC_TYPE_CONNECTOR; }
 		virtual void	Destroy();
-		virtual void	SetPhase(int phase);
+		virtual void	SetPhase(int32_t phase);
 
-		bool 		Connect(int iPhaseWhenSucceed = 0);
-		void		Setup(LPFDWATCH _fdw, const char * _host, WORD _port);
+		bool 		Connect(int32_t iPhaseWhenSucceed = 0);
+		void		Setup(LPFDWATCH _fdw, const char * _host, uint16_t _port);
 
 		void		SetRetryWhenClosed(bool);
 
-		void		DBPacketHeader(BYTE bHeader, DWORD dwHandle, DWORD dwSize);
-		void		DBPacket(BYTE bHeader, DWORD dwHandle, const void * c_pvData, DWORD dwSize);
-		void		Packet(const void * c_pvData, int iSize);
+		void		DBPacketHeader(uint8_t bHeader, uint32_t dwHandle, uint32_t dwSize);
+		void		DBPacket(uint8_t bHeader, uint32_t dwHandle, const void * c_pvData, uint32_t dwSize);
+		void		Packet(const void * c_pvData, int32_t iSize);
 		bool		IsRetryWhenClosed();
 
-		void		Update(DWORD t);
-		void		UpdateChannelStatus(DWORD t, bool fForce);
+		void		Update(uint32_t t);
+		void		UpdateChannelStatus(uint32_t t, bool fForce);
 
 		// Non-destructive close for reuse
 		void Reset();
@@ -33,7 +33,7 @@ class CLIENT_DESC : public DESC
 		void InitializeBuffers();
 
 	protected:
-		int			m_iPhaseWhenSucceed;
+		int32_t			m_iPhaseWhenSucceed;
 		bool		m_bRetryWhenClosed;
 		time_t		m_LastTryToConnectTime;
 		time_t		m_tLastChannelStatusUpdateTime;

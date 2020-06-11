@@ -28,7 +28,7 @@ PyObject* imeDisableCaptureInput(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* imeSetMax(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMax;
+	int32_t iMax;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMax))
 		return Py_BuildException();
 
@@ -38,7 +38,7 @@ PyObject* imeSetMax(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* imeSetUserMax(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMax;
+	int32_t iMax;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMax))
 		return Py_BuildException();
 
@@ -58,7 +58,7 @@ PyObject* imeSetText(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* imeGetText(PyObject* poSelf, PyObject* poArgs)
 {	
-	int bCodePage;
+	int32_t bCodePage;
 	if (!PyTuple_GetInteger(poArgs, 0, &bCodePage))
 		bCodePage = 0;
 
@@ -79,12 +79,12 @@ PyObject* imeGetCandidateCount(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* imeGetCandidate(PyObject* poSelf, PyObject* poArgs)
 {
-	int index;
+	int32_t index;
 	if (!PyTuple_GetInteger(poArgs, 0, &index))
 		return Py_BuildException();
 
 	std::string strText;
-	int iLength = CPythonIME::Instance().GetCandidate(index, strText);
+	int32_t iLength = CPythonIME::Instance().GetCandidate(index, strText);
 	return Py_BuildValue("si", strText.c_str(), iLength);
 }
 
@@ -119,7 +119,7 @@ PyObject* imeDisableIME(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* imeSetInputMode(PyObject* poSelf, PyObject* poArgs)
 {	
-	int	mode;
+	int32_t	mode;
 	if (!PyTuple_GetInteger(poArgs, 0, &mode))
 		return Py_BuildException();
 
@@ -135,7 +135,7 @@ PyObject * imeSetNumberMode(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * imeAddExceptKey(PyObject* poSelf, PyObject* poArgs)
 {
-	int key;
+	int32_t key;
 	if (!PyTuple_GetInteger(poArgs, 0, &key))
 		return Py_BuildException();
 
@@ -188,7 +188,7 @@ PyObject* imeMoveEnd(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* imeSetCursorPosition(PyObject* poSelf, PyObject* poArgs)
 {
-	int	iPosition;
+	int32_t	iPosition;
 	if (!PyTuple_GetInteger(poArgs, 0, &iPosition))
 		return Py_BuildException();
 
@@ -212,7 +212,7 @@ PyObject* imePasteTextFromClipBoard(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* imeEnablePaste(PyObject* poSelf, PyObject* poArgs)
 {
-	int	iFlag;
+	int32_t	iFlag;
 	if (!PyTuple_GetInteger(poArgs, 0, &iFlag))
 		return Py_BuildException();
 
@@ -231,13 +231,13 @@ PyObject* imePasteString(PyObject * poSelf, PyObject * poArgs)
 
 PyObject* imePasteBackspace(PyObject * poSelf, PyObject * poArgs)
 {
-	CPythonIME::Instance().WMChar(NULL, WM_CHAR, 0x08, NULL);
+	CPythonIME::Instance().WMChar(nullptr, WM_CHAR, 0x08, 0);
 	return Py_BuildNone();
 }
 
 PyObject* imePasteReturn(PyObject * poSelf, PyObject * poArgs)
 {
-	CPythonIME::Instance().WMChar(NULL, WM_CHAR, 0x0D, NULL);
+	CPythonIME::Instance().WMChar(nullptr, WM_CHAR, 0x0D, 0);
 	return Py_BuildNone();
 }
 
@@ -282,7 +282,7 @@ void initime()
 		{ "PasteTextFromClipBoard",	imePasteTextFromClipBoard,	METH_VARARGS },
 		{ "EnablePaste",			imeEnablePaste,				METH_VARARGS },
 
-		{ NULL,						NULL,						NULL		 },
+		{ nullptr,						nullptr,						0		 },
 	};	
 
 	Py_InitModule("ime", s_methods);

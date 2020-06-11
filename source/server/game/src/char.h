@@ -17,8 +17,8 @@
 #define ENABLE_ANTI_CMD_FLOOD
 #define ENABLE_OPEN_SHOP_WITH_ARMOR
 enum eMountType {MOUNT_TYPE_NONE=0, MOUNT_TYPE_NORMAL=1, MOUNT_TYPE_COMBAT=2, MOUNT_TYPE_MILITARY=3};
-eMountType GetMountLevelByVnum(DWORD dwMountVnum, bool IsNew);
-const DWORD GetRandomSkillVnum(BYTE bJob = JOB_MAX_NUM);
+eMountType GetMountLevelByVnum(uint32_t dwMountVnum, bool IsNew);
+const uint32_t GetRandomSkillVnum(uint8_t bJob = JOB_MAX_NUM);
 
 class CBuffOnAttributes;
 class CPetSystem;
@@ -34,7 +34,7 @@ class CPetSystem;
 #define AI_FLAG_HELPER				(1 << 2)
 #define AI_FLAG_STAYZONE			(1 << 3)
 
-extern int g_nPortalLimitTime;
+extern int32_t g_nPortalLimitTime;
 
 enum
 {
@@ -396,51 +396,51 @@ struct DynamicCharacterPtr {
 /* 저장하는 데이터 */
 typedef struct character_point
 {
-	long			points[POINT_MAX_NUM];
+	int32_t			points[POINT_MAX_NUM];
 
-	BYTE			job;
-	BYTE			voice;
+	uint8_t			job;
+	uint8_t			voice;
 
-	BYTE			level;
-	DWORD			exp;
-	long			gold;
+	uint8_t			level;
+	uint32_t			exp;
+	int32_t			gold;
 
-	int				hp;
-	int				sp;
+	int32_t				hp;
+	int32_t				sp;
 
-	int				iRandomHP;
-	int				iRandomSP;
+	int32_t				iRandomHP;
+	int32_t				iRandomSP;
 
-	int				stamina;
+	int32_t				stamina;
 
-	BYTE			skill_group;
+	uint8_t			skill_group;
 } CHARACTER_POINT;
 
 /* 저장되지 않는 캐릭터 데이터 */
 typedef struct character_point_instant
 {
-	long			points[POINT_MAX_NUM];
+	int32_t			points[POINT_MAX_NUM];
 
 	float			fRot;
 
-	int				iMaxHP;
-	int				iMaxSP;
+	int32_t				iMaxHP;
+	int32_t				iMaxSP;
 
-	long			position;
+	int32_t			position;
 
-	long			instant_flag;
-	DWORD			dwAIFlag;
-	DWORD			dwImmuneFlag;
-	DWORD			dwLastShoutPulse;
+	int32_t			instant_flag;
+	uint32_t			dwAIFlag;
+	uint32_t			dwImmuneFlag;
+	uint32_t			dwLastShoutPulse;
 
-	WORD			parts[PART_MAX_NUM];
+	uint16_t			parts[PART_MAX_NUM];
 
 	LPITEM			pItems[INVENTORY_AND_EQUIP_SLOT_MAX];
-	BYTE			bItemGrid[INVENTORY_AND_EQUIP_SLOT_MAX];
+	uint8_t			bItemGrid[INVENTORY_AND_EQUIP_SLOT_MAX];
 
 	// 용혼석 인벤토리.
 	LPITEM			pDSItems[DRAGON_SOUL_INVENTORY_MAX_NUM];
-	WORD			wDSItemGrid[DRAGON_SOUL_INVENTORY_MAX_NUM];
+	uint16_t			wDSItemGrid[DRAGON_SOUL_INVENTORY_MAX_NUM];
 
 	// by mhh
 	LPITEM			pCubeItems[CUBE_MAX_NUM];
@@ -450,15 +450,15 @@ typedef struct character_point_instant
 #endif
 	LPCHARACTER			battle_victim;
 
-	BYTE			gm_level;
+	uint8_t			gm_level;
 
-	BYTE			bBasePart;	// 평상복 번호
+	uint8_t			bBasePart;	// 평상복 번호
 
-	int				iMaxStamina;
+	int32_t				iMaxStamina;
 
-	BYTE			bBlockMode;
+	uint8_t			bBlockMode;
 
-	int				iDragonSoulActiveDeck;
+	int32_t				iDragonSoulActiveDeck;
 	LPENTITY		m_pDragonSoulRefineWindowOpener;
 } CHARACTER_POINT_INSTANT;
 
@@ -466,20 +466,20 @@ typedef struct character_point_instant
 
 typedef struct trigger
 {
-	BYTE	type;
-	int		(*func) (TRIGGERPARAM);
-	long	value;
+	uint8_t	type;
+	int32_t		(*func) (TRIGGERPARAM);
+	int32_t	value;
 } TRIGGER;
 
 class CTrigger
 {
 	public:
-		CTrigger() : bType(0), pFunc(NULL)
+		CTrigger() : bType(0), pFunc(nullptr)
 		{
 		}
 
-		BYTE	bType;
-		int	(*pFunc) (TRIGGERPARAM);
+		uint8_t	bType;
+		int32_t	(*pFunc) (TRIGGERPARAM);
 };
 
 EVENTINFO(char_event_info)
@@ -489,13 +489,13 @@ EVENTINFO(char_event_info)
 
 struct TSkillUseInfo
 {
-	int	    iHitCount;
-	int	    iMaxHitCount;
-	int	    iSplashCount;
-	DWORD   dwNextSkillUsableTime;
-	int	    iRange;
+	int32_t	    iHitCount;
+	int32_t	    iMaxHitCount;
+	int32_t	    iSplashCount;
+	uint32_t   dwNextSkillUsableTime;
+	int32_t	    iRange;
 	bool    bUsed;
-	DWORD   dwVID;
+	uint32_t   dwVID;
 	bool    isGrandMaster;
 
 	std::unordered_map<VID, size_t> TargetVIDMap;
@@ -505,11 +505,11 @@ struct TSkillUseInfo
 		dwVID(0), isGrandMaster(false)
    	{}
 
-	bool    HitOnce(DWORD dwVnum = 0);
+	bool    HitOnce(uint32_t dwVnum = 0);
 
-	bool    UseSkill(bool isGrandMaster, DWORD vid, DWORD dwCooltime, int splashcount = 1, int hitcount = -1, int range = -1);
-	DWORD   GetMainTargetVID() const	{ return dwVID; }
-	void    SetMainTargetVID(DWORD vid) { dwVID=vid; }
+	bool    UseSkill(bool isGrandMaster, uint32_t vid, uint32_t dwCooltime, int32_t splashcount = 1, int32_t hitcount = -1, int32_t range = -1);
+	uint32_t   GetMainTargetVID() const	{ return dwVID; }
+	void    SetMainTargetVID(uint32_t vid) { dwVID=vid; }
 	void    ResetHitCount() { if (iSplashCount) { iHitCount = iMaxHitCount; iSplashCount--; } }
 };
 
@@ -532,7 +532,7 @@ class CMobInstance;
 typedef struct SMobSkillInfo TMobSkillInfo;
 
 //SKILL_POWER_BY_LEVEL
-extern int GetSkillPowerByLevelFromType(int job, int skillgroup, int skilllevel);
+extern int32_t GetSkillPowerByLevelFromType(int32_t job, int32_t skillgroup, int32_t skilllevel);
 //END_SKILL_POWER_BY_LEVEL
 
 namespace marriage
@@ -577,7 +577,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// END_OF_STATE_IDLE_REFACTORING
 
 	public:
-		DWORD GetAIFlag() const	{ return m_pointsInstant.dwAIFlag; }
+		uint32_t GetAIFlag() const	{ return m_pointsInstant.dwAIFlag; }
 	
 		void				SetAggressive();
 		bool				IsAggressive() const;
@@ -604,14 +604,14 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void				RestartAtSamePos();
 
 	protected:
-		DWORD				m_dwStateDuration;
+		uint32_t				m_dwStateDuration;
 		//////////////////////////////////////////////////////////////////////////////////
 
 	public:
 		CHARACTER();
 		virtual ~CHARACTER();
 
-		void			Create(const char * c_pszName, DWORD vid, bool isPC);
+		void			Create(const char * c_pszName, uint32_t vid, bool isPC);
 		void			Destroy();
 
 		void			Disconnect(const char * c_pszReason);
@@ -622,13 +622,13 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		//////////////////////////////////////////////////////////////////////////////////
 		// Basic Points
 	public:
-		DWORD			GetPlayerID() const	{ return m_dwPlayerID; }
+		uint32_t			GetPlayerID() const	{ return m_dwPlayerID; }
 
 		void			SetPlayerProto(const TPlayerTable * table);
 		void			CreatePlayerProto(TPlayerTable & tab);	// 저장 시 사용
 
 		void			SetProto(const CMob * c_pkMob);
-		WORD			GetRaceNum() const;
+		uint16_t			GetRaceNum() const;
 
 		void			Save();		// DelayedSave
 		void			SaveReal();	// 실제 저장
@@ -639,16 +639,16 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		void			SetName(const std::string& name) { m_stName = name; }
 
-		void			SetRace(BYTE race);
+		void			SetRace(uint8_t race);
 		bool			ChangeSex();
 
-		DWORD			GetAID() const;
-		int				GetChangeEmpireCount() const;
+		uint32_t			GetAID() const;
+		int32_t				GetChangeEmpireCount() const;
 		void			SetChangeEmpireCount();
-		int				ChangeEmpire(BYTE empire);
+		int32_t				ChangeEmpire(uint8_t empire);
 
-		BYTE			GetJob() const;
-		BYTE			GetCharType() const;
+		uint8_t			GetJob() const;
+		uint8_t			GetCharType() const;
 
 		bool			IsPC() const		{ return GetDesc() ? true : false; }
 		bool			IsNPC()	const		{ return m_bCharType != CHAR_TYPE_PC; }
@@ -660,75 +660,75 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool			IsGoto() const		{ return m_bCharType == CHAR_TYPE_GOTO; }
 //		bool			IsPet() const		{ return m_bCharType == CHAR_TYPE_PET; }
 
-		DWORD			GetLastShoutPulse() const	{ return m_pointsInstant.dwLastShoutPulse; }
-		void			SetLastShoutPulse(DWORD pulse) { m_pointsInstant.dwLastShoutPulse = pulse; }
-		int				GetLevel() const		{ return m_points.level;	}
-		void			SetLevel(BYTE level);
+		uint32_t			GetLastShoutPulse() const	{ return m_pointsInstant.dwLastShoutPulse; }
+		void			SetLastShoutPulse(uint32_t pulse) { m_pointsInstant.dwLastShoutPulse = pulse; }
+		int32_t				GetLevel() const		{ return m_points.level;	}
+		void			SetLevel(uint8_t level);
 
-		BYTE			GetGMLevel() const;
+		uint8_t			GetGMLevel() const;
 		BOOL 			IsGM() const;
 		void			SetGMLevel(); 
 
-		DWORD			GetExp() const		{ return m_points.exp;	}
-		void			SetExp(DWORD exp)	{ m_points.exp = exp;	}
-		DWORD			GetNextExp() const;
+		uint32_t			GetExp() const		{ return m_points.exp;	}
+		void			SetExp(uint32_t exp)	{ m_points.exp = exp;	}
+		uint32_t			GetNextExp() const;
 		LPCHARACTER		DistributeExp();	// 제일 많이 때린 사람을 리턴한다.
 		void			DistributeHP(LPCHARACTER pkKiller);
-		void			DistributeSP(LPCHARACTER pkKiller, int iMethod=0);
+		void			DistributeSP(LPCHARACTER pkKiller, int32_t iMethod=0);
 #ifdef __ENABLE_KILL_EVENT_FIX__
 		LPCHARACTER		GetMostAttacked();
 #endif
 
-		void			SetPosition(int pos);
-		bool			IsPosition(int pos) const	{ return m_pointsInstant.position == pos ? true : false; }
-		int				GetPosition() const		{ return m_pointsInstant.position; }
+		void			SetPosition(int32_t pos);
+		bool			IsPosition(int32_t pos) const	{ return m_pointsInstant.position == pos ? true : false; }
+		int32_t				GetPosition() const		{ return m_pointsInstant.position; }
 
-		void			SetPart(BYTE bPartPos, WORD wVal);
-		WORD			GetPart(BYTE bPartPos) const;
-		WORD			GetOriginalPart(BYTE bPartPos) const;
+		void			SetPart(uint8_t bPartPos, uint16_t wVal);
+		uint16_t			GetPart(uint8_t bPartPos) const;
+		uint16_t			GetOriginalPart(uint8_t bPartPos) const;
 
-		void			SetHP(int hp)		{ m_points.hp = hp; }
-		int				GetHP() const		{ return m_points.hp; }
+		void			SetHP(int32_t hp)		{ m_points.hp = hp; }
+		int32_t				GetHP() const		{ return m_points.hp; }
 
-		void			SetSP(int sp)		{ m_points.sp = sp; }
-		int				GetSP() const		{ return m_points.sp; }
+		void			SetSP(int32_t sp)		{ m_points.sp = sp; }
+		int32_t				GetSP() const		{ return m_points.sp; }
 
-		void			SetStamina(int stamina)	{ m_points.stamina = stamina; }
-		int				GetStamina() const		{ return m_points.stamina; }
+		void			SetStamina(int32_t stamina)	{ m_points.stamina = stamina; }
+		int32_t				GetStamina() const		{ return m_points.stamina; }
 
-		void			SetMaxHP(int iVal)	{ m_pointsInstant.iMaxHP = iVal; }
-		int				GetMaxHP() const	{ return m_pointsInstant.iMaxHP; }
+		void			SetMaxHP(int32_t iVal)	{ m_pointsInstant.iMaxHP = iVal; }
+		int32_t				GetMaxHP() const	{ return m_pointsInstant.iMaxHP; }
 
-		void			SetMaxSP(int iVal)	{ m_pointsInstant.iMaxSP = iVal; }
-		int				GetMaxSP() const	{ return m_pointsInstant.iMaxSP; }
+		void			SetMaxSP(int32_t iVal)	{ m_pointsInstant.iMaxSP = iVal; }
+		int32_t				GetMaxSP() const	{ return m_pointsInstant.iMaxSP; }
 
-		void			SetMaxStamina(int iVal)	{ m_pointsInstant.iMaxStamina = iVal; }
-		int				GetMaxStamina() const	{ return m_pointsInstant.iMaxStamina; }
+		void			SetMaxStamina(int32_t iVal)	{ m_pointsInstant.iMaxStamina = iVal; }
+		int32_t				GetMaxStamina() const	{ return m_pointsInstant.iMaxStamina; }
 
-		void			SetRandomHP(int v)	{ m_points.iRandomHP = v; }
-		void			SetRandomSP(int v)	{ m_points.iRandomSP = v; }
+		void			SetRandomHP(int32_t v)	{ m_points.iRandomHP = v; }
+		void			SetRandomSP(int32_t v)	{ m_points.iRandomSP = v; }
 
-		int				GetRandomHP() const	{ return m_points.iRandomHP; }
-		int				GetRandomSP() const	{ return m_points.iRandomSP; }
+		int32_t				GetRandomHP() const	{ return m_points.iRandomHP; }
+		int32_t				GetRandomSP() const	{ return m_points.iRandomSP; }
 
-		int				GetHPPct() const;
+		int32_t				GetHPPct() const;
 
-		void			SetRealPoint(BYTE idx, int val);
-		int				GetRealPoint(BYTE idx) const;
+		void			SetRealPoint(uint8_t idx, int32_t val);
+		int32_t				GetRealPoint(uint8_t idx) const;
 
-		void			SetPoint(BYTE idx, int val);
-		int				GetPoint(BYTE idx) const;
-		int				GetLimitPoint(BYTE idx) const;
-		int				GetPolymorphPoint(BYTE idx) const;
+		void			SetPoint(uint8_t idx, int32_t val);
+		int32_t				GetPoint(uint8_t idx) const;
+		int32_t				GetLimitPoint(uint8_t idx) const;
+		int32_t				GetPolymorphPoint(uint8_t idx) const;
 
 		const TMobTable &	GetMobTable() const;
-		BYTE				GetMobRank() const;
-		BYTE				GetMobBattleType() const;
-		BYTE				GetMobSize() const;
-		DWORD				GetMobDamageMin() const;
-		DWORD				GetMobDamageMax() const;
-		WORD				GetMobAttackRange() const;
-		DWORD				GetMobDropItemVnum() const;
+		uint8_t				GetMobRank() const;
+		uint8_t				GetMobBattleType() const;
+		uint8_t				GetMobSize() const;
+		uint32_t				GetMobDamageMin() const;
+		uint32_t				GetMobDamageMax() const;
+		uint16_t				GetMobAttackRange() const;
+		uint32_t				GetMobDropItemVnum() const;
 		float				GetMobDamageMultiply() const;
 
 		// NEWAI
@@ -751,48 +751,48 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			SetRevive(bool mode);
 		// NEWAI END
 
-		bool			IsRaceFlag(DWORD dwBit) const;
+		bool			IsRaceFlag(uint32_t dwBit) const;
 		bool			IsSummonMonster() const;
-		DWORD			GetSummonVnum() const;
+		uint32_t			GetSummonVnum() const;
 
-		DWORD			GetPolymorphItemVnum() const;
-		DWORD			GetMonsterDrainSPPoint() const;
+		uint32_t			GetPolymorphItemVnum() const;
+		uint32_t			GetMonsterDrainSPPoint() const;
 
 		void			MainCharacterPacket();	// 내가 메인캐릭터라고 보내준다.
 
 		void			ComputePoints();
 		void			ComputeBattlePoints();
-		void			PointChange(BYTE type, int amount, bool bAmount = false, bool bBroadcast = false);
+		void			PointChange(uint8_t type, int32_t amount, bool bAmount = false, bool bBroadcast = false);
 		void			PointsPacket();
-		void			ApplyPoint(BYTE bApplyType, int iVal);
+		void			ApplyPoint(uint8_t bApplyType, int32_t iVal);
 		void			CheckMaximumPoints();	// HP, SP 등의 현재 값이 최대값 보다 높은지 검사하고 높다면 낮춘다.
 
-		bool			Show(long lMapIndex, long x, long y, long z = LONG_MAX, bool bShowSpawnMotion = false);
+		bool			Show(int32_t lMapIndex, int32_t x, int32_t y, int32_t z = LONG_MAX, bool bShowSpawnMotion = false);
 
-		void			Sitdown(int is_ground);
+		void			Sitdown(int32_t is_ground);
 		void			Standup();
 
 		void			SetRotation(float fRot);
-		void			SetRotationToXY(long x, long y);
+		void			SetRotationToXY(int32_t x, int32_t y);
 		float			GetRotation() const	{ return m_pointsInstant.fRot; }
 
-		void			MotionPacketEncode(BYTE motion, LPCHARACTER victim, struct packet_motion * packet);
-		void			Motion(BYTE motion, LPCHARACTER victim = NULL);
+		void			MotionPacketEncode(uint8_t motion, LPCHARACTER victim, struct packet_motion * packet);
+		void			Motion(uint8_t motion, LPCHARACTER victim = nullptr);
 
-		void			ChatPacket(BYTE type, const char *format, ...);
-		void			MonsterChat(BYTE bMonsterChatType);
+		void			ChatPacket(uint8_t type, const char *format, ...);
+		void			MonsterChat(uint8_t bMonsterChatType);
 
-		void			ResetPoint(int iLv);
+		void			ResetPoint(int32_t iLv);
 
-		void			SetBlockMode(BYTE bFlag);
-		void			SetBlockModeForce(BYTE bFlag);
-		bool			IsBlockMode(BYTE bFlag) const	{ return (m_pointsInstant.bBlockMode & bFlag)?true:false; }
+		void			SetBlockMode(uint8_t bFlag);
+		void			SetBlockModeForce(uint8_t bFlag);
+		bool			IsBlockMode(uint8_t bFlag) const	{ return (m_pointsInstant.bBlockMode & bFlag)?true:false; }
 
 		bool			IsPolymorphed() const		{ return m_dwPolymorphRace>0; }
 		bool			IsPolyMaintainStat() const	{ return m_bPolyMaintainStat; } // 이전 스텟을 유지하는 폴리모프.
-		void			SetPolymorph(DWORD dwRaceNum, bool bMaintainStat = false);
-		DWORD			GetPolymorphVnum() const	{ return m_dwPolymorphRace; }
-		int				GetPolymorphPower() const;
+		void			SetPolymorph(uint32_t dwRaceNum, bool bMaintainStat = false);
+		uint32_t			GetPolymorphVnum() const	{ return m_dwPolymorphRace; }
+		int32_t				GetPolymorphPower() const;
 
 		// FISING	
 		void			fishing();
@@ -805,31 +805,31 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			mining_take();
 		// END_OF_MINING
 
-		void			ResetPlayTime(DWORD dwTimeRemain = 0);
+		void			ResetPlayTime(uint32_t dwTimeRemain = 0);
 
-		void			CreateFly(BYTE bType, LPCHARACTER pkVictim);
+		void			CreateFly(uint8_t bType, LPCHARACTER pkVictim);
 
 		void			ResetChatCounter();
-		BYTE			IncreaseChatCounter();
-		BYTE			GetChatCounter() const;
+		uint8_t			IncreaseChatCounter();
+		uint8_t			GetChatCounter() const;
 
 	protected:
-		DWORD			m_dwPolymorphRace;
+		uint32_t			m_dwPolymorphRace;
 		bool			m_bPolyMaintainStat;
-		DWORD			m_dwLoginPlayTime;
-		DWORD			m_dwPlayerID;
+		uint32_t			m_dwLoginPlayTime;
+		uint32_t			m_dwPlayerID;
 		VID				m_vid;
 		std::string		m_stName;
-		BYTE			m_bCharType;
+		uint8_t			m_bCharType;
 
 		CHARACTER_POINT		m_points;
 		CHARACTER_POINT_INSTANT	m_pointsInstant;
 
-		int				m_iMoveCount;
-		DWORD			m_dwPlayStartTime;
-		BYTE			m_bAddChrState;
+		int32_t				m_iMoveCount;
+		uint32_t			m_dwPlayStartTime;
+		uint8_t			m_bAddChrState;
 		bool			m_bSkipSave;
-		BYTE			m_bChatCounter;
+		uint8_t			m_bChatCounter;
 
 		// End of Basic Points
 
@@ -844,35 +844,35 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			SetNowWalking(bool bWalkFlag);	
 		void			ResetWalking()			{ SetNowWalking(m_bWalking); }
 
-		bool			Goto(long x, long y);	// 바로 이동 시키지 않고 목표 위치로 BLENDING 시킨다.
+		bool			Goto(int32_t x, int32_t y);	// 바로 이동 시키지 않고 목표 위치로 BLENDING 시킨다.
 		void			Stop();
 
 		bool			CanMove() const;		// 이동할 수 있는가?
 
 		void			SyncPacket();
-		bool			Sync(long x, long y);	// 실제 이 메소드로 이동 한다 (각 종 조건에 의한 이동 불가가 없음)
-		bool			Move(long x, long y);	// 조건을 검사하고 Sync 메소드를 통해 이동 한다.
+		bool			Sync(int32_t x, int32_t y);	// 실제 이 메소드로 이동 한다 (각 종 조건에 의한 이동 불가가 없음)
+		bool			Move(int32_t x, int32_t y);	// 조건을 검사하고 Sync 메소드를 통해 이동 한다.
 		void			OnMove(bool bIsAttack = false);	// 움직일때 불린다. Move() 메소드 이외에서도 불릴 수 있다.
-		DWORD			GetMotionMode() const;
+		uint32_t			GetMotionMode() const;
 		float			GetMoveMotionSpeed() const;
 		float			GetMoveSpeed() const;
 		void			CalculateMoveDuration();
-		void			SendMovePacket(BYTE bFunc, BYTE bArg, DWORD x, DWORD y, DWORD dwDuration, DWORD dwTime=0, int iRot=-1);
-		DWORD			GetCurrentMoveDuration() const	{ return m_dwMoveDuration; }
-		DWORD			GetWalkStartTime() const	{ return m_dwWalkStartTime; }
-		DWORD			GetLastMoveTime() const		{ return m_dwLastMoveTime; }
-		DWORD			GetLastAttackTime() const	{ return m_dwLastAttackTime; }
+		void			SendMovePacket(uint8_t bFunc, uint8_t bArg, uint32_t x, uint32_t y, uint32_t dwDuration, uint32_t dwTime=0, int32_t iRot=-1);
+		uint32_t			GetCurrentMoveDuration() const	{ return m_dwMoveDuration; }
+		uint32_t			GetWalkStartTime() const	{ return m_dwWalkStartTime; }
+		uint32_t			GetLastMoveTime() const		{ return m_dwLastMoveTime; }
+		uint32_t			GetLastAttackTime() const	{ return m_dwLastAttackTime; }
 
-		void			SetLastAttacked(DWORD time);	// 마지막으로 공격받은 시간 및 위치를 저장함
+		void			SetLastAttacked(uint32_t time);	// 마지막으로 공격받은 시간 및 위치를 저장함
 
 		bool			SetSyncOwner(LPCHARACTER ch, bool bRemoveFromList = true);
 		bool			IsSyncOwner(LPCHARACTER ch) const;
 
-		bool			WarpSet(long x, long y, long lRealMapIndex = 0);
-		void			SetWarpLocation(long lMapIndex, long x, long y);
+		bool			WarpSet(int32_t x, int32_t y, int32_t lRealMapIndex = 0);
+		void			SetWarpLocation(int32_t lMapIndex, int32_t x, int32_t y);
 		void			WarpEnd();
 		const PIXEL_POSITION & GetWarpPosition() const { return m_posWarp; }
-		bool			WarpToPID(DWORD dwPID);
+		bool			WarpToPID(uint32_t dwPID);
 
 		void			SaveExitLocation();
 		void			ExitToSavedLocation();
@@ -883,7 +883,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool			IsStaminaHalfConsume() const;
 
 		void			ResetStopTime();
-		DWORD			GetStopTime() const;
+		uint32_t			GetStopTime() const;
 
 	protected:
 		void			ClearSync();
@@ -895,18 +895,18 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		PIXEL_POSITION	m_posDest;
 		PIXEL_POSITION	m_posStart;
 		PIXEL_POSITION	m_posWarp;
-		long			m_lWarpMapIndex;
+		int32_t			m_lWarpMapIndex;
 
 		PIXEL_POSITION	m_posExit;
-		long			m_lExitMapIndex;
+		int32_t			m_lExitMapIndex;
 
-		DWORD			m_dwMoveStartTime;
-		DWORD			m_dwMoveDuration;
+		uint32_t			m_dwMoveStartTime;
+		uint32_t			m_dwMoveDuration;
 
-		DWORD			m_dwLastMoveTime;
-		DWORD			m_dwLastAttackTime;
-		DWORD			m_dwWalkStartTime;
-		DWORD			m_dwStopTime;
+		uint32_t			m_dwLastMoveTime;
+		uint32_t			m_dwLastAttackTime;
+		uint32_t			m_dwWalkStartTime;
+		uint32_t			m_dwStopTime;
 
 		bool			m_bWalking;
 		bool			m_bNowWalking;
@@ -915,12 +915,12 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		// Quickslot 관련
 	public:
-		void			SyncQuickslot(BYTE bType, BYTE bOldPos, BYTE bNewPos);
-		bool			GetQuickslot(BYTE pos, TQuickslot ** ppSlot);
-		bool			SetQuickslot(BYTE pos, TQuickslot & rSlot);
-		bool			DelQuickslot(BYTE pos);
-		bool			SwapQuickslot(BYTE a, BYTE b);
-		void			ChainQuickslotItem(LPITEM pItem, BYTE bType, BYTE bOldPos);
+		void			SyncQuickslot(uint8_t bType, uint8_t bOldPos, uint8_t bNewPos);
+		bool			GetQuickslot(uint8_t pos, TQuickslot ** ppSlot);
+		bool			SetQuickslot(uint8_t pos, TQuickslot & rSlot);
+		bool			DelQuickslot(uint8_t pos);
+		bool			SwapQuickslot(uint8_t a, uint8_t b);
+		void			ChainQuickslotItem(LPITEM pItem, uint8_t bType, uint8_t bOldPos);
 
 	protected:
 		TQuickslot		m_quickslot[QUICKSLOT_MAX_NUM];
@@ -931,26 +931,26 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			StartAffectEvent();
 		void			ClearAffect(bool bSave=false);
 		void			ComputeAffect(CAffect * pkAff, bool bAdd);
-		bool			AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD dwFlag, long lDuration, long lSPCost, bool bOverride, bool IsCube = false);
+		bool			AddAffect(uint32_t dwType, uint8_t bApplyOn, int32_t lApplyValue, uint32_t dwFlag, int32_t lDuration, int32_t lSPCost, bool bOverride, bool IsCube = false);
 		void			RefreshAffect();
-		bool			RemoveAffect(DWORD dwType);
-		bool			IsAffectFlag(DWORD dwAff) const;
+		bool			RemoveAffect(uint32_t dwType);
+		bool			IsAffectFlag(uint32_t dwAff) const;
 
 		bool			UpdateAffect();	// called from EVENT
-		int				ProcessAffect();
+		int32_t				ProcessAffect();
 
-		void			LoadAffect(DWORD dwCount, TPacketAffectElement * pElements);
+		void			LoadAffect(uint32_t dwCount, TPacketAffectElement * pElements);
 		void			SaveAffect();
 
 		// Affect loading이 끝난 상태인가?
 		bool			IsLoadedAffect() const	{ return m_bIsLoadedAffect; }		
 
-		bool			IsGoodAffect(BYTE bAffectType) const;
+		bool			IsGoodAffect(uint8_t bAffectType) const;
 
 		void			RemoveGoodAffect();
 		void			RemoveBadAffect();
 
-		CAffect *		FindAffect(DWORD dwType, BYTE bApply=APPLY_NONE) const;
+		CAffect *		FindAffect(uint32_t dwType, uint8_t bApply=APPLY_NONE) const;
 		const std::list<CAffect *> & GetAffectContainer() const	{ return m_list_pkAffect; }
 		bool			RemoveAffect(CAffect * pkAff);
 
@@ -988,12 +988,12 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		/**
 		 * @param [in]	dwPID 초대 했던 character 의 PID
 		 */
-		void			PartyInviteDeny(DWORD dwPID);
+		void			PartyInviteDeny(uint32_t dwPID);
 
 		bool			BuildUpdatePartyPacket(TPacketGCPartyUpdate & out);
-		int				GetLeadershipSkillLevel() const;
+		int32_t				GetLeadershipSkillLevel() const;
 
-		bool			CanSummon(int iLeaderShip);
+		bool			CanSummon(int32_t iLeaderShip);
 
 		void			SetPartyRequestEvent(LPEVENT pkEvent) { m_pkPartyRequestEvent = pkEvent; }
 
@@ -1042,7 +1042,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		static PartyJoinErrCode	IsPartyJoinableMutableCondition(const LPCHARACTER pchLeader, const LPCHARACTER pchGuest);
 
 		LPPARTY			m_pkParty;
-		DWORD			m_dwLastDeadTime;
+		uint32_t			m_dwLastDeadTime;
 		LPEVENT			m_pkPartyRequestEvent;
 
 		/**
@@ -1052,7 +1052,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		 *
 		 * 초대한 캐릭터들에 대한 event map.
 		 */
-		typedef std::map< DWORD, LPEVENT >	EventMap;
+		typedef std::map< uint32_t, LPEVENT >	EventMap;
 		EventMap		m_PartyInviteEventMap;
 
 		// END_OF_PARTY_JOIN_BUG_FIX
@@ -1065,7 +1065,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		LPDUNGEON		GetDungeonForce() const;
 	protected:
 		LPDUNGEON	m_pkDungeon;
-		int			m_iEventAttr;
+		int32_t			m_iEventAttr;
 
 		////////////////////////////////////////////////////////////////////////////////////////
 		// Guild
@@ -1078,7 +1078,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 	protected:
 		CGuild *		m_pGuild;
-		DWORD			m_dwUnderGuildWarInfoMessageTime;
+		uint32_t			m_dwUnderGuildWarInfoMessageTime;
 		CWarMap *		m_pWarMap;
 
 		////////////////////////////////////////////////////////////////////////////////////////
@@ -1096,11 +1096,11 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			SetItem(TItemPos Cell, LPITEM item);
 #endif
 		LPITEM			GetItem(TItemPos Cell) const;
-		LPITEM			GetInventoryItem(WORD wCell) const;
-		bool			IsEmptyItemGrid(TItemPos Cell, BYTE size, int iExceptionCell = -1) const;
+		LPITEM			GetInventoryItem(uint16_t wCell) const;
+		bool			IsEmptyItemGrid(TItemPos Cell, uint8_t size, int32_t iExceptionCell = -1) const;
 
-		void			SetWear(BYTE bCell, LPITEM item);
-		LPITEM			GetWear(BYTE bCell) const;
+		void			SetWear(uint8_t bCell, LPITEM item);
+		LPITEM			GetWear(uint8_t bCell) const;
 
 		// MYSHOP_PRICE_LIST
 		void			UseSilkBotary(void); 		/// 비단 보따리 아이템의 사용
@@ -1121,18 +1121,18 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// ADD_REFINE_BUILDING
 		bool			IsRefineThroughGuild() const;
 		CGuild *		GetRefineGuild() const;
-		int				ComputeRefineFee(int iCost, int iMultiply = 5) const;
-		void			PayRefineFee(int iTotalMoney);
+		int32_t				ComputeRefineFee(int32_t iCost, int32_t iMultiply = 5) const;
+		void			PayRefineFee(int32_t iTotalMoney);
 		void			SetRefineNPC(LPCHARACTER ch);
 		// END_OF_ADD_REFINE_BUILDING
 
 		bool			RefineItem(LPITEM pkItem, LPITEM pkTarget);
-		bool			DropItem(TItemPos Cell,  BYTE bCount=0);
+		bool			DropItem(TItemPos Cell,  uint8_t bCount=0);
 		bool			GiveRecallItem(LPITEM item);
 		void			ProcessRecallItem(LPITEM item);
 
-		//	void			PotionPacket(int iPotionType);
-		void			EffectPacket(int enumEffectType);
+		//	void			PotionPacket(int32_t iPotionType);
+		void			EffectPacket(int32_t enumEffectType);
 		void			SpecificEffectPacket(const char filename[128]);
 
 		// ADD_MONSTER_REFINE
@@ -1140,20 +1140,20 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// END_OF_ADD_MONSTER_REFINE
 
 		bool			DoRefineWithScroll(LPITEM item);
-		bool			RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell = -1);
+		bool			RefineInformation(uint8_t bCell, uint8_t bType, int32_t iAdditionalCell = -1);
 
-		void			SetRefineMode(int iAdditionalCell = -1);
+		void			SetRefineMode(int32_t iAdditionalCell = -1);
 		void			ClearRefineMode();
 
 		bool			GiveItem(LPCHARACTER victim, TItemPos Cell);
 		bool			CanReceiveItem(LPCHARACTER from, LPITEM item) const;
 		void			ReceiveItem(LPCHARACTER from, LPITEM item);
-		bool			GiveItemFromSpecialItemGroup(DWORD dwGroupNum, std::vector <DWORD> &dwItemVnums, 
-							std::vector <DWORD> &dwItemCounts, std::vector <LPITEM> &item_gets, int &count);
+		bool			GiveItemFromSpecialItemGroup(uint32_t dwGroupNum, std::vector <uint32_t> &dwItemVnums, 
+							std::vector <uint32_t> &dwItemCounts, std::vector <LPITEM> &item_gets, int32_t &count);
 
-		bool			MoveItem(TItemPos pos, TItemPos change_pos, BYTE num);
-		bool			PickupItem(DWORD vid);
-		bool			EquipItem(LPITEM item, int iCandidateCell = -1);
+		bool			MoveItem(TItemPos pos, TItemPos change_pos, uint8_t num);
+		bool			PickupItem(uint32_t vid);
+		bool			EquipItem(LPITEM item, int32_t iCandidateCell = -1);
 		bool			UnequipItem(LPITEM item);
 
 		// 현재 item을 착용할 수 있는 지 확인하고, 불가능 하다면 캐릭터에게 이유를 알려주는 함수
@@ -1162,28 +1162,28 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// 착용중인 item을 벗을 수 있는 지 확인하고, 불가능 하다면 캐릭터에게 이유를 알려주는 함수
 		bool			CanUnequipNow(const LPITEM item, const TItemPos& srcCell = NPOS, const TItemPos& destCell = NPOS);
 
-		bool			SwapItem(BYTE bCell, BYTE bDestCell);
-		LPITEM			AutoGiveItem(DWORD dwItemVnum, BYTE bCount=1, int iRarePct = -1, bool bMsg = true);
+		bool			SwapItem(uint8_t bCell, uint8_t bDestCell);
+		LPITEM			AutoGiveItem(uint32_t dwItemVnum, uint8_t bCount=1, int32_t iRarePct = -1, bool bMsg = true);
 		void			AutoGiveItem(LPITEM item, bool longOwnerShip = false);
 		
-		int				GetEmptyInventory(BYTE size) const;
-		int				GetEmptyDragonSoulInventory(LPITEM pItem) const;
-		void			CopyDragonSoulItemGrid(std::vector<WORD>& vDragonSoulItemGrid) const;
+		int32_t				GetEmptyInventory(uint8_t size) const;
+		int32_t				GetEmptyDragonSoulInventory(LPITEM pItem) const;
+		void			CopyDragonSoulItemGrid(std::vector<uint16_t>& vDragonSoulItemGrid) const;
 
-		int				CountEmptyInventory() const;
+		int32_t				CountEmptyInventory() const;
 
-		int				CountSpecifyItem(DWORD vnum) const;
-		void			RemoveSpecifyItem(DWORD vnum, DWORD count = 1);
-		LPITEM			FindSpecifyItem(DWORD vnum) const;
-		LPITEM			FindItemByID(DWORD id) const;
+		int32_t				CountSpecifyItem(uint32_t vnum) const;
+		void			RemoveSpecifyItem(uint32_t vnum, uint32_t count = 1);
+		LPITEM			FindSpecifyItem(uint32_t vnum) const;
+		LPITEM			FindItemByID(uint32_t id) const;
 
-		int				CountSpecifyTypeItem(BYTE type) const;
-		void			RemoveSpecifyTypeItem(BYTE type, DWORD count = 1);
+		int32_t				CountSpecifyTypeItem(uint8_t type) const;
+		void			RemoveSpecifyTypeItem(uint8_t type, uint32_t count = 1);
 
-		bool			IsEquipUniqueItem(DWORD dwItemVnum) const;
+		bool			IsEquipUniqueItem(uint32_t dwItemVnum) const;
 
 		// CHECK_UNIQUE_GROUP
-		bool			IsEquipUniqueGroup(DWORD dwGroupVnum) const;
+		bool			IsEquipUniqueGroup(uint32_t dwGroupVnum) const;
 		// END_OF_CHECK_UNIQUE_GROUP
 
 		void			SendEquipment(LPCHARACTER ch);
@@ -1196,14 +1196,14 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		 * @param [in]	dwItemVnum 아이템 vnum
 		 * @param [in]	dwItemPrice 아이템 가격
 		 */
-		void			SendMyShopPriceListCmd(DWORD dwItemVnum, DWORD dwItemPrice);
+		void			SendMyShopPriceListCmd(uint32_t dwItemVnum, uint32_t dwItemPrice);
 
 		bool			m_bNoOpenedShop;	///< 이번 접속 후 개인상점을 연 적이 있는지의 여부(열었던 적이 없다면 true)
 
 		bool			m_bItemLoaded;
-		int				m_iRefineAdditionalCell;
+		int32_t				m_iRefineAdditionalCell;
 		bool			m_bUnderRefine;
-		DWORD			m_dwRefineNPCVID;
+		uint32_t			m_dwRefineNPCVID;
 
 	public:
 		////////////////////////////////////////////////////////////////////////////////////////
@@ -1220,12 +1220,12 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	public:
 		void			SetShop(LPSHOP pkShop);
 		LPSHOP			GetShop() const { return m_pkShop; }
-		void			ShopPacket(BYTE bSubHeader);
+		void			ShopPacket(uint8_t bSubHeader);
 
 		void			SetShopOwner(LPCHARACTER ch) { m_pkChrShopOwner = ch; }
 		LPCHARACTER		GetShopOwner() const { return m_pkChrShopOwner;}
 
-		void			OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, BYTE bItemCount);
+		void			OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, uint8_t bItemCount);
 		LPSHOP			GetMyShop() const { return m_pkMyShop; }
 		void			CloseMyShop();
 
@@ -1253,10 +1253,10 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	public:
 		struct TBattleInfo
 		{
-			int iTotalDamage;
-			int iAggro;
+			int32_t iTotalDamage;
+			int32_t iAggro;
 
-			TBattleInfo(int iTot, int iAggr)
+			TBattleInfo(int32_t iTot, int32_t iAggr)
 				: iTotalDamage(iTot), iAggro(iAggr)
 				{}
 		};
@@ -1264,16 +1264,16 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		typedef struct SAttackLog
 		{
-			DWORD	dwVID;
-			DWORD	dwTime;
+			uint32_t	dwVID;
+			uint32_t	dwTime;
 		} AttackLog;
 
-		bool				Damage(LPCHARACTER pAttacker, int dam, EDamageType type = DAMAGE_TYPE_NORMAL);
-		bool				__Profile__Damage(LPCHARACTER pAttacker, int dam, EDamageType type = DAMAGE_TYPE_NORMAL);
-		void				DeathPenalty(BYTE bExpLossPercent);
-		void				ReviveInvisible(int iDur);
+		bool				Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type = DAMAGE_TYPE_NORMAL);
+		bool				__Profile__Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type = DAMAGE_TYPE_NORMAL);
+		void				DeathPenalty(uint8_t bExpLossPercent);
+		void				ReviveInvisible(int32_t iDur);
 
-		bool				Attack(LPCHARACTER pkVictim, BYTE bType = 0);
+		bool				Attack(LPCHARACTER pkVictim, uint8_t bType = 0);
 		bool				IsAlive() const		{ return m_pointsInstant.position == POS_DEAD ? false : true; }
 		bool				CanFight() const;
 
@@ -1285,21 +1285,21 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool				IsStun() const;
 		void				Stun();
 		bool				IsDead() const;
-		void				Dead(LPCHARACTER pkKiller = NULL, bool bImmediateDead=false);
+		void				Dead(LPCHARACTER pkKiller = nullptr, bool bImmediateDead=false);
 
 		void				Reward(bool bItemDrop);
 		void				RewardGold(LPCHARACTER pkAttacker);
 
-		bool				Shoot(BYTE bType);
-		void				FlyTarget(DWORD dwTargetVID, long x, long y, BYTE bHeader);
+		bool				Shoot(uint8_t bType);
+		void				FlyTarget(uint32_t dwTargetVID, int32_t x, int32_t y, uint8_t bHeader);
 
 		void				ForgetMyAttacker();
 		void				AggregateMonster();
 		void				AttractRanger();
 		void				PullMonster();
 
-		int					GetArrowAndBow(LPITEM * ppkBow, LPITEM * ppkArrow, int iArrowCount = 1);
-		void				UseArrow(LPITEM pkArrow, DWORD dwArrowCount);
+		int32_t					GetArrowAndBow(LPITEM * ppkBow, LPITEM * ppkArrow, int32_t iArrowCount = 1);
+		void				UseArrow(LPITEM pkArrow, uint32_t dwArrowCount);
 
 		void				AttackedByPoison(LPCHARACTER pkAttacker);
 		void				RemovePoison();
@@ -1307,73 +1307,73 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void				AttackedByBleeding(LPCHARACTER pkAttacker);
 		void				RemoveBleeding();
 #endif
-		void				AttackedByFire(LPCHARACTER pkAttacker, int amount, int count);
+		void				AttackedByFire(LPCHARACTER pkAttacker, int32_t amount, int32_t count);
 		void				RemoveFire();
 
-		void				UpdateAlignment(int iAmount);
-		int					GetAlignment() const;
+		void				UpdateAlignment(int32_t iAmount);
+		int32_t					GetAlignment() const;
 
 		//선악치 얻기 
-		int					GetRealAlignment() const;
+		int32_t					GetRealAlignment() const;
 		void				ShowAlignment(bool bShow);
 
 		void				SetKillerMode(bool bOn);
 		bool				IsKillerMode() const;
 		void				UpdateKillerMode();
 
-		BYTE				GetPKMode() const;
-		void				SetPKMode(BYTE bPKMode);
+		uint8_t				GetPKMode() const;
+		void				SetPKMode(uint8_t bPKMode);
 
 		void				ItemDropPenalty(LPCHARACTER pkKiller);
 
-		void				UpdateAggrPoint(LPCHARACTER ch, EDamageType type, int dam);
+		void				UpdateAggrPoint(LPCHARACTER ch, EDamageType type, int32_t dam);
 
 		//
 		// HACK
 		// 
 	public:
-		void SetComboSequence(BYTE seq);
-		BYTE GetComboSequence() const;
+		void SetComboSequence(uint8_t seq);
+		uint8_t GetComboSequence() const;
 
-		void SetLastComboTime(DWORD time);
-		DWORD GetLastComboTime() const;
+		void SetLastComboTime(uint32_t time);
+		uint32_t GetLastComboTime() const;
 
-		int GetValidComboInterval() const;
-		void SetValidComboInterval(int interval);
+		int32_t GetValidComboInterval() const;
+		void SetValidComboInterval(int32_t interval);
 
-		BYTE GetComboIndex() const;
+		uint8_t GetComboIndex() const;
 
-		void IncreaseComboHackCount(int k = 1);
+		void IncreaseComboHackCount(int32_t k = 1);
 		void ResetComboHackCount();
-		void SkipComboAttackByTime(int interval);
-		DWORD GetSkipComboAttackByTime() const;
+		void SkipComboAttackByTime(int32_t interval);
+		uint32_t GetSkipComboAttackByTime() const;
 
 	protected:
-		BYTE m_bComboSequence;
-		DWORD m_dwLastComboTime;
-		int m_iValidComboInterval;
-		BYTE m_bComboIndex;
-		int m_iComboHackCount;
-		DWORD m_dwSkipComboAttackByTime;
+		uint8_t m_bComboSequence;
+		uint32_t m_dwLastComboTime;
+		int32_t m_iValidComboInterval;
+		uint8_t m_bComboIndex;
+		int32_t m_iComboHackCount;
+		uint32_t m_dwSkipComboAttackByTime;
 
 	protected:
-		void				UpdateAggrPointEx(LPCHARACTER ch, EDamageType type, int dam, TBattleInfo & info);
-		void				ChangeVictimByAggro(int iNewAggro, LPCHARACTER pNewVictim);
+		void				UpdateAggrPointEx(LPCHARACTER ch, EDamageType type, int32_t dam, TBattleInfo & info);
+		void				ChangeVictimByAggro(int32_t iNewAggro, LPCHARACTER pNewVictim);
 
-		DWORD				m_dwFlyTargetID;
-		std::vector<DWORD>	m_vec_dwFlyTargets;
+		uint32_t				m_dwFlyTargetID;
+		std::vector<uint32_t>	m_vec_dwFlyTargets;
 		TDamageMap			m_map_kDamage;	// 어떤 캐릭터가 나에게 얼마만큼의 데미지를 주었는가?
 //		AttackLog			m_kAttackLog;
-		DWORD				m_dwKillerPID;
+		uint32_t				m_dwKillerPID;
 
-		int					m_iAlignment;		// Lawful/Chaotic value -200000 ~ 200000
-		int					m_iRealAlignment;
-		int					m_iKillerModePulse;
-		BYTE				m_bPKMode;
+		int32_t					m_iAlignment;		// Lawful/Chaotic value -200000 ~ 200000
+		int32_t					m_iRealAlignment;
+		int32_t					m_iKillerModePulse;
+		uint8_t				m_bPKMode;
 
 		// Aggro
-		DWORD				m_dwLastVictimSetTime;
-		int					m_iMaxAggro;
+		uint32_t				m_dwLastVictimSetTime;
+		int32_t					m_iMaxAggro;
 		// End of Battle
 
 		// Stone
@@ -1381,14 +1381,14 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void				SetStone(LPCHARACTER pkChrStone);
 		void				ClearStone();
 		void				DetermineDropMetinStone();
-		DWORD				GetDropMetinStoneVnum() const { return m_dwDropMetinStone; }
-		BYTE				GetDropMetinStonePct() const { return m_bDropMetinStonePct; }
+		uint32_t				GetDropMetinStoneVnum() const { return m_dwDropMetinStone; }
+		uint8_t				GetDropMetinStonePct() const { return m_bDropMetinStonePct; }
 
 	protected:
 		LPCHARACTER			m_pkChrStone;		// 나를 스폰한 돌
 		CHARACTER_SET		m_set_pkChrSpawnedBy;	// 내가 스폰한 놈들
-		DWORD				m_dwDropMetinStone;
-		BYTE				m_bDropMetinStonePct;
+		uint32_t				m_dwDropMetinStone;
+		uint8_t				m_bDropMetinStonePct;
 		// End of Stone
 
 	public:
@@ -1404,62 +1404,62 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		};
 
 		void				SkillLevelPacket();
-		void				SkillLevelUp(DWORD dwVnum, BYTE bMethod = SKILL_UP_BY_POINT);
-		bool				SkillLevelDown(DWORD dwVnum);
+		void				SkillLevelUp(uint32_t dwVnum, uint8_t bMethod = SKILL_UP_BY_POINT);
+		bool				SkillLevelDown(uint32_t dwVnum);
 		// ADD_GRANDMASTER_SKILL
-		bool				UseSkill(DWORD dwVnum, LPCHARACTER pkVictim, bool bUseGrandMaster = true);
+		bool				UseSkill(uint32_t dwVnum, LPCHARACTER pkVictim, bool bUseGrandMaster = true);
 		void				ResetSkill();
-		void				SetSkillLevel(DWORD dwVnum, BYTE bLev);
-		int					GetUsedSkillMasterType(DWORD dwVnum);
+		void				SetSkillLevel(uint32_t dwVnum, uint8_t bLev);
+		int32_t					GetUsedSkillMasterType(uint32_t dwVnum);
 
-		bool				IsLearnableSkill(DWORD dwSkillVnum) const;
+		bool				IsLearnableSkill(uint32_t dwSkillVnum) const;
 		// END_OF_ADD_GRANDMASTER_SKILL
 
-		bool				CheckSkillHitCount(const BYTE SkillID, const VID dwTargetVID);
-		bool				CanUseSkill(DWORD dwSkillVnum) const;
-		bool				IsUsableSkillMotion(DWORD dwMotionIndex) const;
-		int					GetSkillLevel(DWORD dwVnum) const;
-		int					GetSkillMasterType(DWORD dwVnum) const;
-		int					GetSkillPower(DWORD dwVnum, BYTE bLevel = 0) const;
+		bool				CheckSkillHitCount(const uint8_t SkillID, const VID dwTargetVID);
+		bool				CanUseSkill(uint32_t dwSkillVnum) const;
+		bool				IsUsableSkillMotion(uint32_t dwMotionIndex) const;
+		int32_t					GetSkillLevel(uint32_t dwVnum) const;
+		int32_t					GetSkillMasterType(uint32_t dwVnum) const;
+		int32_t					GetSkillPower(uint32_t dwVnum, uint8_t bLevel = 0) const;
 
-		time_t				GetSkillNextReadTime(DWORD dwVnum) const;
-		void				SetSkillNextReadTime(DWORD dwVnum, time_t time);
-		void				SkillLearnWaitMoreTimeMessage(DWORD dwVnum);
+		time_t				GetSkillNextReadTime(uint32_t dwVnum) const;
+		void				SetSkillNextReadTime(uint32_t dwVnum, time_t time);
+		void				SkillLearnWaitMoreTimeMessage(uint32_t dwVnum);
 
-		void				ComputePassiveSkill(DWORD dwVnum);
-		int					ComputeSkill(DWORD dwVnum, LPCHARACTER pkVictim, BYTE bSkillLevel = 0);
+		void				ComputePassiveSkill(uint32_t dwVnum);
+		int32_t					ComputeSkill(uint32_t dwVnum, LPCHARACTER pkVictim, uint8_t bSkillLevel = 0);
 #ifdef ENABLE_WOLFMAN_CHARACTER
-		int					ComputeSkillParty(DWORD dwVnum, LPCHARACTER pkVictim, BYTE bSkillLevel = 0);
+		int32_t					ComputeSkillParty(uint32_t dwVnum, LPCHARACTER pkVictim, uint8_t bSkillLevel = 0);
 #endif
-		int					ComputeSkillAtPosition(DWORD dwVnum, const PIXEL_POSITION& posTarget, BYTE bSkillLevel = 0);
+		int32_t					ComputeSkillAtPosition(uint32_t dwVnum, const PIXEL_POSITION& posTarget, uint8_t bSkillLevel = 0);
 		void				ComputeSkillPoints();
 
-		void				SetSkillGroup(BYTE bSkillGroup); 
-		BYTE				GetSkillGroup() const		{ return m_points.skill_group; }
+		void				SetSkillGroup(uint8_t bSkillGroup); 
+		uint8_t				GetSkillGroup() const		{ return m_points.skill_group; }
 
-		int					ComputeCooltime(int time);
+		int32_t					ComputeCooltime(int32_t time);
 
 		void				GiveRandomSkillBook();
 
 		void				DisableCooltime();
-		bool				LearnSkillByBook(DWORD dwSkillVnum, BYTE bProb = 0);
-		bool				LearnGrandMasterSkill(DWORD dwSkillVnum);
+		bool				LearnSkillByBook(uint32_t dwSkillVnum, uint8_t bProb = 0);
+		bool				LearnGrandMasterSkill(uint32_t dwSkillVnum);
 
 	private:
 		bool				m_bDisableCooltime;
-		DWORD				m_dwLastSkillTime;	///< 마지막으로 skill 을 쓴 시간(millisecond).
+		uint32_t				m_dwLastSkillTime;	///< 마지막으로 skill 을 쓴 시간(millisecond).
 		// End of Skill
 
 		// MOB_SKILL
 	public:
 		bool				HasMobSkill() const;
 		size_t				CountMobSkill() const;
-		const TMobSkillInfo * GetMobSkill(unsigned int idx) const;
-		bool				CanUseMobSkill(unsigned int idx) const;
-		bool				UseMobSkill(unsigned int idx);
+		const TMobSkillInfo * GetMobSkill(uint32_t idx) const;
+		bool				CanUseMobSkill(uint32_t idx) const;
+		bool				UseMobSkill(uint32_t idx);
 		void				ResetMobSkillCooltime();
 	protected:
-		DWORD				m_adwMobSkillCooltime[MOB_SKILL_MAX_NUM];
+		uint32_t				m_adwMobSkillCooltime[MOB_SKILL_MAX_NUM];
 		// END_OF_MOB_SKILL
 
 		// for SKILL_MUYEONG
@@ -1472,15 +1472,15 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		// for SKILL_CHAIN lighting
 	public:
-		int					GetChainLightningIndex() const { return m_iChainLightingIndex; }
+		int32_t					GetChainLightningIndex() const { return m_iChainLightingIndex; }
 		void				IncChainLightningIndex() { ++m_iChainLightingIndex; }
 		void				AddChainLightningExcept(LPCHARACTER ch) { m_setExceptChainLighting.insert(ch); }
 		void				ResetChainLightningIndex() { m_iChainLightingIndex = 0; m_setExceptChainLighting.clear(); }
-		int					GetChainLightningMaxCount() const;
+		int32_t					GetChainLightningMaxCount() const;
 		const CHARACTER_SET& GetChainLightingExcept() const { return m_setExceptChainLighting; }
 
 	private:
-		int					m_iChainLightingIndex;
+		int32_t					m_iChainLightingIndex;
 		CHARACTER_SET m_setExceptChainLighting;
 
 		// for SKILL_EUNHYUNG
@@ -1490,15 +1490,15 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool				GetAffectedEunhyung() const { return m_dwAffectedEunhyungLevel; }
 
 	private:
-		DWORD				m_dwAffectedEunhyungLevel;
+		uint32_t				m_dwAffectedEunhyungLevel;
 
 		//
 		// Skill levels
 		//
 	protected:
 		TPlayerSkill*					m_pSkillLevels;
-		std::unordered_map<BYTE, int>		m_SkillDamageBonus;
-		std::map<int, TSkillUseInfo>	m_SkillUseInfo;
+		std::unordered_map<uint8_t, int32_t>		m_SkillDamageBonus;
+		std::map<int32_t, TSkillUseInfo>	m_SkillUseInfo;
 
 		////////////////////////////////////////////////////////////////////////////////////////
 		// AI related
@@ -1524,7 +1524,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		VID				m_kVIDVictim;
 
 	protected:
-		DWORD			m_dwLastChangeAttackPositionTime;
+		uint32_t			m_dwLastChangeAttackPositionTime;
 		CTrigger		m_triggerOnClick;
 		// End of AI
 
@@ -1544,13 +1544,13 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		////////////////////////////////////////////////////////////////////////////////////////
 		// Safebox
 	public:
-		int					GetSafeboxSize() const;
+		int32_t					GetSafeboxSize() const;
 		void				QuerySafeboxSize();
-		void				SetSafeboxSize(int size);
+		void				SetSafeboxSize(int32_t size);
 
 		CSafebox *			GetSafebox() const;
-		void				LoadSafebox(int iSize, DWORD dwGold, int iItemCount, TPlayerItem * pItems);
-		void				ChangeSafeboxSize(BYTE bSize);
+		void				LoadSafebox(int32_t iSize, uint32_t dwGold, int32_t iItemCount, TPlayerItem * pItems);
+		void				ChangeSafeboxSize(uint8_t bSize);
 		void				CloseSafebox();
 
 		/// 창고 열기 요청
@@ -1569,11 +1569,11 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		 */
 		void				CancelSafeboxLoad( void ) { m_bOpeningSafebox = false; }
 
-		void				SetMallLoadTime(int t) { m_iMallLoadTime = t; }
-		int					GetMallLoadTime() const { return m_iMallLoadTime; }
+		void				SetMallLoadTime(int32_t t) { m_iMallLoadTime = t; }
+		int32_t					GetMallLoadTime() const { return m_iMallLoadTime; }
 
 		CSafebox *			GetMall() const;
-		void				LoadMall(int iItemCount, TPlayerItem * pItems);
+		void				LoadMall(int32_t iItemCount, TPlayerItem * pItems);
 		void				CloseMall();
 
 		void				SetSafeboxOpenPosition();
@@ -1581,12 +1581,12 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 	protected:
 		CSafebox *			m_pkSafebox;
-		int					m_iSafeboxSize;
-		int					m_iSafeboxLoadTime;
+		int32_t					m_iSafeboxSize;
+		int32_t					m_iSafeboxLoadTime;
 		bool				m_bOpeningSafebox;	///< 창고가 열기 요청 중이거나 열려있는가 여부, true 일 경우 열기요청이거나 열려있음.
 
 		CSafebox *			m_pkMall;
-		int					m_iMallLoadTime;
+		int32_t					m_iMallLoadTime;
 
 		PIXEL_POSITION		m_posSafeboxOpen;
 
@@ -1595,19 +1595,19 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		////////////////////////////////////////////////////////////////////////////////////////
 		// Mounting
 	public:
-		void				MountVnum(DWORD vnum);
-		DWORD				GetMountVnum() const { return m_dwMountVnum; }
-		DWORD				GetLastMountTime() const { return m_dwMountTime; }
+		void				MountVnum(uint32_t vnum);
+		uint32_t				GetMountVnum() const { return m_dwMountVnum; }
+		uint32_t				GetLastMountTime() const { return m_dwMountTime; }
 
 		bool				CanUseHorseSkill();
 
 		// Horse
-		virtual	void		SetHorseLevel(int iLevel);
+		virtual	void		SetHorseLevel(int32_t iLevel);
 
 		virtual	bool		StartRiding();
 		virtual	bool		StopRiding();
 
-		virtual	DWORD		GetMyHorseVnum() const;
+		virtual	uint32_t		GetMyHorseVnum() const;
 
 		virtual	void		HorseDie();
 		virtual bool		ReviveHorse();
@@ -1615,7 +1615,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		virtual void		SendHorseInfo();
 		virtual	void		ClearHorseInfo();
 
-		void				HorseSummon(bool bSummon, bool bFromFar = false, DWORD dwVnum = 0, const char* name = 0);
+		void				HorseSummon(bool bSummon, bool bFromFar = false, uint32_t dwVnum = 0, const char* name = 0);
 
 		LPCHARACTER			GetHorse() const			{ return m_chHorse; }	 // 현재 소환중인 말
 		LPCHARACTER			GetRider() const; // rider on horse
@@ -1637,23 +1637,23 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		LPCHARACTER			m_chHorse;
 		LPCHARACTER			m_chRider;
 
-		DWORD				m_dwMountVnum;
-		DWORD				m_dwMountTime;
+		uint32_t				m_dwMountVnum;
+		uint32_t				m_dwMountTime;
 
-		BYTE				m_bSendHorseLevel;
-		BYTE				m_bSendHorseHealthGrade;
-		BYTE				m_bSendHorseStaminaGrade;
+		uint8_t				m_bSendHorseLevel;
+		uint8_t				m_bSendHorseHealthGrade;
+		uint8_t				m_bSendHorseStaminaGrade;
 
 
 		////////////////////////////////////////////////////////////////////////////////////////
 		// Empire
 
 	public:
-		void 				SetEmpire(BYTE bEmpire);
-		BYTE				GetEmpire() const { return m_bEmpire; }
+		void 				SetEmpire(uint8_t bEmpire);
+		uint8_t				GetEmpire() const { return m_bEmpire; }
 
 	protected:
-		BYTE				m_bEmpire;
+		uint8_t				m_bEmpire;
 
 		////////////////////////////////////////////////////////////////////////////////////////
 		// Regen
@@ -1671,8 +1671,8 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// Resists & Proofs
 	public:
 		bool				CannotMoveByAffect() const;	// 특정 효과에 의해 움직일 수 없는 상태인가?
-		bool				IsImmune(DWORD dwImmuneFlag);
-		void				SetImmuneFlag(DWORD dw) { m_pointsInstant.dwImmuneFlag = dw; }
+		bool				IsImmune(uint32_t dwImmuneFlag);
+		void				SetImmuneFlag(uint32_t dw) { m_pointsInstant.dwImmuneFlag = dw; }
 
 	protected:
 		void				ApplyMobAttribute(const TMobTable* table);
@@ -1682,45 +1682,45 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// QUEST
 		// 
 	public:
-		void				SetQuestNPCID(DWORD vid);
-		DWORD				GetQuestNPCID() const { return m_dwQuestNPCVID; }
+		void				SetQuestNPCID(uint32_t vid);
+		uint32_t				GetQuestNPCID() const { return m_dwQuestNPCVID; }
 		LPCHARACTER			GetQuestNPC() const;
 
 		void				SetQuestItemPtr(LPITEM item);
 		void				ClearQuestItemPtr();
 		LPITEM				GetQuestItemPtr() const;
 
-		void				SetQuestBy(DWORD dwQuestVnum)	{ m_dwQuestByVnum = dwQuestVnum; }
-		DWORD				GetQuestBy() const			{ return m_dwQuestByVnum; }
+		void				SetQuestBy(uint32_t dwQuestVnum)	{ m_dwQuestByVnum = dwQuestVnum; }
+		uint32_t				GetQuestBy() const			{ return m_dwQuestByVnum; }
 
-		int					GetQuestFlag(const std::string& flag) const;
-		void				SetQuestFlag(const std::string& flag, int value);
+		int32_t					GetQuestFlag(const std::string& flag) const;
+		void				SetQuestFlag(const std::string& flag, int32_t value);
 
-		void				ConfirmWithMsg(const char* szMsg, int iTimeout, DWORD dwRequestPID);
+		void				ConfirmWithMsg(const char* szMsg, int32_t iTimeout, uint32_t dwRequestPID);
 
 	private:
-		DWORD				m_dwQuestNPCVID;
-		DWORD				m_dwQuestByVnum;
+		uint32_t				m_dwQuestNPCVID;
+		uint32_t				m_dwQuestByVnum;
 		LPITEM				m_pQuestItem;
 
 		// Events
 	public:
-		bool				StartStateMachine(int iPulse = 1);
+		bool				StartStateMachine(int32_t iPulse = 1);
 		void				StopStateMachine();
-		void				UpdateStateMachine(DWORD dwPulse);
-		void				SetNextStatePulse(int iPulseNext);
+		void				UpdateStateMachine(uint32_t dwPulse);
+		void				SetNextStatePulse(int32_t iPulseNext);
 
 		// 캐릭터 인스턴스 업데이트 함수. 기존엔 이상한 상속구조로 CFSM::Update 함수를 호출하거나 UpdateStateMachine 함수를 사용했는데, 별개의 업데이트 함수 추가함.
-		void				UpdateCharacter(DWORD dwPulse);
+		void				UpdateCharacter(uint32_t dwPulse);
 
 	protected:
-		DWORD				m_dwNextStatePulse;
+		uint32_t				m_dwNextStatePulse;
 
 		// Marriage
 	public:
 		LPCHARACTER			GetMarryPartner() const;
 		void				SetMarryPartner(LPCHARACTER ch);
-		int					GetMarriageBonus(DWORD dwItemVnum, bool bSum = true);
+		int32_t					GetMarriageBonus(uint32_t dwItemVnum, bool bSum = true);
 
 		void				SetWeddingMap(marriage::WeddingMap* pMap);
 		marriage::WeddingMap* GetWeddingMap() const { return m_pWeddingMap; }
@@ -1773,27 +1773,27 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		const CMob *		m_pkMobData;
 		CMobInstance *		m_pkMobInst;
 
-		std::map<int, LPEVENT> m_mapMobSkillEvent;
+		std::map<int32_t, LPEVENT> m_mapMobSkillEvent;
 
 		friend struct FuncSplashDamage;
 		friend struct FuncSplashAffect;
 		friend class CFuncShoot;
 
 	public:
-		int				GetPremiumRemainSeconds(BYTE bType) const;
+		int32_t				GetPremiumRemainSeconds(uint8_t bType) const;
 
 	private:
-		int				m_aiPremiumTimes[PREMIUM_MAX_NUM];
+		int32_t				m_aiPremiumTimes[PREMIUM_MAX_NUM];
 
 		// CHANGE_ITEM_ATTRIBUTES
-		// static const DWORD		msc_dwDefaultChangeItemAttrCycle;	///< 디폴트 아이템 속성변경 가능 주기
+		// static const uint32_t		msc_dwDefaultChangeItemAttrCycle;	///< 디폴트 아이템 속성변경 가능 주기
 		static const char		msc_szLastChangeItemAttrFlag[];		///< 최근 아이템 속성을 변경한 시간의 Quest Flag 이름
 		// static const char		msc_szChangeItemAttrCycleFlag[];		///< 아이템 속성병경 가능 주기의 Quest Flag 이름
 		// END_OF_CHANGE_ITEM_ATTRIBUTES
 
 		// NEW_HAIR_STYLE_ADD
 	public :
-		bool ItemProcess_Hair(LPITEM item, int iDestCell);
+		bool ItemProcess_Hair(LPITEM item, int32_t iDestCell);
 		// END_NEW_HAIR_STYLE_ADD
 
 	public :
@@ -1801,17 +1801,17 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void ClearSubSkill();
 
 		// RESET_ONE_SKILL
-		bool ResetOneSkill(DWORD dwVnum);
+		bool ResetOneSkill(uint32_t dwVnum);
 		// END_RESET_ONE_SKILL
 
 	private :
-		void SendDamagePacket(LPCHARACTER pAttacker, int Damage, BYTE DamageFlag);
+		void SendDamagePacket(LPCHARACTER pAttacker, int32_t Damage, uint8_t DamageFlag);
 
 	// ARENA
 	private :
 		CArena *m_pArena;
 		bool m_ArenaObserver;
-		int m_nPotionLimit;
+		int32_t m_nPotionLimit;
 
 	public :
 		void 	SetArena(CArena* pArena) { m_pArena = pArena; }
@@ -1820,8 +1820,8 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		CArena* GetArena() const { return m_pArena; }
 		bool	GetArenaObserverMode() const { return m_ArenaObserver; }
 
-		void	SetPotionLimit(int count) { m_nPotionLimit = count; }
-		int		GetPotionLimit() const { return m_nPotionLimit; }
+		void	SetPotionLimit(int32_t count) { m_nPotionLimit = count; }
+		int32_t		GetPotionLimit() const { return m_nPotionLimit; }
 	// END_ARENA
 
 		//PREVENT_TRADE_WINDOW
@@ -1829,39 +1829,39 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool	IsOpenSafebox() const { return m_isOpenSafebox ? true : false; }
 		void 	SetOpenSafebox(bool b) { m_isOpenSafebox = b; }
 
-		int		GetSafeboxLoadTime() const { return m_iSafeboxLoadTime; }
+		int32_t		GetSafeboxLoadTime() const { return m_iSafeboxLoadTime; }
 		void	SetSafeboxLoadTime() { m_iSafeboxLoadTime = thecore_pulse(); }
 		//END_PREVENT_TRADE_WINDOW
 	private:
 		bool	m_isOpenSafebox;
 
 	public:
-		int		GetSkillPowerByLevel(int level, bool bMob = false) const;
+		int32_t		GetSkillPowerByLevel(int32_t level, bool bMob = false) const;
 		
 		//PREVENT_REFINE_HACK
-		int		GetRefineTime() const { return m_iRefineTime; }
+		int32_t		GetRefineTime() const { return m_iRefineTime; }
 		void	SetRefineTime() { m_iRefineTime = thecore_pulse(); } 
-		int		m_iRefineTime;
+		int32_t		m_iRefineTime;
 		//END_PREVENT_REFINE_HACK
 
 		//RESTRICT_USE_SEED_OR_MOONBOTTLE
-		int 	GetUseSeedOrMoonBottleTime() const { return m_iSeedTime; }
+		int32_t 	GetUseSeedOrMoonBottleTime() const { return m_iSeedTime; }
 		void  	SetUseSeedOrMoonBottleTime() { m_iSeedTime = thecore_pulse(); }
-		int 	m_iSeedTime;
+		int32_t 	m_iSeedTime;
 		//END_RESTRICT_USE_SEED_OR_MOONBOTTLE
 		
 		//PREVENT_PORTAL_AFTER_EXCHANGE
-		int		GetExchangeTime() const { return m_iExchangeTime; }
+		int32_t		GetExchangeTime() const { return m_iExchangeTime; }
 		void	SetExchangeTime() { m_iExchangeTime = thecore_pulse(); }
-		int		m_iExchangeTime;
+		int32_t		m_iExchangeTime;
 		//END_PREVENT_PORTAL_AFTER_EXCHANGE
 		
-		int 	m_iMyShopTime;
-		int		GetMyShopTime() const	{ return m_iMyShopTime; }
+		int32_t 	m_iMyShopTime;
+		int32_t		GetMyShopTime() const	{ return m_iMyShopTime; }
 		void	SetMyShopTime() { m_iMyShopTime = thecore_pulse(); }
 
 		// Hack 방지를 위한 체크.
-		bool	IsHack(bool bSendMsg = true, bool bCheckShopOwner = true, int limittime = g_nPortalLimitTime);
+		bool	IsHack(bool bSendMsg = true, bool bCheckShopOwner = true, int32_t limittime = g_nPortalLimitTime);
 
 		void Say(const std::string & s);
 
@@ -1875,7 +1875,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool CanDoCube() const;
 
 	private:
-		int		m_deposit_pulse;
+		int32_t		m_deposit_pulse;
 
 	public:
 		void	UpdateDepositPulse();
@@ -1887,8 +1887,8 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	public:
 		struct AttackedLog
 		{
-			DWORD 	dwPID;
-			DWORD	dwAttackedTime;
+			uint32_t 	dwPID;
+			uint32_t	dwAttackedTime;
 			
 			AttackedLog() : dwPID(0), dwAttackedTime(0)
 			{
@@ -1897,7 +1897,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		AttackLog	m_kAttackLog;
 		AttackedLog m_AttackedLog;
-		int			m_speed_hack_count;
+		int32_t			m_speed_hack_count;
 
 	private :
 		std::string m_strNewName;
@@ -1910,17 +1910,17 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void GoHome();
 
 	private :
-		std::set<DWORD>	m_known_guild;
+		std::set<uint32_t>	m_known_guild;
 
 	public :
 		void SendGuildName(CGuild* pGuild);
-		void SendGuildName(DWORD dwGuildID);
+		void SendGuildName(uint32_t dwGuildID);
 
 	private :
-		DWORD m_dwLogOffInterval;
+		uint32_t m_dwLogOffInterval;
 
 	public :
-		DWORD GetLogOffInterval() const { return m_dwLogOffInterval; }
+		uint32_t GetLogOffInterval() const { return m_dwLogOffInterval; }
 
 	public:
 		bool UnEquipSpecialRideUniqueItem ();
@@ -1928,14 +1928,14 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool CanWarp () const;
 
 	private:
-		DWORD m_dwLastGoldDropTime;
+		uint32_t m_dwLastGoldDropTime;
 #ifdef ENABLE_NEWSTUFF
-		DWORD m_dwLastItemDropTime;
-		DWORD m_dwLastBoxUseTime;
-		DWORD m_dwLastBuySellTime;
+		uint32_t m_dwLastItemDropTime;
+		uint32_t m_dwLastBoxUseTime;
+		uint32_t m_dwLastBuySellTime;
 	public:
-		DWORD GetLastBuySellTime() const { return m_dwLastBuySellTime; }
-		void SetLastBuySellTime(DWORD dwLastBuySellTime) { m_dwLastBuySellTime = dwLastBuySellTime; }
+		uint32_t GetLastBuySellTime() const { return m_dwLastBuySellTime; }
+		void SetLastBuySellTime(uint32_t dwLastBuySellTime) { m_dwLastBuySellTime = dwLastBuySellTime; }
 #endif
 
 	public:
@@ -1946,10 +1946,10 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void BuffOnAttr_RemoveBuffsFromItem(LPITEM pItem);
 
 	private:
-		void BuffOnAttr_ValueChange(BYTE bType, BYTE bOldValue, BYTE bNewValue);
+		void BuffOnAttr_ValueChange(uint8_t bType, uint8_t bOldValue, uint8_t bNewValue);
 		void BuffOnAttr_ClearAll();
 
-		typedef std::map <BYTE, CBuffOnAttributes*> TMapBuffOnAttrs;
+		typedef std::map <uint8_t, CBuffOnAttributes*> TMapBuffOnAttrs;
 		TMapBuffOnAttrs m_map_buff_on_attrs;
 		// 무적 : 원활한 테스트를 위하여.
 	public:
@@ -1967,16 +1967,16 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 #endif
 #ifdef NEW_ICEDAMAGE_SYSTEM
 	private:
-		DWORD m_dwNDRFlag;
-		std::set<DWORD> m_setNDAFlag;
+		uint32_t m_dwNDRFlag;
+		std::set<uint32_t> m_setNDAFlag;
 	public:
-		const DWORD GetNoDamageRaceFlag();
-		void SetNoDamageRaceFlag(DWORD dwRaceFlag);
-		void UnsetNoDamageRaceFlag(DWORD dwRaceFlag);
+		const uint32_t GetNoDamageRaceFlag();
+		void SetNoDamageRaceFlag(uint32_t dwRaceFlag);
+		void UnsetNoDamageRaceFlag(uint32_t dwRaceFlag);
 		void ResetNoDamageRaceFlag();
-		const std::set<DWORD> & GetNoDamageAffectFlag();
-		void SetNoDamageAffectFlag(DWORD dwAffectFlag);
-		void UnsetNoDamageAffectFlag(DWORD dwAffectFlag);
+		const std::set<uint32_t> & GetNoDamageAffectFlag();
+		void SetNoDamageAffectFlag(uint32_t dwAffectFlag);
+		void UnsetNoDamageAffectFlag(uint32_t dwAffectFlag);
 		void ResetNoDamageAffectFlag();
 #endif
 
@@ -2003,9 +2003,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool	DragonSoul_IsQualified() const;
 		void	DragonSoul_GiveQualification();
 
-		int		DragonSoul_GetActiveDeck() const;
+		int32_t		DragonSoul_GetActiveDeck() const;
 		bool	DragonSoul_IsDeckActivated() const;
-		bool	DragonSoul_ActivateDeck(int deck_idx);
+		bool	DragonSoul_ActivateDeck(int32_t deck_idx);
 
 		void	DragonSoul_DeactivateAll();
 		
@@ -2026,37 +2026,37 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool		DragonSoul_RefineWindow_CanRefine();
 
 	private:
-		unsigned int itemAward_vnum;
+		uint32_t itemAward_vnum;
 		char		 itemAward_cmd[20];
 		//bool		 itemAward_flag;
 	public:
-		unsigned int GetItemAward_vnum() { return itemAward_vnum; }
+		uint32_t GetItemAward_vnum() { return itemAward_vnum; }
 		char*		 GetItemAward_cmd() { return itemAward_cmd;	  }
 		//bool		 GetItemAward_flag() { return itemAward_flag; }
-		void		 SetItemAward_vnum(unsigned int vnum) { itemAward_vnum = vnum; }
+		void		 SetItemAward_vnum(uint32_t vnum) { itemAward_vnum = vnum; }
 		void		 SetItemAward_cmd(char* cmd) { strcpy(itemAward_cmd,cmd); }
 		//void		 SetItemAward_flag(bool flag) { itemAward_flag = flag; }
 #ifdef ENABLE_ANTI_CMD_FLOOD
 	private:
-		int m_dwCmdAntiFloodPulse;
-		DWORD m_dwCmdAntiFloodCount;
+		int32_t m_dwCmdAntiFloodPulse;
+		uint32_t m_dwCmdAntiFloodCount;
 	public:
-		int GetCmdAntiFloodPulse(){return m_dwCmdAntiFloodPulse;}
-		DWORD GetCmdAntiFloodCount(){return m_dwCmdAntiFloodCount;}
-		DWORD IncreaseCmdAntiFloodCount(){return ++m_dwCmdAntiFloodCount;}
-		void SetCmdAntiFloodPulse(int dwPulse){m_dwCmdAntiFloodPulse=dwPulse;}
-		void SetCmdAntiFloodCount(DWORD dwCount){m_dwCmdAntiFloodCount=dwCount;}
+		int32_t GetCmdAntiFloodPulse(){return m_dwCmdAntiFloodPulse;}
+		uint32_t GetCmdAntiFloodCount(){return m_dwCmdAntiFloodCount;}
+		uint32_t IncreaseCmdAntiFloodCount(){return ++m_dwCmdAntiFloodCount;}
+		void SetCmdAntiFloodPulse(int32_t dwPulse){m_dwCmdAntiFloodPulse=dwPulse;}
+		void SetCmdAntiFloodCount(uint32_t dwCount){m_dwCmdAntiFloodCount=dwCount;}
 #endif
 	private:
 		
 		
 		timeval		m_tvLastSyncTime;
-		int			m_iSyncHackCount;
+		int32_t			m_iSyncHackCount;
 	public:
 		void			SetLastSyncTime(const timeval &tv) { memcpy(&m_tvLastSyncTime, &tv, sizeof(timeval)); }
 		const timeval&	GetLastSyncTime() { return m_tvLastSyncTime; }
-		void			SetSyncHackCount(int iCount) { m_iSyncHackCount = iCount;}
-		int				GetSyncHackCount() { return m_iSyncHackCount; }
+		void			SetSyncHackCount(int32_t iCount) { m_iSyncHackCount = iCount;}
+		int32_t				GetSyncHackCount() { return m_iSyncHackCount; }
 
 #ifdef ENABLE_ACCE_SYSTEM
 	protected:
@@ -2069,13 +2069,13 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void	ClearAcceMaterials();
 		bool	CleanAcceAttr(LPITEM pkItem, LPITEM pkTarget);
 		LPITEM*	GetAcceMaterials() {return m_pointsInstant.pAcceMaterials;}
-		bool	AcceIsSameGrade(long lGrade);
-		DWORD	GetAcceCombinePrice(long lGrade);
-		void	GetAcceCombineResult(DWORD & dwItemVnum, DWORD & dwMinAbs, DWORD & dwMaxAbs);
-		BYTE	CheckEmptyMaterialSlot();
-		void	AddAcceMaterial(TItemPos tPos, BYTE bPos);
-		void	RemoveAcceMaterial(BYTE bPos);
-		BYTE	CanRefineAcceMaterials();
+		bool	AcceIsSameGrade(int32_t lGrade);
+		uint32_t	GetAcceCombinePrice(int32_t lGrade);
+		void	GetAcceCombineResult(uint32_t & dwItemVnum, uint32_t & dwMinAbs, uint32_t & dwMaxAbs);
+		uint8_t	CheckEmptyMaterialSlot();
+		void	AddAcceMaterial(TItemPos tPos, uint8_t bPos);
+		void	RemoveAcceMaterial(uint8_t bPos);
+		uint8_t	CanRefineAcceMaterials();
 		void	RefineAcceMaterials();
 #endif
 

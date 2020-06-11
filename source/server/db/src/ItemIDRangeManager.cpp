@@ -12,11 +12,11 @@ CItemIDRangeManager::CItemIDRangeManager()
 
 void CItemIDRangeManager::Build()
 {
-	DWORD dwMin = 0;
-	DWORD dwMax = 0;
+	uint32_t dwMin = 0;
+	uint32_t dwMax = 0;
 	TItemIDRangeTable range;
 
-	for (int i = 0; ; ++i)
+	for (int32_t i = 0; ; ++i)
 	{
 		dwMin = cs_dwMinimumRange * (i + 1) + 1;
 		dwMax = cs_dwMinimumRange * (i + 2);
@@ -78,24 +78,24 @@ TItemIDRangeTable CItemIDRangeManager::GetRange()
 		}
 	}
 
-	for (int i = 0; i < 10; ++i)
+	for (int32_t i = 0; i < 10; ++i)
 		sys_err("ItemIDRange: NO MORE ITEM ID RANGE");
 
 	return ret;
 }
 
-bool CItemIDRangeManager::BuildRange(DWORD dwMin, DWORD dwMax, TItemIDRangeTable& range)
+bool CItemIDRangeManager::BuildRange(uint32_t dwMin, uint32_t dwMax, TItemIDRangeTable& range)
 {
 	char szQuery[1024];
-	DWORD dwItemMaxID = 0;
-	SQLMsg* pMsg = NULL;
+	uint32_t dwItemMaxID = 0;
+	SQLMsg* pMsg = nullptr;
 	MYSQL_ROW row;
 
 	snprintf(szQuery, sizeof(szQuery), "SELECT MAX(id) FROM item%s WHERE id >= %u and id <= %u", GetTablePostfix(), dwMin, dwMax);
 
 	pMsg = CDBManager::instance().DirectQuery(szQuery);
 
-	if (pMsg != NULL)
+	if (pMsg != nullptr)
 	{
 		if (pMsg->Get()->uiNumRows > 0)
 		{
@@ -126,11 +126,11 @@ bool CItemIDRangeManager::BuildRange(DWORD dwMin, DWORD dwMax, TItemIDRangeTable
 
 		pMsg = CDBManager::instance().DirectQuery(szQuery);
 
-		if (pMsg != NULL)
+		if (pMsg != nullptr)
 		{
 			if (pMsg->Get()->uiNumRows > 0)
 			{
-				DWORD count = 0;
+				uint32_t count = 0;
 				row = mysql_fetch_row(pMsg->Get()->pSQLResult);
 				str_to_number(count, row[0]);
 
@@ -153,7 +153,7 @@ bool CItemIDRangeManager::BuildRange(DWORD dwMin, DWORD dwMax, TItemIDRangeTable
 	return false;
 }
 
-void CItemIDRangeManager::UpdateRange(DWORD dwMin, DWORD dwMax)
+void CItemIDRangeManager::UpdateRange(uint32_t dwMin, uint32_t dwMax)
 {
 	TItemIDRangeTable range;
 

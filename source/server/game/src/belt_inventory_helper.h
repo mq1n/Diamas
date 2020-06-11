@@ -7,9 +7,9 @@
 class CBeltInventoryHelper
 {
 public:
-	typedef BYTE	TGradeUnit;
+	typedef uint8_t	TGradeUnit;
 
-	static TGradeUnit GetBeltGradeByRefineLevel(DWORD level)
+	static TGradeUnit GetBeltGradeByRefineLevel(uint32_t level)
 	{
 		static TGradeUnit beltGradeByLevelTable[] = 
 		{
@@ -60,7 +60,7 @@ public:
 		return availableRuleByGrade;
 	}
 
-	static bool IsAvailableCell(WORD cell, int beltGrade /*int beltLevel*/)
+	static bool IsAvailableCell(uint16_t cell, int32_t beltGrade /*int32_t beltLevel*/)
 	{
 		// 기획 또 바뀜.. 아놔...
 		//const TGradeUnit beltGrade = GetBeltGradeByRefineLevel(beltLevel);		
@@ -72,11 +72,11 @@ public:
 	/// pc의 벨트 인벤토리에 아이템이 하나라도 존재하는 지 검사하는 함수.
 	static bool IsExistItemInBeltInventory(LPCHARACTER pc)
 	{
-		for (WORD i = BELT_INVENTORY_SLOT_START; i < BELT_INVENTORY_SLOT_END; ++i)
+		for (uint16_t i = BELT_INVENTORY_SLOT_START; i < BELT_INVENTORY_SLOT_END; ++i)
 		{
 			LPITEM beltInventoryItem = pc->GetInventoryItem(i);
 
-			if (NULL != beltInventoryItem)
+			if (nullptr != beltInventoryItem)
 				return true;
 		}
 

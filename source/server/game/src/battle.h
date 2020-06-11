@@ -11,36 +11,36 @@ enum EBattleTypes       // 상대방 기준
 	BATTLE_DEAD
 };
 
-extern int	CalcAttBonus(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, int iAtk);
-extern int	CalcBattleDamage(int iDam, int iAttackerLev, int iVictimLev);
-extern int	CalcMeleeDamage(LPCHARACTER pAttacker, LPCHARACTER pVictim, bool bIgnoreDefense = false, bool bIgnoreTargetRating = false);
-extern int	CalcMagicDamage(LPCHARACTER pAttacker, LPCHARACTER pVictim);
-extern int	CalcArrowDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, LPITEM pkBow, LPITEM pkArrow, bool bIgnoreDefense = false);
+extern int32_t	CalcAttBonus(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, int32_t iAtk);
+extern int32_t	CalcBattleDamage(int32_t iDam, int32_t iAttackerLev, int32_t iVictimLev);
+extern int32_t	CalcMeleeDamage(LPCHARACTER pAttacker, LPCHARACTER pVictim, bool bIgnoreDefense = false, bool bIgnoreTargetRating = false);
+extern int32_t	CalcMagicDamage(LPCHARACTER pAttacker, LPCHARACTER pVictim);
+extern int32_t	CalcArrowDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, LPITEM pkBow, LPITEM pkArrow, bool bIgnoreDefense = false);
 extern float	CalcAttackRating(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, bool bIgnoreTargetRating = false);
 
 #ifdef NEW_ICEDAMAGE_SYSTEM
 extern bool battle_is_icedamage(LPCHARACTER pAttacker, LPCHARACTER pVictim);
 #endif
 extern bool	battle_is_attackable(LPCHARACTER ch, LPCHARACTER victim);
-extern int	battle_melee_attack(LPCHARACTER ch, LPCHARACTER victim);
+extern int32_t	battle_melee_attack(LPCHARACTER ch, LPCHARACTER victim);
 extern void	battle_end(LPCHARACTER ch);
 
-extern bool	battle_distance_valid_by_xy(long x, long y, long tx, long ty);
+extern bool	battle_distance_valid_by_xy(int32_t x, int32_t y, int32_t tx, int32_t ty);
 extern bool	battle_distance_valid(LPCHARACTER ch, LPCHARACTER victim);
-extern int	battle_count_attackers(LPCHARACTER ch);
+extern int32_t	battle_count_attackers(LPCHARACTER ch);
 
 extern void	NormalAttackAffect(LPCHARACTER pkAttacker, LPCHARACTER pkVictim);
 
 // 특성 공격
 inline void AttackAffect(LPCHARACTER pkAttacker,
 		LPCHARACTER pkVictim,
-		BYTE att_point,
-		DWORD immune_flag,
-		DWORD affect_idx,
-		BYTE affect_point,
-		long affect_amount,
-		DWORD affect_flag,
-		int time,
+		uint8_t att_point,
+		uint32_t immune_flag,
+		uint32_t affect_idx,
+		uint8_t affect_point,
+		int32_t affect_amount,
+		uint32_t affect_flag,
+		int32_t time,
 		const char* name)
 {
 	if (pkAttacker->GetPoint(att_point) && !pkVictim->IsAffectFlag(affect_flag))
@@ -62,13 +62,13 @@ inline void AttackAffect(LPCHARACTER pkAttacker,
 }
 
 inline void SkillAttackAffect(LPCHARACTER pkVictim,
-		int success_pct,
-		DWORD immune_flag,
-		DWORD affect_idx,
-		BYTE affect_point,
-		long affect_amount,
-		DWORD affect_flag,
-		int time,
+		int32_t success_pct,
+		uint32_t immune_flag,
+		uint32_t affect_idx,
+		uint8_t affect_point,
+		int32_t affect_amount,
+		uint32_t affect_flag,
+		int32_t time,
 		const char* name)
 {
 	if (success_pct && !pkVictim->IsAffectFlag(affect_flag))
@@ -95,9 +95,9 @@ inline void SkillAttackAffect(LPCHARACTER pkVictim,
 
 #define GET_SPEED_HACK_COUNT(ch)		((ch)->m_speed_hack_count)
 #define INCREASE_SPEED_HACK_COUNT(ch)	(++GET_SPEED_HACK_COUNT(ch))
-DWORD	GET_ATTACK_SPEED(LPCHARACTER ch);
-void	SET_ATTACK_TIME(LPCHARACTER ch, LPCHARACTER victim, DWORD current_time);
-void	SET_ATTACKED_TIME(LPCHARACTER ch, LPCHARACTER victim, DWORD current_time);
-bool	IS_SPEED_HACK(LPCHARACTER ch, LPCHARACTER victim, DWORD current_time);
+uint32_t	GET_ATTACK_SPEED(LPCHARACTER ch);
+void	SET_ATTACK_TIME(LPCHARACTER ch, LPCHARACTER victim, uint32_t current_time);
+void	SET_ATTACKED_TIME(LPCHARACTER ch, LPCHARACTER victim, uint32_t current_time);
+bool	IS_SPEED_HACK(LPCHARACTER ch, LPCHARACTER victim, uint32_t current_time);
 
 #endif

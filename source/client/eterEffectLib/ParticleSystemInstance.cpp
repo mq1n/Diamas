@@ -30,7 +30,7 @@ void CParticleSystemInstance::Delete(CParticleSystemInstance* pkPSInst)
 
 
 
-DWORD CParticleSystemInstance::GetEmissionCount()
+uint32_t CParticleSystemInstance::GetEmissionCount()
 {
 	return m_dwCurrentEmissionCount;
 }
@@ -41,12 +41,12 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 	m_pEmitterProperty->GetEmissionCountPerSecond(m_fLocalTime, &fEmissionCount);
 
 	float fCreatingValue = fEmissionCount * (fElapsedTime / 1.0f) + m_fEmissionResidue;
-	int iCreatingCount = int(fCreatingValue);
+	int32_t iCreatingCount = int32_t(fCreatingValue);
 	m_fEmissionResidue = fCreatingValue - iCreatingCount;
 
-	int icurEmissionCount = GetEmissionCount();
-	int iMaxEmissionCount = int(m_pEmitterProperty->GetMaxEmissionCount());
-	int iNextEmissionCount = int(icurEmissionCount + iCreatingCount);
+	int32_t icurEmissionCount = GetEmissionCount();
+	int32_t iMaxEmissionCount = int32_t(m_pEmitterProperty->GetMaxEmissionCount());
+	int32_t iNextEmissionCount = int32_t(icurEmissionCount + iCreatingCount);
 	iCreatingCount -= std::max(0, iNextEmissionCount - iMaxEmissionCount);
 
 	float fLifeTime = 0.0f;
@@ -90,7 +90,7 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 
 	CParticleInstance * pFirstInstance = 0;
 
-	for (int i = 0; i < iCreatingCount; ++i)
+	for (int32_t i = 0; i < iCreatingCount; ++i)
 	{
 		CParticleInstance * pInstance;
 
@@ -300,8 +300,8 @@ bool CParticleSystemInstance::OnUpdate(float fElapsedTime)
 
 	/////
 
-	int dwFrameIndex;
-	int dwFrameCount = m_pParticleProperty->GetTextureAnimationFrameCount();
+	int32_t dwFrameIndex;
+	int32_t dwFrameCount = m_pParticleProperty->GetTextureAnimationFrameCount();
 
 	float fAngularVelocity;
 	m_pEmitterProperty->GetEmittingAngularVelocity(m_fLocalTime,&fAngularVelocity);
@@ -354,7 +354,7 @@ namespace NParticleRenderer
 	struct TwoSideRenderer
 	{
 		const D3DXMATRIX * pmat;
-		TwoSideRenderer(const D3DXMATRIX * pmat=NULL)
+		TwoSideRenderer(const D3DXMATRIX * pmat=nullptr)
 			: pmat(pmat)
 		{
 		}
@@ -372,7 +372,7 @@ namespace NParticleRenderer
 	struct ThreeSideRenderer
 	{
 		const D3DXMATRIX * pmat;
-		ThreeSideRenderer(const D3DXMATRIX * pmat=NULL)
+		ThreeSideRenderer(const D3DXMATRIX * pmat=nullptr)
 			: pmat(pmat)
 		{
 		}
@@ -467,7 +467,7 @@ void CParticleSystemInstance::OnSetDataPointer(CEffectElementBase * pElement)
 
 	assert(m_kVct_pkImgInst.empty());
 	m_kVct_pkImgInst.reserve(m_pParticleProperty->m_ImageVector.size());
-	for (DWORD i = 0; i < m_pParticleProperty->m_ImageVector.size(); ++i)
+	for (uint32_t i = 0; i < m_pParticleProperty->m_ImageVector.size(); ++i)
 	{
 		CGraphicImage * pImage = m_pParticleProperty->m_ImageVector[i];
 

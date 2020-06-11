@@ -5,22 +5,22 @@
 
 LPDIRECT3DINDEXBUFFER8 CGraphicIndexBuffer::GetD3DIndexBuffer() const
 {
-	assert(m_lpd3dIdxBuf!=NULL);
+	assert(m_lpd3dIdxBuf!=nullptr);
 	return m_lpd3dIdxBuf;
 }
 
-void CGraphicIndexBuffer::SetIndices(int startIndex) const
+void CGraphicIndexBuffer::SetIndices(int32_t startIndex) const
 {
-	assert(ms_lpd3dDevice!=NULL);
+	assert(ms_lpd3dDevice!=nullptr);
 	STATEMANAGER.SetIndices(m_lpd3dIdxBuf, startIndex);	
 }
 
 
 bool CGraphicIndexBuffer::Lock(void** pretIndices) const
 {
-	assert(m_lpd3dIdxBuf!=NULL);
+	assert(m_lpd3dIdxBuf!=nullptr);
 
-	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (BYTE**)pretIndices, 0)))
+	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (uint8_t**)pretIndices, 0)))
 		return false;
 
 	return true;
@@ -28,16 +28,16 @@ bool CGraphicIndexBuffer::Lock(void** pretIndices) const
 
 void CGraphicIndexBuffer::Unlock() const
 {
-	assert(m_lpd3dIdxBuf!=NULL);
+	assert(m_lpd3dIdxBuf!=nullptr);
 
 	m_lpd3dIdxBuf->Unlock();
 }
 
 bool CGraphicIndexBuffer::Lock(void** pretIndices)
 {
-	assert(m_lpd3dIdxBuf!=NULL);
+	assert(m_lpd3dIdxBuf!=nullptr);
 
-	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (BYTE**)pretIndices, 0)))
+	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (uint8_t**)pretIndices, 0)))
 		return false;
 
 	return true;
@@ -45,16 +45,16 @@ bool CGraphicIndexBuffer::Lock(void** pretIndices)
 
 void CGraphicIndexBuffer::Unlock()
 {
-	assert(m_lpd3dIdxBuf!=NULL);
+	assert(m_lpd3dIdxBuf!=nullptr);
 
 	m_lpd3dIdxBuf->Unlock();
 }
 
-bool CGraphicIndexBuffer::Copy(int bufSize, const void* srcIndices)
+bool CGraphicIndexBuffer::Copy(int32_t bufSize, const void* srcIndices)
 {
-	assert(m_lpd3dIdxBuf!=NULL);
+	assert(m_lpd3dIdxBuf!=nullptr);
 
-	BYTE* dstIndices;
+	uint8_t* dstIndices;
 	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, &dstIndices, 0)))
 		return false;
 
@@ -65,18 +65,18 @@ bool CGraphicIndexBuffer::Copy(int bufSize, const void* srcIndices)
 	return true;
 }
 
-bool CGraphicIndexBuffer::Create(int faceCount, TFace* faces)
+bool CGraphicIndexBuffer::Create(int32_t faceCount, TFace* faces)
 {
-	int idxCount = faceCount * 3;
+	int32_t idxCount = faceCount * 3;
 	m_iidxCount = idxCount;
 	if (!Create(idxCount, D3DFMT_INDEX16))
 		return false;
 
-	WORD* dstIndices;
-	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (BYTE**)&dstIndices, 0)))
+	uint16_t* dstIndices;
+	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (uint8_t**)&dstIndices, 0)))
 		return false;
 
-	for (int i = 0; i<faceCount; ++i, dstIndices+=3)
+	for (int32_t i = 0; i<faceCount; ++i, dstIndices+=3)
 	{		
 		TFace * curFace=faces+i;
 		dstIndices[0]=curFace->indices[0];
@@ -107,12 +107,12 @@ void CGraphicIndexBuffer::DestroyDeviceObjects()
 	safe_release(m_lpd3dIdxBuf);
 }
 
-bool CGraphicIndexBuffer::Create(int idxCount, D3DFORMAT d3dFmt)
+bool CGraphicIndexBuffer::Create(int32_t idxCount, D3DFORMAT d3dFmt)
 {	
 	Destroy();
 	
 	m_iidxCount = idxCount;
-	m_dwBufferSize = sizeof(WORD) * idxCount;
+	m_dwBufferSize = sizeof(uint16_t) * idxCount;
 	m_d3dFmt = d3dFmt;
 
 	return CreateDeviceObjects();
@@ -125,7 +125,7 @@ void CGraphicIndexBuffer::Destroy()
 
 void CGraphicIndexBuffer::Initialize()
 {
-	m_lpd3dIdxBuf=NULL;	
+	m_lpd3dIdxBuf=nullptr;	
 }
 
 CGraphicIndexBuffer::CGraphicIndexBuffer()

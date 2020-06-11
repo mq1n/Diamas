@@ -8,28 +8,28 @@ namespace NMotionEvent
 {
 	typedef struct SMotionEventData
 	{
-		int iType;
-		DWORD dwFrame;
+		int32_t iType;
+		uint32_t dwFrame;
 		float fStartingTime;
 		float fDurationTime;
 
 		SMotionEventData() : dwFrame(0), fStartingTime(0.0f), fDurationTime(0.0f) {}
 		virtual ~SMotionEventData() {}
 
-		virtual void Save(FILE * File, int iTabs) = 0;
+		virtual void Save(FILE * File, int32_t iTabs) = 0;
 		virtual bool Load(CTextFileLoader & rTextFileLoader) { return true; }
 	} TMotionEventData;
 
 	// Screen Waving
 	typedef struct SMotionEventDataScreenWaving : public SMotionEventData
 	{
-		int iPower;
-		int iAffectingRange;
+		int32_t iPower;
+		int32_t iAffectingRange;
 
 		SMotionEventDataScreenWaving() {}
 		virtual ~SMotionEventDataScreenWaving() {}
 
-		void Save(FILE * File, int iTabs)
+		void Save(FILE * File, int32_t iTabs)
 		{
 			PrintfTabs(File, iTabs, "\n");
 			PrintfTabs(File, iTabs, "DuringTime           %f\n", fDurationTime);
@@ -57,7 +57,7 @@ namespace NMotionEvent
 		SMotionEventDataScreenFlashing() {}
 		virtual ~SMotionEventDataScreenFlashing() {}
 
-		void Save(FILE * File, int iTabs) {}
+		void Save(FILE * File, int32_t iTabs) {}
 		bool Load(CTextFileLoader & rTextFileLoader)
 		{
 			return true;
@@ -73,13 +73,13 @@ namespace NMotionEvent
 		std::string strAttachingBoneName;
 		D3DXVECTOR3 v3EffectPosition;
 
-		DWORD dwEffectIndex;
+		uint32_t dwEffectIndex;
 		std::string strEffectFileName;
 
 		SMotionEventDataEffect() {}
 		virtual ~SMotionEventDataEffect() {}
 
-		void Save(FILE * File, int iTabs)
+		void Save(FILE * File, int32_t iTabs)
 		{
 			PrintfTabs(File, iTabs, "\n");
 			PrintfTabs(File, iTabs, "IndependentFlag      %d\n", isIndependent);
@@ -115,7 +115,7 @@ namespace NMotionEvent
 	// Effect To Target
 	typedef struct SMotionEventDataEffectToTarget : public SMotionEventData
 	{
-		DWORD dwEffectIndex;
+		uint32_t dwEffectIndex;
 
 		std::string strEffectFileName;
 		D3DXVECTOR3 v3EffectPosition;
@@ -125,7 +125,7 @@ namespace NMotionEvent
 		SMotionEventDataEffectToTarget() {}
 		virtual ~SMotionEventDataEffectToTarget() {}
 
-		void Save(FILE * File, int iTabs)
+		void Save(FILE * File, int32_t iTabs)
 		{
 			PrintfTabs(File, iTabs, "\n");
 			PrintfTabs(File, iTabs, "EffectFileName       \"%s\"\n", strEffectFileName.c_str());
@@ -163,13 +163,13 @@ namespace NMotionEvent
 		std::string strAttachingBoneName;
 		D3DXVECTOR3 v3FlyPosition;
 
-		DWORD dwFlyIndex;
+		uint32_t dwFlyIndex;
 		std::string strFlyFileName;
 
 		SMotionEventDataFly() {}
 		virtual ~SMotionEventDataFly() {}
 
-		void Save(FILE * File, int iTabs)
+		void Save(FILE * File, int32_t iTabs)
 		{
 			PrintfTabs(File, iTabs, "\n");
 			PrintfTabs(File, iTabs, "AttachingEnable      %d\n", isAttaching);
@@ -208,7 +208,7 @@ namespace NMotionEvent
 		SMotionEventDataAttack() {}
 		virtual ~SMotionEventDataAttack() {}
 
-		void Save(FILE * File, int iTabs)
+		void Save(FILE * File, int32_t iTabs)
 		{
 			PrintfTabs(File, iTabs, "DuringTime           %f\n", fDurationTime);
 			PrintfTabs(File, iTabs, "EnableHitProcess     %d\n", isEnableHitProcess);
@@ -245,7 +245,7 @@ namespace NMotionEvent
 		SMotionEventDataSound() {}
 		virtual ~SMotionEventDataSound() {}
 
-		void Save(FILE * File, int iTabs)
+		void Save(FILE * File, int32_t iTabs)
 		{
 			PrintfTabs(File, iTabs, "\n");
 			PrintfTabs(File, iTabs, "SoundFileName        \"%s\"\n", strSoundFileName.c_str());
@@ -265,7 +265,7 @@ namespace NMotionEvent
 		SMotionEventDataCharacterShow() {}
 		virtual ~SMotionEventDataCharacterShow() {}
 
-		void Save(FILE * File, int iTabs) {}
+		void Save(FILE * File, int32_t iTabs) {}
 		void Load() {}
 	} TMotionEventDataCharacterShow;
 
@@ -275,7 +275,7 @@ namespace NMotionEvent
 		SMotionEventDataCharacterHide() {}
 		virtual ~SMotionEventDataCharacterHide() {}
 
-		void Save(FILE * File, int iTabs) {}
+		void Save(FILE * File, int32_t iTabs) {}
 		void Load() {}
 	} TMotionEventDataCharacterHide;
 
@@ -285,7 +285,7 @@ namespace NMotionEvent
 		SMotionEventDataWarp() {}
 		virtual ~SMotionEventDataWarp() {}
 
-		void Save(FILE * File, int iTabs) {}
+		void Save(FILE * File, int32_t iTabs) {}
 		void Load() {}
 	} TMotionWarpEventData;
 
@@ -293,12 +293,12 @@ namespace NMotionEvent
 	// Unk11 AniSpeed (new type 11)
 	typedef struct SMotionEventDataUnk11 : public SMotionEventData
 	{
-		int iAniSpeed;
+		int32_t iAniSpeed;
 
 		SMotionEventDataUnk11() {}
 		virtual ~SMotionEventDataUnk11() {}
 
-		void Save(FILE * File, int iTabs)
+		void Save(FILE * File, int32_t iTabs)
 		{
 			PrintfTabs(File, iTabs, "\n");
 			PrintfTabs(File, iTabs, "BaseVelocity        \"%d\"\n", iAniSpeed);
@@ -315,12 +315,12 @@ namespace NMotionEvent
 	// Unk12 (new type 12)
 	typedef struct SMotionEventDataUnk12 : public SMotionEventData
 	{
-		int iAniSpeed;
+		int32_t iAniSpeed;
 
 		SMotionEventDataUnk12() {}
 		virtual ~SMotionEventDataUnk12() {}
 
-		void Save(FILE * File, int iTabs) {}
+		void Save(FILE * File, int32_t iTabs) {}
 		void Load() {}
 	} TMotionEventDataUnk12;
 #endif

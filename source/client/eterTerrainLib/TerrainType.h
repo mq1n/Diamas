@@ -11,15 +11,15 @@
 
 typedef struct
 {
-	long					Active;
-	long					NeedsUpdate;
+	int32_t					Active;
+	int32_t					NeedsUpdate;
 	LPDIRECT3DTEXTURE8		pd3dTexture;
 } TTerainSplat;
 
 typedef struct
 {
- 	DWORD			TileCount[MAXTERRAINTEXTURES];
-	DWORD			PatchTileCount[TERRAIN_PATCHCOUNT*TERRAIN_PATCHCOUNT][MAXTERRAINTEXTURES];
+ 	uint32_t			TileCount[MAXTERRAINTEXTURES];
+	uint32_t			PatchTileCount[TERRAIN_PATCHCOUNT*TERRAIN_PATCHCOUNT][MAXTERRAINTEXTURES];
 	TTerainSplat 	Splats[MAXTERRAINTEXTURES];
 	bool			m_bNeedsUpdate;
 } TTerrainSplatPatch;
@@ -27,13 +27,13 @@ typedef struct
 typedef struct
 {
 	char					used;
-	short					mat;
+	int16_t					mat;
 	
 	CGraphicVertexBuffer	vb;
 	CGraphicIndexBuffer		ib;
-	long					VertexSize;
+	int32_t					VertexSize;
 	
-	short					NumIndices;
+	int16_t					NumIndices;
 	
 	float					minx, maxx;
 	float					miny, maxy;
@@ -53,13 +53,13 @@ typedef struct
 {
 	/* Public Settings */
 	float			PageUVLength;
-	long			SquaresPerTexture;              /* Heightfield squares per texture (128 texels) */
-	long			SplatTilesX;					/* Number of splat textures across map */
-	long			SplatTilesY;					/* Number of splat textures down map */
-	long			DisableWrapping;
-	long			DisableShadow;
-	long			ShadowMode;
-	long			OutsideVisible;
+	int32_t			SquaresPerTexture;              /* Heightfield squares per texture (128 texels) */
+	int32_t			SplatTilesX;					/* Number of splat textures across map */
+	int32_t			SplatTilesY;					/* Number of splat textures down map */
+	int32_t			DisableWrapping;
+	int32_t			DisableShadow;
+	int32_t			ShadowMode;
+	int32_t			OutsideVisible;
 	D3DXVECTOR3		SunLocation;
 } TTerrainGlobals;
 

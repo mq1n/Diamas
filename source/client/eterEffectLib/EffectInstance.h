@@ -19,7 +19,7 @@ class CEffectInstance : public CGraphicObjectInstance
 		{
 			ID = EFFECT_OBJECT
 		};
-		int GetType() const
+		int32_t GetType() const
 		{
 			return CEffectInstance::ID;
 		}
@@ -32,7 +32,7 @@ class CEffectInstance : public CGraphicObjectInstance
 		static void Delete(CEffectInstance* pkEftInst);
 
 		static void ResetRenderingEffectCount();
-		static int GetRenderingEffectCount();
+		static int32_t GetRenderingEffectCount();
 
 	public:
 		CEffectInstance();
@@ -68,7 +68,7 @@ class CEffectInstance : public CGraphicObjectInstance
 
 	protected:
 		BOOL					m_isAlive;
-		DWORD					m_dwFrame;
+		uint32_t					m_dwFrame;
 		D3DXMATRIX				m_matGlobal;
 
 		CEffectData * m_pkEftData;
@@ -86,5 +86,5 @@ class CEffectInstance : public CGraphicObjectInstance
 
 	public:
 		static CDynamicPool<CEffectInstance>	ms_kPool;
-		static int ms_iRenderingEffectCount;
+		static int32_t ms_iRenderingEffectCount;
 };

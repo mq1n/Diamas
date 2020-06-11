@@ -25,7 +25,7 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 	public:
 		CGraphicObjectInstance();
 		virtual ~CGraphicObjectInstance();
-		virtual int GetType() const = 0;
+		virtual int32_t GetType() const = 0;
 
 	public:
 		const D3DXVECTOR3 &		GetPosition() const;
@@ -70,7 +70,7 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 		bool					isIntersect(const CRay & c_rRay, float * pu, float * pv, float * pt);
 
 		// Bounding Box
-		D3DXVECTOR4 &			GetWTBBoxVertex(const unsigned char & c_rucNumTBBoxVertex);
+		D3DXVECTOR4 &			GetWTBBoxVertex(const uint8_t & c_rucNumTBBoxVertex);
 		D3DXVECTOR3 &			GetTBBoxMin() { return m_v3TBBoxMin; }
 		D3DXVECTOR3 &			GetTBBoxMax() { return m_v3TBBoxMax; }
 		D3DXVECTOR3 &			GetBBoxMin() { return m_v3BBoxMin; }
@@ -81,8 +81,8 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 		const D3DXMATRIX&		GetWorldMatrix() { return m_worldMatrix; }
 
 		// Portal
-		void					SetPortal(DWORD dwIndex, int iID);
-		int						GetPortal(DWORD dwIndex);
+		void					SetPortal(uint32_t dwIndex, int32_t iID);
+		int32_t						GetPortal(uint32_t dwIndex);
 
 		// Initialize
 		void					Initialize();
@@ -125,7 +125,7 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 		D3DXVECTOR3				m_v3BBoxMin, m_v3BBoxMax;
 
 		// Portal
-		BYTE					m_abyPortalID[PORTAL_ID_MAX_NUM];
+		uint8_t					m_abyPortalID[PORTAL_ID_MAX_NUM];
 
 		// Culling
 		CCullingManager::CullingHandle	m_CullingHandle;
@@ -151,8 +151,8 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 
 	// using in WorldEditor
 	public:
-		DWORD						GetCollisionInstanceCount();
-		CBaseCollisionInstance *	GetCollisionInstanceData(DWORD dwIndex);
+		uint32_t						GetCollisionInstanceCount();
+		CBaseCollisionInstance *	GetCollisionInstanceData(uint32_t dwIndex);
 
 	// Height Data
 	public:

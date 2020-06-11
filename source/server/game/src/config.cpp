@@ -22,14 +22,14 @@
 
 using std::string;
 
-BYTE	g_bChannel = 0;
-WORD	mother_port = 50080;
-int		passes_per_sec = 25;
-WORD	db_port = 0;
-WORD	p2p_port = 50900;
+uint8_t	g_bChannel = 0;
+uint16_t	mother_port = 50080;
+int32_t		passes_per_sec = 25;
+uint16_t	db_port = 0;
+uint16_t	p2p_port = 50900;
 char	db_addr[ADDRESS_MAX_LEN + 1];
-int		save_event_second_cycle = passes_per_sec * 120;	// 3분
-int		ping_event_second_cycle = passes_per_sec * 60;
+int32_t		save_event_second_cycle = passes_per_sec * 120;	// 3분
+int32_t		ping_event_second_cycle = passes_per_sec * 60;
 bool	g_bNoMoreClient = false;
 bool	g_bNoRegen = false;
 // #ifdef ENABLE_NEWSTUFF
@@ -38,59 +38,59 @@ bool	g_bShoutAddonEnable = false;
 bool	g_bGlobalShoutEnable = false;
 bool	g_bDisablePrismNeed = false;
 bool	g_bDisableEmotionMask = false;
-BYTE	g_bItemCountLimit = 200;
-DWORD	g_dwItemBonusChangeTime = 60;
+uint8_t	g_bItemCountLimit = 200;
+uint32_t	g_dwItemBonusChangeTime = 60;
 bool	g_bAllMountAttack = false;
 bool	g_bEnableBootaryCheck = false;
 bool	g_bGMHostCheck = false;
 bool	g_bGuildInviteLimit = false;
 bool	g_bGuildInfiniteMembers = false;
 bool	g_bEnableSpeedHackCrash = false;
-int		g_iStatusPointGetLevelLimit = 90;
-int		g_iStatusPointSetMaxValue = 90;
-int		g_iShoutLimitLevel = 15;
-// int		g_iShoutLimitTime = 15;
-int		g_iDbLogLevel = 3;
-int		g_iSysLogLevel = 3;
-int		g_aiItemDestroyTime[ITEM_DESTROY_TIME_MAX] = {300, 150, 300}; // autoitem, dropgold, dropitem
+int32_t		g_iStatusPointGetLevelLimit = 90;
+int32_t		g_iStatusPointSetMaxValue = 90;
+int32_t		g_iShoutLimitLevel = 15;
+// int32_t		g_iShoutLimitTime = 15;
+int32_t		g_iDbLogLevel = 3;
+int32_t		g_iSysLogLevel = 3;
+int32_t		g_aiItemDestroyTime[ITEM_DESTROY_TIME_MAX] = {300, 150, 300}; // autoitem, dropgold, dropitem
 bool	g_bDisableEmpireLanguageCheck = false;
-DWORD	g_dwSkillBookNextReadMin = 28800;
-DWORD	g_dwSkillBookNextReadMax = 43200;
+uint32_t	g_dwSkillBookNextReadMin = 28800;
+uint32_t	g_dwSkillBookNextReadMax = 43200;
 std::string	g_stProxyIP = "";
 // #endif
 
-BYTE	PK_PROTECT_LEVEL = 15;
+uint8_t	PK_PROTECT_LEVEL = 15;
 
 // TRAFFIC_PROFILER
 bool		g_bTrafficProfileOn = false;
-DWORD		g_dwTrafficProfileFlushCycle = 3600;
+uint32_t		g_dwTrafficProfileFlushCycle = 3600;
 // END_OF_TRAFFIC_PROFILER
 
-int			test_server = 0;
+int32_t			test_server = 0;
 bool		distribution_test_server = false;
 bool		guild_mark_server = true;
-BYTE		guild_mark_min_level = 3;
+uint8_t		guild_mark_min_level = 3;
 bool		no_wander = false;
-int		g_iUserLimit = 32768;
+int32_t		g_iUserLimit = 32768;
 
 char		g_szPublicIP[16] = "0";
 char		g_szInternalIP[16] = "0";
 bool		g_bSkillDisable = false;
-int			g_iFullUserCount = 1200;
-int			g_iBusyUserCount = 650;
+int32_t			g_iFullUserCount = 1200;
+int32_t			g_iBusyUserCount = 650;
 //Canada
-//int			g_iFullUserCount = 600;
-//int			g_iBusyUserCount = 350;
+//int32_t			g_iFullUserCount = 600;
+//int32_t			g_iBusyUserCount = 350;
 //Brazil
-//int			g_iFullUserCount = 650;
-//int			g_iBusyUserCount = 450;
+//int32_t			g_iFullUserCount = 650;
+//int32_t			g_iBusyUserCount = 450;
 bool		g_bEmpireWhisper = true;
-BYTE		g_bAuthServer = false;
+uint8_t		g_bAuthServer = false;
 
-DWORD	g_dwClientVersion = 1215955205;
+uint32_t	g_dwClientVersion = 1215955205;
 
 string	g_stAuthMasterIP;
-WORD		g_wAuthMasterPort = 0;
+uint16_t		g_wAuthMasterPort = 0;
 
 string g_stHostname = "";
 string g_table_postfix = "";
@@ -107,33 +107,33 @@ string g_stBlockDate = "30000705";
 
 extern string g_stLocale;
 
-int SPEEDHACK_LIMIT_COUNT   = 50;
-int SPEEDHACK_LIMIT_BONUS   = 80;
-int g_iSyncHackLimitCount = 10;
+int32_t SPEEDHACK_LIMIT_COUNT   = 50;
+int32_t SPEEDHACK_LIMIT_BONUS   = 80;
+int32_t g_iSyncHackLimitCount = 10;
 
 //시야 = VIEW_RANGE + VIEW_BONUS_RANGE
 //VIEW_BONUSE_RANGE : 클라이언트와 시야 처리에서너무 딱 떨어질경우 문제가 발생할수있어 500CM의 여분을 항상준다.
-int VIEW_RANGE = 5000;
-int VIEW_BONUS_RANGE = 500;
+int32_t VIEW_RANGE = 5000;
+int32_t VIEW_BONUS_RANGE = 500;
 
-int g_server_id = 0;
+int32_t g_server_id = 0;
 string g_strWebMallURL = "www.metin2.de";
 
-unsigned int g_uiSpamBlockDuration = 60 * 15; // 기본 15분
-unsigned int g_uiSpamBlockScore = 100; // 기본 100점
-unsigned int g_uiSpamReloadCycle = 60 * 10; // 기본 10분
+uint32_t g_uiSpamBlockDuration = 60 * 15; // 기본 15분
+uint32_t g_uiSpamBlockScore = 100; // 기본 100점
+uint32_t g_uiSpamReloadCycle = 60 * 10; // 기본 10분
 
 bool		g_bCheckMultiHack = true;
 
-int			g_iSpamBlockMaxLevel = 10;
+int32_t			g_iSpamBlockMaxLevel = 10;
 
 void		LoadStateUserCount();
 bool            g_protectNormalPlayer   = false;        // 범법자가 "평화모드" 인 일반유저를 공격하지 못함
 bool            g_noticeBattleZone      = false;        // 중립지대에 입장하면 안내메세지를 알려줌
 
-int gPlayerMaxLevel = 99;
-int gShutdownAge = 0;
-int gShutdownEnable = 0;
+int32_t gPlayerMaxLevel = 99;
+int32_t gShutdownAge = 0;
+int32_t gShutdownEnable = 0;
 
 /*
  * NOTE : 핵 체크 On/Off. CheckIn할때 false로 수정했으면 반드시 확인하고 고쳐놓을것!
@@ -158,9 +158,9 @@ bool is_string_true(const char * string)
 		return false;
 }
 
-static std::set<int> s_set_map_allows;
+static std::set<int32_t> s_set_map_allows;
 
-bool map_allow_find(int index)
+bool map_allow_find(int32_t index)
 {
 	if (g_bAuthServer)
 		return false;
@@ -173,13 +173,13 @@ bool map_allow_find(int index)
 
 void map_allow_log()
 {
-	std::set<int>::iterator i;
+	std::set<int32_t>::iterator i;
 
 	for (i = s_set_map_allows.begin(); i != s_set_map_allows.end(); ++i)
 		sys_log(0, "MAP_ALLOW: %d", *i);
 }
 
-void map_allow_add(int index)
+void map_allow_add(int32_t index)
 {
 	if (map_allow_find(index) == true)
 	{
@@ -191,14 +191,14 @@ void map_allow_add(int index)
 	s_set_map_allows.insert(index);
 }
 
-void map_allow_copy(long * pl, int size)
+void map_allow_copy(int32_t * pl, int32_t size)
 {
-	int iCount = 0;
-	std::set<int>::iterator it = s_set_map_allows.begin();
+	int32_t iCount = 0;
+	std::set<int32_t>::iterator it = s_set_map_allows.begin();
 
 	while (it != s_set_map_allows.end())
 	{
-		int i = *(it++);
+		int32_t i = *(it++);
 		*(pl++) = i;
 
 		if (++iCount > size)
@@ -215,7 +215,7 @@ static void FN_add_adminpageIP(char *line)
 	while (v)
 	{
 		g_stAdminPageIP.push_back(v);
-		v = strtok_r(NULL, delim, &last);
+		v = strtok_r(nullptr, delim, &last);
 	}
 }
 
@@ -236,12 +236,12 @@ static void FN_log_adminpage()
 bool GetIPInfo()
 {
 #ifndef __WIN32__
-	struct ifaddrs* ifaddrp = NULL;
+	struct ifaddrs* ifaddrp = nullptr;
 
 	if (0 != getifaddrs(&ifaddrp))
 		return false;
 
-	for( struct ifaddrs* ifap=ifaddrp ; NULL != ifap ; ifap = ifap->ifa_next )
+	for( struct ifaddrs* ifap=ifaddrp ; nullptr != ifap ; ifap = ifap->ifa_next )
 	{
 		struct sockaddr_in * sai = (struct sockaddr_in *) ifap->ifa_addr;
 
@@ -253,7 +253,7 @@ bool GetIPInfo()
 	WSADATA wsa_data;
 	char host_name[100];
 	HOSTENT* host_ent;
-	int n = 0;
+	int32_t n = 0;
 
 	if (WSAStartup(0x0101, &wsa_data)) {
 		return false;
@@ -261,10 +261,10 @@ bool GetIPInfo()
 
 	gethostname(host_name, sizeof(host_name));
 	host_ent = gethostbyname(host_name);
-	if (host_ent == NULL) {
+	if (host_ent == nullptr) {
 		return false;
 	}
-	for ( ; host_ent->h_addr_list[n] != NULL; ++n) {
+	for ( ; host_ent->h_addr_list[n] != nullptr; ++n) {
 		struct sockaddr_in addr;
 		struct sockaddr_in* sai = &addr;
 		memcpy(&sai->sin_addr.s_addr, host_ent->h_addr_list[n], host_ent->h_length);
@@ -334,9 +334,9 @@ static bool __LoadConnectConfigFile(const char* configName)
 
 	char db_host[2][64], db_user[2][64], db_pwd[2][64], db_db[2][64];
 	// ... 아... db_port는 이미 있는데... 네이밍 어찌해야함...
-	int mysql_db_port[2];
+	int32_t mysql_db_port[2];
 
-	for (int n = 0; n < 2; ++n)
+	for (int32_t n = 0; n < 2; ++n)
 	{
 		*db_host[n]	= '\0';
 		*db_user[n] = '\0';
@@ -346,7 +346,7 @@ static bool __LoadConnectConfigFile(const char* configName)
 	}
 
 	char log_host[64], log_user[64], log_pwd[64], log_db[64];
-	int log_port = 0;
+	int32_t log_port = 0;
 
 	*log_host = '\0';
 	*log_user = '\0';
@@ -511,7 +511,7 @@ static bool __LoadConnectConfigFile(const char* configName)
 
 		MYSQL_ROW row; 
 
-		while (NULL != (row = mysql_fetch_row(pMsg->Get()->pSQLResult)))
+		while (nullptr != (row = mysql_fetch_row(pMsg->Get()->pSQLResult)))
 		{
 			// 로케일 세팅
 			if (strcasecmp(row[0], "LOCALE") == 0)
@@ -579,9 +579,9 @@ static bool __LoadConnectConfigFile(const char* configName)
 		row = mysql_fetch_row(pMsg->Get()->pSQLResult);
 
 		const char * p = row[0];
-		int cnt = 0;
+		int32_t cnt = 0;
 		char num[128];
-		int aiBaseSkillPowerByLevelTable[SKILL_MAX_LEVEL+1];
+		int32_t aiBaseSkillPowerByLevelTable[SKILL_MAX_LEVEL+1];
 
 		fprintf(stdout, "SKILL_POWER_BY_LEVEL %s\n", p);
 		while (*p != '\0' && cnt < (SKILL_MAX_LEVEL + 1))
@@ -604,9 +604,9 @@ static bool __LoadConnectConfigFile(const char* configName)
 		}
 
 		// 종족별 스킬 세팅
-		for (int job = 0; job < JOB_MAX_NUM * 2; ++job)
+		for (int32_t job = 0; job < JOB_MAX_NUM * 2; ++job)
 		{
-			snprintf(szQuery, sizeof(szQuery), "SELECT mValue from locale where mKey='SKILL_POWER_BY_LEVEL_TYPE%d' ORDER BY CAST(mValue AS unsigned)", job);
+			snprintf(szQuery, sizeof(szQuery), "SELECT mValue from locale where mKey='SKILL_POWER_BY_LEVEL_TYPE%d' ORDER BY CAST(mValue AS uint32_t)", job);
 			std::unique_ptr<SQLMsg> pMsg(AccountDB::instance().DirectQuery(szQuery));
 
 			// 세팅이 안되어있으면 기본테이블을 사용한다.
@@ -619,7 +619,7 @@ static bool __LoadConnectConfigFile(const char* configName)
 			row = mysql_fetch_row(pMsg->Get()->pSQLResult);
 			cnt = 0;
 			p = row[0];
-			int aiSkillTable[SKILL_MAX_LEVEL + 1];
+			int32_t aiSkillTable[SKILL_MAX_LEVEL + 1];
 
 			fprintf(stdout, "SKILL_POWER_BY_JOB %d %s\n", job, p);
 			while (*p != '\0' && cnt < (SKILL_MAX_LEVEL + 1))
@@ -690,7 +690,7 @@ static bool __LoadDefaultConfigFile(const char* configName)
 				{
 					if (stNum.length())
 					{
-						int	index = 0;
+						int32_t	index = 0;
 						str_to_number(index, stNum.c_str());
 						map_allow_add(index);
 						stNum.clear();
@@ -702,7 +702,7 @@ static bool __LoadDefaultConfigFile(const char* configName)
 
 			if (stNum.length())
 		{
-				int	index = 0;
+				int32_t	index = 0;
 				str_to_number(index, stNum.c_str());
 				map_allow_add(index);
 			}
@@ -802,7 +802,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 		{
 			strlcpy(db_addr, value_string, sizeof(db_addr));
 
-			for (int n =0; n < ADDRESS_MAX_LEN; ++n)
+			for (int32_t n =0; n < ADDRESS_MAX_LEN; ++n)
 			{
 				if (db_addr[n] == ' ')
 					db_addr[n] = '\0';
@@ -835,7 +835,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("log_keep_days")
 		{
-			int i = 0;
+			int32_t i = 0;
 			str_to_number(i, value_string);
 			log_set_expiration_days(MINMAX(1, i, 90));
 			continue;
@@ -849,7 +849,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("save_event_second_cycle")
 		{
-			int	cycle = 0;
+			int32_t	cycle = 0;
 			str_to_number(cycle, value_string);
 			save_event_second_cycle = cycle * passes_per_sec;
 			continue;
@@ -857,7 +857,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("ping_event_second_cycle")
 		{
-			int	cycle = 0;
+			int32_t	cycle = 0;
 			str_to_number(cycle, value_string);
 			ping_event_second_cycle = cycle * passes_per_sec;
 			continue;
@@ -913,7 +913,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("shop_price_3x_tax") //alternative
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 			g_bEmpireShopPriceTripleDisable = !flag;
 			fprintf(stdout, "SHOP_PRICE_3X_TAX: %s\n", (!g_bEmpireShopPriceTripleDisable)?"ENABLED":"DISABLED");
@@ -943,7 +943,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("change_attr_time_limit") //alternative
 		{
-			DWORD flag = 0;
+			uint32_t flag = 0;
 			str_to_number(flag, value_string);
 			g_dwItemBonusChangeTime = flag;
 			fprintf(stdout, "CHANGE_ATTR_TIME_LIMIT: %u\n", g_dwItemBonusChangeTime);
@@ -959,7 +959,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("prism_item_require") //alternative
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 			g_bDisablePrismNeed = !flag;
 			fprintf(stdout, "PRISM_ITEM_REQUIRE: %s\n", (!g_bDisablePrismNeed)?"ENABLED":"DISABLED");
@@ -975,7 +975,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("global_shout") //alternative
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 			g_bGlobalShoutEnable = !!flag;
 			fprintf(stdout, "GLOBAL_SHOUT: %s\n", (g_bGlobalShoutEnable)?"ENABLED":"DISABLED");
@@ -991,7 +991,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("emotion_mask_require") //alternative
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 			g_bDisableEmotionMask = !flag;
 			fprintf(stdout, "EMOTION_MASK_REQUIRE: %s\n", (g_bDisableEmotionMask)?"ENABLED":"DISABLED");
@@ -1007,7 +1007,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("bootary_check") //alternative
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 			g_bEnableBootaryCheck = !!flag;
 			fprintf(stdout, "BOOTARY_CHECK: %s\n", (g_bEnableBootaryCheck)?"ENABLED":"DISABLED");
@@ -1016,7 +1016,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("status_point_get_level_limit")
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 			if (flag <= 0) continue;
 
@@ -1027,7 +1027,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("status_point_set_max_value")
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 			if (flag <= 0) continue;
 
@@ -1038,7 +1038,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("shout_limit_level")
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 			if (flag <= 0) continue;
 
@@ -1049,7 +1049,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("db_log_level")
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 
 			g_iDbLogLevel = flag;
@@ -1059,7 +1059,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("sys_log_level")
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 
 			g_iSysLogLevel = flag;
@@ -1069,7 +1069,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("item_destroy_time_autogive")
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 
 			g_aiItemDestroyTime[ITEM_DESTROY_TIME_AUTOGIVE] = flag;
@@ -1079,7 +1079,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("item_destroy_time_dropgold")
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 
 			g_aiItemDestroyTime[ITEM_DESTROY_TIME_DROPGOLD] = flag;
@@ -1089,7 +1089,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("item_destroy_time_dropitem")
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 
 			g_aiItemDestroyTime[ITEM_DESTROY_TIME_DROPITEM] = flag;
@@ -1099,7 +1099,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		// TOKEN("shout_limit_time")
 		// {
-			// int flag = 0;
+			// int32_t flag = 0;
 			// str_to_number(flag, value_string);
 			// if (flag <= 0) continue;
 
@@ -1110,7 +1110,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("check_version_value")
 		{
-			DWORD version = 0;
+			uint32_t version = 0;
 			str_to_number(version, value_string);
 
 			g_dwClientVersion = version;
@@ -1120,7 +1120,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("enable_hack_check")
 		{
-			DWORD flag = 0;
+			uint32_t flag = 0;
 			str_to_number(flag, value_string);
 
 			gHackCheckEnable = !!flag;
@@ -1130,7 +1130,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("gm_host_check")
 		{
-			DWORD flag = 0;
+			uint32_t flag = 0;
 			str_to_number(flag, value_string);
 
 			g_bGMHostCheck = !!flag;
@@ -1140,7 +1140,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("guild_invite_limit")
 		{
-			DWORD flag = 0;
+			uint32_t flag = 0;
 			str_to_number(flag, value_string);
 
 			g_bGuildInviteLimit = !!flag;
@@ -1150,7 +1150,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("guild_infinite_members")
 		{
-			DWORD flag = 0;
+			uint32_t flag = 0;
 			str_to_number(flag, value_string);
 
 			g_bGuildInfiniteMembers = !!flag;
@@ -1160,7 +1160,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("empire_language_check")
 		{
-			int flag = 0;
+			int32_t flag = 0;
 			str_to_number(flag, value_string);
 			g_bDisableEmpireLanguageCheck = !flag;
 			fprintf(stdout, "EMPIRE_LANGUAGE_CHECK: %s\n", (g_bDisableEmpireLanguageCheck)?"DISABLED":"ENABLED");
@@ -1169,7 +1169,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("skillbook_nextread_min")
 		{
-			DWORD flag = 0;
+			uint32_t flag = 0;
 			str_to_number(flag, value_string);
 			g_dwSkillBookNextReadMin = flag;
 			fprintf(stdout, "SKILLBOOK_NEXTREAD_MIN: %u\n", g_dwSkillBookNextReadMin);
@@ -1178,7 +1178,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("skillbook_nextread_max")
 		{
-			DWORD flag = 0;
+			uint32_t flag = 0;
 			str_to_number(flag, value_string);
 			g_dwSkillBookNextReadMax = flag;
 			fprintf(stdout, "SKILLBOOK_NEXTREAD_MAX: %u\n", g_dwSkillBookNextReadMax);
@@ -1337,7 +1337,7 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("block_char_creation")
 		{
-			int tmp = 0;
+			int32_t tmp = 0;
 
 			str_to_number(tmp, value_string);
 
@@ -1364,7 +1364,7 @@ static bool __LoadDefaultCMDFile(const char* cmdName)
 		while (fgets(buf, 256, fp))
 		{
 			char cmd[32], levelname[32];
-			int level;
+			int32_t level;
 
 			two_arguments(buf, cmd, sizeof(cmd), levelname, sizeof(levelname));
 
@@ -1423,15 +1423,15 @@ static bool __LoadExpTableFromDB(void)
 	if (pMsg->Get()->uiNumRows == 0)
 		return false;
 
-	static DWORD new_exp_table[PLAYER_MAX_LEVEL_CONST+1];
-	if (exp_table != NULL)
-		memcpy(new_exp_table, exp_table, (PLAYER_MAX_LEVEL_CONST+1)*sizeof(DWORD));
+	static uint32_t new_exp_table[PLAYER_MAX_LEVEL_CONST+1];
+	if (exp_table != nullptr)
+		memcpy(new_exp_table, exp_table, (PLAYER_MAX_LEVEL_CONST+1)*sizeof(uint32_t));
 
-	MYSQL_ROW row = NULL;
+	MYSQL_ROW row = nullptr;
 	while ((row = mysql_fetch_row(pMsg->Get()->pSQLResult)))
 	{
-		DWORD level = 0;
-		DWORD exp = 0;
+		uint32_t level = 0;
+		uint32_t exp = 0;
 		str_to_number(level, row[0]);
 		str_to_number(exp, row[1]);
 		if (level > PLAYER_MAX_LEVEL_CONST)
@@ -1565,7 +1565,7 @@ void config_init(const string& st_localeServiceName)
 
 	LoadStateUserCount();
 
-	CWarMapManager::instance().LoadWarMapInfo(NULL);
+	CWarMapManager::instance().LoadWarMapInfo(nullptr);
 
 	FN_log_adminpage();
 	if (g_szPublicIP[0] == '0')

@@ -4,7 +4,7 @@
 #include "quest.h"
 #include "buffer_manager.h"
 
-extern int test_server;
+extern int32_t test_server;
 
 namespace quest
 {
@@ -34,11 +34,11 @@ namespace quest
 	
 	struct FSetWarpLocation
 	{
-		long map_index; 
-		long x;
-		long y;
+		int32_t map_index; 
+		int32_t x;
+		int32_t y;
 
-		FSetWarpLocation (long _map_index, long _x, long _y) :
+		FSetWarpLocation (int32_t _map_index, int32_t _x, int32_t _y) :
 			map_index (_map_index), x (_x), y (_y)
 		{}
 		void operator () (LPCHARACTER ch);
@@ -47,7 +47,7 @@ namespace quest
 	struct FSetQuestFlag
 	{
 		std::string flagname;
-		int value;
+		int32_t value;
 
 		void operator () (LPCHARACTER ch);
 	};
@@ -55,17 +55,17 @@ namespace quest
 	struct FPartyCheckFlagLt
 	{
 		std::string flagname;
-		int value;
+		int32_t value;
 
 		bool operator () (LPCHARACTER ch);
 	};
 
 	struct FPartyChat
 	{
-		int iChatType;
+		int32_t iChatType;
 		const char* str;
 
-		FPartyChat(int ChatType, const char* str);
+		FPartyChat(int32_t ChatType, const char* str);
 		void operator() (LPCHARACTER ch);
 	};
 
@@ -84,10 +84,10 @@ namespace quest
 #ifdef ENABLE_NEWSTUFF
 	struct FSendChatPacket
 	{
-		DWORD m_chat_type;
+		uint32_t m_chat_type;
 		std::string m_text;
 
-		FSendChatPacket(DWORD chat_type, std::string text) : m_chat_type(chat_type), m_text(text) {}
+		FSendChatPacket(uint32_t chat_type, std::string text) : m_chat_type(chat_type), m_text(text) {}
 		void operator() (LPENTITY ent);
 	};
 #endif
@@ -95,28 +95,28 @@ namespace quest
 	struct FSendPacketToEmpire
 	{
 		TEMP_BUFFER buf;
-		BYTE bEmpire;
+		uint8_t bEmpire;
 
 		void operator() (LPENTITY ent);
 	};
 
 	struct FWarpEmpire
 	{
-		BYTE m_bEmpire;
-		long m_lMapIndexTo;
-		long m_x;
-		long m_y;
+		uint8_t m_bEmpire;
+		int32_t m_lMapIndexTo;
+		int32_t m_x;
+		int32_t m_y;
 
 		void operator() (LPENTITY ent);
 	};
 
 	EVENTINFO(warp_all_to_map_my_empire_event_info)
 	{
-		BYTE 	m_bEmpire;
-		long	m_lMapIndexFrom;
-		long 	m_lMapIndexTo;
-		long 	m_x;
-		long	m_y;
+		uint8_t 	m_bEmpire;
+		int32_t	m_lMapIndexFrom;
+		int32_t 	m_lMapIndexTo;
+		int32_t 	m_x;
+		int32_t	m_y;
 
 		warp_all_to_map_my_empire_event_info() 
 		: m_bEmpire( 0 )
@@ -133,10 +133,10 @@ namespace quest
 	struct FBuildLuaGuildWarList
 	{
 		lua_State * L;
-		int m_count;
+		int32_t m_count;
 
 		FBuildLuaGuildWarList(lua_State * L);
-		void operator() (DWORD g1, DWORD g2);
+		void operator() (uint32_t g1, uint32_t g2);
 	};
 }
 #endif /*__HEADER_QUEST_LUA__*/

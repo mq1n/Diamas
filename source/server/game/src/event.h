@@ -35,18 +35,18 @@ private:
 	
 typedef struct event EVENT;
 typedef eastl::intrusive_ptr<EVENT> LPEVENT;
-typedef long (*TEVENTFUNC) (LPEVENT event, long processing_time);
+typedef int32_t (*TEVENTFUNC) (LPEVENT event, int32_t processing_time);
 
-#define EVENTFUNC(name)	long (name) (LPEVENT event, long processing_time)
+#define EVENTFUNC(name)	int32_t (name) (LPEVENT event, int32_t processing_time)
 #define EVENTINFO(name) struct name : public event_info_data
 
 struct TQueueElement;
 
 struct event
 {
-	event() : func(NULL), info(NULL), q_el(NULL), ref_count(0) {}
+	event() : func(nullptr), info(nullptr), q_el(nullptr), ref_count(0) {}
 	~event() {
-		if (info != NULL) {
+		if (info != nullptr) {
 #ifdef M2_USE_POOL
 			delete info;
 #else
@@ -76,18 +76,18 @@ T* AllocEventInfo() {
 }
 
 extern void		event_destroy();
-extern int		event_process(int pulse);
-extern int		event_count();
+extern int32_t		event_process(int32_t pulse);
+extern int32_t		event_count();
 
 #define event_create(func, info, when) event_create_ex(func, info, when)
-extern LPEVENT	event_create_ex(TEVENTFUNC func, event_info_data* info, long when);
+extern LPEVENT	event_create_ex(TEVENTFUNC func, event_info_data* info, int32_t when);
 extern void		event_cancel(LPEVENT * event);			// 이벤트 취소
-extern long		event_processing_time(LPEVENT event);	// 수행 시간 리턴
-extern long		event_time(LPEVENT event);			// 남은 시간 리턴
-extern void		event_reset_time(LPEVENT event, long when);	// 실행 시간 재 설정
-extern void		event_set_verbose(int level);
+extern int32_t		event_processing_time(LPEVENT event);	// 수행 시간 리턴
+extern int32_t		event_time(LPEVENT event);			// 남은 시간 리턴
+extern void		event_reset_time(LPEVENT event, int32_t when);	// 실행 시간 재 설정
+extern void		event_set_verbose(int32_t level);
 
-extern event_info_data* FindEventInfo(DWORD dwID);
+extern event_info_data* FindEventInfo(uint32_t dwID);
 extern event_info_data*	event_info(LPEVENT event);
 
 #endif

@@ -18,9 +18,9 @@ class CExchange
 		bool		Accept(bool bIsAccept = true);
 		void		Cancel();
 
-		bool		AddGold(long lGold);
-		bool		AddItem(TItemPos item_pos, BYTE display_pos);
-		bool		RemoveItem(BYTE pos);
+		bool		AddGold(int32_t lGold);
+		bool		AddItem(TItemPos item_pos, uint8_t display_pos);
+		bool		RemoveItem(uint8_t pos);
 
 		LPCHARACTER	GetOwner()	{ return m_pOwner;	}
 		CExchange *	GetCompany()	{ return m_pCompany;	}
@@ -31,7 +31,7 @@ class CExchange
 
 	private:
 		bool		Done();
-		bool		Check(int * piItemCount);
+		bool		Check(int32_t * piItemCount);
 		bool		CheckSpace();
 
 	private:
@@ -41,10 +41,10 @@ class CExchange
 
 		TItemPos		m_aItemPos[EXCHANGE_ITEM_MAX_NUM];
 		LPITEM		m_apItems[EXCHANGE_ITEM_MAX_NUM];
-		BYTE		m_abItemDisplayPos[EXCHANGE_ITEM_MAX_NUM];
+		uint8_t		m_abItemDisplayPos[EXCHANGE_ITEM_MAX_NUM];
 
 		bool 		m_bAccept;
-		long		m_lGold;
+		int32_t		m_lGold;
 
 		CGrid *		m_pGrid;
 

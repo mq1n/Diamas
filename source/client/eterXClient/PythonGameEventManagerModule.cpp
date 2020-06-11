@@ -23,7 +23,7 @@ void initeventmgr()
 	static PyMethodDef s_methods[] = 
 	{
 		{ "Update",					eventMgrUpdate,					METH_VARARGS },
-		{ NULL,						NULL,							NULL },
+		{ nullptr,						nullptr,							0 },
 	};
 
 	Py_InitModule("eventMgr", s_methods);

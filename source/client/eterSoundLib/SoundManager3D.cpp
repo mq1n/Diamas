@@ -20,7 +20,7 @@ bool CSoundManager3D::Initialize()
 	ms_ProviderVector.resize(MAX_PROVIDERS);
 	
 	HPROENUM enum3D = HPROENUM_FIRST;
-	int i = 0;
+	int32_t i = 0;
 
 	while (AIL_enumerate_3D_providers(&enum3D,
 									  &ms_ProviderVector[i].hProvider,
@@ -47,7 +47,7 @@ bool CSoundManager3D::Initialize()
 		return false;
 	}
 
-	assert(ms_pProviderDefault != NULL);
+	assert(ms_pProviderDefault != nullptr);
 
 	if (M3D_NOERR != AIL_open_3D_provider(ms_pProviderDefault->hProvider))
 	{
@@ -80,19 +80,19 @@ void CSoundManager3D::Destroy()
 	if (!m_bInit)
 		return;
 	
-	for (int i = 0; i < INSTANCE_MAX_COUNT; ++i)
+	for (int32_t i = 0; i < INSTANCE_MAX_COUNT; ++i)
 		m_Instances[i].Destroy();
 
 	if (m_pListener)
 	{
 		AIL_close_3D_listener(m_pListener);
-		m_pListener = NULL;
+		m_pListener = nullptr;
 	}
 
 	if (ms_pProviderDefault)
 	{
 		AIL_close_3D_provider(ms_pProviderDefault->hProvider);
-		ms_pProviderDefault = NULL;
+		ms_pProviderDefault = nullptr;
 	}
 
 	CSoundBase::Destroy();
@@ -101,30 +101,30 @@ void CSoundManager3D::Destroy()
 
 void CSoundManager3D::SetListenerDirection(float fxDir, float fyDir, float fzDir, float fxUp, float fyUp, float fzUp)
 {
-	if (NULL == m_pListener)
+	if (nullptr == m_pListener)
 		return;
 	AIL_set_3D_orientation(m_pListener, fxDir, fyDir, -fzDir, fxUp, fyUp, -fzUp);
 }
 
 void CSoundManager3D::SetListenerPosition(float fX, float fY, float fZ)
 {
-// 	assert(m_pListener != NULL);
-	if (NULL == m_pListener)
+// 	assert(m_pListener != nullptr);
+	if (nullptr == m_pListener)
 		return;
 	AIL_set_3D_position(m_pListener, fX, fY, -fZ);
 }
 
 void CSoundManager3D::SetListenerVelocity(float fDistanceX, float fDistanceY, float fDistanceZ, float fNagnitude)
 {
-// 	assert(m_pListener != NULL);
-	if (NULL == m_pListener)
+// 	assert(m_pListener != nullptr);
+	if (nullptr == m_pListener)
 		return;
 	AIL_set_3D_velocity(m_pListener, fDistanceX, fDistanceY, -fDistanceZ, fNagnitude);
 }
 
-int CSoundManager3D::SetInstance(const char * c_pszFileName)
+int32_t CSoundManager3D::SetInstance(const char * c_pszFileName)
 {
-	DWORD dwFileCRC = GetFileCRC(c_pszFileName);
+	uint32_t dwFileCRC = GetFileCRC(c_pszFileName);
 	TSoundDataMap::iterator itor = ms_dataMap.find(dwFileCRC);
 
 	CSoundData * pkSoundData;
@@ -134,12 +134,12 @@ int CSoundManager3D::SetInstance(const char * c_pszFileName)
 	else
 		pkSoundData = itor->second;
 
-	assert(pkSoundData != NULL);
+	assert(pkSoundData != nullptr);
 
-	static DWORD k = 0;
+	static uint32_t k = 0;
 
-	DWORD start = k++;
-	DWORD end = start + INSTANCE_MAX_COUNT;
+	uint32_t start = k++;
+	uint32_t end = start + INSTANCE_MAX_COUNT;
 
 	while (start < end)
 	{
@@ -150,7 +150,7 @@ int CSoundManager3D::SetInstance(const char * c_pszFileName)
 			if (!pkInst->SetSound(pkSoundData))
 			{
 				TraceError("CSoundManager3D::GetInstance (filename: %s)", c_pszFileName);
-				// NOTE : 사운드가 없을 경우 Failed to set. return NULL. - [levites]
+				// NOTE : 사운드가 없을 경우 Failed to set. return nullptr. - [levites]
 				return -1;
 			}
 
@@ -159,7 +159,7 @@ int CSoundManager3D::SetInstance(const char * c_pszFileName)
 
 		++start;
 
-		// 설마 DWORD 한계값을 넘어갈리야 없겠지만.. 그래도.. 혹시나.. - [levites]
+		// 설마 uint32_t 한계값을 넘어갈리야 없겠지만.. 그래도.. 혹시나.. - [levites]
 		if (start > 50000)
 		{
 			start = 0;
@@ -170,17 +170,17 @@ int CSoundManager3D::SetInstance(const char * c_pszFileName)
 	return -1;
 }
 
-ISoundInstance * CSoundManager3D::GetInstance(DWORD dwIndex)
+ISoundInstance * CSoundManager3D::GetInstance(uint32_t dwIndex)
 {
 	if (dwIndex >= INSTANCE_MAX_COUNT)
 	{
 		assert(dwIndex < INSTANCE_MAX_COUNT);
-		return NULL;
+		return nullptr;
 	}
 	return &m_Instances[dwIndex];
 }
 
-__forceinline bool CSoundManager3D::IsValidInstanceIndex(int iIndex)
+__forceinline bool CSoundManager3D::IsValidInstanceIndex(int32_t iIndex)
 {
 	if (iIndex >= 0 && iIndex < INSTANCE_MAX_COUNT)
 		return true;
@@ -188,7 +188,7 @@ __forceinline bool CSoundManager3D::IsValidInstanceIndex(int iIndex)
 	return false;
 }
 
-void CSoundManager3D::Lock(int iIndex)
+void CSoundManager3D::Lock(int32_t iIndex)
 {
 	if (!IsValidInstanceIndex(iIndex))
 		return;
@@ -196,7 +196,7 @@ void CSoundManager3D::Lock(int iIndex)
 	m_bLockingFlag[iIndex] = true;
 }
 
-void CSoundManager3D::Unlock(int iIndex)
+void CSoundManager3D::Unlock(int32_t iIndex)
 {
 	if (!IsValidInstanceIndex(iIndex))
 		return;

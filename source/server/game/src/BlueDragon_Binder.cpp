@@ -5,11 +5,11 @@
 
 #include "questmanager.h"
 
-unsigned int BlueDragon_GetSkillFactor(const size_t cnt, ...)
+uint32_t BlueDragon_GetSkillFactor(const size_t cnt, ...)
 {
 	lua_State* L = quest::CQuestManager::instance().GetLuaState();
 
-	const int stack_top = lua_gettop(L);
+	const int32_t stack_top = lua_gettop(L);
 
 	lua_getglobal( L, "BlueDragonSetting" );
 
@@ -28,7 +28,7 @@ unsigned int BlueDragon_GetSkillFactor(const size_t cnt, ...)
 	{
 		const char* key = va_arg(vl, const char*);
 
-		if (NULL == key)
+		if (nullptr == key)
 		{
 			va_end(vl);
 			lua_settop( L, stack_top );
@@ -57,18 +57,18 @@ unsigned int BlueDragon_GetSkillFactor(const size_t cnt, ...)
 		return 0;
 	}
 
-	int val = static_cast<int>(lua_tonumber( L, -1 ));
+	int32_t val = static_cast<int32_t>(lua_tonumber( L, -1 ));
 
 	lua_settop( L, stack_top );
 
 	return val;
 }
 
-unsigned int BlueDragon_GetRangeFactor(const char* key, const int val)
+uint32_t BlueDragon_GetRangeFactor(const char* key, const int32_t val)
 {
 	lua_State* L = quest::CQuestManager::instance().GetLuaState();
 
-	const int stack_top = lua_gettop(L);
+	const int32_t stack_top = lua_gettop(L);
 
 	lua_getglobal( L, "BlueDragonSetting" );
 
@@ -115,7 +115,7 @@ unsigned int BlueDragon_GetRangeFactor(const char* key, const int val)
 			return 0;
 		}
 
-		const int min = static_cast<int>(lua_tonumber(L, -1));
+		const int32_t min = static_cast<int32_t>(lua_tonumber(L, -1));
 
 		lua_pop(L, 1);
 
@@ -130,7 +130,7 @@ unsigned int BlueDragon_GetRangeFactor(const char* key, const int val)
 			return 0;
 		}
 
-		const int max = static_cast<int>(lua_tonumber(L, -1));
+		const int32_t max = static_cast<int32_t>(lua_tonumber(L, -1));
 
 		lua_pop(L, 1);
 
@@ -147,7 +147,7 @@ unsigned int BlueDragon_GetRangeFactor(const char* key, const int val)
 				return 0;
 			}
 
-			const int pct = static_cast<int>(lua_tonumber(L, -1));
+			const int32_t pct = static_cast<int32_t>(lua_tonumber(L, -1));
 
 			lua_settop( L, stack_top );
 
@@ -162,11 +162,11 @@ unsigned int BlueDragon_GetRangeFactor(const char* key, const int val)
 	return 0;
 }
 
-unsigned int BlueDragon_GetIndexFactor(const char* container, const size_t idx, const char* key)
+uint32_t BlueDragon_GetIndexFactor(const char* container, const size_t idx, const char* key)
 {
 	lua_State* L = quest::CQuestManager::instance().GetLuaState();
 
-	const int stack_top = lua_gettop(L);
+	const int32_t stack_top = lua_gettop(L);
 
 	lua_getglobal( L, "BlueDragonSetting" );
 
@@ -209,7 +209,7 @@ unsigned int BlueDragon_GetIndexFactor(const char* container, const size_t idx, 
 		return 0;
 	}
 
-	const unsigned int ret = static_cast<unsigned int>(lua_tonumber(L, -1));
+	const uint32_t ret = static_cast<uint32_t>(lua_tonumber(L, -1));
 
 	lua_settop( L, stack_top );
 

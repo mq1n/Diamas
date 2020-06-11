@@ -11,14 +11,14 @@ class CItem : public CEntity
 		virtual void	EncodeRemovePacket(LPENTITY entity);
 
 	public:
-		CItem(DWORD dwVnum);
+		CItem(uint32_t dwVnum);
 		virtual ~CItem();
 
-		int			GetLevelLimit();
+		int32_t			GetLevelLimit();
 
-		bool		CheckItemUseLevel(int nLevel);
+		bool		CheckItemUseLevel(int32_t nLevel);
 
-		long		FindApplyValue(BYTE bApplyType);
+		int32_t		FindApplyValue(uint8_t bApplyType);
 
 		bool		IsStackable()		{ return (GetFlag() & ITEM_FLAG_STACKABLE)?true:false; }
 
@@ -27,64 +27,64 @@ class CItem : public CEntity
 
 		void		Save();
 
-		void		SetWindow(BYTE b)	{ m_bWindow = b; }
-		BYTE		GetWindow()		{ return m_bWindow; }
+		void		SetWindow(uint8_t b)	{ m_bWindow = b; }
+		uint8_t		GetWindow()		{ return m_bWindow; }
 
-		void		SetID(DWORD id)		{ m_dwID = id;	}
-		DWORD		GetID()			{ return m_dwID; }
+		void		SetID(uint32_t id)		{ m_dwID = id;	}
+		uint32_t		GetID()			{ return m_dwID; }
 
 		void			SetProto(const TItemTable * table);
 		TItemTable const *	GetProto()	{ return m_pProto; }
 
-		int		GetGold();
-		int		GetShopBuyPrice();
-		const char *	GetName()		{ return m_pProto ? m_pProto->szLocaleName : NULL; }
-		const char *	GetBaseName()		{ return m_pProto ? m_pProto->szName : NULL; }
-		BYTE		GetSize()		{ return m_pProto ? m_pProto->bSize : 0;	}
+		int32_t		GetGold();
+		int32_t		GetShopBuyPrice();
+		const char *	GetName()		{ return m_pProto ? m_pProto->szLocaleName : nullptr; }
+		const char *	GetBaseName()		{ return m_pProto ? m_pProto->szName : nullptr; }
+		uint8_t		GetSize()		{ return m_pProto ? m_pProto->bSize : 0;	}
 
-		void		SetFlag(long flag)	{ m_lFlag = flag;	}
-		long		GetFlag()		{ return m_lFlag;	}
+		void		SetFlag(int32_t flag)	{ m_lFlag = flag;	}
+		int32_t		GetFlag()		{ return m_lFlag;	}
 
-		void		AddFlag(long bit);
-		void		RemoveFlag(long bit);
+		void		AddFlag(int32_t bit);
+		void		RemoveFlag(int32_t bit);
 
-		DWORD		GetWearFlag()		{ return m_pProto ? m_pProto->dwWearFlags : 0; }
-		DWORD		GetAntiFlag()		{ return m_pProto ? m_pProto->dwAntiFlags : 0; }
-		DWORD		GetImmuneFlag()		{ return m_pProto ? m_pProto->dwImmuneFlag : 0; }
+		uint32_t		GetWearFlag()		{ return m_pProto ? m_pProto->dwWearFlags : 0; }
+		uint32_t		GetAntiFlag()		{ return m_pProto ? m_pProto->dwAntiFlags : 0; }
+		uint32_t		GetImmuneFlag()		{ return m_pProto ? m_pProto->dwImmuneFlag : 0; }
 
-		void		SetVID(DWORD vid)	{ m_dwVID = vid;	}
-		DWORD		GetVID()		{ return m_dwVID;	}
+		void		SetVID(uint32_t vid)	{ m_dwVID = vid;	}
+		uint32_t		GetVID()		{ return m_dwVID;	}
 
-		bool		SetCount(DWORD count);
-		DWORD		GetCount();
+		bool		SetCount(uint32_t count);
+		uint32_t		GetCount();
 
 		// GetVnum과 GetOriginalVnum에 대한 comment
 		// GetVnum은 Masking 된 Vnum이다. 이를 사용함으로써, 아이템의 실제 Vnum은 10이지만, Vnum이 20인 것처럼 동작할 수 있는 것이다.
 		// Masking 값은 ori_to_new.txt에서 정의된 값이다.
 		// GetOriginalVnum은 아이템 고유의 Vnum으로, 로그 남길 때, 클라이언트에 아이템 정보 보낼 때, 저장할 때는 이 Vnum을 사용하여야 한다.
 		// 
-		DWORD		GetVnum() const		{ return m_dwMaskVnum ? m_dwMaskVnum : m_dwVnum;	}
-		DWORD		GetOriginalVnum() const		{ return m_dwVnum;	}
-		BYTE		GetType() const		{ return m_pProto ? m_pProto->bType : 0;	}
-		BYTE		GetSubType() const	{ return m_pProto ? m_pProto->bSubType : 0;	}
-		BYTE		GetLimitType(DWORD idx) const { return m_pProto ? m_pProto->aLimits[idx].bType : 0;	}
-		long		GetLimitValue(DWORD idx) const { return m_pProto ? m_pProto->aLimits[idx].lValue : 0;	}
+		uint32_t		GetVnum() const		{ return m_dwMaskVnum ? m_dwMaskVnum : m_dwVnum;	}
+		uint32_t		GetOriginalVnum() const		{ return m_dwVnum;	}
+		uint8_t		GetType() const		{ return m_pProto ? m_pProto->bType : 0;	}
+		uint8_t		GetSubType() const	{ return m_pProto ? m_pProto->bSubType : 0;	}
+		uint8_t		GetLimitType(uint32_t idx) const { return m_pProto ? m_pProto->aLimits[idx].bType : 0;	}
+		int32_t		GetLimitValue(uint32_t idx) const { return m_pProto ? m_pProto->aLimits[idx].lValue : 0;	}
 
-		long		GetValue(DWORD idx);
+		int32_t		GetValue(uint32_t idx);
 
-		void		SetCell(LPCHARACTER ch, WORD pos)	{ m_pOwner = ch, m_wCell = pos;	}
-		WORD		GetCell()				{ return m_wCell;	}
+		void		SetCell(LPCHARACTER ch, uint16_t pos)	{ m_pOwner = ch, m_wCell = pos;	}
+		uint16_t		GetCell()				{ return m_wCell;	}
 
 		LPITEM		RemoveFromCharacter();
 		bool		AddToCharacter(LPCHARACTER ch, TItemPos Cell);
 		LPCHARACTER	GetOwner()		{ return m_pOwner; }
 
 		LPITEM		RemoveFromGround();
-		bool		AddToGround(long lMapIndex, const PIXEL_POSITION & pos, bool skipOwnerCheck = false);
+		bool		AddToGround(int32_t lMapIndex, const PIXEL_POSITION & pos, bool skipOwnerCheck = false);
 
-		int			FindEquipCell(LPCHARACTER ch, int bCandidateCell = -1);
+		int32_t			FindEquipCell(LPCHARACTER ch, int32_t bCandidateCell = -1);
 		bool		IsEquipped() const		{ return m_bEquipped;	}
-		bool		EquipTo(LPCHARACTER ch, BYTE bWearCell);
+		bool		EquipTo(LPCHARACTER ch, uint8_t bWearCell);
 		bool		IsEquipable() const;
 
 		bool		CanUsedBy(LPCHARACTER ch);
@@ -103,55 +103,55 @@ class CItem : public CEntity
 
 		void		ModifyPoints(bool bAdd);	// 아이템의 효과를 캐릭터에 부여 한다. bAdd가 false이면 제거함
 
-		bool		CreateSocket(BYTE bSlot, BYTE bGold);
-		const long *	GetSockets()		{ return &m_alSockets[0];	}
-		long		GetSocket(int i)	{ return m_alSockets[i];	}
+		bool		CreateSocket(uint8_t bSlot, uint8_t bGold);
+		const int32_t *	GetSockets()		{ return &m_alSockets[0];	}
+		int32_t		GetSocket(int32_t i)	{ return m_alSockets[i];	}
 
-		void		SetSockets(const long * al);
-		void		SetSocket(int i, long v, bool bLog = true);
+		void		SetSockets(const int32_t * al);
+		void		SetSocket(int32_t i, int32_t v, bool bLog = true);
 
-		int		GetSocketCount();
+		int32_t		GetSocketCount();
 		bool		AddSocket();
 
 		const TPlayerItemAttribute* GetAttributes()		{ return m_aAttr;	} 
-		const TPlayerItemAttribute& GetAttribute(int i)	{ return m_aAttr[i];	}
+		const TPlayerItemAttribute& GetAttribute(int32_t i)	{ return m_aAttr[i];	}
 
-		BYTE		GetAttributeType(int i)	{ return m_aAttr[i].bType;	}
-		short		GetAttributeValue(int i){ return m_aAttr[i].sValue;	}
+		uint8_t		GetAttributeType(int32_t i)	{ return m_aAttr[i].bType;	}
+		int16_t		GetAttributeValue(int32_t i){ return m_aAttr[i].sValue;	}
 
 		void		SetAttributes(const TPlayerItemAttribute* c_pAttribute);
 		
-		int		FindAttribute(BYTE bType);
-		bool		RemoveAttributeAt(int index);
-		bool		RemoveAttributeType(BYTE bType);
+		int32_t		FindAttribute(uint8_t bType);
+		bool		RemoveAttributeAt(int32_t index);
+		bool		RemoveAttributeType(uint8_t bType);
 
-		bool		HasAttr(BYTE bApply);
-		bool		HasRareAttr(BYTE bApply);
+		bool		HasAttr(uint8_t bApply);
+		bool		HasRareAttr(uint8_t bApply);
 
 		void		SetDestroyEvent(LPEVENT pkEvent);
-		void		StartDestroyEvent(int iSec=300);
+		void		StartDestroyEvent(int32_t iSec=300);
 
-		DWORD		GetRefinedVnum()	{ return m_pProto ? m_pProto->dwRefinedVnum : 0; }
-		DWORD		GetRefineFromVnum();
-		int		GetRefineLevel();
+		uint32_t		GetRefinedVnum()	{ return m_pProto ? m_pProto->dwRefinedVnum : 0; }
+		uint32_t		GetRefineFromVnum();
+		int32_t		GetRefineLevel();
 
 		void		SetSkipSave(bool b)	{ m_bSkipSave = b; }
 		bool		GetSkipSave()		{ return m_bSkipSave; }
 
 		bool		IsOwnership(LPCHARACTER ch);
-		void		SetOwnership(LPCHARACTER ch, int iSec = 10);
+		void		SetOwnership(LPCHARACTER ch, int32_t iSec = 10);
 		void		SetOwnershipEvent(LPEVENT pkEvent);
 
-		DWORD		GetLastOwnerPID()	{ return m_dwLastOwnerPID; }
+		uint32_t		GetLastOwnerPID()	{ return m_dwLastOwnerPID; }
 #ifdef ENABLE_HIGHLIGHT_NEW_ITEM
-		void		SetLastOwnerPID(DWORD pid) { m_dwLastOwnerPID = pid; }
+		void		SetLastOwnerPID(uint32_t pid) { m_dwLastOwnerPID = pid; }
 #endif
 
-		int		GetAttributeSetIndex(); // 속성 붙는것을 지정한 배열의 어느 인덱스를 사용하는지 돌려준다.
+		int32_t		GetAttributeSetIndex(); // 속성 붙는것을 지정한 배열의 어느 인덱스를 사용하는지 돌려준다.
 		void		AlterToMagicItem();
-		void		AlterToSocketItem(int iSocketCount);
+		void		AlterToSocketItem(int32_t iSocketCount);
 
-		WORD		GetRefineSet()		{ return m_pProto ? m_pProto->wRefineSet : 0;	}
+		uint16_t		GetRefineSet()		{ return m_pProto ? m_pProto->wRefineSet : 0;	}
 
 		void		StartUniqueExpireEvent();
 		void		SetUniqueExpireEvent(LPEVENT pkEvent);
@@ -167,30 +167,30 @@ class CItem : public CEntity
 		void		StopAccessorySocketExpireEvent();
 
 		//			일단 REAL_TIME과 TIMER_BASED_ON_WEAR 아이템에 대해서만 제대로 동작함.
-		int			GetDuration();
+		int32_t			GetDuration();
 
-		int		GetAttributeCount();
+		int32_t		GetAttributeCount();
 		void		ClearAttribute();
-		void		ChangeAttribute(const int* aiChangeProb=NULL);
+		void		ChangeAttribute(const int32_t* aiChangeProb=nullptr);
 		void		AddAttribute();
-		void		AddAttribute(BYTE bType, short sValue);
+		void		AddAttribute(uint8_t bType, int16_t sValue);
 
-		void		ApplyAddon(int iAddonType);
+		void		ApplyAddon(int32_t iAddonType);
 
-		int		GetSpecialGroup() const;
+		int32_t		GetSpecialGroup() const;
 		bool	IsSameSpecialGroup(const LPITEM item) const;
 
 		// ACCESSORY_REFINE
 		// 액세서리에 광산을 통해 소켓을 추가
 		bool		IsAccessoryForSocket();
 
-		int		GetAccessorySocketGrade();
-		int		GetAccessorySocketMaxGrade();
-		int		GetAccessorySocketDownGradeTime();
+		int32_t		GetAccessorySocketGrade();
+		int32_t		GetAccessorySocketMaxGrade();
+		int32_t		GetAccessorySocketDownGradeTime();
 
-		void		SetAccessorySocketGrade(int iGrade);
-		void		SetAccessorySocketMaxGrade(int iMaxGrade);
-		void		SetAccessorySocketDownGradeTime(DWORD time);
+		void		SetAccessorySocketGrade(int32_t iGrade);
+		void		SetAccessorySocketMaxGrade(int32_t iMaxGrade);
+		void		SetAccessorySocketDownGradeTime(uint32_t time);
 
 		void		AccessorySocketDegrade();
 
@@ -204,7 +204,7 @@ class CItem : public CEntity
 		void		CopyAttributeTo(LPITEM pItem);
 		void		CopySocketTo(LPITEM pItem);
 
-		int			GetRareAttrCount();
+		int32_t			GetRareAttrCount();
 		bool		AddRareAttribute();
 		bool		ChangeRareAttribute();
 
@@ -214,24 +214,24 @@ class CItem : public CEntity
 		bool		isLocked() const { return m_isLocked; }
 
 	private :
-		void		SetAttribute(int i, BYTE bType, short sValue);
+		void		SetAttribute(int32_t i, uint8_t bType, int16_t sValue);
 	public:
-		void		SetForceAttribute(int i, BYTE bType, short sValue);
+		void		SetForceAttribute(int32_t i, uint8_t bType, int16_t sValue);
 
 	protected:
 		bool		EquipEx(bool is_equip);
 		bool		Unequip();
 
-		void		AddAttr(BYTE bApply, BYTE bLevel);
-		void		PutAttribute(const int * aiAttrPercentTable);
-		void		PutAttributeWithLevel(BYTE bLevel);
+		void		AddAttr(uint8_t bApply, uint8_t bLevel);
+		void		PutAttribute(const int32_t * aiAttrPercentTable);
+		void		PutAttributeWithLevel(uint8_t bLevel);
 
 	public:
-		void		AddRareAttribute2(const int * aiAttrPercentTable = NULL);
+		void		AddRareAttribute2(const int32_t * aiAttrPercentTable = nullptr);
 	protected:
-		void		AddRareAttr(BYTE bApply, BYTE bLevel);
-		void		PutRareAttribute(const int * aiAttrPercentTable);
-		void		PutRareAttributeWithLevel(BYTE bLevel);
+		void		AddRareAttr(uint8_t bApply, uint8_t bLevel);
+		void		PutRareAttribute(const int32_t * aiAttrPercentTable);
+		void		PutRareAttributeWithLevel(uint8_t bLevel);
 
 	protected:
 		friend class CInputDB;
@@ -253,33 +253,33 @@ class CItem : public CEntity
 		// 저장할 때에 본래 vnum으로 바꿔주도록 한다.
 
 		// Mask vnum은 어떤 이유(ex. 위의 상황)로 인해 vnum이 바뀌어 돌아가는 아이템을 위해 있다.
-		void		SetMaskVnum(DWORD vnum)	{	m_dwMaskVnum = vnum; }
-		DWORD		GetMaskVnum()			{	return m_dwMaskVnum; }
+		void		SetMaskVnum(uint32_t vnum)	{	m_dwMaskVnum = vnum; }
+		uint32_t		GetMaskVnum()			{	return m_dwMaskVnum; }
 		bool		IsMaskedItem()	{	return m_dwMaskVnum != 0;	}
 
 		// 용혼석
 		bool		IsDragonSoul();
-		int		GiveMoreTime_Per(float fPercent);
-		int		GiveMoreTime_Fix(DWORD dwTime);
+		int32_t		GiveMoreTime_Per(float fPercent);
+		int32_t		GiveMoreTime_Fix(uint32_t dwTime);
 
 	private:
 		TItemTable const * m_pProto;		// 프로토 타잎
 
-		DWORD		m_dwVnum;
+		uint32_t		m_dwVnum;
 		LPCHARACTER	m_pOwner;
 
-		BYTE		m_bWindow;		// 현재 아이템이 위치한 윈도우 
-		DWORD		m_dwID;			// 고유번호
+		uint8_t		m_bWindow;		// 현재 아이템이 위치한 윈도우 
+		uint32_t		m_dwID;			// 고유번호
 		bool		m_bEquipped;	// 장착 되었는가?
-		DWORD		m_dwVID;		// VID
-		WORD		m_wCell;		// 위치
-		DWORD		m_dwCount;		// 개수
-		long		m_lFlag;		// 추가 flag
-		DWORD		m_dwLastOwnerPID;	// 마지막 가지고 있었던 사람의 PID
+		uint32_t		m_dwVID;		// VID
+		uint16_t		m_wCell;		// 위치
+		uint32_t		m_dwCount;		// 개수
+		int32_t		m_lFlag;		// 추가 flag
+		uint32_t		m_dwLastOwnerPID;	// 마지막 가지고 있었던 사람의 PID
 
 		bool		m_bExchanging;	///< 현재 교환중 상태 
 
-		long		m_alSockets[ITEM_SOCKET_MAX_NUM];	// 아이템 소캣
+		int32_t		m_alSockets[ITEM_SOCKET_MAX_NUM];	// 아이템 소캣
 		TPlayerItemAttribute	m_aAttr[ITEM_ATTRIBUTE_MAX_NUM];
 
 		LPEVENT		m_pkDestroyEvent;
@@ -290,20 +290,20 @@ class CItem : public CEntity
 		LPEVENT		m_pkAccessorySocketExpireEvent;
 		LPEVENT		m_pkOwnershipEvent;
 
-		DWORD		m_dwOwnershipPID;
+		uint32_t		m_dwOwnershipPID;
 
 		bool		m_bSkipSave;
 
 		bool		m_isLocked;
 		
-		DWORD		m_dwMaskVnum;
-		DWORD		m_dwSIGVnum;
+		uint32_t		m_dwMaskVnum;
+		uint32_t		m_dwSIGVnum;
 	public:
-		void SetSIGVnum(DWORD dwSIG)
+		void SetSIGVnum(uint32_t dwSIG)
 		{
 			m_dwSIGVnum = dwSIG;
 		}
-		DWORD	GetSIGVnum() const
+		uint32_t	GetSIGVnum() const
 		{
 			return m_dwSIGVnum;
 		}
@@ -323,7 +323,7 @@ EVENTINFO(item_event_info)
 
 EVENTINFO(item_vid_event_info)
 {
-	DWORD item_vid;
+	uint32_t item_vid;
 
 	item_vid_event_info() 
 	: item_vid( 0 )

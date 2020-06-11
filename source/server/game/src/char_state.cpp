@@ -24,7 +24,7 @@
 
 #include "../../common/VnumHelper.h"
 
-extern LPCHARACTER FindVictim(LPCHARACTER pkChr, int iMaxDistance);
+extern LPCHARACTER FindVictim(LPCHARACTER pkChr, int32_t iMaxDistance);
 
 namespace
 {
@@ -32,7 +32,7 @@ namespace
 	{
 		public:
 			FuncFindChrForFlag(LPCHARACTER pkChr) :
-				m_pkChr(pkChr), m_pkChrFind(NULL), m_iMinDistance(INT_MAX)
+				m_pkChr(pkChr), m_pkChrFind(nullptr), m_iMinDistance(INT_MAX)
 				{
 				}
 
@@ -55,7 +55,7 @@ namespace
 				if (pkChr->IsDead())
 					return;
 
-				int iDist = DISTANCE_APPROX(pkChr->GetX()-m_pkChr->GetX(), pkChr->GetY()-m_pkChr->GetY());
+				int32_t iDist = DISTANCE_APPROX(pkChr->GetX()-m_pkChr->GetX(), pkChr->GetY()-m_pkChr->GetY());
 
 				if (iDist <= 500 && m_iMinDistance > iDist &&
 						!pkChr->IsAffectFlag(AFF_WAR_FLAG1) &&
@@ -63,10 +63,10 @@ namespace
 						!pkChr->IsAffectFlag(AFF_WAR_FLAG3))
 				{
 					// 우리편 깃발일 경우
-					if ((DWORD) m_pkChr->GetPoint(POINT_STAT) == pkChr->GetGuild()->GetID())
+					if ((uint32_t) m_pkChr->GetPoint(POINT_STAT) == pkChr->GetGuild()->GetID())
 					{
 						CWarMap * pMap = pkChr->GetWarMap();
-						BYTE idx;
+						uint8_t idx;
 
 						if (!pMap || !pMap->GetTeamIndex(pkChr->GetGuild()->GetID(), idx))
 							return;
@@ -90,7 +90,7 @@ namespace
 
 			LPCHARACTER	m_pkChr;
 			LPCHARACTER m_pkChrFind;
-			int		m_iMinDistance;
+			int32_t		m_iMinDistance;
 	};
 
 	class FuncFindChrForFlagBase
@@ -118,7 +118,7 @@ namespace
 				if (!pkGuild)
 					return;
 
-				int iDist = DISTANCE_APPROX(pkChr->GetX()-m_pkChr->GetX(), pkChr->GetY()-m_pkChr->GetY());
+				int32_t iDist = DISTANCE_APPROX(pkChr->GetX()-m_pkChr->GetX(), pkChr->GetY()-m_pkChr->GetY());
 
 				if (iDist <= 500 &&
 						(pkChr->IsAffectFlag(AFF_WAR_FLAG1) || 
@@ -133,18 +133,18 @@ namespace
 
 					if (pkAff)
 					{
-						if ((DWORD) m_pkChr->GetPoint(POINT_STAT) == pkGuild->GetID() &&
+						if ((uint32_t) m_pkChr->GetPoint(POINT_STAT) == pkGuild->GetID() &&
 								m_pkChr->GetPoint(POINT_STAT) != pkAff->lApplyValue)
 						{
 							CWarMap * pMap = pkChr->GetWarMap();
-							BYTE idx;
+							uint8_t idx;
 
 							if (!pMap || !pMap->GetTeamIndex(pkGuild->GetID(), idx))
 								return;
 
 							//if (pMap->IsFlagOnBase(idx))
 							{
-								BYTE idx_opp = idx == 0 ? 1 : 0;
+								uint8_t idx_opp = idx == 0 ? 1 : 0;
 
 								SendGuildWarScore(m_pkChr->GetPoint(POINT_STAT), pkAff->lApplyValue, 1);
 								//SendGuildWarScore(pkAff->lApplyValue, m_pkChr->GetPoint(POINT_STAT), -1);
@@ -168,13 +168,13 @@ namespace
 	class FuncFindGuardVictim
 	{
 		public:
-			FuncFindGuardVictim(LPCHARACTER pkChr, int iMaxDistance) :
+			FuncFindGuardVictim(LPCHARACTER pkChr, int32_t iMaxDistance) :
 				m_pkChr(pkChr),
 			m_iMinDistance(INT_MAX),
 			m_iMaxDistance(iMaxDistance),
 			m_lx(pkChr->GetX()),
 			m_ly(pkChr->GetY()),
-			m_pkChrVictim(NULL)
+			m_pkChrVictim(nullptr)
 			{
 			};
 
@@ -205,7 +205,7 @@ namespace
 				if (pkChr->GetRaceNum() == 5001)
 					return;
 
-				int iDistance = DISTANCE_APPROX(m_lx - pkChr->GetX(), m_ly - pkChr->GetY());
+				int32_t iDistance = DISTANCE_APPROX(m_lx - pkChr->GetX(), m_ly - pkChr->GetY());
 
 				if (iDistance < m_iMinDistance && iDistance <= m_iMaxDistance)
 				{
@@ -222,10 +222,10 @@ namespace
 		private:
 			LPCHARACTER	m_pkChr;
 
-			int		m_iMinDistance;
-			int		m_iMaxDistance;
-			long	m_lx;
-			long	m_ly;
+			int32_t		m_iMinDistance;
+			int32_t		m_iMaxDistance;
+			int32_t	m_lx;
+			int32_t	m_ly;
 
 			LPCHARACTER	m_pkChrVictim;
 	};
@@ -279,10 +279,10 @@ bool CHARACTER::IsReviver() const
 
 void CHARACTER::CowardEscape()
 {
-	int iDist[4] = {500, 1000, 3000, 5000};
+	int32_t iDist[4] = {500, 1000, 3000, 5000};
 
-	for (int iDistIdx = 2; iDistIdx >= 0; --iDistIdx)
-		for (int iTryCount = 0; iTryCount < 8; ++iTryCount)
+	for (int32_t iDistIdx = 2; iDistIdx >= 0; --iDistIdx)
+		for (int32_t iTryCount = 0; iTryCount < 8; ++iTryCount)
 		{
 			SetRotation(number(0, 359));        // 방향은 랜덤으로 설정
 
@@ -292,9 +292,9 @@ void CHARACTER::CowardEscape()
 			GetDeltaByDegree(GetRotation(), fDist, &fx, &fy);
 
 			bool bIsWayBlocked = false;
-			for (int j = 1; j <= 100; ++j)
+			for (int32_t j = 1; j <= 100; ++j)
 			{
-				if (!SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int) fx*j/100, GetY() + (int) fy*j/100))
+				if (!SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx*j/100, GetY() + (int32_t) fy*j/100))
 				{
 					bIsWayBlocked = true;
 					break;
@@ -306,8 +306,8 @@ void CHARACTER::CowardEscape()
 
 			m_dwStateDuration = PASSES_PER_SEC(1);
 
-			int iDestX = GetX() + (int) fx;
-			int iDestY = GetY() + (int) fy;
+			int32_t iDestX = GetX() + (int32_t) fx;
+			int32_t iDestY = GetY() + (int32_t) fy;
 
 			if (Goto(iDestX, iDestY))
 				SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
@@ -388,10 +388,10 @@ void CHARACTER::__StateIdle_Stone()
 {
 	m_dwStateDuration = PASSES_PER_SEC(1);
 
-	int iPercent = 0; // @fixme136
+	int32_t iPercent = 0; // @fixme136
 	if (GetMaxHP() >= 0)
 		iPercent = (GetHP() * 100) / GetMaxHP();
-	DWORD dwVnum = number(MIN(GetMobTable().sAttackSpeed, GetMobTable().sMovingSpeed ), MAX(GetMobTable().sAttackSpeed, GetMobTable().sMovingSpeed));
+	uint32_t dwVnum = number(MIN(GetMobTable().sAttackSpeed, GetMobTable().sMovingSpeed ), MAX(GetMobTable().sAttackSpeed, GetMobTable().sMovingSpeed));
 
 	if (iPercent <= 10 && GetMaxSP() < 10)
 	{
@@ -402,7 +402,7 @@ void CHARACTER::__StateIdle_Stone()
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1500, GetY() - 1500, GetX() + 1500, GetY() + 1500);
-		CHARACTER_MANAGER::instance().SelectStone(NULL);
+		CHARACTER_MANAGER::instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 20 && GetMaxSP() < 9)
 	{
@@ -413,7 +413,7 @@ void CHARACTER::__StateIdle_Stone()
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1500, GetY() - 1500, GetX() + 1500, GetY() + 1500);
-		CHARACTER_MANAGER::instance().SelectStone(NULL);
+		CHARACTER_MANAGER::instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 30 && GetMaxSP() < 8)
 	{
@@ -424,7 +424,7 @@ void CHARACTER::__StateIdle_Stone()
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SelectStone(NULL);
+		CHARACTER_MANAGER::instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 40 && GetMaxSP() < 7)
 	{
@@ -435,7 +435,7 @@ void CHARACTER::__StateIdle_Stone()
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SelectStone(NULL);
+		CHARACTER_MANAGER::instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 50 && GetMaxSP() < 6)
 	{
@@ -445,7 +445,7 @@ void CHARACTER::__StateIdle_Stone()
 		CHARACTER_MANAGER::instance().SelectStone(this);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SelectStone(NULL);
+		CHARACTER_MANAGER::instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 60 && GetMaxSP() < 5)
 	{
@@ -455,7 +455,7 @@ void CHARACTER::__StateIdle_Stone()
 		CHARACTER_MANAGER::instance().SelectStone(this);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
-		CHARACTER_MANAGER::instance().SelectStone(NULL);
+		CHARACTER_MANAGER::instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 70 && GetMaxSP() < 4)
 	{
@@ -465,7 +465,7 @@ void CHARACTER::__StateIdle_Stone()
 		CHARACTER_MANAGER::instance().SelectStone(this);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SelectStone(NULL);
+		CHARACTER_MANAGER::instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 80 && GetMaxSP() < 3)
 	{
@@ -475,7 +475,7 @@ void CHARACTER::__StateIdle_Stone()
 		CHARACTER_MANAGER::instance().SelectStone(this);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SelectStone(NULL);
+		CHARACTER_MANAGER::instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 90 && GetMaxSP() < 2)
 	{
@@ -484,7 +484,7 @@ void CHARACTER::__StateIdle_Stone()
 
 		CHARACTER_MANAGER::instance().SelectStone(this);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
-		CHARACTER_MANAGER::instance().SelectStone(NULL);
+		CHARACTER_MANAGER::instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 99 && GetMaxSP() < 1)
 	{
@@ -493,7 +493,7 @@ void CHARACTER::__StateIdle_Stone()
 
 		CHARACTER_MANAGER::instance().SelectStone(this);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SelectStone(NULL);
+		CHARACTER_MANAGER::instance().SelectStone(nullptr);
 	}
 	else
 		return;
@@ -536,27 +536,27 @@ void CHARACTER::__StateIdle_NPC()
 		{
 			if (get_dword_time() > m_dwPlayStartTime)
 			{
-				int	next_warp_time = 2 * 1000;	// 2초
+				int32_t	next_warp_time = 2 * 1000;	// 2초
 
 				m_dwPlayStartTime = get_dword_time() + next_warp_time;
 
 				// 시간이 넘었으니 워프합시다.
 				/*
 				 * 산타용
-				const int WARP_MAP_INDEX_NUM = 4;
-				static const long c_lWarpMapIndexs[WARP_MAP_INDEX_NUM] = {61, 62, 63, 64};
+				const int32_t WARP_MAP_INDEX_NUM = 4;
+				static const int32_t c_lWarpMapIndexs[WARP_MAP_INDEX_NUM] = {61, 62, 63, 64};
 				*/
 				// 신선자 노해용
-				const int WARP_MAP_INDEX_NUM = 7;
-				static const long c_lWarpMapIndexs[WARP_MAP_INDEX_NUM] = { 61, 62, 63, 64, 3, 23, 43 };
-				long lNextMapIndex;
+				const int32_t WARP_MAP_INDEX_NUM = 7;
+				static const int32_t c_lWarpMapIndexs[WARP_MAP_INDEX_NUM] = { 61, 62, 63, 64, 3, 23, 43 };
+				int32_t lNextMapIndex;
 				lNextMapIndex = c_lWarpMapIndexs[number(1, WARP_MAP_INDEX_NUM) - 1];
 
 				if (map_allow_find(lNextMapIndex))
 				{
 					// 이곳입니다.
 					M2_DESTROY_CHARACTER(this);
-					int iNextSpawnDelay = 50 * 60;
+					int32_t iNextSpawnDelay = 50 * 60;
 
 					xmas::SpawnSanta(lNextMapIndex, iNextSpawnDelay);
 				}
@@ -599,13 +599,13 @@ void CHARACTER::__StateIdle_NPC()
 				GetDeltaByDegree(GetRotation(), fDist, &fx, &fy);
 
 				// 느슨한 못감 속성 체크; 최종 위치와 중간 위치가 갈수없다면 가지 않는다.
-				if (!(SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int) fx, GetY() + (int) fy) 
-					&& SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int) fx / 2, GetY() + (int) fy / 2)))
+				if (!(SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx, GetY() + (int32_t) fy) 
+					&& SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx / 2, GetY() + (int32_t) fy / 2)))
 					return;
 
 				SetNowWalking(true);
 
-				if (Goto(GetX() + (int) fx, GetY() + (int) fy))
+				if (Goto(GetX() + (int32_t) fx, GetY() + (int32_t) fy))
 					SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
 
 				return;
@@ -643,8 +643,8 @@ void CHARACTER::__StateIdle_Monster()
 
 	if (!victim || victim->IsDead())
 	{
-		SetVictim(NULL);
-		victim = NULL;
+		SetVictim(nullptr);
+		victim = nullptr;
 		m_dwStateDuration = PASSES_PER_SEC(1);
 	}
 
@@ -707,8 +707,8 @@ void CHARACTER::__StateIdle_Monster()
 			GetDeltaByDegree(GetRotation(), fDist, &fx, &fy);
 
 			// 느슨한 못감 속성 체크; 최종 위치와 중간 위치가 갈수없다면 가지 않는다.
-			if (!(SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int) fx, GetY() + (int) fy) 
-						&& SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int) fx/2, GetY() + (int) fy/2)))
+			if (!(SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx, GetY() + (int32_t) fy) 
+						&& SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx/2, GetY() + (int32_t) fy/2)))
 				return;
 
 			// NOTE: 몬스터가 IDLE 상태에서 주변을 서성거릴 때, 현재 무조건 뛰어가게 되어 있음. (절대로 걷지 않음)
@@ -721,7 +721,7 @@ void CHARACTER::__StateIdle_Monster()
 					SetNowWalking(true);
 			}
 
-			if (Goto(GetX() + (int) fx, GetY() + (int) fy))
+			if (Goto(GetX() + (int32_t) fx, GetY() + (int32_t) fy))
 				SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
 
 			return;
@@ -757,14 +757,14 @@ bool __CHARACTER_GotoNearTarget(LPCHARACTER self, LPCHARACTER victim)
 
 void CHARACTER::StateMove()
 {
-	DWORD dwElapsedTime = get_dword_time() - m_dwMoveStartTime;
+	uint32_t dwElapsedTime = get_dword_time() - m_dwMoveStartTime;
 	float fRate = (float) dwElapsedTime / (float) m_dwMoveDuration;
 
 	if (fRate > 1.0f)
 		fRate = 1.0f;
 
-	int x = (int) ((float) (m_posDest.x - m_posStart.x) * fRate + m_posStart.x);
-	int y = (int) ((float) (m_posDest.y - m_posStart.y) * fRate + m_posStart.y);
+	int32_t x = (int32_t) ((float) (m_posDest.x - m_posStart.x) * fRate + m_posStart.x);
+	int32_t y = (int32_t) ((float) (m_posDest.y - m_posStart.y) * fRate + m_posStart.y);
 
 	Move(x, y);
 
@@ -775,7 +775,7 @@ void CHARACTER::StateMove()
 		if (GetExchange())
 		{
 			LPCHARACTER victim = GetExchange()->GetCompany()->GetOwner();
-			int iDist = DISTANCE_APPROX(GetX() - victim->GetX(), GetY() - victim->GetY());
+			int32_t iDist = DISTANCE_APPROX(GetX() - victim->GetX(), GetY() - victim->GetY());
 
 			// 거리 체크
 			if (iDist >= EXCHANGE_MAX_DISTANCE)
@@ -850,8 +850,8 @@ void CHARACTER::StateMove()
 				// 워프 테스트
 				float fx, fy;
 				GetDeltaByDegree(victim->GetRotation(), 400, &fx, &fy);
-				long new_x = victim->GetX() + (long)fx;
-				long new_y = victim->GetY() + (long)fy;
+				int32_t new_x = victim->GetX() + (int32_t)fx;
+				int32_t new_y = victim->GetY() + (int32_t)fy;
 				SetRotation(GetDegreeFromPositionXY(new_x, new_y, victim->GetX(), victim->GetY()));
 				Show(victim->GetMapIndex(), new_x, new_y, 0, true);
 				GotoState(m_stateBattle);
@@ -921,7 +921,7 @@ void CHARACTER::StateBattle()
 		if (IsDead())
 			return;
 
-		SetVictim(NULL);
+		SetVictim(nullptr);
 
 		if (number(1, 50) != 1)
 		{
@@ -960,18 +960,18 @@ void CHARACTER::StateBattle()
 							GetDeltaByDegree(number(0, 359), fDist, &fx, &fy);
 
 							if (SECTREE_MANAGER::instance().IsMovablePosition(victim->GetMapIndex(),
-										victim->GetX() + (int) fx, 
-										victim->GetY() + (int) fy) && 
+										victim->GetX() + (int32_t) fx, 
+										victim->GetY() + (int32_t) fy) && 
 									SECTREE_MANAGER::instance().IsMovablePosition(victim->GetMapIndex(),
-										victim->GetX() + (int) fx/2,
-										victim->GetY() + (int) fy/2))
+										victim->GetX() + (int32_t) fx/2,
+										victim->GetY() + (int32_t) fy/2))
 							{
 								float dx = victim->GetX() + fx;
 								float dy = victim->GetY() + fy;
 
 								SetRotation(GetDegreeFromPosition(dx, dy));
 
-								if (Goto((long) dx, (long) dy))
+								if (Goto((int32_t) dx, (int32_t) dy))
 								{
 									sys_log(0, "KILL_AND_GO: %s distance %.1f", GetName(), fDist);
 									SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
@@ -983,7 +983,7 @@ void CHARACTER::StateBattle()
 			return;
 		}
 
-		SetVictim(NULL);
+		SetVictim(nullptr);
 
 		if (IsGuardNPC())
 			Return();
@@ -1006,10 +1006,10 @@ void CHARACTER::StateBattle()
 		if (bPct && pParty->CountMemberByVnum(GetSummonVnum()) < SUMMON_MONSTER_COUNT)
 		{
 			// 모자라는 녀석을 불러내 채웁시다.
-			int sx = GetX() - 300;
-			int sy = GetY() - 300;
-			int ex = GetX() + 300;
-			int ey = GetY() + 300;
+			int32_t sx = GetX() - 300;
+			int32_t sy = GetY() - 300;
+			int32_t ex = GetX() + 300;
+			int32_t ey = GetY() + 300;
 
 			LPCHARACTER tch = CHARACTER_MANAGER::instance().SpawnMobRange(GetSummonVnum(), GetMapIndex(), sx, sy, ex, ey, true, true);
 
@@ -1027,7 +1027,7 @@ void CHARACTER::StateBattle()
 
 	if (fDist >= 4000.0f)   // 40미터 이상 멀어지면 포기
 	{
-		SetVictim(NULL);
+		SetVictim(nullptr);
 
 		// 보호할 것(돌, 파티장) 주변으로 간다.
 		if (pkChrProtege)
@@ -1053,8 +1053,8 @@ void CHARACTER::StateBattle()
 		return;
 	}
 
-	DWORD dwCurTime = get_dword_time();
-	DWORD dwDuration = CalculateDuration(GetLimitPoint(POINT_ATT_SPEED), 2000);
+	uint32_t dwCurTime = get_dword_time();
+	uint32_t dwDuration = CalculateDuration(GetLimitPoint(POINT_ATT_SPEED), 2000);
 
 	if ((dwCurTime - m_dwLastAttackTime) < dwDuration) // 2초 마다 공격해야 한다.
 	{
@@ -1077,7 +1077,7 @@ void CHARACTER::StateBattle()
 	//
 	if (HasMobSkill())
 	{
-		for (unsigned int iSkillIdx = 0; iSkillIdx < MOB_SKILL_MAX_NUM; ++iSkillIdx)
+		for (uint32_t iSkillIdx = 0; iSkillIdx < MOB_SKILL_MAX_NUM; ++iSkillIdx)
 		{
 			if (CanUseMobSkill(iSkillIdx))
 			{
@@ -1088,7 +1088,7 @@ void CHARACTER::StateBattle()
 					SendMovePacket(FUNC_MOB_SKILL, iSkillIdx, GetX(), GetY(), 0, dwCurTime);
 
 					float fDuration = CMotionManager::instance().GetMotionDuration(GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_SPECIAL_1 + iSkillIdx));
-					m_dwStateDuration = (DWORD) (fDuration == 0.0f ? PASSES_PER_SEC(2) : PASSES_PER_SEC(fDuration));
+					m_dwStateDuration = (uint32_t) (fDuration == 0.0f ? PASSES_PER_SEC(2) : PASSES_PER_SEC(fDuration));
 
 					if (test_server)
 						sys_log(0, "USE_MOB_SKILL: %s idx %u motion %u duration %.0f", GetName(), iSkillIdx, MOTION_SPECIAL_1 + iSkillIdx, fDuration);
@@ -1109,13 +1109,13 @@ void CHARACTER::StateBattle()
 		SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0, dwCurTime);
 
 		float fDuration = CMotionManager::instance().GetMotionDuration(GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_NORMAL_ATTACK));
-		m_dwStateDuration = (DWORD) (fDuration == 0.0f ? PASSES_PER_SEC(2) : PASSES_PER_SEC(fDuration));
+		m_dwStateDuration = (uint32_t) (fDuration == 0.0f ? PASSES_PER_SEC(2) : PASSES_PER_SEC(fDuration));
 	}
 }
 
 void CHARACTER::StateFlag()
 {
-	m_dwStateDuration = (DWORD) PASSES_PER_SEC(0.5);
+	m_dwStateDuration = (uint32_t) PASSES_PER_SEC(0.5);
 
 	CWarMap * pMap = GetWarMap();
 
@@ -1128,11 +1128,11 @@ void CHARACTER::StateFlag()
 	if (!f.m_pkChrFind)
 		return;
 
-	if (NULL == f.m_pkChrFind->GetGuild())
+	if (nullptr == f.m_pkChrFind->GetGuild())
 		return;
 
 	char buf[256];
-	BYTE idx;
+	uint8_t idx;
 
 	if (!pMap->GetTeamIndex(GetPoint(POINT_STAT), idx))
 		return;
@@ -1148,7 +1148,7 @@ void CHARACTER::StateFlag()
 
 void CHARACTER::StateFlagBase()
 {
-	m_dwStateDuration = (DWORD) PASSES_PER_SEC(0.5);
+	m_dwStateDuration = (uint32_t) PASSES_PER_SEC(0.5);
 
 	FuncFindChrForFlagBase f(this);
 	GetSectree()->ForEachAround(f);
@@ -1158,10 +1158,10 @@ void CHARACTER::StateHorse()
 {
 	float	START_FOLLOW_DISTANCE = 400.0f;		// 이 거리 이상 떨어지면 쫓아가기 시작함
 	float	START_RUN_DISTANCE = 700.0f;		// 이 거리 이상 떨어지면 뛰어서 쫓아감.
-	int		MIN_APPROACH = 150;					// 최소 접근 거리
-	int		MAX_APPROACH = 300;					// 최대 접근 거리	
+	int32_t		MIN_APPROACH = 150;					// 최소 접근 거리
+	int32_t		MAX_APPROACH = 300;					// 최대 접근 거리	
 
-	DWORD	STATE_DURATION = (DWORD)PASSES_PER_SEC(0.5);	// 상태 지속 시간
+	uint32_t	STATE_DURATION = (uint32_t)PASSES_PER_SEC(0.5);	// 상태 지속 시간
 
 	bool bDoMoveAlone = true;					// 캐릭터와 가까이 있을 때 혼자 여기저기 움직일건지 여부 -_-;
 	bool bRun = true;							// 뛰어야 하나?
@@ -1206,13 +1206,13 @@ void CHARACTER::StateHorse()
 		GetDeltaByDegree(GetRotation(), fDist, &fx, &fy);
 
 		// 느슨한 못감 속성 체크; 최종 위치와 중간 위치가 갈수없다면 가지 않는다.
-		if (!(SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int) fx, GetY() + (int) fy) 
-					&& SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int) fx/2, GetY() + (int) fy/2)))
+		if (!(SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx, GetY() + (int32_t) fy) 
+					&& SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx/2, GetY() + (int32_t) fy/2)))
 			return;
 
 		SetNowWalking(true);
 
-		if (Goto(GetX() + (int) fx, GetY() + (int) fy))
+		if (Goto(GetX() + (int32_t) fx, GetY() + (int32_t) fy))
 			SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
 	}
 }

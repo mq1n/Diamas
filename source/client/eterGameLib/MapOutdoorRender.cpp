@@ -80,25 +80,25 @@ void CMapOutdoor::__RenderTerrain_RecurseRenderQuadTree(CTerrainQuadtreeNode *No
 	}
 	else
 	{
-		if (Node->NW_Node != NULL)
+		if (Node->NW_Node != nullptr)
 			__RenderTerrain_RecurseRenderQuadTree(Node->NW_Node, bCullCheckNeed);
-		if (Node->NE_Node != NULL)
+		if (Node->NE_Node != nullptr)
 			__RenderTerrain_RecurseRenderQuadTree(Node->NE_Node, bCullCheckNeed);
-		if (Node->SW_Node != NULL)
+		if (Node->SW_Node != nullptr)
 			__RenderTerrain_RecurseRenderQuadTree(Node->SW_Node, bCullCheckNeed);
-		if (Node->SE_Node != NULL)
+		if (Node->SE_Node != nullptr)
 			__RenderTerrain_RecurseRenderQuadTree(Node->SE_Node, bCullCheckNeed);
 	}
 }
 
-int	CMapOutdoor::__RenderTerrain_RecurseRenderQuadTree_CheckBoundingCircle(const D3DXVECTOR3 & c_v3Center, const float & c_fRadius)
+int32_t	CMapOutdoor::__RenderTerrain_RecurseRenderQuadTree_CheckBoundingCircle(const D3DXVECTOR3 & c_v3Center, const float & c_fRadius)
 {
-	const int count = 6;
+	const int32_t count = 6;
 
 	D3DXVECTOR3 center = c_v3Center;
 	center.y = -center.y;
 
-	int i;
+	int32_t i;
 
 	float distance[count];
 	for(i = 0; i < count; ++i)
@@ -117,9 +117,9 @@ int	CMapOutdoor::__RenderTerrain_RecurseRenderQuadTree_CheckBoundingCircle(const
 	return VIEW_ALL;
 }
 
-void CMapOutdoor::__RenderTerrain_AppendPatch(const D3DXVECTOR3& c_rv3Center, float fDistance, long lPatchNum)
+void CMapOutdoor::__RenderTerrain_AppendPatch(const D3DXVECTOR3& c_rv3Center, float fDistance, int32_t lPatchNum)
 {
-	assert(NULL!=m_pTerrainPatchProxyList && "CMapOutdoor::__RenderTerrain_AppendPatch");
+	assert(nullptr!=m_pTerrainPatchProxyList && "CMapOutdoor::__RenderTerrain_AppendPatch");
 	if (!m_pTerrainPatchProxyList[lPatchNum].isUsed())
 		return;
 
@@ -127,7 +127,7 @@ void CMapOutdoor::__RenderTerrain_AppendPatch(const D3DXVECTOR3& c_rv3Center, fl
 	m_PatchVector.push_back(std::make_pair(fDistance, lPatchNum));
 }
 
-void CMapOutdoor::ApplyLight(DWORD dwVersion, const D3DLIGHT8& c_rkLight)
+void CMapOutdoor::ApplyLight(uint32_t dwVersion, const D3DLIGHT8& c_rkLight)
 {
 	m_kSTPD.m_dwLightVersion=dwVersion;
 	STATEMANAGER.SetLight(0, &c_rkLight);
@@ -140,24 +140,24 @@ void CMapOutdoor::InitializeVisibleParts()
 }
 
 // 2004. 2. 17. myevan. 특정 부분을 보이게 하거나 감추는 함수
-void CMapOutdoor::SetVisiblePart(int ePart, bool isVisible)
+void CMapOutdoor::SetVisiblePart(int32_t ePart, bool isVisible)
 {
-	DWORD dwMask=(1<<ePart);
+	uint32_t dwMask=(1<<ePart);
 	if (isVisible)
 	{
 		m_dwVisiblePartFlags|=dwMask;
 	}	
 	else
 	{
-		DWORD dwReverseMask=~dwMask;
+		uint32_t dwReverseMask=~dwMask;
 		m_dwVisiblePartFlags&=dwReverseMask;
 	}
 }
 
 // 2004. 2. 17. myevan. 특정 부분이 보이는지 알아내는 함수
-bool CMapOutdoor::IsVisiblePart(int ePart)
+bool CMapOutdoor::IsVisiblePart(int32_t ePart)
 {
-	DWORD dwMask=(1<<ePart);
+	uint32_t dwMask=(1<<ePart);
 	if (dwMask & m_dwVisiblePartFlags)
 		return true;
 
@@ -165,12 +165,12 @@ bool CMapOutdoor::IsVisiblePart(int ePart)
 }
 
 // Splat 개수 제한
-void CMapOutdoor::SetSplatLimit(int iSplatNum)
+void CMapOutdoor::SetSplatLimit(int32_t iSplatNum)
 {
 	m_iSplatLimit = iSplatNum;
 }
 
-std::vector<int> & CMapOutdoor::GetRenderedSplatNum(int * piPatch, int * piSplat, float * pfSplatRatio)
+std::vector<int32_t> & CMapOutdoor::GetRenderedSplatNum(int32_t * piPatch, int32_t * piSplat, float * pfSplatRatio)
 {	
 	*piPatch = m_iRenderedPatchNum;
 	*piSplat = m_iRenderedSplatNum;
@@ -179,7 +179,7 @@ std::vector<int> & CMapOutdoor::GetRenderedSplatNum(int * piPatch, int * piSplat
 	return m_RenderedTextureNumVector;
 }
 
-CArea::TCRCWithNumberVector & CMapOutdoor::GetRenderedGraphicThingInstanceNum(DWORD * pdwGraphicThingInstanceNum, DWORD * pdwCRCNum)
+CArea::TCRCWithNumberVector & CMapOutdoor::GetRenderedGraphicThingInstanceNum(uint32_t * pdwGraphicThingInstanceNum, uint32_t * pdwCRCNum)
 {
 	*pdwGraphicThingInstanceNum = m_dwRenderedGraphicThingInstanceNum;
 	*pdwCRCNum = m_dwRenderedCRCNum;
@@ -193,7 +193,7 @@ void CMapOutdoor::RenderBeforeLensFlare()
 
 	if (!mc_pEnvironmentData)
 	{
-		TraceError("CMapOutdoor::RenderBeforeLensFlare mc_pEnvironmentData is NULL");
+		TraceError("CMapOutdoor::RenderBeforeLensFlare mc_pEnvironmentData is nullptr");
 		return;
 	}
 	
@@ -208,7 +208,7 @@ void CMapOutdoor::RenderAfterLensFlare()
 
 void CMapOutdoor::RenderCollision()
 {
-	for (int i = 0; i < AROUND_AREA_NUM; ++i)
+	for (int32_t i = 0; i < AROUND_AREA_NUM; ++i)
 	{
 		CArea * pArea;
 		if (GetAreaPointer(i, &pArea))
@@ -261,19 +261,19 @@ void CMapOutdoor::SetInverseViewAndDynamicShaodwMatrices()
 void CMapOutdoor::OnRender()
 {
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t1=ELTimer_GetMSec();
+	uint32_t t1=ELTimer_GetMSec();
 	SetInverseViewAndDynamicShaodwMatrices();
 
 	SetBlendOperation();
-	DWORD t2=ELTimer_GetMSec();
+	uint32_t t2=ELTimer_GetMSec();
 	RenderArea();
-	DWORD t3=ELTimer_GetMSec();
+	uint32_t t3=ELTimer_GetMSec();
 	if (!m_bEnableTerrainOnlyForHeight)
 		RenderTerrain();
-	DWORD t4=ELTimer_GetMSec();
+	uint32_t t4=ELTimer_GetMSec();
 	RenderTree();
-	DWORD t5=ELTimer_GetMSec();
-	DWORD tEnd=ELTimer_GetMSec();
+	uint32_t t5=ELTimer_GetMSec();
+	uint32_t tEnd=ELTimer_GetMSec();
 
 	if (tEnd-t1<7)
 		return;
@@ -320,7 +320,7 @@ struct FRenderPCBlocker
 	{
 		pInstance->Show();
 		CGraphicThingInstance* pThingInstance = dynamic_cast <CGraphicThingInstance*> (pInstance);
-		if (pThingInstance != NULL)
+		if (pThingInstance != nullptr)
 		{
 			if (pThingInstance->HaveBlendThing())
 			{
@@ -339,7 +339,7 @@ void CMapOutdoor::RenderEffect()
 {
 	if (!IsVisiblePart(PART_OBJECT))
 		return;
-	for (int i = 0; i < AROUND_AREA_NUM; ++i)
+	for (int32_t i = 0; i < AROUND_AREA_NUM; ++i)
 	{
 		CArea * pArea;
 		if (GetAreaPointer(i, &pArea))
@@ -388,7 +388,7 @@ void CMapOutdoor::RenderArea(bool bRenderAmbience)
 	m_dwRenderedCRCWithNumberVector.clear();
 
 	// NOTE - 20041201.levites.던젼 그림자 추가
-	for (int j = 0; j < AROUND_AREA_NUM; ++j)
+	for (int32_t j = 0; j < AROUND_AREA_NUM; ++j)
 	{
 		CArea * pArea;
 		if (GetAreaPointer(j, &pArea))
@@ -404,7 +404,7 @@ void CMapOutdoor::RenderArea(bool bRenderAmbience)
 	// Shadow Receiver
 	if (m_bDrawShadow && m_bDrawChrShadow)
 	{
-		if (mc_pEnvironmentData != NULL)
+		if (mc_pEnvironmentData != nullptr)
 			STATEMANAGER.SetRenderState(D3DRS_FOGCOLOR, 0xFFFFFFFF);
 
 		STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -436,7 +436,7 @@ void CMapOutdoor::RenderArea(bool bRenderAmbience)
 
 		STATEMANAGER.RestoreTransform(D3DTS_TEXTURE1);
 
-		if (mc_pEnvironmentData != NULL)
+		if (mc_pEnvironmentData != nullptr)
 			STATEMANAGER.SetRenderState(D3DRS_FOGCOLOR, mc_pEnvironmentData->FogColor);
 	}
 #endif
@@ -447,7 +447,7 @@ void CMapOutdoor::RenderArea(bool bRenderAmbience)
 
 	if (m_isDisableSortRendering)
 	{
-		for (int i = 0; i < AROUND_AREA_NUM; ++i)
+		for (int32_t i = 0; i < AROUND_AREA_NUM; ++i)
 		{
 			CArea * pArea;
 			if (GetAreaPointer(i, &pArea))
@@ -462,7 +462,7 @@ void CMapOutdoor::RenderArea(bool bRenderAmbience)
 				CArea::TCRCWithNumberVector::iterator aIterator = rCRCWithNumberVector.begin();
 				while (aIterator != rCRCWithNumberVector.end())
 				{
-					DWORD dwCRC = (*aIterator++).dwCRC;
+					uint32_t dwCRC = (*aIterator++).dwCRC;
 
 					CArea::TCRCWithNumberVector::iterator aCRCWithNumberVectorIterator = 
 						std::find_if(m_dwRenderedCRCWithNumberVector.begin(), m_dwRenderedCRCWithNumberVector.end(), CArea::FFindIfCRC(dwCRC));
@@ -494,7 +494,7 @@ void CMapOutdoor::RenderArea(bool bRenderAmbience)
 		static std::vector<CGraphicThingInstance*> s_kVct_pkOpaqueThingInstSort;
 		s_kVct_pkOpaqueThingInstSort.clear();
 
-		for (int i = 0; i < AROUND_AREA_NUM; ++i)
+		for (int32_t i = 0; i < AROUND_AREA_NUM; ++i)
 		{
 			CArea * pArea;
 			if (GetAreaPointer(i, &pArea))
@@ -531,7 +531,7 @@ void CMapOutdoor::RenderBlendArea()
 	static std::vector<CGraphicThingInstance*> s_kVct_pkBlendThingInstSort;
 	s_kVct_pkBlendThingInstSort.clear();
 
-	for (int i = 0; i < AROUND_AREA_NUM; ++i)
+	for (int32_t i = 0; i < AROUND_AREA_NUM; ++i)
 	{
 		CArea * pArea;
 		if (GetAreaPointer(i, &pArea))
@@ -599,7 +599,7 @@ void CMapOutdoor::RenderBlendArea()
 }
 void CMapOutdoor::RenderDungeon()
 {
-	for (int i = 0; i < AROUND_AREA_NUM; ++i)
+	for (int32_t i = 0; i < AROUND_AREA_NUM; ++i)
 	{
 		CArea * pArea;
 		if (!GetAreaPointer(i, &pArea))
@@ -614,7 +614,7 @@ void CMapOutdoor::RenderPCBlocker()
 	// PCBlocker
 	if (m_PCBlockerVector.size() != 0)
 	{
-		STATEMANAGER.SetTexture(0, NULL);
+		STATEMANAGER.SetTexture(0, nullptr);
 		STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1,	D3DTA_TEXTURE);
 		STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG2,	D3DTA_CURRENT);
 		STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP,	D3DTOP_MODULATE);
@@ -638,7 +638,7 @@ void CMapOutdoor::RenderPCBlocker()
 
 		std::for_each(m_PCBlockerVector.begin(), m_PCBlockerVector.end(), FRenderPCBlocker());
 
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.RestoreTransform(D3DTS_TEXTURE1);
 
 		STATEMANAGER.RestoreTextureStageState(1, D3DTSS_TEXCOORDINDEX);
@@ -654,7 +654,7 @@ void CMapOutdoor::RenderPCBlocker()
 #endif
 }
 
-void CMapOutdoor::SelectIndexBuffer(BYTE byLODLevel, WORD * pwPrimitiveCount, D3DPRIMITIVETYPE * pePrimitiveType)
+void CMapOutdoor::SelectIndexBuffer(uint8_t byLODLevel, uint16_t * pwPrimitiveCount, D3DPRIMITIVETYPE * pePrimitiveType)
 {
 #ifdef WORLD_EDITOR
 	*pwPrimitiveCount = m_wNumIndices - 2;
@@ -677,18 +677,18 @@ void CMapOutdoor::SelectIndexBuffer(BYTE byLODLevel, WORD * pwPrimitiveCount, D3
 
 void CMapOutdoor::SetPatchDrawVector()
 {
-	assert(NULL!=m_pTerrainPatchProxyList && "CMapOutdoor::__SetPatchDrawVector");
+	assert(nullptr!=m_pTerrainPatchProxyList && "CMapOutdoor::__SetPatchDrawVector");
 
 	m_PatchDrawStructVector.clear();
 
-	std::vector<std::pair<float, long> >::iterator aDistancePatchVectorIterator;
+	std::vector<std::pair<float, int32_t> >::iterator aDistancePatchVectorIterator;
 
 	TPatchDrawStruct aPatchDrawStruct;
 
 	aDistancePatchVectorIterator = m_PatchVector.begin();
 	while(aDistancePatchVectorIterator != m_PatchVector.end())
 	{
-		std::pair<float, long> adistancePatchPair = *aDistancePatchVectorIterator;
+		std::pair<float, int32_t> adistancePatchPair = *aDistancePatchVectorIterator;
 
 		CTerrainPatchProxy * pTerrainPatchProxy = &m_pTerrainPatchProxyList[adistancePatchPair.second];
 
@@ -698,14 +698,14 @@ void CMapOutdoor::SetPatchDrawVector()
 			continue;
 		}
 
-		long lPatchNum = pTerrainPatchProxy->GetPatchNum();
+		int32_t lPatchNum = pTerrainPatchProxy->GetPatchNum();
 		if (lPatchNum < 0)
 		{
 			++aDistancePatchVectorIterator;
 			continue;
 		}
 
-		BYTE byTerrainNum = pTerrainPatchProxy->GetTerrainNum();
+		uint8_t byTerrainNum = pTerrainPatchProxy->GetTerrainNum();
 		if (0xFF == byTerrainNum)
 		{
 			++aDistancePatchVectorIterator;
@@ -744,27 +744,27 @@ float CMapOutdoor::__GetFogDistance()
 
 struct FPatchNumMatch
 {
-	long m_lPatchNumToCheck;
-	FPatchNumMatch(long lPatchNum)
+	int32_t m_lPatchNumToCheck;
+	FPatchNumMatch(int32_t lPatchNum)
 	{
 		m_lPatchNumToCheck = lPatchNum;
 	}
-	bool operator() (std::pair<long, BYTE> aPair)
+	bool operator() (std::pair<int32_t, uint8_t> aPair)
 	{
 		return m_lPatchNumToCheck == aPair.first;
 	}
 };
 
-void CMapOutdoor::NEW_DrawWireFrame(CTerrainPatchProxy * pTerrainPatchProxy, WORD wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType)
+void CMapOutdoor::NEW_DrawWireFrame(CTerrainPatchProxy * pTerrainPatchProxy, uint16_t wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType)
 {
-	DWORD dwFillMode = STATEMANAGER.GetRenderState(D3DRS_FILLMODE);
+	uint32_t dwFillMode = STATEMANAGER.GetRenderState(D3DRS_FILLMODE);
 	STATEMANAGER.SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	
-	DWORD dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
+	uint32_t dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
 	STATEMANAGER.SetRenderState(D3DRS_FOGENABLE, FALSE);
 	
-	STATEMANAGER.SetTexture(0, NULL);
-	STATEMANAGER.SetTexture(1, NULL);
+	STATEMANAGER.SetTexture(0, nullptr);
+	STATEMANAGER.SetTexture(1, nullptr);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
 	
 	STATEMANAGER.DrawIndexedPrimitive(ePrimitiveType, 0, m_iPatchTerrainVertexCount, 0, wPrimitiveCount);
@@ -777,30 +777,30 @@ void CMapOutdoor::NEW_DrawWireFrame(CTerrainPatchProxy * pTerrainPatchProxy, WOR
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP,   D3DTOP_MODULATE);	
 }
 
-void CMapOutdoor::DrawWireFrame(long patchnum, WORD wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType)
+void CMapOutdoor::DrawWireFrame(int32_t patchnum, uint16_t wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType)
 {
-	assert(NULL!=m_pTerrainPatchProxyList && "CMapOutdoor::DrawWireFrame");
+	assert(nullptr!=m_pTerrainPatchProxyList && "CMapOutdoor::DrawWireFrame");
 
 	CTerrainPatchProxy * pTerrainPatchProxy= &m_pTerrainPatchProxyList[patchnum];
 
 	if (!pTerrainPatchProxy->isUsed())
 		return;
 
-	long sPatchNum = pTerrainPatchProxy->GetPatchNum();
+	int32_t sPatchNum = pTerrainPatchProxy->GetPatchNum();
 	if (sPatchNum < 0)
 		return;
-	BYTE ucTerrainNum = pTerrainPatchProxy->GetTerrainNum();
+	uint8_t ucTerrainNum = pTerrainPatchProxy->GetTerrainNum();
 	if (0xFF == ucTerrainNum)
 		return;
 
-	DWORD dwFillMode = STATEMANAGER.GetRenderState(D3DRS_FILLMODE);
+	uint32_t dwFillMode = STATEMANAGER.GetRenderState(D3DRS_FILLMODE);
 	STATEMANAGER.SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 
-	DWORD dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
+	uint32_t dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
 	STATEMANAGER.SetRenderState(D3DRS_FOGENABLE, FALSE);
 	
-	STATEMANAGER.SetTexture(0, NULL);
-	STATEMANAGER.SetTexture(1, NULL);
+	STATEMANAGER.SetTexture(0, nullptr);
+	STATEMANAGER.SetTexture(1, nullptr);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
 
 	STATEMANAGER.DrawIndexedPrimitive(ePrimitiveType, 0, m_iPatchTerrainVertexCount, 0, wPrimitiveCount);
@@ -823,7 +823,7 @@ void CMapOutdoor::RenderMarkedArea()
 	m_matWorldForCommonUse._42 = 0.0f;
 	STATEMANAGER.SetTransform(D3DTS_WORLD, &m_matWorldForCommonUse);
 
-	WORD wPrimitiveCount;
+	uint16_t wPrimitiveCount;
 	D3DPRIMITIVETYPE eType;
 	SelectIndexBuffer(0, &wPrimitiveCount, &eType);
 
@@ -838,7 +838,7 @@ void CMapOutdoor::RenderMarkedArea()
 	STATEMANAGER.SaveRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	STATEMANAGER.SaveRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-	static long lStartTime = timeGetTime();
+	static int32_t lStartTime = timeGetTime();
 	float fTime = float((timeGetTime() - lStartTime)%3000) / 3000.0f;
 	float fAlpha = fabs(fTime - 0.5f) / 2.0f + 0.1f;
 	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, D3DXCOLOR(1.0f, 1.0f, 1.0f, fAlpha));
@@ -901,29 +901,29 @@ void CMapOutdoor::RecurseRenderAttr(CTerrainQuadtreeNode *Node, bool bCullEnable
 		}
 		else
 		{
-			if (Node->NW_Node != NULL)
+			if (Node->NW_Node != nullptr)
 				RecurseRenderAttr(Node->NW_Node, bCullEnable);
-			if (Node->NE_Node != NULL)
+			if (Node->NE_Node != nullptr)
 				RecurseRenderAttr(Node->NE_Node, bCullEnable);
-			if (Node->SW_Node != NULL)
+			if (Node->SW_Node != nullptr)
 				RecurseRenderAttr(Node->SW_Node, bCullEnable);
-			if (Node->SE_Node != NULL)
+			if (Node->SE_Node != nullptr)
 				RecurseRenderAttr(Node->SE_Node, bCullEnable);
 		}
  	}
 }
 
-void CMapOutdoor::DrawPatchAttr(long patchnum)
+void CMapOutdoor::DrawPatchAttr(int32_t patchnum)
 {
 	CTerrainPatchProxy * pTerrainPatchProxy = &m_pTerrainPatchProxyList[patchnum];
 	if (!pTerrainPatchProxy->isUsed())
 		return;
 
-	long sPatchNum = pTerrainPatchProxy->GetPatchNum();
+	int32_t sPatchNum = pTerrainPatchProxy->GetPatchNum();
 	if (sPatchNum < 0)
 		return;
 
-	BYTE ucTerrainNum = pTerrainPatchProxy->GetTerrainNum();
+	uint8_t ucTerrainNum = pTerrainPatchProxy->GetTerrainNum();
 	if (0xFF == ucTerrainNum)
 		return;
 
@@ -935,7 +935,7 @@ void CMapOutdoor::DrawPatchAttr(long patchnum)
 	if (!pTerrain->IsMarked())
 		return;
 
-	WORD wCoordX, wCoordY;
+	uint16_t wCoordX, wCoordY;
 	pTerrain->GetCoordinate(&wCoordX, &wCoordY);
 
 	m_matWorldForCommonUse._41 = -(float) (wCoordX * CTerrainImpl::XSIZE * CTerrainImpl::CELLSCALE);

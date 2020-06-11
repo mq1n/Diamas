@@ -7,13 +7,13 @@ class CNetworkPacketHeaderMap
 	public:
 		typedef struct SPacketType
 		{
-			SPacketType(int iSize = 0, bool bFlag = false)
+			SPacketType(int32_t iSize = 0, bool bFlag = false)
 			{
 				iPacketSize = iSize;
 				isDynamicSizePacket = bFlag;
 			}
 
-			int iPacketSize;
+			int32_t iPacketSize;
 			bool isDynamicSizePacket;
 		} TPacketType;
 
@@ -21,9 +21,9 @@ class CNetworkPacketHeaderMap
 		CNetworkPacketHeaderMap();
 		virtual ~CNetworkPacketHeaderMap();
 
-		void Set(int header, TPacketType & rPacketType);
-		bool Get(int header, TPacketType * pPacketType);
+		void Set(int32_t header, TPacketType & rPacketType);
+		bool Get(int32_t header, TPacketType * pPacketType);
 
 	protected:
-		std::map<int, TPacketType> m_headerMap;
+		std::map<int32_t, TPacketType> m_headerMap;
 };

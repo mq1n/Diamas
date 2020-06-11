@@ -16,14 +16,14 @@
 
 		999 : 제국 이동 성공
 */
-int CHARACTER::ChangeEmpire(BYTE empire)
+int32_t CHARACTER::ChangeEmpire(uint8_t empire)
 {
 	if (GetEmpire() == empire)
 		return 1;
 
 	char szQuery[1024+1];
-	DWORD dwAID;
-	DWORD dwPID[4];
+	uint32_t dwAID;
+	uint32_t dwPID[4];
 	memset(dwPID, 0, sizeof(dwPID));
 
 	{
@@ -53,22 +53,22 @@ int CHARACTER::ChangeEmpire(BYTE empire)
 		str_to_number(dwPID[3], row[4]);
 	}
 
-	const int loop = 4;
+	const int32_t loop = 4;
 
 	{
 		// 2. 각 캐릭터의 길드 정보를 얻어온다.
 		//   한 캐릭터라도 길드에 가입 되어 있다면, 제국 이동을 할 수 없다.
-		DWORD dwGuildID[4];
+		uint32_t dwGuildID[4];
 		CGuild * pGuild[4];
-		SQLMsg * pMsg = NULL;
+		SQLMsg * pMsg = nullptr;
 		
-		for (int i = 0; i < loop; ++i)
+		for (int32_t i = 0; i < loop; ++i)
 		{
 			snprintf(szQuery, sizeof(szQuery), "SELECT guild_id FROM guild_member%s WHERE pid=%u", get_table_postfix(), dwPID[i]);
 
 			pMsg = DBManager::instance().DirectQuery(szQuery);
 
-			if (pMsg != NULL)
+			if (pMsg != nullptr)
 			{
 				if (pMsg->Get()->uiNumRows > 0)
 				{
@@ -78,7 +78,7 @@ int CHARACTER::ChangeEmpire(BYTE empire)
 
 					pGuild[i] = CGuildManager::instance().FindGuild(dwGuildID[i]);
 
-					if (pGuild[i] != NULL)
+					if (pGuild[i] != nullptr)
 					{
 						M2_DELETE(pMsg);
 						return 2;
@@ -87,7 +87,7 @@ int CHARACTER::ChangeEmpire(BYTE empire)
 				else
 				{
 					dwGuildID[i] = 0;
-					pGuild[i] = NULL;
+					pGuild[i] = nullptr;
 				}
 
 				M2_DELETE(pMsg);
@@ -98,7 +98,7 @@ int CHARACTER::ChangeEmpire(BYTE empire)
 	{
 		// 3. 각 캐릭터의 결혼 정보를 얻어온다.
 		//   한 캐릭터라도 결혼 상태라면 제국 이동을 할 수 없다.
-		for (int i = 0; i < loop; ++i)
+		for (int32_t i = 0; i < loop; ++i)
 		{
 			if (marriage::CManager::instance().IsEngagedOrMarried(dwPID[i]) == true)
 				return 3;
@@ -129,10 +129,10 @@ int CHARACTER::ChangeEmpire(BYTE empire)
 	return 0;
 }
 
-int CHARACTER::GetChangeEmpireCount() const
+int32_t CHARACTER::GetChangeEmpireCount() const
 {
 	char szQuery[1024+1];
-	DWORD dwAID = GetAID();
+	uint32_t dwAID = GetAID();
 
 	if (dwAID == 0)
 		return 0;
@@ -141,7 +141,7 @@ int CHARACTER::GetChangeEmpireCount() const
 
 	SQLMsg * pMsg = DBManager::instance().DirectQuery(szQuery);
 
-	if (pMsg != NULL)
+	if (pMsg != nullptr)
 	{
 		if (pMsg->Get()->uiNumRows == 0)
 		{
@@ -151,7 +151,7 @@ int CHARACTER::GetChangeEmpireCount() const
 
 		MYSQL_ROW row = mysql_fetch_row(pMsg->Get()->pSQLResult);
 
-		DWORD count = 0;
+		uint32_t count = 0;
 		str_to_number(count, row[0]);
 
 		M2_DELETE(pMsg);
@@ -166,11 +166,11 @@ void CHARACTER::SetChangeEmpireCount()
 {
 	char szQuery[1024+1];
 
-	DWORD dwAID = GetAID();
+	uint32_t dwAID = GetAID();
 
 	if (dwAID == 0) return;
 
-	int count = GetChangeEmpireCount();
+	int32_t count = GetChangeEmpireCount();
 
 	if (count == 0)
 	{
@@ -186,10 +186,10 @@ void CHARACTER::SetChangeEmpireCount()
 	std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery(szQuery));
 }
 
-DWORD CHARACTER::GetAID() const
+uint32_t CHARACTER::GetAID() const
 {
 	char szQuery[1024+1];
-	DWORD dwAID = 0;
+	uint32_t dwAID = 0;
 #ifdef ENABLE_PLAYER_PER_ACCOUNT5
 	snprintf(szQuery, sizeof(szQuery), "SELECT id FROM player_index%s WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
 			get_table_postfix(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
@@ -199,7 +199,7 @@ DWORD CHARACTER::GetAID() const
 #endif
 	SQLMsg* pMsg = DBManager::instance().DirectQuery(szQuery);
 
-	if (pMsg != NULL)
+	if (pMsg != nullptr)
 	{
 		if (pMsg->Get()->uiNumRows == 0)
 		{

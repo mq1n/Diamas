@@ -22,11 +22,11 @@
 #include "belt_inventory_helper.h"
 #include "../../common/VnumHelper.h"
 
-CItem::CItem(DWORD dwVnum)
+CItem::CItem(uint32_t dwVnum)
 	: m_dwVnum(dwVnum), m_bWindow(0), m_dwID(0), m_bEquipped(false), m_dwVID(0), m_wCell(0), m_dwCount(0), m_lFlag(0), m_dwLastOwnerPID(0),
-	m_bExchanging(false), m_pkDestroyEvent(NULL), m_pkExpireEvent(NULL), m_pkUniqueExpireEvent(NULL),
-	m_pkTimerBasedOnWearExpireEvent(NULL), m_pkRealTimeExpireEvent(NULL),
-   	m_pkAccessorySocketExpireEvent(NULL), m_pkOwnershipEvent(NULL), m_dwOwnershipPID(0), m_bSkipSave(false), m_isLocked(false),
+	m_bExchanging(false), m_pkDestroyEvent(nullptr), m_pkExpireEvent(nullptr), m_pkUniqueExpireEvent(nullptr),
+	m_pkTimerBasedOnWearExpireEvent(nullptr), m_pkRealTimeExpireEvent(nullptr),
+   	m_pkAccessorySocketExpireEvent(nullptr), m_pkOwnershipEvent(nullptr), m_dwOwnershipPID(0), m_bSkipSave(false), m_isLocked(false),
 	m_dwMaskVnum(0), m_dwSIGVnum (0)
 {
 	memset( &m_alSockets, 0, sizeof(m_alSockets) );
@@ -43,23 +43,23 @@ void CItem::Initialize()
 	CEntity::Initialize(ENTITY_ITEM);
 
 	m_bWindow = RESERVED_WINDOW;
-	m_pOwner = NULL;
+	m_pOwner = nullptr;
 	m_dwID = 0;
 	m_bEquipped = false;
 	m_dwVID = m_wCell = m_dwCount = m_lFlag = 0;
-	m_pProto = NULL;
+	m_pProto = nullptr;
 	m_bExchanging = false;
 	memset(&m_alSockets, 0, sizeof(m_alSockets));
 	memset(&m_aAttr, 0, sizeof(m_aAttr));
 
-	m_pkDestroyEvent = NULL;
-	m_pkOwnershipEvent = NULL;
+	m_pkDestroyEvent = nullptr;
+	m_pkOwnershipEvent = nullptr;
 	m_dwOwnershipPID = 0;
-	m_pkUniqueExpireEvent = NULL;
-	m_pkTimerBasedOnWearExpireEvent = NULL;
-	m_pkRealTimeExpireEvent = NULL;
+	m_pkUniqueExpireEvent = nullptr;
+	m_pkTimerBasedOnWearExpireEvent = nullptr;
+	m_pkRealTimeExpireEvent = nullptr;
 
-	m_pkAccessorySocketExpireEvent = NULL;
+	m_pkAccessorySocketExpireEvent = nullptr;
 
 	m_bSkipSave = false;
 	m_dwLastOwnerPID = 0;
@@ -84,7 +84,7 @@ EVENTFUNC(item_destroy_event)
 {
 	item_event_info* info = dynamic_cast<item_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "item_destroy_event> <Factor> Null pointer" );
 		return 0;
@@ -95,7 +95,7 @@ EVENTFUNC(item_destroy_event)
 	if (pkItem->GetOwner())
 		sys_err("item_destroy_event: Owner exist. (item %s owner %s)", pkItem->GetName(), pkItem->GetOwner()->GetName());
 
-	pkItem->SetDestroyEvent(NULL);
+	pkItem->SetDestroyEvent(nullptr);
 	M2_DESTROY_ITEM(pkItem);
 	return 0;
 }
@@ -105,7 +105,7 @@ void CItem::SetDestroyEvent(LPEVENT pkEvent)
 	m_pkDestroyEvent = pkEvent;
 }
 
-void CItem::StartDestroyEvent(int iSec)
+void CItem::StartDestroyEvent(int32_t iSec)
 {
 	if (m_pkDestroyEvent)
 		return;
@@ -137,11 +137,11 @@ void CItem::EncodeInsertPacket(LPENTITY ent)
 
 	d->Packet(&pack, sizeof(pack));
 
-	if (m_pkOwnershipEvent != NULL)
+	if (m_pkOwnershipEvent != nullptr)
 	{
 		item_event_info * info = dynamic_cast<item_event_info *>(m_pkOwnershipEvent->info);
 
-		if ( info == NULL )
+		if ( info == nullptr )
 		{
 			sys_err( "CItem::EncodeInsertPacket> <Factor> Null pointer" );
 			return;
@@ -175,7 +175,7 @@ void CItem::EncodeRemovePacket(LPENTITY ent)
 
 void CItem::SetProto(const TItemTable * table)
 {
-	assert(table != NULL);
+	assert(table != nullptr);
 	m_pProto = table;
 	SetFlag(m_pProto->dwFlags);
 }
@@ -192,12 +192,12 @@ void CItem::UsePacketEncode(LPCHARACTER ch, LPCHARACTER victim, struct packet_it
 	packet->vnum	= GetVnum();
 }
 
-void CItem::RemoveFlag(long bit)
+void CItem::RemoveFlag(int32_t bit)
 {
 	REMOVE_BIT(m_lFlag, bit);
 }
 
-void CItem::AddFlag(long bit)
+void CItem::AddFlag(int32_t bit)
 {
 	SET_BIT(m_lFlag, bit);
 }
@@ -213,7 +213,7 @@ void CItem::UpdatePacket()
 	pack.Cell = TItemPos(GetWindow(), m_wCell);
 	pack.count	= m_dwCount;
 
-	for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+	for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 		pack.alSockets[i] = m_alSockets[i];
 
 	memcpy(pack.aAttr, GetAttributes(), sizeof(pack.aAttr));
@@ -222,7 +222,7 @@ void CItem::UpdatePacket()
 	m_pOwner->GetDesc()->Packet(&pack, sizeof(pack));
 }
 
-DWORD CItem::GetCount()
+uint32_t CItem::GetCount()
 {
 	if (GetType() == ITEM_ELK) return MIN(m_dwCount, INT_MAX);
 	else
@@ -231,7 +231,7 @@ DWORD CItem::GetCount()
 	}
 }
 
-bool CItem::SetCount(DWORD count)
+bool CItem::SetCount(uint32_t count)
 {
 	if (GetType() == ITEM_ELK)
 	{
@@ -247,7 +247,7 @@ bool CItem::SetCount(DWORD count)
 		if (GetSubType() == USE_ABILITY_UP || GetSubType() == USE_POTION || GetVnum() == 70020)
 		{
 			LPCHARACTER pOwner = GetOwner();
-			WORD wCell = GetCell();
+			uint16_t wCell = GetCell();
 
 			RemoveFromCharacter();
 
@@ -255,7 +255,7 @@ bool CItem::SetCount(DWORD count)
 			{
 				LPITEM pItem = pOwner->FindSpecifyItem(GetVnum());
 
-				if (NULL != pItem)
+				if (nullptr != pItem)
 				{
 					pOwner->ChainQuickslotItem(pItem, QUICKSLOT_TYPE_ITEM, wCell);
 				}
@@ -313,7 +313,7 @@ LPITEM CItem::RemoveFromCharacter()
 				if (m_wCell >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 					sys_err("CItem::RemoveFromCharacter: pos >= DRAGON_SOUL_INVENTORY_MAX_NUM");
 				else
-					pOwner->SetItem(TItemPos(m_bWindow, m_wCell), NULL);
+					pOwner->SetItem(TItemPos(m_bWindow, m_wCell), nullptr);
 			}
 			else
 			{
@@ -323,12 +323,12 @@ LPITEM CItem::RemoveFromCharacter()
 					sys_err("CItem::RemoveFromCharacter: Invalid Item Position");
 				else
 				{
-					pOwner->SetItem(cell, NULL);
+					pOwner->SetItem(cell, nullptr);
 				}
 			}
 		}
 
-		m_pOwner = NULL;
+		m_pOwner = nullptr;
 		m_wCell = 0;
 
 		SetWindow(RESERVED_WINDOW);
@@ -339,10 +339,10 @@ LPITEM CItem::RemoveFromCharacter()
 
 bool CItem::AddToCharacter(LPCHARACTER ch, TItemPos Cell)
 {
-	assert(GetSectree() == NULL);
-	assert(m_pOwner == NULL);
-	WORD pos = Cell.cell;
-	BYTE window_type = Cell.window_type;
+	assert(GetSectree() == nullptr);
+	assert(m_pOwner == nullptr);
+	uint16_t pos = Cell.cell;
+	uint8_t window_type = Cell.window_type;
 	
 	if (INVENTORY == window_type)
 	{
@@ -371,7 +371,7 @@ bool CItem::AddToCharacter(LPCHARACTER ch, TItemPos Cell)
 #ifdef ENABLE_ACCE_SYSTEM
 	if ((GetType() == ITEM_COSTUME) && (GetSubType() == COSTUME_ACCE) && (GetSocket(ACCE_ABSORPTION_SOCKET) == 0))
 	{
-		long lVal = GetValue(ACCE_GRADE_VALUE_FIELD);
+		int32_t lVal = GetValue(ACCE_GRADE_VALUE_FIELD);
 		switch (lVal)
 		{
 		case 2:
@@ -416,7 +416,7 @@ LPITEM CItem::RemoveFromGround()
 {
 	if (GetSectree())
 	{
-		SetOwnership(NULL);
+		SetOwnership(nullptr);
 		
 		GetSectree()->RemoveEntity(this);
 		
@@ -428,7 +428,7 @@ LPITEM CItem::RemoveFromGround()
 	return (this);
 }
 
-bool CItem::AddToGround(long lMapIndex, const PIXEL_POSITION & pos, bool skipOwnerCheck)
+bool CItem::AddToGround(int32_t lMapIndex, const PIXEL_POSITION & pos, bool skipOwnerCheck)
 {
 	if (0 == lMapIndex)
 	{
@@ -471,7 +471,7 @@ bool CItem::DistanceValid(LPCHARACTER ch)
 	if (!GetSectree())
 		return false;
 
-	int iDist = DISTANCE_APPROX(GetX() - ch->GetX(), GetY() - ch->GetY());
+	int32_t iDist = DISTANCE_APPROX(GetX() - ch->GetX(), GetY() - ch->GetY());
 
 	if (iDist > 300)
 		return false;
@@ -514,7 +514,7 @@ bool CItem::CanUsedBy(LPCHARACTER ch)
 	return true;
 }
 
-int CItem::FindEquipCell(LPCHARACTER ch, int iCandidateCell)
+int32_t CItem::FindEquipCell(LPCHARACTER ch, int32_t iCandidateCell)
 {
 	// 코스츔 아이템(ITEM_COSTUME)은 WearFlag 없어도 됨. (sub type으로 착용위치 구분. 귀찮게 또 wear flag 줄 필요가 있나..)
 	// 용혼석(ITEM_DS, ITEM_SPECIAL_DS)도  SUB_TYPE으로 구분. 신규 반지, 벨트는 ITEM_TYPE으로 구분 -_-
@@ -534,7 +534,7 @@ int CItem::FindEquipCell(LPCHARACTER ch, int iCandidateCell)
 		}
 		else
 		{
-			for (int i = 0; i < DRAGON_SOUL_DECK_MAX_NUM; i++)
+			for (int32_t i = 0; i < DRAGON_SOUL_DECK_MAX_NUM; i++)
 			{
 				if (WEAR_MAX_NUM + i * DS_SLOT_MAX + GetSubType() == iCandidateCell)
 				{
@@ -645,7 +645,7 @@ int CItem::FindEquipCell(LPCHARACTER ch, int iCandidateCell)
 
 void CItem::ModifyPoints(bool bAdd)
 {
-	int accessoryGrade;
+	int32_t accessoryGrade;
 
 	// 무기와 갑옷만 소켓을 적용시킨다.
 	if (false == IsAccessoryForSocket())
@@ -653,9 +653,9 @@ void CItem::ModifyPoints(bool bAdd)
 		if (m_pProto->bType == ITEM_WEAPON || m_pProto->bType == ITEM_ARMOR)
 		{
 			// 소켓이 속성강화에 사용되는 경우 적용하지 않는다 (ARMOR_WRIST ARMOR_NECK ARMOR_EAR)
-			for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+			for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 			{
-				DWORD dwVnum;
+				uint32_t dwVnum;
 
 				if ((dwVnum = GetSocket(i)) <= 2)
 					continue;
@@ -671,7 +671,7 @@ void CItem::ModifyPoints(bool bAdd)
 				if (ITEM_METIN == p->bType)
 				{
 					//m_pOwner->ApplyPoint(p->alValues[0], bAdd ? p->alValues[1] : -p->alValues[1]);
-					for (int i = 0; i < ITEM_APPLY_MAX_NUM; ++i)
+					for (int32_t i = 0; i < ITEM_APPLY_MAX_NUM; ++i)
 					{
 						if (p->aApplies[i].bType == APPLY_NONE)
 							continue;
@@ -701,11 +701,11 @@ void CItem::ModifyPoints(bool bAdd)
 		{
 			if ((pkItemAbsorbed->bType == ITEM_ARMOR) && (pkItemAbsorbed->bSubType == ARMOR_BODY))
 			{
-				long lDefGrade = pkItemAbsorbed->alValues[1] + long(pkItemAbsorbed->alValues[5] * 2);
+				int32_t lDefGrade = pkItemAbsorbed->alValues[1] + int32_t(pkItemAbsorbed->alValues[5] * 2);
 				double dValue = lDefGrade * GetSocket(ACCE_ABSORPTION_SOCKET);
 				dValue = (double)dValue / 100;
 				dValue = (double)dValue + .5;
-				lDefGrade = (long) dValue;
+				lDefGrade = (int32_t) dValue;
 				if ((pkItemAbsorbed->alValues[1] > 0 && (lDefGrade <= 0)) || (pkItemAbsorbed->alValues[5] > 0 && (lDefGrade < 1)))
 					lDefGrade += 1;
 				else if ((pkItemAbsorbed->alValues[1] > 0) || (pkItemAbsorbed->alValues[5] > 0))
@@ -713,11 +713,11 @@ void CItem::ModifyPoints(bool bAdd)
 
 				m_pOwner->ApplyPoint(APPLY_DEF_GRADE_BONUS, bAdd ? lDefGrade : -lDefGrade);
 
-				long lDefMagicBonus = pkItemAbsorbed->alValues[0];
+				int32_t lDefMagicBonus = pkItemAbsorbed->alValues[0];
 				dValue = lDefMagicBonus * GetSocket(ACCE_ABSORPTION_SOCKET);
 				dValue = (double)dValue / 100;
 				dValue = (double)dValue + .5;
-				lDefMagicBonus = (long) dValue;
+				lDefMagicBonus = (int32_t) dValue;
 				if ((pkItemAbsorbed->alValues[0] > 0) && (lDefMagicBonus < 1))
 					lDefMagicBonus += 1;
 				else if (pkItemAbsorbed->alValues[0] > 0)
@@ -727,14 +727,14 @@ void CItem::ModifyPoints(bool bAdd)
 			}
 			else if (pkItemAbsorbed->bType == ITEM_WEAPON)
 			{
-				long lAttGrade = pkItemAbsorbed->alValues[4] + pkItemAbsorbed->alValues[5];
+				int32_t lAttGrade = pkItemAbsorbed->alValues[4] + pkItemAbsorbed->alValues[5];
 				if (pkItemAbsorbed->alValues[3] > pkItemAbsorbed->alValues[4])
 					lAttGrade = pkItemAbsorbed->alValues[3] + pkItemAbsorbed->alValues[5];
 
 				double dValue = lAttGrade * GetSocket(ACCE_ABSORPTION_SOCKET);
 				dValue = (double)dValue / 100;
 				dValue = (double)dValue + .5;
-				lAttGrade = (long) dValue;
+				lAttGrade = (int32_t) dValue;
 				if (((pkItemAbsorbed->alValues[3] > 0) && (lAttGrade < 1)) || ((pkItemAbsorbed->alValues[4] > 0) && (lAttGrade < 1)))
 					lAttGrade += 1;
 				else if ((pkItemAbsorbed->alValues[3] > 0) || (pkItemAbsorbed->alValues[4] > 0))
@@ -742,14 +742,14 @@ void CItem::ModifyPoints(bool bAdd)
 
 				m_pOwner->ApplyPoint(APPLY_ATT_GRADE_BONUS, bAdd ? lAttGrade : -lAttGrade);
 
-				long lAttMagicGrade = pkItemAbsorbed->alValues[2] + pkItemAbsorbed->alValues[5];
+				int32_t lAttMagicGrade = pkItemAbsorbed->alValues[2] + pkItemAbsorbed->alValues[5];
 				if (pkItemAbsorbed->alValues[1] > pkItemAbsorbed->alValues[2])
 					lAttMagicGrade = pkItemAbsorbed->alValues[1] + pkItemAbsorbed->alValues[5];
 
 				dValue = lAttMagicGrade * GetSocket(ACCE_ABSORPTION_SOCKET);
 				dValue = (double)dValue / 100;
 				dValue = (double)dValue + .5;
-				lAttMagicGrade = (long) dValue;
+				lAttMagicGrade = (int32_t) dValue;
 				if (((pkItemAbsorbed->alValues[1] > 0) && (lAttMagicGrade < 1)) || ((pkItemAbsorbed->alValues[2] > 0) && (lAttMagicGrade < 1)))
 					lAttMagicGrade += 1;
 				else if ((pkItemAbsorbed->alValues[1] > 0) || (pkItemAbsorbed->alValues[2] > 0))
@@ -761,7 +761,7 @@ void CItem::ModifyPoints(bool bAdd)
 	}
 #endif
 
-	for (int i = 0; i < ITEM_APPLY_MAX_NUM; ++i)
+	for (int32_t i = 0; i < ITEM_APPLY_MAX_NUM; ++i)
 	{
 #ifdef ENABLE_ACCE_SYSTEM
 		if ((m_pProto->aApplies[i].bType == APPLY_NONE) && (GetType() != ITEM_COSTUME) && (GetSubType() != COSTUME_ACCE))
@@ -770,7 +770,7 @@ void CItem::ModifyPoints(bool bAdd)
 #endif
 			continue;
 
-		long value = m_pProto->aApplies[i].lValue;
+		int32_t value = m_pProto->aApplies[i].lValue;
 #ifdef ENABLE_ACCE_SYSTEM
 		if ((GetType() == ITEM_COSTUME) && (GetSubType() == COSTUME_ACCE))
 		{
@@ -787,7 +787,7 @@ void CItem::ModifyPoints(bool bAdd)
 				double dValue = value * GetSocket(ACCE_ABSORPTION_SOCKET);
 				dValue = (double)dValue / 100;
 				dValue = (double)dValue + .5;
-				value = (long) dValue;
+				value = (int32_t) dValue;
 				if ((pkItemAbsorbed->aApplies[i].lValue > 0) && (value <= 0))
 					value += 1;
 			}
@@ -820,19 +820,19 @@ void CItem::ModifyPoints(bool bAdd)
 	}
 	else
 	{
-		for (int i = 0; i < ITEM_ATTRIBUTE_MAX_NUM; ++i)
+		for (int32_t i = 0; i < ITEM_ATTRIBUTE_MAX_NUM; ++i)
 		{
 			if (GetAttributeType(i))
 			{
 				const TPlayerItemAttribute& ia = GetAttribute(i);
 #ifdef ENABLE_ACCE_SYSTEM
-				long sValue = ia.sValue;
+				int32_t sValue = ia.sValue;
 				if ((GetType() == ITEM_COSTUME) && (GetSubType() == COSTUME_ACCE))
 				{
 					double dValue = sValue * GetSocket(ACCE_ABSORPTION_SOCKET);
 					dValue = (double)dValue / 100;
 					dValue = (double)dValue + .5;
-					sValue = (long) dValue;
+					sValue = (int32_t) dValue;
 					if ((ia.sValue > 0) && (sValue <= 0))
 						sValue += 1;
 				}
@@ -913,7 +913,7 @@ void CItem::ModifyPoints(bool bAdd)
 		// 코스츔 아이템 입었을 때 캐릭터 parts 정보 세팅. 기존 스타일대로 추가함..
 		case ITEM_COSTUME:
 			{
-				DWORD toSetValue = this->GetVnum();
+				uint32_t toSetValue = this->GetVnum();
 				EParts toSetPart = PART_MAX_NUM;
 
 				// 갑옷 코스츔
@@ -925,7 +925,7 @@ void CItem::ModifyPoints(bool bAdd)
 					{
 						// 코스츔 갑옷을 벗었을 때 원래 갑옷을 입고 있었다면 그 갑옷으로 look 세팅, 입지 않았다면 default look
 						const CItem* pArmor = m_pOwner->GetWear(WEAR_BODY);
-						toSetValue = (NULL != pArmor) ? pArmor->GetVnum() : m_pOwner->GetOriginalPart(PART_MAIN);						
+						toSetValue = (nullptr != pArmor) ? pArmor->GetVnum() : m_pOwner->GetOriginalPart(PART_MAIN);						
 					}
 					
 				}
@@ -963,14 +963,14 @@ void CItem::ModifyPoints(bool bAdd)
 					if (false == bAdd)
 					{
 						const CItem* pWeapon = m_pOwner->GetWear(WEAR_WEAPON);
-						toSetValue = (NULL != pWeapon) ? pWeapon->GetVnum() : m_pOwner->GetOriginalPart(PART_WEAPON);
+						toSetValue = (nullptr != pWeapon) ? pWeapon->GetVnum() : m_pOwner->GetOriginalPart(PART_WEAPON);
 					}
 				}
 #endif
 
 				if (PART_MAX_NUM != toSetPart)
 				{
-					m_pOwner->SetPart((BYTE)toSetPart, toSetValue);
+					m_pOwner->SetPart((uint8_t)toSetPart, toSetValue);
 					m_pOwner->UpdatePacket();
 				}
 			}
@@ -980,11 +980,11 @@ void CItem::ModifyPoints(bool bAdd)
 				if (0 != GetSIGVnum())
 				{
 					const CSpecialItemGroup* pItemGroup = ITEM_MANAGER::instance().GetSpecialItemGroup(GetSIGVnum());
-					if (NULL == pItemGroup)
+					if (nullptr == pItemGroup)
 						break;
-					DWORD dwAttrVnum = pItemGroup->GetAttrVnum(GetVnum());
+					uint32_t dwAttrVnum = pItemGroup->GetAttrVnum(GetVnum());
 					const CSpecialAttrGroup* pAttrGroup = ITEM_MANAGER::instance().GetSpecialAttrGroup(dwAttrVnum);
-					if (NULL == pAttrGroup)
+					if (nullptr == pAttrGroup)
 						break;
 					for (auto it = pAttrGroup->m_vecAttrs.begin(); it != pAttrGroup->m_vecAttrs.end(); it++)
 					{
@@ -1018,7 +1018,7 @@ bool CItem::IsEquipable() const
 
 #define ENABLE_IMMUNE_FIX
 // return false on error state
-bool CItem::EquipTo(LPCHARACTER ch, BYTE bWearCell)
+bool CItem::EquipTo(LPCHARACTER ch, uint8_t bWearCell)
 {
 	if (!ch)
 	{
@@ -1060,9 +1060,9 @@ bool CItem::EquipTo(LPCHARACTER ch, BYTE bWearCell)
 	m_wCell	= INVENTORY_MAX_NUM + bWearCell;
 
 #ifndef ENABLE_IMMUNE_FIX
-	DWORD dwImmuneFlag = 0;
+	uint32_t dwImmuneFlag = 0;
 
-	for (int i = 0; i < WEAR_MAX_NUM; ++i)
+	for (int32_t i = 0; i < WEAR_MAX_NUM; ++i)
 	{
 		if (m_pOwner->GetWear(i))
 		{
@@ -1143,12 +1143,12 @@ bool CItem::Unequip()
 
 	m_pOwner->BuffOnAttr_RemoveBuffsFromItem(this);
 
-	m_pOwner->SetWear(GetCell() - INVENTORY_MAX_NUM, NULL);
+	m_pOwner->SetWear(GetCell() - INVENTORY_MAX_NUM, nullptr);
 
 #ifndef ENABLE_IMMUNE_FIX
-	DWORD dwImmuneFlag = 0;
+	uint32_t dwImmuneFlag = 0;
 
-	for (int i = 0; i < WEAR_MAX_NUM; ++i)
+	for (int32_t i = 0; i < WEAR_MAX_NUM; ++i)
 	{
 		if (m_pOwner->GetWear(i))
 		{
@@ -1164,14 +1164,14 @@ bool CItem::Unequip()
 
 	m_pOwner->UpdatePacket();
 
-	m_pOwner = NULL;
+	m_pOwner = nullptr;
 	m_wCell = 0;
 	m_bEquipped	= false;
 
 	return true;
 }
 
-long CItem::GetValue(DWORD idx)
+int32_t CItem::GetValue(uint32_t idx)
 {
 	assert(idx < ITEM_VALUES_MAX_NUM);
 	return GetProto()->alValues[idx];
@@ -1190,7 +1190,7 @@ void CItem::Save()
 	ITEM_MANAGER::instance().DelayedSave(this);
 }
 
-bool CItem::CreateSocket(BYTE bSlot, BYTE bGold)
+bool CItem::CreateSocket(uint8_t bSlot, uint8_t bGold)
 {
 	assert(bSlot < ITEM_SOCKET_MAX_NUM);
 
@@ -1211,13 +1211,13 @@ bool CItem::CreateSocket(BYTE bSlot, BYTE bGold)
 	return true;
 }
 
-void CItem::SetSockets(const long * c_al)
+void CItem::SetSockets(const int32_t * c_al)
 {
 	memcpy(m_alSockets, c_al, sizeof(m_alSockets));
 	Save();
 }
 
-void CItem::SetSocket(int i, long v, bool bLog)
+void CItem::SetSocket(int32_t i, int32_t v, bool bLog)
 {
 	assert(i < ITEM_SOCKET_MAX_NUM);
 	m_alSockets[i] = v;
@@ -1227,7 +1227,7 @@ void CItem::SetSocket(int i, long v, bool bLog)
 		LogManager::instance().ItemLog(i, v, 0, GetID(), "SET_SOCKET", "", "", GetOriginalVnum());
 }
 
-int CItem::GetGold()
+int32_t CItem::GetGold()
 {
 	if (IS_SET(GetFlag(), ITEM_FLAG_COUNT_PER_1GOLD))
 	{
@@ -1240,7 +1240,7 @@ int CItem::GetGold()
 		return GetProto()->dwGold;
 }
 
-int CItem::GetShopBuyPrice()
+int32_t CItem::GetShopBuyPrice()
 {
 	return GetProto()->dwShopBuyPrice;
 }
@@ -1257,7 +1257,7 @@ EVENTFUNC(ownership_event)
 {
 	item_event_info* info = dynamic_cast<item_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "ownership_event> <Factor> Null pointer" );
 		return 0;
@@ -1265,7 +1265,7 @@ EVENTFUNC(ownership_event)
 
 	LPITEM pkItem = info->item;
 
-	pkItem->SetOwnershipEvent(NULL);
+	pkItem->SetOwnershipEvent(nullptr);
 
 	TPacketGCItemOwnership p;
 
@@ -1282,7 +1282,7 @@ void CItem::SetOwnershipEvent(LPEVENT pkEvent)
 	m_pkOwnershipEvent = pkEvent;
 }
 
-void CItem::SetOwnership(LPCHARACTER ch, int iSec)
+void CItem::SetOwnership(LPCHARACTER ch, int32_t iSec)
 {
 	if (!ch)
 	{
@@ -1325,9 +1325,9 @@ void CItem::SetOwnership(LPCHARACTER ch, int iSec)
 	PacketAround(&p, sizeof(p));
 }
 
-int CItem::GetSocketCount()
+int32_t CItem::GetSocketCount()
 {
-	for (int i = 0; i < ITEM_SOCKET_MAX_NUM; i++)
+	for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; i++)
 	{
 		if (GetSocket(i) == 0)
 			return i;
@@ -1337,14 +1337,14 @@ int CItem::GetSocketCount()
 
 bool CItem::AddSocket()
 {
-	int count = GetSocketCount();
+	int32_t count = GetSocketCount();
 	if (count == ITEM_SOCKET_MAX_NUM)
 		return false;
 	m_alSockets[count] = 1;
 	return true;
 }
 
-void CItem::AlterToSocketItem(int iSocketCount)
+void CItem::AlterToSocketItem(int32_t iSocketCount)
 {
 	if (iSocketCount > ITEM_SOCKET_MAX_NUM)
 	{
@@ -1352,13 +1352,13 @@ void CItem::AlterToSocketItem(int iSocketCount)
 		iSocketCount = ITEM_SOCKET_MAX_NUM;
 	}
 
-	for (int i = 0; i < iSocketCount; ++i)
+	for (int32_t i = 0; i < iSocketCount; ++i)
 		SetSocket(i, 1);
 }
 
 void CItem::AlterToMagicItem()
 {
-	int idx = GetAttributeSetIndex();
+	int32_t idx = GetAttributeSetIndex();
 
 	if (idx < 0)
 		return;
@@ -1368,8 +1368,8 @@ void CItem::AlterToMagicItem()
 	// Armor  30        10     2
 	// Acc    20        10     1
 
-	int iSecondPct;
-	int iThirdPct;
+	int32_t iSecondPct;
+	int32_t iThirdPct;
 
 	switch (GetType())
 	{
@@ -1406,12 +1406,12 @@ void CItem::AlterToMagicItem()
 		PutAttribute(aiItemMagicAttributePercentLow);
 }
 
-DWORD CItem::GetRefineFromVnum()
+uint32_t CItem::GetRefineFromVnum()
 {
 	return ITEM_MANAGER::instance().GetRefineFromVnum(GetVnum());
 }
 
-int CItem::GetRefineLevel()
+int32_t CItem::GetRefineLevel()
 {
 	const char* name = GetBaseName();
 	char* p = const_cast<char*>(strrchr(name, '+'));
@@ -1419,7 +1419,7 @@ int CItem::GetRefineLevel()
 	if (!p)
 		return 0;
 
-	int	rtn = 0;
+	int32_t	rtn = 0;
 	str_to_number(rtn, p+1);
 
 	const char* locale_name = GetName();
@@ -1427,7 +1427,7 @@ int CItem::GetRefineLevel()
 
 	if (p)
 	{
-		int	locale_rtn = 0;
+		int32_t	locale_rtn = 0;
 		str_to_number(locale_rtn, p+1);
 		if (locale_rtn != rtn)
 		{
@@ -1447,7 +1447,7 @@ EVENTFUNC(unique_expire_event)
 {
 	item_event_info* info = dynamic_cast<item_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "unique_expire_event> <Factor> Null pointer" );
 		return 0;
@@ -1460,7 +1460,7 @@ EVENTFUNC(unique_expire_event)
 		if (pkItem->GetSocket(ITEM_SOCKET_UNIQUE_REMAIN_TIME) <= 1)
 		{
 			sys_log(0, "UNIQUE_ITEM: expire %s %u", pkItem->GetName(), pkItem->GetID());
-			pkItem->SetUniqueExpireEvent(NULL);
+			pkItem->SetUniqueExpireEvent(nullptr);
 			ITEM_MANAGER::instance().RemoveItem(pkItem, "UNIQUE_EXPIRE");
 			return 0;
 		}
@@ -1476,7 +1476,7 @@ EVENTFUNC(unique_expire_event)
 		
 		if (pkItem->GetSocket(ITEM_SOCKET_UNIQUE_REMAIN_TIME) <= cur)
 		{
-			pkItem->SetUniqueExpireEvent(NULL);
+			pkItem->SetUniqueExpireEvent(nullptr);
 			ITEM_MANAGER::instance().RemoveItem(pkItem, "UNIQUE_EXPIRE");
 			return 0;
 		}
@@ -1500,18 +1500,18 @@ EVENTFUNC(timer_based_on_wear_expire_event)
 {
 	item_event_info* info = dynamic_cast<item_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "expire_event <Factor> Null pointer" );
 		return 0;
 	}
 
 	LPITEM pkItem = info->item;
-	int remain_time = pkItem->GetSocket(ITEM_SOCKET_REMAIN_SEC) - processing_time/passes_per_sec;
+	int32_t remain_time = pkItem->GetSocket(ITEM_SOCKET_REMAIN_SEC) - processing_time/passes_per_sec;
 	if (remain_time <= 0)
 	{
 		sys_log(0, "ITEM EXPIRED : expired %s %u", pkItem->GetName(), pkItem->GetID());
-		pkItem->SetTimerBasedOnWearExpireEvent(NULL);
+		pkItem->SetTimerBasedOnWearExpireEvent(nullptr);
 		pkItem->SetSocket(ITEM_SOCKET_REMAIN_SEC, 0);
 	
 		// 일단 timer based on wear 용혼석은 시간 다 되었다고 없애지 않는다.
@@ -1543,12 +1543,12 @@ EVENTFUNC(real_time_expire_event)
 {
 	const item_vid_event_info* info = reinterpret_cast<const item_vid_event_info*>(event->info);
 
-	if (NULL == info)
+	if (nullptr == info)
 		return 0;
 
 	const LPITEM item = ITEM_MANAGER::instance().FindByVID( info->item_vid );
 
-	if (NULL == item)
+	if (nullptr == item)
 		return 0;
 
 	const time_t current = get_global_time();
@@ -1570,7 +1570,7 @@ void CItem::StartRealTimeExpireEvent()
 {
 	if (m_pkRealTimeExpireEvent)
 		return;
-	for (int i=0 ; i < ITEM_LIMIT_MAX_NUM ; i++)
+	for (int32_t i=0 ; i < ITEM_LIMIT_MAX_NUM ; i++)
 	{
 		if (LIMIT_REAL_TIME == GetProto()->aLimits[i].bType || LIMIT_REAL_TIME_START_FIRST_USE == GetProto()->aLimits[i].bType)
 		{
@@ -1590,7 +1590,7 @@ bool CItem::IsRealTimeItem()
 {
 	if(!GetProto())
 		return false;
-	for (int i=0 ; i < ITEM_LIMIT_MAX_NUM ; i++)
+	for (int32_t i=0 ; i < ITEM_LIMIT_MAX_NUM ; i++)
 	{
 		if (LIMIT_REAL_TIME == GetProto()->aLimits[i].bType)
 			return true;
@@ -1614,7 +1614,7 @@ void CItem::StartUniqueExpireEvent()
 	if (GetVnum() == UNIQUE_ITEM_HIDE_ALIGNMENT_TITLE)
 		m_pOwner->ShowAlignment(false);
 
-	int iSec = GetSocket(ITEM_SOCKET_UNIQUE_SAVE_TIME);
+	int32_t iSec = GetSocket(ITEM_SOCKET_UNIQUE_SAVE_TIME);
 
 	if (iSec == 0)
 		iSec = 60;
@@ -1643,7 +1643,7 @@ void CItem::StartTimerBasedOnWearExpireEvent()
 	if (-1 == GetProto()->cLimitTimerBasedOnWearIndex)
 		return;
 
-	int iSec = GetSocket(0);
+	int32_t iSec = GetSocket(0);
 	
 	// 남은 시간을 분단위로 끊기 위해...
 	if (0 != iSec)
@@ -1682,7 +1682,7 @@ void CItem::StopTimerBasedOnWearExpireEvent()
 	if (!m_pkTimerBasedOnWearExpireEvent)
 		return;
 
-	int remain_time = GetSocket(ITEM_SOCKET_REMAIN_SEC) - event_processing_time(m_pkTimerBasedOnWearExpireEvent) / passes_per_sec;
+	int32_t remain_time = GetSocket(ITEM_SOCKET_REMAIN_SEC) - event_processing_time(m_pkTimerBasedOnWearExpireEvent) / passes_per_sec;
 
 	SetSocket(ITEM_SOCKET_REMAIN_SEC, remain_time);
 	event_cancel(&m_pkTimerBasedOnWearExpireEvent);
@@ -1690,12 +1690,12 @@ void CItem::StopTimerBasedOnWearExpireEvent()
 	ITEM_MANAGER::instance().SaveSingleItem(this);
 }
 
-void CItem::ApplyAddon(int iAddonType)
+void CItem::ApplyAddon(int32_t iAddonType)
 {
 	CItemAddonManager::instance().ApplyAddonTo(iAddonType, this);
 }
 
-int CItem::GetSpecialGroup() const
+int32_t CItem::GetSpecialGroup() const
 { 
 	return ITEM_MANAGER::instance().GetSpecialGroupFromItem(GetVnum()); 
 }
@@ -1709,11 +1709,11 @@ bool CItem::IsAccessoryForSocket()
 		(m_pProto->bType == ITEM_BELT);				// 2013년 2월 새로 추가된 '벨트' 아이템의 경우 기획팀에서 악세서리 소켓 시스템을 그대로 이용하자고 함.
 }
 
-void CItem::SetAccessorySocketGrade(int iGrade) 
+void CItem::SetAccessorySocketGrade(int32_t iGrade) 
 { 
 	SetSocket(0, MINMAX(0, iGrade, GetAccessorySocketMaxGrade())); 
 
-	int iDownTime = aiAccessorySocketDegradeTime[GetAccessorySocketGrade()];
+	int32_t iDownTime = aiAccessorySocketDegradeTime[GetAccessorySocketGrade()];
 
 	//if (test_server)
 	//	iDownTime /= 60;
@@ -1721,12 +1721,12 @@ void CItem::SetAccessorySocketGrade(int iGrade)
 	SetAccessorySocketDownGradeTime(iDownTime);
 }
 
-void CItem::SetAccessorySocketMaxGrade(int iMaxGrade) 
+void CItem::SetAccessorySocketMaxGrade(int32_t iMaxGrade) 
 { 
 	SetSocket(1, MINMAX(0, iMaxGrade, ITEM_ACCESSORY_SOCKET_MAX_NUM)); 
 }
 
-void CItem::SetAccessorySocketDownGradeTime(DWORD time) 
+void CItem::SetAccessorySocketDownGradeTime(uint32_t time) 
 { 
 	SetSocket(2, time); 
 
@@ -1738,7 +1738,7 @@ EVENTFUNC(accessory_socket_expire_event)
 {
 	item_vid_event_info* info = dynamic_cast<item_vid_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "accessory_socket_expire_event> <Factor> Null pointer" );
 		return 0;
@@ -1749,13 +1749,13 @@ EVENTFUNC(accessory_socket_expire_event)
 	if (item->GetAccessorySocketDownGradeTime() <= 1)
 	{
 degrade:
-		item->SetAccessorySocketExpireEvent(NULL);
+		item->SetAccessorySocketExpireEvent(nullptr);
 		item->AccessorySocketDegrade();
 		return 0;
 	}
 	else
 	{
-		int iTime = item->GetAccessorySocketDownGradeTime() - 60;
+		int32_t iTime = item->GetAccessorySocketDownGradeTime() - 60;
 
 		if (iTime <= 1)
 			goto degrade;
@@ -1783,8 +1783,8 @@ void CItem::StartAccessorySocketExpireEvent()
 	if (GetAccessorySocketGrade() == 0)
 		return;
 
-	int iSec = GetAccessorySocketDownGradeTime();
-	SetAccessorySocketExpireEvent(NULL);
+	int32_t iSec = GetAccessorySocketDownGradeTime();
+	SetAccessorySocketExpireEvent(nullptr);
 
 	if (iSec <= 1)
 		iSec = 5;
@@ -1805,7 +1805,7 @@ void CItem::StopAccessorySocketExpireEvent()
 	if (!IsAccessoryForSocket())
 		return;
 
-	int new_time = GetAccessorySocketDownGradeTime() - (60 - event_time(m_pkAccessorySocketExpireEvent) / passes_per_sec);
+	int32_t new_time = GetAccessorySocketDownGradeTime() - (60 - event_time(m_pkAccessorySocketExpireEvent) / passes_per_sec);
 
 	event_cancel(&m_pkAccessorySocketExpireEvent);
 
@@ -1888,7 +1888,7 @@ void CItem::AccessorySocketDegrade()
 		SetAccessorySocketGrade(GetAccessorySocketGrade()-1);
 		ModifyPoints(true);
 
-		int iDownTime = aiAccessorySocketDegradeTime[GetAccessorySocketGrade()];
+		int32_t iDownTime = aiAccessorySocketDegradeTime[GetAccessorySocketGrade()];
 
 		if (test_server)
 			iDownTime /= 60;
@@ -1903,7 +1903,7 @@ void CItem::AccessorySocketDegrade()
 // ring에 item을 박을 수 있는지 여부를 체크해서 리턴
 static const bool CanPutIntoRing(LPITEM ring, LPITEM item)
 {
-	//const DWORD vnum = item->GetVnum();
+	//const uint32_t vnum = item->GetVnum();
 	return false;
 }
 
@@ -1918,14 +1918,14 @@ bool CItem::CanPutInto(LPITEM item)
 	else if (item->GetType() != ITEM_ARMOR)
 		return false;
 
-	DWORD vnum = item->GetVnum();
+	uint32_t vnum = item->GetVnum();
 
 	struct JewelAccessoryInfo
 	{
-		DWORD jewel;
-		DWORD wrist;
-		DWORD neck;
-		DWORD ear;
+		uint32_t jewel;
+		uint32_t wrist;
+		uint32_t neck;
+		uint32_t ear;
 	};
 	const static JewelAccessoryInfo infos[] = { 
 		{ 50634, 14420, 16220, 17220 }, 
@@ -1936,7 +1936,7 @@ bool CItem::CanPutInto(LPITEM item)
 		{ 50639, 14570, 16570, 17570 },
 	};
 	
-	DWORD item_type = (item->GetVnum() / 10) * 10;
+	uint32_t item_type = (item->GetVnum() / 10) * 10;
 	for (size_t i = 0; i < sizeof(infos) / sizeof(infos[0]); i++)
 	{
 		const JewelAccessoryInfo& info = infos[i];
@@ -1992,7 +1992,7 @@ bool CItem::CanPutInto(LPITEM item)
 	else
 		return false;
 
-	DWORD type = vnum / 20;
+	uint32_t type = vnum / 20;
 
 	if (type < 0 || type > 11)
 	{
@@ -2021,9 +2021,9 @@ bool CItem::CanPutInto(LPITEM item)
 	return 50623 + type == GetVnum();
 }
 
-bool CItem::CheckItemUseLevel(int nLevel)
+bool CItem::CheckItemUseLevel(int32_t nLevel)
 {
-	for (int i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
+	for (int32_t i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
 	{
 		if (this->m_pProto->aLimits[i].bType == LIMIT_LEVEL)
 		{
@@ -2034,12 +2034,12 @@ bool CItem::CheckItemUseLevel(int nLevel)
 	return true;
 }
 
-long CItem::FindApplyValue(BYTE bApplyType)
+int32_t CItem::FindApplyValue(uint8_t bApplyType)
 {
-	if (m_pProto == NULL)
+	if (m_pProto == nullptr)
 		return 0;
 
-	for (int i = 0; i < ITEM_APPLY_MAX_NUM; ++i)
+	for (int32_t i = 0; i < ITEM_APPLY_MAX_NUM; ++i)
 	{
 		if (m_pProto->aApplies[i].bType == bApplyType)
 			return m_pProto->aApplies[i].lValue;
@@ -2050,35 +2050,35 @@ long CItem::FindApplyValue(BYTE bApplyType)
 
 void CItem::CopySocketTo(LPITEM pItem)
 {
-	for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+	for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 	{
 		pItem->m_alSockets[i] = m_alSockets[i];
 	}
 }
 
-int CItem::GetAccessorySocketGrade()
+int32_t CItem::GetAccessorySocketGrade()
 {
    	return MINMAX(0, GetSocket(0), GetAccessorySocketMaxGrade()); 
 }
 
-int CItem::GetAccessorySocketMaxGrade()
+int32_t CItem::GetAccessorySocketMaxGrade()
 {
    	return MINMAX(0, GetSocket(1), ITEM_ACCESSORY_SOCKET_MAX_NUM);
 }
 
-int CItem::GetAccessorySocketDownGradeTime()
+int32_t CItem::GetAccessorySocketDownGradeTime()
 {
 	return MINMAX(0, GetSocket(2), aiAccessorySocketDegradeTime[GetAccessorySocketGrade()]);
 }
 
 void CItem::AttrLog()
 {
-	const char * pszIP = NULL;
+	const char * pszIP = nullptr;
 
 	if (GetOwner() && GetOwner()->GetDesc())
 		pszIP = GetOwner()->GetDesc()->GetHostName();
 
-	for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+	for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 	{
 		if (m_alSockets[i])
 		{
@@ -2086,19 +2086,19 @@ void CItem::AttrLog()
 		}
 	}
 
-	for (int i = 0; i<ITEM_ATTRIBUTE_MAX_NUM; ++i)
+	for (int32_t i = 0; i<ITEM_ATTRIBUTE_MAX_NUM; ++i)
 	{
-		int	type	= m_aAttr[i].bType;
-		int value	= m_aAttr[i].sValue;
+		int32_t	type	= m_aAttr[i].bType;
+		int32_t value	= m_aAttr[i].sValue;
 
 		if (type)
 			LogManager::instance().ItemLog(i, type, value, GetID(), "INFO_ATTR", "", pszIP ? pszIP : "", GetOriginalVnum());
 	}
 }
 
-int CItem::GetLevelLimit()
+int32_t CItem::GetLevelLimit()
 {
-	for (int i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
+	for (int32_t i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
 	{
 		if (this->m_pProto->aLimits[i].bType == LIMIT_LEVEL)
 		{
@@ -2128,13 +2128,13 @@ bool CItem::IsDragonSoul()
 	return GetType() == ITEM_DS;
 }
 
-int CItem::GiveMoreTime_Per(float fPercent)
+int32_t CItem::GiveMoreTime_Per(float fPercent)
 {
 	if (IsDragonSoul())
 	{
-		DWORD duration = DSManager::instance().GetDuration(this);
-		DWORD remain_sec = GetSocket(ITEM_SOCKET_REMAIN_SEC);
-		DWORD given_time = fPercent * duration / 100u;
+		uint32_t duration = DSManager::instance().GetDuration(this);
+		uint32_t remain_sec = GetSocket(ITEM_SOCKET_REMAIN_SEC);
+		uint32_t given_time = fPercent * duration / 100u;
 		if (remain_sec == duration)
 			return false;
 		if ((given_time + remain_sec) >= duration)
@@ -2153,12 +2153,12 @@ int CItem::GiveMoreTime_Per(float fPercent)
 		return 0;
 }
 
-int CItem::GiveMoreTime_Fix(DWORD dwTime)
+int32_t CItem::GiveMoreTime_Fix(uint32_t dwTime)
 {
 	if (IsDragonSoul())
 	{
-		DWORD duration = DSManager::instance().GetDuration(this);
-		DWORD remain_sec = GetSocket(ITEM_SOCKET_REMAIN_SEC);
+		uint32_t duration = DSManager::instance().GetDuration(this);
+		uint32_t remain_sec = GetSocket(ITEM_SOCKET_REMAIN_SEC);
 		if (remain_sec == duration)
 			return false;
 		if ((dwTime + remain_sec) >= duration)
@@ -2178,12 +2178,12 @@ int CItem::GiveMoreTime_Fix(DWORD dwTime)
 }
 
 
-int	CItem::GetDuration()
+int32_t	CItem::GetDuration()
 {
 	if(!GetProto())
 		return -1;
 
-	for (int i=0 ; i < ITEM_LIMIT_MAX_NUM ; i++)
+	for (int32_t i=0 ; i < ITEM_LIMIT_MAX_NUM ; i++)
 	{
 		if (LIMIT_REAL_TIME == GetProto()->aLimits[i].bType)
 			return GetProto()->aLimits[i].lValue;
@@ -2191,7 +2191,7 @@ int	CItem::GetDuration()
 	
 	if (GetProto()->cLimitTimerBasedOnWearIndex >= 0)
 	{
-		BYTE cLTBOWI = GetProto()->cLimitTimerBasedOnWearIndex;
+		uint8_t cLTBOWI = GetProto()->cLimitTimerBasedOnWearIndex;
 		return GetProto()->aLimits[cLTBOWI].lValue;
 	}
 

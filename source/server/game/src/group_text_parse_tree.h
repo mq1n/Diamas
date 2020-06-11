@@ -6,7 +6,7 @@
 #include "file_loader.h"
 #include <sstream>
 typedef std::map<std::string, TTokenVector>	TTokenVectorMap;
-typedef std::map<std::string, int> TMapNameToIndex;
+typedef std::map<std::string, int32_t> TMapNameToIndex;
 
 class CGroupNode
 {
@@ -20,9 +20,9 @@ public:
 		template <typename T>
 		bool GetValue(const std::string & stColKey, OUT T& value) const;
 		template <typename T>
-		bool GetValue(int idx, OUT T& value) const;
+		bool GetValue(int32_t idx, OUT T& value) const;
 
-		int GetSize() const;
+		int32_t GetSize() const;
 
 	private:
 		CGroupNode*		m_pOwnerGroupNode;
@@ -35,14 +35,14 @@ public:
 	bool Load(const char * c_szFileName);
 	const char * GetFileName();
 
-	DWORD GetChildNodeCount();
+	uint32_t GetChildNodeCount();
 	bool SetChildNode(const char * c_szKey, CGroupNode* pChildNode);
 	CGroupNode* GetChildNode(const std::string & c_rstrKey) const;
 	std::string GetNodeName() const;
 
 	bool IsToken(const std::string & c_rstrKey) const;
 
-	int GetRowCount();
+	int32_t GetRowCount();
 	
 	template <typename T>
 	bool GetValue(size_t i, const std::string & c_rstrColKey, T& tValue) const;	// n번째(map에 들어있는 순서일 뿐, txt의 순서와는 관계 없음) row의 특정 컬럼의 값을 반환하는 함수. 
@@ -50,19 +50,19 @@ public:
 	template <typename T>
 	bool GetValue(const std::string & c_rstrRowKey, const std::string & c_rstrColKey, T& tValue) const;
 	template <typename T>
-	bool GetValue(const std::string & c_rstrRowKey, int index, T& tValue) const;
+	bool GetValue(const std::string & c_rstrRowKey, int32_t index, T& tValue) const;
 
 	bool GetRow(const std::string & c_rstrKey, OUT const CGroupNodeRow ** ppRow) const;
 	// 참고로, idx랑 txt에 쓰여진 순서랑 관계 없음.
-	bool GetRow(int idx, OUT const CGroupNodeRow ** ppRow) const;
+	bool GetRow(int32_t idx, OUT const CGroupNodeRow ** ppRow) const;
 	bool GetGroupRow(const std::string& stGroupName, const std::string& stRow, OUT const CGroupNode::CGroupNodeRow ** ppRow) const;
 
 	template <typename T>
-	bool GetGroupValue(const std::string& stGroupName, const std::string& stRow, int iCol, OUT T& tValue) const;
+	bool GetGroupValue(const std::string& stGroupName, const std::string& stRow, int32_t iCol, OUT T& tValue) const;
 	template <typename T>
 	bool GetGroupValue(const std::string& stGroupName, const std::string& stRow, const std::string& stCol, OUT T& tValue) const;
 
-	int	GetColumnIndexFromName(const std::string& stName) const;
+	int32_t	GetColumnIndexFromName(const std::string& stName) const;
 
 private:
 	typedef std::map <std::string, CGroupNode*> TMapGroup;
@@ -90,7 +90,7 @@ private:
 
 	CGroupNode *				m_pRootGroupNode;
 	std::string					m_strFileName;
-	DWORD						m_dwcurLineIndex;
+	uint32_t						m_dwcurLineIndex;
 
 	CMemoryTextFileLoader		m_fileLoader;
 };
@@ -103,12 +103,12 @@ bool from_string(OUT T& t, IN const std::string& s)
 }
 
 template <>
-inline bool from_string <BYTE>(OUT BYTE& t, IN const std::string& s)
+inline bool from_string <uint8_t>(OUT uint8_t& t, IN const std::string& s)
 {
 	std::istringstream iss(s);
-	int temp;
+	int32_t temp;
 	bool b = !(iss >> temp).fail();
-	t = (BYTE)temp;
+	t = (uint8_t)temp;
 	return b;
 }
 
@@ -127,7 +127,7 @@ bool CGroupNode::GetValue(size_t i, const std::string & c_rstrColKey, T& tValue)
 		return FALSE;
 	}
 
-	int index = col_idx_it->second;
+	int32_t index = col_idx_it->second;
 	if (row_it->second.GetSize() <= index)
 	{
 		return FALSE;
@@ -150,7 +150,7 @@ bool CGroupNode::GetValue(const std::string & c_rstrRowKey, const std::string & 
 		return FALSE;
 	}
 
-	int index = col_idx_it->second;
+	int32_t index = col_idx_it->second;
 	if (row_it->second.GetSize() <= index)
 	{
 		return FALSE;
@@ -160,7 +160,7 @@ bool CGroupNode::GetValue(const std::string & c_rstrRowKey, const std::string & 
 }
 
 template <typename T>
-bool CGroupNode::GetValue(const std::string & c_rstrRowKey, int index, T& tValue) const
+bool CGroupNode::GetValue(const std::string & c_rstrRowKey, int32_t index, T& tValue) const
 {
 	TMapRow::const_iterator row_it = m_map_rows.find(c_rstrRowKey);
 	if (m_map_rows.end() == row_it)
@@ -176,17 +176,17 @@ bool CGroupNode::GetValue(const std::string & c_rstrRowKey, int index, T& tValue
 }
 
 template <typename T>
-bool CGroupNode::GetGroupValue(const std::string& stGroupName, const std::string& stRow, int iCol, OUT T& tValue) const
+bool CGroupNode::GetGroupValue(const std::string& stGroupName, const std::string& stRow, int32_t iCol, OUT T& tValue) const
 {
 	CGroupNode* pChildGroup = GetChildNode(stGroupName);
-	if (NULL != pChildGroup)
+	if (nullptr != pChildGroup)
 	{
 		if (pChildGroup->GetValue(stRow, iCol, tValue))
 			return true;
 	}
 	// default group을 살펴봄.
 	pChildGroup = GetChildNode("default");
-	if (NULL != pChildGroup)
+	if (nullptr != pChildGroup)
 	{
 		if (pChildGroup->GetValue(stRow, iCol, tValue))
 			return true;
@@ -198,14 +198,14 @@ template <typename T>
 bool CGroupNode::GetGroupValue(const std::string& stGroupName, const std::string& stRow, const std::string& stCol, OUT T& tValue) const
 {
 	CGroupNode* pChildGroup = GetChildNode(stGroupName);
-	if (NULL != pChildGroup)
+	if (nullptr != pChildGroup)
 	{
 		if (pChildGroup->GetValue(stRow, stCol, tValue))
 			return true;
 	}
 	// default group을 살펴봄.
 	pChildGroup = GetChildNode("default");
-	if (NULL != pChildGroup)
+	if (nullptr != pChildGroup)
 	{
 		if (pChildGroup->GetValue(stRow, stCol, tValue))
 			return true;
@@ -216,14 +216,14 @@ bool CGroupNode::GetGroupValue(const std::string& stGroupName, const std::string
 template <typename T>
 bool CGroupNode::CGroupNodeRow::GetValue(const std::string & stColKey, OUT T& value) const
 {
-	int idx = m_pOwnerGroupNode->GetColumnIndexFromName(stColKey);
+	int32_t idx = m_pOwnerGroupNode->GetColumnIndexFromName(stColKey);
 	if (idx < 0 || (TTokenVectorMap::size_type)idx >= m_vec_values.size())
 		return false;
 	return from_string(value, m_vec_values[idx]);
 }
 
 template <typename T>
-bool CGroupNode::CGroupNodeRow::GetValue(int idx, OUT T& value) const
+bool CGroupNode::CGroupNodeRow::GetValue(int32_t idx, OUT T& value) const
 {
 	if (idx < 0 || (TTokenVectorMap::size_type)idx >= m_vec_values.size())
 		return false;

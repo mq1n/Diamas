@@ -124,7 +124,7 @@ namespace NEffectUpdateDecorator
 				it_end(ted.it_end),
 				it_cur(ted.it_cur),
 				it_next(ted.it_next),
-				pData((T*)( (unsigned char*)ted.pData - (DWORD)pFirstInstance + (DWORD)pInstance))
+				pData((T*)( (uint8_t*)ted.pData - (uint32_t)pFirstInstance + (uint32_t)pInstance))
 			{
 				if (it_start == it_end)
 					*pData = T();
@@ -178,10 +178,10 @@ namespace NEffectUpdateDecorator
 	class CTextureAnimationCWDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationCWDecorator>
 	{
 	public:
-		CTextureAnimationCWDecorator(float fFrameTime, DWORD n, BYTE * pIdx) :n(n),pIdx(pIdx),fFrameTime(fFrameTime),fLastFrameTime(fFrameTime){}
+		CTextureAnimationCWDecorator(float fFrameTime, uint32_t n, uint8_t * pIdx) :n(n),pIdx(pIdx),fFrameTime(fFrameTime),fLastFrameTime(fFrameTime){}
 		virtual ~CTextureAnimationCWDecorator(){}
 	protected:
-		virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationCWDecorator(fFrameTime,n,(BYTE*)((unsigned char*)pi+((BYTE*)pIdx-(BYTE*)pfi))); }
+		virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationCWDecorator(fFrameTime,n,(uint8_t*)((uint8_t*)pi+((uint8_t*)pIdx-(uint8_t*)pfi))); }
 		virtual void __Excute(const CDecoratorData & d)
 		{
 			fLastFrameTime -= d.fElapsedTime;
@@ -192,19 +192,19 @@ namespace NEffectUpdateDecorator
 					*pIdx = 0;
 			}
 		}
-		DWORD n;
+		uint32_t n;
 		float fLastFrameTime;
 		float fFrameTime;
-		BYTE* pIdx;
+		uint8_t* pIdx;
 		
 	};
 	class CTextureAnimationCCWDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationCCWDecorator>
 	{
 	public:
-		CTextureAnimationCCWDecorator(float fFrameTime, BYTE n, BYTE * pIdx) :n(n),pIdx(pIdx),fFrameTime(fFrameTime),fLastFrameTime(fFrameTime){}
+		CTextureAnimationCCWDecorator(float fFrameTime, uint8_t n, uint8_t * pIdx) :n(n),pIdx(pIdx),fFrameTime(fFrameTime),fLastFrameTime(fFrameTime){}
 		virtual ~CTextureAnimationCCWDecorator(){}
 	protected:
-		virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationCCWDecorator(fFrameTime,n,(BYTE*)((unsigned char*)pi+((BYTE*)pIdx-(BYTE*)pfi))); }
+		virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationCCWDecorator(fFrameTime,n,(uint8_t*)((uint8_t*)pi+((uint8_t*)pIdx-(uint8_t*)pfi))); }
 		virtual void __Excute(const CDecoratorData & d)
 		{
 			fLastFrameTime -= d.fElapsedTime;
@@ -212,37 +212,37 @@ namespace NEffectUpdateDecorator
 			{
 				fLastFrameTime += fFrameTime;
 
-				if (--(*pIdx) >= n && n != 0) // Because variable is unsigned..
-					*pIdx = BYTE(n - 1);
+				if (--(*pIdx) >= n && n != 0) // Because variable is uint32_t..
+					*pIdx = uint8_t(n - 1);
 			}
 		}
-		BYTE n;
+		uint8_t n;
 		float fLastFrameTime;
 		float fFrameTime;
-		BYTE* pIdx;
+		uint8_t* pIdx;
 		
 	};
 	class CTextureAnimationRandomDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationRandomDecorator>
 	{
 	public:
-		CTextureAnimationRandomDecorator(float fFrameTime, BYTE n, BYTE * pIdx) :n(n),pIdx(pIdx),fFrameTime(fFrameTime),fLastFrameTime(fFrameTime){}
+		CTextureAnimationRandomDecorator(float fFrameTime, uint8_t n, uint8_t * pIdx) :n(n),pIdx(pIdx),fFrameTime(fFrameTime),fLastFrameTime(fFrameTime){}
 		virtual ~CTextureAnimationRandomDecorator(){}
 	protected:
-		virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationRandomDecorator(fFrameTime,n,(BYTE*)((unsigned char*)pi+((BYTE*)pIdx-(BYTE*)pfi))); }
+		virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationRandomDecorator(fFrameTime,n,(uint8_t*)((uint8_t*)pi+((uint8_t*)pIdx-(uint8_t*)pfi))); }
 		virtual void __Excute(const CDecoratorData & d)
 		{
 			fLastFrameTime -= d.fElapsedTime;
 			if (fLastFrameTime<0.0f && n!=0)
 			{
-				*pIdx = (BYTE)random_range(0,n-1);
+				*pIdx = (uint8_t)random_range(0,n-1);
 			}
 			while (fLastFrameTime<0.0f)
 				fLastFrameTime += fFrameTime;
 		}
-		BYTE n;
+		uint8_t n;
 		float fLastFrameTime;
 		float fFrameTime;
-		BYTE* pIdx;
+		uint8_t* pIdx;
 		
 	};
 

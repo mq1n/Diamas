@@ -23,8 +23,8 @@ class SphereInterface
 public:
 	SphereInterface();
 	virtual ~SphereInterface();
-	virtual int GetVertexCount(void) const = 0;
-	virtual bool GetVertex(int i,Vector3d &vect) const = 0;
+	virtual int32_t GetVertexCount(void) const = 0;
+	virtual bool GetVertex(int32_t i,Vector3d &vect) const = 0;
 private:
 };
 

@@ -20,35 +20,35 @@
 #include "Cache.h"
 #include <sstream>
 
-extern int g_iPlayerCacheFlushSeconds;
-extern int g_iItemCacheFlushSeconds;
-extern int g_test_server;
-extern int g_log;
+extern int32_t g_iPlayerCacheFlushSeconds;
+extern int32_t g_iItemCacheFlushSeconds;
+extern int32_t g_test_server;
+extern int32_t g_log;
 extern std::string g_stLocale;
 extern std::string g_stLocaleNameColumn;
-bool CreateItemTableFromRes(MYSQL_RES * res, std::vector<TPlayerItem> * pVec, DWORD dwPID);
+bool CreateItemTableFromRes(MYSQL_RES * res, std::vector<TPlayerItem> * pVec, uint32_t dwPID);
 
-DWORD g_dwUsageMax = 0;
-DWORD g_dwUsageAvg = 0;
+uint32_t g_dwUsageMax = 0;
+uint32_t g_dwUsageAvg = 0;
 
 CPacketInfo g_query_info;
 CPacketInfo g_item_info;
 
-int g_item_count = 0;
-int g_query_count[2];
+int32_t g_item_count = 0;
+int32_t g_query_count[2];
 #ifdef ENABLE_PROTO_FROM_DB
 bool g_bMirror2DB = false;
 #endif
 
 CClientManager::CClientManager() :
-	m_pkAuthPeer(NULL),
+	m_pkAuthPeer(nullptr),
 	m_iPlayerIDStart(0),
 	m_iPlayerDeleteLevelLimit(0),
 	m_iPlayerDeleteLevelLimitLower(0),
 	m_iShopTableSize(0),
-	m_pShopTable(NULL),
+	m_pShopTable(nullptr),
 	m_iRefineTableSize(0),
-	m_pRefineTable(NULL),
+	m_pRefineTable(nullptr),
 	m_bShutdowned(FALSE),
 	m_iCacheFlushCount(0),
 	m_iCacheFlushCountLimit(200)
@@ -68,7 +68,7 @@ CClientManager::~CClientManager()
 	Destroy();
 }
 
-void CClientManager::SetPlayerIDStart(int iIDStart)
+void CClientManager::SetPlayerIDStart(int32_t iIDStart)
 {
 	m_iPlayerIDStart = iIDStart;
 }
@@ -80,7 +80,7 @@ void CClientManager::GetPeerP2PHostNames(std::string& peerHostNames)
 	for (auto it = m_peerList.begin(); it != m_peerList.end(); ++it)
 	{
 		CPeer * peer = *it;
-		oss << peer->GetHost() << " " << peer->GetP2PPort() << " channel : " << (int)(peer->GetChannel()) << "\n";
+		oss << peer->GetHost() << " " << peer->GetP2PPort() << " channel : " << (int32_t)(peer->GetChannel()) << "\n";
 	}
 
 	peerHostNames += oss.str();
@@ -114,16 +114,16 @@ static bool __InitializeDefaultPriv()
 	std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery("SELECT priv_type, id, type, value, UNIX_TIMESTAMP(duration) FROM priv_settings", SQL_COMMON));
 	if (pMsg->Get()->uiNumRows == 0)
 		return false;
-	MYSQL_ROW row = NULL;
+	MYSQL_ROW row = nullptr;
 	while ((row = mysql_fetch_row(pMsg->Get()->pSQLResult)))
 	{
 		if (!strcmp(row[0], "EMPIRE"))
 		{
 			// init
-			BYTE empire = 0;
-			BYTE type = 1;
-			int value = 0;
-			time_t duration_sec = 0;
+			uint8_t empire = 0;
+			uint8_t type = 1;
+			int32_t value = 0;
+			uint32_t duration_sec = 0;
 			// set
 			str_to_number(empire, row[1]);
 			str_to_number(type, row[2]);
@@ -142,10 +142,10 @@ static bool __InitializeDefaultPriv()
 		else if (!strcmp(row[0], "GUILD"))
 		{
 			// init
-			DWORD guild_id = 0;
-			BYTE type = 1;
-			int value = 0;
-			time_t duration_sec = 0;
+			uint32_t guild_id = 0;
+			uint8_t type = 1;
+			int32_t value = 0;
+			uint32_t duration_sec = 0;
 			// set
 			str_to_number(guild_id, row[1]);
 			str_to_number(type, row[2]);
@@ -167,9 +167,9 @@ static bool __InitializeDefaultPriv()
 		else if (!strcmp(row[0], "PLAYER"))
 		{
 			// init
-			DWORD pid = 0;
-			BYTE type = 1;
-			int value = 0;
+			uint32_t pid = 0;
+			uint8_t type = 1;
+			int32_t value = 0;
 			// set
 			str_to_number(pid, row[1]);
 			str_to_number(type, row[2]);
@@ -185,7 +185,7 @@ static bool __InitializeDefaultPriv()
 	return true;
 }
 
-static bool __UpdateDefaultPriv(const char* priv_type, DWORD id, BYTE type, int value, time_t duration_sec)
+static bool __UpdateDefaultPriv(const char* priv_type, uint32_t id, uint8_t type, int32_t value, time_t duration_sec)
 {
 	char szQuery[1024];
 	snprintf(szQuery, 1024,
@@ -199,7 +199,7 @@ static bool __UpdateDefaultPriv(const char* priv_type, DWORD id, BYTE type, int 
 
 bool CClientManager::Initialize()
 {
-	int tmpValue;
+	int32_t tmpValue;
 	
 	//BOOT_LOCALIZATION
 	if (!InitializeLocalization())
@@ -225,7 +225,7 @@ bool CClientManager::Initialize()
 	//END_ITEM_UNIQUE_ID
 
 #ifdef ENABLE_PROTO_FROM_DB
-	int iTemp;
+	int32_t iTemp;
 	if (CConfig::instance().GetValue("PROTO_FROM_DB", &iTemp))
 	{
 		bIsProtoReadFromDB = !!iTemp;
@@ -262,7 +262,7 @@ bool CClientManager::Initialize()
 	}
 
 	sys_log(0, "ACCEPT_HANDLE: %u", m_fdAccept);
-	fdwatch_add_fd(m_fdWatcher, m_fdAccept, NULL, FDW_READ, false);
+	fdwatch_add_fd(m_fdWatcher, m_fdAccept, nullptr, FDW_READ, false);
 
 	if (!CConfig::instance().GetValue("BACKUP_LIMIT_SEC", &tmpValue))
 		tmpValue = 600;
@@ -363,7 +363,7 @@ void CClientManager::Quit()
 
 void CClientManager::QUERY_BOOT(CPeer* peer, TPacketGDBoot * p)
 {
-	const BYTE bPacketVersion = 6; // BOOT 패킷이 바뀔때마다 번호를 올리도록 한다.
+	const uint8_t bPacketVersion = 6; // BOOT 패킷이 바뀔때마다 번호를 올리도록 한다.
 
 	std::vector<tAdminInfo> vAdmin;
 	std::vector<std::string> vHost;
@@ -373,31 +373,31 @@ void CClientManager::QUERY_BOOT(CPeer* peer, TPacketGDBoot * p)
 
 	sys_log(0, "QUERY_BOOT : AdminInfo (Request ServerIp %s) ", p->szIP);
 
-	DWORD dwPacketSize = 
-		sizeof(DWORD) +
-		sizeof(BYTE) +
-		sizeof(WORD) + sizeof(WORD) + sizeof(TMobTable) * m_vec_mobTable.size() +
-		sizeof(WORD) + sizeof(WORD) + sizeof(TItemTable) * m_vec_itemTable.size() +
-		sizeof(WORD) + sizeof(WORD) + sizeof(TShopTable) * m_iShopTableSize +
-		sizeof(WORD) + sizeof(WORD) + sizeof(TSkillTable) * m_vec_skillTable.size() +
-		sizeof(WORD) + sizeof(WORD) + sizeof(TRefineTable) * m_iRefineTableSize +
-		sizeof(WORD) + sizeof(WORD) + sizeof(TItemAttrTable) * m_vec_itemAttrTable.size() +
-		sizeof(WORD) + sizeof(WORD) + sizeof(TItemAttrTable) * m_vec_itemRareTable.size() +
-		sizeof(WORD) + sizeof(WORD) + sizeof(TBanwordTable) * m_vec_banwordTable.size() +
-		sizeof(WORD) + sizeof(WORD) + sizeof(building::TLand) * m_vec_kLandTable.size() +
-		sizeof(WORD) + sizeof(WORD) + sizeof(building::TObjectProto) * m_vec_kObjectProto.size() + 
-		sizeof(WORD) + sizeof(WORD) + sizeof(building::TObject) * m_map_pkObjectTable.size() +
+	uint32_t dwPacketSize = 
+		sizeof(uint32_t) +
+		sizeof(uint8_t) +
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TMobTable) * m_vec_mobTable.size() +
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TItemTable) * m_vec_itemTable.size() +
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TShopTable) * m_iShopTableSize +
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TSkillTable) * m_vec_skillTable.size() +
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TRefineTable) * m_iRefineTableSize +
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TItemAttrTable) * m_vec_itemAttrTable.size() +
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TItemAttrTable) * m_vec_itemRareTable.size() +
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TBanwordTable) * m_vec_banwordTable.size() +
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(building::TLand) * m_vec_kLandTable.size() +
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(building::TObjectProto) * m_vec_kObjectProto.size() + 
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(building::TObject) * m_map_pkObjectTable.size() +
 		sizeof(time_t) + 
-		sizeof(WORD) + sizeof(WORD) + sizeof(TItemIDRangeTable)*2 +
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TItemIDRangeTable)*2 +
 		//ADMIN_MANAGER
-		sizeof(WORD) + sizeof(WORD) + 16 * vHost.size() +
-		sizeof(WORD) + sizeof(WORD) +  sizeof(tAdminInfo) *  vAdmin.size() +
+		sizeof(uint16_t) + sizeof(uint16_t) + 16 * vHost.size() +
+		sizeof(uint16_t) + sizeof(uint16_t) +  sizeof(tAdminInfo) *  vAdmin.size() +
 		//END_ADMIN_MANAGER
-		sizeof(WORD); 
+		sizeof(uint16_t); 
 
 	peer->EncodeHeader(HEADER_DG_BOOT, 0, dwPacketSize);
-	peer->Encode(&dwPacketSize, sizeof(DWORD));
-	peer->Encode(&bPacketVersion, sizeof(BYTE));
+	peer->Encode(&dwPacketSize, sizeof(uint32_t));
+	peer->Encode(&bPacketVersion, sizeof(uint8_t));
 
 	sys_log(0, "BOOT: PACKET: %d", dwPacketSize);
 	sys_log(0, "BOOT: VERSION: %d", bPacketVersion);
@@ -510,20 +510,20 @@ void CClientManager::SendPartyOnSetup(CPeer* pkPeer)
 	{
 		sys_log(0, "PARTY SendPartyOnSetup Party [%u]", it_party->first);
 		pkPeer->EncodeHeader(HEADER_DG_PARTY_CREATE, 0, sizeof(TPacketPartyCreate));
-		pkPeer->Encode(&it_party->first, sizeof(DWORD));
+		pkPeer->Encode(&it_party->first, sizeof(uint32_t));
 
 		for (auto it_member = it_party->second.begin(); it_member != it_party->second.end(); ++it_member)
 		{
 			sys_log(0, "PARTY SendPartyOnSetup Party [%u] Member [%u]", it_party->first, it_member->first);
 			pkPeer->EncodeHeader(HEADER_DG_PARTY_ADD, 0, sizeof(TPacketPartyAdd));
-			pkPeer->Encode(&it_party->first, sizeof(DWORD));
-			pkPeer->Encode(&it_member->first, sizeof(DWORD));
-			pkPeer->Encode(&it_member->second.bRole, sizeof(BYTE));
+			pkPeer->Encode(&it_party->first, sizeof(uint32_t));
+			pkPeer->Encode(&it_member->first, sizeof(uint32_t));
+			pkPeer->Encode(&it_member->second.bRole, sizeof(uint8_t));
 
 			pkPeer->EncodeHeader(HEADER_DG_PARTY_SET_MEMBER_LEVEL, 0, sizeof(TPacketPartySetMemberLevel));
-			pkPeer->Encode(&it_party->first, sizeof(DWORD));
-			pkPeer->Encode(&it_member->first, sizeof(DWORD));
-			pkPeer->Encode(&it_member->second.bLevel, sizeof(BYTE));
+			pkPeer->Encode(&it_party->first, sizeof(uint32_t));
+			pkPeer->Encode(&it_member->first, sizeof(uint32_t));
+			pkPeer->Encode(&it_member->second.bLevel, sizeof(uint8_t));
 		}
 	}
 }
@@ -533,7 +533,7 @@ void CClientManager::QUERY_PLAYER_COUNT(CPeer * pkPeer, TPlayerCountPacket * pPa
 	pkPeer->SetUserCount(pPacket->dwCount);
 }
 
-void CClientManager::QUERY_QUEST_SAVE(CPeer * pkPeer, TQuestTable * pTable, DWORD dwLen)
+void CClientManager::QUERY_QUEST_SAVE(CPeer * pkPeer, TQuestTable * pTable, uint32_t dwLen)
 {
 	if (0 != (dwLen % sizeof(TQuestTable)))
 	{
@@ -541,11 +541,11 @@ void CClientManager::QUERY_QUEST_SAVE(CPeer * pkPeer, TQuestTable * pTable, DWOR
 		return;
 	}
 
-	int iSize = dwLen / sizeof(TQuestTable);
+	int32_t iSize = dwLen / sizeof(TQuestTable);
 
 	char szQuery[1024];
 
-	for (int i = 0; i < iSize; ++i, ++pTable)
+	for (int32_t i = 0; i < iSize; ++i, ++pTable)
 	{
 		if (pTable->lValue == 0)
 		{
@@ -560,11 +560,11 @@ void CClientManager::QUERY_QUEST_SAVE(CPeer * pkPeer, TQuestTable * pTable, DWOR
 					GetTablePostfix(), pTable->dwPID, pTable->szName, pTable->szState, pTable->lValue);
 		}
 
-		CDBManager::instance().ReturnQuery(szQuery, QID_QUEST_SAVE, pkPeer->GetHandle(), NULL);
+		CDBManager::instance().ReturnQuery(szQuery, QID_QUEST_SAVE, pkPeer->GetHandle(), nullptr);
 	}
 }
 
-void CClientManager::QUERY_SAFEBOX_LOAD(CPeer * pkPeer, DWORD dwHandle, TSafeboxLoadPacket * packet, bool bMall)
+void CClientManager::QUERY_SAFEBOX_LOAD(CPeer * pkPeer, uint32_t dwHandle, TSafeboxLoadPacket * packet, bool bMall)
 {
 	ClientHandleInfo * pi = new ClientHandleInfo(dwHandle);
 	strlcpy(pi->safebox_password, packet->szPassword, sizeof(pi->safebox_password));
@@ -588,7 +588,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 {
 	CQueryInfo * qi = (CQueryInfo *) msg->pvUserData;
 	ClientHandleInfo * pi = (ClientHandleInfo *) qi->pvData;
-	DWORD dwHandle = pi->dwHandle;
+	uint32_t dwHandle = pi->dwHandle;
 
 	// 여기에서 사용하는 account_index는 쿼리 순서를 말한다.
 	// 첫번째 패스워드 알아내기 위해 하는 쿼리가 0
@@ -705,7 +705,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 			CGrid grid(5, MAX(1, pi->pSafebox->bSize) * 9);
 			bool bEscape = false;
 
-			for (DWORD i = 0; i < s_items.size(); ++i)
+			for (uint32_t i = 0; i < s_items.size(); ++i)
 			{
 				TPlayerItem & r = s_items[i];
 
@@ -723,7 +723,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 
 			if (!bEscape)
 			{
-				std::vector<std::pair<DWORD, DWORD> > vec_dwFinishedAwardID;
+				std::vector<std::pair<uint32_t, uint32_t> > vec_dwFinishedAwardID;
 
 				char szQuery[512];
 
@@ -731,7 +731,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 				while (it != pSet->end())
 				{
 					TItemAward * pItemAward = *(it++);
-					const DWORD& dwItemVnum = pItemAward->dwVnum;
+					const uint32_t& dwItemVnum = pItemAward->dwVnum;
 
 					if (pItemAward->bTaken)
 						continue;
@@ -752,7 +752,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 
 					TItemTable * pItemTable = it->second;
 
-					int iPos;
+					int32_t iPos;
 
 					if ((iPos = grid.FindBlank(1, it->second->bSize)) == -1)
 						break;
@@ -760,7 +760,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 					TPlayerItem item;
 					memset(&item, 0, sizeof(TPlayerItem));
 
-					DWORD dwSocket2 = 0;
+					uint32_t dwSocket2 = 0;
 
 					if (pItemTable->bType == ITEM_UNIQUE)
 					{
@@ -771,8 +771,8 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 					}
 					else if ((dwItemVnum == 50300 || dwItemVnum == 70037) && pItemAward->dwSocket0 == 0)
 					{
-						DWORD dwSkillIdx;
-						DWORD dwSkillVnum;
+						uint32_t dwSkillIdx;
+						uint32_t dwSkillVnum;
 
 						do
 						{
@@ -821,14 +821,14 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 							continue;
 						}
 						TItemTable* item_table = it->second;
-						if (item_table == NULL)
+						if (item_table == nullptr)
 						{
-							sys_err ("Invalid item_table (vnum : %d). It's value is NULL in m_map_itemTableByVnum.", dwItemVnum);
+							sys_err ("Invalid item_table (vnum : %d). It's value is nullptr in m_map_itemTableByVnum.", dwItemVnum);
 							continue;
 						}
 						if (0 == pItemAward->dwSocket0)
 						{
-							for (int i = 0; i < ITEM_LIMIT_MAX_NUM; i++)
+							for (int32_t i = 0; i < ITEM_LIMIT_MAX_NUM; i++)
 							{
 								if (LIMIT_REAL_TIME == item_table->aLimits[i].bType)
 								{
@@ -883,7 +883,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 					grid.Put(iPos, 1, it->second->bSize);
 				}
 
-				for (DWORD i = 0; i < vec_dwFinishedAwardID.size(); ++i)
+				for (uint32_t i = 0; i < vec_dwFinishedAwardID.size(); ++i)
 					ItemAwardManager::instance().Taken(vec_dwFinishedAwardID[i].first, vec_dwFinishedAwardID[i].second);
 			}
 		}
@@ -901,7 +901,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 	}
 }
 
-void CClientManager::QUERY_SAFEBOX_CHANGE_SIZE(CPeer * pkPeer, DWORD dwHandle, TSafeboxChangeSizePacket * p)
+void CClientManager::QUERY_SAFEBOX_CHANGE_SIZE(CPeer * pkPeer, uint32_t dwHandle, TSafeboxChangeSizePacket * p)
 {
 	ClientHandleInfo * pi = new ClientHandleInfo(dwHandle);
 	pi->account_index = p->bSize;	// account_index를 사이즈로 임시로 사용
@@ -920,19 +920,19 @@ void CClientManager::RESULT_SAFEBOX_CHANGE_SIZE(CPeer * pkPeer, SQLMsg * msg)
 {
 	CQueryInfo * qi = (CQueryInfo *) msg->pvUserData;
 	ClientHandleInfo * p = (ClientHandleInfo *) qi->pvData;
-	DWORD dwHandle = p->dwHandle;
-	BYTE bSize = p->account_index;
+	uint32_t dwHandle = p->dwHandle;
+	uint8_t bSize = p->account_index;
 
 	delete p;
 
 	if (msg->Get()->uiNumRows > 0)
 	{
-		pkPeer->EncodeHeader(HEADER_DG_SAFEBOX_CHANGE_SIZE, dwHandle, sizeof(BYTE));
+		pkPeer->EncodeHeader(HEADER_DG_SAFEBOX_CHANGE_SIZE, dwHandle, sizeof(uint8_t));
 		pkPeer->EncodeBYTE(bSize);
 	}
 }
 
-void CClientManager::QUERY_SAFEBOX_CHANGE_PASSWORD(CPeer * pkPeer, DWORD dwHandle, TSafeboxChangePasswordPacket * p)
+void CClientManager::QUERY_SAFEBOX_CHANGE_PASSWORD(CPeer * pkPeer, uint32_t dwHandle, TSafeboxChangePasswordPacket * p)
 {
 	ClientHandleInfo * pi = new ClientHandleInfo(dwHandle);
 	strlcpy(pi->safebox_password, p->szNewPassword, sizeof(pi->safebox_password));
@@ -949,7 +949,7 @@ void CClientManager::RESULT_SAFEBOX_CHANGE_PASSWORD(CPeer * pkPeer, SQLMsg * msg
 {
 	CQueryInfo * qi = (CQueryInfo *) msg->pvUserData;
 	ClientHandleInfo * p = (ClientHandleInfo *) qi->pvData;
-	DWORD dwHandle = p->dwHandle;
+	uint32_t dwHandle = p->dwHandle;
 
 	if (msg->Get()->uiNumRows > 0)
 	{
@@ -971,7 +971,7 @@ void CClientManager::RESULT_SAFEBOX_CHANGE_PASSWORD(CPeer * pkPeer, SQLMsg * msg
 	delete p;
 
 	// Wrong old password
-	pkPeer->EncodeHeader(HEADER_DG_SAFEBOX_CHANGE_PASSWORD_ANSWER, dwHandle, sizeof(BYTE));
+	pkPeer->EncodeHeader(HEADER_DG_SAFEBOX_CHANGE_PASSWORD_ANSWER, dwHandle, sizeof(uint8_t));
 	pkPeer->EncodeBYTE(0);
 }
 
@@ -979,10 +979,10 @@ void CClientManager::RESULT_SAFEBOX_CHANGE_PASSWORD_SECOND(CPeer * pkPeer, SQLMs
 {
 	CQueryInfo * qi = (CQueryInfo *) msg->pvUserData;
 	ClientHandleInfo * p = (ClientHandleInfo *) qi->pvData;
-	DWORD dwHandle = p->dwHandle;
+	uint32_t dwHandle = p->dwHandle;
 	delete p;
 
-	pkPeer->EncodeHeader(HEADER_DG_SAFEBOX_CHANGE_PASSWORD_ANSWER, dwHandle, sizeof(BYTE));
+	pkPeer->EncodeHeader(HEADER_DG_SAFEBOX_CHANGE_PASSWORD_ANSWER, dwHandle, sizeof(uint8_t));
 	pkPeer->EncodeBYTE(1);
 }
 
@@ -1068,10 +1068,10 @@ void CClientManager::QUERY_SAFEBOX_SAVE(CPeer * pkPeer, TSafeboxTable * pTable)
 			"UPDATE safebox%s SET gold='%u' WHERE account_id=%u", 
 			GetTablePostfix(), pTable->dwGold, pTable->dwID);
 
-	CDBManager::instance().ReturnQuery(szQuery, QID_SAFEBOX_SAVE, pkPeer->GetHandle(), NULL);
+	CDBManager::instance().ReturnQuery(szQuery, QID_SAFEBOX_SAVE, pkPeer->GetHandle(), nullptr);
 }
 
-void CClientManager::QUERY_EMPIRE_SELECT(CPeer * pkPeer, DWORD dwHandle, TEmpireSelectPacket * p)
+void CClientManager::QUERY_EMPIRE_SELECT(CPeer * pkPeer, uint32_t dwHandle, TEmpireSelectPacket * p)
 {
 	char szQuery[QUERY_MAX_LEN];
 
@@ -1097,9 +1097,9 @@ void CClientManager::QUERY_EMPIRE_SELECT(CPeer * pkPeer, DWORD dwHandle, TEmpire
 			sys_log(0, "EMPIRE %lu", pRes->uiNumRows);
 
 			MYSQL_ROW row = mysql_fetch_row(pRes->pSQLResult);
-			DWORD pids[3];
+			uint32_t pids[3];
 
-			UINT g_start_map[4] =
+			uint32_t g_start_map[4] =
 			{
 				0,  // reserved
 				1,  // 신수국
@@ -1108,7 +1108,7 @@ void CClientManager::QUERY_EMPIRE_SELECT(CPeer * pkPeer, DWORD dwHandle, TEmpire
 			};
 
 			// FIXME share with game
-			DWORD g_start_position[4][2]=
+			uint32_t g_start_position[4][2]=
 			{
 				{      0,      0 },
 				{ 469300, 964200 }, // 신수국
@@ -1116,7 +1116,7 @@ void CClientManager::QUERY_EMPIRE_SELECT(CPeer * pkPeer, DWORD dwHandle, TEmpire
 				{ 969600, 278400 }  // 진노국
 			};
 
-			for (int i = 0; i < 3; ++i)
+			for (int32_t i = 0; i < 3; ++i)
 			{
 				str_to_number(pids[i], row[i]);
 				sys_log(0, "EMPIRE PIDS[%d]", pids[i]);
@@ -1139,11 +1139,11 @@ void CClientManager::QUERY_EMPIRE_SELECT(CPeer * pkPeer, DWORD dwHandle, TEmpire
 		}
 	}
 
-	pkPeer->EncodeHeader(HEADER_DG_EMPIRE_SELECT, dwHandle, sizeof(BYTE));
+	pkPeer->EncodeHeader(HEADER_DG_EMPIRE_SELECT, dwHandle, sizeof(uint8_t));
 	pkPeer->EncodeBYTE(p->bEmpire);
 }
 
-void CClientManager::QUERY_SETUP(CPeer * peer, DWORD dwHandle, const char * c_pData)
+void CClientManager::QUERY_SETUP(CPeer * peer, uint32_t dwHandle, const char * c_pData)
 {
 	TPacketGDSetup * p = (TPacketGDSetup *) c_pData;
 	c_pData += sizeof(TPacketGDSetup);
@@ -1171,7 +1171,7 @@ void CClientManager::QUERY_SETUP(CPeer * peer, DWORD dwHandle, const char * c_pD
 	kMapLocations.wPort = peer->GetListenPort();
 	memcpy(kMapLocations.alMaps, peer->GetMaps(), sizeof(kMapLocations.alMaps));
 
-	BYTE bMapCount;
+	uint8_t bMapCount;
 
 	std::vector<TMapLocation> vec_kMapLocations;
 
@@ -1195,7 +1195,7 @@ void CClientManager::QUERY_SETUP(CPeer * peer, DWORD dwHandle, const char * c_pD
 				memcpy(kMapLocation2.alMaps, tmp->GetMaps(), sizeof(kMapLocation2.alMaps));
 				vec_kMapLocations.push_back(kMapLocation2);
 
-				tmp->EncodeHeader(HEADER_DG_MAP_LOCATIONS, 0, sizeof(BYTE) + sizeof(TMapLocation));
+				tmp->EncodeHeader(HEADER_DG_MAP_LOCATIONS, 0, sizeof(uint8_t) + sizeof(TMapLocation));
 				bMapCount = 1;
 				tmp->EncodeBYTE(bMapCount);
 				tmp->Encode(&kMapLocations, sizeof(TMapLocation));
@@ -1223,7 +1223,7 @@ void CClientManager::QUERY_SETUP(CPeer * peer, DWORD dwHandle, const char * c_pD
 				vec_kMapLocations.push_back(kMapLocation2);
 			}
 
-			tmp->EncodeHeader(HEADER_DG_MAP_LOCATIONS, 0, sizeof(BYTE) + sizeof(TMapLocation));
+			tmp->EncodeHeader(HEADER_DG_MAP_LOCATIONS, 0, sizeof(uint8_t) + sizeof(TMapLocation));
 			bMapCount = 1;
 			tmp->EncodeBYTE(bMapCount);
 			tmp->Encode(&kMapLocations, sizeof(TMapLocation));
@@ -1254,7 +1254,7 @@ void CClientManager::QUERY_SETUP(CPeer * peer, DWORD dwHandle, const char * c_pD
 
 			if (tmp->GetChannel() == peer->GetChannel())
 			{
-				tmp->EncodeHeader(HEADER_DG_MAP_LOCATIONS, 0, sizeof(BYTE) + sizeof(TMapLocation));
+				tmp->EncodeHeader(HEADER_DG_MAP_LOCATIONS, 0, sizeof(uint8_t) + sizeof(TMapLocation));
 				bMapCount = 1;
 				tmp->EncodeBYTE(bMapCount);
 				tmp->Encode(&kMapLocations, sizeof(TMapLocation));
@@ -1264,7 +1264,7 @@ void CClientManager::QUERY_SETUP(CPeer * peer, DWORD dwHandle, const char * c_pD
 
 	vec_kMapLocations.push_back(kMapLocations);
 
-	peer->EncodeHeader(HEADER_DG_MAP_LOCATIONS, 0, sizeof(BYTE) + sizeof(TMapLocation) * vec_kMapLocations.size());
+	peer->EncodeHeader(HEADER_DG_MAP_LOCATIONS, 0, sizeof(uint8_t) + sizeof(TMapLocation) * vec_kMapLocations.size());
 	bMapCount = vec_kMapLocations.size();
 	peer->EncodeBYTE(bMapCount);
 	peer->Encode(&vec_kMapLocations[0], sizeof(TMapLocation) * vec_kMapLocations.size());
@@ -1298,7 +1298,7 @@ void CClientManager::QUERY_SETUP(CPeer * peer, DWORD dwHandle, const char * c_pD
 	// 로그인 및 빌링정보 보내기
 	//
 	TPacketLoginOnSetup * pck = (TPacketLoginOnSetup *) c_pData;;
-	for (DWORD c = 0; c < p->dwLoginCount; ++c, ++pck)
+	for (uint32_t c = 0; c < p->dwLoginCount; ++c, ++pck)
 	{
 		CLoginData * pkLD = new CLoginData;
 
@@ -1333,7 +1333,7 @@ void CClientManager::QUERY_SETUP(CPeer * peer, DWORD dwHandle, const char * c_pD
 
 void CClientManager::QUERY_ITEM_FLUSH(CPeer * pkPeer, const char * c_pData)
 {
-	DWORD dwID = *(DWORD *) c_pData;
+	uint32_t dwID = *(uint32_t *) c_pData;
 
 	if (g_log)
 		sys_log(0, "HEADER_GD_ITEM_FLUSH: %u", dwID);
@@ -1400,7 +1400,7 @@ void CClientManager::QUERY_ITEM_SAVE(CPeer * pkPeer, const char * c_pData)
 			p->aAttr[5].bType, p->aAttr[5].sValue,
 			p->aAttr[6].bType, p->aAttr[6].sValue);
 
-		CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_SAVE, pkPeer->GetHandle(), NULL);
+		CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_SAVE, pkPeer->GetHandle(), nullptr);
 	}
 	else
 	{
@@ -1411,17 +1411,17 @@ void CClientManager::QUERY_ITEM_SAVE(CPeer * pkPeer, const char * c_pData)
 	}
 }
 
-CClientManager::TItemCacheSet * CClientManager::GetItemCacheSet(DWORD pid)
+CClientManager::TItemCacheSet * CClientManager::GetItemCacheSet(uint32_t pid)
 {
 	TItemCacheSetPtrMap::iterator it = m_map_pkItemCacheSetPtr.find(pid);
 
 	if (it == m_map_pkItemCacheSetPtr.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
 
-void CClientManager::CreateItemCacheSet(DWORD pid)
+void CClientManager::CreateItemCacheSet(uint32_t pid)
 {
 	if (m_map_pkItemCacheSetPtr.find(pid) != m_map_pkItemCacheSetPtr.end())
 		return;
@@ -1433,7 +1433,7 @@ void CClientManager::CreateItemCacheSet(DWORD pid)
 		sys_log(0, "ITEM_CACHE: new cache %u", pid);
 }
 
-void CClientManager::FlushItemCacheSet(DWORD pid)
+void CClientManager::FlushItemCacheSet(uint32_t pid)
 {
 	TItemCacheSetPtrMap::iterator it = m_map_pkItemCacheSetPtr.find(pid);
 
@@ -1464,12 +1464,12 @@ void CClientManager::FlushItemCacheSet(DWORD pid)
 		sys_log(0, "FLUSH_ITEMCACHESET : Deleted pid(%d)", pid);
 }
 
-CItemCache * CClientManager::GetItemCache(DWORD id)
+CItemCache * CClientManager::GetItemCache(uint32_t id)
 {
 	TItemCacheMap::iterator it = m_map_itemCache.find(id);
 
 	if (it == m_map_itemCache.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
@@ -1535,7 +1535,7 @@ void CClientManager::PutItemCache(TPlayerItem * pNew, bool bSkipQuery)
 	}
 }
 
-bool CClientManager::DeleteItemCache(DWORD dwID)
+bool CClientManager::DeleteItemCache(uint32_t dwID)
 {
 	CItemCache * c = GetItemCache(dwID);
 
@@ -1547,12 +1547,12 @@ bool CClientManager::DeleteItemCache(DWORD dwID)
 }
 
 // MYSHOP_PRICE_LIST
-CItemPriceListTableCache* CClientManager::GetItemPriceListCache(DWORD dwID)
+CItemPriceListTableCache* CClientManager::GetItemPriceListCache(uint32_t dwID)
 {
 	TItemPriceListCacheMap::iterator it = m_mapItemPriceListCache.find(dwID);
 
 	if (it == m_mapItemPriceListCache.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
@@ -1594,7 +1594,7 @@ void CClientManager::UpdatePlayerCache()
 }
 // END_OF_MYSHOP_PRICE_LIST
 
-void CClientManager::SetCacheFlushCountLimit(int iLimit)
+void CClientManager::SetCacheFlushCountLimit(int32_t iLimit)
 {
 	m_iCacheFlushCountLimit = MAX(10, iLimit);
 	sys_log(0, "CACHE_FLUSH_LIMIT_PER_SECOND: %d", m_iCacheFlushCountLimit);
@@ -1645,10 +1645,10 @@ void CClientManager::UpdateItemPriceListCache()
 
 void CClientManager::QUERY_ITEM_DESTROY(CPeer * pkPeer, const char * c_pData)
 {
-	DWORD dwID = *(DWORD *) c_pData;
-	c_pData += sizeof(DWORD);
+	uint32_t dwID = *(uint32_t *) c_pData;
+	c_pData += sizeof(uint32_t);
 
-	DWORD dwPID = *(DWORD *) c_pData;
+	uint32_t dwPID = *(uint32_t *) c_pData;
 
 	if (!DeleteItemCache(dwID))
 	{
@@ -1661,13 +1661,13 @@ void CClientManager::QUERY_ITEM_DESTROY(CPeer * pkPeer, const char * c_pData)
 		if (dwPID == 0) // 아무도 가진 사람이 없었다면, 비동기 쿼리
 			CDBManager::instance().AsyncQuery(szQuery);
 		else
-			CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_DESTROY, pkPeer->GetHandle(), NULL);
+			CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_DESTROY, pkPeer->GetHandle(), nullptr);
 	}
 }
 
 void CClientManager::QUERY_FLUSH_CACHE(CPeer * pkPeer, const char * c_pData)
 {
-	DWORD dwPID = *(DWORD *) c_pData;
+	uint32_t dwPID = *(uint32_t *) c_pData;
 
 	CPlayerTableCache * pkCache = GetPlayerCache(dwPID);
 
@@ -1699,10 +1699,10 @@ void CClientManager::QUERY_RELOAD_PROTO()
 			continue;
 
 		tmp->EncodeHeader(HEADER_DG_RELOAD_PROTO, 0, 
-				sizeof(WORD) + sizeof(TSkillTable) * m_vec_skillTable.size() +
-				sizeof(WORD) + sizeof(TBanwordTable) * m_vec_banwordTable.size() +
-				sizeof(WORD) + sizeof(TItemTable) * m_vec_itemTable.size() +
-				sizeof(WORD) + sizeof(TMobTable) * m_vec_mobTable.size());
+				sizeof(uint16_t) + sizeof(TSkillTable) * m_vec_skillTable.size() +
+				sizeof(uint16_t) + sizeof(TBanwordTable) * m_vec_banwordTable.size() +
+				sizeof(uint16_t) + sizeof(TItemTable) * m_vec_itemTable.size() +
+				sizeof(uint16_t) + sizeof(TMobTable) * m_vec_mobTable.size());
 
 		tmp->EncodeWORD(m_vec_skillTable.size());
 		tmp->Encode(&m_vec_skillTable[0], sizeof(TSkillTable) * m_vec_skillTable.size());
@@ -1752,12 +1752,12 @@ void CClientManager::MoneyLog(TPacketMoneyLog* p)
 	CMoneyLog::instance().AddLog(p->type, p->vnum, p->gold);
 }
 
-CLoginData * CClientManager::GetLoginData(DWORD dwKey)
+CLoginData * CClientManager::GetLoginData(uint32_t dwKey)
 {
 	TLoginDataByLoginKey::iterator it = m_map_pkLoginData.find(dwKey);
 
 	if (it == m_map_pkLoginData.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
@@ -1770,17 +1770,17 @@ CLoginData * CClientManager::GetLoginDataByLogin(const char * c_pszLogin)
 	TLoginDataByLogin::iterator it = m_map_pkLoginDataByLogin.find(szLogin);
 
 	if (it == m_map_pkLoginDataByLogin.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
 
-CLoginData * CClientManager::GetLoginDataByAID(DWORD dwAID)
+CLoginData * CClientManager::GetLoginDataByAID(uint32_t dwAID)
 {
 	TLoginDataByAID::iterator it = m_map_pkLoginDataByAID.find(dwAID);
 
 	if (it == m_map_pkLoginDataByAID.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
@@ -1807,7 +1807,7 @@ void CClientManager::DeleteLoginData(CLoginData * pkLD)
 		pkLD->SetDeleted(true);
 }
 
-void CClientManager::QUERY_AUTH_LOGIN(CPeer * pkPeer, DWORD dwHandle, TPacketGDAuthLogin * p)
+void CClientManager::QUERY_AUTH_LOGIN(CPeer * pkPeer, uint32_t dwHandle, TPacketGDAuthLogin * p)
 {
 	if (g_test_server)
 		sys_log(0, "QUERY_AUTH_LOGIN %d %d %s", p->dwID, p->dwLoginKey, p->szLogin);
@@ -1818,14 +1818,14 @@ void CClientManager::QUERY_AUTH_LOGIN(CPeer * pkPeer, DWORD dwHandle, TPacketGDA
 		DeleteLoginData(pkLD);
 	}
 
-	BYTE bResult;
+	uint8_t bResult;
 
 	if (GetLoginData(p->dwLoginKey))
 	{
 		sys_err("LoginData already exist key %u login %s", p->dwLoginKey, p->szLogin);
 		bResult = 0;
 
-		pkPeer->EncodeHeader(HEADER_DG_AUTH_LOGIN, dwHandle, sizeof(BYTE));
+		pkPeer->EncodeHeader(HEADER_DG_AUTH_LOGIN, dwHandle, sizeof(uint8_t));
 		pkPeer->EncodeBYTE(bResult);
 	}
 	else
@@ -1851,7 +1851,7 @@ void CClientManager::QUERY_AUTH_LOGIN(CPeer * pkPeer, DWORD dwHandle, TPacketGDA
 
 		InsertLoginData(pkLD);
 
-		pkPeer->EncodeHeader(HEADER_DG_AUTH_LOGIN, dwHandle, sizeof(BYTE));
+		pkPeer->EncodeHeader(HEADER_DG_AUTH_LOGIN, dwHandle, sizeof(uint8_t));
 		pkPeer->EncodeBYTE(bResult);
 	}
 }
@@ -1914,7 +1914,7 @@ void CClientManager::CreateObject(TPacketGDCreateObject * p)
 	m_map_pkObjectTable.insert(std::make_pair(pkObj->dwID, pkObj));
 }
 
-void CClientManager::DeleteObject(DWORD dwID)
+void CClientManager::DeleteObject(uint32_t dwID)
 {
 	char szQuery[128];
 
@@ -1936,17 +1936,17 @@ void CClientManager::DeleteObject(DWORD dwID)
 		m_map_pkObjectTable.erase(it);
 	}
 
-	ForwardPacket(HEADER_DG_DELETE_OBJECT, &dwID, sizeof(DWORD));
+	ForwardPacket(HEADER_DG_DELETE_OBJECT, &dwID, sizeof(uint32_t));
 }
 
-void CClientManager::UpdateLand(DWORD * pdw)
+void CClientManager::UpdateLand(uint32_t * pdw)
 {
-	DWORD dwID = pdw[0];
-	DWORD dwGuild = pdw[1];
+	uint32_t dwID = pdw[0];
+	uint32_t dwGuild = pdw[1];
 
 	building::TLand * p = &m_vec_kLandTable[0];
 
-	DWORD i;
+	uint32_t i;
 
 	for (i = 0; i < m_vec_kLandTable.size(); ++i, ++p)
 	{
@@ -1980,7 +1980,7 @@ void CClientManager::BlockChat(TPacketBlockChat* p)
 	if (pRes->uiNumRows)
 	{
 		MYSQL_ROW row = mysql_fetch_row(pRes->pSQLResult);
-		DWORD pid = strtoul(row[0], NULL, 10);
+		uint32_t pid = strtoul(row[0], nullptr, 10);
 
 		TPacketGDAddAffect pa;
 		pa.dwPID = pid;
@@ -1990,7 +1990,7 @@ void CClientManager::BlockChat(TPacketBlockChat* p)
 		pa.elem.dwFlag = 0;
 		pa.elem.lDuration = p->lDuration;
 		pa.elem.lSPCost = 0;
-		QUERY_ADD_AFFECT(NULL, &pa);
+		QUERY_ADD_AFFECT(nullptr, &pa);
 	}
 	else
 	{
@@ -2080,7 +2080,7 @@ void CClientManager::MyshopPricelistUpdate(const TItemPriceListTable* pPacket) /
 // MYSHOP_PRICE_LIST
 // 캐시된 가격정보가 있으면 캐시를 읽어 바로 전송하고 캐시에 정보가 없으면 DB 에 쿼리를 한다.
 //
-void CClientManager::MyshopPricelistRequest(CPeer* peer, DWORD dwHandle, DWORD dwPlayerID)
+void CClientManager::MyshopPricelistRequest(CPeer* peer, uint32_t dwHandle, uint32_t dwPlayerID)
 {
 	if (CItemPriceListTableCache* pCache = GetItemPriceListCache(dwPlayerID))
 	{
@@ -2112,12 +2112,12 @@ void CClientManager::MyshopPricelistRequest(CPeer* peer, DWORD dwHandle, DWORD d
 }
 // END_OF_MYSHOP_PRICE_LIST
 
-void CPacketInfo::Add(int header)
+void CPacketInfo::Add(int32_t header)
 {
 	auto it = m_map_info.find(header);
 
 	if (it == m_map_info.end())
-		m_map_info.insert(std::map<int, int>::value_type(header, 1));
+		m_map_info.insert(std::map<int32_t, int32_t>::value_type(header, 1));
 	else
 		++it->second;
 }
@@ -2129,12 +2129,12 @@ void CPacketInfo::Reset()
 
 void CClientManager::ProcessPackets(CPeer * peer)
 {
-	BYTE		header;
-	DWORD		dwHandle;
-	DWORD		dwLength;
-	const char * data = NULL;
-	int			i = 0;
-	int			iCount = 0;
+	uint8_t		header;
+	uint32_t		dwHandle;
+	uint32_t		dwLength;
+	const char * data = nullptr;
+	int32_t			i = 0;
+	int32_t			iCount = 0;
 
 	while (peer->PeekPacket(i, header, dwHandle, dwLength, &data))
 	{
@@ -2225,7 +2225,7 @@ void CClientManager::ProcessPackets(CPeer * peer)
 				break;
 
 			case HEADER_GD_GUILD_CREATE:
-				GuildCreate(peer, *(DWORD *) data);
+				GuildCreate(peer, *(uint32_t *) data);
 				break;
 
 			case HEADER_GD_GUILD_SKILL_UPDATE:
@@ -2375,11 +2375,11 @@ void CClientManager::ProcessPackets(CPeer * peer)
 				break;
 
 			case HEADER_GD_DELETE_OBJECT:
-				DeleteObject(*(DWORD *) data);
+				DeleteObject(*(uint32_t *) data);
 				break;
 
 			case HEADER_GD_UPDATE_LAND:
-				UpdateLand((DWORD *) data);
+				UpdateLand((uint32_t *) data);
 				break;
 
 			case HEADER_GD_MARRIAGE_ADD:
@@ -2418,7 +2418,7 @@ void CClientManager::ProcessPackets(CPeer * peer)
 				break;
 
 			case HEADER_GD_MYSHOP_PRICELIST_REQ:
-				MyshopPricelistRequest(peer, dwHandle, *(DWORD*)data);
+				MyshopPricelistRequest(peer, dwHandle, *(uint32_t*)data);
 				break;
 				// END_OF_MYSHOP_PRICE_LIST
 		
@@ -2445,7 +2445,7 @@ void CClientManager::ProcessPackets(CPeer * peer)
 				break;
 
 			case HEADER_GD_REQ_HORSE_NAME :
-				AckHorseName(*(DWORD*)data, peer);
+				AckHorseName(*(uint32_t*)data, peer);
 				break;
 
 			case HEADER_GD_DC:
@@ -2495,7 +2495,7 @@ void CClientManager::RemovePeer(CPeer * pPeer)
 {
 	if (m_pkAuthPeer == pPeer)
 	{
-		m_pkAuthPeer = NULL;
+		m_pkAuthPeer = nullptr;
 	}
 	else
 	{
@@ -2539,13 +2539,13 @@ CPeer * CClientManager::GetPeer(IDENT ident)
 			return tmp;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 CPeer * CClientManager::GetAnyPeer()
 {
 	if (m_peerList.empty())
-		return NULL;
+		return nullptr;
 
 	return m_peerList.front();
 }
@@ -2553,7 +2553,7 @@ CPeer * CClientManager::GetAnyPeer()
 // DB 매니저로 부터 받은 결과를 처리한다.
 //
 // @version	05/06/10 Bang2ni - 가격정보 관련 쿼리(QID_ITEMPRICE_XXX) 추가
-int CClientManager::AnalyzeQueryResult(SQLMsg * msg)
+int32_t CClientManager::AnalyzeQueryResult(SQLMsg * msg)
 {
 	CQueryInfo * qi = (CQueryInfo *) msg->pvUserData;
 	CPeer * peer = GetPeer(qi->dwIdent);
@@ -2655,13 +2655,13 @@ int CClientManager::AnalyzeQueryResult(SQLMsg * msg)
 
 void UsageLog()
 {   
-	FILE* fp = NULL;
+	FILE* fp = nullptr;
 
 	time_t      ct;
 	char        *time_s;
 	struct tm   lt;
 
-	int         avg = g_dwUsageAvg / 3600; // 60 초 * 60 분
+	int32_t         avg = g_dwUsageAvg / 3600; // 60 초 * 60 분
 
 	fp = fopen("usage.txt", "a+");
 
@@ -2683,9 +2683,9 @@ void UsageLog()
 }
 
 #define ENABLE_ITEMAWARD_REFRESH
-int CClientManager::Process()
+int32_t CClientManager::Process()
 {
-	int pulses;
+	int32_t pulses;
 
 	if (!(pulses = thecore_idle()))
 		return 0;
@@ -2752,7 +2752,7 @@ int CClientManager::Process()
 
 			CDBManager::instance().ResetCounter();
 
-			DWORD dwCount = CClientManager::instance().GetUserCount();
+			uint32_t dwCount = CClientManager::instance().GetUserCount();
 
 			g_dwUsageAvg += dwCount;
 			g_dwUsageMax = MAX(g_dwUsageMax, dwCount);
@@ -2788,7 +2788,7 @@ int CClientManager::Process()
 		{
 			/*
 			char buf[4096 + 1];
-			int len
+			int32_t len
 
 			/////////////////////////////////////////////////////////////////
 			buf[0] = '\0';
@@ -2796,7 +2796,7 @@ int CClientManager::Process()
 
 			it = g_query_info.m_map_info.begin();
 
-			int count = 0;
+			int32_t count = 0;
 
 			while (it != g_query_info.m_map_info.end())
 			{
@@ -2852,8 +2852,8 @@ int CClientManager::Process()
 		}
 	}
 
-	int num_events = fdwatch(m_fdWatcher, 0);
-	int idx;
+	int32_t num_events = fdwatch(m_fdWatcher, 0);
+	int32_t idx;
 	CPeer * peer;
 
 	for (idx = 0; idx < num_events; ++idx) // 인풋
@@ -2919,7 +2919,7 @@ int CClientManager::Process()
 
 #ifdef __WIN32__
 	if (_kbhit()) {
-		int c = _getch();
+		int32_t c = _getch();
 		switch (c) {
 			case 0x1b: // Esc
 				return 0; // shutdown
@@ -2933,7 +2933,7 @@ int CClientManager::Process()
 	return 1;
 }
 
-DWORD CClientManager::GetUserCount()
+uint32_t CClientManager::GetUserCount()
 {
 	// 단순히 로그인 카운트를 센다.. --;
 	return m_map_kLogonAccount.size();
@@ -2941,7 +2941,7 @@ DWORD CClientManager::GetUserCount()
 
 void CClientManager::SendAllGuildSkillRechargePacket()
 {
-	ForwardPacket(HEADER_DG_GUILD_SKILL_RECHARGE, NULL, 0);
+	ForwardPacket(HEADER_DG_GUILD_SKILL_RECHARGE, nullptr, 0);
 }
 
 void CClientManager::SendTime()
@@ -2950,7 +2950,7 @@ void CClientManager::SendTime()
 	ForwardPacket(HEADER_DG_TIME, &now, sizeof(time_t));
 }
 
-void CClientManager::ForwardPacket(BYTE header, const void* data, int size, BYTE bChannel, CPeer* except)
+void CClientManager::ForwardPacket(uint8_t header, const void* data, int32_t size, uint8_t bChannel, CPeer* except)
 {
 	for (auto it = m_peerList.begin(); it != m_peerList.end(); ++it)
 	{
@@ -2978,7 +2978,7 @@ void CClientManager::SendNotice(const char * c_pszFormat, ...)
 	va_list args;
 
 	va_start(args, c_pszFormat);
-	int len = vsnprintf(szBuf, sizeof(szBuf), c_pszFormat, args);
+	int32_t len = vsnprintf(szBuf, sizeof(szBuf), c_pszFormat, args);
 	va_end(args);
 	szBuf[len] = '\0';
 
@@ -2993,7 +2993,7 @@ time_t CClientManager::GetCurrentTime()
 // ITEM_UNIQUE_ID
 bool CClientManager::InitializeNowItemID()
 {
-	DWORD dwMin, dwMax;
+	uint32_t dwMin, dwMax;
 
 	//아이템 ID를 초기화 한다.
 	if (!CConfig::instance().GetTwoValue("ITEM_ID_RANGE", &dwMin, &dwMax))
@@ -3015,12 +3015,12 @@ bool CClientManager::InitializeNowItemID()
 	return true;
 }
 
-DWORD CClientManager::GainItemID()
+uint32_t CClientManager::GainItemID()
 {
 	return m_itemRange.dwUsableItemIDMin++;
 }
 
-DWORD CClientManager::GetItemID()
+uint32_t CClientManager::GetItemID()
 {
 	return m_itemRange.dwUsableItemIDMin;
 }
@@ -3044,11 +3044,11 @@ bool CClientManager::InitializeLocalization()
 
 	m_vec_Locale.clear();
 
-	MYSQL_ROW row = NULL;
+	MYSQL_ROW row = nullptr;
 
-	for (int n = 0; (row = mysql_fetch_row(pMsg->Get()->pSQLResult)) != NULL; ++n)
+	for (int32_t n = 0; (row = mysql_fetch_row(pMsg->Get()->pSQLResult)) != nullptr; ++n)
 	{
-		int col = 0;
+		int32_t col = 0;
 		tLocale locale;
 
 		strlcpy(locale.szValue, row[col++], sizeof(locale.szValue));
@@ -3427,7 +3427,7 @@ bool CClientManager::InitializeLocalization()
 
 bool CClientManager::__GetAdminInfo(const char *szIP, std::vector<tAdminInfo> & rAdminVec)
 {
-	//szIP == NULL 일경우  모든서버에 운영자 권한을 갖는다.
+	//szIP == nullptr 일경우  모든서버에 운영자 권한을 갖는다.
 	char szQuery[512];
 	snprintf(szQuery, sizeof(szQuery),
 			"SELECT mID,mAccount,mName,mContactIP,mServerIP,mAuthority FROM gmlist WHERE mServerIP='ALL' or mServerIP='%s'",
@@ -3447,7 +3447,7 @@ bool CClientManager::__GetAdminInfo(const char *szIP, std::vector<tAdminInfo> & 
 
 	while ((row = mysql_fetch_row(pMsg->Get()->pSQLResult)))
 	{
-		int idx = 0;
+		int32_t idx = 0;
 		tAdminInfo Info;
 
 		str_to_number(Info.m_ID, row[idx++]);
@@ -3520,8 +3520,8 @@ void CClientManager::ReloadAdmin(CPeer*, TPacketReloadAdmin* p)
 	__GetHostInfo(vHost);
 	__GetAdminInfo(p->szIP, vAdmin);
 
-	DWORD dwPacketSize = sizeof(WORD) + sizeof (WORD) + sizeof(tAdminInfo) * vAdmin.size() + 
-		  sizeof(WORD) + sizeof(WORD) + 16 * vHost.size();	
+	uint32_t dwPacketSize = sizeof(uint16_t) + sizeof (uint16_t) + sizeof(tAdminInfo) * vAdmin.size() + 
+		  sizeof(uint16_t) + sizeof(uint16_t) + 16 * vHost.size();	
 
 	for (auto it = m_peerList.begin(); it != m_peerList.end(); ++it)
 	{
@@ -3551,20 +3551,20 @@ void CClientManager::ReloadAdmin(CPeer*, TPacketReloadAdmin* p)
 //BREAK_MARRIAGE
 void CClientManager::BreakMarriage(CPeer * peer, const char * data)
 {
-	DWORD pid1, pid2;
+	uint32_t pid1, pid2;
 
-	pid1 = *(int *) data;
-	data += sizeof(int);
+	pid1 = *(int32_t *) data;
+	data += sizeof(int32_t);
 
-	pid2 = *(int *) data;
-	data += sizeof(int);
+	pid2 = *(int32_t *) data;
+	data += sizeof(int32_t);
 
 	sys_log(0, "Breaking off a marriage engagement! pid %d and pid %d", pid1, pid2);
 	marriage::CManager::instance().Remove(pid1, pid2);
 }
 //END_BREAK_MARIIAGE
 
-void CClientManager::UpdateItemCacheSet(DWORD pid)
+void CClientManager::UpdateItemCacheSet(uint32_t pid)
 {
 	auto it = m_map_pkItemCacheSetPtr.find(pid);
 
@@ -3617,7 +3617,7 @@ void CClientManager::DeleteLoginKey(TPacketDC *data)
 void CClientManager::DeleteAwardId(TPacketDeleteAwardID *data)
 {
 	//sys_log(0,"data from game server arrived %d",data->dwID);
-	std::map<DWORD, TItemAward *>::iterator it;
+	std::map<uint32_t, TItemAward *>::iterator it;
 	it = ItemAwardManager::Instance().GetMapAward().find(data->dwID);
 	if ( it != ItemAwardManager::Instance().GetMapAward().end() )
 	{
@@ -3644,14 +3644,14 @@ void CClientManager::UpdateChannelStatus(TChannelStatus* pData)
 	}
 }
 
-void CClientManager::RequestChannelStatus(CPeer* peer, DWORD dwHandle)
+void CClientManager::RequestChannelStatus(CPeer* peer, uint32_t dwHandle)
 {
-	const int nSize = m_mChannelStatus.size();
-	peer->EncodeHeader(HEADER_DG_RESPOND_CHANNELSTATUS, dwHandle, sizeof(TChannelStatus)*nSize+sizeof(int));
-	peer->Encode(&nSize, sizeof(int));
+	const int32_t nSize = m_mChannelStatus.size();
+	peer->EncodeHeader(HEADER_DG_RESPOND_CHANNELSTATUS, dwHandle, sizeof(TChannelStatus)*nSize+sizeof(int32_t));
+	peer->Encode(&nSize, sizeof(int32_t));
 	for (TChannelStatusMap::iterator it = m_mChannelStatus.begin(); it != m_mChannelStatus.end(); it++) {
-		peer->Encode(&it->first, sizeof(short));
-		peer->Encode(&it->second, sizeof(BYTE));
+		peer->Encode(&it->first, sizeof(int16_t));
+		peer->Encode(&it->second, sizeof(uint8_t));
 	}
 }
 
@@ -3659,7 +3659,7 @@ void CClientManager::ResetLastPlayerID(const TPacketNeedLoginLogInfo* data)
 {
 	CLoginData* pkLD = GetLoginDataByAID( data->dwPlayerID );
 
-	if (NULL != pkLD)
+	if (nullptr != pkLD)
 	{
 		pkLD->SetLastPlayerID( 0 );
 	}

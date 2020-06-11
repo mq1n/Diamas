@@ -13,7 +13,7 @@
 #include "ani.h"
 #include "dev_log.h"
 
-const char* FN_race_name(int race)
+const char* FN_race_name(int32_t race)
 {
 #define FN_NAME(race)	case race: return #race
 	switch (race)
@@ -36,7 +36,7 @@ const char* FN_race_name(int race)
 #undef FN_NAME
 }
 
-const char* FN_weapon_type(int weapon)
+const char* FN_weapon_type(int32_t weapon)
 {
 #define FN_NAME(weapon)	case weapon: return #weapon
 	switch (weapon)
@@ -63,30 +63,30 @@ class ANI
 {
 	protected:
 		// [Á¾Á·][ÀÏ¹Ý0Å»°Í1][¹«±â][ÄÞº¸]
-		DWORD m_speed[MAIN_RACE_MAX_NUM][2][WEAPON_NUM_TYPES][9];
+		uint32_t m_speed[MAIN_RACE_MAX_NUM][2][WEAPON_NUM_TYPES][9];
 
 	public:
 		ANI();
 
 	public:
 		bool	load();
-		bool	load_one_race(int race, const char *dir_name);
-		DWORD	load_one_weapon(const char *dir_name, int weapon, BYTE combo, bool horse);
-		DWORD	attack_speed(int race, int weapon, BYTE combo = 0, bool horse = false);
+		bool	load_one_race(int32_t race, const char *dir_name);
+		uint32_t	load_one_weapon(const char *dir_name, int32_t weapon, uint8_t combo, bool horse);
+		uint32_t	attack_speed(int32_t race, int32_t weapon, uint8_t combo = 0, bool horse = false);
 
 		void	print_attack_speed();
 };
 
 static class ANI s_ANI;
 
-DWORD FN_attack_speed_from_file(const char *file)
+uint32_t FN_attack_speed_from_file(const char *file)
 {
 	FILE * fp = fopen(file, "r");
 
-	if (NULL == fp)
+	if (nullptr == fp)
 		return 0;
 
-	int speed = 1000;
+	int32_t speed = 1000;
 
 	const char	*key	= "DirectInputTime";
 	const char	*delim	= " \t\r\n";
@@ -97,14 +97,14 @@ DWORD FN_attack_speed_from_file(const char *file)
 	while (fgets(buf, 1024, fp))
 	{
 		field	= strtok(buf, delim);
-		value	= strtok(NULL, delim);
+		value	= strtok(nullptr, delim);
 
 		if (field && value)
 		{
 			if (0 == strcasecmp(field, key))
 			{
-				float f_speed = strtof(value, NULL);
-				speed = (int) (f_speed * 1000.0);
+				float f_speed = strtof(value, nullptr);
+				speed = (int32_t) (f_speed * 1000.0);
 				break;
 			}
 		}
@@ -117,11 +117,11 @@ DWORD FN_attack_speed_from_file(const char *file)
 ANI::ANI()
 {
 	// set default value
-	for (int race = 0; race < MAIN_RACE_MAX_NUM; ++race)
+	for (int32_t race = 0; race < MAIN_RACE_MAX_NUM; ++race)
 	{
-		for (int weapon = 0; weapon < WEAPON_NUM_TYPES; ++weapon)
+		for (int32_t weapon = 0; weapon < WEAPON_NUM_TYPES; ++weapon)
 		{
-			for (BYTE combo = 0; combo <= 8; ++combo)
+			for (uint8_t combo = 0; combo <= 8; ++combo)
 			{
 				m_speed[race][0][weapon][combo] = 1000;
 				m_speed[race][1][weapon][combo] = 1000;
@@ -146,7 +146,7 @@ bool ANI::load()
 #endif
 	};
 
-	for (int race = 0; race <MAIN_RACE_MAX_NUM; ++race)
+	for (int32_t race = 0; race <MAIN_RACE_MAX_NUM; ++race)
 	{
 		if (false == load_one_race(race, dir_name[race]))
 		{
@@ -158,7 +158,7 @@ bool ANI::load()
 	return true;
 }
 
-DWORD ANI::load_one_weapon(const char *dir_name, int weapon, BYTE combo, bool horse)
+uint32_t ANI::load_one_weapon(const char *dir_name, int32_t weapon, uint8_t combo, bool horse)
 {
 	char format[128];
 	char filename[256];
@@ -200,7 +200,7 @@ DWORD ANI::load_one_weapon(const char *dir_name, int weapon, BYTE combo, bool ho
 	}
 
 	snprintf(filename, sizeof(filename), format, dir_name, horse ? "horse_" : "", combo);
-	DWORD speed = FN_attack_speed_from_file(filename);
+	uint32_t speed = FN_attack_speed_from_file(filename);
 
 	if (speed == 0)
 		return 1000;
@@ -208,16 +208,16 @@ DWORD ANI::load_one_weapon(const char *dir_name, int weapon, BYTE combo, bool ho
 	return speed;
 }
 
-bool ANI::load_one_race(int race, const char *dir_name)
+bool ANI::load_one_race(int32_t race, const char *dir_name)
 {
-	if (NULL == dir_name || '\0' == dir_name[0])
+	if (nullptr == dir_name || '\0' == dir_name[0])
 		return false;
 
-	for (int weapon = WEAPON_SWORD; weapon < WEAPON_NUM_TYPES; ++weapon)
+	for (int32_t weapon = WEAPON_SWORD; weapon < WEAPON_NUM_TYPES; ++weapon)
 	{
 		dev_log(LOG_DEB0, "ANI (%s,%s)", FN_race_name(race), FN_weapon_type(weapon));
 
-		for (BYTE combo = 1; combo <= 8; ++combo)
+		for (uint8_t combo = 1; combo <= 8; ++combo)
 		{
 			// ¸» ¾ÈÅÀÀ» ¶§
 			m_speed[race][0][weapon][combo] = load_one_weapon(dir_name, weapon, combo, false);
@@ -237,7 +237,7 @@ bool ANI::load_one_race(int race, const char *dir_name)
 	return true;
 }
 
-DWORD ANI::attack_speed(int race, int weapon, BYTE combo, bool horse)
+uint32_t ANI::attack_speed(int32_t race, int32_t weapon, uint8_t combo, bool horse)
 {
 	switch (race)
 	{
@@ -278,7 +278,7 @@ DWORD ANI::attack_speed(int race, int weapon, BYTE combo, bool horse)
 	return m_speed[race][horse ? 1 : 0][weapon][combo];
 }
 
-const char* FN_race_string(int race)
+const char* FN_race_string(int32_t race)
 {
 	switch (race)
 	{
@@ -299,7 +299,7 @@ const char* FN_race_string(int race)
 	return "UNKNOWN_RACE";
 }
 
-const char* FN_weapon_string(int weapon)
+const char* FN_weapon_string(int32_t weapon)
 {
 	switch (weapon)
 	{
@@ -321,9 +321,9 @@ const char* FN_weapon_string(int weapon)
 
 void ANI::print_attack_speed()
 {
-	for (int race = 0; race < MAIN_RACE_MAX_NUM; ++race)
+	for (int32_t race = 0; race < MAIN_RACE_MAX_NUM; ++race)
 	{
-		for (int weapon = 0; weapon < WEAPON_NUM_TYPES; ++weapon)
+		for (int32_t weapon = 0; weapon < WEAPON_NUM_TYPES; ++weapon)
 		{
 			printf("[%s][%s] = %u\n",
 					FN_race_string(race),
@@ -339,23 +339,23 @@ void ani_init()
 	s_ANI.load();
 }
 
-DWORD ani_attack_speed(LPCHARACTER ch)
+uint32_t ani_attack_speed(LPCHARACTER ch)
 {
-	DWORD speed = 1000;
+	uint32_t speed = 1000;
 
-	if (NULL == ch)
+	if (nullptr == ch)
 		return speed;
 
 	LPITEM item = ch->GetWear(WEAR_WEAPON);
 
-	if (NULL == item)
+	if (nullptr == item)
 		return speed;
 
 	if (ITEM_WEAPON != item->GetType())
 		return speed;
 
-	int race = ch->GetRaceNum();
-	int weapon = item->GetSubType();
+	int32_t race = ch->GetRaceNum();
+	int32_t weapon = item->GetSubType();
 
 	/*
 	dev_log(LOG_DEB0, "%s : (race,weapon) = (%s,%s) POINT_ATT_SPEED = %d",
@@ -373,11 +373,11 @@ DWORD ani_attack_speed(LPCHARACTER ch)
 	return s_ANI.attack_speed(race, weapon);
 }
 
-DWORD ani_combo_speed(LPCHARACTER ch, BYTE combo)
+uint32_t ani_combo_speed(LPCHARACTER ch, uint8_t combo)
 {
 	LPITEM item = ch->GetWear(WEAR_WEAPON);
 
-	if (NULL == item || combo > 8)
+	if (nullptr == item || combo > 8)
 		return 1000;
 
 	return s_ANI.attack_speed(ch->GetRaceNum(), item->GetSubType(), combo, ch->IsRiding());
@@ -389,7 +389,7 @@ void ani_print_attack_speed()
 }
 
 #if 0
-int main(int argc, char **argv)
+int32_t main(int32_t argc, char **argv)
 {
 	ani_init();
 	ani_print_attack_speed();

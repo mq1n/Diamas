@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "GrpImage.h"
 
-CGraphicImage::CGraphicImage(const char * c_szFileName, DWORD dwFilter) : 
+CGraphicImage::CGraphicImage(const char * c_szFileName, uint32_t dwFilter) : 
 CResource(c_szFileName),
 m_dwFilter(dwFilter)
 {
@@ -36,12 +36,12 @@ bool CGraphicImage::OnIsType(TType type)
 	return CResource::OnIsType(type);
 }
 
-int CGraphicImage::GetWidth() const
+int32_t CGraphicImage::GetWidth() const
 {
 	return m_rect.right - m_rect.left;
 }
 
-int CGraphicImage::GetHeight() const
+int32_t CGraphicImage::GetHeight() const
 {
 	return m_rect.bottom - m_rect.top;
 }
@@ -61,7 +61,7 @@ const RECT& CGraphicImage::GetRectReference() const
 	return m_rect;
 }
 
-bool CGraphicImage::OnLoad(int iSize, const void * c_pvBuf)
+bool CGraphicImage::OnLoad(int32_t iSize, const void * c_pvBuf)
 {
 	if (!c_pvBuf)
 		return false;

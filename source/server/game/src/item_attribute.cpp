@@ -9,10 +9,10 @@
 #include "config.h"
 #endif
 
-const int MAX_NORM_ATTR_NUM = ITEM_MANAGER::MAX_NORM_ATTR_NUM;
-const int MAX_RARE_ATTR_NUM = ITEM_MANAGER::MAX_RARE_ATTR_NUM;
+const int32_t MAX_NORM_ATTR_NUM = ITEM_MANAGER::MAX_NORM_ATTR_NUM;
+const int32_t MAX_RARE_ATTR_NUM = ITEM_MANAGER::MAX_RARE_ATTR_NUM;
 
-int CItem::GetAttributeSetIndex()
+int32_t CItem::GetAttributeSetIndex()
 {
 	if (GetType() == ITEM_WEAPON)
 	{
@@ -86,34 +86,34 @@ int CItem::GetAttributeSetIndex()
 	return -1;
 }
 
-bool CItem::HasAttr(BYTE bApply)
+bool CItem::HasAttr(uint8_t bApply)
 {
-	for (int i = 0; i < ITEM_APPLY_MAX_NUM; ++i)
+	for (int32_t i = 0; i < ITEM_APPLY_MAX_NUM; ++i)
 		if (m_pProto->aApplies[i].bType == bApply)
 			return true;
 
-	for (int i = 0; i < MAX_NORM_ATTR_NUM; ++i)
+	for (int32_t i = 0; i < MAX_NORM_ATTR_NUM; ++i)
 		if (GetAttributeType(i) == bApply)
 			return true;
 
 	return false;
 }
 
-bool CItem::HasRareAttr(BYTE bApply)
+bool CItem::HasRareAttr(uint8_t bApply)
 {
-	for (int i = 0; i < MAX_RARE_ATTR_NUM; ++i)
+	for (int32_t i = 0; i < MAX_RARE_ATTR_NUM; ++i)
 		if (GetAttributeType(i + 5) == bApply)
 			return true;
 
 	return false;
 }
 
-void CItem::AddAttribute(BYTE bApply, short sValue)
+void CItem::AddAttribute(uint8_t bApply, int16_t sValue)
 {
 	if (HasAttr(bApply))
 		return;
 
-	int i = GetAttributeCount();
+	int32_t i = GetAttributeCount();
 
 	if (i >= MAX_NORM_ATTR_NUM)
 		sys_err("item attribute overflow!");
@@ -124,7 +124,7 @@ void CItem::AddAttribute(BYTE bApply, short sValue)
 	}
 }
 
-void CItem::AddAttr(BYTE bApply, BYTE bLevel)
+void CItem::AddAttr(uint8_t bApply, uint8_t bLevel)
 {
 	if (HasAttr(bApply))
 		return;
@@ -132,23 +132,23 @@ void CItem::AddAttr(BYTE bApply, BYTE bLevel)
 	if (bLevel <= 0)
 		return;
 
-	int i = GetAttributeCount();
+	int32_t i = GetAttributeCount();
 
 	if (i == MAX_NORM_ATTR_NUM)
 		sys_err("item attribute overflow!");
 	else
 	{
 		const TItemAttrTable & r = g_map_itemAttr[bApply];
-		long lVal = r.lValues[MIN(4, bLevel - 1)];
+		int32_t lVal = r.lValues[MIN(4, bLevel - 1)];
 
 		if (lVal)
 			SetAttribute(i, bApply, lVal);
 	}
 }
 
-void CItem::PutAttributeWithLevel(BYTE bLevel)
+void CItem::PutAttributeWithLevel(uint8_t bLevel)
 {
-	int iAttributeSet = GetAttributeSetIndex();
+	int32_t iAttributeSet = GetAttributeSetIndex();
 
 	if (iAttributeSet < 0)
 		return;
@@ -156,12 +156,12 @@ void CItem::PutAttributeWithLevel(BYTE bLevel)
 	if (bLevel > ITEM_ATTRIBUTE_MAX_LEVEL)
 		return;
 
-	std::vector<int> avail;
+	std::vector<int32_t> avail;
 
-	int total = 0;
+	int32_t total = 0;
 
 	// 붙일 수 있는 속성 배열을 구축
-	for (int i = 0; i < MAX_APPLY_NUM; ++i)
+	for (int32_t i = 0; i < MAX_APPLY_NUM; ++i)
 	{
 		const TItemAttrTable & r = g_map_itemAttr[i];
 
@@ -173,10 +173,10 @@ void CItem::PutAttributeWithLevel(BYTE bLevel)
 	}
 
 	// 구축된 배열로 확률 계산을 통해 붙일 속성 선정
-	unsigned int prob = number(1, total);
-	int attr_idx = APPLY_NONE;
+	uint32_t prob = number(1, total);
+	int32_t attr_idx = APPLY_NONE;
 
-	for (DWORD i = 0; i < avail.size(); ++i)
+	for (uint32_t i = 0; i < avail.size(); ++i)
 	{
 		const TItemAttrTable & r = g_map_itemAttr[avail[i]];
 
@@ -204,10 +204,10 @@ void CItem::PutAttributeWithLevel(BYTE bLevel)
 	AddAttr(attr_idx, bLevel);
 }
 
-void CItem::PutAttribute(const int * aiAttrPercentTable)
+void CItem::PutAttribute(const int32_t * aiAttrPercentTable)
 {
-	int iAttrLevelPercent = number(1, 100);
-	int i;
+	int32_t iAttrLevelPercent = number(1, 100);
+	int32_t i;
 
 	for (i = 0; i < ITEM_ATTRIBUTE_MAX_LEVEL; ++i)
 	{
@@ -220,9 +220,9 @@ void CItem::PutAttribute(const int * aiAttrPercentTable)
 	PutAttributeWithLevel(i + 1);
 }
 
-void CItem::ChangeAttribute(const int* aiChangeProb)
+void CItem::ChangeAttribute(const int32_t* aiChangeProb)
 {
-	int iAttributeCount = GetAttributeCount();
+	int32_t iAttributeCount = GetAttributeCount();
 
 	ClearAttribute();
 
@@ -236,14 +236,14 @@ void CItem::ChangeAttribute(const int* aiChangeProb)
 		ApplyAddon(pProto->sAddonType);
 	}
 
-	static const int tmpChangeProb[ITEM_ATTRIBUTE_MAX_LEVEL] =
+	static const int32_t tmpChangeProb[ITEM_ATTRIBUTE_MAX_LEVEL] =
 	{
 		0, 10, 40, 35, 15,
 	};
 
-	for (int i = GetAttributeCount(); i < iAttributeCount; ++i)
+	for (int32_t i = GetAttributeCount(); i < iAttributeCount; ++i)
 	{
-		if (aiChangeProb == NULL)
+		if (aiChangeProb == nullptr)
 		{
 			PutAttribute(tmpChangeProb);
 		}
@@ -256,7 +256,7 @@ void CItem::ChangeAttribute(const int* aiChangeProb)
 
 void CItem::AddAttribute()
 {
-	static const int aiItemAddAttributePercent[ITEM_ATTRIBUTE_MAX_LEVEL] = 
+	static const int32_t aiItemAddAttributePercent[ITEM_ATTRIBUTE_MAX_LEVEL] = 
 	{
 		40, 50, 10, 0, 0
 	};
@@ -267,16 +267,16 @@ void CItem::AddAttribute()
 
 void CItem::ClearAttribute()
 {
-	for (int i = 0; i < MAX_NORM_ATTR_NUM; ++i)
+	for (int32_t i = 0; i < MAX_NORM_ATTR_NUM; ++i)
 	{
 		m_aAttr[i].bType = 0;
 		m_aAttr[i].sValue = 0;
 	}
 }
 
-int CItem::GetAttributeCount()
+int32_t CItem::GetAttributeCount()
 {
-	int i;
+	int32_t i;
 
 	for (i = 0; i < MAX_NORM_ATTR_NUM; ++i)
 	{
@@ -287,9 +287,9 @@ int CItem::GetAttributeCount()
 	return i;
 }
 
-int CItem::FindAttribute(BYTE bType)
+int32_t CItem::FindAttribute(uint8_t bType)
 {
-	for (int i = 0; i < MAX_NORM_ATTR_NUM; ++i)
+	for (int32_t i = 0; i < MAX_NORM_ATTR_NUM; ++i)
 	{
 		if (GetAttributeType(i) == bType)
 			return i;
@@ -298,12 +298,12 @@ int CItem::FindAttribute(BYTE bType)
 	return -1;
 }
 
-bool CItem::RemoveAttributeAt(int index)
+bool CItem::RemoveAttributeAt(int32_t index)
 {
 	if (GetAttributeCount() <= index)
 		return false;
 
-	for (int i = index; i < MAX_NORM_ATTR_NUM - 1; ++i)
+	for (int32_t i = index; i < MAX_NORM_ATTR_NUM - 1; ++i)
 	{
 		SetAttribute(i, GetAttributeType(i + 1), GetAttributeValue(i + 1));
 	}
@@ -312,9 +312,9 @@ bool CItem::RemoveAttributeAt(int index)
 	return true;
 }
 
-bool CItem::RemoveAttributeType(BYTE bType)
+bool CItem::RemoveAttributeType(uint8_t bType)
 {
-	int index = FindAttribute(bType);
+	int32_t index = FindAttribute(bType);
 	return index != -1 && RemoveAttributeType(index);
 }
 
@@ -324,7 +324,7 @@ void CItem::SetAttributes(const TPlayerItemAttribute* c_pAttribute)
 	Save();
 }
 
-void CItem::SetAttribute(int i, BYTE bType, short sValue)
+void CItem::SetAttribute(int32_t i, uint8_t bType, int16_t sValue)
 {
 	assert(i < MAX_NORM_ATTR_NUM);
 
@@ -335,7 +335,7 @@ void CItem::SetAttribute(int i, BYTE bType, short sValue)
 
 	if (bType)
 	{
-		const char * pszIP = NULL;
+		const char * pszIP = nullptr;
 
 		if (GetOwner() && GetOwner()->GetDesc())
 			pszIP = GetOwner()->GetDesc()->GetHostName();
@@ -344,7 +344,7 @@ void CItem::SetAttribute(int i, BYTE bType, short sValue)
 	}
 }
 
-void CItem::SetForceAttribute(int i, BYTE bType, short sValue)
+void CItem::SetForceAttribute(int32_t i, uint8_t bType, int16_t sValue)
 {
 	assert(i < ITEM_ATTRIBUTE_MAX_NUM);
 
@@ -355,7 +355,7 @@ void CItem::SetForceAttribute(int i, BYTE bType, short sValue)
 
 	if (bType)
 	{
-		const char * pszIP = NULL;
+		const char * pszIP = nullptr;
 
 		if (GetOwner() && GetOwner()->GetDesc())
 			pszIP = GetOwner()->GetDesc()->GetHostName();
@@ -370,11 +370,11 @@ void CItem::CopyAttributeTo(LPITEM pItem)
 	pItem->SetAttributes(m_aAttr);
 }
 
-int CItem::GetRareAttrCount()
+int32_t CItem::GetRareAttrCount()
 {
-	int ret = 0;
+	int32_t ret = 0;
 
-	for (DWORD dwIdx = ITEM_ATTRIBUTE_RARE_START; dwIdx < ITEM_ATTRIBUTE_RARE_END; dwIdx++)
+	for (uint32_t dwIdx = ITEM_ATTRIBUTE_RARE_START; dwIdx < ITEM_ATTRIBUTE_RARE_END; dwIdx++)
 	{
 		if (m_aAttr[dwIdx].bType != 0)
 			ret++;
@@ -388,9 +388,9 @@ bool CItem::ChangeRareAttribute()
 	if (GetRareAttrCount() == 0)
 		return false;
 
-	int cnt = GetRareAttrCount();
+	int32_t cnt = GetRareAttrCount();
 
-	for (int i = 0; i < cnt; ++i)
+	for (int32_t i = 0; i < cnt; ++i)
 	{
 		m_aAttr[i + ITEM_ATTRIBUTE_RARE_START].bType = 0;
 		m_aAttr[i + ITEM_ATTRIBUTE_RARE_START].sValue = 0;
@@ -401,7 +401,7 @@ bool CItem::ChangeRareAttribute()
 	else
 		LogManager::instance().ItemLog(0, 0, 0, GetID(), "SET_RARE_CHANGE", "", "", GetOriginalVnum());
 
-	for (int i = 0; i < cnt; ++i)
+	for (int32_t i = 0; i < cnt; ++i)
 	{
 		AddRareAttribute();
 	}
@@ -411,18 +411,18 @@ bool CItem::ChangeRareAttribute()
 
 bool CItem::AddRareAttribute()
 {
-	int count = GetRareAttrCount();
+	int32_t count = GetRareAttrCount();
 
 	if (count >= ITEM_ATTRIBUTE_RARE_NUM)
 		return false;
 
-	int pos = count + ITEM_ATTRIBUTE_RARE_START;
+	int32_t pos = count + ITEM_ATTRIBUTE_RARE_START;
 	TPlayerItemAttribute & attr = m_aAttr[pos];
 
-	int nAttrSet = GetAttributeSetIndex();
-	std::vector<int> avail;
+	int32_t nAttrSet = GetAttributeSetIndex();
+	std::vector<int32_t> avail;
 
-	for (int i = 0; i < MAX_APPLY_NUM; ++i)
+	for (int32_t i = 0; i < MAX_APPLY_NUM; ++i)
 	{
 		const TItemAttrTable & r = g_map_itemRare[i];
 
@@ -433,7 +433,7 @@ bool CItem::AddRareAttribute()
 	}
 
 	const TItemAttrTable& r = g_map_itemRare[avail[number(0, avail.size() - 1)]];
-	int nAttrLevel = 5;
+	int32_t nAttrLevel = 5;
 
 	if (nAttrLevel > r.bMaxLevelBySet[nAttrSet])
 		nAttrLevel = r.bMaxLevelBySet[nAttrSet];
@@ -445,7 +445,7 @@ bool CItem::AddRareAttribute()
 
 	Save();
 
-	const char * pszIP = NULL;
+	const char * pszIP = nullptr;
 
 	if (GetOwner() && GetOwner()->GetDesc())
 		pszIP = GetOwner()->GetDesc()->GetHostName();
@@ -454,23 +454,23 @@ bool CItem::AddRareAttribute()
 	return true;
 }
 
-void CItem::AddRareAttribute2(const int * aiAttrPercentTable)
+void CItem::AddRareAttribute2(const int32_t * aiAttrPercentTable)
 {
-	static const int aiItemAddAttributePercent[ITEM_ATTRIBUTE_MAX_LEVEL] =
+	static const int32_t aiItemAddAttributePercent[ITEM_ATTRIBUTE_MAX_LEVEL] =
 	{
 		40, 50, 10, 0, 0
 	};
-	if (aiAttrPercentTable == NULL)
+	if (aiAttrPercentTable == nullptr)
 		aiAttrPercentTable = aiItemAddAttributePercent;
 
 	if (GetRareAttrCount() < MAX_RARE_ATTR_NUM)
 		PutRareAttribute(aiAttrPercentTable);
 }
 
-void CItem::PutRareAttribute(const int * aiAttrPercentTable)
+void CItem::PutRareAttribute(const int32_t * aiAttrPercentTable)
 {
-	int iAttrLevelPercent = number(1, 100);
-	int i;
+	int32_t iAttrLevelPercent = number(1, 100);
+	int32_t i;
 
 	for (i = 0; i < ITEM_ATTRIBUTE_MAX_LEVEL; ++i)
 	{
@@ -483,21 +483,21 @@ void CItem::PutRareAttribute(const int * aiAttrPercentTable)
 	PutRareAttributeWithLevel(i + 1);
 }
 
-void CItem::PutRareAttributeWithLevel(BYTE bLevel)
+void CItem::PutRareAttributeWithLevel(uint8_t bLevel)
 {
-	int iAttributeSet = GetAttributeSetIndex();
+	int32_t iAttributeSet = GetAttributeSetIndex();
 	if (iAttributeSet < 0)
 		return;
 
 	if (bLevel > ITEM_ATTRIBUTE_MAX_LEVEL)
 		return;
 
-	std::vector<int> avail;
+	std::vector<int32_t> avail;
 
-	int total = 0;
+	int32_t total = 0;
 
 	
-	for (int i = 0; i < MAX_APPLY_NUM; ++i)
+	for (int32_t i = 0; i < MAX_APPLY_NUM; ++i)
 	{
 		const TItemAttrTable & r = g_map_itemRare[i];
 
@@ -509,10 +509,10 @@ void CItem::PutRareAttributeWithLevel(BYTE bLevel)
 	}
 
 	
-	unsigned int prob = number(1, total);
-	int attr_idx = APPLY_NONE;
+	uint32_t prob = number(1, total);
+	int32_t attr_idx = APPLY_NONE;
 
-	for (DWORD i = 0; i < avail.size(); ++i)
+	for (uint32_t i = 0; i < avail.size(); ++i)
 	{
 		const TItemAttrTable & r = g_map_itemRare[avail[i]];
 
@@ -540,7 +540,7 @@ void CItem::PutRareAttributeWithLevel(BYTE bLevel)
 	AddRareAttr(attr_idx, bLevel);
 }
 
-void CItem::AddRareAttr(BYTE bApply, BYTE bLevel)
+void CItem::AddRareAttr(uint8_t bApply, uint8_t bLevel)
 {
 	if (HasRareAttr(bApply))
 		return;
@@ -548,14 +548,14 @@ void CItem::AddRareAttr(BYTE bApply, BYTE bLevel)
 	if (bLevel <= 0)
 		return;
 
-	int i = ITEM_ATTRIBUTE_RARE_START + GetRareAttrCount();
+	int32_t i = ITEM_ATTRIBUTE_RARE_START + GetRareAttrCount();
 
 	if (i == ITEM_ATTRIBUTE_RARE_END)
 		sys_err("item rare attribute overflow!");
 	else
 	{
 		const TItemAttrTable & r = g_map_itemRare[bApply];
-		long lVal = r.lValues[MIN(4, bLevel - 1)];
+		int32_t lVal = r.lValues[MIN(4, bLevel - 1)];
 
 		if (lVal)
 			SetForceAttribute(i, bApply, lVal);

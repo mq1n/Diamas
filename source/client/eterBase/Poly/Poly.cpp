@@ -14,28 +14,28 @@ double _random()
     return rand() / (RAND_MAX + 1.0);
 }
 
-void CPoly::SetRandom(int iRandomType)
+void CPoly::SetRandom(int32_t iRandomType)
 {
 	m_iRandomType = iRandomType;
 }
 
-int CPoly::my_irandom(double start, double end)
+int32_t CPoly::my_irandom(double start, double end)
 {
 	switch (m_iRandomType)
 	{
 		case RANDOM_TYPE_FORCE_MIN:
-			return int(start);
+			return int32_t(start);
 			break;
 		case RANDOM_TYPE_FORCE_MAX:
-			return int(end);
+			return int32_t(end);
 			break;
 	}
 
     // Make range as inclusive-exclusive
-    int is = int(start + 0.5);
-    int ie = int(end - start + 0.5) + 1;
+    int32_t is = int32_t(start + 0.5);
+    int32_t ie = int32_t(end - start + 0.5) + 1;
 
-    return int(_random() * ie + is);
+    return int32_t(_random() * ie + is);
 }
 
 double CPoly::my_frandom(double start, double end)
@@ -67,9 +67,9 @@ void CPoly::SetStr(const string & str)
 
 float CPoly::Eval()
 {
-    int stNow;
+    int32_t stNow;
     double save[POLY_MAXSTACK],t;
-    int iSp=0;
+    int32_t iSp=0;
     if (ErrorOccur) 
     {
 	/*THROW(new CEvalException("Evaluate Error"));*/ 
@@ -77,9 +77,9 @@ float CPoly::Eval()
     }
 
     //TEST
-    //list<int>::iterator pos = tokenBase.begin();
+    //list<int32_t>::iterator pos = tokenBase.begin();
     //list<double>::iterator posn = numBase.begin();
-    vector<int>::iterator pos = tokenBase.begin();
+    vector<int32_t>::iterator pos = tokenBase.begin();
     vector<double>::iterator posn = numBase.begin();
     while (pos != tokenBase.end())
     {
@@ -231,7 +231,7 @@ float CPoly::Eval()
     return float(save[iSp-1]);
 }
 
-int CPoly::Analyze(const char * pszStr)
+int32_t CPoly::Analyze(const char * pszStr)
 {
     if (pszStr)
 	SetStr(pszStr);
@@ -257,7 +257,7 @@ int CPoly::Analyze(const char * pszStr)
 
 void CPoly::Clear()
 {
-    int i;
+    int32_t i;
     //while (!tokenBase.IsEmpty()) listBase.RemoveTail();
     //while (!numBase.IsEmpty()) numBase.RemoveTail();
     tokenBase.clear();
@@ -266,7 +266,7 @@ void CPoly::Clear()
     for (i = 0;i < STSize; ++i)
     {
 	if (lSymbol[i]) delete lSymbol[i];
-	lSymbol[i]=NULL;
+	lSymbol[i]=nullptr;
     }
     //lSymbol.FreeExtra();
     lSymbol.clear();
@@ -277,7 +277,7 @@ void CPoly::Clear()
 
 void CPoly::expr() 
 {
-    int t;
+    int32_t t;
 
     switch (iLookAhead)
     {
@@ -317,9 +317,9 @@ void CPoly::error()
     ErrorOccur=true;
 }
 
-int CPoly::lexan()
+int32_t CPoly::lexan()
 {
-    int t;
+    int32_t t;
     double tt;
 
     while (uiLookPos < strData.size())
@@ -380,7 +380,7 @@ int CPoly::lexan()
 
 void CPoly::term()
 {
-    int t;
+    int32_t t;
     factor();
     while (!ErrorOccur)
     {
@@ -402,7 +402,7 @@ void CPoly::term()
 
 void CPoly::factor()
 {
-    int t;
+    int32_t t;
     expo();
     while (!ErrorOccur)
     {
@@ -422,7 +422,7 @@ void CPoly::factor()
 
 void CPoly::expo()
 {
-    int t;
+    int32_t t;
     switch (iLookAhead)
     {
 	case '(':
@@ -430,7 +430,7 @@ void CPoly::expo()
 	case POLY_NUM:
 	    emit(POLY_NUM, iToken); match(POLY_NUM); break;
 	case POLY_ID:
-	    emit(POLY_ID,(int)/*FindIndex*/(iToken)); match(POLY_ID); break;
+	    emit(POLY_ID,(int32_t)/*FindIndex*/(iToken)); match(POLY_ID); break;
 	case POLY_ROOT:
 	case POLY_SIN:
 	case POLY_COT:
@@ -462,12 +462,12 @@ void CPoly::expo()
     }
 }
 
-void CPoly::match(int t)
+void CPoly::match(int32_t t)
 {
     if (iLookAhead==t) iLookAhead=lexan(); else error();
 }
 
-void CPoly::emit(int t, int tval)
+void CPoly::emit(int32_t t, int32_t tval)
 {
     switch (t)
     {
@@ -523,9 +523,9 @@ void CPoly::emit(int t, int tval)
     }
 }
 
-int CPoly::find(const string & s)
+int32_t CPoly::find(const string & s)
 {
-    int l, m, r;
+    int32_t l, m, r;
 
     l = 0;
     r = STSize - 1;
@@ -544,9 +544,9 @@ int CPoly::find(const string & s)
     return -1;
 }
 
-int CPoly::insert(const string & s, int tok)
+int32_t CPoly::insert(const string & s, int32_t tok)
 {
-    int i;
+    int32_t i;
     bool bAdded=false;
 
     lSymbol.push_back(new CSymTable(tok,s));
@@ -568,23 +568,23 @@ int CPoly::insert(const string & s, int tok)
     return STSize-1;
 }
 
-int CPoly::SetVar(const string & strName, double dVar)
+int32_t CPoly::SetVar(const string & strName, double dVar)
 {
 
     if (ErrorOccur) return false;
-    int index=find(strName);
+    int32_t index=find(strName);
     if (index==-1) return false;
     CSymTable* stVar = lSymbol[(/*FindIndex*/(index))];
     stVar->dVal=dVar;
     return true;
 }
 
-int CPoly::GetVarCount()
+int32_t CPoly::GetVarCount()
 {
 	return lSymbol.size() - MathSymbolCount;
 }
 
-const char * CPoly::GetVarName(unsigned int dwIndex)
+const char * CPoly::GetVarName(uint32_t dwIndex)
 {
 	assert(dwIndex + MathSymbolCount < lSymbol.size());
 	return lSymbol[dwIndex + MathSymbolCount]->strlex.c_str();

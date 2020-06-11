@@ -84,7 +84,7 @@ namespace script
 			
 		private:
 			void                SetError(const char *str);
-			bool                GetArg(const char * c_atr_base, int arg_len, TArgList & argList);
+			bool                GetArg(const char * c_atr_base, int32_t arg_len, TArgList & argList);
 			
 			std::string         m_stError;
 			std::list<TCmd>     m_cmdList;

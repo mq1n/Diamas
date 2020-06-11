@@ -19,17 +19,17 @@ extern ACMD(do_in_game_mall);
 
 namespace quest
 {
-	int game_set_event_flag(lua_State* L)
+	int32_t game_set_event_flag(lua_State* L)
 	{
 		CQuestManager & q = CQuestManager::instance();
 
 		if (lua_isstring(L,1) && lua_isnumber(L, 2))
-			q.RequestSetEventFlag(lua_tostring(L,1), (int)lua_tonumber(L,2));
+			q.RequestSetEventFlag(lua_tostring(L,1), (int32_t)lua_tonumber(L,2));
 
 		return 0;
 	}
 
-	int game_get_event_flag(lua_State* L)
+	int32_t game_get_event_flag(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 
@@ -41,40 +41,40 @@ namespace quest
 		return 1;
 	}
 
-	int game_request_make_guild(lua_State* L)
+	int32_t game_request_make_guild(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 		LPDESC d = q.GetCurrentCharacterPtr()->GetDesc();
 		if (d)
 		{
-			BYTE header = HEADER_GC_REQUEST_MAKE_GUILD;
+			uint8_t header = HEADER_GC_REQUEST_MAKE_GUILD;
 			d->Packet(&header, 1);
 		}
 		return 0;
 	}
 
-	int game_get_safebox_level(lua_State* L)
+	int32_t game_get_safebox_level(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 		lua_pushnumber(L, q.GetCurrentCharacterPtr()->GetSafeboxSize()/SAFEBOX_PAGE_SIZE);
 		return 1;
 	}
 
-	int game_set_safebox_level(lua_State* L)
+	int32_t game_set_safebox_level(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 
-		//q.GetCurrentCharacterPtr()->ChangeSafeboxSize(3*(int)lua_tonumber(L,-1));
+		//q.GetCurrentCharacterPtr()->ChangeSafeboxSize(3*(int32_t)lua_tonumber(L,-1));
 		TSafeboxChangeSizePacket p;
 		p.dwID = q.GetCurrentCharacterPtr()->GetDesc()->GetAccountTable().id;
-		p.bSize = (int)lua_tonumber(L,-1);
+		p.bSize = (int32_t)lua_tonumber(L,-1);
 		db_clientdesc->DBPacket(HEADER_GD_SAFEBOX_CHANGE_SIZE,  q.GetCurrentCharacterPtr()->GetDesc()->GetHandle(), &p, sizeof(p));
 
-		q.GetCurrentCharacterPtr()->SetSafeboxSize(SAFEBOX_PAGE_SIZE * (int)lua_tonumber(L,-1));
+		q.GetCurrentCharacterPtr()->SetSafeboxSize(SAFEBOX_PAGE_SIZE * (int32_t)lua_tonumber(L,-1));
 		return 0;
 	}
 
-	int game_open_safebox(lua_State* /*L*/)
+	int32_t game_open_safebox(lua_State* /*L*/)
 	{
 		CQuestManager& q = CQuestManager::instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
@@ -83,7 +83,7 @@ namespace quest
 		return 0;
 	}
 
-	int game_open_mall(lua_State* /*L*/)
+	int32_t game_open_mall(lua_State* /*L*/)
 	{
 		CQuestManager& q = CQuestManager::instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
@@ -92,17 +92,17 @@ namespace quest
 		return 0;
 	}
 
-	int game_drop_item(lua_State* L)
+	int32_t game_drop_item(lua_State* L)
 	{
 		//
 		// Syntax: game.drop_item(50050, 1)
 		//
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
-		DWORD item_vnum = (DWORD) lua_tonumber(L, 1);
-		int count = (int) lua_tonumber(L, 2);
-		long x = ch->GetX();
-		long y = ch->GetY();
+		uint32_t item_vnum = (uint32_t) lua_tonumber(L, 1);
+		int32_t count = (int32_t) lua_tonumber(L, 2);
+		int32_t x = ch->GetX();
+		int32_t y = ch->GetY();
 
 		LPITEM item = ITEM_MANAGER::instance().CreateItem(item_vnum, count);
 
@@ -122,32 +122,32 @@ namespace quest
 		return 0;
 	}
 
-	int game_drop_item_with_ownership(lua_State* L)
+	int32_t game_drop_item_with_ownership(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
-		LPITEM item = NULL;
+		LPITEM item = nullptr;
 		switch (lua_gettop(L))
 		{
 		case 1:
-			item = ITEM_MANAGER::instance().CreateItem((DWORD) lua_tonumber(L, 1));
+			item = ITEM_MANAGER::instance().CreateItem((uint32_t) lua_tonumber(L, 1));
 			break;
 		case 2:
 		case 3:
-			item = ITEM_MANAGER::instance().CreateItem((DWORD) lua_tonumber(L, 1), (int) lua_tonumber(L, 2));
+			item = ITEM_MANAGER::instance().CreateItem((uint32_t) lua_tonumber(L, 1), (int32_t) lua_tonumber(L, 2));
 			break;
 		default:
 			return 0;
 		}
 
-		if ( item == NULL )
+		if ( item == nullptr )
 		{
 			return 0;
 		}
 
 		if (lua_isnumber(L, 3))
 		{
-			int sec = (int) lua_tonumber(L, 3);
+			int32_t sec = (int32_t) lua_tonumber(L, 3);
 			if (sec <= 0)
 			{
 				item->SetOwnership( ch );
@@ -170,11 +170,11 @@ namespace quest
 		return 0;
 	}
 
-	int game_web_mall(lua_State* L)
+	int32_t game_web_mall(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
-		if ( ch != NULL )
+		if ( ch != nullptr )
 		{
 			do_in_game_mall(ch, const_cast<char*>(""), 0, 0);
 		}
@@ -196,7 +196,7 @@ namespace quest
 			{ "drop_item_with_ownership",	game_drop_item_with_ownership	},
 			{ "open_web_mall",				game_web_mall					},
 
-			{ NULL,					NULL				}
+			{ nullptr,					nullptr				}
 		};
 
 		CQuestManager::instance().AddLuaFunctionTable("game", game_functions);

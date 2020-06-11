@@ -23,7 +23,7 @@ endif()
 file (STRINGS "VERSION.txt" MAJOR_VERSION)
 
 # Build options
-option(BUILD_UTILITIES "Build the common utilities" ON)
+option(BUILD_UTILITIES "Build the common utilities" OFF)
 option(BUILD_CLIENT "Build the client binaries" ON)
 option(BUILD_SERVER "Build the server binaries" ON)
 option(BUILD_TOOLS "Build the tool binaries" OFF)

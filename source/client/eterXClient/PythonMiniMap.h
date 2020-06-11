@@ -53,7 +53,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		void Show();
 		void Hide();
 
-		bool GetPickedInstanceInfo(float fScreenX, float fScreenY, std::string & rReturnName, float * pReturnPosX, float * pReturnPosY, DWORD * pdwTextColor);
+		bool GetPickedInstanceInfo(float fScreenX, float fScreenY, std::string & rReturnName, float * pReturnPosX, float * pReturnPosY, uint32_t * pdwTextColor);
 
 		// Atlas
 		bool LoadAtlas();
@@ -62,16 +62,16 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		void ShowAtlas();
 		void HideAtlas();
 
-		bool GetAtlasInfo(float fScreenX, float fScreenY, std::string & rReturnString, float * pReturnPosX, float * pReturnPosY, DWORD * pdwTextColor, DWORD * pdwGuildID);
+		bool GetAtlasInfo(float fScreenX, float fScreenY, std::string & rReturnString, float * pReturnPosX, float * pReturnPosY, uint32_t * pdwTextColor, uint32_t * pdwGuildID);
 		bool GetAtlasSize(float * pfSizeX, float * pfSizeY);
 
-		void AddObserver(DWORD dwVID, float fSrcX, float fSrcY);
-		void MoveObserver(DWORD dwVID, float fDstX, float fDstY);
-		void RemoveObserver(DWORD dwVID);
+		void AddObserver(uint32_t dwVID, float fSrcX, float fSrcY);
+		void MoveObserver(uint32_t dwVID, float fDstX, float fDstY);
+		void RemoveObserver(uint32_t dwVID);
 
 		// WayPoint
-		void AddWayPoint(BYTE byType, DWORD dwID, float fX, float fY, std::string strText, DWORD dwChrVID=0);
-		void RemoveWayPoint(DWORD dwID);
+		void AddWayPoint(uint8_t byType, uint32_t dwID, float fX, float fY, std::string strText, uint32_t dwChrVID=0);
+		void RemoveWayPoint(uint32_t dwID);
 
 		// SignalPoint
 		void AddSignalPoint(float fX, float fY);
@@ -80,56 +80,56 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		void RegisterAtlasWindow(PyObject* poHandler);
 		void UnregisterAtlasWindow();
 		void OpenAtlasWindow();
-		void SetAtlasCenterPosition(int x, int y);
+		void SetAtlasCenterPosition(int32_t x, int32_t y);
 
 		// NPC List
 		void ClearAtlasMarkInfo();
-		void RegisterAtlasMark(BYTE byType, const char * c_szName, long lx, long ly);
+		void RegisterAtlasMark(uint8_t byType, const char * c_szName, int32_t lx, int32_t ly);
 
 		// Guild
 		void ClearGuildArea();
-		void RegisterGuildArea(DWORD dwID, DWORD dwGuildID, long x, long y, long width, long height);
-		DWORD GetGuildAreaID(DWORD x, DWORD y);
+		void RegisterGuildArea(uint32_t dwID, uint32_t dwGuildID, int32_t x, int32_t y, int32_t width, int32_t height);
+		uint32_t GetGuildAreaID(uint32_t x, uint32_t y);
 
 		// Target
-		void CreateTarget(int iID, const char * c_szName);
-		void CreateTarget(int iID, const char * c_szName, DWORD dwVID);
-		void UpdateTarget(int iID, int ix, int iy);
-		void DeleteTarget(int iID);
+		void CreateTarget(int32_t iID, const char * c_szName);
+		void CreateTarget(int32_t iID, const char * c_szName, uint32_t dwVID);
+		void UpdateTarget(int32_t iID, int32_t ix, int32_t iy);
+		void DeleteTarget(int32_t iID);
 
 	protected:
 		void __Initialize();
 		void __SetPosition();
 		void __LoadAtlasMarkInfo();
 
-		void __RenderWayPointMark(int ixCenter, int iyCenter);
-		void __RenderMiniWayPointMark(int ixCenter, int iyCenter);
-		void __RenderTargetMark(int ixCenter, int iyCenter);
+		void __RenderWayPointMark(int32_t ixCenter, int32_t iyCenter);
+		void __RenderMiniWayPointMark(int32_t ixCenter, int32_t iyCenter);
+		void __RenderTargetMark(int32_t ixCenter, int32_t iyCenter);
 
-		void __GlobalPositionToAtlasPosition(long lx, long ly, float * pfx, float * pfy);
+		void __GlobalPositionToAtlasPosition(int32_t lx, int32_t ly, float * pfx, float * pfy);
 
 	protected:
 		// Atlas
 		typedef struct 
 		{
-			BYTE m_byType;
-			DWORD m_dwID; // For WayPoint
+			uint8_t m_byType;
+			uint32_t m_dwID; // For WayPoint
 			float m_fX;
 			float m_fY;
 			float m_fScreenX;
 			float m_fScreenY;
 			float m_fMiniMapX;
 			float m_fMiniMapY;
-			DWORD m_dwChrVID;
+			uint32_t m_dwChrVID;
 			std::string m_strText;
 		} TAtlasMarkInfo;
 
 		// GuildArea
 		typedef struct
 		{
-			DWORD dwGuildID;
-			long lx, ly;
-			long lwidth, lheight;
+			uint32_t dwGuildID;
+			int32_t lx, ly;
+			int32_t lwidth, lheight;
 
 			float fsxRender, fsyRender;
 			float fexRender, feyRender;
@@ -144,8 +144,8 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 			float fDstX;
 			float fDstY;
 
-			DWORD dwSrcTime;
-			DWORD dwDstTime;
+			uint32_t dwSrcTime;
+			uint32_t dwDstTime;
 		};
 
 		// 캐릭터 리스트
@@ -153,15 +153,15 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		{
 			float	m_fX;
 			float	m_fY;
-			UINT	m_eNameColor;
+			uint32_t	m_eNameColor;
 		} TMarkPosition;
 
 		typedef std::vector<TMarkPosition>				TInstanceMarkPositionVector;
 		typedef TInstanceMarkPositionVector::iterator	TInstancePositionVectorIterator;
 
 	protected:
-		bool __GetWayPoint(DWORD dwID, TAtlasMarkInfo ** ppkInfo);
-		void __UpdateWayPoint(TAtlasMarkInfo * pkInfo, int ix, int iy);
+		bool __GetWayPoint(uint32_t dwID, TAtlasMarkInfo ** ppkInfo);
+		void __UpdateWayPoint(TAtlasMarkInfo * pkInfo, int32_t ix, int32_t iy);
 
 	protected:
 		float							m_fWidth;
@@ -196,7 +196,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		TInstanceMarkPositionVector		m_NPCPositionVector;
 		TInstanceMarkPositionVector		m_MonsterPositionVector;
 		TInstanceMarkPositionVector		m_WarpPositionVector;
-		std::map<DWORD, SObserver>		m_kMap_dwVID_kObserver;
+		std::map<uint32_t, SObserver>		m_kMap_dwVID_kObserver;
 
 		bool							m_bAtlas;
 		bool							m_bShow;
@@ -216,8 +216,8 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		float							m_fAtlasScreenX;
 		float							m_fAtlasScreenY;
 
-		DWORD							m_dwAtlasBaseX;
-		DWORD							m_dwAtlasBaseY;
+		uint32_t							m_dwAtlasBaseX;
+		uint32_t							m_dwAtlasBaseY;
 
 		float							m_fAtlasMaxX;
 		float							m_fAtlasMaxY;
@@ -245,7 +245,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		struct TSignalPoint
 		{
 			D3DXVECTOR2 v2Pos;
-			unsigned int id;
+			uint32_t id;
 		};
 		std::vector<TSignalPoint>				m_SignalPointVector;
 

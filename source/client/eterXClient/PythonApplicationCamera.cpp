@@ -147,7 +147,7 @@ void CPythonApplication::GetCamera(float * Distance, float * Pitch, float * Rota
 	*DestinationHeight	= pCurrentCamera->GetTarget().z;
 }
 
-void CPythonApplication::RotateCamera(int iDirection)
+void CPythonApplication::RotateCamera(int32_t iDirection)
 {
 	if (IsLockCurrentCamera())
 		return;
@@ -156,7 +156,7 @@ void CPythonApplication::RotateCamera(int iDirection)
 	m_fRotationSpeed = fDegree;
 }
 
-void CPythonApplication::PitchCamera(int iDirection)
+void CPythonApplication::PitchCamera(int32_t iDirection)
 {
 	if (IsLockCurrentCamera())
 		return;
@@ -165,7 +165,7 @@ void CPythonApplication::PitchCamera(int iDirection)
 	m_fPitchSpeed = fDegree;
 }
 
-void CPythonApplication::ZoomCamera(int iDirection)
+void CPythonApplication::ZoomCamera(int32_t iDirection)
 {
 	if (IsLockCurrentCamera())
 		return;
@@ -174,7 +174,7 @@ void CPythonApplication::ZoomCamera(int iDirection)
 	m_fZoomSpeed = fRatio;
 }
 
-void CPythonApplication::MovieRotateCamera(int iDirection)
+void CPythonApplication::MovieRotateCamera(int32_t iDirection)
 {
 	if (IsLockCurrentCamera())
 		return;
@@ -191,7 +191,7 @@ void CPythonApplication::MovieRotateCamera(int iDirection)
 	m_fRotationSpeed = fDegree;
 }
 
-void CPythonApplication::MoviePitchCamera(int iDirection)
+void CPythonApplication::MoviePitchCamera(int32_t iDirection)
 {
 	if (IsLockCurrentCamera())
 		return;
@@ -208,7 +208,7 @@ void CPythonApplication::MoviePitchCamera(int iDirection)
 	m_fPitchSpeed = fDegree;
 }
 
-void CPythonApplication::MovieZoomCamera(int iDirection)
+void CPythonApplication::MovieZoomCamera(int32_t iDirection)
 {
 	if (IsLockCurrentCamera())
 		return;
@@ -366,15 +366,15 @@ void CPythonApplication::SaveCameraSetting(const char * c_szFileName)
 	PrintfTabs(File, 0, "CameraSetting %f %f %f\n", CameraSetting.fZoom, CameraSetting.fPitch, CameraSetting.fRotation);
 	PrintfTabs(File, 0, "CmrPos %f %f %f\n", CameraSetting.kCmrPos.m_fUpDir, CameraSetting.kCmrPos.m_fViewDir, CameraSetting.kCmrPos.m_fCrossDir);
 	PrintfTabs(File, 0, "Line \"x;%d|y;%d|z;%d|distance;%d|pitch;%d|rot;%d|up;%d|view;%d|cross;%d\"\n",
-												int(CameraSetting.v3CenterPosition.x),
-												int(CameraSetting.v3CenterPosition.y),
-												int(CameraSetting.v3CenterPosition.z),
-												int(CameraSetting.fZoom),
-												int(CameraSetting.fPitch),
-												int(CameraSetting.fRotation),
-												int(CameraSetting.kCmrPos.m_fUpDir),
-												int(CameraSetting.kCmrPos.m_fViewDir),
-												int(CameraSetting.kCmrPos.m_fCrossDir));
+												int32_t(CameraSetting.v3CenterPosition.x),
+												int32_t(CameraSetting.v3CenterPosition.y),
+												int32_t(CameraSetting.v3CenterPosition.z),
+												int32_t(CameraSetting.fZoom),
+												int32_t(CameraSetting.fPitch),
+												int32_t(CameraSetting.fRotation),
+												int32_t(CameraSetting.kCmrPos.m_fUpDir),
+												int32_t(CameraSetting.kCmrPos.m_fViewDir),
+												int32_t(CameraSetting.kCmrPos.m_fCrossDir));
 
 	fclose(File);
 }

@@ -3,7 +3,7 @@
 #include "Packet.h"
 
 CGuildMarkUploader::CGuildMarkUploader()
- : m_pbySymbolBuf(NULL)
+ : m_pbySymbolBuf(nullptr)
 {
 	SetRecvBufferSize(1024);
 	SetSendBufferSize(1024);
@@ -52,9 +52,9 @@ bool CGuildMarkUploader::__Save(const char* c_szFileName)
 
 	ilConvertImage(IL_BGRA, IL_BYTE);
 
-	UINT uColCount = CGuildMarkImage::MARK_COL_COUNT;
-	UINT uCol = m_dwGuildID % uColCount;
-	UINT uRow = m_dwGuildID / uColCount;
+	uint32_t uColCount = CGuildMarkImage::MARK_COL_COUNT;
+	uint32_t uCol = m_dwGuildID % uColCount;
+	uint32_t uRow = m_dwGuildID / uColCount;
 
 	ilSetPixels(uCol*SGuildMark::WIDTH, uRow*SGuildMark::HEIGHT, 0, SGuildMark::WIDTH, SGuildMark::HEIGHT, 1, IL_BGRA, IL_BYTE, (ILvoid*)m_kMark.m_apxBuf);
 
@@ -65,7 +65,7 @@ bool CGuildMarkUploader::__Save(const char* c_szFileName)
 	return true;
 }
 
-bool CGuildMarkUploader::__Load(const char* c_szFileName, UINT* peError)
+bool CGuildMarkUploader::__Load(const char* c_szFileName, uint32_t* peError)
 {
 	ILuint uImg;
 	ilGenImages(1, &uImg);
@@ -99,7 +99,7 @@ bool CGuildMarkUploader::__Load(const char* c_szFileName, UINT* peError)
 	return true;
 }
 
-bool CGuildMarkUploader::__LoadSymbol(const char* c_szFileName, UINT* peError)
+bool CGuildMarkUploader::__LoadSymbol(const char* c_szFileName, uint32_t* peError)
 {
 	//	For Check Image
 	ILuint uImg;
@@ -137,7 +137,7 @@ bool CGuildMarkUploader::__LoadSymbol(const char* c_szFileName, UINT* peError)
 	m_dwSymbolBufSize = ftell(file);
 	fseek(file, 0, SEEK_SET);
 
-	m_pbySymbolBuf = new BYTE [m_dwSymbolBufSize];
+	m_pbySymbolBuf = new uint8_t [m_dwSymbolBufSize];
 	fread(m_pbySymbolBuf, m_dwSymbolBufSize, 1, file);
 
 	fclose(file);
@@ -148,7 +148,7 @@ bool CGuildMarkUploader::__LoadSymbol(const char* c_szFileName, UINT* peError)
 	return true;
 }
 
-bool CGuildMarkUploader::Connect(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey, DWORD dwGuildID, const char* c_szFileName, UINT* peError)
+bool CGuildMarkUploader::Connect(const CNetworkAddress& c_rkNetAddr, uint32_t dwHandle, uint32_t dwRandomKey, uint32_t dwGuildID, const char* c_szFileName, uint32_t* peError)
 {
 	__OfflineState_Set();
 	SetRecvBufferSize(1024);
@@ -174,7 +174,7 @@ bool CGuildMarkUploader::Connect(const CNetworkAddress& c_rkNetAddr, DWORD dwHan
 	return true;
 }
 
-bool CGuildMarkUploader::ConnectToSendSymbol(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey, DWORD dwGuildID, const char* c_szFileName, UINT* peError)
+bool CGuildMarkUploader::ConnectToSendSymbol(const CNetworkAddress& c_rkNetAddr, uint32_t dwHandle, uint32_t dwRandomKey, uint32_t dwGuildID, const char* c_szFileName, uint32_t* peError)
 {
 	__OfflineState_Set();
 	SetRecvBufferSize(1024);
@@ -242,7 +242,7 @@ void CGuildMarkUploader::__Inialize()
 	}
 
 	m_dwSymbolBufSize = 0;
-	m_pbySymbolBuf = NULL;
+	m_pbySymbolBuf = nullptr;
 }
 
 bool CGuildMarkUploader::__StateProcess()
@@ -426,8 +426,8 @@ bool CGuildMarkUploader::__LoginState_RecvKeyAgreement()
 	{
 		// Key agreement 성공, 응답 전송
 		packetToSend.bHeader = HEADER_CG_KEY_AGREEMENT;
-		packetToSend.wAgreedLength = (WORD)agreedLength;
-		packetToSend.wDataLength = (WORD)dataLength;
+		packetToSend.wAgreedLength = (uint16_t)agreedLength;
+		packetToSend.wDataLength = (uint16_t)dataLength;
 
 		if (!Send(sizeof(packetToSend), &packetToSend))
 		{
@@ -461,9 +461,9 @@ bool CGuildMarkUploader::__LoginState_RecvKeyAgreementCompleted()
 }
 #endif // _IMPROVED_PACKET_ENCRYPTION_
 
-bool CGuildMarkUploader::__AnalyzePacket(UINT uHeader, UINT uPacketSize, bool (CGuildMarkUploader::*pfnDispatchPacket)())
+bool CGuildMarkUploader::__AnalyzePacket(uint32_t uHeader, uint32_t uPacketSize, bool (CGuildMarkUploader::*pfnDispatchPacket)())
 {
-	BYTE bHeader;
+	uint8_t bHeader;
 	if (!Peek(sizeof(bHeader), &bHeader))
 		return true;
 

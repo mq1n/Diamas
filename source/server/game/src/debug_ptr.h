@@ -11,7 +11,7 @@
 template<typename T>
 class DebugPtr {
 public:
-	DebugPtr() : p_(NULL), age_(0) {}
+	DebugPtr() : p_(nullptr), age_(0) {}
 	DebugPtr(T* p) : p_(p) {
 		age_ = DebugAllocator::RetrieveAge(p_);
 	}
@@ -55,24 +55,24 @@ public:
 	}
 
 	bool operator!() const {
-		return (Get() == NULL);
+		return (Get() == nullptr);
 	}
 
 private:
 	T* GetVerified() const {
 		T* p = p_;
-		if (p != NULL) {
+		if (p != nullptr) {
 			// Quick test first
 			size_t age = *(reinterpret_cast<size_t*>(p) - 1);
 			if (age != age_) {
-				if (DebugAllocator::Verify(p, age_) != NULL) {
+				if (DebugAllocator::Verify(p, age_) != nullptr) {
 					// Age header corrupted
 					DebugAllocator::LogBoundaryCorruption(p, age);
 				}
 				// Make it crash immediately
-				int* no_way = NULL;
+				int32_t* no_way = nullptr;
 				*no_way = 0;
-				//p = NULL;
+				//p = nullptr;
 			}
 		}
 		return p;

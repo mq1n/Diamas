@@ -15,10 +15,10 @@
 // affect가 가장 마지막에 로드되어 LoadAffect에서 호출함.
 void CHARACTER::DragonSoul_Initialize()
 {
-	for (int i = INVENTORY_MAX_NUM + WEAR_MAX_NUM; i < DRAGON_SOUL_EQUIP_SLOT_END; i++)
+	for (int32_t i = INVENTORY_MAX_NUM + WEAR_MAX_NUM; i < DRAGON_SOUL_EQUIP_SLOT_END; i++)
 	{
 		LPITEM pItem = GetItem(TItemPos(INVENTORY, i));
-		if (NULL != pItem)
+		if (nullptr != pItem)
 			pItem->SetSocket(ITEM_SOCKET_DRAGON_SOUL_ACTIVE_IDX, 0);
 	}
 	
@@ -32,7 +32,7 @@ void CHARACTER::DragonSoul_Initialize()
 	}
 }
 
-int CHARACTER::DragonSoul_GetActiveDeck() const
+int32_t CHARACTER::DragonSoul_GetActiveDeck() const
 {
 	return m_pointsInstant.iDragonSoulActiveDeck;
 }
@@ -44,12 +44,12 @@ bool CHARACTER::DragonSoul_IsDeckActivated() const
 
 bool CHARACTER::DragonSoul_IsQualified() const
 {
-	return FindAffect(AFFECT_DRAGON_SOUL_QUALIFIED) != NULL;
+	return FindAffect(AFFECT_DRAGON_SOUL_QUALIFIED) != nullptr;
 }
 
 void CHARACTER::DragonSoul_GiveQualification()
 {
-	if(NULL == FindAffect(AFFECT_DRAGON_SOUL_QUALIFIED))
+	if(nullptr == FindAffect(AFFECT_DRAGON_SOUL_QUALIFIED))
 	{
 		LogManager::instance().CharLog(this, 0, "DS_QUALIFIED", "");
 	}
@@ -59,7 +59,7 @@ void CHARACTER::DragonSoul_GiveQualification()
 	//PointChange(POINT_DRAGON_SOUL_IS_QUALIFIED, 1 - GetPoint(POINT_DRAGON_SOUL_IS_QUALIFIED));
 }
 
-bool CHARACTER::DragonSoul_ActivateDeck(int deck_idx)
+bool CHARACTER::DragonSoul_ActivateDeck(int32_t deck_idx)
 {
 	if (deck_idx < DRAGON_SOUL_DECK_0 || deck_idx >= DRAGON_SOUL_DECK_MAX_NUM)
 	{
@@ -81,11 +81,11 @@ bool CHARACTER::DragonSoul_ActivateDeck(int deck_idx)
 
 	m_pointsInstant.iDragonSoulActiveDeck = deck_idx;
 
-	for (int i = DRAGON_SOUL_EQUIP_SLOT_START + DS_SLOT_MAX * deck_idx; 
+	for (int32_t i = DRAGON_SOUL_EQUIP_SLOT_START + DS_SLOT_MAX * deck_idx; 
 		i < DRAGON_SOUL_EQUIP_SLOT_START + DS_SLOT_MAX * (deck_idx + 1); i++)
 	{
 		LPITEM pItem = GetInventoryItem(i);
-		if (NULL != pItem)
+		if (nullptr != pItem)
 			DSManager::instance().ActivateDragonSoul(pItem);
 	}
 	return true;
@@ -93,7 +93,7 @@ bool CHARACTER::DragonSoul_ActivateDeck(int deck_idx)
 
 void CHARACTER::DragonSoul_DeactivateAll()
 {
-	for (int i = DRAGON_SOUL_EQUIP_SLOT_START; i < DRAGON_SOUL_EQUIP_SLOT_END; i++)
+	for (int32_t i = DRAGON_SOUL_EQUIP_SLOT_START; i < DRAGON_SOUL_EQUIP_SLOT_END; i++)
 	{
 		DSManager::instance().DeactivateDragonSoul(GetInventoryItem(i), true);
 	}
@@ -104,7 +104,7 @@ void CHARACTER::DragonSoul_DeactivateAll()
 
 void CHARACTER::DragonSoul_CleanUp()
 {
-	for (int i = DRAGON_SOUL_EQUIP_SLOT_START; i < DRAGON_SOUL_EQUIP_SLOT_END; i++)
+	for (int32_t i = DRAGON_SOUL_EQUIP_SLOT_START; i < DRAGON_SOUL_EQUIP_SLOT_END; i++)
 	{
 		DSManager::instance().DeactivateDragonSoul(GetInventoryItem(i), true);
 	}
@@ -112,7 +112,7 @@ void CHARACTER::DragonSoul_CleanUp()
 
 bool CHARACTER::DragonSoul_RefineWindow_Open(LPENTITY pEntity)
 {
-	if (NULL == m_pointsInstant.m_pDragonSoulRefineWindowOpener)
+	if (nullptr == m_pointsInstant.m_pDragonSoulRefineWindowOpener)
 	{
 		m_pointsInstant.m_pDragonSoulRefineWindowOpener = pEntity;
 	}
@@ -122,9 +122,9 @@ bool CHARACTER::DragonSoul_RefineWindow_Open(LPENTITY pEntity)
 	PDS.bSubType = DS_SUB_HEADER_OPEN;
 	LPDESC d = GetDesc();
 
-	if (NULL == d)
+	if (nullptr == d)
 	{
-		sys_err ("User(%s)'s DESC is NULL POINT.", GetName());
+		sys_err ("User(%s)'s DESC is nullptr POINT.", GetName());
 		return false;
 	}
 
@@ -134,11 +134,11 @@ bool CHARACTER::DragonSoul_RefineWindow_Open(LPENTITY pEntity)
 
 bool CHARACTER::DragonSoul_RefineWindow_Close()
 {
-	m_pointsInstant.m_pDragonSoulRefineWindowOpener = NULL;
+	m_pointsInstant.m_pDragonSoulRefineWindowOpener = nullptr;
 	return true;
 }
 
 bool CHARACTER::DragonSoul_RefineWindow_CanRefine()
 {
-	return NULL != m_pointsInstant.m_pDragonSoulRefineWindowOpener;
+	return nullptr != m_pointsInstant.m_pDragonSoulRefineWindowOpener;
 }

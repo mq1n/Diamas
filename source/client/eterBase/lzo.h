@@ -11,10 +11,10 @@ class CLZObject
 		#pragma pack(4)
 			typedef struct SHeader
 			{
-				DWORD	dwFourCC;
-				DWORD	dwEncryptSize;		// 암호화된 크기
-				DWORD	dwCompressedSize;	// 압축된 데이터 크기
-				DWORD	dwRealSize;		// 실제 데이터 크기
+				uint32_t	dwFourCC;
+				uint32_t	dwEncryptSize;		// 암호화된 크기
+				uint32_t	dwCompressedSize;	// 압축된 데이터 크기
+				uint32_t	dwRealSize;		// 실제 데이터 크기
 			} THeader;
 		#pragma pack()
 		
@@ -23,37 +23,37 @@ class CLZObject
 		
 		void			Clear();
 		
-		void			BeginCompress(const void * pvIn, UINT uiInLen);
-		void			BeginCompressInBuffer(const void * pvIn, UINT uiInLen, void * pvOut);
+		void			BeginCompress(const void * pvIn, uint32_t uiInLen);
+		void			BeginCompressInBuffer(const void * pvIn, uint32_t uiInLen, void * pvOut);
 		bool			Compress();
 		
 		bool			BeginDecompress(const void * pvIn);
-		bool			Decompress(DWORD * pdwKey = NULL);
+		bool			Decompress(uint32_t * pdwKey = nullptr);
 		
-		bool			Encrypt(DWORD * pdwKey);
-		bool			__Decrypt(DWORD * key, BYTE* data);
+		bool			Encrypt(uint32_t * pdwKey);
+		bool			__Decrypt(uint32_t * key, uint8_t* data);
 		
 		const THeader &	GetHeader() { return *m_pHeader; }
-		BYTE *			GetBuffer() { return m_pbBuffer; }
-		DWORD			GetSize();
-		void			AllocBuffer(DWORD dwSize);
-		DWORD			GetBufferSize() { return m_dwBufferSize; }
-		//void			CopyBuffer(const char* pbSrc, DWORD dwSrcSize);
+		uint8_t *			GetBuffer() { return m_pbBuffer; }
+		uint32_t			GetSize();
+		void			AllocBuffer(uint32_t dwSize);
+		uint32_t			GetBufferSize() { return m_dwBufferSize; }
+		//void			CopyBuffer(const char* pbSrc, uint32_t dwSrcSize);
 		
 	private:
 		void			Initialize();
 		
-		BYTE *			m_pbBuffer;
-		DWORD			m_dwBufferSize;
+		uint8_t *			m_pbBuffer;
+		uint32_t			m_dwBufferSize;
 		
 		THeader	*		m_pHeader;
-		const BYTE *	m_pbIn;
+		const uint8_t *	m_pbIn;
 		bool			m_bCompressed;
 
 		bool			m_bInBuffer;
 
 	public:
-		static DWORD	ms_dwFourCC;
+		static uint32_t	ms_dwFourCC;
 };
 
 class CLZO : public CSingleton<CLZO>
@@ -62,13 +62,13 @@ class CLZO : public CSingleton<CLZO>
 		CLZO();
 		virtual ~CLZO();
 		
-		bool	CompressMemory(CLZObject & rObj, const void * pIn, UINT uiInLen);
-		bool	CompressEncryptedMemory(CLZObject & rObj, const void * pIn, UINT uiInLen, DWORD * pdwKey);
-		bool	Decompress(CLZObject & rObj, const BYTE * pbBuf, DWORD * pdwKey = NULL);
-		BYTE *	GetWorkMemory();
+		bool	CompressMemory(CLZObject & rObj, const void * pIn, uint32_t uiInLen);
+		bool	CompressEncryptedMemory(CLZObject & rObj, const void * pIn, uint32_t uiInLen, uint32_t * pdwKey);
+		bool	Decompress(CLZObject & rObj, const uint8_t * pbBuf, uint32_t * pdwKey = nullptr);
+		uint8_t *	GetWorkMemory();
 		
 	private:
-		BYTE *	m_pWorkMem;
+		uint8_t *	m_pWorkMem;
 };
 
 #endif

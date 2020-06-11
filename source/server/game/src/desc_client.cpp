@@ -13,8 +13,8 @@
 
 extern LPFDWATCH	main_fdw;
 
-LPCLIENT_DESC db_clientdesc = NULL;
-LPCLIENT_DESC g_pkAuthMasterDesc = NULL;
+LPCLIENT_DESC db_clientdesc = nullptr;
+LPCLIENT_DESC g_pkAuthMasterDesc = nullptr;
 
 static const char* GetKnownClientDescName(LPCLIENT_DESC desc) {
 	if (desc == db_clientdesc) {
@@ -68,7 +68,7 @@ void CLIENT_DESC::SetRetryWhenClosed(bool b)
 	m_bRetryWhenClosed = b;
 }
 
-bool CLIENT_DESC::Connect(int iPhaseWhenSucceed)
+bool CLIENT_DESC::Connect(int32_t iPhaseWhenSucceed)
 {
 	if (iPhaseWhenSucceed != 0)
 		m_iPhaseWhenSucceed = iPhaseWhenSucceed;
@@ -100,7 +100,7 @@ bool CLIENT_DESC::Connect(int iPhaseWhenSucceed)
 	}
 }
 
-void CLIENT_DESC::Setup(LPFDWATCH _fdw, const char * _host, WORD _port)
+void CLIENT_DESC::Setup(LPFDWATCH _fdw, const char * _host, uint16_t _port)
 {
 	// 1MB input/output buffer
 	m_lpFdw = _fdw;
@@ -112,13 +112,13 @@ void CLIENT_DESC::Setup(LPFDWATCH _fdw, const char * _host, WORD _port)
 	m_sock = INVALID_SOCKET;
 }
 
-void CLIENT_DESC::SetPhase(int iPhase)
+void CLIENT_DESC::SetPhase(int32_t iPhase)
 {
 	switch (iPhase)
 	{
 		case PHASE_CLIENT_CONNECTING:
 			sys_log(1, "PHASE_CLIENT_DESC::CONNECTING");
-			m_pInputProcessor = NULL;
+			m_pInputProcessor = nullptr;
 			break;
 
 		case PHASE_DBCLIENT:
@@ -224,21 +224,21 @@ void CLIENT_DESC::SetPhase(int iPhase)
 			break;
 
 		case PHASE_CLOSE:
-			m_pInputProcessor = NULL;
+			m_pInputProcessor = nullptr;
 			break;
 	}
 
 	m_iPhase = iPhase;
 }
 
-void CLIENT_DESC::DBPacketHeader(BYTE bHeader, DWORD dwHandle, DWORD dwSize)
+void CLIENT_DESC::DBPacketHeader(uint8_t bHeader, uint32_t dwHandle, uint32_t dwSize)
 {
-	buffer_write(m_lpOutputBuffer, encode_byte(bHeader), sizeof(BYTE));
-	buffer_write(m_lpOutputBuffer, encode_4bytes(dwHandle), sizeof(DWORD));
-	buffer_write(m_lpOutputBuffer, encode_4bytes(dwSize), sizeof(DWORD));
+	buffer_write(m_lpOutputBuffer, encode_byte(bHeader), sizeof(uint8_t));
+	buffer_write(m_lpOutputBuffer, encode_4bytes(dwHandle), sizeof(uint32_t));
+	buffer_write(m_lpOutputBuffer, encode_4bytes(dwSize), sizeof(uint32_t));
 }
 
-void CLIENT_DESC::DBPacket(BYTE bHeader, DWORD dwHandle, const void * c_pvData, DWORD dwSize)
+void CLIENT_DESC::DBPacket(uint8_t bHeader, uint32_t dwHandle, const void * c_pvData, uint32_t dwSize)
 {
 	if (m_sock == INVALID_SOCKET) {
 		sys_log(0, "CLIENT_DESC [%s] trying DBPacket() while not connected",
@@ -252,7 +252,7 @@ void CLIENT_DESC::DBPacket(BYTE bHeader, DWORD dwHandle, const void * c_pvData, 
 		buffer_write(m_lpOutputBuffer, c_pvData, dwSize);
 }
 
-void CLIENT_DESC::Packet(const void * c_pvData, int iSize)
+void CLIENT_DESC::Packet(const void * c_pvData, int32_t iSize)
 {
 	if (m_sock == INVALID_SOCKET) {
 		sys_log(0, "CLIENT_DESC [%s] trying Packet() while not connected",
@@ -267,23 +267,23 @@ bool CLIENT_DESC::IsRetryWhenClosed()
 	return (0 == thecore_is_shutdowned() && m_bRetryWhenClosed);
 }
 
-void CLIENT_DESC::Update(DWORD t)
+void CLIENT_DESC::Update(uint32_t t)
 {
 	if (!g_bAuthServer) {
 		UpdateChannelStatus(t, false);
 	}
 }
 
-void CLIENT_DESC::UpdateChannelStatus(DWORD t, bool fForce)
+void CLIENT_DESC::UpdateChannelStatus(uint32_t t, bool fForce)
 {
 	enum {
 		CHANNELSTATUS_UPDATE_PERIOD = 5*60*1000,	// 5ºÐ¸¶´Ù
 	};
-	DWORD tLCSUP = m_tLastChannelStatusUpdateTime+CHANNELSTATUS_UPDATE_PERIOD;
+	uint32_t tLCSUP = m_tLastChannelStatusUpdateTime+CHANNELSTATUS_UPDATE_PERIOD;
 	if (fForce || tLCSUP < t) {
-		int iTotal; 
-		int * paiEmpireUserCount;
-		int iLocal;
+		int32_t iTotal; 
+		int32_t * paiEmpireUserCount;
+		int32_t iLocal;
 		DESC_MANAGER::instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
 
 		TChannelStatus channelStatus;
@@ -302,7 +302,7 @@ void CLIENT_DESC::Reset()
 	// Backup connection target info
 	LPFDWATCH fdw = m_lpFdw;
 	std::string host = m_stHost;
-	WORD port = m_wPort;
+	uint16_t port = m_wPort;
 
 	Destroy();
 	Initialize();

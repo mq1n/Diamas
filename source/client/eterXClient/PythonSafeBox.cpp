@@ -1,20 +1,20 @@
 #include "StdAfx.h"
 #include "PythonSafeBox.h"
 
-void CPythonSafeBox::OpenSafeBox(int iSize)
+void CPythonSafeBox::OpenSafeBox(int32_t iSize)
 {
 	m_dwMoney = 0;
 	m_ItemInstanceVector.clear();
 	m_ItemInstanceVector.resize(SAFEBOX_SLOT_X_COUNT * iSize);
 
-	for (DWORD i = 0; i < m_ItemInstanceVector.size(); ++i)
+	for (uint32_t i = 0; i < m_ItemInstanceVector.size(); ++i)
 	{
 		TItemData & rInstance = m_ItemInstanceVector[i];
 		ZeroMemory(&rInstance, sizeof(rInstance));
 	}
 }
 
-void CPythonSafeBox::SetItemData(DWORD dwSlotIndex, const TItemData & rItemInstance)
+void CPythonSafeBox::SetItemData(uint32_t dwSlotIndex, const TItemData & rItemInstance)
 {
 	if (dwSlotIndex >= m_ItemInstanceVector.size())
 	{
@@ -25,7 +25,7 @@ void CPythonSafeBox::SetItemData(DWORD dwSlotIndex, const TItemData & rItemInsta
 	m_ItemInstanceVector[dwSlotIndex] = rItemInstance;
 }
 
-void CPythonSafeBox::DelItemData(DWORD dwSlotIndex)
+void CPythonSafeBox::DelItemData(uint32_t dwSlotIndex)
 {
 	if (dwSlotIndex >= m_ItemInstanceVector.size())
 	{
@@ -37,22 +37,22 @@ void CPythonSafeBox::DelItemData(DWORD dwSlotIndex)
 	ZeroMemory(&rInstance, sizeof(rInstance));
 }
 
-void CPythonSafeBox::SetMoney(DWORD dwMoney)
+void CPythonSafeBox::SetMoney(uint32_t dwMoney)
 {
 	m_dwMoney = dwMoney;
 }
 
-DWORD CPythonSafeBox::GetMoney()
+uint32_t CPythonSafeBox::GetMoney()
 {
 	return m_dwMoney;
 }
 
-int CPythonSafeBox::GetCurrentSafeBoxSize()
+int32_t CPythonSafeBox::GetCurrentSafeBoxSize()
 {
 	return m_ItemInstanceVector.size();
 }
 
-BOOL CPythonSafeBox::GetSlotItemID(DWORD dwSlotIndex, DWORD* pdwItemID)
+BOOL CPythonSafeBox::GetSlotItemID(uint32_t dwSlotIndex, uint32_t* pdwItemID)
 {
 	if (dwSlotIndex >= m_ItemInstanceVector.size())
 	{
@@ -65,7 +65,7 @@ BOOL CPythonSafeBox::GetSlotItemID(DWORD dwSlotIndex, DWORD* pdwItemID)
 	return TRUE;
 }
 
-BOOL CPythonSafeBox::GetItemDataPtr(DWORD dwSlotIndex, TItemData ** ppInstance)
+BOOL CPythonSafeBox::GetItemDataPtr(uint32_t dwSlotIndex, TItemData ** ppInstance)
 {
 	if (dwSlotIndex >= m_ItemInstanceVector.size())
 	{
@@ -78,19 +78,19 @@ BOOL CPythonSafeBox::GetItemDataPtr(DWORD dwSlotIndex, TItemData ** ppInstance)
 	return TRUE;
 }
 
-void CPythonSafeBox::OpenMall(int iSize)
+void CPythonSafeBox::OpenMall(int32_t iSize)
 {
 	m_MallItemInstanceVector.clear();
 	m_MallItemInstanceVector.resize(SAFEBOX_SLOT_X_COUNT * iSize);
 
-	for (DWORD i = 0; i < m_MallItemInstanceVector.size(); ++i)
+	for (uint32_t i = 0; i < m_MallItemInstanceVector.size(); ++i)
 	{
 		TItemData & rInstance = m_MallItemInstanceVector[i];
 		ZeroMemory(&rInstance, sizeof(rInstance));
 	}
 }
 
-void CPythonSafeBox::SetMallItemData(DWORD dwSlotIndex, const TItemData & rItemData)
+void CPythonSafeBox::SetMallItemData(uint32_t dwSlotIndex, const TItemData & rItemData)
 {
 	if (dwSlotIndex >= m_MallItemInstanceVector.size())
 	{
@@ -101,7 +101,7 @@ void CPythonSafeBox::SetMallItemData(DWORD dwSlotIndex, const TItemData & rItemD
 	m_MallItemInstanceVector[dwSlotIndex] = rItemData;
 }
 
-void CPythonSafeBox::DelMallItemData(DWORD dwSlotIndex)
+void CPythonSafeBox::DelMallItemData(uint32_t dwSlotIndex)
 {
 	if (dwSlotIndex >= m_MallItemInstanceVector.size())
 	{
@@ -113,7 +113,7 @@ void CPythonSafeBox::DelMallItemData(DWORD dwSlotIndex)
 	ZeroMemory(&rInstance, sizeof(rInstance));
 }
 
-BOOL CPythonSafeBox::GetMallItemDataPtr(DWORD dwSlotIndex, TItemData ** ppInstance)
+BOOL CPythonSafeBox::GetMallItemDataPtr(uint32_t dwSlotIndex, TItemData ** ppInstance)
 {
 	if (dwSlotIndex >= m_MallItemInstanceVector.size())
 	{
@@ -126,7 +126,7 @@ BOOL CPythonSafeBox::GetMallItemDataPtr(DWORD dwSlotIndex, TItemData ** ppInstan
 	return TRUE;
 }
 
-BOOL CPythonSafeBox::GetSlotMallItemID(DWORD dwSlotIndex, DWORD * pdwItemID)
+BOOL CPythonSafeBox::GetSlotMallItemID(uint32_t dwSlotIndex, uint32_t * pdwItemID)
 {
 	if (dwSlotIndex >= m_MallItemInstanceVector.size())
 	{
@@ -139,7 +139,7 @@ BOOL CPythonSafeBox::GetSlotMallItemID(DWORD dwSlotIndex, DWORD * pdwItemID)
 	return TRUE;
 }
 
-DWORD CPythonSafeBox::GetMallSize()
+uint32_t CPythonSafeBox::GetMallSize()
 {
 	return m_MallItemInstanceVector.size();
 }
@@ -160,7 +160,7 @@ PyObject * safeboxGetCurrentSafeboxSize(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * safeboxGetItemID(PyObject * poSelf, PyObject * poArgs)
 {
-	int ipos;
+	int32_t ipos;
 	if (!PyTuple_GetInteger(poArgs, 0, &ipos))
 		return Py_BadArgument();
 
@@ -173,7 +173,7 @@ PyObject * safeboxGetItemID(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * safeboxGetItemCount(PyObject * poSelf, PyObject * poArgs)
 {
-	int ipos;
+	int32_t ipos;
 	if (!PyTuple_GetInteger(poArgs, 0, &ipos))
 		return Py_BadArgument();
 
@@ -186,7 +186,7 @@ PyObject * safeboxGetItemCount(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * safeboxGetItemFlags(PyObject * poSelf, PyObject * poArgs)
 {
-	int ipos;
+	int32_t ipos;
 	if (!PyTuple_GetInteger(poArgs, 0, &ipos))
 		return Py_BadArgument();
 
@@ -199,10 +199,10 @@ PyObject * safeboxGetItemFlags(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * safeboxGetItemMetinSocket(PyObject * poSelf, PyObject * poArgs)
 {
-	int iSlotIndex;
+	int32_t iSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSlotIndex))
 		return Py_BadArgument();
-	int iSocketIndex;
+	int32_t iSocketIndex;
 	if (!PyTuple_GetInteger(poArgs, 1, &iSocketIndex))
 		return Py_BadArgument();
 
@@ -218,10 +218,10 @@ PyObject * safeboxGetItemMetinSocket(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * safeboxGetItemAttribute(PyObject * poSelf, PyObject * poArgs)
 {
-	int iSlotIndex;
+	int32_t iSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSlotIndex))
 		return Py_BuildException();
-	int iAttrSlotIndex;
+	int32_t iAttrSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 1, &iAttrSlotIndex))
 		return Py_BuildException();
 
@@ -242,7 +242,7 @@ PyObject * safeboxGetMoney(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * safeboxGetMallItemID(PyObject * poSelf, PyObject * poArgs)
 {
-	int ipos;
+	int32_t ipos;
 	if (!PyTuple_GetInteger(poArgs, 0, &ipos))
 		return Py_BadArgument();
 
@@ -255,7 +255,7 @@ PyObject * safeboxGetMallItemID(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * safeboxGetMallItemCount(PyObject * poSelf, PyObject * poArgs)
 {
-	int ipos;
+	int32_t ipos;
 	if (!PyTuple_GetInteger(poArgs, 0, &ipos))
 		return Py_BadArgument();
 
@@ -268,10 +268,10 @@ PyObject * safeboxGetMallItemCount(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * safeboxGetMallItemMetinSocket(PyObject * poSelf, PyObject * poArgs)
 {
-	int iSlotIndex;
+	int32_t iSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSlotIndex))
 		return Py_BadArgument();
-	int iSocketIndex;
+	int32_t iSocketIndex;
 	if (!PyTuple_GetInteger(poArgs, 1, &iSocketIndex))
 		return Py_BadArgument();
 
@@ -287,10 +287,10 @@ PyObject * safeboxGetMallItemMetinSocket(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * safeboxGetMallItemAttribute(PyObject * poSelf, PyObject * poArgs)
 {
-	int iSlotIndex;
+	int32_t iSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iSlotIndex))
 		return Py_BuildException();
-	int iAttrSlotIndex;
+	int32_t iAttrSlotIndex;
 	if (!PyTuple_GetInteger(poArgs, 1, &iAttrSlotIndex))
 		return Py_BuildException();
 
@@ -328,7 +328,7 @@ void initsafebox()
 		{ "GetMallItemMetinSocket",		safeboxGetMallItemMetinSocket,			METH_VARARGS },
 		{ "GetMallItemAttribute",		safeboxGetMallItemAttribute,			METH_VARARGS },
 		{ "GetMallSize",				safeboxGetMallSize,						METH_VARARGS },
-		{ NULL,							NULL,									NULL },
+		{ nullptr,							nullptr,									0 },
 	};
 
 	PyObject * poModule = Py_InitModule("safebox", s_methods);

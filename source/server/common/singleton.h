@@ -11,8 +11,8 @@ template <typename T> class singleton
 		singleton()
 		{ 
 			assert(!ms_singleton);
-			long offset = (long) (T*) 1 - (long) (singleton <T>*) (T*) 1; 
-			ms_singleton = (T*) ((long) this + offset);
+			int32_t offset = (int32_t) (T*) 1 - (int32_t) (singleton <T>*) (T*) 1; 
+			ms_singleton = (T*) ((int32_t) this + offset);
 		} 
 
 		virtual ~singleton()
@@ -39,6 +39,6 @@ template <typename T> class singleton
 		}
 };
 
-template <typename T> T * singleton <T>::ms_singleton = NULL;
+template <typename T> T * singleton <T>::ms_singleton = nullptr;
 
 #endif

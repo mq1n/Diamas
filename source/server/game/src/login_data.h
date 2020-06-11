@@ -6,44 +6,44 @@ class CLoginData
 	public:
 		CLoginData();
 
-		void            SetClientKey(const DWORD * c_pdwClientKey);
+		void            SetClientKey(const uint32_t * c_pdwClientKey);
 
-		const DWORD *   GetClientKey();
-		void            SetKey(DWORD dwKey);
-		DWORD           GetKey();
+		const uint32_t *   GetClientKey();
+		void            SetKey(uint32_t dwKey);
+		uint32_t           GetKey();
 
 		void		SetLogin(const char * c_pszLogin);
 		const char *	GetLogin();
 
-		void            SetConnectedPeerHandle(DWORD dwHandle);
-		DWORD		GetConnectedPeerHandle();
+		void            SetConnectedPeerHandle(uint32_t dwHandle);
+		uint32_t		GetConnectedPeerHandle();
 
 		void            SetLogonTime();
-		DWORD		GetLogonTime();
+		uint32_t		GetLogonTime();
 
 		void		SetIP(const char * c_pszIP);
 		const char *	GetIP();
 
-		void		SetRemainSecs(long l);
-		long		GetRemainSecs();
+		void		SetRemainSecs(int32_t l);
+		int32_t		GetRemainSecs();
 
 		void		SetDeleted(bool bSet);
 		bool		IsDeleted();
 
-		void		SetPremium(int * paiPremiumTimes);
-		int		GetPremium(BYTE type);
-		int *		GetPremiumPtr();
+		void		SetPremium(int32_t * paiPremiumTimes);
+		int32_t		GetPremium(uint8_t type);
+		int32_t *		GetPremiumPtr();
 
 
 	private:
-		DWORD           m_dwKey;
-		DWORD           m_adwClientKey[4];
-		DWORD           m_dwConnectedPeerHandle;
-		DWORD           m_dwLogonTime;
+		uint32_t           m_dwKey;
+		uint32_t           m_adwClientKey[4];
+		uint32_t           m_dwConnectedPeerHandle;
+		uint32_t           m_dwLogonTime;
 		char		m_szIP[MAX_HOST_LENGTH+1];
 		bool		m_bDeleted;
 		std::string	m_stLogin;
-		int		m_aiPremiumTimes[PREMIUM_MAX_NUM];
+		int32_t		m_aiPremiumTimes[PREMIUM_MAX_NUM];
 };
 
 #endif

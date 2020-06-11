@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "Input.h"
 
-LPDIRECTINPUT8			CInputDevice::ms_lpDI = NULL;
-LPDIRECTINPUTDEVICE8	CInputKeyboard::ms_lpKeyboard = NULL;
+LPDIRECTINPUT8			CInputDevice::ms_lpDI = nullptr;
+LPDIRECTINPUTDEVICE8	CInputKeyboard::ms_lpKeyboard = nullptr;
 bool					CInputKeyboard::ms_bPressedKey[256];
 char					CInputKeyboard::ms_diks[256];
 
@@ -26,8 +26,8 @@ HRESULT CInputDevice::CreateDevice(HWND /*hWnd*/)
 	HRESULT hr;
 	
 	// Create a DInput object
-	if (FAILED(hr = DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, 
-					IID_IDirectInput8, (VOID**) &ms_lpDI, NULL)))
+	if (FAILED(hr = DirectInput8Create(GetModuleHandle(nullptr), DIRECTINPUT_VERSION, 
+					IID_IDirectInput8, (VOID**) &ms_lpDI, nullptr)))
 		return hr;
 
 	return S_OK;
@@ -64,16 +64,16 @@ bool CInputKeyboard::InitializeKeyboard(HWND hWnd)
 	HRESULT hr;
 
 	// Obtain an interface to the system keyboard device.
-	if (FAILED(hr = ms_lpDI->CreateDevice(GUID_SysKeyboard, &ms_lpKeyboard, NULL)))
+	if (FAILED(hr = ms_lpDI->CreateDevice(GUID_SysKeyboard, &ms_lpKeyboard, nullptr)))
 		return false;
 
 	if (FAILED(hr = ms_lpKeyboard->SetDataFormat(&c_dfDIKeyboard)))
 		return false;
 
 // Alt + F4를 위해 비독점 모드로 - [levites]
-//	DWORD dwCoopFlags = DISCL_FOREGROUND | DISCL_EXCLUSIVE;
-//	DWORD dwCoopFlags = DISCL_NONEXCLUSIVE | DISCL_BACKGROUND;
-	DWORD dwCoopFlags = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
+//	uint32_t dwCoopFlags = DISCL_FOREGROUND | DISCL_EXCLUSIVE;
+//	uint32_t dwCoopFlags = DISCL_NONEXCLUSIVE | DISCL_BACKGROUND;
+	uint32_t dwCoopFlags = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
 
 	if (FAILED(hr = ms_lpKeyboard->SetCooperativeLevel(hWnd, dwCoopFlags)))
 		return false;
@@ -101,7 +101,7 @@ void CInputKeyboard::UpdateKeyboard()
 		return;
 	}
 
-	for (int i = 0; i < 256; ++i)
+	for (int32_t i = 0; i < 256; ++i)
 	{
 		if (ms_diks[i] & 0x80)
 		{
@@ -113,19 +113,19 @@ void CInputKeyboard::UpdateKeyboard()
 	}
 }
 
-void CInputKeyboard::KeyDown(int iIndex)
+void CInputKeyboard::KeyDown(int32_t iIndex)
 {
 	ms_bPressedKey[iIndex] = true;
 	OnKeyDown(iIndex);
 }
 
-void CInputKeyboard::KeyUp(int iIndex)
+void CInputKeyboard::KeyUp(int32_t iIndex)
 {
 	ms_bPressedKey[iIndex] = false;
 	OnKeyUp(iIndex);
 }
 
-bool CInputKeyboard::IsPressed(int iIndex)
+bool CInputKeyboard::IsPressed(int32_t iIndex)
 {
 	return ms_bPressedKey[iIndex];
 }

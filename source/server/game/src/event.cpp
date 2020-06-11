@@ -19,9 +19,9 @@ static ObjectPool<EVENT> event_pool;
 static CEventQueue cxx_q;
 
 /* 이벤트를 생성하고 리턴한다 */
-LPEVENT event_create_ex(TEVENTFUNC func, event_info_data* info, long when)
+LPEVENT event_create_ex(TEVENTFUNC func, event_info_data* info, int32_t when)
 {
-	LPEVENT new_event = NULL;
+	LPEVENT new_event = nullptr;
 
 	/* 반드시 다음 pulse 이상의 시간이 지난 후에 부르도록 한다. */
 	if (when < 1)
@@ -33,7 +33,7 @@ LPEVENT event_create_ex(TEVENTFUNC func, event_info_data* info, long when)
 	new_event = M2_NEW event;
 #endif
 
-	assert(NULL != new_event);
+	assert(nullptr != new_event);
 
 	new_event->func = func;
 	new_event->info	= info;
@@ -65,29 +65,29 @@ void event_cancel(LPEVENT * ppevent)
 		if (event->q_el)
 			event->q_el->bCancel = TRUE;
 
-		*ppevent = NULL;
+		*ppevent = nullptr;
 		return;
 	}
 
 	// 이미 취소 되었는가?
 	if (!event->q_el)
 	{
-		*ppevent = NULL;
+		*ppevent = nullptr;
 		return;
 	}
 
 	if (event->q_el->bCancel)
 	{
-		*ppevent = NULL;
+		*ppevent = nullptr;
 		return;
 	}
 
 	event->q_el->bCancel = TRUE;
 
-	*ppevent = NULL;
+	*ppevent = nullptr;
 }
 
-void event_reset_time(LPEVENT event, long when)
+void event_reset_time(LPEVENT event, int32_t when)
 {
 	if (!event->is_processing)
 	{
@@ -99,10 +99,10 @@ void event_reset_time(LPEVENT event, long when)
 }
 
 /* 이벤트를 실행할 시간에 도달한 이벤트들을 실행한다 */
-int event_process(int pulse)
+int32_t event_process(int32_t pulse)
 {
-	long	new_time;
-	int		num_events = 0;
+	int32_t	new_time;
+	int32_t		num_events = 0;
 
 	// event_q 즉 이벤트 큐의 헤드의 시간보다 현재의 pulse 가 적으면 루프문이 
 	// 돌지 않게 된다.
@@ -119,7 +119,7 @@ int event_process(int pulse)
 		new_time = pElem->iKey;
 
 		LPEVENT the_event = pElem->pvData;
-		long processing_time = event_processing_time(the_event);
+		int32_t processing_time = event_processing_time(the_event);
 		cxx_q.Delete(pElem);
 
 		/*
@@ -131,7 +131,7 @@ int event_process(int pulse)
 
 		if (!the_event->info)
 		{
-			the_event->q_el = NULL;
+			the_event->q_el = nullptr;
 			ContinueOnFatalError();
 		}
 		else
@@ -141,7 +141,7 @@ int event_process(int pulse)
 			
 			if (new_time <= 0 || the_event->is_force_to_end)
 			{
-				the_event->q_el = NULL;
+				the_event->q_el = nullptr;
 			}
 			else
 			{
@@ -157,9 +157,9 @@ int event_process(int pulse)
 }
 
 /* 이벤트가 수행시간을 pulse 단위로 리턴해 준다 */
-long event_processing_time(LPEVENT event)
+int32_t event_processing_time(LPEVENT event)
 {
-	long start_time;
+	int32_t start_time;
 
 	if (!event->q_el)
 		return 0;
@@ -169,9 +169,9 @@ long event_processing_time(LPEVENT event)
 }
 
 /* 이벤트가 남은 시간을 pulse 단위로 리턴해 준다 */
-long event_time(LPEVENT event)
+int32_t event_time(LPEVENT event)
 {
-	long when;
+	int32_t when;
 
 	if (!event->q_el)
 		return 0;
@@ -198,7 +198,7 @@ void event_destroy(void)
 	}
 }
 
-int event_count()
+int32_t event_count()
 {
 	return cxx_q.Size();
 }

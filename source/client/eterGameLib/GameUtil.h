@@ -34,7 +34,7 @@ enum EDegree_Direction
 	DEGREE_DIRECTION_LEFT = 2,
 };
 float GetDegreeDifference(float fSource, float fTarget);
-int GetRotatingDirection(float fSource, float fTarget);
+int32_t GetRotatingDirection(float fSource, float fTarget);
 
 // Converting Rotation
 float CameraRotationToCharacterRotation(float fCameraRotation);

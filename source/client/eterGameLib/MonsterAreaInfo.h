@@ -34,54 +34,54 @@ public:
 	CMonsterAreaInfo();
 	virtual ~CMonsterAreaInfo();
 
-	void			SetID(DWORD dwID)									{ m_dwID = dwID; }
-	DWORD			GetID()												{ return m_dwID; }
+	void			SetID(uint32_t dwID)									{ m_dwID = dwID; }
+	uint32_t			GetID()												{ return m_dwID; }
 
 	void			Clear();
 
 	//
-	void			SetOrigin(long lOriginX, long lOriginY);
-	void			GetOrigin(long * plOriginX, long * plOriginY);
+	void			SetOrigin(int32_t lOriginX, int32_t lOriginY);
+	void			GetOrigin(int32_t * plOriginX, int32_t * plOriginY);
 	
-	void			SetSize(long lSizeX, long lSizeY);
-	void			GetSize(long * plSizeX, long * plSizeY);
+	void			SetSize(int32_t lSizeX, int32_t lSizeY);
+	void			GetSize(int32_t * plSizeX, int32_t * plSizeY);
 	
-	long			GetLeft()											{ return m_lLeft; }
-	long			GetTop()											{ return m_lTop; }
-	long			GetRight()											{ return m_lRight; }
-	long			GetBottom()											{ return m_lBottom; }
+	int32_t			GetLeft()											{ return m_lLeft; }
+	int32_t			GetTop()											{ return m_lTop; }
+	int32_t			GetRight()											{ return m_lRight; }
+	int32_t			GetBottom()											{ return m_lBottom; }
 
 public:
 	void			SetMonsterAreaInfoType(EMonsterAreaInfoType eMonsterAreaInfoType) { m_eMonsterAreaInfoType = eMonsterAreaInfoType; }
 	EMonsterAreaInfoType GetMonsterAreaInfoType() { return m_eMonsterAreaInfoType; }
 
 public:
-	void			SetMonsterGroupID(DWORD dwGroupID) { m_dwGroupID = dwGroupID;}
+	void			SetMonsterGroupID(uint32_t dwGroupID) { m_dwGroupID = dwGroupID;}
 	void			SetMonsterGroupName(std::string strGroupName) { m_strGroupName = strGroupName; }
 	void			SetMonsterGroupLeaderName(std::string strGroupLeaderName) { m_strLeaderName = strGroupLeaderName; }
-	void			SetMonsterGroupFollowerCount(DWORD dwFollowerCount) { m_dwFollowerCount = dwFollowerCount; }
+	void			SetMonsterGroupFollowerCount(uint32_t dwFollowerCount) { m_dwFollowerCount = dwFollowerCount; }
 
-	DWORD			GetMonsterGroupID() { return m_dwGroupID; }
+	uint32_t			GetMonsterGroupID() { return m_dwGroupID; }
 	std::string		GetMonsterGroupName() { return m_strGroupName; }
 	std::string		GetMonsterGroupLeaderName() { return m_strLeaderName; }
-	DWORD			GetMonsterGroupFollowerCount() { return m_dwFollowerCount; }
+	uint32_t			GetMonsterGroupFollowerCount() { return m_dwFollowerCount; }
 
 public:
 	void			SetMonsterName(std::string strMonsterName) { m_strMonsterName = strMonsterName; }
-	void			SetMonsterVID(DWORD dwVID) { m_dwVID = dwVID; }
+	void			SetMonsterVID(uint32_t dwVID) { m_dwVID = dwVID; }
 
 	std::string		GetMonsterName() { return m_strMonsterName;	}
-	DWORD			GetMonsterVID() { return m_dwVID; }
+	uint32_t			GetMonsterVID() { return m_dwVID; }
 
 public:
-	void			SetMonsterCount(DWORD dwCount);
+	void			SetMonsterCount(uint32_t dwCount);
  	void			SetMonsterDirection(EMonsterDir eMonsterDir);
 	void			RemoveAllMonsters();
 
-	DWORD			GetMonsterCount() { return m_dwMonsterCount; }
+	uint32_t			GetMonsterCount() { return m_dwMonsterCount; }
 	EMonsterDir		GetMonsterDir() { return m_eMonsterDir; }
 	D3DXVECTOR2		GetMonsterDirVector() { return m_v2Monsterdirection; }
-	D3DXVECTOR2		GetTempMonsterPos(DWORD dwIndex);
+	D3DXVECTOR2		GetTempMonsterPos(uint32_t dwIndex);
 
 protected:
 	void			SetLRTB();
@@ -90,31 +90,31 @@ protected:
 	EMonsterAreaInfoType	m_eMonsterAreaInfoType;
 
 	// Group Type 정보
-	DWORD			m_dwGroupID;
+	uint32_t			m_dwGroupID;
 	std::string		m_strGroupName;
 	std::string		m_strLeaderName;
-	DWORD			m_dwFollowerCount;
+	uint32_t			m_dwFollowerCount;
 
 	// Monster Type 정보
-	DWORD			m_dwVID;
+	uint32_t			m_dwVID;
 	std::string		m_strMonsterName;
 
 	// 공통 정보
-	DWORD			m_dwMonsterCount;
+	uint32_t			m_dwMonsterCount;
 	EMonsterDir		m_eMonsterDir;
 	D3DXVECTOR2		m_v2Monsterdirection;
 
-	DWORD			m_dwID;
+	uint32_t			m_dwID;
 
-	long			m_lOriginX;
-	long			m_lOriginY;
-	long			m_lSizeX;
-	long			m_lSizeY;
+	int32_t			m_lOriginX;
+	int32_t			m_lOriginY;
+	int32_t			m_lSizeX;
+	int32_t			m_lSizeY;
 
-	long			m_lLeft;			
-	long			m_lRight;
-	long			m_lTop;
-	long			m_lBottom;
+	int32_t			m_lLeft;			
+	int32_t			m_lRight;
+	int32_t			m_lTop;
+	int32_t			m_lBottom;
 
 	std::vector<D3DXVECTOR2> m_TempMonsterPosVector;
 };

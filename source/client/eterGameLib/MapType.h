@@ -41,8 +41,8 @@ namespace prt
 		".prd"
 	};
 
-	DWORD GetPropertyType(const char * c_szTypeName);
-	const char * GetPropertyExtension(DWORD dwType);
+	uint32_t GetPropertyType(const char * c_szTypeName);
+	const char * GetPropertyExtension(uint32_t dwType);
 
 	struct TPropertyTree
 	{
@@ -147,8 +147,8 @@ typedef struct SEnvironmentData
 	// Filtering
 	BOOL bFilteringEnable;
 	D3DXCOLOR FilteringColor;
-	BYTE byFilteringAlphaSrc;
-	BYTE byFilteringAlphaDest;
+	uint8_t byFilteringAlphaSrc;
+	uint8_t byFilteringAlphaDest;
 
 	// Wind
 	float fWindStrength;
@@ -158,8 +158,8 @@ typedef struct SEnvironmentData
 	D3DXVECTOR3 v3SkyBoxScale;
 	BOOL		bSkyBoxTextureRenderMode;
 
-	BYTE bySkyBoxGradientLevelUpper;
-	BYTE bySkyBoxGradientLevelLower;
+	uint8_t bySkyBoxGradientLevelUpper;
+	uint8_t bySkyBoxGradientLevelLower;
 
 	std::string strSkyBoxFaceFileName[6]; //order : front/back/left/right/top/bottom
 
@@ -185,12 +185,12 @@ typedef struct SEnvironmentData
 	BOOL bReserve; // 외부에서 설정을 고치지 않음
 } TEnvironmentData;
 
-typedef std::map<DWORD, TEnvironmentData*> TEnvironmentDataMap;
+typedef std::map<uint32_t, TEnvironmentData*> TEnvironmentDataMap;
 /////////////////////////////////////////////////////////////////
 
 typedef struct SScreenPosition {
-	int x;
-	int y;
+	int32_t x;
+	int32_t y;
 } TScreenPosition;
 
 typedef D3DXVECTOR3 TPixelPosition;
@@ -205,18 +205,18 @@ typedef struct SCellPosition
 		this->y = 0;
 	}
 
-	SCellPosition(int x, int y)
+	SCellPosition(int32_t x, int32_t y)
 	{
 		this->x = x;
 		this->y = y;
 	}
 
-	int x, y;
+	int32_t x, y;
 } TCellPosition;
 
-const int c_Section_xAttributeCellSize = 50;
-const int c_Section_yAttributeCellSize = 50;
-const int c_Section_xCellSize = 100;
-const int c_Section_yCellSize = 100;
+const int32_t c_Section_xAttributeCellSize = 50;
+const int32_t c_Section_yAttributeCellSize = 50;
+const int32_t c_Section_xCellSize = 100;
+const int32_t c_Section_yCellSize = 100;
 
 #endif

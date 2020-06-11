@@ -20,7 +20,7 @@ struct emotion_type_s
 {
 	const char *	command;
 	const char *	command_to_client;
-	long	flag;
+	int32_t	flag;
 	float	extra_delay;
 } emotion_types[] = {
 	{ "키스",	"french_kiss",	NEED_PC | OTHER_SEX_ONLY | BOTH_DISARM,		2.0f },
@@ -86,7 +86,7 @@ struct emotion_type_s
 };
 
 
-std::set<std::pair<DWORD, DWORD> > s_emotion_set;
+std::set<std::pair<uint32_t, uint32_t> > s_emotion_set;
 
 ACMD(do_emotion_allow)
 {
@@ -102,7 +102,7 @@ ACMD(do_emotion_allow)
 	if (!*arg1)
 		return;
 
-	DWORD	val = 0; str_to_number(val, arg1);
+	uint32_t	val = 0; str_to_number(val, arg1);
 	s_emotion_set.insert(std::make_pair(ch->GetVID(), val));
 }
 
@@ -132,7 +132,7 @@ bool CHARACTER_CanEmotion(CHARACTER& rch)
 
 ACMD(do_emotion)
 {
-	int i;
+	int32_t i;
 	{
 		if (ch->IsRiding())
 		{
@@ -171,7 +171,7 @@ ACMD(do_emotion)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
-	LPCHARACTER victim = NULL;
+	LPCHARACTER victim = nullptr;
 
 	if (*arg1)
 		victim = ch->FindCharacterInView(arg1, IS_SET(emotion_types[i].flag, NEED_PC));
@@ -196,7 +196,7 @@ ACMD(do_emotion)
 			return;
 		}
 
-		long distance = DISTANCE_APPROX(ch->GetX() - victim->GetX(), ch->GetY() - victim->GetY());
+		int32_t distance = DISTANCE_APPROX(ch->GetX() - victim->GetX(), ch->GetY() - victim->GetY());
 
 		if (distance < 10)
 		{
@@ -227,7 +227,7 @@ ACMD(do_emotion)
 				{
 					const marriage::TMarriage* marriageInfo = marriage::CManager::instance().Get( ch->GetPlayerID() );
 
-					const DWORD other = marriageInfo->GetOther( ch->GetPlayerID() );
+					const uint32_t other = marriageInfo->GetOther( ch->GetPlayerID() );
 
 					if (0 == other || other != victim->GetPlayerID())
 					{
@@ -247,11 +247,11 @@ ACMD(do_emotion)
 	}
 
 	char chatbuf[256+1];
-	int len = snprintf(chatbuf, sizeof(chatbuf), "%s %u %u", 
+	int32_t len = snprintf(chatbuf, sizeof(chatbuf), "%s %u %u", 
 			emotion_types[i].command_to_client,
-			(DWORD) ch->GetVID(), victim ? (DWORD) victim->GetVID() : 0);
+			(uint32_t) ch->GetVID(), victim ? (uint32_t) victim->GetVID() : 0);
 
-	if (len < 0 || len >= (int) sizeof(chatbuf))
+	if (len < 0 || len >= (int32_t) sizeof(chatbuf))
 		len = sizeof(chatbuf) - 1;
 
 	++len;  // \0 문자 포함

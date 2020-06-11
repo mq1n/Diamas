@@ -2,7 +2,7 @@
 #include "SoundManager3D.h"
 #include "../eterBase/Timer.h"
 
-CSoundInstance3D::CSoundInstance3D() : m_sample(NULL), m_pSoundData(NULL)
+CSoundInstance3D::CSoundInstance3D() : m_sample(nullptr), m_pSoundData(nullptr)
 {
 }
 
@@ -18,7 +18,7 @@ void CSoundInstance3D::Destroy()
 	if (m_sample)
 	{
 		AIL_release_3D_sample_handle(m_sample);
-		m_sample = NULL;
+		m_sample = nullptr;
 	}
 }
 
@@ -33,7 +33,7 @@ bool CSoundInstance3D::Initialize()
 
 bool CSoundInstance3D::SetSound(CSoundData* pSoundData)
 {
-	assert(m_sample != NULL && pSoundData != NULL);
+	assert(m_sample != nullptr && pSoundData != nullptr);
 
 	// 레퍼런스 카운트가 1이 될 때 로드를 해야 제대로 사이즈가 리턴
 	// 되므로 반드시 Get을 호출 하고 진행해야 한다.
@@ -42,13 +42,13 @@ bool CSoundInstance3D::SetSound(CSoundData* pSoundData)
 	// 카운터를 올려놔야 한다.
 	LPVOID lpData = pSoundData->Get();
 	
-	if (m_pSoundData != NULL)
+	if (m_pSoundData != nullptr)
 	{
 		m_pSoundData->Release();
-		m_pSoundData = NULL;
+		m_pSoundData = nullptr;
 	}
 	
-	if (AIL_set_3D_sample_file(m_sample, lpData) == NULL)
+	if (AIL_set_3D_sample_file(m_sample, lpData) == 0)
 	{
 		TraceError("%s: %s", AIL_last_error(), pSoundData->GetFileName());
 		pSoundData->Release();
@@ -67,12 +67,12 @@ bool CSoundInstance3D::IsDone() const
 	return AIL_3D_sample_status(m_sample) == SMP_DONE;
 }
 
-void CSoundInstance3D::Play(int iLoopCount, DWORD dwPlayCycleTimeLimit) const
+void CSoundInstance3D::Play(int32_t iLoopCount, uint32_t dwPlayCycleTimeLimit) const
 {
 	if (!m_pSoundData)
 		return;
 
-	DWORD dwCurTime = ELTimer_GetMSec();
+	uint32_t dwCurTime = ELTimer_GetMSec();
 
 	if (dwCurTime - m_pSoundData->GetPlayTime() < dwPlayCycleTimeLimit)
 		return;
@@ -96,7 +96,7 @@ void CSoundInstance3D::Resume() const
 void CSoundInstance3D::Stop()
 {
 	AIL_end_3D_sample(m_sample);
-//	m_sample = NULL;
+//	m_sample = nullptr;
 // NOTE : IsDone을 체크하려면 m_sample이 살아있어야 합니다 - [levites]
 }
 

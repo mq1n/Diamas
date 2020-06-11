@@ -8,7 +8,7 @@
 
 
 
-DWORD g_dwLastCachedItemAwardID = 0;
+uint32_t g_dwLastCachedItemAwardID = 0;
 ItemAwardManager::ItemAwardManager()
 {
 }
@@ -20,8 +20,8 @@ ItemAwardManager::~ItemAwardManager()
 void ItemAwardManager::RequestLoad()
 {
 	char szQuery[QUERY_MAX_LEN];
-	snprintf(szQuery, sizeof(szQuery), "SELECT id,login,vnum,count,socket0,socket1,socket2,mall,why FROM item_award WHERE taken_time IS NULL and id > %d", g_dwLastCachedItemAwardID);
-	CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_AWARD_LOAD, 0, NULL);
+	snprintf(szQuery, sizeof(szQuery), "SELECT id,login,vnum,count,socket0,socket1,socket2,mall,why FROM item_award WHERE taken_time IS nullptr and id > %d", g_dwLastCachedItemAwardID);
+	CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_AWARD_LOAD, 0, nullptr);
 }
 
 void ItemAwardManager::Load(SQLMsg * pMsg)
@@ -31,9 +31,9 @@ void ItemAwardManager::Load(SQLMsg * pMsg)
 	for (size_t i = 0; i < pMsg->Get()->uiNumRows; ++i)
 	{
 		MYSQL_ROW row = mysql_fetch_row(pRes);
-		int col = 0;
+		int32_t col = 0;
 
-		DWORD dwID = 0;
+		uint32_t dwID = 0;
 		str_to_number(dwID, row[col++]);
 
 		if (m_map_award.find(dwID) != m_map_award.end())
@@ -88,12 +88,12 @@ std::set<TItemAward *> * ItemAwardManager::GetByLogin(const char * c_pszLogin)
 	auto it = m_map_kSetAwardByLogin.find(c_pszLogin);
 
 	if (it == m_map_kSetAwardByLogin.end())
-		return NULL;
+		return nullptr;
 
 	return &it->second;
 }
 
-void ItemAwardManager::Taken(DWORD dwAwardID, DWORD dwItemID)
+void ItemAwardManager::Taken(uint32_t dwAwardID, uint32_t dwItemID)
 {
 	auto it = m_map_award.find(dwAwardID);
 
@@ -112,13 +112,13 @@ void ItemAwardManager::Taken(DWORD dwAwardID, DWORD dwItemID)
 	char szQuery[QUERY_MAX_LEN];
 
 	snprintf(szQuery, sizeof(szQuery), 
-			"UPDATE item_award SET taken_time=NOW(),item_id=%u WHERE id=%u AND taken_time IS NULL", 
+			"UPDATE item_award SET taken_time=NOW(),item_id=%u WHERE id=%u AND taken_time IS nullptr", 
 			dwItemID, dwAwardID);
 
-	CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_AWARD_TAKEN, 0, NULL);
+	CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_AWARD_TAKEN, 0, nullptr);
 }
 
-std::map<DWORD, TItemAward *>& ItemAwardManager::GetMapAward()
+std::map<uint32_t, TItemAward *>& ItemAwardManager::GetMapAward()
 {
 	return m_map_award;
 }

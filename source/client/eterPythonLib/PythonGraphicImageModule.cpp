@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 
-bool PyTuple_GetImageInstance(PyObject* poArgs, int pos, CGraphicImageInstance** ppRetImageInstance)
+bool PyTuple_GetImageInstance(PyObject* poArgs, int32_t pos, CGraphicImageInstance** ppRetImageInstance)
 {
-	int handle;
+	int32_t handle;
 
 	if (!PyTuple_GetInteger(poArgs, pos, &handle))
 		return false;
@@ -14,9 +14,9 @@ bool PyTuple_GetImageInstance(PyObject* poArgs, int pos, CGraphicImageInstance**
 	return true;
 }
 
-bool PyTuple_GetExpandedImageInstance(PyObject* poArgs, int pos, CGraphicExpandedImageInstance ** ppRetImageInstance)
+bool PyTuple_GetExpandedImageInstance(PyObject* poArgs, int32_t pos, CGraphicExpandedImageInstance ** ppRetImageInstance)
 {
-	int handle;
+	int32_t handle;
 
 	if (!PyTuple_GetInteger(poArgs, pos, &handle))
 		return false;
@@ -82,7 +82,7 @@ PyObject* grpImageGenerateExpanded(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* grpImageGenerateFromHandle(PyObject * poSelf, PyObject* poArgs)
 {
-	int iHandle;
+	int32_t iHandle;
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BadArgument();
 
@@ -303,7 +303,7 @@ void initgrpImage()
 		{ "SetDiffuseColor",		grpSetImageDiffuseColor,		METH_VARARGS },
 		{ "GetWidth",				grpGetWidth,					METH_VARARGS },
 		{ "GetHeight",				grpGetHeight,					METH_VARARGS },
-		{ NULL,						NULL,							NULL		 },
+		{ nullptr,						nullptr,							0		 },
 	};	
 
 	Py_InitModule("grpImage", s_methods);

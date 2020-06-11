@@ -1,6 +1,6 @@
 #pragma once
 
-extern bool GetExeCRC(DWORD & r_dwProcCRC, DWORD & r_dwFileCRC);
+extern bool GetExeCRC(uint32_t & r_dwProcCRC, uint32_t & r_dwFileCRC);
 
 extern void BuildProcessCRC();
-extern BYTE GetProcessCRCMagicCubePiece();
+extern uint8_t GetProcessCRCMagicCubePiece();

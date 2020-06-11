@@ -8,7 +8,7 @@
 #ifdef __clang__
 namespace CryptoPP
 {
-	typedef BYTE byte;
+	typedef uint8_t byte;
 }
 #endif
 
@@ -49,7 +49,7 @@ class Cipher {
   bool activated() const { return activated_; }
   void set_activated(bool value) { activated_ = value; }
 
-  bool IsKeyPrepared() { return key_agreement_ != NULL; }
+  bool IsKeyPrepared() { return key_agreement_ != nullptr; }
 
  private:
   bool SetUp(bool polarity);

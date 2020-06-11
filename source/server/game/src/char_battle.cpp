@@ -38,21 +38,21 @@
 #include "DragonLair.h"
 
 #define ENABLE_EFFECT_PENETRATE
-static DWORD __GetPartyExpNP(const DWORD level)
+static uint32_t __GetPartyExpNP(const uint32_t level)
 {
 	if (!level || level > PLAYER_EXP_TABLE_MAX)
 		return 14000;
 	return party_exp_distribute_table[level];
 }
 
-static int __GetExpLossPerc(const DWORD level)
+static int32_t __GetExpLossPerc(const uint32_t level)
 {
 	if (!level || level > PLAYER_EXP_TABLE_MAX)
 		return 1;
 	return aiExpLossPercents[level];
 }
 
-DWORD AdjustExpByLevel(const LPCHARACTER ch, const DWORD exp)
+uint32_t AdjustExpByLevel(const LPCHARACTER ch, const uint32_t exp)
 {
 	if (PLAYER_MAX_LEVEL_CONST < ch->GetLevel())
 	{
@@ -72,7 +72,7 @@ DWORD AdjustExpByLevel(const LPCHARACTER ch, const DWORD exp)
 		if (ret < 1.0)
 			return 1;
 
-		return static_cast<DWORD>(ret);
+		return static_cast<uint32_t>(ret);
 	}
 
 	return exp;
@@ -98,7 +98,7 @@ bool CHARACTER::CanFight() const
 	return m_pointsInstant.position >= POS_FIGHTING ? true : false;
 }
 
-void CHARACTER::CreateFly(BYTE bType, LPCHARACTER pkVictim)
+void CHARACTER::CreateFly(uint8_t bType, LPCHARACTER pkVictim)
 {
 	TPacketGCCreateFly packFly;
 
@@ -110,7 +110,7 @@ void CHARACTER::CreateFly(BYTE bType, LPCHARACTER pkVictim)
 	PacketAround(&packFly, sizeof(TPacketGCCreateFly));
 }
 
-void CHARACTER::DistributeSP(LPCHARACTER pkKiller, int iMethod)
+void CHARACTER::DistributeSP(LPCHARACTER pkKiller, int32_t iMethod)
 {
 	if (pkKiller->GetSP() >= pkKiller->GetMaxSP())
 		return;
@@ -120,12 +120,12 @@ void CHARACTER::DistributeSP(LPCHARACTER pkKiller, int iMethod)
 
 	if (iMethod == 1)
 	{
-		int num = number(0, 3);
+		int32_t num = number(0, 3);
 
 		if (!num)
 		{
-			int iLvDelta = GetLevel() - pkKiller->GetLevel();
-			int iAmount = 0;
+			int32_t iLvDelta = GetLevel() - pkKiller->GetLevel();
+			int32_t iAmount = 0;
 
 			if (iLvDelta >= 5)
 				iAmount = 10;
@@ -153,7 +153,7 @@ void CHARACTER::DistributeSP(LPCHARACTER pkKiller, int iMethod)
 	{
 		if (pkKiller->GetJob() == JOB_SHAMAN || (pkKiller->GetJob() == JOB_SURA && pkKiller->GetSkillGroup() == 2))
 		{
-			int iAmount;
+			int32_t iAmount;
 
 			if (bAttacking)
 				iAmount = 2 + GetMaxSP() / 100;
@@ -167,7 +167,7 @@ void CHARACTER::DistributeSP(LPCHARACTER pkKiller, int iMethod)
 		}
 		else
 		{
-			int iAmount;
+			int32_t iAmount;
 
 			if (bAttacking)
 				iAmount = 2 + pkKiller->GetMaxSP() / 200;
@@ -189,7 +189,7 @@ void CHARACTER::DistributeSP(LPCHARACTER pkKiller, int iMethod)
 }
 
 
-bool CHARACTER::Attack(LPCHARACTER pkVictim, BYTE bType)
+bool CHARACTER::Attack(LPCHARACTER pkVictim, uint8_t bType)
 {
 	if (test_server)
 		sys_log(0, "[TEST_SERVER] Attack : %s type %d, MobBattleType %d", GetName(), bType, !GetMobBattleType() ? 0 : GetMobAttackRange());
@@ -204,7 +204,7 @@ bool CHARACTER::Attack(LPCHARACTER pkVictim, BYTE bType)
 	if (!battle_is_attackable(this, pkVictim))
 		return false;
 
-	DWORD dwCurrentTime = get_dword_time();
+	uint32_t dwCurrentTime = get_dword_time();
 
 	if (IsPC())
 	{
@@ -224,7 +224,7 @@ bool CHARACTER::Attack(LPCHARACTER pkVictim, BYTE bType)
 	if (pkVictim->CanBeginFight())
 		pkVictim->BeginFight(this);
 
-	int iRet;
+	int32_t iRet;
 
 	if (bType == 0)
 	{
@@ -263,7 +263,7 @@ bool CHARACTER::Attack(LPCHARACTER pkVictim, BYTE bType)
 		{
 			if (dwCurrentTime - m_dwLastSkillTime > 1500)
 			{
-				sys_log(1, "HACK: Too long skill using term. Name(%s) PID(%u) delta(%u)",
+				sys_log(1, "HACK: Too int32_t skill using term. Name(%s) PID(%u) delta(%u)",
 						GetName(), GetPlayerID(), (dwCurrentTime - m_dwLastSkillTime));
 				return false;
 			}
@@ -282,7 +282,7 @@ bool CHARACTER::Attack(LPCHARACTER pkVictim, BYTE bType)
 
 		// only pc sets victim null. For npc, state machine will reset this.
 		if (BATTLE_DEAD == iRet && IsPC())
-			SetVictim(NULL);
+			SetVictim(nullptr);
 
 		return true;
 	}
@@ -290,7 +290,7 @@ bool CHARACTER::Attack(LPCHARACTER pkVictim, BYTE bType)
 	return false;
 }
 
-void CHARACTER::DeathPenalty(BYTE bTown)
+void CHARACTER::DeathPenalty(uint8_t bTown)
 {
 	sys_log(1, "DEATH_PERNALY_CHECK(%s) town(%d)", GetName(), bTown);
 
@@ -330,7 +330,7 @@ void CHARACTER::DeathPenalty(BYTE bTown)
 		}
 		// END_OF_NO_DEATH_PENALTY_BUG_FIX
 
-		int iLoss = ((GetNextExp() * __GetExpLossPerc(GetLevel())) / 100);
+		int32_t iLoss = ((GetNextExp() * __GetExpLossPerc(GetLevel())) / 100);
 
 		iLoss = MIN(800000, iLoss);
 
@@ -358,7 +358,7 @@ EVENTFUNC(StunEvent)
 {
 	char_event_info* info = dynamic_cast<char_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "StunEvent> <Factor> Null pointer" );
 		return 0;
@@ -366,10 +366,10 @@ EVENTFUNC(StunEvent)
 
 	LPCHARACTER ch = info->ch;
 
-	if (ch == NULL) { // <Factor>
+	if (ch == nullptr) { // <Factor>
 		return 0;
 	}
-	ch->m_pkStunEvent = NULL;
+	ch->m_pkStunEvent = nullptr;
 	ch->Dead();
 	return 0;
 }
@@ -429,13 +429,13 @@ EVENTFUNC(dead_event)
 {
 	const SCharDeadEventInfo* info = dynamic_cast<SCharDeadEventInfo*>(event->info);
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "dead_event> <Factor> Null pointer" );
 		return 0;
 	}
 
-	LPCHARACTER ch = NULL;
+	LPCHARACTER ch = nullptr;
 
 	if (true == info->isPC)
 	{
@@ -446,13 +446,13 @@ EVENTFUNC(dead_event)
 		ch = CHARACTER_MANAGER::instance().Find( info->dwID );
 	}
 
-	if (NULL == ch)
+	if (nullptr == ch)
 	{
 		sys_err("DEAD_EVENT: cannot find char pointer with %s id(%d)", info->isPC ? "PC" : "MOB", info->dwID );
 		return 0;
 	}
 
-	ch->m_pkDeadEvent = NULL;
+	ch->m_pkDeadEvent = nullptr;
 
 	if (ch->GetDesc())
 	{
@@ -527,11 +527,11 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		if (!SECTREE_MANAGER::instance().GetMovablePosition(GetMapIndex(), GetX(), GetY(), pos))
 			return;
 
-	int iTotalGold = 0;
+	int32_t iTotalGold = 0;
 	//
 	// --------- 돈 드롭 확률 계산 ----------
 	//
-	int iGoldPercent = MobRankStats[GetMobRank()].iGoldPercent;
+	int32_t iGoldPercent = MobRankStats[GetMobRank()].iGoldPercent;
 
 	if (pkAttacker->IsPC())
 		iGoldPercent = iGoldPercent * (100 + CPrivManager::instance().GetPriv(pkAttacker, PRIV_GOLD_DROP)) / 100;
@@ -550,18 +550,18 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 	if (iGoldPercent > 100) 
 		iGoldPercent = 100;
 
-	int iPercent;
+	int32_t iPercent;
 
 	if (GetMobRank() >= MOB_RANK_BOSS)
 		iPercent = ((iGoldPercent * PERCENT_LVDELTA_BOSS(pkAttacker->GetLevel(), GetLevel())) / 100);
 	else
 		iPercent = ((iGoldPercent * PERCENT_LVDELTA(pkAttacker->GetLevel(), GetLevel())) / 100);
-	//int iPercent = CALCULATE_VALUE_LVDELTA(pkAttacker->GetLevel(), GetLevel(), iGoldPercent);
+	//int32_t iPercent = CALCULATE_VALUE_LVDELTA(pkAttacker->GetLevel(), GetLevel(), iGoldPercent);
 
 	if (number(1, 100) > iPercent)
 		return;
 
-	int iGoldMultipler = GetGoldMultipler();
+	int32_t iGoldMultipler = GetGoldMultipler();
 
 	if (1 == number(1, 50000)) // 1/50000 확률로 돈이 10배
 		iGoldMultipler *= 10;
@@ -584,7 +584,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 	// 
 	LPITEM item;
 
-	int iGold10DropPct = 100;
+	int32_t iGold10DropPct = 100;
 	iGold10DropPct = (iGold10DropPct * 100) / (100 + CPrivManager::instance().GetPriv(pkAttacker, PRIV_GOLD10_DROP));
 
 	// MOB_RANK가 BOSS보다 높으면 무조건 돈폭탄
@@ -593,11 +593,11 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		if (1 == number(1, iGold10DropPct))
 			iGoldMultipler *= 10; // 1% 확률로 돈 10배
 
-		int iSplitCount = number(25, 35);
+		int32_t iSplitCount = number(25, 35);
 
-		for (int i = 0; i < iSplitCount; ++i)
+		for (int32_t i = 0; i < iSplitCount; ++i)
 		{
-			int iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax) / iSplitCount;
+			int32_t iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax) / iSplitCount;
 			if (test_server)
 				sys_log(0, "iGold %d", iGold);
 			iGold = iGold * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 100;
@@ -633,9 +633,9 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		//
 		// 돈 폭탄식 드롭
 		//
-		for (int i = 0; i < 10; ++i)
+		for (int32_t i = 0; i < 10; ++i)
 		{
-			int iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax);
+			int32_t iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax);
 			iGold = iGold * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 100;
 			iGold *= iGoldMultipler;
 
@@ -662,11 +662,11 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		//
 		// 일반적인 방식의 돈 드롭
 		//
-		int iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax);
+		int32_t iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax);
 		iGold = iGold * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 100;
 		iGold *= iGoldMultipler;
 
-		int iSplitCount;
+		int32_t iSplitCount;
 
 		if (iGold >= 3)
 			iSplitCount = number(1, 3);
@@ -684,7 +684,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		{
 			iTotalGold += iGold; // Total gold
 
-			for (int i = 0; i < iSplitCount; ++i)
+			for (int32_t i = 0; i < iSplitCount; ++i)
 			{
 				if (isAutoLoot)
 				{
@@ -715,14 +715,14 @@ void CHARACTER::Reward(bool bItemDrop)
 			return;
 
 		LPITEM item;
-		int iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax);
-		iGold = iGold * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(NULL) / 100;
+		int32_t iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax);
+		iGold = iGold * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(nullptr) / 100;
 		iGold *= GetGoldMultipler();
-		int iSplitCount = number(25, 35);
+		int32_t iSplitCount = number(25, 35);
 
 		sys_log(0, "WAEGU Dead gold %d split %d", iGold, iSplitCount);
 
-		for (int i = 1; i <= iSplitCount; ++i)
+		for (int32_t i = 1; i <= iSplitCount; ++i)
 		{
 			if ((item = ITEM_MANAGER::instance().CreateItem(1, iGold / iSplitCount)))
 			{
@@ -777,14 +777,14 @@ void CHARACTER::Reward(bool bItemDrop)
 		{
 			if (pkAttacker->GetPoint(POINT_KILL_HP_RECOVERY))
 			{
-				int iHP = pkAttacker->GetMaxHP() * pkAttacker->GetPoint(POINT_KILL_HP_RECOVERY) / 100;
+				int32_t iHP = pkAttacker->GetMaxHP() * pkAttacker->GetPoint(POINT_KILL_HP_RECOVERY) / 100;
 				pkAttacker->PointChange(POINT_HP, iHP);
 				CreateFly(FLY_HP_SMALL, pkAttacker);
 			}
 
 			if (pkAttacker->GetPoint(POINT_KILL_SP_RECOVER))
 			{
-				int iSP = pkAttacker->GetMaxSP() * pkAttacker->GetPoint(POINT_KILL_SP_RECOVER) / 100;
+				int32_t iSP = pkAttacker->GetMaxSP() * pkAttacker->GetPoint(POINT_KILL_SP_RECOVER) / 100;
 				pkAttacker->PointChange(POINT_SP, iSP);
 				CreateFly(FLY_SP_SMALL, pkAttacker);
 			}
@@ -851,15 +851,15 @@ void CHARACTER::Reward(bool bItemDrop)
 		}
 		else
 		{
-			int iItemIdx = s_vec_item.size() - 1;
+			int32_t iItemIdx = s_vec_item.size() - 1;
 
-			std::priority_queue<std::pair<int, LPCHARACTER> > pq;
+			std::priority_queue<std::pair<int32_t, LPCHARACTER> > pq;
 
-			int total_dam = 0;
+			int32_t total_dam = 0;
 
 			for (TDamageMap::iterator it = m_map_kDamage.begin(); it != m_map_kDamage.end(); ++it)
 			{
-				int iDamage = it->second.iTotalDamage;
+				int32_t iDamage = it->second.iTotalDamage;
 				if (iDamage > 0)
 				{
 					LPCHARACTER ch = CHARACTER_MANAGER::instance().Find(it->first);
@@ -965,10 +965,10 @@ void CHARACTER::Reward(bool bItemDrop)
 
 struct TItemDropPenalty
 {
-	int iInventoryPct;		// Range: 1 ~ 1000
-	int iInventoryQty;		// Range: --
-	int iEquipmentPct;		// Range: 1 ~ 100
-	int iEquipmentQty;		// Range: --
+	int32_t iInventoryPct;		// Range: 1 ~ 1000
+	int32_t iInventoryQty;		// Range: --
+	int32_t iEquipmentPct;		// Range: 1 ~ 100
+	int32_t iEquipmentQty;		// Range: --
 };
 
 TItemDropPenalty aItemDropPenalty_kor[9] =
@@ -998,7 +998,7 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 	if (GetLevel() < 10)
 		return;
 
-	int iAlignIndex;
+	int32_t iAlignIndex;
 
 	if (GetRealAlignment() >= 120000)
 		iAlignIndex = 0;
@@ -1019,9 +1019,9 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 	else
 		iAlignIndex = 8;
 
-	std::vector<std::pair<LPITEM, int> > vec_item;
+	std::vector<std::pair<LPITEM, int32_t> > vec_item;
 	LPITEM pkItem;
-	int	i;
+	int32_t	i;
 	bool isDropAllEquipments = false;
 
 	TItemDropPenalty & r = table[iAlignIndex];
@@ -1040,7 +1040,7 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 
 	if (bDropInventory) // Drop Inventory
 	{
-		std::vector<BYTE> vec_bSlots;
+		std::vector<uint8_t> vec_bSlots;
 
 		for (i = 0; i < INVENTORY_MAX_NUM; ++i)
 			if (GetInventoryItem(i))
@@ -1050,7 +1050,7 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 		{
 			std::shuffle(vec_bSlots.begin(), vec_bSlots.end(), GetRand());
 
-			int iQty = MIN(vec_bSlots.size(), r.iInventoryQty);
+			int32_t iQty = MIN(vec_bSlots.size(), r.iInventoryQty);
 
 			if (iQty)
 				iQty = number(1, iQty);
@@ -1072,7 +1072,7 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 
 	if (bDropEquipment) // Drop Equipment
 	{
-		std::vector<BYTE> vec_bSlots;
+		std::vector<uint8_t> vec_bSlots;
 
 		for (i = 0; i < WEAR_MAX_NUM; ++i)
 			if (GetWear(i))
@@ -1081,7 +1081,7 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 		if (!vec_bSlots.empty())
 		{
 			std::shuffle(vec_bSlots.begin(), vec_bSlots.end(), GetRand());
-			int iQty;
+			int32_t iQty;
 
 			if (isDropAllEquipments)
 				iQty = vec_bSlots.size();
@@ -1130,12 +1130,12 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 		pos.x = GetX();
 		pos.y = GetY();
 
-		unsigned int i;
+		uint32_t i;
 
 		for (i = 0; i < vec_item.size(); ++i)
 		{
 			LPITEM item = vec_item[i].first;
-			int window = vec_item[i].second;
+			int32_t window = vec_item[i].second;
 
 			item->AddToGround(GetMapIndex(), pos);
 			item->StartDestroyEvent();
@@ -1152,7 +1152,7 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 class FPartyAlignmentCompute
 {
 	public:
-		FPartyAlignmentCompute(int iAmount, int x, int y)
+		FPartyAlignmentCompute(int32_t iAmount, int32_t x, int32_t y)
 		{
 			m_iAmount = iAmount;
 			m_iCount = 0;
@@ -1176,12 +1176,12 @@ class FPartyAlignmentCompute
 			}
 		}
 
-		int m_iAmount;
-		int m_iCount;
-		int m_iStep;
+		int32_t m_iAmount;
+		int32_t m_iCount;
+		int32_t m_iStep;
 
-		int m_iKillerX;
-		int m_iKillerY;
+		int32_t m_iKillerX;
+		int32_t m_iKillerY;
 };
 
 
@@ -1220,7 +1220,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 	if (pkKiller && pkKiller->IsPC())
 	{
 		if (pkKiller->m_pkChrTarget == this)
-			pkKiller->SetTarget(NULL);
+			pkKiller->SetTarget(nullptr);
 
 		if (!IsPC() && pkKiller->GetDungeon())
 			pkKiller->GetDungeon()->IncKillCount(pkKiller, this);
@@ -1300,7 +1300,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 
 			if (GetEmpire() != pkKiller->GetEmpire())
 			{
-				int iEP = MIN(GetPoint(POINT_EMPIRE_POINT), pkKiller->GetPoint(POINT_EMPIRE_POINT));
+				int32_t iEP = MIN(GetPoint(POINT_EMPIRE_POINT), pkKiller->GetPoint(POINT_EMPIRE_POINT));
 
 				PointChange(POINT_EMPIRE_POINT, -(iEP / 10));
 				pkKiller->PointChange(POINT_EMPIRE_POINT, iEP / 5);
@@ -1322,7 +1322,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 			{
 				if (!isAgreedPVP && !isUnderGuildWar && !IsKillerMode() && GetAlignment() >= 0 && !isDuel && !isForked)
 				{
-					int iNoPenaltyProb = 0;
+					int32_t iNoPenaltyProb = 0;
 
 					if (pkKiller->GetAlignment() >= 0)	// 1/3 percent down
 						iNoPenaltyProb = 33;
@@ -1371,7 +1371,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 
 	ClearSync();
 
-	//sys_log(1, "stun cancel %s[%d]", GetName(), (DWORD)GetVID());
+	//sys_log(1, "stun cancel %s[%d]", GetName(), (uint32_t)GetVID());
 	event_cancel(&m_pkStunEvent); // 기절 이벤트는 죽인다.
 
 	if (IsPC())
@@ -1391,7 +1391,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 				if (GetMobTable().dwResurrectionVnum)
 				{
 					// DUNGEON_MONSTER_REBIRTH_BUG_FIX
-					LPCHARACTER chResurrect = CHARACTER_MANAGER::instance().SpawnMob(GetMobTable().dwResurrectionVnum, GetMapIndex(), GetX(), GetY(), GetZ(), true, (int) GetRotation());
+					LPCHARACTER chResurrect = CHARACTER_MANAGER::instance().SpawnMob(GetMobTable().dwResurrectionVnum, GetMapIndex(), GetX(), GetY(), GetZ(), true, (int32_t) GetRotation());
 					if (GetDungeon() && chResurrect)
 					{
 						chResurrect->SetDungeon(GetDungeon());
@@ -1440,7 +1440,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 	REMOVE_BIT(m_pointsInstant.instant_flag, INSTANT_FLAG_STUN);
 
 	// 플레이어 캐릭터이면
-	if (GetDesc() != NULL) {
+	if (GetDesc() != nullptr) {
 		//
 		// 클라이언트에 에펙트 패킷을 다시 보낸다.
 		//
@@ -1499,7 +1499,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 		sys_log(1, "DEAD_EVENT_CREATE: %s %p %p", GetName(), this, get_pointer(m_pkDeadEvent));
 	}
 
-	if (m_pkExchange != NULL)
+	if (m_pkExchange != nullptr)
 	{
 		m_pkExchange->Cancel();
 	}
@@ -1518,7 +1518,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 
 	if (true == IsMonster() && 2493 == GetMobTable().dwVnum)
 	{
-		if (NULL != pkKiller && NULL != pkKiller->GetGuild())
+		if (nullptr != pkKiller && nullptr != pkKiller->GetGuild())
 		{
 			CDragonLairManager::instance().OnDragonDead( this, pkKiller->GetGuild()->GetID() );
 		}
@@ -1531,7 +1531,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 
 struct FuncSetLastAttacked
 {
-	FuncSetLastAttacked(DWORD dwTime) : m_dwTime(dwTime)
+	FuncSetLastAttacked(uint32_t dwTime) : m_dwTime(dwTime)
 	{
 	}
 
@@ -1540,18 +1540,18 @@ struct FuncSetLastAttacked
 		ch->SetLastAttacked(m_dwTime);
 	}
 
-	DWORD m_dwTime;
+	uint32_t m_dwTime;
 };
 
-void CHARACTER::SetLastAttacked(DWORD dwTime)
+void CHARACTER::SetLastAttacked(uint32_t dwTime)
 {
-	assert(m_pkMobInst != NULL);
+	assert(m_pkMobInst != nullptr);
 
 	m_pkMobInst->m_dwLastAttackedTime = dwTime;
 	m_pkMobInst->m_posLastAttacked = GetXYZ();
 }
 
-void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int Damage, BYTE DamageFlag)
+void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int32_t Damage, uint8_t DamageFlag)
 {
 	if (IsPC() == true || (pAttacker->IsPC() == true && pAttacker->GetTarget() == this))
 	{
@@ -1559,21 +1559,21 @@ void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int Damage, BYTE DamageF
 		memset(&damageInfo, 0, sizeof(TPacketGCDamageInfo));
 
 		damageInfo.header = HEADER_GC_DAMAGE_INFO;
-		damageInfo.dwVID = (DWORD)GetVID();
+		damageInfo.dwVID = (uint32_t)GetVID();
 		damageInfo.flag = DamageFlag;
 		damageInfo.damage = Damage;
 
-		if (GetDesc() != NULL)
+		if (GetDesc() != nullptr)
 		{
 			GetDesc()->Packet(&damageInfo, sizeof(TPacketGCDamageInfo));
 		}
 
-		if (pAttacker->GetDesc() != NULL)
+		if (pAttacker->GetDesc() != nullptr)
 		{
 			pAttacker->GetDesc()->Packet(&damageInfo, sizeof(TPacketGCDamageInfo));
 		}
 		/*
-		   if (GetArenaObserverMode() == false && GetArena() != NULL)
+		   if (GetArenaObserverMode() == false && GetArena() != nullptr)
 		   {
 		   GetArena()->SendPacketToObserver(&damageInfo, sizeof(TPacketGCDamageInfo));
 		   }
@@ -1593,7 +1593,7 @@ void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int Damage, BYTE DamageF
 //    true		: dead
 //    false		: not dead yet
 // 
-bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // returns true if dead
+bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // returns true if dead
 {
 #ifdef ENABLE_NEWSTUFF
 	if (pAttacker && IsStone() && pAttacker->IsPC())
@@ -1607,12 +1607,12 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 #endif
 	if (DAMAGE_TYPE_MAGIC == type)
 	{
-		dam = (int)((float)dam * (100 + (pAttacker->GetPoint(POINT_MAGIC_ATT_BONUS_PER) + pAttacker->GetPoint(POINT_MELEE_MAGIC_ATT_BONUS_PER))) / 100.f + 0.5f);
+		dam = (int32_t)((float)dam * (100 + (pAttacker->GetPoint(POINT_MAGIC_ATT_BONUS_PER) + pAttacker->GetPoint(POINT_MELEE_MAGIC_ATT_BONUS_PER))) / 100.f + 0.5f);
 	}
 	if (GetRaceNum() == 5001)
 	{
 		bool bDropMoney = false;
-		int iPercent = 0; // @fixme136
+		int32_t iPercent = 0; // @fixme136
 		if (GetMaxHP() >= 0)
 			iPercent = (GetHP() * 100) / GetMaxHP();
 
@@ -1644,12 +1644,12 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 
 		if (bDropMoney)
 		{
-			DWORD dwGold = 1000;
-			int iSplitCount = number(10, 13);
+			uint32_t dwGold = 1000;
+			int32_t iSplitCount = number(10, 13);
 
 			sys_log(0, "WAEGU DropGoldOnHit %d times", GetMaxSP());
 
-			for (int i = 1; i <= iSplitCount; ++i)
+			for (int32_t i = 1; i <= iSplitCount; ++i)
 			{
 				PIXEL_POSITION pos;
 				LPITEM item;
@@ -1677,15 +1677,15 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 	{
 		if (IsAffectFlag(AFF_TERROR))
 		{
-			int pct = GetSkillPower(SKILL_TERROR) / 400;
+			int32_t pct = GetSkillPower(SKILL_TERROR) / 400;
 
 			if (number(1, 100) <= pct)
 				return false;
 		}
 	}
 
-	int iCurHP = GetHP();
-	int iCurSP = GetSP();
+	int32_t iCurHP = GetHP();
+	int32_t iCurSP = GetSP();
 
 	bool IsCritical = false;
 	bool IsPenetrate = false;
@@ -1707,7 +1707,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 		if (pAttacker)
 		{
 			// 크리티컬
-			int iCriticalPct = pAttacker->GetPoint(POINT_CRITICAL_PCT);
+			int32_t iCriticalPct = pAttacker->GetPoint(POINT_CRITICAL_PCT);
 
 			if (!IsPC())
 				iCriticalPct += pAttacker->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_CRITICAL_BONUS);
@@ -1736,7 +1736,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			}
 
 			// 관통공격
-			int iPenetratePct = pAttacker->GetPoint(POINT_PENETRATE_PCT);
+			int32_t iPenetratePct = pAttacker->GetPoint(POINT_PENETRATE_PCT);
 
 			if (!IsPC())
 				iPenetratePct += pAttacker->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_PENETRATE_BONUS);
@@ -1747,11 +1747,11 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 				{
 					CSkillProto* pkSk = CSkillManager::instance().Get(SKILL_RESIST_PENETRATE);
 
-					if (NULL != pkSk)
+					if (nullptr != pkSk)
 					{
 						pkSk->SetPointVar("k", 1.0f * GetSkillPower(SKILL_RESIST_PENETRATE) / 100.0f);
 
-						iPenetratePct -= static_cast<int>(pkSk->kPointPoly.Eval());
+						iPenetratePct -= static_cast<int32_t>(pkSk->kPointPoly.Eval());
 					}
 				}
 
@@ -1826,10 +1826,10 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 		}
 
 		if (IsAffectFlag(AFF_JEONGWIHON))
-			dam = (int) (dam * (100 + GetSkillPower(SKILL_JEONGWI) * 25 / 100) / 100);
+			dam = (int32_t) (dam * (100 + GetSkillPower(SKILL_JEONGWI) * 25 / 100) / 100);
 
 		if (IsAffectFlag(AFF_TERROR))
-			dam = (int) (dam * (95 - GetSkillPower(SKILL_TERROR) / 5) / 100);
+			dam = (int32_t) (dam * (95 - GetSkillPower(SKILL_TERROR) / 5) / 100);
 
 		if (IsAffectFlag(AFF_HOSIN))
 			dam = dam * (100 - GetPoint(POINT_RESIST_NORMAL_DAMAGE)) / 100;
@@ -1844,19 +1844,19 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 				// 반사
 				if (GetPoint(POINT_REFLECT_MELEE))
 				{
-					int reflectDamage = dam * GetPoint(POINT_REFLECT_MELEE) / 100;
+					int32_t reflectDamage = dam * GetPoint(POINT_REFLECT_MELEE) / 100;
 
 					// NOTE: 공격자가 IMMUNE_REFLECT 속성을 갖고있다면 반사를 안 하는 게 
 					// 아니라 1/3 데미지로 고정해서 들어가도록 기획에서 요청.
 					if (pAttacker->IsImmune(IMMUNE_REFLECT))
-						reflectDamage = int(reflectDamage / 3.0f + 0.5f);
+						reflectDamage = int32_t(reflectDamage / 3.0f + 0.5f);
 
 					pAttacker->Damage(this, reflectDamage, DAMAGE_TYPE_SPECIAL);
 				}
 			}
 
 			// 크리티컬
-			int iCriticalPct = pAttacker->GetPoint(POINT_CRITICAL_PCT);
+			int32_t iCriticalPct = pAttacker->GetPoint(POINT_CRITICAL_PCT);
 
 			if (!IsPC())
 				iCriticalPct += pAttacker->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_CRITICAL_BONUS);
@@ -1875,7 +1875,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			}
 
 			// 관통공격
-			int iPenetratePct = pAttacker->GetPoint(POINT_PENETRATE_PCT);
+			int32_t iPenetratePct = pAttacker->GetPoint(POINT_PENETRATE_PCT);
 
 			if (!IsPC())
 				iPenetratePct += pAttacker->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_PENETRATE_BONUS);
@@ -1883,11 +1883,11 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			{
 				CSkillProto* pkSk = CSkillManager::instance().Get(SKILL_RESIST_PENETRATE);
 
-				if (NULL != pkSk)
+				if (nullptr != pkSk)
 				{
 					pkSk->SetPointVar("k", 1.0f * GetSkillPower(SKILL_RESIST_PENETRATE) / 100.0f);
 
-					iPenetratePct -= static_cast<int>(pkSk->kPointPoly.Eval());
+					iPenetratePct -= static_cast<int32_t>(pkSk->kPointPoly.Eval());
 				}
 			}
 
@@ -1914,11 +1914,11 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			// HP 스틸
 			if (pAttacker->GetPoint(POINT_STEAL_HP))
 			{
-				int pct = 1;
+				int32_t pct = 1;
 
 				if (number(1, 10) <= pct)
 				{
-					int iHP = MIN(dam, MAX(0, iCurHP)) * pAttacker->GetPoint(POINT_STEAL_HP) / 100;
+					int32_t iHP = MIN(dam, MAX(0, iCurHP)) * pAttacker->GetPoint(POINT_STEAL_HP) / 100;
 
 					if (iHP > 0 && GetHP() >= iHP)
 					{
@@ -1932,18 +1932,18 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			// SP 스틸
 			if (pAttacker->GetPoint(POINT_STEAL_SP))
 			{
-				int pct = 1;
+				int32_t pct = 1;
 
 				if (number(1, 10) <= pct)
 				{
-					int iCur;
+					int32_t iCur;
 
 					if (IsPC())
 						iCur = iCurSP;
 					else
 						iCur = iCurHP;
 
-					int iSP = MIN(dam, MAX(0, iCur)) * pAttacker->GetPoint(POINT_STEAL_SP) / 100;
+					int32_t iSP = MIN(dam, MAX(0, iCur)) * pAttacker->GetPoint(POINT_STEAL_SP) / 100;
 
 					if (iSP > 0 && iCur >= iSP)
 					{
@@ -1961,7 +1961,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			{
 				if (number(1, 100) <= pAttacker->GetPoint(POINT_STEAL_GOLD))
 				{
-					int iAmount = number(1, GetLevel());
+					int32_t iAmount = number(1, GetLevel());
 					pAttacker->PointChange(POINT_GOLD, iAmount);
 					DBManager::instance().SendMoneyLog(MONEY_LOG_MISC, 1, iAmount);
 				}
@@ -1970,7 +1970,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			// 칠 때마다 HP회복
 			if (pAttacker->GetPoint(POINT_HIT_HP_RECOVERY) && number(0, 4) > 0) // 80% 확률
 			{
-				int i = ((iCurHP>=0)?MIN(dam, iCurHP):dam) * pAttacker->GetPoint(POINT_HIT_HP_RECOVERY) / 100; //@fixme107
+				int32_t i = ((iCurHP>=0)?MIN(dam, iCurHP):dam) * pAttacker->GetPoint(POINT_HIT_HP_RECOVERY) / 100; //@fixme107
 
 				if (i)
 				{
@@ -1982,7 +1982,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 			// 칠 때마다 SP회복
 			if (pAttacker->GetPoint(POINT_HIT_SP_RECOVERY) && number(0, 4) > 0) // 80% 확률
 			{
-				int i = ((iCurHP>=0)?MIN(dam, iCurHP):dam) * pAttacker->GetPoint(POINT_HIT_SP_RECOVERY) / 100; //@fixme107
+				int32_t i = ((iCurHP>=0)?MIN(dam, iCurHP):dam) * pAttacker->GetPoint(POINT_HIT_SP_RECOVERY) / 100; //@fixme107
 
 				if (i)
 				{
@@ -2037,9 +2037,9 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 	if (IsAffectFlag(AFF_MANASHIELD))
 	{
 		// POINT_MANASHIELD 는 작아질수록 좋다
-		int iDamageSPPart = dam / 3;
-		int iDamageToSP = iDamageSPPart * GetPoint(POINT_MANASHIELD) / 100;
-		int iSP = GetSP();
+		int32_t iDamageSPPart = dam / 3;
+		int32_t iDamageToSP = iDamageSPPart * GetPoint(POINT_MANASHIELD) / 100;
+		int32_t iSP = GetSP();
 
 		// SP가 있으면 무조건 데미지 절반 감소
 		if (iDamageToSP <= iSP)
@@ -2060,7 +2060,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 	// 
 	if (GetPoint(POINT_MALL_DEFBONUS) > 0)
 	{
-		int dec_dam = MIN(200, dam * GetPoint(POINT_MALL_DEFBONUS) / 100);
+		int32_t dec_dam = MIN(200, dam * GetPoint(POINT_MALL_DEFBONUS) / 100);
 		dam -= dec_dam;
 	}
 
@@ -2071,15 +2071,15 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 		//
 		if (pAttacker->GetPoint(POINT_MALL_ATTBONUS) > 0)
 		{
-			int add_dam = MIN(300, dam * pAttacker->GetLimitPoint(POINT_MALL_ATTBONUS) / 100);
+			int32_t add_dam = MIN(300, dam * pAttacker->GetLimitPoint(POINT_MALL_ATTBONUS) / 100);
 			dam += add_dam;
 		}
 
 		if (pAttacker->IsPC())
 		{
-			int iEmpire = pAttacker->GetEmpire();
-			long lMapIndex = pAttacker->GetMapIndex();
-			int iMapEmpire = SECTREE_MANAGER::instance().GetEmpireFromMapIndex(lMapIndex);
+			int32_t iEmpire = pAttacker->GetEmpire();
+			int32_t lMapIndex = pAttacker->GetMapIndex();
+			int32_t iMapEmpire = SECTREE_MANAGER::instance().GetEmpireFromMapIndex(lMapIndex);
 
 			
 			if (iEmpire && iMapEmpire && iEmpire != iMapEmpire)
@@ -2089,13 +2089,13 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 
 			if (!IsPC() && GetMonsterDrainSPPoint())
 			{
-				int iDrain = GetMonsterDrainSPPoint();
+				int32_t iDrain = GetMonsterDrainSPPoint();
 
 				if (iDrain <= pAttacker->GetSP())
 					pAttacker->PointChange(POINT_SP, -iDrain);
 				else
 				{
-					int iSP = pAttacker->GetSP();
+					int32_t iSP = pAttacker->GetSP();
 					pAttacker->PointChange(POINT_SP, -iSP);
 				}
 			}
@@ -2155,7 +2155,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 	// -----------------------
 	if (pAttacker && pAttacker->IsPC())
 	{
-		int iDmgPct = CHARACTER_MANAGER::instance().GetUserDamageRate(pAttacker);
+		int32_t iDmgPct = CHARACTER_MANAGER::instance().GetUserDamageRate(pAttacker);
 		dam = dam * iDmgPct / 100;
 	}
 
@@ -2184,7 +2184,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 
 		dam = BlueDragon_Damage(this, pAttacker, dam);
 
-		BYTE damageFlag = 0;
+		uint8_t damageFlag = 0;
 
 		if (type == DAMAGE_TYPE_POISON)
 			damageFlag = DAMAGE_POISON;
@@ -2216,7 +2216,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 
 		if (test_server)
 		{
-			int iTmpPercent = 0; // @fixme136
+			int32_t iTmpPercent = 0; // @fixme136
 			if (GetMaxHP() >= 0)
 				iTmpPercent = (GetHP() * 100) / GetMaxHP();
 
@@ -2304,8 +2304,8 @@ void CHARACTER::DistributeHP(LPCHARACTER pkKiller)
 #define ENABLE_NEWEXP_CALCULATION
 #ifdef ENABLE_NEWEXP_CALCULATION
 #define NEW_GET_LVDELTA(me, victim) aiPercentByDeltaLev[MINMAX(0, (victim + 15) - me, MAX_EXP_DELTA_OF_LEV - 1)]
-typedef long double rate_t;
-static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
+typedef double rate_t;
+static void GiveExp(LPCHARACTER from, LPCHARACTER to, int32_t iExp)
 {
 	if (test_server && iExp < 0)
 	{
@@ -2316,7 +2316,7 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 	rate_t lvFactor = static_cast<rate_t>(NEW_GET_LVDELTA(to->GetLevel(), from->GetLevel())) / 100.0L;
 	iExp *= lvFactor;
 	// start calculating rate exp bonus
-	int iBaseExp = iExp;
+	int32_t iBaseExp = iExp;
 	rate_t rateFactor = 100;
 	if (distribution_test_server)
 		rateFactor *= 3;
@@ -2366,7 +2366,7 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 	rateFactor += to->GetPoint(POINT_EXP);
 	rateFactor = rateFactor * static_cast<rate_t>(CHARACTER_MANAGER::instance().GetMobExpRate(to))/100.0L;
 	// fix underflow formula
-	iExp = std::max<int>(0, iExp);
+	iExp = std::max<int32_t>(0, iExp);
 	rateFactor = std::max<rate_t>(100.0L, rateFactor);
 	// apply calculated rate bonus
 	iExp *= (rateFactor/100.0L);
@@ -2387,7 +2387,7 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 		if (you)
 		{
 			// sometimes, this overflows
-			DWORD dwUpdatePoint = (2000.0L/to->GetLevel()/to->GetLevel()/3)*iExp;
+			uint32_t dwUpdatePoint = (2000.0L/to->GetLevel()/to->GetLevel()/3)*iExp;
 
 			if (to->GetPremiumRemainSeconds(PREMIUM_MARRIAGE_FAST) > 0 ||
 					you->GetPremiumRemainSeconds(PREMIUM_MARRIAGE_FAST) > 0)
@@ -2403,7 +2403,7 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 	}
 }
 #else
-static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
+static void GiveExp(LPCHARACTER from, LPCHARACTER to, int32_t iExp)
 {
 	iExp = CALCULATE_VALUE_LVDELTA(to->GetLevel(), from->GetLevel(), iExp);
 
@@ -2411,7 +2411,7 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 	if (distribution_test_server)
 		iExp *= 3;
 
-	int iBaseExp = iExp;
+	int32_t iBaseExp = iExp;
 
 	// 점술, 회사 경험치 이벤트 적용
 	iExp = iExp * (100 + CPrivManager::instance().GetPriv(to, PRIV_EXP_PCT)) / 100;
@@ -2514,11 +2514,11 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 		if (you)
 		{
 			// 1억이 100%
-			DWORD dwUpdatePoint = 2000*iExp/to->GetLevel()/to->GetLevel()/3;
+			uint32_t dwUpdatePoint = 2000*iExp/to->GetLevel()/to->GetLevel()/3;
 
 			if (to->GetPremiumRemainSeconds(PREMIUM_MARRIAGE_FAST) > 0 || 
 					you->GetPremiumRemainSeconds(PREMIUM_MARRIAGE_FAST) > 0)
-				dwUpdatePoint = (DWORD)(dwUpdatePoint * 3);
+				dwUpdatePoint = (uint32_t)(dwUpdatePoint * 3);
 
 			marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(to->GetPlayerID());
 
@@ -2535,9 +2535,9 @@ namespace NPartyExpDistribute
 {
 	struct FPartyTotaler
 	{
-		int		total;
-		int		member_count;
-		int		x, y;
+		int32_t		total;
+		int32_t		member_count;
+		int32_t		x, y;
 
 		FPartyTotaler(LPCHARACTER center)
 			: total(0), member_count(0), x(center->GetX()), y(center->GetY())
@@ -2556,14 +2556,14 @@ namespace NPartyExpDistribute
 
 	struct FPartyDistributor
 	{
-		int		total;
+		int32_t		total;
 		LPCHARACTER	c;
-		int		x, y;
-		DWORD		_iExp;
-		int		m_iMode;
-		int		m_iMemberCount;
+		int32_t		x, y;
+		uint32_t		_iExp;
+		int32_t		m_iMode;
+		int32_t		m_iMemberCount;
 
-		FPartyDistributor(LPCHARACTER center, int member_count, int total, DWORD iExp, int iMode) 
+		FPartyDistributor(LPCHARACTER center, int32_t member_count, int32_t total, uint32_t iExp, int32_t iMode) 
 			: total(total), c(center), x(center->GetX()), y(center->GetY()), _iExp(iExp), m_iMode(iMode), m_iMemberCount(member_count)
 			{
 				if (m_iMemberCount == 0)
@@ -2574,12 +2574,12 @@ namespace NPartyExpDistribute
 		{
 			if (DISTANCE_APPROX(ch->GetX() - x, ch->GetY() - y) <= PARTY_DEFAULT_RANGE)
 			{
-				DWORD iExp2 = 0;
+				uint32_t iExp2 = 0;
 
 				switch (m_iMode)
 				{
 					case PARTY_EXP_DISTRIBUTION_NON_PARITY:
-						iExp2 = (DWORD) (_iExp * (float) __GetPartyExpNP(ch->GetLevel()) / total);
+						iExp2 = (uint32_t) (_iExp * (float) __GetPartyExpNP(ch->GetLevel()) / total);
 						break;
 
 					case PARTY_EXP_DISTRIBUTION_PARITY:
@@ -2599,17 +2599,17 @@ namespace NPartyExpDistribute
 
 typedef struct SDamageInfo
 {
-	int iDam;
+	int32_t iDam;
 	LPCHARACTER pAttacker;
 	LPPARTY pParty;
 
 	void Clear()
 	{
-		pAttacker = NULL;
-		pParty = NULL;
+		pAttacker = nullptr;
+		pParty = nullptr;
 	}
 
-	inline void Distribute(LPCHARACTER ch, int iExp)
+	inline void Distribute(LPCHARACTER ch, int32_t iExp)
 	{
 		if (pAttacker)
 			GiveExp(ch, pAttacker, iExp);
@@ -2634,7 +2634,7 @@ typedef struct SDamageInfo
 
 				if (DISTANCE_APPROX(ch->GetX() - tch->GetX(), ch->GetY() - tch->GetY()) <= PARTY_DEFAULT_RANGE)
 				{
-					int iExpCenteralize = (int) (iExp * 0.05f);
+					int32_t iExpCenteralize = (int32_t) (iExp * 0.05f);
 					iExp -= iExpCenteralize;
 
 					GiveExp(ch, pParty->GetExpCentralizeCharacter(), iExpCenteralize);
@@ -2651,14 +2651,14 @@ typedef struct SDamageInfo
 #ifdef __ENABLE_KILL_EVENT_FIX__
 LPCHARACTER CHARACTER::GetMostAttacked() {
 
-	int iMostDam=-1;
-	LPCHARACTER pkChrMostAttacked = NULL;
+	int32_t iMostDam=-1;
+	LPCHARACTER pkChrMostAttacked = nullptr;
 	auto it = m_map_kDamage.begin();
 
 	while (it != m_map_kDamage.end()){
 		//* getting information from the iterator
 		const VID & c_VID = it->first;
-		const int iDam    = it->second.iTotalDamage;
+		const int32_t iDam    = it->second.iTotalDamage;
 
 		//* increasing the iterator
 		++it;
@@ -2690,14 +2690,14 @@ LPCHARACTER CHARACTER::GetMostAttacked() {
 
 LPCHARACTER CHARACTER::DistributeExp()
 {
-	int iExpToDistribute = GetExp();
+	int32_t iExpToDistribute = GetExp();
 
 	if (iExpToDistribute <= 0)
-		return NULL;
+		return nullptr;
 
-	int	iTotalDam = 0;
-	LPCHARACTER pkChrMostAttacked = NULL;
-	int iMostDam = 0;
+	int32_t	iTotalDam = 0;
+	LPCHARACTER pkChrMostAttacked = nullptr;
+	int32_t iMostDam = 0;
 
 	typedef std::vector<TDamageInfo> TDamageInfoTable;
 	TDamageInfoTable damage_info_table;
@@ -2711,7 +2711,7 @@ LPCHARACTER CHARACTER::DistributeExp()
 	while (it != m_map_kDamage.end())
 	{
 		const VID & c_VID = it->first;
-		int iDam = it->second.iTotalDamage;
+		int32_t iDam = it->second.iTotalDamage;
 
 		++it;
 
@@ -2735,7 +2735,7 @@ LPCHARACTER CHARACTER::DistributeExp()
 			{
 				TDamageInfo di;
 				di.iDam = iDam;
-				di.pAttacker = NULL;
+				di.pAttacker = nullptr;
 				di.pParty = pAttacker->GetParty();
 				map_party_damage.insert(std::make_pair(di.pParty, di));
 			}
@@ -2750,7 +2750,7 @@ LPCHARACTER CHARACTER::DistributeExp()
 
 			di.iDam = iDam;
 			di.pAttacker = pAttacker;
-			di.pParty = NULL;
+			di.pParty = nullptr;
 
 			//sys_log(0, "__ pq_damage %s %d", pAttacker->GetName(), iDam);
 			//pq_damage.push(di);
@@ -2768,12 +2768,12 @@ LPCHARACTER CHARACTER::DistributeExp()
 	//m_map_kDamage.clear();
 
 	if (iTotalDam == 0)	// 데미지 준게 0이면 리턴
-		return NULL;
+		return nullptr;
 
 	if (m_pkChrStone)	// 돌이 있을 경우 경험치의 반을 돌에게 넘긴다.
 	{
 		//sys_log(0, "__ Give half to Stone : %d", iExpToDistribute>>1);
-		int iExp = iExpToDistribute >> 1;
+		int32_t iExp = iExpToDistribute >> 1;
 		m_pkChrStone->SetExp(m_pkChrStone->GetExp() + iExp);
 		iExpToDistribute -= iExp;
 	}
@@ -2784,7 +2784,7 @@ LPCHARACTER CHARACTER::DistributeExp()
 	//GetName(), iExpToDistribute, pq_damage.size(), iTotalDam);
 
 	if (damage_info_table.empty())
-		return NULL;
+		return nullptr;
 
 	// 제일 데미지를 많이 준 사람이 HP 회복을 한다.
 	DistributeHP(pkChrMostAttacked);	// 만두 시스템
@@ -2802,7 +2802,7 @@ LPCHARACTER CHARACTER::DistributeExp()
 			}
 		}
 
-		int	iExp = iExpToDistribute / 5;
+		int32_t	iExp = iExpToDistribute / 5;
 		iExpToDistribute -= iExp;
 
 		float fPercent = (float) di->iDam / iTotalDam;
@@ -2813,7 +2813,7 @@ LPCHARACTER CHARACTER::DistributeExp()
 			fPercent = 1.0f;
 		}
 
-		iExp += (int) (iExpToDistribute * fPercent);
+		iExp += (int32_t) (iExpToDistribute * fPercent);
 
 		//sys_log(0, "%s given exp percent %.1f + 20 dam %d", GetName(), fPercent * 100.0f, di.iDam);
 
@@ -2843,7 +2843,7 @@ LPCHARACTER CHARACTER::DistributeExp()
 			}
 
 			//sys_log(0, "%s given exp percent %.1f dam %d", GetName(), fPercent * 100.0f, di.iDam);
-			di.Distribute(this, (int) (iExpToDistribute * fPercent));
+			di.Distribute(this, (int32_t) (iExpToDistribute * fPercent));
 		}
 	}
 
@@ -2851,7 +2851,7 @@ LPCHARACTER CHARACTER::DistributeExp()
 }
 
 // 화살 개수를 리턴해 줌
-int CHARACTER::GetArrowAndBow(LPITEM * ppkBow, LPITEM * ppkArrow, int iArrowCount/* = 1 */)
+int32_t CHARACTER::GetArrowAndBow(LPITEM * ppkBow, LPITEM * ppkArrow, int32_t iArrowCount/* = 1 */)
 {
 	LPITEM pkBow;
 
@@ -2876,10 +2876,10 @@ int CHARACTER::GetArrowAndBow(LPITEM * ppkBow, LPITEM * ppkArrow, int iArrowCoun
 	return iArrowCount;
 }
 
-void CHARACTER::UseArrow(LPITEM pkArrow, DWORD dwArrowCount)
+void CHARACTER::UseArrow(LPITEM pkArrow, uint32_t dwArrowCount)
 {
-	int iCount = pkArrow->GetCount();
-	DWORD dwVnum = pkArrow->GetVnum();
+	int32_t iCount = pkArrow->GetCount();
+	uint32_t dwVnum = pkArrow->GetVnum();
 	iCount = iCount - MIN(iCount, dwArrowCount);
 	pkArrow->SetCount(iCount);
 
@@ -2898,14 +2898,14 @@ class CFuncShoot
 {
 	public:
 		LPCHARACTER	m_me;
-		BYTE		m_bType;
+		uint8_t		m_bType;
 		bool		m_bSucceed;
 
-		CFuncShoot(LPCHARACTER ch, BYTE bType) : m_me(ch), m_bType(bType), m_bSucceed(FALSE)
+		CFuncShoot(LPCHARACTER ch, uint8_t bType) : m_me(ch), m_bType(bType), m_bSucceed(FALSE)
 		{
 		}
 
-		void operator () (DWORD dwTargetVID)
+		void operator () (uint32_t dwTargetVID)
 		{
 			if (m_bType > 1)
 			{
@@ -2938,7 +2938,7 @@ class CFuncShoot
 			{
 				case 0: // 일반활
 					{
-						int iDam = 0;
+						int32_t iDam = 0;
 
 						if (m_me->IsPC())
 						{
@@ -2961,7 +2961,7 @@ class CFuncShoot
 							m_me->UseArrow(pkArrow, 1);
 
 							// check speed hack
-							DWORD	dwCurrentTime	= get_dword_time();
+							uint32_t	dwCurrentTime	= get_dword_time();
 							if (IS_SPEED_HACK(m_me, pkVictim, dwCurrentTime))
 								iDam	= 0;
 						}
@@ -2988,7 +2988,7 @@ class CFuncShoot
 
 				case 1: // 일반 마법
 					{
-						int iDam;
+						int32_t iDam;
 
 						if (m_me->IsPC())
 							return;
@@ -2999,9 +2999,9 @@ class CFuncShoot
 
 						// 데미지 계산
 #ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
-						const int resist_magic = MINMAX(0, pkVictim->GetPoint(POINT_RESIST_MAGIC), 100);
-						const int resist_magic_reduction = MINMAX(0, (m_me->GetJob()==JOB_SURA) ? m_me->GetPoint(POINT_RESIST_MAGIC_REDUCTION)/2 : m_me->GetPoint(POINT_RESIST_MAGIC_REDUCTION), 50);
-						const int total_res_magic = MINMAX(0, resist_magic - resist_magic_reduction, 100);
+						const int32_t resist_magic = MINMAX(0, pkVictim->GetPoint(POINT_RESIST_MAGIC), 100);
+						const int32_t resist_magic_reduction = MINMAX(0, (m_me->GetJob()==JOB_SURA) ? m_me->GetPoint(POINT_RESIST_MAGIC_REDUCTION)/2 : m_me->GetPoint(POINT_RESIST_MAGIC_REDUCTION), 50);
+						const int32_t total_res_magic = MINMAX(0, resist_magic - resist_magic_reduction, 100);
 						iDam = iDam * (100 - total_res_magic) / 100;
 #else
 						iDam = iDam * (100 - pkVictim->GetPoint(POINT_RESIST_MAGIC)) / 100;
@@ -3022,8 +3022,8 @@ class CFuncShoot
 
 				case SKILL_YEONSA:	// 연사
 					{
-						//int iUseArrow = 2 + (m_me->GetSkillPower(SKILL_YEONSA) *6/100);
-						int iUseArrow = 1;
+						//int32_t iUseArrow = 2 + (m_me->GetSkillPower(SKILL_YEONSA) *6/100);
+						int32_t iUseArrow = 1;
 
 						// 토탈만 계산하는경우
 						{
@@ -3051,7 +3051,7 @@ class CFuncShoot
 
 				case SKILL_KWANKYEOK:
 					{
-						int iUseArrow = 1;
+						int32_t iUseArrow = 1;
 
 						if (iUseArrow == m_me->GetArrowAndBow(&pkBow, &pkArrow, iUseArrow))
 						{
@@ -3070,7 +3070,7 @@ class CFuncShoot
 
 				case SKILL_GIGUNG:
 					{
-						int iUseArrow = 1;
+						int32_t iUseArrow = 1;
 						if (iUseArrow == m_me->GetArrowAndBow(&pkBow, &pkArrow, iUseArrow))
 						{
 							m_me->OnMove(true);
@@ -3088,7 +3088,7 @@ class CFuncShoot
 					break;
 				case SKILL_HWAJO:
 					{
-						int iUseArrow = 1;
+						int32_t iUseArrow = 1;
 						if (iUseArrow == m_me->GetArrowAndBow(&pkBow, &pkArrow, iUseArrow))
 						{
 							m_me->OnMove(true);
@@ -3107,7 +3107,7 @@ class CFuncShoot
 
 				case SKILL_HORSE_WILDATTACK_RANGE:
 					{
-						int iUseArrow = 1;
+						int32_t iUseArrow = 1;
 						if (iUseArrow == m_me->GetArrowAndBow(&pkBow, &pkArrow, iUseArrow))
 						{
 							m_me->OnMove(true);
@@ -3172,8 +3172,8 @@ class CFuncShoot
 					  m_me->OnMove(true);
 					  pkVictim->OnMove();
 
-					  DWORD * pdw;
-					  DWORD dwEI = AllocEventInfo(sizeof(DWORD) * 2, &pdw);
+					  uint32_t * pdw;
+					  uint32_t dwEI = AllocEventInfo(sizeof(uint32_t) * 2, &pdw);
 					  pdw[0] = m_me->GetVID();
 					  pdw[1] = pkVictim->GetVID();
 
@@ -3182,7 +3182,7 @@ class CFuncShoot
 					  break;*/
 
 				default:
-					sys_err("CFuncShoot: I don't know this type [%d] of range attack.", (int) m_bType);
+					sys_err("CFuncShoot: I don't know this type [%d] of range attack.", (int32_t) m_bType);
 					break;
 			}
 
@@ -3190,7 +3190,7 @@ class CFuncShoot
 		}
 };
 
-bool CHARACTER::Shoot(BYTE bType)
+bool CHARACTER::Shoot(uint8_t bType)
 {
 	sys_log(1, "Shoot %s type %u flyTargets.size %zu", GetName(), bType, m_vec_dwFlyTargets.size());
 
@@ -3213,7 +3213,7 @@ bool CHARACTER::Shoot(BYTE bType)
 	return f.m_bSucceed;
 }
 
-void CHARACTER::FlyTarget(DWORD dwTargetVID, long x, long y, BYTE bHeader)
+void CHARACTER::FlyTarget(uint32_t dwTargetVID, int32_t x, int32_t y, uint8_t bHeader)
 {
 	LPCHARACTER pkVictim = CHARACTER_MANAGER::instance().Find(dwTargetVID);
 	TPacketGCFlyTargeting pack;
@@ -3246,11 +3246,11 @@ void CHARACTER::FlyTarget(DWORD dwTargetVID, long x, long y, BYTE bHeader)
 
 LPCHARACTER CHARACTER::GetNearestVictim(LPCHARACTER pkChr)
 {
-	if (NULL == pkChr)
+	if (nullptr == pkChr)
 		pkChr = this;
 
 	float fMinDist = 99999.0f;
-	LPCHARACTER pkVictim = NULL;
+	LPCHARACTER pkVictim = nullptr;
 
 	TDamageMap::iterator it = m_map_kDamage.begin();
 
@@ -3309,15 +3309,15 @@ LPCHARACTER CHARACTER::GetProtege() const // 보호해야 할 대상을 리턴
 	if (m_pkParty)
 		return m_pkParty->GetLeader();
 
-	return NULL;
+	return nullptr;
 }
 
-int CHARACTER::GetAlignment() const
+int32_t CHARACTER::GetAlignment() const
 {
 	return m_iAlignment;
 }
 
-int CHARACTER::GetRealAlignment() const
+int32_t CHARACTER::GetRealAlignment() const
 {
 	return m_iRealAlignment;
 }
@@ -3342,14 +3342,14 @@ void CHARACTER::ShowAlignment(bool bShow)
 	}
 }
 
-void CHARACTER::UpdateAlignment(int iAmount)
+void CHARACTER::UpdateAlignment(int32_t iAmount)
 {
 	bool bShow = false;
 
 	if (m_iAlignment == m_iRealAlignment)
 		bShow = true;
 
-	int i = m_iAlignment / 10;
+	int32_t i = m_iAlignment / 10;
 
 	m_iRealAlignment = MINMAX(-200000, m_iRealAlignment + iAmount, 200000);
 
@@ -3391,7 +3391,7 @@ void CHARACTER::UpdateKillerMode()
 		SetKillerMode(false);
 }
 
-void CHARACTER::SetPKMode(BYTE bPKMode)
+void CHARACTER::SetPKMode(uint8_t bPKMode)
 {
 	if (bPKMode >= PK_MODE_MAX_NUM)
 		return;
@@ -3408,7 +3408,7 @@ void CHARACTER::SetPKMode(BYTE bPKMode)
 	sys_log(0, "PK_MODE: %s %d", GetName(), m_bPKMode);
 }
 
-BYTE CHARACTER::GetPKMode() const
+uint8_t CHARACTER::GetPKMode() const
 {
 	return m_bPKMode;
 }
@@ -3428,7 +3428,7 @@ struct FuncForgetMyAttacker
 			if (ch->IsPC())
 				return;
 			if (ch->m_kVIDVictim == m_ch->GetVID())
-				ch->SetVictim(NULL);
+				ch->SetVictim(nullptr);
 		}
 	}
 };
@@ -3481,7 +3481,7 @@ struct FuncAttractRanger
 				return;
 			if (ch->GetMobAttackRange() > 150)
 			{
-				int iNewRange = 150;//(int)(ch->GetMobAttackRange() * 0.2);
+				int32_t iNewRange = 150;//(int32_t)(ch->GetMobAttackRange() * 0.2);
 				if (iNewRange < 150)
 					iNewRange = 150;
 
@@ -3494,8 +3494,8 @@ struct FuncAttractRanger
 struct FuncPullMonster
 {
 	LPCHARACTER m_ch;
-	int m_iLength;
-	FuncPullMonster(LPCHARACTER ch, int iLength = 300)
+	int32_t m_iLength;
+	FuncPullMonster(LPCHARACTER ch, int32_t iLength = 300)
 	{
 		m_ch = ch;
 		m_iLength = iLength;
@@ -3525,8 +3525,8 @@ struct FuncPullMonster
 			float fy;
 
 			GetDeltaByDegree(degree, fDist - fNewDist, &fx, &fy);
-			long tx = (long)(ch->GetX() + fx);
-			long ty = (long)(ch->GetY() + fy);
+			int32_t tx = (int32_t)(ch->GetX() + fx);
+			int32_t ty = (int32_t)(ch->GetY() + fy);
 
 			ch->Sync(tx, ty);
 			ch->Goto(tx, ty);
@@ -3578,21 +3578,21 @@ void CHARACTER::PullMonster()
 	}
 }
 
-void CHARACTER::UpdateAggrPointEx(LPCHARACTER pAttacker, EDamageType type, int dam, CHARACTER::TBattleInfo & info)
+void CHARACTER::UpdateAggrPointEx(LPCHARACTER pAttacker, EDamageType type, int32_t dam, CHARACTER::TBattleInfo & info)
 {
 	// 특정 공격타입에 따라 더 올라간다
 	switch (type)
 	{
 		case DAMAGE_TYPE_NORMAL_RANGE:
-			dam = (int) (dam*1.2f);
+			dam = (int32_t) (dam*1.2f);
 			break;
 
 		case DAMAGE_TYPE_RANGE:
-			dam = (int) (dam*1.5f);
+			dam = (int32_t) (dam*1.5f);
 			break;
 
 		case DAMAGE_TYPE_MAGIC:
-			dam = (int) (dam*1.2f);
+			dam = (int32_t) (dam*1.2f);
 			break;
 
 		default:
@@ -3601,7 +3601,7 @@ void CHARACTER::UpdateAggrPointEx(LPCHARACTER pAttacker, EDamageType type, int d
 
 	// 공격자가 현재 대상인 경우 보너스를 준다.
 	if (pAttacker == GetVictim())
-		dam = (int) (dam * 1.2f);
+		dam = (int32_t) (dam * 1.2f);
 
 	info.iAggro += dam;
 
@@ -3614,7 +3614,7 @@ void CHARACTER::UpdateAggrPointEx(LPCHARACTER pAttacker, EDamageType type, int d
 		LPPARTY pParty = GetParty();
 
 		// 리더인 경우 영향력이 좀더 강하다
-		int iPartyAggroDist = dam;
+		int32_t iPartyAggroDist = dam;
 
 		if (pParty->GetLeaderPID() == GetVID())
 			iPartyAggroDist /= 2;
@@ -3627,7 +3627,7 @@ void CHARACTER::UpdateAggrPointEx(LPCHARACTER pAttacker, EDamageType type, int d
 	ChangeVictimByAggro(info.iAggro, pAttacker);
 }
 
-void CHARACTER::UpdateAggrPoint(LPCHARACTER pAttacker, EDamageType type, int dam)
+void CHARACTER::UpdateAggrPoint(LPCHARACTER pAttacker, EDamageType type, int32_t dam)
 {
 	if (IsDead() || IsStun())
 		return;
@@ -3643,7 +3643,7 @@ void CHARACTER::UpdateAggrPoint(LPCHARACTER pAttacker, EDamageType type, int dam
 	UpdateAggrPointEx(pAttacker, type, dam, it->second);
 }
 
-void CHARACTER::ChangeVictimByAggro(int iNewAggro, LPCHARACTER pNewVictim)
+void CHARACTER::ChangeVictimByAggro(int32_t iNewAggro, LPCHARACTER pNewVictim)
 {
 	if (get_dword_time() - m_dwLastVictimSetTime < 3000) // 3초는 기다려야한다
 		return;

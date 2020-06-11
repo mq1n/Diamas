@@ -9,8 +9,8 @@ public:
 	TAbstractSingleton()
 	{ 
 		assert(!ms_singleton);
-		int offset = (int) (T*) 1 - (int) (CSingleton <T>*) (T*) 1; 
-		ms_singleton = (T*) ((int) this + offset);
+		int32_t offset = (int32_t) (T*) 1 - (int32_t) (CSingleton <T>*) (T*) 1; 
+		ms_singleton = (T*) ((int32_t) this + offset);
 	} 
 
 	virtual ~TAbstractSingleton()
@@ -21,7 +21,7 @@ public:
 
 	__forceinline static T & GetSingleton()
 	{
-		assert(ms_singleton!=NULL);
+		assert(ms_singleton!=nullptr);
 		return (*ms_singleton);
 	}	
 };

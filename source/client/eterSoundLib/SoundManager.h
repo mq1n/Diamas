@@ -27,8 +27,8 @@ public:
 	void SetSoundVolumeRatio(float fRatio);
 	void SetMusicVolume(float fVolume);
 	void SetMusicVolumeRatio(float fRatio);
-	void SetSoundVolumeGrade(int iGrade);
-	void SetMusicVolumeGrade(int iGrade);
+	void SetSoundVolumeGrade(int32_t iGrade);
+	void SetMusicVolumeGrade(int32_t iGrade);
 	void SaveVolume();
 	void RestoreVolume();
 	float GetSoundVolume();
@@ -36,11 +36,11 @@ public:
 
 	// Sound
 	void PlaySound2D(const char * c_szFileName);
-	void PlaySound3D(float fx, float fy, float fz, const char * c_szFileName, int iPlayCount = 1);
-	void StopSound3D(int iIndex);
-	int  PlayAmbienceSound3D(float fx, float fy, float fz, const char * c_szFileName, int iPlayCount = 1);
+	void PlaySound3D(float fx, float fy, float fz, const char * c_szFileName, int32_t iPlayCount = 1);
+	void StopSound3D(int32_t iIndex);
+	int32_t  PlayAmbienceSound3D(float fx, float fy, float fz, const char * c_szFileName, int32_t iPlayCount = 1);
 	void PlayCharacterSound3D(float fx, float fy, float fz, const char * c_szFileName, BOOL bCheckFrequency = FALSE);
-	void SetSoundVolume3D(int iIndex, float fVolume);
+	void SetSoundVolume3D(int32_t iIndex, float fVolume);
 	void StopAllSound3D();
 
 	// Music
@@ -52,10 +52,10 @@ public:
 	void FadeAll();
 
 	// Sound Node
-	void UpdateSoundData(DWORD dwcurFrame, const NSound::TSoundDataVector * c_pSoundDataVector);
-	void UpdateSoundData(float fx, float fy, float fz, DWORD dwcurFrame, const NSound::TSoundDataVector * c_pSoundDataVector);
-	void UpdateSoundInstance(float fx, float fy, float fz, DWORD dwcurFrame, const NSound::TSoundInstanceVector * c_pSoundInstanceVector, BOOL bCheckFrequency = FALSE);
-	void UpdateSoundInstance(DWORD dwcurFrame, const NSound::TSoundInstanceVector * c_pSoundInstanceVector);
+	void UpdateSoundData(uint32_t dwcurFrame, const NSound::TSoundDataVector * c_pSoundDataVector);
+	void UpdateSoundData(float fx, float fy, float fz, uint32_t dwcurFrame, const NSound::TSoundDataVector * c_pSoundDataVector);
+	void UpdateSoundInstance(float fx, float fy, float fz, uint32_t dwcurFrame, const NSound::TSoundInstanceVector * c_pSoundInstanceVector, BOOL bCheckFrequency = FALSE);
+	void UpdateSoundInstance(uint32_t dwcurFrame, const NSound::TSoundInstanceVector * c_pSoundInstanceVector);
 
 protected:
 	enum EMusicState
@@ -68,19 +68,19 @@ protected:
 	};
 	typedef struct SMusicInstance
 	{
-		DWORD dwMusicFileNameCRC;
+		uint32_t dwMusicFileNameCRC;
 		EMusicState MusicState;
 		float fVolume;
 		float fLimitVolume;
 		float fVolumeSpeed;
 	} TMusicInstance;
 
-	void PlayMusic(DWORD dwIndex, const char * c_szFileName, float fVolume, float fVolumeSpeed);
-	void StopMusic(DWORD dwIndex);
-	BOOL GetMusicIndex(const char * c_szFileName, DWORD * pdwIndex);
+	void PlayMusic(uint32_t dwIndex, const char * c_szFileName, float fVolume, float fVolumeSpeed);
+	void StopMusic(uint32_t dwIndex);
+	BOOL GetMusicIndex(const char * c_szFileName, uint32_t * pdwIndex);
 
 protected:
-	float __ConvertGradeVolumeToApplyVolume(int nVolumeGrade);
+	float __ConvertGradeVolumeToApplyVolume(int32_t nVolumeGrade);
 	float __ConvertRatioVolumeToApplyVolume(float fVolumeRatio);
 	void __SetMusicVolume(float fVolume);
 	BOOL GetSoundInstance2D(const char * c_szSoundFileName, ISoundInstance ** ppInstance);

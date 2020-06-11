@@ -15,7 +15,7 @@ namespace quest
 	//
 	// "quest" Lua functions
 	//
-	int quest_start(lua_State* L)
+	int32_t quest_start(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 
@@ -24,7 +24,7 @@ namespace quest
 		return 0;
 	}
 
-	int quest_done(lua_State* L)
+	int32_t quest_done(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 
@@ -33,7 +33,7 @@ namespace quest
 		return 0;
 	}
 
-	int quest_set_title(lua_State* L)
+	int32_t quest_set_title(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 
@@ -44,7 +44,7 @@ namespace quest
 		return 0;
 	}
 
-	int quest_set_another_title(lua_State* L)
+	int32_t quest_set_another_title(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 
@@ -54,7 +54,7 @@ namespace quest
 		return 0;
 	}
 
-	int quest_set_clock_name(lua_State* L)
+	int32_t quest_set_clock_name(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 
@@ -65,18 +65,18 @@ namespace quest
 		return 0;
 	}
 
-	int quest_set_clock_value(lua_State* L)
+	int32_t quest_set_clock_value(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 
-		//q.GetPC(q.GetCurrentCharacterPtr()->GetPlayerID())->SetCurrentQuestClockValue((int)rint(lua_tonumber(L,-1)));
+		//q.GetPC(q.GetCurrentCharacterPtr()->GetPlayerID())->SetCurrentQuestClockValue((int32_t)rint(lua_tonumber(L,-1)));
 		if (lua_isnumber(L,-1))
-			q.GetCurrentPC()->SetCurrentQuestClockValue((int)rint(lua_tonumber(L,-1)));
+			q.GetCurrentPC()->SetCurrentQuestClockValue((int32_t)rint(lua_tonumber(L,-1)));
 
 		return 0;
 	}
 
-	int quest_set_counter_name(lua_State* L)
+	int32_t quest_set_counter_name(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 
@@ -87,31 +87,31 @@ namespace quest
 		return 0;
 	}
 
-	int quest_set_counter_value(lua_State* L)
+	int32_t quest_set_counter_value(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 
-		//q.GetPC(q.GetCurrentCharacterPtr()->GetPlayerID())->SetCurrentQuestCounterValue((int)rint(lua_tonumber(L,-1)));
+		//q.GetPC(q.GetCurrentCharacterPtr()->GetPlayerID())->SetCurrentQuestCounterValue((int32_t)rint(lua_tonumber(L,-1)));
 		if (lua_isnumber(L,-1))
-			q.GetCurrentPC()->SetCurrentQuestCounterValue((int)rint(lua_tonumber(L,-1)));
+			q.GetCurrentPC()->SetCurrentQuestCounterValue((int32_t)rint(lua_tonumber(L,-1)));
 
 		return 0;
 	}
 
-	int quest_set_icon_file(lua_State* L)
+	int32_t quest_set_icon_file(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 
-		//q.GetPC(q.GetCurrentCharacterPtr()->GetPlayerID())->SetCurrentQuestCounterValue((int)rint(lua_tonumber(L,-1)));
+		//q.GetPC(q.GetCurrentCharacterPtr()->GetPlayerID())->SetCurrentQuestCounterValue((int32_t)rint(lua_tonumber(L,-1)));
 		if (lua_isstring(L,-1))
 			q.GetCurrentPC()->SetCurrentQuestIconFile(lua_tostring(L,-1));
 
 		return 0;
 	}
 
-	int quest_setstate(lua_State* L)
+	int32_t quest_setstate(lua_State* L)
 	{
-		if (lua_tostring(L, -1)==NULL)
+		if (lua_tostring(L, -1)==nullptr)
 		{
 			sys_err("state name is empty");
 			return 0;
@@ -146,7 +146,7 @@ namespace quest
 		return 0;
 	}
 
-	int quest_coroutine_yield(lua_State * L)
+	int32_t quest_coroutine_yield(lua_State * L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 		// other_pc_block 내부에서는 yield가 일어나서는 안된다. 절대로.
@@ -154,13 +154,13 @@ namespace quest
 		{
 			sys_err("FATAL ERROR! Yield occur in other_pc_block.");
 			PC* pPC = q.GetOtherPCBlockRootPC();
-			if (NULL == pPC)
+			if (nullptr == pPC)
 			{
-				sys_err("	... FFFAAATTTAAALLL Error. RootPC is NULL");
+				sys_err("	... FFFAAATTTAAALLL Error. RootPC is nullptr");
 				return 0;
 			}
 			QuestState* pQS = pPC->GetRunningQuestState();
-			if (NULL == pQS || NULL == q.GetQuestStateName(pPC->GetCurrentQuestName(), pQS->st))
+			if (nullptr == pQS || nullptr == q.GetQuestStateName(pPC->GetCurrentQuestName(), pQS->st))
 			{
 				sys_err("	... WHO AM I? WHERE AM I? I only know QuestName(%s)...", pPC->GetCurrentQuestName().c_str());
 			}
@@ -173,32 +173,32 @@ namespace quest
 		return lua_yield(L, lua_gettop(L));
 	}
 
-	int quest_no_send(lua_State* L)
+	int32_t quest_no_send(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 		q.SetNoSend();
 		return 0;
 	}
 
-	int quest_get_current_quest_index(lua_State* L)
+	int32_t quest_get_current_quest_index(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 		PC* pPC = q.GetCurrentPC();
 
-		int idx = q.GetQuestIndexByName(pPC->GetCurrentQuestName());
+		int32_t idx = q.GetQuestIndexByName(pPC->GetCurrentQuestName());
 		lua_pushnumber(L, idx);
 		return 1;
 	}
 
-	int quest_begin_other_pc_block(lua_State* L)
+	int32_t quest_begin_other_pc_block(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
-		DWORD pid = lua_tonumber(L, -1);
+		uint32_t pid = lua_tonumber(L, -1);
 		q.BeginOtherPCBlock(pid);
 		return 0;
 	}
 
-	int quest_end_other_pc_block(lua_State* L)
+	int32_t quest_end_other_pc_block(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 		q.EndOtherPCBlock();
@@ -239,7 +239,7 @@ namespace quest
 			// 주의 : other_pc_block 내부에서는 절대로 yield가 일어나서는 안된다.(ex. wait, select, input, ...)
 			{ "begin_other_pc_block",	quest_begin_other_pc_block	}, 
 			{ "end_other_pc_block",		quest_end_other_pc_block	},
-			{ NULL,						NULL						}
+			{ nullptr,						nullptr						}
 		};
 
 		CQuestManager::instance().AddLuaFunctionTable("q", quest_functions);

@@ -42,11 +42,11 @@ public:
 		virtual ~CSpeedGrassWrapper( );
 
 		void							SetMapOutdoor(CMapOutdoor* pMapOutdoor)	{ m_pMapOutdoor = pMapOutdoor; }
-		int								Draw(float fDensity);
+		int32_t								Draw(float fDensity);
 		bool							InitFromBsfFile(const char* pFilename,
-														unsigned int nNumBlades, 
-														unsigned int uiRows, 
-														unsigned int uiCols, 
+														uint32_t nNumBlades, 
+														uint32_t uiRows, 
+														uint32_t uiCols, 
 														float fCollisionDistance);
 
 private:

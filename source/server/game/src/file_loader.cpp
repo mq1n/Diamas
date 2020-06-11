@@ -9,22 +9,22 @@ CMemoryTextFileLoader::~CMemoryTextFileLoader()
 {
 }
 
-bool CMemoryTextFileLoader::SplitLine(DWORD dwLine, std::vector<std::string>* pstTokenVector, const char * c_szDelimeter)
+bool CMemoryTextFileLoader::SplitLine(uint32_t dwLine, std::vector<std::string>* pstTokenVector, const char * c_szDelimeter)
 {
 	pstTokenVector->clear();
 
 	std::string stToken;
 	const std::string & c_rstLine = GetLineString(dwLine);
 
-	DWORD basePos = 0;
+	uint32_t basePos = 0;
 
 	do
 	{
-		int beginPos = c_rstLine.find_first_not_of(c_szDelimeter, basePos);
+		int32_t beginPos = c_rstLine.find_first_not_of(c_szDelimeter, basePos);
 		if (beginPos < 0)
 			return false;
 
-		int endPos;
+		int32_t endPos;
 
 		if (c_rstLine[beginPos] == '#' && c_rstLine.compare(beginPos, 4, "#--#") != 0)
 		{
@@ -49,19 +49,19 @@ bool CMemoryTextFileLoader::SplitLine(DWORD dwLine, std::vector<std::string>* ps
 		pstTokenVector->push_back(c_rstLine.substr(beginPos, endPos - beginPos));
 
 		// 추가 코드. 맨뒤에 탭이 있는 경우를 체크한다. - [levites]
-		if (int(c_rstLine.find_first_not_of(c_szDelimeter, basePos)) < 0)
+		if (int32_t(c_rstLine.find_first_not_of(c_szDelimeter, basePos)) < 0)
 			break;
 	} while (basePos < c_rstLine.length());
 
 	return true;
 }
 
-DWORD CMemoryTextFileLoader::GetLineCount()
+uint32_t CMemoryTextFileLoader::GetLineCount()
 {
 	return m_stLineVector.size();
 }
 
-bool CMemoryTextFileLoader::CheckLineIndex(DWORD dwLine)
+bool CMemoryTextFileLoader::CheckLineIndex(uint32_t dwLine)
 {
 	if (dwLine >= m_stLineVector.size())
 		return false;
@@ -69,19 +69,19 @@ bool CMemoryTextFileLoader::CheckLineIndex(DWORD dwLine)
 	return true;
 }
 
-const std::string & CMemoryTextFileLoader::GetLineString(DWORD dwLine)
+const std::string & CMemoryTextFileLoader::GetLineString(uint32_t dwLine)
 {
 	assert(CheckLineIndex(dwLine));
 	return m_stLineVector[dwLine];
 }
 
-void CMemoryTextFileLoader::Bind(int bufSize, const void* c_pvBuf)
+void CMemoryTextFileLoader::Bind(int32_t bufSize, const void* c_pvBuf)
 {
 	m_stLineVector.clear();
 
 	const char * c_pcBuf = (const char *)c_pvBuf;
 	std::string stLine;
-	int pos = 0;
+	int32_t pos = 0;
 
 	while (pos < bufSize)
 	{

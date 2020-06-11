@@ -12,13 +12,13 @@
 * TEA Encryption Module Instruction
 *					Edited by 김한주 aka. 비엽, Cronan
 *
-* void tea_code(const unsigned long sz, const unsigned long sy, const unsigned long *key, unsigned long *dest)
-* void tea_decode(const unsigned long sz, const unsigned long sy, const unsigned long *key, unsigned long *dest)
+* void tea_code(const uint32_t sz, const uint32_t sy, const uint32_t *key, uint32_t *dest)
+* void tea_decode(const uint32_t sz, const uint32_t sy, const uint32_t *key, uint32_t *dest)
 *   8바이트를 암호/복호화 할때 사용된다. key 는 16 바이트여야 한다.
 *   sz, sy 는 8바이트의 역순으로 대입한다. 
 * 
-* int tea_decrypt(unsigned long *dest, const unsigned long *src, const unsigned long *key, int size);
-* int tea_encrypt(unsigned long *dest, const unsigned long *src, const unsigned long *key, int size);
+* int32_t tea_decrypt(uint32_t *dest, const uint32_t *src, const uint32_t *key, int32_t size);
+* int32_t tea_encrypt(uint32_t *dest, const uint32_t *src, const uint32_t *key, int32_t size);
 *   한꺼번에 8 바이트 이상을 암호/복호화 할때 사용한다. 만약 size 가
 *   8의 배수가 아니면 8의 배수로 크기를 "늘려서" 암호화 한다. 
 *
@@ -29,10 +29,10 @@
 #define TEA_ROUND		32		// 32 를 권장하며, 높을 수록 결과가 난해해 진다.
 #define DELTA			0x9E3779B9	// DELTA 값 바꾸지 말것.
 
-void tea_code(const unsigned long sz, const unsigned long sy, const unsigned long *key, unsigned long *dest)
+void tea_code(const uint32_t sz, const uint32_t sy, const uint32_t *key, uint32_t *dest)
 {
-	register unsigned long y = sy, z = sz, sum = 0;
-	unsigned long		n = TEA_ROUND;
+	register uint32_t y = sy, z = sz, sum = 0;
+	uint32_t		n = TEA_ROUND;
 	
 	while (n-- > 0)
 	{
@@ -45,13 +45,13 @@ void tea_code(const unsigned long sz, const unsigned long sy, const unsigned lon
 	*dest	= z;
 }
 
-void tea_decode(const unsigned long sz, const unsigned long sy, const unsigned long *key, unsigned long *dest)
+void tea_decode(const uint32_t sz, const uint32_t sy, const uint32_t *key, uint32_t *dest)
 {
 #pragma warning(disable:4307)
-	register unsigned long y = sy, z = sz, sum = DELTA * TEA_ROUND;
+	register uint32_t y = sy, z = sz, sum = DELTA * TEA_ROUND;
 #pragma warning(default:4307)
 
-	unsigned long		n = TEA_ROUND;
+	uint32_t		n = TEA_ROUND;
 	
 	while (n-- > 0)
 	{
@@ -64,10 +64,10 @@ void tea_decode(const unsigned long sz, const unsigned long sy, const unsigned l
 	*dest	= z;
 }
 
-int tea_encrypt(unsigned long *dest, const unsigned long *src, const unsigned long * key, int size)
+int32_t tea_encrypt(uint32_t *dest, const uint32_t *src, const uint32_t * key, int32_t size)
 {
-	int		i;
-	int		resize;
+	int32_t		i;
+	int32_t		resize;
 	
 	if (size % 8 != 0)
 	{
@@ -83,10 +83,10 @@ int tea_encrypt(unsigned long *dest, const unsigned long *src, const unsigned lo
 	return (resize);
 }
 
-int tea_decrypt(unsigned long *dest, const unsigned long *src, const unsigned long * key, int size)
+int32_t tea_decrypt(uint32_t *dest, const uint32_t *src, const uint32_t * key, int32_t size)
 {
-	int		i;
-	int		resize;
+	int32_t		i;
+	int32_t		resize;
 	
 	if (size % 8 != 0)
 		resize = size + 8 - (size % 8);

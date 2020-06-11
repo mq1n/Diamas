@@ -15,15 +15,15 @@ class CAffectFlagContainer
 
 		void Clear();
 		void CopyInstance(const CAffectFlagContainer& c_rkAffectContainer);		
-		void Set(UINT uPos, bool isSet);
-		bool IsSet(UINT uPos) const;
+		void Set(uint32_t uPos, bool isSet);
+		bool IsSet(uint32_t uPos) const;
 
-		void CopyData(UINT uPos, UINT uByteSize, const void* c_pvData);
+		void CopyData(uint32_t uPos, uint32_t uByteSize, const void* c_pvData);
 
-		void ConvertToPosition(unsigned* uRetX, unsigned* uRetY) const;
+		void ConvertToPosition(uint32_t* uRetX, uint32_t* uRetY) const;
 		
 	private:
-		typedef unsigned char Element;
+		typedef uint8_t Element;
 
 		Element m_aElement[BYTE_SIZE];
 };

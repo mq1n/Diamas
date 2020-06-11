@@ -55,7 +55,7 @@
 class CSpeedTreeForest
 {
 	public:
-		typedef std::map<DWORD, CSpeedTreeWrapper *> TTreeMap;
+		typedef std::map<uint32_t, CSpeedTreeWrapper *> TTreeMap;
 
 	public:
 		CSpeedTreeForest();
@@ -64,11 +64,11 @@ class CSpeedTreeForest
 		void						ClearMainTree();
 
 		
-		BOOL						GetMainTree(DWORD dwCRC, CSpeedTreeWrapper ** ppMainTree, const char * c_pszFileName);
-		CSpeedTreeWrapper *			GetMainTree(DWORD dwCRC);
-		void						DeleteMainTree(DWORD dwCRC);
+		BOOL						GetMainTree(uint32_t dwCRC, CSpeedTreeWrapper ** ppMainTree, const char * c_pszFileName);
+		CSpeedTreeWrapper *			GetMainTree(uint32_t dwCRC);
+		void						DeleteMainTree(uint32_t dwCRC);
 
-		CSpeedTreeWrapper *			CreateInstance(float x, float y, float z, DWORD dwTreeCRC, const char * c_pszTreeName);
+		CSpeedTreeWrapper *			CreateInstance(float x, float y, float z, uint32_t dwTreeCRC, const char * c_pszTreeName);
 		void						DeleteInstance(CSpeedTreeWrapper * pTree);
 
 		//void						SetLodLimits(void);
@@ -89,8 +89,8 @@ class CSpeedTreeForest
 		void						SetupWindMatrices(float fTimeInSecs);
 		
 		// overridden by specific graphics API
-		virtual	void				UploadWindMatrix(unsigned int uiLocation, const float* pMatrix) const = 0;
-		virtual void				Render(unsigned long ulRenderBitVector) = 0;
+		virtual	void				UploadWindMatrix(uint32_t uiLocation, const float* pMatrix) const = 0;
+		virtual void				Render(uint32_t ulRenderBitVector) = 0;
 		
 	protected:
 		TTreeMap					m_pMainTreeMap;

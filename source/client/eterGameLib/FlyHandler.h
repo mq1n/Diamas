@@ -8,7 +8,7 @@ public:
 
 	// Call by ActorInstance
 	virtual void OnSetFlyTarget() {}
-	virtual void OnShoot(DWORD dwSkillIndex) {}
+	virtual void OnShoot(uint32_t dwSkillIndex) {}
 
 	virtual void OnNoTarget() {}
 	virtual void OnNoArrow() {}
@@ -16,6 +16,6 @@ public:
 	// Call by FlyingInstance
 	virtual void OnExplodingOutOfRange() {}
 	virtual void OnExplodingAtBackground() {}
-	virtual void OnExplodingAtAnotherTarget(DWORD dwSkillIndex, DWORD dwVID) {}
-	virtual void OnExplodingAtTarget(DWORD dwSkillIndex) {}
+	virtual void OnExplodingAtAnotherTarget(uint32_t dwSkillIndex, uint32_t dwVID) {}
+	virtual void OnExplodingAtTarget(uint32_t dwSkillIndex) {}
 };

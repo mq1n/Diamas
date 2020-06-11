@@ -10,8 +10,8 @@ BOOL GetTokenTimeEventFloat(CTextFileLoader & rTextFileLoader, const char * c_sz
 	pTimeEventTableFloat->clear();
 	pTimeEventTableFloat->resize(pTokenVector->size() / 2);
 
-	DWORD dwIndex = 0;
-	for (DWORD i = 0; i < pTokenVector->size(); i+=2, ++dwIndex)
+	uint32_t dwIndex = 0;
+	for (uint32_t i = 0; i < pTokenVector->size(); i+=2, ++dwIndex)
 	{
 		pTimeEventTableFloat->at(dwIndex).m_fTime = atof(pTokenVector->at(i).c_str());
 		pTimeEventTableFloat->at(dwIndex).m_Value = atof(pTokenVector->at(i+1).c_str());

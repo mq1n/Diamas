@@ -11,7 +11,7 @@
 #include "TrafficProfiler.h"
 
 TrafficProfiler::TrafficProfiler()
-	: m_pfProfileLogFile(NULL), m_dwFlushCycle(0), m_tmProfileStartTime(0), m_dwTotalTraffic(0), m_dwTotalPacket(0)
+	: m_pfProfileLogFile(nullptr), m_dwFlushCycle(0), m_tmProfileStartTime(0), m_dwTotalTraffic(0), m_dwTotalPacket(0)
 {
 	m_aTrafficVec[ 0 ].resize( 256 );
 	m_aTrafficVec[ 1 ].resize( 256 );
@@ -23,7 +23,7 @@ TrafficProfiler::~TrafficProfiler()
 		fclose( m_pfProfileLogFile );
 }
 
-bool TrafficProfiler::Initialize( DWORD dwFlushCycle, const char* pszFileName )
+bool TrafficProfiler::Initialize( uint32_t dwFlushCycle, const char* pszFileName )
 {
 	m_pfProfileLogFile = fopen( pszFileName, "w" );
 	if ( !m_pfProfileLogFile )
@@ -50,11 +50,11 @@ bool TrafficProfiler::Flush()
 
 	fprintf( m_pfProfileLogFile, "------------------ Input ------------------\n" );
 
-	for ( int idx = 0; idx < (int)IODIR_MAX; idx++ ) 
+	for ( int32_t idx = 0; idx < (int32_t)IODIR_MAX; idx++ ) 
 	{
 		fprintf( m_pfProfileLogFile, "Packet\tCount\tTotal Size\tAverage\n" );
 
-		BYTE byHeader = 0;
+		uint8_t byHeader = 0;
 		for ( TrafficVec::iterator it = m_aTrafficVec[ idx ].begin(); it != m_aTrafficVec[ idx ].end(); ++it, byHeader++ ) 
 		{
 			if ( it->second )
@@ -64,7 +64,7 @@ bool TrafficProfiler::Flush()
 		fprintf( m_pfProfileLogFile, "------------------ Output -----------------\n" );
 	}
 
-	time_t cur = time( NULL );
+	time_t cur = time( nullptr );
 	fprintf( m_pfProfileLogFile, "# Profile End(Flush): %s", ctime( &cur ) );
 	fflush( m_pfProfileLogFile );
 
@@ -79,12 +79,12 @@ bool TrafficProfiler::Flush()
 
 void TrafficProfiler::InitializeProfiling()
 {
-	m_tmProfileStartTime = time( NULL );
+	m_tmProfileStartTime = time( nullptr );
 	m_dwTotalPacket = 0;
 	m_dwTotalTraffic = 0;
 
 	TrafficInfo empty( 0, 0 );
-	for ( int idx = 0; idx < (int)IODIR_MAX; idx++ ) 
+	for ( int32_t idx = 0; idx < (int32_t)IODIR_MAX; idx++ ) 
 	{
 		for ( TrafficVec::iterator it = m_aTrafficVec[ idx ].begin(); it != m_aTrafficVec[ idx ].end(); ++it )
 			*it = empty;

@@ -9,8 +9,8 @@ class CGuildMarkDownloader : public CNetworkStream, public CSingleton<CGuildMark
 		CGuildMarkDownloader();
 		virtual ~CGuildMarkDownloader();
 
-		bool Connect(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey);
-		bool ConnectToRecvSymbol(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey, const std::vector<DWORD> & c_rkVec_dwGuildID);
+		bool Connect(const CNetworkAddress& c_rkNetAddr, uint32_t dwHandle, uint32_t dwRandomKey);
+		bool ConnectToRecvSymbol(const CNetworkAddress& c_rkNetAddr, uint32_t dwHandle, uint32_t dwRandomKey, const std::vector<uint32_t> & c_rkVec_dwGuildID);
 
 		void Process();
 
@@ -38,8 +38,8 @@ class CGuildMarkDownloader : public CNetworkStream, public CSingleton<CGuildMark
 		void __Initialize();
 		bool __StateProcess();
 
-		UINT __GetPacketSize(UINT header);
-		bool __DispatchPacket(UINT header);
+		uint32_t __GetPacketSize(uint32_t header);
+		bool __DispatchPacket(uint32_t header);
 
 		void __OfflineState_Set();
 		void __CompleteState_Set();
@@ -61,19 +61,19 @@ class CGuildMarkDownloader : public CNetworkStream, public CSingleton<CGuildMark
 		bool __SendSymbolCRCList();
 
 	private:
-		DWORD m_dwHandle;
-		DWORD m_dwRandomKey;
-		DWORD m_dwTodo;
+		uint32_t m_dwHandle;
+		uint32_t m_dwRandomKey;
+		uint32_t m_dwTodo;
 
-		std::vector<DWORD> m_kVec_dwGuildID;
+		std::vector<uint32_t> m_kVec_dwGuildID;
 
-		UINT m_eState;
+		uint32_t m_eState;
 
-		BYTE m_currentRequestingImageIndex;
+		uint8_t m_currentRequestingImageIndex;
 
 		CGuildMarkManager * m_pkMarkMgr;
 
-		DWORD m_dwBlockIndex;
-		DWORD m_dwBlockDataSize;
-		DWORD m_dwBlockDataPos;
+		uint32_t m_dwBlockIndex;
+		uint32_t m_dwBlockDataSize;
+		uint32_t m_dwBlockDataPos;
 };

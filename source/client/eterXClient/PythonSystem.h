@@ -28,49 +28,49 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 
 		typedef struct SResolution
 		{
-			DWORD	width;
-			DWORD	height;
-			DWORD	bpp;		// bits per pixel (high-color = 16bpp, true-color = 32bpp)
+			uint32_t	width;
+			uint32_t	height;
+			uint32_t	bpp;		// bits per pixel (high-color = 16bpp, true-color = 32bpp)
 
-			DWORD	frequency[20];
-			BYTE	frequency_count;
+			uint32_t	frequency[20];
+			uint8_t	frequency_count;
 		} TResolution;
 
 		typedef struct SWindowStatus
 		{
-			int		isVisible;
-			int		isMinimized;
+			int32_t		isVisible;
+			int32_t		isMinimized;
 
-			int		ixPosition;
-			int		iyPosition;
-			int		iHeight;
+			int32_t		ixPosition;
+			int32_t		iyPosition;
+			int32_t		iHeight;
 		} TWindowStatus;
 
 		typedef struct SConfig
 		{
-			DWORD			width;
-			DWORD			height;
-			DWORD			bpp;
-			DWORD			frequency;
+			uint32_t			width;
+			uint32_t			height;
+			uint32_t			bpp;
+			uint32_t			frequency;
 
 			bool			is_software_cursor;
 			bool			is_object_culling;
-			int				iDistance;
-			int				iShadowLevel;
+			int32_t				iDistance;
+			int32_t				iShadowLevel;
 
-			FLOAT			music_volume;
-			BYTE			voice_volume;
+			float			music_volume;
+			uint8_t			voice_volume;
 
-			int				gamma;
+			int32_t				gamma;
 
-			int				isSaveID;
+			int32_t				isSaveID;
 			char			SaveID[20];
 
 			bool			bWindowed;
 			bool			bDecompressDDS;
 			bool			bNoSoundCard;
 			bool			bUseDefaultIME;
-			BYTE			bSoftwareTiling;
+			uint8_t			bSoftwareTiling;
 			bool			bViewChat;
 			bool			bAlwaysShowName;
 			bool			bShowDamage;
@@ -104,12 +104,12 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 		bool							LoadInterfaceStatus();
 		void							SaveInterfaceStatus();
 		bool							isInterfaceConfig();
-		const TWindowStatus &			GetWindowStatusReference(int iIndex);
+		const TWindowStatus &			GetWindowStatusReference(int32_t iIndex);
 
-		DWORD							GetWidth();
-		DWORD							GetHeight();
-		DWORD							GetBPP();
-		DWORD							GetFrequency();
+		uint32_t							GetWidth();
+		uint32_t							GetHeight();
+		uint32_t							GetBPP();
+		uint32_t							GetFrequency();
 		bool							IsSoftwareCursor();
 		bool							IsWindowed();
 		bool							IsViewChat();
@@ -121,51 +121,51 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 		bool							IsAutoTiling();
 		bool							IsSoftwareTiling();
 		void							SetSoftwareTiling(bool isEnable);
-		void							SetViewChatFlag(int iFlag);
-		void							SetAlwaysShowNameFlag(int iFlag);
-		void							SetShowDamageFlag(int iFlag);
-		void							SetShowSalesTextFlag(int iFlag);
+		void							SetViewChatFlag(int32_t iFlag);
+		void							SetAlwaysShowNameFlag(int32_t iFlag);
+		void							SetShowDamageFlag(int32_t iFlag);
+		void							SetShowSalesTextFlag(int32_t iFlag);
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
 		bool							IsShowMobAIFlag();
-		void							SetShowMobAIFlagFlag(int iFlag);
+		void							SetShowMobAIFlagFlag(int32_t iFlag);
 #endif
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
 		bool							IsShowMobLevel();
-		void							SetShowMobLevelFlag(int iFlag);
+		void							SetShowMobLevelFlag(int32_t iFlag);
 #endif
 
 		// Window
-		void							SaveWindowStatus(int iIndex, int iVisible, int iMinimized, int ix, int iy, int iHeight);
+		void							SaveWindowStatus(int32_t iIndex, int32_t iVisible, int32_t iMinimized, int32_t ix, int32_t iy, int32_t iHeight);
 
 		// SaveID
-		int								IsSaveID();
+		int32_t								IsSaveID();
 		const char *					GetSaveID();
-		void							SetSaveID(int iValue, const char * c_szSaveID);
+		void							SetSaveID(int32_t iValue, const char * c_szSaveID);
 
 		/// Display
 		void							GetDisplaySettings();
 
-		int								GetResolutionCount();
-		int								GetFrequencyCount(int index);
-		bool							GetResolution(int index, OUT DWORD *width, OUT DWORD *height, OUT DWORD *bpp);
-		bool							GetFrequency(int index, int freq_index, OUT DWORD *frequncy);
-		int								GetResolutionIndex(DWORD width, DWORD height, DWORD bpp);
-		int								GetFrequencyIndex(int res_index, DWORD frequency);
+		int32_t								GetResolutionCount();
+		int32_t								GetFrequencyCount(int32_t index);
+		bool							GetResolution(int32_t index, OUT uint32_t *width, OUT uint32_t *height, OUT uint32_t *bpp);
+		bool							GetFrequency(int32_t index, int32_t freq_index, OUT uint32_t *frequncy);
+		int32_t								GetResolutionIndex(uint32_t width, uint32_t height, uint32_t bpp);
+		int32_t								GetFrequencyIndex(int32_t res_index, uint32_t frequency);
 		bool							isViewCulling();
 
 		// Sound
 		float							GetMusicVolume();
-		int								GetSoundVolume();
+		int32_t								GetSoundVolume();
 		void							SetMusicVolume(float fVolume);
 		void							SetSoundVolumef(float fVolume);
 
-		int								GetDistance();
-		int								GetShadowLevel();
-		void							SetShadowLevel(unsigned int level);
+		int32_t								GetDistance();
+		int32_t								GetShadowLevel();
+		void							SetShadowLevel(uint32_t level);
 
 	protected:
 		TResolution						m_ResolutionList[RESOLUTION_MAX_NUM];
-		int								m_ResolutionCount;
+		int32_t								m_ResolutionCount;
 
 		TConfig							m_Config;
 		TConfig							m_OldConfig;

@@ -6,29 +6,29 @@
 
 PyObject * nonplayerGetEventType(PyObject * poSelf, PyObject * poArgs)
 {
-	int iVirtualNumber;
+	int32_t iVirtualNumber;
 	if (!PyTuple_GetInteger(poArgs, 0, &iVirtualNumber))
 		return Py_BuildException();
 
-	BYTE iType = CPythonNonPlayer::Instance().GetEventType(iVirtualNumber);
+	uint8_t iType = CPythonNonPlayer::Instance().GetEventType(iVirtualNumber);
 
 	return Py_BuildValue("i", iType);
 }
 
 PyObject * nonplayerGetEventTypeByVID(PyObject * poSelf, PyObject * poArgs)
 {
-	int iVirtualID;
+	int32_t iVirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iVirtualID))
 		return Py_BuildException();
 
-	BYTE iType = CPythonNonPlayer::Instance().GetEventTypeByVID(iVirtualID);
+	uint8_t iType = CPythonNonPlayer::Instance().GetEventTypeByVID(iVirtualID);
 
 	return Py_BuildValue("i", iType);
 }
 
 PyObject * nonplayerGetLevelByVID(PyObject * poSelf, PyObject * poArgs)
 {
-	int iVirtualID;
+	int32_t iVirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iVirtualID))
 		return Py_BuildException();
 
@@ -44,12 +44,12 @@ PyObject * nonplayerGetLevelByVID(PyObject * poSelf, PyObject * poArgs)
 
 	float fAverageLevel = pMobTable->bLevel;//(float(pMobTable->abLevelRange[0]) + float(pMobTable->abLevelRange[1])) / 2.0f;
 	fAverageLevel = floor(fAverageLevel + 0.5f);
-	return Py_BuildValue("i", int(fAverageLevel));
+	return Py_BuildValue("i", int32_t(fAverageLevel));
 }
 
 PyObject * nonplayerGetGradeByVID(PyObject * poSelf, PyObject * poArgs)
 {
-	int iVirtualID;
+	int32_t iVirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iVirtualID))
 		return Py_BuildException();
 
@@ -69,7 +69,7 @@ PyObject * nonplayerGetGradeByVID(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * nonplayerGetMonsterName(PyObject * poSelf, PyObject * poArgs)
 {
-	int iVNum;
+	int32_t iVNum;
 	if (!PyTuple_GetInteger(poArgs, 0, &iVNum))
 		return Py_BuildException();
 
@@ -99,7 +99,7 @@ void initNonPlayer()
 
 		{ "LoadNonPlayerData",			nonplayerLoadNonPlayerData,			METH_VARARGS },
 
-		{ NULL,							NULL,								NULL		 },
+		{ nullptr,							nullptr,								0		 },
 	};
 
 	PyObject * poModule = Py_InitModule("nonplayer", s_methods);

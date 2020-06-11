@@ -9,13 +9,13 @@ struct SParticleVertex
 struct BlurVertex
 {
 	D3DXVECTOR3 pos;
-	FLOAT       rhw;
-    DWORD       color;
-	FLOAT		tu, tv;
+	float       rhw;
+    uint32_t       color;
+	float		tu, tv;
 
-	static const DWORD FVF;
+	static const uint32_t FVF;
 
-	BlurVertex(D3DXVECTOR3 p, float w,DWORD c,float u,float v):pos(p),rhw(w),color(c),tu(u),tv(v) {}
+	BlurVertex(D3DXVECTOR3 p, float w,uint32_t c,float u,float v):pos(p),rhw(w),color(c),tu(u),tv(v) {}
 	~BlurVertex(){};
 };
 

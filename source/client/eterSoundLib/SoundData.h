@@ -21,13 +21,13 @@ class CSoundData
 
 		void			Assign(const char* filename);
 		LPVOID			Get();
-		ULONG			GetSize();
+		uint32_t			GetSize();
 		void			Release();
-		DWORD			GetAccessTime();
+		uint32_t			GetAccessTime();
 		const char *	GetFileName();
 
-		void			SetPlayTime(DWORD dwPlayTime);
-		DWORD			GetPlayTime();
+		void			SetPlayTime(uint32_t dwPlayTime);
+		uint32_t			GetPlayTime();
 
 	protected:
 		bool			ReadFromDisk();
@@ -35,12 +35,12 @@ class CSoundData
 		
 	protected:
 		char			m_filename[128];
-		int				m_iRefCount;
-		DWORD			m_dwAccessTime;
-		DWORD			m_dwPlayTime;
-		ULONG			m_size;
+		int32_t				m_iRefCount;
+		uint32_t			m_dwAccessTime;
+		uint32_t			m_dwPlayTime;
+		DWORD			m_size;
 		LPVOID			m_data;
-		long			m_flag;
+		int32_t			m_flag;
 		bool			m_assigned;
 
 	private:
@@ -49,8 +49,8 @@ class CSoundData
 		static S32 AILCALLBACK		seek_callback(U32 file_handle, S32 offset, U32 type);
 		static U32 AILCALLBACK		read_callback(U32 file_handle, void *buffer, U32 bytes);
 
-		static bool					isSlotIndex(DWORD dwIndex);
-		static int					GetEmptySlotIndex();
+		static bool					isSlotIndex(uint32_t dwIndex);
+		static int32_t					GetEmptySlotIndex();
 
 		static bool					ms_isSoundFile[SOUND_FILE_MAX_NUM];
 		static CFile				ms_SoundFile[SOUND_FILE_MAX_NUM];

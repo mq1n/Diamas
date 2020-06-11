@@ -10,7 +10,7 @@
 
 PyObject * chrmgrSetEmpireNameMode(PyObject* poSelf, PyObject* poArgs)
 {
-	int	iEnable;
+	int32_t	iEnable;
 	if (!PyTuple_GetInteger(poArgs, 0, &iEnable))
 		return Py_BadArgument();
 
@@ -22,7 +22,7 @@ PyObject * chrmgrSetEmpireNameMode(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrRegisterTitleName(PyObject* poSelf, PyObject* poArgs)
 {
-	int	iIndex;
+	int32_t	iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BadArgument();
 	char * szTitleName;
@@ -35,17 +35,17 @@ PyObject * chrmgrRegisterTitleName(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrRegisterNameColor(PyObject* poSelf, PyObject* poArgs)
 {	
-	int index;
+	int32_t index;
 	if (!PyTuple_GetInteger(poArgs, 0, &index))
 		return Py_BadArgument();
 	
-	int ir;
+	int32_t ir;
 	if (!PyTuple_GetInteger(poArgs, 1, &ir))
 		return Py_BadArgument();
-	int ig;
+	int32_t ig;
 	if (!PyTuple_GetInteger(poArgs, 2, &ig))
 		return Py_BadArgument();
-	int ib;
+	int32_t ib;
 	if (!PyTuple_GetInteger(poArgs, 3, &ib))
 		return Py_BadArgument();
 
@@ -55,16 +55,16 @@ PyObject * chrmgrRegisterNameColor(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrRegisterTitleColor(PyObject* poSelf, PyObject* poArgs)
 {
-	int	iIndex;
+	int32_t	iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BadArgument();
-	int ir;
+	int32_t ir;
 	if (!PyTuple_GetInteger(poArgs, 1, &ir))
 		return Py_BadArgument();
-	int ig;
+	int32_t ig;
 	if (!PyTuple_GetInteger(poArgs, 2, &ig))
 		return Py_BadArgument();
-	int ib;
+	int32_t ib;
 	if (!PyTuple_GetInteger(poArgs, 3, &ib))
 		return Py_BadArgument();
 
@@ -76,7 +76,7 @@ PyObject * chrmgrGetPickedVID(PyObject* poSelf, PyObject* poArgs)
 {
 	CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
 
-	DWORD dwPickedActorID;
+	uint32_t dwPickedActorID;
 	if (rkChrMgr.OLD_GetPickedInstanceVID(&dwPickedActorID))
 		return Py_BuildValue("i", dwPickedActorID);
 	else
@@ -85,7 +85,7 @@ PyObject * chrmgrGetPickedVID(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrGetVIDInfo(PyObject* poSelf, PyObject* poArgs)
 {
-	int	nVID;
+	int32_t	nVID;
 	if (!PyTuple_GetInteger(poArgs, 0, &nVID))
 		return Py_BadArgument();
 
@@ -98,8 +98,8 @@ PyObject * chrmgrGetVIDInfo(PyObject* poSelf, PyObject* poArgs)
 		TPixelPosition kPPosInst;
 		pkInstBase->NEW_GetPixelPosition(&kPPosInst);
 
-		LONG xInst=kPPosInst.x;
-		LONG yInst=kPPosInst.y;
+		int32_t xInst=kPPosInst.x;
+		int32_t yInst=kPPosInst.y;
 
 		CPythonBackground& rkBG=CPythonBackground::Instance();
 		rkBG.LocalPositionToGlobalPosition(xInst, yInst);
@@ -132,7 +132,7 @@ PyObject * chrmgrSetPathName(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrCreateRace(PyObject * poSelf, PyObject * poArgs)
 {
-	int	iRace;
+	int32_t	iRace;
 	if (!PyTuple_GetInteger(poArgs, 0, &iRace))
 		return Py_BadArgument();
 
@@ -142,7 +142,7 @@ PyObject * chrmgrCreateRace(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * chrmgrSelectRace(PyObject * poSelf, PyObject * poArgs)
 {
-	int	iRace;
+	int32_t	iRace;
 	if (!PyTuple_GetInteger(poArgs, 0, &iRace))
 		return Py_BadArgument();
 
@@ -152,7 +152,7 @@ PyObject * chrmgrSelectRace(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * chrmgrRegisterAttachingBoneName(PyObject * poSelf, PyObject * poArgs)
 {
-	int iPartIndex;
+	int32_t iPartIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iPartIndex))
 		return Py_BadArgument();
 	char * szBoneName;
@@ -169,7 +169,7 @@ PyObject * chrmgrRegisterAttachingBoneName(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * chrmgrRegisterMotionMode(PyObject* poSelf, PyObject* poArgs)
 {
-	int	iMotionIndex;
+	int32_t	iMotionIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMotionIndex))
 		return Py_BadArgument();
 
@@ -185,19 +185,19 @@ PyObject * chrmgrRegisterMotionMode(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrSetMotionRandomWeight(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMode;
+	int32_t iMode;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMode))
 		return Py_BadArgument();
 
-	int iMotion;
+	int32_t iMotion;
 	if (!PyTuple_GetInteger(poArgs, 1, &iMotion))
 		return Py_BadArgument();
 
-	int iSubMotion;
+	int32_t iSubMotion;
 	if (!PyTuple_GetInteger(poArgs, 2, &iSubMotion))
 		return Py_BadArgument();
 
-	int iPercentage;
+	int32_t iPercentage;
 	if (!PyTuple_GetInteger(poArgs, 3, &iPercentage))
 		return Py_BadArgument();
 
@@ -213,11 +213,11 @@ PyObject * chrmgrSetMotionRandomWeight(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrRegisterNormalAttack(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMode;
+	int32_t iMode;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMode))
 		return Py_BadArgument();
 
-	int iMotion;
+	int32_t iMotion;
 	if (!PyTuple_GetInteger(poArgs, 1, &iMotion))
 		return Py_BadArgument();
 
@@ -233,11 +233,11 @@ PyObject * chrmgrRegisterNormalAttack(PyObject* poSelf, PyObject* poArgs)
 // 없어질 함수들
 PyObject * chrmgrReserveComboAttack(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMode;
+	int32_t iMode;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMode))
 		return Py_BadArgument();
 
-	int iCount;
+	int32_t iCount;
 	if (!PyTuple_GetInteger(poArgs, 1, &iCount))
 		return Py_BadArgument();
 
@@ -251,15 +251,15 @@ PyObject * chrmgrReserveComboAttack(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrRegisterComboAttack(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMode;
+	int32_t iMode;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMode))
 		return Py_BadArgument();
 
-	int iComboIndex;
+	int32_t iComboIndex;
 	if (!PyTuple_GetInteger(poArgs, 1, &iComboIndex))
 		return Py_BadArgument();
 
-	int iMotionIndex;
+	int32_t iMotionIndex;
 	if (!PyTuple_GetInteger(poArgs, 2, &iMotionIndex))
 		return Py_BadArgument();
 
@@ -275,15 +275,15 @@ PyObject * chrmgrRegisterComboAttack(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrReserveComboAttackNew(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMotionMode;
+	int32_t iMotionMode;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMotionMode))
 		return Py_BadArgument();
 
-	int iComboType;
+	int32_t iComboType;
 	if (!PyTuple_GetInteger(poArgs, 1, &iComboType))
 		return Py_BadArgument();
 
-	int iCount;
+	int32_t iCount;
 	if (!PyTuple_GetInteger(poArgs, 2, &iCount))
 		return Py_BadArgument();
 
@@ -297,19 +297,19 @@ PyObject * chrmgrReserveComboAttackNew(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrRegisterComboAttackNew(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMotionMode;
+	int32_t iMotionMode;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMotionMode))
 		return Py_BadArgument();
 
-	int iComboType;
+	int32_t iComboType;
 	if (!PyTuple_GetInteger(poArgs, 1, &iComboType))
 		return Py_BadArgument();
 
-	int iComboIndex;
+	int32_t iComboIndex;
 	if (!PyTuple_GetInteger(poArgs, 2, &iComboIndex))
 		return Py_BadArgument();
 
-	int iMotionIndex;
+	int32_t iMotionIndex;
 	if (!PyTuple_GetInteger(poArgs, 3, &iMotionIndex))
 		return Py_BadArgument();
 
@@ -361,11 +361,11 @@ PyObject * chrmgrLoadLocalRaceData(PyObject* poSelf, PyObject* poArgs)
 /*
 PyObject * chrmgrRegisterMotion(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMode;
+	int32_t iMode;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMode))
 		return Py_BadArgument();
 
-	int iMotion;
+	int32_t iMotion;
 	if (!PyTuple_GetInteger(poArgs, 1, &iMotion))
 		return Py_BadArgument();
 
@@ -373,7 +373,7 @@ PyObject * chrmgrRegisterMotion(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 2, &szFileName))
 		return Py_BadArgument();
 
-	int iWeight = 0;
+	int32_t iWeight = 0;
 	PyTuple_GetInteger(poArgs, 3, &iWeight);
 	iWeight = MIN(100, iWeight);
 
@@ -388,11 +388,11 @@ PyObject * chrmgrRegisterMotion(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrRegisterCacheMotionData(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMode;
+	int32_t iMode;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMode))
 		return Py_BadArgument();
 
-	int iMotion;
+	int32_t iMotion;
 	if (!PyTuple_GetInteger(poArgs, 1, &iMotion))
 		return Py_BadArgument();
 
@@ -400,7 +400,7 @@ PyObject * chrmgrRegisterCacheMotionData(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 2, &szFileName))
 		return Py_BadArgument();
 
-	int iWeight = 0;
+	int32_t iWeight = 0;
 	PyTuple_GetInteger(poArgs, 3, &iWeight);
 	iWeight = MIN(100, iWeight);
 
@@ -419,11 +419,11 @@ PyObject * chrmgrRegisterCacheMotionData(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrRegisterMotionData(PyObject* poSelf, PyObject* poArgs)
 {
-	int iMode;
+	int32_t iMode;
 	if (!PyTuple_GetInteger(poArgs, 0, &iMode))
 		return Py_BadArgument();
 
-	int iMotion;
+	int32_t iMotion;
 	if (!PyTuple_GetInteger(poArgs, 1, &iMotion))
 		return Py_BadArgument();
 
@@ -431,7 +431,7 @@ PyObject * chrmgrRegisterMotionData(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 2, &szFileName))
 		return Py_BadArgument();
 
-	int iWeight = 0;
+	int32_t iWeight = 0;
 	PyTuple_GetInteger(poArgs, 3, &iWeight);
 	iWeight = MIN(100, iWeight);
 
@@ -462,7 +462,7 @@ PyObject * chrmgrRegisterRaceSrcName(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrRegisterRaceName(PyObject* poSelf, PyObject* poArgs)
 {
-	int iRaceIndex;
+	int32_t iRaceIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iRaceIndex))
 		return Py_BadArgument();
 
@@ -477,7 +477,7 @@ PyObject * chrmgrRegisterRaceName(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrSetShapeModel(PyObject* poSelf, PyObject* poArgs)
 {
-	int eShape;
+	int32_t eShape;
 	if (!PyTuple_GetInteger(poArgs, 0, &eShape))
 		return Py_BadArgument();
 
@@ -496,11 +496,11 @@ PyObject * chrmgrSetShapeModel(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrAppendShapeSkin(PyObject* poSelf, PyObject* poArgs)
 {
-	int eShape;
+	int32_t eShape;
 	if (!PyTuple_GetInteger(poArgs, 0, &eShape))
 		return Py_BadArgument();
 
-	int ePart;
+	int32_t ePart;
 	if (!PyTuple_GetInteger(poArgs, 1, &ePart))
 		return Py_BadArgument();
 
@@ -526,7 +526,7 @@ PyObject * chrmgrAppendShapeSkin(PyObject* poSelf, PyObject* poArgs)
 PyObject * chrmgrSetMovingSpeed(PyObject* poSelf, PyObject* poArgs)
 {
 #ifndef NDEBUG // @warme601 _DISTRIBUTE -> NDEBUG
-	int	nMovSpd;
+	int32_t	nMovSpd;
 	if (!PyTuple_GetInteger(poArgs, 0, &nMovSpd))
 		return Py_BadArgument();
 
@@ -545,7 +545,7 @@ PyObject * chrmgrSetMovingSpeed(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrRegisterEffect(PyObject* poSelf, PyObject* poArgs)
 {
-	int eEftType;
+	int32_t eEftType;
 	if (!PyTuple_GetInteger(poArgs, 0, &eEftType))
 		return Py_BadArgument();
 
@@ -563,7 +563,7 @@ PyObject * chrmgrRegisterEffect(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrRegisterCacheEffect(PyObject* poSelf, PyObject* poArgs)
 {
-	int eEftType;
+	int32_t eEftType;
 	if (!PyTuple_GetInteger(poArgs, 0, &eEftType))
 		return Py_BadArgument();
 
@@ -582,7 +582,7 @@ PyObject * chrmgrRegisterCacheEffect(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrSetDustGap(PyObject* poSelf, PyObject* poArgs)
 {
-	int nGap;
+	int32_t nGap;
 	if (!PyTuple_GetInteger(poArgs, 0, &nGap))
 		return Py_BadArgument();
 
@@ -592,7 +592,7 @@ PyObject * chrmgrSetDustGap(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrSetHorseDustGap(PyObject* poSelf, PyObject* poArgs)
 {
-	int nGap;
+	int32_t nGap;
 	if (!PyTuple_GetInteger(poArgs, 0, &nGap))
 		return Py_BadArgument();
 
@@ -611,7 +611,7 @@ PyObject * chrmgrToggleDirectionLine(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrRegisterPointEffect(PyObject* poSelf, PyObject* poArgs)
 {
-	int iEft;
+	int32_t iEft;
 	if (!PyTuple_GetInteger(poArgs, 0, &iEft))
 		return Py_BadArgument();
 
@@ -626,11 +626,11 @@ PyObject * chrmgrRegisterPointEffect(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrShowPointEffect(PyObject* poSelf, PyObject* poArgs)
 {
-	int nVID;
+	int32_t nVID;
 	if (!PyTuple_GetInteger(poArgs, 0, &nVID))
 		return Py_BadArgument();
 
-	int nEft;
+	int32_t nEft;
 	if (!PyTuple_GetInteger(poArgs, 1, &nEft))
 		return Py_BadArgument();
 
@@ -640,7 +640,7 @@ PyObject * chrmgrShowPointEffect(PyObject* poSelf, PyObject* poArgs)
 }
 
 
-void CPythonCharacterManager::SCRIPT_SetAffect(DWORD dwVID, DWORD eState, BOOL isVisible)
+void CPythonCharacterManager::SCRIPT_SetAffect(uint32_t dwVID, uint32_t eState, BOOL isVisible)
 {
 	CInstanceBase * pkInstSel = (dwVID == 0xffffffff) ? GetSelectedInstancePtr() : GetInstancePtr(dwVID);
 	if (!pkInstSel)
@@ -651,15 +651,15 @@ void CPythonCharacterManager::SCRIPT_SetAffect(DWORD dwVID, DWORD eState, BOOL i
 
 PyObject * chrmgrSetAffect(PyObject* poSelf, PyObject* poArgs)
 {
-	int nVID;
+	int32_t nVID;
 	if (!PyTuple_GetInteger(poArgs, 0, &nVID))
 		return Py_BadArgument();
 
-	int nEft;
+	int32_t nEft;
 	if (!PyTuple_GetInteger(poArgs, 1, &nEft))
 		return Py_BadArgument();
 
-	int nVisible;
+	int32_t nVisible;
 	if (!PyTuple_GetInteger(poArgs, 2, &nVisible))
 		return Py_BadArgument();
 
@@ -668,7 +668,7 @@ PyObject * chrmgrSetAffect(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
-void CPythonCharacterManager::SetEmoticon(DWORD dwVID, DWORD eState)
+void CPythonCharacterManager::SetEmoticon(uint32_t dwVID, uint32_t eState)
 {
 	CInstanceBase * pkInstSel = (dwVID == 0xffffffff) ? GetSelectedInstancePtr() : GetInstancePtr(dwVID);
 	if (!pkInstSel)
@@ -677,7 +677,7 @@ void CPythonCharacterManager::SetEmoticon(DWORD dwVID, DWORD eState)
 	pkInstSel->SetEmoticon(eState);
 }
 
-bool CPythonCharacterManager::IsPossibleEmoticon(DWORD dwVID)
+bool CPythonCharacterManager::IsPossibleEmoticon(uint32_t dwVID)
 {
 	CInstanceBase * pkInstSel = (dwVID == 0xffffffff) ? GetSelectedInstancePtr() : GetInstancePtr(dwVID);
 	if (!pkInstSel)
@@ -688,11 +688,11 @@ bool CPythonCharacterManager::IsPossibleEmoticon(DWORD dwVID)
 
 PyObject * chrmgrSetEmoticon(PyObject* poSelf, PyObject* poArgs)
 {
-	int nVID;
+	int32_t nVID;
 	if (!PyTuple_GetInteger(poArgs, 0, &nVID))
 		return Py_BadArgument();
 	
-	int nEft;
+	int32_t nEft;
 	if (!PyTuple_GetInteger(poArgs, 1, &nEft))
 		return Py_BadArgument();
 	
@@ -703,12 +703,12 @@ PyObject * chrmgrSetEmoticon(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrIsPossibleEmoticon(PyObject* poSelf, PyObject* poArgs)
 {	
-	int nVID;
+	int32_t nVID;
 	if (!PyTuple_GetInteger(poArgs, 0, &nVID))
 		return Py_BadArgument();
 
 	CPythonCharacterManager & rkChrMgr = CPythonCharacterManager::Instance();
-	int result = rkChrMgr.IsPossibleEmoticon(nVID >= 0 ? nVID : 0xffffffff);
+	int32_t result = rkChrMgr.IsPossibleEmoticon(nVID >= 0 ? nVID : 0xffffffff);
 
 	return Py_BuildValue("i", result);
 }
@@ -759,7 +759,7 @@ void initchrmgr()
 		{ "RegisterNameColor",			chrmgrRegisterNameColor,				METH_VARARGS },
 		{ "RegisterTitleColor",			chrmgrRegisterTitleColor,				METH_VARARGS },
 
-		{ NULL,							NULL,									NULL },
+		{ nullptr,							nullptr,									0 },
 	};	
 
 	PyObject * poModule = Py_InitModule("chrmgr", s_methods);

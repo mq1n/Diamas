@@ -17,7 +17,7 @@ void CReferenceObject::AddReference()
 	++m_refCount;
 }
 
-int CReferenceObject::GetReferenceCount()
+int32_t CReferenceObject::GetReferenceCount()
 {
 	return m_refCount;
 }

@@ -16,7 +16,7 @@ public:
 	void MoveRight();
 	void MoveHome();
 	void MoveEnd();
-	void SetCursorPosition(int iPosition);
+	void SetCursorPosition(int32_t iPosition);
 	void Delete();
 
 	void Create(HWND hWnd);

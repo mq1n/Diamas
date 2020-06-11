@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "GrpVertexBufferDynamic.h"
 
-bool CDynamicVertexBuffer::Create(int vtxCount, int fvf)
+bool CDynamicVertexBuffer::Create(int32_t vtxCount, int32_t fvf)
 {
 	if (m_lpd3dVB)
 	{

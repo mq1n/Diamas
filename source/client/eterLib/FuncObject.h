@@ -15,8 +15,8 @@ class CFuncObject
 
 		void Clear()
 		{
-			m_pSelfObject = NULL;
-			m_pFuncObject = NULL;
+			m_pSelfObject = nullptr;
+			m_pFuncObject = nullptr;
 		}
 
 		void Set(T* pSelfObject, void (T::*pFuncObject)())
@@ -27,10 +27,10 @@ class CFuncObject
 
 		bool IsEmpty()
 		{
-			if (m_pSelfObject != NULL)
+			if (m_pSelfObject != nullptr)
 				return false;
 
-			if (m_pFuncObject != NULL)
+			if (m_pFuncObject != nullptr)
 				return false;
 
 			return true;

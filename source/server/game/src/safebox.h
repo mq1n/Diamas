@@ -8,23 +8,23 @@ class CGrid;
 class CSafebox
 {
 	public:
-		CSafebox(LPCHARACTER pkChrOwner, int iSize, DWORD dwGold);
+		CSafebox(LPCHARACTER pkChrOwner, int32_t iSize, uint32_t dwGold);
 		~CSafebox();
 
-		bool		Add(DWORD dwPos, LPITEM pkItem);
-		LPITEM		Get(DWORD dwPos);
-		LPITEM		Remove(DWORD dwPos);
-		void		ChangeSize(int iSize);
+		bool		Add(uint32_t dwPos, LPITEM pkItem);
+		LPITEM		Get(uint32_t dwPos);
+		LPITEM		Remove(uint32_t dwPos);
+		void		ChangeSize(int32_t iSize);
 
-		bool		MoveItem(BYTE bCell, BYTE bDestCell, BYTE count);
-		LPITEM		GetItem(BYTE bCell);
+		bool		MoveItem(uint8_t bCell, uint8_t bDestCell, uint8_t count);
+		LPITEM		GetItem(uint8_t bCell);
 
 		void		Save();
 
-		bool		IsEmpty(DWORD dwPos, BYTE bSize);
-		bool		IsValidPosition(DWORD dwPos);
+		bool		IsEmpty(uint32_t dwPos, uint8_t bSize);
+		bool		IsValidPosition(uint32_t dwPos);
 
-		void		SetWindowMode(BYTE bWindowMode);
+		void		SetWindowMode(uint8_t bWindowMode);
 
 	protected:
 		void		__Destroy();
@@ -32,10 +32,10 @@ class CSafebox
 		LPCHARACTER	m_pkChrOwner;
 		LPITEM		m_pkItems[SAFEBOX_MAX_NUM];
 		CGrid *		m_pkGrid;
-		int		m_iSize;
-		long		m_lGold;
+		int32_t		m_iSize;
+		int32_t		m_lGold;
 
-		BYTE		m_bWindowMode;
+		uint8_t		m_bWindowMode;
 };
 
 #endif

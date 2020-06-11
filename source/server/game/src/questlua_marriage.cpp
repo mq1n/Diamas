@@ -13,13 +13,13 @@
 #define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
-extern int g_nPortalLimitTime;
+extern int32_t g_nPortalLimitTime;
 
 namespace quest
 {
-	int marriage_engage_to(lua_State* L)
+	int32_t marriage_engage_to(lua_State* L)
 	{
-		DWORD vid = (DWORD) lua_tonumber(L, 1);
+		uint32_t vid = (uint32_t) lua_tonumber(L, 1);
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		LPCHARACTER ch_you = CHARACTER_MANAGER::instance().Find(vid);
 		if (ch_you)
@@ -29,7 +29,7 @@ namespace quest
 		return 0;
 	}
 
-	int marriage_remove(lua_State* L)
+	int32_t marriage_remove(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
@@ -42,7 +42,7 @@ namespace quest
 		return 0;
 	}
 
-	int marriage_set_to_marriage(lua_State* L)
+	int32_t marriage_set_to_marriage(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
@@ -55,11 +55,11 @@ namespace quest
 		return 0;
 	}
 
-	int marriage_find_married_vid(lua_State* L)
+	int32_t marriage_find_married_vid(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
-		DWORD vid = 0;
+		uint32_t vid = 0;
 		if (pMarriage)
 		{
 			LPCHARACTER you = CHARACTER_MANAGER::instance().FindByPID(pMarriage->GetOther(ch->GetPlayerID()));
@@ -75,7 +75,7 @@ namespace quest
 	struct FBuildLuaWeddingMapList
 	{
 		lua_State * L;
-		int m_count;
+		int32_t m_count;
 		FBuildLuaWeddingMapList(lua_State * L) : L(L), m_count(1)
 		{
 			lua_newtable(L);
@@ -99,13 +99,13 @@ namespace quest
 		}
 	};
 
-	int marriage_get_wedding_list(lua_State* L)
+	int32_t marriage_get_wedding_list(lua_State* L)
 	{
 		marriage::CManager::instance().for_each_wedding(FBuildLuaWeddingMapList(L));
 		return 1;
 	}
 
-	int marriage_join_wedding(lua_State* L)
+	int32_t marriage_join_wedding(lua_State* L)
 	{
 		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2))
 		{
@@ -113,8 +113,8 @@ namespace quest
 			return 0;
 		}
 
-		DWORD pid1 = (DWORD) lua_tonumber(L, 1);
-		DWORD pid2 = (DWORD) lua_tonumber(L, 2);
+		uint32_t pid1 = (uint32_t) lua_tonumber(L, 1);
+		uint32_t pid2 = (uint32_t) lua_tonumber(L, 2);
 
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
@@ -138,7 +138,7 @@ namespace quest
 		return 0;
 	}
 
-	int marriage_warp_to_my_marriage_map(lua_State* L)
+	int32_t marriage_warp_to_my_marriage_map(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
@@ -158,7 +158,7 @@ namespace quest
 		return 0;
 	}
 
-	int marriage_end_wedding(lua_State* L)
+	int32_t marriage_end_wedding(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
@@ -175,7 +175,7 @@ namespace quest
 		return 0;
 	}
 
-	int marriage_wedding_dark(lua_State* L)
+	int32_t marriage_wedding_dark(lua_State* L)
 	{
 		if (!lua_isboolean(L, 1))
 		{
@@ -199,7 +199,7 @@ namespace quest
 		return 0;
 	}
 
-	int marriage_wedding_client_command(lua_State* L)
+	int32_t marriage_wedding_client_command(lua_State* L)
 	{
 		if (!lua_isstring(L, 1))
 		{
@@ -223,7 +223,7 @@ namespace quest
 
 	}
 
-	int marriage_wedding_is_playing_music(lua_State* L)
+	int32_t marriage_wedding_is_playing_music(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
@@ -244,7 +244,7 @@ namespace quest
 		lua_pushboolean(L, false);
 		return 1;
 	}
-	int marriage_wedding_music(lua_State* L)
+	int32_t marriage_wedding_music(lua_State* L)
 	{
 		if (!lua_isboolean(L, 1))
 		{
@@ -274,7 +274,7 @@ namespace quest
 		}
 		return 0;
 	}
-	int marriage_wedding_snow(lua_State* L)
+	int32_t marriage_wedding_snow(lua_State* L)
 	{
 		if (!lua_isboolean(L, 1))
 		{
@@ -296,13 +296,13 @@ namespace quest
 		return 0;
 	}
 
-	int marriage_in_my_wedding(lua_State* L)
+	int32_t marriage_in_my_wedding(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
 		if (pMarriage->pWeddingInfo)
 		{
-			lua_pushboolean(L, (DWORD)ch->GetMapIndex() == pMarriage->pWeddingInfo->dwMapIndex);
+			lua_pushboolean(L, (uint32_t)ch->GetMapIndex() == pMarriage->pWeddingInfo->dwMapIndex);
 		}
 		else
 		{
@@ -311,7 +311,7 @@ namespace quest
 		return 1;
 	}
 
-	int marriage_get_married_time(lua_State* L)
+	int32_t marriage_get_married_time(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
@@ -346,7 +346,7 @@ namespace quest
 			{ "in_my_wedding",		marriage_in_my_wedding	    },
 			{ "warp_to_my_marriage_map",marriage_warp_to_my_marriage_map},
 			{ "get_married_time",	marriage_get_married_time   },
-			{ NULL,			NULL			    }
+			{ nullptr,			nullptr			    }
 		};
 		CQuestManager::instance().AddLuaFunctionTable("marriage", marriage_functions);
 	}

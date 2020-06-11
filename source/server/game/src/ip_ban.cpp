@@ -11,8 +11,8 @@
 #include <vector>
 #include <algorithm>
 
-typedef unsigned char BYTE;
-typedef unsigned long DWORD;
+typedef uint8_t uint8_t;
+typedef uint32_t uint32_t;
 
 #else
 
@@ -35,18 +35,18 @@ class IP
 			dwMask = r.dwMask;
 		}
 
-		IP(const char * c_pszStart, const char * c_pszEnd = NULL)
+		IP(const char * c_pszStart, const char * c_pszEnd = nullptr)
 		{
-			BYTE start[4];
-			BYTE end[4];
-			BYTE mask[4];
+			uint8_t start[4];
+			uint8_t end[4];
+			uint8_t mask[4];
 
 			Read(c_pszStart, start);
 
 			if (c_pszEnd && *c_pszEnd)
 				Read(c_pszEnd, end);
 			else
-				memcpy(end, start, sizeof(BYTE) * 4);
+				memcpy(end, start, sizeof(uint8_t) * 4);
 
 			mask[0] = 255 - (start[0] ^ end[0]);
 			mask[1] = 255 - (start[1] ^ end[1]);
@@ -77,12 +77,12 @@ class IP
 			if ((r.dwStart & r.dwMask) != (dwStart & r.dwMask))
 				return false;
 
-			DWORD m = r.dwMask | dwMask;
+			uint32_t m = r.dwMask | dwMask;
 
 			return (dwStart & ~m) == (dwStart & ~dwMask) && (dwEnd & ~m) == (dwEnd & ~dwMask);
 		}
 
-		int hash()
+		int32_t hash()
 		{
 			return (dwStart & 0x000000FF);
 		}
@@ -101,9 +101,9 @@ class IP
 		}
 
 	protected:
-		bool Read(const char * s, BYTE * dest)
+		bool Read(const char * s, uint8_t * dest)
 		{
-			BYTE bClass = 0;
+			uint8_t bClass = 0;
 			const char * p = s;
 
 			while (bClass < 3)
@@ -130,12 +130,12 @@ class IP
 			return true;
 		}
 
-		DWORD dwStart;
-		DWORD dwEnd;
-		DWORD dwMask;
+		uint32_t dwStart;
+		uint32_t dwEnd;
+		uint32_t dwMask;
 };
 
-std::map<int, std::vector<IP> > mapBanIP;
+std::map<int32_t, std::vector<IP> > mapBanIP;
 
 bool LoadBanIP(const char * filename)
 {
@@ -181,7 +181,7 @@ bool LoadBanIP(const char * filename)
 		{
 			std::vector<IP> v;
 			v.push_back(ip);
-			mapBanIP.insert(std::map<DWORD, std::vector<IP> >::value_type(ip.hash(), v));
+			mapBanIP.insert(std::map<uint32_t, std::vector<IP> >::value_type(ip.hash(), v));
 		}
 		else
 			it->second.push_back(ip);
@@ -311,7 +311,7 @@ void FilterIP(std::vector<IP> & v)
 	while (1);
 }
 
-int main(int argc, char **argv)
+int32_t main(int32_t argc, char **argv)
 {
 	using namespace std;
 

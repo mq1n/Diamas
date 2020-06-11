@@ -85,7 +85,7 @@ void CEntity::ViewRemove(LPENTITY entity, bool recursive)
 class CFuncViewInsert
 {
 	private:
-		int dwViewRange;
+		int32_t dwViewRange;
 
 	public:
 		LPENTITY m_me;

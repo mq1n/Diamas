@@ -188,7 +188,7 @@ class CGrannyLODController : public CGraphicBase
 			const CGrannyMotion *	m_pMotion;
 			float					m_speedRatio;
 			float					m_blendTime;
-			int						m_loopCount;
+			int32_t						m_loopCount;
 
 			void operator() (CGrannyLODController * pController)
 			{
@@ -201,7 +201,7 @@ class CGrannyLODController : public CGraphicBase
 		{
 			const CGrannyMotion *	m_pMotion;
 			float					m_speedRatio;
-			int						m_loopCount;
+			int32_t						m_loopCount;
 
 			void operator() (CGrannyLODController * pController)
 			{
@@ -229,12 +229,12 @@ class CGrannyLODController : public CGraphicBase
 		void	CreateDeviceObjects();
 		void	DestroyDeviceObjects();
 
-		void	AddModel(CGraphicThing * pThing, int iSrcModel, CGrannyLODController * pSkelLODController=NULL);		
+		void	AddModel(CGraphicThing * pThing, int32_t iSrcModel, CGrannyLODController * pSkelLODController=nullptr);		
 		void	AttachModelInstance(CGrannyLODController * pSrcLODController, const char * c_szBoneName);
 		void	DetachModelInstance(CGrannyLODController * pSrcLODController);
 		void	SetLODLimits(float fNearLOD, float fFarLOD);
-		void	SetLODLevel(BYTE bLODLevel);
-		BYTE	GetLODLevel() { return m_bLODLevel; }
+		void	SetLODLevel(uint8_t bLODLevel);
+		uint8_t	GetLODLevel() { return m_bLODLevel; }
 		void	SetMaterialImagePointer(const char* c_szImageName, CGraphicImage* pImage);
 		void	SetMaterialData(const char* c_szImageName, const SMaterialData& c_rkMaterialData);
 		void	SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower);
@@ -263,8 +263,8 @@ class CGrannyLODController : public CGraphicBase
 		void	SetLocalTime(float fLocalTime);
 		void	ResetLocalTime();
 
-		void	SetMotionPointer(const CGrannyMotion * c_pMotion, float fBlendTime, int iLoopCount, float speedRatio);
-		void	ChangeMotionPointer(const CGrannyMotion * c_pMotion, int iLoopCount, float speedRatio);
+		void	SetMotionPointer(const CGrannyMotion * c_pMotion, float fBlendTime, int32_t iLoopCount, float speedRatio);
+		void	ChangeMotionPointer(const CGrannyMotion * c_pMotion, int32_t iLoopCount, float speedRatio);
 		void	SetMotionAtEnd();
 
 		BOOL	isModelInstance();
@@ -275,11 +275,11 @@ class CGrannyLODController : public CGraphicBase
 		void	SetCurrentModelInstance(CGrannyModelInstance * pgrnModelInstance);
 		void	RefreshAttachedModelInstance();
 
-		void	__ReserveSharedDeformableVertexBuffer(DWORD deformableVertexCount);
+		void	__ReserveSharedDeformableVertexBuffer(uint32_t deformableVertexCount);
 
 	protected:
 		float								m_fLODDistance;
-		DWORD								m_dwLODAniFPS;
+		uint32_t								m_dwLODAniFPS;
 
 		//// Attaching Link Data
 		// Data of Parent Side
@@ -293,7 +293,7 @@ class CGrannyLODController : public CGraphicBase
 		// Data of Child Side
 		CGrannyLODController *				m_pAttachedParentModel;
 
-		BYTE								m_bLODLevel;
+		uint8_t								m_bLODLevel;
 		CGrannyModelInstance *				m_pCurrentModelInstance;		
 
 		// WORK

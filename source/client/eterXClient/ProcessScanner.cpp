@@ -5,11 +5,11 @@
 
 static std::vector<CRCPair> gs_kVct_crcPair;
 static CRITICAL_SECTION gs_csData;
-static HANDLE gs_evReqExit=NULL;
-static HANDLE gs_evResExit=NULL;
-static HANDLE gs_hThread=NULL;
+static HANDLE gs_evReqExit=nullptr;
+static HANDLE gs_evResExit=nullptr;
+static HANDLE gs_hThread=nullptr;
 
-void ScanProcessList(std::map<DWORD, DWORD>& rkMap_crcProc, std::vector<CRCPair>* pkVct_crcPair)
+void ScanProcessList(std::map<uint32_t, uint32_t>& rkMap_crcProc, std::vector<CRCPair>* pkVct_crcPair)
 {
 	SYSTEM_INFO si;
 	memset(&si, 0, sizeof(si));
@@ -40,12 +40,12 @@ void ScanProcessList(std::map<DWORD, DWORD>& rkMap_crcProc, std::vector<CRCPair>
 				BOOL bRet = Module32First(hModuleSnap, &me32);
 				while (bRet) 
 				{
-					DWORD crcExtPath=GetCRC32((const char*)me32.szExePath, strlen(me32.szExePath));
+					uint32_t crcExtPath=GetCRC32((const char*)me32.szExePath, strlen(me32.szExePath));
 
-					std::map<DWORD, DWORD>::iterator f=rkMap_crcProc.find(crcExtPath);
+					std::map<uint32_t, uint32_t>::iterator f=rkMap_crcProc.find(crcExtPath);
 					if (rkMap_crcProc.end()==f)
 					{
-						DWORD crcProc=GetFileCRC32(me32.szExePath);
+						uint32_t crcProc=GetFileCRC32(me32.szExePath);
 						rkMap_crcProc.insert(std::make_pair(crcExtPath, crcProc));
 						pkVct_crcPair->push_back(std::make_pair(crcProc, (const char*)me32.szExePath));						
 					}
@@ -98,9 +98,9 @@ bool ProcessScanner_PopProcessQueue(std::vector<CRCPair>* pkVct_crcPair)
 
 void ProcessScanner_Thread(void* pv)
 {	
-	DWORD dwDelay=(rand()%10)*1000+1000*10;
+	uint32_t dwDelay=(rand()%10)*1000+1000*10;
 
-	std::map<DWORD, DWORD>	kMap_crcProc;
+	std::map<uint32_t, uint32_t>	kMap_crcProc;
 	std::vector<CRCPair>	kVct_crcPair;
 	
 	while (WAIT_OBJECT_0 != WaitForSingleObject(gs_evReqExit, dwDelay))
@@ -122,10 +122,10 @@ void ProcessScanner_Thread(void* pv)
 bool ProcessScanner_Create()
 {
 	InitializeCriticalSection(&gs_csData);
-	gs_evReqExit=CreateEvent(NULL, FALSE, FALSE, "ProcessScanner_ReqExit");
-	gs_evResExit=CreateEvent(NULL, FALSE, FALSE, "ProcessScanner_ResExit");
+	gs_evReqExit=CreateEvent(nullptr, FALSE, FALSE, "ProcessScanner_ReqExit");
+	gs_evResExit=CreateEvent(nullptr, FALSE, FALSE, "ProcessScanner_ResExit");
 
-	gs_hThread=(HANDLE)_beginthread(ProcessScanner_Thread, 64*1024, NULL);
+	gs_hThread=(HANDLE)_beginthread(ProcessScanner_Thread, 64*1024, nullptr);
 	if (INVALID_HANDLE_VALUE==gs_hThread)
 	{
 		LogBox("CreateThread Error");

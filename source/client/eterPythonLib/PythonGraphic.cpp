@@ -48,7 +48,7 @@ void CPythonGraphic::SetGameRenderState()
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, TRUE);
 }
 
-void CPythonGraphic::SetCursorPosition(int x, int y)
+void CPythonGraphic::SetCursorPosition(int32_t x, int32_t y)
 {
 	CScreen::SetCursorPosition(x, y, ms_iWidth, ms_iHeight);
 }
@@ -124,16 +124,16 @@ void CPythonGraphic::SetGamma(float fGammaFactor)
 {
 	D3DCAPS8		d3dCaps;
 	D3DGAMMARAMP	NewRamp;
-	int				ui, val;
+	int32_t				ui, val;
 	
 	ms_lpd3dDevice->GetDeviceCaps(&d3dCaps);
 
 	if (D3DCAPS2_FULLSCREENGAMMA != (d3dCaps.Caps2 & D3DCAPS2_FULLSCREENGAMMA))
 		return;
 
-	for (int i = 0; i < 256; ++i)
+	for (int32_t i = 0; i < 256; ++i)
 	{
-		val	= (int) (i * fGammaFactor * 255.0f);
+		val	= (int32_t) (i * fGammaFactor * 255.0f);
 		ui = 0;
 		
 		if (val > 32767)
@@ -145,15 +145,15 @@ void CPythonGraphic::SetGamma(float fGammaFactor)
 		if (val > 32767)
 			val = 32767;
 		
-		NewRamp.red[i] = (WORD) (val | (32768 * ui));
-		NewRamp.green[i] = (WORD) (val | (32768 * ui));
-		NewRamp.blue[i] = (WORD) (val | (32768 * ui));
+		NewRamp.red[i] = (uint16_t) (val | (32768 * ui));
+		NewRamp.green[i] = (uint16_t) (val | (32768 * ui));
+		NewRamp.blue[i] = (uint16_t) (val | (32768 * ui));
 	}
 
 	ms_lpd3dDevice->SetGammaRamp(D3DSGR_NO_CALIBRATION, &NewRamp);
 }
 
-void GenScreenShotTag(const char* src, DWORD crc32, char* leaf, size_t leafLen)
+void GenScreenShotTag(const char* src, uint32_t crc32, char* leaf, size_t leafLen)
 {
 	const char* p = src;
 	const char* n = p;
@@ -224,7 +224,7 @@ void CPythonGraphic::PopState()
 
 void CPythonGraphic::RenderImage(CGraphicImageInstance* pImageInstance, float x, float y)
 {
-	assert(pImageInstance != NULL);
+	assert(pImageInstance != nullptr);
 
 	//SetColorRenderState();
 	const CGraphicTexture * c_pTexture = pImageInstance->GetTexturePointer();
@@ -247,7 +247,7 @@ void CPythonGraphic::RenderImage(CGraphicImageInstance* pImageInstance, float x,
 
 void CPythonGraphic::RenderAlphaImage(CGraphicImageInstance* pImageInstance, float x, float y, float aLeft, float aRight)
 {
-	assert(pImageInstance != NULL);
+	assert(pImageInstance != nullptr);
 
 	D3DXCOLOR DiffuseColor1 = D3DXCOLOR(1.0f, 1.0f, 1.0f, aLeft);
 	D3DXCOLOR DiffuseColor2 = D3DXCOLOR(1.0f, 1.0f, 1.0f, aRight);
@@ -302,7 +302,7 @@ void CPythonGraphic::RenderCoolTimeBox(float fxCenter, float fyCenter, float fRa
 	fTime = std::max(0.0f, fTime);
 
 	static D3DXCOLOR color = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f);
-	static WORD s_wBoxIndicies[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+	static uint16_t s_wBoxIndicies[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 	static D3DXVECTOR2 s_v2BoxPos[8] =
 	{
 		D3DXVECTOR2( -1.0f, -1.0f ),
@@ -315,7 +315,7 @@ void CPythonGraphic::RenderCoolTimeBox(float fxCenter, float fyCenter, float fRa
 		D3DXVECTOR2(  0.0f, -1.0f ),
 	};
 
-	int iTriCount = int(8 - 8.0f * fTime);
+	int32_t iTriCount = int32_t(8 - 8.0f * fTime);
 	float fLastPercentage = (8 - 8.0f * fTime) - iTriCount;
 
 	std::vector<TPDTVertex> vertices;
@@ -335,7 +335,7 @@ void CPythonGraphic::RenderCoolTimeBox(float fxCenter, float fyCenter, float fRa
 	vertex.texCoord.x = 0.0f;
 	vertices.push_back(vertex);
 
-	for (int j = 0; j < iTriCount; ++j)
+	for (int32_t j = 0; j < iTriCount; ++j)
 	{
 		vertex.position.x = fxCenter + s_v2BoxPos[j].x * fRadius;
 		vertex.position.y = fyCenter + s_v2BoxPos[j].y * fRadius;
@@ -367,8 +367,8 @@ void CPythonGraphic::RenderCoolTimeBox(float fxCenter, float fyCenter, float fRa
 		STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLOROP,	D3DTOP_SELECTARG1);
 		STATEMANAGER.SaveTextureStageState(0, D3DTSS_ALPHAARG1,	D3DTA_DIFFUSE);
 		STATEMANAGER.SaveTextureStageState(0, D3DTSS_ALPHAOP,	D3DTOP_SELECTARG1);
-		STATEMANAGER.SetTexture(0, NULL);
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(0, nullptr);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 		STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLEFAN, 0, iTriCount);
 		STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLORARG1);
@@ -378,7 +378,7 @@ void CPythonGraphic::RenderCoolTimeBox(float fxCenter, float fyCenter, float fRa
 	}
 }
 
-long CPythonGraphic::GenerateColor(float r, float g, float b, float a)
+int32_t CPythonGraphic::GenerateColor(float r, float g, float b, float a)
 {
 	return GetColor(r, g, b, a);
 }
@@ -409,7 +409,7 @@ void CPythonGraphic::RenderUpButton(float sx, float sy, float ex, float ey)
 	RenderLine2d(ex, sy, ex, ey);
 }
 
-DWORD CPythonGraphic::GetAvailableMemory()
+uint32_t CPythonGraphic::GetAvailableMemory()
 {
 	return ms_lpd3dDevice->GetAvailableTextureMem();
 }

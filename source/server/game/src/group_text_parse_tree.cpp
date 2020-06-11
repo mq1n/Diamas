@@ -3,13 +3,13 @@
 #include "group_text_parse_tree.h"
 
 CGroupTextParseTreeLoader::CGroupTextParseTreeLoader()
-	: m_pRootGroupNode(NULL), m_dwcurLineIndex(0)
+	: m_pRootGroupNode(nullptr), m_dwcurLineIndex(0)
 {
 }
 
 CGroupTextParseTreeLoader::~CGroupTextParseTreeLoader()
 {
-	if (NULL != m_pRootGroupNode)
+	if (nullptr != m_pRootGroupNode)
 		delete m_pRootGroupNode;
 }
 
@@ -26,7 +26,7 @@ bool CGroupTextParseTreeLoader::Load(const char * c_szFileName)
 
 	FILE* fp = fopen(c_szFileName, "rb");
 
-	if (NULL == fp)
+	if (nullptr == fp)
 		return false;
 
 	fseek(fp, 0L, SEEK_END);
@@ -40,7 +40,7 @@ bool CGroupTextParseTreeLoader::Load(const char * c_szFileName)
 	m_fileLoader.Bind(fileSize, pData);
 	M2_DELETE_ARRAY(pData);
 
-	if (NULL != m_pRootGroupNode)
+	if (nullptr != m_pRootGroupNode)
 	{
 		delete m_pRootGroupNode;
 	}
@@ -76,7 +76,7 @@ bool CGroupTextParseTreeLoader::LoadGroup(CGroupNode * pGroupNode)
 			if (2 != stTokenVector.size())
 			{
 				sys_err("Invalid group syntax token size: %u != 2 (DO NOT SPACE IN NAME)", stTokenVector.size());
-				for (unsigned int i = 0; i < stTokenVector.size(); ++i)
+				for (uint32_t i = 0; i < stTokenVector.size(); ++i)
 					sys_err("  %u %s", i, stTokenVector[i].c_str());
 				exit(1);
 				continue;
@@ -125,8 +125,8 @@ bool CGroupTextParseTreeLoader::LoadGroup(CGroupNode * pGroupNode)
 
 CGroupNode* CGroupTextParseTreeLoader::GetGroup(const char * c_szGroupName)
 {
-	if (NULL == m_pRootGroupNode)
-		return NULL;
+	if (nullptr == m_pRootGroupNode)
+		return nullptr;
 	return m_pRootGroupNode->GetChildNode(c_szGroupName);
 }
 
@@ -142,14 +142,14 @@ CGroupNode::~CGroupNode()
 	}
 }
 
-DWORD CGroupNode::GetChildNodeCount()
+uint32_t CGroupNode::GetChildNodeCount()
 {
 	return m_mapChildNodes.size();
 }
 
 bool CGroupNode::SetChildNode(const char * c_szKey, CGroupNode* pChildGroup)
 {
-	if (NULL == pChildGroup)
+	if (nullptr == pChildGroup)
 	{
 		m_mapChildNodes.erase(c_szKey);
 		return true;
@@ -169,7 +169,7 @@ CGroupNode* CGroupNode::GetChildNode(const std::string & c_rstrKey) const
 	if (it != m_mapChildNodes.end())
 		return it->second;
 	else
-		return NULL;
+		return nullptr;
 }
 
 std::string CGroupNode::GetNodeName() const
@@ -182,7 +182,7 @@ bool CGroupNode::IsToken(const std::string & c_rstrKey) const
 	return m_map_rows.end() != m_map_rows.find(c_rstrKey);
 }
 
-int CGroupNode::GetRowCount()
+int32_t CGroupNode::GetRowCount()
 {
 	return m_map_rows.size();
 }
@@ -201,7 +201,7 @@ bool CGroupNode::GetRow(const std::string & c_rstrRowKey, OUT const CGroupNode::
 }
 
 // 참고로, idx랑 txt에 쓰여진 순서랑 관계 없음.
-bool CGroupNode::GetRow(int idx, OUT const CGroupNode::CGroupNodeRow ** ppRow) const
+bool CGroupNode::GetRow(int32_t idx, OUT const CGroupNode::CGroupNodeRow ** ppRow) const
 {
 	if ((TMapRow::size_type)idx >= m_map_rows.size())
 		return false;
@@ -218,14 +218,14 @@ bool CGroupNode::GetRow(int idx, OUT const CGroupNode::CGroupNodeRow ** ppRow) c
 bool CGroupNode::GetGroupRow(const std::string& stGroupName, const std::string& stRow, OUT const CGroupNode::CGroupNodeRow ** ppRow) const
 {
 	CGroupNode* pChildGroup = GetChildNode(stGroupName);
-	if (NULL != pChildGroup)
+	if (nullptr != pChildGroup)
 	{
 		if (pChildGroup->GetRow(stRow, ppRow))
 			return true;
 	}
 	// default group을 살펴봄.
 	pChildGroup = GetChildNode("default");
-	if (NULL != pChildGroup)
+	if (nullptr != pChildGroup)
 	{
 		if (pChildGroup->GetRow(stRow, ppRow))
 			return true;
@@ -233,7 +233,7 @@ bool CGroupNode::GetGroupRow(const std::string& stGroupName, const std::string& 
 	return false;
 }
 
-int	CGroupNode::GetColumnIndexFromName(const std::string& stName) const
+int32_t	CGroupNode::GetColumnIndexFromName(const std::string& stName) const
 {
 	TMapNameToIndex::const_iterator it = m_map_columnNameToIndex.find(stName);
 	if (m_map_columnNameToIndex.end() == it)
@@ -253,7 +253,7 @@ CGroupNode::CGroupNodeRow::~CGroupNodeRow()
 {
 }
 
-int CGroupNode::CGroupNodeRow::GetSize() const
+int32_t CGroupNode::CGroupNodeRow::GetSize() const
 {
 	return m_vec_values.size();
 }

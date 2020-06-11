@@ -3,17 +3,17 @@
 
 namespace mining
 {
-	LPEVENT CreateMiningEvent(LPCHARACTER ch, LPCHARACTER load, int count);
-	DWORD GetRawOreFromLoad(DWORD dwLoadVnum);
-	bool OreRefine(LPCHARACTER ch, LPCHARACTER npc, LPITEM item, int cost, int pct, LPITEM metinstone_item);
-	int GetFractionCount();
+	LPEVENT CreateMiningEvent(LPCHARACTER ch, LPCHARACTER load, int32_t count);
+	uint32_t GetRawOreFromLoad(uint32_t dwLoadVnum);
+	bool OreRefine(LPCHARACTER ch, LPCHARACTER npc, LPITEM item, int32_t cost, int32_t pct, LPITEM metinstone_item);
+	int32_t GetFractionCount();
 
 	// REFINE_PICK
-	int RealRefinePick(LPCHARACTER ch, LPITEM item);
+	int32_t RealRefinePick(LPCHARACTER ch, LPITEM item);
 	void CHEAT_MAX_PICK(LPCHARACTER ch, LPITEM item);
 	// END_OF_REFINE_PICK
 
-	bool IsVeinOfOre (DWORD vnum);
+	bool IsVeinOfOre (uint32_t vnum);
 }
 
 #endif

@@ -21,8 +21,8 @@ std::string __SECURITY_KEY_STRING__ = LSS_SECURITY_KEY;
 char	MULTI_LOCALE_SERVICE[256]	= "YMIR";
 char	MULTI_LOCALE_PATH[256]		= "locale/ymir";
 char	MULTI_LOCALE_NAME[256]		= "ymir";
-int		MULTI_LOCALE_CODE			= 949;
-int		MULTI_LOCALE_REPORT_PORT	= 10000;
+int32_t		MULTI_LOCALE_CODE			= 949;
+int32_t		MULTI_LOCALE_REPORT_PORT	= 10000;
 
 void LocaleService_LoadConfig(const char* fileName)
 {
@@ -32,8 +32,8 @@ void LocaleService_LoadConfig(const char* fileName)
 	{		
 		char	line[256];			
 		char	name[256];
-		int		code;
-		int		id;
+		int32_t		code;
+		int32_t		id;
 		if (fgets(line, sizeof(line)-1, fp))
 		{
 			line[sizeof(line)-1] = '\0';
@@ -48,13 +48,13 @@ void LocaleService_LoadConfig(const char* fileName)
 	}
 }
 
-unsigned LocaleService_GetLastExp(int level)
+uint32_t LocaleService_GetLastExp(int32_t level)
 {
-	static const int GUILD_LEVEL_MAX = 20;
+	static const int32_t GUILD_LEVEL_MAX = 20;
 
 	if (LocaleService_IsCHEONMA())
 	{
-		static DWORD CHEONMA_GUILDEXP_LIST[GUILD_LEVEL_MAX+1] = 
+		static uint32_t CHEONMA_GUILDEXP_LIST[GUILD_LEVEL_MAX+1] = 
 		{
 			0,			// 0
 			15000ul,	// 1
@@ -84,7 +84,7 @@ unsigned LocaleService_GetLastExp(int level)
 		return CHEONMA_GUILDEXP_LIST[level];
 	}
 	
-	static DWORD INTERNATIONAL_GUILDEXP_LIST[GUILD_LEVEL_MAX+1] = 
+	static uint32_t INTERNATIONAL_GUILDEXP_LIST[GUILD_LEVEL_MAX+1] = 
 	{
 		0,			// 0
 		6000UL,		// 1
@@ -115,16 +115,16 @@ unsigned LocaleService_GetLastExp(int level)
 	return INTERNATIONAL_GUILDEXP_LIST[level];	
 }
 
-int LocaleService_GetSkillPower(unsigned level)
+int32_t LocaleService_GetSkillPower(uint32_t level)
 {
-	static const unsigned SKILL_POWER_NUM = 50;
+	static const uint32_t SKILL_POWER_NUM = 50;
 
 	if (level >= SKILL_POWER_NUM)
 		return 0;
 
 	if (LocaleService_IsCHEONMA())
 	{
-		static unsigned CHEONMA_SKILL_POWERS[SKILL_POWER_NUM]=
+		static uint32_t CHEONMA_SKILL_POWERS[SKILL_POWER_NUM]=
 		{
 			0,  
 				5,  7,  9, 11, 13, 
@@ -141,7 +141,7 @@ int LocaleService_GetSkillPower(unsigned level)
 	}
 	
 	// 0 5 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 50 52 54 56 58 60 63 66 69 72 82 85 88 91 94 98 102 106 110 115 125 125 125 125 125
-	static unsigned INTERNATIONAL_SKILL_POWERS[SKILL_POWER_NUM]=
+	static uint32_t INTERNATIONAL_SKILL_POWERS[SKILL_POWER_NUM]=
 	{
 		0, 
 			5,  6,  8, 10, 12, 
@@ -184,12 +184,12 @@ const char* LocaleService_GetName()				{ return _LSS_SERVICE_NAME;}
 #else
 const char* LocaleService_GetName()				{ return MULTI_LOCALE_SERVICE; }
 #endif
-unsigned int LocaleService_GetCodePage()		{ return MULTI_LOCALE_CODE; }
+uint32_t LocaleService_GetCodePage()		{ return MULTI_LOCALE_CODE; }
 const char*	LocaleService_GetLocaleName()		{ return MULTI_LOCALE_NAME; }
 const char*	LocaleService_GetLocalePath()		{ return MULTI_LOCALE_PATH; }
 #elif defined(_LSS_SERVICE_NAME)
 const char* LocaleService_GetName()				{ return _LSS_SERVICE_NAME;}
-unsigned int LocaleService_GetCodePage()		{ return _LSS_SERVICE_CODEPAGE; }
+uint32_t LocaleService_GetCodePage()		{ return _LSS_SERVICE_CODEPAGE; }
 const char*	LocaleService_GetLocaleName()		{ return _LSS_SERVICE_LOCALE_NAME; }
 const char*	LocaleService_GetLocalePath()		{ return _LSS_SERVICE_LOCALE_PATH; }
 #endif
@@ -216,10 +216,10 @@ bool LocaleService_IsNEWCIBN()	{ return (stricmp( LocaleService_GetName(), LSS_N
 
 BOOL LocaleService_IsLeadByte( const char chByte )
 {
-	return (((unsigned char) chByte) & 0x80) != 0;
+	return (((uint8_t) chByte) & 0x80) != 0;
 }
 
-int LocaleService_StringCompareCI( LPCSTR szStringLeft, LPCSTR szStringRight, size_t sizeLength )
+int32_t LocaleService_StringCompareCI( LPCSTR szStringLeft, LPCSTR szStringRight, size_t sizeLength )
 {
 	return strnicmp( szStringLeft, szStringRight, sizeLength );
 }

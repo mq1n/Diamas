@@ -5,7 +5,7 @@
 
 CDynamicPool<CGraphicExpandedImageInstance>		CGraphicExpandedImageInstance::ms_kPool;
 
-void CGraphicExpandedImageInstance::CreateSystem(UINT uCapacity)
+void CGraphicExpandedImageInstance::CreateSystem(uint32_t uCapacity)
 {
 	ms_kPool.Create(uCapacity);
 }
@@ -86,7 +86,7 @@ void CGraphicExpandedImageInstance::OnRender()
 		float fimgHalfWidth = float(pImage->GetWidth())/2.0f * m_v2Scale.x;
 		float fimgHalfHeight = float(pImage->GetHeight())/2.0f * m_v2Scale.y;
 
-		for (int i = 0; i < 4; ++i)
+		for (int32_t i = 0; i < 4; ++i)
 		{
 			vertices[i].position.x += m_v2Origin.x;
 			vertices[i].position.y += m_v2Origin.y;
@@ -122,7 +122,7 @@ void CGraphicExpandedImageInstance::OnRender()
 		CGraphicBase::SetDefaultIndexBuffer(CGraphicBase::DEFAULT_IB_FILL_RECT);
 
 		STATEMANAGER.SetTexture(0, pTexture->GetD3DTexture());
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 		STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);	
 	}
@@ -182,14 +182,14 @@ void CGraphicExpandedImageInstance::SetRenderingRect(float fLeft, float fTop, fl
 	m_RenderingRect.bottom = fHeight * fBottom;
 }
 
-void CGraphicExpandedImageInstance::SetRenderingMode(int iMode)
+void CGraphicExpandedImageInstance::SetRenderingMode(int32_t iMode)
 {
 	m_iRenderingMode = iMode;
 }
 
-DWORD CGraphicExpandedImageInstance::Type()
+uint32_t CGraphicExpandedImageInstance::Type()
 {
-	static DWORD s_dwType = GetCRC32("CGraphicExpandedImageInstance", strlen("CGraphicExpandedImageInstance"));
+	static uint32_t s_dwType = GetCRC32("CGraphicExpandedImageInstance", strlen("CGraphicExpandedImageInstance"));
 	return (s_dwType);
 }
 
@@ -201,7 +201,7 @@ void CGraphicExpandedImageInstance::OnSetImagePointer()
 	SetOrigin(float(GetWidth()) / 2.0f, float(GetHeight()) / 2.0f);
 }
 
-BOOL CGraphicExpandedImageInstance::OnIsType(DWORD dwType)
+BOOL CGraphicExpandedImageInstance::OnIsType(uint32_t dwType)
 {
 	if (CGraphicExpandedImageInstance::Type() == dwType)
 		return TRUE;

@@ -22,25 +22,25 @@
 
 #pragma once
 
-const int		c_nNumWindMatrices = 4;
-const int		c_nNumInstancesPerModel = 10;
+const int32_t		c_nNumWindMatrices = 4;
+const int32_t		c_nNumInstancesPerModel = 10;
 const float		c_fForestSize = 200.0f;
 const float		c_fSpacingTolerance = 30.0f;
-const int		c_nMaxPlacementIterations = 500;
-const int		c_nDefaultAlphaTestValue = 84;
+const int32_t		c_nMaxPlacementIterations = 500;
+const int32_t		c_nDefaultAlphaTestValue = 84;
 const float		c_fNearLodFactor = 2.0f;
 const float		c_fFarLodFactor = 9.0f;
 const float		c_fBenchmarkPeriod = 1.0f;
 
 // vertex shader constant locations
-const int c_nVertexShader_LeafLightingAdjustment = 70;
-const int c_nVertexShader_Light = 71;
-const int c_nVertexShader_Material = 74;
-const int c_nVertexShader_TreePos = 52;
-const int c_nVertexShader_CompoundMatrix = 0;
-const int c_nVertexShader_WindMatrices = 54;
-const int c_nVertexShader_LeafTables = 4;
-const int c_nVertexShader_Fog = 85;
+const int32_t c_nVertexShader_LeafLightingAdjustment = 70;
+const int32_t c_nVertexShader_Light = 71;
+const int32_t c_nVertexShader_Material = 74;
+const int32_t c_nVertexShader_TreePos = 52;
+const int32_t c_nVertexShader_CompoundMatrix = 0;
+const int32_t c_nVertexShader_WindMatrices = 54;
+const int32_t c_nVertexShader_LeafTables = 4;
+const int32_t c_nVertexShader_Fog = 85;
 
 // lighting
 const float c_afLightPosition[4] = { -0.707f, 0.0f, 0.707f, 0.0f };

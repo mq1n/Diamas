@@ -28,7 +28,7 @@ class CAttributeData : public CResource
 
 		typedef struct SCollisionData
 		{
-			DWORD dwType;
+			uint32_t dwType;
 			char szName[32+1];
 
 			D3DXVECTOR3 v3Position;
@@ -43,20 +43,20 @@ class CAttributeData : public CResource
 		CAttributeData(const char * c_szFileName);
 		virtual ~CAttributeData();
 
-		//DWORD GetCollisionDataCount() const;
-		//BOOL GetCollisionDataPointer(DWORD dwIndex, const TCollisionData ** c_ppCollisionData) const;
+		//uint32_t GetCollisionDataCount() const;
+		//BOOL GetCollisionDataPointer(uint32_t dwIndex, const TCollisionData ** c_ppCollisionData) const;
 		const CStaticCollisionDataVector & GetCollisionDataVector() const;
 		const THeightDataVector & GetHeightDataVector() const;
 
 		size_t AddCollisionData(const CStaticCollisionData& collisionData);	// return m_StaticCollisionDataVector.size();
 
-		DWORD GetHeightDataCount() const;
-		BOOL GetHeightDataPointer(DWORD dwIndex, const THeightData ** c_ppHeightData) const;
+		uint32_t GetHeightDataCount() const;
+		BOOL GetHeightDataPointer(uint32_t dwIndex, const THeightData ** c_ppHeightData) const;
 
 		float GetMaximizeRadius();
 
 	protected:
-		bool OnLoad(int iSize, const void * c_pvBuf);
+		bool OnLoad(int32_t iSize, const void * c_pvBuf);
 		void OnClear();
 		bool OnIsEmpty() const;
 		bool OnIsType(TType type);

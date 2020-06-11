@@ -71,8 +71,8 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 #pragma pack(1)
 		typedef struct SMobSkillLevel
 		{
-			DWORD       dwVnum;
-			BYTE        bLevel;
+			uint32_t       dwVnum;
+			uint8_t        bLevel;
 		} TMobSkillLevel;
 
 		typedef struct SMobTable_r235
@@ -83,120 +83,120 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 				MOB_SKILL_MAX_NUM = 1,//r1
 			};
 
-			DWORD       dwVnum;
+			uint32_t       dwVnum;
 			char        szName[CHARACTER_NAME_MAX_LEN + 1];
 			char        szLocaleName[CHARACTER_NAME_MAX_LEN + 1];
 
-			BYTE        bType;                  // Monster, NPC
-			BYTE        bRank;                  // PAWN, KNIGHT, KING
-			BYTE        bBattleType;            // MELEE, etc..
-			BYTE        bLevel;                 // Level
-			BYTE        bSize;
+			uint8_t        bType;                  // Monster, NPC
+			uint8_t        bRank;                  // PAWN, KNIGHT, KING
+			uint8_t        bBattleType;            // MELEE, etc..
+			uint8_t        bLevel;                 // Level
+			uint8_t        bSize;
 
-			DWORD       dwGoldMin;
-			DWORD       dwGoldMax;
-			DWORD       dwExp;
-			DWORD       dwMaxHP;
-			BYTE        bRegenCycle;
-			BYTE        bRegenPercent;
-			WORD        wDef;
+			uint32_t       dwGoldMin;
+			uint32_t       dwGoldMax;
+			uint32_t       dwExp;
+			uint32_t       dwMaxHP;
+			uint8_t        bRegenCycle;
+			uint8_t        bRegenPercent;
+			uint16_t        wDef;
 
-			DWORD       dwAIFlag;
-			DWORD       dwRaceFlag;
-			DWORD       dwImmuneFlag;
+			uint32_t       dwAIFlag;
+			uint32_t       dwRaceFlag;
+			uint32_t       dwImmuneFlag;
 
-			BYTE        bStr, bDex, bCon, bInt;
-			DWORD       dwDamageRange[2];
+			uint8_t        bStr, bDex, bCon, bInt;
+			uint32_t       dwDamageRange[2];
 
-			short       sAttackSpeed;
-			short       sMovingSpeed;
-			BYTE        bAggresiveHPPct;
-			WORD        wAggressiveSight;
-			WORD        wAttackRange;
+			int16_t       sAttackSpeed;
+			int16_t       sMovingSpeed;
+			uint8_t        bAggresiveHPPct;
+			uint16_t        wAggressiveSight;
+			uint16_t        wAttackRange;
 
 			char        cEnchants[MOB_ENCHANTS_MAX_NUM];
 			char        cResists[MOB_RESISTS_MAX_NUM];
 
-			DWORD       dwResurrectionVnum;
-			DWORD       dwDropItemVnum;
+			uint32_t       dwResurrectionVnum;
+			uint32_t       dwDropItemVnum;
 
-			BYTE        bMountCapacity;
-			BYTE        bOnClickType;
+			uint8_t        bMountCapacity;
+			uint8_t        bOnClickType;
 
-			BYTE        bEmpire;
+			uint8_t        bEmpire;
 			char        szFolder[64 + 1];
 			float       fDamMultiply;
-			DWORD       dwSummonVnum;
-			DWORD       dwDrainSP;
-			DWORD		dwMonsterColor;
-		    DWORD       dwPolymorphItemVnum;
+			uint32_t       dwSummonVnum;
+			uint32_t       dwDrainSP;
+			uint32_t		dwMonsterColor;
+		    uint32_t       dwPolymorphItemVnum;
 
 			TMobSkillLevel	Skills[SMobTable_r235::MOB_SKILL_MAX_NUM];
 
-		    BYTE		bBerserkPoint;
-			BYTE		bStoneSkinPoint;
-			BYTE		bGodSpeedPoint;
-			BYTE		bDeathBlowPoint;
-			BYTE		bRevivePoint;
+		    uint8_t		bBerserkPoint;
+			uint8_t		bStoneSkinPoint;
+			uint8_t		bGodSpeedPoint;
+			uint8_t		bDeathBlowPoint;
+			uint8_t		bRevivePoint;
 		} TMobTable_r235;
 
 		typedef struct SMobTable_r255
 		{
-			DWORD       dwVnum;
+			uint32_t       dwVnum;
 			char        szName[CHARACTER_NAME_MAX_LEN + 1]; 
 			char        szLocaleName[CHARACTER_NAME_MAX_LEN + 1];
 
-			BYTE        bType;                  // Monster, NPC
-			BYTE        bRank;                  // PAWN, KNIGHT, KING
-			BYTE        bBattleType;            // MELEE, etc..
-			BYTE        bLevel;                 // Level
-			BYTE        bSize;
+			uint8_t        bType;                  // Monster, NPC
+			uint8_t        bRank;                  // PAWN, KNIGHT, KING
+			uint8_t        bBattleType;            // MELEE, etc..
+			uint8_t        bLevel;                 // Level
+			uint8_t        bSize;
 
-			DWORD       dwGoldMin;
-			DWORD       dwGoldMax;
-			DWORD       dwExp;
-			DWORD       dwMaxHP;
-			BYTE        bRegenCycle;
-			BYTE        bRegenPercent;
-			WORD        wDef;
+			uint32_t       dwGoldMin;
+			uint32_t       dwGoldMax;
+			uint32_t       dwExp;
+			uint32_t       dwMaxHP;
+			uint8_t        bRegenCycle;
+			uint8_t        bRegenPercent;
+			uint16_t        wDef;
 
-			DWORD       dwAIFlag;
-			DWORD       dwRaceFlag;
-			DWORD       dwImmuneFlag;
+			uint32_t       dwAIFlag;
+			uint32_t       dwRaceFlag;
+			uint32_t       dwImmuneFlag;
 
-			BYTE        bStr, bDex, bCon, bInt;
-			DWORD       dwDamageRange[2];
+			uint8_t        bStr, bDex, bCon, bInt;
+			uint32_t       dwDamageRange[2];
 
-			short       sAttackSpeed;
-			short       sMovingSpeed;
-			BYTE        bAggresiveHPPct;
-			WORD        wAggressiveSight;
-			WORD        wAttackRange;
+			int16_t       sAttackSpeed;
+			int16_t       sMovingSpeed;
+			uint8_t        bAggresiveHPPct;
+			uint16_t        wAggressiveSight;
+			uint16_t        wAttackRange;
 
 			char        cEnchants[MOB_ENCHANTS_MAX_NUM];
 			char        cResists[MOB_RESISTS_MAX_NUM];
 
-			DWORD       dwResurrectionVnum;
-			DWORD       dwDropItemVnum;
+			uint32_t       dwResurrectionVnum;
+			uint32_t       dwDropItemVnum;
 
-			BYTE        bMountCapacity;
-			BYTE        bOnClickType;
+			uint8_t        bMountCapacity;
+			uint8_t        bOnClickType;
 
-			BYTE        bEmpire;
+			uint8_t        bEmpire;
 			char        szFolder[64 + 1];
 			float       fDamMultiply;
-			DWORD       dwSummonVnum;
-			DWORD       dwDrainSP;
-			DWORD		dwMonsterColor;
-		    DWORD       dwPolymorphItemVnum;
+			uint32_t       dwSummonVnum;
+			uint32_t       dwDrainSP;
+			uint32_t		dwMonsterColor;
+		    uint32_t       dwPolymorphItemVnum;
 
 			TMobSkillLevel	Skills[MOB_SKILL_MAX_NUM];
 
-		    BYTE		bBerserkPoint;
-			BYTE		bStoneSkinPoint;
-			BYTE		bGodSpeedPoint;
-			BYTE		bDeathBlowPoint;
-			BYTE		bRevivePoint;
+		    uint8_t		bBerserkPoint;
+			uint8_t		bStoneSkinPoint;
+			uint8_t		bGodSpeedPoint;
+			uint8_t		bDeathBlowPoint;
+			uint8_t		bRevivePoint;
 		} TMobTable_r255;
 
 		typedef struct SMobTable_r256
@@ -218,61 +218,61 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 				MOB_RESISTS_MAX_NUM
 			};
 
-			DWORD       dwVnum;
+			uint32_t       dwVnum;
 			char        szName[CHARACTER_NAME_MAX_LEN + 1];
 			char        szLocaleName[CHARACTER_NAME_MAX_LEN + 1];
 
-			BYTE        bType;                  // Monster, NPC
-			BYTE        bRank;                  // PAWN, KNIGHT, KING
-			BYTE        bBattleType;            // MELEE, etc..
-			BYTE        bLevel;                 // Level
-			BYTE        bSize;
+			uint8_t        bType;                  // Monster, NPC
+			uint8_t        bRank;                  // PAWN, KNIGHT, KING
+			uint8_t        bBattleType;            // MELEE, etc..
+			uint8_t        bLevel;                 // Level
+			uint8_t        bSize;
 
-			DWORD       dwGoldMin;
-			DWORD       dwGoldMax;
-			DWORD       dwExp;
-			DWORD       dwMaxHP;
-			BYTE        bRegenCycle;
-			BYTE        bRegenPercent;
-			WORD        wDef;
+			uint32_t       dwGoldMin;
+			uint32_t       dwGoldMax;
+			uint32_t       dwExp;
+			uint32_t       dwMaxHP;
+			uint8_t        bRegenCycle;
+			uint8_t        bRegenPercent;
+			uint16_t        wDef;
 
-			DWORD       dwAIFlag;
-			DWORD       dwRaceFlag;
-			DWORD       dwImmuneFlag;
+			uint32_t       dwAIFlag;
+			uint32_t       dwRaceFlag;
+			uint32_t       dwImmuneFlag;
 
-			BYTE        bStr, bDex, bCon, bInt;
-			DWORD       dwDamageRange[2];
+			uint8_t        bStr, bDex, bCon, bInt;
+			uint32_t       dwDamageRange[2];
 
-			short       sAttackSpeed;
-			short       sMovingSpeed;
-			BYTE        bAggresiveHPPct;
-			WORD        wAggressiveSight;
-			WORD        wAttackRange;
+			int16_t       sAttackSpeed;
+			int16_t       sMovingSpeed;
+			uint8_t        bAggresiveHPPct;
+			uint16_t        wAggressiveSight;
+			uint16_t        wAttackRange;
 
 			char        cEnchants[MOB_ENCHANTS_MAX_NUM];
 			char        cResists[SMobTable_r256::MOB_RESISTS_MAX_NUM];
 
-			DWORD       dwResurrectionVnum;
-			DWORD       dwDropItemVnum;
+			uint32_t       dwResurrectionVnum;
+			uint32_t       dwDropItemVnum;
 
-			BYTE        bMountCapacity;
-			BYTE        bOnClickType;
+			uint8_t        bMountCapacity;
+			uint8_t        bOnClickType;
 
-			BYTE        bEmpire;
+			uint8_t        bEmpire;
 			char        szFolder[64 + 1];
 			float       fDamMultiply;
-			DWORD       dwSummonVnum;
-			DWORD       dwDrainSP;
-			DWORD		dwMonsterColor;
-		    DWORD       dwPolymorphItemVnum;
+			uint32_t       dwSummonVnum;
+			uint32_t       dwDrainSP;
+			uint32_t		dwMonsterColor;
+		    uint32_t       dwPolymorphItemVnum;
 
 			TMobSkillLevel	Skills[MOB_SKILL_MAX_NUM];
 
-		    BYTE		bBerserkPoint;
-			BYTE		bStoneSkinPoint;
-			BYTE		bGodSpeedPoint;
-			BYTE		bDeathBlowPoint;
-			BYTE		bRevivePoint;
+		    uint8_t		bBerserkPoint;
+			uint8_t		bStoneSkinPoint;
+			uint8_t		bGodSpeedPoint;
+			uint8_t		bDeathBlowPoint;
+			uint8_t		bRevivePoint;
 		} TMobTable_r256;
 
 		typedef struct SMobTable_r262
@@ -295,64 +295,64 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 				MOB_RESISTS_MAX_NUM
 			};
 
-			DWORD       dwVnum;
+			uint32_t       dwVnum;
 			char        szName[CHARACTER_NAME_MAX_LEN + 1];
 			char        szLocaleName[CHARACTER_NAME_MAX_LEN + 1];
 
-			BYTE        bType;                  // Monster, NPC
-			BYTE        bRank;                  // PAWN, KNIGHT, KING
-			BYTE        bBattleType;            // MELEE, etc..
-			BYTE        bLevel;                 // Level
-			BYTE		bLvlPct;
-			BYTE        bSize;//r4
+			uint8_t        bType;                  // Monster, NPC
+			uint8_t        bRank;                  // PAWN, KNIGHT, KING
+			uint8_t        bBattleType;            // MELEE, etc..
+			uint8_t        bLevel;                 // Level
+			uint8_t		bLvlPct;
+			uint8_t        bSize;//r4
 
-			DWORD       dwGoldMin;
-			DWORD       dwGoldMax;
-			DWORD       dwExp;
-			DWORD       dwMaxHP;
-			BYTE        bRegenCycle;
-			BYTE        bRegenPercent;
-			WORD        wDef;
+			uint32_t       dwGoldMin;
+			uint32_t       dwGoldMax;
+			uint32_t       dwExp;
+			uint32_t       dwMaxHP;
+			uint8_t        bRegenCycle;
+			uint8_t        bRegenPercent;
+			uint16_t        wDef;
 
-			DWORD       dwAIFlag;
-			DWORD       dwRaceFlag;
-			DWORD       dwImmuneFlag;
+			uint32_t       dwAIFlag;
+			uint32_t       dwRaceFlag;
+			uint32_t       dwImmuneFlag;
 
-			BYTE        bStr, bDex, bCon, bInt;
-			DWORD       dwDamageRange[2];
+			uint8_t        bStr, bDex, bCon, bInt;
+			uint32_t       dwDamageRange[2];
 
-			short       sAttackSpeed;
-			short       sMovingSpeed;
-			BYTE        bAggresiveHPPct;
-			WORD        wAggressiveSight;
-			WORD        wAttackRange;
+			int16_t       sAttackSpeed;
+			int16_t       sMovingSpeed;
+			uint8_t        bAggresiveHPPct;
+			uint16_t        wAggressiveSight;
+			uint16_t        wAttackRange;
 
 			char        cEnchants[MOB_ENCHANTS_MAX_NUM];
 			char        cResists[SMobTable_r262::MOB_RESISTS_MAX_NUM];
 
-			DWORD       dwResurrectionVnum;
-			DWORD       dwDropItemVnum;
+			uint32_t       dwResurrectionVnum;
+			uint32_t       dwDropItemVnum;
 
-			BYTE        bMountCapacity;
-			BYTE        bOnClickType;
+			uint8_t        bMountCapacity;
+			uint8_t        bOnClickType;
 
-			BYTE        bEmpire;
+			uint8_t        bEmpire;
 			char        szFolder[64 + 1];
 			float       fDamMultiply;
-			DWORD       dwSummonVnum;
-			DWORD       dwDrainSP;
-			DWORD		dwMonsterColor;
-		    DWORD       dwPolymorphItemVnum;
+			uint32_t       dwSummonVnum;
+			uint32_t       dwDrainSP;
+			uint32_t		dwMonsterColor;
+		    uint32_t       dwPolymorphItemVnum;
 
 			TMobSkillLevel	Skills[MOB_SKILL_MAX_NUM];
 
-		    BYTE		bBerserkPoint;
-			BYTE		bStoneSkinPoint;
-			BYTE		bGodSpeedPoint;
-			BYTE		bDeathBlowPoint;
-			BYTE		bRevivePoint;
+		    uint8_t		bBerserkPoint;
+			uint8_t		bStoneSkinPoint;
+			uint8_t		bGodSpeedPoint;
+			uint8_t		bDeathBlowPoint;
+			uint8_t		bRevivePoint;
 
-			DWORD		dwHealerPoint;//r4
+			uint32_t		dwHealerPoint;//r4
 		} TMobTable_r262;
 
 		typedef struct SMobTable_r263
@@ -375,65 +375,65 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 				MOB_RESISTS_MAX_NUM
 			};
 
-			DWORD       dwVnum;
+			uint32_t       dwVnum;
 			char        szName[CHARACTER_NAME_MAX_LEN + 1];
 			char        szLocaleName[CHARACTER_NAME_MAX_LEN + 1];
 
-			BYTE        bType;                  // Monster, NPC
-			BYTE        bRank;                  // PAWN, KNIGHT, KING
-			BYTE        bBattleType;            // MELEE, etc..
-			BYTE        bLevel;                 // Level
-			BYTE		bLvlPct;
-			BYTE        bSize;//r4
+			uint8_t        bType;                  // Monster, NPC
+			uint8_t        bRank;                  // PAWN, KNIGHT, KING
+			uint8_t        bBattleType;            // MELEE, etc..
+			uint8_t        bLevel;                 // Level
+			uint8_t		bLvlPct;
+			uint8_t        bSize;//r4
 
-			DWORD       dwGoldMin;
-			DWORD       dwGoldMax;
-			DWORD       dwExp;
-			DWORD       dwMaxHP;
-			BYTE        bRegenCycle;
-			BYTE        bRegenPercent;
-			WORD        wDef;
+			uint32_t       dwGoldMin;
+			uint32_t       dwGoldMax;
+			uint32_t       dwExp;
+			uint32_t       dwMaxHP;
+			uint8_t        bRegenCycle;
+			uint8_t        bRegenPercent;
+			uint16_t        wDef;
 
-			DWORD       dwAIFlag;
-			DWORD       dwRaceFlag;
-			DWORD       dwImmuneFlag;
+			uint32_t       dwAIFlag;
+			uint32_t       dwRaceFlag;
+			uint32_t       dwImmuneFlag;
 
-			BYTE        bStr, bDex, bCon, bInt;
-			DWORD       dwDamageRange[2];
+			uint8_t        bStr, bDex, bCon, bInt;
+			uint32_t       dwDamageRange[2];
 
-			short       sAttackSpeed;
-			short       sMovingSpeed;
-			BYTE        bAggresiveHPPct;
-			WORD        wAggressiveSight;
-			WORD        wAttackRange;
+			int16_t       sAttackSpeed;
+			int16_t       sMovingSpeed;
+			uint8_t        bAggresiveHPPct;
+			uint16_t        wAggressiveSight;
+			uint16_t        wAttackRange;
 
 			char        cEnchants[MOB_ENCHANTS_MAX_NUM];
 			char        cResists[SMobTable_r263::MOB_RESISTS_MAX_NUM];
 
-			DWORD       dwResurrectionVnum;
-			DWORD       dwDropItemVnum;
+			uint32_t       dwResurrectionVnum;
+			uint32_t       dwDropItemVnum;
 
-			BYTE        bMountCapacity;
-			BYTE        bOnClickType;
+			uint8_t        bMountCapacity;
+			uint8_t        bOnClickType;
 
-			BYTE        bEmpire;
+			uint8_t        bEmpire;
 			char        szFolder[64 + 1];
 			float       fDamMultiply;
-			DWORD       dwSummonVnum;
-			DWORD       dwDrainSP;
-			DWORD		dwMonsterColor;
-		    DWORD       dwPolymorphItemVnum;
+			uint32_t       dwSummonVnum;
+			uint32_t       dwDrainSP;
+			uint32_t		dwMonsterColor;
+		    uint32_t       dwPolymorphItemVnum;
 
 			TMobSkillLevel	Skills[MOB_SKILL_MAX_NUM];
 
-		    BYTE		bBerserkPoint;
-			BYTE		bStoneSkinPoint;
-			BYTE		bGodSpeedPoint;
-			BYTE		bDeathBlowPoint;
-			BYTE		bRevivePoint;
+		    uint8_t		bBerserkPoint;
+			uint8_t		bStoneSkinPoint;
+			uint8_t		bGodSpeedPoint;
+			uint8_t		bDeathBlowPoint;
+			uint8_t		bRevivePoint;
 
-			DWORD		dwHealerPoint;//r5
-			BYTE		bUnk263;//r5
+			uint32_t		dwHealerPoint;//r5
+			uint8_t		bUnk263;//r5
 		} TMobTable_r263; //brazilian only 2016/08
 
 		typedef TMobTable_r255 SMobTable, TMobTable;
@@ -441,7 +441,7 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 #ifdef ENABLE_PROTOSTRUCT_AUTODETECT
 		typedef struct SMobTableAll
 		{
-			static bool IsValidStruct(DWORD structSize)
+			static bool IsValidStruct(uint32_t structSize)
 			{
 				switch (structSize)
 				{
@@ -456,7 +456,7 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 				return false;
 			}
 
-			static void Process(void* obj, DWORD structSize, DWORD i, CPythonNonPlayer::TMobTable& t)
+			static void Process(void* obj, uint32_t structSize, uint32_t i, CPythonNonPlayer::TMobTable& t)
 			{
 				#define MTABLE_COPY_STR(x) strncpy_s(t.##x##, sizeof(t.##x##), r.##x##, _TRUNCATE)
 				#define MTABLE_COPY_INT(x) t.##x## = r.##x
@@ -560,7 +560,7 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 #pragma pack(pop)
 
 		typedef std::list<TMobTable *> TMobTableList;
-		typedef std::map<DWORD, TMobTable *> TNonPlayerDataMap;
+		typedef std::map<uint32_t, TMobTable *> TNonPlayerDataMap;
 
 	public:
 		CPythonNonPlayer(void);
@@ -571,24 +571,24 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 
 		bool				LoadNonPlayerData(const char * c_szFileName);
 
-		const TMobTable *	GetTable(DWORD dwVnum);
-		bool				GetName(DWORD dwVnum, const char ** c_pszName);
-		bool				GetInstanceType(DWORD dwVnum, BYTE* pbType);
-		BYTE				GetEventType(DWORD dwVnum);
-		BYTE				GetEventTypeByVID(DWORD dwVID);
-		DWORD				GetMonsterColor(DWORD dwVnum);
-		const char*			GetMonsterName(DWORD dwVnum);
+		const TMobTable *	GetTable(uint32_t dwVnum);
+		bool				GetName(uint32_t dwVnum, const char ** c_pszName);
+		bool				GetInstanceType(uint32_t dwVnum, uint8_t* pbType);
+		uint8_t				GetEventType(uint32_t dwVnum);
+		uint8_t				GetEventTypeByVID(uint32_t dwVID);
+		uint32_t				GetMonsterColor(uint32_t dwVnum);
+		const char*			GetMonsterName(uint32_t dwVnum);
 
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
-		DWORD				GetMonsterLevel(DWORD dwVnum);
+		uint32_t				GetMonsterLevel(uint32_t dwVnum);
 #endif
 
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
-		bool				IsAggressive(DWORD dwVnum);
+		bool				IsAggressive(uint32_t dwVnum);
 #endif
 
 		// Function for outer
-		void				GetMatchableMobList(int iLevel, int iInterval, TMobTableList * pMobTableList);
+		void				GetMatchableMobList(int32_t iLevel, int32_t iInterval, TMobTableList * pMobTableList);
 
 	protected:
 		TNonPlayerDataMap	m_NonPlayerDataMap;

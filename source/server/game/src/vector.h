@@ -10,7 +10,7 @@ typedef struct SVector
 
 extern void		Normalize(VECTOR * pV1, VECTOR * pV2);
 extern float    GetDegreeFromPosition(float x, float y);
-extern float    GetDegreeFromPositionXY(long sx, long sy, long ex, long ey);
+extern float    GetDegreeFromPositionXY(int32_t sx, int32_t sy, int32_t ex, int32_t ey);
 extern void     GetDeltaByDegree(float fDegree, float fDistance, float *x, float *y);
 extern float	GetDegreeDelta(float iDegree, float iDegree2);
 

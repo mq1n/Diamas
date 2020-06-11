@@ -31,13 +31,13 @@ static CGraphicVertexBuffer gs_emptyVB;
 
 #include <time.h>
 
-static CGraphicVertexBuffer* __AllocDeformVertexBuffer(unsigned deformableVertexCount)
+static CGraphicVertexBuffer* __AllocDeformVertexBuffer(uint32_t deformableVertexCount)
 {
 	if (deformableVertexCount == 0)
 		return &gs_emptyVB;
 
-	unsigned capacity	= (((deformableVertexCount-1) / 500) + 1) * 500;
-	unsigned index		= (deformableVertexCount-1) / 500;	
+	uint32_t capacity	= (((deformableVertexCount-1) / 500) + 1) * 500;
+	uint32_t index		= (deformableVertexCount-1) / 500;	
 	if (index < SHARED_VB_NUM)
 	{	
 		std::vector<CGraphicVertexBuffer*>& vbs = gs_vbs[index];
@@ -52,8 +52,8 @@ static CGraphicVertexBuffer* __AllocDeformVertexBuffer(unsigned deformableVertex
 	}
 
 
-	static time_t base = time(NULL);
-	//TraceError("NEW %8d: %d(%d)", time(NULL) - base, capacity, deformableVertexCount);
+	static time_t base = time(nullptr);
+	//TraceError("NEW %8d: %d(%d)", time(nullptr) - base, capacity, deformableVertexCount);
 
 	CGraphicVertexBuffer* pkNewVB = new CGraphicVertexBuffer;
 
@@ -63,7 +63,7 @@ static CGraphicVertexBuffer* __AllocDeformVertexBuffer(unsigned deformableVertex
 		D3DUSAGE_WRITEONLY, 
 		D3DPOOL_MANAGED))
 	{
-		TraceError("NEW_ERROR %8d: %d(%d)", time(NULL) - base, capacity, deformableVertexCount);
+		TraceError("NEW_ERROR %8d: %d(%d)", time(nullptr) - base, capacity, deformableVertexCount);
 	}
 
 	return pkNewVB;
@@ -76,7 +76,7 @@ void __FreeDeformVertexBuffer(CGraphicVertexBuffer* pkDelVB)
 		if (pkDelVB == &gs_emptyVB)
 			return;
 
-		unsigned index = (pkDelVB->GetVertexCount() - 1) / 500;
+		uint32_t index = (pkDelVB->GetVertexCount() - 1) / 500;
 		if (index < SHARED_VB_NUM)
 		{	
 			gs_vbs[index].push_back(pkDelVB);			
@@ -89,14 +89,14 @@ void __FreeDeformVertexBuffer(CGraphicVertexBuffer* pkDelVB)
 	}
 }
 
-void __ReserveSharedVertexBuffers(unsigned index, unsigned count)
+void __ReserveSharedVertexBuffers(uint32_t index, uint32_t count)
 {
 	if (index >= SHARED_VB_NUM)
 		return;
 
-	unsigned capacity = (index + 1) * 500;
+	uint32_t capacity = (index + 1) * 500;
 
-	for (unsigned i = 0; i != count; ++i)
+	for (uint32_t i = 0; i != count; ++i)
 	{
 		CGraphicVertexBuffer* pkNewVB = new CGraphicVertexBuffer;
 		pkNewVB->Create(
@@ -122,7 +122,7 @@ void GrannyDestroySharedDeformBuffer()
 #ifdef _DEBUG
 	TraceError("granny_shared_vbs:");
 #endif
-	for (int i = 0; i != SHARED_VB_NUM; ++i)
+	for (int32_t i = 0; i != SHARED_VB_NUM; ++i)
 	{	
 		std::vector<CGraphicVertexBuffer*>& vbs = gs_vbs[i];
 #ifdef _DEBUG
@@ -177,12 +177,12 @@ void CGrannyLODController::SetSpecularInfo(const char* c_szMtrlName, BOOL bEnabl
 }
 
 CGrannyLODController::CGrannyLODController() : 
-	m_pCurrentModelInstance(NULL),
+	m_pCurrentModelInstance(nullptr),
 	m_bLODLevel(0),
-	m_pAttachedParentModel(NULL),
+	m_pAttachedParentModel(nullptr),
 	m_fLODDistance(0.0f),
 	m_dwLODAniFPS(CGrannyModelInstance::ANIFPS_MAX),
-	m_pkSharedDeformableVertexBuffer(NULL)
+	m_pkSharedDeformableVertexBuffer(nullptr)
 	/////////////////////////////////////////////////////
 {
 }
@@ -201,8 +201,8 @@ void CGrannyLODController::Clear()
 		m_pAttachedParentModel->DetachModelInstance(this);
 	}
 
-	m_pCurrentModelInstance = NULL;
-	m_pAttachedParentModel = NULL;
+	m_pCurrentModelInstance = nullptr;
+	m_pAttachedParentModel = nullptr;
 
 	std::for_each(m_que_pkModelInst.begin(), m_que_pkModelInst.end(), CGrannyModelInstance::Delete);
 	m_que_pkModelInst.clear();
@@ -211,13 +211,13 @@ void CGrannyLODController::Clear()
 	for (; m_AttachedModelDataVector.end() != itor; ++itor)
 	{
 		TAttachingModelData & rData = *itor;
-		rData.pkLODController->m_pAttachedParentModel = NULL;
+		rData.pkLODController->m_pAttachedParentModel = nullptr;
 	}
 
 	m_AttachedModelDataVector.clear();
 }
 
-void CGrannyLODController::AddModel(CGraphicThing * pThing, int iSrcModel, CGrannyLODController * pSkelLODController)
+void CGrannyLODController::AddModel(CGraphicThing * pThing, int32_t iSrcModel, CGrannyLODController * pSkelLODController)
 {
 	if (!pThing)
 		return;
@@ -254,7 +254,7 @@ void CGrannyLODController::AddModel(CGraphicThing * pThing, int iSrcModel, CGran
 	}
 	else
 	{		
-		pModelInstance->SetLinkedModelPointer(pModel, m_pkSharedDeformableVertexBuffer, NULL);
+		pModelInstance->SetLinkedModelPointer(pModel, m_pkSharedDeformableVertexBuffer, nullptr);
 	}
 
 	// END_OF_WORK
@@ -281,7 +281,7 @@ void CGrannyLODController::AddModel(CGraphicThing * pThing, int iSrcModel, CGran
 	else
 	{
 		// FIXME : CModelInstance::m_pgrnWorldPose를 Update에서 사용하는데,
-		//         Deform을 하지 않으면 NULL 입니다. 구조가 조금 바뀌어야 할지도.. - [levites]
+		//         Deform을 하지 않으면 nullptr 입니다. 구조가 조금 바뀌어야 할지도.. - [levites]
  		pModelInstance->DeformNoSkin(&ms_matIdentity);
 	}	
 
@@ -292,7 +292,7 @@ void CGrannyLODController::AddModel(CGraphicThing * pThing, int iSrcModel, CGran
 
 
 
-void CGrannyLODController::__ReserveSharedDeformableVertexBuffer(DWORD deformableVertexCount)
+void CGrannyLODController::__ReserveSharedDeformableVertexBuffer(uint32_t deformableVertexCount)
 {
 	if (m_pkSharedDeformableVertexBuffer && 
 		m_pkSharedDeformableVertexBuffer->GetVertexCount() >= deformableVertexCount)
@@ -351,7 +351,7 @@ void CGrannyLODController::DetachModelInstance(CGrannyLODController * pSrcLODCon
 	CGrannyModelInstance * pDestInstance = GetModelInstance();
 	if (pDestInstance)
 	{
-		pSrcInstance->SetParentModelInstance(NULL, 0);
+		pSrcInstance->SetParentModelInstance(nullptr, 0);
 	}
 
 //	if (!pSrcLODController->GetModelInstance())
@@ -373,7 +373,7 @@ void CGrannyLODController::DetachModelInstance(CGrannyLODController * pSrcLODCon
 	}
 
 	// Unlink Parent Data
-	pSrcLODController->m_pAttachedParentModel = NULL;
+	pSrcLODController->m_pAttachedParentModel = nullptr;
 }
 
 void CGrannyLODController::SetLODLimits(float /*fNearLOD*/, float fFarLOD)
@@ -381,12 +381,12 @@ void CGrannyLODController::SetLODLimits(float /*fNearLOD*/, float fFarLOD)
 	m_fLODDistance = fFarLOD;
 }
 
-void CGrannyLODController::SetLODLevel(BYTE bLodLevel)
+void CGrannyLODController::SetLODLevel(uint8_t bLodLevel)
 {
 	assert(m_que_pkModelInst.size() > 0);
 	
 	if (m_que_pkModelInst.size() > 0)
-		m_bLODLevel	= (BYTE) MIN(m_que_pkModelInst.size() - 1, bLodLevel);
+		m_bLODLevel	= (uint8_t) MIN(m_que_pkModelInst.size() - 1, bLodLevel);
 }
 
 void CGrannyLODController::CreateDeviceObjects()
@@ -405,7 +405,7 @@ void CGrannyLODController::DestroyDeviceObjects()
 
 void CGrannyLODController::RenderWithOneTexture()
 {
-	assert(m_pCurrentModelInstance != NULL);
+	assert(m_pCurrentModelInstance != nullptr);
 
 //#define CHECK_LOD
 #ifdef CHECK_LOD
@@ -428,19 +428,19 @@ void CGrannyLODController::RenderWithOneTexture()
 
 void CGrannyLODController::BlendRenderWithOneTexture()
 {
-	assert(m_pCurrentModelInstance != NULL);
+	assert(m_pCurrentModelInstance != nullptr);
 	m_pCurrentModelInstance->BlendRenderWithOneTexture();
 }
 
 void CGrannyLODController::RenderWithTwoTexture()
 {
-	assert(m_pCurrentModelInstance != NULL);
+	assert(m_pCurrentModelInstance != nullptr);
 	m_pCurrentModelInstance->RenderWithTwoTexture();
 }
 
 void CGrannyLODController::BlendRenderWithTwoTexture()
 {
-	assert(m_pCurrentModelInstance != NULL);
+	assert(m_pCurrentModelInstance != nullptr);
 	m_pCurrentModelInstance->BlendRenderWithTwoTexture();
 }
 
@@ -455,7 +455,7 @@ void CGrannyLODController::UpdateLODLevel(float fDistanceFromCenter, float fDist
 	if (m_que_pkModelInst.size()<=1)
 		return;
 	
-	assert(m_pCurrentModelInstance != NULL);
+	assert(m_pCurrentModelInstance != nullptr);
 
 	
 	if (fDistanceFromCenter > LOD_APPLY_MIN) // 중심 LOD 예외 취소
@@ -468,7 +468,7 @@ void CGrannyLODController::UpdateLODLevel(float fDistanceFromCenter, float fDist
 		float fLODFactor = fMINMAX(0.0f, (m_fLODDistance-fDistanceFromCamera), m_fLODDistance);
 		
 		if (m_fLODDistance>0.0f)
-			m_dwLODAniFPS = (DWORD) ((CGrannyModelInstance::ANIFPS_MAX - CGrannyModelInstance::ANIFPS_MIN) * fLODFactor / m_fLODDistance + CGrannyModelInstance::ANIFPS_MIN);
+			m_dwLODAniFPS = (uint32_t) ((CGrannyModelInstance::ANIFPS_MAX - CGrannyModelInstance::ANIFPS_MIN) * fLODFactor / m_fLODDistance + CGrannyModelInstance::ANIFPS_MIN);
 		else
 			m_dwLODAniFPS = CGrannyModelInstance::ANIFPS_MIN;
 		
@@ -477,7 +477,7 @@ void CGrannyLODController::UpdateLODLevel(float fDistanceFromCenter, float fDist
 		m_dwLODAniFPS *= 10;
 
 		float fLODStep = m_fLODDistance / m_que_pkModelInst.size();
-		BYTE bLODLevel = BYTE(fLODFactor / fLODStep);
+		uint8_t bLODLevel = uint8_t(fLODFactor / fLODStep);
 
 		if (m_fLODDistance <= 5000.0f)
 		{
@@ -498,7 +498,7 @@ void CGrannyLODController::UpdateLODLevel(float fDistanceFromCenter, float fDist
 				bLODLevel = 3;
 			}
 
-			bLODLevel = (BYTE) (m_que_pkModelInst.size() - std::min<BYTE>(bLODLevel, m_que_pkModelInst.size()) - 1);
+			bLODLevel = (uint8_t) (m_que_pkModelInst.size() - std::min<uint8_t>(bLODLevel, m_que_pkModelInst.size()) - 1);
 		}
 		
 		if (ms_isMinLODModeEnable)
@@ -527,14 +527,14 @@ void CGrannyLODController::UpdateLODLevel(float fDistanceFromCenter, float fDist
 
 void CGrannyLODController::UpdateTime(float fElapsedTime)
 {
-	assert(m_pCurrentModelInstance != NULL);
+	assert(m_pCurrentModelInstance != nullptr);
 
 	m_pCurrentModelInstance->Update(m_dwLODAniFPS);
 
-	//DWORD t3=timeGetTime();
+	//uint32_t t3=timeGetTime();
 	m_pCurrentModelInstance->UpdateLocalTime(fElapsedTime);
 
-	//DWORD t4=timeGetTime();
+	//uint32_t t4=timeGetTime();
 
 #ifdef __PERFORMANCE_CHECKER__
 	{
@@ -575,14 +575,14 @@ void CGrannyLODController::RefreshAttachedModelInstance()
 	if (!m_pCurrentModelInstance)
 		return;
 
-	for (DWORD i = 0; i < m_AttachedModelDataVector.size(); ++i)
+	for (uint32_t i = 0; i < m_AttachedModelDataVector.size(); ++i)
 	{
 		TAttachingModelData & rModelData = m_AttachedModelDataVector[i];
 
 		CGrannyModelInstance * pSrcInstance = rModelData.pkLODController->GetModelInstance();
 		if (!pSrcInstance)
 		{
-			Tracenf("CGrannyLODController::RefreshAttachedModelInstance : m_AttachedModelDataVector[%d]->pkLODController->GetModelIntance()==NULL", i);
+			Tracenf("CGrannyLODController::RefreshAttachedModelInstance : m_AttachedModelDataVector[%d]->pkLODController->GetModelIntance()==nullptr", i);
 			continue;
 		}
 
@@ -657,19 +657,19 @@ void CGrannyLODController::SetLocalTime(float fLocalTime)
 
 void CGrannyLODController::ResetLocalTime()
 {
-	assert(m_pCurrentModelInstance != NULL);
+	assert(m_pCurrentModelInstance != nullptr);
 	m_pCurrentModelInstance->ResetLocalTime();
 }
 
-void CGrannyLODController::SetMotionPointer(const CGrannyMotion * c_pMotion, float fBlendTime, int iLoopCount, float speedRatio)
+void CGrannyLODController::SetMotionPointer(const CGrannyMotion * c_pMotion, float fBlendTime, int32_t iLoopCount, float speedRatio)
 {
-	assert(m_pCurrentModelInstance != NULL);
+	assert(m_pCurrentModelInstance != nullptr);
 	m_pCurrentModelInstance->SetMotionPointer(c_pMotion, fBlendTime, iLoopCount, speedRatio);
 }
 
-void CGrannyLODController::ChangeMotionPointer(const CGrannyMotion * c_pMotion, int iLoopCount, float speedRatio)
+void CGrannyLODController::ChangeMotionPointer(const CGrannyMotion * c_pMotion, int32_t iLoopCount, float speedRatio)
 {
-	assert(m_pCurrentModelInstance != NULL);
+	assert(m_pCurrentModelInstance != nullptr);
 	m_pCurrentModelInstance->ChangeMotionPointer(c_pMotion, iLoopCount, speedRatio);
 }
 

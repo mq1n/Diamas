@@ -11,9 +11,9 @@ CPolymorphUtils::CPolymorphUtils()
 	m_mapSPDType.insert(std::make_pair(1901, 1901));
 }
 
-POLYMORPH_BONUS_TYPE CPolymorphUtils::GetBonusType(DWORD dwVnum)
+POLYMORPH_BONUS_TYPE CPolymorphUtils::GetBonusType(uint32_t dwVnum)
 {
-	std::unordered_map<DWORD, DWORD>::iterator iter;
+	std::unordered_map<uint32_t, uint32_t>::iterator iter;
 
 	iter = m_mapSPDType.find(dwVnum);
 
@@ -35,10 +35,10 @@ POLYMORPH_BONUS_TYPE CPolymorphUtils::GetBonusType(DWORD dwVnum)
 
 bool CPolymorphUtils::PolymorphCharacter(LPCHARACTER pChar, LPITEM pItem, const CMob* pMob)
 {
-	BYTE bySkillLevel = pChar->GetSkillLevel(POLYMORPH_SKILL_ID);
-	DWORD dwDuration = 0;
-	DWORD dwBonusPercent = 0;
-	int iPolyPercent = 0;
+	uint8_t bySkillLevel = pChar->GetSkillLevel(POLYMORPH_SKILL_ID);
+	uint32_t dwDuration = 0;
+	uint32_t dwBonusPercent = 0;
+	int32_t iPolyPercent = 0;
 
 	switch (pChar->GetSkillMasterType(POLYMORPH_SKILL_ID))
 	{
@@ -110,7 +110,7 @@ bool CPolymorphUtils::PolymorphCharacter(LPCHARACTER pChar, LPITEM pItem, const 
 
 bool CPolymorphUtils::UpdateBookPracticeGrade(LPCHARACTER pChar, LPITEM pItem)
 {
-	if (pChar == NULL || pItem == NULL)
+	if (pChar == nullptr || pItem == nullptr)
 		return false;
 
 	if (pItem->GetSocket(1) > 0)
@@ -121,19 +121,19 @@ bool CPolymorphUtils::UpdateBookPracticeGrade(LPCHARACTER pChar, LPITEM pItem)
 	return true;
 }
 
-bool CPolymorphUtils::GiveBook(LPCHARACTER pChar, DWORD dwMobVnum, DWORD dwPracticeCount, BYTE BookLevel, BYTE LevelLimit)
+bool CPolymorphUtils::GiveBook(LPCHARACTER pChar, uint32_t dwMobVnum, uint32_t dwPracticeCount, uint8_t BookLevel, uint8_t LevelLimit)
 {
 	// 소켓0                소켓1       소켓2
 	// 둔갑할 몬스터 번호   수련정도    둔갑서 레벨
-	if (pChar == NULL)
+	if (pChar == nullptr)
 		return false;
 
 	LPITEM pItem = pChar->AutoGiveItem(POLYMORPH_BOOK_ID, 1);
 
-	if (pItem == NULL)
+	if (pItem == nullptr)
 		return false;
 
-	if (CMobManager::instance().Get(dwMobVnum) == NULL)
+	if (CMobManager::instance().Get(dwMobVnum) == nullptr)
 	{
 		sys_err("Wrong Polymorph vnum passed: CPolymorphUtils::GiveBook(PID(%d), %d %d %d %d)", 
 				pChar->GetPlayerID(), dwMobVnum, dwPracticeCount, BookLevel, LevelLimit);
@@ -148,7 +148,7 @@ bool CPolymorphUtils::GiveBook(LPCHARACTER pChar, DWORD dwMobVnum, DWORD dwPract
 
 bool CPolymorphUtils::BookUpgrade(LPCHARACTER pChar, LPITEM pItem)
 {
-	if (pChar == NULL || pItem == NULL)
+	if (pChar == nullptr || pItem == nullptr)
 		return false;
 
 	pItem->SetSocket(1, pItem->GetSocket(2) * 50);

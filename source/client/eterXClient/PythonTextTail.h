@@ -24,7 +24,7 @@ class CPythonTextTail : public CSingleton<CPythonTextTail>
 			//        도중 캐릭터가 없어질 경우 튕길 가능성이 있음
 			CGraphicObjectInstance *		pOwner;
 
-			DWORD							dwVirtualID;
+			uint32_t							dwVirtualID;
 
 			float							x, y, z;
 			float							fDistanceFromPlayer;
@@ -34,7 +34,7 @@ class CPythonTextTail : public CSingleton<CPythonTextTail>
 			float							xStart, yStart;
 			float							xEnd, yEnd;
 
-			DWORD							LivingTime;
+			uint32_t							LivingTime;
 
 			float							fHeight;
 
@@ -42,7 +42,7 @@ class CPythonTextTail : public CSingleton<CPythonTextTail>
 			virtual ~STextTail() {}
 		} TTextTail;
 
-		typedef std::map<DWORD, TTextTail*>		TTextTailMap;
+		typedef std::map<uint32_t, TTextTail*>		TTextTailMap;
 		typedef std::list<TTextTail*>			TTextTailList;
 		typedef TTextTailMap					TChatTailMap;
 
@@ -63,34 +63,34 @@ class CPythonTextTail : public CSingleton<CPythonTextTail>
 		void ArrangeTextTail();
 		void HideAllTextTail();
 		void ShowAllTextTail();
-		void ShowCharacterTextTail(DWORD VirtualID);
-		void ShowItemTextTail(DWORD VirtualID);
+		void ShowCharacterTextTail(uint32_t VirtualID);
+		void ShowItemTextTail(uint32_t VirtualID);
 
-		void RegisterCharacterTextTail(DWORD dwGuildID, DWORD dwVirtualID, const D3DXCOLOR & c_rColor, float fAddHeight=10.0f);
-		void RegisterItemTextTail(DWORD VirtualID, const char * c_szText, CGraphicObjectInstance * pOwner);
-		void RegisterChatTail(DWORD VirtualID, const char * c_szChat);
-		void RegisterInfoTail(DWORD VirtualID, const char * c_szChat);
-		void SetCharacterTextTailColor(DWORD VirtualID, const D3DXCOLOR & c_rColor);
-		void SetItemTextTailOwner(DWORD dwVID, const char * c_szName);
-		void DeleteCharacterTextTail(DWORD VirtualID);
-		void DeleteItemTextTail(DWORD VirtualID);
+		void RegisterCharacterTextTail(uint32_t dwGuildID, uint32_t dwVirtualID, const D3DXCOLOR & c_rColor, float fAddHeight=10.0f);
+		void RegisterItemTextTail(uint32_t VirtualID, const char * c_szText, CGraphicObjectInstance * pOwner);
+		void RegisterChatTail(uint32_t VirtualID, const char * c_szChat);
+		void RegisterInfoTail(uint32_t VirtualID, const char * c_szChat);
+		void SetCharacterTextTailColor(uint32_t VirtualID, const D3DXCOLOR & c_rColor);
+		void SetItemTextTailOwner(uint32_t dwVID, const char * c_szName);
+		void DeleteCharacterTextTail(uint32_t VirtualID);
+		void DeleteItemTextTail(uint32_t VirtualID);
 
-		int Pick(int ixMouse, int iyMouse);
-		void SelectItemName(DWORD dwVirtualID);
+		int32_t Pick(int32_t ixMouse, int32_t iyMouse);
+		void SelectItemName(uint32_t dwVirtualID);
 
-		bool GetTextTailPosition(DWORD dwVID, float* px, float* py, float* pz);
-		bool IsChatTextTail(DWORD dwVID);
+		bool GetTextTailPosition(uint32_t dwVID, float* px, float* py, float* pz);
+		bool IsChatTextTail(uint32_t dwVID);
 
 		void EnablePKTitle(BOOL bFlag);
-		void AttachTitle(DWORD dwVID, const char * c_szName, const D3DXCOLOR& c_rColor);
-		void DetachTitle(DWORD dwVID);
+		void AttachTitle(uint32_t dwVID, const char * c_szName, const D3DXCOLOR& c_rColor);
+		void DetachTitle(uint32_t dwVID);
 
-		void AttachLevel(DWORD dwVID, const char* c_szText, const D3DXCOLOR& c_rColor);
-		void DetachLevel(DWORD dwVID);
+		void AttachLevel(uint32_t dwVID, const char* c_szText, const D3DXCOLOR& c_rColor);
+		void DetachLevel(uint32_t dwVID);
 		
 
 	protected:
-		TTextTail * RegisterTextTail(DWORD dwVirtualID, const char * c_szText, CGraphicObjectInstance * pOwner, float fHeight, const D3DXCOLOR & c_rColor);
+		TTextTail * RegisterTextTail(uint32_t dwVirtualID, const char * c_szText, CGraphicObjectInstance * pOwner, float fHeight, const D3DXCOLOR & c_rColor);
 		void DeleteTextTail(TTextTail * pTextTail);
 
 		void UpdateTextTail(TTextTail * pTextTail);

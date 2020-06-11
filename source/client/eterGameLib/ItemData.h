@@ -525,107 +525,107 @@ class CItemData
 #pragma pack(1)
 		typedef struct SItemLimit
 		{
-			BYTE        bType;
-			long        lValue;
+			uint8_t        bType;
+			int32_t        lValue;
 		} TItemLimit;
 
 		typedef struct SItemApply
 		{
-			BYTE        bType;
-			long        lValue;
+			uint8_t        bType;
+			int32_t        lValue;
 		} TItemApply;
 
 		typedef struct SItemTable_r152
 		{
-			DWORD       dwVnum;
+			uint32_t       dwVnum;
 			char        szName[ITEM_NAME_MAX_LEN + 1];
 			char        szLocaleName[ITEM_NAME_MAX_LEN + 1];
-			BYTE        bType;
-			BYTE        bSubType;
+			uint8_t        bType;
+			uint8_t        bSubType;
 			
-			BYTE        bWeight;
-			BYTE        bSize;
+			uint8_t        bWeight;
+			uint8_t        bSize;
 			
-			DWORD       dwAntiFlags;
-			DWORD       dwFlags;
-			DWORD       dwWearFlags;
-			DWORD       dwImmuneFlag;
+			uint32_t       dwAntiFlags;
+			uint32_t       dwFlags;
+			uint32_t       dwWearFlags;
+			uint32_t       dwImmuneFlag;
 						
-			DWORD       dwIBuyItemPrice;			
-			DWORD		dwISellItemPrice;
+			uint32_t       dwIBuyItemPrice;			
+			uint32_t		dwISellItemPrice;
 			
 			TItemLimit  aLimits[ITEM_LIMIT_MAX_NUM];
 			TItemApply  aApplies[ITEM_APPLY_MAX_NUM];
-			long        alValues[ITEM_VALUES_MAX_NUM];
-			long        alSockets[ITEM_SOCKET_MAX_NUM];
-			DWORD       dwRefinedVnum;
-			WORD		wRefineSet;
-			BYTE        bAlterToMagicItemPct;
-			BYTE		bSpecular;
-			BYTE        bGainSocketPct;
+			int32_t        alValues[ITEM_VALUES_MAX_NUM];
+			int32_t        alSockets[ITEM_SOCKET_MAX_NUM];
+			uint32_t       dwRefinedVnum;
+			uint16_t		wRefineSet;
+			uint8_t        bAlterToMagicItemPct;
+			uint8_t		bSpecular;
+			uint8_t        bGainSocketPct;
 		} TItemTable_r152;
 
 		typedef struct SItemTable_r156
 		{
-			DWORD       dwVnum;
-			DWORD       dwVnumRange;
+			uint32_t       dwVnum;
+			uint32_t       dwVnumRange;
 			char        szName[ITEM_NAME_MAX_LEN + 1];
 			char        szLocaleName[ITEM_NAME_MAX_LEN + 1];
-			BYTE        bType;
-			BYTE        bSubType;
+			uint8_t        bType;
+			uint8_t        bSubType;
 
-			BYTE        bWeight;
-			BYTE        bSize;
+			uint8_t        bWeight;
+			uint8_t        bSize;
 
-			DWORD       dwAntiFlags;
-			DWORD       dwFlags;
-			DWORD       dwWearFlags;
-			DWORD       dwImmuneFlag;
+			uint32_t       dwAntiFlags;
+			uint32_t       dwFlags;
+			uint32_t       dwWearFlags;
+			uint32_t       dwImmuneFlag;
 
-			DWORD       dwIBuyItemPrice;
-			DWORD		dwISellItemPrice;
+			uint32_t       dwIBuyItemPrice;
+			uint32_t		dwISellItemPrice;
 
 			TItemLimit  aLimits[ITEM_LIMIT_MAX_NUM];
 			TItemApply  aApplies[ITEM_APPLY_MAX_NUM];
-			long        alValues[ITEM_VALUES_MAX_NUM];
-			long        alSockets[ITEM_SOCKET_MAX_NUM];
-			DWORD       dwRefinedVnum;
-			WORD		wRefineSet;
-			BYTE        bAlterToMagicItemPct;
-			BYTE		bSpecular;
-			BYTE        bGainSocketPct;
+			int32_t        alValues[ITEM_VALUES_MAX_NUM];
+			int32_t        alSockets[ITEM_SOCKET_MAX_NUM];
+			uint32_t       dwRefinedVnum;
+			uint16_t		wRefineSet;
+			uint8_t        bAlterToMagicItemPct;
+			uint8_t		bSpecular;
+			uint8_t        bGainSocketPct;
 		} TItemTable_r156;
 
 		typedef struct SItemTable_r158
 		{
-			DWORD       dwVnum;
-			DWORD       dwVnumRange;
+			uint32_t       dwVnum;
+			uint32_t       dwVnumRange;
 			char        szName[ITEM_NAME_MAX_LEN + 1];
 			char        szLocaleName[ITEM_NAME_MAX_LEN + 1];
-			BYTE        bType;
-			BYTE        bSubType;
+			uint8_t        bType;
+			uint8_t        bSubType;
 
-			BYTE        bWeight;
-			BYTE        bSize;
+			uint8_t        bWeight;
+			uint8_t        bSize;
 
-			DWORD       dwAntiFlags;
-			DWORD       dwFlags;
-			DWORD       dwWearFlags;
-			DWORD       dwImmuneFlag;
+			uint32_t       dwAntiFlags;
+			uint32_t       dwFlags;
+			uint32_t       dwWearFlags;
+			uint32_t       dwImmuneFlag;
 
-			DWORD       dwIBuyItemPrice;
-			DWORD		dwISellItemPrice;
+			uint32_t       dwIBuyItemPrice;
+			uint32_t		dwISellItemPrice;
 
 			TItemLimit  aLimits[ITEM_LIMIT_MAX_NUM];
 			TItemApply  aApplies[ITEM_APPLY_MAX_NUM];
-			long        alValues[ITEM_VALUES_MAX_NUM];
-			long        alSockets[ITEM_SOCKET_MAX_NUM];
-			DWORD       dwRefinedVnum;
-			WORD		wRefineSet;
-			BYTE        bAlterToMagicItemPct;
-			BYTE		bSpecular;
-			BYTE        bGainSocketPct;
-			WORD		wWearableFlag;
+			int32_t        alValues[ITEM_VALUES_MAX_NUM];
+			int32_t        alSockets[ITEM_SOCKET_MAX_NUM];
+			uint32_t       dwRefinedVnum;
+			uint16_t		wRefineSet;
+			uint8_t        bAlterToMagicItemPct;
+			uint8_t		bSpecular;
+			uint8_t        bGainSocketPct;
+			uint16_t		wWearableFlag;
 		} TItemTable_r158;
 
 		typedef SItemTable_r156 SItemTable, TItemTable;
@@ -646,7 +646,7 @@ class CItemData
 #ifdef ENABLE_PROTOSTRUCT_AUTODETECT
 		typedef struct SItemTableAll
 		{
-			static bool IsValidStruct(DWORD structSize)
+			static bool IsValidStruct(uint32_t structSize)
 			{
 				switch (structSize)
 				{
@@ -659,7 +659,7 @@ class CItemData
 				return false;
 			}
 
-			static void Process(void* obj, DWORD structSize, DWORD i, CItemData::TItemTable& t)
+			static void Process(void* obj, uint32_t structSize, uint32_t i, CItemData::TItemTable& t)
 			{
 				#define ITABLE_COPY_STR(x) strncpy_s(t.##x##, sizeof(t.##x##), r.##x##, _TRUNCATE)
 				#define ITABLE_COPY_INT(x) t.##x## = r.##x
@@ -745,41 +745,41 @@ class CItemData
 		CGraphicThing * GetDropModelThing();
 		CGraphicSubImage * GetIconImage();
 
-		DWORD GetLODModelThingCount();
-		BOOL GetLODModelThingPointer(DWORD dwIndex, CGraphicThing ** ppModelThing);
+		uint32_t GetLODModelThingCount();
+		BOOL GetLODModelThingPointer(uint32_t dwIndex, CGraphicThing ** ppModelThing);
 
-		DWORD GetAttachingDataCount();
-		BOOL GetCollisionDataPointer(DWORD dwIndex, const NRaceData::TAttachingData ** c_ppAttachingData);
-		BOOL GetAttachingDataPointer(DWORD dwIndex, const NRaceData::TAttachingData ** c_ppAttachingData);
+		uint32_t GetAttachingDataCount();
+		BOOL GetCollisionDataPointer(uint32_t dwIndex, const NRaceData::TAttachingData ** c_ppAttachingData);
+		BOOL GetAttachingDataPointer(uint32_t dwIndex, const NRaceData::TAttachingData ** c_ppAttachingData);
 
 		/////
 		const TItemTable*	GetTable() const;
-		DWORD GetIndex() const;
+		uint32_t GetIndex() const;
 		const char * GetName() const;
 		const char * GetDescription() const;
 		const char * GetSummary() const;
-		BYTE GetType() const;
-		BYTE GetSubType() const;
-		UINT GetRefine() const;
+		uint8_t GetType() const;
+		uint8_t GetSubType() const;
+		uint32_t GetRefine() const;
 		const char* GetUseTypeString() const;
-		DWORD GetWeaponType() const;
-		BYTE GetSize() const;
-		BOOL IsAntiFlag(DWORD dwFlag) const;
-		BOOL IsFlag(DWORD dwFlag) const;
-		BOOL IsWearableFlag(DWORD dwFlag) const;
+		uint32_t GetWeaponType() const;
+		uint8_t GetSize() const;
+		BOOL IsAntiFlag(uint32_t dwFlag) const;
+		BOOL IsFlag(uint32_t dwFlag) const;
+		BOOL IsWearableFlag(uint32_t dwFlag) const;
 		BOOL HasNextGrade() const;
-		DWORD GetWearFlags() const;
-		DWORD GetIBuyItemPrice() const;
-		DWORD GetISellItemPrice() const;
-		BOOL GetLimit(BYTE byIndex, TItemLimit * pItemLimit) const;
-		BOOL GetApply(BYTE byIndex, TItemApply * pItemApply) const;
-		long GetValue(BYTE byIndex) const;
-		long GetSocket(BYTE byIndex) const;
-		long SetSocket(BYTE byIndex,DWORD value);
-		int GetSocketCount() const;
-		DWORD GetIconNumber() const;
+		uint32_t GetWearFlags() const;
+		uint32_t GetIBuyItemPrice() const;
+		uint32_t GetISellItemPrice() const;
+		BOOL GetLimit(uint8_t byIndex, TItemLimit * pItemLimit) const;
+		BOOL GetApply(uint8_t byIndex, TItemApply * pItemApply) const;
+		int32_t GetValue(uint8_t byIndex) const;
+		int32_t GetSocket(uint8_t byIndex) const;
+		int32_t SetSocket(uint8_t byIndex,uint32_t value);
+		int32_t GetSocketCount() const;
+		uint32_t GetIconNumber() const;
 
-		UINT	GetSpecularPoweru() const;
+		uint32_t	GetSpecularPoweru() const;
 		float	GetSpecularPowerf() const;
 	
 		/////
@@ -789,12 +789,12 @@ class CItemData
 		/////
 
 		//BOOL LoadItemData(const char * c_szFileName);
-		void SetDefaultItemData(const char * c_szIconFileName, const char * c_szModelFileName  = NULL);
+		void SetDefaultItemData(const char * c_szIconFileName, const char * c_szModelFileName  = nullptr);
 		void SetItemTableData(TItemTable * pItemTable);
 
 #ifdef ENABLE_ACCE_SYSTEM
 		void SetItemScale(const std::string strJob, const std::string strSex, const std::string strScaleX, const std::string strScaleY, const std::string strScaleZ, const std::string strPositionX, const std::string strPositionY, const std::string strPositionZ);
-		bool GetItemScale(DWORD dwPos, float & fScaleX, float & fScaleY, float & fScaleZ, float & fPositionX, float & fPositionY, float & fPositionZ);
+		bool GetItemScale(uint32_t dwPos, float & fScaleX, float & fScaleY, float & fScaleZ, float & fPositionX, float & fPositionY, float & fPositionZ);
 #endif
 
 	protected:
@@ -817,7 +817,7 @@ class CItemData
 		std::vector<CGraphicThing *> m_pLODModelThingVector;
 
 		NRaceData::TAttachingDataVector m_AttachingDataVector;
-		DWORD		m_dwVnum;
+		uint32_t		m_dwVnum;
 		TItemTable m_ItemTable;
 #ifdef ENABLE_ACCE_SYSTEM
 		TScaleTable	m_ScaleTable;

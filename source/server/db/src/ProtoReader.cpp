@@ -25,8 +25,8 @@ string trim(const string& str){return trim_left(trim_right(str));}
 
 static string* StringSplit(string strOrigin, string strTok)
 {
-    unsigned int cutAt;                       
-    int     index     = 0;                    //문자열인덱스
+    uint32_t cutAt;                       
+    int32_t     index     = 0;                    //문자열인덱스
     string* strResult = new string[30];		  //결과return 할변수
 
     //strTok을찾을때까지반복
@@ -44,7 +44,7 @@ static string* StringSplit(string strOrigin, string strTok)
         strResult[index++] = strOrigin.substr(0, cutAt);  //나머지를결과배열에추가
     }
 
-	for( int i=0;i<index;i++)
+	for( int32_t i=0;i<index;i++)
 	{
 		strResult[i] = trim(strResult[i]);
 	}
@@ -54,7 +54,7 @@ static string* StringSplit(string strOrigin, string strTok)
 
 
 
-int get_Item_Type_Value(string inputString)
+int32_t get_Item_Type_Value(string inputString)
 {
 	string arType[] = {"ITEM_NONE", "ITEM_WEAPON",
 		"ITEM_ARMOR", "ITEM_USE", 
@@ -84,9 +84,9 @@ int get_Item_Type_Value(string inputString)
 	};
 
 	
-	int retInt = -1;
+	int32_t retInt = -1;
 	//cout << "Type : " << typeStr << " -> ";
-	for (unsigned int j=0;j<sizeof(arType)/sizeof(arType[0]);j++) {
+	for (uint32_t j=0;j<sizeof(arType)/sizeof(arType[0]);j++) {
 		string tempString = arType[j];
 		if	(inputString.find(tempString)!=string::npos && tempString.find(inputString)!=string::npos) {
 			//cout << j << " ";
@@ -100,7 +100,7 @@ int get_Item_Type_Value(string inputString)
 
 }
 
-int get_Item_SubType_Value(unsigned int type_value, string inputString)
+int32_t get_Item_SubType_Value(uint32_t type_value, string inputString)
 {
 	static string arSub1[] = { "WEAPON_SWORD", "WEAPON_DAGGER", "WEAPON_BOW", "WEAPON_TWO_HANDED",
 				"WEAPON_BELL", "WEAPON_FAN", "WEAPON_ARROW", "WEAPON_MOUNT_SPEAR", "WEAPON_CLAW", "WEAPON_QUIVER", "WEAPON_BOUQUET"};
@@ -169,7 +169,7 @@ int get_Item_SubType_Value(unsigned int type_value, string inputString)
 		0,			//33 반지
 		0,			//34 벨트
 	};
-	static int arNumberOfSubtype[_countof(arSubType)] = {
+	static int32_t arNumberOfSubtype[_countof(arSubType)] = {
 		0,
 		sizeof(arSub1)/sizeof(arSub1[0]),
 		sizeof(arSub2)/sizeof(arSub2[0]),
@@ -227,9 +227,9 @@ int get_Item_SubType_Value(unsigned int type_value, string inputString)
 	}
 	//
 
-	int retInt = -1;
+	int32_t retInt = -1;
 	//cout << "SubType : " << subTypeStr << " -> ";
-	for (int j=0;j<arNumberOfSubtype[type_value];j++) {
+	for (int32_t j=0;j<arNumberOfSubtype[type_value];j++) {
 		string tempString = arSubType[type_value][j];
 		string tempInputString = trim(inputString);
 		if	(tempInputString.compare(tempString)==0)
@@ -248,7 +248,7 @@ int get_Item_SubType_Value(unsigned int type_value, string inputString)
 
 
 
-int get_Item_AntiFlag_Value(string inputString) 
+int32_t get_Item_AntiFlag_Value(string inputString) 
 {
 
 	string arAntiFlag[] = {"ANTI_FEMALE", "ANTI_MALE", "ANTI_MUSA", "ANTI_ASSASSIN", "ANTI_SURA", "ANTI_MUDANG",
@@ -257,11 +257,11 @@ int get_Item_AntiFlag_Value(string inputString)
 							"ANTI_PET20", "ANTI_PET21"};
 
 
-	int retValue = 0;
+	int32_t retValue = 0;
 	string* arInputString = StringSplit(inputString, "|");				//프로토 정보 내용을 단어별로 쪼갠 배열.
-	for(unsigned int i =0;i<sizeof(arAntiFlag)/sizeof(arAntiFlag[0]);i++) {
+	for(uint32_t i =0;i<sizeof(arAntiFlag)/sizeof(arAntiFlag[0]);i++) {
 		string tempString = arAntiFlag[i];
-		for (unsigned int j=0; j<30 ; j++)		
+		for (uint32_t j=0; j<30 ; j++)		
 		{
 			string tempString2 = arInputString[j];
 			if (tempString2.compare(tempString)==0) {				//일치하는지 확인.
@@ -278,7 +278,7 @@ int get_Item_AntiFlag_Value(string inputString)
 	return retValue;
 }
 
-int get_Item_Flag_Value(string inputString) 
+int32_t get_Item_Flag_Value(string inputString) 
 {
 
 	string arFlag[] = {"ITEM_TUNABLE", "ITEM_SAVE", "ITEM_STACKABLE", "COUNT_PER_1GOLD", "ITEM_SLOW_QUERY", "ITEM_UNIQUE",
@@ -286,11 +286,11 @@ int get_Item_Flag_Value(string inputString)
 			"QUEST_GIVE", "ITEM_QUEST", "LOG", "STACKABLE", "SLOW_QUERY", "REFINEABLE", "IRREMOVABLE", "ITEM_APPLICABLE"};
 
 
-	int retValue = 0;
+	int32_t retValue = 0;
 	string* arInputString = StringSplit(inputString, "|");				//프로토 정보 내용을 단어별로 쪼갠 배열.
-	for(unsigned int i =0;i<sizeof(arFlag)/sizeof(arFlag[0]);i++) {
+	for(uint32_t i =0;i<sizeof(arFlag)/sizeof(arFlag[0]);i++) {
 		string tempString = arFlag[i];
-		for (unsigned int j=0; j<30 ; j++)		
+		for (uint32_t j=0; j<30 ; j++)		
 		{
 			string tempString2 = arInputString[j];
 			if (tempString2.compare(tempString)==0) {				//일치하는지 확인.
@@ -307,7 +307,7 @@ int get_Item_Flag_Value(string inputString)
 	return retValue;
 }
 
-int get_Item_WearFlag_Value(string inputString) 
+int32_t get_Item_WearFlag_Value(string inputString) 
 {
 
 	string arWearrFlag[] = {"WEAR_BODY", "WEAR_HEAD", "WEAR_FOOTS", "WEAR_WRIST", "WEAR_WEAPON", "WEAR_NECK", "WEAR_EAR", "WEAR_SHIELD", "WEAR_UNIQUE",
@@ -318,11 +318,11 @@ int get_Item_WearFlag_Value(string inputString)
 	};
 
 
-	int retValue = 0;
+	int32_t retValue = 0;
 	string* arInputString = StringSplit(inputString, "|");				//프로토 정보 내용을 단어별로 쪼갠 배열.
-	for(unsigned int i =0;i<sizeof(arWearrFlag)/sizeof(arWearrFlag[0]);i++) {
+	for(uint32_t i =0;i<sizeof(arWearrFlag)/sizeof(arWearrFlag[0]);i++) {
 		string tempString = arWearrFlag[i];
-		for (unsigned int j=0; j<30 ; j++)		
+		for (uint32_t j=0; j<30 ; j++)		
 		{
 			string tempString2 = arInputString[j];
 			if (tempString2.compare(tempString)==0) {				//일치하는지 확인.
@@ -339,16 +339,16 @@ int get_Item_WearFlag_Value(string inputString)
 	return retValue;
 }
 
-int get_Item_Immune_Value(string inputString) 
+int32_t get_Item_Immune_Value(string inputString) 
 {
 
 	string arImmune[] = {"PARA","CURSE","STUN","SLEEP","SLOW","POISON","TERROR"};
 
-	int retValue = 0;
+	int32_t retValue = 0;
 	string* arInputString = StringSplit(inputString, "|");				//프로토 정보 내용을 단어별로 쪼갠 배열.
-	for(unsigned int i =0;i<sizeof(arImmune)/sizeof(arImmune[0]);i++) {
+	for(uint32_t i =0;i<sizeof(arImmune)/sizeof(arImmune[0]);i++) {
 		string tempString = arImmune[i];
-		for (unsigned int j=0; j<30 ; j++)		
+		for (uint32_t j=0; j<30 ; j++)		
 		{
 			string tempString2 = arInputString[j];
 			if (tempString2.compare(tempString)==0) {				//일치하는지 확인.
@@ -368,13 +368,13 @@ int get_Item_Immune_Value(string inputString)
 
 
 
-int get_Item_LimitType_Value(string inputString)
+int32_t get_Item_LimitType_Value(string inputString)
 {
 	string arLimitType[] = {"LIMIT_NONE", "LEVEL", "STR", "DEX", "INT", "CON", "PC_BANG", "REAL_TIME", "REAL_TIME_FIRST_USE", "TIMER_BASED_ON_WEAR"};
 	
-	int retInt = -1;
+	int32_t retInt = -1;
 	//cout << "LimitType : " << limitTypeStr << " -> ";
-	for (unsigned int j=0;j<sizeof(arLimitType)/sizeof(arLimitType[0]);j++) {
+	for (uint32_t j=0;j<sizeof(arLimitType)/sizeof(arLimitType[0]);j++) {
 		string tempString = arLimitType[j];
 		string tempInputString = trim(inputString);
 		if	(tempInputString.compare(tempString)==0)
@@ -390,7 +390,7 @@ int get_Item_LimitType_Value(string inputString)
 }
 
 
-int get_Item_ApplyType_Value(string inputString)
+int32_t get_Item_ApplyType_Value(string inputString)
 {
 	string arApplyType[] = {"APPLY_NONE", "APPLY_MAX_HP", "APPLY_MAX_SP", "APPLY_CON", "APPLY_INT", "APPLY_STR", "APPLY_DEX", "APPLY_ATT_SPEED",
 			"APPLY_MOV_SPEED", "APPLY_CAST_SPEED", "APPLY_HP_REGEN", "APPLY_SP_REGEN", "APPLY_POISON_PCT", "APPLY_STUN_PCT",
@@ -413,9 +413,9 @@ int get_Item_ApplyType_Value(string inputString)
 			"APPLY_ACCEDRAIN_RATE", "APPLY_RESIST_MAGIC_REDUCTION" // 97,98
 	};
 
-	int retInt = -1;
+	int32_t retInt = -1;
 	//cout << "ApplyType : " << applyTypeStr << " -> ";
-	for (unsigned int j=0;j<sizeof(arApplyType)/sizeof(arApplyType[0]);j++) {
+	for (uint32_t j=0;j<sizeof(arApplyType)/sizeof(arApplyType[0]);j++) {
 		string tempString = arApplyType[j];
 		string tempInputString = trim(inputString);
 		if	(tempInputString.compare(tempString)==0)
@@ -435,13 +435,13 @@ int get_Item_ApplyType_Value(string inputString)
 //몬스터 프로토도 읽는다.
 
 
-int get_Mob_Rank_Value(string inputString) 
+int32_t get_Mob_Rank_Value(string inputString) 
 {
 	string arRank[] = {"PAWN", "S_PAWN", "KNIGHT", "S_KNIGHT", "BOSS", "KING"};
 
-	int retInt = -1;
+	int32_t retInt = -1;
 	//cout << "Rank : " << rankStr << " -> ";
-	for (unsigned int j=0;j<sizeof(arRank)/sizeof(arRank[0]);j++) {
+	for (uint32_t j=0;j<sizeof(arRank)/sizeof(arRank[0]);j++) {
 		string tempString = arRank[j];
 		string tempInputString = trim(inputString);
 		if	(tempInputString.compare(tempString)==0) 
@@ -457,13 +457,13 @@ int get_Mob_Rank_Value(string inputString)
 }
 
 
-int get_Mob_Type_Value(string inputString)
+int32_t get_Mob_Type_Value(string inputString)
 {
 	string arType[] = { "MONSTER", "NPC", "STONE", "WARP", "DOOR", "BUILDING", "PC", "POLYMORPH_PC", "HORSE", "GOTO"};
 
-	int retInt = -1;
+	int32_t retInt = -1;
 	//cout << "Type : " << typeStr << " -> ";
-	for (unsigned int j=0;j<sizeof(arType)/sizeof(arType[0]);j++) {
+	for (uint32_t j=0;j<sizeof(arType)/sizeof(arType[0]);j++) {
 		string tempString = arType[j];
 		string tempInputString = trim(inputString);
 		if	(tempInputString.compare(tempString)==0) 
@@ -478,13 +478,13 @@ int get_Mob_Type_Value(string inputString)
 	return retInt;
 }
 
-int get_Mob_BattleType_Value(string inputString) 
+int32_t get_Mob_BattleType_Value(string inputString) 
 {
 	string arBattleType[] = { "MELEE", "RANGE", "MAGIC", "SPECIAL", "POWER", "TANKER", "SUPER_POWER", "SUPER_TANKER"};
 
-	int retInt = -1;
+	int32_t retInt = -1;
 	//cout << "Battle Type : " << battleTypeStr << " -> ";
-	for (unsigned int j=0;j<sizeof(arBattleType)/sizeof(arBattleType[0]);j++) {
+	for (uint32_t j=0;j<sizeof(arBattleType)/sizeof(arBattleType[0]);j++) {
 		string tempString = arBattleType[j];
 		string tempInputString = trim(inputString);
 		if	(tempInputString.compare(tempString)==0) 
@@ -499,13 +499,13 @@ int get_Mob_BattleType_Value(string inputString)
 	return retInt;
 }
 
-int get_Mob_Size_Value(string inputString)
+int32_t get_Mob_Size_Value(string inputString)
 {
 	string arSize[] = { "SMALL", "MEDIUM", "BIG"}; //@fixme201 SAMLL to SMALL
 
-	int retInt = 0;
+	int32_t retInt = 0;
 	//cout << "Size : " << sizeStr << " -> ";
-	for (unsigned int j=0;j<sizeof(arSize)/sizeof(arSize[0]);j++) {
+	for (uint32_t j=0;j<sizeof(arSize)/sizeof(arSize[0]);j++) {
 		string tempString = arSize[j];
 		string tempInputString = trim(inputString);
 		if	(tempInputString.compare(tempString)==0) 
@@ -520,17 +520,17 @@ int get_Mob_Size_Value(string inputString)
 	return retInt;
 }
 
-int get_Mob_AIFlag_Value(string inputString)
+int32_t get_Mob_AIFlag_Value(string inputString)
 {
 	string arAIFlag[] = {"AGGR","NOMOVE","COWARD","NOATTSHINSU","NOATTCHUNJO","NOATTJINNO","ATTMOB","BERSERK","STONESKIN","GODSPEED","DEATHBLOW","REVIVE",
 		"UNK13", "UNK14"
 	};
 
-	int retValue = 0;
+	int32_t retValue = 0;
 	string* arInputString = StringSplit(inputString, ",");				//프로토 정보 내용을 단어별로 쪼갠 배열.
-	for(unsigned int i =0;i<sizeof(arAIFlag)/sizeof(arAIFlag[0]);i++) {
+	for(uint32_t i =0;i<sizeof(arAIFlag)/sizeof(arAIFlag[0]);i++) {
 		string tempString = arAIFlag[i];
-		for (unsigned int j=0; j<30 ; j++)		
+		for (uint32_t j=0; j<30 ; j++)		
 		{
 			string tempString2 = arInputString[j];
 			if (tempString2.compare(tempString)==0) {				//일치하는지 확인.
@@ -546,16 +546,16 @@ int get_Mob_AIFlag_Value(string inputString)
 
 	return retValue;
 }
-int get_Mob_RaceFlag_Value(string inputString)
+int32_t get_Mob_RaceFlag_Value(string inputString)
 {
 	string arRaceFlag[] = {"ANIMAL","UNDEAD","DEVIL","HUMAN","ORC","MILGYO","INSECT","FIRE","ICE","DESERT","TREE",
 		"ATT_ELEC","ATT_FIRE","ATT_ICE","ATT_WIND","ATT_EARTH","ATT_DARK"};
 
-	int retValue = 0;
+	int32_t retValue = 0;
 	string* arInputString = StringSplit(inputString, ",");				//프로토 정보 내용을 단어별로 쪼갠 배열.
-	for(unsigned int i =0;i<sizeof(arRaceFlag)/sizeof(arRaceFlag[0]);i++) {
+	for(uint32_t i =0;i<sizeof(arRaceFlag)/sizeof(arRaceFlag[0]);i++) {
 		string tempString = arRaceFlag[i];
-		for (unsigned int j=0; j<30 ; j++)		
+		for (uint32_t j=0; j<30 ; j++)		
 		{
 			string tempString2 = arInputString[j];
 			if (tempString2.compare(tempString)==0) {				//일치하는지 확인.
@@ -571,15 +571,15 @@ int get_Mob_RaceFlag_Value(string inputString)
 
 	return retValue;
 }
-int get_Mob_ImmuneFlag_Value(string inputString)
+int32_t get_Mob_ImmuneFlag_Value(string inputString)
 {
 	string arImmuneFlag[] = {"STUN","SLOW","FALL","CURSE","POISON","TERROR", "REFLECT"};
 
-	int retValue = 0;
+	int32_t retValue = 0;
 	string* arInputString = StringSplit(inputString, ",");				//프로토 정보 내용을 단어별로 쪼갠 배열.
-	for(unsigned int i =0;i<sizeof(arImmuneFlag)/sizeof(arImmuneFlag[0]);i++) {
+	for(uint32_t i =0;i<sizeof(arImmuneFlag)/sizeof(arImmuneFlag[0]);i++) {
 		string tempString = arImmuneFlag[i];
-		for (unsigned int j=0; j<30 ; j++)		
+		for (uint32_t j=0; j<30 ; j++)		
 		{
 			string tempString2 = arInputString[j];
 			if (tempString2.compare(tempString)==0) {				//일치하는지 확인.
@@ -601,14 +601,14 @@ int get_Mob_ImmuneFlag_Value(string inputString)
 #ifndef __DUMP_PROTO__
 
 //몹 테이블을 셋팅해준다.
-bool Set_Proto_Mob_Table(TMobTable *mobTable, cCsvTable &csvTable,std::map<int,const char*> &nameMap)
+bool Set_Proto_Mob_Table(TMobTable *mobTable, cCsvTable &csvTable,std::map<int32_t,const char*> &nameMap)
 {
-	int col = 0;
+	int32_t col = 0;
 	str_to_number(mobTable->dwVnum, csvTable.AsStringByIndex(col++));
 	strlcpy(mobTable->szName, csvTable.AsStringByIndex(col++), sizeof(mobTable->szName));
 
 	//3. 지역별 이름 넣어주기.
-	map<int,const char*>::iterator it;
+	map<int32_t,const char*>::iterator it;
 	it = nameMap.find(mobTable->dwVnum);
 	if (it != nameMap.end()) {
 		const char * localeName = it->second;
@@ -618,29 +618,29 @@ bool Set_Proto_Mob_Table(TMobTable *mobTable, cCsvTable &csvTable,std::map<int,c
 	}
 
 	//RANK
-	int rankValue = get_Mob_Rank_Value(csvTable.AsStringByIndex(col++));
+	int32_t rankValue = get_Mob_Rank_Value(csvTable.AsStringByIndex(col++));
 	mobTable->bRank = rankValue;
 	//TYPE
-	int typeValue = get_Mob_Type_Value(csvTable.AsStringByIndex(col++));
+	int32_t typeValue = get_Mob_Type_Value(csvTable.AsStringByIndex(col++));
 	mobTable->bType = typeValue;
 	//BATTLE_TYPE
-	int battleTypeValue = get_Mob_BattleType_Value(csvTable.AsStringByIndex(col++));
+	int32_t battleTypeValue = get_Mob_BattleType_Value(csvTable.AsStringByIndex(col++));
 	mobTable->bBattleType = battleTypeValue;
 
 	str_to_number(mobTable->bLevel, csvTable.AsStringByIndex(col++));
 	//SIZE
-	int sizeValue = get_Mob_Size_Value(csvTable.AsStringByIndex(col++));
+	int32_t sizeValue = get_Mob_Size_Value(csvTable.AsStringByIndex(col++));
 	mobTable->bSize = sizeValue;
 	//AI_FLAG
-	int aiFlagValue = get_Mob_AIFlag_Value(csvTable.AsStringByIndex(col++));
+	int32_t aiFlagValue = get_Mob_AIFlag_Value(csvTable.AsStringByIndex(col++));
 	mobTable->dwAIFlag = aiFlagValue;
 	//mount_capacity;
 	col++;
 	//RACE_FLAG
-	int raceFlagValue = get_Mob_RaceFlag_Value(csvTable.AsStringByIndex(col++));
+	int32_t raceFlagValue = get_Mob_RaceFlag_Value(csvTable.AsStringByIndex(col++));
 	mobTable->dwRaceFlag = raceFlagValue;
 	//IMMUNE_FLAG
-	int immuneFlagValue = get_Mob_ImmuneFlag_Value(csvTable.AsStringByIndex(col++));
+	int32_t immuneFlagValue = get_Mob_ImmuneFlag_Value(csvTable.AsStringByIndex(col++));
 	mobTable->dwImmuneFlag = immuneFlagValue;
 
 	str_to_number(mobTable->bEmpire, csvTable.AsStringByIndex(col++));  //col = 11
@@ -670,10 +670,10 @@ bool Set_Proto_Mob_Table(TMobTable *mobTable, cCsvTable &csvTable,std::map<int,c
 
 	str_to_number(mobTable->dwDropItemVnum, csvTable.AsStringByIndex(col++));	//32
 	str_to_number(mobTable->dwResurrectionVnum, csvTable.AsStringByIndex(col++));
-	for (int i = 0; i < MOB_ENCHANTS_MAX_NUM; ++i)
+	for (int32_t i = 0; i < MOB_ENCHANTS_MAX_NUM; ++i)
 		str_to_number(mobTable->cEnchants[i], csvTable.AsStringByIndex(col++));
 
-	for (int i = 0; i < MOB_RESISTS_MAX_NUM; ++i)
+	for (int32_t i = 0; i < MOB_RESISTS_MAX_NUM; ++i)
 		str_to_number(mobTable->cResists[i], csvTable.AsStringByIndex(col++));
 
 	str_to_number(mobTable->fDamMultiply, csvTable.AsStringByIndex(col++));
@@ -707,13 +707,13 @@ bool Set_Proto_Mob_Table(TMobTable *mobTable, cCsvTable &csvTable,std::map<int,c
 	return true;
 }
 
-bool Set_Proto_Item_Table(TItemTable *itemTable, cCsvTable &csvTable,std::map<int,const char*> &nameMap)
+bool Set_Proto_Item_Table(TItemTable *itemTable, cCsvTable &csvTable,std::map<int32_t,const char*> &nameMap)
 {
-	int col = 0;
+	int32_t col = 0;
 
-	int dataArray[33];
-	for (unsigned int i=0; i<sizeof(dataArray)/sizeof(dataArray[0]);i++) {
-		int validCheck = 0;
+	int32_t dataArray[33];
+	for (uint32_t i=0; i<sizeof(dataArray)/sizeof(dataArray[0]);i++) {
+		int32_t validCheck = 0;
 		if (i==2) {
 			dataArray[i] = get_Item_Type_Value(csvTable.AsStringByIndex(col));
 			validCheck = dataArray[i];
@@ -755,7 +755,7 @@ bool Set_Proto_Item_Table(TItemTable *itemTable, cCsvTable &csvTable,std::map<in
 		{
 			std::ostringstream dataStream;
 
-			for (unsigned int j = 0; j < i; ++j)
+			for (uint32_t j = 0; j < i; ++j)
 				dataStream << dataArray[j] << ",";
 
 			//fprintf(stderr, "ItemProto Reading Failed : Invalid value.\n");
@@ -771,7 +771,7 @@ bool Set_Proto_Item_Table(TItemTable *itemTable, cCsvTable &csvTable,std::map<in
 	// vnum 및 vnum range 읽기.
 	{
 		std::string s(csvTable.AsStringByIndex(0));
-		unsigned int pos = s.find("~");
+		uint32_t pos = s.find("~");
 		// vnum 필드에 '~'가 없다면 패스
 		if (std::string::npos == pos)
 		{
@@ -783,8 +783,8 @@ bool Set_Proto_Item_Table(TItemTable *itemTable, cCsvTable &csvTable,std::map<in
 			std::string s_start_vnum (s.substr(0, pos));
 			std::string s_end_vnum (s.substr(pos +1 ));
 
-			int start_vnum = atoi(s_start_vnum.c_str());
-			int end_vnum = atoi(s_end_vnum.c_str());
+			int32_t start_vnum = atoi(s_start_vnum.c_str());
+			int32_t end_vnum = atoi(s_end_vnum.c_str());
 			if (0 == start_vnum || (0 != end_vnum && end_vnum < start_vnum))
 			{
 				sys_err ("INVALID VNUM %s", s.c_str());
@@ -797,7 +797,7 @@ bool Set_Proto_Item_Table(TItemTable *itemTable, cCsvTable &csvTable,std::map<in
 
 	strlcpy(itemTable->szName, csvTable.AsStringByIndex(1), sizeof(itemTable->szName));
 	//지역별 이름 넣어주기.
-	map<int,const char*>::iterator it;
+	map<int32_t,const char*>::iterator it;
 	it = nameMap.find(itemTable->dwVnum);
 	if (it != nameMap.end()) {
 		const char * localeName = it->second;
@@ -820,7 +820,7 @@ bool Set_Proto_Item_Table(TItemTable *itemTable, cCsvTable &csvTable,std::map<in
 	itemTable->cLimitRealTimeFirstUseIndex = -1;
 	itemTable->cLimitTimerBasedOnWearIndex = -1;
 
-	int i;
+	int32_t i;
 
 	for (i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
 	{

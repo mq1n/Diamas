@@ -33,30 +33,30 @@ void CActorInstance::INSTANCEBASE_Transform()
 		m_bNeedUpdateCollision = TRUE;			
 	}
 	
-	//DWORD t2=ELTimer_GetMSec();
+	//uint32_t t2=ELTimer_GetMSec();
 	Update();
-	//DWORD t3=ELTimer_GetMSec();
+	//uint32_t t3=ELTimer_GetMSec();
 	TransformProcess();
-	//DWORD t4=ELTimer_GetMSec();
+	//uint32_t t4=ELTimer_GetMSec();
 	Transform();
-	//DWORD t5=ELTimer_GetMSec();
+	//uint32_t t5=ELTimer_GetMSec();
 	UpdatePointInstance();
-	//DWORD t6=ELTimer_GetMSec();
+	//uint32_t t6=ELTimer_GetMSec();
 	ShakeProcess();
-	//DWORD t7=ELTimer_GetMSec();
+	//uint32_t t7=ELTimer_GetMSec();
 	UpdateBoundingSphere();
-	//DWORD t8=ELTimer_GetMSec();
+	//uint32_t t8=ELTimer_GetMSec();
 	UpdateAttribute();
 }
 
 /*
 void CActorInstance::TEMP_Update()
 {
-	//DWORD t1=ELTimer_GetMSec();
+	//uint32_t t1=ELTimer_GetMSec();
 	OnUpdate();
-	//DWORD t2=ELTimer_GetMSec();
+	//uint32_t t2=ELTimer_GetMSec();
 	UpdateBoundingSphere();
-	//DWORD t3=ELTimer_GetMSec();
+	//uint32_t t3=ELTimer_GetMSec();
 
 #ifdef __PERFORMANCE_CHECKER__
 	{
@@ -80,24 +80,24 @@ void CActorInstance::TEMP_Update()
 void CActorInstance::OnUpdate()
 {
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t1=ELTimer_GetMSec();
+	uint32_t t1=ELTimer_GetMSec();
 #endif
 	if (!IsParalysis())
 		CGraphicThingInstance::OnUpdate();
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t2=ELTimer_GetMSec();
+	uint32_t t2=ELTimer_GetMSec();
 #endif
 
 	UpdateAttachingInstances();
 
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t3=ELTimer_GetMSec();
+	uint32_t t3=ELTimer_GetMSec();
 #endif
 
 	__BlendAlpha_Update();
 
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t4=ELTimer_GetMSec();
+	uint32_t t4=ELTimer_GetMSec();
 	{
 		static FILE* fp=fopen("perf_actor_update2.txt", "w");
 
@@ -166,7 +166,7 @@ float CActorInstance::__GetAttackSpeed()
 	return m_fAtkSpd;
 }
 
-WORD CActorInstance::__GetCurrentComboType()
+uint16_t CActorInstance::__GetCurrentComboType()
 {
 	if (IsBowMode())
 		return 0;
@@ -178,7 +178,7 @@ WORD CActorInstance::__GetCurrentComboType()
 	return m_wcurComboType;
 }
 
-void CActorInstance::SetComboType(WORD wComboType)
+void CActorInstance::SetComboType(uint16_t wComboType)
 {
 	m_wcurComboType = wComboType;
 }
@@ -226,18 +226,18 @@ void  CActorInstance::Stop(float fBlendingTime)
 	SetLoopMotion(CRaceMotionData::NAME_WAIT, fBlendingTime);
 }
 
-void CActorInstance::SetOwner(DWORD dwOwnerVID)
+void CActorInstance::SetOwner(uint32_t dwOwnerVID)
 {
 	m_fOwnerBaseTime=GetLocalTime();
 	m_dwOwnerVID=dwOwnerVID;
 }
 
-void CActorInstance::SetActorType(UINT eType)
+void CActorInstance::SetActorType(uint32_t eType)
 {
 	m_eActorType=eType;
 }
 
-UINT CActorInstance::GetActorType() const
+uint32_t CActorInstance::GetActorType() const
 {
 	return m_eActorType;
 }
@@ -579,7 +579,7 @@ void CActorInstance::SetRunMode()
 
 MOTION_KEY CActorInstance::GetNormalAttackIndex()
 {
-	WORD wMotionIndex;
+	uint16_t wMotionIndex;
 	m_pkCurRaceData->GetNormalAttackIndex(GetMotionMode(), &wMotionIndex);
 
 	return MAKE_MOTION_KEY(GetMotionMode(), wMotionIndex);
@@ -618,7 +618,7 @@ void CActorInstance::AdjustDynamicCollisionMovement(const CActorInstance * c_pAc
 	if (isAttacking() )
 		return;
 	
-	UINT uActorType = c_pActorInstance->GetActorType();
+	uint32_t uActorType = c_pActorInstance->GetActorType();
 	if( (uActorType == TYPE_BUILDING) || (uActorType == TYPE_OBJECT) || (uActorType == TYPE_DOOR) || (uActorType == TYPE_STONE))
 	{
 		BlockMovement();
@@ -630,7 +630,7 @@ void CActorInstance::AdjustDynamicCollisionMovement(const CActorInstance * c_pAc
 		for (; itMain != m_BodyPointInstanceList.end(); ++itMain)
 		{
 			CDynamicSphereInstanceVector & c_rMainSphereVector = (*itMain).SphereInstanceVector;
-			for (DWORD i = 0; i < c_rMainSphereVector.size(); ++i)
+			for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
 			{
 				CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
 				c_rMainSphere.v3Position =c_rMainSphere.v3LastPosition;
@@ -648,7 +648,7 @@ void CActorInstance::AdjustDynamicCollisionMovement(const CActorInstance * c_pAc
 		for (; itMain != m_BodyPointInstanceList.end(); ++itMain)
 		{
 			CDynamicSphereInstanceVector & c_rMainSphereVector = (*itMain).SphereInstanceVector;
-			for (DWORD i = 0; i < c_rMainSphereVector.size(); ++i)
+			for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
 			{
 				CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
 
@@ -700,7 +700,7 @@ void CActorInstance::__AdjustCollisionMovement(const CGraphicObjectInstance * c_
 	for (; itMain != m_BodyPointInstanceList.end(); ++itMain)
 	{
 		CDynamicSphereInstanceVector & c_rMainSphereVector = (*itMain).SphereInstanceVector;
-		for (DWORD i = 0; i < c_rMainSphereVector.size(); ++i)
+		for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
 		{
 			CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
 
@@ -787,7 +787,7 @@ bool CActorInstance::IntersectDefendingSphere()
 
 bool CActorInstance::__IsMountingHorse()
 {
-	return NULL != m_pkHorse;
+	return nullptr != m_pkHorse;
 }
 
 void CActorInstance::MountHorse(CActorInstance * pkHorse)
@@ -849,7 +849,7 @@ void CActorInstance::Destroy()
 	{
 		m_pAttributeInstance->Clear();
 		CAttributeInstance::Delete(m_pAttributeInstance);
-		m_pAttributeInstance = NULL;
+		m_pAttributeInstance = nullptr;
 	}
 
 	__ClearAttachingEffect();
@@ -858,7 +858,7 @@ void CActorInstance::Destroy()
 
 	__DestroyWeaponTrace();
 	__DestroyTree();
-	//m_PhysicsObject.SetActorInstance(NULL);
+	//m_PhysicsObject.SetActorInstance(nullptr);
 
 
 	__Initialize();
@@ -932,10 +932,10 @@ void CActorInstance::__InitializeMotionData()
 
 void CActorInstance::__Initialize()
 {
-	m_pkCurRaceMotionData=NULL;
-	m_pkCurRaceData=NULL;
-	m_pkHorse=NULL;
-	m_pkTree=NULL;
+	m_pkCurRaceMotionData=nullptr;
+	m_pkCurRaceData=nullptr;
+	m_pkHorse=nullptr;
+	m_pkTree=nullptr;
 
 	m_fOwnerBaseTime=0.0f;
 
@@ -948,18 +948,18 @@ void CActorInstance::__Initialize()
 	m_dwSelfVID = 0;
 	m_dwOwnerVID = 0;
 
-	m_pkEventHandler =  NULL;
+	m_pkEventHandler =  nullptr;
 
 	m_PhysicsObject.Initialize();
 
-	m_pAttributeInstance = NULL;
+	m_pAttributeInstance = nullptr;
 
 	m_pFlyEventHandler = 0;
 
 	m_v3FishingPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_iFishingEffectID = -1;
 
-	m_pkHorse = NULL;
+	m_pkHorse = nullptr;
 
 	__InitializePositionData();
 	__InitializeRotationData();

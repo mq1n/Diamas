@@ -14,17 +14,17 @@
 /// 포함하고 있었는데...
 ///
 /// <pre>
-/// int a = row.AsInt(0);
-/// int b = row.AsInt(1);
+/// int32_t a = row.AsInt(0);
+/// int32_t b = row.AsInt(1);
 /// </pre>
 ///
 /// 그 사이에 C에 관한 내용을 포함하는 컬럼이 끼어든 경우, 하드코딩되어 있는 
 /// 1번을 찾아서 고쳐야 하는데, 상당히 에러가 발생하기 쉬운 작업이다. 
 ///
 /// <pre>
-/// int a = row.AsInt(0);
-/// int c = row.AsInt(1);
-/// int b = row.AsInt(2); <-- 이 부분을 일일이 신경써야 한다.
+/// int32_t a = row.AsInt(0);
+/// int32_t c = row.AsInt(1);
+/// int32_t b = row.AsInt(2); <-- 이 부분을 일일이 신경써야 한다.
 /// </pre>
 /// 
 /// 이 부분을 문자열로 처리하면 유지보수에 들어가는 수고를 약간이나마 줄일 수 
@@ -109,8 +109,8 @@ public:
 
 
 public:
-    /// \brief 해당 셀의 데이터를 int 형으로 반환한다.
-    int AsInt(size_t index) const { return atoi(at(index).c_str()); }
+    /// \brief 해당 셀의 데이터를 int32_t 형으로 반환한다.
+    int32_t AsInt(size_t index) const { return atoi(at(index).c_str()); }
 
     /// \brief 해당 셀의 데이터를 double 형으로 반환한다.
     double AsDouble(size_t index) const { return atof(at(index).c_str()); }
@@ -118,12 +118,12 @@ public:
     /// \brief 해당 셀의 데이터를 문자열로 반환한다.
     const char* AsString(size_t index) const { return at(index).c_str(); }
 
-    /// \brief 해당하는 이름의 셀 데이터를 int 형으로 반환한다.
-    int AsInt(const char* name, const cCsvAlias& alias) const {
+    /// \brief 해당하는 이름의 셀 데이터를 int32_t 형으로 반환한다.
+    int32_t AsInt(const char* name, const cCsvAlias& alias) const {
         return atoi( at(alias[name]).c_str() ); 
     }
 
-    /// \brief 해당하는 이름의 셀 데이터를 int 형으로 반환한다.
+    /// \brief 해당하는 이름의 셀 데이터를 int32_t 형으로 반환한다.
     double AsDouble(const char* name, const cCsvAlias& alias) const {
         return atof( at(alias[name]).c_str() ); 
     }
@@ -240,7 +240,7 @@ private:
 ///     while (table.next())
 ///     {
 ///         std::string item_class = table.AsString("ItemClass");
-///         int         item_type  = table.AsInt("ItemType"); 
+///         int32_t         item_type  = table.AsInt("ItemType"); 
 ///     }
 /// }
 /// </pre>
@@ -252,7 +252,7 @@ public :
     cCsvFile  m_File;   ///< CSV 파일 객체
 private:
     cCsvAlias m_Alias;  ///< 문자열을 셀 인덱스로 변환하기 위한 객체
-    int       m_CurRow; ///< 현재 횡단 중인 행 번호
+    int32_t       m_CurRow; ///< 현재 횡단 중인 행 번호
 
 
 public:
@@ -276,8 +276,8 @@ public:
     /// \brief 현재 행의 셀 숫자를 반환한다.
     size_t ColCount() const;
 
-    /// \brief 인덱스를 이용해 int 형으로 셀값을 반환한다.
-    int AsInt(size_t index) const;
+    /// \brief 인덱스를 이용해 int32_t 형으로 셀값을 반환한다.
+    int32_t AsInt(size_t index) const;
 
     /// \brief 인덱스를 이용해 double 형으로 셀값을 반환한다.
     double AsDouble(size_t index) const;
@@ -285,8 +285,8 @@ public:
     /// \brief 인덱스를 이용해 std::string 형으로 셀값을 반환한다.
     const char* AsStringByIndex(size_t index) const;
 
-    /// \brief 셀 이름을 이용해 int 형으로 셀값을 반환한다.
-    int AsInt(const char* name) const { return AsInt(m_Alias[name]); }
+    /// \brief 셀 이름을 이용해 int32_t 형으로 셀값을 반환한다.
+    int32_t AsInt(const char* name) const { return AsInt(m_Alias[name]); }
 
     /// \brief 셀 이름을 이용해 double 형으로 셀값을 반환한다.
     double AsDouble(const char* name) const { return AsDouble(m_Alias[name]); }

@@ -25,7 +25,7 @@ DBManager::~DBManager()
 {
 }
 
-bool DBManager::Connect(const char * host, const int port, const char * user, const char * pwd, const char * db)
+bool DBManager::Connect(const char * host, const int32_t port, const char * user, const char * pwd, const char * db)
 {
 	if (m_sql.Setup(host, user, pwd, db, g_stLocale.c_str(), false, port))
 		m_bIsConnect = true;
@@ -69,7 +69,7 @@ bool DBManager::IsConnected()
 	return m_bIsConnect;
 }
 
-void DBManager::ReturnQuery(int iType, DWORD dwIdent, void * pvData, const char * c_pszFormat, ...)
+void DBManager::ReturnQuery(int32_t iType, uint32_t dwIdent, void * pvData, const char * c_pszFormat, ...)
 {
 	//sys_log(0, "ReturnQuery %s", c_pszQuery);
 	char szQuery[4096];
@@ -96,16 +96,16 @@ SQLMsg * DBManager::PopResult()
 	if (m_sql.PopResult(&p))
 		return p;
 
-	return NULL;
+	return nullptr;
 }
 
 void DBManager::Process()
 {
-	SQLMsg* pMsg = NULL;
+	SQLMsg* pMsg = nullptr;
 
 	while ((pMsg = PopResult()))
 	{
-		if( NULL != pMsg->pvUserData )
+		if( nullptr != pMsg->pvUserData )
 		{
 			switch( reinterpret_cast<CQueryInfo*>(pMsg->pvUserData)->iQueryType )
 			{
@@ -135,12 +135,12 @@ void DBManager::Process()
 	}
 }
 
-CLoginData * DBManager::GetLoginData(DWORD dwKey)
+CLoginData * DBManager::GetLoginData(uint32_t dwKey)
 {
-	std::map<DWORD, CLoginData *>::iterator it = m_map_pkLoginData.find(dwKey);
+	std::map<uint32_t, CLoginData *>::iterator it = m_map_pkLoginData.find(dwKey);
 
 	if (it == m_map_pkLoginData.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
@@ -152,7 +152,7 @@ void DBManager::InsertLoginData(CLoginData * pkLD)
 
 void DBManager::DeleteLoginData(CLoginData * pkLD)
 {
-	std::map<DWORD, CLoginData *>::iterator it = m_map_pkLoginData.find(pkLD->GetKey());
+	std::map<uint32_t, CLoginData *>::iterator it = m_map_pkLoginData.find(pkLD->GetKey());
 
 	if (it == m_map_pkLoginData.end())
 		return;
@@ -197,7 +197,7 @@ void DBManager::SendAuthLogin(LPDESC d)
 	ptod.dwLoginKey = d->GetLoginKey();
 
 	memcpy(ptod.iPremiumTimes, pkLD->GetPremiumPtr(), sizeof(ptod.iPremiumTimes));
-	memcpy(&ptod.adwClientKey, pkLD->GetClientKey(), sizeof(DWORD) * 4);
+	memcpy(&ptod.adwClientKey, pkLD->GetClientKey(), sizeof(uint32_t) * 4);
 
 	db_clientdesc->DBPacket(HEADER_GD_AUTH_LOGIN, d->GetHandle(), &ptod, sizeof(TPacketGDAuthLogin));
 	sys_log(0, "SendAuthLogin %s key %u", ptod.szLogin, ptod.dwID);
@@ -205,7 +205,7 @@ void DBManager::SendAuthLogin(LPDESC d)
 	SendLoginPing(r.login);
 }
 
-void DBManager::LoginPrepare(LPDESC d, DWORD * pdwClientKey, int * paiPremiumTimes)
+void DBManager::LoginPrepare(LPDESC d, uint32_t * pdwClientKey, int32_t * paiPremiumTimes)
 {
 	const TAccountTable & r = d->GetAccountTable();
 
@@ -254,14 +254,14 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 				else
 				{
 					MYSQL_ROW row = mysql_fetch_row(pMsg->Get()->pSQLResult);
-					int col = 0;
+					int32_t col = 0;
 
 					// PASSWORD('%s'), password, securitycode, social_id, id, status
 					char szEncrytPassword[45 + 1] = {0, };
 					char szPassword[45 + 1] = {0, };
 					char szSocialID[SOCIAL_ID_MAX_LEN + 1] = {0, };
 					char szStatus[ACCOUNT_STATUS_MAX_LEN + 1] = {0, };
-					DWORD dwID = 0;
+					uint32_t dwID = 0;
 
 					if (!row[col]) 
 					{ 
@@ -308,10 +308,10 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 					strlcpy(szStatus, row[col++], sizeof(szStatus));
 
-					BYTE bNotAvail = 0;
+					uint8_t bNotAvail = 0;
 					str_to_number(bNotAvail, row[col++]);
 
-					int aiPremiumTimes[PREMIUM_MAX_NUM];
+					int32_t aiPremiumTimes[PREMIUM_MAX_NUM];
 					memset(&aiPremiumTimes, 0, sizeof(aiPremiumTimes));
 
 					char szCreateDate[256] = "00000000";
@@ -326,7 +326,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 						str_to_number(aiPremiumTimes[PREMIUM_GOLD], row[col++]);
 
 						{
-							long retValue = 0;
+							int32_t retValue = 0;
 							str_to_number(retValue, row[col]);
 
 							time_t create_time = retValue;
@@ -339,7 +339,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 						}
 					}
 
-					int nPasswordDiff = strcmp(szEncrytPassword, szPassword);
+					int32_t nPasswordDiff = strcmp(szEncrytPassword, szPassword);
 
 					if (nPasswordDiff)
 					{
@@ -409,7 +409,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 					if (pMsg->Get()->uiNumRows > 0)
 					{
 						MYSQL_ROW row = mysql_fetch_row(pMsg->Get()->pSQLResult);
-						int	size = 0;
+						int32_t	size = 0;
 						str_to_number(size, row[0]);
 						ch->SetSafeboxSize(SAFEBOX_PAGE_SIZE * size);
 					}
@@ -422,7 +422,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 			{
 				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(qi->dwIdent);
 				
-				if (ch == NULL)
+				if (ch == nullptr)
 					break;
 				if (pMsg->Get()->uiNumRows)
 				{
@@ -448,7 +448,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 	M2_DELETE(qi);
 }
 
-void DBManager::SendMoneyLog(BYTE type, DWORD vnum, int gold)
+void DBManager::SendMoneyLog(uint8_t type, uint32_t vnum, int32_t gold)
 {
 	if (!gold)
 		return;
@@ -477,7 +477,7 @@ bool AccountDB::IsConnected()
 	return m_IsConnect;
 }
 
-bool AccountDB::Connect(const char * host, const int port, const char * user, const char * pwd, const char * db)
+bool AccountDB::Connect(const char * host, const int32_t port, const char * user, const char * pwd, const char * db)
 {
 	m_IsConnect = m_sql_direct.Setup(host, user, pwd, db, "", true, port);
 
@@ -490,7 +490,7 @@ bool AccountDB::Connect(const char * host, const int port, const char * user, co
 	return m_IsConnect;
 }
 
-bool AccountDB::ConnectAsync(const char * host, const int port, const char * user, const char * pwd, const char * db, const char * locale)
+bool AccountDB::ConnectAsync(const char * host, const int32_t port, const char * user, const char * pwd, const char * db, const char * locale)
 {
 	m_sql.Setup(host, user, pwd, db, locale, false, port);
 	return true;
@@ -511,7 +511,7 @@ void AccountDB::AsyncQuery(const char* query)
 	m_sql.AsyncQuery(query);
 }
 
-void AccountDB::ReturnQuery(int iType, DWORD dwIdent, void * pvData, const char * c_pszFormat, ...)
+void AccountDB::ReturnQuery(int32_t iType, uint32_t dwIdent, void * pvData, const char * c_pszFormat, ...)
 {
 	char szQuery[4096];
 	va_list args;
@@ -537,12 +537,12 @@ SQLMsg * AccountDB::PopResult()
 	if (m_sql.PopResult(&p))
 		return p;
 
-	return NULL;
+	return nullptr;
 }
 
 void AccountDB::Process()
 {
-	SQLMsg* pMsg = NULL;
+	SQLMsg* pMsg = nullptr;
 
 	while ((pMsg = PopResult()))
 	{
@@ -559,7 +559,7 @@ void AccountDB::Process()
 	delete pMsg;
 }
 
-extern unsigned int g_uiSpamReloadCycle;
+extern uint32_t g_uiSpamReloadCycle;
 
 enum EAccountQID
 {
@@ -567,25 +567,25 @@ enum EAccountQID
 };
 
 // 10분마다 리로드
-static LPEVENT s_pkReloadSpamEvent = NULL;
+static LPEVENT s_pkReloadSpamEvent = nullptr;
 
 EVENTINFO(reload_spam_event_info)
 {
 	// used to send command
-	DWORD empty;
+	uint32_t empty;
 };
 
 EVENTFUNC(reload_spam_event)
 {
-	AccountDB::instance().ReturnQuery(QID_SPAM_DB, 0, NULL, "SELECT word, score FROM spam_db WHERE type='SPAM'");
+	AccountDB::instance().ReturnQuery(QID_SPAM_DB, 0, nullptr, "SELECT word, score FROM spam_db WHERE type='SPAM'");
 	return PASSES_PER_SEC(g_uiSpamReloadCycle);
 }
 
 void LoadSpamDB()
 {
-	AccountDB::instance().ReturnQuery(QID_SPAM_DB, 0, NULL, "SELECT word, score FROM spam_db WHERE type='SPAM'");
+	AccountDB::instance().ReturnQuery(QID_SPAM_DB, 0, nullptr, "SELECT word, score FROM spam_db WHERE type='SPAM'");
 #ifdef ENABLE_SPAMDB_REFRESH
-	if (NULL == s_pkReloadSpamEvent)
+	if (nullptr == s_pkReloadSpamEvent)
 	{
 		reload_spam_event_info* info = AllocEventInfo<reload_spam_event_info>();
 		s_pkReloadSpamEvent = event_create(reload_spam_event, info, PASSES_PER_SEC(g_uiSpamReloadCycle));
@@ -594,7 +594,7 @@ void LoadSpamDB()
 }
 
 void CancelReloadSpamEvent() {
-	s_pkReloadSpamEvent = NULL;
+	s_pkReloadSpamEvent = nullptr;
 }
 
 void AccountDB::AnalyzeReturnQuery(SQLMsg * pMsg)

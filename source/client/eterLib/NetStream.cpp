@@ -34,7 +34,7 @@ bool CNetworkStream::IsSecurityMode()
 #endif
 }
 
-void CNetworkStream::SetRecvBufferSize(int recvBufSize)
+void CNetworkStream::SetRecvBufferSize(int32_t recvBufSize)
 {
 	if (m_recvBuf)
 	{
@@ -52,7 +52,7 @@ void CNetworkStream::SetRecvBufferSize(int recvBufSize)
 	m_recvTEABuf = new char[m_recvTEABufSize];
 }
 
-void CNetworkStream::SetSendBufferSize(int sendBufSize)
+void CNetworkStream::SetSendBufferSize(int32_t sendBufSize)
 {
 	if (m_sendBuf)
 	{
@@ -75,7 +75,7 @@ bool CNetworkStream::__RecvInternalBuffer()
 {
 	if (m_recvBufOutputPos>0)
 	{
-		int recvBufDataSize = m_recvBufInputPos - m_recvBufOutputPos;
+		int32_t recvBufDataSize = m_recvBufInputPos - m_recvBufOutputPos;
 		if (recvBufDataSize>0)
 		{
 			memmove(m_recvBuf, m_recvBuf + m_recvBufOutputPos, recvBufDataSize);
@@ -86,15 +86,15 @@ bool CNetworkStream::__RecvInternalBuffer()
 	}
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
-	int restSize = m_recvBufSize - m_recvBufInputPos;
+	int32_t restSize = m_recvBufSize - m_recvBufInputPos;
 	if (restSize>0)
 	{		
-		int recvSize = recv(m_sock, m_recvBuf + m_recvBufInputPos, m_recvBufSize - m_recvBufInputPos, 0);	
+		int32_t recvSize = recv(m_sock, m_recvBuf + m_recvBufInputPos, m_recvBufSize - m_recvBufInputPos, 0);	
 		//Tracenf("RECV %d %d(%d, %d)", recvSize, restSize, m_recvTEABufSize - m_recvTEABufInputPos, m_recvBufSize - m_recvBufInputPos);
 
 		if (recvSize < 0)
 		{
-			int error = WSAGetLastError();
+			int32_t error = WSAGetLastError();
 
 			if (error != WSAEWOULDBLOCK)
 			{
@@ -115,16 +115,16 @@ bool CNetworkStream::__RecvInternalBuffer()
 #else
 	if (IsSecurityMode())
 	{		
-		int restSize = std::min(m_recvTEABufSize - m_recvTEABufInputPos, m_recvBufSize - m_recvBufInputPos);
+		int32_t restSize = std::min(m_recvTEABufSize - m_recvTEABufInputPos, m_recvBufSize - m_recvBufInputPos);
  
 		if (restSize > 0)
 		{
-			int recvSize = recv(m_sock, m_recvTEABuf + m_recvTEABufInputPos, restSize, 0);	
+			int32_t recvSize = recv(m_sock, m_recvTEABuf + m_recvTEABufInputPos, restSize, 0);	
 			//Tracenf("RECV %d %d(%d, %d)", recvSize, restSize, m_recvTEABufSize - m_recvTEABufInputPos, m_recvBufSize - m_recvBufInputPos);
 
 			if (recvSize < 0)
 			{
-				int error = WSAGetLastError();
+				int32_t error = WSAGetLastError();
 
 				if (error != WSAEWOULDBLOCK)
 				{
@@ -138,21 +138,21 @@ bool CNetworkStream::__RecvInternalBuffer()
 
 			m_recvTEABufInputPos += recvSize;
 
-			int decodeSize = m_recvTEABufInputPos;
+			int32_t decodeSize = m_recvTEABufInputPos;
 
 			if (decodeSize >= 8)
 			{
 				decodeSize >>= 3;
 				decodeSize <<= 3;
 
-				/*int decodeDstSize = tea_decrypt((DWORD *) (m_recvBuf + m_recvBufInputPos),
-												 (DWORD *) m_recvTEABuf,
-												 (const DWORD *) m_szDecryptKey,
+				/*int32_t decodeDstSize = tea_decrypt((uint32_t *) (m_recvBuf + m_recvBufInputPos),
+												 (uint32_t *) m_recvTEABuf,
+												 (const uint32_t *) m_szDecryptKey,
 												 decodeSize);
 												 */
-				int decodeDstSize = tea_decrypt((DWORD *) (m_recvBuf + m_recvBufInputPos),
-												(DWORD *) m_recvTEABuf,
-												(const DWORD *) m_szDecryptKey,
+				int32_t decodeDstSize = tea_decrypt((uint32_t *) (m_recvBuf + m_recvBufInputPos),
+												(uint32_t *) m_recvTEABuf,
+												(const uint32_t *) m_szDecryptKey,
 												decodeSize);
 
 				m_recvBufInputPos += decodeDstSize;
@@ -170,15 +170,15 @@ bool CNetworkStream::__RecvInternalBuffer()
 	}
 	else
 	{
-		int restSize = m_recvBufSize - m_recvBufInputPos;
+		int32_t restSize = m_recvBufSize - m_recvBufInputPos;
 		if (restSize>0)
 		{		
-			int recvSize = recv(m_sock, m_recvBuf + m_recvBufInputPos, m_recvBufSize - m_recvBufInputPos, 0);	
+			int32_t recvSize = recv(m_sock, m_recvBuf + m_recvBufInputPos, m_recvBufSize - m_recvBufInputPos, 0);	
 			//Tracenf("RECV %d %d(%d, %d)", recvSize, restSize, m_recvTEABufSize - m_recvTEABufInputPos, m_recvBufSize - m_recvBufInputPos);
 
 			if (recvSize < 0)
 			{
-				int error = WSAGetLastError();
+				int32_t error = WSAGetLastError();
 
 				if (error != WSAEWOULDBLOCK)
 				{
@@ -204,7 +204,7 @@ bool CNetworkStream::__RecvInternalBuffer()
 bool CNetworkStream::__SendInternalBuffer()
 {
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
-	int dataSize=__GetSendBufferSize();
+	int32_t dataSize=__GetSendBufferSize();
 	if (dataSize<=0)
 		return true;
 
@@ -212,7 +212,7 @@ bool CNetworkStream::__SendInternalBuffer()
 		m_cipher.Encrypt(m_sendBuf + m_sendBufOutputPos, dataSize);
 	}
 
-	int sendSize = send(m_sock, m_sendBuf+m_sendBufOutputPos, dataSize, 0);	
+	int32_t sendSize = send(m_sock, m_sendBuf+m_sendBufOutputPos, dataSize, 0);	
 	if (sendSize < 0)
 		return false;
 
@@ -222,19 +222,19 @@ bool CNetworkStream::__SendInternalBuffer()
 #else
 	if (IsSecurityMode())
 	{
-		int encodeSize=__GetSendBufferSize();
+		int32_t encodeSize=__GetSendBufferSize();
 		if (encodeSize<=0)
 			return true;
 
-		m_sendTEABufInputPos += tea_encrypt((DWORD *) (m_sendTEABuf + m_sendTEABufInputPos),
-												 (DWORD *) (m_sendBuf + m_sendBufOutputPos),
-												 (const DWORD *) m_szEncryptKey,
+		m_sendTEABufInputPos += tea_encrypt((uint32_t *) (m_sendTEABuf + m_sendTEABufInputPos),
+												 (uint32_t *) (m_sendBuf + m_sendBufOutputPos),
+												 (const uint32_t *) m_szEncryptKey,
 												 encodeSize);
 		m_sendBufOutputPos += encodeSize;
 
 		if (m_sendTEABufInputPos>0)
 		{	
-			int sendSize = send(m_sock, m_sendTEABuf, m_sendTEABufInputPos, 0);	
+			int32_t sendSize = send(m_sock, m_sendTEABuf, m_sendTEABufInputPos, 0);	
 			if (sendSize < 0)
 				return false;
 
@@ -248,11 +248,11 @@ bool CNetworkStream::__SendInternalBuffer()
 	}
 	else
 	{
-		int dataSize=__GetSendBufferSize();
+		int32_t dataSize=__GetSendBufferSize();
 		if (dataSize<=0)
 			return true;
 
-		int sendSize = send(m_sock, m_sendBuf+m_sendBufOutputPos, dataSize, 0);	
+		int32_t sendSize = send(m_sock, m_sendBuf+m_sendBufOutputPos, dataSize, 0);	
 		if (sendSize < 0)
 			return false;
 
@@ -270,7 +270,7 @@ void CNetworkStream::__PopSendBuffer()
 	if (m_sendBufOutputPos<=0)
 		return;
 		
-	int sendBufDataSize = m_sendBufInputPos - m_sendBufOutputPos;
+	int32_t sendBufDataSize = m_sendBufInputPos - m_sendBufOutputPos;
 
 	if (sendBufDataSize>0)
 	{
@@ -302,7 +302,7 @@ void CNetworkStream::Process()
 	delay.tv_sec = 0;
 	delay.tv_usec = 0;
 	
-	if (select(0, &fdsRecv, &fdsSend, NULL, &delay) == SOCKET_ERROR)
+	if (select(0, &fdsRecv, &fdsSend, nullptr, &delay) == SOCKET_ERROR)
 		return;
 
 	if (!m_isOnline)
@@ -312,7 +312,7 @@ void CNetworkStream::Process()
 			m_isOnline = true;
 			OnConnectSuccess();
 		}
-		else if (time(NULL) > m_connectLimitTime)
+		else if (time(nullptr) > m_connectLimitTime)
 		{
 			Clear();
 			OnConnectFailure();
@@ -325,7 +325,7 @@ void CNetworkStream::Process()
 	{
 		if (!__SendInternalBuffer())
 		{
-			int error = WSAGetLastError();
+			int32_t error = WSAGetLastError();
 
 			if (error != WSAEWOULDBLOCK)
 			{
@@ -400,7 +400,7 @@ void CNetworkStream::Clear()
 #endif
 }
 
-bool CNetworkStream::Connect(const CNetworkAddress& c_rkNetAddr, int limitSec)
+bool CNetworkStream::Connect(const CNetworkAddress& c_rkNetAddr, int32_t limitSec)
 {
 	Clear();
 
@@ -420,7 +420,7 @@ bool CNetworkStream::Connect(const CNetworkAddress& c_rkNetAddr, int limitSec)
 
 	if (connect(m_sock, (PSOCKADDR)&m_addr, m_addr.GetSize()) == SOCKET_ERROR)
 	{
-		int error = WSAGetLastError();
+		int32_t error = WSAGetLastError();
 
 		if (error != WSAEWOULDBLOCK)
 		{
@@ -431,15 +431,15 @@ bool CNetworkStream::Connect(const CNetworkAddress& c_rkNetAddr, int limitSec)
 		}
 	}
 
-	m_connectLimitTime = time(NULL) + limitSec;
+	m_connectLimitTime = time(nullptr) + limitSec;
 	return true;	
 }
 
-bool CNetworkStream::Connect(DWORD dwAddr, int port, int limitSec)
+bool CNetworkStream::Connect(uint32_t dwAddr, int32_t port, int32_t limitSec)
 {
 	char szAddr[256];
 	{
-		BYTE ip[4];
+		uint8_t ip[4];
 		ip[0]=dwAddr&0xff;dwAddr>>=8;
 		ip[1]=dwAddr&0xff;dwAddr>>=8;
 		ip[2]=dwAddr&0xff;dwAddr>>=8;
@@ -451,7 +451,7 @@ bool CNetworkStream::Connect(DWORD dwAddr, int port, int limitSec)
 	return Connect(szAddr, port, limitSec);
 }
 
-bool CNetworkStream::Connect(const char* c_szAddr, int port, int /*limitSec*/)
+bool CNetworkStream::Connect(const char* c_szAddr, int32_t port, int32_t /*limitSec*/)
 {
 	CNetworkAddress kNetAddr;
 	kNetAddr.Set(c_szAddr, port);
@@ -464,12 +464,12 @@ void CNetworkStream::ClearRecvBuffer()
 	m_recvBufOutputPos = m_recvBufInputPos = 0;	 
 }
 
-int CNetworkStream::GetRecvBufferSize()
+int32_t CNetworkStream::GetRecvBufferSize()
 {
 	return m_recvBufInputPos - m_recvBufOutputPos;
 }
 
-bool CNetworkStream::Peek(int size)
+bool CNetworkStream::Peek(int32_t size)
 {
 	if (GetRecvBufferSize() < size)
 		return false;
@@ -477,7 +477,7 @@ bool CNetworkStream::Peek(int size)
 	return true;
 }
 
-bool CNetworkStream::Peek(int size, char * pDestBuf)
+bool CNetworkStream::Peek(int32_t size, char * pDestBuf)
 {
 	if (GetRecvBufferSize() < size)
 		return false;
@@ -488,13 +488,13 @@ bool CNetworkStream::Peek(int size, char * pDestBuf)
 
 
 #ifdef _PACKETDUMP
-const char * GetSendHeaderName(BYTE header)
+const char * GetSendHeaderName(uint8_t header)
 {
 	static bool b = false;
 	static std::string stringList[UCHAR_MAX+1];
 	if (b==false)
 	{
-		for (DWORD i = 0; i < UCHAR_MAX+1; i++)
+		for (uint32_t i = 0; i < UCHAR_MAX+1; i++)
 		{
 			char buf[10];
 			sprintf(buf,"%d",i);
@@ -574,13 +574,13 @@ const char * GetSendHeaderName(BYTE header)
 	return stringList[header].c_str();
 }
 
-const char * GetRecvHeaderName(BYTE header)
+const char * GetRecvHeaderName(uint8_t header)
 {
 	static bool b = false;
 	static std::string stringList[UCHAR_MAX+1];
 	if (b==false)
 	{
-		for (DWORD i = 0; i < UCHAR_MAX+1; i++)
+		for (uint32_t i = 0; i < UCHAR_MAX+1; i++)
 		{
 			char buf[10];
 			sprintf(buf,"%d",i);
@@ -709,7 +709,7 @@ const char * GetRecvHeaderName(BYTE header)
 
 #endif
 
-bool CNetworkStream::Recv(int size)
+bool CNetworkStream::Recv(int32_t size)
 {
 	if (!Peek(size))
 		return false;
@@ -718,7 +718,7 @@ bool CNetworkStream::Recv(int size)
 	return true;
 }
 
-bool CNetworkStream::Recv(int size, char * pDestBuf)
+bool CNetworkStream::Recv(int32_t size, char * pDestBuf)
 {
 	if (!Peek(size, pDestBuf)) 
 		return false;
@@ -729,9 +729,9 @@ bool CNetworkStream::Recv(int size, char * pDestBuf)
 		TraceError("RECV< %s (%d)", GetRecvHeaderName(*pDestBuf), size);
 		std::string contents;
 		char buf[10];
-		for(int i = 1; i < size; i++)
+		for(int32_t i = 1; i < size; i++)
 		{
-			sprintf(buf," %02x", (unsigned char)(pDestBuf[i]));
+			sprintf(buf," %02x", (uint8_t)(pDestBuf[i]));
 			contents.append(buf);
 		}
 		TraceError(contents.c_str());
@@ -743,15 +743,15 @@ bool CNetworkStream::Recv(int size, char * pDestBuf)
 	return true;
 }
 
-int CNetworkStream::__GetSendBufferSize()
+int32_t CNetworkStream::__GetSendBufferSize()
 {
 	return m_sendBufInputPos-m_sendBufOutputPos;
 }
 
 
-bool CNetworkStream::Send(int size, const char * pSrcBuf)
+bool CNetworkStream::Send(int32_t size, const char * pSrcBuf)
 {
-	int sendBufRestSize = m_sendBufSize - m_sendBufInputPos;
+	int32_t sendBufRestSize = m_sendBufSize - m_sendBufInputPos;
 	if ((size + 1) > sendBufRestSize)
 		return false;
 
@@ -764,9 +764,9 @@ bool CNetworkStream::Send(int size, const char * pSrcBuf)
 		TraceError("SEND> %s (%d)", GetSendHeaderName(*pSrcBuf), size);
 		std::string contents;
 		char buf[10];
-		for(int i = 1; i < size; i++)
+		for(int32_t i = 1; i < size; i++)
 		{
-			sprintf(buf," %02x", (unsigned char)(pSrcBuf[i]));
+			sprintf(buf," %02x", (uint8_t)(pSrcBuf[i]));
 			contents.append(buf);
 		}
 		TraceError(contents.c_str());
@@ -780,9 +780,9 @@ bool CNetworkStream::Send(int size, const char * pSrcBuf)
 	{
 		if (IsSecurityMode())
 		{
-			m_sendBufInputPos += TEA_Encrypt((DWORD *) (m_sendBuf + m_sendBufInputPos),
-											 (DWORD *) (m_sendBuf + m_sendBufInputPos),
-											 (const DWORD *) gs_szTeaKey,
+			m_sendBufInputPos += TEA_Encrypt((uint32_t *) (m_sendBuf + m_sendBufInputPos),
+											 (uint32_t *) (m_sendBuf + m_sendBufInputPos),
+											 (const uint32_t *) gs_szTeaKey,
 											 size);
 		}
 		else
@@ -794,17 +794,17 @@ bool CNetworkStream::Send(int size, const char * pSrcBuf)
 	*/
 }
 
-bool CNetworkStream::Peek(int len, void* pDestBuf)
+bool CNetworkStream::Peek(int32_t len, void* pDestBuf)
 {
 	return Peek(len, (char*)pDestBuf);
 }
 
-bool CNetworkStream::Recv(int len, void* pDestBuf)
+bool CNetworkStream::Recv(int32_t len, void* pDestBuf)
 {
 	return Recv(len, (char*)pDestBuf);
 }
 
-bool CNetworkStream::SendFlush(int len, const void* pSrcBuf)
+bool CNetworkStream::SendFlush(int32_t len, const void* pSrcBuf)
 {
 	if (!Send(len, pSrcBuf))
 		return false;
@@ -812,7 +812,7 @@ bool CNetworkStream::SendFlush(int len, const void* pSrcBuf)
 	return __SendInternalBuffer();
 }
 
-bool CNetworkStream::Send(int len, const void* pSrcBuf)
+bool CNetworkStream::Send(int32_t len, const void* pSrcBuf)
 {
 	return Send(len, (const char*)pSrcBuf);
 }
@@ -835,9 +835,9 @@ bool CNetworkStream::SendSequence()
 	if (!m_bUseSequence)
 		return true;
 
-	BYTE bSeq = m_kVec_bSequenceTable[m_iSequence++];
+	uint8_t bSeq = m_kVec_bSequenceTable[m_iSequence++];
 
-	bool bRet = Send(sizeof(BYTE), &bSeq);
+	bool bRet = Send(sizeof(uint8_t), &bSeq);
 	if (m_iSequence == SEQUENCE_TABLE_SIZE)
 		m_iSequence = 0;
 
@@ -880,7 +880,7 @@ void CNetworkStream::OnConnectFailure()
 
 #define SEQUENCE_TABLE_SIZE 32768
 
-static BYTE s_bSequenceTable[SEQUENCE_TABLE_SIZE] =
+static uint8_t s_bSequenceTable[SEQUENCE_TABLE_SIZE] =
 {
 	0xaf,0xca,0x8a,0xcf,0x48,0xa7,0x54,0xc7,0xd7,0xdf,0x1,0x25,0x72,0xf7,0x6f,0x84,
 	0xbc,0x37,0x46,0xe3,0x24,0xda,0xa1,0xc8,0xee,0x36,0x7c,0x33,0x2f,0x98,0x76,0x5e,
@@ -2942,20 +2942,20 @@ CNetworkStream::CNetworkStream()
 	m_isOnline = false;
 	m_connectLimitTime = 0;
 
-	m_recvTEABuf = NULL;
+	m_recvTEABuf = nullptr;
 	m_recvTEABufSize = 0;
 	m_recvTEABufInputPos = 0;
 	
-	m_recvBuf = NULL;	
+	m_recvBuf = nullptr;	
 	m_recvBufSize = 0;	
 	m_recvBufOutputPos = 0;
 	m_recvBufInputPos = 0;	
 
-	m_sendTEABuf = NULL;
+	m_sendTEABuf = nullptr;
 	m_sendTEABuf = 0;
 	m_sendTEABufInputPos = 0;
 
-	m_sendBuf = NULL;	
+	m_sendBuf = nullptr;	
 	m_sendBufSize = 0;	
 	m_sendBufOutputPos = 0;
 	m_sendBufInputPos = 0;
@@ -2964,7 +2964,7 @@ CNetworkStream::CNetworkStream()
 	m_iSequence = 0;
 	m_bUseSequence = false;
 	m_kVec_bSequenceTable.resize(SEQUENCE_TABLE_SIZE);
-	memcpy(&m_kVec_bSequenceTable[0], s_bSequenceTable, sizeof(BYTE) * SEQUENCE_TABLE_SIZE);
+	memcpy(&m_kVec_bSequenceTable[0], s_bSequenceTable, sizeof(uint8_t) * SEQUENCE_TABLE_SIZE);
 #endif
 }
 
@@ -2975,25 +2975,25 @@ CNetworkStream::~CNetworkStream()
 	if (m_sendTEABuf)
 	{
 		delete [] m_sendTEABuf;
-		m_sendTEABuf=NULL;
+		m_sendTEABuf=nullptr;
 	}
 
 	if (m_recvTEABuf)
 	{
 		delete [] m_recvTEABuf;
-		m_recvTEABuf=NULL;
+		m_recvTEABuf=nullptr;
 	}
 
 	if (m_recvBuf)
 	{
 		delete [] m_recvBuf;
-		m_recvBuf=NULL;
+		m_recvBuf=nullptr;
 	}
 
 	if (m_sendBuf)
 	{
 		delete [] m_sendBuf;
-		m_sendBuf=NULL;
+		m_sendBuf=nullptr;
 	}
 }
 

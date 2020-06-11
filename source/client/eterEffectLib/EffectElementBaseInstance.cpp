@@ -69,7 +69,7 @@ void CEffectElementBaseInstance::SetDeactive()
 
 void CEffectElementBaseInstance::Initialize()
 {
-	mc_pmatLocal = NULL;
+	mc_pmatLocal = nullptr;
 
 	m_isActive = true;
 

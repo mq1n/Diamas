@@ -13,13 +13,13 @@ extern bool g_bShutdown;
 
 namespace marriage
 {
-	const int MAX_LOVE_GRADE = 4;
-	const int MAX_MARRIAGE_UNIQUE_ITEM = 6;
+	const int32_t MAX_LOVE_GRADE = 4;
+	const int32_t MAX_MARRIAGE_UNIQUE_ITEM = 6;
 
 	struct TMarriageItemBonusByGrade
 	{
-		DWORD dwVnum;
-		int value[MAX_LOVE_GRADE];
+		uint32_t dwVnum;
+		int32_t value[MAX_LOVE_GRADE];
 	} g_ItemBonus[MAX_MARRIAGE_UNIQUE_ITEM] = {
 		{ 71069,	{ 4,	5,	6,	8,  } }, // 관통 증가
 		{ 71070,	{ 10,	12,	15,	20, } }, // 경험치 증가
@@ -36,11 +36,11 @@ namespace marriage
 		//{ 71074,	5,	10,	15,	20,	30, }, // 방어력 증가 (절대값)
 	};
 
-	const int MARRIAGE_POINT_PER_DAY = 1;
-	const int MARRIAGE_POINT_PER_DAY_FAST = 2;
+	const int32_t MARRIAGE_POINT_PER_DAY = 1;
+	const int32_t MARRIAGE_POINT_PER_DAY_FAST = 2;
 	using namespace std;
 
-	void SendLoverInfo(LPCHARACTER ch, const string& lover_name, int love_point)
+	void SendLoverInfo(LPCHARACTER ch, const string& lover_name, int32_t love_point)
 	{
 		TPacketGCLoverInfo p;
 
@@ -59,12 +59,12 @@ namespace marriage
 			ch2->ChatPacket(CHAT_TYPE_COMMAND, "lover_divorce");
 		}
 		M2_DELETE(pWeddingInfo);
-		pWeddingInfo = NULL;
+		pWeddingInfo = nullptr;
 	}
 
-	int TMarriage::GetMarriageGrade()
+	int32_t TMarriage::GetMarriageGrade()
 	{
-		int point = MINMAX(50, GetMarriagePoint(), 100);
+		int32_t point = MINMAX(50, GetMarriagePoint(), 100);
 		if (point < 65)
 			return 0;
 		else if (point < 80)
@@ -74,17 +74,17 @@ namespace marriage
 		return 3;
 	}
 
-	int TMarriage::GetMarriagePoint()
+	int32_t TMarriage::GetMarriagePoint()
 	{
 		if (test_server)
 		{
-			int value = quest::CQuestManager::instance().GetEventFlag("lovepoint");
+			int32_t value = quest::CQuestManager::instance().GetEventFlag("lovepoint");
 			if (value)
 				return MINMAX(0, value, 100);
 		}
 
-		int point_per_day = MARRIAGE_POINT_PER_DAY;
-		int max_limit = 30;
+		int32_t point_per_day = MARRIAGE_POINT_PER_DAY;
+		int32_t max_limit = 30;
 		if (IsOnline())
 		{
 			if (ch1->GetPremiumRemainSeconds(PREMIUM_MARRIAGE_FAST) > 0 || 
@@ -95,7 +95,7 @@ namespace marriage
 			}
 		}
 
-		int days = (get_global_time() - marry_time);
+		int32_t days = (get_global_time() - marry_time);
 		if (test_server)
 			days /= 60;
 		else
@@ -129,7 +129,7 @@ namespace marriage
 		  return false;*/
 
 		// 거리 체크가 사라졌음
-		/*const int DISTANCE = 5000;
+		/*const int32_t DISTANCE = 5000;
 
 		  if (labs(ch1->GetX() - ch2->GetX()) > DISTANCE)
 		  return false;
@@ -141,7 +141,7 @@ namespace marriage
 	}
 
 	// 금슬 수치
-	int TMarriage::GetBonus(DWORD dwItemVnum, bool bShare, LPCHARACTER me)
+	int32_t TMarriage::GetBonus(uint32_t dwItemVnum, bool bShare, LPCHARACTER me)
 	{
 		if (!is_married)
 			return 0;
@@ -149,7 +149,7 @@ namespace marriage
 		// 주변에 없을때는 자기 기능만 적용된다.
 
 		// 해당 아이템이 어떤 기능을 하는지 찾는다.
-		int iFindedBonusIndex=0;
+		int32_t iFindedBonusIndex=0;
 		{
 			for (iFindedBonusIndex = 0; iFindedBonusIndex < MAX_MARRIAGE_UNIQUE_ITEM; ++iFindedBonusIndex)
 			{
@@ -164,10 +164,10 @@ namespace marriage
 		if (bShare)
 		{
 			// 두명의 보너스를 합한다.
-			int count = 0;
-			if (NULL != ch1 && ch1->IsEquipUniqueItem(dwItemVnum))
+			int32_t count = 0;
+			if (nullptr != ch1 && ch1->IsEquipUniqueItem(dwItemVnum))
 				count ++;
-			if (NULL != ch2 && ch2->IsEquipUniqueItem(dwItemVnum))
+			if (nullptr != ch2 && ch2->IsEquipUniqueItem(dwItemVnum))
 				count ++;
 
 			const TMarriageItemBonusByGrade& rkBonus = g_ItemBonus[iFindedBonusIndex];
@@ -179,10 +179,10 @@ namespace marriage
 		else
 		{
 			// 상대방 것만 계산
-			int count = 0;
-			if (me != ch1 && NULL!= ch1 && ch1->IsEquipUniqueItem(dwItemVnum))
+			int32_t count = 0;
+			if (me != ch1 && nullptr!= ch1 && ch1->IsEquipUniqueItem(dwItemVnum))
 				count ++;
-			if (me != ch2 && NULL!= ch2 && ch2->IsEquipUniqueItem(dwItemVnum))
+			if (me != ch2 && nullptr!= ch2 && ch2->IsEquipUniqueItem(dwItemVnum))
 				count ++;
 
 			const TMarriageItemBonusByGrade& rkBonus = g_ItemBonus[iFindedBonusIndex];
@@ -223,7 +223,7 @@ namespace marriage
 			LPDESC d1, d2;
 			CCI * pkCCI;
 
-			d1 = ch1 ? ch1->GetDesc() : NULL;
+			d1 = ch1 ? ch1->GetDesc() : nullptr;
 
 			if (!d1)
 			{
@@ -236,7 +236,7 @@ namespace marriage
 				}
 			}
 
-			d2 = ch2 ? ch2->GetDesc() : NULL;
+			d2 = ch2 ? ch2->GetDesc() : nullptr;
 
 			if (!d2)
 			{
@@ -258,22 +258,22 @@ namespace marriage
 		}
 	}
 
-	void TMarriage::Logout(DWORD pid)
+	void TMarriage::Logout(uint32_t pid)
 	{
 		if (pid == m_pid1)
-			ch1 = NULL;
+			ch1 = nullptr;
 		else if (pid == m_pid2)
-			ch2 = NULL;
+			ch2 = nullptr;
 
 		if (ch1 || ch2)
 		{
 			Save();
 
 			if (ch1)
-				ch1->SetMarryPartner(NULL);
+				ch1->SetMarryPartner(nullptr);
 
 			if (ch2)
-				ch2->SetMarryPartner(NULL);
+				ch2->SetMarryPartner(nullptr);
 
 			StopNearCheckEvent();
 		}
@@ -283,7 +283,7 @@ namespace marriage
 			LPDESC d1, d2;
 			CCI * pkCCI;
 
-			d1 = ch1 ? ch1->GetDesc() : NULL;
+			d1 = ch1 ? ch1->GetDesc() : nullptr;
 
 			if (!d1)
 			{
@@ -300,7 +300,7 @@ namespace marriage
 				d1->ChatPacket(CHAT_TYPE_COMMAND, "lover_logout");
 			}
 
-			d2 = ch2 ? ch2->GetDesc() : NULL;
+			d2 = ch2 ? ch2->GetDesc() : nullptr;
 
 			if (!d2)
 			{
@@ -370,7 +370,7 @@ namespace marriage
 	{
 		near_check_event_info* info = dynamic_cast<near_check_event_info*>( event->info );
 
-		if ( info == NULL )
+		if ( info == nullptr )
 		{
 			sys_err( "near_check_event> <Factor> Null pointer" );
 			return 0;
@@ -423,7 +423,7 @@ namespace marriage
 		}
 	}
 
-	void TMarriage::Update(DWORD point)
+	void TMarriage::Update(uint32_t point)
 	{
 		if (!IsOnline())
 			return;
@@ -448,7 +448,7 @@ namespace marriage
 		}
 	}
 
-	void TMarriage::WarpToWeddingMap(DWORD dwPID)
+	void TMarriage::WarpToWeddingMap(uint32_t dwPID)
 	{
 		if (!pWeddingInfo)
 			return;
@@ -482,9 +482,9 @@ namespace marriage
 	{
 	}
 
-	bool CManager::IsMarriageUniqueItem(DWORD dwItemVnum)
+	bool CManager::IsMarriageUniqueItem(uint32_t dwItemVnum)
 	{
-		for (int i = 0; i < MAX_MARRIAGE_UNIQUE_ITEM; i++)
+		for (int32_t i = 0; i < MAX_MARRIAGE_UNIQUE_ITEM; i++)
 		{
 			if (g_ItemBonus[i].dwVnum == dwItemVnum)
 				return true;
@@ -492,7 +492,7 @@ namespace marriage
 		return false;
 	}
 
-	bool CManager::IsMarried(DWORD dwPlayerID) 
+	bool CManager::IsMarried(uint32_t dwPlayerID) 
 	{ 
 		TMarriage* pkMarriageFinded=Get(dwPlayerID);
 		if (pkMarriageFinded && pkMarriageFinded->is_married)
@@ -501,7 +501,7 @@ namespace marriage
 		return false;
 	}
 
-	bool CManager::IsEngaged(DWORD dwPlayerID) 
+	bool CManager::IsEngaged(uint32_t dwPlayerID) 
 	{ 
 		TMarriage* pkMarriageFinded=Get(dwPlayerID);
 		if (pkMarriageFinded && !pkMarriageFinded->is_married)
@@ -510,9 +510,9 @@ namespace marriage
 		return false;
 	}
 
-	bool CManager::IsEngagedOrMarried(DWORD dwPlayerID) 
+	bool CManager::IsEngagedOrMarried(uint32_t dwPlayerID) 
 	{ 
-		return Get(dwPlayerID) != NULL; 
+		return Get(dwPlayerID) != nullptr; 
 	}
 
 	bool CManager::Initialize()
@@ -524,23 +524,23 @@ namespace marriage
 	{
 	}
 
-	void Align(DWORD& dwPID1, DWORD& dwPID2)
+	void Align(uint32_t& dwPID1, uint32_t& dwPID2)
 	{
 		if (dwPID1 > dwPID2)
 			std::swap(dwPID1, dwPID2);
 	}
 
-	TMarriage* CManager::Get(DWORD dwPlayerID)
+	TMarriage* CManager::Get(uint32_t dwPlayerID)
 	{
 		auto it = m_MarriageByPID.find(dwPlayerID);
 
 		if (it != m_MarriageByPID.end())
 			return it->second;
 
-		return NULL;
+		return nullptr;
 	}
 
-	void CManager::RequestAdd(DWORD dwPID1, DWORD dwPID2, const char* szName1, const char* szName2)
+	void CManager::RequestAdd(uint32_t dwPID1, uint32_t dwPID2, const char* szName1, const char* szName2)
 	{
 		if (dwPID1 > dwPID2)
 		{
@@ -557,7 +557,7 @@ namespace marriage
 		db_clientdesc->DBPacket(HEADER_GD_MARRIAGE_ADD, 0, &p, sizeof(p));
 	}
 
-	void CManager::Add(DWORD dwPID1, DWORD dwPID2, time_t tMarryTime, const char* szName1, const char* szName2)
+	void CManager::Add(uint32_t dwPID1, uint32_t dwPID2, time_t tMarryTime, const char* szName1, const char* szName2)
 	{
 		if (IsEngagedOrMarried(dwPID1) || IsEngagedOrMarried(dwPID2))
 		{
@@ -590,7 +590,7 @@ namespace marriage
 		}
 	}
 
-	void CManager::RequestUpdate(DWORD dwPID1, DWORD dwPID2, int iUpdatePoint, BYTE byMarried)
+	void CManager::RequestUpdate(uint32_t dwPID1, uint32_t dwPID2, int32_t iUpdatePoint, uint8_t byMarried)
 	{
 		Align(dwPID1, dwPID2);
 
@@ -602,7 +602,7 @@ namespace marriage
 		db_clientdesc->DBPacket(HEADER_GD_MARRIAGE_UPDATE, 0, &p, sizeof(p));
 	}
 
-	void CManager::Update(DWORD dwPID1, DWORD dwPID2, long lTotalPoint, BYTE byMarried)
+	void CManager::Update(uint32_t dwPID1, uint32_t dwPID2, int32_t lTotalPoint, uint8_t byMarried)
 	{
 		TMarriage* pMarriage = Get(dwPID1);
 
@@ -616,7 +616,7 @@ namespace marriage
 		pMarriage->is_married = byMarried;
 	}
 
-	void CManager::RequestRemove(DWORD dwPID1, DWORD dwPID2)
+	void CManager::RequestRemove(uint32_t dwPID1, uint32_t dwPID2)
 	{
 		Align(dwPID1, dwPID2);
 
@@ -626,7 +626,7 @@ namespace marriage
 		db_clientdesc->DBPacket(HEADER_GD_MARRIAGE_REMOVE, 0, &p, sizeof(p));
 	}
 
-	void CManager::Remove(DWORD dwPID1, DWORD dwPID2)
+	void CManager::Remove(uint32_t dwPID1, uint32_t dwPID2)
 	{
 		TMarriage* pMarriage = Get(dwPID1);
 		if (!pMarriage || pMarriage->GetOther(dwPID1) != dwPID2)
@@ -644,7 +644,7 @@ namespace marriage
 
 	void CManager::Login(LPCHARACTER ch)
 	{
-		DWORD pid = ch->GetPlayerID();
+		uint32_t pid = ch->GetPlayerID();
 
 		TMarriage* pMarriage = Get(pid);
 		if (!pMarriage)
@@ -653,7 +653,7 @@ namespace marriage
 		pMarriage->Login(ch);
 	}
 
-	void CManager::Logout(DWORD pid)
+	void CManager::Logout(uint32_t pid)
 	{
 		TMarriage * pMarriage = Get(pid);
 
@@ -668,7 +668,7 @@ namespace marriage
 		Logout(ch->GetPlayerID());
 	}
 
-	void CManager::WeddingReady(DWORD dwPID1, DWORD dwPID2, DWORD dwMapIndex)
+	void CManager::WeddingReady(uint32_t dwPID1, uint32_t dwPID2, uint32_t dwMapIndex)
 	{
 		TMarriage* pMarriage = Get(dwPID1);
 		if (!pMarriage || pMarriage->GetOther(dwPID1) != dwPID2)
@@ -689,7 +689,7 @@ namespace marriage
 		pwi->dwMapIndex = dwMapIndex;
 	}
 
-	void CManager::WeddingStart(DWORD dwPID1, DWORD dwPID2)
+	void CManager::WeddingStart(uint32_t dwPID1, uint32_t dwPID2)
 	{
 		TMarriage* pMarriage = Get(dwPID1);
 		if (!pMarriage || pMarriage->GetOther(dwPID1) != dwPID2)
@@ -711,7 +711,7 @@ namespace marriage
 		m_setWedding.insert(make_pair(dwPID1, dwPID2));
 	}
 
-	void CManager::WeddingEnd(DWORD dwPID1, DWORD dwPID2)
+	void CManager::WeddingEnd(uint32_t dwPID1, uint32_t dwPID2)
 	{
 		TMarriage* pMarriage = Get(dwPID1);
 		if (!pMarriage || pMarriage->GetOther(dwPID1) != dwPID2)
@@ -735,12 +735,12 @@ namespace marriage
 			}
 
 		M2_DELETE(pMarriage->pWeddingInfo);
-		pMarriage->pWeddingInfo = NULL;
+		pMarriage->pWeddingInfo = nullptr;
 
 		m_setWedding.erase(make_pair(dwPID1, dwPID2));
 	}
 
-	void CManager::RequestEndWedding(DWORD dwPID1, DWORD dwPID2)
+	void CManager::RequestEndWedding(uint32_t dwPID1, uint32_t dwPID2)
 	{
 		TPacketWeddingEnd p;
 		p.dwPID1 = dwPID1;

@@ -48,13 +48,13 @@ class CDynamic
 
 		T* GetPointer() const
 		{
-			assert(m_pObject != NULL);
+			assert(m_pObject != nullptr);
 			return m_pObject;
 		}
 		
 		T* operator->() const
 		{
-			assert(m_pObject != NULL);
+			assert(m_pObject != nullptr);
 			return m_pObject;
 		}
 
@@ -64,7 +64,7 @@ class CDynamic
 	private:
 		void Initialize()
 		{
-			m_pObject = NULL;
+			m_pObject = nullptr;
 		}
 
 	private:

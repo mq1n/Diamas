@@ -90,10 +90,10 @@ void CFlyTrace::Update()
 struct TFlyVertex
 {
 	D3DXVECTOR3 p;
-	DWORD c;
+	uint32_t c;
 	D3DXVECTOR2 t;
 	TFlyVertex(){};
-	TFlyVertex(const D3DXVECTOR3& p, DWORD c, const D3DXVECTOR2 & t):p(p),c(c),t(t){}
+	TFlyVertex(const D3DXVECTOR3& p, uint32_t c, const D3DXVECTOR2 & t):p(p),c(c),t(t){}
 };
 
 struct TFlyVertexSet
@@ -156,8 +156,8 @@ void CFlyTrace::Render()
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, FALSE);
-	STATEMANAGER.SetTexture(0, NULL);
-	STATEMANAGER.SetTexture(1, NULL);
+	STATEMANAGER.SetTexture(0, nullptr);
+	STATEMANAGER.SetTexture(1, nullptr);
 	
 	
 	D3DXMATRIX m;
@@ -211,12 +211,12 @@ void CFlyTrace::Render()
 			TFlyVertex(D3DXVECTOR3(size2,0.0f,0.0f), m_dwColor,D3DXVECTOR2(1.0f,0.5f)),
 			TFlyVertex(D3DXVECTOR3(0.0f,-size2,0.0f),m_dwColor,D3DXVECTOR2(1.0f,1.0f)),
 	
-			/*TVertex(D3DXVECTOR3(0.0f,size1,0.0f), ((DWORD)(0x40*rate1)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
-			TVertex(D3DXVECTOR3(-size1,0.0f,0.0f),((DWORD)(0x40*rate1)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
-			TVertex(D3DXVECTOR3(size1,0.0f,0.0f), ((DWORD)(0x40*rate1)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
-			TVertex(D3DXVECTOR3(-size2,0.0f,0.0f),((DWORD)(0x40*rate2)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
-			TVertex(D3DXVECTOR3(size2,0.0f,0.0f), ((DWORD)(0x40*rate2)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
-			TVertex(D3DXVECTOR3(0.0f,-size2,0.0f),((DWORD)(0x40*rate2)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),*/
+			/*TVertex(D3DXVECTOR3(0.0f,size1,0.0f), ((uint32_t)(0x40*rate1)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
+			TVertex(D3DXVECTOR3(-size1,0.0f,0.0f),((uint32_t)(0x40*rate1)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
+			TVertex(D3DXVECTOR3(size1,0.0f,0.0f), ((uint32_t)(0x40*rate1)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
+			TVertex(D3DXVECTOR3(-size2,0.0f,0.0f),((uint32_t)(0x40*rate2)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
+			TVertex(D3DXVECTOR3(size2,0.0f,0.0f), ((uint32_t)(0x40*rate2)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
+			TVertex(D3DXVECTOR3(0.0f,-size2,0.0f),((uint32_t)(0x40*rate2)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),*/
 
 			/*TVertex(D3DXVECTOR3(0.0f,size1,0.0f),0x20ff0000,D3DXVECTOR2(0.0f,0.0f)),
 			TVertex(D3DXVECTOR3(-size1,0.0f,0.0f),0x20ff0000,D3DXVECTOR2(0.0f,0.0f)),
@@ -253,7 +253,7 @@ void CFlyTrace::Render()
 		m._11 = R.x;
 		m._12 = R.y;
 		m._13 = R.z;
-		int i;
+		int32_t i;
 		for(i=0;i<6;i++)
 			D3DXVec3TransformNormal(&v[i].p,&v[i].p,&m);
 		for(i=0;i<3;i++)

@@ -18,7 +18,7 @@ CSkyObjectQuad::CSkyObjectQuad()
 	m_Indices[2] = 1;
 	m_Indices[3] = 3;
 
-	for (unsigned char uci = 0; uci < 4; ++uci)
+	for (uint8_t uci = 0; uci < 4; ++uci)
 	{
 		memset(&m_Vertex[uci], 0, sizeof(TPDTVertex));
 	}
@@ -28,7 +28,7 @@ CSkyObjectQuad::~CSkyObjectQuad()
 {
 }
 
-void CSkyObjectQuad::Clear(const unsigned char & c_rucNumVertex,
+void CSkyObjectQuad::Clear(const uint8_t & c_rucNumVertex,
 						   const float & c_rfRed,
 						   const float & c_rfGreen,
 						   const float & c_rfBlue,
@@ -39,7 +39,7 @@ void CSkyObjectQuad::Clear(const unsigned char & c_rucNumVertex,
 	m_Helper[c_rucNumVertex].Clear(c_rfRed, c_rfGreen, c_rfBlue, c_rfAlpha);
 }
 
-void CSkyObjectQuad::SetSrcColor(const unsigned char & c_rucNumVertex,
+void CSkyObjectQuad::SetSrcColor(const uint8_t & c_rucNumVertex,
 								 const float & c_rfRed,
 								 const float & c_rfGreen,
 								 const float & c_rfBlue,
@@ -50,19 +50,19 @@ void CSkyObjectQuad::SetSrcColor(const unsigned char & c_rucNumVertex,
 	m_Helper[c_rucNumVertex].SetSrcColor(c_rfRed, c_rfGreen, c_rfBlue, c_rfAlpha);
 }
 
-void CSkyObjectQuad::SetTransition(const unsigned char & c_rucNumVertex,
+void CSkyObjectQuad::SetTransition(const uint8_t & c_rucNumVertex,
 								   const float & c_rfRed,
 								   const float & c_rfGreen,
 								   const float & c_rfBlue,
 								   const float & c_rfAlpha,
-								   DWORD dwDuration)
+								   uint32_t dwDuration)
 {
 	if (c_rucNumVertex > 3)
 		return;
 	m_Helper[c_rucNumVertex].SetTransition(c_rfRed, c_rfGreen, c_rfBlue, c_rfAlpha, dwDuration);
 }
 
-void CSkyObjectQuad::SetVertex(const unsigned char & c_rucNumVertex, const TPDTVertex & c_rPDTVertex)
+void CSkyObjectQuad::SetVertex(const uint8_t & c_rucNumVertex, const TPDTVertex & c_rPDTVertex)
 {
 	if (c_rucNumVertex > 3)
 		return;
@@ -71,7 +71,7 @@ void CSkyObjectQuad::SetVertex(const unsigned char & c_rucNumVertex, const TPDTV
 
 void CSkyObjectQuad::StartTransition()
 {
-	for (unsigned char uci = 0; uci < 4; ++uci)
+	for (uint8_t uci = 0; uci < 4; ++uci)
 	{
 		m_Helper[uci].StartTransition();
 	}
@@ -80,7 +80,7 @@ void CSkyObjectQuad::StartTransition()
 bool CSkyObjectQuad::Update()
 {
 	bool bResult = false;
-	for (unsigned char uci = 0; uci < 4; ++uci)
+	for (uint8_t uci = 0; uci < 4; ++uci)
 	{
 		bResult = m_Helper[uci].Update() || bResult;
 		m_Vertex[m_Indices[uci]].diffuse = m_Helper[uci].GetCurColor();
@@ -154,7 +154,7 @@ void CSkyObject::Render()
 
 CGraphicImageInstance * CSkyObject::GenerateTexture(const char * szfilename)
 {
-	assert(szfilename != NULL);
+	assert(szfilename != nullptr);
 
 	if (strlen(szfilename) <= 0)
 		assert(false);
@@ -164,7 +164,7 @@ CGraphicImageInstance * CSkyObject::GenerateTexture(const char * szfilename)
 	if (!pResource->IsType(CGraphicImage::Type()))
 	{
 		assert(false);
-		return NULL;
+		return nullptr;
 	}
 
 	CGraphicImageInstance * pImageInstance = CGraphicImageInstance::New();
@@ -188,7 +188,7 @@ void CSkyObject::StartTransition()
 
 void CSkyObject::TSkyObjectFace::StartTransition()
 {
-	for (unsigned char uci = 0; uci < m_SkyObjectQuadVector.size(); ++uci)
+	for (uint8_t uci = 0; uci < m_SkyObjectQuadVector.size(); ++uci)
 	{
 		m_SkyObjectQuadVector[uci].StartTransition();
 	}
@@ -197,14 +197,14 @@ void CSkyObject::TSkyObjectFace::StartTransition()
 bool CSkyObject::TSkyObjectFace::Update()
 {
 	bool bResult = false;
-	for (DWORD dwi = 0; dwi < m_SkyObjectQuadVector.size(); ++dwi)
+	for (uint32_t dwi = 0; dwi < m_SkyObjectQuadVector.size(); ++dwi)
  		bResult = m_SkyObjectQuadVector[dwi].Update() || bResult;
  	return bResult;
 }
 
 void CSkyObject::TSkyObjectFace::Render()
 {
-	for (unsigned char uci = 0; uci < m_SkyObjectQuadVector.size(); ++uci)
+	for (uint8_t uci = 0; uci < m_SkyObjectQuadVector.size(); ++uci)
 	{
 		m_SkyObjectQuadVector[uci].Render();
 	}
@@ -240,13 +240,13 @@ void CSkyBox::SetSkyBoxScale(const D3DXVECTOR3 & c_rv3Scale)
 	D3DXMatrixScaling(&m_matWorld, m_fScaleX, m_fScaleY, m_fScaleZ);
 }
 
-void CSkyBox::SetGradientLevel(BYTE byUpper, BYTE byLower)
+void CSkyBox::SetGradientLevel(uint8_t byUpper, uint8_t byLower)
 {
 	m_ucVirticalGradientLevelUpper = byUpper;
 	m_ucVirticalGradientLevelLower = byLower;
 }
 
-void CSkyBox::SetFaceTexture( const char* c_szFileName, int iFaceIndex )
+void CSkyBox::SetFaceTexture( const char* c_szFileName, int32_t iFaceIndex )
 {
 	if( iFaceIndex < 0 || iFaceIndex > 5 ) 
 		return;
@@ -322,12 +322,12 @@ void CSkyBox::SetSkyObjectQuadVertical(TSkyObjectQuadVector * pSkyObjectQuadVect
 {
 	TPDTVertex aPDTVertex;
 
-	DWORD dwIndex = 0;
+	uint32_t dwIndex = 0;
 
 	pSkyObjectQuadVector->clear();
 	pSkyObjectQuadVector->resize(m_ucVirticalGradientLevelUpper + m_ucVirticalGradientLevelLower);
 
-	unsigned char ucY;
+	uint8_t ucY;
 	for (ucY = 0; ucY < m_ucVirticalGradientLevelUpper; ++ucY)
 	{
 		CSkyObjectQuad & rSkyObjectQuad = pSkyObjectQuadVector->at(dwIndex++);
@@ -390,7 +390,7 @@ void CSkyBox::SetSkyObjectQuadVertical(TSkyObjectQuadVector * pSkyObjectQuadVect
 
 //void CSkyBox::UpdateSkyFaceQuadTransform(D3DXVECTOR3 * c_pv3QuadPoints)
 //{
-//	for( int i = 0; i < 4; ++i )
+//	for( int32_t i = 0; i < 4; ++i )
 //	{
 //		c_pv3QuadPoints[i].x *= m_fScaleX;	
 //		c_pv3QuadPoints[i].y *= m_fScaleY;	
@@ -562,10 +562,10 @@ void CSkyBox::Refresh()
 	SetSkyObjectQuadHorizon(&m_FaceCloud.m_SkyObjectQuadVector, v3QuadPoints);
 }
 
-void CSkyBox::SetCloudColor(const TGradientColor & c_rColor, const TGradientColor & c_rNextColor, const DWORD & dwTransitionTime)
+void CSkyBox::SetCloudColor(const TGradientColor & c_rColor, const TGradientColor & c_rNextColor, const uint32_t & dwTransitionTime)
 {
 	TSkyObjectFace & aFaceCloud = m_FaceCloud;
-	for (DWORD dwk = 0; dwk < aFaceCloud.m_SkyObjectQuadVector.size(); ++dwk)
+	for (uint32_t dwk = 0; dwk < aFaceCloud.m_SkyObjectQuadVector.size(); ++dwk)
 	{
 		CSkyObjectQuad & aSkyObjectQuad = aFaceCloud.m_SkyObjectQuadVector[dwk];
 		
@@ -616,11 +616,11 @@ void CSkyBox::SetCloudColor(const TGradientColor & c_rColor, const TGradientColo
 	}
 }
 
-void CSkyBox::SetSkyColor(const TVectorGradientColor & c_rColorVector, const TVectorGradientColor & c_rNextColorVector, long lTransitionTime)
+void CSkyBox::SetSkyColor(const TVectorGradientColor & c_rColorVector, const TVectorGradientColor & c_rNextColorVector, int32_t lTransitionTime)
 {
-	unsigned long ulVectorGradientColornum = 0;
-	unsigned long uck;
-	for (unsigned char ucj = 0; ucj < 4; ++ucj)
+	uint32_t ulVectorGradientColornum = 0;
+	uint32_t uck;
+	for (uint8_t ucj = 0; ucj < 4; ++ucj)
 	{
 		TSkyObjectFace & aFace = m_Faces[ucj];
 		ulVectorGradientColornum = 0;
@@ -786,7 +786,7 @@ void CSkyBox::SetSkyColor(const TVectorGradientColor & c_rColorVector, const TVe
 void CSkyBox::StartTransition()
 {
 	m_bTransitionStarted = true;
-	for (unsigned char ucj = 0; ucj < 6; ++ucj)
+	for (uint8_t ucj = 0; ucj < 6; ++ucj)
 		m_Faces[ucj].StartTransition();
 	m_FaceCloud.StartTransition();
 }
@@ -799,7 +799,7 @@ void CSkyBox::Update()
 		return;
 	
 	bool bResult = false;
-	for (unsigned char uci = 0; uci < 6; ++uci)
+	for (uint8_t uci = 0; uci < 6; ++uci)
  		bResult = m_Faces[uci].Update() || bResult;
  	bResult = m_FaceCloud.Update() || bResult;
 
@@ -821,7 +821,7 @@ void CSkyBox::Render()
 
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
-	STATEMANAGER.SetTexture(1, NULL);
+	STATEMANAGER.SetTexture(1, nullptr);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
@@ -836,7 +836,7 @@ void CSkyBox::Render()
 		STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSU,	D3DTADDRESS_CLAMP);
 		STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSV,	D3DTADDRESS_CLAMP);
 
-		for (unsigned int i = 0; i < 6; ++i)
+		for (uint32_t i = 0; i < 6; ++i)
 		{
 			CGraphicImageInstance * pFaceImageInstance = m_GraphicImageInstanceMap[m_Faces[i].m_strFaceTextureFileName];
 			if (!pFaceImageInstance)
@@ -847,14 +847,14 @@ void CSkyBox::Render()
 			m_Faces[i].Render();
 		}
 
-		//STATEMANAGER.SetTexture( 0, NULL );
+		//STATEMANAGER.SetTexture( 0, nullptr );
 
 		STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSU);
 		STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSV);
 	}
 	else
 	{
-		for (unsigned int i = 0; i < 6; ++i)
+		for (uint32_t i = 0; i < 6; ++i)
 		{
 			m_Faces[i].Render();
 		}
@@ -891,7 +891,7 @@ void CSkyBox::RenderCloud()
 	m_matTextureCloud._31 = m_fCloudPositionU;
 	m_matTextureCloud._32 = m_fCloudPositionV;
 	
-	DWORD dwCurTime = CTimer::Instance().GetCurrentMillisecond();
+	uint32_t dwCurTime = CTimer::Instance().GetCurrentMillisecond();
 	
 	m_fCloudPositionU += m_fCloudScrollSpeedU * (float)( dwCurTime - m_dwlastTime ) * 0.001f;
 	if (m_fCloudPositionU >= 1.0f)

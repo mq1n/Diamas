@@ -6,12 +6,12 @@
 #include "RaceData.h"
 #include "GameLibDefines.h"
 
-void CActorInstance::SetBattleHitEffect(DWORD dwID)
+void CActorInstance::SetBattleHitEffect(uint32_t dwID)
 {
 	m_dwBattleHitEffectID = dwID;
 }
 
-void CActorInstance::SetBattleAttachEffect(DWORD dwID)
+void CActorInstance::SetBattleAttachEffect(uint32_t dwID)
 {
 	m_dwBattleAttachEffectID = dwID;
 }
@@ -41,7 +41,7 @@ bool CActorInstance::CanUseSkill()
 	if (!CanAct())
 		return false;
 
-	DWORD dwCurMotionIndex=__GetCurrentMotionIndex();
+	uint32_t dwCurMotionIndex=__GetCurrentMotionIndex();
 	
 	// Locked during attack
 	switch (dwCurMotionIndex)
@@ -220,7 +220,7 @@ void CActorInstance::ComboProcess()
 	{
 		if (!m_pkCurRaceMotionData)
 		{
-			Tracef("Attacking motion data is NULL! : %d\n", m_dwcurComboIndex);
+			Tracef("Attacking motion data is nullptr! : %d\n", m_dwcurComboIndex);
 			__ClearCombo();
 			return;
 		}
@@ -258,8 +258,8 @@ void CActorInstance::__RunNextCombo()
  	++m_dwcurComboIndex;
 	///////////////////////////
 
-	WORD wComboIndex = m_dwcurComboIndex;
-	WORD wComboType = __GetCurrentComboType();
+	uint16_t wComboIndex = m_dwcurComboIndex;
+	uint16_t wComboType = __GetCurrentComboType();
 
 	if (wComboIndex==0)
 	{
@@ -267,13 +267,13 @@ void CActorInstance::__RunNextCombo()
 		return;
 	}
 
-	DWORD dwComboArrayIndex = wComboIndex - 1;
+	uint32_t dwComboArrayIndex = wComboIndex - 1;
 
 	CRaceData::TComboData * pComboData;
 
 	if (!m_pkCurRaceData->GetComboDataPointer(m_wcurMotionMode, wComboType, &pComboData))
 	{
-		TraceError("CActorInstance::__RunNextCombo(wComboType=%d, wComboIndex=%d) - m_pkCurRaceData->GetComboDataPointer(m_wcurMotionMode=%d, &pComboData) == NULL", 
+		TraceError("CActorInstance::__RunNextCombo(wComboType=%d, wComboIndex=%d) - m_pkCurRaceData->GetComboDataPointer(m_wcurMotionMode=%d, &pComboData) == nullptr", 
 			wComboType, wComboIndex, m_wcurMotionMode);
 		return;
 	}
@@ -285,7 +285,7 @@ void CActorInstance::__RunNextCombo()
 		return;
 	}
 
-	WORD wcurComboMotionIndex = pComboData->ComboIndexVector[dwComboArrayIndex];
+	uint16_t wcurComboMotionIndex = pComboData->ComboIndexVector[dwComboArrayIndex];
 	ComboAttack(wcurComboMotionIndex, m_fAtkDirRot, 0.1f);
 
 	////////////////////////////////
@@ -311,7 +311,7 @@ void CActorInstance::__ClearCombo()
 {
 	m_dwcurComboIndex = 0;
 	m_isPreInput = FALSE;
-	m_pkCurRaceMotionData = NULL;
+	m_pkCurRaceMotionData = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -409,7 +409,7 @@ BOOL CActorInstance::IsSplashAttacking()
 	return FALSE;
 }
 
-BOOL CActorInstance::__IsMovingSkill(WORD wSkillNumber)
+BOOL CActorInstance::__IsMovingSkill(uint16_t wSkillNumber)
 {
 	enum
 	{
@@ -421,7 +421,7 @@ BOOL CActorInstance::__IsMovingSkill(WORD wSkillNumber)
 
 BOOL CActorInstance::IsActEmotion()
 {
-	DWORD dwCurMotionIndex=__GetCurrentMotionIndex();
+	uint32_t dwCurMotionIndex=__GetCurrentMotionIndex();
 	switch (dwCurMotionIndex)
 	{
 		case CRaceMotionData::NAME_FRENCH_KISS_START+0:
@@ -450,7 +450,7 @@ BOOL CActorInstance::IsUsingMovingSkill()
 	return __IsMovingSkill(m_kCurMotNode.uSkill);
 }
 
-DWORD CActorInstance::GetComboIndex()
+uint32_t CActorInstance::GetComboIndex()
 {
 	return m_dwcurComboIndex;
 }
@@ -479,7 +479,7 @@ bool CActorInstance::__CanInputNormalAttackCommand()
 
 BOOL CActorInstance::NormalAttack(float fDirRot, float fBlendTime)
 {
-	WORD wMotionIndex;
+	uint16_t wMotionIndex;
 	if (!m_pkCurRaceData->GetNormalAttackIndex(m_wcurMotionMode, &wMotionIndex))
 		return FALSE;
 
@@ -494,7 +494,7 @@ BOOL CActorInstance::NormalAttack(float fDirRot, float fBlendTime)
 	return TRUE;
 }
 
-BOOL CActorInstance::ComboAttack(DWORD dwMotionIndex, float fDirRot, float fBlendTime)
+BOOL CActorInstance::ComboAttack(uint32_t dwMotionIndex, float fDirRot, float fBlendTime)
 {
 	BlendRotation(fDirRot, fBlendTime);
 	SetAdvancingRotation(fDirRot);
@@ -508,7 +508,7 @@ BOOL CActorInstance::ComboAttack(DWORD dwMotionIndex, float fDirRot, float fBlen
 	return TRUE;
 }
 
-void CActorInstance::__ProcessMotionEventAttackSuccess(DWORD dwMotionKey, BYTE byEventIndex, CActorInstance & rVictim)
+void CActorInstance::__ProcessMotionEventAttackSuccess(uint32_t dwMotionKey, uint8_t byEventIndex, CActorInstance & rVictim)
 {
 	CRaceMotionData * pMotionData;
 
@@ -527,7 +527,7 @@ void CActorInstance::__ProcessMotionEventAttackSuccess(DWORD dwMotionKey, BYTE b
 }
 
 
-void CActorInstance::__ProcessMotionAttackSuccess(DWORD dwMotionKey, CActorInstance & rVictim)
+void CActorInstance::__ProcessMotionAttackSuccess(uint32_t dwMotionKey, CActorInstance & rVictim)
 {
 	CRaceMotionData * c_pMotionData;
 
@@ -539,7 +539,7 @@ void CActorInstance::__ProcessMotionAttackSuccess(DWORD dwMotionKey, CActorInsta
 }
 
 
-DWORD CActorInstance::__GetOwnerVID()
+uint32_t CActorInstance::__GetOwnerVID()
 {
 	return m_dwOwnerVID;
 }
@@ -549,7 +549,7 @@ float CActorInstance::__GetOwnerTime()
 	return GetLocalTime()-m_fOwnerBaseTime;
 }
 
-bool IS_HUGE_RACE(unsigned int vnum)
+bool IS_HUGE_RACE(uint32_t vnum)
 {
 	switch (vnum)
 	{
@@ -574,7 +574,7 @@ bool CActorInstance::__CanPushDestActor(CActorInstance& rkActorDst)
 		return false;
 
 	// 거대 몬스터 밀림 제외
-	extern bool IS_HUGE_RACE(unsigned int vnum);
+	extern bool IS_HUGE_RACE(uint32_t vnum);
 	if (IS_HUGE_RACE(rkActorDst.GetRace()))
 		return false;
 
@@ -590,7 +590,7 @@ bool CActorInstance::__CanPushDestActor(CActorInstance& rkActorDst)
 	return true;
 }
 
-bool IS_PARTY_HUNTING_RACE(unsigned int vnum)
+bool IS_PARTY_HUNTING_RACE(uint32_t vnum)
 {
 	return true;
 
@@ -609,7 +609,7 @@ bool IS_PARTY_HUNTING_RACE(unsigned int vnum)
 	*/
 }
 
-void CActorInstance::__ProcessDataAttackSuccess(const NRaceData::TAttackData & c_rAttackData, CActorInstance & rVictim, const D3DXVECTOR3 & c_rv3Position, UINT uiSkill, BOOL isSendPacket)
+void CActorInstance::__ProcessDataAttackSuccess(const NRaceData::TAttackData & c_rAttackData, CActorInstance & rVictim, const D3DXVECTOR3 & c_rv3Position, uint32_t uiSkill, BOOL isSendPacket)
 {
 	if (NRaceData::HIT_TYPE_NONE == c_rAttackData.iHittingType)
 		return;	
@@ -648,7 +648,7 @@ void CActorInstance::__ProcessDataAttackSuccess(const NRaceData::TAttackData & c
 	D3DXVECTOR3 vec3Effect(rVictim.m_x, rVictim.m_y, rVictim.m_z);
 	
 	// #0000780: [M2KR] 수룡 타격구 문제
-	extern bool IS_HUGE_RACE(unsigned int vnum);
+	extern bool IS_HUGE_RACE(uint32_t vnum);
 	if (IS_HUGE_RACE(rVictim.GetRace()))
 	{
 		vec3Effect = c_rv3Position;
@@ -675,7 +675,7 @@ void CActorInstance::__ProcessDataAttackSuccess(const NRaceData::TAttackData & c
 		if (m_dwBattleHitEffectID)
 			rkEftMgr.CreateEffect(m_dwBattleHitEffectID, vec3Effect, D3DXVECTOR3(0.0f, 0.0f, fHeight));
 		if (m_dwBattleAttachEffectID)
-			rVictim.AttachEffectByID(0, NULL, m_dwBattleAttachEffectID);
+			rVictim.AttachEffectByID(0, nullptr, m_dwBattleAttachEffectID);
 	}
 
 	if (rVictim.IsBuilding())
@@ -725,9 +725,9 @@ void CActorInstance::OnShootDamage()
 	}
 }
 
-void CActorInstance::__Shake(DWORD dwDuration)
+void CActorInstance::__Shake(uint32_t dwDuration)
 {
-	DWORD dwCurTime=ELTimer_GetMSec();
+	uint32_t dwCurTime=ELTimer_GetMSec();
 	m_dwShakeTime=dwCurTime+dwDuration;
 }
 
@@ -737,7 +737,7 @@ void CActorInstance::ShakeProcess()
 	{
 		D3DXVECTOR3 v3Pos(0.0f, 0.0f, 0.0f);
 
-		DWORD dwCurTime=ELTimer_GetMSec();
+		uint32_t dwCurTime=ELTimer_GetMSec();
 
 		if (m_dwShakeTime<dwCurTime)
 		{
@@ -745,7 +745,7 @@ void CActorInstance::ShakeProcess()
 		}
 		else
 		{
-			int nShakeSize=10;
+			int32_t nShakeSize=10;
 
 			switch (rand()%2)
 			{
@@ -835,7 +835,7 @@ void CActorInstance::__HitGreate(CActorInstance& rVictim)
 		return;
 	// END_OF_DISABLE_KNOCKDOWN_ATTACK
 
-	extern bool IS_HUGE_RACE(unsigned int vnum);
+	extern bool IS_HUGE_RACE(uint32_t vnum);
 	if (IS_HUGE_RACE(rVictim.GetRace()))
 		return;
 

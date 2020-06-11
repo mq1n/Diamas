@@ -8,8 +8,8 @@
 class CGraphicImageInstance
 {
 	public:
-		static DWORD Type();
-		BOOL IsType(DWORD dwType);
+		static uint32_t Type();
+		BOOL IsType(uint32_t dwType);
 
 	public:
 		CGraphicImageInstance();
@@ -26,8 +26,8 @@ class CGraphicImageInstance
 		void ReloadImagePointer(CGraphicImage* pImage);
 		bool IsEmpty() const;
 
-		int GetWidth();
-		int GetHeight();
+		int32_t GetWidth();
+		int32_t GetHeight();
 
 		CGraphicTexture * GetTexturePointer();
 		const CGraphicTexture &	GetTextureReference() const;
@@ -41,7 +41,7 @@ class CGraphicImageInstance
 		virtual void OnRender();
 		virtual void OnSetImagePointer();
 
-		virtual BOOL OnIsType(DWORD dwType);
+		virtual BOOL OnIsType(uint32_t dwType);
 
 	protected:
 		D3DXCOLOR m_DiffuseColor;
@@ -50,7 +50,7 @@ class CGraphicImageInstance
 		CGraphicImage::TRef m_roImage;
 		
 	public:
-		static void CreateSystem(UINT uCapacity);
+		static void CreateSystem(uint32_t uCapacity);
 		static void DestroySystem();
 
 		static CGraphicImageInstance* New();

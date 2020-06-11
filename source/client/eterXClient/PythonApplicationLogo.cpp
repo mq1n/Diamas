@@ -3,22 +3,22 @@
 
 static bool bInitializedLogo = false;
 
-int CPythonApplication::OnLogoOpen(char* szName)
+int32_t CPythonApplication::OnLogoOpen(char* szName)
 {
-	m_pLogoTex = NULL;
+	m_pLogoTex = nullptr;
 	m_pLogoTex = new CGraphicImageTexture();
-	m_pCaptureBuffer = NULL;
+	m_pCaptureBuffer = nullptr;
 	m_lBufferSize = 0;
 	m_bLogoError = true;
 	m_bLogoPlay = false;
 
-	m_pGraphBuilder = NULL;
-	m_pFilterSG = NULL;
-	m_pSampleGrabber = NULL;
-	m_pMediaCtrl = NULL;
-	m_pMediaEvent = NULL;
-	m_pVideoWnd = NULL;
-	m_pBasicVideo = NULL;
+	m_pGraphBuilder = nullptr;
+	m_pFilterSG = nullptr;
+	m_pSampleGrabber = nullptr;
+	m_pMediaCtrl = nullptr;
+	m_pMediaEvent = nullptr;
+	m_pVideoWnd = nullptr;
+	m_pBasicVideo = nullptr;
 
 	m_nLeft = 0; m_nRight = 0; m_nTop = 0; m_nBottom = 0;
 
@@ -27,8 +27,8 @@ int CPythonApplication::OnLogoOpen(char* szName)
 	if(!m_pLogoTex->Create(1, 1, D3DFMT_A8R8G8B8)) { return 0; }
 
 	// Set GraphBuilder / SampleGrabber
-	if(FAILED(CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER, IID_IGraphBuilder, (VOID**)(&m_pGraphBuilder)))) { return 0; }
-	if(FAILED(CoCreateInstance(CLSID_SampleGrabber, NULL, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (VOID**)&m_pFilterSG))) { return 0; }
+	if(FAILED(CoCreateInstance(CLSID_FilterGraph, nullptr, CLSCTX_INPROC_SERVER, IID_IGraphBuilder, (VOID**)(&m_pGraphBuilder)))) { return 0; }
+	if(FAILED(CoCreateInstance(CLSID_SampleGrabber, nullptr, CLSCTX_INPROC_SERVER, IID_IBaseFilter, (VOID**)&m_pFilterSG))) { return 0; }
 	if(FAILED(m_pGraphBuilder->AddFilter(m_pFilterSG, L"SampleGrabber"))) { return 0; }
 
 	// Create Media Type
@@ -42,7 +42,7 @@ int CPythonApplication::OnLogoOpen(char* szName)
 	// Render File
 	WCHAR wFileName[ MAX_PATH ];
 	MultiByteToWideChar(CP_ACP, 0, szName, -1, wFileName, MAX_PATH);
-	if(FAILED(m_pGraphBuilder->RenderFile(wFileName, NULL))) { return 0; }
+	if(FAILED(m_pGraphBuilder->RenderFile(wFileName, nullptr))) { return 0; }
 
 	IBaseFilter* pSrc;
 	m_pGraphBuilder->AddSourceFilter(wFileName, L"Source", &pSrc);
@@ -73,7 +73,7 @@ int CPythonApplication::OnLogoOpen(char* szName)
 	return 1;
 }
 
-int CPythonApplication::OnLogoUpdate()
+int32_t CPythonApplication::OnLogoUpdate()
 {
 	//OSVERSIONINFO osvi;
 	//ZeroMemory(&osvi, sizeof(osvi));
@@ -81,35 +81,35 @@ int CPythonApplication::OnLogoUpdate()
 	//GetVersionEx(&osvi);
 
 	//// windows xp 이하인 버전은 logo skip.
-	////	m_pSampleGrabber->GetCurrentBuffer(&m_lBufferSize,  (LONG*)m_pCaptureBuffer) fail 나기 때문.
+	////	m_pSampleGrabber->GetCurrentBuffer(&m_lBufferSize,  (int32_t*)m_pCaptureBuffer) fail 나기 때문.
 	//if (osvi.dwMajorVersion <= 5)
 	//{
 	//	return 0;
 	//}
 
-	if(m_pGraphBuilder == NULL || m_pFilterSG == NULL || m_pSampleGrabber == NULL || m_pMediaCtrl == NULL || m_pMediaEvent == NULL || m_pVideoWnd == NULL || false == bInitializedLogo)
+	if(m_pGraphBuilder == nullptr || m_pFilterSG == nullptr || m_pSampleGrabber == nullptr || m_pMediaCtrl == nullptr || m_pMediaEvent == nullptr || m_pVideoWnd == nullptr || false == bInitializedLogo)
 	{
 		return 0;
 	}
 
-	BYTE* pBuffer = m_pCaptureBuffer; LONG lBufferSize = m_lBufferSize;
+	uint8_t* pBuffer = m_pCaptureBuffer; int32_t lBufferSize = m_lBufferSize;
 
 	// 재생이 안됬을 경우 재생.
 	if(!m_bLogoPlay) { m_pMediaCtrl->Run(); m_bLogoPlay = true; }
 
 	// 읽어온 버퍼가 0인경우 버퍼를 재할당.
 	if( lBufferSize == 0  ) {
-		m_pSampleGrabber->GetCurrentBuffer(&m_lBufferSize, NULL);
+		m_pSampleGrabber->GetCurrentBuffer(&m_lBufferSize, nullptr);
 
 		SAFE_DELETE_ARRAY(m_pCaptureBuffer);
-		m_pCaptureBuffer = new BYTE[ m_lBufferSize ];
+		m_pCaptureBuffer = new uint8_t[ m_lBufferSize ];
 		pBuffer = m_pCaptureBuffer;
 		lBufferSize = m_lBufferSize;
 	}
 	
 	// 영상 로딩중에 Update되는 경우, 버퍼 얻기에 실패하는 경우가 많다.
 	// 실패하더라도 완전히 종료되는 경우는 아니므로, 실행을 중단하지는 않는다.
-	if(FAILED(m_pSampleGrabber->GetCurrentBuffer(&m_lBufferSize,  (LONG*)m_pCaptureBuffer)))
+	if(FAILED(m_pSampleGrabber->GetCurrentBuffer(&m_lBufferSize,  (long*)m_pCaptureBuffer)))
 	{
 		m_bLogoError = true;
 
@@ -119,10 +119,10 @@ int CPythonApplication::OnLogoUpdate()
 
 		// 실패한 경우에는 텍스쳐를 까맣게 비운다.
 		tex->LockRect(0, &rt, 0, 0);
-		BYTE* destb = static_cast<byte*>(rt.pBits);
-		for(int a = 0; a < 4; a+= 4)
+		uint8_t* destb = static_cast<byte*>(rt.pBits);
+		for(int32_t a = 0; a < 4; a+= 4)
 		{
-			BYTE* dest = &destb[a];
+			uint8_t* dest = &destb[a];
 			dest[0] = 0; dest[1] = 0; dest[2] = 0; dest[3] = 0xff;
 		}
 		tex->UnlockRect(0);
@@ -163,10 +163,10 @@ int CPythonApplication::OnLogoUpdate()
 	ZeroMemory(&rt, sizeof(rt));
 
 	tex->LockRect(0, &rt, 0, 0);
-	BYTE* destb = static_cast<byte*>(rt.pBits);
-	for(int a = 0; a < lBufferSize; a+= 4)
+	uint8_t* destb = static_cast<byte*>(rt.pBits);
+	for(int32_t a = 0; a < lBufferSize; a+= 4)
 	{
-		BYTE* src = &m_pCaptureBuffer[a]; BYTE* dest = &destb[a];
+		uint8_t* src = &m_pCaptureBuffer[a]; uint8_t* dest = &destb[a];
 		dest[0] = src[0]; dest[1] = src[1]; dest[2] = src[2]; dest[3] = 0xff;
 	}
 	tex->UnlockRect(0);
@@ -210,30 +210,30 @@ void CPythonApplication::OnLogoClose()
 	if (false == bInitializedLogo)
 		return;
 
-	if(m_pCaptureBuffer != NULL)
+	if(m_pCaptureBuffer != nullptr)
 	{
 		delete[] m_pCaptureBuffer;
-		m_pCaptureBuffer = NULL;
+		m_pCaptureBuffer = nullptr;
 	}
-	if(m_pLogoTex != NULL)
+	if(m_pLogoTex != nullptr)
 	{
 		m_pLogoTex->Destroy();
 		delete m_pLogoTex;
-		m_pLogoTex = NULL;
+		m_pLogoTex = nullptr;
 	}
 
-	if(m_pMediaEvent != NULL)
+	if(m_pMediaEvent != nullptr)
 	{
-		m_pMediaEvent->SetNotifyWindow(NULL, 0, 0);
+		m_pMediaEvent->SetNotifyWindow(0, 0, 0);
 		m_pMediaEvent->Release();
-		m_pMediaEvent = NULL;
+		m_pMediaEvent = nullptr;
 	}
-	if(m_pBasicVideo != NULL) m_pBasicVideo->Release(); m_pBasicVideo = NULL;
-	if(m_pVideoWnd != NULL) m_pVideoWnd->Release(); m_pVideoWnd = NULL;
-	if(m_pMediaCtrl != NULL) m_pMediaCtrl->Release(); m_pMediaCtrl = NULL;
-	if(m_pSampleGrabber != NULL) m_pSampleGrabber->Release(); m_pSampleGrabber = NULL;
-	if(m_pFilterSG != NULL) m_pFilterSG->Release(); m_pFilterSG = NULL;
-	if(m_pGraphBuilder != NULL) m_pGraphBuilder->Release(); m_pGraphBuilder = NULL;
+	if(m_pBasicVideo != nullptr) m_pBasicVideo->Release(); m_pBasicVideo = nullptr;
+	if(m_pVideoWnd != nullptr) m_pVideoWnd->Release(); m_pVideoWnd = nullptr;
+	if(m_pMediaCtrl != nullptr) m_pMediaCtrl->Release(); m_pMediaCtrl = nullptr;
+	if(m_pSampleGrabber != nullptr) m_pSampleGrabber->Release(); m_pSampleGrabber = nullptr;
+	if(m_pFilterSG != nullptr) m_pFilterSG->Release(); m_pFilterSG = nullptr;
+	if(m_pGraphBuilder != nullptr) m_pGraphBuilder->Release(); m_pGraphBuilder = nullptr;
 
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_POINT);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_POINT);

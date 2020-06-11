@@ -31,10 +31,10 @@ CGraphicText::TType CGraphicText::Type()
 	return s_type;
 }
 
-bool CGraphicText::OnLoad(int /*iSize*/, const void* /*c_pvBuf*/)
+bool CGraphicText::OnLoad(int32_t /*iSize*/, const void* /*c_pvBuf*/)
 {
 	static char strName[32];
-	int size;
+	int32_t size;
 	bool bItalic = false;
 
 	// format
@@ -50,7 +50,7 @@ bool CGraphicText::OnLoad(int /*iSize*/, const void* /*c_pvBuf*/)
 
 		static char num[8];
 
-		int i = 0;
+		int32_t i = 0;
 		while (*p && isdigit(*p))
 		{
 			num[i++] = *(p++);

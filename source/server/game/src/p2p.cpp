@@ -18,7 +18,7 @@
 
 P2P_MANAGER::P2P_MANAGER()
 {
-	m_pkInputProcessor = NULL;
+	m_pkInputProcessor = nullptr;
 	m_iHandleCount = 0;
 
 	memset(m_aiEmpireUserCount, 0, sizeof(m_aiEmpireUserCount));
@@ -115,7 +115,7 @@ void P2P_MANAGER::EraseUserByDesc(LPDESC d)
 	}
 }
 
-void P2P_MANAGER::Send(const void * c_pvData, int iSize, LPDESC except)
+void P2P_MANAGER::Send(const void * c_pvData, int32_t iSize, LPDESC except)
 {
 	std::unordered_set<LPDESC>::iterator it = m_set_pkPeers.begin();
 
@@ -136,7 +136,7 @@ void P2P_MANAGER::Login(LPDESC d, const TPacketGGLogin * p)
 
 	bool UpdateP2P = false;
 
-	if (NULL == pkCCI)
+	if (nullptr == pkCCI)
 	{
 		UpdateP2P = true;
 		pkCCI = M2_NEW CCI;
@@ -218,11 +218,11 @@ void P2P_MANAGER::Logout(const char * c_pszName)
 	sys_log(0, "P2P: Logout %s", c_pszName);
 }
 
-CCI * P2P_MANAGER::FindByPID(DWORD pid)
+CCI * P2P_MANAGER::FindByPID(uint32_t pid)
 {
 	TPIDCCIMap::iterator it = m_map_dwPID_pkCCI.find(pid);
 	if (it == m_map_dwPID_pkCCI.end())
-		return NULL;
+		return nullptr;
 	return it->second;
 }
 
@@ -233,25 +233,25 @@ CCI * P2P_MANAGER::Find(const char * c_pszName)
 	it = m_map_pkCCI.find(c_pszName);
 
 	if (it == m_map_pkCCI.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
 
-int P2P_MANAGER::GetCount()
+int32_t P2P_MANAGER::GetCount()
 {
 	//return m_map_pkCCI.size();
 	return m_aiEmpireUserCount[1] + m_aiEmpireUserCount[2] + m_aiEmpireUserCount[3];
 }
 
-int P2P_MANAGER::GetEmpireUserCount(int idx)
+int32_t P2P_MANAGER::GetEmpireUserCount(int32_t idx)
 {
 	assert(idx < EMPIRE_MAX_NUM);
 	return m_aiEmpireUserCount[idx];
 }
 
 
-int P2P_MANAGER::GetDescCount()
+int32_t P2P_MANAGER::GetDescCount()
 {
 	return m_set_pkPeers.size();
 }

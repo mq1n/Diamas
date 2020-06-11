@@ -12,22 +12,22 @@ class CGraphicColorInstance
 		void Clear();
 
 		void SetColorReference(const CGraphicColor& c_rSrcColor);
-		void BlendColorReference(DWORD blendTime, const CGraphicColor& c_rDstColor);
+		void BlendColorReference(uint32_t blendTime, const CGraphicColor& c_rDstColor);
 
 		void Update();
 
 		const CGraphicColor& GetCurrentColorReference() const;
 
 	protected:
-		DWORD GetCurrentTime();
+		uint32_t GetCurrentTime();
 
 	protected:
 		CGraphicColor m_srcColor;
 		CGraphicColor m_dstColor;
 		CGraphicColor m_curColor;
 
-		DWORD m_baseTime;
-		DWORD m_blendTime;
+		uint32_t m_baseTime;
+		uint32_t m_blendTime;
 };
 
 typedef CDynamicPool<CGraphicColorInstance> TGraphicColorInstancePool;

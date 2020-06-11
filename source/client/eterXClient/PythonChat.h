@@ -37,7 +37,7 @@ class CWhisper
 
 		void SetPosition(float fPosition);
 		void SetBoxSize(float fWidth, float fHeight);
-		void AppendChat(int iType, const char* c_szChat);
+		void AppendChat(int32_t iType, const char* c_szChat);
 		void Render(float fx, float fy);
 
 	protected:
@@ -91,7 +91,7 @@ class CPythonChat : public CSingleton<CPythonChat>, public IAbstractChat
 
 		typedef struct SChatLine
 		{
-			int iType;
+			int32_t iType;
 			float fAppendedTime;
 			D3DXCOLOR aColor[CHAT_LINE_COLOR_ARRAY_MAX_NUM];
 			CGraphicTextInstance Instance;
@@ -99,9 +99,9 @@ class CPythonChat : public CSingleton<CPythonChat>, public IAbstractChat
 			SChatLine();
 			virtual ~SChatLine();
 
-			void SetColor(DWORD dwID, DWORD dwColor);
-			void SetColorAll(DWORD dwColor);
-			D3DXCOLOR & GetColorRef(DWORD dwID);
+			void SetColor(uint32_t dwID, uint32_t dwColor);
+			void SetColorAll(uint32_t dwColor);
+			D3DXCOLOR & GetColorRef(uint32_t dwID);
 			static void DestroySystem();
 
 			static SChatLine* New();
@@ -112,10 +112,10 @@ class CPythonChat : public CSingleton<CPythonChat>, public IAbstractChat
 
 		typedef struct SWaitChat
 		{
-			int iType;
+			int32_t iType;
 			std::string strChat;
 
-			DWORD dwAppendingTime;
+			uint32_t dwAppendingTime;
 		} TWaitChat;
 
 		typedef std::deque<TChatLine*> TChatLineDeque;
@@ -127,18 +127,18 @@ class CPythonChat : public CSingleton<CPythonChat>, public IAbstractChat
 
 		typedef struct SChatSet
 		{
-			int					m_ix;
-			int					m_iy;
-			int					m_iHeight;
-			int					m_iStep;
+			int32_t					m_ix;
+			int32_t					m_iy;
+			int32_t					m_iHeight;
+			int32_t					m_iStep;
 			float				m_fEndPos;
 
-			int					m_iBoardState;
-			std::vector<int>	m_iMode;
+			int32_t					m_iBoardState;
+			std::vector<int32_t>	m_iMode;
 
 			TChatLineList		m_ShowingChatLineList;
 
-			bool CheckMode(DWORD dwType)
+			bool CheckMode(uint32_t dwType)
 			{
 				if (dwType >= m_iMode.size())
 					return false;
@@ -160,43 +160,43 @@ class CPythonChat : public CSingleton<CPythonChat>, public IAbstractChat
 				m_iMode.resize(ms_iChatModeSize, 1);
 			}
 
-			static int ms_iChatModeSize;
+			static int32_t ms_iChatModeSize;
 		} TChatSet;
 
-		typedef std::map<int, TChatSet> TChatSetMap;
+		typedef std::map<int32_t, TChatSet> TChatSetMap;
 
 	public:
 		CPythonChat();
 		virtual ~CPythonChat();
 
-		void SetChatColor(UINT eType, UINT r, UINT g, UINT b);
+		void SetChatColor(uint32_t eType, uint32_t r, uint32_t g, uint32_t b);
 
 		void Destroy();
 		void Close();
 
-		int CreateChatSet(DWORD dwID);
-		void Update(DWORD dwID);
-		void Render(DWORD dwID);
+		int32_t CreateChatSet(uint32_t dwID);
+		void Update(uint32_t dwID);
+		void Render(uint32_t dwID);
 		void RenderWhisper(const char * c_szName, float fx, float fy);
 
-		void SetBoardState(DWORD dwID, int iState);
-		void SetPosition(DWORD dwID, int ix, int iy);
-		void SetHeight(DWORD dwID, int iHeight);
-		void SetStep(DWORD dwID, int iStep);
-		void ToggleChatMode(DWORD dwID, int iMode);
-		void EnableChatMode(DWORD dwID, int iMode);
-		void DisableChatMode(DWORD dwID, int iMode);
-		void SetEndPos(DWORD dwID, float fPos);
+		void SetBoardState(uint32_t dwID, int32_t iState);
+		void SetPosition(uint32_t dwID, int32_t ix, int32_t iy);
+		void SetHeight(uint32_t dwID, int32_t iHeight);
+		void SetStep(uint32_t dwID, int32_t iStep);
+		void ToggleChatMode(uint32_t dwID, int32_t iMode);
+		void EnableChatMode(uint32_t dwID, int32_t iMode);
+		void DisableChatMode(uint32_t dwID, int32_t iMode);
+		void SetEndPos(uint32_t dwID, float fPos);
 
-		int  GetVisibleLineCount(DWORD dwID);
-		int  GetEditableLineCount(DWORD dwID);
-		int  GetLineCount(DWORD dwID);
-		int  GetLineStep(DWORD dwID);
+		int32_t  GetVisibleLineCount(uint32_t dwID);
+		int32_t  GetEditableLineCount(uint32_t dwID);
+		int32_t  GetLineCount(uint32_t dwID);
+		int32_t  GetLineStep(uint32_t dwID);
 
 		// Chat
-		void AppendChat(int iType, const char * c_szChat);
-		void AppendChatWithDelay(int iType, const char * c_szChat, int iDelay);
-		void ArrangeShowingChat(DWORD dwID);
+		void AppendChat(int32_t iType, const char * c_szChat);
+		void AppendChatWithDelay(int32_t iType, const char * c_szChat, int32_t iDelay);
+		void ArrangeShowingChat(uint32_t dwID);
 
 		// Ignore
 		void IgnoreCharacter(const char * c_szName);
@@ -204,7 +204,7 @@ class CPythonChat : public CSingleton<CPythonChat>, public IAbstractChat
 
 		// Whisper
 		CWhisper * CreateWhisper(const char * c_szName);
-		void AppendWhisper(int iType, const char * c_szName, const char * c_szChat);
+		void AppendWhisper(int32_t iType, const char * c_szName, const char * c_szChat);
 		void ClearWhisper(const char * c_szName);
 		BOOL GetWhisper(const char * c_szName, CWhisper ** ppWhisper);
 		void InitWhisper(PyObject * ppyObject);
@@ -213,14 +213,14 @@ class CPythonChat : public CSingleton<CPythonChat>, public IAbstractChat
 		void __Initialize();
 		void __DestroyWhisperMap();
 
-		TChatLineList * GetChatLineListPtr(DWORD dwID);
-		TChatSet * GetChatSetPtr(DWORD dwID);
+		TChatLineList * GetChatLineListPtr(uint32_t dwID);
+		TChatSet * GetChatSetPtr(uint32_t dwID);
 
-		void UpdateViewMode(DWORD dwID);
-		void UpdateEditMode(DWORD dwID);
-		void UpdateLogMode(DWORD dwID);
+		void UpdateViewMode(uint32_t dwID);
+		void UpdateEditMode(uint32_t dwID);
+		void UpdateLogMode(uint32_t dwID);
 
-		DWORD GetChatColor(int iType);
+		uint32_t GetChatColor(int32_t iType);
 
 	protected:
 		TChatLineDeque						m_ChatLineDeque;

@@ -21,7 +21,7 @@ CTerrainPatch::SSoftwareTransformPatch::~SSoftwareTransformPatch()
 
 void CTerrainPatch::SSoftwareTransformPatch::Create()
 {
-	assert(NULL==m_akTerrainVertex);
+	assert(nullptr==m_akTerrainVertex);
 	m_akTerrainVertex=new SoftwareTransformPatch_SSourceVertex[TERRAIN_VERTEX_COUNT];
 }
 
@@ -35,7 +35,7 @@ void CTerrainPatch::SSoftwareTransformPatch::Destroy()
 
 void CTerrainPatch::SSoftwareTransformPatch::__Initialize()
 {
-	m_akTerrainVertex=NULL;
+	m_akTerrainVertex=nullptr;
 }
 
 bool CTerrainPatch::SOFTWARE_TRANSFORM_PATCH_ENABLE=TRUE;
@@ -60,7 +60,7 @@ void CTerrainPatch::Clear()
 	m_dwVersion=0;
 }
 
-void CTerrainPatch::BuildWaterVertexBuffer(SWaterVertex* akSrcVertex, UINT uWaterVertexCount)
+void CTerrainPatch::BuildWaterVertexBuffer(SWaterVertex* akSrcVertex, uint32_t uWaterVertexCount)
 {
 	CGraphicVertexBuffer& rkVB=m_WaterVertexBuffer;
 
@@ -70,7 +70,7 @@ void CTerrainPatch::BuildWaterVertexBuffer(SWaterVertex* akSrcVertex, UINT uWate
 	SWaterVertex* akDstWaterVertex;
 	if (rkVB.Lock((void **) &akDstWaterVertex))
 	{
-		UINT uVBSize=sizeof(SWaterVertex)*uWaterVertexCount;
+		uint32_t uVBSize=sizeof(SWaterVertex)*uWaterVertexCount;
 		memcpy(akDstWaterVertex, akSrcVertex, uVBSize);
 		m_dwWaterPriCount=uWaterVertexCount/3;
 
@@ -88,12 +88,12 @@ void CTerrainPatch::BuildTerrainVertexBuffer(HardwareTransformPatch_SSourceVerte
 
 void CTerrainPatch::__BuildSoftwareTerrainVertexBuffer(HardwareTransformPatch_SSourceVertex* akSrcVertex)
 {
-	//DWORD dwVBSize=sizeof(HardwareTransformPatch_SSourceVertex)*TERRAIN_VERTEX_COUNT;
+	//uint32_t dwVBSize=sizeof(HardwareTransformPatch_SSourceVertex)*TERRAIN_VERTEX_COUNT;
 
 	m_kST.Create();
 
 	SoftwareTransformPatch_SSourceVertex* akDstVertex=SoftwareTransformPatch_GetTerrainVertexDataPtr();
-	for (UINT uIndex=0; uIndex!=TERRAIN_VERTEX_COUNT; ++uIndex)
+	for (uint32_t uIndex=0; uIndex!=TERRAIN_VERTEX_COUNT; ++uIndex)
 	{
 		*((HardwareTransformPatch_SSourceVertex*)(akDstVertex+uIndex))=*(akSrcVertex+uIndex);
 		akDstVertex[uIndex].dwDiffuse=0xFFFFFFFF;
@@ -110,14 +110,14 @@ void CTerrainPatch::__BuildHardwareTerrainVertexBuffer(HardwareTransformPatch_SS
 	HardwareTransformPatch_SSourceVertex* akDstVertex;
 	if (rkVB.Lock((void **) &akDstVertex))
 	{
-		UINT uVBSize=sizeof(HardwareTransformPatch_SSourceVertex)*TERRAIN_VERTEX_COUNT;
+		uint32_t uVBSize=sizeof(HardwareTransformPatch_SSourceVertex)*TERRAIN_VERTEX_COUNT;
 	
 		memcpy(akDstVertex, akSrcVertex, uVBSize);
 		rkVB.Unlock();		
 	}
 }
 
-void CTerrainPatch::SoftwareTransformPatch_UpdateTerrainLighting(DWORD dwVersion, const D3DLIGHT8& c_rkLight, const D3DMATERIAL8& c_rkMtrl)
+void CTerrainPatch::SoftwareTransformPatch_UpdateTerrainLighting(uint32_t dwVersion, const D3DLIGHT8& c_rkLight, const D3DMATERIAL8& c_rkMtrl)
 {
 	if (m_dwVersion==dwVersion)
 		return;
@@ -131,13 +131,13 @@ void CTerrainPatch::SoftwareTransformPatch_UpdateTerrainLighting(DWORD dwVersion
 	D3DXVECTOR3 kLightDir=c_rkLight.Direction;	
 
 
-	DWORD dwDot;	
-	DWORD dwAmbientR=(c_rkMtrl.Ambient.r*c_rkLight.Ambient.r+c_rkMtrl.Emissive.r)*255.0f;
-	DWORD dwAmbientG=(c_rkMtrl.Ambient.g*c_rkLight.Ambient.g+c_rkMtrl.Emissive.g)*255.0f;
-	DWORD dwAmbientB=(c_rkMtrl.Ambient.b*c_rkLight.Ambient.b+c_rkMtrl.Emissive.b)*255.0f;
-	DWORD dwDiffuseR=(c_rkMtrl.Diffuse.r*c_rkLight.Diffuse.r)*255.0f;
-	DWORD dwDiffuseG=(c_rkMtrl.Diffuse.g*c_rkLight.Diffuse.g)*255.0f;
-	DWORD dwDiffuseB=(c_rkMtrl.Diffuse.b*c_rkLight.Diffuse.b)*255.0f;
+	uint32_t dwDot;	
+	uint32_t dwAmbientR=(c_rkMtrl.Ambient.r*c_rkLight.Ambient.r+c_rkMtrl.Emissive.r)*255.0f;
+	uint32_t dwAmbientG=(c_rkMtrl.Ambient.g*c_rkLight.Ambient.g+c_rkMtrl.Emissive.g)*255.0f;
+	uint32_t dwAmbientB=(c_rkMtrl.Ambient.b*c_rkLight.Ambient.b+c_rkMtrl.Emissive.b)*255.0f;
+	uint32_t dwDiffuseR=(c_rkMtrl.Diffuse.r*c_rkLight.Diffuse.r)*255.0f;
+	uint32_t dwDiffuseG=(c_rkMtrl.Diffuse.g*c_rkLight.Diffuse.g)*255.0f;
+	uint32_t dwDiffuseB=(c_rkMtrl.Diffuse.b*c_rkLight.Diffuse.b)*255.0f;
 
 	if (dwDiffuseR>255-dwAmbientR)
 		dwDiffuseR=255-dwAmbientR;
@@ -148,12 +148,12 @@ void CTerrainPatch::SoftwareTransformPatch_UpdateTerrainLighting(DWORD dwVersion
 	if (dwDiffuseB+dwAmbientB>255)
 		dwDiffuseB=255-dwAmbientB;
 
-	for (UINT uIndex=0; uIndex!=CTerrainPatch::TERRAIN_VERTEX_COUNT; ++uIndex)
+	for (uint32_t uIndex=0; uIndex!=CTerrainPatch::TERRAIN_VERTEX_COUNT; ++uIndex)
 	{
 		float fDot=D3DXVec3Dot(&akSrcVertex[uIndex].kNormal, &kLightDir);
 
 		const float N=0xffffff;
-		const int S=24;
+		const int32_t S=24;
 		if (fDot<0.0f) 
 			dwDot=(N*-fDot);
 		else
@@ -167,7 +167,7 @@ void CTerrainPatch::SoftwareTransformPatch_UpdateTerrainLighting(DWORD dwVersion
 
 }
 
-UINT CTerrainPatch::GetWaterFaceCount()
+uint32_t CTerrainPatch::GetWaterFaceCount()
 {
 	return m_dwWaterPriCount;
 }
@@ -200,7 +200,7 @@ bool CTerrainPatchProxy::IsIn(const D3DXVECTOR3& c_rv3Target, float fRadius)
 	return false;
 }
 
-void CTerrainPatchProxy::SoftwareTransformPatch_UpdateTerrainLighting(DWORD dwVersion, const D3DLIGHT8& c_rkLight, const D3DMATERIAL8& c_rkMtrl)
+void CTerrainPatchProxy::SoftwareTransformPatch_UpdateTerrainLighting(uint32_t dwVersion, const D3DLIGHT8& c_rkLight, const D3DMATERIAL8& c_rkMtrl)
 {
 	if (m_pTerrainPatch)
 		m_pTerrainPatch->SoftwareTransformPatch_UpdateTerrainLighting(dwVersion, c_rkLight, c_rkMtrl);	
@@ -211,7 +211,7 @@ CGraphicVertexBuffer* CTerrainPatchProxy::HardwareTransformPatch_GetVertexBuffer
 	if (m_pTerrainPatch)
 		return m_pTerrainPatch->HardwareTransformPatch_GetVertexBufferPtr();
 
-	return NULL;
+	return nullptr;
 }
 
 SoftwareTransformPatch_SSourceVertex* CTerrainPatchProxy::SoftwareTransformPatch_GetTerrainVertexDataPtr()
@@ -219,10 +219,10 @@ SoftwareTransformPatch_SSourceVertex* CTerrainPatchProxy::SoftwareTransformPatch
 	if (m_pTerrainPatch)
 		return m_pTerrainPatch->SoftwareTransformPatch_GetTerrainVertexDataPtr();
 	
-	return NULL;
+	return nullptr;
 }
 
-UINT CTerrainPatchProxy::GetWaterFaceCount()
+uint32_t CTerrainPatchProxy::GetWaterFaceCount()
 {
 	if (m_pTerrainPatch)
 		return m_pTerrainPatch->GetWaterFaceCount();
@@ -236,5 +236,5 @@ void CTerrainPatchProxy::Clear()
 	m_sPatchNum = 0;
 	m_byTerrainNum = 0xFF;
 
-	m_pTerrainPatch = NULL;
+	m_pTerrainPatch = nullptr;
 }

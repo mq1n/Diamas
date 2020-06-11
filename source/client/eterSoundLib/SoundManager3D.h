@@ -20,19 +20,19 @@ class CSoundManager3D : public CSoundBase
 		bool				Initialize();
 		void				Destroy();
 
-		int					GetEmptyInstanceIndex();
-		int					SetInstance(const char * c_szFileName);
-		ISoundInstance *	GetInstance(DWORD dwIndex);
+		int32_t					GetEmptyInstanceIndex();
+		int32_t					SetInstance(const char * c_szFileName);
+		ISoundInstance *	GetInstance(uint32_t dwIndex);
 
 		void				SetListenerDirection(float fxDir, float fyDir, float fzDir, float fxUp, float fyUp, float fzUp);
 		void				SetListenerPosition(float x, float y, float z);
 		void				SetListenerVelocity(float fDistanceX, float fDistanceY, float fDistanceZ, float fNagnitude);
 
-		void				Lock(int iIndex);
-		void				Unlock(int iIndex);
+		void				Lock(int32_t iIndex);
+		void				Unlock(int32_t iIndex);
 
 	protected:
-		bool				IsValidInstanceIndex(int iIndex);
+		bool				IsValidInstanceIndex(int32_t iIndex);
 
 	protected:
 		bool				m_bLockingFlag[INSTANCE_MAX_COUNT];

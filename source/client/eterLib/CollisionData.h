@@ -59,7 +59,7 @@ struct CDynamicSphereInstance
 class CStaticCollisionData
 {
 public:
-	DWORD dwType;
+	uint32_t dwType;
 	char szName[32+1];
 	
 	D3DXVECTOR3 v3Position;

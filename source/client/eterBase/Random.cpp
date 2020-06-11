@@ -2,9 +2,9 @@
 
 #include <assert.h>
 
-static unsigned long randseed = 1;
+static uint32_t randseed = 1;
 
-void srandom(unsigned long seed)
+void srandom(uint32_t seed)
 {
 	randseed = seed;
 }
@@ -14,9 +14,9 @@ void srandom(unsigned long seed)
  * and whatever else we might use it for.  The result is uniform on
  * [0, 2^31 - 1].
  */
-unsigned long random()
+uint32_t random()
 {       
-	register long x, hi, lo, t;
+	register int32_t x, hi, lo, t;
 	
 	/*
 	* Compute x[n + 1] = (7^5 * x[n]) mod (2^31 - 1).
@@ -41,7 +41,7 @@ float frandom(float flLow, float flHigh)
 	return (fl * (flHigh - flLow)) + flLow; // float in [low,high)
 }
 
-long random_range(long from, long to)
+int32_t random_range(int32_t from, int32_t to)
 {
 	assert(from <= to);
 	return ((random() % (to - from + 1)) + from);

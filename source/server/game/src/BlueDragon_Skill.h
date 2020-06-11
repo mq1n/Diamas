@@ -20,7 +20,7 @@ struct FSkillBreath
 
 	void operator()(LPENTITY ent)
 	{
-		if (NULL != ent)
+		if (nullptr != ent)
 		{
 			if (true == ent->IsType(ENTITY_CHARACTER))
 			{
@@ -28,7 +28,7 @@ struct FSkillBreath
 
 				if (true == ch->IsPC() && false == ch->IsDead())
 				{
-					if (NULL != ch->FindAffect(AFFECT_REVIVE_INVISIBLE, APPLY_NONE))
+					if (nullptr != ch->FindAffect(AFFECT_REVIVE_INVISIBLE, APPLY_NONE))
 						return;
 
 					if ((signed)BlueDragon_GetSkillFactor(2, "Skill0", "damage_area") < DISTANCE_APPROX(pAttacker->GetX()-ch->GetX(), pAttacker->GetY()-ch->GetY()))
@@ -37,12 +37,12 @@ struct FSkillBreath
 						return;
 					}
 
-					int overlapDamageCount = 0;
+					int32_t overlapDamageCount = 0;
 
-					int pct = 0;
+					int32_t pct = 0;
 					if (ch->GetJob() == Set1)
 					{
-						const char* ptr = NULL;
+						const char* ptr = nullptr;
 
 						switch ( Set1 )
 						{
@@ -59,7 +59,7 @@ struct FSkillBreath
 						}
 
 
-						int firstDamagePercent =  number(BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "min"), BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "max"));
+						int32_t firstDamagePercent =  number(BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "min"), BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "max"));
 						pct += firstDamagePercent;
 
 						if (firstDamagePercent > 0)
@@ -68,7 +68,7 @@ struct FSkillBreath
 
 					if (ch->GetJob() == Set2)
 					{
-						const char* ptr = NULL;
+						const char* ptr = nullptr;
 
 						switch ( Set2 )
 						{
@@ -84,7 +84,7 @@ struct FSkillBreath
 							case JOB_MAX_NUM:	return;
 						}
 
-						int secondDamagePercent = number(BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "min"), BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "max"));
+						int32_t secondDamagePercent = number(BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "min"), BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "max"));
 						pct += secondDamagePercent;
 
 						if (secondDamagePercent > 0)
@@ -93,7 +93,7 @@ struct FSkillBreath
 
 					if (GET_SEX(ch) == gender)
 					{
-						const char* ptr = NULL;
+						const char* ptr = nullptr;
 
 						switch (gender)
 						{
@@ -102,7 +102,7 @@ struct FSkillBreath
 							default:			return;
 						}
 
-						int thirdDamagePercent = number(BlueDragon_GetSkillFactor(4, "Skill0", "gender", ptr, "min"), BlueDragon_GetSkillFactor(4, "Skill0", "gender", ptr, "max"));
+						int32_t thirdDamagePercent = number(BlueDragon_GetSkillFactor(4, "Skill0", "gender", ptr, "min"), BlueDragon_GetSkillFactor(4, "Skill0", "gender", ptr, "max"));
 						pct += thirdDamagePercent;
 
 						if (thirdDamagePercent > 0)
@@ -122,11 +122,11 @@ struct FSkillBreath
 							break;
 					}
 
-					int addPct = BlueDragon_GetRangeFactor("hp_damage", pAttacker->GetHPPct());
+					int32_t addPct = BlueDragon_GetRangeFactor("hp_damage", pAttacker->GetHPPct());
 
 					pct += addPct;
 
-					int dam = number(BlueDragon_GetSkillFactor(3, "Skill0", "default_damage", "min"), BlueDragon_GetSkillFactor(3, "Skill0", "default_damage", "max"));
+					int32_t dam = number(BlueDragon_GetSkillFactor(3, "Skill0", "default_damage", "min"), BlueDragon_GetSkillFactor(3, "Skill0", "default_damage", "max"));
 
 					dam += (dam * addPct) / 100;
 					dam += (ch->GetMaxHP() * pct) / 100;
@@ -151,7 +151,7 @@ struct FSkillWeakBreath
 
 	void operator()(LPENTITY ent)
 	{
-		if (NULL != ent)
+		if (nullptr != ent)
 		{
 			if (true == ent->IsType(ENTITY_CHARACTER))
 			{
@@ -159,7 +159,7 @@ struct FSkillWeakBreath
 
 				if (true == ch->IsPC() && false == ch->IsDead())
 				{
-					if (NULL != ch->FindAffect(AFFECT_REVIVE_INVISIBLE, APPLY_NONE))
+					if (nullptr != ch->FindAffect(AFFECT_REVIVE_INVISIBLE, APPLY_NONE))
 						return;
 
 					if ((signed)BlueDragon_GetSkillFactor(2, "Skill1", "damage_area") < DISTANCE_APPROX(pAttacker->GetX()-ch->GetX(), pAttacker->GetY()-ch->GetY()))
@@ -168,9 +168,9 @@ struct FSkillWeakBreath
 						return;
 					}
 
-					int addPct = BlueDragon_GetRangeFactor("hp_damage", pAttacker->GetHPPct());
+					int32_t addPct = BlueDragon_GetRangeFactor("hp_damage", pAttacker->GetHPPct());
 
-					int dam = number( BlueDragon_GetSkillFactor(3, "Skill1", "default_damage", "min"), BlueDragon_GetSkillFactor(3, "Skill1", "default_damage", "max") );
+					int32_t dam = number( BlueDragon_GetSkillFactor(3, "Skill1", "default_damage", "min"), BlueDragon_GetSkillFactor(3, "Skill1", "default_damage", "max") );
 					dam += (dam * addPct) / 100;
 
 					ch->Damage( pAttacker, dam, DAMAGE_TYPE_ICE );
@@ -187,7 +187,7 @@ struct FSkillEarthQuake
 	EJobs Set1;
 	EJobs Set2;
 	ESex gender;
-	long MaxDistance;
+	int32_t MaxDistance;
 	LPCHARACTER pAttacker;
 	LPCHARACTER pFarthestChar;
 
@@ -196,7 +196,7 @@ struct FSkillEarthQuake
 		pAttacker = p;
 
 		MaxDistance = 0;
-		pFarthestChar = NULL;
+		pFarthestChar = nullptr;
 
 		Set1 = static_cast<EJobs>(number(0,3));
 		Set2 = static_cast<EJobs>(number(0,3));
@@ -205,7 +205,7 @@ struct FSkillEarthQuake
 
 	void operator()(LPENTITY ent)
 	{
-		if (NULL != ent)
+		if (nullptr != ent)
 		{
 			if (true == ent->IsType(ENTITY_CHARACTER))
 			{
@@ -213,7 +213,7 @@ struct FSkillEarthQuake
 
 				if (true == ch->IsPC() && false == ch->IsDead())
 				{
-					if (NULL != ch->FindAffect(AFFECT_REVIVE_INVISIBLE, APPLY_NONE))
+					if (nullptr != ch->FindAffect(AFFECT_REVIVE_INVISIBLE, APPLY_NONE))
 						return;
 
 					if ((signed)BlueDragon_GetSkillFactor(2, "Skill2", "damage_area") < DISTANCE_APPROX(pAttacker->GetX()-ch->GetX(), pAttacker->GetY()-ch->GetY()))
@@ -222,11 +222,11 @@ struct FSkillEarthQuake
 						return;
 					}
 
-					int sec = number(BlueDragon_GetSkillFactor(4, "Skill2", "stun_time", "default", "min"), BlueDragon_GetSkillFactor(4, "Skill2", "stun_time", "default", "max"));
+					int32_t sec = number(BlueDragon_GetSkillFactor(4, "Skill2", "stun_time", "default", "min"), BlueDragon_GetSkillFactor(4, "Skill2", "stun_time", "default", "max"));
 
 					if (ch->GetJob() == Set1)
 					{
-						const char* ptr = NULL;
+						const char* ptr = nullptr;
 
 						switch ( Set1 )
 						{
@@ -247,7 +247,7 @@ struct FSkillEarthQuake
 
 					if (ch->GetJob() == Set2)
 					{
-						const char* ptr = NULL;
+						const char* ptr = nullptr;
 
 						switch ( Set2 )
 						{
@@ -268,7 +268,7 @@ struct FSkillEarthQuake
 
 					if (GET_SEX(ch) == gender)
 					{
-						const char* ptr = NULL;
+						const char* ptr = nullptr;
 
 						switch (gender)
 						{
@@ -280,9 +280,9 @@ struct FSkillEarthQuake
 						sec += number(BlueDragon_GetSkillFactor(4, "Skill2", "gender", ptr, "min"), BlueDragon_GetSkillFactor(4, "Skill2", "gender", ptr, "max"));
 					}
 
-					int addPct = BlueDragon_GetRangeFactor("hp_damage", pAttacker->GetHPPct());
+					int32_t addPct = BlueDragon_GetRangeFactor("hp_damage", pAttacker->GetHPPct());
 
-					int dam = number( BlueDragon_GetSkillFactor(3, "Skill2", "default_damage", "min"), BlueDragon_GetSkillFactor(3, "Skill2", "default_damage", "max") );
+					int32_t dam = number( BlueDragon_GetSkillFactor(3, "Skill2", "default_damage", "min"), BlueDragon_GetSkillFactor(3, "Skill2", "default_damage", "max") );
 					dam += (dam * addPct) / 100;
 
 					ch->Damage( pAttacker, dam, DAMAGE_TYPE_ICE);
@@ -299,12 +299,12 @@ struct FSkillEarthQuake
 
 					Normalize( &vec, &vec );
 
-					const int nFlyDistance = 1000;
+					const int32_t nFlyDistance = 1000;
 
-					long tx = ch->GetX() + vec.x * nFlyDistance;
-					long ty = ch->GetY() + vec.y * nFlyDistance;
+					int32_t tx = ch->GetX() + vec.x * nFlyDistance;
+					int32_t ty = ch->GetY() + vec.y * nFlyDistance;
 
-					for (int i=0 ; i < 5 ; ++i)
+					for (int32_t i=0 ; i < 5 ; ++i)
 					{
 						if (true == SECTREE_MANAGER::instance().IsMovablePosition( ch->GetMapIndex(), tx, ty ))
 						{
@@ -342,7 +342,7 @@ struct FSkillEarthQuake
 
 					ch->SyncPacket();
 
-					long dist = DISTANCE_APPROX( pAttacker->GetX() - ch->GetX(), pAttacker->GetY() - ch->GetY() );
+					int32_t dist = DISTANCE_APPROX( pAttacker->GetX() - ch->GetX(), pAttacker->GetY() - ch->GetY() );
 
 					if (dist > MaxDistance)
 					{

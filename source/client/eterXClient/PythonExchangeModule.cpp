@@ -34,7 +34,7 @@ PyObject * exchangeGetAcceptFromTarget(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * exchangeGetItemVnumFromSelf(PyObject * poSelf, PyObject * poArgs)
 {
-	int pos;
+	int32_t pos;
 
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
@@ -44,7 +44,7 @@ PyObject * exchangeGetItemVnumFromSelf(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * exchangeGetItemVnumFromTarget(PyObject * poTarget, PyObject * poArgs)
 {
-	int pos;
+	int32_t pos;
 
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
@@ -54,7 +54,7 @@ PyObject * exchangeGetItemVnumFromTarget(PyObject * poTarget, PyObject * poArgs)
 
 PyObject * exchangeGetItemCountFromSelf(PyObject * poSelf, PyObject * poArgs)
 {
-	int pos;
+	int32_t pos;
 
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
@@ -64,7 +64,7 @@ PyObject * exchangeGetItemCountFromSelf(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * exchangeGetItemCountFromTarget(PyObject * poTarget, PyObject * poArgs)
 {
-	int pos;
+	int32_t pos;
 
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
@@ -96,10 +96,10 @@ PyObject * exchangeGetLevelFromTarget(PyObject * poTarget, PyObject * poArgs)
 
 PyObject * exchangeGetItemMetinSocketFromTarget(PyObject * poTarget, PyObject * poArgs)
 {
-	int pos;
+	int32_t pos;
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
-	int iMetinSocketPos;
+	int32_t iMetinSocketPos;
 	if (!PyTuple_GetInteger(poArgs, 1, &iMetinSocketPos))
 		return Py_BuildException();
 	return Py_BuildValue("i", CPythonExchange::Instance().GetItemMetinSocketFromTarget(pos, iMetinSocketPos));
@@ -107,10 +107,10 @@ PyObject * exchangeGetItemMetinSocketFromTarget(PyObject * poTarget, PyObject * 
 
 PyObject * exchangeGetItemMetinSocketFromSelf(PyObject * poTarget, PyObject * poArgs)
 {
-	int pos;
+	int32_t pos;
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
-	int iMetinSocketPos;
+	int32_t iMetinSocketPos;
 	if (!PyTuple_GetInteger(poArgs, 1, &iMetinSocketPos))
 		return Py_BuildException();
 	return Py_BuildValue("i", CPythonExchange::Instance().GetItemMetinSocketFromSelf(pos, iMetinSocketPos));
@@ -118,15 +118,15 @@ PyObject * exchangeGetItemMetinSocketFromSelf(PyObject * poTarget, PyObject * po
 
 PyObject * exchangeGetItemAttributeFromTarget(PyObject * poTarget, PyObject * poArgs)
 {
-	int pos;
+	int32_t pos;
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
-	int iAttrSlotPos;
+	int32_t iAttrSlotPos;
 	if (!PyTuple_GetInteger(poArgs, 1, &iAttrSlotPos))
 		return Py_BuildException();
 
-	BYTE byType;
-	short sValue;
+	uint8_t byType;
+	int16_t sValue;
 	CPythonExchange::Instance().GetItemAttributeFromTarget(pos, iAttrSlotPos, &byType, &sValue);
 
 	return Py_BuildValue("ii", byType, sValue);
@@ -134,15 +134,15 @@ PyObject * exchangeGetItemAttributeFromTarget(PyObject * poTarget, PyObject * po
 
 PyObject * exchangeGetItemAttributeFromSelf(PyObject * poTarget, PyObject * poArgs)
 {
-	int pos;
+	int32_t pos;
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
-	int iAttrSlotPos;
+	int32_t iAttrSlotPos;
 	if (!PyTuple_GetInteger(poArgs, 1, &iAttrSlotPos))
 		return Py_BuildException();
 
-	BYTE byType;
-	short sValue;
+	uint8_t byType;
+	int16_t sValue;
 	CPythonExchange::Instance().GetItemAttributeFromSelf(pos, iAttrSlotPos, &byType, &sValue);
 
 	return Py_BuildValue("ii", byType, sValue);
@@ -155,7 +155,7 @@ PyObject * exchangeGetElkMode(PyObject * poTarget, PyObject * poArgs)
 
 PyObject * exchangeSetElkMode(PyObject * poTarget, PyObject * poArgs)
 {
-	int elk_mode;
+	int32_t elk_mode;
 
 	if (!PyTuple_GetInteger(poArgs, 0, &elk_mode))
 		return Py_BuildException();
@@ -200,7 +200,7 @@ void initTrade()
 		{"GetElkMode",					exchangeGetElkMode,					METH_VARARGS},
 		{"SetElkMode",					exchangeSetElkMode,					METH_VARARGS},
 
-		{NULL, NULL},
+		{nullptr, nullptr},
 	};
 
 	PyObject * poModule = Py_InitModule("exchange", s_methods);

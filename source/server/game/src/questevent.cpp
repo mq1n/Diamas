@@ -14,7 +14,7 @@ namespace quest
 		if (info)
 		{
 			M2_DELETE_ARRAY(info->name);
-			info->name = NULL;
+			info->name = nullptr;
 		}
 
 		event_cancel(ppEvent);
@@ -24,7 +24,7 @@ namespace quest
 	{
 		quest_server_event_info * info = dynamic_cast<quest_server_event_info *>( event->info );
 
-		if ( info == NULL )
+		if ( info == nullptr )
 		{
 			sys_err( "quest_server_timer_event> <Factor> Null pointer" );
 			return 0;
@@ -39,7 +39,7 @@ namespace quest
 		{
 			q.ClearServerTimerNotCancel(info->name, info->arg);
 			M2_DELETE_ARRAY(info->name);
-			info->name = NULL;
+			info->name = nullptr;
 		}
 
 		return info->time_cycle;
@@ -49,7 +49,7 @@ namespace quest
 	{
 		quest_event_info * info = dynamic_cast<quest_event_info *>( event->info );
 
-		if ( info == NULL )
+		if ( info == nullptr )
 		{
 			sys_err( "quest_timer_event> <Factor> Null pointer" );
 			return 0;
@@ -76,18 +76,18 @@ END_OF_TIMER_EVENT:
 				sys_err("quest::PC pointer null. player_id: %u", info->player_id);
 
 			M2_DELETE_ARRAY(info->name);
-			info->name = NULL;
+			info->name = nullptr;
 			return 0;
 		}
 
 		return info->time_cycle;
 	}
 
-	LPEVENT quest_create_server_timer_event(const char * name, double when, unsigned int timernpc, bool loop, unsigned int arg)
+	LPEVENT quest_create_server_timer_event(const char * name, double when, uint32_t timernpc, bool loop, uint32_t arg)
 	{
-		const int nameCapacity = strlen(name) + 1;
+		const int32_t nameCapacity = strlen(name) + 1;
 
-		long ltime_cycle = (long) (rint(PASSES_PER_SEC(when)));
+		int32_t ltime_cycle = (int32_t) (rint(PASSES_PER_SEC(when)));
 
 		quest_server_event_info* info = AllocEventInfo<quest_server_event_info>();
 
@@ -102,11 +102,11 @@ END_OF_TIMER_EVENT:
 		return event_create(quest_server_timer_event, info, ltime_cycle);
 	}
 
-	LPEVENT quest_create_timer_event(const char * name, unsigned int player_id, double when, unsigned int npc_id, bool loop)
+	LPEVENT quest_create_timer_event(const char * name, uint32_t player_id, double when, uint32_t npc_id, bool loop)
 	{
-		const int nameCapacity = strlen(name) + 1;
+		const int32_t nameCapacity = strlen(name) + 1;
 
-		long ltime_cycle = (int) (rint(PASSES_PER_SEC(when)));
+		int32_t ltime_cycle = (int32_t) (rint(PASSES_PER_SEC(when)));
 
 		quest_event_info* info = AllocEventInfo<quest_event_info>();
 

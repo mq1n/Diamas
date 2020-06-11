@@ -28,9 +28,9 @@ void CFlyingInstance::__Initialize()
 	m_qAttachRotation=m_qRot=D3DXQUATERNION(0.0f, 0.0f, 0.0f, 0.0f);
 	m_v3Accel=m_v3LocalVelocity=m_v3Velocity=m_v3Position=D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	
-	m_pHandler=NULL;
-	m_pData=NULL;
-	m_pOwner=NULL;
+	m_pHandler=nullptr;
+	m_pData=nullptr;
+	m_pOwner=nullptr;
 
 	m_bAlive=false;
 	m_canAttack=false;
@@ -63,7 +63,7 @@ void CFlyingInstance::Destroy()
 
 void CFlyingInstance::BuildAttachInstance()
 {
-	for(int i=0;i<m_pData->GetAttachDataCount();i++)
+	for(int32_t i=0;i<m_pData->GetAttachDataCount();i++)
 	{
 		CFlyingData::TFlyingAttachData & rfad = m_pData->GetAttachDataReference(i);
 
@@ -78,12 +78,12 @@ void CFlyingInstance::BuildAttachInstance()
 					CEffectManager & rem = CEffectManager::Instance();
 					TAttachEffectInstance aei;
 
-					DWORD dwCRC = GetCaseCRC32(rfad.strFilename.c_str(),rfad.strFilename.size());
+					uint32_t dwCRC = GetCaseCRC32(rfad.strFilename.c_str(),rfad.strFilename.size());
 
 					aei.iAttachIndex = i;
 					aei.dwEffectInstanceIndex = rem.GetEmptyIndex();
 
-					aei.pFlyTrace = NULL;
+					aei.pFlyTrace = nullptr;
 					if (rfad.bHasTail)
 					{
 						aei.pFlyTrace = CFlyTrace::New();
@@ -509,7 +509,7 @@ void CFlyingInstance::ClearAttachInstance()
 
 		i->iAttachIndex=0;
 		i->dwEffectInstanceIndex=0;
-		i->pFlyTrace=NULL;
+		i->pFlyTrace=nullptr;
 	}
 	m_vecAttachEffectInstance.clear();
 }
@@ -531,7 +531,7 @@ void CFlyingInstance::__Bomb()
 	if (!m_pData->m_dwBombEffectID)
 		return;
 
-	DWORD dwEmptyIndex = rkEftMgr.GetEmptyIndex();
+	uint32_t dwEmptyIndex = rkEftMgr.GetEmptyIndex();
 	rkEftMgr.CreateEffectInstance(dwEmptyIndex,m_pData->m_dwBombEffectID);
 
 	D3DXMATRIX m;

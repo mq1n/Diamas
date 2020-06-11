@@ -29,7 +29,7 @@ void CGraphicColorInstance::SetColorReference(const CGraphicColor & c_rSrcColor)
 	m_curColor = c_rSrcColor;
 }
 
-void CGraphicColorInstance::BlendColorReference(DWORD blendTime, const CGraphicColor& c_rDstColor)
+void CGraphicColorInstance::BlendColorReference(uint32_t blendTime, const CGraphicColor& c_rDstColor)
 {
 	m_baseTime = GetCurrentTime();
 	m_blendTime = blendTime;
@@ -40,8 +40,8 @@ void CGraphicColorInstance::BlendColorReference(DWORD blendTime, const CGraphicC
 
 void CGraphicColorInstance::Update()
 {
-	DWORD curTime = GetCurrentTime();
-	DWORD elapsedTime = curTime - m_baseTime;
+	uint32_t curTime = GetCurrentTime();
+	uint32_t elapsedTime = curTime - m_baseTime;
 
 	if (elapsedTime < m_blendTime)
 	{
@@ -53,7 +53,7 @@ void CGraphicColorInstance::Update()
 	}
 }
 
-DWORD CGraphicColorInstance::GetCurrentTime()
+uint32_t CGraphicColorInstance::GetCurrentTime()
 {
 	return CTimer::Instance().GetCurrentMillisecond();
 }

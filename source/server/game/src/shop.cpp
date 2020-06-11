@@ -20,7 +20,7 @@
 
 /* ------------------------------------------------------------------------------------ */
 CShop::CShop()
-	: m_dwVnum(0), m_dwNPCVnum(0), m_pkPC(NULL)
+	: m_dwVnum(0), m_dwNPCVnum(0), m_pkPC(nullptr)
 {
 	m_pGrid = M2_NEW CGrid(5, 9);
 }
@@ -42,7 +42,7 @@ CShop::~CShop()
 	while (it != m_map_guest.end())
 	{
 		LPCHARACTER ch = it->first;
-		ch->SetShop(NULL);
+		ch->SetShop(nullptr);
 		++it;
 	}
 
@@ -54,10 +54,10 @@ void CShop::SetPCShop(LPCHARACTER ch)
 	m_pkPC = ch;
 }
 
-bool CShop::Create(DWORD dwVnum, DWORD dwNPCVnum, TShopItemTable * pTable)
+bool CShop::Create(uint32_t dwVnum, uint32_t dwNPCVnum, TShopItemTable * pTable)
 {
 	/*
-	   if (NULL == CMobManager::instance().Get(dwNPCVnum))
+	   if (nullptr == CMobManager::instance().Get(dwNPCVnum))
 	   {
 	   sys_err("No such a npc by vnum %d", dwNPCVnum);
 	   return false;
@@ -68,7 +68,7 @@ bool CShop::Create(DWORD dwVnum, DWORD dwNPCVnum, TShopItemTable * pTable)
 	m_dwVnum = dwVnum;
 	m_dwNPCVnum = dwNPCVnum;
 
-	BYTE bItemCount;
+	uint8_t bItemCount;
 
 	for (bItemCount = 0; bItemCount < SHOP_HOST_ITEM_MAX_NUM; ++bItemCount)
 		if (0 == (pTable + bItemCount)->vnum)
@@ -78,7 +78,7 @@ bool CShop::Create(DWORD dwVnum, DWORD dwNPCVnum, TShopItemTable * pTable)
 	return true;
 }
 
-void CShop::SetShopItems(TShopItemTable * pTable, BYTE bItemCount)
+void CShop::SetShopItems(TShopItemTable * pTable, uint8_t bItemCount)
 {
 	if (bItemCount > SHOP_HOST_ITEM_MAX_NUM)
 		return;
@@ -88,9 +88,9 @@ void CShop::SetShopItems(TShopItemTable * pTable, BYTE bItemCount)
 	m_itemVector.resize(SHOP_HOST_ITEM_MAX_NUM);
 	memset(&m_itemVector[0], 0, sizeof(SHOP_ITEM) * m_itemVector.size());
 
-	for (int i = 0; i < bItemCount; ++i)
+	for (int32_t i = 0; i < bItemCount; ++i)
 	{
-		LPITEM pkItem = NULL;
+		LPITEM pkItem = nullptr;
 		const TItemTable * item_table;
 
 		if (m_pkPC)
@@ -119,7 +119,7 @@ void CShop::SetShopItems(TShopItemTable * pTable, BYTE bItemCount)
 			continue;
 		}
 
-		int iPos;
+		int32_t iPos;
 
 		if (IsPCShop())
 		{
@@ -179,14 +179,14 @@ void CShop::SetShopItems(TShopItemTable * pTable, BYTE bItemCount)
 		}
 
 		char name[36];
-		snprintf(name, sizeof(name), "%-20s(#%-5d) (x %d)", item_table->szName, (int) item.vnum, item.count);
+		snprintf(name, sizeof(name), "%-20s(#%-5d) (x %d)", item_table->szName, (int32_t) item.vnum, item.count);
 
 		sys_log(0, "SHOP_ITEM: %-36s PRICE %-5d", name, item.price);
 		++pTable;
 	}
 }
 
-int CShop::Buy(LPCHARACTER ch, BYTE pos)
+int32_t CShop::Buy(LPCHARACTER ch, uint8_t pos)
 {
 	if (pos >= m_itemVector.size())
 	{
@@ -232,12 +232,12 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 		}
 	}
 
-	DWORD dwPrice = r_item.price;
+	uint32_t dwPrice = r_item.price;
 
 	//if (it->second)	// if other empire, price is triple
 	//	dwPrice *= 3;
 
-	if (ch->GetGold() < (int) dwPrice)
+	if (ch->GetGold() < (int32_t) dwPrice)
 	{
 		sys_log(1, "Shop::Buy : Not enough money : %s has %d, price %d", ch->GetName(), ch->GetGold(), dwPrice);
 		return SHOP_SUBHEADER_GC_NOT_ENOUGH_MONEY;
@@ -267,7 +267,7 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 	}
 #endif
 
-	int iEmptyPos;
+	int32_t iEmptyPos;
 	if (item->IsDragonSoul())
 	{
 		iEmptyPos = ch->GetEmptyDragonSoulInventory(item);
@@ -295,8 +295,8 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 	ch->PointChange(POINT_GOLD, -dwPrice, false);
 
 	//세금 계산
-	DWORD dwTax = 0;
-	int iVal = 0;
+	uint32_t dwTax = 0;
+	int32_t iVal = 0;
 
 	{
 		iVal = quest::CQuestManager::instance().GetEventFlag("personal_shop");
@@ -346,7 +346,7 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 			LogManager::instance().ItemLog(m_pkPC, item, "SHOP_SELL", buf);
 		}
 
-		r_item.pkItem = NULL;
+		r_item.pkItem = nullptr;
 		BroadcastUpdateItem(pos);
 
 		m_pkPC->PointChange(POINT_GOLD, dwPrice, false);
@@ -379,7 +379,7 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
     return (SHOP_SUBHEADER_GC_OK);
 }
 
-bool CShop::AddGuest(LPCHARACTER ch, DWORD owner_vid, bool bOtherEmpire)
+bool CShop::AddGuest(LPCHARACTER ch, uint32_t owner_vid, bool bOtherEmpire)
 {
 	if (!ch)
 		return false;
@@ -404,7 +404,7 @@ bool CShop::AddGuest(LPCHARACTER ch, DWORD owner_vid, bool bOtherEmpire)
 	memset(&pack2, 0, sizeof(pack2));
 	pack2.owner_vid = owner_vid;
 
-	for (DWORD i = 0; i < m_itemVector.size() && i < SHOP_HOST_ITEM_MAX_NUM; ++i)
+	for (uint32_t i = 0; i < m_itemVector.size() && i < SHOP_HOST_ITEM_MAX_NUM; ++i)
 	{
 		const SHOP_ITEM & item = m_itemVector[i];
 
@@ -460,7 +460,7 @@ void CShop::RemoveGuest(LPCHARACTER ch)
 		return;
 
 	m_map_guest.erase(ch);
-	ch->SetShop(NULL);
+	ch->SetShop(nullptr);
 
 	TPacketGCShop pack;
 
@@ -471,7 +471,7 @@ void CShop::RemoveGuest(LPCHARACTER ch)
 	ch->GetDesc()->Packet(&pack, sizeof(pack));
 }
 
-void CShop::Broadcast(const void * data, int bytes)
+void CShop::Broadcast(const void * data, int32_t bytes)
 {
 	sys_log(1, "Shop::Broadcast %p %d", data, bytes);
 
@@ -490,7 +490,7 @@ void CShop::Broadcast(const void * data, int bytes)
 	}
 }
 
-void CShop::BroadcastUpdateItem(BYTE pos)
+void CShop::BroadcastUpdateItem(uint8_t pos)
 {
 	TPacketGCShop pack;
 	TPacketGCShopUpdateItem pack2;
@@ -529,11 +529,11 @@ void CShop::BroadcastUpdateItem(BYTE pos)
 	Broadcast(buf.read_peek(), buf.size());
 }
 
-int CShop::GetNumberByVnum(DWORD dwVnum)
+int32_t CShop::GetNumberByVnum(uint32_t dwVnum)
 {
-	int itemNumber = 0;
+	int32_t itemNumber = 0;
 
-	for (DWORD i = 0; i < m_itemVector.size() && i < SHOP_HOST_ITEM_MAX_NUM; ++i)
+	for (uint32_t i = 0; i < m_itemVector.size() && i < SHOP_HOST_ITEM_MAX_NUM; ++i)
 	{
 		const SHOP_ITEM & item = m_itemVector[i];
 
@@ -546,13 +546,13 @@ int CShop::GetNumberByVnum(DWORD dwVnum)
 	return itemNumber;
 }
 
-bool CShop::IsSellingItem(DWORD itemID)
+bool CShop::IsSellingItem(uint32_t itemID)
 {
 	bool isSelling = false;
 
-	for (DWORD i = 0; i < m_itemVector.size() && i < SHOP_HOST_ITEM_MAX_NUM; ++i)
+	for (uint32_t i = 0; i < m_itemVector.size() && i < SHOP_HOST_ITEM_MAX_NUM; ++i)
 	{
-		if ((unsigned int)(m_itemVector[i].itemid) == itemID)
+		if ((uint32_t)(m_itemVector[i].itemid) == itemID)
 		{
 			isSelling = true;
 			break;

@@ -12,11 +12,11 @@ CBanwordManager::~CBanwordManager()
 {
 }
 
-bool CBanwordManager::Initialize(TBanwordTable * p, WORD wSize)
+bool CBanwordManager::Initialize(TBanwordTable * p, uint16_t wSize)
 {
 	m_hashmap_words.clear();
 
-	for (WORD i = 0; i < wSize; ++i, ++p)
+	for (uint16_t i = 0; i < wSize; ++i, ++p)
 		m_hashmap_words[p->szWord] = true;
 
 	char szBuf[256];

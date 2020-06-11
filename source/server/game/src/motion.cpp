@@ -51,7 +51,7 @@ static float MOB_GetNormalAttackDuration(TMobTable* mobTable)
 		char mode[1024];
 		char type[1024];
 		char msaName[1024];
-		int percent;
+		int32_t percent;
 
 		sscanf(line, "%s %s %s %d", mode, type, msaName, &percent);
 		if (strcmp(mode, "GENERAL") == 0 && strncmp(type, "NORMAL_ATTACK", 13) == 0)
@@ -78,9 +78,9 @@ static const char* GetMotionFileName(TMobTable* mobTable, EPublicMotion motion)
 	FILE * fp = fopen(buf, "rt");
 	char * v[4];
 
-	if (fp != NULL)
+	if (fp != nullptr)
 	{
-		const char* field = NULL;
+		const char* field = nullptr;
 
 		switch (motion)
 		{
@@ -96,17 +96,17 @@ static const char* GetMotionFileName(TMobTable* mobTable, EPublicMotion motion)
 			default:
 				fclose(fp);
 				sys_err("Motion: no process for this motion(%d) vnum(%d)", motion, mobTable->dwVnum);
-				return NULL;
+				return nullptr;
 		}
 
 		while (fgets(buf, 1024, fp))
 		{
 			v[0] = strtok(buf,  " \t\r\n");
-			v[1] = strtok(NULL, " \t\r\n");
-			v[2] = strtok(NULL, " \t\r\n");
-			v[3] = strtok(NULL, " \t\r\n");
+			v[1] = strtok(nullptr, " \t\r\n");
+			v[2] = strtok(nullptr, " \t\r\n");
+			v[3] = strtok(nullptr, " \t\r\n");
 
-			if (NULL != v[0] && NULL != v[1] && NULL != v[2] && NULL != v[3] && !strcasecmp(v[1], field))
+			if (nullptr != v[0] && nullptr != v[1] && nullptr != v[2] && nullptr != v[3] && !strcasecmp(v[1], field))
 			{
 				fclose(fp);
 
@@ -127,14 +127,14 @@ static const char* GetMotionFileName(TMobTable* mobTable, EPublicMotion motion)
 		sys_err("Motion: %s have not motlist.txt vnum(%d) folder(%s)", folder, mobTable->dwVnum, mobTable->szFolder);
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 static void LoadMotion(CMotionSet* pMotionSet, TMobTable* mob_table, EPublicMotion motion)
 {
 	const char* cpFileName = GetMotionFileName(mob_table, motion);
 
-	if (cpFileName == NULL)
+	if (cpFileName == nullptr)
 	{
 		return;
 	}
@@ -158,7 +158,7 @@ static void LoadMotion(CMotionSet* pMotionSet, TMobTable* mob_table, EPublicMoti
 
 static void LoadSkillMotion(CMotionSet* pMotionSet, CMob* pMob, EPublicMotion motion)
 {
-	int idx = 0;
+	int32_t idx = 0;
 
 	switch (motion)
 	{
@@ -177,7 +177,7 @@ static void LoadSkillMotion(CMotionSet* pMotionSet, CMob* pMob, EPublicMotion mo
 	if (mob_table->Skills[idx].dwVnum == 0) return;
 
 	const char* cpFileName = GetMotionFileName(mob_table, motion);
-	if (cpFileName == NULL) return;
+	if (cpFileName == nullptr) return;
 
 	CMotion* pMotion = M2_NEW CMotion;
 
@@ -208,36 +208,36 @@ CMotionManager::~CMotionManager()
 	}
 }
 
-const CMotionSet * CMotionManager::GetMotionSet(DWORD dwVnum)
+const CMotionSet * CMotionManager::GetMotionSet(uint32_t dwVnum)
 {
 	iterator it = m_map_pkMotionSet.find(dwVnum);
 
 	if (m_map_pkMotionSet.end() == it)
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
 
-const CMotion * CMotionManager::GetMotion(DWORD dwVnum, DWORD dwKey)
+const CMotion * CMotionManager::GetMotion(uint32_t dwVnum, uint32_t dwKey)
 {
 	const CMotionSet * pkMotionSet = GetMotionSet(dwVnum);
 
 	if (!pkMotionSet)
-		return NULL;
+		return nullptr;
 
 	return pkMotionSet->GetMotion(dwKey);
 }
 
-float CMotionManager::GetMotionDuration(DWORD dwVnum, DWORD dwKey)
+float CMotionManager::GetMotionDuration(uint32_t dwVnum, uint32_t dwKey)
 {
 	const CMotion * pkMotion = GetMotion(dwVnum, dwKey);
 	return pkMotion ? pkMotion->GetDuration() : 0.0f;
 }
 
 // POLYMORPH_BUG_FIX
-float	CMotionManager::GetNormalAttackDuration(DWORD dwVnum)
+float	CMotionManager::GetNormalAttackDuration(uint32_t dwVnum)
 {
-	std::map<DWORD, float>::iterator f = m_map_normalAttackDuration.find(dwVnum);
+	std::map<uint32_t, float>::iterator f = m_map_normalAttackDuration.find(dwVnum);
 	if (m_map_normalAttackDuration.end() == f)
 		return 0.0f;
 	else
@@ -278,7 +278,7 @@ bool CMotionManager::Build()
 #endif
 	};
 	
-	for (int i = 0; i < MAIN_RACE_MAX_NUM; ++i)
+	for (int32_t i = 0; i < MAIN_RACE_MAX_NUM; ++i)
 	{
 		CMotionSet * pkMotionSet = M2_NEW CMotionSet;
 		m_map_pkMotionSet.insert(TContainer::value_type(i, pkMotionSet));
@@ -357,7 +357,7 @@ bool CMotionManager::Build()
 			// POLYMORPH_BUG_FIX
 			float normalAttackDuration = MOB_GetNormalAttackDuration(t);
 			sys_log(0, "mob_normal_attack_duration:%d:%s:%.2f", t->dwVnum, t->szFolder, normalAttackDuration);
-			m_map_normalAttackDuration.insert(std::map<DWORD, float>::value_type(t->dwVnum, normalAttackDuration));
+			m_map_normalAttackDuration.insert(std::map<uint32_t, float>::value_type(t->dwVnum, normalAttackDuration));
 			// END_OF_POLYMORPH_BUG_FIX
 		}
 	}
@@ -377,22 +377,22 @@ CMotionSet::~CMotionSet()
 	}
 }
 
-const CMotion * CMotionSet::GetMotion(DWORD dwKey) const
+const CMotion * CMotionSet::GetMotion(uint32_t dwKey) const
 {
 	const_iterator it = m_map_pkMotion.find(dwKey);
 
 	if (it == m_map_pkMotion.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
 
-void CMotionSet::Insert(DWORD dwKey, CMotion * pkMotion)
+void CMotionSet::Insert(uint32_t dwKey, CMotion * pkMotion)
 {
 	m_map_pkMotion.insert(TContainer::value_type(dwKey, pkMotion));
 }
 
-bool CMotionSet::Load(const char * szFileName, int mode, int motion)
+bool CMotionSet::Load(const char * szFileName, int32_t mode, int32_t motion)
 {
 	CMotion * pkMotion = M2_NEW CMotion;
 
@@ -418,7 +418,7 @@ CMotion::~CMotion()
 {
 }
 
-bool CMotion::LoadMobSkillFromFile(const char * c_pszFileName, CMob* pMob, int iSkillIndex)
+bool CMotion::LoadMobSkillFromFile(const char * c_pszFileName, CMob* pMob, int32_t iSkillIndex)
 {
 	CTextFileLoader rkTextFileLoader;
 	if (!rkTextFileLoader.Load(c_pszFileName))
@@ -439,7 +439,7 @@ bool CMotion::LoadMobSkillFromFile(const char * c_pszFileName, CMob* pMob, int i
 	//m_isAccumulation = true;
 
 	std::string strNodeName;
-	for (DWORD i = 0; i < rkTextFileLoader.GetChildNodeCount(); ++i)
+	for (uint32_t i = 0; i < rkTextFileLoader.GetChildNodeCount(); ++i)
 	{
 		//CTextFileLoader::CGotoChild GotoChild(rkTextFileLoader, i);
 		rkTextFileLoader.SetChildNode(i);
@@ -448,12 +448,12 @@ bool CMotion::LoadMobSkillFromFile(const char * c_pszFileName, CMob* pMob, int i
 
 		if (0 == strNodeName.compare("motioneventdata"))
 		{
-			DWORD dwMotionEventDataCount;
+			uint32_t dwMotionEventDataCount;
 
 			if (!rkTextFileLoader.GetTokenDoubleWord("motioneventdatacount", &dwMotionEventDataCount))
 				continue;
 
-			for (DWORD j = 0; j < dwMotionEventDataCount; ++j)
+			for (uint32_t j = 0; j < dwMotionEventDataCount; ++j)
 			{
 				if (!rkTextFileLoader.SetChildNode("event", j))
 				{
@@ -461,7 +461,7 @@ bool CMotion::LoadMobSkillFromFile(const char * c_pszFileName, CMob* pMob, int i
 					return false;
 				}
 
-				int iType;
+				int32_t iType;
 				if (!rkTextFileLoader.GetTokenInteger("motioneventtype", &iType))
 				{
 					sys_err("Motion: no motioneventtype data %s", c_pszFileName);
@@ -516,7 +516,7 @@ bool CMotion::LoadMobSkillFromFile(const char * c_pszFileName, CMob* pMob, int i
 					return false;
 				}
 
-				pMob->AddSkillSplash(iSkillIndex, 100 + DWORD(fStartingTime * 1000), -(DWORD)(v3Position.y));
+				pMob->AddSkillSplash(iSkillIndex, 100 + uint32_t(fStartingTime * 1000), -(uint32_t)(v3Position.y));
 
 				rkTextFileLoader.SetParentNode();
 			}

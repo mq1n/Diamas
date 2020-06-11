@@ -10,7 +10,7 @@ class CGuild;
 
 class CDungeon
 {
-	typedef std::unordered_map<LPPARTY, int> TPartyMap;
+	typedef std::unordered_map<LPPARTY, int32_t> TPartyMap;
 	typedef std::map<std::string, LPCHARACTER> TUniqueMobMap;
 
 	public:
@@ -41,118 +41,118 @@ class CDungeon
 
 	void	IncMonster() { m_iMonsterCount++; sys_log(0, "MonsterCount %d", m_iMonsterCount); }
 	void	DecMonster() { m_iMonsterCount--; CheckEliminated(); }
-	int	CountMonster() { return m_iMonsterCount; }	// 데이터로 리젠한 몬스터의 수
-	int	CountRealMonster();				// 실제로 맵상에 있는 몬스터
+	int32_t	CountMonster() { return m_iMonsterCount; }	// 데이터로 리젠한 몬스터의 수
+	int32_t	CountRealMonster();				// 실제로 맵상에 있는 몬스터
 
 	void	IncPartyMember(LPPARTY pParty, LPCHARACTER ch);
 	void	DecPartyMember(LPPARTY pParty, LPCHARACTER ch);
 
 	void	IncKillCount(LPCHARACTER pkKiller, LPCHARACTER pkVictim);
-	int	GetKillMobCount();
-	int	GetKillStoneCount();
+	int32_t	GetKillMobCount();
+	int32_t	GetKillStoneCount();
 	bool	IsUsePotion();
 	bool	IsUseRevive();
 	void	UsePotion(LPCHARACTER ch);
 	void	UseRevive(LPCHARACTER ch);
 
-	long	GetMapIndex() { return m_lMapIndex; }
+	int32_t	GetMapIndex() { return m_lMapIndex; }
 
-	void	Spawn(DWORD vnum, const char* pos);
-	LPCHARACTER	SpawnMob(DWORD vnum, int x, int y, int dir = 0);
-	LPCHARACTER	SpawnMob_ac_dir(DWORD vnum, int x, int y, int dir = 0);
-	LPCHARACTER	SpawnGroup(DWORD vnum, long x, long y, float radius, bool bAggressive=false, int count=1);
+	void	Spawn(uint32_t vnum, const char* pos);
+	LPCHARACTER	SpawnMob(uint32_t vnum, int32_t x, int32_t y, int32_t dir = 0);
+	LPCHARACTER	SpawnMob_ac_dir(uint32_t vnum, int32_t x, int32_t y, int32_t dir = 0);
+	LPCHARACTER	SpawnGroup(uint32_t vnum, int32_t x, int32_t y, float radius, bool bAggressive=false, int32_t count=1);
 
-	void	SpawnNameMob(DWORD vnum, int x, int y, const char* name);
-	void	SpawnGotoMob(long lFromX, long lFromY, long lToX, long lToY);
+	void	SpawnNameMob(uint32_t vnum, int32_t x, int32_t y, const char* name);
+	void	SpawnGotoMob(int32_t lFromX, int32_t lFromY, int32_t lToX, int32_t lToY);
 
 	void	SpawnRegen(const char* filename, bool bOnce = true);
 	void	AddRegen(LPREGEN regen);
 	void	ClearRegen();
 	bool	IsValidRegen(LPREGEN regen, size_t regen_id);
 
-	void	SetUnique(const char* key, DWORD vid);
-	void	SpawnMoveUnique(const char* key, DWORD vnum, const char* pos_from, const char* pos_to);
-	void	SpawnMoveGroup(DWORD vnum, const char* pos_from, const char* pos_to, int count=1);
-	void	SpawnUnique(const char* key, DWORD vnum, const char* pos);
+	void	SetUnique(const char* key, uint32_t vid);
+	void	SpawnMoveUnique(const char* key, uint32_t vnum, const char* pos_from, const char* pos_to);
+	void	SpawnMoveGroup(uint32_t vnum, const char* pos_from, const char* pos_to, int32_t count=1);
+	void	SpawnUnique(const char* key, uint32_t vnum, const char* pos);
 	void	SpawnStoneDoor(const char* key, const char* pos);
 	void	SpawnWoodenDoor(const char* key, const char* pos);
 	void	KillUnique(const std::string& key);
 	void	PurgeUnique(const std::string& key);
 	bool	IsUniqueDead(const std::string& key);
 	float	GetUniqueHpPerc(const std::string& key);
-	DWORD	GetUniqueVid(const std::string& key);
+	uint32_t	GetUniqueVid(const std::string& key);
 
 	void	DeadCharacter(LPCHARACTER ch);
 
-	void	UniqueSetMaxHP(const std::string& key, int iMaxHP);
-	void	UniqueSetHP(const std::string& key, int iHP);
-	void	UniqueSetDefGrade(const std::string& key, int iGrade);
+	void	UniqueSetMaxHP(const std::string& key, int32_t iMaxHP);
+	void	UniqueSetHP(const std::string& key, int32_t iHP);
+	void	UniqueSetDefGrade(const std::string& key, int32_t iGrade);
 
-	void	SendDestPositionToParty(LPPARTY pParty, long x, long y);
+	void	SendDestPositionToParty(LPPARTY pParty, int32_t x, int32_t y);
 
 	void	CheckEliminated();
 
-	void	JumpAll(long lFromMapIndex, int x, int y);
-	void	WarpAll(long lFromMapIndex, int x, int y);
-	void	JumpParty(LPPARTY pParty, long lFromMapIndex, int x, int y);
+	void	JumpAll(int32_t lFromMapIndex, int32_t x, int32_t y);
+	void	WarpAll(int32_t lFromMapIndex, int32_t x, int32_t y);
+	void	JumpParty(LPPARTY pParty, int32_t lFromMapIndex, int32_t x, int32_t y);
 #ifdef ENABLE_D_NJGUILD
-	void	JumpGuild(CGuild* pGuild, long lFromMapIndex, int x, int y);
+	void	JumpGuild(CGuild* pGuild, int32_t lFromMapIndex, int32_t x, int32_t y);
 #endif
 
 	void	ExitAll();
 	void	ExitAllToStartPosition();
 	void	JumpToEliminateLocation();
-	void	SetExitAllAtEliminate(long time);
-	void	SetWarpAtEliminate(long time, long lMapIndex, int x, int y, const char* regen_file);
+	void	SetExitAllAtEliminate(int32_t time);
+	void	SetWarpAtEliminate(int32_t time, int32_t lMapIndex, int32_t x, int32_t y, const char* regen_file);
 
-	int	GetFlag(std::string name);
-	void	SetFlag(std::string name, int value);
-	void	SetWarpLocation (long map_index, int x, int y);
+	int32_t	GetFlag(std::string name);
+	void	SetFlag(std::string name, int32_t value);
+	void	SetWarpLocation (int32_t map_index, int32_t x, int32_t y);
 
 	// item group은 item_vnum과 item_count로 구성.
-	typedef std::vector <std::pair <DWORD, int> > ItemGroup;
+	typedef std::vector <std::pair <uint32_t, int32_t> > ItemGroup;
 	void	CreateItemGroup (std::string& group_name, ItemGroup& item_group);
 	const ItemGroup* GetItemGroup (std::string& group_name);
-	//void	InsertItemGroup (std::string& group_name, DWORD item_vnum);
+	//void	InsertItemGroup (std::string& group_name, uint32_t item_vnum);
 
 	template <class Func> Func ForEachMember(Func f);
 
-	bool IsAllPCNearTo( int x, int y, int dist );
+	bool IsAllPCNearTo( int32_t x, int32_t y, int32_t dist );
 
 	protected:
-	CDungeon(IdType id, long lOriginalMapIndex, long lMapIndex);
+	CDungeon(IdType id, int32_t lOriginalMapIndex, int32_t lMapIndex);
 
 	void	Initialize();
 	void	CheckDestroy();
 
 	private:
 	IdType 		m_id; // <Factor>
-	DWORD		m_lOrigMapIndex;
-	DWORD		m_lMapIndex;
+	uint32_t		m_lOrigMapIndex;
+	uint32_t		m_lMapIndex;
 
 	CHARACTER_SET	    m_set_pkCharacter;
-	std::map<std::string, int>  m_map_Flag;
+	std::map<std::string, int32_t>  m_map_Flag;
 	typedef std::map<std::string, ItemGroup> ItemGroupMap;
 	ItemGroupMap m_map_ItemGroup;
 	TPartyMap	m_map_pkParty;
 	TAreaMap&	m_map_Area;
 	TUniqueMobMap	m_map_UniqueMob;
 
-	int		m_iMobKill;
-	int		m_iStoneKill;
+	int32_t		m_iMobKill;
+	int32_t		m_iStoneKill;
 	bool		m_bUsePotion;
 	bool		m_bUseRevive;
 
-	int		m_iMonsterCount;
+	int32_t		m_iMonsterCount;
 
 	bool		m_bExitAllAtEliminate;
 	bool		m_bWarpAtEliminate;
 
 	// 적 전멸시 워프하는 위치
-	int		m_iWarpDelay;
-	long		m_lWarpMapIndex;
-	long		m_lWarpX;
-	long		m_lWarpY;
+	int32_t		m_iWarpDelay;
+	int32_t		m_lWarpMapIndex;
+	int32_t		m_lWarpX;
+	int32_t		m_lWarpY;
 	std::string	m_stRegenFile;
 
 	std::vector<LPREGEN> m_regen;
@@ -184,22 +184,22 @@ class CDungeon
 class CDungeonManager : public singleton<CDungeonManager>
 {
 	typedef std::map<CDungeon::IdType, LPDUNGEON> TDungeonMap;
-	typedef std::map<long, LPDUNGEON> TMapDungeon;
+	typedef std::map<int32_t, LPDUNGEON> TMapDungeon;
 
 	public:
 	CDungeonManager();
 	virtual ~CDungeonManager();
 
-	LPDUNGEON	Create(long lOriginalMapIndex);
+	LPDUNGEON	Create(int32_t lOriginalMapIndex);
 	void		Destroy(CDungeon::IdType dungeon_id);
 	LPDUNGEON	Find(CDungeon::IdType dungeon_id);
-	LPDUNGEON	FindByMapIndex(long lMapIndex);
+	LPDUNGEON	FindByMapIndex(int32_t lMapIndex);
 
 	private:
 	TDungeonMap	m_map_pkDungeon;
 	TMapDungeon m_map_pkMapDungeon;
 
-	// <Factor> Introduced unsigned 32-bit dungeon identifier
+	// <Factor> Introduced uint32_t 32-bit dungeon identifier
 	CDungeon::IdType next_id_;
 };
 

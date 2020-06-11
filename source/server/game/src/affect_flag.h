@@ -19,33 +19,33 @@
 
 struct TAffectFlag
 {
-	DWORD bits[2];
+	uint32_t bits[2];
 
 	inline TAffectFlag() { bits[0] = 0; bits[1] = 0; }
-	inline TAffectFlag(DWORD v1, DWORD v2 = 0) {bits[0] = v1; bits[1] = v2;}
+	inline TAffectFlag(uint32_t v1, uint32_t v2 = 0) {bits[0] = v1; bits[1] = v2;}
 
-	inline bool IsSet(int flag) const
+	inline bool IsSet(int32_t flag) const
 	{ 
 		if (AFF_BITS_MAX <= flag || 0 >= flag)
 			return false;
 
-		return IS_SET(bits[(flag - 1) >> 5], (((DWORD)1) << ((flag - 1) & 31))); 
+		return IS_SET(bits[(flag - 1) >> 5], (((uint32_t)1) << ((flag - 1) & 31))); 
 	}
 
-	inline void Set(int flag)
+	inline void Set(int32_t flag)
 	{
 		if (AFF_BITS_MAX <= flag || 0 >= flag)
 			return;
 
-		SET_BIT(bits[(flag-1)>>5], (((DWORD)1)<<((flag-1)&31))); 
+		SET_BIT(bits[(flag-1)>>5], (((uint32_t)1)<<((flag-1)&31))); 
 	}
 
-	inline void Reset(int flag)
+	inline void Reset(int32_t flag)
 	{
 		if (AFF_BITS_MAX <= flag || 0 >= flag)
 			return;
 
-		REMOVE_BIT(bits[(flag-1)>>5], (((DWORD)1)<<((flag-1)&31)));
+		REMOVE_BIT(bits[(flag-1)>>5], (((uint32_t)1)<<((flag-1)&31)));
 	}
 
 	inline TAffectFlag& operator = (const TAffectFlag& rhs)

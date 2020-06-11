@@ -17,7 +17,7 @@ void CConfig::Destroy()
 
 void CConfig::NextLine(FILE *fp)
 {
-	int c;
+	int32_t c;
 
 	while ((c = fgetc(fp)) != EOF)
 	{
@@ -28,10 +28,10 @@ void CConfig::NextLine(FILE *fp)
 
 bool CConfig::GetWord(FILE *fp, char *tar)
 {
-	int i = 0;
-	int c;
+	int32_t i = 0;
+	int32_t c;
 
-	int semicolon_mode = 0;
+	int32_t semicolon_mode = 0;
 
 	while ((c = fgetc(fp)) != EOF)
 	{
@@ -82,8 +82,8 @@ bool CConfig::GetWord(FILE *fp, char *tar)
 
 bool CConfig::GetLine(FILE* fp, char*dest)
 {
-	int c;
-	int i = 0;
+	int32_t c;
+	int32_t i = 0;
 	while ((c = fgetc(fp)) != EOF)
 	{
 		if (c == '\n')
@@ -101,10 +101,10 @@ bool CConfig::LoadFile(const char* filename)
 
 	FILE *	fp = fopen(filename, "rb");
 
-	if (fp == NULL)
+	if (fp == nullptr)
 		return false;
 
-	int mode = 0;
+	int32_t mode = 0;
 
 	while (GetWord(fp, szTmp))
 	{
@@ -154,12 +154,12 @@ std::string * CConfig::Search(const char* key)
 	auto i = m_valueMap.find(key); 
 
 	if (i == m_valueMap.end())
-		return NULL;
+		return nullptr;
 	else
 		return (&i->second);
 }
 
-bool CConfig::GetParam(const char*key, int index, DWORD *Param)
+bool CConfig::GetParam(const char*key, int32_t index, uint32_t *Param)
 {
 	std::string * pstStr = Search(key);
 	if (!pstStr)
@@ -188,7 +188,7 @@ const char * CConfig::Get(const char* key)
 }
 
 
-bool CConfig::GetValue(const char * key, int* dest)
+bool CConfig::GetValue(const char * key, int32_t* dest)
 {
 	if (!Search(key))
 		return false;
@@ -206,7 +206,7 @@ bool CConfig::GetValue(const char * key, float *dest)
 	return true;
 }
 
-bool CConfig::GetValue(const char * key, DWORD *dest)
+bool CConfig::GetValue(const char * key, uint32_t *dest)
 { 
 	if (!Search(key))
 		return false;
@@ -215,12 +215,12 @@ bool CConfig::GetValue(const char * key, DWORD *dest)
 	return true;
 }
 
-bool CConfig::GetValue(const char * key, BYTE *dest)
+bool CConfig::GetValue(const char * key, uint8_t *dest)
 { 
 	if (!Search(key))
 		return false;
 
-	*dest = *(BYTE *) Get(key);
+	*dest = *(uint8_t *) Get(key);
 	return true;
 }
 
@@ -237,7 +237,7 @@ bool CConfig::GetValue(const char * key, char *dest, size_t destSize)
 	return true;
 }
 
-bool CConfig::GetTwoValue(const char* key, DWORD * dest1, DWORD *dest2)
+bool CConfig::GetTwoValue(const char* key, uint32_t * dest1, uint32_t *dest2)
 {
 	if (!GetParam(key, 0, dest1))
 		return false;

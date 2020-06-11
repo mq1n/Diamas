@@ -30,7 +30,7 @@ void CScreenFilter::SetEnable(BOOL /*bFlag*/)
 	m_bEnable = FALSE;
 }
 
-void CScreenFilter::SetBlendType(BYTE bySrcType, BYTE byDestType)
+void CScreenFilter::SetBlendType(uint8_t bySrcType, uint8_t byDestType)
 {
 	m_bySrcType = bySrcType;
 	m_byDestType = byDestType;

@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 
-bool PyTuple_GetThingInstance(PyObject* poArgs, int pos, CGraphicThingInstance** ppRetThingInstance)
+bool PyTuple_GetThingInstance(PyObject* poArgs, int32_t pos, CGraphicThingInstance** ppRetThingInstance)
 {
-	int handle;
+	int32_t handle;
 	if (!PyTuple_GetInteger(poArgs, pos, &handle))
 		return false;
 
@@ -157,7 +157,7 @@ void initgrpThing()
 		{ "SetFileName",			grpThingSetFileName,			METH_VARARGS },		
 		{ "SetRotation",			grpSetThingRotation,			METH_VARARGS },
 		{ "SetScale",				grpSetThingScale,				METH_VARARGS },
-		{ NULL,						NULL,							NULL		 },
+		{ nullptr,						nullptr,							0		 },
 	};	
 
 	Py_InitModule("grpThing", s_methods);

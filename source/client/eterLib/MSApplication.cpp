@@ -25,7 +25,7 @@ bool CMSApplication::IsMessage()
 {
 	MSG msg;
 
-	if (!PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+	if (!PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
 		return false;
 
 	return true;
@@ -35,7 +35,7 @@ bool CMSApplication::MessageProcess()
 {
 	MSG msg;
 
-	if (!GetMessage(&msg, NULL, 0, 0))
+	if (!GetMessage(&msg, nullptr, 0, 0))
 		return false;
 
 	TranslateMessage(&msg);
@@ -43,7 +43,7 @@ bool CMSApplication::MessageProcess()
 	return true;
 }
 
-LRESULT CMSApplication::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CMSApplication::WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uiMsg)
 	{

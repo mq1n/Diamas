@@ -13,7 +13,7 @@
 
 bool COXEventManager::Initialize()
 {
-	m_timedEvent = NULL;
+	m_timedEvent = nullptr;
 	m_map_char.clear();
 	m_map_attender.clear();
 	m_vec_quiz.clear();
@@ -36,7 +36,7 @@ void COXEventManager::Destroy()
 
 OXEventStatus COXEventManager::GetStatus()
 {
-	BYTE ret = quest::CQuestManager::instance().GetEventFlag("oxevent_status");
+	uint8_t ret = quest::CQuestManager::instance().GetEventFlag("oxevent_status");
 
 	switch (ret)
 	{
@@ -61,7 +61,7 @@ OXEventStatus COXEventManager::GetStatus()
 
 void COXEventManager::SetStatus(OXEventStatus status)
 {
-	BYTE val = 0;
+	uint8_t val = 0;
 	
 	switch (status)
 	{
@@ -115,7 +115,7 @@ bool COXEventManager::Enter(LPCHARACTER pkChar)
 
 bool COXEventManager::EnterAttender(LPCHARACTER pkChar)
 {
-	DWORD pid = pkChar->GetPlayerID();
+	uint32_t pid = pkChar->GetPlayerID();
 
 	m_map_char.insert(std::make_pair(pid, pid));
 	m_map_attender.insert(std::make_pair(pid, pid));
@@ -125,14 +125,14 @@ bool COXEventManager::EnterAttender(LPCHARACTER pkChar)
 
 bool COXEventManager::EnterAudience(LPCHARACTER pkChar)
 {
-	DWORD pid = pkChar->GetPlayerID();
+	uint32_t pid = pkChar->GetPlayerID();
 
 	m_map_char.insert(std::make_pair(pid, pid));
 
 	return true;
 }
 
-bool COXEventManager::AddQuiz(unsigned char level, const char* pszQuestion, bool answer)
+bool COXEventManager::AddQuiz(uint8_t level, const char* pszQuestion, bool answer)
 {
 	if (m_vec_quiz.size() < (size_t) level + 1)
 		m_vec_quiz.resize(level + 1);
@@ -149,7 +149,7 @@ bool COXEventManager::AddQuiz(unsigned char level, const char* pszQuestion, bool
 
 bool COXEventManager::ShowQuizList(LPCHARACTER pkChar)
 {
-	int c = 0;
+	int32_t c = 0;
 	
 	for (size_t i = 0; i < m_vec_quiz.size(); ++i)
 	{
@@ -165,7 +165,7 @@ bool COXEventManager::ShowQuizList(LPCHARACTER pkChar)
 
 void COXEventManager::ClearQuiz()
 {
-	for (unsigned int i = 0; i < m_vec_quiz.size(); ++i)
+	for (uint32_t i = 0; i < m_vec_quiz.size(); ++i)
 	{
 		m_vec_quiz[i].clear();
 	}
@@ -185,10 +185,10 @@ EVENTINFO(OXEventInfoData)
 
 EVENTFUNC(oxevent_timer)
 {
-	static BYTE flag = 0;
+	static uint8_t flag = 0;
 	OXEventInfoData* info = dynamic_cast<OXEventInfoData*>(event->info);
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "oxevent_timer> <Factor> Null pointer" );
 		return 0;
@@ -230,7 +230,7 @@ EVENTFUNC(oxevent_timer)
 	return 0;
 }
 
-bool COXEventManager::Quiz(unsigned char level, int timelimit)
+bool COXEventManager::Quiz(uint8_t level, int32_t timelimit)
 {
 	if (m_vec_quiz.size() == 0) return false;
 	if (level > m_vec_quiz.size()) level = m_vec_quiz.size() - 1;
@@ -238,13 +238,13 @@ bool COXEventManager::Quiz(unsigned char level, int timelimit)
 
 	if (timelimit < 0) timelimit = 30;
 
-	int idx = number(0, m_vec_quiz[level].size()-1);
+	int32_t idx = number(0, m_vec_quiz[level].size()-1);
 
 	SendNoticeMap(LC_TEXT("문제 입니다."), OXEVENT_MAP_INDEX, true);
 	SendNoticeMap(m_vec_quiz[level][idx].Quiz, OXEVENT_MAP_INDEX, true);
 	SendNoticeMap(LC_TEXT("맞으면 O, 틀리면 X로 이동해주세요"), OXEVENT_MAP_INDEX, true);
 
-	if (m_timedEvent != NULL) {
+	if (m_timedEvent != nullptr) {
 		event_cancel(&m_timedEvent);
 	}
 
@@ -270,7 +270,7 @@ bool COXEventManager::CheckAnswer(bool answer)
 	
 	m_map_miss.clear();
 
-	int rect[4];
+	int32_t rect[4];
 	if (answer != true)
 	{
 		rect[0] = 892600;
@@ -286,12 +286,12 @@ bool COXEventManager::CheckAnswer(bool answer)
 		rect[3] = 26400;
 	}
 	
-	LPCHARACTER pkChar = NULL;
+	LPCHARACTER pkChar = nullptr;
 	PIXEL_POSITION pos;
 	for (; iter != m_map_attender.end();)
 	{
 		pkChar = CHARACTER_MANAGER::instance().FindByPID(iter->second);
-		if (pkChar != NULL)
+		if (pkChar != nullptr)
 		{
 			pos = pkChar->GetXYZ();
 
@@ -308,11 +308,11 @@ bool COXEventManager::CheckAnswer(bool answer)
 				pkChar->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("정답입니다!"));
 				// pkChar->CreateFly(number(FLY_FIREWORK1, FLY_FIREWORK6), pkChar);
 				char chatbuf[256];
-				int len = snprintf(chatbuf, sizeof(chatbuf), 
-						"%s %u %u", number(0, 1) == 1 ? "cheer1" : "cheer2", (DWORD)pkChar->GetVID(), 0);
+				int32_t len = snprintf(chatbuf, sizeof(chatbuf), 
+						"%s %u %u", number(0, 1) == 1 ? "cheer1" : "cheer2", (uint32_t)pkChar->GetVID(), 0);
 
 				// 리턴값이 sizeof(chatbuf) 이상일 경우 truncate되었다는 뜻..
-				if (len < 0 || len >= (int) sizeof(chatbuf))
+				if (len < 0 || len >= (int32_t) sizeof(chatbuf))
 					len = sizeof(chatbuf) - 1;
 
 				// \0 문자 포함
@@ -355,13 +355,13 @@ void COXEventManager::WarpToAudience()
 	if (m_map_miss.size() <= 0) return;
 
 	auto iter = m_map_miss.begin();
-	LPCHARACTER pkChar = NULL;
+	LPCHARACTER pkChar = nullptr;
 	
 	for (; iter != m_map_miss.end(); ++iter)
 	{
 		pkChar = CHARACTER_MANAGER::instance().FindByPID(iter->second);
 
-		if (pkChar != NULL)
+		if (pkChar != nullptr)
 		{
 			switch ( number(0, 3))
 			{
@@ -379,18 +379,18 @@ void COXEventManager::WarpToAudience()
 
 bool COXEventManager::CloseEvent()
 {
-	if (m_timedEvent != NULL) {
+	if (m_timedEvent != nullptr) {
 		event_cancel(&m_timedEvent);
 	}
 
 	auto iter = m_map_char.begin();
 
-	LPCHARACTER pkChar = NULL;
+	LPCHARACTER pkChar = nullptr;
 	for (; iter != m_map_char.end(); ++iter)
 	{
 		pkChar = CHARACTER_MANAGER::instance().FindByPID(iter->second);
 
-		if (pkChar != NULL)
+		if (pkChar != nullptr)
 			pkChar->WarpSet(EMPIRE_START_X(pkChar->GetEmpire()), EMPIRE_START_Y(pkChar->GetEmpire()));
 	}
 
@@ -414,7 +414,7 @@ bool COXEventManager::LogWinner()
 	return true;
 }
 
-bool COXEventManager::GiveItemToAttender(DWORD dwItemVnum, BYTE count)
+bool COXEventManager::GiveItemToAttender(uint32_t dwItemVnum, uint8_t count)
 {
 	auto iter = m_map_attender.begin();
 

@@ -17,12 +17,12 @@
 
 std::string g_strEffectName = "d:/ymir work/effect/etc/direction/direction_land.mse";
 
-DWORD CPythonBackground::GetRenderShadowTime()
+uint32_t CPythonBackground::GetRenderShadowTime()
 {
 	return m_dwRenderShadowTime;
 }
 
-bool CPythonBackground::SetVisiblePart(int eMapOutDoorPart, bool isVisible)
+bool CPythonBackground::SetVisiblePart(int32_t eMapOutDoorPart, bool isVisible)
 {
 	if (!m_pkMap)
 		return false;
@@ -41,7 +41,7 @@ void CPythonBackground::EnableTerrainOnlyForHeight()
 	rkMap.EnableTerrainOnlyForHeight(TRUE);
 }
 
-bool CPythonBackground::SetSplatLimit(int iSplatNum)
+bool CPythonBackground::SetSplatLimit(int32_t iSplatNum)
 {
 	if (!m_pkMap)
 		return false;
@@ -74,7 +74,7 @@ void CPythonBackground::RefreshShadowLevel()
 	SetShadowLevel(CPythonSystem::Instance().GetShadowLevel());
 }
 
-bool CPythonBackground::SetShadowLevel(int eLevel)
+bool CPythonBackground::SetShadowLevel(int32_t eLevel)
 {
 	if (!m_pkMap)
 		return false;
@@ -127,7 +127,7 @@ bool CPythonBackground::SetShadowLevel(int eLevel)
 	return true;
 }
 
-void CPythonBackground::SelectViewDistanceNum(int eNum)
+void CPythonBackground::SelectViewDistanceNum(int32_t eNum)
 {
 	if (!m_pkMap)
 		return;
@@ -136,7 +136,7 @@ void CPythonBackground::SelectViewDistanceNum(int eNum)
 
 	if (!mc_pcurEnvironmentData)
 	{
-		TraceError("CPythonBackground::SelectViewDistanceNum(int eNum=%d) mc_pcurEnvironmentData is NULL", eNum);
+		TraceError("CPythonBackground::SelectViewDistanceNum(int32_t eNum=%d) mc_pcurEnvironmentData is nullptr", eNum);
 		return;
 	}
 
@@ -154,7 +154,7 @@ void CPythonBackground::SelectViewDistanceNum(int eNum)
 	}
 }
 
-void CPythonBackground::SetViewDistanceSet(int eNum, float fFarClip)
+void CPythonBackground::SetViewDistanceSet(int32_t eNum, float fFarClip)
 {
 	if (!m_pkMap)
 		return;
@@ -184,7 +184,7 @@ float CPythonBackground::GetFarClip()
 	return m_ViewDistanceSet[m_eViewDistanceNum].m_fFarClip;
 }
 
-void CPythonBackground::GetDistanceSetInfo(int * peNum, float * pfStart, float * pfEnd, float * pfFarClip)
+void CPythonBackground::GetDistanceSetInfo(int32_t * peNum, float * pfStart, float * pfEnd, float * pfFarClip)
 {
 	if (!m_pkMap)
 	{
@@ -288,7 +288,7 @@ void CPythonBackground::Destroy()
 
 void CPythonBackground::Create()
 {
-	static int s_isCreateProperty=false;
+	static int32_t s_isCreateProperty=false;
 
 	if (!s_isCreateProperty)
 	{
@@ -304,7 +304,7 @@ void CPythonBackground::Create()
 struct FGetPortalID
 {
 	float m_fRequestX, m_fRequestY;
-	std::set<int> m_kSet_iPortalID;
+	std::set<int32_t> m_kSet_iPortalID;
 	FGetPortalID(float fRequestX, float fRequestY)
 	{
 		m_fRequestX=fRequestX;
@@ -312,9 +312,9 @@ struct FGetPortalID
 	}
 	void operator () (CGraphicObjectInstance * pObject)
 	{
-		for (int i = 0; i < PORTAL_ID_MAX_NUM; ++i)
+		for (int32_t i = 0; i < PORTAL_ID_MAX_NUM; ++i)
 		{
-			int iID = pObject->GetPortal(i);
+			int32_t iID = pObject->GetPortal(i);
 			if (0 == iID)
 				break;
 
@@ -328,15 +328,15 @@ void CPythonBackground::Update(float fCenterX, float fCenterY, float fCenterZ)
 	if (!IsMapReady())
 		return;
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t1=ELTimer_GetMSec();
+	uint32_t t1=ELTimer_GetMSec();
 #endif
 	UpdateMap(fCenterX, fCenterY, fCenterZ);
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t2=ELTimer_GetMSec();
+	uint32_t t2=ELTimer_GetMSec();
 #endif
 	UpdateAroundAmbience(fCenterX, fCenterY, fCenterZ);
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t3=ELTimer_GetMSec();
+	uint32_t t3=ELTimer_GetMSec();
 #endif
 	m_SnowEnvironment.Update(D3DXVECTOR3(fCenterX, -fCenterY, fCenterZ));
 
@@ -368,11 +368,11 @@ void CPythonBackground::Update(float fCenterX, float fCenterY, float fCenterZ)
 
 		rkCullingMgr.ForInRay(aVector3d, toTop, &kGetPortalID);
 
-		std::set<int>::iterator itor = kGetPortalID.m_kSet_iPortalID.begin();
+		std::set<int32_t>::iterator itor = kGetPortalID.m_kSet_iPortalID.begin();
 		if (!__IsSame(kGetPortalID.m_kSet_iPortalID, m_kSet_iShowingPortalID))
 		{
 			ClearPortal();
-			std::set<int>::iterator itor=kGetPortalID.m_kSet_iPortalID.begin();
+			std::set<int32_t>::iterator itor=kGetPortalID.m_kSet_iPortalID.begin();
 			for (; itor!=kGetPortalID.m_kSet_iPortalID.end(); ++itor)
 			{
 				AddShowingPortalID(*itor);
@@ -385,11 +385,11 @@ void CPythonBackground::Update(float fCenterX, float fCenterY, float fCenterZ)
 
 	// Target Effect Process
 	{
-		std::map<DWORD, DWORD>::iterator itor = m_kMap_dwTargetID_dwChrID.begin();
+		std::map<uint32_t, uint32_t>::iterator itor = m_kMap_dwTargetID_dwChrID.begin();
 		for (; itor != m_kMap_dwTargetID_dwChrID.end(); ++itor)
 		{
-			DWORD dwTargetID = itor->first;
-			DWORD dwChrID = itor->second;
+			uint32_t dwTargetID = itor->first;
+			uint32_t dwChrID = itor->second;
 
 			CInstanceBase * pInstance = CPythonCharacterManager::Instance().GetInstancePtr(dwChrID);
 
@@ -409,10 +409,10 @@ void CPythonBackground::Update(float fCenterX, float fCenterY, float fCenterZ)
 
 	// Reserve Target Effect
 	{
-		std::map<DWORD, SReserveTargetEffect>::iterator itor = m_kMap_dwID_kReserveTargetEffect.begin();
+		std::map<uint32_t, SReserveTargetEffect>::iterator itor = m_kMap_dwID_kReserveTargetEffect.begin();
 		for (; itor != m_kMap_dwID_kReserveTargetEffect.end();)
 		{
-			DWORD dwID = itor->first;
+			uint32_t dwID = itor->first;
 			SReserveTargetEffect & rReserveTargetEffect = itor->second;
 
 			float ilx = float(rReserveTargetEffect.ilx);
@@ -432,10 +432,10 @@ void CPythonBackground::Update(float fCenterX, float fCenterY, float fCenterZ)
 	}
 }
 
-bool CPythonBackground::__IsSame(std::set<int> & rleft, std::set<int> & rright)
+bool CPythonBackground::__IsSame(std::set<int32_t> & rleft, std::set<int32_t> & rright)
 {
-	std::set<int>::iterator itor_l;
-	std::set<int>::iterator itor_r;
+	std::set<int32_t>::iterator itor_l;
+	std::set<int32_t>::iterator itor_r;
 
 	for (itor_l=rleft.begin(); itor_l!=rleft.end(); ++itor_l)
 	{
@@ -498,7 +498,7 @@ void CPythonBackground::RenderCharacterShadowToTexture()
 		return;
 
 	CMapOutdoor& rkMap=GetMapOutdoorRef();
-	DWORD t1=ELTimer_GetMSec();
+	uint32_t t1=ELTimer_GetMSec();
 
 	if (m_eShadowLevel == SHADOW_ALL ||
 		m_eShadowLevel == SHADOW_ALL_HIGH ||
@@ -523,7 +523,7 @@ void CPythonBackground::RenderCharacterShadowToTexture()
 		STATEMANAGER.SetTransform(D3DTS_WORLD, &matWorld);
 	}
 
-	DWORD t2=ELTimer_GetMSec();
+	uint32_t t2=ELTimer_GetMSec();
 
 	m_dwRenderShadowTime=t2-t1;	
 }
@@ -659,7 +659,7 @@ void CPythonBackground::ClearGuildArea()
 	rkMap.ClearGuildArea();
 }
 
-void CPythonBackground::RegisterGuildArea(int isx, int isy, int iex, int iey)
+void CPythonBackground::RegisterGuildArea(int32_t isx, int32_t isy, int32_t iex, int32_t iey)
 {
 	if (!IsMapReady())
 		return;
@@ -689,13 +689,13 @@ void CPythonBackground::SetBackgroundDirLight()
 	STATEMANAGER.SetLight(0, &mc_pcurEnvironmentData->DirLights[ENV_DIRLIGHT_BACKGROUND]);
 }
 
-void CPythonBackground::GlobalPositionToLocalPosition(LONG& rGlobalX, LONG& rGlobalY)
+void CPythonBackground::GlobalPositionToLocalPosition(int32_t& rGlobalX, int32_t& rGlobalY)
 {
 	rGlobalX-=m_dwBaseX;
 	rGlobalY-=m_dwBaseY;
 }
 
-void CPythonBackground::LocalPositionToGlobalPosition(LONG& rLocalX, LONG& rLocalY)
+void CPythonBackground::LocalPositionToGlobalPosition(int32_t& rLocalX, int32_t& rLocalY)
 {
 	rLocalX+=m_dwBaseX;
 	rLocalY+=m_dwBaseY;
@@ -706,16 +706,16 @@ void CPythonBackground::RegisterDungeonMapName(const char * c_szMapName)
 	m_kSet_strDungeonMapName.insert(c_szMapName);
 }
 
-CPythonBackground::TMapInfo* CPythonBackground::GlobalPositionToMapInfo(DWORD dwGlobalX, DWORD dwGlobalY)
+CPythonBackground::TMapInfo* CPythonBackground::GlobalPositionToMapInfo(uint32_t dwGlobalX, uint32_t dwGlobalY)
 {
 	TMapInfoVector::iterator f = std::find_if(m_kVct_kMapInfo.begin(), m_kVct_kMapInfo.end(), FFindWarpMapName(dwGlobalX, dwGlobalY));
 	if (f == m_kVct_kMapInfo.end())
-		return NULL;
+		return nullptr;
 
 	return &(*f);
 }
 
-void CPythonBackground::Warp(DWORD dwX, DWORD dwY)
+void CPythonBackground::Warp(uint32_t dwX, uint32_t dwY)
 {
 	TMapInfo* pkMapInfo = GlobalPositionToMapInfo(dwX, dwY);
 	if (!pkMapInfo)
@@ -807,7 +807,7 @@ void CPythonBackground::DisableSnowEnvironment()
 
 const D3DXVECTOR3 c_v3TreePos = D3DXVECTOR3(76500.0f, -60900.0f, 20215.0f);
 
-void CPythonBackground::SetXMaxTree(int iGrade)
+void CPythonBackground::SetXMaxTree(int32_t iGrade)
 {
 	if (!m_pkMap)
 		return;
@@ -848,24 +848,24 @@ void CPythonBackground::SetXMaxTree(int iGrade)
 	rkMap.XMasTree_Set(c_v3TreePos.x, c_v3TreePos.y, c_v3TreePos.z, s_strTreeName[iGrade].c_str(), s_strEffectName[iGrade].c_str());
 }
 
-void CPythonBackground::CreateTargetEffect(DWORD dwID, DWORD dwChrVID)
+void CPythonBackground::CreateTargetEffect(uint32_t dwID, uint32_t dwChrVID)
 {
 	m_kMap_dwTargetID_dwChrID.insert(std::make_pair(dwID, dwChrVID));
 }
 
-void CPythonBackground::CreateTargetEffect(DWORD dwID, long lx, long ly)
+void CPythonBackground::CreateTargetEffect(uint32_t dwID, int32_t lx, int32_t ly)
 {
 	if (m_kMap_dwTargetID_dwChrID.end() != m_kMap_dwTargetID_dwChrID.find(dwID))
 		return;
 
 	CMapOutdoor& rkMap=GetMapOutdoorRef();
 
-	DWORD dwBaseX;
-	DWORD dwBaseY;
+	uint32_t dwBaseX;
+	uint32_t dwBaseY;
 	rkMap.GetBaseXY(&dwBaseX, &dwBaseY);
 
-	int ilx = +(lx-int(dwBaseX));
-	int ily = -(ly-int(dwBaseY));
+	int32_t ilx = +(lx-int32_t(dwBaseX));
+	int32_t ily = -(ly-int32_t(dwBaseY));
 
 	float fHeight = rkMap.GetHeight(float(ilx), float(ily));
 
@@ -881,7 +881,7 @@ void CPythonBackground::CreateTargetEffect(DWORD dwID, long lx, long ly)
 	CreateSpecialEffect(dwID, ilx, ily, fHeight, g_strEffectName.c_str());
 }
 
-void CPythonBackground::DeleteTargetEffect(DWORD dwID)
+void CPythonBackground::DeleteTargetEffect(uint32_t dwID)
 {
 	if (m_kMap_dwID_kReserveTargetEffect.end() != m_kMap_dwID_kReserveTargetEffect.find(dwID))
 	{
@@ -895,13 +895,13 @@ void CPythonBackground::DeleteTargetEffect(DWORD dwID)
 	DeleteSpecialEffect(dwID);
 }
 
-void CPythonBackground::CreateSpecialEffect(DWORD dwID, float fx, float fy, float fz, const char * c_szFileName)
+void CPythonBackground::CreateSpecialEffect(uint32_t dwID, float fx, float fy, float fz, const char * c_szFileName)
 {
 	CMapOutdoor& rkMap=GetMapOutdoorRef();
 	rkMap.SpecialEffect_Create(dwID, fx, fy, fz, c_szFileName);
 }
 
-void CPythonBackground::DeleteSpecialEffect(DWORD dwID)
+void CPythonBackground::DeleteSpecialEffect(uint32_t dwID)
 {
 	CMapOutdoor& rkMap=GetMapOutdoorRef();
 	rkMap.SpecialEffect_Delete(dwID);

@@ -3,7 +3,7 @@
 #include "Config.h"
 #include "ClientManager.h"
 
-LPFDWATCH CNetBase::m_fdWatcher = NULL;
+LPFDWATCH CNetBase::m_fdWatcher = nullptr;
 
 CNetBase::CNetBase()
 {
@@ -47,7 +47,7 @@ void CNetPoller::Destroy()
 	if (m_fdWatcher)
 	{
 		fdwatch_delete(m_fdWatcher);
-		m_fdWatcher = NULL;
+		m_fdWatcher = nullptr;
 	}
 
 	thecore_destroy();

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "PeerBase.h"
 
-CPeerBase::CPeerBase() : m_fd(INVALID_SOCKET), m_BytesRemain(0), m_outBuffer(NULL), m_inBuffer(NULL)
+CPeerBase::CPeerBase() : m_fd(INVALID_SOCKET), m_BytesRemain(0), m_outBuffer(nullptr), m_inBuffer(nullptr)
 {
 }
 
@@ -28,13 +28,13 @@ void CPeerBase::Destroy()
 	if (m_outBuffer)
 	{
 		buffer_delete(m_outBuffer);
-		m_outBuffer = NULL;
+		m_outBuffer = nullptr;
 	}
 
 	if (m_inBuffer)
 	{
 		buffer_delete(m_inBuffer);
-		m_inBuffer = NULL;
+		m_inBuffer = nullptr;
 	}
 }
 
@@ -82,7 +82,7 @@ bool CPeerBase::Accept(socket_t fd_accept)
 	return true;
 }
 
-bool CPeerBase::Connect(const char* host, WORD port)
+bool CPeerBase::Connect(const char* host, uint16_t port)
 {
 	strlcpy(m_host, host, sizeof(m_host));
 	m_wPort = port;
@@ -109,7 +109,7 @@ void CPeerBase::Close()
 	OnClose();
 }
 
-void CPeerBase::EncodeBYTE(BYTE b)
+void CPeerBase::EncodeBYTE(uint8_t b)
 {
 	if (!m_outBuffer)
 	{
@@ -121,7 +121,7 @@ void CPeerBase::EncodeBYTE(BYTE b)
 	fdwatch_add_fd(m_fdWatcher, m_fd, this, FDW_WRITE, true);
 }
 
-void CPeerBase::EncodeWORD(WORD w)
+void CPeerBase::EncodeWORD(uint16_t w)
 {
 	if (!m_outBuffer)
 	{
@@ -133,7 +133,7 @@ void CPeerBase::EncodeWORD(WORD w)
 	fdwatch_add_fd(m_fdWatcher, m_fd, this, FDW_WRITE, true);
 }
 
-void CPeerBase::EncodeDWORD(DWORD dw)
+void CPeerBase::EncodeDWORD(uint32_t dw)
 {
 	if (!m_outBuffer)
 	{
@@ -145,7 +145,7 @@ void CPeerBase::EncodeDWORD(DWORD dw)
 	fdwatch_add_fd(m_fdWatcher, m_fd, this, FDW_WRITE, true);
 }
 
-void CPeerBase::Encode(const void* data, DWORD size)
+void CPeerBase::Encode(const void* data, uint32_t size)
 {
 	if (!m_outBuffer)
 	{
@@ -157,7 +157,7 @@ void CPeerBase::Encode(const void* data, DWORD size)
 	fdwatch_add_fd(m_fdWatcher, m_fd, this, FDW_WRITE, true);
 }
 
-int CPeerBase::Recv()
+int32_t CPeerBase::Recv()
 {
 	if (!m_inBuffer)
 	{
@@ -166,7 +166,7 @@ int CPeerBase::Recv()
 	}
 
 	buffer_adjust_size(m_inBuffer, MAX_INPUT_LEN >> 2);
-	int bytes_to_read = buffer_has_space(m_inBuffer);
+	int32_t bytes_to_read = buffer_has_space(m_inBuffer);
 	ssize_t bytes_read = socket_read(m_fd, (char *) buffer_write_peek(m_inBuffer), bytes_to_read);
 
 	if (bytes_read < 0)
@@ -182,13 +182,13 @@ int CPeerBase::Recv()
 	return 1;
 }
 
-void CPeerBase::RecvEnd(int proceed_bytes)
+void CPeerBase::RecvEnd(int32_t proceed_bytes)
 {
 	buffer_read_proceed(m_inBuffer, proceed_bytes);
 	m_BytesRemain = buffer_size(m_inBuffer);
 }
 
-int CPeerBase::GetRecvLength()
+int32_t CPeerBase::GetRecvLength()
 {
 	return m_BytesRemain;
 }
@@ -198,23 +198,23 @@ const void * CPeerBase::GetRecvBuffer()
 	return buffer_read_peek(m_inBuffer);
 }
 
-int CPeerBase::GetSendLength()
+int32_t CPeerBase::GetSendLength()
 {
 	return buffer_size(m_outBuffer);
 }
 
-int CPeerBase::Send()
+int32_t CPeerBase::Send()
 {
 	if (buffer_size(m_outBuffer) <= 0)
 		return 0;
 
-	int iBufferLeft = fdwatch_get_buffer_size(m_fdWatcher, m_fd);
-	int iBytesToWrite = MIN(iBufferLeft, buffer_size(m_outBuffer));
+	int32_t iBufferLeft = fdwatch_get_buffer_size(m_fdWatcher, m_fd);
+	int32_t iBytesToWrite = MIN(iBufferLeft, buffer_size(m_outBuffer));
 
 	if (iBytesToWrite == 0)
 		return 0;
 
-	int result = socket_write(m_fd, (const char *) buffer_read_peek(m_outBuffer), iBytesToWrite);
+	int32_t result = socket_write(m_fd, (const char *) buffer_read_peek(m_outBuffer), iBytesToWrite);
 
 	if (result == 0)
 	{

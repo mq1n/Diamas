@@ -11,8 +11,8 @@ public:
 	CSingleton()
 	{ 
 		assert(!ms_singleton);
-		int offset = (int) (T*) 1 - (int) (CSingleton <T>*) (T*) 1; 
-		ms_singleton = (T*) ((int) this + offset);
+		int32_t offset = (int32_t) (T*) 1 - (int32_t) (CSingleton <T>*) (T*) 1; 
+		ms_singleton = (T*) ((int32_t) this + offset);
 	} 
 
 	virtual ~CSingleton()
@@ -52,8 +52,8 @@ public:
 	singleton()
 	{ 
 		assert(!ms_singleton);
-		int offset = (int) (T*) 1 - (int) (singleton <T>*) (T*) 1; 
-		ms_singleton = (T*) ((int) this + offset);
+		int32_t offset = (int32_t) (T*) 1 - (int32_t) (singleton <T>*) (T*) 1; 
+		ms_singleton = (T*) ((int32_t) this + offset);
 	} 
 
 	virtual ~singleton()

@@ -15,10 +15,10 @@ static Pixel * LoadOldGuildMarkImageFile()
 	if (!fp)
 	{
 		sys_err("cannot open %s", OLD_MARK_INDEX_FILENAME);
-		return NULL;
+		return nullptr;
 	}
 
-	int dataSize = 512 * 512 * sizeof(Pixel);
+	int32_t dataSize = 512 * 512 * sizeof(Pixel);
 	Pixel * dataPtr = (Pixel *) malloc(dataSize);
 
 	fread(dataPtr, dataSize, 1, fp);
@@ -28,7 +28,7 @@ static Pixel * LoadOldGuildMarkImageFile()
 	return dataPtr;
 }
 
-bool GuildMarkConvert(const std::vector<DWORD> & vecGuildID)
+bool GuildMarkConvert(const std::vector<uint32_t> & vecGuildID)
 {
 	// 폴더 생성
 #ifndef __WIN32__
@@ -48,13 +48,13 @@ bool GuildMarkConvert(const std::vector<DWORD> & vecGuildID)
 	// 인덱스 파일 열기
 	FILE* fp = fopen(OLD_MARK_INDEX_FILENAME, "r");
 
-	if (NULL == fp)
+	if (nullptr == fp)
 		return false;
 
 	// 이미지 파일 열기
 	Pixel * oldImagePtr = LoadOldGuildMarkImageFile();
 
-	if (NULL == oldImagePtr)
+	if (nullptr == oldImagePtr)
 	{
 		fclose(fp);
 		return false;
@@ -72,8 +72,8 @@ bool GuildMarkConvert(const std::vector<DWORD> & vecGuildID)
 	sys_log(0, "Guild Mark Converting Start.");
 
 	char line[256];
-	DWORD guild_id;
-	DWORD mark_id;
+	uint32_t guild_id;
+	uint32_t mark_id;
 	Pixel mark[SGuildMark::SIZE];
 
 	while (fgets(line, sizeof(line)-1, fp))
@@ -103,16 +103,16 @@ bool GuildMarkConvert(const std::vector<DWORD> & vecGuildID)
 		Pixel * dst = mark;
 
 		// 옛날 이미지에서 마크 한개 복사
-		for (int y = 0; y != SGuildMark::HEIGHT; ++y)
+		for (int32_t y = 0; y != SGuildMark::HEIGHT; ++y)
 		{
-			for (int x = 0; x != SGuildMark::WIDTH; ++x)
+			for (int32_t x = 0; x != SGuildMark::WIDTH; ++x)
 				*(dst++) = *(src+x);
 
 			src += 512;
 		}
 
 		// 새 길드 마크 시스템에 넣는다.
-		CGuildMarkManager::instance().SaveMark(guild_id, (BYTE *) mark);
+		CGuildMarkManager::instance().SaveMark(guild_id, (uint8_t *) mark);
 		line[0] = '\0';
 	}
 

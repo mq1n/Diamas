@@ -31,7 +31,7 @@ class CItemManager : public CSingleton<CItemManager>
 #endif
 
 	public:
-		typedef std::map<DWORD, CItemData*> TItemMap;
+		typedef std::map<uint32_t, CItemData*> TItemMap;
 		typedef std::map<std::string, CItemData*> TItemNameMap;
 
 	public:
@@ -40,16 +40,16 @@ class CItemManager : public CSingleton<CItemManager>
 		
 		void			Destroy();
 
-		BOOL			SelectItemData(DWORD dwIndex);
+		BOOL			SelectItemData(uint32_t dwIndex);
 		CItemData *		GetSelectedItemDataPointer();
 
-		BOOL			GetItemDataPointer(DWORD dwItemID, CItemData ** ppItemData);
+		BOOL			GetItemDataPointer(uint32_t dwItemID, CItemData ** ppItemData);
 		
 		/////
 		bool			LoadItemDesc(const char* c_szFileName);
 		bool			LoadItemList(const char* c_szFileName);
 		bool			LoadItemTable(const char* c_szFileName);
-		CItemData *		MakeItemData(DWORD dwIndex);
+		CItemData *		MakeItemData(uint32_t dwIndex);
 
 #ifdef ENABLE_ACCE_SYSTEM
 		bool			LoadItemScale(const char* c_szFileName);

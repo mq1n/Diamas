@@ -33,12 +33,12 @@ class CTransitor
 			return TRUE;
 		}
 
-		DWORD GetID()
+		uint32_t GetID()
 		{
 			return m_dwID;
 		}
 
-		void SetID(DWORD dwID)
+		void SetID(uint32_t dwID)
 		{
 			m_dwID = dwID;
 		}
@@ -67,7 +67,7 @@ class CTransitor
 		}
 
 	protected:
-		DWORD	m_dwID;			// Public Transitor ID
+		uint32_t	m_dwID;			// Public Transitor ID
 
 		BOOL	m_bActivated;	// Have been started to blend?
 		float	m_fStartTime;
@@ -83,7 +83,7 @@ typedef CTransitor<D3DXCOLOR>		TTransitorColor;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void PrintfTabs(FILE * File, int iTabCount, const char * c_szString, ...);
+void PrintfTabs(FILE * File, int32_t iTabCount, const char * c_szString, ...);
 
 
 //typedef CTokenVector TTokenVector;
@@ -98,16 +98,16 @@ extern D3DXCOLOR TokenToColor(CTokenVector & rVector);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern int CALLBACK EnumFontFamExProc(CONST LOGFONT* plogFont, CONST TEXTMETRIC* textMetric, DWORD dwWord, LPARAM lParam);
-extern int GetCharsetFromCodePage(WORD codePage);
-extern const char* GetFontFaceFromCodePageNT(WORD codePage);
-extern const char* GetFontFaceFromCodePage9x(WORD codePage);
-extern DWORD GetDefaultCodePage();
+extern int32_t CALLBACK EnumFontFamExProc(CONST LOGFONT* plogFont, CONST TEXTMETRIC* textMetric, uint32_t dwWord, LPARAM lParam);
+extern int32_t GetCharsetFromCodePage(uint16_t codePage);
+extern const char* GetFontFaceFromCodePageNT(uint16_t codePage);
+extern const char* GetFontFaceFromCodePage9x(uint16_t codePage);
+extern uint32_t GetDefaultCodePage();
 extern const char * GetDefaultFontFace();
-extern const char*	GetFontFaceFromCodePage(WORD codePage);
+extern const char*	GetFontFaceFromCodePage(uint16_t codePage);
 extern void SetDefaultFontFace(const char* fontFace);
-extern bool SetDefaultCodePage(DWORD codePage);
+extern bool SetDefaultCodePage(uint32_t codePage);
 extern void base64_decode(const char * str,char * resultStr);
 
-extern DWORD GetMaxTextureWidth();
-extern DWORD GetMaxTextureHeight();
+extern uint32_t GetMaxTextureWidth();
+extern uint32_t GetMaxTextureHeight();

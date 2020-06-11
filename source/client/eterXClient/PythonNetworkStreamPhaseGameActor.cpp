@@ -11,13 +11,13 @@
 
 
 
-void CPythonNetworkStream::__GlobalPositionToLocalPosition(LONG& rGlobalX, LONG& rGlobalY)
+void CPythonNetworkStream::__GlobalPositionToLocalPosition(int32_t& rGlobalX, int32_t& rGlobalY)
 {
 	CPythonBackground&rkBgMgr=CPythonBackground::Instance();
 	rkBgMgr.GlobalPositionToLocalPosition(rGlobalX, rGlobalY);
 }
 
-void CPythonNetworkStream::__LocalPositionToGlobalPosition(LONG& rLocalX, LONG& rLocalY)
+void CPythonNetworkStream::__LocalPositionToGlobalPosition(int32_t& rLocalX, int32_t& rLocalY)
 {
 	CPythonBackground&rkBgMgr=CPythonBackground::Instance();
 	rkBgMgr.LocalPositionToGlobalPosition(rLocalX, rLocalY);
@@ -38,13 +38,13 @@ void CPythonNetworkStream::__ClearNetworkActorManager()
 	m_rokNetActorMgr->Destroy();
 }
 
-void __SetWeaponPower(IAbstractPlayer& rkPlayer, DWORD dwWeaponID)
+void __SetWeaponPower(IAbstractPlayer& rkPlayer, uint32_t dwWeaponID)
 {
-	DWORD minPower=0;
-	DWORD maxPower=0;
-	DWORD minMagicPower=0;
-	DWORD maxMagicPower=0;
-	DWORD addPower=0;
+	uint32_t minPower=0;
+	uint32_t maxPower=0;
+	uint32_t minMagicPower=0;
+	uint32_t maxMagicPower=0;
+	uint32_t addPower=0;
 
 	CItemData* pkWeapon;
 	if (CItemManager::Instance().GetItemDataPointer(dwWeaponID, &pkWeapon))
@@ -78,7 +78,7 @@ void __SetWeaponPower(IAbstractPlayer& rkPlayer, DWORD dwWeaponID)
 
 //테이블에서 이름이 "." 인 것들
 //차후에 서버에서 보내주지 않게 되면 없어질 함수..(서버님께 꼭!!협박; )
-bool IsInvisibleRace(WORD raceNum)
+bool IsInvisibleRace(uint16_t raceNum)
 {
 	switch(raceNum)
 	{
@@ -421,8 +421,8 @@ bool CPythonNetworkStream::RecvSyncPositionPacket()
 
 	TPacketGCSyncPositionElement kSyncPos;
 
-	UINT uSyncPosCount=(kPacketSyncPos.wSize-sizeof(kPacketSyncPos))/sizeof(kSyncPos);
-	for (UINT iSyncPos=0; iSyncPos<uSyncPosCount; ++iSyncPos)
+	uint32_t uSyncPosCount=(kPacketSyncPos.wSize-sizeof(kPacketSyncPos))/sizeof(kSyncPos);
+	for (uint32_t iSyncPos=0; iSyncPos<uSyncPosCount; ++iSyncPos)
 	{		
 		if (!Recv(sizeof(TPacketGCSyncPositionElement), &kSyncPos))
 			return false;

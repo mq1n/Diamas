@@ -10,22 +10,22 @@ CMemoryTextFileLoader::~CMemoryTextFileLoader()
 {
 }
 
-bool CMemoryTextFileLoader::SplitLineByTab(DWORD dwLine, CTokenVector* pstTokenVector)
+bool CMemoryTextFileLoader::SplitLineByTab(uint32_t dwLine, CTokenVector* pstTokenVector)
 {
 	pstTokenVector->reserve(10);
 	pstTokenVector->clear();
 
 	const std::string & c_rstLine = GetLineString(dwLine);
-	const int c_iLineLength = c_rstLine.length();
+	const int32_t c_iLineLength = c_rstLine.length();
 
 	if (0 == c_iLineLength)
 		return false;
 
-	int basePos = 0;
+	int32_t basePos = 0;
 
 	do
 	{
-		int beginPos = c_rstLine.find_first_of("\t", basePos);
+		int32_t beginPos = c_rstLine.find_first_of("\t", basePos);
 
 		pstTokenVector->push_back(c_rstLine.substr(basePos, beginPos-basePos));
 
@@ -35,7 +35,7 @@ bool CMemoryTextFileLoader::SplitLineByTab(DWORD dwLine, CTokenVector* pstTokenV
 	return true;
 }
 
-int CMemoryTextFileLoader::SplitLine2(DWORD dwLine, CTokenVector* pstTokenVector, const char * c_szDelimeter)
+int32_t CMemoryTextFileLoader::SplitLine2(uint32_t dwLine, CTokenVector* pstTokenVector, const char * c_szDelimeter)
 {
 	pstTokenVector->reserve(10);
 	pstTokenVector->clear();
@@ -43,16 +43,16 @@ int CMemoryTextFileLoader::SplitLine2(DWORD dwLine, CTokenVector* pstTokenVector
 	std::string stToken;
 	const std::string & c_rstLine = GetLineString(dwLine);
 
-	DWORD basePos = 0;
+	uint32_t basePos = 0;
 
 	do
 	{
-		int beginPos = c_rstLine.find_first_not_of(c_szDelimeter, basePos);
+		int32_t beginPos = c_rstLine.find_first_not_of(c_szDelimeter, basePos);
 
 		if (beginPos < 0)
 			return -1;
 
-		int endPos;
+		int32_t endPos;
 
 		if (c_rstLine[beginPos] == '"')
 		{
@@ -73,14 +73,14 @@ int CMemoryTextFileLoader::SplitLine2(DWORD dwLine, CTokenVector* pstTokenVector
 		pstTokenVector->push_back(c_rstLine.substr(beginPos, endPos - beginPos));
 
 		// 추가 코드. 맨뒤에 탭이 있는 경우를 체크한다. - [levites]
-		if (int(c_rstLine.find_first_not_of(c_szDelimeter, basePos)) < 0)
+		if (int32_t(c_rstLine.find_first_not_of(c_szDelimeter, basePos)) < 0)
 			break;
 	} while (basePos < c_rstLine.length());
 
 	return 0;
 }
 
-bool CMemoryTextFileLoader::SplitLine(DWORD dwLine, CTokenVector* pstTokenVector, const char * c_szDelimeter)
+bool CMemoryTextFileLoader::SplitLine(uint32_t dwLine, CTokenVector* pstTokenVector, const char * c_szDelimeter)
 {
 	pstTokenVector->reserve(10);
 	pstTokenVector->clear();
@@ -88,15 +88,15 @@ bool CMemoryTextFileLoader::SplitLine(DWORD dwLine, CTokenVector* pstTokenVector
 	std::string stToken;
 	const std::string & c_rstLine = GetLineString(dwLine);
 
-	DWORD basePos = 0;
+	uint32_t basePos = 0;
 
 	do
 	{
-		int beginPos = c_rstLine.find_first_not_of(c_szDelimeter, basePos);
+		int32_t beginPos = c_rstLine.find_first_not_of(c_szDelimeter, basePos);
 		if (beginPos < 0)
 			return false;
 
-		int endPos;
+		int32_t endPos;
 
 		if (c_rstLine[beginPos] == '"')
 		{
@@ -117,19 +117,19 @@ bool CMemoryTextFileLoader::SplitLine(DWORD dwLine, CTokenVector* pstTokenVector
 		pstTokenVector->push_back(c_rstLine.substr(beginPos, endPos - beginPos));
 
 		// 추가 코드. 맨뒤에 탭이 있는 경우를 체크한다. - [levites]
-		if (int(c_rstLine.find_first_not_of(c_szDelimeter, basePos)) < 0)
+		if (int32_t(c_rstLine.find_first_not_of(c_szDelimeter, basePos)) < 0)
 			break;
 	} while (basePos < c_rstLine.length());
 
 	return true;
 }
 
-DWORD CMemoryTextFileLoader::GetLineCount()
+uint32_t CMemoryTextFileLoader::GetLineCount()
 {
 	return m_stLineVector.size();
 }
 
-bool CMemoryTextFileLoader::CheckLineIndex(DWORD dwLine)
+bool CMemoryTextFileLoader::CheckLineIndex(uint32_t dwLine)
 {
 	if (dwLine >= m_stLineVector.size())
 		return false;
@@ -137,20 +137,20 @@ bool CMemoryTextFileLoader::CheckLineIndex(DWORD dwLine)
 	return true;
 }
 
-const std::string & CMemoryTextFileLoader::GetLineString(DWORD dwLine)
+const std::string & CMemoryTextFileLoader::GetLineString(uint32_t dwLine)
 {
 	assert(CheckLineIndex(dwLine));
 	return m_stLineVector[dwLine];
 }
 
-void CMemoryTextFileLoader::Bind(int bufSize, const void* c_pvBuf)
+void CMemoryTextFileLoader::Bind(int32_t bufSize, const void* c_pvBuf)
 {
 	m_stLineVector.reserve(128);
 	m_stLineVector.clear();
 
 	const char * c_pcBuf = (const char *)c_pvBuf;
 	std::string stLine;
-	int pos = 0;
+	int32_t pos = 0;
 
 	while (pos < bufSize)
 	{
@@ -180,17 +180,17 @@ void CMemoryTextFileLoader::Bind(int bufSize, const void* c_pvBuf)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-int CMemoryFileLoader::GetSize()
+int32_t CMemoryFileLoader::GetSize()
 {
 	return m_size;
 }
 
-int CMemoryFileLoader::GetPosition()
+int32_t CMemoryFileLoader::GetPosition()
 {
 	return m_pos;
 }
 
-bool CMemoryFileLoader::IsReadableSize(int size)
+bool CMemoryFileLoader::IsReadableSize(int32_t size)
 {
 	if (m_pos + size > m_size)
 		return false;
@@ -198,7 +198,7 @@ bool CMemoryFileLoader::IsReadableSize(int size)
 	return true;
 }
 
-bool CMemoryFileLoader::Read(int size, void* pvDst)
+bool CMemoryFileLoader::Read(int32_t size, void* pvDst)
 {
 	if (!IsReadableSize(size))
 		return false;
@@ -210,13 +210,13 @@ bool CMemoryFileLoader::Read(int size, void* pvDst)
 
 const char* CMemoryFileLoader::GetCurrentPositionPointer()
 {
-	assert(m_pcBase != NULL);
+	assert(m_pcBase != nullptr);
 	return (m_pcBase + m_pos);
 }
 
-CMemoryFileLoader::CMemoryFileLoader(int size, const void* c_pvMemoryFile)
+CMemoryFileLoader::CMemoryFileLoader(int32_t size, const void* c_pvMemoryFile)
 {
-	assert(c_pvMemoryFile != NULL);
+	assert(c_pvMemoryFile != nullptr);
 
 	m_pos = 0;
 	m_size = size;
@@ -228,16 +228,16 @@ CMemoryFileLoader::~CMemoryFileLoader()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-int CDiskFileLoader::GetSize()
+int32_t CDiskFileLoader::GetSize()
 {
 	return m_size;
 }
 
-bool CDiskFileLoader::Read(int size, void* pvDst)
+bool CDiskFileLoader::Read(int32_t size, void* pvDst)
 {
-	assert(m_fp != NULL);
+	assert(m_fp != nullptr);
 
-	int ret = fread(pvDst, size, 1, m_fp);
+	int32_t ret = fread(pvDst, size, 1, m_fp);
 
 	if (ret <= 0)
 		return false;
@@ -273,7 +273,7 @@ void CDiskFileLoader::Close()
 
 void CDiskFileLoader::Initialize()
 {
-	m_fp = NULL;
+	m_fp = nullptr;
 	m_size = 0;
 }
 

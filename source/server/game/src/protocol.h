@@ -8,28 +8,28 @@ inline const char *encode_byte(char ind)
 	return (a);
 }
 
-inline const char *encode_2bytes(short ind)
+inline const char *encode_2bytes(int16_t ind)
 {
 	static char a[8];
-	*((short*) a) = ind;
+	*((int16_t*) a) = ind;
 	return (a);
 }
 
-inline const char *encode_4bytes(int ind)
+inline const char *encode_4bytes(int32_t ind)
 {
 	static char a[8];
-	*((int *) a) = ind;
+	*((int32_t *) a) = ind;
 	return (a);
 }
 
-inline BYTE decode_byte(const void * a)
+inline uint8_t decode_byte(const void * a)
 {
-	return (*(BYTE *) a);
+	return (*(uint8_t *) a);
 }
 
-inline WORD decode_2bytes(const void * a)
+inline uint16_t decode_2bytes(const void * a)
 {
-	return (*((WORD *) a));
+	return (*((uint16_t *) a));
 }
 
 inline INT decode_4bytes(const void *a)
@@ -42,10 +42,10 @@ inline INT decode_4bytes(const void *a)
 //#define DEFAULT_PACKET_BUFFER_SIZE 32768
 #define DEFAULT_PACKET_BUFFER_SIZE 65536
 
-inline bool __packet_encode(LPBUFFER pbuf, const void * data, int length, const char * file, int line)
+inline bool __packet_encode(LPBUFFER pbuf, const void * data, int32_t length, const char * file, int32_t line)
 {
-	assert(NULL != pbuf);
-	assert(NULL != data);
+	assert(nullptr != pbuf);
+	assert(nullptr != data);
 
 	if (buffer_has_space(pbuf) < length)
 	{

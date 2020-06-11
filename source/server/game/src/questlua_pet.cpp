@@ -17,14 +17,14 @@
 #define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
-extern int (*check_name) (const char * str);
+extern int32_t (*check_name) (const char * str);
 
 namespace quest
 {
 
 #ifdef __PET_SYSTEM__
 	// syntax in LUA: pet.summon(mob_vnum, pet's name, (bool)run to me from far away)
-	int pet_summon(lua_State* L)
+	int32_t pet_summon(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		CPetSystem* petSystem = ch->GetPetSystem();
@@ -42,7 +42,7 @@ namespace quest
 		}
 
 		// 소환수의 vnum
-		DWORD mobVnum= lua_isnumber(L, 1) ? lua_tonumber(L, 1) : 0;
+		uint32_t mobVnum= lua_isnumber(L, 1) ? lua_tonumber(L, 1) : 0;
 
 		// 소환수의 이름
 		const char* petName = lua_isstring(L, 2) ? lua_tostring(L, 2) : 0;
@@ -52,7 +52,7 @@ namespace quest
 
 		CPetActor* pet = petSystem->Summon(mobVnum, pItem, petName, bFromFar);
 
-		if (pet != NULL)
+		if (pet != nullptr)
 			lua_pushnumber (L, pet->GetVID());
 		else
 			lua_pushnumber (L, 0);
@@ -61,7 +61,7 @@ namespace quest
 	}
 
 	// syntax: pet.unsummon(mob_vnum)
-	int pet_unsummon(lua_State* L)
+	int32_t pet_unsummon(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		CPetSystem* petSystem = ch->GetPetSystem();
@@ -70,14 +70,14 @@ namespace quest
 			return 0;
 
 		// 소환수의 vnum
-		DWORD mobVnum= lua_isnumber(L, 1) ? lua_tonumber(L, 1) : 0;
+		uint32_t mobVnum= lua_isnumber(L, 1) ? lua_tonumber(L, 1) : 0;
 
 		petSystem->Unsummon(mobVnum);
 		return 1;
 	}
 
 	// syntax: pet.unsummon(mob_vnum)
-	int pet_count_summoned(lua_State* L)
+	int32_t pet_count_summoned(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		CPetSystem* petSystem = ch->GetPetSystem();
@@ -93,7 +93,7 @@ namespace quest
 	}
 
 	// syntax: pet.is_summon(mob_vnum)
-	int pet_is_summon(lua_State* L)
+	int32_t pet_is_summon(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		CPetSystem* petSystem = ch->GetPetSystem();
@@ -102,11 +102,11 @@ namespace quest
 			return 0;
 
 		// 소환수의 vnum
-		DWORD mobVnum= lua_isnumber(L, 1) ? lua_tonumber(L, 1) : 0;
+		uint32_t mobVnum= lua_isnumber(L, 1) ? lua_tonumber(L, 1) : 0;
 
 		CPetActor* petActor = petSystem->GetByVnum(mobVnum);
 
-		if (NULL == petActor)
+		if (nullptr == petActor)
 			lua_pushboolean(L, false);
 		else
 			lua_pushboolean(L, petActor->IsSummoned());
@@ -114,7 +114,7 @@ namespace quest
 		return 1;
 	}
 
-	int pet_spawn_effect(lua_State* L)
+	int32_t pet_spawn_effect(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		CPetSystem* petSystem = ch->GetPetSystem();
@@ -122,13 +122,13 @@ namespace quest
 		if (0 == petSystem)
 			return 0;
 
-		DWORD mobVnum = lua_isnumber(L, 1) ? lua_tonumber(L, 1) : 0;
+		uint32_t mobVnum = lua_isnumber(L, 1) ? lua_tonumber(L, 1) : 0;
 
 		CPetActor* petActor = petSystem->GetByVnum(mobVnum);
-		if (NULL == petActor)
+		if (nullptr == petActor)
 			return 0;
 		LPCHARACTER pet_ch = petActor->GetCharacter();
-		if (NULL == pet_ch)
+		if (nullptr == pet_ch)
 			return 0;
 
 		if (lua_isstring(L, 2))
@@ -147,7 +147,7 @@ namespace quest
 			{ "is_summon",		pet_is_summon		},
 			{ "count_summoned",	pet_count_summoned	},
 			{ "spawn_effect",	pet_spawn_effect	},
-			{ NULL,				NULL				}
+			{ nullptr,				nullptr				}
 		};
 
 		CQuestManager::instance().AddLuaFunctionTable("pet", pet_functions);

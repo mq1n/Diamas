@@ -13,7 +13,7 @@ CPathStack::~CPathStack()
 
 void CPathStack::GetCurrentPathName(std::string* pstCurPathName)
 {
-	assert(pstCurPathName!=NULL);
+	assert(pstCurPathName!=nullptr);
 
 	char szPathName[MAX_PATH+1];
 	_getcwd(szPathName, MAX_PATH);

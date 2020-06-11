@@ -12,12 +12,12 @@ extern std::string g_strResourcePath;
 extern std::string g_strImagePath;
 
 // Motion Key
-#define MOTION_KEY									DWORD
-#define MAKE_MOTION_KEY(mode, index)				(((DWORD)(((BYTE)(mode)) << 24) | ((DWORD)((WORD)(index))) << 8) | ((DWORD)((BYTE)(0))))
-#define MAKE_RANDOM_MOTION_KEY(mode, index, type)	(((DWORD)(((BYTE)(mode)) << 24) | ((DWORD)((WORD)(index))) << 8) | ((DWORD)((BYTE)(type))))
-#define GET_MOTION_MODE(key)						((BYTE)(((DWORD)(key) >> 24) & 0xFF))
-#define GET_MOTION_INDEX(key)						((WORD)(((DWORD)(key) >> 8) & 0xFFFF))
-#define GET_MOTION_SUB_INDEX(key)					((BYTE)(((DWORD)(key)) & 0xFF))
+#define MOTION_KEY									uint32_t
+#define MAKE_MOTION_KEY(mode, index)				(((uint32_t)(((uint8_t)(mode)) << 24) | ((uint32_t)((uint16_t)(index))) << 8) | ((uint32_t)((uint8_t)(0))))
+#define MAKE_RANDOM_MOTION_KEY(mode, index, type)	(((uint32_t)(((uint8_t)(mode)) << 24) | ((uint32_t)((uint16_t)(index))) << 8) | ((uint32_t)((uint8_t)(type))))
+#define GET_MOTION_MODE(key)						((uint8_t)(((uint32_t)(key) >> 24) & 0xFF))
+#define GET_MOTION_INDEX(key)						((uint16_t)(((uint32_t)(key) >> 8) & 0xFFFF))
+#define GET_MOTION_SUB_INDEX(key)					((uint8_t)(((uint32_t)(key)) & 0xFF))
 /*
 #define MAKE_MOTION_KEY(mode, index)		MAKELONG(index, mode)
 #define GET_MOTION_MODE(key)				HIWORD(key)
@@ -64,12 +64,12 @@ namespace NRaceData
 
 	typedef struct SAttackData
 	{
-		int iAttackType;
-		int iHittingType;
+		int32_t iAttackType;
+		int32_t iHittingType;
 		float fInvisibleTime;
 		float fExternalForce;
 		float fStiffenTime;
-		int iHitLimitCount;
+		int32_t iHitLimitCount;
 	} TAttackData;
 
 	typedef struct SHitData
@@ -89,7 +89,7 @@ namespace NRaceData
 
 	typedef struct SMotionAttackData : public SAttackData
 	{
-		int iMotionType;
+		int32_t iMotionType;
 
 		THitDataContainer HitDataContainer;
 	} TMotionAttackData;
@@ -113,7 +113,7 @@ namespace NRaceData
 	
 	typedef struct SCollisionData
 	{
-		int					iCollisionType;
+		int32_t					iCollisionType;
 		CSphereCollisionInstanceVector	SphereDataVector;
 
 		SCollisionData() {}
@@ -142,11 +142,11 @@ namespace NRaceData
 
 	void DestroySystem();
 
-	void SaveAttackData(FILE * File, int iTabCount, const TAttackData & c_rData);
-	void SaveMotionAttackData(FILE * File, int iTabCount, const TMotionAttackData & c_rData);
-	void SaveCollisionData(FILE * File, int iTabCount, const TCollisionData & c_rCollisionData);
-	void SaveEffectData(FILE * File, int iTabCount, const TAttachingEffectData & c_rEffectData);
-	void SaveObjectData(FILE * File, int iTabCount, const TAttachingObjectData & c_rObjectData);
+	void SaveAttackData(FILE * File, int32_t iTabCount, const TAttackData & c_rData);
+	void SaveMotionAttackData(FILE * File, int32_t iTabCount, const TMotionAttackData & c_rData);
+	void SaveCollisionData(FILE * File, int32_t iTabCount, const TCollisionData & c_rCollisionData);
+	void SaveEffectData(FILE * File, int32_t iTabCount, const TAttachingEffectData & c_rEffectData);
+	void SaveObjectData(FILE * File, int32_t iTabCount, const TAttachingObjectData & c_rObjectData);
 
 	BOOL LoadAttackData(CTextFileLoader & rTextFileLoader, TAttackData * pData);
 	BOOL LoadMotionAttackData(CTextFileLoader & rTextFileLoader, TMotionAttackData * pData);
@@ -173,14 +173,14 @@ namespace NRaceData
 			: dwType(0)
 			, isAttaching(false)
 			, dwAttachingModelIndex(0)
-			, pCollisionData(NULL)
-			, pEffectData(NULL)
-			, pObjectData(NULL)
+			, pCollisionData(nullptr)
+			, pEffectData(nullptr)
+			, pObjectData(nullptr)
 		{}
-		DWORD dwType;
+		uint32_t dwType;
 
 		BOOL isAttaching;
-		DWORD dwAttachingModelIndex;
+		uint32_t dwAttachingModelIndex;
 		std::string strAttachingBoneName;
 
 		TCollisionData * pCollisionData;
@@ -190,7 +190,7 @@ namespace NRaceData
 
 	typedef std::vector<TAttachingData> TAttachingDataVector;
 
-	void SaveAttachingData(FILE * File, int iTabCount, const TAttachingDataVector & c_rAttachingDataVector);
+	void SaveAttachingData(FILE * File, int32_t iTabCount, const TAttachingDataVector & c_rAttachingDataVector);
 	BOOL LoadAttachingData(CTextFileLoader & rTextFileLoader, TAttachingDataVector * pAttachingDataVector);
 
 	extern CDynamicPool<TCollisionData>			g_CollisionDataPool;

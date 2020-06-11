@@ -32,7 +32,7 @@
 #include "Locale.h"
 
 #include "GameType.h"
-extern DWORD __DEFAULT_CODE_PAGE__;
+extern uint32_t __DEFAULT_CODE_PAGE__;
 
 enum
 {

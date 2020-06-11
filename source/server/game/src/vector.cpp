@@ -46,7 +46,7 @@ float GetDegreeFromPosition(float x, float y)
 	return (ret);
 }   
 
-float GetDegreeFromPositionXY(long sx, long sy, long ex, long ey)
+float GetDegreeFromPositionXY(int32_t sx, int32_t sy, int32_t ex, int32_t ey)
 {
 	return GetDegreeFromPosition(ex - sx, ey - sy);
 }

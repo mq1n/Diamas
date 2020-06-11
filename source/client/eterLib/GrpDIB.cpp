@@ -13,9 +13,9 @@ CGraphicDib::~CGraphicDib()
 
 void CGraphicDib::Initialize()
 {
-	m_hDC=NULL;
-	m_hBmp=NULL;
-	m_pvBuf=NULL;
+	m_hDC=nullptr;
+	m_hBmp=nullptr;
+	m_pvBuf=nullptr;
 	m_width=0;
 	m_height=0;
 }
@@ -28,7 +28,7 @@ void CGraphicDib::Destroy()
 	Initialize();			
 }
 
-bool CGraphicDib::Create(HDC hDC, int width, int height)
+bool CGraphicDib::Create(HDC hDC, int32_t width, int32_t height)
 {
 	Destroy();
 
@@ -50,7 +50,7 @@ bool CGraphicDib::Create(HDC hDC, int width, int height)
 		return false;
 	}
 
-	m_hBmp=CreateDIBSection(m_hDC, &m_bmi, DIB_RGB_COLORS, &m_pvBuf, NULL, 0);
+	m_hBmp=CreateDIBSection(m_hDC, &m_bmi, DIB_RGB_COLORS, &m_pvBuf, nullptr, 0);
 	if (!m_hBmp)
 	{
 		assert(!"CGraphicDib::Create CreateDIBSection Error");
@@ -69,18 +69,18 @@ HDC	CGraphicDib::GetDCHandle()
 	return m_hDC;
 }
 
-void CGraphicDib::SetBkMode(int iBkMode)
+void CGraphicDib::SetBkMode(int32_t iBkMode)
 {
 	::SetBkMode(m_hDC, iBkMode);
 }
 
-void CGraphicDib::TextOut(int ix, int iy, const char * c_szText)
+void CGraphicDib::TextOut(int32_t ix, int32_t iy, const char * c_szText)
 {
 	::SetBkColor(m_hDC, 0);	
 	::TextOut(m_hDC, ix, iy, c_szText, strlen(c_szText));
 }
 
-void CGraphicDib::Put(HDC hDC, int x, int y)
+void CGraphicDib::Put(HDC hDC, int32_t x, int32_t y)
 {
 	SetDIBitsToDevice(
 	  hDC,     
@@ -103,12 +103,12 @@ void* CGraphicDib::GetPointer()
 	return m_pvBuf;
 }
 
-int CGraphicDib::GetWidth()
+int32_t CGraphicDib::GetWidth()
 {
 	return m_width;
 }
 
-int CGraphicDib::GetHeight()
+int32_t CGraphicDib::GetHeight()
 {
 	return m_height;
 }

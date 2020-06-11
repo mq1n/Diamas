@@ -1,6 +1,6 @@
 #pragma once
 
-typedef std::pair<DWORD, std::string> CRCPair;
+typedef std::pair<uint32_t, std::string> CRCPair;
 
 void ProcessScanner_Destroy();
 bool ProcessScanner_Create();

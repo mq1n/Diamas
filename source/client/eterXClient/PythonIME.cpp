@@ -38,7 +38,7 @@ void CPythonIME::MoveEnd()
 	ms_curpos = ms_lastpos;
 }
 
-void CPythonIME::SetCursorPosition(int iPosition)
+void CPythonIME::SetCursorPosition(int32_t iPosition)
 {
 	SetCurPos(iPosition);
 }
@@ -70,7 +70,7 @@ void CPythonIME::OnEscape()
 
 bool CPythonIME::OnWM_CHAR( WPARAM wParam, LPARAM lParam )
 {
-	unsigned char c = unsigned char(wParam & 0xff);
+	uint8_t c = uint8_t(wParam & 0xff);
 
 	switch (c) 
 	{

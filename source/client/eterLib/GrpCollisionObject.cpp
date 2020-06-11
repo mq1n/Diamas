@@ -20,7 +20,7 @@ bool CGraphicCollisionObject::IntersectCube(const D3DXMATRIX* c_pmatWorld, float
 	posVertices[6] = TPosition(sx, ey, ez);
 	posVertices[7] = TPosition(ex, ey, ez);
 
-	static const WORD c_awFillCubeIndices[36] = { 
+	static const uint16_t c_awFillCubeIndices[36] = { 
 		0, 1, 2, 1, 3, 2,
 		2, 0, 6, 0, 4, 6,
 		0, 1, 4, 1, 5, 4,
@@ -44,13 +44,13 @@ bool CGraphicCollisionObject::IntersectCube(const D3DXMATRIX* c_pmatWorld, float
 	);
 }
 
-const int c_iLimitVertexCount = 1024;
+const int32_t c_iLimitVertexCount = 1024;
 
-bool CGraphicCollisionObject::IntersectIndexedMesh(const D3DXMATRIX* c_pmatWorld, const void* vertices, int step, int vtxCount, const void* indices, int idxCount,
+bool CGraphicCollisionObject::IntersectIndexedMesh(const D3DXMATRIX* c_pmatWorld, const void* vertices, int32_t step, int32_t vtxCount, const void* indices, int32_t idxCount,
 								   D3DXVECTOR3 & RayOriginal, D3DXVECTOR3 & RayDirection, float* pu, float* pv, float* pt)
 {
 	static D3DXVECTOR3 s_v3PositionArray[c_iLimitVertexCount];
-	static DWORD s_dwPositionCount;
+	static uint32_t s_dwPositionCount;
 
 	if (vtxCount > c_iLimitVertexCount)
 	{
@@ -71,9 +71,9 @@ bool CGraphicCollisionObject::IntersectIndexedMesh(const D3DXMATRIX* c_pmatWorld
 		pcurVtx += step;
 	}
 
-	WORD* pcurIdx = (WORD*)indices;
+	uint16_t* pcurIdx = (uint16_t*)indices;
 
-	int triCount = idxCount / 3;
+	int32_t triCount = idxCount / 3;
 	while (triCount--)
 	{
 		if (IntersectTriangle(RayOriginal, RayDirection, 
@@ -91,13 +91,13 @@ bool CGraphicCollisionObject::IntersectIndexedMesh(const D3DXMATRIX* c_pmatWorld
 	return false;
 }
 
-bool CGraphicCollisionObject::IntersectMesh(const D3DXMATRIX * c_pmatWorld, const void * vertices, DWORD dwStep, DWORD dwvtxCount, D3DXVECTOR3 & RayOriginal, D3DXVECTOR3 & RayDirection, float* pu, float* pv, float* pt)
+bool CGraphicCollisionObject::IntersectMesh(const D3DXMATRIX * c_pmatWorld, const void * vertices, uint32_t dwStep, uint32_t dwvtxCount, D3DXVECTOR3 & RayOriginal, D3DXVECTOR3 & RayDirection, float* pu, float* pv, float* pt)
 {
 	char * pcurVtx = (char *) vertices;
 
 	D3DXVECTOR3 v3Vertex[3];
 
-	for (DWORD i = 0; i < dwvtxCount; i += 3)
+	for (uint32_t i = 0; i < dwvtxCount; i += 3)
 	{
 		D3DXVec3TransformCoord(&v3Vertex[0], (D3DXVECTOR3*)pcurVtx, c_pmatWorld);
 		pcurVtx += dwStep;
@@ -133,7 +133,7 @@ bool CGraphicCollisionObject::IntersectTriangle(const D3DXVECTOR3& c_orig,
     D3DXVECTOR3 pvec;
     D3DXVec3Cross(&pvec, &c_dir, &edge2);
 
-    FLOAT det = D3DXVec3Dot(&edge1, &pvec);
+    float det = D3DXVec3Dot(&edge1, &pvec);
     D3DXVECTOR3 tvec;
 
     if (det > 0)
@@ -162,7 +162,7 @@ bool CGraphicCollisionObject::IntersectTriangle(const D3DXVECTOR3& c_orig,
 		return false;
 
     t = D3DXVec3Dot(&edge2, &qvec);
-    FLOAT fInvDet = 1.0f / det;
+    float fInvDet = 1.0f / det;
     t *= fInvDet;
     u *= fInvDet;
     v *= fInvDet;

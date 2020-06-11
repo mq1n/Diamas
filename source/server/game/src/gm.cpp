@@ -32,7 +32,7 @@ void gm_new_insert( const tAdminInfo &rAdminInfo )
 	}
 	else
 	{
-		t.pset_Host = NULL;
+		t.pset_Host = nullptr;
 		sys_log(0, "GM Use Default Host List" );
 	}
 
@@ -48,7 +48,7 @@ void gm_new_host_inert( const char * host )
 	sys_log( 0, "InsertGMHost(ip:%s)", host );
 }
 
-BYTE gm_new_get_level( const char * name, const char * host, const char* account)
+uint8_t gm_new_get_level( const char * name, const char * host, const char* account)
 {
 	if ( test_server ) return GM_IMPLEMENTOR;
 
@@ -107,7 +107,7 @@ BYTE gm_new_get_level( const char * name, const char * host, const char* account
 }
 	
 //END_ADMIN_MANAGER
-BYTE gm_get_level(const char * name, const char * host, const char* account)
+uint8_t gm_get_level(const char * name, const char * host, const char* account)
 {
 	return gm_new_get_level( name, host, account );
 }

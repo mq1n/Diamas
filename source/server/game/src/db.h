@@ -20,23 +20,23 @@ enum
 
 typedef struct SUseTime
 {
-	DWORD	dwLoginKey;
+	uint32_t	dwLoginKey;
 	char        szLogin[LOGIN_MAX_LEN+1];
-	DWORD       dwUseSec;
+	uint32_t       dwUseSec;
 	char        szIP[MAX_HOST_LENGTH+1];
 } TUseTime;
 
 class CQueryInfo
 {
 	public:
-		int	iQueryType;
+		int32_t	iQueryType;
 };
 
 class CReturnQueryInfo : public CQueryInfo
 {
 	public:
-		int	iType;
-		DWORD	dwIdent;
+		int32_t	iType;
+		uint32_t	dwIdent;
 		void			*	pvData;
 };
 
@@ -63,27 +63,27 @@ class DBManager : public singleton<DBManager>
 
 		bool			IsConnected();
 
-		bool			Connect(const char * host, const int port, const char * user, const char * pwd, const char * db);
+		bool			Connect(const char * host, const int32_t port, const char * user, const char * pwd, const char * db);
 		void			Query(const char * c_pszFormat, ...);
 
 		SQLMsg *		DirectQuery(const char * c_pszFormat, ...);
-		void			ReturnQuery(int iType, DWORD dwIdent, void* pvData, const char * c_pszFormat, ...);
+		void			ReturnQuery(int32_t iType, uint32_t dwIdent, void* pvData, const char * c_pszFormat, ...);
 
 		void			Process();
 		void			AnalyzeReturnQuery(SQLMsg * pmsg);
 
-		void			SendMoneyLog(BYTE type, DWORD vnum, int gold);
+		void			SendMoneyLog(uint8_t type, uint32_t vnum, int32_t gold);
 
-		void			LoginPrepare(LPDESC d, DWORD * pdwClientKey, int * paiPremiumTimes = NULL);
+		void			LoginPrepare(LPDESC d, uint32_t * pdwClientKey, int32_t * paiPremiumTimes = nullptr);
 		void			SendAuthLogin(LPDESC d);
 		void			SendLoginPing(const char * c_pszLogin);
 
 		void			InsertLoginData(CLoginData * pkLD);
 		void			DeleteLoginData(CLoginData * pkLD);
-		CLoginData *	GetLoginData(DWORD dwKey);
+		CLoginData *	GetLoginData(uint32_t dwKey);
 
-		DWORD			CountQuery()		{ return m_sql.CountQuery(); }
-		DWORD			CountQueryResult()	{ return m_sql.CountResult(); }
+		uint32_t			CountQuery()		{ return m_sql.CountQuery(); }
+		uint32_t			CountQueryResult()	{ return m_sql.CountResult(); }
 		void			ResetQueryResult()	{ m_sql.ResetQueryFinished(); }
 
 		template<class Functor> void FuncQuery(Functor f, const char * c_pszFormat, ...); // 결과를 f인자로 호출함 (SQLMsg *) 알아서 해제됨
@@ -98,7 +98,7 @@ class DBManager : public singleton<DBManager>
 		CAsyncSQL				m_sql_direct;
 		bool					m_bIsConnect;
 
-		std::map<DWORD, CLoginData *>		m_map_pkLoginData;
+		std::map<uint32_t, CLoginData *>		m_map_pkLoginData;
 		std::vector<TUseTime>			m_vec_kUseTime;
 };
 
@@ -143,11 +143,11 @@ class AccountDB : public singleton<AccountDB>
 		AccountDB();
 
 		bool IsConnected();
-		bool Connect(const char * host, const int port, const char * user, const char * pwd, const char * db);
-		bool ConnectAsync(const char * host, const int port, const char * user, const char * pwd, const char * db, const char * locale);
+		bool Connect(const char * host, const int32_t port, const char * user, const char * pwd, const char * db);
+		bool ConnectAsync(const char * host, const int32_t port, const char * user, const char * pwd, const char * db, const char * locale);
 
 		SQLMsg* DirectQuery(const char * query);		
-		void ReturnQuery(int iType, DWORD dwIdent, void * pvData, const char * c_pszFormat, ...);
+		void ReturnQuery(int32_t iType, uint32_t dwIdent, void * pvData, const char * c_pszFormat, ...);
 		void AsyncQuery(const char* query);
 
 		void SetLocale(const std::string & stLocale);

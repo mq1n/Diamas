@@ -21,13 +21,13 @@ enum
 
 class CRefineManager : public singleton<CRefineManager>
 {
-	typedef std::map<DWORD, TRefineTable> TRefineRecipeMap;
+	typedef std::map<uint32_t, TRefineTable> TRefineRecipeMap;
 	public:
 	CRefineManager();
 	virtual ~CRefineManager();
 
-	bool	Initialize(TRefineTable * table, int size);
-	const TRefineTable* GetRefineRecipe(DWORD id);
+	bool	Initialize(TRefineTable * table, int32_t size);
+	const TRefineTable* GetRefineRecipe(uint32_t id);
 
 	private:
 	TRefineRecipeMap    m_map_RefineRecipe;

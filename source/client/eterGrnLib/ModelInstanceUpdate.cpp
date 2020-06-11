@@ -4,21 +4,21 @@
 #include "Model.h"
 
 
-void CGrannyModelInstance::Update(DWORD dwAniFPS)
+void CGrannyModelInstance::Update(uint32_t dwAniFPS)
 {		
 	if (!dwAniFPS)
 		return;
 
-	const DWORD c_dwCurUpdateFrame = (DWORD) (GetLocalTime() * ANIFPS_MAX);
-	const DWORD ANIFPS_STEP = ANIFPS_MAX/dwAniFPS;
+	const uint32_t c_dwCurUpdateFrame = (uint32_t) (GetLocalTime() * ANIFPS_MAX);
+	const uint32_t ANIFPS_STEP = ANIFPS_MAX/dwAniFPS;
 	if (c_dwCurUpdateFrame>ANIFPS_STEP && c_dwCurUpdateFrame/ANIFPS_STEP==m_dwOldUpdateFrame/ANIFPS_STEP)
 		return;
 
 	m_dwOldUpdateFrame=c_dwCurUpdateFrame;
 
-	//DWORD t1=timeGetTime();
+	//uint32_t t1=timeGetTime();
 	GrannySetModelClock(m_pgrnModelInstance, GetLocalTime());	
-	//DWORD t2=timeGetTime();
+	//uint32_t t2=timeGetTime();
 
 #ifdef __PERFORMANCE_CHECKER__
 	{
@@ -44,7 +44,7 @@ void CGrannyModelInstance::UpdateTransform(D3DXMATRIX * pMatrix, float fSecondsE
 {
 	if (!m_pgrnModelInstance)
 	{
-		TraceError("CGrannyModelIstance::UpdateTransform - m_pgrnModelInstance = NULL");
+		TraceError("CGrannyModelIstance::UpdateTransform - m_pgrnModelInstance = nullptr");
 		return;
 	}
 	GrannyUpdateModelMatrix(m_pgrnModelInstance, fSecondsElapsed, (const float*)pMatrix, (float*)pMatrix, false);
@@ -88,7 +88,7 @@ class CGrannyLocalPose
 	public:
 		CGrannyLocalPose()
 		{
-			m_pgrnLocalPose = NULL;
+			m_pgrnLocalPose = nullptr;
 			m_boneCount = 0;
 		}
 
@@ -98,7 +98,7 @@ class CGrannyLocalPose
 				GrannyFreeLocalPose(m_pgrnLocalPose);
 		}
 
-		granny_local_pose * Get(int boneCount)
+		granny_local_pose * Get(int32_t boneCount)
 		{
 			if (m_pgrnLocalPose)
 			{
@@ -115,7 +115,7 @@ class CGrannyLocalPose
 
 	private:
 		granny_local_pose *	m_pgrnLocalPose;
-		int					m_boneCount;
+		int32_t					m_boneCount;
 };
 //////////////////////////////////////////////////////
 
@@ -143,7 +143,7 @@ void CGrannyModelInstance::UpdateWorldPose()
 	granny_skeleton * pgrnSkeleton = GrannyGetSourceSkeleton(m_pgrnModelInstance);
 	granny_local_pose * pgrnLocalPose = s_SharedLocalPose.Get(pgrnSkeleton->BoneCount);	
 
-	const float * pAttachBoneMatrix = (mc_pParentInstance) ? mc_pParentInstance->GetBoneMatrixPointer(m_iParentBoneIndex) : NULL;
+	const float * pAttachBoneMatrix = (mc_pParentInstance) ? mc_pParentInstance->GetBoneMatrixPointer(m_iParentBoneIndex) : nullptr;
 
 	GrannySampleModelAnimationsAccelerated(m_pgrnModelInstance, pgrnSkeleton->BoneCount, pAttachBoneMatrix, pgrnLocalPose, __GetWorldPosePtr());
 	/*
@@ -161,15 +161,15 @@ void CGrannyModelInstance::UpdateWorldMatrices(const D3DXMATRIX* c_pWorldMatrix)
 		return;
 	// END_OF_NO_MESH_BUG_FIX
 	
-	assert(m_pModel != NULL);
-	assert(ms_lpd3dMatStack != NULL);
+	assert(m_pModel != nullptr);
+	assert(ms_lpd3dMatStack != nullptr);
 	
-	int meshCount = m_pModel->GetMeshCount();
+	int32_t meshCount = m_pModel->GetMeshCount();
 	
 	granny_matrix_4x4 * pgrnMatCompositeBuffer = GrannyGetWorldPoseComposite4x4Array(__GetWorldPosePtr());
 	D3DXMATRIX * boneMatrices = (D3DXMATRIX *) pgrnMatCompositeBuffer;
 
-	for (int i = 0; i < meshCount; ++i)
+	for (int32_t i = 0; i < meshCount; ++i)
 	{
 		D3DXMATRIX & rWorldMatrix = m_meshMatrices[i];
 
@@ -193,7 +193,7 @@ void CGrannyModelInstance::UpdateWorldMatrices(const D3DXMATRIX* c_pWorldMatrix)
 
 void CGrannyModelInstance::DeformPNTVertices(void * pvDest)
 {
-	assert(m_pModel != NULL);
+	assert(m_pModel != nullptr);
 	assert(m_pModel->CanDeformPNTVertices());
 
 	// WORK

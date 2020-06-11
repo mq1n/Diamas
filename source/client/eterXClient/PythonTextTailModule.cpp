@@ -28,10 +28,10 @@ PyObject * textTailRender(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * textTailRegisterCharacterTextTail(PyObject * poSelf, PyObject * poArgs)
 {
-	int iGuildID;
+	int32_t iGuildID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iGuildID))
 		return Py_BuildException();
-	int iVirtualID;
+	int32_t iVirtualID;
 	if (!PyTuple_GetInteger(poArgs, 1, &iVirtualID))
 		return Py_BuildException();
 
@@ -42,7 +42,7 @@ PyObject * textTailRegisterCharacterTextTail(PyObject * poSelf, PyObject * poArg
 
 PyObject * textTailGetPosition(PyObject * poSelf, PyObject * poArgs)
 {
-	int VirtualID;
+	int32_t VirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &VirtualID))
 		return Py_BuildException();
 
@@ -66,7 +66,7 @@ PyObject * textTailGetPosition(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * textTailIsChat(PyObject * poSelf, PyObject * poArgs)
 {
-	int VirtualID;
+	int32_t VirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &VirtualID))
 		return Py_BuildException();
 
@@ -75,7 +75,7 @@ PyObject * textTailIsChat(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * textTailRegisterChatTail(PyObject * poSelf, PyObject * poArgs)
 {
-	int VirtualID;
+	int32_t VirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &VirtualID))
 		return Py_BuildException();
 
@@ -90,7 +90,7 @@ PyObject * textTailRegisterChatTail(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * textTailRegisterInfoTail(PyObject * poSelf, PyObject * poArgs)
 {
-	int VirtualID;
+	int32_t VirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &VirtualID))
 		return Py_BuildException();
 
@@ -105,7 +105,7 @@ PyObject * textTailRegisterInfoTail(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * textTailAttachTitle(PyObject * poSelf, PyObject * poArgs)
 {
-	int iVirtualID;
+	int32_t iVirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iVirtualID))
 		return Py_BuildException();
 	char * szName;
@@ -128,7 +128,7 @@ PyObject * textTailAttachTitle(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * textTailShowCharacterTextTail(PyObject * poSelf, PyObject * poArgs)
 {
-	int VirtualID;
+	int32_t VirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &VirtualID))
 		return Py_BuildException();
 
@@ -138,7 +138,7 @@ PyObject * textTailShowCharacterTextTail(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * textTailShowItemTextTail(PyObject * poSelf, PyObject * poArgs)
 {
-	int VirtualID;
+	int32_t VirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &VirtualID))
 		return Py_BuildException();
 
@@ -166,20 +166,20 @@ PyObject * textTailShowAllTextTail(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * textTailPick(PyObject * poSelf, PyObject * poArgs)
 {
-	int ix;
+	int32_t ix;
 	if (!PyTuple_GetInteger(poArgs, 0, &ix))
 		return Py_BuildException();
-	int iy;
+	int32_t iy;
 	if (!PyTuple_GetInteger(poArgs, 1, &iy))
 		return Py_BuildException();
 
-	int iValue = CPythonTextTail::Instance().Pick(ix, iy);
+	int32_t iValue = CPythonTextTail::Instance().Pick(ix, iy);
 	return Py_BuildValue("i", iValue);
 }
 
 PyObject * textTailSelectItemName(PyObject * poSelf, PyObject * poArgs)
 {
-	int iVirtualID;
+	int32_t iVirtualID;
 	if (!PyTuple_GetInteger(poArgs, 0, &iVirtualID))
 		return Py_BuildException();
 
@@ -189,7 +189,7 @@ PyObject * textTailSelectItemName(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * textTailEnablePKTitle(PyObject * poSelf, PyObject * poArgs)
 {
-	int iFlag;
+	int32_t iFlag;
 	if (!PyTuple_GetInteger(poArgs, 0, &iFlag))
 		return Py_BuildException();
 
@@ -228,7 +228,7 @@ void initTextTail()
 		{ "RegisterInfoTail",			textTailRegisterInfoTail,			METH_VARARGS },
 		{ "AttachTitle",				textTailAttachTitle,				METH_VARARGS },
 
-		{ NULL, NULL, NULL },
+		{ nullptr, nullptr, 0 },
 	};
 
 	Py_InitModule("textTail", s_methods);

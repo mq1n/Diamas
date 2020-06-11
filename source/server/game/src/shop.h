@@ -14,12 +14,12 @@ class CShop
 	public:
 		typedef struct shop_item
 		{
-			DWORD	vnum;		// 아이템 번호
-			long	price;		// 가격
-			BYTE	count;		// 아이템 개수
+			uint32_t	vnum;		// 아이템 번호
+			int32_t	price;		// 가격
+			uint8_t	count;		// 아이템 개수
 
 			LPITEM	pkItem;
-			int		itemid;		// 아이템 고유아이디
+			int32_t		itemid;		// 아이템 고유아이디
 
 			shop_item()
 			{
@@ -27,44 +27,44 @@ class CShop
 				price = 0;
 				count = 0;
 				itemid = 0;
-				pkItem = NULL;
+				pkItem = nullptr;
 			}
 		} SHOP_ITEM;
 
 		CShop();
 		virtual ~CShop(); // @fixme139 (+virtual)
 
-		bool	Create(DWORD dwVnum, DWORD dwNPCVnum, TShopItemTable * pItemTable);
-		void	SetShopItems(TShopItemTable * pItemTable, BYTE bItemCount);
+		bool	Create(uint32_t dwVnum, uint32_t dwNPCVnum, TShopItemTable * pItemTable);
+		void	SetShopItems(TShopItemTable * pItemTable, uint8_t bItemCount);
 
 		virtual void	SetPCShop(LPCHARACTER ch);
 		virtual bool	IsPCShop()	{ return m_pkPC ? true : false; }
 
 		// 게스트 추가/삭제
-		virtual bool	AddGuest(LPCHARACTER ch,DWORD owner_vid, bool bOtherEmpire);
+		virtual bool	AddGuest(LPCHARACTER ch,uint32_t owner_vid, bool bOtherEmpire);
 		void	RemoveGuest(LPCHARACTER ch);
 
 		// 물건 구입
-		virtual int	Buy(LPCHARACTER ch, BYTE pos);
+		virtual int32_t	Buy(LPCHARACTER ch, uint8_t pos);
 
 		// 게스트에게 패킷을 보냄
-		void	BroadcastUpdateItem(BYTE pos);
+		void	BroadcastUpdateItem(uint8_t pos);
 
 		// 판매중인 아이템의 갯수를 알려준다.
-		int		GetNumberByVnum(DWORD dwVnum);
+		int32_t		GetNumberByVnum(uint32_t dwVnum);
 
 		// 아이템이 상점에 등록되어 있는지 알려준다.
-		virtual bool	IsSellingItem(DWORD itemID);
+		virtual bool	IsSellingItem(uint32_t itemID);
 
-		DWORD	GetVnum() { return m_dwVnum; }
-		DWORD	GetNPCVnum() { return m_dwNPCVnum; }
-
-	protected:
-		void	Broadcast(const void * data, int bytes);
+		uint32_t	GetVnum() { return m_dwVnum; }
+		uint32_t	GetNPCVnum() { return m_dwNPCVnum; }
 
 	protected:
-		DWORD				m_dwVnum;
-		DWORD				m_dwNPCVnum;
+		void	Broadcast(const void * data, int32_t bytes);
+
+	protected:
+		uint32_t				m_dwVnum;
+		uint32_t				m_dwNPCVnum;
 
 		CGrid *				m_pGrid;
 

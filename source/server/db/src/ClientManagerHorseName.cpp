@@ -13,7 +13,7 @@ void CClientManager::UpdateHorseName(TPacketUpdateHorseName* data, CPeer* peer)
 	ForwardPacket(HEADER_DG_UPDATE_HORSE_NAME, data, sizeof(TPacketUpdateHorseName), 0, peer);
 }
 
-void CClientManager::AckHorseName(DWORD dwPID, CPeer* peer)
+void CClientManager::AckHorseName(uint32_t dwPID, CPeer* peer)
 {
 	char szQuery[512];
 

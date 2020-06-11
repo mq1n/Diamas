@@ -9,9 +9,9 @@ CRefineManager::~CRefineManager()
 {
 }
 
-bool CRefineManager::Initialize(TRefineTable * table, int size)
+bool CRefineManager::Initialize(TRefineTable * table, int32_t size)
 {
-	for (int i = 0; i < size; ++i, ++table)
+	for (int32_t i = 0; i < size; ++i, ++table)
 	{
 		sys_log(0, "REFINE %d prob %d cost %d", table->id, table->prob, table->cost);
 		m_map_RefineRecipe.insert(std::make_pair(table->id, *table));
@@ -21,17 +21,17 @@ bool CRefineManager::Initialize(TRefineTable * table, int size)
 	return true;
 }
 
-const TRefineTable* CRefineManager::GetRefineRecipe(DWORD vnum)
+const TRefineTable* CRefineManager::GetRefineRecipe(uint32_t vnum)
 {
 	if (vnum == 0)
-		return NULL;
+		return nullptr;
 
 	auto it = m_map_RefineRecipe.find(vnum);
 	sys_log(0, "REFINE: FIND %u %s", vnum, it == m_map_RefineRecipe.end() ? "FALSE" : "TRUE");
 
 	if (it == m_map_RefineRecipe.end())
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	return &it->second;

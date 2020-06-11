@@ -8,7 +8,7 @@
 #include "../eterSoundLib/SoundManager.h"
 
 CDynamicPool<CEffectInstance>	CEffectInstance::ms_kPool;
-int CEffectInstance::ms_iRenderingEffectCount = 0;
+int32_t CEffectInstance::ms_iRenderingEffectCount = 0;
 
 bool CEffectInstance::LessRenderOrder(CEffectInstance* pkEftInst)
 {
@@ -20,7 +20,7 @@ void CEffectInstance::ResetRenderingEffectCount()
 	ms_iRenderingEffectCount = 0;
 }
 
-int CEffectInstance::GetRenderingEffectCount()
+int32_t CEffectInstance::GetRenderingEffectCount()
 {
 	return ms_iRenderingEffectCount;
 }
@@ -205,7 +205,7 @@ void CEffectInstance::SetEffectDataPointer(CEffectData * pEffectData)
 	if (m_fBoundingSphereRadius > 0.0f)
 		CGraphicObjectInstance::RegisterBoundingSphere();
 
-	DWORD i;
+	uint32_t i;
 
 	for (i = 0; i < pEffectData->GetParticleCount(); ++i)
 	{
@@ -267,11 +267,11 @@ void CEffectInstance::__Initialize()
 {
 	m_isAlive = FALSE;
 	m_dwFrame = 0;
-	m_pSoundInstanceVector = NULL;
+	m_pSoundInstanceVector = nullptr;
 	m_fBoundingSphereRadius = 0.0f;
 	m_v3BoundingSpherePosition.x = m_v3BoundingSpherePosition.y = m_v3BoundingSpherePosition.z = 0.0f;
 
-	m_pkEftData=NULL;
+	m_pkEftData=nullptr;
 
 	D3DXMatrixIdentity(&m_matGlobal);
 }

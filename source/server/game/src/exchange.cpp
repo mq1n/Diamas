@@ -15,10 +15,10 @@
 #include "DragonSoul.h"
 #include "questmanager.h" // @fixme150
 
-void exchange_packet(LPCHARACTER ch, BYTE sub_header, bool is_me, DWORD arg1, TItemPos arg2, DWORD arg3, void * pvData = NULL);
+void exchange_packet(LPCHARACTER ch, uint8_t sub_header, bool is_me, uint32_t arg1, TItemPos arg2, uint32_t arg3, void * pvData = nullptr);
 
 // 교환 패킷
-void exchange_packet(LPCHARACTER ch, BYTE sub_header, bool is_me, DWORD arg1, TItemPos arg2, DWORD arg3, void * pvData)
+void exchange_packet(LPCHARACTER ch, uint8_t sub_header, bool is_me, uint32_t arg1, TItemPos arg2, uint32_t arg3, void * pvData)
 {
 	if (!ch->GetDesc())
 		return;
@@ -74,7 +74,7 @@ bool CHARACTER::ExchangeStart(LPCHARACTER victim)
 		return false;
 	}
 	//END_PREVENT_TRADE_WINDOW
-	int iDist = DISTANCE_APPROX(GetX() - victim->GetX(), GetY() - victim->GetY());
+	int32_t iDist = DISTANCE_APPROX(GetX() - victim->GetX(), GetY() - victim->GetY());
 
 	// 거리 체크
 	if (iDist >= EXCHANGE_MAX_DISTANCE)
@@ -113,13 +113,13 @@ bool CHARACTER::ExchangeStart(LPCHARACTER victim)
 
 CExchange::CExchange(LPCHARACTER pOwner)
 {
-	m_pCompany = NULL;
+	m_pCompany = nullptr;
 
 	m_bAccept = false;
 
-	for (int i = 0; i < EXCHANGE_ITEM_MAX_NUM; ++i)
+	for (int32_t i = 0; i < EXCHANGE_ITEM_MAX_NUM; ++i)
 	{
-		m_apItems[i] = NULL;
+		m_apItems[i] = nullptr;
 		m_aItemPos[i] = NPOS;
 		m_abItemDisplayPos[i] = 0;
 	}
@@ -137,9 +137,9 @@ CExchange::~CExchange()
 	M2_DELETE(m_pGrid);
 }
 
-bool CExchange::AddItem(TItemPos item_pos, BYTE display_pos)
+bool CExchange::AddItem(TItemPos item_pos, uint8_t display_pos)
 {
-	assert(m_pOwner != NULL && GetCompany());
+	assert(m_pOwner != nullptr && GetCompany());
 
 	if (!item_pos.IsValidItemPosition())
 		return false;
@@ -180,7 +180,7 @@ bool CExchange::AddItem(TItemPos item_pos, BYTE display_pos)
 	Accept(false);
 	GetCompany()->Accept(false);
 
-	for (int i = 0; i < EXCHANGE_ITEM_MAX_NUM; ++i)
+	for (int32_t i = 0; i < EXCHANGE_ITEM_MAX_NUM; ++i)
 	{
 		if (m_apItems[i])
 			continue;
@@ -217,7 +217,7 @@ bool CExchange::AddItem(TItemPos item_pos, BYTE display_pos)
 	return false;
 }
 
-bool CExchange::RemoveItem(BYTE pos)
+bool CExchange::RemoveItem(uint8_t pos)
 {
 	if (pos >= EXCHANGE_ITEM_MAX_NUM)
 		return false;
@@ -236,13 +236,13 @@ bool CExchange::RemoveItem(BYTE pos)
 	Accept(false);
 	GetCompany()->Accept(false);
 
-	m_apItems[pos]	    = NULL;
+	m_apItems[pos]	    = nullptr;
 	m_aItemPos[pos]	    = NPOS;
 	m_abItemDisplayPos[pos] = 0;
 	return true;
 }
 
-bool CExchange::AddGold(long gold)
+bool CExchange::AddGold(int32_t gold)
 {
 	if (gold <= 0)
 		return false;
@@ -268,14 +268,14 @@ bool CExchange::AddGold(long gold)
 }
 
 // 돈이 충분히 있는지, 교환하려는 아이템이 실제로 있는지 확인 한다.
-bool CExchange::Check(int * piItemCount)
+bool CExchange::Check(int32_t * piItemCount)
 {
 	if (GetOwner()->GetGold() < m_lGold)
 		return false;
 
-	int item_count = 0;
+	int32_t item_count = 0;
 
-	for (int i = 0; i < EXCHANGE_ITEM_MAX_NUM; ++i)
+	for (int32_t i = 0; i < EXCHANGE_ITEM_MAX_NUM; ++i)
 	{
 		if (!m_apItems[i])
 			continue;
@@ -312,7 +312,7 @@ bool CExchange::CheckSpace()
 	LPCHARACTER	victim = GetCompany()->GetOwner();
 	LPITEM item;
 
-	int i;
+	int32_t i;
 
 	for (i = 0; i < INVENTORY_PAGE_SIZE*1; ++i)
 	{
@@ -345,7 +345,7 @@ bool CExchange::CheckSpace()
 	}
 #endif
 
-	static std::vector <WORD> s_vDSGrid(DRAGON_SOUL_INVENTORY_MAX_NUM);
+	static std::vector <uint16_t> s_vDSGrid(DRAGON_SOUL_INVENTORY_MAX_NUM);
 	
 	// 일단 용혼석을 교환하지 않을 가능성이 크므로, 용혼석 인벤 복사는 용혼석이 있을 때 하도록 한다.
 	bool bDSInitialized = false;
@@ -369,17 +369,17 @@ bool CExchange::CheckSpace()
 			}
 
 			bool bExistEmptySpace = false;
-			WORD wBasePos = DSManager::instance().GetBasePosition(item);
+			uint16_t wBasePos = DSManager::instance().GetBasePosition(item);
 			if (wBasePos >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 				return false;
 			
-			for (int i = 0; i < DRAGON_SOUL_BOX_SIZE; i++)
+			for (int32_t i = 0; i < DRAGON_SOUL_BOX_SIZE; i++)
 			{
-				WORD wPos = wBasePos + i;
+				uint16_t wPos = wBasePos + i;
 				if (0 == s_vDSGrid[wPos]) // @fixme159 (wBasePos to wPos)
 				{
 					bool bEmpty = true;
-					for (int j = 1; j < item->GetSize(); j++)
+					for (int32_t j = 1; j < item->GetSize(); j++)
 					{
 						if (s_vDSGrid[wPos + j * DRAGON_SOUL_BOX_COLUMN_NUM])
 						{
@@ -389,7 +389,7 @@ bool CExchange::CheckSpace()
 					}
 					if (bEmpty)
 					{
-						for (int j = 0; j < item->GetSize(); j++)
+						for (int32_t j = 0; j < item->GetSize(); j++)
 						{
 							s_vDSGrid[wPos + j * DRAGON_SOUL_BOX_COLUMN_NUM] =  wPos + 1;
 						}
@@ -405,7 +405,7 @@ bool CExchange::CheckSpace()
 		}
 		else
 		{
-			int iPos;
+			int32_t iPos;
 
 			if ((iPos = s_grid1.FindBlank(1, item->GetSize())) >= 0)
 			{
@@ -436,7 +436,7 @@ bool CExchange::CheckSpace()
 // 교환 끝 (아이템과 돈 등을 실제로 옮긴다)
 bool CExchange::Done()
 {
-	int		empty_pos, i;
+	int32_t		empty_pos, i;
 	LPITEM	item;
 
 	LPCHARACTER	victim = GetCompany()->GetOwner();
@@ -486,7 +486,7 @@ bool CExchange::Done()
 			}
 		}
 
-		m_apItems[i] = NULL;
+		m_apItems[i] = nullptr;
 	}
 
 	if (m_lGold)
@@ -520,7 +520,7 @@ bool CExchange::Accept(bool bAccept)
 	// 둘 다 동의 했으므로 교환 성립
 	if (m_bAccept && GetCompany()->m_bAccept)
 	{
-		int	iItemCount;
+		int32_t	iItemCount;
 
 		LPCHARACTER victim = GetCompany()->GetOwner();
 
@@ -616,9 +616,9 @@ EXCHANGE_END:
 void CExchange::Cancel()
 {
 	exchange_packet(GetOwner(), EXCHANGE_SUBHEADER_GC_END, 0, 0, NPOS, 0);
-	GetOwner()->SetExchange(NULL);
+	GetOwner()->SetExchange(nullptr);
 
-	for (int i = 0; i < EXCHANGE_ITEM_MAX_NUM; ++i)
+	for (int32_t i = 0; i < EXCHANGE_ITEM_MAX_NUM; ++i)
 	{
 		if (m_apItems[i])
 			m_apItems[i]->SetExchanging(false);
@@ -626,7 +626,7 @@ void CExchange::Cancel()
 
 	if (GetCompany())
 	{
-		GetCompany()->SetCompany(NULL);
+		GetCompany()->SetCompany(nullptr);
 		GetCompany()->Cancel();
 	}
 

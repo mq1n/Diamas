@@ -26,27 +26,27 @@ void CMonsterAreaInfo::Clear()
 	RemoveAllMonsters();
 }
 
-void CMonsterAreaInfo::SetOrigin(long lOriginX, long lOriginY)
+void CMonsterAreaInfo::SetOrigin(int32_t lOriginX, int32_t lOriginY)
 {
 	m_lOriginX = lOriginX;
 	m_lOriginY = lOriginY;
 	SetLRTB();
 }
 
-void CMonsterAreaInfo::SetSize(long lSizeX, long lSizeY)
+void CMonsterAreaInfo::SetSize(int32_t lSizeX, int32_t lSizeY)
 {
 	m_lSizeX = lSizeX;
 	m_lSizeY = lSizeY;
 	SetLRTB();
 }
 
-void CMonsterAreaInfo::GetOrigin(long * plOriginX, long * plOriginY)
+void CMonsterAreaInfo::GetOrigin(int32_t * plOriginX, int32_t * plOriginY)
 {
 	*plOriginX = m_lOriginX;
 	*plOriginY = m_lOriginY;
 }
 
-void CMonsterAreaInfo::GetSize(long * plSizeX, long * plSizeY)
+void CMonsterAreaInfo::GetSize(int32_t * plSizeX, int32_t * plSizeY)
 {
 	*plSizeX = m_lSizeX;
 	*plSizeY = m_lSizeY;
@@ -60,7 +60,7 @@ void CMonsterAreaInfo::SetLRTB()
 	m_lBottom = m_lOriginY + m_lSizeY;
 }
 
-void CMonsterAreaInfo::SetMonsterCount(DWORD dwCount)
+void CMonsterAreaInfo::SetMonsterCount(uint32_t dwCount)
 {
 	m_dwMonsterCount = dwCount;
 
@@ -70,7 +70,7 @@ void CMonsterAreaInfo::SetMonsterCount(DWORD dwCount)
 	m_TempMonsterPosVector.clear();
 	m_TempMonsterPosVector.resize(dwCount);
 
-	for (DWORD dwI = 0; dwI < dwCount; ++dwI)
+	for (uint32_t dwI = 0; dwI < dwCount; ++dwI)
 	{
 		m_TempMonsterPosVector[dwI].x = (float)random_range(m_lLeft, m_lRight);
 		m_TempMonsterPosVector[dwI].y = (float)random_range(m_lTop, m_lBottom);
@@ -139,7 +139,7 @@ void CMonsterAreaInfo::RemoveAllMonsters()
 	m_TempMonsterPosVector.clear();
 }
 
-D3DXVECTOR2 CMonsterAreaInfo::GetTempMonsterPos(DWORD dwIndex)
+D3DXVECTOR2 CMonsterAreaInfo::GetTempMonsterPos(uint32_t dwIndex)
 {
 	if (dwIndex >= m_TempMonsterPosVector.size())
 		return D3DXVECTOR2(0.0f, 0.0f);

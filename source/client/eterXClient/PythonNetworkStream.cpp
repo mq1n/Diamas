@@ -12,7 +12,7 @@
 #include "ProcessCRC.h"
 
 // MARK_BUG_FIX
-static DWORD gs_nextDownloadMarkTime = 0;
+static uint32_t gs_nextDownloadMarkTime = 0;
 // END_OF_MARK_BUG_FIX
 
 // Packet ---------------------------------------------------------------------------
@@ -136,7 +136,7 @@ class CMainPacketHeaderMap : public CNetworkPacketHeaderMap
 
 			Set(HEADER_GC_FISHING,	CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCFishing), STATIC_SIZE_PACKET));
 			Set(HEADER_GC_DUNGEON, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCDungeon), DYNAMIC_SIZE_PACKET));
-			//Set(HEADER_GC_SLOW_TIMER, CNetworkPacketHeaderMap::TPacketType(sizeof(BYTE), STATIC_SIZE_PACKET));
+			//Set(HEADER_GC_SLOW_TIMER, CNetworkPacketHeaderMap::TPacketType(sizeof(uint8_t), STATIC_SIZE_PACKET));
 			Set(HEADER_GC_TIME, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCTime), STATIC_SIZE_PACKET));
 			Set(HEADER_GC_WALK_MODE, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCWalkMode), STATIC_SIZE_PACKET));
 			Set(HEADER_GC_CHANGE_SKILL_GROUP, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCChangeSkillGroup), STATIC_SIZE_PACKET));
@@ -181,7 +181,7 @@ class CMainPacketHeaderMap : public CNetworkPacketHeaderMap
 		}
 };
 
-int g_iLastPacket[2] = { 0, 0 };
+int32_t g_iLastPacket[2] = { 0, 0 };
 
 void CPythonNetworkStream::ExitApplication()
 {
@@ -240,12 +240,12 @@ bool CPythonNetworkStream::__IsNotPing()
 	return false;
 }
 
-DWORD CPythonNetworkStream::GetGuildID()
+uint32_t CPythonNetworkStream::GetGuildID()
 {
 	return m_dwGuildID;
 }
 
-UINT CPythonNetworkStream::UploadMark(const char * c_szImageFileName)
+uint32_t CPythonNetworkStream::UploadMark(const char * c_szImageFileName)
 {
 	// MARK_BUG_FIX
 	// 길드를 만든 직후는 길드 아이디가 0이다.
@@ -255,7 +255,7 @@ UINT CPythonNetworkStream::UploadMark(const char * c_szImageFileName)
 	gs_nextDownloadMarkTime = 0;
 	// END_OF_MARK_BUG_FIX
 
-	UINT uError=ERROR_UNKNOWN;
+	uint32_t uError=ERROR_UNKNOWN;
 	CGuildMarkUploader& rkGuildMarkUploader=CGuildMarkUploader::Instance();
 	if (!rkGuildMarkUploader.Connect(m_kMarkAuth.m_kNetAddr, m_kMarkAuth.m_dwHandle, m_kMarkAuth.m_dwRandomKey, m_dwGuildID, c_szImageFileName, &uError))
 	{
@@ -288,9 +288,9 @@ UINT CPythonNetworkStream::UploadMark(const char * c_szImageFileName)
 	return ERROR_NONE;
 }
 
-UINT CPythonNetworkStream::UploadSymbol(const char* c_szImageFileName)
+uint32_t CPythonNetworkStream::UploadSymbol(const char* c_szImageFileName)
 {
-	UINT uError=ERROR_UNKNOWN;
+	uint32_t uError=ERROR_UNKNOWN;
 	CGuildMarkUploader& rkGuildMarkUploader=CGuildMarkUploader::Instance();
 	if (!rkGuildMarkUploader.ConnectToSendSymbol(m_kMarkAuth.m_kNetAddr, m_kMarkAuth.m_dwHandle, m_kMarkAuth.m_dwRandomKey, m_dwGuildID, c_szImageFileName, &uError))
 	{
@@ -319,7 +319,7 @@ UINT CPythonNetworkStream::UploadSymbol(const char* c_szImageFileName)
 void CPythonNetworkStream::__DownloadMark()
 {
 	// 3분 안에는 다시 접속하지 않는다.
-	DWORD curTime = ELTimer_GetMSec();
+	uint32_t curTime = ELTimer_GetMSec();
 
 	if (curTime < gs_nextDownloadMarkTime)
 		return;
@@ -330,13 +330,13 @@ void CPythonNetworkStream::__DownloadMark()
 	rkGuildMarkDownloader.Connect(m_kMarkAuth.m_kNetAddr, m_kMarkAuth.m_dwHandle, m_kMarkAuth.m_dwRandomKey);
 }
 
-void CPythonNetworkStream::__DownloadSymbol(const std::vector<DWORD> & c_rkVec_dwGuildID)
+void CPythonNetworkStream::__DownloadSymbol(const std::vector<uint32_t> & c_rkVec_dwGuildID)
 {
 	CGuildMarkDownloader& rkGuildMarkDownloader=CGuildMarkDownloader::Instance();
 	rkGuildMarkDownloader.ConnectToRecvSymbol(m_kMarkAuth.m_kNetAddr, m_kMarkAuth.m_dwHandle, m_kMarkAuth.m_dwRandomKey, c_rkVec_dwGuildID);
 }
 
-void CPythonNetworkStream::SetPhaseWindow(UINT ePhaseWnd, PyObject* poPhaseWnd)
+void CPythonNetworkStream::SetPhaseWindow(uint32_t ePhaseWnd, PyObject* poPhaseWnd)
 {
 	if (ePhaseWnd>=PHASE_WINDOW_NUM)
 		return;
@@ -344,7 +344,7 @@ void CPythonNetworkStream::SetPhaseWindow(UINT ePhaseWnd, PyObject* poPhaseWnd)
 	m_apoPhaseWnd[ePhaseWnd]=poPhaseWnd;
 }
 
-void CPythonNetworkStream::ClearPhaseWindow(UINT ePhaseWnd, PyObject* poPhaseWnd)
+void CPythonNetworkStream::ClearPhaseWindow(uint32_t ePhaseWnd, PyObject* poPhaseWnd)
 {
 	if (ePhaseWnd>=PHASE_WINDOW_NUM)
 		return;
@@ -368,7 +368,7 @@ bool CPythonNetworkStream::IsSelectedEmpire()
 	return false;
 }
 
-UINT CPythonNetworkStream::GetAccountCharacterSlotDatau(UINT iSlot, UINT eType)
+uint32_t CPythonNetworkStream::GetAccountCharacterSlotDatau(uint32_t iSlot, uint32_t eType)
 {
 	if (iSlot >= PLAYER_PER_ACCOUNT4)
 		return 0;
@@ -417,7 +417,7 @@ UINT CPythonNetworkStream::GetAccountCharacterSlotDatau(UINT iSlot, UINT eType)
 	return 0;
 }
 
-const char* CPythonNetworkStream::GetAccountCharacterSlotDataz(UINT iSlot, UINT eType)
+const char* CPythonNetworkStream::GetAccountCharacterSlotDataz(uint32_t iSlot, uint32_t eType)
 {
 	static const char* sc_szEmpty="";
 
@@ -430,12 +430,12 @@ const char* CPythonNetworkStream::GetAccountCharacterSlotDataz(UINT iSlot, UINT 
 	{
 		case ACCOUNT_CHARACTER_SLOT_ADDR:
 			{				
-				BYTE ip[4];
+				uint8_t ip[4];
 
-				const int LEN = 4;
-				for (int i = 0; i < LEN; i++)
+				const int32_t LEN = 4;
+				for (int32_t i = 0; i < LEN; i++)
 				{
-					ip[i] = BYTE(rkSimplePlayerInfo.lAddr&0xff);
+					ip[i] = uint8_t(rkSimplePlayerInfo.lAddr&0xff);
 					rkSimplePlayerInfo.lAddr>>=8;
 				}
 
@@ -455,17 +455,17 @@ const char* CPythonNetworkStream::GetAccountCharacterSlotDataz(UINT iSlot, UINT 
 	return sc_szEmpty;
 }
 
-void CPythonNetworkStream::ConnectLoginServer(const char* c_szAddr, UINT uPort)
+void CPythonNetworkStream::ConnectLoginServer(const char* c_szAddr, uint32_t uPort)
 {
 	CNetworkStream::Connect(c_szAddr, uPort);		
 }
 
-void CPythonNetworkStream::SetMarkServer(const char* c_szAddr, UINT uPort)
+void CPythonNetworkStream::SetMarkServer(const char* c_szAddr, uint32_t uPort)
 {
 	m_kMarkAuth.m_kNetAddr.Set(c_szAddr, uPort);
 }
 
-void CPythonNetworkStream::ConnectGameServer(UINT iChrSlot)
+void CPythonNetworkStream::ConnectGameServer(uint32_t iChrSlot)
 {
 	if (iChrSlot >= PLAYER_PER_ACCOUNT4)
 		return;
@@ -475,7 +475,7 @@ void CPythonNetworkStream::ConnectGameServer(UINT iChrSlot)
 	__DirectEnterMode_Set(iChrSlot);
 
 	TSimplePlayerInformation&	rkSimplePlayerInfo=m_akSimplePlayerInfo[iChrSlot];	
-	CNetworkStream::Connect((DWORD)rkSimplePlayerInfo.lAddr, rkSimplePlayerInfo.wPort);
+	CNetworkStream::Connect((uint32_t)rkSimplePlayerInfo.lAddr, rkSimplePlayerInfo.wPort);
 }
 
 void CPythonNetworkStream::SetLoginInfo(const char* c_szID, const char* c_szPassword)
@@ -489,7 +489,7 @@ void CPythonNetworkStream::ClearLoginInfo( void )
 	m_stPassword = "";
 }
 
-void CPythonNetworkStream::SetLoginKey(DWORD dwLoginKey)
+void CPythonNetworkStream::SetLoginKey(uint32_t dwLoginKey)
 {
 	m_dwLoginKey = dwLoginKey;
 }
@@ -578,7 +578,7 @@ bool CPythonNetworkStream::CheckPacket(TPacketHeader * pRetHeader)
 	return true;
 }
 
-bool CPythonNetworkStream::RecvErrorPacket(int header)
+bool CPythonNetworkStream::RecvErrorPacket(int32_t header)
 {
 	TraceError("Phase %s does not handle this header (header: %d, last: %d, %d)",
 		m_strPhase.c_str(), header, g_iLastPacket[0], g_iLastPacket[1]);
@@ -656,7 +656,7 @@ bool CPythonNetworkStream::RecvPingPacket()
 		return true;
 }
 
-bool CPythonNetworkStream::RecvDefaultPacket(int header)
+bool CPythonNetworkStream::RecvDefaultPacket(int32_t header)
 {
 	if (!header)
 		return true;
@@ -744,32 +744,32 @@ void CPythonNetworkStream::SetHandler(PyObject* poHandler)
 }
 
 // ETC
-DWORD CPythonNetworkStream::GetMainActorVID()
+uint32_t CPythonNetworkStream::GetMainActorVID()
 {
 	return m_dwMainActorVID;
 }
 
-DWORD CPythonNetworkStream::GetMainActorRace()
+uint32_t CPythonNetworkStream::GetMainActorRace()
 {
 	return m_dwMainActorRace;
 }
 
-DWORD CPythonNetworkStream::GetMainActorEmpire()
+uint32_t CPythonNetworkStream::GetMainActorEmpire()
 {
 	return m_dwMainActorEmpire;
 }
 
-DWORD CPythonNetworkStream::GetMainActorSkillGroup()
+uint32_t CPythonNetworkStream::GetMainActorSkillGroup()
 {
 	return m_dwMainActorSkillGroup;
 }
 
-void CPythonNetworkStream::SetEmpireID(DWORD dwEmpireID)
+void CPythonNetworkStream::SetEmpireID(uint32_t dwEmpireID)
 {
 	m_dwEmpireID = dwEmpireID;
 }
 
-DWORD CPythonNetworkStream::GetEmpireID()
+uint32_t CPythonNetworkStream::GetEmpireID()
 {
 	return m_dwEmpireID;
 }
@@ -778,7 +778,7 @@ void CPythonNetworkStream::__ClearSelectCharacterData()
 {
 	memset(&m_akSimplePlayerInfo, 0, sizeof(m_akSimplePlayerInfo));
 
-	for (int i = 0; i < PLAYER_PER_ACCOUNT4; ++i)
+	for (int32_t i = 0; i < PLAYER_PER_ACCOUNT4; ++i)
 	{
 		m_adwGuildID[i] = 0;
 		m_astrGuildName[i] = "";
@@ -791,7 +791,7 @@ void CPythonNetworkStream::__DirectEnterMode_Initialize()
 	m_kDirectEnterMode.m_dwChrSlotIndex=0;	
 }
 
-void CPythonNetworkStream::__DirectEnterMode_Set(UINT uChrSlotIndex)
+void CPythonNetworkStream::__DirectEnterMode_Set(uint32_t uChrSlotIndex)
 {
 	m_kDirectEnterMode.m_isSet=true;
 	m_kDirectEnterMode.m_dwChrSlotIndex=uChrSlotIndex;
@@ -814,17 +814,17 @@ void CPythonNetworkStream::__BettingGuildWar_Initialize()
 	m_kBettingGuildWar.m_dwObserverCount=0;
 }
 
-void CPythonNetworkStream::__BettingGuildWar_SetObserverCount(UINT uObserverCount)
+void CPythonNetworkStream::__BettingGuildWar_SetObserverCount(uint32_t uObserverCount)
 {
 	m_kBettingGuildWar.m_dwObserverCount=uObserverCount;
 }
 
-void CPythonNetworkStream::__BettingGuildWar_SetBettingMoney(UINT uBettingMoney)
+void CPythonNetworkStream::__BettingGuildWar_SetBettingMoney(uint32_t uBettingMoney)
 {
 	m_kBettingGuildWar.m_dwBettingMoney=uBettingMoney;
 }
 
-DWORD CPythonNetworkStream::EXPORT_GetBettingGuildWarValue(const char* c_szValueName)
+uint32_t CPythonNetworkStream::EXPORT_GetBettingGuildWarValue(const char* c_szValueName)
 {
 	if (stricmp(c_szValueName, "OBSERVER_COUNT") == 0)
 		return m_kBettingGuildWar.m_dwObserverCount;
@@ -846,7 +846,7 @@ void CPythonNetworkStream::SetWaitFlag()
 	m_isWaitLoginKey = TRUE;
 }
 
-void CPythonNetworkStream::SendEmoticon(UINT eEmoticon)
+void CPythonNetworkStream::SendEmoticon(uint32_t eEmoticon)
 {
 	if(eEmoticon < m_EmoticonStringVector.size())
 		SendChatPacket(m_EmoticonStringVector[eEmoticon].c_str());
@@ -869,7 +869,7 @@ CPythonNetworkStream::CPythonNetworkStream()
 	m_dwMainActorRace = 0;
 	m_dwMainActorEmpire = 0;
 	m_dwMainActorSkillGroup = 0;
-	m_poHandler = NULL;
+	m_poHandler = nullptr;
 
 	m_dwLastGamePingTime = 0;
 
@@ -886,8 +886,8 @@ CPythonNetworkStream::CPythonNetworkStream()
 	__DirectEnterMode_Initialize();
 	__BettingGuildWar_Initialize();
 
-	std::fill(m_apoPhaseWnd, m_apoPhaseWnd+PHASE_WINDOW_NUM, (PyObject*)NULL);
-	m_poSerCommandParserWnd = NULL;
+	std::fill(m_apoPhaseWnd, m_apoPhaseWnd+PHASE_WINDOW_NUM, (PyObject*)nullptr);
+	m_poSerCommandParserWnd = nullptr;
 
 	SetOffLinePhase();
 }

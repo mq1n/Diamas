@@ -13,9 +13,9 @@
 class SpamManager : public singleton<SpamManager>
 {
 	public:
-		inline const char * GetSpamScore(const char * src, size_t len, unsigned int & score)
+		inline const char * GetSpamScore(const char * src, size_t len, uint32_t & score)
 		{
-			const char * word = NULL;
+			const char * word = nullptr;
 			score = 0;
 
 			std::string strOrig(src);
@@ -23,7 +23,7 @@ class SpamManager : public singleton<SpamManager>
 
 			for (size_t i = 0; i < m_vec_word.size(); ++i)
 			{
-				std::pair<std::string, unsigned int> & r = m_vec_word[i];
+				std::pair<std::string, uint32_t> & r = m_vec_word[i];
 
 				if (true == WildCaseCmp(r.first.c_str(), strOrig.c_str()))
 				{
@@ -40,14 +40,14 @@ class SpamManager : public singleton<SpamManager>
 			m_vec_word.clear();
 		}
 
-		inline void Insert(const char * str, unsigned int score = 10)
+		inline void Insert(const char * str, uint32_t score = 10)
 		{
 			m_vec_word.push_back(std::make_pair(str, score));
 			sys_log(0, "SPAM: %2d %s", score, str);
 		}
 
 	private:
-		std::vector< std::pair<std::string, unsigned int> > m_vec_word;
+		std::vector< std::pair<std::string, uint32_t> > m_vec_word;
 };
 
 #endif

@@ -60,11 +60,11 @@ struct BlockCipherAlgorithm {
   BlockCipherAlgorithm() {}
   virtual ~BlockCipherAlgorithm() {}
 
-  static BlockCipherAlgorithm* Pick(int hint);
+  static BlockCipherAlgorithm* Pick(int32_t hint);
 
-  virtual int GetBlockSize() const = 0;
-  virtual int GetDefaultKeyLength() const = 0;
-  virtual int GetIVLength() const = 0;
+  virtual int32_t GetBlockSize() const = 0;
+  virtual int32_t GetDefaultKeyLength() const = 0;
+  virtual int32_t GetIVLength() const = 0;
 
   virtual SymmetricCipher* CreateEncoder(const byte* key, size_t keylen,
                                          const byte* iv) const = 0;
@@ -78,9 +78,9 @@ struct BlockCipherDetail : public BlockCipherAlgorithm {
   BlockCipherDetail() {}
   virtual ~BlockCipherDetail() {}
 
-  virtual int GetBlockSize() const { return T::BLOCKSIZE; }
-  virtual int GetDefaultKeyLength() const { return T::DEFAULT_KEYLENGTH; }
-  virtual int GetIVLength() const { return T::IV_LENGTH; }
+  virtual int32_t GetBlockSize() const { return T::BLOCKSIZE; }
+  virtual int32_t GetDefaultKeyLength() const { return T::DEFAULT_KEYLENGTH; }
+  virtual int32_t GetIVLength() const { return T::IV_LENGTH; }
 
   virtual SymmetricCipher* CreateEncoder(const byte* key, size_t keylen,
                                          const byte* iv) const {
@@ -124,7 +124,7 @@ class DH2KeyAgreement : public KeyAgreement {
 };
 
 Cipher::Cipher()
-    : activated_(false), encoder_(NULL), decoder_(NULL), key_agreement_(NULL) {
+    : activated_(false), encoder_(nullptr), decoder_(nullptr), key_agreement_(nullptr) {
 }
 
 Cipher::~Cipher() {
@@ -134,29 +134,29 @@ Cipher::~Cipher() {
 }
 
 void Cipher::CleanUp() {
-  if (encoder_ != NULL) {
+  if (encoder_ != nullptr) {
     delete encoder_;
-    encoder_ = NULL;
+    encoder_ = nullptr;
   }
-  if (decoder_ != NULL) {
+  if (decoder_ != nullptr) {
     delete decoder_;
-    decoder_ = NULL;
+    decoder_ = nullptr;
   }
-  if (key_agreement_ != NULL) {
+  if (key_agreement_ != nullptr) {
     delete key_agreement_;
-    key_agreement_ = NULL;
+    key_agreement_ = nullptr;
   }
   activated_ = false;
 }
 
 size_t Cipher::Prepare(void* buffer, size_t* length) {
-  assert(key_agreement_ == NULL);
+  assert(key_agreement_ == nullptr);
   key_agreement_ = new DH2KeyAgreement();
-  assert(key_agreement_ != NULL);
+  assert(key_agreement_ != nullptr);
   size_t agreed_length = key_agreement_->Prepare(buffer, length);
   if (agreed_length == 0) {
     delete key_agreement_;
-    key_agreement_ = NULL;
+    key_agreement_ = nullptr;
   }
   return agreed_length;
 }
@@ -164,7 +164,7 @@ size_t Cipher::Prepare(void* buffer, size_t* length) {
 bool Cipher::Activate(bool polarity, size_t agreed_length,
                       const void* buffer, size_t length) {
   assert(activated_ == false);
-  assert(key_agreement_ != NULL);
+  assert(key_agreement_ != nullptr);
   if (activated_ != false)
 	  return false;
   
@@ -172,12 +172,12 @@ bool Cipher::Activate(bool polarity, size_t agreed_length,
     activated_ = SetUp(polarity);
   }
   delete key_agreement_;
-  key_agreement_ = NULL;
+  key_agreement_ = nullptr;
   return activated_;
 }
 
 bool Cipher::SetUp(bool polarity) {
-  assert(key_agreement_ != NULL);
+  assert(key_agreement_ != nullptr);
   const SecByteBlock& shared = key_agreement_->shared();
 
   // Pick a block cipher algorithm
@@ -185,12 +185,12 @@ bool Cipher::SetUp(bool polarity) {
   if (shared.size() < 2) {
     return false;
   }
-  int hint_0 = shared.BytePtr()[*(shared.BytePtr()) % shared.size()];
-  int hint_1 = shared.BytePtr()[*(shared.BytePtr() + 1) % shared.size()];
+  int32_t hint_0 = shared.BytePtr()[*(shared.BytePtr()) % shared.size()];
+  int32_t hint_1 = shared.BytePtr()[*(shared.BytePtr() + 1) % shared.size()];
   BlockCipherAlgorithm* detail_0 = BlockCipherAlgorithm::Pick(hint_0);
   BlockCipherAlgorithm* detail_1 = BlockCipherAlgorithm::Pick(hint_1);
-  assert(detail_0 != NULL);
-  assert(detail_1 != NULL);
+  assert(detail_0 != nullptr);
+  assert(detail_1 != nullptr);
   std::unique_ptr<BlockCipherAlgorithm> algorithm_0(detail_0);
   std::unique_ptr<BlockCipherAlgorithm> algorithm_1(detail_1);
 
@@ -231,14 +231,14 @@ bool Cipher::SetUp(bool polarity) {
     encoder_ = algorithm_0->CreateEncoder(key_0, key_0.size(), iv_0);
     decoder_ = algorithm_1->CreateDecoder(key_1, key_1.size(), iv_1);
   }
-  assert(encoder_ != NULL);
-  assert(decoder_ != NULL);
+  assert(encoder_ != nullptr);
+  assert(decoder_ != nullptr);
   return true;
 }
 
-BlockCipherAlgorithm* BlockCipherAlgorithm::Pick(int hint) {
+BlockCipherAlgorithm* BlockCipherAlgorithm::Pick(int32_t hint) {
   BlockCipherAlgorithm* detail;
-  int selector = hint % kMaxAlgorithms;
+  int32_t selector = hint % kMaxAlgorithms;
   switch (selector) {
 //    case kAES:
 //      detail = new BlockCipherDetail<AES>();

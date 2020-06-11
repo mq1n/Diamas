@@ -41,20 +41,20 @@
 #include "buff_on_attributes.h"
 #include "belt_inventory_helper.h"
 
-const int ITEM_BROKEN_METIN_VNUM = 28960;
+const int32_t ITEM_BROKEN_METIN_VNUM = 28960;
 #define ENABLE_EFFECT_EXTRAPOT
 #define ENABLE_BOOKS_STACKFIX
 
 // CHANGE_ITEM_ATTRIBUTES
-// const DWORD CHARACTER::msc_dwDefaultChangeItemAttrCycle = 10;
+// const uint32_t CHARACTER::msc_dwDefaultChangeItemAttrCycle = 10;
 const char CHARACTER::msc_szLastChangeItemAttrFlag[] = "Item.LastChangeItemAttr";
 // const char CHARACTER::msc_szChangeItemAttrCycleFlag[] = "change_itemattr_cycle";
 // END_OF_CHANGE_ITEM_ATTRIBUTES
-const BYTE g_aBuffOnAttrPoints[] = { POINT_ENERGY, POINT_COSTUME_ATTR_BONUS };
+const uint8_t g_aBuffOnAttrPoints[] = { POINT_ENERGY, POINT_COSTUME_ATTR_BONUS };
 
 struct FFindStone
 {
-	std::map<DWORD, LPCHARACTER> m_mapStone;
+	std::map<uint32_t, LPCHARACTER> m_mapStone;
 
 	void operator()(LPENTITY pEnt)
 	{
@@ -64,7 +64,7 @@ struct FFindStone
 
 			if (pChar->IsStone() == true)
 			{
-				m_mapStone[(DWORD)pChar->GetVID()] = pChar;
+				m_mapStone[(uint32_t)pChar->GetVID()] = pChar;
 			}
 		}
 	}
@@ -72,7 +72,7 @@ struct FFindStone
 
 
 //귀환부, 귀환기억부, 결혼반지
-static bool IS_SUMMON_ITEM(int vnum)
+static bool IS_SUMMON_ITEM(int32_t vnum)
 {
 	switch (vnum)
 	{
@@ -87,7 +87,7 @@ static bool IS_SUMMON_ITEM(int vnum)
 	return false;
 }
 
-static bool IS_MONKEY_DUNGEON(int map_index)
+static bool IS_MONKEY_DUNGEON(int32_t map_index)
 {
 	switch (map_index)
 	{
@@ -102,7 +102,7 @@ static bool IS_MONKEY_DUNGEON(int map_index)
 	return false;
 }
 
-bool IS_SUMMONABLE_ZONE(int map_index)
+bool IS_SUMMONABLE_ZONE(int32_t map_index)
 {
 	if (IS_MONKEY_DUNGEON(map_index))
 		return false;
@@ -137,7 +137,7 @@ bool IS_SUMMONABLE_ZONE(int map_index)
 	return true;
 }
 
-bool IS_BOTARYABLE_ZONE(int nMapIndex)
+bool IS_BOTARYABLE_ZONE(int32_t nMapIndex)
 {
 	if (!g_bEnableBootaryCheck) return true;
 
@@ -158,7 +158,7 @@ bool IS_BOTARYABLE_ZONE(int nMapIndex)
 // item socket 이 프로토타입과 같은지 체크 -- by mhh
 static bool FN_check_item_socket(LPITEM item)
 {
-	for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+	for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 	{
 		if (item->GetSocket(i) != item->GetProto()->alSockets[i])
 			return false;
@@ -170,7 +170,7 @@ static bool FN_check_item_socket(LPITEM item)
 // item socket 복사 -- by mhh
 static void FN_copy_item_socket(LPITEM dest, LPITEM src)
 {
-	for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+	for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 	{
 		dest->SetSocket(i, src->GetSocket(i));
 	}
@@ -210,7 +210,7 @@ bool CHARACTER::CanHandleItem(bool bSkipCheckRefine, bool bSkipObserver)
 		if (m_bUnderRefine)
 			return false;
 
-	if (IsCubeOpen() || NULL != DragonSoul_RefineWindow_GetOpener())
+	if (IsCubeOpen() || nullptr != DragonSoul_RefineWindow_GetOpener())
 		return false;
 
 	if (IsWarping())
@@ -222,16 +222,16 @@ bool CHARACTER::CanHandleItem(bool bSkipCheckRefine, bool bSkipObserver)
 	return true;
 }
 
-LPITEM CHARACTER::GetInventoryItem(WORD wCell) const
+LPITEM CHARACTER::GetInventoryItem(uint16_t wCell) const
 {
 	return GetItem(TItemPos(INVENTORY, wCell));
 }
 LPITEM CHARACTER::GetItem(TItemPos Cell) const
 {
 	if (!IsValidItemPosition(Cell))
-		return NULL;
-	WORD wCell = Cell.cell;
-	BYTE window_type = Cell.window_type;
+		return nullptr;
+	uint16_t wCell = Cell.cell;
+	uint8_t window_type = Cell.window_type;
 	switch (window_type)
 	{
 	case INVENTORY:
@@ -239,21 +239,21 @@ LPITEM CHARACTER::GetItem(TItemPos Cell) const
 		if (wCell >= INVENTORY_AND_EQUIP_SLOT_MAX)
 		{
 			sys_err("CHARACTER::GetInventoryItem: invalid item cell %d", wCell);
-			return NULL;
+			return nullptr;
 		}
 		return m_pointsInstant.pItems[wCell];
 	case DRAGON_SOUL_INVENTORY:
 		if (wCell >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 		{
 			sys_err("CHARACTER::GetInventoryItem: invalid DS item cell %d", wCell);
-			return NULL;
+			return nullptr;
 		}
 		return m_pointsInstant.pDSItems[wCell];
 
 	default:
-		return NULL;
+		return nullptr;
 	}
-	return NULL;
+	return nullptr;
 }
 
 #ifdef ENABLE_HIGHLIGHT_NEW_ITEM
@@ -262,9 +262,9 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem, bool bWereMine)
 void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 #endif
 {
-	WORD wCell = Cell.cell;
-	BYTE window_type = Cell.window_type;
-	if ((unsigned long)((CItem*)pItem) == 0xff || (unsigned long)((CItem*)pItem) == 0xffffffff)
+	uint16_t wCell = Cell.cell;
+	uint8_t window_type = Cell.window_type;
+	if ((uint32_t)((CItem*)pItem) == 0xff || (uint32_t)((CItem*)pItem) == 0xffffffff)
 	{
 		sys_err("!!! FATAL ERROR !!! item == 0xff (char: %s cell: %u)", GetName(), wCell);
 		core_dump();
@@ -294,9 +294,9 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 			{
 				if (wCell < INVENTORY_MAX_NUM)
 				{
-					for (int i = 0; i < pOld->GetSize(); ++i)
+					for (int32_t i = 0; i < pOld->GetSize(); ++i)
 					{
-						int p = wCell + (i * 5);
+						int32_t p = wCell + (i * 5);
 
 						if (p >= INVENTORY_MAX_NUM)
 							continue;
@@ -315,9 +315,9 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 			{
 				if (wCell < INVENTORY_MAX_NUM)
 				{
-					for (int i = 0; i < pItem->GetSize(); ++i)
+					for (int32_t i = 0; i < pItem->GetSize(); ++i)
 					{
-						int p = wCell + (i * 5);
+						int32_t p = wCell + (i * 5);
 
 						if (p >= INVENTORY_MAX_NUM)
 							continue;
@@ -343,9 +343,9 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 			{
 				if (wCell < DRAGON_SOUL_INVENTORY_MAX_NUM)
 				{
-					for (int i = 0; i < pOld->GetSize(); ++i)
+					for (int32_t i = 0; i < pOld->GetSize(); ++i)
 					{
-						int p = wCell + (i * DRAGON_SOUL_BOX_COLUMN_NUM);
+						int32_t p = wCell + (i * DRAGON_SOUL_BOX_COLUMN_NUM);
 
 						if (p >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 							continue;
@@ -370,9 +370,9 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 
 				if (wCell < DRAGON_SOUL_INVENTORY_MAX_NUM)
 				{
-					for (int i = 0; i < pItem->GetSize(); ++i)
+					for (int32_t i = 0; i < pItem->GetSize(); ++i)
 					{
-						int p = wCell + (i * DRAGON_SOUL_BOX_COLUMN_NUM);
+						int32_t p = wCell + (i * DRAGON_SOUL_BOX_COLUMN_NUM);
 
 						if (p >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 							continue;
@@ -451,19 +451,19 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 	}
 }
 
-LPITEM CHARACTER::GetWear(BYTE bCell) const
+LPITEM CHARACTER::GetWear(uint8_t bCell) const
 {
 	// > WEAR_MAX_NUM : 용혼석 슬롯들.
 	if (bCell >= WEAR_MAX_NUM + DRAGON_SOUL_DECK_MAX_NUM * DS_SLOT_MAX)
 	{
 		sys_err("CHARACTER::GetWear: invalid wear cell %d", bCell);
-		return NULL;
+		return nullptr;
 	}
 
 	return m_pointsInstant.pItems[INVENTORY_MAX_NUM + bCell];
 }
 
-void CHARACTER::SetWear(BYTE bCell, LPITEM item)
+void CHARACTER::SetWear(uint8_t bCell, LPITEM item)
 {
 	// > WEAR_MAX_NUM : 용혼석 슬롯들.
 	if (bCell >= WEAR_MAX_NUM + DRAGON_SOUL_DECK_MAX_NUM * DS_SLOT_MAX)
@@ -487,7 +487,7 @@ void CHARACTER::SetWear(BYTE bCell, LPITEM item)
 
 void CHARACTER::ClearItem()
 {
-	int		i;
+	int32_t		i;
 	LPITEM	item;
 	
 	for (i = 0; i < INVENTORY_AND_EQUIP_SLOT_MAX; ++i)
@@ -516,13 +516,13 @@ void CHARACTER::ClearItem()
 	}
 }
 
-bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) const
+bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, uint8_t bSize, int32_t iExceptionCell) const
 {
 	switch (Cell.window_type)
 	{
 	case INVENTORY:
 		{
-			WORD bCell = Cell.cell;
+			uint16_t bCell = Cell.cell;
 
 			// bItemCell은 0이 false임을 나타내기 위해 + 1 해서 처리한다.
 			// 따라서 iExceptionCell에 1을 더해 비교한다.
@@ -532,7 +532,7 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 			{
 				LPITEM beltItem = GetWear(WEAR_BELT);
 
-				if (NULL == beltItem)
+				if (nullptr == beltItem)
 					return false;
 
 				if (false == CBeltInventoryHelper::IsAvailableCell(bCell - BELT_INVENTORY_SLOT_START, beltItem->GetValue(0)))
@@ -560,12 +560,12 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 					if (bSize == 1)
 						return true;
 
-					int j = 1;
-					BYTE bPage = bCell / (INVENTORY_MAX_NUM / INVENTORY_PAGE_COUNT);
+					int32_t j = 1;
+					uint8_t bPage = bCell / (INVENTORY_MAX_NUM / INVENTORY_PAGE_COUNT);
 
 					do
 					{
-						BYTE p = bCell + (5 * j);
+						uint8_t p = bCell + (5 * j);
 
 						if (p >= INVENTORY_MAX_NUM)
 							return false;
@@ -590,12 +590,12 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 				return true;
 			else
 			{
-				int j = 1;
-				BYTE bPage = bCell / (INVENTORY_MAX_NUM / INVENTORY_PAGE_COUNT);
+				int32_t j = 1;
+				uint8_t bPage = bCell / (INVENTORY_MAX_NUM / INVENTORY_PAGE_COUNT);
 
 				do
 				{
-					BYTE p = bCell + (5 * j);
+					uint8_t p = bCell + (5 * j);
 
 					if (p >= INVENTORY_MAX_NUM)
 						return false;
@@ -615,7 +615,7 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 		break;
 	case DRAGON_SOUL_INVENTORY:
 		{
-			WORD wCell = Cell.cell;
+			uint16_t wCell = Cell.cell;
 			if (wCell >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 				return false;
 
@@ -630,11 +630,11 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 					if (bSize == 1)
 						return true;
 
-					int j = 1;
+					int32_t j = 1;
 
 					do
 					{
-						int p = wCell + (DRAGON_SOUL_BOX_COLUMN_NUM * j);
+						int32_t p = wCell + (DRAGON_SOUL_BOX_COLUMN_NUM * j);
 
 						if (p >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 							return false;
@@ -656,11 +656,11 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 				return true;
 			else
 			{
-				int j = 1;
+				int32_t j = 1;
 
 				do
 				{
-					int p = wCell + (DRAGON_SOUL_BOX_COLUMN_NUM * j);
+					int32_t p = wCell + (DRAGON_SOUL_BOX_COLUMN_NUM * j);
 
 					if (p >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 						return false;
@@ -678,49 +678,49 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 	return false;
 }
 
-int CHARACTER::GetEmptyInventory(BYTE size) const
+int32_t CHARACTER::GetEmptyInventory(uint8_t size) const
 {
 	// NOTE: 현재 이 함수는 아이템 지급, 획득 등의 행위를 할 때 인벤토리의 빈 칸을 찾기 위해 사용되고 있는데,
 	//		벨트 인벤토리는 특수 인벤토리이므로 검사하지 않도록 한다. (기본 인벤토리: INVENTORY_MAX_NUM 까지만 검사)
-	for ( int i = 0; i < INVENTORY_MAX_NUM; ++i)
+	for ( int32_t i = 0; i < INVENTORY_MAX_NUM; ++i)
 		if (IsEmptyItemGrid(TItemPos (INVENTORY, i), size))
 			return i;
 	return -1;
 }
 
-int CHARACTER::GetEmptyDragonSoulInventory(LPITEM pItem) const
+int32_t CHARACTER::GetEmptyDragonSoulInventory(LPITEM pItem) const
 {
-	if (NULL == pItem || !pItem->IsDragonSoul())
+	if (nullptr == pItem || !pItem->IsDragonSoul())
 		return -1;
 	if (!DragonSoul_IsQualified())
 	{
 		return -1;
 	}
-	BYTE bSize = pItem->GetSize();
-	WORD wBaseCell = DSManager::instance().GetBasePosition(pItem);
+	uint8_t bSize = pItem->GetSize();
+	uint16_t wBaseCell = DSManager::instance().GetBasePosition(pItem);
 
 	if (WORD_MAX == wBaseCell)
 		return -1;
 
-	for (int i = 0; i < DRAGON_SOUL_BOX_SIZE; ++i)
+	for (int32_t i = 0; i < DRAGON_SOUL_BOX_SIZE; ++i)
 		if (IsEmptyItemGrid(TItemPos(DRAGON_SOUL_INVENTORY, i + wBaseCell), bSize))
 			return i + wBaseCell;
 
 	return -1;
 }
 
-void CHARACTER::CopyDragonSoulItemGrid(std::vector<WORD>& vDragonSoulItemGrid) const
+void CHARACTER::CopyDragonSoulItemGrid(std::vector<uint16_t>& vDragonSoulItemGrid) const
 {
 	vDragonSoulItemGrid.resize(DRAGON_SOUL_INVENTORY_MAX_NUM);
 
 	std::copy(m_pointsInstant.wDSItemGrid, m_pointsInstant.wDSItemGrid + DRAGON_SOUL_INVENTORY_MAX_NUM, vDragonSoulItemGrid.begin());
 }
 
-int CHARACTER::CountEmptyInventory() const
+int32_t CHARACTER::CountEmptyInventory() const
 {
-	int	count = 0;
+	int32_t	count = 0;
 
-	for (int i = 0; i < INVENTORY_MAX_NUM; ++i)
+	for (int32_t i = 0; i < INVENTORY_MAX_NUM; ++i)
 		if (GetInventoryItem(i))
 			count += GetInventoryItem(i)->GetSize();
 
@@ -732,7 +732,7 @@ void TransformRefineItem(LPITEM pkOldItem, LPITEM pkNewItem)
 	// ACCESSORY_REFINE
 	if (pkOldItem->IsAccessoryForSocket())
 	{
-		for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+		for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 		{
 			pkNewItem->SetSocket(i, pkOldItem->GetSocket(i));
 		}
@@ -742,7 +742,7 @@ void TransformRefineItem(LPITEM pkOldItem, LPITEM pkNewItem)
 	else
 	{
 		// 여기서 깨진석이 자동적으로 청소 됨
-		for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+		for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 		{
 			if (!pkOldItem->GetSocket(i))
 				break;
@@ -751,11 +751,11 @@ void TransformRefineItem(LPITEM pkOldItem, LPITEM pkNewItem)
 		}
 
 		// 소켓 설정
-		int slot = 0;
+		int32_t slot = 0;
 
-		for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+		for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 		{
-			long socket = pkOldItem->GetSocket(i);
+			int32_t socket = pkOldItem->GetSocket(i);
 
 			if (socket > 2 && socket != ITEM_BROKEN_METIN_VNUM)
 				pkNewItem->SetSocket(slot++, socket);
@@ -769,7 +769,7 @@ void TransformRefineItem(LPITEM pkOldItem, LPITEM pkNewItem)
 
 void NotifyRefineSuccess(LPCHARACTER ch, LPITEM item, const char* way)
 {
-	if (NULL != ch && item != NULL)
+	if (nullptr != ch && item != nullptr)
 	{
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "RefineSuceeded");
 
@@ -777,9 +777,9 @@ void NotifyRefineSuccess(LPCHARACTER ch, LPITEM item, const char* way)
 	}
 }
 
-void NotifyRefineFail(LPCHARACTER ch, LPITEM item, const char* way, int success = 0)
+void NotifyRefineFail(LPCHARACTER ch, LPITEM item, const char* way, int32_t success = 0)
 {
-	if (NULL != ch && NULL != item)
+	if (nullptr != ch && nullptr != item)
 	{
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "RefineFailed");
 
@@ -789,7 +789,7 @@ void NotifyRefineFail(LPCHARACTER ch, LPITEM item, const char* way, int success 
 
 void CHARACTER::SetRefineNPC(LPCHARACTER ch)
 {
-	if ( ch != NULL )
+	if ( ch != nullptr )
 	{
 		m_dwRefineNPCVID = ch->GetVID();
 	}
@@ -823,12 +823,12 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 	if (!prt)
 		return false;
 
-	DWORD result_vnum = item->GetRefinedVnum();
+	uint32_t result_vnum = item->GetRefinedVnum();
 
 	// REFINE_COST
-	int cost = ComputeRefineFee(prt->cost);
+	int32_t cost = ComputeRefineFee(prt->cost);
 
-	int RefineChance = GetQuestFlag("main_quest_lv7.refine_chance");
+	int32_t RefineChance = GetQuestFlag("main_quest_lv7.refine_chance");
 
 	if (RefineChance > 0)
 	{
@@ -870,7 +870,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 
 	if (!bMoneyOnly && !RefineChance)
 	{
-		for (int i = 0; i < prt->material_count; ++i)
+		for (int32_t i = 0; i < prt->material_count; ++i)
 		{
 			if (CountSpecifyItem(prt->materials[i].vnum) < prt->materials[i].count)
 			{
@@ -883,11 +883,11 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 			}
 		}
 
-		for (int i = 0; i < prt->material_count; ++i)
+		for (int32_t i = 0; i < prt->material_count; ++i)
 			RemoveSpecifyItem(prt->materials[i].vnum, prt->materials[i].count);
 	}
 
-	int prob = number(1, 100);
+	int32_t prob = number(1, 100);
 
 	if (IsRefineThroughGuild() || bMoneyOnly)
 		prob -= 10;
@@ -904,7 +904,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 			ITEM_MANAGER::CopyAllAttrTo(item, pkNewItem);
 			LogManager::instance().ItemLog(this, pkNewItem, "REFINE SUCCESS", pkNewItem->GetName());
 
-			BYTE bCell = item->GetCell();
+			uint8_t bCell = item->GetCell();
 
 			// DETAIL_REFINE_LOG
 			NotifyRefineSuccess(this, item, IsRefineThroughGuild() ? "GUILD" : "POWER");
@@ -1000,8 +1000,8 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 	if (pkItemScroll->GetVnum() == item->GetVnum())
 		return false;
 
-	DWORD result_vnum = item->GetRefinedVnum();
-	DWORD result_fail_vnum = item->GetRefineFromVnum();
+	uint32_t result_vnum = item->GetRefinedVnum();
+	uint32_t result_fail_vnum = item->GetRefineFromVnum();
 
 	if (result_vnum == 0)
 	{
@@ -1052,7 +1052,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 		return false;
 	}
 
-	for (int i = 0; i < prt->material_count; ++i)
+	for (int32_t i = 0; i < prt->material_count; ++i)
 	{
 		if (CountSpecifyItem(prt->materials[i].vnum) < prt->materials[i].count)
 		{
@@ -1065,11 +1065,11 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 		}
 	}
 
-	for (int i = 0; i < prt->material_count; ++i)
+	for (int32_t i = 0; i < prt->material_count; ++i)
 		RemoveSpecifyItem(prt->materials[i].vnum, prt->materials[i].count);
 
-	int prob = number(1, 100);
-	int success_prob = prt->prob;
+	int32_t prob = number(1, 100);
+	int32_t success_prob = prt->prob;
 	bool bDestroyWhenFail = false;
 
 	const char* szRefineType = "SCROLL";
@@ -1149,7 +1149,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 			ITEM_MANAGER::CopyAllAttrTo(item, pkNewItem);
 			LogManager::instance().ItemLog(this, pkNewItem, "REFINE SUCCESS", pkNewItem->GetName());
 
-			BYTE bCell = item->GetCell();
+			uint8_t bCell = item->GetCell();
 
 			NotifyRefineSuccess(this, item, szRefineType);
 			DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -prt->cost);
@@ -1178,7 +1178,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 			ITEM_MANAGER::CopyAllAttrTo(item, pkNewItem);
 			LogManager::instance().ItemLog(this, pkNewItem, "REFINE FAIL", pkNewItem->GetName());
 
-			BYTE bCell = item->GetCell();
+			uint8_t bCell = item->GetCell();
 
 			DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -prt->cost);
 			NotifyRefineFail(this, item, szRefineType, -1);
@@ -1209,7 +1209,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 	return true;
 }
 
-bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
+bool CHARACTER::RefineInformation(uint8_t bCell, uint8_t bType, int32_t iAdditionalCell)
 {
 	if (bCell > INVENTORY_MAX_NUM)
 		return false;
@@ -1340,9 +1340,9 @@ bool CHARACTER::RefineItem(LPITEM pkItem, LPITEM pkTarget)
 
 		bool bHasMetinStone = false;
 
-		for (int i = 0; i < ITEM_SOCKET_MAX_NUM; i++)
+		for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; i++)
 		{
-			long socket = pkTarget->GetSocket(i);
+			int32_t socket = pkTarget->GetSocket(i);
 			if (socket > 2 && socket != ITEM_BROKEN_METIN_VNUM)
 			{
 				bHasMetinStone = true;
@@ -1352,9 +1352,9 @@ bool CHARACTER::RefineItem(LPITEM pkItem, LPITEM pkTarget)
 
 		if (bHasMetinStone)
 		{
-			for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+			for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 			{
-				long socket = pkTarget->GetSocket(i);
+				int32_t socket = pkTarget->GetSocket(i);
 				if (socket > 2 && socket != ITEM_BROKEN_METIN_VNUM)
 				{
 					AutoGiveItem(socket);
@@ -1381,7 +1381,7 @@ EVENTFUNC(kill_campfire_event)
 {
 	char_event_info* info = dynamic_cast<char_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "kill_campfire_event> <Factor> Null pointer" );
 		return 0;
@@ -1389,18 +1389,18 @@ EVENTFUNC(kill_campfire_event)
 
 	LPCHARACTER	ch = info->ch;
 
-	if (ch == NULL) { // <Factor>
+	if (ch == nullptr) { // <Factor>
 		return 0;
 	}
-	ch->m_pkMiningEvent = NULL;
+	ch->m_pkMiningEvent = nullptr;
 	M2_DESTROY_CHARACTER(ch);
 	return 0;
 }
 
 bool CHARACTER::GiveRecallItem(LPITEM item)
 {
-	int idx = GetMapIndex();
-	int iEmpireByMapIndex = -1;
+	int32_t idx = GetMapIndex();
+	int32_t iEmpireByMapIndex = -1;
 
 	if (idx < 20)
 		iEmpireByMapIndex = 1;
@@ -1425,7 +1425,7 @@ bool CHARACTER::GiveRecallItem(LPITEM item)
 		return false;
 	}
 
-	int pos;
+	int32_t pos;
 
 	if (item->GetCount() == 1)	// 아이템이 하나라면 그냥 셋팅.
 	{
@@ -1436,7 +1436,7 @@ bool CHARACTER::GiveRecallItem(LPITEM item)
 	{
 		LPITEM item2 = ITEM_MANAGER::instance().CreateItem(item->GetVnum(), 1);
 
-		if (NULL != item2)
+		if (nullptr != item2)
 		{
 			item2->SetSocket(0, GetX());
 			item2->SetSocket(1, GetY());
@@ -1456,12 +1456,12 @@ bool CHARACTER::GiveRecallItem(LPITEM item)
 
 void CHARACTER::ProcessRecallItem(LPITEM item)
 {
-	int idx;
+	int32_t idx;
 
 	if ((idx = SECTREE_MANAGER::instance().GetMapIndex(item->GetSocket(0), item->GetSocket(1))) == 0)
 		return;
 
-	int iEmpireByMapIndex = -1;
+	int32_t iEmpireByMapIndex = -1;
 
 	if (idx < 20)
 		iEmpireByMapIndex = 1;
@@ -1511,7 +1511,7 @@ void CHARACTER::__OpenPrivateShop()
 #ifdef ENABLE_OPEN_SHOP_WITH_ARMOR
 	ChatPacket(CHAT_TYPE_COMMAND, "OpenPrivateShop");
 #else
-	unsigned bodyPart = GetPart(PART_MAIN);
+	uint32_t bodyPart = GetPart(PART_MAIN);
 	switch (bodyPart)
 	{
 		case 0:
@@ -1527,7 +1527,7 @@ void CHARACTER::__OpenPrivateShop()
 }
 
 // MYSHOP_PRICE_LIST
-void CHARACTER::SendMyShopPriceListCmd(DWORD dwItemVnum, DWORD dwItemPrice)
+void CHARACTER::SendMyShopPriceListCmd(uint32_t dwItemVnum, uint32_t dwItemPrice)
 {
 	char szLine[256];
 	snprintf(szLine, sizeof(szLine), "MyShopPriceList %u %u", dwItemVnum, dwItemPrice);
@@ -1546,7 +1546,7 @@ void CHARACTER::UseSilkBotaryReal(const TPacketMyshopPricelistHeader* p)
 		// 가격 리스트가 없다. dummy 데이터를 넣은 커맨드를 보내준다.
 		SendMyShopPriceListCmd(1, 0);
 	else {
-		for (int idx = 0; idx < p->byCount; idx++)
+		for (int32_t idx = 0; idx < p->byCount; idx++)
 			SendMyShopPriceListCmd(pInfo[ idx ].dwVnum, pInfo[ idx ].dwPrice);
 	}
 
@@ -1560,8 +1560,8 @@ void CHARACTER::UseSilkBotaryReal(const TPacketMyshopPricelistHeader* p)
 void CHARACTER::UseSilkBotary(void)
 {
 	if (m_bNoOpenedShop) {
-		DWORD dwPlayerID = GetPlayerID();
-		db_clientdesc->DBPacket(HEADER_GD_MYSHOP_PRICELIST_REQ, GetDesc()->GetHandle(), &dwPlayerID, sizeof(DWORD));
+		uint32_t dwPlayerID = GetPlayerID();
+		db_clientdesc->DBPacket(HEADER_GD_MYSHOP_PRICELIST_REQ, GetDesc()->GetHandle(), &dwPlayerID, sizeof(uint32_t));
 		m_bNoOpenedShop = false;
 	} else {
 		__OpenPrivateShop();
@@ -1570,17 +1570,17 @@ void CHARACTER::UseSilkBotary(void)
 // END_OF_MYSHOP_PRICE_LIST
 
 
-int CalculateConsume(LPCHARACTER ch)
+int32_t CalculateConsume(LPCHARACTER ch)
 {
-	static const int WARP_NEED_LIFE_PERCENT	= 30;
-	static const int WARP_MIN_LIFE_PERCENT	= 10;
+	static const int32_t WARP_NEED_LIFE_PERCENT	= 30;
+	static const int32_t WARP_MIN_LIFE_PERCENT	= 10;
 	// CONSUME_LIFE_WHEN_USE_WARP_ITEM
-	int consumeLife = 0;
+	int32_t consumeLife = 0;
 	{
 		// CheckNeedLifeForWarp
-		const int curLife		= ch->GetHP();
-		const int needPercent	= WARP_NEED_LIFE_PERCENT;
-		const int needLife = ch->GetMaxHP() * needPercent / 100;
+		const int32_t curLife		= ch->GetHP();
+		const int32_t needPercent	= WARP_NEED_LIFE_PERCENT;
+		const int32_t needLife = ch->GetMaxHP() * needPercent / 100;
 		if (curLife < needLife)
 		{
 			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("남은 생명력 양이 모자라 사용할 수 없습니다."));
@@ -1591,8 +1591,8 @@ int CalculateConsume(LPCHARACTER ch)
 
 
 		// CheckMinLifeForWarp: 독에 의해서 죽으면 안되므로 생명력 최소량는 남겨준다
-		const int minPercent	= WARP_MIN_LIFE_PERCENT;
-		const int minLife	= ch->GetMaxHP() * minPercent / 100;
+		const int32_t minPercent	= WARP_MIN_LIFE_PERCENT;
+		const int32_t minLife	= ch->GetMaxHP() * minPercent / 100;
 		if (curLife - needLife < minLife)
 			consumeLife = curLife - minLife;
 
@@ -1603,12 +1603,12 @@ int CalculateConsume(LPCHARACTER ch)
 	return consumeLife;
 }
 
-int CalculateConsumeSP(LPCHARACTER lpChar)
+int32_t CalculateConsumeSP(LPCHARACTER lpChar)
 {
-	static const int NEED_WARP_SP_PERCENT = 30;
+	static const int32_t NEED_WARP_SP_PERCENT = 30;
 
-	const int curSP = lpChar->GetSP();
-	const int needSP = lpChar->GetMaxSP() * NEED_WARP_SP_PERCENT / 100;
+	const int32_t curSP = lpChar->GetSP();
+	const int32_t needSP = lpChar->GetMaxSP() * NEED_WARP_SP_PERCENT / 100;
 
 	if (curSP < needSP)
 	{
@@ -1623,14 +1623,14 @@ int CalculateConsumeSP(LPCHARACTER lpChar)
 #define ENABLE_ADDSTONE_FAILURE
 bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 {
-	int iLimitRealtimeStartFirstUseFlagIndex = -1;
-	//int iLimitTimerBasedOnWearFlagIndex = -1;
+	int32_t iLimitRealtimeStartFirstUseFlagIndex = -1;
+	//int32_t iLimitTimerBasedOnWearFlagIndex = -1;
 
-	WORD wDestCell = DestCell.cell;
-	BYTE bDestInven = DestCell.window_type;
-	for (int i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
+	uint16_t wDestCell = DestCell.cell;
+	uint8_t bDestInven = DestCell.window_type;
+	for (int32_t i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
 	{
-		long limitValue = item->GetProto()->aLimits[i].lValue;
+		int32_t limitValue = item->GetProto()->aLimits[i].lValue;
 
 		switch (item->GetProto()->aLimits[i].bType)
 		{
@@ -1682,7 +1682,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 	{
 		LPITEM beltItem = GetWear(WEAR_BELT);
 
-		if (NULL == beltItem)
+		if (nullptr == beltItem)
 		{
 			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Belt> You can't use this item if you have no equipped belt."));
 			return false;
@@ -1702,7 +1702,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 		if (0 == item->GetSocket(1))
 		{
 			// 사용가능시간은 Default 값으로 Limit Value 값을 사용하되, Socket0에 값이 있으면 그 값을 사용하도록 한다. (단위는 초)
-			long duration = (0 != item->GetSocket(0)) ? item->GetSocket(0) : item->GetProto()->aLimits[iLimitRealtimeStartFirstUseFlagIndex].lValue;
+			int32_t duration = (0 != item->GetSocket(0)) ? item->GetSocket(0) : item->GetProto()->aLimits[iLimitRealtimeStartFirstUseFlagIndex].lValue;
 
 			if (0 == duration)
 				duration = 60 * 60 * 24 * 7;
@@ -1724,7 +1724,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			return ItemProcess_Polymorph(item);
 
 		case ITEM_QUEST:
-			if (GetArena() != NULL || IsObserverMode() == true)
+			if (GetArena() != nullptr || IsObserverMode() == true)
 			{
 				if (item->GetVnum() == 50051 || item->GetVnum() == 50052 || item->GetVnum() == 50053)
 				{
@@ -1751,7 +1751,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				float fx, fy;
 				GetDeltaByDegree(GetRotation(), 100.0f, &fx, &fy);
 
-				LPSECTREE tree = SECTREE_MANAGER::instance().Get(GetMapIndex(), (long)(GetX()+fx), (long)(GetY()+fy));
+				LPSECTREE tree = SECTREE_MANAGER::instance().Get(GetMapIndex(), (int32_t)(GetX()+fx), (int32_t)(GetY()+fy));
 
 				if (!tree)
 				{
@@ -1759,13 +1759,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					return false;
 				}
 
-				if (tree->IsAttr((long)(GetX()+fx), (long)(GetY()+fy), ATTR_WATER))
+				if (tree->IsAttr((int32_t)(GetX()+fx), (int32_t)(GetY()+fy), ATTR_WATER))
 				{
 					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("물 속에 모닥불을 피울 수 없습니다."));
 					return false;
 				}
 
-				LPCHARACTER campfire = CHARACTER_MANAGER::instance().SpawnMob(fishing::CAMPFIRE_MOB, GetMapIndex(), (long)(GetX()+fx), (long)(GetY()+fy), 0, false, number(0, 359));
+				LPCHARACTER campfire = CHARACTER_MANAGER::instance().SpawnMob(fishing::CAMPFIRE_MOB, GetMapIndex(), (int32_t)(GetX()+fx), (int32_t)(GetY()+fy), 0, false, number(0, 359));
 
 				char_event_info* info = AllocEventInfo<char_event_info>();
 
@@ -1956,18 +1956,18 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				if (item->GetValue(0) == item2->GetValue(0))
 				{
 					//ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("열쇠는 맞으나 아이템 주는 부분 구현이 안되었습니다."));
-					DWORD dwBoxVnum = item2->GetVnum();
-					std::vector <DWORD> dwVnums;
-					std::vector <DWORD> dwCounts;
+					uint32_t dwBoxVnum = item2->GetVnum();
+					std::vector <uint32_t> dwVnums;
+					std::vector <uint32_t> dwCounts;
 					std::vector <LPITEM> item_gets(0);
-					int count = 0;
+					int32_t count = 0;
 
 					if (GiveItemFromSpecialItemGroup(dwBoxVnum, dwVnums, dwCounts, item_gets, count))
 					{
 						ITEM_MANAGER::instance().RemoveItem(item);
 						ITEM_MANAGER::instance().RemoveItem(item2);
 						
-						for (int i = 0; i < count; i++){
+						for (int32_t i = 0; i < count; i++){
 							switch (dwVnums[i])
 							{
 								case CSpecialItemGroup::GOLD:
@@ -2037,11 +2037,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 				m_dwLastBoxUseTime = get_dword_time();
 #endif
-				DWORD dwBoxVnum = item->GetVnum();
-				std::vector <DWORD> dwVnums;
-				std::vector <DWORD> dwCounts;
+				uint32_t dwBoxVnum = item->GetVnum();
+				std::vector <uint32_t> dwVnums;
+				std::vector <uint32_t> dwCounts;
 				std::vector <LPITEM> item_gets(0);
-				int count = 0;
+				int32_t count = 0;
 
 				if( dwBoxVnum > 51500 && dwBoxVnum < 52000 )	
 				{
@@ -2056,7 +2056,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				{
 					item->SetCount(item->GetCount()-1);
 
-					for (int i = 0; i < count; i++){
+					for (int32_t i = 0; i < count; i++){
 						switch (dwVnums[i])
 						{
 						case CSpecialItemGroup::GOLD:
@@ -2113,7 +2113,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					return false;
 				}
 
-				DWORD dwVnum = item->GetSocket(0);
+				uint32_t dwVnum = item->GetSocket(0);
 
 				if (SkillLevelDown(dwVnum))
 				{
@@ -2133,7 +2133,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					return false;
 				}
 
-				DWORD dwVnum = 0;
+				uint32_t dwVnum = 0;
 
 				if (item->GetVnum() == 50300)
 				{
@@ -2160,7 +2160,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					ITEM_MANAGER::instance().RemoveItem(item);
 #endif
 
-					int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+					int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 
 					if (distribution_test_server)
 						iReadDelay /= 3;
@@ -2177,10 +2177,10 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					if (test_server)
 						sys_log (0, "ADD addtional effect : vnum(%d) subtype(%d)", item->GetOriginalVnum(), item->GetSubType());
 
-					int affect_type = AFFECT_EXP_BONUS_EURO_FREE;
-					int apply_type = aApplyInfo[item->GetValue(0)].bPointType;
-					int apply_value = item->GetValue(2);
-					int apply_duration = item->GetValue(1);
+					int32_t affect_type = AFFECT_EXP_BONUS_EURO_FREE;
+					int32_t apply_type = aApplyInfo[item->GetValue(0)].bPointType;
+					int32_t apply_value = item->GetValue(2);
+					int32_t apply_duration = item->GetValue(1);
 
 					switch (item->GetSubType())
 					{
@@ -2374,14 +2374,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					case USE_TIME_CHARGE_PER:
 						{
 							LPITEM pDestItem = GetItem(DestCell);
-							if (NULL == pDestItem)
+							if (nullptr == pDestItem)
 							{
 								return false;
 							}
 							// 우선 용혼석에 관해서만 하도록 한다.
 							if (pDestItem->IsDragonSoul())
 							{
-								int ret;
+								int32_t ret;
 								char buf[128];
 								if (item->GetVnum() == DRAGON_HEART_VNUM)
 								{
@@ -2430,14 +2430,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					case USE_TIME_CHARGE_FIX:
 						{
 							LPITEM pDestItem = GetItem(DestCell);
-							if (NULL == pDestItem)
+							if (nullptr == pDestItem)
 							{
 								return false;
 							}
 							// 우선 용혼석에 관해서만 하도록 한다.
 							if (pDestItem->IsDragonSoul())
 							{
-								int ret = pDestItem->GiveMoreTime_Fix(item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
+								int32_t ret = pDestItem->GiveMoreTime_Fix(item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
 								char buf[128];
 								if (ret)
 								{
@@ -2479,10 +2479,10 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 효과가 걸려 있습니다."));
 										return false;
 									}
-									long time = item->GetValue(0);
-									long moveSpeedPer	= item->GetValue(1);
-									long attPer	= item->GetValue(2);
-									long expPer			= item->GetValue(3);
+									int32_t time = item->GetValue(0);
+									int32_t moveSpeedPer	= item->GetValue(1);
+									int32_t attPer	= item->GetValue(2);
+									int32_t expPer			= item->GetValue(3);
 									AddAffect(AFFECT_NOG_ABILITY, POINT_MOV_SPEED, moveSpeedPer, AFF_MOV_SPEED_POTION, time, 0, true, true);
 									AddAffect(AFFECT_NOG_ABILITY, POINT_MALL_ATTBONUS, attPer, AFF_NONE, time, 0, true, true);
 									AddAffect(AFFECT_NOG_ABILITY, POINT_MALL_EXPBONUS, expPer, AFF_NONE, time, 0, true, true);
@@ -2508,10 +2508,10 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										return false;
 									}
 									// @fixme147 END
-									long time = item->GetValue(0);
-									long moveSpeedPer	= item->GetValue(1);
-									long attPer	= item->GetValue(2);
-									long expPer			= item->GetValue(3);
+									int32_t time = item->GetValue(0);
+									int32_t moveSpeedPer	= item->GetValue(1);
+									int32_t attPer	= item->GetValue(2);
+									int32_t expPer			= item->GetValue(3);
 									AddAffect(AFFECT_RAMADAN_ABILITY, POINT_MOV_SPEED, moveSpeedPer, AFF_MOV_SPEED_POTION, time, 0, true, true);
 									AddAffect(AFFECT_RAMADAN_ABILITY, POINT_MALL_ATTBONUS, attPer, AFF_NONE, time, 0, true, true);
 									AddAffect(AFFECT_RAMADAN_ABILITY, POINT_MALL_EXPBONUS, expPer, AFF_NONE, time, 0, true, true);
@@ -2523,7 +2523,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(GetPlayerID());
 									if (pMarriage)
 									{
-										if (pMarriage->ch1 != NULL)
+										if (pMarriage->ch1 != nullptr)
 										{
 											if (CArenaManager::instance().IsArenaMap(pMarriage->ch1->GetMapIndex()) == true)
 											{
@@ -2532,7 +2532,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											}
 										}
 
-										if (pMarriage->ch2 != NULL)
+										if (pMarriage->ch2 != nullptr)
 										{
 											if (CArenaManager::instance().IsArenaMap(pMarriage->ch2->GetMapIndex()) == true)
 											{
@@ -2541,7 +2541,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											}
 										}
 
-										int consumeSP = CalculateConsumeSP(this);
+										int32_t consumeSP = CalculateConsumeSP(this);
 
 										if (consumeSP < 0)
 											return false;
@@ -2578,12 +2578,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							case 30096:
 								// 복주머니
 								{
-									const int MAX_BAG_INFO = 26;
+									const int32_t MAX_BAG_INFO = 26;
 									static struct LuckyBagInfo
 									{
-										DWORD count;
-										int prob;
-										DWORD vnum;
+										uint32_t count;
+										int32_t prob;
+										uint32_t vnum;
 									} b1[MAX_BAG_INFO] =
 									{
 										{ 1000,	302,	1 },
@@ -2614,12 +2614,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										{ 1,	1,	11882 },
 									};
 
-									LuckyBagInfo * bi = NULL;
+									LuckyBagInfo * bi = nullptr;
 									bi = b1;
 
-									int pct = number(1, 1000);
+									int32_t pct = number(1, 1000);
 
-									int i;
+									int32_t i;
 									for (i=0;i<MAX_BAG_INFO;i++)
 									{
 										if (pct <= bi[i].prob)
@@ -2655,7 +2655,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									else
 									{
 										// 처음 사용시
-										int iMapIndex = GetMapIndex();
+										int32_t iMapIndex = GetMapIndex();
 
 										PIXEL_POSITION pos;
 
@@ -2672,7 +2672,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										}
 									}
 
-									int dist = 0;
+									int32_t dist = 0;
 									float distance = (DISTANCE_SQRT(GetX()-item->GetSocket(1), GetY()-item->GetSocket(2)));
 
 									if (distance < 1000.0f)
@@ -2683,11 +2683,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										// 사용횟수에 따라 주는 아이템을 다르게 한다.
 										struct TEventStoneInfo
 										{
-											DWORD dwVnum;
-											int count;
-											int prob;
+											uint32_t dwVnum;
+											int32_t count;
+											int32_t prob;
 										};
-										const int EVENT_STONE_MAX_INFO = 15;
+										const int32_t EVENT_STONE_MAX_INFO = 15;
 										TEventStoneInfo info_10[EVENT_STONE_MAX_INFO] =
 										{ 
 											{ 27001, 10,  8 },
@@ -2763,9 +2763,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											else
 												info = info_10;
 
-											int prob = number(1, 100);
+											int32_t prob = number(1, 100);
 
-											for (int i = 0; i < EVENT_STONE_MAX_INFO; ++i)
+											for (int32_t i = 0; i < EVENT_STONE_MAX_INFO; ++i)
 											{
 												if (!info[i].prob)
 													continue;
@@ -2780,9 +2780,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										}
 
 										char chatbuf[CHAT_MAX_LEN + 1];
-										int len = snprintf(chatbuf, sizeof(chatbuf), "StoneDetect %u 0 0", (DWORD)GetVID());
+										int32_t len = snprintf(chatbuf, sizeof(chatbuf), "StoneDetect %u 0 0", (uint32_t)GetVID());
 
-										if (len < 0 || len >= (int) sizeof(chatbuf))
+										if (len < 0 || len >= (int32_t) sizeof(chatbuf))
 											len = sizeof(chatbuf) - 1;
 
 										++len;  // \0 문자까지 보내기
@@ -2812,7 +2812,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										dist = 3;
 
 									// 많이 사용했으면 사라진다.
-									const int STONE_DETECT_MAX_TRY = 10;
+									const int32_t STONE_DETECT_MAX_TRY = 10;
 									if (item->GetSocket(0) >= STONE_DETECT_MAX_TRY)
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이벤트용 감지기가 흔적도 없이 사라집니다."));
@@ -2824,11 +2824,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									if (dist)
 									{
 										char chatbuf[CHAT_MAX_LEN + 1];
-										int len = snprintf(chatbuf, sizeof(chatbuf),
+										int32_t len = snprintf(chatbuf, sizeof(chatbuf),
 												"StoneDetect %u %d %d",
-											   	(DWORD)GetVID(), dist, (int)GetDegreeFromPositionXY(GetX(), item->GetSocket(2), item->GetSocket(1), GetY()));
+											   	(uint32_t)GetVID(), dist, (int32_t)GetDegreeFromPositionXY(GetX(), item->GetSocket(2), item->GetSocket(1), GetY()));
 
-										if (len < 0 || len >= (int) sizeof(chatbuf))
+										if (len < 0 || len >= (int32_t) sizeof(chatbuf))
 											len = sizeof(chatbuf) - 1;
 
 										++len;  // \0 문자까지 보내기
@@ -2856,7 +2856,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								{
 									LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(GetMapIndex());
 
-									if (pMap != NULL)
+									if (pMap != nullptr)
 									{
 										item->SetSocket(0, item->GetSocket(0) + 1);
 
@@ -2867,14 +2867,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 										if (f.m_mapStone.size() > 0)
 										{
-											std::map<DWORD, LPCHARACTER>::iterator stone = f.m_mapStone.begin();
+											std::map<uint32_t, LPCHARACTER>::iterator stone = f.m_mapStone.begin();
 
-											DWORD max = UINT_MAX;
+											uint32_t max = UINT_MAX;
 											LPCHARACTER pTarget = stone->second;
 
 											while (stone != f.m_mapStone.end())
 											{
-												DWORD dist = (DWORD)DISTANCE_SQRT(GetX()-stone->second->GetX(), GetY()-stone->second->GetY());
+												uint32_t dist = (uint32_t)DISTANCE_SQRT(GetX()-stone->second->GetX(), GetY()-stone->second->GetY());
 
 												if (dist != 0 && max > dist)
 												{
@@ -2884,15 +2884,15 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 												stone++;
 											}
 
-											if (pTarget != NULL)
+											if (pTarget != nullptr)
 											{
-												int val = 3;
+												int32_t val = 3;
 
 												if (max < 10000) val = 2;
 												else if (max < 70000) val = 1;
 
-												ChatPacket(CHAT_TYPE_COMMAND, "StoneDetect %u %d %d", (DWORD)GetVID(), val,
-														(int)GetDegreeFromPositionXY(GetX(), pTarget->GetY(), pTarget->GetX(), GetY()));
+												ChatPacket(CHAT_TYPE_COMMAND, "StoneDetect %u %d %d", (uint32_t)GetVID(), val,
+														(int32_t)GetDegreeFromPositionXY(GetX(), pTarget->GetY(), pTarget->GetX(), GetY()));
 											}
 											else
 											{
@@ -2906,7 +2906,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 										if (item->GetSocket(0) >= 6)
 										{
-											ChatPacket(CHAT_TYPE_COMMAND, "StoneDetect %u 0 0", (DWORD)GetVID());
+											ChatPacket(CHAT_TYPE_COMMAND, "StoneDetect %u 0 0", (uint32_t)GetVID());
 											ITEM_MANAGER::instance().RemoveItem(item);
 										}
 									}
@@ -2916,7 +2916,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							case 27996: 
 								item->SetCount(item->GetCount() - 1);
-								AttackedByPoison(NULL); // @warme008
+								AttackedByPoison(nullptr); // @warme008
 								break;
 
 							case 27987: // 조개
@@ -2928,7 +2928,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								{
 									item->SetCount(item->GetCount() - 1);
 
-									int r = number(1, 100);
+									int32_t r = number(1, 100);
 
 									if (r <= 50)
 									{
@@ -2937,12 +2937,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									}
 									else
 									{
-										const int prob_table_gb2312[] =
+										const int32_t prob_table_gb2312[] =
 										{
 											95, 97, 99
 										};
 
-										const int * prob_table = prob_table_gb2312;
+										const int32_t * prob_table = prob_table_gb2312;
 
 										if (r <= prob_table[0])
 										{
@@ -3016,7 +3016,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										return false;
 									}
 
-									int lv = GetSkillLevel(SKILL_LEADERSHIP);
+									int32_t lv = GetSkillLevel(SKILL_LEADERSHIP);
 
 									if (lv < item->GetValue(0))
 									{
@@ -3038,7 +3038,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 #endif
 
-										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(SKILL_LEADERSHIP, get_global_time() + iReadDelay);
@@ -3074,7 +3074,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										return false;
 									}
 
-									int iPct = item->GetValue(0);
+									int32_t iPct = item->GetValue(0);
 
 									if (LearnSkillByBook(SKILL_COMBO, iPct))
 									{
@@ -3084,7 +3084,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 #endif
 
-										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(SKILL_COMBO, get_global_time() + iReadDelay);
@@ -3101,8 +3101,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										return false;
 										
 									}
-									DWORD dwSkillVnum = item->GetValue(0);
-									int iPct = MINMAX(0, item->GetValue(1), 100);
+									uint32_t dwSkillVnum = item->GetValue(0);
+									int32_t iPct = MINMAX(0, item->GetValue(1), 100);
 									if (GetSkillLevel(dwSkillVnum)>=20 || dwSkillVnum-SKILL_LANGUAGE1+1 == GetEmpire())
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 완벽하게 알아들을 수 있는 언어이다."));
@@ -3117,7 +3117,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 #endif
 
-										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
@@ -3133,8 +3133,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										return false;
 										
 									}
-									DWORD dwSkillVnum = item->GetValue(0);
-									int iPct = MINMAX(0, item->GetValue(1), 100);
+									uint32_t dwSkillVnum = item->GetValue(0);
+									int32_t iPct = MINMAX(0, item->GetValue(1), 100);
 
 									if (GetSkillLevel(dwSkillVnum) >= 10)
 									{
@@ -3150,7 +3150,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 #endif
 
-										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
@@ -3172,11 +3172,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										return false;
 									}
 									
-									int iSkillLevelLowLimit = item->GetValue(0);
-									int iSkillLevelHighLimit = item->GetValue(1);
-									int iPct = MINMAX(0, item->GetValue(2), 100);
-									int iLevelLimit = item->GetValue(3);
-									DWORD dwSkillVnum = 0;
+									int32_t iSkillLevelLowLimit = item->GetValue(0);
+									int32_t iSkillLevelHighLimit = item->GetValue(1);
+									int32_t iPct = MINMAX(0, item->GetValue(2), 100);
+									int32_t iLevelLimit = item->GetValue(3);
+									uint32_t dwSkillVnum = 0;
 									
 									switch (item->GetVnum())
 									{
@@ -3235,7 +3235,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 #endif
 
-										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
@@ -3253,8 +3253,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										return false;
 										
 									}
-									DWORD dwSkillVnum = SKILL_CREATE;
-									int iPct = MINMAX(0, item->GetValue(1), 100);
+									uint32_t dwSkillVnum = SKILL_CREATE;
+									int32_t iPct = MINMAX(0, item->GetValue(1), 100);
 
 									if (GetSkillLevel(dwSkillVnum)>=40)
 									{
@@ -3270,7 +3270,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 #endif
 
-										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
@@ -3299,8 +3299,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										return false;
 										
 									}
-									DWORD dwSkillVnum = SKILL_MINING;
-									int iPct = MINMAX(0, item->GetValue(1), 100);
+									uint32_t dwSkillVnum = SKILL_MINING;
+									int32_t iPct = MINMAX(0, item->GetValue(1), 100);
 
 									if (GetSkillLevel(dwSkillVnum)>=40)
 									{
@@ -3316,7 +3316,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 #endif
 
-										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
@@ -3333,8 +3333,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										return false;
 										
 									}
-									DWORD dwSkillVnum = SKILL_HORSE;
-									int iPct = MINMAX(0, item->GetValue(1), 100);
+									uint32_t dwSkillVnum = SKILL_HORSE;
+									int32_t iPct = MINMAX(0, item->GetValue(1), 100);
 
 									if (GetLevel() < 50)
 									{
@@ -3371,7 +3371,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("얻은 포인트로는 승마 스킬의 레벨을 올릴 수 있습니다."));
 										PointChange(POINT_HORSE_SKILL, 1);
 
-										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 										if (distribution_test_server) iReadDelay /= 3;
 
 										if (!test_server)
@@ -3395,7 +3395,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									if (GetAlignment() >= 0)
 										return false;
 
-									int delta = MIN(-GetAlignment(), item->GetValue(0));
+									int32_t delta = MIN(-GetAlignment(), item->GetValue(0));
 
 									sys_log(0, "%s ALIGNMENT ITEM %d", GetName(), delta);
 
@@ -3412,12 +3412,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							case 71107: // 천도복숭아
 								{
-									int val = item->GetValue(0);
-									int interval = item->GetValue(1);
+									int32_t val = item->GetValue(0);
+									int32_t interval = item->GetValue(1);
 									quest::PC* pPC = quest::CQuestManager::instance().GetPC(GetPlayerID());
 									if (!pPC)
 										return false; 
-									int last_use_time = pPC->GetFlag("mythical_peach.last_use_time");
+									int32_t last_use_time = pPC->GetFlag("mythical_peach.last_use_time");
 
 									if (get_global_time() - last_use_time < interval * 60 * 60)
 									{
@@ -3443,7 +3443,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										val = (200000 - GetAlignment()) / 10;
 									}
 									
-									int old_alignment = GetAlignment() / 10;
+									int32_t old_alignment = GetAlignment() / 10;
 
 									UpdateAlignment(val*10);
 									
@@ -3492,12 +3492,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											return false;
 									}
 
-									std::stack<long> socket;
+									std::stack<int32_t> socket;
 
-									for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+									for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 										socket.push(item2->GetSocket(i));
 
-									int idx = ITEM_SOCKET_MAX_NUM - 1;
+									int32_t idx = ITEM_SOCKET_MAX_NUM - 1;
 
 									while (socket.size() > 0)
 									{
@@ -3516,7 +3516,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									LPITEM pItemReward = AutoGiveItem(socket.top());
 
-									if (pItemReward != NULL)
+									if (pItemReward != nullptr)
 									{
 										item2->SetSocket(idx, 1);
 
@@ -3550,7 +3550,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 										if (pPC)
 										{
-											int last_dye_level = pPC->GetFlag("dyeing_hair.last_dye_level");
+											int32_t last_dye_level = pPC->GetFlag("dyeing_hair.last_dye_level");
 
 											if (last_dye_level == 0 ||
 													last_dye_level+3 <= GetLevel() ||
@@ -3577,15 +3577,15 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							case ITEM_NEW_YEAR_GREETING_VNUM:
 								{
-									DWORD dwBoxVnum = ITEM_NEW_YEAR_GREETING_VNUM;
-									std::vector <DWORD> dwVnums;
-									std::vector <DWORD> dwCounts;
+									uint32_t dwBoxVnum = ITEM_NEW_YEAR_GREETING_VNUM;
+									std::vector <uint32_t> dwVnums;
+									std::vector <uint32_t> dwCounts;
 									std::vector <LPITEM> item_gets;
-									int count = 0;
+									int32_t count = 0;
 
 									if (GiveItemFromSpecialItemGroup(dwBoxVnum, dwVnums, dwCounts, item_gets, count))
 									{
-										for (int i = 0; i < count; i++)
+										for (int32_t i = 0; i < count; i++)
 										{
 											if (dwVnums[i] == CSpecialItemGroup::GOLD)
 												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("돈 %d 냥을 획득했습니다."), dwCounts[i]);
@@ -3599,11 +3599,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							case ITEM_VALENTINE_ROSE:
 							case ITEM_VALENTINE_CHOCOLATE:
 								{
-									DWORD dwBoxVnum = item->GetVnum();
-									std::vector <DWORD> dwVnums;
-									std::vector <DWORD> dwCounts;
+									uint32_t dwBoxVnum = item->GetVnum();
+									std::vector <uint32_t> dwVnums;
+									std::vector <uint32_t> dwCounts;
 									std::vector <LPITEM> item_gets(0);
-									int count = 0;
+									int32_t count = 0;
 
 
 									if (((item->GetVnum() == ITEM_VALENTINE_ROSE) && (SEX_MALE==GET_SEX(this))) ||
@@ -3623,11 +3623,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							case ITEM_WHITEDAY_CANDY:
 							case ITEM_WHITEDAY_ROSE:
 								{
-									DWORD dwBoxVnum = item->GetVnum();
-									std::vector <DWORD> dwVnums;
-									std::vector <DWORD> dwCounts;
+									uint32_t dwBoxVnum = item->GetVnum();
+									std::vector <uint32_t> dwVnums;
+									std::vector <uint32_t> dwCounts;
 									std::vector <LPITEM> item_gets(0);
-									int count = 0;
+									int32_t count = 0;
 
 
 									if (((item->GetVnum() == ITEM_WHITEDAY_CANDY) && (SEX_MALE==GET_SEX(this))) ||
@@ -3646,15 +3646,15 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							case 50011: // 월광보합
 								{
-									DWORD dwBoxVnum = 50011;
-									std::vector <DWORD> dwVnums;
-									std::vector <DWORD> dwCounts;
+									uint32_t dwBoxVnum = 50011;
+									std::vector <uint32_t> dwVnums;
+									std::vector <uint32_t> dwCounts;
 									std::vector <LPITEM> item_gets(0);
-									int count = 0;
+									int32_t count = 0;
 
 									if (GiveItemFromSpecialItemGroup(dwBoxVnum, dwVnums, dwCounts, item_gets, count))
 									{
-										for (int i = 0; i < count; i++)
+										for (int32_t i = 0; i < count; i++)
 										{
 											char buf[50 + 1];
 											snprintf(buf, sizeof(buf), "%u %u", dwVnums[i], dwCounts[i]);
@@ -3791,7 +3791,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							case ITEM_ELK_VNUM: // 돈꾸러미
 								{
-									int iGold = item->GetSocket(0);
+									int32_t iGold = item->GetSocket(0);
 									ITEM_MANAGER::instance().RemoveItem(item);
 									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("돈 %d 냥을 획득했습니다."), iGold);
 									PointChange(POINT_GOLD, iGold);
@@ -3805,7 +3805,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							case 71092 : // 변신 해체부 임시
 								{
-									if (m_pkChrTarget != NULL)
+									if (m_pkChrTarget != nullptr)
 									{
 										if (m_pkChrTarget->IsPolymorphed())
 										{
@@ -3851,7 +3851,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("성공적으로 속성이 추가 되었습니다"));
 
-										int iAddedIdx = item2->GetRareAttrCount() + 4;
+										int32_t iAddedIdx = item2->GetRareAttrCount() + 4;
 										char buf[21];
 										snprintf(buf, sizeof(buf), "%u", item2->GetID());
 
@@ -3977,7 +3977,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (item->GetCount() > 1)
 									{
-										int pos = GetEmptyInventory(item->GetSize());
+										int32_t pos = GetEmptyInventory(item->GetSize());
 
 										if (-1 == pos)
 										{
@@ -4000,7 +4000,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									CAffect* pAffect = FindAffect( type );
 
-									if (NULL == pAffect)
+									if (nullptr == pAffect)
 									{
 										EPointTypes bonus = POINT_NONE;
 
@@ -4036,7 +4036,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										{
 											LPITEM old = FindItemByID( pAffect->dwFlag );
 
-											if (NULL != old)
+											if (nullptr != old)
 											{
 												old->Lock(false);
 												old->SetSocket(0, false);
@@ -4096,9 +4096,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								quest::CQuestManager& q = quest::CQuestManager::instance();
 								quest::PC* pPC = q.GetPC(GetPlayerID());
 
-								if (pPC != NULL)
+								if (pPC != nullptr)
 								{
-									int last_use_time = pPC->GetFlag("mirror_of_disapper.last_use_time");
+									int32_t last_use_time = pPC->GetFlag("mirror_of_disapper.last_use_time");
 
 									if (get_global_time() - last_use_time < 10*60)
 									{
@@ -4381,8 +4381,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 					case USE_TALISMAN:
 						{
-							const int TOWN_PORTAL	= 1;
-							const int MEMORY_PORTAL = 2;
+							const int32_t TOWN_PORTAL	= 1;
+							const int32_t MEMORY_PORTAL = 2;
 
 
 							// gm_guild_build, oxevent 맵에서 귀환부 귀환기억부 를 사용못하게 막음
@@ -4412,7 +4412,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							}
 
 							// CONSUME_LIFE_WHEN_USE_WARP_ITEM
-							int consumeLife = CalculateConsume(this);
+							int32_t consumeLife = CalculateConsume(this);
 
 							if (consumeLife < 0)
 								return false;
@@ -4616,7 +4616,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								case USE_CLEAN_SOCKET:
 									{
-										int i;
+										int32_t i;
 										for (i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 										{
 											if (item2->GetSocket(i) == ITEM_BROKEN_METIN_VNUM)
@@ -4629,7 +4629,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											return false;
 										}
 
-										int j = 0;
+										int32_t j = 0;
 
 										for (i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 										{
@@ -4675,18 +4675,18 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										
 										//
 
-										// DWORD dwChangeItemAttrCycle = quest::CQuestManager::instance().GetEventFlag(msc_szChangeItemAttrCycleFlag);
+										// uint32_t dwChangeItemAttrCycle = quest::CQuestManager::instance().GetEventFlag(msc_szChangeItemAttrCycleFlag);
 										// if (dwChangeItemAttrCycle < msc_dwDefaultChangeItemAttrCycle)
 											// dwChangeItemAttrCycle = msc_dwDefaultChangeItemAttrCycle;
-										DWORD dwChangeItemAttrCycle = g_dwItemBonusChangeTime;
+										uint32_t dwChangeItemAttrCycle = g_dwItemBonusChangeTime;
 
 										quest::PC* pPC = quest::CQuestManager::instance().GetPC(GetPlayerID());
 
 										if (pPC)
 										{
-											DWORD dwNowSec = get_global_time();
+											uint32_t dwNowSec = get_global_time();
 
-											DWORD dwLastChangeItemAttrSec = pPC->GetFlag(msc_szLastChangeItemAttrFlag);
+											uint32_t dwLastChangeItemAttrSec = pPC->GetFlag(msc_szLastChangeItemAttrFlag);
 
 											if (dwLastChangeItemAttrSec + dwChangeItemAttrCycle > dwNowSec)
 											{
@@ -4701,7 +4701,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (item->GetSubType() == USE_CHANGE_ATTRIBUTE2)
 									{
-										int aiChangeProb[ITEM_ATTRIBUTE_MAX_LEVEL] = 
+										int32_t aiChangeProb[ITEM_ATTRIBUTE_MAX_LEVEL] = 
 										{
 											0, 0, 30, 40, 3
 										};
@@ -4710,7 +4710,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									}
 									else if (item->GetVnum() == 76014)
 									{
-										int aiChangeProb[ITEM_ATTRIBUTE_MAX_LEVEL] = 
+										int32_t aiChangeProb[ITEM_ATTRIBUTE_MAX_LEVEL] = 
 										{
 											0, 10, 50, 39, 1
 										};
@@ -4728,7 +4728,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 												|| (item2->GetType() == ITEM_ARMOR && item2->GetSubType() == ARMOR_BODY))
 											{
 												bool bCanUse = true;
-												for (int i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
+												for (int32_t i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
 												{
 													if (item2->GetLimitType(i) == LIMIT_LEVEL && item2->GetLimitValue(i) > 40)
 													{
@@ -4778,7 +4778,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 												|| (item2->GetType() == ITEM_ARMOR && item2->GetSubType() == ARMOR_BODY))
 											{
 												bool bCanUse = true;
-												for (int i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
+												for (int32_t i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
 												{
 													if (item2->GetLimitType(i) == LIMIT_LEVEL && item2->GetLimitValue(i) > 40)
 													{
@@ -4806,7 +4806,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											item2->AddAttribute();
 											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성 추가에 성공하였습니다."));
 
-											int iAddedIdx = item2->GetAttributeCount() - 1;
+											int32_t iAddedIdx = item2->GetAttributeCount() - 1;
 											LogManager::instance().ItemLog(
 													GetPlayerID(), 
 													item2->GetAttributeType(iAddedIdx),
@@ -4851,7 +4851,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											item2->AddAttribute();
 											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성 추가에 성공하였습니다."));
 
-											int iAddedIdx = item2->GetAttributeCount() - 1;
+											int32_t iAddedIdx = item2->GetAttributeCount() - 1;
 											LogManager::instance().ItemLog(
 													GetPlayerID(),
 													item2->GetAttributeType(iAddedIdx),
@@ -5030,14 +5030,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					case USE_RECIPE :
 						{
 							LPITEM pSource1 = FindSpecifyItem(item->GetValue(1));
-							DWORD dwSourceCount1 = item->GetValue(2);
+							uint32_t dwSourceCount1 = item->GetValue(2);
 
 							LPITEM pSource2 = FindSpecifyItem(item->GetValue(3));
-							DWORD dwSourceCount2 = item->GetValue(4);
+							uint32_t dwSourceCount2 = item->GetValue(4);
 
 							if (dwSourceCount1 != 0)
 							{
-								if (pSource1 == NULL)
+								if (pSource1 == nullptr)
 								{
 									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("물약 조합을 위한 재료가 부족합니다."));
 									return false;
@@ -5046,14 +5046,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							if (dwSourceCount2 != 0)
 							{
-								if (pSource2 == NULL)
+								if (pSource2 == nullptr)
 								{
 									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("물약 조합을 위한 재료가 부족합니다."));
 									return false;
 								}
 							}
 
-							if (pSource1 != NULL)
+							if (pSource1 != nullptr)
 							{
 								if (pSource1->GetCount() < dwSourceCount1)
 								{
@@ -5064,7 +5064,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								pSource1->SetCount(pSource1->GetCount() - dwSourceCount1);
 							}
 
-							if (pSource2 != NULL)
+							if (pSource2 != nullptr)
 							{
 								if (pSource2->GetCount() < dwSourceCount2)
 								{
@@ -5111,11 +5111,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				if (item2->GetType() == ITEM_PICK) return false;
 				if (item2->GetType() == ITEM_ROD) return false;
 
-				int i;
+				int32_t i;
 
 				for (i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 				{
-					DWORD dwVnum;   
+					uint32_t dwVnum;   
 
 					if ((dwVnum = item2->GetSocket(i)) <= 2)
 						continue;
@@ -5202,15 +5202,15 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			sys_log(0,"ITEM_BLEND!!");
 			if (Blend_Item_find(item->GetVnum()))
 			{
-				int		affect_type		= AFFECT_BLEND;
+				int32_t		affect_type		= AFFECT_BLEND;
 				if (item->GetSocket(0) >= _countof(aApplyInfo))
 				{
 					sys_err ("INVALID BLEND ITEM(id : %d, vnum : %d). APPLY TYPE IS %d.", item->GetID(), item->GetVnum(), item->GetSocket(0));
 					return false;
 				}
-				int		apply_type		= aApplyInfo[item->GetSocket(0)].bPointType;
-				int		apply_value		= item->GetSocket(1);
-				int		apply_duration	= item->GetSocket(2);
+				int32_t		apply_type		= aApplyInfo[item->GetSocket(0)].bPointType;
+				int32_t		apply_value		= item->GetSocket(1);
+				int32_t		apply_duration	= item->GetSocket(2);
 				
 				if (FindAffect(affect_type, apply_type))
 				{
@@ -5233,7 +5233,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 		case ITEM_EXTRACT:
 			{
 				LPITEM pDestItem = GetItem(DestCell);
-				if (NULL == pDestItem)
+				if (nullptr == pDestItem)
 				{
 					return false;
 				}
@@ -5269,14 +5269,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 	return true;
 }
 
-int g_nPortalLimitTime = 10;
+int32_t g_nPortalLimitTime = 10;
 
 bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 {
-	WORD wCell = Cell.cell;
-	BYTE window_type = Cell.window_type;
-	//WORD wDestCell = DestCell.cell;
-	//BYTE bDestInven = DestCell.window_type;
+	uint16_t wCell = Cell.cell;
+	uint8_t window_type = Cell.window_type;
+	//uint16_t wDestCell = DestCell.cell;
+	//uint8_t bDestInven = DestCell.window_type;
 	LPITEM item;
 
 	if (!CanHandleItem())
@@ -5322,7 +5322,7 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("삼거리 전투 참가중에는 귀환부,귀환기억부를 사용할수 없습니다."));
 			return false;
 		}
-		int iPulse = thecore_pulse();
+		int32_t iPulse = thecore_pulse();
 
 		//창고 연후 체크
 		if (iPulse - GetSafeboxLoadTime() < PASSES_PER_SEC(g_nPortalLimitTime))
@@ -5370,8 +5370,8 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 		{
 			PIXEL_POSITION posWarp;
 
-			int x = 0;
-			int y = 0;
+			int32_t x = 0;
+			int32_t y = 0;
 
 			double nDist = 0;
 			const double nDistant = 5000.0;
@@ -5442,19 +5442,19 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 
 	if (IS_SET(item->GetFlag(), ITEM_FLAG_LOG)) // 사용 로그를 남기는 아이템 처리
 	{
-		DWORD vid = item->GetVID();
-		DWORD oldCount = item->GetCount();
-		DWORD vnum = item->GetVnum();
+		uint32_t vid = item->GetVID();
+		uint32_t oldCount = item->GetCount();
+		uint32_t vnum = item->GetVnum();
 
 		char hint[ITEM_NAME_MAX_LEN + 32 + 1];
-		int len = snprintf(hint, sizeof(hint) - 32, "%s", item->GetName());
+		int32_t len = snprintf(hint, sizeof(hint) - 32, "%s", item->GetName());
 
-		if (len < 0 || len >= (int) sizeof(hint) - 32)
+		if (len < 0 || len >= (int32_t) sizeof(hint) - 32)
 			len = (sizeof(hint) - 32) - 1;
 
 		bool ret = UseItemEx(item, DestCell);
 
-		if (NULL == ITEM_MANAGER::instance().FindByVID(vid)) // UseItemEx에서 아이템이 삭제 되었다. 삭제 로그를 남김
+		if (nullptr == ITEM_MANAGER::instance().FindByVID(vid)) // UseItemEx에서 아이템이 삭제 되었다. 삭제 로그를 남김
 		{
 			LogManager::instance().ItemLog(this, vid, vnum, "REMOVE", hint);
 		}
@@ -5469,13 +5469,13 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 		return UseItemEx(item, DestCell);
 }
 
-bool CHARACTER::DropItem(TItemPos Cell, BYTE bCount)
+bool CHARACTER::DropItem(TItemPos Cell, uint8_t bCount)
 {
-	LPITEM item = NULL; 
+	LPITEM item = nullptr; 
 
 	if (!CanHandleItem())
 	{
-		if (NULL != DragonSoul_RefineWindow_GetOpener())
+		if (nullptr != DragonSoul_RefineWindow_GetOpener())
 			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("강화창을 연 상태에서는 아이템을 옮길 수 없습니다."));
 		return false;
 	}
@@ -5568,7 +5568,7 @@ bool CHARACTER::DropItem(TItemPos Cell, BYTE bCount)
 	return true;
 }
 
-bool CHARACTER::DropGold(int gold)
+bool CHARACTER::DropGold(int32_t gold)
 {
 	if (gold <= 0 || gold > GetGold())
 		return false;
@@ -5616,9 +5616,9 @@ bool CHARACTER::DropGold(int gold)
 	return false;
 }
 
-bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, BYTE count)
+bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, uint8_t count)
 {
-	LPITEM item = NULL;
+	LPITEM item = nullptr;
 
 	if (!IsValidItemPosition(Cell))
 		return false;
@@ -5645,7 +5645,7 @@ bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, BYTE count)
 
 	if (!CanHandleItem())
 	{
-		if (NULL != DragonSoul_RefineWindow_GetOpener())
+		if (nullptr != DragonSoul_RefineWindow_GetOpener())
 			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("강화창을 연 상태에서는 아이템을 옮길 수 없습니다."));
 		return false;
 	}
@@ -5664,7 +5664,7 @@ bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, BYTE count)
 			return false;
 
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
-		int iWearCell = item->FindEquipCell(this);
+		int32_t iWearCell = item->FindEquipCell(this);
 		if (iWearCell == WEAR_WEAPON)
 		{
 			LPITEM costumeWeapon = GetWear(WEAR_COSTUME_WEAPON);
@@ -5720,7 +5720,7 @@ bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, BYTE count)
 				!IS_SET(item2->GetAntiFlag(), ITEM_ANTIFLAG_STACK) &&
 				item2->GetVnum() == item->GetVnum()) // 합칠 수 있는 아이템의 경우
 		{
-			for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+			for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 				if (item2->GetSocket(i) != item->GetSocket(i))
 					return false;
 
@@ -5784,7 +5784,7 @@ namespace NPartyPickupDistribute
 		LPCHARACTER owner;
 
 		FFindOwnership(LPITEM item) 
-			: item(item), owner(NULL)
+			: item(item), owner(nullptr)
 		{
 		}
 
@@ -5797,8 +5797,8 @@ namespace NPartyPickupDistribute
 
 	struct FCountNearMember
 	{
-		int		total;
-		int		x, y;
+		int32_t		total;
+		int32_t		x, y;
 
 		FCountNearMember(LPCHARACTER center )
 			: total(0), x(center->GetX()), y(center->GetY())
@@ -5814,12 +5814,12 @@ namespace NPartyPickupDistribute
 
 	struct FMoneyDistributor
 	{
-		int		total;
+		int32_t		total;
 		LPCHARACTER	c;
-		int		x, y;
-		int		iMoney;
+		int32_t		x, y;
+		int32_t		iMoney;
 
-		FMoneyDistributor(LPCHARACTER center, int iMoney) 
+		FMoneyDistributor(LPCHARACTER center, int32_t iMoney) 
 			: total(0), c(center), x(center->GetX()), y(center->GetY()), iMoney(iMoney) 
 		{
 		}
@@ -5838,7 +5838,7 @@ namespace NPartyPickupDistribute
 	};
 }
 
-void CHARACTER::GiveGold(int iAmount)
+void CHARACTER::GiveGold(int32_t iAmount)
 {
 	if (iAmount <= 0)
 		return;
@@ -5850,15 +5850,15 @@ void CHARACTER::GiveGold(int iAmount)
 		LPPARTY pParty = GetParty();
 
 		// 파티가 있는 경우 나누어 가진다.
-		DWORD dwTotal = iAmount;
-		DWORD dwMyAmount = dwTotal;
+		uint32_t dwTotal = iAmount;
+		uint32_t dwMyAmount = dwTotal;
 
 		NPartyPickupDistribute::FCountNearMember funcCountNearMember(this);
 		pParty->ForEachOnlineMember(funcCountNearMember);
 
 		if (funcCountNearMember.total > 1)
 		{
-			DWORD dwShare = dwTotal / funcCountNearMember.total;
+			uint32_t dwShare = dwTotal / funcCountNearMember.total;
 			dwMyAmount -= dwShare * (funcCountNearMember.total - 1);
 
 			NPartyPickupDistribute::FMoneyDistributor funcMoneyDist(this, dwShare);
@@ -5882,7 +5882,7 @@ void CHARACTER::GiveGold(int iAmount)
 	}
 }
 
-bool CHARACTER::PickupItem(DWORD dwVID)
+bool CHARACTER::PickupItem(uint32_t dwVID)
 {
 	LPITEM item = ITEM_MANAGER::instance().FindByVID(dwVID);
 
@@ -5922,9 +5922,9 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 			{
 				if (item->IsStackable() && !IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_STACK))
 				{
-					BYTE bCount = item->GetCount();
+					uint8_t bCount = item->GetCount();
 
-					for (int i = 0; i < INVENTORY_MAX_NUM; ++i)
+					for (int32_t i = 0; i < INVENTORY_MAX_NUM; ++i)
 					{
 						LPITEM item2 = GetInventoryItem(i);
 
@@ -5933,7 +5933,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 
 						if (item2->GetVnum() == item->GetVnum())
 						{
-							int j;
+							int32_t j;
 
 							for (j = 0; j < ITEM_SOCKET_MAX_NUM; ++j)
 								if (item2->GetSocket(j) != item->GetSocket(j))
@@ -5942,7 +5942,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 							if (j != ITEM_SOCKET_MAX_NUM)
 								continue;
 
-							BYTE bCount2 = MIN(g_bItemCountLimit - item2->GetCount(), bCount);
+							uint8_t bCount2 = MIN(g_bItemCountLimit - item2->GetCount(), bCount);
 							bCount -= bCount2;
 
 							item2->SetCount(item2->GetCount() + bCount2);
@@ -5961,7 +5961,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 					item->SetCount(bCount);
 				}
 
-				int iEmptyCell;
+				int32_t iEmptyCell;
 				if (item->IsDragonSoul())
 				{
 					if ((iEmptyCell = GetEmptyDragonSoulInventory(item)) == -1)
@@ -6012,7 +6012,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 			if (!owner)
 				return false;
 
-			int iEmptyCell;
+			int32_t iEmptyCell;
 
 			if (item->IsDragonSoul())
 			{
@@ -6070,7 +6070,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 	return false;
 }
 
-bool CHARACTER::SwapItem(BYTE bCell, BYTE bDestCell)
+bool CHARACTER::SwapItem(uint8_t bCell, uint8_t bDestCell)
 {
 	if (!CanHandleItem())
 		return false;
@@ -6121,8 +6121,8 @@ bool CHARACTER::SwapItem(BYTE bCell, BYTE bDestCell)
 	// 바꿀 아이템이 장비창에 있으면
 	if (TItemPos(EQUIPMENT, item2->GetCell()).IsEquipPosition())
 	{
-		BYTE bEquipCell = item2->GetCell() - INVENTORY_MAX_NUM;
-		BYTE bInvenCell = item1->GetCell();
+		uint8_t bEquipCell = item2->GetCell() - INVENTORY_MAX_NUM;
+		uint8_t bInvenCell = item1->GetCell();
 
 		
 		if (item2->IsDragonSoul() || item2->GetType() == ITEM_BELT) // @fixme117
@@ -6143,8 +6143,8 @@ bool CHARACTER::SwapItem(BYTE bCell, BYTE bDestCell)
 	}
 	else
 	{
-		BYTE bCell1 = item1->GetCell();
-		BYTE bCell2 = item2->GetCell();
+		uint8_t bCell1 = item1->GetCell();
+		uint8_t bCell2 = item2->GetCell();
 		
 		item1->RemoveFromCharacter();
 		item2->RemoveFromCharacter();
@@ -6159,7 +6159,7 @@ bool CHARACTER::SwapItem(BYTE bCell, BYTE bDestCell)
 bool CHARACTER::UnequipItem(LPITEM item)
 {
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
-	int iWearCell = item->FindEquipCell(this);
+	int32_t iWearCell = item->FindEquipCell(this);
 	if (iWearCell == WEAR_WEAPON)
 	{
 		LPITEM costumeWeapon = GetWear(WEAR_COSTUME_WEAPON);
@@ -6174,7 +6174,7 @@ bool CHARACTER::UnequipItem(LPITEM item)
 	if (false == CanUnequipNow(item))
 		return false;
 
-	int pos;
+	int32_t pos;
 	if (item->IsDragonSoul())
 		pos = GetEmptyDragonSoulInventory(item);
 	else
@@ -6200,7 +6200,7 @@ bool CHARACTER::UnequipItem(LPITEM item)
 //
 // @version	05/07/05 Bang2ni - Skill 사용후 1.5 초 이내에 장비 착용 금지
 //
-bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
+bool CHARACTER::EquipItem(LPITEM item, int32_t iCandidateCell)
 {
 	if (item->IsExchanging())
 		return false;
@@ -6211,7 +6211,7 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 	if (false == CanEquipNow(item))
 		return false;
 
-	int iWearCell = item->FindEquipCell(this, iCandidateCell);
+	int32_t iWearCell = item->FindEquipCell(this, iCandidateCell);
 
 	if (iWearCell < 0)
 		return false;
@@ -6243,7 +6243,7 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 	}
 
 	// 화살 이외에는 마지막 공격 시간 또는 스킬 사용 1.5 후에 장비 교체가 가능
-	DWORD dwCurTime = get_dword_time();
+	uint32_t dwCurTime = get_dword_time();
 
 	if (iWearCell != WEAR_ARROW 
 		&& (dwCurTime - GetLastAttackTime() <= 1500 || dwCurTime - m_dwLastSkillTime <= 1500))
@@ -6320,7 +6320,7 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 		}
 		else
 		{
-			BYTE bOldCell = item->GetCell();
+			uint8_t bOldCell = item->GetCell();
 
 			if (item->EquipTo(this, iWearCell))
 			{
@@ -6338,7 +6338,7 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 			if (0 == item->GetSocket(1))
 			{
 				// 사용가능시간은 Default 값으로 Limit Value 값을 사용하되, Socket0에 값이 있으면 그 값을 사용하도록 한다. (단위는 초)
-				long duration = (0 != item->GetSocket(0)) ? item->GetSocket(0) : item->GetProto()->aLimits[(unsigned char)(item->GetProto()->cLimitRealTimeFirstUseIndex)].lValue;
+				int32_t duration = (0 != item->GetSocket(0)) ? item->GetSocket(0) : item->GetProto()->aLimits[(uint8_t)(item->GetProto()->cLimitRealTimeFirstUseIndex)].lValue;
 
 				if (0 == duration)
 					duration = 60 * 60 * 24 * 7;
@@ -6353,7 +6353,7 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 		if (item->GetVnum() == UNIQUE_ITEM_HIDE_ALIGNMENT_TITLE)
 			ShowAlignment(false);
 
-		const DWORD& dwVnum = item->GetVnum();
+		const uint32_t& dwVnum = item->GetVnum();
 
 		// 라마단 이벤트 초승달의 반지(71135) 착용시 이펙트 발동
 		if (true == CItemVnumHelper::IsRamadanMoonRing(dwVnum))
@@ -6375,15 +6375,15 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 		{
 			this->EffectPacket(SE_EQUIP_LOVE_PENDANT);
 		}
-		// ITEM_UNIQUE의 경우, SpecialItemGroup에 정의되어 있고, (item->GetSIGVnum() != NULL)
+		// ITEM_UNIQUE의 경우, SpecialItemGroup에 정의되어 있고, (item->GetSIGVnum() != nullptr)
 		// 
 		else if (ITEM_UNIQUE == item->GetType() && 0 != item->GetSIGVnum())
 		{
 			const CSpecialItemGroup* pGroup = ITEM_MANAGER::instance().GetSpecialItemGroup(item->GetSIGVnum());
-			if (NULL != pGroup)
+			if (nullptr != pGroup)
 			{
 				const CSpecialAttrGroup* pAttrGroup = ITEM_MANAGER::instance().GetSpecialAttrGroup(pGroup->GetAttrVnum(item->GetVnum()));
-				if (NULL != pAttrGroup)
+				if (nullptr != pAttrGroup)
 				{
 					const std::string& std = pAttrGroup->m_stEffectFileName;
 					SpecificEffectPacket(std.c_str());
@@ -6439,7 +6439,7 @@ void CHARACTER::BuffOnAttr_ClearAll()
 	}
 }
 
-void CHARACTER::BuffOnAttr_ValueChange(BYTE bType, BYTE bOldValue, BYTE bNewValue)
+void CHARACTER::BuffOnAttr_ValueChange(uint8_t bType, uint8_t bOldValue, uint8_t bNewValue)
 {
 	TMapBuffOnAttrs::iterator it = m_map_buff_on_attrs.find(bType);
 
@@ -6452,28 +6452,28 @@ void CHARACTER::BuffOnAttr_ValueChange(BYTE bType, BYTE bOldValue, BYTE bNewValu
 	}
 	else if(0 == bOldValue)
 	{
-		CBuffOnAttributes* pBuff = NULL;
+		CBuffOnAttributes* pBuff = nullptr;
 		if (m_map_buff_on_attrs.end() == it)
 		{
 			switch (bType)
 			{
 			case POINT_ENERGY:
 				{
-					static BYTE abSlot[] = { WEAR_BODY, WEAR_HEAD, WEAR_FOOTS, WEAR_WRIST, WEAR_WEAPON, WEAR_NECK, WEAR_EAR, WEAR_SHIELD };
-					static std::vector <BYTE> vec_slots (abSlot, abSlot + _countof(abSlot));
+					static uint8_t abSlot[] = { WEAR_BODY, WEAR_HEAD, WEAR_FOOTS, WEAR_WRIST, WEAR_WEAPON, WEAR_NECK, WEAR_EAR, WEAR_SHIELD };
+					static std::vector <uint8_t> vec_slots (abSlot, abSlot + _countof(abSlot));
 					pBuff = M2_NEW CBuffOnAttributes(this, bType, &vec_slots);
 				}
 				break;
 			case POINT_COSTUME_ATTR_BONUS:
 				{
-					static BYTE abSlot[] = {
+					static uint8_t abSlot[] = {
 						WEAR_COSTUME_BODY,
 						WEAR_COSTUME_HAIR,
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
 						WEAR_COSTUME_WEAPON,
 #endif
 					};
-					static std::vector <BYTE> vec_slots (abSlot, abSlot + _countof(abSlot));
+					static std::vector <uint8_t> vec_slots (abSlot, abSlot + _countof(abSlot));
 					pBuff = M2_NEW CBuffOnAttributes(this, bType, &vec_slots);
 				}
 				break;
@@ -6485,7 +6485,7 @@ void CHARACTER::BuffOnAttr_ValueChange(BYTE bType, BYTE bOldValue, BYTE bNewValu
 		}
 		else
 			pBuff = it->second;
-		if (pBuff != NULL)
+		if (pBuff != nullptr)
 			pBuff->On(bNewValue);
 	}
 	else
@@ -6496,41 +6496,41 @@ void CHARACTER::BuffOnAttr_ValueChange(BYTE bType, BYTE bOldValue, BYTE bNewValu
 }
 
 
-LPITEM CHARACTER::FindSpecifyItem(DWORD vnum) const
+LPITEM CHARACTER::FindSpecifyItem(uint32_t vnum) const
 {
-	for (int i = 0; i < INVENTORY_MAX_NUM; ++i)
+	for (int32_t i = 0; i < INVENTORY_MAX_NUM; ++i)
 		if (GetInventoryItem(i) && GetInventoryItem(i)->GetVnum() == vnum)
 			return GetInventoryItem(i);
 
-	return NULL;
+	return nullptr;
 }
 
-LPITEM CHARACTER::FindItemByID(DWORD id) const
+LPITEM CHARACTER::FindItemByID(uint32_t id) const
 {
-	for (int i=0 ; i < INVENTORY_MAX_NUM ; ++i)
+	for (int32_t i=0 ; i < INVENTORY_MAX_NUM ; ++i)
 	{
-		if (NULL != GetInventoryItem(i) && GetInventoryItem(i)->GetID() == id)
+		if (nullptr != GetInventoryItem(i) && GetInventoryItem(i)->GetID() == id)
 			return GetInventoryItem(i);
 	}
 
-	for (int i=BELT_INVENTORY_SLOT_START; i < BELT_INVENTORY_SLOT_END ; ++i)
+	for (int32_t i=BELT_INVENTORY_SLOT_START; i < BELT_INVENTORY_SLOT_END ; ++i)
 	{
-		if (NULL != GetInventoryItem(i) && GetInventoryItem(i)->GetID() == id)
+		if (nullptr != GetInventoryItem(i) && GetInventoryItem(i)->GetID() == id)
 			return GetInventoryItem(i);
 	}
 
-	return NULL;
+	return nullptr;
 }
 
-int CHARACTER::CountSpecifyItem(DWORD vnum) const
+int32_t CHARACTER::CountSpecifyItem(uint32_t vnum) const
 {
-	int	count = 0;
+	int32_t	count = 0;
 	LPITEM item;
 
-	for (int i = 0; i < INVENTORY_MAX_NUM; ++i)
+	for (int32_t i = 0; i < INVENTORY_MAX_NUM; ++i)
 	{
 		item = GetInventoryItem(i);
-		if (NULL != item && item->GetVnum() == vnum)
+		if (nullptr != item && item->GetVnum() == vnum)
 		{
 			// 개인 상점에 등록된 물건이면 넘어간다.
 			if (m_pkMyShop && m_pkMyShop->IsSellingItem(item->GetID()))
@@ -6547,14 +6547,14 @@ int CHARACTER::CountSpecifyItem(DWORD vnum) const
 	return count;
 }
 
-void CHARACTER::RemoveSpecifyItem(DWORD vnum, DWORD count)
+void CHARACTER::RemoveSpecifyItem(uint32_t vnum, uint32_t count)
 {
 	if (0 == count)
 		return;
 
-	for (UINT i = 0; i < INVENTORY_MAX_NUM; ++i)
+	for (uint32_t i = 0; i < INVENTORY_MAX_NUM; ++i)
 	{
-		if (NULL == GetInventoryItem(i))
+		if (nullptr == GetInventoryItem(i))
 			continue;
 
 		if (GetInventoryItem(i)->GetVnum() != vnum)
@@ -6591,14 +6591,14 @@ void CHARACTER::RemoveSpecifyItem(DWORD vnum, DWORD count)
 		sys_log(0, "CHARACTER::RemoveSpecifyItem cannot remove enough item vnum %u, still remain %d", vnum, count);
 }
 
-int CHARACTER::CountSpecifyTypeItem(BYTE type) const
+int32_t CHARACTER::CountSpecifyTypeItem(uint8_t type) const
 {
-	int	count = 0;
+	int32_t	count = 0;
 
-	for (int i = 0; i < INVENTORY_MAX_NUM; ++i)
+	for (int32_t i = 0; i < INVENTORY_MAX_NUM; ++i)
 	{
 		LPITEM pItem = GetInventoryItem(i);
-		if (pItem != NULL && pItem->GetType() == type)
+		if (pItem != nullptr && pItem->GetType() == type)
 		{
 			count += pItem->GetCount();
 		}
@@ -6607,14 +6607,14 @@ int CHARACTER::CountSpecifyTypeItem(BYTE type) const
 	return count;
 }
 
-void CHARACTER::RemoveSpecifyTypeItem(BYTE type, DWORD count)
+void CHARACTER::RemoveSpecifyTypeItem(uint8_t type, uint32_t count)
 {
 	if (0 == count)
 		return;
 
-	for (UINT i = 0; i < INVENTORY_MAX_NUM; ++i)
+	for (uint32_t i = 0; i < INVENTORY_MAX_NUM; ++i)
 	{
-		if (NULL == GetInventoryItem(i))
+		if (nullptr == GetInventoryItem(i))
 			continue;
 
 		if (GetInventoryItem(i)->GetType() != type)
@@ -6646,9 +6646,9 @@ void CHARACTER::RemoveSpecifyTypeItem(BYTE type, DWORD count)
 
 void CHARACTER::AutoGiveItem(LPITEM item, bool longOwnerShip)
 {
-	if (NULL == item)
+	if (nullptr == item)
 	{
-		sys_err ("NULL point.");
+		sys_err ("nullptr point.");
 		return;
 	}
 	if (item->GetOwner())
@@ -6657,7 +6657,7 @@ void CHARACTER::AutoGiveItem(LPITEM item, bool longOwnerShip)
 		return;
 	}
 	
-	int cell;
+	int32_t cell;
 	if (item->IsDragonSoul())
 	{
 		cell = GetEmptyDragonSoulInventory(item);
@@ -6706,18 +6706,18 @@ void CHARACTER::AutoGiveItem(LPITEM item, bool longOwnerShip)
 	}
 }
 
-LPITEM CHARACTER::AutoGiveItem(DWORD dwItemVnum, BYTE bCount, int iRarePct, bool bMsg)
+LPITEM CHARACTER::AutoGiveItem(uint32_t dwItemVnum, uint8_t bCount, int32_t iRarePct, bool bMsg)
 {
 	TItemTable * p = ITEM_MANAGER::instance().GetTable(dwItemVnum);
 
 	if (!p)
-		return NULL;
+		return nullptr;
 
 	DBManager::instance().SendMoneyLog(MONEY_LOG_DROP, dwItemVnum, bCount);
 
 	if (p->dwFlags & ITEM_FLAG_STACKABLE && p->bType != ITEM_BLEND) 
 	{
-		for (int i = 0; i < INVENTORY_MAX_NUM; ++i)
+		for (int32_t i = 0; i < INVENTORY_MAX_NUM; ++i)
 		{
 			LPITEM item = GetInventoryItem(i);
 
@@ -6732,7 +6732,7 @@ LPITEM CHARACTER::AutoGiveItem(DWORD dwItemVnum, BYTE bCount, int iRarePct, bool
 						bCount = p->alValues[1];
 				}
 
-				BYTE bCount2 = MIN(g_bItemCountLimit - item->GetCount(), bCount);
+				uint8_t bCount2 = MIN(g_bItemCountLimit - item->GetCount(), bCount);
 				bCount -= bCount2;
 
 				item->SetCount(item->GetCount() + bCount2);
@@ -6753,16 +6753,16 @@ LPITEM CHARACTER::AutoGiveItem(DWORD dwItemVnum, BYTE bCount, int iRarePct, bool
 	if (!item)
 	{
 		sys_err("cannot create item by vnum %u (name: %s)", dwItemVnum, GetName());
-		return NULL;
+		return nullptr;
 	}
 
 	if (item->GetType() == ITEM_BLEND)
 	{
-		for (int i=0; i < INVENTORY_MAX_NUM; i++)
+		for (int32_t i=0; i < INVENTORY_MAX_NUM; i++)
 		{
 			LPITEM inv_item = GetInventoryItem(i);
 
-			if (inv_item == NULL) continue;
+			if (inv_item == nullptr) continue;
 
 			if (inv_item->GetType() == ITEM_BLEND)
 			{
@@ -6782,7 +6782,7 @@ LPITEM CHARACTER::AutoGiveItem(DWORD dwItemVnum, BYTE bCount, int iRarePct, bool
 		}
 	}
 
-	int iEmptyCell;
+	int32_t iEmptyCell;
 	if (item->IsDragonSoul())
 	{
 		iEmptyCell = GetEmptyDragonSoulInventory(item);
@@ -7121,7 +7121,7 @@ void CHARACTER::ReceiveItem(LPCHARACTER from, LPITEM item)
 	}
 }
 
-bool CHARACTER::IsEquipUniqueItem(DWORD dwItemVnum) const
+bool CHARACTER::IsEquipUniqueItem(uint32_t dwItemVnum) const
 {
 	{
 		LPITEM u = GetWear(WEAR_UNIQUE1);
@@ -7145,19 +7145,19 @@ bool CHARACTER::IsEquipUniqueItem(DWORD dwItemVnum) const
 }
 
 // CHECK_UNIQUE_GROUP
-bool CHARACTER::IsEquipUniqueGroup(DWORD dwGroupVnum) const
+bool CHARACTER::IsEquipUniqueGroup(uint32_t dwGroupVnum) const
 {
 	{
 		LPITEM u = GetWear(WEAR_UNIQUE1);
 
-		if (u && u->GetSpecialGroup() == (int) dwGroupVnum)
+		if (u && u->GetSpecialGroup() == (int32_t) dwGroupVnum)
 			return true;
 	}
 
 	{
 		LPITEM u = GetWear(WEAR_UNIQUE2);
 
-		if (u && u->GetSpecialGroup() == (int) dwGroupVnum)
+		if (u && u->GetSpecialGroup() == (int32_t) dwGroupVnum)
 			return true;
 	}
 
@@ -7165,7 +7165,7 @@ bool CHARACTER::IsEquipUniqueGroup(DWORD dwGroupVnum) const
 }
 // END_OF_CHECK_UNIQUE_GROUP
 
-void CHARACTER::SetRefineMode(int iAdditionalCell)
+void CHARACTER::SetRefineMode(int32_t iAdditionalCell)
 {
 	m_iRefineAdditionalCell = iAdditionalCell;
 	m_bUnderRefine = true;
@@ -7174,11 +7174,11 @@ void CHARACTER::SetRefineMode(int iAdditionalCell)
 void CHARACTER::ClearRefineMode()
 {
 	m_bUnderRefine = false;
-	SetRefineNPC( NULL );
+	SetRefineNPC( nullptr );
 }
 
-bool CHARACTER::GiveItemFromSpecialItemGroup(DWORD dwGroupNum, std::vector<DWORD> &dwItemVnums, 
-											std::vector<DWORD> &dwItemCounts, std::vector <LPITEM> &item_gets, int &count)
+bool CHARACTER::GiveItemFromSpecialItemGroup(uint32_t dwGroupNum, std::vector<uint32_t> &dwItemVnums, 
+											std::vector<uint32_t> &dwItemCounts, std::vector <LPITEM> &item_gets, int32_t &count)
 {
 	const CSpecialItemGroup* pGroup = ITEM_MANAGER::instance().GetSpecialItemGroup(dwGroupNum);
 
@@ -7188,19 +7188,19 @@ bool CHARACTER::GiveItemFromSpecialItemGroup(DWORD dwGroupNum, std::vector<DWORD
 		return false;
 	}
 
-	std::vector <int> idxes;
-	int n = pGroup->GetMultiIndex(idxes);
+	std::vector <int32_t> idxes;
+	int32_t n = pGroup->GetMultiIndex(idxes);
 
 	bool bSuccess;
 
-	for (int i = 0; i < n; i++)
+	for (int32_t i = 0; i < n; i++)
 	{
 		bSuccess = false;
-		int idx = idxes[i];
-		DWORD dwVnum = pGroup->GetVnum(idx);
-		DWORD dwCount = pGroup->GetCount(idx);
-		int	iRarePct = pGroup->GetRarePct(idx);
-		LPITEM item_get = NULL;
+		int32_t idx = idxes[i];
+		uint32_t dwVnum = pGroup->GetVnum(idx);
+		uint32_t dwCount = pGroup->GetCount(idx);
+		int32_t	iRarePct = pGroup->GetRarePct(idx);
+		LPITEM item_get = nullptr;
 		switch (dwVnum)
 		{
 			case CSpecialItemGroup::GOLD:
@@ -7221,8 +7221,8 @@ bool CHARACTER::GiveItemFromSpecialItemGroup(DWORD dwGroupNum, std::vector<DWORD
 			case CSpecialItemGroup::MOB:
 				{
 					sys_log(0, "CSpecialItemGroup::MOB %d", dwCount);
-					int x = GetX() + number(-500, 500);
-					int y = GetY() + number(-500, 500);
+					int32_t x = GetX() + number(-500, 500);
+					int32_t y = GetY() + number(-500, 500);
 
 					LPCHARACTER ch = CHARACTER_MANAGER::instance().SpawnMob(dwCount, GetMapIndex(), x, y, 0, true, -1);
 					if (ch)
@@ -7232,14 +7232,14 @@ bool CHARACTER::GiveItemFromSpecialItemGroup(DWORD dwGroupNum, std::vector<DWORD
 				break;
 			case CSpecialItemGroup::SLOW:
 				{
-					sys_log(0, "CSpecialItemGroup::SLOW %d", -(int)dwCount);
-					AddAffect(AFFECT_SLOW, POINT_MOV_SPEED, -(int)dwCount, AFF_SLOW, 300, 0, true);
+					sys_log(0, "CSpecialItemGroup::SLOW %d", -(int32_t)dwCount);
+					AddAffect(AFFECT_SLOW, POINT_MOV_SPEED, -(int32_t)dwCount, AFF_SLOW, 300, 0, true);
 					bSuccess = true;
 				}
 				break;
 			case CSpecialItemGroup::DRAIN_HP:
 				{
-					int iDropHP = GetMaxHP()*dwCount/100;
+					int32_t iDropHP = GetMaxHP()*dwCount/100;
 					sys_log(0, "CSpecialItemGroup::DRAIN_HP %d", -iDropHP);
 					iDropHP = MIN(iDropHP, GetHP()-1);
 					sys_log(0, "CSpecialItemGroup::DRAIN_HP %d", -iDropHP);
@@ -7249,25 +7249,25 @@ bool CHARACTER::GiveItemFromSpecialItemGroup(DWORD dwGroupNum, std::vector<DWORD
 				break;
 			case CSpecialItemGroup::POISON:
 				{
-					AttackedByPoison(NULL);
+					AttackedByPoison(nullptr);
 					bSuccess = true;
 				}
 				break;
 #ifdef ENABLE_WOLFMAN_CHARACTER
 			case CSpecialItemGroup::BLEEDING:
 				{
-					AttackedByBleeding(NULL);
+					AttackedByBleeding(nullptr);
 					bSuccess = true;
 				}
 				break;
 #endif
 			case CSpecialItemGroup::MOB_GROUP:
 				{
-					int sx = GetX() - number(300, 500);
-					int sy = GetY() - number(300, 500);
-					int ex = GetX() + number(300, 500);
-					int ey = GetY() + number(300, 500);
-					CHARACTER_MANAGER::instance().SpawnGroup(dwCount, GetMapIndex(), sx, sy, ex, ey, NULL, true);
+					int32_t sx = GetX() - number(300, 500);
+					int32_t sy = GetY() - number(300, 500);
+					int32_t ex = GetX() + number(300, 500);
+					int32_t ey = GetY() + number(300, 500);
+					CHARACTER_MANAGER::instance().SpawnGroup(dwCount, GetMapIndex(), sx, sy, ex, ey, nullptr, true);
 
 					bSuccess = true;
 				}
@@ -7301,7 +7301,7 @@ bool CHARACTER::GiveItemFromSpecialItemGroup(DWORD dwGroupNum, std::vector<DWORD
 }
 
 // NEW_HAIR_STYLE_ADD
-bool CHARACTER::ItemProcess_Hair(LPITEM item, int iDestCell)
+bool CHARACTER::ItemProcess_Hair(LPITEM item, int32_t iDestCell)
 {
 	if (item->CheckItemUseLevel(GetLevel()) == false)
 	{
@@ -7310,7 +7310,7 @@ bool CHARACTER::ItemProcess_Hair(LPITEM item, int iDestCell)
 		return false;
 	}
 
-	DWORD hair = item->GetVnum();
+	uint32_t hair = item->GetVnum();
 
 	switch (GetJob())
 	{
@@ -7367,7 +7367,7 @@ bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 		return false;
 	}
 
-	DWORD dwVnum = item->GetSocket(0);
+	uint32_t dwVnum = item->GetSocket(0);
 
 	if (dwVnum == 0)
 	{
@@ -7378,7 +7378,7 @@ bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 
 	const CMob* pMob = CMobManager::instance().Get(dwVnum);
 
-	if (pMob == NULL)
+	if (pMob == nullptr)
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("잘못된 둔갑 아이템입니다."));
 		item->SetCount(item->GetCount()-1);
@@ -7397,17 +7397,17 @@ bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 				sys_log(0, "USE_POLYMORPH_BALL PID(%d) vnum(%d)", GetPlayerID(), dwVnum);
 
 				// 레벨 제한 체크
-				int iPolymorphLevelLimit = MAX(0, 20 - GetLevel() * 3 / 10);
+				int32_t iPolymorphLevelLimit = MAX(0, 20 - GetLevel() * 3 / 10);
 				if (pMob->m_table.bLevel >= GetLevel() + iPolymorphLevelLimit)
 				{
 					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("나보다 너무 높은 레벨의 몬스터로는 변신 할 수 없습니다."));
 					return false;
 				}
 
-				int iDuration = GetSkillLevel(POLYMORPH_SKILL_ID) == 0 ? 5 : (5 + (5 + GetSkillLevel(POLYMORPH_SKILL_ID)/40 * 25));
+				int32_t iDuration = GetSkillLevel(POLYMORPH_SKILL_ID) == 0 ? 5 : (5 + (5 + GetSkillLevel(POLYMORPH_SKILL_ID)/40 * 25));
 				iDuration *= 60;
 
-				DWORD dwBonus = 0;
+				uint32_t dwBonus = 0;
 				
 				dwBonus = (2 + GetSkillLevel(POLYMORPH_SKILL_ID)/40) * 100;
 
@@ -7464,7 +7464,7 @@ bool CHARACTER::UnEquipSpecialRideUniqueItem()
 	LPITEM MountCostume = GetWear(WEAR_COSTUME_MOUNT);
 #endif
 
-	if( NULL != Unique1 )
+	if( nullptr != Unique1 )
 	{
 		if( UNIQUE_GROUP_SPECIAL_RIDE == Unique1->GetSpecialGroup() )
 		{
@@ -7472,7 +7472,7 @@ bool CHARACTER::UnEquipSpecialRideUniqueItem()
 		}
 	}
 
-	if( NULL != Unique2 )
+	if( nullptr != Unique2 )
 	{
 		if( UNIQUE_GROUP_SPECIAL_RIDE == Unique2->GetSpecialGroup() )
 		{
@@ -7499,17 +7499,17 @@ void CHARACTER::AutoRecoveryItemProcess(const EAffectTypes type)
 	if (AFFECT_AUTO_HP_RECOVERY != type && AFFECT_AUTO_SP_RECOVERY != type)
 		return;
 
-	if (NULL != FindAffect(AFFECT_STUN))
+	if (nullptr != FindAffect(AFFECT_STUN))
 		return;
 
 	{
-		const DWORD stunSkills[] = { SKILL_TANHWAN, SKILL_GEOMPUNG, SKILL_BYEURAK, SKILL_GIGUNG };
+		const uint32_t stunSkills[] = { SKILL_TANHWAN, SKILL_GEOMPUNG, SKILL_BYEURAK, SKILL_GIGUNG };
 
-		for (size_t i=0 ; i < sizeof(stunSkills)/sizeof(DWORD) ; ++i)
+		for (size_t i=0 ; i < sizeof(stunSkills)/sizeof(uint32_t) ; ++i)
 		{
 			const CAffect* p = FindAffect(stunSkills[i]);
 
-			if (NULL != p && AFF_STUN == p->dwFlag)
+			if (nullptr != p && AFF_STUN == p->dwFlag)
 				return;
 		}
 	}
@@ -7518,11 +7518,11 @@ void CHARACTER::AutoRecoveryItemProcess(const EAffectTypes type)
 	const size_t idx_of_amount_of_used = 1;
 	const size_t idx_of_amount_of_full = 2;
 
-	if (NULL != pAffect)
+	if (nullptr != pAffect)
 	{
 		LPITEM pItem = FindItemByID(pAffect->dwFlag);
 
-		if (NULL != pItem && true == pItem->GetSocket(0))
+		if (nullptr != pItem && true == pItem->GetSocket(0))
 		{
 			if (!CArenaManager::instance().IsArenaMap(GetMapIndex())
 #ifdef ENABLE_NEWSTUFF
@@ -7530,8 +7530,8 @@ void CHARACTER::AutoRecoveryItemProcess(const EAffectTypes type)
 #endif
 			)
 			{
-				const long amount_of_used = pItem->GetSocket(idx_of_amount_of_used);
-				const long amount_of_full = pItem->GetSocket(idx_of_amount_of_full);
+				const int32_t amount_of_used = pItem->GetSocket(idx_of_amount_of_used);
+				const int32_t amount_of_full = pItem->GetSocket(idx_of_amount_of_full);
 				
 				const int32_t avail = amount_of_full - amount_of_used;
 
@@ -7550,8 +7550,8 @@ void CHARACTER::AutoRecoveryItemProcess(const EAffectTypes type)
 				{
 					if (avail > amount)
 					{
-						const int pct_of_used = amount_of_used * 100 / amount_of_full;
-						const int pct_of_will_used = (amount_of_used + amount) * 100 / amount_of_full;
+						const int32_t pct_of_used = amount_of_used * 100 / amount_of_full;
+						const int32_t pct_of_will_used = (amount_of_used + amount) * 100 / amount_of_full;
 
 						bool bLog = false;
 						// 사용량의 10% 단위로 로그를 남김
@@ -7595,8 +7595,8 @@ void CHARACTER::AutoRecoveryItemProcess(const EAffectTypes type)
 
 bool CHARACTER::IsValidItemPosition(TItemPos Pos) const
 {
-	BYTE window_type = Pos.window_type;
-	WORD cell = Pos.cell;
+	uint8_t window_type = Pos.window_type;
+	uint16_t cell = Pos.cell;
 	
 	switch (window_type)
 	{
@@ -7611,13 +7611,13 @@ bool CHARACTER::IsValidItemPosition(TItemPos Pos) const
 		return cell < (DRAGON_SOUL_INVENTORY_MAX_NUM);
 
 	case SAFEBOX:
-		if (NULL != m_pkSafebox)
+		if (nullptr != m_pkSafebox)
 			return m_pkSafebox->IsValidPosition(cell);
 		else
 			return false;
 
 	case MALL:
-		if (NULL != m_pkMall)
+		if (nullptr != m_pkMall)
 			return m_pkMall->IsValidPosition(cell);
 		else
 			return false;
@@ -7639,8 +7639,8 @@ bool CHARACTER::IsValidItemPosition(TItemPos Pos) const
 bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TItemPos& destCell) /*const*/
 {
 	const TItemTable* itemTable = item->GetProto();
-	//BYTE itemType = item->GetType();
-	//BYTE itemSubType = item->GetSubType();
+	//uint8_t itemType = item->GetType();
+	//uint8_t itemSubType = item->GetSubType();
 
 	switch (GetJob())
 	{
@@ -7671,9 +7671,9 @@ bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TI
 #endif
 	}
 
-	for (int i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
+	for (int32_t i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
 	{
-		long limit = itemTable->aLimits[i].lValue;
+		int32_t limit = itemTable->aLimits[i].lValue;
 		switch (itemTable->aLimits[i].bType)
 		{
 			case LIMIT_LEVEL:
@@ -7752,7 +7752,7 @@ bool CHARACTER::CanUnequipNow(const LPITEM item, const TItemPos& srcCell, const 
 
 	// 아이템 unequip시 인벤토리로 옮길 때 빈 자리가 있는 지 확인
 	{
-		int pos = -1;
+		int32_t pos = -1;
 
 		if (item->IsDragonSoul())
 			pos = GetEmptyDragonSoulInventory(item);

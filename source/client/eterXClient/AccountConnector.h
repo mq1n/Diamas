@@ -21,7 +21,7 @@ class CAccountConnector : public CNetworkStream, public CSingleton<CAccountConne
 		void SetLoginInfo(const char * c_szName, const char * c_szPwd);
 		void ClearLoginInfo( void );
 
-		bool Connect(const char * c_szAddr, int iPort, const char * c_szAccountAddr, int iAccountPort);
+		bool Connect(const char * c_szAddr, int32_t iPort, const char * c_szAccountAddr, int32_t iAccountPort);
 		void Disconnect();
 		void Process();
 
@@ -54,22 +54,22 @@ class CAccountConnector : public CNetworkStream, public CSingleton<CAccountConne
 		bool __AuthState_RecvKeyAgreementCompleted();
 #endif
 
-		bool __AnalyzePacket(UINT uHeader, UINT uPacketSize, bool (CAccountConnector::*pfnDispatchPacket)());
+		bool __AnalyzePacket(uint32_t uHeader, uint32_t uPacketSize, bool (CAccountConnector::*pfnDispatchPacket)());
 		// TODO:  지금 현재는 임시다.  header뒤에 size 4byte가 무조건 온다는 가정임.
 		// 제대로 하려면  Packet System Refactoring해야 한다. 
-		bool __AnalyzeVarSizePacket(UINT uHeader, bool (CAccountConnector::*pfnDispatchPacket)(int));
+		bool __AnalyzeVarSizePacket(uint32_t uHeader, bool (CAccountConnector::*pfnDispatchPacket)(int32_t));
 
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
 		void __BuildClientKey();
 #endif
 
 	protected:
-		UINT m_eState;
+		uint32_t m_eState;
 		std::string m_strID;
 		std::string m_strPassword;
 
 		std::string m_strAddr;
-		int m_iPort;
+		int32_t m_iPort;
 		BOOL m_isWaitKey;
 
 		PyObject * m_poHandler;

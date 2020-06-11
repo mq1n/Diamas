@@ -50,7 +50,7 @@ ACMD(do_user_horse_ride)
 			return;
 		}
 
-		if (ch->GetHorse() == NULL)
+		if (ch->GetHorse() == nullptr)
 		{
 			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("말을 먼저 소환해주세요."));
 			return;
@@ -66,7 +66,7 @@ ACMD(do_user_horse_ride)
 
 ACMD(do_user_horse_back)
 {
-	if (ch->GetHorse() != NULL)
+	if (ch->GetHorse() != nullptr)
 	{
 		ch->HorseSummon(false);
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("말을 돌려보냈습니다."));
@@ -87,7 +87,7 @@ ACMD(do_user_horse_feed)
 	if (ch->GetMyShop())
 		return;
 
-	if (ch->GetHorse() == NULL)
+	if (ch->GetHorse() == nullptr)
 	{
 		if (ch->IsHorseRiding() == false)
 			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("말을 먼저 소환해주세요."));
@@ -96,7 +96,7 @@ ACMD(do_user_horse_feed)
 		return;
 	}
 
-	DWORD dwFood = ch->GetHorseGrade() + 50054 - 1;
+	uint32_t dwFood = ch->GetHorseGrade() + 50054 - 1;
 
 	if (ch->CountSpecifyItem(dwFood) > 0)
 	{
@@ -118,8 +118,8 @@ ACMD(do_user_horse_feed)
 EVENTINFO(TimedEventInfo)
 {
 	DynamicCharacterPtr ch;
-	int		subcmd;
-	int         	left_second;
+	int32_t		subcmd;
+	int32_t         	left_second;
 	char		szReason[MAX_REASON_LEN];
 
 	TimedEventInfo() 
@@ -162,7 +162,7 @@ struct DisconnectFunc
 
 EVENTINFO(shutdown_event_data)
 {
-	int seconds;
+	int32_t seconds;
 
 	shutdown_event_data()
 	: seconds( 0 )
@@ -174,13 +174,13 @@ EVENTFUNC(shutdown_event)
 {
 	shutdown_event_data* info = dynamic_cast<shutdown_event_data*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "shutdown_event> <Factor> Null pointer" );
 		return 0;
 	}
 
-	int * pSec = & (info->seconds);
+	int32_t * pSec = & (info->seconds);
 
 	if (*pSec < 0)
 	{
@@ -216,7 +216,7 @@ EVENTFUNC(shutdown_event)
 	}
 }
 
-void Shutdown(int iSec)
+void Shutdown(int32_t iSec)
 {
 	if (g_bNoMoreClient)
 	{
@@ -255,21 +255,21 @@ EVENTFUNC(timed_event)
 {
 	TimedEventInfo * info = dynamic_cast<TimedEventInfo *>( event->info );
 	
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "timed_event> <Factor> Null pointer" );
 		return 0;
 	}
 
 	LPCHARACTER	ch = info->ch;
-	if (ch == NULL) { // <Factor>
+	if (ch == nullptr) { // <Factor>
 		return 0;
 	}
 	LPDESC d = ch->GetDesc();
 
 	if (info->left_second <= 0)
 	{
-		ch->m_pkTimedEvent = NULL;
+		ch->m_pkTimedEvent = nullptr;
 
 		switch (info->subcmd)
 		{
@@ -324,7 +324,7 @@ EVENTFUNC(timed_event)
 ACMD(do_cmd)
 {
 	/* RECALL_DELAY
-	   if (ch->m_pkRecallEvent != NULL)
+	   if (ch->m_pkRecallEvent != nullptr)
 	   {
 	   ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("취소 되었습니다."));
 	   event_cancel(&ch->m_pkRecallEvent);
@@ -354,7 +354,7 @@ ACMD(do_cmd)
 			break;
 	}
 
-	int nExitLimitTime = 10;
+	int32_t nExitLimitTime = 10;
 
 	if (ch->IsHack(false, true, nExitLimitTime) &&
 		false == CThreeWayWar::instance().IsSungZiMapIndex(ch->GetMapIndex()) &&
@@ -408,7 +408,7 @@ ACMD(do_mount)
 	param.vid	= ch->GetMountingChr()->GetVID();
 	param.is_unmount = true;
 
-	float distance = DISTANCE_SQRT(param.x - (DWORD) ch->GetX(), param.y - (DWORD) ch->GetY());
+	float distance = DISTANCE_SQRT(param.x - (uint32_t) ch->GetX(), param.y - (uint32_t) ch->GetY());
 
 	if (distance > 600.0f)
 	{
@@ -474,10 +474,10 @@ ACMD(do_restart)
 		return;
 	}
 
-	if (NULL == ch->m_pkDeadEvent)
+	if (nullptr == ch->m_pkDeadEvent)
 		return;
 
-	int iTimeToDead = (event_time(ch->m_pkDeadEvent) / passes_per_sec);
+	int32_t iTimeToDead = (event_time(ch->m_pkDeadEvent) / passes_per_sec);
 
 	if (subcmd != SCMD_RESTART_TOWN && (!ch->GetWarMap() || ch->GetWarMap()->GetType() == GUILD_WAR_TYPE_FLAG))
 	{
@@ -579,7 +579,7 @@ ACMD(do_restart)
 	if (ch->GetWarMap() && !ch->IsObserverMode())
 	{
 		CWarMap * pMap = ch->GetWarMap();
-		DWORD dwGuildOpponent = pMap ? pMap->GetGuildOpponent(ch) : 0;
+		uint32_t dwGuildOpponent = pMap ? pMap->GetGuildOpponent(ch) : 0;
 
 		if (dwGuildOpponent)
 		{
@@ -730,7 +730,7 @@ ACMD(do_stat)
 	if (ch->GetPoint(POINT_STAT) <= 0)
 		return;
 
-	BYTE idx = 0;
+	uint8_t idx = 0;
 	
 	if (!strcmp(arg1, "st"))
 		idx = POINT_ST;
@@ -766,7 +766,7 @@ ACMD(do_stat)
 
 ACMD(do_pvp)
 {
-	if (ch->GetArena() != NULL || CArenaManager::instance().IsArenaMap(ch->GetMapIndex()) == true)
+	if (ch->GetArena() != nullptr || CArenaManager::instance().IsArenaMap(ch->GetMapIndex()) == true)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
 		return;
@@ -775,7 +775,7 @@ ACMD(do_pvp)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
-	DWORD vid = 0;
+	uint32_t vid = 0;
 	str_to_number(vid, arg1);
 	LPCHARACTER pkVictim = CHARACTER_MANAGER::instance().Find(vid);
 
@@ -785,7 +785,7 @@ ACMD(do_pvp)
 	if (pkVictim->IsNPC())
 		return;
 
-	if (pkVictim->GetArena() != NULL)
+	if (pkVictim->GetArena() != nullptr)
 	{
 		pkVictim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 대련중입니다."));
 		return;
@@ -812,7 +812,7 @@ ACMD(do_guildskillup)
 	TGuildMember* gm = g->GetMember(ch->GetPlayerID());
 	if (gm->grade == GUILD_LEADER_GRADE)
 	{
-		DWORD vnum = 0;
+		uint32_t vnum = 0;
 		str_to_number(vnum, arg1);
 		g->SkillLevelUp(vnum);
 	}
@@ -830,7 +830,7 @@ ACMD(do_skillup)
 	if (!*arg1)
 		return;
 
-	DWORD vnum = 0;
+	uint32_t vnum = 0;
 	str_to_number(vnum, arg1);
 
 	if (true == ch->CanUseSkill(vnum))
@@ -921,7 +921,7 @@ ACMD(do_mall_password)
 		return;
 	}
 
-	int iPulse = thecore_pulse();
+	int32_t iPulse = thecore_pulse();
 
 	if (ch->GetMall())
 	{
@@ -1026,7 +1026,7 @@ ACMD(do_war)
 
 	//파라메터를 두배로 나누고
 	char arg1[256], arg2[256];
-	DWORD type = GUILD_WAR_TYPE_FIELD; //fixme102 base int modded uint
+	uint32_t type = GUILD_WAR_TYPE_FIELD; //fixme102 base int32_t modded uint
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 
 	if (!*arg1)
@@ -1041,7 +1041,7 @@ ACMD(do_war)
 	}
 
 	//길드의 마스터 아이디를 얻어온뒤
-	DWORD gm_pid = g->GetMasterPID();
+	uint32_t gm_pid = g->GetMasterPID();
 
 	//마스터인지 체크(길전은 길드장만이 가능)
 	if (gm_pid != ch->GetPlayerID())
@@ -1070,7 +1070,7 @@ ACMD(do_war)
 					return;
 				}
 
-				int iWarPrice = KOR_aGuildWarInfo[type].iWarPrice;
+				int32_t iWarPrice = KOR_aGuildWarInfo[type].iWarPrice;
 
 				if (g->GetGuildMoney() < iWarPrice)
 				{
@@ -1152,12 +1152,12 @@ ACMD(do_war)
 
 	do
 	{
-		if (g->GetMasterCharacter() != NULL)
+		if (g->GetMasterCharacter() != nullptr)
 			break;
 
 		CCI *pCCI = P2P_MANAGER::instance().FindByPID(g->GetMasterPID());
 
-		if (pCCI != NULL)
+		if (pCCI != nullptr)
 			break;
 
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 상대방 길드의 길드장이 접속중이 아닙니다."));
@@ -1168,12 +1168,12 @@ ACMD(do_war)
 
 	do
 	{
-		if (opp_g->GetMasterCharacter() != NULL)
+		if (opp_g->GetMasterCharacter() != nullptr)
 			break;
 		
 		CCI *pCCI = P2P_MANAGER::instance().FindByPID(opp_g->GetMasterPID());
 		
-		if (pCCI != NULL)
+		if (pCCI != nullptr)
 			break;
 
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 상대방 길드의 길드장이 접속중이 아닙니다."));
@@ -1197,7 +1197,7 @@ ACMD(do_nowar)
 	if (!*arg1)
 		return;
 
-	DWORD gm_pid = g->GetMasterPID();
+	uint32_t gm_pid = g->GetMasterPID();
 
 	if (gm_pid != ch->GetPlayerID())
 	{
@@ -1224,7 +1224,7 @@ ACMD(do_pkmode)
 	if (!*arg1)
 		return;
 
-	BYTE mode = 0;
+	uint8_t mode = 0;
 	str_to_number(mode, arg1);
 
 	if (mode == PK_MODE_PROTECT)
@@ -1271,7 +1271,7 @@ ACMD(do_setblockmode)
 
 	if (*arg1)
 	{
-		BYTE flag = 0;
+		uint8_t flag = 0;
 		str_to_number(flag, arg1);
 		ch->SetBlockMode(flag);
 	}
@@ -1301,16 +1301,16 @@ ACMD(do_observer_exit)
 	if (ch->IsObserverMode())
 	{
 		if (ch->GetWarMap())
-			ch->SetWarMap(NULL);
+			ch->SetWarMap(nullptr);
 
-		if (ch->GetArena() != NULL || ch->GetArenaObserverMode() == true)
+		if (ch->GetArena() != nullptr || ch->GetArenaObserverMode() == true)
 		{
 			ch->SetArenaObserverMode(false);
 
-			if (ch->GetArena() != NULL)
+			if (ch->GetArena() != nullptr)
 				ch->GetArena()->RemoveObserver(ch->GetPlayerID());
 
-			ch->SetArena(NULL);
+			ch->SetArena(nullptr);
 			ch->WarpSet(ARENA_RETURN_POINT_X(ch->GetEmpire()), ARENA_RETURN_POINT_Y(ch->GetEmpire()));
 		}
 		else
@@ -1331,7 +1331,7 @@ ACMD(do_view_equip)
 
 	if (*arg1)
 	{
-		DWORD vid = 0;
+		uint32_t vid = 0;
 		str_to_number(vid, arg1);
 		LPCHARACTER tch = CHARACTER_MANAGER::instance().Find(vid);
 
@@ -1341,7 +1341,7 @@ ACMD(do_view_equip)
 		if (!tch->IsPC())
 			return;
 		/*
-		   int iSPCost = ch->GetMaxSP() / 3;
+		   int32_t iSPCost = ch->GetMaxSP() / 3;
 
 		   if (ch->GetSP() < iSPCost)
 		   {
@@ -1374,7 +1374,7 @@ ACMD(do_party_request)
 	if (!*arg1)
 		return;
 
-	DWORD vid = 0;
+	uint32_t vid = 0;
 	str_to_number(vid, arg1);
 	LPCHARACTER tch = CHARACTER_MANAGER::instance().Find(vid);
 
@@ -1391,7 +1391,7 @@ ACMD(do_party_request_accept)
 	if (!*arg1)
 		return;
 
-	DWORD vid = 0;
+	uint32_t vid = 0;
 	str_to_number(vid, arg1);
 	LPCHARACTER tch = CHARACTER_MANAGER::instance().Find(vid);
 
@@ -1407,7 +1407,7 @@ ACMD(do_party_request_deny)
 	if (!*arg1)
 		return;
 
-	DWORD vid = 0;
+	uint32_t vid = 0;
 	str_to_number(vid, arg1);
 	LPCHARACTER tch = CHARACTER_MANAGER::instance().Find(vid);
 
@@ -1420,9 +1420,9 @@ struct GotoInfo
 {
 	std::string 	st_name;
 
-	BYTE 	empire;
-	int 	mapIndex;
-	DWORD 	x, y;
+	uint8_t 	empire;
+	int32_t 	mapIndex;
+	uint32_t 	x, y;
 
 	GotoInfo()
 	{
@@ -1455,7 +1455,7 @@ struct GotoInfo
 	}
 };
 
-static const char* FN_point_string(int apply_number)
+static const char* FN_point_string(int32_t apply_number)
 {
 	switch (apply_number)
 	{
@@ -1569,18 +1569,18 @@ static const char* FN_point_string(int apply_number)
 
 static bool FN_hair_affect_string(LPCHARACTER ch, char *buf, size_t bufsiz)
 {
-	if (NULL == ch || NULL == buf)
+	if (nullptr == ch || nullptr == buf)
 		return false;
 
-	CAffect* aff = NULL;
+	CAffect* aff = nullptr;
 	time_t expire = 0;
 	struct tm ltm;
-	int	year, mon, day;
-	int	offset = 0;
+	int32_t	year, mon, day;
+	int32_t	offset = 0;
 
 	aff = ch->FindAffect(AFFECT_HAIR);
 
-	if (NULL == aff)
+	if (nullptr == aff)
 		return false;
 
 	expire = ch->GetQuestFlag("hair.limit_time");
@@ -1591,7 +1591,7 @@ static bool FN_hair_affect_string(LPCHARACTER ch, char *buf, size_t bufsiz)
 	// set apply string
 	offset = snprintf(buf, bufsiz, FN_point_string(aff->bApplyOn), aff->lApplyValue);
 
-	if (offset < 0 || offset >= (int) bufsiz)
+	if (offset < 0 || offset >= (int32_t) bufsiz)
 		offset = bufsiz - 1;
 
 	localtime_r(&expire, &ltm);
@@ -1633,7 +1633,7 @@ ACMD(do_costume)
 		const char* itemName = pHair->GetName();
 		ch->ChatPacket(CHAT_TYPE_INFO, "  HAIR : %s", itemName);
 
-		for (int i = 0; i < pHair->GetAttributeCount(); ++i)
+		for (int32_t i = 0; i < pHair->GetAttributeCount(); ++i)
 		{
 			const TPlayerItemAttribute& attr = pHair->GetAttribute(i);
 			if (0 < attr.bType)
@@ -1702,8 +1702,8 @@ ACMD(do_hair)
 
 ACMD(do_inventory)
 {
-	int	index = 0;
-	int	count		= 1;
+	int32_t	index = 0;
+	int32_t	count		= 1;
 
 	char arg1[256];
 	char arg2[256];
@@ -1729,7 +1729,7 @@ ACMD(do_inventory)
 		str_to_number(count, arg2); count = MIN(count, INVENTORY_MAX_NUM);
 	}
 
-	for (int i = 0; i < count; ++i)
+	for (int32_t i = 0; i < count; ++i)
 	{
 		if (index >= INVENTORY_MAX_NUM)
 			break;
@@ -1754,7 +1754,7 @@ ACMD(do_cube)
 		return;
 
 	dev_log(LOG_DEB0, "CUBE COMMAND <%s>: %s", ch->GetName(), argument);
-	int cube_index = 0, inven_index = 0;
+	int32_t cube_index = 0, inven_index = 0;
 	const char *line;
 
 	char arg1[256], arg2[256], arg3[256];
@@ -1793,7 +1793,7 @@ ACMD(do_cube)
 		{
 			if (isdigit(*arg2))
 			{
-				int listIndex = 0, requestCount = 1;
+				int32_t listIndex = 0, requestCount = 1;
 				str_to_number(listIndex, arg2);
 
 				if (0 != arg3[0] && isdigit(*arg3))
@@ -1866,7 +1866,7 @@ ACMD(do_in_game_mall)
 ACMD(do_dice) 
 {
 	char arg1[256], arg2[256];
-	int start = 1, end = 100;
+	int32_t start = 1, end = 100;
 
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 
@@ -1884,7 +1884,7 @@ ACMD(do_dice)
 	end = MAX(start, end);
 	start = MIN(start, end);
 
-	int n = number(start, end);
+	int32_t n = number(start, end);
 	
 #ifdef ENABLE_DICE_SYSTEM
 	if (ch->GetParty())
@@ -1943,34 +1943,34 @@ ACMD(do_ride)
 	if (ch->GetMountVnum())
 	{
 	    dev_log(LOG_DEB0, "[DO_RIDE] unmount");
-	    do_unmount(ch, NULL, 0, 0);
+	    do_unmount(ch, nullptr, 0, 0);
 	    return;
 	}
     }
 
     // 타기
     {
-	if (ch->GetHorse() != NULL)
+	if (ch->GetHorse() != nullptr)
 	{
 	    dev_log(LOG_DEB0, "[DO_RIDE] start riding");
 	    ch->StartRiding();
 	    return;
 	}
 
-	for (BYTE i=0; i<INVENTORY_MAX_NUM; ++i)
+	for (uint8_t i=0; i<INVENTORY_MAX_NUM; ++i)
 	{
 	    LPITEM item = ch->GetInventoryItem(i);
-	    if (NULL == item)
+	    if (nullptr == item)
 		continue;
 
 	    // 유니크 탈것 아이템
 		if (item->IsRideItem())
 		{
 			if (
-				NULL==ch->GetWear(WEAR_UNIQUE1)
-				|| NULL==ch->GetWear(WEAR_UNIQUE2)
+				nullptr==ch->GetWear(WEAR_UNIQUE1)
+				|| nullptr==ch->GetWear(WEAR_UNIQUE2)
 #ifdef ENABLE_MOUNT_COSTUME_SYSTEM
-				|| NULL==ch->GetWear(WEAR_COSTUME_MOUNT)
+				|| nullptr==ch->GetWear(WEAR_COSTUME_MOUNT)
 #endif
 			)
 			{

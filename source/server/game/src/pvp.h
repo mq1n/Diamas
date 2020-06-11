@@ -3,7 +3,7 @@
 
 class CHARACTER;
 
-// CPVP에는 DWORD 아이디 두개를 받아서 m_dwCRC를 만들어서 가지고 있는다.
+// CPVP에는 uint32_t 아이디 두개를 받아서 m_dwCRC를 만들어서 가지고 있는다.
 // CPVPManager에서 이렇게 만든 CRC를 통해 검색한다.
 class CPVP
 {
@@ -12,8 +12,8 @@ class CPVP
 
 		typedef struct _player
 		{
-			DWORD	dwPID;
-			DWORD	dwVID;
+			uint32_t	dwPID;
+			uint32_t	dwVID;
 			bool	bAgree;
 			bool	bCanRevenge;
 
@@ -22,34 +22,34 @@ class CPVP
 			}
 		} TPlayer;
 
-		CPVP(DWORD dwID1, DWORD dwID2);
+		CPVP(uint32_t dwID1, uint32_t dwID2);
 		CPVP(CPVP & v);
 		~CPVP();
 
-		void	Win(DWORD dwPID); // dwPID가 이겼다!
-		bool	CanRevenge(DWORD dwPID); // dwPID가 복수할 수 있어?
+		void	Win(uint32_t dwPID); // dwPID가 이겼다!
+		bool	CanRevenge(uint32_t dwPID); // dwPID가 복수할 수 있어?
 		bool	IsFight();
-		bool	Agree(DWORD dwPID);
+		bool	Agree(uint32_t dwPID);
 
-		void	SetVID(DWORD dwPID, DWORD dwVID);
+		void	SetVID(uint32_t dwPID, uint32_t dwVID);
 		void	Packet(bool bDelete = false);
 
 		void	SetLastFightTime();
-		DWORD	GetLastFightTime();
+		uint32_t	GetLastFightTime();
 
-		DWORD 	GetCRC() { return m_dwCRC; }
+		uint32_t 	GetCRC() { return m_dwCRC; }
 
 	protected:
 		TPlayer	m_players[2];
-		DWORD	m_dwCRC;
+		uint32_t	m_dwCRC;
 		bool	m_bRevenge;
 
-		DWORD   m_dwLastFightTime;
+		uint32_t   m_dwLastFightTime;
 };
 
 class CPVPManager : public singleton<CPVPManager>
 {
-	typedef std::map<DWORD, std::unordered_set<CPVP*> > CPVPSetMap;
+	typedef std::map<uint32_t, std::unordered_set<CPVP*> > CPVPSetMap;
 
 	public:
 	CPVPManager();
@@ -57,13 +57,13 @@ class CPVPManager : public singleton<CPVPManager>
 
 #ifdef ENABLE_NEWSTUFF
 	bool			IsFighting(LPCHARACTER pkChr);
-	bool			IsFighting(DWORD dwPID);
+	bool			IsFighting(uint32_t dwPID);
 #endif
 
 	void			Insert(LPCHARACTER pkChr, LPCHARACTER pkVictim);
 	bool			CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim);
-	bool			Dead(LPCHARACTER pkChr, DWORD dwKillerPID);	// PVP에 있었나 없었나를 리턴
-	void			GiveUp(LPCHARACTER pkChr, DWORD dwKillerPID);
+	bool			Dead(LPCHARACTER pkChr, uint32_t dwKillerPID);	// PVP에 있었나 없었나를 리턴
+	void			GiveUp(LPCHARACTER pkChr, uint32_t dwKillerPID);
 	void			Connect(LPCHARACTER pkChr);
 	void			Disconnect(LPCHARACTER pkChr);
 
@@ -73,11 +73,11 @@ class CPVPManager : public singleton<CPVPManager>
 	void			Process();
 
 	public:
-	CPVP *			Find(DWORD dwCRC);
+	CPVP *			Find(uint32_t dwCRC);
 	protected:
 	void			ConnectEx(LPCHARACTER pkChr, bool bDisconnect);
 
-	std::map<DWORD, CPVP *>	m_map_pkPVP;
+	std::map<uint32_t, CPVP *>	m_map_pkPVP;
 	CPVPSetMap		m_map_pkPVPSetByID;
 };
 

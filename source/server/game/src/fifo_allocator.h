@@ -17,7 +17,7 @@ public:
 	}
 
 	void* Alloc(size_t size) {
-		void* p = NULL;
+		void* p = nullptr;
 		PoolType& pool = pool_map_[size];
 		if (pool.size() < kWatermark) {
 			p = ::malloc(size);
@@ -25,13 +25,13 @@ public:
 			p = pool.front();
 			pool.pop_front();
 		}
-		if (p != NULL) {
+		if (p != nullptr) {
 			alloc_map_[p] = size;
 		}
 		return p;
 	}
 	void Free(void* p) {
-		if (p == NULL) {
+		if (p == nullptr) {
 			return;
 		}
 		AllocMapType::iterator it = alloc_map_.find(p);

@@ -131,7 +131,7 @@ UINT CIME::ms_uOutputCodePage = 0;
 UINT CIME::ms_uInputCodePage = 0;
 
 extern DWORD gs_codePage=0;
-extern DWORD GetDefaultCodePage();
+extern uint32_t GetDefaultCodePage();
 extern int ReadToken(const char* token);
 extern const char* FindToken(const char* begin, const char* end);
 
@@ -520,7 +520,7 @@ const char* CIME::GetCodePageText()
 {
 	static char szCodePage[16];
 
-	const int defCodePage = GetDefaultCodePage();
+	const uint32_t defCodePage = GetDefaultCodePage();
 	const int outCodePage = ms_uOutputCodePage;
 
 	if (outCodePage != defCodePage)

@@ -5,27 +5,27 @@
 #include "config.h"
 #include "char_manager.h"
 
-const int HORSE_HEALTH_DROP_INTERVAL = 3 * 24 * 60 * 60;
-const int HORSE_STAMINA_CONSUME_INTERVAL = 6 * 60;
-const int HORSE_STAMINA_REGEN_INTERVAL = 12 * 60;
-//const int HORSE_HP_DROP_INTERVAL = 60;
-//const int HORSE_STAMINA_CONSUME_INTERVAL = 3;
-//const int HORSE_STAMINA_REGEN_INTERVAL = 6;
+const int32_t HORSE_HEALTH_DROP_INTERVAL = 3 * 24 * 60 * 60;
+const int32_t HORSE_STAMINA_CONSUME_INTERVAL = 6 * 60;
+const int32_t HORSE_STAMINA_REGEN_INTERVAL = 12 * 60;
+//const int32_t HORSE_HP_DROP_INTERVAL = 60;
+//const int32_t HORSE_STAMINA_CONSUME_INTERVAL = 3;
+//const int32_t HORSE_STAMINA_REGEN_INTERVAL = 6;
 
 THorseStat c_aHorseStat[HORSE_MAX_LEVEL+1] =
 /*
-   int iMinLevel;	// 탑승할 수 있는 최소 레벨
-   int iNPCRace;
-   int iMaxHealth;	// 말의 최대 체력
-   int iMaxStamina;	// 말의 최대 스테미너
-   int iST;
-   int iDX;
-   int iHT;
-   int iIQ;
-   int iDamMean;
-   int iDamMin;
-   int iDamMax;
-   int iDef;
+   int32_t iMinLevel;	// 탑승할 수 있는 최소 레벨
+   int32_t iNPCRace;
+   int32_t iMaxHealth;	// 말의 최대 체력
+   int32_t iMaxStamina;	// 말의 최대 스테미너
+   int32_t iST;
+   int32_t iDX;
+   int32_t iHT;
+   int32_t iIQ;
+   int32_t iDamMean;
+   int32_t iDamMin;
+   int32_t iDamMax;
+   int32_t iDef;
  */
 {
 	{  0,	0,	1,	1,	0,	0,	0,	0,	0,	0,	0,	0  },
@@ -73,8 +73,8 @@ CHorseRider::~CHorseRider()
 
 void CHorseRider::Initialize()
 {
-	m_eventStaminaRegen = NULL;
-	m_eventStaminaConsume = NULL;
+	m_eventStaminaRegen = nullptr;
+	m_eventStaminaConsume = nullptr;
 	memset(&m_Horse, 0, sizeof(m_Horse));
 }
 
@@ -112,7 +112,7 @@ bool CHorseRider::ReviveHorse()
 	if (GetHorseHealth()>0)
 		return false;
 
-	int level = GetHorseLevel();
+	int32_t level = GetHorseLevel();
 
 	m_Horse.sHealth = c_aHorseStat[level].iMaxHealth;
 	m_Horse.sStamina = c_aHorseStat[level].iMaxStamina;
@@ -124,15 +124,15 @@ bool CHorseRider::ReviveHorse()
 	return true;
 }
 
-short CHorseRider::GetHorseMaxHealth() const
+int16_t CHorseRider::GetHorseMaxHealth() const
 {
-	int level = GetHorseLevel();
+	int32_t level = GetHorseLevel();
 	return c_aHorseStat[level].iMaxHealth;
 }
 
-short CHorseRider::GetHorseMaxStamina() const
+int16_t CHorseRider::GetHorseMaxStamina() const
 {
-	int level = GetHorseLevel();
+	int32_t level = GetHorseLevel();
 	return c_aHorseStat[level].iMaxStamina;
 }
 
@@ -153,7 +153,7 @@ void CHorseRider::SetHorseData(const THorseInfo& crInfo)
 }
 
 // Stamina
-void CHorseRider::UpdateHorseDataByLogoff(DWORD dwLogoffTime)
+void CHorseRider::UpdateHorseDataByLogoff(uint32_t dwLogoffTime)
 {
 	if (GetHorseLevel() <= 0)
 		return;
@@ -162,9 +162,9 @@ void CHorseRider::UpdateHorseDataByLogoff(DWORD dwLogoffTime)
 		UpdateHorseStamina(dwLogoffTime / 12 / 60, false); // 로그오프 12분당 1씩 회복
 }
 
-void CHorseRider::UpdateHorseStamina(int iStamina, bool bSend)
+void CHorseRider::UpdateHorseStamina(int32_t iStamina, bool bSend)
 {
-	int level = GetHorseLevel();
+	int32_t level = GetHorseLevel();
 
 	m_Horse.sStamina = MINMAX(0, m_Horse.sStamina + iStamina, c_aHorseStat[level].iMaxStamina);
 
@@ -221,7 +221,7 @@ EVENTFUNC(horse_stamina_consume_event)
 {
 	horserider_info* info = dynamic_cast<horserider_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "horse_stamina_consume_event> <Factor> Null pointer" );
 		return 0;
@@ -231,18 +231,18 @@ EVENTFUNC(horse_stamina_consume_event)
 
 	if (hr->GetHorseHealth() <= 0)
 	{
-		hr->m_eventStaminaConsume = NULL;
+		hr->m_eventStaminaConsume = nullptr;
 		return 0;
 	}
 
 	hr->UpdateHorseStamina(-1);
 	hr->UpdateRideTime(HORSE_STAMINA_CONSUME_INTERVAL);
 
-	int delta = PASSES_PER_SEC(HORSE_STAMINA_CONSUME_INTERVAL);
+	int32_t delta = PASSES_PER_SEC(HORSE_STAMINA_CONSUME_INTERVAL);
 
 	if (hr->GetHorseStamina() == 0)
 	{
-		hr->m_eventStaminaConsume = NULL;
+		hr->m_eventStaminaConsume = nullptr;
 		delta = 0;
 	}
 
@@ -255,7 +255,7 @@ EVENTFUNC(horse_stamina_regen_event)
 {
 	horserider_info* info = dynamic_cast<horserider_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "horse_stamina_regen_event> <Factor> Null pointer" );
 		return 0;
@@ -265,16 +265,16 @@ EVENTFUNC(horse_stamina_regen_event)
 
 	if (hr->GetHorseHealth()<=0)
 	{
-		hr->m_eventStaminaRegen = NULL;
+		hr->m_eventStaminaRegen = nullptr;
 		return 0;
 	}
 
 	hr->UpdateHorseStamina(+1);
-	int delta = PASSES_PER_SEC(HORSE_STAMINA_REGEN_INTERVAL);
+	int32_t delta = PASSES_PER_SEC(HORSE_STAMINA_REGEN_INTERVAL);
 	if (hr->GetHorseStamina() == hr->GetHorseMaxStamina())
 	{
 		delta = 0;
-		hr->m_eventStaminaRegen = NULL;
+		hr->m_eventStaminaRegen = nullptr;
 	}
 
 	hr->CheckHorseHealthDropTime();
@@ -334,7 +334,7 @@ void CHorseRider::ResetHorseHealthDropTime()
 
 void CHorseRider::CheckHorseHealthDropTime(bool bSend)
 {
-	DWORD now = get_global_time();
+	uint32_t now = get_global_time();
 
 	while (m_Horse.dwHorseHealthDropTime < now)
 	{
@@ -343,9 +343,9 @@ void CHorseRider::CheckHorseHealthDropTime(bool bSend)
 	}
 }
 
-void CHorseRider::UpdateHorseHealth(int iHealth, bool bSend)
+void CHorseRider::UpdateHorseHealth(int32_t iHealth, bool bSend)
 {
-	int level = GetHorseLevel();
+	int32_t level = GetHorseLevel();
 
 	m_Horse.sHealth = MINMAX(0, m_Horse.sHealth + iHealth, c_aHorseStat[level].iMaxHealth);
 
@@ -364,7 +364,7 @@ void CHorseRider::HorseDie()
 	event_cancel(&m_eventStaminaConsume);
 }
 
-void CHorseRider::SetHorseLevel(int iLevel)
+void CHorseRider::SetHorseLevel(int32_t iLevel)
 {
 	m_Horse.bLevel = iLevel = MINMAX(0, iLevel, HORSE_MAX_LEVEL);
 
@@ -377,9 +377,9 @@ void CHorseRider::SetHorseLevel(int iLevel)
 	SendHorseInfo();
 }
 
-BYTE CHorseRider::GetHorseGrade()
+uint8_t CHorseRider::GetHorseGrade()
 {
-	BYTE grade = 0;
+	uint8_t grade = 0;
 
 	if (GetHorseLevel())
 		grade = (GetHorseLevel() - 1) / 10 + 1;

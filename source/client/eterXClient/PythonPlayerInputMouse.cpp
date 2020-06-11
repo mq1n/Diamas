@@ -4,7 +4,7 @@
 
 #include "../eterlib/Camera.h"
 
-void CPythonPlayer::NEW_SetMouseMoveState(int eMBS)
+void CPythonPlayer::NEW_SetMouseMoveState(int32_t eMBS)
 {
 	if (MBS_PRESS==eMBS)
 	{
@@ -24,12 +24,12 @@ bool CPythonPlayer::NEW_MoveToMouseScreenDirection()
 {
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 
-	long lMouseX;
-	long lMouseY;
+	int32_t lMouseX;
+	int32_t lMouseY;
 	rkWndMgr.GetMousePosition(lMouseX, lMouseY);
 
-	long lScrWidth = rkWndMgr.GetScreenWidth();
-	long lScrHeight = rkWndMgr.GetScreenHeight();
+	int32_t lScrWidth = rkWndMgr.GetScreenWidth();
+	int32_t lScrHeight = rkWndMgr.GetScreenHeight();
 	float fMouseX=lMouseX/float(lScrWidth);
 	float fMouseY=lMouseY/float(lScrHeight);
 
@@ -39,7 +39,7 @@ bool CPythonPlayer::NEW_MoveToMouseScreenDirection()
 	return NEW_MoveToDirection(fDirRot);
 }
 
-void CPythonPlayer::NEW_SetMouseCameraState(int eMBS)
+void CPythonPlayer::NEW_SetMouseCameraState(int32_t eMBS)
 {
 	CPythonApplication & rkApp = CPythonApplication::Instance();
 	CPythonBackground & rkBG = CPythonBackground::Instance();
@@ -51,8 +51,8 @@ void CPythonPlayer::NEW_SetMouseCameraState(int eMBS)
 		{
 			UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 
-			long lMouseX;
-			long lMouseY;
+			int32_t lMouseX;
+			int32_t lMouseY;
 			rkWndMgr.GetMousePosition(lMouseX, lMouseY);
 
 			pkCmrCur->BeginDrag(lMouseX, lMouseY);
@@ -92,7 +92,7 @@ void CPythonPlayer::NEW_SetMouseCameraState(int eMBS)
 
 
 
-void CPythonPlayer::NEW_SetMouseSmartState(int eMBS, bool isAuto)
+void CPythonPlayer::NEW_SetMouseSmartState(int32_t eMBS, bool isAuto)
 {
 	CInstanceBase* pkInstMain=NEW_GetMainActorPtr();
 	if (!pkInstMain) return;
@@ -133,8 +133,8 @@ void CPythonPlayer::NEW_SetMouseSmartState(int eMBS, bool isAuto)
 
 void CPythonPlayer::__OnPressSmart(CInstanceBase& rkInstMain, bool isAuto)
 {
-	DWORD dwPickedItemID;
-	DWORD dwPickedActorID;
+	uint32_t dwPickedItemID;
+	uint32_t dwPickedActorID;
 	TPixelPosition kPPosPickedGround;
 
 	bool isPickedItemID=__GetPickedItemID(&dwPickedItemID);
@@ -161,8 +161,8 @@ void CPythonPlayer::__OnPressSmart(CInstanceBase& rkInstMain, bool isAuto)
 
 void CPythonPlayer::__OnClickSmart(CInstanceBase& rkInstMain, bool isAuto)
 {
-	DWORD dwPickedItemID;
-	DWORD dwPickedActorID;
+	uint32_t dwPickedItemID;
+	uint32_t dwPickedActorID;
 	TPixelPosition kPPosPickedGround;
 	if (__GetPickedItemID(&dwPickedItemID))
 	{
@@ -194,7 +194,7 @@ void CPythonPlayer::__ShowPickedEffect(const TPixelPosition& c_rkPPosPickedGroun
 	NEW_ShowEffect(EFFECT_PICK, c_rkPPosPickedGround);
 }
 
-bool CPythonPlayer::NEW_SetMouseFunc(int eMBT, int eMBF)
+bool CPythonPlayer::NEW_SetMouseFunc(int32_t eMBT, int32_t eMBF)
 {
 	if (eMBT>=MBT_NUM)
 		return false;
@@ -204,7 +204,7 @@ bool CPythonPlayer::NEW_SetMouseFunc(int eMBT, int eMBF)
 	return true;
 }
 
-int CPythonPlayer::NEW_GetMouseFunc(int eMBT)
+int32_t CPythonPlayer::NEW_GetMouseFunc(int32_t eMBT)
 {
 	if (eMBT>=MBT_NUM)
 		return false;
@@ -223,12 +223,12 @@ void CPythonPlayer::SetQuickCameraMode(bool isEnable)
 	}
 }
 
-bool CPythonPlayer::NEW_SetMouseState(int eMBT, int eMBS)
+bool CPythonPlayer::NEW_SetMouseState(int32_t eMBT, int32_t eMBS)
 {
 	if (eMBT>=MBT_NUM)
 		return false;
 
-	int eMBF=m_aeMBFButton[eMBT];
+	int32_t eMBF=m_aeMBFButton[eMBT];
 	switch (eMBF)
 	{
 		case MBF_MOVE:
@@ -273,7 +273,7 @@ bool CPythonPlayer::NEW_SetMouseState(int eMBT, int eMBS)
 	return true;
 }
 
-void CPythonPlayer::NEW_SetMouseMiddleButtonState(int eMBState)
+void CPythonPlayer::NEW_SetMouseMiddleButtonState(int32_t eMBState)
 {
 	NEW_SetMouseCameraState(eMBState);
 }
@@ -347,7 +347,7 @@ void CPythonPlayer::NEW_RefreshMouseWalkingDirection()
 				float fDistance=pkInstMain->GetDistance(pkInstReserved);
 
 				// #0000806: [M2EU] 수룡에게 무사(나한군) 탄환격 스킬 사용 안됨
-				extern bool IS_HUGE_RACE(unsigned int vnum);
+				extern bool IS_HUGE_RACE(uint32_t vnum);
 				if (IS_HUGE_RACE(pkInstReserved->GetRace())) // 거대 종족은 근접을 못함
 				{
 					fDistance -= 200.0f; // TEMP: 일단 하드 코딩 처리. 정석적으로는 바운드 스피어를 고려해야함

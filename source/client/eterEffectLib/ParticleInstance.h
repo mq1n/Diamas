@@ -24,7 +24,7 @@ class CParticleInstance
 		
 		BOOL Update(float fElapsedTime, float fAngle);
 		//virtual void Transform(const D3DXMATRIX * c_matLocal, const float c_fZRotation)=0;
-		//virtual void Transform(const D3DXMATRIX * c_matLocal = NULL)=0;
+		//virtual void Transform(const D3DXMATRIX * c_matLocal = nullptr)=0;
 
 		//virtual TPTVertex * GetParticleMeshPointer() = 0;
 
@@ -54,9 +54,9 @@ class CParticleInstance
 		DWORDCOLOR			m_dcColor;
 #endif
 
-		BYTE				m_byTextureAnimationType;
+		uint8_t				m_byTextureAnimationType;
 		float				m_fLastFrameTime;
-		BYTE				m_byFrameIndex;
+		uint8_t				m_byFrameIndex;
 
 		float				m_fLifeTime;
 		float				m_fLastLifeTime;
@@ -73,7 +73,7 @@ class CParticleInstance
 		static CParticleInstance* New();
 		static void DestroySystem();
 
-		void Transform(const D3DXMATRIX * c_matLocal=NULL);
+		void Transform(const D3DXMATRIX * c_matLocal=nullptr);
 		void Transform(const D3DXMATRIX * c_matLocal, const float c_fZRotation);
 
 		TPTVertex * GetParticleMeshPointer();

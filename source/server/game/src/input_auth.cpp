@@ -117,7 +117,7 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 		return;
 	}
 
-	DWORD dwKey = DESC_MANAGER::instance().CreateLoginKey(d);
+	uint32_t dwKey = DESC_MANAGER::instance().CreateLoginKey(d);
 	sys_log(0, "InputAuth::Login : key %u login %s", dwKey, login);
 
 	TPacketCGLogin3 * p = M2_NEW TPacketCGLogin3;
@@ -166,7 +166,7 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 	}
 }
 
-int CInputAuth::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
+int32_t CInputAuth::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 {
 
 	if (!g_bAuthServer)
@@ -177,7 +177,7 @@ int CInputAuth::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 		return 0;
 	}
 
-	int iExtraLen = 0;
+	int32_t iExtraLen = 0;
 
 	if (test_server)
 		sys_log(0, " InputAuth Analyze Header[%d] ", bHeader);

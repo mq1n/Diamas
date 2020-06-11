@@ -16,7 +16,7 @@ CGraphicColor::CGraphicColor(float r, float g, float b, float a)
 	Set(r, g, b, a);
 }
 
-CGraphicColor::CGraphicColor(DWORD color)
+CGraphicColor::CGraphicColor(uint32_t color)
 {
 	Set(color);
 }
@@ -55,7 +55,7 @@ void CGraphicColor::Blend(float p, const CGraphicColor& c_rSrcColor, const CGrap
 	m_a=c_rSrcColor.m_a*q+c_rDstColor.m_a*p;
 }
 
-void CGraphicColor::Set(DWORD pack)
+void CGraphicColor::Set(uint32_t pack)
 {
 	m_b = (pack & 0xff) / 255.0f; pack >>= 8;
 	m_g = (pack & 0xff) / 255.0f; pack >>= 8;
@@ -63,14 +63,14 @@ void CGraphicColor::Set(DWORD pack)
 	m_a = (pack) / 255.0f;
 }
 
-DWORD CGraphicColor::GetPackValue() const
+uint32_t CGraphicColor::GetPackValue() const
 {
-	DWORD packValue=0;
+	uint32_t packValue=0;
 	
-	packValue  = int(255.0f * m_a);packValue <<= 8;
-	packValue |= int(255.0f * m_r);packValue <<= 8;
-	packValue |= int(255.0f * m_g);packValue <<= 8;
-	packValue |= int(255.0f * m_b);
+	packValue  = int32_t(255.0f * m_a);packValue <<= 8;
+	packValue |= int32_t(255.0f * m_r);packValue <<= 8;
+	packValue |= int32_t(255.0f * m_g);packValue <<= 8;
+	packValue |= int32_t(255.0f * m_b);
 
 	return packValue;
 }

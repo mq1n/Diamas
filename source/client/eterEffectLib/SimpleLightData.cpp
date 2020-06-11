@@ -63,7 +63,7 @@ void CLightData::GetRange(float fTime, float& rRange)
 	/*
 	float vecLastRange = m_TimeEventTableRange[0].m_Value;
 
-	for (DWORD dwIndex = 0; dwIndex < m_TimeEventTableRange.size(); ++dwIndex)
+	for (uint32_t dwIndex = 0; dwIndex < m_TimeEventTableRange.size(); ++dwIndex)
 	{
 		if(fTime < m_TimeEventTableRange[dwIndex].m_fTime)
 		{

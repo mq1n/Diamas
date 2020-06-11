@@ -19,7 +19,7 @@
 
 CHARACTER_MANAGER::CHARACTER_MANAGER() :
 	m_iVIDCount(0),
-	m_pkChrSelectedStone(NULL),
+	m_pkChrSelectedStone(nullptr),
 	m_bUsePendingDestroy(false)
 {
 	RegisterRaceNum(xmas::MOB_XMAS_FIRWORK_SELLER_VNUM);
@@ -64,15 +64,15 @@ void CHARACTER_MANAGER::GracefulShutdown()
 		(it++)->second->Disconnect("GracefulShutdown");
 }
 
-DWORD CHARACTER_MANAGER::AllocVID()
+uint32_t CHARACTER_MANAGER::AllocVID()
 {
 	++m_iVIDCount;
 	return m_iVIDCount;
 }
 
-LPCHARACTER CHARACTER_MANAGER::CreateCharacter(const char * name, DWORD dwPID)
+LPCHARACTER CHARACTER_MANAGER::CreateCharacter(const char * name, uint32_t dwPID)
 {
-	DWORD dwVID = AllocVID();
+	uint32_t dwVID = AllocVID();
 
 #ifdef M2_USE_POOL
 	LPCHARACTER ch = pool_.Construct();
@@ -107,12 +107,12 @@ void CHARACTER_MANAGER::DestroyCharacter(LPCHARACTER ch, const char* file, size_
 	// <Factor> Check whether it has been already deleted or not.
 	auto it = m_map_pkChrByVID.find(ch->GetVID());
 	if (it == m_map_pkChrByVID.end()) {
-		sys_err("[CHARACTER_MANAGER::DestroyCharacter] <Factor> %d not found", (long)(ch->GetVID()));
+		sys_err("[CHARACTER_MANAGER::DestroyCharacter] <Factor> %d not found", (int32_t)(ch->GetVID()));
 		return; // prevent duplicated destrunction
 	}
 
 	// 던전에 소속된 몬스터는 던전에서도 삭제하도록.
-	if (ch->IsNPC() && !ch->IsPet() && ch->GetRider() == NULL)
+	if (ch->IsNPC() && !ch->IsPet() && ch->GetRider() == nullptr)
 	{
 		if (ch->GetDungeon())
 		{
@@ -165,44 +165,44 @@ void CHARACTER_MANAGER::DestroyCharacter(LPCHARACTER ch, const char* file, size_
 #endif
 }
 
-LPCHARACTER CHARACTER_MANAGER::Find(DWORD dwVID)
+LPCHARACTER CHARACTER_MANAGER::Find(uint32_t dwVID)
 {
 	auto it = m_map_pkChrByVID.find(dwVID);
 
 	if (m_map_pkChrByVID.end() == it)
-		return NULL;
+		return nullptr;
 	
 	// <Factor> Added sanity check
 	LPCHARACTER found = it->second;
-	if (found != NULL && dwVID != (DWORD)found->GetVID()) {
-		sys_err("[CHARACTER_MANAGER::Find] <Factor> %u != %u", dwVID, (DWORD)found->GetVID());
-		return NULL;
+	if (found != nullptr && dwVID != (uint32_t)found->GetVID()) {
+		sys_err("[CHARACTER_MANAGER::Find] <Factor> %u != %u", dwVID, (uint32_t)found->GetVID());
+		return nullptr;
 	}
 	return found;
 }
 
 LPCHARACTER CHARACTER_MANAGER::Find(const VID & vid)
 {
-	LPCHARACTER tch = Find((DWORD) vid);
+	LPCHARACTER tch = Find((uint32_t) vid);
 
 	if (!tch || tch->GetVID() != vid)
-		return NULL;
+		return nullptr;
 
 	return tch;
 }
 
-LPCHARACTER CHARACTER_MANAGER::FindByPID(DWORD dwPID)
+LPCHARACTER CHARACTER_MANAGER::FindByPID(uint32_t dwPID)
 {
 	auto it = m_map_pkChrByPID.find(dwPID);
 
 	if (m_map_pkChrByPID.end() == it)
-		return NULL;
+		return nullptr;
 
 	// <Factor> Added sanity check
 	LPCHARACTER found = it->second;
-	if (found != NULL && dwPID != found->GetPlayerID()) {
+	if (found != nullptr && dwPID != found->GetPlayerID()) {
 		sys_err("[CHARACTER_MANAGER::FindByPID] <Factor> %u != %u", dwPID, found->GetPlayerID());
-		return NULL;
+		return nullptr;
 	}
 	return found;
 }
@@ -214,18 +214,18 @@ LPCHARACTER CHARACTER_MANAGER::FindPC(const char * name)
 	NAME_MAP::iterator it = m_map_pkPCChr.find(szName);
 
 	if (it == m_map_pkPCChr.end())
-		return NULL;
+		return nullptr;
 
 	// <Factor> Added sanity check
 	LPCHARACTER found = it->second;
-	if (found != NULL && strncasecmp(szName, found->GetName(), CHARACTER_NAME_MAX_LEN) != 0) {
+	if (found != nullptr && strncasecmp(szName, found->GetName(), CHARACTER_NAME_MAX_LEN) != 0) {
 		sys_err("[CHARACTER_MANAGER::FindPC] <Factor> %s != %s", name, found->GetName());
-		return NULL;
+		return nullptr;
 	}
 	return found;
 }
 
-LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapIndex)
+LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t lMapIndex)
 {
 
 	// 해태를 스폰할지 말지를 결정할 수 있게 함
@@ -233,7 +233,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 		if (dwVnum == 5002 && !quest::CQuestManager::instance().GetEventFlag("newyear_mob"))
 		{
 			sys_log(1, "HAETAE (new-year-mob) [5002] regen disabled.");
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -242,7 +242,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 		if (dwVnum == 5004 && !quest::CQuestManager::instance().GetEventFlag("independence_day"))
 		{
 			sys_log(1, "INDEPENDECE DAY [5004] regen disabled.");
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -251,22 +251,22 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 	if (!pkMob)
 	{
 		sys_err("no mob data for vnum %u", dwVnum);
-		return NULL;
+		return nullptr;
 	}
 
 	if (!map_allow_find(lMapIndex))
 	{
 		sys_err("not allowed map %u", lMapIndex);
-		return NULL;
+		return nullptr;
 	}
 
 	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(lMapIndex);
-	if (pkSectreeMap == NULL) {
-		return NULL;
+	if (pkSectreeMap == nullptr) {
+		return nullptr;
 	}
 
-	int i;
-	long x, y;
+	int32_t i;
+	int32_t x, y;
 	for (i=0; i<2000; i++)
 	{
 		x = number(1, (pkSectreeMap->m_setting.iWidth / 100)  - 1) * 100 + pkSectreeMap->m_setting.iBaseX;
@@ -277,7 +277,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 		if (!tree)
 			continue;
 
-		DWORD dwAttr = tree->GetAttribute(x, y);
+		uint32_t dwAttr = tree->GetAttribute(x, y);
 
 		if (IS_SET(dwAttr, ATTR_BLOCK | ATTR_OBJECT))
 			continue;
@@ -291,7 +291,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 	if (i == 2000)
 	{
 		sys_err("cannot find valid location");
-		return NULL;
+		return nullptr;
 	}
 
 	LPSECTREE sectree = SECTREE_MANAGER::instance().Get(lMapIndex, x, y);
@@ -299,7 +299,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 	if (!sectree)
 	{
 		sys_log(0, "SpawnMobRandomPosition: cannot create monster at non-exist sectree %d x %d (map %d)", x, y, lMapIndex);
-		return NULL;
+		return nullptr;
 	}
 
 	LPCHARACTER ch = CHARACTER_MANAGER::instance().CreateCharacter(pkMob->m_table.szLocaleName);
@@ -307,7 +307,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 	if (!ch)
 	{
 		sys_log(0, "SpawnMobRandomPosition: cannot create new character");
-		return NULL;
+		return nullptr;
 	}
 
 	ch->SetProto(pkMob);
@@ -323,12 +323,12 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 	{
 		M2_DESTROY_CHARACTER(ch);
 		sys_err(0, "SpawnMobRandomPosition: cannot show monster");
-		return NULL;
+		return nullptr;
 	}
 
 	char buf[512+1];
-	long local_x = x - pkSectreeMap->m_setting.iBaseX;
-	long local_y = y - pkSectreeMap->m_setting.iBaseY;
+	int32_t local_x = x - pkSectreeMap->m_setting.iBaseX;
+	int32_t local_y = y - pkSectreeMap->m_setting.iBaseY;
 	snprintf(buf, sizeof(buf), "spawn %s[%d] random position at %ld %ld %ld %ld (time: %d)", ch->GetName(), dwVnum, x, y, local_x, local_y, get_global_time());
 	
 	if (test_server)
@@ -338,13 +338,13 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 	return (ch);
 }
 
-LPCHARACTER CHARACTER_MANAGER::SpawnMob(DWORD dwVnum, long lMapIndex, long x, long y, long z, bool bSpawnMotion, int iRot, bool bShow)
+LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int32_t x, int32_t y, int32_t z, bool bSpawnMotion, int32_t iRot, bool bShow)
 {
 	const CMob * pkMob = CMobManager::instance().Get(dwVnum);
 	if (!pkMob)
 	{
 		sys_err("SpawnMob: no mob data for vnum %u", dwVnum);
-		return NULL;
+		return nullptr;
 	}
 
 	if (!(pkMob->m_table.bType == CHAR_TYPE_NPC || pkMob->m_table.bType == CHAR_TYPE_WARP || pkMob->m_table.bType == CHAR_TYPE_GOTO) || mining::IsVeinOfOre (dwVnum))
@@ -354,10 +354,10 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(DWORD dwVnum, long lMapIndex, long x, lo
 		if (!tree)
 		{
 			sys_log(0, "no sectree for spawn at %d %d mobvnum %d mapindex %d", x, y, dwVnum, lMapIndex);
-			return NULL;
+			return nullptr;
 		}
 
-		DWORD dwAttr = tree->GetAttribute(x, y);
+		uint32_t dwAttr = tree->GetAttribute(x, y);
 
 		bool is_set = false;
 
@@ -368,9 +368,9 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(DWORD dwVnum, long lMapIndex, long x, lo
 		{
 			// SPAWN_BLOCK_LOG
 			static bool s_isLog=quest::CQuestManager::instance().GetEventFlag("spawn_block_log");
-			static DWORD s_nextTime=get_global_time()+10000;
+			static uint32_t s_nextTime=get_global_time()+10000;
 
-			DWORD curTime=get_global_time();
+			uint32_t curTime=get_global_time();
 
 			if (curTime>s_nextTime)
 			{
@@ -382,13 +382,13 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(DWORD dwVnum, long lMapIndex, long x, lo
 			if (s_isLog)
 				sys_log(0, "SpawnMob: BLOCKED position for spawn %s %u at %d %d (attr %u)", pkMob->m_table.szName, dwVnum, x, y, dwAttr);
 			// END_OF_SPAWN_BLOCK_LOG
-			return NULL;
+			return nullptr;
 		}
 
 		if (IS_SET(dwAttr, ATTR_BANPK))
 		{
 			sys_log(0, "SpawnMob: BAN_PK position for mob spawn %s %u at %d %d", pkMob->m_table.szName, dwVnum, x, y);
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -397,7 +397,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(DWORD dwVnum, long lMapIndex, long x, lo
 	if (!sectree)
 	{
 		sys_log(0, "SpawnMob: cannot create monster at non-exist sectree %d x %d (map %d)", x, y, lMapIndex);
-		return NULL;
+		return nullptr;
 	}
 
 	LPCHARACTER ch = CHARACTER_MANAGER::instance().CreateCharacter(pkMob->m_table.szLocaleName);
@@ -405,7 +405,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(DWORD dwVnum, long lMapIndex, long x, lo
 	if (!ch)
 	{
 		sys_log(0, "SpawnMob: cannot create new character");
-		return NULL;
+		return nullptr;
 	}
 
 	if (iRot == -1)
@@ -424,28 +424,28 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(DWORD dwVnum, long lMapIndex, long x, lo
 	{
 		M2_DESTROY_CHARACTER(ch);
 		sys_log(0, "SpawnMob: cannot show monster");
-		return NULL;
+		return nullptr;
 	}
 
 	return (ch);
 }
 
-LPCHARACTER CHARACTER_MANAGER::SpawnMobRange(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, bool bIsException, bool bSpawnMotion, bool bAggressive )
+LPCHARACTER CHARACTER_MANAGER::SpawnMobRange(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, bool bIsException, bool bSpawnMotion, bool bAggressive )
 {
 	const CMob * pkMob = CMobManager::instance().Get(dwVnum);
 
 	if (!pkMob)
-		return NULL;
+		return nullptr;
 
 	if (pkMob->m_table.bType == CHAR_TYPE_STONE)	// 돌은 무조건 SPAWN 모션이 있다.
 		bSpawnMotion = true;
 
-	int i = 16;
+	int32_t i = 16;
 
 	while (i--)
 	{
-		int x = number(sx, ex);
-		int y = number(sy, ey);
+		int32_t x = number(sx, ex);
+		int32_t y = number(sy, ey);
 		/*
 		   if (bIsException)
 		   if (is_regen_exception(x, y))
@@ -455,14 +455,14 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRange(DWORD dwVnum, long lMapIndex, int s
 
 		if (ch)
 		{
-			sys_log(1, "MOB_SPAWN: %s(%d) %dx%d", ch->GetName(), (DWORD) ch->GetVID(), ch->GetX(), ch->GetY());
+			sys_log(1, "MOB_SPAWN: %s(%d) %dx%d", ch->GetName(), (uint32_t) ch->GetVID(), ch->GetX(), ch->GetY());
 			if ( bAggressive )
 				ch->SetAggressive();
 			return (ch);
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void CHARACTER_MANAGER::SelectStone(LPCHARACTER pkChr)
@@ -470,7 +470,7 @@ void CHARACTER_MANAGER::SelectStone(LPCHARACTER pkChr)
 	m_pkChrSelectedStone = pkChr;
 }
 
-bool CHARACTER_MANAGER::SpawnMoveGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, int tx, int ty, LPREGEN pkRegen, bool bAggressive_)
+bool CHARACTER_MANAGER::SpawnMoveGroup(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, int32_t tx, int32_t ty, LPREGEN pkRegen, bool bAggressive_)
 {
 	CMobGroup * pkGroup = CMobManager::Instance().GetGroup(dwVnum);
 
@@ -480,10 +480,10 @@ bool CHARACTER_MANAGER::SpawnMoveGroup(DWORD dwVnum, long lMapIndex, int sx, int
 		return false;
 	}
 
-	LPCHARACTER pkChrMaster = NULL;
-	LPPARTY pkParty = NULL;
+	LPCHARACTER pkChrMaster = nullptr;
+	LPPARTY pkParty = nullptr;
 
-	const std::vector<DWORD> & c_rdwMembers = pkGroup->GetMemberVector();
+	const std::vector<uint32_t> & c_rdwMembers = pkGroup->GetMemberVector();
 
 	bool bSpawnedByStone = false;
 	bool bAggressive = bAggressive_;
@@ -495,7 +495,7 @@ bool CHARACTER_MANAGER::SpawnMoveGroup(DWORD dwVnum, long lMapIndex, int sx, int
 			bAggressive = true;
 	}
 
-	for (DWORD i = 0; i < c_rdwMembers.size(); ++i)
+	for (uint32_t i = 0; i < c_rdwMembers.size(); ++i)
 	{
 		LPCHARACTER tch = SpawnMobRange(c_rdwMembers[i], lMapIndex, sx, sy, ex, ey, true, bSpawnedByStone);
 
@@ -536,9 +536,9 @@ bool CHARACTER_MANAGER::SpawnMoveGroup(DWORD dwVnum, long lMapIndex, int sx, int
 	return true;
 }
 
-bool CHARACTER_MANAGER::SpawnGroupGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, LPREGEN pkRegen, bool bAggressive_, LPDUNGEON pDungeon)
+bool CHARACTER_MANAGER::SpawnGroupGroup(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, LPREGEN pkRegen, bool bAggressive_, LPDUNGEON pDungeon)
 {
-	const DWORD dwGroupID = CMobManager::Instance().GetGroupFromGroupGroup(dwVnum);
+	const uint32_t dwGroupID = CMobManager::Instance().GetGroupFromGroupGroup(dwVnum);
 
 	if( dwGroupID != 0 )
 	{
@@ -551,20 +551,20 @@ bool CHARACTER_MANAGER::SpawnGroupGroup(DWORD dwVnum, long lMapIndex, int sx, in
 	}
 }
 
-LPCHARACTER CHARACTER_MANAGER::SpawnGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, LPREGEN pkRegen, bool bAggressive_, LPDUNGEON pDungeon)
+LPCHARACTER CHARACTER_MANAGER::SpawnGroup(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, LPREGEN pkRegen, bool bAggressive_, LPDUNGEON pDungeon)
 {
 	CMobGroup * pkGroup = CMobManager::Instance().GetGroup(dwVnum);
 
 	if (!pkGroup)
 	{
 		sys_err("NOT_EXIST_GROUP_VNUM(%u) Map(%u) ", dwVnum, lMapIndex);
-		return NULL;
+		return nullptr;
 	}
 
-	LPCHARACTER pkChrMaster = NULL;
-	LPPARTY pkParty = NULL;
+	LPCHARACTER pkChrMaster = nullptr;
+	LPPARTY pkParty = nullptr;
 
-	const std::vector<DWORD> & c_rdwMembers = pkGroup->GetMemberVector();
+	const std::vector<uint32_t> & c_rdwMembers = pkGroup->GetMemberVector();
 
 	bool bSpawnedByStone = false;
 	bool bAggressive = bAggressive_;
@@ -577,16 +577,16 @@ LPCHARACTER CHARACTER_MANAGER::SpawnGroup(DWORD dwVnum, long lMapIndex, int sx, 
 			bAggressive = true;
 	}
 
-	LPCHARACTER chLeader = NULL;
+	LPCHARACTER chLeader = nullptr;
 
-	for (DWORD i = 0; i < c_rdwMembers.size(); ++i)
+	for (uint32_t i = 0; i < c_rdwMembers.size(); ++i)
 	{
 		LPCHARACTER tch = SpawnMobRange(c_rdwMembers[i], lMapIndex, sx, sy, ex, ey, true, bSpawnedByStone);
 
 		if (!tch)
 		{
 			if (i == 0)	// 못만든 몬스터가 대장일 경우에는 그냥 실패
-				return NULL;
+				return nullptr;
 
 			continue;
 		}
@@ -710,7 +710,7 @@ void CHARACTER_MANAGER::ProcessDelayedSave()
 
 bool CHARACTER_MANAGER::AddToStateList(LPCHARACTER ch)
 {
-	assert(ch != NULL);
+	assert(ch != nullptr);
 
 	CHARACTER_SET::iterator it = m_set_pkChrState.find(ch);
 
@@ -751,9 +751,9 @@ bool CHARACTER_MANAGER::FlushDelayedSave(LPCHARACTER ch)
 	return true;
 }
 
-void CHARACTER_MANAGER::KillLog(DWORD dwVnum)
+void CHARACTER_MANAGER::KillLog(uint32_t dwVnum)
 {
-	const DWORD SEND_LIMIT = 10000;
+	const uint32_t SEND_LIMIT = 10000;
 
 	auto it = m_map_dwMobKillCount.find(dwVnum);
 
@@ -771,14 +771,14 @@ void CHARACTER_MANAGER::KillLog(DWORD dwVnum)
 	}
 }
 
-void CHARACTER_MANAGER::RegisterRaceNum(DWORD dwVnum)
+void CHARACTER_MANAGER::RegisterRaceNum(uint32_t dwVnum)
 {
 	m_set_dwRegisteredRaceNum.insert(dwVnum);
 }
 
 void CHARACTER_MANAGER::RegisterRaceNumMap(LPCHARACTER ch)
 {
-	DWORD dwVnum = ch->GetRaceNum();
+	uint32_t dwVnum = ch->GetRaceNum();
 
 	if (m_set_dwRegisteredRaceNum.find(dwVnum) != m_set_dwRegisteredRaceNum.end()) // 등록된 번호 이면
 	{
@@ -789,7 +789,7 @@ void CHARACTER_MANAGER::RegisterRaceNumMap(LPCHARACTER ch)
 
 void CHARACTER_MANAGER::UnregisterRaceNumMap(LPCHARACTER ch)
 {
-	DWORD dwVnum = ch->GetRaceNum();
+	uint32_t dwVnum = ch->GetRaceNum();
 
 	auto it = m_map_pkChrByRaceNum.find(dwVnum);
 
@@ -797,9 +797,9 @@ void CHARACTER_MANAGER::UnregisterRaceNumMap(LPCHARACTER ch)
 		it->second.erase(ch);
 }
 
-bool CHARACTER_MANAGER::GetCharactersByRaceNum(DWORD dwRaceNum, CharacterVectorInteractor & i)
+bool CHARACTER_MANAGER::GetCharactersByRaceNum(uint32_t dwRaceNum, CharacterVectorInteractor & i)
 {
-	std::map<DWORD, CHARACTER_SET>::iterator it = m_map_pkChrByRaceNum.find(dwRaceNum);
+	std::map<uint32_t, CHARACTER_SET>::iterator it = m_map_pkChrByRaceNum.find(dwRaceNum);
 
 	if (it == m_map_pkChrByRaceNum.end())
 		return false;
@@ -835,10 +835,10 @@ bool CHARACTER_MANAGER::GetCharactersByRaceNum(DWORD dwRaceNum, CharacterVectorI
 //
 // (job+1)*3+(skill_group)
 //
-LPCHARACTER CHARACTER_MANAGER::FindSpecifyPC(unsigned int uiJobFlag, long lMapIndex, LPCHARACTER except, int iMinLevel, int iMaxLevel)
+LPCHARACTER CHARACTER_MANAGER::FindSpecifyPC(uint32_t uiJobFlag, int32_t lMapIndex, LPCHARACTER except, int32_t iMinLevel, int32_t iMaxLevel)
 {
-	LPCHARACTER chFind = NULL;
-	int n = 0;
+	LPCHARACTER chFind = nullptr;
+	int32_t n = 0;
 
 	for (auto it = m_map_pkChrByPID.begin(); it != m_map_pkChrByPID.end(); ++it)
 	{
@@ -858,7 +858,7 @@ LPCHARACTER CHARACTER_MANAGER::FindSpecifyPC(unsigned int uiJobFlag, long lMapIn
 
 		if (uiJobFlag)
 		{
-			unsigned int uiChrJob = (1 << ((ch->GetJob() + 1) * 3 + ch->GetSkillGroup()));
+			uint32_t uiChrJob = (1 << ((ch->GetJob() + 1) * 3 + ch->GetSkillGroup()));
 
 			if (!IS_SET(uiJobFlag, uiChrJob))
 				continue;
@@ -871,7 +871,7 @@ LPCHARACTER CHARACTER_MANAGER::FindSpecifyPC(unsigned int uiJobFlag, long lMapIn
 	return chFind;
 }
 
-int CHARACTER_MANAGER::GetMobItemRate(LPCHARACTER ch)	
+int32_t CHARACTER_MANAGER::GetMobItemRate(LPCHARACTER ch)	
 { 
 	if (ch && ch->GetPremiumRemainSeconds(PREMIUM_ITEM) > 0)
 		return m_iMobItemRatePremium;
@@ -879,12 +879,12 @@ int CHARACTER_MANAGER::GetMobItemRate(LPCHARACTER ch)
 	return m_iMobItemRate; 
 }
 
-int CHARACTER_MANAGER::GetMobDamageRate(LPCHARACTER ch)	
+int32_t CHARACTER_MANAGER::GetMobDamageRate(LPCHARACTER ch)	
 { 
 	return m_iMobDamageRate; 
 }
 
-int CHARACTER_MANAGER::GetMobGoldAmountRate(LPCHARACTER ch)
+int32_t CHARACTER_MANAGER::GetMobGoldAmountRate(LPCHARACTER ch)
 { 
 	if ( !ch )
 		return m_iMobGoldAmountRate;
@@ -895,7 +895,7 @@ int CHARACTER_MANAGER::GetMobGoldAmountRate(LPCHARACTER ch)
 	return m_iMobGoldAmountRate; 
 }
 
-int CHARACTER_MANAGER::GetMobGoldDropRate(LPCHARACTER ch)
+int32_t CHARACTER_MANAGER::GetMobGoldDropRate(LPCHARACTER ch)
 {
 	if ( !ch )
 		return m_iMobGoldDropRate;
@@ -906,7 +906,7 @@ int CHARACTER_MANAGER::GetMobGoldDropRate(LPCHARACTER ch)
 	return m_iMobGoldDropRate;
 }
 
-int CHARACTER_MANAGER::GetMobExpRate(LPCHARACTER ch)
+int32_t CHARACTER_MANAGER::GetMobExpRate(LPCHARACTER ch)
 { 
 	if ( !ch )
 		return m_iMobExpRate;
@@ -917,7 +917,7 @@ int CHARACTER_MANAGER::GetMobExpRate(LPCHARACTER ch)
 	return m_iMobExpRate; 
 }
 
-int	CHARACTER_MANAGER::GetUserDamageRate(LPCHARACTER ch)
+int32_t	CHARACTER_MANAGER::GetUserDamageRate(LPCHARACTER ch)
 {
 	if (!ch)
 		return m_iUserDamageRate;
@@ -928,11 +928,11 @@ int	CHARACTER_MANAGER::GetUserDamageRate(LPCHARACTER ch)
 	return m_iUserDamageRate;
 }
 
-void CHARACTER_MANAGER::SendScriptToMap(long lMapIndex, const std::string & s)
+void CHARACTER_MANAGER::SendScriptToMap(int32_t lMapIndex, const std::string & s)
 {
 	LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap(lMapIndex);
 
-	if (NULL == pSecMap)
+	if (nullptr == pSecMap)
 		return;
 
 	struct packet_script p;

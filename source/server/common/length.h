@@ -726,7 +726,7 @@ enum SPECIAL_EFFECT
 #include "item_length.h"
 
 // inventory의 position을 나타내는 구조체
-// int와의 암시적 형변환이 있는 이유는,
+// int32_t와의 암시적 형변환이 있는 이유는,
 // 인벤 관련된 모든 함수가 window_type은 받지 않고, cell 하나만 받았기 때문에,(기존에는 인벤이 하나 뿐이어서 inventory type이란게 필요없었기 때문에,)
 // 인벤 관련 모든 함수 호출부분을 수정하는 것이 난감하기 떄문이다.
 
@@ -751,15 +751,15 @@ enum EMisc2
 
 typedef struct SItemPos
 {
-	BYTE window_type;
-	WORD cell;
+	uint8_t window_type;
+	uint16_t cell;
     SItemPos ()
     {
         window_type = INVENTORY;
 		cell = WORD_MAX;
     }
 
-	SItemPos (BYTE _window_type, WORD _cell)
+	SItemPos (uint8_t _window_type, uint16_t _cell)
     {
         window_type = _window_type;
         cell = _cell;

@@ -69,9 +69,9 @@ const char* cCsvAlias::operator [] (size_t index) const
     INDEX2NAME_MAP::const_iterator itr(m_Index2Name.find(index));
     if (itr == m_Index2Name.end())
     {
-//        LogToFile(NULL, "cannot find suitable conversion for %d", index);
+//        LogToFile(nullptr, "cannot find suitable conversion for %d", index);
         Assert(false && "cannot find suitable conversion");
-        return NULL;
+        return nullptr;
     }
 
     return itr->second.c_str();
@@ -87,7 +87,7 @@ size_t cCsvAlias::operator [] (const char* name) const
     NAME2INDEX_MAP::const_iterator itr(m_Name2Index.find(Lower(name)));
     if (itr == m_Name2Index.end())
     {
-//        LogToFile(NULL, "cannot find suitable conversion for %s", name);
+//        LogToFile(nullptr, "cannot find suitable conversion for %s", name);
         Assert(false && "cannot find suitable conversion");
         return 0;
     }
@@ -111,7 +111,7 @@ bool cCsvFile::Load(const char* fileName, const char seperator, const char quote
 
     Destroy(); // 기존의 데이터를 삭제
 
-    cCsvRow* row = NULL;
+    cCsvRow* row = nullptr;
     ParseState state = STATE_NORMAL;
     std::string token = "";
     char buf[2048+1] = {0,};
@@ -164,7 +164,7 @@ bool cCsvFile::Load(const char* fileName, const char seperator, const char quote
             // 현재 모드가 NORMAL 모드일 때,
             else if (state == STATE_NORMAL)
             {
-                if (row == NULL)
+                if (row == nullptr)
                     row = new cCsvRow();
 
                 // ',' 문자를 만났다면 셀의 끝의 의미한다.
@@ -193,11 +193,11 @@ bool cCsvFile::Load(const char* fileName, const char seperator, const char quote
         // 단, 처음에 파싱 lookahead 때문에 붙인 스페이스 문자 두 개를 뗀다.
         if (state == STATE_NORMAL)
         {
-            Assert(row != NULL);
+            Assert(row != nullptr);
             row->push_back(token.substr(0, token.size()-2));
             m_Rows.push_back(row);
             token.clear();
-            row = NULL;
+            row = nullptr;
         }
         else
         {
@@ -345,7 +345,7 @@ bool cCsvTable::Load(const char* fileName, const char seperator, const char quot
 bool cCsvTable::Next()
 {
     // 20억번 정도 호출하면 오버플로가 일어날텐데...괜찮겠지?
-    return ++m_CurRow < (int)m_File.GetRowCount() ? true : false;
+    return ++m_CurRow < (int32_t)m_File.GetRowCount() ? true : false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -358,11 +358,11 @@ size_t cCsvTable::ColCount() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief 인덱스를 이용해 int 형으로 셀 값을 반환한다.
+/// \brief 인덱스를 이용해 int32_t 형으로 셀 값을 반환한다.
 /// \param index 셀 인덱스
-/// \return int 셀 값
+/// \return int32_t 셀 값
 ////////////////////////////////////////////////////////////////////////////////
-int cCsvTable::AsInt(size_t index) const
+int32_t cCsvTable::AsInt(size_t index) const
 {
     const cCsvRow* const row = CurRow();
     Assert(row);
@@ -417,12 +417,12 @@ const cCsvRow* const cCsvTable::CurRow() const
     if (m_CurRow < 0)
     {
         Assert(false && "call Next() first!");
-        return NULL;
+        return nullptr;
     }
-    else if (m_CurRow >= (int)m_File.GetRowCount())
+    else if (m_CurRow >= (int32_t)m_File.GetRowCount())
     {
         Assert(false && "no more rows!");
-        return NULL;
+        return nullptr;
     }
 
     return m_File[m_CurRow];

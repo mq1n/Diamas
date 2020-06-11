@@ -56,13 +56,13 @@
 #endif
 #include "DragonSoul.h"
 
-extern const BYTE g_aBuffOnAttrPoints;
-extern bool RaceToJob(unsigned race, unsigned *ret_job);
+extern const uint8_t g_aBuffOnAttrPoints;
+extern bool RaceToJob(uint32_t race, uint32_t *ret_job);
 
-extern bool IS_SUMMONABLE_ZONE(int map_index); // char_item.cpp
-bool CAN_ENTER_ZONE(const LPCHARACTER& ch, int map_index);
+extern bool IS_SUMMONABLE_ZONE(int32_t map_index); // char_item.cpp
+bool CAN_ENTER_ZONE(const LPCHARACTER& ch, int32_t map_index);
 
-bool CAN_ENTER_ZONE(const LPCHARACTER& ch, int map_index)
+bool CAN_ENTER_ZONE(const LPCHARACTER& ch, int32_t map_index)
 {
 	switch (map_index)
 	{
@@ -77,19 +77,19 @@ bool CAN_ENTER_ZONE(const LPCHARACTER& ch, int map_index)
 }
 
 #ifdef NEW_ICEDAMAGE_SYSTEM
-const DWORD CHARACTER::GetNoDamageRaceFlag()
+const uint32_t CHARACTER::GetNoDamageRaceFlag()
 {
 	return m_dwNDRFlag;
 }
 
-void CHARACTER::SetNoDamageRaceFlag(DWORD dwRaceFlag)
+void CHARACTER::SetNoDamageRaceFlag(uint32_t dwRaceFlag)
 {
 	if (dwRaceFlag>=MAIN_RACE_MAX_NUM) return;
 	if (IS_SET(m_dwNDRFlag, 1<<dwRaceFlag)) return;
 	SET_BIT(m_dwNDRFlag, 1<<dwRaceFlag);
 }
 
-void CHARACTER::UnsetNoDamageRaceFlag(DWORD dwRaceFlag)
+void CHARACTER::UnsetNoDamageRaceFlag(uint32_t dwRaceFlag)
 {
 	if (dwRaceFlag>=MAIN_RACE_MAX_NUM) return;
 	if (!IS_SET(m_dwNDRFlag, 1<<dwRaceFlag)) return;
@@ -101,17 +101,17 @@ void CHARACTER::ResetNoDamageRaceFlag()
 	m_dwNDRFlag = 0;
 }
 
-const std::set<DWORD> & CHARACTER::GetNoDamageAffectFlag()
+const std::set<uint32_t> & CHARACTER::GetNoDamageAffectFlag()
 {
 	return m_setNDAFlag;
 }
 
-void CHARACTER::SetNoDamageAffectFlag(DWORD dwAffectFlag)
+void CHARACTER::SetNoDamageAffectFlag(uint32_t dwAffectFlag)
 {
 	m_setNDAFlag.insert(dwAffectFlag);
 }
 
-void CHARACTER::UnsetNoDamageAffectFlag(DWORD dwAffectFlag)
+void CHARACTER::UnsetNoDamageAffectFlag(uint32_t dwAffectFlag)
 {
 	m_setNDAFlag.erase(dwAffectFlag);
 }
@@ -125,7 +125,7 @@ void CHARACTER::ResetNoDamageAffectFlag()
 // <Factor> DynamicCharacterPtr member function definitions
 
 LPCHARACTER DynamicCharacterPtr::Get() const {
-	LPCHARACTER p = NULL;
+	LPCHARACTER p = nullptr;
 	if (is_pc) {
 		p = CHARACTER_MANAGER::instance().FindByPID(id);
 	} else {
@@ -135,7 +135,7 @@ LPCHARACTER DynamicCharacterPtr::Get() const {
 }
 
 DynamicCharacterPtr& DynamicCharacterPtr::operator=(LPCHARACTER character) {
-	if (character == NULL) {
+	if (character == nullptr) {
 		Reset();
 		return *this;
 	}
@@ -177,56 +177,56 @@ void CHARACTER::Initialize()
 
 	m_iMoveCount = 0;
 
-	m_pkRegen = NULL;
+	m_pkRegen = nullptr;
 	regen_id_ = 0;
 	m_posRegen.x = m_posRegen.y = m_posRegen.z = 0;
 	m_posStart.x = m_posStart.y = 0;
 	m_posDest.x = m_posDest.y = 0;
 	m_fRegenAngle = 0.0f;
 
-	m_pkMobData		= NULL;
-	m_pkMobInst		= NULL;
+	m_pkMobData		= nullptr;
+	m_pkMobInst		= nullptr;
 
-	m_pkShop		= NULL;
-	m_pkChrShopOwner	= NULL;
-	m_pkMyShop		= NULL;
-	m_pkExchange	= NULL;
-	m_pkParty		= NULL;
-	m_pkPartyRequestEvent = NULL;
+	m_pkShop		= nullptr;
+	m_pkChrShopOwner	= nullptr;
+	m_pkMyShop		= nullptr;
+	m_pkExchange	= nullptr;
+	m_pkParty		= nullptr;
+	m_pkPartyRequestEvent = nullptr;
 
-	m_pGuild = NULL;
+	m_pGuild = nullptr;
 
-	m_pkChrTarget = NULL;
+	m_pkChrTarget = nullptr;
 
-	m_pkMuyeongEvent = NULL;
+	m_pkMuyeongEvent = nullptr;
 
-	m_pkWarpNPCEvent = NULL;
-	m_pkDeadEvent = NULL;
-	m_pkStunEvent = NULL;
-	m_pkSaveEvent = NULL;
-	m_pkRecoveryEvent = NULL;
-	m_pkTimedEvent = NULL;
-	m_pkFishingEvent = NULL;
-	m_pkWarpEvent = NULL;
+	m_pkWarpNPCEvent = nullptr;
+	m_pkDeadEvent = nullptr;
+	m_pkStunEvent = nullptr;
+	m_pkSaveEvent = nullptr;
+	m_pkRecoveryEvent = nullptr;
+	m_pkTimedEvent = nullptr;
+	m_pkFishingEvent = nullptr;
+	m_pkWarpEvent = nullptr;
 
 	// MINING
-	m_pkMiningEvent = NULL;
+	m_pkMiningEvent = nullptr;
 	// END_OF_MINING
 
-	m_pkPoisonEvent = NULL;
+	m_pkPoisonEvent = nullptr;
 #ifdef ENABLE_WOLFMAN_CHARACTER
-	m_pkBleedingEvent = NULL;
+	m_pkBleedingEvent = nullptr;
 #endif
-	m_pkFireEvent = NULL;
-	m_pkCheckSpeedHackEvent	= NULL;
+	m_pkFireEvent = nullptr;
+	m_pkCheckSpeedHackEvent	= nullptr;
 	m_speed_hack_count	= 0;
 
-	m_pkAffectEvent = NULL;
+	m_pkAffectEvent = nullptr;
 	m_afAffectFlag = TAffectFlag(0, 0);
 
-	m_pkDestroyWhenIdleEvent = NULL;
+	m_pkDestroyWhenIdleEvent = nullptr;
 
-	m_pkChrSyncOwner = NULL;
+	m_pkChrSyncOwner = nullptr;
 
 	memset(&m_points, 0, sizeof(m_points));
 	memset(&m_pointsInstant, 0, sizeof(m_pointsInstant));
@@ -245,13 +245,13 @@ void CHARACTER::Initialize()
 
 	m_bAddChrState = 0;
 
-	m_pkChrStone = NULL;
+	m_pkChrStone = nullptr;
 
-	m_pkSafebox = NULL;
+	m_pkSafebox = nullptr;
 	m_iSafeboxSize = -1;
 	m_iSafeboxLoadTime = 0;
 
-	m_pkMall = NULL;
+	m_pkMall = nullptr;
 	m_iMallLoadTime = 0;
 
 	m_posWarp.x = m_posWarp.y = m_posWarp.z = 0;
@@ -260,7 +260,7 @@ void CHARACTER::Initialize()
 	m_posExit.x = m_posExit.y = m_posExit.z = 0;
 	m_lExitMapIndex = 0;
 
-	m_pSkillLevels = NULL;
+	m_pSkillLevels = nullptr;
 
 	m_dwMoveStartTime = 0;
 	m_dwMoveDuration = 0;
@@ -279,7 +279,7 @@ void CHARACTER::Initialize()
 #ifdef ENABLE_WOLFMAN_CHARACTER
 	m_bHasBled = false;
 #endif
-	m_pkDungeon = NULL;
+	m_pkDungeon = nullptr;
 	m_iEventAttr = 0;
 
 	m_kAttackLog.dwVID = 0;
@@ -298,7 +298,7 @@ void CHARACTER::Initialize()
 
 	m_dwQuestNPCVID = 0;
 	m_dwQuestByVnum = 0;
-	m_pQuestItem = NULL;
+	m_pQuestItem = nullptr;
 
 	m_dwUnderGuildWarInfoMessageTime = get_dword_time()-60000;
 
@@ -315,11 +315,11 @@ void CHARACTER::Initialize()
 	ResetChainLightningIndex();
 
 	m_dwMountVnum = 0;
-	m_chHorse = NULL;
-	m_chRider = NULL;
+	m_chHorse = nullptr;
+	m_chRider = nullptr;
 
-	m_pWarMap = NULL;
-	m_pWeddingMap = NULL;
+	m_pWarMap = nullptr;
+	m_pWeddingMap = nullptr;
 	m_bChatCounter = 0;
 
 	ResetStopTime();
@@ -333,7 +333,7 @@ void CHARACTER::Initialize()
 
 	m_dwLoginPlayTime = 0;
 
-	m_pkChrMarried = NULL;
+	m_pkChrMarried = nullptr;
 
 	m_posSafeboxOpen.x = -1000;
 	m_posSafeboxOpen.y = -1000;
@@ -347,7 +347,7 @@ void CHARACTER::Initialize()
 	// END_OF_MOB_SKILL_COOLTIME
 
 	// ARENA
-	m_pArena = NULL;
+	m_pArena = nullptr;
 	m_nPotionLimit = quest::CQuestManager::instance().GetEventFlag("arena_potion_limit_count");
 	// END_ARENA
 
@@ -421,9 +421,9 @@ void CHARACTER::Initialize()
 #endif
 }
 
-void CHARACTER::Create(const char * c_pszName, DWORD vid, bool isPC)
+void CHARACTER::Create(const char * c_pszName, uint32_t vid, bool isPC)
 {
-	static int s_crc = 172814;
+	static int32_t s_crc = 172814;
 
 	char crc_string[128+1];
 	snprintf(crc_string, sizeof(crc_string), "%s%p%d", c_pszName, this, ++s_crc);
@@ -448,12 +448,12 @@ void CHARACTER::Destroy()
 			// Is this really safe?
 			--m_pkRegen->count;
 		}
-		m_pkRegen = NULL;
+		m_pkRegen = nullptr;
 	}
 
 	if (m_pkDungeon)
 	{
-		SetDungeon(NULL);
+		SetDungeon(nullptr);
 	}
 
 #ifdef __PET_SYSTEM__
@@ -473,32 +473,32 @@ void CHARACTER::Destroy()
 
 	if (GetDesc())
 	{
-		GetDesc()->BindCharacter(NULL);
-//		BindDesc(NULL);
+		GetDesc()->BindCharacter(nullptr);
+//		BindDesc(nullptr);
 	}
 
 	if (m_pkExchange)
 		m_pkExchange->Cancel();
 
-	SetVictim(NULL);
+	SetVictim(nullptr);
 
 	if (GetShop())
 	{
 		GetShop()->RemoveGuest(this);
-		SetShop(NULL);
+		SetShop(nullptr);
 	}
 
 	ClearStone();
 	ClearSync();
 	ClearTarget();
 
-	if (NULL == m_pkMobData)
+	if (nullptr == m_pkMobData)
 	{
 		DragonSoul_CleanUp();
 		ClearItem();
 	}
 
-	// <Factor> m_pkParty becomes NULL after CParty destructor call!
+	// <Factor> m_pkParty becomes nullptr after CParty destructor call!
 	LPPARTY party = m_pkParty;
 	if (party)
 	{
@@ -514,32 +514,32 @@ void CHARACTER::Destroy()
 				party->Quit(GetVID());
 		}
 
-		SetParty(NULL); // 안해도 되지만 안전하게.
+		SetParty(nullptr); // 안해도 되지만 안전하게.
 	}
 
 	if (m_pkMobInst)
 	{
 		M2_DELETE(m_pkMobInst);
-		m_pkMobInst = NULL;
+		m_pkMobInst = nullptr;
 	}
 
-	m_pkMobData = NULL;
+	m_pkMobData = nullptr;
 
 	if (m_pkSafebox)
 	{
 		M2_DELETE(m_pkSafebox);
-		m_pkSafebox = NULL;
+		m_pkSafebox = nullptr;
 	}
 
 	if (m_pkMall)
 	{
 		M2_DELETE(m_pkMall);
-		m_pkMall = NULL;
+		m_pkMall = nullptr;
 	}
 
 	for (TMapBuffOnAttrs::iterator it = m_map_buff_on_attrs.begin();  it != m_map_buff_on_attrs.end(); it++)
 	{
-		if (NULL != it->second)
+		if (nullptr != it->second)
 		{
 			M2_DELETE(it->second);
 		}
@@ -590,7 +590,7 @@ void CHARACTER::Destroy()
 	if (m_pSkillLevels)
 	{
 		M2_DELETE_ARRAY(m_pSkillLevels);
-		m_pSkillLevels = NULL;
+		m_pSkillLevels = nullptr;
 	}
 
 	CEntity::Destroy();
@@ -604,7 +604,7 @@ const char * CHARACTER::GetName() const
 	return m_stName.empty() ? (m_pkMobData ? m_pkMobData->m_table.szLocaleName : "") : m_stName.c_str();
 }
 
-void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, BYTE bItemCount)
+void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, uint8_t bItemCount)
 {
 	if (!CanHandleItem()) // @fixme149
 	{
@@ -638,7 +638,7 @@ void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, BYTE
 
 	int64_t nTotalMoney = 0;
 
-	for (int n = 0; n < bItemCount; ++n)
+	for (int32_t n = 0; n < bItemCount; ++n)
 	{
 		nTotalMoney += static_cast<int64_t>((pTable+n)->price);
 	}
@@ -667,11 +667,11 @@ void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, BYTE
 	}
 
 	// MYSHOP_PRICE_LIST
-	std::map<DWORD, DWORD> itemkind;  // 아이템 종류별 가격, first: vnum, second: 단일 수량 가격
+	std::map<uint32_t, uint32_t> itemkind;  // 아이템 종류별 가격, first: vnum, second: 단일 수량 가격
 	// END_OF_MYSHOP_PRICE_LIST	
 
 	std::set<TItemPos> cont;
-	for (BYTE i = 0; i < bItemCount; ++i)
+	for (uint8_t i = 0; i < bItemCount; ++i)
 	{
 		if (cont.find((pTable + i)->pos) != cont.end())
 		{
@@ -779,7 +779,7 @@ void CHARACTER::CloseMyShop()
 	{
 		m_stShopSign.clear();
 		CShopManager::instance().DestroyPCShop(this);
-		m_pkMyShop = NULL;
+		m_pkMyShop = nullptr;
 
 		TPacketGCShopSign p;
 
@@ -797,7 +797,7 @@ void CHARACTER::CloseMyShop()
 	}
 }
 
-void EncodeMovePacket(TPacketGCMove & pack, DWORD dwVID, BYTE bFunc, BYTE bArg, DWORD x, DWORD y, DWORD dwDuration, DWORD dwTime, BYTE bRot)
+void EncodeMovePacket(TPacketGCMove & pack, uint32_t dwVID, uint8_t bFunc, uint8_t bArg, uint32_t x, uint32_t y, uint32_t dwDuration, uint32_t dwTime, uint8_t bRot)
 {
 	pack.bHeader = HEADER_GC_MOVE;
 	pack.bFunc   = bFunc;
@@ -886,7 +886,7 @@ void CHARACTER::EncodeInsertPacket(LPENTITY entity)
 
 	pack.bStateFlag = m_bAddChrState;
 
-	int iDur = 0;
+	int32_t iDur = 0;
 
 	if (m_posDest.x != pack.x || m_posDest.y != pack.y)
 	{
@@ -955,7 +955,7 @@ void CHARACTER::EncodeInsertPacket(LPENTITY entity)
 		show_all_info:
 			strlcpy(addPacket.name, GetName(), sizeof(addPacket.name));
 
-			if (GetGuild() != NULL)
+			if (GetGuild() != nullptr)
 			{	
 				addPacket.dwGuildID = GetGuild()->GetID();
 			}
@@ -973,7 +973,7 @@ void CHARACTER::EncodeInsertPacket(LPENTITY entity)
 	if (iDur)
 	{
 		TPacketGCMove pack;
-		EncodeMovePacket(pack, GetVID(), FUNC_MOVE, 0, m_posDest.x, m_posDest.y, iDur, 0, (BYTE) (GetRotation() / 5));
+		EncodeMovePacket(pack, GetVID(), FUNC_MOVE, 0, m_posDest.x, m_posDest.y, iDur, 0, (uint8_t) (GetRotation() / 5));
 		d->Packet(&pack, sizeof(pack));
 
 		TPacketGCWalkMode p;
@@ -1033,12 +1033,12 @@ void CHARACTER::EncodeRemovePacket(LPENTITY entity)
 	d->Packet(&pack, sizeof(TPacketGCCharacterDelete));
 
 	if (entity->IsType(ENTITY_CHARACTER))
-		sys_log(3, "EntityRemove %s(%d) FROM %s", GetName(), (DWORD) m_vid, ((LPCHARACTER) entity)->GetName());
+		sys_log(3, "EntityRemove %s(%d) FROM %s", GetName(), (uint32_t) m_vid, ((LPCHARACTER) entity)->GetName());
 }
 
 void CHARACTER::UpdatePacket()
 {
-	if (GetSectree() == NULL) return;
+	if (GetSectree() == nullptr) return;
 
 	TPacketGCCharacterUpdate pack;
 	TPacketGCCharacterUpdate pack2;
@@ -1081,11 +1081,11 @@ void CHARACTER::UpdatePacket()
 			{
 				LPENTITY pEntity = iter->first;
 
-				if (pEntity != NULL)
+				if (pEntity != nullptr)
 				{
 					if (pEntity->IsType(ENTITY_CHARACTER) == true)
 					{
-						if (pEntity->GetDesc() != NULL)
+						if (pEntity->GetDesc() != nullptr)
 						{
 							LPCHARACTER pChar = (LPCHARACTER)pEntity;
 
@@ -1101,7 +1101,7 @@ void CHARACTER::UpdatePacket()
 					}
 					else
 					{
-						if (pEntity->GetDesc() != NULL)
+						if (pEntity->GetDesc() != nullptr)
 						{
 							pEntity->GetDesc()->Packet(&pack, sizeof(pack));
 						}
@@ -1110,7 +1110,7 @@ void CHARACTER::UpdatePacket()
 			}
 		}
 
-		if (GetDesc() != NULL)
+		if (GetDesc() != nullptr)
 		{
 			GetDesc()->Packet(&pack, sizeof(pack));
 		}
@@ -1139,10 +1139,10 @@ LPCHARACTER CHARACTER::FindCharacterInView(const char * c_pszName, bool bFindPCO
 			return (tch);
 	}
 
-	return NULL;
+	return nullptr;
 }
 
-void CHARACTER::SetPosition(int pos)
+void CHARACTER::SetPosition(int32_t pos)
 {
 	if (pos == POS_STANDING)
 	{
@@ -1203,7 +1203,7 @@ void CHARACTER::CreatePlayerProto(TPlayerTable & tab)
 	tab.part_base	= m_pointsInstant.bBasePart;
 	tab.skill_group	= m_points.skill_group;
 
-	DWORD dwPlayedTime = (get_dword_time() - m_dwPlayStartTime);
+	uint32_t dwPlayedTime = (get_dword_time() - m_dwPlayStartTime);
 
 	if (dwPlayedTime > 60000)
 	{
@@ -1277,7 +1277,7 @@ void CHARACTER::CreatePlayerProto(TPlayerTable & tab)
 	tab.sRandomHP = m_points.iRandomHP;
 	tab.sRandomSP = m_points.iRandomSP;
 
-	for (int i = 0; i < QUICKSLOT_MAX_NUM; ++i)
+	for (int32_t i = 0; i < QUICKSLOT_MAX_NUM; ++i)
 		tab.quickslot[i] = m_quickslot[i];
 
 	memcpy(tab.parts, m_pointsInstant.parts, sizeof(tab.parts));
@@ -1325,29 +1325,29 @@ void CHARACTER::FlushDelayedSaveItem()
 	// 저장 안된 소지품을 전부 저장시킨다.
 	LPITEM item;
 
-	for (int i = 0; i < INVENTORY_AND_EQUIP_SLOT_MAX; ++i)
+	for (int32_t i = 0; i < INVENTORY_AND_EQUIP_SLOT_MAX; ++i)
 		if ((item = GetInventoryItem(i)))
 			ITEM_MANAGER::instance().FlushDelayedSave(item);
 }
 
 void CHARACTER::Disconnect(const char * c_pszReason)
 {
-	assert(GetDesc() != NULL);
+	assert(GetDesc() != nullptr);
 
 	sys_log(0, "DISCONNECT: %s (%s)", GetName(), c_pszReason ? c_pszReason : "unset" );
 
 	if (GetShop())
 	{
 		GetShop()->RemoveGuest(this);
-		SetShop(NULL);
+		SetShop(nullptr);
 	}
 
-	if (GetArena() != NULL)
+	if (GetArena() != nullptr)
 	{
 		GetArena()->OnDisconnect(GetPlayerID());
 	}
 
-	if (GetParty() != NULL)
+	if (GetParty() != nullptr)
 	{
 		GetParty()->UpdateOfflineState(GetPlayerID());
 	}
@@ -1362,11 +1362,11 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 	LogManager::instance().CharLog(this, 0, "LOGOUT", "");
 
 	if (m_pWarMap)
-		SetWarMap(NULL);
+		SetWarMap(nullptr);
 
 	if (m_pWeddingMap)
 	{
-		SetWeddingMap(NULL);
+		SetWeddingMap(nullptr);
 	}
 
 	if (GetGuild())
@@ -1411,14 +1411,14 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 
 	if (GetDesc())
 	{
-		GetDesc()->BindCharacter(NULL);
-//		BindDesc(NULL);
+		GetDesc()->BindCharacter(nullptr);
+//		BindDesc(nullptr);
 	}
 
 	M2_DESTROY_CHARACTER(this);
 }
 
-bool CHARACTER::Show(long lMapIndex, long x, long y, long z, bool bShowSpawnMotion/* = false */)
+bool CHARACTER::Show(int32_t lMapIndex, int32_t x, int32_t y, int32_t z, bool bShowSpawnMotion/* = false */)
 {
 	LPSECTREE sectree = SECTREE_MANAGER::instance().Get(lMapIndex, x, y);
 
@@ -1498,7 +1498,7 @@ struct BGMInfo
 	float		vol;
 };
 
-typedef std::map<unsigned, BGMInfo> BGMInfoMap;
+typedef std::map<uint32_t, BGMInfo> BGMInfoMap;
 
 static BGMInfoMap 	gs_bgmInfoMap;
 static bool		gs_bgmVolEnable = false;
@@ -1509,7 +1509,7 @@ void CHARACTER_SetBGMVolumeEnable()
 	sys_log(0, "bgm_info.set_bgm_volume_enable");
 }
 
-void CHARACTER_AddBGMInfo(unsigned mapIndex, const char* name, float vol)
+void CHARACTER_AddBGMInfo(uint32_t mapIndex, const char* name, float vol)
 {
 	BGMInfo newInfo;
 	newInfo.name = name;
@@ -1520,7 +1520,7 @@ void CHARACTER_AddBGMInfo(unsigned mapIndex, const char* name, float vol)
 	sys_log(0, "bgm_info.add_info(%d, '%s', %f)", mapIndex, name, vol);
 }
 
-const BGMInfo& CHARACTER_GetBGMInfo(unsigned mapIndex)
+const BGMInfo& CHARACTER_GetBGMInfo(uint32_t mapIndex)
 {
 	BGMInfoMap::iterator f = gs_bgmInfoMap.find(mapIndex);
 	if (gs_bgmInfoMap.end() == f)
@@ -1539,7 +1539,7 @@ bool CHARACTER_IsBGMVolumeEnable()
 
 void CHARACTER::MainCharacterPacket()
 {
-	const unsigned mapIndex = GetMapIndex();
+	const uint32_t mapIndex = GetMapIndex();
 	const BGMInfo& bgmInfo = CHARACTER_GetBGMInfo(mapIndex);
 
 	// SUPPORT_BGM
@@ -1619,7 +1619,7 @@ void CHARACTER::PointsPacket()
 	pack.points[POINT_STAMINA]		= GetStamina();
 	pack.points[POINT_MAX_STAMINA]	= GetMaxStamina();
 
-	for (int i = POINT_ST; i < POINT_MAX_NUM; ++i)
+	for (int32_t i = POINT_ST; i < POINT_MAX_NUM; ++i)
 		pack.points[i] = GetPoint(i);
 
 	GetDesc()->Packet(&pack, sizeof(TPacketGCPoints));
@@ -1633,7 +1633,7 @@ bool CHARACTER::ChangeSex()
 		return false;
 	}
 
-	int src_race = GetRaceNum();
+	int32_t src_race = GetRaceNum();
 
 	switch (src_race)
 	{
@@ -1682,7 +1682,7 @@ bool CHARACTER::ChangeSex()
 	return true;
 }
 
-WORD CHARACTER::GetRaceNum() const
+uint16_t CHARACTER::GetRaceNum() const
 {
 	if (m_dwPolymorphRace)
 		return m_dwPolymorphRace;
@@ -1693,7 +1693,7 @@ WORD CHARACTER::GetRaceNum() const
 	return m_points.job;
 }
 
-void CHARACTER::SetRace(BYTE race)
+void CHARACTER::SetRace(uint8_t race)
 {
 	if (race >= MAIN_RACE_MAX_NUM)
 	{
@@ -1704,10 +1704,10 @@ void CHARACTER::SetRace(BYTE race)
 	m_points.job = race;
 }
 
-BYTE CHARACTER::GetJob() const
+uint8_t CHARACTER::GetJob() const
 {
-	unsigned race = m_points.job;
-	unsigned job;
+	uint32_t race = m_points.job;
+	uint32_t job;
 
 	if (RaceToJob(race, &job))
 		return job;
@@ -1716,7 +1716,7 @@ BYTE CHARACTER::GetJob() const
 	return JOB_WARRIOR;
 }
 
-void CHARACTER::SetLevel(BYTE level)
+void CHARACTER::SetLevel(uint8_t level)
 {
 	m_points.level = level;
 
@@ -1731,7 +1731,7 @@ void CHARACTER::SetLevel(BYTE level)
 	}
 }
 
-void CHARACTER::SetEmpire(BYTE bEmpire)
+void CHARACTER::SetEmpire(uint8_t bEmpire)
 {
 	m_bEmpire = bEmpire;
 }
@@ -1866,18 +1866,18 @@ void CHARACTER::SetPlayerProto(const TPlayerTable * t)
 EVENTFUNC(kill_ore_load_event)
 {
 	char_event_info* info = dynamic_cast<char_event_info*>( event->info );
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "kill_ore_load_even> <Factor> Null pointer" );
 		return 0;
 	}
 
 	LPCHARACTER	ch = info->ch;
-	if (ch == NULL) { // <Factor>
+	if (ch == nullptr) { // <Factor>
 		return 0;
 	}	
 
-	ch->m_pkMiningEvent = NULL;
+	ch->m_pkMiningEvent = nullptr;
 	M2_DESTROY_CHARACTER(ch);
 	return 0;
 }
@@ -1993,17 +1993,17 @@ const TMobTable & CHARACTER::GetMobTable() const
 	return m_pkMobData->m_table;
 }
 
-bool CHARACTER::IsRaceFlag(DWORD dwBit) const
+bool CHARACTER::IsRaceFlag(uint32_t dwBit) const
 {
 	return m_pkMobData ? IS_SET(m_pkMobData->m_table.dwRaceFlag, dwBit) : 0;
 }
 
-DWORD CHARACTER::GetMobDamageMin() const
+uint32_t CHARACTER::GetMobDamageMin() const
 {
 	return m_pkMobData->m_table.dwDamageRange[0];
 }
 
-DWORD CHARACTER::GetMobDamageMax() const
+uint32_t CHARACTER::GetMobDamageMax() const
 {
 	return m_pkMobData->m_table.dwDamageRange[1];
 }
@@ -2018,7 +2018,7 @@ float CHARACTER::GetMobDamageMultiply() const
 	return fDamMultiply;
 }
 
-DWORD CHARACTER::GetMobDropItemVnum() const
+uint32_t CHARACTER::GetMobDropItemVnum() const
 {
 	return m_pkMobData->m_table.dwDropItemVnum;
 }
@@ -2028,22 +2028,22 @@ bool CHARACTER::IsSummonMonster() const
 	return GetSummonVnum() != 0;
 }
 
-DWORD CHARACTER::GetSummonVnum() const
+uint32_t CHARACTER::GetSummonVnum() const
 {
 	return m_pkMobData ? m_pkMobData->m_table.dwSummonVnum : 0;
 }
 
-DWORD CHARACTER::GetPolymorphItemVnum() const
+uint32_t CHARACTER::GetPolymorphItemVnum() const
 {
 	return m_pkMobData ? m_pkMobData->m_table.dwPolymorphItemVnum : 0;
 }
 
-DWORD CHARACTER::GetMonsterDrainSPPoint() const
+uint32_t CHARACTER::GetMonsterDrainSPPoint() const
 {
 	return m_pkMobData ? m_pkMobData->m_table.dwDrainSP : 0;
 }
 
-BYTE CHARACTER::GetMobRank() const
+uint8_t CHARACTER::GetMobRank() const
 {
 	if (!m_pkMobData)
 		return MOB_RANK_KNIGHT;	// PC일 경우 KNIGHT급
@@ -2051,7 +2051,7 @@ BYTE CHARACTER::GetMobRank() const
 	return m_pkMobData->m_table.bRank;
 }
 
-BYTE CHARACTER::GetMobSize() const
+uint8_t CHARACTER::GetMobSize() const
 {
 	if (!m_pkMobData)
 		return MOBSIZE_MEDIUM;
@@ -2059,7 +2059,7 @@ BYTE CHARACTER::GetMobSize() const
 	return m_pkMobData->m_table.bSize;
 }
 
-WORD CHARACTER::GetMobAttackRange() const
+uint16_t CHARACTER::GetMobAttackRange() const
 { 
 	switch (GetMobBattleType())
 	{
@@ -2071,7 +2071,7 @@ WORD CHARACTER::GetMobAttackRange() const
 	}
 }
 
-BYTE CHARACTER::GetMobBattleType() const
+uint8_t CHARACTER::GetMobBattleType() const
 {
 	if (!m_pkMobData)
 		return BATTLE_TYPE_MELEE;
@@ -2083,10 +2083,10 @@ void CHARACTER::ComputeBattlePoints()
 {
 	if (IsPolymorphed())
 	{
-		DWORD dwMobVnum = GetPolymorphVnum();
+		uint32_t dwMobVnum = GetPolymorphVnum();
 		const CMob * pMob = CMobManager::instance().Get(dwMobVnum);
-		int iAtt = 0;
-		int iDef = 0;
+		int32_t iAtt = 0;
+		int32_t iDef = 0;
 
 		if (pMob)
 		{
@@ -2111,8 +2111,8 @@ void CHARACTER::ComputeBattlePoints()
 		//
 		// 기본 ATK = 2lev + 2str, 직업에 마다 2str은 바뀔 수 있음
 		//
-		int iAtk = GetLevel() * 2;
-		int iStatAtk = 0;
+		int32_t iAtk = GetLevel() * 2;
+		int32_t iStatAtk = 0;
 
 		switch (GetJob())
 		{
@@ -2167,13 +2167,13 @@ void CHARACTER::ComputeBattlePoints()
 		PointChange(POINT_ATT_GRADE, iAtk);
 
 		// DEF = LEV + CON + ARMOR
-		int iShowDef = GetLevel() + GetPoint(POINT_HT); // For Ymir(천마)
-		int iDef = GetLevel() + (int) (GetPoint(POINT_HT) / 1.25); // For Other
-		int iArmor = 0;
+		int32_t iShowDef = GetLevel() + GetPoint(POINT_HT); // For Ymir(천마)
+		int32_t iDef = GetLevel() + (int32_t) (GetPoint(POINT_HT) / 1.25); // For Other
+		int32_t iArmor = 0;
 
 		LPITEM pkItem;
 
-		for (int i = 0; i < WEAR_MAX_NUM; ++i)
+		for (int32_t i = 0; i < WEAR_MAX_NUM; ++i)
 			if ((pkItem = GetWear(i)) && pkItem->GetType() == ITEM_ARMOR)
 			{
 				if (pkItem->GetSubType() == ARMOR_BODY || pkItem->GetSubType() == ARMOR_HEAD || pkItem->GetSubType() == ARMOR_FOOTS || pkItem->GetSubType() == ARMOR_SHIELD)
@@ -2191,7 +2191,7 @@ void CHARACTER::ComputeBattlePoints()
 
 			const char* pHorseName = CHorseNameManager::instance().GetHorseName(GetPlayerID());
 
-			if (pHorseName != NULL && strlen(pHorseName))
+			if (pHorseName != nullptr && strlen(pHorseName))
 			{
 				iArmor += 20;
 			}
@@ -2211,9 +2211,9 @@ void CHARACTER::ComputeBattlePoints()
 	else
 	{
 		// 2lev + str * 2
-		int iAtt = GetLevel() * 2 + GetPoint(POINT_ST) * 2;
+		int32_t iAtt = GetLevel() * 2 + GetPoint(POINT_ST) * 2;
 		// lev + con
-		int iDef = GetLevel() + GetPoint(POINT_HT) + GetMobTable().wDef;
+		int32_t iDef = GetLevel() + GetPoint(POINT_HT) + GetMobTable().wDef;
 
 		SetPoint(POINT_ATT_GRADE, iAtt);
 		SetPoint(POINT_DEF_GRADE, iDef);
@@ -2224,22 +2224,22 @@ void CHARACTER::ComputeBattlePoints()
 
 void CHARACTER::ComputePoints()
 {
-	long lStat = GetPoint(POINT_STAT);
-	long lStatResetCount = GetPoint(POINT_STAT_RESET_COUNT);
-	long lSkillActive = GetPoint(POINT_SKILL);
-	long lSkillSub = GetPoint(POINT_SUB_SKILL);
-	long lSkillHorse = GetPoint(POINT_HORSE_SKILL);
-	long lLevelStep = GetPoint(POINT_LEVEL_STEP);
+	int32_t lStat = GetPoint(POINT_STAT);
+	int32_t lStatResetCount = GetPoint(POINT_STAT_RESET_COUNT);
+	int32_t lSkillActive = GetPoint(POINT_SKILL);
+	int32_t lSkillSub = GetPoint(POINT_SUB_SKILL);
+	int32_t lSkillHorse = GetPoint(POINT_HORSE_SKILL);
+	int32_t lLevelStep = GetPoint(POINT_LEVEL_STEP);
 
-	long lAttackerBonus = GetPoint(POINT_PARTY_ATTACKER_BONUS);
-	long lTankerBonus = GetPoint(POINT_PARTY_TANKER_BONUS);
-	long lBufferBonus = GetPoint(POINT_PARTY_BUFFER_BONUS);
-	long lSkillMasterBonus = GetPoint(POINT_PARTY_SKILL_MASTER_BONUS);
-	long lHasteBonus = GetPoint(POINT_PARTY_HASTE_BONUS);
-	long lDefenderBonus = GetPoint(POINT_PARTY_DEFENDER_BONUS);
+	int32_t lAttackerBonus = GetPoint(POINT_PARTY_ATTACKER_BONUS);
+	int32_t lTankerBonus = GetPoint(POINT_PARTY_TANKER_BONUS);
+	int32_t lBufferBonus = GetPoint(POINT_PARTY_BUFFER_BONUS);
+	int32_t lSkillMasterBonus = GetPoint(POINT_PARTY_SKILL_MASTER_BONUS);
+	int32_t lHasteBonus = GetPoint(POINT_PARTY_HASTE_BONUS);
+	int32_t lDefenderBonus = GetPoint(POINT_PARTY_DEFENDER_BONUS);
 
-	long lHPRecovery = GetPoint(POINT_HP_RECOVERY);
-	long lSPRecovery = GetPoint(POINT_SP_RECOVERY);
+	int32_t lHPRecovery = GetPoint(POINT_HP_RECOVERY);
+	int32_t lSPRecovery = GetPoint(POINT_SP_RECOVERY);
 
 	memset(m_pointsInstant.points, 0, sizeof(m_pointsInstant.points));
 	BuffOnAttr_ClearAll();
@@ -2281,8 +2281,8 @@ void CHARACTER::ComputePoints()
 	SetPoint(POINT_PC_BANG_DROP_BONUS, 0);
 	// END_PC_BANG_ITEM_ADD
 
-	int iMaxHP, iMaxSP;
-	int iMaxStamina;
+	int32_t iMaxHP, iMaxSP;
+	int32_t iMaxStamina;
 
 	if (IsPC())
 	{
@@ -2294,11 +2294,11 @@ void CHARACTER::ComputePoints()
 		{
 			CSkillProto* pkSk = CSkillManager::instance().Get(SKILL_ADD_HP);
 
-			if (NULL != pkSk)
+			if (nullptr != pkSk)
 			{
 				pkSk->SetPointVar("k", 1.0f * GetSkillPower(SKILL_ADD_HP) / 100.0f);
 
-				iMaxHP += static_cast<int>(pkSk->kPointPoly.Eval());
+				iMaxHP += static_cast<int32_t>(pkSk->kPointPoly.Eval());
 			}
 		}
 
@@ -2360,12 +2360,12 @@ void CHARACTER::ComputePoints()
 
 	SetMaxStamina(iMaxStamina);
 	// @fixme118 part1
-	int iCurHP = this->GetHP();
-	int iCurSP = this->GetSP();
+	int32_t iCurHP = this->GetHP();
+	int32_t iCurSP = this->GetSP();
 
 	m_pointsInstant.dwImmuneFlag = 0;
 
-	for (int i = 0 ; i < WEAR_MAX_NUM; i++) 
+	for (int32_t i = 0 ; i < WEAR_MAX_NUM; i++) 
 	{
 		LPITEM pItem = GetWear(i);
 		if (pItem)
@@ -2381,7 +2381,7 @@ void CHARACTER::ComputePoints()
 	// 용혼석 시스템도 ActiveDeck에 있는 모든 용혼석의 속성값을 다시 적용시켜야 한다.
 	if (DragonSoul_IsDeckActivated())
 	{
-		for (int i = WEAR_MAX_NUM + DS_SLOT_MAX * DragonSoul_GetActiveDeck(); 
+		for (int32_t i = WEAR_MAX_NUM + DS_SLOT_MAX * DragonSoul_GetActiveDeck(); 
 			i < WEAR_MAX_NUM + DS_SLOT_MAX * (DragonSoul_GetActiveDeck() + 1); i++)	
 		{
 			LPITEM pItem = GetWear(i);
@@ -2403,7 +2403,7 @@ void CHARACTER::ComputePoints()
 
 	RefreshAffect();
 	CPetSystem* pPetSystem = GetPetSystem();
-	if (NULL != pPetSystem)
+	if (nullptr != pPetSystem)
 		pPetSystem->RefreshBuff();
 
 	// @fixme118 part2 (after petsystem stuff)
@@ -2421,17 +2421,17 @@ void CHARACTER::ComputePoints()
 // m_dwPlayStartTime의 단위는 milisecond다. 데이터베이스에는 분단위로 기록하기
 // 때문에 플레이시간을 계산할 때 / 60000 으로 나눠서 하는데, 그 나머지 값이 남았
 // 을 때 여기에 dwTimeRemain으로 넣어서 제대로 계산되도록 해주어야 한다.
-void CHARACTER::ResetPlayTime(DWORD dwTimeRemain)
+void CHARACTER::ResetPlayTime(uint32_t dwTimeRemain)
 {
 	m_dwPlayStartTime = get_dword_time() - dwTimeRemain;
 }
 
-const int aiRecoveryPercents[10] = { 1, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
+const int32_t aiRecoveryPercents[10] = { 1, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
 
 EVENTFUNC(recovery_event)
 {
 	char_event_info* info = dynamic_cast<char_event_info*>( event->info );
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "recovery_event> <Factor> Null pointer" );
 		return 0;
@@ -2439,7 +2439,7 @@ EVENTFUNC(recovery_event)
 
 	LPCHARACTER	ch = info->ch;
 
-	if (ch == NULL) { // <Factor>
+	if (ch == nullptr) { // <Factor>
 		return 0;
 	}	
 
@@ -2456,14 +2456,14 @@ EVENTFUNC(recovery_event)
 #endif
 		if (2493 == ch->GetMobTable().dwVnum)
 		{
-			int regenPct = BlueDragon_GetRangeFactor("hp_regen", ch->GetHPPct());
+			int32_t regenPct = BlueDragon_GetRangeFactor("hp_regen", ch->GetHPPct());
 			regenPct += ch->GetMobTable().bRegenPercent;
 
-			for (int i=1 ; i <= 4 ; ++i)
+			for (int32_t i=1 ; i <= 4 ; ++i)
 			{
 				if (REGEN_PECT_BONUS == BlueDragon_GetIndexFactor("DragonStone", i, "effect_type"))
 				{
-					DWORD dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
+					uint32_t dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
 					size_t val = BlueDragon_GetIndexFactor("DragonStone", i, "val");
 					size_t cnt = SECTREE_MANAGER::instance().GetMonsterCountInMap( ch->GetMapIndex(), dwDragonStoneID );
 
@@ -2482,17 +2482,17 @@ EVENTFUNC(recovery_event)
 
 		if (ch->GetHP() >= ch->GetMaxHP())
 		{
-			ch->m_pkRecoveryEvent = NULL;
+			ch->m_pkRecoveryEvent = nullptr;
 			return 0;
 		}
 
 		if (2493 == ch->GetMobTable().dwVnum)
 		{
-			for (int i=1 ; i <= 4 ; ++i)
+			for (int32_t i=1 ; i <= 4 ; ++i)
 			{
 				if (REGEN_TIME_BONUS == BlueDragon_GetIndexFactor("DragonStone", i, "effect_type"))
 				{
-					DWORD dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
+					uint32_t dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
 					size_t val = BlueDragon_GetIndexFactor("DragonStone", i, "val");
 					size_t cnt = SECTREE_MANAGER::instance().GetMonsterCountInMap( ch->GetMapIndex(), dwDragonStoneID );
 
@@ -2520,15 +2520,15 @@ EVENTFUNC(recovery_event)
 		if (ch->IsAffectFlag(AFF_BLEEDING))
 			return 3;
 #endif
-		int iSec = (get_dword_time() - ch->GetLastMoveTime()) / 3000;
+		int32_t iSec = (get_dword_time() - ch->GetLastMoveTime()) / 3000;
 
 		ch->DistributeSP(ch);
 
 		if (ch->GetMaxHP() <= ch->GetHP())
 			return PASSES_PER_SEC(3);
 
-		int iPercent = 0;
-		int iAmount = 0;
+		int32_t iPercent = 0;
+		int32_t iAmount = 0;
 		
 		{
 			iPercent = aiRecoveryPercents[MIN(9, iSec)];
@@ -2559,7 +2559,7 @@ void CHARACTER::StartRecoveryEvent()
 
 	info->ch = this;
 
-	int iSec = IsPC() ? 3 : (MAX(1, GetMobTable().bRegenCycle));
+	int32_t iSec = IsPC() ? 3 : (MAX(1, GetMobTable().bRegenCycle));
 	m_pkRecoveryEvent = event_create(recovery_event, info, PASSES_PER_SEC(iSec));
 }
 
@@ -2581,7 +2581,7 @@ void CHARACTER::Standup()
 	PacketAround(&pack_position, sizeof(pack_position));
 }
 
-void CHARACTER::Sitdown(int is_ground)
+void CHARACTER::Sitdown(int32_t is_ground)
 {
 	struct packet_position pack_position;
 
@@ -2603,7 +2603,7 @@ void CHARACTER::SetRotation(float fRot)
 }
 
 // x, y 방향으로 보고 선다.
-void CHARACTER::SetRotationToXY(long x, long y)
+void CHARACTER::SetRotationToXY(int32_t x, int32_t y)
 {
 	SetRotation(GetDegreeFromPositionXY(GetX(), GetY(), x, y));
 }
@@ -2630,7 +2630,7 @@ bool CHARACTER::CanMove() const
 }
 
 // 무조건 x, y 위치로 이동 시킨다.
-bool CHARACTER::Sync(long x, long y)
+bool CHARACTER::Sync(int32_t x, int32_t y)
 {
 	if (!GetSectree())
 		return false;
@@ -2659,7 +2659,7 @@ bool CHARACTER::Sync(long x, long y)
 	if (GetDungeon())
 	{
 		// 던젼용 이벤트 속성 변화
-		int iLastEventAttr = m_iEventAttr;
+		int32_t iLastEventAttr = m_iEventAttr;
 		m_iEventAttr = new_tree->GetEventAttribute(x, y);
 
 		if (m_iEventAttr != iLastEventAttr)
@@ -2708,7 +2708,7 @@ void CHARACTER::Stop()
 	m_posDest.y = m_posStart.y = GetY();
 }
 
-bool CHARACTER::Goto(long x, long y)
+bool CHARACTER::Goto(int32_t x, int32_t y)
 {
 	// TODO 거리체크 필요
 	// 같은 위치면 이동할 필요 없음 (자동 성공)
@@ -2748,9 +2748,9 @@ bool CHARACTER::Goto(long x, long y)
 }
 
 
-DWORD CHARACTER::GetMotionMode() const
+uint32_t CHARACTER::GetMotionMode() const
 {
-	DWORD dwMode = MOTION_MODE_GENERAL;
+	uint32_t dwMode = MOTION_MODE_GENERAL;
 
 	if (IsPolymorphed())
 		return dwMode;
@@ -2796,9 +2796,9 @@ DWORD CHARACTER::GetMotionMode() const
 
 float CHARACTER::GetMoveMotionSpeed() const
 {
-	DWORD dwMode = GetMotionMode();
+	uint32_t dwMode = GetMotionMode();
 
-	const CMotion * pkMotion = NULL;
+	const CMotion * pkMotion = nullptr;
 
 	if (!GetMountVnum())
 		pkMotion = CMotionManager::instance().GetMotion(GetRaceNum(), MAKE_MOTION_KEY(dwMode, (IsWalking() && IsPC()) ? MOTION_WALK : MOTION_RUN));
@@ -2834,7 +2834,7 @@ void CHARACTER::CalculateMoveDuration()
 	float motionSpeed = GetMoveMotionSpeed();
 
 	m_dwMoveDuration = CalculateDuration(GetLimitPoint(POINT_MOV_SPEED),
-			(int) ((fDist / motionSpeed) * 1000.0f));
+			(int32_t) ((fDist / motionSpeed) * 1000.0f));
 
 	if (IsNPC())
 		sys_log(1, "%s: GOTO: distance %f, spd %u, duration %u, motion speed %f pos %d %d -> %d %d",
@@ -2849,7 +2849,7 @@ void CHARACTER::CalculateMoveDuration()
 // 클라에서는 이전 위치에서 바꾼 x, y까지 interpolation한다.
 // 걷거나 뛰는 것은 char의 m_bNowWalking에 달려있다.
 // Warp를 의도한 것이라면 Show를 사용할 것.
-bool CHARACTER::Move(long x, long y)
+bool CHARACTER::Move(int32_t x, int32_t y)
 {
 	// 같은 위치면 이동할 필요 없음 (자동 성공)
 	if (GetX() == x && GetY() == y)
@@ -2859,7 +2859,7 @@ bool CHARACTER::Move(long x, long y)
 	return Sync(x, y);
 }
 
-void CHARACTER::SendMovePacket(BYTE bFunc, BYTE bArg, DWORD x, DWORD y, DWORD dwDuration, DWORD dwTime, int iRot)
+void CHARACTER::SendMovePacket(uint8_t bFunc, uint8_t bArg, uint32_t x, uint32_t y, uint32_t dwDuration, uint32_t dwTime, int32_t iRot)
 {
 	TPacketGCMove pack;
 
@@ -2870,27 +2870,27 @@ void CHARACTER::SendMovePacket(BYTE bFunc, BYTE bArg, DWORD x, DWORD y, DWORD dw
 		dwDuration = m_dwMoveDuration;
 	}
 
-	EncodeMovePacket(pack, GetVID(), bFunc, bArg, x, y, dwDuration, dwTime, iRot == -1 ? (int) GetRotation() / 5 : iRot);
+	EncodeMovePacket(pack, GetVID(), bFunc, bArg, x, y, dwDuration, dwTime, iRot == -1 ? (int32_t) GetRotation() / 5 : iRot);
 	PacketView(&pack, sizeof(TPacketGCMove), this);
 }
 
-int CHARACTER::GetRealPoint(BYTE type) const
+int32_t CHARACTER::GetRealPoint(uint8_t type) const
 {
 	return m_points.points[type];
 }
 
-void CHARACTER::SetRealPoint(BYTE type, int val)
+void CHARACTER::SetRealPoint(uint8_t type, int32_t val)
 {
 	m_points.points[type] = val;
 }
 
-int CHARACTER::GetPolymorphPoint(BYTE type) const
+int32_t CHARACTER::GetPolymorphPoint(uint8_t type) const
 {
 	if (IsPolymorphed() && !IsPolyMaintainStat())
 	{
-		DWORD dwMobVnum = GetPolymorphVnum();
+		uint32_t dwMobVnum = GetPolymorphVnum();
 		const CMob * pMob = CMobManager::instance().Get(dwMobVnum);
-		int iPower = GetPolymorphPower();
+		int32_t iPower = GetPolymorphPower();
 
 		if (pMob)
 		{
@@ -2916,7 +2916,7 @@ int CHARACTER::GetPolymorphPoint(BYTE type) const
 	return GetPoint(type);
 }
 
-int CHARACTER::GetPoint(BYTE type) const
+int32_t CHARACTER::GetPoint(uint8_t type) const
 {
 	if (type >= POINT_MAX_NUM)
 	{
@@ -2924,8 +2924,8 @@ int CHARACTER::GetPoint(BYTE type) const
 		return 0;
 	}
 
-	int val = m_pointsInstant.points[type];
-	int max_val = INT_MAX;
+	int32_t val = m_pointsInstant.points[type];
+	int32_t max_val = INT_MAX;
 
 	switch (type)
 	{
@@ -2941,7 +2941,7 @@ int CHARACTER::GetPoint(BYTE type) const
 	return (val);
 }
 
-int CHARACTER::GetLimitPoint(BYTE type) const
+int32_t CHARACTER::GetLimitPoint(uint8_t type) const
 {
 	if (type >= POINT_MAX_NUM)
 	{
@@ -2949,10 +2949,10 @@ int CHARACTER::GetLimitPoint(BYTE type) const
 		return 0;
 	}
 
-	int val = m_pointsInstant.points[type];
-	int max_val = INT_MAX;
-	int limit = INT_MAX;
-	int min_limit = -INT_MAX;
+	int32_t val = m_pointsInstant.points[type];
+	int32_t max_val = INT_MAX;
+	int32_t limit = INT_MAX;
+	int32_t min_limit = -INT_MAX;
 
 	switch (type)
 	{
@@ -2999,7 +2999,7 @@ int CHARACTER::GetLimitPoint(BYTE type) const
 	return (val);
 }
 
-void CHARACTER::SetPoint(BYTE type, int val)
+void CHARACTER::SetPoint(uint8_t type, int32_t val)
 {
 	if (type >= POINT_MAX_NUM)
 	{
@@ -3035,9 +3035,9 @@ void CHARACTER::CheckMaximumPoints()
 		PointChange(POINT_SP, GetMaxSP() - GetSP());
 }
 
-void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast)
+void CHARACTER::PointChange(uint8_t type, int32_t amount, bool bAmount, bool bBroadcast)
 {
-	int val = 0;
+	int32_t val = 0;
 
 	//sys_log(0, "PointChange %d %d | %d -> %d cHP %d mHP %d", type, amount, GetPoint(type), GetPoint(type)+amount, GetHP(), GetMaxHP());
 
@@ -3099,10 +3099,10 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 
 		case POINT_EXP:
 			{
-				DWORD exp = GetExp();
-				DWORD next_exp = GetNextExp();
+				uint32_t exp = GetExp();
+				uint32_t next_exp = GetNextExp();
 
-				if ((amount < 0) && (exp < (DWORD)(-amount)))
+				if ((amount < 0) && (exp < (uint32_t)(-amount)))
 				{
 					sys_log(1, "%s AMOUNT < 0 %d, CUR EXP: %d", GetName(), -amount, exp);
 					amount = -exp;
@@ -3118,7 +3118,7 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 					if (test_server)
 						ChatPacket(CHAT_TYPE_INFO, "You have gained %d exp.", amount);
 
-					DWORD iExpBalance = 0;
+					uint32_t iExpBalance = 0;
 
 					// 레벨 업!
 					if (exp + amount >= next_exp)
@@ -3135,8 +3135,8 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 						exp = GetExp();
 					}
 
-					DWORD q = DWORD(next_exp / 4.0f);
-					int iLevStep = GetRealPoint(POINT_LEVEL_STEP);
+					uint32_t q = uint32_t(next_exp / 4.0f);
+					int32_t iLevStep = GetRealPoint(POINT_LEVEL_STEP);
 
 					// iLevStep이 4 이상이면 레벨이 올랐어야 하므로 여기에 올 수 없는 값이다.
 					if (iLevStep >= 4)
@@ -3147,17 +3147,17 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 
 					if (exp >= next_exp && iLevStep < 4)
 					{
-						for (int i = 0; i < 4 - iLevStep; ++i)
+						for (int32_t i = 0; i < 4 - iLevStep; ++i)
 							PointChange(POINT_LEVEL_STEP, 1, false, true);
 					}
 					else if (exp >= q * 3 && iLevStep < 3)
 					{
-						for (int i = 0; i < 3 - iLevStep; ++i)
+						for (int32_t i = 0; i < 3 - iLevStep; ++i)
 							PointChange(POINT_LEVEL_STEP, 1, false, true);
 					}
 					else if (exp >= q * 2 && iLevStep < 2)
 					{
-						for (int i = 0; i < 2 - iLevStep; ++i)
+						for (int32_t i = 0; i < 2 - iLevStep; ++i)
 							PointChange(POINT_LEVEL_STEP, 1, false, true);
 					}
 					else if (exp >= q && iLevStep < 1)
@@ -3190,8 +3190,8 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 
 					case 4:
 						{
-							int iHP = number(JobInitialPoints[GetJob()].hp_per_lv_begin, JobInitialPoints[GetJob()].hp_per_lv_end);
-							int iSP = number(JobInitialPoints[GetJob()].sp_per_lv_begin, JobInitialPoints[GetJob()].sp_per_lv_end);
+							int32_t iHP = number(JobInitialPoints[GetJob()].hp_per_lv_begin, JobInitialPoints[GetJob()].hp_per_lv_end);
+							int32_t iSP = number(JobInitialPoints[GetJob()].sp_per_lv_begin, JobInitialPoints[GetJob()].sp_per_lv_end);
 
 							m_points.iRandomHP += iHP;
 							m_points.iRandomSP += iSP;
@@ -3243,7 +3243,7 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 				if (IsDead() || IsStun())
 					return;
 
-				int prev_hp = GetHP();
+				int32_t prev_hp = GetHP();
 
 				amount = MIN(GetMaxHP() - GetHP(), amount);
 				SetHP(GetHP() + amount);
@@ -3272,7 +3272,7 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 				if (IsDead() || IsStun())
 					return;
 
-				int prev_val = GetStamina();
+				int32_t prev_val = GetStamina();
 				amount = MIN(GetMaxStamina() - GetStamina(), amount);
 				SetStamina(GetStamina() + amount);
 				val = GetStamina();
@@ -3299,8 +3299,8 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 
 				//SetMaxHP(GetMaxHP() + amount);
 				// 최대 생명력 = (기본 최대 생명력 + 추가) * 최대생명력%
-				int hp = GetRealPoint(POINT_MAX_HP);
-				int add_hp = MIN(3500, hp * GetPoint(POINT_MAX_HP_PCT) / 100);
+				int32_t hp = GetRealPoint(POINT_MAX_HP);
+				int32_t add_hp = MIN(3500, hp * GetPoint(POINT_MAX_HP_PCT) / 100);
 				add_hp += GetPoint(POINT_MAX_HP);
 				add_hp += GetPoint(POINT_PARTY_TANKER_BONUS);
 
@@ -3316,8 +3316,8 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 
 				//SetMaxSP(GetMaxSP() + amount);
 				// 최대 정신력 = (기본 최대 정신력 + 추가) * 최대정신력%
-				int sp = GetRealPoint(POINT_MAX_SP);
-				int add_sp = MIN(800, sp * GetPoint(POINT_MAX_SP_PCT) / 100);
+				int32_t sp = GetRealPoint(POINT_MAX_SP);
+				int32_t add_sp = MIN(800, sp * GetPoint(POINT_MAX_SP_PCT) / 100);
 				add_sp += GetPoint(POINT_MAX_SP);
 				add_sp += GetPoint(POINT_PARTY_SKILL_MASTER_BONUS);
 
@@ -3627,7 +3627,7 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 		case POINT_ENERGY:
 		case POINT_COSTUME_ATTR_BONUS:
 			{
-				int old_val = GetPoint(type);
+				int32_t old_val = GetPoint(type);
 				SetPoint(type, old_val + amount);
 				val = GetPoint(type);
 				BuffOnAttr_ValueChange(type, old_val, val);
@@ -3678,7 +3678,7 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 	}
 }
 
-void CHARACTER::ApplyPoint(BYTE bApplyType, int iVal)
+void CHARACTER::ApplyPoint(uint8_t bApplyType, int32_t iVal)
 {
 	switch (bApplyType)
 	{
@@ -3703,16 +3703,16 @@ void CHARACTER::ApplyPoint(BYTE bApplyType, int iVal)
 				// 00000000 00000000 00000000 00000000
 				// ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^
 				// vnum     ^ add       change
-				BYTE bSkillVnum = (BYTE) (((DWORD)iVal) >> 24);
-				int iAdd = iVal & 0x00800000;
-				int iChange = iVal & 0x007fffff;
+				uint8_t bSkillVnum = (uint8_t) (((uint32_t)iVal) >> 24);
+				int32_t iAdd = iVal & 0x00800000;
+				int32_t iChange = iVal & 0x007fffff;
 
 				sys_log(1, "APPLY_SKILL skill %d add? %d change %d", bSkillVnum, iAdd ? 1 : 0, iChange);
 
 				if (0 == iAdd)
 					iChange = -iChange;
 
-				std::unordered_map<BYTE, int>::iterator iter = m_SkillDamageBonus.find(bSkillVnum);
+				std::unordered_map<uint8_t, int32_t>::iterator iter = m_SkillDamageBonus.find(bSkillVnum);
 
 				if (iter == m_SkillDamageBonus.end())
 					m_SkillDamageBonus.insert(std::make_pair(bSkillVnum, iChange));
@@ -3725,7 +3725,7 @@ void CHARACTER::ApplyPoint(BYTE bApplyType, int iVal)
 		case APPLY_MAX_HP:
 		case APPLY_MAX_HP_PCT:
 			{
-				int i = GetMaxHP(); if(i == 0) break;
+				int32_t i = GetMaxHP(); if(i == 0) break;
 				PointChange(aApplyInfo[bApplyType].bPointType, iVal);
 				float fRatio = (float)GetMaxHP() / (float)i;
 				PointChange(POINT_HP, GetHP() * fRatio - GetHP());
@@ -3735,7 +3735,7 @@ void CHARACTER::ApplyPoint(BYTE bApplyType, int iVal)
 		case APPLY_MAX_SP:
 		case APPLY_MAX_SP_PCT:
 			{
-				int i = GetMaxSP(); if(i == 0) break;
+				int32_t i = GetMaxSP(); if(i == 0) break;
 				PointChange(aApplyInfo[bApplyType].bPointType, iVal);
 				float fRatio = (float)GetMaxSP() / (float)i;
 				PointChange(POINT_SP, GetSP() * fRatio - GetSP());
@@ -3860,7 +3860,7 @@ void CHARACTER::ApplyPoint(BYTE bApplyType, int iVal)
 	}
 }
 
-void CHARACTER::MotionPacketEncode(BYTE motion, LPCHARACTER victim, struct packet_motion * packet)
+void CHARACTER::MotionPacketEncode(uint8_t motion, LPCHARACTER victim, struct packet_motion * packet)
 {
 	packet->header	= HEADER_GC_MOTION;
 	packet->vid		= m_vid;
@@ -3872,7 +3872,7 @@ void CHARACTER::MotionPacketEncode(BYTE motion, LPCHARACTER victim, struct packe
 		packet->victim_vid = 0;
 }
 
-void CHARACTER::Motion(BYTE motion, LPCHARACTER victim)
+void CHARACTER::Motion(uint8_t motion, LPCHARACTER victim)
 {
 	struct packet_motion pack_motion;
 	MotionPacketEncode(motion, victim, &pack_motion);
@@ -3882,7 +3882,7 @@ void CHARACTER::Motion(BYTE motion, LPCHARACTER victim)
 EVENTFUNC(save_event)
 {
 	char_event_info* info = dynamic_cast<char_event_info*>( event->info );
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "save_event> <Factor> Null pointer" );
 		return 0;
@@ -3890,7 +3890,7 @@ EVENTFUNC(save_event)
 
 	LPCHARACTER ch = info->ch;
 
-	if (ch == NULL) { // <Factor>
+	if (ch == nullptr) { // <Factor>
 		return 0;
 	}	
 	sys_log(1, "SAVE_EVENT: %s", ch->GetName());
@@ -3910,7 +3910,7 @@ void CHARACTER::StartSaveEvent()
 	m_pkSaveEvent = event_create(save_event, info, save_event_second_cycle);
 }
 
-void CHARACTER::ChatPacket(BYTE type, const char * format, ...)
+void CHARACTER::ChatPacket(uint8_t type, const char * format, ...)
 {
 	LPDESC d = GetDesc();
 
@@ -3921,7 +3921,7 @@ void CHARACTER::ChatPacket(BYTE type, const char * format, ...)
 	va_list args;
 
 	va_start(args, format);
-	int len = vsnprintf(chatbuf, sizeof(chatbuf), format, args);
+	int32_t len = vsnprintf(chatbuf, sizeof(chatbuf), format, args);
 	va_end(args);
 
 	struct packet_chat pack_chat;
@@ -3945,7 +3945,7 @@ void CHARACTER::ChatPacket(BYTE type, const char * format, ...)
 // MINING
 void CHARACTER::mining_take()
 {
-	m_pkMiningEvent = NULL;
+	m_pkMiningEvent = nullptr;
 }
 
 void CHARACTER::mining_cancel()
@@ -3984,7 +3984,7 @@ void CHARACTER::mining(LPCHARACTER chLoad)
 		return;
 	}
 
-	int count = number(5, 15); // 동작 횟수, 한 동작당 2초
+	int32_t count = number(5, 15); // 동작 횟수, 한 동작당 2초
 
 	// 채광 동작을 보여줌
 	TPacketGCDigMotion p;
@@ -4011,11 +4011,11 @@ void CHARACTER::fishing()
 	{
 		LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(GetMapIndex());
 
-		int	x = GetX();
-		int y = GetY();
+		int32_t	x = GetX();
+		int32_t y = GetY();
 
 		LPSECTREE tree = pkSectreeMap->Find(x, y);
-		DWORD dwAttr = tree->GetAttribute(x, y);
+		uint32_t dwAttr = tree->GetAttribute(x, y);
 
 		if (IS_SET(dwAttr, ATTR_BLOCK))
 		{
@@ -4067,7 +4067,7 @@ void CHARACTER::fishing_take()
 	event_cancel(&m_pkFishingEvent);
 }
 
-bool CHARACTER::StartStateMachine(int iNextPulse)
+bool CHARACTER::StartStateMachine(int32_t iNextPulse)
 {
 	if (CHARACTER_MANAGER::instance().AddToStateList(this))
 	{
@@ -4083,7 +4083,7 @@ void CHARACTER::StopStateMachine()
 	CHARACTER_MANAGER::instance().RemoveFromStateList(this);
 }
 
-void CHARACTER::UpdateStateMachine(DWORD dwPulse)
+void CHARACTER::UpdateStateMachine(uint32_t dwPulse)
 {
 	if (dwPulse < m_dwNextStatePulse)
 		return;
@@ -4095,7 +4095,7 @@ void CHARACTER::UpdateStateMachine(DWORD dwPulse)
 	m_dwNextStatePulse = dwPulse + m_dwStateDuration;
 }
 
-void CHARACTER::SetNextStatePulse(int iNextPulse)
+void CHARACTER::SetNextStatePulse(int32_t iNextPulse)
 {
 	CHARACTER_MANAGER::instance().AddToStateList(this);
 	m_dwNextStatePulse = iNextPulse;
@@ -4103,7 +4103,7 @@ void CHARACTER::SetNextStatePulse(int iNextPulse)
 
 
 // 캐릭터 인스턴스 업데이트 함수.
-void CHARACTER::UpdateCharacter(DWORD dwPulse)
+void CHARACTER::UpdateCharacter(uint32_t dwPulse)
 {
 	CFSM::Update();
 }
@@ -4115,7 +4115,7 @@ void CHARACTER::SetShop(LPSHOP pkShop)
 	else
 	{
 		REMOVE_BIT(m_pointsInstant.instant_flag, INSTANT_FLAG_SHOP); 
-		SetShopOwner(NULL);
+		SetShopOwner(nullptr);
 	}
 }
 
@@ -4124,19 +4124,19 @@ void CHARACTER::SetExchange(CExchange * pkExchange)
 	m_pkExchange = pkExchange;
 }
 
-void CHARACTER::SetPart(BYTE bPartPos, WORD wVal)
+void CHARACTER::SetPart(uint8_t bPartPos, uint16_t wVal)
 {
 	assert(bPartPos < PART_MAX_NUM);
 	m_pointsInstant.parts[bPartPos] = wVal;
 }
 
-WORD CHARACTER::GetPart(BYTE bPartPos) const
+uint16_t CHARACTER::GetPart(uint8_t bPartPos) const
 {
 	assert(bPartPos < PART_MAX_NUM);
 	return m_pointsInstant.parts[bPartPos];
 }
 
-WORD CHARACTER::GetOriginalPart(BYTE bPartPos) const
+uint16_t CHARACTER::GetOriginalPart(uint8_t bPartPos) const
 {
 	switch (bPartPos)
 	{
@@ -4164,7 +4164,7 @@ WORD CHARACTER::GetOriginalPart(BYTE bPartPos) const
 	}
 }
 
-BYTE CHARACTER::GetCharType() const
+uint8_t CHARACTER::GetCharType() const
 {
 	return m_bCharType;
 }
@@ -4201,8 +4201,8 @@ bool CHARACTER::SetSyncOwner(LPCHARACTER ch, bool bRemoveFromList)
 		if (m_pkChrSyncOwner)
 			sys_log(1, "SyncRelease %s %p from %s", GetName(), this, m_pkChrSyncOwner->GetName());
 
-		// 리스트에서 제거하지 않더라도 포인터는 NULL로 셋팅되어야 한다.
-		m_pkChrSyncOwner = NULL;
+		// 리스트에서 제거하지 않더라도 포인터는 nullptr로 셋팅되어야 한다.
+		m_pkChrSyncOwner = nullptr;
 	}
 	else
 	{
@@ -4259,16 +4259,16 @@ struct FuncClearSync
 {
 	void operator () (LPCHARACTER ch)
 	{
-		assert(ch != NULL);
-		ch->SetSyncOwner(NULL, false);	// false 플래그로 해야 for_each 가 제대로 돈다.
+		assert(ch != nullptr);
+		ch->SetSyncOwner(nullptr, false);	// false 플래그로 해야 for_each 가 제대로 돈다.
 	}
 };
 
 void CHARACTER::ClearSync()
 {
-	SetSyncOwner(NULL);
+	SetSyncOwner(nullptr);
 
-	// 아래 for_each에서 나를 m_pkChrSyncOwner로 가진 자들의 포인터를 NULL로 한다.
+	// 아래 for_each에서 나를 m_pkChrSyncOwner로 가진 자들의 포인터를 nullptr로 한다.
 	std::for_each(m_kLst_pkChrSyncOwned.begin(), m_kLst_pkChrSyncOwned.end(), FuncClearSync());
 	m_kLst_pkChrSyncOwned.clear();
 }
@@ -4297,7 +4297,7 @@ void CHARACTER::SetParty(LPPARTY pkParty)
 	sys_log(1, "PARTY set to %p", get_pointer(pkParty));
 
 	//if (m_pkDungeon && IsPC())
-	//SetDungeon(NULL);
+	//SetDungeon(nullptr);
 	m_pkParty = pkParty;
 
 	if (IsPC())
@@ -4315,8 +4315,8 @@ void CHARACTER::SetParty(LPPARTY pkParty)
 /// 파티 가입 event 정보
 EVENTINFO(TPartyJoinEventInfo)
 {
-	DWORD	dwGuestPID;		///< 파티에 참여할 캐릭터의 PID
-	DWORD	dwLeaderPID;		///< 파티 리더의 PID
+	uint32_t	dwGuestPID;		///< 파티에 참여할 캐릭터의 PID
+	uint32_t	dwLeaderPID;		///< 파티 리더의 PID
 
 	TPartyJoinEventInfo() 
 	: dwGuestPID( 0 )
@@ -4329,7 +4329,7 @@ EVENTFUNC(party_request_event)
 {
 	TPartyJoinEventInfo * info = dynamic_cast<TPartyJoinEventInfo *>(  event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "party_request_event> <Factor> Null pointer" );
 		return 0;
@@ -4341,7 +4341,7 @@ EVENTFUNC(party_request_event)
 	{
 		sys_log(0, "PartyRequestEvent %s", ch->GetName());
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "PartyRequestDenied");
-		ch->SetPartyRequestEvent(NULL);
+		ch->SetPartyRequestEvent(nullptr);
 	}
 
 	return 0;
@@ -4421,7 +4421,7 @@ bool CHARACTER::RequestToParty(LPCHARACTER leader)
 
 	SetPartyRequestEvent(event_create(party_request_event, info, PASSES_PER_SEC(10)));
 
-	leader->ChatPacket(CHAT_TYPE_COMMAND, "PartyRequest %u", (DWORD) GetVID());
+	leader->ChatPacket(CHAT_TYPE_COMMAND, "PartyRequest %u", (uint32_t) GetVID());
 	ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님에게 파티가입 신청을 했습니다."), leader->GetName());
 	return true;
 }
@@ -4513,7 +4513,7 @@ EVENTFUNC(party_invite_event)
 {
 	TPartyJoinEventInfo * pInfo = dynamic_cast<TPartyJoinEventInfo *>(  event->info );
 
-	if ( pInfo == NULL )
+	if ( pInfo == nullptr )
 	{
 		sys_err( "party_invite_event> <Factor> Null pointer" );
 		return 0;
@@ -4694,7 +4694,7 @@ void CHARACTER::PartyInviteAccept(LPCHARACTER pchInvitee)
 	}
 }
 
-void CHARACTER::PartyInviteDeny(DWORD dwPID)
+void CHARACTER::PartyInviteDeny(uint32_t dwPID)
 {
 	EventMap::iterator itFind = m_PartyInviteEventMap.find(dwPID);
 
@@ -4731,7 +4731,7 @@ CHARACTER::PartyJoinErrCode CHARACTER::IsPartyJoinableCondition(const LPCHARACTE
 
 static bool __party_can_join_by_level(LPCHARACTER leader, LPCHARACTER quest)
 {
-	int	level_limit = 30;
+	int32_t	level_limit = 30;
 	return (abs(leader->GetLevel() - quest->GetLevel()) <= level_limit);
 }
 
@@ -4826,7 +4826,7 @@ void CHARACTER::SetWeddingMap(marriage::WeddingMap* pMap)
 void CHARACTER::SetRegen(LPREGEN pkRegen)
 {
 	m_pkRegen = pkRegen;
-	if (pkRegen != NULL) {
+	if (pkRegen != nullptr) {
 		regen_id_ = pkRegen->id;
 	}
 	m_fRegenAngle = GetRotation();
@@ -4875,11 +4875,11 @@ void CHARACTER::OnClick(LPCHARACTER pkChrCauser)
 {
 	if (!pkChrCauser)
 	{
-		sys_err("OnClick %s by NULL", GetName());
+		sys_err("OnClick %s by nullptr", GetName());
 		return;
 	}
 
-	DWORD vid = GetVID();
+	uint32_t vid = GetVID();
 	sys_log(0, "OnClick %s[vnum %d ServerUniqueID %d, pid %d] by %s", GetName(), GetRaceNum(), vid, GetPlayerID(), pkChrCauser->GetName());
 
 	// 상점을 연상태로 퀘스트를 진행할 수 없다.
@@ -4942,7 +4942,7 @@ void CHARACTER::OnClick(LPCHARACTER pkChrCauser)
 				if (pkChrCauser->GetShop())
 				{
 					pkChrCauser->GetShop()->RemoveGuest(pkChrCauser);
-					pkChrCauser->SetShop(NULL);
+					pkChrCauser->SetShop(nullptr);
 				}
 
 				GetMyShop()->AddGuest(pkChrCauser, GetVID(), false);
@@ -4983,7 +4983,7 @@ void CHARACTER::OnClick(LPCHARACTER pkChrCauser)
 
 }
 
-BYTE CHARACTER::GetGMLevel() const
+uint8_t CHARACTER::GetGMLevel() const
 {
 	if (test_server)
 		return GM_IMPLEMENTOR;
@@ -5026,8 +5026,8 @@ struct FuncDeadSpawnedByStone
 {
 	void operator () (LPCHARACTER ch)
 	{
-		ch->Dead(NULL);
-		ch->SetStone(NULL);
+		ch->Dead(nullptr);
+		ch->SetStone(nullptr);
 	}
 };
 
@@ -5045,7 +5045,7 @@ void CHARACTER::ClearStone()
 		return;
 
 	m_pkChrStone->m_set_pkChrSpawnedBy.erase(this);
-	m_pkChrStone = NULL;
+	m_pkChrStone = nullptr;
 }
 
 void CHARACTER::ClearTarget()
@@ -5053,7 +5053,7 @@ void CHARACTER::ClearTarget()
 	if (m_pkChrTarget)
 	{
 		m_pkChrTarget->m_set_pkChrTargetedBy.erase(this);
-		m_pkChrTarget = NULL;
+		m_pkChrTarget = nullptr;
 	}
 
 	TPacketGCTarget p;
@@ -5067,7 +5067,7 @@ void CHARACTER::ClearTarget()
 	while (it != m_set_pkChrTargetedBy.end())
 	{
 		LPCHARACTER pkChr = *(it++);
-		pkChr->m_pkChrTarget = NULL;
+		pkChr->m_pkChrTarget = nullptr;
 
 		if (!pkChr->GetDesc())
 		{
@@ -5119,8 +5119,8 @@ void CHARACTER::SetTarget(LPCHARACTER pkChrTarget)
 
 				if (owner)
 				{
-					int iHorseHealth = owner->GetHorseHealth();
-					int iHorseMaxHealth = owner->GetHorseMaxHealth();
+					int32_t iHorseHealth = owner->GetHorseHealth();
+					int32_t iHorseMaxHealth = owner->GetHorseMaxHealth();
 
 					if (iHorseMaxHealth)
 						p.bHPPercent = MINMAX(0,  iHorseHealth * 100 / iHorseMaxHealth, 100);
@@ -5187,10 +5187,10 @@ void CHARACTER::CheckTarget()
 		return;
 
 	if (DISTANCE_APPROX(GetX() - m_pkChrTarget->GetX(), GetY() - m_pkChrTarget->GetY()) >= 4800)
-		SetTarget(NULL);
+		SetTarget(nullptr);
 }
 
-void CHARACTER::SetWarpLocation(long lMapIndex, long x, long y)
+void CHARACTER::SetWarpLocation(int32_t lMapIndex, int32_t x, int32_t y)
 {
 	m_posWarp.x = x * 100;
 	m_posWarp.y = y * 100;
@@ -5216,14 +5216,14 @@ void CHARACTER::ExitToSavedLocation()
 // 지금까진 privateMapIndex 가 현재 맵 인덱스와 같은지 체크 하는 것을 외부에서 하고,
 // 다르면 warpset을 불렀는데
 // 이를 warpset 안으로 넣자.
-bool CHARACTER::WarpSet(long x, long y, long lPrivateMapIndex)
+bool CHARACTER::WarpSet(int32_t x, int32_t y, int32_t lPrivateMapIndex)
 {
 	if (!IsPC())
 		return false;
 
-	long lAddr;
-	long lMapIndex;
-	WORD wPort;
+	int32_t lAddr;
+	int32_t lMapIndex;
+	uint16_t wPort;
 
 	if (!CMapLocation::instance().Get(x, y, lMapIndex, lAddr, wPort))
 	{
@@ -5289,7 +5289,7 @@ void CHARACTER::WarpEnd()
 	if (m_posWarp.x == 0 && m_posWarp.y == 0)
 		return;
 
-	int index = m_lWarpMapIndex;
+	int32_t index = m_lWarpMapIndex;
 
 	if (index > 10000)
 		index /= 10000;
@@ -5333,15 +5333,15 @@ bool CHARACTER::Return()
 	if (!IsNPC())
 		return false;
 
-	int x, y;
+	int32_t x, y;
 	/*
 	   float fDist = DISTANCE_SQRT(m_pkMobData->m_posLastAttacked.x - GetX(), m_pkMobData->m_posLastAttacked.y - GetY());
 	   float fx, fy;
 	   GetDeltaByDegree(GetRotation(), fDist, &fx, &fy);
-	   x = GetX() + (int) fx;
-	   y = GetY() + (int) fy;
+	   x = GetX() + (int32_t) fx;
+	   y = GetY() + (int32_t) fy;
 	 */
-	SetVictim(NULL);
+	SetVictim(nullptr);
 
 	x = m_pkMobInst->m_posLastAttacked.x;
 	y = m_pkMobInst->m_posLastAttacked.y;
@@ -5391,8 +5391,8 @@ bool CHARACTER::Follow(LPCHARACTER pkChr, float fMinDistance)
 	}
 	// END_OF_TRENT_MONSTER
 
-	long x = pkChr->GetX();
-	long y = pkChr->GetY();
+	int32_t x = pkChr->GetX();
+	int32_t y = pkChr->GetY();
 
 	if (pkChr->IsPC()) // 쫓아가는 상대가 PC일 때
 	{
@@ -5442,14 +5442,14 @@ bool CHARACTER::Follow(LPCHARACTER pkChr, float fMinDistance)
 			{
 				GetDeltaByDegree(pkChr->GetRotation(), fMeetTime * yourSpeed, &fYourMoveEstimateX, &fYourMoveEstimateY);
 
-				x += (long) fYourMoveEstimateX;
-				y += (long) fYourMoveEstimateY;
+				x += (int32_t) fYourMoveEstimateX;
+				y += (int32_t) fYourMoveEstimateY;
 
 				float fDistNew = sqrt(((double)x - GetX())*(x-GetX())+((double)y - GetY())*(y-GetY()));
 				if (fDist < fDistNew)
 				{
-					x = (long)(GetX() + (x - GetX()) * fDist / fDistNew);
-					y = (long)(GetY() + (y - GetY()) * fDist / fDistNew);
+					x = (int32_t)(GetX() + (x - GetX()) * fDist / fDistNew);
+					y = (int32_t)(GetY() + (y - GetY()) * fDist / fDistNew);
 				}
 			}
 		}
@@ -5470,9 +5470,9 @@ bool CHARACTER::Follow(LPCHARACTER pkChr, float fMinDistance)
 		// 상대방 주변 랜덤한 곳으로 이동
 		SetChangeAttackPositionTime();
 
-		int retry = 16;
-		int dx, dy;
-		int rot = (int) GetDegreeFromPositionXY(x, y, GetX(), GetY());
+		int32_t retry = 16;
+		int32_t dx, dy;
+		int32_t rot = (int32_t) GetDegreeFromPositionXY(x, y, GetX(), GetY());
 
 		while (--retry)
 		{
@@ -5481,12 +5481,12 @@ bool CHARACTER::Follow(LPCHARACTER pkChr, float fMinDistance)
 			else
 				GetDeltaByDegree(number(0, 359), fMinDistance, &fx, &fy);
 
-			dx = x + (int) fx;
-			dy = y + (int) fy;
+			dx = x + (int32_t) fx;
+			dy = y + (int32_t) fy;
 
 			LPSECTREE tree = SECTREE_MANAGER::instance().Get(GetMapIndex(), dx, dy);
 
-			if (NULL == tree)
+			if (nullptr == tree)
 				break;
 
 			if (0 == (tree->GetAttribute(dx, dy) & (ATTR_BLOCK | ATTR_OBJECT)))
@@ -5504,7 +5504,7 @@ bool CHARACTER::Follow(LPCHARACTER pkChr, float fMinDistance)
 		GetDeltaByDegree(GetRotation(), fDistToGo, &fx, &fy);
 
 		//sys_log(0, "직선으로 이동 %s", GetName());
-		if (!Goto(GetX() + (int) fx, GetY() + (int) fy))
+		if (!Goto(GetX() + (int32_t) fx, GetY() + (int32_t) fy))
 			return false;
 	}
 
@@ -5541,7 +5541,7 @@ void CHARACTER::ReqSafeboxLoad(const char* pszPassword)
 		return;
 	}
 
-	int iPulse = thecore_pulse();
+	int32_t iPulse = thecore_pulse();
 
 	if (iPulse - GetSafeboxLoadTime()  < PASSES_PER_SEC(10))
 	{
@@ -5570,7 +5570,7 @@ void CHARACTER::ReqSafeboxLoad(const char* pszPassword)
 	db_clientdesc->DBPacket(HEADER_GD_SAFEBOX_LOAD, GetDesc()->GetHandle(), &p, sizeof(p));
 }
 
-void CHARACTER::LoadSafebox(int iSize, DWORD dwGold, int iItemCount, TPlayerItem * pItems)
+void CHARACTER::LoadSafebox(int32_t iSize, uint32_t dwGold, int32_t iItemCount, TPlayerItem * pItems)
 {
 	bool bLoaded = false;
 
@@ -5597,7 +5597,7 @@ void CHARACTER::LoadSafebox(int iSize, DWORD dwGold, int iItemCount, TPlayerItem
 
 	if (!bLoaded)
 	{
-		for (int i = 0; i < iItemCount; ++i, ++pItems)
+		for (int32_t i = 0; i < iItemCount; ++i, ++pItems)
 		{
 			if (!m_pkSafebox->IsValidPosition(pItems->pos))
 				continue;
@@ -5624,7 +5624,7 @@ void CHARACTER::LoadSafebox(int iSize, DWORD dwGold, int iItemCount, TPlayerItem
 	}
 }
 
-void CHARACTER::ChangeSafeboxSize(BYTE bSize)
+void CHARACTER::ChangeSafeboxSize(uint8_t bSize)
 {
 	//if (!m_pkSafebox)
 	//return;
@@ -5654,7 +5654,7 @@ void CHARACTER::CloseSafebox()
 	m_pkSafebox->Save();
 
 	M2_DELETE(m_pkSafebox);
-	m_pkSafebox = NULL;
+	m_pkSafebox = nullptr;
 
 	ChatPacket(CHAT_TYPE_COMMAND, "CloseSafebox");
 
@@ -5669,7 +5669,7 @@ CSafebox * CHARACTER::GetMall() const
 	return m_pkMall;
 }
 
-void CHARACTER::LoadMall(int iItemCount, TPlayerItem * pItems)
+void CHARACTER::LoadMall(int32_t iItemCount, TPlayerItem * pItems)
 {
 	bool bLoaded = false;
 
@@ -5692,7 +5692,7 @@ void CHARACTER::LoadMall(int iItemCount, TPlayerItem * pItems)
 
 	if (!bLoaded)
 	{
-		for (int i = 0; i < iItemCount; ++i, ++pItems)
+		for (int32_t i = 0; i < iItemCount; ++i, ++pItems)
 		{
 			if (!m_pkMall->IsValidPosition(pItems->pos))
 				continue;
@@ -5725,7 +5725,7 @@ void CHARACTER::CloseMall()
 	m_pkMall->Save();
 
 	M2_DELETE(m_pkMall);
-	m_pkMall = NULL;
+	m_pkMall = nullptr;
 
 	ChatPacket(CHAT_TYPE_COMMAND, "CloseMall");
 }
@@ -5763,7 +5763,7 @@ bool CHARACTER::BuildUpdatePartyPacket(TPacketGCPartyUpdate & out)
 	return true;
 }
 
-int CHARACTER::GetLeadershipSkillLevel() const
+int32_t CHARACTER::GetLeadershipSkillLevel() const
 { 
 	return GetSkillLevel(SKILL_LEADERSHIP);
 }
@@ -5774,21 +5774,21 @@ void CHARACTER::QuerySafeboxSize()
 	{
 		DBManager::instance().ReturnQuery(QID_SAFEBOX_SIZE,
 				GetPlayerID(),
-				NULL, 
+				nullptr, 
 				"SELECT size FROM safebox%s WHERE account_id = %u",
 				get_table_postfix(),
 				GetDesc()->GetAccountTable().id);
 	}
 }
 
-void CHARACTER::SetSafeboxSize(int iSize)
+void CHARACTER::SetSafeboxSize(int32_t iSize)
 {
 	sys_log(1, "SetSafeboxSize: %s %d", GetName(), iSize);
 	m_iSafeboxSize = iSize;
 	DBManager::instance().Query("UPDATE safebox%s SET size = %d WHERE account_id = %u", get_table_postfix(), iSize / SAFEBOX_PAGE_SIZE, GetDesc()->GetAccountTable().id);
 }
 
-int CHARACTER::GetSafeboxSize() const
+int32_t CHARACTER::GetSafeboxSize() const
 {
 	return m_iSafeboxSize;
 }
@@ -5859,14 +5859,14 @@ void CHARACTER::ResetStopTime()
 	m_dwStopTime = get_dword_time();
 }
 
-DWORD CHARACTER::GetStopTime() const
+uint32_t CHARACTER::GetStopTime() const
 {
 	return m_dwStopTime;
 }
 
-void CHARACTER::ResetPoint(int iLv)
+void CHARACTER::ResetPoint(int32_t iLv)
 {
-	BYTE bJob = GetJob();
+	uint8_t bJob = GetJob();
 
 	PointChange(POINT_LEVEL, iLv - GetLevel());
 
@@ -5903,7 +5903,7 @@ bool CHARACTER::IsChangeAttackPosition(LPCHARACTER target) const
 	if (!IsNPC())
 		return true;
 
-	DWORD dwChangeTime = AI_CHANGE_ATTACK_POISITION_TIME_NEAR;
+	uint32_t dwChangeTime = AI_CHANGE_ATTACK_POISITION_TIME_NEAR;
 
 	if (DISTANCE_APPROX(GetX() - target->GetX(), GetY() - target->GetY()) > 
 		AI_CHANGE_ATTACK_POISITION_DISTANCE + GetMobAttackRange())
@@ -5916,10 +5916,10 @@ void CHARACTER::GiveRandomSkillBook()
 {
 	LPITEM item = AutoGiveItem(50300);
 
-	if (NULL != item)
+	if (nullptr != item)
 	{
-		extern const DWORD GetRandomSkillVnum(BYTE bJob = JOB_MAX_NUM);
-		DWORD dwSkillVnum = 0;
+		extern const uint32_t GetRandomSkillVnum(uint8_t bJob = JOB_MAX_NUM);
+		uint32_t dwSkillVnum = 0;
 		// 50% of getting random books or getting one of the same player's race
 		if (!number(0, 1))
 			dwSkillVnum = GetRandomSkillVnum(GetJob());
@@ -5929,7 +5929,7 @@ void CHARACTER::GiveRandomSkillBook()
 	}
 }
 
-void CHARACTER::ReviveInvisible(int iDur)
+void CHARACTER::ReviveInvisible(int32_t iDur)
 {
 	AddAffect(AFFECT_REVIVE_INVISIBLE, POINT_NONE, 0, AFF_REVIVE_INVISIBLE, iDur, 0, true);
 }
@@ -5947,7 +5947,7 @@ void CHARACTER::BeginStateEmpty()
 {
 }
 
-void CHARACTER::EffectPacket(int enumEffectType)
+void CHARACTER::EffectPacket(int32_t enumEffectType)
 {
 	TPacketGCSpecialEffect p;
 
@@ -5969,7 +5969,7 @@ void CHARACTER::SpecificEffectPacket(const char filename[MAX_EFFECT_FILE_NAME])
 	PacketAround(&p, sizeof(TPacketGCSpecificEffect));
 }
 
-void CHARACTER::MonsterChat(BYTE bMonsterChatType)
+void CHARACTER::MonsterChat(uint8_t bMonsterChatType)
 {
 	if (IsPC())
 		return;
@@ -6024,7 +6024,7 @@ void CHARACTER::MonsterChat(BYTE bMonsterChatType)
 	PacketAround(buf.read_peek(), buf.size());
 }
 
-void CHARACTER::SetQuestNPCID(DWORD vid)
+void CHARACTER::SetQuestNPCID(uint32_t vid)
 {
 	m_dwQuestNPCVID = vid;
 }
@@ -6041,7 +6041,7 @@ void CHARACTER::SetQuestItemPtr(LPITEM item)
 
 void CHARACTER::ClearQuestItemPtr()
 {
-	m_pQuestItem = NULL;
+	m_pQuestItem = nullptr;
 }
 
 LPITEM CHARACTER::GetQuestItemPtr() const
@@ -6057,7 +6057,7 @@ LPDUNGEON CHARACTER::GetDungeonForce() const
 	return m_pkDungeon;
 }
 
-void CHARACTER::SetBlockMode(BYTE bFlag)
+void CHARACTER::SetBlockMode(uint8_t bFlag)
 {
 	m_pointsInstant.bBlockMode = bFlag;
 
@@ -6071,7 +6071,7 @@ void CHARACTER::SetBlockMode(BYTE bFlag)
 	SetQuestFlag("game_option.block_party_request", bFlag & BLOCK_PARTY_REQUEST ? 1 : 0);
 }
 
-void CHARACTER::SetBlockModeForce(BYTE bFlag)
+void CHARACTER::SetBlockModeForce(uint8_t bFlag)
 {
 	m_pointsInstant.bBlockMode = bFlag;
 	ChatPacket(CHAT_TYPE_COMMAND, "setblockmode %d", m_pointsInstant.bBlockMode);
@@ -6082,18 +6082,18 @@ bool CHARACTER::IsGuardNPC() const
 	return IsNPC() && (GetRaceNum() == 11000 || GetRaceNum() == 11002 || GetRaceNum() == 11004);
 }
 
-int CHARACTER::GetPolymorphPower() const
+int32_t CHARACTER::GetPolymorphPower() const
 {
 	if (test_server)
 	{
-		int value = quest::CQuestManager::instance().GetEventFlag("poly");
+		int32_t value = quest::CQuestManager::instance().GetEventFlag("poly");
 		if (value)
 			return value;
 	}
 	return aiPolymorphPowerByLevel[MINMAX(0, GetSkillLevel(SKILL_POLYMORPH), 40)];
 }
 
-void CHARACTER::SetPolymorph(DWORD dwRaceNum, bool bMaintainStat)
+void CHARACTER::SetPolymorph(uint32_t dwRaceNum, bool bMaintainStat)
 {
 #ifdef ENABLE_WOLFMAN_CHARACTER
 	if (dwRaceNum < MAIN_RACE_MAX_NUM)
@@ -6142,7 +6142,7 @@ void CHARACTER::SetPolymorph(DWORD dwRaceNum, bool bMaintainStat)
 	ComputeBattlePoints();
 }
 
-int CHARACTER::GetQuestFlag(const std::string& flag) const
+int32_t CHARACTER::GetQuestFlag(const std::string& flag) const
 {
 	quest::CQuestManager& q = quest::CQuestManager::instance();
 	quest::PC* pPC = q.GetPC(GetPlayerID());
@@ -6155,7 +6155,7 @@ int CHARACTER::GetQuestFlag(const std::string& flag) const
 	return pPC->GetFlag(flag);
 }
 
-void CHARACTER::SetQuestFlag(const std::string& flag, int value)
+void CHARACTER::SetQuestFlag(const std::string& flag, int32_t value)
 {
 	quest::CQuestManager& q = quest::CQuestManager::instance();
 	quest::PC* pPC = q.GetPC(GetPlayerID());
@@ -6178,7 +6178,7 @@ void CHARACTER::DetermineDropMetinStone()
 	}
 #endif
 
-	static const DWORD c_adwMetin[] =
+	static const uint32_t c_adwMetin[] =
 	{
 #if defined(ENABLE_WOLFMAN_CHARACTER) && defined(USE_WOLFMAN_STONES)
 		28012,
@@ -6202,8 +6202,8 @@ void CHARACTER::DetermineDropMetinStone()
 		28045,
 #endif
 	};
-	DWORD stone_num = GetRaceNum();
-	int idx = std::lower_bound(aStoneDrop, aStoneDrop+STONE_INFO_MAX_NUM, stone_num) - aStoneDrop;
+	uint32_t stone_num = GetRaceNum();
+	int32_t idx = std::lower_bound(aStoneDrop, aStoneDrop+STONE_INFO_MAX_NUM, stone_num) - aStoneDrop;
 	if (idx >= STONE_INFO_MAX_NUM || aStoneDrop[idx].dwMobVnum != stone_num)
 	{
 		m_dwDropMetinStone = 0;
@@ -6213,11 +6213,11 @@ void CHARACTER::DetermineDropMetinStone()
 		const SStoneDropInfo & info = aStoneDrop[idx];
 		m_bDropMetinStonePct = info.iDropPct;
 		{
-			m_dwDropMetinStone = c_adwMetin[number(0, sizeof(c_adwMetin)/sizeof(DWORD) - 1)];
-			int iGradePct = number(1, 100);
-			for (int iStoneLevel = 0; iStoneLevel < STONE_LEVEL_MAX_NUM; iStoneLevel ++)
+			m_dwDropMetinStone = c_adwMetin[number(0, sizeof(c_adwMetin)/sizeof(uint32_t) - 1)];
+			int32_t iGradePct = number(1, 100);
+			for (int32_t iStoneLevel = 0; iStoneLevel < STONE_LEVEL_MAX_NUM; iStoneLevel ++)
 			{
-				int iLevelGradePortion = info.iLevelPct[iStoneLevel];
+				int32_t iLevelGradePortion = info.iLevelPct[iStoneLevel];
 				if (iGradePct <= iLevelGradePortion)
 				{
 					break;
@@ -6237,7 +6237,7 @@ void CHARACTER::SendEquipment(LPCHARACTER ch)
 	TPacketViewEquip p;
 	p.header = HEADER_GC_VIEW_EQUIP;
 	p.vid    = GetVID();
-	for (int i = 0; i<WEAR_MAX_NUM; i++)
+	for (int32_t i = 0; i<WEAR_MAX_NUM; i++)
 	{
 		LPITEM item = GetWear(i);
 		if (item)
@@ -6256,13 +6256,13 @@ void CHARACTER::SendEquipment(LPCHARACTER ch)
 	ch->GetDesc()->Packet(&p, sizeof(p));
 }
 
-bool CHARACTER::CanSummon(int iLeaderShip)
+bool CHARACTER::CanSummon(int32_t iLeaderShip)
 {
 	return ((iLeaderShip >= 20) || ((iLeaderShip >= 12) && ((m_dwLastDeadTime + 180) > get_dword_time())));
 }
 
 
-void CHARACTER::MountVnum(DWORD vnum)
+void CHARACTER::MountVnum(uint32_t vnum)
 {
 	if (m_dwMountVnum == vnum)
 		return;
@@ -6370,7 +6370,7 @@ namespace {
 				if (!pkChr->IsPC())
 					return;
 
-				int iDist = DISTANCE_APPROX(pkChr->GetX() - m_lX, pkChr->GetY() - m_lY);
+				int32_t iDist = DISTANCE_APPROX(pkChr->GetX() - m_lX, pkChr->GetY() - m_lY);
 
 				if (iDist > 300)
 					return;
@@ -6396,19 +6396,19 @@ namespace {
 			bool m_bInvalid;
 			bool m_bUseWarp;
 
-			long m_lX;
-			long m_lY;
-			long m_lTargetX;
-			long m_lTargetY;
+			int32_t m_lX;
+			int32_t m_lY;
+			int32_t m_lTargetX;
+			int32_t m_lTargetY;
 
-			BYTE m_bEmpire;
+			uint8_t m_bEmpire;
 	};
 }
 
 EVENTFUNC(warp_npc_event)
 {
 	char_event_info* info = dynamic_cast<char_event_info*>( event->info );
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "warp_npc_event> <Factor> Null pointer" );
 		return 0;
@@ -6416,13 +6416,13 @@ EVENTFUNC(warp_npc_event)
 
 	LPCHARACTER	ch = info->ch;
 
-	if (ch == NULL) { // <Factor>
+	if (ch == nullptr) { // <Factor>
 		return 0;
 	}	
 
 	if (!ch->GetSectree())
 	{
-		ch->m_pkWarpNPCEvent = NULL;
+		ch->m_pkWarpNPCEvent = nullptr;
 		return 0;
 	}
 
@@ -6480,7 +6480,7 @@ void CHARACTER::SetMarryPartner(LPCHARACTER ch)
 	m_pkChrMarried = ch;
 }
 
-int CHARACTER::GetMarriageBonus(DWORD dwItemVnum, bool bSum)
+int32_t CHARACTER::GetMarriageBonus(uint32_t dwItemVnum, bool bSum)
 {
 	if (IsNPC())
 		return 0;
@@ -6493,7 +6493,7 @@ int CHARACTER::GetMarriageBonus(DWORD dwItemVnum, bool bSum)
 	return pMarriage->GetBonus(dwItemVnum, bSum, this);
 }
 
-void CHARACTER::ConfirmWithMsg(const char* szMsg, int iTimeout, DWORD dwRequestPID)
+void CHARACTER::ConfirmWithMsg(const char* szMsg, int32_t iTimeout, uint32_t dwRequestPID)
 {
 	if (!IsPC())
 		return;
@@ -6508,7 +6508,7 @@ void CHARACTER::ConfirmWithMsg(const char* szMsg, int iTimeout, DWORD dwRequestP
 	GetDesc()->Packet(&p, sizeof(p));
 }
 
-int CHARACTER::GetPremiumRemainSeconds(BYTE bType) const
+int32_t CHARACTER::GetPremiumRemainSeconds(uint8_t bType) const
 {
 	if (bType >= PREMIUM_MAX_NUM)
 		return 0;
@@ -6516,12 +6516,12 @@ int CHARACTER::GetPremiumRemainSeconds(BYTE bType) const
 	return m_aiPremiumTimes[bType] - get_global_time();
 }
 
-bool CHARACTER::WarpToPID(DWORD dwPID)
+bool CHARACTER::WarpToPID(uint32_t dwPID)
 {
 	LPCHARACTER victim;
 	if ((victim = (CHARACTER_MANAGER::instance().FindByPID(dwPID))))
 	{
-		int mapIdx = victim->GetMapIndex();
+		int32_t mapIdx = victim->GetMapIndex();
 		if (IS_SUMMONABLE_ZONE(mapIdx))
 		{
 			if (CAN_ENTER_ZONE(this, mapIdx))
@@ -6590,15 +6590,15 @@ CGuild* CHARACTER::GetRefineGuild() const
 {
 	LPCHARACTER chRefineNPC = CHARACTER_MANAGER::instance().Find(m_dwRefineNPCVID);
 
-	return (chRefineNPC ? chRefineNPC->GetGuild() : NULL);
+	return (chRefineNPC ? chRefineNPC->GetGuild() : nullptr);
 }
 
 bool CHARACTER::IsRefineThroughGuild() const
 {
-	return GetRefineGuild() != NULL;
+	return GetRefineGuild() != nullptr;
 }
 
-int CHARACTER::ComputeRefineFee(int iCost, int iMultiply) const
+int32_t CHARACTER::ComputeRefineFee(int32_t iCost, int32_t iMultiply) const
 {
 	CGuild* pGuild = GetRefineGuild();
 	if (pGuild)
@@ -6617,12 +6617,12 @@ int CHARACTER::ComputeRefineFee(int iCost, int iMultiply) const
 		return iCost;
 }
 
-void CHARACTER::PayRefineFee(int iTotalMoney)
+void CHARACTER::PayRefineFee(int32_t iTotalMoney)
 {
-	int iFee = iTotalMoney / 10;
+	int32_t iFee = iTotalMoney / 10;
 	CGuild* pGuild = GetRefineGuild();
 
-	int iRemain = iTotalMoney;
+	int32_t iRemain = iTotalMoney;
 
 	if (pGuild)
 	{
@@ -6639,9 +6639,9 @@ void CHARACTER::PayRefineFee(int iTotalMoney)
 // END_OF_ADD_REFINE_BUILDING
 
 //Hack 방지를 위한 체크.
-bool CHARACTER::IsHack(bool bSendMsg, bool bCheckShopOwner, int limittime)
+bool CHARACTER::IsHack(bool bSendMsg, bool bCheckShopOwner, int32_t limittime)
 {
-	const int iPulse = thecore_pulse();
+	const int32_t iPulse = thecore_pulse();
 
 	if (test_server)
 		bSendMsg = true;
@@ -6764,7 +6764,7 @@ ESex GET_SEX(LPCHARACTER ch)
 	return SEX_MALE;
 }
 
-int CHARACTER::GetHPPct() const
+int32_t CHARACTER::GetHPPct() const
 {
 	if (GetMaxHP() <= 0) // @fixme136
 		return 0;
@@ -6773,7 +6773,7 @@ int CHARACTER::GetHPPct() const
 
 bool CHARACTER::IsBerserk() const
 {
-	if (m_pkMobInst != NULL)
+	if (m_pkMobInst != nullptr)
 		return m_pkMobInst->m_IsBerserk;
 	else
 		return false;
@@ -6781,13 +6781,13 @@ bool CHARACTER::IsBerserk() const
 
 void CHARACTER::SetBerserk(bool mode)
 {
-	if (m_pkMobInst != NULL)
+	if (m_pkMobInst != nullptr)
 		m_pkMobInst->m_IsBerserk = mode;
 }
 
 bool CHARACTER::IsGodSpeed() const
 {
-	if (m_pkMobInst != NULL)
+	if (m_pkMobInst != nullptr)
 	{
 		return m_pkMobInst->m_IsGodSpeed;
 	}
@@ -6799,7 +6799,7 @@ bool CHARACTER::IsGodSpeed() const
 
 void CHARACTER::SetGodSpeed(bool mode)
 {
-	if (m_pkMobInst != NULL)
+	if (m_pkMobInst != nullptr)
 	{
 		m_pkMobInst->m_IsGodSpeed = mode;
 
@@ -6830,7 +6830,7 @@ struct FFindReviver
 {
 	FFindReviver()
 	{
-		pChar = NULL;
+		pChar = nullptr;
 		HasReviver = false;
 	}
 	
@@ -6859,7 +6859,7 @@ bool CHARACTER::HasReviverInParty() const
 {
 	LPPARTY party = GetParty();
 
-	if (party != NULL)
+	if (party != nullptr)
 	{
 		if (party->GetMemberCount() == 1) return false;
 
@@ -6873,7 +6873,7 @@ bool CHARACTER::HasReviverInParty() const
 
 bool CHARACTER::IsRevive() const
 {
-	if (m_pkMobInst != NULL)
+	if (m_pkMobInst != nullptr)
 	{
 		return m_pkMobInst->m_IsRevive;
 	}
@@ -6883,7 +6883,7 @@ bool CHARACTER::IsRevive() const
 
 void CHARACTER::SetRevive(bool mode)
 {
-	if (m_pkMobInst != NULL)
+	if (m_pkMobInst != nullptr)
 	{
 		m_pkMobInst->m_IsRevive = mode;
 	}
@@ -6894,7 +6894,7 @@ void CHARACTER::SetRevive(bool mode)
 EVENTFUNC(check_speedhack_event)
 {
 	char_event_info* info = dynamic_cast<char_event_info*>( event->info );
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "check_speedhack_event> <Factor> Null pointer" );
 		return 0;
@@ -6902,7 +6902,7 @@ EVENTFUNC(check_speedhack_event)
 
 	LPCHARACTER	ch = info->ch;
 
-	if (NULL == ch || ch->IsNPC())
+	if (nullptr == ch || ch->IsNPC())
 		return 0;
 
 	if (IS_SPEED_HACK_PLAYER(ch))
@@ -6948,11 +6948,11 @@ void CHARACTER::GoHome()
 
 void CHARACTER::SendGuildName(CGuild* pGuild)
 {
-	if (NULL == pGuild) return;
+	if (nullptr == pGuild) return;
 
 	DESC	*desc = GetDesc();
 
-	if (NULL == desc) return;
+	if (nullptr == desc) return;
 	if (m_known_guild.find(pGuild->GetID()) != m_known_guild.end()) return;
 
 	m_known_guild.insert(pGuild->GetID());
@@ -6969,7 +6969,7 @@ void CHARACTER::SendGuildName(CGuild* pGuild)
 	desc->Packet(&pack, sizeof(pack));
 }
 
-void CHARACTER::SendGuildName(DWORD dwGuildID)
+void CHARACTER::SendGuildName(uint32_t dwGuildID)
 {
 	SendGuildName(CGuildManager::instance().FindGuild(dwGuildID));
 }
@@ -6977,14 +6977,14 @@ void CHARACTER::SendGuildName(DWORD dwGuildID)
 EVENTFUNC(destroy_when_idle_event)
 {
 	char_event_info* info = dynamic_cast<char_event_info*>( event->info );
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "destroy_when_idle_event> <Factor> Null pointer" );
 		return 0;
 	}
 
 	LPCHARACTER ch = info->ch;
-	if (ch == NULL) { // <Factor>
+	if (ch == nullptr) { // <Factor>
 		return 0;
 	}	
 
@@ -6995,7 +6995,7 @@ EVENTFUNC(destroy_when_idle_event)
 
 	sys_log(1, "DESTROY_WHEN_IDLE: %s", ch->GetName());
 
-	ch->m_pkDestroyWhenIdleEvent = NULL;
+	ch->m_pkDestroyWhenIdleEvent = nullptr;
 	M2_DESTROY_CHARACTER(ch);
 	return 0;
 }
@@ -7012,42 +7012,42 @@ void CHARACTER::StartDestroyWhenIdleEvent()
 	m_pkDestroyWhenIdleEvent = event_create(destroy_when_idle_event, info, PASSES_PER_SEC(300));
 }
 
-void CHARACTER::SetComboSequence(BYTE seq)
+void CHARACTER::SetComboSequence(uint8_t seq)
 {
 	m_bComboSequence = seq;
 }
 
-BYTE CHARACTER::GetComboSequence() const
+uint8_t CHARACTER::GetComboSequence() const
 {
 	return m_bComboSequence;
 }
 
-void CHARACTER::SetLastComboTime(DWORD time)
+void CHARACTER::SetLastComboTime(uint32_t time)
 {
 	m_dwLastComboTime = time;
 }
 
-DWORD CHARACTER::GetLastComboTime() const
+uint32_t CHARACTER::GetLastComboTime() const
 {
 	return m_dwLastComboTime;
 }
 
-void CHARACTER::SetValidComboInterval(int interval)
+void CHARACTER::SetValidComboInterval(int32_t interval)
 {
 	m_iValidComboInterval = interval;
 }
 
-int CHARACTER::GetValidComboInterval() const
+int32_t CHARACTER::GetValidComboInterval() const
 {
 	return m_iValidComboInterval;
 }
 
-BYTE CHARACTER::GetComboIndex() const
+uint8_t CHARACTER::GetComboIndex() const
 {
 	return m_bComboIndex;
 }
 
-void CHARACTER::IncreaseComboHackCount(int k)
+void CHARACTER::IncreaseComboHackCount(int32_t k)
 {
 	m_iComboHackCount += k;
 
@@ -7067,12 +7067,12 @@ void CHARACTER::ResetComboHackCount()
 	m_iComboHackCount = 0;
 }
 
-void CHARACTER::SkipComboAttackByTime(int interval)
+void CHARACTER::SkipComboAttackByTime(int32_t interval)
 {
 	m_dwSkipComboAttackByTime = get_dword_time() + interval;
 }
 
-DWORD CHARACTER::GetSkipComboAttackByTime() const
+uint32_t CHARACTER::GetSkipComboAttackByTime() const
 {
 	return m_dwSkipComboAttackByTime;
 }
@@ -7082,12 +7082,12 @@ void CHARACTER::ResetChatCounter()
 	m_bChatCounter = 0;
 }
 
-BYTE CHARACTER::IncreaseChatCounter()
+uint8_t CHARACTER::IncreaseChatCounter()
 {
 	return ++m_bChatCounter;
 }
 
-BYTE CHARACTER::GetChatCounter() const
+uint8_t CHARACTER::GetChatCounter() const
 {
 	return m_bChatCounter;
 }
@@ -7100,8 +7100,8 @@ bool CHARACTER::IsRiding() const
 
 bool CHARACTER::CanWarp() const
 {
-	const int iPulse = thecore_pulse();
-	const int limit_time = PASSES_PER_SEC(g_nPortalLimitTime);
+	const int32_t iPulse = thecore_pulse();
+	const int32_t limit_time = PASSES_PER_SEC(g_nPortalLimitTime);
 
 	if ((iPulse - GetSafeboxLoadTime()) < limit_time)
 		return false;
@@ -7121,7 +7121,7 @@ bool CHARACTER::CanWarp() const
 	return true;
 }
 
-DWORD CHARACTER::GetNextExp() const
+uint32_t CHARACTER::GetNextExp() const
 {
 	if (PLAYER_MAX_LEVEL_CONST < GetLevel())
 		return 2500000000u;
@@ -7129,7 +7129,7 @@ DWORD CHARACTER::GetNextExp() const
 		return exp_table[GetLevel()];
 }
 
-int	CHARACTER::GetSkillPowerByLevel(int level, bool bMob) const
+int32_t	CHARACTER::GetSkillPowerByLevel(int32_t level, bool bMob) const
 {
 	return CTableBySkill::instance().GetSkillPowerByLevelFromType(GetJob(), GetSkillGroup(), MINMAX(0, level, SKILL_MAX_LEVEL), bMob); 
 }
@@ -7218,17 +7218,17 @@ void CHARACTER::ClearAcceMaterials()
 {
 	LPITEM * pkItemMaterial;
 	pkItemMaterial = GetAcceMaterials();
-	for (int i = 0; i < ACCE_WINDOW_MAX_MATERIALS; ++i)
+	for (int32_t i = 0; i < ACCE_WINDOW_MAX_MATERIALS; ++i)
 	{
 		if (!pkItemMaterial[i])
 			continue;
 
 		pkItemMaterial[i]->Lock(false);
-		pkItemMaterial[i] = NULL;
+		pkItemMaterial[i] = nullptr;
 	}
 }
 
-bool CHARACTER::AcceIsSameGrade(long lGrade)
+bool CHARACTER::AcceIsSameGrade(int32_t lGrade)
 {
 	LPITEM * pkItemMaterial;
 	pkItemMaterial = GetAcceMaterials();
@@ -7239,9 +7239,9 @@ bool CHARACTER::AcceIsSameGrade(long lGrade)
 	return bReturn;
 }
 
-DWORD CHARACTER::GetAcceCombinePrice(long lGrade)
+uint32_t CHARACTER::GetAcceCombinePrice(int32_t lGrade)
 {
-	DWORD dwPrice = 0;
+	uint32_t dwPrice = 0;
 	switch (lGrade)
 	{
 	case 2:
@@ -7269,11 +7269,11 @@ DWORD CHARACTER::GetAcceCombinePrice(long lGrade)
 	return dwPrice;
 }
 
-BYTE CHARACTER::CheckEmptyMaterialSlot()
+uint8_t CHARACTER::CheckEmptyMaterialSlot()
 {
 	LPITEM * pkItemMaterial;
 	pkItemMaterial = GetAcceMaterials();
-	for (int i = 0; i < ACCE_WINDOW_MAX_MATERIALS; ++i)
+	for (int32_t i = 0; i < ACCE_WINDOW_MAX_MATERIALS; ++i)
 	{
 		if (!pkItemMaterial[i])
 			return i;
@@ -7282,7 +7282,7 @@ BYTE CHARACTER::CheckEmptyMaterialSlot()
 	return 255;
 }
 
-void CHARACTER::GetAcceCombineResult(DWORD & dwItemVnum, DWORD & dwMinAbs, DWORD & dwMaxAbs)
+void CHARACTER::GetAcceCombineResult(uint32_t & dwItemVnum, uint32_t & dwMinAbs, uint32_t & dwMaxAbs)
 {
 	LPITEM * pkItemMaterial;
 	pkItemMaterial = GetAcceMaterials();
@@ -7291,17 +7291,17 @@ void CHARACTER::GetAcceCombineResult(DWORD & dwItemVnum, DWORD & dwMinAbs, DWORD
 	{
 		if ((pkItemMaterial[0]) && (pkItemMaterial[1]))
 		{
-			long lVal = pkItemMaterial[0]->GetValue(ACCE_GRADE_VALUE_FIELD);
+			int32_t lVal = pkItemMaterial[0]->GetValue(ACCE_GRADE_VALUE_FIELD);
 			if (lVal == 4)
 			{
 				dwItemVnum = pkItemMaterial[0]->GetOriginalVnum();
 				dwMinAbs = pkItemMaterial[0]->GetSocket(ACCE_ABSORPTION_SOCKET);
-				DWORD dwMaxAbsCalc = (dwMinAbs + ACCE_GRADE_4_ABS_RANGE > ACCE_GRADE_4_ABS_MAX ? ACCE_GRADE_4_ABS_MAX : (dwMinAbs + ACCE_GRADE_4_ABS_RANGE));
+				uint32_t dwMaxAbsCalc = (dwMinAbs + ACCE_GRADE_4_ABS_RANGE > ACCE_GRADE_4_ABS_MAX ? ACCE_GRADE_4_ABS_MAX : (dwMinAbs + ACCE_GRADE_4_ABS_RANGE));
 				dwMaxAbs = dwMaxAbsCalc;
 			}
 			else
 			{
-				DWORD dwMaskVnum = pkItemMaterial[0]->GetOriginalVnum();
+				uint32_t dwMaskVnum = pkItemMaterial[0]->GetOriginalVnum();
 				TItemTable * pTable = ITEM_MANAGER::instance().GetTable(dwMaskVnum + 1);
 				if (pTable)
 					dwMaskVnum += 1;
@@ -7354,7 +7354,7 @@ void CHARACTER::GetAcceCombineResult(DWORD & dwItemVnum, DWORD & dwMinAbs, DWORD
 	}
 }
 
-void CHARACTER::AddAcceMaterial(TItemPos tPos, BYTE bPos)
+void CHARACTER::AddAcceMaterial(TItemPos tPos, uint8_t bPos)
 {
 	if (bPos >= ACCE_WINDOW_MAX_MATERIALS)
 	{
@@ -7430,7 +7430,7 @@ void CHARACTER::AddAcceMaterial(TItemPos tPos, BYTE bPos)
 	pkItemMaterial[bPos] = pkItem;
 	pkItemMaterial[bPos]->Lock(true);
 
-	DWORD dwItemVnum, dwMinAbs, dwMaxAbs;
+	uint32_t dwItemVnum, dwMinAbs, dwMaxAbs;
 	GetAcceCombineResult(dwItemVnum, dwMinAbs, dwMaxAbs);
 
 	TPacketAcce sPacket;
@@ -7446,7 +7446,7 @@ void CHARACTER::AddAcceMaterial(TItemPos tPos, BYTE bPos)
 	GetDesc()->Packet(&sPacket, sizeof(TPacketAcce));
 }
 
-void CHARACTER::RemoveAcceMaterial(BYTE bPos)
+void CHARACTER::RemoveAcceMaterial(uint8_t bPos)
 {
 	if (bPos >= ACCE_WINDOW_MAX_MATERIALS)
 		return;
@@ -7454,14 +7454,14 @@ void CHARACTER::RemoveAcceMaterial(BYTE bPos)
 	LPITEM * pkItemMaterial;
 	pkItemMaterial = GetAcceMaterials();
 
-	DWORD dwPrice = 0;
+	uint32_t dwPrice = 0;
 
 	if (bPos == 1)
 	{
 		if (pkItemMaterial[bPos])
 		{
 			pkItemMaterial[bPos]->Lock(false);
-			pkItemMaterial[bPos] = NULL;
+			pkItemMaterial[bPos] = nullptr;
 		}
 
 		if (pkItemMaterial[0])
@@ -7487,14 +7487,14 @@ void CHARACTER::RemoveAcceMaterial(BYTE bPos)
 	GetDesc()->Packet(&sPacket, sizeof(TPacketAcce));
 }
 
-BYTE CHARACTER::CanRefineAcceMaterials()
+uint8_t CHARACTER::CanRefineAcceMaterials()
 {
-	BYTE bReturn = 0;
+	uint8_t bReturn = 0;
 	LPITEM * pkItemMaterial;
 	pkItemMaterial = GetAcceMaterials();
 	if (m_bAcceCombination)
 	{
-		for (int i = 0; i < ACCE_WINDOW_MAX_MATERIALS; ++i)
+		for (int32_t i = 0; i < ACCE_WINDOW_MAX_MATERIALS; ++i)
 		{
 			if (pkItemMaterial[i])
 			{
@@ -7539,21 +7539,21 @@ BYTE CHARACTER::CanRefineAcceMaterials()
 
 void CHARACTER::RefineAcceMaterials()
 {
-	BYTE bCan = CanRefineAcceMaterials();
+	uint8_t bCan = CanRefineAcceMaterials();
 	if (bCan == 0)
 		return;
 
 	LPITEM * pkItemMaterial;
 	pkItemMaterial = GetAcceMaterials();
 
-	DWORD dwItemVnum, dwMinAbs, dwMaxAbs;
+	uint32_t dwItemVnum, dwMinAbs, dwMaxAbs;
 	GetAcceCombineResult(dwItemVnum, dwMinAbs, dwMaxAbs);
-	DWORD dwPrice = GetAcceCombinePrice(pkItemMaterial[0]->GetValue(ACCE_GRADE_VALUE_FIELD));
+	uint32_t dwPrice = GetAcceCombinePrice(pkItemMaterial[0]->GetValue(ACCE_GRADE_VALUE_FIELD));
 
 	if (bCan == 1)
 	{
-		int iSuccessChance = 0;
-		long lVal = pkItemMaterial[0]->GetValue(ACCE_GRADE_VALUE_FIELD);
+		int32_t iSuccessChance = 0;
+		int32_t lVal = pkItemMaterial[0]->GetValue(ACCE_GRADE_VALUE_FIELD);
 		switch (lVal)
 		{
 		case 2:
@@ -7584,7 +7584,7 @@ void CHARACTER::RefineAcceMaterials()
 			return;
 		}
 
-		int iChance = number(1, 100);
+		int32_t iChance = number(1, 100);
 		bool bSucces = (iChance <= iSuccessChance ? true : false);
 		if (bSucces)
 		{
@@ -7597,14 +7597,14 @@ void CHARACTER::RefineAcceMaterials()
 
 			ITEM_MANAGER::CopyAllAttrTo(pkItemMaterial[0], pkItem);
 			LogManager::instance().ItemLog(this, pkItem, "COMBINE SUCCESS", pkItem->GetName());
-			DWORD dwAbs = (dwMinAbs == dwMaxAbs ? dwMinAbs : number(dwMinAbs + 1, dwMaxAbs));
+			uint32_t dwAbs = (dwMinAbs == dwMaxAbs ? dwMinAbs : number(dwMinAbs + 1, dwMaxAbs));
 			pkItem->SetSocket(ACCE_ABSORPTION_SOCKET, dwAbs);
 			pkItem->SetSocket(ACCE_ABSORBED_SOCKET, pkItemMaterial[0]->GetSocket(ACCE_ABSORBED_SOCKET));
 
 			PointChange(POINT_GOLD, -dwPrice);
 			DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, pkItemMaterial[0]->GetVnum(), -dwPrice);
 
-			WORD wCell = pkItemMaterial[0]->GetCell();
+			uint16_t wCell = pkItemMaterial[0]->GetCell();
 			ITEM_MANAGER::instance().RemoveItem(pkItemMaterial[0], "COMBINE (REFINE SUCCESS)");
 			ITEM_MANAGER::instance().RemoveItem(pkItemMaterial[1], "COMBINE (REFINE SUCCESS)");
 
@@ -7636,7 +7636,7 @@ void CHARACTER::RefineAcceMaterials()
 
 			LogManager::instance().AcceLog(GetPlayerID(), GetX(), GetY(), dwItemVnum, 0, 0, 0, 0);
 
-			pkItemMaterial[1] = NULL;
+			pkItemMaterial[1] = nullptr;
 		}
 
 		TItemPos tPos;
@@ -7664,7 +7664,7 @@ void CHARACTER::RefineAcceMaterials()
 		pkItemMaterial[1]->CopyAttributeTo(pkItemMaterial[0]);
 		LogManager::instance().ItemLog(this, pkItemMaterial[0], "ABSORB (REFINE SUCCESS)", pkItemMaterial[0]->GetName());
 		pkItemMaterial[0]->SetSocket(ACCE_ABSORBED_SOCKET, pkItemMaterial[1]->GetOriginalVnum());
-		for (int i = 0; i < ITEM_ATTRIBUTE_MAX_NUM; ++i)
+		for (int32_t i = 0; i < ITEM_ATTRIBUTE_MAX_NUM; ++i)
 		{
 			if (pkItemMaterial[0]->GetAttributeValue(i) < 0)
 				pkItemMaterial[0]->SetForceAttribute(i, pkItemMaterial[0]->GetAttributeType(i), 0);
@@ -7710,7 +7710,7 @@ bool CHARACTER::CleanAcceAttr(LPITEM pkItem, LPITEM pkTarget)
 		return false;
 
 	pkTarget->SetSocket(ACCE_ABSORBED_SOCKET, 0);
-	for (int i = 0; i < ITEM_ATTRIBUTE_MAX_NUM; ++i)
+	for (int32_t i = 0; i < ITEM_ATTRIBUTE_MAX_NUM; ++i)
 		pkTarget->SetForceAttribute(i, 0, 0);
 
 	pkItem->SetCount(pkItem->GetCount() - 1);

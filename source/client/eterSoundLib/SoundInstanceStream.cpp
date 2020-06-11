@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SoundInstance.h"
 
-CSoundInstanceStream::CSoundInstanceStream() : m_stream(NULL)
+CSoundInstanceStream::CSoundInstanceStream() : m_stream(nullptr)
 {
 }
 
@@ -12,10 +12,10 @@ CSoundInstanceStream::~CSoundInstanceStream()
 
 void CSoundInstanceStream::Destroy()
 {
-	if (m_stream != NULL)
+	if (m_stream != nullptr)
 	{
 		AIL_close_stream(m_stream);
-		m_stream = NULL;
+		m_stream = nullptr;
 	}
 }
 
@@ -42,7 +42,7 @@ bool CSoundInstanceStream::IsData() const
 	return false;
 }
 
-void CSoundInstanceStream::Play(int count, DWORD dwPlayCycleTimeLimit) const
+void CSoundInstanceStream::Play(int32_t count, uint32_t dwPlayCycleTimeLimit) const
 {
 	if (!IsData())
 		return;
@@ -73,7 +73,7 @@ void CSoundInstanceStream::Stop()
 		return;
 
 	AIL_close_stream(m_stream);
-	m_stream = NULL;
+	m_stream = nullptr;
 }
 
 void CSoundInstanceStream::GetVolume(float& rfVolume) const

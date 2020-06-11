@@ -80,12 +80,12 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		virtual ~CPythonNetworkStream();
 		
 		void StartGame();
-		void Warp(LONG lGlobalX, LONG lGlobalY);
+		void Warp(int32_t lGlobalX, int32_t lGlobalY);
 		
 		void NotifyHack(const char* c_szMsg);		
 		void SetWaitFlag();
 
-		void SendEmoticon(UINT eEmoticon);
+		void SendEmoticon(uint32_t eEmoticon);
 
 		void ExitApplication();
 		void ExitGame();
@@ -97,16 +97,16 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool IsChatInsultIn(const char* c_szMsg);
 		bool IsInsultIn(const char* c_szMsg);
 
-		DWORD GetGuildID();
+		uint32_t GetGuildID();
 
-		UINT UploadMark(const char* c_szImageFileName);
-		UINT UploadSymbol(const char* c_szImageFileName);
+		uint32_t UploadMark(const char* c_szImageFileName);
+		uint32_t UploadSymbol(const char* c_szImageFileName);
 
 		bool LoadInsultList(const char* c_szInsultListFileName);
-		bool LoadConvertTable(DWORD dwEmpireID, const char* c_szFileName);
+		bool LoadConvertTable(uint32_t dwEmpireID, const char* c_szFileName);
 
-		UINT		GetAccountCharacterSlotDatau(UINT iSlot, UINT eType);
-		const char* GetAccountCharacterSlotDataz(UINT iSlot, UINT eType);
+		uint32_t		GetAccountCharacterSlotDatau(uint32_t iSlot, uint32_t eType);
+		const char* GetAccountCharacterSlotDataz(uint32_t iSlot, uint32_t eType);
 
 		// SUPPORT_BGM
 		const char*		GetFieldMusicFileName();
@@ -117,75 +117,75 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 		void ToggleGameDebugInfo();
 
-		void SetMarkServer(const char* c_szAddr, UINT uPort);
-		void ConnectLoginServer(const char* c_szAddr, UINT uPort);
-		void ConnectGameServer(UINT iChrSlot);
+		void SetMarkServer(const char* c_szAddr, uint32_t uPort);
+		void ConnectLoginServer(const char* c_szAddr, uint32_t uPort);
+		void ConnectGameServer(uint32_t iChrSlot);
 
 		void SetLoginInfo(const char* c_szID, const char* c_szPassword);
-		void SetLoginKey(DWORD dwLoginKey);
+		void SetLoginKey(uint32_t dwLoginKey);
 		void ClearLoginInfo( void );
 
 		void SetHandler(PyObject* poHandler);
-		void SetPhaseWindow(UINT ePhaseWnd, PyObject* poPhaseWnd);
-		void ClearPhaseWindow(UINT ePhaseWnd, PyObject* poPhaseWnd);
+		void SetPhaseWindow(uint32_t ePhaseWnd, PyObject* poPhaseWnd);
+		void ClearPhaseWindow(uint32_t ePhaseWnd, PyObject* poPhaseWnd);
 		void SetServerCommandParserWindow(PyObject* poPhaseWnd);
 
-		bool SendSyncPositionElementPacket(DWORD dwVictimVID, DWORD dwVictimX, DWORD dwVictimY);
+		bool SendSyncPositionElementPacket(uint32_t dwVictimVID, uint32_t dwVictimX, uint32_t dwVictimY);
 
-		bool SendAttackPacket(UINT uMotAttack, DWORD dwVIDVictim);
-		bool SendCharacterStatePacket(const TPixelPosition& c_rkPPosDst, float fDstRot, UINT eFunc, UINT uArg);
-		bool SendUseSkillPacket(DWORD dwSkillIndex, DWORD dwTargetVID=0);
-		bool SendTargetPacket(DWORD dwVID);
+		bool SendAttackPacket(uint32_t uMotAttack, uint32_t dwVIDVictim);
+		bool SendCharacterStatePacket(const TPixelPosition& c_rkPPosDst, float fDstRot, uint32_t eFunc, uint32_t uArg);
+		bool SendUseSkillPacket(uint32_t dwSkillIndex, uint32_t dwTargetVID=0);
+		bool SendTargetPacket(uint32_t dwVID);
 
 		// OLDCODE:
-		bool SendCharacterStartWalkingPacket(float fRotation, long lx, long ly);
-		bool SendCharacterEndWalkingPacket(float fRotation, long lx, long ly);
-		bool SendCharacterCheckWalkingPacket(float fRotation, long lx, long ly);
+		bool SendCharacterStartWalkingPacket(float fRotation, int32_t lx, int32_t ly);
+		bool SendCharacterEndWalkingPacket(float fRotation, int32_t lx, int32_t ly);
+		bool SendCharacterCheckWalkingPacket(float fRotation, int32_t lx, int32_t ly);
 
-		bool SendCharacterPositionPacket(BYTE iPosition);
+		bool SendCharacterPositionPacket(uint8_t iPosition);
 
 		bool SendItemUsePacket(TItemPos pos);
 		bool SendItemUseToItemPacket(TItemPos source_pos, TItemPos target_pos);
-		bool SendItemDropPacket(TItemPos pos, DWORD elk);
-		bool SendItemDropPacketNew(TItemPos pos, DWORD elk, DWORD count);
-		bool SendItemMovePacket(TItemPos pos, TItemPos change_pos, BYTE num);
-		bool SendItemPickUpPacket(DWORD vid);
+		bool SendItemDropPacket(TItemPos pos, uint32_t elk);
+		bool SendItemDropPacketNew(TItemPos pos, uint32_t elk, uint32_t count);
+		bool SendItemMovePacket(TItemPos pos, TItemPos change_pos, uint8_t num);
+		bool SendItemPickUpPacket(uint32_t vid);
 
-		bool SendQuickSlotAddPacket(BYTE wpos, BYTE type, BYTE pos);
-		bool SendQuickSlotDelPacket(BYTE wpos);
-		bool SendQuickSlotMovePacket(BYTE wpos, BYTE change_pos);
+		bool SendQuickSlotAddPacket(uint8_t wpos, uint8_t type, uint8_t pos);
+		bool SendQuickSlotDelPacket(uint8_t wpos);
+		bool SendQuickSlotMovePacket(uint8_t wpos, uint8_t change_pos);
 
 		// PointReset 개 임시
 		bool SendPointResetPacket();
 
 		// Shop
 		bool SendShopEndPacket();
-		bool SendShopBuyPacket(BYTE byCount);
-		bool SendShopSellPacket(BYTE bySlot);
-		bool SendShopSellPacketNew(BYTE bySlot, BYTE byCount);
+		bool SendShopBuyPacket(uint8_t byCount);
+		bool SendShopSellPacket(uint8_t bySlot);
+		bool SendShopSellPacketNew(uint8_t bySlot, uint8_t byCount);
 
 		// Exchange
-		bool SendExchangeStartPacket(DWORD vid);
-		bool SendExchangeItemAddPacket(TItemPos ItemPos, BYTE byDisplayPos);
-		bool SendExchangeElkAddPacket(DWORD elk);
-		bool SendExchangeItemDelPacket(BYTE pos);
+		bool SendExchangeStartPacket(uint32_t vid);
+		bool SendExchangeItemAddPacket(TItemPos ItemPos, uint8_t byDisplayPos);
+		bool SendExchangeElkAddPacket(uint32_t elk);
+		bool SendExchangeItemDelPacket(uint8_t pos);
 		bool SendExchangeAcceptPacket();
 		bool SendExchangeExitPacket();
 
 		// Quest
-		bool SendScriptAnswerPacket(int iAnswer);
-		bool SendScriptButtonPacket(unsigned int iIndex);
+		bool SendScriptAnswerPacket(int32_t iAnswer);
+		bool SendScriptButtonPacket(uint32_t iIndex);
 		bool SendAnswerMakeGuildPacket(const char * c_szName);
 		bool SendQuestInputStringPacket(const char * c_szString);
-		bool SendQuestConfirmPacket(BYTE byAnswer, DWORD dwPID);
+		bool SendQuestConfirmPacket(uint8_t byAnswer, uint32_t dwPID);
 
 		// Event
-		bool SendOnClickPacket(DWORD vid);
+		bool SendOnClickPacket(uint32_t vid);
 
 		// Fly
-		bool SendFlyTargetingPacket(DWORD dwTargetVID, const TPixelPosition& kPPosTarget);
-		bool SendAddFlyTargetingPacket(DWORD dwTargetVID, const TPixelPosition& kPPosTarget);
-		bool SendShootPacket(UINT uSkill);
+		bool SendFlyTargetingPacket(uint32_t dwTargetVID, const TPixelPosition& kPPosTarget);
+		bool SendAddFlyTargetingPacket(uint32_t dwTargetVID, const TPixelPosition& kPPosTarget);
+		bool SendShootPacket(uint32_t uSkill);
 
 		// Command
 		bool ClientCommand(const char * c_szCommand);
@@ -195,39 +195,39 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		void RegisterEmoticonString(const char * pcEmoticonString);
 
 		// Party
-		bool SendPartyInvitePacket(DWORD dwVID);
-		bool SendPartyInviteAnswerPacket(DWORD dwLeaderVID, BYTE byAccept);
-		bool SendPartyRemovePacket(DWORD dwPID);
-		bool SendPartySetStatePacket(DWORD dwVID, BYTE byState, BYTE byFlag);
-		bool SendPartyUseSkillPacket(BYTE bySkillIndex, DWORD dwVID);
-		bool SendPartyParameterPacket(BYTE byDistributeMode);
+		bool SendPartyInvitePacket(uint32_t dwVID);
+		bool SendPartyInviteAnswerPacket(uint32_t dwLeaderVID, uint8_t byAccept);
+		bool SendPartyRemovePacket(uint32_t dwPID);
+		bool SendPartySetStatePacket(uint32_t dwVID, uint8_t byState, uint8_t byFlag);
+		bool SendPartyUseSkillPacket(uint8_t bySkillIndex, uint32_t dwVID);
+		bool SendPartyParameterPacket(uint8_t byDistributeMode);
 
 		// SafeBox
-		bool SendSafeBoxMoneyPacket(BYTE byState, DWORD dwMoney);
-		bool SendSafeBoxCheckinPacket(TItemPos InventoryPos, BYTE bySafeBoxPos);
-		bool SendSafeBoxCheckoutPacket(BYTE bySafeBoxPos, TItemPos InventoryPos);
-		bool SendSafeBoxItemMovePacket(BYTE bySourcePos, BYTE byTargetPos, BYTE byCount);
+		bool SendSafeBoxMoneyPacket(uint8_t byState, uint32_t dwMoney);
+		bool SendSafeBoxCheckinPacket(TItemPos InventoryPos, uint8_t bySafeBoxPos);
+		bool SendSafeBoxCheckoutPacket(uint8_t bySafeBoxPos, TItemPos InventoryPos);
+		bool SendSafeBoxItemMovePacket(uint8_t bySourcePos, uint8_t byTargetPos, uint8_t byCount);
 
 		// Mall
-		bool SendMallCheckoutPacket(BYTE byMallPos, TItemPos InventoryPos);
+		bool SendMallCheckoutPacket(uint8_t byMallPos, TItemPos InventoryPos);
 
 		// Guild
-		bool SendGuildAddMemberPacket(DWORD dwVID);
-		bool SendGuildRemoveMemberPacket(DWORD dwPID);
-		bool SendGuildChangeGradeNamePacket(BYTE byGradeNumber, const char * c_szName);
-		bool SendGuildChangeGradeAuthorityPacket(BYTE byGradeNumber, BYTE byAuthority);
-		bool SendGuildOfferPacket(DWORD dwExperience);
+		bool SendGuildAddMemberPacket(uint32_t dwVID);
+		bool SendGuildRemoveMemberPacket(uint32_t dwPID);
+		bool SendGuildChangeGradeNamePacket(uint8_t byGradeNumber, const char * c_szName);
+		bool SendGuildChangeGradeAuthorityPacket(uint8_t byGradeNumber, uint8_t byAuthority);
+		bool SendGuildOfferPacket(uint32_t dwExperience);
 		bool SendGuildPostCommentPacket(const char * c_szMessage);
-		bool SendGuildDeleteCommentPacket(DWORD dwIndex);
-		bool SendGuildRefreshCommentsPacket(DWORD dwHighestIndex);
-		bool SendGuildChangeMemberGradePacket(DWORD dwPID, BYTE byGrade);
-		bool SendGuildUseSkillPacket(DWORD dwSkillID, DWORD dwTargetVID);
-		bool SendGuildChangeMemberGeneralPacket(DWORD dwPID, BYTE byFlag);
-		bool SendGuildInvitePacket(DWORD dwVID);
-		bool SendGuildInviteAnswerPacket(DWORD dwGuildID, BYTE byAnswer);
-		bool SendGuildChargeGSPPacket(DWORD dwMoney);
-		bool SendGuildDepositMoneyPacket(DWORD dwMoney);
-		bool SendGuildWithdrawMoneyPacket(DWORD dwMoney);
+		bool SendGuildDeleteCommentPacket(uint32_t dwIndex);
+		bool SendGuildRefreshCommentsPacket(uint32_t dwHighestIndex);
+		bool SendGuildChangeMemberGradePacket(uint32_t dwPID, uint8_t byGrade);
+		bool SendGuildUseSkillPacket(uint32_t dwSkillID, uint32_t dwTargetVID);
+		bool SendGuildChangeMemberGeneralPacket(uint32_t dwPID, uint8_t byFlag);
+		bool SendGuildInvitePacket(uint32_t dwVID);
+		bool SendGuildInviteAnswerPacket(uint32_t dwGuildID, uint8_t byAnswer);
+		bool SendGuildChargeGSPPacket(uint32_t dwMoney);
+		bool SendGuildDepositMoneyPacket(uint32_t dwMoney);
+		bool SendGuildWithdrawMoneyPacket(uint32_t dwMoney);
 
 		// Mall
 		bool RecvMallOpenPacket();
@@ -242,18 +242,18 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool RecvDigMotionPacket();
 
 		// Fishing
-		bool SendFishingPacket(int iRotation);
-		bool SendGiveItemPacket(DWORD dwTargetVID, TItemPos ItemPos, int iItemCount);
+		bool SendFishingPacket(int32_t iRotation);
+		bool SendGiveItemPacket(uint32_t dwTargetVID, TItemPos ItemPos, int32_t iItemCount);
 
 		// Private Shop
 		bool SendBuildPrivateShopPacket(const char * c_szName, const std::vector<TShopItemTable> & c_rSellingItemStock);
 
 		// Refine
-		bool SendRefinePacket(BYTE byPos, BYTE byType);
-		bool SendSelectItemPacket(DWORD dwItemPos);
+		bool SendRefinePacket(uint8_t byPos, uint8_t byType);
+		bool SendSelectItemPacket(uint32_t dwItemPos);
 
 		// 용홍석 강화
-		bool SendDragonSoulRefinePacket(BYTE bRefineType, TItemPos* pos);
+		bool SendDragonSoulRefinePacket(uint8_t bRefineType, TItemPos* pos);
 
 		// Handshake
 		bool RecvHandshakePacket();
@@ -265,17 +265,17 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 #endif
 		// ETC
-		DWORD GetMainActorVID();
-		DWORD GetMainActorRace();
-		DWORD GetMainActorEmpire();
-		DWORD GetMainActorSkillGroup();
-		void SetEmpireID(DWORD dwEmpireID);
-		DWORD GetEmpireID();
-		void __TEST_SetSkillGroupFake(int iIndex);
+		uint32_t GetMainActorVID();
+		uint32_t GetMainActorRace();
+		uint32_t GetMainActorEmpire();
+		uint32_t GetMainActorSkillGroup();
+		void SetEmpireID(uint32_t dwEmpireID);
+		uint32_t GetEmpireID();
+		void __TEST_SetSkillGroupFake(int32_t iIndex);
 #ifdef ENABLE_ACCE_SYSTEM
 		bool	SendAcceClosePacket();
-		bool	SendAcceAddPacket(TItemPos tPos, BYTE bPos);
-		bool	SendAcceRemovePacket(BYTE bPos);
+		bool	SendAcceAddPacket(TItemPos tPos, uint8_t bPos);
+		bool	SendAcceRemovePacket(uint8_t bPos);
 		bool	SendAcceRefinePacket();
 #endif
 
@@ -294,21 +294,21 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		// Login Phase
 		bool SendLoginPacket(const char * c_szName, const char * c_szPassword);
 		bool SendLoginPacketNew(const char * c_szName, const char * c_szPassword);
-		bool SendDirectEnterPacket(const char * c_szName, const char * c_szPassword, UINT uChrSlot);
+		bool SendDirectEnterPacket(const char * c_szName, const char * c_szPassword, uint32_t uChrSlot);
 
 		bool SendEnterGame();
 
 		// Select Phase
-		bool SendSelectEmpirePacket(DWORD dwEmpireID);
-		bool SendSelectCharacterPacket(BYTE account_Index);
-		bool SendChangeNamePacket(BYTE index, const char *name);
-		bool SendCreateCharacterPacket(BYTE index, const char *name, BYTE job, BYTE shape, BYTE byStat1, BYTE byStat2, BYTE byStat3, BYTE byStat4);
-		bool SendDestroyCharacterPacket(BYTE index, const char * szPrivateCode);
+		bool SendSelectEmpirePacket(uint32_t dwEmpireID);
+		bool SendSelectCharacterPacket(uint8_t account_Index);
+		bool SendChangeNamePacket(uint8_t index, const char *name);
+		bool SendCreateCharacterPacket(uint8_t index, const char *name, uint8_t job, uint8_t shape, uint8_t byStat1, uint8_t byStat2, uint8_t byStat3, uint8_t byStat4);
+		bool SendDestroyCharacterPacket(uint8_t index, const char * szPrivateCode);
 
 		// Main Game Phase
-		bool SendChatPacket(const char * c_szChat, BYTE byType = CHAT_TYPE_TALKING);
+		bool SendChatPacket(const char * c_szChat, uint8_t byType = CHAT_TYPE_TALKING);
 		bool SendWhisperPacket(const char * name, const char * c_szChat);
-		bool SendMessengerAddByVIDPacket(DWORD vid);
+		bool SendMessengerAddByVIDPacket(uint32_t vid);
 		bool SendMessengerAddByNamePacket(const char * c_szName);
 		bool SendMessengerRemovePacket(const char * c_szKey, const char * c_szName);
 
@@ -324,13 +324,13 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool __IsNotPing();
 
 		void __DownloadMark();
-		void __DownloadSymbol(const std::vector<DWORD> & c_rkVec_dwGuildID);
+		void __DownloadSymbol(const std::vector<uint32_t> & c_rkVec_dwGuildID);
 
 		void __PlayInventoryItemUseSound(TItemPos uSlotPos);
 		void __PlayInventoryItemDropSound(TItemPos uSlotPos);
-		//void __PlayShopItemDropSound(UINT uSlotPos);
-		void __PlaySafeBoxItemDropSound(UINT uSlotPos);
-		void __PlayMallItemDropSound(UINT uSlotPos);
+		//void __PlayShopItemDropSound(uint32_t uSlotPos);
+		void __PlaySafeBoxItemDropSound(uint32_t uSlotPos);
+		void __PlayMallItemDropSound(uint32_t uSlotPos);
 
 		bool __CanActMainInstance();
 
@@ -370,7 +370,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		void __RefreshGuildWindowMemberPageGradeComboBox();
 		void __RefreshGuildWindowSkillPage();
 		void __RefreshGuildWindowGradePage();
-		void __RefreshTargetBoardByVID(DWORD dwVID);
+		void __RefreshTargetBoardByVID(uint32_t dwVID);
 		void __RefreshTargetBoardByName(const char * c_szName);
 		void __RefreshTargetBoard();
 		void __RefreshMallWindow();
@@ -383,9 +383,9 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool RecvObserverMovePacket();
 
 		// Common
-		bool RecvErrorPacket(int header);
+		bool RecvErrorPacket(int32_t header);
 		bool RecvPingPacket();
-		bool RecvDefaultPacket(int header);
+		bool RecvDefaultPacket(int32_t header);
 		bool RecvPhasePacket();
 
 		// Login Phase
@@ -553,11 +553,11 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 	protected:
 		// 이모티콘
-		bool ParseEmoticon(const char * pChatMsg, DWORD * pdwEmoticon);
+		bool ParseEmoticon(const char * pChatMsg, uint32_t * pdwEmoticon);
 
 		// 파이썬으로 보내는 콜들
 		void OnConnectFailure();
-		void OnScriptEventStart(int iSkin, int iIndex);
+		void OnScriptEventStart(int32_t iSkin, int32_t iIndex);
 		
 		void OnRemoteDisconnect();
 		void OnDisconnect();
@@ -571,13 +571,13 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		
 		void __InitializeGamePhase();
 		void __InitializeMarkAuth();
-		void __GlobalPositionToLocalPosition(LONG& rGlobalX, LONG& rGlobalY);
-		void __LocalPositionToGlobalPosition(LONG& rLocalX, LONG& rLocalY);
+		void __GlobalPositionToLocalPosition(int32_t& rGlobalX, int32_t& rGlobalY);
+		void __LocalPositionToGlobalPosition(int32_t& rLocalX, int32_t& rLocalY);
 
 		bool __IsPlayerAttacking();
 		bool __IsEquipItemInSlot(TItemPos Cell);
 
-		void __ShowMapName(LONG lLocalX, LONG lLocalY);
+		void __ShowMapName(int32_t lLocalX, int32_t lLocalY);
 
 		void __LeaveOfflinePhase() {}
 		void __LeaveHandshakePhase() {}
@@ -596,41 +596,41 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		void __RecvCharacterAppendPacket(SNetworkActorData * pkNetActorData);
 		void __RecvCharacterUpdatePacket(SNetworkUpdateActorData * pkNetUpdateActorData);
 
-		void __FilterInsult(char* szLine, UINT uLineLen);
+		void __FilterInsult(char* szLine, uint32_t uLineLen);
 
-		void __SetGuildID(DWORD id);
+		void __SetGuildID(uint32_t id);
 
 	protected:
 		TPacketGCHandshake m_HandshakeData;
-		DWORD m_dwChangingPhaseTime;
-		DWORD m_dwBindupRetryCount;
-		DWORD m_dwMainActorVID;
-		DWORD m_dwMainActorRace;
-		DWORD m_dwMainActorEmpire;
-		DWORD m_dwMainActorSkillGroup;
+		uint32_t m_dwChangingPhaseTime;
+		uint32_t m_dwBindupRetryCount;
+		uint32_t m_dwMainActorVID;
+		uint32_t m_dwMainActorRace;
+		uint32_t m_dwMainActorEmpire;
+		uint32_t m_dwMainActorSkillGroup;
 		BOOL m_isGameOnline;
 		BOOL m_isStartGame;
 
-		DWORD m_dwGuildID;
-		DWORD m_dwEmpireID;
+		uint32_t m_dwGuildID;
+		uint32_t m_dwEmpireID;
 		
 		struct SServerTimeSync
 		{
-			DWORD m_dwChangeServerTime;
-			DWORD m_dwChangeClientTime;
+			uint32_t m_dwChangeServerTime;
+			uint32_t m_dwChangeClientTime;
 		} m_kServerTimeSync;
 
 		void __ServerTimeSync_Initialize();
-		//DWORD m_dwBaseServerTime;
-		//DWORD m_dwBaseClientTime;
+		//uint32_t m_dwBaseServerTime;
+		//uint32_t m_dwBaseClientTime;
 
-		DWORD m_dwLastGamePingTime;
+		uint32_t m_dwLastGamePingTime;
 
 		std::string	m_stID;
 		std::string	m_stPassword;
 		std::string	m_strLastCommand;
 		std::string	m_strPhase;
-		DWORD m_dwLoginKey;
+		uint32_t m_dwLoginKey;
 		BOOL m_isWaitLoginKey;
 
 		std::string m_stMarkIP;
@@ -643,7 +643,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		PyObject*							m_poSerCommandParserWnd;
 
 		TSimplePlayerInformation			m_akSimplePlayerInfo[PLAYER_PER_ACCOUNT4];
-		DWORD								m_adwGuildID[PLAYER_PER_ACCOUNT4];
+		uint32_t								m_adwGuildID[PLAYER_PER_ACCOUNT4];
 		std::string							m_astrGuildName[PLAYER_PER_ACCOUNT4];
 		bool m_bSimplePlayerInfo;
 
@@ -672,7 +672,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		{
 			char acUpper[26];
 			char acLower[26];
-			BYTE aacHan[5000][2];
+			uint8_t aacHan[5000][2];
 		} m_aTextConvTable[3];
 
 
@@ -680,13 +680,13 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		struct SMarkAuth
 		{
 			CNetworkAddress m_kNetAddr;
-			DWORD m_dwHandle;
-			DWORD m_dwRandomKey;
+			uint32_t m_dwHandle;
+			uint32_t m_dwRandomKey;
 		} m_kMarkAuth;
 
 
 
-		DWORD m_dwSelectedCharacterIndex;
+		uint32_t m_dwSelectedCharacterIndex;
 
 		CInsultChecker m_kInsultChecker;
 
@@ -699,26 +699,26 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		struct SDirectEnterMode
 		{
 			bool m_isSet;
-			DWORD m_dwChrSlotIndex;
+			uint32_t m_dwChrSlotIndex;
 		} m_kDirectEnterMode;
 
 		void __DirectEnterMode_Initialize();
-		void __DirectEnterMode_Set(UINT uChrSlotIndex);
+		void __DirectEnterMode_Set(uint32_t uChrSlotIndex);
 		bool __DirectEnterMode_IsSet();
 
 	public:
-		DWORD EXPORT_GetBettingGuildWarValue(const char* c_szValueName);
+		uint32_t EXPORT_GetBettingGuildWarValue(const char* c_szValueName);
 
 	private:
 		struct SBettingGuildWar
 		{
-			DWORD m_dwBettingMoney;
-			DWORD m_dwObserverCount;
+			uint32_t m_dwBettingMoney;
+			uint32_t m_dwObserverCount;
 		} m_kBettingGuildWar;
 
 		CInstanceBase * m_pInstTarget;
 
 		void __BettingGuildWar_Initialize();
-		void __BettingGuildWar_SetObserverCount(UINT uObserverCount);
-		void __BettingGuildWar_SetBettingMoney(UINT uBettingMoney);
+		void __BettingGuildWar_SetObserverCount(uint32_t uObserverCount);
+		void __BettingGuildWar_SetBettingMoney(uint32_t uBettingMoney);
 };

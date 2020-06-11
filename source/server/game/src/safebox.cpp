@@ -9,15 +9,15 @@
 #include "item_manager.h"
 #include "config.h"
 
-CSafebox::CSafebox(LPCHARACTER pkChrOwner, int iSize, DWORD dwGold) : m_pkChrOwner(pkChrOwner), m_iSize(iSize), m_lGold(dwGold)
+CSafebox::CSafebox(LPCHARACTER pkChrOwner, int32_t iSize, uint32_t dwGold) : m_pkChrOwner(pkChrOwner), m_iSize(iSize), m_lGold(dwGold)
 {
-	assert(m_pkChrOwner != NULL);
+	assert(m_pkChrOwner != nullptr);
 	memset(m_pkItems, 0, sizeof(m_pkItems));
 
 	if (m_iSize)
 		m_pkGrid = M2_NEW CGrid(5, m_iSize);
 	else
-		m_pkGrid = NULL;
+		m_pkGrid = nullptr;
 
 	m_bWindowMode = SAFEBOX;
 }
@@ -27,14 +27,14 @@ CSafebox::~CSafebox()
 	__Destroy();
 }
 
-void CSafebox::SetWindowMode(BYTE bMode)
+void CSafebox::SetWindowMode(uint8_t bMode)
 {
 	m_bWindowMode = bMode;
 }
 
 void CSafebox::__Destroy()
 {
-	for (int i = 0; i < SAFEBOX_MAX_NUM; ++i)
+	for (int32_t i = 0; i < SAFEBOX_MAX_NUM; ++i)
 	{
 		if (m_pkItems[i])
 		{
@@ -42,18 +42,18 @@ void CSafebox::__Destroy()
 			ITEM_MANAGER::instance().FlushDelayedSave(m_pkItems[i]);
 
 			M2_DESTROY_ITEM(m_pkItems[i]->RemoveFromCharacter());
-			m_pkItems[i] = NULL;
+			m_pkItems[i] = nullptr;
 		}
 	}
 
 	if (m_pkGrid)
 	{
 		M2_DELETE(m_pkGrid);
-		m_pkGrid = NULL;
+		m_pkGrid = nullptr;
 	}
 }
 
-bool CSafebox::Add(DWORD dwPos, LPITEM pkItem)
+bool CSafebox::Add(uint32_t dwPos, LPITEM pkItem)
 {
 	if (!IsValidPosition(dwPos))
 	{
@@ -85,20 +85,20 @@ bool CSafebox::Add(DWORD dwPos, LPITEM pkItem)
 	return true;
 }
 
-LPITEM CSafebox::Get(DWORD dwPos)
+LPITEM CSafebox::Get(uint32_t dwPos)
 {
 	if (dwPos >= m_pkGrid->GetSize())
-		return NULL;
+		return nullptr;
 
 	return m_pkItems[dwPos];
 }
 
-LPITEM CSafebox::Remove(DWORD dwPos)
+LPITEM CSafebox::Remove(uint32_t dwPos)
 {
 	LPITEM pkItem = Get(dwPos);
 
 	if (!pkItem)
-		return NULL;
+		return nullptr;
 
 	if (!m_pkGrid)
 		sys_err("Safebox::Remove : nil grid");
@@ -107,7 +107,7 @@ LPITEM CSafebox::Remove(DWORD dwPos)
 
 	pkItem->RemoveFromCharacter();
 
-	m_pkItems[dwPos] = NULL;
+	m_pkItems[dwPos] = nullptr;
 
 	TPacketGCItemDel pack;
 
@@ -132,7 +132,7 @@ void CSafebox::Save()
 	sys_log(1, "SAFEBOX: SAVE %s", m_pkChrOwner->GetName());
 }
 
-bool CSafebox::IsEmpty(DWORD dwPos, BYTE bSize)
+bool CSafebox::IsEmpty(uint32_t dwPos, uint8_t bSize)
 {
 	if (!m_pkGrid)
 		return false;
@@ -140,7 +140,7 @@ bool CSafebox::IsEmpty(DWORD dwPos, BYTE bSize)
 	return m_pkGrid->IsEmpty(dwPos, 1, bSize);
 }
 
-void CSafebox::ChangeSize(int iSize)
+void CSafebox::ChangeSize(int32_t iSize)
 {
 	// 현재 사이즈가 인자보다 크면 사이즈를 가만 둔다.
 	if (m_iSize >= iSize)
@@ -159,22 +159,22 @@ void CSafebox::ChangeSize(int iSize)
 		m_pkGrid = M2_NEW CGrid(5, m_iSize);
 }
 
-LPITEM CSafebox::GetItem(BYTE bCell)
+LPITEM CSafebox::GetItem(uint8_t bCell)
 {
 	if (bCell >= 5 * m_iSize)
 	{
 		sys_err("CHARACTER::GetItem: invalid item cell %d", bCell);
-		return NULL;
+		return nullptr;
 	}
 
 	return m_pkItems[bCell];
 }
 
-bool CSafebox::MoveItem(BYTE bCell, BYTE bDestCell, BYTE count)
+bool CSafebox::MoveItem(uint8_t bCell, uint8_t bDestCell, uint8_t count)
 {
 	LPITEM item;
 
-	int max_position = 5 * m_iSize;
+	int32_t max_position = 5 * m_iSize;
 
 	if (bCell >= max_position || bDestCell >= max_position)
 		return false;
@@ -195,7 +195,7 @@ bool CSafebox::MoveItem(BYTE bCell, BYTE bDestCell, BYTE count)
 				!IS_SET(item2->GetAntiFlag(), ITEM_ANTIFLAG_STACK) &&
 				item2->GetVnum() == item->GetVnum()) // 합칠 수 있는 아이템의 경우
 		{
-			for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
+			for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 				if (item2->GetSocket(i) != item->GetSocket(i))
 					return false;
 
@@ -239,7 +239,7 @@ bool CSafebox::MoveItem(BYTE bCell, BYTE bDestCell, BYTE count)
 	return true;
 }
 
-bool CSafebox::IsValidPosition(DWORD dwPos)
+bool CSafebox::IsValidPosition(uint32_t dwPos)
 {
 	if (!m_pkGrid)
 		return false;

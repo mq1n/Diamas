@@ -22,7 +22,7 @@ class CGraphicText : public CResource
 		CGraphicFontTexture *	GetFontTexturePointer();
 
 	protected:
-		bool		OnLoad(int iSize, const void * c_pvBuf);
+		bool		OnLoad(int32_t iSize, const void * c_pvBuf);
 		void		OnClear();
 		bool		OnIsEmpty() const;
 		bool		OnIsType(TType type);		

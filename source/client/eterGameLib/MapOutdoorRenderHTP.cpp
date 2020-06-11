@@ -5,7 +5,7 @@
 
 void CMapOutdoor::__RenderTerrain_RenderHardwareTransformPatch()
 {
-	DWORD dwFogColor;
+	uint32_t dwFogColor;
 	float fFogFarDistance;
 	float fFogNearDistance;
 	if (mc_pEnvironmentData)
@@ -95,11 +95,11 @@ void CMapOutdoor::__RenderTerrain_RenderHardwareTransformPatch()
 	m_iRenderedSplatNum = 0;
 	m_RenderedTextureNumVector.clear();
 
-	std::pair<float, long> fog_far(fFogFarDistance+1600.0f, 0);
-	std::pair<float, long> fog_near(fFogNearDistance-3200.0f, 0);
+	std::pair<float, int32_t> fog_far(fFogFarDistance+1600.0f, 0);
+	std::pair<float, int32_t> fog_near(fFogNearDistance-3200.0f, 0);
 
-	std::vector<std::pair<float ,long> >::iterator far_it = std::upper_bound(m_PatchVector.begin(),m_PatchVector.end(),fog_far);
-	std::vector<std::pair<float ,long> >::iterator near_it = std::upper_bound(m_PatchVector.begin(),m_PatchVector.end(),fog_near);
+	std::vector<std::pair<float ,int32_t> >::iterator far_it = std::upper_bound(m_PatchVector.begin(),m_PatchVector.end(),fog_far);
+	std::vector<std::pair<float ,int32_t> >::iterator near_it = std::upper_bound(m_PatchVector.begin(),m_PatchVector.end(),fog_near);
 
 	// NOTE: Word Editor 툴에서는 fog far보다 멀리있는 물체를 텍스쳐 없이 그리는 작업을 하지 않음
 #ifdef WORLD_EDITOR
@@ -107,18 +107,18 @@ void CMapOutdoor::__RenderTerrain_RenderHardwareTransformPatch()
 	far_it = m_PatchVector.end();
 #endif
 
-	WORD wPrimitiveCount;
+	uint16_t wPrimitiveCount;
 	D3DPRIMITIVETYPE ePrimitiveType;
 
-	BYTE byCUrrentLODLevel = 0;
+	uint8_t byCUrrentLODLevel = 0;
 
 	float fLODLevel1Distance = __GetNoFogDistance();
 	float fLODLevel2Distance = __GetFogDistance();
 
 	SelectIndexBuffer(0, &wPrimitiveCount, &ePrimitiveType);
 
-	DWORD dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
-	std::vector<std::pair<float, long> >::iterator it = m_PatchVector.begin();
+	uint32_t dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
+	std::vector<std::pair<float, int32_t> >::iterator it = m_PatchVector.begin();
 
 	// NOTE: 맵툴에서는 view ~ fog near 사이의 지형을 fog disabled 상태로 그리는 작업을 하지 않음.
 #ifndef WORLD_EDITOR
@@ -176,10 +176,10 @@ void CMapOutdoor::__RenderTerrain_RenderHardwareTransformPatch()
 	STATEMANAGER.SetRenderState(D3DRS_FOGENABLE, FALSE);
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, FALSE);
 
-	STATEMANAGER.SetTexture(0, NULL);
+	STATEMANAGER.SetTexture(0, nullptr);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, FALSE);
 
-	STATEMANAGER.SetTexture(1, NULL);
+	STATEMANAGER.SetTexture(1, nullptr);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS, FALSE);
 
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);
@@ -252,19 +252,19 @@ void CMapOutdoor::__RenderTerrain_RenderHardwareTransformPatch()
 	//////////////////////////////////////////////////////////////////////////
 }
 
-void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType)
+void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(int32_t patchnum, uint16_t wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType)
 {
-	assert(NULL!=m_pTerrainPatchProxyList && "__HardwareTransformPatch_RenderPatchSplat");
+	assert(nullptr!=m_pTerrainPatchProxyList && "__HardwareTransformPatch_RenderPatchSplat");
 	CTerrainPatchProxy * pTerrainPatchProxy = &m_pTerrainPatchProxyList[patchnum];
 	
 	if (!pTerrainPatchProxy->isUsed())
 		return;
 
-	long sPatchNum = pTerrainPatchProxy->GetPatchNum();
+	int32_t sPatchNum = pTerrainPatchProxy->GetPatchNum();
 	if (sPatchNum < 0)
 		return;
 
-	BYTE ucTerrainNum = pTerrainPatchProxy->GetTerrainNum();
+	uint8_t ucTerrainNum = pTerrainPatchProxy->GetTerrainNum();
 	if (0xFF == ucTerrainNum)
 		return;
 
@@ -272,13 +272,13 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 	if (!GetTerrainPointer(ucTerrainNum, &pTerrain))
 		return;
 
-	DWORD dwFogColor;
+	uint32_t dwFogColor;
 	if (mc_pEnvironmentData)
 		dwFogColor=mc_pEnvironmentData->FogColor;
 	else
 		dwFogColor=0xffffffff;
 
-	WORD wCoordX, wCoordY;
+	uint16_t wCoordX, wCoordY;
 	pTerrain->GetCoordinate(&wCoordX, &wCoordY);
 
 	TTerrainSplatPatch & rTerrainSplatPatch = pTerrain->GetTerrainSplatPatch();
@@ -306,16 +306,16 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 	
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, FALSE);
 
-	int iPrevRenderedSplatNum=m_iRenderedSplatNum;
+	int32_t iPrevRenderedSplatNum=m_iRenderedSplatNum;
 
 #ifdef WORLD_EDITOR
 
-	int nRenderTextureCount = 0;
+	int32_t nRenderTextureCount = 0;
 
 //	if (!m_bShowEntirePatchTextureCount && !(GetAsyncKeyState(VK_LCONTROL) & 0x8000) )
 	if (1)
 	{
-		for (DWORD j = 1; j < pTerrain->GetNumTextures(); ++j)
+		for (uint32_t j = 1; j < pTerrain->GetNumTextures(); ++j)
 		{
 			TTerainSplat & rSplat = rTerrainSplatPatch.Splats[j];
 			
@@ -328,11 +328,11 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 			++nRenderTextureCount;
 		}
 		
-		DWORD dwTextureFactor = STATEMANAGER.GetRenderState(D3DRS_TEXTUREFACTOR);
+		uint32_t dwTextureFactor = STATEMANAGER.GetRenderState(D3DRS_TEXTUREFACTOR);
 		
-		static int DefaultTCT = 8;
-		int TextureCountThreshold = DefaultTCT;
-		DWORD dwTFactor = 0xFFFFFFFF;
+		static int32_t DefaultTCT = 8;
+		int32_t TextureCountThreshold = DefaultTCT;
+		uint32_t dwTFactor = 0xFFFFFFFF;
 		
 		if (GetAsyncKeyState(VK_LSHIFT) & 0x8000)
 		{
@@ -395,7 +395,7 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 			// 0번 텍스처
 			if ( 0 < rTerrainSplatPatch.PatchTileCount[sPatchNum][0] )
 			{
-				DWORD dwTextureFactorFor0Texture = STATEMANAGER.GetRenderState(D3DRS_TEXTUREFACTOR);
+				uint32_t dwTextureFactorFor0Texture = STATEMANAGER.GetRenderState(D3DRS_TEXTUREFACTOR);
 				STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, 0xFF88FF88);
 				STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);
 				STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
@@ -405,18 +405,18 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 				STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLOROP);
 			}
 
-			for (DWORD j = 1; j < pTerrain->GetNumTextures(); ++j)
+			for (uint32_t j = 1; j < pTerrain->GetNumTextures(); ++j)
 			{
 				TTerainSplat & rSplat = rTerrainSplatPatch.Splats[j];
 				
 				if (!rSplat.Active)
 					continue;
 				
-				DWORD dwTextureCount = rTerrainSplatPatch.PatchTileCount[sPatchNum][j];
+				uint32_t dwTextureCount = rTerrainSplatPatch.PatchTileCount[sPatchNum][j];
 				if (dwTextureCount == 0)
 					continue;
 				
-				DWORD dwTextureFactorForTextureBalance = 0xFFFFFFFF;
+				uint32_t dwTextureFactorForTextureBalance = 0xFFFFFFFF;
 
 				if (!(GetAsyncKeyState(VK_LSHIFT) & 0x8000))
 				{
@@ -440,7 +440,7 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 							STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, 0xFF0000FF);
 						STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);
 						STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-						STATEMANAGER.SetTexture(0, NULL);
+						STATEMANAGER.SetTexture(0, nullptr);
 					}
 					else
 					{
@@ -461,7 +461,7 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 					}
 				}
 				
-				std::vector<int>::iterator aIterator = std::find(m_RenderedTextureNumVector.begin(), m_RenderedTextureNumVector.end(), (int)j);
+				std::vector<int32_t>::iterator aIterator = std::find(m_RenderedTextureNumVector.begin(), m_RenderedTextureNumVector.end(), (int32_t)j);
 				if (aIterator == m_RenderedTextureNumVector.end())
 					m_RenderedTextureNumVector.push_back(j);
 				++m_iRenderedSplatNum;
@@ -472,8 +472,8 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 	}
 	else
 	{
-		int TextureCountThreshold = 6;
-		DWORD dwTFactor = 0xFFFF00FF;
+		int32_t TextureCountThreshold = 6;
+		uint32_t dwTFactor = 0xFFFF00FF;
 		
 		if (GetAsyncKeyState(VK_LSHIFT) & 0x8000)
 		{
@@ -504,7 +504,7 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 			}
 		}
 		
-		for (DWORD j = 1; j < pTerrain->GetNumTextures(); ++j)
+		for (uint32_t j = 1; j < pTerrain->GetNumTextures(); ++j)
 		{
 			TTerainSplat & rSplat = rTerrainSplatPatch.Splats[j];
 			
@@ -514,7 +514,7 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 			if (rTerrainSplatPatch.PatchTileCount[sPatchNum][j] == 0)
 				continue;
 			
-			DWORD dwTextureFactor;
+			uint32_t dwTextureFactor;
 			
 			if (nRenderTextureCount>=TextureCountThreshold)
 			{
@@ -522,7 +522,7 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 				STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, dwTFactor);
 				STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);
 				STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-				STATEMANAGER.SetTexture(0, NULL);
+				STATEMANAGER.SetTexture(0, nullptr);
 			}
 			else
 			{
@@ -544,7 +544,7 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 			
 			++nRenderTextureCount;
 			
-			std::vector<int>::iterator aIterator = std::find(m_RenderedTextureNumVector.begin(), m_RenderedTextureNumVector.end(), (int)j);
+			std::vector<int32_t>::iterator aIterator = std::find(m_RenderedTextureNumVector.begin(), m_RenderedTextureNumVector.end(), (int32_t)j);
 			if (aIterator == m_RenderedTextureNumVector.end())
 				m_RenderedTextureNumVector.push_back(j);
 			++m_iRenderedSplatNum;
@@ -556,7 +556,7 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 
 #else
 	bool isFirst=true;
-	for (DWORD j = 1; j < pTerrain->GetNumTextures(); ++j)
+	for (uint32_t j = 1; j < pTerrain->GetNumTextures(); ++j)
 	{
 		TTerainSplat & rSplat = rTerrainSplatPatch.Splats[j];
 		
@@ -586,7 +586,7 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 			STATEMANAGER.DrawIndexedPrimitive(ePrimitiveType, 0, m_iPatchTerrainVertexCount, 0, wPrimitiveCount);			
 		}
 
-		std::vector<int>::iterator aIterator = std::find(m_RenderedTextureNumVector.begin(), m_RenderedTextureNumVector.end(), (int)j);
+		std::vector<int32_t>::iterator aIterator = std::find(m_RenderedTextureNumVector.begin(), m_RenderedTextureNumVector.end(), (int32_t)j);
 		if (aIterator == m_RenderedTextureNumVector.end())
 			m_RenderedTextureNumVector.push_back(j);
 		++m_iRenderedSplatNum;
@@ -607,7 +607,7 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 			D3DXMatrixMultiply(&matSplatColorTexTransform, &m_matViewInverse, &rTexture.m_matTransform);
 			STATEMANAGER.SetTransform(D3DTS_TEXTURE0, &matSplatColorTexTransform);
 			
-			STATEMANAGER.SetTexture(0, NULL);
+			STATEMANAGER.SetTexture(0, nullptr);
 			STATEMANAGER.SetTexture(1, rSplat.pd3dTexture);
 			STATEMANAGER.DrawIndexedPrimitive(ePrimitiveType, 0, m_iPatchTerrainVertexCount, 0, wPrimitiveCount);
 		}
@@ -653,7 +653,7 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 		}		
 		else
 		{
-			STATEMANAGER.SetTexture(1, NULL);			
+			STATEMANAGER.SetTexture(1, nullptr);			
 		}
 		
 		ms_faceCount += wPrimitiveCount;
@@ -685,15 +685,15 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(long patchnum, WORD 
 	}
 	++m_iRenderedPatchNum;
 
-	int iCurRenderedSplatNum=m_iRenderedSplatNum-iPrevRenderedSplatNum;
+	int32_t iCurRenderedSplatNum=m_iRenderedSplatNum-iPrevRenderedSplatNum;
 
 	m_iRenderedSplatNumSqSum+=iCurRenderedSplatNum*iCurRenderedSplatNum;
 
 }
 
-void CMapOutdoor::__HardwareTransformPatch_RenderPatchNone(long patchnum, WORD wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType)
+void CMapOutdoor::__HardwareTransformPatch_RenderPatchNone(int32_t patchnum, uint16_t wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType)
 {
-	assert(NULL!=m_pTerrainPatchProxyList && "__HardwareTransformPatch_RenderPatchNone");
+	assert(nullptr!=m_pTerrainPatchProxyList && "__HardwareTransformPatch_RenderPatchNone");
 	CTerrainPatchProxy * pTerrainPatchProxy = &m_pTerrainPatchProxyList[patchnum];
 	
 	if (!pTerrainPatchProxy->isUsed())

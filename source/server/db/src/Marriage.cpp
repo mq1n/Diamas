@@ -6,7 +6,7 @@
 
 namespace marriage
 {
-	const DWORD WEDDING_LENGTH = 60 * 60; // sec
+	const uint32_t WEDDING_LENGTH = 60 * 60; // sec
 	bool operator < (const TWedding& lhs, const TWedding& rhs)
 	{
 		return lhs.dwTime < rhs.dwTime;
@@ -50,11 +50,11 @@ namespace marriage
 			{
 				MYSQL_ROW row = mysql_fetch_row(pRes->pSQLResult);
 
-				DWORD pid1 = 0; str_to_number(pid1, row[0]);
-				DWORD pid2 = 0; str_to_number(pid2, row[1]);
-				int love_point = 0; str_to_number(love_point, row[2]);
-				DWORD time = 0; str_to_number(time, row[3]);
-				BYTE is_married = 0; str_to_number(is_married, row[4]);
+				uint32_t pid1 = 0; str_to_number(pid1, row[0]);
+				uint32_t pid2 = 0; str_to_number(pid2, row[1]);
+				int32_t love_point = 0; str_to_number(love_point, row[2]);
+				uint32_t time = 0; str_to_number(time, row[3]);
+				uint8_t is_married = 0; str_to_number(is_married, row[4]);
 				const char* name1 = row[5];
 				const char* name2 = row[6];
 
@@ -69,25 +69,25 @@ namespace marriage
 		return true;
 	}
 
-	TMarriage* CManager::Get(DWORD dwPlayerID)
+	TMarriage* CManager::Get(uint32_t dwPlayerID)
 	{
 		auto it = m_MarriageByPID.find(dwPlayerID);
 
 		if (it != m_MarriageByPID.end())
 			return it->second;
 
-		return NULL;
+		return nullptr;
 	}
 
-	void Align(DWORD& rPID1, DWORD& rPID2)
+	void Align(uint32_t& rPID1, uint32_t& rPID2)
 	{
 		if (rPID1 > rPID2)
 			std::swap(rPID1, rPID2);
 	}
 
-	void CManager::Add(DWORD dwPID1, DWORD dwPID2, const char* szName1, const char* szName2)
+	void CManager::Add(uint32_t dwPID1, uint32_t dwPID2, const char* szName1, const char* szName2)
 	{
-		DWORD now = CClientManager::instance().GetCurrentTime();
+		uint32_t now = CClientManager::instance().GetCurrentTime();
 		if (IsMarried(dwPID1) || IsMarried(dwPID2))
 		{
 			sys_err("cannot marry already married character. %d - %d", dwPID1, dwPID2);
@@ -124,7 +124,7 @@ namespace marriage
 		CClientManager::instance().ForwardPacket(HEADER_DG_MARRIAGE_ADD, &p, sizeof(p));
 	}
 
-	void CManager::Update(DWORD dwPID1, DWORD dwPID2, INT iLovePoint, BYTE byMarried)
+	void CManager::Update(uint32_t dwPID1, uint32_t dwPID2, INT iLovePoint, uint8_t byMarried)
 	{
 		TMarriage* pMarriage = Get(dwPID1);
 		if (!pMarriage || pMarriage->GetOther(dwPID1) != dwPID2)
@@ -160,7 +160,7 @@ namespace marriage
 		CClientManager::instance().ForwardPacket(HEADER_DG_MARRIAGE_UPDATE, &p, sizeof(p));
 	}
 
-	void CManager::Remove(DWORD dwPID1, DWORD dwPID2)
+	void CManager::Remove(uint32_t dwPID1, uint32_t dwPID2)
 	{
 		TMarriage* pMarriage = Get(dwPID1);
 
@@ -208,7 +208,7 @@ namespace marriage
 		delete pMarriage;
 	}
 
-	void CManager::EngageToMarriage(DWORD dwPID1, DWORD dwPID2)
+	void CManager::EngageToMarriage(uint32_t dwPID1, uint32_t dwPID2)
 	{
 		TMarriage* pMarriage = Get(dwPID1);
 		if (!pMarriage || pMarriage->GetOther(dwPID1) != dwPID2)
@@ -300,13 +300,13 @@ namespace marriage
 		}
 	}
 
-	void CManager::ReadyWedding(DWORD dwMapIndex, DWORD dwPID1, DWORD dwPID2)
+	void CManager::ReadyWedding(uint32_t dwMapIndex, uint32_t dwPID1, uint32_t dwPID2)
 	{
-		DWORD dwStartTime = CClientManager::instance().GetCurrentTime();
+		uint32_t dwStartTime = CClientManager::instance().GetCurrentTime();
 		m_pqWeddingStart.push(TWedding(dwStartTime + 5, dwMapIndex, dwPID1, dwPID2));
 	}
 
-	void CManager::EndWedding(DWORD dwPID1, DWORD dwPID2)
+	void CManager::EndWedding(uint32_t dwPID1, uint32_t dwPID2)
 	{
 		auto it = m_mapRunningWedding.find(std::make_pair(dwPID1, dwPID2));
 		if (it == m_mapRunningWedding.end())
@@ -326,7 +326,7 @@ namespace marriage
 
 	void CManager::Update()
 	{
-		DWORD now = CClientManager::instance().GetCurrentTime();
+		uint32_t now = CClientManager::instance().GetCurrentTime();
 
 		if (!m_pqWeddingEnd.empty())
 		{

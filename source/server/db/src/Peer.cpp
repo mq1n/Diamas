@@ -26,7 +26,7 @@ void CPeer::OnAccept()
 {
 	m_state = STATE_PLAYING;
 
-	static DWORD current_handle = 0;
+	static uint32_t current_handle = 0;
 	m_dwHandle = ++current_handle;
 
 	sys_log(0, "Connection accepted. (host: %s handle: %u fd: %d)", m_host, m_dwHandle, m_fd);
@@ -52,22 +52,22 @@ void CPeer::OnClose()
 	m_itemRange.dwUsableItemIDMin = 0;
 }
 
-DWORD CPeer::GetHandle()
+uint32_t CPeer::GetHandle()
 {
 	return m_dwHandle;
 }
 
-DWORD CPeer::GetUserCount()
+uint32_t CPeer::GetUserCount()
 {
 	return m_dwUserCount;
 }
 
-void CPeer::SetUserCount(DWORD dwCount)
+void CPeer::SetUserCount(uint32_t dwCount)
 {
 	m_dwUserCount = dwCount;
 }
 
-bool CPeer::PeekPacket(int & iBytesProceed, BYTE & header, DWORD & dwHandle, DWORD & dwLength, const char ** data)
+bool CPeer::PeekPacket(int32_t & iBytesProceed, uint8_t & header, uint32_t & dwHandle, uint32_t & dwLength, const char ** data)
 {
 	if (GetRecvLength() < iBytesProceed + 9)
 		return false;
@@ -77,14 +77,14 @@ bool CPeer::PeekPacket(int & iBytesProceed, BYTE & header, DWORD & dwHandle, DWO
 
 	header	= *(buf++);
 
-	dwHandle	= *((DWORD *) buf);
-	buf		+= sizeof(DWORD);
+	dwHandle	= *((uint32_t *) buf);
+	buf		+= sizeof(uint32_t);
 
-	dwLength	= *((DWORD *) buf);
-	buf		+= sizeof(DWORD);
+	dwLength	= *((uint32_t *) buf);
+	buf		+= sizeof(uint32_t);
 
 	//sys_log(0, "%d header %d handle %u length %u", GetRecvLength(), header, dwHandle, dwLength);
-	if (iBytesProceed + dwLength + 9 > (DWORD) GetRecvLength())
+	if (iBytesProceed + dwLength + 9 > (uint32_t) GetRecvLength())
 	{
 		sys_log(0, "PeekPacket: not enough buffer size: len %u, recv %d", 
 				9+dwLength, GetRecvLength()-iBytesProceed);
@@ -96,7 +96,7 @@ bool CPeer::PeekPacket(int & iBytesProceed, BYTE & header, DWORD & dwHandle, DWO
 	return true;
 }
 
-void CPeer::EncodeHeader(BYTE header, DWORD dwHandle, DWORD dwSize)
+void CPeer::EncodeHeader(uint8_t header, uint32_t dwHandle, uint32_t dwSize)
 {
 	HEADER h;
 
@@ -109,12 +109,12 @@ void CPeer::EncodeHeader(BYTE header, DWORD dwHandle, DWORD dwSize)
 	Encode(&h, sizeof(HEADER));
 }
 
-void CPeer::EncodeReturn(BYTE header, DWORD dwHandle)
+void CPeer::EncodeReturn(uint8_t header, uint32_t dwHandle)
 {
 	EncodeHeader(header, dwHandle, 0);
 }
 
-int CPeer::Send()
+int32_t CPeer::Send()
 {
 	if (m_state == STATE_CLOSE)
 		return -1;
@@ -122,12 +122,12 @@ int CPeer::Send()
 	return (CPeerBase::Send());
 }
 
-void CPeer::SetP2PPort(WORD wPort)
+void CPeer::SetP2PPort(uint16_t wPort)
 {
 	m_wP2PPort = wPort;
 }
 
-void CPeer::SetMaps(long * pl)
+void CPeer::SetMaps(int32_t * pl)
 {
 	memcpy(m_alMaps, pl, sizeof(m_alMaps));
 }

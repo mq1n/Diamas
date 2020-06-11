@@ -12,13 +12,13 @@ enum ESectree
 
 typedef struct sectree_coord
 {
-	unsigned            x : 16;
-	unsigned            y : 16;
+	uint32_t            x : 16;
+	uint32_t            y : 16;
 } SECTREE_COORD;
 
 typedef union sectreeid
 {
-	DWORD		package;
+	uint32_t		package;
 	SECTREE_COORD	coord;
 } SECTREEID;
 
@@ -36,25 +36,25 @@ struct FCollectEntity {
 		/*
 		if (entity->IsType(ENTITY_CHARACTER)) {
 			LPCHARACTER character = (LPCHARACTER)entity;
-			DWORD vid = character->GetVID();
+			uint32_t vid = character->GetVID();
 			LPCHARACTER found = CHARACTER_MANGAER::instance().Find(vid);
-			if (found == NULL || vid != found->GetVID()) {
+			if (found == nullptr || vid != found->GetVID()) {
 				sys_err("<Factor> Invalid character %p", get_pointer(character));
 				return;
 			}
 		} else if (entity->IsType(ENTITY_ITEM)) {
 			LPITEM item = (LPITEM)entity;
-			DWORD vid = item->GetVID();
+			uint32_t vid = item->GetVID();
 			LPITEM found = ITEM_MANGAER::instance().FindByVID(vid);
-			if (found == NULL || vid != found->GetVID()) {
+			if (found == nullptr || vid != found->GetVID()) {
 				sys_err("<Factor> Invalid item %p", get_pointer(item));
 				return;
 			}
 		} else if (entity->IsType(ENTITY_OBJECT)) {
 			LPOBJECT object = (LPOBJECT)entity;
-			DWORD vid = object->GetVID();
+			uint32_t vid = object->GetVID();
 			LPOBJECT found = CManager::instance().FindObjectByVID(vid);
-			if (found == NULL || vid != found->GetVID()) {
+			if (found == nullptr || vid != found->GetVID()) {
 				sys_err("<Factor> Invalid object %p", get_pointer(object));
 				return;
 			}
@@ -108,7 +108,7 @@ class SECTREE
 				++it_tree;
 			}
 
-			return NULL;
+			return nullptr;
 		}
 
 		template <class _Func> void ForEachAround(_Func & func)
@@ -185,15 +185,15 @@ class SECTREE
 
 		CAttribute *			GetAttributePtr() { return m_pkAttribute; }
 
-		DWORD				GetAttribute(long x, long y);
-		bool				IsAttr(long x, long y, DWORD dwFlag);
+		uint32_t				GetAttribute(int32_t x, int32_t y);
+		bool				IsAttr(int32_t x, int32_t y, uint32_t dwFlag);
 
 		void				CloneAttribute(LPSECTREE tree); // private map 처리시 사용
 
-		int				GetEventAttribute(long x, long y); // 20050313 현재는 사용하지 않음
+		int32_t				GetEventAttribute(int32_t x, int32_t y); // 20050313 현재는 사용하지 않음
 
-		void				SetAttribute(DWORD x, DWORD y, DWORD dwAttr);
-		void				RemoveAttribute(DWORD x, DWORD y, DWORD dwAttr);
+		void				SetAttribute(uint32_t x, uint32_t y, uint32_t dwAttr);
+		void				RemoveAttribute(uint32_t x, uint32_t y, uint32_t dwAttr);
 
 	private:
 		template <class _Func> void for_each_entity(_Func & func)
@@ -214,7 +214,7 @@ class SECTREE
 		SECTREEID			m_id;
 		ENTITY_SET			m_set_entity;
 		LPSECTREE_LIST			m_neighbor_list;
-		int				m_iPCCount;
+		int32_t				m_iPCCount;
 		bool				isClone;
 
 		CAttribute *			m_pkAttribute;

@@ -7,14 +7,14 @@
 #include "locale_service.h"
 
 // µ¶
-const int poison_damage_rate[MOB_RANK_MAX_NUM] = 
+const int32_t poison_damage_rate[MOB_RANK_MAX_NUM] = 
 {
 	80, 50, 40, 30, 25, 1
 };
 
-int GetPoisonDamageRate(LPCHARACTER ch)
+int32_t GetPoisonDamageRate(LPCHARACTER ch)
 {
-	int iRate;
+	int32_t iRate;
 
 	if (ch->IsPC())
 		iRate = 50;
@@ -28,8 +28,8 @@ int GetPoisonDamageRate(LPCHARACTER ch)
 EVENTINFO(TPoisonEventInfo)
 {
 	DynamicCharacterPtr ch;
-	int		count;
-	DWORD	attacker_pid;
+	int32_t		count;
+	uint32_t	attacker_pid;
 
 	TPoisonEventInfo()
 	: ch()
@@ -43,7 +43,7 @@ EVENTFUNC(poison_event)
 {
 	TPoisonEventInfo * info = dynamic_cast<TPoisonEventInfo *>( event->info );
 	
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "poison_event> <Factor> Null pointer" );
 		return 0;
@@ -51,17 +51,17 @@ EVENTFUNC(poison_event)
 
 	LPCHARACTER ch = info->ch;
 
-	if (ch == NULL) { // <Factor>
+	if (ch == nullptr) { // <Factor>
 		return 0;
 	}
 	LPCHARACTER pkAttacker = CHARACTER_MANAGER::instance().FindByPID(info->attacker_pid);
 
-	int dam = ch->GetMaxHP() * GetPoisonDamageRate(ch) / 1000;
+	int32_t dam = ch->GetMaxHP() * GetPoisonDamageRate(ch) / 1000;
 	if (test_server) ch->ChatPacket(CHAT_TYPE_NOTICE, "Poison Damage %d", dam);
 
 	if (ch->Damage(pkAttacker, dam, DAMAGE_TYPE_POISON))
 	{
-		ch->m_pkPoisonEvent = NULL;
+		ch->m_pkPoisonEvent = nullptr;
 		return 0;
 	}
 
@@ -71,20 +71,20 @@ EVENTFUNC(poison_event)
 		return PASSES_PER_SEC(3);
 	else
 	{
-		ch->m_pkPoisonEvent = NULL;
+		ch->m_pkPoisonEvent = nullptr;
 		return 0;
 	}
 }
 
 #ifdef ENABLE_WOLFMAN_CHARACTER
-const int bleeding_damage_rate[MOB_RANK_MAX_NUM] =
+const int32_t bleeding_damage_rate[MOB_RANK_MAX_NUM] =
 {
 	80, 50, 40, 30, 25, 1
 };
 
-int GetBleedingDamageRate(LPCHARACTER ch)
+int32_t GetBleedingDamageRate(LPCHARACTER ch)
 {
-	int iRate;
+	int32_t iRate;
 
 	if (ch->IsPC())
 		iRate = 50;
@@ -101,8 +101,8 @@ int GetBleedingDamageRate(LPCHARACTER ch)
 EVENTINFO(TBleedingEventInfo)
 {
 	DynamicCharacterPtr ch;
-	int		count;
-	DWORD	attacker_pid;
+	int32_t		count;
+	uint32_t	attacker_pid;
 
 	TBleedingEventInfo()
 	: ch()
@@ -116,7 +116,7 @@ EVENTFUNC(bleeding_event)
 {
 	TBleedingEventInfo * info = dynamic_cast<TBleedingEventInfo *>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "bleeding_event> <Factor> Null pointer" );
 		return 0;
@@ -124,17 +124,17 @@ EVENTFUNC(bleeding_event)
 
 	LPCHARACTER ch = info->ch;
 
-	if (ch == NULL) { // <Factor>
+	if (ch == nullptr) { // <Factor>
 		return 0;
 	}
 	LPCHARACTER pkAttacker = CHARACTER_MANAGER::instance().FindByPID(info->attacker_pid);
 
-	int dam = ch->GetMaxHP() * GetBleedingDamageRate(ch) / 1000;
+	int32_t dam = ch->GetMaxHP() * GetBleedingDamageRate(ch) / 1000;
 	if (test_server) ch->ChatPacket(CHAT_TYPE_NOTICE, "Bleeding Damage %d", dam);
 
 	if (ch->Damage(pkAttacker, dam, DAMAGE_TYPE_BLEEDING))
 	{
-		ch->m_pkBleedingEvent = NULL;
+		ch->m_pkBleedingEvent = nullptr;
 		return 0;
 	}
 
@@ -144,7 +144,7 @@ EVENTFUNC(bleeding_event)
 		return PASSES_PER_SEC(3);
 	else
 	{
-		ch->m_pkBleedingEvent = NULL;
+		ch->m_pkBleedingEvent = nullptr;
 		return 0;
 	}
 }
@@ -153,9 +153,9 @@ EVENTFUNC(bleeding_event)
 EVENTINFO(TFireEventInfo)
 {
 	DynamicCharacterPtr ch;
-	int		count;
-	int		amount;
-	DWORD	attacker_pid;
+	int32_t		count;
+	int32_t		amount;
+	uint32_t	attacker_pid;
 
 	TFireEventInfo()
 	: ch()
@@ -170,24 +170,24 @@ EVENTFUNC(fire_event)
 {
 	TFireEventInfo * info = dynamic_cast<TFireEventInfo *>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "fire_event> <Factor> Null pointer" );
 		return 0;
 	}
 
 	LPCHARACTER ch = info->ch;
-	if (ch == NULL) { // <Factor>
+	if (ch == nullptr) { // <Factor>
 		return 0;
 	}
 	LPCHARACTER pkAttacker = CHARACTER_MANAGER::instance().FindByPID(info->attacker_pid);
 
-	int dam = info->amount;
+	int32_t dam = info->amount;
 	if (test_server) ch->ChatPacket(CHAT_TYPE_NOTICE, "Fire Damage %d", dam);
 
 	if (ch->Damage(pkAttacker, dam, DAMAGE_TYPE_FIRE))
 	{
-		ch->m_pkFireEvent = NULL;
+		ch->m_pkFireEvent = nullptr;
 		return 0;
 	}
 
@@ -197,7 +197,7 @@ EVENTFUNC(fire_event)
 		return PASSES_PER_SEC(3);
 	else
 	{
-		ch->m_pkFireEvent = NULL;
+		ch->m_pkFireEvent = nullptr;
 		return 0;
 	}
 }
@@ -226,19 +226,19 @@ EVENTFUNC(fire_event)
 
  */
 
-static int poison_level_adjust[9] =
+static int32_t poison_level_adjust[9] =
 {
 	100, 90, 80, 70, 50, 30, 10, 5, 0
 };
 
 #ifdef ENABLE_WOLFMAN_CHARACTER
-static int bleeding_level_adjust[9] =
+static int32_t bleeding_level_adjust[9] =
 {
 	100, 90, 80, 70, 50, 30, 10, 5, 0
 };
 #endif
 
-void CHARACTER::AttackedByFire(LPCHARACTER pkAttacker, int amount, int count)
+void CHARACTER::AttackedByFire(LPCHARACTER pkAttacker, int32_t amount, int32_t count)
 {
 	if (m_pkFireEvent)
 		return;
@@ -273,7 +273,7 @@ void CHARACTER::AttackedByPoison(LPCHARACTER pkAttacker)
 
 	if (pkAttacker && pkAttacker->GetLevel() < GetLevel())
 	{
-		int delta = GetLevel() - pkAttacker->GetLevel();
+		int32_t delta = GetLevel() - pkAttacker->GetLevel();
 
 		if (delta > 8)
 			delta = 8;
@@ -323,7 +323,7 @@ void CHARACTER::AttackedByBleeding(LPCHARACTER pkAttacker)
 
 	if (pkAttacker && pkAttacker->GetLevel() < GetLevel())
 	{
-		int delta = GetLevel() - pkAttacker->GetLevel();
+		int32_t delta = GetLevel() - pkAttacker->GetLevel();
 
 		if (delta > 8)
 			delta = 8;
@@ -378,7 +378,7 @@ void CHARACTER::RemoveBleeding()
 
 void CHARACTER::ApplyMobAttribute(const TMobTable* table)
 {
-	for (int i = 0; i < MOB_ENCHANTS_MAX_NUM; ++i)
+	for (int32_t i = 0; i < MOB_ENCHANTS_MAX_NUM; ++i)
 	{
 		if (table->cEnchants[i] != 0)
 			ApplyPoint(aiMobEnchantApplyIdx[i], table->cEnchants[i]);
@@ -388,7 +388,7 @@ void CHARACTER::ApplyMobAttribute(const TMobTable* table)
 		ApplyPoint(APPLY_BLEEDING_PCT, table->cEnchants[MOB_ENCHANT_POISON]/50); // @warme009
 #endif
 
-	for (int i = 0; i < MOB_RESISTS_MAX_NUM; ++i)
+	for (int32_t i = 0; i < MOB_RESISTS_MAX_NUM; ++i)
 	{
 		if (table->cResists[i] != 0)
 			ApplyPoint(aiMobResistsApplyIdx[i], table->cResists[i]);
@@ -404,15 +404,15 @@ void CHARACTER::ApplyMobAttribute(const TMobTable* table)
 }
 
 // #define ENABLE_IMMUNE_PERC
-bool CHARACTER::IsImmune(DWORD dwImmuneFlag)
+bool CHARACTER::IsImmune(uint32_t dwImmuneFlag)
 {
 	// 1 stun, 2 slow, 4 fall = 7 all == X
 	// ChatPacket(CHAT_TYPE_PARTY, "<IMMUNE_IS> (%u == %u)", m_pointsInstant.dwImmuneFlag, dwImmuneFlag);
 	if (IS_SET(m_pointsInstant.dwImmuneFlag, dwImmuneFlag))
 	{
 #ifdef ENABLE_IMMUNE_PERC
-		int immune_pct = 90;
-		int	percent = number(1, 100);
+		int32_t immune_pct = 90;
+		int32_t	percent = number(1, 100);
 
 		if (percent <= immune_pct)	// 90% Immune
 #else

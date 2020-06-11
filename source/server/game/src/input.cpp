@@ -40,7 +40,7 @@ void ClearAdminPages()
 	g_stAdminPageIP.clear();
 }
 
-CInputProcessor::CInputProcessor() : m_pPacketInfo(NULL), m_iBufferLeft(0)
+CInputProcessor::CInputProcessor() : m_pPacketInfo(nullptr), m_iBufferLeft(0)
 {
 	if (!m_pPacketInfo)
 		BindPacketInfo(&m_packetInfoCG);
@@ -51,13 +51,13 @@ void CInputProcessor::BindPacketInfo(CPacketInfo * pPacketInfo)
 	m_pPacketInfo = pPacketInfo;
 }
 
-bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int iBytes, int & r_iBytesProceed)
+bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int32_t iBytes, int32_t & r_iBytesProceed)
 {
 	const char * c_pData = (const char *) c_pvOrig;
 
-	BYTE	bLastHeader = 0;
-	int		iLastPacketLen = 0;
-	int		iPacketLen;
+	uint8_t	bLastHeader = 0;
+	int32_t		iLastPacketLen = 0;
+	int32_t		iPacketLen;
 
 	if (!m_pPacketInfo)
 	{
@@ -67,7 +67,7 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int iBytes, 
 
 	for (m_iBufferLeft = iBytes; m_iBufferLeft > 0;)
 	{
-		BYTE bHeader = (BYTE) *(c_pData);
+		uint8_t bHeader = (uint8_t) *(c_pData);
 		const char * c_pszName;
 
 		if (bHeader == 0) // 암호화 처리가 있으므로 0번 헤더는 스킵한다.
@@ -76,7 +76,7 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int iBytes, 
 		{
 			sys_err("UNKNOWN HEADER: %d, LAST HEADER: %d(%d), REMAIN BYTES: %d, fd: %d",
 					bHeader, bLastHeader, iLastPacketLen, m_iBufferLeft, lpDesc->GetSocket());
-			//printdata((BYTE *) c_pvOrig, m_iBufferLeft);
+			//printdata((uint8_t *) c_pvOrig, m_iBufferLeft);
 			lpDesc->SetPhase(PHASE_CLOSE);
 			return true;
 		}
@@ -91,7 +91,7 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int iBytes, 
 
 			m_pPacketInfo->Start();
 
-			int iExtraPacketSize = Analyze(lpDesc, bHeader, c_pData);
+			int32_t iExtraPacketSize = Analyze(lpDesc, bHeader, c_pData);
 
 			if (iExtraPacketSize < 0)
 				return true;
@@ -108,12 +108,12 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int iBytes, 
 
 #ifdef ENABLE_SEQUENCE_SYSTEM
 		if (bHeader == HEADER_CG_PONG)
-			sys_log(0, "PONG! %u %u", m_pPacketInfo->IsSequence(bHeader), *(BYTE *) (c_pData + iPacketLen - sizeof(BYTE)));
+			sys_log(0, "PONG! %u %u", m_pPacketInfo->IsSequence(bHeader), *(uint8_t *) (c_pData + iPacketLen - sizeof(uint8_t)));
 
 		if (m_pPacketInfo->IsSequence(bHeader))
 		{
-			BYTE bSeq = lpDesc->GetSequence();
-			BYTE bSeqReceived = *(BYTE *) (c_pData + iPacketLen - sizeof(BYTE));
+			uint8_t bSeq = lpDesc->GetSequence();
+			uint8_t bSeqReceived = *(uint8_t *) (c_pData + iPacketLen - sizeof(uint8_t));
 
 			if (bSeq != bSeqReceived)
 			{
@@ -122,11 +122,11 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int iBytes, 
 				LPCHARACTER	ch = lpDesc->GetCharacter();
 
 				char buf[1024];
-				int	offset, len;
+				int32_t	offset, len;
 
 				offset = snprintf(buf, sizeof(buf), "SEQUENCE_LOG [%s]-------------\n", ch ? ch->GetName() : "UNKNOWN");
 
-				if (offset < 0 || offset >= (int) sizeof(buf))
+				if (offset < 0 || offset >= (int32_t) sizeof(buf))
 					offset = sizeof(buf) - 1;
 
 				for (size_t i = 0; i < lpDesc->m_seq_vector.size(); ++i)
@@ -135,7 +135,7 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int iBytes, 
 							lpDesc->m_seq_vector[i].hdr,
 							lpDesc->m_seq_vector[i].seq);
 
-					if (len < 0 || len >= (int) sizeof(buf) - offset)
+					if (len < 0 || len >= (int32_t) sizeof(buf) - offset)
 						offset += (sizeof(buf) - offset) - 1;
 					else
 						offset += len;
@@ -230,10 +230,10 @@ CInputHandshake::CInputHandshake()
 
 CInputHandshake::~CInputHandshake()
 {
-	if( NULL != m_pPacketInfo )
+	if( nullptr != m_pPacketInfo )
 	{
 		M2_DELETE(m_pPacketInfo);
-		m_pPacketInfo = NULL;
+		m_pPacketInfo = nullptr;
 	}
 }
 
@@ -243,7 +243,7 @@ std::vector<TPlayerTable> g_vec_save;
 ACMD(do_block_chat);
 // END_OF_BLOCK_CHAT
 
-int CInputHandshake::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
+int32_t CInputHandshake::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 {
 	if (bHeader == 10) // 엔터는 무시
 		return 0;
@@ -314,18 +314,18 @@ int CInputHandshake::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 				}
 				else
 				{
-					int iTotal;
-					int * paiEmpireUserCount;
-					int iLocal;
+					int32_t iTotal;
+					int32_t * paiEmpireUserCount;
+					int32_t iLocal;
 					DESC_MANAGER::instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
 					snprintf(szTmp, sizeof(szTmp), "%d %d %d %d %d", iTotal, paiEmpireUserCount[1], paiEmpireUserCount[2], paiEmpireUserCount[3], iLocal);
 				}
 			}
 			else
 			{
-				int iTotal;
-				int * paiEmpireUserCount;
-				int iLocal;
+				int32_t iTotal;
+				int32_t * paiEmpireUserCount;
+				int32_t iLocal;
 				DESC_MANAGER::instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
 				snprintf(szTmp, sizeof(szTmp), "%d %d %d %d %d", iTotal, paiEmpireUserCount[1], paiEmpireUserCount[2], paiEmpireUserCount[3], iLocal);
 			}
@@ -362,7 +362,7 @@ int CInputHandshake::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 				std::string msg = stBuf.substr(15,26);	// item_award의 id범위?
 				
 				TPacketDeleteAwardID p;
-				p.dwID = (DWORD)(atoi(msg.c_str()));
+				p.dwID = (uint32_t)(atoi(msg.c_str()));
 				snprintf(szTmp,sizeof(szTmp),"Sent to DB cache to delete ItemAward, id: %d",p.dwID);
 				//sys_log(0,"%d",p.dwID);
 				// strlcpy(p.login, msg.c_str(), sizeof(p.login));
@@ -430,7 +430,7 @@ dev_log(LOG_DEB0, "DC : '%s'", msg.c_str());
 					if (stBuf.size() == 6)
 					{
 						LoadStateUserCount();
-						db_clientdesc->DBPacket(HEADER_GD_RELOAD_PROTO, 0, NULL, 0);
+						db_clientdesc->DBPacket(HEADER_GD_RELOAD_PROTO, 0, nullptr, 0);
 					}
 					else
 					{
@@ -443,7 +443,7 @@ dev_log(LOG_DEB0, "DC : '%s'", msg.c_str());
 								break;
 
 							case 'p':
-								db_clientdesc->DBPacket(HEADER_GD_RELOAD_PROTO, 0, NULL, 0);
+								db_clientdesc->DBPacket(HEADER_GD_RELOAD_PROTO, 0, nullptr, 0);
 								break;
 
 							case 'q':
@@ -455,7 +455,7 @@ dev_log(LOG_DEB0, "DC : '%s'", msg.c_str());
 								break;
 
 							case 'a':
-								db_clientdesc->DBPacket(HEADER_GD_RELOAD_ADMIN, 0, NULL, 0);
+								db_clientdesc->DBPacket(HEADER_GD_RELOAD_ADMIN, 0, nullptr, 0);
 								sys_log(0, "Reloading admin infomation.");
 								break;
 						}
@@ -465,7 +465,7 @@ dev_log(LOG_DEB0, "DC : '%s'", msg.c_str());
 				{
 					std::istringstream is(stBuf);
 					std::string strEvent, strFlagName;
-					long lValue;
+					int32_t lValue;
 					is >> strEvent >> strFlagName >> lValue;
 
 					if (!is.fail())
@@ -485,14 +485,14 @@ dev_log(LOG_DEB0, "DC : '%s'", msg.c_str());
 				{
 					std::istringstream is(stBuf);
 					std::string strBlockChat, strCharName;
-					long lDuration;
+					int32_t lDuration;
 					is >> strBlockChat >> strCharName >> lDuration;
 
 					if (!is.fail())
 					{
 						sys_log(0, "EXTERNAL BLOCK_CHAT name %s duration %d", strCharName.c_str(), lDuration);
 
-						do_block_chat(NULL, const_cast<char*>(stBuf.c_str() + 11), 0, 0);
+						do_block_chat(nullptr, const_cast<char*>(stBuf.c_str() + 11), 0, 0);
 
 						stResult = "BLOCK_CHAT ";
 						stResult += strCharName;
@@ -505,7 +505,7 @@ dev_log(LOG_DEB0, "DC : '%s'", msg.c_str());
 				// END_OF_BLOCK_CHAT
 				else if (!stBuf.compare(0, 12, "PRIV_EMPIRE "))
 				{
-					int	empire, type, value, duration;
+					int32_t	empire, type, value, duration;
 					std::istringstream is(stBuf);
 					std::string strPrivEmpire;
 					is >> strPrivEmpire >> empire >> type >> value >> duration;
@@ -563,7 +563,7 @@ dev_log(LOG_DEB0, "DC : '%s'", msg.c_str());
 			return 0;
 		}
 		d->SetChannelStatusRequested(true);
-		db_clientdesc->DBPacket(HEADER_GD_REQUEST_CHANNELSTATUS, d->GetHandle(), NULL, 0);
+		db_clientdesc->DBPacket(HEADER_GD_REQUEST_CHANNELSTATUS, d->GetHandle(), nullptr, 0);
 	}
 	else if (bHeader == HEADER_CG_PONG)
 		Pong(d);

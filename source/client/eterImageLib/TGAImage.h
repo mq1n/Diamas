@@ -25,13 +25,13 @@ class CTGAImage : public CImageC
 
 		TGA_HEADER &	GetHeader();
 	protected:
-		int32_t			GetRawPixelCount(const DWORD * data);
-		int32_t			GetRLEPixelCount(const DWORD * data);
+		int32_t			GetRawPixelCount(const uint32_t * data);
+		int32_t			GetRLEPixelCount(const uint32_t * data);
 
 	protected:
 		TGA_HEADER	m_Header;
-		DWORD		m_dwFlag;
-		DWORD *		m_pdwEndPtr;
+		uint32_t		m_dwFlag;
+		uint32_t *		m_pdwEndPtr;
 };
 
 #endif

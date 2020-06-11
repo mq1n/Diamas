@@ -54,7 +54,7 @@ public:
 			float				m_afPos[3];
 			float				m_afNormal[3];
 			float				m_fSize;
-			unsigned char		m_ucWhichTexture;
+			uint8_t		m_ucWhichTexture;
 
 			// wind
 			float				m_fNoise;
@@ -89,9 +89,9 @@ public:
 		};
 
 		void				DeleteRegions(void);
-		const SRegion*		GetRegions(unsigned int& uiNumRegions);
-		bool				ParseBsfFile(const char* pFilename, unsigned int nNumBlades, unsigned int uiRows, unsigned int uiCols, float fCollisionDistance = 0.0f);
-		bool				CustomPlacement(unsigned int uiRows, unsigned int uiCols);
+		const SRegion*		GetRegions(uint32_t& uiNumRegions);
+		bool				ParseBsfFile(const char* pFilename, uint32_t nNumBlades, uint32_t uiRows, uint32_t uiCols, float fCollisionDistance = 0.0f);
+		bool				CustomPlacement(uint32_t uiRows, uint32_t uiCols);
 
 		//////////////////////////////////////////////////////////////////////////
 		// Utility
@@ -143,8 +143,8 @@ protected:
 		void				CreateRegions(const std::vector<SBlade>& vSceneBlades, float fCollisionDistance = 0.0f);
 static	void				ComputeFrustum(void);
 static	void				ComputeUnitBillboard(void);
-		void				ConvertCoordsToCell(const float* pCoords, int* pGridCoords) const;
-		unsigned int		GetRegionIndex(unsigned int uiRow, unsigned int uiCol) const	{ return uiRow * m_nNumRegionCols + uiCol; }
+		void				ConvertCoordsToCell(const float* pCoords, int32_t* pGridCoords) const;
+		uint32_t		GetRegionIndex(uint32_t uiRow, uint32_t uiCol) const	{ return uiRow * m_nNumRegionCols + uiCol; }
 static	bool				OutsideFrustum(SRegion* pRegion);
 
 		// general
@@ -154,9 +154,9 @@ static	float				m_afUnitBillboard[12];
 static	float				m_afWindDir[4];
 
 		// regions
-		int					m_nNumRegions;
-		int					m_nNumRegionCols;
-		int					m_nNumRegionRows;
+		int32_t					m_nNumRegions;
+		int32_t					m_nNumRegionCols;
+		int32_t					m_nNumRegionRows;
 		SRegion*			m_pRegions;
 
 		// camera

@@ -16,7 +16,7 @@ class CBase
 	bool isSymbol();
 	bool isVar();
 	bool isNumber();
-	int id;
+	int32_t id;
 	CBase();
 	virtual ~CBase();
 

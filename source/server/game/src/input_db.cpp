@@ -40,17 +40,17 @@
 
 #define MAPNAME_DEFAULT	"none"
 
-bool GetServerLocation(TAccountTable & rTab, BYTE bEmpire)
+bool GetServerLocation(TAccountTable & rTab, uint8_t bEmpire)
 {
 	bool bFound = false;
 
-	for (int i = 0; i < PLAYER_PER_ACCOUNT; ++i)
+	for (int32_t i = 0; i < PLAYER_PER_ACCOUNT; ++i)
 	{
 		if (0 == rTab.players[i].dwID)
 			continue;
 
 		bFound = true;
-		long lIndex = 0;
+		int32_t lIndex = 0;
 
 		if (!CMapLocation::instance().Get(rTab.players[i].x,
 					rTab.players[i].y,
@@ -92,7 +92,7 @@ bool GetServerLocation(TAccountTable & rTab, BYTE bEmpire)
 	return bFound;
 }
 
-void CInputDB::LoginSuccess(DWORD dwHandle, const char *data)
+void CInputDB::LoginSuccess(uint32_t dwHandle, const char *data)
 {
 	sys_log(0, "LoginSuccess");
 
@@ -124,7 +124,7 @@ void CInputDB::LoginSuccess(DWORD dwHandle, const char *data)
 		return;
 	}
 
-	for (int i = 0; i != PLAYER_PER_ACCOUNT; ++i)
+	for (int32_t i = 0; i != PLAYER_PER_ACCOUNT; ++i)
 	{
 		TSimplePlayer& player = pTab->players[i];
 		sys_log(0, "\tplayer(%s).job(%d)", player.szName, player.byJob);
@@ -155,7 +155,7 @@ void CInputDB::LoginSuccess(DWORD dwHandle, const char *data)
 	sys_log(0, "InputDB::login_success: %s", pTab->login);
 }
 
-void CInputDB::PlayerCreateFailure(LPDESC d, BYTE bType)
+void CInputDB::PlayerCreateFailure(LPDESC d, uint8_t bType)
 {
 	if (!d)
 		return;
@@ -181,7 +181,7 @@ void CInputDB::PlayerCreateSuccess(LPDESC d, const char * data)
 		return;
 	}
 
-	long lIndex = 0;
+	int32_t lIndex = 0;
 
 	if (!CMapLocation::instance().Get(pPacketDB->player.x,
 				pPacketDB->player.y,
@@ -218,7 +218,7 @@ void CInputDB::PlayerDeleteSuccess(LPDESC d, const char * data)
 	if (!d)
 		return;
 
-	BYTE account_index;
+	uint8_t account_index;
 	account_index = decode_byte(data);
 	d->BufferedPacket(encode_byte(HEADER_GC_CHARACTER_DELETE_SUCCESS),	1);
 	d->Packet(encode_byte(account_index),			1);
@@ -274,7 +274,7 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 	if (!d)
 		return;
 
-	long lMapIndex = pTab->lMapIndex;
+	int32_t lMapIndex = pTab->lMapIndex;
 	PIXEL_POSITION pos;
 
 	if (lMapIndex == 0)
@@ -325,7 +325,7 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 		return;
 	}
 
-	if (NULL != CHARACTER_MANAGER::Instance().FindPC(pTab->name))
+	if (nullptr != CHARACTER_MANAGER::Instance().FindPC(pTab->name))
 	{
 		sys_err("InputDB: PlayerLoad : %s already exist in game", pTab->name);
 		return;
@@ -361,7 +361,7 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 	d->SetPhase(PHASE_LOADING);
 	ch->MainCharacterPacket();
 
-	long lPublicMapIndex = lMapIndex >= 10000 ? lMapIndex / 10000 : lMapIndex;
+	int32_t lPublicMapIndex = lMapIndex >= 10000 ? lMapIndex / 10000 : lMapIndex;
 
 	//if (!map_allow_find(lMapIndex >= 10000 ? lMapIndex / 10000 : lMapIndex) || !CheckEmpire(ch, lMapIndex))
 	if (!map_allow_find(lPublicMapIndex))
@@ -379,7 +379,7 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 
 	quest::CQuestManager::instance().BroadcastEventFlagOnLogin(ch);
 
-	for (int i = 0; i < QUICKSLOT_MAX_NUM; ++i)
+	for (int32_t i = 0; i < QUICKSLOT_MAX_NUM; ++i)
 		ch->SetQuickslot(i, pTab->quickslot[i]);
 
 	ch->PointsPacket();
@@ -403,11 +403,11 @@ void CInputDB::Boot(const char* data)
 	signal_timer_disable();
 
 	// 패킷 사이즈 체크
-	DWORD dwPacketSize = decode_4bytes(data);
+	uint32_t dwPacketSize = decode_4bytes(data);
 	data += 4;
 
 	// 패킷 버전 체크
-	BYTE bVersion = decode_byte(data);
+	uint8_t bVersion = decode_byte(data);
 	data += 1;
 
 	sys_log(0, "BOOT: PACKET: %d", dwPacketSize);
@@ -433,7 +433,7 @@ void CInputDB::Boot(const char* data)
 	sys_log(0, "sizeof(TAdminManager) = %d", sizeof (TAdminInfo) );
 	//END_ADMIN_MANAGER
 
-	WORD size;
+	uint16_t size;
 
 	/*
 	 * MOB
@@ -575,7 +575,7 @@ void CInputDB::Boot(const char* data)
 	{
 		TItemAttrTable * p = (TItemAttrTable *) data;
 
-		for (int i = 0; i < size; ++i, ++p)
+		for (int32_t i = 0; i < size; ++i, ++p)
 		{
 			if (p->dwApplyIndex >= MAX_APPLY_NUM)
 				continue;
@@ -607,7 +607,7 @@ void CInputDB::Boot(const char* data)
 	{
 		TItemAttrTable * p = (TItemAttrTable *) data;
 
-		for (int i = 0; i < size; ++i, ++p)
+		for (int32_t i = 0; i < size; ++i, ++p)
 		{
 			if (p->dwApplyIndex >= MAX_APPLY_NUM)
 				continue;
@@ -659,7 +659,7 @@ void CInputDB::Boot(const char* data)
 		TLand * kLand = (TLand *) data;
 		data += size * sizeof(TLand);
 
-		for (WORD i = 0; i < size; ++i, ++kLand)
+		for (uint16_t i = 0; i < size; ++i, ++kLand)
 			CManager::instance().LoadLand(kLand);
 
 		/*
@@ -697,7 +697,7 @@ void CInputDB::Boot(const char* data)
 		TObject * kObj = (TObject *) data;
 		data += size * sizeof(TObject);
 
-		for (WORD i = 0; i < size; ++i, ++kObj)
+		for (uint16_t i = 0; i < size; ++i, ++kObj)
 			CManager::instance().LoadObject(kObj, true);
 	}
 
@@ -723,12 +723,12 @@ void CInputDB::Boot(const char* data)
 
 	//ADMIN_MANAGER
 	//관리자 등록
-	int ChunkSize = decode_2bytes(data );
+	int32_t ChunkSize = decode_2bytes(data );
 	data += 2;
-	int HostSize = decode_2bytes(data );
+	int32_t HostSize = decode_2bytes(data );
 	data += 2;
 	sys_log(0, "GM Value Count %d %d", HostSize, ChunkSize  );
-	for (int n = 0; n < HostSize; ++n )
+	for (int32_t n = 0; n < HostSize; ++n )
 	{
 		gm_new_host_inert(data );
 		sys_log(0, "GM HOST : IP[%s] ", data );		
@@ -737,10 +737,10 @@ void CInputDB::Boot(const char* data)
 	
 	
 	data += 2;
-	int adminsize = decode_2bytes(data );
+	int32_t adminsize = decode_2bytes(data );
 	data += 2;
 
-	for (int n = 0; n < adminsize; ++n )
+	for (int32_t n = 0; n < adminsize; ++n )
 	{
 		tAdminInfo& rAdminInfo = *(tAdminInfo*)data;
 
@@ -751,7 +751,7 @@ void CInputDB::Boot(const char* data)
 	
 	//END_ADMIN_MANAGER
 
-	WORD endCheck=decode_2bytes(data);
+	uint16_t endCheck=decode_2bytes(data);
 	if (endCheck != 0xffff)
 	{
 		sys_err("boot packet end check error [%x]!=0xffff", endCheck);
@@ -779,7 +779,7 @@ void CInputDB::Boot(const char* data)
 
 
 	// LOCALE_SERVICE
-	const int FILE_NAME_LEN = 256;
+	const int32_t FILE_NAME_LEN = 256;
 	char szCommonDropItemFileName[FILE_NAME_LEN];
 	char szETCDropItemFileName[FILE_NAME_LEN];
 	char szMOBDropItemFileName[FILE_NAME_LEN];
@@ -888,7 +888,7 @@ void CInputDB::Boot(const char* data)
 
 EVENTINFO(quest_login_event_info)
 {
-	DWORD dwPID;
+	uint32_t dwPID;
 
 	quest_login_event_info() 
 	: dwPID( 0 )
@@ -900,13 +900,13 @@ EVENTFUNC(quest_login_event)
 {
 	quest_login_event_info* info = dynamic_cast<quest_login_event_info*>( event->info );
 
-	if ( info == NULL )
+	if ( info == nullptr )
 	{
 		sys_err( "quest_login_event> <Factor> Null pointer" );
 		return 0;
 	}
 
-	DWORD dwPID = info->dwPID;
+	uint32_t dwPID = info->dwPID;
 
 	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(dwPID);
 
@@ -945,19 +945,19 @@ EVENTFUNC(quest_login_event)
 
 void CInputDB::QuestLoad(LPDESC d, const char * c_pData)
 {
-	if (NULL == d)
+	if (nullptr == d)
 		return;
 
 	LPCHARACTER ch = d->GetCharacter();
 
-	if (NULL == ch)
+	if (nullptr == ch)
 		return;
 
-	const DWORD dwCount = decode_4bytes(c_pData);
+	const uint32_t dwCount = decode_4bytes(c_pData);
 
 	const TQuestTable* pQuestTable = reinterpret_cast<const TQuestTable*>(c_pData+4);
 
-	if (NULL != pQuestTable)
+	if (nullptr != pQuestTable)
 	{
 		if (dwCount != 0)
 		{
@@ -981,7 +981,7 @@ void CInputDB::QuestLoad(LPDESC d, const char * c_pData)
 		if (pkPC->IsLoaded())
 			return;
 
-		for (unsigned int i = 0; i < dwCount; ++i)
+		for (uint32_t i = 0; i < dwCount; ++i)
 		{
 			std::string st(pQuestTable[i].szName);
 
@@ -1026,7 +1026,7 @@ void CInputDB::SafeboxLoad(LPDESC d, const char * c_pData)
 	if (!d->GetCharacter())
 		return;
 
-	BYTE bSize = 1;
+	uint8_t bSize = 1;
 
 	LPCHARACTER ch = d->GetCharacter();
 
@@ -1057,7 +1057,7 @@ void CInputDB::SafeboxChangeSize(LPDESC d, const char * c_pData)
 	if (!d)
 		return;
 
-	BYTE bSize = *(BYTE *) c_pData;
+	uint8_t bSize = *(uint8_t *) c_pData;
 
 	if (!d->GetCharacter())
 		return;
@@ -1157,14 +1157,14 @@ void CInputDB::EmpireSelect(LPDESC d, const char * c_pData)
 		return;
 
 	TAccountTable & rTable = d->GetAccountTable();
-	rTable.bEmpire = *(BYTE *) c_pData;
+	rTable.bEmpire = *(uint8_t *) c_pData;
 
 	TPacketGCEmpire pe;
 	pe.bHeader = HEADER_GC_EMPIRE;
 	pe.bEmpire = rTable.bEmpire;
 	d->Packet(&pe, sizeof(pe));
 
-	for (int i = 0; i < PLAYER_PER_ACCOUNT; ++i) 
+	for (int32_t i = 0; i < PLAYER_PER_ACCOUNT; ++i) 
 		if (rTable.players[i].dwID)
 		{
 			rTable.players[i].x = EMPIRE_START_X(rTable.bEmpire);
@@ -1178,7 +1178,7 @@ void CInputDB::EmpireSelect(LPDESC d, const char * c_pData)
 
 void CInputDB::MapLocations(const char * c_pData)
 {
-	BYTE bCount = *(BYTE *) (c_pData++);
+	uint8_t bCount = *(uint8_t *) (c_pData++);
 
 	sys_log(0, "InputDB::MapLocations %d", bCount);
 
@@ -1186,7 +1186,7 @@ void CInputDB::MapLocations(const char * c_pData)
 
 	while (bCount--)
 	{
-		for (int i = 0; i < MAP_ALLOW_LIMIT; ++i)
+		for (int32_t i = 0; i < MAP_ALLOW_LIMIT; ++i)
 		{
 			if (0 == pLoc->alMaps[i])
 				break;
@@ -1208,7 +1208,7 @@ void CInputDB::P2P(const char * c_pData)
 
 	if (false == DESC_MANAGER::instance().IsP2PDescExist(p->szHost, p->wPort))
 	{
-	    LPCLIENT_DESC pkDesc = NULL;
+	    LPCLIENT_DESC pkDesc = nullptr;
 		sys_log(0, "InputDB:P2P %s:%u", p->szHost, p->wPort);
 	    pkDesc = DESC_MANAGER::instance().CreateConnectionDesc(main_fdw, p->szHost, p->wPort, PHASE_P2P, false);
 		mgr.RegisterConnector(pkDesc);
@@ -1218,7 +1218,7 @@ void CInputDB::P2P(const char * c_pData)
 
 void CInputDB::GuildLoad(const char * c_pData)
 {
-	CGuildManager::instance().LoadGuild(*(DWORD *) c_pData);
+	CGuildManager::instance().LoadGuild(*(uint32_t *) c_pData);
 }
 
 void CInputDB::GuildSkillUpdate(const char* c_pData)
@@ -1328,7 +1328,7 @@ void CInputDB::GuildChangeGrade(const char* c_pData)
 	CGuild* g = CGuildManager::instance().TouchGuild(p->dwGuild);
 
 	if (g)
-		g->P2PChangeGrade((BYTE)p->dwInfo);
+		g->P2PChangeGrade((uint8_t)p->dwInfo);
 }
 
 void CInputDB::GuildChangeMemberData(const char* c_pData)
@@ -1367,8 +1367,8 @@ void CInputDB::ItemLoad(LPDESC d, const char * c_pData)
 	if (ch->IsItemLoaded())
 		return;
 
-	DWORD dwCount = decode_4bytes(c_pData);
-	c_pData += sizeof(DWORD);
+	uint32_t dwCount = decode_4bytes(c_pData);
+	c_pData += sizeof(uint32_t);
 
 	sys_log(0, "ITEM_LOAD: COUNT %s %u", ch->GetName(), dwCount);
 
@@ -1376,7 +1376,7 @@ void CInputDB::ItemLoad(LPDESC d, const char * c_pData)
 
 	TPlayerItem * p = (TPlayerItem *) c_pData;
 
-	for (DWORD i = 0; i < dwCount; ++i, ++p)
+	for (uint32_t i = 0; i < dwCount; ++i, ++p)
 	{
 		LPITEM item = ITEM_MANAGER::instance().CreateItem(p->vnum, p->count, p->id);
 
@@ -1445,7 +1445,7 @@ void CInputDB::ItemLoad(LPDESC d, const char * c_pData)
 	{
 		LPITEM item = *(it++);
 
-		int pos = ch->GetEmptyInventory(item->GetSize());
+		int32_t pos = ch->GetEmptyInventory(item->GetSize());
 
 		if (pos < 0)
 		{
@@ -1477,11 +1477,11 @@ void CInputDB::AffectLoad(LPDESC d, const char * c_pData)
 
 	LPCHARACTER ch = d->GetCharacter();
 
-	DWORD dwPID = decode_4bytes(c_pData);
-	c_pData += sizeof(DWORD);
+	uint32_t dwPID = decode_4bytes(c_pData);
+	c_pData += sizeof(uint32_t);
 
-	DWORD dwCount = decode_4bytes(c_pData);
-	c_pData += sizeof(DWORD);
+	uint32_t dwCount = decode_4bytes(c_pData);
+	c_pData += sizeof(uint32_t);
 
 	if (ch->GetPlayerID() != dwPID)
 		return;
@@ -1545,13 +1545,13 @@ void CInputDB::Time(const char * c_pData)
 
 void CInputDB::ReloadProto(const char * c_pData)
 {
-	WORD wSize;
+	uint16_t wSize;
 
 	/*
 	 * Skill
 	 */
 	wSize = decode_2bytes(c_pData);
-	c_pData += sizeof(WORD);
+	c_pData += sizeof(uint16_t);
 	if (wSize) CSkillManager::instance().Initialize((TSkillTable *) c_pData, wSize);
 	c_pData += sizeof(TSkillTable) * wSize;
 
@@ -1560,7 +1560,7 @@ void CInputDB::ReloadProto(const char * c_pData)
 	 */
 
 	wSize = decode_2bytes(c_pData);
-	c_pData += sizeof(WORD);
+	c_pData += sizeof(uint16_t);
 	CBanwordManager::instance().Initialize((TBanwordTable *) c_pData, wSize);
 	c_pData += sizeof(TBanwordTable) * wSize;
 
@@ -1609,7 +1609,7 @@ void CInputDB::AuthLogin(LPDESC d, const char * c_pData)
 	if (!d)
 		return;
 
-	BYTE bResult = *(BYTE *) c_pData;
+	uint8_t bResult = *(uint8_t *) c_pData;
 
 	TPacketGCAuthSuccess ptoc;
 
@@ -1707,7 +1707,7 @@ void CInputDB::CreateObject(const char * c_pData)
 void CInputDB::DeleteObject(const char * c_pData)
 {
 	using namespace building;
-	CManager::instance().DeleteObject(*(DWORD *) c_pData);
+	CManager::instance().DeleteObject(*(uint32_t *) c_pData);
 }
 
 void CInputDB::UpdateLand(const char * c_pData)
@@ -1732,7 +1732,7 @@ void CInputDB::GuildWarReserveAdd(TGuildWarReserve * p)
 	CGuildManager::instance().ReserveWarAdd(p);
 }
 
-void CInputDB::GuildWarReserveDelete(DWORD dwID)
+void CInputDB::GuildWarReserveDelete(uint32_t dwID)
 {
 	CGuildManager::instance().ReserveWarDelete(dwID);
 }
@@ -1744,7 +1744,7 @@ void CInputDB::GuildWarBet(TPacketGDGuildWarBet * p)
 
 void CInputDB::MarriageAdd(TPacketMarriageAdd * p)
 {
-	sys_log(0, "MarriageAdd %u %u %u %s %s", p->dwPID1, p->dwPID2, (DWORD)p->tMarryTime, p->szName1, p->szName2);
+	sys_log(0, "MarriageAdd %u %u %u %s %s", p->dwPID1, p->dwPID2, (uint32_t)p->tMarryTime, p->szName1, p->szName2);
 	marriage::CManager::instance().Add(p->dwPID1, p->dwPID2, p->tMarryTime, p->szName1, p->szName2);
 }
 
@@ -1802,12 +1802,12 @@ void CInputDB::MyshopPricelistRes(LPDESC d, const TPacketMyshopPricelistHeader* 
 void CInputDB::ReloadAdmin(const char * c_pData )
 {
 	gm_new_clear();
-	int ChunkSize = decode_2bytes(c_pData );
+	int32_t ChunkSize = decode_2bytes(c_pData );
 	c_pData += 2;
-	int HostSize = decode_2bytes(c_pData );
+	int32_t HostSize = decode_2bytes(c_pData );
 	c_pData += 2;
 	
-	for (int n = 0; n < HostSize; ++n )
+	for (int32_t n = 0; n < HostSize; ++n )
 	{
 		gm_new_host_inert(c_pData );
 		c_pData += ChunkSize;
@@ -1815,10 +1815,10 @@ void CInputDB::ReloadAdmin(const char * c_pData )
 	
 	
 	c_pData += 2;
-	int size = 	decode_2bytes(c_pData );
+	int32_t size = 	decode_2bytes(c_pData );
 	c_pData += 2;
 	
-	for (int n = 0; n < size; ++n )
+	for (int32_t n = 0; n < size; ++n )
 	{
 		tAdminInfo& rAdminInfo = *(tAdminInfo*)c_pData;
 
@@ -1840,7 +1840,7 @@ void CInputDB::ReloadAdmin(const char * c_pData )
 // Analyze
 // @version	05/06/10 Bang2ni - 아이템 가격정보 리스트 패킷(HEADER_DG_MYSHOP_PRICELIST_RES) 처리루틴 추가.
 ////////////////////////////////////////////////////////////////////
-int CInputDB::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
+int32_t CInputDB::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 {
 	switch (bHeader)
 	{
@@ -2078,7 +2078,7 @@ int CInputDB::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 		break;
 
 	case HEADER_DG_GUILD_WAR_RESERVE_DEL:
-		GuildWarReserveDelete(*(DWORD *) c_pData);
+		GuildWarReserveDelete(*(uint32_t *) c_pData);
 		break;
 
 	case HEADER_DG_GUILD_WAR_BET:
@@ -2156,21 +2156,21 @@ int CInputDB::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 	return 0;
 }
 
-bool CInputDB::Process(LPDESC d, const void * orig, int bytes, int & r_iBytesProceed)
+bool CInputDB::Process(LPDESC d, const void * orig, int32_t bytes, int32_t & r_iBytesProceed)
 {
 	const char *	c_pData = (const char *) orig;
-	BYTE		bHeader, bLastHeader = 0;
-	int			iSize;
-	int			iLastPacketLen = 0;
+	uint8_t		bHeader, bLastHeader = 0;
+	int32_t			iSize;
+	int32_t			iLastPacketLen = 0;
 
 	for (m_iBufferLeft = bytes; m_iBufferLeft > 0;)
 	{
 		if (m_iBufferLeft < 9)
 			return true;
 
-		bHeader		= *((BYTE *) (c_pData));	// 1
-		m_dwHandle	= *((DWORD *) (c_pData + 1));	// 4
-		iSize		= *((DWORD *) (c_pData + 5));	// 4
+		bHeader		= *((uint8_t *) (c_pData));	// 1
+		m_dwHandle	= *((uint32_t *) (c_pData + 1));	// 4
+		iSize		= *((uint32_t *) (c_pData + 5));	// 4
 
 		sys_log(1, "DBCLIENT: header %d handle %d size %d bytes %d", bHeader, m_dwHandle, iSize, bytes); 
 
@@ -2184,7 +2184,7 @@ bool CInputDB::Process(LPDESC d, const void * orig, int bytes, int & r_iBytesPro
 			sys_err("in InputDB: UNKNOWN HEADER: %d, LAST HEADER: %d(%d), REMAIN BYTES: %d, DESC: %d",
 					bHeader, bLastHeader, iLastPacketLen, m_iBufferLeft, d->GetSocket());
 
-			//printdata((BYTE*) orig, bytes);
+			//printdata((uint8_t*) orig, bytes);
 			//d->SetPhase(PHASE_CLOSE);
 		}
 
@@ -2208,7 +2208,7 @@ void CInputDB::DetailLog(const TPacketNeedLoginLogInfo* info)
 {
 	LPCHARACTER pChar = CHARACTER_MANAGER::instance().FindByPID( info->dwPlayerID );
 
-	if (NULL != pChar)
+	if (nullptr != pChar)
 	{
 		LogManager::instance().DetailLoginLog(true, pChar);
 	}
@@ -2218,7 +2218,7 @@ void CInputDB::ItemAwardInformer(TPacketItemAwardInfromer *data)
 {	
 	LPDESC d = DESC_MANAGER::instance().FindByLoginName(data->login);	//login정보
 	
-	if(d == NULL)
+	if(d == nullptr)
 		return;
 	else
 	{
@@ -2241,16 +2241,16 @@ void CInputDB::RespondChannelStatus(LPDESC desc, const char* pcData)
 	if (!desc) {
 		return;
 	}
-	const int nSize = decode_4bytes(pcData);
+	const int32_t nSize = decode_4bytes(pcData);
 	pcData += sizeof(nSize);
 
-	BYTE bHeader = HEADER_GC_RESPOND_CHANNELSTATUS;
-	desc->BufferedPacket(&bHeader, sizeof(BYTE));
+	uint8_t bHeader = HEADER_GC_RESPOND_CHANNELSTATUS;
+	desc->BufferedPacket(&bHeader, sizeof(uint8_t));
 	desc->BufferedPacket(&nSize, sizeof(nSize));
 	if (0 < nSize) {
 		desc->BufferedPacket(pcData, sizeof(TChannelStatus)*nSize);
 	}
-	BYTE bSuccess = 1;
+	uint8_t bSuccess = 1;
 	desc->Packet(&bSuccess, sizeof(bSuccess));
 	desc->SetChannelStatusRequested(false);
 }

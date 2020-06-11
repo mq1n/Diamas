@@ -21,13 +21,13 @@ class CPythonPlayerEventHandler : public CActorInstance::IEventHandler
 		virtual void OnStop(const SState& c_rkState);
 		virtual void OnWarp(const SState& c_rkState);
 		virtual void OnClearAffects();
-		virtual void OnSetAffect(UINT uAffect);
-		virtual void OnResetAffect(UINT uAffect);
-		virtual void OnAttack(const SState& c_rkState, WORD wMotionIndex);
-		virtual void OnUseSkill(const SState& c_rkState, UINT uMotSkill, UINT uArg);
+		virtual void OnSetAffect(uint32_t uAffect);
+		virtual void OnResetAffect(uint32_t uAffect);
+		virtual void OnAttack(const SState& c_rkState, uint16_t wMotionIndex);
+		virtual void OnUseSkill(const SState& c_rkState, uint32_t uMotSkill, uint32_t uArg);
 		virtual void OnUpdate();
 		virtual void OnChangeShape();
-		virtual void OnHit(UINT uSkill, CActorInstance& rkActorVictim, BOOL isSendPacket);
+		virtual void OnHit(uint32_t uSkill, CActorInstance& rkActorVictim, BOOL isSendPacket);
 
 		void FlushVictimList();
 
@@ -37,17 +37,17 @@ class CPythonPlayerEventHandler : public CActorInstance::IEventHandler
 	protected:
 		struct SVictim
 		{
-			DWORD	m_dwVID;
-			long	m_lPixelX;
-			long	m_lPixelY;
+			uint32_t	m_dwVID;
+			int32_t	m_lPixelX;
+			int32_t	m_lPixelY;
 		};
 
 	protected:
 		std::vector<SVictim> m_kVctkVictim;
 
-		DWORD m_dwPrevComboIndex;
-		DWORD m_dwNextWaitingNotifyTime;
-		DWORD m_dwNextMovingNotifyTime;
+		uint32_t m_dwPrevComboIndex;
+		uint32_t m_dwNextWaitingNotifyTime;
+		uint32_t m_dwNextMovingNotifyTime;
 		TPixelPosition m_kPPosPrevWaiting;
 
 	private:
@@ -61,13 +61,13 @@ class CPythonPlayerEventHandler : public CActorInstance::IEventHandler
 				void SetTarget(CInstanceBase* pInstTarget);
 
 				virtual void OnSetFlyTarget();
-				virtual void OnShoot(DWORD dwSkillIndex);
+				virtual void OnShoot(uint32_t dwSkillIndex);
 
 				virtual void OnNoTarget() { /*Tracenf("Shoot : target이 없습니다.");*/ }
 				virtual void OnExplodingOutOfRange() { /*Tracenf("Shoot : 사정거리가 끝났습니다.");*/ }
 				virtual void OnExplodingAtBackground() { /*Tracenf("Shoot : 배경에 맞았습니다.");*/ }
-				virtual void OnExplodingAtAnotherTarget(DWORD dwSkillIndex, DWORD dwVID);
-				virtual void OnExplodingAtTarget(DWORD dwSkillIndex);
+				virtual void OnExplodingAtAnotherTarget(uint32_t dwSkillIndex, uint32_t dwVID);
+				virtual void OnExplodingAtTarget(uint32_t dwSkillIndex);
 
 			protected:
 				CPythonPlayerEventHandler * m_pParent;

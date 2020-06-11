@@ -55,7 +55,7 @@ struct SCubeMaterialInfo
 
 	CUBE_VALUE			reward;							// 보상이 뭐냐
 	TCubeValueVector	material;						// 재료들은 뭐냐
-	DWORD				gold;							// 돈은 얼마드냐
+	uint32_t				gold;							// 돈은 얼마드냐
 	TCubeValueVector	complicateMaterial;				// 복잡한-_- 재료들
 
 	// .. 클라이언트에서 재료를 보여주기 위하여 약속한 포맷
@@ -71,14 +71,14 @@ struct SItemNameAndLevel
 	SItemNameAndLevel() { level = 0; }
 
 	std::string		name;
-	int				level;
+	int32_t				level;
 };
 
 
 // 자료구조나 이런거 병신인건 이해좀... 누구땜에 영혼이 없는 상태에서 만들었씀
 typedef std::vector<SCubeMaterialInfo>								TCubeResultList;
-typedef std::unordered_map<DWORD, TCubeResultList>				TCubeMapByNPC;				// 각각의 NPC별로 어떤 걸 만들 수 있고 재료가 뭔지...
-typedef std::unordered_map<DWORD, std::string>					TCubeResultInfoTextByNPC;	// 각각의 NPC별로 만들 수 있는 목록을 정해진 포맷으로 정리한 정보
+typedef std::unordered_map<uint32_t, TCubeResultList>				TCubeMapByNPC;				// 각각의 NPC별로 어떤 걸 만들 수 있고 재료가 뭔지...
+typedef std::unordered_map<uint32_t, std::string>					TCubeResultInfoTextByNPC;	// 각각의 NPC별로 만들 수 있는 목록을 정해진 포맷으로 정리한 정보
 
 TCubeMapByNPC cube_info_map;
 TCubeResultInfoTextByNPC cube_result_info_map_by_npc;				// 네이밍 존나 병신같다 ㅋㅋㅋ
@@ -93,14 +93,14 @@ public:
 /*                  STATIC FUNCTIONS                      */ 
 /*--------------------------------------------------------*/
  // 필요한 아이템 개수를 가지고있는가?
-static bool FN_check_item_count (LPITEM *items, DWORD item_vnum, int need_count)
+static bool FN_check_item_count (LPITEM *items, uint32_t item_vnum, int32_t need_count)
 {
-	int	count = 0;
+	int32_t	count = 0;
 
 	// for all cube
-	for (int i=0; i<CUBE_MAX_NUM; ++i)
+	for (int32_t i=0; i<CUBE_MAX_NUM; ++i)
 	{
-		if (NULL==items[i])	continue;
+		if (nullptr==items[i])	continue;
 
 		if (item_vnum==items[i]->GetVnum())
 		{
@@ -112,15 +112,15 @@ static bool FN_check_item_count (LPITEM *items, DWORD item_vnum, int need_count)
 }
 
 // 큐브내의 재료를 지운다.
-static void FN_remove_material (LPITEM *items, DWORD item_vnum, int need_count)
+static void FN_remove_material (LPITEM *items, uint32_t item_vnum, int32_t need_count)
 {
-	int		count	= 0;
-	LPITEM	item	= NULL;
+	int32_t		count	= 0;
+	LPITEM	item	= nullptr;
 
 	// for all cube
-	for (int i=0; i<CUBE_MAX_NUM; ++i)
+	for (int32_t i=0; i<CUBE_MAX_NUM; ++i)
 	{
-		if (NULL==items[i])	continue;
+		if (nullptr==items[i])	continue;
 
 		item = items[i];
 		if (item_vnum==item->GetVnum())
@@ -135,18 +135,18 @@ static void FN_remove_material (LPITEM *items, DWORD item_vnum, int need_count)
 			else
 			{
 				item->SetCount(0);
-				items[i] = NULL;
+				items[i] = nullptr;
 			}
 		}
 	}
 }
 
 
-static CUBE_DATA* FN_find_cube (LPITEM *items, WORD npc_vnum)
+static CUBE_DATA* FN_find_cube (LPITEM *items, uint16_t npc_vnum)
 {
-	DWORD	i, end_index;
+	uint32_t	i, end_index;
 
-	if (0==npc_vnum)	return NULL;
+	if (0==npc_vnum)	return nullptr;
 
 	// FOR ALL CUBE_PROTO
 	end_index = s_cube_proto.size();
@@ -156,10 +156,10 @@ static CUBE_DATA* FN_find_cube (LPITEM *items, WORD npc_vnum)
 			return s_cube_proto[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
-static bool FN_check_valid_npc( WORD vnum )
+static bool FN_check_valid_npc( uint16_t vnum )
 {
 	for ( std::vector<CUBE_DATA*>::iterator iter = s_cube_proto.begin(); iter != s_cube_proto.end(); iter++ )
 	{
@@ -173,8 +173,8 @@ static bool FN_check_valid_npc( WORD vnum )
 // 큐브데이타가 올바르게 초기화 되었는지 체크한다.
 static bool FN_check_cube_data (CUBE_DATA *cube_data)
 {
-	DWORD	i = 0;
-	DWORD	end_index = 0;
+	uint32_t	i = 0;
+	uint32_t	end_index = 0;
 
 	end_index = cube_data->npc_vnum.size();
 	for (i=0; i<end_index; ++i)
@@ -205,13 +205,13 @@ CUBE_DATA::CUBE_DATA()
 }
 
 // 필요한 재료의 수량을 만족하는지 체크한다.
-bool CUBE_DATA::can_make_item (LPITEM *items, WORD npc_vnum)
+bool CUBE_DATA::can_make_item (LPITEM *items, uint16_t npc_vnum)
 {
 	// 필요한 재료, 수량을 만족하는지 체크한다.
-	DWORD	i, end_index;
-	DWORD	need_vnum;
-	int		need_count;
-	int		found_npc = false;
+	uint32_t	i, end_index;
+	uint32_t	need_vnum;
+	int32_t		need_count;
+	int32_t		found_npc = false;
 
 	// check npc_vnum
 	end_index = this->npc_vnum.size();
@@ -238,8 +238,8 @@ bool CUBE_DATA::can_make_item (LPITEM *items, WORD npc_vnum)
 // 큐브를 돌렸을때 나오는 아이템의 종류를 결정함
 CUBE_VALUE* CUBE_DATA::reward_value ()
 {
-	int		end_index		= 0;
-	DWORD	reward_index	= 0;
+	int32_t		end_index		= 0;
+	uint32_t	reward_index	= 0;
 
 	end_index = this->reward.size();
 	reward_index = number(0, end_index);
@@ -251,9 +251,9 @@ CUBE_VALUE* CUBE_DATA::reward_value ()
 // 큐브에 들어있는 재료를 지운다
 void CUBE_DATA::remove_material (LPCHARACTER ch)
 {
-	DWORD	i, end_index;
-	DWORD	need_vnum;
-	int		need_count;
+	uint32_t	i, end_index;
+	uint32_t	need_vnum;
+	int32_t		need_count;
 	LPITEM	*items = ch->GetCubeItem();
 
 	end_index = this->item.size();
@@ -272,12 +272,12 @@ void Cube_clean_item (LPCHARACTER ch)
 
 	cube_item = ch->GetCubeItem();
 
-	for (int i=0; i<CUBE_MAX_NUM; ++i)
+	for (int32_t i=0; i<CUBE_MAX_NUM; ++i)
 	{
-		if (NULL == cube_item[i])
+		if (nullptr == cube_item[i])
 			continue;
 
-		cube_item[i] = NULL;
+		cube_item[i] = nullptr;
 	}
 }
 
@@ -289,15 +289,15 @@ void Cube_open (LPCHARACTER ch)
 		Cube_InformationInitialize();
 	}
 
-	if (NULL == ch)
+	if (nullptr == ch)
 		return;
 
 	LPCHARACTER	npc;
 	npc = ch->GetQuestNPC();
-	if (NULL==npc)
+	if (nullptr==npc)
 	{
 		if (test_server)
-			dev_log(LOG_DEB0, "cube_npc is NULL");
+			dev_log(LOG_DEB0, "cube_npc is nullptr");
 		return;
 	}
 
@@ -321,7 +321,7 @@ void Cube_open (LPCHARACTER ch)
 		return;
 	}
 
-	long distance = DISTANCE_APPROX(ch->GetX() - npc->GetX(), ch->GetY() - npc->GetY());
+	int32_t distance = DISTANCE_APPROX(ch->GetX() - npc->GetX(), ch->GetY() - npc->GetY());
 
 	if (distance >= CUBE_MAX_DISTANCE)
 	{
@@ -340,14 +340,14 @@ void Cube_close (LPCHARACTER ch)
 {
 	RETURN_IF_CUBE_IS_NOT_OPENED(ch);
 	Cube_clean_item(ch);
-	ch->SetCubeNpc(NULL);
+	ch->SetCubeNpc(nullptr);
 	ch->ChatPacket(CHAT_TYPE_COMMAND, "cube close");
 	dev_log(LOG_DEB0, "<CUBE> close (%s)", ch->GetName());
 }
 
 void Cube_init()
 {
-	CUBE_DATA * p_cube = NULL;
+	CUBE_DATA * p_cube = nullptr;
 	std::vector<CUBE_DATA*>::iterator iter;
 
 	char file_name[256+1];
@@ -371,10 +371,10 @@ bool Cube_load (const char *file)
 {
 	FILE	*fp;
 	char	one_line[256];
-	int		value1, value2;
+	int32_t		value1, value2;
 	const char	*delim = " \t\r\n";
 	char	*v, *token_string;
-	CUBE_DATA	*cube_data = NULL;
+	CUBE_DATA	*cube_data = nullptr;
 	CUBE_VALUE	cube_value = {0,0};
 
 	if (0 == file || 0 == file[0])
@@ -392,14 +392,14 @@ bool Cube_load (const char *file)
 
 		token_string = strtok(one_line, delim);
 
-		if (NULL == token_string)
+		if (nullptr == token_string)
 			continue;
 
 		// set value1, value2
-		if ((v = strtok(NULL, delim)))
+		if ((v = strtok(nullptr, delim)))
 			str_to_number(value1, v);
 
-		if ((v = strtok(NULL, delim)))
+		if ((v = strtok(nullptr, delim)))
 			str_to_number(value2, v);
 
 		TOKEN("section")
@@ -408,7 +408,7 @@ bool Cube_load (const char *file)
 		}
 		else TOKEN("npc")
 		{
-			cube_data->npc_vnum.push_back((WORD)value1);
+			cube_data->npc_vnum.push_back((uint16_t)value1);
 		}
 		else TOKEN("item")
 		{
@@ -450,9 +450,9 @@ bool Cube_load (const char *file)
 	return true;
 }
 
-static void FN_cube_print (CUBE_DATA *data, DWORD index)
+static void FN_cube_print (CUBE_DATA *data, uint32_t index)
 {
-	DWORD	i;
+	uint32_t	i;
 	dev_log(LOG_DEB0, "--------------------------------");
 	dev_log(LOG_DEB0, "CUBE_DATA[%d]", index);
 
@@ -474,7 +474,7 @@ static void FN_cube_print (CUBE_DATA *data, DWORD index)
 
 void Cube_print ()
 {
-	for (DWORD i=0; i<s_cube_proto.size(); ++i)
+	for (uint32_t i=0; i<s_cube_proto.size(); ++i)
 	{
 		FN_cube_print(s_cube_proto[i], i);
 	}
@@ -483,19 +483,19 @@ void Cube_print ()
 
 static bool FN_update_cube_status(LPCHARACTER ch)
 {
-	if (NULL == ch)
+	if (nullptr == ch)
 		return false;
 
 	if (!ch->IsCubeOpen())
 		return false;
 
 	LPCHARACTER	npc = ch->GetQuestNPC();
-	if (NULL == npc)
+	if (nullptr == npc)
 		return false;
 
 	CUBE_DATA* cube = FN_find_cube(ch->GetCubeItem(), npc->GetRaceNum());
 
-	if (NULL == cube)
+	if (nullptr == cube)
 	{
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "cube info 0 0 0");
 		return false;
@@ -514,7 +514,7 @@ bool Cube_make (LPCHARACTER ch)
 	// 새로운 아이템 지급
 
 	LPCHARACTER	npc;
-	int			percent_number = 0;
+	int32_t			percent_number = 0;
 	CUBE_DATA	*cube_proto;
 	LPITEM	*items;
 	LPITEM	new_item;
@@ -526,7 +526,7 @@ bool Cube_make (LPCHARACTER ch)
 	}
 
 	npc = ch->GetQuestNPC();
-	if (NULL == npc)
+	if (nullptr == npc)
 	{
 		return false;
 	}
@@ -534,12 +534,12 @@ bool Cube_make (LPCHARACTER ch)
 	items = ch->GetCubeItem();
 	cube_proto = FN_find_cube(items, npc->GetRaceNum());
 
-	if (NULL == cube_proto)
+	if (nullptr == cube_proto)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("제조 재료가 부족합니다"));
 		return false;
 	}
-	int cube_gold = cube_proto->gold;
+	int32_t cube_gold = cube_proto->gold;
 	if (cube_gold < 0 || ch->GetGold() < cube_gold)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("돈이 부족하거나 아이템이 제자리에 없습니다."));	// 이 텍스트는 이미 널리 쓰이는거라 추가번역 필요 없음
@@ -590,10 +590,10 @@ void Cube_show_list (LPCHARACTER ch)
 
 	cube_item = ch->GetCubeItem();
 
-	for (int i=0; i<CUBE_MAX_NUM; ++i)
+	for (int32_t i=0; i<CUBE_MAX_NUM; ++i)
 	{
 		item = cube_item[i];
-		if (NULL==item)	continue;
+		if (nullptr==item)	continue;
 
 		ch->ChatPacket(CHAT_TYPE_INFO, "cube[%d]: inventory[%d]: %s",
 				i, item->GetCell(), item->GetName());
@@ -602,7 +602,7 @@ void Cube_show_list (LPCHARACTER ch)
 
 
 // 인벤토리에 있는 아이템을 큐브에 등록
-void Cube_add_item (LPCHARACTER ch, int cube_index, int inven_index)
+void Cube_add_item (LPCHARACTER ch, int32_t cube_index, int32_t inven_index)
 {
 	// 아이템이 있는가?
 	// 큐브내의 빈자리 찾기
@@ -620,16 +620,16 @@ void Cube_add_item (LPCHARACTER ch, int cube_index, int inven_index)
 
 	item = ch->GetInventoryItem(inven_index);
 
-	if (NULL==item)	return;
+	if (nullptr==item)	return;
 
 	cube_item = ch->GetCubeItem();
 
 	// 이미 다른위치에 등록되었던 아이템이면 기존 indext삭제
-	for (int i=0; i<CUBE_MAX_NUM; ++i)
+	for (int32_t i=0; i<CUBE_MAX_NUM; ++i)
 	{
 		if (item==cube_item[i])
 		{
-			cube_item[i] = NULL;
+			cube_item[i] = nullptr;
 			break;
 		}
 	}
@@ -648,7 +648,7 @@ void Cube_add_item (LPCHARACTER ch, int cube_index, int inven_index)
 }
 
 // 큐브에있는 아이템을 제거
-void Cube_delete_item (LPCHARACTER ch, int cube_index)
+void Cube_delete_item (LPCHARACTER ch, int32_t cube_index)
 {
 	LPITEM	item;
 	LPITEM	*cube_item;
@@ -659,10 +659,10 @@ void Cube_delete_item (LPCHARACTER ch, int cube_index)
 
 	cube_item = ch->GetCubeItem();
 
-	if ( NULL== cube_item[cube_index] )	return;
+	if ( nullptr== cube_item[cube_index] )	return;
 
 	item = cube_item[cube_index];
-	cube_item[cube_index] = NULL;
+	cube_item[cube_index] = nullptr;
 
 	if (test_server)
 		ch->ChatPacket(CHAT_TYPE_INFO, "cube[%d]: cube[%d]: %s deleted",
@@ -678,7 +678,7 @@ void Cube_delete_item (LPCHARACTER ch, int cube_index)
 // 아이템 이름을 통해서 순수 이름과 강화레벨을 분리하는 함수 (무쌍검+5 -> 무쌍검, 5)
 SItemNameAndLevel SplitItemNameAndLevelFromName(const std::string& name)
 {
-	int level = 0;
+	int32_t level = 0;
 	SItemNameAndLevel info;
 	info.name = name;
 
@@ -712,7 +712,7 @@ void Cube_MakeCubeInformationText()
 	// 이제 정리된 큐브 결과 및 재료들의 정보로 클라이언트에 보내 줄 정보로 변환함.
 	for (TCubeMapByNPC::iterator iter = cube_info_map.begin(); cube_info_map.end() != iter; ++iter)
 	{
-		//const DWORD& npcVNUM = iter->first;
+		//const uint32_t& npcVNUM = iter->first;
 		TCubeResultList& resultList = iter->second;
 
 		for (TCubeResultList::iterator resultIter = resultList.begin(); resultList.end() != resultIter; ++resultIter)
@@ -798,7 +798,7 @@ void Cube_InformationInitialize()
 		//}
 
 		const CUBE_VALUE& reward = rewards.at(0);
-		const WORD& npcVNUM = cubeData->npc_vnum.at(0);
+		const uint16_t& npcVNUM = cubeData->npc_vnum.at(0);
 		bool bComplicate = false;
 		
 		TCubeMapByNPC& cubeMap = cube_info_map;
@@ -825,7 +825,7 @@ void Cube_InformationInitialize()
 				for (TCubeValueVector::iterator existMaterialIter = existInfo.material.begin(); existInfo.material.end() != existMaterialIter; ++existMaterialIter)
 				{
 					TItemTable* existMaterialProto = ITEM_MANAGER::Instance().GetTable(existMaterialIter->vnum);
-					if (NULL == existMaterialProto)
+					if (nullptr == existMaterialProto)
 					{
 						sys_err("There is no item(%u)", existMaterialIter->vnum);
 						return;
@@ -876,10 +876,10 @@ void Cube_request_result_list(LPCHARACTER ch)
 	RETURN_IF_CUBE_IS_NOT_OPENED(ch);
 
 	LPCHARACTER	npc = ch->GetQuestNPC();
-	if (NULL == npc)
+	if (nullptr == npc)
 		return;
 
-	DWORD npcVNUM = npc->GetRaceNum();
+	uint32_t npcVNUM = npc->GetRaceNum();
 
 	if (!FN_check_valid_npc(npcVNUM)) // @fixme127
 	{
@@ -913,7 +913,7 @@ void Cube_request_result_list(LPCHARACTER ch)
 			resultText.erase(resultText.size() - 1);
 
 		// 채팅 패킷의 한계를 넘어가면 에러 남김... 기획자 분들 께 조정해달라고 요청하거나, 나중에 다른 방식으로 바꾸거나...
-		int fixedSize = 0;
+		int32_t fixedSize = 0;
 		if (resultText.size() < 20)
 		{
 			fixedSize = 20 - resultText.size();
@@ -924,7 +924,7 @@ void Cube_request_result_list(LPCHARACTER ch)
 		}
 		if (fixedSize >= CHAT_MAX_LEN)
 		{
-			sys_err("[CubeInfo] Too long cube result list text. (NPC: %d, fixedSize: %d, length: %d)", npcVNUM, fixedSize, resultText.size());
+			sys_err("[CubeInfo] Too int32_t cube result list text. (NPC: %d, fixedSize: %d, length: %d)", npcVNUM, fixedSize, resultText.size());
 			resultText.clear();
 			resultCount = 0;
 		}
@@ -939,15 +939,15 @@ void Cube_request_result_list(LPCHARACTER ch)
 }
 
 // 
-void Cube_request_material_info(LPCHARACTER ch, int requestStartIndex, int requestCount)
+void Cube_request_material_info(LPCHARACTER ch, int32_t requestStartIndex, int32_t requestCount)
 {
 	RETURN_IF_CUBE_IS_NOT_OPENED(ch);
 
 	LPCHARACTER	npc = ch->GetQuestNPC();
-	if (NULL == npc)
+	if (nullptr == npc)
 		return;
 
-	DWORD npcVNUM = npc->GetRaceNum();
+	uint32_t npcVNUM = npc->GetRaceNum();
 	if (!FN_check_valid_npc(npcVNUM)) // @fixme127
 	{
 		if (test_server)
@@ -956,7 +956,7 @@ void Cube_request_material_info(LPCHARACTER ch, int requestStartIndex, int reque
 	}
 	std::string materialInfoText = "";
 
-	int index = 0;
+	int32_t index = 0;
 	bool bCatchInfo = false;
 
 	const TCubeResultList& resultList = cube_info_map[npcVNUM];
@@ -991,7 +991,7 @@ void Cube_request_material_info(LPCHARACTER ch, int requestStartIndex, int reque
 	// (Server -> Client) /cube m_info start_index count 125,1|126,2|127,2|123,5&555,5&555,4/120000
 	if (materialInfoText.size() - 20 >= CHAT_MAX_LEN)
 	{
-		sys_err("[CubeInfo] Too long material info. (NPC: %d, requestStart: %d, requestCount: %d, length: %d)", npcVNUM, requestStartIndex, requestCount, materialInfoText.size());
+		sys_err("[CubeInfo] Too int32_t material info. (NPC: %d, requestStart: %d, requestCount: %d, length: %d)", npcVNUM, requestStartIndex, requestCount, materialInfoText.size());
 	}
 
 	ch->ChatPacket(CHAT_TYPE_COMMAND, "cube m_info %d %d %s", requestStartIndex, requestCount, materialInfoText.c_str());

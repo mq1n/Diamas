@@ -5,10 +5,10 @@
 
 typedef struct SPacketElement
 {
-	int		iSize;
+	int32_t		iSize;
 	std::string	stName;
-	int		iCalled;
-	DWORD	dwLoad;
+	int32_t		iCalled;
+	uint32_t	dwLoad;
 	bool	bSequencePacket;
 } TPacketElement;
 
@@ -18,8 +18,8 @@ class CPacketInfo
 		CPacketInfo();
 		virtual ~CPacketInfo();
 
-		void Set(int header, int size, const char * c_pszName, bool bSeq=false);
-		bool Get(int header, int * size, const char ** c_ppszName);
+		void Set(int32_t header, int32_t size, const char * c_pszName, bool bSeq=false);
+		bool Get(int32_t header, int32_t * size, const char ** c_ppszName);
 
 		void Start();
 		void End();
@@ -27,17 +27,17 @@ class CPacketInfo
 		void Log(const char * c_pszFileName);
 
 #ifdef ENABLE_SEQUENCE_SYSTEM
-		bool IsSequence(int header);
-		void SetSequence(int header, bool bSeq);
+		bool IsSequence(int32_t header);
+		void SetSequence(int32_t header, bool bSeq);
 #endif
 
 	private:
-		TPacketElement * GetElement(int header);
+		TPacketElement * GetElement(int32_t header);
 
 	protected:
-		std::map<int, TPacketElement *> m_pPacketMap;
+		std::map<int32_t, TPacketElement *> m_pPacketMap;
 		TPacketElement * m_pCurrentPacket;
-		DWORD m_dwStartTime;
+		uint32_t m_dwStartTime;
 };
 
 class CPacketInfoCG : public CPacketInfo

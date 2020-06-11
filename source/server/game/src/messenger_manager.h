@@ -44,7 +44,7 @@ class MessengerManager : public singleton<MessengerManager>
 		std::set<keyT>			m_set_loginAccount;
 		std::map<keyT, std::set<keyT> >	m_Relation;
 		std::map<keyT, std::set<keyT> >	m_InverseRelation;
-		std::set<DWORD>			m_set_requestToAdd;
+		std::set<uint32_t>			m_set_requestToAdd;
 };
 
 #endif

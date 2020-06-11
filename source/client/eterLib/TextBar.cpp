@@ -2,9 +2,9 @@
 #include "TextBar.h"
 #include "../eterlib/Util.h"
 
-void CTextBar::__SetFont(int fontSize, bool isBold)
+void CTextBar::__SetFont(int32_t fontSize, bool isBold)
 {
-	int iCodePage = GetDefaultCodePage();
+	int32_t iCodePage = GetDefaultCodePage();
 
 	LOGFONT logFont;
 
@@ -36,7 +36,7 @@ void CTextBar::__SetFont(int fontSize, bool isBold)
 	
 }
 
-void CTextBar::SetTextColor(int r, int g, int b)
+void CTextBar::SetTextColor(int32_t r, int32_t g, int32_t b)
 {
 	HDC hDC = m_dib.GetDCHandle();
 	::SetTextColor(hDC, RGB(r, g, b));
@@ -48,7 +48,7 @@ void CTextBar::GetTextExtent(const char * c_szText, SIZE* p_size)
 	GetTextExtentPoint32(hDC, c_szText, strlen(c_szText), p_size); 
 }
 
-void CTextBar::TextOut(int ix, int iy, const char * c_szText)
+void CTextBar::TextOut(int32_t ix, int32_t iy, const char * c_szText)
 {
 	m_dib.TextOut(ix, iy, c_szText);
 	Invalidate();
@@ -61,9 +61,9 @@ void CTextBar::OnCreate()
 	__SetFont(m_fontSize, m_isBold);
 }
 
-CTextBar::CTextBar(int fontSize, bool isBold)
+CTextBar::CTextBar(int32_t fontSize, bool isBold)
 {
-	m_hOldFont = NULL;	
+	m_hOldFont = nullptr;	
 	m_fontSize = fontSize;
 	m_isBold = isBold;
 	

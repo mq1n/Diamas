@@ -56,26 +56,26 @@ bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 		if (pFile)
 		{
 			// number of boundary shapes
-			unsigned int nNumBoundaries;
-			if (fread(&nNumBoundaries, sizeof(unsigned int), 1, pFile) == 1)
+			uint32_t nNumBoundaries;
+			if (fread(&nNumBoundaries, sizeof(uint32_t), 1, pFile) == 1)
 			{
-				for (unsigned int i = 0; i < nNumBoundaries && bSuccess; ++i)
+				for (uint32_t i = 0; i < nNumBoundaries && bSuccess; ++i)
 				{
 					SBoundaryShape sShape;
 					
 					// number of contours for this shape
-					unsigned int nNumContours;
-					if (fread(&nNumContours, sizeof(unsigned int), 1, pFile) == 1)
+					uint32_t nNumContours;
+					if (fread(&nNumContours, sizeof(uint32_t), 1, pFile) == 1)
 					{
-						for (unsigned int j = 0; j < nNumContours && bSuccess; ++j)
+						for (uint32_t j = 0; j < nNumContours && bSuccess; ++j)
 						{
 							// number of points in this contour
 							vector<SPoint> vPoints;
-							unsigned int nNumPoints;
-							if (fread(&nNumPoints, sizeof(unsigned int), 1, pFile) == 1)
+							uint32_t nNumPoints;
+							if (fread(&nNumPoints, sizeof(uint32_t), 1, pFile) == 1)
 							{
 								// read the points
-								for (unsigned int k = 0; k < nNumPoints && bSuccess; ++k)
+								for (uint32_t k = 0; k < nNumPoints && bSuccess; ++k)
 								{
 									SPoint sPoint;
 
@@ -93,7 +93,7 @@ bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 										else
 										{
 											// check extents
-											for (int l = 0; l < 3; ++l)
+											for (int32_t l = 0; l < 3; ++l)
 											{
 												if (sPoint.m_afData[l] < sShape.m_afMin[l])
 													sShape.m_afMin[l] = sPoint.m_afData[l];
@@ -157,7 +157,7 @@ bool CBoundaryShapeManager::PointInside(float fX, float fY)
 {
 	bool bInside = false;
 
-	for (DWORD i = 0; i < m_vBoundaries.size() && !bInside; ++i)
+	for (uint32_t i = 0; i < m_vBoundaries.size() && !bInside; ++i)
 		bInside = PointInShape(m_vBoundaries[i], fX, fY);
 
 	return bInside;
@@ -171,9 +171,9 @@ bool CBoundaryShapeManager::PointInShape(SBoundaryShape& sShape, float fX, float
 {
 	bool bInside = false;
 
-	for (DWORD k = 0; k < sShape.m_vContours.size(); ++k)
+	for (uint32_t k = 0; k < sShape.m_vContours.size(); ++k)
 	{
-		for (DWORD i = 0, j = sShape.m_vContours[k].size() - 1; i < sShape.m_vContours[k].size(); j = i++)
+		for (uint32_t i = 0, j = sShape.m_vContours[k].size() - 1; i < sShape.m_vContours[k].size(); j = i++)
 		{
 			if ((((sShape.m_vContours[k][i][1] <= fY) && (fY < sShape.m_vContours[k][j][1])) ||
 				 ((sShape.m_vContours[k][j][1] <= fY) && (fY < sShape.m_vContours[k][i][1]))) &&
@@ -198,7 +198,7 @@ bool CBoundaryShapeManager::RandomPoint(float& fX, float& fY)
 	if (m_vBoundaries.size() > 0)
 	{
 		// pick a random boundary shape
-		int nIndex = random_range(0, m_vBoundaries.size() - 1);
+		int32_t nIndex = random_range(0, m_vBoundaries.size() - 1);
 		SBoundaryShape& sShape = m_vBoundaries[nIndex];
 
 		// pick a point at random within its extents

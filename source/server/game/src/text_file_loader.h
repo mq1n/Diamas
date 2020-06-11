@@ -33,20 +33,20 @@ class CTextFileLoader
 		const char * GetFileName();
 
 		void SetTop();
-		DWORD GetChildNodeCount();
+		uint32_t GetChildNodeCount();
 		BOOL SetChildNode(const char * c_szKey);
-		BOOL SetChildNode(const std::string & c_rstrKeyHead, DWORD dwIndex);
-		BOOL SetChildNode(DWORD dwIndex);
+		BOOL SetChildNode(const std::string & c_rstrKeyHead, uint32_t dwIndex);
+		BOOL SetChildNode(uint32_t dwIndex);
 		BOOL SetParentNode();
 		BOOL GetCurrentNodeName(std::string * pstrName);
 
 		BOOL IsToken(const std::string & c_rstrKey);
 		BOOL GetTokenVector(const std::string & c_rstrKey, TTokenVector ** ppTokenVector);
 		BOOL GetTokenBoolean(const std::string & c_rstrKey, BOOL * pData);
-		BOOL GetTokenByte(const std::string & c_rstrKey, BYTE * pData);
-		BOOL GetTokenWord(const std::string & c_rstrKey, WORD * pData);
-		BOOL GetTokenInteger(const std::string & c_rstrKey, int * pData);
-		BOOL GetTokenDoubleWord(const std::string & c_rstrKey, DWORD * pData);
+		BOOL GetTokenByte(const std::string & c_rstrKey, uint8_t * pData);
+		BOOL GetTokenWord(const std::string & c_rstrKey, uint16_t * pData);
+		BOOL GetTokenInteger(const std::string & c_rstrKey, int32_t * pData);
+		BOOL GetTokenDoubleWord(const std::string & c_rstrKey, uint32_t * pData);
 		BOOL GetTokenFloat(const std::string & c_rstrKey, float * pData);
 
 		BOOL GetTokenVector2(const std::string & c_rstrKey, D3DXVECTOR2 * pVector2);
@@ -65,7 +65,7 @@ class CTextFileLoader
 
 	protected:
 		std::string					m_strFileName;
-		DWORD						m_dwcurLineIndex;
+		uint32_t						m_dwcurLineIndex;
 		const void *					mc_pData;
 
 		CMemoryTextFileLoader				m_fileLoader;

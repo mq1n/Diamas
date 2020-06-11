@@ -7,14 +7,14 @@ class IPhysicsWorld
 public:
 	IPhysicsWorld()
 	{
-		assert(ms_pWorld == NULL);
+		assert(ms_pWorld == nullptr);
 		ms_pWorld = this;
 	}
 
 	virtual ~IPhysicsWorld()
 	{
 		if (this == ms_pWorld) 
-			ms_pWorld = NULL;
+			ms_pWorld = nullptr;
 	}
 
 	static IPhysicsWorld* GetPhysicsWorld()
@@ -36,14 +36,14 @@ class IObjectManager
 public:
 	IObjectManager()
 	{
-		assert(ms_ObjManager == NULL);
+		assert(ms_ObjManager == nullptr);
 		ms_ObjManager = this;
 	}
 
 	virtual ~IObjectManager()
 	{
 		if (this == ms_ObjManager) 
-			ms_ObjManager = NULL;
+			ms_ObjManager = nullptr;
 	}
 
 	static IObjectManager* GetObjectManager()

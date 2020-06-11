@@ -282,7 +282,7 @@ void CParticleInstance::Transform(const D3DXMATRIX * c_matLocal, const float c_f
 #ifdef WORLD_EDITOR
 	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, m_Color);
 #else
-	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, (DWORD)m_dcColor);
+	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, (uint32_t)m_dcColor);
 #endif
 
 	/////
@@ -441,7 +441,7 @@ void CParticleInstance::Destroy()
 void CParticleInstance::__Initialize()
 {
 	//*
-	m_pDecorator=NULL;
+	m_pDecorator=nullptr;
 
 	m_v3Position = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_v3LastPosition = m_v3Position;
@@ -474,7 +474,7 @@ CParticleInstance::~CParticleInstance()
 /*CRayParticleInstance::CRayParticleInstance()
 {
 #ifdef RAY_TO_AFTERIMAGE
-	int i;
+	int32_t i;
 	for(i=0;i<RAY_VERTEX_COUNT*2;i+=2)
 	{
 		m_ParticleMesh[i].texCoord = D3DXVECTOR2(i+0.0f, 1.0f);

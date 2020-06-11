@@ -13,7 +13,7 @@ void CPythonNetworkStream::EnableChatInsultFilter(bool isEnable)
 	m_isEnableChatInsultFilter=isEnable;
 }
 
-void CPythonNetworkStream::__FilterInsult(char* szLine, UINT uLineLen)
+void CPythonNetworkStream::__FilterInsult(char* szLine, uint32_t uLineLen)
 {
 	m_kInsultChecker.FilterInsult(szLine, uLineLen);
 }
@@ -41,7 +41,7 @@ bool CPythonNetworkStream::LoadInsultList(const char* c_szInsultListFileName)
 	kMemTextFileLoader.Bind(file.GetSize(), file.GetData());
 
 	m_kInsultChecker.Clear();
-	for (DWORD dwLineIndex=0; dwLineIndex<kMemTextFileLoader.GetLineCount(); ++dwLineIndex)
+	for (uint32_t dwLineIndex=0; dwLineIndex<kMemTextFileLoader.GetLineCount(); ++dwLineIndex)
 	{
 		const std::string& c_rstLine=kMemTextFileLoader.GetLineString(dwLineIndex);		
 		m_kInsultChecker.AppendInsult(c_rstLine);
@@ -49,7 +49,7 @@ bool CPythonNetworkStream::LoadInsultList(const char* c_szInsultListFileName)
 	return true;
 }
 
-bool CPythonNetworkStream::LoadConvertTable(DWORD dwEmpireID, const char* c_szFileName)
+bool CPythonNetworkStream::LoadConvertTable(uint32_t dwEmpireID, const char* c_szFileName)
 {
 	if (dwEmpireID<1 || dwEmpireID>=4)
 		return false;
@@ -58,10 +58,10 @@ bool CPythonNetworkStream::LoadConvertTable(DWORD dwEmpireID, const char* c_szFi
 	if (!FileSystemManager::Instance().OpenFile(c_szFileName, file))
 		return false;
 
-	DWORD dwEngCount=26;
-	DWORD dwHanCount=(0xc8-0xb0+1)*(0xfe-0xa1+1);
-	DWORD dwHanSize=dwHanCount*2;
-	DWORD dwFileSize=dwEngCount*2+dwHanSize;
+	uint32_t dwEngCount=26;
+	uint32_t dwHanCount=(0xc8-0xb0+1)*(0xfe-0xa1+1);
+	uint32_t dwHanSize=dwHanCount*2;
+	uint32_t dwFileSize=dwEngCount*2+dwHanSize;
 
 	if (file.GetSize() < dwFileSize)
 		return false;
@@ -317,7 +317,7 @@ bool CPythonNetworkStream::__RecvPlayerPoints()
 	if (!Recv(sizeof(TPacketGCPoints), &PointsPacket))
 		return false;
 
-	for (DWORD i = 0; i < POINT_MAX_NUM; ++i)
+	for (uint32_t i = 0; i < POINT_MAX_NUM; ++i)
 		CPythonPlayer::Instance().SetStatus(i, PointsPacket.points[i]);
 
 	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "RefreshStatus", Py_BuildValue("()"));

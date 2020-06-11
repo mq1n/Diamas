@@ -26,32 +26,32 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 
 		void			GracefulShutdown();	// 정상적 셧다운할 때 사용. PC를 모두 저장시키고 Destroy 한다.
 
-		DWORD			AllocVID();
+		uint32_t			AllocVID();
 
-		LPCHARACTER             CreateCharacter(const char * name, DWORD dwPID = 0);
+		LPCHARACTER             CreateCharacter(const char * name, uint32_t dwPID = 0);
 #ifndef DEBUG_ALLOC
 		void DestroyCharacter(LPCHARACTER ch);
 #else
 		void DestroyCharacter(LPCHARACTER ch, const char* file, size_t line);
 #endif
 
-		void			Update(int iPulse);
+		void			Update(int32_t iPulse);
 
-		LPCHARACTER		SpawnMob(DWORD dwVnum, long lMapIndex, long x, long y, long z, bool bSpawnMotion = false, int iRot = -1, bool bShow = true);
-		LPCHARACTER		SpawnMobRange(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, bool bIsException=false, bool bSpawnMotion = false , bool bAggressive = false);
-		LPCHARACTER		SpawnGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, LPREGEN pkRegen = NULL, bool bAggressive_ = false, LPDUNGEON pDungeon = NULL);
-		bool			SpawnGroupGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, LPREGEN pkRegen = NULL, bool bAggressive_ = false, LPDUNGEON pDungeon = NULL);
-		bool			SpawnMoveGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, int tx, int ty, LPREGEN pkRegen = NULL, bool bAggressive_ = false);
-		LPCHARACTER		SpawnMobRandomPosition(DWORD dwVnum, long lMapIndex);
+		LPCHARACTER		SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int32_t x, int32_t y, int32_t z, bool bSpawnMotion = false, int32_t iRot = -1, bool bShow = true);
+		LPCHARACTER		SpawnMobRange(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, bool bIsException=false, bool bSpawnMotion = false , bool bAggressive = false);
+		LPCHARACTER		SpawnGroup(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, LPREGEN pkRegen = nullptr, bool bAggressive_ = false, LPDUNGEON pDungeon = nullptr);
+		bool			SpawnGroupGroup(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, LPREGEN pkRegen = nullptr, bool bAggressive_ = false, LPDUNGEON pDungeon = nullptr);
+		bool			SpawnMoveGroup(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, int32_t tx, int32_t ty, LPREGEN pkRegen = nullptr, bool bAggressive_ = false);
+		LPCHARACTER		SpawnMobRandomPosition(uint32_t dwVnum, int32_t lMapIndex);
 
 		void			SelectStone(LPCHARACTER pkChrStone);
 
 		NAME_MAP &		GetPCMap() { return m_map_pkPCChr; }
 
-		LPCHARACTER		Find(DWORD dwVID);
+		LPCHARACTER		Find(uint32_t dwVID);
 		LPCHARACTER		Find(const VID & vid);
 		LPCHARACTER		FindPC(const char * name);
-		LPCHARACTER		FindByPID(DWORD dwPID);
+		LPCHARACTER		FindByPID(uint32_t dwPID);
 
 		bool			AddToStateList(LPCHARACTER ch);
 		void			RemoveFromStateList(LPCHARACTER ch);
@@ -65,58 +65,58 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 
 		template<class Func>	Func for_each_pc(Func f);
 
-		void			KillLog(DWORD dwVnum);
+		void			KillLog(uint32_t dwVnum);
 
-		void			RegisterRaceNum(DWORD dwVnum);
+		void			RegisterRaceNum(uint32_t dwVnum);
 		void			RegisterRaceNumMap(LPCHARACTER ch);
 		void			UnregisterRaceNumMap(LPCHARACTER ch);
-		bool			GetCharactersByRaceNum(DWORD dwRaceNum, CharacterVectorInteractor & i);
+		bool			GetCharactersByRaceNum(uint32_t dwRaceNum, CharacterVectorInteractor & i);
 
-		LPCHARACTER		FindSpecifyPC(unsigned int uiJobFlag, long lMapIndex, LPCHARACTER except=NULL, int iMinLevel = 1, int iMaxLevel = PLAYER_MAX_LEVEL_CONST);
+		LPCHARACTER		FindSpecifyPC(uint32_t uiJobFlag, int32_t lMapIndex, LPCHARACTER except=nullptr, int32_t iMinLevel = 1, int32_t iMaxLevel = PLAYER_MAX_LEVEL_CONST);
 
-		void			SetMobItemRate(int value)	{ m_iMobItemRate = value; }
-		void			SetMobDamageRate(int value)	{ m_iMobDamageRate = value; }
-		void			SetMobGoldAmountRate(int value)	{ m_iMobGoldAmountRate = value; }
-		void			SetMobGoldDropRate(int value)	{ m_iMobGoldDropRate = value; }
-		void			SetMobExpRate(int value)	{ m_iMobExpRate = value; }
+		void			SetMobItemRate(int32_t value)	{ m_iMobItemRate = value; }
+		void			SetMobDamageRate(int32_t value)	{ m_iMobDamageRate = value; }
+		void			SetMobGoldAmountRate(int32_t value)	{ m_iMobGoldAmountRate = value; }
+		void			SetMobGoldDropRate(int32_t value)	{ m_iMobGoldDropRate = value; }
+		void			SetMobExpRate(int32_t value)	{ m_iMobExpRate = value; }
 
-		void			SetMobItemRatePremium(int value)	{ m_iMobItemRatePremium = value; }
-		void			SetMobGoldAmountRatePremium(int value)	{ m_iMobGoldAmountRatePremium = value; }
-		void			SetMobGoldDropRatePremium(int value)	{ m_iMobGoldDropRatePremium = value; }
-		void			SetMobExpRatePremium(int value)		{ m_iMobExpRatePremium = value; }
+		void			SetMobItemRatePremium(int32_t value)	{ m_iMobItemRatePremium = value; }
+		void			SetMobGoldAmountRatePremium(int32_t value)	{ m_iMobGoldAmountRatePremium = value; }
+		void			SetMobGoldDropRatePremium(int32_t value)	{ m_iMobGoldDropRatePremium = value; }
+		void			SetMobExpRatePremium(int32_t value)		{ m_iMobExpRatePremium = value; }
 
-		void			SetUserDamageRatePremium(int value)	{ m_iUserDamageRatePremium = value; }
-		void			SetUserDamageRate(int value ) { m_iUserDamageRate = value; }
-		int			GetMobItemRate(LPCHARACTER ch);
-		int			GetMobDamageRate(LPCHARACTER ch);
-		int			GetMobGoldAmountRate(LPCHARACTER ch);
-		int			GetMobGoldDropRate(LPCHARACTER ch);
-		int			GetMobExpRate(LPCHARACTER ch);
+		void			SetUserDamageRatePremium(int32_t value)	{ m_iUserDamageRatePremium = value; }
+		void			SetUserDamageRate(int32_t value ) { m_iUserDamageRate = value; }
+		int32_t			GetMobItemRate(LPCHARACTER ch);
+		int32_t			GetMobDamageRate(LPCHARACTER ch);
+		int32_t			GetMobGoldAmountRate(LPCHARACTER ch);
+		int32_t			GetMobGoldDropRate(LPCHARACTER ch);
+		int32_t			GetMobExpRate(LPCHARACTER ch);
 
-		int			GetUserDamageRate(LPCHARACTER ch);
-		void		SendScriptToMap(long lMapIndex, const std::string & s); 
+		int32_t			GetUserDamageRate(LPCHARACTER ch);
+		void		SendScriptToMap(int32_t lMapIndex, const std::string & s); 
 
 		bool			BeginPendingDestroy();
 		void			FlushPendingDestroy();
 
 	private:
-		int					m_iMobItemRate;
-		int					m_iMobDamageRate;
-		int					m_iMobGoldAmountRate;
-		int					m_iMobGoldDropRate;
-		int					m_iMobExpRate;
+		int32_t					m_iMobItemRate;
+		int32_t					m_iMobDamageRate;
+		int32_t					m_iMobGoldAmountRate;
+		int32_t					m_iMobGoldDropRate;
+		int32_t					m_iMobExpRate;
 
-		int					m_iMobItemRatePremium;
-		int					m_iMobGoldAmountRatePremium;
-		int					m_iMobGoldDropRatePremium;
-		int					m_iMobExpRatePremium;
+		int32_t					m_iMobItemRatePremium;
+		int32_t					m_iMobGoldAmountRatePremium;
+		int32_t					m_iMobGoldDropRatePremium;
+		int32_t					m_iMobExpRatePremium;
 
-		int					m_iUserDamageRate;
-		int					m_iUserDamageRatePremium;
-		int					m_iVIDCount;
+		int32_t					m_iUserDamageRate;
+		int32_t					m_iUserDamageRatePremium;
+		int32_t					m_iVIDCount;
 
-		std::unordered_map<DWORD, LPCHARACTER> m_map_pkChrByVID;
-		std::unordered_map<DWORD, LPCHARACTER> m_map_pkChrByPID;
+		std::unordered_map<uint32_t, LPCHARACTER> m_map_pkChrByVID;
+		std::unordered_map<uint32_t, LPCHARACTER> m_map_pkChrByPID;
 		NAME_MAP			m_map_pkPCChr;
 
 		char				dummy1[1024];	// memory barrier
@@ -125,10 +125,10 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 
 		LPCHARACTER			m_pkChrSelectedStone;
 
-		std::map<DWORD, DWORD> m_map_dwMobKillCount;
+		std::map<uint32_t, uint32_t> m_map_dwMobKillCount;
 
-		std::set<DWORD>		m_set_dwRegisteredRaceNum;
-		std::map<DWORD, CHARACTER_SET> m_map_pkChrByRaceNum;
+		std::set<uint32_t>		m_set_dwRegisteredRaceNum;
+		std::map<uint32_t, CHARACTER_SET> m_map_pkChrByRaceNum;
 
 		bool				m_bUsePendingDestroy;
 		CHARACTER_SET		m_set_pkChrPendingDestroy;
@@ -141,7 +141,7 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 	template<class Func>	
 Func CHARACTER_MANAGER::for_each_pc(Func f)
 {
-	std::unordered_map<DWORD, LPCHARACTER>::iterator it;
+	std::unordered_map<uint32_t, LPCHARACTER>::iterator it;
 
 	for (it = m_map_pkChrByPID.begin(); it != m_map_pkChrByPID.end(); ++it)
 		f(it->second);

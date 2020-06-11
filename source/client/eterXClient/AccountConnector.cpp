@@ -5,23 +5,23 @@
 #include "../eterBase/tea.h"
 
 // CHINA_CRYPT_KEY
-DWORD g_adwEncryptKey[4];
-DWORD g_adwDecryptKey[4];
+uint32_t g_adwEncryptKey[4];
+uint32_t g_adwDecryptKey[4];
 // END_OF_CHINA_CRYPT_KEY
 
-inline const BYTE* GetKey_20050304Myevan()
+inline const uint8_t* GetKey_20050304Myevan()
 {
-	volatile static DWORD s_adwKey[1938];
+	volatile static uint32_t s_adwKey[1938];
 
-	volatile DWORD seed = 1491971513;
-	for (UINT i = 0; i < BYTE(seed); i++)
+	volatile uint32_t seed = 1491971513;
+	for (uint32_t i = 0; i < uint8_t(seed); i++)
 	{
 		seed ^= 2148941891;
 		seed += 3592385981;
 		s_adwKey[i] = seed;
 	}
 
-	return (const BYTE*)s_adwKey;
+	return (const uint8_t*)s_adwKey;
 }
 
 void CAccountConnector::SetHandler(PyObject* poHandler)
@@ -43,17 +43,17 @@ void CAccountConnector::ClearLoginInfo( void )
 
 void CAccountConnector::__BuildClientKey_20050304Myevan()
 {
-	const BYTE* c_pszKey = GetKey_20050304Myevan();
+	const uint8_t* c_pszKey = GetKey_20050304Myevan();
 	memcpy(g_adwEncryptKey, c_pszKey + 157, 16);
 
-	for (DWORD i = 0; i < 4; ++i)
+	for (uint32_t i = 0; i < 4; ++i)
 		g_adwEncryptKey[i] = random();
 
-	tea_encrypt((DWORD*)g_adwDecryptKey, (const DWORD*)g_adwEncryptKey, (const DWORD*)(c_pszKey + 37), 16);
-	//	TEA_Encrypt((DWORD *) g_adwDecryptKey, (const DWORD *) g_adwEncryptKey, (const DWORD *) (c_pszKey+37), 16);
+	tea_encrypt((uint32_t*)g_adwDecryptKey, (const uint32_t*)g_adwEncryptKey, (const uint32_t*)(c_pszKey + 37), 16);
+	//	TEA_Encrypt((uint32_t *) g_adwDecryptKey, (const uint32_t *) g_adwEncryptKey, (const uint32_t *) (c_pszKey+37), 16);
 }
 
-bool CAccountConnector::Connect(const char * c_szAddr, int iPort, const char * c_szAccountAddr, int iAccountPort)
+bool CAccountConnector::Connect(const char * c_szAddr, int32_t iPort, const char * c_szAccountAddr, int32_t iAccountPort)
 {
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
 	__BuildClientKey();
@@ -133,7 +133,7 @@ bool CAccountConnector::__HandshakeState_Process()
 
 bool CAccountConnector::__AuthState_Process()
 {
-	if (!__AnalyzePacket(0, sizeof(BYTE), &CAccountConnector::__AuthState_RecvEmpty))
+	if (!__AnalyzePacket(0, sizeof(uint8_t), &CAccountConnector::__AuthState_RecvEmpty))
 		return true;
 
 	if (!__AnalyzePacket(HEADER_GC_PHASE, sizeof(TPacketGCPhase), &CAccountConnector::__AuthState_RecvPhase))
@@ -164,8 +164,8 @@ bool CAccountConnector::__AuthState_Process()
 
 bool CAccountConnector::__AuthState_RecvEmpty()
 {
-	BYTE byEmpty;
-	Recv(sizeof(BYTE), &byEmpty);
+	uint8_t byEmpty;
+	Recv(sizeof(uint8_t), &byEmpty);
 	return true;
 }
 
@@ -201,7 +201,7 @@ bool CAccountConnector::__AuthState_RecvPhase()
 
 		m_strPassword = "";
 
-		for (DWORD i = 0; i < 4; ++i)
+		for (uint32_t i = 0; i < 4; ++i)
 			LoginPacket.adwClientKey[i] = g_adwEncryptKey[i];
 
 		LoginPacket.version = CLIENT_VERSION_TIMESTAMP;
@@ -235,8 +235,8 @@ bool CAccountConnector::__AuthState_RecvHandshake()
 
 		ELTimer_SetServerMSec(kPacketHandshake.dwTime+ kPacketHandshake.lDelta);
 
-		//DWORD dwBaseServerTime = kPacketHandshake.dwTime+ kPacketHandshake.lDelta;
-		//DWORD dwBaseClientTime = ELTimer_GetMSec();
+		//uint32_t dwBaseServerTime = kPacketHandshake.dwTime+ kPacketHandshake.lDelta;
+		//uint32_t dwBaseClientTime = ELTimer_GetMSec();
 
 		kPacketHandshake.dwTime = kPacketHandshake.dwTime + kPacketHandshake.lDelta + kPacketHandshake.lDelta;
 		kPacketHandshake.lDelta = 0;
@@ -341,8 +341,8 @@ bool CAccountConnector::__AuthState_RecvKeyAgreement()
 	{
 		// Key agreement 성공, 응답 전송
 		packetToSend.bHeader = HEADER_CG_KEY_AGREEMENT;
-		packetToSend.wAgreedLength = (WORD)agreedLength;
-		packetToSend.wDataLength = (WORD)dataLength;
+		packetToSend.wAgreedLength = (uint16_t)agreedLength;
+		packetToSend.wDataLength = (uint16_t)dataLength;
 
 		if (!Send(sizeof(packetToSend), &packetToSend))
 		{
@@ -376,9 +376,9 @@ bool CAccountConnector::__AuthState_RecvKeyAgreementCompleted()
 }
 #endif // _IMPROVED_PACKET_ENCRYPTION_
 
-bool CAccountConnector::__AnalyzePacket(UINT uHeader, UINT uPacketSize, bool (CAccountConnector::*pfnDispatchPacket)())
+bool CAccountConnector::__AnalyzePacket(uint32_t uHeader, uint32_t uPacketSize, bool (CAccountConnector::*pfnDispatchPacket)())
 {
-	BYTE bHeader;
+	uint8_t bHeader;
 	if (!Peek(sizeof(bHeader), &bHeader))
 		return true;
 
@@ -391,9 +391,9 @@ bool CAccountConnector::__AnalyzePacket(UINT uHeader, UINT uPacketSize, bool (CA
 	return (this->*pfnDispatchPacket)();
 }
 
-bool CAccountConnector::__AnalyzeVarSizePacket(UINT uHeader, bool (CAccountConnector::*pfnDispatchPacket)(int))
+bool CAccountConnector::__AnalyzeVarSizePacket(uint32_t uHeader, bool (CAccountConnector::*pfnDispatchPacket)(int32_t))
 {
-	BYTE bHeader;
+	uint8_t bHeader;
 	if (!Peek(sizeof(bHeader), &bHeader))
 		return true;
 
@@ -462,11 +462,11 @@ void CAccountConnector::OnDisconnect()
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
 void CAccountConnector::__BuildClientKey()
 {
-	for (DWORD i = 0; i < 4; ++i)
+	for (uint32_t i = 0; i < 4; ++i)
 		g_adwEncryptKey[i] = random();
 
-	const BYTE * c_pszKey = (const BYTE *) "JyTxtHljHJlVJHorRM301vf@4fvj10-v";
-	tea_encrypt((DWORD *) g_adwDecryptKey, (const DWORD *) g_adwEncryptKey, (const DWORD *) c_pszKey, 16);
+	const uint8_t * c_pszKey = (const uint8_t *) "JyTxtHljHJlVJHorRM301vf@4fvj10-v";
+	tea_encrypt((uint32_t *) g_adwDecryptKey, (const uint32_t *) g_adwEncryptKey, (const uint32_t *) c_pszKey, 16);
 }
 #endif
 
@@ -478,7 +478,7 @@ void CAccountConnector::__Inialize()
 
 CAccountConnector::CAccountConnector()
 {
-	m_poHandler = NULL;
+	m_poHandler = nullptr;
 	m_strAddr = "";
 	m_iPort = 0;
 

@@ -50,7 +50,7 @@ public:
 		mUsedCount = 0;
 	};
 	
-	void Set(int maxitems)
+	void Set(int32_t maxitems)
 	{
 		if (mData)
 			delete [] mData; // delete any previous incarnation.
@@ -58,8 +58,8 @@ public:
 		mData = new Type[mMaxItems];
 		mFree = mData;
 		mHead = 0;
-		int loopValue = (mMaxItems-1);
-		for (int i=0; i<loopValue; i++)
+		int32_t loopValue = (mMaxItems-1);
+		for (int32_t i=0; i<loopValue; i++)
 		{
 			mData[i].SetNext( &mData[i+1] );
 			if ( i == 0 )
@@ -106,14 +106,14 @@ public:
 		return false;
 	};
 	
-	int Begin(void)
+	int32_t Begin(void)
 	{
 		mCurrent = mHead;
 		return mUsedCount;
 	};
 	
-	int GetUsedCount(void) const { return mUsedCount; };
-	int GetFreeCount(void) const { return mFreeCount; };
+	int32_t GetUsedCount(void) const { return mUsedCount; };
+	int32_t GetFreeCount(void) const { return mFreeCount; };
 	
 	Type * GetNext(void)
 	{
@@ -237,11 +237,11 @@ public:
 	
 	
 private:
-	int   mMaxItems;
+	int32_t   mMaxItems;
 	Type *mCurrent; // current iteration location.
 	Type *mData;
 	Type *mHead; // head of used list.
 	Type *mFree; // head of free list.
-	int   mUsedCount;
-	int   mFreeCount;
+	int32_t   mUsedCount;
+	int32_t   mFreeCount;
 };

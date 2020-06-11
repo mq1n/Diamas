@@ -67,7 +67,7 @@ struct ScopedOutputFile {
 	}
 	std::ostream& Datetime() {
 		char buf[24];
-		time_t t = ::time(NULL);
+		time_t t = ::time(nullptr);
 		::strftime(buf, 24, "%Y-%m-%d %H:%M:%S", ::localtime(&t));
 		return stream << buf;
 	}
@@ -106,7 +106,7 @@ public:
 
 	// Marks the specified heap pointer as acquired in the given context.
 	static size_t MarkAcquired(void* p, const char* file, size_t line, const char* context) {
-		if (p == NULL) {
+		if (p == nullptr) {
 			return 0;
 		}
 		AllocMapType& alloc_map = GetInstance().alloc_map_;
@@ -141,16 +141,16 @@ public:
 	// Marks the specified heap pointer as released in the given context.
 	template<typename T>
 	static T* MarkReleased(T* p, const char* file, size_t line, const char* context) {
-		return (GetInstance().VerifyReference(p, file, line, context, true) ? p : NULL);
+		return (GetInstance().VerifyReference(p, file, line, context, true) ? p : nullptr);
 	}
     template<typename T>
     static T* MarkReleased(DebugPtr<T>& ptr, const char* file, size_t line, const char* context) {
-		return (GetInstance().VerifyReference(ptr.Get(), file, line, context, true, true, ptr.GetAge()) ? ptr.Get() : NULL);
+		return (GetInstance().VerifyReference(ptr.Get(), file, line, context, true, true, ptr.GetAge()) ? ptr.Get() : nullptr);
     }
 
 	// Retrieves the age of the specified heap pointer.
 	static size_t RetrieveAge(void* p) {
-		if (p == NULL) {
+		if (p == nullptr) {
 			return 0;
 		}
 		AllocMapType& alloc_map = GetInstance().alloc_map_;
@@ -166,13 +166,13 @@ public:
 
 	// Verifies the specified heap pointer with its age.
 	template<typename T>
-	static T* Verify(T* p, size_t age, const char* file = NULL, size_t line = 0) {
-		return (GetInstance().VerifyReference(p, file, line, "ref", false, true, age) ? p : NULL);
+	static T* Verify(T* p, size_t age, const char* file = nullptr, size_t line = 0) {
+		return (GetInstance().VerifyReference(p, file, line, "ref", false, true, age) ? p : nullptr);
 	}
 
 	template<typename T>
 	static T* VerifyDeletion(T* p, const char* file, size_t line, bool verify_age = false, size_t age = 0) {
-		return (GetInstance().VerifyReference(p, file, line, "pre_delete", false, verify_age, age) ? p : NULL);
+		return (GetInstance().VerifyReference(p, file, line, "pre_delete", false, verify_age, age) ? p : nullptr);
 	}
 
 	static void LogBoundaryCorruption(void* p, size_t age) {
@@ -205,7 +205,7 @@ private:
 	bool VerifyReference(void* p, const char* file, size_t line,
 			const char* context, bool mark_released,
 			bool verify_age = false, size_t age = 0) {
-		if (p == NULL) {
+		if (p == nullptr) {
 			return mark_released;
 		}
 		AllocMapType::iterator it = alloc_map_.find(p);

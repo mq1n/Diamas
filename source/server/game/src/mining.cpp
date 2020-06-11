@@ -21,9 +21,9 @@ namespace mining
 
 	struct SInfo
 	{
-		DWORD dwLoadVnum;
-		DWORD dwRawOreVnum;
-		DWORD dwRefineVnum;
+		uint32_t dwLoadVnum;
+		uint32_t dwRawOreVnum;
+		uint32_t dwRefineVnum;
 	};
 
 	SInfo info[MAX_ORE] =
@@ -49,7 +49,7 @@ namespace mining
 		{ 30306, 50619, 50639 },
 	};
 
-	int fraction_info[MAX_FRACTION_COUNT][3] =
+	int32_t fraction_info[MAX_FRACTION_COUNT][3] =
 	{
 		{ 20,  1, 10 },
 		{ 30, 11, 20 },
@@ -62,12 +62,12 @@ namespace mining
 		{  1, 81, 90 },
 	};
 
-	int PickGradeAddPct[10] =
+	int32_t PickGradeAddPct[10] =
 	{
 		3, 5, 8, 11, 15, 20, 26, 32, 40, 50
 	};
 
-	int SkillLevelAddPct[SKILL_MAX_LEVEL + 1] =
+	int32_t SkillLevelAddPct[SKILL_MAX_LEVEL + 1] =
 	{
 		0,
 		1, 1, 1, 1,		//  1 - 4
@@ -83,9 +83,9 @@ namespace mining
 		11,				// 40
 	};
 
-	DWORD GetRawOreFromLoad(DWORD dwLoadVnum)
+	uint32_t GetRawOreFromLoad(uint32_t dwLoadVnum)
 	{
-		for (int i = 0; i < MAX_ORE; ++i)
+		for (int32_t i = 0; i < MAX_ORE; ++i)
 		{
 			if (info[i].dwLoadVnum == dwLoadVnum)
 				return info[i].dwRawOreVnum;
@@ -93,9 +93,9 @@ namespace mining
 		return 0;
 	}
 
-	DWORD GetRefineFromRawOre(DWORD dwRawOreVnum)
+	uint32_t GetRefineFromRawOre(uint32_t dwRawOreVnum)
 	{
-		for (int i = 0; i < MAX_ORE; ++i)
+		for (int32_t i = 0; i < MAX_ORE; ++i)
 		{
 			if (info[i].dwRawOreVnum == dwRawOreVnum)
 				return info[i].dwRefineVnum;
@@ -103,11 +103,11 @@ namespace mining
 		return 0;
 	}
 
-	int GetFractionCount()
+	int32_t GetFractionCount()
 	{
-		int r = number(1, 100);
+		int32_t r = number(1, 100);
 
-		for (int i = 0; i < MAX_FRACTION_COUNT; ++i)
+		for (int32_t i = 0; i < MAX_FRACTION_COUNT; ++i)
 		{
 			if (r <= fraction_info[i][0])
 				return number(fraction_info[i][1], fraction_info[i][2]);
@@ -118,11 +118,11 @@ namespace mining
 		return 0; 
 	}
 
-	void OreDrop(LPCHARACTER ch, DWORD dwLoadVnum)
+	void OreDrop(LPCHARACTER ch, uint32_t dwLoadVnum)
 	{
-		DWORD dwRawOreVnum = GetRawOreFromLoad(dwLoadVnum);
+		uint32_t dwRawOreVnum = GetRawOreFromLoad(dwLoadVnum);
 
-		int iFractionCount = GetFractionCount();
+		int32_t iFractionCount = GetFractionCount();
 
 		if (iFractionCount == 0)
 		{
@@ -149,10 +149,10 @@ namespace mining
 		DBManager::instance().SendMoneyLog(MONEY_LOG_DROP, item->GetVnum(), item->GetCount());
 	}
 
-	int GetOrePct(LPCHARACTER ch)
+	int32_t GetOrePct(LPCHARACTER ch)
 	{
-		int defaultPct = 20;
-		int iSkillLevel = ch->GetSkillLevel(SKILL_MINING);
+		int32_t defaultPct = 20;
+		int32_t iSkillLevel = ch->GetSkillLevel(SKILL_MINING);
 
 		LPITEM pick = ch->GetWear(WEAR_WEAPON);
 
@@ -164,8 +164,8 @@ namespace mining
 
 	EVENTINFO(mining_event_info)
 	{
-		DWORD pid;
-		DWORD vid_load;
+		uint32_t pid;
+		uint32_t vid_load;
 
 		mining_event_info() 
 		: pid( 0 )
@@ -183,32 +183,32 @@ namespace mining
 		return true;
 	}
 
-	int Pick_GetMaxExp(CItem& pick)
+	int32_t Pick_GetMaxExp(CItem& pick)
 	{
 		return pick.GetValue(2);
 	}
 
-	int Pick_GetCurExp(CItem& pick)
+	int32_t Pick_GetCurExp(CItem& pick)
 	{
 		return pick.GetSocket(0);
 	}
 
 	void Pick_IncCurExp(CItem& pick)
 	{
-		int cur = Pick_GetCurExp(pick);
+		int32_t cur = Pick_GetCurExp(pick);
 		pick.SetSocket(0, cur + 1);
 	}
 
 #ifdef ENABLE_PICKAXE_RENEWAL
 	void Pick_SetPenaltyExp(CItem& pick)
 	{
-		int cur = Pick_GetCurExp(pick);
+		int32_t cur = Pick_GetCurExp(pick);
 		pick.SetSocket(0, (cur > 0) ? (cur - (cur * 10 / 100)) : 0);
 	}
 #endif
 	void Pick_MaxCurExp(CItem& pick)
 	{
-		int max = Pick_GetMaxExp(pick);
+		int32_t max = Pick_GetMaxExp(pick);
 		pick.SetSocket(0, max);
 	}
 
@@ -230,7 +230,7 @@ namespace mining
 		return (number(1,100) <= pick.GetValue(3));
 	}
 
-	int RealRefinePick(LPCHARACTER ch, LPITEM item)
+	int32_t RealRefinePick(LPCHARACTER ch, LPITEM item)
 	{
 		if (!ch || !item)
 			return 2;
@@ -250,7 +250,7 @@ namespace mining
 		if (!Pick_Refinable(rkOldPick))
 			return 2;
 
-		int iAdv = rkOldPick.GetValue(0) / 10;
+		int32_t iAdv = rkOldPick.GetValue(0) / 10;
 
 		if (rkOldPick.IsEquipped() == true)
 			return 2;
@@ -262,7 +262,7 @@ namespace mining
 			LPITEM pkNewPick = ITEM_MANAGER::instance().CreateItem(rkOldPick.GetRefinedVnum(), 1);
 			if (pkNewPick)
 			{
-				BYTE bCell = rkOldPick.GetCell();
+				uint8_t bCell = rkOldPick.GetCell();
 				rkItemMgr.RemoveItem(item, "REMOVE (REFINE PICK)");
 				pkNewPick->AddToCharacter(ch, TItemPos(INVENTORY, bCell));
 				LogManager::instance().ItemLog(ch, pkNewPick, "REFINE PICK SUCCESS", pkNewPick->GetName());
@@ -289,7 +289,7 @@ namespace mining
 
 			if (pkNewPick)
 			{
-				BYTE bCell = rkOldPick.GetCell();
+				uint8_t bCell = rkOldPick.GetCell();
 				rkItemMgr.RemoveItem(item, "REMOVE (REFINE PICK)");
 				pkNewPick->AddToCharacter(ch, TItemPos(INVENTORY, bCell));
 				rkLogMgr.ItemLog(ch, pkNewPick, "REFINE PICK FAIL", pkNewPick->GetName());
@@ -355,7 +355,7 @@ namespace mining
 	{
 		mining_event_info* info = dynamic_cast<mining_event_info*>( event->info );
 
-		if ( info == NULL )
+		if ( info == nullptr )
 		{
 			sys_err( "mining_event_info> <Factor> Null pointer" );
 			return 0;
@@ -385,7 +385,7 @@ namespace mining
 			return 0;
 		}
 
-		int iPct = GetOrePct(ch);
+		int32_t iPct = GetOrePct(ch);
 
 		if (number(1, 100) <= iPct)
 		{
@@ -402,7 +402,7 @@ namespace mining
 		return 0;
 	}
 
-	LPEVENT CreateMiningEvent(LPCHARACTER ch, LPCHARACTER load, int count)
+	LPEVENT CreateMiningEvent(LPCHARACTER ch, LPCHARACTER load, int32_t count)
 	{
 		mining_event_info* info = AllocEventInfo<mining_event_info>();
 		info->pid = ch->GetPlayerID();
@@ -411,7 +411,7 @@ namespace mining
 		return event_create(mining_event, info, PASSES_PER_SEC(2 * count));
 	}
 
-	bool OreRefine(LPCHARACTER ch, LPCHARACTER npc, LPITEM item, int cost, int pct, LPITEM metinstone_item)
+	bool OreRefine(LPCHARACTER ch, LPCHARACTER npc, LPITEM item, int32_t cost, int32_t pct, LPITEM metinstone_item)
 	{
 		if (!ch || !npc)
 			return false;
@@ -428,14 +428,14 @@ namespace mining
 			return false;
 		}
 
-		DWORD dwRefinedVnum = GetRefineFromRawOre(item->GetVnum());
+		uint32_t dwRefinedVnum = GetRefineFromRawOre(item->GetVnum());
 
 		if (dwRefinedVnum == 0)
 			return false;
 
 		ch->SetRefineNPC(npc);
 		item->SetCount(item->GetCount() - ORE_COUNT_FOR_REFINE);
-		int iCost = ch->ComputeRefineFee(cost, 1);
+		int32_t iCost = ch->ComputeRefineFee(cost, 1);
 
 		if (ch->GetGold() < iCost)
 			return false;
@@ -454,9 +454,9 @@ namespace mining
 		return false;
 	}
 
-	bool IsVeinOfOre (DWORD vnum)
+	bool IsVeinOfOre (uint32_t vnum)
 	{
-		for (int i = 0; i < MAX_ORE; i++)
+		for (int32_t i = 0; i < MAX_ORE; i++)
 		{
 			if (info[i].dwLoadVnum == vnum)
 				return true;

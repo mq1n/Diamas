@@ -6,8 +6,8 @@
 
 typedef struct SMapRegion
 {
-	int			index;
-	int			sx, sy, ex, ey;
+	int32_t			index;
+	int32_t			sx, sy, ex, ey;
 	PIXEL_POSITION	posSpawn;
 
 	bool		bEmpireSpawnDifferent;
@@ -18,18 +18,18 @@ typedef struct SMapRegion
 
 struct TAreaInfo
 {
-	int sx, sy, ex, ey, dir;
-	TAreaInfo(int sx, int sy, int ex, int ey, int dir)
+	int32_t sx, sy, ex, ey, dir;
+	TAreaInfo(int32_t sx, int32_t sy, int32_t ex, int32_t ey, int32_t dir)
 		: sx(sx), sy(sy), ex(ex), ey(ey), dir(dir)
 		{}
 };
 
 struct npc_info
 {
-	BYTE bType;
+	uint8_t bType;
 	const char* name;
-	long x, y;
-	npc_info(BYTE bType, const char* name, long x, long y)
+	int32_t x, y;
+	npc_info(uint8_t bType, const char* name, int32_t x, int32_t y)
 		: bType(bType), name(name), x(x), y(y)
 		{}
 };
@@ -38,12 +38,12 @@ typedef std::map<std::string, TAreaInfo> TAreaMap;
 
 typedef struct SSetting
 {
-	int			iIndex;
-	int			iCellScale;
-	int			iBaseX;
-	int			iBaseY;
-	int			iWidth;
-	int			iHeight;
+	int32_t			iIndex;
+	int32_t			iCellScale;
+	int32_t			iBaseX;
+	int32_t			iBaseY;
+	int32_t			iWidth;
+	int32_t			iHeight;
 
 	PIXEL_POSITION	posSpawn;
 } TMapSetting;
@@ -51,18 +51,18 @@ typedef struct SSetting
 class SECTREE_MAP
 {
 	public:
-		typedef std::map<DWORD, LPSECTREE> MapType;
+		typedef std::map<uint32_t, LPSECTREE> MapType;
 
 		SECTREE_MAP();
 		SECTREE_MAP(SECTREE_MAP & r);
 		virtual ~SECTREE_MAP();
 
-		bool Add(DWORD key, LPSECTREE sectree) {
+		bool Add(uint32_t key, LPSECTREE sectree) {
 			return map_.insert(MapType::value_type(key, sectree)).second;
 		}
 
-		LPSECTREE	Find(DWORD dwPackage);
-		LPSECTREE	Find(DWORD x, DWORD y);
+		LPSECTREE	Find(uint32_t dwPackage);
+		LPSECTREE	Find(uint32_t x, uint32_t y);
 		void		Build();
 
 		TMapSetting	m_setting;
@@ -72,7 +72,7 @@ class SECTREE_MAP
 		{
 			// <Factor> Using snapshot copy to avoid side-effects
 			FCollectEntity collector;
-			std::map<DWORD, LPSECTREE>::iterator it = map_.begin();
+			std::map<uint32_t, LPSECTREE>::iterator it = map_.begin();
 			for ( ; it != map_.end(); ++it)
 			{
 				LPSECTREE sectree = it->second;
@@ -80,7 +80,7 @@ class SECTREE_MAP
 			}
 			collector.ForEach(rfunc);
 			/*
-			std::map<DWORD,LPSECTREE>::iterator i = map_.begin();
+			std::map<uint32_t,LPSECTREE>::iterator i = map_.begin();
 			for (; i != map_.end(); ++i )
 			{
 				LPSECTREE pSec = i->second;
@@ -114,12 +114,12 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		SECTREE_MANAGER();
 		virtual ~SECTREE_MANAGER();
 
-		LPSECTREE_MAP GetMap(long lMapIndex);
-		LPSECTREE 	Get(DWORD dwIndex, DWORD package);
-		LPSECTREE 	Get(DWORD dwIndex, DWORD x, DWORD y);
+		LPSECTREE_MAP GetMap(int32_t lMapIndex);
+		LPSECTREE 	Get(uint32_t dwIndex, uint32_t package);
+		LPSECTREE 	Get(uint32_t dwIndex, uint32_t x, uint32_t y);
 
 		template< typename Func >
-		void for_each( int iMapIndex, Func & rfunc )
+		void for_each( int32_t iMapIndex, Func & rfunc )
 		{
 			LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap( iMapIndex );
 			if ( pSecMap )
@@ -128,42 +128,42 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 			}
 		}
 		
-		int		LoadSettingFile(long lIndex, const char * c_pszSettingFileName, TMapSetting & r_setting);
+		int32_t		LoadSettingFile(int32_t lIndex, const char * c_pszSettingFileName, TMapSetting & r_setting);
 		bool		LoadMapRegion(const char * c_pszFileName, TMapSetting & r_Setting, const char * c_pszMapName);
-		int		Build(const char * c_pszListFileName, const char* c_pszBasePath);
+		int32_t		Build(const char * c_pszListFileName, const char* c_pszBasePath);
 		LPSECTREE_MAP BuildSectreeFromSetting(TMapSetting & r_setting);
 		bool		LoadAttribute(LPSECTREE_MAP pkMapSectree, const char * c_pszFileName, TMapSetting & r_setting);
-		void		LoadDungeon(int iIndex, const char * c_pszFileName);
-		bool		GetValidLocation(long lMapIndex, long x, long y, long & r_lValidMapIndex, PIXEL_POSITION & r_pos, BYTE empire = 0);
-		bool		GetSpawnPosition(long x, long y, PIXEL_POSITION & r_pos);
-		bool		GetSpawnPositionByMapIndex(long lMapIndex, PIXEL_POSITION & r_pos);
-		bool		GetRecallPositionByEmpire(int iMapIndex, BYTE bEmpire, PIXEL_POSITION & r_pos);
+		void		LoadDungeon(int32_t iIndex, const char * c_pszFileName);
+		bool		GetValidLocation(int32_t lMapIndex, int32_t x, int32_t y, int32_t & r_lValidMapIndex, PIXEL_POSITION & r_pos, uint8_t empire = 0);
+		bool		GetSpawnPosition(int32_t x, int32_t y, PIXEL_POSITION & r_pos);
+		bool		GetSpawnPositionByMapIndex(int32_t lMapIndex, PIXEL_POSITION & r_pos);
+		bool		GetRecallPositionByEmpire(int32_t iMapIndex, uint8_t bEmpire, PIXEL_POSITION & r_pos);
 
-		const TMapRegion *	GetMapRegion(long lMapIndex);
-		int			GetMapIndex(long x, long y);
+		const TMapRegion *	GetMapRegion(int32_t lMapIndex);
+		int32_t			GetMapIndex(int32_t x, int32_t y);
 		const TMapRegion *	FindRegionByPartialName(const char* szMapName);
 
-		bool		GetMapBasePosition(long x, long y, PIXEL_POSITION & r_pos);
-		bool		GetMapBasePositionByMapIndex(long lMapIndex, PIXEL_POSITION & r_pos);
-		bool		GetMovablePosition(long lMapIndex, long x, long y, PIXEL_POSITION & pos);
-		bool		IsMovablePosition(long lMapIndex, long x, long y);
-		bool		GetCenterPositionOfMap(long lMapIndex, PIXEL_POSITION & r_pos);
-		bool        GetRandomLocation(long lMapIndex, PIXEL_POSITION & r_pos, DWORD dwCurrentX = 0, DWORD dwCurrentY = 0, int iMaxDistance = 0);
+		bool		GetMapBasePosition(int32_t x, int32_t y, PIXEL_POSITION & r_pos);
+		bool		GetMapBasePositionByMapIndex(int32_t lMapIndex, PIXEL_POSITION & r_pos);
+		bool		GetMovablePosition(int32_t lMapIndex, int32_t x, int32_t y, PIXEL_POSITION & pos);
+		bool		IsMovablePosition(int32_t lMapIndex, int32_t x, int32_t y);
+		bool		GetCenterPositionOfMap(int32_t lMapIndex, PIXEL_POSITION & r_pos);
+		bool        GetRandomLocation(int32_t lMapIndex, PIXEL_POSITION & r_pos, uint32_t dwCurrentX = 0, uint32_t dwCurrentY = 0, int32_t iMaxDistance = 0);
 
-		long		CreatePrivateMap(long lMapIndex);	// returns new private map index, returns 0 when fail
-		void		DestroyPrivateMap(long lMapIndex);
+		int32_t		CreatePrivateMap(int32_t lMapIndex);	// returns new private map index, returns 0 when fail
+		void		DestroyPrivateMap(int32_t lMapIndex);
 
-		TAreaMap&	GetDungeonArea(long lMapIndex);
+		TAreaMap&	GetDungeonArea(int32_t lMapIndex);
 		void		SendNPCPosition(LPCHARACTER ch);
-		void		InsertNPCPosition(long lMapIndex, BYTE bType, const char* szName, long x, long y);
+		void		InsertNPCPosition(int32_t lMapIndex, uint8_t bType, const char* szName, int32_t x, int32_t y);
 
-		BYTE		GetEmpireFromMapIndex(long lMapIndex);
+		uint8_t		GetEmpireFromMapIndex(int32_t lMapIndex);
 
-		void		PurgeMonstersInMap(long lMapIndex);
-		void		PurgeStonesInMap(long lMapIndex);
-		void		PurgeNPCsInMap(long lMapIndex);
-		size_t		GetMonsterCountInMap(long lMapIndex);
-		size_t		GetMonsterCountInMap(long lMpaIndex, DWORD dwVnum);
+		void		PurgeMonstersInMap(int32_t lMapIndex);
+		void		PurgeStonesInMap(int32_t lMapIndex);
+		void		PurgeNPCsInMap(int32_t lMapIndex);
+		size_t		GetMonsterCountInMap(int32_t lMapIndex);
+		size_t		GetMonsterCountInMap(int32_t lMpaIndex, uint32_t dwVnum);
 
 		/// 영역에 대해 Sectree 의 Attribute 에 대해 특정한 처리를 수행한다.
 		/**
@@ -176,9 +176,9 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		 * @param [in]	dwAttr 적용할 Attribute
 		 * @param [in]	mode Attribute 에 대해 처리할 type
 		 */
-		bool		ForAttrRegion(long lMapIndex, long lStartX, long lStartY, long lEndX, long lEndY, long lRotate, DWORD dwAttr, EAttrRegionMode mode);
+		bool		ForAttrRegion(int32_t lMapIndex, int32_t lStartX, int32_t lStartY, int32_t lEndX, int32_t lEndY, int32_t lRotate, uint32_t dwAttr, EAttrRegionMode mode);
 
-		bool		SaveAttributeToImage(int lMapIndex, const char * c_pszFileName, LPSECTREE_MAP pMapSrc = NULL);
+		bool		SaveAttributeToImage(int32_t lMapIndex, const char * c_pszFileName, LPSECTREE_MAP pMapSrc = nullptr);
 
 	private:
 
@@ -193,7 +193,7 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		 * @param [in]	dwAttr 적용할 Attribute
 		 * @param [in]	mode Attribute 에 대해 처리할 type
 		 */
-		bool		ForAttrRegionRightAngle( long lMapIndex, long lCX, long lCY, long lCW, long lCH, long lRotate, DWORD dwAttr, EAttrRegionMode mode );
+		bool		ForAttrRegionRightAngle( int32_t lMapIndex, int32_t lCX, int32_t lCY, int32_t lCW, int32_t lCH, int32_t lRotate, uint32_t dwAttr, EAttrRegionMode mode );
 
 		/// 직각 이외의 사각형 영역에 대해 Sectree 의 Attribute 에 대해 특정한 처리를 수행한다.
 		/**
@@ -206,7 +206,7 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		 * @param [in]	dwAttr 적용할 Attribute
 		 * @param [in]	mode Attribute 에 대해 처리할 type
 		 */
-		bool		ForAttrRegionFreeAngle( long lMapIndex, long lCX, long lCY, long lCW, long lCH, long lRotate, DWORD dwAttr, EAttrRegionMode mode );
+		bool		ForAttrRegionFreeAngle( int32_t lMapIndex, int32_t lCX, int32_t lCY, int32_t lCW, int32_t lCH, int32_t lRotate, uint32_t dwAttr, EAttrRegionMode mode );
 
 		/// 한 Cell 의 Attribute 에 대해 특정한 처리를 수행한다.
 		/**
@@ -216,16 +216,16 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		 * @param [in]	dwAttr 적용할 Attribute
 		 * @param [in]	mode Attribute 에 대해 처리할 type
 		 */
-		bool		ForAttrRegionCell( long lMapIndex, long lCX, long lCY, DWORD dwAttr, EAttrRegionMode mode );
+		bool		ForAttrRegionCell( int32_t lMapIndex, int32_t lCX, int32_t lCY, uint32_t dwAttr, EAttrRegionMode mode );
 
-		static WORD			current_sectree_version;
-		std::map<DWORD, LPSECTREE_MAP>	m_map_pkSectree;
-		std::map<int, TAreaMap>	m_map_pkArea;
+		static uint16_t			current_sectree_version;
+		std::map<uint32_t, LPSECTREE_MAP>	m_map_pkSectree;
+		std::map<int32_t, TAreaMap>	m_map_pkArea;
 		std::vector<TMapRegion>		m_vec_mapRegion;
-		std::map<DWORD, std::vector<npc_info> > m_mapNPCPosition;
+		std::map<uint32_t, std::vector<npc_info> > m_mapNPCPosition;
 
 		// <Factor> Circular private map indexing
-		typedef std::unordered_map<long, int> PrivateIndexMapType;
+		typedef std::unordered_map<int32_t, int32_t> PrivateIndexMapType;
 		PrivateIndexMapType next_private_index_map_;
 };
 

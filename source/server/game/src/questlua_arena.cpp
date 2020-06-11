@@ -7,13 +7,13 @@
 
 namespace quest
 {
-	int arena_start_duel(lua_State * L)
+	int32_t arena_start_duel(lua_State * L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		LPCHARACTER ch2 = CHARACTER_MANAGER::instance().FindPC(lua_tostring(L,1));
-		int nSetPoint = (int)lua_tonumber(L, 2);
+		int32_t nSetPoint = (int32_t)lua_tonumber(L, 2);
 
-		if ( ch == NULL || ch2 == NULL )
+		if ( ch == nullptr || ch2 == nullptr )
 		{
 			lua_pushnumber(L, 0);
 			return 1;
@@ -51,13 +51,13 @@ namespace quest
 		return 1;
 	}
 
-	int arena_add_map(lua_State* L)
+	int32_t arena_add_map(lua_State* L)
 	{
-		int mapIdx		= (int)lua_tonumber(L, 1);
-		int startposAX	= (int)lua_tonumber(L, 2);
-		int startposAY	= (int)lua_tonumber(L, 3);
-		int startposBX	= (int)lua_tonumber(L, 4);
-		int startposBY	= (int)lua_tonumber(L, 5);
+		int32_t mapIdx		= (int32_t)lua_tonumber(L, 1);
+		int32_t startposAX	= (int32_t)lua_tonumber(L, 2);
+		int32_t startposAY	= (int32_t)lua_tonumber(L, 3);
+		int32_t startposBX	= (int32_t)lua_tonumber(L, 4);
+		int32_t startposBY	= (int32_t)lua_tonumber(L, 5);
 
 		if ( CArenaManager::instance().AddArena(mapIdx, startposAX, startposAY, startposBX, startposBY) == false )
 		{
@@ -71,18 +71,18 @@ namespace quest
 		return 1;
 	}
 
-	int arena_get_duel_list(lua_State* L)
+	int32_t arena_get_duel_list(lua_State* L)
 	{
 		CArenaManager::instance().GetDuelList(L);
 
 		return 1;
 	}
 
-	int arena_add_observer(lua_State* L)
+	int32_t arena_add_observer(lua_State* L)
 	{
-		int mapIdx = (int)lua_tonumber(L, 1);
-		int ObPointX = (int)lua_tonumber(L, 2);
-		int ObPointY = (int)lua_tonumber(L, 3);
+		int32_t mapIdx = (int32_t)lua_tonumber(L, 1);
+		int32_t ObPointX = (int32_t)lua_tonumber(L, 2);
+		int32_t ObPointY = (int32_t)lua_tonumber(L, 3);
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
 		CArenaManager::instance().AddObserver(ch, mapIdx, ObPointX, ObPointY);
@@ -90,19 +90,19 @@ namespace quest
 		return 1;
 	}
 
-	int arena_is_in_arena(lua_State* L)
+	int32_t arena_is_in_arena(lua_State* L)
 	{
-		DWORD pid = (DWORD)lua_tonumber(L, 1);
+		uint32_t pid = (uint32_t)lua_tonumber(L, 1);
 
 		LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pid);
 
-		if ( ch == NULL )
+		if ( ch == nullptr )
 		{
 			lua_pushnumber(L, 1);
 		}
 		else
 		{
-			if ( ch->GetArena() == NULL || ch->GetArenaObserverMode() == true )
+			if ( ch->GetArena() == nullptr || ch->GetArenaObserverMode() == true )
 			{
 				if ( CArenaManager::instance().IsMember(ch->GetMapIndex(), ch->GetPlayerID()) == MEMBER_DUELIST )
 					lua_pushnumber(L, 1);
@@ -127,7 +127,7 @@ namespace quest
 			{"add_observer",	arena_add_observer		},
 			{"is_in_arena",		arena_is_in_arena		},
 
-			{NULL,	NULL}
+			{nullptr,	nullptr}
 		};
 
 		CQuestManager::instance().AddLuaFunctionTable("arena", arena_functions);

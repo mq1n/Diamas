@@ -73,7 +73,7 @@ class CMotion
 		~CMotion();
 
 		bool			LoadFromFile(const char * c_pszFileName);
-		bool			LoadMobSkillFromFile(const char * c_pszFileName, CMob * pMob, int iSkillIndex);
+		bool			LoadMobSkillFromFile(const char * c_pszFileName, CMob * pMob, int32_t iSkillIndex);
 
 		float			GetDuration() const;
 		const D3DVECTOR &	GetAccumVector() const;
@@ -87,19 +87,19 @@ class CMotion
 		D3DVECTOR		m_vec3Accumulation;
 };
 
-typedef DWORD MOTION_KEY;
+typedef uint32_t MOTION_KEY;
 
 #define MAKE_MOTION_KEY(mode, index)			( ((mode) << 24) | ((index) << 8) | (0) )
 #define MAKE_RANDOM_MOTION_KEY(mode, index, type)	( ((mode) << 24) | ((index) << 8) | (type) )
 
-#define GET_MOTION_MODE(key)				((BYTE) ((key >> 24) & 0xFF))
-#define GET_MOTION_INDEX(key)				((WORD) ((key >> 8) & 0xFFFF))
-#define GET_MOTION_SUB_INDEX(key)			((BYTE) ((key) & 0xFF))
+#define GET_MOTION_MODE(key)				((uint8_t) ((key >> 24) & 0xFF))
+#define GET_MOTION_INDEX(key)				((uint16_t) ((key >> 8) & 0xFFFF))
+#define GET_MOTION_SUB_INDEX(key)			((uint8_t) ((key) & 0xFF))
 
 class CMotionSet
 {
 	public:
-		typedef std::map<DWORD, CMotion *>	TContainer;
+		typedef std::map<uint32_t, CMotion *>	TContainer;
 		typedef TContainer::iterator		iterator;
 		typedef TContainer::const_iterator	const_iterator;
 
@@ -107,20 +107,20 @@ class CMotionSet
 		CMotionSet();
 		~CMotionSet();
 
-		void		Insert(DWORD dwKey, CMotion * pkMotion);
-		bool		Load(const char * szFileName, int mode, int motion);
+		void		Insert(uint32_t dwKey, CMotion * pkMotion);
+		bool		Load(const char * szFileName, int32_t mode, int32_t motion);
 
-		const CMotion *	GetMotion(DWORD dwKey) const;
+		const CMotion *	GetMotion(uint32_t dwKey) const;
 
 	protected:
-		// DWORD = MOTION_KEY
+		// uint32_t = MOTION_KEY
 		TContainer			m_map_pkMotion;
 };
 
 class CMotionManager : public singleton<CMotionManager>
 {
 	public:
-		typedef std::map<DWORD, CMotionSet *> TContainer;
+		typedef std::map<uint32_t, CMotionSet *> TContainer;
 		typedef TContainer::iterator iterator;
 
 		CMotionManager();
@@ -128,20 +128,20 @@ class CMotionManager : public singleton<CMotionManager>
 
 		bool			Build();
 
-		const CMotionSet *	GetMotionSet(DWORD dwVnum);
-		const CMotion *		GetMotion(DWORD dwVnum, DWORD dwKey);
-		float			    GetMotionDuration(DWORD dwVnum, DWORD dwKey);
+		const CMotionSet *	GetMotionSet(uint32_t dwVnum);
+		const CMotion *		GetMotion(uint32_t dwVnum, uint32_t dwKey);
+		float			    GetMotionDuration(uint32_t dwVnum, uint32_t dwKey);
 
 		// POLYMORPH_BUG_FIX
-		float			    GetNormalAttackDuration(DWORD dwVnum);
+		float			    GetNormalAttackDuration(uint32_t dwVnum);
 		// END_OF_POLYMORPH_BUG_FIX
 
 	protected:
-		// DWORD = JOB or MONSTER VNUM
+		// uint32_t = JOB or MONSTER VNUM
 		TContainer		m_map_pkMotionSet;
 
 		// POLYMORPH_BUG_FIX
-		std::map<DWORD, float> m_map_normalAttackDuration;
+		std::map<uint32_t, float> m_map_normalAttackDuration;
 		// END_OF_POLYMORPH_BUG_FIX
 };
 

@@ -23,7 +23,7 @@ class CParticleSystemInstance : public CEffectElementBaseInstance
 		template <typename T>
 		inline void ForEachParticleRendering(T & FunObj)
 		{
-			DWORD dwFrameIndex;
+			uint32_t dwFrameIndex;
 			for(dwFrameIndex=0; dwFrameIndex<m_kVct_pkImgInst.size(); dwFrameIndex++)
 			{
 				STATEMANAGER.SetTexture(0, m_kVct_pkImgInst[dwFrameIndex]->GetTextureReference().GetD3DTexture());
@@ -56,7 +56,7 @@ class CParticleSystemInstance : public CEffectElementBaseInstance
 				return CScreen::GetFrustum().ViewVolumeTest(Vector3d(pInstance->m_v3Position.x,pInstance->m_v3Position.y,pInstance->m_v3Position.z),pInstance->GetRadiusApproximation())!=VS_OUTSIDE;
 		}
 		
-		DWORD GetEmissionCount();
+		uint32_t GetEmissionCount();
 
 	protected:
 		void OnInitialize();
@@ -68,8 +68,8 @@ class CParticleSystemInstance : public CEffectElementBaseInstance
 	protected:
 		float m_fEmissionResidue;
 		
-		DWORD m_dwCurrentEmissionCount;
-		int	m_iLoopCount;
+		uint32_t m_dwCurrentEmissionCount;
+		int32_t	m_iLoopCount;
 
 		typedef std::list<CParticleInstance*> TParticleInstanceList;
 		typedef std::vector<TParticleInstanceList> TParticleInstanceListVector;

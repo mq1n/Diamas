@@ -215,15 +215,15 @@ public:
 	
 	const Vector3d& GetPos(void) const { return mCenter; };
 	
-	void Render(unsigned int color);
+	void Render(uint32_t color);
 	
 	bool Recompute(float gravy);
 	
-	int GetChildCount(void) const { return mChildCount; };
+	int32_t GetChildCount(void) const { return mChildCount; };
 	
 #if DEMO
-	void SetColor(unsigned int color) { mColor = color; };
-	unsigned int GetColor(void) const { return mColor; };
+	void SetColor(uint32_t color) { mColor = color; };
+	uint32_t GetColor(void) const { return mColor; };
 #endif
 	
 	void SetFifo1(SpherePack **fifo)
@@ -279,8 +279,8 @@ private:
 	SpherePack      **mFifo1; // address of location inside of fifo1
 	SpherePack      **mFifo2; // address of location inside of fifo2
 	
-	long               mFlags; // my bit flags.
-	long               mChildCount; // number of children
+	int32_t               mFlags; // my bit flags.
+	int32_t               mChildCount; // number of children
 	
 	float             mBindingDistance;
 	
@@ -288,7 +288,7 @@ private:
 	
 	SpherePackFactory *mFactory; // the factory we are a member of.
 #if DEMO
-	unsigned long      mColor;
+	uint32_t      mColor;
 #endif
 
 public:
@@ -298,7 +298,7 @@ public:
 class SpherePackFifo
 {
 public:
-	SpherePackFifo(int fifosize)
+	SpherePackFifo(int32_t fifosize)
 	{
 		mCount = 0;
 		mSP = 0;
@@ -338,7 +338,7 @@ public:
 	bool Flush(SpherePack *pack)
 	{
 		if ( mSP == mBottom ) return false;
-		int i = mBottom;
+		int32_t i = mBottom;
 		while ( i != mSP )
 		{
 			if ( mFifo[i] == pack )
@@ -352,13 +352,13 @@ public:
 		return false;
 	};
 	
-	int GetCount(void) const { return mCount; };
+	int32_t GetCount(void) const { return mCount; };
 	
 private:
-	int         mCount;
-	int         mSP; // stack pointer
-	int         mBottom;
-	int         mFifoSize;
+	int32_t         mCount;
+	int32_t         mSP; // stack pointer
+	int32_t         mBottom;
+	int32_t         mFifoSize;
 	SpherePack **mFifo;
 };
 
@@ -367,7 +367,7 @@ class SpherePackFactory : public SpherePackCallback
 {
 public:
 	
-	SpherePackFactory(int maxspheres,
+	SpherePackFactory(int32_t maxspheres,
 		float rootsize,
 		float leafsize,
 		float gravy);
@@ -381,7 +381,7 @@ public:
 		float radius,
 		void *userdata,
 		bool isSphere,
-		int flags=SPF_LEAF_TREE);
+		int32_t flags=SPF_LEAF_TREE);
 	
 	void AddIntegrate(SpherePack *pack);          // add to the integration FIFO
 	void AddRecompute(SpherePack *recompute);     // add to the recomputation (balancing) FIFO.
@@ -394,7 +394,7 @@ public:
 	// see if any other spheres are contained within this one, if so
 	// collapse them and inherit their children.
 #if DEMO
-	unsigned int GetColor(void);
+	uint32_t GetColor(void);
 #endif
 	
 	void FrustumTest(const Frustum &f,SpherePackCallback *callback);
@@ -434,8 +434,8 @@ private:
 	
 #if DEMO
 #define MAXCOLORS 12
-	int               mColorCount;
-	unsigned int      mColors[MAXCOLORS];
+	int32_t               mColorCount;
+	uint32_t      mColors[MAXCOLORS];
 #endif
 	
 	float             mMaxRootSize;              // maximum size of a root node supersphere

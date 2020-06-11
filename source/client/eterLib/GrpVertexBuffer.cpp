@@ -3,35 +3,35 @@
 #include "GrpVertexBuffer.h"
 #include "StateManager.h"
 
-int	CGraphicVertexBuffer::GetVertexStride() const
+int32_t	CGraphicVertexBuffer::GetVertexStride() const
 {
-	int retSize = D3DXGetFVFVertexSize(m_dwFVF);
+	int32_t retSize = D3DXGetFVFVertexSize(m_dwFVF);
 	return retSize;
 }
 
-DWORD CGraphicVertexBuffer::GetFlexibleVertexFormat() const
+uint32_t CGraphicVertexBuffer::GetFlexibleVertexFormat() const
 {
 	return m_dwFVF;
 }
 
-int CGraphicVertexBuffer::GetVertexCount() const
+int32_t CGraphicVertexBuffer::GetVertexCount() const
 {
 	return m_vtxCount;
 }
 
-void CGraphicVertexBuffer::SetStream(int stride, int layer) const
+void CGraphicVertexBuffer::SetStream(int32_t stride, int32_t layer) const
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 	STATEMANAGER.SetStreamSource(layer, m_lpd3dVB, stride);	
 }
 
-bool CGraphicVertexBuffer::LockRange(unsigned count, void** pretVertices) const
+bool CGraphicVertexBuffer::LockRange(uint32_t count, void** pretVertices) const
 {
 	if (!m_lpd3dVB)
 		return false;
 
-	DWORD dwLockSize=GetVertexStride() * count;
-	if (FAILED(m_lpd3dVB->Lock(0, dwLockSize, (BYTE **) pretVertices, m_dwLockFlag)))
+	uint32_t dwLockSize=GetVertexStride() * count;
+	if (FAILED(m_lpd3dVB->Lock(0, dwLockSize, (uint8_t **) pretVertices, m_dwLockFlag)))
 		return false;
 
 	return true;
@@ -42,8 +42,8 @@ bool CGraphicVertexBuffer::Lock(void ** pretVertices) const
 	if (!m_lpd3dVB)
 		return false;
 
-	DWORD dwLockSize=GetVertexStride()*GetVertexCount();
-	if (FAILED(m_lpd3dVB->Lock(0, dwLockSize, (BYTE **) pretVertices, m_dwLockFlag)))
+	uint32_t dwLockSize=GetVertexStride()*GetVertexCount();
+	if (FAILED(m_lpd3dVB->Lock(0, dwLockSize, (uint8_t **) pretVertices, m_dwLockFlag)))
 		return false;
 
 	return true;
@@ -72,7 +72,7 @@ bool CGraphicVertexBuffer::LockDynamic(void** pretVertices)
 	if (!m_lpd3dVB)
 		return false;
 
-	if (FAILED(m_lpd3dVB->Lock(0, 0, (BYTE**)pretVertices, 0)))
+	if (FAILED(m_lpd3dVB->Lock(0, 0, (uint8_t**)pretVertices, 0)))
 		return false;
 
 	return true;
@@ -83,7 +83,7 @@ bool CGraphicVertexBuffer::Lock(void ** pretVertices)
 	if (!m_lpd3dVB)
 		return false;
 
-	if (FAILED(m_lpd3dVB->Lock(0, 0, (BYTE**)pretVertices, m_dwLockFlag)))
+	if (FAILED(m_lpd3dVB->Lock(0, 0, (uint8_t**)pretVertices, m_dwLockFlag)))
 		return false;
 
 	return true;
@@ -99,7 +99,7 @@ bool CGraphicVertexBuffer::Unlock()
 	return true;
 }
 
-bool CGraphicVertexBuffer::Copy(int bufSize, const void* srcVertices)
+bool CGraphicVertexBuffer::Copy(int32_t bufSize, const void* srcVertices)
 {
 	void * dstVertices;
 
@@ -114,8 +114,8 @@ bool CGraphicVertexBuffer::Copy(int bufSize, const void* srcVertices)
 
 bool CGraphicVertexBuffer::CreateDeviceObjects()
 {
-	assert(ms_lpd3dDevice != NULL);
-	assert(m_lpd3dVB == NULL);
+	assert(ms_lpd3dDevice != nullptr);
+	assert(m_lpd3dVB == nullptr);
 
 	if (FAILED(
 		ms_lpd3dDevice->CreateVertexBuffer(
@@ -135,9 +135,9 @@ void CGraphicVertexBuffer::DestroyDeviceObjects()
 	safe_release(m_lpd3dVB);
 }
 
-bool CGraphicVertexBuffer::Create(int vtxCount, DWORD fvf, DWORD usage, D3DPOOL d3dPool)
+bool CGraphicVertexBuffer::Create(int32_t vtxCount, uint32_t fvf, uint32_t usage, D3DPOOL d3dPool)
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 	assert(vtxCount > 0);
 
 	Destroy();
@@ -163,7 +163,7 @@ void CGraphicVertexBuffer::Destroy()
 
 void CGraphicVertexBuffer::Initialize()
 {
-	m_lpd3dVB = NULL;
+	m_lpd3dVB = nullptr;
 	m_vtxCount = 0;
 	m_dwBufferSize = 0;
 }

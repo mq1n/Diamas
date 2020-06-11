@@ -64,12 +64,12 @@ std::string& CMapOutdoor::GetEnvironmentDataName()
 }
 
 
-bool CMapOutdoor::isTerrainLoaded(WORD wX, WORD wY)
+bool CMapOutdoor::isTerrainLoaded(uint16_t wX, uint16_t wY)
 {
-	for (DWORD i = 0; i < m_TerrainVector.size(); ++i)
+	for (uint32_t i = 0; i < m_TerrainVector.size(); ++i)
 	{
 		CTerrain * pTerrain = m_TerrainVector[i];
-		WORD usCoordX, usCoordY;
+		uint16_t usCoordX, usCoordY;
 		pTerrain->GetCoordinate(&usCoordX, &usCoordY);
 		
 		if (usCoordX == wX && usCoordY == wY)
@@ -78,12 +78,12 @@ bool CMapOutdoor::isTerrainLoaded(WORD wX, WORD wY)
 	return false;
 }
 
-bool CMapOutdoor::isAreaLoaded(WORD wX, WORD wY)
+bool CMapOutdoor::isAreaLoaded(uint16_t wX, uint16_t wY)
 {
-	for (DWORD i = 0; i < m_AreaVector.size(); ++i)
+	for (uint32_t i = 0; i < m_AreaVector.size(); ++i)
 	{
 		CArea * pArea = m_AreaVector[i];
-		WORD usCoordX, usCoordY;
+		uint16_t usCoordX, usCoordY;
 		pArea->GetCoordinate(&usCoordX, &usCoordY);
 		
 		if (usCoordX == wX && usCoordY == wY)
@@ -102,23 +102,23 @@ void CMapOutdoor::AssignTerrainPtr()
 	// 하지 않는다.
 	OnPreAssignTerrainPtr();
 
-	short sReferenceCoordMinX, sReferenceCoordMaxX, sReferenceCoordMinY, sReferenceCoordMaxY;
+	int16_t sReferenceCoordMinX, sReferenceCoordMaxX, sReferenceCoordMinY, sReferenceCoordMaxY;
 	sReferenceCoordMinX = std::max(m_CurCoordinate.m_sTerrainCoordX - LOAD_SIZE_WIDTH, 0);
 	sReferenceCoordMaxX = std::min(m_CurCoordinate.m_sTerrainCoordX + LOAD_SIZE_WIDTH, m_sTerrainCountX - 1);
 	sReferenceCoordMinY = std::max(m_CurCoordinate.m_sTerrainCoordY - LOAD_SIZE_WIDTH, 0);
 	sReferenceCoordMaxY = std::min(m_CurCoordinate.m_sTerrainCoordY + LOAD_SIZE_WIDTH, m_sTerrainCountY - 1);
 
-	DWORD i;
+	uint32_t i;
 	for (i = 0; i < AROUND_AREA_NUM; ++i)
 	{
-		m_pArea[i] = NULL;
-		m_pTerrain[i] = NULL;
+		m_pArea[i] = nullptr;
+		m_pTerrain[i] = nullptr;
 	}
 
 	for (i = 0; i < m_TerrainVector.size(); ++i)
 	{
 		CTerrain * pTerrain = m_TerrainVector[i];
-		WORD usCoordX, usCoordY;
+		uint16_t usCoordX, usCoordY;
 		pTerrain->GetCoordinate(&usCoordX, &usCoordY);
 
 		if (usCoordX >= sReferenceCoordMinX &&
@@ -134,7 +134,7 @@ void CMapOutdoor::AssignTerrainPtr()
 	for (i = 0; i < m_AreaVector.size(); ++i)
 	{
 		CArea * pArea = m_AreaVector[i];
-		WORD usCoordX, usCoordY;
+		uint16_t usCoordX, usCoordY;
 		pArea->GetCoordinate(&usCoordX, &usCoordY);
 
 		if (usCoordX >= sReferenceCoordMinX &&
@@ -148,14 +148,14 @@ void CMapOutdoor::AssignTerrainPtr()
 	}
 }
 
-bool CMapOutdoor::LoadArea(WORD wAreaCoordX, WORD wAreaCoordY, WORD wCellCoordX, WORD wCellCoordY)
+bool CMapOutdoor::LoadArea(uint16_t wAreaCoordX, uint16_t wAreaCoordY, uint16_t wCellCoordX, uint16_t wCellCoordY)
 {
 	if (isAreaLoaded(wAreaCoordX, wAreaCoordY))
 		return true;
 #ifdef _DEBUG
-	DWORD dwStartTime = ELTimer_GetMSec();
+	uint32_t dwStartTime = ELTimer_GetMSec();
 #endif
-	unsigned long ulID = (unsigned long) (wAreaCoordX) * 1000L + (unsigned long) (wAreaCoordY);
+	uint32_t ulID = (uint32_t) (wAreaCoordX) * 1000L + (uint32_t) (wAreaCoordY);
 	char szAreaPathName[64+1];
 	_snprintf(szAreaPathName, sizeof(szAreaPathName), "%s\\%06u\\", GetMapDataDirectory().c_str(), ulID);
 
@@ -184,15 +184,15 @@ bool CMapOutdoor::LoadArea(WORD wAreaCoordX, WORD wAreaCoordY, WORD wCellCoordX,
 	return true;
 }
 
-bool CMapOutdoor::LoadTerrain(WORD wTerrainCoordX, WORD wTerrainCoordY, WORD wCellCoordX, WORD wCellCoordY)
+bool CMapOutdoor::LoadTerrain(uint16_t wTerrainCoordX, uint16_t wTerrainCoordY, uint16_t wCellCoordX, uint16_t wCellCoordY)
 {
 	if (isTerrainLoaded(wTerrainCoordX, wTerrainCoordY))
 		return true;
 
 	//////////////////////////////////////////////////////////////////////////
-	DWORD dwStartTime = ELTimer_GetMSec();
+	uint32_t dwStartTime = ELTimer_GetMSec();
 	
-	unsigned long ulID = (unsigned long) (wTerrainCoordX) * 1000L + (unsigned long) (wTerrainCoordY);
+	uint32_t ulID = (uint32_t) (wTerrainCoordX) * 1000L + (uint32_t) (wTerrainCoordY);
 	char filename[256];
 	sprintf(filename, "%s\\%06u\\AreaProperty.txt", GetMapDataDirectory().c_str(), ulID);
 	
@@ -377,7 +377,7 @@ bool CMapOutdoor::LoadSetting(const char * c_szFileName)
 	{
 		const std::string & c_rstrMapBaseX = stTokenVectorMap["baseposition"][0];
 		const std::string & c_rstrMapBaseY = stTokenVectorMap["baseposition"][1];
-		SetBaseXY((DWORD)atol(c_rstrMapBaseX.c_str()), (DWORD)atol(c_rstrMapBaseY.c_str()));
+		SetBaseXY((uint32_t)atol(c_rstrMapBaseX.c_str()), (uint32_t)atol(c_rstrMapBaseY.c_str()));
 	}
 	
 	std::string stTextureSetFileName = strTextureSet;
@@ -455,7 +455,7 @@ bool CMapOutdoor::LoadMonsterAreaInfo()
 	
 	textFileLoader.Bind(File.GetSize(), File.GetData());
 	
-	for (DWORD i = 0; i < textFileLoader.GetLineCount(); ++i)
+	for (uint32_t i = 0; i < textFileLoader.GetLineCount(); ++i)
 	{
 		if (!textFileLoader.SplitLine(i, &stTokenVector))
 			continue;
@@ -497,10 +497,10 @@ bool CMapOutdoor::LoadMonsterAreaInfo()
 			const std::string & c_rstrCount		= stTokenVector[9].c_str();
 			const std::string & c_rstrVID		= stTokenVector[10].c_str();
 			
-			long lOriginX, lOriginY, lSizeX, lSizeY, lZ, lTime, lPercent;
+			int32_t lOriginX, lOriginY, lSizeX, lSizeY, lZ, lTime, lPercent;
 			CMonsterAreaInfo::EMonsterDir eMonsterDir;
-			DWORD dwMonsterCount;
-			DWORD dwMonsterVID;
+			uint32_t dwMonsterCount;
+			uint32_t dwMonsterVID;
 			
 			lOriginX		= atol(c_rstrOriginX.c_str());
 			lOriginY		= atol(c_rstrOriginY.c_str());
@@ -510,8 +510,8 @@ bool CMapOutdoor::LoadMonsterAreaInfo()
 			eMonsterDir		= (CMonsterAreaInfo::EMonsterDir) atoi(c_rstrDir.c_str());
 			lTime			= atol(c_rstrTime.c_str());
 			lPercent		= atol(c_rstrPercent.c_str());
-			dwMonsterCount	= (DWORD) atoi(c_rstrCount.c_str());
-			dwMonsterVID	= (DWORD) atoi(c_rstrVID.c_str());
+			dwMonsterCount	= (uint32_t) atoi(c_rstrCount.c_str());
+			dwMonsterVID	= (uint32_t) atoi(c_rstrVID.c_str());
 
 //			lOriginX -= m_dwBaseX / 100;
 //			lOriginY -= m_dwBaseY / 100;

@@ -26,7 +26,7 @@ void initProfiler()
 		{ "Push",				profilerPush,				METH_VARARGS },
 		{ "Pop",				profilerPop,				METH_VARARGS },
 
-		{ NULL,					NULL,						NULL		 },
+		{ nullptr,					nullptr,						0		 },
 	};
 
 	Py_InitModule("profiler", s_methods);

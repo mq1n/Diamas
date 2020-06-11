@@ -66,7 +66,7 @@ bool CDir::Create(const char * c_szFilter, const char* c_szPath, BOOL bCheckedEx
 			if (bCheckedExtension)
 			{
 				std::string strFilter = c_szFilter;
-				int iPos = strFilter.find_first_of(';', 0);
+				int32_t iPos = strFilter.find_first_of(';', 0);
 				if (iPos > 0)
 				{
 					std::string strFirstFilter = std::string(c_szFilter).substr(0, iPos);
@@ -101,5 +101,5 @@ bool CDir::IsFolder()
 void CDir::Initialize()
 {
 	memset(&m_wfd, 0, sizeof(m_wfd));
-	m_hFind = NULL;				
+	m_hFind = nullptr;				
 }

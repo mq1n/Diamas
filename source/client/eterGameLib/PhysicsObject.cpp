@@ -4,8 +4,8 @@
 const float c_fFrameTime = 0.02f;
 const float EPSILON		 = 0.001f;
 
-IPhysicsWorld* IPhysicsWorld::ms_pWorld = NULL;
-IObjectManager* IObjectManager::ms_ObjManager = NULL;
+IPhysicsWorld* IPhysicsWorld::ms_pWorld = nullptr;
+IObjectManager* IObjectManager::ms_ObjManager = nullptr;
 
 void CPhysicsObject::Update(float fElapsedTime)
 {
@@ -62,10 +62,10 @@ void CPhysicsObject::IncreaseExternalForce(const D3DXVECTOR3 & c_rvBasePosition,
 		m_v3Acceleration.z);
 */
 	// NOTE : 최종 위치를 구해둔다. 근데 100보다 크다면? ;
-	const int LoopValue = 100;
+	const int32_t LoopValue = 100;
 	D3DXVECTOR3 v3Movement(0.0f, 0.0f, 0.0f);
 
-	for(int i = 0; i < LoopValue; ++i)
+	for(int32_t i = 0; i < LoopValue; ++i)
 	{
 		Accumulate(&v3Movement);
 
@@ -169,7 +169,7 @@ void CPhysicsObject::Initialize()
 
 CPhysicsObject::CPhysicsObject()
 {
-	m_pActorInstance = NULL;
+	m_pActorInstance = nullptr;
 }
 
 CPhysicsObject::~CPhysicsObject()

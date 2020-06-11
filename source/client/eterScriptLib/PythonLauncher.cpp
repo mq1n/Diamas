@@ -8,7 +8,7 @@ static PyObject* WriteToStderr(PyObject* self, PyObject* args)
 {
 	const char* what;
 	if (!PyArg_ParseTuple(args, "s", &what))
-		return NULL;
+		return nullptr;
 
 	TraceError("WriteToStderr/ %s", what);
 	Py_RETURN_NONE;
@@ -53,7 +53,7 @@ bool CPythonLauncher::Create(const char* c_szProgramName)
 	static PyMethodDef methods[] =
 	{
 		{ "write", WriteToStderr, METH_VARARGS, "Write something." },
-		{ NULL, NULL, 0, NULL }
+		{ nullptr, nullptr, 0, nullptr }
 	};
 
 	auto m = Py_InitModule("__log", methods);

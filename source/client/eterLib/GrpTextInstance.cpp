@@ -5,35 +5,35 @@
 #include "TextTag.h"
 #include "../eterBase/Utils.h"
 
-extern DWORD GetDefaultCodePage();
+extern uint32_t GetDefaultCodePage();
 
 const float c_fFontFeather = 0.5f;
 
 CDynamicPool<CGraphicTextInstance>		CGraphicTextInstance::ms_kPool;
 
-static int gs_mx = 0;
-static int gs_my = 0;
+static int32_t gs_mx = 0;
+static int32_t gs_my = 0;
 
 static std::wstring gs_hyperlinkText;
 
-void CGraphicTextInstance::Hyperlink_UpdateMousePos(int x, int y)
+void CGraphicTextInstance::Hyperlink_UpdateMousePos(int32_t x, int32_t y)
 {
 	gs_mx = x;
 	gs_my = y;
 	gs_hyperlinkText = L"";
 }
 
-int CGraphicTextInstance::Hyperlink_GetText(char* buf, int len)
+int32_t CGraphicTextInstance::Hyperlink_GetText(char* buf, int32_t len)
 {
 	if (gs_hyperlinkText.empty())
 		return 0;
 
-	int codePage = GetDefaultCodePage();
+	uint32_t codePage = GetDefaultCodePage();
 
-	return WideCharToMultiByte(codePage, 0, gs_hyperlinkText.c_str(), gs_hyperlinkText.length(), buf, len, NULL, NULL);	
+	return WideCharToMultiByte(codePage, 0, gs_hyperlinkText.c_str(), gs_hyperlinkText.length(), buf, len, nullptr, nullptr);	
 }
 
-int CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture * pFontTexture, WORD codePage, wchar_t text, DWORD dwColor)
+int32_t CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture * pFontTexture, uint16_t codePage, wchar_t text, uint32_t dwColor)
 {
 	CGraphicFontTexture::TCharacterInfomation* pInsCharInfo = pFontTexture->GetCharacterInfomation(codePage, text);
 
@@ -43,22 +43,22 @@ int CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture * pFontTexture, WO
 		m_pCharInfoVector.push_back(pInsCharInfo);
 
 		m_textWidth += pInsCharInfo->advance;
-		m_textHeight = std::max<WORD>(pInsCharInfo->height, m_textHeight);
+		m_textHeight = std::max<uint16_t>(pInsCharInfo->height, m_textHeight);
 		return pInsCharInfo->advance;
 	}
 	
 	return 0;
 }
 
-void CGraphicTextInstance::__GetTextPos(DWORD index, float* x, float* y)
+void CGraphicTextInstance::__GetTextPos(uint32_t index, float* x, float* y)
 {
-	index = std::min<DWORD>(index, m_pCharInfoVector.size());
+	index = std::min<uint32_t>(index, m_pCharInfoVector.size());
 
 	float sx = 0;
 	float sy = 0;
 	float fFontMaxHeight = 0;
 
-	for(DWORD i=0; i<index; ++i)
+	for(uint32_t i=0; i<index; ++i)
 	{
 		if (sx+float(m_pCharInfoVector[i]->width) > m_fLimitWidth)
 		{
@@ -109,9 +109,9 @@ const char* FindToken(const char* begin, const char* end)
 	return end;
 }
 
-int ReadToken(const char* token)
+int32_t ReadToken(const char* token)
 {
-	int nRet = (token[1]-'0')*1000 + (token[2]-'0')*100 + (token[3]-'0')*10 + (token[4]-'0');
+	int32_t nRet = (token[1]-'0')*1000 + (token[2]-'0')*100 + (token[3]-'0')*10 + (token[4]-'0');
 	if (nRet == 9999)
 		return CP_UTF8;
 	return nRet;
@@ -135,13 +135,13 @@ void CGraphicTextInstance::Update()
 	if (!pFontTexture)
 		return;
 
-	UINT defCodePage = GetDefaultCodePage();
+	uint32_t defCodePage = GetDefaultCodePage();
 
-	UINT dataCodePage = defCodePage; // 아랍 및 베트남 내부 데이터를 UTF8 을 사용하려 했으나 실패
+	uint32_t dataCodePage = defCodePage; // 아랍 및 베트남 내부 데이터를 UTF8 을 사용하려 했으나 실패
 		
 	CGraphicFontTexture::TCharacterInfomation* pSpaceInfo = pFontTexture->GetCharacterInfomation(dataCodePage, ' ');
 
-	int spaceHeight = pSpaceInfo ? pSpaceInfo->height : 12;
+	int32_t spaceHeight = pSpaceInfo ? pSpaceInfo->height : 12;
 	
 	m_pCharInfoVector.clear();
 	m_dwColorInfoVector.clear();
@@ -155,35 +155,35 @@ void CGraphicTextInstance::Update()
 	const char* begin = m_stText.c_str();
 	const char* end = begin + m_stText.length();
 
-	int wTextMax = (end - begin) * 2;
+	int32_t wTextMax = (end - begin) * 2;
 	wchar_t* wText = (wchar_t*)_alloca(sizeof(wchar_t)*wTextMax);
 
-	DWORD dwColor = m_dwTextColor;
+	uint32_t dwColor = m_dwTextColor;
 
 	/* wstring end */
 	while (begin < end)
 	{
 		const char * token = FindToken(begin, end);
 
-		int wTextLen = MultiByteToWideChar(dataCodePage, 0, begin, token - begin, wText, wTextMax);
+		int32_t wTextLen = MultiByteToWideChar(dataCodePage, 0, begin, token - begin, wText, wTextMax);
 
 		if (m_isSecret)
 		{
-			for(int i=0; i<wTextLen; ++i)
+			for(int32_t i=0; i<wTextLen; ++i)
 				__DrawCharacter(pFontTexture, dataCodePage, '*', dwColor);
 		} 
 		else 
 		{
 			{
-				int x = 0;
-				int len;				
-				int hyperlinkStep = 0;
+				int32_t x = 0;
+				int32_t len;				
+				int32_t hyperlinkStep = 0;
 				SHyperlink kHyperlink;
 				std::wstring hyperlinkBuffer;
 
-				for (int i = 0; i < wTextLen; )
+				for (int32_t i = 0; i < wTextLen; )
 				{
-					int ret = GetTextTag(&wText[i], wTextLen - i, len, hyperlinkBuffer);
+					int32_t ret = GetTextTag(&wText[i], wTextLen - i, len, hyperlinkBuffer);
 
 					if (ret == TEXT_TAG_PLAIN || ret == TEXT_TAG_TAG)
 					{
@@ -191,7 +191,7 @@ void CGraphicTextInstance::Update()
 							hyperlinkBuffer.append(1, wText[i]);
 						else
 						{
-							int charWidth = __DrawCharacter(pFontTexture, dataCodePage, wText[i], dwColor);
+							int32_t charWidth = __DrawCharacter(pFontTexture, dataCodePage, wText[i], dwColor);
 							kHyperlink.ex += charWidth;
 							x += charWidth;
 						}
@@ -231,7 +231,7 @@ void CGraphicTextInstance::Update()
 
 		if (token < end)
 		{			
-			int newCodePage = ReadToken(token);			
+			int32_t newCodePage = ReadToken(token);			
 			dataCodePage = newCodePage;	// 아랍 및 베트남 내부 데이터를 UTF8 을 사용하려 했으나 실패
 			begin = token + 5;			
 		}
@@ -262,7 +262,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 	float fStanX = m_v3Position.x;
 	float fStanY = m_v3Position.y + 1.0f;
 
-	UINT defCodePage = GetDefaultCodePage();
+	uint32_t defCodePage = GetDefaultCodePage();
 
 	{	
 		switch (m_hAlign)
@@ -288,12 +288,12 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 			break;
 	}
 
-	//WORD FillRectIndices[6] = { 0, 2, 1, 2, 3, 1 };
+	//uint16_t FillRectIndices[6] = { 0, 2, 1, 2, 3, 1 };
 
 	STATEMANAGER.SaveRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	STATEMANAGER.SaveRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	DWORD dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
-	DWORD dwLighting = STATEMANAGER.GetRenderState(D3DRS_LIGHTING);
+	uint32_t dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
+	uint32_t dwLighting = STATEMANAGER.GetRenderState(D3DRS_LIGHTING);
 	STATEMANAGER.SetRenderState(D3DRS_FOGENABLE, FALSE);
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, FALSE);
 
@@ -447,7 +447,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 		fCurY=fStanY;
 		fFontMaxHeight=0.0f;
 
-		for (int i = 0; i < m_pCharInfoVector.size(); ++i)
+		for (int32_t i = 0; i < m_pCharInfoVector.size(); ++i)
 		{
 			pCurCharInfo = m_pCharInfoVector[i];
 
@@ -526,8 +526,8 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 		float sx, sy, ex, ey;
 		TDiffuse diffuse;
 
-		int curpos = CIME::GetCurPos();
-		int compend = curpos + CIME::GetCompLen();
+		int32_t curpos = CIME::GetCurPos();
+		int32_t compend = curpos + CIME::GetCompLen();
 
 		__GetTextPos(curpos, &sx, &sy);
 
@@ -574,7 +574,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 		vertices[2].position = TPosition(sx, ey, 0.0f);
 		vertices[3].position = TPosition(ex, ey, 0.0f);
 
-		STATEMANAGER.SetTexture(0, NULL);
+		STATEMANAGER.SetTexture(0, nullptr);
 
 
 		// 2004.11.18.myevan.DrawIndexPrimitiveUP -> DynamicVertexBuffer
@@ -582,8 +582,8 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 		if (CGraphicBase::SetPDTStream(vertices, 4))
 			STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);
 
-		int ulbegin = CIME::GetULBegin();
-		int ulend = CIME::GetULEnd();
+		int32_t ulbegin = CIME::GetULBegin();
+		int32_t ulend = CIME::GetULEnd();
 
 		if(ulbegin < ulend)
 		{
@@ -617,8 +617,8 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 	//금강경 링크 띄워주는 부분.
 	if (m_hyperlinkVector.size() != 0)
 	{
-		int lx = gs_mx - m_v3Position.x;
-		int ly = gs_my - m_v3Position.y;
+		int32_t lx = gs_mx - m_v3Position.x;
+		int32_t ly = gs_my - m_v3Position.y;
 
 		if (lx >= 0 && ly >= 0 && lx < m_textWidth && ly < m_textHeight)
 		{
@@ -641,7 +641,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 	}
 }
 
-void CGraphicTextInstance::CreateSystem(UINT uCapacity)
+void CGraphicTextInstance::CreateSystem(uint32_t uCapacity)
 {
 	ms_kPool.Create(uCapacity);
 }
@@ -682,11 +682,11 @@ void CGraphicTextInstance::HideOutLine()
 	m_isOutline = false;
 }
 
-void CGraphicTextInstance::SetColor(DWORD color)
+void CGraphicTextInstance::SetColor(uint32_t color)
 {
 	if (m_dwTextColor != color)
 	{
-		for (int i = 0; i < m_pCharInfoVector.size(); ++i)
+		for (int32_t i = 0; i < m_pCharInfoVector.size(); ++i)
 			if (m_dwColorInfoVector[i] == m_dwTextColor)
 				m_dwColorInfoVector[i] = color;
 
@@ -699,7 +699,7 @@ void CGraphicTextInstance::SetColor(float r, float g, float b, float a)
 	SetColor(D3DXCOLOR(r, g, b, a));
 }
 
-void CGraphicTextInstance::SetOutLineColor(DWORD color)
+void CGraphicTextInstance::SetOutLineColor(uint32_t color)
 {
 	m_dwOutLineColor=color;
 }
@@ -736,17 +736,17 @@ void CGraphicTextInstance::SetMultiLine(bool Value)
 	m_isMultiLine = Value;
 }
 
-void CGraphicTextInstance::SetHorizonalAlign(int hAlign)
+void CGraphicTextInstance::SetHorizonalAlign(int32_t hAlign)
 {
 	m_hAlign = hAlign;
 }
 
-void CGraphicTextInstance::SetVerticalAlign(int vAlign)
+void CGraphicTextInstance::SetVerticalAlign(int32_t vAlign)
 {
 	m_vAlign = vAlign;
 }
 
-void CGraphicTextInstance::SetMax(int iMax)
+void CGraphicTextInstance::SetMax(int32_t iMax)
 {
 	m_iMax = iMax;
 }
@@ -791,13 +791,13 @@ const std::string & CGraphicTextInstance::GetValueStringReference()
 	return m_stText;
 }
 
-WORD CGraphicTextInstance::GetTextLineCount()
+uint16_t CGraphicTextInstance::GetTextLineCount()
 {
 	CGraphicFontTexture::TCharacterInfomation* pCurCharInfo;
 	CGraphicFontTexture::TPCharacterInfomationVector::iterator itor;
 
 	float fx = 0.0f;
-	WORD wLineCount = 1;
+	uint16_t wLineCount = 1;
 	for (itor=m_pCharInfoVector.begin(); itor!=m_pCharInfoVector.end(); ++itor)
 	{
 		pCurCharInfo = *itor;
@@ -819,16 +819,16 @@ WORD CGraphicTextInstance::GetTextLineCount()
 	return wLineCount;
 }
 
-void CGraphicTextInstance::GetTextSize(int* pRetWidth, int* pRetHeight)
+void CGraphicTextInstance::GetTextSize(int32_t* pRetWidth, int32_t* pRetHeight)
 {
 	*pRetWidth = m_textWidth;
 	*pRetHeight = m_textHeight;
 }
 
-int CGraphicTextInstance::PixelPositionToCharacterPosition(int iPixelPosition)
+int32_t CGraphicTextInstance::PixelPositionToCharacterPosition(int32_t iPixelPosition)
 {
-	int icurPosition = 0;
-	for (int i = 0; i < (int)m_pCharInfoVector.size(); ++i)
+	int32_t icurPosition = 0;
+	for (int32_t i = 0; i < (int32_t)m_pCharInfoVector.size(); ++i)
 	{
 		CGraphicFontTexture::TCharacterInfomation* pCurCharInfo = m_pCharInfoVector[i];
 		icurPosition += pCurCharInfo->width;
@@ -840,14 +840,14 @@ int CGraphicTextInstance::PixelPositionToCharacterPosition(int iPixelPosition)
 	return -1;
 }
 
-int CGraphicTextInstance::GetHorizontalAlign()
+int32_t CGraphicTextInstance::GetHorizontalAlign()
 {
 	return m_hAlign;
 }
 
 void CGraphicTextInstance::__Initialize()
 {
-	m_roText = NULL;
+	m_roText = nullptr;
 
 	m_hAlign = HORIZONTAL_ALIGN_LEFT;
 	m_vAlign = VERTICAL_ALIGN_TOP;

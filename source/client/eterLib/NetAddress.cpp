@@ -3,7 +3,7 @@
 
 #ifndef VC_EXTRALEAN
 
-bool CNetworkAddress::GetHostName(char* szName, int size)
+bool CNetworkAddress::GetHostName(char* szName, int32_t size)
 {
 	if (gethostname(szName, size)==SOCKET_ERROR)
 		return false;
@@ -37,7 +37,7 @@ bool CNetworkAddress::IsIP(const char* c_szAddr)
 	return true;
 }
 
-bool CNetworkAddress::Set(const char* c_szAddr, int port)
+bool CNetworkAddress::Set(const char* c_szAddr, int32_t port)
 {
 	if (IsIP(c_szAddr))
 	{
@@ -55,10 +55,10 @@ bool CNetworkAddress::Set(const char* c_szAddr, int port)
 
 void CNetworkAddress::SetLocalIP()
 {
-	SetIP(INADDR_ANY);	
+	SetIP((uint32_t)INADDR_ANY);	
 }
 
-void CNetworkAddress::SetIP(DWORD ip)
+void CNetworkAddress::SetIP(uint32_t ip)
 {
 	m_sockAddrIn.sin_addr.s_addr=htonl(ip);
 }
@@ -76,30 +76,30 @@ bool CNetworkAddress::SetDNS(const char* c_szDNS)
 	return true;
 }
 
-void CNetworkAddress::SetPort(int port)
+void CNetworkAddress::SetPort(int32_t port)
 {
 	m_sockAddrIn.sin_port = htons(port);
 }
 
-int CNetworkAddress::GetSize()
+int32_t CNetworkAddress::GetSize()
 {
 	return sizeof(m_sockAddrIn);
 }
 
-DWORD CNetworkAddress::GetIP()
+uint32_t CNetworkAddress::GetIP()
 {
 	return ntohl(m_sockAddrIn.sin_addr.s_addr);
 }
 
-void CNetworkAddress::GetIP(char* szIP, int len)
+void CNetworkAddress::GetIP(char* szIP, int32_t len)
 {
-	BYTE IPs[4];
-	*((DWORD*)IPs)=m_sockAddrIn.sin_addr.s_addr;
+	uint8_t IPs[4];
+	*((uint32_t*)IPs)=m_sockAddrIn.sin_addr.s_addr;
 
 	_snprintf(szIP, len, "%d.%d.%d.%d", IPs[0], IPs[1], IPs[2], IPs[3]);
 }
 			
-int CNetworkAddress::GetPort()
+int32_t CNetworkAddress::GetPort()
 {
 	return ntohs(m_sockAddrIn.sin_port);
 }

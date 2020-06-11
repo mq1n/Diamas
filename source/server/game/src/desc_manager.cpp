@@ -79,7 +79,7 @@ void DESC_MANAGER::Destroy()
 	Initialize();
 }
 
-DWORD DESC_MANAGER::CreateHandshake()
+uint32_t DESC_MANAGER::CreateHandshake()
 {
 	char crc_buf[8];
 	crc_t crc;
@@ -88,10 +88,10 @@ DWORD DESC_MANAGER::CreateHandshake()
 RETRY:
 	do
 	{
-		DWORD val = thecore_random() % (1024 * 1024);
+		uint32_t val = thecore_random() % (1024 * 1024);
 
-		*(DWORD *) (crc_buf    ) = val;
-		*((DWORD *) crc_buf + 1) = get_global_time();
+		*(uint32_t *) (crc_buf    ) = val;
+		*((uint32_t *) crc_buf + 1) = get_global_time();
 
 		crc = GetCRC32(crc_buf, 8);
 		it = m_map_handshake.find(crc);
@@ -112,7 +112,7 @@ LPDESC DESC_MANAGER::AcceptDesc(LPFDWATCH fdw, socket_t s)
 	static char					host[MAX_HOST_LENGTH + 1];
 
 	if ((desc = socket_accept(s, &peer)) == -1)
-		return NULL;
+		return nullptr;
 
 	strlcpy(host, inet_ntoa(peer.sin_addr), sizeof(host));
 
@@ -122,7 +122,7 @@ LPDESC DESC_MANAGER::AcceptDesc(LPFDWATCH fdw, socket_t s)
 		{
 			sys_log(0, "connection from %s was banned.", host);
 			socket_close(desc);
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -130,7 +130,7 @@ LPDESC DESC_MANAGER::AcceptDesc(LPFDWATCH fdw, socket_t s)
 	{
 		sys_err("max connection reached. MAX_ALLOW_USER = %d", MAX_ALLOW_USER);
 		socket_close(desc);
-		return NULL;
+		return nullptr;
 	}
 
 	newd = M2_NEW DESC;
@@ -140,7 +140,7 @@ LPDESC DESC_MANAGER::AcceptDesc(LPFDWATCH fdw, socket_t s)
 	{
 		socket_close(desc);
 		M2_DELETE(newd);
-		return NULL;
+		return nullptr;
 	}
 
 	m_map_handshake.insert(DESC_HANDSHAKE_MAP::value_type(handshake, newd));
@@ -158,7 +158,7 @@ LPDESC DESC_MANAGER::AcceptP2PDesc(LPFDWATCH fdw, socket_t bind_fd)
 	char               host[MAX_HOST_LENGTH + 1];
 
 	if ((fd = socket_accept(bind_fd, &peer)) == -1)
-		return NULL;
+		return nullptr;
 
 	strlcpy(host, inet_ntoa(peer.sin_addr), sizeof(host));
 
@@ -169,7 +169,7 @@ LPDESC DESC_MANAGER::AcceptP2PDesc(LPFDWATCH fdw, socket_t bind_fd)
 		sys_err("DESC_MANAGER::AcceptP2PDesc : Setup failed");
 		socket_close(fd);
 		M2_DELETE(pkDesc);
-		return NULL;
+		return nullptr;
 	}
 
 	m_set_pkDesc.insert(pkDesc);
@@ -246,17 +246,17 @@ LPDESC DESC_MANAGER::FindByLoginName(const std::string& login)
 	DESC_LOGINNAME_MAP::iterator it = m_map_loginName.find(login);
 
 	if (m_map_loginName.end() == it)
-		return NULL;
+		return nullptr;
 
 	return (it->second); 
 }
 
-LPDESC DESC_MANAGER::FindByHandle(DWORD handle)
+LPDESC DESC_MANAGER::FindByHandle(uint32_t handle)
 {
 	DESC_HANDLE_MAP::iterator it = m_map_handle.find(handle);
 
 	if (m_map_handle.end() == it)
-		return NULL;
+		return nullptr;
 
 	return (it->second); 
 }
@@ -286,10 +286,10 @@ struct name_with_desc_func
 LPDESC DESC_MANAGER::FindByCharacterName(const char *name)
 {
 	DESC_SET::iterator it = std::find_if (m_set_pkDesc.begin(), m_set_pkDesc.end(), name_with_desc_func(name));
-	return (it == m_set_pkDesc.end()) ? NULL : (*it);
+	return (it == m_set_pkDesc.end()) ? nullptr : (*it);
 }
 
-LPCLIENT_DESC DESC_MANAGER::CreateConnectionDesc(LPFDWATCH fdw, const char * host, WORD port, int iPhaseWhenSucceed, bool bRetryWhenClosed)
+LPCLIENT_DESC DESC_MANAGER::CreateConnectionDesc(LPFDWATCH fdw, const char * host, uint16_t port, int32_t iPhaseWhenSucceed, bool bRetryWhenClosed)
 {
 	LPCLIENT_DESC newd;
 
@@ -320,7 +320,7 @@ void DESC_MANAGER::TryConnect()
 	std::for_each(m_set_pkClientDesc.begin(), m_set_pkClientDesc.end(), f);
 }
 
-bool DESC_MANAGER::IsP2PDescExist(const char * szHost, WORD wPort)
+bool DESC_MANAGER::IsP2PDescExist(const char * szHost, uint16_t wPort)
 {
 	CLIENT_DESC_SET::iterator it = m_set_pkClientDesc.begin();
 	
@@ -335,12 +335,12 @@ bool DESC_MANAGER::IsP2PDescExist(const char * szHost, WORD wPort)
 	return false;
 }
 
-LPDESC DESC_MANAGER::FindByHandshake(DWORD dwHandshake)
+LPDESC DESC_MANAGER::FindByHandshake(uint32_t dwHandshake)
 {
 	DESC_HANDSHAKE_MAP::iterator it = m_map_handshake.find(dwHandshake);
 
 	if (it == m_map_handshake.end())
-		return NULL;
+		return nullptr;
 
 	return (it->second);
 }
@@ -348,8 +348,8 @@ LPDESC DESC_MANAGER::FindByHandshake(DWORD dwHandshake)
 class FuncWho
 {
 	public:
-		int iTotalCount;
-		int aiEmpireUserCount[EMPIRE_MAX_NUM];
+		int32_t iTotalCount;
+		int32_t aiEmpireUserCount[EMPIRE_MAX_NUM];
 
 		FuncWho()
 		{
@@ -381,11 +381,11 @@ void DESC_MANAGER::UpdateLocalUserCount()
 	m_aiEmpireUserCount[3] += P2P_MANAGER::instance().GetEmpireUserCount(3);
 }
 
-void DESC_MANAGER::GetUserCount(int & iTotal, int ** paiEmpireUserCount, int & iLocalCount)
+void DESC_MANAGER::GetUserCount(int32_t & iTotal, int32_t ** paiEmpireUserCount, int32_t & iLocalCount)
 {
 	*paiEmpireUserCount = &m_aiEmpireUserCount[0];
 	
-	int iCount = P2P_MANAGER::instance().GetCount();
+	int32_t iCount = P2P_MANAGER::instance().GetCount();
 	if (iCount < 0)
 	{
 		sys_err("P2P_MANAGER::instance().GetCount() == -1");
@@ -395,14 +395,14 @@ void DESC_MANAGER::GetUserCount(int & iTotal, int ** paiEmpireUserCount, int & i
 }
 
 
-DWORD DESC_MANAGER::MakeRandomKey(DWORD dwHandle)
+uint32_t DESC_MANAGER::MakeRandomKey(uint32_t dwHandle)
 { 
-	DWORD random_key = thecore_random(); 
+	uint32_t random_key = thecore_random(); 
 	m_map_handle_random_key.insert(std::make_pair(dwHandle, random_key));
 	return random_key;
 }
 
-bool DESC_MANAGER::GetRandomKey(DWORD dwHandle, DWORD* prandom_key)
+bool DESC_MANAGER::GetRandomKey(uint32_t dwHandle, uint32_t* prandom_key)
 {
 	DESC_HANDLE_RANDOM_KEY_MAP::iterator it = m_map_handle_random_key.find(dwHandle); 
 
@@ -413,20 +413,20 @@ bool DESC_MANAGER::GetRandomKey(DWORD dwHandle, DWORD* prandom_key)
 	return true;
 }
 
-LPDESC DESC_MANAGER::FindByLoginKey(DWORD dwKey)
+LPDESC DESC_MANAGER::FindByLoginKey(uint32_t dwKey)
 {
-	std::map<DWORD, CLoginKey *>::iterator it = m_map_pkLoginKey.find(dwKey);
+	std::map<uint32_t, CLoginKey *>::iterator it = m_map_pkLoginKey.find(dwKey);
 
 	if (it == m_map_pkLoginKey.end())
-		return NULL;
+		return nullptr;
 
 	return it->second->m_pkDesc;
 }
 
 
-DWORD DESC_MANAGER::CreateLoginKey(LPDESC d)
+uint32_t DESC_MANAGER::CreateLoginKey(LPDESC d)
 {
-	DWORD dwKey = 0;
+	uint32_t dwKey = 0;
 
 	do
 	{
@@ -446,9 +446,9 @@ DWORD DESC_MANAGER::CreateLoginKey(LPDESC d)
 
 void DESC_MANAGER::ProcessExpiredLoginKey()
 {
-	DWORD dwCurrentTime = get_dword_time();
+	uint32_t dwCurrentTime = get_dword_time();
 
-	std::map<DWORD, CLoginKey *>::iterator it, it2;
+	std::map<uint32_t, CLoginKey *>::iterator it, it2;
 
 	it = m_map_pkLoginKey.begin();
 

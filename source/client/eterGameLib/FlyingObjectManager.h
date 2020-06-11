@@ -28,9 +28,9 @@ public:
 	void DeleteAllInstances();
 
 	bool RegisterFlyingData(const char* c_szFilename);
-	bool RegisterFlyingData(const char* c_szFilename, DWORD & r_dwRetCRC);
+	bool RegisterFlyingData(const char* c_szFilename, uint32_t & r_dwRetCRC);
 
-	CFlyingInstance * CreateFlyingInstanceFlyTarget(const DWORD dwID, const D3DXVECTOR3 & v3StartPosition, const CFlyTarget & cr_FlyTarget, bool canAttack);
+	CFlyingInstance * CreateFlyingInstanceFlyTarget(const uint32_t dwID, const D3DXVECTOR3 & v3StartPosition, const CFlyTarget & cr_FlyTarget, bool canAttack);
 
 	void Update();
 	void Render();
@@ -39,22 +39,22 @@ public:
 	CMapManager * GetMapManagerPtr() { return m_pMapManager; }
 
 public: // Controlled by Server
-	bool RegisterIndexedFlyData(DWORD dwIndex, BYTE byType, const char * c_szFileName);
-	void CreateIndexedFly(DWORD dwIndex, CActorInstance * pStartActor, CActorInstance * pEndActor);
+	bool RegisterIndexedFlyData(uint32_t dwIndex, uint8_t byType, const char * c_szFileName);
+	void CreateIndexedFly(uint32_t dwIndex, CActorInstance * pStartActor, CActorInstance * pEndActor);
 
 private:
 	void __DestroyFlyingInstanceList();
 	void __DestroyFlyingDataMap();		
 
-	typedef std::map<DWORD, CFlyingData *> TFlyingDataMap;
+	typedef std::map<uint32_t, CFlyingData *> TFlyingDataMap;
 	typedef std::list<CFlyingInstance *> TFlyingInstanceList;
 
 	typedef struct SIndexFlyData
 	{
-		BYTE byType;
-		DWORD dwCRC;
+		uint8_t byType;
+		uint32_t dwCRC;
 	} TIndexFlyData;
-	typedef std::map<DWORD, TIndexFlyData> TIndexFlyDataMap;
+	typedef std::map<uint32_t, TIndexFlyData> TIndexFlyDataMap;
 
 	TFlyingDataMap			m_kMap_pkFlyData;
 	TFlyingInstanceList		m_kLst_pkFlyInst;
@@ -62,5 +62,5 @@ private:
 
 	CMapManager * m_pMapManager;
 
-	DWORD m_IDCounter;
+	uint32_t m_IDCounter;
 };

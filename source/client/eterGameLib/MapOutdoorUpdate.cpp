@@ -50,18 +50,18 @@ bool CMapOutdoor::Update(float fX, float fY, float fZ)
 	m_v3Player=v3Player;
 
 
-	DWORD t1=ELTimer_GetMSec();
+	uint32_t t1=ELTimer_GetMSec();
 
-	int ix, iy;
+	int32_t ix, iy;
 	PR_FLOAT_TO_INT(fX, ix);
 	if ( fY < 0 )
 		fY = -fY;
 	PR_FLOAT_TO_INT(fY, iy);
 	
-	short sCoordX = MINMAX(0, ix / CTerrainImpl::TERRAIN_XSIZE, m_sTerrainCountX - 1);
-	short sCoordY = MINMAX(0, iy / CTerrainImpl::TERRAIN_YSIZE, m_sTerrainCountY - 1);
+	int16_t sCoordX = MINMAX(0, ix / CTerrainImpl::TERRAIN_XSIZE, m_sTerrainCountX - 1);
+	int16_t sCoordY = MINMAX(0, iy / CTerrainImpl::TERRAIN_YSIZE, m_sTerrainCountY - 1);
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t2=ELTimer_GetMSec();
+	uint32_t t2=ELTimer_GetMSec();
 #endif
 
 	bool bNeedInit = (m_PrevCoordinate.m_sTerrainCoordX == -1 || m_PrevCoordinate.m_sTerrainCoordY == -1);
@@ -86,18 +86,18 @@ bool CMapOutdoor::Update(float fX, float fY, float fZ)
 		m_lCurCoordStartX = sCoordX * CTerrainImpl::TERRAIN_XSIZE;
 		m_lCurCoordStartY = sCoordY * CTerrainImpl::TERRAIN_YSIZE;
 
-		WORD wCellCoordX = (ix % CTerrainImpl::TERRAIN_XSIZE) / CTerrainImpl::CELLSCALE;
-		WORD wCellCoordY = (iy % CTerrainImpl::TERRAIN_YSIZE) / CTerrainImpl::CELLSCALE;
+		uint16_t wCellCoordX = (ix % CTerrainImpl::TERRAIN_XSIZE) / CTerrainImpl::CELLSCALE;
+		uint16_t wCellCoordY = (iy % CTerrainImpl::TERRAIN_YSIZE) / CTerrainImpl::CELLSCALE;
 
-		short sReferenceCoordMinX, sReferenceCoordMaxX, sReferenceCoordMinY, sReferenceCoordMaxY;
+		int16_t sReferenceCoordMinX, sReferenceCoordMaxX, sReferenceCoordMinY, sReferenceCoordMaxY;
 		sReferenceCoordMinX = std::max(m_CurCoordinate.m_sTerrainCoordX - LOAD_SIZE_WIDTH, 0);
 		sReferenceCoordMaxX = std::min(m_CurCoordinate.m_sTerrainCoordX + LOAD_SIZE_WIDTH, m_sTerrainCountX - 1);
 		sReferenceCoordMinY = std::max(m_CurCoordinate.m_sTerrainCoordY - LOAD_SIZE_WIDTH, 0);
 		sReferenceCoordMaxY = std::min(m_CurCoordinate.m_sTerrainCoordY + LOAD_SIZE_WIDTH, m_sTerrainCountY - 1);
 		
-		for (WORD usY = sReferenceCoordMinY; usY <=sReferenceCoordMaxY; ++usY)
+		for (uint16_t usY = sReferenceCoordMinY; usY <=sReferenceCoordMaxY; ++usY)
 		{
-			for (WORD usX = sReferenceCoordMinX; usX <= sReferenceCoordMaxX; ++usX)
+			for (uint16_t usX = sReferenceCoordMinX; usX <= sReferenceCoordMaxX; ++usX)
 			{
 				LoadTerrain(usX, usY, wCellCoordX, wCellCoordY);
   				LoadArea(usX, usY, wCellCoordX, wCellCoordY);
@@ -110,27 +110,27 @@ bool CMapOutdoor::Update(float fX, float fY, float fZ)
 		Tracenf("Update::Load spent %d ms\n", ELTimer_GetMSec() - t1);
 	}
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t3=ELTimer_GetMSec();
+	uint32_t t3=ELTimer_GetMSec();
 #endif
 	CSpeedTreeForestDirectX8::Instance().UpdateSystem(CTimer::Instance().GetCurrentSecond());
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t4=ELTimer_GetMSec();
+	uint32_t t4=ELTimer_GetMSec();
 #endif
 	__UpdateGarvage();
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t5=ELTimer_GetMSec();
+	uint32_t t5=ELTimer_GetMSec();
 #endif
 	UpdateTerrain(fX, fY);
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t6=ELTimer_GetMSec();
+	uint32_t t6=ELTimer_GetMSec();
 #endif
 	__UpdateArea(v3Player);
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t7=ELTimer_GetMSec();
+	uint32_t t7=ELTimer_GetMSec();
 #endif
 	UpdateSky();
 #ifdef __PERFORMANCE_CHECKER__	
-	DWORD t8=ELTimer_GetMSec();
+	uint32_t t8=ELTimer_GetMSec();
 #endif
 	__HeightCache_Update();
 
@@ -201,7 +201,7 @@ struct FPCBlockerDistanceSort
 
 void CMapOutdoor::UpdateAroundAmbience(float fX, float fY, float fZ)
 {
-	for (int i = 0; i < AROUND_AREA_NUM; ++i)
+	for (int32_t i = 0; i < AROUND_AREA_NUM; ++i)
 	{
 		CArea * pArea;
 		if (GetAreaPointer(i, &pArea))
@@ -221,12 +221,12 @@ void CMapOutdoor::__UpdateArea(D3DXVECTOR3& v3Player)
 void CMapOutdoor::__Game_UpdateArea(D3DXVECTOR3& v3Player)
 {
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t1=timeGetTime();
+	uint32_t t1=timeGetTime();
 #endif
 	m_PCBlockerVector.clear();	
 	m_ShadowReceiverVector.clear();
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t2=timeGetTime();
+	uint32_t t2=timeGetTime();
 #endif
 	CCameraManager& rCmrMgr=CCameraManager::Instance();
 	CCamera * pCamera = rCmrMgr.GetCurrentCamera();
@@ -253,24 +253,24 @@ void CMapOutdoor::__Game_UpdateArea(D3DXVECTOR3& v3Player)
 	}
 	*/
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t3=timeGetTime();
+	uint32_t t3=timeGetTime();
 #endif
 	__CollectShadowReceiver(v3Player, v3Light);
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t4=timeGetTime();
+	uint32_t t4=timeGetTime();
 #endif
 	__CollectCollisionPCBlocker(v3Eye, v3Player, fDistance);
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t5=timeGetTime();
+	uint32_t t5=timeGetTime();
 #endif
 	__CollectCollisionShadowReceiver(v3Player, v3Light);
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t6=timeGetTime();
+	uint32_t t6=timeGetTime();
 #endif
 	__UpdateAroundAreaList();
 
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t7=timeGetTime();
+	uint32_t t7=timeGetTime();
 	{
 		static FILE* fp=fopen("perf_area_update.txt", "w");
 
@@ -300,24 +300,24 @@ void CMapOutdoor::__NEW_WorldEditor_UpdateArea()
 void CMapOutdoor::__UpdateAroundAreaList()
 {
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD ft1=timeGetTime();
+	uint32_t ft1=timeGetTime();
 #endif
-	DWORD at[AROUND_AREA_NUM];
-	for (int i = 0; i < AROUND_AREA_NUM; ++i)
+	uint32_t at[AROUND_AREA_NUM];
+	for (int32_t i = 0; i < AROUND_AREA_NUM; ++i)
 	{
-		DWORD t1=timeGetTime();
+		uint32_t t1=timeGetTime();
 		CArea * pArea;
 		if (GetAreaPointer(i, &pArea))
 			pArea->Update();
-		DWORD t2=timeGetTime();
+		uint32_t t2=timeGetTime();
 
 		at[i]=t2-t1;
 	}	
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD ft2=timeGetTime();
+	uint32_t ft2=timeGetTime();
 	if (ft2-ft1>5)
 	{
-		for (int i=0; i<AROUND_AREA_NUM; ++i)
+		for (int32_t i=0; i<AROUND_AREA_NUM; ++i)
 			Tracef("Area %d %d\n", i, at[i]);
 	}
 #endif
@@ -331,9 +331,9 @@ struct FGetShadowReceiverFromHeightData
 		COLLECT_MAX = 100,
 	};
 	
-	DWORD m_dwCollectOverCount;
-	DWORD m_dwCollectCount;
-	DWORD m_dwCheckCount;
+	uint32_t m_dwCollectOverCount;
+	uint32_t m_dwCollectCount;
+	uint32_t m_dwCheckCount;
 	bool m_bReceiverFound;
 	float m_fFromX, m_fFromY, m_fToX, m_fToY;
 	float m_fReturnHeight;
@@ -348,15 +348,15 @@ struct FGetShadowReceiverFromHeightData
 		m_dwCollectCount=0;		
 	}
 
-	CGraphicObjectInstance* GetCollectItem(UINT uIndex)
+	CGraphicObjectInstance* GetCollectItem(uint32_t uIndex)
 	{
 		if (uIndex>=m_dwCollectCount)
-			return NULL;
+			return nullptr;
 
 		return m_apkShadowReceiver[uIndex];
 	}
 
-	UINT GetCollectCount()
+	uint32_t GetCollectCount()
 	{
 		return m_dwCollectCount;
 	}
@@ -399,19 +399,19 @@ void CMapOutdoor::__CollectShadowReceiver(D3DXVECTOR3& v3Target, D3DXVECTOR3& v3
 	CCullingManager & rkCullingMgr = CCullingManager::Instance();
 
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t1=ELTimer_GetMSec();
+	uint32_t t1=ELTimer_GetMSec();
 #endif
 
 	FGetShadowReceiverFromHeightData kGetShadowReceiverFromHeightData(v3Target.x, v3Target.y, s.v3Position.x, s.v3Position.y);
 	rkCullingMgr.ForInRange(aVector3d, 10.0f, &kGetShadowReceiverFromHeightData);
 
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t2=ELTimer_GetMSec();
+	uint32_t t2=ELTimer_GetMSec();
 #endif
 
 	if (kGetShadowReceiverFromHeightData.m_bReceiverFound)
 	{
-		for (UINT i=0; i<kGetShadowReceiverFromHeightData.GetCollectCount(); ++i)
+		for (uint32_t i=0; i<kGetShadowReceiverFromHeightData.GetCollectCount(); ++i)
 		{
 			CGraphicObjectInstance * pObjInstEach = kGetShadowReceiverFromHeightData.GetCollectItem(i);
 			if (!__IsInShadowReceiverList(pObjInstEach))
@@ -421,7 +421,7 @@ void CMapOutdoor::__CollectShadowReceiver(D3DXVECTOR3& v3Target, D3DXVECTOR3& v3
 
 #ifdef __PERFORMANCE_CHECKER__
 	static FILE* fp=fopen("perf_shadow_collect.txt", "w");
-	DWORD t3=ELTimer_GetMSec();
+	uint32_t t3=ELTimer_GetMSec();
 
 	if (t3-t1>5)
 	{
@@ -448,9 +448,9 @@ struct PCBlocker_SInstanceList
 		CAPACITY = 512,
 	};
 
-	DWORD m_dwInstCount;
-	DWORD m_dwBlockerCount;
-	DWORD m_dwBlockerOverCount;
+	uint32_t m_dwInstCount;
+	uint32_t m_dwBlockerCount;
+	uint32_t m_dwBlockerOverCount;
 
 	Item m_apkPCBlocker[CAPACITY];
 	
@@ -488,7 +488,7 @@ struct PCBlocker_SInstanceList
 	}
 	void __DEBUG_ShowInstanceMaxCount()
 	{
-		static DWORD s_dwInstMaxCount=0;
+		static uint32_t s_dwInstMaxCount=0;
 		if (s_dwInstMaxCount<m_dwInstCount)
 		{
 			s_dwInstMaxCount=m_dwInstCount;
@@ -505,7 +505,7 @@ struct PCBlocker_SInstanceList
 		return m_apkPCBlocker+m_dwBlockerCount;
 	}
 
-	DWORD Size()
+	uint32_t Size()
 	{
 		return m_dwBlockerCount;
 	}
@@ -584,13 +584,13 @@ struct PCBlocker_SInstanceList
 void CMapOutdoor::__CollectCollisionPCBlocker(D3DXVECTOR3& v3Eye, D3DXVECTOR3& v3Target, float fDistance)
 {
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t1=timeGetTime();
+	uint32_t t1=timeGetTime();
 #endif
 
 	Vector3d v3dRayStart;
 	v3dRayStart.Set(v3Eye.x, v3Eye.y, v3Eye.z);
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t2=timeGetTime();
+	uint32_t t2=timeGetTime();
 #endif
 
 	PCBlocker_CDynamicSphereInstanceVector aDynamicSphereInstanceVector;
@@ -617,7 +617,7 @@ void CMapOutdoor::__CollectCollisionPCBlocker(D3DXVECTOR3& v3Eye, D3DXVECTOR3& v
 		++pkDSI;
 	}
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t3=timeGetTime();	
+	uint32_t t3=timeGetTime();	
 #endif
 	CCullingManager & rkCullingMgr = CCullingManager::Instance();
 
@@ -625,7 +625,7 @@ void CMapOutdoor::__CollectCollisionPCBlocker(D3DXVECTOR3& v3Eye, D3DXVECTOR3& v
 	RangeTester<PCBlocker_SInstanceList> kPCBlockerRangeTester(&kPCBlockerList);
 	rkCullingMgr.RangeTest(v3dRayStart, fDistance, &kPCBlockerRangeTester);
 #ifdef __PERFORMANCE_CHECKER__
- 	DWORD t4=timeGetTime();
+ 	uint32_t t4=timeGetTime();
 #endif
 
 	if (!kPCBlockerList.IsEmpty())
@@ -648,12 +648,12 @@ void CMapOutdoor::__CollectCollisionPCBlocker(D3DXVECTOR3& v3Eye, D3DXVECTOR3& v
 		}
 	}
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t5=timeGetTime();
+	uint32_t t5=timeGetTime();
 #endif
 	std::sort(m_PCBlockerVector.begin(), m_PCBlockerVector.end(), FPCBlockerDistanceSort(v3Eye));
 
 #ifdef __PERFORMANCE_CHECKER__
-	DWORD t6=timeGetTime();
+	uint32_t t6=timeGetTime();
 
 	static FILE* fp=fopen("perf_pbc_collect.txt", "w");
 
@@ -724,19 +724,19 @@ void CMapOutdoor::UpdateTerrain(float fX, float fY)
 	if (fY < 0)
 		fY = -fY;
 
-	int sx, sy;
+	int32_t sx, sy;
 	PR_FLOAT_TO_INT(fX, sx);
 	PR_FLOAT_TO_INT(fY, sy);
 
-	long lDivider = (CTerrainImpl::CELLSCALE * TERRAIN_PATCHSIZE);
+	int32_t lDivider = (CTerrainImpl::CELLSCALE * TERRAIN_PATCHSIZE);
 
 	m_lCenterX = (sx - m_lCurCoordStartX) / lDivider;
 	m_lCenterY = (sy - m_lCurCoordStartY) / lDivider;
 	
 	if ((m_lCenterX != m_lOldReadX) || (m_lCenterY != m_lOldReadY))
 	{
-		long lRealCenterX = m_lCenterX * TERRAIN_PATCHSIZE;
-		long lRealCenterY = m_lCenterY * TERRAIN_PATCHSIZE;
+		int32_t lRealCenterX = m_lCenterX * TERRAIN_PATCHSIZE;
+		int32_t lRealCenterY = m_lCenterY * TERRAIN_PATCHSIZE;
 		m_lOldReadX = m_lCenterX; 
 		m_lOldReadY = m_lCenterY;
 		
@@ -753,10 +753,10 @@ void CMapOutdoor::FPushTerrainToDeleteVector::operator () (CTerrain * pTerrain)
 	if (aIterator != m_ReturnTerrainVector.end())
 		return;
 
-	WORD wReferenceCoordX = m_CurCoordinate.m_sTerrainCoordX;
-	WORD wReferenceCoordY = m_CurCoordinate.m_sTerrainCoordY;
+	uint16_t wReferenceCoordX = m_CurCoordinate.m_sTerrainCoordX;
+	uint16_t wReferenceCoordY = m_CurCoordinate.m_sTerrainCoordY;
 
-	WORD wCoordX, wCoordY;
+	uint16_t wCoordX, wCoordY;
 	pTerrain->GetCoordinate(&wCoordX, &wCoordY);
 
 	
@@ -795,10 +795,10 @@ void CMapOutdoor::FPushAreaToDeleteVector::operator () (CArea * pArea)
 	if (aIterator != m_ReturnAreaVector.end())
 		return;
 
-	WORD wReferenceCoordX = m_CurCoordinate.m_sTerrainCoordX;
-	WORD wReferenceCoordY = m_CurCoordinate.m_sTerrainCoordY;
+	uint16_t wReferenceCoordX = m_CurCoordinate.m_sTerrainCoordX;
+	uint16_t wReferenceCoordY = m_CurCoordinate.m_sTerrainCoordY;
 	
-	WORD wCoordX, wCoordY;
+	uint16_t wCoordX, wCoordY;
 	pArea->GetCoordinate(&wCoordX, &wCoordY);
 	
 	switch(m_eLRDeleteDir)
@@ -841,8 +841,8 @@ void CMapOutdoor::__ClearGarvage()
 
 void CMapOutdoor::__UpdateGarvage()
 {
-	const DWORD dwTerrainEraseInterval = 1000 * 60;
-	static DWORD dwEraseTime = ELTimer_GetMSec();
+	const uint32_t dwTerrainEraseInterval = 1000 * 60;
+	static uint32_t dwEraseTime = ELTimer_GetMSec();
 	
 	if (!m_TerrainDeleteVector.empty())
 	{
@@ -874,7 +874,7 @@ void CMapOutdoor::__UpdateGarvage()
 	}
 }
 
-void CMapOutdoor::UpdateAreaList(long lCenterX, long lCenterY)
+void CMapOutdoor::UpdateAreaList(int32_t lCenterX, int32_t lCenterY)
 {
 	if (m_TerrainVector.size() <= AROUND_AREA_NUM && m_AreaVector.size() <= AROUND_AREA_NUM)
 		return;
@@ -902,7 +902,7 @@ void CMapOutdoor::UpdateAreaList(long lCenterX, long lCenterY)
 		m_TerrainDeleteVector.resize(rPushTerrainToDeleteVector.m_ReturnTerrainVector.size());
 		std::copy(rPushTerrainToDeleteVector.m_ReturnTerrainVector.begin(), rPushTerrainToDeleteVector.m_ReturnTerrainVector.end(), m_TerrainDeleteVector.begin());
 
-		for (DWORD dwIndex = 0; dwIndex < rPushTerrainToDeleteVector.m_ReturnTerrainVector.size(); ++dwIndex)
+		for (uint32_t dwIndex = 0; dwIndex < rPushTerrainToDeleteVector.m_ReturnTerrainVector.size(); ++dwIndex)
 		{
 			bool isDel=false;
 			TTerrainPtrVectorIterator aTerrainPtrItertor = m_TerrainVector.begin();
@@ -924,7 +924,7 @@ void CMapOutdoor::UpdateAreaList(long lCenterX, long lCenterY)
 		m_AreaDeleteVector.resize(rPushAreaToDeleteVector.m_ReturnAreaVector.size());
 		std::copy(rPushAreaToDeleteVector.m_ReturnAreaVector.begin(), rPushAreaToDeleteVector.m_ReturnAreaVector.end(), m_AreaDeleteVector.begin());
 		
-		for (DWORD dwIndex = 0; dwIndex < rPushAreaToDeleteVector.m_ReturnAreaVector.size(); ++dwIndex)
+		for (uint32_t dwIndex = 0; dwIndex < rPushAreaToDeleteVector.m_ReturnAreaVector.size(); ++dwIndex)
 		{
 			TAreaPtrVectorIterator aAreaPtrItertor = m_AreaVector.begin();
 			while(aAreaPtrItertor != m_AreaVector.end())
@@ -939,37 +939,37 @@ void CMapOutdoor::UpdateAreaList(long lCenterX, long lCenterY)
 	}
 }
 
-void CMapOutdoor::ConvertTerrainToTnL(long lx, long ly)
+void CMapOutdoor::ConvertTerrainToTnL(int32_t lx, int32_t ly)
 {
-	assert(NULL!=m_pTerrainPatchProxyList && "CMapOutdoor::ConvertTerrainToTnL");
+	assert(nullptr!=m_pTerrainPatchProxyList && "CMapOutdoor::ConvertTerrainToTnL");
 	
-	for (long i = 0; i < m_wPatchCount * m_wPatchCount; i++)
+	for (int32_t i = 0; i < m_wPatchCount * m_wPatchCount; i++)
 		m_pTerrainPatchProxyList[i].SetUsed(false);
 
 	lx -= m_lViewRadius;          /* Move to the top left corner of the */
 	ly -= m_lViewRadius;          /* input rectangle */
 
-	long diameter = m_lViewRadius * 2;
+	int32_t diameter = m_lViewRadius * 2;
 	
-	long x0 = lx / TERRAIN_PATCHSIZE;
-	long y0 = ly / TERRAIN_PATCHSIZE;
-	long x1 = ( lx + diameter - 1 ) / TERRAIN_PATCHSIZE;
-	long y1 = ( ly + diameter - 1 ) / TERRAIN_PATCHSIZE;
+	int32_t x0 = lx / TERRAIN_PATCHSIZE;
+	int32_t y0 = ly / TERRAIN_PATCHSIZE;
+	int32_t x1 = ( lx + diameter - 1 ) / TERRAIN_PATCHSIZE;
+	int32_t y1 = ( ly + diameter - 1 ) / TERRAIN_PATCHSIZE;
 
-	long xw = x1 - x0 + 1;     /* Figure out how many patches are needed */
-	long yw = y1 - y0 + 1;
+	int32_t xw = x1 - x0 + 1;     /* Figure out how many patches are needed */
+	int32_t yw = y1 - y0 + 1;
 	
-	long ex = lx + diameter;
-	long ey = ly + diameter;
+	int32_t ex = lx + diameter;
+	int32_t ey = ly + diameter;
 	
 	y0 = ly;
-	for (long yp = 0; yp < yw; yp++)
+	for (int32_t yp = 0; yp < yw; yp++)
     {
 		x0 = lx;
 		y1 = (y0 / TERRAIN_PATCHSIZE + 1) * TERRAIN_PATCHSIZE;
 		if (y1 > ey)
 			y1 = ey;
-		for (long xp = 0; xp < xw; xp++)
+		for (int32_t xp = 0; xp < xw; xp++)
 		{
 			x1 = (x0 / TERRAIN_PATCHSIZE + 1) * TERRAIN_PATCHSIZE;
 			if (x1 > ex)
@@ -982,9 +982,9 @@ void CMapOutdoor::ConvertTerrainToTnL(long lx, long ly)
 	UpdateQuadTreeHeights(m_pRootNode);
 }
 
-void CMapOutdoor::AssignPatch(long lPatchNum, long x0, long y0, long x1, long y1)
+void CMapOutdoor::AssignPatch(int32_t lPatchNum, int32_t x0, int32_t y0, int32_t x1, int32_t y1)
 {
-	assert(NULL!=m_pTerrainPatchProxyList && "CMapOutdoor::AssignPatch");
+	assert(nullptr!=m_pTerrainPatchProxyList && "CMapOutdoor::AssignPatch");
 	
 	CTerrainPatchProxy * pTerrainPatchProxy = &m_pTerrainPatchProxyList[lPatchNum];
 	
@@ -1050,7 +1050,7 @@ void CMapOutdoor::AssignPatch(long lPatchNum, long x0, long y0, long x1, long y1
 	if (!GetTerrainPointer(pTerrainPatchProxy->GetTerrainNum(), &pTerrain))
 		return;
 
-	BYTE byPatchNumX, byPatchNumY;
+	uint8_t byPatchNumX, byPatchNumY;
 	byPatchNumX = x0 / CTerrainImpl::PATCH_XSIZE;
 	byPatchNumY = y0 / CTerrainImpl::PATCH_YSIZE;
 	
@@ -1066,7 +1066,7 @@ void CMapOutdoor::AssignPatch(long lPatchNum, long x0, long y0, long x1, long y1
 void CMapOutdoor::UpdateQuadTreeHeights(CTerrainQuadtreeNode *Node)
 {
 	// Inserted by levites
-	assert(NULL!=m_pTerrainPatchProxyList && "CMapOutdoor::UpdateQuadTreeHeights");
+	assert(nullptr!=m_pTerrainPatchProxyList && "CMapOutdoor::UpdateQuadTreeHeights");
 	if (!m_pTerrainPatchProxyList)
 		return;
 	
@@ -1083,11 +1083,11 @@ void CMapOutdoor::UpdateQuadTreeHeights(CTerrainQuadtreeNode *Node)
 		maxz = m_pTerrainPatchProxyList[Node->PatchNum].GetMaxZ();
 	}
 	
-	for (long y = Node->y0; y <= Node->y1; y++)
+	for (int32_t y = Node->y0; y <= Node->y1; y++)
 	{
-		for (long x = Node->x0; x <= Node->x1; x++)
+		for (int32_t x = Node->x0; x <= Node->x1; x++)
 		{
-			long patch = y * m_wPatchCount + x;
+			int32_t patch = y * m_wPatchCount + x;
 
 			if (!m_pTerrainPatchProxyList[patch].isUsed())
 				continue;
@@ -1117,15 +1117,15 @@ void CMapOutdoor::UpdateQuadTreeHeights(CTerrainQuadtreeNode *Node)
 		(maxy-miny)*(maxy-miny) +
 		(maxz-minz)*(maxz-minz)) / 2.0f;
 	
-	if (Node->NW_Node != NULL)
+	if (Node->NW_Node != nullptr)
 		UpdateQuadTreeHeights(Node->NW_Node);
 	
-	if (Node->NE_Node != NULL)
+	if (Node->NE_Node != nullptr)
 		UpdateQuadTreeHeights(Node->NE_Node);
 	
-	if (Node->SW_Node != NULL)
+	if (Node->SW_Node != nullptr)
 		UpdateQuadTreeHeights(Node->SW_Node);
 	
-	if (Node->SE_Node != NULL)
+	if (Node->SE_Node != nullptr)
 		UpdateQuadTreeHeights(Node->SE_Node);
 }

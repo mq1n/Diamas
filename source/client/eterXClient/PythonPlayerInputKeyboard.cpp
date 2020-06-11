@@ -19,7 +19,7 @@ void CPythonPlayer::SetAttackKeyState(bool isPress)
 	m_isAtkKey=isPress;
 }
 
-void CPythonPlayer::NEW_SetSingleDIKKeyState(int eDIKKey, bool isPress)
+void CPythonPlayer::NEW_SetSingleDIKKeyState(int32_t eDIKKey, bool isPress)
 {
 	if (NEW_CancelFishing())
 		return;
@@ -41,7 +41,7 @@ void CPythonPlayer::NEW_SetSingleDIKKeyState(int eDIKKey, bool isPress)
 	}
 }
 
-void CPythonPlayer::NEW_SetSingleDirKeyState(int eDirKey, bool isPress)
+void CPythonPlayer::NEW_SetSingleDirKeyState(int32_t eDirKey, bool isPress)
 {
 	switch (eDirKey)
 	{
@@ -88,7 +88,7 @@ void CPythonPlayer::NEW_SetMultiDirKeyState(bool isLeft, bool isRight, bool isUp
 	}
 }
 
-float CPythonPlayer::GetDegreeFromDirection(int iUD, int iLR)
+float CPythonPlayer::GetDegreeFromDirection(int32_t iUD, int32_t iLR)
 {
 	switch(iUD)
 	{

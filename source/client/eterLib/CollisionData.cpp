@@ -62,7 +62,7 @@ CBaseCollisionInstance * CBaseCollisionInstance::BuildCollisionInstance(const CS
 				PlaneData.v3QuadPosition[3].x = +fHalfWidth;
 				PlaneData.v3QuadPosition[3].y = +fHalfLength;
 				PlaneData.v3QuadPosition[3].z = 0.0f;
-				for (DWORD i = 0; i < 4; ++i)
+				for (uint32_t i = 0; i < 4; ++i)
 					D3DXVec3TransformCoord(&PlaneData.v3QuadPosition[i], &PlaneData.v3QuadPosition[i], &matTransform);
 				D3DXVECTOR3 v3Line0 = PlaneData.v3QuadPosition[1] - PlaneData.v3QuadPosition[0];
 				D3DXVECTOR3 v3Line1 = PlaneData.v3QuadPosition[2] - PlaneData.v3QuadPosition[0];
@@ -218,7 +218,7 @@ void CSphereCollisionInstance::Render(D3DFILLMODE d3dFillMode)
 {
 	static CScreen s;
 	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, 0xffffffff);
-	s.RenderSphere(NULL, m_attribute.v3Position.x, m_attribute.v3Position.y, m_attribute.v3Position.z, m_attribute.fRadius, d3dFillMode);
+	s.RenderSphere(nullptr, m_attribute.v3Position.x, m_attribute.v3Position.y, m_attribute.v3Position.z, m_attribute.fRadius, d3dFillMode);
 }
 
 void CSphereCollisionInstance::OnDestroy()
@@ -489,10 +489,10 @@ bool CCylinderCollisionInstance::OnMovementCollisionDynamicSphere(const CDynamic
 		cylinder = m_attribute;
 		cylinder.v3Position = s.v3LastPosition;
 		
-		int iStep = fDistance / s.fRadius*2.0f;
+		int32_t iStep = fDistance / s.fRadius*2.0f;
 		D3DXVECTOR3 v3Step = v3Distance / float(iStep);
 		
-		for (int i = 0; i < iStep; ++i)
+		for (int32_t i = 0; i < iStep; ++i)
 		{
 			cylinder.v3Position += v3Step;
 			if (CollideCylinderVSDynamicSphere(cylinder, s))
@@ -557,7 +557,7 @@ void CCylinderCollisionInstance::Render(D3DFILLMODE d3dFillMode)
 {
 	static CScreen s;
 	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, 0xffffffff);
-	s.RenderCylinder(NULL, m_attribute.v3Position.x, m_attribute.v3Position.y, m_attribute.v3Position.z+m_attribute.fHeight/2, m_attribute.fRadius, m_attribute.fHeight, d3dFillMode);
+	s.RenderCylinder(nullptr, m_attribute.v3Position.x, m_attribute.v3Position.y, m_attribute.v3Position.z+m_attribute.fHeight/2, m_attribute.fRadius, m_attribute.fHeight, d3dFillMode);
 }
 
 void CCylinderCollisionInstance::OnDestroy()

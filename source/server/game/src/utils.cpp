@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-static int global_time_gap = 0;
+static int32_t global_time_gap = 0;
 
 time_t get_global_time()
 {
@@ -12,9 +12,9 @@ void set_global_time(time_t t)
 	global_time_gap = t - time(nullptr);
 }
 
-int dice(int number, int size)
+int32_t dice(int32_t number, int32_t size)
 {
-	int sum = 0, val;
+	int32_t sum = 0, val;
 
 	if (size <= 0 || number <= 0)
 		return (0);
@@ -70,9 +70,9 @@ const char *one_argument(const char *argument, char *first_arg, size_t first_siz
 
 	if (!argument || 0 == first_size)
 	{
-		sys_err("one_argument received a NULL pointer!");               
+		sys_err("one_argument received a nullptr pointer!");               
 		*first_arg = '\0';
-		return NULL;    
+		return nullptr;    
 	} 
 
 	// \0 자리 확보
@@ -128,9 +128,9 @@ const char *first_cmd(const char *argument, char *first_arg, size_t first_arg_si
 	return (argument);
 }
 
-int CalculateDuration(int iSpd, int iDur)
+int32_t CalculateDuration(int32_t iSpd, int32_t iDur)
 {
-	int i = 100 - iSpd;
+	int32_t i = 100 - iSpd;
 
 	if (i > 0) 
 		i = 100 + i;
@@ -173,10 +173,10 @@ float gauss_random(float avg, float sigma)
 	}
 }
 
-int parse_time_str(const char* str)
+int32_t parse_time_str(const char* str)
 {
-	int tmp = 0;
-	int secs = 0;
+	int32_t tmp = 0;
+	int32_t secs = 0;
 
 	while (*str != 0)
 	{

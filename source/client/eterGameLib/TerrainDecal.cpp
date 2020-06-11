@@ -61,7 +61,7 @@ void CTerrainDecal::Make(D3DXVECTOR3 v3Center, D3DXVECTOR3 v3Normal, D3DXVECTOR3
 	float fMinY = fabs(v3Center.y) - fSearchRadius;
 	float fMaxY = fabs(v3Center.y) + fSearchRadius;
 
-	DWORD dwAffectedPrimitiveCount = 0;
+	uint32_t dwAffectedPrimitiveCount = 0;
 	D3DXVECTOR3 v3AffectedVertex[MAX_SEARCH_VERTICES];
 	D3DXVECTOR3 v3AffectedNormal[MAX_SEARCH_VERTICES];
 	memset(v3AffectedVertex, 0, sizeof(v3AffectedVertex));
@@ -74,7 +74,7 @@ void CTerrainDecal::Make(D3DXVECTOR3 v3Center, D3DXVECTOR3 v3Normal, D3DXVECTOR3
 	// Assign texture mapping coordinates
 	float fOne_over_w = 1.0f / fWidth;
 	float fOne_over_h = 1.0f / fHeight;
-	for (DWORD dwi = 0; dwi < m_dwVertexCount; ++dwi)
+	for (uint32_t dwi = 0; dwi < m_dwVertexCount; ++dwi)
 	{
 		D3DXVECTOR3 v3 = m_Vertices[dwi].position - m_v3Center;
 		float fu = -D3DXVec3Dot(&v3, &v3Binormal) * fOne_over_w + 0.5f;
@@ -120,13 +120,13 @@ void CTerrainDecal::SearchAffectedTerrainMesh(float fMinX,
 											  float fMaxX,
 											  float fMinY,
 											  float fMaxY,
-											  DWORD * pdwAffectedPrimitiveCount,
+											  uint32_t * pdwAffectedPrimitiveCount,
 											  D3DXVECTOR3 * pv3AffectedVertex,
 											  D3DXVECTOR3 * pv3AffectedNormal)
 {
 	if (!m_pMapOutdoor)
 		return;
-	int iMinX, iMaxX, iMinY, iMaxY;
+	int32_t iMinX, iMaxX, iMinY, iMaxY;
 	PR_FLOAT_TO_INT(fMinX, iMinX);
 	PR_FLOAT_TO_INT(fMaxX, iMaxX);
 	PR_FLOAT_TO_INT(fMinY, iMinY);
@@ -137,18 +137,18 @@ void CTerrainDecal::SearchAffectedTerrainMesh(float fMinX,
 	iMinY -= iMinY % CTerrainImpl::CELLSCALE; 
 	iMaxY -= iMaxY % CTerrainImpl::CELLSCALE; 
 
-	for(int iy = iMinY; iy <= iMaxY; iy += CTerrainImpl::CELLSCALE)
+	for(int32_t iy = iMinY; iy <= iMaxY; iy += CTerrainImpl::CELLSCALE)
 	{
 		if (iy < 0)
 			continue;
-		WORD wTerrainNumY = iy / CTerrainImpl::TERRAIN_YSIZE;
-		for(int ix = iMinX; ix <= iMaxX; ix += CTerrainImpl::CELLSCALE)
+		uint16_t wTerrainNumY = iy / CTerrainImpl::TERRAIN_YSIZE;
+		for(int32_t ix = iMinX; ix <= iMaxX; ix += CTerrainImpl::CELLSCALE)
 		{
 			if (ix < 0)
 				continue;
-			WORD wTerrainNumX = ix / CTerrainImpl::TERRAIN_YSIZE;
+			uint16_t wTerrainNumX = ix / CTerrainImpl::TERRAIN_YSIZE;
 			
-			BYTE byTerrainNum;
+			uint8_t byTerrainNum;
 			if (!m_pMapOutdoor->GetTerrainNumFromCoord(wTerrainNumX, wTerrainNumY, &byTerrainNum))
 				continue;
 			CTerrain * pTerrain;

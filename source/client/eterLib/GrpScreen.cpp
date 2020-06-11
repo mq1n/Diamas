@@ -3,9 +3,9 @@
 #include "Camera.h"
 #include "StateManager.h"
 
-DWORD		CScreen::ms_diffuseColor = 0xffffffff;
-DWORD		CScreen::ms_clearColor = 0L;
-DWORD		CScreen::ms_clearStencil = 0L;
+uint32_t		CScreen::ms_diffuseColor = 0xffffffff;
+uint32_t		CScreen::ms_clearColor = 0L;
+uint32_t		CScreen::ms_clearStencil = 0L;
 float		CScreen::ms_clearDepth = 1.0f;
 Frustum		CScreen::ms_frustum;
 
@@ -16,7 +16,7 @@ void CScreen::RenderLine3d(float sx, float sy, float sz, float ex, float ey, flo
 	if (GRAPHICS_CAPS_CAN_NOT_DRAW_LINE)
 		return;
 
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 
 	SPDTVertexRaw vertices[2] =
 	{
@@ -27,8 +27,8 @@ void CScreen::RenderLine3d(float sx, float sy, float sz, float ex, float ey, flo
 	// 2004.11.18.myevan.DrawIndexPrimitiveUP -> DynamicVertexBuffer
 	if (SetPDTStream(vertices, 2))
 	{	
-		STATEMANAGER.SetTexture(0, NULL);
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(0, nullptr);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 		STATEMANAGER.DrawPrimitive(D3DPT_LINELIST, 0, 1);
 	}
@@ -39,7 +39,7 @@ void CScreen::RenderBox3d(float sx, float sy, float sz, float ex, float ey, floa
 	if (GRAPHICS_CAPS_CAN_NOT_DRAW_LINE)
 		return;
 
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 
 	SPDTVertexRaw vertices[8] =
 	{
@@ -59,8 +59,8 @@ void CScreen::RenderBox3d(float sx, float sy, float sz, float ex, float ey, floa
 	// 2004.11.18.myevan.DrawIndexPrimitiveUP -> DynamicVertexBuffer
 	if (SetPDTStream(vertices, 8))
 	{
-		STATEMANAGER.SetTexture(0, NULL);
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(0, nullptr);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 		STATEMANAGER.DrawPrimitive(D3DPT_LINELIST, 0, 4);
 	}
@@ -68,7 +68,7 @@ void CScreen::RenderBox3d(float sx, float sy, float sz, float ex, float ey, floa
 
 void CScreen::RenderBar3d(float sx, float sy, float sz, float ex, float ey, float ez)
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 
 	SPDTVertexRaw vertices[4] =
 	{
@@ -82,8 +82,8 @@ void CScreen::RenderBar3d(float sx, float sy, float sz, float ex, float ey, floa
 
 	if (SetPDTStream(vertices, 4))
 	{
-		STATEMANAGER.SetTexture(0, NULL);
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(0, nullptr);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 		STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 	}
@@ -91,7 +91,7 @@ void CScreen::RenderBar3d(float sx, float sy, float sz, float ex, float ey, floa
 
 void CScreen::RenderBar3d(const D3DXVECTOR3 * c_pv3Positions)
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 	
 	SPDTVertexRaw vertices[4] =
 	{
@@ -104,16 +104,16 @@ void CScreen::RenderBar3d(const D3DXVECTOR3 * c_pv3Positions)
 
 	if (SetPDTStream(vertices, 4))
 	{
-		STATEMANAGER.SetTexture(0, NULL);
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(0, nullptr);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 		STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 	}
 }
 
-void CScreen::RenderGradationBar3d(float sx, float sy, float sz, float ex, float ey, float ez, DWORD dwStartColor, DWORD dwEndColor)
+void CScreen::RenderGradationBar3d(float sx, float sy, float sz, float ex, float ey, float ez, uint32_t dwStartColor, uint32_t dwEndColor)
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 	if (sx==ex) return;
 	if (sy==ey) return;
 
@@ -127,8 +127,8 @@ void CScreen::RenderGradationBar3d(float sx, float sy, float sz, float ex, float
 
 	if (SetPDTStream(vertices, 4))
 	{
-		STATEMANAGER.SetTexture(0, NULL);
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(0, nullptr);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 		STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 	}
@@ -151,8 +151,8 @@ void CScreen::RenderLineCube(float sx, float sy, float sz, float ex, float ey, f
 
 	if (SetPDTStream(vertices, 8))
 	{
-		STATEMANAGER.SetTexture(0, NULL);
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(0, nullptr);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 		STATEMANAGER.SetTransform(D3DTS_WORLD, ms_lpd3dMatStack->GetTop());
 		SetDefaultIndexBuffer(DEFAULT_IB_LINE_CUBE);
@@ -178,8 +178,8 @@ void CScreen::RenderCube(float sx, float sy, float sz, float ex, float ey, float
 
 	if (SetPDTStream(vertices, 8))
 	{
-		STATEMANAGER.SetTexture(0, NULL);
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(0, nullptr);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 		STATEMANAGER.SetTransform(D3DTS_WORLD, ms_lpd3dMatStack->GetTop());
 
@@ -204,7 +204,7 @@ void CScreen::RenderCube(float sx, float sy, float sz, float ex, float ey, float
 	};
 	SPDTVertexRaw vertices[8];
 
-	for(int i = 0; i < 8; i++)
+	for(int32_t i = 0; i < 8; i++)
 	{
 		v3Vertex[i] = v3Vertex[i] - v3Center;
 		D3DXVec3TransformCoord(&v3Vertex[i], &v3Vertex[i], &matRotation);
@@ -218,8 +218,8 @@ void CScreen::RenderCube(float sx, float sy, float sz, float ex, float ey, float
 
 	if (SetPDTStream(vertices, 8))
 	{
-		STATEMANAGER.SetTexture(0, NULL);
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(0, nullptr);
+		STATEMANAGER.SetTexture(1, nullptr);
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 		STATEMANAGER.SetTransform(D3DTS_WORLD, ms_lpd3dMatStack->GetTop());
 
@@ -243,14 +243,14 @@ void CScreen::RenderBar2d(float sx, float sy, float ex, float ey, float z)
 	RenderBar3d(sx, sy, z, ex, ey, z);
 }
 
-void CScreen::RenderGradationBar2d(float sx, float sy, float ex, float ey, DWORD dwStartColor, DWORD dwEndColor, float ez)
+void CScreen::RenderGradationBar2d(float sx, float sy, float ex, float ey, uint32_t dwStartColor, uint32_t dwEndColor, float ez)
 {
 	RenderGradationBar3d(sx, sy, ez, ex, ey, ez, dwStartColor, dwEndColor);
 }
 
-void CScreen::RenderCircle2d(float fx, float fy, float fz, float fRadius, int iStep)
+void CScreen::RenderCircle2d(float fx, float fy, float fz, float fRadius, int32_t iStep)
 {
-	int count;
+	int32_t count;
 	float theta, delta;
 	float x, y, z;
 	std::vector<D3DXVECTOR3> pts;
@@ -278,9 +278,9 @@ void CScreen::RenderCircle2d(float fx, float fy, float fz, float fRadius, int iS
 	RenderLine3d(pts[iStep - 1].x, pts[iStep - 1].y, pts[iStep - 1].z, pts[0].x, pts[0].y, pts[0].z);
 }
 
-void CScreen::RenderCircle3d(float fx, float fy, float fz, float fRadius, int iStep)
+void CScreen::RenderCircle3d(float fx, float fy, float fz, float fRadius, int32_t iStep)
 {
-	int count;
+	int32_t count;
 	float theta, delta;
 	std::vector<D3DXVECTOR3> pts;
 
@@ -323,8 +323,8 @@ public:
 		STATEMANAGER.SetRenderState(D3DRS_FILLMODE, d3dFillMode);
 		STATEMANAGER.SaveTransform(D3DTS_WORLD, &c_rmatWorld);
 
-		STATEMANAGER.SetTexture(0, NULL);
-		STATEMANAGER.SetTexture(1, NULL);
+		STATEMANAGER.SetTexture(0, nullptr);
+		STATEMANAGER.SetTexture(1, nullptr);
 	}
 	
 	virtual ~CD3DXMeshRenderingOption()
@@ -378,7 +378,7 @@ void CScreen::RenderCylinder(const D3DXMATRIX * c_pmatWorld, float fx, float fy,
 
 void CScreen::RenderTextureBox(float sx, float sy, float ex, float ey, float z, float su, float sv, float eu, float ev)
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 
 	TPDTVertex vertices[4];
 
@@ -413,7 +413,7 @@ void CScreen::RenderTextureBox(float sx, float sy, float ex, float ey, float z, 
 
 void CScreen::RenderBillboard(D3DXVECTOR3 * Position, D3DXCOLOR & Color)
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 	
 	TPDTVertex vertices[4];
 	vertices[0].position = TPosition(Position[0].x, Position[0].y, Position[0].z);
@@ -484,7 +484,7 @@ void CScreen::DrawGrid(float xMin, float yMin, float xMax, float yMax, float xma
 	RenderLine2d(0.0f, yMin, 0.0f, yMax, zPos);
 }
 
-void CScreen::SetCursorPosition(int x, int y, int hres, int vres)
+void CScreen::SetCursorPosition(int32_t x, int32_t y, int32_t hres, int32_t vres)
 {
 	D3DXVECTOR3 v;
 	v.x = -(((2.0f * x) / hres) - 1) / ms_matProj._11;
@@ -492,7 +492,7 @@ void CScreen::SetCursorPosition(int x, int y, int hres, int vres)
 	v.z = 1.0f;
 
     D3DXMATRIX matViewInverse=ms_matInverseView;
-    //D3DXMatrixInverse(&matViewInverse, NULL, &ms_matView);
+    //D3DXMatrixInverse(&matViewInverse, nullptr, &ms_matView);
 
     ms_vtPickRayDir.x = v.x * matViewInverse._11 + 
 						v.y * matViewInverse._21 +
@@ -535,10 +535,10 @@ bool CScreen::GetCursorXYPosition(float* px, float* py)
 	posVertices[2] = TPosition(v3Eye.x+90000000.0f, v3Eye.y+90000000.0f, 0.0f);
 	posVertices[3] = TPosition(v3Eye.x+90000000.0f, v3Eye.y-90000000.0f, 0.0f);
 
-	static const WORD sc_awFillRectIndices[6] = { 0, 2, 1, 2, 3, 1, };
+	static const uint16_t sc_awFillRectIndices[6] = { 0, 2, 1, 2, 3, 1, };
 
 	float u, v, t;	
-	for (int i = 0; i < 2; ++i)
+	for (int32_t i = 0; i < 2; ++i)
 	{
 		if (IntersectTriangle(ms_vtPickRayOrig, ms_vtPickRayDir,
 							 posVertices[sc_awFillRectIndices[i*3+0]],
@@ -564,10 +564,10 @@ bool CScreen::GetCursorZPosition(float* pz)
 	posVertices[2] = TPosition(v3Eye.x+90000000.0f, 0.0f, v3Eye.z+90000000.0f);
 	posVertices[3] = TPosition(v3Eye.x+90000000.0f, 0.0f, v3Eye.z-90000000.0f);
 
-	static const WORD sc_awFillRectIndices[6] = { 0, 2, 1, 2, 3, 1, };
+	static const uint16_t sc_awFillRectIndices[6] = { 0, 2, 1, 2, 3, 1, };
 
 	float u, v, t;
-	for (int i = 0; i < 2; ++i)
+	for (int32_t i = 0; i < 2; ++i)
 	{
 		if (IntersectTriangle(ms_vtPickRayOrig, ms_vtPickRayDir,
 							 posVertices[sc_awFillRectIndices[i*3+0]],
@@ -589,7 +589,7 @@ void CScreen::GetPickingPosition(float t, float* x, float* y, float* z)
 	*z = ms_vtPickRayOrig.z + ms_vtPickRayDir.z * t;
 }
 
-void CScreen::SetDiffuseColor(DWORD diffuseColor)
+void CScreen::SetDiffuseColor(uint32_t diffuseColor)
 {
 	ms_diffuseColor = diffuseColor;
 }
@@ -609,21 +609,21 @@ void CScreen::SetClearDepth(float depth)
 	ms_clearDepth = depth;
 }
 
-void CScreen::SetClearStencil(DWORD stencil)
+void CScreen::SetClearStencil(uint32_t stencil)
 {
 	ms_clearStencil = stencil;
 }
 
 void CScreen::ClearDepthBuffer()
 {
-	assert(ms_lpd3dDevice != NULL);
-	ms_lpd3dDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER, ms_clearColor, ms_clearDepth, ms_clearStencil);
+	assert(ms_lpd3dDevice != nullptr);
+	ms_lpd3dDevice->Clear(0L, nullptr, D3DCLEAR_ZBUFFER, ms_clearColor, ms_clearDepth, ms_clearStencil);
 }
 
 void CScreen::Clear()
 {
-	assert(ms_lpd3dDevice != NULL);
-	ms_lpd3dDevice->Clear(0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, ms_clearColor, ms_clearDepth, ms_clearStencil);
+	assert(ms_lpd3dDevice != nullptr);
+	ms_lpd3dDevice->Clear(0L, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, ms_clearColor, ms_clearDepth, ms_clearStencil);
 }
 
 BOOL CScreen::IsLostDevice()
@@ -644,7 +644,7 @@ BOOL CScreen::RestoreDevice()
 	if (!ms_lpd3dDevice)
 		return FALSE;
 
-	UINT iD3DAdapterInfo = ms_iD3DAdapterInfo;
+	uint32_t iD3DAdapterInfo = ms_iD3DAdapterInfo;
 	IDirect3D8 & rkD3D = *ms_lpd3d;
 	IDirect3DDevice8 & rkD3DDev = *ms_lpd3dDevice;
 	D3DPRESENT_PARAMETERS & rkD3DPP = ms_d3dPresentParameter;
@@ -690,7 +690,7 @@ BOOL CScreen::RestoreDevice()
 
 bool CScreen::Begin()
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 	ResetFaceCount();
 
 	if (!STATEMANAGER.BeginScene())
@@ -712,7 +712,7 @@ extern RECT g_rcBrowser;
 
 void CScreen::Show(HWND hWnd)
 {
-	assert(ms_lpd3dDevice != NULL);
+	assert(ms_lpd3dDevice != nullptr);
 
 	if (g_isBrowserMode)
 	{
@@ -721,14 +721,14 @@ void CScreen::Show(HWND hWnd)
 		RECT rcLeft={0, g_rcBrowser.top, g_rcBrowser.left, g_rcBrowser.bottom};	
 		RECT rcRight={g_rcBrowser.right, g_rcBrowser.top, ms_d3dPresentParameter.BackBufferWidth, g_rcBrowser.bottom};		
 		
-		ms_lpd3dDevice->Present(&rcTop, &rcTop, hWnd, NULL);
-		ms_lpd3dDevice->Present(&rcBottom, &rcBottom, hWnd, NULL);
-		ms_lpd3dDevice->Present(&rcLeft, &rcLeft, hWnd, NULL);	
-		ms_lpd3dDevice->Present(&rcRight, &rcRight, hWnd, NULL);
+		ms_lpd3dDevice->Present(&rcTop, &rcTop, hWnd, nullptr);
+		ms_lpd3dDevice->Present(&rcBottom, &rcBottom, hWnd, nullptr);
+		ms_lpd3dDevice->Present(&rcLeft, &rcLeft, hWnd, nullptr);	
+		ms_lpd3dDevice->Present(&rcRight, &rcRight, hWnd, nullptr);
 	}
 	else
 	{
-		HRESULT hr=ms_lpd3dDevice->Present(NULL, NULL, hWnd, NULL);
+		HRESULT hr=ms_lpd3dDevice->Present(nullptr, nullptr, hWnd, nullptr);
 		if (D3DERR_DEVICELOST == hr)
 			RestoreDevice();
 	}	
@@ -736,14 +736,14 @@ void CScreen::Show(HWND hWnd)
 
 void CScreen::Show(RECT * pSrcRect)
 {
-	assert(ms_lpd3dDevice != NULL);
-	ms_lpd3dDevice->Present(pSrcRect, NULL, NULL, NULL);
+	assert(ms_lpd3dDevice != nullptr);
+	ms_lpd3dDevice->Present(pSrcRect, nullptr, nullptr, nullptr);
 }
 
 void CScreen::Show(RECT * pSrcRect, HWND hWnd)
 {
-	assert(ms_lpd3dDevice != NULL);
-	ms_lpd3dDevice->Present(pSrcRect, NULL, hWnd, NULL);
+	assert(ms_lpd3dDevice != nullptr);
+	ms_lpd3dDevice->Present(pSrcRect, nullptr, hWnd, nullptr);
 }
 
 void CScreen::ProjectPosition(float x, float y, float z, float * pfX, float * pfY)
@@ -780,7 +780,7 @@ void CScreen::UnprojectPosition(float x, float y, float z, float * pfX, float * 
 
 void CScreen::SetColorOperation()
 {
-	STATEMANAGER.SetTexture(0, NULL);
+	STATEMANAGER.SetTexture(0, nullptr);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1,	D3DTA_DIFFUSE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP,	D3DTOP_SELECTARG1);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP,	D3DTOP_DISABLE);
@@ -790,7 +790,7 @@ void CScreen::SetColorOperation()
 
 void CScreen::SetDiffuseOperation()
 {
-	STATEMANAGER.SetTexture(0, NULL);
+	STATEMANAGER.SetTexture(0, nullptr);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1,	D3DTA_TEXTURE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG2,	D3DTA_DIFFUSE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP,	D3DTOP_MODULATE);
@@ -801,7 +801,7 @@ void CScreen::SetDiffuseOperation()
 
 void CScreen::SetBlendOperation()
 {
-	STATEMANAGER.SetTexture(0, NULL);
+	STATEMANAGER.SetTexture(0, nullptr);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1,	D3DTA_TEXTURE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG2,	D3DTA_CURRENT);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP,	D3DTOP_MODULATE);
@@ -814,8 +814,8 @@ void CScreen::SetBlendOperation()
 
 void CScreen::SetOneColorOperation(D3DXCOLOR & rColor)
 {
-	STATEMANAGER.SetTexture(0, NULL);
-	STATEMANAGER.SetTexture(1, NULL);
+	STATEMANAGER.SetTexture(0, nullptr);
+	STATEMANAGER.SetTexture(1, nullptr);
 
 	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, rColor);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);

@@ -9,7 +9,7 @@ class CServerStateChecker : public CSingleton<CServerStateChecker>
 		virtual ~CServerStateChecker();
 
 		void Create(PyObject* poWnd);
-		void AddChannel(UINT uServerIndex, const char* c_szAddr, UINT uPort);
+		void AddChannel(uint32_t uServerIndex, const char* c_szAddr, uint32_t uPort);
 		void Request();
 		void Update();
 
@@ -18,9 +18,9 @@ class CServerStateChecker : public CSingleton<CServerStateChecker>
 	private:
 		typedef struct SChannel
 		{
-			UINT uServerIndex;
+			uint32_t uServerIndex;
 			const char* c_szAddr;
-			UINT uPort;
+			uint32_t uPort;
 		} TChannel;
 
 		PyObject* m_poWnd;

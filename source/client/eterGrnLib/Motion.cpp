@@ -23,7 +23,7 @@ void CGrannyMotion::Destroy()
 
 void CGrannyMotion::Initialize()
 {
-	m_pgrnAni = NULL;
+	m_pgrnAni = nullptr;
 }
 
 bool CGrannyMotion::BindGrannyAnimation(granny_animation * pgrnAni)
@@ -49,7 +49,7 @@ float CGrannyMotion::GetDuration() const
 	return m_pgrnAni->Duration;
 }
 
-void CGrannyMotion::GetTextTrack(const char * c_szTextTrackName, int * pCount, float * pArray) const
+void CGrannyMotion::GetTextTrack(const char * c_szTextTrackName, int32_t * pCount, float * pArray) const
 {
 	if (m_pgrnAni->TrackGroupCount != 1)
 	{
@@ -58,11 +58,11 @@ void CGrannyMotion::GetTextTrack(const char * c_szTextTrackName, int * pCount, f
 
 	granny_track_group * pTrack = m_pgrnAni->TrackGroups[0];
 
-	for (int i = 0; i < pTrack->TextTrackCount; ++i)
+	for (int32_t i = 0; i < pTrack->TextTrackCount; ++i)
 	{
 		granny_text_track & rTextTrack = pTrack->TextTracks[i];
 
-		for (int j = 0; j < rTextTrack.EntryCount; ++j)
+		for (int32_t j = 0; j < rTextTrack.EntryCount; ++j)
 			if (!_stricmp(c_szTextTrackName, rTextTrack.Entries[j].Text))
 				pArray[(*pCount)++] = rTextTrack.Entries[j].TimeStamp;
 	}

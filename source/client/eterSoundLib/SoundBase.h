@@ -11,7 +11,7 @@ typedef struct SProvider
 	HPROVIDER	hProvider;
 } TProvider;
 
-typedef std::map<DWORD, CSoundData*> TSoundDataMap;
+typedef std::map<uint32_t, CSoundData*> TSoundDataMap;
 
 class CSoundBase
 {
@@ -22,11 +22,11 @@ class CSoundBase
 		void					Initialize();
 		void					Destroy();
 
-		CSoundData *			AddFile(DWORD dwFileCRC, const char* filename);
-		DWORD					GetFileCRC(const char* filename);
+		CSoundData *			AddFile(uint32_t dwFileCRC, const char* filename);
+		uint32_t					GetFileCRC(const char* filename);
 
 	protected:
-		static int								ms_iRefCount;
+		static int32_t								ms_iRefCount;
 		static HDIGDRIVER						ms_DIGDriver;
 		static TProvider *						ms_pProviderDefault;
 		static std::vector<TProvider>			ms_ProviderVector;

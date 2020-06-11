@@ -3,7 +3,7 @@
 
 void Environment_Init(SEnvironmentData& envData)
 {
-	for (int i = 0; i < ENV_DIRLIGHT_NUM; ++i)
+	for (int32_t i = 0; i < ENV_DIRLIGHT_NUM; ++i)
 	{
 		envData.bDirLightsEnable[i] = false;
 		envData.DirLights[i].Type = D3DLIGHT_DIRECTIONAL;
@@ -167,7 +167,7 @@ bool Environment_Load(SEnvironmentData& envData, const char* envFileName)
 			envData.CloudGradientColor.m_SecondColor.a = atof(pTokenVectorCloudColor->at(7).c_str());
 		}
 
-		BYTE byGradientCount = envData.bySkyBoxGradientLevelUpper+envData.bySkyBoxGradientLevelLower;
+		uint8_t byGradientCount = envData.bySkyBoxGradientLevelUpper+envData.bySkyBoxGradientLevelLower;
 		CTokenVector * pTokenVector;
 		if (textLoader.GetTokenVector("gradient", &pTokenVector))
 		if (0 == pTokenVector->size()%8)
@@ -175,7 +175,7 @@ bool Environment_Load(SEnvironmentData& envData, const char* envFileName)
 		{
 			envData.SkyBoxGradientColorVector.clear();
 			envData.SkyBoxGradientColorVector.resize(byGradientCount);
-			for (DWORD i = 0; i < byGradientCount; ++i)
+			for (uint32_t i = 0; i < byGradientCount; ++i)
 			{
 				envData.SkyBoxGradientColorVector[i].m_FirstColor.r = atof(pTokenVector->at(i*8+0).c_str());
 				envData.SkyBoxGradientColorVector[i].m_FirstColor.g = atof(pTokenVector->at(i*8+1).c_str());
@@ -229,8 +229,8 @@ void AttributeCellPositionToPixelPosition(TCellPosition AttrCellPosition, TPixel
 
 float GetPixelPositionDistance(const TPixelPosition & c_rsrcPosition, const TPixelPosition & c_rdstPosition)
 {
-	int idx = c_rsrcPosition.x - c_rdstPosition.x;
-	int idy = c_rsrcPosition.y - c_rdstPosition.y;
+	int32_t idx = c_rsrcPosition.x - c_rdstPosition.x;
+	int32_t idy = c_rsrcPosition.y - c_rdstPosition.y;
 
 	return sqrtf(float(idx*idx + idy*idy));
 }

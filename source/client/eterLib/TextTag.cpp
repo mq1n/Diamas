@@ -2,7 +2,7 @@
 #include "TextTag.h"
 #include "Util.h"
 
-int GetTextTag(const wchar_t * src, int maxLen, int & tagLen, std::wstring & extraInfo)
+int32_t GetTextTag(const wchar_t * src, int32_t maxLen, int32_t & tagLen, std::wstring & extraInfo)
 {
     tagLen = 1;
 
@@ -44,17 +44,17 @@ int GetTextTag(const wchar_t * src, int maxLen, int & tagLen, std::wstring & ext
     return TEXT_TAG_PLAIN;
 }
 
-std::wstring GetTextTagOutputString(const wchar_t * src, int src_len)
+std::wstring GetTextTagOutputString(const wchar_t * src, int32_t src_len)
 {
-    int len;
+    int32_t len;
 	std::wstring dst;
 	std::wstring extraInfo;
-    int output_len = 0;
-    int hyperlinkStep = 0;
+    int32_t output_len = 0;
+    int32_t hyperlinkStep = 0;
 
-    for (int i = 0; i < src_len; )
+    for (int32_t i = 0; i < src_len; )
     {
-        int tag = GetTextTag(&src[i], src_len - i, len, extraInfo);
+        int32_t tag = GetTextTag(&src[i], src_len - i, len, extraInfo);
 
         if (tag == TEXT_TAG_PLAIN || tag == TEXT_TAG_TAG)
         {
@@ -74,19 +74,19 @@ std::wstring GetTextTagOutputString(const wchar_t * src, int src_len)
 	return dst;
 }
 
-int GetTextTagInternalPosFromRenderPos(const wchar_t * src, int src_len, int offset)
+int32_t GetTextTagInternalPosFromRenderPos(const wchar_t * src, int32_t src_len, int32_t offset)
 {
-    int len;
+    int32_t len;
 	std::wstring dst;
 	std::wstring extraInfo;
-    int output_len = 0;
-    int hyperlinkStep = 0;
+    int32_t output_len = 0;
+    int32_t hyperlinkStep = 0;
 	bool color_tag = false;
-	int internal_offset = 0;
+	int32_t internal_offset = 0;
 
-    for (int i = 0; i < src_len; )
+    for (int32_t i = 0; i < src_len; )
     {
-        int tag = GetTextTag(&src[i], src_len - i, len, extraInfo);
+        int32_t tag = GetTextTag(&src[i], src_len - i, len, extraInfo);
 
         if (tag == TEXT_TAG_COLOR)
 		{
@@ -122,16 +122,16 @@ int GetTextTagInternalPosFromRenderPos(const wchar_t * src, int src_len, int off
 	return internal_offset;
 }
 
-int GetTextTagOutputLen(const wchar_t * src, int src_len)
+int32_t GetTextTagOutputLen(const wchar_t * src, int32_t src_len)
 {
-    int len;
+    int32_t len;
     std::wstring extraInfo;
-    int output_len = 0;
-    int hyperlinkStep = 0;
+    int32_t output_len = 0;
+    int32_t hyperlinkStep = 0;
 
-    for (int i = 0; i < src_len; )
+    for (int32_t i = 0; i < src_len; )
     {
-        int tag = GetTextTag(&src[i], src_len - i, len, extraInfo);
+        int32_t tag = GetTextTag(&src[i], src_len - i, len, extraInfo);
 
         if (tag == TEXT_TAG_PLAIN || tag == TEXT_TAG_TAG)
         {
@@ -148,7 +148,7 @@ int GetTextTagOutputLen(const wchar_t * src, int src_len)
     return output_len;
 }
 
-int FindColorTagStartPosition(const wchar_t * src, int src_len)
+int32_t FindColorTagStartPosition(const wchar_t * src, int32_t src_len)
 {
     if (src_len < 2)
         return 0;
@@ -167,7 +167,7 @@ int FindColorTagStartPosition(const wchar_t * src, int src_len)
     // |r의 경우
     if (*cur == wcEnds && *(cur - 1) == L'|')
     {
-	    int len = src_len;
+	    int32_t len = src_len;
 
         // ||r은 무시
         if (len >= 2 && *(cur - 2) == L'|')
@@ -194,7 +194,7 @@ int FindColorTagStartPosition(const wchar_t * src, int src_len)
     return 0;
 }
 
-int FindColorTagEndPosition(const wchar_t * src, int src_len)
+int32_t FindColorTagEndPosition(const wchar_t * src, int32_t src_len)
 {
 	const wchar_t * cur = src;
 
@@ -209,7 +209,7 @@ int FindColorTagEndPosition(const wchar_t * src, int src_len)
 
 	if (src_len >= 4 && *cur == L'|' && *(cur + 1) == wcStarts)
 	{
-		int left = src_len - 2;
+		int32_t left = src_len - 2;
 		cur += 2;
 
 		while (left > 1)

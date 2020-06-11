@@ -4,7 +4,7 @@
 #include "packet_info.h"
 
 CPacketInfo::CPacketInfo()
-	: m_pCurrentPacket(NULL), m_dwStartTime(0)
+	: m_pCurrentPacket(nullptr), m_dwStartTime(0)
 {
 }
 
@@ -16,7 +16,7 @@ CPacketInfo::~CPacketInfo()
 	}
 }
 
-void CPacketInfo::Set(int header, int iSize, const char * c_pszName, bool bSeq)
+void CPacketInfo::Set(int32_t header, int32_t iSize, const char * c_pszName, bool bSeq)
 {
 	if (m_pPacketMap.find(header) != m_pPacketMap.end())
 		return;
@@ -32,15 +32,15 @@ void CPacketInfo::Set(int header, int iSize, const char * c_pszName, bool bSeq)
 	element->bSequencePacket = bSeq;
 
 	if (element->bSequencePacket)
-		element->iSize += sizeof(BYTE);
+		element->iSize += sizeof(uint8_t);
 #endif
 
-	m_pPacketMap.insert(std::map<int, TPacketElement *>::value_type(header, element));
+	m_pPacketMap.insert(std::map<int32_t, TPacketElement *>::value_type(header, element));
 }
 
-bool CPacketInfo::Get(int header, int * size, const char ** c_ppszName)
+bool CPacketInfo::Get(int32_t header, int32_t * size, const char ** c_ppszName)
 {
-	std::map<int, TPacketElement *>::iterator it = m_pPacketMap.find(header);
+	std::map<int32_t, TPacketElement *>::iterator it = m_pPacketMap.find(header);
 
 	if (it == m_pPacketMap.end())
 		return false;
@@ -53,13 +53,13 @@ bool CPacketInfo::Get(int header, int * size, const char ** c_ppszName)
 }
 
 #ifdef ENABLE_SEQUENCE_SYSTEM
-bool CPacketInfo::IsSequence(int header)
+bool CPacketInfo::IsSequence(int32_t header)
 {
 	TPacketElement * pkElement = GetElement(header);
 	return pkElement ? pkElement->bSequencePacket : false;
 }
 
-void CPacketInfo::SetSequence(int header, bool bSeq)
+void CPacketInfo::SetSequence(int32_t header, bool bSeq)
 {
 	TPacketElement * pkElem = GetElement(header);
 
@@ -81,19 +81,19 @@ void CPacketInfo::SetSequence(int header, bool bSeq)
 }
 #endif
 
-TPacketElement * CPacketInfo::GetElement(int header)
+TPacketElement * CPacketInfo::GetElement(int32_t header)
 {
-	std::map<int, TPacketElement *>::iterator it = m_pPacketMap.find(header);
+	std::map<int32_t, TPacketElement *>::iterator it = m_pPacketMap.find(header);
 
 	if (it == m_pPacketMap.end())
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
 
 void CPacketInfo::Start()
 {
-	assert(m_pCurrentPacket != NULL);
+	assert(m_pCurrentPacket != nullptr);
 	m_dwStartTime = get_dword_time();
 }
 
@@ -112,7 +112,7 @@ void CPacketInfo::Log(const char * c_pszFileName)
 	if (!fp)
 		return;
 
-	std::map<int, TPacketElement *>::iterator it = m_pPacketMap.begin();
+	std::map<int32_t, TPacketElement *>::iterator it = m_pPacketMap.begin();
 
 	fprintf(fp, "Name             Called     Load       Ratio\n");
 
@@ -217,13 +217,13 @@ CPacketInfoCG::CPacketInfoCG()
 	Set(HEADER_CG_REFINE, sizeof(TPacketCGRefine), "Refine", true);
 	Set(HEADER_CG_CHANGE_NAME, sizeof(TPacketCGChangeName), "ChangeName", true);
 
-	Set(HEADER_CG_PONG, sizeof(BYTE), "Pong", true);
+	Set(HEADER_CG_PONG, sizeof(uint8_t), "Pong", true);
 	Set(HEADER_CG_MALL_CHECKOUT, sizeof(TPacketCGSafeboxCheckout), "MallCheckout", true);
 
 	Set(HEADER_CG_SCRIPT_SELECT_ITEM, sizeof(TPacketCGScriptSelectItem), "ScriptSelectItem", true);
 
 	Set(HEADER_CG_DRAGON_SOUL_REFINE, sizeof(TPacketCGDragonSoulRefine), "DragonSoulRefine", false);
-	Set(HEADER_CG_STATE_CHECKER, sizeof(BYTE), "ServerStateCheck", false);
+	Set(HEADER_CG_STATE_CHECKER, sizeof(uint8_t), "ServerStateCheck", false);
 #ifdef ENABLE_ACCE_SYSTEM
 	Set(HEADER_CG_ACCE, sizeof(TPacketAcce), "Acce", true);
 #endif

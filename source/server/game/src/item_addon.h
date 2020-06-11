@@ -7,7 +7,7 @@ class CItemAddonManager : public singleton<CItemAddonManager>
 		CItemAddonManager();
 		virtual ~CItemAddonManager();
 
-		void ApplyAddonTo(int iAddonType, LPITEM pItem);
+		void ApplyAddonTo(int32_t iAddonType, LPITEM pItem);
 };
 
 #endif

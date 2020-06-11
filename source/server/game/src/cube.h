@@ -15,8 +15,8 @@
 
 struct CUBE_VALUE
 {
-	DWORD	vnum;
-	int		count;
+	uint32_t	vnum;
+	int32_t		count;
 
 	bool operator == (const CUBE_VALUE& b)
 	{
@@ -26,15 +26,15 @@ struct CUBE_VALUE
 
 struct CUBE_DATA
 {
-	std::vector<WORD>		npc_vnum;
+	std::vector<uint16_t>		npc_vnum;
 	std::vector<CUBE_VALUE>	item;
 	std::vector<CUBE_VALUE>	reward;
-	int						percent;
-	unsigned int			gold;		// 제조시 필요한 금액
+	int32_t						percent;
+	uint32_t			gold;		// 제조시 필요한 금액
 
 	CUBE_DATA();
 
-	bool		can_make_item (LPITEM *items, WORD npc_vnum);
+	bool		can_make_item (LPITEM *items, uint16_t npc_vnum);
 	CUBE_VALUE*	reward_value ();
 	void		remove_material (LPCHARACTER ch);
 }; 
@@ -50,11 +50,11 @@ void Cube_open (LPCHARACTER ch);
 void Cube_close (LPCHARACTER ch);
 
 void Cube_show_list (LPCHARACTER ch);
-void Cube_add_item (LPCHARACTER ch, int cube_index, int inven_index);
-void Cube_delete_item (LPCHARACTER ch, int cube_index);
+void Cube_add_item (LPCHARACTER ch, int32_t cube_index, int32_t inven_index);
+void Cube_delete_item (LPCHARACTER ch, int32_t cube_index);
 
 void Cube_request_result_list(LPCHARACTER ch);
-void Cube_request_material_info(LPCHARACTER ch, int request_start_index, int request_count = 1);
+void Cube_request_material_info(LPCHARACTER ch, int32_t request_start_index, int32_t request_count = 1);
 
 // test print code
 void Cube_print();

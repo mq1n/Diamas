@@ -38,7 +38,7 @@ class CDungeon;
 class CPartyManager : public singleton<CPartyManager>
 {
 	public:
-		typedef std::map<DWORD, LPPARTY> TPartyMap;
+		typedef std::map<uint32_t, LPPARTY> TPartyMap;
 		typedef std::set<LPPARTY> TPCPartySet;
 
 	public:
@@ -58,15 +58,15 @@ class CPartyManager : public singleton<CPartyManager>
 		void		DeleteAllParty();
 		bool		SetParty(LPCHARACTER pkChr);
 
-		void		SetPartyMember(DWORD dwPID, LPPARTY pParty);
+		void		SetPartyMember(uint32_t dwPID, LPPARTY pParty);
 
-		void		P2PLogin(DWORD pid, const char* name);
-		void		P2PLogout(DWORD pid);
+		void		P2PLogin(uint32_t pid, const char* name);
+		void		P2PLogout(uint32_t pid);
 
-		LPPARTY		P2PCreateParty(DWORD pid);
-		void		P2PDeleteParty(DWORD pid);
-		void		P2PJoinParty(DWORD leader, DWORD pid, BYTE role = 0);
-		void		P2PQuitParty(DWORD pid);
+		LPPARTY		P2PCreateParty(uint32_t pid);
+		void		P2PDeleteParty(uint32_t pid);
+		void		P2PJoinParty(uint32_t leader, uint32_t pid, uint8_t role = 0);
+		void		P2PQuitParty(uint32_t pid);
 
 	private:
 		TPartyMap	m_map_pkParty;		// PID로 어느 파티에 있나 검색하기 위한 컨테이너
@@ -92,51 +92,51 @@ class CParty
 		{
 			LPCHARACTER	pCharacter;
 			bool	bNear;
-			BYTE	bRole;
-			BYTE	bLevel;
+			uint8_t	bRole;
+			uint8_t	bLevel;
 			std::string strName;
 		} TMember;
 
-		typedef std::map<DWORD, TMember> TMemberMap;
+		typedef std::map<uint32_t, TMember> TMemberMap;
 
-		typedef std::map<std::string, int> TFlagMap;
+		typedef std::map<std::string, int32_t> TFlagMap;
 
 	public:
 		CParty();
 		virtual ~CParty();
 
-		void		P2PJoin(DWORD dwPID);
-		void		P2PQuit(DWORD dwPID);
-		virtual void	Join(DWORD dwPID);
-		void		Quit(DWORD dwPID);
+		void		P2PJoin(uint32_t dwPID);
+		void		P2PQuit(uint32_t dwPID);
+		virtual void	Join(uint32_t dwPID);
+		void		Quit(uint32_t dwPID);
 		void		Link(LPCHARACTER pkChr);
 		void		Unlink(LPCHARACTER pkChr);
 
-		void		ChatPacketToAllMember(BYTE type, const char* format, ...);	
+		void		ChatPacketToAllMember(uint8_t type, const char* format, ...);	
 
-		void		UpdateOnlineState(DWORD dwPID, const char* name);
-		void		UpdateOfflineState(DWORD dwPID);
+		void		UpdateOnlineState(uint32_t dwPID, const char* name);
+		void		UpdateOfflineState(uint32_t dwPID);
 
-		DWORD		GetLeaderPID();
+		uint32_t		GetLeaderPID();
 		LPCHARACTER	GetLeaderCharacter();
 		LPCHARACTER	GetLeader() { return m_pkChrLeader; }
 
-		DWORD		GetMemberCount();
-		DWORD		GetNearMemberCount()	{ return m_iCountNearPartyMember; }
+		uint32_t		GetMemberCount();
+		uint32_t		GetNearMemberCount()	{ return m_iCountNearPartyMember; }
 
-		bool		IsMember(DWORD pid) { return m_memberMap.find(pid) != m_memberMap.end(); }
+		bool		IsMember(uint32_t pid) { return m_memberMap.find(pid) != m_memberMap.end(); }
 
-		bool		IsNearLeader(DWORD pid);
+		bool		IsNearLeader(uint32_t pid);
 
 		bool		IsPositionNearLeader(LPCHARACTER ch);
 
-		void		SendMessage(LPCHARACTER ch, BYTE bMsg, DWORD dwArg1, DWORD dwArg2);
+		void		SendMessage(LPCHARACTER ch, uint8_t bMsg, uint32_t dwArg1, uint32_t dwArg2);
 
-		void		SendPartyJoinOneToAll(DWORD dwPID);
+		void		SendPartyJoinOneToAll(uint32_t dwPID);
 		void		SendPartyJoinAllToOne(LPCHARACTER ch);
-		void		SendPartyRemoveOneToAll(DWORD dwPID);
+		void		SendPartyRemoveOneToAll(uint32_t dwPID);
 
-		void		SendPartyInfoOneToAll(DWORD pid);
+		void		SendPartyInfoOneToAll(uint32_t pid);
 		void		SendPartyInfoOneToAll(LPCHARACTER ch);
 		void		SendPartyInfoAllToOne(LPCHARACTER ch);
 
@@ -144,59 +144,59 @@ class CParty
 		void		SendPartyLinkAllToOne(LPCHARACTER ch);
 		void		SendPartyUnlinkOneToAll(LPCHARACTER ch);
 
-		int		GetPartyBonusExpPercent()	{ return m_iExpBonus; }
-		int		GetPartyBonusAttackGrade()	{ return m_iAttBonus; }
-		int		GetPartyBonusDefenseGrade()	{ return m_iDefBonus; }
+		int32_t		GetPartyBonusExpPercent()	{ return m_iExpBonus; }
+		int32_t		GetPartyBonusAttackGrade()	{ return m_iAttBonus; }
+		int32_t		GetPartyBonusDefenseGrade()	{ return m_iDefBonus; }
 
-		int	ComputePartyBonusExpPercent();
-		inline int	ComputePartyBonusAttackGrade();
-		inline int	ComputePartyBonusDefenseGrade();
+		int32_t	ComputePartyBonusExpPercent();
+		inline int32_t	ComputePartyBonusAttackGrade();
+		inline int32_t	ComputePartyBonusDefenseGrade();
 
 		template <class Func> void ForEachMember(Func & f);
 		template <class Func> void ForEachMemberPtr(Func & f);
 		template <class Func> void ForEachOnlineMember(Func & f);
 		template <class Func> void ForEachNearMember(Func & f);
-		template <class Func> void ForEachOnMapMember (Func & f, long lMapIndex);
-		template <class Func> bool ForEachOnMapMemberBool (Func & f, long lMapIndex);
+		template <class Func> void ForEachOnMapMember (Func & f, int32_t lMapIndex);
+		template <class Func> bool ForEachOnMapMemberBool (Func & f, int32_t lMapIndex);
 
 		void		Update();
 
-		int		GetExpBonusPercent();
+		int32_t		GetExpBonusPercent();
 
-		bool		SetRole(DWORD pid, BYTE bRole, bool on);
-		BYTE		GetRole(DWORD pid);
-		bool		IsRole(DWORD pid, BYTE bRole);
+		bool		SetRole(uint32_t pid, uint8_t bRole, bool on);
+		uint8_t		GetRole(uint32_t pid);
+		bool		IsRole(uint32_t pid, uint8_t bRole);
 
-		BYTE		GetMemberMaxLevel();
-		BYTE		GetMemberMinLevel();
+		uint8_t		GetMemberMaxLevel();
+		uint8_t		GetMemberMinLevel();
 
-		void		ComputeRolePoint(LPCHARACTER ch, BYTE bRole, bool bAdd);
+		void		ComputeRolePoint(LPCHARACTER ch, uint8_t bRole, bool bAdd);
 
 		void		HealParty();
-		void		SummonToLeader(DWORD pid);
+		void		SummonToLeader(uint32_t pid);
 
 		void		SetPCParty(bool b) { m_bPCParty = b; }
 
-		LPCHARACTER	GetNextOwnership(LPCHARACTER ch, long x, long y);
+		LPCHARACTER	GetNextOwnership(LPCHARACTER ch, int32_t x, int32_t y);
 
-		void		SetFlag(const std::string& name, int value);
-		int		GetFlag(const std::string& name);
+		void		SetFlag(const std::string& name, int32_t value);
+		int32_t		GetFlag(const std::string& name);
 
 		void		SetDungeon(LPDUNGEON pDungeon);
 		LPDUNGEON	GetDungeon();
 
-		BYTE		CountMemberByVnum(DWORD dwVnum);
+		uint8_t		CountMemberByVnum(uint32_t dwVnum);
 
-		void		SetParameter(int iMode);
-		int		GetExpDistributionMode();
+		void		SetParameter(int32_t iMode);
+		int32_t		GetExpDistributionMode();
 
-		void		SetExpCentralizeCharacter(DWORD pid);
+		void		SetExpCentralizeCharacter(uint32_t pid);
 		LPCHARACTER	GetExpCentralizeCharacter();
 
-		void		RequestSetMemberLevel(DWORD pid, BYTE level);
-		void		P2PSetMemberLevel(DWORD pid, BYTE level);
+		void		RequestSetMemberLevel(uint32_t pid, uint8_t level);
+		void		P2PSetMemberLevel(uint32_t pid, uint8_t level);
 
-		bool		IsPartyInDungeon(int mapIndex);
+		bool		IsPartyInDungeon(int32_t mapIndex);
 
 	protected:
 		void		IncreaseOwnership();
@@ -206,13 +206,13 @@ class CParty
 		void		RemovePartyBonus();
 
 		void		RemoveBonus();
-		void		RemoveBonusForOne(DWORD pid);
+		void		RemoveBonusForOne(uint32_t pid);
 
 		void		SendParameter(LPCHARACTER ch);
 		void		SendParameterToAll();
 
 		TMemberMap	m_memberMap;
-		DWORD		m_dwLeaderPID;
+		uint32_t		m_dwLeaderPID;
 		LPCHARACTER	m_pkChrLeader;
 
 		LPEVENT		m_eventUpdate;
@@ -220,28 +220,28 @@ class CParty
 		TMemberMap::iterator m_itNextOwner;
 
 	private:
-		int		m_iExpDistributionMode;
+		int32_t		m_iExpDistributionMode;
 		LPCHARACTER	m_pkChrExpCentralize;
 
-		DWORD		m_dwPartyStartTime;
+		uint32_t		m_dwPartyStartTime;
 
-		DWORD		m_dwPartyHealTime;
+		uint32_t		m_dwPartyHealTime;
 		bool		m_bPartyHealReady;
 		bool		m_bCanUsePartyHeal;
 
-		int		m_anRoleCount[PARTY_ROLE_MAX_NUM];
-		int		m_anMaxRole[PARTY_ROLE_MAX_NUM];
+		int32_t		m_anRoleCount[PARTY_ROLE_MAX_NUM];
+		int32_t		m_anMaxRole[PARTY_ROLE_MAX_NUM];
 
-		int		m_iLongTimeExpBonus;
+		int32_t		m_iLongTimeExpBonus;
 
 		// used in Update
-		int		m_iLeadership;
-		int		m_iExpBonus;
-		int		m_iAttBonus;
-		int		m_iDefBonus;
+		int32_t		m_iLeadership;
+		int32_t		m_iExpBonus;
+		int32_t		m_iAttBonus;
+		int32_t		m_iDefBonus;
 
 		// changed only in Update
-		int		m_iCountNearPartyMember;
+		int32_t		m_iCountNearPartyMember;
 
 		bool		m_bPCParty;
 
@@ -291,7 +291,7 @@ template <class Func> void CParty::ForEachNearMember(Func & f)
 			f(it->second.pCharacter);
 }
 
-template <class Func> void CParty::ForEachOnMapMember (Func & f, long lMapIndex)
+template <class Func> void CParty::ForEachOnMapMember (Func & f, int32_t lMapIndex)
 {
 	TMemberMap::iterator it;
 
@@ -306,7 +306,7 @@ template <class Func> void CParty::ForEachOnMapMember (Func & f, long lMapIndex)
 	}
 }
 
-template <class Func> bool CParty::ForEachOnMapMemberBool(Func & f, long lMapIndex)
+template <class Func> bool CParty::ForEachOnMapMemberBool(Func & f, int32_t lMapIndex)
 {
 	TMemberMap::iterator it;
 
@@ -328,14 +328,14 @@ template <class Func> bool CParty::ForEachOnMapMemberBool(Func & f, long lMapInd
 	return true;
 }
 
-inline int CParty::ComputePartyBonusAttackGrade()
+inline int32_t CParty::ComputePartyBonusAttackGrade()
 {
 	/*
 	   if (GetNearMemberCount() <= 1)
 	   return 0;
 
-	   int leadership = GetLeaderCharacter()->GetLeadershipSkillLevel();
-	   int n = GetNearMemberCount();
+	   int32_t leadership = GetLeaderCharacter()->GetLeadershipSkillLevel();
+	   int32_t n = GetNearMemberCount();
 
 	   if (n >= 3 && leadership >= 10)
 	   return 2;
@@ -346,14 +346,14 @@ inline int CParty::ComputePartyBonusAttackGrade()
 	return 0;
 }
 
-inline int CParty::ComputePartyBonusDefenseGrade()
+inline int32_t CParty::ComputePartyBonusDefenseGrade()
 {
 	/*
 	   if (GetNearMemberCount() <= 1)
 	   return 0;
 
-	   int leadership = GetLeaderCharacter()->GetLeadershipSkillLevel();
-	   int n = GetNearMemberCount();
+	   int32_t leadership = GetLeaderCharacter()->GetLeadershipSkillLevel();
+	   int32_t n = GetNearMemberCount();
 
 	   if (n >= 5 && leadership >= 24)
 	   return 2;
@@ -371,7 +371,7 @@ struct FPartyDropDiceRoll
 {
 	const LPITEM m_itemDrop;
 	LPCHARACTER m_itemOwner;
-	int m_lastNumber;
+	int32_t m_lastNumber;
 
 	FPartyDropDiceRoll(const LPITEM itemDrop, LPCHARACTER itemOwner) : m_itemDrop(itemDrop), m_itemOwner(itemOwner), m_lastNumber(0)
 	{
@@ -413,7 +413,7 @@ struct FPartyDropDiceRoll
 
 		while (true)
 		{
-			int pickedNumber = number(10000, 99999);
+			int32_t pickedNumber = number(10000, 99999);
 			if (pickedNumber > m_lastNumber)
 			{
 				m_lastNumber = pickedNumber;

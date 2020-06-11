@@ -15,24 +15,24 @@
 
 struct FWarpToDragronLairWithGuildMembers
 {
-	DWORD dwGuildID;
-	long mapIndex;
-	long x, y;
+	uint32_t dwGuildID;
+	int32_t mapIndex;
+	int32_t x, y;
 
-	FWarpToDragronLairWithGuildMembers( DWORD guildID, long map, long X, long Y )
+	FWarpToDragronLairWithGuildMembers( uint32_t guildID, int32_t map, int32_t X, int32_t Y )
 		: dwGuildID(guildID), mapIndex(map), x(X), y(Y)
 	{
 	}
 
 	void operator()(LPENTITY ent)
 	{
-		if (NULL != ent && true == ent->IsType(ENTITY_CHARACTER))
+		if (nullptr != ent && true == ent->IsType(ENTITY_CHARACTER))
 		{
 			LPCHARACTER pChar = static_cast<LPCHARACTER>(ent);
 
 			if (true == pChar->IsPC())
 			{
-				if (NULL != pChar->GetGuild())
+				if (nullptr != pChar->GetGuild())
 				{
 					if (dwGuildID == pChar->GetGuild()->GetID())
 					{
@@ -48,11 +48,11 @@ struct FWarpToVillage
 {
 	void operator() (LPENTITY ent)
 	{
-		if (NULL != ent)
+		if (nullptr != ent)
 		{
 			LPCHARACTER pChar = static_cast<LPCHARACTER>(ent);
 
-			if (NULL != pChar)
+			if (nullptr != pChar)
 			{
 				if (true == pChar->IsPC())
 				{
@@ -65,9 +65,9 @@ struct FWarpToVillage
 
 EVENTINFO(tag_DragonLair_Collapse_EventInfo)
 {
-	int step;
+	int32_t step;
 	CDragonLair* pLair;
-	long InstanceMapIndex;
+	int32_t InstanceMapIndex;
 
 	tag_DragonLair_Collapse_EventInfo()
 	: step( 0 )
@@ -81,7 +81,7 @@ EVENTFUNC( DragonLair_Collapse_Event )
 {
 	tag_DragonLair_Collapse_EventInfo* pInfo = dynamic_cast<tag_DragonLair_Collapse_EventInfo*>(event->info);
 
-	if ( pInfo == NULL )
+	if ( pInfo == nullptr )
 	{
 		sys_err( "DragonLair_Collapse_Event> <Factor> Null pointer" );
 		return 0;
@@ -101,7 +101,7 @@ EVENTFUNC( DragonLair_Collapse_Event )
 	{
 		LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap( pInfo->InstanceMapIndex );
 
-		if (NULL != pMap)
+		if (nullptr != pMap)
 		{
 			FWarpToVillage f;
 			pMap->for_each( f );
@@ -128,7 +128,7 @@ EVENTFUNC( DragonLair_Collapse_Event )
 
 
 
-CDragonLair::CDragonLair(DWORD guildID, long BaseMapID, long PrivateMapID)
+CDragonLair::CDragonLair(uint32_t guildID, int32_t BaseMapID, int32_t PrivateMapID)
 	: GuildID_(guildID), BaseMapIndex_(BaseMapID), PrivateMapIndex_(PrivateMapID)
 {
 	StartTime_ = get_global_time();
@@ -138,7 +138,7 @@ CDragonLair::~CDragonLair()
 {
 }
 
-DWORD CDragonLair::GetEstimatedTime() const
+uint32_t CDragonLair::GetEstimatedTime() const
 {
 	return get_global_time() - StartTime_;
 }
@@ -169,9 +169,9 @@ CDragonLairManager::~CDragonLairManager()
 {
 }
 
-bool CDragonLairManager::Start(long MapIndexFrom, long BaseMapIndex, DWORD GuildID)
+bool CDragonLairManager::Start(int32_t MapIndexFrom, int32_t BaseMapIndex, uint32_t GuildID)
 {
-	long instanceMapIndex = SECTREE_MANAGER::instance().CreatePrivateMap(BaseMapIndex);
+	int32_t instanceMapIndex = SECTREE_MANAGER::instance().CreatePrivateMap(BaseMapIndex);
 	if (instanceMapIndex == 0) {
 		sys_err("CDragonLairManager::Start() : no private map index available");
 		return false;
@@ -179,18 +179,18 @@ bool CDragonLairManager::Start(long MapIndexFrom, long BaseMapIndex, DWORD Guild
 
 	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(MapIndexFrom);
 
-	if (NULL != pMap)
+	if (nullptr != pMap)
 	{
 		LPSECTREE_MAP pTargetMap = SECTREE_MANAGER::instance().GetMap(BaseMapIndex);
 
-		if (NULL == pTargetMap)
+		if (nullptr == pTargetMap)
 		{
 			return false;
 		}
 
 		const TMapRegion* pRegionInfo = SECTREE_MANAGER::instance().GetMapRegion( pTargetMap->m_setting.iIndex );
 
-		if (NULL != pRegionInfo)
+		if (nullptr != pRegionInfo)
 		{
 			FWarpToDragronLairWithGuildMembers f(GuildID, instanceMapIndex, 844000, 1066900);
 
@@ -204,7 +204,7 @@ bool CDragonLairManager::Start(long MapIndexFrom, long BaseMapIndex, DWORD Guild
 
 			sys_log(0, "%s", strMapBasePath.c_str());
 
-			regen_do(strMapBasePath.c_str(), instanceMapIndex, pTargetMap->m_setting.iBaseX, pTargetMap->m_setting.iBaseY, NULL, true);
+			regen_do(strMapBasePath.c_str(), instanceMapIndex, pTargetMap->m_setting.iBaseX, pTargetMap->m_setting.iBaseY, nullptr, true);
 
 			return true;
 		}
@@ -213,15 +213,15 @@ bool CDragonLairManager::Start(long MapIndexFrom, long BaseMapIndex, DWORD Guild
 	return false;
 }
 
-void CDragonLairManager::OnDragonDead(LPCHARACTER pDragon, DWORD KillerGuildID)
+void CDragonLairManager::OnDragonDead(LPCHARACTER pDragon, uint32_t KillerGuildID)
 {
-	if (NULL == pDragon)
+	if (nullptr == pDragon)
 		return;
 
 	if (false == pDragon->IsMonster())
 		return;
 
-	std::unordered_map<DWORD, CDragonLair*>::iterator iter = LairMap_.find( KillerGuildID );
+	std::unordered_map<uint32_t, CDragonLair*>::iterator iter = LairMap_.find( KillerGuildID );
 
 	if (LairMap_.end() == iter)
 	{
@@ -230,7 +230,7 @@ void CDragonLairManager::OnDragonDead(LPCHARACTER pDragon, DWORD KillerGuildID)
 
 	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap( pDragon->GetMapIndex() );
 
-	if (NULL == iter->second || NULL == pMap)
+	if (nullptr == iter->second || nullptr == pMap)
 	{
 		LairMap_.erase( iter );
 		return;

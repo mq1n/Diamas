@@ -64,7 +64,7 @@ extern void (*_malloc_message)(const char* p1, const char* p2, const char* p3, c
 // FreeBSD _malloc_message replacement
 void WriteMallocMessage(const char* p1, const char* p2, const char* p3, const char* p4) {
 	FILE* fp = ::fopen(DBGALLOC_LOG_FILENAME, "a");
-	if (fp == NULL) {
+	if (fp == nullptr) {
 		return;
 	}
 	::fprintf(fp, "%s %s %s %s\n", p1, p2, p3, p4);
@@ -73,25 +73,25 @@ void WriteMallocMessage(const char* p1, const char* p2, const char* p3, const ch
 #endif
 
 // TRAFFIC_PROFILER
-static const DWORD	TRAFFIC_PROFILE_FLUSH_CYCLE = 3600;	///< TrafficProfiler 의 Flush cycle. 1시간 간격
+static const uint32_t	TRAFFIC_PROFILE_FLUSH_CYCLE = 3600;	///< TrafficProfiler 의 Flush cycle. 1시간 간격
 // END_OF_TRAFFIC_PROFILER
 
 // 게임과 연결되는 소켓
-volatile int	num_events_called = 0;
-int             max_bytes_written = 0;
-int             current_bytes_written = 0;
-int             total_bytes_written = 0;
-BYTE		g_bLogLevel = 0;
+volatile int32_t	num_events_called = 0;
+int32_t             max_bytes_written = 0;
+int32_t             current_bytes_written = 0;
+int32_t             total_bytes_written = 0;
+uint8_t		g_bLogLevel = 0;
 
 socket_t	tcp_socket = 0;
 socket_t	p2p_socket = 0;
 
-LPFDWATCH	main_fdw = NULL;
+LPFDWATCH	main_fdw = nullptr;
 
-int		io_loop(LPFDWATCH fdw);
+int32_t		io_loop(LPFDWATCH fdw);
 
-int		start(int argc, char **argv);
-int		idle();
+int32_t		start(int32_t argc, char **argv);
+int32_t		idle();
 void	destroy();
 
 void 	test();
@@ -105,11 +105,11 @@ enum EProfile
 	PROF_MAX_NUM
 };
 
-static DWORD s_dwProfiler[PROF_MAX_NUM];
+static uint32_t s_dwProfiler[PROF_MAX_NUM];
 
-int g_shutdown_disconnect_pulse;
-int g_shutdown_disconnect_force_pulse;
-int g_shutdown_core_pulse;
+int32_t g_shutdown_disconnect_pulse;
+int32_t g_shutdown_disconnect_force_pulse;
+int32_t g_shutdown_core_pulse;
 bool g_bShutdown=false;
 
 extern void CancelReloadSpamEvent();
@@ -193,11 +193,11 @@ namespace
 }
 
 extern std::vector<TPlayerTable> g_vec_save;
-unsigned int save_idx = 0;
+uint32_t save_idx = 0;
 
-void heartbeat(LPHEART ht, int pulse) 
+void heartbeat(LPHEART ht, int32_t pulse) 
 {
-	DWORD t;
+	uint32_t t;
 
 	t = get_dword_time();
 	num_events_called += event_process(pulse);
@@ -222,13 +222,13 @@ void heartbeat(LPHEART ht, int pulse)
 		}
 
 		{
-			int count = 0;
+			int32_t count = 0;
 
 			if (save_idx < g_vec_save.size())
 			{
 				count = MIN(100, g_vec_save.size() - save_idx);
 
-				for (int i = 0; i < count; ++i, ++save_idx)
+				for (int32_t i = 0; i < count; ++i, ++save_idx)
 					db_clientdesc->DBPacket(HEADER_GD_PLAYER_SAVE, 0, &g_vec_save[save_idx], sizeof(TPlayerTable));
 
 				sys_log(0, "SAVE_FLUSH %d", count);
@@ -281,7 +281,7 @@ static void CleanUpForEarlyExit() {
 	CancelReloadSpamEvent();
 }
 
-int main(int argc, char **argv)
+int32_t main(int32_t argc, char **argv)
 {
 #ifdef DEBUG_ALLOC
 	DebugAllocator::StaticSetUp();
@@ -368,12 +368,12 @@ int main(int argc, char **argv)
 
 	if (g_bAuthServer)
 	{
-		int iLimit = DBManager::instance().CountQuery() / 50;
-		int i = 0;
+		int32_t iLimit = DBManager::instance().CountQuery() / 50;
+		int32_t i = 0;
 
 		do
 		{
-			DWORD dwCount = DBManager::instance().CountQuery();
+			uint32_t dwCount = DBManager::instance().CountQuery();
 			sys_log(0, "Queries %u", dwCount);
 
 			if (dwCount == 0)
@@ -431,7 +431,7 @@ int main(int argc, char **argv)
 }
 
 
-int start(int argc, char **argv)
+int32_t start(int32_t argc, char **argv)
 {
 	std::string st_localeServiceName;
 
@@ -492,8 +492,8 @@ int start(int argc, char **argv)
 		return 0;
 	}
 
-	fdwatch_add_fd(main_fdw, tcp_socket, NULL, FDW_READ, false);
-	fdwatch_add_fd(main_fdw, p2p_socket, NULL, FDW_READ, false);
+	fdwatch_add_fd(main_fdw, tcp_socket, nullptr, FDW_READ, false);
+	fdwatch_add_fd(main_fdw, p2p_socket, nullptr, FDW_READ, false);
 
 	db_clientdesc = DESC_MANAGER::instance().CreateConnectionDesc(main_fdw, db_addr, db_port, PHASE_DBCLIENT, true);
 	if (!g_bAuthServer) {
@@ -545,23 +545,23 @@ void destroy()
 	thecore_destroy();
 }
 
-int idle()
+int32_t idle()
 {
 	static struct timeval	pta = { 0, 0 };
-	static int			process_time_count = 0;
+	static int32_t			process_time_count = 0;
 	struct timeval		now;
 
 	if (pta.tv_sec == 0)
 		gettimeofday(&pta, (struct timezone *) 0);
 
-	int passed_pulses;
+	int32_t passed_pulses;
 
 	if (!(passed_pulses = thecore_idle()))
 		return 0;
 
 	assert(passed_pulses > 0);
 
-	DWORD t;
+	uint32_t t;
 
 	while (passed_pulses--) {
 		heartbeat(thecore_heart, ++thecore_heart->pulse);
@@ -608,7 +608,7 @@ int idle()
 
 #ifdef __WIN32__
 	if (_kbhit()) {
-		int c = _getch();
+		int32_t c = _getch();
 		switch (c) {
 			case 0x1b: // Esc
 				return 0; // shutdown
@@ -622,10 +622,10 @@ int idle()
 	return 1;
 }
 
-int io_loop(LPFDWATCH fdw)
+int32_t io_loop(LPFDWATCH fdw)
 {
 	LPDESC	d;
-	int		num_events, event_idx;
+	int32_t		num_events, event_idx;
 
 	DESC_MANAGER::instance().DestroyClosed(); // PHASE_CLOSE인 접속들을 끊어준다.
 	DESC_MANAGER::instance().TryConnect();
@@ -652,14 +652,14 @@ int io_loop(LPFDWATCH fdw)
 			continue; 
 		}
 
-		int iRet = fdwatch_check_event(fdw, d->GetSocket(), event_idx);
+		int32_t iRet = fdwatch_check_event(fdw, d->GetSocket(), event_idx);
 
 		switch (iRet)
 		{
 			case FDW_READ:
 				if (db_clientdesc == d)
 				{
-					int size = d->ProcessInput();
+					int32_t size = d->ProcessInput();
 
 					if (size)
 						sys_log(1, "DB_BYTES_READ: %d", size);
@@ -678,10 +678,10 @@ int io_loop(LPFDWATCH fdw)
 			case FDW_WRITE:
 				if (db_clientdesc == d)
 				{
-					int buf_size = buffer_size(d->GetOutputBuffer());
-					int sock_buf_size = fdwatch_get_buffer_size(fdw, d->GetSocket());
+					int32_t buf_size = buffer_size(d->GetOutputBuffer());
+					int32_t sock_buf_size = fdwatch_get_buffer_size(fdw, d->GetSocket());
 
-					int ret = d->ProcessOutput();
+					int32_t ret = d->ProcessOutput();
 
 					if (ret < 0)
 					{

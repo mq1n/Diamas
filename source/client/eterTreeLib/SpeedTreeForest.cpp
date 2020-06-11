@@ -38,14 +38,14 @@ CSpeedTreeForest::~CSpeedTreeForest()
 void CSpeedTreeForest::Clear()
 {
 	TTreeMap::iterator itor = m_pMainTreeMap.begin();
-	UINT uiCount;
+	uint32_t uiCount;
 
 	while (itor != m_pMainTreeMap.end())
 	{
 		CSpeedTreeWrapper * pMainTree = (itor++)->second;
 		CSpeedTreeWrapper ** ppInstances = pMainTree->GetInstances(uiCount);
 
-		for (UINT i = 0; i < uiCount; ++i)
+		for (uint32_t i = 0; i < uiCount; ++i)
 			delete ppInstances[i];
 
 		delete pMainTree;
@@ -54,17 +54,17 @@ void CSpeedTreeForest::Clear()
 	m_pMainTreeMap.clear();
 }
 
-CSpeedTreeWrapper * CSpeedTreeForest::GetMainTree(DWORD dwCRC)
+CSpeedTreeWrapper * CSpeedTreeForest::GetMainTree(uint32_t dwCRC)
 {
 	TTreeMap::iterator itor = m_pMainTreeMap.find(dwCRC);
 
 	if (itor == m_pMainTreeMap.end())
-		return NULL;
+		return nullptr;
 
 	return itor->second;
 }
 
-BOOL CSpeedTreeForest::GetMainTree(DWORD dwCRC, CSpeedTreeWrapper ** ppMainTree, const char * c_pszFileName)
+BOOL CSpeedTreeForest::GetMainTree(uint32_t dwCRC, CSpeedTreeWrapper ** ppMainTree, const char * c_pszFileName)
 {
 	TTreeMap::iterator itor = m_pMainTreeMap.find(dwCRC);
 
@@ -86,7 +86,7 @@ BOOL CSpeedTreeForest::GetMainTree(DWORD dwCRC, CSpeedTreeWrapper ** ppMainTree,
 			return FALSE;
 		}
 
-		m_pMainTreeMap.insert(std::map<DWORD, CSpeedTreeWrapper *>::value_type(dwCRC, pTree));
+		m_pMainTreeMap.insert(std::map<uint32_t, CSpeedTreeWrapper *>::value_type(dwCRC, pTree));
 
 		file.Close();
 	}
@@ -95,11 +95,11 @@ BOOL CSpeedTreeForest::GetMainTree(DWORD dwCRC, CSpeedTreeWrapper ** ppMainTree,
 	return TRUE;
 }
 
-CSpeedTreeWrapper* CSpeedTreeForest::CreateInstance(float x, float y, float z, DWORD dwTreeCRC, const char * c_szTreeName)
+CSpeedTreeWrapper* CSpeedTreeForest::CreateInstance(float x, float y, float z, uint32_t dwTreeCRC, const char * c_szTreeName)
 {
 	CSpeedTreeWrapper * pMainTree;
 	if (!GetMainTree(dwTreeCRC, &pMainTree, c_szTreeName))
-		return NULL;
+		return nullptr;
 
 	CSpeedTreeWrapper* pTreeInst = pMainTree->MakeInstance();	
 	pTreeInst->SetPosition(x, y, z);
@@ -156,14 +156,14 @@ void CSpeedTreeForest::SetWindStrength(float fStrength)
 	m_fWindStrength = fStrength;
 
 	TTreeMap::iterator itor = m_pMainTreeMap.begin();
-	UINT uiCount;
+	uint32_t uiCount;
 
 	while (itor != m_pMainTreeMap.end())
 	{
 		CSpeedTreeWrapper * pMainTree = (itor++)->second;
 		CSpeedTreeWrapper ** ppInstances = pMainTree->GetInstances(uiCount);
 
-		for (UINT i = 0; i < uiCount; ++i)
+		for (uint32_t i = 0; i < uiCount; ++i)
 			ppInstances[i]->GetSpeedTree()->SetWindStrength(m_fWindStrength);
 	}
 }
@@ -191,14 +191,14 @@ void CSpeedTreeForest::SetupWindMatrices(float fTimeInSecs)
 	static float fOldStrength = m_fWindStrength;
 
 	// increment matrix times
-	for (int i = 0; i < c_nNumWindMatrices; ++i)
+	for (int32_t i = 0; i < c_nNumWindMatrices; ++i)
 		afMatrixTimes[i] += fTimeSinceLastCall;
 
 	// compute maximum branch throw
 	float fBaseAngle = m_fWindStrength * 35.0f;
 
 	// build rotation matrices
-	for (int j = 0; j < c_nNumWindMatrices; ++j)
+	for (int32_t j = 0; j < c_nNumWindMatrices; ++j)
 	{
 		// adjust time to prevent "jumping"
 		if (m_fWindStrength != 0.0f)
@@ -251,7 +251,7 @@ void CSpeedTreeForest::SetLodLimits(void)
 	float fTallest = -1.0f;
 
 	TTreeMap::iterator itor = m_pMainTreeMap.begin();
-	UINT uiCount;
+	uint32_t uiCount;
 
 	while (itor != m_pMainTreeMap.end())
 	{
@@ -262,7 +262,7 @@ void CSpeedTreeForest::SetLodLimits(void)
 		fHeight = pMainTree->GetBoundingBox()[5] - pMainTree->GetBoundingBox()[0];
 		fTallest = __max(fHeight, fTallest);
 
-		for (UINT i = 0; i < uiCount; ++i)
+		for (uint32_t i = 0; i < uiCount; ++i)
 		{
 			fHeight = ppInstances[i]->GetBoundingBox()[5] - ppInstances[i]->GetBoundingBox()[0];
 			fTallest = __max(fHeight, fTallest);
@@ -278,7 +278,7 @@ void CSpeedTreeForest::SetLodLimits(void)
 
 		pMainTree->GetSpeedTree()->SetLodLimits(fTallest * c_fNearLodFactor, fTallest * c_fFarLodFactor);
 
-		for (UINT i = 0; i < uiCount; ++i)
+		for (uint32_t i = 0; i < uiCount; ++i)
 			ppInstances[i]->GetSpeedTree()->SetLodLimits(fTallest * c_fNearLodFactor, fTallest * c_fFarLodFactor);
 	}
 }

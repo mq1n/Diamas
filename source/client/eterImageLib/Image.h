@@ -41,13 +41,13 @@ class CImageC
 
 		void				Create(int32_t width, int32_t height);
 
-		void				Clear(DWORD color = 0);
+		void				Clear(uint32_t color = 0);
 
 		int32_t					GetWidth() const;
 		int32_t					GetHeight() const;
 
-		DWORD *				GetBasePointer();
-		DWORD *				GetLinePointer(int32_t line);
+		uint32_t *				GetBasePointer();
+		uint32_t *				GetLinePointer(int32_t line);
 
 		void				PutImage(int32_t x, int32_t y, CImageC* pImage);
 		void				FlipTopToBottom();
@@ -62,7 +62,7 @@ class CImageC
 		void				Initialize();
 
 	protected:
-		DWORD *				m_pdwColors;
+		uint32_t *				m_pdwColors;
 		int32_t					m_width;
 		int32_t					m_height;
 
