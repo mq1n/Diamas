@@ -41,39 +41,39 @@ void CMapOutdoor::__RenderTerrain_RenderHardwareTransformPatch()
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP,   D3DTOP_MODULATE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1);
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_ADDRESSU,  D3DTADDRESS_WRAP);
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_ADDRESSV,  D3DTADDRESS_WRAP);
+	STATEMANAGER.SetSamplerState(0, D3DSAMP_ADDRESSU,  D3DTADDRESS_WRAP);
+	STATEMANAGER.SetSamplerState(0, D3DSAMP_ADDRESSV,  D3DTADDRESS_WRAP);
 
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_CURRENT);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_COLOROP,   D3DTOP_SELECTARG1);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1);
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_ADDRESSU,  D3DTADDRESS_CLAMP);
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_ADDRESSV,  D3DTADDRESS_CLAMP);
+	STATEMANAGER.SetSamplerState(1, D3DSAMP_ADDRESSU,  D3DTADDRESS_CLAMP);
+	STATEMANAGER.SetSamplerState(1, D3DSAMP_ADDRESSV,  D3DTADDRESS_CLAMP);
 
 #ifdef WORLD_EDITOR
 	if (GetAsyncKeyState(VK_CAPITAL))
 	{
 		CSpeedTreeWrapper::ms_bSelfShadowOn = false;
-		STATEMANAGER.SetTextureStageState(0, D3DTSS_MINFILTER,	D3DTEXF_GAUSSIANCUBIC);
-		STATEMANAGER.SetTextureStageState(0, D3DTSS_MAGFILTER,	D3DTEXF_GAUSSIANCUBIC);
-		STATEMANAGER.SetTextureStageState(0, D3DTSS_MIPFILTER,	D3DTEXF_GAUSSIANCUBIC);
-		STATEMANAGER.SetTextureStageState(1, D3DTSS_MINFILTER,	D3DTEXF_GAUSSIANCUBIC);
-		STATEMANAGER.SetTextureStageState(1, D3DTSS_MAGFILTER,	D3DTEXF_GAUSSIANCUBIC);
-		STATEMANAGER.SetTextureStageState(1, D3DTSS_MIPFILTER,	D3DTEXF_GAUSSIANCUBIC);
+		STATEMANAGER.SetSamplerState(0, D3DSAMP_MINFILTER,	D3DTEXF_GAUSSIANCUBIC);
+		STATEMANAGER.SetSamplerState(0, D3DSAMP_MAGFILTER,	D3DTEXF_GAUSSIANCUBIC);
+		STATEMANAGER.SetSamplerState(0, D3DSAMP_MIPFILTER,	D3DTEXF_GAUSSIANCUBIC);
+		STATEMANAGER.SetSamplerState(1, D3DSAMP_MINFILTER,	D3DTEXF_GAUSSIANCUBIC);
+		STATEMANAGER.SetSamplerState(1, D3DSAMP_MAGFILTER,	D3DTEXF_GAUSSIANCUBIC);
+		STATEMANAGER.SetSamplerState(1, D3DSAMP_MIPFILTER,	D3DTEXF_GAUSSIANCUBIC);
 	}
 	else
 	{
 		CSpeedTreeWrapper::ms_bSelfShadowOn = true;
-		STATEMANAGER.SetTextureStageState(0, D3DTSS_MINFILTER,	D3DTEXF_LINEAR);
-		STATEMANAGER.SetTextureStageState(0, D3DTSS_MAGFILTER,	D3DTEXF_LINEAR);
-		STATEMANAGER.SetTextureStageState(0, D3DTSS_MIPFILTER,	D3DTEXF_LINEAR);
-		STATEMANAGER.SetTextureStageState(1, D3DTSS_MINFILTER,	D3DTEXF_LINEAR);
-		STATEMANAGER.SetTextureStageState(1, D3DTSS_MAGFILTER,	D3DTEXF_LINEAR);
-		STATEMANAGER.SetTextureStageState(1, D3DTSS_MIPFILTER,	D3DTEXF_LINEAR);
+		STATEMANAGER.SetSamplerState(0, D3DSAMP_MINFILTER,	D3DTEXF_LINEAR);
+		STATEMANAGER.SetSamplerState(0, D3DSAMP_MAGFILTER,	D3DTEXF_LINEAR);
+		STATEMANAGER.SetSamplerState(0, D3DSAMP_MIPFILTER,	D3DTEXF_LINEAR);
+		STATEMANAGER.SetSamplerState(1, D3DSAMP_MINFILTER,	D3DTEXF_LINEAR);
+		STATEMANAGER.SetSamplerState(1, D3DSAMP_MAGFILTER,	D3DTEXF_LINEAR);
+		STATEMANAGER.SetSamplerState(1, D3DSAMP_MIPFILTER,	D3DTEXF_LINEAR);
 	}
 #else
-	CSpeedTreeWrapper::ms_bSelfShadowOn = true;
+//	CSpeedTreeWrapper::ms_bSelfShadowOn = true;
 	STATEMANAGER.SetBestFiltering(0);
 	STATEMANAGER.SetBestFiltering(1);
 #endif
@@ -88,7 +88,7 @@ void CMapOutdoor::__RenderTerrain_RenderHardwareTransformPatch()
 	// Render State & TextureStageState
 	//////////////////////////////////////////////////////////////////////////
 
-	STATEMANAGER.SetVertexShader(D3DFVF_XYZ | D3DFVF_NORMAL);
+	STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL);
 
 	m_iRenderedSplatNumSqSum = 0;
 	m_iRenderedPatchNum = 0;
@@ -330,8 +330,7 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(int32_t patchnum, ui
 		
 		uint32_t dwTextureFactor = STATEMANAGER.GetRenderState(D3DRS_TEXTUREFACTOR);
 		
-		static int32_t DefaultTCT = 8;
-		int32_t TextureCountThreshold = DefaultTCT;
+		int32_t TextureCountThreshold = 8;
 		uint32_t dwTFactor = 0xFFFFFFFF;
 		
 		if (GetAsyncKeyState(VK_LSHIFT) & 0x8000)
@@ -365,17 +364,6 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(int32_t patchnum, ui
 			{
 				TextureCountThreshold = 7;
 				dwTFactor = 0xFFFF00ff;
-			}
-			// new stuff
-			else if (GetAsyncKeyState(VK_8) & 0x8000)
-			{
-				TextureCountThreshold = DefaultTCT = 8;
-				dwTFactor = 0xFFFFFFFF;
-			}
-			else if (GetAsyncKeyState(VK_0) & 0x8000)
-			{
-				TextureCountThreshold = DefaultTCT = 255;
-				dwTFactor = 0xFFFFFFFF;
 			}
 			
 		}
@@ -636,8 +624,8 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(int32_t patchnum, ui
 		STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 		STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
 		STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP,   D3DTOP_DISABLE);
-		STATEMANAGER.SetTextureStageState(0, D3DTSS_ADDRESSU,	D3DTADDRESS_CLAMP);
-		STATEMANAGER.SetTextureStageState(0, D3DTSS_ADDRESSV,	D3DTADDRESS_CLAMP);	
+		STATEMANAGER.SetSamplerState(0, D3DSAMP_ADDRESSU,	D3DTADDRESS_CLAMP);
+		STATEMANAGER.SetSamplerState(0, D3DSAMP_ADDRESSV,	D3DTADDRESS_CLAMP);	
 
 		if (m_bDrawChrShadow)
 		{
@@ -648,8 +636,8 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(int32_t patchnum, ui
 			STATEMANAGER.SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT);
 			STATEMANAGER.SetTextureStageState(1, D3DTSS_COLOROP,   D3DTOP_MODULATE);
 			STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE);
-			STATEMANAGER.SetTextureStageState(1, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
-			STATEMANAGER.SetTextureStageState(1, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
+			STATEMANAGER.SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+			STATEMANAGER.SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 		}		
 		else
 		{
@@ -673,8 +661,8 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(int32_t patchnum, ui
 		STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP,   D3DTOP_MODULATE);
 		STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 		STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1);
-		STATEMANAGER.SetTextureStageState(0, D3DTSS_ADDRESSU,  D3DTADDRESS_WRAP);
-		STATEMANAGER.SetTextureStageState(0, D3DTSS_ADDRESSV,  D3DTADDRESS_WRAP);
+		STATEMANAGER.SetSamplerState(0, D3DSAMP_ADDRESSU,  D3DTADDRESS_WRAP);
+		STATEMANAGER.SetSamplerState(0, D3DSAMP_ADDRESSV,  D3DTADDRESS_WRAP);
 		
 		
 		STATEMANAGER.SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);

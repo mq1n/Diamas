@@ -90,10 +90,12 @@ namespace UI
 			uint32_t		GetAttachingType();
 			uint32_t		GetAttachingIndex();
 			uint32_t		GetAttachingSlotNumber();
+			uint32_t		GetAttachingRealSlotNumber();
 			void		GetAttachingIconSize(uint8_t * pbyWidth, uint8_t * pbyHeight);
 			void		AttachIcon(uint32_t dwType, uint32_t dwIndex, uint32_t dwSlotNumber, uint8_t byWidth, uint8_t byHeight);
 			void		DeattachIcon();
 			void		SetAttachingFlag(BOOL bFlag);
+			void		SetAttachingRealSlotNumber(uint32_t dwRealslotNumber);
 			// Attaching Icon
 
 			void		OnceIgnoreMouseLeftButtonUpEvent();
@@ -165,6 +167,7 @@ namespace UI
 			uint32_t					m_dwAttachingType;
 			uint32_t					m_dwAttachingIndex;
 			uint32_t					m_dwAttachingSlotNumber;
+			uint32_t					m_dwAttachingRealSlotNumber;
 			uint8_t					m_byAttachingIconWidth;
 			uint8_t					m_byAttachingIconHeight;
 			// Attaching Icon

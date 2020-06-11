@@ -543,10 +543,10 @@ void CSkyBox::Refresh()
 		// v3QuadPoints[1] = D3DXVECTOR3(1.0f, 1.0f, -1.0f);
 		// v3QuadPoints[2] = D3DXVECTOR3(-1.0f, -1.0f, -1.0f);
 		// v3QuadPoints[3] = D3DXVECTOR3(-1.0f, 1.0f, -1.0f);
-		v3QuadPoints[0] = D3DXVECTOR3(1.0f, 1.0f, -1.0f);
-		v3QuadPoints[1] = D3DXVECTOR3(1.0f, -1.0f, -1.0f);
-		v3QuadPoints[2] = D3DXVECTOR3(-1.0f, 1.0f, -1.0f);
-		v3QuadPoints[3] = D3DXVECTOR3(-1.0f, -1.0f, -1.0f);
+		v3QuadPoints[0] = D3DXVECTOR3(1.0f, -1.0f, -1.0f);
+		v3QuadPoints[1] = D3DXVECTOR3(1.0f, 1.0f, -1.0f);
+		v3QuadPoints[2] = D3DXVECTOR3(-1.0f, -1.0f, -1.0f);
+		v3QuadPoints[3] = D3DXVECTOR3(-1.0f, 1.0f, -1.0f);
 
 		//UpdateSkyFaceQuadTransform(v3QuadPoints);
 		
@@ -825,7 +825,7 @@ void CSkyBox::Render()
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
- 	STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
+	STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
 	STATEMANAGER.SetTransform(D3DTS_WORLD, &m_matWorld);
 
@@ -833,8 +833,8 @@ void CSkyBox::Render()
 	if( m_ucRenderMode == CSkyObject::SKY_RENDER_MODE_TEXTURE )
 	{
 		STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-		STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSU,	D3DTADDRESS_CLAMP);
-		STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSV,	D3DTADDRESS_CLAMP);
+		STATEMANAGER.SaveSamplerState(0, D3DSAMP_ADDRESSU,	D3DTADDRESS_CLAMP);
+		STATEMANAGER.SaveSamplerState(0, D3DSAMP_ADDRESSV,	D3DTADDRESS_CLAMP);
 
 		for (uint32_t i = 0; i < 6; ++i)
 		{
@@ -849,8 +849,8 @@ void CSkyBox::Render()
 
 		//STATEMANAGER.SetTexture( 0, nullptr );
 
-		STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSU);
-		STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSV);
+		STATEMANAGER.RestoreSamplerState(0, D3DSAMP_ADDRESSU);
+		STATEMANAGER.RestoreSamplerState(0, D3DSAMP_ADDRESSV);
 	}
 	else
 	{

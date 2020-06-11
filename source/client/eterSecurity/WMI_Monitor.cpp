@@ -3,10 +3,8 @@
 #include "AnticheatManager.h"
 #include "CheatQueueManager.h"
 #include "ProcessNameHelper.h"
-
-#include <XORstr.h>
-
 #include <OleAuto.h>
+#include <xorstr.hpp>
 
 // FIXME: In some client the thread terminate itself due than unknown reasons(s) check it
 // TODO: Check WMI service status before than initilization
@@ -118,7 +116,7 @@ void CWMI_Monitor::OnWMIMessage(int32_t analyseType, std::map <std::string /* sz
 			//"ExecutablePath"
 			//"Name"
 
-			auto it_dwProcessID = mDataMap.find(XOR("ProcessId"));
+			auto it_dwProcessID = mDataMap.find(xorstr("ProcessId").crypt_get());
 
 			if (it_dwProcessID != mDataMap.end())
 			{
@@ -149,9 +147,9 @@ void CWMI_Monitor::OnWMIMessage(int32_t analyseType, std::map <std::string /* sz
 		{
 			//"WaitMode"
 
-			auto it_dwTID			= mDataMap.find(XOR("ThreadID"));
-			auto it_dwPID			= mDataMap.find(XOR("ProcessID"));
-			auto it_dwStartAddress	= mDataMap.find(XOR("Win32StartAddr"));
+			auto it_dwTID			= mDataMap.find(xorstr("ThreadID").crypt_get());
+			auto it_dwPID			= mDataMap.find(xorstr("ProcessID").crypt_get());
+			auto it_dwStartAddress	= mDataMap.find(xorstr("Win32StartAddr").crypt_get());
 
 			if (it_dwTID != mDataMap.end() && it_dwPID != mDataMap.end() && it_dwStartAddress != mDataMap.end())
 			{
@@ -195,31 +193,31 @@ void CWMI_Monitor::OnWMIMessage(int32_t analyseType, std::map <std::string /* sz
 
 DWORD CWMI_Monitor::ThreadRoutine(void)
 {
-	std::string szWQL = XOR("WQL");
+	std::string szWQL = xorstr("WQL").crypt_get();
 	auto wszWQL = std::wstring(szWQL.begin(), szWQL.end());
 	auto wszWQL2 = (wchar_t*)wszWQL.c_str();
 
-	std::string szRootCim = XOR("root\\cimv2");
+	std::string szRootCim = xorstr("root\\cimv2").crypt_get();
 	auto wszRootCim = std::wstring(szRootCim.begin(), szRootCim.end());
 	auto wszRootCim2 = (wchar_t*)wszRootCim.c_str();
 
-	std::string szProcessCreateQuery = XOR("SELECT * FROM __InstanceCreationEvent WITHIN 1 WHERE TargetInstance ISA 'Win32_Process'");
+	std::string szProcessCreateQuery = xorstr("SELECT * FROM __InstanceCreationEvent WITHIN 1 WHERE TargetInstance ISA 'Win32_Process'").crypt_get();
 	auto wszProcessCreateQuery = std::wstring(szProcessCreateQuery.begin(), szProcessCreateQuery.end());
 	auto wszProcessCreateQuery2 = (wchar_t*)wszProcessCreateQuery.c_str();
 
-	std::string szThreadLoadQuery = XOR("SELECT * FROM Win32_ThreadTrace");
+	std::string szThreadLoadQuery = xorstr("SELECT * FROM Win32_ThreadTrace").crypt_get();
 	auto wszThreadLoadQuery = std::wstring(szThreadLoadQuery.begin(), szThreadLoadQuery.end());
 	auto wszThreadLoadQuery2 = (wchar_t*)wszThreadLoadQuery.c_str();
 
-	std::string szModuleLoadQuery = XOR("SELECT * FROM Win32_ModuleLoadTrace");
+	std::string szModuleLoadQuery = xorstr("SELECT * FROM Win32_ModuleLoadTrace").crypt_get();
 	auto wszModuleLoadQuery = std::wstring(szModuleLoadQuery.begin(), szModuleLoadQuery.end());
 	auto wszModuleLoadQuery2 = (wchar_t*)wszModuleLoadQuery.c_str();
 
-	std::string szDriverLoadQuery = XOR("SELECT * FROM __InstanceCreationEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_SystemDriver'");
+	std::string szDriverLoadQuery = xorstr("SELECT * FROM __InstanceCreationEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_SystemDriver'").crypt_get();
 	auto wszDriverLoadQuery = std::wstring(szDriverLoadQuery.begin(), szDriverLoadQuery.end());
 	auto wszDriverLoadQuery2 = (wchar_t*)wszDriverLoadQuery.c_str();
 
-	std::string szServiceLoadQuery = XOR("SELECT * FROM __InstanceCreationEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_Service'");
+	std::string szServiceLoadQuery = xorstr("SELECT * FROM __InstanceCreationEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_Service'").crypt_get();
 	auto wszServiceLoadQuery = std::wstring(szServiceLoadQuery.begin(), szServiceLoadQuery.end());
 	auto wszServiceLoadQuery2 = (wchar_t*)wszServiceLoadQuery.c_str();
 	

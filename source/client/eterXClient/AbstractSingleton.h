@@ -9,14 +9,18 @@ public:
 	TAbstractSingleton()
 	{ 
 		assert(!ms_singleton);
-		int32_t offset = (int32_t) (T*) 1 - (int32_t) (CSingleton <T>*) (T*) 1; 
-		ms_singleton = (T*) ((int32_t) this + offset);
+		ms_singleton = static_cast<T*>(this);
 	} 
 
+	TAbstractSingleton(const TAbstractSingleton &) = delete;
+	TAbstractSingleton(TAbstractSingleton &&) = delete;
+	TAbstractSingleton & operator=(const TAbstractSingleton &) = delete;
+	TAbstractSingleton & operator=(TAbstractSingleton &&) = delete;
+	
 	virtual ~TAbstractSingleton()
 	{ 
 		assert(ms_singleton);
-		ms_singleton = 0; 
+		ms_singleton = nullptr;
 	}
 
 	__forceinline static T & GetSingleton()
@@ -26,4 +30,4 @@ public:
 	}	
 };
 
-template <typename T> T * TAbstractSingleton <T>::ms_singleton = 0;
+template <typename T> T * TAbstractSingleton<T>::ms_singleton = nullptr;

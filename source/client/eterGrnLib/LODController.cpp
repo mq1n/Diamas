@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 #include "LODController.h"
+#include <cstdint>
+#include <algorithm>
 
 static float LODHEIGHT_ACTOR		=	500.0f;
 static float LODDISTANCE_ACTOR		=	5000.0f;
@@ -498,7 +500,7 @@ void CGrannyLODController::UpdateLODLevel(float fDistanceFromCenter, float fDist
 				bLODLevel = 3;
 			}
 
-			bLODLevel = (uint8_t) (m_que_pkModelInst.size() - std::min<uint8_t>(bLODLevel, m_que_pkModelInst.size()) - 1);
+			bLODLevel = (uint8_t) (m_que_pkModelInst.size() - std::min<uint32_t>(bLODLevel, m_que_pkModelInst.size()) - 1);
 		}
 		
 		if (ms_isMinLODModeEnable)
@@ -531,10 +533,15 @@ void CGrannyLODController::UpdateTime(float fElapsedTime)
 
 	m_pCurrentModelInstance->Update(m_dwLODAniFPS);
 
-	//uint32_t t3=timeGetTime();
+#ifdef __PERFORMANCE_CHECKER__
+	uint32_t t3=timeGetTime();
+#endif
+
 	m_pCurrentModelInstance->UpdateLocalTime(fElapsedTime);
 
-	//uint32_t t4=timeGetTime();
+#ifdef __PERFORMANCE_CHECKER__
+	uint32_t t4=timeGetTime();
+#endif
 
 #ifdef __PERFORMANCE_CHECKER__
 	{

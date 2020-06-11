@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../eterBase/Utils.h"
+#include "../eterXClient/Locale_inc.h"
 
 namespace UI
 {
@@ -40,6 +41,15 @@ namespace UI
 				FLAG_NOT_PICK			= (1 <<  9),	// 마우스에 의해 Pick되지 않는 창
 				FLAG_IGNORE_SIZE		= (1 << 10),
 				FLAG_RTL				= (1 << 11),	// Right-to-left
+				FLAG_ALPHA_SENSITIVE	= (1 << 12),
+			};
+			
+			enum WindowTypes // window type flags to recognize expanded_image class
+			{
+				WINDOW_TYPE_WINDOW,
+				WINDOW_TYPE_EX_IMAGE,
+
+				WINDOW_TYPE_MAX_NUM
 			};
 
 		public:
@@ -81,6 +91,8 @@ namespace UI
 			bool			HasParent()		{ return m_pParent ? true : false; }
 			bool			HasChild()		{ return m_pChildList.empty() ? false : true; }
 			int32_t				GetChildCount()	{ return m_pChildList.size(); }
+			
+			void			IsTransparentOnPixel(int32_t* x, int32_t* y, bool* ret);
 
 			CWindow *		GetRoot();
 			CWindow *		GetParent();
@@ -186,6 +198,8 @@ namespace UI
 
 			BOOL				m_isUpdatingChildren;
 			TWindowContainer	m_pReserveChildList;
+			
+			uint8_t				m_windowType; // to recognize window type
 
 #ifdef ENABLE_MOUSEWHEEL_EVENT
 			bool				m_bIsScrollable;
@@ -343,6 +357,7 @@ namespace UI
 
 			BOOL LoadImage(const char * c_szFileName);
 			void SetDiffuseColor(float fr, float fg, float fb, float fa);
+			void SetScale(float sx, float sy);
 
 			int32_t GetWidth();
 			int32_t GetHeight();
@@ -393,6 +408,7 @@ namespace UI
 			void SetRotation(float fRotation);
 			void SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom);
 			void SetRenderingMode(int32_t iMode);
+			D3DXCOLOR GetPixelColor(int32_t x, int32_t y) { if (m_pImageInstance) return m_pImageInstance->GetPixelColor(x, y); else return D3DXCOLOR(0, 0, 0, 0); }
 
 		protected:
 			void OnCreateInstance();
@@ -413,6 +429,7 @@ namespace UI
 			virtual ~CAniImageBox();
 
 			void SetDelay(int32_t iDelay);
+			void AppendImageScale(const char * c_szFileName, float scale_x, float scale_y);
 #ifdef ENABLE_ACCE_SYSTEM
 			void	AppendImage(const char * c_szFileName, float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0);
 #else
@@ -455,6 +472,7 @@ namespace UI
 			const char * GetDownVisualFileName();
 
 			void Flash();
+			void FlashEx();
 			void Enable();
 			void Disable();
 
@@ -485,6 +503,7 @@ namespace UI
 			BOOL m_bEnable;
 			BOOL m_isPressed;
 			BOOL m_isFlash;
+			BOOL m_isFlashEx;
 			CGraphicImageInstance * m_pcurVisual;
 			CGraphicImageInstance m_upVisual;
 			CGraphicImageInstance m_overVisual;

@@ -2,7 +2,19 @@
 
 #define CLIENT_VERSION_TIMESTAMP 1215955205
 #define LSS_SECURITY_KEY	"1234abcd5678efgh"
+
 #define _IMPROVED_PACKET_ENCRYPTION_
+// #define _PACKETDUMP
+//#define __PERFORMANCE_CHECK__
+
+// #define ENABLE_ANTICHEAT
+#ifdef ENABLE_ANTICHEAT
+	#define ENABLE_ANTICHEAT_AGGRESSIVE_MODE false
+	#define ENABLE_DEBUGGER_ALLOW_BY_ANTICHEAT
+#endif
+// #define PYTHON_DYNAMIC_MODULE_NAME
+
+
 
 //////////////////////////////////////////////////////////////////////////
 // ### Default Ymir Macros ###

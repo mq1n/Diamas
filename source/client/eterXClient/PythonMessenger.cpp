@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "PythonMessenger.h"
+#include "PythonDynamicModuleNames.h"
 
 void CPythonMessenger::RemoveFriend(const char * c_szKey)
 {
@@ -156,5 +157,5 @@ void initMessenger()
 		{ nullptr,							nullptr,								0         },
 	};
 
-	Py_InitModule("messenger", s_methods);
+	Py_InitModule(CPythonDynamicModule::Instance().GetModule(MESSENGER_MODULE).c_str(), s_methods);
 }

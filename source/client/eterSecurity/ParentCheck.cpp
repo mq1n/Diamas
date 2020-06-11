@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "AnticheatManager.h"
 #include "CheatQueueManager.h"
-#include <XORstr.h>
 #include <TlHelp32.h>
 #include <xorstr.hpp>
 #include "ProcessNameHelper.h"
@@ -196,12 +195,12 @@ void CAnticheatManager::ParentProcessCheck(const std::string& stPatcherName)
 	if (szLowerPatcherName.empty())
 	{
 #ifdef _DEBUG
-		if (!strcmp(stParentProcessName.c_str(), XOR("devenv.exe")) ||!strcmp(stParentProcessName.c_str(), XOR("vsdbg.exe")))
+		if (!strcmp(stParentProcessName.c_str(), xorstr("devenv.exe").crypt_get()) ||!strcmp(stParentProcessName.c_str(), xorstr("vsdbg.exe").crypt_get()))
 			return;
 #endif
 
 		if (stParentProcessPath != stWindowsPath ||
-			strcmp(stParentProcessName.c_str(), XOR("explorer.exe")) ||
+			strcmp(stParentProcessName.c_str(), xorstr("explorer.exe").crypt_get()) ||
 			dwExplorerPID1 != dwParentPID)
 		{
 			ExitByAnticheat(PARENT_CHECK_UNKNOWN_PARENT, 0, 0, true, stParentProcessName);
@@ -220,7 +219,7 @@ void CAnticheatManager::ParentProcessCheck(const std::string& stPatcherName)
 	else // Executed from a patcher
 	{
 #ifdef _DEBUG
-		if (!strcmp(stParentProcessName.c_str(), XOR("devenv.exe")) ||!strcmp(stParentProcessName.c_str(), XOR("vsdbg.exe")))
+		if (!strcmp(stParentProcessName.c_str(), xorstr("devenv.exe").crypt_get()) || !strcmp(stParentProcessName.c_str(), xorstr("vsdbg.exe").crypt_get()))
 			return;
 #endif
 		if (0 == _access(xorstr("Diamas.exe").crypt_get(), 0))

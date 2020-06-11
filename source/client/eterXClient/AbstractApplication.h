@@ -11,7 +11,9 @@ class IAbstractApplication : public TAbstractSingleton<IAbstractApplication>
 			float m_fViewDir;
 			float m_fCrossDir;
 
-			SCameraPos() : m_fUpDir(0.0f), m_fViewDir(0.0f), m_fCrossDir(0.0f) {}
+			SCameraPos() : m_fUpDir(0.0f), m_fViewDir(0.0f), m_fCrossDir(0.0f)
+			{
+			}
 		};
 
 		struct SCameraSetting
@@ -22,10 +24,10 @@ class IAbstractApplication : public TAbstractSingleton<IAbstractApplication>
 			float					fPitch;
 			float					fZoom;
 
-			SCameraSetting() :	v3CenterPosition(0.0f, 0.0f, 0.0f),
-								fRotation(0.0f),
-								fPitch(0.0f),
-								fZoom(0.0f) {}
+			SCameraSetting() :
+				v3CenterPosition(0.0f, 0.0f, 0.0f), fRotation(0.0f), fPitch(0.0f), fZoom(0.0f)
+			{
+			}
 		};
 
 	public:

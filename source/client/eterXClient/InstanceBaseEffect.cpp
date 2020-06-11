@@ -5,6 +5,7 @@
 #include "AbstractPlayer.h"
 #include "PythonPlayer.h"
 #include "PythonSystem.h"
+#include "PythonCharacterManager.h"
 
 #include "../eterEffectLib/EffectManager.h"
 #include "../eterEffectLib/ParticleSystemData.h"
@@ -93,7 +94,7 @@ void CInstanceBase::AddDamageEffect(uint32_t damage,uint8_t flag,BOOL bSelf,BOOL
 		sDamage.bTarget = bTarget;
 		sDamage.damage = damage;
 		sDamage.flag = flag;
-		m_DamageQueue.push_back(sDamage);
+		m_DamageQueue.emplace_back(sDamage);
 	}
 }
 
@@ -132,11 +133,10 @@ void CInstanceBase::ProcessDamage()
 		//__AttachEffect(EFFECT_DAMAGE_MISS);
 		return;
 	}
-	else if (flag & DAMAGE_CRITICAL)
-	{
-		//rkEftMgr.CreateEffect(ms_adwCRCAffectEffect[EFFECT_DAMAGE_CRITICAL],v3Pos,v3Rot);
-		//return; 숫자도 표시.
-	}
+//	else if (flag & DAMAGE_CRITICAL)
+//	{
+//		rkEftMgr.CreateEffect(ms_adwCRCAffectEffect[EFFECT_DAMAGE_CRITICAL],v3Pos,v3Rot);
+//	}
 
 	std::string strDamageType;
 	uint32_t rdwCRCEft = 0;
@@ -184,8 +184,8 @@ void CInstanceBase::ProcessDamage()
 		num = damage%10;
 		damage /= 10;
 		char numBuf[MAX_PATH];
-		sprintf(numBuf,"%d.dds",num);
-		textures.push_back("d:/ymir work/effect/affect/damagevalue/"+strDamageType+numBuf);
+		sprintf_s(numBuf,"%u.dds",num);
+		textures.emplace_back("d:/ymir work/effect/affect/damagevalue/" + strDamageType + numBuf);
 		
 		rkEftMgr.SetEffectTextures(ms_adwCRCAffectEffect[rdwCRCEft],textures);
 		
@@ -201,8 +201,8 @@ void CInstanceBase::ProcessDamage()
 		matrix = matTrans*matrix;
 		D3DXMatrixMultiply(&matrix,&pCamera->GetViewMatrix(),&matrix);
 		
-		rkEftMgr.CreateEffect(ms_adwCRCAffectEffect[rdwCRCEft],D3DXVECTOR3(matrix._41,matrix._42,matrix._43)
-			,v3Rot);	
+		rkEftMgr.CreateEffect(ms_adwCRCAffectEffect[rdwCRCEft], D3DXVECTOR3(matrix._41, matrix._42, matrix._43) ,v3Rot);
+
 		
 		textures.clear();
 
@@ -236,13 +236,30 @@ void CInstanceBase::CreateSpecialEffect(uint32_t iEffectIndex)
 	CEffectManager::Instance().SetEffectInstanceGlobalMatrix(c_rmatGlobal);
 }
 
+void CInstanceBase::__EffectContainer_Continue()
+{
+	SEffectContainer::Dict& rkDctEftID = __EffectContainer_GetDict();
+
+	SEffectContainer::Dict::iterator i;
+	for (i = rkDctEftID.begin(); i != rkDctEftID.end(); ++i)
+		__AttachEffect(i->second);
+}
+
+void CInstanceBase::__EffectContainer_Suspend()
+{
+	SEffectContainer::Dict& rkDctEftID = __EffectContainer_GetDict();
+
+	SEffectContainer::Dict::iterator i;
+	for (i = rkDctEftID.begin(); i != rkDctEftID.end(); ++i)
+		__DetachEffect(i->second);
+}
+
 void CInstanceBase::__EffectContainer_Destroy()
 {
 	SEffectContainer::Dict& rkDctEftID=__EffectContainer_GetDict();
 
-	SEffectContainer::Dict::iterator i;
-	for (i=rkDctEftID.begin(); i!=rkDctEftID.end(); ++i)
-		__DetachEffect(i->second);
+	for (auto & i : rkDctEftID)
+		__DetachEffect(i.second);
 
 	rkDctEftID.clear();
 }
@@ -262,12 +279,12 @@ CInstanceBase::SEffectContainer::Dict& CInstanceBase::__EffectContainer_GetDict(
 uint32_t CInstanceBase::__EffectContainer_AttachEffect(uint32_t dwEftKey)
 {
 	SEffectContainer::Dict& rkDctEftID=__EffectContainer_GetDict();
-	SEffectContainer::Dict::iterator f=rkDctEftID.find(dwEftKey);
+	auto f = rkDctEftID.find(dwEftKey);
 	if (rkDctEftID.end()!=f)
 		return 0;
 
 	uint32_t dwEftID=__AttachEffect(dwEftKey);
-	rkDctEftID.insert(SEffectContainer::Dict::value_type(dwEftKey, dwEftID));
+	rkDctEftID.emplace(dwEftKey, dwEftID);
 	return dwEftID;
 }
 
@@ -275,7 +292,7 @@ uint32_t CInstanceBase::__EffectContainer_AttachEffect(uint32_t dwEftKey)
 void CInstanceBase::__EffectContainer_DetachEffect(uint32_t dwEftKey)
 {
 	SEffectContainer::Dict& rkDctEftID=__EffectContainer_GetDict();
-	SEffectContainer::Dict::iterator f=rkDctEftID.find(dwEftKey);
+	auto f = rkDctEftID.find(dwEftKey);
 	if (rkDctEftID.end()==f)
 		return;
 
@@ -861,11 +878,10 @@ void CInstanceBase::__SetAffect(uint32_t eAffect, bool isVisible)
 		case AFFECT_YMIR:
 #ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
 			if (IsAffect(AFFECT_INVISIBILITY) && !__MainCanSeeHiddenThing())
-				return;
 #else
 			if (IsAffect(AFFECT_INVISIBILITY))
-				return;
 #endif
+				return;
 			break;
 /*
 		case AFFECT_GWIGEOM: // 전기 속성 공격으로 바뀔 예정
@@ -990,7 +1006,6 @@ bool CInstanceBase::IsPossibleEmoticon()
 
 	if(ELTimer_GetMSec() - m_dwEmoticonTime < 1000)
 	{
-		TraceError("ELTimer_GetMSec() - m_dwEmoticonTime");
 		return false;
 	}
 
@@ -1050,11 +1065,10 @@ uint32_t CInstanceBase::__AttachEffect(uint32_t eEftType)
 	// 2004.07.17.levites.isShow를 ViewFrustumCheck로 변경
 #ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
 	if (IsAffect(AFFECT_INVISIBILITY) && !__MainCanSeeHiddenThing())
-		return 0;
 #else
 	if (IsAffect(AFFECT_INVISIBILITY))
-		return 0;
 #endif
+		return 0;
 
 	if (eEftType>=EFFECT_NUM)
 		return 0;

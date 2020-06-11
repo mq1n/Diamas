@@ -490,7 +490,7 @@ class CDirRemover : public CDir
 			strFullPathName = c_szPathName;
 			strFullPathName += c_szFileName; 
 			_chmod(strFullPathName.c_str(), _S_IWRITE);
-			DeleteFile(strFullPathName.c_str());
+			DeleteFileA(strFullPathName.c_str());
 			return true;
 		}
 
@@ -499,7 +499,7 @@ class CDirRemover : public CDir
 			for (std::deque<std::string>::iterator itor = ms_strDirectoryDeque.begin(); itor != ms_strDirectoryDeque.end(); ++itor)
 			{
 				const std::string & c_rstrDirectory = *itor;
-				RemoveDirectory(c_rstrDirectory.c_str());
+				RemoveDirectoryA(c_rstrDirectory.c_str());
 			}
 
 			ms_strDirectoryDeque.clear();
@@ -599,10 +599,10 @@ PCHAR* CommandLineToArgv( PCHAR CmdLine, int32_t* _argc )
 {
 	PCHAR* argv;
 	PCHAR  _argv;
-	uint32_t   len;
-	uint32_t   argc;
+	ULONG   len;
+	ULONG   argc;
 	CHAR   a;
-	uint32_t   i, j;
+	ULONG   i, j;
 
 	BOOLEAN  in_QM;
 	BOOLEAN  in_TEXT;

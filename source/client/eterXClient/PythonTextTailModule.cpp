@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "PythonTextTail.h"
 #include "PythonCharacterManager.h"
+#include "PythonDynamicModuleNames.h"
 
 PyObject * textTailClear(PyObject * poSelf, PyObject * poArgs)
 {
@@ -231,5 +232,5 @@ void initTextTail()
 		{ nullptr, nullptr, 0 },
 	};
 
-	Py_InitModule("textTail", s_methods);
+	Py_InitModule(CPythonDynamicModule::Instance().GetModule(TEXT_TAIL_MODULE).c_str(), s_methods);
 }

@@ -36,21 +36,21 @@ void CPythonSystem::GetDisplaySettings()
 	memset(m_ResolutionList, 0, sizeof(TResolution) * RESOLUTION_MAX_NUM);
 	m_ResolutionCount = 0;
 
-	LPDIRECT3D8 lpD3D = CPythonGraphic::Instance().GetD3D();
+	LPDIRECT3D9 lpD3D = CPythonGraphic::Instance().GetD3D();
 
-	D3DADAPTER_IDENTIFIER8 d3dAdapterIdentifier;
+	D3DADAPTER_IDENTIFIER9 d3dAdapterIdentifier;
 	D3DDISPLAYMODE d3ddmDesktop;
 
-	lpD3D->GetAdapterIdentifier(0, D3DENUM_NO_WHQL_LEVEL, &d3dAdapterIdentifier);
-	lpD3D->GetAdapterDisplayMode(0, &d3ddmDesktop);
+	lpD3D->GetAdapterIdentifier(D3DADAPTER_DEFAULT, D3DENUM_WHQL_LEVEL, &d3dAdapterIdentifier);
+	lpD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddmDesktop);
 
 	// 이 어뎁터가 가지고 있는 디스플래이 모드갯수를 나열한다..
-	uint32_t dwNumAdapterModes = lpD3D->GetAdapterModeCount(0);
+	uint32_t dwNumAdapterModes = lpD3D->GetAdapterModeCount(D3DADAPTER_DEFAULT, d3ddmDesktop.Format);
 
 	for (uint32_t iMode = 0; iMode < dwNumAdapterModes; iMode++)
 	{
 		D3DDISPLAYMODE DisplayMode;
-		lpD3D->EnumAdapterModes(0, iMode, &DisplayMode);
+		lpD3D->EnumAdapterModes(D3DADAPTER_DEFAULT, d3ddmDesktop.Format, iMode, &DisplayMode);
 		uint32_t bpp = 0;
 
 		// 800 600 이상만 걸러낸다.
@@ -241,7 +241,7 @@ int32_t CPythonSystem::GetShadowLevel()
 void CPythonSystem::SetShadowLevel(uint32_t level)
 {
 	m_Config.iShadowLevel = MIN(level, 5);
-	CPythonBackground::instance().RefreshShadowLevel();
+	CPythonBackground::Instance().RefreshShadowLevel();
 }
 
 int32_t CPythonSystem::IsSaveID()
@@ -296,7 +296,6 @@ void CPythonSystem::SetDefaultConfig()
 	m_Config.voice_volume		= 5;
 
 	m_Config.bDecompressDDS		= 0;
-	m_Config.bSoftwareTiling	= 0;
 	m_Config.iShadowLevel		= 3;
 	m_Config.bViewChat			= true;
 	m_Config.bAlwaysShowName	= DEFAULT_VALUE_ALWAYS_SHOW_NAME;
@@ -378,29 +377,6 @@ void CPythonSystem::SetShowMobLevelFlag(int32_t iFlag)
 }
 #endif
 
-bool CPythonSystem::IsAutoTiling()
-{
-	if (m_Config.bSoftwareTiling == 0)
-		return true;
-
-	return false;
-}
-
-void CPythonSystem::SetSoftwareTiling(bool isEnable)
-{
-	if (isEnable)
-		m_Config.bSoftwareTiling=1;
-	else
-		m_Config.bSoftwareTiling=2;
-}
-
-bool CPythonSystem::IsSoftwareTiling()
-{
-	if (m_Config.bSoftwareTiling==1)
-		return true;
-
-	return false;
-}
 
 bool CPythonSystem::IsUseDefaultIME()
 {
@@ -460,8 +436,6 @@ bool CPythonSystem::LoadConfig()
 		}
 		else if (!stricmp(command, "USE_DEFAULT_IME"))
 			m_Config.bUseDefaultIME = atoi(value) == 1 ? true : false;
-		else if (!stricmp(command, "SOFTWARE_TILING"))
-			m_Config.bSoftwareTiling = atoi(value);
 		else if (!stricmp(command, "SHADOW_LEVEL"))
 			m_Config.iShadowLevel = atoi(value);
 		else if (!stricmp(command, "DECOMPRESSED_TEXTURE"))
@@ -574,7 +548,7 @@ bool CPythonSystem::SaveConfig()
 #endif
 
 	fprintf(fp, "USE_DEFAULT_IME		%d\n", m_Config.bUseDefaultIME);
-	fprintf(fp, "SOFTWARE_TILING		%d\n", m_Config.bSoftwareTiling);
+
 	fprintf(fp, "SHADOW_LEVEL			%d\n", m_Config.iShadowLevel);
 	fprintf(fp, "\n");
 

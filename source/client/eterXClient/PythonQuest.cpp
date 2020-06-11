@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "PythonQuest.h"
+#include "PythonDynamicModuleNames.h"
 
 void CPythonQuest::RegisterQuestInstance(const SQuestInstance & c_rQuestInstance)
 {
@@ -265,6 +266,7 @@ void initquest()
 		{ nullptr,							nullptr,							0 },
 	};
 
-	PyObject * poModule = Py_InitModule("quest", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(QUEST_MODULE).c_str(), s_methods);
+
 	PyModule_AddIntConstant(poModule, "QUEST_MAX_NUM", 5);
 }

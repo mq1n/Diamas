@@ -32,7 +32,7 @@ void CActorInstance::SetMaterialAlpha(uint32_t dwAlpha)
 
 void CActorInstance::OnRender()
 {
-	D3DMATERIAL8 kMtrl;
+	D3DMATERIAL9 kMtrl;
 	STATEMANAGER.GetMaterial(&kMtrl);
 
 	kMtrl.Diffuse=D3DXCOLOR(m_dwMtrlColor);	
@@ -127,7 +127,8 @@ void CActorInstance::OnRender()
 		STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLORARG1);
 		STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLOROP);
 		STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ALPHAOP);
-		STATEMANAGER.RestoreVertexShader();
+
+		STATEMANAGER.RestoreFVF(); 
 	}
 }
 

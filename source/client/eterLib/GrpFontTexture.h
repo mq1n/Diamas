@@ -76,6 +76,6 @@ protected:
 	bool m_isDirty;
 
 	TCHAR	m_fontName[LF_FACESIZE];
-	int32_t	m_fontSize;
+	LONG	m_fontSize;
 	bool	m_bItalic;
 };

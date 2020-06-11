@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "PythonMiniMap.h"
+#include "PythonDynamicModuleNames.h"
 
 PyObject * miniMapSetScale(PyObject * poSelf, PyObject * poArgs)
 {
@@ -343,7 +344,7 @@ void initMiniMap()
 		{ nullptr, nullptr },
 	};
 
-	PyObject * poModule = Py_InitModule("miniMap", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(MINIMAP_MODULE).c_str(), s_methods);
 	
 	PyModule_AddIntConstant(poModule, "TYPE_OPC",			CPythonMiniMap::TYPE_OPC);
 	PyModule_AddIntConstant(poModule, "TYPE_OPCPVP",		CPythonMiniMap::TYPE_OPCPVP);

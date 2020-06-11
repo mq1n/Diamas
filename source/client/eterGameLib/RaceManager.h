@@ -29,7 +29,9 @@ class CRaceManager : public CSingleton<CRaceManager>
 
 		BOOL GetRaceDataPointer(uint32_t dwRaceIndex, CRaceData ** ppRaceData);
 
-
+		void SetRaceHeight(int32_t iVnum, float fHeight);
+		float GetRaceHeight(int32_t iVnum);
+		
 	protected:
 		CRaceData* __LoadRaceData(uint32_t dwRaceIndex);
 		bool __LoadRaceMotionList(CRaceData& rkRaceData, const char* pathName, const char* motionListFileName);
@@ -42,6 +44,7 @@ class CRaceManager : public CSingleton<CRaceManager>
 
 		std::map<std::string, std::string> m_kMap_stRaceName_stSrcName;
 		std::map<uint32_t, std::string>	m_kMap_dwRaceKey_stRaceName;
+		std::map<int32_t, float>		m_kMap_iRaceKey_fRaceAdditionalHeight;
 
 	private:
 		std::string						m_strPathName;

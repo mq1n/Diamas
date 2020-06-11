@@ -10,7 +10,7 @@
 
 #include "../eterlib/StateManager.h"
 #include "../eterGameLib/ItemManager.h"
-#include "../eterGameLib/GameLibDefines.h"
+#include "locale_inc.h"
 
 #ifdef WJ_SHOW_MOB_INFO
 #include "PythonSystem.h"
@@ -481,23 +481,6 @@ float CInstanceBase::__GetBackgroundHeight(float x, float y)
 	return rkBG.GetHeight(x, y);
 }
 
-#ifdef __MOVIE_MODE__
-
-BOOL CInstanceBase::IsMovieMode()
-{
-#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
-	if (IsAffect(AFFECT_INVISIBILITY) && !__MainCanSeeHiddenThing())
-		return true;
-#else
-	if (IsAffect(AFFECT_INVISIBILITY))
-		return true;
-#endif
-
-	return false;
-}
-
-#endif
-
 BOOL CInstanceBase::IsInvisibility()
 {
 #ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
@@ -636,11 +619,6 @@ float CInstanceBase::CalculateDistanceSq3d(const TPixelPosition& c_rkPPosDst)
 
 void CInstanceBase::OnSelected()
 {
-#ifdef __MOVIE_MODE__
-	if (!__IsExistMainInstance())
-		return;
-#endif
-
 	if (IsStoneDoor())
 		return;
 
@@ -657,11 +635,6 @@ void CInstanceBase::OnUnselected()
 
 void CInstanceBase::OnTargeted()
 {
-#ifdef __MOVIE_MODE__
-	if (!__IsExistMainInstance())
-		return;
-#endif
-
 	if (IsStoneDoor())
 		return;
 
@@ -2710,8 +2683,13 @@ void CInstanceBase::SetHair(uint32_t eHair)
 
 	if (IsPC()==false)
 		return;
+	//CItemData * pItemData;
+	float fSpecularPower = 0.0f;
+	/*if (CItemManager::Instance().GetItemDataPointer(__GetHairVnum(eHair), &pItemData))
+		fSpecularPower=pItemData->GetSpecularPowerf();*/
+	
 	m_awPart[CRaceData::PART_HAIR] = eHair;
-	m_GraphicThingInstance.SetHair(eHair);
+	m_GraphicThingInstance.SetHair(eHair, fSpecularPower);
 }
 
 void CInstanceBase::ChangeHair(uint32_t eHair)
@@ -3119,7 +3097,7 @@ bool CInstanceBase::ChangeArmor(uint32_t dwArmor)
 
 	__AttachHorseSaddle();
 
-	RefreshState(CRaceMotionData::NAME_WAIT, TRUE);
+	RefreshState(CRaceMotionData::NAME_WAIT, true);
 
 	// 2004.07.25.myevan.이펙트 안 붙는 문제
 	/////////////////////////////////////////////////
@@ -3166,34 +3144,22 @@ void CInstanceBase::RefreshState(uint32_t dwMotIndex, bool isLoop)
 	}
 
 	if (IsPoly())
-	{
 		SetMotionMode(CRaceMotionData::MODE_GENERAL);
-	}
 	else if (IsWearingDress())
-	{
 		SetMotionMode(CRaceMotionData::MODE_WEDDING_DRESS);
-	}
 	else if (IsHoldingPickAxe())
 	{
 		if (m_kHorse.IsMounting())
-		{
 			SetMotionMode(CRaceMotionData::MODE_HORSE);
-		}
 		else
-		{
 			SetMotionMode(CRaceMotionData::MODE_GENERAL);
-		}
 	}
 	else if (CItemData::ITEM_TYPE_ROD == byItemType)
 	{
 		if (m_kHorse.IsMounting())
-		{
 			SetMotionMode(CRaceMotionData::MODE_HORSE);
-		}
 		else
-		{
 			SetMotionMode(CRaceMotionData::MODE_FISHING);
-		}
 	}
 	else if (m_kHorse.IsMounting())
 	{
@@ -3288,9 +3254,7 @@ void CInstanceBase::RegisterBoundingSphere()
 	// 낙하하는 애니메이션 같은 경우 애니메이션이
 	// 바운드 박스에 영향을 미쳐 컬링이 제대로 이루어지지 않는다.
 	if (!IsStone())
-	{
 		m_GraphicThingInstance.DeformNoSkin();
-	}
 
 	m_GraphicThingInstance.RegisterBoundingSphere();
 }
@@ -3397,7 +3361,7 @@ void CInstanceBase::__Initialize()
 
 	m_bEnableTCPState = TRUE;
 
-	m_stName = "";
+	m_stName.clear();
 
 	memset(m_awPart, 0, sizeof(m_awPart));
 	memset(m_adwCRCAffectEffect, 0, sizeof(m_adwCRCAffectEffect));

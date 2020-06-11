@@ -3,9 +3,10 @@
 #include "../eterLib/FuncObject.h"
 #include "../eterlib/NetStream.h"
 #include "../eterLib/NetPacketHeaderMap.h"
+#include "../eterSecurity/CheatQueueManager.h"
 
 #include "InsultChecker.h"
-
+#include "Locale_inc.h"
 #include "packet.h"
 
 class CInstanceBase;
@@ -82,7 +83,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		void StartGame();
 		void Warp(int32_t lGlobalX, int32_t lGlobalY);
 		
-		void NotifyHack(const char* c_szMsg);		
 		void SetWaitFlag();
 
 		void SendEmoticon(uint32_t eEmoticon);
@@ -312,6 +312,8 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool SendMessengerAddByNamePacket(const char * c_szName);
 		bool SendMessengerRemovePacket(const char * c_szKey, const char * c_szName);
 
+		bool SendHackNotification(const char* c_szMsg, const char* c_szInfo);
+
 	protected:
 		bool OnProcess();	// State들을 실제로 실행한다.
 		void OffLinePhase();
@@ -324,7 +326,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool __IsNotPing();
 
 		void __DownloadMark();
-		void __DownloadSymbol(const std::vector<uint32_t> & c_rkVec_dwGuildID);
+		void __DownloadSymbol(const std::set<uint32_t> & c_rkSet_dwGuildID);
 
 		void __PlayInventoryItemUseSound(TItemPos uSlotPos);
 		void __PlayInventoryItemDropSound(TItemPos uSlotPos);
@@ -642,6 +644,8 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		PyObject*							m_apoPhaseWnd[PHASE_WINDOW_NUM];
 		PyObject*							m_poSerCommandParserWnd;
 
+		CCheatDetectQueueMgr		m_kCheatQueueManager;
+
 		TSimplePlayerInformation			m_akSimplePlayerInfo[PLAYER_PER_ACCOUNT4];
 		uint32_t								m_adwGuildID[PLAYER_PER_ACCOUNT4];
 		std::string							m_astrGuildName[PLAYER_PER_ACCOUNT4];
@@ -693,8 +697,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool m_isEnableChatInsultFilter;
 		bool m_bComboSkillFlag;
 
-		std::deque<std::string> m_kQue_stHack;
-
 	private:
 		struct SDirectEnterMode
 		{
@@ -708,6 +710,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 	public:
 		uint32_t EXPORT_GetBettingGuildWarValue(const char* c_szValueName);
+		std::string GetPhase() { return m_strPhase; };
 
 	private:
 		struct SBettingGuildWar

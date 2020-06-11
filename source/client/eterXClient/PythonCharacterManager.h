@@ -91,6 +91,7 @@ class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, publ
 		// Refresh TextTail
 		void								RefreshAllPCTextTail();
 		void								RefreshAllGuildMark();
+		void								RefreshGuildSymbols(std::set<uint32_t> guildIDSet);
 
 	protected:
 		void								UpdateTransform();

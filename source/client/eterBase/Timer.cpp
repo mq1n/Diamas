@@ -36,13 +36,13 @@ VOID ELTimer_SetServerMSec(uint32_t dwServerTime)
 	if (0 != dwServerTime) // nanomite를 위한 더미 if
 	{
 		gs_dwServerTime = dwServerTime;
-		gs_dwClientTime = CTimer::instance().GetCurrentMillisecond();
+		gs_dwClientTime = CTimer::Instance().GetCurrentMillisecond();
 	}
 }
 
 uint32_t ELTimer_GetServerMSec()
 {
-	return CTimer::instance().GetCurrentMillisecond() - gs_dwClientTime + gs_dwServerTime;
+	return CTimer::Instance().GetCurrentMillisecond() - gs_dwClientTime + gs_dwServerTime;
 	//return ELTimer_GetMSec() - gs_dwClientTime + gs_dwServerTime;
 }
 

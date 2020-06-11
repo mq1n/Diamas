@@ -2,6 +2,7 @@
 #include "PythonGuild.h"
 #include "AbstractPlayer.h"
 #include "MarkManager.h"
+#include "PythonDynamicModuleNames.h"
 
 std::map<uint32_t, uint32_t> g_GuildSkillSlotToIndexMap;
 
@@ -790,7 +791,7 @@ void initguild()
 		{ nullptr,								nullptr,								0 },
 	};
 
-	PyObject * poModule = Py_InitModule("guild", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(GUILD_MODULE).c_str(), s_methods);
 	PyModule_AddIntConstant(poModule, "AUTH_ADD_MEMBER", GUILD_AUTH_ADD_MEMBER);
 	PyModule_AddIntConstant(poModule, "AUTH_REMOVE_MEMBER", GUILD_AUTH_REMOVE_MEMBER);
 	PyModule_AddIntConstant(poModule, "AUTH_NOTICE", GUILD_AUTH_NOTICE);

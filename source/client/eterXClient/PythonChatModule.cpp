@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "PythonChat.h"
 #include "PythonItem.h"
+#include "PythonDynamicModuleNames.h"
 #include "../eterGameLib/ItemManager.h"
 
 PyObject * chatSetChatColor(PyObject* poSelf, PyObject* poArgs)
@@ -497,7 +498,7 @@ void initChat()
 		{ nullptr,						nullptr,						0 },
 	};
 
-	PyObject * poModule = Py_InitModule("chat", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(CHAT_MODULE).c_str(), s_methods);
 
 	PyModule_AddIntConstant(poModule, "CHAT_TYPE_TALKING",		CHAT_TYPE_TALKING);
 	PyModule_AddIntConstant(poModule, "CHAT_TYPE_INFO",			CHAT_TYPE_INFO);

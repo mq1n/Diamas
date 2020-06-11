@@ -26,7 +26,8 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 			TYPE_EMPIRE,
 			TYPE_EMPIRE_END = TYPE_EMPIRE + EMPIRE_NUM,
 			TYPE_TARGET,
-			TYPE_COUNT,
+			TYPE_OFFLINE_SHOP,
+			TYPE_COUNT
 		};
 
 	public:
@@ -61,6 +62,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		void RenderAtlas(float fScreenX, float fScreenY);
 		void ShowAtlas();
 		void HideAtlas();
+		bool ToggleAtlasMarker(int32_t type);
 
 		bool GetAtlasInfo(float fScreenX, float fScreenY, std::string & rReturnString, float * pReturnPosX, float * pReturnPosY, uint32_t * pdwTextColor, uint32_t * pdwGuildID);
 		bool GetAtlasSize(float * pfSizeX, float * pfSizeY);
@@ -70,7 +72,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		void RemoveObserver(uint32_t dwVID);
 
 		// WayPoint
-		void AddWayPoint(uint8_t byType, uint32_t dwID, float fX, float fY, std::string strText, uint32_t dwChrVID=0);
+		void AddWayPoint(uint8_t byType, uint32_t dwID, float fX, float fY, const std::string &strText, uint32_t dwChrVID=0);
 		void RemoveWayPoint(uint32_t dwID);
 
 		// SignalPoint
@@ -84,17 +86,18 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 
 		// NPC List
 		void ClearAtlasMarkInfo();
+		void ClearAtlasPartyInfo();
 		void RegisterAtlasMark(uint8_t byType, const char * c_szName, int32_t lx, int32_t ly);
 
 		// Guild
 		void ClearGuildArea();
 		void RegisterGuildArea(uint32_t dwID, uint32_t dwGuildID, int32_t x, int32_t y, int32_t width, int32_t height);
-		uint32_t GetGuildAreaID(uint32_t x, uint32_t y);
+		uint32_t GetGuildAreaID(int32_t x, int32_t y);
 
 		// Target
 		void CreateTarget(int32_t iID, const char * c_szName);
 		void CreateTarget(int32_t iID, const char * c_szName, uint32_t dwVID);
-		void UpdateTarget(int32_t iID, int32_t ix, int32_t iy);
+		void UpdateTarget(int32_t iID, uint32_t ix, uint32_t iy);
 		void DeleteTarget(int32_t iID);
 
 	protected:
@@ -151,6 +154,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		// 캐릭터 리스트
 		typedef struct 
 		{
+			uint32_t	m_bType;
 			float	m_fX;
 			float	m_fY;
 			uint32_t	m_eNameColor;
@@ -181,7 +185,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		float							m_fMiniMapRadius;
 
 		// 맵 그림...
-		LPDIRECT3DTEXTURE8				m_lpMiniMapTexture[AROUND_AREA_NUM];
+		LPDIRECT3DTEXTURE9				m_lpMiniMapTexture[AROUND_AREA_NUM];
 
 		// 미니맵 커버
 		CGraphicImageInstance			m_MiniMapFilterGraphicImageInstance;
@@ -191,11 +195,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		CGraphicExpandedImageInstance	m_PlayerMark;
 		CGraphicImageInstance			m_WhiteMark;
 
-		TInstanceMarkPositionVector		m_PartyPCPositionVector;
-		TInstanceMarkPositionVector		m_OtherPCPositionVector;
-		TInstanceMarkPositionVector		m_NPCPositionVector;
-		TInstanceMarkPositionVector		m_MonsterPositionVector;
-		TInstanceMarkPositionVector		m_WarpPositionVector;
+		std::vector<TMarkPosition>		m_MinimapPosVector;
 		std::map<uint32_t, SObserver>		m_kMap_dwVID_kObserver;
 
 		bool							m_bAtlas;
@@ -209,6 +209,11 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		D3DXMATRIX						m_matMiniMapCover;
 
 		bool							m_bShowAtlas;
+		bool							m_bAtlasRenderNpc;
+		bool							m_bAtlasRenderWarp;
+		bool							m_bAtlasRenderWaypoint;
+		bool							m_bAtlasRenderParty;
+		bool							m_bAtlasRenderOfflineShop;
 		CGraphicImageInstance			m_AtlasImageInstance;
 		D3DXMATRIX						m_matWorldAtlas;
 		CGraphicExpandedImageInstance	m_AtlasPlayerMark;
@@ -229,9 +234,11 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		typedef TAtlasMarkInfoVector::iterator	TAtlasMarkInfoVectorIterator;
 		typedef std::vector<TGuildAreaInfo>		TGuildAreaInfoVector;
 		typedef TGuildAreaInfoVector::iterator	TGuildAreaInfoVectorIterator;
-		TAtlasMarkInfoVectorIterator			m_AtlasMarkInfoVectorIterator;
+		TAtlasMarkInfoVectorIterator			m_AtlasMarkInfoListIterator;
 		TAtlasMarkInfoVector					m_AtlasNPCInfoVector;
 		TAtlasMarkInfoVector					m_AtlasWarpInfoVector;
+		TAtlasMarkInfoVector					m_AtlasPartyInfoVector;
+		TAtlasMarkInfoVector					m_AtlasOfflineShopInfoVector;
 
 		// WayPoint
 		CGraphicExpandedImageInstance			m_MiniWayPointGraphicImageInstances[MINI_WAYPOINT_IMAGE_COUNT];

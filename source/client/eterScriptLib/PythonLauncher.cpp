@@ -2,6 +2,7 @@
 #include <python27/frameobject.h>
 #include <FileSystemIncl.hpp>
 #include "PythonLauncher.h"
+#include "../eterSecurity/AnticheatManager.h"
 
 #ifdef _DEBUG
 static PyObject* WriteToStderr(PyObject* self, PyObject* args)
@@ -109,6 +110,10 @@ bool CPythonLauncher::RunFile(const std::string& filename, const std::string& mo
 		return false;
 	}
 	data.clear();
+
+#ifdef ENABLE_ANTICHEAT
+	CAnticheatManager::Instance().RemovePythonModuleWatcher();
+#endif
 
 	auto mod = PyImport_ExecCodeModule(const_cast<char*>(modName.c_str()), code);
 	if (!mod)

@@ -31,6 +31,12 @@ void CGraphicObjectInstance::Clear()
 	D3DXMatrixIdentity(&m_PositionMatrix);
 	D3DXMatrixIdentity(&m_TransformMatrix);
 #endif
+	m_vecScalePos.x = m_vecScalePos.y = m_vecScalePos.z = 0.0f;
+	m_vecScaleNew.x = m_vecScaleNew.y = m_vecScaleNew.z = 0.0f;
+
+	D3DXMatrixIdentity(&m_matAbsoluteTrans);
+	D3DXMatrixIdentity(&m_matScale);
+	D3DXMatrixIdentity(&m_matPositon);
 
 	ZeroMemory(m_abyPortalID, sizeof(m_abyPortalID));
 
@@ -233,6 +239,25 @@ void CGraphicObjectInstance::SetScale(float x, float y, float z)
 #endif
 }
 
+void CGraphicObjectInstance::SetScaleNew(float x, float y, float z)
+{
+	m_vecScaleNew.x = x;
+	m_vecScaleNew.y = y;
+	m_vecScaleNew.z = z;
+	D3DXMatrixScaling(&m_matScale, x, y, z);
+}
+
+void CGraphicObjectInstance::SetScaleNew(const D3DXVECTOR3 & newscale)
+{
+	m_vecScaleNew = newscale;
+	D3DXMatrixScaling(&m_matScale, m_vecScaleNew.x, m_vecScaleNew.y, m_vecScaleNew.z);
+}
+
+void CGraphicObjectInstance::SetScalePosition(const D3DXVECTOR3 & newposition)
+{
+	m_vecScalePos = newposition;
+}
+
 void CGraphicObjectInstance::Show()
 {
 	m_isVisible = true;
@@ -337,6 +362,13 @@ void CGraphicObjectInstance::Initialize()
 	D3DXMatrixIdentity(&m_PositionMatrix);
 	D3DXMatrixIdentity(&m_TransformMatrix);
 #endif
+
+	m_vecScalePos.x = m_vecScalePos.y = m_vecScalePos.z = 0.0f;
+	m_vecScaleNew.x = m_vecScaleNew.y = m_vecScaleNew.z = 0.0f;
+
+	D3DXMatrixIdentity(&m_matAbsoluteTrans);
+	D3DXMatrixIdentity(&m_matScale);
+	D3DXMatrixIdentity(&m_matPositon);
 
 	OnInitialize();
 }

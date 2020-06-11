@@ -23,8 +23,10 @@ namespace UI
 			BOOL GetPickedSlotPointer(TSlot ** ppSlot);
 			BOOL GetPickedSlotList(int32_t iWidth, int32_t iHeight, std::list<TSlot*> * pSlotPointerList);
 			BOOL GetGridSlotPointer(int32_t ix, int32_t iy, TSlot ** ppSlot);
+			BOOL GetSlotPointerByNumber (uint32_t dwSlotNumber, TSlot** ppSlot);
 			BOOL GetPickedGridSlotPosition(int32_t ixLocal, int32_t iyLocal, int32_t * pix, int32_t * piy);
 			BOOL CheckMoving(uint32_t dwSlotNumber, uint32_t dwItemIndex, const std::list<TSlot*> & c_rSlotList);
+			BOOL CheckSwapping (uint32_t dwSlotNumber, uint32_t dwItemIndex, const std::list<TSlot*>& c_rSlotList);
 
 			BOOL OnIsType(uint32_t dwType);
 

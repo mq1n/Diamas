@@ -2,8 +2,7 @@
 #include "AnticheatManager.h"
 #include "CheatQueueManager.h"
 #include "NTDefinations.h"
-
-#include <XORstr.h>
+#include <xorstr.hpp>
 
 #if 0
 	if (g_nmApp->SelfHooksInstance()->BlockAPI(xorstr("ntdll.dll").crypt_get(), xorstr("DbgUiIssueRemoteBreakin").crypt_get(), RET_HOOK))
@@ -74,11 +73,11 @@ bool CAnticheatManager::DebugObjectHandleCheck()
 {
 	typedef NTSTATUS(WINAPI* TNtQueryInformationProcess)(HANDLE a, ULONG b, PVOID c, ULONG d, PULONG e);
 
-	auto hNtdll = LoadLibraryA(XOR("ntdll.dll"));
+	auto hNtdll = LoadLibraryA(xorstr("ntdll.dll").crypt_get());
 	if (!hNtdll)
 		return false;
 
-	auto pNtQueryInformationProcess = GetProcAddress(hNtdll, XOR("NtQueryInformationProcess"));
+	auto pNtQueryInformationProcess = GetProcAddress(hNtdll, xorstr("NtQueryInformationProcess").crypt_get());
 	if (!pNtQueryInformationProcess)
 		return false;
 	auto NtQueryInformationProcess = (TNtQueryInformationProcess)pNtQueryInformationProcess;
@@ -109,11 +108,11 @@ bool CAnticheatManager::DebugCheckBugControl()
 {
 	typedef NTSTATUS(WINAPI* TNtQueryInformationProcess)(HANDLE a, ULONG b, PVOID c, ULONG d, PULONG e);
 
-	auto hNtdll = LoadLibraryA(XOR("ntdll.dll"));
+	auto hNtdll = LoadLibraryA(xorstr("ntdll.dll").crypt_get());
 	if (!hNtdll)
 		return false;
 
-	auto pNtQueryInformationProcess = GetProcAddress(hNtdll, XOR("NtQueryInformationProcess"));
+	auto pNtQueryInformationProcess = GetProcAddress(hNtdll, xorstr("NtQueryInformationProcess").crypt_get());
 	if (!pNtQueryInformationProcess)
 		return false;
 	auto NtQueryInformationProcess = (TNtQueryInformationProcess)pNtQueryInformationProcess;
@@ -134,11 +133,11 @@ bool CAnticheatManager::SimpleDebugCheck()
 {
 	typedef NTSTATUS(WINAPI* TNtQueryInformationProcess)(HANDLE a, ULONG b, PVOID c, ULONG d, PULONG e);
 
-	auto hNtdll = LoadLibraryA(XOR("ntdll.dll"));
+	auto hNtdll = LoadLibraryA(xorstr("ntdll.dll").crypt_get());
 	if (!hNtdll)
 		return false;
 
-	auto pNtQueryInformationProcess = GetProcAddress(hNtdll, XOR("NtQueryInformationProcess"));
+	auto pNtQueryInformationProcess = GetProcAddress(hNtdll, xorstr("NtQueryInformationProcess").crypt_get());
 	if (!pNtQueryInformationProcess)
 		return false;
 	auto NtQueryInformationProcess = (TNtQueryInformationProcess)pNtQueryInformationProcess;
@@ -175,16 +174,16 @@ bool CAnticheatManager::SetAntiTrace(HANDLE hThread)
 	if (!IS_VALID_HANDLE(hThread))
 		return false;
 
-	auto hNtdll = LoadLibraryA(XOR("ntdll.dll"));
+	auto hNtdll = LoadLibraryA(xorstr("ntdll.dll").crypt_get());
 	if (!hNtdll)
 		return false;
 
-	auto pNtSetInformationThread = GetProcAddress(hNtdll, XOR("NtSetInformationThread"));
+	auto pNtSetInformationThread = GetProcAddress(hNtdll, xorstr("NtSetInformationThread").crypt_get());
 	if (!pNtSetInformationThread)
 		return false;
 	auto NtSetInformationThread = (TNtSetInformationThread)pNtSetInformationThread;
 
-	auto PNtQueryInformationThread = GetProcAddress(hNtdll, XOR("NtQueryInformationThread"));
+	auto PNtQueryInformationThread = GetProcAddress(hNtdll, xorstr("NtQueryInformationThread").crypt_get());
 	if (!PNtQueryInformationThread)
 		return false;
 	auto NtQueryInformationThread = (TNtQueryInformationThread)PNtQueryInformationThread;

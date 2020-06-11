@@ -156,7 +156,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_METIN2              ICON                    "metin2.ico"
+IDI_METIN2              ICON                    "diamas.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -180,14 +180,14 @@ BEGIN
     BEGIN
         BLOCK "080003b5"
         BEGIN
-            VALUE "CompanyName", "Ymir Entertainment"
-            VALUE "FileDescription", "Metin2Client"
+            VALUE "CompanyName", "Diamas"
+            VALUE "FileDescription", "Diamas client"
             VALUE "FileVersion",  VER_FILE_VERSION_STR "\0"
-            VALUE "InternalName", "Metin2Client"
-            VALUE "LegalCopyright", "Copyright (C) 2011"
-            VALUE "OriginalFilename", "Metin2Client.exe"
-            VALUE "ProductName", "Metin2Client"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "DiamasClient"
+            VALUE "LegalCopyright", "Copyright (C) 2020"
+            VALUE "OriginalFilename", "Diamas.exe"
+            VALUE "ProductName", "Diamas client"
+            VALUE "ProductVersion", __PRODUCT_VERSION__
         END
     END
     BLOCK "VarFileInfo"
@@ -233,7 +233,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 STRINGTABLE 
 BEGIN
-    IDS_APP_NAME            "Metin 2"
+    IDS_APP_NAME            "Diamas"
     IDS_POSSESSIVE_MORPHENE "'s"
     IDS_WARN_BAD_DRIVER     "IDS_WARN_BAD_DRIVER"
     IDS_WARN_NO_TNL         "IDS_WARN_NO_TNL"

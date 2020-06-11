@@ -5,6 +5,7 @@ class CProperty;
 
 #include "../eterLib/SkyBox.h"
 #include "../eterSoundLib/SoundManager.h"
+#include "../eterXClient/Locale_inc.h"
 
 /////////////////////////////////////////////////////////////////
 // Property
@@ -127,13 +128,17 @@ typedef struct SEnvironmentData
 {
 	// Light
 	BOOL		bDirLightsEnable[ENV_DIRLIGHT_NUM];
-	D3DLIGHT8	DirLights[ENV_DIRLIGHT_NUM];
+	D3DLIGHT9	DirLights[ENV_DIRLIGHT_NUM];
 
 	// Material
-	D3DMATERIAL8 Material;
+	D3DMATERIAL9 Material;
 
 	// Fog
+#ifdef ENABLE_FOG_FIX
+	mutable BOOL bFogEnable;
+#else
 	BOOL bFogEnable;
+#endif
 	BOOL bDensityFog;
 
 	float m_fFogNearDistance;

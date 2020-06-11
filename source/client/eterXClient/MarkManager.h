@@ -3,13 +3,13 @@
 
 #include "MarkImage.h"
 
-class CGuildMarkManager : public singleton<CGuildMarkManager>
+class CGuildMarkManager : public CSingleton<CGuildMarkManager>
 {
 	public:
 		enum
 		{
 			MAX_IMAGE_COUNT = 5,
-			INVALID_MARK_ID = 0xffffffff,
+			INVALID_MARK_ID = 0xffffffff
 		};
 
 		// Symbol
@@ -22,7 +22,7 @@ class CGuildMarkManager : public singleton<CGuildMarkManager>
 		CGuildMarkManager();
 		virtual ~CGuildMarkManager();
 
-		const TGuildSymbol * GetGuildSymbol(uint32_t GID);
+		const TGuildSymbol * GetGuildSymbol(uint32_t guildID);
 		bool LoadSymbol(const char* filename);
 		void SaveSymbol(const char* filename);
 		void UploadSymbol(uint32_t guildID, int32_t iSize, const uint8_t* pbyData);
@@ -51,22 +51,18 @@ class CGuildMarkManager : public singleton<CGuildMarkManager>
 		void GetDiffBlocks(uint32_t imgIdx, const uint32_t * crcList, std::map<uint8_t, const SGuildMarkBlock *> & mapDiffBlocks);
 
 		// CLIENT
-		bool SaveBlockFromCompressedData(uint32_t imgIdx, uint32_t idBlock, const uint8_t * pbBlock, uint32_t dwSize);
+		bool SaveBlockFromCompressedData(uint32_t imgIdx, uint32_t posBlock, const uint8_t * pbBlock, uint32_t dwSize);
 		bool GetBlockCRCList(uint32_t imgIdx, uint32_t * crcList);
 
 	private:
 		// 
 		// Mark
 		//
-		CGuildMarkImage * __NewImage();
-		void __DeleteImage(CGuildMarkImage * pkImgDel);
-
 		uint32_t __AllocMarkID(uint32_t guildID);
 
 		CGuildMarkImage * __GetImage(uint32_t imgIdx);
-		CGuildMarkImage * __GetImagePtr(uint32_t idMark);
 
-		std::map<uint32_t, CGuildMarkImage *> m_mapIdx_Image; // index = image index
+		std::map<uint32_t, std::unique_ptr<CGuildMarkImage>> m_mapIdx_Image; // index = image index
 		std::map<uint32_t, uint32_t> m_mapGID_MarkID; // index = guild id
 
 		std::set<uint32_t> m_setFreeMarkID;

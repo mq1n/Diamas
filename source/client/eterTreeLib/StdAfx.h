@@ -7,4 +7,4 @@
 //#include <crtdbg.h>
 
 //#include "Forest.h"
-#include "SpeedTreeForestDirectX8.h"
+#include "SpeedTreeForestDirectX9.h"

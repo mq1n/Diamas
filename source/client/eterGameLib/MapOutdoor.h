@@ -7,14 +7,12 @@
 #include "../eterTerrainLib/TerrainType.h"
 #include "../eterTerrainLib/TextureSet.h"
 
-#include "../eterTreeLib/SpeedTreeForestDirectX8.h"
+#include "../eterTreeLib/SpeedTreeForestDirectX9.h"
 
 #include "MapBase.h"
 #include "Area.h"
 #include "AreaTerrain.h"
 #include "AreaLoaderThread.h"
-
-#include "MonsterAreaInfo.h"
 
 
 #define LOAD_SIZE_WIDTH				1
@@ -71,7 +69,6 @@ class CMapOutdoor : public CMapBase
 
 	protected:
 		bool			Initialize();
-		void			InitializeFog();
 
 		virtual bool	Destroy();
 		virtual void	OnSetEnvironmentDataPtr();
@@ -100,7 +97,7 @@ class CMapOutdoor : public CMapBase
 
 		bool			LoadSetting(const char * c_szFileName);
 
-		void			ApplyLight(uint32_t dwVersion, const D3DLIGHT8& c_rkLight);
+		void			ApplyLight(uint32_t dwVersion, const D3DLIGHT9& c_rkLight);
 		void			SetEnvironmentScreenFilter();
 		void			SetEnvironmentSkyBox();
 		void			SetEnvironmentLensFlare();
@@ -128,6 +125,7 @@ class CMapOutdoor : public CMapBase
 		void			RenderBeforeLensFlare();
 		void			RenderAfterLensFlare();
 		void			RenderScreenFiltering();
+		void 			TextureChange(const char * c_szFileName);
 
 		void			SetWireframe(bool bWireFrame);
 		bool			IsWireframe();
@@ -163,8 +161,6 @@ class CMapOutdoor : public CMapBase
 
 		void			AssignTerrainPtr();				// 현재 좌표에서 주위(ex. 3x3)에 있는 것들의 포인터를 연결한다. (업데이트 시 불려짐)
 
-		void			SaveAlphaFogOperation();
-		void			RestoreAlphaFogOperation();
 
 		//////////////////////////////////////////////////////////////////////////
 		// New
@@ -421,26 +417,19 @@ class CMapOutdoor : public CMapBase
 		void					UnloadWaterTexture();
 		//Water
 		//////////////////////////////////////////////////////////////////////////
-		
-		//////////////////////////////////////////////////////////////////////////
-		// Alpha Fog
-		CGraphicImageInstance	m_AlphaFogImageInstance;
-		D3DXMATRIX				m_matAlphaFogTexture;
-		// Alpha Fog
-		//////////////////////////////////////////////////////////////////////////
 
 		//////////////////////////////////////////////////////////////////////////
 		// Character Shadow
-		LPDIRECT3DTEXTURE8		m_lpCharacterShadowMapTexture;
-		LPDIRECT3DSURFACE8		m_lpCharacterShadowMapRenderTargetSurface;
-		LPDIRECT3DSURFACE8		m_lpCharacterShadowMapDepthSurface;
-		D3DVIEWPORT8			m_ShadowMapViewport;
+		LPDIRECT3DTEXTURE9		m_lpCharacterShadowMapTexture;
+		LPDIRECT3DSURFACE9		m_lpCharacterShadowMapRenderTargetSurface;
+		LPDIRECT3DSURFACE9		m_lpCharacterShadowMapDepthSurface;
+		D3DVIEWPORT9			m_ShadowMapViewport;
 		uint16_t					m_wShadowMapSize;
 
 		// Backup Device Context
-		LPDIRECT3DSURFACE8		m_lpBackupRenderTargetSurface;
-		LPDIRECT3DSURFACE8		m_lpBackupDepthSurface;
-		D3DVIEWPORT8			m_BackupViewport;
+		LPDIRECT3DSURFACE9		m_lpBackupRenderTargetSurface;
+		LPDIRECT3DSURFACE9		m_lpBackupDepthSurface;
+		D3DVIEWPORT9			m_BackupViewport;
 
 		// Character Shadow
 		//////////////////////////////////////////////////////////////////////////
@@ -576,88 +565,11 @@ class CMapOutdoor : public CMapBase
 
 		void __RenderTerrain_AppendPatch(const D3DXVECTOR3& c_rv3Center, float fDistance, int32_t lPatchNum);
 
-		void __RenderTerrain_RenderSoftwareTransformPatch();
 		void __RenderTerrain_RenderHardwareTransformPatch();
 
 	protected:
 		void __HardwareTransformPatch_RenderPatchSplat(int32_t patchnum, uint16_t wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType);
 		void __HardwareTransformPatch_RenderPatchNone(int32_t patchnum, uint16_t wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType);
-
-
-	protected:
-		struct SoftwareTransformPatch_SData
-		{
-			enum
-			{
-				SPLAT_VB_NUM = 8,
-				NONE_VB_NUM = 8,
-			};
-
-			IDirect3DVertexBuffer8* m_pkVBSplat[SPLAT_VB_NUM];
-			IDirect3DVertexBuffer8* m_pkVBNone[NONE_VB_NUM];
-			uint32_t m_dwSplatPos;
-			uint32_t m_dwNonePos;
-			uint32_t m_dwLightVersion;
-		} m_kSTPD;
-
-		struct SoftwareTransformPatch_SRenderState {
-			D3DXMATRIX m_m4Proj;
-			D3DXMATRIX m_m4Frustum;
-			D3DXMATRIX m_m4DynamicShadow;
-			D3DLIGHT8  m_kLight;
-			D3DMATERIAL8 m_kMtrl;
-			D3DXVECTOR3 m_v3Player;
-			uint32_t m_dwFogColor;
-			float m_fScreenHalfWidth;
-			float m_fScreenHalfHeight;
-
-			float m_fFogNearDistance;
-			float m_fFogFarDistance;
-			float m_fFogNearTransZ;
-			float m_fFogFarTransZ;
-			float m_fFogLenInv;
-		};
-
-		struct SoftwareTransformPatch_STVertex
-		{
-			D3DXVECTOR4 kPosition;
-		};
-
-		struct SoftwareTransformPatch_STLVertex
-		{
-			D3DXVECTOR4 kPosition;
-			uint32_t dwDiffuse;
-			uint32_t dwFog;
-			D3DXVECTOR2 kTexTile;
-			D3DXVECTOR2 kTexAlpha;
-			D3DXVECTOR2 kTexStaticShadow;
-			D3DXVECTOR2 kTexDynamicShadow;
-		};
-
-
-		void __SoftwareTransformPatch_ApplyRenderState();
-		void __SoftwareTransformPatch_RestoreRenderState(uint32_t dwFogEnable);
-
-		void __SoftwareTransformPatch_Initialize();
-		bool __SoftwareTransformPatch_Create();
-		void __SoftwareTransformPatch_Destroy();
-		void __SoftwareTransformPatch_BuildPipeline(SoftwareTransformPatch_SRenderState& rkTPRS);
-		void __SoftwareTransformPatch_BuildPipeline_BuildFogFuncTable(SoftwareTransformPatch_SRenderState& rkTPRS);
-		bool __SoftwareTransformPatch_SetTransform(SoftwareTransformPatch_SRenderState& rkTPRS, SoftwareTransformPatch_STLVertex* akTransVertex, CTerrainPatchProxy& rkTerrainPatchProxy, uint32_t uTerrainX, uint32_t uTerrainY, bool isFogEnable, bool isDynamicShadow);
-
-		bool __SoftwareTransformPatch_SetSplatStream(SoftwareTransformPatch_STLVertex* akTransVertex);
-		bool __SoftwareTransformPatch_SetShadowStream(SoftwareTransformPatch_STLVertex* akTransVertex);
-
-		void __SoftwareTransformPatch_ApplyStaticShadowRenderState();
-		void __SoftwareTransformPatch_RestoreStaticShadowRenderState();
-
-		void __SoftwareTransformPatch_ApplyFogShadowRenderState();
-		void __SoftwareTransformPatch_RestoreFogShadowRenderState();
-		void __SoftwareTransformPatch_ApplyDynamicShadowRenderState();
-		void __SoftwareTransformPatch_RestoreDynamicShadowRenderState();
-		void __SoftwareTransformPatch_RenderPatchSplat(SoftwareTransformPatch_SRenderState& rkTPRS, int32_t patchnum, uint16_t wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType, bool isFogEnable);
-		void __SoftwareTransformPatch_RenderPatchNone(SoftwareTransformPatch_SRenderState& rkTPRS, int32_t patchnum, uint16_t wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType);
-
 
 	protected:
 		std::vector<CGraphicObjectInstance *> m_ShadowReceiverVector;
@@ -680,24 +592,6 @@ class CMapOutdoor : public CMapBase
 		CGraphicImageInstance	m_attrImageInstance;
 		CGraphicImageInstance	m_BuildingTransparentImageInstance;
 		D3DXMATRIX				m_matBuildingTransparent;
-
-	protected:
-		CDynamicPool<CMonsterAreaInfo>		m_kPool_kMonsterAreaInfo;
-		TMonsterAreaInfoPtrVector			m_MonsterAreaInfoPtrVector;
-		TMonsterAreaInfoPtrVectorIterator	m_MonsterAreaInfoPtrVectorIterator;
-
-	public:
-		bool LoadMonsterAreaInfo();
-
-		CMonsterAreaInfo * AddMonsterAreaInfo(int32_t lOriginX, int32_t lOriginY, int32_t lSizeX, int32_t lSizeY);
-		void RemoveAllMonsterAreaInfo();
-
-		uint32_t GetMonsterAreaInfoCount() { return m_MonsterAreaInfoPtrVector.size();	}
-		bool GetMonsterAreaInfoFromVectorIndex(uint32_t dwMonsterAreaInfoVectorIndex, CMonsterAreaInfo ** ppMonsterAreaInfo);
-
-		CMonsterAreaInfo * AddNewMonsterAreaInfo(int32_t lOriginX, int32_t lOriginY, int32_t lSizeX, int32_t lSizeY,
-			CMonsterAreaInfo::EMonsterAreaInfoType eMonsterAreaInfoType,
-			uint32_t dwVID, uint32_t dwCount, CMonsterAreaInfo::EMonsterDir eMonsterDir);
 
 	public:
 		void GetBaseXY(uint32_t * pdwBaseX, uint32_t * pdwBaseY);

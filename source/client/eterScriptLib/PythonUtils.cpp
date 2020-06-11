@@ -167,20 +167,6 @@ bool PyTuple_GetUnsignedLong(PyObject* poArgs, int32_t pos, uint32_t* ret)
 	return true;
 }
 
-bool PyTuple_GetUnsignedLongLong(PyObject* poArgs, int32_t pos, uint64_t* ret)
-{
-	if (pos >= PyTuple_Size(poArgs))
-		return false;
-
-	PyObject * poItem = PyTuple_GetItem(poArgs, pos);
-
-	if (!poItem)
-		return false;
-
-	*ret = PyLong_AsUnsignedLongLong(poItem);
-	return true;
-}
-
 bool PyTuple_GetUnsignedInteger(PyObject* poArgs, int32_t pos, uint32_t* ret)
 {
 	if (pos >= PyTuple_Size(poArgs))
@@ -192,6 +178,20 @@ bool PyTuple_GetUnsignedInteger(PyObject* poArgs, int32_t pos, uint32_t* ret)
 		return false;
 	
 	*ret = PyLong_AsUnsignedLong(poItem);
+	return true;
+}
+
+bool PyTuple_GetUnsignedLongLong(PyObject* poArgs, int32_t pos, uint64_t* ret)
+{
+	if (pos >= PyTuple_Size(poArgs))
+		return false;
+
+	PyObject * poItem = PyTuple_GetItem(poArgs, pos);
+
+	if (!poItem)
+		return false;
+
+	*ret = PyLong_AsUnsignedLongLong(poItem);
 	return true;
 }
 

@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "../eterlib/Camera.h"
 #include "../eterLib/TextBar.h"
+#include "../eterLib/GrpDummyFrameBuffer.h"
 
 #include <shlobj.h>
 
@@ -938,6 +939,51 @@ PyObject * grpGetTargetPosition(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildValue("fff", v3Target.x, v3Target.y, v3Target.z);
 }
 
+
+CGraphicDummpyFrameBuffer* GetTmpTexture()
+{
+	static CGraphicDummpyFrameBuffer* tmpTexture = nullptr;
+	if (nullptr == tmpTexture)
+	{
+		tmpTexture = new CGraphicDummpyFrameBuffer();
+	}
+	return tmpTexture;
+}
+
+
+PyObject * grpBeginRenderInTmpTexture(PyObject * poSelf, PyObject * poArgs)
+{
+	GetTmpTexture()->Begin();
+	return Py_BuildNone();
+}
+
+PyObject * grpEndRenderInTmpTexture(PyObject * poSelf, PyObject * poArgs)
+{
+	GetTmpTexture()->End();
+	return Py_BuildNone();
+}
+
+PyObject * grpRenderSubTmpTexture(PyObject * poSelf, PyObject * poArgs)
+{
+	int32_t x, y, width, height;
+	if (!PyTuple_GetLong(poArgs, 0, &x))
+		return Py_BuildException();
+
+	if (!PyTuple_GetLong(poArgs, 1, &y))
+		return Py_BuildException();
+
+	if (!PyTuple_GetLong(poArgs, 2, &width))
+		return Py_BuildException();
+
+	if (!PyTuple_GetLong(poArgs, 3, &height))
+		return Py_BuildException();
+
+	RECT rect = { x, y + 2, x + width, y + (height - 27) };
+	GetTmpTexture()->RenderRect(rect);
+
+	return Py_BuildNone();
+}
+
 void initgrp()
 {
 	static PyMethodDef s_methods[] =
@@ -998,6 +1044,9 @@ void initgrp()
 		{ "ClearTextBar",				grpClearTextBar,				METH_VARARGS },
 		{ "SetTextBarClipRect",			grpSetTextBarClipRect,			METH_VARARGS },
 
+		{ "BeginRenderInTmpTexture", grpBeginRenderInTmpTexture, METH_VARARGS },
+		{ "EndRenderInTmpTexture", grpEndRenderInTmpTexture, METH_VARARGS },
+		{ "RenderSubTmpTexture", grpRenderSubTmpTexture, METH_VARARGS },
 		{ nullptr,							nullptr,							0		},
 	};
 

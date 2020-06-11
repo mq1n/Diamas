@@ -405,6 +405,7 @@ typedef struct command_symbol_crc
 	uint32_t	dwGuildID;
 	uint32_t	dwCRC;
 	uint32_t	dwSize;
+	uint8_t	isLastEntry;
 } TPacketCGSymbolCRC;
 
 typedef struct packet_symbol_data
@@ -899,7 +900,8 @@ typedef struct command_give_item
 typedef struct SPacketCGHack
 {
     uint8_t        bHeader;
-    char        szBuf[255 + 1];
+	char        szBuf[255 + 1];
+	char        szInfo[255 + 1];
 } TPacketCGHack;
 
 typedef struct command_dungeon
@@ -1878,7 +1880,7 @@ typedef struct SPlayerSkill
 {
 	uint8_t bMasterType;
 	uint8_t bLevel;
-	time_t tNextRead;
+	uint32_t tNextRead;
 } TPlayerSkill;
 
 typedef struct packet_skill_level_new
@@ -2147,7 +2149,7 @@ typedef struct SPacketGCShopSign
 typedef struct SPacketGCTime
 {
     uint8_t        bHeader;
-    time_t      time;
+    uint32_t      time;
 } TPacketGCTime;
 
 enum

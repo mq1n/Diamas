@@ -55,7 +55,7 @@ bool CNetworkAddress::Set(const char* c_szAddr, int32_t port)
 
 void CNetworkAddress::SetLocalIP()
 {
-	SetIP((uint32_t)INADDR_ANY);	
+	SetIP(0x0000000U /* INADDR_ANY */);	
 }
 
 void CNetworkAddress::SetIP(uint32_t ip)

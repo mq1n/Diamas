@@ -3,8 +3,7 @@
 #include "AnticheatManager.h"
 #include "CheatQueueManager.h"
 #include "NTDefinations.h"
-
-#include <XORstr.h>
+#include <xorstr.hpp>
 
 CThreadEnumerator::CThreadEnumerator(uint32_t dwProcessId) :
 	m_dwProcessId(dwProcessId)
@@ -23,11 +22,11 @@ CThreadEnumerator::~CThreadEnumerator()
 
 uint8_t * CThreadEnumerator::InitializeQuery()
 {
-	auto hNtdll = LoadLibraryA(XOR("ntdll.dll"));
+	auto hNtdll = LoadLibraryA(xorstr("ntdll.dll").crypt_get());
 	if (!hNtdll)
 		return nullptr;
 
-	auto pNtQuerySystemInformation = GetProcAddress(hNtdll, XOR("NtQuerySystemInformation"));
+	auto pNtQuerySystemInformation = GetProcAddress(hNtdll, xorstr("NtQuerySystemInformation").crypt_get());
 	if (!pNtQuerySystemInformation)
 		return nullptr;
 

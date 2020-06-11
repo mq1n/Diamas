@@ -6,9 +6,7 @@ CAffectFlagContainer::CAffectFlagContainer()
 	Clear();
 }
 
-CAffectFlagContainer::~CAffectFlagContainer()
-{
-}
+CAffectFlagContainer::~CAffectFlagContainer() = default;
 
 void CAffectFlagContainer::Clear()
 {
@@ -22,7 +20,7 @@ void CAffectFlagContainer::CopyInstance(const CAffectFlagContainer& c_rkAffectCo
 
 void CAffectFlagContainer::CopyData(uint32_t uPos, uint32_t uByteSize, const void* c_pvData)
 {
-	const uint8_t* c_pbData=(const uint8_t*)c_pvData; 
+	const auto * c_pbData = static_cast<const uint8_t *>(c_pvData);
 	Element bMask=0x01;
 
 	uint32_t uBitEnd=uPos+uByteSize*8;
@@ -41,7 +39,7 @@ void CAffectFlagContainer::CopyData(uint32_t uPos, uint32_t uByteSize, const voi
 
 void CAffectFlagContainer::ConvertToPosition(uint32_t* uRetX, uint32_t* uRetY) const
 {
-	uint32_t* pos = (uint32_t*)m_aElement;
+	auto * pos = (uint32_t *) m_aElement;
 	*uRetX = pos[0];
 	*uRetY = pos[1];
 }

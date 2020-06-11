@@ -2,9 +2,10 @@
 #define __INC_METIN_II_371GNFBQOCJ_LZO_H__
 
 #include <windows.h>
+#include <lzo/lzo_asm.h>
 #include <lzo/lzo1x.h>
 #include "Singleton.h"
-
+#include <cstdint>
 class CLZObject
 {
 	public:

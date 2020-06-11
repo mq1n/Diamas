@@ -38,7 +38,7 @@ class CMSWindow
 		HWND GetWindowHandle();
 		HINSTANCE GetInstance();
 
-		virtual LRESULT	WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wParam, LPARAM lParam);
+		virtual LRESULT	WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 		virtual void	OnSize(WPARAM wParam, LPARAM lParam);
 		
 	protected:

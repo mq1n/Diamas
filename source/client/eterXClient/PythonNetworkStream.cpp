@@ -9,8 +9,6 @@
 #include "GuildMarkUploader.h"
 #include "MarkManager.h"
 
-#include "ProcessCRC.h"
-
 // MARK_BUG_FIX
 static uint32_t gs_nextDownloadMarkTime = 0;
 // END_OF_MARK_BUG_FIX
@@ -330,10 +328,10 @@ void CPythonNetworkStream::__DownloadMark()
 	rkGuildMarkDownloader.Connect(m_kMarkAuth.m_kNetAddr, m_kMarkAuth.m_dwHandle, m_kMarkAuth.m_dwRandomKey);
 }
 
-void CPythonNetworkStream::__DownloadSymbol(const std::vector<uint32_t> & c_rkVec_dwGuildID)
+void CPythonNetworkStream::__DownloadSymbol(const std::set<uint32_t> & c_rkSet_dwGuildID)
 {
 	CGuildMarkDownloader& rkGuildMarkDownloader=CGuildMarkDownloader::Instance();
-	rkGuildMarkDownloader.ConnectToRecvSymbol(m_kMarkAuth.m_kNetAddr, m_kMarkAuth.m_dwHandle, m_kMarkAuth.m_dwRandomKey, c_rkVec_dwGuildID);
+	rkGuildMarkDownloader.ConnectToRecvSymbol(m_kMarkAuth.m_kNetAddr, m_kMarkAuth.m_dwHandle, m_kMarkAuth.m_dwRandomKey, c_rkSet_dwGuildID);
 }
 
 void CPythonNetworkStream::SetPhaseWindow(uint32_t ePhaseWnd, PyObject* poPhaseWnd)
@@ -400,18 +398,14 @@ uint32_t CPythonNetworkStream::GetAccountCharacterSlotDatau(uint32_t iSlot, uint
 			return rkSimplePlayerInfo.wPort;
 		case ACCOUNT_CHARACTER_SLOT_GUILD_ID:
 			return m_adwGuildID[iSlot];
-			break;
 		case ACCOUNT_CHARACTER_SLOT_CHANGE_NAME_FLAG:
 			return rkSimplePlayerInfo.bChangeName;
-			break;
 		case ACCOUNT_CHARACTER_SLOT_HAIR:
 			return rkSimplePlayerInfo.wHairPart;
-			break;
 
 #ifdef ENABLE_ACCE_SYSTEM
 		case ACCOUNT_CHARACTER_SLOT_ACCE:
 			return rkSimplePlayerInfo.wAccePart;
-			break;
 #endif
 	}
 	return 0;
@@ -558,10 +552,10 @@ bool CPythonNetworkStream::CheckPacket(TPacketHeader * pRetHeader)
 	{
 		if (!Peek(PacketType.iPacketSize))
 		{
-			//Tracef("Not enough packet size: header %d packet size: %d, recv buffer size: %d",
-			//	header,
-			//	PacketType.iPacketSize,
-			//	GetRecvBufferSize());
+			Tracef("Not enough packet size: header %d packet size: %d, recv buffer size: %d",
+				header,
+				PacketType.iPacketSize,
+				GetRecvBufferSize());
 			return false;
 		}
 	}
@@ -573,7 +567,7 @@ bool CPythonNetworkStream::CheckPacket(TPacketHeader * pRetHeader)
 
 	g_iLastPacket[0] = g_iLastPacket[1];
 	g_iLastPacket[1] = header;
-	//Tracenf("header %d size %d", header, PacketType.iPacketSize);
+	Tracenf("header %d size %d", header, PacketType.iPacketSize);
 	//Tracenf("header %d size %d outputpos[%d] security %u", header, PacketType.iPacketSize, m_recvBufOutputPos, IsSecurityMode());
 	return true;
 }
@@ -610,8 +604,6 @@ bool CPythonNetworkStream::RecvPhasePacket()
 
 		case PHASE_SELECT:				// 캐릭터 선택 화면
 			SetSelectPhase();
-
-			BuildProcessCRC();
 	
 			// MARK_BUG_FIX
 			__DownloadMark();
@@ -650,10 +642,7 @@ bool CPythonNetworkStream::RecvPingPacket()
 	if (!Send(sizeof(TPacketCGPong), &kPacketPong))
 		return false;
 
-	if (IsSecurityMode())
-		return SendSequence();
-	else
-		return true;
+	return true;
 }
 
 bool CPythonNetworkStream::RecvDefaultPacket(int32_t header)
@@ -890,6 +879,10 @@ CPythonNetworkStream::CPythonNetworkStream()
 	m_poSerCommandParserWnd = nullptr;
 
 	SetOffLinePhase();
+
+	CCheatDetectQueueMgr::Instance().RegisterReportFunction(
+		std::bind(&CPythonNetworkStream::SendHackNotification, this, std::placeholders::_1, std::placeholders::_2)
+	);
 }
 
 CPythonNetworkStream::~CPythonNetworkStream()

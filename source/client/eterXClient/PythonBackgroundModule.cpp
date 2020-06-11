@@ -3,26 +3,29 @@
 #include "PythonBackground.h"
 #include "../eterlib/StateManager.h"
 #include "../eterGameLib/MapOutDoor.h"
+#include "PythonCharacterManager.h"
+#include "PythonMiniMap.h"
+#include "PythonDynamicModuleNames.h"
 
 PyObject * backgroundIsSoftwareTiling(PyObject * poSelf, PyObject * poArgs)
 {
-	CPythonBackground& rkBG=CPythonBackground::Instance();
-	return Py_BuildValue("i", rkBG.IsSoftwareTilingEnable());
+	return Py_BuildValue("i", 0);
 }
 
 PyObject * backgroundEnableSoftwareTiling(PyObject * poSelf, PyObject * poArgs)
 {
-	int32_t nIsEnable;
-	if (!PyTuple_GetInteger(poArgs, 0, &nIsEnable))
-		return Py_BadArgument();
+	return Py_BuildNone();
+}
 
-	bool isEnable=nIsEnable ? true : false;
+PyObject * backgroundTextureChange(PyObject * poSelf, PyObject * poArgs)
+{
+	char * szFileName;
+	if (!PyTuple_GetString(poArgs, 0, &szFileName))
+		return Py_BuildException();
 
-	CPythonBackground& rkBG=CPythonBackground::Instance();
-	rkBG.ReserveSoftwareTilingEnable(isEnable);
-
-	CPythonSystem& rkSystem=CPythonSystem::Instance();
-	rkSystem.SetSoftwareTiling(isEnable);
+	CPythonBackground& rkBG = CPythonBackground::Instance();
+	CMapOutdoor& rkMap = rkBG.GetMapOutdoorRef();
+	rkMap.TextureChange(szFileName);
 	return Py_BuildNone();
 }
 
@@ -523,6 +526,21 @@ PyObject * backgroundDisableGuildArea(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
+
+#ifdef ENABLE_FOG_FIX
+PyObject * backgroundSetEnvironmentFog(PyObject * poSelf, PyObject * poArgs)
+{
+	bool bFlag;
+	if (!PyTuple_GetBoolean(poArgs, 0, &bFlag))
+		return Py_BadArgument();
+
+	CPythonBackground& rkBG=CPythonBackground::Instance();
+	rkBG.SetEnvironmentFog(bFlag);
+		
+	return Py_BuildNone();
+}
+#endif
+
 void initBackground()
 {
 	static PyMethodDef s_methods[] =
@@ -530,6 +548,7 @@ void initBackground()
 		{ "IsSoftwareTiling",					backgroundIsSoftwareTiling,					METH_VARARGS }, 
 		{ "EnableSoftwareTiling",				backgroundEnableSoftwareTiling,				METH_VARARGS }, 
 		{ "EnableSnow",							backgroundEnableSnow,						METH_VARARGS }, 
+		{ "TextureChange", backgroundTextureChange, METH_VARARGS },
 		{ "GlobalPositionToLocalPosition",		backgroundGlobalPositionToLocalPosition,	METH_VARARGS }, 
 		{ "GlobalPositionToMapInfo",			backgroundGlobalPositionToMapInfo,			METH_VARARGS }, 
 		{ "GetRenderShadowTime",				backgroundGetRenderShadowTime,				METH_VARARGS },
@@ -582,10 +601,14 @@ void initBackground()
 
 		{ "WarpTest",							backgroundWarpTest,							METH_VARARGS },
 
+#ifdef ENABLE_FOG_FIX
+		{ "SetEnvironmentFog",					backgroundSetEnvironmentFog,				METH_VARARGS }, 
+#endif
+
 		{ nullptr, nullptr, 0 },
 	};
 
-	PyObject * poModule = Py_InitModule("background", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(BACKGROUND_MODULE).c_str(), s_methods);
 
 	PyModule_AddIntConstant(poModule, "PART_SKY",				CMapOutdoor::PART_SKY);
 	PyModule_AddIntConstant(poModule, "PART_TREE",				CMapOutdoor::PART_TREE);

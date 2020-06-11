@@ -115,18 +115,11 @@ typedef struct SBoundBox
 
 const uint16_t c_FillRectIndices[6] = { 0, 2, 1, 2, 3, 1 };
 
-/*
-enum EIndexCount
-{
-	LINE_INDEX_COUNT = 2,
-	TRIANGLE_INDEX_COUNT = 2*3,
-	RECTANGLE_INDEX_COUNT = 2*4,
-	CUBE_INDEX_COUNT = 2*4*3,
-	FILLED_TRIANGLE_INDEX_COUNT = 3,
-	FILLED_RECTANGLE_INDEX_COUNT = 3*2,
-	FILLED_CUBE_INDEX_COUNT = 3*2*6,
+enum NONPOW2_SUPPORT_LEVEL {
+	NO_SUPPORT = 0,
+	PARTIAL_SUPPORT,
+	FULL_SUPPORT,
 };
-*/
 
 class CGraphicBase
 {
@@ -134,6 +127,7 @@ class CGraphicBase
 		static uint32_t GetAvailableTextureMemory();
 		static const D3DXMATRIX& GetViewMatrix();
 		static const D3DXMATRIX & GetIdentityMatrix();
+		static int32_t GetNonPow2TextureSupportLevel() { return ms_nonPow2Support; };
 
 		enum
 		{			
@@ -205,6 +199,7 @@ class CGraphicBase
 		
 		void		SetViewport(uint32_t dwX, uint32_t dwY, uint32_t dwWidth, uint32_t dwHeight, float fMinZ, float fMaxZ);
 		static void		GetBackBufferSize(uint32_t* puWidth, uint32_t* puHeight);
+		static void		DetectNonPow2TextureSupport();
 		static bool		IsTLVertexClipping();
 		static bool		IsFastTNL();
 		static bool		IsLowTextureMemory();
@@ -247,19 +242,17 @@ class CGraphicBase
 
 		static HWND						ms_hWnd;
 		static HDC						ms_hDC;
-		static LPDIRECT3D8				ms_lpd3d;
-		static LPDIRECT3DDEVICE8		ms_lpd3dDevice;
+		static LPDIRECT3D9				ms_lpd3d;
+		static LPDIRECT3DDEVICE9		ms_lpd3dDevice;
 		static ID3DXMatrixStack*		ms_lpd3dMatStack;
-		static D3DVIEWPORT8				ms_Viewport;
+		static D3DVIEWPORT9				ms_Viewport;
 
 		static uint32_t					ms_faceCount;
-		static D3DCAPS8					ms_d3dCaps;
+		static D3DCAPS9					ms_d3dCaps;
 		static D3DPRESENT_PARAMETERS	ms_d3dPresentParameter;
 		
 		static uint32_t					ms_dwD3DBehavior;
-		static uint32_t					ms_ptVS;
-		static uint32_t					ms_pntVS;
-		static uint32_t					ms_pnt2VS;
+		static LPDIRECT3DVERTEXDECLARATION9	ms_ptVS, ms_pntVS, ms_pnt2VS;
 
 		static D3DXMATRIX				ms_matScreen0;
 		static D3DXMATRIX				ms_matScreen1;
@@ -299,6 +292,8 @@ class CGraphicBase
 		static bool						ms_bSupportDXT;
 		static bool						ms_isLowTextureMemory;
 		static bool						ms_isHighTextureMemory;
+		static int32_t						ms_nonPow2Support;
+		static bool						ms_bEnableGlobalAntialiasing;
 
 		enum
 		{
@@ -307,6 +302,6 @@ class CGraphicBase
 		};
 		
 		
-		static LPDIRECT3DVERTEXBUFFER8	ms_alpd3dPDTVB[PDT_VERTEXBUFFER_NUM];
-		static LPDIRECT3DINDEXBUFFER8	ms_alpd3dDefIB[DEFAULT_IB_NUM];
+		static LPDIRECT3DVERTEXBUFFER9	ms_alpd3dPDTVB[PDT_VERTEXBUFFER_NUM];
+		static LPDIRECT3DINDEXBUFFER9	ms_alpd3dDefIB[DEFAULT_IB_NUM];
 };

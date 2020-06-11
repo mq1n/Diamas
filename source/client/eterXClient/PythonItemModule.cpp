@@ -2,9 +2,10 @@
 #include "PythonItem.h"
 
 #include "../eterGameLib/ItemManager.h"
-#include "../eterGameLib/GameLibDefines.h"
+#include "locale_inc.h"
 #include "InstanceBase.h"
 #include "AbstractApplication.h"
+#include "PythonDynamicModuleNames.h"
 
 extern int32_t TWOHANDED_WEWAPON_ATT_SPEED_DECREASE_VALUE;
 
@@ -555,7 +556,7 @@ void initItem()
 		{ nullptr,								nullptr,									0		 },
 	};
 
-	PyObject * poModule = Py_InitModule("item", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(ITEM_MODULE).c_str(), s_methods);
 
 	PyModule_AddIntConstant(poModule, "USESOUND_ACCESSORY",			CPythonItem::USESOUND_ACCESSORY);
 	PyModule_AddIntConstant(poModule, "USESOUND_ARMOR",				CPythonItem::USESOUND_ARMOR);

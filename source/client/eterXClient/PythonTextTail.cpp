@@ -16,6 +16,7 @@ const D3DXCOLOR c_TextTail_Item_Color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 const D3DXCOLOR c_TextTail_Chat_Color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 const D3DXCOLOR c_TextTail_Info_Color = D3DXCOLOR(1.0f, 0.785f, 0.785f, 1.0f);
 const D3DXCOLOR c_TextTail_Guild_Name_Color = 0xFFEFD3FF;
+const D3DXCOLOR c_TextTail_Item_Red_Color = 0xFFFF6969;
 const float c_TextTail_Name_Position = -10.0f;
 const float c_fxMarkPosition = 1.5f;
 const float c_fyGuildNamePosition = 15.0f;
@@ -241,21 +242,14 @@ void CPythonTextTail::ArrangeTextTail()
 
 			fxAdd = 8.0f;
 
-			if (LocaleService_IsEUROPE()) // 독일어는 명칭이 길어 오른정렬
+			if( GetDefaultCodePage() == CP_ARABIC )
 			{
-				if( GetDefaultCodePage() == CP_ARABIC )
-				{
-					pTitle->SetPosition(pTextTail->x - (iNameWidth / 2) - iTitleWidth - 4.0f, pTextTail->y, pTextTail->z);
-				}
-				else
-				{
-					pTitle->SetPosition(pTextTail->x - (iNameWidth / 2), pTextTail->y, pTextTail->z);
-				}
+				pTitle->SetPosition(pTextTail->x - (iNameWidth / 2) - iTitleWidth - 4.0f, pTextTail->y, pTextTail->z);
 			}
 			else
 			{
-				pTitle->SetPosition(pTextTail->x - (iNameWidth / 2) - fxAdd, pTextTail->y, pTextTail->z);
-			}			
+				pTitle->SetPosition(pTextTail->x - (iNameWidth / 2), pTextTail->y, pTextTail->z);
+			}
 			pTitle->Update();
 
 			// Level 위치 업데이트
@@ -265,20 +259,14 @@ void CPythonTextTail::ArrangeTextTail()
 				int32_t iLevelWidth, iLevelHeight;
 				pLevel->GetTextSize(&iLevelWidth, &iLevelHeight);
 				
-				if (LocaleService_IsEUROPE()) // 독일어는 명칭이 길어 오른정렬
+
+				if( GetDefaultCodePage() == CP_ARABIC )
 				{
-					if( GetDefaultCodePage() == CP_ARABIC )
-					{
-						pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - iLevelWidth - iTitleWidth - 8.0f, pTextTail->y, pTextTail->z);
-					}
-					else
-					{
-						pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - iTitleWidth, pTextTail->y, pTextTail->z);
-					}
+					pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - iLevelWidth - iTitleWidth - 8.0f, pTextTail->y, pTextTail->z);
 				}
 				else
 				{
-					pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - fxAdd - iTitleWidth, pTextTail->y, pTextTail->z);
+					pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - iTitleWidth, pTextTail->y, pTextTail->z);
 				}
 
 				pLevel->Update();
@@ -295,20 +283,13 @@ void CPythonTextTail::ArrangeTextTail()
 				int32_t iLevelWidth, iLevelHeight;
 				pLevel->GetTextSize(&iLevelWidth, &iLevelHeight);
 				
-				if (LocaleService_IsEUROPE()) // 독일어는 명칭이 길어 오른정렬
+				if( GetDefaultCodePage() == CP_ARABIC )
 				{
-					if( GetDefaultCodePage() == CP_ARABIC )
-					{
-						pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - iLevelWidth - 4.0f, pTextTail->y, pTextTail->z);
-					}
-					else
-					{
-						pLevel->SetPosition(pTextTail->x - (iNameWidth / 2), pTextTail->y, pTextTail->z);
-					}
+					pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - iLevelWidth - 4.0f, pTextTail->y, pTextTail->z);
 				}
 				else
 				{
-					pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - fxAdd, pTextTail->y, pTextTail->z);
+					pLevel->SetPosition(pTextTail->x - (iNameWidth / 2), pTextTail->y, pTextTail->z);
 				}
 
 				pLevel->Update();
@@ -724,6 +705,14 @@ void CPythonTextTail::SetItemTextTailOwner(uint32_t dwVID, const char * c_szName
 		pTextTail->pOwnerTextInstance->SetHorizonalAlign(CGraphicTextInstance::HORIZONTAL_ALIGN_CENTER);
 		pTextTail->pOwnerTextInstance->SetValue(strName.c_str());
 		pTextTail->pOwnerTextInstance->SetColor(1.0f, 1.0f, 0.0f);
+		
+		CInstanceBase * pInstanceBase = CPythonCharacterManager::Instance().GetMainInstancePtr();
+		if (pInstanceBase)
+		{
+			if (strcmp(pInstanceBase->GetNameString(), c_szName))
+				pTextTail->pOwnerTextInstance->SetColor(c_TextTail_Item_Red_Color.r, c_TextTail_Item_Red_Color.g, c_TextTail_Item_Red_Color.b);
+		}
+		
 		pTextTail->pOwnerTextInstance->Update();
 
 		int32_t xOwnerSize, yOwnerSize;
@@ -902,10 +891,7 @@ void CPythonTextTail::AttachTitle(uint32_t dwVID, const char * c_szName, const D
 		prTitle->SetTextPointer(ms_pFont);
 		prTitle->SetOutline(true);
 
-		if (LocaleService_IsEUROPE())
-			prTitle->SetHorizonalAlign(CGraphicTextInstance::HORIZONTAL_ALIGN_RIGHT);
-		else
-			prTitle->SetHorizonalAlign(CGraphicTextInstance::HORIZONTAL_ALIGN_CENTER);
+		prTitle->SetHorizonalAlign(CGraphicTextInstance::HORIZONTAL_ALIGN_RIGHT);
 		prTitle->SetVerticalAlign(CGraphicTextInstance::VERTICAL_ALIGN_BOTTOM);
 	}
 

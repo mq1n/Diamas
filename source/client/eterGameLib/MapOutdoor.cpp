@@ -68,25 +68,16 @@ struct FGetPickingPoint
 
 CMapOutdoor::CMapOutdoor()
 {
-	CGraphicImage * pAlphaFogImage = (CGraphicImage *) CResourceManager::Instance().GetResourcePointer("D:/ymir work/special/fog.tga");
 	CGraphicImage * pAttrImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer("d:/ymir work/special/white.dds");
 	CGraphicImage * pBuildTransparentImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer("d:/ymir Work/special/PCBlockerAlpha.dds");
-	m_AlphaFogImageInstance.SetImagePointer(pAlphaFogImage);
 	m_attrImageInstance.SetImagePointer(pAttrImage);
 	m_BuildingTransparentImageInstance.SetImagePointer(pBuildTransparentImage);
 
 	Initialize();
-
-	__SoftwareTransformPatch_Initialize();
-	__SoftwareTransformPatch_Create();
 }
 
 CMapOutdoor::~CMapOutdoor()
 {
-	__SoftwareTransformPatch_Destroy();
-
-	// 2004.10.14.myevan.TEMP_CAreaLoaderThread
-	//ms_AreaLoaderThread.Shutdown();
 	Destroy();
 }
 
@@ -172,7 +163,6 @@ bool CMapOutdoor::Initialize()
 
 	D3DXMatrixIdentity(&m_matWorldForCommonUse);
 	
-	InitializeFog();
 	InitializeVisibleParts();
 
 	m_dwBaseX = 0;
@@ -212,13 +202,10 @@ bool CMapOutdoor::Destroy()
 	CTerrain::DestroySystem();
 	CArea::DestroySystem();
 
-	RemoveAllMonsterAreaInfo();
 
 	m_rkList_kGuildArea.clear();
-	m_kPool_kMonsterAreaInfo.Destroy();
-	m_AlphaFogImageInstance.Destroy();
 
-	CSpeedTreeForestDirectX8::Instance().Clear();
+	CSpeedTreeForestDirectX9::Instance().Clear();
 
 	return true;
 }
@@ -248,19 +235,20 @@ void CMapOutdoor::OnBeginEnvironment()
 	if (!mc_pEnvironmentData)
 		return;
 
-	CSpeedTreeForestDirectX8& rkForest=CSpeedTreeForestDirectX8::Instance();
+	CSpeedTreeForestDirectX9& rkForest=CSpeedTreeForestDirectX9::Instance();
 	rkForest.SetFog(
 		mc_pEnvironmentData->GetFogNearDistance(), 
 		mc_pEnvironmentData->GetFogFarDistance()
 	);
 
-	const D3DLIGHT8& c_rkLight = mc_pEnvironmentData->DirLights[ENV_DIRLIGHT_CHARACTER];
+	const D3DLIGHT9& c_rkLight = mc_pEnvironmentData->DirLights[ENV_DIRLIGHT_BACKGROUND];
 	rkForest.SetLight(
 		(const float *)&c_rkLight.Direction,
 		(const float *)&c_rkLight.Ambient, 
 		(const float *)&c_rkLight.Diffuse);
 	
-	rkForest.SetWindStrength(mc_pEnvironmentData->fWindStrength);
+	//We dont even support wind strength!
+	//rkForest.SetWindStrength(mc_pEnvironmentData->fWindStrength);
 }
 
 void CMapOutdoor::OnSetEnvironmentDataPtr()
@@ -286,6 +274,33 @@ void CMapOutdoor::SetEnvironmentScreenFilter()
 	m_ScreenFilter.SetEnable(mc_pEnvironmentData->bFilteringEnable);
 	m_ScreenFilter.SetBlendType(mc_pEnvironmentData->byFilteringAlphaSrc, mc_pEnvironmentData->byFilteringAlphaDest);
 	m_ScreenFilter.SetColor(mc_pEnvironmentData->FilteringColor);
+}
+
+void CMapOutdoor::TextureChange(const char * c_szFileName)
+{
+	m_fTerrainTexCoordBase = 1.0f / (float)(CTerrainImpl::PATCH_XSIZE * CTerrainImpl::CELLSCALE);
+
+	std::string strFileName;
+	StringPath(c_szFileName, strFileName);
+
+	std::string stTextureSetFileName = strFileName;
+
+	// TextureSet ? ?? ?? ?? ?? ????.
+	if (0 != stTextureSetFileName.find_first_of("textureset", 0))
+		stTextureSetFileName = "textureset\\" + strFileName;
+
+	if (!m_TextureSet.Load(stTextureSetFileName.c_str(), m_fTerrainTexCoordBase))
+	{
+#ifdef WORLD_EDITOR
+		// TextureSet ? ???? ?? ??? ??
+		LogBox("TextureSet ? ?????? ?? ? ???.\n?? ??? ??? ????? ????.");
+#else
+		TraceError("MapOutdoor::LoadSetting(c_szFileName=%s) - LOAD TEXTURE SET(%s) ERROR", c_szFileName, stTextureSetFileName.c_str());
+		return;
+#endif
+	}
+
+	CTerrain::SetTextureSet(&m_TextureSet);
 }
 
 void CMapOutdoor::SetEnvironmentSkyBox()
@@ -1051,39 +1066,6 @@ BOOL CMapOutdoor::GetTerrainPointer(const uint8_t c_byTerrainNum, CTerrain ** pp
 	return TRUE;
 }
 
-void CMapOutdoor::InitializeFog()
-{
-	memset(&m_matAlphaFogTexture, 0, sizeof(D3DXMATRIX));
-	m_matAlphaFogTexture._31 = -0.001f;
-	m_matAlphaFogTexture._41 = -7.0f;
-	m_matAlphaFogTexture._42 = 0.5f;
-}
-
-void CMapOutdoor::SaveAlphaFogOperation()
-{
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_COLORARG1,	D3DTA_CURRENT);
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_COLOROP,	D3DTOP_SELECTARG1);
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAARG1,	D3DTA_CURRENT);
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAARG2,	D3DTA_TEXTURE);
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAOP,	D3DTOP_MODULATE);
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT2);
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_TEXCOORDINDEX, D3DTSS_TCI_CAMERASPACEPOSITION);
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
-
-	STATEMANAGER.SetTransform(D3DTS_TEXTURE1, &m_matAlphaFogTexture);
-	STATEMANAGER.SaveRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	STATEMANAGER.SetTexture(1, m_AlphaFogImageInstance.GetTexturePointer()->GetD3DTexture());
-}
-
-void CMapOutdoor::RestoreAlphaFogOperation()
-{
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_DISABLE);
-	STATEMANAGER.SetTextureStageState(1, D3DTSS_TEXCOORDINDEX, 1);
-	STATEMANAGER.RestoreRenderState(D3DRS_ALPHABLENDENABLE);
-}
-
-
 void CMapOutdoor::SetDrawShadow(bool bDrawShadow)
 {
 	m_bDrawShadow = bDrawShadow;
@@ -1265,62 +1247,6 @@ bool CMapOutdoor::GetAttr(int32_t iX, int32_t iY, uint8_t * pbyAttr)
 	return true;
 }
 
-// MonsterAreaInfo
-CMonsterAreaInfo * CMapOutdoor::AddMonsterAreaInfo(int32_t lOriginX, int32_t lOriginY, int32_t lSizeX, int32_t lSizeY)
-{
-	CMonsterAreaInfo * pMonsterAreaInfo = m_kPool_kMonsterAreaInfo.Alloc();
-	pMonsterAreaInfo->Clear();
-	pMonsterAreaInfo->SetOrigin(lOriginX, lOriginY);
-	pMonsterAreaInfo->SetSize(lSizeX, lSizeY);
-	m_MonsterAreaInfoPtrVector.push_back(pMonsterAreaInfo);
-
-	return pMonsterAreaInfo;
-}
-
-void CMapOutdoor::RemoveAllMonsterAreaInfo()
-{
-	m_MonsterAreaInfoPtrVectorIterator = m_MonsterAreaInfoPtrVector.begin();
-	while (m_MonsterAreaInfoPtrVectorIterator != m_MonsterAreaInfoPtrVector.end())
-	{
-		CMonsterAreaInfo * pMonsterAreaInfo = *m_MonsterAreaInfoPtrVectorIterator;
-		pMonsterAreaInfo->Clear();
-		++m_MonsterAreaInfoPtrVectorIterator;
-	}
-	m_kPool_kMonsterAreaInfo.FreeAll();
-	m_MonsterAreaInfoPtrVector.clear();
-}
-
-bool CMapOutdoor::GetMonsterAreaInfoFromVectorIndex(uint32_t dwMonsterAreaInfoVectorIndex, CMonsterAreaInfo ** ppMonsterAreaInfo)
-{
-	if (dwMonsterAreaInfoVectorIndex >= m_MonsterAreaInfoPtrVector.size())
-		return false;
-	
-	*ppMonsterAreaInfo = m_MonsterAreaInfoPtrVector[dwMonsterAreaInfoVectorIndex];
-	return true;
-}
-
-//////////////////////////////////////////////////////////////////////////
-CMonsterAreaInfo * CMapOutdoor::AddNewMonsterAreaInfo(int32_t lOriginX, int32_t lOriginY, int32_t lSizeX, int32_t lSizeY,
-										CMonsterAreaInfo::EMonsterAreaInfoType eMonsterAreaInfoType,
-										uint32_t dwVID, uint32_t dwCount, CMonsterAreaInfo::EMonsterDir eMonsterDir)
-{
-	CMonsterAreaInfo * pMonsterAreaInfo = m_kPool_kMonsterAreaInfo.Alloc();
-	pMonsterAreaInfo->Clear();
-	pMonsterAreaInfo->SetOrigin(lOriginX, lOriginY);
-	pMonsterAreaInfo->SetSize(lSizeX, lSizeY);
-
-	pMonsterAreaInfo->SetMonsterAreaInfoType(eMonsterAreaInfoType);
-
-	if (CMonsterAreaInfo::MONSTERAREAINFOTYPE_MONSTER == eMonsterAreaInfoType)
-		pMonsterAreaInfo->SetMonsterVID(dwVID);
-	else if (CMonsterAreaInfo::MONSTERAREAINFOTYPE_GROUP == eMonsterAreaInfoType)
-		pMonsterAreaInfo->SetMonsterGroupID(dwVID);
-	pMonsterAreaInfo->SetMonsterCount(dwCount);
-	pMonsterAreaInfo->SetMonsterDirection(eMonsterDir);
-	m_MonsterAreaInfoPtrVector.push_back(pMonsterAreaInfo);
-
-	return pMonsterAreaInfo;
-}
 
 //////////////////////////////////////////////////////////////////////////
 void CMapOutdoor::GetBaseXY(uint32_t * pdwBaseX, uint32_t * pdwBaseY)
@@ -1350,7 +1276,7 @@ void CMapOutdoor::XMasTree_Destroy()
 {
 	if (m_kXMas.m_pkTree)
 	{
-		CSpeedTreeForestDirectX8& rkForest=CSpeedTreeForestDirectX8::Instance();
+		CSpeedTreeForestDirectX9& rkForest=CSpeedTreeForestDirectX9::Instance();
 		m_kXMas.m_pkTree->Clear();
 		rkForest.DeleteInstance(m_kXMas.m_pkTree);
 		m_kXMas.m_pkTree=nullptr;
@@ -1368,7 +1294,7 @@ void CMapOutdoor::__XMasTree_Create(float x, float y, float z, const char* c_szT
 	assert(nullptr==m_kXMas.m_pkTree);
 	assert(-1==m_kXMas.m_iEffectID);
 
-	CSpeedTreeForestDirectX8& rkForest=CSpeedTreeForestDirectX8::Instance();
+	CSpeedTreeForestDirectX9& rkForest=CSpeedTreeForestDirectX9::Instance();
 	uint32_t dwCRC32 = GetCaseCRC32(c_szTreeName, strlen(c_szTreeName));
 	m_kXMas.m_pkTree=rkForest.CreateInstance(x, y, z, dwCRC32, c_szTreeName);
 

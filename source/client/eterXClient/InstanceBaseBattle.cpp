@@ -154,13 +154,15 @@ bool CInstanceBase::NEW_GetFrontInstance(CInstanceBase ** ppoutTargetInstance, f
 	std::multimap<float, CInstanceBase*> kMap_pkInstNear;
 	{
 		CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
-		CPythonCharacterManager::CharacterIterator i;
-		for(i = rkChrMgr.CharacterInstanceBegin(); i!=rkChrMgr.CharacterInstanceEnd(); ++i)
+		for (CPythonCharacterManager::CharacterIterator i = rkChrMgr.CharacterInstanceBegin(); i != rkChrMgr.CharacterInstanceEnd(); ++i)
 		{
 			CInstanceBase* pkInstEach=*i;
 			if (pkInstEach==this)
 				continue;
-
+			
+			if (pkInstEach == nullptr)
+				continue;
+			
 			if (!IsAttackableInstance(*pkInstEach))
 				continue;
 
@@ -176,7 +178,7 @@ bool CInstanceBase::NEW_GetFrontInstance(CInstanceBase ** ppoutTargetInstance, f
 			float fMaxDstDirRot=fDstRot+fHalfFanRot;
 
 			if (fEachInstDirRot>=fMinDstDirRot && fEachInstDirRot<=fMaxDstDirRot)
-				kMap_pkInstNear.insert(std::multimap<float, CInstanceBase*>::value_type(fEachInstDistance, pkInstEach));
+				kMap_pkInstNear.emplace(fEachInstDistance, pkInstEach);
 		}
 	}
 
@@ -202,11 +204,13 @@ bool CInstanceBase::NEW_GetInstanceVectorInFanRange(float fSkillDistance, CInsta
 	std::multimap<float, CInstanceBase*> kMap_pkInstNear;
 	{
 		CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
-		CPythonCharacterManager::CharacterIterator i;
-		for(i = rkChrMgr.CharacterInstanceBegin(); i!=rkChrMgr.CharacterInstanceEnd(); ++i)
+		for (CPythonCharacterManager::CharacterIterator i = rkChrMgr.CharacterInstanceBegin(); i != rkChrMgr.CharacterInstanceEnd(); ++i)
 		{
 			CInstanceBase* pkInstEach=*i;
 			if (pkInstEach==this)
+				continue;
+			
+			if (pkInstEach == nullptr)
 				continue;
 
 			// 2004.07.25.myevan - 적인 경우만 추가한다
@@ -225,15 +229,15 @@ bool CInstanceBase::NEW_GetInstanceVectorInFanRange(float fSkillDistance, CInsta
 				float fMaxDstDirRot=fDstDirRot+fHalfFanRot;
 
 				if (fEachInstDirRot>=fMinDstDirRot && fEachInstDirRot<=fMaxDstDirRot)
-					kMap_pkInstNear.insert(std::multimap<float, CInstanceBase*>::value_type(fEachInstDistance, pkInstEach));
+					kMap_pkInstNear.emplace(fEachInstDistance, pkInstEach);
 			}
 		}
 	}
 
 	{
-		std::multimap<float, CInstanceBase*>::iterator i=kMap_pkInstNear.begin();
+		auto i = kMap_pkInstNear.begin();
 		for (i=kMap_pkInstNear.begin(); i!=kMap_pkInstNear.end(); ++i)
-			pkVct_pkInst->push_back(i->second);
+			pkVct_pkInst->emplace_back(i->second);
 	}
 
 	if (pkVct_pkInst->empty())
@@ -248,8 +252,7 @@ bool CInstanceBase::NEW_GetInstanceVectorInCircleRange(float fSkillDistance, std
 
 	{
 		CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
-		CPythonCharacterManager::CharacterIterator i;
-		for(i = rkChrMgr.CharacterInstanceBegin(); i!=rkChrMgr.CharacterInstanceEnd(); ++i)
+		for (CPythonCharacterManager::CharacterIterator i = rkChrMgr.CharacterInstanceBegin(); i != rkChrMgr.CharacterInstanceEnd(); ++i)
 		{
 			CInstanceBase* pkInstEach=*i;
 
@@ -264,15 +267,15 @@ bool CInstanceBase::NEW_GetInstanceVectorInCircleRange(float fSkillDistance, std
 			if (m_GraphicThingInstance.IsClickableDistanceDestInstance(pkInstEach->m_GraphicThingInstance, fSkillDistance))
 			{
 				float fEachInstDistance=NEW_GetDistanceFromDestInstance(*pkInstEach);
-				kMap_pkInstNear.insert(std::make_pair(fEachInstDistance, pkInstEach));
+				kMap_pkInstNear.emplace(fEachInstDistance, pkInstEach);
 			}
 		}
 	}
 
 	{
-		std::multimap<float, CInstanceBase*>::iterator i=kMap_pkInstNear.begin();
+		auto i = kMap_pkInstNear.begin();
 		for (i=kMap_pkInstNear.begin(); i!=kMap_pkInstNear.end(); ++i)
-			pkVct_pkInst->push_back(i->second);
+			pkVct_pkInst->emplace_back(i->second);
 	}
 
 	if (pkVct_pkInst->empty())
@@ -377,14 +380,7 @@ void CInstanceBase::NEW_Attack(float fDirRot)
 	}
 	else
 	{
-		if (m_kHorse.IsMounting())
-		{
-			InputComboAttack(fDirRot);
-		}
-		else
-		{
-			InputComboAttack(fDirRot);
-		}
+		InputComboAttack(fDirRot);
 	}
 }
 
@@ -430,16 +426,12 @@ void CInstanceBase::AttackProcess()
 		if (pkInstEach!=this)
 		{
 			if (CheckAttacking(*pkInstEach))
-			{
 				pkInstLast=pkInstEach;
-			}
 		}
 	}
 
 	if (pkInstLast)
-	{
 		m_dwLastDmgActorVID=pkInstLast->GetVirtualID();
-	}
 }
 
 void CInstanceBase::InputNormalAttack(float fAtkDirRot)
@@ -468,10 +460,6 @@ void CInstanceBase::RunComboAttack(float fAtkDirRot, uint32_t wMotionIndex)
 // 리턴값 TRUE가 무엇인가가 있다
 BOOL CInstanceBase::CheckAdvancing()
 {
-#ifdef __MOVIE_MODE__
-	if (IsMovieMode())
-		return FALSE;
-#endif
 	if (!__IsMainInstance() && !IsAttacking())
 	{
 		if (IsPC() && IsWalking())
@@ -496,18 +484,16 @@ BOOL CInstanceBase::CheckAdvancing()
 	}
 
 	if (m_GraphicThingInstance.CanSkipCollision())
-	{
-		//Tracenf("%x VID %d 충돌 스킵", ELTimer_GetMSec(), GetVirtualID());
 		return FALSE;
-	}
-
 
 	BOOL bUsingSkill = m_GraphicThingInstance.IsUsingSkill();
+	BOOL bIsInSafe = IsInSafe();
 
 	m_dwAdvActorVID = 0;
 	uint32_t uCollisionCount=0;
 
 	CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
+	CPythonBackground& rkBG = CPythonBackground::Instance();
 	for(CPythonCharacterManager::CharacterIterator i = rkChrMgr.CharacterInstanceBegin(); i!=rkChrMgr.CharacterInstanceEnd();++i)
 	{
 		CInstanceBase* pkInstEach=*i;
@@ -520,8 +506,34 @@ BOOL CInstanceBase::CheckAdvancing()
 		//NOTE : Skil을 쓰더라도 Door Type과는 Collision체크 한다.
 		if( bUsingSkill && !rkActorEach.IsDoor() )
 			continue;
+		
+		if (rkActorEach.IsNPC() && !rkActorEach.IsDoor() && rkActorEach.GetRace() != 30121 && rkActorEach.GetRace() != 9009 && rkActorEach.GetRace() != 20506 && rkActorEach.GetRace() != 9546 && rkActorEach.GetRace() != 9547 && rkActorEach.GetRace() != 9548)
+			continue;
+	
+		// Collision skipping when in safezone
+		if (bIsInSafe && pkInstEach->IsPC())
+			continue;
 			
-		// 앞으로 전진할수 있는가?
+		if (rkActorEach.IsPC() && strcmp(rkBG.GetWarpMapName(), "metin2_map_oxevent") == 0) 
+		{
+			TPixelPosition pPixelPosition = rkActorSelf.NEW_GetCurPixelPositionRef();
+			
+			int32_t x = pPixelPosition.x/100;
+			int32_t y = pPixelPosition.y/100; 
+			
+			D3DXVECTOR2 playerPos(x, y);
+			D3DXVECTOR2 cornerA(221, 228);
+			D3DXVECTOR2 cornerB(300, 228);
+			D3DXVECTOR2 cornerD(221, 265);
+			
+			int32_t width = cornerB.x - cornerA.x;
+			int32_t height = cornerD.y * cornerA.y;
+			
+			if (playerPos.x > cornerA.x && playerPos.x < cornerA.x + width &&
+				playerPos.y > cornerA.y && playerPos.y < cornerA.x + height) //Inside the rectangle
+					continue;
+		}		
+		
 		if (rkActorSelf.TestActorCollision(rkActorEach))
 		{
 			uCollisionCount++;
@@ -537,21 +549,13 @@ BOOL CInstanceBase::CheckAdvancing()
 				rkActorSelf.BlockMovement();
 				return TRUE;
 			}
-			else
-			{
-				NEW_MoveToDestPixelPositionDirection(NEW_GetDstPixelPositionRef());
-			}
+
+			NEW_MoveToDestPixelPositionDirection(NEW_GetDstPixelPositionRef());
 		}
 	}
-
-	// 맵속성 체크
-	CPythonBackground& rkBG=CPythonBackground::Instance();
 	const D3DXVECTOR3 & rv3Position = m_GraphicThingInstance.GetPosition();
 	const D3DXVECTOR3 & rv3MoveDirection = m_GraphicThingInstance.GetMovementVectorRef();
-
-	// NOTE : 만약 이동 거리가 크다면 쪼개서 구간 별로 속성을 체크해 본다
-	//        현재 설정해 놓은 10.0f는 임의의 거리 - [levites]
-	int32_t iStep = int32_t(D3DXVec3Length(&rv3MoveDirection) / 10.0f);
+	auto iStep = int32_t(D3DXVec3Length(&rv3MoveDirection) / 10.0f);
 	D3DXVECTOR3 v3CheckStep = rv3MoveDirection / float(iStep);
 	D3DXVECTOR3 v3CheckPosition = rv3Position;
 	for (int32_t j = 0; j < iStep; ++j)
@@ -584,10 +588,6 @@ BOOL CInstanceBase::CheckAttacking(CInstanceBase& rkInstVictim)
 
 	if (rkInstVictim.IsInSafe())
 		return FALSE;
-
-#ifdef __MOVIE_MODE__
-	return FALSE;
-#endif
 
 	if (!m_GraphicThingInstance.AttackingProcess(rkInstVictim.m_GraphicThingInstance))
 		return FALSE;
@@ -708,12 +708,19 @@ void CInstanceBase::Die()
 
 void CInstanceBase::Hide()
 {
+	m_bIsHidden = true;
 	m_GraphicThingInstance.SetAlphaValue(0.0f);
 	m_GraphicThingInstance.BlendAlphaValue(0.0f, 0.1f);
 }
 
 void CInstanceBase::Show()
 {
+	m_bIsHidden = false;
 	m_GraphicThingInstance.SetAlphaValue(1.0f);
 	m_GraphicThingInstance.BlendAlphaValue(1.0f, 0.1f);
+}
+
+bool CInstanceBase::IsHidden()
+{
+	return m_bIsHidden;
 }

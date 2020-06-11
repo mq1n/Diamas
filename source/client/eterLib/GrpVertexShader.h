@@ -9,7 +9,7 @@ class CVertexShader : public CGraphicBase
 		virtual ~CVertexShader();
 
 		void Destroy();
-		bool CreateFromDiskFile(const char* c_szFileName, const DWORD* c_pdwVertexDecl);
+		bool CreateFromDiskFile(const char* c_szFileName, const uint32_t* c_pdwVertexDecl);
 
 		void Set();
 
@@ -17,5 +17,5 @@ class CVertexShader : public CGraphicBase
 		void Initialize();
 
 	protected:
-		DWORD m_handle;
+		uint32_t m_handle;
 };

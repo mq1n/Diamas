@@ -26,15 +26,20 @@ LPVOID CSoundData::Get()
 	m_dwAccessTime = ELTimer_GetMSec(); 
 
 	if (!m_data)
-		ReadFromDisk();
+	{
+		if (!ReadFromDisk())
+		{
+			TraceError("%s can not read from disk", m_filename);
+//			return nullptr;
+		}
+	}
 
 	if (m_flag & FLAG_DATA_SIZE)
 		return ((S32 *) m_data + 1);
-	else
-		return (m_data);
+	return m_data;
 }
  
-uint32_t CSoundData::GetSize()
+DWORD CSoundData::GetSize()
 {
 	return m_size;
 }

@@ -241,6 +241,17 @@ bool CEffectManager::DestroyEffectInstance(uint32_t dwInstanceIndex)
 	return true;
 }
 
+void CEffectManager::ActiveEffectInstance(uint32_t dwInstanceIndex)
+{
+	TEffectInstanceMap::iterator itor = m_kEftInstMap.find(dwInstanceIndex);
+
+	if (itor == m_kEftInstMap.end())
+		return;
+
+	CEffectInstance * pEffectInstance = itor->second;
+	pEffectInstance->SetActive();
+}
+
 void CEffectManager::DeactiveEffectInstance(uint32_t dwInstanceIndex)
 {
 	TEffectInstanceMap::iterator itor = m_kEftInstMap.find(dwInstanceIndex);

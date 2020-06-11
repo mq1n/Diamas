@@ -4,6 +4,9 @@
 #include "IME.h"
 #include "TextTag.h"
 #include "../eterBase/Utils.h"
+#include "ResourceManager.h"
+#include <stdio.h>
+#include <cstdint>
 
 extern uint32_t GetDefaultCodePage();
 
@@ -28,7 +31,7 @@ int32_t CGraphicTextInstance::Hyperlink_GetText(char* buf, int32_t len)
 	if (gs_hyperlinkText.empty())
 		return 0;
 
-	uint32_t codePage = GetDefaultCodePage();
+	int32_t codePage = GetDefaultCodePage();
 
 	return WideCharToMultiByte(codePage, 0, gs_hyperlinkText.c_str(), gs_hyperlinkText.length(), buf, len, nullptr, nullptr);	
 }
@@ -297,7 +300,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 	STATEMANAGER.SetRenderState(D3DRS_FOGENABLE, FALSE);
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, FALSE);
 
-	STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
+	STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1,	D3DTA_TEXTURE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG2,	D3DTA_DIFFUSE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP,	D3DTOP_MODULATE);

@@ -2,7 +2,7 @@
 #include "../eterEffectLib/EffectManager.h"
 #include "FlyingObjectManager.h"
 #include "RaceMotionData.h"
-#include "GameLibDefines.h"
+#include "../eterXClient/locale_inc.h"
 
 CDynamicPool<CRaceMotionData> CRaceMotionData::ms_kPool;
 

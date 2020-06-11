@@ -23,7 +23,7 @@ endif()
 file (STRINGS "VERSION.txt" MAJOR_VERSION)
 
 # Build options
-option(BUILD_UTILITIES "Build the common utilities" OFF)
+option(BUILD_UTILITIES "Build the common utilities" ON)
 option(BUILD_CLIENT "Build the client binaries" ON)
 option(BUILD_SERVER "Build the server binaries" ON)
 option(BUILD_TOOLS "Build the tool binaries" OFF)
@@ -163,7 +163,7 @@ endif()
 
 # Register 3rd dependecies include paths
 include_directories(${PROJECT_SOURCE_DIR}/extern/include)
-include_directories(${PROJECT_SOURCE_DIR}/extern/include/d3d8)
+include_directories(${PROJECT_SOURCE_DIR}/extern/include/d3d9)
 include_directories(${PROJECT_SOURCE_DIR}/extern/3rd)
 
 # Register 3rd dependecies precompiled library path
@@ -176,9 +176,9 @@ endif()
 # Sub-projects
 # add_subdirectory(${PROJECT_SOURCE_DIR}/source/common)
 
-if(BUILD_UTILITIES)
+#if(BUILD_UTILITIES)
 	add_subdirectory(${PROJECT_SOURCE_DIR}/source/utilities)
-endif()
+#endif()
 
 if(BUILD_SERVER)
 	add_subdirectory(${PROJECT_SOURCE_DIR}/source/server)

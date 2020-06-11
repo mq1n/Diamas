@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../eterGameLib/ItemData.h"
-#include "../eterGameLib/GameLibDefines.h"
+#include "locale_inc.h"
 #include "../eterBase/Poly/Poly.h"
 
 class CInstanceBase;

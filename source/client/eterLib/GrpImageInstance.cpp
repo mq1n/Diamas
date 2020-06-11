@@ -46,8 +46,8 @@ void CGraphicImageInstance::OnRender()
 	CGraphicImage * pImage = m_roImage.GetPointer();
 	CGraphicTexture * pTexture = pImage->GetTexturePointer();
 
-	float fimgWidth = pImage->GetWidth();
-	float fimgHeight = pImage->GetHeight();
+	float fimgWidth = pImage->GetWidth() * m_v2Scale.x;
+	float fimgHeight = pImage->GetHeight() * m_v2Scale.y;
 
 	const RECT& c_rRect = pImage->GetRectReference();
 	float texReverseWidth = 1.0f / float(pTexture->GetWidth());
@@ -90,7 +90,7 @@ void CGraphicImageInstance::OnRender()
 
 		STATEMANAGER.SetTexture(0, pTexture->GetD3DTexture());
 		STATEMANAGER.SetTexture(1, nullptr);
-		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);		
+		STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 		STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);	
 	}
 	//OLD: STATEMANAGER.DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 4, 2, c_FillRectIndices, D3DFMT_INDEX16, vertices, sizeof(TPDTVertex));	
@@ -140,6 +140,12 @@ void CGraphicImageInstance::SetPosition(float fx, float fy)
 {
 	m_v2Position.x = fx;
 	m_v2Position.y = fy;
+}
+
+void CGraphicImageInstance::SetScale(float fx, float fy)
+{
+	m_v2Scale.x = fx;
+	m_v2Scale.y = fy;
 }
 
 void CGraphicImageInstance::SetImagePointer(CGraphicImage * pImage)
@@ -203,12 +209,63 @@ void CGraphicImageInstance::Initialize()
 {
 	m_DiffuseColor.r = m_DiffuseColor.g = m_DiffuseColor.b = m_DiffuseColor.a = 1.0f;
 	m_v2Position.x = m_v2Position.y = 0.0f;
+	m_v2Scale.x = m_v2Scale.y = 1.0f;
 }
 
 void CGraphicImageInstance::Destroy()
 {
 	m_roImage.SetPointer(nullptr); // CRef 에서 레퍼런스 카운트가 떨어져야 함.
 	Initialize();
+}
+
+D3DXCOLOR CGraphicImageInstance::GetPixelColor(int32_t x, int32_t y)
+{
+	// we first need the d3d texture, but its the "shortest" way to get it
+	D3DXCOLOR dxClr = D3DXCOLOR(0, 0, 0, 0);
+	CGraphicImage * pImage = m_roImage.GetPointer();
+	if (!pImage)
+		return dxClr;
+	CGraphicTexture * pTexture = pImage->GetTexturePointer();
+	if (!pTexture)
+		return dxClr;
+
+	LPDIRECT3DTEXTURE9 d3dTexture = pTexture->GetD3DTexture();
+	if (!d3dTexture)
+		return dxClr;
+
+	IDirect3DSurface9* surface;
+	D3DSURFACE_DESC desc;
+	D3DLOCKED_RECT rect;
+	RECT rc;
+
+	// we want just want to lock only one pixel
+	rc.left = x;
+	rc.right = x + 1;
+	rc.top = y;
+	rc.bottom = y + 1;
+
+	if (FAILED(d3dTexture->GetSurfaceLevel(0, &surface))) // get the top surface of the image (it contains the whole image)
+		return dxClr;
+	if (FAILED(surface->GetDesc(&desc)))
+		return dxClr;
+	if (FAILED(surface->LockRect(&rect, &rc, D3DLOCK_READONLY | D3DLOCK_NO_DIRTY_UPDATE | D3DLOCK_NOSYSLOCK))) // lock the pixel
+		return dxClr;
+
+	PBYTE dwTexel = (PBYTE)rect.pBits;
+
+	switch (desc.Format)
+	{
+	// there are several possible image formats, but its the most common one and as I saw its more than enough
+	case D3DFMT_A8R8G8B8:
+		dxClr.a = dwTexel[3];
+		dxClr.r = dwTexel[2];
+		dxClr.g = dwTexel[1];
+		dxClr.b = dwTexel[0];
+		break;
+	}
+	surface->UnlockRect(); // unlock the pixel for further using (like render)
+
+	return dxClr;
 }
 
 CGraphicImageInstance::CGraphicImageInstance()

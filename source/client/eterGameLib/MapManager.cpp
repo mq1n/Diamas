@@ -29,7 +29,6 @@ CMapOutdoor& CMapManager::GetMapOutdoorRef()
 CMapManager::CMapManager() : mc_pcurEnvironmentData(nullptr)
 {
 	m_pkMap = nullptr;
-	m_isSoftwareTilingEnableReserved=false;
 
 //	Initialize();
 }
@@ -38,17 +37,6 @@ CMapManager::~CMapManager()
 {
 	Destroy();
 }
-
-bool CMapManager::IsSoftwareTilingEnable()
-{
-	return CTerrainPatch::SOFTWARE_TRANSFORM_PATCH_ENABLE;
-}
-
-void CMapManager::ReserveSoftwareTilingEnable(bool isEnable)
-{
-	m_isSoftwareTilingEnableReserved=isEnable;
-}
-
 
 void CMapManager::Initialize()
 {
@@ -64,8 +52,6 @@ void CMapManager::Create()
 		Clear();
 		return;
 	}
-
-	CTerrainPatch::SOFTWARE_TRANSFORM_PATCH_ENABLE=m_isSoftwareTilingEnableReserved;
 
 	m_pkMap = (CMapOutdoor*)AllocMap();
 
@@ -110,6 +96,7 @@ bool CMapManager::LoadMap(const std::string & c_rstrMapName, float x, float y, f
 	CMapOutdoor& rkMap = GetMapOutdoorRef();
 
 	rkMap.Leave();
+	rkMap.Clear();
 	rkMap.SetName(c_rstrMapName);
 	rkMap.LoadProperty();
 
@@ -258,7 +245,7 @@ void CMapManager::BeginEnvironment()
 		}
 		else
 		{
-			CSpeedTreeForestDirectX8& rkForest=CSpeedTreeForestDirectX8::Instance();
+			CSpeedTreeForestDirectX9& rkForest=CSpeedTreeForestDirectX9::Instance();
 			rkForest.SetFog(
 				mc_pcurEnvironmentData->GetFogNearDistance(), 
 				mc_pcurEnvironmentData->GetFogFarDistance()
@@ -335,6 +322,17 @@ void CMapManager::ResetEnvironmentDataPtr(const TEnvironmentData * c_pEnvironmen
 void CMapManager::BlendEnvironmentData(const TEnvironmentData * c_pEnvironmentData, int32_t iTransitionTime)
 {
 }
+
+#ifdef ENABLE_FOG_FIX
+void CMapManager::SetEnvironmentFog(bool flag)
+{	
+	if (mc_pcurEnvironmentData)
+	{
+		mc_pcurEnvironmentData->bFogEnable = flag;
+		ResetEnvironmentDataPtr(mc_pcurEnvironmentData);
+	}
+}
+#endif
 
 bool CMapManager::RegisterEnvironmentData(uint32_t dwIndex, const char * c_szFileName)
 {

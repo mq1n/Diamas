@@ -3,8 +3,7 @@
 #include <Psapi.h>
 #include <string>
 #include <algorithm>
-
-#include <XORstr.h>
+#include <xorstr.hpp>
 
 static std::string DosDevicePath2LogicalPath(LPCSTR lpszDosPath)
 {
@@ -37,7 +36,7 @@ static std::string DosDevicePath2LogicalPath(LPCSTR lpszDosPath)
 					// Reconstruct pszFilename using szTemp
 					// Replace device path with DOS path
 					char szTempFile[MAX_PATH];
-					sprintf_s(szTempFile, XOR("%s%s"), szDrive, lpszDosPath + uNameLen);
+					sprintf_s(szTempFile, xorstr("%s%s").crypt_get(), szDrive, lpszDosPath + uNameLen);
 					strResult = szTempFile;
 				}
 			}

@@ -43,6 +43,8 @@ void CGridSlotWindow::OnRenderPickingSlot()
 		// 아니면 그냥 옮기기
 		if (CheckMoving(dwSlotNumber, dwItemIndex, SlotList))
 			CPythonGraphic::Instance().SetDiffuseColor(1.0f, 1.0f, 1.0f, 0.5f);
+		else if (CheckSwapping (dwSlotNumber, byHeight, SlotList))
+			CPythonGraphic::Instance().SetDiffuseColor (0.22f, 0.67f, 0.65f, 0.5f);
 		else
 			CPythonGraphic::Instance().SetDiffuseColor(1.0f, 0.0f, 0.0f, 0.5f);
 
@@ -249,6 +251,18 @@ BOOL CGridSlotWindow::GetGridSlotPointer(int32_t ix, int32_t iy, TSlot ** ppSlot
 	return TRUE;
 }
 
+BOOL CGridSlotWindow::GetSlotPointerByNumber (uint32_t dwSlotNumber, TSlot** ppSlot)
+{
+	if (dwSlotNumber >= m_SlotVector.size())
+	{
+		return false;
+	}
+
+	*ppSlot = m_SlotVector[dwSlotNumber];
+
+	return true;
+}
+
 BOOL CGridSlotWindow::GetPickedGridSlotPosition(int32_t ixLocal, int32_t iyLocal, int32_t * pix, int32_t * piy)
 {
 	for (uint32_t x = 0; x < m_dwxCount; ++x)
@@ -345,18 +359,113 @@ BOOL CGridSlotWindow::CheckMoving(uint32_t dwSlotNumber, uint32_t dwItemIndex, c
 	if (m_dwSlotStyle != SLOT_STYLE_PICK_UP)
 		return TRUE;
 
+	uint16_t wCellMaxPerPage = m_SlotVector.size();
+	while (dwSlotNumber >= wCellMaxPerPage)
+		dwSlotNumber -= wCellMaxPerPage;
+
 	for (std::list<TSlot*>::const_iterator itor = c_rSlotList.begin(); itor != c_rSlotList.end(); ++itor)
 	{
-		TSlot * pSlot = *itor;
+		TSlot* pSlot = *itor;
+		if (dwSlotNumber == pSlot->dwSlotNumber && itor == c_rSlotList.begin())
+			return TRUE;
 
-		if (dwSlotNumber != pSlot->dwCenterSlotNumber) // 들었던 자리가 아닐 경우에
+		if (dwSlotNumber != pSlot->dwCenterSlotNumber)
 		{
-			if (0 != pSlot->dwItemIndex || pSlot->dwCenterSlotNumber != pSlot->dwSlotNumber) // 아이템이 있고
+			if (c_rSlotList.size() == 2)
 			{
-				if (dwItemIndex != pSlot->dwItemIndex) // 다른 아이템이면 못 옮김
-					return false;
+				std::list<TSlot*>::const_iterator it = c_rSlotList.begin();
+				std::advance(it, 1);
+				if (0 != pSlot->dwItemIndex && 0 != (*it)->dwItemIndex)
+					return FALSE;
+			}
+			if (c_rSlotList.size() == 3)
+			{
+				std::list<TSlot*>::const_iterator it = c_rSlotList.begin();
+				std::advance(it, 1);
+				if (0 != pSlot->dwItemIndex && 0 != (*it)->dwItemIndex)
+					return FALSE;
+				else
+				{
+					std::advance(it, 1);
+					if (0 != pSlot->dwItemIndex && 0 != (*it)->dwItemIndex)
+						return FALSE;
+				}
+			}
+
+			if (0 != pSlot->dwItemIndex || pSlot->dwCenterSlotNumber != pSlot->dwSlotNumber)
+				if (dwItemIndex != pSlot->dwItemIndex)
+					return FALSE;
+		}
+	}
+
+	return true;
+}
+
+BOOL CGridSlotWindow::CheckSwapping (uint32_t dwSlotNumber, uint32_t dwItemIndex, const std::list<TSlot*>& c_rSlotList)
+{
+	if (m_dwSlotStyle != SLOT_STYLE_PICK_UP)
+	{
+		return TRUE;
+	}
+
+	uint8_t byWidth, byHeight;
+	UI::CWindowManager::Instance().GetAttachingIconSize (&byWidth, &byHeight);
+
+	int32_t iyBound = byHeight;
+	int32_t iyBasePosition = 0;
+
+	for (std::list<TSlot*>::const_iterator itor = c_rSlotList.begin(); itor != c_rSlotList.end(); ++itor)
+	{
+		TSlot* pSlot = *itor;
+
+		if (dwSlotNumber == pSlot->dwCenterSlotNumber) // I can't swap with myself
+		{
+			return false;
+		}
+
+		if (itor == c_rSlotList.begin())   //First one, mark
+		{
+			iyBasePosition = pSlot->iyPosition;
+		}
+
+		if (pSlot->dwSlotNumber == pSlot->dwCenterSlotNumber)
+		{
+			iyBound -= pSlot->byyPlacedItemSize;
+		}
+
+		if (!pSlot->dwItemIndex)
+		{
+			TSlot* centerItem;
+			if (!GetSlotPointerByNumber (pSlot->dwCenterSlotNumber, &centerItem)) //Some sort of error
+			{
+				continue;
+			}
+
+			if (!centerItem || !centerItem->dwCenterSlotNumber)
+			{
+				continue; // I can always swap with empty slots, but this may not be the only overlayed slot, so lets continue
+			}
+
+			if (centerItem->iyPosition < iyBasePosition)
+			{
+				return false;    //Out of bounds, upper side
 			}
 		}
+
+		if (pSlot->iyPosition < iyBasePosition) //Out of bounds, upper side
+		{
+			return false;
+		}
+
+		if (iyBound < 0) //An item will go out of bounds on the lower side
+		{
+			return false;
+		}
+	}
+
+	if (iyBound > 0) //Space was not perfectly filled
+	{
+		return false;
 	}
 
 	return true;

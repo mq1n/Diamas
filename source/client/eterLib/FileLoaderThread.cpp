@@ -164,8 +164,6 @@ void CFileLoaderThread::Process()	// called in loader thread
 
 	m_RequestMutex.Unlock();
 
-	LPCVOID pvBuf;
-
 	if (FileSystemManager::Instance().OpenFile(pData->stFileName, pData->File))
 	{
 		pData->dwSize = pData->File.GetSize();

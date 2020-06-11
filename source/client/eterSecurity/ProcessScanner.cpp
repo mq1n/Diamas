@@ -3,12 +3,10 @@
 #include "CheatQueueManager.h"
 #include "ProcessNameHelper.h"
 #include "CheatQuarentineManager.h"
-
 #include "../eterBase/WinVerHelper.h"
-
-#include <XORstr.h>
 #include <psapi.h>
 #include <tlhelp32.h>
+#include <xorstr.hpp>
 
 inline static bool IsValidHandle(HANDLE hTarget)
 {
@@ -75,11 +73,11 @@ DWORD WINAPI CreateProcessHashListRoutine(LPVOID)
 	{
 		typedef NTSTATUS(NTAPI* TNtGetNextProcess)(HANDLE ProcessHandle, ACCESS_MASK DesiredAccess, ULONG HandleAttributes, ULONG Flags, PHANDLE NewProcessHandle);
 
-		auto hNtdll = LoadLibraryA(XOR("ntdll.dll"));
+		auto hNtdll = LoadLibraryA(xorstr("ntdll.dll").crypt_get());
 		if (!hNtdll)
 			return 0;
 
-		auto pNtGetNextProcess = GetProcAddress(hNtdll, XOR("NtGetNextProcess"));
+		auto pNtGetNextProcess = GetProcAddress(hNtdll, xorstr("NtGetNextProcess").crypt_get());
 		if (!pNtGetNextProcess)
 			return 0;
 		auto NtGetNextProcess = (TNtGetNextProcess)pNtGetNextProcess;

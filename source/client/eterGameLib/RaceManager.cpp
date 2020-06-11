@@ -454,6 +454,19 @@ const char * CRaceManager::GetFullPathFileName(const char * c_szFileName)
 	return s_stFileName.c_str();
 }
 
+void CRaceManager::SetRaceHeight(int32_t iVnum, float fHeight)
+{
+	m_kMap_iRaceKey_fRaceAdditionalHeight.insert(std::map<int32_t, float>::value_type(iVnum, fHeight));
+}
+
+float CRaceManager::GetRaceHeight(int32_t iVnum)
+{
+	std::map<int32_t, float>::iterator it = m_kMap_iRaceKey_fRaceAdditionalHeight.find(iVnum);
+	if (m_kMap_iRaceKey_fRaceAdditionalHeight.end() == it)
+		return 0.0f;
+
+	return it->second;
+}
 
 void CRaceManager::Create()
 {

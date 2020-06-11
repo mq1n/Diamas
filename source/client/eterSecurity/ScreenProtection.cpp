@@ -2,8 +2,7 @@
 #include "AnticheatManager.h"
 #include "CheatQueueManager.h"
 #include "../eterBase/WinVerHelper.h"
-
-#include <XORstr.h>
+#include <xorstr.hpp>
 
 typedef BOOL(WINAPI* TGetWindowDisplayAffinity)(HWND hWnd, DWORD* pdwAffinity);
 static TGetWindowDisplayAffinity pGetWindowDisplayAffinity = nullptr;
@@ -68,12 +67,12 @@ void CAnticheatManager::InitScreenProtection()
 		return;
 	}
 
-	auto hNtdll = LoadLibraryA(XOR("ntdll.dll"));
+	auto hNtdll = LoadLibraryA(xorstr("ntdll.dll").crypt_get());
 	if (!hNtdll)
 		return;
 
-	pGetWindowDisplayAffinity = (TGetWindowDisplayAffinity)GetProcAddress(hNtdll, XOR("GetWindowDisplayAffinity"));
-	pSetWindowDisplayAffinity = (TSetWindowDisplayAffinity)GetProcAddress(hNtdll, XOR("SetWindowDisplayAffinity"));
+	pGetWindowDisplayAffinity = (TGetWindowDisplayAffinity)GetProcAddress(hNtdll, xorstr("GetWindowDisplayAffinity").crypt_get());
+	pSetWindowDisplayAffinity = (TSetWindowDisplayAffinity)GetProcAddress(hNtdll, xorstr("SetWindowDisplayAffinity").crypt_get());
 
 	if (!pGetWindowDisplayAffinity || !pSetWindowDisplayAffinity)
 		return;

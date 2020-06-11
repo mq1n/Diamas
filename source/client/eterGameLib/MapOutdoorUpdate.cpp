@@ -112,7 +112,7 @@ bool CMapOutdoor::Update(float fX, float fY, float fZ)
 #ifdef __PERFORMANCE_CHECKER__
 	uint32_t t3=ELTimer_GetMSec();
 #endif
-	CSpeedTreeForestDirectX8::Instance().UpdateSystem(CTimer::Instance().GetCurrentSecond());
+	CSpeedTreeForestDirectX9::Instance().UpdateSystem(CTimer::Instance().GetCurrentSecond());
 #ifdef __PERFORMANCE_CHECKER__
 	uint32_t t4=ELTimer_GetMSec();
 #endif
@@ -301,17 +301,23 @@ void CMapOutdoor::__UpdateAroundAreaList()
 {
 #ifdef __PERFORMANCE_CHECKER__
 	uint32_t ft1=timeGetTime();
-#endif
 	uint32_t at[AROUND_AREA_NUM];
+#endif
 	for (int32_t i = 0; i < AROUND_AREA_NUM; ++i)
 	{
+#ifdef __PERFORMANCE_CHECKER__
 		uint32_t t1=timeGetTime();
+#endif
+
 		CArea * pArea;
 		if (GetAreaPointer(i, &pArea))
 			pArea->Update();
+
+#ifdef __PERFORMANCE_CHECKER__
 		uint32_t t2=timeGetTime();
 
 		at[i]=t2-t1;
+#endif
 	}	
 #ifdef __PERFORMANCE_CHECKER__
 	uint32_t ft2=timeGetTime();

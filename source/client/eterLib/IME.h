@@ -161,7 +161,6 @@ public:
 	static HWND				ms_hWnd;
 	static HKL				ms_hklCurrent;
 	static char				ms_szKeyboardLayout[KL_NAMELENGTH+1];
-	static OSVERSIONINFOA	ms_stOSVI;
 
 	static HINSTANCE		ms_hImm32Dll;
 	static HINSTANCE		ms_hCurrentImeDll;

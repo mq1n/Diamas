@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "PythonSystem.h"
+#include "PythonDynamicModuleNames.h"
 
 PyObject * systemGetWidth(PyObject* poSelf, PyObject* poArgs)
 {
@@ -29,8 +30,6 @@ PyObject * systemDestroyInterfaceHandler(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * systemReserveResource(PyObject* poSelf, PyObject* poArgs)
 {
-	std::set<std::string> ResourceSet;
-	CResourceManager::Instance().PushBackgroundLoadingSet(ResourceSet);
 	return Py_BuildNone();
 }
 
@@ -491,7 +490,7 @@ void initsystemSetting()
 		{ nullptr,							nullptr,							0 }
 	};
 
-	PyObject * poModule = Py_InitModule("systemSetting", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(SYSTEM_MODULE).c_str(), s_methods);
 
 	PyModule_AddIntConstant(poModule, "WINDOW_STATUS",		CPythonSystem::WINDOW_STATUS);
 	PyModule_AddIntConstant(poModule, "WINDOW_INVENTORY",	CPythonSystem::WINDOW_INVENTORY);

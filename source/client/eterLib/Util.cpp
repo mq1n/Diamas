@@ -254,7 +254,7 @@ const char*	GetFontFaceFromCodePage(uint16_t codePage)
 
 	HDC hDC=GetDC(nullptr);
 
-	if(EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (int32_t)fontFace, 0) == 0)
+	if(EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (LONG)fontFace, 0) == 0)
 	{
 		ReleaseDC(nullptr, hDC);
 		return fontFace;
@@ -262,7 +262,7 @@ const char*	GetFontFaceFromCodePage(uint16_t codePage)
 
 	fontFace = GetFontFaceFromCodePageNT(codePage);
 
-	if(EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (int32_t)fontFace, 0) == 0)
+	if(EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (LONG)fontFace, 0) == 0)
 	{
 		ReleaseDC(nullptr, hDC);
 		return fontFace;

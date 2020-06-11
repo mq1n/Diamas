@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "NetStream.h"
 //#include "eterCrypt.h"
+#include <stdio.h>
 
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
 #include "../eterBase/tea.h"
@@ -424,10 +425,25 @@ bool CNetworkStream::Connect(const CNetworkAddress& c_rkNetAddr, int32_t limitSe
 
 		if (error != WSAEWOULDBLOCK)
 		{
-			Tracen("error != WSAEWOULDBLOCK");
+			Sleep(1000);
 			Clear();
-			OnConnectFailure();
-			return false;
+			m_sock = socket(AF_INET, SOCK_STREAM, 0);
+			if (m_sock == INVALID_SOCKET)
+			{
+				Clear();
+				OnConnectFailure();
+				return false;
+
+			}
+
+			ioctlsocket(m_sock, FIONBIO, &arg);
+			if (connect(m_sock, reinterpret_cast<PSOCKADDR>(&m_addr), m_addr.GetSize()) == SOCKET_ERROR)
+			{
+				Tracen("error != WSAEWOULDBLOCK");
+				Clear();
+				OnConnectFailure();
+				return false;
+			}
 		}
 	}
 
@@ -453,6 +469,8 @@ bool CNetworkStream::Connect(uint32_t dwAddr, int32_t port, int32_t limitSec)
 
 bool CNetworkStream::Connect(const char* c_szAddr, int32_t port, int32_t /*limitSec*/)
 {
+	Tracenf("Connect to %s:%d", c_szAddr, port);
+
 	CNetworkAddress kNetAddr;
 	kNetAddr.Set(c_szAddr, port);
 

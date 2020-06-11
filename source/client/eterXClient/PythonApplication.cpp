@@ -10,10 +10,6 @@
 #include "PythonApplication.h"
 #include "PythonCharacterManager.h"
 
-#include "ProcessScanner.h"
-
-#include "CheckLatestFiles.h"
-
 extern void GrannyCreateSharedDeformBuffer();
 extern void GrannyDestroySharedDeformBuffer();
 
@@ -111,17 +107,6 @@ void CPythonApplication::SetFrameSkip(bool isEnable)
 		m_isFrameSkipDisable=false;
 	else
 		m_isFrameSkipDisable=true;
-}
-
-void CPythonApplication::NotifyHack(const char* c_szFormat, ...)
-{
-	char szBuf[1024];
-
-	va_list args;
-	va_start(args, c_szFormat);	
-	_vsnprintf(szBuf, sizeof(szBuf), c_szFormat, args);
-	va_end(args);
-	m_pyNetworkStream.NotifyHack(szBuf);
 }
 
 void CPythonApplication::GetInfo(uint32_t eInfo, std::string* pstInfo)
@@ -745,15 +730,11 @@ int32_t CPythonApplication::CheckDeviceState()
 	return DEVICE_STATE_OK;
 }
 
-bool CPythonApplication::CreateDevice(int32_t width, int32_t height, int32_t Windowed, int32_t bit /* = 32*/, int32_t frequency /* = 0*/)
+bool CPythonApplication::CreateDevice(int32_t width, int32_t height, bool Windowed, int32_t bit /* = 32*/, int32_t frequency /* = 0*/)
 {
-	int32_t iRet;
-
 	m_grpDevice.InitBackBufferCount(2);
-	m_grpDevice.RegisterWarningString(CGraphicDevice::CREATE_BAD_DRIVER,"WARN_BAD_DRIVER");
-	m_grpDevice.RegisterWarningString(CGraphicDevice::CREATE_NO_TNL,"WARN_NO_TNL");
 
-	iRet = m_grpDevice.Create(GetWindowHandle(), width, height, Windowed ? true : false, bit,frequency);
+	int32_t iRet = m_grpDevice.Create(GetWindowHandle(), width, height, Windowed, bit, frequency);
 
 	switch (iRet)
 	{
@@ -772,7 +753,7 @@ bool CPythonApplication::CreateDevice(int32_t width, int32_t height, int32_t Win
 	case CGraphicDevice::CREATE_NO_DIRECTX:
 		//PyErr_SetString(PyExc_RuntimeError, "DirectX 8.1 or greater required to run game");
 		SET_EXCEPTION(CREATE_NO_DIRECTX);
-		TraceError("CreateDevice: DirectX 8.1 or greater required to run game");
+		TraceError("CreateDevice: DirectX 9.0c or greater required to run game");
 		return false;
 
 	case CGraphicDevice::CREATE_DEVICE:
@@ -780,17 +761,6 @@ bool CPythonApplication::CreateDevice(int32_t width, int32_t height, int32_t Win
 		SET_EXCEPTION(CREATE_DEVICE);
 		TraceError("CreateDevice: GraphicDevice create failed");
 		return false;
-
-	case CGraphicDevice::CREATE_FORMAT:
-		SET_EXCEPTION(CREATE_FORMAT);
-		TraceError("CreateDevice: Change the screen format");
-		return false;
-
-		/*case CGraphicDevice::CREATE_GET_ADAPTER_DISPLAY_MODE:
-		//PyErr_SetString(PyExc_RuntimeError, "GetAdapterDisplayMode failed");
-		SET_EXCEPTION(CREATE_GET_ADAPTER_DISPLAY_MODE);
-		TraceError("CreateDevice: GetAdapterDisplayMode failed");
-		return false;*/
 
 	case CGraphicDevice::CREATE_GET_DEVICE_CAPS:
 		PyErr_SetString(PyExc_RuntimeError, "GetDevCaps failed");
@@ -808,6 +778,7 @@ bool CPythonApplication::CreateDevice(int32_t width, int32_t height, int32_t Win
 			if (iRet & CGraphicDevice::CREATE_NO_TNL)
 			{
 				CGrannyLODController::SetMinLODMode(true);
+				TraceError("CreateDevice: Hardware Vertex Processing not available"); //LogBox("Your display Adapter doesnt support TNL", nullptr, GetWindowHandle());
 			}
 			return true;
 		}
@@ -958,7 +929,7 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_
 	// 풀스크린 모드이고
 	// 디폴트 IME 를 사용하거나 유럽 버전이면
 	// 윈도우 풀스크린 모드를 사용한다
-	if (!m_pySystem.IsWindowed() && (m_pySystem.IsUseDefaultIME() || LocaleService_IsEUROPE()))
+	if (!m_pySystem.IsWindowed() && m_pySystem.IsUseDefaultIME())
 	{
 		m_isWindowed = false;
 		m_isWindowFullScreenEnable = TRUE;
@@ -1015,32 +986,12 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_
 			}
 		}
 
-		extern bool GRAPHICS_CAPS_SOFTWARE_TILING;
-
-		if (!m_pySystem.IsAutoTiling())
-			GRAPHICS_CAPS_SOFTWARE_TILING = m_pySystem.IsSoftwareTiling();
-
 		// Device
-		if (!CreateDevice(m_pySystem.GetWidth(), m_pySystem.GetHeight(), Windowed, m_pySystem.GetBPP(), m_pySystem.GetFrequency()))
+		if (!CreateDevice(m_pySystem.GetWidth(), m_pySystem.GetHeight(), Windowed, m_pySystem.GetBPP(),
+						  m_pySystem.GetFrequency()))
 			return false;
 
 		GrannyCreateSharedDeformBuffer();
-
-		if (m_pySystem.IsAutoTiling())
-		{
-			if (m_grpDevice.IsFastTNL())
-			{
-				m_pyBackground.ReserveSoftwareTilingEnable(false);
-			}
-			else
-			{
-				m_pyBackground.ReserveSoftwareTilingEnable(true);
-			}
-		}
-		else
-		{
-			m_pyBackground.ReserveSoftwareTilingEnable(m_pySystem.IsSoftwareTiling());
-		}
 
 		SetVisibleMode(true);
 
@@ -1071,6 +1022,10 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_
 
 		if (!m_grpDevice.IsFastTNL())
 			CGrannyLODController::SetMinLODMode(true);
+
+#ifdef ENABLE_ANTICHEAT
+		CAnticheatManager::Instance().InitializeAnticheatRoutines(GetInstance(), GetWindowHandle());
+#endif
 
 		m_pyItem.Create();
 
@@ -1201,6 +1156,11 @@ void CPythonApplication::SetForceSightRange(int32_t iRange)
 	m_iForceSightRange = iRange;
 }
 
+void CPythonApplication::SetTitle(const char* szTitle)
+{
+	CMSWindow::SetText(szTitle);
+}
+
 void CPythonApplication::Clear()
 {
 	m_pySystem.Clear();
@@ -1259,7 +1219,7 @@ void CPythonApplication::Destroy()
 	m_grpDevice.Destroy();
 
 	// FIXME : 만들어져 있지 않음 - [levites]
-	//CSpeedTreeForestDirectX8::Instance().Clear();
+	//CSpeedTreeForestDirectX9::Instance().Clear();
 
 	CAttributeInstance::DestroySystem();
 	CTextFileLoader::DestroySystem();

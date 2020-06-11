@@ -3,6 +3,7 @@
 #include "PythonBackground.h"
 #include "InstanceBase.h"
 #include "../eterGameLib/RaceManager.h"
+#include "PythonDynamicModuleNames.h"
 
 //////////////////////////////////////////////////////////////////////////
 // RaceData 관련 시작
@@ -402,7 +403,7 @@ PyObject * chrmgrRegisterCacheMotionData(PyObject* poSelf, PyObject* poArgs)
 
 	int32_t iWeight = 0;
 	PyTuple_GetInteger(poArgs, 3, &iWeight);
-	iWeight = MIN(100, iWeight);
+	iWeight = std::min(100, iWeight);
 
 	CRaceData * pRaceData = CRaceManager::Instance().GetSelectedRaceDataPointer();
 	if (!pRaceData)
@@ -762,7 +763,7 @@ void initchrmgr()
 		{ nullptr,							nullptr,									0 },
 	};	
 
-	PyObject * poModule = Py_InitModule("chrmgr", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(CHRMGR_MODULE).c_str(), s_methods);
 
 	PyModule_AddIntConstant(poModule, "NAMECOLOR_MOB", CInstanceBase::NAMECOLOR_NORMAL_MOB);
 	PyModule_AddIntConstant(poModule, "NAMECOLOR_NPC", CInstanceBase::NAMECOLOR_NORMAL_NPC);

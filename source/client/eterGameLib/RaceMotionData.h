@@ -2,7 +2,7 @@
 
 #include "../eterSoundLib/Type.h"
 #include "RaceMotionDataEvent.h"
-#include "GameLibDefines.h"
+#include "../eterXClient/locale_inc.h"
 
 class CRaceMotionData
 {

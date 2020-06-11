@@ -3,6 +3,7 @@
 
 #include "InstanceBase.h"
 #include "PythonCharacterManager.h"
+#include "PythonDynamicModuleNames.h"
 
 PyObject * nonplayerGetEventType(PyObject * poSelf, PyObject * poArgs)
 {
@@ -102,7 +103,7 @@ void initNonPlayer()
 		{ nullptr,							nullptr,								0		 },
 	};
 
-	PyObject * poModule = Py_InitModule("nonplayer", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(NON_PLAYER_MODULE).c_str(), s_methods);
 
 	PyModule_AddIntConstant(poModule, "ON_CLICK_EVENT_NONE",		CPythonNonPlayer::ON_CLICK_EVENT_NONE);
 	PyModule_AddIntConstant(poModule, "ON_CLICK_EVENT_BATTLE",		CPythonNonPlayer::ON_CLICK_EVENT_BATTLE);

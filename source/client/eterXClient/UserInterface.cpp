@@ -2,6 +2,7 @@
 #include "resource.h"
 #include "Version.h"
 #include "PythonApplication.h"
+#include "PythonDynamicModuleNames.h"
 
 #include <cstdlib>
 #include <fstream>
@@ -15,6 +16,9 @@
 #include "../eterBase/lzo.h"
 #include "../eterLib/Util.h"
 #include "../eterWebBrowser/CWebBrowser.h"
+#include "../eterSecurity/AnticheatManager.h"
+#include "../eterSecurity/ProtectionMacros.h"
+#include "../eterSecurity/CheatQueueManager.h"
 
 // d3dx8.lib(cleanmesh.obj) : error LNK2019: unresolved external symbol __vsnprintf referenced in function "void __cdecl OutputError
 int32_t(WINAPIV* __vsnprintf)(char*, size_t, const char*, va_list) = _vsnprintf;
@@ -121,6 +125,8 @@ bool PackInitialize(const char* c_pszFolder)
 
 bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 {
+	initDynamicModuleMgr();
+	/////////////////////////////////////////////	
 	initpack();
 	initdbg();
 	initime();
@@ -141,7 +147,6 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 	initTextTail();
 	initnet();
 	initMiniMap();
-	initProfiler();
 	initEvent();
 	initeffect();
 	initfly();
@@ -176,11 +181,13 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 	char szSystemPy[] = { 's', 'y', 's', 't', 'e', 'm', '_', 'p', 'y', 't', 'h', 'o', 'n', '.', 'p', 'y', 0x0 }; // system_python.py
 	char szSystemPyFailMsg[] = { 'M', 'a', 'i', 'n', ' ', 's', 'c', 'r', 'i', 'p', 't', ' ', 'i', 'n', 'i', 't', 'i', 'l', 'i', 'z', 'a', 't', 'i', 'o', 'n', ' ', 'f', 'a', 'i', 'l', 'e', 'd', '!', 0x0 }; // Main script initilization failed!
 
+	__PROTECTOR_START__("RunFile")
 	if (!pyLauncher.RunFile(szSystemPy, szSystemPy))
 	{
 		TraceError(szSystemPyFailMsg);
 		return false;
 	}
+	__PROTECTOR_END__("RunFile")
 
 	return true;
 }
@@ -212,7 +219,7 @@ bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 	))
 	{
 		LogBox("File system Initialization failed. Check FileSystem.log file..");
-		return false;
+		return ret;
 	}
 
 	fileSystem.AddToDiskBlacklist("py");
@@ -221,15 +228,16 @@ bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 	if (!PackInitialize("data"))
 	{
 		LogBox("Data Initialization failed. Check log.txt file..");
-		return false;
+		return ret;
 	}
-
-	if(LocaleService_LoadGlobal(hInstance))
-		SetDefaultCodePage(LocaleService_GetCodePage());
 
 	CPythonApplication * app = new CPythonApplication;
 
 	app->Initialize(hInstance);
+
+#ifdef ENABLE_ANTICHEAT
+	CCheatDetectQueueMgr::Instance().Initialize();
+#endif
 
 	auto period = std::make_unique<TimerPeriod>();
 
@@ -237,17 +245,24 @@ bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 
 	char __pyApi[] = { 'p', 'y', 'A', 'p', 'i', 0x0 }; // pyApi
 
+	__PROTECTOR_START__("RunMainScript")
 	if (pyLauncher.Create(__pyApi))
 		ret=RunMainScript(pyLauncher, lpCmdLine);
+	__PROTECTOR_END__("RunMainScript")
 
 	app->Clear();
 
 	pyLauncher.Clear();
+		
+#ifdef ENABLE_ANTICHEAT
+	CAnticheatManager::Instance().FinalizeAnticheatRoutines();
+#endif
 
 	app->Destroy();
 
 	fileSystem.FinalizeFSManager();
 
+	delete app;
 	return ret;
 }
 
@@ -256,6 +271,8 @@ int32_t APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 	SetEterExceptionHandler();
 
 	CreateDirectoryA("logs", nullptr);
+	CreateDirectoryA("config", nullptr);
+
 #ifdef _DEBUG
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_LEAK_CHECK_DF );
 
@@ -274,6 +291,11 @@ int32_t APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 #ifdef LEAK_DETECT
 	SymInitialize(GetCurrentProcess(), 0, true);
 	SymSetOptions(SYMOPT_LOAD_LINES);
+#endif
+
+#ifdef ENABLE_ANTICHEAT
+	static CAnticheatManager kAnticheatManager;
+	kAnticheatManager.InitializePythonHooks();
 #endif
 
 	LocaleService_LoadConfig("config/locale.cfg");

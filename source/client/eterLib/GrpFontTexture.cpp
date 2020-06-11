@@ -199,10 +199,8 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::GetCharacterInfo
 	{
 		return UpdateCharacterInfomation(code);
 	}
-	else
-	{
-		return &f->second;	
-	}
+
+	return &f->second;	
 }
 
 CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterInfomation(TCharacterKey code)
@@ -228,7 +226,7 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 		size.cx += ceilf(stABC.abcfC);
 	size.cx++;
 
-	int32_t lAdvance = ceilf( stABC.abcfA + stABC.abcfB + stABC.abcfC );
+	LONG lAdvance = ceilf( stABC.abcfA + stABC.abcfB + stABC.abcfC );
 
 	int32_t width = m_dib.GetWidth();
 	int32_t height = m_dib.GetHeight();

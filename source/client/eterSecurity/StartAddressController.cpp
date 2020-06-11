@@ -3,8 +3,7 @@
 #include "CheatQueueManager.h"
 #include "../eterBase/WinVerHelper.h"
 #include "ProcessNameHelper.h"
-
-#include <XORstr.h>
+#include <xorstr.hpp>
 #include <psapi.h>
 
 enum EBlacklistedShellCodes
@@ -118,28 +117,28 @@ bool CAnticheatManager::IsBlockedStartAddress(uint32_t dwThreadId, uint32_t dwSt
 {
 	typedef NTSTATUS(WINAPI* TNtQueryInformationThread)(HANDLE, int32_t, PVOID, ULONG, PULONG);
 	
-	auto hKernel32 = GetModuleHandleA(XOR("kernel32.dll"));
+	auto hKernel32 = GetModuleHandleA(xorstr("kernel32.dll").crypt_get());
 	if (!hKernel32)
 	{
 //		TraceError("!hKernel32");
 		return false;
 	}
 
-	auto hUser32 = LoadLibraryA(XOR("user32.dll"));
+	auto hUser32 = LoadLibraryA(xorstr("user32.dll").crypt_get());
 	if (!hUser32)
 	{
 //		TraceError("!hUser32");
 		return false;
 	}
 
-	auto hNtdll = LoadLibraryA(XOR("ntdll.dll"));
+	auto hNtdll = LoadLibraryA(xorstr("ntdll.dll").crypt_get());
 	if (!hNtdll)
 	{
 //		TraceError("!hNtdll");
 		return false;
 	}
 
-	auto hPython27 = GetModuleHandleA(XOR("python27.dll"));
+	auto hPython27 = GetModuleHandleA(xorstr("python27.dll").crypt_get());
 	if (!hPython27)
 	{
 //		TraceError("!hPython27");
@@ -151,7 +150,7 @@ bool CAnticheatManager::IsBlockedStartAddress(uint32_t dwThreadId, uint32_t dwSt
 	auto hThread = OpenThread(THREAD_QUERY_INFORMATION, FALSE, dwThreadId);
 	if (hThread && hThread != INVALID_HANDLE_VALUE)
 	{
-		auto pNtQueryInformationThread = GetProcAddress(hNtdll, XOR("NtQueryInformationThread"));
+		auto pNtQueryInformationThread = GetProcAddress(hNtdll, xorstr("NtQueryInformationThread").crypt_get());
 		if (pNtQueryInformationThread)
 		{
 			auto NtQueryInformationThread = reinterpret_cast<TNtQueryInformationThread>(pNtQueryInformationThread);
@@ -181,12 +180,12 @@ bool CAnticheatManager::IsBlockedStartAddress(uint32_t dwThreadId, uint32_t dwSt
 
 	auto dwDetectedType = 0UL;
 
-	auto dwLoadLibraryA = (uint32_t)GetProcAddress(hKernel32, XOR("LoadLibraryA"));
-	auto dwLoadLibraryW = (uint32_t)GetProcAddress(hKernel32, XOR("LoadLibraryW"));
-	auto dwLoadLibraryExA = (uint32_t)GetProcAddress(hKernel32, XOR("LoadLibraryExA"));
-	auto dwLoadLibraryExW = (uint32_t)GetProcAddress(hKernel32, XOR("LoadLibraryExW"));
+	auto dwLoadLibraryA = (uint32_t)GetProcAddress(hKernel32, xorstr("LoadLibraryA").crypt_get());
+	auto dwLoadLibraryW = (uint32_t)GetProcAddress(hKernel32, xorstr("LoadLibraryW").crypt_get());
+	auto dwLoadLibraryExA = (uint32_t)GetProcAddress(hKernel32, xorstr("LoadLibraryExA").crypt_get());
+	auto dwLoadLibraryExW = (uint32_t)GetProcAddress(hKernel32, xorstr("LoadLibraryExW").crypt_get());
 
-	auto dwLdrLoadDll = (uint32_t)GetProcAddress(hNtdll, XOR("LdrLoadDll"));
+	auto dwLdrLoadDll = (uint32_t)GetProcAddress(hNtdll, xorstr("LdrLoadDll").crypt_get());
 
 	//
 
@@ -284,7 +283,7 @@ bool CAnticheatManager::IsBlockedStartAddress(uint32_t dwThreadId, uint32_t dwSt
 
 	if (IsWindowsVistaOrGreater())
 	{
-		auto dwRtlUserThreadStart = (uint32_t)GetProcAddress(hNtdll, XOR("RtlUserThreadStart"));
+		auto dwRtlUserThreadStart = (uint32_t)GetProcAddress(hNtdll, xorstr("RtlUserThreadStart").crypt_get());
 		if (dwThreadStartAddress == dwRtlUserThreadStart)
 		{
 			if (pdwViolationID) *pdwViolationID = EaxRtlUserThreadStart;
@@ -293,7 +292,7 @@ bool CAnticheatManager::IsBlockedStartAddress(uint32_t dwThreadId, uint32_t dwSt
 			return true;
 		}
 
-		auto dwNtCreateThread = (uint32_t)GetProcAddress(hNtdll, XOR("NtCreateThread"));
+		auto dwNtCreateThread = (uint32_t)GetProcAddress(hNtdll, xorstr("NtCreateThread").crypt_get());
 		if (dwThreadStartAddress == dwNtCreateThread)
 		{
 			if (pdwViolationID) *pdwViolationID = EaxNtCreateThread;
@@ -302,7 +301,7 @@ bool CAnticheatManager::IsBlockedStartAddress(uint32_t dwThreadId, uint32_t dwSt
 			return true;
 		}
 
-		auto dwNtCreateThreadEx = (uint32_t)GetProcAddress(hNtdll, XOR("NtCreateThreadEx"));
+		auto dwNtCreateThreadEx = (uint32_t)GetProcAddress(hNtdll, xorstr("NtCreateThreadEx").crypt_get());
 		if (dwThreadStartAddress == dwNtCreateThreadEx)
 		{
 			if (pdwViolationID) *pdwViolationID = EaxNtCreateThreadEx;
@@ -311,7 +310,7 @@ bool CAnticheatManager::IsBlockedStartAddress(uint32_t dwThreadId, uint32_t dwSt
 			return true;
 		}
 
-		auto dwRtlCreateUserThread = (uint32_t)GetProcAddress(hNtdll, XOR("RtlCreateUserThread"));
+		auto dwRtlCreateUserThread = (uint32_t)GetProcAddress(hNtdll, xorstr("RtlCreateUserThread").crypt_get());
 		if (dwThreadStartAddress == dwRtlCreateUserThread)
 		{
 			if (pdwViolationID) *pdwViolationID = EaxRtlCreateUserThread;
@@ -321,10 +320,10 @@ bool CAnticheatManager::IsBlockedStartAddress(uint32_t dwThreadId, uint32_t dwSt
 		}
 	}
 
-	auto hKernelbase = LoadLibraryA(XOR("kernelbase.dll"));
+	auto hKernelbase = LoadLibraryA(xorstr("kernelbase.dll").crypt_get());
 	if (hKernelbase)
 	{
-		auto dwLoadLibraryA_KBase = (uint32_t)GetProcAddress(hKernelbase, XOR("LoadLibraryA"));
+		auto dwLoadLibraryA_KBase = (uint32_t)GetProcAddress(hKernelbase, xorstr("LoadLibraryA").crypt_get());
 		if (dwLoadLibraryA_KBase && dwThreadStartAddress == dwLoadLibraryA_KBase)
 		{
 			if (pdwViolationID) *pdwViolationID = EaxLoadLibraryA_KBase;
@@ -333,7 +332,7 @@ bool CAnticheatManager::IsBlockedStartAddress(uint32_t dwThreadId, uint32_t dwSt
 			return true;
 		}
 
-		auto dwLoadLibraryW_KBase = (uint32_t)GetProcAddress(hKernelbase, XOR("LoadLibraryW"));
+		auto dwLoadLibraryW_KBase = (uint32_t)GetProcAddress(hKernelbase, xorstr("LoadLibraryW").crypt_get());
 		if (dwLoadLibraryW_KBase && dwThreadStartAddress == dwLoadLibraryW_KBase)
 		{
 			if (pdwViolationID) *pdwViolationID = EaxLoadLibraryW_KBase;
@@ -342,7 +341,7 @@ bool CAnticheatManager::IsBlockedStartAddress(uint32_t dwThreadId, uint32_t dwSt
 			return true;
 		}
 
-		auto dwLoadLibraryExA_KBase = (uint32_t)GetProcAddress(hKernelbase, XOR("LoadLibraryExA"));
+		auto dwLoadLibraryExA_KBase = (uint32_t)GetProcAddress(hKernelbase, xorstr("LoadLibraryExA").crypt_get());
 		if (dwLoadLibraryExA_KBase && dwThreadStartAddress == dwLoadLibraryExA_KBase)
 		{
 			if (pdwViolationID) *pdwViolationID = EaxLoadLibraryExA_KBase;
@@ -351,7 +350,7 @@ bool CAnticheatManager::IsBlockedStartAddress(uint32_t dwThreadId, uint32_t dwSt
 			return true;
 		}
 
-		auto dwLoadLibraryExW_KBase = (uint32_t)GetProcAddress(hKernelbase, XOR("LoadLibraryExW"));
+		auto dwLoadLibraryExW_KBase = (uint32_t)GetProcAddress(hKernelbase, xorstr("LoadLibraryExW").crypt_get());
 		if (dwLoadLibraryExW_KBase && dwThreadStartAddress == dwLoadLibraryExW_KBase)
 		{
 			if (pdwViolationID) *pdwViolationID = EaxLoadLibraryExW_KBase;

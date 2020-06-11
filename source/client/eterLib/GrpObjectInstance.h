@@ -6,6 +6,8 @@
 #include "CollisionData.h"
 #include "AttributeInstance.h"
 
+#define ENABLE_OBJ_SCALLING
+
 enum
 {
 	THING_OBJECT   = 0xadf21f13,
@@ -47,6 +49,9 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 		void					SetRotation(float fYaw, float fPitch, float fRoll);
 		void					SetRotationQuaternion(const D3DXQUATERNION &q);
 		void					SetRotationMatrix(const D3DXMATRIX & m);
+		void					SetScaleNew(float x, float y, float z);
+		void					SetScaleNew(const D3DXVECTOR3 & newscale);
+		void					SetScalePosition(const D3DXVECTOR3 & newposition);
 
 		void					Clear();
 		void					Update();
@@ -123,6 +128,11 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 		D3DXVECTOR4				m_v4TBBox[8];
 		D3DXVECTOR3				m_v3TBBoxMin, m_v3TBBoxMax;
 		D3DXVECTOR3				m_v3BBoxMin, m_v3BBoxMax;
+		D3DXVECTOR3				m_vecScalePos;
+		D3DXVECTOR3				m_vecScaleNew;
+		D3DXMATRIX				m_matAbsoluteTrans;
+		D3DXMATRIX				m_matScale;
+		D3DXMATRIX				m_matPositon;
 
 		// Portal
 		uint8_t					m_abyPortalID[PORTAL_ID_MAX_NUM];

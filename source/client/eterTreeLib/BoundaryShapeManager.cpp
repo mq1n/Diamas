@@ -1,98 +1,59 @@
-///////////////////////////////////////////////////////////////////////  
-//  Name: BoundaryShapeManager.cpp
-//
-//  *** INTERACTIVE DATA VISUALIZATION (IDV) PROPRIETARY INFORMATION ***
-//
-//      Copyright (c) 2002-2003 IDV, Inc.
-//      All Rights Reserved.
-//
-//      IDV, Inc.
-//      1233 Washington St. Suite 610
-//      Columbia, SC 29201
-//      Voice: (803) 799-1699
-//      Fax:   (803) 931-0320
-//      Web:   http://www.idvinc.com
-//
-//  This software is supplied under the terms of a license agreement or
-//  nondisclosure agreement with Interactive Data Visualization and may not 
-//  be copied or disclosed except in accordance with the terms of that 
-//  agreement.
 
-
-///////////////////////////////////////////////////////////////////////  
-//	Preprocessor
 #include "StdAfx.h"
 
-#include <windows.h>
-#include "../eterbase/Random.h"
+#include <Windows.h>
+#include "../EterBase/Random.h"
+#include "../eterBase/file_ptr.h"
 #include "BoundaryShapeManager.h"
 
 using namespace std;
+CBoundaryShapeManager::CBoundaryShapeManager() = default;
 
-///////////////////////////////////////////////////////////////////////  
-//	CBoundaryShapeManager::CBoundaryShapeManager
-CBoundaryShapeManager::CBoundaryShapeManager()
-{
-}
-
-
-///////////////////////////////////////////////////////////////////////  
-//	CBoundaryShapeManager::~CBoundaryShapeManager
-
-CBoundaryShapeManager::~CBoundaryShapeManager()
-{
-}
-
-
-///////////////////////////////////////////////////////////////////////  
-//	CBoundaryShapeManager::LoadBsfFile
+CBoundaryShapeManager::~CBoundaryShapeManager() = default;
 
 bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 {
 	bool bSuccess = true;
 	try
 	{
-		FILE* pFile = fopen(pszFilename, "rb");
-		if (pFile)
+		msl::file_ptr fPtr(pszFilename, "rb");
+		if (fPtr)
 		{
-			// number of boundary shapes
+
 			uint32_t nNumBoundaries;
-			if (fread(&nNumBoundaries, sizeof(uint32_t), 1, pFile) == 1)
+			if (fread(&nNumBoundaries, sizeof(uint32_t), 1, fPtr.get()) == 1)
 			{
 				for (uint32_t i = 0; i < nNumBoundaries && bSuccess; ++i)
 				{
 					SBoundaryShape sShape;
-					
-					// number of contours for this shape
 					uint32_t nNumContours;
-					if (fread(&nNumContours, sizeof(uint32_t), 1, pFile) == 1)
+					if (fread(&nNumContours, sizeof(uint32_t), 1, fPtr.get()) == 1)
 					{
 						for (uint32_t j = 0; j < nNumContours && bSuccess; ++j)
 						{
-							// number of points in this contour
+
 							vector<SPoint> vPoints;
 							uint32_t nNumPoints;
-							if (fread(&nNumPoints, sizeof(uint32_t), 1, pFile) == 1)
+							if (fread(&nNumPoints, sizeof(uint32_t), 1, fPtr.get()) == 1)
 							{
-								// read the points
+
 								for (uint32_t k = 0; k < nNumPoints && bSuccess; ++k)
 								{
 									SPoint sPoint;
 
-									if (fread(sPoint.m_afData, sizeof(float), 3, pFile) == 3)
+									if (fread(sPoint.m_afData, sizeof(float), 3, fPtr.get()) == 3)
 									{
-										vPoints.push_back(sPoint);
+										vPoints.emplace_back(sPoint);
 
-										// update extents
 										if (j == 0 && k == 0)
 										{
-											// first point of this shape
+
 											memcpy(sShape.m_afMin, sPoint.m_afData, 3 * sizeof(float));
 											memcpy(sShape.m_afMax, sPoint.m_afData, 3 * sizeof(float));
 										}
 										else
 										{
-											// check extents
+
 											for (int32_t l = 0; l < 3; ++l)
 											{
 												if (sPoint.m_afData[l] < sShape.m_afMin[l])
@@ -107,18 +68,16 @@ bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 										m_strCurrentError = "Error in CBoundaryShapeManager::LoadBsfFile(): Failed to read point";
 										bSuccess = false;
 									}
-
 								}
-								sShape.m_vContours.push_back(vPoints);
+								sShape.m_vContours.emplace_back(vPoints);
 							}
 							else
 							{
 								m_strCurrentError = "Error in CBoundaryShapeManager::LoadBsfFile(): Failed to read number of points";
 								bSuccess = false;
 							}
-
 						}
-						m_vBoundaries.push_back(sShape);
+						m_vBoundaries.emplace_back(sShape);
 					}
 					else
 					{
@@ -132,7 +91,6 @@ bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 				m_strCurrentError = "Error in CBoundaryShapeManager::LoadBsfFile(): Failed to read number of boundaries";
 				bSuccess = false;
 			}
-			fclose(pFile);
 		}
 		else
 		{
@@ -140,7 +98,7 @@ bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 			bSuccess = false;
 		}
 	}
-	
+
 	catch(...)
 	{
 		m_strCurrentError = "Error in CBoundaryShapeManager::LoadBsfFile(): Unknown exception";
@@ -148,11 +106,6 @@ bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 
 	return bSuccess;
 }
-
-
-///////////////////////////////////////////////////////////////////////  
-//	CBoundaryShapeManager::PointInside
-
 bool CBoundaryShapeManager::PointInside(float fX, float fY)
 {
 	bool bInside = false;
@@ -162,11 +115,6 @@ bool CBoundaryShapeManager::PointInside(float fX, float fY)
 
 	return bInside;
 }
-
-
-///////////////////////////////////////////////////////////////////////  
-//	CBoundaryShapeManager::PointInShape
-
 bool CBoundaryShapeManager::PointInShape(SBoundaryShape& sShape, float fX, float fY)
 {
 	bool bInside = false;
@@ -186,26 +134,17 @@ bool CBoundaryShapeManager::PointInShape(SBoundaryShape& sShape, float fX, float
 
 	return bInside;
 }
-
-
-///////////////////////////////////////////////////////////////////////  
-//	CBoundaryShapeManager::RandomPoint
-
 bool CBoundaryShapeManager::RandomPoint(float& fX, float& fY)
 {
 	bool bSuccess = false;
 
-	if (m_vBoundaries.size() > 0)
+	if (!m_vBoundaries.empty())
 	{
-		// pick a random boundary shape
+
 		int32_t nIndex = random_range(0, m_vBoundaries.size() - 1);
 		SBoundaryShape& sShape = m_vBoundaries[nIndex];
-
-		// pick a point at random within its extents
 		fX = frandom(sShape.m_afMin[0], sShape.m_afMax[0]);
 		fY = frandom(sShape.m_afMin[1], sShape.m_afMax[1]);
-
-		// try it
 		bSuccess = PointInShape(sShape, fX, fY);
 	}
 

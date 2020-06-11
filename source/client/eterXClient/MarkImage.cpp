@@ -1,28 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "MarkImage.h"
 #include "../eterBase/lzo.h"
-
-#if !defined(_MSC_VER)
-#include <IL/il.h>
-#include "crc32.h"
-#include "lzo_manager.h"
-#include "minilzo.h"
-#define CLZO LZOManager
-#else
-#define sys_err TraceError
-#define sys_log //(n, format, ...) Tracenf(format, __VA_ARGS__)
-#define thecore_memcpy memcpy
-#endif
-
-CGuildMarkImage * NewMarkImage()
-{
-	return new CGuildMarkImage;
-}
-
-void DeleteMarkImage(CGuildMarkImage * pkImage)
-{
-	delete pkImage;
-}
 
 CGuildMarkImage::CGuildMarkImage()
 {
@@ -51,12 +29,12 @@ void CGuildMarkImage::Create()
 	ilGenImages(1, &m_uImg);
 }
 
-bool CGuildMarkImage::Save(const char* c_szFileName) 
+bool CGuildMarkImage::Save(const char * c_szFileName) const
 {
 	ilEnable(IL_FILE_OVERWRITE);
 	ilBindImage(m_uImg);
 
-	if (!ilSave(IL_TGA, (const ILstring)c_szFileName))
+	if (!ilSave(IL_TGA, c_szFileName))
 		return false;
 
 	return true;
@@ -71,20 +49,17 @@ bool CGuildMarkImage::Build(const char * c_szFileName)
 	ilEnable(IL_ORIGIN_SET);
 	ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
 
-	uint8_t * data = (uint8_t *) malloc(sizeof(Pixel) * WIDTH * HEIGHT);
-	memset(data, 0, sizeof(Pixel) * WIDTH * HEIGHT);
+	std::vector<uint8_t> data(sizeof(Pixel) * WIDTH * HEIGHT);
 
-	if (!ilTexImage(WIDTH, HEIGHT, 1, 4, IL_BGRA, IL_UNSIGNED_BYTE, data))
+	if (!ilTexImage(WIDTH, HEIGHT, 1, 4, IL_BGRA, IL_UNSIGNED_BYTE, data.data()))
 	{
-		sys_err("CGuildMarkImage: cannot initialize image");
+		TraceError("CGuildMarkImage: cannot initialize image");
 		return false;
 	}
 
-	free(data);
-
 	ilEnable(IL_FILE_OVERWRITE);
 
-	if (!ilSave(IL_TGA, (const ILstring)c_szFileName))
+	if (!ilSave(IL_TGA, c_szFileName))
 		return false;
 
 	return true;
@@ -99,26 +74,26 @@ bool CGuildMarkImage::Load(const char * c_szFileName)
 	ilEnable(IL_ORIGIN_SET);
 	ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
 
-	if (!ilLoad(IL_TYPE_UNKNOWN, (const ILstring) c_szFileName))
+	if (!ilLoad(IL_TYPE_UNKNOWN, c_szFileName))
 	{
 		Build(c_szFileName);
 		
 		if (!Load(c_szFileName))
 		{
-			sys_err("CGuildMarkImage: cannot open file for writing %s", c_szFileName);
+			TraceError("CGuildMarkImage: cannot open file for writing %s", c_szFileName);
 			return false;
 		}
 	}
 
 	if (ilGetInteger(IL_IMAGE_WIDTH) != WIDTH)	
 	{
-		sys_err("CGuildMarkImage: %s width must be %u", c_szFileName, WIDTH);
+		TraceError("CGuildMarkImage: %s width must be %u", c_szFileName, WIDTH);
 		return false;
 	}
 
 	if (ilGetInteger(IL_IMAGE_HEIGHT) != HEIGHT)
 	{
-		sys_err("CGuildMarkImage: %s height must be %u", c_szFileName, HEIGHT);
+		TraceError("CGuildMarkImage: %s height must be %u", c_szFileName, HEIGHT);
 		return false;
 	}
 
@@ -128,13 +103,13 @@ bool CGuildMarkImage::Load(const char * c_szFileName)
 	return true;
 }
 
-void CGuildMarkImage::PutData(uint32_t x, uint32_t y, uint32_t width, uint32_t height, void * data)
+void CGuildMarkImage::PutData(uint32_t x, uint32_t y, uint32_t width, uint32_t height, void * data) const
 {
 	ilBindImage(m_uImg);
 	ilSetPixels(x, y, 0, width, height, 1, IL_BGRA, IL_UNSIGNED_BYTE, data);
 }
 
-void CGuildMarkImage::GetData(uint32_t x, uint32_t y, uint32_t width, uint32_t height, void * data)
+void CGuildMarkImage::GetData(uint32_t x, uint32_t y, uint32_t width, uint32_t height, void * data) const
 {
 	ilBindImage(m_uImg);
 	ilCopyPixels(x, y, 0, width, height, 1, IL_BGRA, IL_UNSIGNED_BYTE, data);	
@@ -150,7 +125,7 @@ bool CGuildMarkImage::SaveMark(uint32_t posMark, uint8_t * pbImage)
 {
 	if (posMark >= MARK_TOTAL_COUNT)
 	{
-		sys_err("CGuildMarkImage::CopyMarkFromData: Invalid mark position %u", posMark);
+		TraceError("CGuildMarkImage::CopyMarkFromData: Invalid mark position %u", posMark);
 		return false;
 	}
 
@@ -158,10 +133,10 @@ bool CGuildMarkImage::SaveMark(uint32_t posMark, uint8_t * pbImage)
 	uint32_t colMark = posMark % MARK_COL_COUNT;
 	uint32_t rowMark = posMark / MARK_COL_COUNT;
 
+#ifdef _DEBUG
 	printf("PutMark pos %u %ux%u\n", posMark, colMark * SGuildMark::WIDTH, rowMark * SGuildMark::HEIGHT);
+#endif
 	PutData(colMark * SGuildMark::WIDTH, rowMark * SGuildMark::HEIGHT, SGuildMark::WIDTH, SGuildMark::HEIGHT, pbImage);
-
-	// 그려진 곳의 블럭을 업데이트
 	uint32_t rowBlock = rowMark / SGuildMarkBlock::MARK_PER_BLOCK_HEIGHT;
 	uint32_t colBlock = colMark / SGuildMarkBlock::MARK_PER_BLOCK_WIDTH;
 
@@ -175,7 +150,7 @@ bool CGuildMarkImage::DeleteMark(uint32_t posMark)
 {
 	Pixel image[SGuildMark::SIZE];
 	memset(&image, 0, sizeof(image));
-	return SaveMark(posMark, (uint8_t *) &image);
+	return SaveMark(posMark, reinterpret_cast<uint8_t *>(&image));
 }
 
 // CLIENT
@@ -187,15 +162,17 @@ bool CGuildMarkImage::SaveBlockFromCompressedData(uint32_t posBlock, const uint8
 	Pixel apxBuf[SGuildMarkBlock::SIZE];
 	size_t sizeBuf = sizeof(apxBuf);
 
-	if (LZO_E_OK != lzo1x_decompress_safe(pbComp, dwCompSize, (uint8_t *) apxBuf, (lzo_uint*) &sizeBuf, CLZO::Instance().GetWorkMemory()))
+	auto lzoDecompressResult = lzo1x_decompress_safe(pbComp, dwCompSize, reinterpret_cast<uint8_t *>(apxBuf), reinterpret_cast<lzo_uint *>(&sizeBuf),
+		CLZO::Instance().GetWorkMemory());
+	if (LZO_E_OK != lzoDecompressResult)
 	{
-		sys_err("CGuildMarkImage::CopyBlockFromCompressedData: cannot decompress, compressed size = %u", dwCompSize);
+		TraceError("CGuildMarkImage::CopyBlockFromCompressedData: cannot decompress, compressed size = %u [errorID: %d]", dwCompSize, lzoDecompressResult);
 		return false;
 	}
 
 	if (sizeBuf != sizeof(apxBuf))
 	{
-		sys_err("CGuildMarkImage::CopyBlockFromCompressedData: image corrupted, decompressed size = %u", sizeBuf);
+		TraceError("CGuildMarkImage::CopyBlockFromCompressedData: image corrupted, decompressed size = %u", sizeBuf);
 		return false;
 	}
 
@@ -204,20 +181,23 @@ bool CGuildMarkImage::SaveBlockFromCompressedData(uint32_t posBlock, const uint8
 
 	PutData(colBlock * SGuildMarkBlock::WIDTH, rowBlock * SGuildMarkBlock::HEIGHT, SGuildMarkBlock::WIDTH, SGuildMarkBlock::HEIGHT, apxBuf);
 
-	m_aakBlock[rowBlock][colBlock].CopyFrom(pbComp, dwCompSize, GetCRC32((const char *) apxBuf, sizeof(Pixel) * SGuildMarkBlock::SIZE));
+	m_aakBlock[rowBlock][colBlock].CopyFrom(pbComp, dwCompSize,
+											GetCRC32(reinterpret_cast<const char *>(apxBuf), sizeof(Pixel) * SGuildMarkBlock::SIZE));
 	return true;
 }
 
-void CGuildMarkImage::BuildAllBlocks() // 이미지 전체를 블럭화
+void CGuildMarkImage::BuildAllBlocks() 
 {
 	Pixel apxBuf[SGuildMarkBlock::SIZE];
-	sys_log(0, "CGuildMarkImage::BuildAllBlocks");
+	Tracenf("CGuildMarkImage::BuildAllBlocks");
 
 	for (uint32_t row = 0; row < BLOCK_ROW_COUNT; ++row)
+	{
 		for (uint32_t col = 0; col < BLOCK_COL_COUNT; ++col)
 		{
 			GetData(col * SGuildMarkBlock::WIDTH, row * SGuildMarkBlock::HEIGHT, SGuildMarkBlock::WIDTH, SGuildMarkBlock::HEIGHT, apxBuf);
 			m_aakBlock[row][col].Compress(apxBuf);
+		}
 		}
 }
 
@@ -243,37 +223,39 @@ void CGuildMarkImage::GetDiffBlocks(const uint32_t * crcList, std::map<uint8_t, 
 {
 	uint8_t posBlock = 0;
 
-	for (uint32_t row = 0; row < BLOCK_ROW_COUNT; ++row)
-		for (uint32_t col = 0; col < BLOCK_COL_COUNT; ++col)
+	for (auto & row : m_aakBlock)
+	{
+		for (auto & col : row)
 		{
-			if (m_aakBlock[row][col].m_crc != *crcList)
-			{
-				mapDiffBlocks.insert(std::map<uint8_t, const SGuildMarkBlock *>::value_type(posBlock, &m_aakBlock[row][col]));
-			}
+			if (col.m_crc != *crcList)
+				mapDiffBlocks.emplace(posBlock, &col);
 			++crcList;
 			++posBlock;
 		}
+	}
 }
 
 void CGuildMarkImage::GetBlockCRCList(uint32_t * crcList)
 {
-	for (uint32_t row = 0; row < BLOCK_ROW_COUNT; ++row)
-		for (uint32_t col = 0; col < BLOCK_COL_COUNT; ++col)
-			*(crcList++) = m_aakBlock[row][col].GetCRC();
+	for (auto & row : m_aakBlock)
+	{
+		for (const auto & col : row)
+			*(crcList++) = col.GetCRC();
+	}
 }
-
-////////////////////////////////////////////////////////////////////////////////
 void SGuildMark::Clear()
 {
-	for (uint32_t iPixel = 0; iPixel < SIZE; ++iPixel)
-		m_apxBuf[iPixel] = 0xff000000;	
+	for (auto & iPixel : m_apxBuf)
+		iPixel = 0xff000000;
 }
 
 bool SGuildMark::IsEmpty()
 {
-	for (uint32_t iPixel = 0; iPixel < SIZE; ++iPixel)
-		if (m_apxBuf[iPixel] != 0x00000000)
+	for (auto & iPixel : m_apxBuf)
+	{
+		if (iPixel != 0x00000000)
 			return false;
+	}
 
 	return true;
 }
@@ -290,24 +272,21 @@ void SGuildMarkBlock::CopyFrom(const uint8_t * pbCompBuf, uint32_t dwCompSize, u
 		return;
 
 	m_sizeCompBuf = dwCompSize;
-	thecore_memcpy(m_abCompBuf, pbCompBuf, dwCompSize);
+	memcpy(m_abCompBuf, pbCompBuf, dwCompSize);
 	m_crc = crc;
-	//printf("SGuildMarkBlock::CopyFrom: %u > %u crc %u\n", sizeof(Pixel) * SGuildMarkBlock::SIZE, m_sizeCompBuf, m_crc);
 }
 
 void SGuildMarkBlock::Compress(const Pixel * pxBuf)
 {
 	m_sizeCompBuf = MAX_COMP_SIZE;
 
-	if (LZO_E_OK != lzo1x_999_compress((const uint8_t *) pxBuf,
-		sizeof(Pixel) * SGuildMarkBlock::SIZE, m_abCompBuf,
-		(lzo_uint*) &m_sizeCompBuf,
-		CLZO::Instance().GetWorkMemory()))
+	if (LZO_E_OK !=
+		lzo1x_999_compress(reinterpret_cast<const uint8_t *>(pxBuf), sizeof(Pixel) * SIZE, m_abCompBuf,
+						   reinterpret_cast<lzo_uint *>(&m_sizeCompBuf), CLZO::Instance().GetWorkMemory()))
 	{
-		sys_err("SGuildMarkBlock::Compress: Error! %u > %u", sizeof(Pixel) * SGuildMarkBlock::SIZE, m_sizeCompBuf);
+		TraceError("SGuildMarkBlock::Compress: Error! %u > %u", sizeof(Pixel) * SIZE, m_sizeCompBuf);
 		return;
 	}
 
-	//sys_log(0, "SGuildMarkBlock::Compress %u > %u", sizeof(Pixel) * SGuildMarkBlock::SIZE, m_sizeCompBuf);
-	m_crc = GetCRC32((const char *) pxBuf, sizeof(Pixel) * SGuildMarkBlock::SIZE);
+	m_crc = GetCRC32(reinterpret_cast<const char *>(pxBuf), sizeof(Pixel) * SIZE);
 }

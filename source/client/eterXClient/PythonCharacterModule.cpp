@@ -1,7 +1,10 @@
 #include "StdAfx.h"
 #include "PythonCharacterManager.h"
 #include "PythonNonPlayer.h"
-#include "../eterGameLib/GameLibDefines.h"
+#include "PythonNetworkStream.h"
+#include "PythonPlayer.h"
+#include "PythonDynamicModuleNames.h"
+#include "locale_inc.h"
 
 PyObject * chrRaceToJob(PyObject * poSelf, PyObject * poArgs)
 {
@@ -808,6 +811,20 @@ PyObject * chrGetRace(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildValue("i", pCharacterInstance->GetRace());
 }
 
+PyObject* chrGetRaceByVID (PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t iVirtualID;
+	if (!PyTuple_GetInteger (poArgs, 0, &iVirtualID))
+		return Py_BuildException();
+
+	CInstanceBase* pInstance = CPythonCharacterManager::Instance().GetInstancePtr(iVirtualID);
+
+	if (!pInstance)
+		return Py_BuildValue ("i", 0);
+
+	return Py_BuildValue ("i", pInstance->GetRace());
+}
+
 PyObject * chrGetName(PyObject* poSelf, PyObject* poArgs)
 {
 	CInstanceBase * pCharacterInstance = CPythonCharacterManager::Instance().GetSelectedInstancePtr();
@@ -1244,6 +1261,23 @@ PyObject * chrSetAcce(PyObject* poSelf, PyObject* poArgs)
 }
 #endif
 
+PyObject* chrSetScale (PyObject* poSelf, PyObject* poArgs)
+{
+	float zScale;
+	float yScale;
+	float xScale;
+	if (!PyTuple_GetFloat (poArgs, 0, &xScale) || PyTuple_GetFloat (poArgs, 1, &yScale) || PyTuple_GetFloat (poArgs, 2, &zScale))
+		return Py_BuildException();
+
+	CInstanceBase* pkInst = CPythonCharacterManager::Instance().GetSelectedInstancePtr();
+	if (!pkInst)
+		return Py_BuildNone();
+
+	CActorInstance actoInst = pkInst->GetGraphicThingInstanceRef();
+	actoInst.SetScale (xScale, yScale, zScale, true);
+
+	return Py_BuildNone();
+}
 
 void initchr()
 {
@@ -1311,6 +1345,7 @@ void initchr()
 		{ "BlendRotation",				chrBlendRotation,					METH_VARARGS },
 		{ "GetRotation",				chrGetRotation,						METH_VARARGS },
 		{ "GetRace",					chrGetRace,							METH_VARARGS },
+		{"GetRaceByVID", chrGetRaceByVID, METH_VARARGS},
 		{ "GetName",					chrGetName,							METH_VARARGS },
 		{ "GetNameByVID",				chrGetNameByVID,					METH_VARARGS },
 		{ "GetGuildID",					chrGetGuildID,						METH_VARARGS },
@@ -1332,7 +1367,7 @@ void initchr()
 		{ "WeaponTraceSetTexture",			chrWeaponTraceSetTexture,			METH_VARARGS },
 		{ "WeaponTraceUseAlpha",			chrWeaponTraceUseAlpha,				METH_VARARGS },
 		{ "WeaponTraceUseTexture",			chrWeaponTraceUseTexture,			METH_VARARGS },
-		{ "MoveToDestPosition",				chrMoveToDestPosition,				METH_VARARGS },
+		//{ "MoveToDestPosition",				chrMoveToDestPosition,				METH_VARARGS },
 		{ "testSetComboType",				chrtestSetComboType,				METH_VARARGS },
 		{ "testSetAddRenderMode",			chrtestSetAddRenderMode,			METH_VARARGS },
 		{ "testSetModulateRenderMode",		chrtestSetModulateRenderMode,		METH_VARARGS },
@@ -1346,11 +1381,13 @@ void initchr()
 		{ "SetAcce",						chrSetAcce,							METH_VARARGS },
 #endif
 
+		{"SetScale",	chrSetScale,	METH_VARARGS},
+
 		{ nullptr,								nullptr,								0		 },
 	};
 
-	PyObject * poModule = Py_InitModule("chr", s_methods);
-
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(CHR_MODULE).c_str(), s_methods);
+	
 	// Length
 	PyModule_AddIntConstant(poModule, "PLAYER_NAME_MAX_LEN",				PLAYER_NAME_MAX_LEN);
 

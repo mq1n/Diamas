@@ -5,7 +5,7 @@
 #include "../eterbase/Timer.h"
 
 #include "AbstractPlayer.h"
-#include "../eterGameLib/GameLibDefines.h"
+#include "locale_inc.h"
 
 enum
 {
@@ -383,33 +383,16 @@ uint32_t CPythonPlayer::__GetTotalAtk(uint32_t dwWeaponPower, uint32_t dwRefineB
 	uint32_t dwWepAtk;
 	uint32_t dwTotalAtk;	
 
-	if (LocaleService_IsCHEONMA())
-	{
-		dwWepAtk = __GetWeaponAtk(dwWeaponPower+dwRefineBonus);
-		dwTotalAtk = dwLvAtk+(dwStAtk+dwWepAtk)*(GetStatus(POINT_DX)+210)/300;		
-	}
-	else
-	{
-		int32_t hr = __GetHitRate();
-		dwWepAtk = __GetWeaponAtk(dwWeaponPower+dwRefineBonus);
-		dwTotalAtk = dwLvAtk+(dwStAtk+dwWepAtk)*hr/100;	
-	}
+	int32_t hr = __GetHitRate();
+	dwWepAtk = __GetWeaponAtk(dwWeaponPower+dwRefineBonus);
+	dwTotalAtk = dwLvAtk+(dwStAtk+dwWepAtk)*hr/100;	
 
 	return dwTotalAtk;
 }
 
 uint32_t CPythonPlayer::__GetHitRate()
 {
-	int32_t src = 0;
-
-	if (LocaleService_IsCHEONMA())
-	{
-		src = GetStatus(POINT_DX);
-	}
-	else
-	{
-		src = (GetStatus(POINT_DX) * 4 + GetStatus(POINT_LEVEL) * 2)/6;
-	}
+	int32_t src = (GetStatus(POINT_DX) * 4 + GetStatus(POINT_LEVEL) * 2)/6;
 
 	return 100*(std::min(90, src)+210)/300;
 }
@@ -933,16 +916,12 @@ bool CPythonPlayer::IsEquipmentSlot(TItemPos Cell)
 bool CPythonPlayer::IsEquipItemInSlot(TItemPos Cell)
 {
 	if (!Cell.IsEquipCell())
-	{
 		return false;
-	}
 
 	const TItemData * pData = GetItemData(Cell);
 	
 	if (nullptr == pData)
-	{
 		return false;
-	}
 
 	uint32_t dwItemIndex = pData->vnum;
 
@@ -977,11 +956,9 @@ int32_t CPythonPlayer::GetSkillIndex(uint32_t dwSlotIndex)
 
 bool CPythonPlayer::GetSkillSlotIndex(uint32_t dwSkillIndex, uint32_t* pdwSlotIndex)
 {
-	std::map<uint32_t, uint32_t>::iterator f=m_skillSlotDict.find(dwSkillIndex);
+	auto f = m_skillSlotDict.find(dwSkillIndex);
 	if (m_skillSlotDict.end()==f)
-	{
 		return false;
-	}
 
 	*pdwSlotIndex=f->second;
 
@@ -1337,7 +1314,7 @@ void CPythonPlayer::ExitParty()
 
 void CPythonPlayer::AppendPartyMember(uint32_t dwPID, const char * c_szName)
 {
-	m_PartyMemberMap.insert(std::make_pair(dwPID, TPartyMemberInfo(dwPID, c_szName)));
+	m_PartyMemberMap.emplace(dwPID, TPartyMemberInfo(dwPID, c_szName));
 }
 
 void CPythonPlayer::LinkPartyMember(uint32_t dwPID, uint32_t dwVID)
@@ -1420,7 +1397,7 @@ void CPythonPlayer::RemovePartyMember(uint32_t dwPID)
 
 bool CPythonPlayer::IsPartyMemberByVID(uint32_t dwVID)
 {
-	std::map<uint32_t, TPartyMemberInfo>::iterator itor = m_PartyMemberMap.begin();
+	auto itor = m_PartyMemberMap.begin();
 	for (; itor != m_PartyMemberMap.end(); ++itor)
 	{
 		TPartyMemberInfo & rPartyMemberInfo = itor->second;
@@ -1433,7 +1410,7 @@ bool CPythonPlayer::IsPartyMemberByVID(uint32_t dwVID)
 
 bool CPythonPlayer::IsPartyMemberByName(const char * c_szName)
 {
-	std::map<uint32_t, TPartyMemberInfo>::iterator itor = m_PartyMemberMap.begin();
+	auto itor = m_PartyMemberMap.begin();
 	for (; itor != m_PartyMemberMap.end(); ++itor)
 	{
 		TPartyMemberInfo & rPartyMemberInfo = itor->second;
@@ -1446,7 +1423,7 @@ bool CPythonPlayer::IsPartyMemberByName(const char * c_szName)
 
 bool CPythonPlayer::GetPartyMemberPtr(uint32_t dwPID, TPartyMemberInfo ** ppPartyMemberInfo)
 {
-	std::map<uint32_t, TPartyMemberInfo>::iterator itor = m_PartyMemberMap.find(dwPID);
+	auto itor = m_PartyMemberMap.find(dwPID);
 
 	if (m_PartyMemberMap.end() == itor)
 		return false;
@@ -1458,7 +1435,7 @@ bool CPythonPlayer::GetPartyMemberPtr(uint32_t dwPID, TPartyMemberInfo ** ppPart
 
 bool CPythonPlayer::PartyMemberPIDToVID(uint32_t dwPID, uint32_t * pdwVID)
 {
-	std::map<uint32_t, TPartyMemberInfo>::iterator itor = m_PartyMemberMap.find(dwPID);
+	auto itor = m_PartyMemberMap.find(dwPID);
 
 	if (m_PartyMemberMap.end() == itor)
 		return false;
@@ -1471,7 +1448,7 @@ bool CPythonPlayer::PartyMemberPIDToVID(uint32_t dwPID, uint32_t * pdwVID)
 
 bool CPythonPlayer::PartyMemberVIDToPID(uint32_t dwVID, uint32_t * pdwPID)
 {
-	std::map<uint32_t, TPartyMemberInfo>::iterator itor = m_PartyMemberMap.begin();
+	auto itor = m_PartyMemberMap.begin();
 	for (; itor != m_PartyMemberMap.end(); ++itor)
 	{
 		TPartyMemberInfo & rPartyMemberInfo = itor->second;
@@ -1494,16 +1471,16 @@ bool CPythonPlayer::IsSamePartyMember(uint32_t dwVID1, uint32_t dwVID2)
 void CPythonPlayer::RememberChallengeInstance(uint32_t dwVID)
 {
 	m_RevengeInstanceSet.erase(dwVID);
-	m_ChallengeInstanceSet.insert(dwVID);
+	m_ChallengeInstanceSet.emplace(dwVID);
 }
 void CPythonPlayer::RememberRevengeInstance(uint32_t dwVID)
 {
 	m_ChallengeInstanceSet.erase(dwVID);
-	m_RevengeInstanceSet.insert(dwVID);
+	m_RevengeInstanceSet.emplace(dwVID);
 }
 void CPythonPlayer::RememberCantFightInstance(uint32_t dwVID)
 {
-	m_CantFightInstanceSet.insert(dwVID);
+	m_CantFightInstanceSet.emplace(dwVID);
 }
 void CPythonPlayer::ForgetInstance(uint32_t dwVID)
 {
@@ -1759,6 +1736,6 @@ CPythonPlayer::CPythonPlayer(void)
 	Clear();
 }
 
-CPythonPlayer::~CPythonPlayer(void)
-{
-}
+CPythonPlayer::~CPythonPlayer(void) = default;
+
+

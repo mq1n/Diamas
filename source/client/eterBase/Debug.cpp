@@ -1,11 +1,10 @@
 #include "StdAfx.h"
-#include <time.h>
+#include <ctime>
+#include <chrono>
 #include <stdio.h>
 #include "Debug.h"
 #include "Singleton.h"
 #include "Timer.h"
-#include <chrono>
-#include <ctime>
 #include <fmt/format.h>
 
 const uint32_t DEBUG_STRING_MAX_LEN = 1024;

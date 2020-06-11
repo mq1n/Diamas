@@ -92,7 +92,6 @@ bool CIME::ms_bUseIMMCandidate = false;
 HWND CIME::ms_hWnd;
 HKL	CIME::ms_hklCurrent;
 char CIME::ms_szKeyboardLayout[KL_NAMELENGTH+1];
-OSVERSIONINFOA CIME::ms_stOSVI;
 
 HINSTANCE CIME::ms_hImm32Dll;
 HINSTANCE CIME::ms_hCurrentImeDll;
@@ -305,17 +304,6 @@ bool CIME::Initialize(HWND hWnd)
 
 	g_disableCicero.Initialize();
 
-	ms_stOSVI.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-	GetVersionExA(&ms_stOSVI);
-
-	bool bUnicodeImm = false;
-	// IMM in NT or Win98 supports Unicode
-	if ( ms_stOSVI.dwPlatformId == VER_PLATFORM_WIN32_NT ||
-		( ms_stOSVI.dwMajorVersion > 4 ) ||
-		( ms_stOSVI.dwMajorVersion == 4 ) && ( ms_stOSVI.dwMinorVersion > 0 ) ) {
-		bUnicodeImm = true;
-	}
-
 	// Load ImmLock/ImmUnlock Function Proc
     CHAR szPath[MAX_PATH+1];
 	ms_bDisableIMECompletely = false;
@@ -520,7 +508,7 @@ const char* CIME::GetCodePageText()
 {
 	static char szCodePage[16];
 
-	const uint32_t defCodePage = GetDefaultCodePage();
+	const int defCodePage = GetDefaultCodePage();
 	const int outCodePage = ms_uOutputCodePage;
 
 	if (outCodePage != defCodePage)
@@ -1188,22 +1176,6 @@ void CIME::ReadingProcess(HIMC hImc)
 						dwErr = std::min(dwErr, tempLen);
 						temp = (wchar_t *)(p + 6*4 + 16*2*1);
 						bUnicodeIme = true;
-					}
-					break;
-
-				case IMEID_CHS_VER42: // 4.2.x.x // SCIME98 or MSPY2 (w/Office2k, Win2k, WinME, etc)
-					{
-						OSVERSIONINFOA osi;
-						osi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-						GetVersionExA(&osi);
-
-						int nTcharSize = (osi.dwPlatformId == VER_PLATFORM_WIN32_NT) ? sizeof(wchar_t) : sizeof(char);
-						p = *(LPBYTE *)((LPBYTE)_ImmLockIMCC(lpIC->hPrivate) + 1*4 + 1*4 + 6*4);
-						if(!p) break;
-						tempLen = *(DWORD *)(p + 1*4 + (16*2+2*4) + 5*4 + 16 * nTcharSize);
-						dwErr = *(DWORD *)(p + 1*4 + (16*2+2*4) + 5*4 + 16 * nTcharSize + 1*4);
-						temp  = (wchar_t *) (p + 1*4 + (16*2+2*4) + 5*4);
-						bUnicodeIme = (osi.dwPlatformId == VER_PLATFORM_WIN32_NT) ? true : false;
 					}
 					break;
 

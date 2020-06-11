@@ -40,6 +40,8 @@ class CItemManager : public CSingleton<CItemManager>
 		
 		void			Destroy();
 
+		TItemMap		GetItems() const { return m_ItemMap; }
+
 		BOOL			SelectItemData(uint32_t dwIndex);
 		CItemData *		GetSelectedItemDataPointer();
 

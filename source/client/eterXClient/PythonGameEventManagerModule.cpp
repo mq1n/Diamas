@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "../eterGameLib/GameEventManager.h"
+#include "PythonDynamicModuleNames.h"
 
 PyObject * eventMgrUpdate(PyObject * poSelf, PyObject * poArgs)
 {
@@ -26,5 +27,5 @@ void initeventmgr()
 		{ nullptr,						nullptr,							0 },
 	};
 
-	Py_InitModule("eventMgr", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(EVENT_MANAGER_MODULE).c_str(), s_methods);
 }

@@ -24,8 +24,6 @@
 #include "AbstractCharacterManager.h"
 #include "InstanceBase.h"
 
-#include "ProcessCRC.h"
-
 BOOL gs_bEmpireLanuageEnable = TRUE;
 
 void CPythonNetworkStream::__RefreshAlignmentWindow()
@@ -189,12 +187,6 @@ PERF_PacketTimeAnalyzer gs_kPacketTimeAnalyzer;
 // Game Phase ---------------------------------------------------------------------------
 void CPythonNetworkStream::GamePhase()
 {
-	if (!m_kQue_stHack.empty())
-	{
-		__SendHack(m_kQue_stHack.front().c_str());
-		m_kQue_stHack.pop_front();
-	}
-
 	TPacketHeader header = 0;
 	bool ret = true;
 
@@ -205,15 +197,19 @@ void CPythonNetworkStream::GamePhase()
 	kMap_kPacketInfo.clear();
 #endif
 
+#ifndef ENABLE_NO_RECV_GAME_LIMIT
 	const uint32_t MAX_RECV_COUNT = 4;
 	const uint32_t SAFE_RECV_BUFSIZE = 8192;
 	uint32_t dwRecvCount = 0;
+#endif
 
     while (ret)
 	{
+#ifndef ENABLE_NO_RECV_GAME_LIMIT
 		if(dwRecvCount++ >= MAX_RECV_COUNT-1 && GetRecvBufferSize() < SAFE_RECV_BUFSIZE
 			&& m_strPhase == "Game") //phase_game 이 아니어도 여기로 들어오는 경우가 있다.
 			break;
+#endif
 
 		if (!CheckPacket(&header))
 			break;
@@ -1042,28 +1038,6 @@ void CPythonNetworkStream::__SendWarpPacket()
 	}
 }
 */
-void CPythonNetworkStream::NotifyHack(const char* c_szMsg)
-{
-	if (!m_kQue_stHack.empty())
-		if (c_szMsg==m_kQue_stHack.back())
-			return;
-
-	m_kQue_stHack.push_back(c_szMsg);	
-}
-
-bool CPythonNetworkStream::__SendHack(const char* c_szMsg)
-{
-	Tracen(c_szMsg);
-	
-	TPacketCGHack kPacketHack;
-	kPacketHack.bHeader=HEADER_CG_HACK;
-	strncpy(kPacketHack.szBuf, c_szMsg, sizeof(kPacketHack.szBuf)-1);
-
-	if (!Send(sizeof(kPacketHack), &kPacketHack))
-		return false;
-
-	return SendSequence();
-}
 
 bool CPythonNetworkStream::SendMessengerAddByVIDPacket(uint32_t vid)
 {
@@ -1076,6 +1050,20 @@ bool CPythonNetworkStream::SendMessengerAddByVIDPacket(uint32_t vid)
 		return false;
 	return SendSequence();
 }
+
+bool CPythonNetworkStream::SendHackNotification(const char* c_szMsg, const char* c_szInfo)
+{
+	TPacketCGHack kPacketHack;
+	kPacketHack.bHeader = HEADER_CG_HACK;
+	strncpy_s(kPacketHack.szBuf, c_szMsg, sizeof(kPacketHack.szBuf) - 1);
+	strncpy_s(kPacketHack.szInfo, c_szInfo, sizeof(kPacketHack.szInfo) - 1);
+
+	if (!Send (sizeof (kPacketHack), &kPacketHack))
+		return false;
+
+	return true;
+}
+
 
 bool CPythonNetworkStream::SendMessengerAddByNamePacket(const char * c_szName)
 {
@@ -1251,16 +1239,6 @@ bool CPythonNetworkStream::RecvChatPacket()
 		return false;
 
 	buf[uChatSize]='\0';
-	
-	// 유럽 아랍 버전 처리
-	// "이름: 내용" 입력을 "내용: 이름" 순서로 출력하기 위해 탭(0x08)을 넣음
-	// 탭을 아랍어 기호로 처리해 (영어1) : (영어2) 로 입력되어도 (영어2) : (영어1) 로 출력하게 만든다
-	if (LocaleService_IsEUROPE() && GetDefaultCodePage() == 1256)
-	{
-		char * p = strchr(buf, ':'); 
-		if (p && p[1] == ' ')
-			p[1] = 0x08;
-	}
 
 	if (kChat.type >= CHAT_TYPE_MAX_NUM)
 		return true;
@@ -1661,15 +1639,15 @@ bool CPythonNetworkStream::RecvShopPacket()
 				uint32_t dwVID = pShopStartPacket->owner_vid;
 				uint8_t shop_tab_count = pShopStartPacket->shop_tab_count;
 
-				CPythonShop::instance().SetTabCount(shop_tab_count);
+				CPythonShop::Instance().SetTabCount(shop_tab_count);
 				
 				for (size_t i = 0; i < shop_tab_count; i++)
 				{
 					TPacketGCShopStartEx::TSubPacketShopTab* pPackTab = (TPacketGCShopStartEx::TSubPacketShopTab*)&vecBuffer[read_point];
 					read_point += sizeof(TPacketGCShopStartEx::TSubPacketShopTab);
 					
-					CPythonShop::instance().SetTabCoinType(i, pPackTab->coin_type);
-					CPythonShop::instance().SetTabName(i, pPackTab->name);
+					CPythonShop::Instance().SetTabCoinType(i, pPackTab->coin_type);
+					CPythonShop::Instance().SetTabName(i, pPackTab->name);
 
 					struct packet_shop_item* item = &pPackTab->items[0];
 					
@@ -4032,7 +4010,7 @@ bool CPythonNetworkStream::RecvAffectAddPacket()
 	TPacketAffectElement & rkElement = kAffectAdd.elem;
 	if (rkElement.bPointIdxApplyOn == POINT_ENERGY)
 	{
-		CPythonPlayer::instance().SetStatus (POINT_ENERGY_END_TIME, CPythonApplication::Instance().GetServerTimeStamp() + rkElement.lDuration);
+		CPythonPlayer::Instance().SetStatus (POINT_ENERGY_END_TIME, CPythonApplication::Instance().GetServerTimeStamp() + rkElement.lDuration);
 		__RefreshStatus();
 	}
 	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_NEW_AddAffect", Py_BuildValue("(iiii)", rkElement.dwType, rkElement.bPointIdxApplyOn, rkElement.lApplyValue, rkElement.lDuration));
@@ -4091,7 +4069,7 @@ bool CPythonNetworkStream::RecvLandPacket()
 	if (!Recv(sizeof(kLandList), &kLandList))
 		return false;
 
-	std::vector<uint32_t> kVec_dwGuildID;
+	std::set<uint32_t> kSet_dwGuildID;
 
 	CPythonMiniMap & rkMiniMap = CPythonMiniMap::Instance();
 	CPythonBackground & rkBG = CPythonBackground::Instance();
@@ -4124,11 +4102,9 @@ bool CPythonNetworkStream::RecvLandPacket()
 		}
 
 		if (0 != kElement.dwGuildID)
-			kVec_dwGuildID.push_back(kElement.dwGuildID);
+			kSet_dwGuildID.insert(kElement.dwGuildID);
 	}
-	// @fixme006
-	if (kVec_dwGuildID.size()>0)
-		__DownloadSymbol(kVec_dwGuildID);
+	__DownloadSymbol(kSet_dwGuildID);
 
 	return true;
 }

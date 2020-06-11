@@ -139,6 +139,25 @@ CGrannyMotion * CGraphicThing::GetMotionPointer(int32_t iMotion)
 	return (m_motions + iMotion);
 }
 
+int32_t CGraphicThing::GetTextureCount() const
+{
+	if (!m_pgrnFileInfo)
+		return 0;
+
+	if (m_pgrnFileInfo->TextureCount <= 0)
+		return 0;
+
+	return (m_pgrnFileInfo->TextureCount);
+}
+
+const char * CGraphicThing::GetTexturePath(int32_t iTexture)
+{
+	if(iTexture >= GetTextureCount())
+		return "";
+
+	return m_pgrnFileInfo->Textures[iTexture]->FromFileName;
+}
+
 int32_t CGraphicThing::GetModelCount() const
 {
 	if (!m_pgrnFileInfo)

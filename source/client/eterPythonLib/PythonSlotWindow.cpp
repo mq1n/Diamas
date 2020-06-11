@@ -224,6 +224,8 @@ void CSlotWindow::AppendSlot(uint32_t dwIndex, int32_t ixPosition, int32_t iyPos
 	ClearSlot(&Slot);
 	Slot.dwSlotNumber = dwIndex;
 	Slot.dwCenterSlotNumber = dwIndex;
+	Slot.dwRealSlotNumber = dwIndex;
+	Slot.dwRealCenterSlotNumber = dwIndex;
 	Slot.ixPosition = ixPosition;
 	Slot.iyPosition = iyPosition;
 	Slot.ixCellSize = ixCellSize;
@@ -259,6 +261,31 @@ void CSlotWindow::SetCoverButton(uint32_t dwIndex, const char * c_szUpImageName,
 	{
 		SetTop(pSlot->pSlotButton);
 	}
+}
+
+void CSlotWindow::DeleteCoverButton(uint32_t dwIndex)
+{
+	TSlot * pSlot;
+	if (!GetSlotPointer(dwIndex, &pSlot))
+		return;
+
+	CCoverButton *& rpCoverButton = pSlot->pCoverButton;
+	if (!rpCoverButton)
+		return;
+
+	rpCoverButton->Hide();
+	rpCoverButton->Disable();
+	rpCoverButton->DestroyHandle();
+}
+
+bool CSlotWindow::HasCoverButton(uint32_t dwIndex)
+{
+	TSlot * pSlot;
+	if (!GetSlotPointer(dwIndex, &pSlot))
+		return false;
+
+	CCoverButton *& rpCoverButton = pSlot->pCoverButton;
+	return rpCoverButton ? true : false;
 }
 
 void CSlotWindow::EnableCoverButton(uint32_t dwIndex)
@@ -330,6 +357,11 @@ BOOL CSlotWindow::IsDisableCoverButton(uint32_t dwIndex)
 void CSlotWindow::SetSlotBaseImage(const char * c_szFileName, float fr, float fg, float fb, float fa)
 {
 	__CreateBaseImage(c_szFileName, fr, fg, fb, fa);
+}
+
+void CSlotWindow::SetSlotBaseImageScale(const char * c_szFileName, float fr, float fg, float fb, float fa, float sx, float sy)
+{
+	__CreateBaseImageScale(c_szFileName, fr, fg, fb, fa, sx, sy);
 }
 
 void CSlotWindow::AppendSlotButton(const char * c_szUpImageName, const char * c_szOverImageName, const char * c_szDownImageName)
@@ -410,6 +442,47 @@ void CSlotWindow::SetSlot(uint32_t dwIndex, uint32_t dwVirtualNumber, uint8_t by
 		pSlot->pInstance = CGraphicImageInstance::New();
 		pSlot->pInstance->SetDiffuseColor(diffuseColor.r, diffuseColor.g, diffuseColor.b, diffuseColor.a);
 		pSlot->pInstance->SetImagePointer(pImage);
+	}
+
+	pSlot->byxPlacedItemSize = byWidth;
+	pSlot->byyPlacedItemSize = byHeight;
+
+	if (pSlot->pCoverButton)
+	{
+		pSlot->pCoverButton->Show();
+	}
+}
+
+void CSlotWindow::SetSlotScale(uint32_t dwIndex, uint32_t dwVirtualNumber, uint8_t byWidth, uint8_t byHeight, CGraphicImage * pImage, float sx, float sy, D3DXCOLOR& diffuseColor)
+{
+	TSlot * pSlot;
+	if (!GetSlotPointer(dwIndex, &pSlot))
+		return;
+
+	if (pSlot->isItem)
+		if (pSlot->dwItemIndex == dwVirtualNumber)
+		{
+			pSlot->dwState = 0;
+			pSlot->isItem = TRUE;
+			if (pImage && pSlot->pInstance)
+			{
+				pSlot->pInstance->SetImagePointer(pImage);
+			}
+			return;
+		}
+
+	ClearSlot(pSlot);
+	pSlot->dwState = 0;
+	pSlot->isItem = TRUE;
+	pSlot->dwItemIndex = dwVirtualNumber;
+
+	if (pImage)
+	{
+		assert(nullptr == pSlot->pInstance);
+		pSlot->pInstance = CGraphicImageInstance::New();
+		pSlot->pInstance->SetDiffuseColor(diffuseColor.r, diffuseColor.g, diffuseColor.b, diffuseColor.a);
+		pSlot->pInstance->SetImagePointer(pImage);
+		pSlot->pInstance->SetScale(sx, sy);
 	}
 
 	pSlot->byxPlacedItemSize = byWidth;
@@ -858,6 +931,23 @@ BOOL CSlotWindow::OnMouseLeftButtonUp()
 	}
 
 	return FALSE;
+}
+
+void CSlotWindow::SetSlotID(uint32_t dwIndex, uint32_t dwID)
+{
+	TSlot * pSlot;
+	if (!GetSlotPointer(dwIndex, &pSlot))
+		return;
+
+	if (dwID <= 0)
+	{
+		return;
+	}
+	else
+	{
+		
+		pSlot->dwItemID=dwID;
+	}
 }
 
 BOOL CSlotWindow::OnMouseRightButtonDown()
@@ -1505,6 +1595,17 @@ void CSlotWindow::__CreateBaseImage(const char * c_szFileName, float fr, float f
 	m_pBaseImageInstance = CGraphicImageInstance::New();
 	m_pBaseImageInstance->SetImagePointer(pImage);
 	m_pBaseImageInstance->SetDiffuseColor(fr, fg, fb, fa);
+}
+
+void CSlotWindow::__CreateBaseImageScale(const char * c_szFileName, float fr, float fg, float fb, float fa, float sx, float sy)
+{
+	__DestroyBaseImage();
+
+	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	m_pBaseImageInstance = CGraphicImageInstance::New();
+	m_pBaseImageInstance->SetImagePointer(pImage);
+	m_pBaseImageInstance->SetDiffuseColor(fr, fg, fb, fa);
+	m_pBaseImageInstance->SetScale(sx, sy);
 }
 
 void CSlotWindow::__DestroyToggleSlotImage()

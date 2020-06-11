@@ -12,7 +12,7 @@
 
 #include "PythonMiniMap.h"
 
-const int32_t c_lNormal_Waiting_Time = 10;
+const int32_t c_lNormal_Waiting_Time = 5;
 const int32_t c_fLine_Temp = 16;
 
 void ShowArgument(script::TArgList & rArgumentList)
@@ -1141,6 +1141,24 @@ void CPythonEventManager::SetInterfaceWindow(PyObject * poInterface)
 void CPythonEventManager::SetLeftTimeString(const char * c_szString)
 {
 	m_strLeftTimeString = c_szString;
+}
+
+void CPythonEventManager::SetFontColor(int32_t iIndex, float r, float g, float b)
+{
+	if (!CheckEventSetIndex(iIndex))
+		return;
+
+	TEventSet * pEventSet = m_EventSetVector[iIndex];
+	if (!pEventSet)
+		return;
+
+	if (pEventSet->pCurrentTextLine)
+	{
+		pEventSet->CurrentColor.r = r;
+		pEventSet->CurrentColor.g = g;
+		pEventSet->CurrentColor.b = b;
+		pEventSet->pCurrentTextLine->SetColor(pEventSet->CurrentColor.r, pEventSet->CurrentColor.g, pEventSet->CurrentColor.b);
+	}
 }
 
 CPythonEventManager::CPythonEventManager()

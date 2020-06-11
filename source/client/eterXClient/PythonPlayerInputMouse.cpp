@@ -184,13 +184,6 @@ void CPythonPlayer::__OnClickSmart(CInstanceBase& rkInstMain, bool isAuto)
 
 void CPythonPlayer::__ShowPickedEffect(const TPixelPosition& c_rkPPosPickedGround)
 {
-#ifdef __MOVIE_MODE__
-	CInstanceBase* pkInstMain=NEW_GetMainActorPtr();
-	if (!pkInstMain) return;
-
-	if (pkInstMain->IsMovieMode())
-		return;
-#endif
 	NEW_ShowEffect(EFFECT_PICK, c_rkPPosPickedGround);
 }
 

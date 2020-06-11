@@ -234,13 +234,12 @@ PyObject* appSetCHEONMA(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 0, &enable))
 		return Py_BuildException();
 	
-	LocaleService_SetCHEONMA(enable ? true : false);
 	return Py_BuildNone();
 }
 
 PyObject* appIsCHEONMA(PyObject* poSelf, PyObject* poArgs)
 {
-	return Py_BuildValue("i", LocaleService_IsCHEONMA());
+	return Py_BuildValue("i", 0);
 }
 
 #include "../eterBase/tea.h"
@@ -669,15 +668,6 @@ PyObject * appGetCursorPosition(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildValue("ii", lx, ly);
 }
 
-PyObject * appRunPythonFile(PyObject * poSelf, PyObject * poArgs)
-{
-	char *szFileName;
-	if (!PyTuple_GetString(poArgs, 0, &szFileName))
-		return Py_BuildException();
-
-	return Py_BuildValue("i", 0);
-}
-
 PyObject * appIsPressed(PyObject * poSelf, PyObject * poArgs)
 {
 	int32_t iKey;
@@ -1104,18 +1094,27 @@ PyObject * appSetGuildMarkPath(PyObject * poSelf, PyObject * poArgs)
 PyObject* appIsDevStage(PyObject* poSelf, PyObject* poArgs)
 {
 	int32_t nIsDevelopmentStage = 0;
+#if defined(LOCALE_SERVICE_STAGE_DEVELOPMENT)
+	nIsDevelopmentStage = 1;
+#endif
 	return Py_BuildValue("i", nIsDevelopmentStage);
 }
 
 PyObject* appIsTestStage(PyObject* poSelf, PyObject* poArgs)
 {
 	int32_t nIsTestStage = 0;
+#if defined(LOCALE_SERVICE_STAGE_TEST)
+	nIsTestStage = 1;
+#endif
 	return Py_BuildValue("i", nIsTestStage);
 }
 
 PyObject* appIsLiveStage(PyObject* poSelf, PyObject* poArgs)
 {
-	int32_t nIsLiveStage = 1;
+	int32_t nIsLiveStage = 0;
+#if !defined(LOCALE_SERVICE_STAGE_TEST) && !defined(LOCALE_SERVICE_STAGE_DEVELOPMENT)
+	nIsLiveStage = 1;
+#endif
 	return Py_BuildValue("i", nIsLiveStage);
 }
 
@@ -1126,7 +1125,6 @@ PyObject* appLogoOpen(PyObject* poSelf, PyObject* poArgs)
 		return Py_BuildException();
 
 	int32_t nIsSuccess = 1; //CPythonApplication::Instance().OnLogoOpen(szName);
-	CMovieMan::Instance().PlayLogo(szName);
 
 	return Py_BuildValue("i", nIsSuccess);
 }
@@ -1146,6 +1144,16 @@ PyObject* appLogoRender(PyObject* poSelf, PyObject* poArgs)
 PyObject* appLogoClose(PyObject* poSelf, PyObject* poArgs)
 {
 	//CPythonApplication::Instance().OnLogoClose();
+	return Py_BuildNone();
+}
+
+
+PyObject* appSetTitle(PyObject* poSelf, PyObject* poArgs)
+{
+	char* szTitle;
+	if (!PyTuple_GetString(poArgs, 0, &szTitle))
+		return Py_BuildException();
+	CPythonApplication::Instance().SetTitle(szTitle);
 	return Py_BuildNone();
 }
 
@@ -1215,7 +1223,6 @@ void initapp()
 		{ "GetCursorPosition",			appGetCursorPosition,			METH_VARARGS },
 
 		{ "GetRandom",					appGetRandom,					METH_VARARGS },
-		{ "RunPythonFile",				appRunPythonFile,				METH_VARARGS },
 		{ "IsWebPageMode",				appIsWebPageMode,				METH_VARARGS },		
 		{ "ShowWebPage",				appShowWebPage,					METH_VARARGS },		
 		{ "MoveWebPage",				appMoveWebPage,					METH_VARARGS },		
@@ -1288,12 +1295,13 @@ void initapp()
 		{ "OnLogoRender",				appLogoRender,					METH_VARARGS },
 		{ "OnLogoOpen",					appLogoOpen,					METH_VARARGS },
 		{ "OnLogoClose",				appLogoClose,					METH_VARARGS },
-	
+
+		{ "SetTitle", appSetTitle, METH_VARARGS },
 
 		{ nullptr, nullptr },
 	};
 
-	PyObject * poModule = Py_InitModule("app", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(APP_MODULE).c_str(), s_methods);
 
 	PyModule_AddIntConstant(poModule, "INFO_ITEM",		CPythonApplication::INFO_ITEM);
 	PyModule_AddIntConstant(poModule, "INFO_ACTOR",		CPythonApplication::INFO_ACTOR);

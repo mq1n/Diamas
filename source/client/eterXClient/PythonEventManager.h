@@ -22,7 +22,7 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 			EVENT_POSITION_START = 0,
 			EVENT_POSITION_END = 1,
 
-			BOX_VISIBLE_LINE_COUNT = 5,
+			BOX_VISIBLE_LINE_COUNT = 14,
 		};
 
 		enum EButtonType
@@ -181,6 +181,7 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 
 		void SetInterfaceWindow(PyObject * poInterface);
 		void SetLeftTimeString(const char * c_szString);
+		void SetFontColor(int32_t iIndex, float r, float g, float b);
 
 	protected:
 		void __InitEventSet(TEventSet& rEventSet);

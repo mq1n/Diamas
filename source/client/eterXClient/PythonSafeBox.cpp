@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "PythonSafeBox.h"
+#include "PythonDynamicModuleNames.h"
 
 void CPythonSafeBox::OpenSafeBox(int32_t iSize)
 {
@@ -331,7 +332,7 @@ void initsafebox()
 		{ nullptr,							nullptr,									0 },
 	};
 
-	PyObject * poModule = Py_InitModule("safebox", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(SAFEBOX_MODULE).c_str(), s_methods);
 	PyModule_AddIntConstant(poModule, "SAFEBOX_SLOT_X_COUNT", CPythonSafeBox::SAFEBOX_SLOT_X_COUNT);
 	PyModule_AddIntConstant(poModule, "SAFEBOX_SLOT_Y_COUNT", CPythonSafeBox::SAFEBOX_SLOT_Y_COUNT);
 	PyModule_AddIntConstant(poModule, "SAFEBOX_PAGE_SIZE", CPythonSafeBox::SAFEBOX_PAGE_SIZE);

@@ -5,7 +5,7 @@
 #include <FileSystemIncl.hpp>
 #include <detours.h>
 #include <xorstr.hpp>
-#include <Python/Python.h>
+#include <python27/Python.h>
 
 typedef PyObject*(* TPy_InitModule4)(const char *name, PyMethodDef *methods, const char *doc, PyObject *self, int apiver);
 static TPy_InitModule4 OPy_InitModule4 = nullptr;

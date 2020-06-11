@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include <FileSystemIncl.hpp>
+#include "../eterBase/file_ptr.h"
 #include "PropertyManager.h"
 #include "Property.h"
 
@@ -176,16 +177,15 @@ bool CPropertyManager::Erase(uint32_t dwCRC)
 	DeleteFileA(pProperty->GetFileName());
 	ReserveCRC(pProperty->GetCRC());
 
-	FILE* fp = fopen("property/reserve", "a+");
-	if (!fp)
+	msl::file_ptr fPtr("property/reserve", "a+");
+	if (!fPtr)
 		LogBox("Cannot open the CRC file 'property/reserve'.");
 	else
 	{
 		char szCRC[64 + 1];
 		_snprintf_s(szCRC, sizeof(szCRC), "%u\r\n", pProperty->GetCRC());
 
-		fputs(szCRC, fp);
-		fclose(fp);
+		fputs(szCRC, fPtr.get());
 	}
 
 	delete pProperty;

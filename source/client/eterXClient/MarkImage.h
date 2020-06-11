@@ -3,7 +3,7 @@
 
 #include <IL/il.h>
 
-typedef uint32_t Pixel;
+using Pixel = uint32_t;
 
 struct SGuildMark
 {
@@ -11,7 +11,7 @@ struct SGuildMark
 	{
 		WIDTH = 16,
 		HEIGHT = 12,
-		SIZE = WIDTH * HEIGHT,
+		SIZE = WIDTH * HEIGHT
 	};
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ class CGuildMarkImage
 
 			MARK_TOTAL_COUNT = MARK_ROW_COUNT * MARK_COL_COUNT, // 1280
 
-			INVALID_MARK_POSITION = 0xffffffff,
+			INVALID_MARK_POSITION = 0xffffffff
 		};
 
 		CGuildMarkImage();
@@ -78,13 +78,13 @@ class CGuildMarkImage
 		void Destroy();
 
 		bool Build(const char * c_szFileName);
-		bool Save(const char* c_szFileName);
+		bool Save(const char * c_szFileName) const;
 		bool Load(const char* c_szFileName);
 
-		void PutData(uint32_t x, uint32_t y, uint32_t width, uint32_t height, void* data);
-		void GetData(uint32_t x, uint32_t y, uint32_t width, uint32_t height, void* data);
+		void PutData(uint32_t x, uint32_t y, uint32_t width, uint32_t height, void * data) const;
+		void GetData(uint32_t x, uint32_t y, uint32_t width, uint32_t height, void * data) const;
 
-		bool SaveMark(uint32_t posMark, uint8_t * pbMarkImage);
+		bool SaveMark(uint32_t posMark, uint8_t * pbImage);
 		bool DeleteMark(uint32_t posMark);
 		bool SaveBlockFromCompressedData(uint32_t posBlock, const uint8_t * pbComp, uint32_t dwCompSize); // 서버 -> 클라이언트
 
@@ -96,7 +96,7 @@ class CGuildMarkImage
 	private:
 		enum
 		{
-			INVALID_HANDLE = 0xffffffff,
+			INVALID_HANDLE = 0xffffffff
 		};
 
 		void	BuildAllBlocks();

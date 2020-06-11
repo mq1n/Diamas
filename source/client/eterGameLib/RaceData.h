@@ -177,6 +177,7 @@ class CRaceData
 		// Setup by Python
 		void SetRace(uint32_t dwRaceIndex);
 		void RegisterAttachingBoneName(uint32_t dwPartIndex, const char * c_szBoneName);
+		void ChangeAttachingBoneName(uint32_t dwPartIndex, const char * c_szBoneName);
 
 		void RegisterMotionMode(uint16_t wMotionModeIndex);
 		void SetMotionModeParent(uint16_t wParentMotionModeIndex, uint16_t wMotionModeIndex);

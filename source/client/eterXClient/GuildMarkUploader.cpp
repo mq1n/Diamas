@@ -1,10 +1,11 @@
 #include "StdAfx.h"
 #include "GuildMarkUploader.h"
 #include "Packet.h"
+#include "PythonApplication.h"
 
 CGuildMarkUploader::CGuildMarkUploader()
- : m_pbySymbolBuf(nullptr)
 {
+	m_pbySymbolBuf.clear();
 	SetRecvBufferSize(1024);
 	SetSendBufferSize(1024);
 	__Inialize();
@@ -17,52 +18,8 @@ CGuildMarkUploader::~CGuildMarkUploader()
 
 void CGuildMarkUploader::Disconnect()
 {
+	CNetworkStream::Disconnect();
 	__OfflineState_Set();
-}
-
-bool CGuildMarkUploader::IsCompleteUploading()
-{
-	return STATE_OFFLINE == m_eState;
-}
-
-bool CGuildMarkUploader::__Save(const char* c_szFileName)
-{
-	/* 업로더에서 저장하지 않아야 함;
-	ILuint uImg;
-	ilGenImages(1, &uImg);
-	ilBindImage(uImg);
-	ilEnable(IL_FILE_OVERWRITE);
-	ilEnable(IL_ORIGIN_SET);
-	ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
-
-	if (!ilLoad(IL_TYPE_UNKNOWN, (const ILstring)c_szFileName))	
-	{
-		return false;
-	}
-
-	if (ilGetInteger(IL_IMAGE_WIDTH) != CGuildMarkImage::WIDTH)	
-	{
-		return false;
-	}
-
-	if (ilGetInteger(IL_IMAGE_HEIGHT) != CGuildMarkImage::HEIGHT)
-	{
-		return false;
-	}
-
-	ilConvertImage(IL_BGRA, IL_BYTE);
-
-	uint32_t uColCount = CGuildMarkImage::MARK_COL_COUNT;
-	uint32_t uCol = m_dwGuildID % uColCount;
-	uint32_t uRow = m_dwGuildID / uColCount;
-
-	ilSetPixels(uCol*SGuildMark::WIDTH, uRow*SGuildMark::HEIGHT, 0, SGuildMark::WIDTH, SGuildMark::HEIGHT, 1, IL_BGRA, IL_BYTE, (ILvoid*)m_kMark.m_apxBuf);
-
-	ilSave(IL_TGA, (ILstring)c_szFileName);
-
-	ilDeleteImages(1, &uImg);
-	*/
-	return true;
 }
 
 bool CGuildMarkUploader::__Load(const char* c_szFileName, uint32_t* peError)
@@ -73,7 +30,7 @@ bool CGuildMarkUploader::__Load(const char* c_szFileName, uint32_t* peError)
 	ilEnable(IL_ORIGIN_SET);
 	ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
 
-	if (!ilLoad(IL_TYPE_UNKNOWN, (const ILstring)c_szFileName))	
+	if (!ilLoad(IL_TYPE_UNKNOWN, c_szFileName))
 	{
 		*peError=ERROR_LOAD;
 		return false;
@@ -107,7 +64,7 @@ bool CGuildMarkUploader::__LoadSymbol(const char* c_szFileName, uint32_t* peErro
 	ilBindImage(uImg);
 	ilEnable(IL_ORIGIN_SET);
 	ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
-	if (!ilLoad(IL_TYPE_UNKNOWN, (const ILstring)c_szFileName))
+	if (!ilLoad(IL_TYPE_UNKNOWN, c_szFileName))
 	{
 		*peError=ERROR_LOAD;
 		return false;
@@ -123,26 +80,21 @@ bool CGuildMarkUploader::__LoadSymbol(const char* c_szFileName, uint32_t* peErro
 		return false;
 	}
 	ilDeleteImages(1, &uImg);
-	ilShutDown();
-
-	/////
 
 	FILE * file = fopen(c_szFileName, "rb");
 	if (!file)
 	{
-		*peError=ERROR_LOAD;
+		*peError = ERROR_LOAD;
+		return false;
 	}
 
 	fseek(file, 0, SEEK_END);
-	m_dwSymbolBufSize = ftell(file);
+	auto dwSymbolBufSize = ftell(file);
 	fseek(file, 0, SEEK_SET);
 
-	m_pbySymbolBuf = new uint8_t [m_dwSymbolBufSize];
-	fread(m_pbySymbolBuf, m_dwSymbolBufSize, 1, file);
-
+	m_pbySymbolBuf.resize(dwSymbolBufSize);
+	fread(m_pbySymbolBuf.data(), m_pbySymbolBuf.size(), 1, file);
 	fclose(file);
-
-	/////
 
 	m_dwSymbolCRC32 = GetFileCRC32(c_szFileName);
 	return true;
@@ -236,13 +188,7 @@ void CGuildMarkUploader::__Inialize()
 	m_dwHandle = 0;
 	m_dwRandomKey = 0;
 
-	if (m_pbySymbolBuf)
-	{
-		delete m_pbySymbolBuf;
-	}
-
-	m_dwSymbolBufSize = 0;
-	m_pbySymbolBuf = nullptr;
+	m_pbySymbolBuf.clear();
 }
 
 bool CGuildMarkUploader::__StateProcess()
@@ -252,6 +198,8 @@ bool CGuildMarkUploader::__StateProcess()
 		case STATE_LOGIN:
 			return __LoginState_Process();
 			break;
+		case STATE_COMPLETE:
+			return false;
 	}
 
 	return true;
@@ -265,11 +213,7 @@ void CGuildMarkUploader::__OfflineState_Set()
 void CGuildMarkUploader::__CompleteState_Set()
 {
 	m_eState=STATE_COMPLETE;
-
-	__OfflineState_Set();
 }
-
-
 void CGuildMarkUploader::__LoginState_Set()
 {
 	m_eState=STATE_LOGIN;
@@ -313,25 +257,22 @@ bool CGuildMarkUploader::__SendMarkPacket()
 }
 bool CGuildMarkUploader::__SendSymbolPacket()
 {
-	if (!m_pbySymbolBuf)
+	if (m_pbySymbolBuf.empty())
 		return false;
 
 	TPacketCGSymbolUpload kPacketSymbolUpload;
 	kPacketSymbolUpload.header=HEADER_CG_GUILD_SYMBOL_UPLOAD;
 	kPacketSymbolUpload.handle=m_dwGuildID;
-	kPacketSymbolUpload.size=sizeof(TPacketCGSymbolUpload) + m_dwSymbolBufSize;
+	kPacketSymbolUpload.size = static_cast<uint16_t>(sizeof(TPacketCGSymbolUpload) + m_pbySymbolBuf.size());
 
 	if (!Send(sizeof(TPacketCGSymbolUpload), &kPacketSymbolUpload))
 		return false;
-	if (!Send(m_dwSymbolBufSize, m_pbySymbolBuf))
+	if (!Send(m_pbySymbolBuf.size(), m_pbySymbolBuf.data()))
 		return false;
 
 #ifdef _DEBUG
-	printf("__SendSymbolPacket : [GuildID:%d/PacketSize:%d/BufSize:%d/CRC:%d]\n", m_dwGuildID, kPacketSymbolUpload.size, m_dwSymbolBufSize, m_dwSymbolCRC32);
+	printf("__SendSymbolPacket : [GuildID:%d/PacketSize:%d/BufSize:%d/CRC:%d]\n", m_dwGuildID, kPacketSymbolUpload.size, m_pbySymbolBuf.size(), m_dwSymbolCRC32);
 #endif
-
-	CNetworkStream::__SendInternalBuffer();
-	__CompleteState_Set();
 
 	return true;
 }
@@ -394,10 +335,7 @@ bool CGuildMarkUploader::__LoginState_RecvPing()
 	if (!Send(sizeof(TPacketCGPong), &kPacketPong))
 		return false;
 
-	if (IsSecurityMode())
-		return SendSequence();
-	else
-		return true;
+	return true;
 }
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_

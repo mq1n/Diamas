@@ -36,9 +36,9 @@ void CAccountConnector::SetLoginInfo(const char * c_szName, const char * c_szPwd
 }
 
 
-void CAccountConnector::ClearLoginInfo( void )
+void CAccountConnector::ClearLoginInfo()
 {
-	m_strPassword = "";
+	m_strPassword.clear();
 }
 
 void CAccountConnector::__BuildClientKey_20050304Myevan()
@@ -65,13 +65,7 @@ bool CAccountConnector::Connect(const char * c_szAddr, int32_t iPort, const char
 	__OfflineState_Set();
 
 	// CHINA_CRYPT_KEY
-	if (LocaleService_IsYMIR())
-	{
-	}	
-	else
-	{
-		__BuildClientKey_20050304Myevan();		
-	}
+	__BuildClientKey_20050304Myevan();		
 	// END_OF_CHINA_CRYPT_KEY
 
 	return CNetworkStream::Connect(c_szAccountAddr, iAccountPort);
@@ -100,10 +94,8 @@ bool CAccountConnector::__StateProcess()
 	{
 		case STATE_HANDSHAKE:
 			return __HandshakeState_Process();
-			break;
 		case STATE_AUTH:
 			return __AuthState_Process();
-			break;
 	}
 
 	return true;
@@ -189,8 +181,8 @@ bool CAccountConnector::__AuthState_RecvPhase()
 		TPacketCGLogin3 LoginPacket;
 		LoginPacket.header = HEADER_CG_LOGIN3;
 
-		strncpy(LoginPacket.name, m_strID.c_str(), ID_MAX_NUM);
-		strncpy(LoginPacket.pwd, m_strPassword.c_str(), PASS_MAX_NUM);
+		strncpy_s(LoginPacket.name, m_strID.c_str(), ID_MAX_NUM);
+		strncpy_s(LoginPacket.pwd, m_strPassword.c_str(), PASS_MAX_NUM);
 		LoginPacket.name[ID_MAX_NUM] = '\0';
 		LoginPacket.pwd[PASS_MAX_NUM] = '\0';
 
@@ -199,7 +191,7 @@ bool CAccountConnector::__AuthState_RecvPhase()
 		CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
 		rkNetStream.ClearLoginInfo();
 
-		m_strPassword = "";
+		m_strPassword.clear();
 
 		for (uint32_t i = 0; i < 4; ++i)
 			LoginPacket.adwClientKey[i] = g_adwEncryptKey[i];
@@ -213,9 +205,7 @@ bool CAccountConnector::__AuthState_RecvPhase()
 		}
 
 		if (!SendSequence())
-		{
 			return false;
-		}
 
 		__AuthState_Set();
 	}
@@ -442,15 +432,6 @@ void CAccountConnector::OnConnectSuccess()
 
 void CAccountConnector::OnRemoteDisconnect()
 {
-	if (m_isWaitKey)
-	{
-		if (m_poHandler)
-		{
-			PyCallClassMemberFunc(m_poHandler, "OnExit", Py_BuildValue("()"));
-			return;
-		}
-	}
-
 	__OfflineState_Set();
 }
 
@@ -473,13 +454,12 @@ void CAccountConnector::__BuildClientKey()
 void CAccountConnector::__Inialize()
 {
 	m_eState=STATE_OFFLINE;
-	m_isWaitKey = FALSE;
 }
 
 CAccountConnector::CAccountConnector()
 {
 	m_poHandler = nullptr;
-	m_strAddr = "";
+	m_strAddr.clear();
 	m_iPort = 0;
 
 	SetLoginInfo("", "");

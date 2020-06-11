@@ -4,7 +4,7 @@
 
 #include "../eterLib/TextFileLoader.h"
 #include "../eterLib/CollisionData.h"
-#include "GameLibDefines.h"
+#include "../eterXClient/locale_inc.h"
 
 extern float g_fGameFPS;
 

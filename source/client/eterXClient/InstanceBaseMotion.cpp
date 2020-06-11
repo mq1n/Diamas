@@ -129,13 +129,9 @@ void CInstanceBase::__DisableChangingTCPState()
 void CInstanceBase::ActDualEmotion(CInstanceBase & rkDstInst, uint16_t wMotionNumber1, uint16_t wMotionNumber2)
 {
 	if (!IsWaiting())
-	{
 		m_GraphicThingInstance.SetLoopMotion(CRaceMotionData::NAME_WAIT, 0.05f);
-	}
 	if (!rkDstInst.IsWaiting())
-	{
 		rkDstInst.m_GraphicThingInstance.SetLoopMotion(CRaceMotionData::NAME_WAIT, 0.05f);
-	}
 
 	const float c_fEmotionDistance = 100.0f;
 	const TPixelPosition & c_rMainPosition = NEW_GetCurPixelPositionRef();

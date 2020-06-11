@@ -116,18 +116,21 @@ void CGraphicExpandedImageInstance::OnRender()
 			break;
 	}
 
-	// 2004.11.18.myevan.ctrl+alt+del 반복 사용시 튕기는 문제 	
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+
 	if (CGraphicBase::SetPDTStream(vertices, 4))
 	{
 		CGraphicBase::SetDefaultIndexBuffer(CGraphicBase::DEFAULT_IB_FILL_RECT);
 
 		STATEMANAGER.SetTexture(0, pTexture->GetD3DTexture());
 		STATEMANAGER.SetTexture(1, nullptr);
-		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
+		STATEMANAGER.SetFVF(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 		STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);	
 	}
-	//STATEMANAGER.DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 4, 2, c_FillRectIndices, D3DFMT_INDEX16, vertices, sizeof(TPDTVertex));
-	/////////////////////////////////////////////////////////////
+
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MINFILTER);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MAGFILTER);
 
 	switch (m_iRenderingMode)
 	{

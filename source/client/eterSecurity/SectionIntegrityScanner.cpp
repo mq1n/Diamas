@@ -3,6 +3,7 @@
 #include "AnticheatManager.h"
 #include "CheatQueueManager.h"
 #include "ProcessNameHelper.h"
+#include <xorstr.hpp>
 
 typedef uint32_t(NTAPI* TRtlComputeCrc32)(uint32_t dwInitial, const uint8_t* pData, int32_t iLen);
 static TRtlComputeCrc32 RtlComputeCrc32 = nullptr;
@@ -128,7 +129,7 @@ uint32_t CalculateChecksum(uint32_t dwSectionStart, uint32_t dwSectionLen)
 inline bool GetSectionHash(uint32_t dwModuleBase, const std::string & szSectionName, uint32_t * pdwSectionHash)
 {
 	auto dwSectionBase = 0UL, dwSectionSize = 0UL;
-	if (szSectionName == XOR("PEHEADER"))
+	if (szSectionName == xorstr("PEHEADER").crypt_get())
 	{
 		dwSectionBase = dwModuleBase;
 		dwSectionSize = 0x1000;	
@@ -231,32 +232,32 @@ bool InitSectionHash(uint32_t dwModuleBase, std::shared_ptr < SModuleSectionsHas
 		pModuleSectionHashContainer->dwModuleBase = dwModuleBase;
 
 	// identify sections
-	if (GetSectionHash(dwModuleBase, XOR("PEHEADER"), &pModuleSectionHashContainer->dwPeHeaderHash) == false)
+	if (GetSectionHash(dwModuleBase, xorstr("PEHEADER").crypt_get(), &pModuleSectionHashContainer->dwPeHeaderHash) == false)
 	{
 //		TraceError("GetSectionHash(PEHEADER) fail!");
 		if (pModuleSectionHashContainer->dwPeHeaderHash) pModuleSectionHashContainer->dwPeHeaderHash = 0;
 	}
-	if (GetSectionHash(dwModuleBase, XOR(".text"), &pModuleSectionHashContainer->dwTextHash) == false)
+	if (GetSectionHash(dwModuleBase, xorstr(".text").crypt_get(), &pModuleSectionHashContainer->dwTextHash) == false)
 	{
 //		TraceError("GetSectionHash(.text) fail!");
 		if (pModuleSectionHashContainer->dwTextHash) pModuleSectionHashContainer->dwTextHash = 0;
 	}
-	if (GetSectionHash(dwModuleBase, XOR(".rdata"), &pModuleSectionHashContainer->dwRDataHash) == false)
+	if (GetSectionHash(dwModuleBase, xorstr(".rdata").crypt_get(), &pModuleSectionHashContainer->dwRDataHash) == false)
 	{
 //		TraceError("GetSectionHash(.rdata) fail!");
 		if (pModuleSectionHashContainer->dwRDataHash) pModuleSectionHashContainer->dwRDataHash = 0;
 	}
-	if (GetSectionHash(dwModuleBase, XOR(".edata"), &pModuleSectionHashContainer->dwEDataHash) == false)
+	if (GetSectionHash(dwModuleBase, xorstr(".edata").crypt_get(), &pModuleSectionHashContainer->dwEDataHash) == false)
 	{
 //		TraceError("GetSectionHash(.edata) fail!");
 		if (pModuleSectionHashContainer->dwEDataHash) pModuleSectionHashContainer->dwEDataHash = 0;
 	}
-	if (GetSectionHash(dwModuleBase, XOR(".rsrc"), &pModuleSectionHashContainer->dwRsrcHash) == false)
+	if (GetSectionHash(dwModuleBase, xorstr(".rsrc").crypt_get(), &pModuleSectionHashContainer->dwRsrcHash) == false)
 	{
 //		TraceError("GetSectionHash(.rsrc) fail!");
 		if (pModuleSectionHashContainer->dwRsrcHash) pModuleSectionHashContainer->dwRsrcHash = 0;
 	}
-	if (GetSectionHash(dwModuleBase, XOR(".reloc"), &pModuleSectionHashContainer->dwRelocHash) == false)
+	if (GetSectionHash(dwModuleBase, xorstr(".reloc").crypt_get(), &pModuleSectionHashContainer->dwRelocHash) == false)
 	{
 //		TraceError("GetSectionHash(.reloc) fail!");
 		if (pModuleSectionHashContainer->dwRelocHash) pModuleSectionHashContainer->dwRelocHash = 0;
@@ -386,13 +387,13 @@ VOID NTAPI LdrEnumCallBack(IN PLDR_DATA_TABLE_ENTRY_MY DataTableEntry, IN PVOID 
 
 void CAnticheatManager::InitSectionHashes()
 {
-	auto hNtdll = LoadLibraryA(XOR("ntdll.dll"));
+	auto hNtdll = LoadLibraryA(xorstr("ntdll.dll").crypt_get());
 	if (!hNtdll)
 		return;
 
 	if (!RtlComputeCrc32)
 	{
-		auto pRtlComputeCrc32 = GetProcAddress(hNtdll, XOR("RtlComputeCrc32"));
+		auto pRtlComputeCrc32 = GetProcAddress(hNtdll, xorstr("RtlComputeCrc32").crypt_get());
 		if (pRtlComputeCrc32)
 			RtlComputeCrc32 = (TRtlComputeCrc32)pRtlComputeCrc32;
 	}
@@ -403,7 +404,7 @@ void CAnticheatManager::InitSectionHashes()
 	typedef NTSTATUS(NTAPI* TLdrEnumerateLoadedModules)(IN BOOLEAN ReservedFlag, IN LDR_ENUM_CALLBACK* EnumProc, IN PVOID Context);
 
 
-	auto pLdrEnumerateLoadedModules = GetProcAddress(hNtdll, XOR("LdrEnumerateLoadedModules"));
+	auto pLdrEnumerateLoadedModules = GetProcAddress(hNtdll, xorstr("LdrEnumerateLoadedModules").crypt_get());
 	if (!pLdrEnumerateLoadedModules)
 		return;
 	auto LdrEnumerateLoadedModules = (TLdrEnumerateLoadedModules)pLdrEnumerateLoadedModules;
@@ -421,10 +422,10 @@ bool CAnticheatManager::HasCorruptedModuleSection()
 	static TLdrEnumerateLoadedModules LdrEnumerateLoadedModules = nullptr;
 	if (!LdrEnumerateLoadedModules)
 	{
-		auto hNtdll = LoadLibraryA(XOR("ntdll.dll"));
+		auto hNtdll = LoadLibraryA(xorstr("ntdll.dll").crypt_get());
 		if (hNtdll)
 		{
-			auto pLdrEnumerateLoadedModules = GetProcAddress(hNtdll, XOR("LdrEnumerateLoadedModules"));
+			auto pLdrEnumerateLoadedModules = GetProcAddress(hNtdll, xorstr("LdrEnumerateLoadedModules").crypt_get());
 			if (pLdrEnumerateLoadedModules)
 				LdrEnumerateLoadedModules = (TLdrEnumerateLoadedModules)pLdrEnumerateLoadedModules;
 		}
@@ -477,12 +478,12 @@ void CAnticheatManager::SetupSectionMonitorContainer()
 
 		if (strModuleName.empty())
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_BASE, XOR("1"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_BASE, xorstr("1").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_BASE, 1, true);
 		}
 		else if (IsPackedExecutable(strModuleName))
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_BASE, XOR("2"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_BASE, xorstr("2").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_BASE, 2, true);
 		}
 		else
@@ -491,24 +492,24 @@ void CAnticheatManager::SetupSectionMonitorContainer()
 		}
 	}
 
-	auto hKernel32 = GetModuleHandleA(XOR("kernel32.dll"));
+	auto hKernel32 = GetModuleHandleA(xorstr("kernel32.dll").crypt_get());
 	if (hKernel32)
 	{
 		auto strModuleName = GetModuleOwnerName(hKernel32);
 
 		if (strModuleName.empty())
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_KERNEL32, XOR("1"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_KERNEL32, xorstr("1").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_KERNEL32, 1, true);
 		}
 		else if (IsPackedExecutable(strModuleName))
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_KERNEL32, XOR("2"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_KERNEL32, xorstr("2").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_KERNEL32, 2, true);
 		}
 		else if (strModuleName.find(strLowerWinPath) == std::string::npos)
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_KERNEL32, XOR("3"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_KERNEL32, xorstr("3").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_KERNEL32, 3, true);
 		}
 		else
@@ -517,24 +518,24 @@ void CAnticheatManager::SetupSectionMonitorContainer()
 		}
 	}
 
-	auto hKernelBase = GetModuleHandleA(XOR("kernelbase.dll"));
+	auto hKernelBase = GetModuleHandleA(xorstr("kernelbase.dll").crypt_get());
 	if (hKernelBase)
 	{
 		auto strModuleName = GetModuleOwnerName(hKernelBase);
 
 		if (strModuleName.empty())
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_KERNELBASE, XOR("1"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_KERNELBASE, xorstr("1").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_KERNELBASE, 1, true);
 		}
 		else if (IsPackedExecutable(strModuleName))
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_KERNELBASE, XOR("2"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_KERNELBASE, xorstr("2").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_KERNELBASE, 2, true);
 		}
 		else if (strModuleName.find(strLowerWinPath) == std::string::npos)
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_KERNELBASE, XOR("3"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_KERNELBASE, xorstr("3").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_KERNELBASE, 3, true);
 		}
 		else
@@ -543,24 +544,24 @@ void CAnticheatManager::SetupSectionMonitorContainer()
 		}
 	}
 
-	auto hNtdll = GetModuleHandleA(XOR("ntdll.dll"));
+	auto hNtdll = GetModuleHandleA(xorstr("ntdll.dll").crypt_get());
 	if (hNtdll)
 	{
 		auto strModuleName = GetModuleOwnerName(hNtdll);
 
 		if (strModuleName.empty())
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_NTDLL, XOR("1"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_NTDLL, xorstr("1").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_NTDLL, 1, true);
 		}
 		else if (IsPackedExecutable(strModuleName))
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_NTDLL, XOR("2"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_NTDLL, xorstr("2").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_NTDLL, 2, true);
 		}
 		else if (strModuleName.find(strLowerWinPath) == std::string::npos)
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_NTDLL, XOR("3"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_NTDLL, xorstr("3").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_NTDLL, 3, true);
 		}
 		else
@@ -569,24 +570,24 @@ void CAnticheatManager::SetupSectionMonitorContainer()
 		}
 	}
 
-	auto hUser32 = GetModuleHandleA(XOR("user32.dll"));
+	auto hUser32 = GetModuleHandleA(xorstr("user32.dll").crypt_get());
 	if (hUser32)
 	{
 		auto strModuleName = GetModuleOwnerName(hUser32);
 
 		if (strModuleName.empty())
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_USER32, XOR("1"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_USER32, xorstr("1").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_USER32, 1, true);
 		}
 		else if (IsPackedExecutable(strModuleName))
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_USER32, XOR("2"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_USER32, xorstr("2").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_USER32, 2, true);
 		}
 		else if (strModuleName.find(strLowerWinPath) == std::string::npos)
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_USER32, XOR("3"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_USER32, xorstr("3").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_USER32, 3, true);
 		}
 		else
@@ -595,24 +596,24 @@ void CAnticheatManager::SetupSectionMonitorContainer()
 		}
 	}
 
-	auto hWin32u = GetModuleHandleA(XOR("win32u.dll"));
+	auto hWin32u = GetModuleHandleA(xorstr("win32u.dll").crypt_get());
 	if (hWin32u)
 	{
 		auto strModuleName = GetModuleOwnerName(hWin32u);
 
 		if (strModuleName.empty())
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_WIN32U, XOR("1"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_WIN32U, xorstr("1").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_WIN32U, 1, true);
 		}
 		else if (IsPackedExecutable(strModuleName))
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_WIN32U, XOR("2"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_WIN32U, xorstr("2").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_WIN32U, 2, true);
 		}
 		else if (strModuleName.find(strLowerWinPath) == std::string::npos)
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_WIN32U, XOR("3"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_WIN32U, xorstr("3").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_WIN32U, 3, true);
 		}
 		else
@@ -621,19 +622,19 @@ void CAnticheatManager::SetupSectionMonitorContainer()
 		}
 	}
 
-	auto hPython27 = GetModuleHandleA(XOR("python27.dll"));
+	auto hPython27 = GetModuleHandleA(xorstr("python27.dll").crypt_get());
 	if (hPython27)
 	{
 		auto strModuleName = GetModuleOwnerName(hPython27);
 
 		if (strModuleName.empty())
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_PYTHON27, XOR("1"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_PYTHON27, xorstr("1").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_PYTHON27, 1, true);
 		}
 		else if (IsPackedExecutable(strModuleName))
 		{
-			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_PYTHON27, XOR("2"));
+			CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MONITORED_MODULE, MMODULE_PYTHON27, xorstr("2").crypt_get());
 			ExitByAnticheat(UNKNOWN_MONITORED_MODULE, MMODULE_PYTHON27, 2, true);
 		}
 		else

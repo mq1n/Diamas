@@ -2,6 +2,8 @@
 #include <FileSystemIncl.hpp>
 #include "../eterGameLib/RaceManager.h"
 #include "../eterBase/stl_utils.h"
+#include "../eterSecurity/PythonStackCheck.h"
+#include "PythonDynamicModuleNames.h"
 
 std::string trim(std::string& str)
 {
@@ -277,5 +279,5 @@ void initpack()
 		{ nullptr, nullptr },
 	};
 	
-	Py_InitModule("pack", s_methods);
+	Py_InitModule(CPythonDynamicModule::Instance().GetModule(PACK_MODULE).c_str(), s_methods);
 }

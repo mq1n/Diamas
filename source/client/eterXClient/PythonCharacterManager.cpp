@@ -4,6 +4,8 @@
 #include "PythonNonPlayer.h"
 #include "AbstractPlayer.h"
 #include "packet.h"
+#include "NetworkActorManager.h"
+#include "PythonNetworkStream.h"
 
 #include "../eterLib/Camera.h"
 
@@ -158,9 +160,9 @@ void CPythonCharacterManager::Update()
 	CInstanceBase* pkInstMain=GetMainInstancePtr();
 #ifdef __PERFORMANCE_CHECKER__
 	uint32_t t2=timeGetTime();
-#endif
 	uint32_t dwDeadInstCount=0;
 	uint32_t dwForceVisibleInstCount=0;
+#endif
 
 	TCharacterInstanceMap::iterator i=m_kAliveInstMap.begin(); 
 	while (m_kAliveInstMap.end()!=i)
@@ -172,18 +174,22 @@ void CPythonCharacterManager::Update()
 
 		if (pkInstMain)
 		{
-			/*if (pkInstEach->IsForceVisible())
+#ifdef __PERFORMANCE_CHECKER__
+			if (pkInstEach->IsForceVisible())
 			{
 				dwForceVisibleInstCount++;
-				continue;
-			}*/
+				// continue;
+			}
+#endif
 
 			int32_t nDistance = int32_t(pkInstEach->NEW_GetDistanceFromDestInstance(*pkInstMain));
 			if (nDistance > CHAR_STAGE_VIEW_BOUND + 10)
 			{
 				__DeleteBlendOutInstance(pkInstEach);
 				m_kAliveInstMap.erase(c);
+#ifdef __PERFORMANCE_CHECKER__
 				dwDeadInstCount++;
+#endif
 			}
 		}
 	}
@@ -285,14 +291,7 @@ void CPythonCharacterManager::UpdateTransform()
 		t2=timeGetTime();
 #endif
 
-#ifdef __MOVIE_MODE__
-		if (!m_pkInstMain->IsMovieMode())
-		{
-			rkBG.CheckAdvancing(m_pkInstMain);
-		}
-#else
 		rkBG.CheckAdvancing(m_pkInstMain);
-#endif
 	}
 
 #ifdef __PERFORMANCE_CHECKER__
@@ -914,6 +913,36 @@ void CPythonCharacterManager::RefreshAllGuildMark()
 	}
 }
 
+void CPythonCharacterManager::RefreshGuildSymbols(std::set<uint32_t> guildIDSet)
+{
+	CPythonCharacterManager::CharacterIterator itor = CharacterInstanceBegin();
+	CPythonCharacterManager::CharacterIterator itorEnd = CharacterInstanceEnd();
+	for (; itor != itorEnd; ++itor)
+	{
+		CInstanceBase * pInstance = *itor;
+
+		// Guild Symbol
+		if (pInstance->GetRace() != 14200)
+			continue;
+
+		uint32_t gid = pInstance->GetGuildID();
+		bool isInList = (guildIDSet.find(gid) != guildIDSet.end());
+
+		// We found a symbol but it was not part of this update.
+		if (!isInList)
+			continue;
+
+		std::string strFileName = GetGuildSymbolFileName(gid);
+		CActorInstance * guildSymbolModel = pInstance->GetGraphicThingInstancePtr();
+		if (!guildSymbolModel)
+			continue;
+
+		if (IsFile(strFileName.c_str()))
+			guildSymbolModel->ChangeMaterial(strFileName.c_str());
+		else
+			guildSymbolModel->ChangeMaterial("d:/ymir work/guild/object/guild_symbol/guild_symbol01.dds"); // This makes it possible to delete symbols.
+	}
+}
 void CPythonCharacterManager::DeleteAllInstances()
 {
 	DestroyAliveInstanceMap();

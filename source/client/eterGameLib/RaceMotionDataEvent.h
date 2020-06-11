@@ -2,7 +2,7 @@
 
 #include "../eterEffectLib/EffectManager.h"
 #include "FlyingObjectManager.h"
-#include "GameLibDefines.h"
+#include "../eterXClient/locale_inc.h"
 
 namespace NMotionEvent
 {

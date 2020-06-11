@@ -27,11 +27,11 @@ D3D_CDisplayModeAutoDetector				CGraphicBase::ms_kD3DDetector;
 HWND CGraphicBase::ms_hWnd;
 HDC CGraphicBase::ms_hDC;
 
-LPDIRECT3D8				CGraphicBase::ms_lpd3d = nullptr;
-LPDIRECT3DDEVICE8		CGraphicBase::ms_lpd3dDevice = nullptr;
+LPDIRECT3D9				CGraphicBase::ms_lpd3d = nullptr;
+LPDIRECT3DDEVICE9		CGraphicBase::ms_lpd3dDevice = nullptr;
 ID3DXMatrixStack *		CGraphicBase::ms_lpd3dMatStack = nullptr;
 D3DPRESENT_PARAMETERS	CGraphicBase::ms_d3dPresentParameter;
-D3DVIEWPORT8			CGraphicBase::ms_Viewport;
+D3DVIEWPORT9			CGraphicBase::ms_Viewport;
 
 HRESULT					CGraphicBase::ms_hLastResult = 0;
 
@@ -40,13 +40,13 @@ int32_t						CGraphicBase::ms_iHeight;
 
 uint32_t					CGraphicBase::ms_faceCount = 0;
 
-D3DCAPS8				CGraphicBase::ms_d3dCaps;
+D3DCAPS9				CGraphicBase::ms_d3dCaps;
 
 uint32_t					CGraphicBase::ms_dwD3DBehavior = 0;
 
-uint32_t					CGraphicBase::ms_ptVS = 0;
-uint32_t					CGraphicBase::ms_pntVS = 0;
-uint32_t					CGraphicBase::ms_pnt2VS = 0;
+LPDIRECT3DVERTEXDECLARATION9 CGraphicBase::ms_ptVS = 0;
+LPDIRECT3DVERTEXDECLARATION9 CGraphicBase::ms_pntVS = 0;
+LPDIRECT3DVERTEXDECLARATION9 CGraphicBase::ms_pnt2VS = 0;
 
 D3DXMATRIX				CGraphicBase::ms_matIdentity;
 
@@ -80,7 +80,8 @@ CRay					CGraphicBase::ms_Ray;
 bool					CGraphicBase::ms_bSupportDXT = true;
 bool					CGraphicBase::ms_isLowTextureMemory = false;
 bool					CGraphicBase::ms_isHighTextureMemory = false;
-
+int32_t						CGraphicBase::ms_nonPow2Support = 0;
+bool					CGraphicBase::ms_bEnableGlobalAntialiasing = false;
 // 2004.11.18.myevan.DynamicVertexBuffer·Î ±³Ã¼
 /*
 std::vector<TIndex>		CGraphicBase::ms_lineIdxVector;
@@ -96,9 +97,9 @@ std::vector<TIndex>		CGraphicBase::ms_fillCubeIdxVector;
 LPD3DXMESH				CGraphicBase::ms_lpSphereMesh = nullptr;
 LPD3DXMESH				CGraphicBase::ms_lpCylinderMesh = nullptr;
 
-LPDIRECT3DVERTEXBUFFER8	CGraphicBase::ms_alpd3dPDTVB[PDT_VERTEXBUFFER_NUM];
+LPDIRECT3DVERTEXBUFFER9	CGraphicBase::ms_alpd3dPDTVB[PDT_VERTEXBUFFER_NUM];
 
-LPDIRECT3DINDEXBUFFER8	CGraphicBase::ms_alpd3dDefIB[DEFAULT_IB_NUM];
+LPDIRECT3DINDEXBUFFER9	CGraphicBase::ms_alpd3dDefIB[DEFAULT_IB_NUM];
 
 bool CGraphicBase::IsLowTextureMemory()
 {
@@ -129,6 +130,18 @@ bool CGraphicBase::IsTLVertexClipping()
 	return false;
 }
 
+void CGraphicBase::DetectNonPow2TextureSupport()
+{
+	if (ms_d3dCaps.TextureCaps & D3DPTEXTURECAPS_POW2)	{
+		if (ms_d3dCaps.TextureCaps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL)
+			ms_nonPow2Support = NONPOW2_SUPPORT_LEVEL::PARTIAL_SUPPORT;
+		else
+			ms_nonPow2Support = NONPOW2_SUPPORT_LEVEL::NO_SUPPORT;
+	}
+	else
+		ms_nonPow2Support = NONPOW2_SUPPORT_LEVEL::FULL_SUPPORT;
+}
+
 void CGraphicBase::GetBackBufferSize(uint32_t* puWidth, uint32_t* puHeight)
 {
 	*puWidth=ms_d3dPresentParameter.BackBufferWidth;
@@ -140,7 +153,7 @@ void CGraphicBase::SetDefaultIndexBuffer(uint32_t eDefIB)
 	if (eDefIB>=DEFAULT_IB_NUM)
 		return;
 
-	STATEMANAGER.SetIndices(ms_alpd3dDefIB[eDefIB], 0);
+	STATEMANAGER.SetIndices(ms_alpd3dDefIB[eDefIB]);
 }
 
 bool CGraphicBase::SetPDTStream(SPDTVertex* pVertices, uint32_t uVtxCount)
@@ -158,7 +171,7 @@ bool CGraphicBase::SetPDTStream(SPDTVertexRaw* pSrcVertices, uint32_t uVtxCount)
 	if (s_dwVBPos>=PDT_VERTEXBUFFER_NUM)
 		s_dwVBPos=0;
 
-	IDirect3DVertexBuffer8* plpd3dFillRectVB=ms_alpd3dPDTVB[s_dwVBPos];
+	IDirect3DVertexBuffer9* plpd3dFillRectVB=ms_alpd3dPDTVB[s_dwVBPos];
 	++s_dwVBPos;
 
 	assert(PDT_VERTEX_NUM>=uVtxCount);
@@ -167,7 +180,7 @@ bool CGraphicBase::SetPDTStream(SPDTVertexRaw* pSrcVertices, uint32_t uVtxCount)
 
 	TPDTVertex* pDstVertices;
 	if (FAILED(
-		plpd3dFillRectVB->Lock(0, sizeof(TPDTVertex)*uVtxCount, (uint8_t**)&pDstVertices, D3DLOCK_DISCARD)
+		plpd3dFillRectVB->Lock(0, sizeof(TPDTVertex)*uVtxCount, (void**)&pDstVertices, D3DLOCK_DISCARD)
 	)) 
 	{
 		STATEMANAGER.SetStreamSource(0, nullptr, 0);

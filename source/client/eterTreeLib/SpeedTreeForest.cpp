@@ -1,24 +1,23 @@
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedTreeForest Class
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	Include Files
 #include "StdAfx.h"
 
 #include <vector>
 #include "../eterBase/Filename.h"
 #include <FileSystemIncl.hpp>
-
 #include "SpeedTreeForest.h"
 #include "SpeedTreeConfig.h"
 #include <cfloat>
 
 using namespace std;
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedTreeForest constructor
 
-CSpeedTreeForest::CSpeedTreeForest() : m_fWindStrength(0.0f)
+CSpeedTreeForest::CSpeedTreeForest() : m_fWindStrength(0.0f), m_fAccumTime(0)
 {
 	CSpeedTreeRT::SetNumWindMatrices(c_nNumWindMatrices);
 
@@ -27,7 +26,7 @@ CSpeedTreeForest::CSpeedTreeForest() : m_fWindStrength(0.0f)
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedTreeForest destructor
 
 CSpeedTreeForest::~CSpeedTreeForest()
@@ -37,26 +36,23 @@ CSpeedTreeForest::~CSpeedTreeForest()
 
 void CSpeedTreeForest::Clear()
 {
-	TTreeMap::iterator itor = m_pMainTreeMap.begin();
-	uint32_t uiCount;
-
-	while (itor != m_pMainTreeMap.end())
+	for (const auto &tree : m_pMainTreeMap)
 	{
-		CSpeedTreeWrapper * pMainTree = (itor++)->second;
-		CSpeedTreeWrapper ** ppInstances = pMainTree->GetInstances(uiCount);
+		const auto &pMainTree = tree.second;
 
-		for (uint32_t i = 0; i < uiCount; ++i)
-			delete ppInstances[i];
+		for (const auto &instance : pMainTree->GetInstances())
+			delete instance;
 
 		delete pMainTree;
 	}
 
-	m_pMainTreeMap.clear();
+	if(!m_pMainTreeMap.empty())
+		m_pMainTreeMap.clear();
 }
 
 CSpeedTreeWrapper * CSpeedTreeForest::GetMainTree(uint32_t dwCRC)
 {
-	TTreeMap::iterator itor = m_pMainTreeMap.find(dwCRC);
+	auto itor = m_pMainTreeMap.find(dwCRC);
 
 	if (itor == m_pMainTreeMap.end())
 		return nullptr;
@@ -66,7 +62,7 @@ CSpeedTreeWrapper * CSpeedTreeForest::GetMainTree(uint32_t dwCRC)
 
 BOOL CSpeedTreeForest::GetMainTree(uint32_t dwCRC, CSpeedTreeWrapper ** ppMainTree, const char * c_pszFileName)
 {
-	TTreeMap::iterator itor = m_pMainTreeMap.find(dwCRC);
+	auto itor = m_pMainTreeMap.find(dwCRC);
 
 	CSpeedTreeWrapper * pTree;
 
@@ -74,19 +70,22 @@ BOOL CSpeedTreeForest::GetMainTree(uint32_t dwCRC, CSpeedTreeWrapper ** ppMainTr
 		pTree = itor->second;
 	else
 	{
-		CFile file;
-		if (!FileSystemManager::Instance().OpenFile(c_pszFileName, file))
-			return FALSE;
+        CFile file;
+        if(!FileSystemManager::Instance().OpenFile(c_pszFileName, file))
+        {
+            return FALSE;
+        }
 
-		pTree = new CSpeedTreeWrapper;
+		pTree = new CSpeedTreeWrapper(new CSpeedTreeRT);
 
-		if (!pTree->LoadTree(c_pszFileName, (const uint8_t*)file.GetData(), file.GetSize()))
-		{
-			delete pTree;
-			return FALSE;
-		}
+        if(!pTree->LoadTree(c_pszFileName, (const uint8_t *)file.GetData(), file.GetSize()))
+        {
+            delete pTree;
+			pTree = nullptr;
+            return FALSE;
+        }
 
-		m_pMainTreeMap.insert(std::map<uint32_t, CSpeedTreeWrapper *>::value_type(dwCRC, pTree));
+		m_pMainTreeMap.emplace(dwCRC, pTree);
 
 		file.Close();
 	}
@@ -101,7 +100,7 @@ CSpeedTreeWrapper* CSpeedTreeForest::CreateInstance(float x, float y, float z, u
 	if (!GetMainTree(dwTreeCRC, &pMainTree, c_szTreeName))
 		return nullptr;
 
-	CSpeedTreeWrapper* pTreeInst = pMainTree->MakeInstance();	
+	CSpeedTreeWrapper* pTreeInst = pMainTree->MakeInstance();
 	pTreeInst->SetPosition(x, y, z);
 	pTreeInst->RegisterBoundingSphere();
 	return pTreeInst;
@@ -111,7 +110,7 @@ void CSpeedTreeForest::DeleteInstance(CSpeedTreeWrapper * pInstance)
 {
 	if (!pInstance)
 		return;
-	
+
 	CSpeedTreeWrapper * pParentTree = pInstance->InstanceOf();
 
 	if (!pParentTree)
@@ -127,54 +126,31 @@ void CSpeedTreeForest::UpdateSystem(float fCurrentTime)
 	float fElapsedTime = fCurrentTime - fLastTime;
 	CSpeedTreeRT::SetTime(fElapsedTime);
 
-	m_fAccumTime += fElapsedTime; 
-	SetupWindMatrices(m_fAccumTime);
+	m_fAccumTime += fElapsedTime;
+	//We dont support wind
+	//SetupWindMatrices(m_fAccumTime);
 }
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedTreeForest::AdjustExtents
 void CSpeedTreeForest::AdjustExtents(float x, float y, float z)
 {
     // min
-    m_afForestExtents[0] = __min(m_afForestExtents[0], x); 
-    m_afForestExtents[1] = __min(m_afForestExtents[1], y); 
-    m_afForestExtents[2] = __min(m_afForestExtents[2], z); 
+    m_afForestExtents[0] = __min(m_afForestExtents[0], x);
+    m_afForestExtents[1] = __min(m_afForestExtents[1], y);
+    m_afForestExtents[2] = __min(m_afForestExtents[2], z);
 
     // max
-    m_afForestExtents[3] = __max(m_afForestExtents[3], x); 
-    m_afForestExtents[4] = __max(m_afForestExtents[4], y); 
+    m_afForestExtents[3] = __max(m_afForestExtents[3], x);
+    m_afForestExtents[4] = __max(m_afForestExtents[4], y);
     m_afForestExtents[5] = __max(m_afForestExtents[5], z);
 }
 
-///////////////////////////////////////////////////////////////////////  
-//	CSpeedTreeForest::SetWindStrength
-void CSpeedTreeForest::SetWindStrength(float fStrength)
-{
-	if (m_fWindStrength == fStrength)
-		return;
-
-	m_fWindStrength = fStrength;
-
-	TTreeMap::iterator itor = m_pMainTreeMap.begin();
-	uint32_t uiCount;
-
-	while (itor != m_pMainTreeMap.end())
-	{
-		CSpeedTreeWrapper * pMainTree = (itor++)->second;
-		CSpeedTreeWrapper ** ppInstances = pMainTree->GetInstances(uiCount);
-
-		for (uint32_t i = 0; i < uiCount; ++i)
-			ppInstances[i]->GetSpeedTree()->SetWindStrength(m_fWindStrength);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////  
-//	CSpeedTreeForest::SetupWindMatrices
 void CSpeedTreeForest::SetupWindMatrices(float fTimeInSecs)
 {
 	// matrix computational data
 	static float afMatrixTimes[c_nNumWindMatrices] = { 0.0f };
-	static float afFrequencies[c_nNumWindMatrices][2] = 
+	static float afFrequencies[c_nNumWindMatrices][2] =
 	{
 		{ 0.15f, 0.17f },
 		{ 0.25f, 0.15f },
@@ -227,14 +203,14 @@ void CSpeedTreeForest::SetupWindMatrices(float fTimeInSecs)
         afMatrix[10] = fCosX * fCosY;
         afMatrix[15] = 1.0f;
 
-		#ifdef WRAPPER_USE_CPU_WIND
+#ifdef WRAPPER_USE_CPU_WIND
 			CSpeedTreeRT::SetWindMatrix(j, afMatrix);
-		#endif
+#endif
 
-		#ifdef WRAPPER_USE_GPU_WIND
+#ifdef WRAPPER_USE_GPU_WIND
 			// graphics API specific
 			UploadWindMatrix(c_nVertexShader_WindMatrices + j * 4, afMatrix);
-		#endif
+#endif
 	}
 
 	// track wind strength
@@ -242,7 +218,7 @@ void CSpeedTreeForest::SetupWindMatrices(float fTimeInSecs)
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedTreeForest::SetLodLimits
 /*
 void CSpeedTreeForest::SetLodLimits(void)

@@ -1,19 +1,15 @@
 #include "StdAfx.h"
 #include "InsultChecker.h"
 
-CInsultChecker& CInsultChecker::GetSingleton()
+CInsultChecker & CInsultChecker::GetSingleton() const
 {
 	static CInsultChecker s_kInsultChecker;
 	return s_kInsultChecker;
 }
 
-CInsultChecker::CInsultChecker()
-{
-}
+CInsultChecker::CInsultChecker() = default;
 
-CInsultChecker::~CInsultChecker()
-{
-}
+CInsultChecker::~CInsultChecker() = default;
 
 void CInsultChecker::Clear()
 {
@@ -23,16 +19,13 @@ void CInsultChecker::Clear()
 void CInsultChecker::AppendInsult(const std::string& c_rstInsult)
 {
 	if (c_rstInsult.length()>0)
-		m_kList_stInsult.push_back(c_rstInsult);
+		m_kList_stInsult.emplace_back(c_rstInsult);
 }
 
 bool CInsultChecker::__GetInsultLength(const char* c_szWord, uint32_t* puInsultLen)
 {
-	std::list<std::string>::iterator i;
-	for (i=m_kList_stInsult.begin(); i!=m_kList_stInsult.end(); ++i)
+	for (auto & rstInsult : m_kList_stInsult)
 	{
-		std::string& rstInsult=*i;
-
 		int32_t ret=LocaleService_StringCompareCI(c_szWord, rstInsult.c_str(), rstInsult.length());		
 		if (0==ret)
 		{

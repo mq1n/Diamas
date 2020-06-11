@@ -241,8 +241,6 @@ void TEMP_CAreaLoaderThread::ProcessArea()	// called in loader thread
 	m_AreaCompleteMutex.Lock();
 	m_pAreaCompleteDeque.push_back(pArea);
 	m_AreaCompleteMutex.Unlock();
-
-	Sleep(g_iLoadingDelayTime);
 }
 
 void TEMP_CAreaLoaderThread::ProcessTerrain()	// called in loader thread
@@ -276,8 +274,6 @@ void TEMP_CAreaLoaderThread::ProcessTerrain()	// called in loader thread
 	
 	if (!LoadMultipleTextData(filename, stTokenVectorMap))
 		return;
-	
-	Sleep(g_iLoadingDelayTime);
 
 	if (stTokenVectorMap.end() == stTokenVectorMap.find("scripttype"))
 		return;
@@ -310,23 +306,14 @@ void TEMP_CAreaLoaderThread::ProcessTerrain()	// called in loader thread
 	pTerrain->CopySettingFromGlobalSetting();
 
 	pTerrain->LoadWaterMap(szWaterMapName);
-	Sleep(g_iLoadingDelayTime);
 	pTerrain->LoadHeightMap(szRawHeightFieldname);
-	Sleep(g_iLoadingDelayTime);
 	pTerrain->LoadAttrMap(szAttrMapName);
-	Sleep(g_iLoadingDelayTime);
 	pTerrain->RAW_LoadTileMap(szSplatName, true);
-	Sleep(g_iLoadingDelayTime);
 	pTerrain->LoadShadowTexture(szShadowTexName);
-	Sleep(g_iLoadingDelayTime);
 	pTerrain->LoadShadowMap(szShadowMapName);
-	Sleep(g_iLoadingDelayTime);
 	pTerrain->LoadMiniMapTexture(szMiniMapTexName);
-	Sleep(g_iLoadingDelayTime);
 	pTerrain->SetName(c_rstrAreaName.c_str());
-	Sleep(g_iLoadingDelayTime);
 	pTerrain->CalculateTerrainPatch();
-	Sleep(g_iLoadingDelayTime);
 
 	pTerrain->SetReady();
 
@@ -335,6 +322,4 @@ void TEMP_CAreaLoaderThread::ProcessTerrain()	// called in loader thread
 	m_TerrainCompleteMutex.Lock();
 	m_pTerrainCompleteDeque.push_back(pTerrain);
 	m_TerrainCompleteMutex.Unlock();
-
-	Sleep(g_iLoadingDelayTime);
 }

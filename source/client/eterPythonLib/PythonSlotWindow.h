@@ -46,8 +46,11 @@ namespace UI
 				uint32_t	dwState;
 				uint32_t	dwSlotNumber;
 				uint32_t	dwCenterSlotNumber;		// NOTE : 사이즈가 큰 아이템의 경우 아이템의 실제 위치 번호
+				uint32_t   dwRealSlotNumber;					//Unique identifier. Initially added as an aid for intentory grid. [Think]
+				uint32_t	dwRealCenterSlotNumber;
 				uint32_t	dwItemIndex;			// NOTE : 여기서 사용되는 Item이라는 단어는 좁은 개념의 것이 아닌,
 				BOOL	isItem;					//        "슬롯의 내용물"이라는 포괄적인 개념어. 더 좋은 것이 있을까? - [levites]
+				uint32_t	dwItemID;
 
 				// CoolTime
 				float	fCoolTime;
@@ -83,16 +86,22 @@ namespace UI
 		public:
 			CSlotWindow(PyObject * ppyObject);
 			virtual ~CSlotWindow();
+			
+			void SetSlotID(uint32_t dwIndex, uint32_t dwID);
 
 			void Destroy();
-
+			
 			// Manage Slot
 			void SetSlotType(uint32_t dwType);
 			void SetSlotStyle(uint32_t dwStyle);
 
 			void AppendSlot(uint32_t dwIndex, int32_t ixPosition, int32_t iyPosition, int32_t ixCellSize, int32_t iyCellSize);
 			void SetCoverButton(uint32_t dwIndex, const char * c_szUpImageName, const char * c_szOverImageName, const char * c_szDownImageName, const char * c_szDisableImageName, BOOL bLeftButtonEnable, BOOL bRightButtonEnable);
+			void DeleteCoverButton(uint32_t dwIndex);
+			bool HasCoverButton(uint32_t dwIndex);
 			void SetSlotBaseImage(const char * c_szFileName, float fr, float fg, float fb, float fa);
+			void SetSlotBaseImageScale(const char * c_szFileName, float fr, float fg, float fb, float fa, float sx, float sy);
+			void SetSlotScale(uint32_t dwIndex, uint32_t dwVirtualNumber, uint8_t byWidth, uint8_t byHeight, CGraphicImage * pImage, float sx, float sy, D3DXCOLOR& diffuseColor);
 			void AppendSlotButton(const char * c_szUpImageName, const char * c_szOverImageName, const char * c_szDownImageName);
 			void AppendRequirementSignImage(const char * c_szImageName);
 
@@ -170,6 +179,7 @@ namespace UI
 			void __CreateSlotEnableEffect();
 			void __CreateFinishCoolTimeEffect(TSlot * pSlot);
 			void __CreateBaseImage(const char * c_szFileName, float fr, float fg, float fb, float fa);
+			void __CreateBaseImageScale(const char * c_szFileName, float fr, float fg, float fb, float fa, float sx, float sy);
 
 			void __DestroyToggleSlotImage();
 			void __DestroySlotEnableEffect();

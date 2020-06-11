@@ -2,7 +2,7 @@
 #include "AnticheatManager.h"
 #include "CheatQueueManager.h"
 #include "dirent_win.h"
-#include <XORstr.h>
+#include <xorstr.hpp>
 
 inline static int32_t getdir(const std::string & dir, std::vector <std::string> & files)
 {
@@ -37,26 +37,26 @@ void CAnticheatManager::CheckMainFolderFiles()
 		std::string file = files[i];
 		std::transform(file.begin(), file.end(), file.begin(), tolower);
 
-		if (file.substr(file.find_last_of(".") + 1) == XOR("mix") ||
-			file.substr(file.find_last_of(".") + 1) == XOR("flt") || 
-			file.substr(file.find_last_of(".") + 1) == XOR("asi") || 
-			file.substr(file.find_last_of(".") + 1) == XOR("m3d") ||
-			file.substr(file.find_last_of(".") + 1) == XOR("def") ||
-			file.substr(file.find_last_of(".") + 1) == XOR("py"))
+		if (file.substr(file.find_last_of(".") + 1) == xorstr("mix").crypt_get() ||
+			file.substr(file.find_last_of(".") + 1) == xorstr("flt").crypt_get() ||
+			file.substr(file.find_last_of(".") + 1) == xorstr("asi").crypt_get() ||
+			file.substr(file.find_last_of(".") + 1) == xorstr("m3d").crypt_get() ||
+			file.substr(file.find_last_of(".") + 1) == xorstr("def").crypt_get() ||
+			file.substr(file.find_last_of(".") + 1) == xorstr("py").crypt_get())
 		{
-			TraceError(XOR("Unallowed file found on main folder! File: %s"), file.c_str());
+			TraceError(xorstr("Unallowed file found on main folder! File: %s").crypt_get(), file.c_str());
 			abort();
 		}
 
-		if (file == XOR("mss32.dll") && GetFileMd5(file) != "6400e224b8b44ece59a992e6d8233719")
+		if (file == xorstr("mss32.dll").crypt_get() && GetFileMd5(file) != "6400e224b8b44ece59a992e6d8233719")
 		{
-			TraceError(XOR("mss32.dll file is corrupted! Please delete it and restart game"));
+			TraceError(xorstr("mss32.dll file is corrupted! Please delete it and restart game").crypt_get());
 			abort();
 		}
 
-		if (file == XOR("devil.dll") && GetFileMd5(file) != "26eec5cc3d26cb38c93de01a3eb84cff")
+		if (file == xorstr("devil.dll").crypt_get() && GetFileMd5(file) != "26eec5cc3d26cb38c93de01a3eb84cff")
 		{
-			TraceError(XOR("devil.dll file is corrupted! Please delete it and restart game"));
+			TraceError(xorstr("devil.dll file is corrupted! Please delete it and restart game").crypt_get());
 			abort();
 		}
 	}
@@ -64,37 +64,37 @@ void CAnticheatManager::CheckMainFolderFiles()
 
 void CAnticheatManager::CheckLibFolderForPythonLibs()
 {
-	if (IsDirExist(XOR("stdlib")))
+	if (IsDirExist(xorstr("stdlib").crypt_get()))
 	{
-		TraceError(XOR("Please delete stdlib folder and restart game."));
+		TraceError(xorstr("Please delete stdlib folder and restart game.").crypt_get());
 		abort();
 	}
 }
 
 void CAnticheatManager::CheckMilesFolderForMilesPlugins()
 {
-	auto dir = std::string(XOR("miles"));
+	auto dir = std::string(xorstr("miles").crypt_get());
 	auto files = std::vector<std::string>();
 
 	getdir(dir, files);
 
 	static std::map <std::string /* strFileName */, std::string /* strMd5 */> mapKnownFiles =
 	{
-		{ XOR("mssa3d.m3d"),	XOR("e089ce52b0617a6530069f22e0bdba2a") },
-		{ XOR("mssds3d.m3d"),	XOR("85267776d45dbf5475c7d9882f08117c") },
-		{ XOR("mssdsp.flt"),	XOR("cb71b1791009eca618e9b1ad4baa4fa9") },
-		{ XOR("mssdx7.m3d"),	XOR("2727e2671482a55b2f1f16aa88d2780f") },
-		{ XOR("msseax.m3d"),	XOR("788bd950efe89fa5166292bd6729fa62") },
-		{ XOR("mssmp3.asi"),	XOR("189576dfe55af3b70db7e3e2312cd0fd") },
-		{ XOR("mssrsx.m3d"),	XOR("7fae15b559eb91f491a5f75cfa103cd4") },
-		{ XOR("msssoft.m3d"),	XOR("bdc9ad58ade17dbd939522eee447416f") },
-		{ XOR("mssvoice.asi"),	XOR("3d5342edebe722748ace78c930f4d8a5") },
-		{ XOR("mss32.dll"),		XOR("6400e224b8b44ece59a992e6d8233719") }
+		{ xorstr("mssa3d.m3d").crypt_get(),	xorstr("e089ce52b0617a6530069f22e0bdba2a").crypt_get() },
+		{ xorstr("mssds3d.m3d").crypt_get(),	xorstr("85267776d45dbf5475c7d9882f08117c").crypt_get() },
+		{ xorstr("mssdsp.flt").crypt_get(),	xorstr("cb71b1791009eca618e9b1ad4baa4fa9").crypt_get() },
+		{ xorstr("mssdx7.m3d").crypt_get(),	xorstr("2727e2671482a55b2f1f16aa88d2780f").crypt_get() },
+		{ xorstr("msseax.m3d").crypt_get(),	xorstr("788bd950efe89fa5166292bd6729fa62").crypt_get() },
+		{ xorstr("mssmp3.asi").crypt_get(),	xorstr("189576dfe55af3b70db7e3e2312cd0fd").crypt_get() },
+		{ xorstr("mssrsx.m3d").crypt_get(),	xorstr("7fae15b559eb91f491a5f75cfa103cd4").crypt_get() },
+		{ xorstr("msssoft.m3d").crypt_get(),	xorstr("bdc9ad58ade17dbd939522eee447416f").crypt_get() },
+		{ xorstr("mssvoice.asi").crypt_get(),	xorstr("3d5342edebe722748ace78c930f4d8a5").crypt_get() },
+		{ xorstr("mss32.dll").crypt_get(),		xorstr("6400e224b8b44ece59a992e6d8233719").crypt_get() }
 	};
 
 	if (files.size() > mapKnownFiles.size())
 	{
-		TraceError(XOR("Unknown file detected on miles folder! Please delete miles folder and restart game."));
+		TraceError(xorstr("Unknown file detected on miles folder! Please delete miles folder and restart game.").crypt_get());
 		abort();
 	}
 
@@ -106,16 +106,16 @@ void CAnticheatManager::CheckMilesFolderForMilesPlugins()
 		auto it = mapKnownFiles.find(strCurrFileLower);
 		if (it == mapKnownFiles.end())
 		{
-			TraceError(XOR("Unknown file detected on miles folder! File: %s"), strCurrFolderFile.c_str());
+			TraceError(xorstr("Unknown file detected on miles folder! File: %s").crypt_get(), strCurrFolderFile.c_str());
 			abort();
 		}
 
-		std::string szPath = XOR("miles/");
+		std::string szPath = xorstr("miles/").crypt_get();
 		auto strCurrentMd5 = GetFileMd5(szPath + strCurrFileLower);
 		auto strCorrectMd5 = it->second;
 		if (strCurrentMd5 != strCorrectMd5)
 		{
-			TraceError(XOR("Corrupted file detected on miles folder! File: %s"), strCurrFolderFile.c_str());
+			TraceError(xorstr("Corrupted file detected on miles folder! File: %s").crypt_get(), strCurrFolderFile.c_str());
 			abort();
 		}
 	}
@@ -123,9 +123,9 @@ void CAnticheatManager::CheckMilesFolderForMilesPlugins()
 
 void CAnticheatManager::CheckYmirFolder()
 {
-	if (IsDirExist(XOR("d:/ymir work")) || IsDirExist(XOR("d:\\ymir work")))
+	if (IsDirExist(xorstr("d:/ymir work").crypt_get()) || IsDirExist(xorstr("d:\\ymir work").crypt_get()))
 	{
-		TraceError(XOR("Unallowed folder: 'd:/ymir work' detected! Please delete it and restart game"));
+		TraceError(xorstr("Unallowed folder: 'd:/ymir work' detected! Please delete it and restart game").crypt_get());
 		abort();
 	}
 }

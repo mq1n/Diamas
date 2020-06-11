@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <vector>
 #include <string>
+#include <cstdint>
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)			{ if (p) { delete (p);		(p) = nullptr; } }
@@ -123,7 +124,7 @@ void string_join(const std::string& sep, const C& container, std::string* ret)
             capacity += (*i).length();
     }
 
-    string buf;
+    std::string buf;
     buf.reserve(capacity);
 
     // join strings

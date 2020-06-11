@@ -22,19 +22,7 @@ void CCamera::ProcessTerrainCollision()
 		v3CheckVector.z = rPythonBackground.GetHeight(floorf(v3CheckVector.x), floorf(v3CheckVector.y));
 		D3DXVECTOR3 v3NewEye = v3CheckVector + 2.0f * m_fTerrainCollisionRadius * m_v3Up;
 		if (v3NewEye.z > m_v3Eye.z)
-		{
-			//printf("ToCameraBottom(%f, %f, %f) TCR %f, UP(%f, %f, %f), new %f > old %f", 
-			//	v3CheckVector.x, v3CheckVector.y, v3CheckVector.z, 
-			//	m_fTerrainCollisionRadius,
-			//	m_v3Up.x, m_v3Up.y, m_v3Up.z,
-			//	v3NewEye.z, m_v3Eye.z);
 			SetEye(v3NewEye);
-		}
-		/*
-		SetCameraState(CAMERA_STATE_NORMAL);
-		D3DXVECTOR3 v3NewEye = v3CollisionPoint;
-		SetEye(v3NewEye);
-		*/
 	}
 	else
 		SetCameraState(CAMERA_STATE_NORMAL);
@@ -108,14 +96,15 @@ struct CameraCollisionChecker
 	std::vector<D3DXVECTOR3>* m_pkVct_v3Position;
 	CDynamicSphereInstance * m_pdsi;
 
-	CameraCollisionChecker(CDynamicSphereInstance * pdsi, std::vector<D3DXVECTOR3>* pkVct_v3Position) : m_pdsi(pdsi), m_pkVct_v3Position(pkVct_v3Position), m_isBlocked(false) 
+	CameraCollisionChecker(CDynamicSphereInstance * pdsi, std::vector<D3DXVECTOR3>* pkVct_v3Position)
+		: m_isBlocked(false), m_pkVct_v3Position(pkVct_v3Position), m_pdsi(pdsi)
 	{
 	}
 	void operator () (CGraphicObjectInstance* pOpponent)
 	{
 		if (pOpponent->CollisionDynamicSphere(*m_pdsi))
  		{
-			m_pkVct_v3Position->push_back(pOpponent->GetPosition());
+			m_pkVct_v3Position->emplace_back(pOpponent->GetPosition());
 			m_isBlocked = true;
  		}
 	}
@@ -168,20 +157,11 @@ void CCamera::ProcessBuildingCollision()
 				D3DXVec3Cross(&v3CheckVector, &(kVct_kPosition[0] - m_v3Eye), &m_v3View);
 				float fDot = D3DXVec3Dot(&v3CheckVector, &m_v3Up);
 				if (fDot < 0)
-				{
-	//				m_v3AngularVelocity.x = fMIN(-fMoveAmountSmall, m_v3AngularVelocity.x);
- 					m_v3AngularVelocity.x -= fMoveAmountSmall;
-				}
-				else if(fDot > 0)
-				{
-	//				m_v3AngularVelocity.x = fMAX(fMoveAmountSmall, m_v3AngularVelocity.x);
- 					m_v3AngularVelocity.x += fMoveAmountSmall;
-				}
+					m_v3AngularVelocity.x -= fMoveAmountSmall;
+				else if (fDot > 0)
+					m_v3AngularVelocity.x += fMoveAmountSmall;
 				else
-				{
-	//				m_v3AngularVelocity.z = fMAX(fMoveAmountSmall, m_v3AngularVelocity.z);
- 					m_v3AngularVelocity.z += fMoveAmountSmall;
-				}
+					m_v3AngularVelocity.z += fMoveAmountSmall;
 			}
 		}
 	}
@@ -197,10 +177,7 @@ void CCamera::ProcessBuildingCollision()
 		bool bCollide = kCameraCollisionChecker.m_isBlocked;
 
 		if (bCollide)
-		{
 			m_v3AngularVelocity.z = fMIN(-fMoveAmountSmall, m_v3AngularVelocity.y);
-	// 		m_v3AngularVelocity.z -= 1.0f;
-		}
 	}
 
 	// аб
@@ -291,20 +268,11 @@ void CCamera::ProcessBuildingCollision()
 				D3DXVec3Cross(&v3CheckVector, &(kVct_kPosition[0] - m_v3Eye), &m_v3View);
 				float fDot = D3DXVec3Dot(&v3CheckVector, &m_v3Up);
 				if (fDot < 0)
-				{
-	// 				m_v3AngularVelocity.x = fMIN(-fMoveAmountSmall, m_v3AngularVelocity.x);
 					m_v3AngularVelocity.x -= fMoveAmountSmall;
-				}
-				else if(fDot > 0)
-				{
-	// 				m_v3AngularVelocity.x = fMAX(fMoveAmountSmall, m_v3AngularVelocity.x);
+				else if (fDot > 0)
 					m_v3AngularVelocity.x += fMoveAmountSmall;
-				}
 				else
-				{
-	//				m_v3AngularVelocity.z = fMAX(fMoveAmountSmall, m_v3AngularVelocity.z);
 					m_v3AngularVelocity.z += fMoveAmountSmall;
-				}
 			}
 		}
 	}

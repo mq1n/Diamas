@@ -2,9 +2,7 @@
 #include "AnticheatManager.h"
 #include "CheatQueueManager.h"
 #include "NTDefinations.h"
-
-#include <XORstr.h>
-#include <Python/Python.h>
+#include <python27/Python.h>
 
 #if 0
 

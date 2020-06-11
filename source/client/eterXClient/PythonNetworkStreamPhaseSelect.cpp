@@ -124,6 +124,10 @@ void CPythonNetworkStream::SelectPhase()
 			Recv(sizeof(TPacketGCPointChange), &PointChange);
 			return;
 			break;
+			
+		case HEADER_GC_CHAT:
+			return;
+			break;
 
 		///////////////////////////////////////////////////////////////////////////////////////////
 		case HEADER_GC_PING:

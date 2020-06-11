@@ -2,6 +2,8 @@
 #include "PythonEventManager.h"
 #include "PythonNetworkStream.h"
 
+#include "PythonDynamicModuleNames.h"
+
 PyObject * eventRegisterEventSet(PyObject * poSelf, PyObject * poArgs)
 {
 	char * szFileName;
@@ -269,6 +271,38 @@ PyObject * eventDestroy(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
+PyObject * eventSetFontColor(PyObject * poSelf, PyObject * poArgs)
+{
+	int32_t iIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
+		return Py_BuildException();
+
+	float r;
+	if (!PyTuple_GetFloat(poArgs, 1, &r))
+		return Py_BuildException();
+	
+	float g;
+	if (!PyTuple_GetFloat(poArgs, 2, &g))
+		return Py_BuildException();
+	
+	float b;
+	if (!PyTuple_GetFloat(poArgs, 3, &b))
+		return Py_BuildException();
+	
+	
+	CPythonEventManager::Instance().SetFontColor(iIndex, r, g, b);
+	return Py_BuildNone();
+}
+
+PyObject * eventGetTotalLineCount(PyObject * poSelf, PyObject * poArgs)
+{
+	int32_t iIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
+		return Py_BuildException();
+
+	return Py_BuildValue("i", CPythonEventManager::Instance().GetLineCount(iIndex));
+}
+
 void initEvent()
 {
 	static PyMethodDef s_methods[] =
@@ -303,10 +337,12 @@ void initEvent()
 
 		{ "QuestButtonClick",			eventQuestButtonClick,				METH_VARARGS },
 		{ "Destroy",					eventDestroy,						METH_VARARGS },
+		{ "SetFontColor",				eventSetFontColor,					METH_VARARGS },
+		{ "GetTotalLineCount",			eventGetTotalLineCount,				METH_VARARGS },
 		{ nullptr,							nullptr,								0         },
 	};
 
-	PyObject * poModule = Py_InitModule("event", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(EVENT_MANAGER_MODULE).c_str(), s_methods);
 
 	PyModule_AddIntConstant(poModule, "BOX_VISIBLE_LINE_COUNT", CPythonEventManager::BOX_VISIBLE_LINE_COUNT);
 	PyModule_AddIntConstant(poModule, "BUTTON_TYPE_NEXT", CPythonEventManager::BUTTON_TYPE_NEXT);

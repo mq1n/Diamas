@@ -9,7 +9,7 @@ class CPixelShader : public CGraphicBase
 		virtual ~CPixelShader();
 
 		void Destroy();
-		bool CreateFromDiskFile(const char* c_szFileName);
+		//bool CreateFromDiskFile(const char* c_szFileName);
 
 		void Set();
 
@@ -17,5 +17,5 @@ class CPixelShader : public CGraphicBase
 		void Initialize();
 
 	protected:
-		DWORD m_handle;
+		IDirect3DPixelShader9* m_handle;
 };

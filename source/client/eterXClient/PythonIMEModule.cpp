@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "PythonIME.h"
 #include "PythonApplication.h"
+#include "PythonDynamicModuleNames.h"
 
 PyObject* imeEnable(PyObject* poSelf, PyObject* poArgs)
 {
@@ -285,5 +286,5 @@ void initime()
 		{ nullptr,						nullptr,						0		 },
 	};	
 
-	Py_InitModule("ime", s_methods);
+	Py_InitModule(CPythonDynamicModule::Instance().GetModule(IME_MODULE).c_str(), s_methods);
 }

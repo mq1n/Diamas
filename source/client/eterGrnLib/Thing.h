@@ -25,6 +25,9 @@ class CGraphicThing : public CResource
 		bool					CheckMotionIndex(int32_t iMotion) const;
 		CGrannyMotion *			GetMotionPointer(int32_t iMotion);
 		int32_t						GetMotionCount() const;
+		
+		int32_t						GetTextureCount() const;
+		const char *			GetTexturePath(int32_t iTexture);
 
 	protected:
 		void					Initialize();

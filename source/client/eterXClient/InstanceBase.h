@@ -2,7 +2,7 @@
 
 #include "../eterGameLib/RaceData.h"
 #include "../eterGameLib/ActorInstance.h"
-#include "../eterGameLib/GameLibDefines.h"
+#include "locale_inc.h"
 
 #ifdef ENABLE_ACCE_SYSTEM
 #include "../eterLib/GrpObjectInstance.h"
@@ -45,7 +45,7 @@ class CInstanceBase
 		};
 
 	public:
-		typedef uint32_t TType;
+		using TType = uint32_t;
 
 		enum EDirection
 		{
@@ -57,10 +57,10 @@ class CInstanceBase
 			DIR_SOUTHWEST,
 			DIR_WEST,
 			DIR_NORTHWEST,
-			DIR_MAX_NUM,
+			DIR_MAX_NUM
 		};
 
-		enum
+		enum EFunc
 		{
 			FUNC_WAIT,
 			FUNC_MOVE,
@@ -68,7 +68,7 @@ class CInstanceBase
 			FUNC_COMBO,
 			FUNC_MOB_SKILL,
 			FUNC_EMOTION,
-			FUNC_SKILL = 0x80,
+			FUNC_SKILL = 0x80
 		};
 
 		enum
@@ -198,7 +198,7 @@ class CInstanceBase
 			NEW_AFFECT_QUEST_START_IDX   = 1000,
 		};
 
-		enum
+		enum EStone
 		{
 			STONE_SMOKE1 = 0,	// 99%
 			STONE_SMOKE2 = 1,	// 85%
@@ -208,34 +208,34 @@ class CInstanceBase
 			STONE_SMOKE6 = 5,	// 40%
 			STONE_SMOKE7 = 6,	// 20%
 			STONE_SMOKE8 = 7,	// 10%
-			STONE_SMOKE_NUM = 4,
+			STONE_SMOKE_NUM = 4
 		};
 
 		enum EBuildingAffect
 		{
 			BUILDING_CONSTRUCTION_SMALL = 0,
 			BUILDING_CONSTRUCTION_LARGE = 1,
-			BUILDING_UPGRADE = 2,
+			BUILDING_UPGRADE = 2
 		};
 
-		enum
+		enum EWeapon
 		{
 			WEAPON_DUALHAND,
 			WEAPON_ONEHAND,
 			WEAPON_TWOHAND,
-			WEAPON_NUM,
+			WEAPON_NUM
 		};
 
-		enum
+		enum EEmpire
 		{
 			EMPIRE_NONE,
 			EMPIRE_A,
 			EMPIRE_B,
 			EMPIRE_C,
-			EMPIRE_NUM,
+			EMPIRE_NUM
 		};
 
-		enum
+		enum ENameColor
 		{	
 			NAMECOLOR_MOB,
 			NAMECOLOR_NPC,
@@ -255,18 +255,19 @@ class CInstanceBase
 			NAMECOLOR_PARTY,
 			NAMECOLOR_WARP,
 			NAMECOLOR_WAYPOINT,						
+			NAMECOLOR_SHOP,
 			NAMECOLOR_EXTRA = NAMECOLOR_FUNC + 10,
 			NAMECOLOR_NUM = NAMECOLOR_EXTRA + 10,
 		};
 				
-		enum
+		enum EAlignmentType
 		{
 			ALIGNMENT_TYPE_WHITE,
 			ALIGNMENT_TYPE_NORMAL,
-			ALIGNMENT_TYPE_DARK,
+			ALIGNMENT_TYPE_DARK
 		};
 
-		enum
+		enum EEmoticon
 		{
 			EMOTICON_EXCLAMATION	= 1,
 			EMOTICON_FISH			= 11,
@@ -276,7 +277,7 @@ class CInstanceBase
 			TITLE_NONE				= 4,
 		};
 
-		enum	//아래 번호가 바뀌면 registerEffect 쪽도 바꾸어 줘야 한다.
+		enum ERefinedEffect
 		{
 			EFFECT_REFINED_NONE,
 
@@ -328,7 +329,7 @@ class CInstanceBase
 			// 반-_-사
 		};
 
-		enum
+		enum EEffect
 		{
 			EFFECT_DUST,
 			EFFECT_STUN,
@@ -398,11 +399,11 @@ class CInstanceBase
 			EFFECT_NUM,
 		};
 
-		enum
+		enum EDuel
 		{
 			DUEL_NONE,
 			DUEL_CANNOTATTACK,
-			DUEL_START,
+			DUEL_START
 		};
 
 	public:
@@ -637,9 +638,6 @@ class CInstanceBase
 		BOOL					CanCancelSkill();
 		BOOL					CanAttackHorseLevel();
 
-#ifdef __MOVIE_MODE__
-		BOOL					IsMovieMode(); // 운영자용 완전히 안보이는거
-#endif
 		bool					NEW_CanMoveToDestPixelPosition(const TPixelPosition& c_rkPPosDst);
 
 		void					NEW_SetAdvancingRotationFromPixelPosition(const TPixelPosition& c_rkPPosSrc, const TPixelPosition& c_rkPPosDst);
@@ -932,6 +930,9 @@ class CInstanceBase
 		uint32_t					m_dwLevel;
 		uint32_t					m_dwEmpireID;
 		uint32_t					m_dwGuildID;
+		bool					m_bIsHidden;
+	public:
+		bool					IsHidden();
 
 	protected:		
 		CAffectFlagContainer	m_kAffectFlagContainer;
@@ -963,6 +964,8 @@ class CInstanceBase
 
 		void __EffectContainer_Initialize();
 		void __EffectContainer_Destroy();
+		void __EffectContainer_Suspend();
+		void __EffectContainer_Continue();
 
 		uint32_t __EffectContainer_AttachEffect(uint32_t eEffect);
 		void __EffectContainer_DetachEffect(uint32_t eEffect);

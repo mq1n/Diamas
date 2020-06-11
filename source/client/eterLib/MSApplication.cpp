@@ -43,7 +43,7 @@ bool CMSApplication::MessageProcess()
 	return true;
 }
 
-LRESULT CMSApplication::WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CMSApplication::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uiMsg)
 	{

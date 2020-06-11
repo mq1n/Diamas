@@ -8,7 +8,7 @@
 #include "GameEventManager.h"
 
 #include "FlyHandler.h"
-#include "GameLibDefines.h"
+#include "../eterXClient/locale_inc.h"
 
 void CActorInstance::MotionEventProcess()
 {

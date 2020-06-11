@@ -427,10 +427,6 @@ bool CPythonNetworkStream::RecvSyncPositionPacket()
 		if (!Recv(sizeof(TPacketGCSyncPositionElement), &kSyncPos))
 			return false;
 
-#ifdef __MOVIE_MODE__
-		return true;
-#endif __MOVIE_MODE__
-
 		//Tracenf("CPythonNetworkStream::RecvSyncPositionPacket %d (%d, %d)", kSyncPos.dwVID, kSyncPos.lX, kSyncPos.lY);
 
 		__GlobalPositionToLocalPosition(kSyncPos.lX, kSyncPos.lY);

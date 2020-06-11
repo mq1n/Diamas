@@ -2,6 +2,7 @@
 #include "PythonShop.h"
 
 #include "PythonNetworkStream.h"
+#include "PythonDynamicModuleNames.h"
 
 //BOOL CPythonShop::GetSlotItemID(uint32_t dwSlotPos, uint32_t* pdwItemID)
 //{
@@ -384,7 +385,7 @@ PyObject * shopBuildPrivateShop(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * shopGetTabCount(PyObject * poSelf, PyObject * poArgs)
 {
-	return Py_BuildValue("i", CPythonShop::instance().GetTabCount());
+	return Py_BuildValue("i", CPythonShop::Instance().GetTabCount());
 }
 
 PyObject * shopGetTabName(PyObject * poSelf, PyObject * poArgs)
@@ -393,7 +394,7 @@ PyObject * shopGetTabName(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetInteger(poArgs, 0, &bTabIdx))
 		return Py_BuildException();
 
-	return Py_BuildValue("s", CPythonShop::instance().GetTabName(bTabIdx));
+	return Py_BuildValue("s", CPythonShop::Instance().GetTabName(bTabIdx));
 }
 
 PyObject * shopGetTabCoinType(PyObject * poSelf, PyObject * poArgs)
@@ -402,7 +403,7 @@ PyObject * shopGetTabCoinType(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetInteger(poArgs, 0, &bTabIdx))
 		return Py_BuildException();
 
-	return Py_BuildValue("i", CPythonShop::instance().GetTabCoinType(bTabIdx));
+	return Py_BuildValue("i", CPythonShop::Instance().GetTabCoinType(bTabIdx));
 }
 
 void initshop()
@@ -432,7 +433,8 @@ void initshop()
 		{ "BuildPrivateShop",			shopBuildPrivateShop,			METH_VARARGS },
 		{ nullptr,							nullptr,							0 },
 	};
-	PyObject * poModule = Py_InitModule("shop", s_methods);
+
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(SHOP_MODULE).c_str(), s_methods);
 
 	PyModule_AddIntConstant(poModule, "SHOP_SLOT_COUNT", SHOP_HOST_ITEM_MAX_NUM);
 	PyModule_AddIntConstant(poModule, "SHOP_COIN_TYPE_GOLD", SHOP_COIN_TYPE_GOLD);

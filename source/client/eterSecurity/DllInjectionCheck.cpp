@@ -3,7 +3,7 @@
 #include "CheatQueueManager.h"
 #include "NTDefinations.h"
 #include <detours.h>
-#include <XORstr.h>
+#include <xorstr.hpp>
 
 typedef ULONG(NTAPI* TRtlGetFullPathName_U)(PCWSTR FileName, ULONG Size, PWSTR Buffer, PWSTR* ShortName);
 static TRtlGetFullPathName_U RtlGetFullPathName_U = nullptr;
@@ -46,11 +46,11 @@ ULONG NTAPI RtlGetFullPathName_UTrampoline(PCWSTR FileName, ULONG Size, PWSTR Bu
 
 bool CAnticheatManager::LoadDllFilter()
 {
-	auto hNtdll = LoadLibraryA(XOR("ntdll"));
+	auto hNtdll = LoadLibraryA(xorstr("ntdll").crypt_get());
 	if (!hNtdll)
 		return false;
 
-	gs_dwRtlGetFullPathName_U = (DWORD)GetProcAddress(hNtdll, XOR("RtlGetFullPathName_U"));
+	gs_dwRtlGetFullPathName_U = (DWORD)GetProcAddress(hNtdll, xorstr("RtlGetFullPathName_U").crypt_get());
 	if (!gs_dwRtlGetFullPathName_U)
 		return false;
 

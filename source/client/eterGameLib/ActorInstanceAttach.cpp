@@ -6,7 +6,7 @@
 #include "ItemManager.h"
 #include "RaceData.h"
 #include "WeaponTrace.h"
-#include "GameLibDefines.h"
+#include "../eterXClient/locale_inc.h"
 
 BOOL USE_WEAPON_SPECULAR = TRUE;
 
@@ -599,6 +599,24 @@ void CActorInstance::ShowAllAttachingEffect()
 	{
 		CEffectManager::Instance().SelectEffectInstance(it->dwEffectIndex);
 		CEffectManager::Instance().ShowEffect();
+	}
+}
+
+void CActorInstance::SetActiveAllAttachingEffect()
+{
+	std::list<TAttachingEffect>::iterator it;
+	for (it = m_AttachingEffectList.begin(); it != m_AttachingEffectList.end(); ++it)
+	{
+		CEffectManager::Instance().ActiveEffectInstance(it->dwEffectIndex);
+	}
+}
+
+void CActorInstance::SetDeactiveAllAttachingEffect()
+{
+	std::list<TAttachingEffect>::iterator it;
+	for (it = m_AttachingEffectList.begin(); it != m_AttachingEffectList.end(); ++it)
+	{
+		CEffectManager::Instance().DeactiveEffectInstance(it->dwEffectIndex);
 	}
 }
 

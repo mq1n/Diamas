@@ -5,7 +5,7 @@
 #include "RaceData.h"
 #include "RaceMotionData.h"
 #include "../eterBase/Filename.h"
-#include "GameLibDefines.h"
+#include "../eterXClient/locale_inc.h"
 
 CDynamicPool<CRaceData> CRaceData::ms_kPool;
 CDynamicPool<CRaceData::TMotionModeData> CRaceData::ms_MotionModeDataPool;
@@ -286,6 +286,16 @@ void CRaceData::SetRace(uint32_t dwRaceIndex)
 void CRaceData::RegisterAttachingBoneName(uint32_t dwPartIndex, const char * c_szBoneName)
 {
 	m_AttachingBoneNameMap.insert(TAttachingBoneNameMap::value_type(dwPartIndex, c_szBoneName));
+}
+
+void CRaceData::ChangeAttachingBoneName(uint32_t dwPartIndex, const char * c_szBoneName)
+{
+	TAttachingBoneNameMap::iterator it = m_AttachingBoneNameMap.find(dwPartIndex);
+	if (it == m_AttachingBoneNameMap.end())
+		return;
+
+	//m_AttachingBoneNameMap[dwPartIndex] = c_szBoneName; //bad behavior possiblity
+	it->second = c_szBoneName;
 }
 
 void CRaceData::RegisterMotionMode(uint16_t wMotionModeIndex)

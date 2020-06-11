@@ -3,8 +3,6 @@
 #include "CheatQueueManager.h"
 #include "NTDefinations.h"
 
-#include <XORstr.h>
-
 // https://github.com/kruk3t/BetaShield/blob/master/BetaStatic/EnumerateHandles.cpp
 
 #if 0

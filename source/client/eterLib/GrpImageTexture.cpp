@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include <FileSystemIncl.hpp>
 #include "GrpImageTexture.h"
+#include <d3d9/DxErr.h>
 
 bool CGraphicImageTexture::Lock(int32_t* pRetPitch, void** ppRetPixels, int32_t level)
 {
@@ -44,7 +45,7 @@ bool CGraphicImageTexture::CreateDeviceObjects()
 	if (m_stFileName.empty())
 	{
 		// 폰트 텍스쳐
-		if (FAILED(ms_lpd3dDevice->CreateTexture(m_width, m_height, 1, 0, m_d3dFmt, D3DPOOL_MANAGED, &m_lpd3dTexture)))
+		if (FAILED(ms_lpd3dDevice->CreateTexture(m_width, m_height, 1, 0, m_d3dFmt, D3DPOOL_MANAGED, &m_lpd3dTexture, nullptr)))
 			return false;
 	}
 	else
@@ -95,105 +96,111 @@ void CGraphicImageTexture::CreateFromTexturePointer(const CGraphicTexture * c_pS
 	m_bEmpty = false;
 }
 
+bool CGraphicImageTexture::ConvertTexture(IDirect3DTexture9* pkTexSrc, IDirect3DTexture9* pkTexDst, int32_t mipMapCount)
+{
+	HRESULT hr;
+	bool failed = false;
+	IDirect3DSurface9* ppsSrc = nullptr;
+	IDirect3DSurface9* ppsDst = nullptr;
+
+	for (int32_t i = 0; i < mipMapCount; ++i) {
+		hr = pkTexSrc->GetSurfaceLevel(i, &ppsSrc);
+		if (FAILED(hr)) {
+			TraceError("CreateDDSTexture: ms_bSupportDXT = false GetSurfaceLevel(ppsSrc) failed (file: %s, mipLevel: %d) Error: %s", m_stFileName.c_str(), i, DXGetErrorString(hr));
+			failed = true;
+			break;
+		}
+
+		hr = pkTexDst->GetSurfaceLevel(i, &ppsDst);
+		if (FAILED(hr)) {
+			TraceError("CreateDDSTexture: ms_bSupportDXT = false GetSurfaceLevel(ppsDst) failed (file: %s, mipLevel: %d) Error: %s", m_stFileName.c_str(), i, DXGetErrorString(hr));
+			failed = true;
+			break;
+		}
+
+		hr = D3DXLoadSurfaceFromSurface(ppsDst, nullptr, nullptr, ppsSrc, nullptr, nullptr, D3DX_FILTER_NONE, 0);
+		if (FAILED(hr)) {
+			TraceError("CreateDDSTexture: ms_bSupportDXT = false D3DXLoadSurfaceFromSurface failed (file: %s, mipLevel: %d) Error: %s", m_stFileName.c_str(), i, DXGetErrorString(hr));
+			failed = true;
+			break;
+		}
+
+		ppsDst->Release();
+		ppsSrc->Release();
+	}
+
+	if (failed) {
+		if (ppsSrc)
+			ppsSrc->Release();
+
+		if (ppsDst)
+			ppsDst->Release();
+
+		return false;
+	}
+
+	return true;
+}
+
 bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage & image, const uint8_t * /*c_pbBuf*/)
 {
 	int32_t mipmapCount = image.m_dwMipMapCount == 0 ? 1 : image.m_dwMipMapCount;
 
-	D3DFORMAT format;
-	LPDIRECT3DTEXTURE8 lpd3dTexture;
+	LPDIRECT3DTEXTURE9 lpd3dTexture;
+	HRESULT hr;
 	D3DPOOL pool = ms_bSupportDXT ? D3DPOOL_MANAGED : D3DPOOL_SCRATCH;;
 
-	if(image.m_CompFormat == PF_DXT5)
-		format = D3DFMT_DXT5;	
-	else if(image.m_CompFormat == PF_DXT3)
-		format = D3DFMT_DXT3;	
-	else
-		format = D3DFMT_DXT1;	
+	hr = D3DXCreateTexture(ms_lpd3dDevice, image.m_nWidth, image.m_nHeight, mipmapCount, 0, (D3DFORMAT)image.m_xddPixelFormat.dwFourCC, pool, &lpd3dTexture);
 
-	uint32_t uTexBias=0;
-	if (IsLowTextureMemory())
-		uTexBias=1;
-
-	uint32_t uMinMipMapIndex=0;
-	if (uTexBias>0)
-	{
-		if (mipmapCount>uTexBias)
-		{
-			uMinMipMapIndex=uTexBias;
-			image.m_nWidth>>=uTexBias;
-			image.m_nHeight>>=uTexBias;
-			mipmapCount-=uTexBias;
-		}
-	}
-
-	if (FAILED(D3DXCreateTexture(	ms_lpd3dDevice, image.m_nWidth, image.m_nHeight,
-									mipmapCount, 0, format, pool, &lpd3dTexture)))
-	{
-		TraceError("CreateDDSTexture: Cannot creatre texture");
+	if (FAILED(hr)) {
+		TraceError("CreateDDSTexture: Cannot create texture (file: %s, pool: %d, ms_bSupportDXT: %d) Error: %s", m_stFileName.c_str(), pool, ms_bSupportDXT, DXGetErrorString(hr));
 		return false;
 	}
 
-	for (uint32_t i = 0; i < mipmapCount; ++i)
+	for (int32_t i = 0; i < mipmapCount; ++i)
 	{
 		D3DLOCKED_RECT lockedRect;
 
-		if (FAILED(lpd3dTexture->LockRect(i, &lockedRect, nullptr, 0)))
-		{
-			TraceError("CreateDDSTexture: Cannot lock texture");
+		hr = lpd3dTexture->LockRect(i, &lockedRect, nullptr, 0);
+
+		if (FAILED(hr)) {
+			TraceError("CreateDDSTexture: Cannot lock texture (file: %s, mipmapCount: %d) Error: %s", m_stFileName.c_str(), mipmapCount, DXGetErrorString(hr));
+			continue;
 		}
-		else
-		{
-			image.Copy(i+uMinMipMapIndex, (uint8_t*)lockedRect.pBits, lockedRect.Pitch);
-			lpd3dTexture->UnlockRect(i);
-		}
+
+		image.Copy(i, (uint8_t*)lockedRect.pBits, lockedRect.Pitch);
+		lpd3dTexture->UnlockRect(i);
 	}
 
-	if(ms_bSupportDXT)
-	{
+	if (ms_bSupportDXT)
 		m_lpd3dTexture = lpd3dTexture;
-	}
 	else
 	{
-		if(image.m_CompFormat == PF_DXT3 || image.m_CompFormat == PF_DXT5)
-			format = D3DFMT_A4R4G4B4;
-		else
-			format = D3DFMT_A1R5G5B5;
+		D3DFORMAT compatFormat;
+
+		if (image.m_CompFormat == PF_DXT1) // Everything except DXT1 uses a non 1 bit alpha channel
+			compatFormat = D3DFMT_A1R5G5B5;
+		else if (IsLowTextureMemory())
+			compatFormat = D3DFMT_A4R4G4B4; // Glitches are visible but it uses less memory.
+		else 
+			compatFormat = D3DFMT_A8R8G8B8;
 
 		uint32_t imgWidth=image.m_nWidth;
 		uint32_t imgHeight=image.m_nHeight;
 
-		extern bool GRAPHICS_CAPS_HALF_SIZE_IMAGE;
+		hr = D3DXCreateTexture(ms_lpd3dDevice, imgWidth, imgHeight, mipmapCount, 0, compatFormat , D3DPOOL_MANAGED, &m_lpd3dTexture);
 
-		if (GRAPHICS_CAPS_HALF_SIZE_IMAGE && uTexBias>0 && mipmapCount==0)
-		{
-			imgWidth>>=uTexBias;
-			imgHeight>>=uTexBias;		
+		if (FAILED(hr)) {
+			TraceError("CreateDDSTexture: ms_bSupportDXT = false Cannot create texture (file: %s, compatFormat: %d) Error: %s", m_stFileName.c_str(), compatFormat, DXGetErrorString(hr));
+			return false;
 		}
 
-		if (FAILED(D3DXCreateTexture(	ms_lpd3dDevice, imgWidth, imgHeight, 
-										mipmapCount, 0, format, D3DPOOL_MANAGED, &m_lpd3dTexture)))
-		{
-				TraceError("CreateDDSTexture: Cannot creatre texture");
-				return false;
-		}
+		IDirect3DTexture9* pkTexSrc=lpd3dTexture;
+		IDirect3DTexture9* pkTexDst=m_lpd3dTexture;
 
-		IDirect3DTexture8* pkTexSrc=lpd3dTexture;
-		IDirect3DTexture8* pkTexDst=m_lpd3dTexture;
-
-		for(int32_t i=0; i<mipmapCount; ++i) {
-
-			IDirect3DSurface8* ppsSrc = nullptr;
-			IDirect3DSurface8* ppsDst = nullptr;
-
-			if (SUCCEEDED(pkTexSrc->GetSurfaceLevel(i, &ppsSrc)))
-			{
-				if (SUCCEEDED(pkTexDst->GetSurfaceLevel(i, &ppsDst)))
-				{
-					D3DXLoadSurfaceFromSurface(ppsDst, nullptr, nullptr, ppsSrc, nullptr, nullptr, D3DX_FILTER_NONE, 0);
-					ppsDst->Release();
-				}
-				ppsSrc->Release();
-			}
+		if (!ConvertTexture(pkTexSrc, pkTexDst, mipmapCount)) {
+			lpd3dTexture->Release();
+			return false;
 		}
 
 		lpd3dTexture->Release();
@@ -213,36 +220,36 @@ bool CGraphicImageTexture::CreateFromMemoryFile(uint32_t bufSize, const void * c
 
 	static CDXTCImage image;
 
-	if (image.LoadHeaderFromMemory((const uint8_t *) c_pvBuf, bufSize))	// DDS인가 확인
-	{
+	if (image.LoadHeaderFromMemory((const uint8_t *) c_pvBuf, bufSize))	// DDS Texture found
 		return (CreateDDSTexture(image, (const uint8_t *) c_pvBuf));
-	}
-	else
-	{
-		D3DXIMAGE_INFO imageInfo;
-		if (FAILED(D3DXCreateTextureFromFileInMemoryEx(
-					ms_lpd3dDevice,
-					c_pvBuf,
-					bufSize,
-					D3DX_DEFAULT,
-					D3DX_DEFAULT,
-					D3DX_DEFAULT,
-					0,
-					d3dFmt,
-					D3DPOOL_MANAGED,
-					dwFilter,
-					dwFilter,
-					0xffff00ff,
-					&imageInfo,
-					nullptr,
-					&m_lpd3dTexture)))
-		{
-			TraceError("CreateFromMemoryFile: Cannot create texture");
-			return false;
-		}
 
-		m_width = imageInfo.Width;
-		m_height = imageInfo.Height;
+	/************************************************************************/
+	/* We got a non .DDS DXT file                                           */
+	/************************************************************************/
+
+	uint32_t width, height;
+	height = width = D3DX_DEFAULT;
+
+	// This is only valid because we don not load an DXT1 - DXT5 compressed texture if partial Support is given the call would fail 
+	// for said formats.
+	int32_t pow2TextureSupportLevel = GetNonPow2TextureSupportLevel();
+	if (pow2TextureSupportLevel == NONPOW2_SUPPORT_LEVEL::FULL_SUPPORT || pow2TextureSupportLevel == NONPOW2_SUPPORT_LEVEL::PARTIAL_SUPPORT) {
+		width = D3DX_DEFAULT_NONPOW2;
+		height = D3DX_DEFAULT_NONPOW2;
+	}
+
+	HRESULT hr;
+	D3DXIMAGE_INFO imageInfo;
+
+	hr = D3DXCreateTextureFromFileInMemoryEx(ms_lpd3dDevice, c_pvBuf, bufSize, width, height, D3DX_DEFAULT, 0, d3dFmt, D3DPOOL_MANAGED, dwFilter, D3DX_DEFAULT, 0xffff00ff, &imageInfo, nullptr, &m_lpd3dTexture);
+
+	if (FAILED(hr)) {
+		TraceError("CreateFromMemoryFile: Non DDS file cannot create texture (file: %s) Error: %s", m_stFileName.c_str(), DXGetErrorString(hr));
+		return false;
+	}
+
+	m_width = imageInfo.Width;
+	m_height = imageInfo.Height;
 
 		D3DFORMAT format=imageInfo.Format;
 		switch(imageInfo.Format) {
@@ -256,50 +263,26 @@ bool CGraphicImageTexture::CreateFromMemoryFile(uint32_t bufSize, const void * c
 				break;
 		}
 
-		uint32_t uTexBias=0;
+	if (IsLowTextureMemory() && (format != imageInfo.Format))
+	{
+		IDirect3DTexture9* pkTexSrc = m_lpd3dTexture;
+		IDirect3DTexture9* pkTexDst;
 
-		extern bool GRAPHICS_CAPS_HALF_SIZE_IMAGE;
-		if (GRAPHICS_CAPS_HALF_SIZE_IMAGE)
-			uTexBias=1;
+		hr = D3DXCreateTexture(ms_lpd3dDevice, imageInfo.Width, imageInfo.Height, imageInfo.MipLevels, 0, format, D3DPOOL_MANAGED, &pkTexDst);
 
-		if (IsLowTextureMemory())
-		if (uTexBias || format!=imageInfo.Format)
-		{
-			IDirect3DTexture8* pkTexSrc=m_lpd3dTexture;
-			IDirect3DTexture8* pkTexDst;
-			
-			
-			if (SUCCEEDED(D3DXCreateTexture(	
-				ms_lpd3dDevice, 
-				imageInfo.Width>>uTexBias, 
-				imageInfo.Height>>uTexBias, 
-				imageInfo.MipLevels, 
-				0, 
-				format, 
-				D3DPOOL_MANAGED, 
-				&pkTexDst)))
-			{
-				m_lpd3dTexture=pkTexDst;
-				
-				for(int32_t i=0; i<imageInfo.MipLevels; ++i) {
-
-					IDirect3DSurface8* ppsSrc = nullptr;
-					IDirect3DSurface8* ppsDst = nullptr;
-
-					if (SUCCEEDED(pkTexSrc->GetSurfaceLevel(i, &ppsSrc)))
-					{
-						if (SUCCEEDED(pkTexDst->GetSurfaceLevel(i, &ppsDst)))
-						{
-							D3DXLoadSurfaceFromSurface(ppsDst, nullptr, nullptr, ppsSrc, nullptr, nullptr, D3DX_FILTER_LINEAR, 0);
-							ppsDst->Release();
-						}
-						ppsSrc->Release();
-					}
-				}
-
-				pkTexSrc->Release();
-			}
+		if (FAILED(hr))	{
+			TraceError("CreateFromMemoryFile: Non DDS file IsLowTextureMemory cannot create texture (file: %s) Error: %s", m_stFileName.c_str(), DXGetErrorString(hr));
+			return  false;
 		}
+
+		m_lpd3dTexture = pkTexDst;
+
+		if (!ConvertTexture(pkTexSrc, pkTexDst, imageInfo.MipLevels)) {
+			pkTexSrc->Release();
+			return false;
+		}
+
+		pkTexSrc->Release();
 	}
 
 	m_bEmpty = false;

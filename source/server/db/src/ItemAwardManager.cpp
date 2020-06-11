@@ -20,7 +20,7 @@ ItemAwardManager::~ItemAwardManager()
 void ItemAwardManager::RequestLoad()
 {
 	char szQuery[QUERY_MAX_LEN];
-	snprintf(szQuery, sizeof(szQuery), "SELECT id,login,vnum,count,socket0,socket1,socket2,mall,why FROM item_award WHERE taken_time IS nullptr and id > %d", g_dwLastCachedItemAwardID);
+	snprintf(szQuery, sizeof(szQuery), "SELECT id,login,vnum,count,socket0,socket1,socket2,mall,why FROM item_award WHERE taken_time IS NULL and id > %d", g_dwLastCachedItemAwardID);
 	CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_AWARD_LOAD, 0, nullptr);
 }
 

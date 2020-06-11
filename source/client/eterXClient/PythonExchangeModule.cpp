@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "PythonExchange.h"
+#include "PythonDynamicModuleNames.h"
 
 PyObject * exchangeInitTrading(PyObject * poSelf, PyObject * poArgs)
 {
@@ -203,6 +204,6 @@ void initTrade()
 		{nullptr, nullptr},
 	};
 
-	PyObject * poModule = Py_InitModule("exchange", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(EXCHANGE_MODULE).c_str(), s_methods);
 	PyModule_AddIntConstant(poModule, "EXCHANGE_ITEM_MAX_NUM", CPythonExchange::EXCHANGE_ITEM_MAX_NUM);
 }

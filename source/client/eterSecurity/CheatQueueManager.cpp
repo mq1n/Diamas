@@ -1,8 +1,6 @@
 #include "StdAfx.h"
 #include "CheatQueueManager.h"
-
 #include <nb30.h>
-#include <XORstr.h>
 
 CCheatDetectQueueMgr::CCheatDetectQueueMgr() :
 	m_pNetReportCallbackFunc(nullptr)

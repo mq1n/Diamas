@@ -9,7 +9,6 @@ char korean_tolower(const char c)
 	if (c >= 'A' && c <= 'Z')
 		ret = c - 'A' + 'a';
 
-	assert(ret == tolower(c));
 	return ret;
 }
 

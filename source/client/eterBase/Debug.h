@@ -2,6 +2,7 @@
 #define __INC_ETERLIB_DEBUG_H__
 
 #include <windows.h>
+#include <cstdint>
 
 extern void SetLogLevel(uint32_t uLevel);
 extern void Log(uint32_t uLevel, const char* c_szMsg);

@@ -121,7 +121,7 @@ bool CActorInstance::SetRace(uint32_t eRace)
 	return true;
 }
 
-void CActorInstance::SetHair(uint32_t eHair)
+void CActorInstance::SetHair(uint32_t eHair, float fSpecular)
 {
 	m_eHair = eHair;
 
@@ -149,12 +149,25 @@ void CActorInstance::SetHair(uint32_t eHair)
 			CResource * pkRes = CResourceManager::Instance().GetResourcePointer(c_rkSkinItem.m_stDstFileName.c_str());
 
 			if (pkRes)
-				SetMaterialImagePointer(CRaceData::PART_HAIR, c_rkSkinItem.m_stSrcFileName.c_str(), static_cast<CGraphicImage*>(pkRes));
+			{
+				if (fSpecular > 0.0f)
+				{
+					SMaterialData kMaterialData;
+					kMaterialData.pImage = static_cast<CGraphicImage*>(pkRes);
+					kMaterialData.isSpecularEnable = TRUE;
+					kMaterialData.fSpecularPower = fSpecular;
+					kMaterialData.bSphereMapIndex = 0;
+	 				SetMaterialData(CRaceData::PART_HAIR, c_rkSkinItem.m_stSrcFileName.c_str(), kMaterialData);
+				}
+				else
+				{
+					SetMaterialImagePointer(CRaceData::PART_HAIR, c_rkSkinItem.m_stSrcFileName.c_str(), static_cast<CGraphicImage*>(pkRes));
+	 				SetMaterialImagePointer(c_rkSkinItem.m_ePart, c_rkSkinItem.m_stSrcFileName.c_str(), static_cast<CGraphicImage*>(pkRes));
+				}
+			}
 		}
 	}
 }
-
-
 
 void CActorInstance::SetShape(uint32_t eShape, float fSpecular)
 {
@@ -239,7 +252,21 @@ void CActorInstance::SetShape(uint32_t eShape, float fSpecular)
 			RegisterModelThing(0, pModelThing);
 
 			CGraphicThing* pLODModelThing = pRaceData->GetLODModelThing();
-			RegisterLODThing(0, pLODModelThing);
+
+			bool canLOD = true;
+			if (pModelThing && pLODModelThing) {
+				if (pModelThing->GetTextureCount() == pLODModelThing->GetTextureCount()) {
+					for (int32_t i = 0; i < pModelThing->GetTextureCount(); i++) {
+						if (strcmp(pModelThing->GetTexturePath(i), pLODModelThing->GetTexturePath(i)) != 0)
+							canLOD = false;
+					}
+				} else {
+					canLOD = false;
+				}
+			}
+
+			if(canLOD)
+				RegisterLODThing(0, pLODModelThing);
 
 			SetModelInstance(0, 0, 0);
 		}

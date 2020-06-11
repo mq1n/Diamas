@@ -3,6 +3,7 @@
 #include "AccountConnector.h"
 #include "PythonGuild.h"
 #include "AbstractPlayer.h"
+#include "PythonDynamicModuleNames.h"
 
 static std::string gs_stServerInfo;
 extern BOOL gs_bEmpireLanuageEnable;
@@ -1611,47 +1612,6 @@ PyObject* netDisconnectUploader(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
-PyObject* netRecvGuildSymbol(PyObject* poSelf, PyObject* poArgs)
-{
-	char * szIP;
-	if (!PyTuple_GetString(poArgs, 0, &szIP))
-		return Py_BuildException();
-	int32_t iPort;
-	if (!PyTuple_GetInteger(poArgs, 1, &iPort))
-		return Py_BuildException();
-	int32_t iGuildID;
-	if (!PyTuple_GetInteger(poArgs, 2, &iGuildID))
-		return Py_BuildException();
-
-	CNetworkAddress kAddress;
-	kAddress.Set(szIP, iPort);
-
-	std::vector<uint32_t> kVec_dwGuildID;
-	kVec_dwGuildID.clear();
-	kVec_dwGuildID.push_back(iGuildID);
-
-	// @fixme006
-	if (kVec_dwGuildID.size()>0)
-	{
-		CGuildMarkDownloader& rkGuildMarkDownloader=CGuildMarkDownloader::Instance();
-		if (!rkGuildMarkDownloader.ConnectToRecvSymbol(kAddress, 0, 0, kVec_dwGuildID))
-		{
-			assert(!"Failed connecting to recv symbol");
-		}
-	}
-
-	return Py_BuildNone();
-}
-
-PyObject* netRegisterErrorLog(PyObject* poSelf, PyObject* poArgs)
-{
-	char * szLog;
-	if (!PyTuple_GetString(poArgs, 0, &szLog))
-		return Py_BuildException();
-
-	return Py_BuildNone();
-}
-
 void initnet()
 {
 	static PyMethodDef s_methods[] =
@@ -1809,15 +1769,11 @@ void initnet()
 		// Guild Symbol
 		{ "SendGuildSymbol",						netSendGuildSymbol,							METH_VARARGS },
 		{ "DisconnectUploader",						netDisconnectUploader,						METH_VARARGS },
-		{ "RecvGuildSymbol",						netRecvGuildSymbol,							METH_VARARGS },
-
-		// Log
-		{ "RegisterErrorLog",						netRegisterErrorLog,						METH_VARARGS },
 
 		{ nullptr,										nullptr,										0 },
 	};
 
-	PyObject* poModule = Py_InitModule("net", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(NET_MODULE).c_str(), s_methods);
 
 	PyModule_AddIntConstant(poModule, "ERROR_NONE", CPythonNetworkStream::ERROR_NONE);
 	PyModule_AddIntConstant(poModule, "ERROR_CONNECT_MARK_SERVER", CPythonNetworkStream::ERROR_CONNECT_MARK_SERVER);

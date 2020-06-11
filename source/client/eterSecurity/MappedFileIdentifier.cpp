@@ -2,8 +2,8 @@
 #include "AnticheatManager.h"
 #include "CheatQueueManager.h"
 #include <FileSystemIncl.hpp>
-#include <XOrstr.h>
 #include <fstream>
+#include <xorstr.hpp>
 
 std::string GetMappedFileHash(const std::string & strFileName)
 {
@@ -356,7 +356,7 @@ void DumpMappedFileHashes()
 
 void CAnticheatManager::CheckMappedFiles()
 {
-	for (size_t i = 0; strcmp(st_FileHashList[i].c_szFileName, XOR("XXX")); ++i)
+	for (size_t i = 0; strcmp(st_FileHashList[i].c_szFileName, xorstr("XXX").crypt_get()); ++i)
 	{
 		auto c_szCurrentFileName = st_FileHashList[i].c_szFileName;
 		auto strCurrentFileHash = std::string(st_FileHashList[i].c_szFileMd5);

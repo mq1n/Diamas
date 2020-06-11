@@ -3,7 +3,7 @@
 class CInsultChecker
 {
 	public:
-		CInsultChecker& GetSingleton();
+		CInsultChecker & GetSingleton() const;
 
 	public:
 		CInsultChecker();

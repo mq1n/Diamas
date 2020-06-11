@@ -171,13 +171,9 @@ void CInstanceBase::EndWalking(float fBlendingTime)
 	{
 		m_GraphicThingInstance.Stop(fBlendingTime);
 		if (IsAffect(AFFECT_GYEONGGONG))
-		{
 			__EffectContainer_DetachEffect(EFFECT_AFFECT_GYEONGGONG);
-		}
 		else if (IsAffect(AFFECT_KWAESOK))
-		{
 			__EffectContainer_DetachEffect(EFFECT_AFFECT_KWAESOK);
-		}
 	}
 }
 
@@ -251,9 +247,7 @@ bool CInstanceBase::NEW_MoveToDestPixelPositionDirection(const TPixelPosition & 
 bool CInstanceBase::NEW_Goto(const TPixelPosition& c_rkPPosDst, float fDstRot)
 {
 	if (__IsSyncing())
-	{
 		return false;
-	}
 
 	if (m_GraphicThingInstance.IsUsingMovingSkill())
 	{
@@ -262,9 +256,7 @@ bool CInstanceBase::NEW_Goto(const TPixelPosition& c_rkPPosDst, float fDstRot)
 	}
 
 	if (isLock())
-	{
 		return false;
-	}
 
 	if (!NEW_CanMoveToDestPixelPosition(c_rkPPosDst))
 	{
@@ -281,9 +273,7 @@ bool CInstanceBase::NEW_Goto(const TPixelPosition& c_rkPPosDst, float fDstRot)
 	m_isGoing = TRUE;
 
 	if (!IsWalking())
-	{
 		StartWalking();
-	}
 
 	NEW_SetAdvancingRotationFromPixelPosition(NEW_GetSrcPixelPositionRef(), NEW_GetDstPixelPositionRef());
 
@@ -309,9 +299,7 @@ void CInstanceBase::NEW_MoveToDirection(float fDirRot)
 	SetAdvancingRotation(fDirRot);	
 
 	if (!IsWalking())
-	{ 
 		StartWalking();
-	}
 
 	TPixelPosition kPPosCur;
 	NEW_GetPixelPosition(&kPPosCur);

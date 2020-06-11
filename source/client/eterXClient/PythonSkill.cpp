@@ -5,7 +5,7 @@
 #include <FileSystemIncl.hpp>
 #include "InstanceBase.h"
 #include "PythonPlayer.h"
-#include "../eterGameLib/GameLibDefines.h"
+#include "PythonDynamicModuleNames.h"
 
 std::map<std::string, uint32_t> CPythonSkill::SSkillData::ms_StatusNameMap;
 std::map<std::string, uint32_t> CPythonSkill::SSkillData::ms_NewMinStatusNameMap;
@@ -175,7 +175,7 @@ bool CPythonSkill::RegisterSkillTable(const char * c_szFileName)
 		const std::string & c_strPointPoly = TokenVector[TABLE_TOKEN_TYPE_POINT_POLY];
 
 		// OVERWRITE_SKILLPROTO_POLY
-		bool USE_SKILL_PROTO = LocaleService_IsCHEONMA() ? false : true;
+		bool USE_SKILL_PROTO = true;
 
 		switch (iVnum)
 		{
@@ -2254,7 +2254,8 @@ void initskill()
 		{ nullptr,										nullptr,										0 },
 	};
 
-	PyObject * poModule = Py_InitModule("skill", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(SKILL_MODULE).c_str(), s_methods);
+
 	PyModule_AddIntConstant(poModule, "SKILL_TYPE_NONE",	CPythonSkill::SKILL_TYPE_NONE);
 	PyModule_AddIntConstant(poModule, "SKILL_TYPE_ACTIVE",	CPythonSkill::SKILL_TYPE_ACTIVE);
 	PyModule_AddIntConstant(poModule, "SKILL_TYPE_SUPPORT",	CPythonSkill::SKILL_TYPE_SUPPORT);

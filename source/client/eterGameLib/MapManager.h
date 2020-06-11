@@ -7,6 +7,7 @@ class CMapBase;
 // VICTIM_COLLISION_TEST
 #include "PhysicsObject.h"
 // VICTIM_COLLISION_TEST_END
+#include "../eterXClient/Locale_inc.h"
 
 // Map Manager
 class CMapManager : public CScreen, public IPhysicsWorld
@@ -17,9 +18,6 @@ class CMapManager : public CScreen, public IPhysicsWorld
 
 		bool IsMapOutdoor();
 		CMapOutdoor& GetMapOutdoorRef();
-
-		bool	IsSoftwareTilingEnable();
-		void	ReserveSoftwareTilingEnable(bool isEnable);
 
 		//////////////////////////////////////////////////////////////////////////
 		// Contructor / Destructor
@@ -89,6 +87,10 @@ class CMapManager : public CScreen, public IPhysicsWorld
 		std::vector<int32_t> &		GetRenderedSplatNum(int32_t * piPatch, int32_t * piSplat, float * pfSplatRatio);
 		CArea::TCRCWithNumberVector & GetRenderedGraphicThingInstanceNum(uint32_t * pdwGraphicThingInstanceNum, uint32_t * pdwCRCNum);
 
+#ifdef ENABLE_FOG_FIX
+		void	SetEnvironmentFog(bool flag);
+#endif
+
 	protected:
 		TEnvironmentData *		AllocEnvironmentData();
 		void					DeleteEnvironmentData(TEnvironmentData * pEnvironmentData);
@@ -107,7 +109,7 @@ class CMapManager : public CScreen, public IPhysicsWorld
 		// Map
 		//////////////////////////////////////////////////////////////////////////
 		CMapOutdoor *				m_pkMap;
-		CSpeedTreeForestDirectX8	m_Forest;
+		CSpeedTreeForestDirectX9	m_Forest;
 
 	public:
 		// 2004.10.14.myevan.TEMP_CAreaLoaderThread
@@ -137,8 +139,6 @@ class CMapManager : public CScreen, public IPhysicsWorld
 
 	protected:
 		TMapInfoVector			m_kVct_kMapInfo;
-
-		bool m_isSoftwareTilingEnableReserved;
 
 	protected:
 		void	__LoadMapInfoVector();

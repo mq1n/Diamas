@@ -6,7 +6,7 @@ class CAffectFlagContainer
 		enum
 		{
 			BIT_SIZE = 64,
-			BYTE_SIZE = BIT_SIZE/8+(1*((BIT_SIZE&7) ? 1 : 0)),
+			BYTE_SIZE = BIT_SIZE / 8 + (1 * ((BIT_SIZE & 7) ? 1 : 0))
 		};
 
 	public:
@@ -23,7 +23,7 @@ class CAffectFlagContainer
 		void ConvertToPosition(uint32_t* uRetX, uint32_t* uRetY) const;
 		
 	private:
-		typedef uint8_t Element;
+		using Element = uint8_t;
 
 		Element m_aElement[BYTE_SIZE];
 };

@@ -31,7 +31,7 @@ namespace UI
 		m_bAttachingFlag(FALSE),
 		m_dwAttachingType(0),
 		m_dwAttachingIndex(0),
-		m_dwAttachingSlotNumber(0),
+		m_dwAttachingSlotNumber(0), m_dwAttachingRealSlotNumber(0),
 		m_poMouseHandler(nullptr),
 		m_iHres(0),
 		m_iVres(0),
@@ -462,6 +462,11 @@ namespace UI
 	{
 		return m_dwAttachingSlotNumber;
 	}
+	
+	uint32_t CWindowManager::GetAttachingRealSlotNumber()
+	{
+		return m_dwAttachingRealSlotNumber;
+	}
 
 	void CWindowManager::GetAttachingIconSize(uint8_t * pbyWidth, uint8_t * pbyHeight)
 	{
@@ -483,6 +488,11 @@ namespace UI
 	void CWindowManager::SetAttachingFlag(BOOL bFlag)
 	{
 		m_bAttachingFlag = bFlag;
+	}
+	
+	void CWindowManager::SetAttachingRealSlotNumber(uint32_t dwRealSlotNumber)
+	{
+		m_dwAttachingRealSlotNumber = dwRealSlotNumber;
 	}
 
 	void CWindowManager::DeattachIcon()

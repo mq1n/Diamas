@@ -1,7 +1,8 @@
 #include "StdAfx.h"
 #include "PythonPlayer.h"
 #include "PythonApplication.h"
-#include "../eterGameLib/GameLibDefines.h"
+#include "Locale_inc.h"
+#include "PythonDynamicModuleNames.h"
 
 extern const uint32_t c_iSkillIndex_Tongsol	= 121;
 extern const uint32_t c_iSkillIndex_Combo		= 122;
@@ -2393,7 +2394,8 @@ void initPlayer()
 		{ nullptr,							nullptr,								0 },
 	};
 
-	PyObject* poModule = Py_InitModule("player", s_methods);
+	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(PLAYER_MODULE).c_str(), s_methods);
+
     PyModule_AddIntConstant(poModule, "LEVEL",					POINT_LEVEL);
     PyModule_AddIntConstant(poModule, "VOICE",					POINT_VOICE);
     PyModule_AddIntConstant(poModule, "EXP",					POINT_EXP);

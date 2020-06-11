@@ -1,10 +1,9 @@
 #include "StdAfx.h"
 #include "PythonStackCheck.h"
 #include "CheatQueueManager.h"
-
-#include <XORstr.h>
-#include <Python/Python.h>
-#include <Python/frameobject.h>
+#include <python27/Python.h>
+#include <python27/frameobject.h>
+#include <xorstr.hpp>
 
 #pragma optimize("", off )
 CPythonStackController::CPythonStackController()
@@ -41,7 +40,7 @@ void CPythonStackController::SendViolationMessage(int32_t iTypeId, const std::st
 #endif
 
 	char szMsg[1024];
-	sprintf_s(szMsg, XOR("%d)%s!%s"), iTypeId, szRefFileName.c_str(), szRefFuncName.c_str());
+	sprintf_s(szMsg, xorstr("%d)%s!%s").crypt_get(), iTypeId, szRefFileName.c_str(), szRefFuncName.c_str());
 
 	CCheatDetectQueueMgr::Instance().AppendDetection(CHEAT_PY_API_UNKNOWN_REFERENCE, 0, szMsg);
 }

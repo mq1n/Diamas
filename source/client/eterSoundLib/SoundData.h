@@ -21,7 +21,7 @@ class CSoundData
 
 		void			Assign(const char* filename);
 		LPVOID			Get();
-		uint32_t			GetSize();
+		DWORD			GetSize();
 		void			Release();
 		uint32_t			GetAccessTime();
 		const char *	GetFileName();

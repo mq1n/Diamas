@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "../eterEffectLib/EffectManager.h"
 #include "PythonCharacterManager.h"
+#include "PythonDynamicModuleNames.h"
 
 PyObject * effectRegisterEffect(PyObject * poSelf, PyObject * poArgs)
 {
@@ -104,7 +105,8 @@ void initeffect()
 		{ nullptr,							nullptr,							0         },
 	};
 
-	PyObject * poModule = Py_InitModule("effect", s_methods);
+	PyObject* poModule =  Py_InitModule(CPythonDynamicModule::Instance().GetModule(EFFECT_MODULE).c_str(), s_methods);
+
 	PyModule_AddIntConstant(poModule, "INDEX_FLY_TYPE_NORMAL",			CFlyingManager::INDEX_FLY_TYPE_NORMAL);
 	PyModule_AddIntConstant(poModule, "INDEX_FLY_TYPE_FIRE_CRACKER",	CFlyingManager::INDEX_FLY_TYPE_FIRE_CRACKER);
 	PyModule_AddIntConstant(poModule, "INDEX_FLY_TYPE_AUTO_FIRE",		CFlyingManager::INDEX_FLY_TYPE_AUTO_FIRE);

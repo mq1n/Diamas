@@ -46,6 +46,20 @@ void CPythonApplication::__MinimizeFullScreenWindow(HWND hWnd, uint32_t dwWidth,
 	ShowWindow(hWnd, SW_MINIMIZE);
 }
 
+void CPythonApplication::__ResetCameraWhenMinimize()
+{
+	CCameraManager& rkCmrMgr=CCameraManager::Instance();
+	CCamera* pkCmrCur=rkCmrMgr.GetCurrentCamera();
+	if (pkCmrCur) 
+	{
+		pkCmrCur->EndDrag();
+	}
+	
+	SetCursorNum(NORMAL);
+	if ( CURSOR_MODE_HARDWARE == GetCursorMode())
+		SetCursorVisible(TRUE);
+}
+
 LRESULT CPythonApplication::WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wParam, LPARAM lParam)
 {
 	const int32_t c_DoubleClickTime = 300;
@@ -67,7 +81,12 @@ LRESULT CPythonApplication::WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wP
 
 					if (m_isWindowFullScreenEnable)
 					{
-						__SetFullScreenWindow(hWnd, m_dwWidth, m_dwHeight, m_pySystem.GetBPP());
+						__MinimizeFullScreenWindow(hWnd, m_dwWidth, m_dwHeight);
+						__ResetCameraWhenMinimize();
+					}
+					else
+					{
+						__ResetCameraWhenMinimize();
 					}
 				}
 				else

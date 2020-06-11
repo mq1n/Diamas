@@ -23,9 +23,9 @@ class CGraphicIndexBuffer : public CGraphicBase
 		bool Lock(void** pretIndices);
 		void Unlock();
 
-		void SetIndices(int32_t startIndex=0) const;		
+		void SetIndices() const;		
 
-		LPDIRECT3DINDEXBUFFER8 GetD3DIndexBuffer() const;
+		LPDIRECT3DINDEXBUFFER9 GetD3DIndexBuffer() const;
 
 		int32_t GetIndexCount() const {return m_iidxCount;}
 
@@ -33,7 +33,7 @@ class CGraphicIndexBuffer : public CGraphicBase
 		void Initialize();
 
 	protected:
-		LPDIRECT3DINDEXBUFFER8	m_lpd3dIdxBuf;
+		LPDIRECT3DINDEXBUFFER9	m_lpd3dIdxBuf;
 		uint32_t					m_dwBufferSize;
 		D3DFORMAT				m_d3dFmt;
 		int32_t						m_iidxCount;

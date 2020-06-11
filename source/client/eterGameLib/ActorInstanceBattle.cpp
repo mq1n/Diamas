@@ -1,10 +1,11 @@
 #include "StdAfx.h"
+#include "../eterXClient/locale_inc.h"
 #include "../eterEffectLib/EffectManager.h"
 #include "../eterSoundLib/SoundManager.h"
+#include "../eterXClient/PythonNonPlayer.h"
 
 #include "ActorInstance.h"
 #include "RaceData.h"
-#include "GameLibDefines.h"
 
 void CActorInstance::SetBattleHitEffect(uint32_t dwID)
 {
@@ -551,11 +552,27 @@ float CActorInstance::__GetOwnerTime()
 
 bool IS_HUGE_RACE(uint32_t vnum)
 {
-	switch (vnum)
-	{
-	case 2493:
+	uint32_t dVnum = (uint32_t)vnum;
+	const CPythonNonPlayer::TMobTable * pMobTable = CPythonNonPlayer::Instance().GetTable(vnum);
+
+	if (!pMobTable)
+		return false;
+
+	if (pMobTable->bRank >= 4)
 		return true;
-	}
+	
+	if (vnum == 9415)
+		return true;
+	
+	if (vnum == 9416)
+		return true;
+	
+	if (vnum == 6417)
+		return true;
+	
+	if (vnum == 9419)
+		return true;
+
 	return false;
 }
 
@@ -834,10 +851,6 @@ void CActorInstance::__HitGreate(CActorInstance& rVictim)
 	if (rVictim.__IsStandUpMotion())
 		return;
 	// END_OF_DISABLE_KNOCKDOWN_ATTACK
-
-	extern bool IS_HUGE_RACE(uint32_t vnum);
-	if (IS_HUGE_RACE(rVictim.GetRace()))
-		return;
 
 	float fRotRad = D3DXToRadian(GetRotation());
 	float fVictimRotRad = D3DXToRadian(rVictim.GetRotation());

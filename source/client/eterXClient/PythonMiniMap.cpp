@@ -11,11 +11,9 @@
 
 #include "AbstractPlayer.h"
 
-#include "../eterPythonLib/PythonWindowManager.h"
-
 void CPythonMiniMap::AddObserver(uint32_t dwVID, float fSrcX, float fSrcY)
 {
-	std::map<uint32_t, SObserver>::iterator f=m_kMap_dwVID_kObserver.find(dwVID);
+	auto f = m_kMap_dwVID_kObserver.find(dwVID);
 	if (m_kMap_dwVID_kObserver.end()==f)
 	{
 		SObserver kObserver;
@@ -27,7 +25,7 @@ void CPythonMiniMap::AddObserver(uint32_t dwVID, float fSrcX, float fSrcY)
 		kObserver.fDstY=fSrcY;
 		kObserver.fCurX=fSrcX;
 		kObserver.fCurY=fSrcY;
-		m_kMap_dwVID_kObserver.insert(std::map<uint32_t, SObserver>::value_type(dwVID, kObserver));
+		m_kMap_dwVID_kObserver.emplace(dwVID, kObserver);
 	}
 	else
 	{
@@ -45,7 +43,7 @@ void CPythonMiniMap::AddObserver(uint32_t dwVID, float fSrcX, float fSrcY)
 
 void CPythonMiniMap::MoveObserver(uint32_t dwVID, float fDstX, float fDstY)
 {
-	std::map<uint32_t, SObserver>::iterator f=m_kMap_dwVID_kObserver.find(dwVID);
+	auto f = m_kMap_dwVID_kObserver.find(dwVID);
 	if (m_kMap_dwVID_kObserver.end()==f)
 		return;
 
@@ -79,8 +77,10 @@ void CPythonMiniMap::SetCenterPosition(float fCenterX, float fCenterY)
 
 	const TOutdoorMapCoordinate & rOutdoorMapCoord = rkMap.GetCurCoordinate();
 
-	m_fCenterCellX = (m_fCenterX - (float)(rOutdoorMapCoord.m_sTerrainCoordX * CTerrainImpl::TERRAIN_XSIZE)) / (float)(CTerrainImpl::CELLSCALE);
-	m_fCenterCellY = (m_fCenterY - (float)(rOutdoorMapCoord.m_sTerrainCoordY * CTerrainImpl::TERRAIN_YSIZE)) / (float)(CTerrainImpl::CELLSCALE);
+	m_fCenterCellX = (m_fCenterX - static_cast<float>(rOutdoorMapCoord.m_sTerrainCoordX * CTerrainImpl::TERRAIN_XSIZE)) /
+		static_cast<float>(CTerrainImpl::CELLSCALE);
+	m_fCenterCellY = (m_fCenterY - static_cast<float>(rOutdoorMapCoord.m_sTerrainCoordY * CTerrainImpl::TERRAIN_YSIZE)) /
+		static_cast<float>(CTerrainImpl::CELLSCALE);
 
 	__SetPosition();
 }
@@ -95,14 +95,8 @@ void CPythonMiniMap::Update(float fCenterX, float fCenterY)
 	if (m_fCenterX != fCenterX || m_fCenterY != fCenterY )
 		SetCenterPosition(fCenterX, fCenterY);
 
-	// 캐릭터 리스트 갱신
-	m_OtherPCPositionVector.clear();
-	m_PartyPCPositionVector.clear();
-	m_NPCPositionVector.clear();
-	m_MonsterPositionVector.clear();
-	m_WarpPositionVector.clear();
-
-	float fooCellScale = 1.0f / ((float) CTerrainImpl::CELLSCALE);
+	m_MinimapPosVector.clear();
+	float fooCellScale = 1.0f / (static_cast<float>(CTerrainImpl::CELLSCALE));
 
 	CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
 
@@ -110,8 +104,7 @@ void CPythonMiniMap::Update(float fCenterX, float fCenterY)
 	if (!pkInstMain)
 		return;
 
-	CPythonCharacterManager::CharacterIterator i;
-	for(i = rkChrMgr.CharacterInstanceBegin(); i!=rkChrMgr.CharacterInstanceEnd(); ++i)
+	for (CPythonCharacterManager::CharacterIterator i = rkChrMgr.CharacterInstanceBegin(); i != rkChrMgr.CharacterInstanceEnd(); ++i)
 	{
 		CInstanceBase* pkInstEach=*i;
 
@@ -128,53 +121,73 @@ void CPythonMiniMap::Update(float fCenterX, float fCenterY)
 
 		TMarkPosition aMarkPosition;
 
-		if (pkInstEach->IsPC() && !pkInstEach->IsInvisibility())
+		if (pkInstEach->IsPC() && (!pkInstEach->IsInvisibility()))
 		{
 			if (pkInstEach == CPythonCharacterManager::Instance().GetMainInstancePtr())
 				continue;
 
+			aMarkPosition.m_bType = CActorInstance::TYPE_PC;
 			aMarkPosition.m_fX = ( m_fWidth - (float)m_WhiteMark.GetWidth() ) / 2.0f + fDistanceFromCenterX + m_fScreenX;
 			aMarkPosition.m_fY = ( m_fHeight - (float)m_WhiteMark.GetHeight() ) / 2.0f + fDistanceFromCenterY + m_fScreenY;
 			aMarkPosition.m_eNameColor=pkInstEach->GetNameColorIndex();
-			if (aMarkPosition.m_eNameColor==CInstanceBase::NAMECOLOR_PARTY)
-				m_PartyPCPositionVector.push_back(aMarkPosition);
-			else
-				m_OtherPCPositionVector.push_back(aMarkPosition);
+			m_MinimapPosVector.push_back(aMarkPosition);
 		}
-		else if (pkInstEach->IsNPC())
+#ifdef ENABLE_OFFLINE_SHOP
+		else if (pkInstEach->IsOfflineShop())
 		{
+			aMarkPosition.m_bType = CActorInstance::TYPE_OFFLINE_SHOP;
 			aMarkPosition.m_fX = ( m_fWidth - (float)m_WhiteMark.GetWidth() ) / 2.0f + fDistanceFromCenterX + m_fScreenX;
 			aMarkPosition.m_fY = ( m_fHeight - (float)m_WhiteMark.GetHeight() ) / 2.0f + fDistanceFromCenterY + m_fScreenY;
 
-			m_NPCPositionVector.push_back(aMarkPosition);
+			m_MinimapPosVector.push_back(aMarkPosition);
+		}
+#endif
+		else if (pkInstEach->IsNPC())
+		{
+			aMarkPosition.m_bType = CActorInstance::TYPE_NPC;
+			aMarkPosition.m_fX = ( m_fWidth - (float)m_WhiteMark.GetWidth() ) / 2.0f + fDistanceFromCenterX + m_fScreenX;
+			aMarkPosition.m_fY = ( m_fHeight - (float)m_WhiteMark.GetHeight() ) / 2.0f + fDistanceFromCenterY + m_fScreenY;
+
+			m_MinimapPosVector.push_back(aMarkPosition);
 		}
 		else if (pkInstEach->IsEnemy())
 		{
+			aMarkPosition.m_bType = CActorInstance::TYPE_ENEMY;
 			aMarkPosition.m_fX = ( m_fWidth - (float)m_WhiteMark.GetWidth() ) / 2.0f + fDistanceFromCenterX + m_fScreenX;
 			aMarkPosition.m_fY = ( m_fHeight - (float)m_WhiteMark.GetHeight() ) / 2.0f + fDistanceFromCenterY + m_fScreenY;
 
-			m_MonsterPositionVector.push_back(aMarkPosition);
+			m_MinimapPosVector.push_back(aMarkPosition);
 		}
 		else if (pkInstEach->IsWarp())
 		{
+			aMarkPosition.m_bType = CActorInstance::TYPE_WARP;
 			aMarkPosition.m_fX = ( m_fWidth - (float)m_WhiteMark.GetWidth() ) / 2.0f + fDistanceFromCenterX + m_fScreenX;
 			aMarkPosition.m_fY = ( m_fHeight - (float)m_WhiteMark.GetHeight() ) / 2.0f + fDistanceFromCenterY + m_fScreenY;
 
-			m_WarpPositionVector.push_back(aMarkPosition);
+			m_MinimapPosVector.push_back(aMarkPosition);
+		}
+		else if (pkInstEach->IsStone() && strcmp(rkBG.GetWarpMapName(), "metin2_map_dragon_timeattack_01") == 0) // Show stones only on ED run <martpwns> 04.07.2014
+		{
+			aMarkPosition.m_bType = CActorInstance::TYPE_ENEMY;
+			aMarkPosition.m_fX = (m_fWidth - (float)m_WhiteMark.GetWidth()) / 2.0f + fDistanceFromCenterX + m_fScreenX;
+			aMarkPosition.m_fY = (m_fHeight - (float)m_WhiteMark.GetHeight()) / 2.0f + fDistanceFromCenterY + m_fScreenY;
+
+			m_MinimapPosVector.push_back(aMarkPosition);
 		}
 	}
 
 	{
 		uint32_t dwCurTime=ELTimer_GetMSec();
 
-		std::map<uint32_t, SObserver>::iterator i;
-		for (i=m_kMap_dwVID_kObserver.begin(); i!=m_kMap_dwVID_kObserver.end(); ++i)
+		for (auto & i : m_kMap_dwVID_kObserver)
 		{
-			SObserver& rkObserver=i->second;
+			SObserver & rkObserver = i.second;
 
 			float fPos=float(dwCurTime-rkObserver.dwSrcTime)/float(rkObserver.dwDstTime-rkObserver.dwSrcTime);			
-			if (fPos<0.0f) fPos=0.0f;
-			else if (fPos>1.0f) fPos=1.0f;
+			if (fPos < 0.0f)
+				fPos = 0.0f;
+			else if (fPos > 1.0f)
+				fPos = 1.0f;
 
 			rkObserver.fCurX=(rkObserver.fDstX-rkObserver.fSrcX)*fPos+rkObserver.fSrcX;
 			rkObserver.fCurY=(rkObserver.fDstY-rkObserver.fSrcY)*fPos+rkObserver.fSrcY;
@@ -194,12 +207,14 @@ void CPythonMiniMap::Update(float fCenterX, float fCenterY)
 				continue;
 
 			TMarkPosition aMarkPosition;
+			aMarkPosition.m_bType = CActorInstance::TYPE_PC;
 			aMarkPosition.m_fX = ( m_fWidth - (float)m_WhiteMark.GetWidth() ) / 2.0f + fDistanceFromCenterX + m_fScreenX;
 			aMarkPosition.m_fY = ( m_fHeight - (float)m_WhiteMark.GetHeight() ) / 2.0f + fDistanceFromCenterY + m_fScreenY;
 			aMarkPosition.m_eNameColor=CInstanceBase::NAMECOLOR_PARTY;
-			m_PartyPCPositionVector.push_back(aMarkPosition);
+			m_MinimapPosVector.emplace_back(aMarkPosition);
 		}
 	}
+	std::sort(m_MinimapPosVector.begin(), m_MinimapPosVector.end(), [](TMarkPosition a, TMarkPosition b){ return a.m_bType > b.m_bType; }); //Sort minimap by TYPE => LESS GPU calls
 
 	{
 		TAtlasMarkInfoVector::iterator itor = m_AtlasWayPointInfoVector.begin();
@@ -264,17 +279,17 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 		__SetPosition();
 	}
 
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MIPFILTER, D3DTEXF_POINT);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_POINT);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 
 	STATEMANAGER.SaveTextureStageState(1, D3DTSS_TEXCOORDINDEX, D3DTSS_TCI_CAMERASPACEPOSITION);
 	STATEMANAGER.SaveTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT2);
-	STATEMANAGER.SaveTextureStageState(1, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
-	STATEMANAGER.SaveTextureStageState(1, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
+	STATEMANAGER.SaveSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	STATEMANAGER.SaveSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
@@ -295,19 +310,18 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 	STATEMANAGER.SetTexture(1, m_MiniMapFilterGraphicImageInstance.GetTexturePointer()->GetD3DTexture());
 	STATEMANAGER.SetTransform(D3DTS_TEXTURE1, &m_matMiniMapCover);
 
-	STATEMANAGER.SetVertexShader(D3DFVF_XYZ | D3DFVF_TEX1);
+	STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_TEX1);
 	STATEMANAGER.SetStreamSource(0, m_VertexBuffer.GetD3DVertexBuffer(), 20);
-	STATEMANAGER.SetIndices(m_IndexBuffer.GetD3DIndexBuffer(), 0);
+	STATEMANAGER.SetIndices(m_IndexBuffer.GetD3DIndexBuffer());
 	STATEMANAGER.SetTransform(D3DTS_WORLD, &m_matWorld);
 
 	for (uint8_t byTerrainNum = 0; byTerrainNum < AROUND_AREA_NUM; ++byTerrainNum)
 	{
-		LPDIRECT3DTEXTURE8 pMiniMapTexture = m_lpMiniMapTexture[byTerrainNum];
+		LPDIRECT3DTEXTURE9 pMiniMapTexture = m_lpMiniMapTexture[byTerrainNum];
 		STATEMANAGER.SetTexture(0, pMiniMapTexture);
 		if (pMiniMapTexture)
 		{
-			CStateManager& rkSttMgr=CStateManager::Instance();
-			rkSttMgr.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, byTerrainNum * 4, 4, byTerrainNum * 6, 2);
+			STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, byTerrainNum * 4, 4, byTerrainNum * 6, 2);
 		}
 		else
 		{
@@ -333,12 +347,12 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLORARG2);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLOROP);
 
-	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSU);
-	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSV);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_ADDRESSU);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_ADDRESSV);
 	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_TEXCOORDINDEX);
 	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS);
-	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_ADDRESSU);
-	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_ADDRESSV);
+	STATEMANAGER.RestoreSamplerState(1, D3DSAMP_ADDRESSU);
+	STATEMANAGER.RestoreSamplerState(1, D3DSAMP_ADDRESSV);
 
 	SetDiffuseOperation();
 	STATEMANAGER.SetTransform(D3DTS_WORLD, &m_matIdentity);
@@ -351,71 +365,51 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_TEXTURE);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
 
-	TInstancePositionVectorIterator aIterator;
+	char stage = 0;
+	bool scaleIsOK = m_fScale >= 2.0f;
 
-	if (m_fScale >= 2.0f)
+	for (auto& i : m_MinimapPosVector)
 	{
-		// Monster
-		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_MOB));//m_MarkTypeToColorMap[TYPE_MONSTER]);
-		aIterator = m_MonsterPositionVector.begin();
-		while (aIterator != m_MonsterPositionVector.end())
-		{
-			TMarkPosition & rPosition = *aIterator;
-			m_WhiteMark.SetPosition(rPosition.m_fX, rPosition.m_fY);
-			m_WhiteMark.Render();
-			++aIterator;
-		}
+		if (!scaleIsOK && (i.m_bType == CActorInstance::TYPE_PC || i.m_bType == CActorInstance::TYPE_ENEMY)) // Stop iterating if we cant draw
+			continue;
 
-		// Other PC
-		aIterator = m_OtherPCPositionVector.begin();
-		while (aIterator != m_OtherPCPositionVector.end())
+		if (i.m_bType == CActorInstance::TYPE_PC) // Can have multiple colors no stage used
 		{
-			TMarkPosition & rPosition = *aIterator;
-			STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(rPosition.m_eNameColor));
-			m_WhiteMark.SetPosition(rPosition.m_fX, rPosition.m_fY);
-			m_WhiteMark.Render();
-			++aIterator;
-		}
-
-		// Party PC
-		if (!m_PartyPCPositionVector.empty())
-		{
-			float v = (1+sinf(CTimer::Instance().GetCurrentSecond()*6))/5+0.6;
-			D3DXCOLOR c(CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_PARTY));//(m_MarkTypeToColorMap[TYPE_PARTY]);
-			D3DXCOLOR d(v,v,v,1);
-			D3DXColorModulate(&c,&c,&d);
-			STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, (uint32_t)c);
-			aIterator = m_PartyPCPositionVector.begin();
-			while (aIterator != m_PartyPCPositionVector.end())
-			{
-				TMarkPosition & rPosition = *aIterator;
-				m_WhiteMark.SetPosition(rPosition.m_fX, rPosition.m_fY);
-				m_WhiteMark.Render();
-				++aIterator;
+			if (i.m_eNameColor == CInstanceBase::NAMECOLOR_PARTY) {
+				float v = (1 + sinf(CTimer::Instance().GetCurrentSecond() * 6)) / 5 + 0.6;
+				D3DXCOLOR c(CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_PARTY));//(m_MarkTypeToColorMap[TYPE_PARTY]);
+				D3DXCOLOR d(v, v, v, 1);
+				D3DXColorModulate(&c, &c, &d);
+				STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, (uint32_t)c);
 			}
+			else {
+				STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(i.m_eNameColor));
+			}
+
 		}
-	}
-
-	// NPC
-	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_NPC));
-	aIterator = m_NPCPositionVector.begin();
-	while (aIterator != m_NPCPositionVector.end())
-	{
-		TMarkPosition & rPosition = *aIterator;
-		m_WhiteMark.SetPosition(rPosition.m_fX, rPosition.m_fY);
+		else if (stage != 2 && i.m_bType == CActorInstance::TYPE_ENEMY) {
+			STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_MOB));//m_MarkTypeToColorMap[TYPE_MONSTER]);
+			stage = 2;
+		}
+		else if (stage != 3 && i.m_bType == CActorInstance::TYPE_NPC) {
+			STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_NPC));
+			stage = 3;
+		}
+		else if (stage != 4 && i.m_bType == CActorInstance::TYPE_WARP)
+		{
+			STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WARP));
+			stage = 4;
+		}
+#ifdef ENABLE_OFFLINE_SHOP
+		else if (stage != 5 && i.m_bType == CActorInstance::TYPE_OFFLINE_SHOP)
+		{
+			STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_SHOP));
+			stage = 5;
+		}
+#endif
+	
+		m_WhiteMark.SetPosition(i.m_fX, i.m_fY);
 		m_WhiteMark.Render();
-		++aIterator;
-	}
-
-	// Warp
-	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WARP));
-	aIterator = m_WarpPositionVector.begin();
-	while (aIterator != m_WarpPositionVector.end())
-	{
-		TMarkPosition & rPosition = *aIterator;
-		m_WhiteMark.SetPosition(rPosition.m_fX, rPosition.m_fY);
-		m_WhiteMark.Render();
-		++aIterator;
 	}
 
 	STATEMANAGER.RestoreRenderState(D3DRS_TEXTUREFACTOR);
@@ -427,12 +421,9 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLORARG2);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLOROP);
 
-	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MIPFILTER);
-	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MINFILTER);
-	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MAGFILTER);
-
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_LINEAR);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MIPFILTER);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MINFILTER);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MAGFILTER);
 
 	// 캐릭터 마크
 	CInstanceBase * pkInst = CPythonCharacterManager::Instance().GetMainInstancePtr();
@@ -476,8 +467,6 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 		m_MiniMapCameraraphicImageInstance.SetRotation(pkCmrCur->GetRoll());
 		m_MiniMapCameraraphicImageInstance.Render();
 	}
-	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MINFILTER);
-	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MAGFILTER);
 }
 
 void CPythonMiniMap::SetScale(float fScale)
@@ -550,19 +539,19 @@ bool CPythonMiniMap::Create()
 	char buf[256];
 	for (int32_t i = 0; i < MINI_WAYPOINT_IMAGE_COUNT; ++i)
 	{
-		sprintf(buf, "%sminimap/mini_waypoint%02d.sub", strImageRoot.c_str(), i+1);
+		sprintf_s(buf, "%sminimap/mini_waypoint%02d.sub", strImageRoot.c_str(), i+1);
 		m_MiniWayPointGraphicImageInstances[i].SetImagePointer((CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(buf));
 		m_MiniWayPointGraphicImageInstances[i].SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
 	}
 	for (int32_t j = 0; j < WAYPOINT_IMAGE_COUNT; ++j)
 	{
-		sprintf(buf, "%sminimap/waypoint%02d.sub", strImageRoot.c_str(), j+1);
+		sprintf_s(buf, "%sminimap/waypoint%02d.sub", strImageRoot.c_str(), j + 1);
 		m_WayPointGraphicImageInstances[j].SetImagePointer((CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(buf));
 		m_WayPointGraphicImageInstances[j].SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
 	}
 	for (int32_t k = 0; k < TARGET_MARK_IMAGE_COUNT; ++k)
 	{
-		sprintf(buf, "%sminimap/targetmark%02d.sub", strImageRoot.c_str(), k+1);
+		sprintf_s(buf, "%sminimap/targetmark%02d.sub", strImageRoot.c_str(), k + 1);
 		m_TargetMarkGraphicImageInstances[k].SetImagePointer((CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(buf));
 		m_TargetMarkGraphicImageInstances[k].SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
 	}
@@ -693,6 +682,13 @@ void CPythonMiniMap::ClearAtlasMarkInfo()
 {
 	m_AtlasNPCInfoVector.clear();
 	m_AtlasWarpInfoVector.clear();
+	m_AtlasPartyInfoVector.clear();
+	m_AtlasOfflineShopInfoVector.clear();
+}
+
+void CPythonMiniMap::ClearAtlasPartyInfo()
+{
+	m_AtlasPartyInfoVector.clear();
 }
 
 void CPythonMiniMap::RegisterAtlasMark(uint8_t byType, const char * c_szName, int32_t lx, int32_t ly)
@@ -714,13 +710,17 @@ void CPythonMiniMap::RegisterAtlasMark(uint8_t byType, const char * c_szName, in
 			break;
 		case CActorInstance::TYPE_WARP:
 			aAtlasMarkInfo.m_byType = TYPE_WARP;
-			{
-				int32_t iPos = aAtlasMarkInfo.m_strText.find(" ");
-				if (iPos >= 0)
-					aAtlasMarkInfo.m_strText[iPos]=0;
-				
-			}
 			m_AtlasWarpInfoVector.push_back(aAtlasMarkInfo);
+			break;
+			/*
+		case CActorInstance::TYPE_OFFLINE_SHOP:
+			aAtlasMarkInfo.m_byType = TYPE_OFFLINE_SHOP;
+			m_AtlasOfflineShopInfoVector.push_back(aAtlasMarkInfo);
+			break;
+			*/
+		case CActorInstance::TYPE_PC:
+			aAtlasMarkInfo.m_byType = TYPE_PARTY; // For now, all pc marks added are supposed to be party members
+			m_AtlasPartyInfoVector.push_back(aAtlasMarkInfo);
 			break;
 	}
 }
@@ -741,7 +741,7 @@ void CPythonMiniMap::RegisterGuildArea(uint32_t dwID, uint32_t dwGuildID, int32_
 	m_GuildAreaInfoVector.push_back(kGuildAreaInfo);
 }
 
-uint32_t CPythonMiniMap::GetGuildAreaID(uint32_t x, uint32_t y)
+uint32_t CPythonMiniMap::GetGuildAreaID(int32_t x, int32_t y)
 {
 	TGuildAreaInfoVectorIterator itor = m_GuildAreaInfoVector.begin();
 	for (; itor != m_GuildAreaInfoVector.end(); ++itor)
@@ -765,7 +765,7 @@ void CPythonMiniMap::CreateTarget(int32_t iID, const char * c_szName)
 	AddWayPoint(TYPE_TARGET, iID, 0.0f, 0.0f, c_szName);
 }
 
-void CPythonMiniMap::UpdateTarget(int32_t iID, int32_t ix, int32_t iy)
+void CPythonMiniMap::UpdateTarget(int32_t iID, uint32_t ix, uint32_t iy)
 {
 	TAtlasMarkInfo * pkInfo;
 	if (!__GetWayPoint(iID, &pkInfo))
@@ -799,10 +799,6 @@ void CPythonMiniMap::DeleteTarget(int32_t iID)
 	RemoveWayPoint(iID);
 }
 
-#define ENABLE_NEW_ATLAS_MARK_INFO
-#ifdef ENABLE_NEW_ATLAS_MARK_INFO
-	#include "PythonNonPlayer.h"
-#endif
 void CPythonMiniMap::__LoadAtlasMarkInfo()
 {
 	ClearAtlasMarkInfo();
@@ -816,7 +812,7 @@ void CPythonMiniMap::__LoadAtlasMarkInfo()
 
 	// LOCALE
 	char szAtlasMarkInfoFileName[64+1];
-	_snprintf(szAtlasMarkInfoFileName, sizeof(szAtlasMarkInfoFileName), "%s/map/%s_point.txt", LocaleService_GetLocalePath(), rkMap.GetName().c_str());
+	_snprintf_s(szAtlasMarkInfoFileName, sizeof(szAtlasMarkInfoFileName), "%s/map/%s_point.txt", LocaleService_GetLocalePath(), rkMap.GetName().c_str());
 	// END_OF_LOCALE
 
 	CTokenVectorMap stTokenVectorMap;
@@ -832,44 +828,28 @@ void CPythonMiniMap::__LoadAtlasMarkInfo()
 	for (uint32_t i = 0; i < stTokenVectorMap.size(); ++i)
 	{
 		char szMarkInfoName[32+1];
-		_snprintf(szMarkInfoName, sizeof(szMarkInfoName), "%d", i);
+		_snprintf_s(szMarkInfoName, sizeof(szMarkInfoName), "%u", i);
 
 		if (stTokenVectorMap.end() == stTokenVectorMap.find(szMarkInfoName))
 			continue;
 
 		const CTokenVector & rVector = stTokenVectorMap[szMarkInfoName];
 
+		const std::string & c_rstrType = rVector[0];
+		const std::string & c_rstrPositionX = rVector[1];
+		const std::string & c_rstrPositionY = rVector[2];
+		const std::string & c_rstrText = rVector[3];
+
 		TAtlasMarkInfo aAtlasMarkInfo;
-#ifdef ENABLE_NEW_ATLAS_MARK_INFO
-		if (rVector.size() == 3)
-		{
-			const std::string & c_rstrType = strType[3]; // FULL NPC
-			const std::string & c_rstrPositionX = rVector[0].c_str();
-			const std::string & c_rstrPositionY = rVector[1].c_str();
-			const std::string & c_rstrText = rVector[2].c_str();
-			int32_t iVNum = atoi(c_rstrText.c_str());
 
-			aAtlasMarkInfo.m_fX = atof(c_rstrPositionX.c_str());
-			aAtlasMarkInfo.m_fY = atof(c_rstrPositionY.c_str());
-			aAtlasMarkInfo.m_strText = CPythonNonPlayer::Instance().GetMonsterName(iVNum);
-		}
-		else
-#endif
+		for ( int32_t i = 0; i < TYPE_COUNT; ++i)
 		{
-			const std::string & c_rstrType = rVector[0].c_str();
-			const std::string & c_rstrPositionX = rVector[1].c_str();
-			const std::string & c_rstrPositionY = rVector[2].c_str();
-			const std::string & c_rstrText = rVector[3].c_str();
-			for (int32_t i = 0; i < TYPE_COUNT; ++i)
-			{
-				if (0 == c_rstrType.compare(strType[i]))
-					aAtlasMarkInfo.m_byType = (uint8_t)i;
-			}
-
-			aAtlasMarkInfo.m_fX = atof(c_rstrPositionX.c_str());
-			aAtlasMarkInfo.m_fY = atof(c_rstrPositionY.c_str());
-			aAtlasMarkInfo.m_strText = c_rstrText;
+			if (0 == c_rstrType.compare(strType[i]))
+				aAtlasMarkInfo.m_byType = (uint8_t)i;
 		}
+		aAtlasMarkInfo.m_fX = atof(c_rstrPositionX.c_str());
+		aAtlasMarkInfo.m_fY = atof(c_rstrPositionY.c_str());
+		aAtlasMarkInfo.m_strText = c_rstrText;
 
 		aAtlasMarkInfo.m_fScreenX = aAtlasMarkInfo.m_fX / m_fAtlasMaxX * m_fAtlasImageSizeX - (float)m_WhiteMark.GetWidth() / 2.0f;
 		aAtlasMarkInfo.m_fScreenY = aAtlasMarkInfo.m_fY / m_fAtlasMaxY * m_fAtlasImageSizeY - (float)m_WhiteMark.GetHeight() / 2.0f;
@@ -881,6 +861,9 @@ void CPythonMiniMap::__LoadAtlasMarkInfo()
 				break;
 			case TYPE_WARP:
 				m_AtlasWarpInfoVector.push_back(aAtlasMarkInfo);
+				break;
+			case TYPE_OFFLINE_SHOP:
+				m_AtlasOfflineShopInfoVector.push_back(aAtlasMarkInfo);
 				break;
 		}
 	}
@@ -900,7 +883,7 @@ bool CPythonMiniMap::LoadAtlas()
 	snprintf(atlasFileName, sizeof(atlasFileName), "%s/atlas.sub", rkMap.GetName().c_str());	
 	if (!FileSystemManager::Instance().DoesFileExist(atlasFileName))		
 	{
-		snprintf(atlasFileName, sizeof(atlasFileName), "d:/ymir work/ui/atlas/%s/atlas.sub", rkMap.GetName().c_str());
+		_snprintf_s(atlasFileName, sizeof(atlasFileName), "d:/ymir work/ui/atlas/%s/atlas.sub", rkMap.GetName().c_str());
 	}
 	
 	m_AtlasImageInstance.Destroy();
@@ -915,19 +898,17 @@ bool CPythonMiniMap::LoadAtlas()
 		else
 			m_bAtlas=true;		
 	}
-	else
-	{
-	}
+
 	m_AtlasPlayerMark.SetImagePointer((CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(playerMarkFileName));
 
 	int16_t sTerrainCountX, sTerrainCountY;  
 	rkMap.GetBaseXY(&m_dwAtlasBaseX, &m_dwAtlasBaseY);
 	rkMap.GetTerrainCount(&sTerrainCountX, &sTerrainCountY);
-	m_fAtlasMaxX = (float) sTerrainCountX * CTerrainImpl::TERRAIN_XSIZE;
-	m_fAtlasMaxY = (float) sTerrainCountY * CTerrainImpl::TERRAIN_YSIZE;
+	m_fAtlasMaxX = static_cast<float>(sTerrainCountX) * CTerrainImpl::TERRAIN_XSIZE;
+	m_fAtlasMaxY = static_cast<float>(sTerrainCountY) * CTerrainImpl::TERRAIN_YSIZE;
 
-	m_fAtlasImageSizeX = (float) m_AtlasImageInstance.GetWidth();
-	m_fAtlasImageSizeY = (float) m_AtlasImageInstance.GetHeight();
+	m_fAtlasImageSizeX = static_cast<float>(m_AtlasImageInstance.GetWidth());
+	m_fAtlasImageSizeY = static_cast<float>(m_AtlasImageInstance.GetHeight());
 
 	__LoadAtlasMarkInfo();
 
@@ -952,8 +933,7 @@ void CPythonMiniMap::UpdateAtlas()
 		TPixelPosition kInstPos;
 		pkInst->NEW_GetPixelPosition(&kInstPos);
 
-		float fRotation;
-		fRotation = (540.0f - pkInst->GetRotation());
+		float fRotation = (540.0f - pkInst->GetRotation());
 		while(fRotation > 360.0f)
 			fRotation -= 360.0f;
 		while(fRotation < 0.0f)
@@ -975,6 +955,18 @@ void CPythonMiniMap::UpdateAtlas()
 	}
 }
 
+D3DXCOLOR RGBAtoD3DXColor(uint32_t r, uint32_t g, uint32_t b, float a) {
+	uint32_t dwColor = 0xff; dwColor <<= 8;
+	dwColor |= r; dwColor <<= 8;
+	dwColor |= g; dwColor <<= 8;
+	dwColor |= b;
+
+	D3DXCOLOR color(dwColor);
+	D3DXCOLOR alpha(a, a, a, 1);
+	D3DXColorModulate(&color, &color, &alpha);
+
+	return color;
+}
 void CPythonMiniMap::RenderAtlas(float fScreenX, float fScreenY)
 {
 	if (!m_bShowAtlas)
@@ -989,8 +981,6 @@ void CPythonMiniMap::RenderAtlas(float fScreenX, float fScreenY)
 	}
 
 	STATEMANAGER.SetTransform(D3DTS_WORLD, &m_matWorldAtlas);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_POINT);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_POINT);
 	m_AtlasImageInstance.Render();
 
 	STATEMANAGER.SaveRenderState(D3DRS_TEXTUREFACTOR, 0xFFFFFFFF);
@@ -998,46 +988,78 @@ void CPythonMiniMap::RenderAtlas(float fScreenX, float fScreenY)
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TEXTURE);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 
-	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_NPC));
-	m_AtlasMarkInfoVectorIterator = m_AtlasNPCInfoVector.begin();
-	while (m_AtlasMarkInfoVectorIterator != m_AtlasNPCInfoVector.end())
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+
+	if (m_bAtlasRenderNpc)
 	{
-		TAtlasMarkInfo & rAtlasMarkInfo = *m_AtlasMarkInfoVectorIterator;
-		m_WhiteMark.SetPosition(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
-		m_WhiteMark.Render();
-		++m_AtlasMarkInfoVectorIterator;
-	}
-
-	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WARP));
-	m_AtlasMarkInfoVectorIterator = m_AtlasWarpInfoVector.begin();
-	while (m_AtlasMarkInfoVectorIterator != m_AtlasWarpInfoVector.end())
-	{
-		TAtlasMarkInfo & rAtlasMarkInfo = *m_AtlasMarkInfoVectorIterator;
-		m_WhiteMark.SetPosition(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
-		m_WhiteMark.Render();
-		++m_AtlasMarkInfoVectorIterator;
-	}
-
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_LINEAR);
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR);
-	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WAYPOINT));
-	m_AtlasMarkInfoVectorIterator = m_AtlasWayPointInfoVector.begin();
-	for (; m_AtlasMarkInfoVectorIterator != m_AtlasWayPointInfoVector.end(); ++m_AtlasMarkInfoVectorIterator)
-	{
-		TAtlasMarkInfo & rAtlasMarkInfo = *m_AtlasMarkInfoVectorIterator;
-
-		if (rAtlasMarkInfo.m_fScreenX <= 0.0f)
-			continue;
-		if (rAtlasMarkInfo.m_fScreenY <= 0.0f)
-			continue;
-
-		if (TYPE_TARGET == rAtlasMarkInfo.m_byType)
+		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_NPC));
+		for (auto &rAtlasMarkInfo : m_AtlasNPCInfoVector)
 		{
-			__RenderMiniWayPointMark(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
+			m_WhiteMark.SetPosition(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
+			m_WhiteMark.Render();
 		}
-		else
+	}
+
+	if (m_bAtlasRenderParty)
+	{
+		// Blink
+		float val = (1 + sinf(CTimer::Instance().GetCurrentSecond() * 6)) / 5 + 0.6;
+
+		D3DXCOLOR baseColor(CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_PARTY));
+		D3DXCOLOR currentColor(val, val, val, 1.0);
+		D3DXColorModulate(&baseColor, &baseColor, &currentColor);
+
+		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, (uint32_t) baseColor);
+		for(const auto& rAtlasMarkInfo : m_AtlasPartyInfoVector )
 		{
-			__RenderWayPointMark(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
+			m_WhiteMark.SetPosition(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
+			m_WhiteMark.Render();
+		}
+	}
+
+	if (m_bAtlasRenderWarp)
+	{
+		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WARP));
+		for (auto &rAtlasMarkInfo : m_AtlasWarpInfoVector)
+		{
+			m_WhiteMark.SetPosition(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
+			m_WhiteMark.Render();
+		}
+	}
+
+	if (m_bAtlasRenderOfflineShop)
+	{
+		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_SHOP));
+		for (auto& rAtlasMarkInfo : m_AtlasOfflineShopInfoVector)
+		{
+			m_WhiteMark.SetPosition(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
+			m_WhiteMark.Render();
+		}
+	}
+
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MINFILTER);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MAGFILTER);
+
+	if (m_bAtlasRenderWaypoint)
+	{
+		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WAYPOINT));
+
+		for (auto &rAtlasMarkInfo : m_AtlasWayPointInfoVector)
+		{
+			if (rAtlasMarkInfo.m_fScreenX <= 0.0f)
+				continue;
+			if (rAtlasMarkInfo.m_fScreenY <= 0.0f)
+				continue;
+
+			if (TYPE_TARGET == rAtlasMarkInfo.m_byType)
+			{
+				__RenderMiniWayPointMark(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
+			}
+			else
+			{
+				__RenderWayPointMark(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
+			}
 		}
 	}
 
@@ -1050,12 +1072,10 @@ void CPythonMiniMap::RenderAtlas(float fScreenX, float fScreenY)
 	if ((ELTimer_GetMSec() / 500) % 2)
 		m_AtlasPlayerMark.Render();
 
-	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MINFILTER);
-	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MAGFILTER);
 	STATEMANAGER.SetTransform(D3DTS_WORLD, &m_matIdentity);
 
 	{
-		TGuildAreaInfoVectorIterator itor = m_GuildAreaInfoVector.begin();
+		auto itor = m_GuildAreaInfoVector.begin();
 		for (; itor != m_GuildAreaInfoVector.end(); ++itor)
 		{
 			TGuildAreaInfo & rInfo = *itor;
@@ -1080,8 +1100,8 @@ bool CPythonMiniMap::GetPickedInstanceInfo(float fScreenX, float fScreenY, std::
 	if (sqrtf(fDistanceFromMiniMapCenterX * fDistanceFromMiniMapCenterX + fDistanceFromMiniMapCenterY * fDistanceFromMiniMapCenterY) > m_fMiniMapRadius )
 		return false;
 
-	float fRealX = m_fCenterX + fDistanceFromMiniMapCenterX / m_fScale * ((float) CTerrainImpl::CELLSCALE);
-	float fRealY = m_fCenterY + fDistanceFromMiniMapCenterY / m_fScale * ((float) CTerrainImpl::CELLSCALE);
+	float fRealX = m_fCenterX + fDistanceFromMiniMapCenterX / m_fScale * (static_cast<float>(CTerrainImpl::CELLSCALE));
+	float fRealY = m_fCenterY + fDistanceFromMiniMapCenterY / m_fScale * (static_cast<float>(CTerrainImpl::CELLSCALE));
 
 	CInstanceBase * pkInst = CPythonCharacterManager::Instance().GetMainInstancePtr();
 
@@ -1090,10 +1110,14 @@ bool CPythonMiniMap::GetPickedInstanceInfo(float fScreenX, float fScreenY, std::
 		TPixelPosition kInstPos;
 		pkInst->NEW_GetPixelPosition(&kInstPos);
 
-		if (fabs(kInstPos.x - fRealX) < ((float) CTerrainImpl::CELLSCALE) * 6.0f / m_fScale &&
-			fabs(kInstPos.y - fRealY) < ((float) CTerrainImpl::CELLSCALE) * 6.0f / m_fScale)
+		if (fabs(kInstPos.x - fRealX) < (static_cast<float>(CTerrainImpl::CELLSCALE)) * 6.0f / m_fScale &&
+			fabs(kInstPos.y - fRealY) < (static_cast<float>(CTerrainImpl::CELLSCALE)) * 6.0f / m_fScale)
 		{
-			rReturnName = pkInst->GetNameString();
+#if defined(ENABLE_COMBAT_ZONE_SYSTEM) && defined(ENABLE_COMBAT_ZONE_SYSTEM_HIDE_INFO_USER)
+			rReturnName = (pkInst->IsCombatZoneMap()) ? "" : pkInst->GetNameString();
+#else
+			rReturnName = pkInst->GetNameString();				
+#endif
 			*pReturnPosX = kInstPos.x;
 			*pReturnPosY = kInstPos.y;
 			*pdwTextColor = pkInst->GetNameColor();
@@ -1105,8 +1129,7 @@ bool CPythonMiniMap::GetPickedInstanceInfo(float fScreenX, float fScreenY, std::
 		return false;
 
 	CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
-	CPythonCharacterManager::CharacterIterator i;
-	for(i = rkChrMgr.CharacterInstanceBegin(); i!=rkChrMgr.CharacterInstanceEnd(); ++i)
+	for (CPythonCharacterManager::CharacterIterator i = rkChrMgr.CharacterInstanceBegin(); i != rkChrMgr.CharacterInstanceEnd(); ++i)
 	{
 		CInstanceBase* pkInstEach=*i;
 		if (pkInstEach->IsInvisibility())
@@ -1119,7 +1142,11 @@ bool CPythonMiniMap::GetPickedInstanceInfo(float fScreenX, float fScreenY, std::
 		if (fabs(kInstancePosition.x - fRealX) < ((float) CTerrainImpl::CELLSCALE) * 3.0f / m_fScale &&
 			fabs(kInstancePosition.y - fRealY) < ((float) CTerrainImpl::CELLSCALE) * 3.0f / m_fScale)
 		{
-			rReturnName = pkInstEach->GetNameString();
+#if defined(ENABLE_COMBAT_ZONE_SYSTEM) && defined(ENABLE_COMBAT_ZONE_SYSTEM_HIDE_INFO_USER)
+			rReturnName = (pkInstEach->IsCombatZoneMap()) ? "" : pkInstEach->GetNameString();
+#else
+			rReturnName = pkInstEach->GetNameString();				
+#endif
 			*pReturnPosX = kInstancePosition.x;
 			*pReturnPosY = kInstancePosition.y;
 			*pdwTextColor = pkInstEach->GetNameColor();
@@ -1149,7 +1176,11 @@ bool CPythonMiniMap::GetAtlasInfo(float fScreenX, float fScreenY, std::string & 
 		if (kInstPos.x-fCheckWidth<fRealX && kInstPos.x+fCheckWidth>fRealX && 
 			kInstPos.y-fCheckHeight<fRealY && kInstPos.y+fCheckHeight>fRealY)
 		{
-			rReturnString = pkInst->GetNameString();
+#if defined(ENABLE_COMBAT_ZONE_SYSTEM) && defined(ENABLE_COMBAT_ZONE_SYSTEM_HIDE_INFO_USER)
+			rReturnString = (pkInst->IsCombatZoneMap()) ? "" : pkInst->GetNameString();
+#else
+			rReturnString = pkInst->GetNameString();				
+#endif
 			*pReturnPosX = kInstPos.x;
 			*pReturnPosY = kInstPos.y;
 			*pdwTextColor = pkInst->GetNameColor();
@@ -1157,74 +1188,99 @@ bool CPythonMiniMap::GetAtlasInfo(float fScreenX, float fScreenY, std::string & 
 		}
 	}
 
-	m_AtlasMarkInfoVectorIterator = m_AtlasNPCInfoVector.begin();
-	while (m_AtlasMarkInfoVectorIterator != m_AtlasNPCInfoVector.end())
+	if (m_bAtlasRenderNpc)
 	{
-		TAtlasMarkInfo & rAtlasMarkInfo = *m_AtlasMarkInfoVectorIterator;
-
-		if (rAtlasMarkInfo.m_fX-fCheckWidth/2<fRealX && rAtlasMarkInfo.m_fX+fCheckWidth>fRealX && 
-			rAtlasMarkInfo.m_fY-fCheckWidth/2<fRealY && rAtlasMarkInfo.m_fY+fCheckHeight>fRealY)		
+		for (auto &rAtlasMarkInfo : m_AtlasNPCInfoVector)
 		{
-			rReturnString = rAtlasMarkInfo.m_strText;
-			*pReturnPosX = rAtlasMarkInfo.m_fX;
-			*pReturnPosY = rAtlasMarkInfo.m_fY;
-			*pdwTextColor = CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_NPC);//m_MarkTypeToColorMap[rAtlasMarkInfo.m_byType];
-			return true;
+			if (rAtlasMarkInfo.m_fX - fCheckWidth / 2 < fRealX && rAtlasMarkInfo.m_fX + fCheckWidth > fRealX &&
+				rAtlasMarkInfo.m_fY - fCheckWidth / 2 < fRealY && rAtlasMarkInfo.m_fY + fCheckHeight > fRealY)
+			{
+				rReturnString = rAtlasMarkInfo.m_strText;
+				*pReturnPosX = rAtlasMarkInfo.m_fX;
+				*pReturnPosY = rAtlasMarkInfo.m_fY;
+				*pdwTextColor = CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_NPC);//m_MarkTypeToColorMap[rAtlasMarkInfo.m_byType];
+				return true;
+			}
 		}
-		++m_AtlasMarkInfoVectorIterator;
 	}
 
-	m_AtlasMarkInfoVectorIterator = m_AtlasWarpInfoVector.begin();
-	while (m_AtlasMarkInfoVectorIterator != m_AtlasWarpInfoVector.end())
+	if (m_bAtlasRenderParty)
 	{
-		TAtlasMarkInfo & rAtlasMarkInfo = *m_AtlasMarkInfoVectorIterator;
-		if (rAtlasMarkInfo.m_fX-fCheckWidth/2<fRealX && rAtlasMarkInfo.m_fX+fCheckWidth>fRealX && 
-			rAtlasMarkInfo.m_fY-fCheckWidth/2<fRealY && rAtlasMarkInfo.m_fY+fCheckHeight>fRealY)
+		for (const auto & rAtlasMarkInfo : m_AtlasPartyInfoVector)
 		{
-			rReturnString = rAtlasMarkInfo.m_strText;
-			*pReturnPosX = rAtlasMarkInfo.m_fX;
-			*pReturnPosY = rAtlasMarkInfo.m_fY;
-			*pdwTextColor = CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WARP);//m_MarkTypeToColorMap[rAtlasMarkInfo.m_byType];
-			return true;
+			if (rAtlasMarkInfo.m_fX - fCheckWidth / 2 < fRealX && rAtlasMarkInfo.m_fX + fCheckWidth > fRealX &&
+				rAtlasMarkInfo.m_fY - fCheckWidth / 2 < fRealY && rAtlasMarkInfo.m_fY + fCheckHeight > fRealY)
+			{
+				rReturnString = rAtlasMarkInfo.m_strText;
+				*pReturnPosX = rAtlasMarkInfo.m_fX;
+				*pReturnPosY = rAtlasMarkInfo.m_fY;
+				*pdwTextColor = CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_PARTY);//m_MarkTypeToColorMap[rAtlasMarkInfo.m_byType];
+				return true;
+			}
 		}
-		++m_AtlasMarkInfoVectorIterator;
 	}
 
-	m_AtlasMarkInfoVectorIterator = m_AtlasWayPointInfoVector.begin();
-	while (m_AtlasMarkInfoVectorIterator != m_AtlasWayPointInfoVector.end())
+	if (m_bAtlasRenderWarp)
 	{
-		TAtlasMarkInfo & rAtlasMarkInfo = *m_AtlasMarkInfoVectorIterator;
-		if (rAtlasMarkInfo.m_fScreenX > 0.0f)
-		if (rAtlasMarkInfo.m_fScreenY > 0.0f)
-		if (rAtlasMarkInfo.m_fX-fCheckWidth/2<fRealX && rAtlasMarkInfo.m_fX+fCheckWidth>fRealX && 
-			rAtlasMarkInfo.m_fY-fCheckWidth/2<fRealY && rAtlasMarkInfo.m_fY+fCheckHeight>fRealY)		
+		for (auto &rAtlasMarkInfo : m_AtlasWarpInfoVector)
 		{
-			rReturnString = rAtlasMarkInfo.m_strText;
-			*pReturnPosX = rAtlasMarkInfo.m_fX;
-			*pReturnPosY = rAtlasMarkInfo.m_fY;
-			*pdwTextColor = CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WAYPOINT);//m_MarkTypeToColorMap[rAtlasMarkInfo.m_byType];
-			return true;
+			if (rAtlasMarkInfo.m_fX - fCheckWidth / 2 < fRealX && rAtlasMarkInfo.m_fX + fCheckWidth > fRealX &&
+				rAtlasMarkInfo.m_fY - fCheckWidth / 2 < fRealY && rAtlasMarkInfo.m_fY + fCheckHeight > fRealY)
+			{
+				rReturnString = rAtlasMarkInfo.m_strText;
+				*pReturnPosX = rAtlasMarkInfo.m_fX;
+				*pReturnPosY = rAtlasMarkInfo.m_fY;
+				*pdwTextColor = CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WARP);//m_MarkTypeToColorMap[rAtlasMarkInfo.m_byType];
+				return true;
+			}
 		}
-		++m_AtlasMarkInfoVectorIterator;
 	}
 
-	TGuildAreaInfoVector::iterator itor = m_GuildAreaInfoVector.begin();
-	for (; itor!=m_GuildAreaInfoVector.end(); ++itor)
+	if (m_bAtlasRenderOfflineShop)
 	{
-		TGuildAreaInfo & rInfo = *itor;
+		for (auto& rAtlasMarkInfo : m_AtlasOfflineShopInfoVector)
+		{
+			if (rAtlasMarkInfo.m_fX - fCheckWidth / 2 < fRealX && rAtlasMarkInfo.m_fX + fCheckWidth > fRealX &&
+				rAtlasMarkInfo.m_fY - fCheckWidth / 2 < fRealY && rAtlasMarkInfo.m_fY + fCheckHeight > fRealY)
+			{
+				rReturnString = rAtlasMarkInfo.m_strText;
+				*pReturnPosX = rAtlasMarkInfo.m_fX;
+				*pReturnPosY = rAtlasMarkInfo.m_fY;
+				*pdwTextColor = CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_SHOP);//m_MarkTypeToColorMap[rAtlasMarkInfo.m_byType];
+				return true;
+			}
+		}
+	}
+
+	if (m_bAtlasRenderWaypoint)
+	{
+		for (auto &rAtlasMarkInfo : m_AtlasWayPointInfoVector)
+		{
+			if (rAtlasMarkInfo.m_fScreenX > 0.0f)
+				if (rAtlasMarkInfo.m_fScreenY > 0.0f)
+					if (rAtlasMarkInfo.m_fX - fCheckWidth / 2 < fRealX && rAtlasMarkInfo.m_fX + fCheckWidth > fRealX &&
+						rAtlasMarkInfo.m_fY - fCheckWidth / 2 < fRealY && rAtlasMarkInfo.m_fY + fCheckHeight > fRealY)
+					{
+						rReturnString = rAtlasMarkInfo.m_strText;
+						*pReturnPosX = rAtlasMarkInfo.m_fX;
+						*pReturnPosY = rAtlasMarkInfo.m_fY;
+						*pdwTextColor = CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WAYPOINT);//m_MarkTypeToColorMap[rAtlasMarkInfo.m_byType];
+						return true;
+					}
+		}
+	}
+
+	for (auto &rInfo : m_GuildAreaInfoVector)
+	{
 		if (fScreenX - m_fAtlasScreenX >= rInfo.fsxRender)
 		if (fScreenY - m_fAtlasScreenY >= rInfo.fsyRender)
 		if (fScreenX - m_fAtlasScreenX <= rInfo.fexRender)
 		if (fScreenY - m_fAtlasScreenY <= rInfo.feyRender)
 		{
 			if (CPythonGuild::Instance().GetGuildName(rInfo.dwGuildID, &rReturnString))
-			{
 				*pdwGuildID = rInfo.dwGuildID;
-			}
 			else
-			{
 				rReturnString = "empty_guild_area";
-			}
 
 			*pReturnPosX = rInfo.lx + rInfo.lwidth/2;
 			*pReturnPosY = rInfo.ly + rInfo.lheight/2;
@@ -1253,15 +1309,15 @@ bool CPythonMiniMap::GetAtlasSize(float * pfSizeX, float * pfSizeY)
 
 //////////////////////////////////////////////////////////////////////////
 // WayPoint
-void CPythonMiniMap::AddWayPoint(uint8_t byType, uint32_t dwID, float fX, float fY, std::string strText, uint32_t dwChrVID)
+void CPythonMiniMap::AddWayPoint(uint8_t byType, uint32_t dwID, float fX, float fY, const std::string &strText, uint32_t dwChrVID)
 {
-	m_AtlasMarkInfoVectorIterator = m_AtlasWayPointInfoVector.begin();
-	while (m_AtlasMarkInfoVectorIterator != m_AtlasWayPointInfoVector.end())
+	m_AtlasMarkInfoListIterator = m_AtlasWayPointInfoVector.begin();
+	while (m_AtlasMarkInfoListIterator != m_AtlasWayPointInfoVector.end())
 	{
-		TAtlasMarkInfo & rAtlasMarkInfo = *m_AtlasMarkInfoVectorIterator;
+		TAtlasMarkInfo & rAtlasMarkInfo = *m_AtlasMarkInfoListIterator;
 		if (rAtlasMarkInfo.m_dwID == dwID)
 			return;
-		++m_AtlasMarkInfoVectorIterator;
+		++m_AtlasMarkInfoListIterator;
 	}
 
 	TAtlasMarkInfo aAtlasMarkInfo;
@@ -1276,28 +1332,28 @@ void CPythonMiniMap::AddWayPoint(uint8_t byType, uint32_t dwID, float fX, float 
 	aAtlasMarkInfo.m_strText = strText;
 	aAtlasMarkInfo.m_dwChrVID = dwChrVID;
 	__UpdateWayPoint(&aAtlasMarkInfo, fX, fY);
-	m_AtlasWayPointInfoVector.push_back(aAtlasMarkInfo);
+	m_AtlasWayPointInfoVector.emplace_back(aAtlasMarkInfo);
 	
 }
 
 void CPythonMiniMap::RemoveWayPoint(uint32_t dwID)
 {
-	m_AtlasMarkInfoVectorIterator = m_AtlasWayPointInfoVector.begin();
-	while (m_AtlasMarkInfoVectorIterator != m_AtlasWayPointInfoVector.end())
+	m_AtlasMarkInfoListIterator = m_AtlasWayPointInfoVector.begin();
+	while (m_AtlasMarkInfoListIterator != m_AtlasWayPointInfoVector.end())
 	{
-		TAtlasMarkInfo & rAtlasMarkInfo = *m_AtlasMarkInfoVectorIterator;
+		TAtlasMarkInfo & rAtlasMarkInfo = *m_AtlasMarkInfoListIterator;
 		if (rAtlasMarkInfo.m_dwID == dwID)
 		{
-			m_AtlasMarkInfoVectorIterator = m_AtlasWayPointInfoVector.erase(m_AtlasMarkInfoVectorIterator);
+			m_AtlasMarkInfoListIterator = m_AtlasWayPointInfoVector.erase(m_AtlasMarkInfoListIterator);
 			return;
 		}
-		++m_AtlasMarkInfoVectorIterator;
+		++m_AtlasMarkInfoListIterator;
 	}
 }
 
 bool CPythonMiniMap::__GetWayPoint(uint32_t dwID, TAtlasMarkInfo ** ppkInfo)
 {
-	TAtlasMarkInfoVectorIterator itor = m_AtlasWayPointInfoVector.begin();
+	auto itor = m_AtlasWayPointInfoVector.begin();
 	for (; itor != m_AtlasWayPointInfoVector.end(); ++itor)
 	{
 		TAtlasMarkInfo & rInfo = *itor;
@@ -1367,11 +1423,8 @@ void CPythonMiniMap::AddSignalPoint(float fX, float fY)
 
 void CPythonMiniMap::ClearAllSignalPoint()
 {
-	std::vector<TSignalPoint>::iterator it;
-	for(it = m_SignalPointVector.begin();it!=m_SignalPointVector.end();++it)
-	{
-		RemoveWayPoint(it->id);
-	}
+	for (auto & it : m_SignalPointVector)
+		RemoveWayPoint(it.id);
 	m_SignalPointVector.clear();
 }
 
@@ -1382,15 +1435,13 @@ void CPythonMiniMap::RegisterAtlasWindow(PyObject* poHandler)
 
 void CPythonMiniMap::UnregisterAtlasWindow()
 {
-	m_poHandler = 0;
+	m_poHandler = nullptr;
 }
 
 void CPythonMiniMap::OpenAtlasWindow()
 {
 	if (m_poHandler)
-	{
 		PyCallClassMemberFunc(m_poHandler,"Show", Py_BuildValue("()"));
-	}
 }
 
 void CPythonMiniMap::SetAtlasCenterPosition(int32_t x, int32_t y)
@@ -1438,10 +1489,29 @@ void CPythonMiniMap::Hide()
 {
 	m_bShow=false;
 }
-		
+
+bool CPythonMiniMap::ToggleAtlasMarker(int32_t type)
+{
+	switch (type)
+	{
+		case CPythonMiniMap::TYPE_NPC:
+			return m_bAtlasRenderNpc = !m_bAtlasRenderNpc;
+		case CPythonMiniMap::TYPE_WAYPOINT:
+			return m_bAtlasRenderWaypoint = !m_bAtlasRenderWaypoint;
+		case CPythonMiniMap::TYPE_WARP:
+			return m_bAtlasRenderWarp = !m_bAtlasRenderWarp;
+		case CPythonMiniMap::TYPE_PARTY:
+			return m_bAtlasRenderParty = !m_bAtlasRenderParty;
+		case CPythonMiniMap::TYPE_OFFLINE_SHOP:
+			return m_bAtlasRenderOfflineShop = !m_bAtlasRenderOfflineShop;
+	}	
+
+	return false;
+}
+
 void CPythonMiniMap::__Initialize()
 {
-	m_poHandler = 0;
+	m_poHandler = nullptr;
 
 	SetMiniMapSize(128.0f, 128.0f);
 
@@ -1470,6 +1540,10 @@ void CPythonMiniMap::__Initialize()
 	m_bShow = false;
 	m_bShowAtlas = false;
 
+	m_bAtlasRenderNpc = true;
+	m_bAtlasRenderWarp = true;
+	m_bAtlasRenderWaypoint = true;
+	m_bAtlasRenderParty = true;
 	D3DXMatrixIdentity(&m_matIdentity);
 	D3DXMatrixIdentity(&m_matWorld);
 	D3DXMatrixIdentity(&m_matMiniMapCover);
@@ -1479,7 +1553,7 @@ void CPythonMiniMap::__Initialize()
 void CPythonMiniMap::Destroy()
 {
 	ClearAllSignalPoint();
-	m_poHandler = 0;
+	m_poHandler = nullptr;
 
 	m_VertexBuffer.Destroy();
 	m_IndexBuffer.Destroy();

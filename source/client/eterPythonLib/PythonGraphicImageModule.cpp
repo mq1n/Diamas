@@ -284,6 +284,22 @@ PyObject * grpGetHeight(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildValue("i", pImageInstance->GetHeight());
 }
 
+PyObject* grpImageGetGraphicImagePointer(PyObject* poSelf, PyObject* poArgs)
+{
+	CGraphicImageInstance * pImageInstance;
+
+	if (!PyTuple_GetImageInstance(poArgs, 0, &pImageInstance))
+		return Py_BadArgument();
+
+	if (!pImageInstance)
+		return Py_BuildNone();
+
+	if (pImageInstance->IsEmpty())
+		return Py_BuildException("Cannot image handle.");
+
+	return Py_BuildValue("i", pImageInstance->GetGraphicImagePointer());
+}
+
 void initgrpImage()
 {
 	static PyMethodDef s_methods[] =
@@ -303,6 +319,7 @@ void initgrpImage()
 		{ "SetDiffuseColor",		grpSetImageDiffuseColor,		METH_VARARGS },
 		{ "GetWidth",				grpGetWidth,					METH_VARARGS },
 		{ "GetHeight",				grpGetHeight,					METH_VARARGS },
+		{ "GetGraphicImagePointer", grpImageGetGraphicImagePointer, METH_VARARGS },
 		{ nullptr,						nullptr,							0		 },
 	};	
 

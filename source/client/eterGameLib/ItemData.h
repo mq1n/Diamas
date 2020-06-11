@@ -5,7 +5,7 @@
 
 #include "../eterLib/GrpSubImage.h"
 #include "../eterGrnLib/Thing.h"
-#include "GameLibDefines.h"
+#include "../eterXClient/locale_inc.h"
 
 class CItemData
 {
@@ -771,6 +771,7 @@ class CItemData
 		uint32_t GetWearFlags() const;
 		uint32_t GetIBuyItemPrice() const;
 		uint32_t GetISellItemPrice() const;
+		int32_t GetLevelLimit() const;
 		BOOL GetLimit(uint8_t byIndex, TItemLimit * pItemLimit) const;
 		BOOL GetApply(uint8_t byIndex, TItemApply * pItemApply) const;
 		int32_t GetValue(uint8_t byIndex) const;

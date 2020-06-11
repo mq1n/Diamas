@@ -387,6 +387,16 @@ uint32_t CItemData::GetISellItemPrice() const
 	return m_ItemTable.dwISellItemPrice;
 }
 
+int32_t CItemData::GetLevelLimit() const
+{
+	for(int32_t lv = 0; lv < ITEM_LIMIT_MAX_NUM; lv++)
+	{
+		if(m_ItemTable.aLimits[lv].bType == LIMIT_LEVEL)
+			return m_ItemTable.aLimits[lv].lValue;
+	}
+	return 0;
+}
+
 
 BOOL CItemData::GetLimit(uint8_t byIndex, TItemLimit * pItemLimit) const
 {
@@ -426,7 +436,7 @@ int32_t CItemData::GetValue(uint8_t byIndex) const
 
 int32_t CItemData::SetSocket(uint8_t byIndex,uint32_t value)
 {
-	if (byIndex > ITEM_SOCKET_MAX_NUM)
+	if (byIndex >= ITEM_SOCKET_MAX_NUM)
 	{
 		assert(byIndex < ITEM_SOCKET_MAX_NUM);
 		return -1;
@@ -437,7 +447,7 @@ int32_t CItemData::SetSocket(uint8_t byIndex,uint32_t value)
 
 int32_t CItemData::GetSocket(uint8_t byIndex) const
 {
-	if (byIndex > ITEM_SOCKET_MAX_NUM)
+	if (byIndex >= ITEM_SOCKET_MAX_NUM)
 	{
 		assert(byIndex < ITEM_SOCKET_MAX_NUM);
 		return -1;

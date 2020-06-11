@@ -12,7 +12,8 @@
 #include "ActorInstanceInterface.h"
 #include "Interface.h"
 //#include "../eterGrnLib/ThingInstance.h"
-#include "GameLibDefines.h"
+#include "../eterXClient/locale_inc.h"
+#include <memory>
 
 class CItemData;
 class CWeaponTrace;
@@ -243,7 +244,7 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		void SetEventHandler(IEventHandler* pkEventHandler);
 
 		bool SetRace(uint32_t eRace);
-		void SetHair(uint32_t eHair);
+		void SetHair(uint32_t eHair, float fSpecular = 0.0f);
 #ifdef ENABLE_ACCE_SYSTEM
 		void AttachAcce(CItemData * pItemData, float fSpecular = 0.0f);
 #endif
@@ -501,7 +502,8 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		void		ShowAllAttachingEffect();
 		void		HideAllAttachingEffect();
 		void		ClearAttachingEffect();
-
+		void		SetActiveAllAttachingEffect();
+		void		SetDeactiveAllAttachingEffect();
 		// Fishing
 		bool		CanFishing();
 		BOOL		IsFishing();

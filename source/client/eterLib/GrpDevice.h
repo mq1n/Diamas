@@ -26,8 +26,6 @@ public:
 		CREATE_ENUM				= (1 << 6), // 2003. 01. 09. myevan 모드 리스트 얻기 실패
 		CREATE_DETECT			= (1 << 7), // 2003. 01. 09. myevan 모드 선택 실패
 		CREATE_NO_TNL			= (1 << 8),
-		CREATE_BAD_DRIVER		= (1 << 9),
-		CREATE_FORMAT			= (1 << 10),
 	};
 
 	CGraphicDevice();
@@ -36,9 +34,12 @@ public:
 	void			InitBackBufferCount(uint32_t uBackBufferCount);
 
 	void			Destroy();
-	int32_t				Create(HWND hWnd, int32_t hres, int32_t vres, bool Windowed = true, int32_t bit = 32, int32_t ReflashRate = 0);
+	int32_t			Create(HWND hWnd, int32_t hres, int32_t vres, bool Windowed = true,
+						   int32_t bit = 32, int32_t ReflashRate = 0, bool antialias = false);
 
 	EDeviceState	GetDeviceState();
+	LPDIRECT3D9		GetDirectx9();
+	LPDIRECT3DDEVICE9 GetDevice();
 	bool			Reset();
 
 	void			EnableWebBrowserMode(const RECT& c_rcWebPage);		
@@ -50,7 +51,6 @@ public:
 
 protected:
 	void __Initialize();
-	bool __IsInDriverBlackList(D3D_CAdapterInfo& rkD3DAdapterInfo);
 	void __WarningMessage(HWND hWnd, uint32_t uiMsg);
 
 	void __InitializeDefaultIndexBufferList();
@@ -62,10 +62,9 @@ protected:
 	void __DestroyPDTVertexBufferList();
 	bool __CreatePDTVertexBufferList();
 
-	uint32_t CreatePTStreamVertexShader();
-	uint32_t CreatePNTStreamVertexShader();
-	uint32_t CreatePNT2StreamVertexShader();
-	uint32_t CreateDoublePNTStreamVertexShader();
+	LPDIRECT3DVERTEXDECLARATION9 CreatePTStreamVertexShader();
+	LPDIRECT3DVERTEXDECLARATION9 CreatePNTStreamVertexShader();
+	LPDIRECT3DVERTEXDECLARATION9 CreatePNT2StreamVertexShader();
 
 protected:
 	uint32_t						m_uBackBufferCount;

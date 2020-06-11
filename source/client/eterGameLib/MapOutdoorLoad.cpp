@@ -16,12 +16,7 @@ bool CMapOutdoor::Load(float x, float y, float z)
 
 	if (!LoadSetting(strFileName.c_str()))
 		TraceError("CMapOutdoor::Load : LoadSetting(%s) Failed", strFileName.c_str());
-
-#ifdef WORLD_EDITOR // @fixme015
-	if (!LoadMonsterAreaInfo())
-		TraceError("CMapOutdoor::Load - LoadMonsterAreaInfo ERROR");
-#endif
-
+	
 	CreateTerrainPatchProxyList();
 	BuildQuadTree();
 	LoadWaterTexture();
@@ -30,7 +25,7 @@ bool CMapOutdoor::Load(float x, float y, float z)
 	m_lOldReadX = -1;
 
 	// TODO: SetRenderingDevice에서 Environment로 부터 라이트 속성을 넘겨줘야 스태틱 라이트가 제대로 작동한다.
-	CSpeedTreeForestDirectX8::Instance().SetRenderingDevice(ms_lpd3dDevice);
+	CSpeedTreeForestDirectX9::Instance().SetRenderingDevice(ms_lpd3dDevice);
 
 	Update(x, y, z);
 
@@ -432,100 +427,5 @@ bool CMapOutdoor::LoadSetting(const char * c_szFileName)
 	D3DXMatrixScaling(&m_matBuildingTransparent, 1.0f / ((float)ms_iWidth), -1.0f / ((float)ms_iHeight), 1.0f);
 	m_matBuildingTransparent._41 = 0.5f;
 	m_matBuildingTransparent._42 = 0.5f;
-	return true;
-}
-
-
-bool CMapOutdoor::LoadMonsterAreaInfo()
-{
-	RemoveAllMonsterAreaInfo();
-
-	char c_szFileName[256];
-	sprintf(c_szFileName, "%s\\regen.txt", GetMapDataDirectory().c_str());
-	
-	CFile File;
-	if (!FileSystemManager::Instance().OpenFile(c_szFileName, File))
-	{
-		//TraceError(" CMapOutdoorAccessor::LoadMonsterAreaInfo Load File %s ERROR", c_szFileName);
-		return false;
-	}
-	
-	CMemoryTextFileLoader textFileLoader;
-	CTokenVector stTokenVector;
-	
-	textFileLoader.Bind(File.GetSize(), File.GetData());
-	
-	for (uint32_t i = 0; i < textFileLoader.GetLineCount(); ++i)
-	{
-		if (!textFileLoader.SplitLine(i, &stTokenVector))
-			continue;
-		
-		stl_lowers(stTokenVector[0]);
-		
-		// Start or End
-		if (0 == stTokenVector[0].compare("m") || 0 == stTokenVector[0].compare("g"))
-		{
-			if (stTokenVector.size() < 11)
-			{
-				TraceError("CMapOutdoorAccessor::LoadMonsterAreaInfo Get MonsterInfo File Format ERROR! continue....");
-				continue;
-			}
-
-			CMonsterAreaInfo::EMonsterAreaInfoType eMonsterAreaInfoType;
-			if (0 == stTokenVector[0].compare("m"))
-			{
-				eMonsterAreaInfoType = CMonsterAreaInfo::MONSTERAREAINFOTYPE_MONSTER;
-			}
-			else if (0 == stTokenVector[0].compare("g"))
-			{
-				eMonsterAreaInfoType = CMonsterAreaInfo::MONSTERAREAINFOTYPE_GROUP;
-			}
-			else
-			{
-				TraceError("CMapOutdoorAccessor::LoadMonsterAreaInfo Get MonsterInfo Data ERROR! continue....");
-				continue;
-			}
-			
-			const std::string & c_rstrOriginX	= stTokenVector[1].c_str();
-			const std::string & c_rstrOriginY	= stTokenVector[2].c_str();
-			const std::string & c_rstrSizeX		= stTokenVector[3].c_str();
-			const std::string & c_rstrSizeY		= stTokenVector[4].c_str();
-			const std::string & c_rstrZ			= stTokenVector[5].c_str();
-			const std::string & c_rstrDir		= stTokenVector[6].c_str();
-			const std::string & c_rstrTime		= stTokenVector[7].c_str();
-			const std::string & c_rstrPercent	= stTokenVector[8].c_str();
-			const std::string & c_rstrCount		= stTokenVector[9].c_str();
-			const std::string & c_rstrVID		= stTokenVector[10].c_str();
-			
-			int32_t lOriginX, lOriginY, lSizeX, lSizeY, lZ, lTime, lPercent;
-			CMonsterAreaInfo::EMonsterDir eMonsterDir;
-			uint32_t dwMonsterCount;
-			uint32_t dwMonsterVID;
-			
-			lOriginX		= atol(c_rstrOriginX.c_str());
-			lOriginY		= atol(c_rstrOriginY.c_str());
-			lSizeX			= atol(c_rstrSizeX.c_str());
-			lSizeY			= atol(c_rstrSizeY.c_str());
-			lZ				= atol(c_rstrZ.c_str());
-			eMonsterDir		= (CMonsterAreaInfo::EMonsterDir) atoi(c_rstrDir.c_str());
-			lTime			= atol(c_rstrTime.c_str());
-			lPercent		= atol(c_rstrPercent.c_str());
-			dwMonsterCount	= (uint32_t) atoi(c_rstrCount.c_str());
-			dwMonsterVID	= (uint32_t) atoi(c_rstrVID.c_str());
-
-//			lOriginX -= m_dwBaseX / 100;
-//			lOriginY -= m_dwBaseY / 100;
-			
-			CMonsterAreaInfo * pMonsterAreaInfo = AddMonsterAreaInfo(lOriginX, lOriginY, lSizeX, lSizeY);
-			pMonsterAreaInfo->SetMonsterAreaInfoType(eMonsterAreaInfoType);
-			if (CMonsterAreaInfo::MONSTERAREAINFOTYPE_MONSTER == eMonsterAreaInfoType)
-				pMonsterAreaInfo->SetMonsterVID(dwMonsterVID);
-			else if (CMonsterAreaInfo::MONSTERAREAINFOTYPE_GROUP == eMonsterAreaInfoType)
-				pMonsterAreaInfo->SetMonsterGroupID(dwMonsterVID);
-			pMonsterAreaInfo->SetMonsterCount(dwMonsterCount);
-			pMonsterAreaInfo->SetMonsterDirection(eMonsterDir);
-		}
-	}
-	
 	return true;
 }

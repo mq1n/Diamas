@@ -21,6 +21,7 @@
 #include <queue>
 #include <functional>
 #include <SSTREAM>
+#include <cstdint>
 
 #pragma warning ( pop )
 
@@ -145,6 +146,7 @@ inline void stl_wipe_second(TContainer& container)
 	for (TContainer::iterator i = container.begin(); i != container.end(); ++i)
 	{
 		delete i->second;
+		i->second = nullptr;
 	}
 	
 	container.clear();

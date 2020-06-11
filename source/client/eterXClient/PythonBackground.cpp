@@ -233,8 +233,7 @@ CPythonBackground::~CPythonBackground()
 
 void CPythonBackground::Initialize()
 {
-	std::string stAtlasInfoFileName("AtlasInfo.txt");
-	SetAtlasInfoFileName(stAtlasInfoFileName.c_str());
+	SetAtlasInfoFileName("AtlasInfo.txt");
 	CMapManager::Initialize();
 }
 
@@ -490,10 +489,6 @@ void CPythonBackground::RenderCollision()
 
 void CPythonBackground::RenderCharacterShadowToTexture()
 {
-	extern bool GRAPHICS_CAPS_CAN_NOT_DRAW_SHADOW;
-	if (GRAPHICS_CAPS_CAN_NOT_DRAW_SHADOW)
-		return;
-
 	if (!IsMapReady())
 		return;
 
@@ -724,7 +719,6 @@ void CPythonBackground::Warp(uint32_t dwX, uint32_t dwY)
 		return;
 	}
 
-	RefreshShadowLevel();
 	TMapInfo & rMapInfo = *pkMapInfo;
 	assert( (dwX >= rMapInfo.m_dwBaseX) && (dwY >= rMapInfo.m_dwBaseY) );
 
@@ -737,6 +731,8 @@ void CPythonBackground::Warp(uint32_t dwX, uint32_t dwY)
 	}
 
 	CPythonMiniMap::Instance().LoadAtlas();
+	
+	RefreshShadowLevel();
 
 	m_dwBaseX=rMapInfo.m_dwBaseX;
 	m_dwBaseY=rMapInfo.m_dwBaseY;

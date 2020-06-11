@@ -3,6 +3,7 @@
 
 #include "Pool.h"
 #include "GrpText.h"
+#include "GrpImageInstance.h"
 
 class CGraphicTextInstance
 {
@@ -67,7 +68,7 @@ class CGraphicTextInstance
 
 		int32_t PixelPositionToCharacterPosition(int32_t iPixelPosition);
 		int32_t GetHorizontalAlign();
-
+		
 	protected:
 		void __Initialize();
 		int32_t  __DrawCharacter(CGraphicFontTexture * pFontTexture, uint16_t codePage, wchar_t text, uint32_t dwColor);

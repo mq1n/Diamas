@@ -2,11 +2,12 @@
 #include "MsWindow.h"
 
 #include <windowsx.h>
+#include "../EterBase/Random.h"
 
 CMSWindow::TWindowClassSet CMSWindow::ms_stWCSet;
 HINSTANCE CMSWindow::ms_hInstance = nullptr;
 
-LRESULT CALLBACK MSWindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK MSWindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {	
 	CMSWindow * pWnd = (CMSWindow *) GetWindowLong(hWnd, GWL_USERDATA);
 
@@ -16,7 +17,7 @@ LRESULT CALLBACK MSWindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wParam, LPA
 	return DefWindowProc(hWnd, uiMsg, wParam, lParam);
 }
 
-LRESULT CMSWindow::WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CMSWindow::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uiMsg)
 	{
@@ -208,7 +209,8 @@ void CMSWindow::SetSize(int32_t width, int32_t height)
 const char * CMSWindow::RegisterWindowClass(uint32_t style, int32_t brush, WNDPROC pfnWndProc, HICON hIcon, int32_t iCursorResource)
 {
 	char szClassName[1024];
-	sprintf(szClassName, "eter - s%x:b%x:p:%x", style, brush, (uint32_t) pfnWndProc);
+	//sprintf(szClassName, "eter - s%x:b%x:p:%x", style, brush, (uint32_t) pfnWndProc);
+	sprintf(szClassName, "eter - s%x:b%x:p:%x:%d", style, brush, (uint32_t)pfnWndProc, random_range(2, 99955599));
 
 	TWindowClassSet::iterator f = ms_stWCSet.find((char*) szClassName);
 

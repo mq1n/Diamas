@@ -4,7 +4,7 @@
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 
-#pragma warning(push)
+//#pragma warning(push)
 //#pragma warning(disable: 4100 4127 4189 4231 4512 4706)
 
 #include <cryptopp/modes.h>
@@ -414,7 +414,7 @@ bool DH2KeyAgreement::Agree(size_t agreed_length, const void* buffer, size_t len
 	return true;
 }
 
-#pragma warning(pop)
+//#pragma warning(pop)
 
 #endif // _IMPROVED_PACKET_ENCRYPTION_
 

@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-#include <stdlib.h>
-
+#include <cstdlib>
+#include <lzo/lzodefs.h>
 #include "lzo.h"
 #include "tea.h"
 #include "debug.h"
@@ -17,10 +17,10 @@ public:
 public:
 	~LZOFreeMemoryMgr()
 	{
-		std::vector<uint8_t*>::iterator i;
-		for (i = m_freeVector.begin(); i != m_freeVector.end(); ++i)
-			delete *i;
-
+		for(size_t i = 0; i < m_freeVector.size(); ++i)
+		{
+			delete m_freeVector[i];
+		}
 		m_freeVector.clear();
 	}
 	uint8_t* Alloc(uint32_t capacity)

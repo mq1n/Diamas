@@ -20,6 +20,7 @@ class CGraphicImageInstance
 		void Render();
 
 		void SetDiffuseColor(float fr, float fg, float fb, float fa);
+		void SetScale(float sx, float sy);
 		void SetPosition(float fx, float fy);
 
 		void SetImagePointer(CGraphicImage* pImage);
@@ -34,6 +35,7 @@ class CGraphicImageInstance
 		CGraphicImage * GetGraphicImagePointer();
 
 		bool operator == (const CGraphicImageInstance & rhs) const;
+		D3DXCOLOR GetPixelColor(int32_t x, int32_t y);
 
 	protected:
 		void Initialize();
@@ -46,6 +48,7 @@ class CGraphicImageInstance
 	protected:
 		D3DXCOLOR m_DiffuseColor;
 		D3DXVECTOR2 m_v2Position;
+		D3DXVECTOR2 m_v2Scale;
 
 		CGraphicImage::TRef m_roImage;
 		

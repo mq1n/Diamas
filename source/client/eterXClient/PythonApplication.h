@@ -12,7 +12,11 @@
 #include "../eterGameLib/FlyingObjectManager.h"
 #include "../eterGameLib/GameEventManager.h"
 #include "../eterSoundLib/SoundManager.h"
+#include "../eterSecurity/PythonStackCheck.h"
+#include "../eterSecurity/AnticheatManager.h"
 
+#include "Locale_inc.h"
+#include "PythonDynamicModuleNames.h"
 #include "PythonEventManager.h"
 #include "PythonPlayer.h"
 #include "PythonNonPlayer.h"
@@ -39,7 +43,6 @@
 
 #include "ServerStateChecker.h"
 #include "AbstractApplication.h"
-#include "MovieMan.h"
 #ifdef ENABLE_ACCE_SYSTEM
 #include "PythonAcce.h"
 #endif
@@ -135,7 +138,6 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		bool IsWebPageMode();
 
 	public:
-		void NotifyHack(const char* c_szFormat, ...);
 		void GetInfo(uint32_t eInfo, std::string* pstInfo);
 		void GetMousePosition(POINT* ppt);
 		
@@ -156,7 +158,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		void SkipRenderBuffering(uint32_t dwSleepMSec);
 
 		bool Create(PyObject* poSelf, const char* c_szName, int32_t width, int32_t height, int32_t Windowed);
-		bool CreateDevice(int32_t width, int32_t height, int32_t Windowed, int32_t bit = 32, int32_t frequency = 0);
+		bool CreateDevice(int32_t width, int32_t height, bool Windowed, int32_t bit = 32, int32_t frequency = 0);
 
 		void UpdateGame();
 		void RenderGame();
@@ -249,27 +251,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 	
 
 	public:
-		int32_t OnLogoOpen(char* szName);
-		int32_t OnLogoUpdate();
-		void OnLogoRender();
-		void OnLogoClose();
-
-	protected:
-		IGraphBuilder*			m_pGraphBuilder;			// Graph Builder
-		IBaseFilter*			m_pFilterSG;				// Sample Grabber 필터
-		ISampleGrabber*			m_pSampleGrabber;			// 영상 이미지 캡처를 위한 샘플 그래버
-		IMediaControl*			m_pMediaCtrl;				// Media Control
-		IMediaEventEx*			m_pMediaEvent;				// Media Event
-		IVideoWindow*			m_pVideoWnd;				// Video Window
-		IBasicVideo*			m_pBasicVideo;
-		uint8_t*					m_pCaptureBuffer;			// 영상 이미지를 캡처한 버퍼
-		long					m_lBufferSize;				// Video 버퍼 크기 변수 
-		CGraphicImageTexture*	m_pLogoTex;					// 출력할 텍스쳐
-		bool					m_bLogoError;				// 영상 읽기 상태
-		bool					m_bLogoPlay;
-
-		int32_t						m_nLeft, m_nRight, m_nTop, m_nBottom;
-
+		void SetTitle(const char* szTitle);
 
 	protected:
 		LRESULT WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wParam, LPARAM lParam);
@@ -307,6 +289,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 
 		void __SetFullScreenWindow(HWND hWnd, uint32_t dwWidth, uint32_t dwHeight, uint32_t dwBPP);
 		void __MinimizeFullScreenWindow(HWND hWnd, uint32_t dwWidth, uint32_t dwHeight);
+		void __ResetCameraWhenMinimize();
 
 
 	protected:
@@ -318,7 +301,6 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		CRaceManager				m_RaceManager;
 		CGameEventManager			m_GameEventManager;
 		CItemManager				m_kItemMgr;
-		CMovieMan					m_MovieManager;
 
 		UI::CWindowManager			m_kWndMgr;
 		CEffectManager				m_kEftMgr;
@@ -348,6 +330,10 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		CPythonSafeBox				m_pySafeBox;
 		CPythonGuild				m_pyGuild;
 
+		CPythonDynamicModule m_pkPyDynamicModuleMgr;
+		CPythonStackController		m_kPyStackController;
+		CAnticheatManager			m_kAnticheatManager;
+		
 		CGuildMarkManager			m_kGuildMarkManager;
 		CGuildMarkDownloader		m_kGuildMarkDownloader;
 		CGuildMarkUploader			m_kGuildMarkUploader;

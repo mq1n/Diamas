@@ -6,11 +6,11 @@
 class CAccountConnector : public CNetworkStream, public CSingleton<CAccountConnector>
 {
 	public:
-		enum
+		enum EAccountConnectorState
 		{
 			STATE_OFFLINE,
 			STATE_HANDSHAKE,
-			STATE_AUTH,
+			STATE_AUTH
 		};
 
 	public:
@@ -70,7 +70,6 @@ class CAccountConnector : public CNetworkStream, public CSingleton<CAccountConne
 
 		std::string m_strAddr;
 		int32_t m_iPort;
-		BOOL m_isWaitKey;
 
 		PyObject * m_poHandler;
 

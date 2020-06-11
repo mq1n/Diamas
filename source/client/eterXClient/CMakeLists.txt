@@ -57,13 +57,17 @@ file(GLOB ETERCLIENT_OTHER_INPUT
 add_executable(${EXE_NAME} WIN32 ${ETERCLIENT_HEADERS} ${ETERCLIENT_SOURCES} ${ETERCLIENT_OTHER_INPUT})
 
 SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES LINK_FLAGS    "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:WINDOWS")
-target_link_libraries(${EXE_NAME} eterBase eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterTerrainLib eterTreeLib eterWebBrowser ${EXTRA_LIBS})
+target_link_libraries(${EXE_NAME} eterBase eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterSecurity eterTerrainLib eterTreeLib eterWebBrowser ${EXTRA_LIBS})
+
+set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ${EXE_NAME} PROPERTY CMAKE_CXX_EXTENSIONS OFF)
 
 if (ENABLE_STATIC_ANALYSIS)
 	pvs_studio_add_target(
 		TARGET client.analyze ALL
         OUTPUT FORMAT errorfile
-        ANALYZE ${EXE_NAME} eterBase eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterSecurity eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterTerrainLib eterTreeLib eterWebBrowser
+        ANALYZE ${EXE_NAME} eterBase eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterSecurity eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterSecurity eterTerrainLib eterTreeLib eterWebBrowser
 		LOG client_analysis.err
 	)
 endif()

@@ -1,12 +1,10 @@
 #include "StdAfx.h"
 #include "AnticheatManager.h"
 #include "CheatQueueManager.h"
-
 #include <AccCtrl.h>
 #include <Aclapi.h>
 #include <sddl.h>
-
-#include <XORstr.h>
+#include <xorstr.hpp>
 
 #ifndef PROCESS_SET_LIMITED_INFORMATION
 #define PROCESS_SET_LIMITED_INFORMATION 0x2000
@@ -33,13 +31,13 @@
 bool CAnticheatManager::BlockAccess(HANDLE hTarget)
 {
 	std::string szSD =
-		XOR("D:P"				/* DACL */
+		xorstr("D:P"				/* DACL */
 			"(D;OICI;GA;;;BG)"  /* Deny access to built-in guests */
 			"(D;OICI;GA;;;AN)"  /*		  ^		  anonymous logon */
 			"(D;OICI;GA;;;AU)"  /*		  ^		  authenticated users */
 			"(D;OICI;GA;;;BA)"  /*		  ^		  administrators */
 			"(D;OICI;GA;;;LA)"  /*		  ^		  Built-in Administrator */
-		);
+		).crypt_get();
 
 	SECURITY_ATTRIBUTES sa = { 0 };
 	sa.nLength = sizeof(sa);
@@ -70,11 +68,11 @@ bool CAnticheatManager::DenyProcessAccess()
 {
 	typedef NTSTATUS(NTAPI* TRtlAddAccessDeniedAce)(PACL pAcl, uint32_t dwAceRevision, ACCESS_MASK	AccessMask, PSID pSid);
 
-	auto hNtdll = LoadLibraryA(XOR("ntdll.dll"));
+	auto hNtdll = LoadLibraryA(xorstr("ntdll.dll").crypt_get());
 	if (!hNtdll)
 		return false;
 
-	auto lpRtlAddAccessDeniedAce = GetProcAddress(hNtdll, XOR("RtlAddAccessDeniedAce"));
+	auto lpRtlAddAccessDeniedAce = GetProcAddress(hNtdll, xorstr("RtlAddAccessDeniedAce").crypt_get());
 	if (!lpRtlAddAccessDeniedAce)
 		return false;
 	auto RtlAddAccessDeniedAce = (TRtlAddAccessDeniedAce)lpRtlAddAccessDeniedAce;
@@ -115,11 +113,11 @@ bool CAnticheatManager::DenyThreadAccess()
 {
 	typedef NTSTATUS(NTAPI* TRtlAddAccessDeniedAce)(PACL pAcl, uint32_t dwAceRevision, ACCESS_MASK	AccessMask, PSID pSid);
 
-	auto hNtdll = LoadLibraryA(XOR("ntdll.dll"));
+	auto hNtdll = LoadLibraryA(xorstr("ntdll.dll").crypt_get());
 	if (!hNtdll)
 		return false;
 
-	auto lpRtlAddAccessDeniedAce = GetProcAddress(hNtdll, XOR("RtlAddAccessDeniedAce"));
+	auto lpRtlAddAccessDeniedAce = GetProcAddress(hNtdll, xorstr("RtlAddAccessDeniedAce").crypt_get());
 	if (!lpRtlAddAccessDeniedAce)
 		return false;
 	auto RtlAddAccessDeniedAce = reinterpret_cast<TRtlAddAccessDeniedAce>(lpRtlAddAccessDeniedAce);

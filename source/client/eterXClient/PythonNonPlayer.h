@@ -1,4 +1,5 @@
 #pragma once
+#include "StdAfx.h"
 
 /*
  *	NPC 데이터 프로토 타잎을 관리 한다.

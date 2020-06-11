@@ -20,7 +20,7 @@ namespace UI
 		m_dwFlag(0),
 		m_isUpdatingChildren(FALSE)
 #ifdef ENABLE_MOUSEWHEEL_EVENT
-		,m_bIsScrollable(false)
+		, m_bIsScrollable(false)
 #endif
 	{			
 #ifdef _DEBUG
@@ -34,6 +34,7 @@ namespace UI
 		m_VerticalAlign = VERTICAL_ALIGN_TOP;
 		m_rect.bottom = m_rect.left = m_rect.right = m_rect.top = 0;
 		m_limitBiasRect.bottom = m_limitBiasRect.left = m_limitBiasRect.right = m_limitBiasRect.top = 0;
+		m_windowType = WINDOW_TYPE_WINDOW; // setting all window type to window first
 	}
 
 	CWindow::~CWindow()
@@ -827,6 +828,14 @@ namespace UI
 		if (IsFlag(CWindow::FLAG_NOT_PICK))
 			return nullptr;
 
+		if (IsFlag(CWindow::FLAG_ALPHA_SENSITIVE)) // check flag
+		{
+			bool isFullTransparent = true;
+			IsTransparentOnPixel(&x, &y, &isFullTransparent); // check transparency of the clicking position
+			if (isFullTransparent)
+				return nullptr; // if transparent then return nothing, else give current window
+		}
+
 		return (this);
 	}
 
@@ -839,11 +848,53 @@ namespace UI
 			if (pWin->IsShow())
 				if (pWin->IsIn(x, y))
 					if (!pWin->IsFlag(CWindow::FLAG_NOT_PICK))
+					{
+						if (pWin->IsFlag(CWindow::FLAG_ALPHA_SENSITIVE)) // if the window is alpha sensitive check the alpha
+						{
+							bool isFullTransparent = true;
+							pWin->IsTransparentOnPixel(&x, &y, &isFullTransparent);
+							if (isFullTransparent) // if the window is transparent at the coordinates then its not the top window
+								continue;
+						}
 						return pWin;
+					}
 		}
 
 		return nullptr;
 	}
+	
+	void CWindow::IsTransparentOnPixel(int32_t* x, int32_t* y, bool* ret)
+	{
+		if (IsShow() && IsIn(*x, *y)) // check if the window is active and the cursor is in the window
+		{
+			if (m_windowType == WINDOW_TYPE_EX_IMAGE) // check if its an expanded_image
+			{
+				D3DXCOLOR pixel = ((CExpandedImageBox*)this)->GetPixelColor(*x - m_rect.left, *y - m_rect.top); // get current pixel color
+
+				if ((uint8_t)pixel.a != 0) // if the pixel is not trasparent then the whole window is not trasparent
+				{
+					*ret = false;
+					return;
+				}
+			}
+			else if (m_pChildList.empty()) // if its not ex_image and has no child then its NOT transparent [default for other components]
+			{
+				*ret = false;
+				return;
+			}
+		}
+		if (!m_pChildList.empty()) // check if all the childs are trasparent on the current position
+		{
+			std::list<CWindow *>::reverse_iterator ritor = m_pChildList.rbegin();
+			for (; ritor != m_pChildList.rend(); ritor++)
+			{
+				(*ritor)->IsTransparentOnPixel(x, y, ret);
+				if (!*ret)
+					return;
+			}
+		}
+	}
+	
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1255,18 +1306,36 @@ namespace UI
 
 		CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
 		if (!pResource)
+		{
+			TraceError("Resource: %s not found!", c_szFileName);
 			return FALSE;
+		}
 		if (!pResource->IsType(CGraphicImage::Type()))
+		{
+			TraceError("Resource type not valid");
 			return FALSE;
+		}
 
 		m_pImageInstance->SetImagePointer(static_cast<CGraphicImage*>(pResource));
 		if (m_pImageInstance->IsEmpty())
+		{
+			TraceError("Image instance can NOT created for: %s", c_szFileName);
 			return FALSE;
+		}
 
 		SetSize(m_pImageInstance->GetWidth(), m_pImageInstance->GetHeight());
 		UpdateRect();
 
 		return TRUE;
+	}
+
+	void CImageBox::SetScale(float sx, float sy)
+	{
+		if (!m_pImageInstance)
+			return;
+
+		((CGraphicImageInstance*)m_pImageInstance)->SetScale(sx, sy);
+		CWindow::SetSize(int32_t(float(GetWidth())*sx), int32_t(float(GetHeight())*sy));
 	}
 
 	void CImageBox::SetDiffuseColor(float fr, float fg, float fb, float fa)
@@ -1416,6 +1485,7 @@ namespace UI
 
 	CExpandedImageBox::CExpandedImageBox(PyObject * ppyObject) : CImageBox(ppyObject)
 	{
+		m_windowType = WINDOW_TYPE_EX_IMAGE;
 	}
 	CExpandedImageBox::~CExpandedImageBox()
 	{
@@ -1535,7 +1605,27 @@ namespace UI
 #ifdef ENABLE_ACCE_SYSTEM
 		pImageInstance->SetDiffuseColor(r, g, b, a);
 #endif
+		
+		if (pImageInstance->IsEmpty())
+		{
+			CGraphicExpandedImageInstance::Delete(pImageInstance);
+			return;
+		}
+		
+		m_ImageVector.push_back(pImageInstance);
+		m_bycurIndex = rand() % m_ImageVector.size();
+	}
 
+	void CAniImageBox::AppendImageScale(const char * c_szFileName, float scale_x, float scale_y)
+	{
+		CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+		if (!pResource->IsType(CGraphicImage::Type()))
+			return;
+
+		CGraphicExpandedImageInstance * pImageInstance = CGraphicExpandedImageInstance::New();
+
+		pImageInstance->SetImagePointer(static_cast<CGraphicImage*>(pResource));
+		pImageInstance->SetScale(scale_x, scale_y);
 		if (pImageInstance->IsEmpty())
 		{
 			CGraphicExpandedImageInstance::Delete(pImageInstance);
@@ -1643,7 +1733,8 @@ namespace UI
 			m_pcurVisual(nullptr),
 			m_bEnable(TRUE),
 			m_isPressed(FALSE),
-			m_isFlash(FALSE)
+			m_isFlash(FALSE),
+			m_isFlashEx(FALSE)
 	{
 		CWindow::AddFlag(CWindow::FLAG_NOT_CAPTURE);
 	}
@@ -1728,6 +1819,12 @@ namespace UI
 	{
 		m_isFlash = TRUE;
 	}
+	
+	void CButton::FlashEx()
+	{
+		m_isFlashEx = TRUE;
+	}
+
 
 	void CButton::Enable()
 	{
@@ -1782,11 +1879,18 @@ namespace UI
 
 		if (m_pcurVisual)
 		{
-			if (m_isFlash)
-			if (!IsIn())
-			if (int32_t(timeGetTime() / 500)%2)
+			if (m_isFlash && !IsIn())
 			{
-				return;
+				if (int32_t(timeGetTime() / 500) % 2)
+					return;
+			}
+
+			if (m_isFlashEx && !IsIn())
+			{
+				if (int32_t(timeGetTime() / 500) % 2)
+					Over();
+				if (int32_t(timeGetTime() / (500 - 15)) % 2)
+					Down();
 			}
 
 			m_pcurVisual->Render();
@@ -2024,7 +2128,8 @@ namespace UI
 		m_rect.right = m_rect.left + m_lWidth;
 		m_rect.bottom = m_rect.top + m_lHeight;
 
-		std::for_each(m_pChildList.begin(), m_pChildList.end(), std::mem_fn(&CWindow::UpdateRect));
+		for (const auto& window : m_pChildList)
+			window->UpdateRect();
 
 		if (m_pcurVisual)
 			m_pcurVisual->SetPosition(m_rect.left, m_rect.top);

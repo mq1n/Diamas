@@ -12,13 +12,13 @@ class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUp
 			ERROR_CONNECT,
 			ERROR_LOAD,
 			ERROR_WIDTH,
-			ERROR_HEIGHT,
+			ERROR_HEIGHT
 		};
 
 		enum
 		{
 			SEND_TYPE_MARK,
-			SEND_TYPE_SYMBOL,
+			SEND_TYPE_SYMBOL
 		};
 
 	public:
@@ -28,7 +28,6 @@ class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUp
 		void Disconnect();
 		bool Connect(const CNetworkAddress& c_rkNetAddr, uint32_t dwHandle, uint32_t dwRandomKey, uint32_t dwGuildID, const char* c_szFileName, uint32_t* peError);
 		bool ConnectToSendSymbol(const CNetworkAddress& c_rkNetAddr, uint32_t dwHandle, uint32_t dwRandomKey, uint32_t dwGuildID, const char* c_szFileName, uint32_t* peError);
-		bool IsCompleteUploading();
 
 		void Process();
 
@@ -37,7 +36,7 @@ class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUp
 		{
 			STATE_OFFLINE,
 			STATE_LOGIN,
-			STATE_COMPLETE,
+			STATE_COMPLETE
 		};
 
 	private:
@@ -48,8 +47,6 @@ class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUp
 
 		bool __Load(const char* c_szFileName, uint32_t* peError);
 		bool __LoadSymbol(const char* c_szFileName, uint32_t* peError);
-
-		bool __Save(const char* c_szFileName);
 
 		void __Inialize();
 		bool __StateProcess();
@@ -82,7 +79,6 @@ class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUp
 
 		SGuildMark m_kMark;
 
-		uint32_t m_dwSymbolBufSize;
 		uint32_t m_dwSymbolCRC32;
-		uint8_t * m_pbySymbolBuf;
+		std::vector<uint8_t> m_pbySymbolBuf;
 };

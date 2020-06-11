@@ -2,14 +2,10 @@
 #include "AnticheatManager.h"
 #include "CheatQueueManager.h"
 #include "../eterBase/SimpleTimer.h"
-#include "../../../common/defines.h"
 #include <FileSystemIncl.hpp>
-
-#include <XORstr.h>
 #include <xorstr.hpp>
 #include <Wtsapi32.h>
 #include <sstream>
-
 #include "DataBuffer.hpp"
 #include "md5.h"
 #include "Exception.h"
