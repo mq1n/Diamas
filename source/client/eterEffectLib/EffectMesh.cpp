@@ -408,7 +408,7 @@ bool CEffectMesh::OnIsEmpty() const
 	return !m_isData;
 }
 
-CEffectMesh::CEffectMesh(const char * c_szFileName) : CResource(c_szFileName)
+CEffectMesh::CEffectMesh(const FileSystem::CFileName& filename) : CResource(filename)
 {
 	m_iGeomCount = 0;
 	m_iFrameCount = 0;

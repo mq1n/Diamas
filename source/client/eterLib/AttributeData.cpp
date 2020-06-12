@@ -191,7 +191,7 @@ void CAttributeData::OnSelfDestruct()
 	Clear();
 }
 
-CAttributeData::CAttributeData(const char * c_szFileName) : CResource(c_szFileName)
+CAttributeData::CAttributeData(const FileSystem::CFileName& filename) : CResource(filename)
 {
 	m_fMaximizeRadius = 0.0f;
 }

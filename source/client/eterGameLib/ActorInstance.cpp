@@ -140,6 +140,11 @@ void CActorInstance::SetFaint(bool isFaint)
 	m_isFaint=isFaint;
 }
 
+void CActorInstance::SetReviving(bool isReviving)
+{
+	m_isReviving = isReviving;
+}
+
 void CActorInstance::SetSleep(bool isSleep)
 {
 	m_isSleep=isSleep;
@@ -359,6 +364,11 @@ void CActorInstance::Die()
 	m_isRealDead = TRUE;
 }
 
+BOOL CActorInstance::IsReviving()
+{
+	return m_isReviving;
+}
+
 BOOL CActorInstance::IsSleep()
 {
 	return m_isSleep;
@@ -509,19 +519,6 @@ bool CActorInstance::OnGetObjectHeight(float fX, float fY, float * pfHeight)
 
 //////////////////////////////////////////////////////////////////
 // Battle
-void CActorInstance::Revive()
-{
-	m_isSleep = FALSE;
-	m_isParalysis = FALSE;
-	m_isFaint = FALSE;
-	m_isRealDead = FALSE;
-	m_isStun = FALSE;
-	m_isWalking = FALSE;
-	m_isMain = FALSE;
-	m_isResistFallen = FALSE;
-
-	__InitializeCollisionData();
-}
 
 BOOL CActorInstance::IsStun()
 {
@@ -865,6 +862,7 @@ void CActorInstance::__InitializeStateData()
 	m_isNextPreInput = FALSE;
 
 	m_isSleep = FALSE;
+	m_isReviving = FALSE;
 	m_isParalysis = FALSE;
 	m_isFaint = FALSE;
 	m_isRealDead = FALSE;

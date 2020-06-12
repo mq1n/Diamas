@@ -413,7 +413,10 @@ PyObject * chrmgrRegisterCacheMotionData(PyObject* poSelf, PyObject* poArgs)
 	CGraphicThing* pkMotionThing=pRaceData->RegisterMotionData(iMode, iMotion, c_szFullFileName, iWeight);
 
 	if (pkMotionThing)
-		CResourceManager::Instance().LoadStaticCache(pkMotionThing->GetFileName());
+	{
+		const auto& stRefResourceName = pkMotionThing->GetFileNameString();
+		CResourceManager::Instance().LoadStaticCache(stRefResourceName.c_str());
+	}
 
 	return Py_BuildNone();
 }

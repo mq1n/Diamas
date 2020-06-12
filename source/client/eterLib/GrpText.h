@@ -13,7 +13,7 @@ class CGraphicText : public CResource
 		static TType Type();
 		
 	public:
-		CGraphicText(const char* c_szFileName);
+		CGraphicText(const FileSystem::CFileName& filename);
 		virtual ~CGraphicText();
 		
 		virtual bool			CreateDeviceObjects();

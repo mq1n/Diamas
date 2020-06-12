@@ -71,9 +71,8 @@ class CGraphicTextInstance
 		
 	protected:
 		void __Initialize();
-		int32_t  __DrawCharacter(CGraphicFontTexture * pFontTexture, uint16_t codePage, wchar_t text, uint32_t dwColor);
+		int32_t  __DrawCharacter(CGraphicFontTexture * pFontTexture, wchar_t text, uint32_t dwColor);
 		void __GetTextPos(uint32_t index, float* x, float* y);
-		int32_t __GetTextTag(const wchar_t * src, int32_t maxLen, int32_t & tagLen, std::wstring & extraInfo);
 
 	protected:
 		struct SHyperlink
@@ -115,7 +114,7 @@ class CGraphicTextInstance
 		bool m_isUpdateFontTexture;
 		
 		CGraphicText::TRef m_roText;
-		CGraphicFontTexture::TPCharacterInfomationVector m_pCharInfoVector;
+		CGraphicFontTexture::TPCharacterInformationVector m_pCharInfoVector;
 		std::vector<uint32_t> m_dwColorInfoVector;
 		std::vector<SHyperlink> m_hyperlinkVector;
 
@@ -128,8 +127,5 @@ class CGraphicTextInstance
 
 		static CDynamicPool<CGraphicTextInstance>		ms_kPool;
 };
-
-extern const char* FindToken(const char* begin, const char* end);
-extern int32_t ReadToken(const char* token);
 
 #endif

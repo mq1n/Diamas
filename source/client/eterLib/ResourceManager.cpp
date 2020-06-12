@@ -1,5 +1,4 @@
 #include "StdAfx.h"
-#include <io.h>
 #include "../eterBase/CRC32.h"
 #include "../eterBase/Timer.h"
 #include "../eterBase/Stl.h"
@@ -8,13 +7,11 @@
 #include "ResourceManager.h"
 #include "GrpImage.h"
 
-int32_t g_iLoadingDelayTime = 20;
+#include <io.h>
 
 const int32_t c_Deleting_Wait_Time = 30000;			// 삭제 대기 시간 (30초)
 const int32_t c_DeletingCountPerFrame = 30;			// 프레임당 체크 리소스 갯수
 const int32_t c_Reference_Decrease_Wait_Time = 30000;	// 선로딩 리소스의 해제 대기 시간 (30초)
-
-CFileLoaderThread CResourceManager::ms_loadingThread;
 
 void CResourceManager::LoadStaticCache(const char* c_szFileName)
 {
@@ -31,100 +28,7 @@ void CResourceManager::LoadStaticCache(const char* c_szFileName)
 		return;
 
 	pkRes->AddReference();
-	m_pCacheMap.insert(TResourcePointerMap::value_type(dwCacheKey, pkRes));	
-
-}
-
-void CResourceManager::ProcessBackgroundLoading()
-{
-	TResourceRequestMap::iterator itor = m_RequestMap.begin();
-
-	while (itor != m_RequestMap.end())
-	{
-		uint32_t dwFileCRC = itor->first;
-		std::string & stFileName = itor->second;
-
-		if (isResourcePointerData(dwFileCRC) ||
-			(m_WaitingMap.end() != m_WaitingMap.find(dwFileCRC)))
-		{
-			//printf("SKP %s\n", stFileName.c_str());
-			itor = m_RequestMap.erase(itor);
-			continue;
-		}
-
-		//printf("REQ %s\n", stFileName.c_str());
-		ms_loadingThread.Request(stFileName);
-		m_WaitingMap.insert(TResourceRequestMap::value_type(dwFileCRC, stFileName));
-		itor = m_RequestMap.erase(itor);
-		//break; // NOTE: 여기서 break 하면 천천히 로딩 된다.
-	}
-
-	uint32_t dwCurrentTime = ELTimer_GetMSec();
-
-	CFileLoaderThread::TData * pData;
-	while (ms_loadingThread.Fetch(&pData))
-	{
-		//printf("LOD %s\n", pData->stFileName.c_str());
-		CResource * pResource = GetResourcePointer(pData->stFileName.c_str());
-
-		if (pResource)
-		{
-			if (pResource->IsEmpty())
-			{				
-				pResource->OnLoad(pData->dwSize, pData->pvBuf);
-				pResource->AddReferenceOnly();
-
-				// 여기서 올라간 레퍼런스 카운트를 일정 시간이 지난 뒤에 풀어주기 위하여
-				m_pResRefDecreaseWaitingMap.insert(TResourceRefDecreaseWaitingMap::value_type(dwCurrentTime, pResource));
-			}
-		}
-
-		m_WaitingMap.erase(GetCRC32(pData->stFileName.c_str(), pData->stFileName.size()));
-
-		delete [] ((char *) pData->pvBuf);
-		delete pData;
-	}
-
-	// DO : 일정 시간이 지나고 난뒤 미리 로딩해 두었던 리소스의 레퍼런스 카운트를 감소 시킨다 - [levites]
-	int32_t lCurrentTime = ELTimer_GetMSec();
-
-	TResourceRefDecreaseWaitingMap::iterator itorRef = m_pResRefDecreaseWaitingMap.begin();
-
-	while (itorRef != m_pResRefDecreaseWaitingMap.end())
-	{
-		const int32_t & rCreatingTime = itorRef->first;
-
-		if (lCurrentTime - rCreatingTime > c_Reference_Decrease_Wait_Time)
-		{
-			CResource * pResource = itorRef->second;
-
-			// Decrease Reference Count
-			pResource->Release();
-			itorRef = m_pResRefDecreaseWaitingMap.erase(itorRef);
-			//Tracef("Decrease Pre Loading Resource\n", rCreatingTime);
-		}
-		else
-			++itorRef;
-	}
-}
-
-void CResourceManager::PushBackgroundLoadingSet(std::set<std::string> & LoadingSet)
-{
-	std::set<std::string>::iterator itor = LoadingSet.begin();
-
-	while (itor != LoadingSet.end())
-	{
-		uint32_t dwFileCRC = __GetFileCRC(itor->c_str());
-
-		if (isResourcePointerData(dwFileCRC))
-		{
-			++itor;
-			continue;
-		}
-
-		m_RequestMap.insert(TResourceRequestMap::value_type(dwFileCRC, itor->c_str()));
-		++itor;
-	}
+	m_pCacheMap.insert(TResourcePointerMap::value_type(dwCacheKey, pkRes));
 }
 
 void CResourceManager::__DestroyCacheMap()
@@ -171,107 +75,35 @@ void CResourceManager::DestroyDeletingList()
 }
 
 void CResourceManager::Destroy()
-{	
+{
 	assert(m_ResourceDeletingMap.empty() && "CResourceManager::Destroy - YOU MUST CALL DestroyDeletingList");
 	__DestroyResourceMap();
 }
 
-void CResourceManager::RegisterResourceNewFunctionPointer(const char* c_szFileExt, CResource* (*pNewFunc)(const char* c_szFileName))
+void CResourceManager::RegisterResourceNewFunctionPointer(const char* c_szFileExt, CResource* (*pNewFunc)(const FileSystem::CFileName&))
 {
-	m_pResNewFuncMap[c_szFileExt] = pNewFunc;
+	m_newFuncs.push_back(std::make_pair(c_szFileExt, pNewFunc));
 }
 
-void CResourceManager::RegisterResourceNewFunctionByTypePointer(int32_t iType, CResource* (*pNewFunc) (const char* c_szFileName))
+CResource * CResourceManager::InsertResourcePointer(uint64_t nameHash, CResource* pResource)
 {
-	assert(iType >= 0);
-	m_pResNewFuncByTypeMap[iType] = pNewFunc;
-}
-
-CResource * CResourceManager::InsertResourcePointer(uint32_t dwFileCRC, CResource* pResource)
-{
-	TResourcePointerMap::iterator itor = m_pResMap.find(dwFileCRC);
-
+	TResourcePointerMap::iterator itor = m_pResMap.find(nameHash);
 	if (m_pResMap.end() != itor)
-	{		
-		TraceError("CResource::InsertResourcePointer: %s is already registered\n", pResource->GetFileName());
+	{
+		const auto& stRefResourceName = pResource->GetFileNameString();
+
+		TraceError("CResource::InsertResourcePointer: %s is already registered\n", stRefResourceName.c_str());
 		assert(!"CResource::InsertResourcePointer: Resource already resistered");
+
 		delete pResource;
 		return itor->second;
 	}
 
-	m_pResMap.insert(TResourcePointerMap::value_type(dwFileCRC, pResource));
+	m_pResMap.insert(TResourcePointerMap::value_type(nameHash, pResource));
 	return pResource;
 }
 
-
-int32_t __ConvertPathName(const char * c_szPathName, char * pszRetPathName, int32_t retLen)
-{
-	const char * pc;
-	int32_t len = 0;
-
-	for (pc = c_szPathName; *pc && len < retLen; ++pc, ++len)
-	{
-		if (*pc == '/')
-			*(pszRetPathName++) = '\\';
-		else
-			*(pszRetPathName++) = (char) ascii_tolower(*pc);
-	}
-
-	*pszRetPathName = '\0';
-	return len;
-}
-
-CResource * CResourceManager::GetTypeResourcePointer(const char * c_szFileName, int32_t iType)
-{
-	if (!c_szFileName || !*c_szFileName)
-	{
-		assert(c_szFileName != nullptr && *c_szFileName != '\0');
-		return nullptr;
-	}
-
-	const char * c_pszFile;
-	uint32_t dwFileCRC = __GetFileCRC(c_szFileName, &c_pszFile);
-	CResource * pResource = FindResourcePointer(dwFileCRC);
-
-	if (pResource)	// 이미 리소스가 있으면 리턴 한다.
-		return pResource;
-
-	CResource *	(*newFunc) (const char *) = nullptr;
-
-	if (iType != -1)
-	{
-		TResourceNewFunctionByTypePointerMap::iterator f = m_pResNewFuncByTypeMap.find(iType);
-
-		if (m_pResNewFuncByTypeMap.end() != f)
-			newFunc = f->second;
-	}
-	else
-	{
-		const char * pcFileExt = strrchr(c_pszFile, '.');
-
-		if (pcFileExt)
-		{
-			static char s_szFileExt[8 + 1];
-			strncpy(s_szFileExt, pcFileExt + 1, 8);
-
-			TResourceNewFunctionPointerMap::iterator f = m_pResNewFuncMap.find(s_szFileExt);
-
-			if (m_pResNewFuncMap.end() != f)
-				newFunc = f->second;
-		}
-	}
-
-	if (!newFunc)
-	{
-		TraceError("ResourceManager::GetResourcePointer: NOT SUPPORT FILE %s", c_pszFile);
-		return nullptr;
-	}
-
-	pResource = InsertResourcePointer(dwFileCRC, newFunc(c_pszFile));
-	return pResource;
-}
-
-CResource * CResourceManager::GetResourcePointer(const char * c_szFileName)
+CResource * CResourceManager::GetResourcePointer(const char* c_szFileName)
 {
 	if (!c_szFileName || !*c_szFileName)
 	{
@@ -279,90 +111,57 @@ CResource * CResourceManager::GetResourcePointer(const char * c_szFileName)
 		return nullptr;
 	}
 
-	const char * c_pszFile;
-	uint32_t dwFileCRC = __GetFileCRC(c_szFileName, &c_pszFile);
-	CResource * pResource = FindResourcePointer(dwFileCRC);
+	FileSystem::CFileName filename(c_szFileName);
 
-	if (pResource)	// 이미 리소스가 있으면 리턴 한다.
+	CResource * pResource = FindResourcePointer(filename.GetHash());
+	if (pResource) // 이미 리소스가 있으면 리턴 한다.
 		return pResource;
 
-	const char * pcFileExt = strrchr(c_pszFile, '.');
+	CResource* (*newFunc) (const FileSystem::CFileName&) = nullptr;
 
-#ifdef _DEBUG
-	if (!IsFileExist(c_szFileName) )
+	auto stFileName = filename.GetPathA();
+	const auto fileExt = stFileName.rfind('.');
+	if (fileExt != std::string::npos)
 	{
-		if( pcFileExt == nullptr || (stricmp( pcFileExt, ".fnt" ) != 0) ) {
-			TraceError("CResourceManager::GetResourcePointer: File not exist %s", c_szFileName);
-		}
+		const auto it = std::find_if(m_newFuncs.begin(), m_newFuncs.end(), [&filename, fileExt, &stFileName] (const NewFunc& nf)
+		{
+			return 0 == stFileName.compare(fileExt + 1, std::string::npos, nf.first);
+		});
+
+		if (it != m_newFuncs.end())
+			newFunc = it->second;
 	}
-#endif
-
-	CResource *	(*newFunc) (const char *) = nullptr;
-
-	if (pcFileExt)
+	else
 	{
-		static char s_szFileExt[8 + 1];
-		strncpy(s_szFileExt, pcFileExt + 1, 8);
-
-		TResourceNewFunctionPointerMap::iterator f = m_pResNewFuncMap.find(s_szFileExt);
-
-		if (m_pResNewFuncMap.end() != f)
-			newFunc = f->second;
+		TraceError("ResourceManager::GetResourcePointer: BROKEN FILE NAME: %s", stFileName.c_str());
+		return nullptr;
 	}
 
 	if (!newFunc)
 	{
-		TraceError("ResourceManager::GetResourcePointer: NOT SUPPORT FILE %s", c_pszFile);
+		TraceError("ResourceManager::GetResourcePointer: NOT SUPPORT FILE %s", stFileName.c_str());
 		return nullptr;
 	}
 
-	pResource = InsertResourcePointer(dwFileCRC, newFunc(c_pszFile));
-	return pResource;
+	return InsertResourcePointer(filename.GetHash(), newFunc(filename));
 }
 
-CResource * CResourceManager::FindResourcePointer(uint32_t dwFileCRC)
+CResource* CResourceManager::FindResourcePointer(uint64_t nameHash)
 {
-	TResourcePointerMap::iterator itor = m_pResMap.find(dwFileCRC);
-
+	TResourcePointerMap::iterator itor = m_pResMap.find(nameHash);
 	if (m_pResMap.end() == itor)
 		return nullptr;
 
 	return itor->second;
 }
 
-bool CResourceManager::isResourcePointerData(uint32_t dwFileCRC)
+bool CResourceManager::isResourcePointerData(uint64_t nameHash)
 {
-	TResourcePointerMap::iterator itor = m_pResMap.find(dwFileCRC);
-
+	TResourcePointerMap::iterator itor = m_pResMap.find(nameHash);
 	if (m_pResMap.end() == itor)
 		return nullptr;
 
 	return (itor->second)->IsData();
-}
-
-uint32_t CResourceManager::__GetFileCRC(const char * c_szFileName, const char ** c_ppszLowerFileName)
-{
-	static char s_szFullPathFileName[MAX_PATH];
-	const char * src = c_szFileName;
-	char * dst = s_szFullPathFileName;
-	int32_t	len = 0;
-
-	while (src[len])
-	{
-		if (src[len]=='/')
-			dst[len] = '\\';
-		else
-			dst[len] = (char)ascii_tolower(src[len]);
-
-		++len;
-	}
-
-	dst[len] = '\0';
-
-	if (c_ppszLowerFileName)
-		*c_ppszLowerFileName = &s_szFullPathFileName[0];
-
-	return (GetCRC32(s_szFullPathFileName, len));
 }
 
 typedef struct SDumpData
@@ -399,10 +198,10 @@ float FDumpPrint::m_totalKB;
 struct FDumpCostPrint
 {
 	FILE * m_fp;
-	
+
 	void operator() (TDumpData & data)
 	{
-		fprintf(m_fp, "%-4d %s\n", data.cost, data.filename);
+		fprintf(m_fp, "%-4u %s\n", data.cost, data.filename);
 	}
 };
 
@@ -418,7 +217,8 @@ void CResourceManager::DumpFileListToTextFile(const char* c_szFileName)
 		if (pResource->IsEmpty())
 			continue;
 		
-		data.filename = pResource->GetFileName();
+		auto stResourceName = pResource->GetFileNameString();
+		data.filename = stResourceName.c_str();
 
 		int32_t filesize;
 
@@ -441,7 +241,7 @@ void CResourceManager::DumpFileListToTextFile(const char* c_szFileName)
 		}
 
 		data.KB = (float) filesize / (float) 1024;
-		data.cost = pResource->GetLoadCostMilliSecond();
+		//data.cost = pResource->GetLoadCostMilliSecond();
 
 		dumpVector.push_back(data);
 	}
@@ -503,8 +303,6 @@ void CResourceManager::Update()
 		else
 			++itor;
 	}
-
-	ProcessBackgroundLoading();
 }
 
 void CResourceManager::ReserveDeletingResource(CResource * pResource)

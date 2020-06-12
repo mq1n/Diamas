@@ -743,7 +743,7 @@ class CItemData
 		CGraphicThing * GetModelThing();
 		CGraphicThing * GetSubModelThing();
 		CGraphicThing * GetDropModelThing();
-		CGraphicSubImage * GetIconImage(const char * c_szIconFileName = nullptr);
+		CGraphicSubImage * GetIconImage(const std::string& stIconFileName = "");
 
 		uint32_t GetLODModelThingCount();
 		BOOL GetLODModelThingPointer(uint32_t dwIndex, CGraphicThing ** ppModelThing);

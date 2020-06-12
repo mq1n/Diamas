@@ -29,7 +29,8 @@ namespace FileSystem
 	CFileName::CFileName(const uint32_t hash)
 	{
 		m_hash = hash;
-		m_path.clear();
+		m_pathW.clear();
+		m_pathA.clear();
 	}
 
 	auto& CFileName::operator=(const std::wstring& path)
@@ -55,45 +56,48 @@ namespace FileSystem
 	auto& CFileName::operator=(const uint32_t hash)
 	{
 		m_hash = hash;
-		m_path.clear();
+		m_pathW.clear();
+		m_pathA.clear();
 		return *this;
 	}
 
 	void CFileName::Set(const std::wstring& path, uint32_t length)
 	{
-		m_path.resize(length);
+		m_pathW.resize(length);
 
-		m_path = path;
-		for (size_t i = 0; i < m_path.size(); ++i)
+		m_pathW = path;
+		for (size_t i = 0; i < m_pathW.size(); ++i)
 		{
-			if (m_path[i] == L'\\')
-				m_path[i] = L'/';
+			if (m_pathW[i] == L'\\')
+				m_pathW[i] = L'/';
 		}
-		std::transform(m_path.begin(), m_path.end(), m_path.begin(), ::tolower);
+		std::transform(m_pathW.begin(), m_pathW.end(), m_pathW.begin(), ::tolower);
 
-		m_hash = XXH32(m_path.data(), length * sizeof(wchar_t), FILE_NAME_MAGIC);
+		m_hash = XXH32(m_pathW.data(), length * sizeof(wchar_t), FILE_NAME_MAGIC);
+		m_pathA = std::string(m_pathW.begin(), m_pathW.end());
 	}
 	void CFileName::Set(const std::string& path, uint32_t length)
 	{
-		m_path.resize(length);
+		m_pathW.resize(length);
 
-		m_path = std::wstring(path.begin(), path.end());
-		for (size_t i = 0; i < m_path.size(); ++i)
+		m_pathW = std::wstring(path.begin(), path.end());
+		for (size_t i = 0; i < m_pathW.size(); ++i)
 		{
-			if (m_path[i] == L'\\')
-				m_path[i] = L'/';
+			if (m_pathW[i] == L'\\')
+				m_pathW[i] = L'/';
 		}
-		std::transform(m_path.begin(), m_path.end(), m_path.begin(), ::tolower);
+		std::transform(m_pathW.begin(), m_pathW.end(), m_pathW.begin(), ::tolower);
 
-		m_hash = XXH32(m_path.data(), length * sizeof(wchar_t), FILE_NAME_MAGIC);
+		m_hash = XXH32(m_pathW.data(), length * sizeof(wchar_t), FILE_NAME_MAGIC);
+		m_pathA = std::string(m_pathW.begin(), m_pathW.end()); // convert again instead of usage coming path argument, cuz it's required as lower
 	}
 
 	std::wstring CFileName::GetPathW() const
 	{
-		return m_path;
+		return m_pathW;
 	}
 	std::string CFileName::GetPathA() const
 	{
-		return std::string(m_path.begin(), m_path.end());
+		return m_pathA;
 	}
 }

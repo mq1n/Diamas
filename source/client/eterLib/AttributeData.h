@@ -40,7 +40,7 @@ class CAttributeData : public CResource
 		static TType Type();
 
 	public:
-		CAttributeData(const char * c_szFileName);
+		CAttributeData(const FileSystem::CFileName& filename);
 		virtual ~CAttributeData();
 
 		//uint32_t GetCollisionDataCount() const;

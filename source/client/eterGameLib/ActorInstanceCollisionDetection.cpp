@@ -610,6 +610,10 @@ BOOL CActorInstance::TestActorCollision(CActorInstance & rVictim)
 		return FALSE;
 	}
 */
+	// If the player has the revive flag set allow him to pass through monsters.
+	if (IsReviving() && !rVictim.IsDoor() && rVictim.IsEnemy())
+		return FALSE;
+
 	if (rVictim.IsDead())
 		return FALSE;
 

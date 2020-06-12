@@ -570,7 +570,6 @@ class CInstanceBase
 		void					ActEmotion(uint32_t dwMotionNumber);
 		void					LevelUp();
 		void					SkillUp();
-		void					Revive();
 		void					Stun();
 		void					Die();
 		void					Hide();

@@ -24,32 +24,32 @@
 
 #include "Resource.h"
 
-CResource * NewImage(const char* c_szFileName)
+CResource * NewImage(const FileSystem::CFileName& c_szFileName)
 {
 	return new CGraphicImage(c_szFileName);
 }
 
-CResource * NewSubImage(const char* c_szFileName)
+CResource * NewSubImage(const FileSystem::CFileName& c_szFileName)
 {
 	return new CGraphicSubImage(c_szFileName);
 }
 
-CResource * NewText(const char* c_szFileName)
+CResource * NewText(const FileSystem::CFileName& c_szFileName)
 {
 	return new CGraphicText(c_szFileName);
 }
 
-CResource * NewThing(const char* c_szFileName)
+CResource * NewThing(const FileSystem::CFileName& c_szFileName)
 {
 	return new CGraphicThing(c_szFileName);
 }
 
-CResource * NewEffectMesh(const char* c_szFileName)
+CResource * NewEffectMesh(const FileSystem::CFileName& c_szFileName)
 {
 	return new CEffectMesh(c_szFileName);
 }
 
-CResource * NewAttributeData(const char* c_szFileName)
+CResource * NewAttributeData(const FileSystem::CFileName& c_szFileName)
 {
 	return new CAttributeData(c_szFileName);
 }

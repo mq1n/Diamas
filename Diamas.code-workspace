@@ -105,7 +105,9 @@
             "regex": "cpp",
             "scoped_allocator": "cpp",
             "format": "cpp",
-            "*.ch": "cpp"
+            "*.ch": "cpp",
+            "concepts": "cpp",
+            "hash_set": "cpp"
         },
         "git.ignoreLimitWarning": true
 	}

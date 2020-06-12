@@ -107,7 +107,8 @@ PyObject * itemGetIconImageFileName(PyObject * poSelf, PyObject * poArgs)
 	if (!pImage)
 		return Py_BuildValue("s", "Noname");
 
-	return Py_BuildValue("s", pImage->GetFileName());
+	const auto& stRefResourceName = pImage->GetFileNameString();
+	return Py_BuildValue("s", stRefResourceName.c_str());
 }
 
 PyObject * itemGetItemSize(PyObject * poSelf, PyObject * poArgs)

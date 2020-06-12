@@ -12,7 +12,7 @@ class CGraphicSubImage : public CGraphicImage
 		static char m_SearchPath[256];
 
 	public:
-		CGraphicSubImage(const char* c_szFileName);
+		CGraphicSubImage(const FileSystem::CFileName& filename);
 		virtual ~CGraphicSubImage();
 
 		bool CreateDeviceObjects();

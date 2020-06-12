@@ -196,10 +196,11 @@ namespace FileSystem
 			return entry.first->Get(path, entry.second, fp);
 		}
 
-		const auto extPos = path.GetPathA().find_last_of('.');
+		const auto fileName = path.GetPathA();
+		const auto extPos = fileName.find_last_of('.');
 		if (extPos != std::string::npos) 
 		{
-			const auto ext = path.GetPathA().substr(extPos + 1);
+			const auto ext = fileName.substr(extPos + 1);
 			if (m_diskExtBlacklist.find(ext) != m_diskExtBlacklist.end())
 			{
 				DEBUG_LOG(LL_ERR, "Loading %ls from disk is forbidden", path.GetPathW().c_str());

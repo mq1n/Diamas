@@ -606,21 +606,15 @@ bool CPythonSkill::RegisterSkill(uint32_t dwSkillIndex, const char * c_szFileNam
 	}
 
 	{
-		char szName[256];
-		sprintf(szName, "%dname", LocaleService_GetCodePage());
-		if (!TextFileLoader.GetTokenString(szName, &SkillData.strName))
 			if (!TextFileLoader.GetTokenString("name", &SkillData.strName))
 			{
-				TraceError("CPythonSkill::RegisterSkill(dwSkillIndex=%d, c_szFileName=%s) - Failed to find [%s]", dwSkillIndex, c_szFileName, szName);
+				TraceError("CPythonSkill::RegisterSkill(dwSkillIndex=%d, c_szFileName=%s) - Failed to find [%s]", dwSkillIndex, c_szFileName, "name");
 				return false;	
 			}
 	}
 
 	{
-		char szName[256];
-		sprintf(szName, "%ddescription", LocaleService_GetCodePage());
-		if (!TextFileLoader.GetTokenString(szName, &SkillData.strDescription))
-			TextFileLoader.GetTokenString("description", &SkillData.strDescription);
+		TextFileLoader.GetTokenString("description", &SkillData.strDescription);
 	}
 
 	if (!TextFileLoader.GetTokenString("iconfilename", &SkillData.strIconFileName))
@@ -632,13 +626,9 @@ bool CPythonSkill::RegisterSkill(uint32_t dwSkillIndex, const char * c_szFileNam
 	{
 		CTokenVector * pConditionDataVector;
 
-		char szConditionData[256];
-		sprintf(szConditionData, "%dconditiondata", LocaleService_GetCodePage());
-
 		bool isConditionData=true;
-		if (!TextFileLoader.GetTokenVector(szConditionData, &pConditionDataVector))
-			if (!TextFileLoader.GetTokenVector("conditiondata", &pConditionDataVector))
-				isConditionData=false;
+		if (!TextFileLoader.GetTokenVector("conditiondata", &pConditionDataVector))
+			isConditionData=false;
 
 		if (isConditionData)
 		{
@@ -655,13 +645,9 @@ bool CPythonSkill::RegisterSkill(uint32_t dwSkillIndex, const char * c_szFileNam
 	{
 		CTokenVector * pAffectDataVector;
 
-		char szAffectData[256];
-		sprintf(szAffectData, "%daffectdata", LocaleService_GetCodePage());
-
 		bool isAffectData=true;
-		if (!TextFileLoader.GetTokenVector(szAffectData, &pAffectDataVector))
-			if (!TextFileLoader.GetTokenVector("affectdata", &pAffectDataVector))
-				isAffectData=false;
+		if (!TextFileLoader.GetTokenVector("affectdata", &pAffectDataVector))
+			isAffectData=false;
 
 		if (isAffectData)
 		{
@@ -681,7 +667,7 @@ bool CPythonSkill::RegisterSkill(uint32_t dwSkillIndex, const char * c_szFileNam
 		CTokenVector * pGradeDataVector;
 
 		char szGradeData[256];
-		sprintf(szGradeData, "%dgradedata", LocaleService_GetCodePage());
+		sprintf(szGradeData, "%dgradedata", 1254);
 
 		if (TextFileLoader.GetTokenVector(szGradeData, &pGradeDataVector))
 		{

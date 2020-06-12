@@ -675,14 +675,6 @@ void CInstanceBase::SetBlendingPosition(const TPixelPosition & c_rPixelPosition)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CInstanceBase::Revive()
-{
-	m_isGoing=FALSE;
-	m_GraphicThingInstance.Revive();
-
-	__AttachHorseSaddle();
-}
-
 void CInstanceBase::Stun()
 {
 	NEW_Stop();

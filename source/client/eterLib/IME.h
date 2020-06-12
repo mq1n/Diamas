@@ -45,7 +45,6 @@ public:
 	void SetUserMax(int iMax);
 	void SetText(const char* c_szText, int len);
 	int GetText(std::string & rstrText, bool addCodePage=false);
-	const char* GetCodePageText();
 	int GetCodePage();
 
 	// Candidate List

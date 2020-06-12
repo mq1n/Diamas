@@ -7,7 +7,6 @@ std::string __SECURITY_KEY_STRING__ = LSS_SECURITY_KEY;
 
 char		MULTI_LOCALE_PATH[256]	= "locale/de";
 char		MULTI_LOCALE_NAME[256]	= "de";
-int32_t		MULTI_LOCALE_CODE		= 1254;
 
 void LocaleService_LoadConfig(const char* fileName)
 {
@@ -25,7 +24,6 @@ void LocaleService_LoadConfig(const char* fileName)
 			if (sscanf(line, "%d %d %s", &id, &code, name) >= 3)
 #pragma warning(default:4996)
 			{
-				MULTI_LOCALE_CODE				= code;
 				strcpy_s(MULTI_LOCALE_NAME, name);
 				sprintf_s(MULTI_LOCALE_PATH, "locale/%s", MULTI_LOCALE_NAME);
 			}
@@ -98,7 +96,6 @@ const char*	LocaleService_GetSecurityKey()
 {
 	return __SECURITY_KEY_STRING__.c_str();
 }
-uint32_t LocaleService_GetCodePage()		{ return MULTI_LOCALE_CODE; }
 const char*	LocaleService_GetLocaleName()		{ return MULTI_LOCALE_NAME; }
 const char*	LocaleService_GetLocalePath()		{ return MULTI_LOCALE_PATH; }
 

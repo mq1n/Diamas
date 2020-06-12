@@ -583,7 +583,7 @@ float CActorInstance::GetMotionDuration(uint32_t dwMotionKey)
 {
 	CGraphicThing * pMotion;
 	
-	if (!GetMotionThingPointer(dwMotionKey, &pMotion))
+	if (!GetMotionThingPointer(dwMotionKey, &pMotion) || !pMotion)
 	{
 		Tracenf("CActorInstance::GetMotionDuration - Cannot get motion: %d / %d",
 			GET_MOTION_MODE(dwMotionKey), GET_MOTION_INDEX(dwMotionKey));

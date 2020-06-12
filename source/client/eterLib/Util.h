@@ -99,15 +99,6 @@ extern D3DXCOLOR TokenToColor(CTokenVector & rVector);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern int32_t CALLBACK EnumFontFamExProc(CONST LOGFONT* plogFont, CONST TEXTMETRIC* textMetric, uint32_t dwWord, LPARAM lParam);
-extern int32_t GetCharsetFromCodePage(uint16_t codePage);
-extern const char* GetFontFaceFromCodePageNT(uint16_t codePage);
-extern const char* GetFontFaceFromCodePage9x(uint16_t codePage);
-extern uint32_t GetDefaultCodePage();
-extern const char * GetDefaultFontFace();
-extern const char*	GetFontFaceFromCodePage(uint16_t codePage);
-extern void SetDefaultFontFace(const char* fontFace);
-extern bool SetDefaultCodePage(uint32_t codePage);
 extern void base64_decode(const char * str,char * resultStr);
 
 extern uint32_t GetMaxTextureWidth();

@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "GrpImage.h"
 
-CGraphicImage::CGraphicImage(const char * c_szFileName, uint32_t dwFilter) : 
-CResource(c_szFileName),
+CGraphicImage::CGraphicImage(const FileSystem::CFileName& filename, uint32_t dwFilter) :
+CResource(filename),
 m_dwFilter(dwFilter)
 {
 	m_rect.bottom = m_rect.right = m_rect.top = m_rect.left = 0;
@@ -66,13 +66,14 @@ bool CGraphicImage::OnLoad(int32_t iSize, const void * c_pvBuf)
 	if (!c_pvBuf)
 		return false;
 
-	m_imageTexture.SetFileName(CResource::GetFileName());
+	m_imageTexture.SetFileName(GetFilename());
 
 	// 특정 컴퓨터에서 Unknown으로 '안'하면 튕기는 현상이 있음-_-; -비엽
 	//@fixme002
 	if (!m_imageTexture.CreateFromMemoryFile(iSize, c_pvBuf, D3DFMT_UNKNOWN, m_dwFilter))
 	{
-		TraceError("CGraphicImage::OnLoad: CreateFromMemoryFile: texture not found(%s)", CResource::GetFileName());
+		const auto& stRefResourceName = CResource::GetFileNameString();
+		TraceError("CGraphicImage::OnLoad: CreateFromMemoryFile: texture not found(%s)", stRefResourceName.c_str());
 		return false;
 	}
 

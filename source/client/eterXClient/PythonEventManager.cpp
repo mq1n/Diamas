@@ -987,16 +987,7 @@ void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int3
 			int32_t textWidth;
 			int32_t textHeight;
 			rEventSet.pCurrentTextLine->GetTextSize(&textWidth,&textHeight);
-			if (GetDefaultCodePage() == CP_1256)
-			{
-				kLine.ixLocal = rEventSet.iWidth;
-				if (iX_pos != 0)
-				{
-					kLine.ixLocal -= iX_pos - 20;
-					kLine.ixLocal += textWidth / 2;
-				}
-			}
-			else
+
 			{
 				kLine.ixLocal = 0;
 				if (iX_pos != 0)
@@ -1042,16 +1033,8 @@ void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int3
 	}
 	else
 	{
-		if (GetDefaultCodePage() == CP_1256)
-		{
-			rEventSet.pCurrentTextLine->SetHorizonalAlign(CGraphicTextInstance::HORIZONTAL_ALIGN_LEFT);
-			rEventSet.pCurrentTextLine->SetPosition(rEventSet.ix + rEventSet.iWidth, rEventSet.iy + rEventSet.iyLocal);
-		}
-		else
-		{
-			rEventSet.pCurrentTextLine->SetHorizonalAlign(CGraphicTextInstance::HORIZONTAL_ALIGN_LEFT);
-			rEventSet.pCurrentTextLine->SetPosition(rEventSet.ix, rEventSet.iy + rEventSet.iyLocal);
-		}		
+		rEventSet.pCurrentTextLine->SetHorizonalAlign(CGraphicTextInstance::HORIZONTAL_ALIGN_LEFT);
+		rEventSet.pCurrentTextLine->SetPosition(rEventSet.ix, rEventSet.iy + rEventSet.iyLocal);	
 	}
 
 	rEventSet.iCurrentLetter = 0;
@@ -1075,10 +1058,7 @@ void CPythonEventManager::RefreshLinePosition(TEventSet * pEventSet)
 	}
 	else
 	{
-		if (GetDefaultCodePage() == CP_1256)
-			ixTextPos = pEventSet->ix+pEventSet->iWidth;
-		else
-			ixTextPos = pEventSet->ix;
+		ixTextPos = pEventSet->ix;
 	}
 	pEventSet->pCurrentTextLine->SetPosition(ixTextPos, pEventSet->iy + pEventSet->iyLocal);
 }

@@ -18,7 +18,7 @@ namespace FileSystem
 			void Set(const std::wstring& path, uint32_t length);
 			void Set(const std::string& path, uint32_t length);
 
-			explicit operator bool() { return (m_path.size() ? true : false); }
+			explicit operator bool() { return (m_pathW.size() ? true : false); }
 			auto& operator=(const wchar_t* path);
 			auto& operator=(const char* path);
 			auto& operator=(const std::wstring& path);
@@ -31,7 +31,8 @@ namespace FileSystem
 			std::string GetPathA() const;
 
 		private:
-			std::wstring m_path;
+			std::wstring m_pathW;
+			std::string m_pathA;
 			uint32_t 	 m_hash;
 	};
 }

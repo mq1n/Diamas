@@ -10,9 +10,7 @@
 class CGraphicFontTexture : public CGraphicTexture
 {
 public:
-	typedef std::pair<uint16_t,wchar_t> TCharacterKey;
-
-	typedef struct SCharacterInfomation
+	typedef struct SCharacterInformation
 	{
 		int16_t index;
 		int16_t width;
@@ -21,10 +19,11 @@ public:
 		float top;
 		float right;
 		float bottom;
+		float prespacing;
 		float advance;
-	} TCharacterInfomation;
+	} TCharacterInformation;
 
-	typedef std::vector<TCharacterInfomation*>		TPCharacterInfomationVector;
+	typedef std::vector<TCharacterInformation*>		TPCharacterInformationVector;
 
 public:
 	CGraphicFontTexture();
@@ -41,8 +40,8 @@ public:
 
 	bool UpdateTexture();
 
-	TCharacterInfomation* GetCharacterInfomation(uint16_t codePage, wchar_t keyValue);
-	TCharacterInfomation* UpdateCharacterInfomation(TCharacterKey code);
+	TCharacterInformation* GetCharacterInformation(wchar_t keyValue);
+	TCharacterInformation* UpdateCharacterInformation(wchar_t keyValue);
 
 	bool IsEmpty() const;
 
@@ -51,12 +50,11 @@ protected:
 
 	bool AppendTexture();
 
-	HFONT GetFont(uint16_t codePage);
+	HFONT GetFont();
 
 protected:		
 	typedef std::vector<CGraphicImageTexture*>				TGraphicImageTexturePointerVector;
-	typedef std::map<TCharacterKey, TCharacterInfomation>	TCharacterInfomationMap;
-	typedef std::map<uint16_t, HFONT>							TFontMap;
+	typedef std::map<wchar_t, TCharacterInformation>	TCharacterInformationMap;
 
 protected:		
 	CGraphicDib	m_dib;
@@ -66,9 +64,7 @@ protected:
 
 	TGraphicImageTexturePointerVector m_pFontTextureVector;
 
-	TCharacterInfomationMap m_charInfoMap;
-
-	TFontMap m_fontMap;
+	TCharacterInformationMap m_charInfoMap;
 
 	int32_t m_x;
 	int32_t m_y;

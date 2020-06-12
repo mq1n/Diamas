@@ -12,7 +12,7 @@ CGraphicSubImage::TType CGraphicSubImage::Type()
 	return s_type;
 }
 
-CGraphicSubImage::CGraphicSubImage(const char* c_szFileName) : CGraphicImage(c_szFileName)
+CGraphicSubImage::CGraphicSubImage(const FileSystem::CFileName& filename) : CGraphicImage(filename)
 {
 }
 
@@ -120,18 +120,18 @@ bool CGraphicSubImage::OnLoad(int32_t iSize, const void* c_pvBuf)
 	if ("2.0"==c_rstVersion)
 	{	
 		const std::string& c_rstSubFileName=GetFileNameString();
-		int32_t nPos=c_rstSubFileName.find_last_of('\\', -1);
+		int32_t nPos=c_rstSubFileName.find_last_of('/', -1);
 		if (nPos>=0)
 		{
 			nPos++;
 			memcpy(szFileName, c_rstSubFileName.c_str(), nPos);
-			szFileName[nPos]='\0';
 			memcpy(szFileName+nPos, c_rstImage.c_str(), c_rstImage.length());
 			szFileName[nPos+c_rstImage.length()]='\0';
 		}
 		else
 		{
 			memcpy(szFileName, c_rstImage.c_str(), c_rstImage.length());
+			szFileName[c_rstImage.length()]='\0';
 		}
 	}
 	else

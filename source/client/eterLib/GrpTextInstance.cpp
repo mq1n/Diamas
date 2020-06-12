@@ -8,8 +8,6 @@
 #include <stdio.h>
 #include <cstdint>
 
-extern uint32_t GetDefaultCodePage();
-
 const float c_fFontFeather = 0.5f;
 
 CDynamicPool<CGraphicTextInstance>		CGraphicTextInstance::ms_kPool;
@@ -31,14 +29,14 @@ int32_t CGraphicTextInstance::Hyperlink_GetText(char* buf, int32_t len)
 	if (gs_hyperlinkText.empty())
 		return 0;
 
-	int32_t codePage = GetDefaultCodePage();
+	int32_t codePage = 1254; CP_UTF8;
 
 	return WideCharToMultiByte(codePage, 0, gs_hyperlinkText.c_str(), gs_hyperlinkText.length(), buf, len, nullptr, nullptr);	
 }
 
-int32_t CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture * pFontTexture, uint16_t codePage, wchar_t text, uint32_t dwColor)
+int32_t CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture * pFontTexture, wchar_t text, uint32_t dwColor)
 {
-	CGraphicFontTexture::TCharacterInfomation* pInsCharInfo = pFontTexture->GetCharacterInfomation(codePage, text);
+	CGraphicFontTexture::TCharacterInformation* pInsCharInfo = pFontTexture->GetCharacterInformation(text);
 
 	if (pInsCharInfo)
 	{
@@ -77,49 +75,6 @@ void CGraphicTextInstance::__GetTextPos(uint32_t index, float* x, float* y)
 	*y = sy;
 }
 
-bool isNumberic(const char chr)
-{
-	if (chr >= '0' && chr <= '9')
-		return true;
-	return false;
-}
-
-bool IsValidToken(const char* iter)
-{
-	return	iter[0]=='@' && 
-		isNumberic(iter[1]) && 
-		isNumberic(iter[2]) && 
-		isNumberic(iter[3]) && 
-		isNumberic(iter[4]);
-}
-
-const char* FindToken(const char* begin, const char* end)
-{
-	while(begin < end)
-	{
-		begin = std::find(begin, end, '@');
-
-		if(end-begin>5 && IsValidToken(begin))
-		{
-			return begin;
-		}
-		else
-		{
-			++begin;
-		}
-	}
-
-	return end;
-}
-
-int32_t ReadToken(const char* token)
-{
-	int32_t nRet = (token[1]-'0')*1000 + (token[2]-'0')*100 + (token[3]-'0')*10 + (token[4]-'0');
-	if (nRet == 9999)
-		return CP_UTF8;
-	return nRet;
-}
-
 void CGraphicTextInstance::Update()
 {
 	if (m_isUpdate) // 문자열이 바뀌었을 때만 업데이트 한다.
@@ -138,11 +93,7 @@ void CGraphicTextInstance::Update()
 	if (!pFontTexture)
 		return;
 
-	uint32_t defCodePage = GetDefaultCodePage();
-
-	uint32_t dataCodePage = defCodePage; // 아랍 및 베트남 내부 데이터를 UTF8 을 사용하려 했으나 실패
-		
-	CGraphicFontTexture::TCharacterInfomation* pSpaceInfo = pFontTexture->GetCharacterInfomation(dataCodePage, ' ');
+	CGraphicFontTexture::TCharacterInformation* pSpaceInfo = pFontTexture->GetCharacterInformation(' ');
 
 	int32_t spaceHeight = pSpaceInfo ? pSpaceInfo->height : 12;
 	
@@ -163,84 +114,68 @@ void CGraphicTextInstance::Update()
 
 	uint32_t dwColor = m_dwTextColor;
 
-	/* wstring end */
-	while (begin < end)
+	auto code_page = 1254; // CP_UTF8;
+	int32_t wTextLen = MultiByteToWideChar(code_page, 0,
+	                                   begin, end - begin,
+	                                   wText, wTextMax);
+
+	if (m_isSecret)
 	{
-		const char * token = FindToken(begin, end);
+		for(int32_t i=0; i<wTextLen; ++i)
+			__DrawCharacter(pFontTexture, '*', dwColor);
+	}
+	else
+	{
+		int32_t x = 0;
+		int32_t len;
+		int32_t hyperlinkStep = 0;
+		SHyperlink kHyperlink;
+		std::wstring hyperlinkBuffer;
 
-		int32_t wTextLen = MultiByteToWideChar(dataCodePage, 0, begin, token - begin, wText, wTextMax);
+		for (int32_t i = 0; i < wTextLen; )
+		{
+			int32_t ret = GetTextTag(&wText[i], wTextLen - i, len, hyperlinkBuffer);
 
-		if (m_isSecret)
-		{
-			for(int32_t i=0; i<wTextLen; ++i)
-				__DrawCharacter(pFontTexture, dataCodePage, '*', dwColor);
-		} 
-		else 
-		{
+			if (ret == TEXT_TAG_PLAIN || ret == TEXT_TAG_TAG)
 			{
-				int32_t x = 0;
-				int32_t len;				
-				int32_t hyperlinkStep = 0;
-				SHyperlink kHyperlink;
-				std::wstring hyperlinkBuffer;
-
-				for (int32_t i = 0; i < wTextLen; )
+				if (hyperlinkStep == 1)
+					hyperlinkBuffer.append(1, wText[i]);
+				else
 				{
-					int32_t ret = GetTextTag(&wText[i], wTextLen - i, len, hyperlinkBuffer);
-
-					if (ret == TEXT_TAG_PLAIN || ret == TEXT_TAG_TAG)
+					int32_t charWidth = __DrawCharacter(pFontTexture, wText[i], dwColor);
+					kHyperlink.ex += charWidth;
+					x += charWidth;
+				}
+			}
+			else
+			{
+				if (ret == TEXT_TAG_COLOR)
+					dwColor = htoi(hyperlinkBuffer.c_str(), 8);
+				else if (ret == TEXT_TAG_RESTORE_COLOR)
+					dwColor = m_dwTextColor;
+				else if (ret == TEXT_TAG_HYPERLINK_START)
+				{
+					hyperlinkStep = 1;
+					hyperlinkBuffer.clear();
+				}
+				else if (ret == TEXT_TAG_HYPERLINK_END)
+				{
+					if (hyperlinkStep == 1)
 					{
-						if (hyperlinkStep == 1)
-							hyperlinkBuffer.append(1, wText[i]);
-						else
-						{
-							int32_t charWidth = __DrawCharacter(pFontTexture, dataCodePage, wText[i], dwColor);
-							kHyperlink.ex += charWidth;
-							x += charWidth;
-						}
+						++hyperlinkStep;
+						kHyperlink.ex = kHyperlink.sx = x; // 실제 텍스트가 시작되는 위치
 					}
 					else
 					{
-						if (ret == TEXT_TAG_COLOR)
-							dwColor = htoi(hyperlinkBuffer.c_str(), 8);
-						else if (ret == TEXT_TAG_RESTORE_COLOR)
-							dwColor = m_dwTextColor;
-						else if (ret == TEXT_TAG_HYPERLINK_START)
-						{
-							hyperlinkStep = 1;
-							hyperlinkBuffer = L"";
-						}
-						else if (ret == TEXT_TAG_HYPERLINK_END)
-						{
-							if (hyperlinkStep == 1)
-							{
-								++hyperlinkStep;
-								kHyperlink.ex = kHyperlink.sx = x; // 실제 텍스트가 시작되는 위치
-							}
-							else
-							{
-								kHyperlink.text = hyperlinkBuffer;
-								m_hyperlinkVector.push_back(kHyperlink);
+						kHyperlink.text = hyperlinkBuffer;
+						m_hyperlinkVector.push_back(kHyperlink);
 
-								hyperlinkStep = 0;
-								hyperlinkBuffer = L"";						
-							}
-						}
+						hyperlinkStep = 0;
+						hyperlinkBuffer.clear();
 					}
-					i += len;
 				}
 			}
-		}
-
-		if (token < end)
-		{			
-			int32_t newCodePage = ReadToken(token);			
-			dataCodePage = newCodePage;	// 아랍 및 베트남 내부 데이터를 UTF8 을 사용하려 했으나 실패
-			begin = token + 5;			
-		}
-		else
-		{
-			begin = token;
+			i += len;
 		}
 	}
 
@@ -265,19 +200,15 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 	float fStanX = m_v3Position.x;
 	float fStanY = m_v3Position.y + 1.0f;
 
-	uint32_t defCodePage = GetDefaultCodePage();
+	switch (m_hAlign)
+	{
+		case HORIZONTAL_ALIGN_RIGHT:
+			fStanX -= m_textWidth;
+			break;
 
-	{	
-		switch (m_hAlign)
-		{
-			case HORIZONTAL_ALIGN_RIGHT:
-				fStanX -= m_textWidth;
-				break;
-
-			case HORIZONTAL_ALIGN_CENTER:
-				fStanX -= float(m_textWidth / 2);
-				break;	
-		}
+		case HORIZONTAL_ALIGN_CENTER:
+			fStanX -= float(m_textWidth / 2);
+			break;
 	}
 
 	switch (m_vAlign)
@@ -329,7 +260,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 		akVertex[2].z=m_v3Position.z;
 		akVertex[3].z=m_v3Position.z;
 
-		CGraphicFontTexture::TCharacterInfomation* pCurCharInfo;		
+		CGraphicFontTexture::TCharacterInformation* pCurCharInfo;
 
 		// 테두리
 		if (m_isOutline)
@@ -338,7 +269,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 			fCurY=fStanY;
 			fFontMaxHeight=0.0f;
 
-			CGraphicFontTexture::TPCharacterInfomationVector::iterator i;
+			CGraphicFontTexture::TPCharacterInformationVector::iterator i;
 			for (i=m_pCharInfoVector.begin(); i!=m_pCharInfoVector.end(); ++i)
 			{
 				pCurCharInfo = *i;
@@ -370,7 +301,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 					}
 				}
 
-				fFontSx = fCurX - 0.5f;
+				fFontSx = fCurX - 0.5f + pCurCharInfo->prespacing;
 				fFontSy = fCurY - 0.5f;
 				fFontEx = fFontSx + fFontWidth;
 				fFontEy = fFontSy + fFontHeight;
@@ -448,7 +379,6 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 		// 메인 폰트
 		fCurX=fStanX;
 		fCurY=fStanY;
-		fFontMaxHeight=0.0f;
 
 		for (int32_t i = 0; i < m_pCharInfoVector.size(); ++i)
 		{
@@ -482,7 +412,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 				}
 			}
 
-			fFontSx = fCurX-0.5f;
+			fFontSx = fCurX - 0.5f + pCurCharInfo->prespacing;
 			fFontSy = fCurY-0.5f;
 			fFontEx = fFontSx + fFontWidth;
 			fFontEy = fFontSy + fFontHeight;
@@ -546,12 +476,10 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 			ex = sx + 2;
 		}
 
-		{
-			sx += m_v3Position.x;
-			sy += m_v3Position.y;
-			ex += m_v3Position.x;
-			ey = sy + m_textHeight;
-		}
+		sx += m_v3Position.x;
+		sy += m_v3Position.y;
+		ex += m_v3Position.x;
+		ey = sy + m_textHeight;
 
 		switch (m_vAlign)
 		{
@@ -796,8 +724,8 @@ const std::string & CGraphicTextInstance::GetValueStringReference()
 
 uint16_t CGraphicTextInstance::GetTextLineCount()
 {
-	CGraphicFontTexture::TCharacterInfomation* pCurCharInfo;
-	CGraphicFontTexture::TPCharacterInfomationVector::iterator itor;
+	CGraphicFontTexture::TCharacterInformation* pCurCharInfo;
+	CGraphicFontTexture::TPCharacterInformationVector::iterator itor;
 
 	float fx = 0.0f;
 	uint16_t wLineCount = 1;
@@ -833,7 +761,7 @@ int32_t CGraphicTextInstance::PixelPositionToCharacterPosition(int32_t iPixelPos
 	int32_t icurPosition = 0;
 	for (int32_t i = 0; i < (int32_t)m_pCharInfoVector.size(); ++i)
 	{
-		CGraphicFontTexture::TCharacterInfomation* pCurCharInfo = m_pCharInfoVector[i];
+		CGraphicFontTexture::TCharacterInformation* pCurCharInfo = m_pCharInfoVector[i];
 		icurPosition += pCurCharInfo->width;
 
 		if (iPixelPosition < icurPosition)
@@ -877,7 +805,7 @@ void CGraphicTextInstance::__Initialize()
 
 void CGraphicTextInstance::Destroy()
 {
-	m_stText="";
+	m_stText.clear();
 	m_pCharInfoVector.clear();
 	m_dwColorInfoVector.clear();
 	m_hyperlinkVector.clear();

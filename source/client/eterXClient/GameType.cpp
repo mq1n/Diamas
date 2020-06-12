@@ -77,7 +77,7 @@ CResource* DefaultItalicFont_GetResource()
 
 void SetGuildSymbolPath(const char * c_szPathName)
 {
-	g_strGuildSymbolPathName = "mark/";
+	g_strGuildSymbolPathName = "guild_logo/";
 	g_strGuildSymbolPathName += c_szPathName;
 	g_strGuildSymbolPathName += "/";
 }

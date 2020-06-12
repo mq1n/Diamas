@@ -142,13 +142,10 @@ namespace UI
 
 			void LockSlot(uint32_t dwIndex);
 			void UnlockSlot(uint32_t dwIndex);
-			BOOL IsLockSlot(uint32_t dwIndex);
 			void SetCantUseSlot(uint32_t dwIndex);
 			void SetUseSlot(uint32_t dwIndex);
-			BOOL IsCantUseSlot(uint32_t dwIndex);
 			void EnableSlot(uint32_t dwIndex);
 			void DisableSlot(uint32_t dwIndex);
-			BOOL IsEnableSlot(uint32_t dwIndex);
 
 			// Select
 			void ClearSelected();

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <d3dx9.h>
 
 #include "../eterlib/GrpScreen.h"
@@ -47,7 +46,7 @@ class CEffectMesh : public CResource
 		static TType Type();
 
 	public:
-		CEffectMesh(const char * c_szFileName);
+		CEffectMesh(const FileSystem::CFileName& filename);
 		virtual ~CEffectMesh();
 
 		uint32_t GetFrameCount();

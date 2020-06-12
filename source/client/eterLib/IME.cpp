@@ -130,9 +130,6 @@ UINT CIME::ms_uOutputCodePage = 0;
 UINT CIME::ms_uInputCodePage = 0;
 
 extern DWORD gs_codePage=0;
-extern uint32_t GetDefaultCodePage();
-extern int ReadToken(const char* token);
-extern const char* FindToken(const char* begin, const char* end);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -419,11 +416,9 @@ int CIME::GetReading(std::string & rstrText)
 	
 	if(ms_wstrReading.size() == 0)
 		return 0;
-	int readingLen = WideCharToMultiByte(ms_uOutputCodePage, 0, &ms_wstrReading[0], ms_wstrReading.size(), reading, sizeof(reading), NULL, NULL);
+	int32_t readingLen = WideCharToMultiByte(ms_uOutputCodePage, 0, &ms_wstrReading[0], ms_wstrReading.size(), reading, sizeof(reading), nullptr, nullptr);
 
-	rstrText.append(GetCodePageText());
 	rstrText.append(reading, reading + readingLen);
-
 	return rstrText.size();
 }
 
@@ -450,15 +445,10 @@ void CIME::SetText(const char* szText, int len)
 
 	const char* begin = szText;
 	const char* end = begin + len;
-	const char* iter = FindToken(begin, end);
 
-	int m_wTextLen = sizeof(m_wText)/sizeof(wchar_t);
+	int32_t m_wTextLen = sizeof(m_wText)/sizeof(wchar_t);
 
-	ms_lastpos = MultiByteToWideChar(ms_uInputCodePage, 0, begin, iter-begin, m_wText, m_wTextLen);
-
-	if (iter < end)
-		ms_lastpos += MultiByteToWideChar(ReadToken(iter), 0, (iter+5), end-(iter+5), m_wText+ms_lastpos, m_wTextLen-ms_lastpos);
-
+	ms_lastpos = MultiByteToWideChar(ms_uInputCodePage, 0, begin, end-begin, m_wText, m_wTextLen);
 	ms_curpos = std::min(ms_curpos, ms_lastpos);
 }
 
@@ -502,25 +492,6 @@ int  CIME::GetText(std::string & rstrText, bool addCodePage)
 	}
 
 	return rstrText.size();
-}
-
-const char* CIME::GetCodePageText()
-{
-	static char szCodePage[16];
-
-	const int defCodePage = GetDefaultCodePage();
-	const int outCodePage = ms_uOutputCodePage;
-
-	if (outCodePage != defCodePage)
-	{
-		sprintf(szCodePage, "@%04d", outCodePage);
-	}
-	else
-	{
-		szCodePage[0] = 0;
-	}
-
-	return szCodePage;
 }
 
 int CIME::GetCodePage()

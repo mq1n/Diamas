@@ -396,16 +396,18 @@ void CGraphicThingInstance::SetMaterialImagePointer(uint32_t ePart, const char* 
 {
 	if (ePart>=m_LODControllerVector.size())
 	{
+		const auto& stRefResourceName = pImage->GetFileNameString();
 		TraceError("CGraphicThingInstance::SetMaterialImagePointer(ePart(%d)<uPartCount(%d), c_szImageName=%s, pImage=%s) - ePart OUT OF RANGE",
-			ePart, m_LODControllerVector.size(), c_szImageName, pImage->GetFileName());
+			ePart, m_LODControllerVector.size(), c_szImageName, stRefResourceName.c_str());
 
 		return;
 	}
 
 	if (!m_LODControllerVector[ePart])
 	{
+		const auto& stRefResourceName = pImage->GetFileNameString();
 		TraceError("CGraphicThingInstance::SetMaterialImagePointer(ePart(%d), c_szImageName=%s, pImage=%s) - ePart Data is nullptr",
-			ePart, m_LODControllerVector.size(), c_szImageName, pImage->GetFileName());
+			ePart, m_LODControllerVector.size(), c_szImageName, stRefResourceName.c_str());
 
 		return;
 	}
@@ -513,7 +515,8 @@ void CGraphicThingInstance::RegisterModelThing(int32_t iModelThing, CGraphicThin
 {
 	if (!CheckModelThingIndex(iModelThing))
 	{
-		TraceError("CGraphicThingInstance::RegisterModelThing(iModelThing=%d, pModelThing=%s)\n", iModelThing, pModelThing ? pModelThing->GetFileName() : "ERR 0x0");
+		const auto& stRefResourceName = pModelThing ? pModelThing->GetFileNameString() : "ERR 0x0";
+		TraceError("CGraphicThingInstance::RegisterModelThing(iModelThing=%d, pModelThing=%s)\n", iModelThing, stRefResourceName.c_str());
 		return;
 	}
 

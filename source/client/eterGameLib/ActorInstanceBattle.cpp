@@ -81,6 +81,9 @@ bool CActorInstance::CanMove()
 
 bool CActorInstance::CanAttack()
 {
+	if (m_fMovSpd == 0)
+		return false;
+
 	if (!CanAct())
 		return false;
 

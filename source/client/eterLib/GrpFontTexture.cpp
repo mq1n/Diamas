@@ -25,7 +25,7 @@ void CGraphicFontTexture::Initialize()
 
 bool CGraphicFontTexture::IsEmpty() const
 {
-	return m_fontMap.size() == 0;
+	return m_hFont == nullptr;
 }
 
 void CGraphicFontTexture::Destroy()
@@ -41,19 +41,8 @@ void CGraphicFontTexture::Destroy()
 	stl_wipe(m_pFontTextureVector);
 	m_charInfoMap.clear();
 
-	if (m_fontMap.size())
-	{
-		TFontMap::iterator i = m_fontMap.begin();
+	DeleteObject((HGDIOBJ)m_hFont);
 
-		while(i != m_fontMap.end())
-		{
-			DeleteObject((HGDIOBJ)i->second);
-			++i;
-		}
-
-		m_fontMap.clear();
-	}
-	
 	Initialize();
 }
 
@@ -89,7 +78,7 @@ bool CGraphicFontTexture::Create(const char* c_szFontName, int32_t fontSize, boo
 
 	HDC hDC = m_dib.GetDCHandle();
 
-	m_hFont = GetFont(GetDefaultCodePage());
+	m_hFont = GetFont();
 
 	m_hFontOld=(HFONT)SelectObject(hDC, m_hFont);
 	SetTextColor(hDC, RGB(255, 255, 255));
@@ -101,45 +90,26 @@ bool CGraphicFontTexture::Create(const char* c_szFontName, int32_t fontSize, boo
 	return true;
 }
 
-
-
-HFONT CGraphicFontTexture::GetFont(uint16_t codePage)
+HFONT CGraphicFontTexture::GetFont()
 {
-	HFONT hFont = nullptr;
-	TFontMap::iterator i = m_fontMap.find(codePage);
+	LOGFONT logFont;
+	memset(&logFont, 0, sizeof(LOGFONT));
 
-	if(i != m_fontMap.end())
-	{
-		hFont = i->second;
-	}
-	else
-	{
-		LOGFONT logFont;
+	logFont.lfHeight			= m_fontSize;
+	logFont.lfEscapement		= 0;
+	logFont.lfOrientation		= 0;
+	logFont.lfWeight			= FW_NORMAL;
+	logFont.lfItalic			= (uint8_t) m_bItalic;
+	logFont.lfUnderline			= FALSE;
+	logFont.lfStrikeOut			= FALSE;
+	logFont.lfCharSet			= DEFAULT_CHARSET;
+	logFont.lfOutPrecision		= OUT_RASTER_PRECIS; // OUT_DEFAULT_PRECIS;
+	logFont.lfClipPrecision		= CLIP_CHARACTER_PRECIS; // CLIP_DEFAULT_PRECIS;
+	logFont.lfQuality			= m_bItalic ? CLEARTYPE_QUALITY : ANTIALIASED_QUALITY;
+	logFont.lfPitchAndFamily	= DEFAULT_PITCH;
+	strcpy(logFont.lfFaceName, m_fontName);
 
-		memset(&logFont, 0, sizeof(LOGFONT));
-
-		logFont.lfHeight			= m_fontSize;
-		logFont.lfEscapement		= 0;
-		logFont.lfOrientation		= 0;
-		logFont.lfWeight			= FW_NORMAL;
-		logFont.lfItalic			= (uint8_t) m_bItalic;
-		logFont.lfUnderline			= FALSE;
-		logFont.lfStrikeOut			= FALSE;
-		logFont.lfCharSet			= GetCharsetFromCodePage(codePage);
-		logFont.lfOutPrecision		= OUT_DEFAULT_PRECIS;
-		logFont.lfClipPrecision		= CLIP_DEFAULT_PRECIS;
-		logFont.lfQuality			= ANTIALIASED_QUALITY;
-		logFont.lfPitchAndFamily	= DEFAULT_PITCH;
-		//Tracenf("font: %s", GetFontFaceFromCodePage(codePage));
-		strcpy(logFont.lfFaceName, m_fontName); //GetFontFaceFromCodePage(codePage));
-		//strcpy(logFont.lfFaceName, GetFontFaceFromCodePage(codePage));
-
-		hFont = CreateFontIndirect(&logFont);
-
-		m_fontMap.insert(TFontMap::value_type(codePage, hFont));
-	}
-
-	return hFont;
+	return CreateFontIndirect(&logFont);
 }
 
 bool CGraphicFontTexture::AppendTexture()
@@ -189,41 +159,66 @@ bool CGraphicFontTexture::UpdateTexture()
 	return true;
 }
 
-CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::GetCharacterInfomation(uint16_t codePage, wchar_t keyValue)
+CGraphicFontTexture::TCharacterInformation* CGraphicFontTexture::GetCharacterInformation(wchar_t keyValue)
 {
-	TCharacterKey code(codePage, keyValue);
-
-	TCharacterInfomationMap::iterator f = m_charInfoMap.find(code);
-
+	TCharacterInformationMap::iterator f = m_charInfoMap.find(keyValue);
 	if (m_charInfoMap.end() == f)
-	{
-		return UpdateCharacterInfomation(code);
-	}
-
-	return &f->second;	
+		return UpdateCharacterInformation(keyValue);
+	else
+		return &f->second;
 }
 
-CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterInfomation(TCharacterKey code)
+CGraphicFontTexture::TCharacterInformation* CGraphicFontTexture::UpdateCharacterInformation(wchar_t keyValue)
 {
 	HDC hDC = m_dib.GetDCHandle();
-	SelectObject(hDC, GetFont(code.first));
-
-	wchar_t keyValue = code.second;
+	SelectObject(hDC, m_hFont);
 
 	if (keyValue == 0x08)
 		keyValue = L' '; // ÅÇÀº °ø¹éÀ¸·Î ¹Ù²Û´Ù (¾Æ¶ø Ãâ·Â½Ã ÅÇ »ç¿ë: NAME:\tTEXT -> TEXT\t:NAME ·Î ÀüÈ¯µÊ )
 
+#if 0
+	// Turkish special characters conversion
+	if (!strcmp(LocaleService_GetLocaleName(), "tr")) {
+		switch (keyValue) {
+			case wchar_t(222):
+				keyValue = 'S';
+				break;
+
+			case wchar_t(254):
+				keyValue = 's';
+				break;
+
+			case wchar_t(208):
+				keyValue = 'G';
+				break;
+
+			case wchar_t(240):
+				keyValue = 'g';
+				break;
+
+			case wchar_t(221):
+				keyValue = 'I';
+				break;
+
+			case wchar_t(253):
+				keyValue = 'i';
+				break;
+		}
+	}
+#endif
+
 	ABCFLOAT	stABC;
 	SIZE		size;
 
-	if (!GetTextExtentPoint32W(hDC, &keyValue, 1, &size) || !GetCharABCWidthsFloatW(hDC, keyValue, keyValue, &stABC))
+	if (!GetTextExtentPoint32W(hDC, &keyValue, 1, &size) ||
+	    !GetCharABCWidthsFloatW(hDC, keyValue, keyValue, &stABC))
 		return nullptr;
 
-	size.cx = stABC.abcfB;
-	if( stABC.abcfA > 0.0f )
-		size.cx += ceilf(stABC.abcfA);
-	if( stABC.abcfC > 0.0f )
-		size.cx += ceilf(stABC.abcfC);
+	size.cx = ceilf(stABC.abcfB);
+	//if( stABC.abcfA != 0.0f )
+	//	size.cx += abs(ceilf(stABC.abcfA));
+	//if( stABC.abcfC != 0.0f )
+	//	size.cx += abs(ceilf(stABC.abcfC));
 	size.cx++;
 
 	LONG lAdvance = ceilf( stABC.abcfA + stABC.abcfB + stABC.abcfC );
@@ -231,10 +226,13 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 	int32_t width = m_dib.GetWidth();
 	int32_t height = m_dib.GetHeight();
 
+	if (m_step < size.cy)
+		m_step = size.cy;
+
 	if (m_x + size.cx >= (width - 1))
 	{
 		m_y += (m_step + 1);
-		m_step = 0;
+		m_step = size.cy;
 		m_x = 0;
 
 		if (m_y + size.cy >= (height - 1))
@@ -251,7 +249,7 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 		}
 	}
 
-	TextOutW(hDC, m_x, m_y, &keyValue, 1);
+	TextOutW(hDC, m_x - stABC.abcfA, m_y, &keyValue, 1);
 		
 	int32_t nChrX;
 	int32_t nChrY;
@@ -269,14 +267,14 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 	{			
 		for (nChrX=0; nChrX<nChrWidth; ++nChrX)
 		{
-			pdwDIBRow[nChrX]=(pdwDIBRow[nChrX]&0xff) ? 0xffff : 0;
+			pdwDIBRow[nChrX]= (pdwDIBRow[nChrX] & 0xf000) | 0xfff;
 		}
 	}
 
 	float rhwidth = 1.0f / float(width);
 	float rhheight = 1.0f / float(height);
 
-	TCharacterInfomation& rNewCharInfo = m_charInfoMap[code];
+	TCharacterInformation& rNewCharInfo = m_charInfoMap[keyValue];
 
 	rNewCharInfo.index = m_pFontTextureVector.size() - 1;
 	rNewCharInfo.width = size.cx;
@@ -285,12 +283,10 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 	rNewCharInfo.top = float(m_y) * rhheight;
 	rNewCharInfo.right = float(m_x+size.cx) * rhwidth;
 	rNewCharInfo.bottom = float(m_y+size.cy) * rhheight;
+	rNewCharInfo.prespacing = stABC.abcfA;
 	rNewCharInfo.advance = (float) lAdvance;
 
 	m_x += size.cx;
-
-	if (m_step < size.cy)
-		m_step = size.cy;	
 
 	m_isDirty = true;
 

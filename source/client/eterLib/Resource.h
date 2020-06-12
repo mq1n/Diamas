@@ -1,7 +1,7 @@
 #pragma once
-
 #include "ReferenceObject.h"
 #include <string>
+#include <FileSystemIncl.hpp>
 
 class CResource : public CReferenceObject
 {
@@ -25,13 +25,12 @@ class CResource : public CReferenceObject
 
 		void			Load();
 		void			Reload();
-		int32_t				ConvertPathName(const char * c_szPathName, char * pszRetPathName, int32_t retLen);
 
 		virtual bool	CreateDeviceObjects();
 		virtual void	DestroyDeviceObjects();
 
 	public:
-		CResource(const char* c_szFileName);
+		CResource(const FileSystem::CFileName& filename);
 		virtual ~CResource();
 
 		static void		SetDeleteImmediately(bool isSet = false);
@@ -41,17 +40,15 @@ class CResource : public CReferenceObject
 		bool			IsEmpty() const;
 		bool			IsType(TType type);
 
-		uint32_t			GetLoadCostMilliSecond()	{ return m_dwLoadCostMiliiSecond;	}
-		//const char *	GetFileName() const			{ return m_pszFileName;				}
-		const char *	GetFileName() const			{ return m_stFileName.c_str();				}
-		const std::string& GetFileNameString() const { return m_stFileName;	}
+		std::string GetFileNameString() const { return m_stFileName.GetPathA(); }
+		const FileSystem::CFileName& GetFilename() const { return m_stFileName; }
 
 		virtual bool	OnLoad(int32_t iSize, const void * c_pvBuf) = 0;
 
 	protected:
-		void			SetFileName(const char* c_szFileName);
+		void			SetFileName(const FileSystem::CFileName& filename);
 
-		virtual void	OnClear() = 0;		
+		virtual void	OnClear() = 0;
 		virtual bool	OnIsEmpty() const = 0;
 		virtual bool	OnIsType(TType type) = 0;
 
@@ -59,9 +56,9 @@ class CResource : public CReferenceObject
 		virtual void	OnSelfDestruct();
 
 	protected:
-		std::string		m_stFileName;
+		FileSystem::CFileName		m_stFileName;
 		//char *			m_pszFileName;
-		uint32_t			m_dwLoadCostMiliiSecond;
+		//uint32_t			m_dwLoadCostMiliiSecond;
 		EState			me_state;
 
 	protected:

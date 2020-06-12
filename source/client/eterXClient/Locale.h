@@ -2,7 +2,6 @@
 
 #include "Locale_inc.h"
 
-uint32_t	LocaleService_GetCodePage();
 const char*	LocaleService_GetLocaleName();
 const char*	LocaleService_GetLocalePath();
 const char*	LocaleService_GetSecurityKey();

@@ -12,7 +12,7 @@ class CGraphicThing : public CResource
 		static CGraphicThing::TType Type();
 
 	public:
-		CGraphicThing(const char * c_szFileName);
+		CGraphicThing(const FileSystem::CFileName& filename);
 		virtual ~CGraphicThing();
 
 		virtual bool			CreateDeviceObjects();

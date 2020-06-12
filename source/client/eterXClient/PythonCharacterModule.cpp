@@ -558,15 +558,6 @@ PyObject * chrDismountHorse(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
-PyObject * chrRevive(PyObject* poSelf, PyObject* poArgs)
-{
-	CInstanceBase * pkInst = CPythonCharacterManager::Instance().GetSelectedInstancePtr();
-	if (!pkInst)
-		return Py_BuildNone();
- 	pkInst->Revive();
-	return Py_BuildNone();
-}
-
 PyObject * chrDie(PyObject* poSelf, PyObject* poArgs)
 {
 	CInstanceBase * pkInst = CPythonCharacterManager::Instance().GetSelectedInstancePtr();
@@ -1327,7 +1318,6 @@ void initchr()
 		{ "SetPixelPosition",			chrSetPixelPosition,				METH_VARARGS },
 		{ "SetDirection",				chrSetDirection,					METH_VARARGS },
 		{ "Refresh",					chrRefresh,							METH_VARARGS },
-		{ "Revive",						chrRevive,							METH_VARARGS },
 		{ "Die",						chrDie,								METH_VARARGS },
 
 		{ "AttachEffectByID",			chrAttachEffectByID,				METH_VARARGS },

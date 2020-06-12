@@ -143,7 +143,8 @@ bool CTextureSet::SetTexture(uint32_t ulIndex,
 
 	if (!pResource->IsType(CGraphicImage::Type()))
 	{
-		TraceError("CTerrainImpl::GenerateTexture : %s is NOT Image File", pResource->GetFileName());
+		const auto& stRefResourceName = pResource->GetFileNameString();
+		TraceError("CTerrainImpl::GenerateTexture : %s is NOT Image File", stRefResourceName.c_str());
 		return false;
 	}
 
@@ -244,7 +245,8 @@ bool CTextureSet::AddTexture(const char * c_szFileName,
 
 	if (!pResource->IsType(CGraphicImage::Type()))
 	{
-		LogBox("CTerrainImpl::GenerateTexture : It's not an image file. %s", pResource->GetFileName());
+		const auto& stRefResourceName = pResource->GetFileNameString();
+		LogBox("CTerrainImpl::GenerateTexture : It's not an image file. %s", stRefResourceName.c_str());
 		return false;
 	}
 	

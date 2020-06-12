@@ -232,6 +232,7 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 
 		void SetParalysis(bool isParalysis);
 		void SetFaint(bool isFaint);
+		void SetReviving(bool isReviving);
 		void SetSleep(bool isSleep);
 		void SetResistFallen(bool isResistFallen);
 
@@ -373,8 +374,7 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		BOOL		NormalAttack(float fDirRot, float fBlendTime = 0.1f);
 		BOOL		ComboAttack(uint32_t wMotionIndex, float fDirRot, float fBlendTime = 0.1f);
 
-		void		Revive();
-
+		BOOL		IsReviving();
 		BOOL		IsSleep();
 		BOOL		IsParalysis();
 		BOOL		IsFaint();
@@ -750,6 +750,7 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 
 		// TODO : State로 통합 시킬 수 있는지 고려해 볼것
 		BOOL						m_isResistFallen;
+		BOOL						m_isReviving;
 		BOOL						m_isSleep;
 		BOOL						m_isFaint;
 		BOOL						m_isParalysis;

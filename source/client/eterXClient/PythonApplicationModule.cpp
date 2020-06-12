@@ -280,7 +280,7 @@ PyObject* appGetLocalePath(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* appGetDefaultCodePage(PyObject* poSelf, PyObject* poArgs)
 {
-	return Py_BuildValue("i", LocaleService_GetCodePage());
+	return Py_BuildValue("i", 1254);
 }
 
 #include <il/il.h>

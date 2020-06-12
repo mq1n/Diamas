@@ -8,9 +8,11 @@
 
 bool CResource::ms_bDeleteImmediately = false;
 
-CResource::CResource(const char* c_szFileName) : me_state(STATE_EMPTY)
+CResource::CResource(const FileSystem::CFileName& filename)
+	: me_state(STATE_EMPTY)
+	, m_stFileName(filename)
 {
-	SetFileName(c_szFileName);
+	// ctor
 }
 
 CResource::~CResource()
@@ -40,32 +42,20 @@ void CResource::Load()
 	if (me_state != STATE_EMPTY)
 		return;
 
-	const char * c_szFileName = GetFileName();
-	
-	if (c_szFileName && c_szFileName[0] == '\0') {
-		me_state = STATE_ERROR;
-		return;
-	}
-
-	uint32_t		dwStart = ELTimer_GetMSec();
-	CFile	file;
-
-	//Tracenf("Load %s", c_szFileName);
-
-	if (FileSystemManager::Instance().OpenFile(c_szFileName, file))
+	CFile file;
+	if (FileSystemManager::Instance().OpenFile(m_stFileName, file))
 	{
-		m_dwLoadCostMiliiSecond = ELTimer_GetMSec() - dwStart;
-		//Tracef("CResource::Load %s (%d bytes) in %d ms\n", c_szFileName, file.GetSize(), m_dwLoadCostMiliiSecond);
-
+		//m_dwLoadCostMiliiSecond = ELTimer_GetMSec() - dwStart;
+		//Tracef("CResource::Load %s (%d bytes) in %d ms\n", c_szFileName, file.Size(), m_dwLoadCostMiliiSecond);
 		if (OnLoad(file.GetSize(), file.GetData()))
 		{
 			me_state = STATE_EXIST;
 		}
 		else
 		{
-			Tracef("CResource::Load Error %s\n", c_szFileName);
+			const auto& stRefResourceName = GetFileNameString();
+			Tracef("CResource::Load Error %s\n", stRefResourceName.c_str());
 			me_state = STATE_ERROR;
-			return;
 		}
 	}
 	else
@@ -74,7 +64,8 @@ void CResource::Load()
 			me_state = STATE_EXIST;
 		else
 		{
-			Tracef("CResource::Load file not exist %s\n", c_szFileName);
+			const auto& stRefResourceName = GetFileNameString();
+			Tracef("CResource::Load file not exist %s\n", stRefResourceName.c_str());
 			me_state = STATE_ERROR;
 		}
 	}
@@ -83,10 +74,11 @@ void CResource::Load()
 void CResource::Reload()
 {
 	Clear();
-	Tracef("CResource::Reload %s\n", GetFileName());
+	const auto& stRefResourceName = GetFileNameString();
+	Tracef("CResource::Reload %s\n", stRefResourceName.c_str());
 
-	CFile	file;
-	if (FileSystemManager::Instance().OpenFile(GetFileName(), file))
+	CFile file;
+	if (FileSystemManager::Instance().OpenFile(m_stFileName, file))
 	{
 		if (OnLoad(file.GetSize(), file.GetData()))
 		{
@@ -114,28 +106,11 @@ CResource::TType CResource::StringToType(const char* c_szType)
 	return GetCRC32(c_szType, strlen(c_szType));
 }
 
-int32_t CResource::ConvertPathName(const char * c_szPathName, char * pszRetPathName, int32_t retLen)
-{
-	const char * pc;
-	int32_t len = 0;
-
-	for (pc = c_szPathName; *pc && len < retLen; ++pc, ++len)
-	{
-		if (*pc == '/')
-			*(pszRetPathName++) = '\\';
-		else
-			*(pszRetPathName++) = (char) ascii_tolower(*pc);
-	}
-
-	*pszRetPathName = '\0';
-	return len;
-}
-
-void CResource::SetFileName(const char* c_szFileName)
+void CResource::SetFileName(const FileSystem::CFileName& filename)
 {
 	// 2004. 2. 1. myevan. 쓰레드가 사용되는 상황에서 static 변수는 사용하지 않는것이 좋다.
 	// 2004. 2. 1. myevan. 파일 이름 처리를 std::string 사용
-	m_stFileName=c_szFileName;
+	m_stFileName = filename;
 }
 
 void CResource::Clear()

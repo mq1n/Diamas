@@ -165,7 +165,8 @@ void CAttributeInstance::RefreshObject(const D3DXMATRIX & c_rmatGlobal)
 
 const char * CAttributeInstance::GetDataFileName() const
 {
-	return m_roAttributeData->GetFileName();
+	auto stResourceName = m_roAttributeData->GetFileNameString();
+	return stResourceName.c_str();
 }
 
 void CAttributeInstance::CreateSystem(uint32_t uCapacity)

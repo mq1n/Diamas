@@ -24,7 +24,7 @@ void CGraphicImageTexture::Initialize()
 {
 	CGraphicTexture::Initialize();
 
-	m_stFileName = "";
+	m_stFileName = FileSystem::CFileName();
 
 	m_d3dFmt=D3DFMT_UNKNOWN;
 	m_dwFilter=0;
@@ -42,7 +42,8 @@ bool CGraphicImageTexture::CreateDeviceObjects()
 	assert(ms_lpd3dDevice != nullptr);
 	assert(m_lpd3dTexture == nullptr);
 
-	if (m_stFileName.empty())
+	const auto& stRefFilename = m_stFileName.GetPathA();
+	if (stRefFilename.empty())
 	{
 		// 폰트 텍스쳐
 		if (FAILED(ms_lpd3dDevice->CreateTexture(m_width, m_height, 1, 0, m_d3dFmt, D3DPOOL_MANAGED, &m_lpd3dTexture, nullptr)))
@@ -57,11 +58,11 @@ bool CGraphicImageTexture::CreateDeviceObjects()
 		//@fixme002
 		if (!CreateFromMemoryFile(mappedFile.GetSize(), mappedFile.GetData(), m_d3dFmt, m_dwFilter))
 		{
-			TraceError("CGraphicImageTexture::CreateDeviceObjects: CreateFromMemoryFile: texture not found(%s)", m_stFileName.c_str());
+			const auto& stRefFilename = m_stFileName.GetPathA();
+			TraceError("CGraphicImageTexture::CreateDeviceObjects: CreateFromMemoryFile: texture not found(%s)", stRefFilename.c_str());
 			return false;
 		}
 		return true;
-		// return CreateFromMemoryFile(mappedFile.GetSize(), mappedFile.GetData(), m_d3dFmt, m_dwFilter);
 	}
 
 	m_bEmpty = false;
@@ -103,24 +104,25 @@ bool CGraphicImageTexture::ConvertTexture(IDirect3DTexture9* pkTexSrc, IDirect3D
 	IDirect3DSurface9* ppsSrc = nullptr;
 	IDirect3DSurface9* ppsDst = nullptr;
 
+	const auto& stRefFilename = m_stFileName.GetPathA();
 	for (int32_t i = 0; i < mipMapCount; ++i) {
 		hr = pkTexSrc->GetSurfaceLevel(i, &ppsSrc);
 		if (FAILED(hr)) {
-			TraceError("CreateDDSTexture: ms_bSupportDXT = false GetSurfaceLevel(ppsSrc) failed (file: %s, mipLevel: %d) Error: %s", m_stFileName.c_str(), i, DXGetErrorString(hr));
+			TraceError("CreateDDSTexture: ms_bSupportDXT = false GetSurfaceLevel(ppsSrc) failed (file: %s, mipLevel: %d) Error: %s", stRefFilename.c_str(), i, DXGetErrorString(hr));
 			failed = true;
 			break;
 		}
 
 		hr = pkTexDst->GetSurfaceLevel(i, &ppsDst);
 		if (FAILED(hr)) {
-			TraceError("CreateDDSTexture: ms_bSupportDXT = false GetSurfaceLevel(ppsDst) failed (file: %s, mipLevel: %d) Error: %s", m_stFileName.c_str(), i, DXGetErrorString(hr));
+			TraceError("CreateDDSTexture: ms_bSupportDXT = false GetSurfaceLevel(ppsDst) failed (file: %s, mipLevel: %d) Error: %s", stRefFilename.c_str(), i, DXGetErrorString(hr));
 			failed = true;
 			break;
 		}
 
 		hr = D3DXLoadSurfaceFromSurface(ppsDst, nullptr, nullptr, ppsSrc, nullptr, nullptr, D3DX_FILTER_NONE, 0);
 		if (FAILED(hr)) {
-			TraceError("CreateDDSTexture: ms_bSupportDXT = false D3DXLoadSurfaceFromSurface failed (file: %s, mipLevel: %d) Error: %s", m_stFileName.c_str(), i, DXGetErrorString(hr));
+			TraceError("CreateDDSTexture: ms_bSupportDXT = false D3DXLoadSurfaceFromSurface failed (file: %s, mipLevel: %d) Error: %s", stRefFilename.c_str(), i, DXGetErrorString(hr));
 			failed = true;
 			break;
 		}
@@ -146,6 +148,8 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage & image, const uint8_t * 
 {
 	int32_t mipmapCount = image.m_dwMipMapCount == 0 ? 1 : image.m_dwMipMapCount;
 
+	const auto& stRefFilename = m_stFileName.GetPathA();
+
 	LPDIRECT3DTEXTURE9 lpd3dTexture;
 	HRESULT hr;
 	D3DPOOL pool = ms_bSupportDXT ? D3DPOOL_MANAGED : D3DPOOL_SCRATCH;;
@@ -153,7 +157,7 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage & image, const uint8_t * 
 	hr = D3DXCreateTexture(ms_lpd3dDevice, image.m_nWidth, image.m_nHeight, mipmapCount, 0, (D3DFORMAT)image.m_xddPixelFormat.dwFourCC, pool, &lpd3dTexture);
 
 	if (FAILED(hr)) {
-		TraceError("CreateDDSTexture: Cannot create texture (file: %s, pool: %d, ms_bSupportDXT: %d) Error: %s", m_stFileName.c_str(), pool, ms_bSupportDXT, DXGetErrorString(hr));
+		TraceError("CreateDDSTexture: Cannot create texture (file: %s, pool: %d, ms_bSupportDXT: %d) Error: %s", stRefFilename.c_str(), pool, ms_bSupportDXT, DXGetErrorString(hr));
 		return false;
 	}
 
@@ -164,7 +168,7 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage & image, const uint8_t * 
 		hr = lpd3dTexture->LockRect(i, &lockedRect, nullptr, 0);
 
 		if (FAILED(hr)) {
-			TraceError("CreateDDSTexture: Cannot lock texture (file: %s, mipmapCount: %d) Error: %s", m_stFileName.c_str(), mipmapCount, DXGetErrorString(hr));
+			TraceError("CreateDDSTexture: Cannot lock texture (file: %s, mipmapCount: %d) Error: %s", stRefFilename.c_str(), mipmapCount, DXGetErrorString(hr));
 			continue;
 		}
 
@@ -191,7 +195,7 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage & image, const uint8_t * 
 		hr = D3DXCreateTexture(ms_lpd3dDevice, imgWidth, imgHeight, mipmapCount, 0, compatFormat , D3DPOOL_MANAGED, &m_lpd3dTexture);
 
 		if (FAILED(hr)) {
-			TraceError("CreateDDSTexture: ms_bSupportDXT = false Cannot create texture (file: %s, compatFormat: %d) Error: %s", m_stFileName.c_str(), compatFormat, DXGetErrorString(hr));
+			TraceError("CreateDDSTexture: ms_bSupportDXT = false Cannot create texture (file: %s, compatFormat: %d) Error: %s", stRefFilename.c_str(), compatFormat, DXGetErrorString(hr));
 			return false;
 		}
 
@@ -217,6 +221,8 @@ bool CGraphicImageTexture::CreateFromMemoryFile(uint32_t bufSize, const void * c
 {
 	assert(ms_lpd3dDevice != nullptr);
 	assert(m_lpd3dTexture == nullptr);
+	
+	const auto& stRefFilename = m_stFileName.GetPathA();
 
 	static CDXTCImage image;
 
@@ -244,7 +250,7 @@ bool CGraphicImageTexture::CreateFromMemoryFile(uint32_t bufSize, const void * c
 	hr = D3DXCreateTextureFromFileInMemoryEx(ms_lpd3dDevice, c_pvBuf, bufSize, width, height, D3DX_DEFAULT, 0, d3dFmt, D3DPOOL_MANAGED, dwFilter, D3DX_DEFAULT, 0xffff00ff, &imageInfo, nullptr, &m_lpd3dTexture);
 
 	if (FAILED(hr)) {
-		TraceError("CreateFromMemoryFile: Non DDS file cannot create texture (file: %s) Error: %s", m_stFileName.c_str(), DXGetErrorString(hr));
+		TraceError("CreateFromMemoryFile: Non DDS file cannot create texture (file: %s) Error: %s", stRefFilename.c_str(), DXGetErrorString(hr));
 		return false;
 	}
 
@@ -271,7 +277,7 @@ bool CGraphicImageTexture::CreateFromMemoryFile(uint32_t bufSize, const void * c
 		hr = D3DXCreateTexture(ms_lpd3dDevice, imageInfo.Width, imageInfo.Height, imageInfo.MipLevels, 0, format, D3DPOOL_MANAGED, &pkTexDst);
 
 		if (FAILED(hr))	{
-			TraceError("CreateFromMemoryFile: Non DDS file IsLowTextureMemory cannot create texture (file: %s) Error: %s", m_stFileName.c_str(), DXGetErrorString(hr));
+			TraceError("CreateFromMemoryFile: Non DDS file IsLowTextureMemory cannot create texture (file: %s) Error: %s", stRefFilename.c_str(), DXGetErrorString(hr));
 			return  false;
 		}
 
@@ -289,9 +295,9 @@ bool CGraphicImageTexture::CreateFromMemoryFile(uint32_t bufSize, const void * c
 	return true;
 }
 
-void CGraphicImageTexture::SetFileName(const char * c_szFileName)
+void CGraphicImageTexture::SetFileName(const FileSystem::CFileName& filename)
 {
-	m_stFileName=c_szFileName;
+	m_stFileName=filename;
 }
 
 bool CGraphicImageTexture::CreateFromDiskFile(const char * c_szFileName, D3DFORMAT d3dFmt, uint32_t dwFilter)

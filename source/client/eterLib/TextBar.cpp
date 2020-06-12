@@ -4,8 +4,6 @@
 
 void CTextBar::__SetFont(int32_t fontSize, bool isBold)
 {
-	int32_t iCodePage = GetDefaultCodePage();
-
 	LOGFONT logFont;
 
 	memset(&logFont, 0, sizeof(LOGFONT));
@@ -22,12 +20,12 @@ void CTextBar::__SetFont(int32_t fontSize, bool isBold)
 	logFont.lfItalic			= FALSE;
 	logFont.lfUnderline			= FALSE;
 	logFont.lfStrikeOut			= FALSE;
-	logFont.lfCharSet			= GetCharsetFromCodePage(iCodePage);
+	logFont.lfCharSet			= DEFAULT_CHARSET;
 	logFont.lfOutPrecision		= OUT_DEFAULT_PRECIS;
 	logFont.lfClipPrecision		= CLIP_DEFAULT_PRECIS;
 	logFont.lfQuality			= ANTIALIASED_QUALITY;
 	logFont.lfPitchAndFamily	= DEFAULT_PITCH;
-	strcpy(logFont.lfFaceName, GetFontFaceFromCodePage(iCodePage));
+	strcpy(logFont.lfFaceName, "Arial");
 	m_hFont = CreateFontIndirect(&logFont);
 
 		
@@ -63,6 +61,7 @@ void CTextBar::OnCreate()
 
 CTextBar::CTextBar(int32_t fontSize, bool isBold)
 {
+	m_hFont = nullptr;
 	m_hOldFont = nullptr;	
 	m_fontSize = fontSize;
 	m_isBold = isBold;

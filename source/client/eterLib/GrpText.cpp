@@ -2,7 +2,7 @@
 #include "../eterBase/Utils.h"
 #include "GrpText.h"
 
-CGraphicText::CGraphicText(const char* c_szFileName) : CResource(c_szFileName)
+CGraphicText::CGraphicText(const FileSystem::CFileName& filename) : CResource(filename)
 {
 }
 
@@ -41,11 +41,12 @@ bool CGraphicText::OnLoad(int32_t /*iSize*/, const void* /*c_pvBuf*/)
 	// 굴림.fnt		"굴림" 폰트 기본 사이즈 12 로 로딩
 	// 굴림:18.fnt  "굴림" 폰트 사이즈 18 로 로딩
 	// 굴림:14i.fnt "굴림" 폰트 사이즈 14 & 이탤릭으로 로딩
-	const char * p = strrchr(GetFileName(), ':');
+	const auto& stRefResourceName = GetFileNameString();
+	const char * p = strrchr(stRefResourceName.c_str(), ':');
 
 	if (p)
 	{
-		strncpy_s(strName, GetFileName(), MIN(31, p - GetFileName()));
+		strncpy_s(strName, stRefResourceName.c_str(), MIN(31, p - stRefResourceName.c_str()));
 		++p;
 
 		static char num[8];
@@ -63,7 +64,7 @@ bool CGraphicText::OnLoad(int32_t /*iSize*/, const void* /*c_pvBuf*/)
 	}
 	else
 	{
-		p = strrchr(GetFileName(), '.');
+		p = strrchr(stRefResourceName.c_str(), '.');
 
 		if (!p)
 		{
@@ -71,7 +72,7 @@ bool CGraphicText::OnLoad(int32_t /*iSize*/, const void* /*c_pvBuf*/)
 			strName[0] = '\0';
 		}
 		else
-			strncpy_s(strName, GetFileName(), MIN(31, p - GetFileName()));
+			strncpy_s(strName, stRefResourceName.c_str(), MIN(31, p - stRefResourceName.c_str()));
 		
 		size = 12;
 	}

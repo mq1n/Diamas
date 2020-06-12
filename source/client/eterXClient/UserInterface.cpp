@@ -300,7 +300,6 @@ int32_t APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 #endif
 
 	LocaleService_LoadConfig("config/locale.cfg");
-	SetDefaultCodePage(LocaleService_GetCodePage());
 
 	WebBrowser_Startup(hInstance);
 

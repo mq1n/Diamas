@@ -52,7 +52,7 @@ my_file_info* GetMyFileInfo(granny_file* File)
 
 }
 
-CGraphicThing::CGraphicThing(const char* c_szFileName) : CResource(c_szFileName)
+CGraphicThing::CGraphicThing(const FileSystem::CFileName& filename) : CResource(filename)
 {
 	Initialize();	
 }
@@ -133,7 +133,8 @@ bool CGraphicThing::CheckModelIndex(int32_t iModel) const
 {
 	if (!m_pgrnFileInfo)
 	{
-		Tracef("m_pgrnFileInfo == nullptr: %s\n", GetFileName());
+		const auto& stRefResourceName = GetFileNameString();
+		Tracef("m_pgrnFileInfo == nullptr: %s\n", stRefResourceName.c_str());
 		return false;
 	}
 
