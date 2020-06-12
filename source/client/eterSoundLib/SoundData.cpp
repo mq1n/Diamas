@@ -16,7 +16,7 @@ void CSoundData::Assign(const char* filename)
 {
 	assert(m_assigned == false);
 
-	strncpy(m_filename, filename, sizeof(m_filename)-1);
+	strncpy_s(m_filename, filename, sizeof(m_filename)-1);
 	m_assigned = true;
 }
 
@@ -39,7 +39,7 @@ LPVOID CSoundData::Get()
 	return m_data;
 }
  
-DWORD CSoundData::GetSize()
+ULONG CSoundData::GetSize()
 {
 	return m_size;
 }
@@ -69,9 +69,6 @@ uint32_t CSoundData::GetAccessTime()
 bool CSoundData::ReadFromDisk()
 {
 	assert(m_assigned == true);
-
-	LARGE_INTEGER start;
-	QueryPerformanceCounter(&start);
 
 	U32* s = (U32 *) AIL_file_read(m_filename, FILE_READ_WITH_SIZE);
 
@@ -202,13 +199,13 @@ void CSoundData::Destroy()
 }
 
 CSoundData::CSoundData() : 
-m_assigned(false),
-m_iRefCount(0),
-m_dwPlayTime(0),
-m_dwAccessTime(ELTimer_GetMSec()),
-m_size(0),
-m_data(nullptr),
-m_flag(0)
+	m_iRefCount(0),
+	m_dwAccessTime(ELTimer_GetMSec()),
+	m_dwPlayTime(0),
+	m_size(0),
+	m_data(nullptr),
+	m_flag(0),
+	m_assigned(false)
 {
 }
 

@@ -2,6 +2,7 @@
 #include "PythonWindow.h"
 #include "PythonSlotWindow.h"
 #include "PythonGridSlotWindow.h"
+#include "../eterXClient/PythonRenderTargetManager.h"
 
 bool PyTuple_GetWindow(PyObject* poArgs, int32_t pos, UI::CWindow ** ppRetWindow)
 {
@@ -279,6 +280,20 @@ PyObject * wndMgrRegisterNumberLine(PyObject * poSelf, PyObject * poArgs)
 	UI::CWindow * pWindow = UI::CWindowManager::Instance().RegisterNumberLine(po, szLayer);
 	return Py_BuildValue("i", pWindow);
 }
+
+PyObject * wndMgrRegisterRenderTarget(PyObject * poSelf, PyObject * poArgs)
+{
+	PyObject * po;
+	if (!PyTuple_GetObject(poArgs, 0, &po))
+		return Py_BuildException();
+	char * szLayer;
+	if (!PyTuple_GetString(poArgs, 1, &szLayer))
+		return Py_BuildException();
+
+	UI::CWindow * pWindow = UI::CWindowManager::Instance().RegisterRenderTarget(po, szLayer);
+	return Py_BuildValue("i", pWindow);
+}
+
 ///// Register /////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1363,6 +1378,30 @@ PyObject * wndMgrSetSlotCount(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
+PyObject * wndMgrSetSlotBackground(PyObject * poSelf, PyObject * poArgs)
+{
+	UI::CWindow * pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	int32_t iSlotIndex;
+	if (!PyTuple_GetInteger(poArgs, 1, &iSlotIndex))
+		return Py_BuildException();
+	
+	char * szFileName;
+	if (!PyTuple_GetString(poArgs, 2, &szFileName))
+		return Py_BuildException();
+
+
+	if (!pWin->IsType(UI::CSlotWindow::Type()))
+		return Py_BuildException();
+
+	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWin;
+	pSlotWin->SetSlotBackground(iSlotIndex, szFileName);
+
+	return Py_BuildNone();
+}
+
 PyObject * wndMgrSetSlotCountNew(PyObject * poSelf, PyObject * poArgs)
 {
 	UI::CWindow * pWin;
@@ -1386,6 +1425,29 @@ PyObject * wndMgrSetSlotCountNew(PyObject * poSelf, PyObject * poArgs)
 
 	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWin;
 	pSlotWin->SetSlotCountNew(iSlotIndex, iGrade, iCount);
+
+	return Py_BuildNone();
+}
+
+PyObject * wndMgrSetRealSlotNumber(PyObject * poSelf, PyObject * poArgs)
+{
+	UI::CWindow * pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	int32_t iSlotIndex;
+	if (!PyTuple_GetInteger(poArgs, 1, &iSlotIndex))
+		return Py_BuildException();
+
+	int32_t iRealSlotNumber;
+	if (!PyTuple_GetInteger(poArgs, 2, &iRealSlotNumber))
+		return Py_BuildException();
+
+	if (!pWin->IsType(UI::CSlotWindow::Type()))
+		return Py_BuildException();
+
+	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWin;
+	pSlotWin->SetRealSlotNumber(iSlotIndex, iRealSlotNumber);
 
 	return Py_BuildNone();
 }
@@ -1527,6 +1589,25 @@ PyObject * wndMgrHideSlotBaseImage(PyObject * poSelf, PyObject * poArgs)
 
 	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWin;
 	pSlotWin->HideSlotBaseImage(iSlotIndex);
+	return Py_BuildNone();
+}
+
+PyObject * wndMgrSetWindowType(PyObject * poSelf, PyObject * poArgs)
+{
+	UI::CWindow * pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	int32_t iType;
+	if (!PyTuple_GetInteger(poArgs, 1, &iType))
+		return Py_BuildException();
+
+	if (!pWin->IsType(UI::CSlotWindow::Type()))
+		return Py_BuildException();
+
+	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWin;
+	pSlotWin->SetWindowType(iType);
+
 	return Py_BuildNone();
 }
 
@@ -1699,26 +1780,26 @@ PyObject * wndBarSetColor(PyObject * poSelf, PyObject * poArgs)
 	UI::CWindow * pWindow;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
 		return Py_BuildException();
-	int32_t iColor;
-	if (!PyTuple_GetInteger(poArgs, 1, &iColor))
+	uint32_t dwColor;
+	if (!PyTuple_GetUnsignedLong(poArgs, 1, &dwColor))
 		return Py_BuildException();
 
 	if (pWindow->IsType(UI::CBar3D::Type()))
 	{
-		int32_t iLeftColor = iColor;
+		uint32_t dwLeftColor = dwColor;
 
-		int32_t iRightColor;
-		if (!PyTuple_GetInteger(poArgs, 2, &iRightColor))
+		uint32_t dwRightColor;
+		if (!PyTuple_GetUnsignedLong(poArgs, 2, &dwRightColor))
 			return Py_BuildException();
-		int32_t iCenterColor;
-		if (!PyTuple_GetInteger(poArgs, 3, &iCenterColor))
+		uint32_t dwCenterColor;
+		if (!PyTuple_GetUnsignedLong(poArgs, 3, &dwCenterColor))
 			return Py_BuildException();
 
-		((UI::CBar3D *)pWindow)->SetColor(iLeftColor, iRightColor, iCenterColor);
+		((UI::CBar3D *)pWindow)->SetColor(dwLeftColor, dwRightColor, dwCenterColor);
 	}
 	else
 	{
-		((UI::CWindow *)pWindow)->SetColor(iColor);
+		((UI::CWindow *)pWindow)->SetColor(dwColor);
 	}
 	return Py_BuildNone();
 }
@@ -1742,6 +1823,16 @@ PyObject * wndMgrAttachIcon(PyObject * poSelf, PyObject * poArgs)
 		return Py_BuildException();
 
 	UI::CWindowManager::Instance().AttachIcon(iType, iIndex, iSlotNumber, iWidth, iHeight);
+	return Py_BuildNone();
+}
+
+PyObject * wndMgrSetAttachingRealSlotNumber(PyObject * poSelf, PyObject * poArgs)
+{
+	int32_t iRealSlotNumber;
+	if (!PyTuple_GetInteger(poArgs, 0, &iRealSlotNumber))
+		return Py_BuildException();
+
+	UI::CWindowManager::Instance().SetAttachingRealSlotNumber(iRealSlotNumber);
 	return Py_BuildNone();
 }
 
@@ -1866,10 +1957,10 @@ PyObject * wndTextSetFontColor(PyObject * poSelf, PyObject * poArgs)
 
 	if (2 == PyTuple_Size(poArgs))
 	{
-		int32_t iColor;
-		if (!PyTuple_GetInteger(poArgs, 1, &iColor))
+		uint32_t dwColor;
+		if (!PyTuple_GetUnsignedLong(poArgs, 1, &dwColor))
 			return Py_BuildException();
-		((UI::CTextLine*)pWindow)->SetFontColor(iColor);
+		((UI::CTextLine*)pWindow)->SetFontColor(dwColor);
 	}
 	else if (4 == PyTuple_Size(poArgs))
 	{
@@ -2599,7 +2690,6 @@ PyObject * wndMgrDeactivateEffect(PyObject * poSelf, PyObject * poArgs)
 }
 #endif
 
-
 PyObject * wndButtonOver(PyObject * poSelf, PyObject * poArgs)
 {
 	UI::CWindow * pWindow;
@@ -2611,13 +2701,140 @@ PyObject * wndButtonOver(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
-PyObject * wndMgrSetAttachingRealSlotNumber(PyObject * poSelf, PyObject * poArgs)
-{
-	int32_t iRealSlotNumber;
-	if (!PyTuple_GetInteger(poArgs, 0, &iRealSlotNumber))
+
+PyObject* wndMgrSetRenderTarget(PyObject* poSelf, PyObject* poArgs) {
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
 		return Py_BuildException();
 
-	UI::CWindowManager::Instance().SetAttachingRealSlotNumber(iRealSlotNumber);
+	int32_t render_index;
+	if (!PyTuple_GetInteger(poArgs, 1, &render_index))
+		return Py_BuildException();
+
+	char* background_image;
+	if (!PyTuple_GetString(poArgs, 2, &background_image))
+		return Py_BuildException();
+
+	UI::CRenderTarget* pRenderTarget = (UI::CRenderTarget*) pWindow;
+	pRenderTarget->SetRenderTarget(render_index, background_image);
+	return Py_BuildNone();
+}
+
+PyObject* wndMgrShowRenderTarget(PyObject* poSelf, PyObject* poArgs) {
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+
+	UI::CRenderTarget* pRenderTarget = (UI::CRenderTarget*) pWindow;
+	pRenderTarget->Show();
+	return Py_BuildNone();
+}
+
+PyObject* wndMgrHideRenderTarget(PyObject* poSelf, PyObject* poArgs) {
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+
+	UI::CRenderTarget* pRenderTarget = (UI::CRenderTarget*) pWindow;
+	pRenderTarget->Hide();
+	return Py_BuildNone();
+}
+
+PyObject* wndMgrSetRenderTargetRace(PyObject* poSelf, PyObject* poArgs) {
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+
+	int32_t race_vnum;
+	if (!PyTuple_GetInteger(poArgs, 1, &race_vnum))
+		return Py_BuildException();
+
+	UI::CRenderTarget* pRenderTarget = (UI::CRenderTarget*) pWindow;
+	pRenderTarget->SetRace(race_vnum);
+	return Py_BuildNone();
+}
+
+PyObject* wndMgrSetRenderTargetRotation(PyObject* poSelf, PyObject* poArgs) {
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+
+	float value;
+	if (!PyTuple_GetFloat(poArgs, 1, &value))
+		return Py_BuildException();
+
+	UI::CRenderTarget* pRenderTarget = (UI::CRenderTarget*) pWindow;
+	pRenderTarget->SetRotation(value);
+	return Py_BuildNone();
+}
+
+PyObject* wndMgrSetRenderTargetArmor(PyObject* poSelf, PyObject* poArgs) {
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+
+	int32_t armor;
+	if (!PyTuple_GetInteger(poArgs, 1, &armor))
+		return Py_BuildException();
+
+	UI::CRenderTarget* pRenderTarget = (UI::CRenderTarget*) pWindow;
+	pRenderTarget->SetArmor(armor);
+	return Py_BuildNone();
+}
+
+PyObject* wndMgrSetRenderTargetHair(PyObject* poSelf, PyObject* poArgs) {
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+
+	int32_t hair;
+	if (!PyTuple_GetInteger(poArgs, 1, &hair))
+		return Py_BuildException();
+
+	UI::CRenderTarget* pRenderTarget = (UI::CRenderTarget*) pWindow;
+	pRenderTarget->SetHair(hair);
+	return Py_BuildNone();
+}
+
+PyObject* wndMgrSetRenderTargetWeapon(PyObject* poSelf, PyObject* poArgs) {
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+
+	int32_t weapon;
+	if (!PyTuple_GetInteger(poArgs, 1, &weapon))
+		return Py_BuildException();
+
+	UI::CRenderTarget* pRenderTarget = (UI::CRenderTarget*) pWindow;
+	pRenderTarget->SetWeapon(weapon);
+	return Py_BuildNone();
+}
+
+PyObject* wndMgrSetRenderTargetMotion(PyObject* poSelf, PyObject* poArgs) {
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+
+	uint32_t motion_index;
+	if (!PyTuple_GetUnsignedLong(poArgs, 1, &motion_index))
+		return Py_BuildException();
+
+	UI::CRenderTarget* pRenderTarget = (UI::CRenderTarget*) pWindow;
+	pRenderTarget->SetMotion(motion_index);
+	return Py_BuildNone();
+}
+
+PyObject* wndMgrSetRenderTargetAlwaysRotate(PyObject* poSelf, PyObject* poArgs) {
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+
+	bool rotate;
+	if (!PyTuple_GetBoolean(poArgs, 1, &rotate))
+		return Py_BuildException();
+
+	UI::CRenderTarget* pRenderTarget = (UI::CRenderTarget*) pWindow;
+	pRenderTarget->SetAlwaysRotate(rotate);
 	return Py_BuildNone();
 }
 
@@ -2635,6 +2852,7 @@ void initwndMgr()
 		{ "AttachIcon",					wndMgrAttachIcon,					METH_VARARGS },
 		{ "DeattachIcon",				wndMgrDeattachIcon,					METH_VARARGS },
 		{ "SetAttachingFlag",			wndMgrSetAttachingFlag,				METH_VARARGS },
+		{ "SetAttachingRealSlotNumber", wndMgrSetAttachingRealSlotNumber,	METH_VARARGS },
 		{ "GetAspect",					wndMgrGetAspect,					METH_VARARGS },
 		{ "GetHyperlink",				wndMgrGetHyperlink,					METH_VARARGS },
 		{ "OnceIgnoreMouseLeftButtonUpEvent",	wndMgrOnceIgnoreMouseLeftButtonUpEvent,		METH_VARARGS },
@@ -2657,6 +2875,7 @@ void initwndMgr()
 		{ "RegisterLine",				wndMgrRegisterLine,					METH_VARARGS },
 		{ "RegisterBar3D",				wndMgrRegisterBar3D,				METH_VARARGS },
 		{ "RegisterNumberLine",			wndMgrRegisterNumberLine,			METH_VARARGS },
+		{ "RegisterRenderTarget",		wndMgrRegisterRenderTarget,			METH_VARARGS },
 		{ "Destroy",					wndMgrDestroy,						METH_VARARGS },
 		{ "AddFlag",					wndMgrAddFlag,						METH_VARARGS },
 		{ "IsRTL",						wndMgrIsRTL,						METH_VARARGS },
@@ -2716,6 +2935,7 @@ void initwndMgr()
 		{ "AppendImageScale",			wndImageAppendImageScale,			METH_VARARGS },
 		{ "SetSlotCount",				wndMgrSetSlotCount,					METH_VARARGS },
 		{ "SetSlotCountNew",			wndMgrSetSlotCountNew,				METH_VARARGS },
+		{ "SetSlotRealNumber",			wndMgrSetRealSlotNumber,			METH_VARARGS },
 		{ "SetSlotCoolTime",			wndMgrSetSlotCoolTime,				METH_VARARGS },
 		{ "SetToggleSlot",				wndMgrSetToggleSlot,				METH_VARARGS },
 		{ "ActivateSlot",				wndMgrActivateSlot,					METH_VARARGS },
@@ -2724,6 +2944,7 @@ void initwndMgr()
 		{ "DisableSlot",				wndMgrDisableSlot,					METH_VARARGS },
 		{ "ShowSlotBaseImage",			wndMgrShowSlotBaseImage,			METH_VARARGS },
 		{ "HideSlotBaseImage",			wndMgrHideSlotBaseImage,			METH_VARARGS },
+		{ "SetWindowType",				wndMgrSetWindowType,				METH_VARARGS },
 		{ "SetSlotType",				wndMgrSetSlotType,					METH_VARARGS },
 		{ "SetSlotStyle",				wndMgrSetSlotStyle,					METH_VARARGS },
 		{ "SetSlotBaseImage",			wndMgrSetSlotBaseImage,				METH_VARARGS },
@@ -2820,6 +3041,9 @@ void initwndMgr()
 		{ "SetUp",						wndButtonSetUp,						METH_VARARGS },
 		{ "IsDown",						wndButtonIsDown,					METH_VARARGS },
 
+		// Background
+		{ "SetSlotBackground",			wndMgrSetSlotBackground,			METH_VARARGS },
+
 		// DragButton
 		{ "SetRestrictMovementArea",	wndButtonSetRestrictMovementArea,	METH_VARARGS },
 
@@ -2837,6 +3061,17 @@ void initwndMgr()
 		{"DeactivateEffect",			wndMgrDeactivateEffect,				METH_VARARGS },
 #endif
 
+		{ "SetRenderTarget",				wndMgrSetRenderTarget,				METH_VARARGS },
+		{ "ShowRenderTarget",				wndMgrShowRenderTarget,				METH_VARARGS },
+		{ "HideRenderTarget",				wndMgrHideRenderTarget,				METH_VARARGS },
+		{ "SetRenderTargetRace",			wndMgrSetRenderTargetRace,			METH_VARARGS },
+		{ "SetRenderTargetRotation",		wndMgrSetRenderTargetRotation,		METH_VARARGS },
+		{ "SetRenderTargetArmor",			wndMgrSetRenderTargetArmor,			METH_VARARGS },
+		{ "SetRenderTargetHair",			wndMgrSetRenderTargetHair,			METH_VARARGS },
+		{ "SetRenderTargetWeapon",			wndMgrSetRenderTargetWeapon,		METH_VARARGS },
+		{ "SetRenderTargetMotion",			wndMgrSetRenderTargetMotion,		METH_VARARGS },
+		{ "SetRenderTargetAlwaysRotate",	wndMgrSetRenderTargetAlwaysRotate,	METH_VARARGS },
+
 		{ nullptr,							nullptr,								0 },
 	};
 
@@ -2846,6 +3081,9 @@ void initwndMgr()
 //	PyObject * poMgrModule = Py_InitModule("wndMgr", s_methods);
 //	PyObject * poTextModule = Py_InitModule("wndText", s_methods);
 //	PyObject * poSlotModule = Py_InitModule("wndSlot", s_methods);
+
+	PyModule_AddIntConstant(poModule, "SLOT_WND_DEFAULT",			UI::SLOT_WND_DEFAULT);
+	PyModule_AddIntConstant(poModule, "SLOT_WND_INVENTORY",			UI::SLOT_WND_INVENTORY);
 
 	PyModule_AddIntConstant(poModule, "SLOT_STYLE_NONE",				UI::SLOT_STYLE_NONE);
 	PyModule_AddIntConstant(poModule, "SLOT_STYLE_PICK_UP",				UI::SLOT_STYLE_PICK_UP);
@@ -2866,4 +3104,8 @@ void initwndMgr()
 	PyModule_AddIntConstant(poModule, "VERTICAL_ALIGN_BOTTOM",			UI::CWindow::VERTICAL_ALIGN_BOTTOM);
 
 	PyModule_AddIntConstant(poModule, "RENDERING_MODE_MODULATE",		CGraphicExpandedImageInstance::RENDERING_MODE_MODULATE);
+
+	PyModule_AddIntConstant(poModule, "RENDER_TYPE_SHOP_DECO",			CPythonRenderTargetManager::RENDER_TYPE_SHOP_DECO);
+	PyModule_AddIntConstant(poModule, "RENDER_TYPE_COSTUME_INVENTORY",	CPythonRenderTargetManager::RENDER_TYPE_COSTUME_INVENTORY);
+	PyModule_AddIntConstant(poModule, "RENDER_TYPE_ITEM_TOOLTIP",		CPythonRenderTargetManager::RENDER_TYPE_ITEM_TOOLTIP);
 }

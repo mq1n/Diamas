@@ -26,7 +26,7 @@ struct D3D_SModeInfo
 class D3D_CAdapterDisplayModeList
 {
 	public:
-		D3D_CAdapterDisplayModeList() {}
+		D3D_CAdapterDisplayModeList(): m_uD3DDMNum(0), m_uD3DFmtNum(0)	{}
 		~D3D_CAdapterDisplayModeList() {}
 		VOID Build(IDirect3D9& rkD3D, D3DFORMAT eD3DFmtDefault, uint32_t iAdapter);
 
@@ -58,7 +58,8 @@ class D3D_CAdapterDisplayModeList
 class D3D_CDeviceInfo
 {
 	public:
-		D3D_CDeviceInfo() {}
+		D3D_CDeviceInfo(): m_szDevDesc(nullptr), m_eD3DDevType(), m_iCurD3DModeInfo(0), m_uD3DModeInfoNum(0), m_isWindowed(0), m_eD3DMSTWindowed(), m_eD3DMSTFullscreen()
+		{}
 		~D3D_CDeviceInfo() {}
 		BOOL Build(IDirect3D9& rkD3D, uint32_t iAdapter, uint32_t iDevType, D3D_CAdapterDisplayModeList& rkD3DADMList, PFNCONFIRMDEVICE pfnConfirmDevice);
 		BOOL Find(uint32_t uScrWidth, uint32_t uScrHeight, uint32_t uScrDepthBits, BOOL isWindowed, uint32_t* piD3DModeInfo);	
@@ -69,7 +70,6 @@ class D3D_CDeviceInfo
 		
 		BOOL FindDepthStencilFormat(IDirect3D9& rkD3D, uint32_t iAdapter, D3DDEVTYPE DeviceType, D3DFORMAT TargetFormat, D3DFORMAT* pDepthStencilFormat);
 
-		D3D_SModeInfo& GetD3DModeInfor(uint32_t iD3DModeInfo);
 		D3D_SModeInfo* GetD3DModeInfop(uint32_t iD3DModeInfo);
 				
 	protected:
@@ -84,7 +84,6 @@ class D3D_CDeviceInfo
 
 		D3DDEVTYPE	m_eD3DDevType;
 		D3DCAPS9	m_kD3DCaps; 			
-		BOOL		m_canDoWindowed;
 
 		uint32_t		m_iCurD3DModeInfo;
 		uint32_t		m_uD3DModeInfoNum;
@@ -105,7 +104,8 @@ class D3D_CDeviceInfo
 class D3D_CAdapterInfo
 {
 	public:
-		D3D_CAdapterInfo() {}
+		D3D_CAdapterInfo(): m_iCurD3DDevInfo(0), m_uD3DDevInfoNum(0)
+		{}
 		~D3D_CAdapterInfo() {}
 		BOOL Find(uint32_t uScrWidth, uint32_t uScrHeight, uint32_t uScrDepthBits, BOOL isWindowed, uint32_t* piD3DModeInfo, uint32_t* piD3DDevInfo);
 

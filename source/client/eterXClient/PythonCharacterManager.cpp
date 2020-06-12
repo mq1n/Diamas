@@ -86,7 +86,7 @@ void CPythonCharacterManager::RemovePVPKey(uint32_t dwVIDSrc, uint32_t dwVIDDst)
 void CPythonCharacterManager::ChangeGVG(uint32_t dwSrcGuildID, uint32_t dwDstGuildID)
 {
 	TCharacterInstanceMap::iterator itor;
-	for (itor = m_kAliveInstMap.begin(); itor != m_kAliveInstMap.end(); itor++)
+	for (itor = m_kAliveInstMap.begin(); itor != m_kAliveInstMap.end(); ++itor)
 	{
 		CInstanceBase * pInstance = itor->second;
 
@@ -125,7 +125,7 @@ void CPythonCharacterManager::GetInfo(std::string* pstInfo)
 	CInstanceBase::GetInfo(pstInfo);
 
 	char szInfo[256];
-	sprintf(szInfo, "Container - Live %d, Dead %d", m_kAliveInstMap.size(), m_kDeadInstList.size());
+	sprintf_s(szInfo, "Container - Live %u, Dead %u", m_kAliveInstMap.size(), m_kDeadInstList.size());
 	pstInfo->append(szInfo);
 }
 
@@ -351,29 +351,11 @@ void CPythonCharacterManager::UpdateDeleting()
 	}
 }
 
-struct FCharacterManagerCharacterInstanceDeform
-{
-	inline void operator () (const std::pair<uint32_t,CInstanceBase *>& cr_Pair)
-	{
-		cr_Pair.second->Deform();
-		//pInstance->Update();
-	}
-};
-struct FCharacterManagerCharacterInstanceListDeform
-{
-	inline void operator () (CInstanceBase * pInstance)
-	{
-		pInstance->Deform();
-	}
-};
-
 void CPythonCharacterManager::Deform()
 {
-	std::for_each(m_kAliveInstMap.begin(), m_kAliveInstMap.end(), FCharacterManagerCharacterInstanceDeform());
-	std::for_each(m_kDeadInstList.begin(), m_kDeadInstList.end(), FCharacterManagerCharacterInstanceListDeform());
+	std::for_each(m_kAliveInstMap.begin(), m_kAliveInstMap.end(), [](const std::pair<uint32_t, CInstanceBase *>& cr_Pair) { cr_Pair.second->Deform(); });
+	std::for_each(m_kDeadInstList.begin(), m_kDeadInstList.end(), [](CInstanceBase * pInstance) { pInstance->Deform(); });
 }
-
-
 
 
 bool CPythonCharacterManager::OLD_GetPickedInstanceVID(uint32_t* pdwPickedActorID)
@@ -419,37 +401,6 @@ bool CPythonCharacterManager::IsDeadVID(uint32_t dwVID)
 	return false;
 }
 
-struct LessCharacterInstancePtrRenderOrder
-{
-	bool operator() (CInstanceBase* pkLeft, CInstanceBase* pkRight)
-	{
-		return pkLeft->LessRenderOrder(pkRight);		
-	}
-};
-
-struct FCharacterManagerCharacterInstanceRender
-{
-	inline void operator () (const std::pair<uint32_t,CInstanceBase *>& cr_Pair)
-	{
-		cr_Pair.second->Render();
-		cr_Pair.second->RenderTrace();
-	}
-};
-struct FCharacterInstanceRender
-{
-	inline void operator () (CInstanceBase * pInstance)
-	{
-		pInstance->Render();
-	}
-};
-struct FCharacterInstanceRenderTrace
-{
-	inline void operator () (CInstanceBase * pInstance)
-	{
-		pInstance->RenderTrace();
-	}
-};
-
 
 void CPythonCharacterManager::__RenderSortedAliveActorList()
 {
@@ -461,9 +412,8 @@ void CPythonCharacterManager::__RenderSortedAliveActorList()
 	for (i=rkMap_pkInstAlive.begin(); i!=rkMap_pkInstAlive.end(); ++i)
 		s_kVct_pkInstAliveSort.push_back(i->second);
 
-	std::sort(s_kVct_pkInstAliveSort.begin(), s_kVct_pkInstAliveSort.end(), LessCharacterInstancePtrRenderOrder());
-	std::for_each(s_kVct_pkInstAliveSort.begin(), s_kVct_pkInstAliveSort.end(), FCharacterInstanceRender());
-	std::for_each(s_kVct_pkInstAliveSort.begin(), s_kVct_pkInstAliveSort.end(), FCharacterInstanceRenderTrace());
+	std::sort(s_kVct_pkInstAliveSort.begin(), s_kVct_pkInstAliveSort.end(), [](CInstanceBase* pkLeft, CInstanceBase* pkRight){return pkLeft->LessRenderOrder(pkRight);});
+	std::for_each(s_kVct_pkInstAliveSort.begin(), s_kVct_pkInstAliveSort.end(), [](CInstanceBase* pInstance){pInstance->Render(); pInstance->RenderTrace(); });
 }
 
 void CPythonCharacterManager::__RenderSortedDeadActorList()
@@ -476,8 +426,8 @@ void CPythonCharacterManager::__RenderSortedDeadActorList()
 	for (i=rkLst_pkInstDead.begin(); i!=rkLst_pkInstDead.end(); ++i)
 		s_kVct_pkInstDeadSort.push_back(*i);
 
-	std::sort(s_kVct_pkInstDeadSort.begin(), s_kVct_pkInstDeadSort.end(), LessCharacterInstancePtrRenderOrder());
-	std::for_each(s_kVct_pkInstDeadSort.begin(), s_kVct_pkInstDeadSort.end(), FCharacterInstanceRender());
+	std::sort(s_kVct_pkInstDeadSort.begin(), s_kVct_pkInstDeadSort.end(), [](CInstanceBase* pkLeft, CInstanceBase* pkRight){return pkLeft->LessRenderOrder(pkRight); });
+	std::for_each(s_kVct_pkInstDeadSort.begin(), s_kVct_pkInstDeadSort.end(), [](CInstanceBase* pInstance){pInstance->Render();});
 
 }
 
@@ -612,15 +562,18 @@ void CPythonCharacterManager::__DeleteBlendOutInstance(CInstanceBase* pkInstDel)
 
 	IAbstractPlayer& rkPlayer=IAbstractPlayer::GetSingleton();
 	rkPlayer.NotifyCharacterDead(pkInstDel->GetVirtualID());
+
+	if (m_pkInstMain && m_pkInstMain->IsMiningVID(pkInstDel->GetVirtualID())) {
+		m_pkInstMain->CancelMining();
+	}
 }
 
 void CPythonCharacterManager::DeleteInstanceByFade(uint32_t dwVID)
 {
 	TCharacterInstanceMap::iterator f = m_kAliveInstMap.find(dwVID);
 	if (m_kAliveInstMap.end() == f)
-	{
 		return;
-	}
+	
 	__DeleteBlendOutInstance(f->second);
 	m_kAliveInstMap.erase(f);	
 }
@@ -652,7 +605,7 @@ CInstanceBase * CPythonCharacterManager::GetInstancePtrByName(const char *name)
 {
 	TCharacterInstanceMap::iterator itor;
 
-	for (itor = m_kAliveInstMap.begin(); itor != m_kAliveInstMap.end(); itor++)
+	for (itor = m_kAliveInstMap.begin(); itor != m_kAliveInstMap.end(); ++itor)
 	{
 		CInstanceBase * pInstance = itor->second;
 

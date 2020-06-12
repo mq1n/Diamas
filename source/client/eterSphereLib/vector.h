@@ -76,9 +76,9 @@ public:
         return(Scaled); 
     };
 	
-    void operator += (const Vector3d A)             // ACCUMULATED VECTOR ADDITION (+=)
+    void operator += (const Vector3d &A)             // ACCUMULATED VECTOR ADDITION (+=)
 	{ x+=A.x; y+=A.y; z+=A.z; };
-    void operator -= (const Vector3d A)             // ACCUMULATED VECTOR SUBTRACTION (+=)
+    void operator -= (const Vector3d &A)             // ACCUMULATED VECTOR SUBTRACTION (+=)
 	{ x-=A.x; y-=A.y; z-=A.z; };
     void operator *= (const float s)        // ACCUMULATED SCALAR MULTIPLICATION (*=) (bpc 4/24/2000)
 	{x*=s; y*=s; z*=s;}

@@ -54,7 +54,6 @@ bool CActorInstance::CanUseSkill()
 		case CRaceMotionData::NAME_FISHING_CATCH:
 		case CRaceMotionData::NAME_FISHING_FAIL:
 			return TRUE;
-			break;
 	}
 
 	// Locked during using skill
@@ -110,7 +109,6 @@ bool CActorInstance::CanFishing()
 			break;
 		default:
 			return false;
-			break;
 	}
 
 	return true;
@@ -440,7 +438,6 @@ BOOL CActorInstance::IsActEmotion()
 		case CRaceMotionData::NAME_KISS_START+4:
 #endif
 			return TRUE;
-			break;
 	}
 
 	return FALSE;
@@ -560,7 +557,7 @@ bool IS_HUGE_RACE(uint32_t vnum)
 
 	if (pMobTable->bRank >= 4)
 		return true;
-	
+	/*
 	if (vnum == 9415)
 		return true;
 	
@@ -572,6 +569,7 @@ bool IS_HUGE_RACE(uint32_t vnum)
 	
 	if (vnum == 9419)
 		return true;
+	*/
 
 	return false;
 }

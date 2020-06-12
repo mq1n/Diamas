@@ -220,27 +220,8 @@ PyObject* appForceSetLocale(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
-PyObject* appGetLocaleServiceName(PyObject* poSelf, PyObject* poArgs)
-{
-	return Py_BuildValue("s", LocaleService_GetName());
-}
-
 // 
 bool LoadLocaleData(const char* localePath);
-
-PyObject* appSetCHEONMA(PyObject* poSelf, PyObject* poArgs)
-{
-	int32_t enable;
-	if (!PyTuple_GetInteger(poArgs, 0, &enable))
-		return Py_BuildException();
-	
-	return Py_BuildNone();
-}
-
-PyObject* appIsCHEONMA(PyObject* poSelf, PyObject* poArgs)
-{
-	return Py_BuildValue("i", 0);
-}
 
 #include "../eterBase/tea.h"
 
@@ -335,9 +316,7 @@ PyObject* appIsExistFile(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szFileName))
 		return Py_BuildException();
 
-	bool isExist = FileSystemManager::Instance().DoesFileExist(szFileName);
-
-	return Py_BuildValue("i", isExist);
+	return Py_BuildValue("i", FileSystemManager::Instance().DoesFileExist(szFileName));
 }
 
 PyObject* appGetFileList(PyObject* poSelf, PyObject* poArgs)
@@ -407,12 +386,8 @@ PyObject* appCreate(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 2, &height))
 		return Py_BuildException();
 
-	int32_t Windowed;
-	if (!PyTuple_GetInteger(poArgs, 3, &Windowed))
-		return Py_BuildException();
-
 	CPythonApplication& rkApp=CPythonApplication::Instance();
-	if (!rkApp.Create(poSelf, szName, width, height, Windowed))
+	if (!rkApp.Create(poSelf, szName, width, height))
 	{
 		//return Py_BuildNone();			
 		return nullptr;
@@ -718,12 +693,12 @@ PyObject * appHideCursor(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * appIsShowCursor(PyObject * poSelf, PyObject * poArgs)
 {
-	return Py_BuildValue("i", TRUE == CPythonApplication::Instance().GetCursorVisible());
+	return Py_BuildValue("i", FALSE != CPythonApplication::Instance().GetCursorVisible());
 }
 
 PyObject * appIsLiarCursorOn(PyObject * poSelf, PyObject * poArgs)
 {
-	return Py_BuildValue("i", TRUE == CPythonApplication::Instance().GetLiarCursorOn());
+	return Py_BuildValue("i", FALSE != CPythonApplication::Instance().GetLiarCursorOn());
 }
 
 PyObject * appSetSoftwareCursor(PyObject * poSelf, PyObject * poArgs)
@@ -1081,11 +1056,11 @@ PyObject * appSetGuildMarkPath(PyObject * poSelf, PyObject * poArgs)
     if (ext)
     {
 		int32_t extPos = ext - path;
-        strncpy(newPath, path, extPos);
+        strncpy_s(newPath, path, extPos);
         newPath[extPos] = '\0';
     }
     else
-        strncpy(newPath, path, sizeof(newPath)-1);
+        strncpy_s(newPath, path, sizeof(newPath)-1);
 	
 	CGuildMarkManager::Instance().SetMarkPathPrefix(newPath);
 	return Py_BuildNone();
@@ -1263,18 +1238,13 @@ void initapp()
 		{ "GetTextFileLine",			appGetTextFileLine,				METH_VARARGS },
 
 		// LOCALE
-		{ "GetLocaleServiceName",		appGetLocaleServiceName,		METH_VARARGS },
 		{ "GetLocaleName",				appGetLocaleName,				METH_VARARGS },
 		{ "GetLocalePath",				appGetLocalePath,				METH_VARARGS },
 		{ "ForceSetLocale",				appForceSetLocale,				METH_VARARGS },
 		// END_OF_LOCALE
 
-		// CHEONMA
 		{ "LoadLocaleAddr",				appLoadLocaleAddr,				METH_VARARGS },
 		{ "LoadLocaleData",				appLoadLocaleData,				METH_VARARGS },
-		{ "SetCHEONMA",					appSetCHEONMA,					METH_VARARGS },
-		{ "IsCHEONMA",					appIsCHEONMA,					METH_VARARGS },
-		// END_OF_CHEONMA
 		
 		{ "GetDefaultCodePage",			appGetDefaultCodePage,			METH_VARARGS },
 		{ "SetControlFP",				appSetControlFP,				METH_VARARGS },

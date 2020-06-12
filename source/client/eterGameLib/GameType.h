@@ -116,7 +116,8 @@ namespace NRaceData
 		int32_t					iCollisionType;
 		CSphereCollisionInstanceVector	SphereDataVector;
 
-		SCollisionData() {}
+		SCollisionData(): iCollisionType(0)
+		{}
 		virtual ~SCollisionData() {}
 	} TCollisionData;
 

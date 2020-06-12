@@ -10,88 +10,6 @@
 
 BOOL USE_WEAPON_SPECULAR = TRUE;
 
-BOOL USE_VIETNAM_CONVERT_WEAPON_VNUM = FALSE;
-
-uint32_t Vietnam_ConvertWeaponVnum(uint32_t vnum)
-{
-	uint32_t base = vnum / 10 * 10;
-	uint32_t rest = vnum % 10;
-	switch (base)
-	{
-	case  10:base = 5000;break;
-	case  20:base = 5010;break;
-	case  30:base = 5020;break;
-	case  40:base = 5030;break;
-	case  50:base = 5030;break;
-	case  60:base = 5040;break;
-	case  70:base = 5040;break;
-	case  80:base = 5050;break;
-	case  90:base = 5050;break;
-	case 100:base = 5060;break;
-	case 110:base = 5060;break;
-	case 120:base = 5070;break;
-	case 130:base = 5070;break;
-	case 140:base = 5080;break;
-	case 150:base = 5080;break;
-	case 160:base = 5090;break;
-	case 170:base = 5090;break;
-	case 180:base = 5100;break;
-	case 190:base = 5100;break;
-	case 200:base = 5110;break;
-	case 210:base = 5110;break;
-	case 220:base = 5120;break;
-	case 230:base = 5120;break;
-	case 240:base = 5130;break;
-	case 250:base = 5130;break;
-	case 260:base = 5140;break;
-	case 270:base = 5140;break;
-	case 280:base = 5150;break;
-	case 290:base = 5150;break;
-	case 1000:base = 5000;break;
-	case 1010:base = 5010;break;
-	case 1020:base = 5020;break;
-	case 1030:base = 5030;break;
-	case 1040:base = 5040;break;
-	case 1050:base = 5050;break;
-	case 1060:base = 5060;break;
-	case 1070:base = 5070;break;
-	case 1080:base = 5080;break;
-	case 1090:base = 5090;break;
-	case 1100:base = 5100;break;
-	case 1110:base = 5110;break;
-	case 1120:base = 5120;break;
-	case 1130:base = 5130;break;
-	case 1140:base = 5140;break;
-	case 1150:base = 5150;break;
-	case 1160:base = 5150;break;
-	case 1170:base = 5150;break;
-	case 3000:base = 5000;break;
-	case 3010:base = 5010;break;
-	case 3020:base = 5020;break;
-	case 3030:base = 5030;break;
-	case 3040:base = 5040;break;
-	case 3050:base = 5050;break;
-	case 3060:base = 5060;break;
-	case 3070:base = 5070;break;
-	case 3080:base = 5080;break;
-	case 3090:base = 5090;break;
-	case 3100:base = 5100;break;
-	case 3110:base = 5100;break;
-	case 3120:base = 5110;break;
-	case 3130:base = 5110;break;
-	case 3140:base = 5120;break;
-	case 3150:base = 5120;break;
-	case 3160:base = 5130;break;
-	case 3170:base = 5130;break;
-	case 3180:base = 5140;break;
-	case 3190:base = 5140;break;
-	case 3200:base = 5150;break;
-	case 3210:base = 5150;break;
-	}
-	return base + rest;
-}
-
-
 uint32_t CActorInstance::AttachSmokeEffect(uint32_t eSmoke)
 {
 	if (!m_pkCurRaceData)
@@ -150,9 +68,6 @@ void CActorInstance::AttachWeapon(uint32_t dwItemIndex,uint32_t dwParentPartInde
 		return;
 	
 	m_adwPartItemID[dwPartIndex]=dwItemIndex;
-
-	if (USE_VIETNAM_CONVERT_WEAPON_VNUM)
-		dwItemIndex = Vietnam_ConvertWeaponVnum(dwItemIndex);
 
 	CItemData * pItemData;
 	if (!CItemManager::Instance().GetItemDataPointer(dwItemIndex, &pItemData))
@@ -519,20 +434,14 @@ void CActorInstance::SetWeaponTraceTexture(const char * szTextureName)
 
 void CActorInstance::UseTextureWeaponTrace()
 {
-	for_each(
-			m_WeaponTraceVector.begin(),
-			m_WeaponTraceVector.end(),
-			std::void_mem_fun(&CWeaponTrace::UseTexture)
-			);
+	for (const auto & weaponTrace : m_WeaponTraceVector)
+		weaponTrace->UseTexture();
 }
 
 void CActorInstance::UseAlphaWeaponTrace()
 {
-	for_each(
-			m_WeaponTraceVector.begin(),
-			m_WeaponTraceVector.end(),
-			std::void_mem_fun(&CWeaponTrace::UseAlpha)
-			);
+	for (const auto & weaponTrace : m_WeaponTraceVector)
+		weaponTrace->UseAlpha();
 }
 
 void CActorInstance::UpdateAttachingInstances()

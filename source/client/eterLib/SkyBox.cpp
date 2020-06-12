@@ -99,22 +99,18 @@ void CSkyObjectQuad::Render()
 // CSkyObject
 /////////////////////////////////////////////////////////////////////////
 CSkyObject::CSkyObject() :
-	m_v3Position(0.0f, 0.0f, 0.0f),
-	m_fScaleX(1.0f),
-	m_fScaleY(1.0f),
-	m_fScaleZ(1.0f)
+	m_fCloudScaleX(0), m_fCloudScaleY(0), m_fCloudHeight(0),
+	m_fCloudTextureScaleX(0), m_fCloudTextureScaleY(0), m_fCloudScrollSpeedU(0),
+	m_fCloudScrollSpeedV(0), m_fCloudPositionU(0.0f), m_fCloudPositionV(0.0f),
+	m_v3Position(0.0f, 0.0f, 0.0f), m_fScaleX(1.0f), m_fScaleY(1.0f),
+	m_fScaleZ(1.0f), m_ucRenderMode(0), m_bTransitionStarted(false),
+	m_bSkyMatrixUpdated(false)
 {
 	D3DXMatrixIdentity(&m_matWorld);
 	D3DXMatrixIdentity(&m_matTranslation);
 	D3DXMatrixIdentity(&m_matTextureCloud);
 
 	m_dwlastTime = CTimer::Instance().GetCurrentMillisecond();
-
-	m_fCloudPositionU = 0.0f;
-	m_fCloudPositionV = 0.0f;
-
-	m_bTransitionStarted = false;
-	m_bSkyMatrixUpdated = false;
 }
 
 CSkyObject::~CSkyObject()
@@ -628,49 +624,52 @@ void CSkyBox::SetSkyColor(const TVectorGradientColor & c_rColorVector, const TVe
 		{
 			CSkyObjectQuad & aSkyObjectQuad = aFace.m_SkyObjectQuadVector[uck];
 
+			TGradientColor colorVector = c_rColorVector[ulVectorGradientColornum];
+			TGradientColor nextColorVector = c_rNextColorVector[ulVectorGradientColornum];
+
 			aSkyObjectQuad.SetSrcColor(0,
-				c_rColorVector[ulVectorGradientColornum].m_SecondColor.r,
-				c_rColorVector[ulVectorGradientColornum].m_SecondColor.g,
-				c_rColorVector[ulVectorGradientColornum].m_SecondColor.b,
-				c_rColorVector[ulVectorGradientColornum].m_SecondColor.a);
+				colorVector.m_SecondColor.r,
+				colorVector.m_SecondColor.g,
+				colorVector.m_SecondColor.b,
+				colorVector.m_SecondColor.a);
 			aSkyObjectQuad.SetTransition(0, 
-				c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.r,
-				c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.g,
-				c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.b,
-				c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.a,
+				nextColorVector.m_SecondColor.r,
+				nextColorVector.m_SecondColor.g,
+				nextColorVector.m_SecondColor.b,
+				nextColorVector.m_SecondColor.a,
 				lTransitionTime);
 			aSkyObjectQuad.SetSrcColor(1,
-				c_rColorVector[ulVectorGradientColornum].m_FirstColor.r,
-				c_rColorVector[ulVectorGradientColornum].m_FirstColor.g,
-				c_rColorVector[ulVectorGradientColornum].m_FirstColor.b,
-				c_rColorVector[ulVectorGradientColornum].m_FirstColor.a);
+				colorVector.m_FirstColor.r,
+				colorVector.m_FirstColor.g,
+				colorVector.m_FirstColor.b,
+				colorVector.m_FirstColor.a);
 			aSkyObjectQuad.SetTransition(1,
-				c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.r,
-				c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.g,
-				c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.b,
-				c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.a,
+				nextColorVector.m_FirstColor.r,
+				nextColorVector.m_FirstColor.g,
+				nextColorVector.m_FirstColor.b,
+				nextColorVector.m_FirstColor.a,
 				lTransitionTime);
 			aSkyObjectQuad.SetSrcColor(2,
-				c_rColorVector[ulVectorGradientColornum].m_SecondColor.r,
-				c_rColorVector[ulVectorGradientColornum].m_SecondColor.g,
-				c_rColorVector[ulVectorGradientColornum].m_SecondColor.b,
-				c_rColorVector[ulVectorGradientColornum].m_SecondColor.a);
+				colorVector.m_SecondColor.r,
+				colorVector.m_SecondColor.g,
+				colorVector.m_SecondColor.b,
+				colorVector.m_SecondColor.a);
 			aSkyObjectQuad.SetTransition(2,
-				c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.r,
-				c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.g,
-				c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.b,
-				c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.a,
+				nextColorVector.m_SecondColor.r,
+				nextColorVector.m_SecondColor.g,
+				nextColorVector.m_SecondColor.b,
+				nextColorVector.m_SecondColor.a,
 				lTransitionTime);
 			aSkyObjectQuad.SetSrcColor(3,
-				c_rColorVector[ulVectorGradientColornum].m_FirstColor.r,
-				c_rColorVector[ulVectorGradientColornum].m_FirstColor.g,
-				c_rColorVector[ulVectorGradientColornum].m_FirstColor.b,
-				c_rColorVector[ulVectorGradientColornum].m_FirstColor.a);
+				colorVector.m_FirstColor.r,
+				colorVector.m_FirstColor.g,
+				colorVector.m_FirstColor.b,
+				colorVector.m_FirstColor.a);
 			aSkyObjectQuad.SetTransition(3,
-				c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.r,
-				c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.g,
-				c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.b,
-				c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.a,
+				nextColorVector.m_FirstColor.r,
+				nextColorVector.m_FirstColor.g,
+				nextColorVector.m_FirstColor.b,
+				nextColorVector.m_FirstColor.a,
 				lTransitionTime);
 
 			ulVectorGradientColornum++;
@@ -680,105 +679,113 @@ void CSkyBox::SetSkyColor(const TVectorGradientColor & c_rColorVector, const TVe
 	/////
 
 	TSkyObjectFace & aFaceTop = m_Faces[4];
-	ulVectorGradientColornum = 0;
+
+	//instead of ulVectorGradientColornum = 0 we use [0] here
+	TGradientColor zeroColorVector = c_rColorVector[0]; 
+	TGradientColor zeroNextColorVector = c_rNextColorVector[0];
+
 	for (uck = 0; uck < aFaceTop.m_SkyObjectQuadVector.size(); ++uck)
 	{
 		CSkyObjectQuad & aSkyObjectQuad = aFaceTop.m_SkyObjectQuadVector[uck];
 
 		aSkyObjectQuad.SetSrcColor(0,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.r,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.g,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.b,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.a);
+			zeroColorVector.m_FirstColor.r,
+			zeroColorVector.m_FirstColor.g,
+			zeroColorVector.m_FirstColor.b,
+			zeroColorVector.m_FirstColor.a);
 		aSkyObjectQuad.SetTransition(0, 
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.r,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.g,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.b,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.a,
+			zeroNextColorVector.m_FirstColor.r,
+			zeroNextColorVector.m_FirstColor.g,
+			zeroNextColorVector.m_FirstColor.b,
+			zeroNextColorVector.m_FirstColor.a,
 			lTransitionTime);
 		aSkyObjectQuad.SetSrcColor(1,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.r,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.g,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.b,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.a);
+			zeroColorVector.m_FirstColor.r,
+			zeroColorVector.m_FirstColor.g,
+			zeroColorVector.m_FirstColor.b,
+			zeroColorVector.m_FirstColor.a);
 		aSkyObjectQuad.SetTransition(1,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.r,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.g,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.b,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.a,
+			zeroNextColorVector.m_FirstColor.r,
+			zeroNextColorVector.m_FirstColor.g,
+			zeroNextColorVector.m_FirstColor.b,
+			zeroNextColorVector.m_FirstColor.a,
 			lTransitionTime);
 		aSkyObjectQuad.SetSrcColor(2,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.r,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.g,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.b,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.a);
+			zeroColorVector.m_FirstColor.r,
+			zeroColorVector.m_FirstColor.g,
+			zeroColorVector.m_FirstColor.b,
+			zeroColorVector.m_FirstColor.a);
 		aSkyObjectQuad.SetTransition(2,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.r,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.g,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.b,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.a,
+			zeroNextColorVector.m_FirstColor.r,
+			zeroNextColorVector.m_FirstColor.g,
+			zeroNextColorVector.m_FirstColor.b,
+			zeroNextColorVector.m_FirstColor.a,
 			lTransitionTime);
 		aSkyObjectQuad.SetSrcColor(3,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.r,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.g,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.b,
-			c_rColorVector[ulVectorGradientColornum].m_FirstColor.a);
+			zeroColorVector.m_FirstColor.r,
+			zeroColorVector.m_FirstColor.g,
+			zeroColorVector.m_FirstColor.b,
+			zeroColorVector.m_FirstColor.a);
 		aSkyObjectQuad.SetTransition(3,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.r,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.g,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.b,
-			c_rNextColorVector[ulVectorGradientColornum].m_FirstColor.a,
+			zeroNextColorVector.m_FirstColor.r,
+			zeroNextColorVector.m_FirstColor.g,
+			zeroNextColorVector.m_FirstColor.b,
+			zeroNextColorVector.m_FirstColor.a,
 			lTransitionTime);
 	}
+
 	TSkyObjectFace & aFaceBottom = m_Faces[5];
 	ulVectorGradientColornum = c_rColorVector.size() - 1;
+
+	TGradientColor faceColorVector = c_rColorVector[ulVectorGradientColornum];
+	TGradientColor faceNextColorVector = c_rNextColorVector[ulVectorGradientColornum];
 	for (uck = 0; uck < aFaceBottom.m_SkyObjectQuadVector.size(); ++uck)
 	{
 		CSkyObjectQuad & aSkyObjectQuad = aFaceBottom.m_SkyObjectQuadVector[uck];
 		
 		aSkyObjectQuad.SetSrcColor(0,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.r,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.g,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.b,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.a);
+			faceColorVector.m_SecondColor.r,
+			faceColorVector.m_SecondColor.g,
+			faceColorVector.m_SecondColor.b,
+			faceColorVector.m_SecondColor.a);
 		aSkyObjectQuad.SetTransition(0, 
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.r,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.g,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.b,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.a,
+			faceNextColorVector.m_SecondColor.r,
+			faceNextColorVector.m_SecondColor.g,
+			faceNextColorVector.m_SecondColor.b,
+			faceNextColorVector.m_SecondColor.a,
 			lTransitionTime);
 		aSkyObjectQuad.SetSrcColor(1,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.r,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.g,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.b,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.a);
+			faceColorVector.m_SecondColor.r,
+			faceColorVector.m_SecondColor.g,
+			faceColorVector.m_SecondColor.b,
+			faceColorVector.m_SecondColor.a);
 		aSkyObjectQuad.SetTransition(1,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.r,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.g,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.b,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.a,
+			faceNextColorVector.m_SecondColor.r,
+			faceNextColorVector.m_SecondColor.g,
+			faceNextColorVector.m_SecondColor.b,
+			faceNextColorVector.m_SecondColor.a,
 			lTransitionTime);
 		aSkyObjectQuad.SetSrcColor(2,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.r,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.g,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.b,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.a);
+			faceColorVector.m_SecondColor.r,
+			faceColorVector.m_SecondColor.g,
+			faceColorVector.m_SecondColor.b,
+			faceColorVector.m_SecondColor.a);
 		aSkyObjectQuad.SetTransition(2,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.r,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.g,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.b,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.a,
+			faceNextColorVector.m_SecondColor.r,
+			faceNextColorVector.m_SecondColor.g,
+			faceNextColorVector.m_SecondColor.b,
+			faceNextColorVector.m_SecondColor.a,
 			lTransitionTime);
 		aSkyObjectQuad.SetSrcColor(3,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.r,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.g,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.b,
-			c_rColorVector[ulVectorGradientColornum].m_SecondColor.a);
+			faceColorVector.m_SecondColor.r,
+			faceColorVector.m_SecondColor.g,
+			faceColorVector.m_SecondColor.b,
+			faceColorVector.m_SecondColor.a);
 		aSkyObjectQuad.SetTransition(3,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.r,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.g,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.b,
-			c_rNextColorVector[ulVectorGradientColornum].m_SecondColor.a,
+			faceNextColorVector.m_SecondColor.r,
+			faceNextColorVector.m_SecondColor.g,
+			faceNextColorVector.m_SecondColor.b,
+			faceNextColorVector.m_SecondColor.a,
 			lTransitionTime);
 	}
 }

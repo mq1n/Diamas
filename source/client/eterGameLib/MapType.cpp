@@ -46,14 +46,14 @@ const char * GetPropertyExtension(uint32_t dwType)
 const char * IntegerNumberToString(int32_t iNumber)
 {
 	static char szString[16+1];
-	_snprintf(szString, sizeof(szString), "%d", iNumber);
+	_snprintf_s(szString, sizeof(szString), "%d", iNumber);
 	return szString;
 }
 
 const char * FloatNumberToString(float fNumber)
 {
 	static char szString[16+1];
-	_snprintf(szString, sizeof(szString), "%f", fNumber);
+	_snprintf_s(szString, sizeof(szString), "%f", fNumber);
 	return szString;
 }
 
@@ -81,7 +81,7 @@ bool PropertyTreeStringToData(CProperty * pProperty, TPropertyTree * pData)
 	if (!pProperty->GetString("PropertyName", &c_pszPropertyName))
 		return false;
 
-	if (strcmp(c_pszPropertyType, "Tree"))
+	if (strcmp(c_pszPropertyType, "Tree") != 0)
 		return false;
 
 	pData->strName = c_pszPropertyName;
@@ -127,7 +127,7 @@ bool PropertyBuildingStringToData(CProperty * pProperty, TPropertyBuilding * pDa
 	if (!pProperty->GetString("PropertyName", &c_pszPropertyName))
 		return false;
 
-	if (strcmp(c_pszPropertyType, "Building"))
+	if (strcmp(c_pszPropertyType, "Building") != 0)
 		return false;
 
 	pData->strName = c_pszPropertyName;
@@ -176,7 +176,7 @@ bool PropertyEffectStringToData(CProperty * pProperty, TPropertyEffect * pData)
 	if (!pProperty->GetString("PropertyName", &c_pszPropertyName))
 		return false;
 
-	if (strcmp(c_pszPropertyType, "Effect"))
+	if (strcmp(c_pszPropertyType, "Effect") != 0)
 		return false;
 
 	pData->strName = c_pszPropertyName;
@@ -224,7 +224,7 @@ bool PropertyAmbienceStringToData(CProperty * pProperty, TPropertyAmbience * pDa
 	if (!pProperty->GetString("PropertyName", &c_pszPropertyName))
 		return false;
 
-	if (strcmp(c_pszPropertyType, "Ambience"))
+	if (strcmp(c_pszPropertyType, "Ambience") != 0)
 		return false;
 
 	pData->strName = c_pszPropertyName;
@@ -279,7 +279,7 @@ bool PropertyDungeonBlockStringToData(CProperty * pProperty, TPropertyDungeonBlo
 	if (!pProperty->GetString("PropertyName", &c_pszPropertyName))
 		return false;
 
-	if (strcmp(c_pszPropertyType, "DungeonBlock"))
+	if (strcmp(c_pszPropertyType, "DungeonBlock") != 0)
 		return false;
 
 	pData->strName = c_pszPropertyName;

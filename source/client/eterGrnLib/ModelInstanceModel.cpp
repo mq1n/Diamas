@@ -58,7 +58,7 @@ void CGrannyModelInstance::SetLinkedModelPointer(CGrannyModel* pkModel, CGraphic
 
 	ResetLocalTime();
 	
-	m_kMtrlPal.Copy(pkModel->GetMaterialPalette());
+	m_kMtrlPal = pkModel->GetMaterialPalette();
 }
 
 // WORK
@@ -265,7 +265,7 @@ const float * CGrannyModelInstance::GetBoneMatrixPointer(int32_t iBone) const
 	const float* bones = GrannyGetWorldPose4x4(__GetWorldPosePtr(), iBone);
 	if (!bones)
 	{
-		granny_model* pModel = m_pModel->GetGrannyModelPointer();		
+		//granny_model* pModel = m_pModel->GetGrannyModelPointer();		
 		//TraceError("GrannyModelInstance(%s).GetBoneMatrixPointer(boneIndex(%d)).NOT_FOUND_BONE", pModel->Name, iBone);
 		return nullptr;
 	}

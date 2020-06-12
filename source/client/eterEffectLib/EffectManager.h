@@ -49,7 +49,7 @@ class CEffectManager : public CScreen, public CSingleton<CEffectManager>
 		void DeactiveEffectInstance(uint32_t dwInstanceIndex);
 		void ActiveEffectInstance(uint32_t dwInstanceIndex);
 
-		void SetEffectTextures(uint32_t dwID, std::vector<std::string> textures);
+		void SetEffectTextures(uint32_t dwID,const std::vector<std::string> &textures);
 		void SetEffectInstancePosition(const D3DXVECTOR3 & c_rv3Position);
 		void SetEffectInstanceRotation(const D3DXVECTOR3 & c_rv3Rotation);
 		void SetEffectInstanceGlobalMatrix(const D3DXMATRIX & c_rmatGlobal);
@@ -67,8 +67,6 @@ class CEffectManager : public CScreen, public CSingleton<CEffectManager>
 		// EffectManager 내부 EffectInstanceMap을 이용하지 않는다.
 		void CreateUnsafeEffectInstance(uint32_t dwEffectDataID, CEffectInstance ** ppEffectInstance);
 		bool DestroyUnsafeEffectInstance(CEffectInstance * pEffectInstance);
-
-		int32_t GetRenderingEffectCount();
 
 	protected:
 		void __Initialize();

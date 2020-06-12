@@ -13,7 +13,6 @@ class CDynamicVertexBuffer : public CGraphicVertexBuffer
 
 
 	protected:
-		int32_t m_vtxCount;
 		int32_t m_fvf;
 };
 

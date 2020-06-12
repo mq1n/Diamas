@@ -68,7 +68,8 @@ class CPythonItem : public CSingleton<CPythonItem>
 			static void	__PlayDropSound(uint32_t eItemType, const D3DXVECTOR3& c_rv3Pos);
 			static std::string		ms_astDropSoundFileName[DROPSOUND_NUM];
 
-			SGroundItemInstance() {}
+			SGroundItemInstance(): dwVirtualNumber(0), dwStartTime(0), dwEndTime(0), eDropSoundType(0), bAnimEnded(false), dwEffectInstanceIndex(0)
+			{}
 			virtual ~SGroundItemInstance() {}
 		} TGroundItemInstance;
 

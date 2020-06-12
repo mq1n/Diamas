@@ -45,11 +45,7 @@ bool CLightInstance::OnUpdate(float fElapsedTime)
 	if (m_fLocalTime >= m_pData->GetDuration())
 	{
 		if (m_pData->isLoop() && --m_iLoopCount!=0)
-		{
-			if (m_iLoopCount<0)
-				m_iLoopCount = 0;
 			m_fLocalTime -= m_pData->GetDuration();
-		}
 		else
 		{
 			Destroy();

@@ -244,6 +244,7 @@ CMSWindow::CMSWindow()
 {
 	m_hWnd=nullptr;
 	m_isVisible=false;
+	m_isActive = false;
 }
 
 CMSWindow::~CMSWindow()

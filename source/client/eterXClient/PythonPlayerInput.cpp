@@ -952,6 +952,15 @@ void CPythonPlayer::__ReserveProcess_ClickActor()
 		SetTarget(pkInstReserved->GetVirtualID());
 	}
 
+	/* note :  자동공격 관련 문제로 이쪽에 추가.
+	 * CanAttack의 호출을 꼭 필요한데서만 호출되게 고쳐야할 필요성이 있음..
+	 * __CanAttack과 CanAttack의 결과가 다른것도 관리 필요.. ~ ity ~
+	 */
+	if(!__CanAttack())	
+	{
+		return;
+	}
+
 	pkInstMain->NEW_AttackToDestInstanceDirection(*pkInstReserved);
 	__ClearReservedAction();
 }

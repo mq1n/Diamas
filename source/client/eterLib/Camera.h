@@ -133,7 +133,7 @@ class CCamera
 		//////////////////////////////////////////////////////////////////////////
 		// ¹°¸®
 		//////////////////////////////////////////////////////////////////////////
-		void SetAngularAcceleration(D3DXVECTOR3 v3AngularAcceleration) { m_v3AngularAcceleration = v3AngularAcceleration; }
+		void SetAngularAcceleration(const D3DXVECTOR3 &v3AngularAcceleration) { m_v3AngularAcceleration = v3AngularAcceleration; }
 		
 		//////////////////////////////////////////////////////////////////////////
 		// AI
@@ -255,6 +255,7 @@ class CCameraManager : public CSingleton<CCameraManager>
 			NO_CURRENT_CAMERA,
 			DEFAULT_PERSPECTIVE_CAMERA,
 			DEFAULT_ORTHO_CAMERA,
+			RENDER_TARGET_CAMERA,
 			CAMERA_MAX = 255
 		};
 

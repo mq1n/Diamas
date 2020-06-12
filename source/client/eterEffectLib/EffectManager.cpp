@@ -9,7 +9,7 @@ void CEffectManager::GetInfo(std::string* pstInfo)
 {
 	char szInfo[256];
 	
-	sprintf(szInfo, "Effect: Inst - ED %d, EI %d Pool - PSI %d, MI %d, LI %d, PI %d, EI %d, ED %d, PSD %d, EM %d, LD %d", 		
+	sprintf_s(szInfo, "Effect: Inst - ED %u, EI %u Pool - PSI %u, MI %u, LI %u, PI %u, EI %u, ED %u, PSD %u, EM %u, LD %u", 		
 		m_kEftDataMap.size(),
 		m_kEftInstMap.size(),		
 		CParticleSystemInstance::ms_kPool.GetCapacity(),
@@ -109,7 +109,8 @@ void CEffectManager::Render()
 		for (TEffectInstanceMap::iterator itor = m_kEftInstMap.begin(); itor != m_kEftInstMap.end();)
 		{
 			CEffectInstance * pEffectInstance = itor->second;
-			pEffectInstance->Render();
+			if (pEffectInstance->isShow())
+				pEffectInstance->Render();
 			++itor;
 		}
 	}
@@ -121,7 +122,8 @@ void CEffectManager::Render()
 		TEffectInstanceMap& rkMap_pkEftInstSrc=m_kEftInstMap;
 		TEffectInstanceMap::iterator i;
 		for (i=rkMap_pkEftInstSrc.begin(); i!=rkMap_pkEftInstSrc.end(); ++i)
-			s_kVct_pkEftInstSort.push_back(i->second);
+			if (i->second->isShow())
+				s_kVct_pkEftInstSort.push_back(i->second);
 
 		std::sort(s_kVct_pkEftInstSort.begin(), s_kVct_pkEftInstSort.end(), CEffectManager_LessEffectInstancePtrRenderOrder());
 		std::for_each(s_kVct_pkEftInstSort.begin(), s_kVct_pkEftInstSort.end(), CEffectManager_FEffectInstanceRender());
@@ -302,7 +304,7 @@ BOOL CEffectManager::SelectEffectInstance(uint32_t dwInstanceIndex)
 	return TRUE;
 }
 
-void CEffectManager::SetEffectTextures(uint32_t dwID, std::vector<std::string> textures)
+void CEffectManager::SetEffectTextures(uint32_t dwID,const std::vector<std::string> &textures)
 {
 	CEffectData * pEffectData;
 	if (!GetEffectData(dwID, &pEffectData))
@@ -354,6 +356,7 @@ void CEffectManager::ShowEffect()
 		return;
 
 	m_pSelectedEffectInstance->Show();
+	m_pSelectedEffectInstance->SetActive();
 }
 
 void CEffectManager::HideEffect()
@@ -362,6 +365,7 @@ void CEffectManager::HideEffect()
 		return;
 
 	m_pSelectedEffectInstance->Hide();
+	m_pSelectedEffectInstance->SetDeactive();
 }
 
 bool CEffectManager::GetEffectData(uint32_t dwID, CEffectData ** ppEffect)
@@ -392,8 +396,8 @@ uint32_t CEffectManager::GetRandomEffect()
 {
 	int32_t iIndex = random() % m_kEftDataMap.size();
 
-	TEffectDataMap::iterator itor = m_kEftDataMap.begin();
-	for (int32_t i = 0; i < iIndex; ++i, ++itor);
+	auto itor = m_kEftDataMap.begin();
+	std::advance(itor, iIndex);
 
 	return itor->first;
 }

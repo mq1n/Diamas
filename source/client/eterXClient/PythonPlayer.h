@@ -130,7 +130,8 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 
 		typedef struct SPartyMemberInfo
 		{
-			SPartyMemberInfo(uint32_t _dwPID, const char * c_szName) : dwPID(_dwPID), strName(c_szName), dwVID(0) {}
+			SPartyMemberInfo(uint32_t _dwPID, const char * c_szName) : dwVID(0), dwPID(_dwPID), strName(c_szName), byState(0), byHPPercentage(0)
+			{}
 
 			uint32_t dwVID;
 			uint32_t dwPID;
@@ -164,7 +165,8 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		// 자동물약 상태 관련 특화 구조체.. 이런식의 특화 처리 작업을 안 하려고 최대한 노력했지만 실패하고 결국 특화처리.
 		struct SAutoPotionInfo
 		{
-			SAutoPotionInfo() : bActivated(false), totalAmount(0), currentAmount(0) {}
+			SAutoPotionInfo() : bActivated(false), currentAmount(0), totalAmount(0), inventorySlotIndex(0)
+			{}
 
 			bool bActivated;					// 활성화 되었는가?			
 			int32_t currentAmount;					// 현재 남은 양

@@ -38,7 +38,10 @@ class CPythonTextTail : public CSingleton<CPythonTextTail>
 
 			float							fHeight;
 
-			STextTail() {}
+			STextTail(): pTextInstance(nullptr), pOwnerTextInstance(nullptr), pMarkInstance(nullptr), pGuildNameTextInstance(nullptr), pTitleTextInstance(nullptr),
+				pLevelTextInstance(nullptr), pOwner(nullptr), dwVirtualID(0), x(0.0f), y(0.0f), z(0.0f), fDistanceFromPlayer(0.0f),
+				bNameFlag(0), xStart(0.0f), yStart(0.0f), xEnd(0.0f), yEnd(0.0f), LivingTime(0), fHeight(0.0f)
+			{}
 			virtual ~STextTail() {}
 		} TTextTail;
 

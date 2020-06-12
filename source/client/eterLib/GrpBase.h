@@ -149,7 +149,6 @@ class CGraphicBase
 		void		SetEyeCamera(float xEye, float yEye, float zEye, float xCenter, float yCenter, float zCenter, float xUp, float yUp, float zUp);
 		void		SetAroundCamera(float distance, float pitch, float roll, float lookAtZ = 0.0f);
 		void		SetPositionCamera(float fx, float fy, float fz, float fDistance, float fPitch, float fRotation);
-		void		MoveCamera(float fdeltax, float fdeltay, float fdeltaz);
 
 		void		GetTargetPosition(float * px, float * py, float * pz);
 		void		GetCameraPosition(float * px, float * py, float * pz);
@@ -157,6 +156,9 @@ class CGraphicBase
 		void		SetOrtho3D(float hres, float vres, float zmin, float zmax);
 		void		SetPerspective(float fov, float aspect, float nearz, float farz);
 		float		GetFOV();
+		float		GetAspect();
+		float		GetNear();
+		float		GetFar();
 		void		GetClipPlane(float * fNearY, float * fFarY)
 		{
 			*fNearY = ms_fNearY;

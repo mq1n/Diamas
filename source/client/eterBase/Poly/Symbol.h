@@ -32,8 +32,8 @@ class CSymbol : public CBase
 	static int32_t	issymbol(int32_t ch);
 	void		SetType(int32_t Type);
 	int32_t		GetType();
-	bool		Equal(CSymbol dif);
-	bool		Less(CSymbol dif);
+	bool		Equal(const CSymbol &dif);
+	bool		Less(const CSymbol &dif);
 };
 
 #endif 

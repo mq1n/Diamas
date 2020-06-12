@@ -6,6 +6,7 @@
 #include "../eterLib/GrpDevice.h"
 #include "../eterLib/NetDevice.h"
 #include "../eterLib/GrpLightManager.h"
+#include "../eterLib/RenderTargetManager.h"
 #include "../eterEffectLib/EffectManager.h"
 #include "../eterGameLib/RaceManager.h"
 #include "../eterGameLib/ItemManager.h"
@@ -35,6 +36,7 @@
 #include "PythonMessenger.h"
 #include "PythonSafeBox.h"
 #include "PythonGuild.h"
+#include "PythonRenderTargetManager.h"
 
 #include "GuildMarkDownloader.h"
 #include "GuildMarkUploader.h"
@@ -157,7 +159,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		void SetFrameSkip(bool isEnable);
 		void SkipRenderBuffering(uint32_t dwSleepMSec);
 
-		bool Create(PyObject* poSelf, const char* c_szName, int32_t width, int32_t height, int32_t Windowed);
+		bool Create(PyObject* poSelf, const char* c_szName, int32_t width, int32_t height);
 		bool CreateDevice(int32_t width, int32_t height, bool Windowed, int32_t bit = 32, int32_t frequency = 0);
 
 		void UpdateGame();
@@ -289,8 +291,6 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 
 		void __SetFullScreenWindow(HWND hWnd, uint32_t dwWidth, uint32_t dwHeight, uint32_t dwBPP);
 		void __MinimizeFullScreenWindow(HWND hWnd, uint32_t dwWidth, uint32_t dwHeight);
-		void __ResetCameraWhenMinimize();
-
 
 	protected:
 		CTimer m_timer;
@@ -348,6 +348,9 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		PyObject *					m_poMouseHandler;
 		D3DXVECTOR3					m_v3CenterPosition;
 
+		CRenderTargetManager		m_cRenderTargetManager;
+		CPythonRenderTargetManager	m_pyRenderTargetManager;
+
 		uint32_t				m_iFPS;
 		float						m_fAveRenderTime;
 		uint32_t						m_dwCurRenderTime;
@@ -358,7 +361,6 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 
 	protected:
 		// Time
-		uint32_t						m_dwLastIdleTime;
 		uint32_t						m_dwStartLocalTime;
 		time_t						m_tServerTime;
 		time_t						m_tLocalStartTime;
@@ -430,4 +432,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 	protected:
 		int32_t m_iCursorNum;
 		int32_t m_iContinuousCursorNum;
+	public:
+		LPDIRECT3D9		GetDirectx9();
+		LPDIRECT3DDEVICE9 GetDevice();
 };

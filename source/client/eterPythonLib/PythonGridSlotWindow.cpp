@@ -29,8 +29,10 @@ void CGridSlotWindow::OnRenderPickingSlot()
 			{
 				if (m_isUsableItem)
 					CPythonGraphic::Instance().SetDiffuseColor(1.0f, 1.0f, 0.0f, 0.5f);
-				else
+				else if (pCenterSlot->dwItemIndex != dwItemIndex)
 					CPythonGraphic::Instance().SetDiffuseColor(1.0f, 0.0f, 0.0f, 0.5f);
+				else
+					CPythonGraphic::Instance().SetDiffuseColor(1.0f, 1.0f, 1.0f, 0.5f);
 
 				CPythonGraphic::Instance().RenderBar2d(	m_rect.left + pCenterSlot->ixPosition,
 														m_rect.top + pCenterSlot->iyPosition,
@@ -101,7 +103,7 @@ BOOL CGridSlotWindow::GetPickedSlotPointer(TSlot ** ppSlot)
 			}
 			else
 			{
-				if (!pMinSlot->isItem && pSlot->isItem)
+				if (m_iWindowType != UI::SLOT_WND_INVENTORY && !pMinSlot->isItem && pSlot->isItem)
 				{
 					pMinSlot = pSlot;
 				}
@@ -254,9 +256,7 @@ BOOL CGridSlotWindow::GetGridSlotPointer(int32_t ix, int32_t iy, TSlot ** ppSlot
 BOOL CGridSlotWindow::GetSlotPointerByNumber (uint32_t dwSlotNumber, TSlot** ppSlot)
 {
 	if (dwSlotNumber >= m_SlotVector.size())
-	{
 		return false;
-	}
 
 	*ppSlot = m_SlotVector[dwSlotNumber];
 
@@ -325,6 +325,7 @@ void CGridSlotWindow::OnRefreshSlot()
 			continue;
 
 		pSlot->dwCenterSlotNumber = pSlot->dwSlotNumber;
+		pSlot->dwRealCenterSlotNumber = pSlot->dwRealSlotNumber;
 	}
 
 	for (x = 0; x < m_dwxCount; ++x)
@@ -344,6 +345,7 @@ void CGridSlotWindow::OnRefreshSlot()
 					continue;
 
 				pSubSlot->dwCenterSlotNumber = pSlot->dwSlotNumber;
+				pSubSlot->dwRealCenterSlotNumber = pSlot->dwRealSlotNumber;
 				pSubSlot->dwItemIndex = pSlot->dwItemIndex;
 			}
 		}
@@ -401,12 +403,10 @@ BOOL CGridSlotWindow::CheckMoving(uint32_t dwSlotNumber, uint32_t dwItemIndex, c
 	return true;
 }
 
-BOOL CGridSlotWindow::CheckSwapping (uint32_t dwSlotNumber, uint32_t dwItemIndex, const std::list<TSlot*>& c_rSlotList)
+BOOL CGridSlotWindow::CheckSwapping(uint32_t dwRealSlotNumber, uint32_t dwItemIndex, const std::list<TSlot*> & c_rSlotList)
 {
 	if (m_dwSlotStyle != SLOT_STYLE_PICK_UP)
-	{
 		return TRUE;
-	}
 
 	uint8_t byWidth, byHeight;
 	UI::CWindowManager::Instance().GetAttachingIconSize (&byWidth, &byHeight);
@@ -418,55 +418,38 @@ BOOL CGridSlotWindow::CheckSwapping (uint32_t dwSlotNumber, uint32_t dwItemIndex
 	{
 		TSlot* pSlot = *itor;
 
-		if (dwSlotNumber == pSlot->dwCenterSlotNumber) // I can't swap with myself
-		{
+		if (dwRealSlotNumber == pSlot->dwRealCenterSlotNumber) // I can't swap with myself
 			return false;
-		}
 
-		if (itor == c_rSlotList.begin())   //First one, mark
-		{
+		if (itor == c_rSlotList.begin()) { //First one, mark
 			iyBasePosition = pSlot->iyPosition;
 		}
 
 		if (pSlot->dwSlotNumber == pSlot->dwCenterSlotNumber)
-		{
 			iyBound -= pSlot->byyPlacedItemSize;
-		}
 
-		if (!pSlot->dwItemIndex)
-		{
-			TSlot* centerItem;
-			if (!GetSlotPointerByNumber (pSlot->dwCenterSlotNumber, &centerItem)) //Some sort of error
-			{
+		if (!pSlot->dwItemIndex) {
+			TSlot * centerItem;
+			if (!GetSlotPointerByNumber(pSlot->dwCenterSlotNumber, &centerItem)) //Some sort of error
 				continue;
-			}
 
-			if (!centerItem || !centerItem->dwCenterSlotNumber)
-			{
+			if (!centerItem || !centerItem->dwCenterSlotNumber) {
 				continue; // I can always swap with empty slots, but this may not be the only overlayed slot, so lets continue
 			}
 
 			if (centerItem->iyPosition < iyBasePosition)
-			{
-				return false;    //Out of bounds, upper side
-			}
+				return false; //Out of bounds, upper side
 		}
-
+		
 		if (pSlot->iyPosition < iyBasePosition) //Out of bounds, upper side
-		{
 			return false;
-		}
 
 		if (iyBound < 0) //An item will go out of bounds on the lower side
-		{
 			return false;
-		}
 	}
 
 	if (iyBound > 0) //Space was not perfectly filled
-	{
 		return false;
-	}
 
 	return true;
 }
@@ -500,7 +483,7 @@ BOOL CGridSlotWindow::OnIsType(uint32_t dwType)
 	return CSlotWindow::OnIsType(dwType);
 }
 
-CGridSlotWindow::CGridSlotWindow(PyObject * ppyObject) : CSlotWindow(ppyObject)
+CGridSlotWindow::CGridSlotWindow(PyObject * ppyObject) : CSlotWindow(ppyObject), m_dwxCount(0), m_dwyCount(0)
 {
 }
 

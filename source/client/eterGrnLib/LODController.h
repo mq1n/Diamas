@@ -237,7 +237,7 @@ class CGrannyLODController : public CGraphicBase
 		uint8_t	GetLODLevel() { return m_bLODLevel; }
 		void	SetMaterialImagePointer(const char* c_szImageName, CGraphicImage* pImage);
 		void	SetMaterialData(const char* c_szImageName, const SMaterialData& c_rkMaterialData);
-		void	SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower);
+		void	SetSpecularInfo(const char* c_szMtrlName, bool bEnable, float fPower);
 
 		void	RenderWithOneTexture();
 		void	RenderWithTwoTexture();

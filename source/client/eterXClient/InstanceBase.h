@@ -437,14 +437,15 @@ class CInstanceBase
 
 	protected:
 		uint32_t	__AttachEffect(uint32_t eEftType);
-		uint32_t	__AttachEffect(char filename[128]);
 		void	__DetachEffect(uint32_t dwEID);
 
 	public:		
 		void CreateSpecialEffect(uint32_t iEffectIndex);
 		void AttachSpecialEffect(uint32_t effect);
+		void RemoveAttachedSpecialEffect(uint32_t effect);
 
 	protected:
+		std::map<uint32_t, std::vector<uint32_t>> m_specialEffects;
 		static std::string ms_astAffectEffectAttachBone[EFFECT_NUM];
 		static uint32_t ms_adwCRCAffectEffect[EFFECT_NUM];
 		static float ms_fDustGap;
@@ -453,6 +454,14 @@ class CInstanceBase
 	public:
 		CInstanceBase();
 		virtual ~CInstanceBase();
+
+		void SetLODLimits(uint32_t index, float fLimit);
+
+	protected:
+		bool m_IsAlwaysRender;
+	public:
+		bool IsAlwaysRender() const;
+		void SetAlwaysRender(bool val);
 
 		bool LessRenderOrder(CInstanceBase* pkInst);
 
@@ -561,7 +570,6 @@ class CInstanceBase
 		void					ActEmotion(uint32_t dwMotionNumber);
 		void					LevelUp();
 		void					SkillUp();
-		void					UseSpinTop();
 		void					Revive();
 		void					Stun();
 		void					Die();
@@ -689,7 +697,7 @@ class CInstanceBase
 		bool					NEW_GetInstanceVectorInCircleRange(float fSkillDistance, std::vector<CInstanceBase*>* pkVct_pkInst);
 
 		void					NEW_SetOwner(uint32_t dwOwnerVID);
-		void					NEW_SyncPixelPosition(int32_t & nPPosX, int32_t & nPPosY);
+		void					NEW_SyncPixelPosition(int32_t nPPosX, int32_t nPPosY);
 		void					NEW_SyncCurrentPixelPosition();
 
 		void					NEW_SetPixelPosition(const TPixelPosition& c_rkPPosDst);
@@ -893,7 +901,6 @@ class CInstanceBase
 
 		void					__ComboProcess();
 		void					MovementProcess();
-		void					TodoProcess();
 		void					StateProcess();
 		void					AttackProcess();
 
@@ -1154,6 +1161,19 @@ class CInstanceBase
 	public:
 		void					MobInfoLevelRefresh();
 #endif
+
+	protected:
+		CInstanceBase *mp_flyTargetInstance;
+	public:
+		CInstanceBase* GetFlyTargetInstance() { return mp_flyTargetInstance; }
+
+	protected:
+		uint32_t m_dwMiningVID;
+		
+	public:
+		bool IsMiningVID(uint32_t vid);
+		void StartMining(uint32_t vid);
+		void CancelMining();
 };
 
 inline int32_t RaceToJob(int32_t race)

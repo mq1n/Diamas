@@ -28,6 +28,12 @@ namespace UI
 		SLOT_STATE_ALWAYS_RENDER_COVER = (1 << 3),			// 현재 Cover 버튼은 슬롯에 무언가 들어와 있을 때에만 렌더링 하는데, 이 flag가 있으면 빈 슬롯이어도 커버 렌더링
 	};
 
+	enum EWindowType
+	{
+		SLOT_WND_DEFAULT,
+		SLOT_WND_INVENTORY
+	};
+
 	class CSlotWindow : public CWindow
 	{
 		public:
@@ -69,6 +75,7 @@ namespace UI
 				uint8_t	byyPlacedItemSize;
 
 				CGraphicImageInstance * pInstance;
+				CGraphicImageInstance * pBackgroundInstance;
 				CNumberLine * pNumberLine;
 
 				bool	bRenderBaseSlotImage;
@@ -90,6 +97,7 @@ namespace UI
 			void SetSlotID(uint32_t dwIndex, uint32_t dwID);
 
 			void Destroy();
+			void SetWindowType(int32_t iType);
 			
 			// Manage Slot
 			void SetSlotType(uint32_t dwType);
@@ -119,6 +127,7 @@ namespace UI
 			void SetSlot(uint32_t dwIndex, uint32_t dwVirtualNumber, uint8_t byWidth, uint8_t byHeight, CGraphicImage * pImage, D3DXCOLOR& diffuseColor);
 			void SetSlotCount(uint32_t dwIndex, uint32_t dwCount);
 			void SetSlotCountNew(uint32_t dwIndex, uint32_t dwGrade, uint32_t dwCount);
+			void SetRealSlotNumber(uint32_t dwIndex, uint32_t dwID);
 			void SetSlotCoolTime(uint32_t dwIndex, float fCoolTime, float fElapsedTime = 0.0f);
 			void ActivateSlot(uint32_t dwIndex);
 			void DeactivateSlot(uint32_t dwIndex);
@@ -152,6 +161,9 @@ namespace UI
 			void ShowSlotButton(uint32_t dwSlotNumber);
 			void HideAllSlotButton();
 			void OnPressedSlotButton(uint32_t dwType, uint32_t dwSlotNumber, BOOL isLeft = TRUE);
+
+			// Slot background			
+			void SetSlotBackground(uint32_t dwIndex, const char* c_szFileName);
 
 			// Requirement Sign
 			void ShowRequirementSign(uint32_t dwSlotNumber);
@@ -218,6 +230,7 @@ namespace UI
 			BOOL OnIsType(uint32_t dwType);
 
 		protected:
+			int32_t m_iWindowType;
 			uint32_t m_dwSlotType;
 			uint32_t m_dwSlotStyle;
 			std::list<uint32_t> m_dwSelectedSlotIndexList;

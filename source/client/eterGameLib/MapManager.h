@@ -36,7 +36,7 @@ class CMapManager : public CScreen, public IPhysicsWorld
 		bool					IsMapReady();
 
 		virtual bool			LoadMap(const std::string & c_rstrMapName, float x, float y, float z);
-		bool					UnloadMap(const std::string c_strMapName);
+		bool					UnloadMap(const std::string & c_strMapName);
 
 		bool					UpdateMap(float fx, float fy, float fz);
 		void					UpdateAroundAmbience(float fx, float fy, float fz);
@@ -154,9 +154,7 @@ class CMapManager : public CScreen, public IPhysicsWorld
 			}
 			bool operator() (TMapInfo & rMapInfo)
 			{
-				if (rMapInfo.m_strName == strNametoFind)
-					return true;
-				return false;
+				return rMapInfo.m_strName == strNametoFind;
 			}
 		};
 	public:

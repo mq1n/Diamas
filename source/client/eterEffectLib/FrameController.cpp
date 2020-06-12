@@ -33,7 +33,7 @@ void CFrameController::SetCurrentFrame(uint32_t dwFrame)
 	m_dwcurFrame = dwFrame;
 }
 
-uint8_t CFrameController::GetCurrentFrame() const
+uint8_t CFrameController::GetCurrentFrame()
 {
 	return m_dwcurFrame;
 }
@@ -67,7 +67,7 @@ void CFrameController::SetActive(BOOL bFlag)
 	m_isActive = bFlag;
 }
 
-BOOL CFrameController::isActive(uint32_t dwMainFrame) const
+BOOL CFrameController::isActive(uint32_t dwMainFrame)
 {
 	if (dwMainFrame < m_dwStartFrame)
 		return FALSE;
@@ -94,4 +94,6 @@ CFrameController::CFrameController()
 	m_fFrameTime = 0.0f;
 	m_dwStartFrame = 0;
 }
-CFrameController::~CFrameController() = default;
+CFrameController::~CFrameController()
+{
+}

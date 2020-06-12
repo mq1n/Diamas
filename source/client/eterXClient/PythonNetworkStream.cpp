@@ -250,7 +250,7 @@ uint32_t CPythonNetworkStream::UploadMark(const char * c_szImageFileName)
 	if (0 == m_dwGuildID)
 		return ERROR_MARK_UPLOAD_NEED_RECONNECT;
 
-	gs_nextDownloadMarkTime = 0;
+	m_nextDownloadMarkTime = 0;
 	// END_OF_MARK_BUG_FIX
 
 	uint32_t uError=ERROR_UNKNOWN;
@@ -277,7 +277,7 @@ uint32_t CPythonNetworkStream::UploadMark(const char * c_szImageFileName)
 	}
 
 	// MARK_BUG_FIX	
-	__DownloadMark();
+	__DownloadMark(true);
 	// END_OF_MARK_BUG_FIX
 	
 	if (CGuildMarkManager::INVALID_MARK_ID == CGuildMarkManager::Instance().GetMarkID(m_dwGuildID))
@@ -310,19 +310,22 @@ uint32_t CPythonNetworkStream::UploadSymbol(const char* c_szImageFileName)
 				return ERROR_UNKNOWN;
 		}
 	}
+	std::set<uint32_t> guildIDSet;
+	guildIDSet.insert(m_dwGuildID);
 
+	__DownloadSymbol(guildIDSet);
 	return ERROR_NONE;
 }
 
-void CPythonNetworkStream::__DownloadMark()
+void CPythonNetworkStream::__DownloadMark(bool forceDownload)
 {
 	// 3분 안에는 다시 접속하지 않는다.
 	uint32_t curTime = ELTimer_GetMSec();
 
-	if (curTime < gs_nextDownloadMarkTime)
+	if (!forceDownload && (curTime < m_nextDownloadMarkTime))
 		return;
 
-	gs_nextDownloadMarkTime = curTime + 60000 * 3; // 3분
+	m_nextDownloadMarkTime = curTime + 60000 * 3; // 3분
 
 	CGuildMarkDownloader& rkGuildMarkDownloader = CGuildMarkDownloader::Instance();
 	rkGuildMarkDownloader.Connect(m_kMarkAuth.m_kNetAddr, m_kMarkAuth.m_dwHandle, m_kMarkAuth.m_dwRandomKey);
@@ -435,7 +438,7 @@ const char* CPythonNetworkStream::GetAccountCharacterSlotDataz(uint32_t iSlot, u
 
 
 				static char s_szAddr[256];
-				sprintf(s_szAddr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+				sprintf_s(s_szAddr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 				return s_szAddr;
 			}
 			break;
@@ -480,7 +483,7 @@ void CPythonNetworkStream::SetLoginInfo(const char* c_szID, const char* c_szPass
 
 void CPythonNetworkStream::ClearLoginInfo( void )
 {
-	m_stPassword = "";
+	m_stPassword.clear();
 }
 
 void CPythonNetworkStream::SetLoginKey(uint32_t dwLoginKey)
@@ -496,19 +499,21 @@ bool CPythonNetworkStream::CheckPacket(TPacketHeader * pRetHeader)
 
 	TPacketHeader header;
 
-	if (!Peek(sizeof(TPacketHeader), &header))
+	size_t packetHeaderSize = sizeof(TPacketHeader);
+
+	if (!Peek(packetHeaderSize, &header))
 		return false;
 
 	if (0 == header)
 	{
-		if (!Recv(sizeof(TPacketHeader), &header))
+		if (!Recv(packetHeaderSize, &header))
 			return false;
 		
-		while (Peek(sizeof(TPacketHeader), &header))
+		while (Peek(packetHeaderSize, &header))
 		{
 			if (0 == header)
 			{
-				if (!Recv(sizeof(TPacketHeader), &header))
+				if (!Recv(packetHeaderSize, &header))
 					return false;
 			}
 			else
@@ -592,18 +597,22 @@ bool CPythonNetworkStream::RecvPhasePacket()
 	{
 		case PHASE_CLOSE:				// 끊기는 상태 (또는 끊기 전 상태)
 			ClosePhase();
+			m_isChatEnable = FALSE;
 			break;
 
 		case PHASE_HANDSHAKE:			// 악수..;;
 			SetHandShakePhase();
+			m_isChatEnable = FALSE;
 			break;
 
 		case PHASE_LOGIN:				// 로그인 중
 			SetLoginPhase();
+			m_isChatEnable = FALSE;
 			break;
 
 		case PHASE_SELECT:				// 캐릭터 선택 화면
 			SetSelectPhase();
+			m_isChatEnable = FALSE;
 	
 			// MARK_BUG_FIX
 			__DownloadMark();
@@ -612,10 +621,12 @@ bool CPythonNetworkStream::RecvPhasePacket()
 
 		case PHASE_LOADING:				// 선택 후 로딩 화면
 			SetLoadingPhase();
+			m_isChatEnable = FALSE;
 			break;
 
 		case PHASE_GAME:				// 게임 화면
 			SetGamePhase();
+			m_isChatEnable = TRUE;
 			break;
 
 		case PHASE_DEAD:				// 죽었을 때.. (게임 안에 있는 것일 수도..)
@@ -770,7 +781,7 @@ void CPythonNetworkStream::__ClearSelectCharacterData()
 	for (int32_t i = 0; i < PLAYER_PER_ACCOUNT4; ++i)
 	{
 		m_adwGuildID[i] = 0;
-		m_astrGuildName[i] = "";
+		m_astrGuildName[i].clear();
 	}
 }
 
@@ -865,6 +876,7 @@ CPythonNetworkStream::CPythonNetworkStream()
 	m_dwLoginKey = 0;
 	m_isWaitLoginKey = FALSE;
 	m_isStartGame = FALSE;
+	m_isChatEnable = TRUE;
 	m_isEnableChatInsultFilter = FALSE;
 	m_bComboSkillFlag = FALSE;
 	m_strPhase = "OffLine";
@@ -880,6 +892,8 @@ CPythonNetworkStream::CPythonNetworkStream()
 
 	SetOffLinePhase();
 
+	m_nextDownloadMarkTime = 0;
+	
 	CCheatDetectQueueMgr::Instance().RegisterReportFunction(
 		std::bind(&CPythonNetworkStream::SendHackNotification, this, std::placeholders::_1, std::placeholders::_2)
 	);

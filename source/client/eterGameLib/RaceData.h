@@ -59,7 +59,8 @@ class CRaceData
 
 			TMotionVectorMap MotionVectorMap;
 			
-			SMotionModeData() {}
+			SMotionModeData(): wMotionModeIndex(0)
+			{}
 			virtual ~SMotionModeData() {}
 		} TMotionModeData;
 		typedef std::map<uint16_t, TMotionModeData*> TMotionModeDataMap;
@@ -180,7 +181,6 @@ class CRaceData
 		void ChangeAttachingBoneName(uint32_t dwPartIndex, const char * c_szBoneName);
 
 		void RegisterMotionMode(uint16_t wMotionModeIndex);
-		void SetMotionModeParent(uint16_t wParentMotionModeIndex, uint16_t wMotionModeIndex);
 		void OLD_RegisterMotion(uint16_t wMotionModeIndex, uint16_t wMotionIndex, const char * c_szFileName, uint8_t byPercentage = 100);
 		CGraphicThing* NEW_RegisterMotion(CRaceMotionData* pkMotionData, uint16_t wMotionModeIndex, uint16_t wMotionIndex, const char * c_szFileName, uint8_t byPercentage = 100);
 		bool SetMotionRandomWeight(uint16_t wMotionModeIndex, uint16_t wMotionIndex, uint16_t wMotionSubIndex, uint8_t byPercentage);

@@ -236,7 +236,7 @@ void CFlyingInstance::UpdateAttachInstance()
 			case CFlyingData::FLY_ATTACH_TYPE_SINE:
 				{
 					//Tracenf("%f",CTimer::Instance().GetCurrentSecond());
-					float angle = (CTimer::Instance().GetCurrentSecond() - m_fStartTime)*2*3.1415926535897931f/rfad.fPeriod;
+					float angle = (CTimer::Instance().GetCurrentSecond() - m_fStartTime)*2*M_PI/rfad.fPeriod;
 					D3DXVECTOR3 p(
 						-sinf(D3DXToRadian(rfad.fRoll))*rfad.fAmplitude*sinf(angle),
 						0.0f,
@@ -579,8 +579,8 @@ void CFlyingInstance::__SetDataPointer(CFlyingData * pData, const D3DXVECTOR3 & 
 	if (pData->m_bSpreading)
 	{
 		D3DXQUATERNION q1, q2;
-		D3DXQuaternionRotationAxis(&q2, &D3DXVECTOR3(0.0f,0.0f,1.0f),(frandom(-3.141592f/3,+3.141592f/3)+frandom(-3.141592f/3,+3.141592f/3))/2);
-		D3DXQuaternionRotationAxis(&q1, &D3DXVECTOR3(0.0f,-1.0f,0.0f), frandom(0,2*3.1415926535897931f));
+		D3DXQuaternionRotationAxis(&q2, &D3DXVECTOR3(0.0f,0.0f,1.0f),(frandom(-(float)M_PI/3,+(float)M_PI/3)+frandom(-(float)M_PI/3,+(float)M_PI/3))/2);
+		D3DXQuaternionRotationAxis(&q1, &D3DXVECTOR3(0.0f,-1.0f,0.0f), frandom(0,2* (float)M_PI));
 		D3DXQuaternionMultiply(&q1,&q2,&q1);
 		D3DXQuaternionMultiply(&m_qRot,&q1,&m_qRot);
 	}

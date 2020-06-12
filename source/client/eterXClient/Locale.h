@@ -3,10 +3,10 @@
 #include "Locale_inc.h"
 
 uint32_t	LocaleService_GetCodePage();
-const char* LocaleService_GetName();
 const char*	LocaleService_GetLocaleName();
 const char*	LocaleService_GetLocalePath();
 const char*	LocaleService_GetSecurityKey();
+
 BOOL		LocaleService_IsLeadByte( const char chByte );
 int32_t			LocaleService_StringCompareCI( LPCSTR szStringLeft, LPCSTR szStringRight, size_t sizeLength );
 

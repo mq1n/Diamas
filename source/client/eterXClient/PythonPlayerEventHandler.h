@@ -54,7 +54,8 @@ class CPythonPlayerEventHandler : public CActorInstance::IEventHandler
 		class CNormalBowAttack_FlyEventHandler_AutoClear : public IFlyEventHandler
 		{
 			public:
-				CNormalBowAttack_FlyEventHandler_AutoClear() {}
+				CNormalBowAttack_FlyEventHandler_AutoClear(): m_pParent(nullptr), m_pInstMain(nullptr), m_pInstTarget(nullptr)
+				{}
 				virtual ~CNormalBowAttack_FlyEventHandler_AutoClear() {}
 
 				void Set(CPythonPlayerEventHandler * pParent, CInstanceBase * pInstMain, CInstanceBase * pInstTarget);

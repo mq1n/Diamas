@@ -103,9 +103,9 @@ namespace NEffectUpdateDecorator
 		typedef std::vector<TTimeEventType> TTimeEventContainerType;
 		CTimeEventDecorator(const TTimeEventContainerType& TimeEventContainer, T * pValue = 0) 
 			:	it_start(TimeEventContainer.begin()),
+				it_end(TimeEventContainer.end()),
 				it_cur(TimeEventContainer.begin()),
 				it_next(TimeEventContainer.begin()),
-				it_end(TimeEventContainer.end()),
 				pData(pValue)
 			{ 
 				if (it_start == it_end)
@@ -178,7 +178,7 @@ namespace NEffectUpdateDecorator
 	class CTextureAnimationCWDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationCWDecorator>
 	{
 	public:
-		CTextureAnimationCWDecorator(float fFrameTime, uint32_t n, uint8_t * pIdx) :n(n),pIdx(pIdx),fFrameTime(fFrameTime),fLastFrameTime(fFrameTime){}
+		CTextureAnimationCWDecorator(float fFrameTime, uint32_t n, uint8_t * pIdx) :n(n),fLastFrameTime(fFrameTime),fFrameTime(fFrameTime),pIdx(pIdx){}
 		virtual ~CTextureAnimationCWDecorator(){}
 	protected:
 		virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationCWDecorator(fFrameTime,n,(uint8_t*)((uint8_t*)pi+((uint8_t*)pIdx-(uint8_t*)pfi))); }
@@ -201,7 +201,7 @@ namespace NEffectUpdateDecorator
 	class CTextureAnimationCCWDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationCCWDecorator>
 	{
 	public:
-		CTextureAnimationCCWDecorator(float fFrameTime, uint8_t n, uint8_t * pIdx) :n(n),pIdx(pIdx),fFrameTime(fFrameTime),fLastFrameTime(fFrameTime){}
+		CTextureAnimationCCWDecorator(float fFrameTime, uint8_t n, uint8_t * pIdx) :n(n),fLastFrameTime(fFrameTime),fFrameTime(fFrameTime),pIdx(pIdx){}
 		virtual ~CTextureAnimationCCWDecorator(){}
 	protected:
 		virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationCCWDecorator(fFrameTime,n,(uint8_t*)((uint8_t*)pi+((uint8_t*)pIdx-(uint8_t*)pfi))); }
@@ -225,7 +225,7 @@ namespace NEffectUpdateDecorator
 	class CTextureAnimationRandomDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationRandomDecorator>
 	{
 	public:
-		CTextureAnimationRandomDecorator(float fFrameTime, uint8_t n, uint8_t * pIdx) :n(n),pIdx(pIdx),fFrameTime(fFrameTime),fLastFrameTime(fFrameTime){}
+		CTextureAnimationRandomDecorator(float fFrameTime, uint8_t n, uint8_t * pIdx) :n(n),fLastFrameTime(fFrameTime),fFrameTime(fFrameTime),pIdx(pIdx){}
 		virtual ~CTextureAnimationRandomDecorator(){}
 	protected:
 		virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationRandomDecorator(fFrameTime,n,(uint8_t*)((uint8_t*)pi+((uint8_t*)pIdx-(uint8_t*)pfi))); }

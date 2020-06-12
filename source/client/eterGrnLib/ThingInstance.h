@@ -2,7 +2,6 @@
 
 #include "../eterbase/Stl.h"
 #include "../eterlib/GrpObjectInstance.h"
-#include "../eterlib/GrpShadowTexture.h"
 
 #include "LODController.h"
 		
@@ -72,8 +71,8 @@ class CGraphicThingInstance : public CGraphicObjectInstance
 		void		InsertDelay(float fDelay);
 
 		void		SetMaterialImagePointer(uint32_t ePart, const char* c_szImageName, CGraphicImage* pImage);
-		void		SetMaterialData(uint32_t ePart, const char* c_szImageName, SMaterialData kMaterialData);
-		void		SetSpecularInfo(uint32_t ePart, const char* c_szMtrlName, BOOL bEnable, float fPower);
+		void		SetMaterialData(uint32_t ePart, const char* c_szImageName, const SMaterialData &kMaterialData);
+		void		SetSpecularInfo(uint32_t ePart, const char* c_szMtrlName, bool bEnable, float fPower);
 
 		void		__SetLocalTime(float fLocalTime); // Only Used by Tools
 		float		GetLastLocalTime();
@@ -106,7 +105,6 @@ class CGraphicThingInstance : public CGraphicObjectInstance
 		BOOL		GetBoneMatrix(uint32_t dwModelInstanceIndex, uint32_t dwBoneIndex, D3DXMATRIX ** ppMatrix);
 		BOOL		GetCompositeBoneMatrix(uint32_t dwModelInstanceIndex, uint32_t dwBoneIndex, D3DXMATRIX ** ppMatrix);
 		void		UpdateTransform(D3DXMATRIX * pMatrix, float fSecondsElapsed = 0.0f, int32_t iModelInstanceIndex = 0);
-		void		ProjectShadow(const CGraphicShadowTexture & c_rShadowTexture);
 
 	public:
 		void			BuildBoundingSphere();
@@ -114,6 +112,8 @@ class CGraphicThingInstance : public CGraphicObjectInstance
 		virtual void	CalculateBBox();
 		virtual bool	GetBoundingSphere(D3DXVECTOR3 & v3Center, float & fRadius);
 		virtual bool	GetBoundingAABB(D3DXVECTOR3 & v3Min, D3DXVECTOR3 & v3Max);
+
+		void			ClearPart(uint8_t part_index);
 
 	protected:
 		void		OnClear();
@@ -155,4 +155,7 @@ class CGraphicThingInstance : public CGraphicObjectInstance
 		static CDynamicPool<CGraphicThingInstance>		ms_kPool;
 
 		bool	HaveBlendThing();
+
+	public:
+		float		m_nextAllowedMovement;
 };

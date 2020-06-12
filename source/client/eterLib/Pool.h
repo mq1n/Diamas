@@ -136,7 +136,7 @@ class CDynamicPoolEx
 #ifdef _DEBUG
 			char szText[256];
 			sprintf_s(szText, "--------------------------------------------------------------------- %s Pool Capacity %d\n", typeid(T).name(), m_uUsedCapacity);
-			OutputDebugString(szText);
+			OutputDebugStringA(szText);
 			printf(szText);			
 #endif
 		}
@@ -153,7 +153,7 @@ class CDynamicPoolEx
 			{
 				char szText[256];
 				sprintf_s(szText, "--------------------------------------------------------------------- %s Pool Destroy\n", typeid(T).name());
-				OutputDebugString(szText);
+				OutputDebugStringA(szText);
 				printf(szText);
 			}
 #endif			

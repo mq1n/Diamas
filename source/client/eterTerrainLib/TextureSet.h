@@ -65,6 +65,16 @@ class CTextureSet
 								   float fTerrainTexCoordBase);
 
 		void			Reload(float fTerrainTexCoordBase);
+		bool			ReplaceTexture(const char * c_szFileName,
+								const char * c_OldszFileName,
+								float fuScale,
+								float fvScale,
+								float fuOffset,
+								float fvOffset,
+								bool bSplat,
+								uint16_t usBegin,
+								uint16_t usEnd,
+								float fTerrainTexCoordBase);
 
 		bool			AddTexture(const char * c_szFileName,
 			 					   float fuScale,

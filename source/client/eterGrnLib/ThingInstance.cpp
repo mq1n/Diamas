@@ -413,7 +413,7 @@ void CGraphicThingInstance::SetMaterialImagePointer(uint32_t ePart, const char* 
 	m_LODControllerVector[ePart]->SetMaterialImagePointer(c_szImageName, pImage);	
 }
 
-void CGraphicThingInstance::SetMaterialData(uint32_t ePart, const char* c_szImageName, SMaterialData kMaterialData)
+void CGraphicThingInstance::SetMaterialData(uint32_t ePart, const char* c_szImageName, const SMaterialData &kMaterialData)
 {
 	if (ePart>=m_LODControllerVector.size())
 	{
@@ -434,7 +434,7 @@ void CGraphicThingInstance::SetMaterialData(uint32_t ePart, const char* c_szImag
 	m_LODControllerVector[ePart]->SetMaterialData(c_szImageName, kMaterialData);	
 }
 
-void CGraphicThingInstance::SetSpecularInfo(uint32_t ePart, const char* c_szMtrlName, BOOL bEnable, float fPower)
+void CGraphicThingInstance::SetSpecularInfo(uint32_t ePart, const char* c_szMtrlName, bool bEnable, float fPower)
 {
 	if (ePart>=m_LODControllerVector.size())
 	{
@@ -513,7 +513,7 @@ void CGraphicThingInstance::RegisterModelThing(int32_t iModelThing, CGraphicThin
 {
 	if (!CheckModelThingIndex(iModelThing))
 	{
-		TraceError("CGraphicThingInstance::RegisterModelThing(iModelThing=%d, pModelThing=%s)\n", iModelThing, pModelThing->GetFileName());
+		TraceError("CGraphicThingInstance::RegisterModelThing(iModelThing=%d, pModelThing=%s)\n", iModelThing, pModelThing ? pModelThing->GetFileName() : "ERR 0x0");
 		return;
 	}
 
@@ -955,6 +955,14 @@ bool CGraphicThingInstance::HaveBlendThing()
 	return false;
 }
 
+void CGraphicThingInstance::ClearPart(uint8_t part_index)
+{
+	CGrannyLODController * pController = m_LODControllerVector[part_index];
+	if (!pController)
+		return;
+
+	pController->Clear();
+}
 
 void CGraphicThingInstance::OnClear()
 {

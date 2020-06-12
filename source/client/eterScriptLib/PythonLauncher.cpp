@@ -49,7 +49,8 @@ bool CPythonLauncher::Create(const char* c_szProgramName)
 	PyModule_AddIntConstant(builtins, "FALSE", 0);
 	PyDict_SetItemString(m_poDic, "__builtins__", builtins);
 	Py_DECREF(builtins);
-
+	
+/*
 #ifdef _DEBUG
 	static PyMethodDef methods[] =
 	{
@@ -61,6 +62,7 @@ bool CPythonLauncher::Create(const char* c_szProgramName)
 	PySys_SetObject("stderr", m);
 	PySys_SetObject("stdout", m);
 #endif
+*/
 	return true;
 }
 

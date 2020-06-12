@@ -12,13 +12,13 @@ CSymbol::~CSymbol()
 
 }
 
-bool CSymbol::Equal(CSymbol dif)
+bool CSymbol::Equal(const CSymbol &dif)
 {
     if (dif.iType/10 == iType/10) return true;
     return false;
 }
 
-bool CSymbol::Less(CSymbol dif)
+bool CSymbol::Less(const CSymbol &dif)
 {
     if (dif.iType/10 > iType/10) return true;
     return false;

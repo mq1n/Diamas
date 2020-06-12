@@ -293,7 +293,7 @@ void CLensFlare::DrawAfterFlare()
 ///////////////////////////////////////////////////////////////////////  
 //	CLensFlare::SetMainFlare
 
-void CLensFlare::SetMainFlare(string strSunFile, float fSunSize)
+void CLensFlare::SetMainFlare(const string &strSunFile, float fSunSize)
 {
 	if (m_bEnabled && m_bShowMainFlare)
 	{
@@ -370,7 +370,7 @@ void CLensFlare::CharacterizeFlare(bool bEnabled, bool bShowMainFlare, float fMa
 
 ///////////////////////////////////////////////////////////////////////  
 //	CLensFlare::Initialize
-void CLensFlare::Initialize(std::string strPath)
+void CLensFlare::Initialize(const std::string &strPath)
 {
 	if (m_bEnabled)
 		m_cFlare.Init(strPath);
@@ -510,7 +510,7 @@ void CFlare::Init(std::string strPath)
 {
 	int32_t i = 0;
 
-	while (g_strFiles[i] != "")
+	while (!g_strFiles[i].empty())
 	{
 		CResource * pResource = CResourceManager::Instance().GetResourcePointer((strPath + "/" + string(g_strFiles[i])).c_str());
 		

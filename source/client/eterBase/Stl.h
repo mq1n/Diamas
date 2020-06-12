@@ -25,7 +25,7 @@
 
 #pragma warning ( pop )
 
-extern char korean_tolower(const char c);
+extern char ascii_tolower(const char c);
 extern std::string& stl_static_string(const char* c_sz);
 extern void stl_lowers(std::string& rstRet);
 extern int32_t split_string(const std::string & input, const std::string & delimiter, std::vector<std::string>& results, bool includeEmpties);
@@ -111,7 +111,7 @@ struct stl_sz_less
 template<typename TContainer>
 inline void stl_wipe(TContainer& container)
 {
-	for (TContainer::iterator i = container.begin(); i != container.end(); ++i)
+	for (auto i = container.begin(); i != container.end(); ++i)
 	{
 		delete *i;
 		*i = nullptr;
@@ -143,7 +143,7 @@ inline uint32_t htmlColorStringToARGB(TString str)
 template<typename TContainer>
 inline void stl_wipe_second(TContainer& container)
 {
-	for (TContainer::iterator i = container.begin(); i != container.end(); ++i)
+	for (auto i = container.begin(); i != container.end(); ++i)
 	{
 		delete i->second;
 		i->second = nullptr;
@@ -176,7 +176,7 @@ void DeleteVectorItem(std::vector<T> * pVector, uint32_t dwIndex)
 		return;
 	}
 
-	std::vector<T>::iterator itor = pVector->begin();
+	auto itor = pVector->begin();
 	for (uint32_t i = 0; i < dwIndex; ++i)
 		++itor;
 
@@ -197,10 +197,10 @@ void DeleteVectorItem(T * pVector, uint32_t dwStartIndex, uint32_t dwEndIndex)
 		return;
 	}
 
-	T::iterator itorStart = pVector->begin();
+	auto itorStart = pVector->begin();
 	for (uint32_t i = 0; i < dwStartIndex; ++i)
 		++itorStart;
-	T::iterator itorEnd = pVector->begin();
+	auto itorEnd = pVector->begin();
 	for (uint32_t j = 0; j < dwEndIndex; ++j)
 		++itorEnd;
 
@@ -210,7 +210,7 @@ void DeleteVectorItem(T * pVector, uint32_t dwStartIndex, uint32_t dwEndIndex)
 template <typename T>
 void DeleteVectorItem(std::vector<T> * pVector, T pItem)
 {
-	std::vector<T>::iterator itor = pVector->begin();
+	auto itor = pVector->begin();
 	for (; itor != pVector->end(); ++itor)
 	{
 		if (pItem == *itor)
@@ -231,7 +231,7 @@ void DeleteVectorItem(std::vector<T> * pVector, T pItem)
 template <typename T>
 void DeleteListItem(std::list<T> * pList, T pItem)
 {
-	std::list<T>::iterator itor = pList->begin();
+	auto itor = pList->begin();
 	for (; itor != pList->end(); ++itor)
 	{
 		if (pItem == *itor)

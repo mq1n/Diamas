@@ -57,21 +57,21 @@ bool CTextureSet::Load(const char * c_szTextureSetFileName, float fTerrainTexCoo
 
 	for (int32_t i = 0; i < lCount; ++i)
 	{
-		_snprintf(szTextureName, sizeof(szTextureName), "texture%03d", i + 1);
+		_snprintf_s(szTextureName, sizeof(szTextureName), "texture%03d", i + 1);
 
 		if (stTokenVectorMap.end() == stTokenVectorMap.find(szTextureName))
 			continue;
 
 		const CTokenVector & rVector = stTokenVectorMap[szTextureName];
 
-		const std::string & c_rstrFileName	= rVector[0].c_str();
-		const std::string & c_rstrUScale	= rVector[1].c_str();
-		const std::string & c_rstrVScale	= rVector[2].c_str();
-		const std::string & c_rstrUOffset	= rVector[3].c_str();
-		const std::string & c_rstrVOffset	= rVector[4].c_str();
-		const std::string & c_rstrbSplat	= rVector[5].c_str();
-		const std::string & c_rstrBegin		= rVector[6].c_str();
-		const std::string & c_rstrEnd		= rVector[7].c_str();
+		const std::string & c_rstrFileName	= rVector[0];
+		const std::string & c_rstrUScale	= rVector[1];
+		const std::string & c_rstrVScale	= rVector[2];
+		const std::string & c_rstrUOffset	= rVector[3];
+		const std::string & c_rstrVOffset	= rVector[4];
+		const std::string & c_rstrbSplat	= rVector[5];
+		const std::string & c_rstrBegin		= rVector[6];
+		const std::string & c_rstrEnd		= rVector[7];
 
 		float fuScale, fvScale, fuOffset, fvOffset;
 		bool bSplat;
@@ -181,7 +181,38 @@ void CTextureSet::Reload(float fTerrainTexCoordBase)
 		tex.m_matTransform._42 = -tex.VOffset;
 	}
 }
-							 
+
+bool CTextureSet::ReplaceTexture(const char * c_OldszFileName,
+							 const char * c_szFileName,
+							 float fuScale,
+							 float fvScale,
+							 float fuOffset,
+							 float fvOffset,
+							 bool bSplat,
+							 uint16_t usBegin,
+							 uint16_t usEnd,
+							 float fTerrainTexCoordBase)
+{
+	for (uint32_t i = 1; i < GetTextureCount(); ++i)
+	{
+		if (0 == m_Textures[i].stFilename.compare(c_OldszFileName))
+		{
+			SetTexture(i,
+			   c_szFileName,
+			   fuScale,
+			   fvScale,
+			   fuOffset,
+			   fvOffset,
+			   bSplat,
+			   usBegin,
+			   usEnd,
+			   fTerrainTexCoordBase);
+			return true;
+		}
+	}
+	return false;
+}
+
 bool CTextureSet::AddTexture(const char * c_szFileName,
 							 float fuScale,
 							 float fvScale,
@@ -256,14 +287,14 @@ bool CTextureSet::Save(const char * c_pszFileName)
 	fprintf(pFile, "\n");
 	
 	// @fixme004
-	fprintf(pFile, "TextureCount %ld\n", GetTextureCount()?(GetTextureCount() - 1):0);	// -1 을 하는 이유는 지우개 때문임
+	fprintf(pFile, "TextureCount %u\n", GetTextureCount()?(GetTextureCount() - 1):0);	// -1 을 하는 이유는 지우개 때문임
 	fprintf(pFile, "\n");
 
 	for (uint32_t i = 1; i < GetTextureCount(); ++i)
 	{
 		TTerrainTexture & rTex = m_Textures[i];
 		
-		fprintf(pFile, "Start Texture%03d\n", i);
+		fprintf(pFile, "Start Texture%03u\n", i);
 		fprintf(pFile, "    \"%s\"\n", rTex.stFilename.c_str());
 		fprintf(pFile, "    %f\n", rTex.UScale);
 		fprintf(pFile, "    %f\n", rTex.VScale);
@@ -272,7 +303,7 @@ bool CTextureSet::Save(const char * c_pszFileName)
 		fprintf(pFile, "    %d\n", rTex.bSplat);
 		fprintf(pFile, "    %hu\n", rTex.Begin);
 		fprintf(pFile, "    %hu\n", rTex.End);
-		fprintf(pFile, "End Texture%03d\n", i);
+		fprintf(pFile, "End Texture%03u\n", i);
 	}
 	
 	fclose(pFile);

@@ -7,7 +7,7 @@ void CActorInstance::__OnSyncing()
 
 	IEventHandler::SState kState;
 	kState.kPPosSelf=NEW_GetCurPixelPositionRef();
-	kState.fAdvRotSelf=GetAdvancingRotation();
+	kState.fAdvRotSelf=GetRotation();
 	rkEventHandler.OnSyncing(kState);
 }
 
@@ -19,7 +19,7 @@ void CActorInstance::__OnWaiting()
 
 	IEventHandler::SState kState;
 	kState.kPPosSelf=NEW_GetCurPixelPositionRef();
-	kState.fAdvRotSelf=GetAdvancingRotation();
+	kState.fAdvRotSelf=GetRotation();
 	rkEventHandler.OnWaiting(kState);
 }
 
@@ -47,7 +47,7 @@ void CActorInstance::__OnMoving()
 	{
 		kState.kPPosSelf=c_rkPPosDst;
 	}
-	kState.fAdvRotSelf=GetAdvancingRotation();
+	kState.fAdvRotSelf=GetRotation();
 	rkEventHandler.OnMoving(kState);
 }
 
@@ -58,7 +58,7 @@ void CActorInstance::__OnMove()
 
 	IEventHandler::SState kState;
 	kState.kPPosSelf=NEW_GetCurPixelPositionRef();
-	kState.fAdvRotSelf=GetAdvancingRotation();
+	kState.fAdvRotSelf=GetRotation();
 	rkEventHandler.OnMove(kState);
 }
 
@@ -68,7 +68,7 @@ void CActorInstance::__OnStop()
 
 	IEventHandler::SState kState;
 	kState.kPPosSelf=NEW_GetCurPixelPositionRef();
-	kState.fAdvRotSelf=GetAdvancingRotation();
+	kState.fAdvRotSelf=GetRotation();
 	rkEventHandler.OnStop(kState);
 }
 
@@ -78,7 +78,7 @@ void CActorInstance::__OnWarp()
 
 	IEventHandler::SState kState;
 	kState.kPPosSelf=NEW_GetCurPixelPositionRef();
-	kState.fAdvRotSelf=GetAdvancingRotation();
+	kState.fAdvRotSelf=GetRotation();
 	rkEventHandler.OnWarp(kState);
 }
 
@@ -98,7 +98,7 @@ void CActorInstance::__OnUseSkill(uint32_t uMotSkill, uint32_t uLoopCount, bool 
 
 	IEventHandler::SState kState;
 	kState.kPPosSelf=NEW_GetCurPixelPositionRef();
-	kState.fAdvRotSelf=GetAdvancingRotation();
+	kState.fAdvRotSelf=GetRotation();
 
 	uint32_t uArg=uLoopCount;
 	if (isMovingSkill)

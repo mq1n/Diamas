@@ -1,273 +1,97 @@
 #include "StdAfx.h"
 #include "parser.h"
+#include "../eterBase/stl_utils.h"
 
 using namespace script;
 
-#define ishan(ch)		(((ch) & 0xE0) > 0x90)
-#define isnhspace(ch)	(!ishan(ch) && isspace(ch))
 
-
-extern uint32_t GetDefaultCodePage();
-
-const char* LocaleString_FindChar(const char* base, int32_t len, char test)
+int32_t LocaleString_FindChar(const std::string &base, int32_t start, int32_t until, char test)
 {
-	if (!base)
-		return nullptr;
+	until = std::min<int32_t>(until, base.size());
+	for (int32_t j = start; j < until; ++j) {
+		if (base[j] == test)
+			return j;
+	}
 
-	uint32_t codePage = GetDefaultCodePage();
+	return -1;
+}
+
+/*
+* Advance position to the next non-whitespace (or line break) character.
+*/
+void LocaleString_Skip(const std::string &base, int32_t& pos)
+{
+	for (; pos < base.size(); ++pos) {
+		if (!isspace((uint8_t)base[pos]) && base[pos] != '\n' && base[pos] != '\r')
+			break;
+	}
+}
+
+bool Group::GetArg(const std::string &argString, TArgList & argList)
+{
+    std::string szName = "";
+	std::string szValue = "";
 	
-	int32_t pos = 0;
-	while (pos < len)
-	{
-		const char* cur = base + pos;
-		const char* next = CharNextExA(codePage, cur, 0);
-		int32_t cur_len = next - cur;
-		if (cur_len > 1)
-		{
-			pos += cur_len;
-		}
-		else if (1 == cur_len)
-		{
-			if (*cur == test)
-				return cur;
-
-			++pos;
-		}
-		else
-		{
-			break;
-		}
-	}
-	return nullptr;
-}
-
-int32_t LocaleString_RightTrim(char* base, int32_t len)
-{
-	uint32_t codePage = GetDefaultCodePage();
-
-	int32_t pos = len;
-	
-	while (pos > 0)
-	{
-		char* cur = base + pos;
-		char* prev = CharPrevExA(codePage, base, cur , 0);
-		
-		int32_t prev_len = cur - prev;
-		if (prev_len != 1)
-			break;
-		
-		if (!isspace((uint8_t) *prev) && *prev != '\n' && *prev != '\r')
-			break;				
-		
-		*prev = '\0';
-		
-		pos -= prev_len;
-	}
-
-	if (pos > 0)
-		return pos;
-
-	return 0;
-}
-
-void LocaleString_RightTrim(char* base)
-{
-	LocaleString_RightTrim(base, strlen(base));
-}
-
-void OLD_rtrim(char* base)
-{
-	if (!base)
-		return;
-
-	uint32_t codePage = GetDefaultCodePage();
-
-	if (949 == codePage || 936 == codePage)
-	{
-		char* end = base + strlen(base) - 1;
-
-		while (end != base)
-		{
-			if (!isnhspace((uint8_t) *end) && *end != '\n' && *end != '\r' || (end!=base && *((uint8_t*)end-1)>0xa0))
-				break;
-			
-			*end = '\0';
-			
-			end = CharPrevExA(codePage, base, end, 0);
-		}
-	}
-	else
-	{
-		char* end = base + strlen(base);
-
-		while (end != base)
-		{
-			char* prev = CharPrevExA(codePage, base, end, 0);
-
-			int32_t prev_len = end - prev;
-			if (prev_len != 1)
-				break;
-
-			if (!isspace((uint8_t) *prev) && *prev != '\n' && *prev != '\r')
-				break;				
-			
-			*prev = '\0';
-			
-			end = prev;
-		}
-	}
-}
-
-const char* LocaleString_Skip(uint32_t codePage, const char* cur)
-{
-	int32_t loopCount = 0;
-
-	while (*cur)
-	{
-		if (++loopCount > 9216)
-		{
-			TraceError("Infinite loop in LocaleString_Skip [%s]", cur);
-			break;
-		}
-
-		const char* next = CharNextExA(codePage, cur, 0);
-		int32_t cur_len = next - cur;
-		if (cur_len > 1)
-		{
-			cur = next;
-		}
-		else if (1 == cur_len)
-		{
-			if (!isspace((uint8_t) *cur) && *cur != '\n' && *cur != '\r')
-				return cur;
-		}
-		else
-		{
-			break;
-		}
-	}
-	return cur;
-}
-
-bool Group::GetArg(const char *c_arg_base, int32_t arg_len, TArgList & argList)
-{
-    char szName[32 + 1];
-    char szValue[64 + 1];
-
-    int32_t iNameLen = 0;
-    int32_t iValueLen = 0;
-	int32_t iCharLen = 0;
-
-	int32_t pos = 0;
-
     bool isValue = false;
 
-	uint32_t codePage = GetDefaultCodePage();
-
-    while (pos < arg_len)
+	//Read args on a string of format NAME;VALUE|NAME;VALUE
+	for (size_t pos = 0, arg_len = argString.size(); pos < arg_len; ++pos)
     {
-		const char* cur = c_arg_base + pos;
-		const char* next = CharNextExA(codePage, cur, 0); 
-		iCharLen = next - cur;
+		const char c = argString[pos];
+		if (!c)
+			break;
+		
+		if (c == '|')
+		{
+			if (szName.empty())
+			{
+				TraceError("no argument name");
+				return false;
+			}
 
-		if (iCharLen > 1)
+			// Store the arg/value pair, and start looking for a name again
+			isValue = false;
+			argList.push_back(TArg(rtrim(szName), rtrim(szValue)));
+
+			szValue.clear();
+			szName.clear();
+		}
+		else if (c == ';')
+		{
+			// We expect a value next
+			isValue = true;
+		}
+		else if ((isValue || szName.size() > 0 || !isspace((uint8_t)c)) && c != '\r' && c != '\n')
 		{
 			if (isValue)
 			{
-				if (iValueLen >= 64)
+				if (szValue.size() >= 64)
 				{
+					//Note: Obviously not a real overflow anymore, but will just keep this here for possible
+					//backwards compatibility with other places that might use it.
 					TraceError("argument value overflow: must be shorter than 64 letters");
 					return false;
 				}
 
-				memcpy(szValue+iValueLen, cur, iCharLen);                
-				iValueLen += iCharLen;
-				szValue[iValueLen] = '\0';
+				szValue.append(&c, 1);
 			}
 			else
 			{
-				if (iNameLen >= 32)
+				if (szName.size() >= 32)
 				{
+					//Note: Look on note about value overflow.
 					TraceError("argument name overflow: must be shorter than 32 letters");
 					return false;
 				}
-				memcpy(szName+iNameLen, cur, iCharLen);				                
-				iNameLen += iCharLen;
-				szName[iNameLen] = '\0';
+
+				szName.append(&c, 1);
 			}
 		}
-		else if (iCharLen == 1)
-		{
-			const char c = *cur;
-			if (c == '|')
-			{
-				if (iNameLen == 0)
-				{
-					TraceError("no argument name");
-					return false;
-				}
-
-				isValue = false;
-
-				iNameLen = LocaleString_RightTrim(szName, iNameLen);
-				iValueLen = LocaleString_RightTrim(szValue, iValueLen);
-				argList.push_back(TArg(szName, szValue));
-
-				iNameLen = 0;
-				iValueLen = 0;
-			}
-			else if (c == ';')
-			{
-				isValue = true;
-			}
-			// 값이 아니고, 이름이 시작되지 않았을 경우 빈칸은 건너 뛴다.
-			else if (!isValue && iNameLen == 0 && isspace((uint8_t) c))
-			{
-			}
-			// 엔터는 건너 뛴다
-			else if (c == '\r' || c == '\n')
-			{
-			}
-			else
-			{
-				if (isValue)
-				{
-					if (iValueLen >= 64)
-					{
-						TraceError("argument value overflow: must be shorter than 64 letters");
-						return false;
-					}
-
-					memcpy(szValue+iValueLen, cur, iCharLen);                
-					iValueLen += iCharLen;
-					szValue[iValueLen]        = '\0';
-				}
-				else
-				{
-					if (iNameLen >= 32)
-					{
-						TraceError("argument name overflow: must be shorter than 32 letters");
-						return false;
-					}
-					memcpy(szName+iNameLen, cur, iCharLen);				                
-					iNameLen += iCharLen;
-					szName[iNameLen]        = '\0';
-				}				
-			}
-		}
-		else
-		{
-			break;
-		}
-
-		pos += iCharLen;
     }
 
-    if (iNameLen != 0 && iValueLen != 0)
-    {
-		iNameLen = LocaleString_RightTrim(szName, iNameLen);
-		iValueLen = LocaleString_RightTrim(szValue, iValueLen);
-        argList.push_back(TArg(szName, szValue));
+	//Store unsaved args (e.g if we didn't reach any | in the string to store them previously)
+    if (!szName.empty() && !szValue.empty()) {
+		argList.push_back(TArg(rtrim(szName), rtrim(szValue)));
     }
 
     return true;
@@ -279,128 +103,67 @@ bool Group::Create(const std::string & stSource)
 	m_cmdList.clear();
 
 	if (stSource.empty())
-		return false;
-
-    const char *str_base = stSource.c_str();
-    if (!str_base || !*str_base)
-    {
-        TraceError("Source file has no content");
+	{
+        TraceError("Source string has no content");
         return false;
     }
-	int32_t str_len = stSource.length();
-	int32_t str_pos = 0;
-	
-	uint32_t codePage = GetDefaultCodePage();
-
-    char box_data[1024 + 1];
 
 	static std::string stLetter;
-	
-    while (str_pos < str_len)
-    {
-        TCmd cmd;
 
-		const char* word = str_base + str_pos;
-		const char* word_next = CharNextExA(codePage, word, 0);
-		
-		int32_t word_len = word_next - word;
-		
-		if (word_len > 1)
+	for (size_t i = 0, strLen = stSource.length(); i < strLen - 1; ++i)
+	{
+		TCmd cmd;
+		const char cur = stSource[i];
+
+		if (cur == '[')
 		{
-			str_pos += word_len;
-
+			int32_t advanceTo = LocaleString_FindChar(stSource, i, strLen, ']');
+			if (advanceTo < 0)
 			{
-				stLetter.assign(word, word_next);
-
-				cmd.name.assign("LETTER");
-				cmd.argList.push_back(TArg("value", stLetter));
+				TraceError(" !! PARSING ERROR - Syntax Error : %s\n", stSource.c_str());
+				return false;
+			}
 			
-				m_cmdList.push_back(cmd);
-			}
-
-		}
-		else if (word_len == 1)
-		{
-			const char cur = *word;
-
-			if ('[' == cur)
+			// Skip spaces following '[' and prior to the command name
+			// pos will hold the position of the character
+			int32_t pos = i + 1;
+			LocaleString_Skip(stSource, pos);
+			
+			int32_t cmdArgsStart = LocaleString_FindChar(stSource, pos, advanceTo, ' ');
+			if (cmdArgsStart < 0)
 			{
-				++str_pos;
-
-				const char* box_begin = str_base + str_pos;
-				const char* box_end = LocaleString_FindChar(box_begin, str_len - str_pos, ']');				
-				if (!box_end)
-				{
-					TraceError(" !! PARSING ERROR - Syntax Error : %s\n", box_begin);
-					return false;
-				}
-				str_pos += box_end - box_begin + 1;
-				
-
-				int32_t data_len = 0;
-				{
-					const char* data_begin = LocaleString_Skip(codePage, box_begin);
-					const char* data_end = box_end;
-					data_len = data_end - data_begin;
-					if (data_len >= 1024)
-					{
-						TraceError(" !! PARSING ERROR - Buffer Overflow : %d, %s\n", data_len, str_base);
-						return false;
-					}
-					memcpy(box_data, data_begin, data_len);
-					box_data[data_len] = '\0';
-
-					data_len = LocaleString_RightTrim(box_data, data_len); // 오른쪽 빈칸 자르기
-				}
-
-				{
-					const char* space = LocaleString_FindChar(box_data, data_len, ' ');
-					if (space)  // 인자가 있음
-					{
-						int32_t name_len = space - box_data;
-						cmd.name.assign(box_data, name_len);
-						
-						const char* space_next = CharNextExA(codePage, space, 0);
-						const char* arg = LocaleString_Skip(codePage, space_next);
-
-						int32_t arg_len = data_len - (arg - box_data);
-						
-						if (!GetArg(arg, arg_len, cmd.argList))
-						{
-							TraceError(" !! PARSING ERROR - Unknown Arguments : %d, %s\n", arg_len, arg);
-							return false;
-						}
-					}
-					else        // 인자가 없으므로 모든 스트링이 명령어다.
-					{
-						cmd.name.assign(box_data);
-						cmd.argList.clear();
-					}
-					
-					m_cmdList.push_back(cmd);
-				}
-			}
-			else if (cur == '\r' || cur == '\n')
-			{
-				++str_pos;
+				//There are no arguments.
+				cmd.name = stSource.substr(pos, advanceTo - pos);
+				cmd.argList.clear();
 			}
 			else
 			{
-				++str_pos;
+				cmd.name = stSource.substr(pos, cmdArgsStart - pos);
 				
+				// Ignore spaces
+				LocaleString_Skip(stSource, cmdArgsStart);
+
+				if (!GetArg(stSource.substr(cmdArgsStart, advanceTo - cmdArgsStart), cmd.argList))
 				{
-					stLetter.assign(1, cur);
-					cmd.name.assign("LETTER");
-					cmd.argList.push_back(TArg("value", stLetter));
-					m_cmdList.push_back(cmd);
-				}					
+					TraceError(" !! PARSING ERROR - Unknown Arguments : %d, %s\n", advanceTo - cmdArgsStart, stSource.c_str());
+					return false;
+				}
 			}
+
+			m_cmdList.push_back(cmd);
+
+			// Continue looping after this character
+			i = advanceTo;
 		}
-		else
+		else if (cur != '\r' && cur != '\n')
 		{
-			break;
+			stLetter = cur;
+
+			cmd.name = "LETTER";
+			cmd.argList.push_back(TArg("value", stLetter));
+			m_cmdList.push_back(cmd);
 		}
-    }
+	}
 
     return true;
 }

@@ -213,7 +213,7 @@ CPythonBackground::CPythonBackground()
 	m_eShadowLevel=SHADOW_NONE;
 	m_dwBaseX=0;
 	m_dwBaseY=0;
-	m_strMapName="";
+	m_strMapName.clear();
 	m_iDayMode = DAY_MODE_LIGHT;
 	m_iXMasTreeGrade = 0;
 	m_bVisibleGuildArea = FALSE;
@@ -287,13 +287,7 @@ void CPythonBackground::Destroy()
 
 void CPythonBackground::Create()
 {
-	static int32_t s_isCreateProperty=false;
-
-	if (!s_isCreateProperty)
-	{
-		s_isCreateProperty=true;
-		__CreateProperty();
-	}
+	__CreateProperty();
 
 	CMapManager::Create();
 
@@ -367,7 +361,6 @@ void CPythonBackground::Update(float fCenterX, float fCenterY, float fCenterZ)
 
 		rkCullingMgr.ForInRay(aVector3d, toTop, &kGetPortalID);
 
-		std::set<int32_t>::iterator itor = kGetPortalID.m_kSet_iPortalID.begin();
 		if (!__IsSame(kGetPortalID.m_kSet_iPortalID, m_kSet_iShowingPortalID))
 		{
 			ClearPortal();
@@ -531,7 +524,7 @@ struct CollisionChecker
 {
 	bool isBlocked;
 	CInstanceBase* pInstance;
-	CollisionChecker(CInstanceBase* pInstance) : pInstance(pInstance), isBlocked(false) {}
+	CollisionChecker(CInstanceBase* pInstance) : isBlocked(false), pInstance(pInstance) {}
 	void operator () (CGraphicObjectInstance* pOpponent)
 	{
 		if (isBlocked)
@@ -549,7 +542,7 @@ struct CollisionAdjustChecker
 {
 	bool isBlocked;
 	CInstanceBase* pInstance;
-	CollisionAdjustChecker(CInstanceBase* pInstance) : pInstance(pInstance), isBlocked(false) {}
+	CollisionAdjustChecker(CInstanceBase* pInstance) : isBlocked(false), pInstance(pInstance) {}
 	void operator () (CGraphicObjectInstance* pOpponent)
 	{
 		if (!pOpponent)
@@ -719,6 +712,7 @@ void CPythonBackground::Warp(uint32_t dwX, uint32_t dwY)
 		return;
 	}
 
+	RefreshShadowLevel();
 	TMapInfo & rMapInfo = *pkMapInfo;
 	assert( (dwX >= rMapInfo.m_dwBaseX) && (dwY >= rMapInfo.m_dwBaseY) );
 
@@ -731,8 +725,6 @@ void CPythonBackground::Warp(uint32_t dwX, uint32_t dwY)
 	}
 
 	CPythonMiniMap::Instance().LoadAtlas();
-	
-	RefreshShadowLevel();
 
 	m_dwBaseX=rMapInfo.m_dwBaseX;
 	m_dwBaseY=rMapInfo.m_dwBaseY;

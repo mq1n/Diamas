@@ -75,7 +75,9 @@ void CPythonApplication::OnMouseMove(int32_t x, int32_t y)
 	POINT Point;
 	if (pkCmrCur)
 	{
-		if ( CPythonBackground::Instance().IsMapReady() && pkCmrCur->Drag(x, y, &Point) )
+		if (m_isActivateWnd &&
+		    CPythonBackground::Instance().IsMapReady() &&
+		    pkCmrCur->Drag(x, y, &Point))
 		{
 			x = Point.x;
 			y = Point.y;

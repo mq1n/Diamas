@@ -80,7 +80,7 @@ void CPythonEventManager::__InitEventSet(TEventSet& rEventSet)
 	rEventSet.lLastDelayTime = 0;
 	rEventSet.iCurrentLetter = 0;
 	rEventSet.CurrentColor = D3DXCOLOR(1, 1, 1, 1);
-	rEventSet.strCurrentLine = "";
+	rEventSet.strCurrentLine.clear();
 
 	rEventSet.pCurrentTextLine = nullptr;
 	rEventSet.ScriptTextLineList.clear();
@@ -125,7 +125,7 @@ int32_t CPythonEventManager::RegisterEventSet(const char * c_szFileName)
 		return -1;
 	}
 
-	strncpy(pEventSet->szFileName, c_szFileName, 32);
+	strncpy_s(pEventSet->szFileName, c_szFileName, 32);
 
 	pEventSet->pCurrentTextLine = nullptr;
 	pEventSet->poEventHandler = nullptr;
@@ -209,7 +209,7 @@ void CPythonEventManager::__ClearEventSetp(TEventSet * pEventSet)
 		m_ScriptTextLinePool.Free(pEventSet->pCurrentTextLine);
 	}
 	pEventSet->pCurrentTextLine = nullptr;
-	pEventSet->strCurrentLine = "";
+	pEventSet->strCurrentLine.clear();
 	pEventSet->iCurrentLetter = 0;
 
 	m_EventSetPool.Free(pEventSet);

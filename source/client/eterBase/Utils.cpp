@@ -8,7 +8,7 @@
 #include "Utils.h"
 #include "filedir.h"
 
-char korean_tolower(const char c);
+char ascii_tolower(const char c);
 
 const char * CreateTempFileName(const char * c_pszPrefix)
 {
@@ -172,15 +172,16 @@ void GetOldIndexingName(char * szName, int32_t Index)
 
 void GetIndexingName(char * szName, uint32_t Index)
 {
-	sprintf(szName + strlen(szName), "%u", Index);
+	sprintf_s(szName + strlen(szName), sizeof(szName), "%u", Index);
 }
 
 void GetOnlyFileName(const char * sz_Name, std::string & strFileName)
 {
-	strFileName = "";
+	strFileName.clear();
 
+	size_t szLen = strlen(sz_Name);
 	int32_t i;
-	for (i=strlen(sz_Name)-1; i>=0; --i)
+	for (i= szLen -1; i>=0; --i)
 	{
 		if ('\\' == sz_Name[i] || '/' == sz_Name[i])
 		{
@@ -192,7 +193,7 @@ void GetOnlyFileName(const char * sz_Name, std::string & strFileName)
 	if (i == -1)
 		i = 0;
 
-	for (size_t j = i; j < strlen(sz_Name); ++j)
+	for (size_t j = i; j < szLen; ++j)
 	{
 		strFileName += sz_Name[j];
 	}
@@ -221,7 +222,7 @@ void GetOnlyPathName(const char * sz_Name, std::string & OnlyPathName)
 		i = 0;
 
 	OnlyPathName.reserve(strlen(sz_Name));
-	OnlyPathName = "";
+	OnlyPathName.clear();
 
 	for (int32_t j=0; j<i; ++j)
 	{
@@ -240,8 +241,6 @@ const char * GetOnlyPathName(const char * c_szName)
 
 bool GetLocalFileName(const char * c_szGlobalPath, const char * c_szFullPathFileName, std::string * pstrLocalFileName)
 {
-	std::string strLocalFileName;
-
 	std::string strGlobalPath;
 	std::string strFullPathFileName;
 	StringPath(c_szGlobalPath, strGlobalPath);
@@ -274,7 +273,7 @@ void StringLowers(char * String)
 {
 	for (uint32_t i = 0; i < strlen(String); ++i)
 	{
-		String[i] = korean_tolower(String[i]);
+		String[i] = ascii_tolower(String[i]);
 	}
 }
 
@@ -285,7 +284,7 @@ void StringPath(std::string & rString)
 		if (rString[i] == '\\')
 			rString[i] = '/';
 		else
-			rString[i] = korean_tolower(rString[i]);
+			rString[i] = ascii_tolower(rString[i]);
 	}
 }
 
@@ -296,32 +295,34 @@ void StringPath(char * pString)
 		if (pString[i] == '\\')
 			pString[i] = '/';
 		else
-			pString[i] = korean_tolower(pString[i]);
+			pString[i] = ascii_tolower(pString[i]);
 	}
 }
 
 void StringPath(const char * c_szSrc, char * szDest)
 {
-	for (uint32_t i = 0; i < strlen(c_szSrc); ++i)
+	for (size_t i = 0, srcLen = strlen(c_szSrc); i < srcLen; ++i)
 	{
 		if (c_szSrc[i] == '\\')
 			szDest[i] = '/';
 		else
-			szDest[i] = korean_tolower(c_szSrc[i]);
+			szDest[i] = ascii_tolower(c_szSrc[i]);
 	}
 }
 
 void StringPath(const char * c_szSrc, std::string & rString)
 {
-	rString = "";
-	rString.resize(strlen(c_szSrc));
+	size_t srcLen = strlen(c_szSrc);
 
-	for (uint32_t i = 0; i < strlen(c_szSrc); ++i)
+	rString.clear();
+	rString.resize(srcLen);
+
+	for (size_t i = 0; i < srcLen; ++i)
 	{
 		if (c_szSrc[i] == '\\')
 			rString[i] = '/';
 		else
-			rString[i] = korean_tolower(c_szSrc[i]);
+			rString[i] = ascii_tolower(c_szSrc[i]);
 	}
 }
 
@@ -337,7 +338,7 @@ void PrintAsciiData(const void* void_data, int32_t bytes)
 
     fprintf(stdout, "------------------------------------------------------------------\n");
     j = bytes;
-    while (1)
+    while (j > 0)
     {
         k = j >= 16 ? 16 : j;
 
@@ -367,9 +368,6 @@ void PrintAsciiData(const void* void_data, int32_t bytes)
 
         j       -= 16;
         data    += 16;
-
-        if (j <= 0)
-            break;
     }
 
     fprintf(stdout, "------------------------------------------------------------------\n");
@@ -593,84 +591,4 @@ const char * _getf(const char* c_szFormat, ...)
 	va_end(args);
 
 	return szBuf;
-}
-
-PCHAR* CommandLineToArgv( PCHAR CmdLine, int32_t* _argc )
-{
-	PCHAR* argv;
-	PCHAR  _argv;
-	ULONG   len;
-	ULONG   argc;
-	CHAR   a;
-	ULONG   i, j;
-
-	BOOLEAN  in_QM;
-	BOOLEAN  in_TEXT;
-	BOOLEAN  in_SPACE;
-
-	len = strlen(CmdLine);
-	i = ((len+2)/2)*sizeof(PVOID) + sizeof(PVOID);
-
-	argv = (PCHAR*)GlobalAlloc(GMEM_FIXED,
-		i + (len+2)*sizeof(CHAR));
-
-	_argv = (PCHAR)(((PUCHAR)argv)+i);
-
-	argc = 0;
-	argv[argc] = _argv;
-	in_QM = FALSE;
-	in_TEXT = FALSE;
-	in_SPACE = TRUE;
-	i = 0;
-	j = 0;
-
-	while( (a = CmdLine[i]) != 0 ) {
-		if(in_QM) {
-			if(a == '\"') {
-				in_QM = FALSE;
-			} else {
-				_argv[j] = a;
-				j++;
-			}
-		} else {
-			switch(a) {
-				case '\"':
-					in_QM = TRUE;
-					in_TEXT = TRUE;
-					if(in_SPACE) {
-						argv[argc] = _argv+j;
-						argc++;
-					}
-					in_SPACE = FALSE;
-					break;
-				case ' ':
-				case '\t':
-				case '\n':
-				case '\r':
-					if(in_TEXT) {
-						_argv[j] = '\0';
-						j++;
-					}
-					in_TEXT = FALSE;
-					in_SPACE = TRUE;
-					break;
-				default:
-					in_TEXT = TRUE;
-					if(in_SPACE) {
-						argv[argc] = _argv+j;
-						argc++;
-					}
-					_argv[j] = a;
-					j++;
-					in_SPACE = FALSE;
-					break;
-			}
-		}
-		i++;
-	}
-	_argv[j] = '\0';
-	argv[argc] = nullptr;
-
-	(*_argc) = argc;
-	return argv;
 }

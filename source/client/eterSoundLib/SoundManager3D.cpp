@@ -4,6 +4,7 @@
 CSoundManager3D::CSoundManager3D()
 {
 	m_bInit = false;
+	m_pListener = nullptr;
 }
 
 CSoundManager3D::~CSoundManager3D()
@@ -161,10 +162,7 @@ int32_t CSoundManager3D::SetInstance(const char * c_pszFileName)
 
 		// 설마 uint32_t 한계값을 넘어갈리야 없겠지만.. 그래도.. 혹시나.. - [levites]
 		if (start > 50000)
-		{
-			start = 0;
 			return -1;
-		}
 	}
 
 	return -1;

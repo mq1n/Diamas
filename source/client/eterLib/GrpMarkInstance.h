@@ -20,9 +20,8 @@ class CGraphicMarkInstance
 
 		void Render();
 
-		void SetDepth(float fDepth);
 		void SetDiffuseColor(float fr, float fg, float fb, float fa);
-		void SetPosition(float fx, float fy);
+		void SetPosition(float fx, float fy, float fz = 0.0f);
 		void SetIndex(uint32_t uIndex);
 		void SetScale(float fScale);
 
@@ -56,7 +55,7 @@ class CGraphicMarkInstance
 
 	protected:
 		D3DXCOLOR m_DiffuseColor;
-		D3DXVECTOR2 m_v2Position;
+		D3DXVECTOR3 m_v3Position;
 
 		uint32_t m_uIndex;
 	

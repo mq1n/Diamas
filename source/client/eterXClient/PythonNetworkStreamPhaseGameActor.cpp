@@ -112,9 +112,8 @@ bool CPythonNetworkStream::RecvCharacterAppendPacket()
 	kNetActorData.m_dwVID=chrAddPacket.dwVID;
 	kNetActorData.m_fRot=chrAddPacket.angle;
 
-	kNetActorData.m_stName="";
+	kNetActorData.m_stName.clear();
 
-	kNetActorData.m_stName="";
 	kNetActorData.m_kAffectFlags.CopyData(0, sizeof(chrAddPacket.dwAffectFlag[0]), &chrAddPacket.dwAffectFlag[0]);
 	kNetActorData.m_kAffectFlags.CopyData(32, sizeof(chrAddPacket.dwAffectFlag[1]), &chrAddPacket.dwAffectFlag[1]);
 	

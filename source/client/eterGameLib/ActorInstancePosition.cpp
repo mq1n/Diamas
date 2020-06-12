@@ -116,4 +116,6 @@ void CActorInstance::__InitializePositionData()
 	m_kPPosAtk=m_kPPosLast=m_kPPosDst=m_kPPosCur=m_kPPosSrc=TPixelPosition(0.0f, 0.0f, 0.0f);
 
 	__InitializeMovement();
+
+	m_nextAllowedMovement = 0;
 }

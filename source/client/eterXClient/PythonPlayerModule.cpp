@@ -1083,7 +1083,7 @@ PyObject * playerGetItemLink(PyObject * poSelf, PyObject * poArgs)
 		int32_t len;
 		bool isAttr = false;
 
-		len = snprintf(itemlink, sizeof(itemlink), "item:%x:%x:%x:%x:%x", 
+		len = _snprintf_s(itemlink, sizeof(itemlink), "item:%x:%x:%x:%x:%x",
 				pPlayerItem->vnum, pPlayerItem->flags,
 				pPlayerItem->alSockets[0], pPlayerItem->alSockets[1], pPlayerItem->alSockets[2]);
 

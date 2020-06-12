@@ -4,7 +4,8 @@
 #include <windows.h>
 #include <vector>
 #include <string>
-#include <cstdint>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)			{ if (p) { delete (p);		(p) = nullptr; } }
@@ -86,7 +87,7 @@ PCHAR*				CommandLineToArgv( PCHAR CmdLine, int32_t* _argc );
 template<typename T>
 T EL_DegreeToRadian(T degree)
 {
-	const T PI = T(3.141592);
+	const T PI = T(M_PI);
 	return T(PI*degree/180.0f);
 }
 
@@ -120,7 +121,7 @@ void string_join(const std::string& sep, const C& container, std::string* ret)
     
     // calculate string sequence
     {
-        for (C::const_iterator i = container.begin(); i != container.end(); ++i)
+        for (auto i = container.begin(); i != container.end(); ++i)
             capacity += (*i).length();
     }
 
@@ -129,8 +130,8 @@ void string_join(const std::string& sep, const C& container, std::string* ret)
 
     // join strings
     {
-        C::const_iterator cur = container.begin();
-        C::const_iterator end = container.end();
+        auto cur = container.begin();
+        auto end = container.end();
         --end;
 
         while (cur != end)

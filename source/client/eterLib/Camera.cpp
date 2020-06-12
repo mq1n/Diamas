@@ -550,6 +550,7 @@ m_pPreviousCamera(nullptr)
 {
 	AddCamera(DEFAULT_PERSPECTIVE_CAMERA);
 	AddCamera(DEFAULT_ORTHO_CAMERA);
+	AddCamera(RENDER_TARGET_CAMERA);
 
 	SetCurrentCamera(DEFAULT_PERSPECTIVE_CAMERA);
 }

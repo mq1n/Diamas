@@ -45,6 +45,7 @@ float CInstanceBase::GetFlyTargetDistance()
 void CInstanceBase::ClearFlyTargetInstance()
 {
 	m_GraphicThingInstance.ClearFlyTarget();
+	mp_flyTargetInstance = nullptr;
 }
 
 void CInstanceBase::SetFlyTargetInstance(CInstanceBase& rkInstDst)
@@ -54,6 +55,7 @@ void CInstanceBase::SetFlyTargetInstance(CInstanceBase& rkInstDst)
 //		return;
 
 	m_GraphicThingInstance.SetFlyTarget(rkInstDst.GetGraphicThingInstancePtr());
+	mp_flyTargetInstance = &rkInstDst;
 }
 
 void CInstanceBase::AddFlyTargetPosition(const TPixelPosition& c_rkPPosDst)
@@ -336,10 +338,11 @@ bool CInstanceBase::NEW_UseSkill(uint32_t uSkill, uint32_t uMot, uint32_t uMotLo
 		m_isGoing = FALSE;
 	}
 
+	float animSpeed = 1.0f;
 	float fCurRot=m_GraphicThingInstance.GetTargetRotation();
 	SetAdvancingRotation(fCurRot);
 
-	m_GraphicThingInstance.InterceptOnceMotion(CRaceMotionData::NAME_SKILL + uMot, 0.1f, uSkill, 1.0f);
+	m_GraphicThingInstance.InterceptOnceMotion(CRaceMotionData::NAME_SKILL + uMot, 0.1f, uSkill, animSpeed);
 
 	m_GraphicThingInstance.__OnUseSkill(uMot, uMotLoopCount, isMovingSkill);
 

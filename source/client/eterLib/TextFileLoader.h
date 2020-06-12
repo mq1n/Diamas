@@ -62,7 +62,7 @@ class CTextFileLoader
 
 		static void SetCacheMode();
 
-		static CTextFileLoader* Cache(const char* c_szFileName);
+		static CTextFileLoader* Cache(const char* c_szFileName, bool silentFailure = false);
 
 	public:
 		CTextFileLoader();
@@ -70,7 +70,7 @@ class CTextFileLoader
 
 		void Destroy();
 
-		bool Load(const char * c_szFileName);
+		bool Load(const char * c_szFileName, bool silentFailure = false);
 		const char * GetFileName();
 
 		bool IsEmpty();

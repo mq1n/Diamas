@@ -465,8 +465,8 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		void		SetAlphaValue(float fAlpha);
 		float		GetAlphaValue();
 		void		BlendAlphaValue(float fDstAlpha, float fDuration);
-		void		SetSpecularInfo(BOOL bEnable, int32_t iPart, float fAlpha);
-		void		SetSpecularInfoForce(BOOL bEnable, int32_t iPart, float fAlpha);
+		void		SetSpecularInfo(bool bEnable, int32_t iPart, float fAlpha);
+		void		SetSpecularInfoForce(bool bEnable, int32_t iPart, float fAlpha);
 
 		void		BeginAddRender();
 		void		EndAddRender();
@@ -509,6 +509,9 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		BOOL		IsFishing();
 		void		SetFishingPosition(D3DXVECTOR3 & rv3Position);
 
+		// Mining
+		bool		IsMining();
+
 	// Flying Methods
 		// As a Flying Target
 	public:
@@ -524,6 +527,7 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		void AddFlyTarget(const CFlyTarget & cr_FlyTarget);
 		void SetFlyTarget(const CFlyTarget & cr_FlyTarget);		
 		void LookAtFlyTarget();
+		const CFlyTarget& GetFlyTarget() { return m_kFlyTarget; };
 
 		float GetFlyTargetDistance();
 
@@ -651,7 +655,6 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		void		__ClearMotion();
 
 		bool		__BindMotionData(uint32_t dwMotionKey);	// 모션 데이터를 바인딩
-		void		__ClearHittedActorInstanceMap();		// 때려진 액터 인스턴스 맵을 지운다
 
 		uint32_t		__GetMotionType();			// 모션 타입 얻기
 
@@ -671,7 +674,6 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		bool		__CanNextComboAttack();		// 다음 콤보 어택이 가능한가?
 
 		bool		__IsComboAttacking();	// 콤보 공격중인가?
-		void		__CancelComboAttack();	// 콤보 공격 취소
 
 		uint16_t		__GetCurrentMotionIndex();
 		uint32_t		__GetCurrentMotionKey();
@@ -876,8 +878,6 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		void __BlendAlpha_Initialize();
 		void __BlendAlpha_Apply(float fDstAlpha, float fDuration);
 		void __BlendAlpha_Update();
-		void __BlendAlpha_UpdateFadeIn();
-		void __BlendAlpha_UpdateFadeOut();
 		void __BlendAlpha_UpdateComplete();
 		float __BlendAlpha_GetElapsedTime();
 

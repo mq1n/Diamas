@@ -52,7 +52,7 @@ void CSnowParticle::GetVerticies(SParticleVertex & rv3Vertex1, SParticleVertex &
 	rv3Vertex4.v = 1.0f;
 }
 
-void CSnowParticle::Init(const D3DXVECTOR3 & c_rv3Pos)
+void CSnowParticle::Init(const D3DXVECTOR3 & c_rv3Pos, bool bIsRain)
 {
 	float fRot = frandom(0.0f, 36000.0f) / 100.0f;
 	float fDistance = frandom(0.0f, c_fSnowDistance) / 10.0f;
@@ -71,6 +71,9 @@ void CSnowParticle::Init(const D3DXVECTOR3 & c_rv3Pos)
 	m_fPeriod = frandom(1.5f, 5.0f);
 	m_fcurRadian = frandom(-1.6f, 1.6f);
 	m_fAmplitude = frandom(1.0f, 3.0f);
+
+	if (bIsRain)
+		m_v3Velocity.z = -1500.f;
 }
 
 CSnowParticle * CSnowParticle::New()
@@ -95,7 +98,7 @@ void CSnowParticle::DestroyPool()
 	stl_wipe(ms_kVct_SnowParticlePool);
 }
 
-CSnowParticle::CSnowParticle()
+CSnowParticle::CSnowParticle(): m_bActivate(false), m_bChangedSize(false), m_fHalfWidth(0), m_fHalfHeight(0), m_fPeriod(0), m_fcurRadian(0), m_fAmplitude(0)
 {
 }
 CSnowParticle::~CSnowParticle()

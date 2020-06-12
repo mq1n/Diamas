@@ -1924,13 +1924,13 @@ bool CPythonNetworkStream::RecvQuestInfoPacket()
 			rkQuest.MakeQuest(QuestInfo.index);
 		}
 
-		if (strlen(szTitle) > 0)
+		if (szTitle[0] != '\0')
 			rkQuest.SetQuestTitle(QuestInfo.index, szTitle);
-		if (strlen(szClockName) > 0)
+		if (szClockName[0] != '\0')
 			rkQuest.SetQuestClockName(QuestInfo.index, szClockName);
-		if (strlen(szCounterName) > 0)
+		if (szCounterName[0] != '\0')
 			rkQuest.SetQuestCounterName(QuestInfo.index, szCounterName);
-		if (strlen(szIconFileName) > 0)
+		if (szIconFileName[0] != '\0')
 			rkQuest.SetQuestIconFileName(QuestInfo.index, szIconFileName);
 
 		if (c_rFlag & QUEST_SEND_CLOCK_VALUE)
@@ -2979,7 +2979,7 @@ bool CPythonNetworkStream::SendGuildChangeGradeNamePacket(uint8_t byGradeNumber,
 		return false;
 
 	char szName[GUILD_GRADE_NAME_MAX_LEN+1];
-	strncpy(szName, c_szName, GUILD_GRADE_NAME_MAX_LEN);
+	strncpy_s(szName, c_szName, GUILD_GRADE_NAME_MAX_LEN);
 	szName[GUILD_GRADE_NAME_MAX_LEN] = '\0';
 
 	if (!Send(sizeof(szName), &szName))
@@ -3375,7 +3375,7 @@ bool CPythonNetworkStream::RecvGuild()
 
 			CPythonGuild::Instance().EnableGuild();
 			CPythonGuild::TGuildInfo & rGuildInfo = CPythonGuild::Instance().GetGuildInfoRef();
-			strncpy(rGuildInfo.szGuildName, GuildInfo.name, GUILD_NAME_MAX_LEN);
+			strncpy_s(rGuildInfo.szGuildName, GuildInfo.name, GUILD_NAME_MAX_LEN);
 			rGuildInfo.szGuildName[GUILD_NAME_MAX_LEN] = '\0';
 
 			rGuildInfo.dwGuildID = GuildInfo.guild_id;
@@ -3483,10 +3483,10 @@ bool CPythonNetworkStream::RecvGuild()
 			if (!Recv(sizeof(dwGuildID), &dwGuildID))
 				return false;
 			char szGuildName[GUILD_NAME_MAX_LEN+1];
-			if (!Recv(GUILD_NAME_MAX_LEN, &szGuildName))
+			if (!Recv(GUILD_NAME_MAX_LEN + 1, &szGuildName))
 				return false;
 
-			szGuildName[GUILD_NAME_MAX_LEN] = 0;
+			szGuildName[GUILD_NAME_MAX_LEN] = '\0';
 
 			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "RecvGuildInviteQuestion", Py_BuildValue("(is)", dwGuildID, szGuildName));
 			Tracef(" <Guild Invite> %d, %s\n", dwGuildID, szGuildName);
@@ -3786,7 +3786,7 @@ bool CPythonNetworkStream::SendBuildPrivateShopPacket(const char * c_szName, con
 {
 	TPacketCGMyShop packet;
 	packet.bHeader = HEADER_CG_MYSHOP;
-	strncpy(packet.szSign, c_szName, SHOP_SIGN_MAX_LEN);
+	strncpy_s(packet.szSign, c_szName, SHOP_SIGN_MAX_LEN);
 	packet.bCount = c_rSellingItemStock.size();
 	if (!Send(sizeof(packet), &packet))
 		return false;
@@ -3809,7 +3809,7 @@ bool CPythonNetworkStream::RecvShopSignPacket()
 
 	CPythonPlayer& rkPlayer=CPythonPlayer::Instance();
 	
-	if (0 == strlen(p.szSign))
+	if (p.szSign[0] == '\0')
 	{
 		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], 
 			"BINARY_PrivateShop_Disappear", 
@@ -4238,14 +4238,18 @@ bool CPythonNetworkStream::RecvDigMotionPacket()
 	IAbstractCharacterManager& rkChrMgr=IAbstractCharacterManager::GetSingleton();
 	CInstanceBase * pkInstMain = rkChrMgr.GetInstancePtr(kDigMotion.vid);
 	CInstanceBase * pkInstTarget = rkChrMgr.GetInstancePtr(kDigMotion.target_vid);
-	if (nullptr == pkInstMain)
+	if (!pkInstMain || !pkInstTarget)
 		return true;
 
-	if (pkInstTarget)
-		pkInstMain->NEW_LookAtDestInstance(*pkInstTarget);
+	// Look their way
+	pkInstMain->NEW_LookAtDestInstance(*pkInstTarget);
 
+	// Run the motion(s)
 	for (int32_t i = 0; i < kDigMotion.count; ++i)
 		pkInstMain->PushOnceMotion(CRaceMotionData::NAME_DIG);
+
+	// Start the mining!
+	pkInstMain->StartMining(kDigMotion.target_vid);
 
 	return true;
 }

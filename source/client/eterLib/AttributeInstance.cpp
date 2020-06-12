@@ -207,7 +207,7 @@ void CAttributeInstance::Clear()
 	m_roAttributeData.SetPointer(nullptr);
 }
 
-CAttributeInstance::CAttributeInstance()
+CAttributeInstance::CAttributeInstance(): m_fCollisionRadius(0), m_fHeightRadius(0)
 {
 }
 CAttributeInstance::~CAttributeInstance()

@@ -26,7 +26,8 @@ class CPythonGuild : public CSingleton<CPythonGuild>
 
 		typedef struct SGuildGradeData
 		{
-			SGuildGradeData(){}
+			SGuildGradeData(): byAuthorityFlag(0)
+			{}
 			SGuildGradeData(uint8_t byAuthorityFlag_, const char * c_szName_) : byAuthorityFlag(byAuthorityFlag_), strName(c_szName_) {}
 			uint8_t byAuthorityFlag;
 			std::string strName;

@@ -251,8 +251,6 @@ class CMapOutdoor : public CMapBase
 		const int32_t		GetViewRadius()			{ return m_lViewRadius;		}
 		const float		GetHeightScale()		{ return m_fHeightScale;	}
 
-		const TOutdoorMapCoordinate & GetEntryPoint(const std::string & c_rstrEntryPointName) const;
-		void SetEntryPoint(const std::string & c_rstrEntryPointName, const TOutdoorMapCoordinate & c_rOutdoorMapCoordinate);
 		const TOutdoorMapCoordinate & GetCurCoordinate() { return m_CurCoordinate; }
 		const TOutdoorMapCoordinate & GetPrevCoordinate() { return m_PrevCoordinate; }
 
@@ -269,8 +267,6 @@ class CMapOutdoor : public CMapBase
 		void			__NEW_WorldEditor_UpdateArea();
 #endif
 		void			__Game_UpdateArea(D3DXVECTOR3& v3Player);
-
-		void			__BuildDynamicSphereInstanceVector();
 
 		void			__CollectShadowReceiver(D3DXVECTOR3& v3Target, D3DXVECTOR3& v3Light);
 		void			__CollectCollisionPCBlocker(D3DXVECTOR3& v3Eye, D3DXVECTOR3& v3Target, float fDistance);
@@ -300,10 +296,6 @@ class CMapOutdoor : public CMapBase
 		bool		GetAttr(float fX, float fY, uint8_t * pbyAttr);
 		bool		isAttrOn(int32_t iX, int32_t iY, uint8_t byAttr);
 		bool		GetAttr(int32_t iX, int32_t iY, uint8_t * pbyAttr);
-
-		void		SetMaterialDiffuse(float fr, float fg, float fb);
-		void		SetMaterialAmbient(float fr, float fg, float fb);
-		void		SetTerrainMaterial(const PR_MATERIAL * pMaterial);
 
 		bool		GetTerrainNum(float fx, float fy, uint8_t * pbyTerrainNum);
 		bool		GetTerrainNumFromCoord(uint16_t wCoordX, uint16_t wCoordY, uint8_t * pbyTerrainNum);
@@ -670,4 +662,5 @@ class CMapOutdoor : public CMapBase
 
 	private:
 		bool m_bSettingTerrainVisible;
+		bool m_bSettingIsLavaMap;
 };

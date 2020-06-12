@@ -25,7 +25,7 @@ protected:
 	StrList m_StrList;
 };
 
-CPostIt::CPostIt( LPCSTR szAppName ) : m_pMemoryBlock(nullptr), m_bModified(FALSE)
+CPostIt::CPostIt( LPCSTR szAppName ) : m_bModified(FALSE), m_pMemoryBlock(nullptr)
 {
 	Init( szAppName );
 }
@@ -117,7 +117,7 @@ BOOL CPostIt::Set( LPCSTR lpszKeyName, uint32_t dwValue )
 {
 	CHAR szValue[12];
 
-	_snprintf( szValue, 12, "%d", dwValue );
+	_snprintf_s( szValue, 12, "%u", dwValue );
 	return Set( lpszKeyName, szValue );
 }
 
@@ -234,12 +234,13 @@ BOOL _CPostItMemoryBlock::DestroyHandle( void )
 
 LPSTR _CPostItMemoryBlock::Find( LPCSTR lpszKeyName )
 {
+	size_t keyLen = strlen(lpszKeyName);
 	for( StrListItr itr = m_StrList.begin(); itr != m_StrList.end(); ++itr ) {
 		LPSTR	lpszText = *itr;
 
-		if( _strnicmp( lpszText, lpszKeyName, strlen( lpszKeyName ) ) != 0 )
+		if( _strnicmp( lpszText, lpszKeyName, keyLen) != 0 )
 			continue;
-		if( *(lpszText + strlen( lpszKeyName )) != '=' )
+		if( *(lpszText + keyLen) != '=' )
 			continue;
 		return lpszText;
 	}

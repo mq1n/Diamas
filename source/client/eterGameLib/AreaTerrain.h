@@ -96,7 +96,7 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 		void			SetCoordinate(uint16_t wCoordX, uint16_t wCoordY);
 
 		std::string &	GetName() { return m_strName; }
-		void			SetName(const std::string c_strName) { m_strName = c_strName; }
+		void			SetName(const std::string &c_strName) { m_strName = c_strName; }
 
 		CMapOutdoor *	GetOwner() { return m_pOwnerOutdoorMap; }
 		void			RAW_GenerateSplat(bool bBGLoading = false);

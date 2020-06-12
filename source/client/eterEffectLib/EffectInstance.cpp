@@ -59,16 +59,16 @@ void CEffectInstance::UpdateSound()
 
 struct FEffectUpdator
 {
-	BOOL isAlive;
+	bool isAlive;
 	float fElapsedTime;
 	FEffectUpdator(float fElapsedTime)
-		: isAlive(FALSE), fElapsedTime(fElapsedTime)
+		: isAlive(false), fElapsedTime(fElapsedTime)
 	{
 	}
 	void operator () (CEffectElementBaseInstance * pInstance)
 	{
 		if (pInstance->Update(fElapsedTime))
-			isAlive = TRUE;
+			isAlive = true;
 	}
 };
 
@@ -132,7 +132,7 @@ void CEffectInstance::SetGlobalMatrix(const D3DXMATRIX & c_rmatGlobal)
 	m_matGlobal = c_rmatGlobal;
 }
 
-BOOL CEffectInstance::isAlive()
+bool CEffectInstance::isAlive()
 {
 	return m_isAlive;
 }
@@ -260,7 +260,7 @@ void CEffectInstance::Clear()
 
 void CEffectInstance::__Initialize()
 {
-	m_isAlive = FALSE;
+	m_isAlive = false;
 	m_dwFrame = 0;
 	m_pSoundInstanceVector = nullptr;
 	m_fBoundingSphereRadius = 0.0f;

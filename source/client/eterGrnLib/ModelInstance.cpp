@@ -11,7 +11,7 @@ CGrannyModel* CGrannyModelInstance::GetModel()
 
 void CGrannyModelInstance::SetMaterialImagePointer(const char* c_szImageName, CGraphicImage* pImage)
 {
-	m_kMtrlPal.SetMaterialImagePointer(c_szImageName, pImage);
+	m_kMtrlPal.SetMaterialImage(c_szImageName, pImage);
 }
 
 void CGrannyModelInstance::SetMaterialData(const char* c_szImageName, const SMaterialData& c_rkMaterialData)
@@ -19,7 +19,7 @@ void CGrannyModelInstance::SetMaterialData(const char* c_szImageName, const SMat
 	m_kMtrlPal.SetMaterialData(c_szImageName, c_rkMaterialData);
 }
 
-void CGrannyModelInstance::SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower)
+void CGrannyModelInstance::SetSpecularInfo(const char* c_szMtrlName, bool bEnable, float fPower)
 {
 	m_kMtrlPal.SetSpecularInfo(c_szMtrlName, bEnable, fPower);
 }

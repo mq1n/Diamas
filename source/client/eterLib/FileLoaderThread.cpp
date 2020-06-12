@@ -4,7 +4,7 @@
 #include "ResourceManager.h"
 #include "../eterBase/Stl.h"
 
-CFileLoaderThread::CFileLoaderThread() : m_bShutdowned(false), m_pArg(nullptr), m_hThread(nullptr), m_uThreadID(0)
+CFileLoaderThread::CFileLoaderThread() : m_hThread(nullptr), m_pArg(nullptr), m_uThreadID(0), m_hSemaphore(nullptr), m_iRestSemCount(0), m_bShutdowned(false)
 {
 }
 
@@ -13,7 +13,7 @@ CFileLoaderThread::~CFileLoaderThread()
 	Destroy();
 }
 
-int32_t CFileLoaderThread::Create(void * arg)
+bool CFileLoaderThread::Create(void * arg)
 {
 	Arg(arg);
 	m_hThread = (HANDLE) _beginthreadex(nullptr, 0, EntryPoint, this, 0, &m_uThreadID);
@@ -174,6 +174,4 @@ void CFileLoaderThread::Process()	// called in loader thread
 	m_CompleteMutex.Lock();
 	m_pCompleteDeque.push_back(pData);
 	m_CompleteMutex.Unlock();
-
-	Sleep(g_iLoadingDelayTime);
 }

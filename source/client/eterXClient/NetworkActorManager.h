@@ -155,8 +155,6 @@ class CNetworkActorManager : public CReferenceObject
 		void __RemoveDynamicActors();
 		void __RemoveCharacterManagerActor(SNetworkActorData& rkNetActorData);
 
-		SNetworkActorData* __FindActorData(uint32_t dwVID);
-
 		CInstanceBase* __AppendCharacterManagerActor(SNetworkActorData& rkNetActorData);
 		CInstanceBase* __FindActor(SNetworkActorData& rkNetActorData);
 		CInstanceBase* __FindActor(SNetworkActorData& rkNetActorData, int32_t lDstX, int32_t lDstY);

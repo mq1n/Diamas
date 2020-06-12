@@ -137,11 +137,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool SendUseSkillPacket(uint32_t dwSkillIndex, uint32_t dwTargetVID=0);
 		bool SendTargetPacket(uint32_t dwVID);
 
-		// OLDCODE:
-		bool SendCharacterStartWalkingPacket(float fRotation, int32_t lx, int32_t ly);
-		bool SendCharacterEndWalkingPacket(float fRotation, int32_t lx, int32_t ly);
-		bool SendCharacterCheckWalkingPacket(float fRotation, int32_t lx, int32_t ly);
-
 		bool SendCharacterPositionPacket(uint8_t iPosition);
 
 		bool SendItemUsePacket(TItemPos pos);
@@ -314,6 +309,8 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 		bool SendHackNotification(const char* c_szMsg, const char* c_szInfo);
 
+		void ResetNextMarkDownloadTime() { m_nextDownloadMarkTime = 0; };
+
 	protected:
 		bool OnProcess();	// State들을 실제로 실행한다.
 		void OffLinePhase();
@@ -325,7 +322,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 		bool __IsNotPing();
 
-		void __DownloadMark();
+		void __DownloadMark(bool forceDownload = false);
 		void __DownloadSymbol(const std::set<uint32_t> & c_rkSet_dwGuildID);
 
 		void __PlayInventoryItemUseSound(TItemPos uSlotPos);
@@ -612,9 +609,11 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		uint32_t m_dwMainActorSkillGroup;
 		BOOL m_isGameOnline;
 		BOOL m_isStartGame;
+	BOOL m_isChatEnable;
 
 		uint32_t m_dwGuildID;
 		uint32_t m_dwEmpireID;
+	int32_t	  m_nextDownloadMarkTime;
 		
 		struct SServerTimeSync
 		{

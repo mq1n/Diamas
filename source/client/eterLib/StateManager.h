@@ -242,6 +242,7 @@ class CStateManager : public CSingleton<CStateManager>
 		HRESULT DrawPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, uint32_t PrimitiveCount, const void* pVertexStreamZeroData, uint32_t VertexStreamZeroStride);
 		HRESULT DrawIndexedPrimitive(D3DPRIMITIVETYPE PrimitiveType, uint32_t minIndex, uint32_t NumVertices, uint32_t startIndex, uint32_t primCount, INT baseVertexIndex = 0);
 		HRESULT DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, uint32_t MinVertexIndex, uint32_t NumVertexIndices, uint32_t PrimitiveCount, CONST void * pIndexData, D3DFORMAT IndexDataFormat, CONST void * pVertexStreamZeroData, uint32_t VertexStreamZeroStride);
+		// Codes For Debug
 		uint32_t GetRenderState(D3DRENDERSTATETYPE Type);
 
 		bool LoadShader(const char *pszFilename, LPD3DXEFFECT &pEffect);

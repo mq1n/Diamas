@@ -6,19 +6,19 @@
 
 namespace script
 {
-    typedef struct SArgumet
+    typedef struct SArgument
     {
-        SArgumet(const std::string& c_stName, const std::string& c_stValue)
+		SArgument(const std::string& stName, const std::string& stValue)
         {
-            strName = c_stName;
-            strValue = c_stValue;
+			strName = stName;
+			strValue = stValue;
         }
-		SArgumet(const SArgumet& c_arg)
+		SArgument(const SArgument& c_arg)
 		{
 			strName = c_arg.strName;
 			strValue = c_arg.strValue;
 		}		
-		void operator=(const SArgumet& c_arg)
+		void operator=(const SArgument& c_arg)
 		{
 			strName = c_arg.strName;
 			strValue = c_arg.strValue;
@@ -84,7 +84,7 @@ namespace script
 			
 		private:
 			void                SetError(const char *str);
-			bool                GetArg(const char * c_atr_base, int32_t arg_len, TArgList & argList);
+			bool                GetArg(const std::string &argString, TArgList & argList);
 			
 			std::string         m_stError;
 			std::list<TCmd>     m_cmdList;

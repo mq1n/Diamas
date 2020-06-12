@@ -70,7 +70,7 @@ bool CGraphicFontTexture::Create(const char* c_szFontName, int32_t fontSize, boo
 {
 	Destroy();
 	
-	strncpy(m_fontName, c_szFontName, sizeof(m_fontName)-1);
+	strncpy_s(m_fontName, c_szFontName, sizeof(m_fontName)-1);
 	m_fontSize	= fontSize;
 	m_bItalic	= bItalic;
 

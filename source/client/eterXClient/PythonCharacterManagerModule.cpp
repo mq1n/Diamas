@@ -104,12 +104,12 @@ PyObject * chrmgrGetVIDInfo(PyObject* poSelf, PyObject* poArgs)
 
 		CPythonBackground& rkBG=CPythonBackground::Instance();
 		rkBG.LocalPositionToGlobalPosition(xInst, yInst);
-		sprintf(szDetail, "pos=(%d, %d)", xInst, yInst);
+		sprintf_s(szDetail, "pos=(%d, %d)", xInst, yInst);
 	}	
 	
 
 	char szInfo[1024];	
-	sprintf(szInfo, "VID %d (isRegistered=%d, isAlive=%d, isDead=%d) %s", 
+	sprintf_s(szInfo, "VID %d (isRegistered=%d, isAlive=%d, isDead=%d) %s", 
 		nVID,
 		rkChrMgr.IsRegisteredVID(nVID),
 		rkChrMgr.IsAliveVID(nVID),

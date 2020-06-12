@@ -26,9 +26,7 @@ public:
 	void SetSoundVolume(float fVolume);
 	void SetSoundVolumeRatio(float fRatio);
 	void SetMusicVolume(float fVolume);
-	void SetMusicVolumeRatio(float fRatio);
 	void SetSoundVolumeGrade(int32_t iGrade);
-	void SetMusicVolumeGrade(int32_t iGrade);
 	void SaveVolume();
 	void RestoreVolume();
 	float GetSoundVolume();

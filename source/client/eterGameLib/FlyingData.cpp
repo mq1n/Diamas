@@ -196,7 +196,7 @@ bool CFlyingData::LoadScriptFile(const char* c_szFilename)
 
 	if (!TextFileLoader.GetTokenString("bombeffect",&m_strBombEffectName))
 	{
-		m_strBombEffectName = "";
+		m_strBombEffectName.clear();
 	}
 	else if (!m_strBombEffectName.empty())
 	{
@@ -240,7 +240,7 @@ bool CFlyingData::LoadScriptFile(const char* c_szFilename)
 			TextFileLoader.GetTokenInteger("flytype",&fad.iFlyType);
 			if (!TextFileLoader.GetTokenString("attachfile",&fad.strFilename))
 			{
-				fad.strFilename = "";
+				fad.strFilename.clear();
 			}
 			else if (!fad.strFilename.empty())
 			{

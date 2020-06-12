@@ -9,7 +9,7 @@
 
 const uint32_t DEBUG_STRING_MAX_LEN = 1024;
 
-static int32_t isLogFile = false;
+static bool isLogFile = false;
 HWND g_PopupHwnd = nullptr;
 
 auto g_stSyserrFileName = ""s;
@@ -47,7 +47,7 @@ class CLogFile : public CSingleton<CLogFile>
 			time_t ct = time(0);
 			struct tm ctm = *localtime(&ct);
 
-			fprintf(m_fp, "%02d%02d %02d:%02d:%05d :: %s", 
+			fprintf(m_fp, "%02d%02d %02d:%02d:%05u :: %s", 
 				ctm.tm_mon + 1, 
 				ctm.tm_mday,
 				ctm.tm_hour,
@@ -145,15 +145,12 @@ void Tracen(const char* c_szMsg)
 {
 #ifdef _DEBUG
 	char szBuf[DEBUG_STRING_MAX_LEN+1];
-	_snprintf(szBuf, sizeof(szBuf), "%s\n", c_szMsg);
+	_snprintf_s(szBuf, sizeof(szBuf), "%s\n", c_szMsg);
 	OutputDebugString(szBuf);
 	puts(c_szMsg);
 
 	if (isLogFile)
 		LogFile(szBuf);
-
-	puts(c_szMsg);
-	putc('\n', stdout);
 #else
 	if (isLogFile)
 	{
@@ -210,7 +207,7 @@ void TraceError(const char* c_szFormat, ...)
 
 	char szBuf[DEBUG_STRING_MAX_LEN+2];
 
-	strncpy(szBuf, "SYSERR: ", DEBUG_STRING_MAX_LEN);
+	strncpy_s(szBuf, "SYSERR: ", DEBUG_STRING_MAX_LEN);
 	int32_t len = strlen(szBuf);
 
 	va_list args;
@@ -224,7 +221,7 @@ void TraceError(const char* c_szFormat, ...)
 	time_t ct = time(0);
 	struct tm ctm = *localtime(&ct);
 
-	fprintf(stderr, "%02d%02d %02d:%02d:%05d :: %s", 
+	fprintf(stderr, "%02d%02d %02d:%02d:%05u :: %s", 
 					ctm.tm_mon + 1, 
 					ctm.tm_mday,
 					ctm.tm_hour,
@@ -258,7 +255,7 @@ void TraceErrorWithoutEnter(const char* c_szFormat, ...)
 	time_t ct = time(0);
 	struct tm ctm = *localtime(&ct);
 
-	fprintf(stderr, "%02d%02d %02d:%02d:%05d :: %s", 
+	fprintf(stderr, "%02d%02d %02d:%02d:%05u :: %s", 
 					ctm.tm_mon + 1, 
 					ctm.tm_mday,
 					ctm.tm_hour,

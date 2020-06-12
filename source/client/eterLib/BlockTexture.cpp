@@ -170,10 +170,8 @@ bool CBlockTexture::Create(CGraphicDib * pDIB, const RECT & c_rRect, uint32_t dw
 	return true;
 }
 
-CBlockTexture::CBlockTexture()
+CBlockTexture::CBlockTexture(): m_pDIB(nullptr), m_bClipEnable(0), m_dwWidth(0), m_dwHeight(0), m_lpd3dTexture(nullptr)
 {
-	m_pDIB = nullptr;
-	m_lpd3dTexture = nullptr;
 }
 
 CBlockTexture::~CBlockTexture()

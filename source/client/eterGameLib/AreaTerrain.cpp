@@ -54,7 +54,7 @@ void CTerrain::Clear()
 bool CTerrain::Initialize()
 {
 	SetReady(false);
-	m_strName = "";
+	m_strName.clear();
 	m_wX = m_wY = 0xFFFF;
 	m_bReady = false;
 	m_bMarked = false;
@@ -355,7 +355,6 @@ bool CTerrain::GetNormal(int32_t ix, int32_t iy, D3DXVECTOR3 * pv3Normal)
 	ix /= CELLSCALE;
 	iy /= CELLSCALE;
 
-	D3DXVECTOR3 v3Noraml;
 	char * n = (char*) &m_acNormalMap[(iy * NORMALMAP_XSIZE + ix)*3];
 	pv3Normal->x = -((float)*n++) * 0.007874016f;
 	pv3Normal->y = ((float)*n++) * 0.007874016f;
@@ -544,7 +543,7 @@ void CTerrain::RAW_DeallocateSplats(bool bBGLoading)
 
 		if (m_lpAlphaTexture[i])
 		{
-			uint32_t ulRef;
+			ULONG ulRef;
 			do
 			{
 				ulRef = m_lpAlphaTexture[i]->Release();
@@ -659,7 +658,7 @@ void CTerrain::RAW_GenerateSplat(bool bBGLoading)
 				{
 					if (m_lpAlphaTexture[i])
 					{
-						uint32_t ulRef;
+						ULONG ulRef;
 						do
 						{
 							ulRef = m_lpAlphaTexture[i]->Release();
@@ -744,7 +743,7 @@ void CTerrain::RAW_GenerateSplat(bool bBGLoading)
 				{
 					if (m_lpAlphaTexture[i])
 					{
-						uint32_t ulRef;
+						ULONG ulRef;
 						do
 						{
 							ulRef = m_lpAlphaTexture[i]->Release();
@@ -788,7 +787,7 @@ LPDIRECT3DTEXTURE9 CTerrain::AddTexture32(uint8_t byImageNum, uint8_t * pbyImage
 	uint32_t uiNewHeight = 256;
 	hr = ms_lpd3dDevice->CreateTexture(
 		uiNewWidth, uiNewHeight, 5, 0, 
-		format, D3DPOOL_MANAGED, &pkTex, nullptr);
+		format, D3DPOOL_MANAGED, &pkTex,0);
 	if (FAILED(hr))
 	{
 		TraceError("CTerrain::AddTexture32 - CreateTexture Error");
@@ -923,7 +922,7 @@ void CTerrain::CalculateTerrainPatch()
 
 CTerrainPatch * CTerrain::GetTerrainPatchPtr(uint8_t byPatchNumX, uint8_t byPatchNumY)
 {
-	if (byPatchNumX < 0 || byPatchNumX >= PATCH_XCOUNT || byPatchNumY < 0 || byPatchNumY >= PATCH_YCOUNT)
+	if (byPatchNumX >= PATCH_XCOUNT || byPatchNumY >= PATCH_YCOUNT)
 		return nullptr;
 
 	return &m_TerrainPatchList[byPatchNumY * PATCH_XCOUNT + byPatchNumX];
@@ -933,9 +932,6 @@ CTerrainPatch * CTerrain::GetTerrainPatchPtr(uint8_t byPatchNumX, uint8_t byPatc
 
 void CTerrain::_CalculateTerrainPatch(uint8_t byPatchNumX, uint8_t byPatchNumY)
 {
-	if (!m_awRawHeightMap || !m_acNormalMap || !m_abyWaterMap)
-		return;
-
 	uint32_t dwPatchNum = byPatchNumY * PATCH_XCOUNT + byPatchNumX;
 
 	CTerrainPatch& rkTerrainPatch=m_TerrainPatchList[dwPatchNum];
@@ -1017,8 +1013,7 @@ void CTerrain::_CalculateTerrainPatch(uint8_t byPatchNumX, uint8_t byPatchNumY)
 			if (kPosition.z < fMinZ)
 				fMinZ = kPosition.z;
 			
-			if (0 <= dwX && 0 <= dwY && XSIZE > dwX && YSIZE > dwY && 
-				(dwStartX + PATCH_XSIZE) != dwX && (dwStartY + PATCH_YSIZE) != dwY)
+			if (XSIZE > dwX && YSIZE > dwY && (dwStartX + PATCH_XSIZE) != dwX && (dwStartY + PATCH_YSIZE) != dwY)
 			{
 				uint8_t byNumWater = (*pbyWater++);
 
@@ -1149,7 +1144,7 @@ void CTerrain::AllocateMarkedSplats(uint8_t * pbyAlphaMap)
 
 	if (m_lpMarkedTexture)
 	{
-		uint32_t ulRef;
+		ULONG ulRef;
 		do
 		{
 			ulRef = m_lpMarkedTexture->Release();
@@ -1158,7 +1153,7 @@ void CTerrain::AllocateMarkedSplats(uint8_t * pbyAlphaMap)
 
 	do
 	{
-		hr = ms_lpd3dDevice->CreateTexture(ATTRMAP_XSIZE, ATTRMAP_YSIZE, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &m_lpMarkedTexture, nullptr);
+		hr = ms_lpd3dDevice->CreateTexture(ATTRMAP_XSIZE, ATTRMAP_YSIZE, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &m_lpMarkedTexture,0);
 	} while(FAILED(hr));
 
 	D3DLOCKED_RECT d3dlr;
@@ -1183,7 +1178,7 @@ void CTerrain::DeallocateMarkedSplats()
 	TTerainSplat & rSplat = m_MarkedSplatPatch.Splats[0];
 	if (m_lpMarkedTexture)
 	{
-		uint32_t ulRef;
+		ULONG ulRef;
 		do
 		{
 			ulRef = m_lpMarkedTexture->Release();

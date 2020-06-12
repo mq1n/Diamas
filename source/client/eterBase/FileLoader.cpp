@@ -40,7 +40,6 @@ int32_t CMemoryTextFileLoader::SplitLine2(uint32_t dwLine, CTokenVector* pstToke
 	pstTokenVector->reserve(10);
 	pstTokenVector->clear();
 
-	std::string stToken;
 	const std::string & c_rstLine = GetLineString(dwLine);
 
 	uint32_t basePos = 0;
@@ -85,7 +84,6 @@ bool CMemoryTextFileLoader::SplitLine(uint32_t dwLine, CTokenVector* pstTokenVec
 	pstTokenVector->reserve(10);
 	pstTokenVector->clear();
 
-	std::string stToken;
 	const std::string & c_rstLine = GetLineString(dwLine);
 
 	uint32_t basePos = 0;
@@ -163,7 +161,7 @@ void CMemoryTextFileLoader::Bind(int32_t bufSize, const void* c_pvBuf)
 					++pos;
 
 			m_stLineVector.push_back(stLine);
-			stLine = "";
+			stLine.clear();
 		}
 		else if (c < 0)
 		{

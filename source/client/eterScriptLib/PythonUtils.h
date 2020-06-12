@@ -30,8 +30,6 @@ PyObject * Py_BadArgument();
 PyObject * Py_BuildNone();
 PyObject * Py_BuildEmptyTuple();
 
-//Think - 27/04/14 - More intuitive reference to follow the uint32_t usage
-//static auto &&PyTuple_GetDWORD = PyTuple_GetUnsignedLong;
 // Python int32_t too large to convert to C int32_t
 #define PyLong_AsLong PyLong_AsLongLong
-#define PyLong_AsUnsignedLong PyLong_AsUnsignedLongLong
+#define PyLong_AsUnsignedLong (unsigned long)PyLong_AsLongLong

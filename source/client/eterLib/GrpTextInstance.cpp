@@ -23,7 +23,7 @@ void CGraphicTextInstance::Hyperlink_UpdateMousePos(int32_t x, int32_t y)
 {
 	gs_mx = x;
 	gs_my = y;
-	gs_hyperlinkText = L"";
+	gs_hyperlinkText.clear();
 }
 
 int32_t CGraphicTextInstance::Hyperlink_GetText(char* buf, int32_t len)

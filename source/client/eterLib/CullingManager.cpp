@@ -148,6 +148,7 @@ CCullingManager::CCullingManager()
 		1600,	// leaf radius
 		400		// extra radius
 		);
+	m_RayFarDistance = 0;
 }
 
 CCullingManager::~CCullingManager()

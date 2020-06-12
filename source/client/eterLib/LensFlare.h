@@ -87,8 +87,8 @@ public:
 	void			DrawAfterFlare();
 	void			DrawFlare();
 	
-	void			SetMainFlare(std::string strSunFile, float fSunSize);
-	void			Initialize(std::string strPath);
+	void			SetMainFlare(const std::string &strSunFile, float fSunSize);
+	void			Initialize(const std::string &strPath);
 	
 	void            SetFlareLocation(double dX, double dY);
 	

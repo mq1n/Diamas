@@ -3,16 +3,18 @@
 //
 #include "stdafx.h"
 #include "InstanceBase.h"
-#include "resource.h"
 #include "PythonTextTail.h"
 #include "PythonCharacterManager.h"
 #include "PythonGuild.h"
 #include "Locale.h"
 #include "MarkManager.h"
+#include "resource.h"
+#include "PythonBackground.h"
 
 const D3DXCOLOR c_TextTail_Player_Color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 const D3DXCOLOR c_TextTail_Monster_Color = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
 const D3DXCOLOR c_TextTail_Item_Color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+const D3DXCOLOR c_TextTail_Item_Picked_Color = D3DXCOLOR(0.1f, 0.9f, 0.1f, 1.0f);
 const D3DXCOLOR c_TextTail_Chat_Color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 const D3DXCOLOR c_TextTail_Info_Color = D3DXCOLOR(1.0f, 0.785f, 0.785f, 1.0f);
 const D3DXCOLOR c_TextTail_Guild_Name_Color = 0xFFEFD3FF;
@@ -43,7 +45,7 @@ CGraphicText * ms_pFont = nullptr;
 void CPythonTextTail::GetInfo(std::string* pstInfo)
 {
 	char szInfo[256];
-	sprintf(szInfo, "TextTail: ChatTail %d, ChrTail (Map %d, List %d), ItemTail (Map %d, List %d), Pool %d", 
+	sprintf_s(szInfo, "TextTail: ChatTail %u, ChrTail (Map %u, List %u), ItemTail (Map %u, List %u), Pool %u", 
 		m_ChatTailMap.size(), 
 		m_CharacterTextTailMap.size(), m_CharacterTextTailList.size(), 
 		m_ItemTextTailMap.size(), m_ItemTextTailList.size(), 
@@ -214,8 +216,6 @@ void CPythonTextTail::ArrangeTextTail()
 	{
 		TTextTail * pTextTail = *itor;
 
-		float fxAdd = 0.0f;
-
 		// Mark 위치 업데이트
 		CGraphicMarkInstance * pMarkInstance = pTextTail->pMarkInstance;
 		CGraphicTextInstance * pGuildNameInstance = pTextTail->pGuildNameTextInstance;
@@ -224,8 +224,7 @@ void CPythonTextTail::ArrangeTextTail()
 			int32_t iWidth, iHeight;
 			int32_t iImageHalfSize = pMarkInstance->GetWidth()/2 + c_fxMarkPosition;
 			pGuildNameInstance->GetTextSize(&iWidth, &iHeight);
-
-			pMarkInstance->SetPosition(pTextTail->x - iWidth/2 - iImageHalfSize, pTextTail->y - c_fyMarkPosition);
+			pMarkInstance->SetPosition(pTextTail->x - iWidth / 2 - iImageHalfSize, pTextTail->y - c_fyMarkPosition, pTextTail->z);
 			pGuildNameInstance->SetPosition(pTextTail->x + iImageHalfSize, pTextTail->y - c_fyGuildNamePosition, pTextTail->z);
 			pGuildNameInstance->Update();
 		}
@@ -240,16 +239,9 @@ void CPythonTextTail::ArrangeTextTail()
 			int32_t iTitleWidth, iTitleHeight;
 			pTitle->GetTextSize(&iTitleWidth, &iTitleHeight);
 
-			fxAdd = 8.0f;
 
-			if( GetDefaultCodePage() == CP_ARABIC )
-			{
-				pTitle->SetPosition(pTextTail->x - (iNameWidth / 2) - iTitleWidth - 4.0f, pTextTail->y, pTextTail->z);
-			}
-			else
-			{
-				pTitle->SetPosition(pTextTail->x - (iNameWidth / 2), pTextTail->y, pTextTail->z);
-			}
+			pTitle->SetPosition(pTextTail->x - (iNameWidth / 2) - 4.0f, pTextTail->y, pTextTail->z);
+			
 			pTitle->Update();
 
 			// Level 위치 업데이트
@@ -258,24 +250,14 @@ void CPythonTextTail::ArrangeTextTail()
 			{
 				int32_t iLevelWidth, iLevelHeight;
 				pLevel->GetTextSize(&iLevelWidth, &iLevelHeight);
-				
+				pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - 8.0f - iTitleWidth, pTextTail->y, pTextTail->z);
 
-				if( GetDefaultCodePage() == CP_ARABIC )
-				{
-					pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - iLevelWidth - iTitleWidth - 8.0f, pTextTail->y, pTextTail->z);
-				}
-				else
-				{
-					pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - iTitleWidth, pTextTail->y, pTextTail->z);
-				}
 
 				pLevel->Update();
 			}
 		}
 		else
 		{
-			fxAdd = 4.0f;
-
 			// Level 위치 업데이트
 			CGraphicTextInstance * pLevel = pTextTail->pLevelTextInstance;
 			if (pLevel)
@@ -283,21 +265,14 @@ void CPythonTextTail::ArrangeTextTail()
 				int32_t iLevelWidth, iLevelHeight;
 				pLevel->GetTextSize(&iLevelWidth, &iLevelHeight);
 				
-				if( GetDefaultCodePage() == CP_ARABIC )
-				{
-					pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - iLevelWidth - 4.0f, pTextTail->y, pTextTail->z);
-				}
-				else
-				{
-					pLevel->SetPosition(pTextTail->x - (iNameWidth / 2), pTextTail->y, pTextTail->z);
-				}
+				pLevel->SetPosition(pTextTail->x - (iNameWidth / 2) - 4.0f, pTextTail->y, pTextTail->z);
 
 				pLevel->Update();
 			}
 		}
 		
 		pTextTail->pTextInstance->SetColor(pTextTail->Color.r, pTextTail->Color.g, pTextTail->Color.b);
-		pTextTail->pTextInstance->SetPosition(pTextTail->x + fxAdd, pTextTail->y, pTextTail->z);
+		pTextTail->pTextInstance->SetPosition(pTextTail->x, pTextTail->y, pTextTail->z);
 		pTextTail->pTextInstance->Update();
 	}
 
@@ -691,7 +666,7 @@ void CPythonTextTail::SetItemTextTailOwner(uint32_t dwVID, const char * c_szName
 
 	TTextTail * pTextTail = itor->second;
 
-	if (strlen(c_szName) > 0)
+	if (c_szName[0] != '\0')
 	{
 		if (!pTextTail->pOwnerTextInstance)
 		{
@@ -870,7 +845,7 @@ void CPythonTextTail::SelectItemName(uint32_t dwVirtualID)
 		return;
 
 	TTextTail * pTextTail = itor->second;
-	pTextTail->pTextInstance->SetColor(0.1f, 0.9f, 0.1f);
+	pTextTail->pTextInstance->SetColor(c_TextTail_Item_Picked_Color);
 }
 
 void CPythonTextTail::AttachTitle(uint32_t dwVID, const char * c_szName, const D3DXCOLOR & c_rColor)

@@ -9,11 +9,9 @@
 #include "../eterlib/GrpImageInstance.h"
 #include "Util.h"
 
-class CGrannyMaterial : public CReferenceObject
+class CGrannyMaterial
 {
 	public:
-		typedef CRef<CGrannyMaterial> TRef;
-
 		static void CreateSphereMap(uint32_t uMapIndex, const char* c_szSphereMapImageFileName);
 		static void DestroySphereMap();
 
@@ -34,16 +32,16 @@ class CGrannyMaterial : public CReferenceObject
 
 	public:
 		CGrannyMaterial();
-		virtual ~CGrannyMaterial();
+		~CGrannyMaterial();
 
-		void					Destroy();
 		void					Copy(CGrannyMaterial& rkMtrl);
-		bool					IsEqual(granny_material * pgrnMaterial) const;
 		bool					IsIn(const char* c_szImageName, int32_t* iStage);
 		void					SetSpecularInfo(BOOL bFlag, float fPower, uint8_t uSphereMapIndex);
 
 		void					ApplyRenderState();
 		void					RestoreRenderState();
+
+		bool operator==(granny_material* material) const;
 
 	protected:
 		void					Initialize();
@@ -100,21 +98,18 @@ class CGrannyMaterial : public CReferenceObject
 class CGrannyMaterialPalette
 {
 	public:
-		CGrannyMaterialPalette();
-		virtual ~CGrannyMaterialPalette();
+		// TODO(tim): Remove this
+		void Clear() { m_materials.clear(); }
 
-		void	Clear();
-		void	Copy(const CGrannyMaterialPalette& rkMtrlPalSrc);
+		std::size_t RegisterMaterial(granny_material* material);
 
-		uint32_t	RegisterMaterial(granny_material* pgrnMaterial);
-		void	SetMaterialImagePointer(const char* c_szMtrlName, CGraphicImage* pImage);
-		void	SetMaterialData(const char* c_szMtrlName, const SMaterialData& c_rkMaterialData);
-		void	SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower);
+		void SetMaterialImage(const char* materialName, CGraphicImage* image);
+		void SetMaterialData(const char* materialName, const SMaterialData& data);
+		void SetSpecularInfo(const char* materialName, bool enable, float power);
 
-		CGrannyMaterial& GetMaterialRef(uint32_t mtrlIndex);
-
-		uint32_t	GetMaterialCount() const;
+		CGrannyMaterial& GetMaterialRef(std::size_t index);
+		std::size_t GetMaterialCount() const;
 
 	protected:
-		std::vector<CGrannyMaterial::TRef> m_mtrlVector;
+		std::vector<CGrannyMaterial> m_materials;
 };

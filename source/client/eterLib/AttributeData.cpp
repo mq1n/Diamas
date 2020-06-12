@@ -70,7 +70,7 @@ bool CAttributeData::OnLoad(int32_t /*iSize*/, const void * c_pvBuf)
 	char szHeader[c_iAttributeDataFileHeaderLength+1];
 	memcpy(szHeader, c_pbBuf, c_iAttributeDataFileHeaderLength+1);
 	c_pbBuf += c_iAttributeDataFileHeaderLength+1;
-	if (strcmp(szHeader, c_szAttributeDataFileHeader))
+	if (strcmp(szHeader, c_szAttributeDataFileHeader) != 0)
 		return FALSE;
 
 	uint32_t dwCollisionDataCount;
@@ -145,9 +145,10 @@ bool CAttributeData::OnLoad(int32_t /*iSize*/, const void * c_pvBuf)
 		// Getting Maximize Radius
 		for (uint32_t k = 0; k < rHeightData.v3VertexVector.size(); ++k)
 		{
-			m_fMaximizeRadius = fMAX(m_fMaximizeRadius, fabs(rHeightData.v3VertexVector[k].x)+50.0f);
-			m_fMaximizeRadius = fMAX(m_fMaximizeRadius, fabs(rHeightData.v3VertexVector[k].y)+50.0f);
-			m_fMaximizeRadius = fMAX(m_fMaximizeRadius, fabs(rHeightData.v3VertexVector[k].z)+50.0f);
+			const D3DXVECTOR3 rHVecK = rHeightData.v3VertexVector[k];
+			m_fMaximizeRadius = fMAX(m_fMaximizeRadius, fabs(rHVecK.x)+50.0f);
+			m_fMaximizeRadius = fMAX(m_fMaximizeRadius, fabs(rHVecK.y)+50.0f);
+			m_fMaximizeRadius = fMAX(m_fMaximizeRadius, fabs(rHVecK.z)+50.0f);
 		}
 		// Getting Maximize Radius
 	}

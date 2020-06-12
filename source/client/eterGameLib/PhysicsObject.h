@@ -76,7 +76,6 @@ class CPhysicsObject
 
 		float GetXMovement();
 		float GetYMovement();
-		void ClearSavingMovement();
 
 		void SetActorInstance( CActorInstance* pInst ) { m_pActorInstance = pInst; }
 		CActorInstance* GetActorInstance() { return m_pActorInstance; }

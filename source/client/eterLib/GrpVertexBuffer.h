@@ -21,7 +21,6 @@ class CGraphicVertexBuffer : public CGraphicBase
 		bool	Unlock() const;
 
 		bool	LockDynamic(void** pretVertices);
-		virtual bool	Lock(void** pretVertices);
 		bool	Unlock();
 
 		void	SetStream(int32_t stride, int32_t layer=0) const;

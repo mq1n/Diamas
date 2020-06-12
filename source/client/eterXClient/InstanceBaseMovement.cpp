@@ -44,7 +44,7 @@ void CInstanceBase::NEW_Stop()
 	m_GraphicThingInstance.__OnStop();
 }
 
-void CInstanceBase::NEW_SyncPixelPosition(int32_t & nPPosX, int32_t & nPPosY)
+void CInstanceBase::NEW_SyncPixelPosition(int32_t nPPosX, int32_t nPPosY)
 {
 	m_GraphicThingInstance.TEMP_Push(nPPosX, nPPosY);
 }
@@ -62,8 +62,15 @@ bool CInstanceBase::NEW_CanMoveToDestPixelPosition(const TPixelPosition& c_rkPPo
 
 float CInstanceBase_GetDegreeFromPosition(float x, float y)
 {
-	D3DXVECTOR3 vtDir(floor(x), floor(y), 0.0f);
+	D3DXVECTOR3 vtDir(x, y, 0.0f);
 	D3DXVec3Normalize(&vtDir, &vtDir);
+
+	if (vtDir.y > 1) {
+		vtDir.y = 1;
+	}
+	else if (vtDir.y < -1) {
+		vtDir.y = -1;
+	}
 
 	D3DXVECTOR3 vtStan(0, -1, 0);
 	float ret = D3DXToDegree(acosf(D3DXVec3Dot(&vtDir, &vtStan)));
@@ -150,13 +157,16 @@ void CInstanceBase::StartWalking()
 {
 	m_GraphicThingInstance.Move();
 
-	if (IsAffect(AFFECT_GYEONGGONG))
+	if (!IsInvisibility() || __IsMainInstance())
 	{
-		m_adwCRCAffectEffect[AFFECT_GYEONGGONG] = __EffectContainer_AttachEffect(EFFECT_AFFECT_GYEONGGONG);
-	}
-	else if (IsAffect(AFFECT_KWAESOK))
-	{
-		m_adwCRCAffectEffect[AFFECT_KWAESOK] = __EffectContainer_AttachEffect(EFFECT_AFFECT_KWAESOK);
+		if (IsAffect(AFFECT_GYEONGGONG))
+		{
+			m_adwCRCAffectEffect[AFFECT_GYEONGGONG] = __EffectContainer_AttachEffect(EFFECT_AFFECT_GYEONGGONG);
+		}
+		else if (IsAffect(AFFECT_KWAESOK))
+		{
+			m_adwCRCAffectEffect[AFFECT_KWAESOK] = __EffectContainer_AttachEffect(EFFECT_AFFECT_KWAESOK);
+		}
 	}
 }
 

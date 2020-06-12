@@ -281,7 +281,7 @@ PyObject* grpGetSplitingTextLineCount(PyObject* poSelf, PyObject* poArgs)
 	int32_t iPosition = 0;
 	int32_t iLineCount = 0;
 
-	for (uint32_t i = 0; i < strlen(szText);)
+	for (size_t i = 0, textLen = strlen(szText); i < textLen;)
 	{
 		if ('|' == szText[i])
 		{
@@ -339,7 +339,7 @@ PyObject* grpGetSplitingTextLine(PyObject* poSelf, PyObject* poArgs)
 
 	// 1차 : 조금 더 깔끔하게 안될까 -_-a
 	// 2차 : 오.. 좀 나아졌다 +_+
-	for (uint32_t i = 0; i < strlen(szText);)
+	for (size_t i = 0, textLen = strlen(szText); i < textLen;)
 	{
 		if ('|' == szText[i])
 		{

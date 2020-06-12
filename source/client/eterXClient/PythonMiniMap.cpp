@@ -880,7 +880,7 @@ bool CPythonMiniMap::LoadAtlas()
 	const char* playerMarkFileName = "d:/ymir work/ui/minimap/playermark.sub";
 
 	char atlasFileName[1024+1];
-	snprintf(atlasFileName, sizeof(atlasFileName), "%s/atlas.sub", rkMap.GetName().c_str());	
+	_snprintf_s(atlasFileName, sizeof(atlasFileName), "%s/atlas.sub", rkMap.GetName().c_str());
 	if (!FileSystemManager::Instance().DoesFileExist(atlasFileName))		
 	{
 		_snprintf_s(atlasFileName, sizeof(atlasFileName), "d:/ymir work/ui/atlas/%s/atlas.sub", rkMap.GetName().c_str());

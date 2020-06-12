@@ -20,6 +20,9 @@ class CSnowEnvironment : public CScreen
 		void Deform();
 		void Render();
 
+		void ToggleRain(bool enable);
+		bool IsRainEnabled() { return m_bRainEnable; }
+
 	protected:		
 		void __Initialize();
 		bool __CreateBlurTexture();
@@ -29,7 +32,6 @@ class CSnowEnvironment : public CScreen
 
 	protected:
 		LPDIRECT3DSURFACE9 m_lpOldSurface;
-		LPDIRECT3DSURFACE9 m_lpOldDepthStencilSurface;
 
 		LPDIRECT3DTEXTURE9 m_lpSnowTexture;
 		LPDIRECT3DSURFACE9 m_lpSnowRenderTargetSurface;
@@ -52,4 +54,5 @@ class CSnowEnvironment : public CScreen
 		BOOL m_bBlurEnable;
 
 		BOOL m_bSnowEnable;
+		bool m_bRainEnable;
 };

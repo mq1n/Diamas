@@ -98,11 +98,11 @@ void CActorInstance::UpdateAdvancingPointInstance()
 	// 말을 탔을 경우 사람은 이동값을 가지고 있지 않기 때문에 말로 부터 얻어와야 한다 - [levites]
 	D3DXVECTOR3 v3Movement = m_v3Movement;
 	if (m_pkHorse)
+	{
 		v3Movement = m_pkHorse->m_v3Movement;
-
-	// 말은 업데이트 하지 않아도 된다 - [levites]
-	if (m_pkHorse)
+		// 말은 업데이트 하지 않아도 된다 - [levites]
 		m_pkHorse->UpdateAdvancingPointInstance();
+	}
 
 	D3DXMATRIX matPoint;
 	D3DXMATRIX matCenter;
@@ -377,13 +377,39 @@ BOOL CActorInstance::__NormalAttackProcess(CActorInstance & rVictim)
 		}
 
 		NRaceData::THitTimePositionMap::const_iterator range_start, range_end;
-		range_start = c_rHitData.mapHitPosition.lower_bound(motiontime-CTimer::Instance().GetElapsedSecond());
-		range_end = c_rHitData.mapHitPosition.upper_bound(motiontime);
+		// NOTE : 공격시 공격 속도가 빨라지면 일부 MotionData가 skip되는 현상때문에 임시로 이렇게 고쳤다. (Mantis #75176)
+		// 이 코드도 공격 판정 데이터와 실제 결과가 달라질 수 있는 문제가 있어 좋은 코드는 못되지만 공격이 아예 안들어가는것보단(..) 나으므로
+		// 일단 이렇게 고쳐둔다.. 완벽하게 고치려면 모션중 판정 데이터와 관련된 모든 코드를 갈아엎는게 빠르다.
+		
+		// 주요 문제점은 이전 Frame에서의 time과 현재 Frame에서의 time의 오차가 크면 중간에 처리가 skip되는 hitdata가 생긴다.
+		// motiontime-CTimer::Instance().GetElapsedSecond() 이걸로 어떻게 해보려했던것 같지만 로그찍어본 결과 그렇게 안되더라.
+		// ~ ityz ~
+
+		/*------------------------수정된 코드------------------------------*/
+		range_start = c_rHitData.mapHitPosition.begin();
+		range_end = c_rHitData.mapHitPosition.end();
+		
 		float c = cosf(D3DXToRadian(GetRotation()));
 		float s = sinf(D3DXToRadian(GetRotation()));
 
 		for(;range_start!=range_end;++range_start)
 		{
+			if(c_rHitData.fAttackStartTime > motiontime) break;
+			if(c_rHitData.fAttackEndTime < motiontime) break;
+
+		/*------------------------------------------------------------------*/
+
+		/*-------------------------원본 코드------------------------------
+		range_start = c_rHitData.mapHitPosition.lower_bound(motiontime-CTimer::Instance().GetElapsedSecond());
+		range_end = c_rHitData.mapHitPosition.upper_bound(motiontime);
+		
+		float c = cosf(D3DXToRadian(GetRotation()));
+		float s = sinf(D3DXToRadian(GetRotation()));
+
+		for(;range_start!=range_end;++range_start)
+		{
+		----------------------------------------------------------------*/
+
 			const CDynamicSphereInstance& dsiSrc=range_start->second;
 
 			CDynamicSphereInstance dsi;
@@ -584,9 +610,9 @@ BOOL CActorInstance::TestActorCollision(CActorInstance & rVictim)
 		return FALSE;
 	}
 */
-
 	if (rVictim.IsDead())
 		return FALSE;
+
 
 	// Check Distance
 	// NOTE : 적당히 멀면 체크 안함

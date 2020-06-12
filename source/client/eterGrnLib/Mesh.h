@@ -38,7 +38,6 @@ class CGrannyMesh
 		bool					CreateFromGrannyMeshPointer(granny_skeleton* pgrnSkeleton, granny_mesh* pgrnMesh, int32_t vtxBasePos, int32_t idxBasePos, CGrannyMaterialPalette& rkMtrlPal);			
 		void					LoadIndices(void* dstBaseIndices);
  		void					LoadPNTVertices(void* dstBaseVertices);
-		void					NEW_LoadVertices(void* dstBaseVertices);
 		void					Destroy();
 
 		void					SetPNT2Mesh();
@@ -60,7 +59,6 @@ class CGrannyMesh
 		const CGrannyMesh::TTriGroupNode *	GetTriGroupNodeList(CGrannyMaterial::EType eMtrlType) const;
 
 		void					RebuildTriGroupNodeList();
-		void					ReloadMaterials();
 
 	protected:
 		void					Initialize();

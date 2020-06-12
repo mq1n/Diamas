@@ -130,7 +130,7 @@ void CLZObject::BeginCompress(const void * pvIn, uint32_t uiInLen)
 	
     m_pHeader = (THeader *) m_pbBuffer;
     m_pHeader->dwFourCC = ms_dwFourCC;
-    m_pHeader->dwEncryptSize = m_pHeader->dwCompressedSize = m_pHeader->dwRealSize = 0;
+    m_pHeader->dwEncryptSize = m_pHeader->dwCompressedSize = 0;
     m_pHeader->dwRealSize = uiInLen;
 }
 
@@ -149,7 +149,7 @@ void CLZObject::BeginCompressInBuffer(const void * pvIn, uint32_t uiInLen, void 
 	
     m_pHeader = (THeader *) m_pbBuffer;
     m_pHeader->dwFourCC = ms_dwFourCC;
-    m_pHeader->dwEncryptSize = m_pHeader->dwCompressedSize = m_pHeader->dwRealSize = 0;
+    m_pHeader->dwEncryptSize = m_pHeader->dwCompressedSize = 0;
     m_pHeader->dwRealSize = uiInLen;
 	m_bInBuffer = true;
 }
@@ -163,11 +163,8 @@ bool CLZObject::Compress()
     *(uint32_t *) pbBuffer = ms_dwFourCC;
     pbBuffer += sizeof(uint32_t);
 
-#if defined( LZO1X_999_MEM_COMPRESS )
-    int32_t r = lzo1x_999_compress((uint8_t *) m_pbIn, m_pHeader->dwRealSize, pbBuffer, (lzo_uint*) &iOutLen, CLZO::Instance().GetWorkMemory());
-#else
-    int32_t r = lzo1x_1_compress((uint8_t *) m_pbIn, m_pHeader->dwRealSize, pbBuffer, (lzo_uint*) &iOutLen, CLZO::Instance().GetWorkMemory());
-#endif
+	int32_t r = lzo1x_999_compress((uint8_t *) m_pbIn, m_pHeader->dwRealSize, pbBuffer, (lzo_uint*) &iOutLen, CLZO::Instance().GetWorkMemory());
+
 	
     if (LZO_E_OK != r)
     {
@@ -182,6 +179,12 @@ bool CLZObject::Compress()
 
 bool CLZObject::BeginDecompress(const void * pvIn)
 {
+	if (pvIn == nullptr)
+	{
+		TraceError("LZObject: pvIn = nullptr! Corrupted data");
+		return false;
+	}
+
     THeader * pHeader = (THeader *) pvIn;
 
     if (pHeader->dwFourCC != ms_dwFourCC)
@@ -239,12 +242,12 @@ public:
 	{
 		if (m_local_buf != m_buf)
 		{
-			dbg_printf("DecruptBuffer - FreeHeap\n");
+			dbg_printf("DecryptBuffer - FreeHeap\n");
 			delete [] m_buf;
 		}
 		else
 		{
-			dbg_printf("DecruptBuffer - FreeStack\n");
+			dbg_printf("DecryptBuffer - FreeStack\n");
 		}
 	}
 	void* GetBufferPtr()

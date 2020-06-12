@@ -135,10 +135,10 @@ bool CMapManager::IsMapReady()
 	return m_pkMap->IsReady();
 }
 
-bool CMapManager::UnloadMap(const std::string c_strMapName)
+bool CMapManager::UnloadMap(const std::string &c_strMapName)
 {
 	CMapOutdoor& rkMap=GetMapOutdoorRef();
-	if (c_strMapName != rkMap.GetName() && "" != rkMap.GetName())
+	if (c_strMapName != rkMap.GetName() && !rkMap.GetName().empty())
 	{
 		LogBoxf("%s: Unload Map Failed", c_strMapName.c_str());
 		return false;

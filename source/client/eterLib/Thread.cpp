@@ -5,7 +5,7 @@ CThread::CThread() : m_pArg(nullptr), m_hThread(nullptr), m_uThreadID(0)
 {
 }
 
-int32_t CThread::Create(void * arg)
+bool CThread::Create(void * arg)
 {
 	Arg(arg);
 	m_hThread = (HANDLE) _beginthreadex(nullptr, 0, EntryPoint, this, 0, &m_uThreadID);

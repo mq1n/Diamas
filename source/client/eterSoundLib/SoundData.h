@@ -21,7 +21,7 @@ class CSoundData
 
 		void			Assign(const char* filename);
 		LPVOID			Get();
-		DWORD			GetSize();
+		ULONG			GetSize();
 		void			Release();
 		uint32_t			GetAccessTime();
 		const char *	GetFileName();
@@ -38,7 +38,7 @@ class CSoundData
 		int32_t				m_iRefCount;
 		uint32_t			m_dwAccessTime;
 		uint32_t			m_dwPlayTime;
-		DWORD			m_size;
+		ULONG			m_size;
 		LPVOID			m_data;
 		int32_t			m_flag;
 		bool			m_assigned;

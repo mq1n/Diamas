@@ -71,7 +71,7 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		CGrannyModel* GetModel();
 		void	SetMaterialImagePointer(const char* c_szImageName, CGraphicImage* pImage);
 		void	SetMaterialData(const char* c_szImageName, const SMaterialData& c_rkMaterialData);
-		void	SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower);
+		void	SetSpecularInfo(const char* c_szMtrlName, bool bEnable, float fPower);
 		
 		void	SetMainModelPointer(CGrannyModel* pkModel, CGraphicVertexBuffer* pkSharedDefromableVertexBuffer);
 		void	SetLinkedModelPointer(CGrannyModel* pkModel, CGraphicVertexBuffer* pkSharedDefromableVertexBuffer, CGrannyModelInstance** ppkSkeletonInst);
@@ -88,7 +88,6 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		void	SetLocalTime(float fLocalTime);
 		int32_t		ResetLocalTime();
 		float	GetLocalTime();
-		float	GetNextTime();
 
 		// WORK
 		uint32_t	GetDeformableVertexCount();

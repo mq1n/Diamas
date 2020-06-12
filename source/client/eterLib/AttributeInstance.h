@@ -25,12 +25,6 @@ class CAttributeInstance
 		BOOL IsInHeight(float fx, float fy);
 		BOOL GetHeight(float fx, float fy, float * pfHeight);
 
-		BOOL IsHeightData() const;
-
-	protected:
-		void SetGlobalMatrix(const D3DXMATRIX & c_rmatGlobal);
-		void SetGlobalPosition(const D3DXVECTOR3 & c_rv3Position);
-
 	protected:
 		float m_fCollisionRadius;
 		float m_fHeightRadius;

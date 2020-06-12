@@ -11,7 +11,7 @@ class CFrameController
 		void Update(float fElapsedTime);
 
 		void SetCurrentFrame(uint32_t dwFrame);
-		uint8_t GetCurrentFrame() const;
+		uint8_t GetCurrentFrame();
 
 		void SetMaxFrame(uint32_t dwMaxFrame);
 		void SetFrameTime(float fTime);
@@ -20,7 +20,7 @@ class CFrameController
 		void SetLoopCount(int32_t iLoopCount);
 
 		void SetActive(BOOL bFlag);
-		BOOL isActive(uint32_t dwMainFrame = 0) const;
+		BOOL isActive(uint32_t dwMainFrame = 0);
 
 	protected:
 		// Dynamic

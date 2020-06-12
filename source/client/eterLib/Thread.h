@@ -5,7 +5,7 @@ class CThread
 {
 	public:
 		CThread();
-		int32_t Create(void * arg);
+		bool Create(void * arg);
 		
 	protected:
 		static uint32_t CALLBACK	EntryPoint(void * pThis);

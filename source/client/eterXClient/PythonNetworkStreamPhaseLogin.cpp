@@ -209,8 +209,8 @@ bool CPythonNetworkStream::SendDirectEnterPacket(const char* c_szID, const char*
 	TPacketCGDirectEnter kPacketDirectEnter;
 	kPacketDirectEnter.bHeader=HEADER_CG_DIRECT_ENTER;
 	kPacketDirectEnter.index=uChrSlot;
-	strncpy(kPacketDirectEnter.login, c_szID, ID_MAX_NUM);
-	strncpy(kPacketDirectEnter.passwd, c_szPassword, PASS_MAX_NUM);
+	strncpy_s(kPacketDirectEnter.login, c_szID, ID_MAX_NUM);
+	strncpy_s(kPacketDirectEnter.passwd, c_szPassword, PASS_MAX_NUM);
 
 	if (!Send(sizeof(kPacketDirectEnter), &kPacketDirectEnter))
 	{
@@ -226,8 +226,8 @@ bool CPythonNetworkStream::SendLoginPacket(const char* c_szName, const char* c_s
 	TPacketCGLogin LoginPacket;
 	LoginPacket.header = HEADER_CG_LOGIN;
 
-	strncpy(LoginPacket.name, c_szName, sizeof(LoginPacket.name)-1);
-	strncpy(LoginPacket.pwd, c_szPassword, sizeof(LoginPacket.pwd)-1);
+	strncpy_s(LoginPacket.name, c_szName, sizeof(LoginPacket.name) - 1);
+	strncpy_s(LoginPacket.pwd, c_szPassword, sizeof(LoginPacket.pwd) - 1);
 
 	LoginPacket.name[ID_MAX_NUM]='\0';
 	LoginPacket.pwd[PASS_MAX_NUM]='\0';
@@ -247,7 +247,7 @@ bool CPythonNetworkStream::SendLoginPacketNew(const char * c_szName, const char 
 	LoginPacket.header = HEADER_CG_LOGIN2;
 	LoginPacket.login_key = m_dwLoginKey;
 
-	strncpy(LoginPacket.name, c_szName, sizeof(LoginPacket.name)-1);
+	strncpy_s(LoginPacket.name, c_szName, sizeof(LoginPacket.name) - 1);
 	LoginPacket.name[ID_MAX_NUM]='\0';
 
 	extern uint32_t g_adwEncryptKey[4];

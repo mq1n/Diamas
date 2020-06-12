@@ -199,6 +199,11 @@ class UI::CSlotWindow::CCoolTimeFinishEffect : public CAniImageBox
 
 // Set & Append
 
+void CSlotWindow::SetWindowType(int32_t iType)
+{
+	m_iWindowType = iType;
+}
+
 void CSlotWindow::SetSlotType(uint32_t dwType)
 {
 	m_dwSlotType = dwType;
@@ -213,6 +218,7 @@ void CSlotWindow::AppendSlot(uint32_t dwIndex, int32_t ixPosition, int32_t iyPos
 {
 	TSlot Slot;
 	Slot.pInstance = nullptr;
+	Slot.pBackgroundInstance = nullptr;
 	Slot.pNumberLine = nullptr;
 	Slot.pCoverButton = nullptr;
 	Slot.pSlotButton = nullptr;
@@ -511,7 +517,7 @@ void CSlotWindow::SetSlotCount(uint32_t dwIndex, uint32_t dwCount)
 	else
 	{
 		char szCount[16+1];
-		_snprintf(szCount, sizeof(szCount), "%d", dwCount);
+		_snprintf_s(szCount, sizeof(szCount), "%u", dwCount);
 
 		if (!pSlot->pNumberLine)
 		{
@@ -546,16 +552,16 @@ void CSlotWindow::SetSlotCountNew(uint32_t dwIndex, uint32_t dwGrade, uint32_t d
 		switch (dwGrade)
 		{
 			case 0:
-				_snprintf(szCount, sizeof(szCount), "%d", dwCount);
+				_snprintf_s(szCount, sizeof(szCount), "%u", dwCount);
 				break;
 			case 1:
-				_snprintf(szCount, sizeof(szCount), "m%d", dwCount);
+				_snprintf_s(szCount, sizeof(szCount), "m%u", dwCount);
 				break;
 			case 2:
-				_snprintf(szCount, sizeof(szCount), "g%d", dwCount);
+				_snprintf_s(szCount, sizeof(szCount), "g%u", dwCount);
 				break;
 			case 3:
-				_snprintf(szCount, sizeof(szCount), "p");
+				_snprintf_s(szCount, sizeof(szCount), "p");
 				break;
 		}
 
@@ -569,6 +575,15 @@ void CSlotWindow::SetSlotCountNew(uint32_t dwIndex, uint32_t dwGrade, uint32_t d
 
 		pSlot->pNumberLine->SetNumber(szCount);
 	}
+}
+
+void CSlotWindow::SetRealSlotNumber(uint32_t dwIndex, uint32_t dwSlotRealNumber)
+{
+	TSlot * pSlot;
+	if (!GetSlotPointer(dwIndex, &pSlot))
+		return;
+
+	pSlot->dwRealSlotNumber = dwSlotRealNumber;
 }
 
 void CSlotWindow::SetSlotCoolTime(uint32_t dwIndex, float fCoolTime, float fElapsedTime)
@@ -646,6 +661,7 @@ void CSlotWindow::ClearSlot(TSlot * pSlot)
 	pSlot->fCoolTime = 0.0f;
 	pSlot->fStartCoolTime = 0.0f;
 	pSlot->dwCenterSlotNumber = 0xffffffff;
+	pSlot->dwRealCenterSlotNumber = 0xffffffff;
 
 	pSlot->dwItemIndex = 0;
 	pSlot->bRenderBaseSlotImage = true;
@@ -655,6 +671,13 @@ void CSlotWindow::ClearSlot(TSlot * pSlot)
 		CGraphicImageInstance::Delete(pSlot->pInstance);
 		pSlot->pInstance = nullptr;
 	}
+
+	if (pSlot->pBackgroundInstance)
+	{
+		CGraphicImageInstance::Delete(pSlot->pBackgroundInstance);
+		pSlot->pBackgroundInstance = nullptr;
+	}
+
 	if (pSlot->pCoverButton)
 	{
 		pSlot->pCoverButton->Hide();
@@ -1123,7 +1146,8 @@ void CSlotWindow::OnRender()
 			break;
 	}
 
-	std::for_each(m_pChildList.begin(), m_pChildList.end(), std::void_mem_fun(&CWindow::OnRender));
+	for (const auto & window : m_pChildList)
+		window->OnRender();
 
 	TSlotListIterator itor;
 
@@ -1284,8 +1308,10 @@ void CSlotWindow::RenderSlotBaseImage()
 		if (!rSlot.bRenderBaseSlotImage)
 			continue;
 
-		m_pBaseImageInstance->SetPosition(m_rect.left + rSlot.ixPosition, m_rect.top + rSlot.iyPosition);
-		m_pBaseImageInstance->Render();
+		CGraphicImageInstance* bgImageInstance = rSlot.pBackgroundInstance ? rSlot.pBackgroundInstance : m_pBaseImageInstance;
+		
+		bgImageInstance->SetPosition(m_rect.left + rSlot.ixPosition, m_rect.top + rSlot.iyPosition);
+		bgImageInstance->Render();
 	}
 }
 
@@ -1496,6 +1522,24 @@ BOOL CSlotWindow::OnIsType(uint32_t dwType)
 	return CWindow::OnIsType(dwType);
 }
 
+void CSlotWindow::SetSlotBackground(uint32_t dwIndex, const char* c_szFileName)
+{
+	TSlot * pSlot;
+	if (!GetSlotPointer(dwIndex, &pSlot))
+		return;
+
+	//Destroy old one first
+	if (pSlot->pBackgroundInstance) 
+	{
+		CGraphicImageInstance::Delete(pSlot->pBackgroundInstance);
+		pSlot->pBackgroundInstance = nullptr;
+	}
+
+	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	pSlot->pBackgroundInstance = CGraphicImageInstance::New();
+	pSlot->pBackgroundInstance->SetImagePointer(pImage);
+}
+
 void CSlotWindow::__CreateToggleSlotImage()
 {
 	__DestroyToggleSlotImage();
@@ -1659,6 +1703,7 @@ void CSlotWindow::__DestroyBaseImage()
 void CSlotWindow::__Initialize()
 {
 	m_dwSlotType = 0;
+	m_iWindowType = SLOT_WND_DEFAULT;
 	m_dwSlotStyle = SLOT_STYLE_PICK_UP;
 	m_dwToolTipSlotNumber = SLOT_NUMBER_NONE;
 

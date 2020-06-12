@@ -3,7 +3,7 @@
 
 static std::list<std::string> s_stList;
 
-char korean_tolower(const char c)
+char ascii_tolower(const char c)
 {
 	char ret = c;
 	if (c >= 'A' && c <= 'Z')
@@ -24,7 +24,7 @@ std::string& stl_static_string(const char * c_sz)
 void stl_lowers(std::string& rstRet)
 {
 	for (size_t i = 0; i < rstRet.length(); ++i)
-		rstRet[i] = korean_tolower(rstRet[i]);
+		rstRet[i] = ascii_tolower(rstRet[i]);
 }
 
 int32_t split_string(const std::string& input, const std::string& delimiter, std::vector<std::string>& results, bool includeEmpties)

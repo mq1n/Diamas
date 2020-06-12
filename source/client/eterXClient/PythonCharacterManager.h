@@ -53,9 +53,6 @@ class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, publ
 
 		void								DeleteAllInstances();
 
-		bool								CreateDeviceObjects();
-		void								DestroyDeviceObjects();
-
 		void								Update();
 		void								Deform();
 		void								Render();
@@ -69,7 +66,6 @@ class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, publ
 
 		void								DeleteInstance(uint32_t VirtualID);
 		void								DeleteInstanceByFade(uint32_t VirtualID);
-		void								DeleteVehicleInstance(uint32_t VirtualID);
 
 		void 								DestroyAliveInstanceMap();
 		void 								DestroyDeadInstanceList();

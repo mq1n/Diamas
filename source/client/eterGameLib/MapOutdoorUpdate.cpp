@@ -166,7 +166,7 @@ struct FGetShadowReceiverFromCollisionData
 	bool m_bCollide;
 	std::vector<CGraphicObjectInstance *>* m_pkVct_pkShadowReceiver;
 	CDynamicSphereInstance * m_pdsi;
-	FGetShadowReceiverFromCollisionData(CDynamicSphereInstance * pdsi, std::vector<CGraphicObjectInstance *>* pkVct_pkShadowReceiver) : m_pdsi(pdsi), m_bCollide(false)
+	FGetShadowReceiverFromCollisionData(CDynamicSphereInstance * pdsi, std::vector<CGraphicObjectInstance *>* pkVct_pkShadowReceiver) : m_bCollide(false), m_pdsi(pdsi)
 	{
 		m_pkVct_pkShadowReceiver=pkVct_pkShadowReceiver;
 		m_pkVct_pkShadowReceiver->clear();
@@ -235,8 +235,6 @@ void CMapOutdoor::__Game_UpdateArea(D3DXVECTOR3& v3Player)
 
 	float fDistance = pCamera->GetDistance();	
 
-	D3DXVECTOR3 v3View= pCamera->GetView();		
-	D3DXVECTOR3 v3Target = pCamera->GetTarget();
 	D3DXVECTOR3 v3Eye= pCamera->GetEye();
 
 	D3DXVECTOR3 v3Light = D3DXVECTOR3(1.732f, 1.0f, -3.464f); // ºûÀÇ ¹æÇâ
@@ -347,7 +345,7 @@ struct FGetShadowReceiverFromHeightData
 	CGraphicObjectInstance* m_apkShadowReceiver[COLLECT_MAX];
 	
 	FGetShadowReceiverFromHeightData(float fFromX, float fFromY, float fToX, float fToY) :
-	m_fFromX(fFromX), m_fFromY(fFromY), m_fToX(fToX), m_fToY(fToY), m_bReceiverFound(false)
+	m_bReceiverFound(false), m_fFromX(fFromX), m_fFromY(fFromY), m_fToX(fToX), m_fToY(fToY), m_fReturnHeight(0)
 	{
 		m_dwCheckCount=0;
 		m_dwCollectOverCount=0;
@@ -910,7 +908,6 @@ void CMapOutdoor::UpdateAreaList(int32_t lCenterX, int32_t lCenterY)
 
 		for (uint32_t dwIndex = 0; dwIndex < rPushTerrainToDeleteVector.m_ReturnTerrainVector.size(); ++dwIndex)
 		{
-			bool isDel=false;
 			TTerrainPtrVectorIterator aTerrainPtrItertor = m_TerrainVector.begin();
 			while(aTerrainPtrItertor != m_TerrainVector.end())
 			{
@@ -918,7 +915,6 @@ void CMapOutdoor::UpdateAreaList(int32_t lCenterX, int32_t lCenterY)
 				if (pTerrain == rPushTerrainToDeleteVector.m_ReturnTerrainVector[dwIndex])
 				{
 					aTerrainPtrItertor = m_TerrainVector.erase(aTerrainPtrItertor);
-					isDel=true;
 				}
 				else
 					++aTerrainPtrItertor;

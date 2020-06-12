@@ -14,7 +14,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-TEMP_CAreaLoaderThread::TEMP_CAreaLoaderThread() : m_bShutdowned(false), m_pArg(nullptr), m_hThread(nullptr), m_uThreadID(0)
+TEMP_CAreaLoaderThread::TEMP_CAreaLoaderThread() : m_hThread(nullptr), m_pArg(nullptr), m_uThreadID(0), m_hSemaphore(nullptr), m_iRestSemCount(0), m_bShutdowned(false)
 {
 
 }
@@ -232,7 +232,7 @@ void TEMP_CAreaLoaderThread::ProcessArea()	// called in loader thread
 	const std::string & c_rStrMapName = pArea->GetOwner()->GetName();
 
 	char szAreaPathName[64+1];
-	_snprintf(szAreaPathName, sizeof(szAreaPathName), "%s\\%06u\\", c_rStrMapName.c_str(), dwID);
+	_snprintf_s(szAreaPathName, sizeof(szAreaPathName), "%s\\%06u\\", c_rStrMapName.c_str(), dwID);
 
 	pArea->Load(szAreaPathName);
 
@@ -268,7 +268,7 @@ void TEMP_CAreaLoaderThread::ProcessTerrain()	// called in loader thread
 
 	const std::string & c_rStrMapName = pTerrain->GetOwner()->GetName();
 	char filename[256];
-	sprintf(filename, "%s\\%06u\\AreaProperty.txt", c_rStrMapName.c_str(), dwID);
+	sprintf_s(filename, "%s\\%06u\\AreaProperty.txt", c_rStrMapName.c_str(), dwID);
 	
 	CTokenVectorMap stTokenVectorMap;
 	
@@ -295,13 +295,13 @@ void TEMP_CAreaLoaderThread::ProcessTerrain()	// called in loader thread
 	char szMiniMapTexName[64+1];
 	char szSplatName[64+1];
 	
-	_snprintf(szRawHeightFieldname, sizeof(szRawHeightFieldname), "%s\\%06u\\height.raw", c_rStrMapName.c_str(), dwID);
-	_snprintf(szSplatName, sizeof(szSplatName), "%s\\%06u\\tile.raw", c_rStrMapName.c_str(), dwID);
-	_snprintf(szAttrMapName, sizeof(szAttrMapName), "%s\\%06u\\attr.atr", c_rStrMapName.c_str(), dwID);
-	_snprintf(szWaterMapName, sizeof(szWaterMapName), "%s\\%06u\\water.wtr", c_rStrMapName.c_str(), dwID);
-	_snprintf(szShadowTexName, sizeof(szShadowTexName), "%s\\%06u\\shadowmap.dds", c_rStrMapName.c_str(), dwID);
-	_snprintf(szShadowMapName, sizeof(szShadowMapName), "%s\\%06u\\shadowmap.raw", c_rStrMapName.c_str(), dwID);
-	_snprintf(szMiniMapTexName,	sizeof(szMiniMapTexName), "%s\\%06u\\minimap.dds", c_rStrMapName.c_str(), dwID);
+	_snprintf_s(szRawHeightFieldname, sizeof(szRawHeightFieldname), "%s\\%06u\\height.raw", c_rStrMapName.c_str(), dwID);
+	_snprintf_s(szSplatName, sizeof(szSplatName), "%s\\%06u\\tile.raw", c_rStrMapName.c_str(), dwID);
+	_snprintf_s(szAttrMapName, sizeof(szAttrMapName), "%s\\%06u\\attr.atr", c_rStrMapName.c_str(), dwID);
+	_snprintf_s(szWaterMapName, sizeof(szWaterMapName), "%s\\%06u\\water.wtr", c_rStrMapName.c_str(), dwID);
+	_snprintf_s(szShadowTexName, sizeof(szShadowTexName), "%s\\%06u\\shadowmap.dds", c_rStrMapName.c_str(), dwID);
+	_snprintf_s(szShadowMapName, sizeof(szShadowMapName), "%s\\%06u\\shadowmap.raw", c_rStrMapName.c_str(), dwID);
+	_snprintf_s(szMiniMapTexName,	sizeof(szMiniMapTexName), "%s\\%06u\\minimap.dds", c_rStrMapName.c_str(), dwID);
 	
 	pTerrain->CopySettingFromGlobalSetting();
 
@@ -312,9 +312,8 @@ void TEMP_CAreaLoaderThread::ProcessTerrain()	// called in loader thread
 	pTerrain->LoadShadowTexture(szShadowTexName);
 	pTerrain->LoadShadowMap(szShadowMapName);
 	pTerrain->LoadMiniMapTexture(szMiniMapTexName);
-	pTerrain->SetName(c_rstrAreaName.c_str());
+	pTerrain->SetName(c_rstrAreaName);
 	pTerrain->CalculateTerrainPatch();
-
 	pTerrain->SetReady();
 
 	Tracef("TEMP_CAreaLoaderThread::ProcessTerrain LoadTerrain : %d ms elapsed\n", ELTimer_GetMSec() - dwStartTime);

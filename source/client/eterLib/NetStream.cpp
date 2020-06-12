@@ -43,9 +43,7 @@ void CNetworkStream::SetRecvBufferSize(int32_t recvBufSize)
 			return;
 
 		delete [] m_recvBuf;
-
-		if (m_recvTEABuf)
-			delete [] m_recvTEABuf;
+		delete [] m_recvTEABuf;
 	}
 	m_recvBufSize = recvBufSize;
 	m_recvBuf = new char[m_recvBufSize];	
@@ -61,9 +59,7 @@ void CNetworkStream::SetSendBufferSize(int32_t sendBufSize)
 			return;
 
 		delete [] m_sendBuf;
-
-		if (m_sendTEABuf)
-			delete [] m_sendTEABuf;
+		delete [] m_sendTEABuf;
 	}
 
 	m_sendBufSize = sendBufSize;
@@ -289,22 +285,30 @@ void CNetworkStream::Process()
 	if (m_sock == INVALID_SOCKET)
 		return;
 
-	fd_set fdsRecv;
-	fd_set fdsSend;
-
+	fd_set fdsRecv, fdsSend, fdsExcept;
 	FD_ZERO(&fdsRecv);
 	FD_ZERO(&fdsSend);
+	FD_ZERO(&fdsExcept);
 
 	FD_SET(m_sock, &fdsRecv);
 	FD_SET(m_sock, &fdsSend);
+	FD_SET(m_sock, &fdsExcept);
 
 	TIMEVAL delay;
-
 	delay.tv_sec = 0;
 	delay.tv_usec = 0;
 	
-	if (select(0, &fdsRecv, &fdsSend, nullptr, &delay) == SOCKET_ERROR)
+	if (select(0, &fdsRecv, &fdsSend, &fdsExcept, &delay) == SOCKET_ERROR)
 		return;
+
+	if (FD_ISSET(m_sock, &fdsExcept))
+	{
+		TraceError("select: Connecting to %s:%d failed",
+		           inet_ntoa(m_addr.GetAddr()), m_addr.GetPort());
+		Clear();
+		OnConnectFailure();
+		return;
+	}
 
 	if (!m_isOnline)
 	{
@@ -315,6 +319,8 @@ void CNetworkStream::Process()
 		}
 		else if (time(nullptr) > m_connectLimitTime)
 		{
+			TraceError("Connecting to %s:%d timed out",
+			           inet_ntoa(m_addr.GetAddr()), m_addr.GetPort());
 			Clear();
 			OnConnectFailure();
 		}
@@ -461,7 +467,7 @@ bool CNetworkStream::Connect(uint32_t dwAddr, int32_t port, int32_t limitSec)
 		ip[2]=dwAddr&0xff;dwAddr>>=8;
 		ip[3]=dwAddr&0xff;dwAddr>>=8;
 
-		sprintf(szAddr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+		sprintf_s(szAddr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 	}
 
 	return Connect(szAddr, port, limitSec);
@@ -515,7 +521,7 @@ const char * GetSendHeaderName(uint8_t header)
 		for (uint32_t i = 0; i < UCHAR_MAX+1; i++)
 		{
 			char buf[10];
-			sprintf(buf,"%d",i);
+			sprintf_s(buf,"%d",i);
 			stringList[i] = buf;
 		}
 		stringList[1] = "HEADER_CG_LOGIN";
@@ -601,7 +607,7 @@ const char * GetRecvHeaderName(uint8_t header)
 		for (uint32_t i = 0; i < UCHAR_MAX+1; i++)
 		{
 			char buf[10];
-			sprintf(buf,"%d",i);
+			sprintf_s(buf,"%d",i);
 			stringList[i] = buf;
 		}
 		stringList[1] = "HEADER_GC_CHARACTER_ADD";
@@ -749,7 +755,7 @@ bool CNetworkStream::Recv(int32_t size, char * pDestBuf)
 		char buf[10];
 		for(int32_t i = 1; i < size; i++)
 		{
-			sprintf(buf," %02x", (uint8_t)(pDestBuf[i]));
+			sprintf_s(buf," %02x", (uint8_t)(pDestBuf[i]));
 			contents.append(buf);
 		}
 		TraceError(contents.c_str());
@@ -784,7 +790,7 @@ bool CNetworkStream::Send(int32_t size, const char * pSrcBuf)
 		char buf[10];
 		for(int32_t i = 1; i < size; i++)
 		{
-			sprintf(buf," %02x", (uint8_t)(pSrcBuf[i]));
+			sprintf_s(buf," %02x", (uint8_t)(pSrcBuf[i]));
 			contents.append(buf);
 		}
 		TraceError(contents.c_str());
@@ -880,12 +886,11 @@ void CNetworkStream::OnDisconnect()
 
 void CNetworkStream::OnConnectSuccess()
 {
-	Tracen("Succeed connecting.");
 }
 
 void CNetworkStream::OnConnectFailure()
 {
-	Tracen("Failed to connect.");
+	// should be overwritten
 }
 
 //void CNetworkStream::OnCheckinSuccess()

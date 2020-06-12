@@ -6,6 +6,9 @@
 #include "../eterLib/ResourceManager.h"
 #include "SnowParticle.h"
 
+static const std::string snow_resource_filename = "d:/ymir work/special/snow.dds";
+static const std::string rain_resource_filename = "d:/ymir work/pc/common/effect/armor/water1.dds";
+
 void CSnowEnvironment::Enable()
 {
 	if (!m_bSnowEnable)
@@ -79,7 +82,7 @@ void CSnowEnvironment::Deform()
 		for (int32_t p = 0; p < std::min(10U, m_dwParticleMaxNum - m_kVct_pkParticleSnow.size()); ++p)
 		{
 			CSnowParticle * pSnowParticle = CSnowParticle::New();
-			pSnowParticle->Init(v3ChangedPos);
+			pSnowParticle->Init(v3ChangedPos, m_bRainEnable);
 			m_kVct_pkParticleSnow.push_back(pSnowParticle);
 		}
 	}
@@ -231,18 +234,18 @@ bool CSnowEnvironment::__CreateBlurTexture()
 	if (!m_bBlurEnable)
 		return true;
 
-	if (FAILED(ms_lpd3dDevice->CreateTexture(m_wBlurTextureSize, m_wBlurTextureSize, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &m_lpSnowTexture, nullptr)))
+	if (FAILED(ms_lpd3dDevice->CreateTexture(m_wBlurTextureSize, m_wBlurTextureSize, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &m_lpSnowTexture,0)))
 		return false;
 	if (FAILED(m_lpSnowTexture->GetSurfaceLevel(0, &m_lpSnowRenderTargetSurface)))
 		return false;
-	if (FAILED(ms_lpd3dDevice->CreateDepthStencilSurface(m_wBlurTextureSize, m_wBlurTextureSize, D3DFMT_D16, D3DMULTISAMPLE_NONE, 0, TRUE, &m_lpSnowDepthSurface, nullptr)))
+	if (FAILED(ms_lpd3dDevice->CreateDepthStencilSurface(m_wBlurTextureSize, m_wBlurTextureSize, D3DFMT_D16, D3DMULTISAMPLE_NONE,0, true, &m_lpSnowDepthSurface, 0)))
 		return false;
 
-	if (FAILED(ms_lpd3dDevice->CreateTexture(m_wBlurTextureSize, m_wBlurTextureSize, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &m_lpAccumTexture, nullptr)))
+	if (FAILED(ms_lpd3dDevice->CreateTexture(m_wBlurTextureSize, m_wBlurTextureSize, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &m_lpAccumTexture, 0)))
 		return false;
 	if (FAILED(m_lpAccumTexture->GetSurfaceLevel(0, &m_lpAccumRenderTargetSurface)))
 		return false;
-	if (FAILED(ms_lpd3dDevice->CreateDepthStencilSurface(m_wBlurTextureSize, m_wBlurTextureSize, D3DFMT_D16, D3DMULTISAMPLE_NONE, 0, TRUE, &m_lpAccumDepthSurface, nullptr)))
+	if (FAILED(ms_lpd3dDevice->CreateDepthStencilSurface(m_wBlurTextureSize, m_wBlurTextureSize, D3DFMT_D16, D3DMULTISAMPLE_NONE, 0, true, &m_lpAccumDepthSurface, 0)))
 		return false;
 
 	return true;
@@ -254,14 +257,16 @@ bool CSnowEnvironment::__CreateGeometry()
 											D3DUSAGE_DYNAMIC|D3DUSAGE_WRITEONLY,
 											D3DFVF_XYZ | D3DFVF_TEX1,
 											D3DPOOL_SYSTEMMEM,
-											&m_pVB, nullptr)))
+											&m_pVB,
+											0)))
 		return false;
 
 	if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(sizeof(uint16_t)*m_dwParticleMaxNum*6,
 										   D3DUSAGE_WRITEONLY, 
 										   D3DFMT_INDEX16,
 										   D3DPOOL_MANAGED,
-										   &m_pIB, nullptr)))
+										   &m_pIB,
+										   0)))
 		return false;
 
 	uint16_t* dstIndices;
@@ -291,7 +296,7 @@ bool CSnowEnvironment::Create()
 	if (!__CreateGeometry())
 		return false;
 
-	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer("d:/ymir work/special/snow.dds");
+	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(snow_resource_filename.c_str());
 	m_pImageInstance = CGraphicImageInstance::New();
 	m_pImageInstance->SetImagePointer(pImage);
 
@@ -324,6 +329,7 @@ void CSnowEnvironment::Destroy()
 void CSnowEnvironment::__Initialize()
 {
 	m_bSnowEnable = FALSE;
+	m_bRainEnable = false;
 	m_lpSnowTexture = nullptr;
 	m_lpSnowRenderTargetSurface = nullptr;
 	m_lpSnowDepthSurface = nullptr;
@@ -340,7 +346,7 @@ void CSnowEnvironment::__Initialize()
 CSnowEnvironment::CSnowEnvironment()
 {
 	m_bBlurEnable = FALSE;
-	m_dwParticleMaxNum = 3000;
+	m_dwParticleMaxNum = 3009;
 	m_wBlurTextureSize = 512;
 
 	__Initialize();
@@ -348,4 +354,25 @@ CSnowEnvironment::CSnowEnvironment()
 CSnowEnvironment::~CSnowEnvironment()
 {
 	Destroy();
+}
+
+void CSnowEnvironment::ToggleRain(bool enable) {
+	Destroy();
+
+	if (enable) {
+		// Re-create the whole thing
+		Create();
+
+		// Change the image
+		CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(rain_resource_filename.c_str());
+		m_pImageInstance = CGraphicImageInstance::New();
+		m_pImageInstance->SetImagePointer(pImage);
+
+		// Modify these as well so that a higher amount of "rain drops" are created
+		m_dwParticleMaxNum = 12000;
+		m_kVct_pkParticleSnow.reserve(m_dwParticleMaxNum);
+	}
+
+	m_bRainEnable = enable;
+	m_bSnowEnable = enable;
 }

@@ -82,7 +82,6 @@ CBaseCollisionInstance * CBaseCollisionInstance::BuildCollisionInstance(const CS
 
 				return ppci;
 			}
-			break;
 		case COLLISION_TYPE_BOX:
 			assert(false && "COLLISION_TYPE_BOX not implemented");
 			break;
@@ -112,7 +111,6 @@ CBaseCollisionInstance * CBaseCollisionInstance::BuildCollisionInstance(const CS
 
 				return paci;
 			}
-			break;
 			case COLLISION_TYPE_OBB:
 			{
 				COBBCollisionInstance * poci = gs_oci.Alloc();
@@ -143,19 +141,11 @@ CBaseCollisionInstance * CBaseCollisionInstance::BuildCollisionInstance(const CS
 				OBBData.v3Max.y = v3Position.y + c_pCollisionData->fDimensions[1];
 				OBBData.v3Max.z = v3Position.z + c_pCollisionData->fDimensions[2];
 
-				
-
-				D3DXMATRIX matTransform = *pMat;
-
 				D3DXMatrixIdentity(&OBBData.matRot); OBBData.matRot = *pMat;
 				OBBData.matRot._41 = 0; OBBData.matRot._42 = 0; OBBData.matRot._43 = 0; OBBData.matRot._44 = 1;
 
-
-
-
 				return poci;
 			}
-			break;
 		case COLLISION_TYPE_SPHERE:
 			{
 				CSphereCollisionInstance * psci = gs_sci.Alloc();
@@ -172,7 +162,6 @@ CBaseCollisionInstance * CBaseCollisionInstance::BuildCollisionInstance(const CS
 
 				return psci;
 			}
-			break;
 		case COLLISION_TYPE_CYLINDER:
 			{
 				CCylinderCollisionInstance * pcci = gs_cci.Alloc();
@@ -190,7 +179,6 @@ CBaseCollisionInstance * CBaseCollisionInstance::BuildCollisionInstance(const CS
 
 				return pcci;
 			}
-			break;
 	}
 	assert(false && "NOT_REACHED");
 	return 0;
@@ -581,7 +569,6 @@ const TAABBData & CAABBCollisionInstance::GetAttribute() const
 bool CAABBCollisionInstance::OnMovementCollisionDynamicSphere(const CDynamicSphereInstance & s) const
 {
 	D3DXVECTOR3 v;
-	D3DXVECTOR3 v3center = (m_attribute.v3Min + m_attribute.v3Max) * 0.5f;
 
 	memcpy(&v, &s.v3Position, sizeof(D3DXVECTOR3));
 
@@ -593,11 +580,7 @@ bool CAABBCollisionInstance::OnMovementCollisionDynamicSphere(const CDynamicSphe
 	if(v.z > m_attribute.v3Max.z) v.z = m_attribute.v3Max.z;
 
 	if(GetVector3Distance(v, s.v3Position) <= s.fRadius * s.fRadius)
-	{
-		
 		return true;
-	}
-
 
 	memcpy(&v, &s.v3LastPosition, sizeof(D3DXVECTOR3));
 
@@ -609,10 +592,7 @@ bool CAABBCollisionInstance::OnMovementCollisionDynamicSphere(const CDynamicSphe
 	if(v.z > m_attribute.v3Max.z) v.z = m_attribute.v3Max.z;
 
 	if(GetVector3Distance(v, s.v3LastPosition) <= s.fRadius * s.fRadius)
-	{
-		
 		return true;
-	}
 
 	return false;
 }

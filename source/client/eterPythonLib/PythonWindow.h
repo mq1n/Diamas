@@ -2,6 +2,7 @@
 
 #include "../eterBase/Utils.h"
 #include "../eterXClient/Locale_inc.h"
+#include "../eterLib/GrpRenderTargetTexture.h"
 
 namespace UI
 {
@@ -62,6 +63,8 @@ namespace UI
 			void			DestroyHandle();
 			void			Update();
 			void			Render();
+			void			BeginRender();
+			void			EndRender();
 
 			void			SetName(const char * c_szName);
 			const char *	GetName()		{ return m_strName.c_str(); }
@@ -550,6 +553,38 @@ namespace UI
 		protected:
 			RECT m_restrictArea;
 	};
+
+	class CRenderTarget : public CWindow
+	{
+		public:
+			static uint32_t Type();
+			BOOL OnIsType(uint32_t dwType) { return dwType == Type(); }
+
+			CRenderTarget(PyObject* ppyObject);
+			virtual ~CRenderTarget();
+
+			void SetRenderTarget(uint32_t index, const char* background_image);
+			void OnUpdate();
+
+			void Show();
+			void Hide();
+
+			void SetRace(uint32_t dwRaceVnum);
+			void SetAlwaysRotate(bool bRotate);
+			void SetRotation(float fRotation);
+			void SetArmor(uint32_t dwVnum);
+			void SetHair(uint32_t dwHairIndex);
+			void SetWeapon(uint32_t dwVnum);
+			void SetMotion(uint32_t dwMotionIndex);
+
+		protected:
+			void OnRender() override;
+		
+		private:
+			CGraphicRenderTargetTexture* m_renderTarget;
+			int32_t m_iRenderTargetIndex;
+	};
+
 };
 
 extern BOOL g_bOutlineBoxEnable;

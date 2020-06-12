@@ -11,6 +11,7 @@ CLightManager::CLightManager()
 {
 	m_v3CenterPosition			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_dwLimitLightCount			= LIGHT_LIMIT_DEFAULT;
+	m_dwSkipIndex = 0;
 }
 
 CLightManager::~CLightManager()

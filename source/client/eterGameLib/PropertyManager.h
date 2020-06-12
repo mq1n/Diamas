@@ -15,7 +15,7 @@ public:
 	void			ReserveCRC(uint32_t dwCRC);
 	uint32_t		GetUniqueCRC(const char * c_szSeed);
 
-	bool			Initialize(const char * c_pszPackFileName = nullptr);
+	bool			Initialize(const std::string& listFilename);
 	bool			Register(const char * c_pszFileName, CProperty ** ppProperty = nullptr);
 
 	bool			Get(uint32_t dwCRC, CProperty ** ppProperty);

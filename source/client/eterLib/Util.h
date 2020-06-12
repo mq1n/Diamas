@@ -6,13 +6,14 @@
 #include <map>
 #include <vector>
 
-#include <d3dx9.h>
-
+#include <d3d9.h>
+#include <d3dx9math.h>
 template<typename T>
 class CTransitor
 {
 	public:
-		CTransitor() {}
+		CTransitor(): m_dwID(0), m_bActivated(0), m_fStartTime(0), m_fEndTime(0)
+		{}
 		~CTransitor() {}
 
 		void SetActive(BOOL bActive = TRUE)

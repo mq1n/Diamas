@@ -117,7 +117,8 @@ template<typename T>
 class CTimeEvent
 {
 public:
-	CTimeEvent(){}
+	CTimeEvent(): m_fTime(0)
+	{}
 	~CTimeEvent(){}
 
 	float m_fTime;
@@ -130,7 +131,7 @@ struct DWORDCOLOR
 {
 	uint32_t m_dwColor;
 
-	DWORDCOLOR()
+	DWORDCOLOR(): m_dwColor(0)
 	{
 	}
 	DWORDCOLOR(const DWORDCOLOR& r)
@@ -271,9 +272,7 @@ extern BOOL GetTokenTimeEventFloat(CTextFileLoader & rTextFileLoader, const char
 template <typename T>
 void InsertItemTimeEvent(std::vector<CTimeEvent<T> > * pTable, float fTime, T fValue)
 {
-	typedef std::vector<CTimeEvent<T> >::iterator iterator;
-
-	iterator itor = std::lower_bound(pTable->begin(), pTable->end(), fTime);
+	auto itor = std::lower_bound(pTable->begin(), pTable->end(), fTime);
 
 	CTimeEvent<T> TimeEvent;
 	TimeEvent.m_fTime = fTime;

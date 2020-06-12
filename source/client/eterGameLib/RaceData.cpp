@@ -557,9 +557,9 @@ void CRaceData::Destroy()
 	m_kMap_dwHairKey_kHair.clear();
 	m_kMap_dwShapeKey_kShape.clear();
 
-	m_strBaseModelFileName = "";
-	m_strTreeFileName = "";
-	m_strAttributeFileName = "";
+	m_strBaseModelFileName.clear();
+	m_strTreeFileName.clear();
+	m_strAttributeFileName.clear();
 	m_strMotionListFileName = "motlist.txt";
 
 	m_AttachingBoneNameMap.clear();

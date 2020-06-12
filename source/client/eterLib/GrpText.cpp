@@ -45,7 +45,7 @@ bool CGraphicText::OnLoad(int32_t /*iSize*/, const void* /*c_pvBuf*/)
 
 	if (p)
 	{
-		strncpy(strName, GetFileName(), MIN(31, p - GetFileName()));
+		strncpy_s(strName, GetFileName(), MIN(31, p - GetFileName()));
 		++p;
 
 		static char num[8];
@@ -71,7 +71,7 @@ bool CGraphicText::OnLoad(int32_t /*iSize*/, const void* /*c_pvBuf*/)
 			strName[0] = '\0';
 		}
 		else
-			strncpy(strName, GetFileName(), MIN(31, p - GetFileName()));
+			strncpy_s(strName, GetFileName(), MIN(31, p - GetFileName()));
 		
 		size = 12;
 	}

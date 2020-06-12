@@ -116,6 +116,14 @@ PyObject* netUploadSymbol(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildValue("i", rkNetStream.UploadSymbol(szFileName));
 }
 
+PyObject* netResetNextGuildMarkDownloadTime(PyObject* poSelf, PyObject* poArgs)
+{
+	CPythonNetworkStream& rkNetStream = CPythonNetworkStream::Instance();
+	rkNetStream.ResetNextMarkDownloadTime();
+
+	return Py_BuildNone();
+}
+
 PyObject* netGetGuildID(PyObject* poSelf, PyObject* poArgs)
 {
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
@@ -1632,6 +1640,7 @@ void initnet()
 		{ "LoadInsultList",						netLoadInsultList,						METH_VARARGS },
 		{ "UploadMark",							netUploadMark,							METH_VARARGS },
 		{ "UploadSymbol",						netUploadSymbol,						METH_VARARGS },
+		{ "ResetGuildMarkDownloadTime",			netResetNextGuildMarkDownloadTime,		METH_VARARGS },
 		{ "GetGuildID",							netGetGuildID,							METH_VARARGS },
 		{ "GetEmpireID",						netGetEmpireID,							METH_VARARGS },
 		{ "GetMainActorVID",					netGetMainActorVID,						METH_VARARGS },

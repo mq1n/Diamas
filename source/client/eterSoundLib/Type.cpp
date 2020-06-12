@@ -89,7 +89,8 @@ bool NSound::SaveSoundInformationPiece(const char * c_szFileName, NSound::TSound
 	std::string strResult;
 	strResult = c_szFileName;
 
-	FILE * File = fopen(c_szFileName, "wt");
+	FILE * File;
+	fopen_s(&File, c_szFileName, "wt");
 
 	if (!File)
 	{
@@ -103,12 +104,12 @@ bool NSound::SaveSoundInformationPiece(const char * c_szFileName, NSound::TSound
 	fprintf(File, "ScriptType        CharacterSoundInformation\n");
 	fprintf(File, "\n");
 
-	fprintf(File, "SoundDataCount    %d\n", rSoundDataVector.size());
+	fprintf(File, "SoundDataCount    %u\n", rSoundDataVector.size());
 
 	for (uint32_t i = 0; i < rSoundDataVector.size(); ++i)
 	{
 		NSound::TSoundData & rSoundData = rSoundDataVector[i];
-		fprintf(File, "SoundData%02d       %f \"%s\"\n", i, rSoundData.fTime, rSoundData.strSoundFileName.c_str());
+		fprintf(File, "SoundData%02u       %f \"%s\"\n", i, rSoundData.fTime, rSoundData.strSoundFileName.c_str());
 	}
 
 	fclose(File);

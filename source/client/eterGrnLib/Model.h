@@ -89,8 +89,6 @@ class CGrannyModel : public CReferenceObject
 	//////////////////////////////////////////////////////////////////////////
 	// New members to support PNT2 type models
 	protected:
-		bool __LoadVertices();
-	protected:
 		uint32_t m_dwFvF;
 	// New members to support PNT2 type models
 	//////////////////////////////////////////////////////////////////////////

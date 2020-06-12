@@ -627,7 +627,7 @@ void CSpeedTreeWrapper::SetupBranchForTreeType(void) const
 {
 #ifdef WRAPPER_USE_DYNAMIC_LIGHTING
 
-	STATEMANAGER.SetMaterial(((CSpeedTreeMaterial)m_cBranchMaterial).GetData());
+	STATEMANAGER.SetMaterial(((CSpeedTreeMaterial)m_cBranchMaterial).Get());
 	SetShaderConstants(m_pSpeedTree->GetBranchMaterial());
 #endif
 #ifdef WRAPPER_USE_CPU_WIND
@@ -686,7 +686,7 @@ void CSpeedTreeWrapper::SetupFrondForTreeType(void) const
 {
 #ifdef SPEEDTREE_LIGHTING_DYNAMIC
 
-	STATEMANAGER.SetMaterial(m_cFrondMaterial.GetData());
+	STATEMANAGER.SetMaterial(m_cFrondMaterial.Get());
 	SetShaderConstants(m_pSpeedTree->GetFrondMaterial());
 #endif
 #ifdef WRAPPER_USE_CPU_WIND
@@ -741,7 +741,7 @@ void CSpeedTreeWrapper::SetupLeafForTreeType(void) const
 {
 #ifdef SPEEDTREE_LIGHTING_DYNAMIC
 
-	STATEMANAGER.SetMaterial(m_cLeafMaterial.GetData());
+	STATEMANAGER.SetMaterial(m_cLeafMaterial.Get());
 	SetShaderConstants(m_pSpeedTree->GetLeafMaterial());
 #endif
 #ifdef WRAPPER_USE_GPU_LEAF_PLACEMENT

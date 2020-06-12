@@ -179,12 +179,6 @@ public:
 		
 		mChildCount++;
 
-#if defined(_DEBUG)
-		float dist = DistanceSquared(pack);
-		float radius = sqrtf(dist) + pack->GetRadius();
-		
-		assert( radius <= GetRadius()+0.0001f );
-#endif
 	}
 	
 	void SetNextSibling(SpherePack *child) { mNextSibling = child; }

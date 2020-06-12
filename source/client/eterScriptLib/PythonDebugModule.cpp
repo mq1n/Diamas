@@ -47,14 +47,6 @@ PyObject* dbgTraceError(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
-PyObject* dbgRegisterExceptionString(PyObject* poSelf, PyObject* poArgs)
-{
-	char* szMsg;
-	if (!PyTuple_GetString(poArgs, 0, &szMsg)) 
-		return Py_BuildException();
-
-	return Py_BuildNone();
-}
 
 void initdbg()
 {
@@ -64,7 +56,6 @@ void initdbg()
 		{ "Trace",						dbgTrace,					METH_VARARGS },
 		{ "Tracen",						dbgTracen,					METH_VARARGS },
 		{ "TraceError",					dbgTraceError,				METH_VARARGS },
-		{ "RegisterExceptionString",	dbgRegisterExceptionString,	METH_VARARGS },
 		{ nullptr, nullptr},
 	};	
 

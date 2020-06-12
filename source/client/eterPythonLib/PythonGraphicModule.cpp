@@ -825,7 +825,7 @@ PyObject * grpSaveScreenShotToPath(PyObject * poSelf, PyObject * poArgs)
 	tmNow = localtime(&ct);
 
 	char szPath[MAX_PATH + 256];
-	snprintf(szPath, sizeof(szPath), "%s%02d%02d_%02d%02d%02d.jpg", 
+	_snprintf_s(szPath, sizeof(szPath), "%s%02d%02d_%02d%02d%02d.jpg", 
 			szBasePath,
 			tmNow->tm_mon + 1,
 			tmNow->tm_mday,
@@ -858,7 +858,7 @@ PyObject * grpSaveScreenShot(PyObject * poSelf, PyObject * poArgs)
 			return Py_BuildValue("(is)", FALSE, "");
 		}
 
-	sprintf(szPath + strlen(szPath), "%02d%02d_%02d%02d%02d.jpg", 
+	sprintf_s(szPath + strlen(szPath),sizeof(szPath), "%02d%02d_%02d%02d%02d.jpg",
 			tmNow->tm_mon + 1,
 			tmNow->tm_mday,
 			tmNow->tm_hour,
@@ -1047,6 +1047,7 @@ void initgrp()
 		{ "BeginRenderInTmpTexture", grpBeginRenderInTmpTexture, METH_VARARGS },
 		{ "EndRenderInTmpTexture", grpEndRenderInTmpTexture, METH_VARARGS },
 		{ "RenderSubTmpTexture", grpRenderSubTmpTexture, METH_VARARGS },
+		
 		{ nullptr,							nullptr,							0		},
 	};
 

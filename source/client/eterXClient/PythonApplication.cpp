@@ -23,20 +23,19 @@ float c_fDefaultCameraPitchSpeed = 1.5f;
 float c_fDefaultCameraZoomSpeed = 0.05f;
 
 CPythonApplication::CPythonApplication() :
-m_bCursorVisible(TRUE),
-m_bLiarCursorOn(false),
-m_iCursorMode(CURSOR_MODE_HARDWARE),
-m_isWindowed(false),
-m_isFrameSkipDisable(false),
-m_poMouseHandler(nullptr),
-m_dwUpdateFPS(0),
-m_dwRenderFPS(0),
-m_fAveRenderTime(0.0f),
-m_dwFaceCount(0),
-m_fGlobalTime(0.0f),
-m_fGlobalElapsedTime(0.0f),
-m_dwLButtonDownTime(0),
-m_dwLastIdleTime(0)
+	m_poMouseHandler(nullptr),
+	m_fAveRenderTime(0.0f),
+	m_fGlobalTime(0.0f),
+	m_fGlobalElapsedTime(0.0f),
+	m_dwUpdateFPS(0),
+	m_dwRenderFPS(0),
+	m_dwFaceCount(0),
+	m_dwLButtonDownTime(0),
+	m_bCursorVisible(TRUE),
+	m_bLiarCursorOn(false),
+	m_iCursorMode(CURSOR_MODE_HARDWARE),
+	m_isWindowed(false),
+	m_isFrameSkipDisable(false)
 {
 	CTimer::Instance().UseCustomTime();
 	m_dwWidth = 800;
@@ -132,6 +131,15 @@ void CPythonApplication::Abort()
 {
 	TraceError("============================================================================================================");
 	TraceError("Abort!!!!\n\n");
+    PyThreadState * ts = PyThreadState_Get();
+    PyFrameObject* frame = ts->frame;
+    while (frame != 0)
+    {
+		char const* filename = PyString_AsString(frame->f_code->co_filename);
+        char const* name = PyString_AsString(frame->f_code->co_name);
+        TraceError("filename=%s, name=%s", filename, name);
+        frame = frame->f_back;
+    }
 
 	PostQuitMessage(0);
 }
@@ -144,6 +152,8 @@ void CPythonApplication::Exit()
 void CPythonApplication::RenderGame()
 {	
 	{
+		CPythonRenderTargetManager::Instance().RenderBackground();
+
 		float fAspect=m_kWndMgr.GetAspect();
 		float fFarClip=m_pyBackground.GetFarClip();
 
@@ -153,6 +163,7 @@ void CPythonApplication::RenderGame()
 
 		m_kChrMgr.Deform();
 		m_kEftMgr.Update();
+		CPythonRenderTargetManager::Instance().Deform();
 
 		m_pyBackground.RenderCharacterShadowToTexture();
 
@@ -176,6 +187,7 @@ void CPythonApplication::RenderGame()
 
 		m_pyBackground.SetCharacterDirLight();
 		m_kChrMgr.Render();
+		CPythonRenderTargetManager::Instance().RenderModel();
 
 		m_pyBackground.SetBackgroundDirLight();
 		m_pyBackground.RenderWater();
@@ -232,6 +244,8 @@ void CPythonApplication::UpdateGame()
 
 	m_pyPlayer.Update();
 
+	CPythonRenderTargetManager::Instance().Update();
+
 	// NOTE : Update 동안 위치 값이 바뀌므로 다시 얻어 옵니다 - [levites]
 	//        이 부분 때문에 메인 케릭터의 Sound가 이전 위치에서 플레이 되는 현상이 있었음.
 	m_pyPlayer.NEW_GetMainActorPosition(&kPPosMainActor);
@@ -276,7 +290,7 @@ bool CPythonApplication::Process()
 	}
 
 	// Update Time
-	static BOOL s_bFrameSkip = false;
+	static BOOL s_bFrameSkip = FALSE;
 	static uint32_t s_uiNextFrameTime = ELTimer_GetMSec();
 
 #ifdef __PERFORMANCE_CHECK__
@@ -352,16 +366,16 @@ bool CPythonApplication::Process()
 	{			
 		static FILE* fp=fopen("perf_app_update.txt", "w");
 
-		fprintf(fp, "AU.Total %d (Time %d)\n", dwUpdateTime9-dwUpdateTime1, ELTimer_GetMSec());
-		fprintf(fp, "AU.TU %d\n", dwUpdateTime2-dwUpdateTime1);
-		fprintf(fp, "AU.NU %d\n", dwUpdateTime3-dwUpdateTime2);
-		fprintf(fp, "AU.KU %d\n", dwUpdateTime4-dwUpdateTime3);
-		fprintf(fp, "AU.MP %d\n", dwUpdateTime5-dwUpdateTime4);
-		fprintf(fp, "AU.CP %d\n", dwUpdateTime6-dwUpdateTime5);
-		fprintf(fp, "AU.RU %d\n", dwUpdateTime7-dwUpdateTime6);
-		fprintf(fp, "AU.CU %d\n", dwUpdateTime8-dwUpdateTime7);
-		fprintf(fp, "AU.MU %d\n", dwUpdateTime9-dwUpdateTime8);
-		fprintf(fp, "AU.UU %d\n", dwUpdateTime10-dwUpdateTime9);			
+		fprintf(fp, "AU.Total %u (Time %u)\n", dwUpdateTime9-dwUpdateTime1, ELTimer_GetMSec());
+		fprintf(fp, "AU.TU %u\n", dwUpdateTime2-dwUpdateTime1);
+		fprintf(fp, "AU.NU %u\n", dwUpdateTime3-dwUpdateTime2);
+		fprintf(fp, "AU.KU %u\n", dwUpdateTime4-dwUpdateTime3);
+		fprintf(fp, "AU.MP %u\n", dwUpdateTime5-dwUpdateTime4);
+		fprintf(fp, "AU.CP %u\n", dwUpdateTime6-dwUpdateTime5);
+		fprintf(fp, "AU.RU %u\n", dwUpdateTime7-dwUpdateTime6);
+		fprintf(fp, "AU.CU %u\n", dwUpdateTime8-dwUpdateTime7);
+		fprintf(fp, "AU.MU %u\n", dwUpdateTime9-dwUpdateTime8);
+		fprintf(fp, "AU.UU %u\n", dwUpdateTime10-dwUpdateTime9);
 		fprintf(fp, "----------------------------------\n");
 		fflush(fp);
 	}		
@@ -383,11 +397,16 @@ bool CPythonApplication::Process()
 		if ( dt >= 500 )
 		{
 			s_uiNextFrameTime += nAdjustTime; 
-			printf("FrameSkip Adjusting... %d\n",nAdjustTime);
+
+			Tracenf("Process(): dt %d uiFrameTime %u nAdjustTime %d",
+					dt, uiFrameTime, nAdjustTime);
+
 			CTimer::Instance().Adjust(nAdjustTime);
 		}
 
-		s_bFrameSkip = true;
+		if (!m_isFrameSkipDisable)
+			s_bFrameSkip = true;
+
 		bCurrentLateUpdate = TRUE;
 	}
 
@@ -517,6 +536,7 @@ bool CPythonApplication::Process()
 		if (m_isMinimizedWnd)
 		{
 			canRender = false;
+			Tracenf("Process(): Minimized, canRender %d", canRender);
 		}
 		else
 		{
@@ -524,11 +544,16 @@ bool CPythonApplication::Process()
 			{
 				CPythonBackground& rkBG = CPythonBackground::Instance();
 				rkBG.ReleaseCharacterShadowTexture();
+				CRenderTargetManager::Instance().ReleaseRenderTargetTextures();
 
-				if (m_pyGraphic.RestoreDevice())					
+				if (m_pyGraphic.RestoreDevice()) {
+					CRenderTargetManager::Instance().CreateRenderTargetTextures();
 					rkBG.CreateCharacterShadowTexture();
+				}
 				else
-					canRender = false;				
+					canRender = false;
+
+				Tracenf("Process(): Lost device, canRender %d", canRender);
 			}
 		}
 
@@ -617,34 +642,13 @@ bool CPythonApplication::Process()
 						if (s_fBufRenderTime > 100.0f)
 							s_fBufRenderTime = 100.0f;
 
-						uint32_t dwBufRenderTime = s_fBufRenderTime;
-
-						if (m_isWindowed)
-						{						
-							if (dwBufRenderTime>58)
-								dwBufRenderTime=64;
-							else if (dwBufRenderTime>42)
-								dwBufRenderTime=48;
-							else if (dwBufRenderTime>26)
-								dwBufRenderTime=32;
-							else if (dwBufRenderTime>10)
-								dwBufRenderTime=16;
-							else
-								dwBufRenderTime=8;
-						}
-
-						// 일정 프레임 속도에 맞추어주는쪽에 눈에 편하다
-						// 아래에서 한번 하면 됬다.
-						//if (m_dwCurRenderTime<dwBufRenderTime)
-						//	Sleep(dwBufRenderTime-m_dwCurRenderTime);			
-
 						m_fAveRenderTime=s_fBufRenderTime;
 					}
 
 					m_dwFaceAccCount += dwCurFaceCount;
 					m_dwFaceAccTime += m_dwCurRenderTime;
 
-					m_fFaceSpd=(m_dwFaceAccCount/m_dwFaceAccTime);
+					m_fFaceSpd=(float(m_dwFaceAccCount)/m_dwFaceAccTime);
 
 					// 거리 자동 조절
 					if (-1 == m_iForceSightRange)
@@ -803,8 +807,6 @@ void CPythonApplication::Loop()
 		{
 			if (!Process())
 				break;
-
-			m_dwLastIdleTime=ELTimer_GetMSec();
 		}
 	}
 }
@@ -824,13 +826,13 @@ bool LoadLocaleData(const char* localePath)
 	char szSkillDescFileName[256];
 	char szSkillTableFileName[256];
 	char szInsultList[256];
-	snprintf(szItemList,	sizeof(szItemList) ,	"%s/item_list.txt",	localePath);		
-	snprintf(szItemProto,	sizeof(szItemProto),	"%s/item_proto",	localePath);
-	snprintf(szItemDesc,	sizeof(szItemDesc),	"%s/itemdesc.txt",	localePath);	
-	snprintf(szMobProto,	sizeof(szMobProto),	"%s/mob_proto",		localePath);	
-	snprintf(szSkillDescFileName, sizeof(szSkillDescFileName),	"%s/SkillDesc.txt", localePath);
-	snprintf(szSkillTableFileName, sizeof(szSkillTableFileName),	"%s/SkillTable.txt", localePath);	
-	snprintf(szInsultList,	sizeof(szInsultList),	"%s/insult.txt", localePath);
+	_snprintf_s(szItemList,				sizeof(szItemList) ,			"%s/item_list.txt",	localePath);
+	_snprintf_s(szItemProto,			sizeof(szItemProto),			"%s/item_proto",	localePath);
+	_snprintf_s(szItemDesc,				sizeof(szItemDesc),				"%s/itemdesc.txt",	localePath);
+	_snprintf_s(szMobProto,				sizeof(szMobProto),				"%s/mob_proto",		localePath);
+	_snprintf_s(szSkillDescFileName,	sizeof(szSkillDescFileName),	"%s/SkillDesc.txt", localePath);
+	_snprintf_s(szSkillTableFileName,	sizeof(szSkillTableFileName),	"%s/SkillTable.txt",localePath);
+	_snprintf_s(szInsultList,			sizeof(szInsultList),			"%s/insult.txt",	localePath);
 
 	rkNPCMgr.Destroy();
 	rkItemMgr.Destroy();	
@@ -898,9 +900,10 @@ uint32_t __GetWindowMode(bool windowed)
 	return WS_POPUP;
 }
 
-bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_t width, int32_t height, int32_t Windowed)
+bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_t width, int32_t height)
 {
-	Windowed = CPythonSystem::Instance().IsWindowed() ? 1 : 0;
+	
+	bool Windowed = CPythonSystem::Instance().IsWindowed();
 
 	bool bAnotherWindow = false;
 
@@ -911,7 +914,7 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_
 	m_dwHeight = height;
 
 	// Window
-	uint32_t WindowMode = __GetWindowMode(Windowed ? true : false);
+	uint32_t WindowMode = __GetWindowMode(Windowed);
 
 	if (!CMSWindow::Create(c_szName, 4, 0, WindowMode, ::LoadIcon( GetInstance(), MAKEINTRESOURCE( IDI_METIN2 ) ), IDC_CURSOR_NORMAL))
 	{
@@ -929,7 +932,7 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_
 	// 풀스크린 모드이고
 	// 디폴트 IME 를 사용하거나 유럽 버전이면
 	// 윈도우 풀스크린 모드를 사용한다
-	if (!m_pySystem.IsWindowed() && m_pySystem.IsUseDefaultIME())
+	if (!m_pySystem.IsWindowed())
 	{
 		m_isWindowed = false;
 		m_isWindowFullScreenEnable = TRUE;
@@ -987,8 +990,7 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_
 		}
 
 		// Device
-		if (!CreateDevice(m_pySystem.GetWidth(), m_pySystem.GetHeight(), Windowed, m_pySystem.GetBPP(),
-						  m_pySystem.GetFrequency()))
+		if (!CreateDevice(m_pySystem.GetWidth(), m_pySystem.GetHeight(), Windowed, m_pySystem.GetBPP(), m_pySystem.GetFrequency()))
 			return false;
 
 		GrannyCreateSharedDeformBuffer();
@@ -1055,6 +1057,13 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_
 		// SphereMap
 		CGrannyMaterial::CreateSphereMap(0, "d:/ymir work/special/spheremap.jpg");
 		CGrannyMaterial::CreateSphereMap(1, "d:/ymir work/special/spheremap01.jpg");
+
+		// Render Target
+		for (int32_t i = 0; i < CPythonRenderTargetManager::RENDER_TYPE_MAX_NUM; i++) {
+			if (!CRenderTargetManager::Instance().CreateRenderTargetWithIndex(m_dwWidth, m_dwHeight, i))
+				TraceError("WARNING - Could not create render target (%d, %d, %d).", m_dwWidth, m_dwHeight, i);
+		}
+
 		return true;
 }
 
@@ -1179,6 +1188,9 @@ void CPythonApplication::Destroy()
 
 	DestroyCollisionInstanceSystem();
 
+	CRenderTargetManager::Instance().Destroy();
+	CPythonRenderTargetManager::Instance().Destroy();
+
 	m_pySystem.SaveInterfaceStatus();
 
 	m_pyEventManager.Destroy();	
@@ -1232,4 +1244,14 @@ void CPythonApplication::Destroy()
 	sStickKeys.cbSize = sizeof(sStickKeys);
 	sStickKeys.dwFlags = m_dwStickyKeysFlag;
 	SystemParametersInfo( SPI_SETSTICKYKEYS, sizeof(sStickKeys), &sStickKeys, 0 );
+}
+
+LPDIRECT3D9 CPythonApplication::GetDirectx9()
+{
+	return m_grpDevice.GetDirectx9();
+}
+
+LPDIRECT3DDEVICE9 CPythonApplication::GetDevice()
+{
+	return m_grpDevice.GetDevice();
 }

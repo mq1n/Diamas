@@ -39,7 +39,7 @@ void CWeaponTrace::Update(float fReachScale)
 			it->first += fElapsedTime;
 			if (it->first>m_fLifeTime)
 			{
-				it++;
+				++it;
 				break;
 			}
 		}
@@ -50,7 +50,7 @@ void CWeaponTrace::Update(float fReachScale)
 			it->first += fElapsedTime;
 			if (it->first>m_fLifeTime)
 			{
-				it++;
+				++it;
 				break;
 			}
 		}
@@ -156,7 +156,6 @@ bool CWeaponTrace::BuildVertex()
 	{
 		TTimePointList & Input = (loop) ? m_LongTimePointList : m_ShortTimePointList;
 		std::vector<TPDTVertex> & Output = (loop) ? m_LongVertexVector : m_ShortVertexVector;
-		TTimePointList::iterator it;
 		int32_t i;
 		
 		for(i=0;i<n;++i)

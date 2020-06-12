@@ -155,7 +155,7 @@ bool CDibBar::Create(HDC hdc, uint32_t dwWidth, uint32_t dwHeight)
 	return true;
 }
 
-CDibBar::CDibBar()
+CDibBar::CDibBar(): m_dwWidth(0), m_dwHeight(0)
 {
 }
 CDibBar::~CDibBar()

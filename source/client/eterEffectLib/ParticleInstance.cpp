@@ -140,8 +140,6 @@ void CParticleInstance::Transform(const D3DXMATRIX * c_matLocal)
 		const D3DXVECTOR3 & c_rv3Up = pCurrentCamera->GetUp();
 		const D3DXVECTOR3 & c_rv3Cross = pCurrentCamera->GetCross();
 
-		D3DXVECTOR3 v3Rotation;
-
 		switch(m_pParticleProperty->m_byBillboardType) {
 		case BILLBOARD_TYPE_LIE:
 			{
@@ -295,8 +293,6 @@ void CParticleInstance::Transform(const D3DXMATRIX * c_matLocal, const float c_f
 		CCamera * pCurrentCamera = CCameraManager::Instance().GetCurrentCamera();
 		const D3DXVECTOR3 & c_rv3Up = pCurrentCamera->GetUp();
 		const D3DXVECTOR3 & c_rv3Cross = pCurrentCamera->GetCross();
-
-		D3DXVECTOR3 v3Rotation;
 
 		switch(m_pParticleProperty->m_byBillboardType) {
 		case BILLBOARD_TYPE_LIE:

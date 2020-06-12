@@ -27,9 +27,10 @@ void CActorInstance::INSTANCEBASE_Transform()
 	{
 		m_pkHorse->INSTANCEBASE_Transform();
 
-		m_x = m_pkHorse->NEW_GetCurPixelPositionRef().x;
-		m_y = -m_pkHorse->NEW_GetCurPixelPositionRef().y;
-		m_z = m_pkHorse->NEW_GetCurPixelPositionRef().z;
+		const TPixelPosition& horseCurePixPosRef = m_pkHorse->NEW_GetCurPixelPositionRef();
+		m_x = horseCurePixPosRef.x;
+		m_y = -horseCurePixPosRef.y;
+		m_z = horseCurePixPosRef.z;
 		m_bNeedUpdateCollision = TRUE;			
 	}
 	
@@ -274,86 +275,52 @@ bool CActorInstance::IsBowMode()
 
 bool CActorInstance::IsPoly()
 {
-	if (TYPE_POLY==m_eActorType)
-		return true;
-
-	if (TYPE_PC==m_eActorType)
-		if (m_eRace >= MAIN_RACE_MAX_NUM)
-			return TRUE;
-
-	return false;
+	return (m_eActorType == TYPE_POLY || (m_eActorType == TYPE_PC && m_eRace >= MAIN_RACE_MAX_NUM));
 }
 
 bool CActorInstance::IsPC()
 {
-	if (TYPE_PC==m_eActorType)
-		return true;
-
-	return false;
+	return (m_eActorType == TYPE_PC);
 }
 
 bool CActorInstance::IsNPC()
 {
-	if (TYPE_NPC==m_eActorType)
-		return true;
-
-	return false;
+	return (m_eActorType == TYPE_NPC);
 }
 
 bool CActorInstance::IsEnemy()
 {
-	if (TYPE_ENEMY==m_eActorType)
-		return true;
-
-	return false;
+	return (m_eActorType == TYPE_ENEMY);
 }
 
 bool CActorInstance::IsStone()
 {
-	if (TYPE_STONE==m_eActorType)
-		return true;
-
-	return false;
+	return (m_eActorType == TYPE_STONE);
 }
 
 bool CActorInstance::IsWarp()
 {
-	if (TYPE_WARP==m_eActorType)
-		return true;
-
-	return false;
+	return (m_eActorType == TYPE_WARP);
 }
 
 bool CActorInstance::IsGoto()
 {
-	if (TYPE_GOTO==m_eActorType)
-		return true;
-
-	return false;
+	return (m_eActorType == TYPE_GOTO);
 }
 
 bool CActorInstance::IsBuilding()
 {
-	if (TYPE_BUILDING==m_eActorType)
-		return true;
-
-	return false;	
+	return (m_eActorType == TYPE_BUILDING);
 }
 
 bool CActorInstance::IsDoor()
 {
-	if (TYPE_DOOR==m_eActorType)
-		return true;
-
-	return false;
+	return (m_eActorType == TYPE_DOOR);
 }
 
 bool CActorInstance::IsObject()
 {
-	if (TYPE_OBJECT==m_eActorType)
-		return true;
-
-	return false;
+	return (m_eActorType == TYPE_OBJECT);
 }
 
 void CActorInstance::DestroySystem()
@@ -483,6 +450,9 @@ void CActorInstance::AccumulationMovement()
 
 	if (m_pkHorse)
 	{
+		if (m_nextAllowedMovement > CTimer::Instance().GetCurrentMillisecond())
+			return;
+
 		m_pkHorse->__AccumulationMovement(m_fcurRotation);
 		return;
 	}
@@ -534,7 +504,7 @@ bool CActorInstance::OnGetObjectHeight(float fX, float fY, float * pfHeight)
 	if (TYPE_BUILDING != GetType())
 		return false;
 
-	return m_pHeightAttributeInstance->GetHeight(fX, fY, pfHeight) == 1 ? true : false;
+	return m_pHeightAttributeInstance->GetHeight(fX, fY, pfHeight) != FALSE ? true : false;
 }
 
 //////////////////////////////////////////////////////////////////

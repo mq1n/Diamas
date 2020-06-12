@@ -464,6 +464,11 @@ BOOL CActorInstance::IsFishing()
 	return FALSE;
 }
 
+bool CActorInstance::IsMining()
+{
+	return m_pkCurRaceMotionData && __GetCurrentMotionIndex() == CRaceMotionData::NAME_DIG;
+}
+
 BOOL CActorInstance::CanCancelSkill()
 {
 	assert(IsUsingSkill());
@@ -545,7 +550,6 @@ BOOL CActorInstance::isLock()
 		case CRaceMotionData::NAME_SLAP_HURT_WITH_WOLFMAN:
 #endif
 			return TRUE;
-			break;
 	}
 
 	// Locked during using skill
@@ -589,8 +593,12 @@ float CActorInstance::GetMotionDuration(uint32_t dwMotionKey)
 	if (0 == pMotion->GetMotionCount())
 	{
 #ifdef _DEBUG
-		Tracenf("CActorInstance::GetMotionDuration - Invalid Motion Key : %d, %d, %d",
+		uint32_t dwWaitMotionKey;
+		m_pkCurRaceData->GetMotionKey(GET_MOTION_MODE(dwMotionKey), CRaceMotionData::NAME_WAIT, &dwWaitMotionKey);
+		if (dwMotionKey != dwWaitMotionKey) {
+			Tracenf("CActorInstance::GetMotionDuration - Invalid Motion Key : %d, %d, %d",
 				GET_MOTION_MODE(dwMotionKey), GET_MOTION_INDEX(dwMotionKey), GET_MOTION_SUB_INDEX(dwMotionKey));
+		}
 #endif
 		return 0.0f;
 	}
@@ -682,7 +690,7 @@ uint32_t CActorInstance::__SetMotion(const SSetMotionData& c_rkSetMotData, uint3
 			if (!m_isMain)
 			{
 				Logn(0, "Only MainActor can receive damage when moving");
-				return false;
+				return 0;
 			}
 		}
 

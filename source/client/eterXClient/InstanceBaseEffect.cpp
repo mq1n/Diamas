@@ -159,11 +159,7 @@ void CInstanceBase::ProcessDamage()
 			m_bDamageEffectType = !m_bDamageEffectType;
 		}
 		else if(bTarget == false)
-		{
-			strDamageType = "nontarget_";
-			rdwCRCEft = EFFECT_DAMAGE_NOT_TARGET;
 			return;//현재 적용 안됨.
-		}
 		else
 		{
 			strDamageType = "target_";
@@ -212,8 +208,22 @@ void CInstanceBase::ProcessDamage()
 
 void CInstanceBase::AttachSpecialEffect(uint32_t effect)
 {
-	__AttachEffect(effect);
+	uint32_t dwEffID = __AttachEffect(effect);
+	m_specialEffects[effect].push_back(dwEffID);
 }
+
+void CInstanceBase::RemoveAttachedSpecialEffect(uint32_t dwEfType)
+{
+	const auto it = m_specialEffects.find(dwEfType);
+	if (it == m_specialEffects.end())
+		return;
+
+	for (const uint32_t effID : it->second)
+		__DetachEffect(effID);
+
+	m_specialEffects.erase(dwEfType);
+}
+
 
 void CInstanceBase::LevelUp()
 {
@@ -316,19 +326,16 @@ void CInstanceBase::__AttachEmpireEffect(uint32_t eEmpire)
 		return;
 	if (IsResource())
 		return;
+	if (IsInvisibility()) //Assasins spawned guys etc
+		return;
 
-	if (pkInstMain->IsGameMaster())
-	{
-	}
-	else
+	if (!pkInstMain->IsGameMaster())
 	{
 		if (pkInstMain->IsSameEmpire(*this))
 			return;
 
-		// HIDE_OTHER_EMPIRE_EUNHYEONG_ASSASSIN
 		if (IsAffect(AFFECT_EUNHYEONG))
 			return;
-		// END_OF_HIDE_OTHER_EMPIRE_EUNHYEONG_ASSASSIN
 	}
 
 	if (IsGameMaster())
@@ -674,7 +681,8 @@ void CInstanceBase::UpdateTextTailLevel(uint32_t level)
 	static D3DXCOLOR s_kLevelColor = D3DXCOLOR(152.0f/255.0f, 255.0f/255.0f, 51.0f/255.0f, 1.0f);
 
 	char szText[256];
-	sprintf(szText, "Lv %d", level);
+	sprintf_s(szText, "Lv %u", level);
+	m_dwLevel = level;
 	CPythonTextTail::Instance().AttachLevel(GetVirtualID(), szText, s_kLevelColor);
 }
 
@@ -777,14 +785,25 @@ void CInstanceBase::SetAffectFlagContainer(const CAffectFlagContainer& c_rkAffec
 	{
 		return;		
 	}
-	else if (IsStone())
-	{
+
+	uint32_t dwVnum = GetVirtualNumber();
+	BOOL bIsStone = IsStone();
+
+	switch (dwVnum) {
+		// Meley's Dragon Statues
+		case 6318:
+		case 8077:
+		case 8078:
+		case 8079:
+		case 8080:
+			bIsStone = false;
+			break;
+	}
+
+	if (bIsStone)
 		__SetStoneSmokeFlagContainer(c_rkAffectFlagContainer);
-	}
 	else
-	{
 		__SetNormalAffectFlagContainer(c_rkAffectFlagContainer);
-	}
 }
 
 
@@ -795,17 +814,19 @@ void CInstanceBase::SCRIPT_SetAffect(uint32_t eAffect, bool isVisible)
 
 void CInstanceBase::__SetReviveInvisibilityAffect(bool isVisible)
 {
-	if (isVisible)
-	{
-		// NOTE : Dress 를 입고 있으면 Alpha 를 넣지 않는다.
+	if (isVisible) {
+		// NOTE : Dress does not support alpha operations properly.
 		if (IsWearingDress())
 			return;
 
-		m_GraphicThingInstance.BlendAlphaValue(0.5f, 1.0f);
+		m_GraphicThingInstance.BlendAlphaValue(0.5f, 0.1f);
+
+		if (!__IsMainInstance())
+			m_GraphicThingInstance.HideAllAttachingEffect();
 	}
-	else
-	{
-		m_GraphicThingInstance.BlendAlphaValue(1.0f, 1.0f);	
+	else {
+		m_GraphicThingInstance.BlendAlphaValue(1.0f, 0.1f);
+		m_GraphicThingInstance.ShowAllAttachingEffect();
 	}
 }
 
@@ -1027,19 +1048,7 @@ void CInstanceBase::SetEmoticon(uint32_t eEmoticon)
 	}
 	if (IsPossibleEmoticon())
 	{
-		D3DXVECTOR3 v3Pos = m_GraphicThingInstance.GetPosition();
-		v3Pos.z += float(m_GraphicThingInstance.GetHeight());
-
-		//CEffectManager& rkEftMgr=CEffectManager::Instance();
-		CCamera * pCamera = CCameraManager::Instance().GetCurrentCamera();
-		
-		D3DXVECTOR3 v3Dir = (pCamera->GetEye()-v3Pos)*9/10;	
-		v3Pos = pCamera->GetEye()-v3Dir;
-
-		v3Pos = D3DXVECTOR3(0,0,0);
-		v3Pos.z += float(m_GraphicThingInstance.GetHeight());
-
-		//rkEftMgr.CreateEffect(ms_adwCRCAffectEffect[EFFECT_EMOTICON+eEmoticon],v3Pos,D3DXVECTOR3(0,0,0));
+		D3DXVECTOR3 v3Pos = D3DXVECTOR3(0, 0, float(m_GraphicThingInstance.GetHeight()));
 		m_GraphicThingInstance.AttachEffectByID(0, nullptr, ms_adwCRCAffectEffect[EFFECT_EMOTICON+eEmoticon],&v3Pos);
 		m_dwEmoticonTime = ELTimer_GetMSec();
 	}

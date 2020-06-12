@@ -31,6 +31,7 @@ class CNetworkAddress
 		
 		operator const SOCKADDR_IN&() const;	
 
+		const in_addr& GetAddr() const { return m_sockAddrIn.sin_addr; }
 
 	private:
 		bool IsIP(const char* c_szAddr);

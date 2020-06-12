@@ -75,7 +75,7 @@ void CTextFileLoader::SGroupNode::Delete(SGroupNode* pkNode)
 {
 	pkNode->m_kMap_dwKey_kVct_stToken.clear();
 	pkNode->ChildNodeVector.clear();
-	pkNode->m_strGroupName="";
+	pkNode->m_strGroupName.clear();
 	pkNode->m_dwGroupNameKey=0;
 	ms_kPool.Free(pkNode);
 }
@@ -88,7 +88,7 @@ void CTextFileLoader::SGroupNode::DestroySystem()
 }
 
 
-CTextFileLoader* CTextFileLoader::Cache(const char* c_szFileName)
+CTextFileLoader* CTextFileLoader::Cache(const char* c_szFileName, bool silentFailure)
 {
 	uint32_t dwNameKey=GetCRC32(c_szFileName, strlen(c_szFileName));
 	std::map<uint32_t, CTextFileLoader*>::iterator f=ms_kMap_dwNameKey_pkTextFileLoader.find(dwNameKey);
@@ -99,7 +99,7 @@ CTextFileLoader* CTextFileLoader::Cache(const char* c_szFileName)
 			delete f->second;
 
 			CTextFileLoader* pkNewTextFileLoader=new CTextFileLoader;
-			pkNewTextFileLoader->Load(c_szFileName);			
+			pkNewTextFileLoader->Load(c_szFileName, silentFailure);
 			f->second=pkNewTextFileLoader;
 		}
 		f->second->SetTop();
@@ -107,7 +107,7 @@ CTextFileLoader* CTextFileLoader::Cache(const char* c_szFileName)
 	}
 
 	CTextFileLoader* pkNewTextFileLoader=new CTextFileLoader;
-	pkNewTextFileLoader->Load(c_szFileName);
+	pkNewTextFileLoader->Load(c_szFileName, silentFailure);
 
 	ms_kMap_dwNameKey_pkTextFileLoader.insert(std::map<uint32_t, CTextFileLoader*>::value_type(dwNameKey, pkNewTextFileLoader));
 	return pkNewTextFileLoader;
@@ -152,9 +152,7 @@ CTextFileLoader::CTextFileLoader()
 CTextFileLoader::~CTextFileLoader()
 {
 	Destroy();
-
-	if (m_acBufData)
-		delete [] m_acBufData;
+	delete [] m_acBufData;
 }
 
 void CTextFileLoader::__DestroyGroupNodeVector()
@@ -175,20 +173,18 @@ bool CTextFileLoader::IsEmpty()
 	return m_strFileName.empty();
 }
 
-bool CTextFileLoader::Load(const char * c_szFileName)
+bool CTextFileLoader::Load(const char * c_szFileName, bool silentFailure)
 {
-	m_strFileName = "";
+	m_strFileName.clear();
 
 	CFile kFile;
-	if (!FileSystemManager::Instance().OpenFile(c_szFileName, kFile))
+	if (!FileSystemManager::Instance().OpenFile(c_szFileName, kFile, silentFailure))
 		return false;
 
 	if (m_dwBufCapacity < kFile.GetSize())
 	{
 		m_dwBufCapacity = kFile.GetSize();
-
-		if (m_acBufData)
-			delete[] m_acBufData;
+		delete [] m_acBufData;
 
 		m_acBufData = new char[m_dwBufCapacity];
 	}
@@ -353,7 +349,7 @@ BOOL CTextFileLoader::SetChildNode(const char * c_szKey)
 BOOL CTextFileLoader::SetChildNode(const std::string & c_rstrKeyHead, uint32_t dwIndex)
 {
 	char szKey[32+1];
-	_snprintf(szKey, sizeof(szKey), "%s%02u", c_rstrKeyHead.c_str(), dwIndex);
+	_snprintf_s(szKey, sizeof(szKey), "%s%02u", c_rstrKeyHead.c_str(), dwIndex);
 
 	return SetChildNode(szKey);
 }

@@ -13,7 +13,7 @@ namespace NMotionEvent
 		float fStartingTime;
 		float fDurationTime;
 
-		SMotionEventData() : dwFrame(0), fStartingTime(0.0f), fDurationTime(0.0f) {}
+		SMotionEventData() : iType(0), dwFrame(0), fStartingTime(0.0f), fDurationTime(0.0f) {}
 		virtual ~SMotionEventData() {}
 
 		virtual void Save(FILE * File, int32_t iTabs) = 0;
@@ -26,7 +26,8 @@ namespace NMotionEvent
 		int32_t iPower;
 		int32_t iAffectingRange;
 
-		SMotionEventDataScreenWaving() {}
+		SMotionEventDataScreenWaving(): iPower(0), iAffectingRange(0)
+		{}
 		virtual ~SMotionEventDataScreenWaving() {}
 
 		void Save(FILE * File, int32_t iTabs)
@@ -76,7 +77,8 @@ namespace NMotionEvent
 		uint32_t dwEffectIndex;
 		std::string strEffectFileName;
 
-		SMotionEventDataEffect() {}
+		SMotionEventDataEffect(): isAttaching(0), isFollowing(0), isIndependent(0), dwEffectIndex(0)
+		{}
 		virtual ~SMotionEventDataEffect() {}
 
 		void Save(FILE * File, int32_t iTabs)
@@ -122,7 +124,8 @@ namespace NMotionEvent
 		BOOL isFollowing;
 		BOOL isFishingEffect;
 
-		SMotionEventDataEffectToTarget() {}
+		SMotionEventDataEffectToTarget(): dwEffectIndex(0), isFollowing(0), isFishingEffect(0)
+		{}
 		virtual ~SMotionEventDataEffectToTarget() {}
 
 		void Save(FILE * File, int32_t iTabs)
@@ -166,7 +169,8 @@ namespace NMotionEvent
 		uint32_t dwFlyIndex;
 		std::string strFlyFileName;
 
-		SMotionEventDataFly() {}
+		SMotionEventDataFly(): isAttaching(0), dwFlyIndex(0)
+		{}
 		virtual ~SMotionEventDataFly() {}
 
 		void Save(FILE * File, int32_t iTabs)
@@ -205,7 +209,8 @@ namespace NMotionEvent
 		NRaceData::TAttackData AttackData;
 		BOOL isEnableHitProcess;
 
-		SMotionEventDataAttack() {}
+		SMotionEventDataAttack(): isEnableHitProcess(0)
+		{}
 		virtual ~SMotionEventDataAttack() {}
 
 		void Save(FILE * File, int32_t iTabs)

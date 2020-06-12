@@ -6,35 +6,37 @@ void CActorInstance::TraceProcess()
 {
 	if (!m_WeaponTraceVector.empty())
 	{
-		std::vector<CWeaponTrace*>::iterator it;
-		for(it = m_WeaponTraceVector.begin(); it != m_WeaponTraceVector.end(); ++it)
-		{
-			CWeaponTrace * pWeaponTrace = (*it);
-			pWeaponTrace->SetPosition(m_x, m_y, m_z);
-			pWeaponTrace->SetRotation(m_fcurRotation);
-			pWeaponTrace->Update(__GetReachScale());
+		for (const auto & weaponTrace : m_WeaponTraceVector) {
+			weaponTrace->SetPosition(m_x, m_y, m_z);
+			weaponTrace->SetRotation(m_fcurRotation);
+			weaponTrace->Update(__GetReachScale());
 		}
 	}
 }
 
 void CActorInstance::RenderTrace()
 {
-	for_each(m_WeaponTraceVector.begin(), m_WeaponTraceVector.end(), std::void_mem_fun(&CWeaponTrace::Render));
+	for (const auto & weaponTrace : m_WeaponTraceVector)
+		weaponTrace->Render();
 }
 
 void CActorInstance::__DestroyWeaponTrace()
 {
-	std::for_each(m_WeaponTraceVector.begin(), m_WeaponTraceVector.end(), CWeaponTrace::Delete);
+	for (const auto & weaponTrace : m_WeaponTraceVector)
+		weaponTrace->Delete(weaponTrace);
+
 	m_WeaponTraceVector.clear();
 }
 
 void CActorInstance::__ShowWeaponTrace()
 {
-	for_each(m_WeaponTraceVector.begin(), m_WeaponTraceVector.end(), std::void_mem_fun(&CWeaponTrace::TurnOn));
+	for (const auto & weaponTrace : m_WeaponTraceVector)
+		weaponTrace->TurnOn();
 }
 
 void CActorInstance::__HideWeaponTrace()
 {
-	for_each(m_WeaponTraceVector.begin(), m_WeaponTraceVector.end(), std::void_mem_fun(&CWeaponTrace::TurnOff));
+	for (const auto & weaponTrace : m_WeaponTraceVector)
+		weaponTrace->TurnOff();
 }
 

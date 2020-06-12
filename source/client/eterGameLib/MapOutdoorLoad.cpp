@@ -152,7 +152,7 @@ bool CMapOutdoor::LoadArea(uint16_t wAreaCoordX, uint16_t wAreaCoordY, uint16_t 
 #endif
 	uint32_t ulID = (uint32_t) (wAreaCoordX) * 1000L + (uint32_t) (wAreaCoordY);
 	char szAreaPathName[64+1];
-	_snprintf(szAreaPathName, sizeof(szAreaPathName), "%s\\%06u\\", GetMapDataDirectory().c_str(), ulID);
+	_snprintf_s(szAreaPathName, sizeof(szAreaPathName), "%s\\%06u\\", GetMapDataDirectory().c_str(), ulID);
 
 	CArea * pArea = CArea::New();
 	pArea->SetMapOutDoor(this);
@@ -189,7 +189,7 @@ bool CMapOutdoor::LoadTerrain(uint16_t wTerrainCoordX, uint16_t wTerrainCoordY, 
 	
 	uint32_t ulID = (uint32_t) (wTerrainCoordX) * 1000L + (uint32_t) (wTerrainCoordY);
 	char filename[256];
-	sprintf(filename, "%s\\%06u\\AreaProperty.txt", GetMapDataDirectory().c_str(), ulID);
+	sprintf_s(filename, "%s\\%06u\\AreaProperty.txt", GetMapDataDirectory().c_str(), ulID);
 	
 	CTokenVectorMap stTokenVectorMap;
 	
@@ -237,13 +237,13 @@ bool CMapOutdoor::LoadTerrain(uint16_t wTerrainCoordX, uint16_t wTerrainCoordY, 
 	char szMiniMapTexName[64+1];
 	char szSplatName[64+1];
 	
-	_snprintf(szRawHeightFieldname, sizeof(szRawHeightFieldname), "%s\\%06u\\height.raw", GetMapDataDirectory().c_str(), ulID);
-	_snprintf(szSplatName, sizeof(szSplatName), "%s\\%06u\\tile.raw", GetMapDataDirectory().c_str(), ulID);
-	_snprintf(szAttrMapName, sizeof(szAttrMapName), "%s\\%06u\\attr.atr", GetMapDataDirectory().c_str(), ulID);
-	_snprintf(szWaterMapName, sizeof(szWaterMapName), "%s\\%06u\\water.wtr", GetMapDataDirectory().c_str(), ulID);
-	_snprintf(szShadowTexName, sizeof(szShadowTexName), "%s\\%06u\\shadowmap.dds", GetMapDataDirectory().c_str(), ulID);
-	_snprintf(szShadowMapName, sizeof(szShadowMapName), "%s\\%06u\\shadowmap.raw", GetMapDataDirectory().c_str(), ulID);
-	_snprintf(szMiniMapTexName, sizeof(szMiniMapTexName), "%s\\%06u\\minimap.dds", GetMapDataDirectory().c_str(), ulID);
+	_snprintf_s(szRawHeightFieldname, sizeof(szRawHeightFieldname), "%s\\%06u\\height.raw", GetMapDataDirectory().c_str(), ulID);
+	_snprintf_s(szSplatName, sizeof(szSplatName), "%s\\%06u\\tile.raw", GetMapDataDirectory().c_str(), ulID);
+	_snprintf_s(szAttrMapName, sizeof(szAttrMapName), "%s\\%06u\\attr.atr", GetMapDataDirectory().c_str(), ulID);
+	_snprintf_s(szWaterMapName, sizeof(szWaterMapName), "%s\\%06u\\water.wtr", GetMapDataDirectory().c_str(), ulID);
+	_snprintf_s(szShadowTexName, sizeof(szShadowTexName), "%s\\%06u\\shadowmap.dds", GetMapDataDirectory().c_str(), ulID);
+	_snprintf_s(szShadowMapName, sizeof(szShadowMapName), "%s\\%06u\\shadowmap.raw", GetMapDataDirectory().c_str(), ulID);
+	_snprintf_s(szMiniMapTexName, sizeof(szMiniMapTexName), "%s\\%06u\\minimap.dds", GetMapDataDirectory().c_str(), ulID);
 	
 	if(!pTerrain->LoadWaterMap(szWaterMapName))
 		TraceError(" CMapOutdoor::LoadTerrain(%d, %d) LoadWaterMap ERROR", wTerrainCoordX, wTerrainCoordY);
@@ -263,7 +263,7 @@ bool CMapOutdoor::LoadTerrain(uint16_t wTerrainCoordX, uint16_t wTerrainCoordY, 
 		TraceError(" CMapOutdoor::LoadTerrain(%d, %d) LoadShadowMap ERROR", wTerrainCoordX, wTerrainCoordY);
 
 	pTerrain->LoadMiniMapTexture(szMiniMapTexName);
-	pTerrain->SetName(c_rstrAreaName.c_str());
+	pTerrain->SetName(c_rstrAreaName);
 	pTerrain->CalculateTerrainPatch();
 	
 	pTerrain->SetReady();
@@ -328,6 +328,15 @@ bool CMapOutdoor::LoadSetting(const char * c_szFileName)
 	else
 	{
 		m_bSettingTerrainVisible = true;
+	}
+
+	if (stTokenVectorMap.end() != stTokenVectorMap.find("islavamap"))
+	{
+		m_bSettingIsLavaMap = (bool)(atoi(stTokenVectorMap["islavamap"][0].c_str()) != 0);
+	}
+	else
+	{
+		m_bSettingIsLavaMap = false;
 	}
 
 	const std::string & c_rstrType = stTokenVectorMap["scripttype"][0];

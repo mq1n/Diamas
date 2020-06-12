@@ -19,7 +19,6 @@ int32_t SplitLine(const char * c_szText, CTokenVector* pstTokenVector, const cha
 	pstTokenVector->reserve(10);
 	pstTokenVector->clear();
 
-	std::string stToken;
 	std::string stLine = c_szText;
 
 	uint32_t basePos = 0;
@@ -108,8 +107,6 @@ bool CPythonSkill::RegisterSkillTable(const char * c_szFileName)
 	{
 		if (!textFileLoader.SplitLineByTab(i, &TokenVector))
 			continue;
-
-		std::string strLine = textFileLoader.GetLineString(i);
 
 		if (TABLE_TOKEN_TYPE_MAX_NUM != TokenVector.size())
 		{
@@ -202,9 +199,9 @@ bool CPythonSkill::RegisterSkillTable(const char * c_szFileName)
 				strstr(c_strPointPoly.c_str(), "mwep")		!= nullptr ||
 				strstr(c_strPointPoly.c_str(), "number")	!= nullptr)
 			{
-				src_poly_rand = "";
-				src_poly_atk = "";
-				src_poly_mwep = "";
+				src_poly_rand.clear();
+				src_poly_atk.clear();
+				src_poly_mwep.clear();
 
 				// MIN
 				string_replace_word(c_strPointPoly.c_str(), c_strPointPoly.length(),
@@ -236,7 +233,7 @@ bool CPythonSkill::RegisterSkillTable(const char * c_szFileName)
 			else
 			{
 				affect.strAffectMinFormula = c_strPointPoly;
-				affect.strAffectMaxFormula = "";
+				affect.strAffectMaxFormula.clear();
 			}					
 		}		
 		// END_OF_OVERWRITE_SKILLPROTO_POLY
@@ -252,7 +249,7 @@ void CPythonSkill::__RegisterGradeIconImage(TSkillData & rData, const char * c_s
 		TGradeData & rGradeData = rData.GradeData[j];
 
 		char szCount[8+1];
-		_snprintf(szCount, sizeof(szCount), "_%02d", j+1);
+		_snprintf_s(szCount, sizeof(szCount), "_%02d", j+1);
 
 		std::string strFileName = "";
 		strFileName += c_szHeader;
@@ -392,7 +389,7 @@ bool CPythonSkill::RegisterSkillDesc(const char * c_szFileName)
 				std::map<std::string, uint32_t>::iterator it2 = m_SkillNeedWeaponIndexMap.find(rstrToken);
 				if (m_SkillNeedWeaponIndexMap.end() == it2)
 				{
-					TraceError("CPythonSkill::RegisterSkillDesc(dwSkillIndex=%d) - Strange Skill Need Weapon(%s)", iSkillIndex, rstrToken.c_str());
+					TraceError("CPythonSkill::RegisterSkillDesc(skill number=%d) - Incorrect skill weapon limitation (%s)", iSkillIndex, rstrToken.c_str());
 					continue;
 				}
 				rSkillData.dwNeedWeapon |= it2->second;
@@ -408,14 +405,14 @@ bool CPythonSkill::RegisterSkillDesc(const char * c_szFileName)
 			if (c_iSkillIndex_Riding == iSkillIndex)
 			{
 				char szIconFileNameHeader[64+1];
-				_snprintf(szIconFileNameHeader, sizeof(szIconFileNameHeader), "%sskill/common/support/", g_strImagePath.c_str());
+				_snprintf_s(szIconFileNameHeader, sizeof(szIconFileNameHeader), "%sskill/common/support/", g_strImagePath.c_str());
 
 				__RegisterGradeIconImage(rSkillData, szIconFileNameHeader, c_rstrIconName.c_str());
 			}
 			else if (m_PathNameMap.end() != m_PathNameMap.find(c_rstrJob))
 			{
 				char szIconFileNameHeader[64+1];
-				_snprintf(szIconFileNameHeader, sizeof(szIconFileNameHeader), "%sskill/%s/", g_strImagePath.c_str(), m_PathNameMap[c_rstrJob].c_str());
+				_snprintf_s(szIconFileNameHeader, sizeof(szIconFileNameHeader), "%sskill/%s/", g_strImagePath.c_str(), m_PathNameMap[c_rstrJob].c_str());
 
 				switch (rSkillData.byType)
 				{
@@ -456,9 +453,9 @@ bool CPythonSkill::RegisterSkillDesc(const char * c_szFileName)
 		}
 
 		if (TokenVector.size() > DESC_TOKEN_TYPE_TARGET_COUNT_FORMULA)
-			rSkillData.strTargetCountFormula = TokenVector[DESC_TOKEN_TYPE_TARGET_COUNT_FORMULA].c_str();
+			rSkillData.strTargetCountFormula = TokenVector[DESC_TOKEN_TYPE_TARGET_COUNT_FORMULA];
 		if (TokenVector.size() > DESC_TOKEN_TYPE_MOTION_LOOP_COUNT_FORMULA)
-			rSkillData.strMotionLoopCountFormula = TokenVector[DESC_TOKEN_TYPE_MOTION_LOOP_COUNT_FORMULA].c_str();
+			rSkillData.strMotionLoopCountFormula = TokenVector[DESC_TOKEN_TYPE_MOTION_LOOP_COUNT_FORMULA];
 
 		rSkillData.AffectDataNewVector.clear();
 		rSkillData.AffectDataNewVector.reserve(3);
@@ -476,9 +473,9 @@ bool CPythonSkill::RegisterSkillDesc(const char * c_szFileName)
 				rSkillData.AffectDataVector.push_back(TAffectData());
 
 				TAffectData & rAffectData = *rSkillData.AffectDataVector.rbegin();
-				rAffectData.strAffectDescription = "";
-				rAffectData.strAffectMinFormula = "";
-				rAffectData.strAffectMaxFormula = "";
+				rAffectData.strAffectDescription.clear();
+				rAffectData.strAffectMinFormula.clear();
+				rAffectData.strAffectMaxFormula.clear();
 
 				rAffectData.strAffectDescription = TokenVector[iDescriptionSlotIndex];
 				if (TokenVector.size() > iMinSlotIndex)
@@ -792,7 +789,7 @@ void CPythonSkill::TEST()
 		TSkillData & rSkillData = itor->second;
 
 		std::string strLine = "";
-		strLine += rSkillData.strName.c_str();
+		strLine += rSkillData.strName;
 		strLine += "\t";
 		// Name2
 		strLine += "\t";
@@ -857,14 +854,14 @@ void CPythonSkill::TEST()
 
 		strLine += "\t";
 		char szMotionIndex[32+1];
-		_snprintf(szMotionIndex, sizeof(szMotionIndex), "%d", rSkillData.wMotionIndex);
+		_snprintf_s(szMotionIndex, sizeof(szMotionIndex), "%d", rSkillData.wMotionIndex);
 		strLine += szMotionIndex;
 
 		strLine += "\t";
 		if (rSkillData.wMotionIndexForMe > 1)
 		{
 			char szMotionIndexForMe[32+1];
-			_snprintf(szMotionIndexForMe, sizeof(szMotionIndexForMe), "%d", rSkillData.wMotionIndexForMe);
+			_snprintf_s(szMotionIndexForMe, sizeof(szMotionIndexForMe), "%d", rSkillData.wMotionIndexForMe);
 			strLine += szMotionIndexForMe;
 		}
 
@@ -1032,7 +1029,7 @@ CPythonSkill::CPythonSkill()
 
 	SSkillData::ms_NewMaxStatusNameMap.insert(make_pair(std::string("atk"), POINT_MAX_ATK));
 	SSkillData::ms_NewMaxStatusNameMap.insert(make_pair(std::string("mtk"), POINT_MAX_WEP));
-	SSkillData::ms_NewMinStatusNameMap.insert(make_pair(std::string("wep"), POINT_MAX_WEP));
+	SSkillData::ms_NewMaxStatusNameMap.insert(make_pair(std::string("wep"), POINT_MAX_WEP));
 	SSkillData::ms_NewMaxStatusNameMap.insert(make_pair(std::string("lv"), POINT_LEVEL));
 	SSkillData::ms_NewMaxStatusNameMap.insert(make_pair(std::string("ar"), POINT_HIT_RATE));
 	SSkillData::ms_NewMaxStatusNameMap.insert(make_pair(std::string("iq"), POINT_IQ));
@@ -1318,45 +1315,16 @@ const char * CPythonSkill::SSkillData::GetAffectDescription(uint32_t dwIndex, fl
 	if (fMaxValue < 0.0)
 		fMaxValue = - fMaxValue;
 
-	if (CP_ARABIC == ::GetDefaultCodePage())
+	if (strstr(c_rstrAffectDescription.c_str(), "%.0f"))
 	{
-		// #0000870: [M2AE] 한국어 모드일때 특정 아랍어 문장에서 크래쉬 발생 
-		static std::string strDescription;
-		strDescription = c_rstrAffectDescription;
-		int32_t first = strDescription.find("%.0f");
-		if (first >= 0)
-		{
-			fMinValue = floorf(fMinValue);
-
-			char szMinValue[256];
-			_snprintf(szMinValue, sizeof(szMinValue), "%.0f", fMinValue);
-			strDescription.replace(first, 4, szMinValue);
-
-			int32_t second = strDescription.find("%.0f", first);
-			if (second >= 0)
-			{
-				fMaxValue = floorf(fMaxValue);
-
-				char szMaxValue[256];
-				_snprintf(szMaxValue, sizeof(szMaxValue), "%.0f", fMaxValue);
-				strDescription.replace(second, 4, szMaxValue);
-			}
-		}
-		return strDescription.c_str();
+		fMinValue = floorf(fMinValue);
+		fMaxValue = floorf(fMaxValue);
 	}
-	else
-	{
-		if (strstr(c_rstrAffectDescription.c_str(), "%.0f"))
-		{
-			fMinValue = floorf(fMinValue);
-			fMaxValue = floorf(fMaxValue);
-		}
 
-		static char szDescription[64+1];
-		_snprintf(szDescription, sizeof(szDescription), c_rstrAffectDescription.c_str(), fMinValue, fMaxValue);
-		
-		return szDescription;
-	}
+	static char szDescription[64+1];
+	_snprintf_s(szDescription, sizeof(szDescription), c_rstrAffectDescription.c_str(), fMinValue, fMaxValue);
+
+	return szDescription;
 }
 
 uint32_t CPythonSkill::SSkillData::GetSkillCoolTime(float fSkillPoint)
@@ -1477,24 +1445,28 @@ CPythonSkill::SSkillData::SSkillData()
 	dwSkillAttribute = 0;
 	dwNeedWeapon = 0;
 	dwTargetRange = 0;
-	strCoolTimeFormula = "";
-	strMotionLoopCountFormula = "";
-	strNeedSPFormula = "";
-	strContinuationSPFormula = "";
+	strCoolTimeFormula.clear();
+	strMotionLoopCountFormula.clear();
+	strNeedSPFormula.clear();
+	strContinuationSPFormula.clear();
 	isRequirement = FALSE;
-	strRequireSkillName = "";
+	strRequireSkillName.clear();
 	byRequireSkillLevel = 0;
-	strDuration = "";
+	strDuration.clear();
 	byLevelLimit = 0;
 	bNoMotion = FALSE;
 
-	strName = "";
+	strName.clear();
 	pImage = nullptr;
+
+	dwSkillIndex = 0;
+	wMotionIndex = 0;
+	wMotionIndexForMe = 0;
 
 	for (int32_t j = 0; j < SKILL_GRADE_COUNT; ++j)
 	{
 		TGradeData & rGradeData = GradeData[j];
-		rGradeData.strName = "";
+		rGradeData.strName.clear();
 		rGradeData.pImage = nullptr;
 		rGradeData.wMotionIndex = 0;
 	}

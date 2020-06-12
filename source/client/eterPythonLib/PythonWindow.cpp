@@ -3,6 +3,9 @@
 #include "PythonWindow.h"
 #include "PythonSlotWindow.h"
 #include "PythonWindowManager.h"
+#include "../eterLib/RenderTargetManager.h"
+#include "../eterXClient/PythonRenderTargetManager.h"
+#include "../eterXClient/PythonApplication.h"
 
 BOOL g_bOutlineBoxEnable = FALSE;
 
@@ -10,14 +13,13 @@ namespace UI
 {
 	
 	CWindow::CWindow(PyObject * ppyObject) : 
-		m_x(0),
-		m_y(0),
-		m_lWidth(0),
-		m_lHeight(0),
-		m_poHandler(ppyObject),
+		m_x(0), m_y(0),
+		m_lWidth(0), m_lHeight(0),
+		m_bMovable(false),
 		m_bShow(false),
-		m_pParent(nullptr),
 		m_dwFlag(0),
+		m_poHandler(ppyObject),
+		m_pParent(nullptr),
 		m_isUpdatingChildren(FALSE)
 #ifdef ENABLE_MOUSEWHEEL_EVENT
 		, m_bIsScrollable(false)
@@ -133,14 +135,10 @@ namespace UI
 		OnUpdate();
 
 		m_isUpdatingChildren = TRUE;
-		TWindowContainer::iterator it;
-		for(it = m_pChildList.begin(); it != m_pChildList.end();)
-		{
-			TWindowContainer::iterator it_next = it;
-			++it_next;
-			(*it)->Update();
-			it = it_next;
-		}
+
+		for (const auto & window : m_pChildList)
+			window->Update();
+
 		m_isUpdatingChildren = FALSE;		
 	}
 
@@ -148,6 +146,8 @@ namespace UI
 	{
 		if (!IsShow())
 			return;
+
+		BeginRender();
 
 		OnRender();
 
@@ -157,7 +157,36 @@ namespace UI
 			CPythonGraphic::Instance().RenderBox2d(m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
 		}
 
-		std::for_each(m_pChildList.begin(), m_pChildList.end(), std::void_mem_fun(&CWindow::Render));
+		for (const auto & window : m_pChildList)
+			window->Render();
+
+		EndRender();
+	}
+
+	void CWindow::BeginRender()
+	{
+		if (!m_poHandler)
+			return;
+
+		if (!IsShow())
+			return;
+
+		static PyObject* poFuncName_OnUpdate = PyString_InternFromString("BeginRender");
+
+		PyCallClassMemberFunc_ByPyString(m_poHandler, poFuncName_OnUpdate, BuildEmptyTuple());
+	}
+
+	void CWindow::EndRender()
+	{
+		if (!m_poHandler)
+			return;
+
+		if (!IsShow())
+			return;
+
+		static PyObject* poFuncName_OnUpdate = PyString_InternFromString("EndRender");
+
+		PyCallClassMemberFunc_ByPyString(m_poHandler, poFuncName_OnUpdate, BuildEmptyTuple());
 	}
 
 	void CWindow::OnUpdate()
@@ -295,7 +324,8 @@ namespace UI
 		}
 		m_rect.right = m_rect.left + m_lWidth;
 #endif
-		std::for_each(m_pChildList.begin(), m_pChildList.end(), std::mem_fn(&CWindow::UpdateRect));
+		for (const auto & window : m_pChildList)
+			window->UpdateRect();
 
 		OnChangePosition();
 
@@ -364,8 +394,18 @@ namespace UI
 
 	void CWindow::SetTop(CWindow * pWin)
 	{
-		if (!pWin->IsFlag(CWindow::FLAG_FLOAT))
+		//if (!pWin->IsFlag(CWindow::FLAG_FLOAT))
+		if (false)
+		{
+			std::string s (pWin->GetName());
+			if (s.find("ScrollBar") != std::string::npos)
+			{
+				_asm nop;
+			}
+
+			TraceError(" CWindow::SetTop - Failed to find child window\n");
 			return;
+		}
 
 		TWindowContainer::iterator itor = std::find(m_pChildList.begin(), m_pChildList.end(), pWin);
 		if (m_pChildList.end() != itor)
@@ -1113,16 +1153,7 @@ namespace UI
 
 	void CTextLine::OnChangePosition()
 	{
-		// FOR_ARABIC_ALIGN
-		//if (m_TextInstance.GetHorizontalAlign() == CGraphicTextInstance::HORIZONTAL_ALIGN_ARABIC)
-		if( GetDefaultCodePage() == CP_ARABIC )
-		{
-			m_TextInstance.SetPosition(m_rect.right, m_rect.top);
-		}
-		else
-		{
-			m_TextInstance.SetPosition(m_rect.left, m_rect.top);
-		}
+		m_TextInstance.SetPosition(m_rect.left, m_rect.top);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1228,7 +1259,7 @@ namespace UI
 	{
 		m_ImageInstanceVector.clear();
 		m_dwWidthSummary = 0;
-		m_strNumber = "";
+		m_strNumber.clear();
 	}
 
 	void CNumberLine::OnRender()
@@ -2155,5 +2186,86 @@ namespace UI
 
 		CButton::OnMouseOverIn();
 		PyCallClassMemberFunc(m_poHandler, "OnMouseOverOut", BuildEmptyTuple());
+	}
+
+	uint32_t CRenderTarget::Type()
+	{
+		static uint32_t s_dwType = GetCRC32("CRenderTarget", strlen("CRenderTarget"));
+		return (s_dwType);
+	}
+
+	CRenderTarget::CRenderTarget(PyObject* ppyObject) : CWindow(ppyObject), m_renderTarget(nullptr), m_iRenderTargetIndex(-1) {
+	}
+
+	CRenderTarget::~CRenderTarget() {
+		m_renderTarget = nullptr;
+		m_iRenderTargetIndex = -1;
+	}
+
+	void CRenderTarget::SetRenderTarget(uint32_t index, const char* background_image) {
+		m_iRenderTargetIndex = index;
+
+		const auto pRenderTarget = CRenderTargetManager::Instance().GetRenderTarget(index);
+		if (pRenderTarget)
+			m_renderTarget = pRenderTarget;
+
+		CPythonRenderTargetManager::Instance().InitializeRenderInstance(m_iRenderTargetIndex, background_image);
+	}
+
+	void CRenderTarget::Show() {
+		if (m_iRenderTargetIndex != -1)
+			CPythonRenderTargetManager::Instance().Show(m_iRenderTargetIndex, true);
+		UI::CWindow::Show();
+	}
+
+	void CRenderTarget::Hide() {
+		if (m_iRenderTargetIndex != -1)
+			CPythonRenderTargetManager::Instance().Show(m_iRenderTargetIndex, false);
+		UI::CWindow::Hide();
+	}
+
+	void CRenderTarget::SetRace(uint32_t dwRaceVnum) {
+		if (m_iRenderTargetIndex != -1)
+			CPythonRenderTargetManager::Instance().SetRace(m_iRenderTargetIndex, dwRaceVnum);
+	}
+
+	void CRenderTarget::SetAlwaysRotate(bool bRotate) {
+		if (m_iRenderTargetIndex != -1)
+			CPythonRenderTargetManager::Instance().SetAlwaysRotate(m_iRenderTargetIndex, bRotate);
+	}
+
+	void CRenderTarget::SetRotation(float fRotation) {
+		if (m_iRenderTargetIndex != -1)
+			CPythonRenderTargetManager::Instance().SetRotation(m_iRenderTargetIndex, fRotation);
+	}
+
+	void CRenderTarget::SetArmor(uint32_t dwVnum) {
+		if (m_iRenderTargetIndex != -1)
+			CPythonRenderTargetManager::Instance().SetArmor(m_iRenderTargetIndex, dwVnum);
+	}
+
+	void CRenderTarget::SetHair(uint32_t dwHairIndex) {
+		if (m_iRenderTargetIndex != -1)
+			CPythonRenderTargetManager::Instance().SetHair(m_iRenderTargetIndex, dwHairIndex);
+	}
+
+	void CRenderTarget::SetWeapon(uint32_t dwVnum) {
+		if (m_iRenderTargetIndex != -1)
+			CPythonRenderTargetManager::Instance().SetWeapon(m_iRenderTargetIndex, dwVnum);
+	}
+
+	void CRenderTarget::SetMotion(uint32_t dwMotionIndex) {
+		if (m_iRenderTargetIndex != -1)
+			CPythonRenderTargetManager::Instance().SetMotion(m_iRenderTargetIndex, dwMotionIndex);
+	}
+
+	void CRenderTarget::OnUpdate() {
+		if (m_renderTarget && m_bShow)
+			m_renderTarget->SetRenderingRect(&m_rect);
+	}
+
+	void CRenderTarget::OnRender() {
+		if (m_renderTarget && m_bShow)
+			m_renderTarget->Render();
 	}
 };

@@ -157,7 +157,7 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage & image, const uint8_t * 
 		return false;
 	}
 
-	for (int32_t i = 0; i < mipmapCount; ++i)
+	for (uint32_t i = 0; i < mipmapCount; ++i)
 	{
 		D3DLOCKED_RECT lockedRect;
 

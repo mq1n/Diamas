@@ -14,29 +14,29 @@ CPropertyManager::~CPropertyManager()
 	Clear();
 }
 
-bool CPropertyManager::Initialize(const char * c_pszPackFileName)
+bool CPropertyManager::Initialize(const std::string& listFilename)
 {
 	if (m_bInitialized)
 		return true;
 
 	CFile kPropertyFile;
-	if (!FileSystemManager::Instance().OpenFile(c_pszPackFileName, kPropertyFile))
+	if (!FileSystemManager::Instance().OpenFile(listFilename, kPropertyFile))
 	{
-		TraceError("Property list: %s can NOT load", c_pszPackFileName);
+		TraceError("Property list: %s can NOT load", listFilename.c_str());
 		return false;
 	}
 
 	auto stContent = std::string(reinterpret_cast<const char*>(kPropertyFile.GetData()), kPropertyFile.GetSize());
 	if (stContent.empty())
 	{
-		TraceError("Property list: %s is null", c_pszPackFileName);
+		TraceError("Property list: %s is null", listFilename.c_str());
 		return false;
 	}
 
 	TPropertyContainer vPropertyList;
 	if (LoadPropertyList(stContent, vPropertyList) == false)
 	{
-		TraceError("Property list: %s can NOT parsed", c_pszPackFileName);
+		TraceError("Property list: %s can NOT parsed", listFilename.c_str());
 		return false;
 	}
 	if (vPropertyList.empty())

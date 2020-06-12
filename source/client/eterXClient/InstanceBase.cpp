@@ -21,7 +21,7 @@ BOOL HAIR_COLOR_ENABLE=FALSE;
 BOOL USE_ARMOR_SPECULAR=FALSE;
 BOOL RIDE_HORSE_ENABLE=TRUE;
 const float c_fDefaultRotationSpeed = 1200.0f;
-const float c_fDefaultHorseRotationSpeed = 300.0f;
+const float c_fDefaultHorseRotationSpeed = 600.0f;
 
 
 bool IsWall(uint32_t race)
@@ -365,6 +365,16 @@ class CActorInstanceBackground : public IBackground
 };
 
 static CActorInstanceBackground gs_kActorInstBG;
+
+void CInstanceBase::SetLODLimits(uint32_t index, float fLimit)
+{
+
+	CGrannyLODController* pLODCtrl = m_GraphicThingInstance.GetLODControllerPointer(index);
+	if (pLODCtrl)
+	{
+		pLODCtrl->SetLODLimits(0.0, fLimit);
+	}
+}
 
 bool CInstanceBase::LessRenderOrder(CInstanceBase* pkInst)
 {
@@ -871,13 +881,19 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 			SetModulateRenderMode();
 			SetAddColor(dwBodyColor);
 		}
+
+#ifdef ENABLE_OBJ_SCALLING
+//		const auto table = CPythonNonPlayer::Instance().GetTable(c_rkCreateData.m_dwRace);
+//		// NPC scalling according to its value
+//		if (table && table->fScale)
+//			m_GraphicThingInstance.SetScale(table->fScale);
+#endif
 	}
 
 	__AttachHorseSaddle();
 
-	// 길드 심볼을 위한 임시 코드, 적정 위치를 찾는 중
-	const int32_t c_iGuildSymbolRace = 14200;
-	if (c_iGuildSymbolRace == GetRace())
+	// If we receive the guild symbol update its texture if we have one for it.
+	if (14200 == GetRace())
 	{
 		std::string strFileName = GetGuildSymbolFileName(m_dwGuildID);
 		if (IsFile(strFileName.c_str()))
@@ -925,11 +941,6 @@ void CInstanceBase::__Create_SetWarpName(const SCreateData& c_rkCreateData)
 	if (CPythonNonPlayer::Instance().GetName(c_rkCreateData.m_dwRace, &c_szName))
 	{
 		std::string strName = c_szName;
-		int32_t iFindingPos = strName.find_first_of(" ", 0);
-		if (iFindingPos > 0)
-		{
-			strName.resize(iFindingPos);
-		}
 		SetNameString(strName.c_str(), strName.length());
 	}
 	else
@@ -1025,7 +1036,7 @@ void CInstanceBase::DismountHorse()
 void CInstanceBase::GetInfo(std::string* pstInfo)
 {
 	char szInfo[256];
-	sprintf(szInfo, "Inst - UC %d, RC %d Pool - %d ", 
+	sprintf_s(szInfo, "Inst - UC %u, RC %u Pool - %u ",
 		ms_dwUpdateCounter, 
 		ms_dwRenderCounter,
 		ms_kPool.GetCapacity()
@@ -1423,25 +1434,35 @@ void CInstanceBase::StateProcess()
 
 			case FUNC_MOVE:
 			{
-				//NEW_GetSrcPixelPositionRef() = kPPosCur;
-				//NEW_GetDstPixelPositionRef() = kPPosDst;
-				NEW_SetSrcPixelPosition(kPPosCur);
-				NEW_SetDstPixelPosition(kPPosDst);
-				m_fDstRot = fRotDst;
-				m_isGoing = TRUE;
-				__EnableSkipCollision();
-				//m_isSyncMov = TRUE;
-
-				m_kMovAfterFunc.eFunc = FUNC_MOVE;
-
-				if (!IsWalking())
+				if (fDirLen > 0.0f)
 				{
-					//Tracen("걷고 있지 않아 걷기 시작");
-					StartWalking();
+					NEW_SetSrcPixelPosition(kPPosCur);
+					NEW_SetDstPixelPosition(kPPosDst);
+					m_fDstRot = fRotDst;
+					m_isGoing = TRUE;
+					__EnableSkipCollision();
+					//m_isSyncMov = TRUE;
+
+					m_kMovAfterFunc.eFunc = FUNC_MOVE;
+
+					if (!IsWalking())
+					{
+						//Tracen("걷고 있지 않아 걷기 시작");
+						StartWalking();
+					}
+					else
+					{
+						//Tracen("이미 걷는중 ");
+					}
 				}
 				else
 				{
-					//Tracen("이미 걷는중 ");
+					//If there was no advancement, update only rotation
+					m_fDstRot = fRotDst;
+
+					m_isGoing = FALSE;
+					if (!IsWaiting())
+						EndWalking();
 				}
 				break;
 			}
@@ -1650,8 +1671,7 @@ void CInstanceBase::MovementProcess()
 	{
 		if (m_isGoing && IsWalking())
 		{
-			float fDstRot = NEW_GetAdvancingRotationFromPixelPosition(NEW_GetSrcPixelPositionRef(), NEW_GetDstPixelPositionRef());
-
+			float fDstRot = NEW_GetAdvancingRotationFromPixelPosition(kPPosCur, NEW_GetDstPixelPositionRef());
 			SetAdvancingRotation(fDstRot);
 
 			if (fRestLen<=0.0)
@@ -3099,6 +3119,10 @@ bool CInstanceBase::ChangeArmor(uint32_t dwArmor)
 
 	RefreshState(CRaceMotionData::NAME_WAIT, true);
 
+	if (m_kHorse.IsMounting()) {
+		m_GraphicThingInstance.m_nextAllowedMovement = CTimer::Instance().GetCurrentMillisecond() + 250;
+	}
+
 	// 2004.07.25.myevan.이펙트 안 붙는 문제
 	/////////////////////////////////////////////////
 	SetAffectFlagContainer(kAffectFlagContainer);
@@ -3371,6 +3395,9 @@ void CInstanceBase::__Initialize()
 	m_bDamageEffectType = false;
 	m_dwDuelMode = DUEL_NONE;
 	m_dwEmoticonTime = 0;
+
+	mp_flyTargetInstance = nullptr;
+	m_IsAlwaysRender = false;
 }
 
 CInstanceBase::CInstanceBase()
@@ -3388,4 +3415,30 @@ void CInstanceBase::GetBoundBox(D3DXVECTOR3 * vtMin, D3DXVECTOR3 * vtMax)
 {
 	m_GraphicThingInstance.GetBoundBox(vtMin, vtMax);
 }
+
+bool CInstanceBase::IsMiningVID(uint32_t vid)
+{
+	return m_dwMiningVID == vid && GetGraphicThingInstancePtr()->IsMining();
+}
+
+void CInstanceBase::StartMining(uint32_t vid)
+{
+	m_dwMiningVID = vid;
+}
+
+void CInstanceBase::CancelMining()
+{
+	GetGraphicThingInstancePtr()->InterceptLoopMotion(CRaceMotionData::NAME_WAIT);
+}
+
+bool CInstanceBase::IsAlwaysRender() const
+{
+	return m_IsAlwaysRender;
+}
+
+void CInstanceBase::SetAlwaysRender(bool val)
+{
+	m_IsAlwaysRender = val;
+}
+
 

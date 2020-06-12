@@ -47,7 +47,7 @@ void CGrannyModelInstance::UpdateTransform(D3DXMATRIX * pMatrix, float fSecondsE
 		TraceError("CGrannyModelIstance::UpdateTransform - m_pgrnModelInstance = nullptr");
 		return;
 	}
-	GrannyUpdateModelMatrix(m_pgrnModelInstance, fSecondsElapsed, (const float *)pMatrix, (float *)pMatrix, 0);
+	GrannyUpdateModelMatrix(m_pgrnModelInstance, fSecondsElapsed, (const float *) pMatrix, (float *) pMatrix, false);
 	//Tracef("%f %f %f",pMatrix->_41,pMatrix->_42,pMatrix->_43);
 	
 }

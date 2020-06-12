@@ -16,7 +16,5 @@ class CMSApplication : public CMSWindow
 		bool MessageProcess();
 
 	protected:
-		void ClearWindowClass();
-
 		LRESULT WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 };

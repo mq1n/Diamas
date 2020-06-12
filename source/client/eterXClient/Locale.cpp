@@ -5,7 +5,6 @@
 
 std::string __SECURITY_KEY_STRING__ = LSS_SECURITY_KEY;
 
-char		MULTI_LOCALE_SERVICE[256]	= "EUROPE";
 char		MULTI_LOCALE_PATH[256]	= "locale/de";
 char		MULTI_LOCALE_NAME[256]	= "de";
 int32_t		MULTI_LOCALE_CODE		= 1254;
@@ -99,7 +98,6 @@ const char*	LocaleService_GetSecurityKey()
 {
 	return __SECURITY_KEY_STRING__.c_str();
 }
-const char* LocaleService_GetName()				{ return MULTI_LOCALE_SERVICE;}
 uint32_t LocaleService_GetCodePage()		{ return MULTI_LOCALE_CODE; }
 const char*	LocaleService_GetLocaleName()		{ return MULTI_LOCALE_NAME; }
 const char*	LocaleService_GetLocalePath()		{ return MULTI_LOCALE_PATH; }

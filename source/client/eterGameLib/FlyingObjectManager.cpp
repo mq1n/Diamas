@@ -6,7 +6,7 @@
 
 #include "ActorInstance.h"
 
-CFlyingManager::CFlyingManager()
+CFlyingManager::CFlyingManager(): m_IDCounter(0)
 {
 	m_pMapManager = 0;
 }
@@ -141,7 +141,8 @@ void CFlyingManager::Update()
 
 void CFlyingManager::Render()
 {
-	std::for_each(m_kLst_pkFlyInst.begin(), m_kLst_pkFlyInst.end(), std::void_mem_fun(&CFlyingInstance::Render));
+	for (const auto & flyInstance : m_kLst_pkFlyInst)
+		flyInstance->Render();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

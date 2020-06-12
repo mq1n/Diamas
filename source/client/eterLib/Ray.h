@@ -13,7 +13,7 @@ class CRay
 			m_v3End = m_v3Start + fRayRange * m_v3Direction;
 		}
 		
-		CRay()
+		CRay(): m_fRayRange(0)
 		{
 		}
 		

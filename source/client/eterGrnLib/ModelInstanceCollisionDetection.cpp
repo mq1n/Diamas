@@ -2,8 +2,12 @@
 #include "ModelInstance.h"
 #include "Model.h"
 
-void CGrannyModelInstance::MakeBoundBox(TBoundBox* pBoundBox, const float* mat, const float* OBBMin, const float* OBBMax,
-	D3DXVECTOR3* vtMin, D3DXVECTOR3* vtMax)
+void CGrannyModelInstance::MakeBoundBox(TBoundBox* pBoundBox, 
+										 const float* mat, 
+										 const float* OBBMin, 
+										 const float* OBBMax, 
+										 D3DXVECTOR3* vtMin, 
+										 D3DXVECTOR3* vtMax)
 {
 	pBoundBox->sx = OBBMin[0] * mat[0] + OBBMin[1] * mat[4] + OBBMin[2] * mat[8] + mat[12];
 	pBoundBox->sy = OBBMin[0] * mat[1] + OBBMin[1] * mat[5] + OBBMin[2] * mat[9] + mat[13];

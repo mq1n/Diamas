@@ -22,20 +22,24 @@ namespace UI
 	
 	CWindowManager::CWindowManager()
 		: 
-		m_pActiveWindow(nullptr),
-		m_pPointWindow(nullptr),
-		m_pLeftCaptureWindow(nullptr),
-		m_pMiddleCaptureWindow(nullptr),
-		m_pRightCaptureWindow(nullptr),
-		m_pLockWindow(nullptr),
+		m_lWidth(0), m_lHeight(0),	
+		m_iVres(0), m_iHres(0),
+		m_lMouseX(0), m_lMouseY(0),
+		m_lDragX(0), m_lDragY(0),
+		m_lPickedX(0), m_lPickedY(0),
+		m_bOnceIgnoreMouseLeftButtonUpEventFlag(FALSE), m_iIgnoreEndTime(0),
+		m_poMouseHandler(nullptr),
 		m_bAttachingFlag(FALSE),
 		m_dwAttachingType(0),
 		m_dwAttachingIndex(0),
-		m_dwAttachingSlotNumber(0), m_dwAttachingRealSlotNumber(0),
-		m_poMouseHandler(nullptr),
-		m_iHres(0),
-		m_iVres(0),
-		m_bOnceIgnoreMouseLeftButtonUpEventFlag(FALSE)
+		m_dwAttachingSlotNumber(0),
+		m_dwAttachingRealSlotNumber(0), m_byAttachingIconWidth(0), m_byAttachingIconHeight(0),
+		m_pActiveWindow(nullptr),
+		m_pLockWindow(nullptr),
+		m_pPointWindow(nullptr),
+		m_pLeftCaptureWindow(nullptr),
+		m_pRightCaptureWindow(nullptr),
+		m_pMiddleCaptureWindow(nullptr)
 	{		
 		m_pRootWindow = new CWindow(nullptr);
 		m_pRootWindow->SetName("root");
@@ -109,52 +113,36 @@ namespace UI
 		{
 			case WT_SLOT:
 				return new CSlotWindow(po);
-				break;
 			case WT_GRIDSLOT:
 				return new CGridSlotWindow(po);
-				break;
 			case WT_TEXTLINE:
 				return new CTextLine(po);
-				break;
 			case WT_MARKBOX:
 				return new CMarkBox(po);
-				break;
 			case WT_IMAGEBOX:
 				return new CImageBox(po);
-				break;
 			case WT_EXP_IMAGEBOX:
 				return new CExpandedImageBox(po);
-				break;
 			case WT_ANI_IMAGEBOX:
 				return new CAniImageBox(po);
-				break;
 			case WT_BUTTON:
 				return new CButton(po);
-				break;
 			case WT_RATIOBUTTON:
 				return new CRadioButton(po);
-				break;
 			case WT_TOGGLEBUTTON:
 				return new CToggleButton(po);
-				break;
 			case WT_DRAGBUTTON:
 				return new CDragButton(po);
-				break;
 			case WT_BOX:
 				return new CBox(po);
-				break;
 			case WT_BAR:
 				return new CBar(po);
-				break;
 			case WT_LINE:
 				return new CLine(po);
-				break;
 			case WT_BAR3D:
 				return new CBar3D(po);
-				break;
 			case WT_NUMLINE:
 				return new CNumberLine(po);
-				break;
 			default:
 				assert(!"CWindowManager::__NewWindow");
 				break;
@@ -383,6 +371,19 @@ namespace UI
 		return pWin;
 	}
 
+	CWindow* CWindowManager::RegisterRenderTarget(PyObject* po, const char* c_szLayer)
+	{
+		assert(m_LayerWindowMap.end() != m_LayerWindowMap.find(c_szLayer));
+
+		CWindow* pWin = new CRenderTarget(po);
+		m_LayerWindowMap[c_szLayer]->AddChild(pWin);
+
+#ifdef __WINDOW_LEAK_CHECK__
+		gs_kSet_pkWnd.insert(pWin);
+#endif
+		return pWin;
+	}
+
 	void CWindowManager::NotifyDestroyWindow(CWindow * pWindow)
 	{
 		if (pWindow == m_pActiveWindow)
@@ -526,6 +527,7 @@ namespace UI
 		}
 
 		pParentWindow->AddChild(pWindow);
+		pWindow->UpdateRect();
 	}
 
 	void CWindowManager::SetPickAlways(CWindow * pWindow)
@@ -842,7 +844,13 @@ namespace UI
 		{
 #ifdef _DEBUG
 			if (pPointWindow && pPointWindow->GetName())
+			{
+				if (!strcmp(pPointWindow->GetName(), "!!debug"))
+				{
+					_asm nop;
+				}
 				Tracenf("PointWindow: %s", pPointWindow->GetName());
+			}
 #endif
 			if (m_pPointWindow)
 				m_pPointWindow->OnMouseOverOut();

@@ -9,7 +9,6 @@ class Mutex
 		
 		void Lock();
 		void Unlock();
-		bool Trylock();
 
 	private:
 		CRITICAL_SECTION lock;		

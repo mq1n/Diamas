@@ -116,6 +116,7 @@ bool CMapOutdoor::Initialize()
 #endif
 
 	m_bSettingTerrainVisible = false;
+	m_bSettingIsLavaMap = false;
 	m_bDrawWireFrame	= false;
 	m_bDrawShadow		= false;
 	m_bDrawChrShadow	= false;
@@ -133,7 +134,6 @@ bool CMapOutdoor::Initialize()
 	m_lpCharacterShadowMapDepthSurface = nullptr;
 
 	m_lpBackupRenderTargetSurface = nullptr;
-	m_lpBackupDepthSurface = nullptr;
 	// Character Shadow
 	//////////////////////////////////////////////////////////////////////////
 
@@ -168,7 +168,7 @@ bool CMapOutdoor::Initialize()
 	m_dwBaseX = 0;
 	m_dwBaseY = 0;
 
-	m_settings_envDataName = "";
+	m_settings_envDataName.clear();
 	m_bShowEntirePatchTextureCount = false;
 	m_bTransparentTree = true;
 	
@@ -310,7 +310,7 @@ void CMapOutdoor::SetEnvironmentSkyBox()
 
 	m_SkyBox.SetSkyBoxScale(mc_pEnvironmentData->v3SkyBoxScale);
 	m_SkyBox.SetGradientLevel(mc_pEnvironmentData->bySkyBoxGradientLevelUpper, mc_pEnvironmentData->bySkyBoxGradientLevelLower);
-	m_SkyBox.SetRenderMode( (mc_pEnvironmentData->bSkyBoxTextureRenderMode == TRUE) ? CSkyObject::SKY_RENDER_MODE_TEXTURE : CSkyObject::SKY_RENDER_MODE_DIFFUSE);
+	m_SkyBox.SetRenderMode( (mc_pEnvironmentData->bSkyBoxTextureRenderMode != FALSE) ? CSkyObject::SKY_RENDER_MODE_TEXTURE : CSkyObject::SKY_RENDER_MODE_DIFFUSE);
 
 	for( int32_t i = 0; i < 6; ++i )
 	{
@@ -342,8 +342,8 @@ void CMapOutdoor::SetEnvironmentLensFlare()
 	if (!mc_pEnvironmentData)
 		return;
 
-	m_LensFlare.CharacterizeFlare(mc_pEnvironmentData->bLensFlareEnable == 1 ? true : false,
-								  mc_pEnvironmentData->bMainFlareEnable == 1 ? true : false,
+	m_LensFlare.CharacterizeFlare(mc_pEnvironmentData->bLensFlareEnable != FALSE ? true : false,
+								  mc_pEnvironmentData->bMainFlareEnable != FALSE ? true : false,
 								  mc_pEnvironmentData->fLensFlareMaxBrightness,
 								  mc_pEnvironmentData->LensFlareBrightnessColor);
 
@@ -502,7 +502,7 @@ bool CMapOutdoor::GetPickingPointWithRay(const CRay & rRay, D3DXVECTOR3 * v3Inte
 	bool bTerrainPick = false;
 	D3DXVECTOR3 v3ObjectPick, v3TerrainPick;
 
-	D3DXVECTOR3 v3Start, v3End, v3Dir, v3CurPos;
+	D3DXVECTOR3 v3Start, v3End, v3Dir;
  	float fRayRange;
 	rRay.GetStartPoint(&v3Start);
 	rRay.GetDirection(&v3Dir, &fRayRange);
@@ -561,10 +561,9 @@ bool CMapOutdoor::GetPickingPointWithRay(const CRay & rRay, D3DXVECTOR3 * v3Inte
 
 bool CMapOutdoor::GetPickingPointWithRayOnlyTerrain(const CRay & rRay, D3DXVECTOR3 * v3IntersectPt)
 {
-	bool bTerrainPick = false;
 	D3DXVECTOR3 v3TerrainPick;
 
-	D3DXVECTOR3 v3Start, v3End, v3Dir, v3CurPos;
+	D3DXVECTOR3 v3Start, v3End, v3Dir;
  	float fRayRange;
 	rRay.GetStartPoint(&v3Start);
 	rRay.GetDirection(&v3Dir, &fRayRange);
@@ -577,7 +576,7 @@ bool CMapOutdoor::GetPickingPointWithRayOnlyTerrain(const CRay & rRay, D3DXVECTO
 
 	
 	float fPos = 0.0f;	
-	bTerrainPick=true;
+	bool bTerrainPick = true;
 	if (!__PickTerrainHeight(fPos, v3Start, v3End, 5.0f, fRayRange, 5000.0f, &v3TerrainPick))
 		if (!__PickTerrainHeight(fPos, v3Start, v3End, 10.0f, fRayRange, 10000.0f, &v3TerrainPick))
 			if (!__PickTerrainHeight(fPos, v3Start, v3End, 100.0f, fRayRange, 100000.0f, &v3TerrainPick))
@@ -649,7 +648,7 @@ bool CMapOutdoor::GetPickingPointWithRayOnlyTerrain(const CRay & rRay, D3DXVECTO
 
 void CMapOutdoor::GetHeightMap(const uint8_t & c_rucTerrainNum, uint16_t ** pwHeightMap)
 {
-	if (c_rucTerrainNum < 0 || c_rucTerrainNum > AROUND_AREA_NUM - 1 || !m_pTerrain[c_rucTerrainNum])
+	if (c_rucTerrainNum > AROUND_AREA_NUM - 1 || !m_pTerrain[c_rucTerrainNum])
 	{
 		*pwHeightMap = nullptr;
 		return;
@@ -660,7 +659,7 @@ void CMapOutdoor::GetHeightMap(const uint8_t & c_rucTerrainNum, uint16_t ** pwHe
 
 void CMapOutdoor::GetNormalMap(const uint8_t & c_rucTerrainNum, char ** pucNormalMap)
 {
-	if (c_rucTerrainNum < 0 || c_rucTerrainNum > AROUND_AREA_NUM - 1 || !m_pTerrain[c_rucTerrainNum])
+	if (c_rucTerrainNum > AROUND_AREA_NUM - 1 || !m_pTerrain[c_rucTerrainNum])
 	{
 		*pucNormalMap = nullptr;
 		return;
@@ -671,7 +670,7 @@ void CMapOutdoor::GetNormalMap(const uint8_t & c_rucTerrainNum, char ** pucNorma
 
 void CMapOutdoor::GetWaterMap(const uint8_t & c_rucTerrainNum, uint8_t ** pucWaterMap)
 {
-	if (c_rucTerrainNum < 0 || c_rucTerrainNum > AROUND_AREA_NUM - 1 || !m_pTerrain[c_rucTerrainNum])
+	if (c_rucTerrainNum > AROUND_AREA_NUM - 1 || !m_pTerrain[c_rucTerrainNum])
 	{
 		*pucWaterMap = nullptr;
 		return;
@@ -682,7 +681,7 @@ void CMapOutdoor::GetWaterMap(const uint8_t & c_rucTerrainNum, uint8_t ** pucWat
 
 void CMapOutdoor::GetWaterHeight(uint8_t byTerrainNum, uint8_t byWaterNum, int32_t * plWaterHeight)
 {
-	if (byTerrainNum < 0 || byTerrainNum > AROUND_AREA_NUM - 1 || !m_pTerrain[byTerrainNum])
+	if (byTerrainNum > AROUND_AREA_NUM - 1 || !m_pTerrain[byTerrainNum])
 	{
 		*plWaterHeight = -1;
 		return;
@@ -723,7 +722,7 @@ bool CMapOutdoor::GetTerrainNumFromCoord(uint16_t wCoordX, uint16_t wCoordY, uin
 	*pbyTerrainNum = (wCoordY - m_CurCoordinate.m_sTerrainCoordY + LOAD_SIZE_WIDTH) * 3 + 
 		(wCoordX - m_CurCoordinate.m_sTerrainCoordX + LOAD_SIZE_WIDTH);
 	
-	if (*pbyTerrainNum < 0 || *pbyTerrainNum > AROUND_AREA_NUM)
+	if (*pbyTerrainNum > AROUND_AREA_NUM)
 		return false;
 	return true;
 }
@@ -1089,93 +1088,78 @@ uint32_t CMapOutdoor::GetShadowMapColor(float fx, float fy)
 
 	if (fYRef < -fTerrainSize)
 		return 0xFFFFFFFF;
-	else if (fYRef >= -fTerrainSize && fYRef < 0.0f)
+	if (fYRef >= -fTerrainSize && fYRef < 0.0f)
 	{
 		if (fXRef < -fTerrainSize)
 			return 0xFFFFFFFF;
-		else if (fXRef >= -fTerrainSize && fXRef < 0.0f)
+		if (fXRef >= -fTerrainSize && fXRef < 0.0f)
 		{
 			if (GetTerrainPointer(0, &pTerrain))
 				return pTerrain->GetShadowMapColor(fXRef + fTerrainSize, fYRef + fTerrainSize);
-			else
-				return 0xFFFFFFFF;
+			return 0xFFFFFFFF;
 		}
-		else if (fXRef >= 0.0f && fXRef < fTerrainSize)
+		if (fXRef >= 0.0f && fXRef < fTerrainSize)
 		{
 			if (GetTerrainPointer(1, &pTerrain))
 				return pTerrain->GetShadowMapColor(fXRef, fYRef + fTerrainSize);
-			else
-				return 0xFFFFFFFF;
+			return 0xFFFFFFFF;
 		}
-		else if (fXRef >= fTerrainSize && fXRef < 2.0f * fTerrainSize)
+		if (fXRef >= fTerrainSize && fXRef < 2.0f * fTerrainSize)
 		{
 			if (GetTerrainPointer(2, &pTerrain))
 				return pTerrain->GetShadowMapColor(fXRef - fTerrainSize, fYRef + fTerrainSize);
-			else
-				return 0xFFFFFFFF;
-		}
-		else
 			return 0xFFFFFFFF;
+		}
+		return 0xFFFFFFFF;
 	}
-	else if (fYRef >= 0.0f && fYRef < fTerrainSize)
+	if (fYRef >= 0.0f && fYRef < fTerrainSize)
 	{
 		if (fXRef < -fTerrainSize)
 			return 0xFFFFFFFF;
-		else if (fXRef >= -fTerrainSize && fXRef < 0.0f)
+		if (fXRef >= -fTerrainSize && fXRef < 0.0f)
 		{
 			if (GetTerrainPointer(3, &pTerrain))
 				return pTerrain->GetShadowMapColor(fXRef + fTerrainSize, fYRef);
-			else
-				return 0xFFFFFFFF;
+			return 0xFFFFFFFF;
 		}
-		else if (fXRef >= 0.0f && fXRef < fTerrainSize)
+		if (fXRef >= 0.0f && fXRef < fTerrainSize)
 		{
 			if (GetTerrainPointer(4, &pTerrain))
 				return pTerrain->GetShadowMapColor(fXRef, fYRef);
-			else
-				return 0xFFFFFFFF;
+			return 0xFFFFFFFF;
 		}
-		else if (fXRef >= fTerrainSize && fXRef < 2.0f * fTerrainSize)
+		if (fXRef >= fTerrainSize && fXRef < 2.0f * fTerrainSize)
 		{
 			if (GetTerrainPointer(5, &pTerrain))
 				return pTerrain->GetShadowMapColor(fXRef - fTerrainSize, fYRef);
-			else
-				return 0xFFFFFFFF;
-		}
-		else
 			return 0xFFFFFFFF;
+		}
+		return 0xFFFFFFFF;
 	}
-	else if (fYRef >= fTerrainSize && fYRef < 2.0f * fTerrainSize)
+	if (fYRef >= fTerrainSize && fYRef < 2.0f * fTerrainSize)
 	{
 		if (fXRef < -fTerrainSize)
 			return 0xFFFFFFFF;
-		else if (fXRef >= -fTerrainSize && fXRef < 0.0f)
+		if (fXRef >= -fTerrainSize && fXRef < 0.0f)
 		{
 			if (GetTerrainPointer(6, &pTerrain))
 				return pTerrain->GetShadowMapColor(fXRef + fTerrainSize, fYRef - fTerrainSize);
-			else
-				return 0xFFFFFFFF;
+			return 0xFFFFFFFF;
 		}
-		else if (fXRef >= 0.0f && fXRef < fTerrainSize)
+		if (fXRef >= 0.0f && fXRef < fTerrainSize)
 		{
 			if (GetTerrainPointer(7, &pTerrain))
 				return pTerrain->GetShadowMapColor(fXRef, fYRef - fTerrainSize);
-			else
-				return 0xFFFFFFFF;
+			return 0xFFFFFFFF;
 		}
-		else if (fXRef >= fTerrainSize && fXRef < 2.0f * fTerrainSize)
+		if (fXRef >= fTerrainSize && fXRef < 2.0f * fTerrainSize)
 		{
 			if (GetTerrainPointer(8, &pTerrain))
 				return pTerrain->GetShadowMapColor(fXRef - fTerrainSize, fYRef - fTerrainSize);
-			else
-				return 0xFFFFFFFF;
-		}
-		else
 			return 0xFFFFFFFF;
-	}
-	else
+		}
 		return 0xFFFFFFFF;
-
+	}
 	return 0xFFFFFFFF;
 }
 
@@ -1380,7 +1364,6 @@ void CMapOutdoor::RegisterGuildArea(int32_t isx, int32_t isy, int32_t iex, int32
 void CMapOutdoor::VisibleMarkedArea()
 {
 	std::map<int32_t, uint8_t*> kMap_pbyMarkBuf;
-	std::set<int32_t> kSet_iProcessedMapIndex;
 
 	std::list<RECT>::iterator itorRect = m_rkList_kGuildArea.begin();
 	for (; itorRect != m_rkList_kGuildArea.end(); ++itorRect)

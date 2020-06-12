@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "Timer.h"
 
-static LARGE_INTEGER gs_liTickCountPerSec;
+//static LARGE_INTEGER gs_liTickCountPerSec;
 static uint32_t gs_dwBaseTime=0;
 static uint32_t gs_dwServerTime=0;
 static uint32_t gs_dwClientTime=0;
@@ -65,16 +65,14 @@ CTimer::CTimer()
 {
 	ELTimer_Init();
 
-	if (this)
-	{
-		m_dwCurrentTime = 0;
-		m_bUseRealTime = true;
-		m_index = 0;
-	
-		m_dwElapsedTime = 0;
+	m_dwCurrentTime = 0;
+	m_bUseRealTime = true;
+	m_index = 0;
 
-		m_fCurrentTime = 0.0f;
-	}
+	m_dwElapsedTime = 0;
+
+	m_fCurrentTime = 0.0f;
+	m_dwBaseTime = 0;
 }
 
 CTimer::~CTimer()

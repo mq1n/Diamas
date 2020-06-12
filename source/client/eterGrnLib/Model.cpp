@@ -14,7 +14,9 @@ const CGrannyModel::TMeshNode* CGrannyModel::GetMeshNodeList(CGrannyMesh::EType 
 
 CGrannyMesh * CGrannyModel::GetMeshPointer(int32_t iMesh)
 {
+	// Client can be crash on some costumes!
 	assert(CheckMeshIndex(iMesh));
+	
 	assert(m_meshs != nullptr);
 
 	return m_meshs + iMesh;
@@ -200,7 +202,7 @@ bool CGrannyModel::LoadMeshs()
 		int32_t i = 0;
 		while (i < grni32xTypeCount)
 		{
-			if (nullptr == pgrnMesh->PrimaryVertexData->VertexType[i].Name || 0 == strlen(pgrnMesh->PrimaryVertexData->VertexType[i].Name))
+			if (nullptr == pgrnMesh->PrimaryVertexData->VertexType[i].Name || pgrnMesh->PrimaryVertexData->VertexType[i].Name[0] == '\0')
 			{
 				++i;
 				continue;
@@ -292,7 +294,7 @@ bool CGrannyModel::CreateFromGrannyModelPointer(granny_model* pgrnModel)
 	if (!LoadMeshs())
 		return false;
 
-	if (!__LoadVertices())
+	if (!LoadPNTVertices())
 		return false;
 
 	if (!LoadIndices())
@@ -347,43 +349,13 @@ void CGrannyModel::Destroy()
 {	
 	m_kMtrlPal.Clear();
 	
-	if (m_meshNodes)
-		delete [] m_meshNodes;
-
-	if (m_meshs)
-		delete [] m_meshs;
+	delete [] m_meshNodes;
+	delete [] m_meshs;
 
 	m_pntVtxBuf.Destroy();
 	m_idxBuf.Destroy();
 
 	Initialize();
-}
-
-bool CGrannyModel::__LoadVertices()
-{
-	if (m_rigidVtxCount <= 0)
-		return true;
-	
-	assert(m_meshs != nullptr);
-
-//	assert((m_dwFvF & (D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1)) == m_dwFvF);
-
-//	if (!m_pntVtxBuf.Create(m_rigidVtxCount, D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED))
-	if (!m_pntVtxBuf.Create(m_rigidVtxCount, m_dwFvF, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED))
-		return false;
-	
-	void* vertices;
-	if (!m_pntVtxBuf.Lock(&vertices))
-		return false;
-	
-	for (int32_t m = 0; m < m_pgrnModel->MeshBindingCount; ++m)
-	{
-		CGrannyMesh& rMesh = m_meshs[m];
-		rMesh.NEW_LoadVertices(vertices);
-	}
-	
-	m_pntVtxBuf.Unlock();
-	return true;
 }
 
 void CGrannyModel::Initialize()

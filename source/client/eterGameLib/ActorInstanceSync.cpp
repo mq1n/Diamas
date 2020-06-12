@@ -6,9 +6,6 @@
 
 void CActorInstance::__Push(int32_t x, int32_t y)
 {
-	if (IsResistFallen())
-		return;
-
 	//uint32_t dwVID=GetVirtualID();
 	//Tracenf("VID %d SyncPixelPosition %d %d", dwVID, x, y);		
 
@@ -39,6 +36,9 @@ void CActorInstance::__Push(int32_t x, int32_t y)
 	}
 
 	SetBlendingPosition(c_v3Dst);
+
+	if (IsResistFallen() || IsPushing())
+		return;
 
 	if (!IsUsingSkill())
 	{

@@ -11,7 +11,11 @@ void CMapOutdoor::LoadWaterTexture()
 	char buf[256];
 	for (int32_t i = 0; i < 30; ++i)
 	{
-		sprintf(buf, "d:/ymir Work/special/water/%02d.dds", i+1);
+		if (m_bSettingIsLavaMap) {
+			sprintf_s(buf, "d:/ymir Work/special/lava/%02d.dds", i + 1);
+		} else {
+			sprintf_s(buf, "d:/ymir Work/special/water/%02d.dds", i + 1);	
+		}
 		m_WaterInstances[i].SetImagePointer((CGraphicImage *) CResourceManager::Instance().GetResourcePointer(buf));
 	}
 }

@@ -29,7 +29,7 @@ class CSnowParticle
 		static void Delete(CSnowParticle * pSnowParticle);
 		static void DestroyPool();
 
-		void Init(const D3DXVECTOR3 & c_rv3Pos);
+		void Init(const D3DXVECTOR3 & c_rv3Pos, bool bIsRain);
 
 		void SetCameraVertex(const D3DXVECTOR3 & rv3Up, const D3DXVECTOR3 & rv3Cross);
 		bool IsActivate();

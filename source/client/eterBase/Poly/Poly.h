@@ -44,6 +44,7 @@
 #define POLY_FRAND		POLY_MAXVALUE + 25
 #define POLY_MOD		POLY_MAXVALUE + 26
 #define POLY_FLOOR		POLY_MAXVALUE + 27
+#define POLY_CEIL		POLY_MAXVALUE + 28
 
 #define POLY_MAXSTACK	100
 
@@ -61,11 +62,11 @@ public:
 	CPoly();
 	virtual ~CPoly();
 
-	int32_t		Analyze(const char * pszStr = nullptr);
+	bool	Analyze(const char * pszStr = nullptr);
 	float	Eval();
 	void	SetRandom(int32_t iRandomType);
 	void	SetStr(const std::string & str);
-	int32_t		SetVar(const std::string & strName, double dVar);
+	bool	SetVar(const std::string & strName, double dVar);
 	int32_t		GetVarCount();
 	const char * GetVarName(uint32_t dwIndex);
 	void	Clear();

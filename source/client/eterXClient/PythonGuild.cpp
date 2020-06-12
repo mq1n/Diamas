@@ -52,7 +52,7 @@ void CPythonGuild::ClearComment()
 
 void CPythonGuild::RegisterComment(uint32_t dwCommentID, const char * c_szName, const char * c_szComment)
 {
-	if (0 == strlen(c_szComment))
+	if (c_szComment[0] == '\0')
 		return;
 
 	TGuildBoardCommentData CommentData;
@@ -98,7 +98,7 @@ struct CPythonGuild_FFindGuildMemberByName
 	CPythonGuild_FFindGuildMemberByName(const char * c_szSearchingName) : strSearchingName(c_szSearchingName) {}
 	int32_t operator () (CPythonGuild::TGuildMemberData & rGuildMemberData)
 	{
-		return 0 == strSearchingName.compare(rGuildMemberData.strName.c_str());
+		return 0 == strSearchingName.compare(rGuildMemberData.strName);
 	}
 
 	std::string strSearchingName;

@@ -78,27 +78,27 @@ void CGraphicMarkInstance::OnRender()
 	float fRenderHeight=MARK_HEIGHT*m_fScale;
 
 	TPDTVertex vertices[4];
-	vertices[0].position.x	= m_v2Position.x-0.5f;
-	vertices[0].position.y	= m_v2Position.y-0.5f;
-	vertices[0].position.z	= 0.0f;
+	vertices[0].position.x	= m_v3Position.x-0.5f;
+	vertices[0].position.y = m_v3Position.y - 0.5f;
+	vertices[0].position.z = m_v3Position.z;
 	vertices[0].texCoord	= TTextureCoordinate(su, sv);
 	vertices[0].diffuse		= m_DiffuseColor;
 
-	vertices[1].position.x	= m_v2Position.x + fRenderWidth -0.5f;
-	vertices[1].position.y	= m_v2Position.y-0.5f;
-	vertices[1].position.z	= 0.0f;
+	vertices[1].position.x = m_v3Position.x + fRenderWidth - 0.5f;
+	vertices[1].position.y = m_v3Position.y - 0.5f;
+	vertices[1].position.z = m_v3Position.z;
 	vertices[1].texCoord	= TTextureCoordinate(eu, sv);
 	vertices[1].diffuse		= m_DiffuseColor;
 
-	vertices[2].position.x	= m_v2Position.x-0.5f;
-	vertices[2].position.y	= m_v2Position.y + fRenderHeight -0.5f;
-	vertices[2].position.z	= 0.0f;
+	vertices[2].position.x = m_v3Position.x - 0.5f;
+	vertices[2].position.y = m_v3Position.y + fRenderHeight - 0.5f;
+	vertices[2].position.z = m_v3Position.z;
 	vertices[2].texCoord	= TTextureCoordinate(su, ev);
 	vertices[2].diffuse		= m_DiffuseColor;
 
-	vertices[3].position.x	= m_v2Position.x + fRenderWidth -0.5f;
-	vertices[3].position.y	= m_v2Position.y + fRenderHeight -0.5f;
-	vertices[3].position.z	= 0.0f;
+	vertices[3].position.x = m_v3Position.x + fRenderWidth - 0.5f;
+	vertices[3].position.y = m_v3Position.y + fRenderHeight - 0.5f;
+	vertices[3].position.z = m_v3Position.z;
 	vertices[3].texCoord	= TTextureCoordinate(eu, ev);	
 	vertices[3].diffuse		= m_DiffuseColor;
 
@@ -165,10 +165,11 @@ void CGraphicMarkInstance::SetDiffuseColor(float fr, float fg, float fb, float f
 	m_DiffuseColor.a = fa;
 }
 
-void CGraphicMarkInstance::SetPosition(float fx, float fy)
+void CGraphicMarkInstance::SetPosition(float fx, float fy, float fz)
 {
-	m_v2Position.x = fx;
-	m_v2Position.y = fy;
+	m_v3Position.x = fx;
+	m_v3Position.y = fy;
+	m_v3Position.z = fz;
 }
 
 void CGraphicMarkInstance::Load()
@@ -197,7 +198,7 @@ void CGraphicMarkInstance::SetImagePointer(CGraphicImage * pImage)
 
 bool CGraphicMarkInstance::IsEmpty() const
 {
-	if (!m_roImage.IsNull() && !m_roImage->IsEmpty())
+	if (m_uIndex != 0xffffffff && !m_roImage.IsNull() && !m_roImage->IsEmpty())
 		return false;
 
 	return true;
@@ -234,7 +235,7 @@ void CGraphicMarkInstance::OnSetImagePointer()
 void CGraphicMarkInstance::Initialize()
 {
 	m_DiffuseColor.r = m_DiffuseColor.g = m_DiffuseColor.b = m_DiffuseColor.a = 1.0f;
-	m_v2Position.x = m_v2Position.y = 0.0f;
+	m_v3Position.x = m_v3Position.y = m_v3Position.z = 0.0f;
 	m_uIndex = 0;
 	m_fScale = 1.0f;
 }

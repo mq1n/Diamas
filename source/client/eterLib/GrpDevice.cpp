@@ -261,18 +261,9 @@ BOOL EL3D_ConfirmDevice(D3DCAPS9& rkD3DCaps, uint32_t uBehavior, D3DFORMAT /*eD3
 		if (!(rkD3DCaps.VertexProcessingCaps & D3DVTXPCAPS_POSITIONALLIGHTS))
 			return FALSE;
 
-		// Software T&L Support - ATI NOT SUPPORT CLIP, USE DIRECTX SOFTWARE PROCESSING CLIPPING
-		if (GRAPHICS_CAPS_SOFTWARE_TILING)
-		{
-			if (!(rkD3DCaps.PrimitiveMiscCaps & D3DPMISCCAPS_CLIPTLVERTS))
-				return FALSE;
-		}
-		else
-		{
-			// Shadow/Terrain
-			if (!(rkD3DCaps.VertexProcessingCaps & D3DVTXPCAPS_TEXGEN))
-				return FALSE;
-		}
+		// Shadow/Terrain
+		if (!(rkD3DCaps.VertexProcessingCaps & D3DVTXPCAPS_TEXGEN))
+			return FALSE;
 	}
 
 	s_MaxTextureWidth = rkD3DCaps.MaxTextureWidth;
@@ -313,11 +304,13 @@ int32_t CGraphicDevice::Create(HWND hWnd, int32_t iHres, int32_t iVres, bool Win
 	if (!ms_kD3DDetector.Build(*ms_lpd3d, EL3D_ConfirmDevice))
 		return CREATE_ENUM;
 
+	/*
 	std::string stDevList;
 	ms_kD3DDetector.GetString(&stDevList);
 
 	Tracen(stDevList.c_str());
 	Tracenf("adapter %d, device %d, mode %d", ms_iD3DAdapterInfo, ms_iD3DDevInfo, ms_iD3DModeInfo);
+	*/
 
 	D3D_CAdapterInfo * pkD3DAdapterInfo = ms_kD3DDetector.GetD3DAdapterInfop(ms_iD3DAdapterInfo);
 	if (!pkD3DAdapterInfo)
@@ -583,7 +576,8 @@ bool CGraphicDevice::__CreatePDTVertexBufferList()
 			D3DUSAGE_DYNAMIC|D3DUSAGE_WRITEONLY, 
 			D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1, 
 			D3DPOOL_SYSTEMMEM, 
-			&ms_alpd3dPDTVB[i], nullptr)
+			&ms_alpd3dPDTVB[i],
+			nullptr)
 		))
 		return false;
 	}
@@ -616,7 +610,8 @@ bool CGraphicDevice::__CreateDefaultIndexBuffer(uint32_t eDefIB, uint32_t uIdxCo
 			D3DUSAGE_WRITEONLY, 
 			D3DFMT_INDEX16,
 			D3DPOOL_MANAGED,
-			&ms_alpd3dDefIB[eDefIB], nullptr)
+			&ms_alpd3dDefIB[eDefIB],
+			nullptr)
 	)) return false;
 	
 	uint16_t* dstIndices;

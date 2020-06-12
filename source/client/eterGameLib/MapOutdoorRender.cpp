@@ -393,12 +393,16 @@ void CMapOutdoor::RenderArea(bool bRenderAmbience)
 		}
 	}
 
+	bool bRenderShadow = true;
+	if (GetName().find("metin2_map_orchideout") != std::string::npos)
+		bRenderShadow = false;
+
 #ifndef WORLD_EDITOR
 	// PCBlocker
 	std::for_each(m_PCBlockerVector.begin(), m_PCBlockerVector.end(), FPCBlockerHide());
 
 	// Shadow Receiver
-	if (m_bDrawShadow && m_bDrawChrShadow)
+	if (m_bDrawShadow && m_bDrawChrShadow && bRenderShadow)
 	{
 		if (mc_pEnvironmentData != nullptr)
 			STATEMANAGER.SetRenderState(D3DRS_FOGCOLOR, 0xFFFFFFFF);
@@ -512,9 +516,10 @@ void CMapOutdoor::RenderArea(bool bRenderAmbience)
 
 #ifndef WORLD_EDITOR
 	// Shadow Receiver
-	if (m_bDrawShadow && m_bDrawChrShadow)
+	if (m_bDrawShadow && m_bDrawChrShadow && bRenderShadow)
 	{
-		std::for_each(m_ShadowReceiverVector.begin(), m_ShadowReceiverVector.end(), std::void_mem_fun(&CGraphicObjectInstance::Show));
+		for (const auto & shadowReceiver : m_ShadowReceiverVector)
+			shadowReceiver->Show();
 	}
 #endif
 }
@@ -745,7 +750,7 @@ struct FPatchNumMatch
 	{
 		m_lPatchNumToCheck = lPatchNum;
 	}
-	bool operator() (std::pair<int32_t, uint8_t> aPair)
+	bool operator() (std::pair<int32_t, uint8_t> &aPair)
 	{
 		return m_lPatchNumToCheck == aPair.first;
 	}
@@ -823,7 +828,7 @@ void CMapOutdoor::RenderMarkedArea()
 	D3DPRIMITIVETYPE eType;
 	SelectIndexBuffer(0, &wPrimitiveCount, &eType);
 
-	D3DXMATRIX matTexTransform, matTexTransformTemp;
+	D3DXMATRIX matTexTransform;
 
 	D3DXMatrixScaling(&matTexTransform, m_fTerrainTexCoordBase * 32.0f, -m_fTerrainTexCoordBase * 32.0f, 0.0f);
 	D3DXMatrixMultiply(&matTexTransform, &m_matViewInverse, &matTexTransform);
@@ -937,7 +942,7 @@ void CMapOutdoor::DrawPatchAttr(int32_t patchnum)
 	m_matWorldForCommonUse._41 = -(float) (wCoordX * CTerrainImpl::XSIZE * CTerrainImpl::CELLSCALE);
 	m_matWorldForCommonUse._42 = (float) (wCoordY * CTerrainImpl::YSIZE * CTerrainImpl::CELLSCALE);
 
-	D3DXMATRIX matTexTransform, matTexTransformTemp;
+	D3DXMATRIX matTexTransform;
 	D3DXMatrixMultiply(&matTexTransform, &m_matViewInverse, &m_matWorldForCommonUse);
 	D3DXMatrixMultiply(&matTexTransform, &matTexTransform, &m_matStaticShadow);
 	STATEMANAGER.SetTransform(D3DTS_TEXTURE1, &matTexTransform);

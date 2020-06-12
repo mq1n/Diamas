@@ -27,19 +27,18 @@ public:
 		mCurrent = 0;
 		mFreeCount = 0;
 		mUsedCount = 0;
+		mMaxItems = 0;
 	};
 	
 	~Pool(void)
 	{
-		if (mData)
-			delete [] mData;
+		delete [] mData;
 	};
 	
 	
 	void Release(void)
 	{
-		if (mData)
-			delete [] mData;	
+		delete [] mData;	
 
 		mHead = 0;
 		mFree = 0;
@@ -48,12 +47,12 @@ public:
 		mCurrent = 0;
 		mFreeCount = 0;
 		mUsedCount = 0;
+		mMaxItems = 0;
 	};
 	
 	void Set(int32_t maxitems)
 	{
-		if (mData)
-			delete [] mData; // delete any previous incarnation.
+		delete [] mData; // delete any previous incarnation.
 		mMaxItems = maxitems;
 		mData = new Type[mMaxItems];
 		mFree = mData;
@@ -201,7 +200,6 @@ public:
 		// Add 'item' after 'e'
 		if ( e )
 		{
-			Type *eprev = e->GetPrevious();
 			Type *enext = e->GetNext();
 			e->SetNext(item);
 			item->SetNext(enext);
@@ -221,7 +219,6 @@ public:
 	{
 		// Add 'item' before 'e'
 		Type *eprev = e->GetPrevious();
-		Type *enext = e->GetNext();
 		
 		if ( !eprev ) 
 			mHead = item;

@@ -15,14 +15,14 @@ std::string CPythonItem::TGroundItemInstance::ms_astDropSoundFileName[DROPSOUND_
 void CPythonItem::GetInfo(std::string* pstInfo)
 {
 	char szInfo[256];
-	sprintf(szInfo, "Item: Inst %d, Pool %d", m_GroundItemInstanceMap.size(), m_GroundItemInstancePool.GetCapacity());
+	sprintf_s(szInfo, "Item: Inst %u, Pool %u", m_GroundItemInstanceMap.size(), m_GroundItemInstancePool.GetCapacity());
 
 	pstInfo->append(szInfo);
 }
 
 void CPythonItem::TGroundItemInstance::Clear()
 {
-	stOwnership = "";
+	stOwnership.clear();
 	ThingInstance.Clear();
 	CEffectManager::Instance().DestroyEffectInstance(dwEffectInstanceIndex);
 }
@@ -435,7 +435,7 @@ void CPythonItem::CreateItem(uint32_t dwVirtualID, uint32_t dwVirtualNumber, flo
 			}
 		}
 		//D3DXQuaternionRotationYawPitchRoll(&pGroundItemInstance->qEnd, rEnd.y, rEnd.x, rEnd.z );
-		float rot = frandom(0, 2*3.1415926535f);
+		float rot = frandom(0, 2*float(M_PI));
 		D3DXQUATERNION q(0,0,cosf(rot),sinf(rot));
 		D3DXQuaternionMultiply(&pGroundItemInstance->qEnd, &pGroundItemInstance->qEnd, &q);
 		q = RotationArc(D3DXVECTOR3(0,0,1),normal);
@@ -703,6 +703,8 @@ void CPythonItem::Create()
 
 CPythonItem::CPythonItem()
 {
+	m_nMouseX = m_nMouseY = 0;
+	m_dwDropItemEffectID = 0;
 	m_GroundItemInstancePool.SetName("CDynamicPool<TGroundItemInstance>");	
 	m_dwPickedItemID = INVALID_ID;
 }

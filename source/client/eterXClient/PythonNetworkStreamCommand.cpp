@@ -90,7 +90,6 @@ bool SplitToken(const char * c_szLine, CTokenVector * pstTokenVector, const char
 	pstTokenVector->reserve(10);
 	pstTokenVector->clear();
 
-	std::string stToken;
 	std::string strLine = c_szLine;
 
 	uint32_t basePos = 0;
@@ -131,12 +130,11 @@ bool SplitToken(const char * c_szLine, CTokenVector * pstTokenVector, const char
 
 void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 {
-	// #0000811: [M2EU] 콘솔창 기능 차단 
-	if (strcmpi(c_szCommand, "ConsoleEnable") == 0)
-		return;
-
+	std::string parserType = "internal";
 	if (m_apoPhaseWnd[PHASE_WINDOW_GAME])
 	{
+		parserType = "game";
+
 		bool isTrue;
 		if (PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], 
 			"BINARY_ServerCommand_Run", 
@@ -150,6 +148,8 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 	}
 	else if (m_poSerCommandParserWnd)
 	{
+		parserType = "cmdParserWnd";
+
 		bool isTrue;
 		if (PyCallClassMemberFunc(m_poSerCommandParserWnd, 
 			"BINARY_ServerCommand_Run", 
@@ -174,7 +174,7 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 	{
 		PostQuitMessage(0);
 	}
-	else if (!strcmpi(szCmd, "BettingMoney"))
+	/*else if (!strcmpi(szCmd, "BettingMoney"))
 	{
 		if (2 != TokenVector.size())
 		{
@@ -182,9 +182,9 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 			return;
 		}
 
-		//uint32_t uMoney= atoi(TokenVector[1].c_str());		
-		
-	}
+		//uint32_t uMoney= atoi(TokenVector[1].c_str());
+
+	}*/
 	// GIFT NOTIFY
 	else if (!strcmpi(szCmd, "gift"))
 	{
@@ -526,7 +526,7 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 		std::map<std::string, int32_t>::iterator f = s_emotionDict.find(szCmd);
 		if (f == s_emotionDict.end())
 		{
-			TraceError("Unknown Server Command %s | %s", c_szCommand, szCmd);
+			TraceError("Unknown Server Command %s | %s (parser %s)", c_szCommand, szCmd, parserType.c_str());
 		}
 		else
 		{

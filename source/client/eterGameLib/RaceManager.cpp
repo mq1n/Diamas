@@ -147,8 +147,8 @@ CRaceData* CRaceManager::__LoadRaceData(uint32_t dwRaceIndex)
 		const char* pathName = c_rstRaceName.c_str() + 1;
 		char shapeFileName[256];
 		char motionListFileName[256];
-		_snprintf(shapeFileName, sizeof(shapeFileName), "%sshape.msm", pathName);
-		_snprintf(motionListFileName, sizeof(motionListFileName), "%smotlist.txt", pathName);
+		_snprintf_s(shapeFileName, sizeof(shapeFileName), "%sshape.msm", pathName);
+		_snprintf_s(motionListFileName, sizeof(motionListFileName), "%smotlist.txt", pathName);
 				
 		CRaceData * pRaceData = CRaceData::New();
 		pRaceData->SetRace(dwRaceIndex);
@@ -300,14 +300,12 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 	static std::string stSpawnMotionFileName;
 	static std::string stMotionFileName;
 
-	stSpawnMotionFileName = "";
-	stMotionFileName = "";
+	stSpawnMotionFileName.clear();
+	stMotionFileName.clear();
 
 	uint32_t uLineCount=kTextFileLoader.GetLineCount();
-	for (uint32_t uLineIndex=0; uLineIndex<uLineCount; ++uLineIndex)
+	for (uint32_t uLineIndex=0, szTypeLen = strlen(szType); uLineIndex<uLineCount; ++uLineIndex)
 	{
-		uint32_t motionType = CRaceMotionData::NAME_NONE;
-
 		const std::string& c_rstLine=kTextFileLoader.GetLineString(uLineIndex);
 		sscanf(c_rstLine.c_str(), "%s %s %s %d", szMode, szType, szFile, &nPercent);
 
@@ -320,11 +318,11 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 			const size_t c_cutLengthLimit = 2;
 			bool bFound = false;
 
-			if (c_cutLengthLimit < strlen(szType) + 1)
+			if (c_cutLengthLimit < szTypeLen + 1)
 			{
 				for (size_t i = 1; i <= c_cutLengthLimit; ++i)
 				{
-					std::string typeName = std::string(szType).substr(0, strlen(szType) - i);
+					std::string typeName = std::string(szType).substr(0, szTypeLen - i);
 					fTypeIndex = s_kMap_stType_dwIndex.find(typeName);
 
 					if (s_kMap_stType_dwIndex.end() != fTypeIndex)
@@ -339,7 +337,7 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 				continue;
 		}
 
-		motionType = fTypeIndex->second;
+		uint32_t motionType = fTypeIndex->second;
 
 		stMotionFileName = pathName;
 		stMotionFileName += szFile; 
@@ -357,7 +355,7 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 		}
 	}
 
-	if (!isSpawn && stSpawnMotionFileName!="")
+	if (!isSpawn && !stSpawnMotionFileName.empty())
 	{
 		rkRaceData.RegisterMotionData(CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SPAWN, stSpawnMotionFileName.c_str(), nPercent);
 	}

@@ -68,6 +68,8 @@ class CLZO : public CSingleton<CLZO>
 		bool	Decompress(CLZObject & rObj, const uint8_t * pbBuf, uint32_t * pdwKey = nullptr);
 		uint8_t *	GetWorkMemory();
 		
+		size_t	GetMaxCompressedSize(size_t original) {	return (original + (original >> 4) + 64 + 3);	}
+
 	private:
 		uint8_t *	m_pWorkMem;
 };

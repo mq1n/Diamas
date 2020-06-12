@@ -122,51 +122,15 @@ bool CItemManager::LoadItemList(const char * c_szFileName)
 
 		CItemData * pItemData = MakeItemData(dwItemVNum);
 
-		extern BOOL USE_VIETNAM_CONVERT_WEAPON_VNUM;
-		if (USE_VIETNAM_CONVERT_WEAPON_VNUM)
+		
+		if (4 == TokenVector.size())
 		{
-			extern uint32_t Vietnam_ConvertWeaponVnum(uint32_t vnum);
-			uint32_t dwMildItemVnum = Vietnam_ConvertWeaponVnum(dwItemVNum);
-			if (dwMildItemVnum == dwItemVNum)
-			{
-				if (4 == TokenVector.size())
-				{
-					const std::string & c_rstrModelFileName = TokenVector[3];
-					pItemData->SetDefaultItemData(c_rstrIcon.c_str(), c_rstrModelFileName.c_str());
-				}
-				else
-				{
-					pItemData->SetDefaultItemData(c_rstrIcon.c_str());
-				}
-			}
-			else
-			{
-				uint32_t dwMildBaseVnum = dwMildItemVnum / 10 * 10;
-				char szMildIconPath[MAX_PATH];				
-				sprintf(szMildIconPath, "icon/item/%.5d.tga", dwMildBaseVnum);
-				if (4 == TokenVector.size())
-				{
-					char szMildModelPath[MAX_PATH];
-					sprintf(szMildModelPath, "d:/ymir work/item/weapon/%.5d.gr2", dwMildBaseVnum);	
-					pItemData->SetDefaultItemData(szMildIconPath, szMildModelPath);
-				}
-				else
-				{
-					pItemData->SetDefaultItemData(szMildIconPath);
-				}
-			}
+			const std::string & c_rstrModelFileName = TokenVector[3];
+			pItemData->SetDefaultItemData(c_rstrIcon.c_str(), c_rstrModelFileName.c_str());
 		}
 		else
 		{
-			if (4 == TokenVector.size())
-			{
-				const std::string & c_rstrModelFileName = TokenVector[3];
-				pItemData->SetDefaultItemData(c_rstrIcon.c_str(), c_rstrModelFileName.c_str());
-			}
-			else
-			{
-				pItemData->SetDefaultItemData(c_rstrIcon.c_str());
-			}
+			pItemData->SetDefaultItemData(c_rstrIcon.c_str());
 		}
 	}
 
@@ -326,16 +290,16 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 		TItemMap::iterator f = m_ItemMap.find(dwVnum);
 		if (m_ItemMap.end() == f)
 		{
-			_snprintf(szName, sizeof(szName), "icon/item/%05d.tga", dwVnum);
+			_snprintf_s(szName, sizeof(szName), "icon/item/%05u.tga", dwVnum);
 
 			if (CResourceManager::Instance().IsFileExist(szName) == false)
 			{
 				std::map<uint32_t, uint32_t>::iterator itVnum = itemNameMap.find(GetHashCode(table->szName));
 				
 				if (itVnum != itemNameMap.end())
-					_snprintf(szName, sizeof(szName), "icon/item/%05d.tga", itVnum->second);
+					_snprintf_s(szName, sizeof(szName), "icon/item/%05u.tga", itVnum->second);
 				else
-					_snprintf(szName, sizeof(szName), "icon/item/%05d.tga", dwVnum-dwVnum % 10);
+					_snprintf_s(szName, sizeof(szName), "icon/item/%05u.tga", dwVnum-(dwVnum % 10));
 
 				if (CResourceManager::Instance().IsFileExist(szName) == false)
 				{

@@ -66,7 +66,7 @@ void CPythonSystem::GetDisplaySettings()
 		else
 			continue;
 
-		int32_t check_res = false;
+		bool check_res = false;
 
 		for (int32_t i = 0; !check_res && i < m_ResolutionCount; ++i)
 		{
@@ -75,7 +75,7 @@ void CPythonSystem::GetDisplaySettings()
 				m_ResolutionList[i].height != DisplayMode.Height)
 				continue;
 
-			int32_t check_fre = false;
+			bool check_fre = false;
 
 			// 프리퀀시만 다르므로 프리퀀시만 셋팅해준다.
 			for (int32_t j = 0; j < m_ResolutionList[i].frequency_count; ++j)
@@ -191,7 +191,7 @@ uint32_t CPythonSystem::GetHeight()
 }
 uint32_t CPythonSystem::GetBPP()
 {
-	return m_Config.bpp;
+	return 32/*m_Config.bpp*/;
 }
 uint32_t CPythonSystem::GetFrequency()
 {
@@ -265,7 +265,7 @@ void CPythonSystem::SetSaveID(int32_t iValue, const char * c_szSaveID)
 		return;
 	
 	m_Config.isSaveID = iValue;
-	strncpy(m_Config.SaveID, c_szSaveID, sizeof(m_Config.SaveID) - 1);
+	strncpy_s(m_Config.SaveID, c_szSaveID, sizeof(m_Config.SaveID) - 1);
 }
 
 CPythonSystem::TConfig * CPythonSystem::GetConfig()
@@ -427,9 +427,7 @@ bool CPythonSystem::LoadConfig()
 		else if (!stricmp(command, "IS_SAVE_ID"))
 			m_Config.isSaveID = atoi(value);
 		else if (!stricmp(command, "SAVE_ID"))
-			strncpy(m_Config.SaveID, value, 20);
-		else if (!stricmp(command, "PRE_LOADING_DELAY_TIME"))
-			g_iLoadingDelayTime = atoi(value);
+			strncpy_s(m_Config.SaveID, value, 20);
 		else if (!stricmp(command, "WINDOWED"))
 		{
 			m_Config.bWindowed = atoi(value) == 1 ? true : false;
@@ -511,7 +509,6 @@ bool CPythonSystem::SaveConfig()
 				"GAMMA						%d\n"
 				"IS_SAVE_ID					%d\n"
 				"SAVE_ID					%s\n"
-				"PRE_LOADING_DELAY_TIME		%d\n"
 				"DECOMPRESSED_TEXTURE		%d\n",
 				m_Config.width,
 				m_Config.height,
@@ -525,7 +522,6 @@ bool CPythonSystem::SaveConfig()
 				m_Config.gamma,
 				m_Config.isSaveID,
 				m_Config.SaveID,
-				g_iLoadingDelayTime,
 				m_Config.bDecompressDDS);
 
 	if (m_Config.bWindowed == 1)

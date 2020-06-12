@@ -460,7 +460,6 @@ bool CRaceMotionData::LoadMotionData(const char * c_szFileName)
 					default:
 						assert(!" CRaceMotionData::LoadMotionData - Strange Event Type");
 						return false;
-						break;
 				}
 				m_MotionEventDataVector[j] = pData;
 				m_MotionEventDataVector[j]->Load(rkTextFileLoader);

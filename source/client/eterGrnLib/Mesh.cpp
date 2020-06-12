@@ -31,17 +31,6 @@ void CGrannyMesh::LoadPNTVertices(void * dstBaseVertices)
 	GrannyCopyMeshVertices(pgrnMesh, m_pgrnMeshType, dstVertices);
 }
 
-void CGrannyMesh::NEW_LoadVertices(void * dstBaseVertices)
-{
-	const granny_mesh * pgrnMesh = GetGrannyMeshPointer();
-	
-	if (!GrannyMeshIsRigid(pgrnMesh))
-		return;
-	
-	TPNTVertex * dstVertices = ((TPNTVertex *)dstBaseVertices) + m_vtxBasePos;
-	GrannyCopyMeshVertices(pgrnMesh, m_pgrnMeshType, dstVertices);
-}
-
 void CGrannyMesh::DeformPNTVertices(void * dstBaseVertices, D3DXMATRIX * boneMatrices, granny_mesh_binding* pgrnMeshBinding) const
 {
 	assert(dstBaseVertices != nullptr);
@@ -258,8 +247,7 @@ void CGrannyMesh::SetPNT2Mesh()
 
 void CGrannyMesh::Destroy()
 {
-	if (m_triGroupNodes)
-		delete [] m_triGroupNodes;
+	delete [] m_triGroupNodes;
 
 	m_mtrlIndexVector.clear();
 

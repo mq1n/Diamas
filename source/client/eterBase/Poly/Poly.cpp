@@ -1,9 +1,9 @@
 #include "../StdAfx.h"
 #include <string>
 #include <assert.h>
-
 #include "Poly.h"
-#include <cmath>
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <cctype>
 #include <cstdlib>
 
@@ -25,10 +25,8 @@ int32_t CPoly::my_irandom(double start, double end)
 	{
 		case RANDOM_TYPE_FORCE_MIN:
 			return int32_t(start);
-			break;
 		case RANDOM_TYPE_FORCE_MAX:
 			return int32_t(end);
-			break;
 	}
 
     // Make range as inclusive-exclusive
@@ -93,7 +91,7 @@ float CPoly::Eval()
 	    case POLY_ID:
 		save[iSp++]=
 		    lSymbol[ *pos ]->dVal; 
-		pos++;
+		++pos;
 		break;
 		//case '+':
 	    case POLY_PLU:
@@ -141,28 +139,28 @@ float CPoly::Eval()
 	    case POLY_SIN:
 		save[iSp-1]=sin(save[iSp-1]); break;
 	    case POLY_TAN:
-		if (!(t=cos(save[iSp-1]))) 
+		if (!((t=cos(save[iSp-1])))) 
 		{
 		    //THROW (new CEvalException("Divide by 0"));
 		    return 0;
 		}
 		save[iSp-1]=tan(save[iSp-1]); break;
 	    case POLY_CSC:
-		if (!(t=sin(save[iSp-1]))) 
+		if (!((t=sin(save[iSp-1])))) 
 		{
 		    //THROW(new CEvalException("Divide by 0"));
 		    return 0;
 		}
 		save[iSp-1]=1/t; break;
 	    case POLY_SEC:
-		if (!(t=cos(save[iSp-1]))) 
+		if (!((t=cos(save[iSp-1])))) 
 		{
 		    //THROW(new CEvalException("Divide by 0"));
 		    return 0;
 		}
 		save[iSp-1]=1/t; break;
 	    case POLY_COT:
-		if (!(t=sin(save[iSp-1]))) 
+		if (!((t=sin(save[iSp-1])))) 
 		{
 		    //THROW(new CEvalException("Divide by 0"));
 		    return 0;
@@ -203,6 +201,9 @@ float CPoly::Eval()
 		case POLY_FLOOR:
 		save[iSp-1]=floor(save[iSp-1]);
 		break;
+		case POLY_CEIL:
+		save[iSp - 1] = ceil(save[iSp - 1]);
+		break;
 	    case POLY_IRAND:
 		save[iSp-2]=my_irandom(save[iSp-2],save[iSp-1]);
 		iSp--;
@@ -231,7 +232,7 @@ float CPoly::Eval()
     return float(save[iSp-1]);
 }
 
-int32_t CPoly::Analyze(const char * pszStr)
+bool CPoly::Analyze(const char * pszStr)
 {
     if (pszStr)
 	SetStr(pszStr);
@@ -265,8 +266,8 @@ void CPoly::Clear()
 
     for (i = 0;i < STSize; ++i)
     {
-	if (lSymbol[i]) delete lSymbol[i];
-	lSymbol[i]=nullptr;
+		delete lSymbol[i];
+		lSymbol[i]=nullptr;
     }
     //lSymbol.FreeExtra();
     lSymbol.clear();
@@ -442,6 +443,7 @@ void CPoly::expo()
 	case POLY_COS:
 	case POLY_ABS:
 	case POLY_FLOOR:
+	case POLY_CEIL:
 	    t=iLookAhead;
 	    match(iLookAhead); match('('); expr(); match(')'); emit(t,iToken);
 	    break;
@@ -506,6 +508,7 @@ void CPoly::emit(int32_t t, int32_t tval)
 	case POLY_FRAND:
 	case POLY_MOD:
 	case POLY_FLOOR:
+	case POLY_CEIL:
 	    tokenBase.push_back(t);
 	    break;
 	case POLY_NUM:
@@ -568,12 +571,14 @@ int32_t CPoly::insert(const string & s, int32_t tok)
     return STSize-1;
 }
 
-int32_t CPoly::SetVar(const string & strName, double dVar)
+bool CPoly::SetVar(const string & strName, double dVar)
 {
 
-    if (ErrorOccur) return false;
+    if (ErrorOccur)
+		return false;
     int32_t index=find(strName);
-    if (index==-1) return false;
+    if (index==-1) 
+		return false;
     CSymTable* stVar = lSymbol[(/*FindIndex*/(index))];
     stVar->dVal=dVar;
     return true;
@@ -609,14 +614,15 @@ void CPoly::init()
     insert("cosec",POLY_COSEC);
     insert("sec",POLY_SEC);
     insert("pi",POLY_PI);
-    SetVar("pi",3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068);
+	SetVar("pi", M_PI); 
     insert("e",POLY_EXP);
-    SetVar("e",2.718281828459045235360287471352662497757247093699959574966967627724076630353547594571382178525166427);
+    SetVar("e", M_E);
     insert("log",POLY_LOG);
     insert("ln",POLY_LN);
     insert("log10",POLY_LOG10);
     insert("abs",POLY_ABS);
     insert("mod",POLY_MOD);
     insert("floor",POLY_FLOOR);	
+	insert("ceil", POLY_CEIL);
 	MathSymbolCount = STSize;
 }

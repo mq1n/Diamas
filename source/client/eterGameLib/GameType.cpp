@@ -47,7 +47,7 @@ bool NRaceData::THitData::Load(CTextFileLoader & rTextFileLoader)
 		return false;
 
 	if (!rTextFileLoader.GetTokenString("attackingbone", &strBoneName))
-		strBoneName = "";
+		strBoneName.clear();
 	if (!rTextFileLoader.GetTokenFloat("weaponlength",&fWeaponLength))
 		fWeaponLength = 0.0f;
 

@@ -49,7 +49,6 @@ class CEventManager : public CSingleton<CEventManager>
 					break;
 
 				m_eventQueue.pop();
-				float fTime = pEvent->GetStartTime();
 				pEvent->Run();
 				delete pEvent;
 			}

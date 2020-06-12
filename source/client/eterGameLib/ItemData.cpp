@@ -41,12 +41,27 @@ CGraphicThing * CItemData::GetDropModelThing()
 	return m_pDropModelThing;
 }
 
-CGraphicSubImage * CItemData::GetIconImage()
+CGraphicSubImage * CItemData::GetIconImage(const char * c_szIconFileName)
 {
-	if(m_pIconImage == nullptr && m_strIconFileName.empty() == false)
-		__SetIconImage(m_strIconFileName.c_str());
+	bool reload = false; 
+	if (c_szIconFileName)
+	{
+		if (m_pIconImage != nullptr)
+			reload = m_pIconImage->GetFileName() != c_szIconFileName;
+		__SetIconImage(c_szIconFileName, reload);
+	}
+	else
+	{
+		if (!m_strIconFileName.empty())
+		{
+			if (m_pIconImage != nullptr)
+				reload = m_pIconImage->GetFileName() != m_strIconFileName;
+			__SetIconImage(m_strIconFileName.c_str(), reload);
+		}
+	}
 	return m_pIconImage;
 }
+
 
 uint32_t CItemData::GetLODModelThingCount()
 {
@@ -160,14 +175,14 @@ void CItemData::SetDefaultItemData(const char * c_szIconFileName, const char * c
 	}
 	else
 	{
-		m_strModelFileName = "";
+		m_strModelFileName.clear();
 		m_strDropModelFileName = "d:/ymir work/item/etc/item_bag.gr2";
 	}
 	m_strIconFileName = c_szIconFileName;
 
-	m_strSubModelFileName = "";
-	m_strDescription = "";
-	m_strSummary = "";
+	m_strSubModelFileName.clear();
+	m_strDescription.clear();
+	m_strSummary.clear();
 	memset(m_ItemTable.alSockets, 0, sizeof(m_ItemTable.alSockets));
 
 	__LoadFiles();
@@ -200,11 +215,11 @@ void CItemData::__LoadFiles()
 }
 
 #define ENABLE_LOAD_ALTER_ITEMICON
-void CItemData::__SetIconImage(const char * c_szFileName)
+void CItemData::__SetIconImage(const char * c_szFileName, bool renew)
 {
 	if (!CResourceManager::Instance().IsFileExist(c_szFileName))
 	{
-		TraceError("%s not found. CItemData::__SetIconImage",c_szFileName);
+		TraceError("CItemData::__SetIconImage - %s does not exist",c_szFileName);
 		m_pIconImage = nullptr;
 #ifdef ENABLE_LOAD_ALTER_ITEMICON
 		static const char* c_szAlterIconImage = "icon/item/27995.tga";
@@ -212,7 +227,7 @@ void CItemData::__SetIconImage(const char * c_szFileName)
 			m_pIconImage = (CGraphicSubImage *)CResourceManager::Instance().GetResourcePointer(c_szAlterIconImage);
 #endif
 	}
-	else if (m_pIconImage == nullptr) 
+	else if (m_pIconImage == nullptr || renew)
 		m_pIconImage = (CGraphicSubImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
 }
 
@@ -372,6 +387,16 @@ BOOL CItemData::HasNextGrade() const
 	return 0 != m_ItemTable.dwRefinedVnum;
 }
 
+uint32_t CItemData::GetFlags() const
+{
+	return m_ItemTable.dwFlags;
+}
+
+uint32_t CItemData::GetAntiFlags() const
+{
+	return m_ItemTable.dwAntiFlags;
+}
+
 uint32_t CItemData::GetWearFlags() const
 {
 	return m_ItemTable.dwWearFlags;
@@ -497,7 +522,6 @@ BOOL CItemData::IsEquipment() const
 		case ITEM_TYPE_WEAPON:
 		case ITEM_TYPE_ARMOR:
 			return TRUE;
-			break;
 	}
 
 	return FALSE;
@@ -505,11 +529,11 @@ BOOL CItemData::IsEquipment() const
 
 void CItemData::Clear()
 {
-	m_strSummary = "";
-	m_strModelFileName = "";
-	m_strSubModelFileName = "";
-	m_strDropModelFileName = "";
-	m_strIconFileName = "";
+	m_strSummary.clear();
+	m_strModelFileName.clear();
+	m_strSubModelFileName.clear();
+	m_strDropModelFileName.clear();
+	m_strIconFileName.clear();
 	m_strLODModelFileNameVector.clear();
 
 	m_pModelThing = nullptr;

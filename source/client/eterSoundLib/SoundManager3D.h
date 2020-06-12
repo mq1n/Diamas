@@ -20,7 +20,6 @@ class CSoundManager3D : public CSoundBase
 		bool				Initialize();
 		void				Destroy();
 
-		int32_t					GetEmptyInstanceIndex();
 		int32_t					SetInstance(const char * c_szFileName);
 		ISoundInstance *	GetInstance(uint32_t dwIndex);
 

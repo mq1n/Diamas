@@ -81,6 +81,7 @@ namespace UI
 			CWindow *	RegisterLine(PyObject * po, const char * c_szLayer);
 			CWindow *	RegisterBar3D(PyObject * po, const char * c_szLayer);
 			CWindow *	RegisterNumberLine(PyObject * po, const char * c_szLayer);
+			CWindow *	RegisterRenderTarget(PyObject * po, const char * c_szLayer);
 
 			void		DestroyWindow(CWindow * pWin);
 			void		NotifyDestroyWindow(CWindow * pWindow);

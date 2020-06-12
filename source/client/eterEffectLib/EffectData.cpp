@@ -79,7 +79,7 @@ bool CEffectData::LoadScript(const char * c_szFileName)
 	// Load Sound
 	std::string strPathHeader = "d:/ymir work/";
 	std::string strNoExtensionName = CFileNameHelper::NoExtension(m_strFileName);
-	int32_t iPos = strNoExtensionName.find(strPathHeader.c_str());
+	int32_t iPos = strNoExtensionName.find(strPathHeader);
 	if (iPos >= 0)
 	if (strNoExtensionName.size() > strPathHeader.size())
 	{

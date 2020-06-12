@@ -14,4 +14,3 @@
 #include <math.h>
 
 #include "../eterBase/StdAfx.h"
-#include "../eterXClient/Locale_inc.h"

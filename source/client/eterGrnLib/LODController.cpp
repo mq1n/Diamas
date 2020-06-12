@@ -1,7 +1,5 @@
 #include "StdAfx.h"
 #include "LODController.h"
-#include <cstdint>
-#include <algorithm>
 
 static float LODHEIGHT_ACTOR		=	500.0f;
 static float LODDISTANCE_ACTOR		=	5000.0f;
@@ -168,7 +166,7 @@ void CGrannyLODController::SetMaterialData(const char* c_szImageName, const SMat
 	}
 }
 
-void CGrannyLODController::SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower)
+void CGrannyLODController::SetSpecularInfo(const char* c_szMtrlName, bool bEnable, float fPower)
 {
 	std::deque<CGrannyModelInstance *>::iterator i;
 	for (i=m_que_pkModelInst.begin(); i!=m_que_pkModelInst.end(); ++i)
@@ -179,11 +177,11 @@ void CGrannyLODController::SetSpecularInfo(const char* c_szMtrlName, BOOL bEnabl
 }
 
 CGrannyLODController::CGrannyLODController() : 
-	m_pCurrentModelInstance(nullptr),
-	m_bLODLevel(0),
-	m_pAttachedParentModel(nullptr),
 	m_fLODDistance(0.0f),
 	m_dwLODAniFPS(CGrannyModelInstance::ANIFPS_MAX),
+	m_pAttachedParentModel(nullptr),
+	m_bLODLevel(0),
+	m_pCurrentModelInstance(nullptr),
 	m_pkSharedDeformableVertexBuffer(nullptr)
 	/////////////////////////////////////////////////////
 {

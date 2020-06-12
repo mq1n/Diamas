@@ -4,6 +4,54 @@
 #include "ThingInstance.h"
 #include <FileSystemIncl.hpp>
 
+namespace
+{
+
+struct my_file_info
+{
+	granny_uint32 Sentinel;
+	granny_file_info* FileInfo;
+};
+
+// Explicitly declare them as uint32s here to avoid compiler warnings
+// due to |GrannyFirstGRNStandardTag| being converted to signed int32_t.
+const granny_uint32 kGrnCurrent = GrannyCurrentGRNStandardTag;
+const granny_uint32 kGrnStart = GrannyFirstGRNStandardTag;
+
+// (current - first) gives us the current "revision", which is necessary,
+// since our tag needs to change when the underlying GrannyFileInfoType
+// changes.
+const granny_uint32 kCurrentTag = kGrnCurrent - kGrnStart + 0x70000000;
+
+const granny_uint32 kSentinel = 0xdeadbeef;
+
+granny_data_type_definition MyFileInfoType[] =
+{
+	{ GrannyUInt32Member, "Sentinel" },
+	{ GrannyReferenceMember, "FileInfo", GrannyFileInfoType },
+	{ GrannyEndMember }
+};
+
+my_file_info* GetMyFileInfo(granny_file* File)
+{
+	granny_variant Root;
+	GrannyGetDataTreeFromFile(File, &Root);
+
+	if (File->Header->TypeTag == kCurrentTag) {
+		return (my_file_info*)Root.Object;
+	} else {
+		if (File->ConversionBuffer == nullptr) {
+			// Log Warning about conversion operation
+			File->ConversionBuffer =
+				GrannyConvertTree(Root.Type, Root.Object, MyFileInfoType, nullptr, nullptr);
+		}
+
+		return (my_file_info*)File->ConversionBuffer;
+	}
+}
+
+}
+
 CGraphicThing::CGraphicThing(const char* c_szFileName) : CResource(c_szFileName)
 {
 	Initialize();	
@@ -27,11 +75,8 @@ void CGraphicThing::Initialize()
 
 void CGraphicThing::OnClear()
 {
-	if (m_motions)
-		delete [] m_motions;
-
-	if (m_models)
-		delete [] m_models;
+	delete [] m_motions;
+	delete [] m_models;
 
 	if (m_pgrnFile)
 		GrannyFreeFile(m_pgrnFile);
@@ -206,11 +251,33 @@ bool CGraphicThing::OnLoad(int32_t iSize, const void * c_pvBuf)
 	decryptedBufer.clear();
 #endif
 
-    m_pgrnFileInfo = GrannyGetFileInfo(m_pgrnFile);
-	if (!m_pgrnFileInfo)
-	{
-		DEBUG_LOG(LL_ERR, "Granny read file info fail!");
+	auto info = GetMyFileInfo(m_pgrnFile);
+	if (!info)
 		return false;
+
+	// Converting a standard .gr2 file to our wrapper type should
+	// result in a zero sentinel, which is invalid.
+	if (!info->FileInfo || info->Sentinel != kSentinel) {
+#if !defined(_DEBUG) && !defined(WORLD_EDITOR)
+		// We do not support standard gr2 files in client release builds
+		return false;
+#else
+		// If the gr2 file's format is old, we need to convert again. Since
+		// we can hold only one conversion buffer
+		// (and GrannyGetFileInfo just gives us the already existing buffer back if one already exists),
+		// we need to free our current buffer here.
+		if (m_pgrnFile->ConversionBuffer) {
+			GrannyFreeBuilderResult(m_pgrnFile->ConversionBuffer);
+			m_pgrnFile->ConversionBuffer = nullptr;
+		}
+
+		m_pgrnFileInfo = GrannyGetFileInfo(m_pgrnFile);
+		if (!m_pgrnFileInfo)
+			return false;
+#endif
+	}
+	else {
+		m_pgrnFileInfo = info->FileInfo;
 	}
 
 	LoadModels();

@@ -22,7 +22,7 @@ class CFileLoaderThread
 		CFileLoaderThread();
 		~CFileLoaderThread();
 
-		int32_t Create(void * arg);
+		bool Create(void * arg);
 	
 	public:
 		void	Request(std::string & c_rstFileName);

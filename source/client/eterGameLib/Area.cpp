@@ -401,8 +401,6 @@ void CArea::Refresh()
 			{
 				m_TreeCloneInstaceVector.push_back(pObjectInstance->pTree);
 
-				const float * pfPosition;
-				pfPosition = pObjectInstance->pTree->GetPosition();
 				pObjectInstance->pTree->UpdateBoundingSphere();
 				pObjectInstance->pTree->UpdateCollisionData();
 			}
@@ -629,7 +627,7 @@ void CArea::__SetObjectInstance_SetBuilding(TObjectInstance * pObjectInstance, c
 		char szLODModelFileNameEnd[256];
 		for (uint32_t uLODIndex=1; uLODIndex<=3; ++uLODIndex)
 		{
-			sprintf(szLODModelFileNameEnd, "_lod_%.2d.gr2", uLODIndex);
+			sprintf_s(szLODModelFileNameEnd, "_lod_%.2d.gr2", uLODIndex);
 			stLODModelFileName = CFileNameHelper::NoExtension(stSrcModelFileName) + szLODModelFileNameEnd;
 			if (!rkResMgr.IsFileExist(stLODModelFileName.c_str()))
 				break;
@@ -730,8 +728,8 @@ void CArea::__LoadAttribute(TObjectInstance * pObjectInstance, const char * c_sz
 	if (false == bFileExist)
 	{
 		std::string attrFileName(c_szAttributeFileName);
-		std::transform(attrFileName.begin(), attrFileName.end(), attrFileName.begin(), tolower);
-
+		stl_lowers(attrFileName);
+		
 		const bool bIsDungeonObject = (std::string::npos != attrFileName.find("/dungeon/")) || (std::string::npos != attrFileName.find("\\dungeon\\"));
 
 		// NOTE: dungeon 오브젝트는 Dummy Collision을 자동으로 생성하지 않도록 함 (던전의 경우 더미 컬리전때문에 문제가 된 경우가 수차례 있었음. 이렇게 하기로 그래픽 팀과 협의 완료)
@@ -919,17 +917,17 @@ bool CArea::__Load_LoadObject(const char * c_szFileName)
 
 	for (uint32_t i = 0; i < dwCount; ++i)
 	{
-		_snprintf(szObjectName, sizeof(szObjectName), "object%03d", i);
+		_snprintf_s(szObjectName, sizeof(szObjectName), "object%03u", i);
 
 		if (stTokenVectorMap.end() == stTokenVectorMap.find(szObjectName))
 			continue;
 
 		const CTokenVector & rVector = stTokenVectorMap[szObjectName];
 
-		const std::string & c_rstrxPosition = rVector[0].c_str();
-		const std::string & c_rstryPosition = rVector[1].c_str();
-		const std::string & c_rstrzPosition = rVector[2].c_str();
-		const std::string & c_rstrCRC = rVector[3].c_str();
+		const std::string & c_rstrxPosition = rVector[0];
+		const std::string & c_rstryPosition = rVector[1];
+		const std::string & c_rstrzPosition = rVector[2];
+		const std::string & c_rstrCRC = rVector[3];
 
 		TObjectData ObjectData;
 		ZeroMemory(&ObjectData, sizeof(ObjectData));
@@ -1017,18 +1015,18 @@ bool CArea::__Load_LoadAmbience(const char * c_szFileName)
 
 	for (uint32_t i = 0; i < dwCount; ++i)
 	{
-		_snprintf(szObjectName, sizeof(szObjectName), "object%03d", i);
+		_snprintf_s(szObjectName, sizeof(szObjectName), "object%03u", i);
 
 		if (stTokenVectorMap.end() == stTokenVectorMap.find(szObjectName))
 			continue;
 
 		const CTokenVector & rVector = stTokenVectorMap[szObjectName];
 
-		const std::string & c_rstrxPosition = rVector[0].c_str();
-		const std::string & c_rstryPosition = rVector[1].c_str();
-		const std::string & c_rstrzPosition = rVector[2].c_str();
-		const std::string & c_rstrCRC = rVector[3].c_str();
-		const std::string & c_rstrRange = rVector[4].c_str();
+		const std::string & c_rstrxPosition = rVector[0];
+		const std::string & c_rstryPosition = rVector[1];
+		const std::string & c_rstrzPosition = rVector[2];
+		const std::string & c_rstrCRC = rVector[3];
+		const std::string & c_rstrRange = rVector[4];
 
 		TObjectData ObjectData;
 		ZeroMemory(&ObjectData, sizeof(ObjectData));
@@ -1045,7 +1043,7 @@ bool CArea::__Load_LoadAmbience(const char * c_szFileName)
 
 		if (rVector.size() >= 6)
 		{
-			const std::string & c_rstrPercentage = rVector[5].c_str();
+			const std::string & c_rstrPercentage = rVector[5];
 			ObjectData.fMaxVolumeAreaPercentage = atof(c_rstrPercentage.c_str());
 		}
 
@@ -1292,7 +1290,7 @@ void CArea::SetMapOutDoor(CMapOutdoor * pOwnerOutdoorMap)
 	m_pOwnerOutdoorMap=pOwnerOutdoorMap;
 }
 
-CArea::CArea()
+CArea::CArea(): m_pOwnerOutdoorMap(nullptr), m_bPortalEnable(0)
 {
 	m_wX = m_wY = 0xFF;
 }
@@ -1436,7 +1434,7 @@ bool CArea::SAmbienceInstance::Picking()
 	return CGraphicCollisionObject::IntersectSphere(D3DXVECTOR3(fx, fy, fz), dwRange);
 }
 
-CArea::SAmbienceInstance::SAmbienceInstance()
+CArea::SAmbienceInstance::SAmbienceInstance(): fMaxVolumeAreaPercentage(0), Update(nullptr)
 {
 	fx = 0.0f;
 	fy = 0.0f;

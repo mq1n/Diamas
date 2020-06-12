@@ -279,8 +279,8 @@ PyObject * backgroundGetRenderedSplatNum(PyObject * poSelf, PyObject * poArgs)
 
 	char szOutput[MAX_PATH] = "";
 	int32_t iOutput = 0;
-	for( std::vector<int32_t>::iterator it = aTextureNumVector.begin(); it != aTextureNumVector.end(); it++ ) {
-		iOutput += snprintf(szOutput + iOutput, sizeof(szOutput) - iOutput, "%d ", *it);
+	for( std::vector<int32_t>::iterator it = aTextureNumVector.begin(); it != aTextureNumVector.end(); ++it ) {
+		iOutput += _snprintf_s(szOutput + iOutput, sizeof(szOutput) - iOutput, sizeof(szOutput) - iOutput, "%d ", *it);
 	}
 	//std::copy(aTextureNumVector.begin(),aTextureNumVector.end(),std::ostream_iterator<int32_t>(ostr," "));
 

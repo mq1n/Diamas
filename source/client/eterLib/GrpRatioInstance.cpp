@@ -4,8 +4,7 @@
 
 CGraphicRatioInstance::CGraphicRatioInstance()
 {
-	m_baseTime = 0;
-	m_blendTime = 0;
+	Clear();
 }
 
 CGraphicRatioInstance::~CGraphicRatioInstance()
@@ -24,9 +23,7 @@ void CGraphicRatioInstance::Clear()
 
 void CGraphicRatioInstance::SetRatioReference(const float& c_rRatio)
 {
-	m_curRatio = c_rRatio;	
-	m_srcRatio = m_curRatio;
-	m_dstRatio = m_curRatio;
+	m_curRatio =  m_srcRatio = m_dstRatio = c_rRatio;	
 }
 
 void CGraphicRatioInstance::BlendRatioReference(uint32_t blendTime, const float& c_rDstRatio)

@@ -743,7 +743,7 @@ class CItemData
 		CGraphicThing * GetModelThing();
 		CGraphicThing * GetSubModelThing();
 		CGraphicThing * GetDropModelThing();
-		CGraphicSubImage * GetIconImage();
+		CGraphicSubImage * GetIconImage(const char * c_szIconFileName = nullptr);
 
 		uint32_t GetLODModelThingCount();
 		BOOL GetLODModelThingPointer(uint32_t dwIndex, CGraphicThing ** ppModelThing);
@@ -768,6 +768,9 @@ class CItemData
 		BOOL IsFlag(uint32_t dwFlag) const;
 		BOOL IsWearableFlag(uint32_t dwFlag) const;
 		BOOL HasNextGrade() const;
+
+		uint32_t GetFlags() const;
+		uint32_t GetAntiFlags() const;
 		uint32_t GetWearFlags() const;
 		uint32_t GetIBuyItemPrice() const;
 		uint32_t GetISellItemPrice() const;
@@ -798,9 +801,10 @@ class CItemData
 		bool GetItemScale(uint32_t dwPos, float & fScaleX, float & fScaleY, float & fScaleZ, float & fPositionX, float & fPositionY, float & fPositionZ);
 #endif
 
+		bool IsStackable() const { return IsFlag(ITEM_FLAG_STACKABLE) && !IsAntiFlag(ITEM_ANTIFLAG_STACK); }
 	protected:
 		void __LoadFiles();
-		void __SetIconImage(const char * c_szFileName);
+		void __SetIconImage(const char * c_szFileName, bool renew = false);
 
 	protected:
 		std::string m_strModelFileName;

@@ -196,7 +196,6 @@ BOOL CEffectMesh::__LoadData_Ver002(int32_t iSize, const uint8_t * c_pbBuf)
 			if (FileSystemManager::Instance().OpenFile(pMeshData->szDiffuseMapFileName, File))
 			{
 				CMemoryTextFileLoader textFileLoader;
-				std::vector<std::string> stTokenVector;
 
 				textFileLoader.Bind(File.GetSize(), File.GetData());
 
@@ -339,7 +338,6 @@ BOOL CEffectMesh::__LoadData_Ver001(int32_t iSize, const uint8_t * c_pbBuf)
 			if (FileSystemManager::Instance().OpenFile(pMeshData->szDiffuseMapFileName, File))
 			{
 				CMemoryTextFileLoader textFileLoader;
-				std::vector<std::string> stTokenVector;
 
 				textFileLoader.Bind(File.GetSize(), File.GetData());
 
@@ -513,14 +511,14 @@ BOOL CEffectMeshScript::isBlendingEnable(uint32_t dwMeshIndex)
 uint8_t CEffectMeshScript::GetBlendingSrcType(uint32_t dwMeshIndex)
 {
 	if (!CheckMeshIndex(dwMeshIndex))
-		return false;
+		return 0;
 
 	return m_MeshDataVector[dwMeshIndex].byBlendingSrcType;
 }
 uint8_t CEffectMeshScript::GetBlendingDestType(uint32_t dwMeshIndex)
 {
 	if (!CheckMeshIndex(dwMeshIndex))
-		return false;
+		return 0;
 
 	return m_MeshDataVector[dwMeshIndex].byBlendingDestType;
 }
@@ -684,7 +682,7 @@ void CEffectMeshScript::OnClear()
 	m_fMeshAnimationFrameDelay = 0.02f;
 
 	m_MeshDataVector.clear();
-	m_strMeshFileName = "";
+	m_strMeshFileName.clear();
 }
 
 CEffectMeshScript::CEffectMeshScript()

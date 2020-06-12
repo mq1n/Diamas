@@ -50,7 +50,7 @@ void Environment_Init(SEnvironmentData& envData)
 	envData.fCloudHeight = 30000.0f;
 	envData.v2CloudTextureScale = D3DXVECTOR2(4.0f, 4.0f);
 	envData.v2CloudSpeed = D3DXVECTOR2(0.001f, 0.001f);
-	envData.strCloudTextureFileName = "";
+	envData.strCloudTextureFileName.clear();
 	envData.CloudGradientColor.m_FirstColor = .0f;
 	envData.CloudGradientColor.m_SecondColor = .0f;
 
@@ -61,7 +61,7 @@ void Environment_Init(SEnvironmentData& envData)
 	envData.fLensFlareMaxBrightness = 1.0f;
 
 	envData.bMainFlareEnable = FALSE;
-	envData.strMainFlareTextureFileName = "";
+	envData.strMainFlareTextureFileName.clear();
 	envData.fMainFlareSize = 0.2f;
 
 	envData.bReserve = FALSE;
@@ -215,7 +215,7 @@ float GetLinearInterpolation(float begin, float end, float curRate)
 	return (end - begin) * curRate + begin;
 }
 
-void PixelPositionToAttributeCellPosition(TPixelPosition PixelPosition, TCellPosition * pAttrCellPosition)
+void PixelPositionToAttributeCellPosition(const TPixelPosition &PixelPosition, TCellPosition * pAttrCellPosition)
 {
 	pAttrCellPosition->x = PixelPosition.x / c_Section_xAttributeCellSize;
 	pAttrCellPosition->y = PixelPosition.y / c_Section_yAttributeCellSize;

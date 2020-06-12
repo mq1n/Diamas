@@ -80,7 +80,7 @@ bool CActorInstance::SetRace(uint32_t eRace)
 	CGraphicThingInstance::Clear();
 
 	//NOTE : PC만 Part별로 다 생성하게 해준다.
-	if( IsPC())
+	if (IsPC() || (IsNPC() && GetRace() < 10))
 	{
 		CGraphicThingInstance::ReserveModelThing(CRaceData::PART_MAX_NUM);
 		CGraphicThingInstance::ReserveModelInstance(CRaceData::PART_MAX_NUM);
@@ -199,7 +199,7 @@ void CActorInstance::SetShape(uint32_t eShape, float fSpecular)
 			char szLODModelFileNameEnd[256];
 			for (uint32_t uLODIndex=1; uLODIndex<=3; ++uLODIndex)
 			{
-				sprintf(szLODModelFileNameEnd, "_lod_%.2d.gr2", uLODIndex);
+				sprintf_s(szLODModelFileNameEnd, "_lod_%.2d.gr2", uLODIndex);
 				stLODModelFileName = CFileNameHelper::NoExtension(pkShape->m_stModelFileName) + szLODModelFileNameEnd;
 				if (!rkResMgr.IsFileExist(stLODModelFileName.c_str()))
 					break;
@@ -312,8 +312,7 @@ void CActorInstance::ChangeMaterial(const char * c_szFileName)
 	std::vector<CRaceData::SSkin>::const_iterator i = c_rkVct_kSkin.begin();
 	const CRaceData::SSkin& c_rkSkinItem = *i;
 
-	std::string dstFileName = "d:/ymir work/npc/guild_symbol/guild_symbol.dds";
-	dstFileName = c_szFileName;
+	std::string dstFileName = c_szFileName;
 
 	CResource * pkRes = CResourceManager::Instance().GetResourcePointer(dstFileName.c_str());
 	if (!pkRes)
@@ -363,7 +362,7 @@ uint32_t CActorInstance::GetPartItemID(uint32_t dwPartIndex)
 	return m_adwPartItemID[dwPartIndex];
 }
 
-void CActorInstance::SetSpecularInfo(BOOL bEnable, int32_t iPart, float fAlpha)
+void CActorInstance::SetSpecularInfo(bool bEnable, int32_t iPart, float fAlpha)
 {
 	CRaceData * pkRaceData;
 	if (!CRaceManager::Instance().GetRaceDataPointer(m_eRace, &pkRaceData))
@@ -379,7 +378,7 @@ void CActorInstance::SetSpecularInfo(BOOL bEnable, int32_t iPart, float fAlpha)
 	CGraphicThingInstance::SetSpecularInfo(iPart, filename.c_str(), bEnable, fAlpha);
 }
 
-void CActorInstance::SetSpecularInfoForce(BOOL bEnable, int32_t iPart, float fAlpha)
+void CActorInstance::SetSpecularInfoForce(bool bEnable, int32_t iPart, float fAlpha)
 {
 	CGraphicThingInstance::SetSpecularInfo(iPart, nullptr, bEnable, fAlpha);
 }

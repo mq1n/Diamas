@@ -99,7 +99,6 @@ class CTerrainImpl
 		void					Initialize();
 		virtual void			Clear();
 		
-		void					LoadTextures();
 		bool					LoadHeightMap(const char *c_szFileName);
 		bool					RAW_LoadTileMap(const char * c_szFileName);
 		bool					LoadAttrMap(const char *c_pszFileName);

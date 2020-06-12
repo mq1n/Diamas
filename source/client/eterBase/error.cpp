@@ -40,9 +40,9 @@ bool SetEterExceptionHandler()
 	// Provide privacy policy URL
 	info.pszPrivacyPolicyURL = _T("http://diamas.to/err_privacy.html");
 
-	info.uPriorities[CR_HTTP] = 3; // First try send report over HTTP
+	info.uPriorities[CR_HTTP] = 1; // First try send report over HTTP
 	info.uPriorities[CR_SMTP] = 2; // Second try send report over SMTP
-	info.uPriorities[CR_SMAPI] = 1; // Third try send report over Simple MAPI
+	info.uPriorities[CR_SMAPI] = 3; // Third try send report over Simple MAPI
 
 	auto nResult = crInstall(&info);
 	if (nResult != 0)

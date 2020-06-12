@@ -374,16 +374,18 @@ void CGraphicBase::SetViewport(uint32_t dwX, uint32_t dwY, uint32_t dwWidth, uin
 
 void CGraphicBase::GetTargetPosition(float * px, float * py, float * pz)
 {
-	*px = CCameraManager::Instance().GetCurrentCamera()->GetTarget().x;
-	*py = CCameraManager::Instance().GetCurrentCamera()->GetTarget().y;
-	*pz = CCameraManager::Instance().GetCurrentCamera()->GetTarget().z;
+	const D3DXVECTOR3& camTarget = CCameraManager::Instance().GetCurrentCamera()->GetTarget();
+	*px = camTarget.x;
+	*py = camTarget.y;
+	*pz = camTarget.z;
 }
 
 void CGraphicBase::GetCameraPosition(float * px, float * py, float * pz)
 {
-	*px = CCameraManager::Instance().GetCurrentCamera()->GetEye().x;
-	*py = CCameraManager::Instance().GetCurrentCamera()->GetEye().y;
-	*pz = CCameraManager::Instance().GetCurrentCamera()->GetEye().z;
+	const D3DXVECTOR3& camEye = CCameraManager::Instance().GetCurrentCamera()->GetEye();
+	*px = camEye.x;
+	*py = camEye.y;
+	*pz = camEye.z;
 }
 
 void CGraphicBase::GetMatrix(D3DXMATRIX* pRetMatrix) const
@@ -414,6 +416,21 @@ void CGraphicBase::GetSphereMatrix(D3DXMATRIX * pMatrix, float fValue)
 float CGraphicBase::GetFOV()
 {
 	return ms_fFieldOfView;
+}
+
+float CGraphicBase::GetAspect()
+{
+	return ms_fAspect;
+}
+
+float CGraphicBase::GetNear()
+{
+	return ms_fNearY;
+}
+
+float CGraphicBase::GetFar()
+{
+	return ms_fFarY;
 }
 
 void CGraphicBase::PushMatrix()

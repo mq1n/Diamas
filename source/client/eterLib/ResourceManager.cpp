@@ -214,7 +214,7 @@ int32_t __ConvertPathName(const char * c_szPathName, char * pszRetPathName, int3
 		if (*pc == '/')
 			*(pszRetPathName++) = '\\';
 		else
-			*(pszRetPathName++) = (char) korean_tolower(*pc);
+			*(pszRetPathName++) = (char) ascii_tolower(*pc);
 	}
 
 	*pszRetPathName = '\0';
@@ -352,7 +352,7 @@ uint32_t CResourceManager::__GetFileCRC(const char * c_szFileName, const char **
 		if (src[len]=='/')
 			dst[len] = '\\';
 		else
-			dst[len] = (char) korean_tolower(src[len]);
+			dst[len] = (char)ascii_tolower(src[len]);
 
 		++len;
 	}

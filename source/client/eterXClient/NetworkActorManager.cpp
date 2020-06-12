@@ -122,7 +122,7 @@ SNetworkActorData::SNetworkActorData()
 	m_byPKMode=0;
 	m_dwMountVnum=0;
 
-	m_stName="";
+	m_stName.clear();
 
 	m_kAffectFlags.Clear();
 }
@@ -131,6 +131,8 @@ SNetworkActorData::SNetworkActorData()
 
 CNetworkActorManager::CNetworkActorManager()
 {
+	m_lMainPosX = 0;
+	m_lMainPosY = 0;
 	m_dwMainVID=0;
 }
 
