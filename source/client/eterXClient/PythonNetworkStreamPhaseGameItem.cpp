@@ -23,7 +23,7 @@ bool CPythonNetworkStream::SendSafeBoxMoneyPacket(uint8_t byState, uint32_t dwMo
 //	if (!Send(sizeof(kSafeboxMoney), &kSafeboxMoney))
 //		return false;
 //
-//	return SendSequence();
+//	return true
 }
 
 bool CPythonNetworkStream::SendSafeBoxCheckinPacket(TItemPos InventoryPos, uint8_t bySafeBoxPos)
@@ -37,7 +37,7 @@ bool CPythonNetworkStream::SendSafeBoxCheckinPacket(TItemPos InventoryPos, uint8
 	if (!Send(sizeof(kSafeboxCheckin), &kSafeboxCheckin))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendSafeBoxCheckoutPacket(uint8_t bySafeBoxPos, TItemPos InventoryPos)
@@ -51,7 +51,7 @@ bool CPythonNetworkStream::SendSafeBoxCheckoutPacket(uint8_t bySafeBoxPos, TItem
 	if (!Send(sizeof(kSafeboxCheckout), &kSafeboxCheckout))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendSafeBoxItemMovePacket(uint8_t bySourcePos, uint8_t byTargetPos, uint8_t byCount)
@@ -66,7 +66,7 @@ bool CPythonNetworkStream::SendSafeBoxItemMovePacket(uint8_t bySourcePos, uint8_
 	if (!Send(sizeof(kItemMove), &kItemMove))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvSafeBoxSetPacket()
@@ -157,7 +157,7 @@ bool CPythonNetworkStream::SendMallCheckoutPacket(uint8_t byMallPos, TItemPos In
 	if (!Send(sizeof(kMallCheckoutPacket), &kMallCheckoutPacket))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvMallOpenPacket()
@@ -395,7 +395,7 @@ bool CPythonNetworkStream::SendShopEndPacket()
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendShopBuyPacket(uint8_t bPos)
@@ -426,7 +426,7 @@ bool CPythonNetworkStream::SendShopBuyPacket(uint8_t bPos)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendShopSellPacket(uint8_t bySlot)
@@ -449,7 +449,7 @@ bool CPythonNetworkStream::SendShopSellPacket(uint8_t bySlot)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendShopSellPacketNew(uint8_t bySlot, uint8_t byCount)
@@ -479,7 +479,7 @@ bool CPythonNetworkStream::SendShopSellPacketNew(uint8_t bySlot, uint8_t byCount
 
 	Tracef(" SendShopSellPacketNew(bySlot=%d, byCount=%d)\n", bySlot, byCount);
 
-	return SendSequence();
+	return true
 }
 
 // Send
@@ -518,7 +518,7 @@ bool CPythonNetworkStream::SendItemUsePacket(TItemPos pos)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendItemUseToItemPacket(TItemPos source_pos, TItemPos target_pos)
@@ -541,7 +541,7 @@ bool CPythonNetworkStream::SendItemUseToItemPacket(TItemPos source_pos, TItemPos
 	Tracef(" << SendItemUseToItemPacket(src=%d, dst=%d)\n", source_pos, target_pos);
 #endif
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendItemDropPacket(TItemPos pos, uint32_t elk)
@@ -560,7 +560,7 @@ bool CPythonNetworkStream::SendItemDropPacket(TItemPos pos, uint32_t elk)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendItemDropPacketNew(TItemPos pos, uint32_t elk, uint32_t count)
@@ -580,7 +580,7 @@ bool CPythonNetworkStream::SendItemDropPacketNew(TItemPos pos, uint32_t elk, uin
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::__IsEquipItemInSlot(TItemPos uSlotPos)
@@ -683,7 +683,7 @@ bool CPythonNetworkStream::SendItemMovePacket(TItemPos pos, TItemPos change_pos,
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendItemPickUpPacket(uint32_t vid)
@@ -701,7 +701,7 @@ bool CPythonNetworkStream::SendItemPickUpPacket(uint32_t vid)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 
@@ -723,7 +723,7 @@ bool CPythonNetworkStream::SendQuickSlotAddPacket(uint8_t wpos, uint8_t type, ui
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendQuickSlotDelPacket(uint8_t pos)
@@ -742,7 +742,7 @@ bool CPythonNetworkStream::SendQuickSlotDelPacket(uint8_t pos)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendQuickSlotMovePacket(uint8_t pos, uint8_t change_pos)
@@ -762,7 +762,7 @@ bool CPythonNetworkStream::SendQuickSlotMovePacket(uint8_t pos, uint8_t change_p
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvSpecialEffect()

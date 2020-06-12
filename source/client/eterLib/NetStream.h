@@ -49,9 +49,6 @@ class CNetworkStream
 
 		bool IsOnline();
 
-		void SetPacketSequenceMode(bool isOn);
-		bool SendSequence();
-
 	protected:			
 		virtual void OnConnectSuccess();				
 		virtual void OnConnectFailure();
@@ -107,11 +104,4 @@ class CNetworkStream
 		SOCKET	m_sock;
 
 		CNetworkAddress m_addr;
-
-#ifdef ENABLE_SEQUENCE_SYSTEM
-		// Sequence
-		uint32_t					m_iSequence;
-		bool					m_bUseSequence;
-		std::vector<uint8_t>		m_kVec_bSequenceTable;
-#endif
 };

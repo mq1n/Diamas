@@ -1048,7 +1048,7 @@ bool CPythonNetworkStream::SendMessengerAddByVIDPacket(uint32_t vid)
 		return false;
 	if (!Send(sizeof(vid), &vid))
 		return false;
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendHackNotification(const char* c_szMsg, const char* c_szInfo)
@@ -1079,7 +1079,7 @@ bool CPythonNetworkStream::SendMessengerAddByNamePacket(const char * c_szName)
 	if (!Send(sizeof(szName), &szName))
 		return false;
 	Tracef(" SendMessengerAddByNamePacket : %s\n", c_szName);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendMessengerRemovePacket(const char * c_szKey, const char * c_szName)
@@ -1094,7 +1094,7 @@ bool CPythonNetworkStream::SendMessengerRemovePacket(const char * c_szKey, const
 	if (!Send(sizeof(szKey), &szKey))
 		return false;
 	__RefreshTargetBoardByName(c_szName);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendCharacterStatePacket(const TPixelPosition& c_rkPPosDst, float fDstRot, uint32_t eFunc, uint32_t uArg)
@@ -1132,7 +1132,7 @@ bool CPythonNetworkStream::SendCharacterStatePacket(const TPixelPosition& c_rkPP
 			kStatePacket.bArg);
 		return false;
 	}
-	return SendSequence();
+	return true
 }
 
 // NOTE : SlotIndex는 임시
@@ -1148,7 +1148,7 @@ bool CPythonNetworkStream::SendUseSkillPacket(uint32_t dwSkillIndex, uint32_t dw
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendChatPacket(const char * c_szChat, uint8_t byType)
@@ -1187,7 +1187,7 @@ bool CPythonNetworkStream::SendChatPacket(const char * c_szChat, uint8_t byType)
 	if (!Send(iTextLen, c_szChat))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1392,7 +1392,7 @@ bool CPythonNetworkStream::SendWhisperPacket(const char * name, const char * c_s
 	if (!Send(iTextLen, c_szChat))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvPointChange()
@@ -1539,7 +1539,7 @@ bool CPythonNetworkStream::SendCharacterPositionPacket(uint8_t iPosition)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendOnClickPacket(uint32_t vid)
@@ -1555,7 +1555,7 @@ bool CPythonNetworkStream::SendOnClickPacket(uint32_t vid)
 	}
 
 	Tracef("SendOnClickPacket\n");
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvCharacterPositionPacket()
@@ -2007,7 +2007,7 @@ bool CPythonNetworkStream::SendExchangeStartPacket(uint32_t vid)
 	}
 
 	Tracef("send_trade_start_packet   vid %d \n", vid);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendExchangeElkAddPacket(uint32_t elk)
@@ -2027,7 +2027,7 @@ bool CPythonNetworkStream::SendExchangeElkAddPacket(uint32_t elk)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendExchangeItemAddPacket(TItemPos ItemPos, uint8_t byDisplayPos)
@@ -2048,7 +2048,7 @@ bool CPythonNetworkStream::SendExchangeItemAddPacket(TItemPos ItemPos, uint8_t b
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendExchangeItemDelPacket(uint8_t pos)
@@ -2071,7 +2071,7 @@ bool CPythonNetworkStream::SendExchangeItemDelPacket(uint8_t pos)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendExchangeAcceptPacket()
@@ -2090,7 +2090,7 @@ bool CPythonNetworkStream::SendExchangeAcceptPacket()
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendExchangeExitPacket()
@@ -2109,7 +2109,7 @@ bool CPythonNetworkStream::SendExchangeExitPacket()
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 // PointReset 개임시
@@ -2182,7 +2182,7 @@ bool CPythonNetworkStream::SendScriptAnswerPacket(int32_t iAnswer)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendScriptButtonPacket(uint32_t iIndex)
@@ -2197,7 +2197,7 @@ bool CPythonNetworkStream::SendScriptButtonPacket(uint32_t iIndex)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendAnswerMakeGuildPacket(const char * c_szName)
@@ -2215,7 +2215,7 @@ bool CPythonNetworkStream::SendAnswerMakeGuildPacket(const char * c_szName)
 	}
 
 // 	Tracef(" SendAnswerMakeGuildPacket : %s", c_szName);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendQuestInputStringPacket(const char * c_szString)
@@ -2230,7 +2230,7 @@ bool CPythonNetworkStream::SendQuestInputStringPacket(const char * c_szString)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendQuestConfirmPacket(uint8_t byAnswer, uint32_t dwPID)
@@ -2247,7 +2247,7 @@ bool CPythonNetworkStream::SendQuestConfirmPacket(uint8_t byAnswer, uint32_t dwP
 	}
 
 	Tracenf(" SendQuestConfirmPacket : %d, %d", byAnswer, dwPID);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvSkillCoolTimeEnd()
@@ -2455,7 +2455,7 @@ bool CPythonNetworkStream::SendAttackPacket(uint32_t uMotAttack, uint32_t dwVIDV
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvAddFlyTargetingPacket()
@@ -2546,7 +2546,7 @@ bool CPythonNetworkStream::SendShootPacket(uint32_t uSkill)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendAddFlyTargetingPacket(uint32_t dwTargetVID, const TPixelPosition & kPPosTarget)
@@ -2568,7 +2568,7 @@ bool CPythonNetworkStream::SendAddFlyTargetingPacket(uint32_t dwTargetVID, const
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 
@@ -2591,7 +2591,7 @@ bool CPythonNetworkStream::SendFlyTargetingPacket(uint32_t dwTargetVID, const TP
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvCreateFlyPacket()
@@ -2625,7 +2625,7 @@ bool CPythonNetworkStream::SendTargetPacket(uint32_t dwVID)
 		return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendSyncPositionElementPacket(uint32_t dwVictimVID, uint32_t dwVictimX, uint32_t dwVictimY)
@@ -2722,7 +2722,7 @@ bool CPythonNetworkStream::SendPartyInvitePacket(uint32_t dwVID)
 	}
 
 	Tracef(" << SendPartyInvitePacket : %d\n", dwVID);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendPartyInviteAnswerPacket(uint32_t dwLeaderVID, uint8_t byAnswer)
@@ -2739,7 +2739,7 @@ bool CPythonNetworkStream::SendPartyInviteAnswerPacket(uint32_t dwLeaderVID, uin
 	}
 
 	Tracef(" << SendPartyInviteAnswerPacket : %d, %d\n", dwLeaderVID, byAnswer);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendPartyRemovePacket(uint32_t dwPID)
@@ -2755,7 +2755,7 @@ bool CPythonNetworkStream::SendPartyRemovePacket(uint32_t dwPID)
 	}
 
 	Tracef(" << SendPartyRemovePacket : %d\n", dwPID);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendPartySetStatePacket(uint32_t dwVID, uint8_t byState, uint8_t byFlag)
@@ -2773,7 +2773,7 @@ bool CPythonNetworkStream::SendPartySetStatePacket(uint32_t dwVID, uint8_t bySta
 	}
 
 	Tracef(" << SendPartySetStatePacket : %d, %d, %d\n", dwVID, byState, byFlag);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendPartyUseSkillPacket(uint8_t bySkillIndex, uint32_t dwVID)
@@ -2790,7 +2790,7 @@ bool CPythonNetworkStream::SendPartyUseSkillPacket(uint8_t bySkillIndex, uint32_
 	}
 
 	Tracef(" << SendPartyUseSkillPacket : %d, %d\n", bySkillIndex, dwVID);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendPartyParameterPacket(uint8_t byDistributeMode)
@@ -2806,7 +2806,7 @@ bool CPythonNetworkStream::SendPartyParameterPacket(uint8_t byDistributeMode)
 	}
 
 	Tracef(" << SendPartyParameterPacket : %d\n", byDistributeMode);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvPartyInvite()
@@ -2951,7 +2951,7 @@ bool CPythonNetworkStream::SendGuildAddMemberPacket(uint32_t dwVID)
 		return false;
 
 	Tracef(" SendGuildAddMemberPacket\n", dwVID);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildRemoveMemberPacket(uint32_t dwPID)
@@ -2965,7 +2965,7 @@ bool CPythonNetworkStream::SendGuildRemoveMemberPacket(uint32_t dwPID)
 		return false;
 
 	Tracef(" SendGuildRemoveMemberPacket %d\n", dwPID);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildChangeGradeNamePacket(uint8_t byGradeNumber, const char * c_szName)
@@ -2986,7 +2986,7 @@ bool CPythonNetworkStream::SendGuildChangeGradeNamePacket(uint8_t byGradeNumber,
 		return false;
 
 	Tracef(" SendGuildChangeGradeNamePacket %d, %s\n", byGradeNumber, c_szName);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildChangeGradeAuthorityPacket(uint8_t byGradeNumber, uint8_t byAuthority)
@@ -3002,7 +3002,7 @@ bool CPythonNetworkStream::SendGuildChangeGradeAuthorityPacket(uint8_t byGradeNu
 		return false;
 
 	Tracef(" SendGuildChangeGradeAuthorityPacket %d, %d\n", byGradeNumber, byAuthority);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildOfferPacket(uint32_t dwExperience)
@@ -3016,7 +3016,7 @@ bool CPythonNetworkStream::SendGuildOfferPacket(uint32_t dwExperience)
 		return false;
 
 	Tracef(" SendGuildOfferPacket %d\n", dwExperience);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildPostCommentPacket(const char * c_szMessage)
@@ -3034,7 +3034,7 @@ bool CPythonNetworkStream::SendGuildPostCommentPacket(const char * c_szMessage)
 		return false;
 
 	Tracef(" SendGuildPostCommentPacket %d, %s\n", bySize, c_szMessage);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildDeleteCommentPacket(uint32_t dwIndex)
@@ -3049,7 +3049,7 @@ bool CPythonNetworkStream::SendGuildDeleteCommentPacket(uint32_t dwIndex)
 		return false;
 
 	Tracef(" SendGuildDeleteCommentPacket %d\n", dwIndex);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildRefreshCommentsPacket(uint32_t dwHighestIndex)
@@ -3067,7 +3067,7 @@ bool CPythonNetworkStream::SendGuildRefreshCommentsPacket(uint32_t dwHighestInde
 		return false;
 
 	Tracef(" SendGuildRefreshCommentPacket %d\n", dwHighestIndex);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildChangeMemberGradePacket(uint32_t dwPID, uint8_t byGrade)
@@ -3084,7 +3084,7 @@ bool CPythonNetworkStream::SendGuildChangeMemberGradePacket(uint32_t dwPID, uint
 		return false;
 
 	Tracef(" SendGuildChangeMemberGradePacket %d, %d\n", dwPID, byGrade);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildUseSkillPacket(uint32_t dwSkillID, uint32_t dwTargetVID)
@@ -3101,7 +3101,7 @@ bool CPythonNetworkStream::SendGuildUseSkillPacket(uint32_t dwSkillID, uint32_t 
 		return false;
 
 	Tracef(" SendGuildUseSkillPacket %d, %d\n", dwSkillID, dwTargetVID);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildChangeMemberGeneralPacket(uint32_t dwPID, uint8_t byFlag)
@@ -3118,7 +3118,7 @@ bool CPythonNetworkStream::SendGuildChangeMemberGeneralPacket(uint32_t dwPID, ui
 		return false;
 
 	Tracef(" SendGuildChangeMemberGeneralFlagPacket %d, %d\n", dwPID, byFlag);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildInviteAnswerPacket(uint32_t dwGuildID, uint8_t byAnswer)
@@ -3135,7 +3135,7 @@ bool CPythonNetworkStream::SendGuildInviteAnswerPacket(uint32_t dwGuildID, uint8
 		return false;
 
 	Tracef(" SendGuildInviteAnswerPacket %d, %d\n", dwGuildID, byAnswer);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildChargeGSPPacket(uint32_t dwMoney)
@@ -3150,7 +3150,7 @@ bool CPythonNetworkStream::SendGuildChargeGSPPacket(uint32_t dwMoney)
 		return false;
 
 	Tracef(" SendGuildChargeGSPPacket %d\n", dwMoney);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildDepositMoneyPacket(uint32_t dwMoney)
@@ -3164,7 +3164,7 @@ bool CPythonNetworkStream::SendGuildDepositMoneyPacket(uint32_t dwMoney)
 		return false;
 
 	Tracef(" SendGuildDepositMoneyPacket %d\n", dwMoney);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGuildWithdrawMoneyPacket(uint32_t dwMoney)
@@ -3178,7 +3178,7 @@ bool CPythonNetworkStream::SendGuildWithdrawMoneyPacket(uint32_t dwMoney)
 		return false;
 
 	Tracef(" SendGuildWithdrawMoneyPacket %d\n", dwMoney);
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvGuild()
@@ -3656,7 +3656,7 @@ bool CPythonNetworkStream::SendFishingPacket(int32_t iRotation)
 	if (!Send(sizeof(uint8_t), &byPacketRotation))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendGiveItemPacket(uint32_t dwTargetVID, TItemPos ItemPos, int32_t iItemCount)
@@ -3670,7 +3670,7 @@ bool CPythonNetworkStream::SendGiveItemPacket(uint32_t dwTargetVID, TItemPos Ite
 	if (!Send(sizeof(GiveItemPacket), &GiveItemPacket))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvFishing()
@@ -3798,7 +3798,7 @@ bool CPythonNetworkStream::SendBuildPrivateShopPacket(const char * c_szName, con
 			return false;
 	}
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvShopSignPacket()
@@ -3899,7 +3899,7 @@ bool CPythonNetworkStream::SendRefinePacket(uint8_t byPos, uint8_t byType)
 	if (!Send(sizeof(kRefinePacket), &kRefinePacket))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendSelectItemPacket(uint32_t dwItemPos)
@@ -3911,7 +3911,7 @@ bool CPythonNetworkStream::SendSelectItemPacket(uint32_t dwItemPos)
 	if (!Send(sizeof(kScriptSelectItem), &kScriptSelectItem))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::RecvRefineInformationPacket()
@@ -4359,7 +4359,7 @@ bool CPythonNetworkStream::SendAcceClosePacket()
 	if (!Send(sizeof(sPacket), &sPacket))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendAcceAddPacket(TItemPos tPos, uint8_t bPos)
@@ -4380,7 +4380,7 @@ bool CPythonNetworkStream::SendAcceAddPacket(TItemPos tPos, uint8_t bPos)
 	if (!Send(sizeof(sPacket), &sPacket))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendAcceRemovePacket(uint8_t bPos)
@@ -4405,7 +4405,7 @@ bool CPythonNetworkStream::SendAcceRemovePacket(uint8_t bPos)
 	if (!Send(sizeof(sPacket), &sPacket))
 		return false;
 
-	return SendSequence();
+	return true
 }
 
 bool CPythonNetworkStream::SendAcceRefinePacket()
@@ -4430,6 +4430,6 @@ bool CPythonNetworkStream::SendAcceRefinePacket()
 	if (!Send(sizeof(sPacket), &sPacket))
 		return false;
 
-	return SendSequence();
+	return true
 }
 #endif

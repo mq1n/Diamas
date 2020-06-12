@@ -119,9 +119,6 @@ bool CPythonNetworkStream::RecvHandshakePacket()
 		assert(!"Failed Sending Handshake");
 		return false;
 	}
-
-	SendSequence();
-
 	return true;
 }
 

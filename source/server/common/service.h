@@ -14,7 +14,6 @@
 #define ENABLE_BELT_INVENTORY_EX
 #define ENABLE_CMD_WARP_IN_DUNGEON
 // #define ENABLE_ITEM_ATTR_COSTUME
-// #define ENABLE_SEQUENCE_SYSTEM
 
 enum eCommonDefines {
 	MAP_ALLOW_LIMIT = 32, // 32 default

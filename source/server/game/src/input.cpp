@@ -106,56 +106,6 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int32_t iByt
 			TrafficProfiler::instance().Report(TrafficProfiler::IODIR_INPUT, bHeader, iPacketLen);
 		// END_OF_TRAFFIC_PROFILER
 
-#ifdef ENABLE_SEQUENCE_SYSTEM
-		if (bHeader == HEADER_CG_PONG)
-			sys_log(0, "PONG! %u %u", m_pPacketInfo->IsSequence(bHeader), *(uint8_t *) (c_pData + iPacketLen - sizeof(uint8_t)));
-
-		if (m_pPacketInfo->IsSequence(bHeader))
-		{
-			uint8_t bSeq = lpDesc->GetSequence();
-			uint8_t bSeqReceived = *(uint8_t *) (c_pData + iPacketLen - sizeof(uint8_t));
-
-			if (bSeq != bSeqReceived)
-			{
-				sys_err("SEQUENCE %x mismatch 0x%x != 0x%x header %u", get_pointer(lpDesc), bSeq, bSeqReceived, bHeader);
-
-				LPCHARACTER	ch = lpDesc->GetCharacter();
-
-				char buf[1024];
-				int32_t	offset, len;
-
-				offset = snprintf(buf, sizeof(buf), "SEQUENCE_LOG [%s]-------------\n", ch ? ch->GetName() : "UNKNOWN");
-
-				if (offset < 0 || offset >= (int32_t) sizeof(buf))
-					offset = sizeof(buf) - 1;
-
-				for (size_t i = 0; i < lpDesc->m_seq_vector.size(); ++i)
-				{
-					len = snprintf(buf + offset, sizeof(buf) - offset, "\t[%03d : 0x%x]\n",
-							lpDesc->m_seq_vector[i].hdr,
-							lpDesc->m_seq_vector[i].seq);
-
-					if (len < 0 || len >= (int32_t) sizeof(buf) - offset)
-						offset += (sizeof(buf) - offset) - 1;
-					else
-						offset += len;
-				}
-
-				snprintf(buf + offset, sizeof(buf) - offset, "\t[%03d : 0x%x]\n", bHeader, bSeq);
-				sys_err("%s", buf);
-
-				lpDesc->SetPhase(PHASE_CLOSE);
-				return true;
-			}
-			else
-			{
-				lpDesc->push_seq(bHeader, bSeq);
-				lpDesc->SetNextSequence();
-				//sys_err("SEQUENCE %x match %u next %u header %u", lpDesc, bSeq, lpDesc->GetSequence(), bHeader);
-			}
-		}
-#endif
-
 		c_pData	+= iPacketLen;
 		m_iBufferLeft -= iPacketLen;
 		r_iBytesProceed += iPacketLen;
@@ -221,9 +171,6 @@ void LoginFailure(LPDESC d, const char * c_pszStatus)
 CInputHandshake::CInputHandshake()
 {
 	CPacketInfoCG * pkPacketInfo = M2_NEW CPacketInfoCG;
-#ifdef ENABLE_SEQUENCE_SYSTEM
-	pkPacketInfo->SetSequence(HEADER_CG_PONG, false);
-#endif
 	m_pMainPacketInfo = m_pPacketInfo;
 	BindPacketInfo(pkPacketInfo);
 }

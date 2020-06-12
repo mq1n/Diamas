@@ -16,9 +16,6 @@
 #include "TrafficProfiler.h"
 #include "locale_service.h"
 #include "log.h"
-#ifdef ENABLE_SEQUENCE_SYSTEM
-#include "sequence.h"
-#endif
 
 extern int32_t max_bytes_written;
 extern int32_t current_bytes_written;
@@ -77,10 +74,6 @@ void DESC::Initialize()
 	m_bPong = true;
 	m_bChannelStatusRequested = false;
 
-#ifdef ENABLE_SEQUENCE_SYSTEM
-	m_iCurrentSequence = 0;
-#endif
-
 	m_pkLoginKey = nullptr;
 	m_dwLoginKey = 0;
 
@@ -94,10 +87,6 @@ void DESC::Initialize()
 	m_offtime = 0;
 
 	m_pkDisconnectEvent = nullptr;
-
-#ifdef ENABLE_SEQUENCE_SYSTEM
-	m_seq_vector.clear();
-#endif
 }
 
 void DESC::Destroy()
@@ -157,10 +146,6 @@ void DESC::Destroy()
 		socket_close(m_sock);
 		m_sock = INVALID_SOCKET;
 	}
-
-#ifdef ENABLE_SEQUENCE_SYSTEM
-	m_seq_vector.clear();
-#endif
 }
 
 EVENTFUNC(ping_event)
@@ -876,19 +861,6 @@ bool DESC::IsAdminMode()
 	return m_bAdminMode;
 }
 
-#ifdef ENABLE_SEQUENCE_SYSTEM
-uint8_t DESC::GetSequence()
-{
-	return gc_abSequence[m_iCurrentSequence];
-}
-
-void DESC::SetNextSequence()
-{
-	if (++m_iCurrentSequence == SEQUENCE_MAX_NUM)
-		m_iCurrentSequence = 0;
-}
-#endif
-
 void DESC::SendLoginSuccessPacket()
 {
 	TAccountTable & rTable = GetAccountTable();
@@ -980,19 +952,6 @@ void DESC::SetSecurityKey(const uint32_t * c_pdwKey)
 			m_adwEncryptionKey[0], m_adwEncryptionKey[1], m_adwEncryptionKey[2], m_adwEncryptionKey[3]);
 }
 #endif // _IMPROVED_PACKET_ENCRYPTION_
-
-#ifdef ENABLE_SEQUENCE_SYSTEM
-void DESC::push_seq(uint8_t hdr, uint8_t seq)
-{
-	if (m_seq_vector.size()>=20)
-	{
-		m_seq_vector.erase(m_seq_vector.begin());
-	}
-
-	seq_t info = { hdr, seq };
-	m_seq_vector.push_back(info);
-}
-#endif
 
 uint8_t DESC::GetEmpire()
 {

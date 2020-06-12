@@ -204,9 +204,6 @@ bool CAccountConnector::__AuthState_RecvPhase()
 			return false;
 		}
 
-		if (!SendSequence())
-			return false;
-
 		__AuthState_Set();
 	}
 
@@ -260,10 +257,7 @@ bool CAccountConnector::__AuthState_SendPong()
 	kPacketPong.bHeader = HEADER_CG_PONG;
 	if (!Send(sizeof(kPacketPong), &kPacketPong))
 		return false;
-
-	if (IsSecurityMode())
-		return SendSequence();
-
+		
 	return true;
 }
 
