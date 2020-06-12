@@ -218,7 +218,7 @@ bool CPythonNetworkStream::SendDirectEnterPacket(const char* c_szID, const char*
 		return false;
 	}
 
-	return true
+	return true;
 }
 
 bool CPythonNetworkStream::SendLoginPacket(const char* c_szName, const char* c_szPassword)
@@ -238,7 +238,7 @@ bool CPythonNetworkStream::SendLoginPacket(const char* c_szName, const char* c_s
 		return false;
 	}
 
-	return true
+	return true;
 }
 
 bool CPythonNetworkStream::SendLoginPacketNew(const char * c_szName, const char * c_szPassword)
