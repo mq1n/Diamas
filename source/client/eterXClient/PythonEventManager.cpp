@@ -987,14 +987,11 @@ void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int3
 			int32_t textWidth;
 			int32_t textHeight;
 			rEventSet.pCurrentTextLine->GetTextSize(&textWidth,&textHeight);
-
+			kLine.ixLocal = 0;
+			if (iX_pos != 0)
 			{
-				kLine.ixLocal = 0;
-				if (iX_pos != 0)
-				{
-					kLine.ixLocal += (iX_pos - 20);
-					kLine.ixLocal -= textWidth / 2;
-				}
+				kLine.ixLocal += (iX_pos - 20);
+				kLine.ixLocal -= textWidth / 2;
 			}
 
 			kLine.iyLocal = rEventSet.iyLocal;
@@ -1038,7 +1035,7 @@ void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int3
 	}
 
 	rEventSet.iCurrentLetter = 0;
-	rEventSet.strCurrentLine = "";
+	rEventSet.strCurrentLine.clear();
 }
 
 void CPythonEventManager::RefreshLinePosition(TEventSet * pEventSet)
@@ -1142,7 +1139,7 @@ void CPythonEventManager::SetFontColor(int32_t iIndex, float r, float g, float b
 }
 
 CPythonEventManager::CPythonEventManager()
-	: m_poInterface(0), m_strLeftTimeString("남은 시간 : %d초")
+	: m_isQuestConfirmWait(0), m_poInterface(0), m_strLeftTimeString("남은 시간 : %d초")
 {
 	EventTypeMap["LETTER"]=EVENT_TYPE_LETTER;
 	EventTypeMap["COLOR"]=EVENT_TYPE_COLOR;

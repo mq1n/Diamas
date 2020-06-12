@@ -857,7 +857,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		float			GetMoveMotionSpeed() const;
 		float			GetMoveSpeed() const;
 		void			CalculateMoveDuration();
-		void			SendMovePacket(uint8_t bFunc, uint8_t bArg, uint32_t x, uint32_t y, uint32_t dwDuration, uint32_t dwTime=0, int32_t iRot=-1);
+		void			SendMovePacket(uint8_t bFunc, uint8_t bArg, uint32_t x, uint32_t y, uint32_t dwDuration, uint32_t dwTime=0, float rot = -1.0f);
 		uint32_t			GetCurrentMoveDuration() const	{ return m_dwMoveDuration; }
 		uint32_t			GetWalkStartTime() const	{ return m_dwWalkStartTime; }
 		uint32_t			GetLastMoveTime() const		{ return m_dwLastMoveTime; }

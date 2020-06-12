@@ -6,7 +6,7 @@
 #include "PythonPlayer.h"
 #include "PythonSystem.h"
 #include "PythonCharacterManager.h"
-
+#include "PythonBackground.h"
 #include "../eterEffectLib/EffectManager.h"
 #include "../eterEffectLib/ParticleSystemData.h"
 #include "../eterLib/Camera.h"
@@ -341,6 +341,10 @@ void CInstanceBase::__AttachEmpireEffect(uint32_t eEmpire)
 	if (IsGameMaster())
 		return;
 
+
+	if (CPythonBackground::Instance().IsPrimalMap())
+		return;
+
 	__EffectContainer_AttachEffect(EFFECT_EMPIRE+eEmpire);
 }
 
@@ -537,6 +541,9 @@ bool CInstanceBase::IsPVPInstance(CInstanceBase& rkInstSel)
 	if (GetDuelMode())	//대련 모드일때는 ~_~
 		return true;	
 
+	if (CPythonBackground::Instance().IsPrimalMap() && CPythonBackground::Instance().IsPrimalMapAttackable())
+		return true;
+
 	return __FindPVPKey(dwVIDSrc, dwVIDDst) || __FindGVGKey(dwGuildIDSrc, dwGuildIDDst);
 											//__FindDUELKey(dwVIDSrc, dwVIDDst);
 }
@@ -548,12 +555,13 @@ const D3DXCOLOR& CInstanceBase::GetNameColor()
 
 uint32_t CInstanceBase::GetNameColorIndex()
 {
+	if (IsShop())
+		return NAMECOLOR_SHOP;
+
 	if (IsPC())
 	{
 		if (m_isKiller)
-		{
 			return NAMECOLOR_PK;
-		}
 
 		if (__IsExistMainInstance() && !__IsMainInstance())
 		{			
@@ -565,6 +573,9 @@ uint32_t CInstanceBase::GetNameColorIndex()
 			}
 			uint32_t dwVIDMain=pkInstMain->GetVirtualID();
 			uint32_t dwVIDSelf=GetVirtualID();
+
+			if (CPythonBackground::Instance().IsPrimalMap() && CPythonBackground::Instance().IsPrimalMapAttackable())
+				return NAMECOLOR_PVP;
 
 			if (pkInstMain->GetDuelMode())
 			{
@@ -583,27 +594,15 @@ uint32_t CInstanceBase::GetNameColorIndex()
 			if (pkInstMain->IsSameEmpire(*this))
 			{
 				if (__FindPVPKey(dwVIDMain, dwVIDSelf))
-				{
 					return NAMECOLOR_PVP;
-				}
 
-				uint32_t dwGuildIDMain=pkInstMain->GetGuildID();
-				uint32_t dwGuildIDSelf=GetGuildID();
+				uint32_t dwGuildIDMain = pkInstMain->GetGuildID();
+				uint32_t dwGuildIDSelf = GetGuildID();
 				if (__FindGVGKey(dwGuildIDMain, dwGuildIDSelf))
-				{
 					return NAMECOLOR_PVP;
-				}
-				/*
-				if (__FindDUELKey(dwVIDMain, dwVIDSelf))
-				{
-					return NAMECOLOR_PVP;
-				}
-				*/
 			}
 			else
-			{
 				return NAMECOLOR_PVP;
-			}
 		}
 
 		IAbstractPlayer& rPlayer=IAbstractPlayer::GetSingleton();
@@ -647,6 +646,13 @@ void CInstanceBase::AttachTextTail()
 	if (m_isTextTail)
 	{
 		TraceError("CInstanceBase::AttachTextTail - VID [%d] ALREADY EXIST", GetVirtualID());
+		return;
+	}
+
+	if(strcmp(GetNameString(), "<noname>") == 0)
+	{
+		// Don't 
+		Tracenf("Not attaching text tail to %d, <noname> name.", GetVirtualID());
 		return;
 	}
 
@@ -815,6 +821,7 @@ void CInstanceBase::SCRIPT_SetAffect(uint32_t eAffect, bool isVisible)
 void CInstanceBase::__SetReviveInvisibilityAffect(bool isVisible)
 {
 	if (isVisible) {
+		m_GraphicThingInstance.SetReviving(TRUE);
 		// NOTE : Dress does not support alpha operations properly.
 		if (IsWearingDress())
 			return;
@@ -825,6 +832,7 @@ void CInstanceBase::__SetReviveInvisibilityAffect(bool isVisible)
 			m_GraphicThingInstance.HideAllAttachingEffect();
 	}
 	else {
+		m_GraphicThingInstance.SetReviving(FALSE);
 		m_GraphicThingInstance.BlendAlphaValue(1.0f, 0.1f);
 		m_GraphicThingInstance.ShowAllAttachingEffect();
 	}
@@ -903,6 +911,9 @@ void CInstanceBase::__SetAffect(uint32_t eAffect, bool isVisible)
 			if (IsAffect(AFFECT_INVISIBILITY))
 #endif
 				return;
+				
+			if (CPythonBackground::Instance().IsPrimalMap())
+				return;
 			break;
 /*
 		case AFFECT_GWIGEOM: // 전기 속성 공격으로 바뀔 예정
@@ -941,10 +952,13 @@ void CInstanceBase::__SetAffect(uint32_t eAffect, bool isVisible)
 			return;
 			break;
 		case AFFECT_REVIVE_INVISIBILITY:
-			__Assassin_SetEunhyeongAffect(isVisible);
+			__SetReviveInvisibilityAffect(isVisible);
+			m_kAffectFlagContainer.Set(eAffect, isVisible);
 			break;
 		case AFFECT_EUNHYEONG:
 			__Assassin_SetEunhyeongAffect(isVisible);
+			//Set the affect right away so that other effects can be hidden/displayed accordingly
+			m_kAffectFlagContainer.Set(eAffect, isVisible); 
 			break;
 		case AFFECT_GYEONGGONG:
 		case AFFECT_KWAESOK:
@@ -1040,6 +1054,11 @@ void CInstanceBase::SetFishEmoticon()
 
 void CInstanceBase::SetEmoticon(uint32_t eEmoticon)
 {
+	if (eEmoticon == 99) { //Fake emoti
+		m_dwEmoticonTime = ELTimer_GetMSec();
+		return;
+	}
+
 	if (eEmoticon>=EMOTICON_NUM)
 	{
 		TraceError("CInstanceBase[VID:%d]::SetEmoticon(eEmoticon:%d<EMOTICON_NUM:%d, isVisible=%d)",
@@ -1073,9 +1092,9 @@ uint32_t CInstanceBase::__AttachEffect(uint32_t eEftType)
 {
 	// 2004.07.17.levites.isShow를 ViewFrustumCheck로 변경
 #ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
-	if (IsAffect(AFFECT_INVISIBILITY) && !__MainCanSeeHiddenThing())
+	if (IsInvisibility() && !__MainCanSeeHiddenThing())
 #else
-	if (IsAffect(AFFECT_INVISIBILITY))
+	if (IsInvisibility() && !__IsMainInstance())
 #endif
 		return 0;
 

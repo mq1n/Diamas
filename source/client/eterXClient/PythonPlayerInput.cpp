@@ -24,7 +24,7 @@ uint32_t CPythonPlayer::__GetPickableDistance()
 	return 300;
 }
 
-void CPythonPlayer::PickCloseMoney()
+void CPythonPlayer::PickCloseLoot(bool bIsYangPriority)
 {
 	CInstanceBase * pkInstMain = NEW_GetMainActorPtr();
 	if (!pkInstMain)
@@ -35,24 +35,7 @@ void CPythonPlayer::PickCloseMoney()
 
 	uint32_t dwItemID;
 	CPythonItem& rkItem=CPythonItem::Instance();
-	if (!rkItem.GetCloseMoney(kPPosMain, &dwItemID, __GetPickableDistance()))
-		return;
-
-	SendClickItemPacket(dwItemID);
-}
-
-void CPythonPlayer::PickCloseItem()
-{
-	CInstanceBase * pkInstMain = NEW_GetMainActorPtr();
-	if (!pkInstMain)
-		return;
-
-	TPixelPosition kPPosMain;
-	pkInstMain->NEW_GetPixelPosition(&kPPosMain);
-
-	uint32_t dwItemID;
-	CPythonItem& rkItem=CPythonItem::Instance();
-	if (!rkItem.GetCloseItem(kPPosMain, &dwItemID, __GetPickableDistance()))
+	if (!rkItem.GetCloseLoot(pkInstMain->GetNameString(), kPPosMain, &dwItemID, __GetPickableDistance(), bIsYangPriority))
 		return;
 
 	SendClickItemPacket(dwItemID);
@@ -98,7 +81,8 @@ void CPythonPlayer::__ClearTarget()
 	if (!pkInstMain)
 		return;
 
-	pkInstMain->ClearFlyTargetInstance();
+	if (pkInstMain->CanChangeTarget())
+		pkInstMain->ClearFlyTargetInstance();
 
 	CInstanceBase * pTargetedInstance = __GetTargetActorPtr();
 	if (pTargetedInstance)
@@ -109,7 +93,7 @@ void CPythonPlayer::__ClearTarget()
 	CPythonNetworkStream::Instance().SendTargetPacket(0);
 }
 
-void CPythonPlayer::SetTarget(uint32_t dwVID, BOOL bForceChange)
+void CPythonPlayer::SetTarget(uint32_t dwVID, BOOL bForceChange /*= TRUE*/, bool bIgnoreViewFrustrum /*= false*/)
 {
 	CInstanceBase * pkInstMain = NEW_GetMainActorPtr();
 	if (!pkInstMain)
@@ -163,7 +147,7 @@ void CPythonPlayer::SetTarget(uint32_t dwVID, BOOL bForceChange)
 	CInstanceBase * pkInstTarget = CPythonCharacterManager::Instance().GetInstancePtr(dwVID);
 	if (pkInstTarget)
 	{
-		if (pkInstMain->IsTargetableInstance(*pkInstTarget))
+		if (pkInstMain->IsTargetableInstance(*pkInstTarget, bIgnoreViewFrustrum))
 		{
 			__SetTargetVID(dwVID);
 			
@@ -244,7 +228,7 @@ void CPythonPlayer::OpenCharacterMenu(uint32_t dwVictimActorID)
 	if (!pkInstTarget)
 		return;
 
-	if (!pkInstTarget->IsPC() && !pkInstTarget->IsBuilding())
+	if (!pkInstTarget->IsPC() && !pkInstTarget->IsBuilding() && !pkInstTarget->IsShop())
 		return;
 
 //	if (pkInstMain == pkInstTarget)
@@ -278,9 +262,11 @@ void CPythonPlayer::__OnClickActor(CInstanceBase& rkInstMain, uint32_t dwPickedA
 	__ClearReservedAction();
 
 	CInstanceBase* pkInstVictim=NEW_FindActorPtr(dwPickedActorID);
-	CInstanceBase& rkInstVictim=*pkInstVictim;
 	if (!pkInstVictim)
 		return;
+
+	CInstanceBase& rkInstVictim=*pkInstVictim;
+
 	
 	// 2005.01.28.myevan
 	// 초급말 상태에서는 공격이 안되나 NPC 클릭이되어야함
@@ -296,7 +282,7 @@ void CPythonPlayer::__OnClickActor(CInstanceBase& rkInstMain, uint32_t dwPickedA
 
 	if (rkInstVictim.IsNPC())
 	{
-		__SendClickActorPacket(rkInstVictim);
+		SendClickActorPacket(rkInstVictim);
 	}
 
 	rkInstMain.NEW_Stop();
@@ -450,7 +436,7 @@ void CPythonPlayer::__OnPressScreen(CInstanceBase& rkInstMain)
 }
 
 
-bool CPythonPlayer::NEW_MoveToDirection(float fDirRot)
+bool CPythonPlayer::NEW_MoveToDirection(float fDirRot, bool isBackwards)
 {
 	// PrivateShop
 	if (IsOpenPrivateShop())
@@ -493,6 +479,12 @@ bool CPythonPlayer::NEW_MoveToDirection(float fDirRot)
 		fDirRot=fmod(360.0f + fCmrCurRot + fDirRot, 360.0f);
 	}
 
+	//Don't move if free camera - [Think]
+	if (IsFreeCameraMode()) {
+		CPythonApplication::Instance().MoveFreeCamera(fDirRot, isBackwards);
+		return true;
+	}
+
 	pkInstMain->NEW_MoveToDirection(fDirRot);
 
 	return true;
@@ -505,10 +497,11 @@ void CPythonPlayer::NEW_Stop()
 		return;
 
 	pkInstMain->NEW_Stop();
-	m_isLeft = FALSE;
-	m_isRight = FALSE;
-	m_isUp = FALSE;
-	m_isDown = FALSE;
+	m_isLeft = false;
+	m_isRight = false;
+	m_isUp = false;
+	m_isDown = false;
+	m_isDirKey = false;
 }
 
 bool CPythonPlayer::NEW_CancelFishing()
@@ -764,10 +757,10 @@ bool CPythonPlayer::__CanAttack()
 	// 나중에 시간 나면 can attack 체크를 서버에서 해주자...
 	// ㅡ_ㅡ unique 슬롯에 차는 탈것은 이 조건이랑 관계없이 공격할 수 있어야 한다 ㅡ_ㅡ
 	// ㅡ_ㅡ 뉴마운트만 이 체크를 하게 함... ㅡ_ㅡ_ㅡ_ㅡ_ㅡ
-	if (pkInstMain->IsMountingHorse() && pkInstMain->IsNewMount() && (GetSkillGrade(109) < 1 && GetSkillLevel(109) < 11))
+	/*if (pkInstMain->IsMountingHorse() && pkInstMain->IsNewMount() && (GetSkillGrade(109) < 1 && GetSkillLevel(109) < 11))
 	{
 		return false;
-	}
+	}*/
 
 	return pkInstMain->CanAttack();
 }
@@ -873,6 +866,10 @@ void CPythonPlayer::__ReserveUseSkill(uint32_t dwActorID, uint32_t dwSkillSlotIn
 
 void CPythonPlayer::__ClearAutoAttackTargetActorID()
 {
+	if(m_dwAutoAttackTargetVID == m_dwVIDReserved) {
+		__ClearReservedAction();
+	}
+	
 	__SetAutoAttackTargetActorID(0);
 }
 
@@ -901,7 +898,7 @@ void CPythonPlayer::__ReserveProcess_ClickActor()
 	if (!pkInstMain->IsAttackableInstance(*pkInstReserved))
 	{
 		pkInstMain->NEW_Stop();
-		__SendClickActorPacket(*pkInstReserved);
+		SendClickActorPacket(*pkInstReserved);
 		__ClearReservedAction();
 		return;
 	}

@@ -54,6 +54,36 @@ void CPythonApplication::__UpdateCamera()
 									  m_kEventCameraSetting.v3CenterPosition.z + pMainCamera->GetTargetHeight(),
 									  fDistance, fPitch, fRotation);
 	}
+	else if (CAMERA_MODE_FREE == m_iCameraMode)
+	{
+		float fDistance, fPitch, fRotation, fHeight;
+		GetCamera(&fDistance, &fPitch, &fRotation, &fHeight);
+		
+		/*CPythonPlayer& rkPlayer = CPythonPlayer::Instance();
+		TPixelPosition kPPosCur;
+
+		D3DXVECTOR3 kD3DVt3Cur(kPPosCur.x, -kPPosCur.y, kPPosCur.z);
+		D3DXVECTOR3 kD3DVt3Dst;
+
+		D3DXVECTOR3 kD3DVt3AdvDir(0.0f, -1.0f, 0.0f);
+		D3DXMATRIX kD3DMatAdv;
+		D3DXMatrixRotationZ(&kD3DMatAdv, D3DXToRadian(fRotation));
+		D3DXVec3TransformCoord(&kD3DVt3AdvDir, &kD3DVt3AdvDir, &kD3DMatAdv);
+		D3DXVec3Scale(&kD3DVt3AdvDir, &kD3DVt3AdvDir, 300.0f);
+		D3DXVec3Add(&kD3DVt3Dst, &kD3DVt3AdvDir, &kD3DVt3Cur);
+
+		TPixelPosition kPPosDst;
+		kPPosDst.x = +kD3DVt3Dst.x;
+		kPPosDst.y = -kD3DVt3Dst.y;
+		kPPosDst.z = +kD3DVt3Dst.z;*/
+
+		m_pyGraphic.SetPositionCamera(	m_kEventCameraSetting.v3CenterPosition.x, 
+										m_kEventCameraSetting.v3CenterPosition.y, 
+										m_kEventCameraSetting.v3CenterPosition.z + pMainCamera->GetTargetHeight(), 
+										fDistance, 
+										fPitch, 
+										fRotation);
+	}
 	else if (CAMERA_MODE_NORMAL == m_iCameraMode)
 	{
 		float fDistance, fPitch, fRotation, fHeight;
@@ -280,6 +310,94 @@ void CPythonApplication::SetEventCamera(const SCameraSetting & c_rCameraSetting)
 	m_iCameraMode = CAMERA_MODE_STAND;
 }
 
+void CPythonApplication::SetFreeCamera()
+{
+	if (CCameraManager::DEFAULT_PERSPECTIVE_CAMERA == CCameraManager::Instance().GetCurrentCameraNum())
+	{
+		GetCameraSetting(&m_DefaultCameraSetting);
+	}
+
+	/////
+
+	CCameraManager::Instance().SetCurrentCamera(EVENT_CAMERA_NUMBER);
+	CCamera * pCamera = CCameraManager::Instance().GetCurrentCamera();
+	if (!pCamera)
+		return;
+
+	SCameraSetting StartingCameraSetting;
+	StartingCameraSetting.v3CenterPosition = m_v3CenterPosition;
+	
+	StartingCameraSetting.fZoom = m_DefaultCameraSetting.fZoom;
+	StartingCameraSetting.fPitch = m_DefaultCameraSetting.fPitch;
+	StartingCameraSetting.fRotation = m_DefaultCameraSetting.fRotation;
+
+	StartingCameraSetting.kCmrPos.m_fUpDir = m_kCmrPos.m_fUpDir;
+	StartingCameraSetting.kCmrPos.m_fViewDir = m_kCmrPos.m_fViewDir;
+	StartingCameraSetting.kCmrPos.m_fCrossDir = m_kCmrPos.m_fCrossDir;
+
+	SetCameraSetting(StartingCameraSetting);
+	m_kEventCameraSetting = StartingCameraSetting;
+	m_iCameraMode = CAMERA_MODE_FREE;
+	m_freeCameraSpeedPct = 100;
+
+	CPythonPlayer::Instance().SetFreeCameraMode(true);
+}
+
+void CPythonApplication::MoveFreeCamera(float fDirRot, bool isBackwards)
+{
+	float fDistance, fPitch, fRotation, fHeight;
+	GetCamera(&fDistance, &fPitch, &fRotation, &fHeight);
+
+	float fFreeMovSpd = 0.1f*m_freeCameraSpeedPct / 100.0f;
+	float fTargetHeight = 0.0f;
+	float fPitchRad = D3DXToRadian(fPitch);
+
+	if (cos(fPitchRad) != 0) {	
+		fTargetHeight = -sin(fPitchRad);
+
+		//Check rotation for reversing across the x-z axis
+		if (fDirRot > fRotation)
+			fRotation -= 360;
+	}
+
+	if (isBackwards)
+		fTargetHeight *= -1;
+
+	D3DXVECTOR3 kD3DVt3Cur(m_kEventCameraSetting.v3CenterPosition.x, m_kEventCameraSetting.v3CenterPosition.y, m_kEventCameraSetting.v3CenterPosition.z);
+	D3DXVECTOR3 kD3DVt3Dst;
+
+	D3DXVECTOR3 kD3DVt3AdvDir(0.0f, -fFreeMovSpd, fTargetHeight * fFreeMovSpd);
+	D3DXMATRIX kD3DMatAdv;
+	D3DXMatrixRotationZ(&kD3DMatAdv, D3DXToRadian(fDirRot));
+	D3DXVec3TransformCoord(&kD3DVt3AdvDir, &kD3DVt3AdvDir, &kD3DMatAdv);
+	D3DXVec3Scale(&kD3DVt3AdvDir, &kD3DVt3AdvDir, 300.0f);
+	D3DXVec3Add(&kD3DVt3Dst, &kD3DVt3AdvDir, &kD3DVt3Cur);
+
+	m_kEventCameraSetting.v3CenterPosition.x = kD3DVt3Dst.x;
+	m_kEventCameraSetting.v3CenterPosition.y = kD3DVt3Dst.y;
+	m_kEventCameraSetting.v3CenterPosition.z = kD3DVt3Dst.z;
+}
+
+void CPythonApplication::SetFreeCameraSpeed(int32_t speed)
+{
+	m_freeCameraSpeedPct = speed;
+}
+
+void CPythonApplication::UpdateEventCameraX(float fdx)
+{
+	m_kEventCameraSetting.v3CenterPosition.x += fdx;
+}
+
+void CPythonApplication::UpdateEventCameraY(float fdy)
+{
+	m_kEventCameraSetting.v3CenterPosition.y += fdy;
+}
+
+void CPythonApplication::UpdateEventCameraZ(float fdz)
+{
+	m_kEventCameraSetting.v3CenterPosition.z += fdz;
+}
+
 void CPythonApplication::BlendEventCamera(const SCameraSetting & c_rCameraSetting, float fBlendTime)
 {
 	m_iCameraMode = CAMERA_MODE_BLEND;
@@ -309,6 +427,8 @@ void CPythonApplication::SetDefaultCamera()
 		CCameraManager::Instance().SetCurrentCamera(CCameraManager::DEFAULT_PERSPECTIVE_CAMERA);
 		SetCameraSetting(m_DefaultCameraSetting);
 	}
+
+	CPythonPlayer::Instance().SetFreeCameraMode(false);
 }
 
 void CPythonApplication::SetCameraSetting(const SCameraSetting & c_rCameraSetting)

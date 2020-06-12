@@ -598,24 +598,20 @@ bool CPythonSkill::RegisterSkill(uint32_t dwSkillIndex, const char * c_szFileNam
 			std::map<std::string, uint32_t>::iterator it2 = m_SkillNeedWeaponIndexMap.find(rstrToken.c_str());
 			if (m_SkillNeedWeaponIndexMap.end() == it2)
 			{
-				TraceError("Strange Skill Need Weapon - CPythonSkill::RegisterSkill(dwSkillIndex=%d, c_szFileName=%s)", dwSkillIndex, c_szFileName);
+				TraceError("Incorrect skill weapon limitation - CPythonSkill::RegisterSkill(skill vnum=%lu, c_szFileName=%s)", dwSkillIndex, c_szFileName);
 				continue;
 			}
 			SkillData.dwNeedWeapon |= it2->second;
 		}
 	}
 
+	if (!TextFileLoader.GetTokenString("name", &SkillData.strName))
 	{
-			if (!TextFileLoader.GetTokenString("name", &SkillData.strName))
-			{
-				TraceError("CPythonSkill::RegisterSkill(dwSkillIndex=%d, c_szFileName=%s) - Failed to find [%s]", dwSkillIndex, c_szFileName, "name");
-				return false;	
-			}
+		TraceError("CPythonSkill::RegisterSkill(dwSkillIndex=%d, c_szFileName=%s) - Failed to find [name]", dwSkillIndex, c_szFileName);
+		return false;
 	}
 
-	{
-		TextFileLoader.GetTokenString("description", &SkillData.strDescription);
-	}
+	TextFileLoader.GetTokenString("description", &SkillData.strDescription);
 
 	if (!TextFileLoader.GetTokenString("iconfilename", &SkillData.strIconFileName))
 	{
@@ -625,12 +621,7 @@ bool CPythonSkill::RegisterSkill(uint32_t dwSkillIndex, const char * c_szFileNam
 
 	{
 		CTokenVector * pConditionDataVector;
-
-		bool isConditionData=true;
-		if (!TextFileLoader.GetTokenVector("conditiondata", &pConditionDataVector))
-			isConditionData=false;
-
-		if (isConditionData)
+		if (TextFileLoader.GetTokenVector("conditiondata", &pConditionDataVector))
 		{
 			uint32_t dwSize = pConditionDataVector->size();
 			SkillData.ConditionDataVector.clear();
@@ -645,11 +636,7 @@ bool CPythonSkill::RegisterSkill(uint32_t dwSkillIndex, const char * c_szFileNam
 	{
 		CTokenVector * pAffectDataVector;
 
-		bool isAffectData=true;
-		if (!TextFileLoader.GetTokenVector("affectdata", &pAffectDataVector))
-			isAffectData=false;
-
-		if (isAffectData)
+		if (TextFileLoader.GetTokenVector("affectdata", &pAffectDataVector))
 		{
 			uint32_t dwSize = pAffectDataVector->size()/3;
 			SkillData.AffectDataVector.clear();
@@ -665,11 +652,7 @@ bool CPythonSkill::RegisterSkill(uint32_t dwSkillIndex, const char * c_szFileNam
 
 	{
 		CTokenVector * pGradeDataVector;
-
-		char szGradeData[256];
-		sprintf(szGradeData, "%dgradedata", 1254);
-
-		if (TextFileLoader.GetTokenVector(szGradeData, &pGradeDataVector))
+		if (TextFileLoader.GetTokenVector("gradedata", &pGradeDataVector))
 		{
 			if (SKILL_GRADE_COUNT*2 != pGradeDataVector->size())
 				TraceError("CPythonSkill::RegisterSkill(dwSkillIndex=%d, c_szFileName=%s) - Strange Grade Data Count", dwSkillIndex, c_szFileName);

@@ -217,6 +217,8 @@ CPythonBackground::CPythonBackground()
 	m_iDayMode = DAY_MODE_LIGHT;
 	m_iXMasTreeGrade = 0;
 	m_bVisibleGuildArea = FALSE;
+	m_bIsPrimalMap = false;
+	m_bIsPrimalMapAttackable = false;
 
 	SetViewDistanceSet(4, 25600.0f);
 	SetViewDistanceSet(3, 25600.0f);
@@ -793,6 +795,14 @@ void CPythonBackground::DisableSnowEnvironment()
 	m_SnowEnvironment.Disable();
 }
 
+void CPythonBackground::ToggleRainEnvironment(bool enable) {
+	m_SnowEnvironment.ToggleRain(enable);
+}
+
+bool CPythonBackground::IsRainEnabled() {
+	return m_SnowEnvironment.IsRainEnabled();
+}
+
 const D3DXVECTOR3 c_v3TreePos = D3DXVECTOR3(76500.0f, -60900.0f, 20215.0f);
 
 void CPythonBackground::SetXMaxTree(int32_t iGrade)
@@ -893,4 +903,38 @@ void CPythonBackground::DeleteSpecialEffect(uint32_t dwID)
 {
 	CMapOutdoor& rkMap=GetMapOutdoorRef();
 	rkMap.SpecialEffect_Delete(dwID);
+}
+
+void CPythonBackground::SetPrimalMap(bool is_primal) 
+{
+	bool was_primal = m_bIsPrimalMap;
+	m_bIsPrimalMap = is_primal; 
+	// Update all players weapons
+	if (is_primal)
+	{
+		CPythonCharacterManager& rkChrMgr = CPythonCharacterManager::Instance();
+		CPythonCharacterManager::CharacterIterator i;
+		for (i = rkChrMgr.CharacterInstanceBegin(); i != rkChrMgr.CharacterInstanceEnd(); ++i)
+		{
+			CInstanceBase* pkInstEach = *i;
+			static std::list<uint32_t> safe_weapons = { 19, 1009, 2009, 3009, 5009, 7009 };
+			uint32_t dwWeapon = pkInstEach->GetPart(CRaceData::PART_WEAPON);
+			if (std::find(safe_weapons.begin(), safe_weapons.end(), dwWeapon) == safe_weapons.end())
+			{
+				pkInstEach->SetWeapon(dwWeapon);
+			}
+		}
+	}
+	else if(was_primal && is_primal == false)
+	{
+		CPythonCharacterManager& rkChrMgr = CPythonCharacterManager::Instance();
+		CPythonCharacterManager::CharacterIterator i;
+		for (i = rkChrMgr.CharacterInstanceBegin(); i != rkChrMgr.CharacterInstanceEnd(); ++i)
+		{
+			CInstanceBase* pkInstEach = *i;
+			uint32_t dwWeapon = pkInstEach->GetPart(CRaceData::PART_WEAPON);
+			pkInstEach->SetWeapon(dwWeapon);
+			pkInstEach->RefreshTextTail();
+		}
+	}
 }

@@ -130,6 +130,7 @@ void initeffect()
 		FLY_CHAIN_LIGHTNING,
 		FLY_HP_SMALL,
 		FLY_SKILL_MUYEONG,
+		FLY_EXP_CURSE,
 	};
 
 	PyModule_AddIntConstant(poModule, "FLY_NONE",				FLY_NONE);
@@ -149,4 +150,5 @@ void initeffect()
 	PyModule_AddIntConstant(poModule, "FLY_CHAIN_LIGHTNING",	FLY_CHAIN_LIGHTNING);
 	PyModule_AddIntConstant(poModule, "FLY_HP_SMALL",			FLY_HP_SMALL);
 	PyModule_AddIntConstant(poModule, "FLY_SKILL_MUYEONG",		FLY_SKILL_MUYEONG);
+	PyModule_AddIntConstant(poModule, "FLY_EXP_CURSE",			FLY_EXP_CURSE);
 }

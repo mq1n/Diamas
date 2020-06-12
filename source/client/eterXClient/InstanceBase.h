@@ -413,7 +413,6 @@ class CInstanceBase
 		static void RegisterTitleName(int32_t iIndex, const char * c_szTitleName);
 		static bool RegisterNameColor(uint32_t uIndex, uint32_t r, uint32_t g, uint32_t b);
 		static bool RegisterTitleColor(uint32_t uIndex, uint32_t r, uint32_t g, uint32_t b);
-		static bool ChangeEffectTexture(uint32_t eEftType, const char* c_szSrcFileName, const char* c_szDstFileName);
 
 		static void SetDustGap(float fDustGap);
 		static void SetHorseDustGap(float fDustGap);
@@ -516,6 +515,7 @@ class CInstanceBase
 
 		void					SetNameString(const char* c_szName, int32_t len);
 		bool					SetRace(uint32_t dwRaceIndex);
+		void					SetScale(float fScale) { m_GraphicThingInstance.SetScale(fScale, fScale, fScale, true); }
 		void					SetVirtualID(uint32_t wVirtualNumber);
 		void					SetVirtualNumber(uint32_t dwVirtualNumber);
 		void					SetInstanceType(int32_t iInstanceType);
@@ -582,10 +582,10 @@ class CInstanceBase
 		bool					CanFishing();
 		bool					IsConflictAlignmentInstance(CInstanceBase& rkInstVictim);
 		bool					IsAttackableInstance(CInstanceBase& rkInstVictim);
-		bool					IsTargetableInstance(CInstanceBase& rkInstVictim);
+		bool					IsTargetableInstance(CInstanceBase& rkInstVictim, bool bIgnoreViewFrustrum);
 		bool					IsPVPInstance(CInstanceBase& rkInstVictim);
 		bool					CanChangeTarget();
-		bool					CanPickInstance();
+		bool CanPickInstance(bool bIgnoreViewFrustrum = false);
 		bool					CanViewTargetHP(CInstanceBase& rkInstVictim);
 
 
@@ -622,6 +622,7 @@ class CInstanceBase
 		BOOL					IsWarp();
 		BOOL					IsGoto();
 		BOOL					IsObject();
+		BOOL					IsShop();
 		BOOL					IsDoor();
 		BOOL					IsBuilding();
 		BOOL					IsWoodenDoor();
@@ -697,7 +698,6 @@ class CInstanceBase
 
 		void					NEW_SetOwner(uint32_t dwOwnerVID);
 		void					NEW_SyncPixelPosition(int32_t nPPosX, int32_t nPPosY);
-		void					NEW_SyncCurrentPixelPosition();
 
 		void					NEW_SetPixelPosition(const TPixelPosition& c_rkPPosDst);
 
@@ -717,7 +717,6 @@ class CInstanceBase
 		void					RunNormalAttack(float fAtkDirRot);
 		void					RunComboAttack(float fAtkDirRot, uint32_t wMotionIndex);
 
-		CInstanceBase*			FindNearestVictim();
 		BOOL					CheckAdvancing();
 
 
@@ -914,7 +913,6 @@ class CInstanceBase
 		void					OnWaiting();
 		void					OnMoving();
 
-		void					NEW_SetCurPixelPosition(const TPixelPosition& c_rkPPosDst);
 		void					NEW_SetSrcPixelPosition(const TPixelPosition& c_rkPPosDst);
 		void					NEW_SetDstPixelPosition(const TPixelPosition& c_rkPPosDst);
 		void					NEW_SetDstPixelPositionZ(float z);

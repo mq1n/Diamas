@@ -327,6 +327,7 @@ bool CPythonNetworkStream::__RecvPlayerPoints()
 void CPythonNetworkStream::StartGame()
 {
 	m_isStartGame=TRUE;
+	m_isChatEnable=TRUE;
 }
 	
 bool CPythonNetworkStream::SendEnterGame()

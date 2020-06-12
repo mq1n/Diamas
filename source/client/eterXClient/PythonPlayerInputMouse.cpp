@@ -36,7 +36,7 @@ bool CPythonPlayer::NEW_MoveToMouseScreenDirection()
 	float fDirRot;
 	NEW_GetMouseDirRotation(fMouseX, fMouseY, &fDirRot);
 
-	return NEW_MoveToDirection(fDirRot);
+	return NEW_MoveToDirection(fDirRot, false);
 }
 
 void CPythonPlayer::NEW_SetMouseCameraState(int32_t eMBS)
@@ -200,20 +200,15 @@ bool CPythonPlayer::NEW_SetMouseFunc(int32_t eMBT, int32_t eMBF)
 int32_t CPythonPlayer::NEW_GetMouseFunc(int32_t eMBT)
 {
 	if (eMBT>=MBT_NUM)
-		return false;
+		return 0;
 
 	return m_aeMBFButton[eMBT];
 }
 
 void CPythonPlayer::SetQuickCameraMode(bool isEnable)
 {
-	if (isEnable)
-	{
-	}
-	else
-	{
+	if (!isEnable)
 		NEW_SetMouseCameraState(MBS_CLICK);
-	}
 }
 
 bool CPythonPlayer::NEW_SetMouseState(int32_t eMBT, int32_t eMBS)
@@ -287,7 +282,7 @@ void CPythonPlayer::NEW_RefreshMouseWalkingDirection()
 			TPixelPosition kPPosPickedItem;
 			if (rkIT.GetGroundItemPosition(m_dwIIDReserved, &kPPosPickedItem))
 			{
-				if (pkInstMain->NEW_GetDistanceFromDestPixelPosition(kPPosPickedItem)<20.0f)
+				if (pkInstMain->NEW_GetDistanceFromDestPixelPosition(kPPosPickedItem)<150.0f)
 				{
 					CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
 
@@ -372,11 +367,23 @@ void CPythonPlayer::NEW_RefreshMouseWalkingDirection()
 	if (m_isDirMov)
 		NEW_MoveToMouseScreenDirection();
 
-	if (m_isDirKey)
-		NEW_SetMultiDirKeyState(m_isLeft, m_isRight, m_isUp, m_isDown);
+	float now = CPythonApplication::Instance().GetGlobalTime();
+	if (CPythonApplication::Instance().IsActive())
+		m_fLastClientFocusTime = now;
 
-	if (m_isAtkKey)
-		NEW_Attack();
+	if (m_fLastClientFocusTime + 60.0f * 2 > now)
+	{
+		if (m_isDirKey)
+			NEW_SetMultiDirKeyState(m_isLeft, m_isRight, m_isUp, m_isDown);
+
+		if (m_isAtkKey)
+			NEW_Attack();
+	}
+	else if (m_isDirKey || m_isAtkKey)
+	{
+		NEW_Stop();
+		m_isAtkKey = false;
+	}
 
 	m_iComboOld=pkInstMain->GetComboIndex();
 }

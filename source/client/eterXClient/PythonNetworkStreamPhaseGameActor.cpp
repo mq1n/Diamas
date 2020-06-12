@@ -133,8 +133,7 @@ bool CPythonNetworkStream::RecvCharacterAppendPacket()
 
 	kNetActorData.m_dwLevel = 0; // 몬스터 레벨 표시 안함
 
-	if(kNetActorData.m_bType != CActorInstance::TYPE_PC && 
-		kNetActorData.m_bType != CActorInstance::TYPE_NPC)
+	if(kNetActorData.m_bType != CActorInstance::TYPE_PC && 	kNetActorData.m_bType != CActorInstance::TYPE_NPC && kNetActorData.m_bType != CActorInstance::TYPE_SHOP)
 	{
 		const char * c_szName;
 		CPythonNonPlayer& rkNonPlayer=CPythonNonPlayer::Instance();
@@ -390,7 +389,7 @@ bool CPythonNetworkStream::RecvCharacterMovePacket()
 	kNetMoveActorData.m_dwFunc=kMovePacket.bFunc;
 	kNetMoveActorData.m_dwTime=kMovePacket.dwTime;
 	kNetMoveActorData.m_dwVID=kMovePacket.dwVID;
-	kNetMoveActorData.m_fRot=kMovePacket.bRot*5.0f;
+	kNetMoveActorData.m_fRot =kMovePacket.rot;
 	kNetMoveActorData.m_lPosX=kMovePacket.lX;
 	kNetMoveActorData.m_lPosY=kMovePacket.lY;
 	kNetMoveActorData.m_dwDuration=kMovePacket.dwDuration;

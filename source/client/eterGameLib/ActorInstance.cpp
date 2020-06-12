@@ -328,6 +328,11 @@ bool CActorInstance::IsObject()
 	return (m_eActorType == TYPE_OBJECT);
 }
 
+bool CActorInstance::IsShop()
+{
+	return (m_eActorType == TYPE_SHOP);
+}
+
 void CActorInstance::DestroySystem()
 {
 }

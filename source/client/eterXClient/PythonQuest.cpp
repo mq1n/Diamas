@@ -191,7 +191,7 @@ PyObject * questGetQuestData(PyObject * poSelf, PyObject * poArgs)
 	{
 		std::string strIconFileName;
 		strIconFileName = "d:/ymir work/ui/game/quest/questicon/";
-		strIconFileName += pQuestInstance->strIconFileName.c_str();
+		strIconFileName += pQuestInstance->strIconFileName;
 		pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(strIconFileName.c_str());
 	}
 	else

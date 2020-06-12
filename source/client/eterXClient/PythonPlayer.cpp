@@ -78,7 +78,6 @@ bool CPythonPlayer::__GetPickedGroundPos(TPixelPosition* pkPPosPicked)
 {
 	CPythonBackground& rkBG=CPythonBackground::Instance();
 
-	TPixelPosition kPPosPicked;
 	if (rkBG.GetPickingPoint(pkPPosPicked))
 	{
 		pkPPosPicked->y=-pkPPosPicked->y;
@@ -90,8 +89,6 @@ bool CPythonPlayer::__GetPickedGroundPos(TPixelPosition* pkPPosPicked)
 
 void CPythonPlayer::NEW_GetMainActorPosition(TPixelPosition* pkPPosActor)
 {
-	TPixelPosition kPPosMainActor;
-
 	IAbstractPlayer& rkPlayer=IAbstractPlayer::GetSingleton();
 	CInstanceBase * pInstance = rkPlayer.NEW_GetMainActorPtr();
 	if (pInstance)
@@ -228,7 +225,7 @@ void CPythonPlayer::__Update_AutoAttack()
 	}
 	else
 	{
-		if (pkInstVictim->IsDead())
+		if (!pkInstMain->IsTargetableInstance(*pkInstVictim, false))
 		{
 			__ClearAutoAttackTargetActorID();
 		}
@@ -238,14 +235,7 @@ void CPythonPlayer::__Update_AutoAttack()
 		}
 		else if (pkInstMain->IsAttackableInstance(*pkInstVictim))
 		{
-			if (pkInstMain->IsSleep())
-			{
-				//TraceError("SKIP_AUTO_ATTACK_IN_SLEEPING");
-			}
-			else
-			{
-				__ReserveClickActor(m_dwAutoAttackTargetVID);
-			}
+			__ReserveClickActor(m_dwAutoAttackTargetVID);
 		}
 	}
 }
@@ -491,7 +481,7 @@ void CPythonPlayer::NotifyCharacterDead(uint32_t dwVID)
 {
 	if (__IsSameTargetVID(dwVID))
 	{
-		SetTarget(0);
+		__ClearTarget();
 	}
 }
 
@@ -503,9 +493,9 @@ void CPythonPlayer::NotifyCharacterUpdate(uint32_t dwVID)
 		CInstanceBase * pTargetInstance = CPythonCharacterManager::Instance().GetInstancePtr(dwVID);
 		if (pMainInstance && pTargetInstance)
 		{
-			if (!pMainInstance->IsTargetableInstance(*pTargetInstance))
+			if (!pMainInstance->IsTargetableInstance(*pTargetInstance, false))
 			{
-				SetTarget(0);
+				__ClearTarget();
 				PyCallClassMemberFunc(m_ppyGameWindow, "CloseTargetBoard", Py_BuildValue("()"));
 			}
 			else
@@ -1172,35 +1162,30 @@ uint32_t CPythonPlayer::GetPlayTime()
 	return m_dwPlayTime;
 }
 
-#define ENABLE_NO_PICKUP_LIMIT
 void CPythonPlayer::SendClickItemPacket(uint32_t dwIID)
 {
 	if (IsObserverMode())
 		return;
 
-#ifndef ENABLE_NO_PICKUP_LIMIT
-	static uint32_t s_dwNextTCPTime = 0;
-	uint32_t dwCurTime=ELTimer_GetMSec();
-	if (dwCurTime >= s_dwNextTCPTime)
-#endif
+	const char * c_szOwnerName;
+	if (!CPythonItem::Instance().GetOwnership(dwIID, &c_szOwnerName))
+		return;
+		
+	CItemData * pItemData;
+	if (!CItemManager::Instance().GetItemDataPointer(CPythonItem::Instance().GetVirtualNumberOfGroundItem(dwIID), &pItemData))
 	{
-#ifndef ENABLE_NO_PICKUP_LIMIT
-		s_dwNextTCPTime=dwCurTime + 500;
-#endif
+		Tracenf("CPythonPlayer::SendClickItemPacket(dwIID=%d) : Non-exist item.", dwIID);
+		return;
+	}
 
-		const char * c_szOwnerName;
-		if (!CPythonItem::Instance().GetOwnership(dwIID, &c_szOwnerName))
-			return;
+	static uint32_t s_dwLastTCPTime = 0;
+	uint32_t dwCurTime = ELTimer_GetMSec();
+	int32_t delay = pItemData->GetIndex() != 1 ? 150 : 50;
 
-		if (strlen(c_szOwnerName) > 0)
-		if (0 != strcmp(c_szOwnerName, GetName()))
+	if (dwCurTime >= s_dwLastTCPTime + delay)
+	{
+		if (c_szOwnerName[0] != '\0' && 0 != strcmp(c_szOwnerName, GetName()))
 		{
-			CItemData * pItemData;
-			if (!CItemManager::Instance().GetItemDataPointer(CPythonItem::Instance().GetVirtualNumberOfGroundItem(dwIID), &pItemData))
-			{
-				Tracenf("CPythonPlayer::SendClickItemPacket(dwIID=%d) : Non-exist item.", dwIID);
-				return;
-			}
 			if (!IsPartyMemberByName(c_szOwnerName) || pItemData->IsAntiFlag(CItemData::ITEM_ANTIFLAG_DROP | CItemData::ITEM_ANTIFLAG_GIVE))
 			{
 				PyCallClassMemberFunc(m_ppyGameWindow, "OnCannotPickItem", Py_BuildValue("()"));
@@ -1208,12 +1193,14 @@ void CPythonPlayer::SendClickItemPacket(uint32_t dwIID)
 			}
 		}
 
+		s_dwLastTCPTime = dwCurTime;
+
 		CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
 		rkNetStream.SendItemPickUpPacket(dwIID);
 	}
 }
 
-void CPythonPlayer::__SendClickActorPacket(CInstanceBase& rkInstVictim)
+void CPythonPlayer::SendClickActorPacket(CInstanceBase& rkInstVictim)
 {
 	// 말을 타고 광산을 캐는 것에 대한 예외 처리
 	CInstanceBase* pkInstMain=NEW_GetMainActorPtr();
@@ -1526,6 +1513,15 @@ bool CPythonPlayer::IsObserverMode()
 	return m_isObserverMode;
 }
 
+void CPythonPlayer::SetFreeCameraMode(bool isEnable) 
+{
+	m_isFreeCameraMode = isEnable;
+}
+
+bool CPythonPlayer::IsFreeCameraMode() 
+{
+	return m_isFreeCameraMode;
+}
 
 BOOL CPythonPlayer::__ToggleCoolTime()
 {
@@ -1608,6 +1604,7 @@ void CPythonPlayer::ClearSkillDict()
 	// Game End - Player Data Reset
 	m_isOpenPrivateShop = false;
 	m_isObserverMode = false;
+	m_isFreeCameraMode = false;
 
 	m_isConsumingStamina = FALSE;
 	m_fConsumeStaminaPerSec = 0.0f;
@@ -1627,7 +1624,7 @@ void CPythonPlayer::Clear()
 	m_fTargetUpdateTime = 0.0f;
 
 	// Test Code for Status Interface
-	m_stName = "";
+	m_stName.clear();
 	m_dwMainCharacterIndex = 0;
 	m_dwRace = 0;
 	m_dwWeaponMinPower = 0;
@@ -1677,6 +1674,7 @@ void CPythonPlayer::Clear()
 
 	m_isOpenPrivateShop = false;
 	m_isObserverMode = false;
+	m_isFreeCameraMode = false;
 
 	m_isConsumingStamina = FALSE;
 	m_fConsumeStaminaPerSec = 0.0f;

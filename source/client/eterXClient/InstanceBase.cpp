@@ -493,13 +493,15 @@ float CInstanceBase::__GetBackgroundHeight(float x, float y)
 
 BOOL CInstanceBase::IsInvisibility()
 {
+	//GM invisibility | Stealth | Recently revived invisibility
+	if ((IsAffect(AFFECT_INVISIBILITY) || IsAffect(AFFECT_EUNHYEONG) || IsAffect(AFFECT_REVIVE_INVISIBILITY))
 #ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
-	if (IsAffect(AFFECT_INVISIBILITY) && !__MainCanSeeHiddenThing())
-		return true;
-#else
-	if (IsAffect(AFFECT_INVISIBILITY))
-		return true;
+		 && !__MainCanSeeHiddenThing()
+	)
 #endif
+	{
+		return true;
+	}
 
 	return false;
 }
@@ -794,9 +796,11 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 
 	SetArmor(c_rkCreateData.m_dwArmor);
 
+	if (IsPC() || (IsNPC() && c_rkCreateData.m_dwHair))
+		SetHair(c_rkCreateData.m_dwHair);
+
 	if (IsPC())
 	{
-		SetHair(c_rkCreateData.m_dwHair);
 		SetWeapon(c_rkCreateData.m_dwWeapon);
 #ifdef ENABLE_ACCE_SYSTEM
 		SetAcce(c_rkCreateData.m_dwAcce);
@@ -900,6 +904,21 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 			m_GraphicThingInstance.ChangeMaterial(strFileName.c_str());
 	}
 
+	//Shining on models
+	std::vector<uint32_t>c_vShineRaces;
+	c_vShineRaces.push_back(29000);
+
+	if (std::find(c_vShineRaces.begin(), c_vShineRaces.end(), GetRace()) != c_vShineRaces.end())
+	{
+		SMaterialData kMaterialData;
+		kMaterialData.pImage = nullptr;
+		kMaterialData.isSpecularEnable = TRUE;
+		kMaterialData.fSpecularPower = 0.1f;
+		kMaterialData.bSphereMapIndex = 1;
+
+		m_GraphicThingInstance.SetMaterialData(0, nullptr, kMaterialData);
+	}
+	
 #ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
 	if (IsAffect(AFFECT_INVISIBILITY) && __MainCanSeeHiddenThing())
 		m_GraphicThingInstance.BlendAlphaValue(0.5f, 0.5f);
@@ -2286,6 +2305,14 @@ bool CInstanceBase::IsAttackableInstance(CInstanceBase& rkInstVictim)
 
 		if (rkInstVictim.IsPC())
 		{
+			// The other person is invincible.
+			if (rkInstVictim.IsAffect(AFFECT_REVIVE_INVISIBILITY))
+				return false;
+
+			// In Primal Map players can only attack each other if the event started
+			if (CPythonBackground::Instance().IsPrimalMap())
+				return CPythonBackground::Instance().IsPrimalMapAttackable();
+
 			if (GetDuelMode())
 			{
 				switch(GetDuelMode())
@@ -2336,7 +2363,7 @@ bool CInstanceBase::IsAttackableInstance(CInstanceBase& rkInstVictim)
 			}
 			else
 			{
-				return true;
+				return PK_MODE_PROTECT != GetPKMode() && PK_MODE_PROTECT != rkInstVictim.GetPKMode();
 			}
 		}
 
@@ -2366,9 +2393,9 @@ bool CInstanceBase::IsAttackableInstance(CInstanceBase& rkInstVictim)
 	return false;
 }
 
-bool CInstanceBase::IsTargetableInstance(CInstanceBase& rkInstVictim)
+bool CInstanceBase::IsTargetableInstance(CInstanceBase& rkInstVictim, bool bIgnoreViewFrustrum)
 {
-	return rkInstVictim.CanPickInstance();
+	return rkInstVictim.CanPickInstance(bIgnoreViewFrustrum);
 }
 
 // 2004. 07. 07. [levites] - 스킬 사용중 타겟이 바뀌는 문제 해결을 위한 코드
@@ -2378,9 +2405,13 @@ bool CInstanceBase::CanChangeTarget()
 }
 
 // 2004.07.17.levites.isShow를 ViewFrustumCheck로 변경
-bool CInstanceBase::CanPickInstance()
+bool CInstanceBase::CanPickInstance(bool bIgnoreViewFrustrum /*= false*/)
 {
-	if (!__IsInViewFrustum())
+	if (!bIgnoreViewFrustrum && !__IsInViewFrustum())
+		return false;
+
+	// Prevents clicking on client objects and guild buildings
+	if (IsObject() || IsBuilding())
 		return false;
 
 	if (IsDoor())
@@ -2391,30 +2422,25 @@ bool CInstanceBase::CanPickInstance()
 
 	if (IsPC())
 	{
-		if (IsAffect(AFFECT_EUNHYEONG))
+		if ((IsAffect(AFFECT_EUNHYEONG) ||
+		   IsAffect(AFFECT_REVIVE_INVISIBILITY) ||
+		   IsAffect(AFFECT_INVISIBILITY))
+#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM	
+			&& !__MainCanSeeHiddenThing())
+#endif
 		{
-			if (!__MainCanSeeHiddenThing())
-				return false;
+			return false;
 		}
-#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
-		if (IsAffect(AFFECT_REVIVE_INVISIBILITY) && !__MainCanSeeHiddenThing())
-			return false;
-#else
-		if (IsAffect(AFFECT_REVIVE_INVISIBILITY))
-			return false;
-#endif
-#ifdef ENABLE_CANSEEHIDDENTHING_FOR_GM
-		if (IsAffect(AFFECT_INVISIBILITY) && !__MainCanSeeHiddenThing())
-			return false;
-#else
-		if (IsAffect(AFFECT_INVISIBILITY))
-			return false;
-#endif
+
 
 	}
 
-	if (IsDead())
+	if (IsDead()) {
+		if (CPythonBackground::Instance().IsHazardousMap() && IsPC())
+			return true;
+
 		return false;
+	}
 
 	return true;
 }
@@ -2505,6 +2531,11 @@ BOOL CInstanceBase::IsGoto()
 BOOL CInstanceBase::IsObject()
 {
 	return m_GraphicThingInstance.IsObject();
+}
+
+BOOL CInstanceBase::IsShop()
+{
+	return m_GraphicThingInstance.IsShop();
 }
 
 BOOL CInstanceBase::IsBuilding()
@@ -2701,7 +2732,7 @@ void CInstanceBase::SetHair(uint32_t eHair)
 	if (!HAIR_COLOR_ENABLE)
 		return;
 
-	if (IsPC()==false)
+	if (!IsPC() && !IsNPC())
 		return;
 	//CItemData * pItemData;
 	float fSpecularPower = 0.0f;
@@ -3049,6 +3080,35 @@ bool CInstanceBase::SetWeapon(uint32_t eWeapon)
 	if (__IsChangableWeapon(eWeapon) == false)
 		eWeapon = 0;
 
+	if (CPythonBackground::Instance().IsPrimalMap())
+	{
+		uint32_t weaponType = CItemData::WEAPON_NONE;
+		CItemData * pItemData;
+		if (CItemManager::Instance().GetItemDataPointer(eWeapon, &pItemData))
+			weaponType = pItemData->GetWeaponType();
+
+		switch (weaponType)
+		{
+		case CItemData::WEAPON_SWORD:
+			eWeapon = 19;
+			break;
+		case CItemData::WEAPON_DAGGER:
+			eWeapon = 1009;
+			break;
+		case CItemData::WEAPON_BOW:
+			eWeapon = 2009;
+			break;
+		case CItemData::WEAPON_TWO_HANDED:
+			eWeapon = 3009;
+			break;
+		case CItemData::WEAPON_BELL:
+			eWeapon = 5009;
+			break;
+		case CItemData::WEAPON_FAN:
+			eWeapon = 7009;
+			break;
+		}
+	}
 	m_GraphicThingInstance.AttachWeapon(eWeapon);
 	m_awPart[CRaceData::PART_WEAPON] = eWeapon;
 	
@@ -3064,6 +3124,36 @@ bool CInstanceBase::SetWeapon(uint32_t eWeapon)
 
 void CInstanceBase::ChangeWeapon(uint32_t eWeapon)
 {
+	if (CPythonBackground::Instance().IsPrimalMap())
+	{
+		uint32_t weaponType = CItemData::WEAPON_NONE;
+		CItemData * pItemData;
+		if (CItemManager::Instance().GetItemDataPointer(eWeapon, &pItemData))
+			weaponType = pItemData->GetWeaponType();
+
+		switch (weaponType)
+		{
+		case CItemData::WEAPON_SWORD:
+			eWeapon = 19;
+			break;
+		case CItemData::WEAPON_DAGGER:
+			eWeapon = 1009;
+			break;
+		case CItemData::WEAPON_BOW:
+			eWeapon = 2009;
+			break;
+		case CItemData::WEAPON_TWO_HANDED:
+			eWeapon = 3009;
+			break;
+		case CItemData::WEAPON_BELL:
+			eWeapon = 5009;
+			break;
+		case CItemData::WEAPON_FAN:
+			eWeapon = 7009;
+			break;
+		}
+	}
+
 	if (eWeapon == m_GraphicThingInstance.GetPartItemID(CRaceData::PART_WEAPON))
 		return;
 

@@ -44,6 +44,19 @@ PyObject * backgroundEnableSnow(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
+PyObject* backgroundToggleRain(PyObject* poSelf, PyObject* poArgs) {
+	bool bEnable;
+	if (!PyTuple_GetBoolean(poArgs, 0, &bEnable))
+		return Py_BadArgument();
+
+	CPythonBackground::Instance().ToggleRainEnvironment(bEnable);
+	return Py_BuildNone();
+}
+
+PyObject* backgroundIsRainEnabled(PyObject* poSelf, PyObject* poArgs) {
+	return Py_BuildValue("b", CPythonBackground::Instance().IsRainEnabled());
+}
+
 PyObject * backgroundLoadMap(PyObject * poSelf, PyObject * poArgs)
 {
 	char * pszMapPathName;
@@ -526,6 +539,13 @@ PyObject * backgroundDisableGuildArea(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
+PyObject* backgroundIsPrimalMap(PyObject* poSelf, PyObject* poArgs) {
+	return Py_BuildValue("b", CPythonBackground::Instance().IsPrimalMap());
+}
+
+PyObject* backgroundIsHazardousMap(PyObject* poSelf, PyObject* poArgs) {
+	return Py_BuildValue("b", CPythonBackground::Instance().IsHazardousMap());
+}
 
 #ifdef ENABLE_FOG_FIX
 PyObject * backgroundSetEnvironmentFog(PyObject * poSelf, PyObject * poArgs)
@@ -600,6 +620,12 @@ void initBackground()
 		{ "DisableGuildArea",					backgroundDisableGuildArea,					METH_VARARGS },
 
 		{ "WarpTest",							backgroundWarpTest,							METH_VARARGS },
+
+		{ "ToggleRain",							backgroundToggleRain,						METH_VARARGS },
+		{ "IsRainEnabled",						backgroundIsRainEnabled,					METH_VARARGS },
+
+		{ "IsPrimalMap",						backgroundIsPrimalMap,						METH_VARARGS },
+		{ "IsHazardousMap",						backgroundIsHazardousMap,					METH_VARARGS },
 
 #ifdef ENABLE_FOG_FIX
 		{ "SetEnvironmentFog",					backgroundSetEnvironmentFog,				METH_VARARGS }, 

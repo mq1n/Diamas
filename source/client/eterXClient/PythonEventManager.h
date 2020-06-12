@@ -140,7 +140,12 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 
 			PyObject * poEventHandler;
 
-			SEventSet() {}
+			bool isQuestInfo;
+
+			SEventSet() : ix(0), iy(0), iWidth(0), iyLocal(0), isLock(false), lLastDelayTime(0), iCurrentLetter(0), pCurrentTextLine(nullptr),
+						isConfirmWait(0), pConfirmTimeTextLine(nullptr), iConfirmEndTime(0), iVisibleStartLine(0), iVisibleLineCount(0),
+						iAdjustLine(0), lWaitingTime(0), iRestrictedCharacterCount(0), nAnswer(0), isTextCenterMode(false), isWaitFlag(false), poEventHandler(nullptr), isQuestInfo(false)
+			{}
 			virtual ~SEventSet() {}
 		} TEventSet;
 

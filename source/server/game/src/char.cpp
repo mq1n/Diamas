@@ -797,14 +797,14 @@ void CHARACTER::CloseMyShop()
 	}
 }
 
-void EncodeMovePacket(TPacketGCMove & pack, uint32_t dwVID, uint8_t bFunc, uint8_t bArg, uint32_t x, uint32_t y, uint32_t dwDuration, uint32_t dwTime, uint8_t bRot)
+void EncodeMovePacket(TPacketGCMove & pack, uint32_t dwVID, uint8_t bFunc, uint8_t bArg, uint32_t x, uint32_t y, uint32_t dwDuration, uint32_t dwTime, float fRot)
 {
 	pack.bHeader = HEADER_GC_MOVE;
 	pack.bFunc   = bFunc;
 	pack.bArg    = bArg;
 	pack.dwVID   = dwVID;
 	pack.dwTime  = dwTime ? dwTime : get_dword_time();
-	pack.bRot    = bRot;
+	pack.rot    = fRot;
 	pack.lX		= x;
 	pack.lY		= y;
 	pack.dwDuration	= dwDuration;
@@ -2859,7 +2859,7 @@ bool CHARACTER::Move(int32_t x, int32_t y)
 	return Sync(x, y);
 }
 
-void CHARACTER::SendMovePacket(uint8_t bFunc, uint8_t bArg, uint32_t x, uint32_t y, uint32_t dwDuration, uint32_t dwTime, int32_t iRot)
+void CHARACTER::SendMovePacket(uint8_t bFunc, uint8_t bArg, uint32_t x, uint32_t y, uint32_t dwDuration, uint32_t dwTime, float rot)
 {
 	TPacketGCMove pack;
 
@@ -2870,7 +2870,7 @@ void CHARACTER::SendMovePacket(uint8_t bFunc, uint8_t bArg, uint32_t x, uint32_t
 		dwDuration = m_dwMoveDuration;
 	}
 
-	EncodeMovePacket(pack, GetVID(), bFunc, bArg, x, y, dwDuration, dwTime, iRot == -1 ? (int32_t) GetRotation() / 5 : iRot);
+	EncodeMovePacket(pack, GetVID(), bFunc, bArg, x, y, dwDuration, dwTime, rot < 0.0f ? GetRotation() : rot);
 	PacketView(&pack, sizeof(TPacketGCMove), this);
 }
 

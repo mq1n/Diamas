@@ -603,10 +603,10 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 		return iExtraLen;
 	}
 
-	if (true == SpamBlockCheck(ch, buf, buflen))
-	{
-		return iExtraLen;
-	}
+//	if (true == SpamBlockCheck(ch, buf, buflen))
+//	{
+//		return iExtraLen;
+//	}
 
 	// @fixme133 begin
 	CBanwordManager::instance().ConvertString(buf, buflen);
@@ -1479,7 +1479,7 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 		if (ch->GetLimitPoint(POINT_MOV_SPEED) == 0)
 			return;
 
-		ch->SetRotation(pinfo->bRot * 5);	// 중복 코드
+		ch->SetRotation(pinfo->rot);	// 중복 코드
 		ch->ResetStopTime();				// ""
 
 		ch->Goto(pinfo->lX, pinfo->lY);
@@ -1518,7 +1518,7 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 			ch->OnMove();
 		}
 
-		ch->SetRotation(pinfo->bRot * 5);	// 중복 코드
+		ch->SetRotation(pinfo->rot);	// 중복 코드
 		ch->ResetStopTime();				// ""
 
 		ch->Move(pinfo->lX, pinfo->lY);
@@ -1531,7 +1531,7 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 	pack.bHeader      = HEADER_GC_MOVE;
 	pack.bFunc        = pinfo->bFunc;
 	pack.bArg         = pinfo->bArg;
-	pack.bRot         = pinfo->bRot;
+	pack.rot          = pinfo->rot;
 	pack.dwVID        = ch->GetVID();
 	pack.lX           = pinfo->lX;
 	pack.lY           = pinfo->lY;

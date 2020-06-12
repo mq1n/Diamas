@@ -559,7 +559,7 @@ typedef struct command_move
 	uint8_t	bHeader;
 	uint8_t	bFunc;
 	uint8_t	bArg;
-	uint8_t	bRot;
+	float	rot;
 	int32_t	lX;
 	int32_t	lY;
 	uint32_t	dwTime;
@@ -1258,7 +1258,7 @@ typedef struct packet_move
 	uint8_t		bHeader;
 	uint8_t		bFunc;
 	uint8_t		bArg;
-	uint8_t		bRot;
+	float		rot;
 	uint32_t		dwVID;
 	int32_t		lX;
 	int32_t		lY;

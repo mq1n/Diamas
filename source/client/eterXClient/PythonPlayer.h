@@ -185,13 +185,17 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		CPythonPlayer(void);
 		virtual ~CPythonPlayer(void);
 
-		void	PickCloseMoney();
-		void	PickCloseItem();
+		void	PickCloseLoot(bool bIsYangPriority=0);
 
 		void	SetGameWindow(PyObject * ppyObject);
 
 		void	SetObserverMode(bool isEnable);
 		bool	IsObserverMode();
+
+		//Free camera - [Think]
+		void	SetFreeCameraMode(bool isEnable);
+		bool	IsFreeCameraMode();
+		//End free camera
 
 		void	SetQuickCameraMode(bool isEnable);
 
@@ -217,14 +221,8 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		void	NEW_Fishing();
 		bool	NEW_CancelFishing();
 
-		void	NEW_LookAtFocusActor();
-		bool	NEW_IsAttackableDistanceFocusActor();
-
-
-		bool	NEW_MoveToDestPixelPositionDirection(const TPixelPosition& c_rkPPosDst);
-		bool	NEW_MoveToMousePickedDirection();
 		bool	NEW_MoveToMouseScreenDirection();
-		bool	NEW_MoveToDirection(float fDirRot);
+		bool	NEW_MoveToDirection(float fDirRot, bool isBackwards);
 		void	NEW_Stop();
 
 
@@ -357,7 +355,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 
 
 		// Target
-		void	SetTarget(uint32_t dwVID, BOOL bForceChange = TRUE);
+		void	SetTarget(uint32_t dwVID, BOOL bForceChange = TRUE, bool bIgnoreViewFrustrum = false);
 		void	OpenCharacterMenu(uint32_t dwVictimActorID);
 		uint32_t	GetTargetVID();
 
@@ -473,7 +471,6 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		void	__ReserveProcess_ClickActor();
 
 		void	__ShowPickedEffect(const TPixelPosition& c_rkPPosPickedGround);
-		void	__SendClickActorPacket(CInstanceBase& rkInstVictim);
 
 		void	__ClearAutoAttackTargetActorID();
 		void	__SetAutoAttackTargetActorID(uint32_t dwActorID);
@@ -489,16 +486,10 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		float	GetDegreeFromDirection(int32_t iUD, int32_t iLR);
 		float	GetDegreeFromPosition(int32_t ix, int32_t iy, int32_t iHalfWidth, int32_t iHalfHeight);
 
-		bool	CheckCategory(int32_t iCategory);
-		bool	CheckAbilitySlot(int32_t iSlotIndex);
-
-		void	RefreshKeyWalkingDirection();
 		void	NEW_RefreshMouseWalkingDirection();
 
 
 		// Instances
-		void	RefreshInstances();
-
 		bool	__CanShot(CInstanceBase& rkInstMain, CInstanceBase& rkInstTarget);
 		bool	__CanUseSkill();
 
@@ -509,7 +500,6 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 
 		bool	__CheckSkillUsable(uint32_t dwSlotIndex);
 		void	__UseCurrentSkill();
-		void	__UseChargeSkill(uint32_t dwSkillSlotIndex);
 		bool	__UseSkill(uint32_t dwSlotIndex);
 		bool	__CheckSpecialSkill(uint32_t dwSkillIndex);
 
@@ -521,6 +511,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 
 		void	__SendUseSkill(uint32_t dwSkillSlotIndex, uint32_t dwTargetVID);
 		void	__RunCoolTime(uint32_t dwSkillSlotIndex);
+		void	SendClickActorPacket(CInstanceBase& rkInstVictim);
 
 		uint8_t	__GetSkillType(uint32_t dwSkillSlotIndex);
 
@@ -593,6 +584,8 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 
 		float					m_fMovDirRot;
 
+		float					m_fLastClientFocusTime;
+
 		bool					m_isUp;
 		bool					m_isDown;
 		bool					m_isLeft;
@@ -638,6 +631,9 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		// Private Shop
 		bool					m_isOpenPrivateShop;
 		bool					m_isObserverMode;
+
+		// Free camera mode - [Think]
+		bool					m_isFreeCameraMode;
 
 		// Stamina
 		BOOL					m_isConsumingStamina;

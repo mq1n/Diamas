@@ -15,6 +15,11 @@
 
 class CInstanceBase;
 
+static const std::vector<std::string> c_vec_hazardous_maps = {
+	"metin2_map_deceitful_forest",
+	"metin2_map_n_snow_dungeon_01",
+};
+
 class CPythonBackground : public CMapManager, public CSingleton<CPythonBackground>  
 {
 public:
@@ -106,6 +111,8 @@ public:
 	void ChangeToNight();
 	void EnableSnowEnvironment();
 	void DisableSnowEnvironment();
+	void ToggleRainEnvironment(bool enable);
+	bool IsRainEnabled();
 	void SetXMaxTree(int32_t iGrade);
 
 	void ClearGuildArea();
@@ -126,6 +133,14 @@ public:
 	void RegisterDungeonMapName(const char * c_szMapName);
 	TMapInfo* GlobalPositionToMapInfo(uint32_t dwGlobalX, uint32_t dwGlobalY);
 	const char* GetWarpMapName();
+
+	bool IsPrimalMap() const { return m_bIsPrimalMap; }
+	void SetPrimalMap(bool is_primal);
+
+	bool IsPrimalMapAttackable() const { return m_bIsPrimalMapAttackable; }
+	void SetPrimalMapAttackable(bool attackable) { m_bIsPrimalMapAttackable = attackable; }
+
+	bool IsHazardousMap() { return std::find(c_vec_hazardous_maps.begin(), c_vec_hazardous_maps.end(), m_strMapName) != c_vec_hazardous_maps.end(); }
 
 protected:
 	void __CreateProperty();
@@ -178,6 +193,9 @@ private:
 			return true;
 		}
 	};
+
+	bool m_bIsPrimalMap;
+	bool m_bIsPrimalMapAttackable;
 };
 
 #endif // !defined(AFX_PYTHONBACKGROUND_H__A202CB18_9553_4CF3_8500_5D7062B55432__INCLUDED_)

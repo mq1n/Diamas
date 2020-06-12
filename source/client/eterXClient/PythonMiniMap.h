@@ -12,6 +12,8 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 			MINI_WAYPOINT_IMAGE_COUNT = 12,
 			WAYPOINT_IMAGE_COUNT = 15,
 			TARGET_MARK_IMAGE_COUNT = 2,
+			STORM_CIRCLE_IMAGE_COUNT = 1,
+			SAFE_ZONE_IMAGE_COUNT = 1,
 		};
 		enum
 		{
@@ -26,8 +28,8 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 			TYPE_EMPIRE,
 			TYPE_EMPIRE_END = TYPE_EMPIRE + EMPIRE_NUM,
 			TYPE_TARGET,
-			TYPE_OFFLINE_SHOP,
-			TYPE_COUNT
+			TYPE_SHOP,
+			TYPE_COUNT,
 		};
 
 	public:
@@ -86,19 +88,25 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 
 		// NPC List
 		void ClearAtlasMarkInfo();
+		void ClearAtlasShopInfo();
 		void ClearAtlasPartyInfo();
 		void RegisterAtlasMark(uint8_t byType, const char * c_szName, int32_t lx, int32_t ly);
 
 		// Guild
 		void ClearGuildArea();
 		void RegisterGuildArea(uint32_t dwID, uint32_t dwGuildID, int32_t x, int32_t y, int32_t width, int32_t height);
-		uint32_t GetGuildAreaID(int32_t x, int32_t y);
+		void UpdateGuildArea(uint32_t updateID, uint32_t updatedGuild);
+		uint32_t GetGuildAreaID(uint32_t x, uint32_t y);
 
 		// Target
 		void CreateTarget(int32_t iID, const char * c_szName);
 		void CreateTarget(int32_t iID, const char * c_szName, uint32_t dwVID);
 		void UpdateTarget(int32_t iID, uint32_t ix, uint32_t iy);
 		void DeleteTarget(int32_t iID);
+
+		// Primal Law
+		void SetStormCircle(int32_t ix, int32_t iy, int32_t radius);
+		void SetNextSafeZoneCircle(int32_t ix, int32_t iy, int32_t radius);
 
 	protected:
 		void __Initialize();
@@ -108,6 +116,8 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		void __RenderWayPointMark(int32_t ixCenter, int32_t iyCenter);
 		void __RenderMiniWayPointMark(int32_t ixCenter, int32_t iyCenter);
 		void __RenderTargetMark(int32_t ixCenter, int32_t iyCenter);
+		void __RenderStormCircle();
+		void __RenderNextSafeZoneCircle();
 
 		void __GlobalPositionToAtlasPosition(int32_t lx, int32_t ly, float * pfx, float * pfy);
 
@@ -130,6 +140,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		// GuildArea
 		typedef struct
 		{
+			uint32_t dwID;
 			uint32_t dwGuildID;
 			int32_t lx, ly;
 			int32_t lwidth, lheight;
@@ -209,11 +220,12 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		D3DXMATRIX						m_matMiniMapCover;
 
 		bool							m_bShowAtlas;
+		bool							m_bAtlasRenderShops;
 		bool							m_bAtlasRenderNpc;
 		bool							m_bAtlasRenderWarp;
 		bool							m_bAtlasRenderWaypoint;
 		bool							m_bAtlasRenderParty;
-		bool							m_bAtlasRenderOfflineShop;
+
 		CGraphicImageInstance			m_AtlasImageInstance;
 		D3DXMATRIX						m_matWorldAtlas;
 		CGraphicExpandedImageInstance	m_AtlasPlayerMark;
@@ -236,9 +248,9 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		typedef TGuildAreaInfoVector::iterator	TGuildAreaInfoVectorIterator;
 		TAtlasMarkInfoVectorIterator			m_AtlasMarkInfoListIterator;
 		TAtlasMarkInfoVector					m_AtlasNPCInfoVector;
+		TAtlasMarkInfoVector					m_AtlasShopInfoVector;
 		TAtlasMarkInfoVector					m_AtlasWarpInfoVector;
 		TAtlasMarkInfoVector					m_AtlasPartyInfoVector;
-		TAtlasMarkInfoVector					m_AtlasOfflineShopInfoVector;
 
 		// WayPoint
 		CGraphicExpandedImageInstance			m_MiniWayPointGraphicImageInstances[MINI_WAYPOINT_IMAGE_COUNT];
@@ -247,6 +259,14 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		CGraphicImageInstance					m_GuildAreaFlagImageInstance;
 		TAtlasMarkInfoVector					m_AtlasWayPointInfoVector;
 		TGuildAreaInfoVector					m_GuildAreaInfoVector;
+
+		// Primal Law
+		CGraphicExpandedImageInstance			m_StormIndicatorInstances[STORM_CIRCLE_IMAGE_COUNT];
+		CGraphicExpandedImageInstance			m_NextSafezoneIndicatorInstances[SAFE_ZONE_IMAGE_COUNT];
+		bool									m_bShowStormCircle;
+		bool									m_bShowSafezoneCircle;
+		float									m_fStormCircleAlpha;
+		float									m_fSafezoneCircleAlpha;
 
 		// SignalPoint
 		struct TSignalPoint

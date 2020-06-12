@@ -310,6 +310,10 @@ PyObject * chrHide(PyObject* poSelf, PyObject* poArgs)
 	if (!pkInst)
 		return Py_BuildNone();
 
+	bool bHideEffects;
+	if (PyTuple_GetBoolean(poArgs, 0, &bHideEffects) && bHideEffects)
+		pkInst->SCRIPT_SetAffect(CInstanceBase::AFFECT_REVIVE_INVISIBILITY, true);
+
 	pkInst->Hide();
 	return Py_BuildNone();
 }
@@ -319,6 +323,10 @@ PyObject * chrShow(PyObject* poSelf, PyObject* poArgs)
 	CInstanceBase * pkInst = CPythonCharacterManager::Instance().GetSelectedInstancePtr();
 	if (!pkInst)
 		return Py_BuildNone();
+
+	bool bShowEffects;
+	if (PyTuple_GetBoolean(poArgs, 0, &bShowEffects) && bShowEffects)
+		pkInst->SCRIPT_SetAffect(CInstanceBase::AFFECT_REVIVE_INVISIBILITY, false);
 
 	pkInst->Show();
 	return Py_BuildNone();
@@ -555,15 +563,6 @@ PyObject * chrDismountHorse(PyObject* poSelf, PyObject* poArgs)
 	if (!pkInst)
 		return Py_BuildNone();
  	pkInst->DismountHorse();
-	return Py_BuildNone();
-}
-
-PyObject * chrDie(PyObject* poSelf, PyObject* poArgs)
-{
-	CInstanceBase * pkInst = CPythonCharacterManager::Instance().GetSelectedInstancePtr();
-	if (!pkInst)
-		return Py_BuildNone();
- 	pkInst->Die();
 	return Py_BuildNone();
 }
 
@@ -840,6 +839,30 @@ PyObject * chrGetNameByVID(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildValue("s", pInstance->GetNameString());
 }
 
+PyObject * chrGetLevel(PyObject* poSelf, PyObject* poArgs)
+{
+	CInstanceBase * pInstance = CPythonCharacterManager::Instance().GetSelectedInstancePtr();
+
+	if (!pInstance)
+		return Py_BuildValue("i", 0);
+
+	return Py_BuildValue("i", pInstance->GetLevel());
+}
+
+PyObject * chrGetLevelByVID(PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t iVirtualID;
+	if (!PyTuple_GetInteger(poArgs, 0, &iVirtualID))
+		return Py_BuildException();
+
+	CInstanceBase * pInstance = CPythonCharacterManager::Instance().GetInstancePtr(iVirtualID);
+
+	if (!pInstance)
+		return Py_BuildValue("i", 0);
+
+	return Py_BuildValue("i", pInstance->GetLevel());
+}
+
 PyObject * chrGetGuildID(PyObject* poSelf, PyObject* poArgs)
 {
 	int32_t iVirtualID;
@@ -1054,7 +1077,7 @@ PyObject * chrtestSetSpecularRenderMode(PyObject* poSelf, PyObject* poArgs)
 	CInstanceBase * pkInst = CPythonCharacterManager::Instance().GetInstancePtr(iVirtualID);
 	if (pkInst)
 	{
-		pkInst->GetGraphicThingInstanceRef().SetSpecularInfo(TRUE, iPart, fAlpha);
+		pkInst->GetGraphicThingInstanceRef().SetSpecularInfo(true, iPart, fAlpha);
 	}
 
 	return Py_BuildNone();
@@ -1318,7 +1341,6 @@ void initchr()
 		{ "SetPixelPosition",			chrSetPixelPosition,				METH_VARARGS },
 		{ "SetDirection",				chrSetDirection,					METH_VARARGS },
 		{ "Refresh",					chrRefresh,							METH_VARARGS },
-		{ "Die",						chrDie,								METH_VARARGS },
 
 		{ "AttachEffectByID",			chrAttachEffectByID,				METH_VARARGS },
 		{ "AttachEffectByName",			chrAttachEffectByName,				METH_VARARGS },
@@ -1337,7 +1359,9 @@ void initchr()
 		{ "GetRace",					chrGetRace,							METH_VARARGS },
 		{"GetRaceByVID", chrGetRaceByVID, METH_VARARGS},
 		{ "GetName",					chrGetName,							METH_VARARGS },
+		{ "GetLevel",					chrGetLevel,						METH_VARARGS },
 		{ "GetNameByVID",				chrGetNameByVID,					METH_VARARGS },
+		{ "GetLevelByVID",				chrGetLevelByVID,					METH_VARARGS },
 		{ "GetGuildID",					chrGetGuildID,						METH_VARARGS },
 		{ "GetProjectPosition",			chrGetProjectPosition,				METH_VARARGS },
 
@@ -1532,6 +1556,7 @@ void initchr()
 	PyModule_AddIntConstant(poModule, "AFFECT_HEUKSIN",						CInstanceBase::AFFECT_HEUKSIN);
 	PyModule_AddIntConstant(poModule, "AFFECT_MUYEONG",						CInstanceBase::AFFECT_MUYEONG);
 	PyModule_AddIntConstant(poModule, "AFFECT_GICHEON",						CInstanceBase::AFFECT_GICHEON);
+	PyModule_AddIntConstant(poModule, "AFFECT_FIRE",						CInstanceBase::AFFECT_FIRE);
 	PyModule_AddIntConstant(poModule, "AFFECT_JEUNGRYEOK",					CInstanceBase::AFFECT_JEUNGRYEOK);
 	PyModule_AddIntConstant(poModule, "AFFECT_PABEOP",						CInstanceBase::AFFECT_PABEOP);
 	PyModule_AddIntConstant(poModule, "AFFECT_FALLEN_CHEONGEUN",			CInstanceBase::AFFECT_FALLEN_CHEONGEUN);

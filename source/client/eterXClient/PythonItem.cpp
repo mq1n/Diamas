@@ -543,64 +543,46 @@ void CPythonItem::DeleteItem(uint32_t dwVirtualID)
 	CPythonTextTail::Instance().DeleteItemTextTail(dwVirtualID);
 }
 
-
-bool CPythonItem::GetCloseMoney(const TPixelPosition & c_rPixelPosition, uint32_t * pdwItemID, uint32_t dwDistance)
+bool CPythonItem::GetCloseLoot(const std::string & myName, const TPixelPosition & c_rPixelPosition, uint32_t * pdwItemID, uint32_t dwDistance, bool bIsYangPriority)
 {
 	uint32_t dwCloseItemID = 0;
 	uint32_t dwCloseItemDistance = 1000 * 1000;
 
+	uint32_t dwPriorityCloseItemID = 0;
+	uint32_t dwPriorityCloseItemDistance = 1000 * 1000;
+	
 	TGroundItemInstanceMap::iterator i;
 	for (i = m_GroundItemInstanceMap.begin(); i != m_GroundItemInstanceMap.end(); ++i)
 	{
 		TGroundItemInstance * pInstance = i->second;
-
-		if (pInstance->dwVirtualNumber!=VNUM_MONEY)
-			continue;
 
 		uint32_t dwxDistance = uint32_t(c_rPixelPosition.x-pInstance->v3EndPosition.x);
 		uint32_t dwyDistance = uint32_t(c_rPixelPosition.y-(-pInstance->v3EndPosition.y));
 		uint32_t dwDistance = uint32_t(dwxDistance*dwxDistance + dwyDistance*dwyDistance);
-
-		if (dwxDistance*dwxDistance + dwyDistance*dwyDistance < dwCloseItemDistance)
-		{
-			dwCloseItemID = i->first;
-			dwCloseItemDistance = dwDistance;
-		}
-	}
-
-	if (dwCloseItemDistance>float(dwDistance)*float(dwDistance))
-		return false;
-
-	*pdwItemID=dwCloseItemID;
-
-	return true;
-}
-
-bool CPythonItem::GetCloseItem(const TPixelPosition & c_rPixelPosition, uint32_t * pdwItemID, uint32_t dwDistance)
-{
-	uint32_t dwCloseItemID = 0;
-	uint32_t dwCloseItemDistance = 1000 * 1000;
-
-	TGroundItemInstanceMap::iterator i;
-	for (i = m_GroundItemInstanceMap.begin(); i != m_GroundItemInstanceMap.end(); ++i)
-	{
-		TGroundItemInstance * pInstance = i->second;
-
-		uint32_t dwxDistance = uint32_t(c_rPixelPosition.x)-uint32_t(pInstance->v3EndPosition.x); // @fixme022
-		uint32_t dwyDistance = uint32_t(c_rPixelPosition.y)-uint32_t(-pInstance->v3EndPosition.y); // @fixme022
-		uint32_t dwDistance = dwxDistance*dwxDistance + dwyDistance*dwyDistance;
-
+		
 		if (dwDistance < dwCloseItemDistance)
 		{
 			dwCloseItemID = i->first;
 			dwCloseItemDistance = dwDistance;
 		}
+
+		bool isYang = pInstance->dwVirtualNumber == 1;
+		if (((pInstance->stOwnership.empty() && !isYang && !bIsYangPriority) || (bIsYangPriority && isYang) || pInstance->stOwnership == myName) && dwDistance < dwPriorityCloseItemDistance)
+		{
+			dwPriorityCloseItemID = i->first;
+			dwPriorityCloseItemDistance = dwDistance;
+		}
 	}
 
-	if (dwCloseItemDistance>float(dwDistance)*float(dwDistance))
-		return false;
+	if (dwPriorityCloseItemDistance>float(dwDistance)*float(dwDistance)  || dwPriorityCloseItemID == 0) { //I have no item that belongs to me to pick up.
+		if (dwCloseItemDistance > float(dwDistance)*float(dwDistance) || dwCloseItemID == 0)
+			return false;
 
-	*pdwItemID=dwCloseItemID;
+		*pdwItemID = dwCloseItemID;
+	}
+	else {
+		*pdwItemID = dwPriorityCloseItemID;
+	}
 
 	return true;
 }
@@ -624,6 +606,14 @@ BOOL CPythonItem::GetGroundItemPosition(uint32_t dwVirtualID, TPixelPosition * p
 
 uint32_t CPythonItem::__Pick(const POINT& c_rkPtMouse)
 {
+	CPythonTextTail& rkTextTailMgr = CPythonTextTail::Instance();
+	uint32_t pickedIDByTail = rkTextTailMgr.Pick(c_rkPtMouse.x, c_rkPtMouse.y);
+
+	//Prioritise tail clicking over model clicking
+	if (pickedIDByTail != INVALID_ID)
+		return pickedIDByTail;
+
+	//Find the graphic instance on the world and try to intercept the mouse with the model on the floor
 	float fu, fv, ft;
 
 	TGroundItemInstanceMap::iterator itor = m_GroundItemInstanceMap.begin();
@@ -637,8 +627,7 @@ uint32_t CPythonItem::__Pick(const POINT& c_rkPtMouse)
 		}
 	}
 
-	CPythonTextTail& rkTextTailMgr=CPythonTextTail::Instance();
-	return rkTextTailMgr.Pick(c_rkPtMouse.x, c_rkPtMouse.y);
+	return INVALID_ID; //Nothing to pick up.
 }
 
 bool CPythonItem::GetPickedItemID(uint32_t* pdwPickedItemID)

@@ -106,8 +106,7 @@ class CPythonItem : public CSingleton<CPythonItem>
 
 		bool	GetPickedItemID(uint32_t* pdwPickedItemID);
 
-		bool	GetCloseItem(const TPixelPosition & c_rPixelPosition, uint32_t* pdwItemID, uint32_t dwDistance=300);
-		bool	GetCloseMoney(const TPixelPosition & c_rPixelPosition, uint32_t* dwItemID, uint32_t dwDistance=300);
+		bool	GetCloseLoot(const std::string & myName, const TPixelPosition & c_rPixelPosition, uint32_t* pdwItemID, uint32_t dwDistance=300, bool bIsYangPriority =false);
 
 		uint32_t	GetVirtualNumberOfGroundItem(uint32_t dwVID);
 

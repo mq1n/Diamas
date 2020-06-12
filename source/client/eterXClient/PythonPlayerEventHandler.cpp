@@ -35,13 +35,12 @@ void CPythonPlayerEventHandler::OnSyncing(const SState& c_rkState)
 	m_kPPosPrevWaiting=c_rkPPosCurSyncing;
 }
 
+//This function indicates that a player made a tiny step and stopped afterwards.
+//=> No delay rarely happens.
 void CPythonPlayerEventHandler::OnWaiting(const SState& c_rkState)
 {
-	uint32_t dwCurTime=ELTimer_GetMSec();
-	if (m_dwNextWaitingNotifyTime>dwCurTime)
-		return;
-
-	m_dwNextWaitingNotifyTime=dwCurTime+100;
+	uint32_t dwCurTime = ELTimer_GetMSec();
+	m_dwNextMovingNotifyTime = dwCurTime;  // We want to instantly get the moving state because we might do bigger steps now.
 
 	const TPixelPosition& c_rkPPosCurWaiting=c_rkState.kPPosSelf;
 	float dx=m_kPPosPrevWaiting.x-c_rkPPosCurWaiting.x;
@@ -59,25 +58,28 @@ void CPythonPlayerEventHandler::OnWaiting(const SState& c_rkState)
 	//Trace("waiting\n");
 }
 
+//This function indicates that a player is moving.
+//It keeps getting called, so we need to delay it.
 void CPythonPlayerEventHandler::OnMoving(const SState& c_rkState)
 {
 	uint32_t dwCurTime=ELTimer_GetMSec();		
 	if (m_dwNextMovingNotifyTime>dwCurTime)
 		return;
 	
-	m_dwNextMovingNotifyTime=dwCurTime+300;
-	
+	m_dwNextMovingNotifyTime = dwCurTime + 175; // If we keep moving delaying the stream of packets is fine!
+
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
 	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_MOVE, 0);
 
 //	Trace("moving\n");
 }
 
+//This function indicates that a player started to move after a wait.
+//Only called once after a wait state.
 void CPythonPlayerEventHandler::OnMove(const SState& c_rkState)
 {
 	uint32_t dwCurTime=ELTimer_GetMSec();
-	m_dwNextWaitingNotifyTime=dwCurTime+100;
-	m_dwNextMovingNotifyTime=dwCurTime+300;
+	m_dwNextMovingNotifyTime=dwCurTime + 100;
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
 	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_MOVE, 0);
@@ -85,6 +87,7 @@ void CPythonPlayerEventHandler::OnMove(const SState& c_rkState)
 //	Trace("move\n");
 }
 
+//This function indicates that a player stopped completely.
 void CPythonPlayerEventHandler::OnStop(const SState& c_rkState)
 {
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
@@ -166,7 +169,7 @@ void CPythonPlayerEventHandler::FlushVictimList()
 		return;
 
 	// #0000682: [M2EU] ´ëÁø°¢ ½ºÅ³ »ç¿ë½Ã Æ¨±è 
-	uint32_t SYNC_POSITION_COUNT_LIMIT = 16;
+	//uint32_t SYNC_POSITION_COUNT_LIMIT = 16;
 	uint32_t uiVictimCount = m_kVctkVictim.size();
 
 	CPythonNetworkStream& rkStream=CPythonNetworkStream::Instance();
@@ -190,7 +193,6 @@ CPythonPlayerEventHandler::CPythonPlayerEventHandler()
 {
 	m_dwPrevComboIndex=0;
 	m_dwNextMovingNotifyTime=0;
-	m_dwNextWaitingNotifyTime=0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,8 +205,12 @@ void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnSe
 	m_pInstMain->NEW_GetPixelPosition(&s.kPPosSelf);
 	s.fAdvRotSelf=m_pInstMain->GetGraphicThingInstancePtr()->GetTargetRotation();
 
+	CInstanceBase* targetInstance = m_pInstMain->GetFlyTargetInstance();
+	if (!targetInstance)
+		targetInstance = m_pInstTarget ? m_pInstTarget : m_pInstMain;
+
 	CPythonNetworkStream& rpns=CPythonNetworkStream::Instance();
-	rpns.SendFlyTargetingPacket(m_pInstTarget->GetVirtualID(), m_pInstTarget->GetGraphicThingInstancePtr()->OnGetFlyTargetPosition());
+	rpns.SendFlyTargetingPacket(targetInstance->GetVirtualID(), targetInstance->GetGraphicThingInstancePtr()->OnGetFlyTargetPosition());
 }
 void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnShoot(uint32_t dwSkillIndex)
 {

@@ -717,6 +717,30 @@ PyObject * chrmgrIsPossibleEmoticon(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildValue("i", result);
 }
 
+#ifdef _DEBUG
+//Allows sending an attack packet to a certain VID from python
+#include "PythonNetworkStream.h"
+PyObject * chrmgrAttack(PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t nVID;
+	if (!PyTuple_GetInteger(poArgs, 0, &nVID))
+		return Py_BadArgument();
+	
+	CPythonNetworkStream& rkStream = CPythonNetworkStream::Instance();
+	rkStream.SendAttackPacket(0, nVID);
+	return Py_BuildNone();
+}
+#endif
+
+PyObject* chrmgrIsDead(PyObject* poSelf, PyObject* poArgs) {
+	int32_t vid;
+	if (!PyTuple_GetInteger(poArgs, 0, &vid))
+		return Py_BadArgument();
+
+	CInstanceBase* pInstance = CPythonCharacterManager::Instance().GetInstancePtr(vid);
+	return Py_BuildValue("b", pInstance ? pInstance->IsDead() : true);
+}
+
 void initchrmgr()
 {
 	static PyMethodDef s_methods[] =
@@ -762,6 +786,11 @@ void initchrmgr()
 		{ "RegisterTitleName",			chrmgrRegisterTitleName,				METH_VARARGS },
 		{ "RegisterNameColor",			chrmgrRegisterNameColor,				METH_VARARGS },
 		{ "RegisterTitleColor",			chrmgrRegisterTitleColor,				METH_VARARGS },
+
+#ifdef _DEBUG
+		{ "Attack",						chrmgrAttack,							METH_VARARGS },
+#endif
+		{ "IsDead",						chrmgrIsDead,							METH_VARARGS },
 
 		{ nullptr,							nullptr,									0 },
 	};	

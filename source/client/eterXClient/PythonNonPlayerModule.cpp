@@ -1,9 +1,17 @@
 #include "StdAfx.h"
 #include "PythonNonPlayer.h"
-
 #include "InstanceBase.h"
 #include "PythonCharacterManager.h"
 #include "PythonDynamicModuleNames.h"
+#include "../eterLib/ResourceManager.h"
+
+PyObject * nonplayerIsFileExist(PyObject * poSelf, PyObject * poArgs)
+{
+	char * szFileName;
+	if (!PyTuple_GetString(poArgs, 0, &szFileName))
+		return Py_BuildException();
+	return Py_BuildValue("b", CResourceManager::Instance().IsFileExist(szFileName));
+}
 
 PyObject * nonplayerGetEventType(PyObject * poSelf, PyObject * poArgs)
 {
@@ -99,6 +107,7 @@ void initNonPlayer()
 		{ "GetMonsterName",				nonplayerGetMonsterName,			METH_VARARGS },
 
 		{ "LoadNonPlayerData",			nonplayerLoadNonPlayerData,			METH_VARARGS },
+		{ "IsFileExist",				nonplayerIsFileExist,				METH_VARARGS },
 
 		{ nullptr,							nullptr,								0		 },
 	};

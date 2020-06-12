@@ -99,6 +99,16 @@ PyObject * miniMapisShow(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildValue("b", bShow);
 }
 
+PyObject * miniMapToggleAtlasMarker(PyObject * poSelf, PyObject * poArgs)
+{
+	int32_t type;
+	if (!PyTuple_GetInteger(poArgs, 0, &type))
+		return Py_BuildException();
+	
+	bool returnValue = CPythonMiniMap::Instance().ToggleAtlasMarker(type);
+	return Py_BuildValue("i", (int32_t)returnValue);
+}
+
 PyObject * miniMapScaleUp(PyObject * poSelf, PyObject * poArgs)
 {
 	CPythonMiniMap::Instance().ScaleUp();
@@ -332,6 +342,7 @@ void initMiniMap()
 		{ "IsAtlas",						miniMapIsAtlas,									METH_VARARGS },
 		{ "GetAtlasInfo",					miniMapGetAtlasInfo,							METH_VARARGS },
 		{ "GetAtlasSize",					miniMapGetAtlasSize,							METH_VARARGS },
+		{ "ToggleAtlasMarker",				miniMapToggleAtlasMarker,								METH_VARARGS },
 
 		{ "AddWayPoint",					miniMapAddWayPoint,								METH_VARARGS },
 		{ "RemoveWayPoint",					miniMapRemoveWayPoint,							METH_VARARGS },
@@ -355,4 +366,5 @@ void initMiniMap()
 	PyModule_AddIntConstant(poModule, "TYPE_WAYPOINT",		CPythonMiniMap::TYPE_WAYPOINT);
 	PyModule_AddIntConstant(poModule, "TYPE_PARTY",		CPythonMiniMap::TYPE_PARTY);
 	PyModule_AddIntConstant(poModule, "TYPE_EMPIRE",		CPythonMiniMap::TYPE_EMPIRE);
+	PyModule_AddIntConstant(poModule, "TYPE_SHOP",			CPythonMiniMap::TYPE_SHOP);
 }

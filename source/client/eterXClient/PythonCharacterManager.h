@@ -82,7 +82,7 @@ class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, publ
 
 		// Pick		
 		int32_t									PickAll();
-		CInstanceBase *						GetCloseInstance(CInstanceBase * pInstance);
+		std::vector<CInstanceBase *>		GetClosestTargets(CInstanceBase * pInstance, int32_t count);
 
 		// Refresh TextTail
 		void								RefreshAllPCTextTail();

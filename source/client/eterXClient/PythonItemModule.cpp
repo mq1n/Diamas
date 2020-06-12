@@ -87,14 +87,18 @@ PyObject * itemGetIconImage(PyObject * poSelf, PyObject * poArgs)
 	if (!pItemData)
 		return Py_BuildException("no selected item data");
 
+	char* szFileName;
+	if (PyTuple_GetString(poArgs, 0, &szFileName))
+		if (strlen(szFileName) > 0)
+			return Py_BuildValue("i", pItemData->GetIconImage(szFileName));
+	
+	return Py_BuildValue("i", pItemData->GetIconImage());
 //	if (CItemData::ITEM_TYPE_SKILLBOOK == pItemData->GetType())
 //	{
 //		char szItemName[64+1];
-//		_snprintf(szItemName, "d:/ymir work/ui/items/etc/book_%02d.sub", );
+//		_snprintf_s(szItemName, "d:/ymir work/ui/items/etc/book_%02d.sub", );
 //		CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(szItemName);
 //	}
-
-	return Py_BuildValue("i", pItemData->GetIconImage());
 }
 
 PyObject * itemGetIconImageFileName(PyObject * poSelf, PyObject * poArgs)
@@ -504,6 +508,33 @@ PyObject* itemLoadItemTable(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
+PyObject* itemIsStackable(PyObject* poSelf, PyObject* poArgs)
+{
+	CItemData * pItemData = CItemManager::Instance().GetSelectedItemDataPointer();
+	if (!pItemData)
+		return Py_BuildException("Can't find select item data");
+
+	return Py_BuildValue("b", pItemData->IsStackable());
+}
+
+
+PyObject* itemVnumByName(PyObject* poSelf, PyObject* poArgs) {
+	char* name;
+	if (!PyTuple_GetString(poArgs, 0, &name))
+		return Py_BadArgument();
+
+	uint32_t dwVnum = 0;
+	for (const auto itemData : CItemManager::Instance().GetItems())
+	{
+		if (!strcmp(name, itemData.second->GetName())) {
+			dwVnum = itemData.first;
+			break;
+		}
+	}
+
+	return Py_BuildValue("i", dwVnum);
+}
+
 void initItem()
 {
 	static PyMethodDef s_methods[] =
@@ -538,6 +569,7 @@ void initItem()
 		{ "IsDetachScroll",					itemIsDetachScroll,						METH_VARARGS },
 		{ "IsKey",							itemIsKey,								METH_VARARGS },
 		{ "IsMetin",						itemIsMetin,							METH_VARARGS },
+		{ "IsStackable",					itemIsStackable,						METH_VARARGS },
 		{ "CanAddToQuickSlotItem",			itemCanAddToQuickSlotItem,				METH_VARARGS },
 
 		{ "Update",							itemUpdate,								METH_VARARGS },
@@ -547,6 +579,8 @@ void initItem()
 		{ "Pick",							itemPick,								METH_VARARGS },
 
 		{ "LoadItemTable",					itemLoadItemTable,						METH_VARARGS },
+		
+		{ "GetVnumByName",					itemVnumByName,							METH_VARARGS },
 
 #ifdef ENABLE_SEALBIND_SYSTEM
 		{ "IsSealScroll",					itemIsSealScroll,						METH_VARARGS },

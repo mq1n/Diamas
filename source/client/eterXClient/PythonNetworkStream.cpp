@@ -9,9 +9,6 @@
 #include "GuildMarkUploader.h"
 #include "MarkManager.h"
 
-// MARK_BUG_FIX
-static uint32_t gs_nextDownloadMarkTime = 0;
-// END_OF_MARK_BUG_FIX
 
 // Packet ---------------------------------------------------------------------------
 class CMainPacketHeaderMap : public CNetworkPacketHeaderMap
@@ -572,7 +569,7 @@ bool CPythonNetworkStream::CheckPacket(TPacketHeader * pRetHeader)
 
 	g_iLastPacket[0] = g_iLastPacket[1];
 	g_iLastPacket[1] = header;
-	Tracenf("header %d size %d", header, PacketType.iPacketSize);
+	//Tracenf("header %d size %d", header, PacketType.iPacketSize);
 	//Tracenf("header %d size %d outputpos[%d] security %u", header, PacketType.iPacketSize, m_recvBufOutputPos, IsSecurityMode());
 	return true;
 }

@@ -121,7 +121,7 @@ void CPythonMiniMap::Update(float fCenterX, float fCenterY)
 
 		TMarkPosition aMarkPosition;
 
-		if (pkInstEach->IsPC() && (!pkInstEach->IsInvisibility()))
+		if (pkInstEach->IsPC() && !pkInstEach->IsInvisibility())
 		{
 			if (pkInstEach == CPythonCharacterManager::Instance().GetMainInstancePtr())
 				continue;
@@ -132,19 +132,17 @@ void CPythonMiniMap::Update(float fCenterX, float fCenterY)
 			aMarkPosition.m_eNameColor=pkInstEach->GetNameColorIndex();
 			m_MinimapPosVector.push_back(aMarkPosition);
 		}
-#ifdef ENABLE_OFFLINE_SHOP
-		else if (pkInstEach->IsOfflineShop())
+		else if (pkInstEach->IsNPC())
 		{
-			aMarkPosition.m_bType = CActorInstance::TYPE_OFFLINE_SHOP;
+			aMarkPosition.m_bType = CActorInstance::TYPE_NPC;
 			aMarkPosition.m_fX = ( m_fWidth - (float)m_WhiteMark.GetWidth() ) / 2.0f + fDistanceFromCenterX + m_fScreenX;
 			aMarkPosition.m_fY = ( m_fHeight - (float)m_WhiteMark.GetHeight() ) / 2.0f + fDistanceFromCenterY + m_fScreenY;
 
 			m_MinimapPosVector.push_back(aMarkPosition);
 		}
-#endif
-		else if (pkInstEach->IsNPC())
+		else if (pkInstEach->IsShop())
 		{
-			aMarkPosition.m_bType = CActorInstance::TYPE_NPC;
+			aMarkPosition.m_bType = CActorInstance::TYPE_SHOP;
 			aMarkPosition.m_fX = ( m_fWidth - (float)m_WhiteMark.GetWidth() ) / 2.0f + fDistanceFromCenterX + m_fScreenX;
 			aMarkPosition.m_fY = ( m_fHeight - (float)m_WhiteMark.GetHeight() ) / 2.0f + fDistanceFromCenterY + m_fScreenY;
 
@@ -400,13 +398,12 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 			STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WARP));
 			stage = 4;
 		}
-#ifdef ENABLE_OFFLINE_SHOP
-		else if (stage != 5 && i.m_bType == CActorInstance::TYPE_OFFLINE_SHOP)
+		else if (stage != 5 && i.m_bType == CActorInstance::TYPE_SHOP)
 		{
 			STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_SHOP));
 			stage = 5;
 		}
-#endif
+
 	
 		m_WhiteMark.SetPosition(i.m_fX, i.m_fY);
 		m_WhiteMark.Render();
@@ -555,6 +552,18 @@ bool CPythonMiniMap::Create()
 		m_TargetMarkGraphicImageInstances[k].SetImagePointer((CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(buf));
 		m_TargetMarkGraphicImageInstances[k].SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
 	}
+	for (int32_t l = 0; l < STORM_CIRCLE_IMAGE_COUNT; ++l)
+	{
+		sprintf_s(buf, "%sgame/primal_law/atlasmap_circle.dds", strImageRoot.c_str());
+		m_StormIndicatorInstances[l].SetImagePointer((CGraphicSubImage *)CResourceManager::Instance().GetResourcePointer(buf));
+		m_StormIndicatorInstances[l].SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
+	}
+	for (int32_t m = 0; m < SAFE_ZONE_IMAGE_COUNT; ++m)
+	{
+		sprintf_s(buf, "%sgame/primal_law/atlasmap_circle.dds", strImageRoot.c_str());
+		m_NextSafezoneIndicatorInstances[m].SetImagePointer((CGraphicSubImage *)CResourceManager::Instance().GetResourcePointer(buf));
+		m_NextSafezoneIndicatorInstances[m].SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
+	}
 
 	m_GuildAreaFlagImageInstance.SetImagePointer((CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer("d:/ymir work/ui/minimap/GuildArea01.sub"));
 
@@ -683,7 +692,11 @@ void CPythonMiniMap::ClearAtlasMarkInfo()
 	m_AtlasNPCInfoVector.clear();
 	m_AtlasWarpInfoVector.clear();
 	m_AtlasPartyInfoVector.clear();
-	m_AtlasOfflineShopInfoVector.clear();
+}
+
+void CPythonMiniMap::ClearAtlasShopInfo()
+{
+	m_AtlasShopInfoVector.clear();
 }
 
 void CPythonMiniMap::ClearAtlasPartyInfo()
@@ -712,12 +725,11 @@ void CPythonMiniMap::RegisterAtlasMark(uint8_t byType, const char * c_szName, in
 			aAtlasMarkInfo.m_byType = TYPE_WARP;
 			m_AtlasWarpInfoVector.push_back(aAtlasMarkInfo);
 			break;
-			/*
-		case CActorInstance::TYPE_OFFLINE_SHOP:
-			aAtlasMarkInfo.m_byType = TYPE_OFFLINE_SHOP;
-			m_AtlasOfflineShopInfoVector.push_back(aAtlasMarkInfo);
+		case CActorInstance::TYPE_SHOP: //No atlas marks implemented sent anymore as of 30.05.2015 <MartPwnS>
+			aAtlasMarkInfo.m_byType = CActorInstance::TYPE_SHOP;
+			aAtlasMarkInfo.m_strText.append("'s Shop ");
+			m_AtlasShopInfoVector.push_back(aAtlasMarkInfo);
 			break;
-			*/
 		case CActorInstance::TYPE_PC:
 			aAtlasMarkInfo.m_byType = TYPE_PARTY; // For now, all pc marks added are supposed to be party members
 			m_AtlasPartyInfoVector.push_back(aAtlasMarkInfo);
@@ -730,9 +742,18 @@ void CPythonMiniMap::ClearGuildArea()
 	m_GuildAreaInfoVector.clear();
 }
 
+void CPythonMiniMap::UpdateGuildArea(uint32_t updateID, uint32_t updatedGuild)
+{
+	for (auto & rInfo : m_GuildAreaInfoVector) {
+		if (rInfo.dwID == updateID)
+			rInfo.dwGuildID = updatedGuild;
+	}
+}
+
 void CPythonMiniMap::RegisterGuildArea(uint32_t dwID, uint32_t dwGuildID, int32_t x, int32_t y, int32_t width, int32_t height)
 {
 	TGuildAreaInfo kGuildAreaInfo;
+	kGuildAreaInfo.dwID = dwID;
 	kGuildAreaInfo.dwGuildID = dwGuildID;
 	kGuildAreaInfo.lx = x;
 	kGuildAreaInfo.ly = y;
@@ -741,7 +762,7 @@ void CPythonMiniMap::RegisterGuildArea(uint32_t dwID, uint32_t dwGuildID, int32_
 	m_GuildAreaInfoVector.push_back(kGuildAreaInfo);
 }
 
-uint32_t CPythonMiniMap::GetGuildAreaID(int32_t x, int32_t y)
+uint32_t CPythonMiniMap::GetGuildAreaID(uint32_t x, uint32_t y)
 {
 	TGuildAreaInfoVectorIterator itor = m_GuildAreaInfoVector.begin();
 	for (; itor != m_GuildAreaInfoVector.end(); ++itor)
@@ -797,6 +818,61 @@ void CPythonMiniMap::CreateTarget(int32_t iID, const char * c_szName, uint32_t d
 void CPythonMiniMap::DeleteTarget(int32_t iID)
 {
 	RemoveWayPoint(iID);
+}
+
+void CPythonMiniMap::SetStormCircle(int32_t ix, int32_t iy, int32_t radius)
+{
+	if (radius == 0)
+	{
+		m_bShowStormCircle = false;
+		m_fStormCircleAlpha = 0.0f;
+		return;
+	}
+
+	// assuming same atlas size for X and Y
+	radius = radius / (m_fAtlasMaxX / 100) * m_fAtlasImageSizeX;
+	m_bShowStormCircle = true;
+	m_fStormCircleAlpha = 0.0f;
+
+	// ix and iy are local coords x 100
+	float fScreenX = ix / m_fAtlasMaxX * m_fAtlasImageSizeX;
+	float fScreenY = iy / m_fAtlasMaxY * m_fAtlasImageSizeY;
+	for (int32_t i = 0; i < STORM_CIRCLE_IMAGE_COUNT; ++i)
+	{
+		auto& rInstance = m_StormIndicatorInstances[i];
+		float diffX = (2.0*radius / rInstance.GetWidth()) * rInstance.GetWidth() / 2.0;
+		float diffY = (2.0*radius / rInstance.GetHeight()) * rInstance.GetHeight() / 2.0;
+		rInstance.SetPosition(fScreenX - diffX, fScreenY - diffY);
+		rInstance.SetScale(2.0*radius / rInstance.GetWidth(), 2.0*radius / rInstance.GetHeight());
+	}
+}
+
+void CPythonMiniMap::SetNextSafeZoneCircle(int32_t ix, int32_t iy, int32_t radius)
+{
+	if (radius == 0)
+	{
+		m_bShowSafezoneCircle = false;
+		m_fSafezoneCircleAlpha = 0.0f;
+		return;
+	}
+
+	// assuming same atlas size for X and Y
+	radius = radius / (m_fAtlasMaxX / 100) * m_fAtlasImageSizeX;
+	m_bShowSafezoneCircle = true;
+	m_fSafezoneCircleAlpha = 0.0f;
+
+	// ix and iy are local coords x 100
+	float fScreenX = ix / m_fAtlasMaxX * m_fAtlasImageSizeX;
+	float fScreenY = iy / m_fAtlasMaxY * m_fAtlasImageSizeY;
+
+	for (int32_t i = 0; i < SAFE_ZONE_IMAGE_COUNT; ++i)
+	{
+		auto& rInstance = m_NextSafezoneIndicatorInstances[i];
+		float diffX = (2.0*radius / rInstance.GetWidth()) * rInstance.GetWidth() / 2.0;
+		float diffY = (2.0*radius / rInstance.GetHeight()) * rInstance.GetHeight() / 2.0;
+		rInstance.SetPosition(fScreenX - diffX, fScreenY - diffY);
+		rInstance.SetScale(2.0*radius / rInstance.GetWidth(), 2.0*radius / rInstance.GetHeight());
+	}
 }
 
 void CPythonMiniMap::__LoadAtlasMarkInfo()
@@ -861,9 +937,6 @@ void CPythonMiniMap::__LoadAtlasMarkInfo()
 				break;
 			case TYPE_WARP:
 				m_AtlasWarpInfoVector.push_back(aAtlasMarkInfo);
-				break;
-			case TYPE_OFFLINE_SHOP:
-				m_AtlasOfflineShopInfoVector.push_back(aAtlasMarkInfo);
 				break;
 		}
 	}
@@ -991,6 +1064,16 @@ void CPythonMiniMap::RenderAtlas(float fScreenX, float fScreenY)
 	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 
+	if (m_bAtlasRenderShops)
+	{
+		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_SHOP));
+		for (auto &rAtlasMarkInfo : m_AtlasShopInfoVector)
+		{
+			m_WhiteMark.SetPosition(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
+			m_WhiteMark.Render();
+		}
+	}
+
 	if (m_bAtlasRenderNpc)
 	{
 		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_NPC));
@@ -1028,15 +1111,6 @@ void CPythonMiniMap::RenderAtlas(float fScreenX, float fScreenY)
 		}
 	}
 
-	if (m_bAtlasRenderOfflineShop)
-	{
-		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_SHOP));
-		for (auto& rAtlasMarkInfo : m_AtlasOfflineShopInfoVector)
-		{
-			m_WhiteMark.SetPosition(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
-			m_WhiteMark.Render();
-		}
-	}
 
 	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MINFILTER);
 	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MAGFILTER);
@@ -1061,6 +1135,26 @@ void CPythonMiniMap::RenderAtlas(float fScreenX, float fScreenY)
 				__RenderWayPointMark(rAtlasMarkInfo.m_fScreenX, rAtlasMarkInfo.m_fScreenY);
 			}
 		}
+	}
+
+	// Primal Law Markers
+	if (m_bShowStormCircle) {
+		//STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, RGBAtoD3DXColor(0, 144, 255, m_fStormCircleAlpha));
+		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, RGBAtoD3DXColor(255, 30, 0, m_fStormCircleAlpha));
+		__RenderStormCircle();
+
+		m_fStormCircleAlpha += 0.03f;
+		if (m_fStormCircleAlpha >= 1.0f)
+			m_fStormCircleAlpha = 1.0f;
+	}
+
+	if (m_bShowSafezoneCircle) {
+		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, RGBAtoD3DXColor(0, 204, 255, m_fSafezoneCircleAlpha));
+		__RenderNextSafeZoneCircle();
+
+		m_fSafezoneCircleAlpha += 0.03f;
+		if (m_fSafezoneCircleAlpha >= 1.0f)
+			m_fSafezoneCircleAlpha = 1.0f;
 	}
 
 	STATEMANAGER.RestoreRenderState(D3DRS_TEXTUREFACTOR);
@@ -1188,6 +1282,24 @@ bool CPythonMiniMap::GetAtlasInfo(float fScreenX, float fScreenY, std::string & 
 		}
 	}
 
+	if (m_bAtlasRenderShops)
+	{
+		for (auto &rAtlasMarkInfo : m_AtlasShopInfoVector)
+		{
+			if (rAtlasMarkInfo.m_fScreenX > 0.0f)
+				if (rAtlasMarkInfo.m_fScreenY > 0.0f)
+					if (rAtlasMarkInfo.m_fX - fCheckWidth / 2 < fRealX && rAtlasMarkInfo.m_fX + fCheckWidth > fRealX &&
+						rAtlasMarkInfo.m_fY - fCheckWidth / 2 < fRealY && rAtlasMarkInfo.m_fY + fCheckHeight > fRealY)
+					{
+						rReturnString = rAtlasMarkInfo.m_strText;
+						*pReturnPosX = rAtlasMarkInfo.m_fX;
+						*pReturnPosY = rAtlasMarkInfo.m_fY;
+						*pdwTextColor = CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_SHOP);
+						return true;
+					}
+		}
+	}
+
 	if (m_bAtlasRenderNpc)
 	{
 		for (auto &rAtlasMarkInfo : m_AtlasNPCInfoVector)
@@ -1231,22 +1343,6 @@ bool CPythonMiniMap::GetAtlasInfo(float fScreenX, float fScreenY, std::string & 
 				*pReturnPosX = rAtlasMarkInfo.m_fX;
 				*pReturnPosY = rAtlasMarkInfo.m_fY;
 				*pdwTextColor = CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WARP);//m_MarkTypeToColorMap[rAtlasMarkInfo.m_byType];
-				return true;
-			}
-		}
-	}
-
-	if (m_bAtlasRenderOfflineShop)
-	{
-		for (auto& rAtlasMarkInfo : m_AtlasOfflineShopInfoVector)
-		{
-			if (rAtlasMarkInfo.m_fX - fCheckWidth / 2 < fRealX && rAtlasMarkInfo.m_fX + fCheckWidth > fRealX &&
-				rAtlasMarkInfo.m_fY - fCheckWidth / 2 < fRealY && rAtlasMarkInfo.m_fY + fCheckHeight > fRealY)
-			{
-				rReturnString = rAtlasMarkInfo.m_strText;
-				*pReturnPosX = rAtlasMarkInfo.m_fX;
-				*pReturnPosY = rAtlasMarkInfo.m_fY;
-				*pdwTextColor = CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_SHOP);//m_MarkTypeToColorMap[rAtlasMarkInfo.m_byType];
 				return true;
 			}
 		}
@@ -1405,6 +1501,20 @@ void CPythonMiniMap::__RenderTargetMark(int32_t ixCenter, int32_t iyCenter)
 	rInstance.Render();
 }
 
+void CPythonMiniMap::__RenderStormCircle()
+{
+	int32_t iNum = (ELTimer_GetMSec() / 67) % STORM_CIRCLE_IMAGE_COUNT;
+	CGraphicImageInstance & rInstance = m_StormIndicatorInstances[iNum];
+	rInstance.Render();
+}
+
+void CPythonMiniMap::__RenderNextSafeZoneCircle()
+{
+	int32_t iNum = (ELTimer_GetMSec() / 67) % SAFE_ZONE_IMAGE_COUNT;
+	CGraphicImageInstance & rInstance = m_NextSafezoneIndicatorInstances[iNum];
+	rInstance.Render();
+}
+
 void CPythonMiniMap::AddSignalPoint(float fX, float fY)
 {
 	static uint32_t g_id = 255;
@@ -1496,14 +1606,14 @@ bool CPythonMiniMap::ToggleAtlasMarker(int32_t type)
 	{
 		case CPythonMiniMap::TYPE_NPC:
 			return m_bAtlasRenderNpc = !m_bAtlasRenderNpc;
+		case CPythonMiniMap::TYPE_SHOP:
+			return m_bAtlasRenderShops = !m_bAtlasRenderShops;
 		case CPythonMiniMap::TYPE_WAYPOINT:
 			return m_bAtlasRenderWaypoint = !m_bAtlasRenderWaypoint;
 		case CPythonMiniMap::TYPE_WARP:
 			return m_bAtlasRenderWarp = !m_bAtlasRenderWarp;
 		case CPythonMiniMap::TYPE_PARTY:
 			return m_bAtlasRenderParty = !m_bAtlasRenderParty;
-		case CPythonMiniMap::TYPE_OFFLINE_SHOP:
-			return m_bAtlasRenderOfflineShop = !m_bAtlasRenderOfflineShop;
 	}	
 
 	return false;
@@ -1541,13 +1651,20 @@ void CPythonMiniMap::__Initialize()
 	m_bShowAtlas = false;
 
 	m_bAtlasRenderNpc = true;
+	m_bAtlasRenderShops = true;
 	m_bAtlasRenderWarp = true;
 	m_bAtlasRenderWaypoint = true;
 	m_bAtlasRenderParty = true;
+
 	D3DXMatrixIdentity(&m_matIdentity);
 	D3DXMatrixIdentity(&m_matWorld);
 	D3DXMatrixIdentity(&m_matMiniMapCover);
 	D3DXMatrixIdentity(&m_matWorldAtlas);
+
+	m_bShowStormCircle = false;
+	m_bShowSafezoneCircle = false;
+	m_fStormCircleAlpha = 0.0f;
+	m_fSafezoneCircleAlpha = 0.0f;
 }
 
 void CPythonMiniMap::Destroy()
@@ -1574,6 +1691,11 @@ void CPythonMiniMap::Destroy()
 		m_WayPointGraphicImageInstances[j].Destroy();
 	for (int32_t k = 0; k < TARGET_MARK_IMAGE_COUNT; ++k)
 		m_TargetMarkGraphicImageInstances[k].Destroy();
+
+	for (int32_t l = 0; l < SAFE_ZONE_IMAGE_COUNT; ++l)
+		m_NextSafezoneIndicatorInstances[l].Destroy();
+	for (int32_t m = 0; m < STORM_CIRCLE_IMAGE_COUNT; ++m)
+		m_StormIndicatorInstances[m].Destroy();
 
 	m_GuildAreaFlagImageInstance.Destroy();
 

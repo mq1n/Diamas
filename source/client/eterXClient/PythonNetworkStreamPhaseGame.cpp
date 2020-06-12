@@ -140,7 +140,7 @@ void CPythonNetworkStream::__SetGuildID(uint32_t id)
 				}
 				else
 				{
-					m_astrGuildName[i] = "";
+					m_astrGuildName[i].clear();
 				}
 			}
 	}
@@ -1073,7 +1073,7 @@ bool CPythonNetworkStream::SendMessengerAddByNamePacket(const char * c_szName)
 	if (!Send(sizeof(packet), &packet))
 		return false;
 	char szName[CHARACTER_NAME_MAX_LEN];
-	strncpy(szName, c_szName, CHARACTER_NAME_MAX_LEN-1);
+	strncpy_s(szName, c_szName, CHARACTER_NAME_MAX_LEN-1);
 	szName[CHARACTER_NAME_MAX_LEN-1] = '\0'; // #720: 메신저 이름 관련 버퍼 오버플로우 버그 수정
 
 	if (!Send(sizeof(szName), &szName))
@@ -1090,7 +1090,7 @@ bool CPythonNetworkStream::SendMessengerRemovePacket(const char * c_szKey, const
 	if (!Send(sizeof(packet), &packet))
 		return false;
 	char szKey[CHARACTER_NAME_MAX_LEN];
-	strncpy(szKey, c_szKey, CHARACTER_NAME_MAX_LEN-1);
+	strncpy_s(szKey, c_szKey, CHARACTER_NAME_MAX_LEN-1);
 	if (!Send(sizeof(szKey), &szKey))
 		return false;
 	__RefreshTargetBoardByName(c_szName);
@@ -1112,7 +1112,7 @@ bool CPythonNetworkStream::SendCharacterStatePacket(const TPixelPosition& c_rkPP
 	kStatePacket.bHeader = HEADER_CG_CHARACTER_MOVE;
 	kStatePacket.bFunc = eFunc;
 	kStatePacket.bArg = uArg;
-	kStatePacket.bRot = fDstRot/5.0f;
+	kStatePacket.rot = fDstRot;
 	kStatePacket.lX = int32_t(c_rkPPosDst.x);
 	kStatePacket.lY = int32_t(c_rkPPosDst.y);
 	kStatePacket.dwTime = ELTimer_GetServerMSec();
@@ -1153,39 +1153,42 @@ bool CPythonNetworkStream::SendUseSkillPacket(uint32_t dwSkillIndex, uint32_t dw
 
 bool CPythonNetworkStream::SendChatPacket(const char * c_szChat, uint8_t byType)
 {
-	if (strlen(c_szChat) == 0)
-		return true;
-
-	if (strlen(c_szChat) >= 512)
-		return true;
-
-	if (c_szChat[0] == '/')
+	if(m_isChatEnable)
 	{
-		if (1 == strlen(c_szChat))
+		if (c_szChat[0] == '\0')
+			return true;
+
+		if (strlen(c_szChat) >= 512)
+			return true;
+
+		if (c_szChat[0] == '/')
 		{
-			if (!m_strLastCommand.empty())
-				c_szChat = m_strLastCommand.c_str();
+			if (1 == strlen(c_szChat))
+			{
+				if (!m_strLastCommand.empty())
+					c_szChat = m_strLastCommand.c_str();
+			}
+			else
+			{
+				m_strLastCommand = c_szChat;
+			}
 		}
-		else
-		{
-			m_strLastCommand = c_szChat;
-		}
+
+		if (ClientCommand(c_szChat))
+			return true;
+
+		int32_t iTextLen = strlen(c_szChat) + 1;
+		TPacketCGChat ChatPacket;
+		ChatPacket.header = HEADER_CG_CHAT;
+		ChatPacket.length = sizeof(ChatPacket) + iTextLen;
+		ChatPacket.type = byType;
+
+		if (!Send(sizeof(ChatPacket), &ChatPacket))
+			return false;
+
+		if (!Send(iTextLen, c_szChat))
+			return false;
 	}
-
-	if (ClientCommand(c_szChat))
-		return true;
-
-	int32_t iTextLen = strlen(c_szChat) + 1;
-	TPacketCGChat ChatPacket;
-	ChatPacket.header = HEADER_CG_CHAT;
-	ChatPacket.length = sizeof(ChatPacket) + iTextLen;
-	ChatPacket.type = byType;
-
-	if (!Send(sizeof(ChatPacket), &ChatPacket))
-		return false;
-
-	if (!Send(iTextLen, c_szChat))
-		return false;
 
 	return true;
 }
@@ -1204,9 +1207,10 @@ void CPythonNetworkStream::RegisterEmoticonString(const char * pcEmoticonString)
 
 bool CPythonNetworkStream::ParseEmoticon(const char * pChatMsg, uint32_t * pdwEmoticon)
 {
+	size_t chatLen = strlen(pChatMsg);
 	for (uint32_t dwEmoticonIndex = 0; dwEmoticonIndex < m_EmoticonStringVector.size() ; ++dwEmoticonIndex)
 	{
-		if (strlen(pChatMsg) > m_EmoticonStringVector[dwEmoticonIndex].size())
+		if (chatLen > m_EmoticonStringVector[dwEmoticonIndex].size())
 			continue;
 
 		const char * pcFind = strstr(pChatMsg, m_EmoticonStringVector[dwEmoticonIndex].c_str());
@@ -1219,10 +1223,49 @@ bool CPythonNetworkStream::ParseEmoticon(const char * pChatMsg, uint32_t * pdwEm
 		return true;
 	}
 
+	//Special emoticon
+	if (strlen(pChatMsg) == 6 && strcmp(pChatMsg, "(*f_*)") == 0) {
+		*pdwEmoticon = 99;
+		return true;
+	}
+
 	return false;
 }
 // Emoticon
 //////////////////////////////////////////////////////////////////////////
+
+const char* ProcessItemHyperlinkText(OUT std::string& src) {
+	// Not a hyperlink string, quit
+	if (src.find("|Hitem") == std::string::npos)
+		return src.c_str();
+
+	// Kinda "ymir-ish" method so consider modify it later. Perhaps, the same as in uiChat.py?
+	for (auto itemData : CItemManager::Instance().GetItems())
+	{
+		std::string searchingString = "[" + std::to_string(itemData.first) + "]";
+		if (src.find(searchingString.c_str()) == std::string::npos)
+			continue;
+
+		const auto table = itemData.second;
+		if (!table)
+			continue;
+
+		std::vector<std::string> results;
+		split_string(src, searchingString, results, false);
+		if (results.empty())
+			continue;
+
+		src.clear();
+		for (auto s : results) {
+			src += s;
+
+			if (s.find("|h", s.length() - 3) != std::string::npos)
+				src += "[" + (std::string) table->GetName() + "]";
+		}
+	}
+
+	return src.c_str();
+}
 
 bool CPythonNetworkStream::RecvChatPacket()
 {
@@ -1280,15 +1323,13 @@ bool CPythonNetworkStream::RecvChatPacket()
 				}
 				else
 				{
-					if (m_isEnableChatInsultFilter)
-					{
-						if (false == pkInstChatter->IsNPC() && false == pkInstChatter->IsEnemy())
-						{
+					if (m_isEnableChatInsultFilter) {
+						if (!pkInstChatter->IsNPC() && !pkInstChatter->IsEnemy()) {
 							__FilterInsult(p, strlen(p));
 						}
 					}
 
-					_snprintf(line, sizeof(line), "%s", p);
+					_snprintf_s(line, sizeof(line), "%s", p);
 				}
 			}
 			break;
@@ -1302,17 +1343,12 @@ bool CPythonNetworkStream::RecvChatPacket()
 #endif
 		case CHAT_TYPE_MAX_NUM:
 		default:
-			_snprintf(line, sizeof(line), "%s", buf);
+			_snprintf_s(line, sizeof(line), "%s", buf);
 			break;
 		}
 
-		if (CHAT_TYPE_SHOUT != kChat.type)
-		{
-			CPythonTextTail::Instance().RegisterChatTail(kChat.dwVID, line);
-		}
-
 		if (pkInstChatter->IsPC())
-			CPythonChat::Instance().AppendChat(kChat.type, buf);
+			CPythonChat::Instance().AppendChat(kChat.type, ProcessItemHyperlinkText(std::string(buf)));
 	}
 	else
 	{
@@ -1334,8 +1370,18 @@ bool CPythonNetworkStream::RecvChatPacket()
 					__FilterInsult(p, strlen(p));
 			}
 		}
+		else if (CHAT_TYPE_TALKING == kChat.type)
+		{
+			uint32_t dwEmoticon;
 
-		CPythonChat::Instance().AppendChat(kChat.type, buf);
+			if (ParseEmoticon(buf, &dwEmoticon))
+			{
+				CInstanceBase * inst = CPythonCharacterManager::Instance().GetMainInstancePtr();
+				inst->SetEmoticon(dwEmoticon);
+				return true;
+			}
+		}
+		CPythonChat::Instance().AppendChat(kChat.type, ProcessItemHyperlinkText(std::string(buf)));
 		
 	}
 	return true;
@@ -1349,17 +1395,15 @@ bool CPythonNetworkStream::RecvWhisperPacket()
 	if (!Recv(sizeof(whisperPacket), &whisperPacket))
 		return false;
 
-	assert(whisperPacket.wSize - sizeof(whisperPacket) < 512);
-
 	if (!Recv(whisperPacket.wSize - sizeof(whisperPacket), &buf))
 		return false;
 
 	buf[whisperPacket.wSize - sizeof(whisperPacket)] = '\0';
 
-	static char line[256];
+	static char line[512 + CHARACTER_NAME_MAX_LEN + 3 + 1]; // buffer size + char name + extra + \0
 	if (CPythonChat::WHISPER_TYPE_CHAT == whisperPacket.bType || CPythonChat::WHISPER_TYPE_GM == whisperPacket.bType)
 	{		
-		_snprintf(line, sizeof(line), "%s : %s", whisperPacket.szNameFrom, buf);
+		_snprintf_s(line, sizeof(line), "%s : %s", whisperPacket.szNameFrom, ProcessItemHyperlinkText(std::string(buf)));
 		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnRecvWhisper", Py_BuildValue("(iss)", (int32_t) whisperPacket.bType, whisperPacket.szNameFrom, line));
 	}
 	else if (CPythonChat::WHISPER_TYPE_SYSTEM == whisperPacket.bType || CPythonChat::WHISPER_TYPE_ERROR == whisperPacket.bType)
@@ -1384,7 +1428,7 @@ bool CPythonNetworkStream::SendWhisperPacket(const char * name, const char * c_s
 	WhisperPacket.bHeader = HEADER_CG_WHISPER;
 	WhisperPacket.wSize = sizeof(WhisperPacket) + iTextLen;
 
-	strncpy(WhisperPacket.szNameTo, name, sizeof(WhisperPacket.szNameTo) - 1);
+	strncpy_s(WhisperPacket.szNameTo, name, sizeof(WhisperPacket.szNameTo) - 1);
 
 	if (!Send(sizeof(WhisperPacket), &WhisperPacket))
 		return false;
@@ -1822,13 +1866,13 @@ bool CPythonNetworkStream::RecvQuestInfoPacket()
 
 	if (!Peek(sizeof(TPacketGCQuestInfo), &QuestInfo))
 	{
-		Tracen("Recv Quest Info Packet Error #1");
+		Tracenf("Quest: invalid byte sequence");
 		return false;
 	}
 
 	if (!Peek(QuestInfo.size))
 	{
-		Tracen("Recv Quest Info Packet Error #2");
+		Tracenf("Quest: no size defined");
 		return false;
 	}
 
@@ -1849,8 +1893,10 @@ bool CPythonNetworkStream::RecvQuestInfoPacket()
 	if (0 != (c_rFlag & QUEST_SEND_IS_BEGIN))
 	{
 		uint8_t isBegin;
-		if (!Recv(sizeof(isBegin), &isBegin))
+		if (!Recv(sizeof(isBegin), &isBegin)) {
+			Tracenf("Quest: Starting but could not receive");
 			return false;
+		}
 
 		if (isBegin)
 			byQuestPacketType = QUEST_PACKET_TYPE_BEGIN;
@@ -1872,39 +1918,51 @@ bool CPythonNetworkStream::RecvQuestInfoPacket()
 
 	if (0 != (c_rFlag & QUEST_SEND_TITLE))
 	{
-		if (!Recv(sizeof(szTitle), &szTitle))
+		if (!Recv(sizeof(szTitle), &szTitle)) {
+			Tracenf("Quest: Invalid title");
 			return false;
+		}
 
 		szTitle[30]='\0';
 	}
 	if (0 != (c_rFlag & QUEST_SEND_CLOCK_NAME))
 	{
-		if (!Recv(sizeof(szClockName), &szClockName))
+		if (!Recv(sizeof(szClockName), &szClockName)) {
+			Tracenf("Quest: Invalid clock name");
 			return false;
+		}
 
 		szClockName[16]='\0';
 	}
 	if (0 != (c_rFlag & QUEST_SEND_CLOCK_VALUE))
 	{
-		if (!Recv(sizeof(iClockValue), &iClockValue))
+		if (!Recv(sizeof(iClockValue), &iClockValue)) {
+			Tracenf("Quest: Invalid clock");
 			return false;
+		}
 	}
 	if (0 != (c_rFlag & QUEST_SEND_COUNTER_NAME))
 	{
-		if (!Recv(sizeof(szCounterName), &szCounterName))
+		if (!Recv(sizeof(szCounterName), &szCounterName)) {
+			Tracenf("Quest: Invalid counter name");
 			return false;
+		}
 
 		szCounterName[16]='\0';
 	}
 	if (0 != (c_rFlag & QUEST_SEND_COUNTER_VALUE))
 	{
-		if (!Recv(sizeof(iCounterValue), &iCounterValue))
+		if (!Recv(sizeof(iCounterValue), &iCounterValue)) {
+			Tracenf("Quest: Invalid counter");
 			return false;
+		}
 	}
 	if (0 != (c_rFlag & QUEST_SEND_ICON_FILE))
 	{
-		if (!Recv(sizeof(szIconFileName), &szIconFileName))
+		if (!Recv(sizeof(szIconFileName), &szIconFileName)) {
+			Tracenf("Quest: Invalid icon");
 			return false;
+		}
 
 		szIconFileName[24]='\0';
 	}
@@ -2151,7 +2209,7 @@ bool CPythonNetworkStream::RecvScriptPacket()
 	ScriptPacket.size -= sizeof(TPacketGCScript);
 	
 	static std::string str;
-	str = "";
+	str.clear();
 	str.resize(ScriptPacket.size+1);
 
 	if (!Recv(ScriptPacket.size, &str[0]))
@@ -2222,7 +2280,7 @@ bool CPythonNetworkStream::SendQuestInputStringPacket(const char * c_szString)
 {
 	TPacketCGQuestInputString Packet;
 	Packet.bHeader = HEADER_CG_QUEST_INPUT_STRING;
-	strncpy(Packet.szString, c_szString, QUEST_INPUT_STRING_MAX_NUM);
+	strncpy_s(Packet.szString, c_szString, QUEST_INPUT_STRING_MAX_NUM);
 
 	if (!Send(sizeof(Packet), &Packet))
 	{
@@ -3280,7 +3338,7 @@ bool CPythonNetworkStream::RecvGuild()
 					CPythonGuild::TGuildMemberData * pMemberData;
 					if (CPythonGuild::Instance().GetMemberDataPtrByPID(memberPacket.pid, &pMemberData))
 					{
-						strncpy(szName, pMemberData->strName.c_str(), CHARACTER_NAME_MAX_LEN);
+						strncpy_s(szName, pMemberData->strName.c_str(), CHARACTER_NAME_MAX_LEN);
 					}
 				}
 

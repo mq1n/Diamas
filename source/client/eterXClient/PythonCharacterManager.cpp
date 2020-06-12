@@ -36,7 +36,7 @@ void CPythonCharacterManager::AdjustCollisionWithOtherObjects(CActorInstance* pI
 		if (rkActorEach==pInst)
 			continue;
 
-		if( rkActorEach->IsPC() || rkActorEach->IsNPC() || rkActorEach->IsEnemy() )
+		if (rkActorEach->IsPC() || rkActorEach->IsNPC() || rkActorEach->IsEnemy() || rkActorEach->IsShop())
 			continue;
 
 		if(pInst->TestPhysicsBlendingCollision(*rkActorEach) )
@@ -272,8 +272,7 @@ void CPythonCharacterManager::UpdateTransform()
 	uint32_t t2=timeGetTime();
 #endif
 
-	CInstanceBase * pMainInstance = GetMainInstancePtr();
-	if (pMainInstance)
+	if (m_pkInstMain)
 	{
 		CPythonBackground& rkBG=CPythonBackground::Instance();
 		for (TCharacterInstanceMap::iterator i = m_kAliveInstMap.begin(); i != m_kAliveInstMap.end(); ++i)
@@ -809,32 +808,47 @@ int32_t CPythonCharacterManager::PickAll()
 	return -1;
 }
 
-CInstanceBase * CPythonCharacterManager::GetCloseInstance(CInstanceBase * pInstance)
+std::vector<CInstanceBase *> CPythonCharacterManager::GetClosestTargets(CInstanceBase * me, int32_t count)
 {
-	float fMinDistance = 10000.0f;
-	CInstanceBase * pCloseInstance = nullptr;
+	std::map<uint32_t, CInstanceBase *> instanceList;
+	std::vector<CInstanceBase *> closestTargets;
 
-	TCharacterInstanceMap::iterator itor = m_kAliveInstMap.begin();
-	for (; itor != m_kAliveInstMap.end(); ++itor)
+	//Return an empty list and avoid crashing.
+	if (!me)
+		return closestTargets;
+
+	for (const auto it : m_kAliveInstMap)
 	{
-		CInstanceBase * pTargetInstance = itor->second;
+		CInstanceBase * pTargetInstance = it.second;
 
-		if (pTargetInstance == pInstance)
+		//Prevent it from picking ourselves
+		if (pTargetInstance == me)
 			continue;
 
-		uint32_t dwVirtualNumber = pTargetInstance->GetVirtualNumber();
-		if (CPythonNonPlayer::ON_CLICK_EVENT_BATTLE != CPythonNonPlayer::Instance().GetEventType(dwVirtualNumber))
+		//Prevent it from picking dead bodies (which recently died and as such still are on the alive map)
+		if (pTargetInstance->IsDead())
 			continue;
 
-		float fDistance = pInstance->GetDistance(pTargetInstance);
-		if (fDistance < fMinDistance)
-		{
-			fMinDistance = fDistance;
-			pCloseInstance = pTargetInstance;
-		}
+		//Prevent from picking non-battleable targets
+		if (!me->IsAttackableInstance(*pTargetInstance))
+			continue;
+
+		//Prevent tabbing into non-targetable units (such as stealth assassins).
+		if (!me->IsTargetableInstance(*pTargetInstance, true))
+			continue;
+
+		instanceList.insert({ me->GetDistance(pTargetInstance), pTargetInstance });
 	}
 
-	return pCloseInstance;
+	//Take the first <count> instances: we're taking advantage of the fact that maps are sorted by key
+	for (const auto it : instanceList) {
+		closestTargets.push_back(it.second);
+
+		if (closestTargets.size() >= count)
+			break;
+	}
+
+	return closestTargets;
 }
 
 void CPythonCharacterManager::RefreshAllPCTextTail()

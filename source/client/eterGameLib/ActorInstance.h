@@ -87,6 +87,7 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 			TYPE_POLY,
 			TYPE_HORSE,
 			TYPE_GOTO,
+			TYPE_SHOP,
 
 			TYPE_OBJECT, // Only For Client
 		};
@@ -275,6 +276,7 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		bool IsWarp();
 		bool IsGoto();
 		bool IsObject();
+		bool IsShop();
 		bool IsDoor();
 		bool IsPoly();
 

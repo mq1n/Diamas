@@ -46,7 +46,6 @@ class CPythonPlayerEventHandler : public CActorInstance::IEventHandler
 		std::vector<SVictim> m_kVctkVictim;
 
 		uint32_t m_dwPrevComboIndex;
-		uint32_t m_dwNextWaitingNotifyTime;
 		uint32_t m_dwNextMovingNotifyTime;
 		TPixelPosition m_kPPosPrevWaiting;
 

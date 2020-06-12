@@ -76,7 +76,7 @@ void CPythonPlayer::NEW_SetMultiDirKeyState(bool isLeft, bool isRight, bool isUp
 		float fDirRot=0.0f;
 		NEW_GetMultiKeyDirRotation(isLeft, isRight, isUp, isDown, &fDirRot);
 
-		if (!NEW_MoveToDirection(fDirRot))
+		if (!NEW_MoveToDirection(fDirRot, isDown))
 		{
 			Tracen("CPythonPlayer::NEW_SetMultiKeyState - NEW_Move -> ERROR");
 			return;

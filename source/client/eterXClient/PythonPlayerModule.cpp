@@ -114,7 +114,10 @@ public:
 
 PyObject * playerPickCloseItem(PyObject* poSelf, PyObject* poArgs)
 {
-	CPythonPlayer::Instance().PickCloseItem();
+	int32_t iIsYangPriority;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIsYangPriority))
+		iIsYangPriority = 0;
+	CPythonPlayer::Instance().PickCloseLoot(!!iIsYangPriority);
 	return Py_BuildNone();
 }
 

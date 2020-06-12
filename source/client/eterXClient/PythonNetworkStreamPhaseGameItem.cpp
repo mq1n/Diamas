@@ -382,6 +382,9 @@ bool CPythonNetworkStream::RecvQuickSlotMovePacket()
 
 bool CPythonNetworkStream::SendShopEndPacket()
 {
+	if ("Game" != m_strPhase) // The Windowmanager is calling Destroy on Phase Changes we need to prevent sending the packet for uishop.py <MartPwnS> 20/12/2014
+		return false;
+
 	if (!__CanActMainInstance())
 		return true;
 

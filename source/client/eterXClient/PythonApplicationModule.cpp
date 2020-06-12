@@ -906,6 +906,22 @@ PyObject * appSetDefaultCamera(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
+PyObject * appSetFreeCamera(PyObject * poSelf, PyObject * poArgs)
+{
+	CPythonApplication::Instance().SetFreeCamera();
+	return Py_BuildNone();
+}
+
+PyObject * appSetFreeCameraSpeed(PyObject * poSelf, PyObject * poArgs)
+{
+	int32_t iSpeed;
+	if (!PyTuple_GetInteger(poArgs, 0, &iSpeed))
+		return Py_BuildException();
+
+	CPythonApplication::Instance().SetFreeCameraSpeed(iSpeed);
+	return Py_BuildNone();
+}
+
 PyObject * appSetSightRange(PyObject * poSelf, PyObject * poArgs)
 {
 	int32_t iRange;
@@ -1228,6 +1244,8 @@ void initapp()
 		{ "LoadCameraSetting",			appLoadCameraSetting,			METH_VARARGS },
 		{ "SetDefaultCamera",			appSetDefaultCamera,			METH_VARARGS },
 		{ "SetCameraSetting",			appSetCameraSetting,			METH_VARARGS },
+		{ "SetFreeCamera",				appSetFreeCamera,				METH_VARARGS },
+		{ "SetFreeCameraSpeed",			appSetFreeCameraSpeed,			METH_VARARGS },
 
 		{ "SetSightRange",				appSetSightRange,				METH_VARARGS },
 

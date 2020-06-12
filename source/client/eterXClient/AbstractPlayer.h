@@ -44,7 +44,7 @@ class IAbstractPlayer : public TAbstractSingleton<IAbstractPlayer>
 
 		virtual void	SetWeaponPower(uint32_t dwMinPower, uint32_t dwMaxPower, uint32_t dwMinMagicPower, uint32_t dwMaxMagicPower, uint32_t dwAddPower) = 0;
 
-		virtual void	SetTarget(uint32_t dwVID, BOOL bForceChange = TRUE) = 0;
+		virtual void	SetTarget(uint32_t dwVID, BOOL bForceChange = TRUE, bool bIgnoreViewFrustrum = false) = 0;
 		virtual void	NotifyCharacterUpdate(uint32_t dwVID) = 0;		
 		virtual void	NotifyCharacterDead(uint32_t dwVID) = 0;
 		virtual void	NotifyDeletingCharacterInstance(uint32_t dwVID) = 0;

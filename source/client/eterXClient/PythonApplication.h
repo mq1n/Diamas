@@ -115,6 +115,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 			CAMERA_MODE_NORMAL = 0,
 			CAMERA_MODE_STAND = 1,
 			CAMERA_MODE_BLEND = 2,
+			CAMERA_MODE_FREE = 3,
 
 			EVENT_CAMERA_NUMBER = 101,
 		};
@@ -241,6 +242,13 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 
 		bool IsLockCurrentCamera();
 		void SetEventCamera(const SCameraSetting & c_rCameraSetting);
+
+		//Free camera [Think]
+		void SetFreeCamera();
+		void MoveFreeCamera(float fDirRot, bool isBackwards);
+		void SetFreeCameraSpeed(int32_t pct);
+		//End
+
 		void BlendEventCamera(const SCameraSetting & c_rCameraSetting, float fBlendTime);
 		void SetDefaultCamera();
 
@@ -251,6 +259,9 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 
 		void SetForceSightRange(int32_t iRange);
 	
+		void UpdateEventCameraX(float fdx);
+		void UpdateEventCameraY(float fdy);
+		void UpdateEventCameraZ(float fdz);
 
 	public:
 		void SetTitle(const char* szTitle);
@@ -380,6 +391,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		float						m_fRotationSpeed;
 		float						m_fPitchSpeed;
 		float						m_fZoomSpeed;
+		int32_t							m_freeCameraSpeedPct;
 		float						m_fCameraRotateSpeed;
 		float						m_fCameraPitchSpeed;
 		float						m_fCameraZoomSpeed;
