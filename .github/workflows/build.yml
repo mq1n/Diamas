@@ -1,0 +1,78 @@
+name: build
+
+on: [push, pull_request]
+
+jobs:
+
+  linux:
+    timeout-minutes: 20
+
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+        compiler: [g++, clang++]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        submodules: true
+    - name: Compile tests
+      working-directory: sql
+      env:
+        CXX: ${{ matrix.compiler }}
+      run: |
+        cmake -DBUILD_TESTING=ON ..
+        make -j12
+    - name: Run tests
+      working-directory: sql
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest --timeout 20 -C Debug -j12
+
+  windows:
+    timeout-minutes: 20
+
+    strategy:
+      matrix:
+        os: [windows-2019]
+        include:
+          - os: windows-2019
+            generator: Visual Studio 16 2019
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        submodules: true
+    - name: Compile tests
+      working-directory: sql
+      run: |
+        cmake .. -A Win32 -DBUILD_TESTING=ON -DCMAKE_CXX_FLAGS=/W1 -G"${{ matrix.generator }}"
+        cmake --build . -j 12
+    - name: Run tests
+      working-directory: sql
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest --timeout 20 -C Debug -j12
+
+  macos:
+    timeout-minutes: 20
+    runs-on: macOS-10.14
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Compile tests
+      working-directory: sql
+      run: |
+        cmake -DBUILD_TESTING=ON ..
+        make -j12
+    - name: Run tests
+      working-directory: sql
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest --timeout 20 -C Debug -j12
