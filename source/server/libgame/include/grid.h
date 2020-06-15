@@ -1,5 +1,6 @@
 #ifndef __INC_GRID_H__
 #define __INC_GRID_H__
+#include <cstdint>
 
 class CGrid
 {
