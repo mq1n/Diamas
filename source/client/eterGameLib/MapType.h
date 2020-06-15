@@ -19,7 +19,7 @@ namespace prt
 		PROPERTY_TYPE_EFFECT,
 		PROPERTY_TYPE_AMBIENCE,
 		PROPERTY_TYPE_DUNGEON_BLOCK,
-		PROPERTY_TYPE_MAX_NUM,
+		PROPERTY_TYPE_MAX_NUM
 	};
 
 	const char c_szPropertyTypeName[PROPERTY_TYPE_MAX_NUM][32] = 
@@ -73,7 +73,7 @@ namespace prt
 		AMBIENCE_PLAY_TYPE_ONCE,
 		AMBIENCE_PLAY_TYPE_STEP,
 		AMBIENCE_PLAY_TYPE_LOOP,
-		AMBIENCE_PLAY_TYPE_MAX_NUM,
+		AMBIENCE_PLAY_TYPE_MAX_NUM
 	};
 
 	const char c_szPlayTypeName[AMBIENCE_PLAY_TYPE_MAX_NUM][8] =
@@ -193,7 +193,8 @@ typedef struct SEnvironmentData
 typedef std::map<uint32_t, TEnvironmentData*> TEnvironmentDataMap;
 /////////////////////////////////////////////////////////////////
 
-typedef struct SScreenPosition {
+typedef struct SScreenPosition
+{
 	int32_t x;
 	int32_t y;
 } TScreenPosition;

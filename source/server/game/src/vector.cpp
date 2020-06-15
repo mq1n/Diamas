@@ -1,6 +1,7 @@
 #include "stdafx.h"
-
 #include "vector.h"
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 #define _PI    ((float) 3.141592654f)
 #define _1BYPI ((float) 0.318309886f)
@@ -48,7 +49,7 @@ float GetDegreeFromPosition(float x, float y)
 
 float GetDegreeFromPositionXY(int32_t sx, int32_t sy, int32_t ex, int32_t ey)
 {
-	return GetDegreeFromPosition(ex - sx, ey - sy);
+	return GetDegreeFromPosition((float)ex - sx, (float)ey - sy);
 }
 
 void GetDeltaByDegree(float fDegree, float fDistance, float *x, float *y)
@@ -70,3 +71,33 @@ float GetDegreeDelta(float iDegree, float iDegree2)
 	return fabs(iDegree - iDegree2);
 }
 
+inline float RadiansFromDegrees(float value)
+{
+	return value * _PI / 180.0f;
+}
+
+void RotateRegion(int32_t& sx, int32_t& sy, int32_t& ex, int32_t& ey, float xRot, float yRot, float zRot)
+{
+	xRot = RadiansFromDegrees(xRot);
+	yRot = RadiansFromDegrees(yRot);
+	zRot = RadiansFromDegrees(zRot);
+	Eigen::Vector3f center(
+		static_cast<const float>(sx + (ex - sx) / 2),
+		static_cast<const float>(sy + (ey - sy) / 2),
+		0.0f
+	);
+	Eigen::Matrix3f m;
+	m = Eigen::AngleAxisf(xRot, Eigen::Vector3f::UnitX()) *
+		Eigen::AngleAxisf(yRot, Eigen::Vector3f::UnitY()) *
+		Eigen::AngleAxisf(zRot, Eigen::Vector3f::UnitZ());
+	Eigen::Vector3f start = center + m * (Eigen::Vector3f(static_cast<const float>(sx), static_cast<const float>(sy), 0.0f) - center);
+	Eigen::Vector3f end = center + m * (Eigen::Vector3f(static_cast<const float>(ex), static_cast<const float>(ey), 0.0f) - center);
+	sx = static_cast<int32_t>(start.x());
+	sy = static_cast<int32_t>(start.y());
+	ex = static_cast<int32_t>(end.x());
+	ey = static_cast<int32_t>(end.y());
+	if (sx > ex)
+		std::swap(sx, ex);
+	if (sy > ey)
+		std::swap(sy, ey);
+}

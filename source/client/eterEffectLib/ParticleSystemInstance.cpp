@@ -60,9 +60,7 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 	{
 		m_pEmitterProperty->GetParticleLifeTime(m_fLocalTime, &fLifeTime);
 		if (fLifeTime==0.0f)
-		{
 			return;
-		}
 		
 		m_pEmitterProperty->GetEmittingSize(m_fLocalTime, &fEmittingSize);
 		
@@ -88,7 +86,7 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 
 	}
 
-	CParticleInstance * pFirstInstance = 0;
+	CParticleInstance * pFirstInstance = nullptr;
 
 	for (int32_t i = 0; i < iCreatingCount; ++i)
 	{
@@ -239,9 +237,7 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 				}
 			}
 			if (m_pParticleProperty->m_bTexAniRandomStartFrameFlag)
-			{
 				pInstance->m_byFrameIndex = random_range(0,m_pParticleProperty->GetTextureAnimationFrameCount()-1);
-			}
 		}
 
 		// Simple Update
@@ -270,7 +266,7 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 			pInstance->m_pDecorator = pFirstInstance->m_pDecorator->Clone(pFirstInstance,pInstance);
 		}
 
-		m_ParticleInstanceListVector[pInstance->m_byFrameIndex].push_back(pInstance);
+		m_ParticleInstanceListVector[pInstance->m_byFrameIndex].emplace_back(pInstance);
 		m_dwCurrentEmissionCount++;
 	}
 }
@@ -307,13 +303,11 @@ bool CParticleSystemInstance::OnUpdate(float fElapsedTime)
 	m_pEmitterProperty->GetEmittingAngularVelocity(m_fLocalTime,&fAngularVelocity);
 	
 	if (fAngularVelocity && !m_pParticleProperty->m_bAttachFlag)
-	{
 		D3DXVec3TransformNormal(&m_pParticleProperty->m_v3ZAxis,&D3DXVECTOR3(0.0f,0.0f,1.0f),mc_pmatLocal);
-	}
 
 	for (dwFrameIndex = 0; dwFrameIndex < dwFrameCount; dwFrameIndex++)
 	{
-		TParticleInstanceList::iterator itor = m_ParticleInstanceListVector[dwFrameIndex].begin();
+		auto itor = m_ParticleInstanceListVector[dwFrameIndex].begin();
 		for (; itor != m_ParticleInstanceListVector[dwFrameIndex].end();)
 		{
 			CParticleInstance * pInstance = *itor;
@@ -421,35 +415,23 @@ void CParticleSystemInstance::OnRender()
 	if (m_pParticleProperty->m_byBillboardType < BILLBOARD_TYPE_2FACE)
 	{
 		if (!m_pParticleProperty->m_bAttachFlag)
-		{
 			ForEachParticleRendering(NParticleRenderer::NormalRenderer());
-		}
 		else
-		{
 			ForEachParticleRendering(NParticleRenderer::AttachRenderer(mc_pmatLocal));
-		}
 	}
 	else if (m_pParticleProperty->m_byBillboardType == BILLBOARD_TYPE_2FACE)
 	{
 		if (!m_pParticleProperty->m_bAttachFlag)
-		{
 			ForEachParticleRendering(NParticleRenderer::TwoSideRenderer());
-		}
 		else
-		{
 			ForEachParticleRendering(NParticleRenderer::TwoSideRenderer(mc_pmatLocal));
-		}
 	}
 	else if (m_pParticleProperty->m_byBillboardType == BILLBOARD_TYPE_3FACE)
 	{
 		if (!m_pParticleProperty->m_bAttachFlag)
-		{
 			ForEachParticleRendering(NParticleRenderer::ThreeSideRenderer());
-		}
 		else
-		{
 			ForEachParticleRendering(NParticleRenderer::ThreeSideRenderer(mc_pmatLocal));
-		}
 	}
 }
 
@@ -467,13 +449,11 @@ void CParticleSystemInstance::OnSetDataPointer(CEffectElementBase * pElement)
 
 	assert(m_kVct_pkImgInst.empty());
 	m_kVct_pkImgInst.reserve(m_pParticleProperty->m_ImageVector.size());
-	for (uint32_t i = 0; i < m_pParticleProperty->m_ImageVector.size(); ++i)
+	for (auto pImage : m_pParticleProperty->m_ImageVector)
 	{
-		CGraphicImage * pImage = m_pParticleProperty->m_ImageVector[i];
-
 		CGraphicImageInstance* pkImgInstNew = CGraphicImageInstance::New();
 		pkImgInstNew->SetImagePointer(pImage);
-		m_kVct_pkImgInst.push_back(pkImgInstNew);
+		m_kVct_pkImgInst.emplace_back(pkImgInstNew);
 	}
 }
 
@@ -486,18 +466,10 @@ void CParticleSystemInstance::OnInitialize()
 
 void CParticleSystemInstance::OnDestroy()
 {
-	// 2004. 3. 1. myevan. 파티클 제거 루틴
-	TParticleInstanceListVector::iterator i;
-	for(i = m_ParticleInstanceListVector.begin(); i!=m_ParticleInstanceListVector.end(); ++i)
+	for (auto & rkLst_kParticleInst : m_ParticleInstanceListVector)
 	{
-		TParticleInstanceList& rkLst_kParticleInst=*i;
-
-		TParticleInstanceList::iterator j;
-		for(j = rkLst_kParticleInst.begin(); j!=rkLst_kParticleInst.end(); ++j)
-		{
-			CParticleInstance* pkParticleInst=*j;
+		for (auto & pkParticleInst : rkLst_kParticleInst)
 			pkParticleInst->DeleteThis();
-		}
 
 		rkLst_kParticleInst.clear();	
 	}

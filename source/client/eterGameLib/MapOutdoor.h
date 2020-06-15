@@ -41,7 +41,7 @@ class CMapOutdoor : public CMapBase
 		{
 			VIEW_NONE = 0,
 			VIEW_PART,
-			VIEW_ALL,
+			VIEW_ALL
 		};
 
 		enum EPart
@@ -52,13 +52,13 @@ class CMapOutdoor : public CMapBase
 			PART_WATER,
 			PART_TREE,
 			PART_SKY,
-			PART_NUM,
+			PART_NUM
 		};
 
 		enum ETerrainRenderSort
 		{
 			DISTANCE_SORT,
-			TEXTURE_SORT,
+			TEXTURE_SORT
 		};
 
 	public:
@@ -364,7 +364,7 @@ class CMapOutdoor : public CMapBase
 				}
 				if (!brhsOrderFound)
 				{
-					m_TerrainNumVector.push_back(rhs.byTerrainNum);
+				m_TerrainNumVector.emplace_back(rhs.byTerrainNum);
 					rhsTerrainNumOrder = m_TerrainNumVector.size() -1;
 				}
 				if (!blhsOrderFound)
@@ -377,7 +377,7 @@ class CMapOutdoor : public CMapBase
 					}
 					if (!blhsOrderFound)
 					{
-						m_TerrainNumVector.push_back(lhs.byTerrainNum);
+					m_TerrainNumVector.emplace_back(lhs.byTerrainNum);
 						lhsTerrainNumOrder = m_TerrainNumVector.size() -1;
 					}
 				}
@@ -481,7 +481,7 @@ class CMapOutdoor : public CMapBase
 				DELETE_LEFT,
 				DELETE_RIGHT,
 				DELETE_TOP,
-				DELETE_BOTTOM,
+				DELETE_BOTTOM
 			};
 
 			EDeleteDir m_eLRDeleteDir;
@@ -641,7 +641,7 @@ class CMapOutdoor : public CMapBase
 
 			enum
 			{
-				HASH_SIZE = 100,
+				HASH_SIZE = 100
 			};
 
 			std::vector<SItem> m_akVct_kItem[HASH_SIZE];

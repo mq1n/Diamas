@@ -14,15 +14,15 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 			CGraphicTextInstance * pInstance;
 		} TTextLine;
 
-		typedef std::list<TTextLine> TScriptTextLineList;
-		typedef std::map<int32_t, std::string> TEventAnswerMap;
+		using TScriptTextLineList = std::list<TTextLine>;
+		using TEventAnswerMap = std::map<int32_t, std::string>;
 
 		enum
 		{
 			EVENT_POSITION_START = 0,
 			EVENT_POSITION_END = 1,
 
-			BOX_VISIBLE_LINE_COUNT = 14,
+			BOX_VISIBLE_LINE_COUNT = 5,
 		};
 
 		enum EButtonType
@@ -107,6 +107,8 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 			int32_t lLastDelayTime;
 
 			int32_t iCurrentLetter;
+			
+			int32_t iTotalLineCount;
 
 			D3DXCOLOR CurrentColor;
 			std::string strCurrentLine;
@@ -149,7 +151,7 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 			virtual ~SEventSet() {}
 		} TEventSet;
 
-		typedef std::vector<TEventSet*> TEventSetVector;
+		using TEventSetVector = std::vector<TEventSet *>;
 
 
 	public:
@@ -157,9 +159,21 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 		virtual ~CPythonEventManager();
 
 		void Destroy();
+		
+		int32_t GetTotalLineCount(int32_t iIndex);
+
+		void AllProcessEventSet(int32_t iIndex);
+
+		int32_t GetProcessedLineCount(int32_t iIndex);
+
+		void SetYPosition(int32_t iIndex, int32_t iY);
+
+		int32_t	GetLineHeight(int32_t iIndex);
+
+		void SetVisibleLineCount(int32_t iIndex, int32_t iLineCount);
 
 		int32_t RegisterEventSet(const char * c_szFileName);
-		int32_t RegisterEventSetFromString(const std::string& strScript);
+		int32_t RegisterEventSetFromString(const std::string& strScript, bool bIsQuestInfo = false);
 		void ClearEventSeti(int32_t iIndex);
 		void __ClearEventSetp(TEventSet * pEventSet);
 
@@ -182,7 +196,6 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 		void SetVisibleStartLine(int32_t iIndex, int32_t iStartLine);
 		int32_t GetVisibleStartLine(int32_t iIndex);
 		int32_t GetLineCount(int32_t iIndex);
-		void SetVisibleLineCount(int32_t iIndex, int32_t iLineCount);
 
 		void SetInterfaceWindow(PyObject * poInterface);
 		void SetLeftTimeString(const char * c_szString);
@@ -197,7 +210,7 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 
 		bool CheckEventSetIndex(int32_t iIndex);
 
-		void ProcessEventSet(TEventSet * pEventSet);
+		bool ProcessEventSet(TEventSet * pEventSet);
 
 		void ClearLine(TEventSet * pEventSet);		
 		void RefreshLinePosition(TEventSet * pEventSet);		

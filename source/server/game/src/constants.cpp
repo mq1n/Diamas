@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "char.h"
+#include "../../common/service.h"
 
 TJobInitialPoints JobInitialPoints[JOB_MAX_NUM] = 
 /*
@@ -62,7 +63,7 @@ TBattleTypeStat BattleTypeStats[BATTLE_TYPE_MAX_NUM] =
 
 const uint32_t * exp_table = nullptr;
 
-const uint32_t exp_table_common[PLAYER_EXP_TABLE_MAX + 1] =
+const uint32_t exp_table_common[PLAYER_MAX_LEVEL_CONST + 1] =
 {
 	0,	//	0
 	300,
@@ -698,11 +699,7 @@ const TApplyInfo aApplyInfo[MAX_APPLY_NUM] =
 	{ POINT_NONE,			},	// APPLY_ACCEDRAIN_RATE,		97
 #endif
 
-#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
 	{ POINT_RESIST_MAGIC_REDUCTION,	},	// APPLY_RESIST_MAGIC_REDUCTION,98
-#else
-	{ POINT_NONE,					},	// APPLY_RESIST_MAGIC_REDUCTION,98
-#endif
 };
 
 const int32_t aiItemMagicAttributePercentHigh[ITEM_ATTRIBUTE_MAX_LEVEL] =
@@ -871,6 +868,14 @@ const char * c_apszEmpireNames[EMPIRE_MAX_NUM] =
 	"Áø³ë±¹"
 };
 
+const char * c_apszEmpireNamesAlt[EMPIRE_MAX_NUM] =
+{
+	"None",
+	"[|cf6222200Shinsoo]|r]",
+	"[|cfeef2600Chunjo|r]",
+	"[|c264AFE00Jinno|r]"
+};
+
 const char * c_apszPrivNames[MAX_PRIV_NUM] =
 {
 	"",
@@ -937,8 +942,8 @@ TGuildWarInfo KOR_aGuildWarInfo[GUILD_WAR_TYPE_MAX_NUM] =
  */
 {
 	{ 0,        0,      0,      0,      0,      0       },
-	{ 110,      0,      100,    50,     0,      100     },
-	{ 111,      0,      100,    50,     0,      10      },
+	{ GUILD_WAR_MAP_INDEX,	  0,	  100,	50,	 0,	  100	 },
+	{ GUILD_FLAG_WAR_MAP_INDEX,	  0,	  100,	50,	 0,	  10	  },
 };
 
 //
@@ -1056,8 +1061,8 @@ TValueName c_aApplyTypeNames[] =
     { "NORMAL_HIT_DAMAGE_BONUS",APPLY_NORMAL_HIT_DAMAGE_BONUS	},
     { "SKILL_DEFEND_BONUS",	APPLY_SKILL_DEFEND_BONUS	},
     { "NORMAL_HIT_DEFEND_BONUS",APPLY_NORMAL_HIT_DEFEND_BONUS	},
-    { "PCBANG_EXP_BONUS", APPLY_PC_BANG_EXP_BONUS	},
-    { "PCBANG_DROP_BONUS", APPLY_PC_BANG_DROP_BONUS	},
+    { "PCBANG_EXP_BONUS", UNUSED_APPLY_PC_BANG_EXP_BONUS	},
+    { "PCBANG_DROP_BONUS", UNUSED_APPLY_PC_BANG_DROP_BONUS	},
 
     { "RESIST_WARRIOR",	APPLY_RESIST_WARRIOR},
     { "RESIST_ASSASSIN",	APPLY_RESIST_ASSASSIN},
@@ -1081,9 +1086,7 @@ TValueName c_aApplyTypeNames[] =
 #ifdef ENABLE_ACCE_SYSTEM
 	{ "ACCEDRAIN_RATE",APPLY_ACCEDRAIN_RATE },
 #endif
-#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
 	{ "RESIST_MAGIC_REDUCTION",APPLY_RESIST_MAGIC_REDUCTION },
-#endif
     { nullptr,		0			}
 };
 // from import_item_proto.c
@@ -1098,3 +1101,91 @@ int32_t FN_get_apply_type(const char *apply_type_string)
 	}
 	return 0;
 }
+
+const char * FN_MAP_NAME_STRING(int32_t mapindex)
+{
+	if (mapindex >= 10000)
+		return LC_TEXT("metin2_map_dungeon_string");
+
+	switch (mapindex)
+	{
+		case 1: return LC_TEXT("metin2_map_a1");
+		case 3: return LC_TEXT("metin2_map_a3");
+		case 4: return LC_TEXT("metin2_map_guild_01");
+		case 5: return LC_TEXT("metin2_map_monkey_dungeon_11");
+		case 6: return LC_TEXT("metin2_guild_village_01");
+		case 21: return LC_TEXT("metin2_map_b1");
+		case 23: return LC_TEXT("metin2_map_b3");
+		case 24: return LC_TEXT("metin2_map_guild_02");
+		case 25: return LC_TEXT("metin2_map_monkey_dungeon_12");
+		case 26: return LC_TEXT("metin2_guild_village_02");
+		case 41: return LC_TEXT("metin2_map_c1");
+		case 43: return LC_TEXT("metin2_map_c3");
+		case 44: return LC_TEXT("metin2_map_guild_03");
+		case 45: return LC_TEXT("metin2_map_monkey_dungeon_13");
+		case 46: return LC_TEXT("metin2_guild_village_03");
+		case 51: return LC_TEXT("metin2_map_wolf");
+		case 61: return LC_TEXT("map_n_snowm_01");
+		case 62: return LC_TEXT("metin2_map_n_flame_01");
+		case 63: return LC_TEXT("metin2_map_n_desert_01");
+		case 64: return LC_TEXT("map_n_threeway");
+		case 65: return LC_TEXT("metin2_map_milgyo");
+		case 66: return LC_TEXT("metin2_map_deviltower1");
+		case 67: return LC_TEXT("metin2_map_trent");
+		case 68: return LC_TEXT("metin2_map_trent02");
+		case 69: return LC_TEXT("metin2_map_WL_01");
+		case 70: return LC_TEXT("metin2_map_nusluck01");
+		case 71: return LC_TEXT("metin2_map_spiderdungeon_02");
+		case 72: return LC_TEXT("metin2_map_skipia_dungeon_01");
+		case 73: return LC_TEXT("metin2_map_skipia_dungeon_02");
+		case 81: return LC_TEXT("metin2_map_wedding_01");
+		case 100: return LC_TEXT("metin2_map_fielddungeon");
+		case 101: return LC_TEXT("metin2_map_resources_zon");
+		case 103: return LC_TEXT("metin2_map_t1");
+		case 104: return LC_TEXT("metin2_map_spiderdungeon");
+		case 105: return LC_TEXT("metin2_map_t2");
+		case 107: return LC_TEXT("metin2_map_monkey_dungeon");
+		case 108: return LC_TEXT("metin2_map_monkey_dungeon2");
+		case 109: return LC_TEXT("metin2_map_monkey_dungeon3");
+		case 110: return LC_TEXT("metin2_map_t3");
+		case 111: return LC_TEXT("metin2_map_t4");
+		case 112: return LC_TEXT("metin2_map_duel");
+		case 113: return LC_TEXT("metin2_map_oxevent");
+		case 114: return LC_TEXT("metin2_map_sungzi");
+		case 118: return LC_TEXT("metin2_map_sungzi_flame_hill_01");
+		case 119: return LC_TEXT("metin2_map_sungzi_flame_hill_02");
+		case 120: return LC_TEXT("metin2_map_sungzi_flame_hill_03");
+		case 121: return LC_TEXT("metin2_map_sungzi_snow");
+		case 122: return LC_TEXT("metin2_map_sungzi_snow_pass01");
+		case 123: return LC_TEXT("metin2_map_sungzi_snow_pass02");
+		case 124: return LC_TEXT("metin2_map_sungzi_snow_pass03");
+		case 125: return LC_TEXT("metin2_map_sungzi_desert_01");
+		case 126: return LC_TEXT("metin2_map_sungzi_desert_hill_01");
+		case 127: return LC_TEXT("metin2_map_sungzi_desert_hill_02");
+		case 128: return LC_TEXT("metin2_map_sungzi_desert_hill_03");
+		case 181: return LC_TEXT("metin2_map_empirewar01");
+		case 182: return LC_TEXT("metin2_map_empirewar02");
+		case 183: return LC_TEXT("metin2_map_empirewar03");
+		case 200: return LC_TEXT("gm_guild_build");
+		case 207: return LC_TEXT("metin2_map_skipia_dungeon_boss");
+		case 212: return LC_TEXT("metin2_map_n_flame_dragon");
+		case 216: return LC_TEXT("metin2_map_devilcatacomb");
+		case 217: return LC_TEXT("metin2_map_spiderdungeon_03");
+		case 246: return LC_TEXT("metin2_map_battlefied");
+		case 301: return LC_TEXT("Metin2_map_CapeDragonHead");
+		case 302: return LC_TEXT("metin2_map_dawnmistwood");
+		case 303: return LC_TEXT("metin2_map_BayBlackSand");
+		case 304: return LC_TEXT("metin2_map_Mt_Thunder");
+		case 305: return LC_TEXT("metin2_map_sungzi_flame_pass01");
+		case 306: return LC_TEXT("metin2_map_sungzi_flame_pass02");
+		case 307: return LC_TEXT("metin2_map_sungzi_flame_pass03");
+		case 351: return LC_TEXT("metin2_map_n_flame_dungeon_01");
+		case 352: return LC_TEXT("metin2_map_n_snow_dungeon_01");
+		case 353: return LC_TEXT("metin2_map_dawnmist_dungeon_01");
+		case 354: return LC_TEXT("metin2_map_mt_th_dungeon_01");
+		case 355: return LC_TEXT("metin2_map_dawnmist_dungeon_02");
+		case 356: return LC_TEXT("metin2_12zi_stage");
+		default: return LC_TEXT("metin2_map_unknown");
+	}
+}
+

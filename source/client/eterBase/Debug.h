@@ -1,7 +1,7 @@
 #ifndef __INC_ETERLIB_DEBUG_H__
 #define __INC_ETERLIB_DEBUG_H__
 
-#include <windows.h>
+#include <Windows.h>
 #include <cstdint>
 
 extern void SetLogLevel(uint32_t uLevel);
@@ -15,19 +15,18 @@ extern void Tracen(const char* c_szMsg);
 extern void Tracenf(const char* c_szFormat, ...);
 extern void Tracef(const char* c_szFormat, ...);
 extern void TraceError(const char* c_szFormat, ...);
+extern void TraceErrorFunc(const char* func, const char* c_szFormat, ...);
 extern void TraceErrorWithoutEnter(const char* c_szFormat, ...);
 
 extern void LogBox(const char* c_szMsg, const char * c_szCaption = nullptr, HWND hWnd = nullptr);
-extern void LogBoxf(const char* c_szMsg, ...);
+extern void LogBoxf(const char * c_szFormat, ...);
 
 extern void LogFile(const char* c_szMsg);
 extern void LogFilef(const char * c_szMessage, ...);
 extern void OpenConsoleWindow(void);
 extern void CloseConsoleWindow();
-extern void SetupLog(void);
 
 extern void OpenLogFile(bool bUseLogFile = true);
-extern void CloseLogFile();
 
 extern HWND g_PopupHwnd;
 
@@ -36,6 +35,8 @@ extern HWND g_PopupHwnd;
 	{										\
 		LogBox(string);						\
 		return;								\
-	}										\
+	}
 
 #endif
+
+#define FuncTrace(fmt, ...) TraceErrorFunc(__FUNCTION__, fmt, __VA_ARGS__);

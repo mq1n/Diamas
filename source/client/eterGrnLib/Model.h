@@ -41,7 +41,7 @@ class CGrannyModel : public CReferenceObject
 		LPDIRECT3DVERTEXBUFFER9 GetPNTD3DVertexBuffer() const;
 		LPDIRECT3DINDEXBUFFER9 GetD3DIndexBuffer() const;
 
-		const CGrannyModel::TMeshNode*  GetMeshNodeList(CGrannyMesh::EType eMeshType, CGrannyMaterial::EType eMtrlType) const;
+		const TMeshNode*  GetMeshNodeList(CGrannyMesh::EType eMeshType, CGrannyMaterial::EType eMtrlType) const;
 
 		bool LockVertices(void** indicies, void** vertices) const;
 		void UnlockVertices() const;

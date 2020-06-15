@@ -9,7 +9,7 @@
 #include "skill.h"
 #include "text_file_loader.h"
 #include "priv_manager.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "unique_item.h"
 #include "safebox.h"
 #include "blend_item.h"
@@ -224,6 +224,10 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName)
 
 					if (!GetVnumByOriginalName(name.c_str(), dwVnum))
 					{
+						if (name == "gold")
+						{
+							dwVnum = CSpecialItemGroup::GOLD;
+						}
 						if (name == "°æÇèÄ¡" || name == "exp")
 						{
 							dwVnum = CSpecialItemGroup::EXP;
@@ -388,12 +392,12 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 
 			if (loader.GetTokenVector(buf, &pTok))
 			{
-				std::string& name = pTok->at(0);
+				std::string name = pTok->at(0);
 				uint32_t dwVnum = 0;
 
 				if (!GetVnumByOriginalName(name.c_str(), dwVnum))
 				{
-					if (
+					if (name == "gold" ||
 						name == "exp" ||
 						name == "mob" ||
 						name == "slow" ||
@@ -613,9 +617,12 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 					std::string& name = pTok->at(0);
 					uint32_t dwVnum = 0;
 
-					if (!GetVnumByOriginalName(name.c_str(), dwVnum))
+					if (is_positive_number(name))
+						str_to_number(dwVnum, name.c_str()); //Assume it's an vnum first
+
+					if (!dwVnum)
 					{
-						str_to_number(dwVnum, name.c_str());
+						GetVnumByOriginalName(name.c_str(), dwVnum);
 						if (!ITEM_MANAGER::instance().GetTable(dwVnum))
 						{
 							sys_err("ReadMonsterDropItemGroup : there is no item %s : node %s : vnum %d", name.c_str(), stName.c_str(), dwVnum);
@@ -679,10 +686,12 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				{
 					std::string& name = pTok->at(0);
 					uint32_t dwVnum = 0;
+					if (is_positive_number(name))
+						str_to_number(dwVnum, name.c_str()); //Assume it's an vnum first
 
-					if (!GetVnumByOriginalName(name.c_str(), dwVnum))
+					if (!dwVnum)
 					{
-						str_to_number(dwVnum, name.c_str());
+						GetVnumByOriginalName(name.c_str(), dwVnum);
 						if (!ITEM_MANAGER::instance().GetTable(dwVnum))
 						{
 							sys_err("ReadDropItemGroup : there is no item %s : node %s", name.c_str(), stName.c_str());
@@ -732,10 +741,12 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				{
 					std::string& name = pTok->at(0);
 					uint32_t dwItemVnum = 0;
+					if (is_positive_number(name))
+						str_to_number(dwItemVnum, name.c_str()); //Assume it's an vnum first
 
-					if (false == GetVnumByOriginalName(name.c_str(), dwItemVnum))
+					if (!dwItemVnum)
 					{
-						str_to_number(dwItemVnum, name.c_str());
+						GetVnumByOriginalName(name.c_str(), dwItemVnum);
 						if ( !ITEM_MANAGER::instance().GetTable(dwItemVnum) )
 						{
 							sys_err("ReadDropItemGroup : there is no item %s : node %s", name.c_str(), stName.c_str());
@@ -781,10 +792,12 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				{
 					std::string& name = pTok->at(0);
 					uint32_t dwVnum = 0;
+					if (is_positive_number(name))
+						str_to_number(dwVnum, name.c_str()); //Assume it's an vnum first
 
-					if (!GetVnumByOriginalName(name.c_str(), dwVnum))
+					if (!dwVnum)
 					{
-						str_to_number(dwVnum, name.c_str());
+						GetVnumByOriginalName(name.c_str(), dwVnum);
 						if (!ITEM_MANAGER::instance().GetTable(dwVnum))
 						{
 							sys_err("ReadDropItemGroup : there is no item %s : node %s", name.c_str(), stName.c_str());
@@ -888,9 +901,9 @@ bool ITEM_MANAGER::ReadDropItemGroup(const char * c_pszFileName)
 				std::string& name = pTok->at(0);
 				uint32_t dwVnum = 0;
 
-				if (!GetVnumByOriginalName(name.c_str(), dwVnum))
+				if (!dwVnum)
 				{
-					str_to_number(dwVnum, name.c_str());
+					GetVnumByOriginalName(name.c_str(), dwVnum);
 					if (!ITEM_MANAGER::instance().GetTable(dwVnum))
 					{
 						sys_err("ReadDropItemGroup : there is no item %s : node %s", name.c_str(), stName.c_str());

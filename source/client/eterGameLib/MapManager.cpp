@@ -344,11 +344,9 @@ bool CMapManager::RegisterEnvironmentData(uint32_t dwIndex, const char * c_szFil
 		return false;
 	}
 
-	TEnvironmentDataMap::iterator f=m_EnvironmentDataMap.find(dwIndex);
+	auto f = m_EnvironmentDataMap.find(dwIndex);
 	if (m_EnvironmentDataMap.end()==f)
-	{
-		m_EnvironmentDataMap.insert(TEnvironmentDataMap::value_type(dwIndex, pEnvironmentData));
-	}
+		m_EnvironmentDataMap.emplace(dwIndex, pEnvironmentData);
 	else
 	{
 		delete f->second;
@@ -364,7 +362,7 @@ void CMapManager::GetCurrentEnvironmentData(const TEnvironmentData ** c_ppEnviro
 
 bool CMapManager::GetEnvironmentData(uint32_t dwIndex, const TEnvironmentData ** c_ppEnvironmentData)
 {
-	TEnvironmentDataMap::iterator itor = m_EnvironmentDataMap.find(dwIndex);
+	auto itor = m_EnvironmentDataMap.find(dwIndex);
 
 	if (m_EnvironmentDataMap.end() == itor)
 	{
@@ -382,7 +380,7 @@ void CMapManager::RefreshPortal()
 		return;
 
 	CMapOutdoor & rMap = GetMapOutdoorRef();
-	for (int32_t i = 0; i < AROUND_AREA_NUM; ++i)
+	for (uint8_t i = 0; i < AROUND_AREA_NUM; ++i)
 	{
 		CArea * pArea;
 		if (!rMap.GetAreaPointer(i, &pArea))
@@ -398,7 +396,7 @@ void CMapManager::ClearPortal()
 		return;
 
 	CMapOutdoor & rMap = GetMapOutdoorRef();
-	for (int32_t i = 0; i < AROUND_AREA_NUM; ++i)
+	for (uint8_t i = 0; i < AROUND_AREA_NUM; ++i)
 	{
 		CArea * pArea;
 		if (!rMap.GetAreaPointer(i, &pArea))
@@ -414,7 +412,7 @@ void CMapManager::AddShowingPortalID(int32_t iID)
 		return;
 
 	CMapOutdoor & rMap = GetMapOutdoorRef();
-	for (int32_t i = 0; i < AROUND_AREA_NUM; ++i)
+	for (uint8_t i = 0; i < AROUND_AREA_NUM; ++i)
 	{
 		CArea * pArea;
 		if (!rMap.GetAreaPointer(i, &pArea))
@@ -426,7 +424,7 @@ void CMapManager::AddShowingPortalID(int32_t iID)
 
 TEnvironmentData * CMapManager::AllocEnvironmentData()
 {
-	TEnvironmentData * pEnvironmentData = new TEnvironmentData;
+	auto * pEnvironmentData = new TEnvironmentData;
 	Environment_Init(*pEnvironmentData);
 	return pEnvironmentData;
 }
@@ -602,20 +600,21 @@ void CMapManager::__LoadMapInfoVector()
 	textFileLoader.Bind(kFile.GetSize(), kFile.GetData());
 
 	char szMapName[256];
+	char szMapLocaleName[256];
 	int32_t x, y;
 	int32_t width, height;
 	for (uint32_t uLineIndex=0; uLineIndex<textFileLoader.GetLineCount(); ++uLineIndex)
 	{
 		const std::string& c_rstLine=textFileLoader.GetLineString(uLineIndex);
-		sscanf(c_rstLine.c_str(), "%s %d %d %d %d", 
-			szMapName, 
-			&x, &y, &width, &height);
+//		sscanf(c_rstLine.c_str(), "%s %s %d %d %d %d",  szMapName, szMapLocaleName, &x, &y, &width, &height);
+		sscanf(c_rstLine.c_str(), "%s %d %d %d %d", szMapName, &x, &y, &width, &height);
 
 		if ('\0'==szMapName[0])
 			continue;
 
 		TMapInfo kMapInfo;
 		kMapInfo.m_strName = szMapName;
+		kMapInfo.m_strLocaleName = szMapName; // szMapLocaleName;
 		kMapInfo.m_dwBaseX = x;
 		kMapInfo.m_dwBaseY = y;
 
@@ -625,9 +624,8 @@ void CMapManager::__LoadMapInfoVector()
 		kMapInfo.m_dwEndX = kMapInfo.m_dwBaseX + kMapInfo.m_dwSizeX * CTerrainImpl::TERRAIN_XSIZE;
 		kMapInfo.m_dwEndY = kMapInfo.m_dwBaseY + kMapInfo.m_dwSizeY * CTerrainImpl::TERRAIN_YSIZE;
 
-		m_kVct_kMapInfo.push_back(kMapInfo);
+		m_kVct_kMapInfo.emplace_back(kMapInfo);
 	}
 
-	return;
 }
 

@@ -1,8 +1,6 @@
 #include "stdafx.h"
-
 #include "questlua.h"
-#include "questmanager.h"
-#include "horsename_manager.h"
+#include "quest_manager.h"
 #include "char.h"
 #include "affect.h"
 #include "config.h"
@@ -15,8 +13,7 @@
 #define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
-extern int32_t (*check_name) (const char * str);
-
+extern bool IS_MOUNTABLE_ZONE(int32_t map_index, bool isHorse);
 namespace quest
 {
 	//
@@ -25,6 +22,11 @@ namespace quest
 	int32_t horse_is_riding(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 
 		if (ch->IsHorseRiding())
 			lua_pushnumber(L, 1);
@@ -38,7 +40,7 @@ namespace quest
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
-		if (nullptr != ch)
+		if (ch)
 		{
 			lua_pushboolean(L, (ch->GetHorse() != nullptr) ? true : false);
 		}
@@ -53,6 +55,12 @@ namespace quest
 	int32_t horse_ride(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
+
 		ch->StartRiding();
 		return 0;
 	}
@@ -60,6 +68,12 @@ namespace quest
 	int32_t horse_unride(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
+
 		ch->StopRiding();
 		return 0;
 	}
@@ -67,21 +81,33 @@ namespace quest
 	int32_t horse_summon(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 
-		// 소환하면 멀리서부터 달려오는지 여부
+		if (!IS_MOUNTABLE_ZONE(ch->GetMapIndex(), true))
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "RIDING_IS_BLOCKED_HERE");
+			return 0;
+		}
+
 		bool bFromFar = lua_isboolean(L, 1) ? lua_toboolean(L, 1) : false;
+		uint32_t horseVnum = lua_isnumber(L, 2) ? (uint32_t)lua_tonumber(L, 2) : 0;
 
-		// 소환수의 vnum
-		uint32_t horseVnum= lua_isnumber(L, 2) ? lua_tonumber(L, 2) : 0;
-
-		const char* name = lua_isstring(L, 3) ? lua_tostring(L, 3) : 0;
-		ch->HorseSummon(true, bFromFar, horseVnum, name);
+		ch->HorseSummon(true, bFromFar, horseVnum);
 		return 0;
 	}
 
 	int32_t horse_unsummon(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 		ch->HorseSummon(false);
 		return 0;
 	}
@@ -89,6 +115,11 @@ namespace quest
 	int32_t horse_is_mine(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 		LPCHARACTER horse = CQuestManager::instance().GetCurrentNPCCharacterPtr();
 
 		lua_pushboolean(L, horse && horse->GetRider() == ch);
@@ -98,6 +129,11 @@ namespace quest
 	int32_t horse_set_level(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 
 		if (!lua_isnumber(L, 1))
 			return 0;
@@ -112,6 +148,11 @@ namespace quest
 	int32_t horse_get_level(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 		lua_pushnumber(L, ch->GetHorseLevel());
 		return 1;
 	}
@@ -119,6 +160,11 @@ namespace quest
 	int32_t horse_advance(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 
 		if (ch->GetHorseLevel() >= HORSE_MAX_LEVEL)
 			return 0;
@@ -132,6 +178,11 @@ namespace quest
 	int32_t horse_get_health(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 
 		if (ch->GetHorseLevel())
 			lua_pushnumber(L, ch->GetHorseHealth());
@@ -144,9 +195,13 @@ namespace quest
 	int32_t horse_get_health_pct(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 
 		int32_t pct = MINMAX(0, ch->GetHorseHealth() * 100 / ch->GetHorseMaxHealth(), 100);
-		sys_log(1, "horse.get_health_pct %d", pct);
 
 		if (ch->GetHorseLevel())
 			lua_pushnumber(L, pct);
@@ -159,6 +214,11 @@ namespace quest
 	int32_t horse_get_stamina(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 
 		if (ch->GetHorseLevel())
 			lua_pushnumber(L, ch->GetHorseStamina());
@@ -171,8 +231,12 @@ namespace quest
 	int32_t horse_get_stamina_pct(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 		int32_t pct = MINMAX(0, ch->GetHorseStamina() * 100 / ch->GetHorseMaxStamina(), 100);
-		sys_log(1, "horse.get_stamina_pct %d", pct);
 
 		if (ch->GetHorseLevel())
 			lua_pushnumber(L, pct);
@@ -185,6 +249,11 @@ namespace quest
 	int32_t horse_get_grade(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 		lua_pushnumber(L, ch->GetHorseGrade());
 		return 1;
 	}
@@ -192,6 +261,11 @@ namespace quest
 	int32_t horse_is_dead(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 		lua_pushboolean(L, ch->GetHorseHealth()<=0);
 		return 1;
 	}
@@ -199,6 +273,11 @@ namespace quest
 	int32_t horse_revive(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 		if (ch->GetHorseLevel() > 0 && ch->GetHorseHealth() <= 0)
 		{
 			ch->ReviveHorse();
@@ -209,6 +288,11 @@ namespace quest
 	int32_t horse_feed(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 		//uint32_t dwHorseFood = ch->GetHorseLevel() + ITEM_HORSE_FOOD_1 - 1;
 		if (ch->GetHorseLevel() > 0 && ch->GetHorseHealth() > 0)
 		{
@@ -219,31 +303,29 @@ namespace quest
 
 	int32_t horse_set_name(lua_State* L)
 	{
-		// 리턴값
-		// 0 : 소유한 말이 없다
-		// 1 : 잘못된 이름이다
-		// 2 : 이름 바꾸기 성공
-
-		if ( lua_isstring(L, -1) != true ) return 0;
+		if ( !lua_isstring(L, -1) ) 
+			return 0;
+		const char* pHorseName = lua_tostring(L, -1);
 
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
 
 		if ( ch->GetHorseLevel() > 0 )
 		{
-			const char* pHorseName = lua_tostring(L, -1);
-
 			if ( pHorseName == nullptr || check_name(pHorseName) == 0 )
 			{
 				lua_pushnumber(L, 1);
 			}
 			else
 			{
-				int32_t nHorseNameDuration = test_server == true ? 60*5 : 60*60*24*30;
+				int32_t nHorseNameDuration = g_bIsTestServer ? 60 * 5 : 60 * 60 * 24 * 30;
 
 				ch->SetQuestFlag("horse_name.valid_till", get_global_time() + nHorseNameDuration);
 				ch->AddAffect(AFFECT_HORSE_NAME, 0, 0, 0, PASSES_PER_SEC(nHorseNameDuration), 0, true);
-
-				CHorseNameManager::instance().UpdateHorseName(ch->GetPlayerID(), lua_tostring(L, -1), true);
 
 				ch->HorseSummon(false, true);
 				ch->HorseSummon(true, true);
@@ -265,17 +347,26 @@ namespace quest
 
 		if ( ch != nullptr )
 		{
-			const char* pHorseName = CHorseNameManager::instance().GetHorseName(ch->GetPlayerID());
-
-			if ( pHorseName != nullptr )
-			{
-				lua_pushstring(L, pHorseName);
-				return 1;
-			}
+			lua_pushstring(L, ch->GetHorseName());
+			return 1;
 		}
 
 		lua_pushstring(L, "");
 
+		return 1;
+	}
+	int32_t horse_in_summonable_area(lua_State* L)
+	{
+		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch ptr");
+			return 0;
+		}
+
+		bool isMount = lua_isboolean(L, 1) ? lua_toboolean(L, 1) : true;
+
+		lua_pushboolean(L, IS_MOUNTABLE_ZONE(ch->GetMapIndex(), isMount));
 		return 1;
 	}
 
@@ -286,6 +377,7 @@ namespace quest
 			{ "is_mine",		horse_is_mine			},
 			{ "is_riding",		horse_is_riding			},
 			{ "is_summon",		horse_is_summon			},
+			{ "in_summonable_area", horse_in_summonable_area},
 			{ "ride",			horse_ride				},
 			{ "unride",			horse_unride			},
 			{ "summon",			horse_summon			},

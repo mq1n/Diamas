@@ -7,19 +7,21 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "../eterXClient/Locale_inc.h"
-#include <windows.h>
-#include <assert.h>
-#include <stdio.h>
+#include <Windows.h>
+#include <cassert>
+#include <cstdio>
 #include <mmsystem.h>
-#include <time.h>
+#include <ctime>
+#include <cstdint>
 
+#include "file_ptr.h"
 #include <algorithm>
 #include <string>
 #include <vector>
 #include <deque>
 #include <list>
 #include <map>
+#include <fmt/format.h>
 using namespace std::string_literals;
 
 #if _MSC_VER >= 1400
@@ -34,4 +36,5 @@ using namespace std::string_literals;
 #endif
 
 #include "vk.h"
-#include "filename.h"
+#include "Filename.h"
+#include "../eterXClient/Locale_inc.h"

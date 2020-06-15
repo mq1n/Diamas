@@ -2,11 +2,11 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "../eterlib/CullingManager.h"
-#include "../eterlib/Camera.h"
+#include "StdAfx.h"
+#include "../eterLib/CullingManager.h"
+#include "../eterLib/Camera.h"
 #include <FileSystemIncl.hpp>
-#include "../eterGameLib/MapOutDoor.h"
+#include "../eterGameLib/MapOutdoor.h"
 #include "../eterGameLib/PropertyLoader.h"
 
 #include "PythonBackground.h"
@@ -14,6 +14,7 @@
 #include "PythonNetworkStream.h"
 #include "PythonMiniMap.h"
 #include "PythonSystem.h"
+#include "Locale_inc.h"
 
 std::string g_strEffectName = "d:/ymir work/effect/etc/direction/direction_land.mse";
 
@@ -142,7 +143,7 @@ void CPythonBackground::SelectViewDistanceNum(int32_t eNum)
 
 	m_eViewDistanceNum = eNum;
 
-	TEnvironmentData * env = ((TEnvironmentData *) mc_pcurEnvironmentData);
+	TEnvironmentData * env = (const_cast<TEnvironmentData *>(mc_pcurEnvironmentData));
 
 	// 게임 분위기를 바꿔놓을 수 있으므로 reserve로 되어있으면 고치지 않는다.
 	if (env->bReserve)
@@ -313,7 +314,7 @@ struct FGetPortalID
 			if (0 == iID)
 				break;
 
-			m_kSet_iPortalID.insert(iID);
+			m_kSet_iPortalID.emplace(iID);
 		}
 	}
 };
@@ -366,11 +367,9 @@ void CPythonBackground::Update(float fCenterX, float fCenterY, float fCenterZ)
 		if (!__IsSame(kGetPortalID.m_kSet_iPortalID, m_kSet_iShowingPortalID))
 		{
 			ClearPortal();
-			std::set<int32_t>::iterator itor=kGetPortalID.m_kSet_iPortalID.begin();
+			auto itor = kGetPortalID.m_kSet_iPortalID.begin();
 			for (; itor!=kGetPortalID.m_kSet_iPortalID.end(); ++itor)
-			{
 				AddShowingPortalID(*itor);
-			}
 			RefreshPortal();
 
 			m_kSet_iShowingPortalID = kGetPortalID.m_kSet_iPortalID;
@@ -379,7 +378,7 @@ void CPythonBackground::Update(float fCenterX, float fCenterY, float fCenterZ)
 
 	// Target Effect Process
 	{
-		std::map<uint32_t, uint32_t>::iterator itor = m_kMap_dwTargetID_dwChrID.begin();
+		auto itor = m_kMap_dwTargetID_dwChrID.begin();
 		for (; itor != m_kMap_dwTargetID_dwChrID.end(); ++itor)
 		{
 			uint32_t dwTargetID = itor->first;
@@ -403,14 +402,14 @@ void CPythonBackground::Update(float fCenterX, float fCenterY, float fCenterZ)
 
 	// Reserve Target Effect
 	{
-		std::map<uint32_t, SReserveTargetEffect>::iterator itor = m_kMap_dwID_kReserveTargetEffect.begin();
+		auto itor = m_kMap_dwID_kReserveTargetEffect.begin();
 		for (; itor != m_kMap_dwID_kReserveTargetEffect.end();)
 		{
 			uint32_t dwID = itor->first;
 			SReserveTargetEffect & rReserveTargetEffect = itor->second;
 
-			float ilx = float(rReserveTargetEffect.ilx);
-			float ily = float(rReserveTargetEffect.ily);
+			auto ilx = float(rReserveTargetEffect.ilx);
+			auto ily = float(rReserveTargetEffect.ily);
 
 			float fHeight = rkMap.GetHeight(ilx, ily);
 			if (0.0f == fHeight)
@@ -428,18 +427,15 @@ void CPythonBackground::Update(float fCenterX, float fCenterY, float fCenterZ)
 
 bool CPythonBackground::__IsSame(std::set<int32_t> & rleft, std::set<int32_t> & rright)
 {
-	std::set<int32_t>::iterator itor_l;
-	std::set<int32_t>::iterator itor_r;
-
-	for (itor_l=rleft.begin(); itor_l!=rleft.end(); ++itor_l)
+	for (auto & itor_l : rleft)
 	{
-		if (rright.end() == rright.find(*itor_l))
+		if (rright.end() == rright.find(itor_l))
 			return false;
 	}
 
-	for (itor_r=rright.begin(); itor_r!=rright.end(); ++itor_r)
+	for (auto & itor_r : rright)
 	{
-		if (rleft.end() == rleft.find(*itor_r))
+		if (rleft.end() == rleft.find(itor_r))
 			return false;
 	}
 
@@ -577,10 +573,7 @@ bool CPythonBackground::CheckAdvancing(CInstanceBase * pInstance)
 			pInstance->BlockMovement();
 			return true;
 		}
-		else
-		{
-			pInstance->NEW_MoveToDestPixelPositionDirection(pInstance->NEW_GetDstPixelPositionRef());
-		}
+		pInstance->NEW_MoveToDestPixelPositionDirection(pInstance->NEW_GetDstPixelPositionRef());
 		return false;
 	}
 	return false;
@@ -693,12 +686,12 @@ void CPythonBackground::LocalPositionToGlobalPosition(int32_t& rLocalX, int32_t&
 
 void CPythonBackground::RegisterDungeonMapName(const char * c_szMapName)
 {
-	m_kSet_strDungeonMapName.insert(c_szMapName);
+	m_kSet_strDungeonMapName.emplace(c_szMapName);
 }
 
 CPythonBackground::TMapInfo* CPythonBackground::GlobalPositionToMapInfo(uint32_t dwGlobalX, uint32_t dwGlobalY)
 {
-	TMapInfoVector::iterator f = std::find_if(m_kVct_kMapInfo.begin(), m_kVct_kMapInfo.end(), FFindWarpMapName(dwGlobalX, dwGlobalY));
+	auto f = std::find_if(m_kVct_kMapInfo.begin(), m_kVct_kMapInfo.end(), FFindWarpMapName(dwGlobalX, dwGlobalY));
 	if (f == m_kVct_kMapInfo.end())
 		return nullptr;
 
@@ -775,6 +768,17 @@ const char * CPythonBackground::GetWarpMapName()
 	return m_strMapName.c_str();
 }
 
+std::string CPythonBackground::GetMapName(uint32_t dwX, uint32_t dwY)
+{
+	TMapInfo* pkMapInfo = GlobalPositionToMapInfo(dwX, dwY);
+	if (!pkMapInfo)
+	{
+		TraceError("NOT_FOUND_GLOBAL_POSITION(%d, %d)", dwX, dwY);
+		return "";
+	}
+	return pkMapInfo->m_strName;
+}
+
 void CPythonBackground::ChangeToDay()
 {
 	m_iDayMode = DAY_MODE_LIGHT;
@@ -848,7 +852,7 @@ void CPythonBackground::SetXMaxTree(int32_t iGrade)
 
 void CPythonBackground::CreateTargetEffect(uint32_t dwID, uint32_t dwChrVID)
 {
-	m_kMap_dwTargetID_dwChrID.insert(std::make_pair(dwID, dwChrVID));
+	m_kMap_dwTargetID_dwChrID.emplace(dwID, dwChrVID);
 }
 
 void CPythonBackground::CreateTargetEffect(uint32_t dwID, int32_t lx, int32_t ly)
@@ -872,7 +876,7 @@ void CPythonBackground::CreateTargetEffect(uint32_t dwID, int32_t lx, int32_t ly
 		SReserveTargetEffect ReserveTargetEffect;
 		ReserveTargetEffect.ilx = ilx;
 		ReserveTargetEffect.ily = ily;
-		m_kMap_dwID_kReserveTargetEffect.insert(std::make_pair(dwID, ReserveTargetEffect));
+		m_kMap_dwID_kReserveTargetEffect.emplace(dwID, ReserveTargetEffect);
 		return;
 	}
 
@@ -882,13 +886,9 @@ void CPythonBackground::CreateTargetEffect(uint32_t dwID, int32_t lx, int32_t ly
 void CPythonBackground::DeleteTargetEffect(uint32_t dwID)
 {
 	if (m_kMap_dwID_kReserveTargetEffect.end() != m_kMap_dwID_kReserveTargetEffect.find(dwID))
-	{
 		m_kMap_dwID_kReserveTargetEffect.erase(dwID);
-	}
 	if (m_kMap_dwTargetID_dwChrID.end() != m_kMap_dwTargetID_dwChrID.find(dwID))
-	{
 		m_kMap_dwTargetID_dwChrID.erase(dwID);
-	}
 
 	DeleteSpecialEffect(dwID);
 }

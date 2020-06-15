@@ -15,9 +15,7 @@ CNetworkAddress::CNetworkAddress()
 	Clear();
 }
 
-CNetworkAddress::~CNetworkAddress()
-{
-}
+CNetworkAddress::~CNetworkAddress() = default;
 
 CNetworkAddress::operator const SOCKADDR_IN&() const
 {
@@ -55,7 +53,7 @@ bool CNetworkAddress::Set(const char* c_szAddr, int32_t port)
 
 void CNetworkAddress::SetLocalIP()
 {
-	SetIP(0x0000000U /* INADDR_ANY */);	
+	SetIP((uint32_t)0x00000000 /* INADDR_ANY */);
 }
 
 void CNetworkAddress::SetIP(uint32_t ip)
@@ -71,7 +69,8 @@ void CNetworkAddress::SetIP(const char* c_szIP)
 bool CNetworkAddress::SetDNS(const char* c_szDNS)
 {
 	HOSTENT* pHostent=gethostbyname(c_szDNS);
-	if (!pHostent) return false;
+	if (!pHostent)
+		return false;
 	memcpy(&m_sockAddrIn.sin_addr, pHostent->h_addr, sizeof(m_sockAddrIn.sin_addr));
 	return true;
 }

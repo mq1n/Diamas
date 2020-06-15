@@ -22,7 +22,7 @@ void CCullingManager::RayTraceCallback(const Vector3d &/*p1*/,          // sourc
 		if (sphere->IS_SPHERE)
 			puts("CCullingManager::RayTraceCallback");
 #endif		
-		m_list.push_back((CGraphicObjectInstance *)sphere->GetUserData());
+		m_list.emplace_back((CGraphicObjectInstance *) sphere->GetUserData());
 	}
 		//f((CGraphicObjectInstance *)sphere->GetUserData());
 	//}
@@ -79,7 +79,7 @@ void CCullingManager::RangeTestCallback(const Vector3d &/*p*/,float /*distance*/
 #endif
 	if (state!=VS_OUTSIDE)
 	{
-		m_list.push_back((CGraphicObjectInstance *)sphere->GetUserData());
+		m_list.emplace_back((CGraphicObjectInstance *) sphere->GetUserData());
 		//f((CGraphicObjectInstance *)sphere->GetUserData());
 	}
 	//assert(false && "NOT REACHED");

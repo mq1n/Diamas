@@ -84,9 +84,7 @@ void CGrannyModelInstance::DestroyDeviceObjects()
 void CGrannyModelInstance::__Initialize()
 {
 	if (m_pModel)
-	{
 		m_pModel->Release();
-	}
 	m_pModel = nullptr;
 	mc_pParentInstance = nullptr;
 	m_iParentBoneIndex = 0;

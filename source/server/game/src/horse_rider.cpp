@@ -377,6 +377,11 @@ void CHorseRider::SetHorseLevel(int32_t iLevel)
 	SendHorseInfo();
 }
 
+void CHorseRider::SetHorseName(const char* szName)
+{
+	strlcpy(m_Horse.szName, szName, sizeof(m_Horse.szName));
+}
+
 uint8_t CHorseRider::GetHorseGrade()
 {
 	uint8_t grade = 0;

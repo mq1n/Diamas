@@ -1,9 +1,7 @@
-#ifndef __INC_MAIN_H__
-#define __INC_MAIN_H__
+#pragma once
+#include <stdint.h>
 
-int32_t	Start();
+bool Start();
 void End();
-const char * GetTablePostfix();
 const char * GetPlayerDBName();
-
-#endif
+const char * GetAccountDBName();

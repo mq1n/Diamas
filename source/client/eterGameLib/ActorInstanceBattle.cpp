@@ -293,17 +293,13 @@ void CActorInstance::__RunNextCombo()
 	////////////////////////////////
 	// 콤보가 끝났다면
 	if (m_dwcurComboIndex == pComboData->ComboIndexVector.size())
-	{
 		__OnEndCombo();
-	}
 }
 
 void CActorInstance::__OnEndCombo()
 {
 	if (__IsMountingHorse())
-	{
 		m_dwcurComboIndex = 1;
-	}
 
 	// 여기서 콤보를 초기화 해선 안된다.
 	// 콤보가 초기화 되는 곳은 마지막 콤보가 끝나고 Motion 이 자동으로 Wait 으로 돌아가는 시점이다.
@@ -342,12 +338,11 @@ BOOL CActorInstance::isValidAttacking()
 
 	const NRaceData::TMotionAttackData * c_pData = m_pkCurRaceMotionData->GetMotionAttackDataPointer();
 	float fElapsedTime = GetAttackingElapsedTime();
-	NRaceData::THitDataContainer::const_iterator itor = c_pData->HitDataContainer.begin();
+	auto itor = c_pData->HitDataContainer.begin();
 	for (; itor != c_pData->HitDataContainer.end(); ++itor)
 	{
 		const NRaceData::THitData & c_rHitData = *itor;
-		if (fElapsedTime > c_rHitData.fAttackStartTime &&
-			fElapsedTime < c_rHitData.fAttackEndTime)
+		if (fElapsedTime > c_rHitData.fAttackStartTime && fElapsedTime < c_rHitData.fAttackEndTime)
 			return TRUE;
 	}
 
@@ -415,7 +410,7 @@ BOOL CActorInstance::__IsMovingSkill(uint16_t wSkillNumber)
 {
 	enum
 	{
-		HORSE_DASH_SKILL_NUMBER = 137,
+		HORSE_DASH_SKILL_NUMBER = 137
 	};
 
 	return HORSE_DASH_SKILL_NUMBER == wSkillNumber;
@@ -579,6 +574,8 @@ bool IS_HUGE_RACE(uint32_t vnum)
 
 bool CActorInstance::__CanPushDestActor(CActorInstance& rkActorDst)
 {
+	rkActorDst.SetPushFlag(false);
+
 	if (rkActorDst.IsBuilding())
 		return false;
 
@@ -591,8 +588,11 @@ bool CActorInstance::__CanPushDestActor(CActorInstance& rkActorDst)
 	if (rkActorDst.IsNPC())
 		return false;
 
+	if (rkActorDst.IsShop())
+		return false;
+
 	// 거대 몬스터 밀림 제외
-	extern bool IS_HUGE_RACE(uint32_t vnum);
+
 	if (IS_HUGE_RACE(rkActorDst.GetRace()))
 		return false;
 
@@ -605,6 +605,7 @@ bool CActorInstance::__CanPushDestActor(CActorInstance& rkActorDst)
 	if (rkActorDst.__GetOwnerTime()>3.0f)
 		return false;
 
+	rkActorDst.SetPushFlag(true);
 	return true;
 }
 
@@ -627,22 +628,32 @@ bool IS_PARTY_HUNTING_RACE(uint32_t vnum)
 	*/
 }
 
-void CActorInstance::__ProcessDataAttackSuccess(const NRaceData::TAttackData & c_rAttackData, CActorInstance & rVictim, const D3DXVECTOR3 & c_rv3Position, uint32_t uiSkill, BOOL isSendPacket)
+void CActorInstance::__ProcessDataAttackSuccess(const NRaceData::TAttackData & c_rAttackData, CActorInstance & rVictim,
+												const D3DXVECTOR3 & c_rv3Position, uint32_t uiSkill, BOOL isSendPacket)
 {
 	if (NRaceData::HIT_TYPE_NONE == c_rAttackData.iHittingType)
 		return;	
 
 	InsertDelay(c_rAttackData.fStiffenTime);
 
+	bool bPush = false;
+
 	if (__CanPushDestActor(rVictim) && c_rAttackData.fExternalForce > 0.0f)
 	{
 		__PushCircle(rVictim);
-		
+
 		// VICTIM_COLLISION_TEST
-		const D3DXVECTOR3& kVictimPos = rVictim.GetPosition();
+		const D3DXVECTOR3 & kVictimPos = rVictim.GetPosition();
 		rVictim.m_PhysicsObject.IncreaseExternalForce(kVictimPos, c_rAttackData.fExternalForce); //*nForceRatio/100.0f);
 
 		// VICTIM_COLLISION_TEST_END
+
+		bPush = true;
+	}
+
+	if (!bPush && rVictim.CanPush())
+	{
+		isSendPacket = FALSE; // Antifly patch detected...
 	}
 
 	// Invisible Time
@@ -658,7 +669,7 @@ void CActorInstance::__ProcessDataAttackSuccess(const NRaceData::TAttackData & c
 	{
 		rVictim.m_fInvisibleTime = CTimer::Instance().GetCurrentSecond() + c_rAttackData.fInvisibleTime;
 	}
-		
+
 	// Stiffen Time
 	rVictim.InsertDelay(c_rAttackData.fStiffenTime);
 
@@ -666,12 +677,10 @@ void CActorInstance::__ProcessDataAttackSuccess(const NRaceData::TAttackData & c
 	D3DXVECTOR3 vec3Effect(rVictim.m_x, rVictim.m_y, rVictim.m_z);
 	
 	// #0000780: [M2KR] 수룡 타격구 문제
-	extern bool IS_HUGE_RACE(uint32_t vnum);
+
 	if (IS_HUGE_RACE(rVictim.GetRace()))
-	{
 		vec3Effect = c_rv3Position;
-	}
-	
+
 	const D3DXVECTOR3 & v3Pos = GetPosition();
 
 	float fHeight = D3DXToDegree(atan2(-vec3Effect.x + v3Pos.x,+vec3Effect.y - v3Pos.y));
@@ -701,25 +710,17 @@ void CActorInstance::__ProcessDataAttackSuccess(const NRaceData::TAttackData & c
 		// 2004.08.03.빌딩의 경우 흔들리면 이상하다
 	}
 	else if (rVictim.IsStone() || rVictim.IsDoor())
-	{
 		__HitStone(rVictim);
-	}
 	else
 	{
 		///////////
 		// Motion
 		if (NRaceData::HIT_TYPE_GOOD == c_rAttackData.iHittingType || rVictim.IsResistFallen())
-		{
 			__HitGood(rVictim);
-		}
 		else if (NRaceData::HIT_TYPE_GREAT == c_rAttackData.iHittingType)
-		{
 			__HitGreate(rVictim);
-		}
 		else
-		{
 			TraceError("ProcessSucceedingAttacking: Unknown AttackingData.iHittingType %d", c_rAttackData.iHittingType);
-		}
 	}
 
 	__OnHit(uiSkill, rVictim, isSendPacket);
@@ -767,20 +768,32 @@ void CActorInstance::ShakeProcess()
 
 			switch (rand()%2)
 			{
-				case 0:v3Pos.x+=rand()%nShakeSize;break;
-				case 1:v3Pos.x-=rand()%nShakeSize;break;
+			case 0:
+				v3Pos.x += rand() % nShakeSize;
+				break;
+			case 1:
+				v3Pos.x -= rand() % nShakeSize;
+				break;
 			}
 
 			switch (rand()%2)
 			{
-				case 0:v3Pos.y+=rand()%nShakeSize;break;
-				case 1:v3Pos.y-=rand()%nShakeSize;break;
+			case 0:
+				v3Pos.y += rand() % nShakeSize;
+				break;
+			case 1:
+				v3Pos.y -= rand() % nShakeSize;
+				break;
 			}
 
 			switch (rand()%2)
 			{
-				case 0:v3Pos.z+=rand()%nShakeSize;break;
-				case 1:v3Pos.z-=rand()%nShakeSize;break;
+			case 0:
+				v3Pos.z += rand() % nShakeSize;
+				break;
+			case 1:
+				v3Pos.z -= rand() % nShakeSize;
+				break;
 			}
 		}
 
@@ -793,13 +806,9 @@ void CActorInstance::ShakeProcess()
 void CActorInstance::__HitStone(CActorInstance& rVictim)
 {
 	if (rVictim.IsStun())
-	{
 		rVictim.Die();
-	}
 	else
-	{
 		rVictim.__Shake(100);
-	}
 }
 
 void CActorInstance::__HitGood(CActorInstance& rVictim)

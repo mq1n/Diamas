@@ -5,7 +5,7 @@ namespace building
 {
 	enum
 	{
-		OBJECT_MATERIAL_MAX_NUM = 5,
+		OBJECT_MATERIAL_MAX_NUM = 5
 	};
 
 	typedef struct SLand

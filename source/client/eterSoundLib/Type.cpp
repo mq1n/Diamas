@@ -45,7 +45,7 @@ bool NSound::LoadSoundInformationPiece(const char * c_szFileName, NSound::TSound
 	char szSoundDataHeader[32+1];
 	for (uint32_t i = 0; i < rSoundDataVector.size(); ++i)
 	{
-		_snprintf(szSoundDataHeader, sizeof(szSoundDataHeader), "sounddata%02d", i);
+		_snprintf_s(szSoundDataHeader, sizeof(szSoundDataHeader), "sounddata%02u", i);
 		CTokenVector * pTokenVector;
 		if (!rkTextFileLoader.GetTokenVector(szSoundDataHeader, &pTokenVector))
 		{
@@ -63,11 +63,11 @@ bool NSound::LoadSoundInformationPiece(const char * c_szFileName, NSound::TSound
 		if (c_szPathHeader)
 		{
 			rSoundDataVector[i].strSoundFileName = c_szPathHeader;
-			rSoundDataVector[i].strSoundFileName += pTokenVector->at(1).c_str();
+			rSoundDataVector[i].strSoundFileName += pTokenVector->at(1);
 		}
 		else
 		{
-			rSoundDataVector[i].strSoundFileName = pTokenVector->at(1).c_str();
+			rSoundDataVector[i].strSoundFileName = pTokenVector->at(1);
 		}
 	}
 
@@ -89,30 +89,27 @@ bool NSound::SaveSoundInformationPiece(const char * c_szFileName, NSound::TSound
 	std::string strResult;
 	strResult = c_szFileName;
 
-	FILE * File;
-	fopen_s(&File, c_szFileName, "wt");
+	msl::file_ptr fPtr(c_szFileName, "wt");
 
-	if (!File)
+	if (!fPtr)
 	{
 		char szErrorText[256+1];
-		_snprintf(szErrorText, sizeof(szErrorText), "Failed to save file (%s).\nPlease check if it is read-only or you have no space on the disk.\n", c_szFileName);
+		_snprintf_s(szErrorText, sizeof(szErrorText), "Failed to save file (%s).\nPlease check if it is read-only or you have no space on the disk.\n", c_szFileName);
 		LogBox(szErrorText, "Error");
 		SetResultString((strResult + " Cannot open file for writing").c_str());
 		return false;
 	}
 
-	fprintf(File, "ScriptType        CharacterSoundInformation\n");
-	fprintf(File, "\n");
+	fprintf(fPtr.get(), "ScriptType        CharacterSoundInformation\n");
+	fprintf(fPtr.get(), "\n");
 
-	fprintf(File, "SoundDataCount    %u\n", rSoundDataVector.size());
+	fprintf(fPtr.get(), "SoundDataCount    %u\n", rSoundDataVector.size());
 
 	for (uint32_t i = 0; i < rSoundDataVector.size(); ++i)
 	{
 		NSound::TSoundData & rSoundData = rSoundDataVector[i];
-		fprintf(File, "SoundData%02u       %f \"%s\"\n", i, rSoundData.fTime, rSoundData.strSoundFileName.c_str());
+		fprintf(fPtr.get(), "SoundData%02u       %f \"%s\"\n", i, rSoundData.fTime, rSoundData.strSoundFileName.c_str());
 	}
-
-	fclose(File);
 	return true;
 }
 

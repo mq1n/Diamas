@@ -6,7 +6,7 @@
 #include "sectree_manager.h"
 #include "char.h"
 #include "char_manager.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 
 namespace xmas
 {
@@ -42,22 +42,18 @@ namespace xmas
 			{
 				if (value > 0 && prev_value == 0)
 				{
-					CharacterVectorInteractor i;
-
-					// 없으면 만들어준다
-					if (!CHARACTER_MANAGER::instance().GetCharactersByRaceNum(MOB_XMAS_TREE_VNUM, i))
+					auto snapshot = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(MOB_XMAS_TREE_VNUM);
+					if (snapshot.empty())
 						CHARACTER_MANAGER::instance().SpawnMob(MOB_XMAS_TREE_VNUM, 61, 76500 + 358400, 60900 + 153600, 0, false, -1);
 				}
 				else if (prev_value > 0 && value == 0)
 				{
-					// 있으면 지워준다
-					CharacterVectorInteractor i;
-
-					if (CHARACTER_MANAGER::instance().GetCharactersByRaceNum(MOB_XMAS_TREE_VNUM, i))
+					auto snapshot = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(MOB_XMAS_TREE_VNUM);
+					if (!snapshot.empty())
 					{
-						CharacterVectorInteractor::iterator it = i.begin();
+						auto it = snapshot.begin();
 
-						while (it != i.end())
+						while (it != snapshot.end())
 							M2_DESTROY_CHARACTER(*it++);
 					}
 				}
@@ -70,13 +66,12 @@ namespace xmas
 				case 0:
 					// 있으면 지우는 코드
 					{
-						CharacterVectorInteractor i;
-
-						if (CHARACTER_MANAGER::instance().GetCharactersByRaceNum(MOB_SANTA_VNUM, i))
+						auto snapshot = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(MOB_SANTA_VNUM);
+						if (!snapshot.empty())
 						{
-							CharacterVectorInteractor::iterator it = i.begin();
+							auto it = snapshot.begin();
 
-							while (it != i.end())
+							while (it != snapshot.end())
 								M2_DESTROY_CHARACTER(*it++);
 						}
 					}
@@ -89,9 +84,8 @@ namespace xmas
 					{
 						quest::CQuestManager::instance().RequestSetEventFlag("xmas_santa", 2);
 
-						CharacterVectorInteractor i;
-
-						if (CHARACTER_MANAGER::instance().GetCharactersByRaceNum(MOB_SANTA_VNUM, i))
+						auto snapshot = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(MOB_SANTA_VNUM);
+						if (!snapshot.empty())
 							CHARACTER_MANAGER::instance().SpawnMobRandomPosition(MOB_SANTA_VNUM, 61);
 					}
 					break;
@@ -127,9 +121,9 @@ namespace xmas
 		if (quest::CQuestManager::instance().GetEventFlag("xmas_santa") == 0)
 			return 0;
 
-		CharacterVectorInteractor i;
+		auto snapshot = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(MOB_SANTA_VNUM);
 
-		if (CHARACTER_MANAGER::instance().GetCharactersByRaceNum(MOB_SANTA_VNUM, i))
+		if (snapshot.empty())
 			return 0;
 
 		if (CHARACTER_MANAGER::instance().SpawnMobRandomPosition(xmas::MOB_SANTA_VNUM, lMapIndex))
@@ -143,7 +137,7 @@ namespace xmas
 
 	void SpawnSanta(int32_t lMapIndex, int32_t iTimeGapSec)
 	{
-		if (test_server)
+		if (g_bIsTestServer)
 		{
 			iTimeGapSec /= 60;
 		}
@@ -181,7 +175,7 @@ namespace xmas
 			{
 				if (map_allow_find(p->lMapIndex))
 				{
-					PIXEL_POSITION posBase;
+					GPOS posBase;
 					if (!SECTREE_MANAGER::instance().GetMapBasePositionByMapIndex(p->lMapIndex, posBase))
 					{
 						sys_err("cannot get map base position %d", p->lMapIndex);
@@ -197,14 +191,12 @@ namespace xmas
 		}
 		else
 		{
-			CharacterVectorInteractor i;
-
-			// 있으면 지워준다
-			if (CHARACTER_MANAGER::instance().GetCharactersByRaceNum(MOB_XMAS_FIRWORK_SELLER_VNUM, i))
+			auto snapshot = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(MOB_XMAS_FIRWORK_SELLER_VNUM);
+			if (!snapshot.empty())
 			{
-				CharacterVectorInteractor::iterator it = i.begin();
+				auto it = snapshot.begin();
 
-				while (it != i.end())
+				while (it != snapshot.end())
 					M2_DESTROY_CHARACTER(*it++);
 			}
 		}

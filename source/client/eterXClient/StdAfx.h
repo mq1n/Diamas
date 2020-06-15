@@ -22,12 +22,17 @@
 #include <tchar.h>
 #include <strsafe.h>
 
-#include <dshow.h>
 #include <stdint.h>
+#include <dshow.h>
+#include <qedit.h>
 
 #include "Locale.h"
 
 #include "GameType.h"
+
+#ifdef __USE_CYTHON__
+#include "PythonrootlibManager.h"
+#endif
 
 enum
 {

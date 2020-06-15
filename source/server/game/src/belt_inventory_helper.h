@@ -82,11 +82,62 @@ public:
 
 		return false;
 	}
+	static int32_t GetItemCount(LPCHARACTER pc)
+	{
+		uint32_t count = 0;
+		for (uint16_t i = BELT_INVENTORY_SLOT_START; i < BELT_INVENTORY_SLOT_END; ++i)
+		{
+			LPITEM beltInventoryItem = pc->GetInventoryItem(i);
+			if (beltInventoryItem)
+				count++;
+		}
+		return count;
+	}
+
+	/// pc의 벨트 인벤토리에 아이템이 하나라도 존재하는 지 검사하는 함수.
+	static bool ClearBelt(LPCHARACTER pc)
+	{
+		int32_t EmptySlotCount = pc->GetEmptyInventoryCount(1);
+		int32_t BeltItemCount = GetItemCount(pc);
+
+		if (EmptySlotCount - 1 < BeltItemCount)
+		{
+			pc->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You have not enough empty belt inventory space"));
+			return false;
+		}
+
+		for (uint16_t i = BELT_INVENTORY_SLOT_START; i < BELT_INVENTORY_SLOT_END; ++i)
+		{
+			LPITEM beltInventoryItem = pc->GetInventoryItem(i);
+
+			if (beltInventoryItem)
+			{
+				int32_t NewPos = pc->GetEmptyInventory(1);
+				if (NewPos != -1)
+				{
+					beltInventoryItem->RemoveFromCharacter();
+					beltInventoryItem->AddToCharacter(pc, TItemPos(INVENTORY, NewPos));
+				}
+				else
+				{
+					pc->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You have not enough empty belt inventory space"));
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 
 	/// item이 벨트 인벤토리에 들어갈 수 있는 타입인지 검사하는 함수. (이 규칙은 기획자가 결정함)
 	static bool CanMoveIntoBeltInventory(LPITEM item)
 	{
-		bool canMove = false;
+		/*
+		if (item->GetType() == ITEM_LOTTERY && item->GetSubType() == LOTTERY_TICKET)
+			return true;
+
+		if (item->GetType() == ITEM_BLEND)
+			return true;
+		*/
 
 		if (item->GetType() == ITEM_USE)
 		{
@@ -95,12 +146,15 @@ public:
 			case USE_POTION:
 			case USE_POTION_NODELAY:
 			case USE_ABILITY_UP:
-				canMove = true;
+			case USE_AFFECT:
+			case USE_BAIT:
+			case USE_TALISMAN:
+				return true;
 				break;
 			}
 		}
 
-		return canMove;
+		return false;
 	}
 
 };

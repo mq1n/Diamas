@@ -130,7 +130,7 @@ void initeffect()
 		FLY_CHAIN_LIGHTNING,
 		FLY_HP_SMALL,
 		FLY_SKILL_MUYEONG,
-		FLY_EXP_CURSE,
+		FLY_EXP_CURSE
 	};
 
 	PyModule_AddIntConstant(poModule, "FLY_NONE",				FLY_NONE);

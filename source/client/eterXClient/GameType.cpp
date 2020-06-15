@@ -107,6 +107,5 @@ uint8_t SlotTypeToInvenType(uint8_t bSlotType)
 {
 	if (bSlotType >= SLOT_TYPE_MAX)
 		return RESERVED_WINDOW;
-	else
-		return c_aSlotTypeToInvenType[bSlotType];
+	return c_aSlotTypeToInvenType[bSlotType];
 }

@@ -2,33 +2,22 @@
 #include "PythonSystem.h"
 #include "PythonApplication.h"
 
-#define DEFAULT_VALUE_ALWAYS_SHOW_NAME		true
+/**
+* 0 is NONE
+* 1 is ALL
+* 2 is ITEM ONLY
+* 3 is CHAR ONLY
+*/
+#define DEFAULT_VALUE_DISPLAY_NAME_FLAG		1
 
 void CPythonSystem::SetInterfaceHandler(PyObject * poHandler)
 {
-// NOTE : 레퍼런스 카운트는 바꾸지 않는다. 레퍼런스가 남아 있어 Python에서 완전히 지워지지 않기 때문.
-//        대신에 __del__때 Destroy를 호출해 Handler를 nullptr로 셋팅한다. - [levites]
-//	if (m_poInterfaceHandler)
-//		Py_DECREF(m_poInterfaceHandler);
-
 	m_poInterfaceHandler = poHandler;
-
-//	if (m_poInterfaceHandler)
-//		Py_INCREF(m_poInterfaceHandler);
 }
 
 void CPythonSystem::DestroyInterfaceHandler()
 {
 	m_poInterfaceHandler = nullptr;
-}
-
-void CPythonSystem::SaveWindowStatus(int32_t iIndex, int32_t iVisible, int32_t iMinimized, int32_t ix, int32_t iy, int32_t iHeight)
-{
-	m_WindowStatus[iIndex].isVisible	= iVisible;
-	m_WindowStatus[iIndex].isMinimized	= iMinimized;
-	m_WindowStatus[iIndex].ixPosition	= ix;
-	m_WindowStatus[iIndex].iyPosition	= iy;
-	m_WindowStatus[iIndex].iHeight		= iHeight;
 }
 
 void CPythonSystem::GetDisplaySettings()
@@ -213,7 +202,7 @@ float CPythonSystem::GetMusicVolume()
 	return m_Config.music_volume;
 }
 
-int32_t CPythonSystem::GetSoundVolume()
+float CPythonSystem::GetSoundVolume()
 {
 	return m_Config.voice_volume;
 }
@@ -223,9 +212,9 @@ void CPythonSystem::SetMusicVolume(float fVolume)
 	m_Config.music_volume = fVolume;
 }
 
-void CPythonSystem::SetSoundVolumef(float fVolume)
+void CPythonSystem::SetSoundVolume(float fVolume)
 {
-	m_Config.voice_volume = int32_t(5 * fVolume);
+	m_Config.voice_volume = fVolume;
 }
 
 int32_t CPythonSystem::GetDistance()
@@ -244,28 +233,9 @@ void CPythonSystem::SetShadowLevel(uint32_t level)
 	CPythonBackground::Instance().RefreshShadowLevel();
 }
 
-int32_t CPythonSystem::IsSaveID()
-{
-	return m_Config.isSaveID;
-}
-
-const char * CPythonSystem::GetSaveID()
-{
-	return m_Config.SaveID;
-}
-
 bool CPythonSystem::isViewCulling()
 {
 	return m_Config.is_object_culling;
-}
-
-void CPythonSystem::SetSaveID(int32_t iValue, const char * c_szSaveID)
-{
-	if (iValue != 1)
-		return;
-	
-	m_Config.isSaveID = iValue;
-	strncpy_s(m_Config.SaveID, c_szSaveID, sizeof(m_Config.SaveID) - 1);
 }
 
 CPythonSystem::TConfig * CPythonSystem::GetConfig()
@@ -273,7 +243,7 @@ CPythonSystem::TConfig * CPythonSystem::GetConfig()
 	return &m_Config;
 }
 
-void CPythonSystem::SetConfig(TConfig * pNewConfig)
+void CPythonSystem::SetConfig(const TConfig * pNewConfig)
 {
 	m_Config = *pNewConfig;
 }
@@ -293,12 +263,13 @@ void CPythonSystem::SetDefaultConfig()
 
 	m_Config.gamma				= 3;
 	m_Config.music_volume		= 1.0f;
-	m_Config.voice_volume		= 5;
+	m_Config.voice_volume = 1.0f;
 
-	m_Config.bDecompressDDS		= 0;
+	m_Config.bDecompressDDS = false;
+	m_Config.bUseDefaultIME = false;
 	m_Config.iShadowLevel		= 3;
 	m_Config.bViewChat			= true;
-	m_Config.bAlwaysShowName	= DEFAULT_VALUE_ALWAYS_SHOW_NAME;
+	m_Config.bShowNameFlag		= DEFAULT_VALUE_DISPLAY_NAME_FLAG;
 	m_Config.bShowDamage		= true;
 	m_Config.bShowSalesText		= true;
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
@@ -324,14 +295,14 @@ void CPythonSystem::SetViewChatFlag(int32_t iFlag)
 	m_Config.bViewChat = iFlag == 1 ? true : false;
 }
 
-bool CPythonSystem::IsAlwaysShowName()
+uint8_t CPythonSystem::GetShowNameFlag()
 {
-	return m_Config.bAlwaysShowName;
+	return m_Config.bShowNameFlag;
 }
 
-void CPythonSystem::SetAlwaysShowNameFlag(int32_t iFlag)
+void CPythonSystem::SetShowNameFlag(int32_t iFlag)
 {
-	m_Config.bAlwaysShowName = iFlag == 1 ? true : false;
+	m_Config.bShowNameFlag = (uint8_t)iFlag;
 }
 
 bool CPythonSystem::IsShowDamage()
@@ -385,18 +356,20 @@ bool CPythonSystem::IsUseDefaultIME()
 
 bool CPythonSystem::LoadConfig()
 {
-	FILE * fp = nullptr;
+	msl::file_ptr fPtr("config/settings.cfg", "rt");
 
-	if (nullptr == (fp = fopen("config/settings.cfg", "rt")))
+	if (!fPtr)
 		return false;
 
 	char buf[256];
 	char command[256];
 	char value[256];
 
-	while (fgets(buf, 256, fp))
+	while (fgets(buf, 256, fPtr.get()))
 	{
+#pragma warning(disable:4996)
 		if (sscanf(buf, " %s %s\n", command, value) == EOF)
+#pragma warning(default:4996)
 			break;
 
 		if (!stricmp(command, "WIDTH"))
@@ -413,25 +386,14 @@ bool CPythonSystem::LoadConfig()
 			m_Config.is_object_culling = atoi(value) ? true : false;
 		else if (!stricmp(command, "VISIBILITY"))
 			m_Config.iDistance = atoi(value);
-		else if (!stricmp(command, "MUSIC_VOLUME")) {
-			if(strchr(value, '.') == 0) { // Old compatiability
-				m_Config.music_volume = pow(10.0f, (-1.0f + (((float) atoi(value)) / 5.0f)));
-				if(atoi(value) == 0)
-					m_Config.music_volume = 0.0f;
-			} else
+		else if (!stricmp(command, "MUSIC_VOLUME"))
 				m_Config.music_volume = atof(value);
-		} else if (!stricmp(command, "VOICE_VOLUME"))
-			m_Config.voice_volume = (char) atoi(value);
+		else if (!stricmp(command, "VOICE_VOLUME"))
+			m_Config.voice_volume = atof(value);
 		else if (!stricmp(command, "GAMMA"))
 			m_Config.gamma = atoi(value);
-		else if (!stricmp(command, "IS_SAVE_ID"))
-			m_Config.isSaveID = atoi(value);
-		else if (!stricmp(command, "SAVE_ID"))
-			strncpy_s(m_Config.SaveID, value, 20);
 		else if (!stricmp(command, "WINDOWED"))
-		{
 			m_Config.bWindowed = atoi(value) == 1 ? true : false;
-		}
 		else if (!stricmp(command, "USE_DEFAULT_IME"))
 			m_Config.bUseDefaultIME = atoi(value) == 1 ? true : false;
 		else if (!stricmp(command, "SHADOW_LEVEL"))
@@ -442,8 +404,8 @@ bool CPythonSystem::LoadConfig()
 			m_Config.bNoSoundCard = atoi(value) == 1 ? true : false;
 		else if (!stricmp(command, "VIEW_CHAT"))
 			m_Config.bViewChat = atoi(value) == 1 ? true : false;
-		else if (!stricmp(command, "ALWAYS_VIEW_NAME"))
-			m_Config.bAlwaysShowName = atoi(value) == 1 ? true : false;
+		else if (!stricmp(command, "VIEW_NAME_FLAG"))
+			m_Config.bShowNameFlag = atoi(value) ? true : false;
 		else if (!stricmp(command, "SHOW_DAMAGE"))
 			m_Config.bShowDamage = atoi(value) == 1 ? true : false;
 		else if (!stricmp(command, "SHOW_SALESTEXT"))
@@ -460,140 +422,63 @@ bool CPythonSystem::LoadConfig()
 
 	if (m_Config.bWindowed)
 	{
-		uint32_t screen_width = GetSystemMetrics(SM_CXFULLSCREEN);
-		uint32_t screen_height = GetSystemMetrics(SM_CYFULLSCREEN);
+		RECT workArea;
+		SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0);
 
-		if (m_Config.width >= screen_width)
-		{
-			m_Config.width = screen_width;
-		}
-		if (m_Config.height >= screen_height)
-		{
-			m_Config.height = screen_height;
-		}
+		uint32_t workAreaWidth = (workArea.right - workArea.left);
+		uint32_t workAreaHeight = (workArea.bottom - workArea.top);
+
+		uint32_t maxWidth = workAreaWidth - GetSystemMetrics(SM_CXBORDER) * 2 - GetSystemMetrics(SM_CXDLGFRAME) * 2 - GetSystemMetrics(SM_CXFRAME) * 2;
+		uint32_t maxHeight = workAreaHeight - GetSystemMetrics(SM_CYBORDER) * 2 - GetSystemMetrics(SM_CYDLGFRAME) * 2 - GetSystemMetrics(SM_CYFRAME) * 2 - GetSystemMetrics(SM_CYCAPTION);
+
+		if (m_Config.width > maxWidth)
+			m_Config.width = maxWidth;
+		if (m_Config.height > maxHeight)
+			m_Config.height = maxHeight;
 	}
 	
 	m_OldConfig = m_Config;
-
-	fclose(fp);
-
-//	Tracef("LoadConfig: Resolution: %dx%d %dBPP %dHZ Software Cursor: %d, Music/Voice Volume: %d/%d Gamma: %d\n",
-//		m_Config.width,
-//		m_Config.height,
-//		m_Config.bpp,
-//		m_Config.frequency,
-//		m_Config.is_software_cursor,
-//		m_Config.music_volume,
-//		m_Config.voice_volume,
-//		m_Config.gamma);
-
 	return true;
 }
 
 bool CPythonSystem::SaveConfig()
 {
-	FILE *fp;
+	msl::file_ptr fPtr("config/settings.cfg", "wt");
 
-	if (nullptr == (fp = fopen("config/settings.cfg", "wt")))
+	if (!fPtr)
 		return false;
 
-	fprintf(fp, "WIDTH						%d\n"
-				"HEIGHT						%d\n"
-				"BPP						%d\n"
-				"FREQUENCY					%d\n"
-				"SOFTWARE_CURSOR			%d\n"
-				"OBJECT_CULLING				%d\n"
-				"VISIBILITY					%d\n"
-				"MUSIC_VOLUME				%.3f\n"
-				"VOICE_VOLUME				%d\n"
-				"GAMMA						%d\n"
-				"IS_SAVE_ID					%d\n"
-				"SAVE_ID					%s\n"
-				"DECOMPRESSED_TEXTURE		%d\n",
-				m_Config.width,
-				m_Config.height,
-				m_Config.bpp,
-				m_Config.frequency,
-				m_Config.is_software_cursor,
-				m_Config.is_object_culling,
-				m_Config.iDistance,
-				m_Config.music_volume,
-				m_Config.voice_volume,
-				m_Config.gamma,
-				m_Config.isSaveID,
-				m_Config.SaveID,
-				m_Config.bDecompressDDS);
+	fprintf(fPtr.get(), "WIDTH	%d\n", m_Config.width);
+	fprintf(fPtr.get(), "HEIGHT	%d\n", m_Config.height);
+	fprintf(fPtr.get(), "BPP	%d\n", m_Config.bpp);
+	fprintf(fPtr.get(), "FREQUENCY	%d\n", m_Config.frequency);
+	fprintf(fPtr.get(), "SOFTWARE_CURSOR	%d\n", m_Config.is_software_cursor);
+	fprintf(fPtr.get(), "OBJECT_CULLING	%d\n", m_Config.is_object_culling);
+	fprintf(fPtr.get(), "VISIBILITY	%d\n", m_Config.iDistance);
+	fprintf(fPtr.get(), "MUSIC_VOLUME	%.3f\n", m_Config.music_volume);
+	fprintf(fPtr.get(), "VOICE_VOLUME	%.3f\n", m_Config.voice_volume);
+	fprintf(fPtr.get(), "GAMMA	%d\n", m_Config.gamma);
+	fprintf(fPtr.get(), "DECOMPRESSED_TEXTURE	%d\n", m_Config.bDecompressDDS);
 
-	if (m_Config.bWindowed == 1)
-		fprintf(fp, "WINDOWED				%d\n", m_Config.bWindowed);
-	if (m_Config.bViewChat == 0)
-		fprintf(fp, "VIEW_CHAT				%d\n", m_Config.bViewChat);
-	if (m_Config.bAlwaysShowName != DEFAULT_VALUE_ALWAYS_SHOW_NAME)
-		fprintf(fp, "ALWAYS_VIEW_NAME		%d\n", m_Config.bAlwaysShowName);
-	if (m_Config.bShowDamage == 0)
-		fprintf(fp, "SHOW_DAMAGE		%d\n", m_Config.bShowDamage);
-	if (m_Config.bShowSalesText == 0)
-		fprintf(fp, "SHOW_SALESTEXT		%d\n", m_Config.bShowSalesText);
+	fprintf(fPtr.get(), "WINDOWED	%d\n", m_Config.bWindowed);
+	fprintf(fPtr.get(), "VIEW_CHAT	%d\n", m_Config.bViewChat);
+	if (m_Config.bShowNameFlag != DEFAULT_VALUE_DISPLAY_NAME_FLAG)
+		fprintf(fPtr.get(), "VIEW_NAME_FLAG		%d\n", m_Config.bShowNameFlag);
+	fprintf(fPtr.get(), "SHOW_DAMAGE	%d\n", m_Config.bShowDamage);
+	fprintf(fPtr.get(), "SHOW_SALESTEXT	%d\n", m_Config.bShowSalesText);
+	fprintf(fPtr.get(), "USE_DEFAULT_IME	%d\n", m_Config.bUseDefaultIME);
+	fprintf(fPtr.get(), "SHADOW_LEVEL	%d\n", m_Config.iShadowLevel);
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
-	if (m_Config.bShowMobAIFlag == 0)
-		fprintf(fp, "SHOW_MOBAIFLAG		%d\n", m_Config.bShowMobAIFlag);
+	fprintf(fPtr.get(), "SHOW_MOBAIFLAG		%d\n", m_Config.bShowMobAIFlag);
 #endif
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
-	if (m_Config.bShowMobLevel == 0)
-		fprintf(fp, "SHOW_MOBLEVEL		%d\n", m_Config.bShowMobLevel);
+	fprintf(fPtr.get(), "SHOW_MOBLEVEL		%d\n", m_Config.bShowMobLevel);
 #endif
 
-	fprintf(fp, "USE_DEFAULT_IME		%d\n", m_Config.bUseDefaultIME);
 
-	fprintf(fp, "SHADOW_LEVEL			%d\n", m_Config.iShadowLevel);
-	fprintf(fp, "\n");
+	fprintf(fPtr.get(), "\n");
 
-	fclose(fp);
 	return true;
-}
-
-bool CPythonSystem::LoadInterfaceStatus()
-{
-	FILE * File;
-	File = fopen("interface.cfg", "rb");
-
-	if (!File)
-		return false;
-
-	fread(m_WindowStatus, 1, sizeof(TWindowStatus) * WINDOW_MAX_NUM, File);
-	fclose(File);
-	return true;
-}
-
-void CPythonSystem::SaveInterfaceStatus()
-{
-	if (!m_poInterfaceHandler)
-		return;
-
-	PyCallClassMemberFunc(m_poInterfaceHandler, "OnSaveInterfaceStatus", Py_BuildValue("()"));
-
-	FILE * File;
-
-	File = fopen("interface.cfg", "wb");
-
-	if (!File)
-	{
-		TraceError("Cannot open interface.cfg");
-		return;
-	}
-
-	fwrite(m_WindowStatus, 1, sizeof(TWindowStatus) * WINDOW_MAX_NUM, File);
-	fclose(File);
-}
-
-bool CPythonSystem::isInterfaceConfig()
-{
-	return m_isInterfaceConfig;
-}
-
-const CPythonSystem::TWindowStatus & CPythonSystem::GetWindowStatusReference(int32_t iIndex)
-{
-	return m_WindowStatus[iIndex];
 }
 
 void CPythonSystem::ApplyConfig() // 이전 설정과 현재 설정을 비교해서 바뀐 설정을 적용 한다.
@@ -604,11 +489,21 @@ void CPythonSystem::ApplyConfig() // 이전 설정과 현재 설정을 비교해서 바뀐 설정�
 		
 		switch (m_Config.gamma)
 		{
-			case 0: val = 0.4f;	break;
-			case 1: val = 0.7f; break;
-			case 2: val = 1.0f; break;
-			case 3: val = 1.2f; break;
-			case 4: val = 1.4f; break;
+		case 0:
+			val = 0.4f;
+			break;
+		case 1:
+			val = 0.7f;
+			break;
+		case 2:
+			val = 1.0f;
+			break;
+		case 3:
+			val = 1.2f;
+			break;
+		case 4:
+			val = 1.4f;
+			break;
 		}
 		
 		CPythonGraphic::Instance().SetGamma(val);
@@ -629,31 +524,9 @@ void CPythonSystem::ApplyConfig() // 이전 설정과 현재 설정을 비교해서 바뀐 설정�
 
 void CPythonSystem::ChangeSystem()
 {
-	// Shadow
-	/*
-	if (m_Config.is_shadow)
-		CScreen::SetShadowFlag(true);
-	else
-		CScreen::SetShadowFlag(false);
-	*/
-	CSoundManager& rkSndMgr = CSoundManager::Instance();
-	/*
-	float fMusicVolume;
-	if (0 == m_Config.music_volume)
-		fMusicVolume = 0.0f;
-	else
-		fMusicVolume= (float)pow(10.0f, (-1.0f + (float)m_Config.music_volume / 5.0f));
-		*/
+	CSoundManager & rkSndMgr = CSoundManager::Instance();
 	rkSndMgr.SetMusicVolume(m_Config.music_volume);
-
-	/*
-	float fVoiceVolume;
-	if (0 == m_Config.voice_volume)
-		fVoiceVolume = 0.0f;
-	else
-		fVoiceVolume = (float)pow(10.0f, (-1.0f + (float)m_Config.voice_volume / 5.0f));
-	*/
-	rkSndMgr.SetSoundVolumeGrade(m_Config.voice_volume);	
+	rkSndMgr.SetSoundVolume(m_Config.voice_volume);
 }
 
 void CPythonSystem::Clear()
@@ -672,11 +545,6 @@ CPythonSystem::CPythonSystem()
 	LoadConfig();
 
 	ChangeSystem();
-
-	if (LoadInterfaceStatus())
-		m_isInterfaceConfig = true;
-	else
-		m_isInterfaceConfig = false;
 }
 
 CPythonSystem::~CPythonSystem()

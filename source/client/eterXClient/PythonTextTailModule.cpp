@@ -159,9 +159,15 @@ PyObject * textTailHideAllTextTail(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
-PyObject * textTailShowAllTextTail(PyObject * poSelf, PyObject * poArgs)
+PyObject * textTailShowAllCharactersTextTails(PyObject * poSelf, PyObject * poArgs)
 {
-	CPythonTextTail::Instance().ShowAllTextTail();
+	CPythonTextTail::Instance().ShowAllCharactersTextTails();
+	return Py_BuildNone();
+}
+
+PyObject * textTailShowAllItemsTextTails(PyObject * poSelf, PyObject * poArgs)
+{
+	CPythonTextTail::Instance().ShowAllItemsTextTails();
 	return Py_BuildNone();
 }
 
@@ -216,7 +222,8 @@ void initTextTail()
 
 		{ "ArrangeTextTail",			textTailArrangeTextTail,			METH_VARARGS },
 		{ "HideAllTextTail",			textTailHideAllTextTail,			METH_VARARGS },
-		{ "ShowAllTextTail",			textTailShowAllTextTail,			METH_VARARGS },
+		{ "ShowAllCharactersTextTail",	textTailShowAllCharactersTextTails,	METH_VARARGS },
+		{ "ShowAllItemsTextTail",		textTailShowAllItemsTextTails,		METH_VARARGS },
 
 		{ "Pick",						textTailPick,						METH_VARARGS },
 		{ "SelectItemName",				textTailSelectItemName,				METH_VARARGS },
@@ -229,7 +236,7 @@ void initTextTail()
 		{ "RegisterInfoTail",			textTailRegisterInfoTail,			METH_VARARGS },
 		{ "AttachTitle",				textTailAttachTitle,				METH_VARARGS },
 
-		{ nullptr, nullptr, 0 },
+		{nullptr, nullptr, 0}
 	};
 
 	Py_InitModule(CPythonDynamicModule::Instance().GetModule(TEXT_TAIL_MODULE).c_str(), s_methods);

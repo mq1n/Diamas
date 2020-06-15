@@ -1,10 +1,10 @@
-#include "stdafx.h"
-#include "../eterlib/GrpMath.h"
+#include "StdAfx.h"
+#include "../eterLib/GrpMath.h"
 #include "../eterGameLib/ItemManager.h"
 #include "../eterEffectLib/EffectManager.h"
 #include "PythonBackground.h"
 
-#include "pythonitem.h"
+#include "PythonItem.h"
 #include "PythonTextTail.h"
 
 const float c_fDropStartHeight = 100.0f;
@@ -109,11 +109,9 @@ bool CPythonItem::TGroundItemInstance::Update()
 
 void CPythonItem::Update(const POINT& c_rkPtMouse)
 {
-	TGroundItemInstanceMap::iterator itor = m_GroundItemInstanceMap.begin();
+	auto itor = m_GroundItemInstanceMap.begin();
 	for(; itor != m_GroundItemInstanceMap.end(); ++itor)
-	{
 		itor->second->Update();
-	}
 
 	m_dwPickedItemID=__Pick(c_rkPtMouse);
 }
@@ -121,7 +119,7 @@ void CPythonItem::Update(const POINT& c_rkPtMouse)
 void CPythonItem::Render()
 {
 	CPythonGraphic::Instance().SetDiffuseOperation();
-	TGroundItemInstanceMap::iterator itor = m_GroundItemInstanceMap.begin();
+	auto itor = m_GroundItemInstanceMap.begin();
 	for (; itor != m_GroundItemInstanceMap.end(); ++itor)
 	{
 		CGraphicThingInstance & rInstance = itor->second->ThingInstance;
@@ -169,7 +167,7 @@ void	CPythonItem::PlayUseSound(uint32_t dwItemID)
 }
 
 
-void	CPythonItem::PlayDropSound(uint32_t dwItemID)
+void CPythonItem::PlayDropSound(uint32_t dwItemID)
 {
 	//CItemManager& rkItemMgr=CItemManager::Instance();
 
@@ -184,12 +182,12 @@ void	CPythonItem::PlayDropSound(uint32_t dwItemID)
 	CSoundManager::Instance().PlaySound2D(SGroundItemInstance::ms_astDropSoundFileName[eItemType].c_str());
 }
 
-void	CPythonItem::PlayUsePotionSound()
+void CPythonItem::PlayUsePotionSound()
 {
 	CSoundManager::Instance().PlaySound2D(m_astUseSoundFileName[USESOUND_POTION].c_str());
 }
 
-uint32_t	CPythonItem::__GetDropSoundType(const CItemData& c_rkItemData)
+uint32_t CPythonItem::__GetDropSoundType(const CItemData& c_rkItemData)
 {
 	switch (c_rkItemData.GetType())
 	{
@@ -198,13 +196,10 @@ uint32_t	CPythonItem::__GetDropSoundType(const CItemData& c_rkItemData)
 			{
 				case CItemData::WEAPON_BOW:
 					return DROPSOUND_BOW;
-					break;
 				case CItemData::WEAPON_ARROW:
 					return DROPSOUND_DEFAULT;
-					break;
 				default:
 					return DROPSOUND_WEAPON;
-					break;
 			}
 			break;
 		case CItemData::ITEM_TYPE_ARMOR:
@@ -213,24 +208,19 @@ uint32_t	CPythonItem::__GetDropSoundType(const CItemData& c_rkItemData)
 				case CItemData::ARMOR_NECK:
 				case CItemData::ARMOR_EAR:
 					return DROPSOUND_ACCESSORY;
-					break;
 				case CItemData::ARMOR_BODY:
 					return DROPSOUND_ARMOR;
 				default:
 					return DROPSOUND_DEFAULT;		
-					break;
 			}
 			break;	
 		default:
 			return DROPSOUND_DEFAULT;
-			break;
 	}
-
-	return DROPSOUND_DEFAULT;
 }
 
 
-uint32_t	CPythonItem::__GetUseSoundType(const CItemData& c_rkItemData)
+uint32_t CPythonItem::__GetUseSoundType(const CItemData& c_rkItemData)
 {
 	switch (c_rkItemData.GetType())
 	{
@@ -239,13 +229,10 @@ uint32_t	CPythonItem::__GetUseSoundType(const CItemData& c_rkItemData)
 			{
 				case CItemData::WEAPON_BOW:
 					return USESOUND_BOW;
-					break;
 				case CItemData::WEAPON_ARROW:
 					return USESOUND_DEFAULT;
-					break;
 				default:
 					return USESOUND_WEAPON;
-					break;
 			}
 			break;
 		case CItemData::ITEM_TYPE_ARMOR:
@@ -254,12 +241,10 @@ uint32_t	CPythonItem::__GetUseSoundType(const CItemData& c_rkItemData)
 				case CItemData::ARMOR_NECK:
 				case CItemData::ARMOR_EAR:
 					return USESOUND_ACCESSORY;
-					break;
 				case CItemData::ARMOR_BODY:
 					return USESOUND_ARMOR;
 				default:
 					return USESOUND_DEFAULT;		
-					break;
 			}
 			break;
 		case CItemData::ITEM_TYPE_USE:
@@ -267,24 +252,17 @@ uint32_t	CPythonItem::__GetUseSoundType(const CItemData& c_rkItemData)
 			{
 				case CItemData::USE_ABILITY_UP:
 					return USESOUND_POTION;
-					break;
 				case CItemData::USE_POTION:
 					return USESOUND_NONE;
-					break;
 				case CItemData::USE_TALISMAN:
 					return USESOUND_PORTAL;
-					break;
 				default:
 					return USESOUND_DEFAULT;		
-					break;
 			}
 			break;			
 		default:
 			return USESOUND_DEFAULT;
-			break;
 	}
-
-	return USESOUND_DEFAULT;
 }
 
 void CPythonItem::CreateItem(uint32_t dwVirtualID, uint32_t dwVirtualNumber, float x, float y, float z, bool bDrop)
@@ -477,18 +455,15 @@ void CPythonItem::CreateItem(uint32_t dwVirtualID, uint32_t dwVirtualNumber, flo
 
 	pGroundItemInstance->ThingInstance.Show();
 
-	m_GroundItemInstanceMap.insert(TGroundItemInstanceMap::value_type(dwVirtualID, pGroundItemInstance));
+	m_GroundItemInstanceMap.emplace(dwVirtualID, pGroundItemInstance);
 
 	CPythonTextTail& rkTextTail=CPythonTextTail::Instance();
-	rkTextTail.RegisterItemTextTail(
-		dwVirtualID,
-		pItemData->GetName(),
-		&pGroundItemInstance->ThingInstance);
+	rkTextTail.RegisterItemTextTail(dwVirtualID, pItemData->GetName(), &pGroundItemInstance->ThingInstance);
 }
 
 void CPythonItem::SetOwnership(uint32_t dwVID, const char * c_pszName)
 {
-	TGroundItemInstanceMap::iterator itor = m_GroundItemInstanceMap.find(dwVID);
+	auto itor = m_GroundItemInstanceMap.find(dwVID);
 
 	if (m_GroundItemInstanceMap.end() == itor)
 		return;
@@ -502,7 +477,7 @@ void CPythonItem::SetOwnership(uint32_t dwVID, const char * c_pszName)
 
 bool CPythonItem::GetOwnership(uint32_t dwVID, const char ** c_pszName)
 {
-	TGroundItemInstanceMap::iterator itor = m_GroundItemInstanceMap.find(dwVID);
+	auto itor = m_GroundItemInstanceMap.find(dwVID);
 
 	if (m_GroundItemInstanceMap.end() == itor)
 		return false;
@@ -517,11 +492,10 @@ void CPythonItem::DeleteAllItems()
 {
 	CPythonTextTail& rkTextTail=CPythonTextTail::Instance();
 
-	TGroundItemInstanceMap::iterator i;
-	for (i= m_GroundItemInstanceMap.begin(); i!=m_GroundItemInstanceMap.end(); ++i)
+	for (auto & i : m_GroundItemInstanceMap)
 	{
-		TGroundItemInstance* pGroundItemInst=i->second;
-		rkTextTail.DeleteItemTextTail(i->first);
+		TGroundItemInstance * pGroundItemInst = i.second;
+		rkTextTail.DeleteItemTextTail(i.first);
 		pGroundItemInst->Clear();
 		m_GroundItemInstancePool.Free(pGroundItemInst);
 	}
@@ -530,7 +504,7 @@ void CPythonItem::DeleteAllItems()
 
 void CPythonItem::DeleteItem(uint32_t dwVirtualID)
 {
-	TGroundItemInstanceMap::iterator itor = m_GroundItemInstanceMap.find(dwVirtualID);
+	auto itor = m_GroundItemInstanceMap.find(dwVirtualID);
 	if (m_GroundItemInstanceMap.end() == itor)
 		return;
 
@@ -566,7 +540,7 @@ bool CPythonItem::GetCloseLoot(const std::string & myName, const TPixelPosition 
 			dwCloseItemDistance = dwDistance;
 		}
 
-		bool isYang = pInstance->dwVirtualNumber == 1;
+		bool isYang = pInstance->dwVirtualNumber == VNUM_MONEY;
 		if (((pInstance->stOwnership.empty() && !isYang && !bIsYangPriority) || (bIsYangPriority && isYang) || pInstance->stOwnership == myName) && dwDistance < dwPriorityCloseItemDistance)
 		{
 			dwPriorityCloseItemID = i->first;
@@ -589,7 +563,7 @@ bool CPythonItem::GetCloseLoot(const std::string & myName, const TPixelPosition 
 
 BOOL CPythonItem::GetGroundItemPosition(uint32_t dwVirtualID, TPixelPosition * pPosition)
 {
-	TGroundItemInstanceMap::iterator itor = m_GroundItemInstanceMap.find(dwVirtualID);
+	auto itor = m_GroundItemInstanceMap.find(dwVirtualID);
 	if (m_GroundItemInstanceMap.end() == itor)
 		return FALSE;
 
@@ -641,12 +615,12 @@ bool CPythonItem::GetPickedItemID(uint32_t* pdwPickedItemID)
 
 uint32_t CPythonItem::GetVirtualNumberOfGroundItem(uint32_t dwVID)
 {
-	TGroundItemInstanceMap::iterator itor = m_GroundItemInstanceMap.find(dwVID);
+	auto itor = m_GroundItemInstanceMap.find(dwVID);
 
 	if (itor == m_GroundItemInstanceMap.end())
 		return 0;
-	else
-		return itor->second->dwVirtualNumber;
+
+	return itor->second->dwVirtualNumber;
 }
 
 void CPythonItem::BuildNoGradeNameData(int32_t iType)

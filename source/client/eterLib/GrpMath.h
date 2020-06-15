@@ -82,13 +82,9 @@ inline float square_distance_between_linesegment_and_point(const D3DXVECTOR3& p1
 	float l = D3DXVec3LengthSq(&(p2-p1));
 	float d = D3DXVec3Dot(&(x-p1),&(p2-p1));
 	if (d<=0.0f)
-	{
 		return D3DXVec3LengthSq(&(x-p1));
-	}
 	else if (d>=l)
-	{
 		return D3DXVec3LengthSq(&(x-p2));
-	}
 	else
 	{
 		D3DXVECTOR3 c;

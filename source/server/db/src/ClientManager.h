@@ -7,16 +7,20 @@
 
 #include "../../common/stl.h"
 #include "../../common/building.h"
+#include "../../common/service.h"
 
 #include "Peer.h"
 #include "DBManager.h"
 #include "LoginData.h"
 
-#define ENABLE_PROTO_FROM_DB
+#ifdef _WIN32
+#undef GetCurrentTime
+#endif
 
 class CPlayerTableCache;
 class CItemCache;
 class CItemPriceListTableCache;
+class CActivityCache;
 
 class CPacketInfo
 {
@@ -38,7 +42,10 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	typedef std::unordered_set<CItemCache *, std::hash<CItemCache*> > TItemCacheSet;
 	typedef std::unordered_map<uint32_t, TItemCacheSet *> TItemCacheSetPtrMap;
 	typedef std::unordered_map<uint32_t, CItemPriceListTableCache*> TItemPriceListCacheMap;
+	typedef std::unordered_map<uint32_t, CActivityCache*> TActivityCacheMap;
+
 	typedef std::unordered_map<int16_t, uint8_t> TChannelStatusMap;
+	typedef std::unordered_map<int16_t, uint32_t> TPlayerCountMap;
 
 	// MYSHOP_PRICE_LIST
 	/// 아이템 가격정보 리스트 요청 정보
@@ -63,7 +70,7 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 		TAccountTable * pAccountTable;
 		TSafeboxTable * pSafebox;
 
-		ClientHandleInfo(uint32_t argHandle, uint32_t dwPID = 0)
+		ClientHandleInfo(uint32_t argHandle, uint32_t dwPID = 0) : account_id(0), account_index(0)
 		{
 		    dwHandle = argHandle;
 		    pSafebox = nullptr;
@@ -71,7 +78,7 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 		    player_id = dwPID;
 		};
 		//독일선물기능용 생성자
-		ClientHandleInfo(uint32_t argHandle, uint32_t dwPID, uint32_t accountId)
+		ClientHandleInfo(uint32_t argHandle, uint32_t dwPID, uint32_t accountId): account_index(0)
 		{
 		    dwHandle = argHandle;
 		    pSafebox = nullptr;
@@ -101,11 +108,17 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	void	Quit();
 
 	void	GetPeerP2PHostNames(std::string& peerHostNames);
-	void	SetTablePostfix(const char* c_pszTablePostfix);
-	void	SetPlayerIDStart(int32_t iIDStart);
-	int32_t	GetPlayerIDStart() { return m_iPlayerIDStart; }
 
-	int32_t	GetPlayerDeleteLevelLimit() { return m_iPlayerDeleteLevelLimit; }
+	void	SetPlayerIDStart(int32_t iIDStart);
+	int32_t GetPlayerIDStart() const
+	{
+		return m_iPlayerIDStart;
+	}
+
+	int32_t GetPlayerDeleteLevelLimit() const
+	{
+		return m_iPlayerDeleteLevelLimit;
+	}
 
 	uint32_t	GetUserCount();	// 접속된 사용자 수를 리턴 한다.
 
@@ -120,9 +133,8 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	void			FlushItemCacheSet(uint32_t dwID);
 
 	CItemCache *		GetItemCache(uint32_t id);
-	void			PutItemCache(TPlayerItem * pNew, bool bSkipQuery = false);
+	void PutItemCache(const TPlayerItem* pNew, bool bSkipQuery = false);
 	bool			DeleteItemCache(uint32_t id);
-
 	void			UpdatePlayerCache();
 	void			UpdateItemCache();
 
@@ -140,13 +152,14 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	 *
 	 * 캐시가 이미 있으면 Update 가 아닌 replace 한다.
 	 */
-	void			PutItemPriceListCache(const TItemPriceListTable* pItemPriceList);
+	void PutItemPriceListCache(TItemPriceListTable* pItemPriceList);
 
 
 	/// Flush 시간이 만료된 아이템 가격정보 리스트 캐시를 Flush 해주고 캐시에서 삭제한다.
 	void			UpdateItemPriceListCache(void);
 	// END_OF_MYSHOP_PRICE_LIST
 
+	void 			UpdateActivityCache();
 
 	void			SendGuildSkillUsable(uint32_t guild_id, uint32_t dwSkillVnum, bool bUsable);
 
@@ -172,8 +185,9 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	bool		InitializeTables();
 	bool		InitializeShopTable();
 	bool		InitializeMobTable();
+	bool 		InitializeMobTableFile();
 	bool		InitializeItemTable();
-	bool		InitializeQuestItemTable();
+	bool 		InitializeItemTableFile();
 	bool		InitializeSkillTable();
 	bool		InitializeRefineTable();
 	bool		InitializeBanwordTable();
@@ -203,6 +217,7 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	CLoginData *	GetLoginData(uint32_t dwKey);
 	CLoginData *	GetLoginDataByLogin(const char * c_pszLogin);
 	CLoginData *	GetLoginDataByAID(uint32_t dwAID);
+	CLoginData* GetLoginDataByPID(uint32_t dwPID);
 
 	void		InsertLoginData(CLoginData * pkLD);
 	void		DeleteLoginData(CLoginData * pkLD);
@@ -243,8 +258,9 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	void		RESULT_PLAYER_LOAD(CPeer * peer, MYSQL_RES * pRes, ClientHandleInfo * pkInfo);
 	void		RESULT_ITEM_LOAD(CPeer * peer, MYSQL_RES * pRes, uint32_t dwHandle, uint32_t dwPID);
 	void		RESULT_QUEST_LOAD(CPeer * pkPeer, MYSQL_RES * pRes, uint32_t dwHandle, uint32_t dwPID);
-	// @fixme402 (RESULT_AFFECT_LOAD +dwRealPID)
 	void		RESULT_AFFECT_LOAD(CPeer * pkPeer, MYSQL_RES * pRes, uint32_t dwHandle, uint32_t dwRealPID);
+	void 		RESULT_ACTIVITY_LOAD(CPeer* pkPeer, MYSQL_RES* pRes, uint32_t dwHandle, uint32_t dwPID);
+	void 		LoadActivity(CPeer* peer, uint32_t pid, uint32_t dwHandle, TActivityTable* activity); //Aux
 
 	// PLAYER_INDEX_CREATE_BUG_FIX
 	void		RESULT_PLAYER_INDEX_CREATE(CPeer *pkPeer, SQLMsg *msg);
@@ -274,8 +290,6 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	void		__QUERY_PLAYER_CREATE(CPeer * peer, uint32_t dwHandle, TPlayerCreatePacket *);
 	void		__QUERY_PLAYER_DELETE(CPeer * peer, uint32_t dwHandle, TPlayerDeletePacket *);
 	void		__RESULT_PLAYER_DELETE(CPeer * peer, SQLMsg* msg);
-
-	void		QUERY_PLAYER_COUNT(CPeer * pkPeer, TPlayerCountPacket *);
 
 	void		QUERY_ITEM_SAVE(CPeer * pkPeer, const char * c_pData);
 	void		QUERY_ITEM_DESTROY(CPeer * pkPeer, const char * c_pData);
@@ -317,11 +331,11 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 
 	void		QUERY_LOGIN_KEY(CPeer * pkPeer, TPacketGDLoginKey * p);
 
+	void 		QUERY_SAVE_ACTIVITY(CPeer* peer, uint32_t dwHandle, TActivityTable*);
+
 	void		AddGuildPriv(TPacketGiveGuildPriv* p);
 	void		AddEmpirePriv(TPacketGiveEmpirePriv* p);
 	void		AddCharacterPriv(TPacketGiveCharacterPriv* p);
-
-	void		MoneyLog(TPacketMoneyLog* p);
 
 	void		QUERY_AUTH_LOGIN(CPeer * pkPeer, uint32_t dwHandle, TPacketGDAuthLogin * p);
 
@@ -428,14 +442,18 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	TItemPriceListCacheMap m_mapItemPriceListCache;  ///< 플레이어별 아이템 가격정보 리스트
 	// END_OF_MYSHOP_PRICE_LIST
 
-	TChannelStatusMap m_mChannelStatus;
+	TActivityCacheMap 		m_map_activityCache; // 플레잴어 id가 key
+
+	TChannelStatusMap 		m_mChannelStatus;
+	TPlayerCountMap 		m_mUserCount;
 
 	struct TPartyInfo
 	{
 	    uint8_t bRole;
 	    uint8_t bLevel;
 
-		TPartyInfo() :bRole(0), bLevel(0)
+		TPartyInfo() :
+			bRole(0), bLevel(0)
 		{
 		}
 	};
@@ -459,7 +477,10 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	bool InitializeNowItemID();
 	uint32_t GetItemID();
 	uint32_t GainItemID();
-	TItemIDRangeTable GetItemRange() { return m_itemRange; }
+	TItemIDRangeTable GetItemRange() const
+	{
+		return m_itemRange;
+	}
 
 	//BOOT_LOCALIZATION
     public:
@@ -472,13 +493,12 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	//END_BOOT_LOCALIZATION
 	//ADMIN_MANAGER
 
-	bool __GetAdminInfo(const char *szIP, std::vector<tAdminInfo> & rAdminVec);
-	bool __GetHostInfo(std::vector<std::string> & rIPVec);
+	bool __GetAdminInfo(std::vector<tAdminInfo> & rAdminVec);
+	bool __GetAdminConfig(uint32_t pAdminConfig[GM_MAX_NUM]);
 	//END_ADMIN_MANAGER
 
-		
 	//RELOAD_ADMIN
-	void ReloadAdmin(CPeer * peer, TPacketReloadAdmin * p);
+	void ReloadAdmin();
 	//END_RELOAD_ADMIN
 	void BreakMarriage(CPeer * peer, const char * data);
 
@@ -487,7 +507,7 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	    uint32_t	pid;
 	    time_t	time;
 
-	    bool operator < (const TLogoutPlayer & r) 
+		bool operator <(const TLogoutPlayer& r) const
 	    {
 		return (pid < r.pid);
 	    }
@@ -505,14 +525,13 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 
 	void SendSpareItemIDRange(CPeer* peer);
 
-	void UpdateHorseName(TPacketUpdateHorseName* data, CPeer* peer);
-	void AckHorseName(uint32_t dwPID, CPeer* peer);
 	void DeleteLoginKey(TPacketDC *data);
 	void ResetLastPlayerID(const TPacketNeedLoginLogInfo* data);
 	//delete gift notify icon
 	void DeleteAwardId(TPacketDeleteAwardID* data);
 	void UpdateChannelStatus(TChannelStatus* pData);
 	void RequestChannelStatus(CPeer* peer, uint32_t dwHandle);
+
 #ifdef ENABLE_PROTO_FROM_DB
 	public:
 	bool		InitializeMobTableFromDB();
@@ -520,6 +539,11 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	protected:
 	bool		bIsProtoReadFromDB;
 #endif
+
+private:
+	//Activity
+	CActivityCache* GetActivityCache(uint32_t id);
+	void PutActivityCache(TActivityTable* pNew);
 };
 
 template<class Func>	

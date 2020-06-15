@@ -108,8 +108,7 @@ void TEMP_CAreaLoaderThread::Shutdown()
 	do
 	{
 		bRet = ReleaseSemaphore(m_hSemaphore, 1, nullptr);
-	}
-	while (!bRet);
+	} while (!bRet);
 
 	WaitForSingleObject(m_hThread, 10000);	// 쓰레드가 종료 되기를 10초 기다림
 }
@@ -147,7 +146,7 @@ uint32_t TEMP_CAreaLoaderThread::Execute(void * pvArg)
 void TEMP_CAreaLoaderThread::Request(CTerrain * pTerrain)	// called in main thread
 {
 	m_TerrainRequestMutex.Lock();
-	m_pTerrainRequestDeque.push_back(pTerrain);
+	m_pTerrainRequestDeque.emplace_back(pTerrain);
 	m_TerrainRequestMutex.Unlock();
 
 	++m_iRestSemCount;
@@ -178,7 +177,7 @@ bool TEMP_CAreaLoaderThread::Fetch(CTerrain ** ppTerrain)	// called in main thre
 void TEMP_CAreaLoaderThread::Request(CArea * pArea)	// called in main thread
 {
 	m_AreaRequestMutex.Lock();
-	m_pAreaRequestDeque.push_back(pArea);
+	m_pAreaRequestDeque.emplace_back(pArea);
 	m_AreaRequestMutex.Unlock();
 
 	++m_iRestSemCount;
@@ -239,7 +238,7 @@ void TEMP_CAreaLoaderThread::ProcessArea()	// called in loader thread
 	Tracef("TEMP_CAreaLoaderThread::ProcessArea LoadArea : %d ms elapsed\n", ELTimer_GetMSec() - dwStartTime);
 
 	m_AreaCompleteMutex.Lock();
-	m_pAreaCompleteDeque.push_back(pArea);
+	m_pAreaCompleteDeque.emplace_back(pArea);
 	m_AreaCompleteMutex.Unlock();
 }
 
@@ -319,6 +318,6 @@ void TEMP_CAreaLoaderThread::ProcessTerrain()	// called in loader thread
 	Tracef("TEMP_CAreaLoaderThread::ProcessTerrain LoadTerrain : %d ms elapsed\n", ELTimer_GetMSec() - dwStartTime);
 
 	m_TerrainCompleteMutex.Lock();
-	m_pTerrainCompleteDeque.push_back(pTerrain);
+	m_pTerrainCompleteDeque.emplace_back(pTerrain);
 	m_TerrainCompleteMutex.Unlock();
 }

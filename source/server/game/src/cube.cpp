@@ -85,8 +85,6 @@ TCubeResultInfoTextByNPC cube_result_info_map_by_npc;				// 네이밍 존나 병신같다
 
 class CCubeMaterialInfoHelper
 {
-public:
-public:
 };
 
 /*--------------------------------------------------------*/
@@ -205,28 +203,25 @@ CUBE_DATA::CUBE_DATA()
 }
 
 // 필요한 재료의 수량을 만족하는지 체크한다.
-bool CUBE_DATA::can_make_item (LPITEM *items, uint16_t npc_vnum)
+bool CUBE_DATA::can_make_item (LPITEM *items, uint16_t npcvnum)
 {
-	// 필요한 재료, 수량을 만족하는지 체크한다.
-	uint32_t	i, end_index;
-	uint32_t	need_vnum;
-	int32_t		need_count;
-	int32_t		found_npc = false;
+	uint32_t need_vnum = 0;
+	int32_t	need_count = 0;
+	bool found_npc = false;
 
 	// check npc_vnum
-	end_index = this->npc_vnum.size();
-	for (i=0; i<end_index; ++i)
+	for (auto i = 0; i < npc_vnum.size(); ++i)
 	{
-		if (npc_vnum == this->npc_vnum[i])
+		if (npcvnum == npc_vnum[i])
 			found_npc = true;
 	}
-	if (false==found_npc)	return false;
+	if (false == found_npc)
+		return false;
 
-	end_index = this->item.size();
-	for (i=0; i<end_index; ++i)
+	for (auto i = 0; i < item.size(); ++i)
 	{
-		need_vnum	= this->item[i].vnum;
-		need_count	= this->item[i].count;
+		need_vnum	= item[i].vnum;
+		need_count	= item[i].count;
 
 		if ( false==FN_check_item_count(items, need_vnum, need_count) )
 			return false;
@@ -296,14 +291,14 @@ void Cube_open (LPCHARACTER ch)
 	npc = ch->GetQuestNPC();
 	if (nullptr==npc)
 	{
-		if (test_server)
+		if (g_bIsTestServer)
 			dev_log(LOG_DEB0, "cube_npc is nullptr");
 		return;
 	}
 
 	if ( FN_check_valid_npc(npc->GetRaceNum()) == false )
 	{
-		if ( test_server == true )
+		if ( g_bIsTestServer )
 		{
 			dev_log(LOG_DEB0, "cube not valid NPC");
 		}
@@ -561,21 +556,19 @@ bool Cube_make (LPCHARACTER ch)
 		// 성공
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "cube success %d %d", reward_value->vnum, reward_value->count);
 		new_item = ch->AutoGiveItem(reward_value->vnum, reward_value->count);
-
-		LogManager::instance().CubeLog(ch->GetPlayerID(), ch->GetX(), ch->GetY(),
+		if (new_item)
+		{
+			LogManager::instance().CubeLog(ch->GetPlayerID(), ch->GetX(), ch->GetY(),
 				reward_value->vnum, new_item->GetID(), reward_value->count, 1);
+		}
 		return true;
 	}
-	else
-	{
-		// 실패
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("제조에 실패하였습니다."));	// 2012.11.12 새로 추가된 메세지 (locale_string.txt 에 추가해야 함)
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "cube fail");
-		LogManager::instance().CubeLog(ch->GetPlayerID(), ch->GetX(), ch->GetY(),
-				reward_value->vnum, 0, 0, 0);
-		return false;
-	}
-
+	
+	// 실패
+	ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("제조에 실패하였습니다."));	// 2012.11.12 새로 추가된 메세지 (locale_string.txt 에 추가해야 함)
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "cube fail");
+	LogManager::instance().CubeLog(ch->GetPlayerID(), ch->GetX(), ch->GetY(),
+			reward_value->vnum, 0, 0, 0);
 	return false;
 }
 
@@ -619,8 +612,8 @@ void Cube_add_item (LPCHARACTER ch, int32_t cube_index, int32_t inven_index)
 		return;
 
 	item = ch->GetInventoryItem(inven_index);
-
-	if (nullptr==item)	return;
+	if (!item)
+		return;
 
 	cube_item = ch->GetCubeItem();
 
@@ -636,7 +629,7 @@ void Cube_add_item (LPCHARACTER ch, int32_t cube_index, int32_t inven_index)
 
 	cube_item[cube_index] = item;
 
-	if (test_server)
+	if (g_bIsTestServer)
 		ch->ChatPacket(CHAT_TYPE_INFO, "cube[%d]: inventory[%d]: %s added",
 									cube_index, inven_index, item->GetName());
 
@@ -664,7 +657,7 @@ void Cube_delete_item (LPCHARACTER ch, int32_t cube_index)
 	item = cube_item[cube_index];
 	cube_item[cube_index] = nullptr;
 
-	if (test_server)
+	if (g_bIsTestServer)
 		ch->ChatPacket(CHAT_TYPE_INFO, "cube[%d]: cube[%d]: %s deleted",
 				cube_index, item->GetCell(), item->GetName());
 
@@ -728,11 +721,11 @@ void Cube_MakeCubeInformationText()
 				std::sort(materialInfo.material.begin(), materialInfo.material.end(), FIsLessCubeValue);
 
 				//// 중복되는 재료들을 지움
-				for (TCubeValueVector::iterator iter = materialInfo.complicateMaterial.begin(); materialInfo.complicateMaterial.end() != iter; ++iter)
+				for (auto iter2 = materialInfo.complicateMaterial.begin(); materialInfo.complicateMaterial.end() != iter2; ++iter2)
 				{
 					for (TCubeValueVector::iterator targetIter = materialInfo.material.begin(); materialInfo.material.end() != targetIter; ++targetIter)
 					{
-						if (*targetIter == *iter)
+						if (*targetIter == *iter2)
 						{
 							targetIter = materialInfo.material.erase(targetIter);
 						}
@@ -740,10 +733,10 @@ void Cube_MakeCubeInformationText()
 				}
 
 				// 72723,1 or 72725,1 or ... 이런 식의 약속된 포맷을 지키는 텍스트를 생성
-				for (TCubeValueVector::iterator iter = materialInfo.complicateMaterial.begin(); materialInfo.complicateMaterial.end() != iter; ++iter)
+				for (auto iter2 = materialInfo.complicateMaterial.begin(); materialInfo.complicateMaterial.end() != iter2; ++iter2)
 				{
 					char tempBuffer[128];
-					sprintf(tempBuffer, "%d,%d|", iter->vnum, iter->count);
+					sprintf(tempBuffer, "%d,%d|", iter2->vnum, iter2->count);
 					
 					infoText += std::string(tempBuffer);
 				}
@@ -755,10 +748,10 @@ void Cube_MakeCubeInformationText()
 			}
 
 			// 중복되지 않는 일반 재료들도 포맷 생성
-			for (TCubeValueVector::iterator iter = materialInfo.material.begin(); materialInfo.material.end() != iter; ++iter)
+			for (auto iter2 = materialInfo.material.begin(); materialInfo.material.end() != iter2; ++iter2)
 			{
 				char tempBuffer[128];
-				sprintf(tempBuffer, "%d,%d&", iter->vnum, iter->count);
+				sprintf(tempBuffer, "%d,%d&", iter2->vnum, iter2->count);
 				infoText += std::string(tempBuffer);
 			}
 
@@ -777,7 +770,7 @@ void Cube_MakeCubeInformationText()
 	} // for npc
 }
 
-void Cube_InformationInitialize()
+bool Cube_InformationInitialize()
 {
 	for (size_t i = 0; i < s_cube_proto.size(); ++i)
 	{
@@ -828,7 +821,7 @@ void Cube_InformationInitialize()
 					if (nullptr == existMaterialProto)
 					{
 						sys_err("There is no item(%u)", existMaterialIter->vnum);
-						return;
+						return false;
 					}
 					SItemNameAndLevel existItemInfo = SplitItemNameAndLevelFromName(existMaterialProto->szName);
 
@@ -868,6 +861,7 @@ void Cube_InformationInitialize()
 	Cube_MakeCubeInformationText();
 
 	s_isInitializedCubeMaterialInformation = true;
+	return true;
 }
 
 // 클라이언트에서 서버로 : 현재 NPC가 만들 수 있는 아이템들의 정보(목록)를 요청
@@ -883,7 +877,7 @@ void Cube_request_result_list(LPCHARACTER ch)
 
 	if (!FN_check_valid_npc(npcVNUM)) // @fixme127
 	{
-		if (test_server)
+		if (g_bIsTestServer)
 			dev_log(LOG_DEB0, "cube not valid NPC");
 		return;
 	}
@@ -950,7 +944,7 @@ void Cube_request_material_info(LPCHARACTER ch, int32_t requestStartIndex, int32
 	uint32_t npcVNUM = npc->GetRaceNum();
 	if (!FN_check_valid_npc(npcVNUM)) // @fixme127
 	{
-		if (test_server)
+		if (g_bIsTestServer)
 			dev_log(LOG_DEB0, "cube not valid NPC");
 		return;
 	}

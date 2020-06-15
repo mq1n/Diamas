@@ -172,6 +172,4 @@ CPhysicsObject::CPhysicsObject(): m_fMass(0), m_fFriction(0)
 	m_pActorInstance = nullptr;
 }
 
-CPhysicsObject::~CPhysicsObject()
-{
-}
+CPhysicsObject::~CPhysicsObject() = default;

@@ -103,7 +103,11 @@ protected:
 
 public:
 	static CFlyingInstance *  New() { return ms_kPool.Alloc(); }
-	static void Delete(CFlyingInstance * pInstance) { pInstance->Destroy(); ms_kPool.Free(pInstance); }
+	static void Delete(CFlyingInstance * pInstance)
+	{
+		pInstance->Destroy();
+		ms_kPool.Free(pInstance);
+	}
 
 	static void DestroySystem() { ms_kPool.Destroy(); }
 

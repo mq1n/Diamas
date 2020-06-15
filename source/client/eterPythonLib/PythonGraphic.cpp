@@ -3,8 +3,6 @@
 #include "PythonGraphic.h"
 #include <cstdint>
 
-bool g_isScreenShotKey = false;
-
 void CPythonGraphic::Destroy()
 {	
 }
@@ -105,9 +103,7 @@ void CPythonGraphic::SetViewport(float fx, float fy, float fWidth, float fHeight
 	ViewPort.Height = fHeight;
 	ViewPort.MinZ = 0.0f;
 	ViewPort.MaxZ = 1.0f;
-	if (FAILED(
-		ms_lpd3dDevice->SetViewport(&ViewPort)
-	))
+	if (FAILED(ms_lpd3dDevice->SetViewport(&ViewPort)))
 	{
 		Tracef("CPythonGraphic::SetViewport(%d, %d, %d, %d) - Error", 
 			ViewPort.X, ViewPort.Y,
@@ -125,7 +121,7 @@ void CPythonGraphic::SetGamma(float fGammaFactor)
 {
 	D3DCAPS9		d3dCaps;
 	D3DGAMMARAMP	NewRamp;
-	int32_t				ui, val;
+
 	
 	ms_lpd3dDevice->GetDeviceCaps(&d3dCaps);
 
@@ -134,8 +130,8 @@ void CPythonGraphic::SetGamma(float fGammaFactor)
 
 	for (int32_t i = 0; i < 256; ++i)
 	{
-		val	= (int32_t) (i * fGammaFactor * 255.0f);
-		ui = 0;
+		auto val = static_cast<int32_t>(i * fGammaFactor * 255.0f);
+		int32_t ui = 0;
 		
 		if (val > 32767)
 		{
@@ -146,9 +142,9 @@ void CPythonGraphic::SetGamma(float fGammaFactor)
 		if (val > 32767)
 			val = 32767;
 		
-		NewRamp.red[i] = (uint16_t) (val | (32768 * ui));
-		NewRamp.green[i] = (uint16_t) (val | (32768 * ui));
-		NewRamp.blue[i] = (uint16_t) (val | (32768 * ui));
+		NewRamp.red[i] = static_cast<uint16_t>(val | (32768 * ui));
+		NewRamp.green[i] = static_cast<uint16_t>(val | (32768 * ui));
+		NewRamp.blue[i] = static_cast<uint16_t>(val | (32768 * ui));
 	}
 
 	ms_lpd3dDevice->SetGammaRamp(0, D3DSGR_NO_CALIBRATION, &NewRamp);
@@ -221,8 +217,8 @@ void CPythonGraphic::RenderImage(CGraphicImageInstance* pImageInstance, float x,
 	//SetColorRenderState();
 	const CGraphicTexture * c_pTexture = pImageInstance->GetTexturePointer();
 
-	float width = (float) pImageInstance->GetWidth();
-	float height = (float) pImageInstance->GetHeight();
+	auto width = static_cast<float>(pImageInstance->GetWidth());
+	auto height = static_cast<float>(pImageInstance->GetHeight());
 
 	c_pTexture->SetTextureStage(0);
 
@@ -246,8 +242,8 @@ void CPythonGraphic::RenderAlphaImage(CGraphicImageInstance* pImageInstance, flo
 
 	const CGraphicTexture * c_pTexture = pImageInstance->GetTexturePointer();
 
-	float width = (float) pImageInstance->GetWidth();
-	float height = (float) pImageInstance->GetHeight();
+	auto width = static_cast<float>(pImageInstance->GetWidth());
+	auto height = static_cast<float>(pImageInstance->GetHeight());
 
 	c_pTexture->SetTextureStage(0);
 
@@ -306,7 +302,7 @@ void CPythonGraphic::RenderCoolTimeBox(float fxCenter, float fyCenter, float fRa
 		D3DXVECTOR2(  0.0f, -1.0f ),
 	};
 
-	int32_t iTriCount = int32_t(8 - 8.0f * fTime);
+	auto iTriCount = int32_t(8 - 8.0f * fTime);
 	float fLastPercentage = (8 - 8.0f * fTime) - iTriCount;
 
 	std::vector<TPDTVertex> vertices;
@@ -316,36 +312,33 @@ void CPythonGraphic::RenderCoolTimeBox(float fxCenter, float fyCenter, float fRa
 	vertex.position.z = 0.0f;
 	vertex.diffuse = color;
 	vertex.texCoord.x = 0.0f;
-	vertex.texCoord.x = 0.0f;
-	vertices.push_back(vertex);
+	vertex.texCoord.y = 0.0f;
+	vertices.emplace_back(vertex);
 	vertex.position.x = fxCenter;
 	vertex.position.y = fyCenter - fRadius;
 	vertex.position.z = 0.0f;
 	vertex.diffuse = color;
 	vertex.texCoord.x = 0.0f;
-	vertex.texCoord.x = 0.0f;
-	vertices.push_back(vertex);
+	vertex.texCoord.y = 0.0f;
+	vertices.emplace_back(vertex);
 
 	for (int32_t j = 0; j < iTriCount; ++j)
 	{
 		vertex.position.x = fxCenter + s_v2BoxPos[j].x * fRadius;
 		vertex.position.y = fyCenter + s_v2BoxPos[j].y * fRadius;
-		vertices.push_back(vertex);
+		vertices.emplace_back(vertex);
 	}
 
 	if (fLastPercentage > 0.0f)
 	{
-		D3DXVECTOR2 * pv2Pos;
-		D3DXVECTOR2 * pv2LastPos;
-
 		assert((iTriCount-1+8)%8 >= 0 && (iTriCount-1+8)%8 < 8);
 		assert((iTriCount+8)%8 >= 0 && (iTriCount+8)%8 < 8);
-		pv2LastPos = &s_v2BoxPos[(iTriCount-1+8)%8];
-		pv2Pos = &s_v2BoxPos[(iTriCount+8)%8];
+		D3DXVECTOR2 * pv2LastPos = &s_v2BoxPos[(iTriCount - 1 + 8) % 8];
+		D3DXVECTOR2 * pv2Pos = &s_v2BoxPos[(iTriCount + 8) % 8];
 
 		vertex.position.x = fxCenter + ((pv2Pos->x-pv2LastPos->x) * fLastPercentage + pv2LastPos->x) * fRadius;
 		vertex.position.y = fyCenter + ((pv2Pos->y-pv2LastPos->y) * fLastPercentage + pv2LastPos->y) * fRadius;
-		vertices.push_back(vertex);
+		vertices.emplace_back(vertex);
 		++iTriCount;
 	}
 
@@ -369,7 +362,7 @@ void CPythonGraphic::RenderCoolTimeBox(float fxCenter, float fyCenter, float fRa
 	}
 }
 
-int32_t CPythonGraphic::GenerateColor(float r, float g, float b, float a)
+uint32_t CPythonGraphic::GenerateColor(float r, float g, float b, float a)
 {
 	return GetColor(r, g, b, a);
 }

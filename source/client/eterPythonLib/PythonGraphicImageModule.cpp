@@ -10,7 +10,7 @@ bool PyTuple_GetImageInstance(PyObject* poArgs, int32_t pos, CGraphicImageInstan
 	if (!handle)
 		return false;
 
-	*ppRetImageInstance = (CGraphicImageInstance*)handle;	
+	*ppRetImageInstance = reinterpret_cast<CGraphicImageInstance*>(handle);
 	return true;
 }
 
@@ -24,10 +24,10 @@ bool PyTuple_GetExpandedImageInstance(PyObject* poArgs, int32_t pos, CGraphicExp
 	if (!handle)
 		return false;
 
-	if (!((CGraphicImageInstance*)handle)->IsType(CGraphicExpandedImageInstance::Type()))
+	if (!reinterpret_cast<CGraphicImageInstance*>(handle)->IsType(CGraphicExpandedImageInstance::Type()))
 		return false;
 
-	*ppRetImageInstance = (CGraphicExpandedImageInstance*)handle;
+	*ppRetImageInstance = reinterpret_cast<CGraphicExpandedImageInstance*>(handle);
 
 	return true;
 }

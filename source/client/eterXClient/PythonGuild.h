@@ -8,7 +8,7 @@ class CPythonGuild : public CSingleton<CPythonGuild>
 		enum
 		{
 			GUILD_SKILL_MAX_NUM = 12,
-			ENEMY_GUILD_SLOT_MAX_COUNT = 6,
+			ENEMY_GUILD_SLOT_MAX_COUNT = 6
 		};
 
 		typedef struct SGulidInfo
@@ -45,7 +45,8 @@ class CPythonGuild : public CSingleton<CPythonGuild>
 			uint8_t byGeneralFlag;
 			uint32_t dwOffer;
 		} TGuildMemberData;
-		typedef std::vector<TGuildMemberData> TGuildMemberDataVector;
+
+		using TGuildMemberDataVector = std::vector<TGuildMemberData>;
 
 		typedef struct SGuildBoardCommentData
 		{
@@ -53,7 +54,8 @@ class CPythonGuild : public CSingleton<CPythonGuild>
 			std::string strName;
 			std::string strComment;
 		} TGuildBoardCommentData;
-		typedef std::vector<TGuildBoardCommentData> TGuildBoardCommentDataVector;
+
+		using TGuildBoardCommentDataVector = std::vector<TGuildBoardCommentData>;
 
 		typedef struct SGuildSkillData
 		{

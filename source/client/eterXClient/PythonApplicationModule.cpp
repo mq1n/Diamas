@@ -4,6 +4,7 @@
 #include "../eterLib/Camera.h"
 #include "Locale.h"
 #include <FileSystemIncl.hpp>
+#include <il/il.h>
 
 extern D3DXCOLOR g_fSpecularColor;
 extern BOOL bVisibleNotice = true;
@@ -26,10 +27,7 @@ PyObject* appShowWebPage(PyObject* poSelf, PyObject* poArgs)
 	rcWebPage.right=PyInt_AsLong(PyTuple_GetItem(poRect, 2));
 	rcWebPage.bottom=PyInt_AsLong(PyTuple_GetItem(poRect, 3));
 
-	CPythonApplication::Instance().ShowWebPage(
-		szWebPage,
-		rcWebPage		
-	);
+	CPythonApplication::Instance().ShowWebPage(szWebPage, rcWebPage);
 	return Py_BuildNone();
 }
 
@@ -59,11 +57,6 @@ PyObject* appHideWebPage(PyObject* poSelf, PyObject* poArgs)
 PyObject * appIsWebPageMode(PyObject * poSelf, PyObject * poArgs)
 {
 	return Py_BuildValue("i", CPythonApplication::Instance().IsWebPageMode());
-}
-
-PyObject* appEnablePerformanceTime(PyObject* poSelf, PyObject* poArgs)
-{
-	return Py_BuildNone();
 }
 
 /////////////////////////////////////////////////////
@@ -168,7 +161,6 @@ PyObject* appSetCameraMaxDistance(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* appSetControlFP(PyObject* poSelf, PyObject* poArgs)
 {
-	_controlfp( _PC_24, _MCW_PC );
 	return Py_BuildNone();
 }
 
@@ -223,41 +215,6 @@ PyObject* appForceSetLocale(PyObject* poSelf, PyObject* poArgs)
 // 
 bool LoadLocaleData(const char* localePath);
 
-#include "../eterBase/tea.h"
-
-PyObject* appLoadLocaleAddr(PyObject* poSelf, PyObject* poArgs)
-{
-	char* addrPath;
-	if (!PyTuple_GetString(poArgs, 0, &addrPath))
-		return Py_BuildException();
-
-	FILE* fp = fopen(addrPath, "rb");
-	if (!fp)
-		return Py_BuildException();
-
-	fseek(fp, 0, SEEK_END);
-
-	int32_t size = ftell(fp);
-	char* enc = (char*)_alloca(size);
-	fseek(fp, 0, SEEK_SET);
-	fread(enc, size, 1, fp);
-	fclose(fp);
-
-	static const uint8_t key[16] = {
-		0x82, 0x1b, 0x34, 0xae,
-		0x12, 0x3b, 0xfb, 0x17,
-		0xd7, 0x2c, 0x39, 0xae,
-		0x41, 0x98, 0xf1, 0x63
-	};
-
-	char* buf = (char*)_alloca(size);
-	//int32_t decSize = 
-	tea_decrypt((uint32_t*)buf, (const uint32_t*)enc, (const uint32_t*)key, size);
-	uint32_t retSize = *(uint32_t*)buf;
-	char* ret = buf + sizeof(uint32_t);
-	return Py_BuildValue("s#", ret, retSize);
-}
-
 PyObject* appLoadLocaleData(PyObject* poSelf, PyObject* poArgs)
 {
 	char* localePath;
@@ -283,8 +240,6 @@ PyObject* appGetDefaultCodePage(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildValue("i", 1254);
 }
 
-#include <il/il.h>
-	
 PyObject* appGetImageInfo(PyObject* poSelf, PyObject* poArgs)
 {
 	char* szFileName;
@@ -337,8 +292,7 @@ PyObject* appGetFileList(PyObject* poSelf, PyObject* poArgs)
 		{
 			PyObject* poFileName=PyString_FromString(wfd.cFileName) ;
 			PyList_Append(poList, poFileName);
-		} 			
-		while (FindNextFile(hFind, &wfd));
+		} while (FindNextFile(hFind, &wfd));
 		
 
 		FindClose(hFind);
@@ -1020,8 +974,7 @@ PyObject * appOpenTextFile(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szFileName))
 		return Py_BuildException();
 
-	CTextLineLoader * pTextLineLoader = new CTextLineLoader(szFileName);
-
+	auto * pTextLineLoader = new CTextLineLoader(szFileName);
 	return Py_BuildValue("i", (int32_t)pTextLineLoader);
 }
 
@@ -1031,7 +984,7 @@ PyObject * appCloseTextFile(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
 
-	CTextLineLoader * pTextFileLoader = (CTextLineLoader *)iHandle;
+	auto * pTextFileLoader = (CTextLineLoader *) iHandle;
 	delete pTextFileLoader;
 
 	return Py_BuildNone();
@@ -1043,7 +996,7 @@ PyObject * appGetTextFileLineCount(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
 
-	CTextLineLoader * pTextFileLoader = (CTextLineLoader *)iHandle;
+	auto * pTextFileLoader = (CTextLineLoader *) iHandle;
 	return Py_BuildValue("i", pTextFileLoader->GetLineCount());
 }
 
@@ -1056,7 +1009,7 @@ PyObject * appGetTextFileLine(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetInteger(poArgs, 1, &iLineIndex))
 		return Py_BuildException();
 
-	CTextLineLoader * pTextFileLoader = (CTextLineLoader *)iHandle;
+	auto * pTextFileLoader = (CTextLineLoader *) iHandle;
 	return Py_BuildValue("s", pTextFileLoader->GetLine(iLineIndex));
 }
 
@@ -1084,58 +1037,23 @@ PyObject * appSetGuildMarkPath(PyObject * poSelf, PyObject * poArgs)
 
 PyObject* appIsDevStage(PyObject* poSelf, PyObject* poArgs)
 {
-	int32_t nIsDevelopmentStage = 0;
-#if defined(LOCALE_SERVICE_STAGE_DEVELOPMENT)
-	nIsDevelopmentStage = 1;
-#endif
-	return Py_BuildValue("i", nIsDevelopmentStage);
+	return Py_BuildValue("i", CPythonApplication::Instance().GetGameStage() == STAGE_DEV_GAME);
 }
 
 PyObject* appIsTestStage(PyObject* poSelf, PyObject* poArgs)
 {
-	int32_t nIsTestStage = 0;
-#if defined(LOCALE_SERVICE_STAGE_TEST)
-	nIsTestStage = 1;
-#endif
-	return Py_BuildValue("i", nIsTestStage);
+	return Py_BuildValue("i", CPythonApplication::Instance().GetGameStage() == STAGE_TEST_GAME);
 }
 
 PyObject* appIsLiveStage(PyObject* poSelf, PyObject* poArgs)
 {
-	int32_t nIsLiveStage = 0;
-#if !defined(LOCALE_SERVICE_STAGE_TEST) && !defined(LOCALE_SERVICE_STAGE_DEVELOPMENT)
-	nIsLiveStage = 1;
-#endif
-	return Py_BuildValue("i", nIsLiveStage);
+	return Py_BuildValue("i", CPythonApplication::Instance().GetGameStage() == STAGE_LIVE_GAME);
 }
 
-PyObject* appLogoOpen(PyObject* poSelf, PyObject* poArgs)
+PyObject* appFlashApplication(PyObject* poSelf, PyObject* poArgs)
 {
-	char* szName;
-	if (!PyTuple_GetString(poArgs, 0, &szName))
-		return Py_BuildException();
-
-	int32_t nIsSuccess = 1; //CPythonApplication::Instance().OnLogoOpen(szName);
-
-	return Py_BuildValue("i", nIsSuccess);
-}
-
-PyObject* appLogoUpdate(PyObject* poSelf, PyObject* poArgs)
-{
-	int32_t nIsRun = 0; //CPythonApplication::Instance().OnLogoUpdate();
-	return Py_BuildValue("i", nIsRun);
-}
-
-PyObject* appLogoRender(PyObject* poSelf, PyObject* poArgs)
-{
-	//CPythonApplication::Instance().OnLogoRender();
-	return Py_BuildNone();
-}
-
-PyObject* appLogoClose(PyObject* poSelf, PyObject* poArgs)
-{
-	//CPythonApplication::Instance().OnLogoClose();
-	return Py_BuildNone();
+   CPythonApplication::Instance().FlashApplication();
+   return Py_BuildNone();
 }
 
 
@@ -1160,7 +1078,6 @@ void initapp()
 		{ "SetTextTailLivingTime",		appSetTextTailLivingTime,		METH_VARARGS },
 		// END_OF_TEXTTAIL_LIVINGTIME_CONTROL
 		
-		{ "EnablePerformanceTime",		appEnablePerformanceTime,		METH_VARARGS },
 		{ "SetHairColorEnable",			appSetHairColorEnable,			METH_VARARGS },
 		
 		{ "SetArmorSpecularEnable",		appSetArmorSpecularEnable,		METH_VARARGS },
@@ -1261,7 +1178,6 @@ void initapp()
 		{ "ForceSetLocale",				appForceSetLocale,				METH_VARARGS },
 		// END_OF_LOCALE
 
-		{ "LoadLocaleAddr",				appLoadLocaleAddr,				METH_VARARGS },
 		{ "LoadLocaleData",				appLoadLocaleData,				METH_VARARGS },
 		
 		{ "GetDefaultCodePage",			appGetDefaultCodePage,			METH_VARARGS },
@@ -1279,14 +1195,11 @@ void initapp()
 
 		{ "SetGuildMarkPath",			appSetGuildMarkPath,			METH_VARARGS },
 
-		{ "OnLogoUpdate",				appLogoUpdate,					METH_VARARGS },
-		{ "OnLogoRender",				appLogoRender,					METH_VARARGS },
-		{ "OnLogoOpen",					appLogoOpen,					METH_VARARGS },
-		{ "OnLogoClose",				appLogoClose,					METH_VARARGS },
+		{"FlashApplication", appFlashApplication, METH_VARARGS},
 
 		{ "SetTitle", appSetTitle, METH_VARARGS },
 
-		{ nullptr, nullptr },
+		{ nullptr, nullptr }
 	};
 
 	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(APP_MODULE).c_str(), s_methods);
@@ -1446,6 +1359,12 @@ void initapp()
 	PyModule_AddIntConstant(poModule, "CAMERA_TO_NEGATIVE",		CPythonApplication::CAMERA_TO_NEGITIVE);
 	PyModule_AddIntConstant(poModule, "CAMERA_STOP",			CPythonApplication::CAMERA_STOP);
 
+#ifdef _DEBUG
+	PyModule_AddIntConstant(poModule, "DEBUG_MODE_CLIENT",	1);
+#else
+	PyModule_AddIntConstant(poModule, "DEBUG_MODE_CLIENT",	0);
+#endif
+
 #ifdef ENABLE_COSTUME_SYSTEM
 	PyModule_AddIntConstant(poModule, "ENABLE_COSTUME_SYSTEM",	1);
 #else
@@ -1478,11 +1397,10 @@ void initapp()
 
 #ifdef ENABLE_PLAYER_PER_ACCOUNT5
 	PyModule_AddIntConstant(poModule, "ENABLE_PLAYER_PER_ACCOUNT5",	1);
-	PyModule_AddIntConstant(poModule, "PLAYER_PER_ACCOUNT",	PLAYER_PER_ACCOUNT5);
 #else
 	PyModule_AddIntConstant(poModule, "ENABLE_PLAYER_PER_ACCOUNT5",	0);
-	PyModule_AddIntConstant(poModule, "PLAYER_PER_ACCOUNT",	PLAYER_PER_ACCOUNT4);
 #endif
+	PyModule_AddIntConstant(poModule, "PLAYER_PER_ACCOUNT", PLAYER_PER_ACCOUNT);
 
 #ifdef ENABLE_WOLFMAN_CHARACTER
 	PyModule_AddIntConstant(poModule, "ENABLE_WOLFMAN_CHARACTER",	1);

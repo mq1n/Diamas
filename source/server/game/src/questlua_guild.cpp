@@ -1,7 +1,6 @@
 #include "stdafx.h"
-
 #include "questlua.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "desc_client.h"
 #include "char.h"
 #include "char_manager.h"
@@ -25,14 +24,22 @@ namespace quest
 	{
 		CQuestManager& q = CQuestManager::instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
-		if (!ch->GetGuild())
-			lua_pushstring(L,"");
-		else
+		if (!ch)
 		{
-			char szBuf[4096+1];
-			CGuildManager::instance().GetAroundRankString(ch->GetGuild()->GetID(), szBuf, sizeof(szBuf));
-			lua_pushstring(L, szBuf);
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
 		}
+
+		if (!ch->GetGuild())
+		{
+			lua_pushstring(L, "");
+			return 1;
+		}
+		
+		char szBuf[4096+1];
+		CGuildManager::instance().GetAroundRankString(ch->GetGuild()->GetID(), szBuf, sizeof(szBuf));
+		
+		lua_pushstring(L, szBuf);
 		return 1;
 	}
 
@@ -40,6 +47,11 @@ namespace quest
 	{
 		CQuestManager& q = CQuestManager::instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
 		uint32_t dwMyGuild = 0;
 		if (ch->GetGuild())
 			dwMyGuild = ch->GetGuild()->GetID();
@@ -54,6 +66,11 @@ namespace quest
 	{
 		CQuestManager& q = CQuestManager::instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
 		if (!ch->GetGuild())
 		{
 			lua_pushnumber(L, -1);
@@ -69,6 +86,11 @@ namespace quest
 	{
 		CQuestManager& q = CQuestManager::instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
 
 		if (!ch->GetGuild())
 		{
@@ -90,6 +112,11 @@ namespace quest
 		}
 
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
 
 		if (ch->GetGuild() && ch->GetGuild()->UnderWar((uint32_t) lua_tonumber(L, 1)))
 			lua_pushboolean(L, true);
@@ -119,7 +146,11 @@ namespace quest
 
 	int32_t guild_level(lua_State* L)
 	{
-		luaL_checknumber(L, 1);
+		if (!lua_isnumber(L, 1))
+		{
+			sys_err("invalid argument");
+			return 0;
+		}
 
 		CGuild * pkGuild = CGuildManager::instance().FindGuild((uint32_t) lua_tonumber(L, 1));
 
@@ -141,6 +172,11 @@ namespace quest
 
 		CQuestManager& q = CQuestManager::instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
 
 		if (ch->GetGuild())
 			ch->GetGuild()->GuildWarEntryAccept((uint32_t) lua_tonumber(L, 1), ch);
@@ -151,6 +187,11 @@ namespace quest
 	int32_t guild_get_any_war(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
 
 		if (ch->GetGuild())
 			lua_pushnumber(L, ch->GetGuild()->UnderAnyWar());
@@ -178,103 +219,10 @@ namespace quest
 		return 1;
 	}
 
-	int32_t guild_war_bet(lua_State * L)
-	{
-		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2) || !lua_isnumber(L, 3))
-		{
-			sys_err("invalid argument");
-			return 0;
-		}
-
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-
-		TPacketGDGuildWarBet p;
-
-		p.dwWarID = (uint32_t) lua_tonumber(L, 1);
-		strlcpy(p.szLogin, ch->GetDesc()->GetAccountTable().login, sizeof(p.szLogin));
-		p.dwGuild = (uint32_t) lua_tonumber(L, 2);
-		p.dwGold = (uint32_t) lua_tonumber(L, 3);
-
-		sys_log(0, "GUILD_WAR_BET: %s login %s war_id %u guild %u gold %u", 
-				ch->GetName(), p.szLogin, p.dwWarID, p.dwGuild, p.dwGold);
-
-		db_clientdesc->DBPacket(HEADER_GD_GUILD_WAR_BET, 0, &p, sizeof(p));
-		return 0;
-	}
-
-	int32_t guild_is_bet(lua_State * L)
-	{
-		if (!lua_isnumber(L, 1))
-		{
-			sys_err("invalid argument");
-			lua_pushboolean(L, true);
-			return 1;
-		}
-
-		bool bBet = CGuildManager::instance().IsBet((uint32_t) lua_tonumber(L, 1),
-				CQuestManager::instance().GetCurrentCharacterPtr()->GetDesc()->GetAccountTable().login);
-
-		lua_pushboolean(L, bBet);
-		return 1;
-	}
-
 	int32_t guild_get_warp_war_list(lua_State* L)
 	{
 		FBuildLuaGuildWarList f(L);
 		CGuildManager::instance().for_each_war(f);
-		return 1;
-	}
-
-	int32_t guild_get_reserve_war_table(lua_State * L)
-	{
-		std::vector<CGuildWarReserveForGame *> & con = CGuildManager::instance().GetReserveWarRef();
-
-		int32_t i = 0;
-		std::vector<CGuildWarReserveForGame *>::iterator it = con.begin();
-
-		sys_log(0, "con.size(): %d", con.size());
-
-		// stack : table1
-		lua_newtable(L);
-
-		while (it != con.end())
-		{
-			TGuildWarReserve * p = &(*(it++))->data;
-
-			if (p->bType != GUILD_WAR_TYPE_BATTLE)
-				continue;
-
-			lua_newtable(L);
-
-			sys_log(0, "con.size(): %u %u %u handi %d", p->dwID, p->dwGuildFrom, p->dwGuildTo, p->lHandicap);
-
-			// stack : table1 table2
-			lua_pushnumber(L, p->dwID);
-			// stack : table1 table2 dwID
-			lua_rawseti(L, -2, 1);
-
-			// stack : table1 table2
-			if (p->lPowerFrom > p->lPowerTo)
-				lua_pushnumber(L, p->dwGuildFrom);
-			else
-				lua_pushnumber(L, p->dwGuildTo);
-			// stack : table1 table2 guildfrom
-			lua_rawseti(L, -2, 2);
-
-			// stack : table1 table2
-			if (p->lPowerFrom > p->lPowerTo)
-				lua_pushnumber(L, p->dwGuildTo);
-			else
-				lua_pushnumber(L, p->dwGuildFrom);
-			// stack : table1 table2 guildto
-			lua_rawseti(L, -2, 3);
-
-			lua_pushnumber(L, p->lHandicap);
-			lua_rawseti(L, -2, 4);
-
-			// stack : table1 table2
-			lua_rawseti(L, -2, ++i);
-		}
 
 		return 1;
 	}
@@ -312,14 +260,18 @@ namespace quest
 		//	4 : 길드가 없음
 
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
 
 		CGuild* pGuild = ch->GetGuild();
-
-		if ( pGuild != nullptr )
+		if (pGuild)
 		{
-			if ( pGuild->GetMasterPID() == ch->GetPlayerID() )
+			if (pGuild->GetMasterPID() == ch->GetPlayerID())
 			{
-				if ( lua_isstring(L, 1) == false )
+				if (!lua_isstring(L, 1))
 				{
 					lua_pushnumber(L, 0);
 				}
@@ -364,24 +316,33 @@ namespace quest
 		//	7 : 새 길드장이 be_other_leader 제한에 걸림
 
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		if (!lua_isnumber(L, 2))
+		{
+			sys_err("wrong arg");
+			return 0;
+		}
 
 		CGuild* pGuild = ch->GetGuild();
-
-		if ( pGuild != nullptr )
+		if (pGuild)
 		{
-			if ( pGuild->GetMasterPID() == ch->GetPlayerID() )
+			if (pGuild->GetMasterPID() == ch->GetPlayerID())
 			{
-				if ( lua_isstring(L, 1) == false )
+				if (!lua_isstring(L, 1))
 				{
 					lua_pushnumber(L, 0);
 				}
 				else
 				{
 					LPCHARACTER pNewMaster = CHARACTER_MANAGER::instance().FindPC( lua_tostring(L,1) );
-
-					if ( pNewMaster != nullptr )
+					if (pNewMaster)
 					{
-						if ( pNewMaster->GetLevel() < lua_tonumber(L, 2) )
+						if (pNewMaster->GetLevel() < lua_tonumber(L, 2))
 						{
 							lua_pushnumber(L, 6);
 						}
@@ -390,7 +351,8 @@ namespace quest
 							int32_t nBeOtherLeader = pNewMaster->GetQuestFlag("change_guild_master.be_other_leader");
 							CQuestManager::instance().GetPC( ch->GetPlayerID() );
 
-							if ( lua_toboolean(L, 6) == true ) nBeOtherLeader = 0;
+							if ( lua_toboolean(L, 6) ) 
+								nBeOtherLeader = 0;
 
 							if ( nBeOtherLeader > get_global_time() )
 							{
@@ -438,27 +400,325 @@ namespace quest
 		return 1;
 	}
 
+
+	int32_t guild_get_id(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch) 
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+
+		lua_pushnumber(L, (pGuild != nullptr) ? pGuild->GetID() : 0);
+		return 1;
+	}
+
+	int32_t guild_get_sp(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+
+		lua_pushnumber(L, (pGuild != nullptr) ? pGuild->GetSP() : 0);
+		return 1;
+	}
+
+	int32_t guild_get_maxsp(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch) 
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+
+		lua_pushnumber(L, (pGuild != nullptr) ? pGuild->GetMaxSP() : 0);
+		return 1;
+	}
+
+	int32_t guild_get_money(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch) 
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+
+		lua_pushnumber(L, (pGuild != nullptr) ? static_cast<int32_t>(pGuild->GetGuildMoney()) : 0);
+		return 1;
+	}
+
+	int32_t guild_get_max_member(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch) 
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+
+		lua_pushnumber(L, (pGuild != nullptr) ? pGuild->GetMaxMemberCount() : 0);
+		return 1;
+	}
+
+	int32_t guild_get_total_member_level(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+
+		lua_pushnumber(L, (pGuild != nullptr) ? pGuild->GetTotalLevel() : 0);
+		return 1;
+	}
+
+	int32_t guild_has_land(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+
+		lua_pushboolean(L, (pGuild != nullptr) ? pGuild->HasLand() : false);
+		return 1;
+	}
+
+	int32_t guild_get_win_count(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch) 
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+
+		lua_pushnumber(L, (pGuild != nullptr) ? pGuild->GetGuildWarWinCount() : 0);
+		return 1;
+	}
+
+	int32_t guild_get_draw_count(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch) 
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+
+		lua_pushnumber(L, (pGuild != nullptr) ? pGuild->GetGuildWarDrawCount() : 0);
+		return 1;
+	}
+
+	int32_t guild_get_loss_count(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+
+		lua_pushnumber(L, (pGuild != nullptr) ? pGuild->GetGuildWarLossCount() : 0);
+		return 1;
+	}
+
+	int32_t guild_add_comment(lua_State* L)
+	{
+		if (!lua_isstring(L, 1))
+			return 0;
+
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch) 
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+		if (pGuild)
+			pGuild->AddComment(ch, std::string(lua_tostring(L, 1)));
+
+		return 0;
+	}
+
+	int32_t guild_set_ladder_point(lua_State* L)
+	{
+		if (!lua_isnumber(L, 1))
+			return 0;
+
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+		if (pGuild)
+			pGuild->ChangeLadderPoint((int32_t)lua_tonumber(L, 1));
+
+		return 0;
+	}
+
+	int32_t guild_get_exp_level(lua_State* L)
+	{
+		lua_pushnumber(L, guild_exp_table2[MINMAX(0, (int32_t)lua_tonumber(L, 1), GUILD_MAX_LEVEL)]);
+		return 1;
+	}
+
+	int32_t guild_offer_exp(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+		if (!pGuild)
+		{
+			lua_pushboolean(L, false);
+			return 1;
+		}
+
+		uint32_t offer = (uint32_t)lua_tonumber(L, 1);
+
+		if (pGuild->GetLevel() >= GUILD_MAX_LEVEL)
+		{
+			lua_pushboolean(L, false);
+		}
+		else
+		{
+			offer /= 100;
+			offer *= 100;
+
+			if (pGuild->OfferExp(ch, offer))
+			{
+				lua_pushboolean(L, true);
+			}
+			else
+			{
+				lua_pushboolean(L, false);
+			}
+		}
+		return 1;
+	}
+
+	int32_t guild_give_exp(lua_State* L)
+	{
+		if (!lua_isnumber(L, 1))
+			return 0;
+
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch) 
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		CGuild* pGuild = ch->GetGuild();
+		if (!pGuild)
+			return 0;
+
+		pGuild->GuildPointChange(POINT_EXP, (int32_t)lua_tonumber(L, 1) / 100, true);
+		return 0;
+	}
+
+	int32_t guild_force_war(lua_State* L)
+	{
+		if (!lua_isstring(L, 1) || !lua_isstring(L, 2))
+			return 0;
+
+		CHARACTER* lpGuildOwn1 = CHARACTER_MANAGER::instance().FindPC(lua_tostring(L, 1));
+		CHARACTER* lpGuildOwn2 = CHARACTER_MANAGER::instance().FindPC(lua_tostring(L, 2));
+		if (lpGuildOwn1 || lpGuildOwn2)
+			return 0;
+
+		CGuild* lpGuild1 = lpGuildOwn1->GetGuild();
+		CGuild* lpGuild2 = lpGuildOwn2->GetGuild();
+		if (lpGuild1 && lpGuild2) 
+		{
+			lpGuild1->StartWar(lpGuild2->GetID());
+			lpGuild2->StartWar(lpGuild1->GetID());
+
+			char szNoticeBuf[500];
+			sprintf(szNoticeBuf, "%s ve %s arasinda savas basladi", lpGuild1->GetName(), lpGuild2->GetName());
+			SendNotice(szNoticeBuf);
+		}
+		else 
+		{
+			sys_err("Forcewar error guild pointers are null");
+		}
+
+		return 0;
+	}
+
+
 	void RegisterGuildFunctionTable()
 	{
 		luaL_reg guild_functions[] =
 		{
-			{ "get_rank",				guild_get_rank				},
-			{ "get_ladder_point",		guild_get_ladder_point		},
-			{ "high_ranking_string",	guild_high_ranking_string	},
-			{ "around_ranking_string",	guild_around_ranking_string	},
-			{ "name",					guild_name					},
-			{ "level",					guild_level					},
-			{ "is_war",					guild_is_war				},
-			{ "war_enter",				guild_war_enter				},
-			{ "get_any_war",			guild_get_any_war			},
-			{ "get_reserve_war_table",	guild_get_reserve_war_table	},
-			{ "get_name",				guild_get_name				},
-			{ "war_bet",				guild_war_bet				},
-			{ "is_bet",					guild_is_bet				},
-			{ "get_warp_war_list",		guild_get_warp_war_list		},
-			{ "get_member_count",		guild_get_member_count		},
-			{ "change_master",			guild_change_master			},
-			{ "change_master_with_limit",			guild_change_master_with_limit			},
+			{ "get_rank",					guild_get_rank					},
+			{ "get_ladder_point",			guild_get_ladder_point			},
+			{ "high_ranking_string",		guild_high_ranking_string		},
+			{ "around_ranking_string",		guild_around_ranking_string		},
+			{ "name",						guild_name						},
+			{ "level",						guild_level						},
+			{ "is_war",						guild_is_war					},
+			{ "war_enter",					guild_war_enter					},
+			{ "get_any_war",				guild_get_any_war				},
+			{ "get_name",					guild_get_name					},
+			{ "get_warp_war_list",			guild_get_warp_war_list			},
+			{ "get_member_count",			guild_get_member_count			},
+			{ "change_master",				guild_change_master				},
+			{ "change_master_with_limit",	guild_change_master_with_limit	},
+
+			{ "get_id",						guild_get_id					},
+			{ "get_sp",						guild_get_sp					},
+			{ "get_maxsp",					guild_get_maxsp					},
+			{ "get_money",					guild_get_money					},
+			{ "get_max_member",				guild_get_max_member			},
+			{ "get_total_member_level",		guild_get_total_member_level	},
+			{ "has_land",					guild_has_land					},
+			{ "get_win_count",				guild_get_win_count				},
+			{ "get_draw_count",				guild_get_draw_count			},
+			{ "get_loss_count",				guild_get_loss_count			},
+			{ "add_comment",				guild_add_comment				},
+			{ "set_ladder_point",			guild_set_ladder_point			},
+			{ "get_exp_level",              guild_get_exp_level				},
+			{ "offer_exp",                  guild_offer_exp					},
+			{ "give_exp",               	guild_give_exp					},
+			{ "force_war",               	guild_force_war					},
 
 			{ nullptr,						nullptr						}
 		};

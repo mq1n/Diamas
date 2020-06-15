@@ -105,26 +105,14 @@ PyObject * sndSetMusicVolume(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
-PyObject * sndSetSoundVolumef(PyObject * poSelf, PyObject * poArgs)
+PyObject * sndSetSoundVolume(PyObject * poSelf, PyObject * poArgs)
 {
 	float fVolume;
 	if (!PyTuple_GetFloat(poArgs, 0, &fVolume))
 		return Py_BuildException();
 
-	CSoundManager& rkSndMgr=CSoundManager::Instance();	
-	rkSndMgr.SetSoundVolumeRatio(fVolume);
-	return Py_BuildNone();
-}
-
-
-PyObject * sndSetSoundVolume(PyObject * poSelf, PyObject * poArgs)
-{
-	int32_t iVolume;
-	if (!PyTuple_GetInteger(poArgs, 0, &iVolume))
-		return Py_BuildException();
-
-	CSoundManager& rkSndMgr=CSoundManager::Instance();
-	rkSndMgr.SetSoundVolumeGrade(iVolume);
+	CSoundManager& rkSndMgr = CSoundManager::Instance();
+	rkSndMgr.SetSoundVolume(fVolume);
 	return Py_BuildNone();
 }
 
@@ -163,9 +151,7 @@ void initsnd()
 		{ "FadeLimitOutMusic",		sndFadeLimitOutMusic,		METH_VARARGS },
 		{ "StopAllSound",			sndStopAllSound,			METH_VARARGS },
 
-		{ "SetMusicVolumef",		sndSetMusicVolume,			METH_VARARGS },
 		{ "SetMusicVolume",			sndSetMusicVolume,			METH_VARARGS },
-		{ "SetSoundVolumef",		sndSetSoundVolumef,			METH_VARARGS },
 		{ "SetSoundVolume",			sndSetSoundVolume,			METH_VARARGS },
 		{ "SetSoundScale",			sndSetSoundScale,			METH_VARARGS },
 		{ "SetAmbienceSoundScale",	sndSetAmbienceSoundScale,	METH_VARARGS },

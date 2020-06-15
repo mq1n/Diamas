@@ -1,6 +1,10 @@
 #ifndef __INC_METIN_II_GAME_CMD_H__
 #define __INC_METIN_II_GAME_CMD_H__
 
+#include "typedef.h"
+#include <stdint.h>
+#include <string>
+
 #define ACMD(name)  void (name)(LPCHARACTER ch, const char *argument, int32_t cmd, int32_t subcmd)
 #define CMD_NAME(name) cmd_info[cmd].command
 
@@ -40,7 +44,8 @@ enum SCMD_CMD
 enum SCMD_RESTART
 {
 	SCMD_RESTART_TOWN,
-	SCMD_RESTART_HERE
+	SCMD_RESTART_HERE,
+	SCMD_RESTART_BASE
 };
 
 enum SCMD_XMAS
@@ -52,13 +57,8 @@ enum SCMD_XMAS
 
 extern void Shutdown(int32_t iSec);
 extern void SendLog(const char * c_pszBuf);		
-#ifdef ENABLE_FULL_NOTICE
 extern void SendNotice(const char * c_pszBuf, bool bBigFont=false);
 extern void BroadcastNotice(const char * c_pszBuf, bool bBigFont=false);
-#else
-extern void SendNotice(const char * c_pszBuf);		
-extern void BroadcastNotice(const char * c_pszBuf);	
-#endif
 extern void SendNoticeMap(const char* c_pszBuf, int32_t nMapIndex, bool bBigFont); // 지정 맵에만 공지
 
 // LUA_ADD_BGM_INFO

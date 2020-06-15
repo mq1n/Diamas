@@ -1,17 +1,18 @@
 #include "stdafx.h"
-#include "../../common/stl.h"
 #include "constants.h"
 #include "packet_info.h"
+#include "../../common/stl.h"
+#include "../../common/service.h"
 
-CPacketInfo::CPacketInfo()
-	: m_pCurrentPacket(nullptr), m_dwStartTime(0)
+CPacketInfo::CPacketInfo() :
+	m_pCurrentPacket(nullptr), m_dwStartTime(0)
 {
 }
 
 CPacketInfo::~CPacketInfo()
 {
-	auto it = m_pPacketMap.begin();
-	for ( ; it != m_pPacketMap.end(); ++it) {
+	for (auto it = m_pPacketMap.begin(); it != m_pPacketMap.end(); ++it) 
+	{
 		M2_DELETE(it->second);
 	}
 }
@@ -33,8 +34,7 @@ void CPacketInfo::Set(int32_t header, int32_t iSize, const char * c_pszName)
 
 bool CPacketInfo::Get(int32_t header, int32_t * size, const char ** c_ppszName)
 {
-	std::map<int32_t, TPacketElement *>::iterator it = m_pPacketMap.find(header);
-
+	auto it = m_pPacketMap.find(header);
 	if (it == m_pPacketMap.end())
 		return false;
 
@@ -47,8 +47,7 @@ bool CPacketInfo::Get(int32_t header, int32_t * size, const char ** c_ppszName)
 
 TPacketElement * CPacketInfo::GetElement(int32_t header)
 {
-	std::map<int32_t, TPacketElement *>::iterator it = m_pPacketMap.find(header);
-
+	auto it = m_pPacketMap.find(header);
 	if (it == m_pPacketMap.end())
 		return nullptr;
 
@@ -69,23 +68,24 @@ void CPacketInfo::End()
 
 void CPacketInfo::Log(const char * c_pszFileName)
 {
-	FILE * fp = fopen(c_pszFileName, "w");
+	auto fp = fopen(c_pszFileName, "w");
 	if (!fp)
 		return;
 
 	fprintf(fp, "Name             Called     Load       Ratio\n");
 
-	std::map<int32_t, TPacketElement *>::iterator it = m_pPacketMap.begin();
+	auto it = m_pPacketMap.begin();
 	while (it != m_pPacketMap.end())
 	{
 		TPacketElement * p = it->second;
-		++it;
 
 		fprintf(fp, "%-16s %-10d %-10u %.2f\n",
 				p->stName.c_str(),
 				p->iCalled,
 				p->dwLoad,
 				p->iCalled != 0 ? (float) p->dwLoad / p->iCalled : 0.0f);
+
+		++it;
 	}
 
 	fclose(fp);
@@ -94,7 +94,6 @@ void CPacketInfo::Log(const char * c_pszFileName)
 
 CPacketInfoCG::CPacketInfoCG()
 {
-	Set(HEADER_CG_TEXT, sizeof(TPacketCGText), "Text");
 	Set(HEADER_CG_HANDSHAKE, sizeof(TPacketCGHandshake), "Handshake");
 	Set(HEADER_CG_TIME_SYNC, sizeof(TPacketCGHandshake), "TimeSync");
 	Set(HEADER_CG_MARK_LOGIN, sizeof(TPacketCGMarkLogin), "MarkLogin");

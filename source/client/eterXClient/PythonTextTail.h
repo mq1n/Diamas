@@ -45,13 +45,13 @@ class CPythonTextTail : public CSingleton<CPythonTextTail>
 			virtual ~STextTail() {}
 		} TTextTail;
 
-		typedef std::map<uint32_t, TTextTail*>		TTextTailMap;
-		typedef std::list<TTextTail*>			TTextTailList;
-		typedef TTextTailMap					TChatTailMap;
+		using TTextTailMap = std::map<uint32_t, TTextTail*>;
+		using TTextTailList = std::list<TTextTail *>;
+		using TChatTailMap = TTextTailMap;
 
 	public:
-		CPythonTextTail(void);
-		virtual ~CPythonTextTail(void);
+		CPythonTextTail();
+		virtual ~CPythonTextTail();
 
 		void GetInfo(std::string* pstInfo);
 
@@ -65,7 +65,8 @@ class CPythonTextTail : public CSingleton<CPythonTextTail>
 
 		void ArrangeTextTail();
 		void HideAllTextTail();
-		void ShowAllTextTail();
+		void ShowAllCharactersTextTails();
+		void ShowAllItemsTextTails();
 		void ShowCharacterTextTail(uint32_t VirtualID);
 		void ShowItemTextTail(uint32_t VirtualID);
 

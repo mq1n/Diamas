@@ -30,7 +30,7 @@ public:
 		SHADOW_GROUND_AND_SOLO,
 		SHADOW_ALL,
 		SHADOW_ALL_HIGH,
-		SHADOW_ALL_MAX,
+		SHADOW_ALL_MAX
 	};
 
 	enum
@@ -46,7 +46,7 @@ public:
 	enum
 	{
 		DAY_MODE_LIGHT,
-		DAY_MODE_DARK,
+		DAY_MODE_DARK
 	};
 
 	typedef struct SVIEWDISTANCESET
@@ -133,6 +133,7 @@ public:
 	void RegisterDungeonMapName(const char * c_szMapName);
 	TMapInfo* GlobalPositionToMapInfo(uint32_t dwGlobalX, uint32_t dwGlobalY);
 	const char* GetWarpMapName();
+	std::string GetMapName(uint32_t dwX, uint32_t dwY);
 
 	bool IsPrimalMap() const { return m_bIsPrimalMap; }
 	void SetPrimalMap(bool is_primal);
@@ -181,12 +182,13 @@ private:
 	struct FFindWarpMapName
 	{
 		uint32_t m_dwX, m_dwY;
-		FFindWarpMapName::FFindWarpMapName(uint32_t dwX, uint32_t dwY)
+
+		FFindWarpMapName(uint32_t dwX, uint32_t dwY)
 		{
 			m_dwX = dwX;
 			m_dwY = dwY;
 		}
-		bool operator() (TMapInfo & rMapInfo)
+		bool operator()(TMapInfo & rMapInfo) const
 		{
 			if (m_dwX < rMapInfo.m_dwBaseX || m_dwX >= rMapInfo.m_dwEndX || m_dwY < rMapInfo.m_dwBaseY || m_dwY >= rMapInfo.m_dwEndY)
 				return false;

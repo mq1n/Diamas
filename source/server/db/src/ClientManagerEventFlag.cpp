@@ -2,14 +2,12 @@
 #include "stdafx.h"
 #include "ClientManager.h"
 #include "Main.h"
-#include "Config.h"
 #include "DBManager.h"
-#include "QID.h"
 
 void CClientManager::LoadEventFlag()
 {
 	char szQuery[1024];
-	snprintf(szQuery, sizeof(szQuery), "SELECT szName, lValue FROM quest%s WHERE dwPID = 0", GetTablePostfix());
+	snprintf(szQuery, sizeof(szQuery), "SELECT szName, lValue FROM quest WHERE dwPID = 0");
 	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
 
 	SQLResult* pRes = pmsg->Get();
@@ -50,8 +48,7 @@ void CClientManager::SetEventFlag(TPacketSetEventFlag* p)
 	{
 		char szQuery[1024];
 		snprintf(szQuery, sizeof(szQuery),
-				"REPLACE INTO quest%s (dwPID, szName, szState, lValue) VALUES(0, '%s', '', %ld)",
-				GetTablePostfix(), p->szFlagName, p->lValue);
+				"REPLACE INTO quest (dwPID, szName, szState, lValue) VALUES(0, '%s', '', %d)", p->szFlagName, p->lValue);
 		szQuery[1023] = '\0';
 
 		//CDBManager::instance().ReturnQuery(szQuery, QID_QUEST_SAVE, 0, nullptr);
@@ -64,11 +61,11 @@ void CClientManager::SetEventFlag(TPacketSetEventFlag* p)
 
 void CClientManager::SendEventFlagsOnSetup(CPeer* peer)
 {
-	for (auto it = m_map_lEventFlag.begin(); it != m_map_lEventFlag.end(); ++it)
+	for (auto & it : m_map_lEventFlag)
 	{
 		TPacketSetEventFlag p;
-		strlcpy(p.szFlagName, it->first.c_str(), sizeof(p.szFlagName));
-		p.lValue = it->second;
+		strlcpy(p.szFlagName, it.first.c_str(), sizeof(p.szFlagName));
+		p.lValue = it.second;
 		peer->EncodeHeader(HEADER_DG_SET_EVENT_FLAG, 0, sizeof(TPacketSetEventFlag));
 		peer->Encode(&p, sizeof(TPacketSetEventFlag));
 	}

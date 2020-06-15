@@ -6,6 +6,8 @@
 #include "db.h"
 #include "guild_manager.h"
 #include "marriage.h"
+#include "desc.h"
+#include "../../common/service.h"
 
 /*
    Return Value
@@ -28,15 +30,9 @@ int32_t CHARACTER::ChangeEmpire(uint8_t empire)
 
 	{
 		// 1. 내 계정의 모든 pid를 얻어 온다
-#ifdef ENABLE_PLAYER_PER_ACCOUNT5
 		snprintf(szQuery, sizeof(szQuery),
-				"SELECT id, pid1, pid2, pid3, pid4, pid5 FROM player_index%s WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
-				get_table_postfix(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
-#else
-		snprintf(szQuery, sizeof(szQuery),
-				"SELECT id, pid1, pid2, pid3, pid4 FROM player_index%s WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u AND empire=%u",
-				get_table_postfix(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
-#endif
+				"SELECT id, pid1, pid2, pid3, pid4, pid5 FROM player_index WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
+				GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
 		std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
 
 		if (msg->Get()->uiNumRows == 0)
@@ -64,7 +60,7 @@ int32_t CHARACTER::ChangeEmpire(uint8_t empire)
 		
 		for (int32_t i = 0; i < loop; ++i)
 		{
-			snprintf(szQuery, sizeof(szQuery), "SELECT guild_id FROM guild_member%s WHERE pid=%u", get_table_postfix(), dwPID[i]);
+			snprintf(szQuery, sizeof(szQuery), "SELECT guild_id FROM guild_member WHERE pid=%u", dwPID[i]);
 
 			pMsg = DBManager::instance().DirectQuery(szQuery);
 
@@ -107,13 +103,8 @@ int32_t CHARACTER::ChangeEmpire(uint8_t empire)
 	
 	{
 		// 4. db의 제국 정보를 업데이트 한다.
-#ifdef ENABLE_PLAYER_PER_ACCOUNT5
-		snprintf(szQuery, sizeof(szQuery), "UPDATE player_index%s SET empire=%u WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
-				get_table_postfix(), empire, GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
-#else
-		snprintf(szQuery, sizeof(szQuery), "UPDATE player_index%s SET empire=%u WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u AND empire=%u",
-				get_table_postfix(), empire, GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
-#endif
+		snprintf(szQuery, sizeof(szQuery), "UPDATE player_index SET empire=%u WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
+				empire, GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
 		std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
 
 		if (msg->Get()->uiAffectedRows > 0)
@@ -188,15 +179,17 @@ void CHARACTER::SetChangeEmpireCount()
 
 uint32_t CHARACTER::GetAID() const
 {
+	if (GetDesc()) 
+	{
+		const TAccountTable& rkTab = GetDesc()->GetAccountTable();
+		if (rkTab.id)
+			return rkTab.id;
+	}
+
 	char szQuery[1024+1];
 	uint32_t dwAID = 0;
-#ifdef ENABLE_PLAYER_PER_ACCOUNT5
-	snprintf(szQuery, sizeof(szQuery), "SELECT id FROM player_index%s WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
-			get_table_postfix(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
-#else
-	snprintf(szQuery, sizeof(szQuery), "SELECT id FROM player_index%s WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u AND empire=%u",
-			get_table_postfix(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
-#endif
+	snprintf(szQuery, sizeof(szQuery), "SELECT id FROM player_index WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
+			GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
 	SQLMsg* pMsg = DBManager::instance().DirectQuery(szQuery);
 
 	if (pMsg != nullptr)

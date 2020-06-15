@@ -1,10 +1,12 @@
 #include "stdafx.h"
-#include "../../common/stl.h"
 #include "constants.h"
 #include "motion.h"
 #include "text_file_loader.h"
 #include "mob_manager.h"
 #include "char.h"
+
+#include "../../common/stl.h"
+#include "../../common/service.h"
 
 // POLYMORPH_BUG_FIX
 static float MSA_GetNormalAttackDuration(const char* msaPath)
@@ -56,7 +58,7 @@ static float MOB_GetNormalAttackDuration(TMobTable* mobTable)
 		sscanf(line, "%s %s %s %d", mode, type, msaName, &percent);
 		if (strcmp(mode, "GENERAL") == 0 && strncmp(type, "NORMAL_ATTACK", 13) == 0)
 		{
-			char msaPath[1024];
+			char msaPath[2062];
 			snprintf(msaPath, sizeof(msaPath), "data/monster/%s/%s", folder, msaName);
 			float curDuration = MSA_GetNormalAttackDuration(msaPath);
 			if (curDuration < minDuration)
@@ -124,7 +126,7 @@ static const char* GetMotionFileName(TMobTable* mobTable, EPublicMotion motion)
 	}
 	else
 	{
-		sys_err("Motion: %s have not motlist.txt vnum(%d) folder(%s)", folder, mobTable->dwVnum, mobTable->szFolder);
+		sys_log(0, "Motion: %s have not motlist.txt vnum(%d) folder(%s)", folder, mobTable->dwVnum, mobTable->szFolder);
 	}
 
 	return nullptr;
@@ -177,7 +179,8 @@ static void LoadSkillMotion(CMotionSet* pMotionSet, CMob* pMob, EPublicMotion mo
 	if (mob_table->Skills[idx].dwVnum == 0) return;
 
 	const char* cpFileName = GetMotionFileName(mob_table, motion);
-	if (cpFileName == nullptr) return;
+	if (cpFileName == nullptr)
+		return;
 
 	CMotion* pMotion = M2_NEW CMotion;
 
@@ -187,6 +190,7 @@ static void LoadSkillMotion(CMotionSet* pMotionSet, CMob* pMob, EPublicMotion mo
 	}
 	else
 	{
+		sys_err("Motion: Could not load mob skill from file: %s", cpFileName);
 		if (mob_table->Skills[idx].dwVnum != 0)
 		{
 			sys_err("Motion: Skill exist but no motion data for index %d mob %u skill %u",
@@ -422,7 +426,10 @@ bool CMotion::LoadMobSkillFromFile(const char * c_pszFileName, CMob* pMob, int32
 {
 	CTextFileLoader rkTextFileLoader;
 	if (!rkTextFileLoader.Load(c_pszFileName))
+	{
+		sys_err("Motion: could not load %s", c_pszFileName);
 		return false;
+	}
 
 	//if (rkTextFileLoader.IsEmpty())
 	//return false;
@@ -503,6 +510,7 @@ bool CMotion::LoadMobSkillFromFile(const char * c_pszFileName, CMob* pMob, int32
 						rkTextFileLoader.SetParentNode();
 						break;
 					default:
+						sys_err("Motion: strange event type");
 						assert(!" CRaceMotionData::LoadMotionData - Strange Event Type");
 						return false;
 						break;

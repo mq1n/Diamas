@@ -5,23 +5,25 @@
 #include "ClientManager.h"
 #include "GuildManager.h"
 #include "ItemAwardManager.h"
+#include "QID.h"
 #include "PrivManager.h"
-#include "MoneyLog.h"
 #include "Marriage.h"
 #include "ItemIDRangeManager.h"
 #include <signal.h>
 
-void SetPlayerDBName(const char* c_pszPlayerDBName);
-void SetTablePostfix(const char* c_pszTablePostfix);
-int32_t Start();
+#include "../../libthecore/include/winminidump.h"
 
-std::string g_stTablePostfix;
+void SetPlayerDBName(const char* c_pszPlayerDBName);
+void SetAccountDBName(const char* c_pszAccountDBName);
+bool Start();
+
 std::string g_stLocaleNameColumn = "name";
 std::string g_stLocale = "latin1"; // default: euckr
 std::string g_stPlayerDBName = "";
+std::string g_stAccountDBName = "";
 
-
-BOOL g_test_server = false;
+bool g_test_server = false;
+bool g_log = true;
 
 //단위 초
 int32_t g_iPlayerCacheFlushSeconds = 60*7;
@@ -29,20 +31,16 @@ int32_t g_iItemCacheFlushSeconds = 60*5;
 
 //g_iLogoutSeconds 수치는 g_iPlayerCacheFlushSeconds 와 g_iItemCacheFlushSeconds 보다 길어야 한다.
 int32_t g_iLogoutSeconds = 60*10;
-
-int32_t g_log = 1;
-
-
 // MYSHOP_PRICE_LIST
-int32_t g_iItemPriceListTableCacheFlushSeconds = 540;
+int32_t g_iItemPriceListTableCacheFlushSeconds = 360;
+int32_t g_iActivityCacheFlushSeconds = 600;
+
 // END_OF_MYSHOP_PRICE_LIST
 
-#if defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version<1000000
-extern const char * _malloc_options;
-#endif
 
 extern void WriteVersion();
 
+//#ifndef _DEBUG
 void emergency_sig(int32_t sig)
 {
 	if (sig == SIGSEGV)
@@ -53,14 +51,14 @@ void emergency_sig(int32_t sig)
 	if (sig == SIGSEGV)
 		abort();
 }
+//#endif
 
 int32_t main()
 {
-	WriteVersion();
+	if (setup_minidump_generator() == false)
+		return 1;
 
-#if defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version<1000000
-	_malloc_options = "A";
-#endif
+	WriteVersion();
 
 	CConfig Config;
 	CNetPoller poller;
@@ -68,10 +66,13 @@ int32_t main()
 	CClientManager ClientManager;
 	CGuildManager GuildManager;
 	CPrivManager PrivManager;
-	CMoneyLog MoneyLog;
 	ItemAwardManager ItemAwardManager;
 	marriage::CManager MarriageManager;
 	CItemIDRangeManager ItemIDRangeManager;
+
+#ifdef _DEBUG
+	log_set_level(1);
+#endif
 	if (!Start())
 		return 1;
 
@@ -88,7 +89,7 @@ int32_t main()
 	DBManager.Quit();
 	int32_t iCount;
 
-	while (1)
+	for (;;)
 	{
 		iCount = 0;
 
@@ -99,7 +100,7 @@ int32_t main()
 			break;
 
 		usleep(1000);
-		sys_log(0, "WAITING_QUERY_COUNT %d", iCount);
+		fprintf(stderr, "WAITING_QUERY_COUNT %d\n", iCount);
 	}
 
 	return 1;
@@ -115,7 +116,7 @@ void emptybeat(LPHEART heart, int32_t pulse)
 //
 // @version	05/06/13 Bang2ni - 아이템 가격정보 캐시 flush timeout 설정 추가.
 //
-int32_t Start()
+bool Start()
 {
 	if (!CConfig::instance().LoadFile("conf.txt"))
 	{
@@ -123,24 +124,27 @@ int32_t Start()
 		return false;
 	}
 
-	if (!CConfig::instance().GetValue("TEST_SERVER", &g_test_server))
+	int test_srv = 0;
+	if (!CConfig::instance().GetValue("TEST_SERVER", &test_srv))
 	{
 		fprintf(stderr, "Real Server\n");
 	}
 	else
 		fprintf(stderr, "Test Server\n");
+	g_test_server = !!test_srv;
 
-	if (!CConfig::instance().GetValue("LOG", &g_log))
+	int logon = 0;
+	if (!CConfig::instance().GetValue("LOG", &logon))
 	{
 		fprintf(stderr, "Log Off");
-		g_log= 0;
+		logon = 0;
 	}
 	else
 	{
-		g_log = 1;
+		logon = 1;
 		fprintf(stderr, "Log On");
 	}
-	
+	g_log = !!logon;
 	
 	int32_t tmpValue;
 
@@ -172,14 +176,6 @@ int32_t Start()
 		sys_log(0, "LOCALE set to %s", g_stLocale.c_str());
 	}
 
-	if (!CConfig::instance().GetValue("TABLE_POSTFIX", szBuf, 256))
-	{
-		sys_log(0, "TABLE_POSTFIX not configured use default"); // @warme012
-		szBuf[0] = '\0';
-	}
-
-	SetTablePostfix(szBuf);
-
 	if (CConfig::instance().GetValue("PLAYER_CACHE_FLUSH_SECONDS", szBuf, 256))
 	{
 		str_to_number(g_iPlayerCacheFlushSeconds, szBuf);
@@ -200,6 +196,13 @@ int32_t Start()
 	}
 	// END_OF_MYSHOP_PRICE_LIST
 	//
+
+	if (CConfig::instance().GetValue("ACTIVITY_CACHE_FLUSH_SECONDS", szBuf, 256))
+	{
+		str_to_number(g_iActivityCacheFlushSeconds, szBuf);
+		sys_log(0, "ACTIVITY_CACHE_FLUSH_SECONDS: %d", g_iActivityCacheFlushSeconds);
+	}
+
 	if (CConfig::instance().GetValue("CACHE_FLUSH_LIMIT_PER_SECOND", szBuf, 256))
 	{
 		uint32_t dwVal = 0; str_to_number(dwVal, szBuf);
@@ -225,86 +228,38 @@ int32_t Start()
 	int32_t iPort;
 	char line[256+1];
 
-	if (CConfig::instance().GetValue("SQL_PLAYER", line, 256))
+	std::string databases[] = { "SQL_PLAYER", "SQL_ACCOUNT", "SQL_COMMON" };
+
+	for (size_t dataBase = 0; dataBase < sizeof(databases) / sizeof(databases[0]); dataBase++)
 	{
-		sscanf(line, " %s %s %s %s %d ", szAddr, szDB, szUser, szPassword, &iPort);
-		sys_log(0, "connecting to MySQL server (player)");
+		const char * DB_NAME = databases[dataBase].c_str();
 
-		int32_t iRetry = 5;
-
-		do
+		if (!CConfig::instance().GetValue(DB_NAME, line, 256))
 		{
-			if (CDBManager::instance().Connect(SQL_PLAYER, szAddr, iPort, szDB, szUser, szPassword))
-			{
-				sys_log(0, "   OK");
-				break;
-			}
+			sys_err("%s not configured",DB_NAME);
+			return false;
+		}
 
-			sys_log(0, "   failed, retrying in 5 seconds");
-			fprintf(stderr, "   failed, retrying in 5 seconds");
-			sleep(5);
-		} while (iRetry--);
-		fprintf(stderr, "Success PLAYER\n");
-		SetPlayerDBName(szDB);
-	}
-	else
-	{
-		sys_err("SQL_PLAYER not configured");
-		return false;
-	}
-
-	if (CConfig::instance().GetValue("SQL_ACCOUNT", line, 256))
-	{
 		sscanf(line, " %s %s %s %s %d ", szAddr, szDB, szUser, szPassword, &iPort);
-		sys_log(0, "connecting to MySQL server (account)");
 
-		int32_t iRetry = 5;
-
-		do
+		for (int32_t retries = 1; retries < 4; ++retries)
 		{
-			if (CDBManager::instance().Connect(SQL_ACCOUNT, szAddr, iPort, szDB, szUser, szPassword))
-			{
-				sys_log(0, "   OK");
+			if (CDBManager::instance().Connect(dataBase, szAddr, iPort, szDB, szUser, szPassword))
 				break;
-			}
 
-			sys_log(0, "   failed, retrying in 5 seconds");
-			fprintf(stderr, "   failed, retrying in 5 seconds");
-			sleep(5);
-		} while (iRetry--);
-		fprintf(stderr, "Success ACCOUNT\n");
-	}
-	else
-	{
-		sys_err("SQL_ACCOUNT not configured");
-		return false;
-	}
+			fprintf(stderr, "Connection to %s failed, try: [%d|3]\n", szDB, retries);
 
-	if (CConfig::instance().GetValue("SQL_COMMON", line, 256))
-	{
-		sscanf(line, " %s %s %s %s %d ", szAddr, szDB, szUser, szPassword, &iPort);
-		sys_log(0, "connecting to MySQL server (common)");
+			if (retries == 3) 
+				return false;
 
-		int32_t iRetry = 5;
+			sleep(2);
+		}
+		fprintf(stderr, "Established connection with database [%s]\n", szDB);
 
-		do
-		{
-			if (CDBManager::instance().Connect(SQL_COMMON, szAddr, iPort, szDB, szUser, szPassword))
-			{
-				sys_log(0, "   OK");
-				break;
-			}
-
-			sys_log(0, "   failed, retrying in 5 seconds");
-			fprintf(stderr, "   failed, retrying in 5 seconds");
-			sleep(5);
-		} while (iRetry--);
-		fprintf(stderr, "Success COMMON\n");
-	}
-	else
-	{
-		sys_err("SQL_COMMON not configured");
-		return false;
+		if (dataBase == 0)
+			SetPlayerDBName(szDB);
+		else if (dataBase == 1)
+			SetAccountDBName(szDB);
 	}
 	
 	if (!CNetPoller::instance().Create())
@@ -317,45 +272,43 @@ int32_t Start()
 
 	if (!CClientManager::instance().Initialize())
 	{
-		sys_log(0, "   failed"); 
+		sys_log(0, "ClientManager initialization failed"); 
 		return false;
 	}
 
-	sys_log(0, "   OK");
+	sys_log(0, "DB initialization OK");
 
-#ifndef __WIN32__
-	signal(SIGUSR1, emergency_sig);
-#endif
-	signal(SIGSEGV, emergency_sig);
+//#ifndef _DEBUG
+	#ifndef _WIN32
+		signal(SIGUSR1, emergency_sig);
+	#endif
+		signal(SIGSEGV, emergency_sig);
+//#endif
 	return true;
-}
-
-void SetTablePostfix(const char* c_pszTablePostfix)
-{
-	if (!c_pszTablePostfix || !*c_pszTablePostfix)
-		g_stTablePostfix = "";
-	else
-		g_stTablePostfix = c_pszTablePostfix;
-}
-
-const char * GetTablePostfix()
-{
-	return g_stTablePostfix.c_str();
 }
 
 void SetPlayerDBName(const char* c_pszPlayerDBName)
 {
 	if (! c_pszPlayerDBName || ! *c_pszPlayerDBName)
-		g_stPlayerDBName = "";
+		g_stPlayerDBName.clear();
 	else
-	{
 		g_stPlayerDBName = c_pszPlayerDBName;
-		g_stPlayerDBName += ".";
-	}
 }
 
 const char * GetPlayerDBName()
 {
 	return g_stPlayerDBName.c_str();
+}
+
+void SetAccountDBName(const char* c_pszAccountDBName)
+{
+	if (!c_pszAccountDBName || !*c_pszAccountDBName)
+		g_stAccountDBName.clear();
+	else
+		g_stAccountDBName = c_pszAccountDBName;
+}
+const char * GetAccountDBName()
+{
+	return g_stAccountDBName.c_str();
 }
 

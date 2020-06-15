@@ -13,8 +13,9 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 			WAYPOINT_IMAGE_COUNT = 15,
 			TARGET_MARK_IMAGE_COUNT = 2,
 			STORM_CIRCLE_IMAGE_COUNT = 1,
-			SAFE_ZONE_IMAGE_COUNT = 1,
+			SAFE_ZONE_IMAGE_COUNT = 1
 		};
+
 		enum
 		{
 			TYPE_OPC,
@@ -29,7 +30,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 			TYPE_EMPIRE_END = TYPE_EMPIRE + EMPIRE_NUM,
 			TYPE_TARGET,
 			TYPE_SHOP,
-			TYPE_COUNT,
+			TYPE_COUNT
 		};
 
 	public:

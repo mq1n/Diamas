@@ -7,6 +7,7 @@
 #ifndef __INC_LIBTHECORE_EVENT_H__
 #define __INC_LIBTHECORE_EVENT_H__
 
+#include "../../common/service.h"
 #include <intrusive_ptr.h>
 
 #ifdef M2_USE_POOL
@@ -44,9 +45,14 @@ struct TQueueElement;
 
 struct event
 {
-	event() : func(nullptr), info(nullptr), q_el(nullptr), ref_count(0) {}
-	~event() {
-		if (info != nullptr) {
+	event() : 
+		func(nullptr), info(nullptr), q_el(nullptr), ref_count(0), is_force_to_end(0), is_processing(0)
+	{
+	}
+	~event() 
+	{
+		if (info != nullptr) 
+		{
 #ifdef M2_USE_POOL
 			delete info;
 #else
@@ -67,7 +73,8 @@ extern void intrusive_ptr_add_ref(EVENT* p);
 extern void intrusive_ptr_release(EVENT* p);
 
 template<class T> // T should be a subclass of event_info_data
-T* AllocEventInfo() {
+T* AllocEventInfo() 
+{
 #ifdef M2_USE_POOL
 	return new T;
 #else
@@ -85,9 +92,5 @@ extern void		event_cancel(LPEVENT * event);			// 이벤트 취소
 extern int32_t		event_processing_time(LPEVENT event);	// 수행 시간 리턴
 extern int32_t		event_time(LPEVENT event);			// 남은 시간 리턴
 extern void		event_reset_time(LPEVENT event, int32_t when);	// 실행 시간 재 설정
-extern void		event_set_verbose(int32_t level);
-
-extern event_info_data* FindEventInfo(uint32_t dwID);
-extern event_info_data*	event_info(LPEVENT event);
 
 #endif

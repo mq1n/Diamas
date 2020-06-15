@@ -97,7 +97,7 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 			RENDER_MODE_NORMAL,
 			RENDER_MODE_BLEND,
 			RENDER_MODE_ADD,
-			RENDER_MODE_MODULATE,
+			RENDER_MODE_MODULATE
 		};
 
 		/////////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		{
 			MOTION_TYPE_NONE,
 			MOTION_TYPE_ONCE,
-			MOTION_TYPE_LOOP,
+			MOTION_TYPE_LOOP
 		};
 
 		typedef struct SReservingMotionNode
@@ -196,7 +196,7 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		{
 			EFFECT_LIFE_NORMAL,
 			EFFECT_LIFE_INFINITE,
-			EFFECT_LIFE_WITH_MOTION,
+			EFFECT_LIFE_WITH_MOTION
 		};
 
 		struct TAttachingEffect
@@ -612,6 +612,13 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		float __GetOwnerTime();
 		uint32_t __GetOwnerVID();
 		bool __CanPushDestActor(CActorInstance& rkActorDst);
+
+	public:
+		bool CanPush() const { return m_bPushFlag; };
+		void SetPushFlag(bool bNewFlag) { m_bPushFlag = bNewFlag; };
+
+	private:
+		bool m_bPushFlag;
 
 	protected:
 		void __RunNextCombo();

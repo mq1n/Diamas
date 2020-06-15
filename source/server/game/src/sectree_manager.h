@@ -2,16 +2,32 @@
 #define __INC_METIN_II_GAME_SECTREE_MANAGER_H__
 
 #include "sectree.h"
+#include "vid.h"
+#include "../../common/length.h"
 
+// Generic finder for all players in a given sectree
+struct FCharacterFinder
+{
+	std::vector<CHARACTER *>* playerList;
+	FCharacterFinder(std::vector<CHARACTER *> &list)
+	{
+		playerList = &list;
+	}
 
+	void operator()(LPENTITY ent)
+	{
+		if (ent && ent->IsType(ENTITY_CHARACTER))
+			playerList->push_back((CHARACTER *)ent);
+	}
+};
 typedef struct SMapRegion
 {
 	int32_t			index;
 	int32_t			sx, sy, ex, ey;
-	PIXEL_POSITION	posSpawn;
+	GPOS	posSpawn;
 
 	bool		bEmpireSpawnDifferent;
-	PIXEL_POSITION	posEmpire[3];
+	GPOS	posEmpire[3];
 
 	std::string		strMapName;
 } TMapRegion;
@@ -19,9 +35,10 @@ typedef struct SMapRegion
 struct TAreaInfo
 {
 	int32_t sx, sy, ex, ey, dir;
-	TAreaInfo(int32_t sx, int32_t sy, int32_t ex, int32_t ey, int32_t dir)
-		: sx(sx), sy(sy), ex(ex), ey(ey), dir(dir)
-		{}
+	TAreaInfo(int32_t sx, int32_t sy, int32_t ex, int32_t ey, int32_t dir) :
+		sx(sx), sy(sy), ex(ex), ey(ey), dir(dir)
+	{
+	}
 };
 
 struct npc_info
@@ -29,9 +46,10 @@ struct npc_info
 	uint8_t bType;
 	const char* name;
 	int32_t x, y;
-	npc_info(uint8_t bType, const char* name, int32_t x, int32_t y)
-		: bType(bType), name(name), x(x), y(y)
-		{}
+	npc_info(uint8_t bType, const char* name, int32_t x, int32_t y) :
+		bType(bType), name(name), x(x), y(y)
+	{
+	}
 };
 
 typedef std::map<std::string, TAreaInfo> TAreaMap;
@@ -45,7 +63,7 @@ typedef struct SSetting
 	int32_t			iWidth;
 	int32_t			iHeight;
 
-	PIXEL_POSITION	posSpawn;
+	GPOS	posSpawn;
 } TMapSetting;
 
 class SECTREE_MAP
@@ -58,7 +76,7 @@ class SECTREE_MAP
 		virtual ~SECTREE_MAP();
 
 		bool Add(uint32_t key, LPSECTREE sectree) {
-			return map_.insert(MapType::value_type(key, sectree)).second;
+			return map_.insert({ key, sectree }).second;
 		}
 
 		LPSECTREE	Find(uint32_t dwPackage);
@@ -71,29 +89,36 @@ class SECTREE_MAP
 		void for_each( Func & rfunc )
 		{
 			// <Factor> Using snapshot copy to avoid side-effects
+			// TODO(noff): Attempt to remove this soon!
 			FCollectEntity collector;
-			std::map<uint32_t, LPSECTREE>::iterator it = map_.begin();
-			for ( ; it != map_.end(); ++it)
+			for (auto it = map_.begin(); it != map_.end(); ++it)
 			{
 				LPSECTREE sectree = it->second;
-				sectree->for_each_entity(collector);
+				sectree->ForEachEntity(collector);
 			}
 			collector.ForEach(rfunc);
-			/*
-			std::map<uint32_t,LPSECTREE>::iterator i = map_.begin();
-			for (; i != map_.end(); ++i )
-			{
-				LPSECTREE pSec = i->second;
-				pSec->for_each_entity( rfunc );
-			}
-			*/
 		}
 
-		void DumpAllToSysErr() {
-			SECTREE_MAP::MapType::iterator i;
-			for (i = map_.begin(); i != map_.end(); ++i)
+		template< typename Func >
+		void ForEachOfType(Func & rfunc, int32_t type)
+		{
+			// <Factor> Using snapshot copy to avoid side-effects
+			// TODO(noff): Attempt to remove this soon!
+			FCollectEntity collector;
+			for (auto it = map_.begin(); it != map_.end(); ++it)
 			{
-				sys_err("SECTREE %x(%u, %u)", i->first, i->first & 0xffff, i->first >> 16);
+				LPSECTREE sectree = it->second;
+				sectree->ForEachEntityOfType(collector, type);
+			}
+
+			collector.ForEach(rfunc);
+		}
+
+		void DumpAllToSysErr()
+		{
+			for (auto it = map_.begin(); it != map_.end(); ++it)
+			{
+				sys_err("SECTREE %x(%u, %u)", it->first, it->first & 0xffff, it->first >> 16);
 			}
 		}
 
@@ -134,21 +159,21 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		LPSECTREE_MAP BuildSectreeFromSetting(TMapSetting & r_setting);
 		bool		LoadAttribute(LPSECTREE_MAP pkMapSectree, const char * c_pszFileName, TMapSetting & r_setting);
 		void		LoadDungeon(int32_t iIndex, const char * c_pszFileName);
-		bool		GetValidLocation(int32_t lMapIndex, int32_t x, int32_t y, int32_t & r_lValidMapIndex, PIXEL_POSITION & r_pos, uint8_t empire = 0);
-		bool		GetSpawnPosition(int32_t x, int32_t y, PIXEL_POSITION & r_pos);
-		bool		GetSpawnPositionByMapIndex(int32_t lMapIndex, PIXEL_POSITION & r_pos);
-		bool		GetRecallPositionByEmpire(int32_t iMapIndex, uint8_t bEmpire, PIXEL_POSITION & r_pos);
+		bool		GetValidLocation(int32_t lMapIndex, int32_t x, int32_t y, int32_t & r_lValidMapIndex, GPOS & r_pos, uint8_t empire = 0);
+		bool		GetSpawnPosition(int32_t x, int32_t y, GPOS & r_pos);
+		bool		GetSpawnPositionByMapIndex(int32_t lMapIndex, GPOS & r_pos);
+		bool		GetRecallPositionByEmpire(int32_t iMapIndex, uint8_t bEmpire, GPOS & r_pos);
 
 		const TMapRegion *	GetMapRegion(int32_t lMapIndex);
 		int32_t			GetMapIndex(int32_t x, int32_t y);
 		const TMapRegion *	FindRegionByPartialName(const char* szMapName);
 
-		bool		GetMapBasePosition(int32_t x, int32_t y, PIXEL_POSITION & r_pos);
-		bool		GetMapBasePositionByMapIndex(int32_t lMapIndex, PIXEL_POSITION & r_pos);
-		bool		GetMovablePosition(int32_t lMapIndex, int32_t x, int32_t y, PIXEL_POSITION & pos);
+		bool		GetMapBasePosition(int32_t x, int32_t y, GPOS & r_pos);
+		bool		GetMapBasePositionByMapIndex(int32_t lMapIndex, GPOS & r_pos);
+		bool		GetMovablePosition(int32_t lMapIndex, int32_t x, int32_t y, GPOS & pos);
 		bool		IsMovablePosition(int32_t lMapIndex, int32_t x, int32_t y);
-		bool		GetCenterPositionOfMap(int32_t lMapIndex, PIXEL_POSITION & r_pos);
-		bool        GetRandomLocation(int32_t lMapIndex, PIXEL_POSITION & r_pos, uint32_t dwCurrentX = 0, uint32_t dwCurrentY = 0, int32_t iMaxDistance = 0);
+		bool		GetCenterPositionOfMap(int32_t lMapIndex, GPOS & r_pos);
+		bool        GetRandomLocation(int32_t lMapIndex, GPOS & r_pos, uint32_t dwCurrentX = 0, uint32_t dwCurrentY = 0, int32_t iMaxDistance = 0);
 
 		int32_t		CreatePrivateMap(int32_t lMapIndex);	// returns new private map index, returns 0 when fail
 		void		DestroyPrivateMap(int32_t lMapIndex);
@@ -163,7 +188,8 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		void		PurgeStonesInMap(int32_t lMapIndex);
 		void		PurgeNPCsInMap(int32_t lMapIndex);
 		size_t		GetMonsterCountInMap(int32_t lMapIndex);
-		size_t		GetMonsterCountInMap(int32_t lMpaIndex, uint32_t dwVnum);
+		size_t		GetMonsterCountInMap(int32_t lMapIndex, uint32_t dwVnum);
+		std::string GetMapNameByIndex(int32_t mapIndex);
 
 		/// 영역에 대해 Sectree 의 Attribute 에 대해 특정한 처리를 수행한다.
 		/**
@@ -177,6 +203,7 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		 * @param [in]	mode Attribute 에 대해 처리할 type
 		 */
 		bool		ForAttrRegion(int32_t lMapIndex, int32_t lStartX, int32_t lStartY, int32_t lEndX, int32_t lEndY, int32_t lRotate, uint32_t dwAttr, EAttrRegionMode mode);
+		bool		ForAttrRegion(int32_t mapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, float xRot, float yRot, float zRot, uint32_t attr, EAttrRegionMode mode);
 
 		bool		SaveAttributeToImage(int32_t lMapIndex, const char * c_pszFileName, LPSECTREE_MAP pMapSrc = nullptr);
 
@@ -224,8 +251,10 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		std::vector<TMapRegion>		m_vec_mapRegion;
 		std::map<uint32_t, std::vector<npc_info> > m_mapNPCPosition;
 
+		using IndexToNameMap = std::unordered_map < uint32_t, std::string >;
+		IndexToNameMap m_mapIndexToName;
 		// <Factor> Circular private map indexing
-		typedef std::unordered_map<int32_t, int32_t> PrivateIndexMapType;
+		using PrivateIndexMapType = std::unordered_map<int32_t, int32_t>;
 		PrivateIndexMapType next_private_index_map_;
 };
 

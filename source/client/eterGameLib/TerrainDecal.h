@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "../eterlib/Decal.h"
+#include "../eterLib/Decal.h"
 
 class CMapOutdoor;
 
@@ -18,7 +18,7 @@ class CTerrainDecal : public CDecal
 public:
 	enum
 	{
-		MAX_SEARCH_VERTICES = 1024,
+		MAX_SEARCH_VERTICES = 1024
 	};
 
 	CTerrainDecal(CMapOutdoor * pMapOutdoor = nullptr);

@@ -160,13 +160,9 @@ void CInstanceBase::StartWalking()
 	if (!IsInvisibility() || __IsMainInstance())
 	{
 		if (IsAffect(AFFECT_GYEONGGONG))
-		{
 			m_adwCRCAffectEffect[AFFECT_GYEONGGONG] = __EffectContainer_AttachEffect(EFFECT_AFFECT_GYEONGGONG);
-		}
 		else if (IsAffect(AFFECT_KWAESOK))
-		{
 			m_adwCRCAffectEffect[AFFECT_KWAESOK] = __EffectContainer_AttachEffect(EFFECT_AFFECT_KWAESOK);
-		}
 	}
 }
 

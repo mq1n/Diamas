@@ -241,9 +241,7 @@ CEaseOutInterpolation::CEaseOutInterpolation()
 	Initialize();
 }
 
-CEaseOutInterpolation::~CEaseOutInterpolation()
-{
-}
+CEaseOutInterpolation::~CEaseOutInterpolation() = default;
 
 void CEaseOutInterpolation::Initialize()
 {
@@ -260,9 +258,7 @@ BOOL CEaseOutInterpolation::Setup(float fStart, float fEnd, float fTime)
 {
 	//for safety 
 	if( fabs(fTime) < FLT_EPSILON )
-	{
 		fTime = 0.01f;
-	}
 
 	m_fValue = fStart;
 	m_fStartValue = fStart;

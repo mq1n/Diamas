@@ -7,8 +7,8 @@
 #include <d3dx9.h>
 
 #include "../eterBase/Timer.h"
-#include "../eterlib/StateManager.h"
-#include "../eterlib/Camera.h"
+#include "../eterLib/StateManager.h"
+#include "../eterLib/Camera.h"
 
 #include "SpeedTreeForestDirectX9.h"
 #include "SpeedTreeConfig.h"

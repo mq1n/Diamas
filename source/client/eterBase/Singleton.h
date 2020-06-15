@@ -1,6 +1,4 @@
-#ifndef __INC_ETERLIB_SINGLETON_H__
-#define __INC_ETERLIB_SINGLETON_H__
-
+#pragma once
 #include <Windows.h>
 #include <cassert>
 #include <typeinfo>
@@ -46,6 +44,5 @@ public:
 
 };
 
-template <typename T> T* CSingleton<T>::ms_singleton = nullptr;
-
-#endif
+template <typename T>
+T* CSingleton<T>::ms_singleton = nullptr;

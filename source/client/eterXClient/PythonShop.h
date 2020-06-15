@@ -14,14 +14,14 @@
 typedef enum
 {
 	SHOP_COIN_TYPE_GOLD, // DEFAULT VALUE
-	SHOP_COIN_TYPE_SECONDARY_COIN,
+	SHOP_COIN_TYPE_SECONDARY_COIN
 } EShopCoinType;
 
 class CPythonShop : public CSingleton<CPythonShop>
 {
 	public:
-		CPythonShop(void);
-		virtual ~CPythonShop(void);
+		CPythonShop();
+		virtual ~CPythonShop();
 
 		void Clear();
 		

@@ -8,13 +8,9 @@ std::vector<TProvider>	CSoundBase::ms_ProviderVector;
 bool					CSoundBase::ms_bInitialized = false;
 int32_t						CSoundBase::ms_iRefCount = 0;
 
-CSoundBase::CSoundBase()
-{
-}
+CSoundBase::CSoundBase() = default;
 
-CSoundBase::~CSoundBase()
-{
-}
+CSoundBase::~CSoundBase() = default;
 
 void CSoundBase::Destroy()
 {
@@ -63,8 +59,8 @@ uint32_t CSoundBase::GetFileCRC(const char * filename)
 
 CSoundData * CSoundBase::AddFile(uint32_t dwFileCRC, const char* filename)
 {
-	CSoundData * pSoundData = new CSoundData;
+	auto * pSoundData = new CSoundData;
 	pSoundData->Assign(filename);
-	ms_dataMap.insert(TSoundDataMap::value_type(dwFileCRC, pSoundData));
+	ms_dataMap.emplace(dwFileCRC, pSoundData);
 	return pSoundData;
 }

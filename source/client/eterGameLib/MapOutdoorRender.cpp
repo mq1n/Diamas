@@ -4,8 +4,8 @@
 #include "AreaTerrain.h"
 #include "TerrainQuadtree.h"
 
-#include "../eterlib/Camera.h"
-#include "../eterlib/StateManager.h"
+#include "../eterLib/Camera.h"
+#include "../eterLib/StateManager.h"
 
 
 #define MAX_RENDER_SPALT 150
@@ -95,17 +95,15 @@ int32_t	CMapOutdoor::__RenderTerrain_RecurseRenderQuadTree_CheckBoundingCircle(c
 	D3DXVECTOR3 center = c_v3Center;
 	center.y = -center.y;
 
-	int32_t i;
-
 	float distance[count];
-	for(i = 0; i < count; ++i)
+	for (int32_t i = 0; i < count; ++i)
 	{
 		distance[i] = D3DXPlaneDotCoord(&m_plane[i], &center);
 		if (distance[i] <= -c_fRadius) 
 			return VIEW_NONE;
 	}
 
-	for(i = 0; i < count;++i)
+	for (int32_t i = 0; i < count; ++i)
 	{
 		if (distance[i] <= c_fRadius) 
 			return VIEW_PART;
@@ -121,7 +119,7 @@ void CMapOutdoor::__RenderTerrain_AppendPatch(const D3DXVECTOR3& c_rv3Center, fl
 		return;
 
 	m_pTerrainPatchProxyList[lPatchNum].SetCenterPosition(c_rv3Center);
-	m_PatchVector.push_back(std::make_pair(fDistance, lPatchNum));
+	m_PatchVector.emplace_back(fDistance, lPatchNum);
 }
 
 void CMapOutdoor::ApplyLight(uint32_t dwVersion, const D3DLIGHT9& c_rkLight)
@@ -315,7 +313,7 @@ struct FRenderPCBlocker
 	void operator () (CGraphicObjectInstance * pInstance)
 	{
 		pInstance->Show();
-		CGraphicThingInstance* pThingInstance = dynamic_cast <CGraphicThingInstance*> (pInstance);
+		auto * pThingInstance = dynamic_cast<CGraphicThingInstance *>(pInstance); // the only dynamic cast required!
 		if (pThingInstance != nullptr)
 		{
 			if (pThingInstance->HaveBlendThing())
@@ -339,9 +337,7 @@ void CMapOutdoor::RenderEffect()
 	{
 		CArea * pArea;
 		if (GetAreaPointer(i, &pArea))
-		{
 			pArea->RenderEffect();
-		}
 	}
 }
 
@@ -388,9 +384,7 @@ void CMapOutdoor::RenderArea(bool bRenderAmbience)
 	{
 		CArea * pArea;
 		if (GetAreaPointer(j, &pArea))
-		{
 			pArea->RenderDungeon();
-		}
 	}
 
 	bool bRenderShadow = true;
@@ -459,20 +453,20 @@ void CMapOutdoor::RenderArea(bool bRenderAmbience)
 
 				CArea::TCRCWithNumberVector & rCRCWithNumberVector = pArea->DEBUG_GetRenderedCRCWithNumVector();
 
-				CArea::TCRCWithNumberVector::iterator aIterator = rCRCWithNumberVector.begin();
+				auto aIterator = rCRCWithNumberVector.begin();
 				while (aIterator != rCRCWithNumberVector.end())
 				{
 					uint32_t dwCRC = (*aIterator++).dwCRC;
 
-					CArea::TCRCWithNumberVector::iterator aCRCWithNumberVectorIterator = 
-						std::find_if(m_dwRenderedCRCWithNumberVector.begin(), m_dwRenderedCRCWithNumberVector.end(), CArea::FFindIfCRC(dwCRC));
+					auto aCRCWithNumberVectorIterator = std::find_if(m_dwRenderedCRCWithNumberVector.begin(),
+																	 m_dwRenderedCRCWithNumberVector.end(), CArea::FFindIfCRC(dwCRC));
 
 					if ( m_dwRenderedCRCWithNumberVector.end() == aCRCWithNumberVectorIterator)
 					{
 						CArea::TCRCWithNumber aCRCWithNumber;
 						aCRCWithNumber.dwCRC = dwCRC;
 						aCRCWithNumber.dwNumber = 1;
-						m_dwRenderedCRCWithNumberVector.push_back(aCRCWithNumber);
+						m_dwRenderedCRCWithNumberVector.emplace_back(aCRCWithNumber);
 					}
 					else
 					{
@@ -536,12 +530,10 @@ void CMapOutdoor::RenderBlendArea()
 	{
 		CArea * pArea;
 		if (GetAreaPointer(i, &pArea))
-		{
 			pArea->CollectBlendRenderingObject(s_kVct_pkBlendThingInstSort);
-		}
 	}
 
-	if (s_kVct_pkBlendThingInstSort.size() != 0)
+	if (!s_kVct_pkBlendThingInstSort.empty())
 	{
 
 		
@@ -613,7 +605,7 @@ void CMapOutdoor::RenderPCBlocker()
 {
 #ifndef WORLD_EDITOR
 	// PCBlocker
-	if (m_PCBlockerVector.size() != 0)
+	if (!m_PCBlockerVector.empty())
 	{
 		STATEMANAGER.SetTexture(0, nullptr);
 		STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1,	D3DTA_TEXTURE);
@@ -725,7 +717,7 @@ void CMapOutdoor::SetPatchDrawVector()
 		aPatchDrawStruct.lPatchNum				= lPatchNum;
 		aPatchDrawStruct.pTerrainPatchProxy		= pTerrainPatchProxy;
 
-		m_PatchDrawStructVector.push_back(aPatchDrawStruct);
+		m_PatchDrawStructVector.emplace_back(aPatchDrawStruct);
 
 		++aDistancePatchVectorIterator;
 	}
@@ -735,12 +727,12 @@ void CMapOutdoor::SetPatchDrawVector()
 
 float CMapOutdoor::__GetNoFogDistance()
 {
-	return (float)(CTerrainImpl::CELLSCALE * m_lViewRadius) * 0.5f;
+	return static_cast<float>(CTerrainImpl::CELLSCALE * m_lViewRadius) * 0.5f;
 }
 
 float CMapOutdoor::__GetFogDistance()
 {
-	return (float)(CTerrainImpl::CELLSCALE * m_lViewRadius) * 0.75f;
+	return static_cast<float>(CTerrainImpl::CELLSCALE * m_lViewRadius) * 0.75f;
 }
 
 struct FPatchNumMatch
@@ -840,7 +832,7 @@ void CMapOutdoor::RenderMarkedArea()
 	STATEMANAGER.SaveRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 	static int32_t lStartTime = timeGetTime();
-	float fTime = float((timeGetTime() - lStartTime)%3000) / 3000.0f;
+	float fTime = static_cast<float>((timeGetTime() - lStartTime) % 3000) / 3000.0f;
 	float fAlpha = fabs(fTime - 0.5f) / 2.0f + 0.1f;
 	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, D3DXCOLOR(1.0f, 1.0f, 1.0f, fAlpha));
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -939,8 +931,8 @@ void CMapOutdoor::DrawPatchAttr(int32_t patchnum)
 	uint16_t wCoordX, wCoordY;
 	pTerrain->GetCoordinate(&wCoordX, &wCoordY);
 
-	m_matWorldForCommonUse._41 = -(float) (wCoordX * CTerrainImpl::XSIZE * CTerrainImpl::CELLSCALE);
-	m_matWorldForCommonUse._42 = (float) (wCoordY * CTerrainImpl::YSIZE * CTerrainImpl::CELLSCALE);
+	m_matWorldForCommonUse._41 = -static_cast<float>(wCoordX * CTerrainImpl::XSIZE * CTerrainImpl::CELLSCALE);
+	m_matWorldForCommonUse._42 = static_cast<float>(wCoordY * CTerrainImpl::YSIZE * CTerrainImpl::CELLSCALE);
 
 	D3DXMATRIX matTexTransform;
 	D3DXMatrixMultiply(&matTexTransform, &m_matViewInverse, &m_matWorldForCommonUse);

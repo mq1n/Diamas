@@ -1,8 +1,8 @@
 #ifndef __TERRAIn_TYPES__
 #define __TERRAIn_TYPES__
 
-#include "../eterlib/GrpVertexBuffer.h"
-#include "../eterlib/GrpIndexBuffer.h"
+#include "../eterLib/GrpVertexBuffer.h"
+#include "../eterLib/GrpIndexBuffer.h"
 
 #define TERRAIN_PATCHSIZE	16
 #define TERRAIN_SIZE		128

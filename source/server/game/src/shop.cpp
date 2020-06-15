@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "../../libgame/include/grid.h"
 #include "constants.h"
 #include "utils.h"
 #include "config.h"
@@ -14,13 +13,17 @@
 #include "packet.h"
 #include "log.h"
 #include "db.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "mob_manager.h"
 #include "locale_service.h"
+#include "gm.h"
+#include "desc_client.h"
 
+#include "../../libgame/include/grid.h"
+#include "../../common/service.h"
 /* ------------------------------------------------------------------------------------ */
-CShop::CShop()
-	: m_dwVnum(0), m_dwNPCVnum(0), m_pkPC(nullptr)
+CShop::CShop() :
+	m_dwVnum(0), m_dwNPCVnum(0), m_pkPC(nullptr)
 {
 	m_pGrid = M2_NEW CGrid(5, 9);
 }
@@ -194,6 +197,13 @@ int32_t CShop::Buy(LPCHARACTER ch, uint8_t pos)
 		return SHOP_SUBHEADER_GC_INVALID_POS;
 	}
 
+	if (IsPCShop() && !GM::check_allow(ch->GetGMLevel(), GM_ALLOW_BUY_PRIVATE_ITEM))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot do this with this gamemaster rank."));
+		sys_log(0, "Shop::Buy : cannot buy as gamemaster player %u %s", ch->GetPlayerID(), ch->GetName());
+		return SHOP_SUBHEADER_GC_NOT_ENOUGH_MONEY;
+	}
+
 	sys_log(0, "Shop::Buy : name %s pos %d", ch->GetName(), pos);
 
 	GuestMapType::iterator it = m_map_guest.find(ch);
@@ -252,20 +262,6 @@ int32_t CShop::Buy(LPCHARACTER ch, uint8_t pos)
 
 	if (!item)
 		return SHOP_SUBHEADER_GC_SOLD_OUT;
-
-#ifdef ENABLE_SHOP_BLACKLIST
-	if (!m_pkPC)
-	{
-		if (quest::CQuestManager::instance().GetEventFlag("hivalue_item_sell") == 0)
-		{
-			//축복의 구슬 && 만년한철 이벤트 
-			if (item->GetVnum() == 70024 || item->GetVnum() == 70035)
-			{
-				return SHOP_SUBHEADER_GC_END;
-			}
-		}
-	}
-#endif
 
 	int32_t iEmptyPos;
 	if (item->IsDragonSoul())
@@ -368,7 +364,7 @@ int32_t CShop::Buy(LPCHARACTER ch, uint8_t pos)
 			LogManager::instance().GoldBarLog(ch->GetPlayerID(), item->GetID(), PERSONAL_SHOP_BUY, "");
 		}
 
-		DBManager::instance().SendMoneyLog(MONEY_LOG_SHOP, item->GetVnum(), -dwPrice);
+		LogManager::instance().MoneyLog(MONEY_LOG_SHOP, item->GetVnum(), -dwPrice);
 	}
 
 	if (item)
@@ -408,35 +404,17 @@ bool CShop::AddGuest(LPCHARACTER ch, uint32_t owner_vid, bool bOtherEmpire)
 	{
 		const SHOP_ITEM & item = m_itemVector[i];
 
-#ifdef ENABLE_SHOP_BLACKLIST
-		//HIVALUE_ITEM_EVENT
-		if (quest::CQuestManager::instance().GetEventFlag("hivalue_item_sell") == 0)
-		{
-			
-			if (item.vnum == 70024 || item.vnum == 70035)
-			{
-				continue;
-			}
-		}
-#endif
+
 		//END_HIVALUE_ITEM_EVENT
 		if (m_pkPC && !item.pkItem)
 			continue;
 
 		pack2.items[i].vnum = item.vnum;
 
-		// REMOVED_EMPIRE_PRICE_LIFT
-#ifdef ENABLE_NEWSTUFF
-		if (bOtherEmpire && !g_bEmpireShopPriceTripleDisable) // no empire price penalty for pc shop
-#else
-		if (bOtherEmpire) // no empire price penalty for pc shop
-#endif
-		{
-			pack2.items[i].price = item.price * 3;
-		}
-		else
-			pack2.items[i].price = item.price;
-		// END_REMOVED_EMPIRE_PRICE_LIFT
+			if (bOtherEmpire) // no empire price penalty for pc shop
+				pack2.items[i].price = item.price * 3;
+			else
+				pack2.items[i].price = item.price;
 
 		pack2.items[i].count = item.count;
 
@@ -483,7 +461,7 @@ void CShop::Broadcast(const void * data, int32_t bytes)
 	{
 		LPCHARACTER ch = it->first;
 
-		if (ch->GetDesc())
+		if (ch && ch->GetDesc())
 			ch->GetDesc()->Packet(data, bytes);
 
 		++it;
@@ -494,8 +472,6 @@ void CShop::BroadcastUpdateItem(uint8_t pos)
 {
 	TPacketGCShop pack;
 	TPacketGCShopUpdateItem pack2;
-
-	TEMP_BUFFER	buf;
 
 	pack.header		= HEADER_GC_SHOP;
 	pack.subheader	= SHOP_SUBHEADER_GC_UPDATE_ITEM;
@@ -523,6 +499,7 @@ void CShop::BroadcastUpdateItem(uint8_t pos)
 	pack2.item.price	= m_itemVector[pos].price;
 	pack2.item.count	= m_itemVector[pos].count;
 
+	TEMP_BUFFER	buf;
 	buf.write(&pack, sizeof(pack));
 	buf.write(&pack2, sizeof(pack2));
 

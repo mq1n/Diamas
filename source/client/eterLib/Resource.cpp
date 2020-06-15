@@ -15,9 +15,7 @@ CResource::CResource(const FileSystem::CFileName& filename)
 	// ctor
 }
 
-CResource::~CResource()
-{
-}
+CResource::~CResource() = default;
 
 void CResource::SetDeleteImmediately(bool isSet)
 {
@@ -45,8 +43,6 @@ void CResource::Load()
 	CFile file;
 	if (FileSystemManager::Instance().OpenFile(m_stFileName, file))
 	{
-		//m_dwLoadCostMiliiSecond = ELTimer_GetMSec() - dwStart;
-		//Tracef("CResource::Load %s (%d bytes) in %d ms\n", c_szFileName, file.Size(), m_dwLoadCostMiliiSecond);
 		if (OnLoad(file.GetSize(), file.GetData()))
 		{
 			me_state = STATE_EXIST;
@@ -74,6 +70,7 @@ void CResource::Load()
 void CResource::Reload()
 {
 	Clear();
+
 	const auto& stRefResourceName = GetFileNameString();
 	Tracef("CResource::Reload %s\n", stRefResourceName.c_str());
 
@@ -95,9 +92,7 @@ void CResource::Reload()
 		if (OnLoad(0, nullptr))
 			me_state = STATE_EXIST;
 		else
-		{
 			me_state = STATE_ERROR;
-		}
 	}
 }
 
@@ -108,8 +103,6 @@ CResource::TType CResource::StringToType(const char* c_szType)
 
 void CResource::SetFileName(const FileSystem::CFileName& filename)
 {
-	// 2004. 2. 1. myevan. 쓰레드가 사용되는 상황에서 static 변수는 사용하지 않는것이 좋다.
-	// 2004. 2. 1. myevan. 파일 이름 처리를 std::string 사용
 	m_stFileName = filename;
 }
 

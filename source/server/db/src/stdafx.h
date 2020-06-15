@@ -3,11 +3,12 @@
 
 #include "../../libthecore/include/stdafx.h"
 
-#ifndef __WIN32__
+#ifndef _WIN32
 #include <semaphore.h>
 #else
 #define isdigit iswdigit
 #define isspace iswspace
+#define isalpha iswalpha
 #endif
 
 #include "../../common/service.h"

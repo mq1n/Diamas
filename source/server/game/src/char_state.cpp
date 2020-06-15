@@ -10,7 +10,7 @@
 #include "party.h"
 #include "affect.h"
 #include "buffer_manager.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "p2p.h"
 #include "item_manager.h"
 #include "mob_manager.h"
@@ -20,11 +20,13 @@
 #include "guild_manager.h"
 #include "war_map.h"
 #include "locale_service.h"
-#include "BlueDragon.h"
+#include "blue_dragon.h"
+#include "Battleground.h"
 
 #include "../../common/VnumHelper.h"
 
-extern LPCHARACTER FindVictim(LPCHARACTER pkChr, int32_t iMaxDistance);
+extern LPCHARACTER FindMobVictim(LPCHARACTER pkChr, int32_t iMaxDistance);
+extern LPCHARACTER FindBattlegroundMobVictim(LPCHARACTER pkChr);
 
 namespace
 {
@@ -230,6 +232,58 @@ namespace
 			LPCHARACTER	m_pkChrVictim;
 	};
 
+	class FuncFindPlayerVictim
+	{
+	public:
+		FuncFindPlayerVictim(int32_t lBaseX, int32_t lBaseY, int32_t iMaxDistance) :
+			m_iMinDistance(INT_MAX),
+			m_iMaxDistance(iMaxDistance),
+			m_lx(lBaseX),
+			m_ly(lBaseY),
+			m_pkChrVictim(nullptr)
+		{
+		};
+
+		void operator () (LPENTITY ent)
+		{
+			if (!ent->IsType(ENTITY_CHARACTER))
+				return;
+
+			LPCHARACTER pkChr = (LPCHARACTER)ent;
+
+			if (!pkChr->IsPC())
+				return;
+
+			if (pkChr->IsDead())
+				return;
+
+			if (pkChr->IsAffectFlag(AFF_EUNHYUNG) ||
+				pkChr->IsAffectFlag(AFF_INVISIBILITY) ||
+				pkChr->IsAffectFlag(AFF_REVIVE_INVISIBLE))
+				return;
+
+			int32_t iDistance = DISTANCE_APPROX(m_lx - pkChr->GetX(), m_ly - pkChr->GetY());
+
+			if (iDistance < m_iMinDistance && iDistance <= m_iMaxDistance)
+			{
+				m_pkChrVictim = pkChr;
+				m_iMinDistance = iDistance;
+			}
+		}
+
+		LPCHARACTER GetVictim()
+		{
+			return (m_pkChrVictim);
+		}
+
+	private:
+		int32_t		m_iMinDistance;
+		int32_t		m_iMaxDistance;
+		int32_t	m_lx;
+		int32_t	m_ly;
+
+		LPCHARACTER	m_pkChrVictim;
+	};
 }
 
 bool CHARACTER::IsAggressive() const
@@ -354,6 +408,31 @@ void CHARACTER::SetAttackMob()
 bool CHARACTER::IsAttackMob() const
 {
 	return IS_SET(m_pointsInstant.dwAIFlag, AIFLAG_ATTACKMOB);
+}
+
+void CHARACTER::SetNoMove()
+{
+	SET_BIT(m_pointsInstant.dwAIFlag, AIFLAG_NOMOVE);
+}
+
+bool CHARACTER::CanNPCFollowTarget(LPCHARACTER pkTarget)
+{
+	if (!IsNPC() && !IsMonster())
+		return true;
+
+	if (IS_SET(GetAIFlag(), AIFLAG_NOMOVE))
+	{
+		if (GetBattleground())
+			return false;
+
+		if (!IS_SET(GetAIFlag(), AIFLAG_AGGRESSIVE))
+			return false;
+
+		if (DISTANCE_APPROX(pkTarget->GetX() - m_posExit.x, pkTarget->GetY() - m_posExit.y) > GetMobTable().wAggressiveSight)
+			return false;
+	}
+
+	return true;
 }
 
 // STATE_IDLE_REFACTORING
@@ -575,6 +654,24 @@ void CHARACTER::__StateIdle_NPC()
 
 		if (!IS_SET(m_pointsInstant.dwAIFlag, AIFLAG_NOMOVE))
 		{
+			if (IS_SET(m_pointsInstant.dwAIFlag, AIFLAG_AGGRESSIVE) && IS_SET(m_pointsInstant.dwAIFlag, AIFLAG_ATTACKMOB))
+			{
+				FuncFindGuardVictim f(this, 50000);
+
+				if (GetSectree())
+					GetSectree()->ForEachAround(f);
+
+				LPCHARACTER victim = f.GetVictim();
+
+				if (victim)
+				{
+					m_dwStateDuration = passes_per_sec / 2;
+
+					if (CanBeginFight())
+						BeginFight(victim);
+				}
+			}
+
 			//
 			// 이 곳 저 곳 이동한다.
 			// 
@@ -609,6 +706,23 @@ void CHARACTER::__StateIdle_NPC()
 					SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
 
 				return;
+			}
+		}
+		else if (IS_SET(GetAIFlag(), AIFLAG_AGGRESSIVE))
+		{
+			FuncFindPlayerVictim f(m_posExit.x, m_posExit.y, GetMobTable().wAggressiveSight);
+
+			if (GetSectree())
+				GetSectree()->ForEachAround(f);
+
+			LPCHARACTER victim = f.GetVictim();
+
+			if (victim)
+			{
+				m_dwStateDuration = passes_per_sec / 2;
+
+				if (CanBeginFight())
+					BeginFight(victim);
 			}
 		}
 	}
@@ -655,13 +769,28 @@ void CHARACTER::__StateIdle_Monster()
 		{
 			victim = m_pkChrStone->GetNearestVictim(m_pkChrStone);
 		}
+		else if (GetBattleground())
+		{
+			switch (GetRaceNum())
+			{
+				case MINNION_SOLDIER:
+				case MINNION_ARCHER:
+				case MINNION_COMMANDER:
+				{
+					victim = FindBattlegroundMobVictim(this);
+				} break;
+				
+				default:
+					break;
+			}			
+		}
 		// 선공 몬스터 처리
 		else if (!no_wander && IsAggressive())
 		{
 			if (GetMapIndex() == 61 && quest::CQuestManager::instance().GetEventFlag("xmas_tree"));
 			// 서한산에서 나무가 있으면 선공하지않는다.
 			else
-				victim = FindVictim(this, m_pkMobData->m_table.wAggressiveSight);
+				victim = FindMobVictim(this, m_pkMobData->m_table.wAggressiveSight);
 		}
 	}
 
@@ -713,7 +842,7 @@ void CHARACTER::__StateIdle_Monster()
 
 			// NOTE: 몬스터가 IDLE 상태에서 주변을 서성거릴 때, 현재 무조건 뛰어가게 되어 있음. (절대로 걷지 않음)
 			// 그래픽 팀에서 몬스터가 걷는 모습도 보고싶다고 해서 임시로 특정확률로 걷거나 뛰게 함. (게임의 전반적인 느낌이 틀려지기 때문에 일단 테스트 모드에서만 작동)
-			if (test_server) // @warme010
+			if (g_bIsTestServer) // @warme010
 			{
 				if (number(0, 100) < 60)
 					SetNowWalking(false);
@@ -734,7 +863,7 @@ void CHARACTER::__StateIdle_Monster()
 
 bool __CHARACTER_GotoNearTarget(LPCHARACTER self, LPCHARACTER victim)
 {
-	if (IS_SET(self->GetAIFlag(), AIFLAG_NOMOVE))
+	if (!self->CanNPCFollowTarget(victim))
 		return false;
 
 	switch (self->GetMobBattleType())
@@ -768,11 +897,11 @@ void CHARACTER::StateMove()
 
 	Move(x, y);
 
-	if (IsPC() && (thecore_pulse() & 15) == 0)
+	if ((IsPC() || GetBattleground()) && (thecore_pulse() & 15) == 0)
 	{
 		UpdateSectree();
 
-		if (GetExchange())
+		if (IsPC() && GetExchange())
 		{
 			LPCHARACTER victim = GetExchange()->GetCompany()->GetOwner();
 			int32_t iDist = DISTANCE_APPROX(GetX() - victim->GetX(), GetY() - victim->GetY());
@@ -788,15 +917,19 @@ void CHARACTER::StateMove()
 	// 스테미나가 0 이상이어야 한다.
 	if (IsPC())
 	{
+    	// Cooldown attacks
+		GetAbuseController()->SuspiciousAttackCooldown();
+
 		if (IsWalking() && GetStamina() < GetMaxStamina())
 		{
 			// 5초 후 부터 스테미너 증가
 			if (get_dword_time() - GetWalkStartTime() > 5000)
-				PointChange(POINT_STAMINA, GetMaxStamina() / 1);
+				PointChange(POINT_STAMINA, GetMaxStamina());
 		}
 
 		// 전투 중이면서 뛰는 중이면
-		if (!IsWalking() && !IsRiding()){
+		if (!IsWalking() && !IsRiding())
+		{
 			if ((get_dword_time() - GetLastAttackTime()) < 20000)
 			{
 				StartAffectEvent();
@@ -833,10 +966,10 @@ void CHARACTER::StateMove()
 			LPCHARACTER victim = GetVictim();
 			UpdateAggrPoint(victim, DAMAGE_TYPE_NORMAL, -(victim->GetLevel() / 3 + 1));
 
-			if (test_server) // @warme010
+			if (g_bIsTestServer) // @warme010
 			{
 				// 몬스터가 적을 쫓아가는 것이면 무조건 뛰어간다.
-				SetNowWalking(false);
+				//SetNowWalking(false);
 			}
 		}
 
@@ -845,7 +978,7 @@ void CHARACTER::StateMove()
 			LPCHARACTER victim = GetVictim();
 
 			// 거대 거북
-			if (GetRaceNum() == 2191 && number(1, 20) == 1 && get_dword_time() - m_pkMobInst->m_dwLastWarpTime > 1000)
+			if ((GetRaceNum() == 2191 || GetRaceNum() == 2192) && number(1, 20) == 1 && get_dword_time() - m_pkMobInst->m_dwLastWarpTime > 1000)
 			{
 				// 워프 테스트
 				float fx, fy;
@@ -870,6 +1003,38 @@ void CHARACTER::StateMove()
 		}
 	}
 
+	if (m_nBGTeamID)
+	{
+		// check has near enemy 
+		auto pkCharNearEnemy = FindBattlegroundMobVictim(this);
+
+		if (pkCharNearEnemy && !pkCharNearEnemy->IsDead())
+		{
+			if (CanBeginFight())
+			{
+				BeginFight(pkCharNearEnemy);
+
+				if (!IsState(m_stateBattle))
+				{
+					GotoState(m_stateBattle);
+					m_dwStateDuration = 1;
+				}
+
+				// Attack(pkCharNearEnemy);
+				return;
+			}
+		}
+	}
+
+	if (fRate >= 0.93f)
+	{
+		if (DoMovingWay())
+			return;
+
+		if (DoMoveBattlegroundMinnion())
+			return;
+	}
+
 	if (1.0f == fRate)
 	{
 		if (IsPC())
@@ -891,6 +1056,9 @@ void CHARACTER::StateMove()
 
 				//LPCHARACTER rider = GetRider();
 
+				if (GetBattlegroundTeamID() && IsMonster())
+					CBattlegroundManager::instance().OnSwitchIdle(this);
+
 				m_dwStateDuration = PASSES_PER_SEC(number(1, 3));
 			}
 		}
@@ -906,7 +1074,11 @@ void CHARACTER::StateBattle()
 	}
 
 	if (IsPC())
-		return; 
+    {
+		// Cooldown attacks
+		GetAbuseController()->SuspiciousAttackCooldown();
+		return;
+	}
 
 	if (!CanMove())
 		return;
@@ -939,12 +1111,14 @@ void CHARACTER::StateBattle()
 		if (victim && victim->IsDead() &&
 				!no_wander && IsAggressive() && (!GetParty() || GetParty()->GetLeader() == this))
 		{
-			LPCHARACTER new_victim = FindVictim(this, m_pkMobData->m_table.wAggressiveSight);
+			LPCHARACTER new_victim = FindMobVictim(this, m_pkMobData->m_table.wAggressiveSight);
 
 			SetVictim(new_victim);
 			m_dwStateDuration = PASSES_PER_SEC(1);
 
 			if (!new_victim)
+			{
+				if (IsMonster())
 			{
 				switch (GetMobBattleType())
 				{
@@ -980,6 +1154,7 @@ void CHARACTER::StateBattle()
 						}
 				}
 			}
+			}
 			return;
 		}
 
@@ -987,6 +1162,16 @@ void CHARACTER::StateBattle()
 
 		if (IsGuardNPC())
 			Return();
+
+		if (IS_SET(GetAIFlag(), AIFLAG_NOMOVE) && IS_SET(GetAIFlag(), AIFLAG_AGGRESSIVE))
+		{
+			if (GetX() != m_posExit.x || GetY() != m_posExit.y)
+			{
+				SetRotationToXY(m_posExit.x, m_posExit.y);
+				if (Goto(m_posExit.x, m_posExit.y))
+					SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
+			}
+		}
 
 		m_dwStateDuration = PASSES_PER_SEC(1);
 		return;
@@ -1021,13 +1206,59 @@ void CHARACTER::StateBattle()
 		}
 	}
 
-	LPCHARACTER pkChrProtege = GetProtege();
-
 	float fDist = DISTANCE_APPROX(GetX() - victim->GetX(), GetY() - victim->GetY());
 
-	if (fDist >= 4000.0f)   // 40미터 이상 멀어지면 포기
+	if (IS_SET(GetAIFlag(), AIFLAG_NOMOVE) && IS_SET(GetAIFlag(), AIFLAG_AGGRESSIVE))
+	{
+		float fDistFromBase = DISTANCE_APPROX(GetX() - m_posExit.x, GetY() - m_posExit.y);
+
+		if (fDistFromBase > GetMobTable().wAggressiveSight || fDist >= 4000.0f)
+		{
+			SetVictim(nullptr);
+
+			SetRotation(GetDegreeFromPositionXY(GetX(), GetY(), m_posExit.x, m_posExit.y));
+			if (Goto(m_posExit.x, m_posExit.y))
+				SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
+
+			return;
+		}
+	}
+
+#if 0
+	// yerini degistir, idleye gecince victimi nexus yap ve nexusa olan uzunluk x ise nexusa yurut
+	if (m_nBGTeamID)
+	{
+		if (fDist > 400.f)
+		{
+//			sys_err("far victim. dist %f", fDist);
+
+			auto pkEnemyNexus = GetEnemyNexus();
+			if (pkEnemyNexus)
+			{
+				if (GetVictim() != pkEnemyNexus)
+					SetVictim(pkEnemyNexus);
+
+				return;
+			}
+			else
+			{
+				SetVictim(nullptr);
+			}
+
+			LPCHARACTER pkChrProtege = GetProtege();
+			if (pkChrProtege)
+				if (DISTANCE_APPROX(GetX() - pkChrProtege->GetX(), GetY() - pkChrProtege->GetY()) > 1000)
+					Follow(pkChrProtege, number(150, 400));		
+		}
+//		return;
+	}
+#endif
+
+	if (!m_nBGTeamID && fDist >= 4000.0f)   // 40미터 이상 멀어지면 포기
 	{
 		SetVictim(nullptr);
+
+		LPCHARACTER pkChrProtege = GetProtege();
 
 		// 보호할 것(돌, 파티장) 주변으로 간다.
 		if (pkChrProtege)
@@ -1037,7 +1268,7 @@ void CHARACTER::StateBattle()
 		return;
 	}
 
-	if (fDist >= GetMobAttackRange() * 1.15)
+	if (!m_nBGTeamID && fDist >= GetMobAttackRange() * 1.15)
 	{
 		__CHARACTER_GotoNearTarget(this, victim);
 		return;
@@ -1090,7 +1321,7 @@ void CHARACTER::StateBattle()
 					float fDuration = CMotionManager::instance().GetMotionDuration(GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_SPECIAL_1 + iSkillIdx));
 					m_dwStateDuration = (uint32_t) (fDuration == 0.0f ? PASSES_PER_SEC(2) : PASSES_PER_SEC(fDuration));
 
-					if (test_server)
+					if (g_bIsTestServer)
 						sys_log(0, "USE_MOB_SKILL: %s idx %u motion %u duration %.0f", GetName(), iSkillIdx, MOTION_SPECIAL_1 + iSkillIdx, fDuration);
 
 					return;

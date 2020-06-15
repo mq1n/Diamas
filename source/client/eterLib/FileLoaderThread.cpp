@@ -4,7 +4,8 @@
 #include "ResourceManager.h"
 #include "../eterBase/Stl.h"
 
-CFileLoaderThread::CFileLoaderThread() : m_hThread(nullptr), m_pArg(nullptr), m_uThreadID(0), m_hSemaphore(nullptr), m_iRestSemCount(0), m_bShutdowned(false)
+CFileLoaderThread::CFileLoaderThread() :
+	m_hThread(nullptr), m_pArg(nullptr), m_uThreadID(0), m_hSemaphore(nullptr), m_iRestSemCount(0), m_bShutdowned(false)
 {
 }
 
@@ -55,10 +56,7 @@ void CFileLoaderThread::Destroy()
 
 uint32_t CFileLoaderThread::Setup()
 {
-	m_hSemaphore = CreateSemaphore(nullptr,		// no security attributes
-								   0,			// initial count
-								   65535,		// maximum count
-								   nullptr);		// unnamed semaphore
+	m_hSemaphore = CreateSemaphore(nullptr, 0, 65535, nullptr);
 	if (!m_hSemaphore)
 		return 0;
 
@@ -77,8 +75,7 @@ void CFileLoaderThread::Shutdown()
 	do
 	{
 		bRet = ReleaseSemaphore(m_hSemaphore, 1, nullptr);
-	}
-	while (!bRet);
+	} while (!bRet);
 
 	WaitForSingleObject(m_hThread, 10000);	// 쓰레드가 종료 되기를 10초 기다림
 }
@@ -121,7 +118,7 @@ void CFileLoaderThread::Request(std::string & c_rstFileName)	// called in main t
 	pData->stFileName = c_rstFileName;
 
 	m_RequestMutex.Lock();
-	m_pRequestDeque.push_back(pData);
+	m_pRequestDeque.emplace_back(pData);
 	m_RequestMutex.Unlock();
 
 	++m_iRestSemCount;
@@ -172,6 +169,6 @@ void CFileLoaderThread::Process()	// called in loader thread
 	}
 
 	m_CompleteMutex.Lock();
-	m_pCompleteDeque.push_back(pData);
+	m_pCompleteDeque.emplace_back(pData);
 	m_CompleteMutex.Unlock();
 }

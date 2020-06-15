@@ -1,18 +1,14 @@
 #include "stdafx.h"
-
+#include "config.h"
 #include "threeway_war.h"
-
 #include "../../common/stl.h"
-
 #include "questlua.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "char.h"
 #include "dungeon.h"
 #include "p2p.h"
 #include "locale_service.h"
 #include "threeway_war.h"
-
-extern int32_t passes_per_sec;
 
 namespace quest
 {
@@ -95,7 +91,7 @@ namespace quest
 	{
 		lua_pushnumber( L, GetSungziMapIndex() ); 
 
-		if ( test_server )
+		if ( g_bIsTestServer )
 			sys_log ( 0, "forked_sungzi_map_index_by_empire %d", GetSungziMapIndex() );
 		return 1;
 	}
@@ -253,6 +249,12 @@ namespace quest
 		return 0;
 	}
 
+	int32_t forked_get_kill_score(lua_State* L)
+	{
+		lua_pushnumber(L, CThreeWayWar::instance().GetKillScore(lua_tonumber(L, 1)));
+		return 1;
+	}
+
 	void RegisterForkedFunctionTable() 
 	{
 		luaL_reg forked_functions[] = 
@@ -272,6 +274,7 @@ namespace quest
 			{ "is_registered_user",		forked_is_registered_user			},
 			{ "register_user",			forked_register_user				},
 			{ "purge_all_monsters",		forked_purge_all_monsters			},
+			{ "get_kill_score",			forked_get_kill_score				},
 
 			{ nullptr,				nullptr			}
 		};

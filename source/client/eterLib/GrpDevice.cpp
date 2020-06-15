@@ -684,7 +684,7 @@ void CGraphicDevice::Destroy()
 	if (ms_ptVS)
 	{	
 		ms_ptVS->Release();
-		ms_ptVS = 0;;
+		ms_ptVS = 0;
 	}
 
 	if (ms_pntVS)

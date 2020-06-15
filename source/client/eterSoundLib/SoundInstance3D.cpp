@@ -107,7 +107,7 @@ void CSoundInstance3D::GetVolume(float& rfVolume) const
 
 void CSoundInstance3D::SetVolume(float volume) const
 {
-	volume = std::max<float>(0.0f, std::min<float>(1.0f, volume));
+	volume = std::max(0.0f, std::min(1.0f, volume));
 	AIL_set_3D_sample_volume(m_sample, volume);
 }
 

@@ -299,12 +299,14 @@ bool CGraphicObjectInstance::isIntersect(const CRay & c_rRay, float * pu, float 
 	posVertices[6] = TPosition(m_v3TBBoxMin.x, m_v3TBBoxMax.y, m_v3TBBoxMax.z);
 	posVertices[7] = TPosition(m_v3TBBoxMax.x, m_v3TBBoxMax.y, m_v3TBBoxMax.z);
 
-	TIndex Indices[36] = {0, 1, 2, 1, 3, 2,
-						  2, 0, 6, 0, 4, 6, 
-						  0, 1, 4, 1, 5, 4,
-						  1, 3, 5, 3, 7, 5,
-						  3, 2, 7, 2, 6, 7,
-						  4, 5, 6, 5, 7, 6};
+	TIndex Indices[36] = {
+		0, 1, 2, 1, 3, 2,
+		2, 0, 6, 0, 4, 6,
+		0, 1, 4, 1, 5, 4,
+		1, 3, 5, 3, 7, 5,
+		3, 2, 7, 2, 6, 7,
+		4, 5, 6, 5, 7, 6
+	};
 
 	int32_t triCount = 12;
 	uint16_t* pcurIdx = (uint16_t*)Indices;
@@ -328,7 +330,7 @@ bool CGraphicObjectInstance::isIntersect(const CRay & c_rRay, float * pu, float 
 
 CGraphicObjectInstance::CGraphicObjectInstance()
 {
-	m_CullingHandle = 0;
+	m_CullingHandle = nullptr;
 	Initialize();
 }
 
@@ -336,7 +338,7 @@ void CGraphicObjectInstance::Initialize()
 {
 	if (m_CullingHandle)
 		CCullingManager::Instance().Unregister(m_CullingHandle);
-	m_CullingHandle = 0;
+	m_CullingHandle = nullptr;
 
 	m_pHeightAttributeInstance = nullptr;
 	
@@ -402,16 +404,14 @@ void CGraphicObjectInstance::RegisterBoundingSphere()
 
 void CGraphicObjectInstance::AddCollision(const CStaticCollisionData * pscd, const D3DXMATRIX* pMat)
 {
-	m_StaticCollisionInstanceVector.push_back(CBaseCollisionInstance::BuildCollisionInstance(pscd, pMat));
+	m_StaticCollisionInstanceVector.emplace_back(CBaseCollisionInstance::BuildCollisionInstance(pscd, pMat));
 }
 
 void CGraphicObjectInstance::ClearCollision()
 {
 	CCollisionInstanceVector::iterator it;
 	for(it = m_StaticCollisionInstanceVector.begin();it!=m_StaticCollisionInstanceVector.end();++it)
-	{
 		(*it)->Destroy();
-	}
 	m_StaticCollisionInstanceVector.clear();
 }
 
@@ -463,9 +463,7 @@ uint32_t CGraphicObjectInstance::GetCollisionInstanceCount()
 CBaseCollisionInstance * CGraphicObjectInstance::GetCollisionInstanceData(uint32_t dwIndex)
 {
 	if (dwIndex>m_StaticCollisionInstanceVector.size())
-	{
-		return 0;
-	}
+		return nullptr;
 	return m_StaticCollisionInstanceVector[dwIndex];
 }
 

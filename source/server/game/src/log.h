@@ -1,7 +1,7 @@
-#ifndef __INC_LOG_MANAGER_H__
-#define __INC_LOG_MANAGER_H__
-
+#pragma once
+#include "../../common/singleton.h"
 #include "../../libsql/include/AsyncSQL.h"
+#include "typedef.h"
 
 enum GOLDBAR_HOW
 {
@@ -63,4 +63,3 @@ class LogManager : public singleton<LogManager>
 		bool		m_bIsConnect;
 };
 
-#endif

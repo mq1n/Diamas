@@ -1,9 +1,5 @@
 #include "stdafx.h"
-
-#include "../../common/VnumHelper.h"
-
 #include "char.h"
-
 #include "config.h"
 #include "utils.h"
 #include "crc32.h"
@@ -27,7 +23,7 @@
 #include "pvp.h"
 #include "party.h"
 #include "start_position.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "log.h"
 #include "p2p.h"
 #include "guild.h"
@@ -45,16 +41,19 @@
 #include "mining.h"
 #include "arena.h"
 #include "dev_log.h"
-#include "horsename_manager.h"
 #include "gm.h"
 #include "map_location.h"
-#include "BlueDragon_Binder.h"
+#include "blue_dragon_binder.h"
 #include "skill_power.h"
 #include "buff_on_attributes.h"
-#ifdef __PET_SYSTEM__
-#include "PetSystem.h"
-#endif
-#include "DragonSoul.h"
+#include "ox_event.h"
+#include "dragon_soul.h"
+#include "pet_system.h"
+#include "Anticheat_Manager.h"
+#include "Battleground.h"
+
+#include "../../common/VnumHelper.h"
+#include "../../common/service.h"
 
 extern const uint8_t g_aBuffOnAttrPoints;
 extern bool RaceToJob(uint32_t race, uint32_t *ret_job);
@@ -73,11 +72,19 @@ bool CAN_ENTER_ZONE(const LPCHARACTER& ch, int32_t map_index)
 		if (ch->GetLevel() < 90)
 			return false;
 	}
+
+	// oxevent only if running
+	if (map_index == OXEVENT_MAP_INDEX && COXEventManager::instance().GetStatus() != OXEVENT_OPEN)
+	{
+		sys_err("%s tries to enter ox event while not running", ch->GetName());
+		LogManager::instance().HackLog("ENTER_OX", ch);
+		return false;
+	}
+
 	return true;
 }
 
-#ifdef NEW_ICEDAMAGE_SYSTEM
-const uint32_t CHARACTER::GetNoDamageRaceFlag()
+uint32_t CHARACTER::GetNoDamageRaceFlag()
 {
 	return m_dwNDRFlag;
 }
@@ -120,7 +127,41 @@ void CHARACTER::ResetNoDamageAffectFlag()
 {
 	m_setNDAFlag.clear();
 }
-#endif
+
+bool IS_MOUNTABLE_ZONE(int32_t map_index, bool isHorse)
+{
+	// (Private map instances, i.e dungeons, have high indexes)
+	if (map_index >= 10000)
+		map_index /= 10000;
+
+	if (CBattlegroundManager::instance().IsEventMap(map_index))
+		return false;
+
+	if (CWarMapManager::instance().IsWarMap(map_index))
+		return false;
+
+	if (CArenaManager::instance().IsArenaMap(map_index))
+		return false;
+
+	// Only mounts allowed on ED map
+	if (map_index == 209)
+		return !isHorse;
+
+	switch (map_index)
+	{
+	case 26:
+	case 110:
+	case 111:
+	case 113:
+	case 114:
+	case 121:
+	case 125:
+	case 352:
+		return false;
+	}
+	return true;
+}
+
 
 // <Factor> DynamicCharacterPtr member function definitions
 
@@ -182,7 +223,19 @@ void CHARACTER::Initialize()
 	m_posRegen.x = m_posRegen.y = m_posRegen.z = 0;
 	m_posStart.x = m_posStart.y = 0;
 	m_posDest.x = m_posDest.y = 0;
+
+    m_lastMoveAblePos.x = 0;
+	m_lastMoveAblePos.y = 0;
+	m_lastMoveAblePos.z = 0;
+
 	m_fRegenAngle = 0.0f;
+
+	m_pMovingWay = nullptr;
+	m_iMovingWayIndex = 0;
+	m_iMovingWayMaxNum = 0;
+	m_bMovingWayRepeat = false;
+	m_lMovingWayBaseX = 0;
+	m_lMovingWayBaseY = 0;
 
 	m_pkMobData		= nullptr;
 	m_pkMobInst		= nullptr;
@@ -193,8 +246,20 @@ void CHARACTER::Initialize()
 	m_pkExchange	= nullptr;
 	m_pkParty		= nullptr;
 	m_pkPartyRequestEvent = nullptr;
+	m_pkAnticheatEvent = nullptr;
 
 	m_pGuild = nullptr;
+
+	m_pkBattleground = nullptr;
+	m_nBGTeamID = 0;
+	m_nBGCurrentMovingWayIndex = 0;
+	m_nBGMovingWayBaseXpos = 0;
+	m_nBGMovingWayBaseYpos = 0;
+	m_bBGMoveCompleted = false;
+	m_bBGHasMoveTarget = false;
+	m_pkCharBattlegroundProtege = nullptr;
+	m_pkCharBattlegroundEnemyNexus = nullptr;
+	m_bBGHasMovedFirstTime = true;
 
 	m_pkChrTarget = nullptr;
 
@@ -220,6 +285,7 @@ void CHARACTER::Initialize()
 	m_pkFireEvent = nullptr;
 	m_pkCheckSpeedHackEvent	= nullptr;
 	m_speed_hack_count	= 0;
+    m_pkCheckWallHackEvent = nullptr;
 
 	m_pkAffectEvent = nullptr;
 	m_afAffectFlag = TAffectFlag(0, 0);
@@ -370,9 +436,11 @@ void CHARACTER::Initialize()
 
 	m_iMyShopTime = 0;
 
+	m_dwLastShopOpenTime = 0;
+
 	m_deposit_pulse = 0;
 
-	m_strNewName = "";
+	m_strNewName.clear();
 
 	m_known_guild.clear();
 
@@ -387,50 +455,66 @@ void CHARACTER::Initialize()
 	m_dwMountTime = 0;
 
 	m_dwLastGoldDropTime = 0;
-#ifdef ENABLE_NEWSTUFF
 	m_dwLastItemDropTime = 0;
 	m_dwLastBoxUseTime = 0;
 	m_dwLastBuySellTime = 0;
-#endif
 
 	m_bIsLoadedAffect = false;
 	cannot_dead = false;
 
-#ifdef __PET_SYSTEM__
+	block_exp = false;
+
 	m_petSystem = 0;
 	m_bIsPet = false;
-#endif
-#ifdef NEW_ICEDAMAGE_SYSTEM
+
+	//Abuse controller
+	m_abuse = nullptr;
+
+	//Activity
+	m_activityHandler = nullptr;
+
 	m_dwNDRFlag = 0;
 	m_setNDAFlag.clear();
-#endif
 
 	m_fAttMul = 1.0f;
 	m_fDamMul = 1.0f;
 
 	m_pointsInstant.iDragonSoulActiveDeck = -1;
-#ifdef ENABLE_ANTI_CMD_FLOOD
+
 	m_dwCmdAntiFloodCount = 0;
 	m_dwCmdAntiFloodPulse = 0;
-#endif
+
+	//Anti-hack
 	memset(&m_tvLastSyncTime, 0, sizeof(m_tvLastSyncTime));
-	m_iSyncHackCount = 0;
+	m_iSyncNoHackCount = 0;
+	m_iSyncPlayerHackCount = 0;
+	m_iSyncMonsterHackCount = 0;
+
+	m_bGMInvisible = false;
+	m_bGMInvisibleChanged = false;
 #ifdef ENABLE_ACCE_SYSTEM
 	m_bAcceCombination	= false;
 	m_bAcceAbsorption	= false;
 #endif
+
+//	sys_log(0, "%u cotr ok", GetVID());
 }
 
-void CHARACTER::Create(const char * c_pszName, uint32_t vid, bool isPC)
+void CHARACTER::Create(std::string stName, uint32_t vid, bool isPC)
 {
 	static int32_t s_crc = 172814;
 
 	char crc_string[128+1];
-	snprintf(crc_string, sizeof(crc_string), "%s%p%d", c_pszName, this, ++s_crc);
+	snprintf(crc_string, sizeof(crc_string), "%s%p%d", stName.c_str(), this, ++s_crc);
 	m_vid = VID(vid, GetCRC32(crc_string, strlen(crc_string)));
 
 	if (isPC)
-		m_stName = c_pszName;
+    {
+		m_stName = stName;
+
+        m_abuse = std::make_shared<AbuseController>(this);
+		m_activityHandler = std::make_shared<ActivityHandler>(this);
+	}
 }
 
 void CHARACTER::Destroy()
@@ -456,7 +540,6 @@ void CHARACTER::Destroy()
 		SetDungeon(nullptr);
 	}
 
-#ifdef __PET_SYSTEM__
 	if (m_petSystem)
 	{
 		m_petSystem->Destroy();
@@ -464,12 +547,16 @@ void CHARACTER::Destroy()
 
 		m_petSystem = 0;
 	}
-#endif
 
 	HorseSummon(false);
 
 	if (GetRider())
 		GetRider()->ClearHorseInfo();
+
+	if (IsPC())
+	{
+		CAnticheatManager::instance().DeleteClientHandle(GetPlayerID());
+	}
 
 	if (GetDesc())
 	{
@@ -562,9 +649,16 @@ void CHARACTER::Destroy()
 #endif
 	event_cancel(&m_pkFireEvent);
 	event_cancel(&m_pkPartyRequestEvent);
+
+	if (m_pkAnticheatEvent)
+	{
+		event_cancel(&m_pkAnticheatEvent);
+	}
+
 	//DELAYED_WARP
 	event_cancel(&m_pkWarpEvent);
 	event_cancel(&m_pkCheckSpeedHackEvent);
+    event_cancel(&m_pkCheckWallHackEvent);
 	//END_DELAYED_WARP
 
 	// RECALL_DELAY
@@ -604,21 +698,35 @@ const char * CHARACTER::GetName() const
 	return m_stName.empty() ? (m_pkMobData ? m_pkMobData->m_table.szLocaleName : "") : m_stName.c_str();
 }
 
+std::string CHARACTER::GetStringName() const
+{
+	return m_stName.empty() ? (m_pkMobData ? std::string(m_pkMobData->m_table.szLocaleName) : "") : m_stName;
+}
+
+const char* CHARACTER::GetProtoName() const
+{
+	return m_pkMobData ? m_pkMobData->m_table.szName : "";
+}
+
 void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, uint8_t bItemCount)
 {
+	if (!GM::check_allow(GetGMLevel(), GM_ALLOW_CREATE_PRIVATE_SHOP))
+	{
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot do this with this gamemaster rank."));
+		return;
+	}
+
 	if (!CanHandleItem()) // @fixme149
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot handle more item"));
 		return;
 	}
 
-#ifndef ENABLE_OPEN_SHOP_WITH_ARMOR
 	if (GetPart(PART_MAIN) > 2)
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("갑옷을 벗어야 개인 상점을 열 수 있습니다."));
 		return;
 	}
-#endif
 
 	if (GetMyShop())	// 이미 샵이 열려 있으면 닫는다.
 	{
@@ -810,22 +918,75 @@ void EncodeMovePacket(TPacketGCMove & pack, uint32_t dwVID, uint8_t bFunc, uint8
 	pack.dwDuration	= dwDuration;
 }
 
+void CHARACTER::RestartAtPos(int32_t lX, int32_t lY)
+{
+	if (m_isObserver)
+		return;
+
+	LPSECTREE sectree = SECTREE_MANAGER::instance().Get(GetMapIndex(), lX, lY);
+	if (!sectree)
+	{
+		sys_log(0, "cannot find sectree by %dx%d mapindex %d (pid %u race %u)", lX, lY, GetMapIndex(), GetPlayerID(), GetRaceNum());
+		return;
+	}
+
+	bool bChangeTree = false;
+
+	if (!GetSectree() || GetSectree() != sectree)
+		bChangeTree = true;
+
+	if (bChangeTree)
+	{
+		if (GetSectree())
+			GetSectree()->RemoveEntity(this);
+	}
+	ViewCleanup();
+
+	if (GetStamina() < GetMaxStamina())
+		StartAffectEvent();
+
+	SetXYZ(lX, lY, 0);
+
+	m_posDest.x = lX;
+	m_posDest.y = lY;
+	m_posDest.z = 0;
+
+	m_posStart.x = lX;
+	m_posStart.y = lY;
+	m_posStart.z = 0;
+
+	EncodeInsertPacket(this);
+	if (bChangeTree)
+	{
+		sectree->InsertEntity(this);
+		UpdateSectree();
+	}
+	else
+	{
+		ViewReencode();
+		sys_log(0, "	  in same sectree");
+	}
+}
+
 void CHARACTER::RestartAtSamePos()
 {
-	if (m_bIsObserver)
+	if (m_isObserver)
 		return;
 
 	EncodeRemovePacket(this);
 	EncodeInsertPacket(this);
 
-	ENTITY_MAP::iterator it = m_map_view.begin();
+	if (IsGMInvisible())
+		return;
 
-	while (it != m_map_view.end())
+	auto it = m_mapView.begin();
+
+	while (it != m_mapView.end())
 	{
 		LPENTITY entity = (it++)->first;
 
 		EncodeRemovePacket(entity);
-		if (!m_bIsObserver)
+		if (!m_isObserver)
 			EncodeInsertPacket(entity);
 
 		if( entity->IsType(ENTITY_CHARACTER) )
@@ -847,40 +1008,52 @@ void CHARACTER::RestartAtSamePos()
 	}
 }
 
-
 // Entity에 내가 나타났다고 패킷을 보낸다.
 void CHARACTER::EncodeInsertPacket(LPENTITY entity)
 {
+	if ((IsGMInvisible() || (!IsPC() && GetRider() && GetRider()->IsGMInvisible())) && entity != this && (IsPC() || entity != GetRider()))
+	{
+		if (g_bIsTestServer)
+			sys_log(0, "CHARACTER::EncodeInsertPacket: GMInvisible stopped.");
+		return;
+	}
 
 	LPDESC d;
 
 	if (!(d = entity->GetDesc()))
 		return;
 
-	// 길드이름 버그 수정 코드
-	LPCHARACTER ch = (LPCHARACTER) entity;
-	ch->SendGuildName(GetGuild());
-	// 길드이름 버그 수정 코드
+	if (entity->IsType(ENTITY_CHARACTER) && GetDesc())
+	{
+		// Send the guild name
+		LPCHARACTER ch = static_cast<LPCHARACTER>(entity);
+		ch->SendGuildName(GetGuild());
+
+		std::function<bool(LPCHARACTER)> f = GetRequirementFunction();
+		if (f && !f(ch)) {
+			return;
+		}
+	}
 
 	TPacketGCCharacterAdd pack;
 
 	pack.header		= HEADER_GC_CHARACTER_ADD;
+	pack.guildID	= 0; //Only important for buildings additional data packet is taking care.
 	pack.dwVID		= m_vid;
 	pack.bType		= GetCharType();
 	pack.angle		= GetRotation();
 	pack.x		= GetX();
 	pack.y		= GetY();
 	pack.z		= GetZ();
-	pack.wRaceNum	= GetRaceNum();
+	pack.dwRaceNum	= GetRaceNum();
+	pack.level = GetLevel();
+
 	if (IsPet())
-	{
 		pack.bMovingSpeed	= 150;
-	}
 	else
-	{
-		pack.bMovingSpeed	= GetLimitPoint(POINT_MOV_SPEED);
-	}
-	pack.bAttackSpeed	= GetLimitPoint(POINT_ATT_SPEED);
+		pack.bMovingSpeed	= static_cast<uint8_t>(GetLimitPoint(POINT_MOV_SPEED));
+
+	pack.bAttackSpeed	= static_cast<uint8_t>(GetLimitPoint(POINT_ATT_SPEED));
 	pack.dwAffectFlag[0] = m_afAffectFlag.bits[0];
 	pack.dwAffectFlag[1] = m_afAffectFlag.bits[1];
 
@@ -921,51 +1094,19 @@ void CHARACTER::EncodeInsertPacket(LPENTITY entity)
 		addPacket.bPKMode = m_bPKMode;
 		addPacket.dwMountVnum = GetMountVnum();
 		addPacket.bEmpire = m_bEmpire;
+		addPacket.dwLevel = 0;
 
-#ifdef ENABLE_SHOWNPCLEVEL
-		if (1)
-#else
-		if (IsPC() == true)
-#endif
-		{
+		if (IsMonster() || IsPC() || IsStone())
 			addPacket.dwLevel = GetLevel();
-		}
-		else
-		{
-			addPacket.dwLevel = 0;
-		}
 
-		if (false)
-		{
-			LPCHARACTER ch = (LPCHARACTER) entity;
+		addPacket.dwGuildID = 0;
 
-			if (GetEmpire() == ch->GetEmpire() || ch->GetGMLevel() > GM_PLAYER || m_bCharType == CHAR_TYPE_NPC)
-			{
-				goto show_all_info;
-			}
-			else
-			{
-				memset(addPacket.name, 0, CHARACTER_NAME_MAX_LEN);
-				addPacket.dwGuildID = 0;
-				addPacket.sAlignment = 0;
-			}
-		}
-		else
-		{
-		show_all_info:
-			strlcpy(addPacket.name, GetName(), sizeof(addPacket.name));
+		strlcpy(addPacket.name, GetName(), sizeof(addPacket.name));
 
-			if (GetGuild() != nullptr)
-			{	
-				addPacket.dwGuildID = GetGuild()->GetID();
-			}
-			else
-			{
-				addPacket.dwGuildID = 0;
-			}
+		if (GetGuild() != nullptr)
+			addPacket.dwGuildID = GetGuild()->GetID();
 
-			addPacket.sAlignment = m_iAlignment / 10;
-		}
+		addPacket.sAlignment = m_iAlignment / 10;
 
 		d->Packet(&addPacket, sizeof(TPacketGCCharacterAdditionalInfo));
 	}
@@ -986,7 +1127,7 @@ void CHARACTER::EncodeInsertPacket(LPENTITY entity)
 
 	if (entity->IsType(ENTITY_CHARACTER) && GetDesc())
 	{
-		LPCHARACTER ch = (LPCHARACTER) entity;
+		LPCHARACTER ch = static_cast<LPCHARACTER>(entity);
 		if (ch->IsWalking())
 		{
 			TPacketGCWalkMode p;
@@ -997,7 +1138,7 @@ void CHARACTER::EncodeInsertPacket(LPENTITY entity)
 		}
 	}
 
-	if (GetMyShop())
+	if (IsPC() && GetMyShop())
 	{
 		TPacketGCShopSign p;
 
@@ -1036,12 +1177,35 @@ void CHARACTER::EncodeRemovePacket(LPENTITY entity)
 		sys_log(3, "EntityRemove %s(%d) FROM %s", GetName(), (uint32_t) m_vid, ((LPCHARACTER) entity)->GetName());
 }
 
+void CHARACTER::PacketView(const void * data, int32_t bytes, LPENTITY except)
+{
+	if (IsGMInvisible() || (!IsPC() && GetRider() && GetRider()->IsGMInvisible()))
+	{
+		if (except != this && GetDesc())
+			GetDesc()->Packet(data, bytes);
+		else if (!IsPC() && GetRider() && except != GetRider() && GetRider()->GetDesc()) {
+			GetRider()->GetDesc()->Packet(data, bytes);
+		}
+		return;
+	}
+
+	CEntity::PacketView(data, bytes, except);
+}
+
 void CHARACTER::UpdatePacket()
 {
-	if (GetSectree() == nullptr) return;
+	if (IsPC() && (!GetDesc() || !GetDesc()->GetCharacter()))
+		return;
+
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	{
+//		if (IsGM())
+//			m_bPKMode = PK_MODE_PROTECT;
+//		else
+			m_bPKMode = PK_MODE_FREE;
+	}
 
 	TPacketGCCharacterUpdate pack;
-	TPacketGCCharacterUpdate pack2;
 
 	pack.header = HEADER_GC_CHARACTER_UPDATE;
 	pack.dwVID = m_vid;
@@ -1069,63 +1233,12 @@ void CHARACTER::UpdatePacket()
 
 	pack.dwMountVnum	= GetMountVnum();
 
-	pack2 = pack;
-	pack2.dwGuildID = 0;
-	pack2.sAlignment = 0;
-
-	if (false)
-	{
-		if (m_bIsObserver != true)
-		{
-			for (ENTITY_MAP::iterator iter = m_map_view.begin(); iter != m_map_view.end(); iter++)
-			{
-				LPENTITY pEntity = iter->first;
-
-				if (pEntity != nullptr)
-				{
-					if (pEntity->IsType(ENTITY_CHARACTER) == true)
-					{
-						if (pEntity->GetDesc() != nullptr)
-						{
-							LPCHARACTER pChar = (LPCHARACTER)pEntity;
-
-							if (GetEmpire() == pChar->GetEmpire() || pChar->GetGMLevel() > GM_PLAYER)
-							{
-								pEntity->GetDesc()->Packet(&pack, sizeof(pack));
-							}
-							else
-							{
-								pEntity->GetDesc()->Packet(&pack2, sizeof(pack2));
-							}
-						}
-					}
-					else
-					{
-						if (pEntity->GetDesc() != nullptr)
-						{
-							pEntity->GetDesc()->Packet(&pack, sizeof(pack));
-						}
-					}
-				}
-			}
-		}
-
-		if (GetDesc() != nullptr)
-		{
-			GetDesc()->Packet(&pack, sizeof(pack));
-		}
-	}
-	else
-	{
-		PacketAround(&pack, sizeof(pack));
-	}
+	PacketAround(&pack, sizeof(pack));
 }
 
 LPCHARACTER CHARACTER::FindCharacterInView(const char * c_pszName, bool bFindPCOnly)
 {
-	ENTITY_MAP::iterator it = m_map_view.begin();
-
-	for (; it != m_map_view.end(); ++it)
+	for (auto it = m_mapView.begin(); it != m_mapView.end(); ++it)
 	{
 		if (!it->first->IsType(ENTITY_CHARACTER))
 			continue;
@@ -1287,6 +1400,8 @@ void CHARACTER::CreatePlayerProto(TPlayerTable & tab)
 	// END_OF_REMOVE_REAL_SKILL_LEVLES
 
 	tab.horse = GetHorseData();
+
+	tab.is_gm_invisible = m_bGMInvisible;
 }
 
 
@@ -1315,9 +1430,15 @@ void CHARACTER::SaveReal()
 		pkQuestPC->Save();
 	}
 
+	//Save marriage (if existing)
 	marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(GetPlayerID());
 	if (pMarriage)
 		pMarriage->Save();
+
+	//Save activity
+	spActivityHandler activityHandler = GetActivityHandler();
+	if (activityHandler)
+		activityHandler->Save();
 }
 
 void CHARACTER::FlushDelayedSaveItem()
@@ -1357,6 +1478,7 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 	// P2P Logout
 	TPacketGGLogout p;
 	p.bHeader = HEADER_GG_LOGOUT;
+	p.dwPID = GetPlayerID();
 	strlcpy(p.szName, GetName(), sizeof(p.szName));
 	P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGLogout));
 	LogManager::instance().CharLog(this, 0, "LOGOUT", "");
@@ -1409,6 +1531,9 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 
 	MessengerManager::instance().Logout(GetName());
 
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+		CBattlegroundManager::instance().OnLogout(this);
+
 	if (GetDesc())
 	{
 		GetDesc()->BindCharacter(nullptr);
@@ -1424,7 +1549,7 @@ bool CHARACTER::Show(int32_t lMapIndex, int32_t x, int32_t y, int32_t z, bool bS
 
 	if (!sectree)
 	{
-		sys_log(0, "cannot find sectree by %dx%d mapindex %d", x, y, lMapIndex);
+		sys_log(0, "cannot find sectree by %dx%d mapindex %d (pid %u race %u)", x, y, lMapIndex, GetPlayerID(), GetRaceNum());
 		return false;
 	}
 
@@ -1486,8 +1611,17 @@ bool CHARACTER::Show(int32_t lMapIndex, int32_t x, int32_t y, int32_t z, bool bS
 	}
 
 	REMOVE_BIT(m_bAddChrState, ADD_CHARACTER_STATE_SPAWN);
-	
+	if (IsNPC())
+	{
+		if (IS_SET(GetAIFlag(), AIFLAG_NOMOVE) && IS_SET(GetAIFlag(), AIFLAG_AGGRESSIVE))
+			SaveExitLocation();
+	}
+
 	SetValidComboInterval(0);
+
+    if (IsPC())
+		GetAbuseController()->ResetMovementSpeedhackChecker();
+
 	return true;
 }
 
@@ -1722,7 +1856,7 @@ void CHARACTER::SetLevel(uint8_t level)
 
 	if (IsPC())
 	{
-		if (level < PK_PROTECT_LEVEL)
+		if (level < g_bPKProtectLevel)
 			SetPKMode(PK_MODE_PROTECT);
 		else if (GetGMLevel() != GM_PLAYER)
 			SetPKMode(PK_MODE_PROTECT);
@@ -1736,8 +1870,6 @@ void CHARACTER::SetEmpire(uint8_t bEmpire)
 	m_bEmpire = bEmpire;
 }
 
-#define ENABLE_GM_FLAG_IF_TEST_SERVER
-#define ENABLE_GM_FLAG_FOR_LOW_WIZARD
 void CHARACTER::SetPlayerProto(const TPlayerTable * t)
 {
 	if (!GetDesc() || !*GetDesc()->GetHostName())
@@ -1816,22 +1948,15 @@ void CHARACTER::SetPlayerProto(const TPlayerTable * t)
 	SetSP(t->sp);
 	SetStamina(t->stamina);
 
-#ifndef ENABLE_GM_FLAG_IF_TEST_SERVER
-	if (!test_server)
-#endif
+	//GM일때 보호모드
+	if ((!g_bIsTestServer && GetGMLevel() >= GM_LOW_WIZARD) ||
+		(g_bIsTestServer && GM::get_level(GetName(), GetDesc()->GetAccountTable().login, true) >= GM_LOW_WIZARD))
 	{
-#ifdef ENABLE_GM_FLAG_FOR_LOW_WIZARD
-		if (GetGMLevel() > GM_PLAYER)
-#else
-		if (GetGMLevel() > GM_LOW_WIZARD)
-#endif
-		{
 			m_afAffectFlag.Set(AFF_YMIR);
-			m_bPKMode = PK_MODE_PROTECT;
-		}
+		m_bPKMode = PK_MODE_PROTECT;
 	}
 
-	if (GetLevel() < PK_PROTECT_LEVEL)
+	if (GetLevel() < g_bPKProtectLevel)
 		m_bPKMode = PK_MODE_PROTECT;
 
 	SetHorseData(t->horse);
@@ -1851,7 +1976,6 @@ void CHARACTER::SetPlayerProto(const TPlayerTable * t)
 		sys_log(0, "GM_LOGIN(gmlevel=%d, name=%s(%d), pos=(%d, %d)", GetGMLevel(), GetName(), GetPlayerID(), GetX(), GetY());
 	}
 
-#ifdef __PET_SYSTEM__
 	// NOTE: 일단 캐릭터가 PC인 경우에만 PetSystem을 갖도록 함. 유럽 머신당 메모리 사용률때문에 NPC까지 하긴 좀..
 	if (m_petSystem)
 	{
@@ -1860,7 +1984,8 @@ void CHARACTER::SetPlayerProto(const TPlayerTable * t)
 	}
 
 	m_petSystem = M2_NEW CPetSystem(this);
-#endif
+
+	m_bGMInvisible = t->is_gm_invisible;
 }
 
 EVENTFUNC(kill_ore_load_event)
@@ -1940,7 +2065,7 @@ void CHARACTER::SetProto(const CMob * pkMob)
 		//m_dwPlayStartTime = get_dword_time() + 10 * 60 * 1000;
 		//신선자 노해 
 		m_dwPlayStartTime = get_dword_time() + 30 * 1000;
-		if (test_server)
+		if (g_bIsTestServer)
 			m_dwPlayStartTime = get_dword_time() + 30 * 1000;
 	}
 
@@ -2076,11 +2201,24 @@ uint8_t CHARACTER::GetMobBattleType() const
 	if (!m_pkMobData)
 		return BATTLE_TYPE_MELEE;
 
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	{
+		switch (GetRaceNum())
+		{
+			case MINNION_SOLDIER:
+			case MINNION_COMMANDER:
+				return BATTLE_TYPE_MELEE;
+			default:
+				break;
+		}
+	}
+
 	return (m_pkMobData->m_table.bBattleType);
 }
 
 void CHARACTER::ComputeBattlePoints()
 {
+	/*
 	if (IsPolymorphed())
 	{
 		uint32_t dwMobVnum = GetPolymorphVnum();
@@ -2097,10 +2235,12 @@ void CHARACTER::ComputeBattlePoints()
 
 		SetPoint(POINT_ATT_GRADE, iAtt);
 		SetPoint(POINT_DEF_GRADE, iDef);
-		SetPoint(POINT_MAGIC_ATT_GRADE, GetPoint(POINT_ATT_GRADE)); 
+		SetPoint(POINT_MAGIC_ATT_GRADE, GetPoint(POINT_ATT_GRADE));
 		SetPoint(POINT_MAGIC_DEF_GRADE, GetPoint(POINT_DEF_GRADE));
 	}
-	else if (IsPC())
+	else
+		*/
+	if (IsPC())
 	{
 		SetPoint(POINT_ATT_GRADE, 0);
 		SetPoint(POINT_DEF_GRADE, 0);
@@ -2174,6 +2314,7 @@ void CHARACTER::ComputeBattlePoints()
 		LPITEM pkItem;
 
 		for (int32_t i = 0; i < WEAR_MAX_NUM; ++i)
+        {
 			if ((pkItem = GetWear(i)) && pkItem->GetType() == ITEM_ARMOR)
 			{
 				if (pkItem->GetSubType() == ARMOR_BODY || pkItem->GetSubType() == ARMOR_HEAD || pkItem->GetSubType() == ARMOR_FOOTS || pkItem->GetSubType() == ARMOR_SHIELD)
@@ -2182,19 +2323,13 @@ void CHARACTER::ComputeBattlePoints()
 					iArmor += (2 * pkItem->GetValue(5));
 				}
 			}
+        }
 
 		// 말 타고 있을 때 방어력이 말의 기준 방어력보다 낮으면 기준 방어력으로 설정
-		if( true == IsHorseRiding() )
+		if (IsHorseRiding())
 		{
 			if (iArmor < GetHorseArmor())
 				iArmor = GetHorseArmor();
-
-			const char* pHorseName = CHorseNameManager::instance().GetHorseName(GetPlayerID());
-
-			if (pHorseName != nullptr && strlen(pHorseName))
-			{
-				iArmor += 20;
-			}
 		}
 
 		iArmor += GetPoint(POINT_DEF_GRADE_BONUS);
@@ -2635,6 +2770,12 @@ bool CHARACTER::Sync(int32_t x, int32_t y)
 	if (!GetSectree())
 		return false;
 
+	if (IsPC() && IsDead()) 
+	{
+		GetAbuseController()->DeadWalk();
+		return false;
+	}
+
 	LPSECTREE new_tree = SECTREE_MANAGER::instance().Get(GetMapIndex(), x, y);
 
 	if (!new_tree)
@@ -2647,10 +2788,18 @@ bool CHARACTER::Sync(int32_t x, int32_t y)
 		else
 		{
 			sys_err("no tree: %s %d %d %d", GetName(), x, y, GetMapIndex());
-			Dead();
+			SetNoRewardFlag();
+//			Dead();
 		}
 
 		return false;
+	}
+
+    if (IsPC()) 
+	{
+		spAbuseController controller = GetAbuseController();
+		//controller->VerifyCoordinates(new_tree, x, y, GetZ());
+		controller->CheckSpeedhack(x, y);
 	}
 
 	SetRotationToXY(x, y);
@@ -2706,6 +2855,186 @@ void CHARACTER::Stop()
 
 	m_posDest.x = m_posStart.x = GetX();
 	m_posDest.y = m_posStart.y = GetY();
+}
+
+void CHARACTER::RegisterBattlegroundMovingWay(uint8_t step, int32_t x, int32_t y)
+{
+	switch (step)
+	{
+		case 1:
+		{
+			m_pkBattlegroundMobFirstMovePos = GPOS(x, y);
+		} break;
+		case 2:
+		{
+			m_pkBattlegroundMobSecondMovePos = GPOS(x, y);
+		} break;
+		case 3:
+		{
+			m_pkBattlegroundMobLastMovePos = GPOS(x, y);
+		} break;
+		default:
+			sys_err("Unknown move register step: %u", step);
+			break;
+	}
+}
+
+void CHARACTER::MoveBattlegroundMinnion()
+{
+	// sys_log(0, "Current move index %d", m_nBGCurrentMovingWayIndex);
+
+	switch (m_nBGCurrentMovingWayIndex)
+	{
+		case 0:
+		{
+			m_pkBattlegroundCurrentMovePos = m_pkBattlegroundMobFirstMovePos;
+		} break;
+		case 1:
+		{
+			m_pkBattlegroundCurrentMovePos = m_pkBattlegroundMobSecondMovePos;
+		} break;
+		case 2:
+		{
+			m_pkBattlegroundCurrentMovePos = m_pkBattlegroundMobLastMovePos;
+		} break;
+		default:
+			return;
+	}
+
+	GPOS pxBase;
+	if (!SECTREE_MANAGER::instance().GetMapBasePositionByMapIndex(GetMapIndex(), pxBase))
+	{
+		sys_err("cannot get map base position by index %ld", GetMapIndex());
+		return;
+	}
+
+	m_nBGMovingWayBaseXpos = pxBase.x / 100;
+	m_nBGMovingWayBaseYpos = pxBase.y / 100;
+
+	auto vid = (uint32_t)GetVID();
+		
+	// sys_log(0, "Char: %s(%u) move starting... Pos: %u.%u - MapBase: %u.%u - Target: %u.%u",
+	// 	GetName(), vid, GetX(), GetY(), m_nBGMovingWayBaseXpos, m_nBGMovingWayBaseYpos,
+	//	m_pkBattlegroundCurrentMovePos.x, m_pkBattlegroundCurrentMovePos.y
+	// );
+
+	m_bBGHasMoveTarget = true;
+	DoMoveBattlegroundMinnion();
+}
+
+bool CHARACTER::DoMoveBattlegroundMinnion()
+{
+	if (HasBattlegroundMoveTarget())
+	{
+		int32_t lX = m_pkBattlegroundCurrentMovePos.x + m_lMovingWayBaseX;
+		int32_t lY = m_pkBattlegroundCurrentMovePos.y + m_lMovingWayBaseY;
+
+		auto toX = (m_nBGMovingWayBaseXpos + lX) * 100;
+		auto toY = (m_nBGMovingWayBaseYpos + lY) * 100;	
+
+		auto vid = (uint32_t)GetVID();
+
+		if (GetX() == toX && GetY() == toY)
+		{
+			sys_log(0, "Char: %s(%u) in target! Move index: %u Switching to idle...",
+				GetName(), vid, m_nBGCurrentMovingWayIndex);
+		
+			if (m_nBGCurrentMovingWayIndex == 2) // hardcoded final pos index
+			{
+				sys_log(0, "Char: %s(%u) is completed moving!", GetName(), vid);
+				m_bBGMoveCompleted = true;
+				return true;
+			}			
+		
+			// she is in target, set next move index
+			m_nBGCurrentMovingWayIndex++;		
+
+			// go to new pos
+			MoveBattlegroundMinnion();
+
+			return true;
+		}
+
+		// sys_log(0, "Char: %s(%u) - pos: %u.%u - target-local: %u.%u - target-global: %u-%u",
+		// 	GetName(), vid, GetX(), GetY(), lX, lY, toX, toY);
+		
+		SetNowWalking(false);
+
+		OnMove(true);
+		ResetStopTime();
+
+		if (Goto(toX, toY))
+		{
+			CalculateMoveDuration();
+
+			// SendMovePacket(FUNC_MOVE, 0, 0, 0, 0); // FIXME: dag tepe gidiyor
+			SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
+		}
+		
+		SyncPacket();
+
+		return true;
+	}
+
+	return false;
+}
+
+
+void CHARACTER::SetMovingWay(const TNPCMovingPosition* pWay, int32_t iMaxNum, bool bRepeat, bool bLocal)
+{
+	m_pMovingWay = pWay;
+	m_iMovingWayIndex = 0;
+	m_iMovingWayMaxNum = iMaxNum;
+	m_bMovingWayRepeat = bRepeat;
+	m_lMovingWayBaseX = 0;
+	m_lMovingWayBaseY = 0;
+
+	if (bLocal)
+	{
+		GPOS pxBase;
+		if (!SECTREE_MANAGER::instance().GetMapBasePositionByMapIndex(GetMapIndex(), pxBase))
+		{
+			m_pMovingWay = nullptr;
+			sys_err("cannot get map base position by index %ld", GetMapIndex());
+			return;
+		}
+
+		m_lMovingWayBaseX = pxBase.x / 100;
+		m_lMovingWayBaseY = pxBase.y / 100;
+	}
+
+
+	if (GetX() / 100 == m_lMovingWayBaseX + m_pMovingWay[0].lX && GetY() / 100 == m_lMovingWayBaseY + m_pMovingWay[0].lY)
+		m_iMovingWayIndex++;
+
+	DoMovingWay();
+}
+
+bool CHARACTER::DoMovingWay()
+{
+	if (m_pMovingWay)
+	{
+		if (m_iMovingWayIndex >= m_iMovingWayMaxNum)
+		{
+			if (!m_bMovingWayRepeat)
+				return false;
+
+			m_iMovingWayIndex = 0;
+		}
+
+		int32_t lX = m_pMovingWay[m_iMovingWayIndex].lX + m_lMovingWayBaseX;
+		int32_t lY = m_pMovingWay[m_iMovingWayIndex].lY + m_lMovingWayBaseY;
+
+		SetNowWalking(!m_pMovingWay[m_iMovingWayIndex].bRun);
+		if (Goto(lX * 100, lY * 100))
+			SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
+
+		m_iMovingWayIndex++;
+
+		return true;
+	}
+
+	return false;
 }
 
 bool CHARACTER::Goto(int32_t x, int32_t y)
@@ -2800,14 +3129,16 @@ float CHARACTER::GetMoveMotionSpeed() const
 
 	const CMotion * pkMotion = nullptr;
 
+	bool bIsWalking = IsPC() ? IsWalking() : m_bNowWalking;
+
 	if (!GetMountVnum())
-		pkMotion = CMotionManager::instance().GetMotion(GetRaceNum(), MAKE_MOTION_KEY(dwMode, (IsWalking() && IsPC()) ? MOTION_WALK : MOTION_RUN));
+		pkMotion = CMotionManager::instance().GetMotion(GetRaceNum(), MAKE_MOTION_KEY(dwMode, bIsWalking ? MOTION_WALK : MOTION_RUN));
 	else
 	{
-		pkMotion = CMotionManager::instance().GetMotion(GetMountVnum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, (IsWalking() && IsPC()) ? MOTION_WALK : MOTION_RUN));
+		pkMotion = CMotionManager::instance().GetMotion(GetMountVnum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, bIsWalking ? MOTION_WALK : MOTION_RUN));
 
 		if (!pkMotion)
-			pkMotion = CMotionManager::instance().GetMotion(GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_HORSE, (IsWalking() && IsPC()) ? MOTION_WALK : MOTION_RUN));
+			pkMotion = CMotionManager::instance().GetMotion(GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_HORSE, bIsWalking ? MOTION_WALK : MOTION_RUN));
 	}
 
 	if (pkMotion)
@@ -2871,7 +3202,10 @@ void CHARACTER::SendMovePacket(uint8_t bFunc, uint8_t bArg, uint32_t x, uint32_t
 	}
 
 	EncodeMovePacket(pack, GetVID(), bFunc, bArg, x, y, dwDuration, dwTime, rot < 0.0f ? GetRotation() : rot);
-	PacketView(&pack, sizeof(TPacketGCMove), this);
+	if (GetBattleground())
+		PacketMap(GetMapIndex(), &pack, sizeof(TPacketGCMove));
+	else
+		PacketView(&pack, sizeof(TPacketGCMove), this);
 }
 
 int32_t CHARACTER::GetRealPoint(uint8_t type) const
@@ -2939,6 +3273,54 @@ int32_t CHARACTER::GetPoint(uint8_t type) const
 		sys_err("POINT_ERROR: %s type %d val %d (max: %d)", GetName(), type, val, max_val);
 
 	return (val);
+}
+
+int32_t CHARACTER::GetConvPoint(uint8_t type) const
+{
+	switch (type)
+	{
+	case POINT_LEVEL:
+		return GetLevel();
+		break;
+
+	case POINT_EXP:
+		return GetExp();
+		break;
+
+	case POINT_NEXT_EXP:
+		return GetNextExp();
+		break;
+
+	case POINT_HP:
+		return GetHP();
+		break;
+
+	case POINT_MAX_HP:
+		return GetMaxHP();
+		break;
+
+	case POINT_SP:
+		return GetSP();
+		break;
+
+	case POINT_MAX_SP:
+		return GetMaxSP();
+		break;
+
+	case POINT_GOLD:
+		return GetGold();
+		break;
+
+	case POINT_STAMINA:
+		return GetStamina();
+		break;
+
+	case POINT_MAX_STAMINA:
+		return GetMaxStamina();
+		break;
+	}
+
+	return GetPoint(type);
 }
 
 int32_t CHARACTER::GetLimitPoint(uint8_t type) const
@@ -3078,6 +3460,17 @@ void CHARACTER::PointChange(uint8_t type, int32_t amount, bool bAmount, bool bBr
 			{
 				quest::CQuestManager::instance().LevelUp(GetPlayerID());
 
+				// UpdateP2P
+				TPacketGGLogin p;
+				p.bHeader = HEADER_GG_LOGIN;
+				strlcpy(p.szName, GetName(), sizeof(p.szName));
+				p.dwPID = GetPlayerID();
+				p.bEmpire = GetEmpire();
+				p.lMapIndex = SECTREE_MANAGER::instance().GetMapIndex(GetX(), GetY());
+				p.bChannel = g_bChannel;
+				p.iLevel = GetLevel();
+				P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGLogin));
+
 				LogManager::instance().LevelLog(this, val, GetRealPoint(POINT_PLAYTIME) + (get_dword_time() - m_dwPlayStartTime) / 60000);
 
 				if (GetGuild())
@@ -3115,7 +3508,10 @@ void CHARACTER::PointChange(uint8_t type, int32_t amount, bool bAmount, bool bBr
 					if (gPlayerMaxLevel <= GetLevel())
 						return;
 
-					if (test_server)
+					if (block_exp)
+						return;
+
+					if (g_bIsTestServer)
 						ChatPacket(CHAT_TYPE_INFO, "You have gained %d exp.", amount);
 
 					uint32_t iExpBalance = 0;
@@ -3212,16 +3608,6 @@ void CHARACTER::PointChange(uint8_t type, int32_t amount, bool bAmount, bool bBr
 							val = 0;
 						}
 						break;
-				}
-
-				if (GetLevel() <= 10)
-					AutoGiveItem(27001, 2);
-				else if (GetLevel() <= 30)
-					AutoGiveItem(27002, 2);
-				else
-				{
-					AutoGiveItem(27002, 2);
-//					AutoGiveItem(27003, 2);
 				}
 
 				PointChange(POINT_HP, GetMaxHP() - GetHP());
@@ -3454,9 +3840,7 @@ void CHARACTER::PointChange(uint8_t type, int32_t amount, bool bAmount, bool bBr
 #ifdef ENABLE_ACCE_SYSTEM
 		case POINT_ACCEDRAIN_RATE:
 #endif
-#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
 		case POINT_RESIST_MAGIC_REDUCTION:
-#endif
 		case POINT_RESIST_WIND:
 		case POINT_RESIST_ICE:
 		case POINT_RESIST_EARTH:
@@ -3830,8 +4214,8 @@ void CHARACTER::ApplyPoint(uint8_t bApplyType, int32_t iVal)
 		case APPLY_NORMAL_HIT_DEFEND_BONUS:
 			// END_OF_DEPEND_BONUS_ATTRIBUTES
 
-		case APPLY_PC_BANG_EXP_BONUS :
-		case APPLY_PC_BANG_DROP_BONUS :
+		case UNUSED_APPLY_PC_BANG_EXP_BONUS :
+		case UNUSED_APPLY_PC_BANG_DROP_BONUS :
 
 		case APPLY_RESIST_WARRIOR :
 		case APPLY_RESIST_ASSASSIN :
@@ -3848,9 +4232,7 @@ void CHARACTER::ApplyPoint(uint8_t bApplyType, int32_t iVal)
 #ifdef ENABLE_ACCE_SYSTEM
 		case APPLY_ACCEDRAIN_RATE:			//97
 #endif
-#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
 		case APPLY_RESIST_MAGIC_REDUCTION:	//98
-#endif
 			PointChange(aApplyInfo[bApplyType].bPointType, iVal);
 			break;
 
@@ -3917,6 +4299,9 @@ void CHARACTER::ChatPacket(uint8_t type, const char * format, ...)
 	if (!d || !format)
 		return;
 
+	if (GetMapIndex() == OXEVENT_MAP_INDEX)
+		return;
+
 	char chatbuf[CHAT_MAX_LEN + 1];
 	va_list args;
 
@@ -3938,7 +4323,7 @@ void CHARACTER::ChatPacket(uint8_t type, const char * format, ...)
 
 	d->Packet(buf.read_peek(), buf.size());
 
-	if (type == CHAT_TYPE_COMMAND && test_server)
+	if (type == CHAT_TYPE_COMMAND && g_bIsTestServer)
 		sys_log(0, "SEND_COMMAND %s %s", GetName(), chatbuf);
 }
 
@@ -3960,6 +4345,9 @@ void CHARACTER::mining_cancel()
 
 void CHARACTER::mining(LPCHARACTER chLoad)
 {
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+		return;
+		
 	if (m_pkMiningEvent)
 	{
 		mining_cancel();
@@ -3999,13 +4387,36 @@ void CHARACTER::mining(LPCHARACTER chLoad)
 }
 // END_OF_MINING
 
+bool CHARACTER::IsNearWater() const
+{
+	if (!GetSectree())
+		return false;
+
+	for (int32_t x = -1; x <= 1; ++x)
+	{
+		for (int32_t y = -1; y <= 1; ++y)
+		{
+			if (IS_SET(GetSectree()->GetAttribute(GetX() + x * 100, GetY() + y * 100), ATTR_WATER))
+				return true;
+		}
+	}
+
+	return false;
+}
+
 void CHARACTER::fishing()
 {
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+		return;
+
 	if (m_pkFishingEvent)
 	{
 		fishing_take();
 		return;
 	}
+
+	if (!IsNearWater())
+		return;
 
 	// 못감 속성에서 낚시를 시도한다?
 	{
@@ -4138,6 +4549,11 @@ uint16_t CHARACTER::GetPart(uint8_t bPartPos) const
 
 uint16_t CHARACTER::GetOriginalPart(uint8_t bPartPos) const
 {
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	{
+		// start with 0 when buy new item from battlegroundshop save to new veriable from character class and return it
+	}
+
 	switch (bPartPos)
 	{
 		case PART_MAIN:
@@ -4543,6 +4959,14 @@ void CHARACTER::PartyInvite(LPCHARACTER pchInvitee)
 		return;
 	}
 
+	if (CBattlegroundManager::instance().IsEventMap(pchInvitee->GetMapIndex()) || CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+		return;
+	if (CArenaManager::instance().IsArenaMap(pchInvitee->GetMapIndex()) || CArenaManager::instance().IsArenaMap(GetMapIndex())) 
+	{
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Arenada oyuncu davet edemezsin"));
+		return;
+	}
+
 	PartyJoinErrCode errcode = IsPartyJoinableCondition(this, pchInvitee);
 
 	switch (errcode)
@@ -4778,6 +5202,8 @@ void CHARACTER::SetDungeon(LPDUNGEON pkDungeon)
 		else if (IsMonster() || IsStone())
 		{
 			m_pkDungeon->DecMonster();
+			if (!IsDead())
+				m_pkDungeon->DecAliveMonster();
 		}
 	}
 
@@ -4846,7 +5272,7 @@ void CHARACTER::OnMove(bool bIsAttack)
 	{
 		m_dwLastAttackTime = m_dwLastMoveTime;
 
-		if (IsAffectFlag(AFF_REVIVE_INVISIBLE))
+		if (IsAffectFlag(AFFECT_REVIVE_INVISIBLE) || IsAffectFlag(AFF_REVIVE_INVISIBLE))
 			RemoveAffect(AFFECT_REVIVE_INVISIBLE);
 
 		if (IsAffectFlag(AFF_EUNHYUNG))
@@ -4950,7 +5376,7 @@ void CHARACTER::OnClick(LPCHARACTER pkChrCauser)
 				return;
 			}
 
-			if (test_server)
+			if (g_bIsTestServer)
 				sys_err("%s.OnClickFailure(%s) - target is PC", pkChrCauser->GetName(), GetName());
 
 			return;
@@ -4983,10 +5409,18 @@ void CHARACTER::OnClick(LPCHARACTER pkChrCauser)
 
 }
 
-uint8_t CHARACTER::GetGMLevel() const
+int32_t CHARACTER::GetChannel() const
 {
-	if (test_server)
+	return g_bChannel;
+}
+
+uint8_t CHARACTER::GetGMLevel(bool bIgnoreTestServer) const
+{
+	if (!bIgnoreTestServer && g_bIsTestServer)
 		return GM_IMPLEMENTOR;
+	if (bIgnoreTestServer && IsPC())
+		return GM::get_level(GetName(), GetDesc()->GetAccountTable().login, true);
+
 	return m_pointsInstant.gm_level;
 }
 
@@ -4994,7 +5428,7 @@ void CHARACTER::SetGMLevel()
 {
 	if (GetDesc())
 	{
-	    m_pointsInstant.gm_level =  gm_get_level(GetName(), GetDesc()->GetHostName(), GetDesc()->GetAccountTable().login);
+		m_pointsInstant.gm_level = GM::get_level(GetName(), GetDesc()->GetAccountTable().login);
 	}
 	else
 	{
@@ -5006,9 +5440,25 @@ BOOL CHARACTER::IsGM() const
 {
 	if (m_pointsInstant.gm_level != GM_PLAYER)
 		return true;
-	if (test_server)
+	if (g_bIsTestServer)
 		return true;
 	return false;
+}
+
+void CHARACTER::SetGMInvisible(bool bActive)
+{
+	if (bActive == m_bGMInvisible)
+		return;
+
+	m_bGMInvisible = bActive;
+	m_bGMInvisibleChanged = true;
+
+	if (m_bGMInvisible)
+		ReviveInvisible(INFINITE_AFFECT_DURATION);
+	else
+		RemoveAffect(AFFECT_REVIVE_INVISIBLE);
+
+	UpdateSectree();
 }
 
 void CHARACTER::SetStone(LPCHARACTER pkChrStone)
@@ -5181,6 +5631,40 @@ void CHARACTER::BroadcastTargetPacket()
 	}
 }
 
+void CHARACTER::SendTargetDrop()
+{
+	TPacketGCTargetDrop p;
+
+	p.header = HEADER_GC_TARGET_DROP;
+	p.dwVID = 0;
+	p.size = 0;
+	p.bonuses = 0;
+
+	if (!m_pkChrTarget)
+		return;
+
+	static std::vector<uint32_t> s_vec_itemsDrop;
+	s_vec_itemsDrop.clear();
+
+	if (ITEM_MANAGER::instance().GetPossibleItemsToDrop(m_pkChrTarget, s_vec_itemsDrop))
+	{
+		if (s_vec_itemsDrop.size() > 0)
+		{
+			for (size_t i = 0; i < s_vec_itemsDrop.size() && i < 60; ++i)
+			{
+				p.size += 1;
+				p.drop[i] = s_vec_itemsDrop[i];
+			}
+		}
+	}
+
+	if (m_pkChrTarget->m_pkMobData)
+		p.bonuses = m_pkChrTarget->m_pkMobData->m_table.dwRaceFlag;
+
+	if (GetDesc())
+		GetDesc()->Packet(&p, sizeof(TPacketGCTargetDrop));
+}
+
 void CHARACTER::CheckTarget()
 {
 	if (!m_pkChrTarget)
@@ -5201,6 +5685,12 @@ void CHARACTER::SaveExitLocation()
 {
 	m_posExit = GetXYZ();
 	m_lExitMapIndex = GetMapIndex();
+}
+
+void CHARACTER::GetExitLocation(int32_t& lMapIndex, int32_t& x, int32_t& y)
+{
+	lMapIndex = m_lExitMapIndex;
+	x = m_posExit.x, y = m_posExit.y;
 }
 
 void CHARACTER::ExitToSavedLocation()
@@ -5274,16 +5764,15 @@ bool CHARACTER::WarpSet(int32_t x, int32_t y, int32_t lPrivateMapIndex)
 	GetDesc()->Packet(&p, sizeof(TPacketGCWarp));
 
 	char buf[256];
-	snprintf(buf, sizeof(buf), "%s MapIdx %ld DestMapIdx%ld DestX%ld DestY%ld Empire%d", GetName(), GetMapIndex(), lPrivateMapIndex, x, y, GetEmpire());
+	snprintf(buf, sizeof(buf), "%s MapIdx %d DestMapIdx%d DestX%d DestY%d Empire%d", GetName(), GetMapIndex(), lPrivateMapIndex, x, y, GetEmpire());
 	LogManager::instance().CharLog(this, 0, "WARP", buf);
 
 	return true;
 }
 
-#define ENABLE_GOHOME_IF_MAP_NOT_ALLOWED
 void CHARACTER::WarpEnd()
 {
-	if (test_server)
+	if (g_bIsTestServer)
 		sys_log(0, "WarpEnd %s", GetName());
 
 	if (m_posWarp.x == 0 && m_posWarp.y == 0)
@@ -5297,11 +5786,7 @@ void CHARACTER::WarpEnd()
 	if (!map_allow_find(index))
 	{
 		sys_err("location %d %d not allowed to login this server", m_posWarp.x, m_posWarp.y);
-#ifdef ENABLE_GOHOME_IF_MAP_NOT_ALLOWED
 		GoHome();
-#else
-		GetDesc()->SetPhase(PHASE_CLOSE);
-#endif
 		return;
 	}
 
@@ -5323,6 +5808,7 @@ void CHARACTER::WarpEnd()
 		p.bEmpire = GetEmpire();
 		p.lMapIndex = SECTREE_MANAGER::instance().GetMapIndex(GetX(), GetY());
 		p.bChannel = g_bChannel;
+		p.iLevel = GetLevel();
 
 		P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGLogin));
 	}
@@ -5353,7 +5839,7 @@ bool CHARACTER::Return()
 
 	SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
 
-	if (test_server)
+	if (g_bIsTestServer)
 		sys_log(0, "%s %p 포기하고 돌아가자! %d %d", GetName(), this, x, y);
 
 	if (GetParty())
@@ -5394,7 +5880,7 @@ bool CHARACTER::Follow(LPCHARACTER pkChr, float fMinDistance)
 	int32_t x = pkChr->GetX();
 	int32_t y = pkChr->GetY();
 
-	if (pkChr->IsPC()) // 쫓아가는 상대가 PC일 때
+	if (pkChr->IsPC() && !GetBattlegroundTeamID()) // 쫓아가는 상대가 PC일 때
 	{
 		// If i'm in a party. I must obey party leader's AI.
 		if (!GetParty() || !GetParty()->GetLeader() || GetParty()->GetLeader() == this)
@@ -5471,7 +5957,7 @@ bool CHARACTER::Follow(LPCHARACTER pkChr, float fMinDistance)
 		SetChangeAttackPositionTime();
 
 		int32_t retry = 16;
-		int32_t dx, dy;
+		int32_t dx = 0, dy = 0;
 		int32_t rot = (int32_t) GetDegreeFromPositionXY(x, y, GetX(), GetY());
 
 		while (--retry)
@@ -5513,6 +5999,19 @@ bool CHARACTER::Follow(LPCHARACTER pkChr, float fMinDistance)
 	return true;
 }
 
+bool CHARACTER::IsInSafezone()
+{
+	if (IsPC())
+	{
+		SECTREE	*my_sectree = nullptr;
+		my_sectree = GetSectree();
+
+		if (my_sectree && my_sectree->IsAttr(GetX(), GetY(), ATTR_BANPK))
+			return true;
+	}
+	return false;
+}
+
 float CHARACTER::GetDistanceFromSafeboxOpen() const
 {
 	return DISTANCE_APPROX(GetX() - m_posSafeboxOpen.x, GetY() - m_posSafeboxOpen.y);
@@ -5530,6 +6029,15 @@ CSafebox * CHARACTER::GetSafebox() const
 
 void CHARACTER::ReqSafeboxLoad(const char* pszPassword)
 {
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+		return;
+		
+	if (!GM::check_allow(GetGMLevel(), GM_ALLOW_USE_SAFEBOX))
+	{
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot do this with this gamemaster rank."));
+		return;
+	}
+
 	if (!*pszPassword || strlen(pszPassword) > SAFEBOX_PASSWORD_MAX_LEN)
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<창고> 잘못된 암호를 입력하셨습니다."));
@@ -5582,7 +6090,7 @@ void CHARACTER::LoadSafebox(int32_t iSize, uint32_t dwGold, int32_t iItemCount, 
 		bLoaded = true;
 
 	if (!m_pkSafebox)
-		m_pkSafebox = M2_NEW CSafebox(this, iSize, dwGold);
+		m_pkSafebox = M2_NEW CSafebox(this, iSize);
 	else
 		m_pkSafebox->ChangeSize(iSize);
 
@@ -5613,6 +6121,7 @@ void CHARACTER::LoadSafebox(int32_t iSize, uint32_t dwGold, int32_t iItemCount, 
 			item->SetSkipSave(true);
 			item->SetSockets(pItems->alSockets);
 			item->SetAttributes(pItems->aAttr);
+			item->SetGMOwner(pItems->is_gm_owner);
 
 			if (!m_pkSafebox->Add(pItems->pos, item))
 			{
@@ -5677,7 +6186,7 @@ void CHARACTER::LoadMall(int32_t iItemCount, TPlayerItem * pItems)
 		bLoaded = true;
 
 	if (!m_pkMall)
-		m_pkMall = M2_NEW CSafebox(this, 3 * SAFEBOX_PAGE_SIZE, 0);
+		m_pkMall = M2_NEW CSafebox(this, 3 * SAFEBOX_PAGE_SIZE);
 	else
 		m_pkMall->ChangeSize(3 * SAFEBOX_PAGE_SIZE);
 
@@ -5708,6 +6217,7 @@ void CHARACTER::LoadMall(int32_t iItemCount, TPlayerItem * pItems)
 			item->SetSkipSave(true);
 			item->SetSockets(pItems->alSockets);
 			item->SetAttributes(pItems->aAttr);
+			item->SetGMOwner(pItems->is_gm_owner);
 
 			if (!m_pkMall->Add(pItems->pos, item))
 				M2_DESTROY_ITEM(item);
@@ -5775,8 +6285,7 @@ void CHARACTER::QuerySafeboxSize()
 		DBManager::instance().ReturnQuery(QID_SAFEBOX_SIZE,
 				GetPlayerID(),
 				nullptr, 
-				"SELECT size FROM safebox%s WHERE account_id = %u",
-				get_table_postfix(),
+				"SELECT size FROM safebox WHERE account_id = %u",
 				GetDesc()->GetAccountTable().id);
 	}
 }
@@ -5785,7 +6294,7 @@ void CHARACTER::SetSafeboxSize(int32_t iSize)
 {
 	sys_log(1, "SetSafeboxSize: %s %d", GetName(), iSize);
 	m_iSafeboxSize = iSize;
-	DBManager::instance().Query("UPDATE safebox%s SET size = %d WHERE account_id = %u", get_table_postfix(), iSize / SAFEBOX_PAGE_SIZE, GetDesc()->GetAccountTable().id);
+	DBManager::instance().Query("UPDATE safebox SET size = %d WHERE account_id = %u", iSize / SAFEBOX_PAGE_SIZE, GetDesc()->GetAccountTable().id);
 }
 
 int32_t CHARACTER::GetSafeboxSize() const
@@ -5918,7 +6427,7 @@ void CHARACTER::GiveRandomSkillBook()
 
 	if (nullptr != item)
 	{
-		extern const uint32_t GetRandomSkillVnum(uint8_t bJob = JOB_MAX_NUM);
+		extern uint32_t GetRandomSkillVnum(uint8_t bJob = JOB_MAX_NUM);
 		uint32_t dwSkillVnum = 0;
 		// 50% of getting random books or getting one of the same player's race
 		if (!number(0, 1))
@@ -5951,7 +6460,7 @@ void CHARACTER::EffectPacket(int32_t enumEffectType)
 {
 	TPacketGCSpecialEffect p;
 
-	p.header = HEADER_GC_SEPCIAL_EFFECT;
+	p.header = HEADER_GC_SPECIAL_EFFECT;
 	p.type = enumEffectType;
 	p.vid = GetVID();
 
@@ -6026,6 +6535,15 @@ void CHARACTER::MonsterChat(uint8_t bMonsterChatType)
 
 void CHARACTER::SetQuestNPCID(uint32_t vid)
 {
+	if (m_dwQuestNPCVID)
+	{
+		quest::PC* pPC = quest::CQuestManager::instance().GetPCForce(GetPlayerID());
+		if (pPC && pPC->IsRunning())
+		{
+			sys_err("cannot reset quest npc id - already running quest [%u %s]", GetPlayerID(), GetName());
+			return;
+		}
+	}
 	m_dwQuestNPCVID = vid;
 }
 
@@ -6084,7 +6602,7 @@ bool CHARACTER::IsGuardNPC() const
 
 int32_t CHARACTER::GetPolymorphPower() const
 {
-	if (test_server)
+	if (g_bIsTestServer)
 	{
 		int32_t value = quest::CQuestManager::instance().GetEventFlag("poly");
 		if (value)
@@ -6095,6 +6613,9 @@ int32_t CHARACTER::GetPolymorphPower() const
 
 void CHARACTER::SetPolymorph(uint32_t dwRaceNum, bool bMaintainStat)
 {
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+		return;
+
 #ifdef ENABLE_WOLFMAN_CHARACTER
 	if (dwRaceNum < MAIN_RACE_MAX_NUM)
 #else
@@ -6144,11 +6665,19 @@ void CHARACTER::SetPolymorph(uint32_t dwRaceNum, bool bMaintainStat)
 
 int32_t CHARACTER::GetQuestFlag(const std::string& flag) const
 {
+	if (!IsPC())
+	{
+		sys_err("Trying to get qf %s from non player character", flag.c_str());
+		return 0;
+	}
+	uint32_t pid = GetPlayerID();
+
 	quest::CQuestManager& q = quest::CQuestManager::instance();
 	quest::PC* pPC = q.GetPC(GetPlayerID());
+
 	if (!pPC)
 	{
-		sys_err("Nullpointer in CHARACTER::GetQuestFlag %lu", GetPlayerID());
+		sys_err("Nullpointer when trying to access questflag %s for player with pid %u", flag.c_str(), pid);
 		return 0;
 	}
 
@@ -6157,11 +6686,14 @@ int32_t CHARACTER::GetQuestFlag(const std::string& flag) const
 
 void CHARACTER::SetQuestFlag(const std::string& flag, int32_t value)
 {
+	uint32_t pid = GetPlayerID();
+
 	quest::CQuestManager& q = quest::CQuestManager::instance();
 	quest::PC* pPC = q.GetPC(GetPlayerID());
+
 	if (!pPC)
 	{
-		sys_err("Nullpointer in CHARACTER::SetQuestFlag %lu", GetPlayerID());
+		sys_err("Nullpointer when trying to set questflag %s for player with pid %u", flag.c_str(), pid);
 		return;
 	}
 
@@ -6170,13 +6702,11 @@ void CHARACTER::SetQuestFlag(const std::string& flag, int32_t value)
 
 void CHARACTER::DetermineDropMetinStone()
 {
-#ifdef ENABLE_NEWSTUFF
 	if (g_NoDropMetinStone)
 	{
 		m_dwDropMetinStone = 0;
 		return;
 	}
-#endif
 
 	static const uint32_t c_adwMetin[] =
 	{
@@ -6197,10 +6727,8 @@ void CHARACTER::DetermineDropMetinStone()
 		28041,
 		28042,
 		28043,
-#if defined(ENABLE_MAGIC_REDUCTION_SYSTEM) && defined(USE_MAGIC_REDUCTION_STONES)
 		28044,
 		28045,
-#endif
 	};
 	uint32_t stone_num = GetRaceNum();
 	int32_t idx = std::lower_bound(aStoneDrop, aStoneDrop+STONE_INFO_MAX_NUM, stone_num) - aStoneDrop;
@@ -6264,6 +6792,9 @@ bool CHARACTER::CanSummon(int32_t iLeaderShip)
 
 void CHARACTER::MountVnum(uint32_t vnum)
 {
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+		return;
+
 	if (m_dwMountVnum == vnum)
 		return;
 	if ((m_dwMountVnum != 0)&&(vnum!=0)) //@fixme108 set recursively to 0 for eventuality
@@ -6272,37 +6803,20 @@ void CHARACTER::MountVnum(uint32_t vnum)
 	m_dwMountVnum = vnum;
 	m_dwMountTime = get_dword_time();
 
-	if (m_bIsObserver)
+	if (m_isObserver)
 		return;
 
 	m_posDest.x = m_posStart.x = GetX();
 	m_posDest.y = m_posStart.y = GetY();
-#ifdef ENABLE_MOUNT_ENTITY_REFRESH
 	// EncodeRemovePacket(this); // commented, otherwise it may warp you back
-#endif
 	EncodeInsertPacket(this);
 
-	ENTITY_MAP::iterator it = m_map_view.begin();
+	auto it = m_mapView.begin();
 
-	while (it != m_map_view.end())
+	while (it != m_mapView.end())
 	{
 		LPENTITY entity = (it++)->first;
-
-#ifdef ENABLE_MOUNT_ENTITY_REFRESH
-		if (entity->IsType(ENTITY_CHARACTER))
-		{
-			EncodeRemovePacket(entity);
-			if (!m_bIsObserver)
-				EncodeInsertPacket(entity);
-
-			if (!entity->IsObserverMode())
-					entity->EncodeInsertPacket(this);
-		}
-		else
-			EncodeInsertPacket(entity);
-#else
 		EncodeInsertPacket(entity);
-#endif
 	}
 
 	SetValidComboInterval(0);
@@ -6328,7 +6842,7 @@ namespace {
 
 				char szTmp[64];
 
-				if (3 != sscanf(pkWarp->GetName(), " %s %ld %ld ", szTmp, &m_lTargetX, &m_lTargetY))
+				if (3 != sscanf(pkWarp->GetName(), " %s %d %d ", szTmp, &m_lTargetX, &m_lTargetY))
 				{
 					if (number(1, 100) < 5)
 						sys_err("Warp NPC name wrong : vnum(%d) name(%s)", pkWarp->GetRaceNum(), pkWarp->GetName());
@@ -6467,7 +6981,10 @@ void CHARACTER::SyncPacket()
 	buf.write(&pack, sizeof(pack));
 	buf.write(&elem, sizeof(elem));
 
-	PacketAround(buf.read_peek(), buf.size());
+	if (GetBattleground())
+		PacketMap(GetMapIndex(), buf.read_peek(), buf.size());
+	else
+		PacketAround(buf.read_peek(), buf.size());
 }
 
 LPCHARACTER CHARACTER::GetMarryPartner() const
@@ -6578,7 +7095,7 @@ bool CHARACTER::WarpToPID(uint32_t dwPID)
 			p.dwTargetPID = dwPID;
 			pcci->pkDesc->Packet(&p, sizeof(TPacketGGFindPosition));
 
-			if (test_server) 
+			if (g_bIsTestServer) 
 				ChatPacket(CHAT_TYPE_PARTY, "sent find position packet for teleport");
 		}
 	}
@@ -6643,7 +7160,7 @@ bool CHARACTER::IsHack(bool bSendMsg, bool bCheckShopOwner, int32_t limittime)
 {
 	const int32_t iPulse = thecore_pulse();
 
-	if (test_server)
+	if (g_bIsTestServer)
 		bSendMsg = true;
 
 	//창고 연후 체크
@@ -6652,7 +7169,7 @@ bool CHARACTER::IsHack(bool bSendMsg, bool bCheckShopOwner, int32_t limittime)
 		if (bSendMsg)
 			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("창고를 연후 %d초 이내에는 다른곳으로 이동할수 없습니다."), limittime);
 
-		if (test_server)
+		if (g_bIsTestServer)
 			ChatPacket(CHAT_TYPE_INFO, "[TestOnly]Pulse %d LoadTime %d PASS %d", iPulse, GetSafeboxLoadTime(), PASSES_PER_SEC(limittime));
 		return true; 
 	}
@@ -6941,6 +7458,114 @@ void CHARACTER::StartCheckSpeedHackEvent()
 	m_pkCheckSpeedHackEvent = event_create(check_speedhack_event, info, PASSES_PER_SEC(60));	// 1분
 }
 
+
+/*
+Wallhack Detection
+*/
+EVENTFUNC(wallhack_check)
+{
+	char_event_info* info = dynamic_cast<char_event_info*>(event->info);
+	if (info == nullptr)
+	{
+		sys_err("wallhack_check <Factor> Null pointer");
+		return 0;
+	}
+
+	LPCHARACTER Player = info->ch;
+
+	if (!Player)
+		return 0;
+
+	LPDESC d = Player->GetDesc();
+
+	if (!d)
+		return 0;
+
+	if (d->IsPhase(PHASE_HANDSHAKE) || d->IsPhase(PHASE_LOGIN) || d->IsPhase(PHASE_SELECT) || d->IsPhase(PHASE_DEAD) || d->IsPhase(PHASE_LOADING))
+		return PASSES_PER_SEC(1);
+
+	sys_log(2, "WALLHACK_CHECK: %s", Player->GetName());
+
+
+
+	LPSECTREE CurrentTree = Player->GetSectree();
+	if (!CurrentTree)
+		return PASSES_PER_SEC(1);
+
+	bool isWallHack = false;
+	for (int32_t dx = -300; dx < 300; ++dx)
+	{
+		for (int32_t dy = -300; dy < 300; ++dy)
+		{
+			if (CurrentTree->IsAttr(Player->GetX() + dx, Player->GetY() + dy, ATTR_BLOCK | ATTR_OBJECT))
+			{
+				isWallHack = true;
+				break;
+			}
+		}
+	}
+
+	if (isWallHack)
+	{
+		if (Player->GetLastMoveAblePosition().x == 0 || Player->GetLastMoveAblePosition().y == 0 || Player->GetLastMoveableMapIndex() == 0)
+		{
+			Player->GoHome(); //you're drunk!
+			return 0;
+		}
+
+		std::string HackInfo = "S_WALL_HACK x" + std::to_string(Player->GetX());
+		HackInfo += " y" + std::to_string(Player->GetY());
+		HackInfo += " z" + std::to_string(Player->GetZ());
+		HackInfo += " m" + std::to_string(Player->GetMapIndex());
+		LogManager::instance().HackLog(HackInfo.c_str(), Player);
+		Player->WarpSet(Player->GetLastMoveAblePosition().x, Player->GetLastMoveAblePosition().y, Player->GetLastMoveableMapIndex());
+	}
+	else
+	{
+		Player->SetLastMoveAblePosition(Player->GetXYZ());
+		Player->SetLastMoveableMapIndex();
+	}
+
+	return PASSES_PER_SEC(1);
+}
+
+void CHARACTER::StartCheckWallhack()
+{
+	if (m_pkCheckWallHackEvent)
+		return;
+
+	// temporary disable wallhack check
+	if (true)
+		return;
+
+	char_event_info* info = AllocEventInfo<char_event_info>();
+
+	info->ch = this;
+
+	m_pkCheckWallHackEvent = event_create(wallhack_check, info, PASSES_PER_SEC(1));
+}
+
+bool CHARACTER::IsInHome()
+{
+	if (GetEmpire() == 1) 
+	{
+		if (GetMapIndex() == 1 || GetMapIndex() == 3)
+			return true;
+	}
+	else if (GetEmpire() == 2) 
+	{
+		if (GetMapIndex() == 21 || GetMapIndex() == 23)
+			return true;
+	}
+	else if (GetEmpire() == 3)
+	{
+		if (GetMapIndex() == 41 || GetMapIndex() == 43)
+			return true;
+	}
+	return false;
+}
+
+
 void CHARACTER::GoHome()
 {
 	WarpSet(EMPIRE_START_X(GetEmpire()), EMPIRE_START_Y(GetEmpire()));
@@ -7054,11 +7679,13 @@ void CHARACTER::IncreaseComboHackCount(int32_t k)
 	if (m_iComboHackCount >= 10)
 	{
 		if (GetDesc())
+		{
 			if (GetDesc()->DelayedDisconnect(number(2, 7)))
 			{
 				sys_log(0, "COMBO_HACK_DISCONNECT: %s count: %d", GetName(), m_iComboHackCount);
 				LogManager::instance().HackLog("Combo", this);
 			}
+		}
 	}
 }
 
@@ -7075,6 +7702,27 @@ void CHARACTER::SkipComboAttackByTime(int32_t interval)
 uint32_t CHARACTER::GetSkipComboAttackByTime() const
 {
 	return m_dwSkipComboAttackByTime;
+}
+
+void CHARACTER::UpdateSyncHackCount(const std::string& who, bool increase)
+{
+	int32_t variance = increase ? 1 : -1;
+
+	if (who == "monster")
+		m_iSyncMonsterHackCount += variance;
+	else if (who == "player")
+		m_iSyncPlayerHackCount += variance;
+}
+
+int32_t	CHARACTER::GetSyncHackCount(const std::string & who) const
+{
+	if (who == "monster")
+		return m_iSyncMonsterHackCount;
+
+	if (who == "player")
+		return m_iSyncPlayerHackCount;
+
+	return -1;
 }
 
 void CHARACTER::ResetChatCounter()
@@ -7125,14 +7773,189 @@ uint32_t CHARACTER::GetNextExp() const
 {
 	if (PLAYER_MAX_LEVEL_CONST < GetLevel())
 		return 2500000000u;
-	else
-		return exp_table[GetLevel()];
+	return exp_table[GetLevel()];
 }
 
 int32_t	CHARACTER::GetSkillPowerByLevel(int32_t level, bool bMob) const
 {
 	return CTableBySkill::instance().GetSkillPowerByLevelFromType(GetJob(), GetSkillGroup(), MINMAX(0, level, SKILL_MAX_LEVEL), bMob); 
 }
+
+bool CHARACTER::CanFall()
+{
+	if (IsAffectFlag(AFF_CHEONGEUN) && !IsAffectFlag(AFF_CHEONGEUN_WITH_FALL)) //Taichi skill
+		return false;
+
+	if (IsImmune(IMMUNE_FALL)) //Immune flag
+		return false;
+
+	if (!IsPC() &&
+		GetRaceNum() == 1097 &&
+		GetRaceNum() == 1098 &&
+		GetRaceNum() == 1099 &&
+		GetRaceNum() == 2496 &&
+		GetRaceNum() == 2497 &&
+		GetRaceNum() == 2498
+		)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+EVENTFUNC(anticheat_check_routine)
+{
+	char_event_info* info = dynamic_cast<char_event_info*>(event->info);
+	if (info == nullptr)
+	{
+		sys_err("anticheat_check_routine <Factor> Null pointer");
+		return 0;
+	}
+
+	LPCHARACTER Player = info->ch;
+
+	if (!Player)
+		return 0;
+
+	LPDESC d = Player->GetDesc();
+
+	if (!d)
+		return 0;
+
+	if (d->IsPhase(PHASE_HANDSHAKE) || d->IsPhase(PHASE_LOGIN) || d->IsPhase(PHASE_SELECT) || d->IsPhase(PHASE_DEAD) || d->IsPhase(PHASE_LOADING))
+		return PASSES_PER_SEC(1);
+
+	sys_log(2, "ANTICHEAT_CHECK: %s", Player->GetName());
+
+	LPSECTREE CurrentTree = Player->GetSectree();
+	if (!CurrentTree)
+		return PASSES_PER_SEC(1);
+
+	CAnticheatManager::Instance().SendCheckPacket(Player);
+
+	return PASSES_PER_SEC(60);
+}
+
+void CHARACTER::StartAnticheatCommunication()
+{
+	if (m_pkAnticheatEvent)
+		return;
+
+	char_event_info* info = AllocEventInfo<char_event_info>();
+
+	info->ch = this;
+
+	m_pkAnticheatEvent = event_create(anticheat_check_routine, info, PASSES_PER_SEC(60));
+}
+
+bool CHARACTER::IsPrivateMap(int32_t lMapIndex) const
+{
+	if (lMapIndex)
+		return GetMapIndex() >= lMapIndex * 10000 && GetMapIndex() <= lMapIndex * 10000 + 9999;
+
+	return GetMapIndex() >= 10000;
+}
+
+void CHARACTER::LoadActivity(TActivityTable* data) const
+{
+	if (!m_activityHandler)
+		return;
+
+	m_activityHandler->Load(data);
+}
+
+int32_t CHARACTER::GetActivity() const
+{
+	if (!IsPC()) {
+		sys_err("Trying to get activity from a non-player character? (%u)", GetRaceNum());
+		return 0;
+	}
+
+	if (!m_activityHandler) {
+		sys_err("No activity handler!", GetPlayerID());
+		return 0;
+	}
+
+	return m_activityHandler->GetActivity();
+}
+
+void CHARACTER::SetCoins(int32_t val)
+{
+	if (val < 0 || val > 1000)
+	{
+		sys_err("Value format isn't valid, Value: %ld", val);
+		return;
+	}
+
+	int32_t value = val;
+	std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery("UPDATE account.account SET cash = '%d' WHERE id = '%d'", value, GetAID()));
+
+	if (msg->uiSQLErrno != 0)
+	{
+		sys_err("SetCoins Query Failed, Error code: %ld", msg->uiSQLErrno);
+		return;
+	}
+
+	sys_log(0, "NAME: %s Coins Set Event, Amount: %d", GetName(), val);
+}
+
+void CHARACTER::UpdateCoins(uint32_t dwAID, int32_t val)
+{
+	if (val == 0)
+	{
+		sys_err("Value is zero");
+		return;
+	}
+
+	uint32_t dwTarget = dwAID ? dwAID : GetAID();
+	char szQuery[1024 + 1];
+	int32_t value = abs(val);
+
+	if (val > 0)
+		sprintf(szQuery, "UPDATE account.account SET cash = cash + '%ld' WHERE id = '%u'", value, dwTarget);
+	else
+		sprintf(szQuery, "UPDATE account.account SET cash = cash - '%ld' WHERE id = '%u'", value, dwTarget);
+
+	std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
+
+	if (msg->uiSQLErrno != 0)
+	{
+		sys_err("UpdateCoins Query Failed, Error code: %ld", msg->uiSQLErrno);
+		return;
+	}
+
+	sys_log(0, "NAME: %s Coins Updated, Amount: %d", GetName(), val);
+	if (val > 0)
+		ChatPacket(CHAT_TYPE_INFO, "You won %d coin", value);
+	else
+		ChatPacket(CHAT_TYPE_INFO, "You lost %d coin", value);
+}
+
+int32_t CHARACTER::GetCoins()
+{
+	std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery("SELECT cash FROM account.account WHERE id = '%u'", GetAID()));
+
+	if (msg->uiSQLErrno != 0)
+	{
+		sys_err("GetCoins Query Failed, Error code: %ld", msg->uiSQLErrno);
+		return 0;
+	}
+	if (!msg->Get()->uiNumRows)
+	{
+		sys_err("GetCoins Query Failed, Rows couldn't get");
+		return 0;
+	}
+
+	MYSQL_ROW row = mysql_fetch_row(msg->Get()->pSQLResult);
+	const char * cMyCoins = row[0];
+
+	int32_t lMyCoins = 0;
+	str_to_number(lMyCoins, cMyCoins);
+
+	return lMyCoins;
+}
+
 
 #ifdef ENABLE_ACCE_SYSTEM
 void CHARACTER::OpenAcce(bool bCombination)
@@ -7602,7 +8425,7 @@ void CHARACTER::RefineAcceMaterials()
 			pkItem->SetSocket(ACCE_ABSORBED_SOCKET, pkItemMaterial[0]->GetSocket(ACCE_ABSORBED_SOCKET));
 
 			PointChange(POINT_GOLD, -dwPrice);
-			DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, pkItemMaterial[0]->GetVnum(), -dwPrice);
+			LogManager::instance().MoneyLog(MONEY_LOG_REFINE, pkItemMaterial[0]->GetVnum(), -dwPrice);
 
 			uint16_t wCell = pkItemMaterial[0]->GetCell();
 			ITEM_MANAGER::instance().RemoveItem(pkItemMaterial[0], "COMBINE (REFINE SUCCESS)");
@@ -7625,7 +8448,7 @@ void CHARACTER::RefineAcceMaterials()
 		else
 		{
 			PointChange(POINT_GOLD, -dwPrice);
-			DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, pkItemMaterial[0]->GetVnum(), -dwPrice);
+			LogManager::instance().MoneyLog(MONEY_LOG_REFINE, pkItemMaterial[0]->GetVnum(), -dwPrice);
 
 			ITEM_MANAGER::instance().RemoveItem(pkItemMaterial[1], "COMBINE (REFINE FAIL)");
 

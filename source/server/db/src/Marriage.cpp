@@ -27,22 +27,20 @@ namespace marriage
 	}
 
 	CManager::~CManager()
-	{
-	}
+	= default;
 
 	bool CManager::Initialize()
 	{
 		char szQuery[1024];
 
 		snprintf(szQuery, sizeof(szQuery),
-				"SELECT pid1, pid2, love_point, time, is_married, p1.name, p2.name FROM marriage, player%s as p1, player%s as p2 WHERE p1.id = pid1 AND p2.id = pid2",
-				GetTablePostfix(), GetTablePostfix());
+				"SELECT pid1, pid2, love_point, time, is_married, p1.name, p2.name FROM marriage, player as p1, player as p2 WHERE p1.id = pid1 AND p2.id = pid2");
 
 		std::unique_ptr<SQLMsg> pmsg_delete(CDBManager::instance().DirectQuery("DELETE FROM marriage WHERE is_married = 0"));
 		std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
 
 		SQLResult * pRes = pmsg->Get();
-		sys_log(0, "MarriageList(size=%lu)", pRes->uiNumRows);
+		sys_log(0, "MarriageList(size=%u)", pRes->uiNumRows);
 
 		if (pRes->uiNumRows > 0)
 		{
@@ -58,12 +56,12 @@ namespace marriage
 				const char* name1 = row[5];
 				const char* name2 = row[6];
 
-				TMarriage* pMarriage = new TMarriage(pid1, pid2, love_point, time, is_married, name1, name2);
+				auto pMarriage = new TMarriage(pid1, pid2, love_point, time, is_married, name1, name2);
 				m_Marriages.insert(pMarriage);
 				m_MarriageByPID.insert(std::make_pair(pid1, pMarriage));
 				m_MarriageByPID.insert(std::make_pair(pid2, pMarriage));
 
-				sys_log(0, "Marriage %lu: LP:%d TM:%u ST:%d %10lu:%16s %10lu:%16s ", uiRow, love_point, time, is_married, pid1, name1, pid2, name2);
+				sys_log(0, "Marriage %u: LP:%d TM:%u ST:%d %10lu:%16s %10lu:%16s ", uiRow, love_point, time, is_married, pid1, name1, pid2, name2);
 			}
 		}
 		return true;
@@ -110,7 +108,7 @@ namespace marriage
 
 		sys_log(0, "MARRIAGE ADD %u %u", dwPID1, dwPID2);
 
-		TMarriage* pMarriage = new TMarriage(dwPID1, dwPID2, 0, now, 0, szName1, szName2);
+		auto pMarriage = new TMarriage(dwPID1, dwPID2, 0, now, 0, szName1, szName2);
 		m_Marriages.insert(pMarriage);
 		m_MarriageByPID.insert(std::make_pair(dwPID1, pMarriage));
 		m_MarriageByPID.insert(std::make_pair(dwPID2, pMarriage));
@@ -133,6 +131,10 @@ namespace marriage
 			return;
 		}
 
+		if (pMarriage->love_point == iLovePoint && pMarriage->is_married == byMarried)
+			return;
+		if (iLovePoint < 0)
+			return;
 		Align(dwPID1, dwPID2);
 
 		char szQuery[512];
@@ -142,6 +144,12 @@ namespace marriage
 		std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
 
 		SQLResult* res = pmsg->Get();
+		if (res == nullptr)
+		{
+			sys_err("pmsg->Get() == nullptr! PID1: %d PID2: %d", dwPID1, dwPID2);
+			return;
+		}
+		
 		if (res->uiAffectedRows == 0 || res->uiAffectedRows == (uint32_t)-1)
 		{
 			sys_err("cannot update marriage : PID:%u %u", dwPID1, dwPID2);
@@ -234,7 +242,7 @@ namespace marriage
 		SQLResult* res = pmsg->Get();
 		if (res->uiAffectedRows == 0 || res->uiAffectedRows == (uint32_t)-1)
 		{
-			sys_err("cannot change engage to marriage : PID:%u %u", dwPID1, dwPID2);
+			sys_err("cannot change engage to marriage : PID:%u %u affectedRows = (%u)", dwPID1, dwPID2, res->uiAffectedRows);
 			return;
 		}
 
@@ -252,10 +260,8 @@ namespace marriage
 	void CManager::OnSetup(CPeer* peer)
 	{
 		// 결혼한 사람들 보내기
-		for (auto it = m_Marriages.begin(); it != m_Marriages.end(); ++it)
+		for (auto pMarriage : m_Marriages)
 		{
-			TMarriage* pMarriage = *it;
-
 			{
 				TPacketMarriageAdd p;
 				p.dwPID1 = pMarriage->pid1;
@@ -279,9 +285,9 @@ namespace marriage
 		}
 
 		// 결혼식 보내기
-		for (auto it = m_mapRunningWedding.begin(); it != m_mapRunningWedding.end(); ++it)
+		for (auto & it : m_mapRunningWedding)
 		{
-			const TWedding& t = it->second;
+			const TWedding& t = it.second;
 
 			TPacketWeddingReady p;
 			p.dwPID1 = t.dwPID1;

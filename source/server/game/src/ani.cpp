@@ -12,6 +12,7 @@
 #include "item.h"
 #include "ani.h"
 #include "dev_log.h"
+#include "../../common/service.h"
 
 const char* FN_race_name(int32_t race)
 {
@@ -103,8 +104,8 @@ uint32_t FN_attack_speed_from_file(const char *file)
 		{
 			if (0 == strcasecmp(field, key))
 			{
-				float f_speed = strtof(value, nullptr);
-				speed = (int32_t) (f_speed * 1000.0);
+				auto f_speed = std::stof(value);
+				speed = static_cast<int32_t>(f_speed * 1000.0);
 				break;
 			}
 		}
@@ -216,6 +217,23 @@ bool ANI::load_one_race(int32_t race, const char *dir_name)
 	for (int32_t weapon = WEAPON_SWORD; weapon < WEAPON_NUM_TYPES; ++weapon)
 	{
 		dev_log(LOG_DEB0, "ANI (%s,%s)", FN_race_name(race), FN_weapon_type(weapon));
+
+		if (!(weapon == WEAPON_SWORD || weapon == WEAPON_TWO_HANDED) && (race == MAIN_RACE_WARRIOR_M || race == MAIN_RACE_WARRIOR_W))
+			continue;
+
+		if (!(weapon == WEAPON_SWORD) && (race == MAIN_RACE_SURA_M || race == MAIN_RACE_SURA_W))
+			continue;
+
+		if (!(weapon == WEAPON_FAN || weapon == WEAPON_BELL) && (race == MAIN_RACE_SHAMAN_M || race == MAIN_RACE_SHAMAN_W))
+			continue;
+
+		if (!(weapon == WEAPON_SWORD || weapon == WEAPON_BOW || weapon == WEAPON_DAGGER) && (race == MAIN_RACE_ASSASSIN_M || race == MAIN_RACE_ASSASSIN_W))
+			continue;
+
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		if (!(weapon == WEAPON_CLAW) && (race == MAIN_RACE_WOLFMAN_M))
+			continue;
+#endif
 
 		for (uint8_t combo = 1; combo <= 8; ++combo)
 		{

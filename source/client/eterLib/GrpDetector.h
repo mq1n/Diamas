@@ -8,7 +8,7 @@ enum
 {
 	D3DDEVICETYPE_HAL,
 	D3DDEVICETYPE_REF,
-	D3DDEVICETYPE_NUM,
+	D3DDEVICETYPE_NUM
 };
 
 struct D3D_SModeInfo
@@ -75,7 +75,7 @@ class D3D_CDeviceInfo
 	protected:
 		enum
 		{
-			D3DMODEINFO_NUM = 150,
+			D3DMODEINFO_NUM = 150
 		};
 
 	
@@ -126,7 +126,7 @@ class D3D_CAdapterInfo
 	protected:
 		enum
 		{
-			D3DDEVICEINFO_NUM = 5,
+			D3DDEVICEINFO_NUM = 5
 		};
 		
 		
@@ -157,7 +157,7 @@ class D3D_CDisplayModeAutoDetector
 	protected:
 		enum
 		{
-			D3DADAPTERINFO_NUM = 10,
+			D3DADAPTERINFO_NUM = 10
 		};
 
 	protected:

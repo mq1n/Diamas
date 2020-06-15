@@ -6,9 +6,7 @@ LPDIRECTINPUTDEVICE8	CInputKeyboard::ms_lpKeyboard = nullptr;
 bool					CInputKeyboard::ms_bPressedKey[256];
 char					CInputKeyboard::ms_diks[256];
 
-CInputDevice::CInputDevice()
-{
-}
+CInputDevice::CInputDevice() = default;
 
 CInputDevice::~CInputDevice()
 {

@@ -1,12 +1,18 @@
 #ifndef __INC_METIN_II_GAME_ENTITY_H__
 #define __INC_METIN_II_GAME_ENTITY_H__
 
+#include "GPosition.h"
+#include "typedef.h"
+#include <unordered_map>
+#include <functional>
+
 class SECTREE;
 
 class CEntity
 {
 	public:
-		typedef std::unordered_map<LPENTITY, int32_t> ENTITY_MAP;
+		typedef std::unordered_map<LPENTITY, int32_t> MAP_VIEW;
+		typedef std::function<bool(LPCHARACTER)> ENTITY_REQ_FUNC;
 
 	public:
 		CEntity();
@@ -17,12 +23,12 @@ class CEntity
 
 	protected:
 		void			Initialize(int32_t type = -1);
-		void			Destroy();
+		virtual void	Destroy();
 
 
 	public:
 		void			SetType(int32_t type);
-		int32_t				GetType() const;
+		int32_t			GetType() const;
 		bool			IsType(int32_t type) const;
 
 		void			ViewCleanup();
@@ -30,49 +36,86 @@ class CEntity
 		void			ViewRemove(LPENTITY entity, bool recursive = true);
 		void			ViewReencode();	// 주위 Entity에 패킷을 다시 보낸다.
 
-		int32_t				GetViewAge() const	{ return m_iViewAge;	}
+		int32_t			GetViewAge() const	{ return m_viewAge;	}
 
-		int32_t			GetX() const		{ return m_pos.x; }
-		int32_t			GetY() const		{ return m_pos.y; }
-		int32_t			GetZ() const		{ return m_pos.z; }
-		const PIXEL_POSITION &	GetXYZ() const		{ return m_pos; }
+		int32_t			GetX() const		{ return m_position.x; }
+		int32_t			GetY() const		{ return m_position.y; }
+		int32_t			GetZ() const		{ return m_position.z; }
+		const GPOS &	GetXYZ() const		{ return m_position; }
 
-		void			SetXYZ(int32_t x, int32_t y, int32_t z)		{ m_pos.x = x, m_pos.y = y, m_pos.z = z; }
-		void			SetXYZ(const PIXEL_POSITION & pos)	{ m_pos = pos; }
+		void			SetXYZ(int32_t x, int32_t y, int32_t z)		{ m_position.x = x, m_position.y = y, m_position.z = z; }
+		void			SetXYZ(const GPOS & pos)	{ m_position = pos; }
 
-		LPSECTREE		GetSectree() const			{ return m_pSectree;	}
-		void			SetSectree(LPSECTREE tree)	{ m_pSectree = tree;	}
+		LPSECTREE		GetSectree() const			{ return m_sectree;	}
+		void			SetSectree(LPSECTREE tree)	{ m_sectree = tree;	}
 
 		void			UpdateSectree();
 		void			PacketAround(const void * data, int32_t bytes, LPENTITY except = nullptr);
 		void			PacketView(const void * data, int32_t bytes, LPENTITY except = nullptr);
+		void			PacketMap(int32_t nMapIndex, const void * data, int32_t bytes);
 
-		void			BindDesc(LPDESC _d)     { m_lpDesc = _d; }
-		LPDESC			GetDesc() const			{ return m_lpDesc; }
+		template <typename Function>
+		void ForEachSeen(Function& f);
+		void			BindDesc(LPDESC _d)     { m_desc = _d; }
+		LPDESC			GetDesc() const			{ return m_desc; }
 
-		void			SetMapIndex(int32_t l)	{ m_lMapIndex = l; }
-		int32_t			GetMapIndex() const	{ return m_lMapIndex; }
+		void			SetMapIndex(int32_t l)	{ m_mapIndex = l; }
+		int32_t			GetMapIndex() const	{ return m_mapIndex; }
 
 		void			SetObserverMode(bool bFlag);
-		bool			IsObserverMode() const	{ return m_bIsObserver; }
+		bool			IsObserverMode() const	{ return m_isObserver; }
 
+		void			SetBattlegroundEntity();
+		bool			IsBattlegroundEntity() { return m_isBattlegroundEntity; };
+
+		ENTITY_REQ_FUNC GetRequirementFunction() const { return m_fReq; };
+		void			SetRequirementFunction(ENTITY_REQ_FUNC f) { m_fReq = f; }
 	protected:
-		bool			m_bIsObserver;
-		bool			m_bObserverModeChange;
-		ENTITY_MAP		m_map_view;
-		int32_t			m_lMapIndex;
+		bool			m_isObserver;
+		bool			m_isObserverModeUpdate;
+		MAP_VIEW		m_mapView;
+		int32_t			m_mapIndex;
+		bool			m_isBattlegroundEntity;
 
 	private:
-		LPDESC			m_lpDesc;
+		LPDESC			m_desc;
 
-		int32_t			m_iType;
-		bool			m_bIsDestroyed;
+		int32_t			m_objectType;
+		bool			m_isDestroyed;
 
-		PIXEL_POSITION		m_pos;
+		GPOS			m_position;
 
-		int32_t			m_iViewAge;
+		int32_t			m_viewAge;
 
-		LPSECTREE		m_pSectree;
+		LPSECTREE		m_sectree;
+		bool			m_isShow;
+		ENTITY_REQ_FUNC m_fReq;
 };
 
+template <typename Function>
+void CEntity::ForEachSeen(Function& f)
+{
+	std::vector<CEntity*> seen;
+	seen.reserve(m_mapView.size());
+
+	auto collector = [&seen](const MAP_VIEW::value_type& p)
+	{
+		seen.push_back(p.first);
+	};
+
+	// TODO: Some functions expect the old behaviour of including this in
+	// their around view.
+	// figure those out and manually call f on this
+	seen.push_back(this);
+
+	std::for_each(m_mapView.begin(), m_mapView.end(), collector);
+
+	// This is very fragile. All of ForEachSeen()'s callers are only interested
+	// in characters. One of these characters might however be destroyed while
+	// we are iterating over our snapshot.
+	CharacterSnapshotGuard guard;
+
+	for (const auto& e : seen)
+		f(e);
+}
 #endif

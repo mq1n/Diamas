@@ -2,22 +2,20 @@
 #include "PrivManager.h"
 #include "ClientManager.h"
 
-const int32_t PRIV_DURATION = 60*60*12;
 const int32_t CHARACTER_GOOD_PRIV_DURATION = 2*60*60;
 const int32_t CHARACTER_BAD_PRIV_DURATION = 60*60;
 
 CPrivManager::CPrivManager()
 {
-	for (int32_t type = 0; type < MAX_PRIV_NUM; ++type)
+	for (auto & type : m_aaPrivEmpire)
 	{
 		for (int32_t empire = 0; empire < EMPIRE_MAX_NUM; ++empire)
-			m_aaPrivEmpire[type][empire] = 0;
+			type[empire] = nullptr;
 	}
 }
 
 CPrivManager::~CPrivManager()
-{
-}
+= default;
 
 //
 // @version 05/06/07	Bang2ni - 중복적으로 보너스가 적용 된 길드에 대한 처리
@@ -56,7 +54,7 @@ void CPrivManager::Update()
 		if (p->value != 0 && !p->bRemoved)
 		{
 			SendChangeEmpirePriv(p->empire, p->type, 0, 0);
-			m_aaPrivEmpire[p->type][p->empire] = 0;
+			m_aaPrivEmpire[p->type][p->empire] = nullptr;
 		}
 
 		delete p;
@@ -96,7 +94,7 @@ void CPrivManager::AddCharPriv(uint32_t pid, uint8_t type, int32_t value)
 		return;
 
 	time_t now = CClientManager::instance().GetCurrentTime();
-	TPrivCharData* p = new TPrivCharData(type, value, pid);
+	auto p = new TPrivCharData(type, value, pid);
 
 	int32_t iDuration = CHARACTER_BAD_PRIV_DURATION;
 
@@ -126,7 +124,7 @@ void CPrivManager::AddGuildPriv(uint32_t guild_id, uint8_t type, int32_t value, 
 
 	time_t now = CClientManager::instance().GetCurrentTime();
 	time_t end = now + duration_sec;
-	TPrivGuildData * p = new TPrivGuildData(type, value, guild_id, end);
+	auto p = new TPrivGuildData(type, value, guild_id, end);
 	m_pqPrivGuild.push(std::make_pair(end, p));
 
 	// ADD_GUILD_PRIV_TIME
@@ -164,7 +162,7 @@ void CPrivManager::AddEmpirePriv(uint8_t empire, uint8_t type, int32_t value, ti
 			m_aaPrivEmpire[type][empire]->bRemoved = true;
 	}
 
-	TPrivEmpireData * p = new TPrivEmpireData(type, value, empire, end);
+	auto p = new TPrivEmpireData(type, value, empire, end);
 	m_pqPrivEmpire.push(std::make_pair(end, p));
 	m_aaPrivEmpire[type][empire] = p;
 
@@ -263,9 +261,9 @@ void CPrivManager::SendChangeCharPriv(uint32_t pid, uint8_t type, int32_t value)
 
 void CPrivManager::SendPrivOnSetup(CPeer* peer)
 {
-	for (int32_t i = 1; i < MAX_PRIV_NUM; ++i)
+	for (uint8_t i = 1; i < MAX_PRIV_NUM; ++i)
 	{
-		for (int32_t e = 0; e < EMPIRE_MAX_NUM; ++e)
+		for (uint8_t e = 0; e < EMPIRE_MAX_NUM; ++e)
 		{
 			// ADD_EMPIRE_PRIV_TIME
 			TPrivEmpireData* pPrivEmpireData = m_aaPrivEmpire[i][e];

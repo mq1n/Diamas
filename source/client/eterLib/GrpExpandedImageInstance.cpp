@@ -176,8 +176,8 @@ void CGraphicExpandedImageInstance::SetRenderingRect(float fLeft, float fTop, fl
 	if (IsEmpty())
 		return;
 
-	float fWidth = float(GetWidth());
-	float fHeight = float(GetHeight());
+	auto fWidth = float(GetWidth());
+	auto fHeight = float(GetHeight());
 
 	m_RenderingRect.left = fWidth * fLeft;
 	m_RenderingRect.top = fHeight * fTop;

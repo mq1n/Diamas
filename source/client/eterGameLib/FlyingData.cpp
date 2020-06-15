@@ -1,4 +1,4 @@
-#include "Stdafx.h"
+#include "StdAfx.h"
 #include "../eterEffectLib/EffectManager.h"
 
 #include "FlyingData.h"
@@ -56,14 +56,9 @@ void CFlyingData::SetBombEffect(const char* szEffectName)
 	}
 	StringPath(m_strBombEffectName);
 	if (CEffectManager::Instance().RegisterEffect(m_strBombEffectName.c_str()),true)
-	{
 		m_dwBombEffectID = GetCaseCRC32(m_strBombEffectName.c_str(),m_strBombEffectName.size());
-	}
 	else
-	{
 		m_dwBombEffectID = 0;
-	}
-
 }
 
 CFlyingData::TFlyingAttachData & CFlyingData::GetAttachDataReference(int32_t iIndex)
@@ -101,7 +96,7 @@ uint32_t CFlyingData::AttachFlyEffect(int32_t iType, const std::string & strFile
 		break;
 	}
 	
-	m_AttachDataVector.push_back(fad);
+	m_AttachDataVector.emplace_back(fad);
 	return m_AttachDataVector.size()-1;
 }
 
@@ -119,7 +114,7 @@ void CFlyingData::RemoveAllAttach()
 void CFlyingData::DuplicateAttach(int32_t iIndex)
 {
 	assert(0<=iIndex && iIndex<(int32_t)m_AttachDataVector.size());
-	m_AttachDataVector.push_back(m_AttachDataVector[iIndex]);
+	m_AttachDataVector.emplace_back(m_AttachDataVector[iIndex]);
 }
 
 bool CFlyingData::LoadScriptFile(const char* c_szFilename)
@@ -136,27 +131,17 @@ bool CFlyingData::LoadScriptFile(const char* c_szFilename)
 	int32_t temp;
 
 	if (!TextFileLoader.GetTokenInteger("spreadingflag",&temp))
-	{
 		m_bSpreading = false;
-	}
 	else
-	{
 		m_bSpreading = temp?true:false;
-	}
 
 	if (!TextFileLoader.GetTokenInteger("maintainparallelflag", &temp))
-	{
 		m_bMaintainParallel = false;
-	}
 	else
-	{
 		m_bMaintainParallel = temp?true:false;
-	}
 
 	if (!TextFileLoader.GetTokenFloat("initialvelocity",&m_fInitVel))
-	{
 		return false;
-	}
 
 	TextFileLoader.GetTokenFloat("coneangle", &m_fConeAngle);
 	//if (!TextFileLoader.GetTokenFloat("coneangle", &m_fConeAngle))
@@ -269,7 +254,7 @@ bool CFlyingData::LoadScriptFile(const char* c_szFilename)
 			TextFileLoader.GetTokenFloat("period",&fad.fPeriod);
 			TextFileLoader.GetTokenFloat("amplitude",&fad.fAmplitude);
 
-			m_AttachDataVector.push_back(fad);
+			m_AttachDataVector.emplace_back(fad);
 		}
 		else
 		{
@@ -282,70 +267,67 @@ bool CFlyingData::LoadScriptFile(const char* c_szFilename)
 
 bool CFlyingData::SaveScriptFile(const char* c_szFilename)
 {
-	FILE* fp = fopen(c_szFilename,"w");
-	if (!fp) return false;
+	msl::file_ptr fPtr(c_szFilename, "w");
+	if (!fPtr)
+		return false;
 
-	PrintfTabs(fp, 0, "SpreadingFlag           %d\n", m_bSpreading?1:0);
-	PrintfTabs(fp, 0, "MaintainParallelFlag    %d\n", m_bMaintainParallel?1:0);
+	PrintfTabs(fPtr.get(), 0, "SpreadingFlag           %d\n", m_bSpreading ? 1 : 0);
+	PrintfTabs(fPtr.get(), 0, "MaintainParallelFlag    %d\n", m_bMaintainParallel ? 1 : 0);
 
-	PrintfTabs(fp, 0, "InitialVelocity         %f\n", m_fInitVel);
-	PrintfTabs(fp, 0, "ConeAngle               %f\n", m_fConeAngle);
-	PrintfTabs(fp, 0, "RollAngle               %f\n", m_fRollAngle);
-	PrintfTabs(fp, 0, "AngularVelocity         %f %f %f\n", m_v3AngVel.x, m_v3AngVel.y, m_v3AngVel.z);
-	PrintfTabs(fp, 0, "Gravity                 %f\n", m_fGravity);
+	PrintfTabs(fPtr.get(), 0, "InitialVelocity         %f\n", m_fInitVel);
+	PrintfTabs(fPtr.get(), 0, "ConeAngle               %f\n", m_fConeAngle);
+	PrintfTabs(fPtr.get(), 0, "RollAngle               %f\n", m_fRollAngle);
+	PrintfTabs(fPtr.get(), 0, "AngularVelocity         %f %f %f\n", m_v3AngVel.x, m_v3AngVel.y, m_v3AngVel.z);
+	PrintfTabs(fPtr.get(), 0, "Gravity                 %f\n", m_fGravity);
 
-	PrintfTabs(fp, 0, "HitOnBackground         %d\n",m_bHitOnBackground?1:0);
-	PrintfTabs(fp, 0, "HitOnAnotherMonster     %d\n",m_bHitOnAnotherMonster?1:0);
-	PrintfTabs(fp, 0, "PierceCount             %d\n",m_iPierceCount);
-	PrintfTabs(fp, 0, "CollisionSphereRadius   %f\n",m_fCollisionSphereRadius);
-	
-	PrintfTabs(fp, 0, "BombRange               %f\n", m_fBombRange);
+	PrintfTabs(fPtr.get(), 0, "HitOnBackground         %d\n", m_bHitOnBackground ? 1 : 0);
+	PrintfTabs(fPtr.get(), 0, "HitOnAnotherMonster     %d\n", m_bHitOnAnotherMonster ? 1 : 0);
+	PrintfTabs(fPtr.get(), 0, "PierceCount             %d\n", m_iPierceCount);
+	PrintfTabs(fPtr.get(), 0, "CollisionSphereRadius   %f\n", m_fCollisionSphereRadius);
+
+	PrintfTabs(fPtr.get(), 0, "BombRange               %f\n", m_fBombRange);
 
 	std::string strGlobalPathName;
 	StringPath(GetOnlyPathName(c_szFilename), strGlobalPathName);
 
 	std::string strLocalFileName;
 	if (GetLocalFileName(strGlobalPathName.c_str(), m_strBombEffectName.c_str(), &strLocalFileName))
-		PrintfTabs(fp, 0, "BombEffect              \"%s\"\n", strLocalFileName.c_str());
+		PrintfTabs(fPtr.get(), 0, "BombEffect              \"%s\"\n", strLocalFileName.c_str());
 	else
-		PrintfTabs(fp, 0, "BombEffect              \"%s\"\n", m_strBombEffectName.c_str());
+		PrintfTabs(fPtr.get(), 0, "BombEffect              \"%s\"\n", m_strBombEffectName.c_str());
 
-	PrintfTabs(fp, 0, "HomingFlag              %d\n", m_bIsHoming?1:0);
-	PrintfTabs(fp, 0, "HomingStartTime         %f\n", m_fHomingStartTime);
-	PrintfTabs(fp, 0, "HomingMaxAngle          %f\n", m_fHomingMaxAngle);
-	PrintfTabs(fp, 0, "Range                   %f\n", m_fRange);
-	PrintfTabs(fp, 0, "Acceleration            %f %f %f\n", m_v3Accel.x, m_v3Accel.y, m_v3Accel.z);
+	PrintfTabs(fPtr.get(), 0, "HomingFlag              %d\n", m_bIsHoming ? 1 : 0);
+	PrintfTabs(fPtr.get(), 0, "HomingStartTime         %f\n", m_fHomingStartTime);
+	PrintfTabs(fPtr.get(), 0, "HomingMaxAngle          %f\n", m_fHomingMaxAngle);
+	PrintfTabs(fPtr.get(), 0, "Range                   %f\n", m_fRange);
+	PrintfTabs(fPtr.get(), 0, "Acceleration            %f %f %f\n", m_v3Accel.x, m_v3Accel.y, m_v3Accel.z);
 
-	std::vector<TFlyingAttachData>::iterator it;
-	for(it = m_AttachDataVector.begin();it!=m_AttachDataVector.end();++it)
+	for (auto & it : m_AttachDataVector)
 	{
-		PrintfTabs(fp, 0, "Group AttachData\n");
-		PrintfTabs(fp, 0, "{\n");
-		PrintfTabs(fp, 1, "Type          %d\n", it->iType);
-		PrintfTabs(fp, 1, "FlyType       %d\n", it->iFlyType);
-		if (GetLocalFileName(strGlobalPathName.c_str(), it->strFilename.c_str(), &strLocalFileName))
-			PrintfTabs(fp, 1, "AttachFile    \"%s\"\n", strLocalFileName.c_str());
+		PrintfTabs(fPtr.get(), 0, "Group AttachData\n");
+		PrintfTabs(fPtr.get(), 0, "{\n");
+		PrintfTabs(fPtr.get(), 1, "Type          %d\n", it.iType);
+		PrintfTabs(fPtr.get(), 1, "FlyType       %d\n", it.iFlyType);
+		if (GetLocalFileName(strGlobalPathName.c_str(), it.strFilename.c_str(), &strLocalFileName))
+			PrintfTabs(fPtr.get(), 1, "AttachFile    \"%s\"\n", strLocalFileName.c_str());
 		else
-			PrintfTabs(fp, 1, "AttachFile    \"%s\"\n", it->strFilename.c_str());
-		//PrintfTabs(fp, 1, "AttachFile    \"%s\"\n", it->strFilename);
+			PrintfTabs(fPtr.get(), 1, "AttachFile    \"%s\"\n", it.strFilename.c_str());
 
-		PrintfTabs(fp, 1, "TailFlag      %d\n", it->bHasTail?1:0);
-		if (it->bHasTail)
+		PrintfTabs(fPtr.get(), 1, "TailFlag      %d\n", it.bHasTail ? 1 : 0);
+		if (it.bHasTail)
 		{
-			PrintfTabs(fp, 1, "TailColor     %ud\n", it->dwTailColor);
-			PrintfTabs(fp, 1, "TailLength    %f\n", it->fTailLength);
-			PrintfTabs(fp, 1, "TailSize      %f\n", it->fTailSize);
-			PrintfTabs(fp, 1, "TailShapeRect %d\n", it->bRectShape?1:0);
+			PrintfTabs(fPtr.get(), 1, "TailColor     %ud\n", it.dwTailColor);
+			PrintfTabs(fPtr.get(), 1, "TailLength    %f\n", it.fTailLength);
+			PrintfTabs(fPtr.get(), 1, "TailSize      %f\n", it.fTailSize);
+			PrintfTabs(fPtr.get(), 1, "TailShapeRect %d\n", it.bRectShape ? 1 : 0);
 		}
 
-		PrintfTabs(fp, 1, "Roll          %f\n",it->fRoll );
-		PrintfTabs(fp, 1, "Distance      %f\n",it->fDistance );
-		PrintfTabs(fp, 1, "Period        %f\n",it->fPeriod );
-		PrintfTabs(fp, 1, "Amplitude     %f\n",it->fAmplitude );
+		PrintfTabs(fPtr.get(), 1, "Roll          %f\n", it.fRoll);
+		PrintfTabs(fPtr.get(), 1, "Distance      %f\n", it.fDistance);
+		PrintfTabs(fPtr.get(), 1, "Period        %f\n", it.fPeriod);
+		PrintfTabs(fPtr.get(), 1, "Amplitude     %f\n", it.fAmplitude);
 
-		PrintfTabs(fp, 0, "}\n");
+		PrintfTabs(fPtr.get(), 0, "}\n");
 	}
-	
-	fclose(fp);
 	return true;
 }

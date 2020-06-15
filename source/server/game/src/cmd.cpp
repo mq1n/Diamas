@@ -10,6 +10,20 @@ ACMD(do_user_horse_ride);
 ACMD(do_user_horse_back);
 ACMD(do_user_horse_feed);
 
+ACMD(do_bg_test);
+ACMD(do_search_bg);
+ACMD(do_recv_bg_details);
+ACMD(do_recv_create_bg_details);
+ACMD(do_create_battleground);
+ACMD(do_join_bg_queue);
+ACMD(do_bg_start);
+ACMD(do_bg_join_room);
+ACMD(do_bg_join_team);
+ACMD(do_bg_change_state);
+ACMD(do_bg_leaved);
+ACMD(do_bg_admin);
+ACMD(do_bg_kick);
+
 // ADD_COMMAND_SLOW_STUN
 ACMD(do_slow);
 ACMD(do_stun);
@@ -30,11 +44,9 @@ ACMD(do_state);
 ACMD(do_notice);
 ACMD(do_map_notice);
 ACMD(do_big_notice);
-#ifdef ENABLE_FULL_NOTICE
 ACMD(do_notice_test);
 ACMD(do_big_notice_test);
 ACMD(do_map_big_notice);
-#endif
 ACMD(do_who);
 ACMD(do_user);
 ACMD(do_disconnect);
@@ -46,7 +58,6 @@ ACMD(do_set);
 ACMD(do_cmd);
 ACMD(do_reset);
 ACMD(do_greset);
-ACMD(do_mount);
 ACMD(do_fishing);
 ACMD(do_refine_rod);
 
@@ -166,7 +177,8 @@ ACMD(do_add_socket);
 
 ACMD(do_inputall)
 {
-	ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("명령어를 모두 입력하세요."));
+	if (ch)
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("명령어를 모두 입력하세요."));
 }
 
 ACMD(do_show_arena_list);
@@ -235,7 +247,6 @@ ACMD (do_dragon_soul);
 ACMD (do_ds_list);
 ACMD (do_clear_affect);
 
-#ifdef ENABLE_NEWSTUFF
 ACMD(do_change_rare_attr);
 ACMD(do_add_rare_attr);
 
@@ -244,10 +255,21 @@ ACMD(do_force_logout);
 
 ACMD(do_poison);
 ACMD(do_rewarp);
-#endif
+
 #ifdef ENABLE_WOLFMAN_CHARACTER
 ACMD(do_bleeding);
 #endif
+
+ACMD(do_kill_all);
+ACMD(do_get_ip);
+ACMD(do_drop_item);
+ACMD(do_deny_pvp);
+ACMD(do_disband_gwar);
+ACMD(do_block_exp);
+ACMD(do_unblock_exp);
+ACMD(do_cmdchati);
+ACMD(do_remove_polymorph);
+
 
 struct command_info cmd_info[] =
 {
@@ -259,11 +281,9 @@ struct command_info cmd_info[] =
 	{ "notice",		do_notice,		0,			POS_DEAD,	GM_HIGH_WIZARD	},
 	{ "notice_map",	do_map_notice,	0,			POS_DEAD,	GM_LOW_WIZARD	},
 	{ "big_notice",	do_big_notice,	0,			POS_DEAD,	GM_HIGH_WIZARD	},
-#ifdef ENABLE_FULL_NOTICE
 	{ "big_notice_map",	do_map_big_notice,	0,	POS_DEAD,	GM_HIGH_WIZARD	},
 	{ "notice_test",	do_notice_test,		0,	POS_DEAD,	GM_HIGH_WIZARD	},
 	{ "big_notice_test",do_big_notice_test,	0,	POS_DEAD,	GM_HIGH_WIZARD	},
-#endif
 	{ "nowar",		do_nowar,		0,			POS_DEAD,	GM_PLAYER	},
 	{ "purge",		do_purge,		0,			POS_DEAD,	GM_WIZARD	},
 	{ "weaken",		do_weaken,		0,			POS_DEAD,	GM_GOD		},
@@ -312,7 +332,6 @@ struct command_info cmd_info[] =
 	{ "makeguild",	do_makeguild,		0,			POS_DEAD,	GM_HIGH_WIZARD	},
 	{ "deleteguild",	do_deleteguild,		0,			POS_DEAD,	GM_HIGH_WIZARD	},
 
-	{ "mount",		do_mount,		0,			POS_MOUNTING,	GM_PLAYER	},
 	{ "restart_here",	do_restart,		SCMD_RESTART_HERE,	POS_DEAD,	GM_PLAYER	},
 	{ "restart_town",	do_restart,		SCMD_RESTART_TOWN,	POS_DEAD,	GM_PLAYER	},
 	{ "phase_selec",	do_inputall,		0,			POS_DEAD,	GM_PLAYER	},
@@ -375,6 +394,21 @@ struct command_info cmd_info[] =
 	{ "delqf",		do_delqf,		0,			POS_DEAD,	GM_LOW_WIZARD	},
 	{ "set_state",	do_set_state,		0,			POS_DEAD,	GM_LOW_WIZARD	},
 
+
+	{ "bg_test",				do_bg_test,					0,			POS_DEAD,	GM_PLAYER },
+	{ "search_bg",				do_search_bg,				0,			POS_DEAD,	GM_PLAYER },
+	{ "recv_bg_details",		do_recv_bg_details,			0,			POS_DEAD,	GM_PLAYER },
+	{ "recv_create_bg_details",	do_recv_create_bg_details,	0,			POS_DEAD,	GM_PLAYER },
+	{ "create_battleground",	do_create_battleground,		0,			POS_DEAD,	GM_PLAYER },
+	{ "join_bg_queue",			do_join_bg_queue,			0,			POS_DEAD,	GM_PLAYER },
+	{ "bg_start",				do_bg_start,				0,			POS_DEAD,	GM_PLAYER },
+	{ "bg_join_room",			do_bg_join_room,			0,			POS_DEAD,	GM_PLAYER },
+	{ "bg_join_team",			do_bg_join_team,			0,			POS_DEAD,	GM_PLAYER },
+	{ "bg_change_state",		do_bg_change_state,			0,			POS_DEAD,	GM_PLAYER },
+	{ "bg_leaved",				do_bg_leaved,				0,			POS_DEAD,	GM_PLAYER },
+	{ "bg_admin",				do_bg_admin,				0,			POS_DEAD,	GM_IMPLEMENTOR },
+	{ "bg_kick",				do_bg_kick,					0,			POS_DEAD,	GM_PLAYER },
+
 	{ "forgetme",	do_forgetme,		0,			POS_DEAD,	GM_LOW_WIZARD	},
 	{ "aggregate",	do_aggregate,		0,			POS_DEAD,	GM_LOW_WIZARD	},
 	{ "attract_ranger",	do_attract_ranger,	0,			POS_DEAD,	GM_LOW_WIZARD	},
@@ -401,7 +435,6 @@ struct command_info cmd_info[] =
 	{ "jy",				do_block_chat,		0,			POS_DEAD,	GM_HIGH_WIZARD	},
 
 	// BLOCK_CHAT
-	{ "vote_block_chat", do_vote_block_chat,		0,			POS_DEAD,	GM_PLAYER	},
 	{ "block_chat",		do_block_chat,		0,			POS_DEAD,	GM_PLAYER	},
 	{ "block_chat_list",do_block_chat_list,	0,			POS_DEAD,	GM_PLAYER	},
 	// END_OF_BLOCK_CHAT
@@ -519,7 +552,6 @@ struct command_info cmd_info[] =
 	{ "dragon_soul",				do_dragon_soul,				0,	POS_DEAD,	GM_PLAYER	},
 	{ "ds_list",				do_ds_list,				0,	POS_DEAD,	GM_PLAYER	},
 	{ "do_clear_affect", do_clear_affect, 	0, POS_DEAD,		GM_LOW_WIZARD},
-#ifdef ENABLE_NEWSTUFF
 	//item
 	{ "add_rare_attr",		do_add_rare_attr,			0,			POS_DEAD,	GM_IMPLEMENTOR	},
 	{ "change_rare_attr",	do_change_rare_attr,		0,			POS_DEAD,	GM_IMPLEMENTOR	},
@@ -528,10 +560,20 @@ struct command_info cmd_info[] =
 	{ "force_logout",		do_force_logout,			0,			POS_DEAD,	GM_IMPLEMENTOR	},
 	{ "poison",				do_poison,					0,			POS_DEAD,	GM_IMPLEMENTOR	},
 	{ "rewarp",				do_rewarp,					0,			POS_DEAD,	GM_LOW_WIZARD	},
-#endif
 #ifdef ENABLE_WOLFMAN_CHARACTER
 	{ "bleeding",			do_bleeding,				0,			POS_DEAD,	GM_IMPLEMENTOR	},
 #endif
+
+	{ "deny_pvp",		do_deny_pvp,		0,			POS_DEAD,	GM_PLAYER },
+	{ "disband_gwar",	do_disband_gwar,		0,			POS_DEAD,	GM_PLAYER },
+	{ "ip_list",			do_get_ip,		0,			POS_DEAD,	GM_IMPLEMENTOR },
+	{ "drop_item",			do_drop_item,	0,			POS_DEAD,	GM_HIGH_WIZARD },
+	{ "block_exp",			do_block_exp,			0,	POS_DEAD,	GM_PLAYER },
+	{ "unblock_exp",		do_unblock_exp,			0,	POS_DEAD,	GM_PLAYER },
+	{ "remove_polymorph", do_remove_polymorph, 0, POS_DEAD, GM_PLAYER },
+	{ "cmdchat",        do_cmdchati,        0,      POS_DEAD,       GM_IMPLEMENTOR },
+	{ "kill_all",        do_kill_all,        0,      POS_DEAD,       GM_IMPLEMENTOR },
+
 	{ "\n",		nullptr,			0,			POS_DEAD,	GM_IMPLEMENTOR	}  /* 반드시 이 것이 마지막이어야 한다. */
 };
 
@@ -584,7 +626,12 @@ void double_dollar(const char *src, size_t src_len, char *dest, size_t dest_len)
 
 void interpret_command(LPCHARACTER ch, const char * argument, size_t len)
 {
-#ifdef ENABLE_ANTI_CMD_FLOOD
+	if (nullptr == ch)
+	{
+		sys_err ("nullptr CHRACTER");
+		return ;
+	}
+
 	if (ch && !ch->IsGM())
 	{
 		if (thecore_pulse() > ch->GetCmdAntiFloodPulse() + PASSES_PER_SEC(1))
@@ -597,12 +644,6 @@ void interpret_command(LPCHARACTER ch, const char * argument, size_t len)
 			ch->GetDesc()->DelayedDisconnect(0);
 			return;
 		}
-	}
-#endif
-	if (nullptr == ch)
-	{
-		sys_err ("nullptr CHRACTER");
-		return ;
 	}
 
 	char cmd[128 + 1];  // buffer overflow 문제가 생기지 않도록 일부러 길이를 짧게 잡음
@@ -625,11 +666,7 @@ void interpret_command(LPCHARACTER ch, const char * argument, size_t len)
 			if (!strcmp(cmd_info[icmd].command, cmd)) // do_cmd는 모든 명령어를 쳐야 할 수 있다.
 				break;
 		}
-#ifdef ENABLE_BLOCK_CMD_SHORTCUT
-		else if (!strcmp(cmd_info[icmd].command, cmd))
-#else
 		else if (!strncmp(cmd_info[icmd].command, cmd, cmdlen))
-#endif
 			break;
 	}
 
@@ -672,7 +709,7 @@ void interpret_command(LPCHARACTER ch, const char * argument, size_t len)
 		return;
 	}
 
-	if (cmd_info[icmd].gm_level && (cmd_info[icmd].gm_level > ch->GetGMLevel() || cmd_info[icmd].gm_level == GM_DISABLE))
+	if (cmd_info[icmd].gm_level && (cmd_info[icmd].gm_level > ch->GetGMLevel()))
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("그런 명령어는 없습니다"));
 		return;

@@ -2,7 +2,7 @@
 
 #pragma warning(disable:4786)	// character 255 넘어가는거 끄기
 
-#include <windows.h>
+#include <Windows.h>
 #include <vector>
 #include <map>
 
@@ -15,11 +15,12 @@ class CMemoryTextFileLoader
 		virtual ~CMemoryTextFileLoader();
 
 		void				Bind(int32_t bufSize, const void* c_pvBuf);
-		uint32_t				GetLineCount();
-		bool				CheckLineIndex(uint32_t dwLine);
+		uint32_t GetLineCount() const;
+		bool CheckLineIndex(uint32_t dwLine) const;
 		bool				SplitLine(uint32_t dwLine, CTokenVector * pstTokenVector, const char * c_szDelimeter = " \t");
 		int32_t					SplitLine2(uint32_t dwLine, CTokenVector * pstTokenVector, const char * c_szDelimeter = " \t");
 		bool				SplitLineByTab(uint32_t dwLine, CTokenVector* pstTokenVector);
+		bool SplitLineByTabNew(uint32_t dwLine, CTokenVector * pstTokenVector);
 		const std::string &	GetLineString(uint32_t dwLine);
 
 	protected:
@@ -34,12 +35,12 @@ class CMemoryFileLoader
 
 		bool Read(int32_t size, void* pvDst);
 
-		int32_t				GetPosition();		
-		int32_t				GetSize();
-		
+		int32_t GetPosition() const;
+		int32_t GetSize() const;
+
 	protected:
-		bool			IsReadableSize(int32_t size);
-		const char *	GetCurrentPositionPointer();
+		bool IsReadableSize(int32_t size) const;
+		const char * GetCurrentPositionPointer() const;
 
 	protected:
 		const char *	m_pcBase;
@@ -56,9 +57,9 @@ class CDiskFileLoader
 
 		void Close();
 		bool Open(const char * c_szFileName);
-		bool Read(int32_t size, void * pvDst);
+		bool Read(int32_t size, void * pvDst) const;
 
-		int32_t GetSize();
+		int32_t GetSize() const;
 
 	protected:
 		void Initialize();

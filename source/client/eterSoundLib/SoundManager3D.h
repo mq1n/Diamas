@@ -10,7 +10,7 @@ class CSoundManager3D : public CSoundBase
 		enum
 		{
 			INSTANCE_MAX_COUNT = 32,
-			MAX_PROVIDERS = 32,
+			MAX_PROVIDERS = 32
 		};
 
 	public:

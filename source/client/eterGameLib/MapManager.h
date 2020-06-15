@@ -127,6 +127,7 @@ class CMapManager : public CScreen, public IPhysicsWorld
 		typedef struct 
 		{
 			std::string	m_strName;
+		std::string	m_strLocaleName;
 			uint32_t		m_dwBaseX;
 			uint32_t		m_dwBaseY;
 			uint32_t		m_dwSizeX;
@@ -136,6 +137,8 @@ class CMapManager : public CScreen, public IPhysicsWorld
 		} TMapInfo;
 		typedef std::vector<TMapInfo>		TMapInfoVector;
 		typedef TMapInfoVector::iterator	TMapInfoVectorIterator;
+
+	const TMapInfoVector& GetMapInfoVector() { return m_kVct_kMapInfo; }
 
 	protected:
 		TMapInfoVector			m_kVct_kMapInfo;

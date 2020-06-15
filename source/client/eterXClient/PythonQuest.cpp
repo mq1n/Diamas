@@ -5,7 +5,7 @@
 void CPythonQuest::RegisterQuestInstance(const SQuestInstance & c_rQuestInstance)
 {
 	DeleteQuestInstance(c_rQuestInstance.dwIndex);
-	m_QuestInstanceContainer.push_back(c_rQuestInstance);
+	m_QuestInstanceContainer.emplace_back(c_rQuestInstance);
 
 	/////
 
@@ -17,7 +17,7 @@ struct FQuestInstanceCompare
 {
 	uint32_t dwSearchIndex;
 	FQuestInstanceCompare(uint32_t dwIndex) : dwSearchIndex(dwIndex) {}
-	bool operator () (const CPythonQuest::SQuestInstance & rQuestInstance)
+	bool operator() (const CPythonQuest::SQuestInstance & rQuestInstance) const
 	{
 		return dwSearchIndex == rQuestInstance.dwIndex;
 	}
@@ -25,7 +25,7 @@ struct FQuestInstanceCompare
 
 void CPythonQuest::DeleteQuestInstance(uint32_t dwIndex)
 {
-	TQuestInstanceContainer::iterator itor = std::find_if(m_QuestInstanceContainer.begin(), m_QuestInstanceContainer.end(), FQuestInstanceCompare(dwIndex));
+	auto itor = std::find_if(m_QuestInstanceContainer.begin(), m_QuestInstanceContainer.end(), FQuestInstanceCompare(dwIndex));
 	if (itor == m_QuestInstanceContainer.end())
 		return;
 
@@ -34,14 +34,14 @@ void CPythonQuest::DeleteQuestInstance(uint32_t dwIndex)
 
 bool CPythonQuest::IsQuest(uint32_t dwIndex)
 {
-	TQuestInstanceContainer::iterator itor = std::find_if(m_QuestInstanceContainer.begin(), m_QuestInstanceContainer.end(), FQuestInstanceCompare(dwIndex));
+	auto itor = std::find_if(m_QuestInstanceContainer.begin(), m_QuestInstanceContainer.end(), FQuestInstanceCompare(dwIndex));
 	return itor != m_QuestInstanceContainer.end();
 }
 
 void CPythonQuest::MakeQuest(uint32_t dwIndex)
 {
 	DeleteQuestInstance(dwIndex);
-	m_QuestInstanceContainer.push_back(SQuestInstance());
+	m_QuestInstanceContainer.emplace_back(SQuestInstance());
 
 	/////
 
@@ -105,7 +105,7 @@ void CPythonQuest::SetQuestIconFileName(uint32_t dwIndex, const char * c_szIconF
 	pQuestInstance->strIconFileName = c_szIconFileName;
 }
 
-int32_t CPythonQuest::GetQuestCount()
+int32_t CPythonQuest::GetQuestCount() const
 {
 	return m_QuestInstanceContainer.size();
 }
@@ -122,7 +122,7 @@ bool CPythonQuest::GetQuestInstancePtr(uint32_t dwArrayIndex, SQuestInstance ** 
 
 bool CPythonQuest::__GetQuestInstancePtr(uint32_t dwQuestIndex, SQuestInstance ** ppQuestInstance)
 {
-	TQuestInstanceContainer::iterator itor = std::find_if(m_QuestInstanceContainer.begin(), m_QuestInstanceContainer.end(), FQuestInstanceCompare(dwQuestIndex));
+	auto itor = std::find_if(m_QuestInstanceContainer.begin(), m_QuestInstanceContainer.end(), FQuestInstanceCompare(dwQuestIndex));
 	if (itor == m_QuestInstanceContainer.end())
 		return false;
 
@@ -189,8 +189,7 @@ PyObject * questGetQuestData(PyObject * poSelf, PyObject * poArgs)
 	CGraphicImage * pImage = nullptr;
 	if (!pQuestInstance->strIconFileName.empty())
 	{
-		std::string strIconFileName;
-		strIconFileName = "d:/ymir work/ui/game/quest/questicon/";
+		std::string strIconFileName = "d:/ymir work/ui/game/quest/questicon/";
 		strIconFileName += pQuestInstance->strIconFileName;
 		pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(strIconFileName.c_str());
 	}
@@ -203,6 +202,13 @@ PyObject * questGetQuestData(PyObject * poSelf, PyObject * poArgs)
 		}
 	}
 
+	/*
+	if (pQuestInstance->c_index == 99)
+		pQuestInstance->c_index = 6;
+	return Py_BuildValue("isiisi",	pQuestInstance->dwIndex,
+									pQuestInstance->strTitle.c_str(),
+									pQuestInstance->c_index,
+	*/								
 	return Py_BuildValue("sisi",	pQuestInstance->strTitle.c_str(),
 									pImage,
 									pQuestInstance->strCounterName.c_str(),
@@ -235,9 +241,7 @@ PyObject * questGetQuestLastTime(PyObject * poSelf, PyObject * poArgs)
 	int32_t iLastTime = 0;
 
 	if (pQuestInstance->iClockValue >= 0)
-	{
 		iLastTime = (pQuestInstance->iStartTime + pQuestInstance->iClockValue) - int32_t(CTimer::Instance().GetCurrentSecond());
-	}
 
 	// 시간 증가 처리 코드
 //	else
@@ -254,6 +258,62 @@ PyObject * questClear(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
+PyObject* questAdd(PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t index;
+	if (!PyTuple_GetInteger(poArgs, 0, &index))
+		return Py_BadArgument();
+
+	int32_t category;
+	if (!PyTuple_GetInteger(poArgs, 1, &category))
+		return Py_BadArgument();
+
+	char* title;
+	if (!PyTuple_GetString(poArgs, 2, &title))
+		return Py_BadArgument();
+
+	char* clockName;
+	if (!PyTuple_GetString(poArgs, 3, &clockName))
+		return Py_BadArgument();
+
+	int32_t clockValue;
+	if (!PyTuple_GetInteger(poArgs, 4, &clockValue))
+		return Py_BadArgument();
+
+	char* counterName;
+	if (!PyTuple_GetString(poArgs, 5, &counterName))
+		return Py_BadArgument();
+
+	int32_t counterValue;
+	if (!PyTuple_GetInteger(poArgs, 6, &counterValue))
+		return Py_BadArgument();
+
+	char* iconFilename;
+	if (!PyTuple_GetString(poArgs, 7, &iconFilename))
+		return Py_BadArgument();
+
+	CPythonQuest& rkQuest = CPythonQuest::Instance();
+	if (rkQuest.IsQuest(index)) 
+	{
+		TraceError("Quest with index %d already exists", index);
+		return Py_BuildNone();
+	}
+	
+	CPythonQuest::SQuestInstance QuestInstance;
+	QuestInstance.dwIndex = index;
+//	QuestInstance.c_index = category;
+	QuestInstance.strTitle = title;
+	QuestInstance.strClockName = clockName;
+	QuestInstance.iClockValue = clockValue;
+	QuestInstance.strCounterName = counterName;
+	QuestInstance.iCounterValue = counterValue;
+	QuestInstance.strIconFileName = iconFilename;
+	QuestInstance.iStartTime = int32_t(CTimer::Instance().GetCurrentSecond());
+	rkQuest.RegisterQuestInstance(QuestInstance);
+
+	return Py_BuildNone();
+}
+
 void initquest()
 {
 	static PyMethodDef s_methods[] =
@@ -263,10 +323,12 @@ void initquest()
 		{ "GetQuestIndex",				questGetQuestIndex,				METH_VARARGS },
 		{ "GetQuestLastTime",			questGetQuestLastTime,			METH_VARARGS },
 		{ "Clear",						questClear,						METH_VARARGS },
+		{ "Add",						questAdd,						METH_VARARGS },
 		{ nullptr,							nullptr,							0 },
 	};
 
 	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(QUEST_MODULE).c_str(), s_methods);
 
 	PyModule_AddIntConstant(poModule, "QUEST_MAX_NUM", 5);
+	PyModule_AddIntConstant(poModule, "QUEST_CATEGORY_MAX_NUM", 7);
 }

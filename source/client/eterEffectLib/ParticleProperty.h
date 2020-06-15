@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "../eterlib/GrpImageInstance.h"
+#include "../eterLib/GrpImageInstance.h"
 
 #include "Type.h"
 
@@ -16,7 +16,7 @@ class CParticleProperty
 			ROTATION_TYPE_TIME_EVENT,
 			ROTATION_TYPE_CW,
 			ROTATION_TYPE_CCW,
-			ROTATION_TYPE_RANDOM_DIRECTION,
+			ROTATION_TYPE_RANDOM_DIRECTION
 		};
 
 		enum
@@ -25,7 +25,7 @@ class CParticleProperty
 			TEXTURE_ANIMATION_TYPE_CW,
 			TEXTURE_ANIMATION_TYPE_CCW,
 			TEXTURE_ANIMATION_TYPE_RANDOM_FRAME,
-			TEXTURE_ANIMATION_TYPE_RANDOM_DIRECTION,
+			TEXTURE_ANIMATION_TYPE_RANDOM_DIRECTION
 		};
 
 	public:
@@ -37,20 +37,11 @@ class CParticleProperty
 		void InsertTexture(const char * c_szFileName);
 		bool SetTexture(const char * c_szFileName);
 
-		__forceinline uint8_t GetTextureAnimationType()
-		{
-			return m_byTexAniType;
-		}
+		__forceinline uint8_t GetTextureAnimationType() const { return m_byTexAniType; }
 
-		__forceinline uint32_t GetTextureAnimationFrameCount()
-		{
-			return m_ImageVector.size();
-		}
+		__forceinline uint32_t GetTextureAnimationFrameCount() const { return m_ImageVector.size(); }
 
-		__forceinline float GetTextureAnimationFrameDelay()
-		{
-			return m_fTexAniDelay;
-		}
+		__forceinline float GetTextureAnimationFrameDelay() const { return m_fTexAniDelay; }
 
 
 		uint8_t m_byTexAniType;

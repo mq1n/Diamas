@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "../eterBase/Error.h"
-#include "../eterlib/Camera.h"
-#include "../eterlib/AttributeInstance.h"
+#include "../eterLib/Camera.h"
+#include "../eterLib/AttributeInstance.h"
 #include "../eterGameLib/AreaTerrain.h"
 #include "../eterGrnLib/Material.h"
 #include "../eterWebBrowser/CWebBrowser.h"
@@ -40,6 +40,8 @@ CPythonApplication::CPythonApplication() :
 	CTimer::Instance().UseCustomTime();
 	m_dwWidth = 800;
 	m_dwHeight = 600;
+
+	m_iGameStage = STAGE_NULL;
 
 	ms_pInstance = this;
 	m_isWindowFullScreenEnable = FALSE;
@@ -259,10 +261,7 @@ void CPythonApplication::SkipRenderBuffering(uint32_t dwSleepMSec)
 
 bool CPythonApplication::Process()
 {
-#if defined(CHECK_LATEST_DATA_FILES)
-	if (CheckLatestFiles_PollEvent())
-		return false;
-#endif
+	// POLL EVENTS...
 
 	ELTimer_SetFrameMSec();
 
@@ -392,7 +391,7 @@ bool CPythonApplication::Process()
 	if (dwCurrentTime > s_uiNextFrameTime)
 	{
 		int32_t dt = dwCurrentTime - s_uiNextFrameTime;
-		int32_t nAdjustTime = ((float)dt / (float)uiFrameTime) * uiFrameTime; 
+		int32_t nAdjustTime = (static_cast<float>(dt) / static_cast<float>(uiFrameTime)) * uiFrameTime;
 
 		if ( dt >= 500 )
 		{
@@ -544,29 +543,29 @@ bool CPythonApplication::Process()
 			{
 				CPythonBackground& rkBG = CPythonBackground::Instance();
 				rkBG.ReleaseCharacterShadowTexture();
+
 				CRenderTargetManager::Instance().ReleaseRenderTargetTextures();
 
-				if (m_pyGraphic.RestoreDevice()) {
+				if (m_pyGraphic.RestoreDevice())
+				{
 					CRenderTargetManager::Instance().CreateRenderTargetTextures();
 					rkBG.CreateCharacterShadowTexture();
 				}
 				else
+				{
 					canRender = false;
-
+				}
+				
 				Tracenf("Process(): Lost device, canRender %d", canRender);
 			}
 		}
 
 		if (!IsActive())
-		{
 			SkipRenderBuffering(3000);
-		}
 
 		// 리스토어 처리때를 고려해 일정 시간동안은 버퍼링을 하지 않는다
 		if (!canRender)
-		{
 			SkipRenderBuffering(3000);
-		}
 		else
 		{
 			// RestoreLostDevice
@@ -660,7 +659,7 @@ bool CPythonApplication::Process()
 
 						float fFar=25600.0f;
 						float fNear=MIN_FOG;
-						double dbAvePow=double(1000.0f/s_fAveRenderTime);
+						auto dbAvePow = double(1000.0f / s_fAveRenderTime);
 						double dbMaxPow=60.0;
 						float fDistance=std::max<float>(fNear+(fFar-fNear)*(dbAvePow)/dbMaxPow, fNear);
 						m_pyBackground.SetViewDistanceSet(0, fDistance);
@@ -796,7 +795,7 @@ bool CPythonApplication::CreateDevice(int32_t width, int32_t height, bool Window
 
 void CPythonApplication::Loop()
 {	
-	while (1)
+	while (true)
 	{	
 		if (IsMessage())
 		{
@@ -902,13 +901,7 @@ uint32_t __GetWindowMode(bool windowed)
 
 bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_t width, int32_t height)
 {
-	
 	bool Windowed = CPythonSystem::Instance().IsWindowed();
-
-	bool bAnotherWindow = false;
-
-	if (FindWindow(nullptr, c_szName))
-		bAnotherWindow = true;
 
 	m_dwWidth = width;
 	m_dwHeight = height;
@@ -925,9 +918,7 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_
 	}
 
 	if (m_pySystem.IsUseDefaultIME())
-	{
 		CPythonIME::Instance().UseDefaultIME();
-	}
 
 	// 풀스크린 모드이고
 	// 디폴트 IME 를 사용하거나 유럽 버전이면
@@ -948,17 +939,19 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_
 		{
 			m_isWindowed = true;
 
-			if (bAnotherWindow)
-			{
-				RECT rc;
+			RECT workArea;
+			SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0);
 
-				GetClientRect(&rc);
+			uint32_t workAreaWidth = (workArea.right - workArea.left);
+			uint32_t workAreaHeight = (workArea.bottom - workArea.top);
 
-				int32_t windowWidth = rc.right - rc.left;
-				int32_t windowHeight = (rc.bottom - rc.top);
+			uint32_t windowWidth = m_pySystem.GetWidth() + GetSystemMetrics(SM_CXBORDER) * 2 + GetSystemMetrics(SM_CXDLGFRAME) * 2 + GetSystemMetrics(SM_CXFRAME) * 2;
+			uint32_t windowHeight = m_pySystem.GetHeight() + GetSystemMetrics(SM_CYBORDER) * 2 + GetSystemMetrics(SM_CYDLGFRAME) * 2 + GetSystemMetrics(SM_CYFRAME) * 2 + GetSystemMetrics(SM_CYCAPTION);
 
-				CMSApplication::SetPosition(GetScreenWidth() - windowWidth, GetScreenHeight() - 60 - windowHeight);
-			}
+			uint32_t x = workAreaWidth / 2 - windowWidth / 2;
+			uint32_t y = workAreaHeight / 2 - windowHeight / 2;
+
+			SetPosition(x, y);
 		}
 		else
 		{
@@ -998,9 +991,7 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_
 		SetVisibleMode(true);
 
 		if (m_isWindowFullScreenEnable) //m_pySystem.IsUseDefaultIME() && !m_pySystem.IsWindowed())
-		{
 			SetWindowPos(GetWindowHandle(), HWND_TOP, 0, 0, width, height, SWP_SHOWWINDOW);
-		}
 
 		if (!InitializeKeyboard(GetWindowHandle()))
 			return false;
@@ -1175,6 +1166,28 @@ void CPythonApplication::Clear()
 	m_pySystem.Clear();
 }
 
+void CPythonApplication::FlashApplication()
+{
+   HWND hWnd = GetWindowHandle();
+   FLASHWINFO fi;
+   fi.cbSize = sizeof(FLASHWINFO);
+   fi.hwnd = hWnd;
+   fi.dwFlags = FLASHW_ALL | FLASHW_TIMERNOFG;
+   fi.uCount = 0;
+   fi.dwTimeout = 0;
+   FlashWindowEx(&fi);
+}
+
+int32_t CPythonApplication::GetGameStage() const
+{
+	return m_iGameStage;
+}
+
+void CPythonApplication::SetGameStage(int32_t iNewStage)
+{
+	m_iGameStage = iNewStage;
+}
+
 void CPythonApplication::Destroy()
 {
 	WebBrowser_Destroy();
@@ -1190,8 +1203,6 @@ void CPythonApplication::Destroy()
 
 	CRenderTargetManager::Instance().Destroy();
 	CPythonRenderTargetManager::Instance().Destroy();
-
-	m_pySystem.SaveInterfaceStatus();
 
 	m_pyEventManager.Destroy();	
 	m_FlyingManager.Destroy();

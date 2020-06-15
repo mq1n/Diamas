@@ -1,8 +1,6 @@
-#include "Stdafx.h"
-#include <FileSystemIncl.hpp>
-
-#include "terrain.h"
-#include <math.h>
+#include "StdAfx.h"
+#include "Terrain.h"
+#include <cmath>
 
 //////////////////////////////////////////////////////////////////////////
 // Texture Set
@@ -266,7 +264,7 @@ bool CTerrainImpl::LoadWaterMapFile(const char * c_szFileName)
 
 			uint8_t * abSrcWaterHeight = abSrcWaterData + sizeof(m_abyWaterMap);
 
-			m_byNumWater = MIN(MAX_WATER_NUM, m_byNumWater);
+			m_byNumWater = std::min<uint8_t>(MAX_WATER_NUM, m_byNumWater);
 			if (m_byNumWater)
 			{
 				memcpy(wWaterHeight, abSrcWaterHeight, sizeof(uint16_t) * m_byNumWater);
@@ -295,7 +293,7 @@ bool CTerrainImpl::LoadWaterMapFile(const char * c_szFileName)
 
 uint32_t CTerrainImpl::GetShadowMapColor(float fx, float fy)
 {
-	float fMapSize = (float)(TERRAIN_XSIZE);
+	auto fMapSize = (float) (TERRAIN_XSIZE);
 	float fooMapSize = 1.0f / fMapSize;
 	if (fx < 0 || fy < 0 || fx >= fMapSize || fy >= fMapSize)
 		return 0xFFFFFFFF;
@@ -308,9 +306,14 @@ uint32_t CTerrainImpl::GetShadowMapColor(float fx, float fy)
 
 	uint16_t w = *(m_awShadowMap + (iy * SHADOWMAP_XSIZE) + ix);
 
-	int32_t b = w & 0x1f; w >>= 5; b <<= 3;
-	int32_t g = w & 0x1f; w >>= 5; g <<= 3;
-	int32_t r = w & 0x1f;		   r <<= 3;
+	int32_t b = w & 0x1f;
+	w >>= 5;
+	b <<= 3;
+	int32_t g = w & 0x1f;
+	w >>= 5;
+	g <<= 3;
+	int32_t r = w & 0x1f;
+	r <<= 3;
 
 	return (uint32_t) (0xff << 24) | (g << 16) | (g << 8) | r;
 }

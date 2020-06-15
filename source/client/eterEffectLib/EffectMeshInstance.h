@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../eterlib/GrpScreen.h"
-#include "../eterlib/GrpImageInstance.h"
+#include "../eterLib/GrpScreen.h"
+#include "../eterLib/GrpImageInstance.h"
 #include "EffectElementBaseInstance.h"
 #include "FrameController.h"
 #include "EffectMesh.h"

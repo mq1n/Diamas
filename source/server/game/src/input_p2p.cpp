@@ -14,10 +14,12 @@
 #include "affect.h"
 #include "dev_log.h"
 #include "locale_service.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "skill.h"
 #include "threeway_war.h"
+#include "gm.h"
 
+ACMD(do_reload);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input Processor
@@ -28,7 +30,8 @@ CInputP2P::CInputP2P()
 
 void CInputP2P::Login(LPDESC d, const char * c_pData)
 {
-	P2P_MANAGER::instance().Login(d, (TPacketGGLogin *) c_pData);
+	TPacketGGLogin* p = (TPacketGGLogin *)c_pData;
+	P2P_MANAGER::instance().Login(d, p);
 }
 
 void CInputP2P::Logout(LPDESC d, const char * c_pData)
@@ -89,11 +92,7 @@ int32_t CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
 	return (p->lSize);
 }
 
-#ifdef ENABLE_FULL_NOTICE
 int32_t CInputP2P::Notice(LPDESC d, const char * c_pData, size_t uiBytes, bool bBigFont)
-#else
-int32_t CInputP2P::Notice(LPDESC d, const char * c_pData, size_t uiBytes)
-#endif
 {
 	TPacketGGNotice * p = (TPacketGGNotice *) c_pData;
 
@@ -109,11 +108,7 @@ int32_t CInputP2P::Notice(LPDESC d, const char * c_pData, size_t uiBytes)
 
 	char szBuf[256+1];
 	strlcpy(szBuf, c_pData + sizeof(TPacketGGNotice), MIN(p->lSize + 1, sizeof(szBuf)));
-#ifdef ENABLE_FULL_NOTICE
 	SendNotice(szBuf, bBigFont);
-#else
-	SendNotice(szBuf);
-#endif
 	return (p->lSize);
 }
 
@@ -172,13 +167,9 @@ struct FuncShout
 
 	void operator () (LPDESC d)
 	{
-#ifdef ENABLE_NEWSTUFF
 		if (!d->GetCharacter() || (!g_bGlobalShoutEnable && d->GetCharacter()->GetGMLevel() == GM_PLAYER && d->GetEmpire() != m_bEmpire))
 			return;
-#else
-		if (!d->GetCharacter() || (d->GetCharacter()->GetGMLevel() == GM_PLAYER && d->GetEmpire() != m_bEmpire))
-			return;
-#endif
+
 		d->GetCharacter()->ChatPacket(CHAT_TYPE_SHOUT, "%s", m_str);
 	}
 };
@@ -217,6 +208,7 @@ void CInputP2P::Setup(LPDESC d, const char * c_pData)
 	TPacketGGSetup * p = (TPacketGGSetup *) c_pData;
 	sys_log(0, "P2P: Setup %s:%d", d->GetHostName(), p->wPort);
 	d->SetP2P(d->GetHostName(), p->wPort, p->bChannel);
+	d->SetListenPort(p->wListenPort);
 }
 
 void CInputP2P::MessengerAdd(const char * c_pData)
@@ -237,20 +229,14 @@ void CInputP2P::FindPosition(LPDESC d, const char* c_pData)
 {
 	TPacketGGFindPosition* p = (TPacketGGFindPosition*) c_pData;
 	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(p->dwTargetPID);
-#ifdef ENABLE_CMD_WARP_IN_DUNGEON
 	if (ch)
-#else
-	if (ch && ch->GetMapIndex() < 10000)
-#endif
 	{
 		TPacketGGWarpCharacter pw;
 		pw.header = HEADER_GG_WARP_CHARACTER;
 		pw.pid = p->dwFromPID;
 		pw.x = ch->GetX();
 		pw.y = ch->GetY();
-#ifdef ENABLE_CMD_WARP_IN_DUNGEON
 		pw.mapIndex = (ch->GetMapIndex() < 10000) ? 0 : ch->GetMapIndex();
-#endif
 		d->Packet(&pw, sizeof(pw));
 	}
 }
@@ -259,13 +245,8 @@ void CInputP2P::WarpCharacter(const char* c_pData)
 {
 	TPacketGGWarpCharacter* p = (TPacketGGWarpCharacter*) c_pData;
 	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(p->pid);
-#ifdef ENABLE_CMD_WARP_IN_DUNGEON
 	if (ch)
 		ch->WarpSet(p->x, p->y, p->mapIndex);
-#else
-	if (ch)
-		ch->WarpSet(p->x, p->y);
-#endif
 }
 
 void CInputP2P::GuildWarZoneMapIndex(const char* c_pData)
@@ -295,6 +276,48 @@ void CInputP2P::Transfer(const char * c_pData)
 		ch->WarpSet(p->lX, p->lY);
 }
 
+void CInputP2P::UpdateRights(const char * c_pData)
+{
+	TPacketGGUpdateRights* p = (TPacketGGUpdateRights*)c_pData;
+
+	if (p->gm_level > GM_PLAYER)
+	{
+		tAdminInfo info;
+		memset(&info, 0, sizeof(info));
+		info.m_Authority = p->gm_level;
+		strlcpy(info.m_szName, p->name, sizeof(info.m_szName));
+		strlcpy(info.m_szAccount, "[ALL]", sizeof(info.m_szAccount));
+		GM::insert(info);
+	}
+	else
+	{
+		GM::remove(p->name);
+	}
+
+	LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(p->name);
+	if (tch)
+		tch->SetGMLevel();
+
+	sys_log(0, "P2P::UpdateRights: update rights to %u of %s", p->gm_level, p->name);
+}
+
+void CInputP2P::MessengerRequest(const char * c_pData)
+{
+	TPacketGGMessengerRequest * p = (TPacketGGMessengerRequest *)c_pData;
+	sys_log(0, "P2P: Messenger Request %s %d", p->szRequestor, p->dwTargetPID);
+	MessengerManager::instance().RequestToAdd(p->szRequestor, CHARACTER_MANAGER::instance().FindByPID(p->dwTargetPID));
+}
+
+void CInputP2P::MessengerRequestFail(const char * c_pData)
+{
+	TPacketGGMessengerRequest * p = (TPacketGGMessengerRequest *)c_pData;
+	sys_log(0, "P2P: Messenger Request Fail %s %d", p->szRequestor, p->dwTargetPID);
+	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(p->szRequestor);
+	CCI* pCCI = P2P_MANAGER::instance().FindByPID(p->dwTargetPID);
+	if (ch)
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님으로 부터 친구 등록을 거부 당했습니다."), pCCI->szName);
+}
+
 void CInputP2P::XmasWarpSanta(const char * c_pData)
 {
 	TPacketGGXmasWarpSanta * p =(TPacketGGXmasWarpSanta *) c_pData;
@@ -318,13 +341,13 @@ void CInputP2P::XmasWarpSantaReply(const char* c_pData)
 
 	if (p->bChannel == g_bChannel)
 	{
-		CharacterVectorInteractor i;
-
-		if (CHARACTER_MANAGER::instance().GetCharactersByRaceNum(xmas::MOB_SANTA_VNUM, i))
+		auto snapshot = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(xmas::MOB_SANTA_VNUM);
+		if (!snapshot.empty())
 		{
-			CharacterVectorInteractor::iterator it = i.begin();
+			auto it = snapshot.begin();
 
-			while (it != i.end()) {
+			while (it != snapshot.end())
+			{
 				M2_DESTROY_CHARACTER(*it++);
 			}
 		}
@@ -368,7 +391,7 @@ void CInputP2P::IamAwake(LPDESC d, const char * c_pData)
 
 int32_t CInputP2P::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 {
-	if (test_server)
+	if (g_bIsTestServer)
 		sys_log(0, "CInputP2P::Anlayze[Header %d]", bHeader);
 
 	int32_t iExtraLen = 0;
@@ -391,12 +414,10 @@ int32_t CInputP2P::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 			if ((iExtraLen = Relay(d, c_pData, m_iBufferLeft)) < 0)
 				return -1;
 			break;
-#ifdef ENABLE_FULL_NOTICE
 		case HEADER_GG_BIG_NOTICE:
 			if ((iExtraLen = Notice(d, c_pData, m_iBufferLeft, true)) < 0)
 				return -1;
 			break;
-#endif
 		case HEADER_GG_NOTICE:
 			if ((iExtraLen = Notice(d, c_pData, m_iBufferLeft)) < 0)
 				return -1;
@@ -462,6 +483,22 @@ int32_t CInputP2P::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 
 		case HEADER_GG_CHECK_AWAKENESS:
 			IamAwake(d, c_pData);
+			break;
+
+		case HEADER_GG_UPDATE_RIGHTS:
+			UpdateRights(c_pData);
+			break;
+
+		case HEADER_GG_RELOAD_COMMAND:
+			do_reload(nullptr, ((TPacketGGReloadCommand*)c_pData)->argument, 0, 0);
+			break;
+
+		case HEADER_GG_MESSENGER_REQUEST:
+			MessengerRequest(c_pData);
+			break;
+
+		case HEADER_GG_MESSENGER_REQUEST_FAIL:
+			MessengerRequestFail(c_pData);
 			break;
 	}
 

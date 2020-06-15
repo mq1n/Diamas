@@ -138,7 +138,7 @@ class CGraphicBase
 			DEFAULT_IB_FILL_TRI,
 			DEFAULT_IB_FILL_RECT,
 			DEFAULT_IB_FILL_CUBE,
-			DEFAULT_IB_NUM,
+			DEFAULT_IB_NUM
 		};
 
 	public:
@@ -300,7 +300,7 @@ class CGraphicBase
 		enum
 		{
 			PDT_VERTEX_NUM = 16,
-			PDT_VERTEXBUFFER_NUM = 100,				
+			PDT_VERTEXBUFFER_NUM = 100
 		};
 		
 		

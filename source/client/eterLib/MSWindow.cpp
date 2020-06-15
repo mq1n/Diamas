@@ -1,12 +1,14 @@
 #include "StdAfx.h"
-#include "MsWindow.h"
+#include "MSWindow.h"
 
 #include <windowsx.h>
-#include "../EterBase/Random.h"
+#include "../eterBase/Random.h"
 
 CMSWindow::TWindowClassSet CMSWindow::ms_stWCSet;
 HINSTANCE CMSWindow::ms_hInstance = nullptr;
+LPSTR lpClassName = { 0 };
 
+#pragma optimize("", off)
 LRESULT CALLBACK MSWindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {	
 	CMSWindow * pWnd = (CMSWindow *) GetWindowLong(hWnd, GWL_USERDATA);
@@ -60,6 +62,13 @@ void CMSWindow::Destroy()
 	m_isVisible = false;
 }
 
+std::wstring Utf8ToUtf16(const std::string& s)
+{
+	std::wstring w;
+	w.resize(s.size());
+	w.resize(MultiByteToWideChar(CP_UTF8, 0, s.data(), s.length(), &w[0], w.size()));
+	return w;
+}
 bool CMSWindow::Create(const char* c_szName, int32_t brush, uint32_t cs, uint32_t ws, HICON hIcon, int32_t iCursorResource)
 {
 	//assert(ms_hInstance != nullptr);
@@ -81,6 +90,7 @@ bool CMSWindow::Create(const char* c_szName, int32_t brush, uint32_t cs, uint32_
 		return false;
 
 	SetWindowLong(m_hWnd, GWL_USERDATA, (uint32_t) this);
+	SetWindowTextW(m_hWnd, Utf8ToUtf16(c_szName).c_str());
 	//DestroyWindow(ImmGetDefaultIMEWnd(m_hWnd));
 
 	return true;
@@ -91,13 +101,9 @@ void CMSWindow::SetVisibleMode(bool isVisible)
 	m_isVisible = isVisible;
 
 	if (m_isVisible)
-	{
-		ShowWindow(m_hWnd, SW_SHOW);		
-	}
+		ShowWindow(m_hWnd, SW_SHOW);
 	else
-	{
 		ShowWindow(m_hWnd, SW_HIDE);
-	}	
 }
 
 void CMSWindow::Show()
@@ -198,7 +204,7 @@ void CMSWindow::AdjustSize(int32_t width, int32_t height)
 
 void CMSWindow::SetText(const char* c_szText)
 {
-	SetWindowText(m_hWnd, c_szText);
+	SetWindowTextW(m_hWnd, Utf8ToUtf16(c_szText).c_str());
 }
 
 void CMSWindow::SetSize(int32_t width, int32_t height)
@@ -206,20 +212,25 @@ void CMSWindow::SetSize(int32_t width, int32_t height)
 	SetWindowPos(m_hWnd, nullptr, 0, 0, width, height, SWP_NOZORDER|SWP_NOMOVE);
 }
 
+LPSTR CMSWindow::GetMyClassName()
+{
+	return lpClassName;
+}
 const char * CMSWindow::RegisterWindowClass(uint32_t style, int32_t brush, WNDPROC pfnWndProc, HICON hIcon, int32_t iCursorResource)
 {
 	char szClassName[1024];
 	//sprintf(szClassName, "eter - s%x:b%x:p:%x", style, brush, (uint32_t) pfnWndProc);
-	sprintf(szClassName, "eter - s%x:b%x:p:%x:%d", style, brush, (uint32_t)pfnWndProc, random_range(2, 99955599));
+	lpClassName = GetRandomStringA(20);
+	sprintf_s(szClassName, "%s", lpClassName);
 
-	TWindowClassSet::iterator f = ms_stWCSet.find((char*) szClassName);
+	auto f = ms_stWCSet.find((char *) szClassName);
 
 	if (f != ms_stWCSet.end())
 		return *f;
 
 	const char* c_szStaticClassName = stl_static_string(szClassName).c_str();
 
-	ms_stWCSet.insert((char * const) c_szStaticClassName);
+	ms_stWCSet.emplace((char*)c_szStaticClassName);
 	
 	WNDCLASS wc;
 
@@ -247,6 +258,6 @@ CMSWindow::CMSWindow()
 	m_isActive = false;
 }
 
-CMSWindow::~CMSWindow()
-{
-}
+CMSWindow::~CMSWindow() = default;
+
+#pragma optimize("", on)

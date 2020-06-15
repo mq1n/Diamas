@@ -21,9 +21,7 @@ void CActorInstance::__Push(int32_t x, int32_t y)
 	IPhysicsWorld* pWorld = IPhysicsWorld::GetPhysicsWorld();
 			
 	if (!pWorld)
-	{
 		return;
-	}
 
 	for(int32_t i = 0; i < LoopValue; ++i)
 	{

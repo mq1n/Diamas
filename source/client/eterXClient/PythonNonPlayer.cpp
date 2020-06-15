@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include <FileSystemIncl.hpp>
-#include "pythonnonplayer.h"
+#include "PythonNonPlayer.h"
 #include "InstanceBase.h"
 #include "PythonCharacterManager.h"
 #include "../eterBase/lzo.h"
@@ -34,48 +34,39 @@ bool CPythonNonPlayer::LoadNonPlayerData(const char * c_szFileName)
 	file.Read(&dwElements, sizeof(uint32_t));
 	file.Read(&dwDataSize, sizeof(uint32_t));
 
-	uint8_t * pbData = new uint8_t[dwDataSize];
-	file.Read(pbData, dwDataSize);
+	std::vector<uint8_t> pbData(dwDataSize);
+	file.Read(pbData.data(), dwDataSize);
 	/////
 
 	CLZObject zObj;
 
-	if (!CLZO::Instance().Decompress(zObj, pbData, s_adwMobProtoKey))
-	{
-		delete [] pbData;
+	if (!CLZO::Instance().Decompress(zObj, pbData.data(), s_adwMobProtoKey))
 		return false;
-	}
 
 	uint32_t structSize = zObj.GetSize() / dwElements;
 	uint32_t structDiff = zObj.GetSize() % dwElements;
 #ifdef ENABLE_PROTOSTRUCT_AUTODETECT
-	if (structDiff!=0 && !CPythonNonPlayer::TMobTableAll::IsValidStruct(structSize))
+	if (structDiff != 0 && !TMobTableAll::IsValidStruct(structSize))
 #else
 	if ((zObj.GetSize() % sizeof(TMobTable)) != 0)
 #endif
 	{
-		TraceError("CPythonNonPlayer::LoadNonPlayerData: invalid size %u check data format. structSize %u, structDiff %u", zObj.GetSize(), structSize, structDiff);
+		TraceError("CPythonNonPlayer::LoadNonPlayerData: invalid size %u check data format. structSize %u, structDiff %u", zObj.GetSize(),
+				   structSize, structDiff);
 		return false;
 	}
 
-    for (uint32_t i = 0; i < dwElements; ++i)
+	for (uint32_t i = 0; i < dwElements; ++i)
 	{
 #ifdef ENABLE_PROTOSTRUCT_AUTODETECT
-		CPythonNonPlayer::TMobTable t = {0};
-		CPythonNonPlayer::TMobTableAll::Process(zObj.GetBuffer(), structSize, i, t);
+		TMobTable t = {0};
+		TMobTableAll::Process(zObj.GetBuffer(), structSize, i, t);
 #else
 		CPythonNonPlayer::TMobTable & t = *((CPythonNonPlayer::TMobTable *) zObj.GetBuffer() + i);
 #endif
-		TMobTable * pTable = &t;
-
-		TMobTable * pNonPlayerData = new TMobTable;
-		memcpy(pNonPlayerData, pTable, sizeof(TMobTable));
-
-		//TraceError("%d : %s type[%d] color[%d]", pNonPlayerData->dwVnum, pNonPlayerData->szLocaleName, pNonPlayerData->bType, pNonPlayerData->dwMonsterColor);
-		m_NonPlayerDataMap.insert(TNonPlayerDataMap::value_type(pNonPlayerData->dwVnum, pNonPlayerData));
+		m_NonPlayerDataMap.emplace(t.dwVnum, t);
 	}
 
-	delete [] pbData;
 	return true;
 }
 
@@ -106,12 +97,11 @@ bool CPythonNonPlayer::GetInstanceType(uint32_t dwVnum, uint8_t* pbType)
 
 const CPythonNonPlayer::TMobTable * CPythonNonPlayer::GetTable(uint32_t dwVnum)
 {
-	TNonPlayerDataMap::iterator itor = m_NonPlayerDataMap.find(dwVnum);
-
+	auto itor = m_NonPlayerDataMap.find(dwVnum);
 	if (itor == m_NonPlayerDataMap.end())
 		return nullptr;
 
-	return itor->second;
+	return &itor->second;
 }
 
 uint8_t CPythonNonPlayer::GetEventType(uint32_t dwVnum)
@@ -159,31 +149,27 @@ uint8_t CPythonNonPlayer::GetEventTypeByVID(uint32_t dwVID)
 		return ON_CLICK_EVENT_NONE;
 	}
 
-	uint16_t dwVnum = pInstance->GetVirtualNumber();
+	uint32_t dwVnum = pInstance->GetVirtualNumber();
 	return GetEventType(dwVnum);
 }
 
 const char*	CPythonNonPlayer::GetMonsterName(uint32_t dwVnum)
 {	
-	const CPythonNonPlayer::TMobTable * c_pTable = GetTable(dwVnum);
+	const TMobTable * c_pTable = GetTable(dwVnum);
 	if (!c_pTable)
-	{
-		static const char* sc_szEmpty="";
-		return sc_szEmpty;
-	}
+		return "";
 
 	return c_pTable->szLocaleName;
 }
 
 uint32_t CPythonNonPlayer::GetMonsterColor(uint32_t dwVnum)
 {
-	const CPythonNonPlayer::TMobTable * c_pTable = GetTable(dwVnum);
+	const TMobTable * c_pTable = GetTable(dwVnum);
 	if (!c_pTable)
 		return 0;
 
 	return c_pTable->dwMonsterColor;
 }
-
 void CPythonNonPlayer::GetMatchableMobList(int32_t iLevel, int32_t iInterval, TMobTableList * pMobTableList)
 {
 /*
@@ -206,16 +192,146 @@ void CPythonNonPlayer::GetMatchableMobList(int32_t iLevel, int32_t iInterval, TM
 */
 }
 
+uint32_t CPythonNonPlayer::GetMonsterMaxHP(uint32_t dwVnum)
+{
+	const TMobTable * c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+	{
+		return 0;
+	}
+
+	return c_pTable->dwMaxHP;
+}
+
+uint32_t CPythonNonPlayer::GetMonsterRaceFlag(uint32_t dwVnum)
+{
+	const TMobTable * c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+	{
+		return 0;
+	}
+
+	return c_pTable->dwRaceFlag;
+}
+
+uint32_t CPythonNonPlayer::GetMonsterDamage1(uint32_t dwVnum)
+{
+	const TMobTable * c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+	{
+		return 0;
+	}
+
+	return c_pTable->dwDamageRange[0];
+}
+
+uint32_t CPythonNonPlayer::GetMonsterDamage2(uint32_t dwVnum)
+{
+	const TMobTable * c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+	{
+		return 0;
+	}
+
+	return c_pTable->dwDamageRange[1];
+}
+
+uint32_t CPythonNonPlayer::GetMonsterExp(uint32_t dwVnum)
+{
+	const TMobTable * c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+	{
+		return 0;
+	}
+
+	return c_pTable->dwExp;
+}
+
+float CPythonNonPlayer::GetMonsterDamageMultiply(uint32_t dwVnum)
+{
+	const TMobTable * c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+	{
+		return 0.f;
+	}
+
+	return c_pTable->fDamMultiply;
+}
+
+uint32_t CPythonNonPlayer::GetMonsterST(uint32_t dwVnum)
+{
+	const TMobTable * c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+	{
+		return 0;
+	}
+
+	return c_pTable->bStr;
+}
+
+uint32_t CPythonNonPlayer::GetMonsterDX(uint32_t dwVnum)
+{
+	const TMobTable * c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+	{
+		return 0;
+	}
+
+	return c_pTable->bDex;
+}
+
+bool CPythonNonPlayer::IsMonsterStone(uint32_t dwVnum)
+{
+	const TMobTable * c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+		return false;
+
+	return c_pTable->bType == 2;
+}
+
+uint8_t CPythonNonPlayer::GetMobRegenCycle(uint32_t dwVnum)
+{
+	const TMobTable* c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+		return 0;
+
+	return c_pTable->bRegenCycle;
+}
+
+uint8_t CPythonNonPlayer::GetMobRegenPercent(uint32_t dwVnum)
+{
+	const TMobTable* c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+		return 0;
+
+	return c_pTable->bRegenPercent;
+}
+
+uint32_t CPythonNonPlayer::GetMobGoldMin(uint32_t dwVnum)
+{
+	const TMobTable* c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+		return 0;
+
+	return c_pTable->dwGoldMin;
+}
+
+uint32_t CPythonNonPlayer::GetMobGoldMax(uint32_t dwVnum)
+{
+	const TMobTable* c_pTable = GetTable(dwVnum);
+	if (!c_pTable)
+		return 0;
+
+	return c_pTable->dwGoldMax;
+}
+
+
 void CPythonNonPlayer::Clear()
 {
 }
 
 void CPythonNonPlayer::Destroy()
 {
-	for (TNonPlayerDataMap::iterator itor=m_NonPlayerDataMap.begin(); itor!=m_NonPlayerDataMap.end(); ++itor)
-	{
-		delete itor->second;
-	}
 	m_NonPlayerDataMap.clear();
 }
 
@@ -224,7 +340,8 @@ CPythonNonPlayer::CPythonNonPlayer()
 	Clear();
 }
 
-CPythonNonPlayer::~CPythonNonPlayer(void)
+CPythonNonPlayer::~CPythonNonPlayer()
 {
 	Destroy();
 }
+

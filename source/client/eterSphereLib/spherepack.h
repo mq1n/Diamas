@@ -88,20 +88,20 @@ class SpherePack : public Sphere
 public:
 	SpherePack(void)
 	{		
-		mUserData         = 0; // default user data is null
-		mFactory          = 0; // factory we are a member of
-		mNext             = 0; // linked list pointers
-		mPrevious         = 0;
-		mParent           = 0;
-		mNextSibling      = 0; // our brothers and sisters at this level.
-		mPrevSibling      = 0;
-		mChildren         = 0; // our children.
-		mChildCount       = 0; // number of children we have.
-		mFifo1            = 0; // our FIFO1 location if we have one.
-		mFifo2            = 0; // our FIFO2 location if we have one.
-		SetRadius(0);          // default radius
-		mCenter.Set(0,0,0);    // default center position.
-		IS_SPHERE	= false;
+		mUserData = nullptr; // default user data is null
+		mFactory = nullptr; // factory we are a member of
+		mNext = nullptr; // linked list pointers
+		mPrevious = nullptr;
+		mParent = nullptr;
+		mNextSibling = nullptr; // our brothers and sisters at this level.
+		mPrevSibling = nullptr;
+		mChildren = nullptr; // our children.
+		mChildCount = 0; // number of children we have.
+		mFifo1 = nullptr; // our FIFO1 location if we have one.
+		mFifo2 = nullptr; // our FIFO2 location if we have one.
+		SetRadius(0); // default radius
+		mCenter.Set(0, 0, 0); // default center position.
+		IS_SPHERE = false;
 	};
 	virtual ~SpherePack()
 	{
@@ -114,12 +114,12 @@ public:
 	{
 		IS_SPHERE			= isSphere;
 		mUserData         = userdata;
-		mParent           = 0;
-		mNextSibling      = 0;
-		mPrevSibling      = 0;
-		mFlags            = 0;
-		mFifo1            = 0;
-		mFifo2            = 0;
+		mParent = nullptr;
+		mNextSibling = nullptr;
+		mPrevSibling = nullptr;
+		mFlags = 0;
+		mFifo1 = nullptr;
+		mFifo2 = nullptr;
 		mFactory          = factory;
 		mCenter           = pos;
 		SetRadius(radius);
@@ -130,7 +130,8 @@ public:
 	void ClearSpherePackFlag(SpherePackFlag flag) { mFlags&=~flag; };
 	bool HasSpherePackFlag(SpherePackFlag flag) const
 	{
-		if ( mFlags & flag ) return true;
+		if (mFlags & flag)
+			return true;
 		return false;
 	};
 	
@@ -145,25 +146,26 @@ public:
 	
 	void Unlink(void)
 	{
-		if ( mFifo1 ) // if we belong to fifo1, null us out
+		if (mFifo1) // if we belong to fifo1, null us out
 		{
-			*mFifo1 = 0;
-			mFifo1 = 0;
+			*mFifo1 = nullptr;
+			mFifo1 = nullptr;
 		}
-		
-		if ( mFifo2 ) // if we belong to fifo2, null us out
+
+		if (mFifo2) // if we belong to fifo2, null us out
 		{
-			*mFifo2 = 0;
-			mFifo2 = 0;
+			*mFifo2 = nullptr;
+			mFifo2 = nullptr;
 		}
-		
-		if ( mParent ) mParent->LostChild(this);
-		
-		assert( !mChildren ); // can't unlink guys with children!
-		
-		mParent = 0; // got no father anymore
+
+		if (mParent)
+			mParent->LostChild(this);
+
+		assert(!mChildren); // can't unlink guys with children!
+
+		mParent = nullptr; // got no father anymore
 	}
-	
+
 	
 	void AddChild(SpherePack *pack)
 	{
@@ -172,10 +174,11 @@ public:
 		mChildren = pack; // new head of list
 		
 		pack->SetNextSibling(my_child); // his next is my old next
-		pack->SetPrevSibling(0); // at head of list, no previous
+		pack->SetPrevSibling(nullptr); // at head of list, no previous
 		pack->SetParent(this);
 		
-		if ( my_child ) my_child->SetPrevSibling(pack); // previous now this..
+		if (my_child)
+			my_child->SetPrevSibling(pack); // previous now this..
 		
 		mChildCount++;
 
@@ -183,14 +186,14 @@ public:
 	
 	void SetNextSibling(SpherePack *child) { mNextSibling = child; }
 	void SetPrevSibling(SpherePack *child) { mPrevSibling = child; }
-	
-	SpherePack * _GetNextSibling(void) const 
-	{ 
-		return mNextSibling; 
+
+	SpherePack * _GetNextSibling(void) const
+	{
+		return mNextSibling;
 	}
-	SpherePack * _GetPrevSibling(void) const 
-	{ 
-		return mPrevSibling; 
+	SpherePack * _GetPrevSibling(void) const
+	{
+		return mPrevSibling;
 	}
 	SpherePack * GetChildren(void)    const { return mChildren; }
 	
@@ -201,8 +204,11 @@ public:
 	void SetPrevious(SpherePack *pack) { mPrevious = pack; };
 	
 	void * GetUserData(void) const { return mUserData; };
-	void   SetUserData(void *data, bool isSphere) { mUserData = data; IS_SPHERE=isSphere;};
-	
+	void SetUserData(void * data, bool isSphere)
+	{
+		mUserData = data;
+		IS_SPHERE = isSphere;
+	};
 	float DistanceSquared(const SpherePack *pack) const { return mCenter.DistanceSq( pack->mCenter );  };
 	
 	void LostChild(SpherePack *pack);
@@ -224,12 +230,12 @@ public:
 	{
 		mFifo1 = fifo;
 	};
-	
+
 	void SetFifo2(SpherePack **fifo)
 	{
 		mFifo2 = fifo;
 	};
-	
+
 	void ComputeBindingDistance(SpherePack *parent)
 	{
 		mBindingDistance = parent->GetRadius() - GetRadius();
@@ -242,7 +248,7 @@ public:
 	void VisibilityTest(const Frustum &f,
 		SpherePackCallback *callback,
 		ViewState state);
-	
+
 	void RayTrace(const Vector3d &p1,           // origin of Ray
 		const Vector3d &dir,          // direction of Ray
 		float distance,                      // length of ray.
@@ -253,7 +259,7 @@ public:
 		float distance,
 		SpherePackCallback *callback,
 		ViewState state);
-	
+
 	void PointTest2d(const Vector3d &p,
 		SpherePackCallback *callback,
 		ViewState state);
@@ -312,7 +318,8 @@ public:
 		SpherePack **ret = &mFifo[mSP];
 		mFifo[mSP] = sphere;
 		mSP++;
-		if ( mSP == mFifoSize ) mSP = 0;
+		if ( mSP == mFifoSize )
+			mSP = 0;
 		return ret;
 	};
 	
@@ -323,25 +330,29 @@ public:
 			mCount--;
 			SpherePack *ret = mFifo[mBottom];
 			mBottom++;
-			if ( mBottom == mFifoSize ) mBottom = 0;
-			if ( ret ) return ret;
+			if ( mBottom == mFifoSize )
+				mBottom = 0;
+			if ( ret )
+				return ret;
 		}
-		return 0;
+		return nullptr;
 	}
 	
-	bool Flush(SpherePack *pack)
+	bool Flush(const SpherePack * pack)
 	{
-		if ( mSP == mBottom ) return false;
+		if ( mSP == mBottom )
+			return false;
 		int32_t i = mBottom;
 		while ( i != mSP )
 		{
 			if ( mFifo[i] == pack )
 			{
-				mFifo[i] = 0;
+				mFifo[i] = nullptr;
 				return true;
 			}
 			i++;
-			if ( i == mFifoSize ) i = 0;
+			if ( i == mFifoSize )
+				i = 0;
 		}
 		return false;
 	};
@@ -360,13 +371,13 @@ private:
 class SpherePackFactory : public SpherePackCallback
 {
 public:
-	
+
 	SpherePackFactory(int32_t maxspheres,
 		float rootsize,
 		float leafsize,
 		float gravy);
-	
-	
+
+
 	virtual ~SpherePackFactory(void);
 	
 	void Process(void);
@@ -376,7 +387,7 @@ public:
 		void *userdata,
 		bool isSphere,
 		int32_t flags=SPF_LEAF_TREE);
-	
+
 	void AddIntegrate(SpherePack *pack);          // add to the integration FIFO
 	void AddRecompute(SpherePack *recompute);     // add to the recomputation (balancing) FIFO.
 	

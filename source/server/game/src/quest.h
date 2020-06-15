@@ -8,12 +8,11 @@
 //#define QUEST_DIR "./quest/"
 
 #include "lua_incl.h"
-
-#define ENABLE_QUEST_DIE_EVENT
+#include "../../common/service.h"
 
 namespace quest
 {
-	enum
+	enum EQuestAttrs
 	{
 		QUEST_NO_NPC,
 		QUEST_ATTR_NPC_START = 100000,
@@ -35,7 +34,7 @@ namespace quest
 		QUEST_ATTR15_NPC = 100014,
 	};
 
-	enum
+	enum EQuestEvents
 	{
 		QUEST_CLICK_EVENT,
 		QUEST_KILL_EVENT,
@@ -60,9 +59,7 @@ namespace quest
 		QUEST_ITEM_PICK_EVENT,
 		QUEST_SIG_USE_EVENT,
 		QUEST_ITEM_INFORMER_EVENT,
-#ifdef ENABLE_QUEST_DIE_EVENT
 		QUEST_DIE_EVENT,
-#endif
 		QUEST_EVENT_COUNT
 	};
 
@@ -85,7 +82,7 @@ namespace quest
 
 	struct AStateScriptType
 	{
-		int32_t		GetSize() const { return m_code.size(); }
+		int32_t		GetSize() const { return static_cast<int32_t>(m_code.size()); }
 		const char*	GetCode() const { return &m_code[0]; }
 
 		std::vector<char> m_code;
@@ -126,12 +123,15 @@ namespace quest
 		int32_t		_clock_value;
 		int32_t		_counter_value;
 		std::string	_icon_file;
+		std::string _scmd;
+		std::string questName;
 
 		std::vector<AArgScript *> chat_scripts;
 
+		LPITEM _item;
 		QuestState()
 			: co(nullptr), ico(0), args(0), suspend_state(SUSPEND_STATE_NONE), iIndex(0), bStart(false), st(-1),
-			_clock_value(0), _counter_value(0)
+			_clock_value(0), _counter_value(0), _item(nullptr)
 		{}
 	};
 }

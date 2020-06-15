@@ -18,6 +18,21 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
+-- Table structure for activity
+-- ----------------------------
+DROP TABLE IF EXISTS `activity`;
+CREATE TABLE `activity`  (
+  `pid` int(11) NOT NULL,
+  `today_pvp` int(11) NOT NULL DEFAULT 0,
+  `today_pve` int(11) NOT NULL DEFAULT 0,
+  `today_other` int(11) NOT NULL DEFAULT 0,
+  `today_gk` int(11) NULL DEFAULT 0,
+  `total` int(11) NOT NULL DEFAULT 0,
+  `last_update` int(11) NOT NULL,
+  PRIMARY KEY (`pid`) USING BTREE
+) ENGINE = MyISAM CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Fixed;
+
+-- ----------------------------
 -- Table structure for affect
 -- ----------------------------
 DROP TABLE IF EXISTS `affect`;
@@ -290,6 +305,7 @@ CREATE TABLE `item`  (
   `pos` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
   `count` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
   `vnum` int(11) UNSIGNED NOT NULL DEFAULT 0,
+  `is_gm_owner` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
   `socket0` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `socket1` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `socket2` int(10) UNSIGNED NOT NULL DEFAULT 0,
@@ -949,9 +965,11 @@ CREATE TABLE `player`  (
   `horse_hp` smallint(4) NOT NULL DEFAULT 0,
   `horse_stamina` smallint(4) NOT NULL DEFAULT 0,
   `horse_level` tinyint(2) UNSIGNED NOT NULL DEFAULT 0,
+  `horse_name` varchar(24) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `horse_hp_droptime` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `horse_riding` tinyint(1) NOT NULL DEFAULT 0,
   `horse_skill_point` smallint(3) NOT NULL DEFAULT 0,
+  `gm_invisible` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `account_id_idx`(`account_id`) USING BTREE,
   INDEX `name_idx`(`name`) USING BTREE

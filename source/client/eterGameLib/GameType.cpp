@@ -20,9 +20,7 @@ void NRaceData::DestroySystem()
 BOOL NRaceData::LoadAttackData(CTextFileLoader & rTextFileLoader, TAttackData * pData)
 {
 	if (!rTextFileLoader.GetTokenInteger("attacktype", &pData->iAttackType))
-	{
 		pData->iAttackType = ATTACK_TYPE_SPLASH;
-	}
 	if (!rTextFileLoader.GetTokenInteger("hittingtype", &pData->iHittingType))
 		return false;
 	if (!rTextFileLoader.GetTokenFloat("stiffentime", &pData->fStiffenTime))
@@ -32,9 +30,7 @@ BOOL NRaceData::LoadAttackData(CTextFileLoader & rTextFileLoader, TAttackData * 
 	if (!rTextFileLoader.GetTokenFloat("externalforce", &pData->fExternalForce))
 		return false;
 	if (!rTextFileLoader.GetTokenInteger("hitlimitcount", &pData->iHitLimitCount))
-	{
 		pData->iHitLimitCount = 0;
-	}
 
 	return true;
 }
@@ -56,7 +52,7 @@ bool NRaceData::THitData::Load(CTextFileLoader & rTextFileLoader)
 	CTokenVector * tv;
 	if (rTextFileLoader.GetTokenVector("hitposition",&tv))
 	{
-		CTokenVector::iterator it=tv->begin();
+		auto it = tv->begin();
 
 		while(it!=tv->end())
 		{
@@ -92,10 +88,10 @@ BOOL NRaceData::LoadMotionAttackData(CTextFileLoader & rTextFileLoader, TMotionA
 
 	pData->HitDataContainer.clear();
 
-	uint32_t dwHitDataCount;
+	uint32_t dwHitDataCount = 0;
 	if (!rTextFileLoader.GetTokenDoubleWord("hitdatacount", &dwHitDataCount))
 	{
-		pData->HitDataContainer.push_back(SHitData());
+		pData->HitDataContainer.emplace_back(SHitData());
 		THitData & rHitData = *(pData->HitDataContainer.rbegin());
 		if (!rHitData.Load(rTextFileLoader))
 			return FALSE;
@@ -107,7 +103,7 @@ BOOL NRaceData::LoadMotionAttackData(CTextFileLoader & rTextFileLoader, TMotionA
 			if (!rTextFileLoader.SetChildNode(i))
 				return FALSE;
 
-			pData->HitDataContainer.push_back(SHitData());
+			pData->HitDataContainer.emplace_back(SHitData());
 			THitData & rHitData = *(pData->HitDataContainer.rbegin());
 			if (!rHitData.Load(rTextFileLoader))
 				return FALSE;
@@ -124,7 +120,7 @@ BOOL NRaceData::LoadCollisionData(CTextFileLoader & rTextFileLoader, TCollisionD
 	if (!rTextFileLoader.GetTokenInteger("collisiontype", &pCollisionData->iCollisionType))
 		return false;
 
-	uint32_t dwSphereDataCount;
+	uint32_t dwSphereDataCount = 0;
 	if (!rTextFileLoader.GetTokenDoubleWord("spheredatacount", &dwSphereDataCount))
 		return false;
 
@@ -167,15 +163,10 @@ BOOL NRaceData::LoadEffectData(CTextFileLoader & rTextFileLoader, TAttachingEffe
 		return false;
 
 	if (!rTextFileLoader.GetTokenPosition("effectposition",&pEffectData->v3Position))
-	{
 		pEffectData->v3Position = D3DXVECTOR3(0.0f,0.0f,0.0f);
-	}
 
 	if (!rTextFileLoader.GetTokenPosition("effectrotation",&pEffectData->v3Rotation))
-	{
-		//pEffectData->qRotation = D3DXQUATERNION(0.0f,0.0f,0.0f,1.0f);
 		pEffectData->v3Rotation = D3DXVECTOR3(0.0f,0.0f,0.0f);
-	}
 
 	/*if (!*/
 	// TODO DELETEME FIXME
@@ -212,7 +203,7 @@ void NRaceData::SaveMotionAttackData(FILE * File, int32_t iTabCount, const TMoti
 	PrintfTabs(File, iTabCount, "HitDataCount         %d\n", c_rData.HitDataContainer.size());
 
 	uint32_t dwHitDataNumber = 0;
-	THitDataContainer::const_iterator itor = c_rData.HitDataContainer.begin();
+	auto itor = c_rData.HitDataContainer.begin();
 	for (; itor != c_rData.HitDataContainer.end(); ++itor, ++dwHitDataNumber)
 	{
 		const THitData & c_rHitData = *itor;
@@ -314,7 +305,7 @@ void NRaceData::SaveAttachingData(FILE * File, int32_t iTabCount, const TAttachi
 
 BOOL NRaceData::LoadAttachingData(CTextFileLoader & rTextFileLoader, TAttachingDataVector * pAttachingDataVector)
 {
-	uint32_t dwDataCount;
+	uint32_t dwDataCount = 0;
 	if (!rTextFileLoader.GetTokenDoubleWord("attachingdatacount", &dwDataCount))
 		return false;
 

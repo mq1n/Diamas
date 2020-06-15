@@ -13,7 +13,7 @@
 #include "shop_manager.h"
 #include "sectree_manager.h"
 #include "skill.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "p2p.h"
 #include "guild.h"
 #include "guild_manager.h"
@@ -31,12 +31,15 @@
 #include "motion.h"
 #include "dev_log.h"
 #include "log.h"
-#include "horsename_manager.h"
 #include "gm.h"
 #include "map_location.h"
-#include "DragonSoul.h"
+#include "dragon_soul.h"
 #include "desc_client.h"
+#include "Anticheat_Manager.h"
+#include "safebox.h"
+#include "../../common/service.h"
 
+#include <functional>
 
 #define MAPNAME_DEFAULT	"none"
 
@@ -266,7 +269,6 @@ void CInputDB::ChangeName(LPDESC d, const char * data)
 		}
 }
 
-#define ENABLE_GOHOME_IF_MAP_NOT_EXIST
 void CInputDB::PlayerLoad(LPDESC d, const char * data)
 {
 	TPlayerTable * pTab = (TPlayerTable *) data;
@@ -275,7 +277,7 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 		return;
 
 	int32_t lMapIndex = pTab->lMapIndex;
-	PIXEL_POSITION pos;
+	GPOS pos;
 
 	if (lMapIndex == 0)
 	{
@@ -304,14 +306,9 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 	if (!SECTREE_MANAGER::instance().GetValidLocation(pTab->lMapIndex, pTab->x, pTab->y, lMapIndex, pos, d->GetEmpire()))
 	{
 		sys_err("InputDB::PlayerLoad : cannot find valid location %d x %d (name: %s)", pTab->x, pTab->y, pTab->name);
-#ifdef ENABLE_GOHOME_IF_MAP_NOT_EXIST
 		lMapIndex = EMPIRE_START_MAP(d->GetAccountTable().bEmpire);
 		pos.x = EMPIRE_START_X(d->GetAccountTable().bEmpire);
 		pos.y = EMPIRE_START_Y(d->GetAccountTable().bEmpire);
-#else
-		d->SetPhase(PHASE_CLOSE);
-		return;
-#endif
 	}
 
 	pTab->x = pos.x;
@@ -349,11 +346,12 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 		p.bEmpire = ch->GetEmpire();
 		p.lMapIndex = SECTREE_MANAGER::instance().GetMapIndex(ch->GetX(), ch->GetY());
 		p.bChannel = g_bChannel;
+		p.iLevel = ch->GetLevel();
 
 		P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGLogin));
 
 		char buf[51];
-		snprintf(buf, sizeof(buf), "%s %d %d %ld %d", 
+		snprintf(buf, sizeof(buf), "%s %d %d %d %d", 
 				inet_ntoa(ch->GetDesc()->GetAddr().sin_addr), ch->GetGold(), g_bChannel, ch->GetMapIndex(), ch->GetAlignment());
 		LogManager::instance().CharLog(ch, 0, "LOGIN", buf);
 	}
@@ -396,6 +394,8 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 			ch->GetGMLevel());
 
 	ch->QuerySafeboxSize();
+
+	CAnticheatManager::instance().CreateClientHandle(ch);
 }
 
 void CInputDB::Boot(const char* data)
@@ -635,8 +635,12 @@ void CInputDB::Boot(const char* data)
 	size = decode_2bytes(data);
 	data += 2;
 
-	CBanwordManager::instance().Initialize((TBanwordTable *) data, size);
-	data += size * sizeof(TBanwordTable);
+	if (size)
+	{
+		CBanwordManager::instance().Initialize((TBanwordTable *) data, size);
+		data += size * sizeof(TBanwordTable);
+	}
+	sys_log(0, "[BANWORD] Size %d Count %d", sizeof(TBanwordTable), size);
 
 	{
 		using namespace building;
@@ -656,12 +660,15 @@ void CInputDB::Boot(const char* data)
 		size = decode_2bytes(data);
 		data += 2;
 
-		TLand * kLand = (TLand *) data;
-		data += size * sizeof(TLand);
+		if (size)
+		{
+			TLand * kLand = (TLand *) data;
+			data += size * sizeof(TLand);
 
-		for (uint16_t i = 0; i < size; ++i, ++kLand)
-			CManager::instance().LoadLand(kLand);
-
+			for (uint16_t i = 0; i < size; ++i, ++kLand)
+				CManager::instance().LoadLand(kLand);
+		}
+		sys_log (0, "[LAND] Size %d Count %d", sizeof (TLand), size);
 		/*
 		 * OBJECT PROTO
 		 */
@@ -722,33 +729,22 @@ void CInputDB::Boot(const char* data)
 	data += size * sizeof(TItemIDRangeTable);
 
 	//ADMIN_MANAGER
-	//관리자 등록
-	int32_t ChunkSize = decode_2bytes(data );
 	data += 2;
-	int32_t HostSize = decode_2bytes(data );
-	data += 2;
-	sys_log(0, "GM Value Count %d %d", HostSize, ChunkSize  );
-	for (int32_t n = 0; n < HostSize; ++n )
-	{
-		gm_new_host_inert(data );
-		sys_log(0, "GM HOST : IP[%s] ", data );		
-		data += ChunkSize;
-	}
-	
-	
-	data += 2;
-	int32_t adminsize = decode_2bytes(data );
+	int32_t adminsize = decode_2bytes(data);
 	data += 2;
 
-	for (int32_t n = 0; n < adminsize; ++n )
+	for (int32_t n = 0; n < adminsize; ++n)
 	{
 		tAdminInfo& rAdminInfo = *(tAdminInfo*)data;
 
-		gm_new_insert(rAdminInfo );
-		
-		data += sizeof(rAdminInfo );
+		GM::insert(rAdminInfo);
+
+		data += sizeof(rAdminInfo);
 	}
-	
+
+	GM::init((uint32_t*)data);
+	data += sizeof(uint32_t) * GM_MAX_NUM;
+
 	//END_ADMIN_MANAGER
 
 	uint16_t endCheck=decode_2bytes(data);
@@ -807,7 +803,12 @@ void CInputDB::Boot(const char* data)
 			"%s/dragon_soul_table.txt", LocaleService_GetBasePath().c_str());
 
 	sys_log(0, "Initializing Informations of Cube System");
-	Cube_InformationInitialize();
+	if (!Cube_InformationInitialize())
+	{
+		sys_err("cannot init cube infomation.");
+		thecore_shutdown();
+		return;
+	}
 
 	sys_log(0, "LoadLocaleFile: CommonDropItem: %s", szCommonDropItemFileName);
 	if (!ITEM_MANAGER::instance().ReadCommonDropItemFile(szCommonDropItemFileName))
@@ -880,7 +881,7 @@ void CInputDB::Boot(const char* data)
 
 	signal_timer_enable(30);
 
-	if (test_server)
+	if (g_bIsTestServer)
 	{
 		CMobManager::instance().DumpRegenCount("mob_count");
 	}
@@ -1213,6 +1214,7 @@ void CInputDB::P2P(const char * c_pData)
 	    pkDesc = DESC_MANAGER::instance().CreateConnectionDesc(main_fdw, p->szHost, p->wPort, PHASE_P2P, false);
 		mgr.RegisterConnector(pkDesc);
 		pkDesc->SetP2P(p->szHost, p->wPort, p->bChannel);
+		pkDesc->SetListenPort(p->wListenPort);
 	}
 }
 
@@ -1389,18 +1391,17 @@ void CInputDB::ItemLoad(LPDESC d, const char * c_pData)
 		item->SetSkipSave(true);
 		item->SetSockets(p->alSockets);
 		item->SetAttributes(p->aAttr);
+		item->SetGMOwner(p->is_gm_owner);
 
 #ifdef ENABLE_HIGHLIGHT_NEW_ITEM
 		item->SetLastOwnerPID(p->owner);
 #endif
 
-#ifdef ENABLE_BELT_INVENTORY_EX
 		if (p->window == BELT_INVENTORY)
 		{
 			p->window = INVENTORY;
 			p->pos = p->pos + BELT_INVENTORY_SLOT_START;
 		}
-#endif
 
 		if ((p->window == INVENTORY && ch->GetInventoryItem(p->pos)) ||
 				(p->window == EQUIPMENT && ch->GetWear(p->pos)))
@@ -1449,7 +1450,7 @@ void CInputDB::ItemLoad(LPDESC d, const char * c_pData)
 
 		if (pos < 0)
 		{
-			PIXEL_POSITION coord;
+			GPOS coord;
 			coord.x = ch->GetX();
 			coord.y = ch->GetY();
 
@@ -1489,8 +1490,24 @@ void CInputDB::AffectLoad(LPDESC d, const char * c_pData)
 	ch->LoadAffect(dwCount, (TPacketAffectElement *) c_pData);
 	
 }
-	
 
+void CInputDB::ActivityLoad(LPDESC d, const char* c_pData)
+{
+	if (!d || !d->GetCharacter())
+		return;
+
+	LPCHARACTER ch = d->GetCharacter();
+	if (!ch)
+		return;
+
+	uint32_t dwPID = decode_4bytes(c_pData);
+	c_pData += sizeof(uint32_t);
+
+	if (ch->GetPlayerID() != dwPID)
+		return;
+
+	ch->LoadActivity((TActivityTable*)c_pData);
+}
 
 void CInputDB::PartyCreate(const char* c_pData)
 {
@@ -1657,19 +1674,6 @@ void CInputDB::ChangeCharacterPriv(const char* c_pData)
 	CPrivManager::instance().GiveCharacterPriv(p->pid, p->type, p->value, p->bLog);
 }
 
-void CInputDB::MoneyLog(const char* c_pData)
-{
-	TPacketMoneyLog * p = (TPacketMoneyLog *) c_pData;
-
-	if (p->type == 4) // QUEST_MONEY_LOG_SKIP
-		return;
-
-	if (g_bAuthServer ==true )
-		return;
-
-	LogManager::instance().MoneyLog(p->type, p->vnum, p->gold);
-}
-
 void CInputDB::GuildMoneyChange(const char* c_pData)
 {
 	TPacketDGGuildMoneyChange* p = (TPacketDGGuildMoneyChange*) c_pData;
@@ -1801,38 +1805,27 @@ void CInputDB::MyshopPricelistRes(LPDESC d, const TPacketMyshopPricelistHeader* 
 //RELOAD_ADMIN
 void CInputDB::ReloadAdmin(const char * c_pData )
 {
-	gm_new_clear();
-	int32_t ChunkSize = decode_2bytes(c_pData );
+	GM::clear();
+
+	int32_t size = decode_2bytes(c_pData);
 	c_pData += 2;
-	int32_t HostSize = decode_2bytes(c_pData );
-	c_pData += 2;
-	
-	for (int32_t n = 0; n < HostSize; ++n )
-	{
-		gm_new_host_inert(c_pData );
-		c_pData += ChunkSize;
-	}
-	
-	
-	c_pData += 2;
-	int32_t size = 	decode_2bytes(c_pData );
-	c_pData += 2;
-	
-	for (int32_t n = 0; n < size; ++n )
+
+	for (int32_t n = 0; n < size; ++n)
 	{
 		tAdminInfo& rAdminInfo = *(tAdminInfo*)c_pData;
 
-		gm_new_insert(rAdminInfo );
+		GM::insert(rAdminInfo);
 
-		c_pData += sizeof (tAdminInfo );
-	
-		LPCHARACTER pChar = CHARACTER_MANAGER::instance().FindPC(rAdminInfo.m_szName );
-		if (pChar )
+		c_pData += sizeof(tAdminInfo);
+
+		LPCHARACTER pChar = CHARACTER_MANAGER::instance().FindPC(rAdminInfo.m_szName);
+		if (pChar)
 		{
 			pChar->SetGMLevel();
 		}
 	}
-	
+
+	GM::init((uint32_t*)c_pData);
 }
 //END_RELOAD_ADMIN
 
@@ -1885,11 +1878,11 @@ int32_t CInputDB::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 		break;
 
 	case HEADER_DG_PLAYER_LOAD_FAILED:
-		//sys_log(0, "PLAYER_LOAD_FAILED");
+		sys_log(0, "PLAYER_LOAD_FAILED");
 		break;
 
 	case HEADER_DG_PLAYER_DELETE_FAILED:
-		//sys_log(0, "PLAYER_DELETE_FAILED");
+		sys_log(0, "PLAYER_DELETE_FAILED");
 		PlayerDeleteFail(DESC_MANAGER::instance().FindByHandle(m_dwHandle));
 		break;
 
@@ -1903,6 +1896,10 @@ int32_t CInputDB::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 
 	case HEADER_DG_AFFECT_LOAD:
 		AffectLoad(DESC_MANAGER::instance().FindByHandle(m_dwHandle), c_pData);
+		break;
+
+	case HEADER_DG_ACTIVITY_LOAD:
+		ActivityLoad(DESC_MANAGER::instance().FindByHandle(m_dwHandle), c_pData);
 		break;
 
 	case HEADER_DG_SAFEBOX_LOAD:
@@ -2041,10 +2038,6 @@ int32_t CInputDB::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 		ChangeCharacterPriv(c_pData);
 		break;
 
-	case HEADER_DG_MONEY_LOG:
-		MoneyLog(c_pData);
-		break;
-
 	case HEADER_DG_GUILD_WITHDRAW_MONEY_GIVE:
 		GuildWithdrawMoney(c_pData);
 		break;
@@ -2128,15 +2121,9 @@ int32_t CInputDB::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 	case HEADER_DG_ACK_CHANGE_GUILD_MASTER :
 		this->GuildChangeMaster((TPacketChangeGuildMaster*) c_pData);
 		break;	
+
 	case HEADER_DG_ACK_SPARE_ITEM_ID_RANGE :
 		ITEM_MANAGER::instance().SetMaxSpareItemID(*((TItemIDRangeTable*)c_pData) );
-		break;
-
-	case HEADER_DG_UPDATE_HORSE_NAME :
-	case HEADER_DG_ACK_HORSE_NAME :
-		CHorseNameManager::instance().UpdateHorseName(
-				((TPacketUpdateHorseName*)c_pData)->dwPlayerID, 
-				((TPacketUpdateHorseName*)c_pData)->szHorseName);
 		break;
 
 	case HEADER_DG_NEED_LOGIN_LOG:

@@ -1,6 +1,8 @@
 #ifndef __INC_LIBTHECORE_EVENT_QUEUE_H__
 #define __INC_LIBTHECORE_EVENT_QUEUE_H__
 
+#include "../../common/service.h"
+
 #ifdef M2_USE_POOL
 #include "pool.h"
 #endif

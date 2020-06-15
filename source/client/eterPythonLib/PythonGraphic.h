@@ -1,9 +1,10 @@
 #pragma once
 
-#include "../eterlib/GrpTextInstance.h"
-#include "../eterlib/GrpMarkInstance.h"
-#include "../eterlib/GrpImageInstance.h"
-#include "../eterlib/GrpExpandedImageInstance.h"
+#include "../eterLib/GrpTextInstance.h"
+#include "../eterLib/GrpMarkInstance.h"
+#include "../eterLib/GrpImageInstance.h"
+#include "../eterLib/GrpExpandedImageInstance.h"
+#include "../eterLib/RenderTargetManager.h"
 
 #include "../eterGrnLib/ThingInstance.h"
 
@@ -31,7 +32,7 @@ class CPythonGraphic : public CScreen, public CSingleton<CPythonGraphic>
 		void SetViewport(float fx, float fy, float fWidth, float fHeight);
 		void RestoreViewport();
 
-		int32_t GenerateColor(float r, float g, float b, float a);
+		uint32_t GenerateColor(float r, float g, float b, float a);
 		void RenderDownButton(float sx, float sy, float ex, float ey);
 		void RenderUpButton(float sx, float sy, float ex, float ey);
 

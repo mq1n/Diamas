@@ -4,9 +4,7 @@
 #include "sectree_manager.h"
 
 class CParty;
-#ifdef ENABLE_D_NJGUILD
 class CGuild;
-#endif
 
 class CDungeon
 {
@@ -24,6 +22,7 @@ class CDungeon
 
 	// DUNGEON_NOTICE
 	void	Notice(const char* msg);
+	void	CmdChat(const char* msg);
 	// END_OF_DUNGEON_NOTICE
 
 	void	JoinParty(LPPARTY pParty);
@@ -39,9 +38,11 @@ class CDungeon
 	void	KillAll();
 	// END_OF_DUNGEON_KILL_ALL_BUG_FIX
 
-	void	IncMonster() { m_iMonsterCount++; sys_log(0, "MonsterCount %d", m_iMonsterCount); }
+	void	IncMonster() { m_iMonsterCount++; m_iMonsterAliveCount++; }
 	void	DecMonster() { m_iMonsterCount--; CheckEliminated(); }
+	void	DecAliveMonster() { m_iMonsterAliveCount--; }
 	int32_t	CountMonster() { return m_iMonsterCount; }	// 데이터로 리젠한 몬스터의 수
+	int32_t	CountAliveMonster() { return m_iMonsterAliveCount; }
 	int32_t	CountRealMonster();				// 실제로 맵상에 있는 몬스터
 
 	void	IncPartyMember(LPPARTY pParty, LPCHARACTER ch);
@@ -95,9 +96,7 @@ class CDungeon
 	void	JumpAll(int32_t lFromMapIndex, int32_t x, int32_t y);
 	void	WarpAll(int32_t lFromMapIndex, int32_t x, int32_t y);
 	void	JumpParty(LPPARTY pParty, int32_t lFromMapIndex, int32_t x, int32_t y);
-#ifdef ENABLE_D_NJGUILD
 	void	JumpGuild(CGuild* pGuild, int32_t lFromMapIndex, int32_t x, int32_t y);
-#endif
 
 	void	ExitAll();
 	void	ExitAllToStartPosition();
@@ -106,7 +105,7 @@ class CDungeon
 	void	SetWarpAtEliminate(int32_t time, int32_t lMapIndex, int32_t x, int32_t y, const char* regen_file);
 
 	int32_t	GetFlag(std::string name);
-	void	SetFlag(std::string name, int32_t value);
+	void	SetFlag(const std::string &name, int32_t value);
 	void	SetWarpLocation (int32_t map_index, int32_t x, int32_t y);
 
 	// item group은 item_vnum과 item_count로 구성.
@@ -144,6 +143,7 @@ class CDungeon
 	bool		m_bUseRevive;
 
 	int32_t		m_iMonsterCount;
+	int32_t		m_iMonsterAliveCount;
 
 	bool		m_bExitAllAtEliminate;
 	bool		m_bWarpAtEliminate;
@@ -174,9 +174,8 @@ class CDungeon
 	
 
 	LPPARTY m_pParty;
-#ifdef ENABLE_D_NJGUILD
 	CGuild* m_pGuild;
-#endif
+
 	public :
 	void SetPartyNull();
 };

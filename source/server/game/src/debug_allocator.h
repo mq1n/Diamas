@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <new>
 
+#include "../../common/service.h"
+
 #ifdef DEBUG_ALLOC
 
 // Whether to use DebugPtr for specific objects

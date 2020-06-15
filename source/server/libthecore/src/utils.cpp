@@ -244,7 +244,7 @@ void parse_token(char *src, char *token, char *value)
     for (tmp = src; *tmp && *tmp != ':'; tmp++)
     {
 
-	if (std::isspace(*tmp))
+	if (isspace(*tmp))
 	    continue;
 
 	*(token++) = LOWER(*tmp);
@@ -417,7 +417,7 @@ void thecore_msleep(DWORD dwMillisecond)
 #ifndef _WIN32
 void core_dump_unix(const char *who, long line)
 {   
-    sys_err("*** Dumping Core %s:%ld ***", who, line);
+    sys_err("*** Dumping Core %s:%d ***", who, line);
 
     fflush(stdout);
     fflush(stderr); 
@@ -447,7 +447,7 @@ void gettimeofday(struct timeval* t, struct timezone* dummy)
 
 void core_dump_unix(const char *who, long line)
 {   
-	sys_err("*** Attempting a linux core dump %s:%ld ***", who, line);
+	sys_err("*** Attempting a linux core dump %s:%d ***", who, line);
 }
 
 #endif

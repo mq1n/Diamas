@@ -1,13 +1,10 @@
 #include "StdAfx.h"
 #include "NetStream.h"
-//#include "eterCrypt.h"
-#include <stdio.h>
-
+#include "../eterXClient/Locale_inc.h"
+#include "../eterXClient/Packet.h"
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
 #include "../eterBase/tea.h"
 #endif
-
-// #define _PACKETDUMP
 
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
 void CNetworkStream::SetSecurityMode(bool isSecurityMode, const char* c_szTeaKey)
@@ -420,9 +417,9 @@ bool CNetworkStream::Connect(const CNetworkAddress& c_rkNetAddr, int32_t limitSe
 	DWORD arg = 1;
 	ioctlsocket(m_sock, FIONBIO, &arg);	// Non-blocking mode
 
-	if (connect(m_sock, (PSOCKADDR)&m_addr, m_addr.GetSize()) == SOCKET_ERROR)
+	if (connect(m_sock, reinterpret_cast<PSOCKADDR>(&m_addr), m_addr.GetSize()) == SOCKET_ERROR)
 	{
-		int32_t error = WSAGetLastError();
+		const int32_t error = WSAGetLastError();
 
 		if (error != WSAEWOULDBLOCK)
 		{
@@ -457,12 +454,16 @@ bool CNetworkStream::Connect(uint32_t dwAddr, int32_t port, int32_t limitSec)
 	char szAddr[256];
 	{
 		uint8_t ip[4];
-		ip[0]=dwAddr&0xff;dwAddr>>=8;
-		ip[1]=dwAddr&0xff;dwAddr>>=8;
-		ip[2]=dwAddr&0xff;dwAddr>>=8;
-		ip[3]=dwAddr&0xff;dwAddr>>=8;
+		ip[0] = dwAddr & 0xff;
+		dwAddr >>= 8;
+		ip[1] = dwAddr & 0xff;
+		dwAddr >>= 8;
+		ip[2] = dwAddr & 0xff;
+		dwAddr >>= 8;
+		ip[3] = dwAddr & 0xff;
+		dwAddr >>= 8;
 
-		sprintf_s(szAddr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+		sprintf_s(szAddr, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
 	}
 
 	return Connect(szAddr, port, limitSec);
@@ -515,80 +516,78 @@ const char * GetSendHeaderName(uint8_t header)
 	{
 		for (uint32_t i = 0; i < UCHAR_MAX+1; i++)
 		{
-			char buf[10];
-			sprintf_s(buf,"%d",i);
+			char buf[20];
+			sprintf_s(buf, "UNKNOWN[%d]", i);
 			stringList[i] = buf;
 		}
-		stringList[1] = "HEADER_CG_LOGIN";
-		stringList[2] = "HEADER_CG_ATTACK";
-		stringList[3] = "HEADER_CG_CHAT";
-		stringList[4] = "HEADER_CG_PLAYER_CREATE";
-		stringList[5] = "HEADER_CG_PLAYER_DESTROY";
-		stringList[6] = "HEADER_CG_PLAYER_SELECT";
-		stringList[7] = "HEADER_CG_CHARACTER_MOVE";
-		stringList[8] = "HEADER_CG_SYNC_POSITION";
-		stringList[9] = "HEADER_CG_DIRECT_ENTER";
-		stringList[10] = "HEADER_CG_ENTERGAME";
-		stringList[11] = "HEADER_CG_ITEM_USE";
-		stringList[12] = "HEADER_CG_ITEM_DROP";
-		stringList[13] = "HEADER_CG_ITEM_MOVE";
-		stringList[15] = "HEADER_CG_ITEM_PICKUP";
-		stringList[16] = "HEADER_CG_QUICKSLOT_ADD";
-		stringList[17] = "HEADER_CG_QUICKSLOT_DEL";
-		stringList[18] = "HEADER_CG_QUICKSLOT_SWAP";
-		stringList[19] = "HEADER_CG_WHISPER";
-		stringList[20] = "HEADER_CG_ITEM_DROP2";
-		stringList[26] = "HEADER_CG_ON_CLICK";
-		stringList[27] = "HEADER_CG_EXCHANGE";
-		stringList[28] = "HEADER_CG_CHARACTER_POSITION";
-		stringList[29] = "HEADER_CG_SCRIPT_ANSWER";
-		stringList[30] = "HEADER_CG_QUEST_INPUT_STRING";
-		stringList[31] = "HEADER_CG_QUEST_CONFIRM";
-		stringList[41] = "HEADER_CG_PVP";
-		stringList[50] = "HEADER_CG_SHOP";
-		stringList[51] = "HEADER_CG_FLY_TARGETING";
-		stringList[52] = "HEADER_CG_USE_SKILL";
-		stringList[53] = "HEADER_CG_ADD_FLY_TARGETING";
-		stringList[54] = "HEADER_CG_SHOOT";
-		stringList[55] = "HEADER_CG_MYSHOP";
-		stringList[60] = "HEADER_CG_ITEM_USE_TO_ITEM";
-		stringList[61] = "HEADER_CG_TARGET";
-		stringList[65] = "HEADER_CG_WARP";
-		stringList[66] = "HEADER_CG_SCRIPT_BUTTON";
-		stringList[67] = "HEADER_CG_MESSENGER";
-		stringList[69] = "HEADER_CG_MALL_CHECKOUT";
-		stringList[70] = "HEADER_CG_SAFEBOX_CHECKIN";
-		stringList[71] = "HEADER_CG_SAFEBOX_CHECKOUT";
-		stringList[72] = "HEADER_CG_PARTY_INVITE";
-		stringList[73] = "HEADER_CG_PARTY_INVITE_ANSWER";
-		stringList[74] = "HEADER_CG_PARTY_REMOVE";
-		stringList[75] = "HEADER_CG_PARTY_SET_STATE";
-		stringList[76] = "HEADER_CG_PARTY_USE_SKILL";
-		stringList[77] = "HEADER_CG_SAFEBOX_ITEM_MOVE";
-		stringList[78] = "HEADER_CG_PARTY_PARAMETER";
-		stringList[80] = "HEADER_CG_GUILD";
-		stringList[81] = "HEADER_CG_ANSWER_MAKE_GUILD";
-		stringList[82] = "HEADER_CG_FISHING";
-		stringList[83] = "HEADER_CG_GIVE_ITEM";
-		stringList[90] = "HEADER_CG_EMPIRE";
-		stringList[96] = "HEADER_CG_REFINE";
-		stringList[100] = "HEADER_CG_MARK_LOGIN";
-		stringList[101] = "HEADER_CG_MARK_CRCLIST";
-		stringList[102] = "HEADER_CG_MARK_UPLOAD";
-		stringList[105] = "HEADER_CG_HACK";
-		stringList[106] = "HEADER_CG_CHANGE_NAME";
-		stringList[109] = "HEADER_CG_LOGIN2";
-		stringList[110] = "HEADER_CG_DUNGEON";
-		stringList[111] = "HEADER_CG_LOGIN3";
-		stringList[112] = "HEADER_CG_GUILD_SYMBOL_UPLOAD";
-		stringList[113] = "HEADER_CG_GUILD_SYMBOL_CRC";
-		stringList[114] = "HEADER_CG_SCRIPT_SELECT_ITEM";
+		stringList[HEADER_CG_LOGIN] = "HEADER_CG_LOGIN";
+		stringList[HEADER_CG_ATTACK] = "HEADER_CG_ATTACK";
+		stringList[HEADER_CG_CHAT] = "HEADER_CG_CHAT";
+		stringList[HEADER_CG_PLAYER_CREATE] = "HEADER_CG_PLAYER_CREATE";
+		stringList[HEADER_CG_PLAYER_DESTROY] = "HEADER_CG_PLAYER_DESTROY";
+		stringList[HEADER_CG_PLAYER_SELECT] = "HEADER_CG_PLAYER_SELECT";
+		stringList[HEADER_CG_CHARACTER_MOVE] = "HEADER_CG_CHARACTER_MOVE";
+		stringList[HEADER_CG_SYNC_POSITION] = "HEADER_CG_SYNC_POSITION";
+		stringList[HEADER_CG_ENTERGAME] = "HEADER_CG_ENTERGAME";
+		stringList[HEADER_CG_ITEM_USE] = "HEADER_CG_ITEM_USE";
+		stringList[HEADER_CG_ITEM_DROP] = "HEADER_CG_ITEM_DROP";
+		stringList[HEADER_CG_ITEM_MOVE] = "HEADER_CG_ITEM_MOVE";
+		stringList[HEADER_CG_ITEM_PICKUP] = "HEADER_CG_ITEM_PICKUP";
+		stringList[HEADER_CG_QUICKSLOT_ADD] = "HEADER_CG_QUICKSLOT_ADD";
+		stringList[HEADER_CG_QUICKSLOT_DEL] = "HEADER_CG_QUICKSLOT_DEL";
+		stringList[HEADER_CG_QUICKSLOT_SWAP] = "HEADER_CG_QUICKSLOT_SWAP";
+		stringList[HEADER_CG_WHISPER] = "HEADER_CG_WHISPER";
+		stringList[HEADER_CG_ITEM_DROP2] = "HEADER_CG_ITEM_DROP2";
+		stringList[HEADER_CG_ON_CLICK] = "HEADER_CG_ON_CLICK";
+		stringList[HEADER_CG_EXCHANGE] = "HEADER_CG_EXCHANGE";
+		stringList[HEADER_CG_CHARACTER_POSITION] = "HEADER_CG_CHARACTER_POSITION";
+		stringList[HEADER_CG_SCRIPT_ANSWER] = "HEADER_CG_SCRIPT_ANSWER";
+		stringList[HEADER_CG_QUEST_INPUT_STRING] = "HEADER_CG_QUEST_INPUT_STRING";
+		stringList[HEADER_CG_QUEST_CONFIRM] = "HEADER_CG_QUEST_CONFIRM";
+		stringList[HEADER_CG_SHOP] = "HEADER_CG_SHOP";
+		stringList[HEADER_CG_FLY_TARGETING] = "HEADER_CG_FLY_TARGETING";
+		stringList[HEADER_CG_USE_SKILL] = "HEADER_CG_USE_SKILL";
+		stringList[HEADER_CG_ADD_FLY_TARGETING] = "HEADER_CG_ADD_FLY_TARGETING";
+		stringList[HEADER_CG_SHOOT] = "HEADER_CG_SHOOT";
+		stringList[HEADER_CG_MYSHOP] = "HEADER_CG_MYSHOP";
+		stringList[HEADER_CG_ITEM_USE_TO_ITEM] = "HEADER_CG_ITEM_USE_TO_ITEM";
+		stringList[HEADER_CG_TARGET] = "HEADER_CG_TARGET";
+		stringList[HEADER_CG_WARP] = "HEADER_CG_WARP";
+		stringList[HEADER_CG_SCRIPT_BUTTON] = "HEADER_CG_SCRIPT_BUTTON";
+		stringList[HEADER_CG_MESSENGER] = "HEADER_CG_MESSENGER";
+		stringList[HEADER_CG_MALL_CHECKOUT] = "HEADER_CG_MALL_CHECKOUT";
+		stringList[HEADER_CG_SAFEBOX_CHECKIN] = "HEADER_CG_SAFEBOX_CHECKIN";
+		stringList[HEADER_CG_SAFEBOX_CHECKOUT] = "HEADER_CG_SAFEBOX_CHECKOUT";
+		stringList[HEADER_CG_PARTY_INVITE] = "HEADER_CG_PARTY_INVITE";
+		stringList[HEADER_CG_PARTY_INVITE_ANSWER] = "HEADER_CG_PARTY_INVITE_ANSWER";
+		stringList[HEADER_CG_PARTY_REMOVE] = "HEADER_CG_PARTY_REMOVE";
+		stringList[HEADER_CG_PARTY_SET_STATE] = "HEADER_CG_PARTY_SET_STATE";
+		stringList[HEADER_CG_PARTY_USE_SKILL] = "HEADER_CG_PARTY_USE_SKILL";
+		stringList[HEADER_CG_SAFEBOX_ITEM_MOVE] = "HEADER_CG_SAFEBOX_ITEM_MOVE";
+		stringList[HEADER_CG_PARTY_PARAMETER] = "HEADER_CG_PARTY_PARAMETER";
+		stringList[HEADER_CG_GUILD] = "HEADER_CG_GUILD";
+		stringList[HEADER_CG_ANSWER_MAKE_GUILD] = "HEADER_CG_ANSWER_MAKE_GUILD";
+		stringList[HEADER_CG_FISHING] = "HEADER_CG_FISHING";
+		stringList[HEADER_CG_GIVE_ITEM] = "HEADER_CG_GIVE_ITEM";
+		stringList[HEADER_CG_EMPIRE] = "HEADER_CG_EMPIRE";
+		stringList[HEADER_CG_REFINE] = "HEADER_CG_REFINE";
+		stringList[HEADER_CG_MARK_LOGIN] = "HEADER_CG_MARK_LOGIN";
+		stringList[HEADER_CG_MARK_CRCLIST] = "HEADER_CG_MARK_CRCLIST";
+		stringList[HEADER_CG_MARK_UPLOAD] = "HEADER_CG_MARK_UPLOAD";
+		stringList[HEADER_CG_HACK] = "HEADER_CG_HACK";
+		stringList[HEADER_CG_CHANGE_NAME] = "HEADER_CG_CHANGE_NAME";
+		stringList[HEADER_CG_LOGIN2] = "HEADER_CG_LOGIN2";
+		stringList[HEADER_CG_DUNGEON] = "HEADER_CG_DUNGEON";
+		stringList[HEADER_CG_LOGIN3] = "HEADER_CG_LOGIN3";
+		stringList[HEADER_CG_GUILD_SYMBOL_UPLOAD] = "HEADER_CG_GUILD_SYMBOL_UPLOAD";
+		stringList[HEADER_CG_GUILD_SYMBOL_CRC] = "HEADER_CG_GUILD_SYMBOL_CRC";
+		stringList[HEADER_CG_SCRIPT_SELECT_ITEM] = "HEADER_CG_SCRIPT_SELECT_ITEM";
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
-		stringList[0xfb] = "HEADER_CG_KEY_AGREEMENT";
+		stringList[HEADER_CG_KEY_AGREEMENT] = "HEADER_CG_KEY_AGREEMENT";
 #endif
-		stringList[0xfc] = "HEADER_CG_TIME_SYNC";
-		stringList[0xfe] = "HEADER_CG_PONG";
-		stringList[0xff] = "HEADER_CG_HANDSHAKE";
+		stringList[HEADER_CG_TIME_SYNC] = "HEADER_CG_TIME_SYNC";
+		stringList[HEADER_CG_PONG] = "HEADER_CG_PONG";
+		stringList[HEADER_CG_HANDSHAKE] = "HEADER_CG_HANDSHAKE";
 	}
 	return stringList[header].c_str();
 }
@@ -601,127 +600,118 @@ const char * GetRecvHeaderName(uint8_t header)
 	{
 		for (uint32_t i = 0; i < UCHAR_MAX+1; i++)
 		{
-			char buf[10];
-			sprintf_s(buf,"%d",i);
+			char buf[20];
+			sprintf_s(buf, "UNKNOWN[%d]", i);
 			stringList[i] = buf;
 		}
-		stringList[1] = "HEADER_GC_CHARACTER_ADD";
-		stringList[2] = "HEADER_GC_CHARACTER_DEL";
-		stringList[3] = "HEADER_GC_CHARACTER_MOVE";
-		stringList[4] = "HEADER_GC_CHAT";
-		stringList[5] = "HEADER_GC_SYNC_POSITION";
-		stringList[6] = "HEADER_GC_LOGIN_SUCCESS";
-		stringList[7] = "HEADER_GC_LOGIN_FAILURE";
-		stringList[8] = "HEADER_GC_PLAYER_CREATE_SUCCESS";
-		stringList[9] = "HEADER_GC_PLAYER_CREATE_FAILURE";
-		stringList[10] = "HEADER_GC_PLAYER_DELETE_SUCCESS";
-		stringList[11] = "HEADER_GC_PLAYER_DELETE_WRONG_SOCIAL_ID";
+		stringList[HEADER_GC_CHARACTER_ADD] = "HEADER_GC_CHARACTER_ADD";
+		stringList[HEADER_GC_CHARACTER_DEL] = "HEADER_GC_CHARACTER_DEL";
+		stringList[HEADER_GC_CHARACTER_MOVE] = "HEADER_GC_CHARACTER_MOVE";
+		stringList[HEADER_GC_CHAT] = "HEADER_GC_CHAT";
+		stringList[HEADER_GC_SYNC_POSITION] = "HEADER_GC_SYNC_POSITION";
+		stringList[HEADER_GC_LOGIN_SUCCESS] = "HEADER_GC_LOGIN_SUCCESS";
+		stringList[HEADER_GC_LOGIN_FAILURE] = "HEADER_GC_LOGIN_FAILURE";
+		stringList[HEADER_GC_PLAYER_CREATE_SUCCESS] = "HEADER_GC_PLAYER_CREATE_SUCCESS";
+		stringList[HEADER_GC_PLAYER_CREATE_FAILURE] = "HEADER_GC_PLAYER_CREATE_FAILURE";
+		stringList[HEADER_GC_PLAYER_DELETE_SUCCESS] = "HEADER_GC_PLAYER_DELETE_SUCCESS";
+		stringList[HEADER_GC_PLAYER_DELETE_WRONG_SOCIAL_ID] = "HEADER_GC_PLAYER_DELETE_WRONG_SOCIAL_ID";
 
-		stringList[13] = "HEADER_GC_STUN";
-		stringList[14] = "HEADER_GC_DEAD";
-		stringList[15] = "HEADER_GC_MAIN_CHARACTER";
-		stringList[16] = "HEADER_GC_PLAYER_POINTS";
-		stringList[17] = "HEADER_GC_PLAYER_POINT_CHANGE";
-		stringList[18] = "HEADER_GC_CHANGE_SPEED";
-		stringList[19] = "HEADER_GC_CHARACTER_UPDATE";
-		stringList[20] = "HEADER_GC_ITEM_SET";
-		stringList[22] = "HEADER_GC_ITEM_USE";
-		stringList[23] = "HEADER_GC_ITEM_DROP";
-		stringList[25] = "HEADER_GC_ITEM_UPDATE";
-		stringList[26] = "HEADER_GC_ITEM_GROUND_ADD";
-		stringList[27] = "HEADER_GC_ITEM_GROUND_DEL";
-		stringList[28] = "HEADER_GC_QUICKSLOT_ADD";
-		stringList[29] = "HEADER_GC_QUICKSLOT_DEL";
-		stringList[30] = "HEADER_GC_QUICKSLOT_SWAP";
-		stringList[31] = "HEADER_GC_ITEM_OWNERSHIP";
-		stringList[33] = "HEADER_GC_ITEM_UNBIND_TIME";
-		stringList[34] = "HEADER_GC_WHISPER	";
-		stringList[35] = "HEADER_GC_ALERT";
-		stringList[36] = "HEADER_GC_MOTION";
-		stringList[38] = "HEADER_GC_SHOP";
-		stringList[39] = "HEADER_GC_SHOP_SIGN";
-		stringList[41] = "HEADER_GC_PVP";
-		stringList[42] = "HEADER_GC_EXCHANGE";
-		stringList[43] = "HEADER_GC_CHARACTER_POSITION";
-		stringList[44] = "HEADER_GC_PING";
-		stringList[45] = "HEADER_GC_SCRIPT";
-		stringList[46] = "HEADER_GC_QUEST_CONFIRM";
+		stringList[HEADER_GC_STUN] = "HEADER_GC_STUN";
+		stringList[HEADER_GC_DEAD] = "HEADER_GC_DEAD";
+		stringList[HEADER_GC_MAIN_CHARACTER] = "HEADER_GC_MAIN_CHARACTER";
+		stringList[HEADER_GC_PLAYER_POINTS] = "HEADER_GC_PLAYER_POINTS";
+		stringList[HEADER_GC_PLAYER_POINT_CHANGE] = "HEADER_GC_PLAYER_POINT_CHANGE";
+		stringList[HEADER_GC_CHANGE_SPEED] = "HEADER_GC_CHANGE_SPEED";
+		stringList[HEADER_GC_CHARACTER_UPDATE] = "HEADER_GC_CHARACTER_UPDATE";
+		stringList[HEADER_GC_ITEM_SET] = "HEADER_GC_ITEM_SET";
+		stringList[HEADER_GC_ITEM_USE] = "HEADER_GC_ITEM_USE";
+		stringList[HEADER_GC_ITEM_DROP] = "HEADER_GC_ITEM_DROP";
+		stringList[HEADER_GC_ITEM_UPDATE] = "HEADER_GC_ITEM_UPDATE";
+		stringList[HEADER_GC_ITEM_GROUND_ADD] = "HEADER_GC_ITEM_GROUND_ADD";
+		stringList[HEADER_GC_ITEM_GROUND_DEL] = "HEADER_GC_ITEM_GROUND_DEL";
+		stringList[HEADER_GC_QUICKSLOT_ADD] = "HEADER_GC_QUICKSLOT_ADD";
+		stringList[HEADER_GC_QUICKSLOT_DEL] = "HEADER_GC_QUICKSLOT_DEL";
+		stringList[HEADER_GC_QUICKSLOT_SWAP] = "HEADER_GC_QUICKSLOT_SWAP";
+		stringList[HEADER_GC_ITEM_OWNERSHIP] = "HEADER_GC_ITEM_OWNERSHIP";
+		stringList[HEADER_GC_WHISPER] = "HEADER_GC_WHISPER	";
+		stringList[HEADER_GC_MOTION] = "HEADER_GC_MOTION";
+		stringList[HEADER_GC_SHOP] = "HEADER_GC_SHOP";
+		stringList[HEADER_GC_SHOP_SIGN] = "HEADER_GC_SHOP_SIGN";
+		stringList[HEADER_GC_PVP] = "HEADER_GC_PVP";
+		stringList[HEADER_GC_EXCHANGE] = "HEADER_GC_EXCHANGE";
+		stringList[HEADER_GC_CHARACTER_POSITION] = "HEADER_GC_CHARACTER_POSITION";
+		stringList[HEADER_GC_PING] = "HEADER_GC_PING";
+		stringList[HEADER_GC_SCRIPT] = "HEADER_GC_SCRIPT";
+		stringList[HEADER_GC_QUEST_CONFIRM] = "HEADER_GC_QUEST_CONFIRM";
 
-		stringList[61] = "HEADER_GC_MOUNT";
-		stringList[62] = "HEADER_GC_OWNERSHIP"; 
-		stringList[63] = "HEADER_GC_TARGET";
-		stringList[65] = "HEADER_GC_WARP"; 
-		stringList[69] = "HEADER_GC_ADD_FLY_TARGETING";
+		stringList[HEADER_GC_MOUNT] = "HEADER_GC_MOUNT";
+		stringList[HEADER_GC_OWNERSHIP] = "HEADER_GC_OWNERSHIP";
+		stringList[HEADER_GC_OWNERSHIP] = "HEADER_GC_TARGET";
+		stringList[HEADER_GC_WARP] = "HEADER_GC_WARP";
+		stringList[HEADER_GC_ADD_FLY_TARGETING] = "HEADER_GC_ADD_FLY_TARGETING";
 
-		stringList[70] = "HEADER_GC_CREATE_FLY";
-		stringList[71] = "HEADER_GC_FLY_TARGETING";
-		stringList[72] = "HEADER_GC_SKILL_LEVEL";
-		stringList[73] = "HEADER_GC_SKILL_COOLTIME_END";
-		stringList[74] = "HEADER_GC_MESSENGER";
-		stringList[75] = "HEADER_GC_GUILD";
-		stringList[76] = "HEADER_GC_SKILL_LEVEL_NEW";
-		stringList[77] = "HEADER_GC_PARTY_INVITE";
-		stringList[78] = "HEADER_GC_PARTY_ADD";
-		stringList[79] = "HEADER_GC_PARTY_UPDATE";
-		stringList[80] = "HEADER_GC_PARTY_REMOVE";
-		stringList[81] = "HEADER_GC_QUEST_INFO";
-		stringList[82] = "HEADER_GC_REQUEST_MAKE_GUILD";
-		stringList[83] = "HEADER_GC_PARTY_PARAMETER";
-		stringList[84] = "HEADER_GC_SAFEBOX_MONEY_CHANGE";
-		stringList[85] = "HEADER_GC_SAFEBOX_SET";
-		stringList[86] = "HEADER_GC_SAFEBOX_DEL";
-		stringList[87] = "HEADER_GC_SAFEBOX_WRONG_PASSWORD";
-		stringList[88] = "HEADER_GC_SAFEBOX_SIZE";
-		stringList[89] = "HEADER_GC_FISHING";
-		stringList[90] = "HEADER_GC_EMPIRE";
-		stringList[91] = "HEADER_GC_PARTY_LINK";
-		stringList[92] = "HEADER_GC_PARTY_UNLINK";
+		stringList[HEADER_GC_CREATE_FLY] = "HEADER_GC_CREATE_FLY";
+		stringList[HEADER_GC_FLY_TARGETING] = "HEADER_GC_FLY_TARGETING";
+		stringList[HEADER_GC_SKILL_LEVEL] = "HEADER_GC_SKILL_LEVEL";
+		stringList[HEADER_GC_MESSENGER] = "HEADER_GC_MESSENGER";
+		stringList[HEADER_GC_GUILD] = "HEADER_GC_GUILD";
+		stringList[HEADER_GC_SKILL_LEVEL_NEW] = "HEADER_GC_SKILL_LEVEL_NEW";
+		stringList[HEADER_GC_PARTY_INVITE] = "HEADER_GC_PARTY_INVITE";
+		stringList[HEADER_GC_PARTY_ADD] = "HEADER_GC_PARTY_ADD";
+		stringList[HEADER_GC_PARTY_UPDATE] = "HEADER_GC_PARTY_UPDATE";
+		stringList[HEADER_GC_PARTY_REMOVE] = "HEADER_GC_PARTY_REMOVE";
+		stringList[HEADER_GC_QUEST_INFO] = "HEADER_GC_QUEST_INFO";
+		stringList[HEADER_GC_REQUEST_MAKE_GUILD] = "HEADER_GC_REQUEST_MAKE_GUILD";
+		stringList[HEADER_GC_PARTY_PARAMETER] = "HEADER_GC_PARTY_PARAMETER";
+		stringList[HEADER_GC_SAFEBOX_SET] = "HEADER_GC_SAFEBOX_SET";
+		stringList[HEADER_GC_SAFEBOX_DEL] = "HEADER_GC_SAFEBOX_DEL";
+		stringList[HEADER_GC_SAFEBOX_WRONG_PASSWORD] = "HEADER_GC_SAFEBOX_WRONG_PASSWORD";
+		stringList[HEADER_GC_SAFEBOX_SIZE] = "HEADER_GC_SAFEBOX_SIZE";
+		stringList[HEADER_GC_FISHING] = "HEADER_GC_FISHING";
+		stringList[HEADER_GC_EMPIRE] = "HEADER_GC_EMPIRE";
+		stringList[HEADER_GC_PARTY_LINK] = "HEADER_GC_PARTY_LINK";
+		stringList[HEADER_GC_PARTY_UNLINK] = "HEADER_GC_PARTY_UNLINK";
 
-		stringList[95] = "HEADER_GC_REFINE_INFORMATION";
-		stringList[96] = "HEADER_GC_OBSERVER_ADD";
-		stringList[97] = "HEADER_GC_OBSERVER_REMOVE";
-		stringList[98] = "HEADER_GC_OBSERVER_MOVE";
-		stringList[99] = "HEADER_GC_VIEW_EQUIP";
-		stringList[100] = "HEADER_GC_MARK_BLOCK";
-		stringList[101] = "HEADER_GC_MARK_DIFF_DATA";
+		stringList[HEADER_GC_REFINE_INFORMATION] = "HEADER_GC_REFINE_INFORMATION";
+		stringList[HEADER_GC_OBSERVER_ADD] = "HEADER_GC_OBSERVER_ADD";
+		stringList[HEADER_GC_OBSERVER_REMOVE] = "HEADER_GC_OBSERVER_REMOVE";
+		stringList[HEADER_GC_OBSERVER_MOVE] = "HEADER_GC_OBSERVER_MOVE";
+		stringList[HEADER_GC_VIEW_EQUIP] = "HEADER_GC_VIEW_EQUIP";
+		stringList[HEADER_GC_MARK_BLOCK] = "HEADER_GC_MARK_BLOCK";
 
-		stringList[106] = "HEADER_GC_TIME";
-		stringList[107] = "HEADER_GC_CHANGE_NAME";
-		stringList[110] = "HEADER_GC_DUNGEON";
-		stringList[111] = "HEADER_GC_WALK_MODE"; 
-		stringList[112] = "HEADER_GC_CHANGE_SKILL_GROUP";
-		stringList[113] = "HEADER_GC_MAIN_CHARACTER_NEW";
-		stringList[114] = "HEADER_GC_USE_POTION";
-		stringList[115] = "HEADER_GC_NPC_POSITION";
-		stringList[116] = "HEADER_GC_MATRIX_CARD";
-		stringList[117] = "HEADER_GC_CHARACTER_UPDATE2";
-		stringList[118] = "HEADER_GC_LOGIN_KEY";
-		stringList[119] = "HEADER_GC_REFINE_INFORMATION_NEW";
-		stringList[120] = "HEADER_GC_CHARACTER_ADD2";
-		stringList[121] = "HEADER_GC_CHANNEL";
-		stringList[122] = "HEADER_GC_MALL_OPEN";
-		stringList[123] = "HEADER_GC_TARGET_UPDATE";
-		stringList[124] = "HEADER_GC_TARGET_DELETE";
-		stringList[125] = "HEADER_GC_TARGET_CREATE_NEW";
-		stringList[126] = "HEADER_GC_AFFECT_ADD";
-		stringList[127] = "HEADER_GC_AFFECT_REMOVE";
-		stringList[128] = "HEADER_GC_MALL_SET";
-		stringList[129] = "HEADER_GC_MALL_DEL";
-		stringList[130] = "HEADER_GC_LAND_LIST";
-		stringList[131] = "HEADER_GC_LOVER_INFO";
-		stringList[132] = "HEADER_GC_LOVE_POINT_UPDATE";
-		stringList[133] = "HEADER_GC_GUILD_SYMBOL_DATA";
-		stringList[134] = "HEADER_GC_DIG_MOTION";
-		stringList[135] = "HEADER_GC_DAMAGE_INFO";
-		stringList[136] = "HEADER_GC_CHAR_ADDITIONAL_INFO";
-		stringList[150] = "HEADER_GC_AUTH_SUCCESS";
+		stringList[HEADER_GC_TIME] = "HEADER_GC_TIME";
+		stringList[HEADER_GC_CHANGE_NAME] = "HEADER_GC_CHANGE_NAME";
+		stringList[HEADER_GC_DUNGEON] = "HEADER_GC_DUNGEON";
+		stringList[HEADER_GC_WALK_MODE] = "HEADER_GC_WALK_MODE";
+		stringList[HEADER_GC_CHANGE_SKILL_GROUP] = "HEADER_GC_CHANGE_SKILL_GROUP";
+		stringList[HEADER_GC_NPC_POSITION] = "HEADER_GC_NPC_POSITION";
+		stringList[HEADER_GC_CHARACTER_UPDATE] = "HEADER_GC_CHARACTER_UPDATE";
+		stringList[HEADER_GC_LOGIN_KEY] = "HEADER_GC_LOGIN_KEY";
+		stringList[HEADER_GC_CHANNEL] = "HEADER_GC_CHANNEL";
+		stringList[HEADER_GC_MALL_OPEN] = "HEADER_GC_MALL_OPEN";
+		stringList[HEADER_GC_TARGET_UPDATE] = "HEADER_GC_TARGET_UPDATE";
+		stringList[HEADER_GC_TARGET_DELETE] = "HEADER_GC_TARGET_DELETE";
+		stringList[HEADER_GC_TARGET_CREATE] = "HEADER_GC_TARGET_CREATE";
+		stringList[HEADER_GC_AFFECT_ADD] = "HEADER_GC_AFFECT_ADD";
+		stringList[HEADER_GC_AFFECT_REMOVE] = "HEADER_GC_AFFECT_REMOVE";
+		stringList[HEADER_GC_MALL_SET] = "HEADER_GC_MALL_SET";
+		stringList[HEADER_GC_MALL_DEL] = "HEADER_GC_MALL_DEL";
+		stringList[HEADER_GC_LAND_LIST] = "HEADER_GC_LAND_LIST";
+		stringList[HEADER_GC_LOVER_INFO] = "HEADER_GC_LOVER_INFO";
+		stringList[HEADER_GC_LOVE_POINT_UPDATE] = "HEADER_GC_LOVE_POINT_UPDATE";
+		stringList[HEADER_GC_GUILD_SYMBOL_DATA] = "HEADER_GC_GUILD_SYMBOL_DATA";
+		stringList[HEADER_GC_DIG_MOTION] = "HEADER_GC_DIG_MOTION";
+        stringList[HEADER_GC_MAIN_CHARACTER4_BGM_VOL] = "HEADER_GC_MAIN_CHARACTER4_BGM_VOL";
+		stringList[HEADER_GC_DAMAGE_INFO] = "HEADER_GC_DAMAGE_INFO";
+		stringList[HEADER_GC_CHAR_ADDITIONAL_INFO] = "HEADER_GC_CHAR_ADDITIONAL_INFO";
+		stringList[HEADER_GC_AUTH_SUCCESS] = "HEADER_GC_AUTH_SUCCESS";
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
-		stringList[0xfa] = "HEADER_GC_KEY_AGREEMENT_COMPLETED";
-		stringList[0xfb] = "HEADER_GC_KEY_AGREEMENT";
+		stringList[HEADER_GC_KEY_AGREEMENT_COMPLETED] = "HEADER_GC_KEY_AGREEMENT_COMPLETED";
+		stringList[HEADER_GC_KEY_AGREEMENT] = "HEADER_GC_KEY_AGREEMENT";
 #endif
-		stringList[0xfc] = "HEADER_GC_HANDSHAKE_OK";
-		stringList[0xfd] = "HEADER_GC_PHASE";
-		stringList[0xff] = "HEADER_GC_HANDSHAKE";
+		stringList[HEADER_GC_HANDSHAKE_OK] = "HEADER_GC_HANDSHAKE_OK";
+		stringList[HEADER_GC_PHASE] = "HEADER_GC_PHASE";
+		stringList[HEADER_GC_HANDSHAKE] = "HEADER_GC_HANDSHAKE";
 	}
 	return stringList[header].c_str();
 }
@@ -745,7 +735,7 @@ bool CNetworkStream::Recv(int32_t size, char * pDestBuf)
 #ifdef _PACKETDUMP
 	if (*pDestBuf != 0 )
 	{
-		TraceError("RECV< %s (%d)", GetRecvHeaderName(*pDestBuf), size);
+		TraceError ("RECV< %s(%d[%02X]) | %d", GetRecvHeaderName(*pDestBuf), *pDestBuf, *pDestBuf, size);
 		std::string contents;
 		char buf[10];
 		for(int32_t i = 1; i < size; i++)
@@ -780,7 +770,7 @@ bool CNetworkStream::Send(int32_t size, const char * pSrcBuf)
 #ifdef _PACKETDUMP
 	if (*pSrcBuf != 0 )
 	{
-		TraceError("SEND> %s (%d)", GetSendHeaderName(*pSrcBuf), size);
+		TraceError ("SEND> %s(%d[%02X]) | %d", GetSendHeaderName(*pSrcBuf), *pSrcBuf, *pSrcBuf, size);
 		std::string contents;
 		char buf[10];
 		for(int32_t i = 1; i < size; i++)
@@ -815,12 +805,12 @@ bool CNetworkStream::Send(int32_t size, const char * pSrcBuf)
 
 bool CNetworkStream::Peek(int32_t len, void* pDestBuf)
 {
-	return Peek(len, (char*)pDestBuf);
+	return Peek(len, static_cast<char *>(pDestBuf));
 }
 
 bool CNetworkStream::Recv(int32_t len, void* pDestBuf)
 {
-	return Recv(len, (char*)pDestBuf);
+	return Recv(len, static_cast<char *>(pDestBuf));
 }
 
 bool CNetworkStream::SendFlush(int32_t len, const void* pSrcBuf)
@@ -833,7 +823,7 @@ bool CNetworkStream::SendFlush(int32_t len, const void* pSrcBuf)
 
 bool CNetworkStream::Send(int32_t len, const void* pSrcBuf)
 {
-	return Send(len, (const char*)pSrcBuf);
+	return Send(len, static_cast<const char *>(pSrcBuf));
 }
 
 bool CNetworkStream::IsOnline()

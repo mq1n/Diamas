@@ -80,13 +80,13 @@ bool CPythonIME::OnWM_CHAR( WPARAM wParam, LPARAM lParam )
 
 	case VK_TAB:
 		if(ms_bCaptureInput == false)
-			return 0;
+			return false;
 		OnTab();
 		return true;
 
 	case VK_ESCAPE:
 		if(ms_bCaptureInput == false)
-			return 0;
+			return false;
 		OnEscape();
 		return true;
 	}

@@ -30,8 +30,10 @@ enum
 	ATTR_OBJECT = (1 << 7),
 };
 
-struct FCollectEntity {
-	void operator()(LPENTITY entity) {
+struct FCollectEntity
+{
+	void operator()(LPENTITY entity)
+	{
 		// Consider removing sanity check after debug pass
 		/*
 		if (entity->IsType(ENTITY_CHARACTER)) {
@@ -63,16 +65,31 @@ struct FCollectEntity {
 			return;
 		}
 		*/
-		result.push_back(entity);
+		if (entity)
+			result.push_back(entity);
 	}
 	template<typename F>
-	void ForEach(F& f) {
-		std::vector<LPENTITY>::iterator it = result.begin();
-		for ( ; it != result.end(); ++it) {
+	void ForEach(F& f) 
+	{
+		for (auto it = result.begin(); it != result.end(); ++it)
+		{
 			LPENTITY entity = *it;
 			f(entity);
 		}
 	}
+
+	void GetCharacterEntities(ENTITY_VECTOR &entityList) 
+	{
+		for (auto it = result.begin(); it != result.end(); ++it)
+		{
+			LPENTITY ent = *it;
+			if (ent && ent->IsType(ENTITY_CHARACTER)) 
+			{
+				entityList.push_back(ent);
+			}
+		}
+	}
+
 	typedef std::vector<LPENTITY> ListType;
 	ListType result; // list collected
 };
@@ -85,84 +102,6 @@ class SECTREE
 		friend class SECTREE_MANAGER;
 		friend class SECTREE_MAP;
 
-		template <class _Func> LPENTITY	find_if (_Func & func) const
-		{
-#ifdef __clang__
-			LPSECTREE_LIST::const_iterator it_tree = m_neighbor_list.begin();
-#else
-			LPSECTREE_LIST::iterator it_tree = m_neighbor_list.begin();
-#endif
-
-			while (it_tree != m_neighbor_list.end())
-			{
-				ENTITY_SET::iterator it_entity = (*it_tree)->m_set_entity.begin();
-
-				while (it_entity != (*it_tree)->m_set_entity.end())
-				{
-					if (func(*it_entity))
-						return (*it_entity);
-
-					++it_entity;
-				}
-
-				++it_tree;
-			}
-
-			return nullptr;
-		}
-
-		template <class _Func> void ForEachAround(_Func & func)
-		{
-			// <Factor> Using snapshot copy to avoid side-effects
-			FCollectEntity collector;
-#ifdef __clang__
-			LPSECTREE_LIST::const_iterator it = m_neighbor_list.begin();
-#else
-			LPSECTREE_LIST::iterator it = m_neighbor_list.begin();
-#endif
-			for ( ; it != m_neighbor_list.end(); ++it)
-			{
-				LPSECTREE sectree = *it;
-				sectree->for_each_entity(collector);
-			}
-			collector.ForEach(func);
-			/*
-			LPSECTREE_LIST::iterator it_tree = m_neighbor_list.begin();
-			for ( ; it_tree != m_neighbor_list.end(); ++it_tree) {
-				(*it_tree)->for_each_entity(func);
-			}
-			*/
-		}
-
-		template <class _Func> void for_each_for_find_victim(_Func & func)
-		{
-#ifdef __clang__
-			LPSECTREE_LIST::const_iterator it_tree = m_neighbor_list.begin();
-#else
-			LPSECTREE_LIST::iterator it_tree = m_neighbor_list.begin();
-#endif
-
-			while (it_tree != m_neighbor_list.end())
-			{
-				//첫번째를 찾으면 바로 리턴
-				if ( (*(it_tree++))->for_each_entity_for_find_victim(func) )
-					return;
-			}
-		}
-		template <class _Func> bool for_each_entity_for_find_victim(_Func & func)
-		{
-			auto it = m_set_entity.begin();
-
-			while (it != m_set_entity.end())
-			{
-				//정상적으로 찾으면 바로 리턴
-				if ( func(*it++) )
-					return true;
-			}
-			return false;
-		}
-		
-
 	public:
 		SECTREE();
 		~SECTREE();
@@ -170,22 +109,19 @@ class SECTREE
 		void				Initialize();
 		void				Destroy();
 
-		SECTREEID			GetID();
+		SECTREEID			GetID() const;
 
 		bool				InsertEntity(LPENTITY ent);
 		void				RemoveEntity(LPENTITY ent);
-
-		void				SetRegenEvent(LPEVENT event);
-		bool				Regen();
 
 		void				IncreasePC();
 		void				DecreasePC();
 
 		void				BindAttribute(CAttribute * pkAttribute);
 
-		CAttribute *			GetAttributePtr() { return m_pkAttribute; }
+		CAttribute *		GetAttributePtr() { return m_pkAttribute; }
 
-		uint32_t				GetAttribute(int32_t x, int32_t y);
+		uint32_t			GetAttribute(int32_t x, int32_t y);
 		bool				IsAttr(int32_t x, int32_t y, uint32_t dwFlag);
 
 		void				CloneAttribute(LPSECTREE tree); // private map 처리시 사용
@@ -195,29 +131,62 @@ class SECTREE
 		void				SetAttribute(uint32_t x, uint32_t y, uint32_t dwAttr);
 		void				RemoveAttribute(uint32_t x, uint32_t y, uint32_t dwAttr);
 
-	private:
-		template <class _Func> void for_each_entity(_Func & func)
+		template <class _Func>
+		void ForEachAround(_Func & func)
 		{
-			auto it = m_set_entity.begin();
-			for ( ; it != m_set_entity.end(); ++it) {
-				LPENTITY entity = *it;
+			for (auto it_tree = m_neighbor_list.begin(); it_tree != m_neighbor_list.end(); ++it_tree) 
+			{
+				(*it_tree)->ForEachEntity(func);
+			}
+		}
+
+//	private:
+	public:
+		template <class _Func> void ForEachEntity(_Func & func)
+		{
+			for (auto it = m_set_entity.begin(); it != m_set_entity.end(); ++it)
+			{
+				auto entity = *it;
 				// <Factor> Sanity check
-				if (entity->GetSectree() != this) {
+				if (entity->GetSectree() != this)
+				{
 					sys_err("<Factor> SECTREE-ENTITY relationship mismatch");
+
 					m_set_entity.erase(it);
 					continue;
 				}
+
 				func(entity);
+			}
+		}
+
+		template <class _Func> void ForEachEntityOfType(_Func & func, int32_t type)
+		{
+			for (auto it = m_set_entity.begin(); it != m_set_entity.end(); ++it)
+			{
+				auto entity = *it;
+				
+				// <Factor> Sanity check
+				if (entity->GetSectree() != this) 
+				{
+					sys_err("<Factor> SECTREE-ENTITY relationship mismatch");
+
+					m_set_entity.erase(it);
+					continue;
+				}
+				
+				if (entity->IsType(type))
+					func(entity);
 			}
 		}
 
 		SECTREEID			m_id;
 		ENTITY_SET			m_set_entity;
-		LPSECTREE_LIST			m_neighbor_list;
-		int32_t				m_iPCCount;
+		LPSECTREE_LIST		m_neighbor_list;
+		int32_t					m_iPCCount;
 		bool				isClone;
 
-		CAttribute *			m_pkAttribute;
+		CAttribute *		m_pkAttribute;
 };
 
 #endif

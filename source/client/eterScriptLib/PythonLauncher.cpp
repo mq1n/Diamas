@@ -4,6 +4,7 @@
 #include "PythonLauncher.h"
 #include "../eterSecurity/AnticheatManager.h"
 
+/*
 #ifdef _DEBUG
 static PyObject* WriteToStderr(PyObject* self, PyObject* args)
 {
@@ -15,6 +16,7 @@ static PyObject* WriteToStderr(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 #endif
+*/
 
 CPythonLauncher::CPythonLauncher() :
 	m_poModule(nullptr), m_poDic(nullptr)

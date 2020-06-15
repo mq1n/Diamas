@@ -1,6 +1,6 @@
 #pragma once
 
-#include <windows.h>
+#include <Windows.h>
 #include "Singleton.h"
 
 class CTimer : public CSingleton<CTimer>
@@ -13,11 +13,11 @@ class CTimer : public CSingleton<CTimer>
 		void	Adjust(int32_t iTimeGap);
 		void	SetBaseTime();
 
-		float	GetCurrentSecond();
-		uint32_t	GetCurrentMillisecond();
+	float GetCurrentSecond() const;
+	uint32_t GetCurrentMillisecond() const;
 
 		float	GetElapsedSecond();
-		uint32_t	GetElapsedMilliecond();
+	uint32_t GetElapsedMilliecond() const;
 
 		void	UseCustomTime();
 

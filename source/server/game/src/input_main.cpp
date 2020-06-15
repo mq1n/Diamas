@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "input.h"
 #include "constants.h"
 #include "config.h"
 #include "utils.h"
@@ -18,7 +19,7 @@
 #include "regen.h"
 #include "battle.h"
 #include "exchange.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "profiler.h"
 #include "messenger_manager.h"
 #include "party.h"
@@ -35,23 +36,16 @@
 #include "spam.h"
 #include "ani.h"
 #include "motion.h"
-#include "OXEvent.h"
+#include "ox_event.h"
 #include "locale_service.h"
-#include "DragonSoul.h"
+#include "dragon_soul.h"
 #include "belt_inventory_helper.h" // @fixme119
+#include "battleground.h"
 
-#include "input.h"
+#include "../../common/service.h"
 
-#define ENABLE_CHAT_COLOR_SYSTEM
-#define ENABLE_CHAT_LOGGING
-#define ENABLE_CHAT_SPAMLIMIT
-#define ENABLE_WHISPER_CHAT_SPAMLIMIT
-#define ENABLE_CHECK_GHOSTMODE
-
-#ifdef ENABLE_CHAT_LOGGING
 static char	__escape_string[1024];
 static char	__escape_string2[1024];
-#endif
 
 static int32_t __deposit_limit()
 {
@@ -241,42 +235,39 @@ int32_t ProcessTextTag(LPCHARACTER ch, const char * c_pszText, size_t len)
 	//3 : 교환중
 	//4 : 에러
 	int32_t hyperlinks;
-	bool colored;
+	bool colored = false;
 	
 	GetTextTagInfo(c_pszText, len, hyperlinks, colored);
 
 	if (colored == true && hyperlinks == 0)
 		return 4;
 
-#ifdef ENABLE_NEWSTUFF
 	if (g_bDisablePrismNeed)
 		return 0;
-#endif
 
 	int32_t nPrismCount = ch->CountSpecifyItem(ITEM_PRISM);
 
 	if (nPrismCount < hyperlinks)
 		return 1;
 
-
 	if (!ch->GetMyShop())
 	{
 		ch->RemoveSpecifyItem(ITEM_PRISM, hyperlinks);
 		return 0;
-	} else
+	}
+	else
 	{
 		int32_t sellingNumber = ch->GetMyShop()->GetNumberByVnum(ITEM_PRISM);
 		if(nPrismCount - sellingNumber < hyperlinks)
 		{
 			return 2;
-		} else
+		}
+		else
 		{
 			ch->RemoveSpecifyItem(ITEM_PRISM, hyperlinks);
 			return 0;
 		}
 	}
-	
-	return 4;
 }
 
 int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
@@ -295,13 +286,14 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 		return -1;
 	}
 
-#ifdef ENABLE_WHISPER_CHAT_SPAMLIMIT
-	if (ch->IncreaseChatCounter() >= 10)
+	if (ch->IncreaseChatCounter() >= 10 && !ch->IsGM())
 	{
-		ch->GetDesc()->DelayedDisconnect(0);
-		return (iExtraLen);
+		if (ch->GetChatCounter() == 10)
+		{
+			ch->GetDesc()->DelayedDisconnect(0);
+			return (iExtraLen);
+		}
 	}
-#endif
 
 	if (ch->FindAffect(AFFECT_BLOCK_CHAT))
 	{
@@ -317,8 +309,10 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 	LPDESC pkDesc = nullptr;
 
 	uint8_t bOpponentEmpire = 0;
+	uint32_t dwOpponentPID = 0;
+	const char* szOpponentName = "";
 
-	if (test_server)
+	if (g_bIsTestServer)
 	{
 		if (!pkChr)
 			sys_log(0, "Whisper to %s(%s) from %s", "Null", pinfo->szNameTo, ch->GetName());
@@ -326,7 +320,7 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 			sys_log(0, "Whisper to %s(%s) from %s", pkChr->GetName(), pinfo->szNameTo, ch->GetName());
 	}
 		
-	if (ch->IsBlockMode(BLOCK_WHISPER))
+	if (ch->IsBlockMode(BLOCK_WHISPER) && !pkChr->IsGM())
 	{
 		if (ch->GetDesc())
 		{
@@ -349,15 +343,21 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 			pkDesc = pkCCI->pkDesc;
 			pkDesc->SetRelay(pinfo->szNameTo);
 			bOpponentEmpire = pkCCI->bEmpire;
+			szOpponentName = pkChr->GetName();
+			dwOpponentPID = pkChr->GetPlayerID();
 
-			if (test_server)
-				sys_log(0, "Whisper to %s from %s (Channel %d Mapindex %d)", "Null", ch->GetName(), pkCCI->bChannel, pkCCI->lMapIndex);
+			if (g_bIsTestServer)
+			{
+				sys_log (0, "Whisper out to %s from %s (Channel %d Mapindex %d)", pkCCI->szName, ch->GetName(), pkCCI->bChannel, pkCCI->lMapIndex);
+			}
 		}
 	}
 	else
 	{
 		pkDesc = pkChr->GetDesc();
 		bOpponentEmpire = pkChr->GetEmpire();
+		szOpponentName = pkChr->GetName();
+		dwOpponentPID = pkChr->GetPlayerID();
 	}
 
 	if (!pkDesc)
@@ -408,7 +408,7 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 			strlcpy(buf, data + sizeof(TPacketCGWhisper), MIN(iExtraLen + 1, sizeof(buf)));
 			const size_t buflen = strlen(buf);
 
-			if (true == SpamBlockCheck(ch, buf, buflen))
+			if (SpamBlockCheck(ch, buf, buflen))
 			{
 				if (!pkChr)
 				{
@@ -487,14 +487,13 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 				// @warme006
 				// sys_log(0, "WHISPER: %s -> %s : %s", ch->GetName(), pinfo->szNameTo, buf);
-#ifdef ENABLE_CHAT_LOGGING
+
 				if (ch->IsGM())
 				{
 					LogManager::instance().EscapeString(__escape_string, sizeof(__escape_string), buf, buflen);
 					LogManager::instance().EscapeString(__escape_string2, sizeof(__escape_string2), pinfo->szNameTo, sizeof(pack.szNameFrom));
 					LogManager::instance().ChatLog(ch->GetMapIndex(), ch->GetPlayerID(), ch->GetName(), 0, __escape_string2, "WHISPER", __escape_string, ch->GetDesc() ? ch->GetDesc()->GetHostName() : "");
 				}
-#endif
 			}
 		}
 	}
@@ -575,25 +574,17 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 		interpret_command(ch, buf + 1, buflen - 1);
 		return iExtraLen;
 	}
-#ifdef ENABLE_CHAT_SPAMLIMIT
-	if (ch->IncreaseChatCounter() >= 4)
+	
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return iExtraLen;
+		
+	if (ch->IncreaseChatCounter() >= 6 && !ch->IsGM())
 	{
 		if (ch->GetChatCounter() == 10)
 			ch->GetDesc()->DelayedDisconnect(0);
 		return iExtraLen;
 	}
-#else
-	if (ch->IncreaseChatCounter() >= 10)
-	{
-		if (ch->GetChatCounter() == 10)
-		{
-			sys_log(0, "CHAT_HACK: %s", ch->GetName());
-			ch->GetDesc()->DelayedDisconnect(5);
-		}
 
-		return iExtraLen;
-	}
-#endif
 	// 채팅 금지 Affect 처리
 	const CAffect* pAffect = ch->FindAffect(AFFECT_BLOCK_CHAT);
 
@@ -612,7 +603,7 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 	CBanwordManager::instance().ConvertString(buf, buflen);
 
 	int32_t processReturn = ProcessTextTag(ch, buf, buflen);
-	if (0!=processReturn)
+	if (processReturn)
 	{
 		const TItemTable* pTable = ITEM_MANAGER::instance().GetTable(ITEM_PRISM);
 
@@ -629,12 +620,25 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 	}
 
 	char chatbuf[CHAT_MAX_LEN + 1];
-#ifdef ENABLE_CHAT_COLOR_SYSTEM
-	static const char* colorbuf[] = {"|cFFffa200|H|h[Staff]|h|r", "|cFFff0000|H|h[Shinsoo]|h|r", "|cFFffc700|H|h[Chunjo]|h|r", "|cFF000bff|H|h[Jinno]|h|r"};
-	int32_t len = snprintf(chatbuf, sizeof(chatbuf), "%s %s : %s", (ch->IsGM()?colorbuf[0]:colorbuf[MINMAX(0, ch->GetEmpire(), 3)]), ch->GetName(), buf);
-#else
-	int32_t len = snprintf(chatbuf, sizeof(chatbuf), "%s : %s", ch->GetName(), buf);
-#endif
+	int32_t len;
+
+	char szHyperLinkedName[120];
+	sprintf(szHyperLinkedName, "|Hmsg:%s|h%s|h|r", ch->GetName(), ch->GetName());
+
+	switch (pinfo->type)
+	{
+		case CHAT_TYPE_SHOUT:
+		{
+			static const char* colorbuf[] = { "|cFFffa200|H|h[Yonetici]", "|cFFff2727|H|h", "|cFFfff989|H|h", "|cFF1c67e9|H|h" };
+			len = snprintf(chatbuf, sizeof(chatbuf), "%s%s|h|r : %s", (ch->IsGM() ? colorbuf[0] : colorbuf[MINMAX(0, ch->GetEmpire(), 3)]), szHyperLinkedName, buf);
+		}
+		break;
+
+		default:
+			len = snprintf(chatbuf, sizeof(chatbuf), "%s : %s", ch->GetName(), buf);
+			break;
+	}
+
 	if (CHAT_TYPE_SHOUT == pinfo->type)
 	{
 		LogManager::instance().ShoutLog(g_bChannel, ch->GetEmpire(), chatbuf);
@@ -682,6 +686,13 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 	{
 		case CHAT_TYPE_TALKING:
 			{
+				const int32_t NORMAL_CHAT_LIMIT = 5;
+				if (ch->GetLevel() < NORMAL_CHAT_LIMIT)
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, "5.Seviyeden once bunu yapamazsin");
+					return (iExtraLen);
+				}
+
 				const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
 
 
@@ -693,13 +704,12 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 								(ch->GetGMLevel() > GM_PLAYER ||
 								 ch->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_LANGUAGE)) ? 0 : ch->GetEmpire(), 
 								ch->GetMapIndex(), strlen(ch->GetName())));
-#ifdef ENABLE_CHAT_LOGGING
+
 					if (ch->IsGM())
 					{
 						LogManager::instance().EscapeString(__escape_string, sizeof(__escape_string), chatbuf, len);
 						LogManager::instance().ChatLog(ch->GetMapIndex(), ch->GetPlayerID(), ch->GetName(), 0, "", "NORMAL", __escape_string, ch->GetDesc() ? ch->GetDesc()->GetHostName() : "");
 					}
-#endif
 				}
 			}
 			break;
@@ -717,13 +727,12 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 					RawPacketToCharacterFunc f(tbuf.read_peek(), tbuf.size());
 					ch->GetParty()->ForEachOnlineMember(f);
-#ifdef ENABLE_CHAT_LOGGING
+
 					if (ch->IsGM())
 					{
 						LogManager::instance().EscapeString(__escape_string, sizeof(__escape_string), chatbuf, len);
 						LogManager::instance().ChatLog(ch->GetMapIndex(), ch->GetPlayerID(), ch->GetName(), ch->GetParty()->GetLeaderPID(), "", "PARTY", __escape_string, ch->GetDesc() ? ch->GetDesc()->GetHostName() : "");
 					}
-#endif
 				}
 			}
 			break;
@@ -735,13 +744,11 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 				else
 				{
 					ch->GetGuild()->Chat(chatbuf);
-#ifdef ENABLE_CHAT_LOGGING
 					if (ch->IsGM())
 					{
 						LogManager::instance().EscapeString(__escape_string, sizeof(__escape_string), chatbuf, len);
 						LogManager::instance().ChatLog(ch->GetMapIndex(), ch->GetPlayerID(), ch->GetName(), ch->GetGuild()->GetID(), ch->GetGuild()->GetName(), "GUILD", __escape_string, ch->GetDesc() ? ch->GetDesc()->GetHostName() : "");
 					}
-#endif
 				}
 			}
 			break;
@@ -768,6 +775,9 @@ void CInputMain::ItemToItem(LPCHARACTER ch, const char * pcData)
 
 void CInputMain::ItemDrop(LPCHARACTER ch, const char * data)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	struct command_item_drop * pinfo = (struct command_item_drop *) data;
 
 	if (!ch)
@@ -782,6 +792,9 @@ void CInputMain::ItemDrop(LPCHARACTER ch, const char * data)
 
 void CInputMain::ItemDrop2(LPCHARACTER ch, const char * data)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	TPacketCGItemDrop2 * pinfo = (TPacketCGItemDrop2 *) data;
 
 	// 엘크가 0보다 크면 엘크를 버리는 것 이다.
@@ -812,19 +825,33 @@ void CInputMain::ItemPickup(LPCHARACTER ch, const char * data)
 void CInputMain::QuickslotAdd(LPCHARACTER ch, const char * data)
 {
 	struct command_quickslot_add * pinfo = (struct command_quickslot_add *) data;
+	if (!ch || !pinfo)
+		return;
+
+    if (pinfo->slot.type == QUICKSLOT_TYPE_ITEM)
+    {
+        LPITEM item = nullptr;
+        TItemPos srcCell(INVENTORY, pinfo->slot.pos);
+        if (!(item = ch->GetItem(srcCell)))
+            return;
+        if (item->GetType() != ITEM_USE && item->GetType() != ITEM_QUEST)
+            return;
+    }
 	ch->SetQuickslot(pinfo->pos, pinfo->slot);
 }
 
 void CInputMain::QuickslotDelete(LPCHARACTER ch, const char * data)
 {
 	struct command_quickslot_del * pinfo = (struct command_quickslot_del *) data;
-	ch->DelQuickslot(pinfo->pos);
+	if (ch)
+		ch->DelQuickslot(pinfo->pos);
 }
 
 void CInputMain::QuickslotSwap(LPCHARACTER ch, const char * data)
 {
 	struct command_quickslot_swap * pinfo = (struct command_quickslot_swap *) data;
-	ch->SwapQuickslot(pinfo->pos, pinfo->change_pos);
+	if (ch)
+		ch->SwapQuickslot(pinfo->pos, pinfo->change_pos);
 }
 
 int32_t CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
@@ -886,7 +913,7 @@ int32_t CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiByte
 				char name[CHARACTER_NAME_MAX_LEN + 1];
 				strlcpy(name, c_pData, sizeof(name));
 
-				if (ch->GetGMLevel() == GM_PLAYER && gm_get_level(name) != GM_PLAYER)
+				if (ch->GetGMLevel() == GM_PLAYER && GM::get_level(name) != GM_PLAYER)
 				{
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<메신져> 운영자는 메신져에 추가할 수 없습니다."));
 					return CHARACTER_NAME_MAX_LEN;
@@ -942,8 +969,12 @@ int32_t CInputMain::Shop(LPCHARACTER ch, const char * data, size_t uiBytes)
 	if (uiBytes < sizeof(TPacketCGShop))
 		return -1;
 
-	if (test_server)
+	if (g_bIsTestServer)
 		sys_log(0, "CInputMain::Shop() ==> SubHeader %d", p->subheader);
+	if (!ch)
+		return -1;
+	if (!ch->GetDesc())
+		return -1;
 
 	const char * c_pData = data + sizeof(TPacketCGShop);
 	uiBytes -= sizeof(TPacketCGShop);
@@ -1006,7 +1037,7 @@ void CInputMain::OnClick(LPCHARACTER ch, const char * data)
 
 	if ((victim = CHARACTER_MANAGER::instance().Find(pinfo->vid)))
 		victim->OnClick(ch);
-	else if (test_server)
+	else if (g_bIsTestServer)
 	{
 		sys_err("CInputMain::OnClick %s.Click.NOT_EXIST_VID[%d]", ch->GetName(), pinfo->vid);
 	}
@@ -1014,6 +1045,9 @@ void CInputMain::OnClick(LPCHARACTER ch, const char * data)
 
 void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	struct command_exchange * pinfo = (struct command_exchange *) data;
 	LPCHARACTER	to_ch = nullptr;
 
@@ -1056,7 +1090,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 					{
 						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("창고를 연후 %d초 이내에는 거래를 할수 없습니다."), g_nPortalLimitTime);
 
-						if (test_server)
+						if (g_bIsTestServer)
 							ch->ChatPacket(CHAT_TYPE_INFO, "[TestOnly][Safebox]Pulse %d LoadTime %d PASS %d", iPulse, ch->GetSafeboxLoadTime(), PASSES_PER_SEC(g_nPortalLimitTime));
 						return; 
 					}
@@ -1066,7 +1100,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 						to_ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("창고를 연후 %d초 이내에는 거래를 할수 없습니다."), g_nPortalLimitTime);
 
 
-						if (test_server)
+						if (g_bIsTestServer)
 							to_ch->ChatPacket(CHAT_TYPE_INFO, "[TestOnly][Safebox]Pulse %d LoadTime %d PASS %d", iPulse, to_ch->GetSafeboxLoadTime(), PASSES_PER_SEC(g_nPortalLimitTime));
 						return; 
 					}
@@ -1184,10 +1218,42 @@ static const int32_t ComboSequenceBySkillLevel[3][8] =
 
 #define COMBO_HACK_ALLOWABLE_MS	100
 
+int32_t ClacValidComboInterval(LPCHARACTER ch, uint8_t bArg)
+{
+	int32_t nInterval = 300;
+	float fAdjustNum = 1.5f; // ??쨔캅 ?짱?첬째징 speed hack 쩔징 째?쨍짰쨈? 째??쨩 쨍쨌짹창 ?짠??. 2013.09.10 CYH
+
+	if (!ch)
+	{
+		sys_err("ClacValidComboInterval() ch is nullptr");
+		return nInterval;
+	}
+
+	if (bArg == 13)
+	{
+		float normalAttackDuration = CMotionManager::instance().GetNormalAttackDuration(ch->GetRaceNum());
+		nInterval = (int32_t)(normalAttackDuration / (((float)ch->GetPoint(POINT_ATT_SPEED) / 100.f) * 900.f) + fAdjustNum);
+	}
+	else if (bArg == 14)
+	{
+		nInterval = (int32_t)(ani_combo_speed(ch, 1) / ((ch->GetPoint(POINT_ATT_SPEED) / 100.f) + fAdjustNum));
+	}
+	else if (bArg > 14 && bArg < 22)
+	{
+		nInterval = (int32_t)(ani_combo_speed(ch, bArg - 13) / ((ch->GetPoint(POINT_ATT_SPEED) / 100.f) + fAdjustNum));
+	}
+	else
+	{
+		sys_err("ClacValidComboInterval() Invalid bArg(%d) ch(%s)", bArg, ch->GetName());
+	}
+
+	return nInterval;
+}
+
 bool CheckComboHack(LPCHARACTER ch, uint8_t bArg, uint32_t dwTime, bool CheckSpeedHack)
 {
-	if(!gHackCheckEnable) return false;
-
+	if (!gHackCheckEnable)
+		return false;
 	
 	//	if (IsStun() || IsDead()) return false;
 	//	를 추가하는게 맞다고 생각하나,
@@ -1226,7 +1292,9 @@ bool CheckComboHack(LPCHARACTER ch, uint8_t bArg, uint32_t dwTime, bool CheckSpe
 		}
 
 		ch->SetComboSequence(1);
-		ch->SetValidComboInterval((int32_t) (ani_combo_speed(ch, 1) / (ch->GetPoint(POINT_ATT_SPEED) / 100.f)));
+		// 2013 09 11 CYH edited
+		//ch->SetValidComboInterval((int32_t) (ani_combo_speed(ch, 1) / (ch->GetPoint(POINT_ATT_SPEED) / 100.f)));
+		ch->SetValidComboInterval(ClacValidComboInterval(ch, bArg));
 		ch->SetLastComboTime(dwTime);
 	}
 	else if (bArg > 14 && bArg < 22)
@@ -1285,7 +1353,9 @@ bool CheckComboHack(LPCHARACTER ch, uint8_t bArg, uint32_t dwTime, bool CheckSpe
 			else
 				ch->SetComboSequence(ch->GetComboSequence() + 1);
 
-			ch->SetValidComboInterval((int32_t) (ani_combo_speed(ch, bArg - 13) / (ch->GetPoint(POINT_ATT_SPEED) / 100.f)));
+			// 2013 09 11 CYH edited
+			//ch->SetValidComboInterval((int32_t) (ani_combo_speed(ch, bArg - 13) / (ch->GetPoint(POINT_ATT_SPEED) / 100.f)));
+			ch->SetValidComboInterval(ClacValidComboInterval(ch, bArg));
 			ch->SetLastComboTime(dwTime);
 		}
 	}
@@ -1325,9 +1395,11 @@ bool CheckComboHack(LPCHARACTER ch, uint8_t bArg, uint32_t dwTime, bool CheckSpe
 				ch->SetLastComboTime(dwTime);
 			}
 			*/
-			float normalAttackDuration = CMotionManager::instance().GetNormalAttackDuration(ch->GetRaceNum());
-			int32_t k = (int32_t) (normalAttackDuration / ((float) ch->GetPoint(POINT_ATT_SPEED) / 100.f) * 900.f);
-			ch->SetValidComboInterval(k);
+			// 2013 09 11 CYH edited
+			//float normalAttackDuration = CMotionManager::instance().GetNormalAttackDuration(ch->GetRaceNum());
+			//int32_t k = (int32_t) (normalAttackDuration / ((float) ch->GetPoint(POINT_ATT_SPEED) / 100.f) * 900.f);			
+			//ch->SetValidComboInterval(k);
+			ch->SetValidComboInterval(ClacValidComboInterval(ch, bArg));
 			ch->SetLastComboTime(dwTime);
 			// END_OF_POLYMORPH_BUG_FIX
 		}
@@ -1394,6 +1466,9 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 		return;
 	}
 
+	LPDESC descStore = ch->GetDesc();
+
+
 	//enum EMoveFuncType
 	//{   
 	//	FUNC_WAIT,
@@ -1413,21 +1488,17 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 		// @fixme106 (changed 40 to 60)
 		if (((false == ch->IsRiding() && fDist > 25) || fDist > 60) && OXEVENT_MAP_INDEX != ch->GetMapIndex())
 		{
-#ifdef ENABLE_HACK_TELEPORT_LOG // @warme006
-			{
-				const PIXEL_POSITION & warpPos = ch->GetWarpPosition();
+			const GPOS & warpPos = ch->GetWarpPosition();
 
-				if (warpPos.x == 0 && warpPos.y == 0)
-					LogManager::instance().HackLog("Teleport", ch); 
-			}
-#endif
+			if (warpPos.x == 0 && warpPos.y == 0)
+				LogManager::instance().HackLog("Teleport", ch); 
 			sys_log(0, "MOVE: %s trying to move too far (dist: %.1fm) Riding(%d)", ch->GetName(), fDist, ch->IsRiding());
 
 			ch->Show(ch->GetMapIndex(), ch->GetX(), ch->GetY(), ch->GetZ());
 			ch->Stop();
 			return;
 		}
-#ifdef ENABLE_CHECK_GHOSTMODE
+
 		if (ch->IsPC() && ch->IsDead())
 		{
 			sys_log(0, "MOVE: %s trying to move as dead", ch->GetName());
@@ -1436,13 +1507,15 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 			ch->Stop();
 			return;
 		}
-#endif
+
 		//
 		// 스피드핵(SPEEDHACK) Check
 		//
 		uint32_t dwCurTime = get_dword_time();
 		// 시간을 Sync하고 7초 후 부터 검사한다. (20090702 이전엔 5초였음)
-		bool CheckSpeedHack = (false == ch->GetDesc()->IsHandshaking() && dwCurTime - ch->GetDesc()->GetClientTime() > 7000);
+		if (descStore)
+		{
+			bool CheckSpeedHack = (false == descStore->IsHandshaking() && dwCurTime - descStore->GetClientTime() > 7000);
 
 		if (CheckSpeedHack)
 		{
@@ -1462,6 +1535,7 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 			{
 				sys_log(0, "SPEEDHACK: DETECTED! %s (delta %d %d)", ch->GetName(), iDelta, iServerDelta);
 				ch->GetDesc()->DelayedDisconnect(3);
+				}
 			}
 		}
 
@@ -1470,7 +1544,11 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 		//
 		if (pinfo->bFunc == FUNC_COMBO && g_bCheckMultiHack)
 		{
+			if (descStore)
+			{
+				bool CheckSpeedHack = (false == descStore->IsHandshaking() && dwCurTime - descStore->GetClientTime() > 7000);
 			CheckComboHack(ch, pinfo->bArg, pinfo->dwTime, CheckSpeedHack); // 콤보 체크
+			}
 		}
 	}
 
@@ -1487,7 +1565,10 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 	else
 	{
 		if (pinfo->bFunc == FUNC_ATTACK || pinfo->bFunc == FUNC_COMBO)
+        {
 			ch->OnMove(true);
+			ch->GetAbuseController()->ReceiveMoveAttackPacket();
+		}
 		else if (pinfo->bFunc & FUNC_SKILL)
 		{
 			const int32_t MASK_SKILL_MOTION = 0x7F;
@@ -1504,16 +1585,13 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 				LogManager::instance().HackLog(szBuf, ch->GetDesc()->GetAccountTable().login, ch->GetName(), ch->GetDesc()->GetHostName());
 				sys_log(0, "%s", szBuf);
 
-				if (test_server)
-				{
-					ch->GetDesc()->DelayedDisconnect(number(2, 8));
+				if (g_bIsTestServer)
 					ch->ChatPacket(CHAT_TYPE_INFO, szBuf);
-				}
-				else
-				{
-					ch->GetDesc()->DelayedDisconnect(number(150, 500));
-				}
+
+				ch->GetDesc()->DelayedDisconnect(number(2, 8));
 			}
+
+			ch->GetAbuseController()->ReceiveMoveAttackPacket();
 
 			ch->OnMove();
 		}
@@ -1603,7 +1681,7 @@ void CInputMain::Attack(LPCHARACTER ch, const uint8_t header, const char* data)
 			case SKILL_HORSE_WILDATTACK_RANGE:
 				if (HEADER_CG_SHOOT != type->header)
 				{
-					if (test_server) 
+					if (g_bIsTestServer) 
 						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Attack :name[%s] Vnum[%d] can't use skill by attack(warning)"), type->type);
 					return;
 				}
@@ -1618,7 +1696,7 @@ void CInputMain::Attack(LPCHARACTER ch, const uint8_t header, const char* data)
 				if (nullptr == ch->GetDesc())
 					return;
 
-				const TPacketCGAttack* const packMelee = reinterpret_cast<const TPacketCGAttack*>(data);
+				const TPacketCGAttack* packMelee = reinterpret_cast<const TPacketCGAttack*>(data);
 
 				LPCHARACTER	victim = CHARACTER_MANAGER::instance().Find(packMelee->dwVID);
 
@@ -1687,7 +1765,7 @@ int32_t CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t u
 	if( iCount > nCountLimit )
 	{
 		//LogManager::instance().HackLog( "SYNC_POSITION_HACK", ch );
-		sys_err( "Too many SyncPosition Count(%d) from Name(%s)", iCount, ch->GetName() );
+		sys_err( "Too many SyncPosition Count(%d) from Name(%s)", iCount, ch ? ch->GetName() : "" );
 		//ch->GetDesc()->SetPhase(PHASE_CLOSE);
 		//return -1;
 		iCount = nCountLimit;
@@ -1733,68 +1811,82 @@ int32_t CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t u
 		//		그래도 혹시나 하는 마음에 버퍼로 사용할 겸해서 1000.f 로 둠...
 		if (fDistWithSyncOwner > fLimitDistWithSyncOwner)
 		{
-			// g_iSyncHackLimitCount번 까지는 봐줌.
 			if (ch->GetSyncHackCount() < g_iSyncHackLimitCount)
 			{
-				ch->SetSyncHackCount(ch->GetSyncHackCount() + 1);
+				ch->UpdateSyncHackCount(victim->IsPC() ? "player" : "monster", true);
+				ch->SetNoHackCount(0);
 				continue;
 			}
-			else
-			{
-				LogManager::instance().HackLog( "SYNC_POSITION_HACK", ch );
 
-				sys_err( "Too far SyncPosition DistanceWithSyncOwner(%f)(%s) from Name(%s) CH(%d,%d) VICTIM(%d,%d) SYNC(%d,%d)",
-					fDistWithSyncOwner, victim->GetName(), ch->GetName(), ch->GetX(), ch->GetY(), victim->GetX(), victim->GetY(),
-					e->lX, e->lY );
+			LogManager::instance().HackLog("SYNC_DIST", ch);
 
-				ch->GetDesc()->SetPhase(PHASE_CLOSE);
+			sys_err("Too far SyncPosition DistanceWithSyncOwner(%f)(%s) from Name(%s) CH(%d,%d) VICTIM(%d,%d) SYNC(%d,%d)",
+				fDistWithSyncOwner, victim->GetName(), ch->GetName(), ch->GetX(), ch->GetY(), victim->GetX(), victim->GetY(),
+				e->lX, e->lY);
 
-				return -1;
-			}
+			ch->GetDesc()->SetCloseReason("HACKER_DIST");
+			ch->GetDesc()->SetPhase(PHASE_CLOSE);
+
+			return -1;
 		}
 
-		const float fDist = DISTANCE_SQRT( (victim->GetX() - e->lX) / 100, (victim->GetY() - e->lY) / 100 );
-		static const int32_t g_lValidSyncInterval = 100 * 1000; // 100ms
-		const timeval &tvLastSyncTime = victim->GetLastSyncTime();
-		timeval *tvDiff = timediff(&tvCurTime, &tvLastSyncTime);
-		
-		// SyncPosition을 악용하여 타유저를 이상한 곳으로 보내는 핵 방어하기 위하여,
-		// 같은 유저를 g_lValidSyncInterval ms 이내에 다시 SyncPosition하려고 하면 핵으로 간주.
+		const float fDist = DISTANCE_SQRT((victim->GetX() - e->lX) / 100, (victim->GetY() - e->lY) / 100);
+		static const int32_t g_lValidSyncInterval = 20 * 1000; // 100ms
+		static const int32_t g_minNoHackCount = 10; // 10 valid sync positions reduce 1 in the hack counter
+		const timeval & tvLastSyncTime = victim->GetLastSyncTime();
+		timeval * tvDiff = timediff(&tvCurTime, &tvLastSyncTime);
+
 		if (tvDiff->tv_sec == 0 && tvDiff->tv_usec < g_lValidSyncInterval)
 		{
-			// g_iSyncHackLimitCount번 까지는 봐줌.
-			if (ch->GetSyncHackCount() < g_iSyncHackLimitCount)
+			if (ch->GetSyncHackCount("player") < g_iSyncHackLimitCount
+				&& ch->GetSyncHackCount("monster") < g_iSyncHackLimitCount * 2)
 			{
-				ch->SetSyncHackCount(ch->GetSyncHackCount() + 1);
+				std::string s_targetType = victim->IsPC() ? "player" : "monster";
+
+				ch->UpdateSyncHackCount(s_targetType, true);
+				ch->SetNoHackCount(0);
 				continue;
 			}
 			else
 			{
-				LogManager::instance().HackLog( "SYNC_POSITION_HACK", ch );
+				LogManager::instance().HackLog("SYNC_INTERVAL", ch);
 
-				sys_err( "Too often SyncPosition Interval(%ldms)(%s) from Name(%s) VICTIM(%d,%d) SYNC(%d,%d)",
+				sys_err("Too often SyncPosition Interval(%dms)(%s) from Name(%s) VICTIM(%d,%d) SYNC(%d,%d)",
 					tvDiff->tv_sec * 1000 + tvDiff->tv_usec / 1000, victim->GetName(), ch->GetName(), victim->GetX(), victim->GetY(),
-					e->lX, e->lY );
+					e->lX, e->lY);
 
+				ch->GetDesc()->SetCloseReason("HACKER_INTERVAL");
 				ch->GetDesc()->SetPhase(PHASE_CLOSE);
 
 				return -1;
 			}
 		}
-		else if( fDist > 25.0f )
+		else if (fDist > 25.0f)
 		{
-			LogManager::instance().HackLog( "SYNC_POSITION_HACK", ch );
+			LogManager::instance().HackLog("SYNC_VDIST", ch);
 
-			sys_err( "Too far SyncPosition Distance(%f)(%s) from Name(%s) CH(%d,%d) VICTIM(%d,%d) SYNC(%d,%d)",
-				   	fDist, victim->GetName(), ch->GetName(), ch->GetX(), ch->GetY(), victim->GetX(), victim->GetY(),
-				  e->lX, e->lY );
+			sys_err("Too far SyncPosition Distance(%f)(%s) from Name(%s) CH(%d,%d) VICTIM(%d,%d) SYNC(%d,%d)",
+				fDist, victim->GetName(), ch->GetName(), ch->GetX(), ch->GetY(), victim->GetX(), victim->GetY(),
+				e->lX, e->lY);
 
+			ch->GetDesc()->SetCloseReason("HACKER_VDIST");
 			ch->GetDesc()->SetPhase(PHASE_CLOSE);
 
 			return -1;
 		}
 		else
 		{
+			//Reduce the counter after some valid syncs (reduce false positives)
+			if (ch->GetSyncHackCount("monster") > 0)
+			{
+				int32_t i_curCount = ch->GetNoHackCount();
+				ch->SetNoHackCount(++i_curCount);
+
+				if (i_curCount > g_minNoHackCount) {
+					ch->SetNoHackCount(0);
+					ch->UpdateSyncHackCount("monster", false);
+				}
+			}
 			victim->SetLastSyncTime(tvCurTime);
 			victim->Sync(e->lX, e->lY);
 			buffer_write(lpBuf, e, sizeof(TPacketCGSyncPositionElement));
@@ -1821,6 +1913,9 @@ void CInputMain::FlyTarget(LPCHARACTER ch, const char * pcData, uint8_t bHeader)
 void CInputMain::UseSkill(LPCHARACTER ch, const char * pcData)
 {
 	TPacketCGUseSkill * p = (TPacketCGUseSkill *) pcData;
+	if (!ch->CanUseSkill(p->dwVnum))
+		return;
+
 	ch->UseSkill(p->dwVnum, CHARACTER_MANAGER::instance().Find(p->dwVID));
 }
 
@@ -1831,17 +1926,11 @@ void CInputMain::ScriptButton(LPCHARACTER ch, const void* c_pData)
 
 	quest::PC* pc = quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID());
 	if (pc && pc->IsConfirmWait())
-	{
 		quest::CQuestManager::instance().Confirm(ch->GetPlayerID(), quest::CONFIRM_TIMEOUT);
-	}
 	else if (p->idx & 0x80000000)
-	{
 		quest::CQuestManager::Instance().QuestInfo(ch->GetPlayerID(), p->idx & 0x7fffffff);
-	}
 	else
-	{
 		quest::CQuestManager::Instance().QuestButton(ch->GetPlayerID(), p->idx);
-	}
 }
 
 void CInputMain::ScriptAnswer(LPCHARACTER ch, const void* c_pData)
@@ -1915,12 +2004,56 @@ void CInputMain::Warp(LPCHARACTER ch, const char * pcData)
 	ch->WarpEnd();
 }
 
-void CInputMain::SafeboxCheckin(LPCHARACTER ch, const char * c_pData)
+void CInputMain::TargetDrop(LPCHARACTER ch, const char * pcData)
 {
-	if (quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID())->IsRunning() == true)
+	ch->SendTargetDrop();
+}
+
+void CInputMain::ChestDropInfo(LPCHARACTER ch, const char* c_pData)
+{
+	TPacketCGChestDropInfo* p = (TPacketCGChestDropInfo*)c_pData;
+
+	if (p->wInventoryCell >= INVENTORY_MAX_NUM)
 		return;
 
-	TPacketCGSafeboxCheckin * p = (TPacketCGSafeboxCheckin *) c_pData;
+	if (!ch)
+		return;
+
+	LPDESC pkDesc = ch->GetDesc();
+
+	if (!pkDesc)
+		return;
+
+	LPITEM pkItem = ch->GetInventoryItem(p->wInventoryCell);
+
+	if (!pkItem)
+		return;
+
+	std::vector<TChestDropInfoTable> vec_ItemList;
+	ITEM_MANAGER::instance().GetChestItemList(pkItem->GetVnum(), vec_ItemList);
+
+	if (vec_ItemList.size() == 0)
+		return;
+
+	TPacketGCChestDropInfo packet;
+	packet.bHeader = HEADER_GC_CHEST_DROP_INFO;
+	packet.wSize = sizeof(packet) + sizeof(TChestDropInfoTable) * vec_ItemList.size();
+	packet.dwChestVnum = pkItem->GetVnum();
+
+	pkDesc->BufferedPacket(&packet, sizeof(packet));
+	pkDesc->Packet(&vec_ItemList[0], sizeof(TChestDropInfoTable) * vec_ItemList.size());
+}
+
+void CInputMain::SafeboxCheckin(LPCHARACTER ch, const char * c_pData)
+{
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
+	TPacketCGSafeboxCheckin * p = (TPacketCGSafeboxCheckin *)c_pData;
+
+	quest::PC* pc = quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID());
+	if (pc && pc->IsRunning() == true)
+		return;
 
 	if (!ch->CanHandleItem())
 		return;
@@ -1930,6 +2063,12 @@ void CInputMain::SafeboxCheckin(LPCHARACTER ch, const char * c_pData)
 
 	if (!pkSafebox || !pkItem)
 		return;
+		
+	if (pkItem->GetType() == ITEM_BELT && pkItem->IsEquipped()) 
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("PLEASE_BE_EMPTY_BELT_INVENTORY_WINDOW"));
+		return;
+	}
 
 	if (pkItem->GetCell() >= INVENTORY_MAX_NUM && IS_SET(pkItem->GetFlag(), ITEM_FLAG_IRREMOVABLE))
 	{
@@ -2003,6 +2142,9 @@ void CInputMain::SafeboxCheckin(LPCHARACTER ch, const char * c_pData)
 
 void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMall)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	TPacketCGSafeboxCheckout * p = (TPacketCGSafeboxCheckout *) c_pData;
 
 	if (!ch->CanHandleItem())
@@ -2107,7 +2249,10 @@ void CInputMain::PartyInvite(LPCHARACTER ch, const char * c_pData)
 {
 	if (!ch)
 		return; 
-	
+		
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	if (ch->GetArena())
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
@@ -2130,6 +2275,9 @@ void CInputMain::PartyInvite(LPCHARACTER ch, const char * c_pData)
 void CInputMain::PartyInviteAnswer(LPCHARACTER ch, const char * c_pData)
 {
 	if (!ch)
+		return;
+		
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
 	if (ch->GetArena())
@@ -2213,15 +2361,18 @@ void CInputMain::PartySetState(LPCHARACTER ch, const char* c_pData)
 
 void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 {
-	if (ch->GetArena())
-	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
+	if (!ch->GetParty())
 		return;
-	}
 
 	if (!CPartyManager::instance().IsEnablePCParty())
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 서버 문제로 파티 관련 처리를 할 수 없습니다."));
+		return;
+	}
+	
+	if (ch->GetArena())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
 		return;
 	}
 
@@ -2232,9 +2383,6 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 	}
 
 	TPacketCGPartyRemove* p = (TPacketCGPartyRemove*) c_pData;
-
-	if (!ch->GetParty())
-		return;
 
 	LPPARTY pParty = ch->GetParty();
 	if (pParty->GetLeaderPID() == ch->GetPlayerID())
@@ -2257,6 +2405,9 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 			{
 				// party disband
 				CPartyManager::instance().DeleteParty(pParty);
+
+				if (ch)
+					ch->ComputePoints();
 			}
 			else
 			{
@@ -2269,6 +2420,9 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 					//CPartyManager::instance().SetPartyMember(B->GetPlayerID(), nullptr);
 				}
 				pParty->Quit(p->pid);
+
+				if (B)
+					B->ComputePoints();
 			}
 		}
 	}
@@ -2354,13 +2508,13 @@ void CInputMain::AnswerMakeGuild(LPCHARACTER ch, const char* c_pData)
 		int32_t GuildCreateFee = 200000;
 
 		ch->PointChange(POINT_GOLD, -GuildCreateFee);
-		DBManager::instance().SendMoneyLog(MONEY_LOG_GUILD, ch->GetPlayerID(), -GuildCreateFee);
+		LogManager::instance().MoneyLog(MONEY_LOG_GUILD, ch->GetPlayerID(), -GuildCreateFee);
 
 		char Log[128];
 		snprintf(Log, sizeof(Log), "GUILD_NAME %s MASTER %s", cp.name, ch->GetName());
 		LogManager::instance().CharLog(ch, 0, "MAKE_GUILD", Log);
 
-		ch->RemoveSpecifyItem(GUILD_CREATE_ITEM_VNUM, 1);
+		// ch->RemoveSpecifyItem(GUILD_CREATE_ITEM_VNUM, 1); // kader kitabi kullanilmiyor
 		//ch->SendGuildName(dwGuildID);
 	}
 	else
@@ -2387,8 +2541,20 @@ void CInputMain::PartyUseSkill(LPCHARACTER ch, const char* c_pData)
 		case PARTY_SKILL_WARP:
 			{
 				LPCHARACTER pch = CHARACTER_MANAGER::instance().Find(p->vid);
-				if (pch && pch->IsPC())
+				if (pch && pch->IsPC() && ch->GetParty() == pch->GetParty())
+				{
+					if (ch->GetWarMap())
+					{
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Bu haritada yanina oyuncu cekemezsin!"));
+						return;
+					}
+					if (pch->GetMapIndex() != ch->GetMapIndex())
+					{
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yanina getirmek istedigin oyuncu ile ayni haritada olmalisin!"));
+						return;
+					}
 					ch->GetParty()->SummonToLeader(pch->GetPlayerID());
+				}
 				else
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 소환하려는 대상을 찾을 수 없습니다."));
 			}
@@ -2551,11 +2717,6 @@ int32_t CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 					member->SetQuestFlag("guild_manage.new_withdraw_time", get_global_time());
 					pGuild->RequestRemoveMember(member->GetPlayerID());
-
-					if (g_bGuildInviteLimit)
-					{
-						DBManager::instance().Query("REPLACE INTO guild_invite_limit VALUES(%d, %d)", pGuild->GetID(), get_global_time());
-					}
 				}
 				else
 				{
@@ -2734,9 +2895,9 @@ int32_t CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 		case GUILD_SUBHEADER_CG_USE_SKILL:
 			{
-				const TPacketCGGuildUseSkill* p = reinterpret_cast<const TPacketCGGuildUseSkill*>(c_pData);
+				const TPacketCGGuildUseSkill* p2 = reinterpret_cast<const TPacketCGGuildUseSkill*>(c_pData);
 
-				pGuild->UseSkill(p->dwVnum, ch, p->dwPID);
+				pGuild->UseSkill(p2->dwVnum, ch, p2->dwPID);
 			}
 			return SubPacketLen;
 
@@ -2770,7 +2931,7 @@ int32_t CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 				CGuild * g = CGuildManager::instance().FindGuild(guild_id);
 
-				if (g)
+				if (g && ch && ch->IsPC())
 				{
 					if (accept)
 						g->InviteAccept(ch);
@@ -2787,6 +2948,9 @@ int32_t CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 void CInputMain::Fishing(LPCHARACTER ch, const char* c_pData)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	TPacketCGFishing* p = (TPacketCGFishing*)c_pData;
 	ch->SetRotation(p->dir * 5);
 	ch->fishing();
@@ -2795,6 +2959,9 @@ void CInputMain::Fishing(LPCHARACTER ch, const char* c_pData)
 
 void CInputMain::ItemGive(LPCHARACTER ch, const char* c_pData)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	TPacketCGGiveItem* p = (TPacketCGGiveItem*) c_pData;
 	LPCHARACTER to_ch = CHARACTER_MANAGER::instance().Find(p->dwTargetVID);
 
@@ -2807,14 +2974,33 @@ void CInputMain::ItemGive(LPCHARACTER ch, const char* c_pData)
 void CInputMain::Hack(LPCHARACTER ch, const char * c_pData)
 {
 	TPacketCGHack * p = (TPacketCGHack *) c_pData;
-	
+	if (!p || p->szBuf == '\0')
+		return;
+
 	char buf[sizeof(p->szBuf)];
 	strlcpy(buf, p->szBuf, sizeof(buf));
 
-	sys_err("HACK_DETECT: %s %s", ch->GetName(), buf);
+	char __escape_string[1024];
+	DBManager::instance().EscapeString(__escape_string, sizeof(__escape_string), buf, strlen(p->szBuf));
 
-	// 현재 클라이언트에서 이 패킷을 보내는 경우가 없으므로 무조건 끊도록 한다
-	ch->GetDesc()->SetPhase(PHASE_CLOSE);
+	char __escape_string2[1024];
+	if (strlen(p->szInfo))
+	{
+		char info[sizeof(p->szInfo)];
+		strlcpy(info, p->szInfo, sizeof(info));
+
+		DBManager::instance().EscapeString(__escape_string2, sizeof(__escape_string2), info, strlen(p->szInfo));
+	}
+	else
+		strcpy(__escape_string2, "-");
+
+	char szFinalStr[2096];
+	sprintf(szFinalStr, "%s|%s", __escape_string, __escape_string2);
+	
+	LogManager::instance().HackLog(szFinalStr, ch);
+
+	//if (ch->GetDesc())
+	//	ch->GetDesc()->DelayedDisconnect(3);
 }
 
 int32_t CInputMain::MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes)
@@ -2882,7 +3068,7 @@ void CInputMain::Refine(LPCHARACTER ch, const char* c_pData)
 
 	if (p->type == REFINE_TYPE_NORMAL)
 	{
-		sys_log (0, "refine_type_noraml");
+		sys_log (0, "refine_type_normal");
 		ch->DoRefine(item);
 	}
 	else if (p->type == REFINE_TYPE_SCROLL || p->type == REFINE_TYPE_HYUNIRON || p->type == REFINE_TYPE_MUSIN || p->type == REFINE_TYPE_BDRAGON)
@@ -2892,11 +3078,11 @@ void CInputMain::Refine(LPCHARACTER ch, const char* c_pData)
 	}
 	else if (p->type == REFINE_TYPE_MONEY_ONLY)
 	{
-		const LPITEM item = ch->GetInventoryItem(p->pos);
+		const LPITEM item2 = ch->GetInventoryItem(p->pos);
 
-		if (nullptr != item)
+		if (nullptr != item2)
 		{
-			if (500 <= item->GetRefineSet())
+			if (500 <= item2->GetRefineSet())
 			{
 				LogManager::instance().HackLog("DEVIL_TOWER_REFINE_HACK", ch);
 			}
@@ -2904,7 +3090,7 @@ void CInputMain::Refine(LPCHARACTER ch, const char* c_pData)
 			{
 				if (ch->GetQuestFlag("deviltower_zone.can_refine") > 0) // @fixme158 (allow multiple refine attempts)
 				{
-					if (ch->DoRefine(item, true))
+					if (ch->DoRefine(item2, true))
 						ch->SetQuestFlag("deviltower_zone.can_refine", ch->GetQuestFlag("deviltower_zone.can_refine") - 1);
 				}
 				else
@@ -2969,7 +3155,7 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 
 	int32_t iExtraLen = 0;
 	
-	if (test_server && bHeader != HEADER_CG_MOVE)
+	if (g_bIsTestServer && bHeader != HEADER_CG_MOVE)
 		sys_log(0, "CInputMain::Analyze() ==> Header [%d] ", bHeader);
 
 	switch (bHeader)
@@ -2983,7 +3169,7 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 			break;
 
 		case HEADER_CG_CHAT:
-			if (test_server)
+			if (g_bIsTestServer)
 			{
 				char* pBuf = (char*)c_pData;
 				sys_log(0, "%s", pBuf + sizeof(TPacketCGChat));
@@ -3017,11 +3203,13 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 				ItemDrop(ch, c_pData);
 			}
 			break;
+			
 #ifdef ENABLE_ACCE_SYSTEM
 		case HEADER_CG_ACCE:
 			Acce(ch, c_pData);
 			break;
 #endif
+
 		case HEADER_CG_ITEM_DROP2:
 			if (!ch->IsObserverMode())
 				ItemDrop2(ch, c_pData);
@@ -3127,6 +3315,14 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 			Target(ch, c_pData);
 			break;
 
+		case HEADER_CG_TARGET_DROP:
+			TargetDrop(ch, c_pData);
+			break;
+
+		case HEADER_CG_CHEST_DROP_INFO:
+			ChestDropInfo(ch, c_pData);
+			break;
+
 		case HEADER_CG_WARP:
 			Warp(ch, c_pData);
 			break;
@@ -3172,11 +3368,7 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 			break;
 
 		case HEADER_CG_ANSWER_MAKE_GUILD:
-#ifdef ENABLE_NEWGUILDMAKE
-			ch->ChatPacket(CHAT_TYPE_INFO, "<%s> AnswerMakeGuild disabled", __FUNCTION__);
-#else
 			AnswerMakeGuild(ch, c_pData);
-#endif
 			break;
 
 		case HEADER_CG_GUILD:

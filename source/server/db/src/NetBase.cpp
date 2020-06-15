@@ -5,13 +5,9 @@
 
 LPFDWATCH CNetBase::m_fdWatcher = nullptr;
 
-CNetBase::CNetBase()
-{
-}
+CNetBase::CNetBase() = default;
 
-CNetBase::~CNetBase()
-{
-}
+CNetBase::~CNetBase() = default;
 
 CNetPoller::CNetPoller()
 {

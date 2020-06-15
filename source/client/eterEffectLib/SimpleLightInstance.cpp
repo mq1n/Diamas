@@ -1,4 +1,4 @@
-#include "Stdafx.h"
+#include "StdAfx.h"
 #include "../eterLib/GrpLightManager.h"
 
 #include "SimpleLightInstance.h"
@@ -118,9 +118,7 @@ void CLightInstance::OnInitialize()
 void CLightInstance::OnDestroy()
 {
 	if (m_LightID)
-	{
 		CLightManager::Instance().DeleteLight(m_LightID);
-	}
 }
 
 CLightInstance::CLightInstance()

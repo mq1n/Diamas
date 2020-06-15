@@ -6,6 +6,8 @@
 #include "AbstractCharacterManager.h"
 #include "AbstractChat.h"
 #include "InstanceBase.h"
+#include "PythonBackground.h"
+#include "PythonMiniMap.h"
 
 #define ishan(ch)		(((ch) & 0xE0) > 0x90)
 #define ishanasc(ch)	(isascii(ch) || ishan(ch))
@@ -105,7 +107,7 @@ bool SplitToken(const char * c_szLine, CTokenVector * pstTokenVector, const char
 		if (strLine[beginPos] == '"')
 		{
 			++beginPos;
-			endPos = strLine.find_first_of("\"", beginPos);
+			endPos = strLine.find_first_of('\"', beginPos);
 
 			if (endPos < 0)
 				return false;
@@ -118,7 +120,7 @@ bool SplitToken(const char * c_szLine, CTokenVector * pstTokenVector, const char
 			basePos = endPos;
 		}
 
-		pstTokenVector->push_back(strLine.substr(beginPos, endPos - beginPos));
+		pstTokenVector->emplace_back(strLine.substr(beginPos, endPos - beginPos));
 
 		// 추가 코드. 맨뒤에 탭이 있는 경우를 체크한다. - [levites]
 		if (int32_t(strLine.find_first_not_of(c_szDelimeter, basePos)) < 0)
@@ -207,7 +209,7 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 				return;
 			}
 
-			uint32_t npcVNUM = (uint32_t)atoi(TokenVector[2].c_str());
+			auto npcVNUM = static_cast<uint32_t>(atoi(TokenVector[2].c_str()));
 			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_Cube_Open", Py_BuildValue("(i)", npcVNUM));
 		}
 		else if ("close" == TokenVector[1])
@@ -253,7 +255,7 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 				return;
 			}
 
-			uint32_t npcVNUM = (uint32_t)atoi(TokenVector[2].c_str());
+			auto npcVNUM = static_cast<uint32_t>(atoi(TokenVector[2].c_str()));
 
 			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_Cube_ResultList", Py_BuildValue("(is)", npcVNUM, TokenVector[4].c_str()));
 		}
@@ -270,8 +272,8 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 				return;
 			}
 
-			uint32_t requestStartIndex = (uint32_t)atoi(TokenVector[2].c_str());
-			uint32_t resultCount = (uint32_t)atoi(TokenVector[3].c_str());
+			auto requestStartIndex = static_cast<uint32_t>(atoi(TokenVector[2].c_str()));
+			auto resultCount = static_cast<uint32_t>(atoi(TokenVector[3].c_str()));
 
 			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_Cube_MaterialInfo", Py_BuildValue("(iis)", requestStartIndex, resultCount, TokenVector[4].c_str()));
 		}
@@ -416,6 +418,28 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 		int32_t iFlag = atoi(TokenVector[1].c_str());
 		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnBlockMode", Py_BuildValue("(i)", iFlag));
 	}
+	else if (!strcmpi(szCmd, "pl_storm_circle"))
+	{
+		int32_t iX = atoi(TokenVector[1].c_str());
+		int32_t iY = atoi(TokenVector[2].c_str());
+		int32_t iRadius = atoi(TokenVector[3].c_str());
+		CPythonMiniMap::Instance().SetStormCircle(iX, iY, iRadius);
+	}
+	else if (!strcmpi(szCmd, "pl_safezone_circle"))
+	{
+		int32_t iX = atoi(TokenVector[1].c_str());
+		int32_t iY = atoi(TokenVector[2].c_str());
+		int32_t iRadius = atoi(TokenVector[3].c_str());
+		CPythonMiniMap::Instance().SetNextSafeZoneCircle(iX, iY, iRadius);
+	}
+	else if (!strcmpi(szCmd, "pl_set_map"))
+	{
+		CPythonBackground::Instance().SetPrimalMap(atoi(TokenVector[1].c_str()) ? true : false);
+	}
+	else if (!strcmpi(szCmd, "pl_set_attackable"))
+	{
+		CPythonBackground::Instance().SetPrimalMapAttackable(atoi(TokenVector[1].c_str()) ? true : false);
+	}
 	// Emotion Start
 	else if (!strcmpi(szCmd, "french_kiss"))
 	{
@@ -523,7 +547,7 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 			s_emotionDict["joy"] = CRaceMotionData::NAME_JOY;
 		}
 
-		std::map<std::string, int32_t>::iterator f = s_emotionDict.find(szCmd);
+		auto f = s_emotionDict.find(szCmd);
 		if (f == s_emotionDict.end())
 		{
 			TraceError("Unknown Server Command %s | %s (parser %s)", c_szCommand, szCmd, parserType.c_str());

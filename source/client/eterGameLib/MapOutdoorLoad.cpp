@@ -43,7 +43,7 @@ bool CMapOutdoor::Load(float x, float y, float z)
 		const std::string& c_rstrMapName = GetName();
 		m_envDataName = c_rstrEnvironmentRoot + m_settings_envDataName;
 
-		if (0 == m_envDataName.compare(c_rstrEnvironmentRoot))
+		if (c_rstrEnvironmentRoot == m_envDataName)
 		{
 			const std::string& strAppendName = c_rstrMapName.substr(c_rstrMapName.size() - 2, 2);
 			m_envDataName = c_rstrEnvironmentRoot + strAppendName + ".msenv";
@@ -61,9 +61,8 @@ std::string& CMapOutdoor::GetEnvironmentDataName()
 
 bool CMapOutdoor::isTerrainLoaded(uint16_t wX, uint16_t wY)
 {
-	for (uint32_t i = 0; i < m_TerrainVector.size(); ++i)
+	for (auto pTerrain : m_TerrainVector)
 	{
-		CTerrain * pTerrain = m_TerrainVector[i];
 		uint16_t usCoordX, usCoordY;
 		pTerrain->GetCoordinate(&usCoordX, &usCoordY);
 		
@@ -75,9 +74,8 @@ bool CMapOutdoor::isTerrainLoaded(uint16_t wX, uint16_t wY)
 
 bool CMapOutdoor::isAreaLoaded(uint16_t wX, uint16_t wY)
 {
-	for (uint32_t i = 0; i < m_AreaVector.size(); ++i)
+	for (auto pArea : m_AreaVector)
 	{
-		CArea * pArea = m_AreaVector[i];
 		uint16_t usCoordX, usCoordY;
 		pArea->GetCoordinate(&usCoordX, &usCoordY);
 		
@@ -103,14 +101,13 @@ void CMapOutdoor::AssignTerrainPtr()
 	sReferenceCoordMinY = std::max(m_CurCoordinate.m_sTerrainCoordY - LOAD_SIZE_WIDTH, 0);
 	sReferenceCoordMaxY = std::min(m_CurCoordinate.m_sTerrainCoordY + LOAD_SIZE_WIDTH, m_sTerrainCountY - 1);
 
-	uint32_t i;
-	for (i = 0; i < AROUND_AREA_NUM; ++i)
+	for (uint32_t i = 0; i < AROUND_AREA_NUM; ++i)
 	{
 		m_pArea[i] = nullptr;
 		m_pTerrain[i] = nullptr;
 	}
 
-	for (i = 0; i < m_TerrainVector.size(); ++i)
+	for (uint32_t i = 0; i < m_TerrainVector.size(); ++i)
 	{
 		CTerrain * pTerrain = m_TerrainVector[i];
 		uint16_t usCoordX, usCoordY;
@@ -126,7 +123,7 @@ void CMapOutdoor::AssignTerrainPtr()
 		}
 	}
 
-	for (i = 0; i < m_AreaVector.size(); ++i)
+	for (uint32_t i = 0; i < m_AreaVector.size(); ++i)
 	{
 		CArea * pArea = m_AreaVector[i];
 		uint16_t usCoordX, usCoordY;
@@ -169,7 +166,7 @@ bool CMapOutdoor::LoadArea(uint16_t wAreaCoordX, uint16_t wAreaCoordY, uint16_t 
 	dwStartTime = ELTimer_GetMSec();
 #endif
 
-	m_AreaVector.push_back(pArea);
+	m_AreaVector.emplace_back(pArea);
 
 	pArea->EnablePortal(m_bEnablePortal);
 #ifdef _DEBUG
@@ -270,7 +267,7 @@ bool CMapOutdoor::LoadTerrain(uint16_t wTerrainCoordX, uint16_t wTerrainCoordY, 
 	
 	Tracef("CMapOutdoor::LoadTerrain %d\n", ELTimer_GetMSec() - dwStartTime);
 
-	m_TerrainVector.push_back(pTerrain);
+	m_TerrainVector.emplace_back(pTerrain);
 
 	return true;
 }
@@ -322,13 +319,9 @@ bool CMapOutdoor::LoadSetting(const char * c_szFileName)
 	}
 
 	if (stTokenVectorMap.end() != stTokenVectorMap.find("terrainvisible"))
-	{
 		m_bSettingTerrainVisible = (bool) (atoi(stTokenVectorMap["terrainvisible"][0].c_str()) != 0);
-	}
 	else
-	{
 		m_bSettingTerrainVisible = true;
-	}
 
 	if (stTokenVectorMap.end() != stTokenVectorMap.find("islavamap"))
 	{
@@ -349,9 +342,7 @@ bool CMapOutdoor::LoadSetting(const char * c_szFileName)
 	std::string strTextureSet;
 	TTokenVector & rkVec_strToken = stTokenVectorMap["textureset"];
 	if (!rkVec_strToken.empty())
-	{
 		strTextureSet = rkVec_strToken[0];
-	}
 
 	if (c_rstrType != "MapSetting")
 	{

@@ -37,7 +37,7 @@
 #define VERSIONHELPERAPI FORCEINLINE BOOL
 #endif // __cplusplus
 
-VERSIONHELPERAPI IsWindowsVersionOrGreater(uint16_t wMajorVersion, uint16_t wMinorVersion, uint16_t wServicePackMajor)
+VERSIONHELPERAPI IsWindowsVersionOrGreater(unsigned short wMajorVersion, unsigned short wMinorVersion, unsigned short wServicePackMajor)
 {
 	OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0,{ 0 }, 0, 0 };
 	DWORDLONG const dwlConditionMask = VerSetConditionMask(

@@ -136,7 +136,7 @@ public:
 
 private:
     /// \brief 복사 생성자 금지
-    cCsvRow(const cCsvRow&) {}
+	cCsvRow(const cCsvRow& obj) : std::vector<std::string>(obj) {}
 
     /// \brief 대입 연산자 금지
     const cCsvRow& operator = (const cCsvRow&) { return *this; }
@@ -300,7 +300,7 @@ public:
 
 private:
     /// \brief 현재 행을 반환한다.
-    const cCsvRow* const CurRow() const;
+    const cCsvRow* CurRow() const;
 
     /// \brief 복사 생성자 금지
     cCsvTable(const cCsvTable&) {}

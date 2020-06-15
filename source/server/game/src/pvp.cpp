@@ -230,7 +230,6 @@ void CPVPManager::Insert(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	// END_OF_NOTIFY_PVP_MESSAGE
 }
 
-#ifdef ENABLE_NEWSTUFF
 bool CPVPManager::IsFighting(LPCHARACTER pkChr)
 {
 	if (!pkChr)
@@ -256,7 +255,35 @@ bool CPVPManager::IsFighting(uint32_t dwPID)
 
 	return false;
 }
-#endif
+
+bool CPVPManager::IsDuelingInstance(LPCHARACTER pkChr)
+{
+	CPVPSetMap::iterator it = m_map_pkPVPSetByID.find(pkChr->GetPlayerID());
+
+	if (it == m_map_pkPVPSetByID.end())
+		return false;
+
+	return true;
+}
+
+void CPVPManager::RemoveFromDuel(LPCHARACTER pkChr)
+{
+	CPVPSetMap::iterator it = m_map_pkPVPSetByID.find(pkChr->GetPlayerID());
+
+	if (it == m_map_pkPVPSetByID.end())
+		return;
+
+	auto it2 = it->second.begin();
+
+	while (it2 != it->second.end())
+	{
+		CPVP * pkPVP = *it2++;
+
+		pkPVP->Packet(true);
+		Delete(pkPVP);
+	}
+}
+
 
 void CPVPManager::ConnectEx(LPCHARACTER pkChr, bool bDisconnect)
 {
@@ -283,7 +310,20 @@ void CPVPManager::Connect(LPCHARACTER pkChr)
 
 void CPVPManager::Disconnect(LPCHARACTER pkChr)
 {
-	//ConnectEx(pkChr, true);
+	/*
+    CPVPSetMap::iterator it = m_map_pkPVPSetByID.find(pkChr->GetPlayerID());
+    
+    if (it == m_map_pkPVPSetByID.end())
+        return;
+    
+    std::unordered_set<CPVP*>::iterator it2 = it->second.begin();
+    
+    while (it2 != it->second.end()) {
+        CPVP * pkPVP = *it2++;
+        pkPVP->Packet(true);
+        Delete(pkPVP);	
+    }
+	*/
 }
 
 void CPVPManager::GiveUp(LPCHARACTER pkChr, uint32_t dwKillerPID) // This method is calling from no where yet.
@@ -372,6 +412,42 @@ bool CPVPManager::Dead(LPCHARACTER pkChr, uint32_t dwKillerPID)
 	return found;
 }
 
+void CPVPManager::Reject(LPCHARACTER pkChr, LPCHARACTER pkVictim)
+{
+	CPVPSetMap::iterator it = m_map_pkPVPSetByID.find(pkChr->GetPlayerID());
+
+	if (it == m_map_pkPVPSetByID.end())
+		return;
+
+	auto it2 = it->second.begin();
+
+	while (it2 != it->second.end())
+	{
+		CPVP * pkPVP = *it2++;
+
+		uint32_t dwCompanionPID;
+
+		if (pkPVP->m_players[0].dwPID == pkChr->GetPlayerID())
+			dwCompanionPID = pkPVP->m_players[1].dwPID;
+		else
+			dwCompanionPID = pkPVP->m_players[0].dwPID;
+
+		if (dwCompanionPID == pkVictim->GetPlayerID())
+		{
+			if (pkPVP->IsFight())
+			{
+				pkChr->ChatPacket(CHAT_TYPE_INFO, "Duellodayken bunu yapamazsin"); //you can not use this in duel
+				return;
+			}
+
+			pkPVP->Packet(true);
+			Delete(pkPVP);
+
+			pkVictim->ChatPacket(CHAT_TYPE_INFO, "%s Duello teklifini reddetti", pkChr->GetName()); // %s is rejected your duel
+		}
+	}
+}
+
 bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 {
 	switch (pkVictim->GetCharType())
@@ -404,7 +480,7 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 				break;
 			case MOUNT_TYPE_NORMAL:
 			default:
-				if (test_server)
+				if (g_bIsTestServer)
 					sys_log(0, "CanUseSkill: Mount can't attack. vnum(%u) type(%d)", pkChr->GetMountVnum(), static_cast<int32_t>(eIsMount));
 				return false;
 				break;

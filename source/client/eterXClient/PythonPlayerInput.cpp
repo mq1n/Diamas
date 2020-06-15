@@ -2,8 +2,8 @@
 #include "PythonPlayer.h"
 #include "PythonPlayerEventHandler.h"
 #include "PythonApplication.h"
-#include "../eterlib/Camera.h"
-#include "../eterbase/Timer.h"
+#include "../eterLib/Camera.h"
+#include "../eterBase/Timer.h"
 
 const int32_t c_iFastestSendingCount = 3;
 const int32_t c_iSlowestSendingCount = 3;
@@ -101,9 +101,7 @@ void CPythonPlayer::SetTarget(uint32_t dwVID, BOOL bForceChange /*= TRUE*/, bool
 
 	// 2004. 07. 07. [levites] - 스킬 사용중 타겟이 바뀌는 문제 해결을 위한 코드
 	if (!pkInstMain->CanChangeTarget())
-	{
 		return;
-	}
 
 	uint32_t dwCurrentTime = CTimer::Instance().GetCurrentMillisecond();
 
@@ -129,9 +127,7 @@ void CPythonPlayer::SetTarget(uint32_t dwVID, BOOL bForceChange /*= TRUE*/, bool
 	else
 	{
 		if (m_dwTargetEndTime > dwCurrentTime)
-		{
 			return;
-		}
 
 		m_dwTargetEndTime = dwCurrentTime + 1000;
 	}
@@ -281,12 +277,9 @@ void CPythonPlayer::__OnClickActor(CInstanceBase& rkInstMain, uint32_t dwPickedA
 	}
 
 	if (rkInstVictim.IsNPC())
-	{
 		SendClickActorPacket(rkInstVictim);
-	}
 
 	rkInstMain.NEW_Stop();
-	return;
 }
 
 void CPythonPlayer::__OnPressActor(CInstanceBase& rkInstMain, uint32_t dwPickedActorID, bool isAuto)
@@ -348,9 +341,7 @@ void CPythonPlayer::__OnPressActor(CInstanceBase& rkInstMain, uint32_t dwPickedA
 	}
 
 	if (!rkInstMain.IsAttackableInstance(rkInstVictim))
-	{
 		return;
-	}
 
 	CPythonPlayerEventHandler& rkPlayerEventHandler=CPythonPlayerEventHandler::GetSingleton();
 	rkInstMain.NEW_AttackToDestInstanceDirection(rkInstVictim, rkPlayerEventHandler.GetNormalBowAttackFlyEventHandler(&rkInstMain, &rkInstVictim));	
@@ -424,7 +415,6 @@ void CPythonPlayer::__OnPressGround(CInstanceBase& rkInstMain, const TPixelPosit
 	if (!rkInstMain.NEW_MoveToDestPixelPositionDirection(c_rkPPosPickedGround))
 	{
 		__ReserveClickGround(c_rkPPosPickedGround);
-		return;
 	}
 }
 
@@ -593,7 +583,6 @@ void CPythonPlayer::NEW_Attack()
 		else
 		{
 			PyCallClassMemberFunc(m_ppyGameWindow, "OnCannotUseSkill", Py_BuildValue("(is)", GetMainCharacterIndex(), "NEED_TARGET"));
-			return;
 		}
 	}
 	else if (m_isDirKey)
@@ -691,9 +680,7 @@ bool CPythonPlayer::__CanChangeTarget()
 bool CPythonPlayer::__CanMove()
 {
 	if (__IsProcessingEmotion())
-	{
 		return false;
-	}
 
 	CInstanceBase* pkInstMain=NEW_GetMainActorPtr();
 	if (!pkInstMain) 
@@ -738,9 +725,7 @@ bool CPythonPlayer::__OLD_CanMove()
 bool CPythonPlayer::__CanAttack()
 {
 	if (__IsProcessingEmotion())
-	{
 		return false;
-	}
 
 	if (IsOpenPrivateShop())
 		return false;
@@ -945,9 +930,7 @@ void CPythonPlayer::__ReserveProcess_ClickActor()
 	}
 
 	if (pkInstReserved->GetVirtualID() != GetTargetVID())
-	{
 		SetTarget(pkInstReserved->GetVirtualID());
-	}
 
 	/* note :  자동공격 관련 문제로 이쪽에 추가.
 	 * CanAttack의 호출을 꼭 필요한데서만 호출되게 고쳐야할 필요성이 있음..

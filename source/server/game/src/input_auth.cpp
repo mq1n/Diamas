@@ -21,31 +21,8 @@ bool FN_IS_VALID_LOGIN_STRING(const char *str)
 
 	for (tmp = str; *tmp; ++tmp)
 	{
-		// 알파벳과 수자만 허용
 		if (isdigit(*tmp) || isalpha(*tmp))
 			continue;
-
-#ifdef ENABLE_ACCOUNT_W_SPECIALCHARS
-		
-		switch (*tmp)
-		{
-			case ' ':
-			case '_':
-			case '-':
-			case '.':
-			case '!':
-			case '@':
-			case '#':
-			case '$':
-			case '%':
-			case '^':
-			case '&':
-			case '*':
-			case '(':
-			case ')':
-				continue;
-		}
-#endif
 		return false;
 	}
 
@@ -118,7 +95,8 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 	}
 
 	uint32_t dwKey = DESC_MANAGER::instance().CreateLoginKey(d);
-	sys_log(0, "InputAuth::Login : key %u login %s", dwKey, login);
+
+	sys_log (0, "InputAuth::Login : key %u: login %s", dwKey, login);
 
 	TPacketCGLogin3 * p = M2_NEW TPacketCGLogin3;
 	memcpy(p, pinfo, sizeof(TPacketCGLogin3));
@@ -179,7 +157,7 @@ int32_t CInputAuth::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 
 	int32_t iExtraLen = 0;
 
-	if (test_server)
+	if (g_bIsTestServer)
 		sys_log(0, " InputAuth Analyze Header[%d] ", bHeader);
 
 	switch (bHeader)

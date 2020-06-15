@@ -59,7 +59,7 @@ struct stringhash
 {
 	size_t operator () (const std::string & str) const
 	{
-		const uint8_t * s = (const uint8_t*) str.c_str();
+		const uint8_t * s = reinterpret_cast<const uint8_t*>(str.c_str());
 		const uint8_t * end = s + str.size();
 		size_t h = 0;
 

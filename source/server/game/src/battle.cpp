@@ -5,6 +5,7 @@
 #include "char.h"
 #include "char_manager.h"
 #include "battle.h"
+#include "GPosition.h"
 #include "item.h"
 #include "item_manager.h"
 #include "mob_manager.h"
@@ -20,6 +21,12 @@
 #include "sectree.h"
 #include "ani.h"
 #include "locale_service.h"
+#include "affect_flag.h"
+#include "../../common/service.h"
+#include "quest_manager.h"
+#include "db.h"
+#include "log.h"
+#include "battleground.h"
 
 int32_t battle_hit(LPCHARACTER ch, LPCHARACTER victim, int32_t & iRetDam);
 
@@ -58,7 +65,6 @@ bool timed_event_cancel(LPCHARACTER ch)
 	return false;
 }
 
-#ifdef NEW_ICEDAMAGE_SYSTEM
 bool battle_is_icedamage(LPCHARACTER pAttacker, LPCHARACTER pVictim)
 {
 	if (pAttacker && pAttacker->IsPC())
@@ -86,17 +92,47 @@ bool battle_is_icedamage(LPCHARACTER pAttacker, LPCHARACTER pVictim)
 	}
 	return true;
 }
-#endif
 
 bool battle_is_attackable(LPCHARACTER ch, LPCHARACTER victim)
 {
+	if (ch->GetBattlegroundTeamID() && ch->GetBattlegroundTeamID() == victim->GetBattlegroundTeamID())
+		return false;
+
 	if (victim->IsDead())
 		return false;
 
-	if (victim->GetMyShop())
-		return false;
+	if (ch->IsPC())
+	{
+		if (ch->IsObserverMode())
+			return false;
+			
+		if (ch->IsMining())
+			return false;
+
+		if (ch->IsFishing())
+			return false;
+		
+		if (ch->GetMyShop() && ch->IsInHome())
+			return false;
+	}
+	if (victim->IsPC())
+	{
+		if (victim->IsObserverMode())
+			return false;
+			
+		if (victim->IsMining())
+			return false;
+
+		if (victim->IsFishing())
+			return false;
+		
+		if (victim->GetMyShop() && victim->IsInHome())
+			return false;
+	}
+	
 
 	// 안전지대면 중단
+	if (!ch->IsGuardNPC())
 	{
 		SECTREE	*sectree = nullptr;
 
@@ -108,10 +144,10 @@ bool battle_is_attackable(LPCHARACTER ch, LPCHARACTER victim)
 		if (sectree && sectree->IsAttr(victim->GetX(), victim->GetY(), ATTR_BANPK))
 			return false;
 	}
-#ifdef NEW_ICEDAMAGE_SYSTEM
+
 	if (!battle_is_icedamage(ch, victim))
 		return false;
-#endif
+
 	if (ch->IsStun() || ch->IsDead())
 		return false;
 
@@ -130,24 +166,26 @@ bool battle_is_attackable(LPCHARACTER ch, LPCHARACTER victim)
 	if (CArenaManager::instance().CanAttack(ch, victim) == true)
 		return true;
 
+	if (CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()) && ch->IsMonster())
+		return true;
+
 	return CPVPManager::instance().CanAttack(ch, victim);
 }
 
 int32_t battle_melee_attack(LPCHARACTER ch, LPCHARACTER victim)
 {
-	if (test_server&&ch->IsPC())
-		sys_log(0, "battle_melee_attack : [%s] attack to [%s]", ch->GetName(), victim->GetName());
-
 	if (!victim || ch == victim)
 		return BATTLE_NONE;
 
-	if (test_server&&ch->IsPC())
-		sys_log(0, "battle_melee_attack : [%s] attack to [%s]", ch->GetName(), victim->GetName());
-
 	if (!battle_is_attackable(ch, victim))
+	{
+		if (g_bIsTestServer && ch->IsPC())
+			sys_log(0, "battle_melee_attack_not_attackable : [%s] attempted to attack [%s](%u)", ch->GetName(), victim->GetName(), (uint32_t)victim->GetVID());
+
 		return BATTLE_NONE;
-	
-	if (test_server&&ch->IsPC())
+	}
+
+	if (g_bIsTestServer && ch->IsPC())
 		sys_log(0, "battle_melee_attack : [%s] attack to [%s]", ch->GetName(), victim->GetName());
 
 	// 거리 체크
@@ -171,7 +209,7 @@ int32_t battle_melee_attack(LPCHARACTER ch, LPCHARACTER victim)
 
 		if (distance > max)
 		{
-			if (test_server)
+			if (g_bIsTestServer)
 				sys_log(0, "VICTIM_FAR: %s distance: %d max: %d", ch->GetName(), distance, max);
 
 			return BATTLE_NONE;
@@ -187,7 +225,7 @@ int32_t battle_melee_attack(LPCHARACTER ch, LPCHARACTER victim)
 	ch->SetPosition(POS_FIGHTING);
 	ch->SetVictim(victim);
 
-	const PIXEL_POSITION & vpos = victim->GetXYZ();
+	const GPOS & vpos = victim->GetXYZ();
 	ch->SetRotationToXY(vpos.x, vpos.y);
 
 	int32_t dam;
@@ -521,7 +559,7 @@ int32_t CalcMeleeDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, bool bIgno
 
 	iDam = MAX(0, iAtk - iDef);
 
-	if (test_server)
+	if (g_bIsTestServer)
 	{
 		int32_t DEBUG_iLV = pkAttacker->GetLevel()*2;
 		int32_t DEBUG_iST = int32_t((pkAttacker->GetPoint(POINT_ATT_GRADE) - DEBUG_iLV) * fAR);
@@ -560,7 +598,7 @@ int32_t CalcMeleeDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, bool bIgno
 		if (iDam != DEBUG_iPureDam)
 			snprintf(szUnknownDam, sizeof(szUnknownDam), "+?(%d)", iDam-DEBUG_iPureDam);
 
-		char szMeleeAttack[128];
+		char szMeleeAttack[256];
 
 		snprintf(szMeleeAttack, sizeof(szMeleeAttack), 
 				"%s(%d)-%s(%d)=%d%s, ATK=LV(%d)+ST(%d)+WP(%d)%s%s%s, AR=%.3g%s", 
@@ -638,7 +676,7 @@ int32_t CalcArrowDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, LPITEM pkB
 
 	iPureDam = (iPureDam * iPercent) / 100;
 
-	if (test_server)
+	if (g_bIsTestServer)
 	{
 		pkAttacker->ChatPacket(CHAT_TYPE_INFO, "ARROW %s -> %s, DAM %d DIST %d GAP %d %% %d",
 				pkAttacker->GetName(), 
@@ -677,8 +715,7 @@ void NormalAttackAffect(LPCHARACTER pkAttacker, LPCHARACTER pkVictim)
 
 int32_t battle_hit(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, int32_t & iRetDam)
 {
-	//PROF_UNIT puHit("Hit");
-	if (test_server)
+	if (g_bIsTestServer)
 		sys_log(0, "battle_hit : [%s] attack to [%s] : dam :%d type :%d", pkAttacker->GetName(), pkVictim->GetName(), iRetDam);
 
 	int32_t iDam = CalcMeleeDamage(pkAttacker, pkVictim);
@@ -730,15 +767,18 @@ int32_t battle_hit(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, int32_t & iRetD
 
 
 	//최종적인 데미지 보정. (2011년 2월 현재 대왕거미에게만 적용.)
-	float attMul = pkAttacker->GetAttMul();
-	float tempIDam = iDam;
-	iDam = attMul * tempIDam + 0.5f;
+	iDam = static_cast<int64_t>(iDam * pkAttacker->GetAttMul() + 0.5f);
 
 	iRetDam = iDam;
 
-	//PROF_UNIT puDam("Dam");
 	if (pkVictim->Damage(pkAttacker, iDam, DAMAGE_TYPE_NORMAL))
+	{
+		sys_log(0, "dead: [%s](%u) attacked to [%s](%u) - dam:%d", pkAttacker->GetName(), (uint32_t)pkAttacker->GetVID(), pkVictim->GetName(), (uint32_t)pkVictim->GetVID(), iDam);
 		return (BATTLE_DEAD);
+	}
+
+	if (g_bIsTestServer)
+		sys_log(0, "battle_hit: [%s](%u) attack to [%s](%u) - dam: %d", pkAttacker->GetName(), (uint32_t)pkAttacker->GetVID(), pkVictim->GetName(), (uint32_t)pkVictim->GetVID(), iRetDam);
 
 	return (BATTLE_DAMAGE);
 }
@@ -799,7 +839,8 @@ void SET_ATTACKED_TIME(LPCHARACTER ch, LPCHARACTER victim, uint32_t current_time
 
 bool IS_SPEED_HACK(LPCHARACTER ch, LPCHARACTER victim, uint32_t current_time)
 {
-	if(!gHackCheckEnable) return false;
+	if (!gHackCheckEnable)
+		return false;
 
 	if (ch->m_kAttackLog.dwVID == victim->GetVID())
 	{
@@ -807,7 +848,7 @@ bool IS_SPEED_HACK(LPCHARACTER ch, LPCHARACTER victim, uint32_t current_time)
 		{
 			INCREASE_SPEED_HACK_COUNT(ch);
 
-			if (test_server)
+			if (g_bIsTestServer)
 			{
 				sys_log(0, "%s attack hack! time (delta, limit)=(%u, %u) hack_count %d",
 						ch->GetName(),
@@ -836,7 +877,7 @@ bool IS_SPEED_HACK(LPCHARACTER ch, LPCHARACTER victim, uint32_t current_time)
 		{
 			INCREASE_SPEED_HACK_COUNT(ch);
 
-			if (test_server)
+			if (g_bIsTestServer)
 			{
 				sys_log(0, "%s Attack Speed HACK! time (delta, limit)=(%u, %u), hack_count = %d",
 						ch->GetName(),

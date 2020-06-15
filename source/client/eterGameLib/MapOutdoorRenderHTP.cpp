@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "MapOutdoor.h"
 
-#include "../eterlib/StateManager.h"
+#include "../eterLib/StateManager.h"
 
 void CMapOutdoor::__RenderTerrain_RenderHardwareTransformPatch()
 {
@@ -85,8 +85,8 @@ void CMapOutdoor::__RenderTerrain_RenderHardwareTransformPatch()
 	std::pair<float, int32_t> fog_far(fFogFarDistance+1600.0f, 0);
 	std::pair<float, int32_t> fog_near(fFogNearDistance-3200.0f, 0);
 
-	std::vector<std::pair<float ,int32_t> >::iterator far_it = std::upper_bound(m_PatchVector.begin(),m_PatchVector.end(),fog_far);
-	std::vector<std::pair<float ,int32_t> >::iterator near_it = std::upper_bound(m_PatchVector.begin(),m_PatchVector.end(),fog_near);
+	auto far_it = std::upper_bound(m_PatchVector.begin(), m_PatchVector.end(), fog_far);
+	auto near_it = std::upper_bound(m_PatchVector.begin(), m_PatchVector.end(), fog_near);
 
 	// NOTE: Word Editor 툴에서는 fog far보다 멀리있는 물체를 텍스쳐 없이 그리는 작업을 하지 않음
 #ifdef WORLD_EDITOR
@@ -105,7 +105,7 @@ void CMapOutdoor::__RenderTerrain_RenderHardwareTransformPatch()
 	SelectIndexBuffer(0, &wPrimitiveCount, &ePrimitiveType);
 
 	uint32_t dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
-	std::vector<std::pair<float, int32_t> >::iterator it = m_PatchVector.begin();
+	auto it = m_PatchVector.begin();
 
 	// NOTE: 맵툴에서는 view ~ fog near 사이의 지형을 fog disabled 상태로 그리는 작업을 하지 않음.
 #ifndef WORLD_EDITOR
@@ -436,9 +436,9 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(int32_t patchnum, ui
 					}
 				}
 				
-				std::vector<int32_t>::iterator aIterator = std::find(m_RenderedTextureNumVector.begin(), m_RenderedTextureNumVector.end(), (int32_t)j);
+				auto aIterator = std::find(m_RenderedTextureNumVector.begin(), m_RenderedTextureNumVector.end(), (int32_t)j);
 				if (aIterator == m_RenderedTextureNumVector.end())
-					m_RenderedTextureNumVector.push_back(j);
+					m_RenderedTextureNumVector.emplace_back(j);
 				++m_iRenderedSplatNum;
 				if (m_iRenderedSplatNum >= m_iSplatLimit)
 					break;
@@ -519,9 +519,9 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(int32_t patchnum, ui
 			
 			++nRenderTextureCount;
 			
-			std::vector<int32_t>::iterator aIterator = std::find(m_RenderedTextureNumVector.begin(), m_RenderedTextureNumVector.end(), (int32_t)j);
+			auto aIterator = std::find(m_RenderedTextureNumVector.begin(), m_RenderedTextureNumVector.end(), (int32_t) j);
 			if (aIterator == m_RenderedTextureNumVector.end())
-				m_RenderedTextureNumVector.push_back(j);
+				m_RenderedTextureNumVector.emplace_back(j);
 			++m_iRenderedSplatNum;
 			if (m_iRenderedSplatNum >= m_iSplatLimit)
 				break;
@@ -561,9 +561,9 @@ void CMapOutdoor::__HardwareTransformPatch_RenderPatchSplat(int32_t patchnum, ui
 			STATEMANAGER.DrawIndexedPrimitive(ePrimitiveType, 0, m_iPatchTerrainVertexCount, 0, wPrimitiveCount);			
 		}
 
-		std::vector<int32_t>::iterator aIterator = std::find(m_RenderedTextureNumVector.begin(), m_RenderedTextureNumVector.end(), (int32_t)j);
+		auto aIterator = std::find(m_RenderedTextureNumVector.begin(), m_RenderedTextureNumVector.end(), (int32_t) j);
 		if (aIterator == m_RenderedTextureNumVector.end())
-			m_RenderedTextureNumVector.push_back(j);
+			m_RenderedTextureNumVector.emplace_back(j);
 		++m_iRenderedSplatNum;
 		if (m_iRenderedSplatNum >= m_iSplatLimit)
 			break;

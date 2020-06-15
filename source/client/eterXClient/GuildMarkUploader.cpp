@@ -81,20 +81,21 @@ bool CGuildMarkUploader::__LoadSymbol(const char* c_szFileName, uint32_t* peErro
 	}
 	ilDeleteImages(1, &uImg);
 
-	FILE * file = fopen(c_szFileName, "rb");
-	if (!file)
+	/////
+
+	msl::file_ptr fPtr(c_szFileName, "rb");
+	if (!fPtr)
 	{
 		*peError = ERROR_LOAD;
 		return false;
 	}
 
-	fseek(file, 0, SEEK_END);
-	auto dwSymbolBufSize = ftell(file);
-	fseek(file, 0, SEEK_SET);
+	auto dwSymbolBufSize = fPtr.size();
 
 	m_pbySymbolBuf.resize(dwSymbolBufSize);
-	fread(m_pbySymbolBuf.data(), m_pbySymbolBuf.size(), 1, file);
-	fclose(file);
+	fread(m_pbySymbolBuf.data(), m_pbySymbolBuf.size(), 1, fPtr.get());
+
+	/////
 
 	m_dwSymbolCRC32 = GetFileCRC32(c_szFileName);
 	return true;
@@ -197,7 +198,6 @@ bool CGuildMarkUploader::__StateProcess()
 	{
 		case STATE_LOGIN:
 			return __LoginState_Process();
-			break;
 		case STATE_COMPLETE:
 			return false;
 	}
@@ -302,6 +302,7 @@ bool CGuildMarkUploader::__LoginState_RecvPhase()
 		}
 	}
 
+	CPythonApplication::Instance().SetGameStage(kPacketPhase.stage);
 	return true;
 }
 
@@ -343,9 +344,7 @@ bool CGuildMarkUploader::__LoginState_RecvKeyAgreement()
 {
 	TPacketKeyAgreement packet;
 	if (!Recv(sizeof(packet), &packet))
-	{
 		return false;
-	}
 
 	Tracenf("KEY_AGREEMENT RECV %u", packet.wDataLength);
 
@@ -364,8 +363,8 @@ bool CGuildMarkUploader::__LoginState_RecvKeyAgreement()
 	{
 		// Key agreement 성공, 응답 전송
 		packetToSend.bHeader = HEADER_CG_KEY_AGREEMENT;
-		packetToSend.wAgreedLength = (uint16_t)agreedLength;
-		packetToSend.wDataLength = (uint16_t)dataLength;
+		packetToSend.wAgreedLength = static_cast<uint16_t>(agreedLength);
+		packetToSend.wDataLength = static_cast<uint16_t>(dataLength);
 
 		if (!Send(sizeof(packetToSend), &packetToSend))
 		{
@@ -387,9 +386,7 @@ bool CGuildMarkUploader::__LoginState_RecvKeyAgreementCompleted()
 {
 	TPacketKeyAgreementCompleted packet;
 	if (!Recv(sizeof(packet), &packet))
-	{
 		return false;
-	}
 
 	Tracenf("KEY_AGREEMENT_COMPLETED RECV");
 

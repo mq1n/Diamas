@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Type.h"
-#include "../eterbase/Random.h"
-#include "../eterlib/Pool.h"
+#include "../eterBase/Random.h"
+#include "../eterLib/Pool.h"
 class CParticleInstance;
 
 namespace NEffectUpdateDecorator
@@ -15,7 +15,8 @@ namespace NEffectUpdateDecorator
 		CParticleInstance * pInstance;
 		CDecoratorData(float fTime, float fElapsedTime, CParticleInstance * pInstance)
 			: fTime(fTime), fElapsedTime(fElapsedTime), pInstance(pInstance)
-		{}
+	{
+	}
 	};
 	class CBaseDecorator
 	{
@@ -99,8 +100,8 @@ namespace NEffectUpdateDecorator
 	template <class T> class CTimeEventDecorator : public CBaseDecorator, public CPooledObject<CTimeEventDecorator<T> >
 	{
 	public:
-		typedef CTimeEvent<T> TTimeEventType;
-		typedef std::vector<TTimeEventType> TTimeEventContainerType;
+		using TTimeEventType = CTimeEvent<T>;
+		using TTimeEventContainerType = std::vector<TTimeEventType>;
 		CTimeEventDecorator(const TTimeEventContainerType& TimeEventContainer, T * pValue = 0) 
 			:	it_start(TimeEventContainer.begin()),
 				it_end(TimeEventContainer.end()),
@@ -133,13 +134,9 @@ namespace NEffectUpdateDecorator
 		virtual void __Excute(const CDecoratorData & d) 
 		{
 			if (it_start==it_end)
-			{
 				RemoveMe();
-			}
 			else if (it_cur->m_fTime>d.fTime)
-			{
 				*pData = it_cur->m_Value;
-			}
 			else
 			{
 				while (it_next!=it_end && it_next->m_fTime<=d.fTime)
@@ -168,12 +165,12 @@ namespace NEffectUpdateDecorator
 		T * pData;
 	};
 
-	typedef CTimeEventDecorator<float> CScaleValueDecorator;
-	typedef CTimeEventDecorator<float> CColorValueDecorator;
-	typedef CTimeEventDecorator<DWORDCOLOR> CColorAllDecorator;
-	typedef CTimeEventDecorator<float> CAirResistanceValueDecorator;
-	typedef CTimeEventDecorator<float> CGravityValueDecorator;
-	typedef CTimeEventDecorator<float> CRotationSpeedValueDecorator;
+	using CScaleValueDecorator = CTimeEventDecorator<float>;
+	using CColorValueDecorator = CTimeEventDecorator<float>;
+	using CColorAllDecorator = CTimeEventDecorator<DWORDCOLOR>;
+	using CAirResistanceValueDecorator = CTimeEventDecorator<float>;
+	using CGravityValueDecorator = CTimeEventDecorator<float>;
+	using CRotationSpeedValueDecorator = CTimeEventDecorator<float>;
 
 	class CTextureAnimationCWDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationCWDecorator>
 	{
@@ -213,7 +210,7 @@ namespace NEffectUpdateDecorator
 				fLastFrameTime += fFrameTime;
 
 				if (--(*pIdx) >= n && n != 0) // Because variable is uint32_t..
-					*pIdx = uint8_t(n - 1);
+					*pIdx = static_cast<uint8_t>(n - 1);
 			}
 		}
 		uint8_t n;

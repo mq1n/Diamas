@@ -31,6 +31,4 @@ CGameEventManager::CGameEventManager() : m_CenterPosition(0.0f, 0.0f, 0.0f)
 {
 }
 
-CGameEventManager::~CGameEventManager()
-{
-}
+CGameEventManager::~CGameEventManager() = default;

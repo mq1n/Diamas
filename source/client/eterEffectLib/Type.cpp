@@ -22,7 +22,7 @@ BOOL GetTokenTimeEventFloat(CTextFileLoader & rTextFileLoader, const char * c_sz
 
 void InsertItemTimeEventFloat(TTimeEventTableFloat * pTable, float fTime, float fValue)
 {
-	TTimeEventTableFloat::iterator itor = pTable->begin();
+	auto itor = pTable->begin();
 	for (; itor != pTable->end(); ++itor)
 	{
 		TTimeEventTypeFloat & rTimeEvent = *itor;
@@ -34,5 +34,5 @@ void InsertItemTimeEventFloat(TTimeEventTableFloat * pTable, float fTime, float 
 	TimeEvent.m_fTime = fTime;
 	TimeEvent.m_Value = fValue;
 
-	pTable->insert(itor, TimeEvent);
+	pTable->emplace(itor, TimeEvent);
 }

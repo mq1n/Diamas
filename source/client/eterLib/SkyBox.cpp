@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "SkyBox.h"
 #include "Camera.h"
 #include "StateManager.h"
@@ -184,26 +184,22 @@ void CSkyObject::StartTransition()
 
 void CSkyObject::TSkyObjectFace::StartTransition()
 {
-	for (uint8_t uci = 0; uci < m_SkyObjectQuadVector.size(); ++uci)
-	{
-		m_SkyObjectQuadVector[uci].StartTransition();
-	}
+	for (auto & uci : m_SkyObjectQuadVector)
+		uci.StartTransition();
 }
 
 bool CSkyObject::TSkyObjectFace::Update()
 {
 	bool bResult = false;
-	for (uint32_t dwi = 0; dwi < m_SkyObjectQuadVector.size(); ++dwi)
- 		bResult = m_SkyObjectQuadVector[dwi].Update() || bResult;
+	for (auto & dwi : m_SkyObjectQuadVector)
+		bResult = dwi.Update() || bResult;
  	return bResult;
 }
 
 void CSkyObject::TSkyObjectFace::Render()
 {
-	for (uint8_t uci = 0; uci < m_SkyObjectQuadVector.size(); ++uci)
-	{
-		m_SkyObjectQuadVector[uci].Render();
-	}
+	for (auto & uci : m_SkyObjectQuadVector)
+		uci.Render();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -247,20 +243,20 @@ void CSkyBox::SetFaceTexture( const char* c_szFileName, int32_t iFaceIndex )
 	if( iFaceIndex < 0 || iFaceIndex > 5 ) 
 		return;
 
-	TGraphicImageInstanceMap::iterator itor = m_GraphicImageInstanceMap.find(c_szFileName);
+	auto itor = m_GraphicImageInstanceMap.find(c_szFileName);
 	if (m_GraphicImageInstanceMap.end() != itor)
 		return;
 
 	m_Faces[iFaceIndex].m_strFaceTextureFileName = c_szFileName;
 
 	CGraphicImageInstance * pGraphicImageInstance = GenerateTexture(c_szFileName);
-	m_GraphicImageInstanceMap.insert(TGraphicImageInstanceMap::value_type(c_szFileName, pGraphicImageInstance));
+	m_GraphicImageInstanceMap.emplace(c_szFileName, pGraphicImageInstance);
 }
 
 
 void CSkyBox::SetCloudTexture(const char * c_szFileName)
 {
-	TGraphicImageInstanceMap::iterator itor = m_GraphicImageInstanceMap.find(c_szFileName);
+	auto itor = m_GraphicImageInstanceMap.find(c_szFileName);
 	if (m_GraphicImageInstanceMap.end() != itor)
 		return;
 
@@ -303,7 +299,7 @@ void CSkyBox::SetCloudScrollSpeed(const D3DXVECTOR2 & c_rv2CloudScrollSpeed)
 
 void CSkyBox::Unload()
 {
-	TGraphicImageInstanceMap::iterator itor = m_GraphicImageInstanceMap.begin();
+	auto itor = m_GraphicImageInstanceMap.begin();
 
 	while (itor != m_GraphicImageInstanceMap.end())
 	{

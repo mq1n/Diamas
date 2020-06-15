@@ -70,18 +70,17 @@ static void GrannyError(granny_log_message_type Type, granny_log_message_origin 
 		File, Line, Error, Type, GrannyGetLogMessageTypeString(Type), Origin, GrannyGetLogMessageOriginString(Origin));
 }
 
-bool PackInitialize(const char* c_pszFolder)
+bool PackInitialize(const std::string& folder)
 {
-	if (!std::filesystem::exists(c_pszFolder))
+	if (!std::filesystem::exists(folder))
 	{
-		TraceError("%s folder not exist", c_pszFolder);
+		TraceError("Folder: %s not found", folder.c_str());
 		return false;
 	}
 
 	CTextFileLoader::SetCacheMode();
 	CSoundData::SetPackMode();
 
-	const std::string folder = c_pszFolder;
 	const std::string indexFile = folder + "/Index";
 	const std::string devIndexFile = folder + "/DevIndex";
 
@@ -103,7 +102,7 @@ bool PackInitialize(const char* c_pszFolder)
 	for (size_t i = 0; i < TextLoader.GetLineCount(); ++i)
 	{
 		const std::string& ArchiveName = TextLoader.GetLineString(i);
-		Tracenf("%u) %s", i, ArchiveName.c_str());
+//		Tracenf("%u) %s", i, ArchiveName.c_str());
 
 		if (ArchiveName.empty())
 		{
@@ -126,8 +125,9 @@ bool PackInitialize(const char* c_pszFolder)
 bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 {
 	initDynamicModuleMgr();
-	/////////////////////////////////////////////	
+#ifndef __USE_CYTHON__
 	initpack();
+#endif
 	initdbg();
 	initime();
 	initgrp();
@@ -170,6 +170,7 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 #else
 	PyModule_AddIntConstant(builtins, "__DEBUG__", 1);
 #endif
+
 #ifdef __USE_CYTHON__
 	PyModule_AddIntConstant(builtins, "__USE_CYTHON__", 1);
 #else
@@ -183,11 +184,18 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 	char szSystemPyFailMsg[] = { 'M', 'a', 'i', 'n', ' ', 's', 'c', 'r', 'i', 'p', 't', ' ', 'i', 'n', 'i', 't', 'i', 'l', 'i', 'z', 'a', 't', 'i', 'o', 'n', ' ', 'f', 'a', 'i', 'l', 'e', 'd', '!', 0x0 }; // Main script initilization failed!
 
 	__PROTECTOR_START__("RunFile")
+
+#ifdef __USE_CYTHON__
+	initrootlibManager();
+	initsystem();
+	PyErr_Print();
+#else
 	if (!pyLauncher.RunFile(szSystemFile, szSystemMod))
 	{
 		TraceError(szSystemPyFailMsg);
 		return false;
 	}
+#endif
 	__PROTECTOR_END__("RunFile")
 
 	return true;

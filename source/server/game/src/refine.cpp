@@ -11,6 +11,9 @@ CRefineManager::~CRefineManager()
 
 bool CRefineManager::Initialize(TRefineTable * table, int32_t size)
 {
+	if (!m_map_RefineRecipe.empty())
+		m_map_RefineRecipe.clear();
+
 	for (int32_t i = 0; i < size; ++i, ++table)
 	{
 		sys_log(0, "REFINE %d prob %d cost %d", table->id, table->prob, table->cost);

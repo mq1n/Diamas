@@ -1,7 +1,6 @@
 #include "stdafx.h"
-
 #include "config.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "char.h"
 
 #undef sys_err

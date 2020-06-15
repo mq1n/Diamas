@@ -1,13 +1,9 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "SoundManagerStream.h"
 
-CSoundManagerStream::CSoundManagerStream()
-{
-}
+CSoundManagerStream::CSoundManagerStream() = default;
 
-CSoundManagerStream::~CSoundManagerStream()
-{	
-}
+CSoundManagerStream::~CSoundManagerStream() = default;
 
 bool CSoundManagerStream::Initialize()
 {

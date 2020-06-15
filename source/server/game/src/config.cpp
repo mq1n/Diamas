@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include <sstream>
-#ifndef __WIN32__
+#ifndef _WIN32
 #include <ifaddrs.h>
 #endif
 
@@ -43,7 +43,6 @@ uint32_t	g_dwItemBonusChangeTime = 60;
 bool	g_bAllMountAttack = false;
 bool	g_bEnableBootaryCheck = false;
 bool	g_bGMHostCheck = false;
-bool	g_bGuildInviteLimit = false;
 bool	g_bGuildInfiniteMembers = false;
 bool	g_bEnableSpeedHackCrash = false;
 int32_t		g_iStatusPointGetLevelLimit = 90;
@@ -59,16 +58,9 @@ uint32_t	g_dwSkillBookNextReadMax = 43200;
 std::string	g_stProxyIP = "";
 // #endif
 
-uint8_t	PK_PROTECT_LEVEL = 15;
-
-// TRAFFIC_PROFILER
-bool		g_bTrafficProfileOn = false;
-uint32_t		g_dwTrafficProfileFlushCycle = 3600;
-// END_OF_TRAFFIC_PROFILER
-
-int32_t			test_server = 0;
-bool		distribution_test_server = false;
-bool		guild_mark_server = true;
+int32_t			g_bIsTestServer = 0;
+int32_t			game_stage = STAGE_NULL;
+bool		guild_mark_server = false;
 uint8_t		guild_mark_min_level = 3;
 bool		no_wander = false;
 int32_t		g_iUserLimit = 32768;
@@ -78,38 +70,32 @@ char		g_szInternalIP[16] = "0";
 bool		g_bSkillDisable = false;
 int32_t			g_iFullUserCount = 1200;
 int32_t			g_iBusyUserCount = 650;
-//Canada
-//int32_t			g_iFullUserCount = 600;
-//int32_t			g_iBusyUserCount = 350;
-//Brazil
-//int32_t			g_iFullUserCount = 650;
-//int32_t			g_iBusyUserCount = 450;
 bool		g_bEmpireWhisper = true;
 uint8_t		g_bAuthServer = false;
 
 uint32_t	g_dwClientVersion = 1215955205;
 
+uint8_t		g_bPKProtectLevel = 15;
+
 string	g_stAuthMasterIP;
 uint16_t		g_wAuthMasterPort = 0;
 
 string g_stHostname = "";
-string g_table_postfix = "";
 
 string g_stQuestDir = "./quest";
 //string g_stQuestObjectDir = "./quest/object";
 string g_stDefaultQuestObjectDir = "./quest/object";
 std::set<string> g_setQuestObjectDir;
 
-std::vector<std::string>	g_stAdminPageIP;
-std::string	g_stAdminPagePassword = "SHOWMETHEMONEY";
-
 string g_stBlockDate = "30000705";
 
 extern string g_stLocale;
-
 int32_t SPEEDHACK_LIMIT_COUNT   = 50;
 int32_t SPEEDHACK_LIMIT_BONUS   = 80;
 int32_t g_iSyncHackLimitCount = 10;
+
+bool	g_bDisableMovspeedHacklog = false;
+double	g_dMovspeedHackThreshold = 0.75;
 
 //시야 = VIEW_RANGE + VIEW_BONUS_RANGE
 //VIEW_BONUSE_RANGE : 클라이언트와 시야 처리에서너무 딱 떨어질경우 문제가 발생할수있어 500CM의 여분을 항상준다.
@@ -127,7 +113,6 @@ bool		g_bCheckMultiHack = true;
 
 int32_t			g_iSpamBlockMaxLevel = 10;
 
-void		LoadStateUserCount();
 bool            g_protectNormalPlayer   = false;        // 범법자가 "평화모드" 인 일반유저를 공격하지 못함
 bool            g_noticeBattleZone      = false;        // 중립지대에 입장하면 안내메세지를 알려줌
 
@@ -146,16 +131,14 @@ bool g_BlockCharCreation = false;
 
 bool is_string_true(const char * string)
 {
-	bool	result = 0;
-	if (isnhdigit(*string))
+	bool result = false;
+	if (isdigit(*string))
 	{
-		str_to_number(result, string);
-		return result > 0 ? true : false;
+		str_to_bool(result, string);
+		return result;
 	}
-	else if (LOWER(*string) == 't')
-		return true;
-	else
-		return false;
+
+	return (LOWER(*string) == 't');
 }
 
 static std::set<int32_t> s_set_map_allows;
@@ -206,36 +189,9 @@ void map_allow_copy(int32_t * pl, int32_t size)
 	}
 }
 
-static void FN_add_adminpageIP(char *line)
-{
-	char	*last;
-	const char *delim = " \t\r\n";
-	char *v = strtok_r(line, delim, &last);
-
-	while (v)
-	{
-		g_stAdminPageIP.push_back(v);
-		v = strtok_r(nullptr, delim, &last);
-	}
-}
-
-static void FN_log_adminpage()
-{
-	auto iter = g_stAdminPageIP.begin();
-
-	while (iter != g_stAdminPageIP.end())
-	{
-		dev_log(LOG_DEB0, "ADMIN_PAGE_IP = %s", (*iter).c_str());
-		++iter;
-	}
-
-	dev_log(LOG_DEB0, "ADMIN_PAGE_PASSWORD = %s", g_stAdminPagePassword.c_str());
-}
-
-#define ENABLE_AUTODETECT_INTERNAL_IP
 bool GetIPInfo()
 {
-#ifndef __WIN32__
+#ifndef _WIN32
 	struct ifaddrs* ifaddrp = nullptr;
 
 	if (0 != getifaddrs(&ifaddrp))
@@ -255,16 +211,16 @@ bool GetIPInfo()
 	HOSTENT* host_ent;
 	int32_t n = 0;
 
-	if (WSAStartup(0x0101, &wsa_data)) {
+	if (WSAStartup(0x0101, &wsa_data))
 		return false;
-	}
 
 	gethostname(host_name, sizeof(host_name));
 	host_ent = gethostbyname(host_name);
-	if (host_ent == nullptr) {
+	if (host_ent == nullptr)
 		return false;
-	}
-	for ( ; host_ent->h_addr_list[n] != nullptr; ++n) {
+
+	for (; host_ent->h_addr_list[n] != nullptr; ++n)
+	{
 		struct sockaddr_in addr;
 		struct sockaddr_in* sai = &addr;
 		memcpy(&sai->sin_addr.s_addr, host_ent->h_addr_list[n], host_ent->h_length);
@@ -272,28 +228,10 @@ bool GetIPInfo()
 
 		char * netip = inet_ntoa(sai->sin_addr);
 
-		if (!strncmp(netip, "192.168", 7)) // ignore if address is starting with 192
-		{
-			strlcpy(g_szInternalIP, netip, sizeof(g_szInternalIP));
-#ifndef __WIN32__
-			fprintf(stderr, "INTERNAL_IP: %s interface %s\n", netip, ifap->ifa_name);
-#else
-			fprintf(stderr, "INTERNAL_IP: %s\n", netip);
-#endif
-		}
-		else if (!strncmp(netip, "10.", 3))
-		{
-			strlcpy(g_szInternalIP, netip, sizeof(g_szInternalIP));
-#ifndef __WIN32__
-			fprintf(stderr, "INTERNAL_IP: %s interface %s\n", netip, ifap->ifa_name);
-#else
-			fprintf(stderr, "INTERNAL_IP: %s\n", netip);
-#endif
-		}
-		else if (g_szPublicIP[0] == '0')
+		if (g_szPublicIP[0] == '0')
 		{
 			strlcpy(g_szPublicIP, netip, sizeof(g_szPublicIP));
-#ifndef __WIN32__
+#ifndef _WIN32
 			fprintf(stderr, "PUBLIC_IP: %s interface %s\n", netip, ifap->ifa_name);
 #else
 			fprintf(stderr, "PUBLIC_IP: %s\n", netip);
@@ -301,7 +239,7 @@ bool GetIPInfo()
 		}
 	}
 
-#ifndef __WIN32__
+#ifndef _WIN32
 	freeifaddrs( ifaddrp );
 #else
 	WSACleanup();
@@ -309,21 +247,8 @@ bool GetIPInfo()
 
 	if (g_szPublicIP[0] != '0')
 		return true;
-	else
-	{
-#ifdef ENABLE_AUTODETECT_INTERNAL_IP
-		if (g_szInternalIP[0] == '0')
-			return false;
-		else
-		{
-			strlcpy(g_szPublicIP, g_szInternalIP, sizeof(g_szPublicIP));
-			fprintf(stderr, "INTERNAL_IP -> PUBLIC_IP: %s\n", g_szPublicIP);
-			return true;
-		}
-#else
-		return false;
-#endif
-	}
+
+	return false;
 }
 
 static bool __LoadConnectConfigFile(const char* configName)
@@ -495,35 +420,7 @@ static bool __LoadConnectConfigFile(const char* configName)
 
 	fprintf(stdout, "CommonSQL connected\n");
 
-	// 로케일 정보를 가져오자 
-	// <경고> 쿼리문에 절대 조건문(WHERE) 달지 마세요. (다른 지역에서 문제가 생길수 있습니다)
-	{
-		char szQuery[512];
-		snprintf(szQuery, sizeof(szQuery), "SELECT mKey, mValue FROM locale");
-
-		std::unique_ptr<SQLMsg> pMsg(AccountDB::instance().DirectQuery(szQuery));
-
-		if (pMsg->Get()->uiNumRows == 0)
-		{
-			fprintf(stderr, "COMMON_SQL: DirectQuery failed : %s\n", szQuery);
-			exit(1);
-		}
-
-		MYSQL_ROW row; 
-
-		while (nullptr != (row = mysql_fetch_row(pMsg->Get()->pSQLResult)))
-		{
-			// 로케일 세팅
-			if (strcasecmp(row[0], "LOCALE") == 0)
-			{
-				if (LocaleService_Init(row[1]) == false)
-				{
-					fprintf(stderr, "COMMON_SQL: invalid locale key %s\n", row[1]);
-					exit(1);
-				}
-			}
-		}
-	}
+	LocaleService_Init("turkey");
 
 	// 로케일 정보를 COMMON SQL에 세팅해준다.
 	// 참고로 g_stLocale 정보는 LocaleService_Init() 내부에서 세팅된다.
@@ -606,7 +503,7 @@ static bool __LoadConnectConfigFile(const char* configName)
 		// 종족별 스킬 세팅
 		for (int32_t job = 0; job < JOB_MAX_NUM * 2; ++job)
 		{
-			snprintf(szQuery, sizeof(szQuery), "SELECT mValue from locale where mKey='SKILL_POWER_BY_LEVEL_TYPE%d' ORDER BY CAST(mValue AS uint32_t)", job);
+			snprintf(szQuery, sizeof(szQuery), "SELECT mValue from locale where mKey='SKILL_POWER_BY_LEVEL_TYPE%d' ORDER BY CAST(mValue AS unsigned)", job);
 			std::unique_ptr<SQLMsg> pMsg(AccountDB::instance().DirectQuery(szQuery));
 
 			// 세팅이 안되어있으면 기본테이블을 사용한다.
@@ -686,7 +583,7 @@ static bool __LoadDefaultConfigFile(const char* configName)
 
 			for (; *p; p++)
 			{
-				if (isnhspace(*p))
+				if (isspace(*p))
 				{
 					if (stNum.length())
 					{
@@ -764,31 +661,6 @@ static bool __LoadGeneralConfigFile(const char* configName)
 		{
 			g_stBlockDate = value_string;
 		}
-
-		TOKEN("adminpage_ip")
-		{
-			FN_add_adminpageIP(value_string);
-		}
-
-		TOKEN("adminpage_ip1")
-		{
-			FN_add_adminpageIP(value_string);
-		}
-
-		TOKEN("adminpage_ip2")
-		{
-			FN_add_adminpageIP(value_string);
-		}
-
-		TOKEN("adminpage_ip3")
-		{
-			FN_add_adminpageIP(value_string);
-		}
-
-		TOKEN("adminpage_password")
-		{
-			g_stAdminPagePassword = value_string;
-		}
 		// DB_ONLY_END
 
 		// CONNECTION_BEGIN
@@ -863,24 +735,18 @@ static bool __LoadGeneralConfigFile(const char* configName)
 			continue;
 		}
 
-		TOKEN("table_postfix")
-		{
-			g_table_postfix = value_string;
-			continue;
-		}
-
 		TOKEN("test_server")
 		{
 			printf("-----------------------------------------------\n");
 			printf("TEST_SERVER\n");
 			printf("-----------------------------------------------\n");
-			str_to_number(test_server, value_string);
+			str_to_number(g_bIsTestServer, value_string);
 			continue;
 		}
 
-		TOKEN("distribution_test_server")
+		TOKEN("game_stage")
 		{
-			str_to_number(distribution_test_server, value_string);
+			str_to_number(game_stage, value_string);
 			continue;
 		}
 
@@ -896,7 +762,6 @@ static bool __LoadGeneralConfigFile(const char* configName)
 			continue;
 		}
 
-#ifdef ENABLE_NEWSTUFF
 		TOKEN("item_count_limit")
 		{
 			str_to_number(g_bItemCountLimit, value_string);
@@ -1138,16 +1003,6 @@ static bool __LoadGeneralConfigFile(const char* configName)
 			continue;
 		}
 
-		TOKEN("guild_invite_limit")
-		{
-			uint32_t flag = 0;
-			str_to_number(flag, value_string);
-
-			g_bGuildInviteLimit = !!flag;
-			fprintf(stdout, "GUILD_INVITE_LIMIT: %d\n", g_bGuildInviteLimit);
-			continue;
-		}
-
 		TOKEN("guild_infinite_members")
 		{
 			uint32_t flag = 0;
@@ -1155,6 +1010,18 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 			g_bGuildInfiniteMembers = !!flag;
 			fprintf(stdout, "GUILD_INFINITE_MEMBERS: %d\n", g_bGuildInfiniteMembers);
+			continue;
+		}
+
+		TOKEN("disable_movspeed_hacklog")
+		{
+			str_to_number(g_bDisableMovspeedHacklog, value_string);
+			continue;
+		}
+
+		TOKEN("movspeed_hack_threshold")
+		{
+			str_to_number(g_dMovspeedHackThreshold, value_string);
 			continue;
 		}
 
@@ -1188,13 +1055,6 @@ static bool __LoadGeneralConfigFile(const char* configName)
 		TOKEN("proxy_ip")
 		{
 			g_stProxyIP = value_string;
-		}
-#endif
-
-		TOKEN("traffic_profile")
-		{
-			g_bTrafficProfileOn = true;
-			continue;
 		}
 
 		TOKEN("no_wander")
@@ -1309,8 +1169,8 @@ static bool __LoadGeneralConfigFile(const char* configName)
 
 		TOKEN("pk_protect_level")
 		{
-		    str_to_number(PK_PROTECT_LEVEL, value_string);
-		    fprintf(stderr, "PK_PROTECT_LEVEL: %d", PK_PROTECT_LEVEL);
+		    str_to_number(g_bPKProtectLevel, value_string);
+		    fprintf(stderr, "PK_PROTECT_LEVEL: %d", g_bPKProtectLevel);
 		}
 
 		TOKEN("max_level")
@@ -1353,7 +1213,6 @@ static bool __LoadGeneralConfigFile(const char* configName)
 	return true;
 	}
 
-#define ENABLE_CMD_PLAYER
 static bool __LoadDefaultCMDFile(const char* cmdName)
 	{
 	FILE	*fp;
@@ -1370,11 +1229,7 @@ static bool __LoadDefaultCMDFile(const char* cmdName)
 
 			if (!*cmd || !*levelname)
 			{
-#ifdef ENABLE_CMD_PLAYER
 				fprintf(stderr, "CMD syntax error: <cmd> <PLAYER | LOW_WIZARD | WIZARD | HIGH_WIZARD | GOD | IMPLEMENTOR | DISABLE>\n");
-#else
-				fprintf(stderr, "CMD syntax error: <cmd> <LOW_WIZARD | WIZARD | HIGH_WIZARD | GOD | IMPLEMENTOR | DISABLE>\n");
-#endif
 				exit(1);
 			}
 
@@ -1388,23 +1243,15 @@ static bool __LoadDefaultCMDFile(const char* cmdName)
 				level = GM_GOD;
 			else if (!strcasecmp(levelname, "IMPLEMENTOR"))
 				level = GM_IMPLEMENTOR;
-#ifdef ENABLE_CMD_PLAYER
 			else if (!strcasecmp(levelname, "PLAYER"))
 				level = GM_PLAYER;
-#endif
-			else if (!strcasecmp(levelname, "DISABLE"))
-				level = GM_DISABLE;
 			else
 			{
-#ifdef ENABLE_CMD_PLAYER
 				fprintf(stderr, "CMD syntax error: <cmd> <PLAYER | LOW_WIZARD | WIZARD | HIGH_WIZARD | GOD | IMPLEMENTOR | DISABLE>\n");
-#else
-				fprintf(stderr, "CMD syntax error: <cmd> <LOW_WIZARD | WIZARD | HIGH_WIZARD | GOD | IMPLEMENTOR | DISABLE>\n");
-#endif
 				exit(1);
 			}
 
-			if (test_server)
+			if (g_bIsTestServer)
 				fprintf(stdout, "CMD_REWRITE: [%s] [%s:%d]\n", cmd, levelname, level);
 			interpreter_set_privilege(cmd, level);
 		}
@@ -1415,7 +1262,6 @@ static bool __LoadDefaultCMDFile(const char* cmdName)
 	return false;
 }
 
-#define ENABLE_EXPTABLE_FROMDB
 #ifdef ENABLE_EXPTABLE_FROMDB
 static bool __LoadExpTableFromDB(void)
 {
@@ -1478,29 +1324,6 @@ void config_init(const string& st_localeServiceName)
 		fprintf(stderr, "Can not open [%s]\n", st_configFileName.c_str());
 		exit(1);
 	}
-#ifdef ENABLE_GENERAL_CONFIG
-	// general config - locale based
-	{
-		char szFileName[256];
-		snprintf(szFileName, sizeof(szFileName), "%s/conf/GENERAL_%s", LocaleService_GetBasePath().c_str(), st_configFileName.c_str());
-		if (__LoadGeneralConfigFile(szFileName))
-			fprintf(stderr, "GENERAL CONFIG LOAD OK [%s]\n", szFileName);
-	}
-	// general config - locale n channel based
-	{
-		char szFileName[256];
-		snprintf(szFileName, sizeof(szFileName), "%s/conf/GENERAL_%s_CHANNEL_%d", LocaleService_GetBasePath().c_str(), st_configFileName.c_str(), g_bChannel);
-		if (__LoadGeneralConfigFile(szFileName))
-			fprintf(stderr, "GENERAL CONFIG LOAD OK [%s]\n", szFileName);
-	}
-	// general config - locale n channel n hostname based
-	{
-		char szFileName[256];
-		snprintf(szFileName, sizeof(szFileName), "%s/conf/GENERAL_%s_CHANNEL_%d_HOSTNAME_%s", LocaleService_GetBasePath().c_str(), st_configFileName.c_str(), g_bChannel, g_stHostname.c_str());
-		if (__LoadGeneralConfigFile(szFileName))
-			fprintf(stderr, "GENERAL CONFIG LOAD OK [%s]\n", szFileName);
-	}
-#endif
 
 	if (g_setQuestObjectDir.empty())
 		g_setQuestObjectDir.insert(g_stDefaultQuestObjectDir);
@@ -1539,35 +1362,9 @@ void config_init(const string& st_localeServiceName)
 
 	std::string st_cmdFileName("CMD");
 	__LoadDefaultCMDFile(st_cmdFileName.c_str());
-#ifdef ENABLE_GENERAL_CMD
-	// general cmd - locale based
-	{
-		char szFileName[256];
-		snprintf(szFileName, sizeof(szFileName), "%s/conf/GENERAL_%s", LocaleService_GetBasePath().c_str(), st_cmdFileName.c_str());
-		if (__LoadDefaultCMDFile(szFileName))
-			fprintf(stdout, "GENERAL CMD LOAD OK [%s]\n", szFileName);
-	}
-	// general cmd - locale n channel based
-	{
-		char szFileName[256];
-		snprintf(szFileName, sizeof(szFileName), "%s/conf/GENERAL_%s_CHANNEL_%d", LocaleService_GetBasePath().c_str(), st_cmdFileName.c_str(), g_bChannel);
-		if (__LoadDefaultCMDFile(szFileName))
-			fprintf(stdout, "GENERAL CMD LOAD OK [%s]\n", szFileName);
-	}
-	// general cmd - locale n channel n hostname based
-	{
-		char szFileName[256];
-		snprintf(szFileName, sizeof(szFileName), "%s/conf/GENERAL_%s_CHANNEL_%d_HOSTNAME_%s", LocaleService_GetBasePath().c_str(), st_cmdFileName.c_str(), g_bChannel, g_stHostname.c_str());
-		if (__LoadDefaultCMDFile(szFileName))
-			fprintf(stdout, "GENERAL CMD LOAD OK [%s]\n", szFileName);
-	}
-#endif
-
-	LoadStateUserCount();
 
 	CWarMapManager::instance().LoadWarMapInfo(nullptr);
 
-	FN_log_adminpage();
 	if (g_szPublicIP[0] == '0')
 	{
 		fprintf(stderr, "Can not get public ip address\n");
@@ -1575,19 +1372,3 @@ void config_init(const string& st_localeServiceName)
 	}
 }
 
-const char* get_table_postfix()
-{
-	return g_table_postfix.c_str();
-}
-
-void LoadStateUserCount()
-{
-	FILE * fp = fopen("state_user_count", "r");
-
-	if (!fp)
-		return;
-
-	fscanf(fp, " %d %d ", &g_iFullUserCount, &g_iBusyUserCount);
-
-	fclose(fp);
-}

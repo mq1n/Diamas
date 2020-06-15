@@ -5,17 +5,6 @@
 class CEffectManager : public CScreen, public CSingleton<CEffectManager>
 {
 	public:
-		enum EEffectType
-		{
-			EFFECT_TYPE_NONE				= 0,
-			EFFECT_TYPE_PARTICLE			= 1,
-			EFFECT_TYPE_ANIMATION_TEXTURE	= 2,
-			EFFECT_TYPE_MESH				= 3,
-			EFFECT_TYPE_SIMPLE_LIGHT		= 4,
-
-			EFFECT_TYPE_MAX_NUM				= 4,
-		};
-
 		typedef std::map<uint32_t, CEffectData*> TEffectDataMap;
 		typedef std::map<uint32_t, CEffectInstance*> TEffectInstanceMap;
 

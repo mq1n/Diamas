@@ -28,7 +28,7 @@ uint32_t CRaceData::GetSmokeEffectID(uint32_t eSmoke)
 
 CRaceData::SHair* CRaceData::FindHair(uint32_t eHair)
 {
-	std::map<uint32_t, SHair>::iterator f=m_kMap_dwHairKey_kHair.find(eHair);
+	auto f = m_kMap_dwHairKey_kHair.find(eHair);
 	if (m_kMap_dwHairKey_kHair.end()==f)
 	{
 		if (eHair != 0)
@@ -47,13 +47,13 @@ void CRaceData::SetHairSkin(uint32_t eHair, uint32_t ePart, const char * c_szMod
 	kSkin.m_stDstFileName=c_szDstFileName;
 
 	CFileNameHelper::ChangeDosPath(kSkin.m_stSrcFileName);
-	m_kMap_dwHairKey_kHair[eHair].m_kVct_kSkin.push_back(kSkin);
+	m_kMap_dwHairKey_kHair[eHair].m_kVct_kSkin.emplace_back(kSkin);
 	m_kMap_dwHairKey_kHair[eHair].m_stModelFileName = c_szModelFileName;
 }
 
 CRaceData::SShape* CRaceData::FindShape(uint32_t eShape)
 {
-	std::map<uint32_t, SShape>::iterator f=m_kMap_dwShapeKey_kShape.find(eShape);
+	auto f = m_kMap_dwShapeKey_kShape.find(eShape);
 	if (m_kMap_dwShapeKey_kShape.end()==f)
 		return nullptr;
 
@@ -73,7 +73,7 @@ void CRaceData::AppendShapeSkin(uint32_t eShape, uint32_t ePart, const char* c_s
 	kSkin.m_stDstFileName=c_szDstFileName;
 
 	CFileNameHelper::ChangeDosPath(kSkin.m_stSrcFileName);
-	m_kMap_dwShapeKey_kShape[eShape].m_kVct_kSkin.push_back(kSkin);
+	m_kMap_dwShapeKey_kShape[eShape].m_kVct_kSkin.emplace_back(kSkin);
 }
 
 CRaceData* CRaceData::New()
@@ -163,7 +163,7 @@ BOOL CRaceData::GetMotionKey(uint16_t wMotionModeIndex, uint16_t wMotionIndex, M
 
 BOOL CRaceData::GetMotionModeDataPointer(uint16_t wMotionMode, TMotionModeData ** ppMotionModeData)
 {
-	TMotionModeDataIterator itor = m_pMotionModeDataMap.find(wMotionMode);
+	auto itor = m_pMotionModeDataMap.find(wMotionMode);
 	if (itor == m_pMotionModeDataMap.end())
 		return FALSE;
 
@@ -174,7 +174,7 @@ BOOL CRaceData::GetMotionModeDataPointer(uint16_t wMotionMode, TMotionModeData *
 
 BOOL CRaceData::GetModelDataPointer(uint32_t dwModelIndex, const TModelData ** c_ppModelData)
 {
-	TModelDataMapIterator itor = m_ModelDataMap.find(dwModelIndex);
+	auto itor = m_ModelDataMap.find(dwModelIndex);
 	if (m_ModelDataMap.end() == itor)
 		return false;
 
@@ -189,7 +189,7 @@ BOOL CRaceData::GetMotionVectorPointer(uint16_t wMotionMode, uint16_t wMotionInd
 	if (!GetMotionModeDataPointer(wMotionMode, &pMotionModeData))
 		return FALSE;
 
-	TMotionVectorMap::iterator itor = pMotionModeData->MotionVectorMap.find(wMotionIndex);
+	auto itor = pMotionModeData->MotionVectorMap.find(wMotionIndex);
 	if (pMotionModeData->MotionVectorMap.end() == itor)
 		return FALSE;
 
@@ -285,7 +285,7 @@ void CRaceData::SetRace(uint32_t dwRaceIndex)
 
 void CRaceData::RegisterAttachingBoneName(uint32_t dwPartIndex, const char * c_szBoneName)
 {
-	m_AttachingBoneNameMap.insert(TAttachingBoneNameMap::value_type(dwPartIndex, c_szBoneName));
+	m_AttachingBoneNameMap.emplace(dwPartIndex, c_szBoneName);
 }
 
 void CRaceData::ChangeAttachingBoneName(uint32_t dwPartIndex, const char * c_szBoneName)
@@ -303,7 +303,7 @@ void CRaceData::RegisterMotionMode(uint16_t wMotionModeIndex)
 	TMotionModeData * pMotionModeData = ms_MotionModeDataPool.Alloc();
 	pMotionModeData->wMotionModeIndex = wMotionModeIndex;
 	pMotionModeData->MotionVectorMap.clear();
-	m_pMotionModeDataMap.insert(TMotionModeDataMap::value_type(wMotionModeIndex, pMotionModeData));
+	m_pMotionModeDataMap.emplace(wMotionModeIndex, pMotionModeData);
 }
 
 CGraphicThing* CRaceData::NEW_RegisterMotion(CRaceMotionData* pkMotionData, uint16_t wMotionModeIndex, uint16_t wMotionIndex, const char * c_szFileName, uint8_t byPercentage)
@@ -321,7 +321,7 @@ CGraphicThing* CRaceData::NEW_RegisterMotion(CRaceMotionData* pkMotionData, uint
 	kMotion.byPercentage = byPercentage;
 	kMotion.pMotion		 = pMotionThing;
 	kMotion.pMotionData	 = pkMotionData;
-	pMotionModeData->MotionVectorMap[wMotionIndex].push_back(kMotion);
+	pMotionModeData->MotionVectorMap[wMotionIndex].emplace_back(kMotion);
 
 	return pMotionThing;
 }
@@ -377,18 +377,18 @@ void CRaceData::__OLD_RegisterMotion(uint16_t wMotionMode, uint16_t wMotionIndex
 		return;
 	}
 
-	TMotionVectorMap::iterator itor = pMotionModeData->MotionVectorMap.find(wMotionIndex);
+	auto itor = pMotionModeData->MotionVectorMap.find(wMotionIndex);
 	if (pMotionModeData->MotionVectorMap.end() == itor)
 	{
 		TMotionVector MotionVector;
-		MotionVector.push_back(rMotion);
+		MotionVector.emplace_back(rMotion);
 
-		pMotionModeData->MotionVectorMap.insert(TMotionVectorMap::value_type(wMotionIndex, MotionVector));
+		pMotionModeData->MotionVectorMap.emplace(wMotionIndex, MotionVector);
 	}
 	else
 	{
 		TMotionVector & rMotionVector = itor->second;
-		rMotionVector.push_back(rMotion);
+		rMotionVector.emplace_back(rMotion);
 	}
 }
 
@@ -403,19 +403,15 @@ bool CRaceData::SetMotionRandomWeight(uint16_t wMotionModeIndex, uint16_t wMotio
 		return false;
 	}
 
-	TMotionVectorMap::iterator itor = pMotionModeData->MotionVectorMap.find(wMotionIndex);
+	auto itor = pMotionModeData->MotionVectorMap.find(wMotionIndex);
 
 	if (pMotionModeData->MotionVectorMap.end() != itor)
 	{
 		TMotionVector & rMotionVector = itor->second;
 		if (wMotionSubIndex < rMotionVector.size())
-		{
 			rMotionVector[wMotionSubIndex].byPercentage = byPercentage;
-		}
 		else
-		{
 			return false;
-		}
 	}
 	else
 	{
@@ -430,11 +426,11 @@ bool CRaceData::SetMotionRandomWeight(uint16_t wMotionModeIndex, uint16_t wMotio
 
 void CRaceData::RegisterNormalAttack(uint16_t wMotionModeIndex, uint16_t wMotionIndex)
 {
-	m_NormalAttackIndexMap.insert(TNormalAttackIndexMap::value_type(wMotionModeIndex, wMotionIndex));
+	m_NormalAttackIndexMap.emplace(wMotionModeIndex, wMotionIndex);
 }
 BOOL CRaceData::GetNormalAttackIndex(uint16_t wMotionModeIndex, uint16_t * pwMotionIndex)
 {
-	TNormalAttackIndexMap::iterator itor = m_NormalAttackIndexMap.find(wMotionModeIndex);
+	auto itor = m_NormalAttackIndexMap.find(wMotionModeIndex);
 
 	if (m_NormalAttackIndexMap.end() == itor)
 		return FALSE;
@@ -449,12 +445,12 @@ void CRaceData::ReserveComboAttack(uint16_t wMotionModeIndex, uint16_t wComboTyp
 	TComboData ComboData;
 	ComboData.ComboIndexVector.clear();
 	ComboData.ComboIndexVector.resize(dwComboCount);
-	m_ComboAttackDataMap.insert(TComboAttackDataMap::value_type(MAKE_COMBO_KEY(wMotionModeIndex, wComboType), ComboData));
+	m_ComboAttackDataMap.emplace(MAKE_COMBO_KEY(wMotionModeIndex, wComboType), ComboData);
 }
 
 void CRaceData::RegisterComboAttack(uint16_t wMotionModeIndex, uint16_t wComboType, uint32_t dwComboIndex, uint16_t wMotionIndex)
 {
-	TComboAttackDataIterator itor = m_ComboAttackDataMap.find(MAKE_COMBO_KEY(wMotionModeIndex, wComboType));
+	auto itor = m_ComboAttackDataMap.find(MAKE_COMBO_KEY(wMotionModeIndex, wComboType));
 	if (m_ComboAttackDataMap.end() == itor)
 		return;
 
@@ -470,7 +466,7 @@ void CRaceData::RegisterComboAttack(uint16_t wMotionModeIndex, uint16_t wComboTy
 
 BOOL CRaceData::GetComboDataPointer(uint16_t wMotionModeIndex, uint16_t wComboType, TComboData ** ppComboData)
 {
-	TComboAttackDataIterator itor = m_ComboAttackDataMap.find(MAKE_COMBO_KEY(wMotionModeIndex, wComboType));
+	auto itor = m_ComboAttackDataMap.find(MAKE_COMBO_KEY(wMotionModeIndex, wComboType));
 
 	if (m_ComboAttackDataMap.end() == itor)
 		return FALSE;
@@ -497,9 +493,7 @@ const char* CRaceData::GetMotionListFileName() const
 CGraphicThing * CRaceData::GetBaseModelThing()
 {
 	if (!m_pBaseModelThing)
-	{
 		m_pBaseModelThing = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(m_strBaseModelFileName.c_str());
-	}
 
 	return m_pBaseModelThing;
 }
@@ -510,9 +504,7 @@ CGraphicThing * CRaceData::GetLODModelThing()
 	{
 		std::string strLODFileName = CFileNameHelper::NoExtension(m_strBaseModelFileName) + "_lod_01.gr2";
 		if (CResourceManager::Instance().IsFileExist(strLODFileName.c_str()))
-		{
 			m_pLODModelThing = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(strLODFileName.c_str());
-		}
 	}
 
 	return m_pLODModelThing;
@@ -531,7 +523,7 @@ CAttributeData * CRaceData::GetAttributeDataPtr()
 
 BOOL CRaceData::GetAttachingBoneName(uint32_t dwPartIndex, const char ** c_pszBoneName)
 {
-	TAttachingBoneNameMap::iterator itor = m_AttachingBoneNameMap.find(dwPartIndex);
+	auto itor = m_AttachingBoneNameMap.find(dwPartIndex);
 	if (itor == m_AttachingBoneNameMap.end())
 		return FALSE;
 
@@ -568,19 +560,17 @@ void CRaceData::Destroy()
 	m_NormalAttackIndexMap.clear();
 	m_ComboAttackDataMap.clear();
 
-	TMotionModeDataMap::iterator itorMode = m_pMotionModeDataMap.begin();
+	auto itorMode = m_pMotionModeDataMap.begin();
 	for (; itorMode != m_pMotionModeDataMap.end(); ++itorMode)
 	{
 		TMotionModeData * pMotionModeData = itorMode->second;
 
-		TMotionVectorMap::iterator itorMotion = pMotionModeData->MotionVectorMap.begin();
+		auto itorMotion = pMotionModeData->MotionVectorMap.begin();
 		for (; itorMotion != pMotionModeData->MotionVectorMap.end(); ++itorMotion)
 		{
 			TMotionVector & rMotionVector = itorMotion->second;
-			for (uint32_t i = 0; i < rMotionVector.size(); ++i)
-			{
-				CRaceMotionData::Delete(rMotionVector[i].pMotionData);
-			}
+			for (auto & i : rMotionVector)
+				CRaceMotionData::Delete(i.pMotionData);
 		}
 
 		ms_MotionModeDataPool.Free(pMotionModeData);

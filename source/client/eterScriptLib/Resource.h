@@ -1,12 +1,12 @@
 #pragma once
 
 #include "../eterEffectLib/StdAfx.h"
-#include "../eterlib/Resource.h"
-#include "../eterlib/ResourceManager.h"
+#include "../eterLib/Resource.h"
+#include "../eterLib/ResourceManager.h"
 
 enum EResourceTypes
 {
-	RES_TYPE_UNKNOWN,
+	RES_TYPE_UNKNOWN
 };
 
 class CPythonResource : public CSingleton<CPythonResource>

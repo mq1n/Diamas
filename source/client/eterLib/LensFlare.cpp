@@ -487,23 +487,19 @@ void CLensFlare::ClampBrightness()
 //	CFlare implementation
 ///////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFlare::CFlare
 
-CFlare::CFlare()
-{
-}
+CFlare::CFlare() = default;
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFlare::~CFlare
 
-CFlare::~CFlare()
-{
-}
+CFlare::~CFlare() = default;
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFlare::Init
 
 void CFlare::Init(std::string strPath)
@@ -524,13 +520,13 @@ void CFlare::Init(std::string strPath)
 		pPiece->m_fWidth = g_fWidth[i];
 		pPiece->m_pColor = g_afColors[i];
 
-		m_vFlares.push_back(pPiece);
+		m_vFlares.emplace_back(pPiece);
 		i++;
 	}
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFlare::Draw
 void CFlare::Draw(float fBrightScale, int32_t nWidth, int32_t nHeight, int32_t nX, int32_t nY)
 {
@@ -549,21 +545,19 @@ void CFlare::Draw(float fBrightScale, int32_t nWidth, int32_t nHeight, int32_t n
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG2,	D3DTA_DIFFUSE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP,	D3DTOP_MODULATE);
 
-	for (uint32_t i = 0; i < m_vFlares.size(); i++)
+	for (auto & m_vFlare : m_vFlares)
 	{
-		float fCenterX = float(nX) - (m_vFlares[i]->m_fPosition + 1.0f) * fDX;
-		float fCenterY = float(nY) - (m_vFlares[i]->m_fPosition + 1.0f) * fDY;
-		float fW = m_vFlares[i]->m_fWidth;
-		
-		D3DXCOLOR d3dColor(m_vFlares[i]->m_pColor[0] * fBrightScale,
-						   m_vFlares[i]->m_pColor[1] * fBrightScale,
-						   m_vFlares[i]->m_pColor[2] * fBrightScale,
-						   m_vFlares[i]->m_pColor[3] * fBrightScale);
+		float fCenterX = float(nX) - (m_vFlare->m_fPosition + 1.0f) * fDX;
+		float fCenterY = float(nY) - (m_vFlare->m_fPosition + 1.0f) * fDY;
+		float fW = m_vFlare->m_fWidth;
 
-		STATEMANAGER.SetTexture(0, m_vFlares[i]->m_imageInstance.GetTexturePointer()->GetD3DTexture());
+		D3DXCOLOR d3dColor(m_vFlare->m_pColor[0] * fBrightScale, m_vFlare->m_pColor[1] * fBrightScale, m_vFlare->m_pColor[2] * fBrightScale,
+						   m_vFlare->m_pColor[3] * fBrightScale);
+
+		STATEMANAGER.SetTexture(0, m_vFlare->m_imageInstance.GetTexturePointer()->GetD3DTexture());
 
 		TVertex vertices[4];
-		
+
 		vertices[0].u = 0.0f;
 		vertices[0].v = 0.0f;
 		vertices[0].x = fCenterX - fW;

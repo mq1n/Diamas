@@ -5,9 +5,7 @@ CReferenceObject::CReferenceObject() : m_refCount(0), m_destructed(false)
 {
 }
 
-CReferenceObject::~CReferenceObject()
-{
-}
+CReferenceObject::~CReferenceObject() = default;
 
 void CReferenceObject::AddReference()
 {

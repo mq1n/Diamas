@@ -140,7 +140,7 @@ PyObject * miniMapGetInfo(PyObject * poSelf, PyObject * poArgs)
 	PR_FLOAT_TO_INT(fPosY, iPosY);
 	iPosX /= 100;
 	iPosY /= 100;
-	return Py_BuildValue("isiil", (int32_t)bFind, aString.c_str(), iPosX, iPosY, (signed) dwTextColor);
+	return Py_BuildValue("isiil", static_cast<int32_t>(bFind), aString.c_str(), iPosX, iPosY, static_cast<int32_t>(dwTextColor));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -217,7 +217,7 @@ PyObject * miniMapGetAtlasInfo(PyObject * poSelf, PyObject * poArgs)
 	PR_FLOAT_TO_INT(fPosY, iPosY);
 	iPosX /= 100;
 	iPosY /= 100;
-	return Py_BuildValue("isiili", (int32_t)bFind, aString.c_str(), iPosX, iPosY, (signed) dwTextColor, dwGuildID);
+	return Py_BuildValue("isiili", static_cast<int32_t>(bFind), aString.c_str(), iPosX, iPosY, static_cast<int32_t>(dwTextColor), dwGuildID);
 }
 
 PyObject * miniMapGetAtlasSize(PyObject * poSelf, PyObject * poArgs)
@@ -245,7 +245,7 @@ PyObject * miniMapGetAtlasSize(PyObject * poSelf, PyObject * poArgs)
 	PR_FLOAT_TO_INT(fSizeX, iSizeX);
 	PR_FLOAT_TO_INT(fSizeY, iSizeY);
 
-	return Py_BuildValue("bii", (int32_t)bGet, iSizeX, iSizeY);
+	return Py_BuildValue("bii", static_cast<int32_t>(bGet), iSizeX, iSizeY);
 }
 
 PyObject * miniMapAddWayPoint(PyObject * poSelf, PyObject * poArgs)

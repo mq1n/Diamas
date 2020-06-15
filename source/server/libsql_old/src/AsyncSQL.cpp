@@ -593,7 +593,7 @@ void CAsyncSQL::ChildLoop()
 			
 			// 0.5초 이상 걸렸으면 로그에 남기기
 			if (!profiler.IsOk())
-				sys_log(0, "[QUERY : LONG INTERVAL(OverSec %ld.%ld)] : %s", 
+				sys_log(0, "[QUERY : LONG INTERVAL(OverSec %d.%d)] : %s", 
 						profiler.GetResultSec(), profiler.GetResultUSec(), p->stQuery.c_str());
 
 			PopQueryFromCopyQueue();

@@ -10,42 +10,18 @@ extern std::string g_stLocale;
 
 const int32_t GUILD_RANK_MAX_NUM = 20;
 
-bool isEurope()
-{
-	do
-	{
-		if (g_stLocale.compare("germany") == 0) break;
-		if (g_stLocale.compare("france") == 0) break;
-		if (g_stLocale.compare("italy") == 0) break;
-		if (g_stLocale.compare("spain") == 0) break;
-		if (g_stLocale.compare("uk") == 0) break;
-		if (g_stLocale.compare("turkey") == 0) break;
-		if (g_stLocale.compare("poland") == 0) break;
-		if (g_stLocale.compare("portugal") == 0) break;
-		if (g_stLocale.compare("greek") == 0) break;
-
-		return false;
-	} while (false);
-
-	return true;
-}
+#define GUILD_WAR_DURATION 30 * 60
+#define GUILD_WAR_WIN_POINT 1000
+#define GUILD_WAR_LADDER_HALF_PENALTY_TIME 12 * 60 * 60
 
 uint32_t GetGuildWarWaitStartDuration()
 {
-	// const int32_t GUILD_WAR_WAIT_START_DURATION = 60;
-	// const int32_t GUILD_WAR_WAIT_START_DURATION = 5; 
-
-	if (isEurope() == true) return 60;
-	else return 5;
+	return 60;
 }
 
 uint32_t GetGuildWarReserveSeconds()
 {
-	// const int32_t GUILD_WAR_RESERVE_SECONDS = 180;
-	// const int32_t GUILD_WAR_RESERVE_SECONDS = 10;
-
-	if (isEurope() == true) return 180;
-	else return 10;
+	return 180;
 }
 
 namespace 
@@ -158,7 +134,7 @@ void CGuildManager::ParseResult(SQLResult * pRes)
 void CGuildManager::Initialize()
 {
 	char szQuery[1024];
-	snprintf(szQuery, sizeof(szQuery), "SELECT id, name, ladder_point, win, draw, loss, gold, level FROM guild%s", GetTablePostfix());
+	snprintf(szQuery, sizeof(szQuery), "SELECT id, name, ladder_point, win, draw, loss, gold, level FROM guild");
 	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
 
 	if (pmsg->Get()->uiNumRows)
@@ -189,7 +165,7 @@ void CGuildManager::Load(uint32_t dwGuildID)
 {
 	char szQuery[1024];
 
-	snprintf(szQuery, sizeof(szQuery), "SELECT id, name, ladder_point, win, draw, loss, gold, level FROM guild%s WHERE id=%u", GetTablePostfix(), dwGuildID);
+	snprintf(szQuery, sizeof(szQuery), "SELECT id, name, ladder_point, win, draw, loss, gold, level FROM guild WHERE id=%u", dwGuildID);
 	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
 
 	if (pmsg->Get()->uiNumRows)
@@ -199,7 +175,7 @@ void CGuildManager::Load(uint32_t dwGuildID)
 void CGuildManager::QueryRanking()
 {
 	char szQuery[256];
-	snprintf(szQuery, sizeof(szQuery), "SELECT id,name,ladder_point FROM guild%s ORDER BY ladder_point DESC LIMIT 20", GetTablePostfix());
+	snprintf(szQuery, sizeof(szQuery), "SELECT id,name,ladder_point FROM guild ORDER BY ladder_point DESC LIMIT 20");
 
 	CDBManager::instance().ReturnQuery(szQuery, QID_GUILD_RANKING, 0, 0);
 }
@@ -351,7 +327,7 @@ void CGuildManager::GuildWarWin(uint32_t GID)
 	++it->second.win;
 
 	char buf[1024];
-	snprintf(buf, sizeof(buf), "UPDATE guild%s SET win=%d WHERE id=%u", GetTablePostfix(), it->second.win, GID);
+	snprintf(buf, sizeof(buf), "UPDATE guild SET win=%d WHERE id=%u", it->second.win, GID);
 	CDBManager::instance().AsyncQuery(buf);
 }
 
@@ -365,7 +341,7 @@ void CGuildManager::GuildWarLose(uint32_t GID)
 	++it->second.loss;
 
 	char buf[1024];
-	snprintf(buf, sizeof(buf), "UPDATE guild%s SET loss=%d WHERE id=%u", GetTablePostfix(), it->second.loss, GID);
+	snprintf(buf, sizeof(buf), "UPDATE guild SET loss=%d WHERE id=%u", it->second.loss, GID);
 	CDBManager::instance().AsyncQuery(buf);
 }
 
@@ -379,7 +355,7 @@ void CGuildManager::GuildWarDraw(uint32_t GID)
 	++it->second.draw;
 
 	char buf[1024];
-	snprintf(buf, sizeof(buf), "UPDATE guild%s SET draw=%d WHERE id=%u", GetTablePostfix(), it->second.draw, GID);
+	snprintf(buf, sizeof(buf), "UPDATE guild SET draw=%d WHERE id=%u", it->second.draw, GID);
 	CDBManager::instance().AsyncQuery(buf);
 }
 
@@ -738,7 +714,7 @@ void CGuildManager::ChangeLadderPoint(uint32_t GID, int32_t change)
 		r.ladder_point = 0;
 
 	char buf[1024];
-	snprintf(buf, sizeof(buf), "UPDATE guild%s SET ladder_point=%d WHERE id=%u", GetTablePostfix(), r.ladder_point, GID);
+	snprintf(buf, sizeof(buf), "UPDATE guild SET ladder_point=%d WHERE id=%u", r.ladder_point, GID);
 	CDBManager::instance().AsyncQuery(buf);
 
 	sys_log(0, "GuildManager::ChangeLadderPoint %u %d", GID, r.ladder_point);
@@ -774,7 +750,7 @@ void CGuildManager::MoneyChange(uint32_t dwGuild, uint32_t dwGold)
 	CClientManager::instance().ForwardPacket(HEADER_DG_GUILD_MONEY_CHANGE, &p, sizeof(p));
 
 	char buf[1024];
-	snprintf(buf, sizeof(buf), "UPDATE guild%s SET gold=%u WHERE id = %u", GetTablePostfix(), dwGold, dwGuild);
+	snprintf(buf, sizeof(buf), "UPDATE guild SET gold=%u WHERE id = %u", dwGold, dwGuild);
 	CDBManager::instance().AsyncQuery(buf);
 }
 
@@ -955,11 +931,10 @@ void CGuildManager::BootReserveWar()
 
 int32_t GetAverageGuildMemberLevel(uint32_t dwGID)
 {
-	char szQuery[QUERY_MAX_LEN];
+	char szQuery[ASQL_QUERY_MAX_LEN];
 
 	snprintf(szQuery, sizeof(szQuery), 
-			"SELECT AVG(level) FROM guild_member%s, player%s AS p WHERE guild_id=%u AND guild_member%s.pid=p.id", 
-			GetTablePostfix(), GetTablePostfix(), dwGID, GetTablePostfix());
+			"SELECT AVG(level) FROM guild_member, player AS p WHERE guild_id=%u AND guild_member.pid=p.id", dwGID);
 
 	std::unique_ptr<SQLMsg> msg(CDBManager::instance().DirectQuery(szQuery));
 
@@ -972,9 +947,9 @@ int32_t GetAverageGuildMemberLevel(uint32_t dwGID)
 
 int32_t GetGuildMemberCount(uint32_t dwGID)
 {
-	char szQuery[QUERY_MAX_LEN];
+	char szQuery[ASQL_QUERY_MAX_LEN];
 
-	snprintf(szQuery, sizeof(szQuery), "SELECT COUNT(*) FROM guild_member%s WHERE guild_id=%u", GetTablePostfix(), dwGID);
+	snprintf(szQuery, sizeof(szQuery), "SELECT COUNT(*) FROM guild_member WHERE guild_id=%u", dwGID);
 
 	std::unique_ptr<SQLMsg> msg(CDBManager::instance().DirectQuery(szQuery));
 
@@ -1061,7 +1036,7 @@ bool CGuildManager::ReserveWar(TPacketGuildWar * p)
 
 	snprintf(szQuery, sizeof(szQuery),
 			"INSERT INTO guild_war_reservation (guild1, guild2, time, type, warprice, initscore, power1, power2, handicap) "
-			"VALUES(%u, %u, DATE_ADD(NOW(), INTERVAL 180 SECOND), %u, %ld, %ld, %ld, %ld, %ld)",
+			"VALUES(%u, %u, DATE_ADD(NOW(), INTERVAL 180 SECOND), %u, %d, %d, %d, %d, %d)",
 			GID1, GID2, p->bType, p->lWarPrice, p->lInitialScore, t.lPowerFrom, t.lPowerTo, t.lHandicap);
 
 	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
@@ -1182,13 +1157,13 @@ bool CGuildManager::ChangeMaster(uint32_t dwGID, uint32_t dwFrom, uint32_t dwTo)
 
 	char szQuery[1024];
 
-	snprintf(szQuery, sizeof(szQuery), "UPDATE guild%s SET master=%u WHERE id=%u", GetTablePostfix(), dwTo, dwGID);
+	snprintf(szQuery, sizeof(szQuery), "UPDATE guild SET master=%u WHERE id=%u", dwTo, dwGID);
 	delete CDBManager::instance().DirectQuery(szQuery);
 
-	snprintf(szQuery, sizeof(szQuery), "UPDATE guild_member%s SET grade=1 WHERE pid=%u", GetTablePostfix(), dwTo);
+	snprintf(szQuery, sizeof(szQuery), "UPDATE guild_member SET grade=1 WHERE pid=%u", dwTo);
 	delete CDBManager::instance().DirectQuery(szQuery);
 
-	snprintf(szQuery, sizeof(szQuery), "UPDATE guild_member%s SET grade=15 WHERE pid=%u", GetTablePostfix(), dwFrom);
+	snprintf(szQuery, sizeof(szQuery), "UPDATE guild_member SET grade=15 WHERE pid=%u", dwFrom);
 	delete CDBManager::instance().DirectQuery(szQuery);
 
 	return true;

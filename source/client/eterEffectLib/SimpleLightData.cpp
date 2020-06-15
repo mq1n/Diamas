@@ -59,7 +59,6 @@ void CLightData::GetRange(float fTime, float& rRange)
 	rRange *= m_fMaxRange;
 	if (rRange<0.0f)
 		rRange = 0.0f;
-	return;
 	/*
 	float vecLastRange = m_TimeEventTableRange[0].m_Value;
 
@@ -125,9 +124,7 @@ BOOL CLightData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 		return FALSE;
 
 	if (!GetTokenTimeEventFloat(rTextFileLoader,"timeeventrange",&m_TimeEventTableRange))
-	{
 		m_TimeEventTableRange.clear();
-	}
 
 	return true;
 }
@@ -137,9 +134,7 @@ CLightData::CLightData()
 	Clear();
 }
 
-CLightData::~CLightData()
-{
-}
+CLightData::~CLightData() = default;
 
 float CLightData::GetDuration()
 {

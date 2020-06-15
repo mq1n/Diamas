@@ -1,9 +1,4 @@
 #include "stdafx.h"
-#ifdef __FreeBSD__
-#include <md5.h>
-#else
-#endif
-
 #include "utils.h"
 #include "config.h"
 #include "desc_client.h"
@@ -21,7 +16,7 @@
 #include "dungeon.h"
 #include "messenger_manager.h"
 #include "war_map.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "item_manager.h"
 #include "mob_manager.h"
 #include "dev_log.h"
@@ -31,10 +26,19 @@
 #include "unique_item.h"
 #include "threeway_war.h"
 #include "log.h"
+#include "gm.h"
+#include "crypt_helper.h"
+#include "gposition.h"
+#include "shop.h"
+#include "shop_manager.h"
 #include "../../common/VnumHelper.h"
+#include "battleground.h"
 
 ACMD(do_user_horse_ride)
 {
+	if (ch && CBattlegroundManager::instance().HasBattleground())
+		return;
+
 	if (ch->IsObserverMode())
 		return;
 
@@ -224,6 +228,7 @@ void Shutdown(int32_t iSec)
 		return;
 	}
 
+	CBattlegroundManager::instance().Destroy();
 	CWarMapManager::instance().OnShutdown();
 
 	char buf[64];
@@ -239,16 +244,29 @@ void Shutdown(int32_t iSec)
 
 ACMD(do_shutdown)
 {
-	if (!ch)
-		return;
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
 
-	sys_err("Accept shutdown command from %s.", ch->GetName());
-	
-	TPacketGGShutdown p;
-	p.bHeader = HEADER_GG_SHUTDOWN;
-	P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGShutdown));
+	if (!*arg1 || (*arg1 && strcmp(arg1, "force")))
+	{
+		if (ch && CBattlegroundManager::instance().HasBattleground())
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "You can not shutdown while running any battleground! Use force param.");
+			CBattlegroundManager::instance().BlockCreateBattleground();
+			return;
+		}
+	}
 
-	Shutdown(10);
+	if (ch)
+	{
+		sys_err("Accept shutdown command from %s.", ch->GetName());
+
+		TPacketGGShutdown p;
+		p.bHeader = HEADER_GG_SHUTDOWN;
+		P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGShutdown));
+
+		Shutdown(10);
+	}
 }
 
 EVENTFUNC(timed_event)
@@ -388,68 +406,11 @@ ACMD(do_cmd)
 	}
 }
 
-ACMD(do_mount)
-{
-	/*
-	   char			arg1[256];
-	   struct action_mount_param	param;
-
-	// 이미 타고 있으면
-	if (ch->GetMountingChr())
-	{
-	char arg2[256];
-	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
-
-	if (!*arg1 || !*arg2)
-	return;
-
-	param.x		= atoi(arg1);
-	param.y		= atoi(arg2);
-	param.vid	= ch->GetMountingChr()->GetVID();
-	param.is_unmount = true;
-
-	float distance = DISTANCE_SQRT(param.x - (uint32_t) ch->GetX(), param.y - (uint32_t) ch->GetY());
-
-	if (distance > 600.0f)
-	{
-	ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("좀 더 가까이 가서 내리세요."));
-	return;
-	}
-
-	action_enqueue(ch, ACTION_TYPE_MOUNT, &param, 0.0f, true);
-	return;
-	}
-
-	one_argument(argument, arg1, sizeof(arg1));
-
-	if (!*arg1)
-	return;
-
-	LPCHARACTER tch = CHARACTER_MANAGER::instance().Find(atoi(arg1));
-
-	if (!tch->IsNPC() || !tch->IsMountable())
-	{
-	ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("거기에는 탈 수 없어요."));
-	return;
-	}
-
-	float distance = DISTANCE_SQRT(tch->GetX() - ch->GetX(), tch->GetY() - ch->GetY());
-
-	if (distance > 600.0f)
-	{
-	ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("좀 더 가까이 가서 타세요."));
-	return;
-	}
-
-	param.vid		= tch->GetVID();
-	param.is_unmount	= false;
-
-	action_enqueue(ch, ACTION_TYPE_MOUNT, &param, 0.0f, true);
-	 */
-}
-
 ACMD(do_fishing)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+		
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
@@ -467,6 +428,9 @@ ACMD(do_console)
 
 ACMD(do_restart)
 {
+	static const int32_t iRestartHereSeconds = 170;
+	static const int32_t iRestartTownSeconds = 173;
+
 	if (false == ch->IsDead())
 	{
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "CloseRestartWindow");
@@ -479,9 +443,26 @@ ACMD(do_restart)
 
 	int32_t iTimeToDead = (event_time(ch->m_pkDeadEvent) / passes_per_sec);
 
-	if (subcmd != SCMD_RESTART_TOWN && (!ch->GetWarMap() || ch->GetWarMap()->GetType() == GUILD_WAR_TYPE_FLAG))
+	if (CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
 	{
-		if (!test_server)
+		CBattlegroundManager::instance().OnRevive(ch, iTimeToDead);
+		return;
+	}
+
+	if (iTimeToDead - (180 - g_nPortalLimitTime) < (g_nPortalLimitTime - 180 + 2))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You will be ported in your city soon."));
+		return;
+	}
+
+	if (subcmd == SCMD_RESTART_BASE)
+		return;
+
+	if (iTimeToDead - (180 - g_nPortalLimitTime) > 0)
+	{
+		if (subcmd == SCMD_RESTART_HERE && (!ch->GetWarMap() || ch->GetWarMap()->GetType() == GUILD_WAR_TYPE_FLAG))
+	{
+		if (!g_bIsTestServer)
 		{
 			if (ch->IsHack())
 			{
@@ -492,11 +473,11 @@ ACMD(do_restart)
 					return;
 				}
 			}
-#define eFRS_HERESEC	170
-			if (iTimeToDead > eFRS_HERESEC)
-			{
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 재시작 할 수 없습니다. (%d초 남음)"), iTimeToDead - eFRS_HERESEC);
-				return;
+				if (iTimeToDead > iRestartHereSeconds)
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 재시작 할 수 없습니다. (%d초 남음)"), iTimeToDead - iRestartHereSeconds);
+					return;
+				}
 			}
 		}
 	}
@@ -517,10 +498,9 @@ ACMD(do_restart)
 			}
 		}
 
-#define eFRS_TOWNSEC	173
-		if (iTimeToDead > eFRS_TOWNSEC)
+		if (iTimeToDead > iRestartTownSeconds)
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 마을에서 재시작 할 수 없습니다. (%d 초 남음)"), iTimeToDead - eFRS_TOWNSEC);
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 마을에서 재시작 할 수 없습니다. (%d 초 남음)"), iTimeToDead - iRestartTownSeconds);
 			return;
 		}
 	}
@@ -586,8 +566,9 @@ ACMD(do_restart)
 			switch (subcmd)
 			{
 				case SCMD_RESTART_TOWN:
+				{
 					sys_log(0, "do_restart: restart town");
-					PIXEL_POSITION pos;
+					GPOS pos;
 
 					if (CWarMapManager::instance().GetStartPosition(ch->GetMapIndex(), ch->GetGuild()->GetID() < dwGuildOpponent ? 0 : 1, pos))
 						ch->Show(ch->GetMapIndex(), pos.x, pos.y);
@@ -597,16 +578,17 @@ ACMD(do_restart)
 					ch->PointChange(POINT_HP, ch->GetMaxHP() - ch->GetHP());
 					ch->PointChange(POINT_SP, ch->GetMaxSP() - ch->GetSP());
 					ch->ReviveInvisible(5);
-					break;
+				} break;
 
 				case SCMD_RESTART_HERE:
+				{
 					sys_log(0, "do_restart: restart here");
 					ch->RestartAtSamePos();
 					//ch->Show(ch->GetMapIndex(), ch->GetX(), ch->GetY());
 					ch->PointChange(POINT_HP, ch->GetMaxHP() - ch->GetHP());
 					ch->PointChange(POINT_SP, ch->GetMaxSP() - ch->GetSP());
 					ch->ReviveInvisible(5);
-					break;
+				} break;
 			}
 
 			return;
@@ -616,26 +598,30 @@ ACMD(do_restart)
 	switch (subcmd)
 	{
 		case SCMD_RESTART_TOWN:
+		{
 			sys_log(0, "do_restart: restart town");
-			PIXEL_POSITION pos;
+			GPOS pos;
 
 			if (SECTREE_MANAGER::instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos))
 				ch->WarpSet(pos.x, pos.y);
 			else
-				ch->WarpSet(EMPIRE_START_X(ch->GetEmpire()), EMPIRE_START_Y(ch->GetEmpire()));
+				ch->GoHome();
 
 			ch->PointChange(POINT_HP, 50 - ch->GetHP());
 			ch->DeathPenalty(1);
-			break;
+		} break;
 
 		case SCMD_RESTART_HERE:
+		{
 			sys_log(0, "do_restart: restart here");
+
 			ch->RestartAtSamePos();
 			//ch->Show(ch->GetMapIndex(), ch->GetX(), ch->GetY());
+
 			ch->PointChange(POINT_HP, 50 - ch->GetHP());
 			ch->DeathPenalty(0);
 			ch->ReviveInvisible(5);
-			break;
+		} break;
 	}
 }
 
@@ -713,6 +699,340 @@ ACMD(do_stat_minus)
 	ch->ComputePoints();
 }
 
+
+ACMD(do_search_bg)
+{
+	char arg1[256], arg2[256], arg3[256];
+
+	auto line = two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+	one_argument(line, arg3, sizeof(arg3));
+
+	if (!*arg1 || !*arg2 || !*arg3)
+		return;
+
+	uint8_t nGameMode = 0;
+	str_to_number(nGameMode, arg1);
+
+	uint8_t nGameType = 0;
+	str_to_number(nGameType, arg2);
+
+	uint8_t nQueueType = 0;
+	str_to_number(nQueueType, arg3);
+
+
+	CBattlegroundManager::instance().SearchBattleground(ch, nGameMode, nGameType, nQueueType);
+}
+
+ACMD(do_recv_bg_details)
+{
+	if (CBattlegroundManager::instance().IsStarted() == false)
+	{
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "bg_details 0");
+		ch->ChatPacket(CHAT_TYPE_INFO, "Battleground is not active yet");
+		return;
+	}
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "bg_details %u", CBattlegroundManager::instance().GetBattlegroundJoinType());
+}
+
+ACMD(do_recv_create_bg_details)
+{
+	auto arrReqItems = CBattlegroundManager::instance().GetBattlegroundRequiredItems();
+
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "bg_create_ret %u %u %u", arrReqItems.at(0), arrReqItems.at(1), arrReqItems.at(2));
+}
+
+ACMD(do_create_battleground)
+{
+	char arg1[256], arg2[256], arg3[256];
+
+	auto line = two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+	one_argument(line, arg3, sizeof(arg3));
+
+	if (!*arg1 || !*arg2 || !*arg3)
+		return;
+
+	uint8_t nGameMode = 0;
+	str_to_number(nGameMode, arg1);
+
+	uint8_t nGameType = 0;
+	str_to_number(nGameType, arg2);
+
+	uint8_t nQueueType = 0;
+	str_to_number(nQueueType, arg3);
+
+	if (CBattlegroundManager::instance().IsBattlegroundCreateBlocked())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Battleground create blocked by server administration");
+		return;		
+	}
+
+	auto arrReqItems = CBattlegroundManager::instance().GetBattlegroundRequiredItems();
+	auto dwReqItem1 = arrReqItems.at(0);
+	auto dwReqItem2 = arrReqItems.at(1);
+	auto dwReqItem3 = arrReqItems.at(2);
+	
+	if (dwReqItem1 && 0 == ch->CountSpecifyItem(dwReqItem1))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Yetersiz esya: %u", dwReqItem1);
+		return;
+	}
+	if (dwReqItem2 && 0 == ch->CountSpecifyItem(dwReqItem2))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Yetersiz esya: %u", dwReqItem2);
+		return;
+	}
+	if (dwReqItem3 && 0 == ch->CountSpecifyItem(dwReqItem3))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Yetersiz esya: %u", dwReqItem3);
+		return;
+	}
+
+	if (dwReqItem1)
+		ch->RemoveSpecifyItem(dwReqItem1);
+	if (dwReqItem2)
+		ch->RemoveSpecifyItem(dwReqItem2);
+	if (dwReqItem3)
+		ch->RemoveSpecifyItem(dwReqItem3);
+
+
+	auto dwRoomID = CBattlegroundManager::instance().CreateBattlegroundRoom(ch, nGameMode, nGameType, nQueueType);
+	if (!dwRoomID)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Battleground room can not created!");
+		return;
+	}
+
+	auto pkBgRoom = CBattlegroundManager::instance().FindBattlegroundRoom(dwRoomID);
+	if (pkBgRoom)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Battleground room succesfully created!");
+		pkBgRoom->SendRoomDetails(ch);
+	}
+}
+
+ACMD(do_join_bg_queue)
+{
+	char arg1[256], arg2[256], arg3[256];
+
+	auto line = two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+	one_argument(line, arg3, sizeof(arg3));
+
+	if (!*arg1 || !*arg2 || !*arg3)
+		return;
+
+	uint8_t nGameMode = 0;
+	str_to_number(nGameMode, arg1);
+
+	uint8_t nGameType = 0;
+	str_to_number(nGameType, arg2);
+
+	uint8_t nQueueType = 0;
+	str_to_number(nQueueType, arg3);
+
+
+	auto bRet = CBattlegroundManager::instance().JoinBattlegroundQueue(ch->GetPlayerID(), nGameMode, nGameType, nQueueType);
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "bg_queue_ret %d", bRet ? 1 : 0);
+}
+
+ACMD(do_bg_start)
+{
+	auto pkRoom = CBattlegroundManager::instance().FindBattlegroundRoomByLeader(ch->GetPlayerID());
+	if (pkRoom)
+	{
+		pkRoom->StartBattleground();
+	}
+}
+
+ACMD(do_bg_join_room)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+		return;
+
+	uint32_t dwRoomID = 0;
+	str_to_number(dwRoomID, arg1);
+
+	auto pkRoom = CBattlegroundManager::instance().FindBattlegroundRoom(dwRoomID);
+	if (pkRoom)
+	{
+		if (pkRoom->JoinToRoom(ch->GetPlayerID(), number(BG_TEAM_BLUE, BG_TEAM_RED)))
+			pkRoom->SendRoomDetails(ch);
+	}
+}
+
+ACMD(do_bg_join_team)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+		return;
+
+	uint8_t nTeamID = 0;
+	str_to_number(nTeamID, arg1);
+
+	auto pkRoom = CBattlegroundManager::instance().FindBattlegroundRoomByAttender(ch->GetPlayerID());
+	if (pkRoom)
+	{
+		pkRoom->SetTeamID(ch->GetPlayerID(), nTeamID);
+	}
+}
+
+ACMD(do_bg_change_state)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+		return;
+
+	uint8_t nNewState = 0;
+	str_to_number(nNewState, arg1);
+
+	auto pkRoom = CBattlegroundManager::instance().FindBattlegroundRoomByAttender(ch->GetPlayerID());
+	if (pkRoom)
+	{
+		pkRoom->SetAttenderState(ch->GetPlayerID(), nNewState);
+	}
+}
+
+ACMD(do_bg_leaved)
+{
+	auto pkRoom = CBattlegroundManager::instance().FindBattlegroundRoomByAttender(ch->GetPlayerID());
+	if (pkRoom)
+	{
+		pkRoom->LeaveFromRoom(ch->GetPlayerID());
+	}	
+}
+
+ACMD(do_bg_kick)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+		return;
+
+	auto pkRoom = CBattlegroundManager::instance().FindBattlegroundRoomByLeader(ch->GetPlayerID());
+	if (pkRoom)
+	{
+		pkRoom->KickPlayer(arg1);
+	}
+}
+
+
+ACMD(do_bg_test)
+{
+	char arg1[256], arg2[256], arg3[256];
+
+	auto line = two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+	one_argument(line, arg3, sizeof(arg3));
+
+	uint32_t narg1 = 0;
+	str_to_number(narg1, arg1);
+
+	uint32_t narg2 = 0;
+	str_to_number(narg2, arg2);
+
+	uint32_t narg3 = 0;
+	str_to_number(narg3, arg3);
+
+	switch (narg1)
+	{
+		case 1: // create map index
+		{
+			auto lMapIndex = SECTREE_MANAGER::instance().CreatePrivateMap(BATTLEGROUND_NORMAL_MAP_INDEX);
+			if (!lMapIndex)
+			{
+				sys_err("Battleground dungeon can not created!");
+				return;
+			}
+			ch->ChatPacket(CHAT_TYPE_INFO, "Map index %d", lMapIndex);
+		} break;
+
+		case 2: // create battleground
+		{
+
+		} break;
+
+		case 3: // enter to queue
+		{
+
+		} break;
+
+		case 4: // manually close queue
+		{
+
+		} break;
+
+		case 5: // start event
+		{
+			if (CBattlegroundManager::Instance().StartEvent(narg2) == false)
+			{
+				sys_err("Battleground can not started!");
+				return;			
+			}
+		} break;
+
+		case 6: // close event & battleground
+		{
+			CBattlegroundManager::Instance().CloseEvent(narg2);
+			CBattlegroundManager::Instance().Destroy();
+		} break;
+
+#if 0
+		case 1:
+		{
+			auto mob1 = CHARACTER_MANAGER::instance().SpawnMob(301, 218, 9516500, 9524000, 0, true);
+			if (mob1)
+				ch->ChatPacket(CHAT_TYPE_INFO, "vmob1 id: %u", mob1->GetVID());		
+		} break;
+
+		case 2:
+		{
+			sys_err("%u -> %u", narg2, narg3);
+
+			auto attacker = CHARACTER_MANAGER::instance().Find(narg2);
+			auto victim = CHARACTER_MANAGER::instance().Find(narg3);
+
+			attacker->Attack(victim);
+		} break;
+
+		case 3:
+		{
+			/*
+			typedef struct SNPCMovingPosition
+{
+	int32_t	lX;
+	int32_t	lY;
+	bool	bRun;
+} TNPCMovingPosition;
+			 */
+			// 		void			SetMovingWay(const TNPCMovingPosition* pWay, int32_t iMaxNum, bool bRepeat = false, bool bLocal = false);
+			auto charr = CHARACTER_MANAGER::instance().Find(narg2);
+
+			///*
+			TNPCMovingPosition cmd;
+			cmd.lX = 120;
+			cmd.lY = 120;
+			cmd.bRun = true;
+
+			charr->SetMovingWay(&cmd, 1, false, true);
+			//*/
+
+			//charr->SetNowWalking(false);
+			//if (charr->Goto(lX * 100, lY * 100))
+			//	charr->SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
+		} break;
+#endif
+
+		default:
+			break;
+	};
+}
+
 ACMD(do_stat)
 {
 	char arg1[256];
@@ -766,6 +1086,9 @@ ACMD(do_stat)
 
 ACMD(do_pvp)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	if (ch->GetArena() != nullptr || CArenaManager::instance().IsArenaMap(ch->GetMapIndex()) == true)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
@@ -792,6 +1115,27 @@ ACMD(do_pvp)
 	}
 
 	CPVPManager::instance().Insert(ch, pkVictim);
+}
+
+ACMD(do_deny_pvp)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+		return;
+
+	uint32_t vid = 0;
+	str_to_number(vid, arg1);
+	LPCHARACTER pkVictim = CHARACTER_MANAGER::instance().Find(vid);
+
+	if (!pkVictim)
+		return;
+
+	if (!pkVictim->IsPC())
+		return;
+
+	CPVPManager::instance().Reject(ch, pkVictim);
 }
 
 ACMD(do_guildskillup)
@@ -846,18 +1190,10 @@ ACMD(do_skillup)
 			case SKILL_HORSE_ESCAPE:
 			case SKILL_HORSE_WILDATTACK_RANGE:
 
-			case SKILL_7_A_ANTI_TANHWAN:
-			case SKILL_7_B_ANTI_AMSEOP:
-			case SKILL_7_C_ANTI_SWAERYUNG:
-			case SKILL_7_D_ANTI_YONGBI:
-
-			case SKILL_8_A_ANTI_GIGONGCHAM:
-			case SKILL_8_B_ANTI_YEONSA:
-			case SKILL_8_C_ANTI_MAHWAN:
-			case SKILL_8_D_ANTI_BYEURAK:
-
+				/*
 			case SKILL_ADD_HP:
 			case SKILL_RESIST_PENETRATE:
+				*/
 				ch->SkillLevelUp(vnum);
 				break;
 		}
@@ -877,6 +1213,9 @@ ACMD(do_safebox_close)
 //
 ACMD(do_safebox_password)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 	ch->ReqSafeboxLoad(arg1);
@@ -884,6 +1223,9 @@ ACMD(do_safebox_password)
 
 ACMD(do_safebox_change_password)
 {
+	if (!ch || !ch->GetDesc())
+		return;
+
 	char arg1[256];
 	char arg2[256];
 
@@ -912,6 +1254,12 @@ ACMD(do_safebox_change_password)
 
 ACMD(do_mall_password)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
+	if (!ch || !ch->GetDesc())
+		return;
+
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
@@ -1011,6 +1359,9 @@ ACMD(do_set_run_mode)
 
 ACMD(do_war)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	//내 길드 정보를 얻어오고
 	CGuild * g = ch->GetGuild();
 
@@ -1026,7 +1377,7 @@ ACMD(do_war)
 
 	//파라메터를 두배로 나누고
 	char arg1[256], arg2[256];
-	uint32_t type = GUILD_WAR_TYPE_FIELD; //fixme102 base int32_t modded uint
+	uint8_t type = GUILD_WAR_TYPE_FIELD; //fixme102 base int32_t modded uint
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 
 	if (!*arg1)
@@ -1040,11 +1391,8 @@ ACMD(do_war)
 			type = GUILD_WAR_TYPE_FIELD;
 	}
 
-	//길드의 마스터 아이디를 얻어온뒤
-	uint32_t gm_pid = g->GetMasterPID();
-
 	//마스터인지 체크(길전은 길드장만이 가능)
-	if (gm_pid != ch->GetPlayerID())
+	if (g->GetMasterPID() != ch->GetPlayerID())
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드전에 대한 권한이 없습니다."));
 		return;
@@ -1218,6 +1566,9 @@ ACMD(do_nowar)
 
 ACMD(do_pkmode)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
@@ -1230,14 +1581,57 @@ ACMD(do_pkmode)
 	if (mode == PK_MODE_PROTECT)
 		return;
 
-	if (ch->GetLevel() < PK_PROTECT_LEVEL && mode != 0)
+	if (ch->GetLevel() < g_bPKProtectLevel && mode != 0)
 		return;
 
 	ch->SetPKMode(mode);
 }
 
+ACMD(do_disband_gwar)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+		return;
+
+	if (!ch->GetWarMap())
+		return;
+
+	LPDESC d = DESC_MANAGER::instance().FindByCharacterName(arg1);
+	LPCHARACTER	tch = d ? d->GetCharacter() : nullptr;
+
+	if (!tch || !tch->IsPC())
+		return;
+
+	if (ch == tch)
+		return;
+
+	CGuild * g = ch->GetGuild();
+	CGuild * tg = tch->GetGuild();
+
+	if (!g || !tg)
+		return;
+
+	if (tg->GetID() != g->GetID())
+		return;
+
+	if (g->GetMasterPID() != ch->GetPlayerID())
+		return;
+
+	if (!g->UnderAnyWar())
+		return;
+
+	tch->SetQuestFlag("guild_war_join.savasengeli", get_global_time() + 3600);
+
+	DESC_MANAGER::instance().DestroyDesc(d);
+}
+
 ACMD(do_messenger_auth)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	if (ch->GetArena())
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
@@ -1260,6 +1654,17 @@ ACMD(do_messenger_auth)
 
 		if (tch)
 			tch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님으로 부터 친구 등록을 거부 당했습니다."), ch->GetName());
+		else if (CCI* pCCI = P2P_MANAGER::instance().Find(arg2))
+		{
+			if (pCCI->pkDesc)
+			{
+				TPacketGGMessengerRequest packet;
+				packet.bHeader = HEADER_GG_MESSENGER_REQUEST_FAIL;
+				strlcpy(packet.szRequestor, arg2, sizeof(packet.szRequestor));
+				packet.dwTargetPID = ch->GetPlayerID();
+				pCCI->pkDesc->Packet(&packet, sizeof(TPacketGGMessengerRequest));
+			}
+		}
 	}
 
 }
@@ -1323,8 +1728,17 @@ ACMD(do_observer_exit)
 
 ACMD(do_view_equip)
 {
-	if (ch->GetGMLevel() <= GM_PLAYER)
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
 		return;
+
+	if (!ch)
+		return;
+
+	if (ch->GetLevel() <= 14)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Bu fonksiyonu kulanabilecek seviyede degilsin."));
+		return;
+	}
 
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
@@ -1356,6 +1770,9 @@ ACMD(do_view_equip)
 
 ACMD(do_party_request)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+
 	if (ch->GetArena())
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
@@ -1385,6 +1802,9 @@ ACMD(do_party_request)
 
 ACMD(do_party_request_accept)
 {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		return;
+		
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
@@ -1414,46 +1834,6 @@ ACMD(do_party_request_deny)
 	if (tch)
 		ch->DenyToParty(tch);
 }
-
-// LUA_ADD_GOTO_INFO
-struct GotoInfo
-{
-	std::string 	st_name;
-
-	uint8_t 	empire;
-	int32_t 	mapIndex;
-	uint32_t 	x, y;
-
-	GotoInfo()
-	{
-		st_name 	= "";
-		empire 		= 0;
-		mapIndex 	= 0;
-
-		x = 0;
-		y = 0;
-	}
-
-	GotoInfo(const GotoInfo& c_src)
-	{
-		__copy__(c_src);
-	}
-
-	void operator = (const GotoInfo& c_src)
-	{
-		__copy__(c_src);
-	}
-
-	void __copy__(const GotoInfo& c_src)
-	{
-		st_name 	= c_src.st_name;
-		empire 		= c_src.empire;
-		mapIndex 	= c_src.mapIndex;
-
-		x = c_src.x;
-		y = c_src.y;
-	}
-};
 
 static const char* FN_point_string(int32_t apply_number)
 {
@@ -1504,9 +1884,7 @@ static const char* FN_point_string(int32_t apply_number)
 		case POINT_RESIST_FIRE:		return LC_TEXT("화염 저항 %d%%");
 		case POINT_RESIST_ELEC:		return LC_TEXT("전기 저항 %d%%");
 		case POINT_RESIST_MAGIC:	return LC_TEXT("마법 저항 %d%%");
-#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
 		case POINT_RESIST_MAGIC_REDUCTION:	return LC_TEXT("마법 저항 %d%%");
-#endif
 		case POINT_RESIST_WIND:		return LC_TEXT("바람 저항 %d%%");
 		case POINT_RESIST_ICE:		return LC_TEXT("냉기 저항 %d%%");
 		case POINT_RESIST_EARTH:	return LC_TEXT("대지 저항 %d%%");
@@ -1736,9 +2114,46 @@ ACMD(do_inventory)
 
 		item = ch->GetInventoryItem(index);
 
-		ch->ChatPacket(CHAT_TYPE_INFO, "inventory [%d] = %s",
-						index, item ? item->GetName() : "<NONE>");
+		if (item)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "inventory [%d] = %s [%u] stone %d, %d, %d attr %d %d, %d %d, %d %d, %d %d, %d %d, %d %d, %d %d",
+				index, item->GetName(), item->GetID(), item->GetSocket(0), item->GetSocket(1), item->GetSocket(2),
+				item->GetAttributeType(0), item->GetAttributeValue(0),
+				item->GetAttributeType(1), item->GetAttributeValue(1),
+				item->GetAttributeType(2), item->GetAttributeValue(2),
+				item->GetAttributeType(3), item->GetAttributeValue(3),
+				item->GetAttributeType(4), item->GetAttributeValue(4),
+				item->GetAttributeType(5), item->GetAttributeValue(5),
+				item->GetAttributeType(6), item->GetAttributeValue(6));
+		}
+
 		++index;
+	}
+}
+
+ACMD(do_block_exp)
+{
+	ch->ChatPacket(CHAT_TYPE_INFO, "Anti exp aktif");
+	ch->BlockExp();
+}
+ACMD(do_unblock_exp)
+{
+	ch->ChatPacket(CHAT_TYPE_INFO, "Anti exp pasif");
+	ch->UnblockExp();
+}
+
+ACMD(do_remove_polymorph)
+{
+	if (!ch)
+		return;
+
+	if (ch->GetExchange() || ch->GetMyShop() || ch->GetShopOwner() || ch->IsOpenSafebox() || ch->IsCubeOpen())
+		return;
+
+	if (ch->IsPolymorphed()) 
+	{
+		ch->RemoveAffect(AFFECT_POLYMORPH);
+		ch->SetPolymorph(0);
 	}
 }
 
@@ -1767,7 +2182,7 @@ ACMD(do_cube)
 		// print usage
 		ch->ChatPacket(CHAT_TYPE_INFO, "Usage: cube open");
 		ch->ChatPacket(CHAT_TYPE_INFO, "       cube close");
-		ch->ChatPacket(CHAT_TYPE_INFO, "       cube add <inveltory_index>");
+		ch->ChatPacket(CHAT_TYPE_INFO, "       cube add <inventory_index>");
 		ch->ChatPacket(CHAT_TYPE_INFO, "       cube delete <cube_index>");
 		ch->ChatPacket(CHAT_TYPE_INFO, "       cube list");
 		ch->ChatPacket(CHAT_TYPE_INFO, "       cube cancel");
@@ -1860,6 +2275,20 @@ ACMD(do_cube)
 ACMD(do_in_game_mall)
 {
 	ch->ChatPacket(CHAT_TYPE_COMMAND, "TODOOOO");
+
+#if 0
+	std::string country_code = "tr";
+
+	const char sas_key[] = "GF9001";
+	std::string sas = str(boost::format("%u%u%s") % ch->GetPlayerID() % ch->GetAID() % sas_key);
+
+	auto md5Helper = std::make_unique<CMd5>();
+	auto sas_output = md5Helper->BuildHash(sas.data(), sas.size());
+
+	std::string buf = str(boost::format("mall http://%s/ishop?pid=%u&c=%s&sid=%d&sas=%s") % g_strWebMallURL.c_str() % ch->GetPlayerID() % country_code % g_server_id % sas_output);
+
+	ch->ChatPacket(CHAT_TYPE_COMMAND, buf.c_str());
+#endif
 }
 
 // 주사위
@@ -1899,7 +2328,6 @@ ACMD(do_dice)
 #endif
 }
 
-#ifdef ENABLE_NEWSTUFF
 ACMD(do_click_safebox)
 {
 	if ((ch->GetGMLevel() <= GM_PLAYER) && (ch->GetDungeon() || ch->GetWarMap()))
@@ -1918,7 +2346,6 @@ ACMD(do_force_logout)
 		return;
 	pDesc->DelayedDisconnect(0);
 }
-#endif
 
 ACMD(do_click_mall)
 {
@@ -1931,8 +2358,16 @@ ACMD(do_ride)
     if (ch->IsDead() || ch->IsStun())
 	return;
 
-    // 내리기
-    {
+	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()) && !ch->IsGM())
+		return;
+
+	/*
+	if ((get_dword_time() - ch->GetLastMoveTime()) < 1000) {
+		ch->ChatPacket(CHAT_TYPE_INFO, "Hareket ederken bu eylemi gerceklestiremezsin");
+		return;
+	}
+	*/
+
 	if (ch->IsHorseRiding())
 	{
 	    dev_log(LOG_DEB0, "[DO_RIDE] stop riding");
@@ -1946,10 +2381,8 @@ ACMD(do_ride)
 	    do_unmount(ch, nullptr, 0, 0);
 	    return;
 	}
-    }
+  
 
-    // 타기
-    {
 	if (ch->GetHorse() != nullptr)
 	{
 	    dev_log(LOG_DEB0, "[DO_RIDE] start riding");
@@ -1995,14 +2428,13 @@ ACMD(do_ride)
 	    }
 
 		// GF mantis #113524, 52001~52090 번 탈것
-		if( (item->GetVnum() > 52000) && (item->GetVnum() < 52091) )	{
+		if( (item->GetVnum() > 52000) && (item->GetVnum() < 52091) )
+		{
 			dev_log(LOG_DEB0, "[DO_RIDE] USE QUEST ITEM");
 			ch->UseItem(TItemPos (INVENTORY, i));
 		    return;
 		}
 	}
-    }
-
 
     // 타거나 내릴 수 없을때
     ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("말을 먼저 소환해주세요."));

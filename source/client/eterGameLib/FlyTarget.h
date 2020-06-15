@@ -18,7 +18,7 @@ private:
 	inline void AddFlyTargeter(CFlyTarget* pTargeter)
 	{
 		//if (m_FlyTargeterSet.find(pTargeter)!=m_FlyTargeterSet.end())
-		m_FlyTargeterSet.insert(pTargeter);
+		m_FlyTargeterSet.emplace(pTargeter);
 	}
 	inline void RemoveFlyTargeter(CFlyTarget* pTargeter)
 	{
@@ -34,7 +34,7 @@ public:
 	{
 		TYPE_NONE,
 		TYPE_OBJECT,
-		TYPE_POSITION,
+		TYPE_POSITION
 	};
 
 public:
@@ -72,9 +72,7 @@ inline void IFlyTargetableObject::ClearFlyTargeter()
 {
 	std::set<CFlyTarget*>::iterator it;
 	for(it = m_FlyTargeterSet.begin();it!=m_FlyTargeterSet.end();++it)
-	{
 		(*it)->NotifyTargetClear();
-	}
 	m_FlyTargeterSet.clear();
 }
 

@@ -10,14 +10,14 @@ namespace UI
 		ITEM_WIDTH = 32,
 		ITEM_HEIGHT = 32,
 
-		SLOT_NUMBER_NONE = 0xffffffff,
+		SLOT_NUMBER_NONE = 0xffffffff
 	};
 
 	enum ESlotStyle
 	{
 		SLOT_STYLE_NONE,
 		SLOT_STYLE_PICK_UP,
-		SLOT_STYLE_SELECT,
+		SLOT_STYLE_SELECT
 	};
 
 	enum ESlotState
@@ -55,7 +55,7 @@ namespace UI
 				uint32_t   dwRealSlotNumber;					//Unique identifier. Initially added as an aid for intentory grid. [Think]
 				uint32_t	dwRealCenterSlotNumber;
 				uint32_t	dwItemIndex;			// NOTE : 여기서 사용되는 Item이라는 단어는 좁은 개념의 것이 아닌,
-				BOOL	isItem;					//        "슬롯의 내용물"이라는 포괄적인 개념어. 더 좋은 것이 있을까? - [levites]
+				bool	isItem;					//        "슬롯의 내용물"이라는 포괄적인 개념어. 더 좋은 것이 있을까? - [levites]
 				uint32_t	dwItemID;
 
 				// CoolTime
@@ -63,7 +63,7 @@ namespace UI
 				float	fStartCoolTime;
 
 				// Toggle
-				BOOL	bActive;
+				bool	bActive;
 
 				int32_t		ixPosition;
 				int32_t		iyPosition;
@@ -77,6 +77,7 @@ namespace UI
 				CGraphicImageInstance * pInstance;
 				CGraphicImageInstance * pBackgroundInstance;
 				CNumberLine * pNumberLine;
+				CNumberLine * pNumberLine2;
 
 				bool	bRenderBaseSlotImage;
 				CCoverButton * pCoverButton;
@@ -87,8 +88,8 @@ namespace UI
 				CAniImageBox*	pActiveSlotEffect[3];
 #endif
 			} TSlot;
-			typedef std::list<TSlot> TSlotList;
-			typedef TSlotList::iterator TSlotListIterator;
+			using TSlotList = std::list<TSlot>;
+			using TSlotListIterator = TSlotList::iterator;
 
 		public:
 			CSlotWindow(PyObject * ppyObject);
@@ -104,7 +105,7 @@ namespace UI
 			void SetSlotStyle(uint32_t dwStyle);
 
 			void AppendSlot(uint32_t dwIndex, int32_t ixPosition, int32_t iyPosition, int32_t ixCellSize, int32_t iyCellSize);
-			void SetCoverButton(uint32_t dwIndex, const char * c_szUpImageName, const char * c_szOverImageName, const char * c_szDownImageName, const char * c_szDisableImageName, BOOL bLeftButtonEnable, BOOL bRightButtonEnable);
+			void SetCoverButton(uint32_t dwIndex, const char * c_szUpImageName, const char * c_szOverImageName, const char * c_szDownImageName, const char * c_szDisableImageName, bool bLeftButtonEnable, bool bRightButtonEnable);
 			void DeleteCoverButton(uint32_t dwIndex);
 			bool HasCoverButton(uint32_t dwIndex);
 			void SetSlotBaseImage(const char * c_szFileName, float fr, float fg, float fb, float fa);
@@ -119,12 +120,13 @@ namespace UI
 
 			void ShowSlotBaseImage(uint32_t dwIndex);
 			void HideSlotBaseImage(uint32_t dwIndex);
-			BOOL IsDisableCoverButton(uint32_t dwIndex);
-			BOOL HasSlot(uint32_t dwIndex);
+			bool IsDisableCoverButton(uint32_t dwIndex);
+			bool HasSlot(uint32_t dwIndex);
 
 			void ClearAllSlot();
 			void ClearSlot(uint32_t dwIndex);
 			void SetSlot(uint32_t dwIndex, uint32_t dwVirtualNumber, uint8_t byWidth, uint8_t byHeight, CGraphicImage * pImage, D3DXCOLOR& diffuseColor);
+			void SetSlotRefineLevel(DWORD dwIndex, char* pszRefineLevel);
 			void SetSlotCount(uint32_t dwIndex, uint32_t dwCount);
 			void SetSlotCountNew(uint32_t dwIndex, uint32_t dwGrade, uint32_t dwCount);
 			void SetRealSlotNumber(uint32_t dwIndex, uint32_t dwID);
@@ -150,14 +152,14 @@ namespace UI
 			// Select
 			void ClearSelected();
 			void SelectSlot(uint32_t dwSelectingIndex);
-			BOOL isSelectedSlot(uint32_t dwIndex);
+			bool isSelectedSlot(uint32_t dwIndex);
 			uint32_t GetSelectedSlotCount();
 			uint32_t GetSelectedSlotNumber(uint32_t dwIndex);
 
 			// Slot Button
 			void ShowSlotButton(uint32_t dwSlotNumber);
 			void HideAllSlotButton();
-			void OnPressedSlotButton(uint32_t dwType, uint32_t dwSlotNumber, BOOL isLeft = TRUE);
+			void OnPressedSlotButton(uint32_t dwType, uint32_t dwSlotNumber, bool isLeft = true);
 
 			// Slot background			
 			void SetSlotBackground(uint32_t dwIndex, const char* c_szFileName);
@@ -167,12 +169,12 @@ namespace UI
 			void HideRequirementSign(uint32_t dwSlotNumber);
 
 			// ToolTip
-			BOOL OnOverInItem(uint32_t dwSlotNumber);
+			bool OnOverInItem(uint32_t dwSlotNumber);
 			void OnOverOutItem();
 
 			// For Usable Item
-			void SetUseMode(BOOL bFlag);
-			void SetUsableItem(BOOL bFlag);
+			void SetUseMode(bool bFlag);
+			void SetUsableItem(bool bFlag);
 
 			// CallBack
 			void ReserveDestroyCoolTimeFinishEffect(uint32_t dwSlotIndex);
@@ -198,10 +200,10 @@ namespace UI
 			// Event
 			void OnUpdate();
 			void OnRender();
-			BOOL OnMouseLeftButtonDown();
-			BOOL OnMouseLeftButtonUp();
-			BOOL OnMouseRightButtonDown();
-			BOOL OnMouseLeftButtonDoubleClick();
+			bool OnMouseLeftButtonDown();
+			bool OnMouseLeftButtonUp();
+			bool OnMouseRightButtonDown();
+			bool OnMouseLeftButtonDoubleClick();
 			void OnMouseOverOut();
 			void OnMouseOver();
 			void RenderSlotBaseImage();
@@ -217,14 +219,14 @@ namespace UI
 			void OnUseSlot();
 
 			// Manage Slot
-			BOOL GetSlotPointer(uint32_t dwIndex, TSlot ** ppSlot);
-			BOOL GetSelectedSlotPointer(TSlot ** ppSlot);
-			virtual BOOL GetPickedSlotPointer(TSlot ** ppSlot);
+			bool GetSlotPointer(uint32_t dwIndex, TSlot ** ppSlot);
+			bool GetSelectedSlotPointer(TSlot ** ppSlot);
+			virtual bool GetPickedSlotPointer(TSlot ** ppSlot);
 			void ClearSlot(TSlot * pSlot);
 			virtual void OnRefreshSlot();
 
 			// ETC
-			BOOL OnIsType(uint32_t dwType);
+			bool OnIsType(uint32_t dwType);
 
 		protected:
 			int32_t m_iWindowType;
@@ -234,8 +236,8 @@ namespace UI
 			TSlotList m_SlotList;
 			uint32_t m_dwToolTipSlotNumber;
 
-			BOOL m_isUseMode;
-			BOOL m_isUsableItem;
+			bool m_isUseMode;
+			bool m_isUsableItem;
 
 			CGraphicImageInstance * m_pBaseImageInstance;
 			CImageBox * m_pToggleSlotImage;

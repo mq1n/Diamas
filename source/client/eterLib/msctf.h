@@ -886,19 +886,20 @@ typedef /* [uuid] */  DECLSPEC_UUID("e1b5808d-1e46-4c19-84dc-68c5f5978cc8") stru
     CLSID clsid;
     LANGID langid;
     GUID catid;
-    BOOL fActive;
-    GUID guidProfile;
-    } 	TF_LANGUAGEPROFILE;
+		BOOL fActive;
+		GUID guidProfile;
+	} 	TF_LANGUAGEPROFILE;
 
-typedef /* [public][public][public][public][public][public][public][public][public][public][public][uuid] */  DECLSPEC_UUID("5a886226-ae9a-489b-b991-2b1e25ee59a9") 
-enum __MIDL___MIDL_itf_msctf_0000_0000_0001
-    {	TF_ANCHOR_START	= 0,
-	TF_ANCHOR_END	= 1
-    } 	TfAnchor;
+	typedef /* [public][public][public][public][public][public][public][public][public][public][public][uuid] */  DECLSPEC_UUID("5a886226-ae9a-489b-b991-2b1e25ee59a9")
+		enum __MIDL___MIDL_itf_msctf_0000_0000_0001
+	{
+		TF_ANCHOR_START = 0,
+		TF_ANCHOR_END = 1
+	} 	TfAnchor;
 
 
 
-extern RPC_IF_HANDLE __MIDL_itf_msctf_0000_0000_v0_0_c_ifspec;
+	extern RPC_IF_HANDLE __MIDL_itf_msctf_0000_0000_v0_0_c_ifspec;
 extern RPC_IF_HANDLE __MIDL_itf_msctf_0000_0000_v0_0_s_ifspec;
 
 #ifndef __ITfThreadMgr_INTERFACE_DEFINED__
@@ -2808,15 +2809,16 @@ EXTERN_C const IID IID_IEnumTfContextViews;
 
 #define	TF_ES_ASYNC	( 0x8 )
 
-typedef /* [public][public][public][public][public][uuid] */  DECLSPEC_UUID("1690be9b-d3e9-49f6-8d8b-51b905af4c43") 
-enum __MIDL_ITfContext_0001
-    {	TF_AE_NONE	= 0,
-	TF_AE_START	= 1,
-	TF_AE_END	= 2
-    } 	TfActiveSelEnd;
+	typedef /* [public][public][public][public][public][uuid] */  DECLSPEC_UUID("1690be9b-d3e9-49f6-8d8b-51b905af4c43")
+		enum __MIDL_ITfContext_0001
+	{
+		TF_AE_NONE = 0,
+		TF_AE_START = 1,
+		TF_AE_END = 2
+	} 	TfActiveSelEnd;
 
-typedef /* [uuid] */  DECLSPEC_UUID("36ae42a4-6989-4bdc-b48a-6137b7bf2e42") struct TF_SELECTIONSTYLE
-    {
+	typedef /* [uuid] */  DECLSPEC_UUID("36ae42a4-6989-4bdc-b48a-6137b7bf2e42") struct TF_SELECTIONSTYLE
+	{
     TfActiveSelEnd ase;
     BOOL fInterimChar;
     } 	TF_SELECTIONSTYLE;
@@ -4148,18 +4150,19 @@ EXTERN_C const IID IID_ITfTextEditSink;
 #ifndef __ITfTextLayoutSink_INTERFACE_DEFINED__
 #define __ITfTextLayoutSink_INTERFACE_DEFINED__
 
-/* interface ITfTextLayoutSink */
-/* [unique][uuid][object] */ 
+	/* interface ITfTextLayoutSink */
+	/* [unique][uuid][object] */
 
-typedef /* [public][public][uuid] */  DECLSPEC_UUID("603553cf-9edd-4cc1-9ecc-069e4a427734") 
-enum __MIDL_ITfTextLayoutSink_0001
-    {	TF_LC_CREATE	= 0,
-	TF_LC_CHANGE	= 1,
-	TF_LC_DESTROY	= 2
-    } 	TfLayoutCode;
+	typedef /* [public][public][uuid] */  DECLSPEC_UUID("603553cf-9edd-4cc1-9ecc-069e4a427734")
+		enum __MIDL_ITfTextLayoutSink_0001
+	{
+		TF_LC_CREATE = 0,
+		TF_LC_CHANGE = 1,
+		TF_LC_DESTROY = 2
+	} 	TfLayoutCode;
 
 
-EXTERN_C const IID IID_ITfTextLayoutSink;
+	EXTERN_C const IID IID_ITfTextLayoutSink;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
     
@@ -4907,21 +4910,23 @@ EXTERN_C const IID IID_ITfEditSession;
 #define __ITfRange_INTERFACE_DEFINED__
 
 /* interface ITfRange */
-/* [unique][uuid][object] */ 
+	/* [unique][uuid][object] */
 
 #define	TF_CHAR_EMBEDDED	( TS_CHAR_EMBEDDED )
 
-typedef /* [public][public][public][public][public][uuid] */  DECLSPEC_UUID("cf610f06-2882-46f6-abe5-298568b664c4") 
-enum __MIDL_ITfRange_0001
-    {	TF_GRAVITY_BACKWARD	= 0,
-	TF_GRAVITY_FORWARD	= 1
-    } 	TfGravity;
+	typedef /* [public][public][public][public][public][uuid] */  DECLSPEC_UUID("cf610f06-2882-46f6-abe5-298568b664c4")
+		enum __MIDL_ITfRange_0001
+	{
+		TF_GRAVITY_BACKWARD = 0,
+		TF_GRAVITY_FORWARD = 1
+	} 	TfGravity;
 
-typedef /* [public][public][public][uuid] */  DECLSPEC_UUID("1e512533-bbdc-4530-9a8e-a1dc0af67468") 
-enum __MIDL_ITfRange_0002
-    {	TF_SD_BACKWARD	= 0,
-	TF_SD_FORWARD	= 1
-    } 	TfShiftDir;
+	typedef /* [public][public][public][uuid] */  DECLSPEC_UUID("1e512533-bbdc-4530-9a8e-a1dc0af67468")
+		enum __MIDL_ITfRange_0002
+	{
+		TF_SD_BACKWARD = 0,
+		TF_SD_FORWARD = 1
+	} 	TfShiftDir;
 
 #define	TF_HF_OBJECT	( 1 )
 
@@ -9590,44 +9595,47 @@ EXTERN_C const IID IID_ITfClientId;
 #endif 	/* __ITfClientId_INTERFACE_DEFINED__ */
 
 
-/* interface __MIDL_itf_msctf_0000_0069 */
-/* [local] */ 
+	/* interface __MIDL_itf_msctf_0000_0069 */
+	/* [local] */
 
-typedef /* [public][public][public][public][uuid] */  DECLSPEC_UUID("c4cc07f1-80cc-4a7b-bc54-98512782cbe3") 
-enum __MIDL___MIDL_itf_msctf_0000_0069_0001
-    {	TF_LS_NONE	= 0,
-	TF_LS_SOLID	= 1,
-	TF_LS_DOT	= 2,
-	TF_LS_DASH	= 3,
-	TF_LS_SQUIGGLE	= 4
-    } 	TF_DA_LINESTYLE;
+	typedef /* [public][public][public][public][uuid] */  DECLSPEC_UUID("c4cc07f1-80cc-4a7b-bc54-98512782cbe3")
+		enum __MIDL___MIDL_itf_msctf_0000_0069_0001
+	{
+		TF_LS_NONE = 0,
+		TF_LS_SOLID = 1,
+		TF_LS_DOT = 2,
+		TF_LS_DASH = 3,
+		TF_LS_SQUIGGLE = 4
+	} 	TF_DA_LINESTYLE;
 
-typedef /* [public][public][public][public][public][uuid] */  DECLSPEC_UUID("d9b92e21-084a-401b-9c64-1e6dad91a1ab") 
-enum __MIDL___MIDL_itf_msctf_0000_0069_0002
-    {	TF_CT_NONE	= 0,
-	TF_CT_SYSCOLOR	= 1,
-	TF_CT_COLORREF	= 2
-    } 	TF_DA_COLORTYPE;
+	typedef /* [public][public][public][public][public][uuid] */  DECLSPEC_UUID("d9b92e21-084a-401b-9c64-1e6dad91a1ab")
+		enum __MIDL___MIDL_itf_msctf_0000_0069_0002
+	{
+		TF_CT_NONE = 0,
+		TF_CT_SYSCOLOR = 1,
+		TF_CT_COLORREF = 2
+	} 	TF_DA_COLORTYPE;
 
-typedef /* [uuid] */  DECLSPEC_UUID("90d0cb5e-6520-4a0f-b47c-c39bd955f0d6") struct TF_DA_COLOR
-    {
+	typedef /* [uuid] */  DECLSPEC_UUID("90d0cb5e-6520-4a0f-b47c-c39bd955f0d6") struct TF_DA_COLOR
+	{
     TF_DA_COLORTYPE type;
     union 
         {
         int nIndex;
-        COLORREF cr;
-        } 	;
-    } 	TF_DA_COLOR;
+			COLORREF cr;
+		};
+	} 	TF_DA_COLOR;
 
-typedef /* [public][public][public][public][uuid] */  DECLSPEC_UUID("33d2fe4b-6c24-4f67-8d75-3bc1819e4126") 
-enum __MIDL___MIDL_itf_msctf_0000_0069_0004
-    {	TF_ATTR_INPUT	= 0,
-	TF_ATTR_TARGET_CONVERTED	= 1,
-	TF_ATTR_CONVERTED	= 2,
-	TF_ATTR_TARGET_NOTCONVERTED	= 3,
-	TF_ATTR_INPUT_ERROR	= 4,
-	TF_ATTR_FIXEDCONVERTED	= 5,
-	TF_ATTR_OTHER	= -1
+	typedef /* [public][public][public][public][uuid] */  DECLSPEC_UUID("33d2fe4b-6c24-4f67-8d75-3bc1819e4126")
+		enum __MIDL___MIDL_itf_msctf_0000_0069_0004
+	{
+		TF_ATTR_INPUT = 0,
+		TF_ATTR_TARGET_CONVERTED = 1,
+		TF_ATTR_CONVERTED = 2,
+		TF_ATTR_TARGET_NOTCONVERTED = 3,
+		TF_ATTR_INPUT_ERROR = 4,
+		TF_ATTR_FIXEDCONVERTED = 5,
+		TF_ATTR_OTHER = -1
     } 	TF_DA_ATTR_INFO;
 
 typedef /* [uuid] */  DECLSPEC_UUID("1bf1c305-419b-4182-a4d2-9bfadc3f021f") struct TF_DISPLAYATTRIBUTE

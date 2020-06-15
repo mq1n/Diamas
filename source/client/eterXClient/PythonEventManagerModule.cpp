@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "PythonEventManager.h"
 #include "PythonNetworkStream.h"
-
 #include "PythonDynamicModuleNames.h"
+#include "../eterSecurity/PythonStackCheck.h"
 
 PyObject * eventRegisterEventSet(PyObject * poSelf, PyObject * poArgs)
 {
@@ -186,6 +186,8 @@ PyObject * eventSetEventHandler(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventSelectAnswer(PyObject * poSelf, PyObject * poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_event_SelectAnswer, PY_REF_FILE, PY_REF_FUNC);
+
 	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
@@ -233,6 +235,8 @@ PyObject * eventGetVisibleStartLine(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * eventQuestButtonClick(PyObject * poSelf, PyObject * poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_event_QuestButtonClick, PY_REF_FILE, PY_REF_FUNC);
+
 	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
@@ -271,6 +275,70 @@ PyObject * eventDestroy(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
+PyObject * eventSetVisibleLineCount(PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t iIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
+		return Py_BuildException();
+
+	int32_t iLineCount;
+	if (!PyTuple_GetInteger(poArgs, 1, &iLineCount))
+		return Py_BuildException();
+
+	CPythonEventManager::Instance().SetVisibleLineCount(iIndex, iLineCount);
+	return Py_BuildNone();
+}
+
+PyObject * eventGetLineHeight(PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t iIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
+		return Py_BuildException();
+
+	return Py_BuildValue("i", CPythonEventManager::Instance().GetLineHeight(iIndex));
+}
+
+PyObject * eventSetYPosition(PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t iIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
+		return Py_BuildException();
+	int32_t iY;
+	if (!PyTuple_GetInteger(poArgs, 1, &iY))
+		return Py_BuildException();
+
+	CPythonEventManager::Instance().SetYPosition(iIndex, iY);
+	return Py_BuildNone();
+}
+
+PyObject * eventGetProcessedLineCount(PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t iIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
+		return Py_BuildException();
+
+	return Py_BuildValue("i", CPythonEventManager::Instance().GetProcessedLineCount(iIndex));
+}
+
+PyObject * eventAllProcessEventSet(PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t iIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
+		return Py_BuildException();
+
+	CPythonEventManager::Instance().AllProcessEventSet(iIndex);
+	return Py_BuildNone();
+}
+
+PyObject * eventGetTotalLineCount(PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t iIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
+		return Py_BuildException();
+
+	return Py_BuildValue("i", CPythonEventManager::Instance().GetTotalLineCount(iIndex));
+}
+
 PyObject * eventSetFontColor(PyObject * poSelf, PyObject * poArgs)
 {
 	int32_t iIndex;
@@ -292,15 +360,6 @@ PyObject * eventSetFontColor(PyObject * poSelf, PyObject * poArgs)
 	
 	CPythonEventManager::Instance().SetFontColor(iIndex, r, g, b);
 	return Py_BuildNone();
-}
-
-PyObject * eventGetTotalLineCount(PyObject * poSelf, PyObject * poArgs)
-{
-	int32_t iIndex;
-	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
-		return Py_BuildException();
-
-	return Py_BuildValue("i", CPythonEventManager::Instance().GetLineCount(iIndex));
 }
 
 void initEvent()
@@ -337,6 +396,15 @@ void initEvent()
 
 		{ "QuestButtonClick",			eventQuestButtonClick,				METH_VARARGS },
 		{ "Destroy",					eventDestroy,						METH_VARARGS },
+
+		{ "SetVisibleLineCount",		eventSetVisibleLineCount,			METH_VARARGS },
+
+		{ "GetLineHeight",				eventGetLineHeight,					METH_VARARGS },
+		{ "SetYPosition",				eventSetYPosition,					METH_VARARGS },	
+
+		{ "GetProcessedLineCount",		eventGetProcessedLineCount,			METH_VARARGS },
+		{ "AllProcessEventSet",			eventAllProcessEventSet,			METH_VARARGS },	
+
 		{ "SetFontColor",				eventSetFontColor,					METH_VARARGS },
 		{ "GetTotalLineCount",			eventGetTotalLineCount,				METH_VARARGS },
 		{ nullptr,							nullptr,								0         },

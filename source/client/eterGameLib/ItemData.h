@@ -836,3 +836,8 @@ class CItemData
 
 		static CDynamicPool<CItemData>		ms_kPool;
 };
+
+inline bool operator<(const CItemData::TItemTable & lhs, const CItemData::TItemTable & rhs)
+{
+	return lhs.dwVnum < rhs.dwVnum;
+}

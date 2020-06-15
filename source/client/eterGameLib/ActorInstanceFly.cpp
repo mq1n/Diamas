@@ -57,9 +57,7 @@ bool CActorInstance::__IsSameFlyTarget(CActorInstance * pInstance)
 D3DXVECTOR3 CActorInstance::__GetFlyTargetPosition()
 {
 	if (!m_kFlyTarget.IsValidTarget())
-	{
 		return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	}
 
 	return m_kFlyTarget.GetFlyTargetPosition();
 }
@@ -87,7 +85,7 @@ void CActorInstance::LookAtFlyTarget()
 void CActorInstance::AddFlyTarget(const CFlyTarget & cr_FlyTarget)
 {
 	if (m_kFlyTarget.IsValidTarget())
-		m_kQue_kFlyTarget.push_back(cr_FlyTarget);
+		m_kQue_kFlyTarget.emplace_back(cr_FlyTarget);
 	else
 		SetFlyTarget(cr_FlyTarget);
 }
@@ -99,7 +97,7 @@ void CActorInstance::SetFlyTarget(const CFlyTarget & cr_FlyTarget)
 
 void CActorInstance::ClearFlyEventHandler()
 {
-	m_pFlyEventHandler = 0;
+	m_pFlyEventHandler = nullptr;
 }
 
 void CActorInstance::SetFlyEventHandler(IFlyEventHandler * pHandler)

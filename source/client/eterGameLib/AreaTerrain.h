@@ -21,7 +21,7 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 			LOAD_BOTTOMLEFT,
 			LOAD_BOTTOM,
 			LOAD_BOTTOMRIGHT,
-			LOAD_ALLBOUNDARY,
+			LOAD_ALLBOUNDARY
 		};
 
 		CTerrain();

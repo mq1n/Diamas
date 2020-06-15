@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-#include "../eterlib/StateManager.h"
-#include "../eterlib/ResourceManager.h"
+#include "../eterLib/StateManager.h"
+#include "../eterLib/ResourceManager.h"
 #include "EffectMesh.h"
 #include <FileSystemIncl.hpp>
 
@@ -113,7 +113,7 @@ BOOL CEffectMesh::__LoadData_Ver002(int32_t iSize, const uint8_t * c_pbBuf)
 	m_pEffectMeshDataVector.clear();
 	m_pEffectMeshDataVector.resize(m_iGeomCount);
 
-	for (int16_t n = 0; n < m_iGeomCount; ++n)
+	for (auto n = 0; n < m_iGeomCount; ++n)
 	{
 		SEffectMeshData * pMeshData = SEffectMeshData::New();
 
@@ -190,7 +190,7 @@ BOOL CEffectMesh::__LoadData_Ver002(int32_t iSize, const uint8_t * c_pbBuf)
 		GetFileExtension(pMeshData->szDiffuseMapFileName, strlen(pMeshData->szDiffuseMapFileName), &strExtension);
 		stl_lowers(strExtension);
 
-		if (0 == strExtension.compare("ifl"))
+		if ("ifl" == strExtension)
 		{
 			CFile File;
 			if (FileSystemManager::Instance().OpenFile(pMeshData->szDiffuseMapFileName, File))
@@ -202,7 +202,6 @@ BOOL CEffectMesh::__LoadData_Ver002(int32_t iSize, const uint8_t * c_pbBuf)
 				std::string strPathName;
 				GetOnlyPathName(pMeshData->szDiffuseMapFileName, strPathName);
 
-				std::string strTextureFileName;
 				for (uint32_t i = 0; i < textFileLoader.GetLineCount(); ++i)
 				{
 					const std::string & c_rstrFileName = textFileLoader.GetLineString(i);
@@ -210,12 +209,12 @@ BOOL CEffectMesh::__LoadData_Ver002(int32_t iSize, const uint8_t * c_pbBuf)
 					if (c_rstrFileName.empty())
 						continue;
 
-					strTextureFileName = strPathName;
+					std::string strTextureFileName = strPathName;
 					strTextureFileName += c_rstrFileName;
 
 					CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(strTextureFileName.c_str());
 
-					pMeshData->pImageVector.push_back(pImage);
+					pMeshData->pImageVector.emplace_back(pImage);
 				}
 			}
 		}
@@ -223,7 +222,7 @@ BOOL CEffectMesh::__LoadData_Ver002(int32_t iSize, const uint8_t * c_pbBuf)
 		{
 			CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(pMeshData->szDiffuseMapFileName);
 
-			pMeshData->pImageVector.push_back(pImage);
+			pMeshData->pImageVector.emplace_back(pImage);
 		}
 
 		////////////////////////////////////
@@ -249,7 +248,7 @@ BOOL CEffectMesh::__LoadData_Ver001(int32_t iSize, const uint8_t * c_pbBuf)
 	m_pEffectMeshDataVector.clear();
 	m_pEffectMeshDataVector.resize(m_iGeomCount);
 
-	for (int16_t n = 0; n < m_iGeomCount; ++n)
+	for (auto n = 0; n < m_iGeomCount; ++n)
 	{
 		SEffectMeshData * pMeshData = SEffectMeshData::New();
 
@@ -332,7 +331,7 @@ BOOL CEffectMesh::__LoadData_Ver001(int32_t iSize, const uint8_t * c_pbBuf)
 		GetFileExtension(pMeshData->szDiffuseMapFileName, strlen(pMeshData->szDiffuseMapFileName), &strExtension);
 		stl_lowers(strExtension);
 
-		if (0 == strExtension.compare("ifl"))
+		if ("ifl" == strExtension)
 		{
 			CFile File;
 			if (FileSystemManager::Instance().OpenFile(pMeshData->szDiffuseMapFileName, File))
@@ -344,7 +343,6 @@ BOOL CEffectMesh::__LoadData_Ver001(int32_t iSize, const uint8_t * c_pbBuf)
 				std::string strPathName;
 				GetOnlyPathName(pMeshData->szDiffuseMapFileName, strPathName);
 
-				std::string strTextureFileName;
 				for (uint32_t i = 0; i < textFileLoader.GetLineCount(); ++i)
 				{
 					const std::string & c_rstrFileName = textFileLoader.GetLineString(i);
@@ -352,12 +350,12 @@ BOOL CEffectMesh::__LoadData_Ver001(int32_t iSize, const uint8_t * c_pbBuf)
 					if (c_rstrFileName.empty())
 						continue;
 
-					strTextureFileName = strPathName;
+					std::string strTextureFileName = strPathName;
 					strTextureFileName += c_rstrFileName;
 
 					CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(strTextureFileName.c_str());
 
-					pMeshData->pImageVector.push_back(pImage);
+					pMeshData->pImageVector.emplace_back(pImage);
 				}
 			}
 		}
@@ -365,7 +363,7 @@ BOOL CEffectMesh::__LoadData_Ver001(int32_t iSize, const uint8_t * c_pbBuf)
 		{
 			CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(pMeshData->szDiffuseMapFileName);
 
-			pMeshData->pImageVector.push_back(pImage);
+			pMeshData->pImageVector.emplace_back(pImage);
 		}
 
 		////////////////////////////////////
@@ -391,12 +389,12 @@ void CEffectMesh::OnClear()
 	if (!m_isData)
 		return;
 
-	for (uint32_t i = 0; i < m_pEffectMeshDataVector.size(); ++i)
+	for (auto & i : m_pEffectMeshDataVector)
 	{
-		m_pEffectMeshDataVector[i]->pImageVector.clear();
-		m_pEffectMeshDataVector[i]->EffectFrameDataVector.clear();
+		i->pImageVector.clear();
+		i->EffectFrameDataVector.clear();
 
-		SEffectMeshData::Delete(m_pEffectMeshDataVector[i]);
+		SEffectMeshData::Delete(i);
 	}
 	m_pEffectMeshDataVector.clear();
 
@@ -447,9 +445,8 @@ void CEffectMeshScript::ReserveMeshData(uint32_t dwMeshCount)
 	m_MeshDataVector.clear();
 	m_MeshDataVector.resize(dwMeshCount);
 
-	for (uint32_t i = 0; i < m_MeshDataVector.size(); ++i)
+	for (auto & rMeshData : m_MeshDataVector)
 	{
-		TMeshData & rMeshData = m_MeshDataVector[i];
 
 		rMeshData.byBillboardType = MESH_BILLBOARD_TYPE_NONE;
 		rMeshData.bBlendingEnable = TRUE;
@@ -601,25 +598,19 @@ BOOL CEffectMeshScript::OnLoadScript(CTextFileLoader & rTextFileLoader)
 	if (rTextFileLoader.GetTokenString("meshfilename", &m_strMeshFileName))
 	{
 		if (!IsGlobalFileName(m_strMeshFileName.c_str()))
-		{
 			m_strMeshFileName = GetOnlyPathName(rTextFileLoader.GetFileName()) + m_strMeshFileName;
-		}
 	}
 	else
-	{
 		return FALSE;
-	}
 
 	if (!rTextFileLoader.GetTokenInteger("meshanimationloopenable", &m_isMeshAnimationLoop))
 		return FALSE;
 	if (!rTextFileLoader.GetTokenInteger("meshanimationloopcount", &m_iMeshAnimationLoopCount))
-	{
 		m_iMeshAnimationLoopCount = 0;
-	}
 	if (!rTextFileLoader.GetTokenFloat("meshanimationframedelay", &m_fMeshAnimationFrameDelay))
 		return FALSE;
 
-	uint32_t dwMeshElementCount;
+	uint32_t dwMeshElementCount = 0;
 	if (!rTextFileLoader.GetTokenDoubleWord("meshelementcount", &dwMeshElementCount))
 		return FALSE;
 
@@ -645,23 +636,15 @@ BOOL CEffectMeshScript::OnLoadScript(CTextFileLoader & rTextFileLoader)
 		if (!rTextFileLoader.GetTokenFloat("textureanimationframedelay", &rMeshData.fTextureAnimationFrameDelay))
 			return FALSE;
 		if (!rTextFileLoader.GetTokenDoubleWord("textureanimationstartframe", &rMeshData.dwTextureAnimationStartFrame))
-		{
 			rMeshData.dwTextureAnimationStartFrame = 0;
-		}
 
 		if (!rTextFileLoader.GetTokenByte("coloroperationtype", &rMeshData.byColorOperationType))
-		{
 			rMeshData.byColorOperationType = D3DTOP_MODULATE;
-		}
 		if (!rTextFileLoader.GetTokenColor("colorfactor", &rMeshData.ColorFactor))
-		{
 			rMeshData.ColorFactor = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		}
 
 		if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventalpha", &rMeshData.TimeEventAlpha))
-		{
 			rMeshData.TimeEventAlpha.clear();
-		}
 	}
 
 	return TRUE;

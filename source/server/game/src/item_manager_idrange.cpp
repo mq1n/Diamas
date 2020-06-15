@@ -48,7 +48,7 @@ uint32_t ITEM_MANAGER::GetNewID()
 	return (m_dwCurrentID++);
 }
 
-bool ITEM_MANAGER::SetMaxItemID(TItemIDRangeTable range)
+bool ITEM_MANAGER::SetMaxItemID(const TItemIDRangeTable &range) 
 {
 	m_ItemIDRange = range;
 
@@ -67,7 +67,7 @@ bool ITEM_MANAGER::SetMaxItemID(TItemIDRangeTable range)
 	return true;
 }
 
-bool ITEM_MANAGER::SetMaxSpareItemID(TItemIDRangeTable range)
+bool ITEM_MANAGER::SetMaxSpareItemID(const TItemIDRangeTable &range)
 {
 	if ( range.dwMin == 0 || range.dwMax == 0 || range.dwUsableItemIDMin == 0 )
 	{

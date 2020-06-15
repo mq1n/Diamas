@@ -2,10 +2,10 @@
 #include "PythonPlayerEventHandler.h"
 #include "PythonApplication.h"
 #include "PythonItem.h"
-#include "../eterbase/Timer.h"
+#include "../eterBase/Timer.h"
 
 #include "AbstractPlayer.h"
-#include "locale_inc.h"
+#include "Locale_inc.h"
 
 enum
 {
@@ -20,7 +20,7 @@ enum
 #ifdef ENABLE_WOLFMAN_CHARACTER
 	MAIN_RACE_WOLFMAN_M,
 #endif
-	MAIN_RACE_MAX_NUM,
+	MAIN_RACE_MAX_NUM
 };
 
 const uint32_t POINT_MAGIC_NUMBER = 0xe73ac1da;
@@ -92,15 +92,10 @@ void CPythonPlayer::NEW_GetMainActorPosition(TPixelPosition* pkPPosActor)
 	IAbstractPlayer& rkPlayer=IAbstractPlayer::GetSingleton();
 	CInstanceBase * pInstance = rkPlayer.NEW_GetMainActorPtr();
 	if (pInstance)
-	{
 		pInstance->NEW_GetPixelPosition(pkPPosActor);
-	}
 	else
-	{
 		CPythonApplication::Instance().GetCenterPosition(pkPPosActor);
-	}
 }
-
 
 
 bool CPythonPlayer::RegisterEffect(uint32_t dwEID, const char* c_szFileName, bool isCache)
@@ -154,15 +149,11 @@ void CPythonPlayer::Update()
 			pInstance->NEW_GetPixelPosition(&PixelPosition);
 
 			if (abs(int32_t(PixelPosition.x) - m_ixDestPos) + abs(int32_t(PixelPosition.y) - m_iyDestPos) < 10000)
-			{
 				m_isDestPosition = FALSE;
-			}
 			else
 			{
 				if (CTimer::Instance().GetCurrentMillisecond() - m_iLastAlarmTime > 20000)
-				{
 					AlarmHaveToGo();
-				}
 			}
 		}
 	}
@@ -248,19 +239,14 @@ void CPythonPlayer::__Update_NotifyGuildAreaEvent()
 		TPixelPosition kPixelPosition;
 		pkInstMain->NEW_GetPixelPosition(&kPixelPosition);
 
-		uint32_t dwAreaID = CPythonMiniMap::Instance().GetGuildAreaID(
-			uint32_t(kPixelPosition.x), uint32_t(kPixelPosition.y));
+		uint32_t dwAreaID = CPythonMiniMap::Instance().GetGuildAreaID(kPixelPosition.x, kPixelPosition.y);
 
 		if (dwAreaID != m_inGuildAreaID)
 		{
 			if (0xffffffff != dwAreaID)
-			{
 				PyCallClassMemberFunc(m_ppyGameWindow, "BINARY_Guild_EnterGuildArea", Py_BuildValue("(i)", dwAreaID));
-			}
 			else
-			{
 				PyCallClassMemberFunc(m_ppyGameWindow, "BINARY_Guild_ExitGuildArea", Py_BuildValue("(i)", dwAreaID));
-			}
 
 			m_inGuildAreaID = dwAreaID;
 		}
@@ -324,25 +310,20 @@ uint32_t CPythonPlayer::__GetRaceStat()
 	switch (GetRace())
 	{
 		case MAIN_RACE_WARRIOR_M:
-		case MAIN_RACE_WARRIOR_W:
-			return GetStatus(POINT_ST);
-			break;
-		case MAIN_RACE_ASSASSIN_M:
-		case MAIN_RACE_ASSASSIN_W:
-			return GetStatus(POINT_DX);
-			break;
-		case MAIN_RACE_SURA_M:
-		case MAIN_RACE_SURA_W:
-			return GetStatus(POINT_ST);
-			break;
-		case MAIN_RACE_SHAMAN_M:
-		case MAIN_RACE_SHAMAN_W:
-			return GetStatus(POINT_IQ);
-			break;
+	case MAIN_RACE_WARRIOR_W:
+		return GetStatus(POINT_ST);
+	case MAIN_RACE_ASSASSIN_M:
+	case MAIN_RACE_ASSASSIN_W:
+		return GetStatus(POINT_DX);
+	case MAIN_RACE_SURA_M:
+	case MAIN_RACE_SURA_W:
+		return GetStatus(POINT_ST);
+	case MAIN_RACE_SHAMAN_M:
+	case MAIN_RACE_SHAMAN_W:
+		return GetStatus(POINT_IQ);
 #ifdef ENABLE_WOLFMAN_CHARACTER
-		case MAIN_RACE_WOLFMAN_M:
-			return GetStatus(POINT_DX);
-			break;
+	case MAIN_RACE_WOLFMAN_M:
+		return GetStatus(POINT_DX);
 #endif
 	}	
 	return GetStatus(POINT_ST);
@@ -589,6 +570,16 @@ uint32_t CPythonPlayer::GetItemFlags(TItemPos Cell)
 	return pItem->flags;
 }
 
+uint32_t CPythonPlayer::GetItemAntiFlags(TItemPos Cell)
+{
+	if (!Cell.IsValidCell())
+		return 0;
+
+	const TItemData * pItem = GetItemData(Cell);
+	assert(pItem != nullptr);
+	return pItem->anti_flags;
+}
+
 uint8_t CPythonPlayer::GetItemTypeBySlot(TItemPos Cell)
 {
 	if (!Cell.IsValidCell())
@@ -625,8 +616,7 @@ uint32_t CPythonPlayer::GetItemCount(TItemPos Cell)
 	const TItemData * pItem = GetItemData(Cell);
 	if (pItem == nullptr)
 		return 0;
-	else
-		return pItem->count;
+	return pItem->count;
 }
 
 uint32_t CPythonPlayer::GetItemCountByVnum(uint32_t dwVnum)
@@ -1205,12 +1195,18 @@ void CPythonPlayer::SendClickActorPacket(CInstanceBase& rkInstVictim)
 	// 말을 타고 광산을 캐는 것에 대한 예외 처리
 	CInstanceBase* pkInstMain=NEW_GetMainActorPtr();
 	if (pkInstMain)
-	if (pkInstMain->IsHoldingPickAxe())
-	if (pkInstMain->IsMountingHorse())
-	if (rkInstVictim.IsResource())
 	{
-		PyCallClassMemberFunc(m_ppyGameWindow, "OnCannotMining", Py_BuildValue("()"));
-		return;
+		if (pkInstMain->IsHoldingPickAxe())
+		{
+			if (pkInstMain->IsMountingHorse())
+			{
+				if (rkInstVictim.IsResource())
+				{
+					PyCallClassMemberFunc(m_ppyGameWindow, "OnCannotMining", Py_BuildValue("()"));
+					return;
+				}
+			}
+		}
 	}
 
 	static uint32_t s_dwNextTCPTime = 0;
@@ -1368,9 +1364,7 @@ void CPythonPlayer::RemovePartyMember(uint32_t dwPID)
 	uint32_t dwVID = 0;
 	TPartyMemberInfo * pPartyMemberInfo;
 	if (GetPartyMemberPtr(dwPID, &pPartyMemberInfo))
-	{
 		dwVID = pPartyMemberInfo->dwVID;
-	}
 
 	m_PartyMemberMap.erase(dwPID);
 
@@ -1569,9 +1563,7 @@ void CPythonPlayer::SetGameWindow(PyObject * ppyObject)
 
 void CPythonPlayer::NEW_ClearSkillData(bool bAll)
 {
-	std::map<uint32_t, uint32_t>::iterator it;
-
-	for (it = m_skillSlotDict.begin(); it != m_skillSlotDict.end();)
+	for (auto it = m_skillSlotDict.begin(); it != m_skillSlotDict.end();)
 	{
 		if (bAll || __GetSkillType(it->first) == CPythonSkill::SKILL_TYPE_ACTIVE)
 			it = m_skillSlotDict.erase(it);
@@ -1690,28 +1682,28 @@ CPythonPlayer::CPythonPlayer(void)
 	SetMovableGroundDistance(40.0f);
 
 	// AffectIndex To SkillIndex
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_JEONGWI), 3));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_GEOMGYEONG), 4));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_CHEONGEUN), 19));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_GYEONGGONG), 49));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_EUNHYEONG), 34));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_GONGPO), 64));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_JUMAGAP), 65));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_HOSIN), 94));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_BOHO), 95));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_KWAESOK), 110));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_GICHEON), 96));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_JEUNGRYEOK), 111));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_PABEOP), 66));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_FALLEN_CHEONGEUN), 19));
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_JEONGWI, 3);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_GEOMGYEONG, 4);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_CHEONGEUN, 19);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_GYEONGGONG, 49);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_EUNHYEONG, 34);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_GONGPO, 64);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_JUMAGAP, 65);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_HOSIN, 94);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_BOHO, 95);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_KWAESOK, 110);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_GICHEON, 96);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_JEUNGRYEOK, 111);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_PABEOP, 66);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_FALLEN_CHEONGEUN, 19);
 	/////
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_GWIGEOM), 63));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_MUYEONG), 78));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_HEUKSIN), 79));
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_GWIGEOM, 63);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_MUYEONG, 78);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_HEUKSIN, 79);
 
 #ifdef ENABLE_WOLFMAN_CHARACTER
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_RED_POSSESSION), 174));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int32_t(CInstanceBase::AFFECT_BLUE_POSSESSION), 175));
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_RED_POSSESSION, 174);
+	m_kMap_dwAffectIndexToSkillIndex.emplace(CInstanceBase::AFFECT_BLUE_POSSESSION, 175);
 #endif
 
 	m_ppyGameWindow = nullptr;

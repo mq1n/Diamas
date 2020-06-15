@@ -8,6 +8,7 @@
 #include "desc_client.h"
 #include "dungeon.h"
 #include "unique_item.h"
+#include "log.h"
 
 CPartyManager::CPartyManager()
 {
@@ -148,6 +149,7 @@ LPPARTY CPartyManager::CreateParty(LPCHARACTER pLeader)
 		db_clientdesc->DBPacket(HEADER_GD_PARTY_CREATE, 0, &p, sizeof(TPacketPartyCreate));
 
 		sys_log(0, "PARTY: Create %s pid %u", pLeader->GetName(), pLeader->GetPlayerID());
+		LogManager::instance().CharLog(pLeader, 0, "PARTY_CREATE", "");
 		pParty->SetPCParty(true);
 		pParty->Join(pLeader->GetPlayerID());
 
@@ -176,6 +178,8 @@ void CPartyManager::DeleteParty(LPPARTY pParty)
 	db_clientdesc->DBPacket(HEADER_GD_PARTY_DELETE, 0, &p, sizeof(TPacketPartyDelete));
 
 	m_set_pkPCParty.erase(pParty);
+	if (pParty->GetLeaderPID() != 0)
+		LogManager::instance().CharLog(pParty->GetLeader(), 0, "PARTY_DESTROY", "");
 	M2_DELETE(pParty);
 }
 
@@ -460,6 +464,8 @@ void CParty::Join(uint32_t dwPID)
 		p.dwPID = dwPID;
 		p.bState = PARTY_ROLE_NORMAL; // #0000790: [M2EU] CZ 크래쉬 증가: 초기화 중요! 
 		db_clientdesc->DBPacket(HEADER_GD_PARTY_ADD, 0, &p, sizeof(p));
+		if (dwPID != 0)
+			LogManager::instance().CharLog(CHARACTER_MANAGER::instance().FindByPID(dwPID), 0, "PARTY_JOIN", "");
 	}
 }
 
@@ -499,6 +505,7 @@ void CParty::P2PQuit(uint32_t dwPID)
 	{
 		ch->SetParty(nullptr);
 		ComputeRolePoint(ch, bRole, false);
+//		ch->ComputePoints(); // parti hp sp bug fix
 	}
 
 	if (m_bPCParty)
@@ -507,6 +514,11 @@ void CParty::P2PQuit(uint32_t dwPID)
 	// 리더가 나가면 파티는 해산되어야 한다.
 	if (bRole == PARTY_ROLE_LEADER)
 		CPartyManager::instance().DeleteParty(this);
+	else if (dwPID != 0) {
+		LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(dwPID);
+		if (ch)
+			LogManager::instance().CharLog(ch, 0, "PARTY_LEAVE", "");
+	}
 
 	// 이 아래는 코드를 추가하지 말 것!!! 위 DeleteParty 하면 this는 없다.
 }
@@ -1069,27 +1081,25 @@ void CParty::RemoveBonusForOne(uint32_t pid)
 
 void CParty::HealParty()
 {
-	// XXX DELETEME 클라이언트 완료될때까지
-	{
-		return;
-	}
+	return;
+	
 	if (!m_bPartyHealReady)
 		return;
 
 	TMemberMap::iterator it;
-	LPCHARACTER l = GetLeaderCharacter();
-
 	for (it = m_memberMap.begin(); it != m_memberMap.end(); ++it)
 	{
-		if (!it->second.pCharacter)
+		LPCHARACTER ch = it->second.pCharacter;
+		if (!ch)
 			continue;
 
-		LPCHARACTER ch = it->second.pCharacter;
-
-		if (DISTANCE_APPROX(l->GetX()-ch->GetX(), l->GetY()-ch->GetY()) < PARTY_DEFAULT_RANGE)
+		if (IsPositionNearLeader(ch) && ch->IsAlive())
 		{
-			ch->PointChange(POINT_HP, ch->GetMaxHP()-ch->GetHP());
-			ch->PointChange(POINT_SP, ch->GetMaxSP()-ch->GetSP());
+			int32_t iHP = MAX(ch->GetLevel() * m_iLeadership * 3, ch->GetMaxHP());
+			int32_t iSP = MAX(ch->GetLevel() * m_iLeadership * 2, ch->GetMaxSP());
+
+			ch->PointChange(POINT_HP, iHP);
+			ch->PointChange(POINT_SP, iSP);
 		}
 	}
 
@@ -1134,6 +1144,11 @@ void CParty::SummonToLeader(uint32_t pid)
 		l->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 소환하려는 대상을 찾을 수 없습니다."));
 		return;
 	}
+	if(ch->GetMapIndex() != l->GetMapIndex())
+	{
+		l->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("This party member is not on your map."));
+		return;
+	}
 
 	if (!ch->CanSummon(m_iLeadership))
 	{
@@ -1143,7 +1158,7 @@ void CParty::SummonToLeader(uint32_t pid)
 
 	for (int32_t i = 0; i < 12; ++i)
 	{
-		PIXEL_POSITION p;
+		GPOS p;
 
 		if (s.GetMovablePosition(l->GetMapIndex(), l->GetX() + xy [i][0], l->GetY() + xy[i][1], p))
 		{
@@ -1361,7 +1376,7 @@ void CParty::Update()
 	bool bLongTimeExpBonusChanged = false;
 
 	// 파티 결성 후 충분한 시간이 지나면 경험치 보너스를 받는다.
-	if (!m_iLongTimeExpBonus && (get_dword_time() - m_dwPartyStartTime > PARTY_ENOUGH_MINUTE_FOR_EXP_BONUS * 60 * 1000 / 1))
+	if (!m_iLongTimeExpBonus && (get_dword_time() - m_dwPartyStartTime > PARTY_ENOUGH_MINUTE_FOR_EXP_BONUS * 60 * 240))
 	{
 		bLongTimeExpBonusChanged = true;
 		m_iLongTimeExpBonus = 5;
@@ -1402,23 +1417,17 @@ void CParty::Update()
 	// Party Heal Update
 	if (!m_bPartyHealReady)
 	{
-		if (!m_bCanUsePartyHeal && m_iLeadership >= 18)
-			m_dwPartyHealTime = get_dword_time();
-
-		m_bCanUsePartyHeal = m_iLeadership >= 18; // 통솔력 18 이상은 힐을 사용할 수 있음.
-
-		// 통솔력 40이상은 파티 힐 쿨타임이 적다.
-		uint32_t PartyHealCoolTime = (m_iLeadership >= 40) ? PARTY_HEAL_COOLTIME_SHORT * 60 * 1000 : PARTY_HEAL_COOLTIME_LONG * 60 * 1000;
-
+		m_bCanUsePartyHeal = m_bCanUsePartyHeal ? m_bCanUsePartyHeal : m_iLeadership >= 18; // 통솔력 18 이상은 힐을 사용할 수 있음.
 		if (m_bCanUsePartyHeal)
 		{
+			uint32_t PartyHealCoolTime = (m_iLeadership >= 40) ? 60000 : 180000;
+
 			if (get_dword_time() > m_dwPartyHealTime + PartyHealCoolTime)
 			{
+				m_dwPartyHealTime = get_dword_time();
 				m_bPartyHealReady = true;
 
-				// send heal ready
-				if (0) // XXX  DELETEME 클라이언트 완료될때까지
-					if (GetLeaderCharacter())
+				if (GetLeaderCharacter())
 						GetLeaderCharacter()->ChatPacket(CHAT_TYPE_COMMAND, "PartyHealReady");
 			}
 		}

@@ -20,8 +20,8 @@
 
 struct BLEND_ITEM_INFO
 {
-	uint32_t	item_vnum;
-	int32_t		apply_type;
+	uint32_t	item_vnum{0};
+	int32_t		apply_type{0};
 	int32_t		apply_value[MAX_BLEND_ITEM_VALUE];
 	int32_t		apply_duration[MAX_BLEND_ITEM_VALUE];
 };
@@ -61,12 +61,12 @@ bool	Blend_Item_load(char *file)
 	const char	*delim = " \t\r\n";
 	char	*v;
 
-	BLEND_ITEM_INFO	*blend_item_info;
+	BLEND_ITEM_INFO	* blend_item_info = nullptr;
 
-	if (0==file || 0==file[0])
+	if (nullptr == file || 0 == file[0])
 		return false;
 
-	if ((fp = fopen(file, "r"))==0)
+	if ((fp = fopen(file, "r")) == nullptr)
 		return false;
 
 	while (fgets(one_line, 256, fp))
@@ -94,6 +94,11 @@ bool	Blend_Item_load(char *file)
 				return false;
 			}
 
+			if (!blend_item_info)
+			{
+				sys_err("blend_item_info nullptr!");
+				return false;
+			}
 			str_to_number(blend_item_info->item_vnum, v);
 		}
 		else TOKEN("apply_type")
@@ -107,11 +112,6 @@ bool	Blend_Item_load(char *file)
 			}
 
 			blend_item_info->apply_type = FN_get_apply_type(v);
-			if (!blend_item_info->apply_type)
-			{
-				sys_err ("Invalid apply_type(%s)", v);
-				return false;
-			}
 		}
 		else TOKEN("apply_value")
 		{
@@ -166,10 +166,7 @@ static int32_t FN_random_index()
 		return 2;
 	else if (percent<=90)		// level 4 : 20%
 		return 3;
-	else
-		return 4;				// level 5 : 10%
-
-	return 0;
+	return 4;				// level 5 : 10%
 }
 
 // 충기환의 확률 테이블
@@ -190,10 +187,8 @@ static int32_t FN_ECS_random_index()
 		return 2;
 	else if (percent<=85)		// level 4 : 25%
 		return 3;
-	else
-		return 4;				// level 5 : 15%
-
-	return 0;
+	
+	return 4;				// level 5 : 15%
 }
 
 

@@ -1,6 +1,5 @@
-
 #include "stdafx.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "sectree_manager.h"
 #include "char.h"
 
@@ -14,7 +13,7 @@ namespace quest
 			{
 				LPCHARACTER ch = (LPCHARACTER) ent;
 
-				if ( ch->IsPC() == true && ch->IsGM() != true )
+				if ( ch && ch->IsPC() == true && ch->IsGM() != true )
 				{
 					if ( ((ch->GetX() >= 764503 && ch->GetX() <= 772362) && (ch->GetY() >= 22807 && ch->GetY() <= 26499)) == false )
 					{

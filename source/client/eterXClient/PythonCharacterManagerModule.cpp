@@ -3,6 +3,8 @@
 #include "PythonBackground.h"
 #include "InstanceBase.h"
 #include "../eterGameLib/RaceManager.h"
+#include "../eterSecurity/PythonStackCheck.h"
+#include "../eterSecurity/CheatQueueManager.h"
 #include "PythonDynamicModuleNames.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -126,6 +128,13 @@ PyObject * chrmgrSetPathName(PyObject* poSelf, PyObject* poArgs)
 	char * szPathName;
 	if (!PyTuple_GetString(poArgs, 0, &szPathName))
 		return Py_BadArgument();
+
+	if (!strstr(szPathName, "d:/ymir"))
+	{
+		CCheatDetectQueueMgr::Instance().AppendDetection(UNKNOWN_MAPPED_FILE_PATH_NAME, 0, szPathName);
+		TraceError("unknown base path: %s", szPathName); // temporary
+		return Py_BuildNone();
+	}
 
 	CRaceManager::Instance().SetPathName(szPathName);	
 	return Py_BuildNone();
@@ -437,7 +446,7 @@ PyObject * chrmgrRegisterMotionData(PyObject* poSelf, PyObject* poArgs)
 
 	int32_t iWeight = 0;
 	PyTuple_GetInteger(poArgs, 3, &iWeight);
-	iWeight = MIN(100, iWeight);
+	iWeight = std::min(100, iWeight);
 
 	CRaceData * pRaceData = CRaceManager::Instance().GetSelectedRaceDataPointer();
 	if (!pRaceData)
@@ -529,7 +538,7 @@ PyObject * chrmgrAppendShapeSkin(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chrmgrSetMovingSpeed(PyObject* poSelf, PyObject* poArgs)
 {
-#ifndef NDEBUG // @warme601 _DISTRIBUTE -> NDEBUG
+#ifdef DEBUG
 	int32_t	nMovSpd;
 	if (!PyTuple_GetInteger(poArgs, 0, &nMovSpd))
 		return Py_BadArgument();
@@ -771,7 +780,9 @@ void initchrmgr()
 		{ "RegisterCacheMotionData",	chrmgrRegisterCacheMotionData,			METH_VARARGS },
 
 		// ETC
+#ifdef _DEBUG
 		{ "SetAffect",					chrmgrSetAffect,						METH_VARARGS },
+#endif
 		{ "SetEmoticon",				chrmgrSetEmoticon,						METH_VARARGS },
 		{ "IsPossibleEmoticon",			chrmgrIsPossibleEmoticon,				METH_VARARGS },
 		{ "RegisterEffect",				chrmgrRegisterEffect,					METH_VARARGS },

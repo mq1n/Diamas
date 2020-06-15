@@ -1,14 +1,13 @@
 #include "StdAfx.h"
 #include "../eterLib/StateManager.h"
 #include "../eterLib/GrpSubImage.h"
-#include "../eterlib/Camera.h"
+#include "../eterLib/Camera.h"
 #include <FileSystemIncl.hpp>
-
 #include "PythonMiniMap.h"
 #include "PythonBackground.h"
 #include "PythonCharacterManager.h"
 #include "PythonGuild.h"
-
+#include "PythonNonPlayer.h"
 #include "AbstractPlayer.h"
 
 void CPythonMiniMap::AddObserver(uint32_t dwVID, float fSrcX, float fSrcY)

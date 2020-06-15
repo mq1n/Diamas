@@ -59,9 +59,7 @@ private:
 	struct SFlarePiece
 	{
 		SFlarePiece() :
-	m_fPosition(0.0f),
-		m_fWidth(0.0f),
-		m_pColor(nullptr)
+			m_fPosition(0.0f), m_fWidth(0.0f), 	m_pColor(nullptr)
 	{
 	}
 	CGraphicImageInstance m_imageInstance;

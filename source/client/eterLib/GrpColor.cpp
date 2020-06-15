@@ -57,9 +57,12 @@ void CGraphicColor::Blend(float p, const CGraphicColor& c_rSrcColor, const CGrap
 
 void CGraphicColor::Set(uint32_t pack)
 {
-	m_b = (pack & 0xff) / 255.0f; pack >>= 8;
-	m_g = (pack & 0xff) / 255.0f; pack >>= 8;
-	m_r = (pack & 0xff) / 255.0f; pack >>= 8;
+	m_b = (pack & 0xff) / 255.0f;
+	pack >>= 8;
+	m_g = (pack & 0xff) / 255.0f;
+	pack >>= 8;
+	m_r = (pack & 0xff) / 255.0f;
+	pack >>= 8;
 	m_a = (pack) / 255.0f;
 }
 
@@ -67,9 +70,12 @@ uint32_t CGraphicColor::GetPackValue() const
 {
 	uint32_t packValue=0;
 	
-	packValue  = int32_t(255.0f * m_a);packValue <<= 8;
-	packValue |= int32_t(255.0f * m_r);packValue <<= 8;
-	packValue |= int32_t(255.0f * m_g);packValue <<= 8;
+	packValue = int32_t(255.0f * m_a);
+	packValue <<= 8;
+	packValue |= int32_t(255.0f * m_r);
+	packValue <<= 8;
+	packValue |= int32_t(255.0f * m_g);
+	packValue <<= 8;
 	packValue |= int32_t(255.0f * m_b);
 
 	return packValue;

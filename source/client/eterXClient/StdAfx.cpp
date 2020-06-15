@@ -17,6 +17,7 @@
 #pragma comment( lib, "strmiids.lib" )
 #pragma comment( lib, "dmoguids.lib" )
 #pragma comment( lib, "wtsapi32.lib" )
+#pragma comment( lib, "Netapi32.lib" )
 
 #ifdef _DEBUG
 	#pragma comment( lib, "cryptopp-static_debug.lib" )

@@ -101,6 +101,4 @@ CPythonResource::CPythonResource()
 	m_resManager.RegisterResourceNewFunctionPointer("mdatr", NewAttributeData);
 }
 
-CPythonResource::~CPythonResource()
-{	
-}
+CPythonResource::~CPythonResource() = default;

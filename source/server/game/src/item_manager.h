@@ -1,6 +1,19 @@
 #ifndef __INC_ITEM_MANAGER__
 #define __INC_ITEM_MANAGER__
 
+#include "../../common/service.h"
+#include "../../common/singleton.h"
+#include "../../libthecore/include/utils.h"
+#include "packet.h"
+#include "typedef.h"
+
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <iterator>
+#include <map>
+#include <unordered_set>
+
 #ifdef M2_USE_POOL
 #include "pool.h"
 #endif
@@ -44,13 +57,20 @@ class CSpecialItemGroup
 #ifdef ENABLE_WOLFMAN_CHARACTER
 			BLEEDING,
 #endif
+			MAX_NUM
 		};
 
 		// QUEST 타입은 퀘스트 스크립트에서 vnum.sig_use를 사용할 수 있는 그룹이다.
 		//		단, 이 그룹에 들어가기 위해서는 ITEM 자체의 TYPE이 QUEST여야 한다.
 		// SPECIAL 타입은 idx, item_vnum, attr_vnum을 입력한다. attr_vnum은 위에 CSpecialAttrGroup의 Vnum이다.
 		//		이 그룹에 들어있는 아이템은 같이 착용할 수 없다.
-		enum ESIGType { NORMAL, PCT, QUEST, SPECIAL };
+		enum ESIGType
+		{
+			NORMAL	= 0,
+			PCT		= 1,
+			QUEST	= 2,
+			SPECIAL	= 3,
+		};
 
 		struct CSpecialItemInfo
 		{
@@ -97,7 +117,7 @@ class CSpecialItemGroup
 					idx_vec.push_back(0);
 					count++;
 				}
-				for (size_t i = 1; i < m_vecProbs.size(); i++)
+				for (uint32_t i = 1; i < m_vecProbs.size(); i++)
 				{
 					if (number(1,100) <= m_vecProbs[i] - m_vecProbs[i-1])
 					{
@@ -117,7 +137,7 @@ class CSpecialItemGroup
 		int32_t GetOneIndex() const
 		{
 			int32_t n = number(1, m_vecProbs.back());
-			auto it = lower_bound(m_vecProbs.begin(), m_vecProbs.end(), n);
+			auto it = std::lower_bound(m_vecProbs.begin(), m_vecProbs.end(), n);
 			return std::distance(m_vecProbs.begin(), it);
 		}
 
@@ -367,8 +387,8 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 		void			GracefulShutdown();
 
 		uint32_t			GetNewID();
-		bool			SetMaxItemID(TItemIDRangeTable range); // 최대 고유 아이디를 지정
-		bool			SetMaxSpareItemID(TItemIDRangeTable range);
+		bool			SetMaxItemID(const TItemIDRangeTable &range);
+		bool			SetMaxSpareItemID(const TItemIDRangeTable &range);
 
 		// DelayedSave: 어떠한 루틴 내에서 저장을 해야 할 짓을 많이 하면 저장
 		// 쿼리가 너무 많아지므로 "저장을 한다" 라고 표시만 해두고 잠깐
@@ -391,8 +411,10 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 		bool			GetVnum(const char * c_pszName, uint32_t & r_dwVnum);
 		bool			GetVnumByOriginalName(const char * c_pszName, uint32_t & r_dwVnum);
 
-		bool			GetDropPct(LPCHARACTER pkChr, LPCHARACTER pkKiller, OUT int32_t& iDeltaPercent, OUT int32_t& iRandRange);
+		bool			GetDropPct(LPCHARACTER pkChr, LPCHARACTER pkKiller, int32_t& iDeltaPercent, int32_t& iRandRange);
 		bool			CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::vector<LPITEM> & vec_item);
+		bool			GetPossibleItemsToDrop(LPCHARACTER pkChr, std::vector<uint32_t> & s_vec_itemsDrop);
+		void 			GetChestItemList(uint32_t dwChestVnum, std::vector<TChestDropInfoTable>& vec_item);
 
 		bool			ReadCommonDropItemFile(const char * c_pszFileName);
 		bool			ReadEtcDropItemFile(const char * c_pszFileName);
@@ -408,6 +430,7 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 
 		static void		CopyAllAttrTo(LPITEM pkOldItem, LPITEM pkNewItem);		// pkNewItem으로 모든 속성과 소켓 값들을 목사하는 함수.
 
+		void			DestroyMobDropItem();
 
 		const CSpecialItemGroup* GetSpecialItemGroup(uint32_t dwVnum);
 		const CSpecialAttrGroup* GetSpecialAttrGroup(uint32_t dwVnum);

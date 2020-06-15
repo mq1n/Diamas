@@ -92,9 +92,12 @@ bool CTGAImage::LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem)
 				{
 					for (i = 0; i < hxw; ++i)
 					{
-						r = (uint8_t) *(c_pbMem++); --iSize;
-						g = (uint8_t) *(c_pbMem++); --iSize;
-						b = (uint8_t) *(c_pbMem++); --iSize;
+						r = (uint8_t) * (c_pbMem++);
+						--iSize;
+						g = (uint8_t) * (c_pbMem++);
+						--iSize;
+						b = (uint8_t) * (c_pbMem++);
+						--iSize;
 						a = 0xff;
 						
 						pdwDest[i] = (a << 24) | (r << 16) | (g << 8) | b;
@@ -121,7 +124,8 @@ bool CTGAImage::LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem)
 					i = 0;
 					while (i < hxw)
 					{
-						rle = (uint8_t) *(c_pbMem++); --iSize;
+						rle = (uint8_t) * (c_pbMem++);
+						--iSize;
 
 						if (rle < 0x80)	// 압축 안된 곳
 						{
@@ -129,16 +133,21 @@ bool CTGAImage::LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem)
 
 							while (rle)
 							{
-								b = (uint8_t) *(c_pbMem++); --iSize;
-								g = (uint8_t) *(c_pbMem++); --iSize;
-								r = (uint8_t) *(c_pbMem++); --iSize;
+								b = (uint8_t) * (c_pbMem++);
+								--iSize;
+								g = (uint8_t) * (c_pbMem++);
+								--iSize;
+								r = (uint8_t) * (c_pbMem++);
+								--iSize;
 								a = 0xff;
 								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
 
 								if (i > hxw)
 								{
 									assert(!"RLE overflow");
+#ifdef _DEBUG
 									printf("RLE overflow");
+#endif
 									return false;
 								}
 								--rle;
@@ -149,9 +158,12 @@ bool CTGAImage::LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem)
 							// 압축 된 곳
 							rle -= 127;
 
-							b = (uint8_t) *(c_pbMem++); --iSize;
-							g = (uint8_t) *(c_pbMem++); --iSize;
-							r = (uint8_t) *(c_pbMem++); --iSize;
+							b = (uint8_t) * (c_pbMem++);
+							--iSize;
+							g = (uint8_t) * (c_pbMem++);
+							--iSize;
+							r = (uint8_t) * (c_pbMem++);
+							--iSize;
 							a = 0xff;
 
 							while (rle)
@@ -161,7 +173,9 @@ bool CTGAImage::LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem)
 								if (i > hxw)
 								{
 									assert(!"RLE overflow");
+#ifdef _DEBUG
 									printf("RLE overflow");
+#endif
 									return false;
 								}
 								--rle;
@@ -174,7 +188,8 @@ bool CTGAImage::LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem)
 					i = 0;
 					while (i < hxw)
 					{
-						rle = (uint8_t) *(c_pbMem++); --iSize;
+						rle = (uint8_t) * (c_pbMem++);
+						--iSize;
 						
 						if (rle < 0x80)
 						{
@@ -182,16 +197,22 @@ bool CTGAImage::LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem)
 							
 							while (rle)
 							{
-								b = (uint8_t) *(c_pbMem++); --iSize;
-								g = (uint8_t) *(c_pbMem++); --iSize;
-								r = (uint8_t) *(c_pbMem++); --iSize;
-								a = (uint8_t) *(c_pbMem++); --iSize;
+								b = (uint8_t) * (c_pbMem++);
+								--iSize;
+								g = (uint8_t) * (c_pbMem++);
+								--iSize;
+								r = (uint8_t) * (c_pbMem++);
+								--iSize;
+								a = (uint8_t) * (c_pbMem++);
+								--iSize;
 								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
 								
 								if (i > hxw)
 								{
 									assert(!"RLE overflow");
+#ifdef _DEBUG
 									printf("RLE overflow");
+#endif
 									return false;
 								}
 								--rle;
@@ -201,10 +222,14 @@ bool CTGAImage::LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem)
 						{
 							rle -= 127;
 							
-							b = (uint8_t) *(c_pbMem++); --iSize;
-							g = (uint8_t) *(c_pbMem++); --iSize;
-							r = (uint8_t) *(c_pbMem++); --iSize;
-							a = (uint8_t) *(c_pbMem++); --iSize;
+							b = (uint8_t) * (c_pbMem++);
+							--iSize;
+							g = (uint8_t) * (c_pbMem++);
+							--iSize;
+							r = (uint8_t) * (c_pbMem++);
+							--iSize;
+							a = (uint8_t) * (c_pbMem++);
+							--iSize;
 							
 							while (rle)
 							{
@@ -213,7 +238,9 @@ bool CTGAImage::LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem)
 								if (i > hxw)
 								{
 									assert(!"RLE overflow");
+#ifdef _DEBUG
 									printf("RLE overflow");
+#endif
 									return false;
 								}
 
@@ -227,9 +254,7 @@ bool CTGAImage::LoadFromMemory(int32_t iSize, const uint8_t * c_pbMem)
 	}
 	
 	if (!(m_Header.desc & 0x20))
-	{
 		FlipTopToBottom();
-	}
 
 	return true;
 }
@@ -245,15 +270,13 @@ bool CTGAImage::LoadFromDiskFile(const std::string& stFileName)
 
 int32_t CTGAImage::GetRLEPixelCount(const uint32_t * data)
 {
-	uint32_t pixel;
+	int32_t r = 1;
 
-    int32_t r = 1;
+	if (data >= m_pdwEndPtr)
+		return 0;
 
-    if (data >= m_pdwEndPtr)
-        return 0;
-    
-	pixel = *data;
-    
+	uint32_t pixel = *data;
+
     while ((r < 127) && (data < m_pdwEndPtr))
     {
 		if (pixel != *(++data))

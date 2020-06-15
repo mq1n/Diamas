@@ -50,20 +50,17 @@ void CActorInstance::__BlendAlpha_Update()
 
 	if (fElapsedTime<m_kBlendAlpha.m_fDuration)
 	{
-		float fCurAlpha=m_kBlendAlpha.m_fBaseAlpha+(m_kBlendAlpha.m_fDstAlpha-m_kBlendAlpha.m_fBaseAlpha)*fElapsedTime/m_kBlendAlpha.m_fDuration;		
+		float fCurAlpha = m_kBlendAlpha.m_fBaseAlpha +
+			(m_kBlendAlpha.m_fDstAlpha - m_kBlendAlpha.m_fBaseAlpha) * fElapsedTime / m_kBlendAlpha.m_fDuration;
 		SetBlendRenderMode();
 		SetAlphaValue(fCurAlpha);
 	}
 	else
 	{
 		if (1.0f>m_kBlendAlpha.m_fDstAlpha)
-		{
 			SetBlendRenderMode();
-		}
 		else
-		{
-			m_iRenderMode=m_kBlendAlpha.m_iOldRenderMode;
-		}
+			m_iRenderMode = m_kBlendAlpha.m_iOldRenderMode;
 
 		SetAlphaValue(m_kBlendAlpha.m_fDstAlpha);
 

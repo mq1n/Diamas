@@ -19,6 +19,8 @@ class MessengerManager : public singleton<MessengerManager>
 		void	Login(keyA account);
 		void	Logout(keyA account);
 
+		void	RequestToAdd(LPCHARACTER ch, const char* pszTargetName);
+		void	RequestToAdd(const char* pszName, LPCHARACTER target);
 		void	RequestToAdd(LPCHARACTER ch, LPCHARACTER target);
 		bool	AuthToAdd(keyA account, keyA companion, bool bDeny); // @fixme130 void -> bool
 

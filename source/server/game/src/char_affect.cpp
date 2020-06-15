@@ -1,4 +1,3 @@
-
 #include "stdafx.h"
 #include "config.h"
 #include "char.h"
@@ -13,9 +12,12 @@
 #include "locale_service.h"
 #include "lua_incl.h"
 #include "arena.h"
-#include "horsename_manager.h"
 #include "item.h"
-#include "DragonSoul.h"
+#include "dragon_soul.h"
+#include "party.h"
+#include "skill.h"
+#include "battleground.h"
+#include "../../common/service.h"
 
 #define IS_NO_SAVE_AFFECT(type) ((type) == AFFECT_WAR_FLAG || (type) == AFFECT_REVIVE_INVISIBLE || ((type) >= AFFECT_PREMIUM_START && (type) <= AFFECT_PREMIUM_END) || (type) == AFFECT_MOUNT_BONUS) // @fixme156 added MOUNT_BONUS (if the game core crashes, the bonus would double if present in player.affect)
 #define IS_NO_CLEAR_ON_DEATH_AFFECT(type) ((type) == AFFECT_BLOCK_CHAT || ((type) >= 500 && (type) < 600))
@@ -56,6 +58,8 @@ CAffect * CHARACTER::FindAffect(uint32_t dwType, uint8_t bApply) const
 	while (it != m_list_pkAffect.end())
 	{
 		CAffect * pkAffect = *it++;
+		if (!pkAffect)
+			return nullptr;
 
 		if (pkAffect->dwType == dwType && (bApply == APPLY_NONE || bApply == pkAffect->bApplyOn))
 			return pkAffect;
@@ -155,11 +159,13 @@ bool CHARACTER::UpdateAffect()
 
 	// ProcessAffect는 affect가 없으면 true를 리턴한다.
 	if (ProcessAffect())
+	{
 		if (GetPoint(POINT_HP_RECOVERY) == 0 && GetPoint(POINT_SP_RECOVERY) == 0 && GetStamina() == GetMaxStamina())
 		{
 			m_pkAffectEvent = nullptr;
 			return false;
 		}
+	}
 
 	return true;
 }
@@ -201,6 +207,7 @@ void CHARACTER::ClearAffect(bool bSave)
 			}
 		}
 
+		sys_log(0, "Remove %u", pkAff->dwType);
 		ComputeAffect(pkAff, false);
 
 		it = m_list_pkAffect.erase(it);
@@ -266,8 +273,6 @@ int32_t CHARACTER::ProcessAffect()
 	}
 	////////// HAIR_AFFECT
 	//
-
-	CHorseNameManager::instance().Validate(this);
 
 	TAffectFlag afOld = m_afAffectFlag;
 	int32_t lMovSpd = GetPoint(POINT_MOV_SPEED);
@@ -440,7 +445,7 @@ void CHARACTER::LoadAffect(uint32_t dwCount, TPacketAffectElement * pElements)
 
 	if (!GetDesc()->IsPhase(PHASE_GAME))
 	{
-		if (test_server)
+		if (g_bIsTestServer)
 			sys_log(0, "LOAD_AFFECT: Creating Event", GetName(), dwCount);
 
 		load_affect_login_event_info* info = AllocEventInfo<load_affect_login_event_info>();
@@ -457,7 +462,7 @@ void CHARACTER::LoadAffect(uint32_t dwCount, TPacketAffectElement * pElements)
 
 	ClearAffect(true);
 
-	if (test_server)
+	if (g_bIsTestServer)
 		sys_log(0, "LOAD_AFFECT: %s count %d", GetName(), dwCount);
 
 	TAffectFlag afOld = m_afAffectFlag;
@@ -488,7 +493,7 @@ void CHARACTER::LoadAffect(uint32_t dwCount, TPacketAffectElement * pElements)
 			continue;
 		}
 
-		if (test_server)
+		if (g_bIsTestServer)
 		{
 			sys_log(0, "Load Affect : Affect %s %d %d", GetName(), pElements->dwType, pElements->bApplyOn );
 		}
@@ -510,6 +515,11 @@ void CHARACTER::LoadAffect(uint32_t dwCount, TPacketAffectElement * pElements)
 	
 	}
 
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	{
+		RemoveBadAffect();
+		RemoveGoodAffect();
+	}
 	if ( CArenaManager::instance().IsArenaMap(GetMapIndex()) == true )
 	{
 		RemoveGoodAffect();
@@ -533,7 +543,9 @@ void CHARACTER::LoadAffect(uint32_t dwCount, TPacketAffectElement * pElements)
 		PointChange(POINT_HP, GetMaxHP() - GetHP());
 		PointChange(POINT_SP, GetMaxSP() - GetSP());
 	}
-	// @fixme118 END
+
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+		CBattlegroundManager::instance().OnAffectLoad(this);
 }
 
 bool CHARACTER::AddAffect(uint32_t dwType, uint8_t bApplyOn, int32_t lApplyValue, uint32_t dwFlag, int32_t lDuration, int32_t lSPCost, bool bOverride, bool IsCube )
@@ -673,6 +685,19 @@ void CHARACTER::ComputeAffect(CAffect * pkAff, bool bAdd)
 		else
 			StopMuyeongEvent();
 	}
+
+	if (pkAff->dwType == AFFECT_HORSE_NAME)
+	{
+		if (!bAdd)
+		{
+			if (GetHorse())
+			{
+				HorseSummon(false);
+				SetHorseName("");
+				HorseSummon(true);
+			}
+		}
+	}
 }
 
 bool CHARACTER::RemoveAffect(CAffect * pkAff)
@@ -703,7 +728,7 @@ bool CHARACTER::RemoveAffect(CAffect * pkAff)
 
 	CheckMaximumPoints();
 
-	if (test_server)
+	if (g_bIsTestServer)
 		sys_log(0, "AFFECT_REMOVE: %s (flag %u apply: %u)", GetName(), pkAff->dwFlag, pkAff->bApplyOn);
 
 	if (IsPC())
@@ -760,7 +785,7 @@ void CHARACTER::RemoveGoodAffect()
 	RemoveAffect(SKILL_GWIGEOM);
 	RemoveAffect(SKILL_TERROR);
 	RemoveAffect(SKILL_JUMAGAP);
-	RemoveAffect(SKILL_MANASHILED);
+	RemoveAffect(SKILL_MANASHIELD);
 	RemoveAffect(SKILL_HOSIN);
 	RemoveAffect(SKILL_REFLECT);
 	RemoveAffect(SKILL_KWAESOK);
@@ -792,7 +817,7 @@ bool CHARACTER::IsGoodAffect(uint8_t bAffectType) const
 		case (SKILL_GWIGEOM):
 		case (SKILL_TERROR):
 		case (SKILL_JUMAGAP):
-		case (SKILL_MANASHILED):
+		case (SKILL_MANASHIELD):
 		case (SKILL_HOSIN):
 		case (SKILL_REFLECT):
 		case (SKILL_KWAESOK):

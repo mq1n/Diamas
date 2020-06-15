@@ -29,9 +29,9 @@ class CArena
 	LPEVENT m_pEvent;
 	LPEVENT m_pTimeOutEvent;
 
-	PIXEL_POSITION m_StartPointA;
-	PIXEL_POSITION m_StartPointB;
-	PIXEL_POSITION m_ObserverPoint;
+	GPOS m_StartPointA;
+	GPOS m_StartPointB;
+	GPOS m_ObserverPoint;
 
 	uint32_t m_dwSetCount;
 	uint32_t m_dwSetPointOfA;
@@ -65,18 +65,15 @@ class CArena
 	LPCHARACTER GetPlayerA() { return CHARACTER_MANAGER::instance().FindByPID(m_dwPIDA); }
 	LPCHARACTER GetPlayerB() { return CHARACTER_MANAGER::instance().FindByPID(m_dwPIDB); }
 
-	PIXEL_POSITION GetStartPointA() { return m_StartPointA; }
-	PIXEL_POSITION GetStartPointB() { return m_StartPointB; }
+	GPOS GetStartPointA() { return m_StartPointA; }
+	GPOS GetStartPointB() { return m_StartPointB; }
 
-	PIXEL_POSITION GetObserverPoint() { return m_ObserverPoint; }
+	GPOS GetObserverPoint() { return m_ObserverPoint; }
 
 	void EndDuel();
 	void ClearEvent() { m_pEvent = nullptr; }
 	void OnDisconnect(uint32_t pid);
 	void RemoveObserver(uint32_t pid);
-
-	void SendPacketToObserver(const void * c_pvData, int32_t iSize);
-	void SendChatPacketToObserver(uint8_t type, const char * format, ...);
 };
 
 class CArenaMap
@@ -112,6 +109,7 @@ class CArenaManager : public singleton<CArenaManager>
 {
 	private :
 		std::map<uint32_t, CArenaMap*> m_mapArenaMap;
+		std::vector<int32_t> m_listForbidden;
 
 	public :
 		bool Initialize();

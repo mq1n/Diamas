@@ -9,9 +9,9 @@
 class CEffectData
 {
 	public:
-		typedef std::vector<CParticleSystemData*>	TParticleVector;
-		typedef std::vector<CEffectMeshScript*>		TMeshVector;
-		typedef std::vector<CLightData*>			TLightVector;
+		using TParticleVector = std::vector<CParticleSystemData *>;
+		using TMeshVector = std::vector<CEffectMeshScript *>;
+		using TLightVector = std::vector<CLightData *>;
 
 	public:
 		CEffectData();

@@ -97,9 +97,9 @@ bool CGrannyModelInstance::__CreateMeshBindingVector(CGrannyModelInstance* pkDst
 	
 	m_vct_pgrnMeshBinding.reserve(pgrnModel->MeshBindingCount);
 
-	granny_int32 iMeshBinding;
-	for (iMeshBinding = 0; iMeshBinding != pgrnModel->MeshBindingCount; ++iMeshBinding)
-		m_vct_pgrnMeshBinding.push_back(GrannyNewMeshBinding(pgrnModel->MeshBindings[iMeshBinding].Mesh, pgrnModel->Skeleton, pgrnDstSkeleton));
+	for (granny_int32 iMeshBinding = 0; iMeshBinding != pgrnModel->MeshBindingCount; ++iMeshBinding)
+		m_vct_pgrnMeshBinding.emplace_back(
+			GrannyNewMeshBinding(pgrnModel->MeshBindings[iMeshBinding].Mesh, pgrnModel->Skeleton, pgrnDstSkeleton));
 
 	return true;
 }

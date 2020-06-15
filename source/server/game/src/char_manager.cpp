@@ -12,11 +12,13 @@
 #include "db.h"
 #include "config.h"
 #include "xmas_event.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "questlua.h"
 #include "locale_service.h"
 #include "log.h"
+#include "nearby_scanner.h"
 
+#include "../../common/service.h"
 CHARACTER_MANAGER::CHARACTER_MANAGER() :
 	m_iVIDCount(0),
 	m_pkChrSelectedStone(nullptr),
@@ -49,16 +51,55 @@ CHARACTER_MANAGER::~CHARACTER_MANAGER()
 void CHARACTER_MANAGER::Destroy()
 {
 	auto it = m_map_pkChrByVID.begin();
-	while (it != m_map_pkChrByVID.end()) {
-		LPCHARACTER ch = it->second;
-		M2_DESTROY_CHARACTER(ch); // m_map_pkChrByVID is changed here
-		it = m_map_pkChrByVID.begin();
-	}
+	auto lastIt = it;
+	std::vector<uint32_t> deletedVID;
+
+    while (it != m_map_pkChrByVID.end()) 
+	{
+        LPCHARACTER ch = it->second;
+        M2_DESTROY_CHARACTER(ch); // m_map_pkChrByVID is changed here
+        it = m_map_pkChrByVID.begin();
+		if (it == m_map_pkChrByVID.end())
+			break;
+
+		if (lastIt == it)
+		{
+			sys_err("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FATAL ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			sys_err("Could not process iterator while destroying charMgr. key: %u, expected: %u, pendingDestroy: %b", it->first, (uint32_t)ch->GetVID(), m_bUsePendingDestroy);
+			sys_err("Dumping deleted vids list:");
+			
+			std::string dump = "";
+			for (size_t i = 0, leftInLine = 20, size = deletedVID.size(); i < size; ++i, --leftInLine)
+			{
+				dump += std::to_string(i);
+				if (leftInLine <= 0)
+				{
+					sys_err("%s", dump.c_str());
+					dump = "";
+					leftInLine = 20;
+				}
+				else
+				{
+					dump += ",";
+				}
+			}
+
+			if (dump != "")
+				sys_err("%s", dump.c_str());
+
+			it = m_map_pkChrByVID.erase(it);
+		}
+		else
+		{
+			lastIt = it;
+			deletedVID.push_back(it->first);
+		}
+    }
 }
 
 void CHARACTER_MANAGER::GracefulShutdown()
 {
-	NAME_MAP::iterator it = m_map_pkPCChr.begin();
+    auto it = m_map_pkPCChr.begin();
 
 	while (it != m_map_pkPCChr.end())
 		(it++)->second->Disconnect("GracefulShutdown");
@@ -70,7 +111,7 @@ uint32_t CHARACTER_MANAGER::AllocVID()
 	return m_iVIDCount;
 }
 
-LPCHARACTER CHARACTER_MANAGER::CreateCharacter(const char * name, uint32_t dwPID)
+LPCHARACTER CHARACTER_MANAGER::CreateCharacter(std::string stName, uint32_t dwPID)
 {
 	uint32_t dwVID = AllocVID();
 
@@ -79,16 +120,15 @@ LPCHARACTER CHARACTER_MANAGER::CreateCharacter(const char * name, uint32_t dwPID
 #else
 	LPCHARACTER ch = M2_NEW CHARACTER;
 #endif
-	ch->Create(name, dwVID, dwPID ? true : false);
+    ch->Create(stName, dwVID, dwPID ? true : false);
 
 	m_map_pkChrByVID.insert(std::make_pair(dwVID, ch));
 
 	if (dwPID)
 	{
-		char szName[CHARACTER_NAME_MAX_LEN + 1];
-		str_lower(name, szName, sizeof(szName));
+		std::transform(stName.begin(), stName.end(), stName.begin(), ::tolower);
 
-		m_map_pkPCChr.insert(NAME_MAP::value_type(szName, ch));
+        m_map_pkPCChr.insert(NAME_MAP::value_type(stName.c_str(), ch));
 		m_map_pkChrByPID.insert(std::make_pair(dwPID, ch));
 	}
 
@@ -107,11 +147,12 @@ void CHARACTER_MANAGER::DestroyCharacter(LPCHARACTER ch, const char* file, size_
 	// <Factor> Check whether it has been already deleted or not.
 	auto it = m_map_pkChrByVID.find(ch->GetVID());
 	if (it == m_map_pkChrByVID.end()) {
-		sys_err("[CHARACTER_MANAGER::DestroyCharacter] <Factor> %d not found", (int32_t)(ch->GetVID()));
+		sys_err("[CHARACTER_MANAGER::DestroyCharacter] <Factor> %d not found", static_cast<int32_t>(ch->GetVID()));
 		return; // prevent duplicated destrunction
 	}
+	CNearbyScanner::instance().Die(ch->GetVID());
 
-	// 던전에 소속된 몬스터는 던전에서도 삭제하도록.
+	// ´øAu¿¡ ¼O¼OμE ¸o½ºAI´A ´øAu¿¡¼­μμ ≫eA|CIμμ·I.
 	if (ch->IsNPC() && !ch->IsPet() && ch->GetRider() == nullptr)
 	{
 		if (ch->GetDungeon())
@@ -128,27 +169,30 @@ void CHARACTER_MANAGER::DestroyCharacter(LPCHARACTER ch, const char* file, size_
 
 	m_map_pkChrByVID.erase(it);
 
-	if (true == ch->IsPC())
+	if (ch->IsPC())
 	{
-		char szName[CHARACTER_NAME_MAX_LEN + 1];
+		std::string stNameLower = ch->GetStringName();
+		std::transform(stNameLower.begin(), stNameLower.end(), stNameLower.begin(), ::tolower);
 
-		str_lower(ch->GetName(), szName, sizeof(szName));
+		auto itFndName = m_map_pkPCChr.find(stNameLower);
 
-		NAME_MAP::iterator it = m_map_pkPCChr.find(szName);
-
-		if (m_map_pkPCChr.end() != it)
-			m_map_pkPCChr.erase(it);
+        if (m_map_pkPCChr.end() != itFndName)
+            m_map_pkPCChr.erase(itFndName);
 	}
 
-	if (0 != ch->GetPlayerID())
-	{
-		auto it = m_map_pkChrByPID.find(ch->GetPlayerID());
+	if (ch->GetPlayerID() && ch->IsPC())
+    {
+        auto itByPid = m_map_pkChrByPID.find(ch->GetPlayerID());
 
-		if (m_map_pkChrByPID.end() != it)
-		{
-			m_map_pkChrByPID.erase(it);
-		}
-	}
+        if (m_map_pkChrByPID.end() != itByPid)
+        {
+            m_map_pkChrByPID.erase(itByPid);
+        }
+    }
+
+	auto itByBG = m_map_pkBGMob.find(ch);
+	if (itByBG != m_map_pkBGMob.end())
+		m_map_pkBGMob.erase(itByBG);
 
 	UnregisterRaceNumMap(ch);
 
@@ -174,8 +218,8 @@ LPCHARACTER CHARACTER_MANAGER::Find(uint32_t dwVID)
 	
 	// <Factor> Added sanity check
 	LPCHARACTER found = it->second;
-	if (found != nullptr && dwVID != (uint32_t)found->GetVID()) {
-		sys_err("[CHARACTER_MANAGER::Find] <Factor> %u != %u", dwVID, (uint32_t)found->GetVID());
+	if (found != nullptr && dwVID != static_cast<uint32_t>(found->GetVID())) {
+		sys_err("[CHARACTER_MANAGER::Find] <Factor> %u != %u", dwVID, static_cast<uint32_t>(found->GetVID()));
 		return nullptr;
 	}
 	return found;
@@ -183,7 +227,7 @@ LPCHARACTER CHARACTER_MANAGER::Find(uint32_t dwVID)
 
 LPCHARACTER CHARACTER_MANAGER::Find(const VID & vid)
 {
-	LPCHARACTER tch = Find((uint32_t) vid);
+	LPCHARACTER tch = Find(static_cast<uint32_t>(vid));
 
 	if (!tch || tch->GetVID() != vid)
 		return nullptr;
@@ -207,19 +251,19 @@ LPCHARACTER CHARACTER_MANAGER::FindByPID(uint32_t dwPID)
 	return found;
 }
 
-LPCHARACTER CHARACTER_MANAGER::FindPC(const char * name)
+LPCHARACTER CHARACTER_MANAGER::FindPC(std::string stName)
 {
-	char szName[CHARACTER_NAME_MAX_LEN + 1];
-	str_lower(name, szName, sizeof(szName));
-	NAME_MAP::iterator it = m_map_pkPCChr.find(szName);
+	std::transform(stName.begin(), stName.end(), stName.begin(), ::tolower);
+
+	auto it = m_map_pkPCChr.find(stName);
 
 	if (it == m_map_pkPCChr.end())
 		return nullptr;
 
 	// <Factor> Added sanity check
 	LPCHARACTER found = it->second;
-	if (found != nullptr && strncasecmp(szName, found->GetName(), CHARACTER_NAME_MAX_LEN) != 0) {
-		sys_err("[CHARACTER_MANAGER::FindPC] <Factor> %s != %s", name, found->GetName());
+	if (found != nullptr && strncasecmp(stName.c_str(), found->GetName(), CHARACTER_NAME_MAX_LEN) != 0) {
+		sys_err("[CHARACTER_MANAGER::FindPC] <Factor> %s != %s", stName.c_str(), found->GetName());
 		return nullptr;
 	}
 	return found;
@@ -227,30 +271,26 @@ LPCHARACTER CHARACTER_MANAGER::FindPC(const char * name)
 
 LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t lMapIndex)
 {
-
-	// 해태를 스폰할지 말지를 결정할 수 있게 함
+	// CØAA¸| ½ºÆuCOAo ¸≫Ao¸| °aA¤CO ¼o AO°O CO
+	if (dwVnum == 5002 && !quest::CQuestManager::instance().GetEventFlag("newyear_mob"))
 	{
-		if (dwVnum == 5002 && !quest::CQuestManager::instance().GetEventFlag("newyear_mob"))
-		{
-			sys_log(1, "HAETAE (new-year-mob) [5002] regen disabled.");
-			return nullptr;
-		}
+		sys_log(1, "HAETAE (new-year-mob) [5002] regen disabled.");
+		return nullptr;
 	}
 
-	// 광복절 이벤트 
+
+	if (dwVnum == 5004 && !quest::CQuestManager::instance().GetEventFlag("independence_day"))
 	{
-		if (dwVnum == 5004 && !quest::CQuestManager::instance().GetEventFlag("independence_day"))
-		{
-			sys_log(1, "INDEPENDECE DAY [5004] regen disabled.");
-			return nullptr;
-		}
+		sys_log(1, "INDEPENDECE DAY [5004] regen disabled.");
+		return nullptr;
 	}
+	
 
 	const CMob * pkMob = CMobManager::instance().Get(dwVnum);
 
 	if (!pkMob)
 	{
-		sys_err("no mob data for vnum %u", dwVnum);
+		sys_err("no mob data for vnum %u on map index %d", dwVnum, lMapIndex);
 		return nullptr;
 	}
 
@@ -266,7 +306,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t l
 	}
 
 	int32_t i;
-	int32_t x, y;
+    int32_t x = 0, y = 0;
 	for (i=0; i<2000; i++)
 	{
 		x = number(1, (pkSectreeMap->m_setting.iWidth / 100)  - 1) * 100 + pkSectreeMap->m_setting.iBaseX;
@@ -282,7 +322,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t l
 		if (IS_SET(dwAttr, ATTR_BLOCK | ATTR_OBJECT))
 			continue;
 
-		if (IS_SET(dwAttr, ATTR_BANPK))
+        if (IS_SET(dwAttr, ATTR_BANPK) && !mining::IsVeinOfOre(dwVnum))
 			continue;
 
 		break;
@@ -329,21 +369,21 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t l
 	char buf[512+1];
 	int32_t local_x = x - pkSectreeMap->m_setting.iBaseX;
 	int32_t local_y = y - pkSectreeMap->m_setting.iBaseY;
-	snprintf(buf, sizeof(buf), "spawn %s[%d] random position at %ld %ld %ld %ld (time: %d)", ch->GetName(), dwVnum, x, y, local_x, local_y, get_global_time());
+	snprintf(buf, sizeof(buf), "spawn %s[%d] random position at %d %d %d %d (time: %d)", ch->GetName(), dwVnum, x, y, local_x, local_y, static_cast<int32_t>(get_global_time()));
 	
-	if (test_server)
+	if (g_bIsTestServer)
 		SendNotice(buf);
 
 	sys_log(0, buf);
 	return (ch);
 }
 
-LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int32_t x, int32_t y, int32_t z, bool bSpawnMotion, int32_t iRot, bool bShow)
+LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int32_t x, int32_t y, int32_t z, bool bSpawnMotion, int32_t iRot, bool bShow, bool bBattleground)
 {
 	const CMob * pkMob = CMobManager::instance().Get(dwVnum);
 	if (!pkMob)
 	{
-		sys_err("SpawnMob: no mob data for vnum %u", dwVnum);
+		sys_err("SpawnMob: no mob data for vnum %u (map %d)", dwVnum, lMapIndex);
 		return nullptr;
 	}
 
@@ -385,9 +425,9 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int3
 			return nullptr;
 		}
 
-		if (IS_SET(dwAttr, ATTR_BANPK))
+        if (IS_SET(dwAttr, ATTR_BANPK) && !mining::IsVeinOfOre(dwVnum))
 		{
-			sys_log(0, "SpawnMob: BAN_PK position for mob spawn %s %u at %d %d", pkMob->m_table.szName, dwVnum, x, y);
+			sys_log(0, "SpawnMob: BAN_PK position for mob spawn %s %u at %d %d %d", pkMob->m_table.szName, dwVnum, x, y, lMapIndex);
 			return nullptr;
 		}
 	}
@@ -418,16 +458,19 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int3
 		if (ch->GetEmpire() == 0)
 			ch->SetEmpire(SECTREE_MANAGER::instance().GetEmpireFromMapIndex(lMapIndex));
 
-	ch->SetRotation(iRot);
+	ch->SetRotation(static_cast<float>(iRot));
 
 	if (bShow && !ch->Show(lMapIndex, x, y, z, bSpawnMotion))
 	{
 		M2_DESTROY_CHARACTER(ch);
-		sys_log(0, "SpawnMob: cannot show monster");
+		sys_log(0, "SpawnMob: cannot show monster on map %d x %d y %d", lMapIndex, x, y);
 		return nullptr;
 	}
 
-	return (ch);
+	if (bBattleground)
+		m_map_pkBGMob.emplace(ch);
+
+	return ch;
 }
 
 LPCHARACTER CHARACTER_MANAGER::SpawnMobRange(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, bool bIsException, bool bSpawnMotion, bool bAggressive )
@@ -530,7 +573,7 @@ bool CHARACTER_MANAGER::SpawnMoveGroup(uint32_t dwVnum, int32_t lMapIndex, int32
 			tch->SetAggressive();
 
 		if (tch->Goto(tx, ty))
-			tch->SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
+			tch->SendMovePacket(FUNC_WAIT, 0, 0, 0, 0); // checkme
 	}
 
 	return true;
@@ -546,12 +589,12 @@ bool CHARACTER_MANAGER::SpawnGroupGroup(uint32_t dwVnum, int32_t lMapIndex, int3
 	}
 	else
 	{
-		sys_err( "NOT_EXIST_GROUP_GROUP_VNUM(%u) MAP(%ld)", dwVnum, lMapIndex );
+		sys_err( "NOT_EXIST_GROUP_GROUP_VNUM(%u) MAP(%d)", dwVnum, lMapIndex );
 		return false;
 	}
 }
 
-LPCHARACTER CHARACTER_MANAGER::SpawnGroup(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, LPREGEN pkRegen, bool bAggressive_, LPDUNGEON pDungeon)
+LPCHARACTER CHARACTER_MANAGER::SpawnGroup(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, LPREGEN pkRegen, bool bAggressive_, LPDUNGEON pDungeon, bool bRandom)
 {
 	CMobGroup * pkGroup = CMobManager::Instance().GetGroup(dwVnum);
 
@@ -581,7 +624,11 @@ LPCHARACTER CHARACTER_MANAGER::SpawnGroup(uint32_t dwVnum, int32_t lMapIndex, in
 
 	for (uint32_t i = 0; i < c_rdwMembers.size(); ++i)
 	{
-		LPCHARACTER tch = SpawnMobRange(c_rdwMembers[i], lMapIndex, sx, sy, ex, ey, true, bSpawnedByStone);
+		LPCHARACTER tch;
+		if (bRandom && i == 0)
+			tch = SpawnMobRandomPosition(c_rdwMembers[i], lMapIndex);
+		else
+			tch = SpawnMobRange(c_rdwMembers[i], lMapIndex, sx, sy, ex, ey, true, bSpawnedByStone);
 
 		if (!tch)
 		{
@@ -622,7 +669,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnGroup(uint32_t dwVnum, int32_t lMapIndex, in
 
 	return chLeader;
 }
-
+/*
 struct FuncUpdateAndResetChatCounter
 {
 	void operator () (LPCHARACTER ch)
@@ -631,7 +678,7 @@ struct FuncUpdateAndResetChatCounter
 		ch->CFSM::Update();
 	}
 };
-
+*/
 void CHARACTER_MANAGER::Update(int32_t iPulse)
 {
 	BeginPendingDestroy();
@@ -646,6 +693,10 @@ void CHARACTER_MANAGER::Update(int32_t iPulse)
 
 			if (resetChatCounter)
 			{
+				auto ac = ch->GetAbuseController();
+				if (ac)
+					ac->Analyze();
+
 				ch->ResetChatCounter();
 				ch->CFSM::Update();
 			}
@@ -665,10 +716,10 @@ void CHARACTER_MANAGER::Update(int32_t iPulse)
 	// Update to Santa
 	// /*
 	{
-		CharacterVectorInteractor i;
-		if (CHARACTER_MANAGER::instance().GetCharactersByRaceNum(xmas::MOB_SANTA_VNUM, i))
+		auto snapshot = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(xmas::MOB_SANTA_VNUM);
+		if (!snapshot.empty())
 		{
-			std::for_each(i.begin(), i.end(), [iPulse](LPCHARACTER ch)
+			std::for_each(snapshot.begin(), snapshot.end(), [iPulse](LPCHARACTER ch)
 				{
 					ch->UpdateStateMachine(iPulse);
 				}
@@ -687,7 +738,7 @@ void CHARACTER_MANAGER::Update(int32_t iPulse)
 	}
 
 	// The test server counts the number of characters every 60 seconds
-	if (test_server && 0 == (iPulse % PASSES_PER_SEC(60)))
+	if (g_bIsTestServer && 0 == (iPulse % PASSES_PER_SEC(60)))
 		sys_log(0, "CHARACTER COUNT vid %zu pid %zu", m_map_pkChrByVID.size(), m_map_pkChrByPID.size());
 
 	// Delayed DestroyCharacter
@@ -697,13 +748,9 @@ void CHARACTER_MANAGER::Update(int32_t iPulse)
 
 void CHARACTER_MANAGER::ProcessDelayedSave()
 {
-	CHARACTER_SET::iterator it = m_set_pkChrForDelayedSave.begin();
+	for (auto & ch : m_set_pkChrForDelayedSave)
+		ch->SaveReal();
 
-	while (it != m_set_pkChrForDelayedSave.end())
-	{
-		LPCHARACTER pkChr = *it++;
-		pkChr->SaveReal();
-	}
 
 	m_set_pkChrForDelayedSave.clear();
 }
@@ -712,7 +759,7 @@ bool CHARACTER_MANAGER::AddToStateList(LPCHARACTER ch)
 {
 	assert(ch != nullptr);
 
-	CHARACTER_SET::iterator it = m_set_pkChrState.find(ch);
+	auto it = m_set_pkChrState.find(ch);
 
 	if (it == m_set_pkChrState.end())
 	{
@@ -725,7 +772,7 @@ bool CHARACTER_MANAGER::AddToStateList(LPCHARACTER ch)
 
 void CHARACTER_MANAGER::RemoveFromStateList(LPCHARACTER ch)
 {
-	CHARACTER_SET::iterator it = m_set_pkChrState.find(ch);
+    auto it = m_set_pkChrState.find(ch);
 
 	if (it != m_set_pkChrState.end())
 	{
@@ -741,7 +788,7 @@ void CHARACTER_MANAGER::DelayedSave(LPCHARACTER ch)
 
 bool CHARACTER_MANAGER::FlushDelayedSave(LPCHARACTER ch)
 {
-	CHARACTER_SET::iterator it = m_set_pkChrForDelayedSave.find(ch);
+    auto it = m_set_pkChrForDelayedSave.find(ch);
 
 	if (it == m_set_pkChrForDelayedSave.end())
 		return false;
@@ -765,7 +812,7 @@ void CHARACTER_MANAGER::KillLog(uint32_t dwVnum)
 
 		if (it->second > SEND_LIMIT)
 		{
-			DBManager::instance().SendMoneyLog(MONEY_LOG_MONSTER_KILL, it->first, it->second);
+			LogManager::instance().MoneyLog(MONEY_LOG_MONSTER_KILL, it->first, it->second);
 			m_map_dwMobKillCount.erase(it);
 		}
 	}
@@ -797,16 +844,23 @@ void CHARACTER_MANAGER::UnregisterRaceNumMap(LPCHARACTER ch)
 		it->second.erase(ch);
 }
 
-bool CHARACTER_MANAGER::GetCharactersByRaceNum(uint32_t dwRaceNum, CharacterVectorInteractor & i)
+CharacterSetSnapshot CHARACTER_MANAGER::GetCharactersByRaceNum(uint32_t dwRaceNum)
 {
-	std::map<uint32_t, CHARACTER_SET>::iterator it = m_map_pkChrByRaceNum.find(dwRaceNum);
+	const auto it = m_map_pkChrByRaceNum.find(dwRaceNum);
+	if (it == m_map_pkChrByRaceNum.end())
+		return CharacterSetSnapshot();
+
+	return CharacterSetSnapshot(it->second);
+}
+
+int32_t CHARACTER_MANAGER::CountCharactersByRaceNum(uint32_t dwRaceNum)
+{
+	auto it = m_map_pkChrByRaceNum.find(dwRaceNum);
 
 	if (it == m_map_pkChrByRaceNum.end())
-		return false;
-
-	// 컨테이너 복사
-	i = it->second;
-	return true;
+		return 0;
+	
+	return it->second.size();
 }
 
 #define FIND_JOB_WARRIOR_0	(1 << 3)
@@ -840,9 +894,9 @@ LPCHARACTER CHARACTER_MANAGER::FindSpecifyPC(uint32_t uiJobFlag, int32_t lMapInd
 	LPCHARACTER chFind = nullptr;
 	int32_t n = 0;
 
-	for (auto it = m_map_pkChrByPID.begin(); it != m_map_pkChrByPID.end(); ++it)
+	for(auto & it : m_map_pkChrByPID)
 	{
-		LPCHARACTER ch = it->second;
+		LPCHARACTER ch = it.second;
 
 		if (ch == except)
 			continue;
@@ -871,53 +925,48 @@ LPCHARACTER CHARACTER_MANAGER::FindSpecifyPC(uint32_t uiJobFlag, int32_t lMapInd
 	return chFind;
 }
 
-int32_t CHARACTER_MANAGER::GetMobItemRate(LPCHARACTER ch)	
+int32_t CHARACTER_MANAGER::GetMobItemRate(LPCHARACTER ch) const
 { 
 	if (ch && ch->GetPremiumRemainSeconds(PREMIUM_ITEM) > 0)
 		return m_iMobItemRatePremium;
-
 	return m_iMobItemRate; 
 }
 
-int32_t CHARACTER_MANAGER::GetMobDamageRate(LPCHARACTER ch)	
+int32_t CHARACTER_MANAGER::GetMobDamageRate(LPCHARACTER ch) const
 { 
 	return m_iMobDamageRate; 
 }
 
-int32_t CHARACTER_MANAGER::GetMobGoldAmountRate(LPCHARACTER ch)
+int32_t CHARACTER_MANAGER::GetMobGoldAmountRate(LPCHARACTER ch) const
 { 
 	if ( !ch )
 		return m_iMobGoldAmountRate;
 
 	if (ch && ch->GetPremiumRemainSeconds(PREMIUM_GOLD) > 0)
 		return m_iMobGoldAmountRatePremium;
-
 	return m_iMobGoldAmountRate; 
 }
 
-int32_t CHARACTER_MANAGER::GetMobGoldDropRate(LPCHARACTER ch)
+int32_t CHARACTER_MANAGER::GetMobGoldDropRate(LPCHARACTER ch) const
 {
 	if ( !ch )
 		return m_iMobGoldDropRate;
-	
 	if (ch && ch->GetPremiumRemainSeconds(PREMIUM_GOLD) > 0)
 		return m_iMobGoldDropRatePremium;
-
 	return m_iMobGoldDropRate;
 }
 
-int32_t CHARACTER_MANAGER::GetMobExpRate(LPCHARACTER ch)
+int32_t CHARACTER_MANAGER::GetMobExpRate(LPCHARACTER ch) const
 { 
 	if ( !ch )
 		return m_iMobExpRate;
 
 	if (ch && ch->GetPremiumRemainSeconds(PREMIUM_EXP) > 0)
 		return m_iMobExpRatePremium;
-
 	return m_iMobExpRate; 
 }
 
-int32_t	CHARACTER_MANAGER::GetUserDamageRate(LPCHARACTER ch)
+int32_t	CHARACTER_MANAGER::GetUserDamageRate(LPCHARACTER ch) const
 {
 	if (!ch)
 		return m_iUserDamageRate;
@@ -939,7 +988,7 @@ void CHARACTER_MANAGER::SendScriptToMap(int32_t lMapIndex, const std::string & s
 
 	p.header = HEADER_GC_SCRIPT;
 	p.skin = 1;
-	p.src_size = s.size();
+	p.src_size = static_cast<uint16_t>(s.size());
 
 	quest::FSendPacket f;
 	p.size = p.src_size + sizeof(struct packet_script);
@@ -970,7 +1019,7 @@ void CHARACTER_MANAGER::FlushPendingDestroy()
 	{
 		sys_log(0, "FlushPendingDestroy size %d", m_set_pkChrPendingDestroy.size());
 		
-		CHARACTER_SET::iterator it = m_set_pkChrPendingDestroy.begin(),
+        auto it = m_set_pkChrPendingDestroy.begin(),
 			end = m_set_pkChrPendingDestroy.end();
 		for ( ; it != end; ++it) {
 			M2_DESTROY_CHARACTER(*it);
@@ -980,27 +1029,42 @@ void CHARACTER_MANAGER::FlushPendingDestroy()
 	}
 }
 
-CharacterVectorInteractor::CharacterVectorInteractor(const CHARACTER_SET & r)
+CharacterSnapshotGuard::CharacterSnapshotGuard()
+	: m_hasPendingOwnership(CHARACTER_MANAGER::instance().BeginPendingDestroy())
 {
-	using namespace std;
-#if defined(__GNUC__) && !defined(__clang__) && !defined(CXX11_ENABLED)
-	using namespace __gnu_cxx;
-#endif
-
-	reserve(r.size());
-#if defined(__GNUC__) && !defined(__clang__) && !defined(CXX11_ENABLED)
-	transform(r.begin(), r.end(), back_inserter(*this), identity<CHARACTER_SET::value_type>());
-#else
-	insert(end(), r.begin(), r.end());
-#endif
-
-	if (CHARACTER_MANAGER::instance().BeginPendingDestroy())
-		m_bMyBegin = true;
+	// ctor
 }
 
-CharacterVectorInteractor::~CharacterVectorInteractor()
+CharacterSnapshotGuard::~CharacterSnapshotGuard()
 {
-	if (m_bMyBegin)
+	if (m_hasPendingOwnership)
 		CHARACTER_MANAGER::instance().FlushPendingDestroy();
 }
 
+CharacterSetSnapshot::CharacterSetSnapshot()
+	: m_chars(nullptr)
+{
+	// ctor
+}
+
+CharacterSetSnapshot::CharacterSetSnapshot(const std::unordered_set<CHARACTER*>& chars)
+	: m_chars(&chars)
+{
+	// ctor
+}
+
+std::unordered_set<CHARACTER*>::const_iterator CharacterSetSnapshot::begin() const
+{
+	if (m_chars)
+		return m_chars->begin();
+
+	return{};
+}
+
+std::unordered_set<CHARACTER*>::const_iterator CharacterSetSnapshot::end() const
+{
+	if (m_chars)
+		return m_chars->end();
+
+	return{};
+}

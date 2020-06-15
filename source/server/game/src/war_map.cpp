@@ -288,7 +288,7 @@ void CWarMap::UsePotion(LPCHARACTER ch, LPITEM item)
 
 int32_t CWarMap::STeamData::GetAccumulatedJoinerCount()
 {
-	return set_pidJoiner.size();
+	return static_cast<int32_t>(set_pidJoiner.size());
 }
 
 int32_t CWarMap::STeamData::GetCurJointerCount()
@@ -494,17 +494,9 @@ void CWarMap::CheckWarEnd()
 		CheckScore();
 }
 
-int32_t CWarMap::GetRewardGold(uint8_t bWinnerIdx)
-{
-	int32_t iRewardGold = m_WarInfo.iWarPrice;
-	iRewardGold += (m_TeamData[bWinnerIdx].iUsePotionPrice * m_WarInfo.iWinnerPotionRewardPctToWinner) / 100;
-	iRewardGold += (m_TeamData[bWinnerIdx ? 0 : 1].iUsePotionPrice * m_WarInfo.iLoserPotionRewardPctToWinner) / 100;
-	return iRewardGold;
-}
-
 void CWarMap::Draw()
 {
-	CGuildManager::instance().RequestWarOver(m_TeamData[0].dwID, m_TeamData[1].dwID, 0, 0);
+	CGuildManager::instance().RequestWarOver(m_TeamData[0].dwID, m_TeamData[1].dwID, 0);
 }
 
 void CWarMap::Timeout()
@@ -519,7 +511,6 @@ void CWarMap::Timeout()
 
 	uint32_t dwWinner = 0;
 	uint32_t dwLoser = 0;
-	int32_t iRewardGold = 0;
 
 	if (get_dword_time() - m_dwStartTime < 60000 * 5)
 	{
@@ -542,12 +533,10 @@ void CWarMap::Timeout()
 
 			if (dwWinner == m_TeamData[0].dwID)
 			{
-				iRewardGold = GetRewardGold(0);
 				dwLoser = m_TeamData[1].dwID;
 			}
 			else if (dwWinner == m_TeamData[1].dwID)
 			{
-				iRewardGold = GetRewardGold(1);
 				dwLoser = m_TeamData[0].dwID;
 			}
 
@@ -560,18 +549,16 @@ void CWarMap::Timeout()
 		{
 			dwWinner = m_TeamData[iWinnerIdx].dwID;
 			dwLoser = m_TeamData[iWinnerIdx == 0 ? 1 : 0].dwID;
-
-			iRewardGold = GetRewardGold(iWinnerIdx);
 		}
 	}
 
-	sys_log(0, "WarMap: Timeout %u %u winner %u loser %u reward %d map %d",
-			m_TeamData[0].dwID, m_TeamData[1].dwID, dwWinner, dwLoser, iRewardGold, m_kMapInfo.lMapIndex);
+	sys_log(0, "WarMap: Timeout %u %u winner %u loser %u map %d",
+			m_TeamData[0].dwID, m_TeamData[1].dwID, dwWinner, dwLoser, m_kMapInfo.lMapIndex);
 
 	if (dwWinner)
-		CGuildManager::instance().RequestWarOver(dwWinner, dwLoser, dwWinner, iRewardGold);
+		CGuildManager::instance().RequestWarOver(dwWinner, dwLoser, dwWinner);
 	else
-		CGuildManager::instance().RequestWarOver(m_TeamData[0].dwID, m_TeamData[1].dwID, dwWinner, iRewardGold);
+		CGuildManager::instance().RequestWarOver(m_TeamData[0].dwID, m_TeamData[1].dwID, dwWinner);
 
 	m_bTimeout = true;
 }
@@ -698,7 +685,7 @@ bool CWarMap::CheckScore()
 
 	int32_t iEndScore = m_WarInfo.iEndScore;
 
-	if (test_server) iEndScore /= 10;
+	if (g_bIsTestServer) iEndScore /= 10;
 
 	uint32_t dwWinner;
 	uint32_t dwLoser;
@@ -716,23 +703,15 @@ bool CWarMap::CheckScore()
 	else
 		return false;
 
-	int32_t iRewardGold = 0;
-
-	if (dwWinner == m_TeamData[0].dwID)
-		iRewardGold = GetRewardGold(0);
-	else if (dwWinner == m_TeamData[1].dwID)
-		iRewardGold = GetRewardGold(1);
-
-	sys_log(0, "WarMap::CheckScore end score %d guild1 %u score guild2 %d %u score %d winner %u reward %d", 
+	sys_log(0, "WarMap::CheckScore end score %d guild1 %u score guild2 %d %u score %d winner %u",
 			iEndScore,
 			m_TeamData[0].dwID,
 			m_TeamData[0].iScore,
 			m_TeamData[1].dwID,
 			m_TeamData[1].iScore,
-			dwWinner,
-			iRewardGold);
+			dwWinner);
 
-	CGuildManager::instance().RequestWarOver(dwWinner, dwLoser, dwWinner, iRewardGold);
+	CGuildManager::instance().RequestWarOver(dwWinner, dwLoser, dwWinner);
 	return true;
 }
 
@@ -902,7 +881,7 @@ bool CWarMap::IsFlagOnBase(uint8_t bIdx)
 	if (!r.pkChrFlag)
 		return false;
 
-	const PIXEL_POSITION & pos = r.pkChrFlag->GetXYZ();
+	const GPOS & pos = r.pkChrFlag->GetXYZ();
 
 	if (pos.x == m_kMapInfo.posStart[bIdx].x && pos.y == m_kMapInfo.posStart[bIdx].y)
 		return true;
@@ -1016,7 +995,7 @@ bool CWarMapManager::IsWarMap(int32_t lMapIndex)
 	return GetWarMapInfo(lMapIndex) ? true : false;
 }
 
-bool CWarMapManager::GetStartPosition(int32_t lMapIndex, uint8_t bIdx, PIXEL_POSITION & pos)
+bool CWarMapManager::GetStartPosition(int32_t lMapIndex, uint8_t bIdx, GPOS & pos)
 {
 	assert(bIdx < 3);
 
@@ -1028,7 +1007,7 @@ bool CWarMapManager::GetStartPosition(int32_t lMapIndex, uint8_t bIdx, PIXEL_POS
 
 		for (auto it = m_map_kWarMapInfo.begin(); it != m_map_kWarMapInfo.end(); ++it)
 		{
-			PIXEL_POSITION& cur=it->second->posStart[bIdx];
+			GPOS& cur=it->second->posStart[bIdx];
 			sys_log(0, "WarMap[%d]=Pos(%d, %d)", it->first, cur.x, cur.y);
 		}
 		return false;

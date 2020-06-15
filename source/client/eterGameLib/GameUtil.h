@@ -31,7 +31,7 @@ enum EDegree_Direction
 {
 	DEGREE_DIRECTION_SAME = 0,
 	DEGREE_DIRECTION_RIGHT = 1,
-	DEGREE_DIRECTION_LEFT = 2,
+	DEGREE_DIRECTION_LEFT = 2
 };
 float GetDegreeDifference(float fSource, float fTarget);
 int32_t GetRotatingDirection(float fSource, float fTarget);

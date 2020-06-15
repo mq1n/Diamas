@@ -1,13 +1,10 @@
-#include "Stdafx.h"
+#include "StdAfx.h"
 #include "ModelInstance.h"
 #include "Model.h"
+#include "../eterBase/Timer.h"
 
-void CGrannyModelInstance::MakeBoundBox(TBoundBox* pBoundBox, 
-										 const float* mat, 
-										 const float* OBBMin, 
-										 const float* OBBMax, 
-										 D3DXVECTOR3* vtMin, 
-										 D3DXVECTOR3* vtMax)
+void CGrannyModelInstance::MakeBoundBox(TBoundBox* pBoundBox, const float* mat, const float* OBBMin, const float* OBBMax,
+	D3DXVECTOR3* vtMin, D3DXVECTOR3* vtMax)
 {
 	pBoundBox->sx = OBBMin[0] * mat[0] + OBBMin[1] * mat[4] + OBBMin[2] * mat[8] + mat[12];
 	pBoundBox->sy = OBBMin[0] * mat[1] + OBBMin[1] * mat[5] + OBBMin[2] * mat[9] + mat[13];
@@ -176,8 +173,6 @@ bool CGrannyModelInstance::Intersect(const D3DXMATRIX * c_pMatrix,
 */
 }
 
-#include "../eterBase/Timer.h"
-
 void CGrannyModelInstance::GetBoundBox(D3DXVECTOR3* vtMin, D3DXVECTOR3* vtMax)
 {
 	if (!m_pgrnModelInstance)
@@ -220,7 +215,7 @@ bool CGrannyModelInstance::GetMeshMatrixPointer(int32_t iMesh, const D3DXMATRIX 
 
 	// WORK
 	//const CGrannyMesh * pMesh = m_pModel->GetMeshPointer(iMesh);
-	*c_ppMatrix = (D3DXMATRIX *)GrannyGetWorldPose4x4(__GetWorldPosePtr(), __GetMeshBoneIndices(iMesh)[0]);
+	*c_ppMatrix = reinterpret_cast<D3DXMATRIX *>(GrannyGetWorldPose4x4(__GetWorldPosePtr(), __GetMeshBoneIndices(iMesh)[0]));
 	// END_OF_WORK
 
 	return true;

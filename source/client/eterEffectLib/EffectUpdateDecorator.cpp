@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "EffectUpdateDecorator.h"
 #include "ParticleInstance.h"
 namespace NEffectUpdateDecorator

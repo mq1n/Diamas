@@ -29,7 +29,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 			STATUS_INDEX_ST = 1,
 			STATUS_INDEX_DX = 2,
 			STATUS_INDEX_IQ = 3,
-			STATUS_INDEX_HT = 4,
+			STATUS_INDEX_HT = 4
 		};
 
 		enum
@@ -37,7 +37,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 			MBT_LEFT,
 			MBT_RIGHT,
 			MBT_MIDDLE,
-			MBT_NUM,
+			MBT_NUM
 		};
 
 		enum
@@ -47,13 +47,13 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 			MBF_CAMERA,
 			MBF_ATTACK,
 			MBF_SKILL,
-			MBF_AUTO,
+			MBF_AUTO
 		};
 
 		enum
 		{
 			MBS_CLICK,
-			MBS_PRESS,
+			MBS_PRESS
 		};
 
 		enum EMode
@@ -62,20 +62,20 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 			MODE_CLICK_POSITION,
 			MODE_CLICK_ITEM,
 			MODE_CLICK_ACTOR,
-			MODE_USE_SKILL,
+			MODE_USE_SKILL
 		};
 
 		enum EEffect
 		{
 			EFFECT_PICK,
-			EFFECT_NUM,
+			EFFECT_NUM
 		};
 
 		enum EMetinSocketType
 		{
 			METIN_SOCKET_TYPE_NONE,
 			METIN_SOCKET_TYPE_SILVER,
-			METIN_SOCKET_TYPE_GOLD,
+			METIN_SOCKET_TYPE_GOLD
 		};
 
 		typedef struct SSkillInstance
@@ -97,14 +97,14 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		{
 			KEYBOARD_UD_NONE,
 			KEYBOARD_UD_UP,
-			KEYBOARD_UD_DOWN,
+			KEYBOARD_UD_DOWN
 		};
 
 		enum EKeyBoard_LR
 		{
 			KEYBOARD_LR_NONE,
 			KEYBOARD_LR_LEFT,
-			KEYBOARD_LR_RIGHT,
+			KEYBOARD_LR_RIGHT
 		};
 
 		enum
@@ -112,7 +112,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 			DIR_UP,
 			DIR_DOWN,
 			DIR_LEFT,
-			DIR_RIGHT,
+			DIR_RIGHT
 		};
 
 		typedef struct SPlayerStatus
@@ -151,7 +151,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 			PARTY_ROLE_SKILL_MASTER,
 			PARTY_ROLE_BERSERKER,
 			PARTY_ROLE_DEFENDER,
-			PARTY_ROLE_MAX_NUM,
+			PARTY_ROLE_MAX_NUM
 		};
 
 		enum
@@ -159,7 +159,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 			SKILL_NORMAL,
 			SKILL_MASTER,
 			SKILL_GRAND_MASTER,
-			SKILL_PERFECT_MASTER,
+			SKILL_PERFECT_MASTER
 		};
 
 		// 자동물약 상태 관련 특화 구조체.. 이런식의 특화 처리 작업을 안 하려고 최대한 노력했지만 실패하고 결국 특화처리.
@@ -285,6 +285,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		void	SetItemAttribute(TItemPos Cell, uint32_t dwAttrIndex, uint8_t byType, int16_t sValue);
 		uint32_t	GetItemIndex(TItemPos Cell);
 		uint32_t	GetItemFlags(TItemPos Cell);
+		uint32_t GetItemAntiFlags(TItemPos Cell);
 		uint8_t	GetItemTypeBySlot(TItemPos Cell);
 		uint8_t	GetItemSubTypeBySlot(TItemPos Cell);	
 				uint32_t	GetItemCount(TItemPos Cell);

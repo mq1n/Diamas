@@ -21,12 +21,12 @@ class CRaceMotionData
 			TYPE_STANDUP,
 			TYPE_EVENT,
 			TYPE_FISHING,
-			TYPE_NUM,
+		TYPE_NUM
 		};
 
 		enum
 		{
-			SKILL_NUM = 255,
+		SKILL_NUM = 255
 		};
 
 		enum EMode
@@ -55,7 +55,7 @@ class CRaceMotionData
 			MODE_CLAW,
 			MODE_HORSE_CLAW,
 #endif
-			MODE_MAX_NUM,
+		MODE_MAX_NUM
 		};
 
 		enum EName
@@ -169,7 +169,7 @@ class CRaceMotionData
 			NAME_BANTER,
 			NAME_JOY,
 
-			NAME_MAX_NUM,
+		NAME_MAX_NUM
 		};
 
 		enum EMotionEventType
@@ -191,7 +191,7 @@ class CRaceMotionData
 			MOTION_EVENT_TYPE_UNK12,
 #endif
 
-			MOTION_EVENT_TYPE_MAX_NUM,
+		MOTION_EVENT_TYPE_MAX_NUM
 		};
 
 		typedef struct SComboInputData

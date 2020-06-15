@@ -206,7 +206,8 @@ void CScreen::RenderCube(float sx, float sy, float sz, float ex, float ey, float
 		vertices[i].py = v3Vertex[i].y;
 		vertices[i].pz = v3Vertex[i].z;
 		vertices[i].diffuse = ms_diffuseColor;
-		vertices[i].u = 0.0f; vertices[i].v = 0.0f;
+		vertices[i].u = 0.0f;
+		vertices[i].v = 0.0f;
 	}
 
 	if (SetPDTStream(vertices, 8))
@@ -265,9 +266,7 @@ void CScreen::RenderCircle2d(float fx, float fy, float fz, float fRadius, int32_
 		theta += delta;
 	}
 	for (count=0; count<iStep - 1; count++)
-	{
 		RenderLine3d(pts[count].x, pts[count].y, pts[count].z, pts[count + 1].x, pts[count + 1].y, pts[count + 1].z);
-	}
 	RenderLine3d(pts[iStep - 1].x, pts[iStep - 1].y, pts[iStep - 1].z, pts[0].x, pts[0].y, pts[0].z);
 }
 
@@ -512,8 +511,10 @@ void CScreen::SetCursorPosition(int32_t x, int32_t y, int32_t hres, int32_t vres
 
 bool CScreen::GetCursorPosition(float* px, float* py, float* pz)
 {
-	if (!GetCursorXYPosition(px, py)) return false;
-	if (!GetCursorZPosition(pz)) return false;
+	if (!GetCursorXYPosition(px, py))
+		return false;
+	if (!GetCursorZPosition(pz))
+		return false;
 
 	return true;
 }
@@ -648,9 +649,7 @@ BOOL CScreen::RestoreDevice()
 	if (FAILED(hrTestCooperativeLevel))
 	{		
 		if (D3DERR_DEVICELOST == hrTestCooperativeLevel)
-		{
 			return FALSE;		
-		}
 
 		if (D3DERR_DEVICENOTRESET == hrTestCooperativeLevel)
 		{
@@ -669,10 +668,8 @@ BOOL CScreen::RestoreDevice()
 			HRESULT hrReset = rkD3DDev.Reset(&rkD3DPP);
 
 			if (FAILED(hrReset))
-			{
 				return FALSE;
-			}
-			
+
 			STATEMANAGER.SetDefaultState();
 		}        
 	}

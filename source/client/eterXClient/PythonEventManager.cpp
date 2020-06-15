@@ -2,14 +2,10 @@
 #include "PythonEventManager.h"
 #include "PythonNetworkStream.h"
 #include "PythonNonPlayer.h"
-
 #include "AbstractApplication.h"
-
 #include "../eterGameLib/ItemData.h"
 #include "../eterGameLib/ItemManager.h"
-
 #include <FileSystemIncl.hpp>
-
 #include "PythonMiniMap.h"
 
 const int32_t c_lNormal_Waiting_Time = 5;
@@ -101,6 +97,8 @@ void CPythonEventManager::__InitEventSet(TEventSet& rEventSet)
 	rEventSet.isTextCenterMode = false;
 	rEventSet.isWaitFlag = false;
 
+	rEventSet.isQuestInfo = false;
+
 	__InsertLine(rEventSet);
 }
 
@@ -119,11 +117,14 @@ int32_t CPythonEventManager::RegisterEventSet(const char * c_szFileName)
 	if (!pEventSet)
 		return -1;
 
-	if (!pEventSet->ScriptGroup.Create(strEventString))
+	int32_t iScriptGroup = pEventSet->ScriptGroup.Create(strEventString);
+	if (iScriptGroup <= 0)
 	{
 		__ClearEventSetp(pEventSet);
 		return -1;
 	}
+
+	pEventSet->iTotalLineCount = iScriptGroup;
 
 	strncpy_s(pEventSet->szFileName, c_szFileName, 32);
 
@@ -137,7 +138,7 @@ int32_t CPythonEventManager::RegisterEventSet(const char * c_szFileName)
 	return iEmptySlotIndex;
 }
 
-int32_t CPythonEventManager::RegisterEventSetFromString(const std::string& strScript)
+int32_t CPythonEventManager::RegisterEventSetFromString(const std::string& strScript, bool bIsQuestInfo)
 {
 	TEventSet* pEventSet = m_EventSetPool.Alloc();
 	if (!pEventSet)
@@ -147,15 +148,19 @@ int32_t CPythonEventManager::RegisterEventSetFromString(const std::string& strSc
 	pEventSet->pCurrentTextLine = nullptr;
 	// END_OF_SCRIPT_PARSING_FAILURE_CLEAR_BUG
 	
-	if (!pEventSet->ScriptGroup.Create(strScript))
+	int32_t iScriptGroup = pEventSet->ScriptGroup.Create(strScript);
+	if (iScriptGroup <= 0)
 	{
 		__ClearEventSetp(pEventSet);
 		return -1;
 	}
 
+	pEventSet->iTotalLineCount = iScriptGroup;
+
 	pEventSet->szFileName[0] = 0;
 	pEventSet->poEventHandler = nullptr;
 	__InitEventSet(*pEventSet);
+	pEventSet->isQuestInfo = bIsQuestInfo;
 
 	// NOTE : 만약 단순한 스크립트 이벤트 실행 커맨드라면 다시 만든다.
 	script::TCmd ScriptCommand;
@@ -195,9 +200,8 @@ void CPythonEventManager::__ClearEventSetp(TEventSet * pEventSet)
 	if (!pEventSet)
 		return;
 
-	for (TScriptTextLineList::iterator itor = pEventSet->ScriptTextLineList.begin(); itor != pEventSet->ScriptTextLineList.end(); ++itor)
+	for (auto & rkLine : pEventSet->ScriptTextLineList)
 	{
-		TTextLine & rkLine = *itor;
 		rkLine.pInstance->Destroy();
 		m_ScriptTextLinePool.Free(rkLine.pInstance);
 	}
@@ -220,12 +224,10 @@ uint32_t CPythonEventManager::GetEmptyEventSetSlot()
 	for (uint32_t i = 0; i < m_EventSetVector.size(); ++i)
 	{
 		if (nullptr == m_EventSetVector[i])
-		{
 			return i;
-		}
 	}
 
-	m_EventSetVector.push_back(nullptr);
+	m_EventSetVector.emplace_back(nullptr);
 	return m_EventSetVector.size()-1;
 }
 
@@ -372,10 +374,10 @@ void CPythonEventManager::SetEventSetWidth(int32_t iIndex, int32_t iWidth)
 	pEventSet->iWidth = iWidth;
 }
 
-void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
+bool CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 {
 	if (pEventSet->isLock)
-		return;
+		return false;
 
 	script::TCmd ScriptCommand;
 
@@ -384,13 +386,13 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 	if (!pEventSet->ScriptGroup.GetCmd(ScriptCommand))
 	{
 		pEventSet->isLock = true;
-		return;
+		return false;
 	}
 
 	int32_t pEventPosition;
 	int32_t iEventType;
 	if (!GetScriptEventIndex(ScriptCommand.name.c_str(), &pEventPosition, &iEventType))
-		return;
+		return false;
 
 	switch (iEventType)
 	{
@@ -403,9 +405,7 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 			pEventSet->iCurrentLetter+=c_rstValue.length();
 
 			if (pEventSet->iCurrentLetter >= pEventSet->iRestrictedCharacterCount)
-			{
 				__InsertLine(*pEventSet);
-			}
 
 			pEventSet->lLastDelayTime = pEventSet->lWaitingTime;
 			break;
@@ -424,9 +424,9 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 		{
 			if (EVENT_POSITION_START == pEventPosition)
 			{
-				pEventSet->CurrentColor.r = (float)atof(GetArgument("r", ScriptCommand.argList));
-				pEventSet->CurrentColor.g = (float)atof(GetArgument("g", ScriptCommand.argList));
-				pEventSet->CurrentColor.b = (float)atof(GetArgument("b", ScriptCommand.argList));
+			pEventSet->CurrentColor.r = static_cast<float>(atof(GetArgument("r", ScriptCommand.argList)));
+			pEventSet->CurrentColor.g = static_cast<float>(atof(GetArgument("g", ScriptCommand.argList)));
+			pEventSet->CurrentColor.b = static_cast<float>(atof(GetArgument("b", ScriptCommand.argList)));
 				pEventSet->CurrentColor.a = 1.0f;
 			}
 			else
@@ -551,9 +551,8 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 
 		case EVENT_TYPE_ADD_MAP_SIGNAL:
 		{
-			float x, y;
-			x = (float)atof(GetArgument("x",ScriptCommand.argList));
-			y = (float)atof(GetArgument("y",ScriptCommand.argList));
+			auto x = static_cast<float>(atof(GetArgument("x", ScriptCommand.argList)));
+			auto y = static_cast<float>(atof(GetArgument("y", ScriptCommand.argList)));
 			CPythonMiniMap::Instance().AddSignalPoint(x,y);
 			CPythonMiniMap::Instance().OpenAtlasWindow();
 			break;
@@ -639,7 +638,7 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 		}
 		case EVENT_TYPE_FADE_OUT:
 		{
-			float fSpeed = (float)atof(GetArgument("speed", ScriptCommand.argList));
+		auto fSpeed = static_cast<float>(atof(GetArgument("speed", ScriptCommand.argList)));
 			PyCallClassMemberFunc(pEventSet->poEventHandler, "FadeOut", Py_BuildValue("(f)", fSpeed));
 			pEventSet->isWaitFlag = true;
 			break;
@@ -768,12 +767,12 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 		}
 		case EVENT_TYPE_END_CONFIRM_WAIT:
 		{
-			for (uint32_t i = 0; i < m_EventSetVector.size(); ++i)
-			{
-				if (nullptr == m_EventSetVector[i])
-					continue;
+		for (auto & i : m_EventSetVector)
+		{
+			if (nullptr == i)
+				continue;
 
-				TEventSet * pSet = m_EventSetVector[i];
+			TEventSet * pSet = i;
 				if (!pSet->isConfirmWait)
 					continue;
 
@@ -791,6 +790,7 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 			break;
 		}
 	}
+	return true;
 }
 
 void CPythonEventManager::RenderEventSet(int32_t iIndex)
@@ -804,7 +804,7 @@ void CPythonEventManager::RenderEventSet(int32_t iIndex)
 
 	int32_t iCount = 0;
 
-	for (TScriptTextLineList::iterator itor = pEventSet->ScriptTextLineList.begin(); itor != pEventSet->ScriptTextLineList.end(); ++itor, ++iCount)
+	for (auto & rkLine : pEventSet->ScriptTextLineList)
 	{
 		if (iCount < pEventSet->iVisibleStartLine)
 			continue;
@@ -812,11 +812,11 @@ void CPythonEventManager::RenderEventSet(int32_t iIndex)
 		if (iCount >= pEventSet->iVisibleStartLine + pEventSet->iVisibleLineCount)
 			continue;
 
-		TTextLine & rkLine = *itor;
 		CGraphicTextInstance * pInstance = rkLine.pInstance;
 
 		pInstance->Update();
 		pInstance->Render();
+		iCount++;
 	}
 
 	if (iCount >= pEventSet->iVisibleStartLine)
@@ -888,9 +888,8 @@ void CPythonEventManager::MakeQuestion(TEventSet * pEventSet, script::TArgList &
 	pEventSet->nAnswer = rArgumentList.size();
 
 	int32_t iIndex = 0;
-	for (script::TArgList::iterator itor=rArgumentList.begin(); itor!=rArgumentList.end(); ++itor)
+	for (auto & rArgument : rArgumentList)
 	{
-		script::TArg & rArgument = *itor;
 		PyCallClassMemberFunc(pEventSet->poEventHandler, "AppendQuestion", Py_BuildValue("(si)", rArgument.strValue.c_str(), iIndex));
 		++iIndex;
 	}
@@ -953,9 +952,8 @@ void CPythonEventManager::ClearLine(TEventSet * pEventSet)
 	if (!pEventSet)
 		return;
 
-	for (TScriptTextLineList::iterator itor = pEventSet->ScriptTextLineList.begin(); itor != pEventSet->ScriptTextLineList.end(); ++itor)
+	for (auto & rkLine : pEventSet->ScriptTextLineList)
 	{
-		TTextLine & rkLine = *itor;
 		CGraphicTextInstance * pInstance = rkLine.pInstance;
 		pInstance->Destroy();
 		pInstance->Update();
@@ -997,7 +995,7 @@ void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int3
 			kLine.iyLocal = rEventSet.iyLocal;
 		}
 		kLine.pInstance = rEventSet.pCurrentTextLine;
-		rEventSet.ScriptTextLineList.push_back(kLine);
+		rEventSet.ScriptTextLineList.emplace_back(kLine);
 		__AddSpace(rEventSet, c_fLine_Temp);		
 	}
 
@@ -1041,9 +1039,8 @@ void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int3
 void CPythonEventManager::RefreshLinePosition(TEventSet * pEventSet)
 {
 	//int32_t iCount = 0;
-	for (TScriptTextLineList::iterator itor = pEventSet->ScriptTextLineList.begin(); itor != pEventSet->ScriptTextLineList.end(); ++itor)
+	for (auto & rkLine : pEventSet->ScriptTextLineList)
 	{
-		TTextLine & rkLine = *itor;
 		CGraphicTextInstance * pInstance = rkLine.pInstance;
 		pInstance->SetPosition(pEventSet->ix + rkLine.ixLocal, pEventSet->iy + rkLine.iyLocal);
 	}
@@ -1080,7 +1077,7 @@ bool CPythonEventManager::GetScriptEventIndex(const char * c_szName, int32_t * p
 		c_szEventName = &c_szName[0];
 	}
 	
-	std::map<std::string,int32_t>::iterator it = EventTypeMap.find(c_szEventName);
+	auto it = EventTypeMap.find(c_szEventName);
 	if (it == EventTypeMap.end())
 	{
 		Tracef(" !! PARSING ERROR - Strange Command : %s\n", c_szEventName);
@@ -1097,7 +1094,7 @@ bool CPythonEventManager::CheckEventSetIndex(int32_t iIndex)
 	if (iIndex < 0)
 		return false;
 
-	if ((uint32_t) iIndex >= m_EventSetVector.size())
+	if (static_cast<uint32_t>(iIndex) >= m_EventSetVector.size())
 		return false;
 
 	return true;
@@ -1108,6 +1105,69 @@ void CPythonEventManager::Destroy()
 	m_EventSetVector.clear();
 	m_EventSetPool.Clear();
 	m_ScriptTextLinePool.Clear();
+}
+
+
+int32_t CPythonEventManager::GetLineHeight(int32_t iIndex)
+{
+	if (!CheckEventSetIndex(iIndex))
+		return 0;
+
+	TEventSet * pEventSet = m_EventSetVector[iIndex];
+	if (!pEventSet)
+		return 0;
+
+	TTextLine & rkLine = pEventSet->ScriptTextLineList.front();
+	CGraphicTextInstance * pInstance = rkLine.pInstance;
+	return pInstance->GetLineHeight();
+}
+
+void CPythonEventManager::SetYPosition(int32_t iIndex, int32_t iY)
+{
+	if (!CheckEventSetIndex(iIndex))
+		return;
+
+	TEventSet * pEventSet = m_EventSetVector[iIndex];
+	if (!pEventSet)
+		return;
+
+	pEventSet->iy = iY;
+}
+
+int32_t CPythonEventManager::GetProcessedLineCount(int32_t iIndex)
+{
+	if (!CheckEventSetIndex(iIndex))
+		return 0;
+
+	TEventSet * pEventSet = m_EventSetVector[iIndex];
+	if (!pEventSet)
+		return 0;
+
+	return pEventSet->ScriptTextLineList.size();
+}
+
+void CPythonEventManager::AllProcessEventSet(int32_t iIndex)
+{
+	if (!CheckEventSetIndex(iIndex))
+		return;
+
+	TEventSet * pEventSet = m_EventSetVector[iIndex];
+	if (!pEventSet)
+		return;
+
+	ProcessEventSet(pEventSet);
+}
+
+int32_t CPythonEventManager::GetTotalLineCount(int32_t iIndex)
+{
+	if (!CheckEventSetIndex(iIndex))
+		return 0;
+
+	TEventSet * pEventSet = m_EventSetVector[iIndex];
+	if (!pEventSet)
+		return 0;
+
+	return pEventSet->iTotalLineCount;
 }
 
 void CPythonEventManager::SetInterfaceWindow(PyObject * poInterface)

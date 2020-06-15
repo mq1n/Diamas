@@ -9,7 +9,8 @@
 #include "item_manager.h"
 #include "config.h"
 
-CSafebox::CSafebox(LPCHARACTER pkChrOwner, int32_t iSize, uint32_t dwGold) : m_pkChrOwner(pkChrOwner), m_iSize(iSize), m_lGold(dwGold)
+CSafebox::CSafebox(LPCHARACTER pkChrOwner, int32_t iSize) :
+	m_pkChrOwner(pkChrOwner), m_iSize(iSize)
 {
 	assert(m_pkChrOwner != nullptr);
 	memset(m_pkItems, 0, sizeof(m_pkItems));
@@ -126,7 +127,7 @@ void CSafebox::Save()
 	memset(&t, 0, sizeof(TSafeboxTable));
 
 	t.dwID = m_pkChrOwner->GetDesc()->GetAccountTable().id;
-	t.dwGold = m_lGold;
+	t.dwGold = 0;
 
 	db_clientdesc->DBPacket(HEADER_GD_SAFEBOX_SAVE, 0, &t, sizeof(TSafeboxTable));
 	sys_log(1, "SAFEBOX: SAVE %s", m_pkChrOwner->GetName());
@@ -172,14 +173,14 @@ LPITEM CSafebox::GetItem(uint8_t bCell)
 
 bool CSafebox::MoveItem(uint8_t bCell, uint8_t bDestCell, uint8_t count)
 {
-	LPITEM item;
 
 	int32_t max_position = 5 * m_iSize;
 
 	if (bCell >= max_position || bDestCell >= max_position)
 		return false;
 
-	if (!(item = GetItem(bCell)))
+	LPITEM item = GetItem(bCell);
+	if (!item)
 		return false;
 
 	if (item->IsExchanging())
@@ -189,9 +190,9 @@ bool CSafebox::MoveItem(uint8_t bCell, uint8_t bDestCell, uint8_t count)
 		return false;
 
 	{
-		LPITEM item2;
+		LPITEM item2 = GetItem(bDestCell);
 
-		if ((item2 = GetItem(bDestCell)) && item != item2 && item2->IsStackable() &&
+		if (item2 && item != item2 && item2->IsStackable() &&
 				!IS_SET(item2->GetAntiFlag(), ITEM_ANTIFLAG_STACK) &&
 				item2->GetVnum() == item->GetVnum()) // 합칠 수 있는 아이템의 경우
 		{

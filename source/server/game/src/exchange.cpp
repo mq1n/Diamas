@@ -12,13 +12,14 @@
 #include "locale_service.h"
 #include "../../common/length.h"
 #include "exchange.h"
-#include "DragonSoul.h"
-#include "questmanager.h" // @fixme150
+#include "dragon_soul.h"
+#include "quest_manager.h" // @fixme150
+#include "gm.h"
 
-void exchange_packet(LPCHARACTER ch, uint8_t sub_header, bool is_me, uint32_t arg1, TItemPos arg2, uint32_t arg3, void * pvData = nullptr);
+void exchange_packet(LPCHARACTER ch, uint8_t sub_header, bool is_me, uint32_t arg1, const TItemPos &arg2, uint32_t arg3, void * pvData = nullptr);
 
 // 교환 패킷
-void exchange_packet(LPCHARACTER ch, uint8_t sub_header, bool is_me, uint32_t arg1, TItemPos arg2, uint32_t arg3, void * pvData)
+void exchange_packet(LPCHARACTER ch, uint8_t sub_header, bool is_me, uint32_t arg1, const TItemPos &arg2, uint32_t arg3, void * pvData)
 {
 	if (!ch->GetDesc())
 		return;
@@ -49,7 +50,7 @@ void exchange_packet(LPCHARACTER ch, uint8_t sub_header, bool is_me, uint32_t ar
 // 교환을 시작
 bool CHARACTER::ExchangeStart(LPCHARACTER victim)
 {
-	if (this == victim)	// 자기 자신과는 교환을 못한다.
+	if (!victim || this == victim)	// 자기 자신과는 교환을 못한다.
 		return false;
 
 	if (IsObserverMode())
@@ -58,8 +59,18 @@ bool CHARACTER::ExchangeStart(LPCHARACTER victim)
 		return false;
 	}
 
-	if (victim->IsNPC())
+	if (!victim->IsPC())
 		return false;
+
+	if ((!GM::check_allow(GetGMLevel(), GM_ALLOW_EXCHANGE_TO_GM) && victim->IsGM()) ||
+		(!GM::check_allow(GetGMLevel(), GM_ALLOW_EXCHANGE_TO_PLAYER) && !victim->IsGM()))
+	{
+		if (!GM::check_allow(GetGMLevel(), GM_ALLOW_EXCHANGE_TO_GM) && victim->IsGM())
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You are not allowed to trade to gamemasters."));
+		else if (!GM::check_allow(GetGMLevel(), GM_ALLOW_EXCHANGE_TO_PLAYER) && !victim->IsGM())
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You are not allowed to trade to players."));
+		return false;
+	}
 
 	//PREVENT_TRADE_WINDOW
 	if ( IsOpenSafebox() || GetShopOwner() || GetMyShop() || IsCubeOpen())
@@ -137,7 +148,7 @@ CExchange::~CExchange()
 	M2_DELETE(m_pGrid);
 }
 
-bool CExchange::AddItem(TItemPos item_pos, uint8_t display_pos)
+bool CExchange::AddItem(const TItemPos &item_pos, uint8_t display_pos)
 {
 	assert(m_pOwner != nullptr && GetCompany());
 
@@ -153,13 +164,44 @@ bool CExchange::AddItem(TItemPos item_pos, uint8_t display_pos)
 	if (!(item = m_pOwner->GetItem(item_pos)))
 		return false;
 
+	LPCHARACTER pkVictim = GetCompany()->GetOwner();
+	if (!pkVictim)
+		return false;
+
+	if (item->IsGMOwner())
+	{
+		if (pkVictim->IsGM() && !GM::check_allow(m_pOwner->GetGMLevel(), GM_ALLOW_EXCHANGE_GM_ITEM_TO_GM))
+		{
+			m_pOwner->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You may not exchange a gm owned item to a gm."));
+			return false;
+		}
+		else if (!pkVictim->IsGM() && !GM::check_allow(m_pOwner->GetGMLevel(), GM_ALLOW_EXCHANGE_GM_ITEM_TO_PLAYER))
+		{
+			m_pOwner->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You may not exchange a gm owned item to a player."));
+			return false;
+		}
+	}
+	else
+	{
+		if (pkVictim->IsGM() && !GM::check_allow(m_pOwner->GetGMLevel(), GM_ALLOW_EXCHANGE_PLAYER_ITEM_TO_GM))
+		{
+			m_pOwner->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You may not exchange a player owned item to a gm."));
+			return false;
+		}
+		else if (!pkVictim->IsGM() && !GM::check_allow(m_pOwner->GetGMLevel(), GM_ALLOW_EXCHANGE_PLAYER_ITEM_TO_PLAYER))
+		{
+			m_pOwner->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You may not exchange a player owned item to a player."));
+			return false;
+		}
+	}
+
 	if (IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_GIVE))
 	{
 		m_pOwner->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아이템을 건네줄 수 없습니다."));
 		return false;
 	}
 
-	if (true == item->isLocked())
+	if (item->isLocked())
 	{
 		return false;
 	}
@@ -174,6 +216,12 @@ bool CExchange::AddItem(TItemPos item_pos, uint8_t display_pos)
 	if (!m_pGrid->IsEmpty(display_pos, 1, item->GetSize()))
 	{
 		sys_log(0, "EXCHANGE not empty item_pos %d %d %d", display_pos, 1, item->GetSize());
+		return false;
+	}
+	
+	if (m_pOwner && m_pOwner->GetQuestItemPtr() == item)
+	{
+		sys_log(0, "EXCHANGE %s trying to cheat by using a current quest item in trade", m_pOwner->GetName());
 		return false;
 	}
 
@@ -256,6 +304,17 @@ bool CExchange::AddGold(int32_t gold)
 
 	if (m_lGold > 0)
 		return false;
+
+	LPCHARACTER	victim = GetCompany()->GetOwner();
+	if (m_lGold)
+	{
+		if (victim->GetGold() + m_lGold > GOLD_MAX)
+		{
+			exchange_packet(GetOwner(), EXCHANGE_SUBHEADER_GC_LESS_GOLD, 0, 0, NPOS, 0);
+			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Karsi oyuncu daha fazla yang alamaz"));
+			return false;
+		}
+	}
 
 	Accept(false);
 	GetCompany()->Accept(false);
@@ -373,15 +432,15 @@ bool CExchange::CheckSpace()
 			if (wBasePos >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 				return false;
 			
-			for (int32_t i = 0; i < DRAGON_SOUL_BOX_SIZE; i++)
+			for (int32_t j = 0; j < DRAGON_SOUL_BOX_SIZE; j++)
 			{
-				uint16_t wPos = wBasePos + i;
-				if (0 == s_vDSGrid[wPos]) // @fixme159 (wBasePos to wPos)
+				uint16_t wPos = wBasePos + j;
+				if (0 == s_vDSGrid[wPos])
 				{
 					bool bEmpty = true;
-					for (int32_t j = 1; j < item->GetSize(); j++)
+					for (int32_t k = 1; k < item->GetSize(); k++)
 					{
-						if (s_vDSGrid[wPos + j * DRAGON_SOUL_BOX_COLUMN_NUM])
+						if (s_vDSGrid[wPos + k * DRAGON_SOUL_BOX_COLUMN_NUM])
 						{
 							bEmpty = false;
 							break;
@@ -389,9 +448,9 @@ bool CExchange::CheckSpace()
 					}
 					if (bEmpty)
 					{
-						for (int32_t j = 0; j < item->GetSize(); j++)
+						for (int32_t l = 0; l < item->GetSize(); l++)
 						{
-							s_vDSGrid[wPos + j * DRAGON_SOUL_BOX_COLUMN_NUM] =  wPos + 1;
+							s_vDSGrid[wPos + l * DRAGON_SOUL_BOX_COLUMN_NUM] =  wPos + 1;
 						}
 						bExistEmptySpace = true;
 						break;
@@ -440,6 +499,8 @@ bool CExchange::Done()
 	LPITEM	item;
 
 	LPCHARACTER	victim = GetCompany()->GetOwner();
+
+	GetOwner()->CreateFly(6, victim);
 
 	for (i = 0; i < EXCHANGE_ITEM_MAX_NUM; ++i)
 	{

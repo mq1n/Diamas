@@ -1,9 +1,8 @@
 #include "StdAfx.h"
-#include "MsApplication.h"
+#include "MSApplication.h"
 
-CMSApplication::CMSApplication()
-{
-}
+#pragma optimize("", off)
+CMSApplication::CMSApplication() = default;
 
 CMSApplication::~CMSApplication()
 {
@@ -54,3 +53,4 @@ LRESULT CMSApplication::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LP
 
 	return CMSWindow::WindowProcedure(hWnd, uiMsg, wParam, lParam);
 }
+#pragma optimize("", on)

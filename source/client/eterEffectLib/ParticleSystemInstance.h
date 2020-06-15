@@ -4,8 +4,8 @@
 #include "ParticleInstance.h"
 #include "ParticleProperty.h"
 
-#include "../eterlib/GrpScreen.h"
-#include "../eterlib/StateManager.h"
+#include "../eterLib/GrpScreen.h"
+#include "../eterLib/StateManager.h"
 #include "../eterLib/GrpImageInstance.h"
 #include "EmitterProperty.h"
 
@@ -23,8 +23,7 @@ class CParticleSystemInstance : public CEffectElementBaseInstance
 		template <typename T>
 		inline void ForEachParticleRendering(T & FunObj)
 		{
-			uint32_t dwFrameIndex;
-			for(dwFrameIndex=0; dwFrameIndex<m_kVct_pkImgInst.size(); dwFrameIndex++)
+			for (uint32_t dwFrameIndex = 0; dwFrameIndex < m_kVct_pkImgInst.size(); dwFrameIndex++)
 			{
 				STATEMANAGER.SetTexture(0, m_kVct_pkImgInst[dwFrameIndex]->GetTextureReference().GetD3DTexture());
 				TParticleInstanceList::iterator itor = m_ParticleInstanceListVector[dwFrameIndex].begin();
@@ -71,11 +70,11 @@ class CParticleSystemInstance : public CEffectElementBaseInstance
 		uint32_t m_dwCurrentEmissionCount;
 		int32_t	m_iLoopCount;
 
-		typedef std::list<CParticleInstance*> TParticleInstanceList;
-		typedef std::vector<TParticleInstanceList> TParticleInstanceListVector;
+		using TParticleInstanceList = std::list<CParticleInstance *>;
+		using TParticleInstanceListVector = std::vector<TParticleInstanceList>;
 		TParticleInstanceListVector m_ParticleInstanceListVector;
 
-		typedef std::vector<CGraphicImageInstance*> TImageInstanceVector;
+		using TImageInstanceVector = std::vector<CGraphicImageInstance *>;
 		TImageInstanceVector m_kVct_pkImgInst;
 
 		CParticleSystemData * m_pData;

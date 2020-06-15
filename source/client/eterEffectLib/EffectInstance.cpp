@@ -167,7 +167,7 @@ void CEffectInstance::__SetParticleData(CParticleSystemData * pData)
 	pInstance->SetDataPointer(pData);
 	pInstance->SetLocalMatrixPointer(&m_matGlobal);
 
-	m_ParticleInstanceVector.push_back(pInstance);
+	m_ParticleInstanceVector.emplace_back(pInstance);
 }
 void CEffectInstance::__SetMeshData(CEffectMeshScript * pMesh)
 {
@@ -175,7 +175,7 @@ void CEffectInstance::__SetMeshData(CEffectMeshScript * pMesh)
 	pMeshInstance->SetDataPointer(pMesh);
 	pMeshInstance->SetLocalMatrixPointer(&m_matGlobal);
 
-	m_MeshInstanceVector.push_back(pMeshInstance);
+	m_MeshInstanceVector.emplace_back(pMeshInstance);
 }
 
 void CEffectInstance::__SetLightData(CLightData* pData)
@@ -184,7 +184,7 @@ void CEffectInstance::__SetLightData(CLightData* pData)
 	pInstance->SetDataPointer(pData);
 	pInstance->SetLocalMatrixPointer(&m_matGlobal);
 
-	m_LightInstanceVector.push_back(pInstance);
+	m_LightInstanceVector.emplace_back(pInstance);
 }
 
 void CEffectInstance::SetEffectDataPointer(CEffectData * pEffectData)

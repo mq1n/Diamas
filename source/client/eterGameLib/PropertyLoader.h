@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../eterbase/FileDir.h"
+#include "../eterBase/FileDir.h"
 
 class CPropertyLoader : public CDir
 {

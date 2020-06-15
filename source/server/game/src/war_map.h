@@ -14,7 +14,7 @@ typedef struct SWarMapInfo
 {
 	uint8_t		bType;
 	int32_t		lMapIndex;
-	PIXEL_POSITION	posStart[3];
+	GPOS	posStart[3];
 } TWarMapInfo;
 
 namespace warmap
@@ -81,8 +81,6 @@ class CWarMap
 
 		void	UpdateScore(uint32_t g1, int32_t score1, uint32_t g2, int32_t score2);
 		bool	CheckScore();
-
-		int32_t	GetRewardGold(uint8_t bWinnerIdx);
 
 		bool	GetGuildIndex(uint32_t dwGuild, int32_t& iIndex);
 
@@ -151,13 +149,13 @@ class CWarMapManager : public singleton<CWarMapManager>
 		bool		LoadWarMapInfo(const char * c_pszFileName);
 		bool		IsWarMap(int32_t lMapIndex);
 		TWarMapInfo *	GetWarMapInfo(int32_t lMapIndex);
-		bool		GetStartPosition(int32_t lMapIndex, uint8_t bIdx, PIXEL_POSITION & pos);
+		bool		GetStartPosition(int32_t lMapIndex, uint8_t bIdx, GPOS & pos);
 
 		template <typename Func> Func for_each(Func f);
 		int32_t		CreateWarMap(const TGuildWarInfo & r_WarInfo, uint32_t dwGuildID1, uint32_t dwGuildID2);
 		void		DestroyWarMap(CWarMap* pMap);
 		CWarMap *	Find(int32_t lMapIndex);
-		int32_t		CountWarMap() { return m_mapWarMap.size(); }
+		int32_t			CountWarMap() { return static_cast<int32_t>(m_mapWarMap.size()); }
 
 		void		OnShutdown();
 

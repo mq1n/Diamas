@@ -11,9 +11,7 @@ CBuffOnAttributes::CBuffOnAttributes(LPCHARACTER pOwner, uint8_t point_type, std
 	Initialize();
 }
 
-CBuffOnAttributes::~CBuffOnAttributes()
-{
-}
+CBuffOnAttributes::~CBuffOnAttributes() = default;
 
 void CBuffOnAttributes::Initialize()
 {
@@ -25,11 +23,13 @@ void CBuffOnAttributes::RemoveBuffFromItem(LPITEM pItem)
 {
 	if (0 == m_bBuffValue)
 		return ;
-	if (nullptr != pItem)
+
+	if (pItem)
 	{
 		if (pItem->GetCell() < INVENTORY_MAX_NUM)
 			return;
-		std::vector <uint8_t>::iterator it = find (m_p_vec_buff_wear_targets->begin(), m_p_vec_buff_wear_targets->end(), pItem->GetCell() - INVENTORY_MAX_NUM);
+
+		auto it = find(m_p_vec_buff_wear_targets->begin(), m_p_vec_buff_wear_targets->end(), pItem->GetCell() - INVENTORY_MAX_NUM);
 		if (m_p_vec_buff_wear_targets->end() == it)
 			return;
 
@@ -37,12 +37,12 @@ void CBuffOnAttributes::RemoveBuffFromItem(LPITEM pItem)
 		for (int32_t j = 0; j < m; j++)
 		{
 			TPlayerItemAttribute attr = pItem->GetAttribute(j);
-			TMapAttr::iterator it = m_map_additional_attrs.find(attr.bType);
+			auto it2 = m_map_additional_attrs.find(attr.bType);
 			// m_map_additional_attrs에서 해당 attribute type에 대한 값을 제거하고,
 			// 변경된 값의 (m_bBuffValue)%만큼의 버프 효과 감소
-			if (it != m_map_additional_attrs.end())
+			if (it2 != m_map_additional_attrs.end())
 			{
-				int32_t& sum_of_attr_value = it->second;
+				int32_t& sum_of_attr_value = it2->second;
 				int32_t old_value = sum_of_attr_value * m_bBuffValue / 100;
 				int32_t new_value = (sum_of_attr_value - attr.sValue) * m_bBuffValue / 100;
 				m_pBuffOwner->ApplyPoint(attr.bType, new_value - old_value);
@@ -65,7 +65,7 @@ void CBuffOnAttributes::AddBuffFromItem(LPITEM pItem)
 	{
 		if (pItem->GetCell() < INVENTORY_MAX_NUM)
 			return;
-		std::vector <uint8_t>::iterator it = find (m_p_vec_buff_wear_targets->begin(), m_p_vec_buff_wear_targets->end(), pItem->GetCell() - INVENTORY_MAX_NUM);
+		auto it = find(m_p_vec_buff_wear_targets->begin(), m_p_vec_buff_wear_targets->end(), pItem->GetCell() - INVENTORY_MAX_NUM);
 		if (m_p_vec_buff_wear_targets->end() == it)
 			return;
 
@@ -73,11 +73,11 @@ void CBuffOnAttributes::AddBuffFromItem(LPITEM pItem)
 		for (int32_t j = 0; j < m; j++)
 		{
 			TPlayerItemAttribute attr = pItem->GetAttribute(j);
-			TMapAttr::iterator it = m_map_additional_attrs.find(attr.bType);
-			
+			auto it2 = m_map_additional_attrs.find(attr.bType);
+
 			// m_map_additional_attrs에서 해당 attribute type에 대한 값이 없다면 추가.
 			// 추가된 값의 (m_bBuffValue)%만큼의 버프 효과 추가
-			if (it == m_map_additional_attrs.end())
+			if (it2 == m_map_additional_attrs.end())
 			{
 				m_pBuffOwner->ApplyPoint(attr.bType, attr.sValue * m_bBuffValue / 100);
 				m_map_additional_attrs.insert(TMapAttr::value_type(attr.bType, attr.sValue));
@@ -86,7 +86,7 @@ void CBuffOnAttributes::AddBuffFromItem(LPITEM pItem)
 			// 변경된 값의 (m_bBuffValue)%만큼의 버프 효과 추가
 			else
 			{
-				int32_t& sum_of_attr_value = it->second;
+				int32_t& sum_of_attr_value = it2->second;
 				int32_t old_value = sum_of_attr_value * m_bBuffValue / 100;
 				int32_t new_value = (sum_of_attr_value + attr.sValue) * m_bBuffValue / 100;
 				m_pBuffOwner->ApplyPoint(attr.bType, new_value - old_value);
@@ -104,14 +104,13 @@ void CBuffOnAttributes::ChangeBuffValue(uint8_t bNewValue)
 		Off();
 	else
 	{
-
-		for (TMapAttr::iterator it = m_map_additional_attrs.begin(); it != m_map_additional_attrs.end(); it++)
+		// 기존에, m_map_additional_attrs의 값의 (m_bBuffValue)%만큼이 버프로 들어가 있었으므로,
+		// (bNewValue)%만큼으로 값을 변경함.
+		for (auto & m_map_additional_attr : m_map_additional_attrs)
 		{
-			int32_t& sum_of_attr_value = it->second;
-			//int32_t old_value = sum_of_attr_value * m_bBuffValue / 100;
-			//int32_t new_value = sum_of_attr_value * bNewValue / 100;
+			int32_t& sum_of_attr_value = m_map_additional_attr.second;
 
-			m_pBuffOwner->ApplyPoint(it->first, -sum_of_attr_value * m_bBuffValue / 100);
+			m_pBuffOwner->ApplyPoint(m_map_additional_attr.first, -sum_of_attr_value * m_bBuffValue / 100);
 		}
 		m_bBuffValue = bNewValue;
 	}
@@ -133,7 +132,7 @@ bool CBuffOnAttributes::On(uint8_t bValue)
 			for (int32_t j = 0; j < m; j++)
 			{
 				TPlayerItemAttribute attr = pItem->GetAttribute(j);
-				TMapAttr::iterator it = m_map_additional_attrs.find(attr.bType);
+				auto it = m_map_additional_attrs.find(attr.bType);
 				if (it != m_map_additional_attrs.end())
 				{
 					it->second += attr.sValue;
@@ -146,9 +145,9 @@ bool CBuffOnAttributes::On(uint8_t bValue)
 		}
 	}
 
-	for (TMapAttr::iterator it = m_map_additional_attrs.begin(); it != m_map_additional_attrs.end(); it++)
+	for (auto & m_map_additional_attr : m_map_additional_attrs)
 	{
-		m_pBuffOwner->ApplyPoint(it->first, it->second * bValue / 100);
+		m_pBuffOwner->ApplyPoint(m_map_additional_attr.first, m_map_additional_attr.second * bValue / 100);
 	}
 	
 	m_bBuffValue = bValue;
@@ -161,9 +160,9 @@ void CBuffOnAttributes::Off()
 	if (0 == m_bBuffValue)
 		return ;
 
-	for (TMapAttr::iterator it = m_map_additional_attrs.begin(); it != m_map_additional_attrs.end(); it++)
+	for (auto & m_map_additional_attr : m_map_additional_attrs)
 	{
-		m_pBuffOwner->ApplyPoint(it->first, -it->second * m_bBuffValue / 100);
+		m_pBuffOwner->ApplyPoint(m_map_additional_attr.first, -m_map_additional_attr.second * m_bBuffValue / 100);
 	}
 	Initialize();
 }

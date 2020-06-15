@@ -14,7 +14,7 @@ static uint32_t s_adwItemProtoKey[4] =
 
 BOOL CItemManager::SelectItemData(uint32_t dwIndex)
 {
-	TItemMap::iterator f = m_ItemMap.find(dwIndex);
+	auto f = m_ItemMap.find(dwIndex);
 
 	if (m_ItemMap.end() == f)
 	{
@@ -49,7 +49,7 @@ BOOL CItemManager::GetItemDataPointer(uint32_t dwItemID, CItemData ** ppItemData
 	if (0 == dwItemID)
 		return FALSE;
 
-	TItemMap::iterator f = m_ItemMap.find(dwItemID);
+	auto f = m_ItemMap.find(dwItemID);
 
 	if (m_ItemMap.end() == f)
 	{
@@ -76,13 +76,13 @@ BOOL CItemManager::GetItemDataPointer(uint32_t dwItemID, CItemData ** ppItemData
 
 CItemData * CItemManager::MakeItemData(uint32_t dwIndex)
 {
-	TItemMap::iterator f = m_ItemMap.find(dwIndex);
+	auto f = m_ItemMap.find(dwIndex);
 
 	if (m_ItemMap.end() == f)
 	{
 		CItemData * pItemData = CItemData::New();
 
-		m_ItemMap.insert(TItemMap::value_type(dwIndex, pItemData));		
+		m_ItemMap.emplace(dwIndex, pItemData);
 
 		return pItemData;
 	}
@@ -177,14 +177,14 @@ bool CItemManager::LoadItemDesc(const char* c_szFileName)
 			continue;
 
 		while (kTokenVector.size()<ITEMDESC_COL_NUM)
-			kTokenVector.push_back("");
+			kTokenVector.emplace_back("");
 
 		//assert(kTokenVector.size()==ITEMDESC_COL_NUM);
 		
 		uint32_t dwVnum=atoi(kTokenVector[ITEMDESC_COL_VNUM].c_str());
 		const std::string& c_rstDesc=kTokenVector[ITEMDESC_COL_DESC];
 		const std::string& c_rstSumm=kTokenVector[ITEMDESC_COL_SUMM];
-		TItemMap::iterator f = m_ItemMap.find(dwVnum);
+		auto f = m_ItemMap.find(dwVnum);
 		if (m_ItemMap.end() == f)
 			continue;
 
@@ -287,14 +287,14 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 		CItemData * pItemData;
 		uint32_t dwVnum = table->dwVnum;
 
-		TItemMap::iterator f = m_ItemMap.find(dwVnum);
+		auto f = m_ItemMap.find(dwVnum); 
 		if (m_ItemMap.end() == f)
 		{
 			_snprintf_s(szName, sizeof(szName), "icon/item/%05u.tga", dwVnum);
 
 			if (CResourceManager::Instance().IsFileExist(szName) == false)
 			{
-				std::map<uint32_t, uint32_t>::iterator itVnum = itemNameMap.find(GetHashCode(table->szName));
+				auto itVnum = itemNameMap.find(GetHashCode(table->szName));
 				
 				if (itVnum != itemNameMap.end())
 					_snprintf_s(szName, sizeof(szName), "icon/item/%05u.tga", itVnum->second);
@@ -307,26 +307,24 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 					TraceError("%16s(#%-5d) cannot find icon file. setting to default.", table->szName, dwVnum);
 					#endif
 					const uint32_t EmptyBowl = 27995;
-					_snprintf(szName, sizeof(szName), "icon/item/%05d.tga", EmptyBowl);
+					_snprintf_s(szName, sizeof(szName), "icon/item/%05d.tga", EmptyBowl);
 				}
 			}
 				
 			pItemData = CItemData::New();
 
 			pItemData->SetDefaultItemData(szName);
-			m_ItemMap.insert(TItemMap::value_type(dwVnum, pItemData));
+			m_ItemMap.emplace(dwVnum, pItemData);
 		}
 		else
 		{
 			pItemData = f->second;
 		}	
 		if (itemNameMap.find(GetHashCode(table->szName)) == itemNameMap.end())
-			itemNameMap.insert(std::map<uint32_t,uint32_t>::value_type(GetHashCode(table->szName),table->dwVnum));
+			itemNameMap.emplace(GetHashCode(table->szName), table->dwVnum);
 		pItemData->SetItemTableData(table);
 		if (0 != table->dwVnumRange)
-		{
-			m_vec_ItemRange.push_back(pItemData);
-		}
+			m_vec_ItemRange.emplace_back(pItemData);
 	}
 
 //!@#
@@ -358,9 +356,8 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 
 void CItemManager::Destroy()
 {
-	TItemMap::iterator i;
-	for (i=m_ItemMap.begin(); i!=m_ItemMap.end(); ++i)
-		CItemData::Delete(i->second);
+	for (auto & i : m_ItemMap)
+		CItemData::Delete(i.second);
 
 	m_ItemMap.clear();
 }

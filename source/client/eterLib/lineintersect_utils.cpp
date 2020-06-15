@@ -6,10 +6,10 @@
  |         Author: Graham Rhodes
  |      Revisions: 05-Apr-2001 - GSR. Original.
  **************************************************************************************/
-#include "Stdafx.h"
-#include <math.h>
+#include "StdAfx.h"
+#include <cmath>
 #include "lineintersect_utils.h"
-#include <assert.h>
+#include <cassert>
 
 // uncomment the following line to have the code check intermediate results
 //#define CHECK_ANSWERS
@@ -42,12 +42,11 @@ __forceinline void FindNearestPointOnLineSegment(const D3DXVECTOR3 & A1,
 	
 	// parameter is computed from Equation (20).
 	parameter = (D3DXVec3Dot(&AB,&L)) / D;
-	
-	//if (false == infinite_line) 
+
+	//if (false == infinite_line)
 	parameter = FMAX(0.0f, FMIN(1.0f, parameter));
-	
+
 	Nearest = A1 + parameter * L;
-	return;
 }
 
 /**************************************************************************
@@ -107,38 +106,28 @@ __forceinline void FindNearestPointOfParallelLineSegments(const D3DXVECTOR3 & A1
 	{
 		//float tp[3];
 		D3DXVECTOR3 tp;
-		FindNearestPointOnLineSegment(A1, La, B2,
-			tp, s[1]);
+		FindNearestPointOnLineSegment(A1, La, B2, tp, s[1]);
 		if (s[0] < 0.f && s[1] < 0.f)
 		{
 			OutA = A1;
 			if (s[0] < s[1])
-			{
 				OutB =B2;
-			}
 			else
-			{
 				OutB = B1;
-			}
 		}
 		else if (s[0] > 1.f && s[1] > 1.f)
 		{
 			OutA = A2;
 			if (s[0] < s[1])
-			{
 				OutB = B1;
-			}
 			else
-			{
 				OutB = B2;
-			}
 		}
 		else
 		{
 			temp = 0.5f*(FMAX(0.0f, FMIN(1.0f, s[0])) + FMAX(0.0f, FMIN(1.0f, s[1])));
 			OutA = A1 + temp * La;
-			FindNearestPointOnLineSegment(B1, Lb,
-				OutA, OutB, temp);
+			FindNearestPointOnLineSegment(B1, Lb, OutA, OutB, temp);
 		}
 	}
 }
@@ -183,17 +172,13 @@ __forceinline void AdjustNearestPoints(const D3DXVECTOR3 & A1,
 	{
 		s = FMAX(0.0f, FMIN(1.0f, s));
 		OutA = A1 + s*La;
-		FindNearestPointOnLineSegment(B1, Lb, 
-			OutA,
-			OutB, t);
+		FindNearestPointOnLineSegment(B1, Lb, OutA, OutB, t);
 		if (OUT_OF_RANGE(t))
 		{
 			t = FMAX(0.0f, FMIN(1.0f, t));
 			OutB = B1 + t*Lb;
-			FindNearestPointOnLineSegment(A1, La, OutB, 
-				OutA, s);
-			FindNearestPointOnLineSegment(B1, Lb, OutA,
-				OutB, t);
+			FindNearestPointOnLineSegment(A1, La, OutB, OutA, s);
+			FindNearestPointOnLineSegment(B1, Lb, OutA, OutB, t);
 		}
 	}
 	// otherwise, handle the case where the parameter for only one segment is
@@ -202,16 +187,13 @@ __forceinline void AdjustNearestPoints(const D3DXVECTOR3 & A1,
 	{
 		s = FMAX(0.0f, FMIN(1.0f, s));
 		OutA = A1 + s*La;
-		FindNearestPointOnLineSegment(B1, Lb, 
-			OutA, 
-			OutB, t);
+		FindNearestPointOnLineSegment(B1, Lb, OutA, OutB, t);
 	}
 	else if (OUT_OF_RANGE(t))
 	{
 		t = FMAX(0.0f, FMIN(1.0f, t));
 		OutB = B1 + t*Lb;
-		FindNearestPointOnLineSegment(A1, La, OutB,
-			OutA, s);
+		FindNearestPointOnLineSegment(A1, La, OutB, OutA, s);
 	}
 	else
 	{
@@ -237,20 +219,18 @@ void IntersectLineSegments(const D3DXVECTOR3 & A1,
 	// From Equation (15)
 	float L11 =  D3DXVec3LengthSq(&La);
 	float L22 =  D3DXVec3LengthSq(&Lb);
-	
+
 	// Line/Segment A is degenerate ---- Special Case #1
 	if (L11 < epsilon_squared)
 	{
 		OutA = A1;
-		FindNearestPointOnLineSegment(B1, Lb, A1,
-			OutB, temp);
+		FindNearestPointOnLineSegment(B1, Lb, A1, OutB, temp);
 	}
 	// Line/Segment B is degenerate ---- Special Case #1
 	else if (L22 < epsilon_squared)
 	{
 		OutB = B1;
-		FindNearestPointOnLineSegment(A1, La, B1,
-			OutA, temp);
+		FindNearestPointOnLineSegment(A1, La, B1, OutA, temp);
 	}
 	// Neither line/segment is degenerate
 	else
@@ -260,16 +240,12 @@ void IntersectLineSegments(const D3DXVECTOR3 & A1,
 		
 		// and from Equation (15).
 		float L12 = -D3DXVec3Dot(&La, &Lb);
-		
+
 		float DetL = L11 * L22 - L12 * L12;
 		// Lines/Segments A and B are parallel ---- special case #2.
 		if (FABS(DetL) < epsilon)
 		{
-			FindNearestPointOfParallelLineSegments(A1, A2,
-				La,
-				B1, B2,
-				Lb,
-				OutA, OutB);
+			FindNearestPointOfParallelLineSegments(A1, A2, La, B1, B2, Lb, OutA, OutB);
 		}
 		// The general case
 		else
@@ -302,13 +278,10 @@ void IntersectLineSegments(const D3DXVECTOR3 & A1,
 			// handle this case.
 			if ((OUT_OF_RANGE(s) || OUT_OF_RANGE(t)))
 			{
-				AdjustNearestPoints(A1,La,B1,Lb,
-					s, t,
-					OutA,
-					OutB);
+				AdjustNearestPoints(A1, La, B1, Lb, s, t, OutA, OutB);
 			}
 		}
-	}	
+	}
 }
 
 void IntersectLineSegments(const float A1x, const float A1y, const float A1z,
@@ -641,16 +614,16 @@ void FindNearestPointOnLineSegment(const float A1x, const float A1y, const float
 	float ABx = Bx - A1x;
 	float ABy = By - A1y;
 	float ABz = Bz - A1z;
-	
+
 	// parameter is computed from Equation (20).
 	parameter = (Lx * ABx + Ly * ABy + Lz * ABz) / D;
-	
-	if (false == infinite_line) parameter = FMAX(0.0f, FMIN(1.0f, parameter));
-	
+
+	if (false == infinite_line)
+		parameter = FMAX(0.0f, FMIN(1.0f, parameter));
+
 	NearestPointX = A1x + parameter * Lx;
 	NearestPointY = A1y + parameter * Ly;
 	NearestPointZ = A1z + parameter * Lz;
-	return;
 }
 
 /**************************************************************************

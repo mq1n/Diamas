@@ -1,9 +1,8 @@
-
 #include "stdafx.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "char.h"
 #include "char_manager.h"
-#include "OXEvent.h"
+#include "ox_event.h"
 #include "config.h"
 #include "locale_service.h"
 
@@ -62,9 +61,10 @@ namespace quest
 			{
 				lua_pushnumber(L, 1);
 			}
+			return 1;
 		}
 
-		return 1;
+		return 0;
 	}
 	
 	int32_t oxevent_get_attender(lua_State* L)
@@ -77,8 +77,8 @@ namespace quest
 	{
 		int32_t empty;
 
-		end_oxevent_info() 
-		: empty( 0 )
+		end_oxevent_info() : 
+			empty(0)
 		{
 		}
 	};
@@ -116,6 +116,17 @@ namespace quest
 
 		return 0;
 	}
+
+	int32_t oxevent_is_banned(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (ch)
+		{
+			lua_pushboolean(L, COXEventManager::instance().IsBanned(ch));
+			return 1;
+		}
+		return 0;
+	}
 	
 	void RegisterOXEventFunctionTable()
 	{
@@ -128,6 +139,7 @@ namespace quest
 			{	"get_attender",	oxevent_get_attender},
 			{	"end_event",	oxevent_end_event	},
 			{	"end_event_force",	oxevent_end_event_force	},
+			{	"is_banned",		oxevent_is_banned		},
 			{	"give_item",	oxevent_give_item	},
 
 			{ nullptr, nullptr}

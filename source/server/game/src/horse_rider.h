@@ -31,6 +31,7 @@ class CHorseRider
 		virtual ~CHorseRider();
 		
 		uint8_t		GetHorseLevel() const { return m_Horse.bLevel; }
+		const char*	GetHorseName() const { return m_Horse.szName; }
 		uint8_t		GetHorseGrade();
 		int16_t		GetHorseMaxHealth() const;
 		int16_t		GetHorseMaxStamina() const;
@@ -57,6 +58,7 @@ class CHorseRider
 		void ResetHorseHealthDropTime();
 
 		virtual void SetHorseLevel(int32_t iLevel);
+		virtual void SetHorseName(const char* szName);
 
 		void EnterHorse();
 

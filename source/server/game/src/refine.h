@@ -3,7 +3,7 @@
 
 #include "constants.h"
 
-enum
+enum ERefineVnumNpc
 {
 	BLACKSMITH_MOB = 20016, // 확률 개량
 	ALCHEMIST_MOB = 20001, // 100% 개량 성공 

@@ -2,6 +2,7 @@
 #include "AccountConnector.h"
 #include "Packet.h"
 #include "PythonNetworkStream.h"
+#include "PythonApplication.h"
 #include "../eterBase/tea.h"
 
 // CHINA_CRYPT_KEY
@@ -167,6 +168,8 @@ bool CAccountConnector::__AuthState_RecvPhase()
 	if (!Recv(sizeof(kPacketPhase), &kPacketPhase))
 		return false;
 
+	CPythonApplication::Instance().SetGameStage(kPacketPhase.stage);
+
 	if (kPacketPhase.phase == PHASE_HANDSHAKE)
 	{
 		__HandshakeState_Set();
@@ -186,6 +189,8 @@ bool CAccountConnector::__AuthState_RecvPhase()
 		LoginPacket.name[ID_MAX_NUM] = '\0';
 		LoginPacket.pwd[PASS_MAX_NUM] = '\0';
 
+		LoginPacket.version = CLIENT_VERSION_TIMESTAMP;
+		
 		// 비밀번호를 메모리에 계속 갖고 있는 문제가 있어서, 사용 즉시 날리는 것으로 변경
 		ClearLoginInfo();
 		CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
@@ -195,8 +200,6 @@ bool CAccountConnector::__AuthState_RecvPhase()
 
 		for (uint32_t i = 0; i < 4; ++i)
 			LoginPacket.adwClientKey[i] = g_adwEncryptKey[i];
-
-		LoginPacket.version = CLIENT_VERSION_TIMESTAMP;
 
 		if (!Send(sizeof(LoginPacket), &LoginPacket))
 		{
@@ -304,9 +307,7 @@ bool CAccountConnector::__AuthState_RecvKeyAgreement()
 {
 	TPacketKeyAgreement packet;
 	if (!Recv(sizeof(packet), &packet))
-	{
 		return false;
-	}
 
 	Tracenf("KEY_AGREEMENT RECV %u", packet.wDataLength);
 
@@ -325,8 +326,8 @@ bool CAccountConnector::__AuthState_RecvKeyAgreement()
 	{
 		// Key agreement 성공, 응답 전송
 		packetToSend.bHeader = HEADER_CG_KEY_AGREEMENT;
-		packetToSend.wAgreedLength = (uint16_t)agreedLength;
-		packetToSend.wDataLength = (uint16_t)dataLength;
+		packetToSend.wAgreedLength = static_cast<uint16_t>(agreedLength);
+		packetToSend.wDataLength = static_cast<uint16_t>(dataLength);
 
 		if (!Send(sizeof(packetToSend), &packetToSend))
 		{
@@ -348,9 +349,7 @@ bool CAccountConnector::__AuthState_RecvKeyAgreementCompleted()
 {
 	TPacketKeyAgreementCompleted packet;
 	if (!Recv(sizeof(packet), &packet))
-	{
 		return false;
-	}
 
 	Tracenf("KEY_AGREEMENT_COMPLETED RECV");
 

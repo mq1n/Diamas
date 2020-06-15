@@ -1,7 +1,4 @@
 #include "stdafx.h"
-
-#include <stack>
-
 #include "utils.h"
 #include "config.h"
 #include "char.h"
@@ -10,6 +7,7 @@
 #include "desc.h"
 #include "desc_client.h"
 #include "desc_manager.h"
+#include "GPosition.h"
 #include "packet.h"
 #include "affect.h"
 #include "skill.h"
@@ -19,7 +17,7 @@
 #include "log.h"
 #include "vector.h"
 #include "buffer_manager.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "fishing.h"
 #include "party.h"
 #include "dungeon.h"
@@ -33,17 +31,23 @@
 #include "arena.h"
 #include "dev_log.h"
 #include "threeway_war.h"
+#include "ox_event.h"
 #include "safebox.h"
 #include "shop.h"
 #include "pvp.h"
-#include "../../common/VnumHelper.h"
-#include "DragonSoul.h"
+#include "dragon_soul.h"
 #include "buff_on_attributes.h"
 #include "belt_inventory_helper.h"
+#include "gm.h"
+#include "battleground.h"
+
+#include "../../common/service.h"
+#include "../../common/length.h"
+#include "../../common/VnumHelper.h"
+
+#include <stack>
 
 const int32_t ITEM_BROKEN_METIN_VNUM = 28960;
-#define ENABLE_EFFECT_EXTRAPOT
-#define ENABLE_BOOKS_STACKFIX
 
 // CHANGE_ITEM_ATTRIBUTES
 // const uint32_t CHARACTER::msc_dwDefaultChangeItemAttrCycle = 10;
@@ -91,11 +95,11 @@ static bool IS_MONKEY_DUNGEON(int32_t map_index)
 {
 	switch (map_index)
 	{
-		case 5:
-		case 25:
-		case 45:
-		case 108:
-		case 109:
+	case MONKEY_EASY_MAP_INDEX_1:
+	case MONKEY_EASY_MAP_INDEX_2:
+	case MONKEY_EASY_MAP_INDEX_3:
+	case MONKEY_MEDIUM_MAP_INDEX:
+	case MONKEY_EXPERT_MAP_INDEX:
 			return true;;
 	}
 
@@ -109,27 +113,16 @@ bool IS_SUMMONABLE_ZONE(int32_t map_index)
 
 	switch (map_index)
 	{
-		case 66 : // 사귀타워
-		case 71 : // 거미 던전 2층
-		case 72 : // 천의 동굴
-		case 73 : // 천의 동굴 2층
-		case 193 : // 거미 던전 2-1층
-#if 0
-		case 184 : // 천의 동굴(신수)
-		case 185 : // 천의 동굴 2층(신수)
-		case 186 : // 천의 동굴(천조)
-		case 187 : // 천의 동굴 2층(천조)
-		case 188 : // 천의 동굴(진노)
-		case 189 : // 천의 동굴 2층(진노)
-#endif
-//		case 206 : // 아귀동굴
-		case 216 : // 아귀동굴
-		case 217 : // 거미 던전 3층
-		case 208 : // 천의 동굴 (용방)
-
-		case 113 : // OX Event 맵
+		case DEVILTOWER_MAP_INDEX:
+		case DEVILSCATACOMB_MAP_INDEX:
+		case SPIDER_MAP_INDEX_2:
+		case OXEVENT_MAP_INDEX:
+		case WEDDING_MAP_INDEX:
 			return false;
 	}
+
+	if (CBattlegroundManager::instance().IsEventMap(map_index))
+		return false;
 
 	// 모든 private 맵으론 워프 불가능
 	if (map_index > 10000) return false;
@@ -139,20 +132,7 @@ bool IS_SUMMONABLE_ZONE(int32_t map_index)
 
 bool IS_BOTARYABLE_ZONE(int32_t nMapIndex)
 {
-	if (!g_bEnableBootaryCheck) return true;
-
-	switch (nMapIndex)
-	{
-		case 1 :
-		case 3 :
-		case 21 :
-		case 23 :
-		case 41 :
-		case 43 :
-			return true;
-	}
-	
-	return false;
+	return true;
 }
 
 // item socket 이 프로토타입과 같은지 체크 -- by mhh
@@ -193,6 +173,13 @@ static bool FN_check_item_sex(LPCHARACTER ch, LPITEM item)
 	return true;
 }
 
+static bool FN_check_item_costume(LPCHARACTER ch, LPITEM item)
+{
+	if (IS_SET(item->GetType(), 28))
+		return true;
+
+	return false;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // ITEM HANDLING
@@ -200,7 +187,7 @@ static bool FN_check_item_sex(LPCHARACTER ch, LPITEM item)
 bool CHARACTER::CanHandleItem(bool bSkipCheckRefine, bool bSkipObserver)
 {
 	if (!bSkipObserver)
-		if (m_bIsObserver)
+		if (m_isObserver)
 			return false;
 
 	if (GetMyShop())
@@ -226,7 +213,7 @@ LPITEM CHARACTER::GetInventoryItem(uint16_t wCell) const
 {
 	return GetItem(TItemPos(INVENTORY, wCell));
 }
-LPITEM CHARACTER::GetItem(TItemPos Cell) const
+LPITEM CHARACTER::GetItem(const TItemPos & Cell) const
 {
 	if (!IsValidItemPosition(Cell))
 		return nullptr;
@@ -249,27 +236,18 @@ LPITEM CHARACTER::GetItem(TItemPos Cell) const
 			return nullptr;
 		}
 		return m_pointsInstant.pDSItems[wCell];
-
-	default:
-		return nullptr;
 	}
 	return nullptr;
 }
 
 #ifdef ENABLE_HIGHLIGHT_NEW_ITEM
-void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem, bool bWereMine)
+void CHARACTER::SetItem(const TItemPos & Cell, LPITEM pItem, bool bWereMine)
 #else
-void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
+void CHARACTER::SetItem(const TItemPos & Cell, LPITEM pItem)
 #endif
 {
 	uint16_t wCell = Cell.cell;
 	uint8_t window_type = Cell.window_type;
-	if ((uint32_t)((CItem*)pItem) == 0xff || (uint32_t)((CItem*)pItem) == 0xffffffff)
-	{
-		sys_err("!!! FATAL ERROR !!! item == 0xff (char: %s cell: %u)", GetName(), wCell);
-		core_dump();
-		return;
-	}
 
 	if (pItem && pItem->GetOwner())
 	{
@@ -451,7 +429,7 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 	}
 }
 
-LPITEM CHARACTER::GetWear(uint8_t bCell) const
+LPITEM CHARACTER::GetWear(uint16_t bCell) const
 {
 	// > WEAR_MAX_NUM : 용혼석 슬롯들.
 	if (bCell >= WEAR_MAX_NUM + DRAGON_SOUL_DECK_MAX_NUM * DS_SLOT_MAX)
@@ -463,7 +441,7 @@ LPITEM CHARACTER::GetWear(uint8_t bCell) const
 	return m_pointsInstant.pItems[INVENTORY_MAX_NUM + bCell];
 }
 
-void CHARACTER::SetWear(uint8_t bCell, LPITEM item)
+void CHARACTER::SetWear(uint16_t bCell, LPITEM item)
 {
 	// > WEAR_MAX_NUM : 용혼석 슬롯들.
 	if (bCell >= WEAR_MAX_NUM + DRAGON_SOUL_DECK_MAX_NUM * DS_SLOT_MAX)
@@ -516,7 +494,7 @@ void CHARACTER::ClearItem()
 	}
 }
 
-bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, uint8_t bSize, int32_t iExceptionCell) const
+bool CHARACTER::IsEmptyItemGrid(const TItemPos & Cell, uint8_t bSize, int32_t iExceptionCell) const
 {
 	switch (Cell.window_type)
 	{
@@ -634,7 +612,7 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, uint8_t bSize, int32_t iException
 
 					do
 					{
-						int32_t p = wCell + (DRAGON_SOUL_BOX_COLUMN_NUM * j);
+						uint16_t p = wCell + (DRAGON_SOUL_BOX_COLUMN_NUM * j);
 
 						if (p >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 							return false;
@@ -660,7 +638,7 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, uint8_t bSize, int32_t iException
 
 				do
 				{
-					int32_t p = wCell + (DRAGON_SOUL_BOX_COLUMN_NUM * j);
+					uint16_t p = wCell + (DRAGON_SOUL_BOX_COLUMN_NUM * j);
 
 					if (p >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 						return false;
@@ -676,6 +654,183 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, uint8_t bSize, int32_t iException
 		}
 	}
 	return false;
+}
+
+bool CHARACTER::IsEmptyItemGridSpecial(const TItemPos &Cell, uint8_t bSize, int32_t iExceptionCell, std::vector<uint16_t>& vec) const
+{
+	if (std::find(vec.begin(), vec.end(), Cell.cell) != vec.end()) {
+		return false;
+	}
+
+	switch (Cell.window_type)
+	{
+	case INVENTORY:
+	{
+		uint16_t bCell = (uint16_t)Cell.cell;
+
+		// bItemCell?º 0?? false???? ³ª?¸³?±? ?§?Ø + 1 ?Ø¼­ ?³¸®??´?.
+		// ??¶?¼­ iExceptionCell¿¡ 1?? ´??Ø º?±³??´?.
+		++iExceptionCell;
+
+		if (Cell.IsBeltInventoryPosition())
+		{
+			LPITEM beltItem = GetWear(WEAR_BELT);
+
+			if (nullptr == beltItem)
+				return false;
+
+			if (false == CBeltInventoryHelper::IsAvailableCell(bCell - BELT_INVENTORY_SLOT_START, beltItem->GetValue(0)))
+				return false;
+
+			if (m_pointsInstant.bItemGrid[bCell])
+			{
+				if (m_pointsInstant.bItemGrid[bCell] == iExceptionCell)
+					return true;
+
+				return false;
+			}
+
+			if (bSize == 1)
+				return true;
+
+		}
+		else if (bCell >= INVENTORY_MAX_NUM)
+			return false;
+
+		if (m_pointsInstant.bItemGrid[bCell])
+		{
+			if (m_pointsInstant.bItemGrid[bCell] == iExceptionCell)
+			{
+				if (bSize == 1)
+					return true;
+
+				int32_t j = 1;
+				uint16_t bPage = bCell / (INVENTORY_PAGE_SIZE);
+
+				do
+				{
+					uint16_t p = bCell + (5 * j);
+
+					if (p >= INVENTORY_MAX_NUM)
+						return false;
+
+					if (p / (INVENTORY_PAGE_SIZE) != bPage)
+						return false;
+
+					if (m_pointsInstant.bItemGrid[p])
+						if (m_pointsInstant.bItemGrid[p] != iExceptionCell)
+							return false;
+				} while (++j < bSize);
+
+				return true;
+			}
+			else
+				return false;
+		}
+
+		// ??±?°¡ 1??¸? ???­?? ?÷????´? °???¹?·? ±×³? ¸®??
+		if (1 == bSize)
+			return true;
+		else
+		{
+			int32_t j = 1;
+			uint16_t bPage = bCell / (INVENTORY_PAGE_SIZE);
+
+			do
+			{
+				uint16_t p = bCell + (5 * j);
+
+				if (p >= INVENTORY_MAX_NUM)
+					return false;
+
+				if (p / (INVENTORY_PAGE_SIZE) != bPage)
+					return false;
+
+				if (m_pointsInstant.bItemGrid[p])
+					if (m_pointsInstant.bItemGrid[p] != iExceptionCell)
+						return false;
+			} while (++j < bSize);
+
+			return true;
+		}
+	}
+		break;
+	case DRAGON_SOUL_INVENTORY:
+	{
+		uint16_t wCell = Cell.cell;
+		if (wCell >= DRAGON_SOUL_INVENTORY_MAX_NUM)
+			return false;
+
+		// bItemCell?º 0?? false???? ³ª?¸³?±? ?§?Ø + 1 ?Ø¼­ ?³¸®??´?.
+		// ??¶?¼­ iExceptionCell¿¡ 1?? ´??Ø º?±³??´?.
+		iExceptionCell++;
+
+		if (m_pointsInstant.wDSItemGrid[wCell])
+		{
+			if (m_pointsInstant.wDSItemGrid[wCell] == iExceptionCell)
+			{
+				if (bSize == 1)
+					return true;
+
+				int32_t j = 1;
+
+				do
+				{
+					uint16_t p = wCell + (DRAGON_SOUL_BOX_COLUMN_NUM * j);
+
+					if (p >= DRAGON_SOUL_INVENTORY_MAX_NUM)
+						return false;
+
+					if (m_pointsInstant.wDSItemGrid[p])
+						if (m_pointsInstant.wDSItemGrid[p] != iExceptionCell)
+							return false;
+				} while (++j < bSize);
+
+				return true;
+			}
+			else
+				return false;
+		}
+
+		// ??±?°¡ 1??¸? ???­?? ?÷????´? °???¹?·? ±×³? ¸®??
+		if (1 == bSize)
+			return true;
+		else
+		{
+			int32_t j = 1;
+
+			do
+			{
+				uint16_t p = wCell + (DRAGON_SOUL_BOX_COLUMN_NUM * j);
+
+				if (p >= DRAGON_SOUL_INVENTORY_MAX_NUM)
+					return false;
+
+				if (m_pointsInstant.bItemGrid[p])
+					if (m_pointsInstant.wDSItemGrid[p] != iExceptionCell)
+						return false;
+			} while (++j < bSize);
+
+			return true;
+		}
+	}
+	}
+	return false;
+}
+
+
+int32_t CHARACTER::GetEmptyInventoryCount(uint8_t size) const
+{
+	// NOTE: 현재 이 함수는 아이템 지급, 획득 등의 행위를 할 때 인벤토리의 빈 칸을 찾기 위해 사용되고 있는데,
+	//		벨트 인벤토리는 특수 인벤토리이므로 검사하지 않도록 한다. (기본 인벤토리: INVENTORY_MAX_NUM 까지만 검사)
+	int32_t emptyCount = 0;
+	for (int32_t i = 0; i < INVENTORY_MAX_NUM; ++i)
+	{
+		if (IsEmptyItemGrid(TItemPos(INVENTORY, i), size))
+			++emptyCount;
+	}
+
+	return emptyCount;
 }
 
 int32_t CHARACTER::GetEmptyInventory(uint8_t size) const
@@ -799,6 +954,78 @@ void CHARACTER::SetRefineNPC(LPCHARACTER ch)
 	}
 }
 
+
+struct FindBlacksmith
+{
+	CHARACTER* m_ch;
+	bool found;
+	bool m_throughGuild;
+	int32_t MAX_BLACKSMITH_DIST = 7500; //Around 5000 is the max distance, but to have a bit of room.
+
+	FindBlacksmith(CHARACTER* ch, bool throughGuild) {
+		m_ch = ch;
+		found = false;
+		m_throughGuild = throughGuild;
+	}
+
+	void operator()(CEntity* ent)
+	{
+		if (found) //Skip all the next entities - we already got what we wanted
+			return;
+
+		if (ent->IsType(ENTITY_CHARACTER))
+		{
+			CHARACTER* ch = static_cast<CHARACTER*>(ent);
+			if (ch->IsNPC())
+			{
+				uint32_t vnum = ch->GetMobTable().dwVnum;
+				switch (vnum)
+				{
+				case BLACKSMITH_WEAPON_MOB:
+				case BLACKSMITH_ARMOR_MOB:
+				case BLACKSMITH_ACCESSORY_MOB:
+				{
+					if (!m_throughGuild) //We can ignore proximity to guild blacksmiths if we are not using guild
+						return;
+
+					int32_t dist = DISTANCE_APPROX(m_ch->GetX() - ch->GetX(), m_ch->GetY() - ch->GetY());
+					if (g_bIsTestServer)
+						sys_log(0, "Guild blacksmith found within %d distance units.", dist);
+
+					if (dist < MAX_BLACKSMITH_DIST) {
+						found = true;
+					}
+
+					break;
+				}
+
+				case DEVILTOWER_BLACKSMITH_WEAPON_MOB:
+				case DEVILTOWER_BLACKSMITH_ARMOR_MOB:
+				case DEVILTOWER_BLACKSMITH_ACCESSORY_MOB:
+				case BLACKSMITH_MOB:
+				case BLACKSMITH2_MOB:
+				{
+					if (m_throughGuild) //Poximity to non-guild blacksmiths is irrelevant if we are using guild
+						return;
+
+					int32_t dist = DISTANCE_APPROX(m_ch->GetX() - ch->GetX(), m_ch->GetY() - ch->GetY());
+					if (g_bIsTestServer)
+						sys_log(0, "Blacksmith (%u) found within %d distance units.", vnum, dist);
+
+					if (dist < MAX_BLACKSMITH_DIST) {
+						found = true;
+					}
+
+					break;
+				}
+				}
+			}
+		}
+
+		return;
+	}
+};
+
 bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 {
 	if (!CanHandleItem(true))
@@ -806,6 +1033,21 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 		ClearRefineMode();
 		return false;
 	}
+
+	if (g_bIsTestServer)
+		if (m_dwRefineNPCVID)
+			sys_log(0, "Refine npcVID is %u", m_dwRefineNPCVID);
+
+	/*
+	FindBlacksmith f(this, IsRefineThroughGuild());
+	ForEachSeen(f);
+
+	if (!f.found) 
+	{
+		LogManager::instance().HackLog("REFINE_FAR_BLACKSMITH", this);
+		//We let continue - GMs will decide/ban.
+	}
+	*/
 	
 	//개량 시간제한 : upgrade_refine_scroll.quest 에서 개량후 5분이내에 일반 개량을 
 	//진행할수 없음
@@ -874,7 +1116,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 		{
 			if (CountSpecifyItem(prt->materials[i].vnum) < prt->materials[i].count)
 			{
-				if (test_server)
+				if (g_bIsTestServer)
 				{
 					ChatPacket(CHAT_TYPE_INFO, "Find %d, count %d, require %d", prt->materials[i].vnum, CountSpecifyItem(prt->materials[i].vnum), prt->materials[i].count);
 				}
@@ -904,11 +1146,11 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 			ITEM_MANAGER::CopyAllAttrTo(item, pkNewItem);
 			LogManager::instance().ItemLog(this, pkNewItem, "REFINE SUCCESS", pkNewItem->GetName());
 
-			uint8_t bCell = item->GetCell();
+			uint16_t bCell = item->GetCell();
 
 			// DETAIL_REFINE_LOG
 			NotifyRefineSuccess(this, item, IsRefineThroughGuild() ? "GUILD" : "POWER");
-			DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -cost);
+			LogManager::instance().MoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -cost);
 			ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE SUCCESS)");
 			// END_OF_DETAIL_REFINE_LOG
 
@@ -934,7 +1176,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 	else
 	{
 		// 실패! 모든 아이템이 사라짐.
-		DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -cost);
+		LogManager::instance().MoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -cost);
 		NotifyRefineFail(this, item, IsRefineThroughGuild() ? "GUILD" : "POWER");
 		item->AttrLog();
 		ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE FAIL)");
@@ -1056,7 +1298,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 	{
 		if (CountSpecifyItem(prt->materials[i].vnum) < prt->materials[i].count)
 		{
-			if (test_server)
+			if (g_bIsTestServer)
 			{
 				ChatPacket(CHAT_TYPE_INFO, "Find %d, count %d, require %d", prt->materials[i].vnum, CountSpecifyItem(prt->materials[i].vnum), prt->materials[i].count);
 			}
@@ -1089,15 +1331,17 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 		{
 			success_prob = yagong_prob[MINMAX(0, item->GetRefineLevel(), 8)];
 		}
-		else if (pkItemScroll->GetValue(0) == HYUNIRON_CHN) {} // @fixme121
+		else if (pkItemScroll->GetValue(0) == HYUNIRON_CHN)
+		{
+		}
 		else
 		{
 			sys_err("REFINE : Unknown refine scroll item. Value0: %d", pkItemScroll->GetValue(0));
 		}
 
-		if (test_server) 
+		if (g_bIsTestServer) 
 		{
-			ChatPacket(CHAT_TYPE_INFO, "[Only Test] Success_Prob %d, RefineLevel %d ", success_prob, item->GetRefineLevel());
+			ChatPacket(CHAT_TYPE_INFO, "[Test Server] Success_Prob %d, RefineLevel %d ", success_prob, item->GetRefineLevel());
 		}
 		if (pkItemScroll->GetValue(0) == HYUNIRON_CHN) // 현철은 아이템이 부서져야 한다.
 			bDestroyWhenFail = true;
@@ -1149,10 +1393,10 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 			ITEM_MANAGER::CopyAllAttrTo(item, pkNewItem);
 			LogManager::instance().ItemLog(this, pkNewItem, "REFINE SUCCESS", pkNewItem->GetName());
 
-			uint8_t bCell = item->GetCell();
+			uint16_t bCell = item->GetCell();
 
 			NotifyRefineSuccess(this, item, szRefineType);
-			DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -prt->cost);
+			LogManager::instance().MoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -prt->cost);
 			ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE SUCCESS)");
 
 			pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, bCell)); 
@@ -1178,9 +1422,9 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 			ITEM_MANAGER::CopyAllAttrTo(item, pkNewItem);
 			LogManager::instance().ItemLog(this, pkNewItem, "REFINE FAIL", pkNewItem->GetName());
 
-			uint8_t bCell = item->GetCell();
+			uint16_t bCell = item->GetCell();
 
-			DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -prt->cost);
+			LogManager::instance().MoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -prt->cost);
 			NotifyRefineFail(this, item, szRefineType, -1);
 			ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE FAIL)");
 
@@ -1209,7 +1453,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 	return true;
 }
 
-bool CHARACTER::RefineInformation(uint8_t bCell, uint8_t bType, int32_t iAdditionalCell)
+bool CHARACTER::RefineInformation(uint16_t bCell, uint8_t bType, int32_t iAdditionalCell)
 {
 	if (bCell > INVENTORY_MAX_NUM)
 		return false;
@@ -1508,22 +1752,25 @@ void CHARACTER::ProcessRecallItem(LPITEM item)
 
 void CHARACTER::__OpenPrivateShop()
 {
-#ifdef ENABLE_OPEN_SHOP_WITH_ARMOR
-	ChatPacket(CHAT_TYPE_COMMAND, "OpenPrivateShop");
-#else
-	uint32_t bodyPart = GetPart(PART_MAIN);
-	switch (bodyPart)
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+		return;
+
+	auto lastCheckTime = GetLastPrivateShopOpenTime();
+	if (lastCheckTime && get_dword_time() < lastCheckTime + 5000)
 	{
-		case 0:
-		case 1:
-		case 2:
-			ChatPacket(CHAT_TYPE_COMMAND, "OpenPrivateShop");
-			break;
-		default:
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("갑옷을 벗어야 개인 상점을 열 수 있습니다."));
-			break;
+		ChatPacket(CHAT_TYPE_INFO, "You can not use too fast");
+		return;
 	}
-#endif
+	SetLastPrivateShopOpenTime();
+	
+	uint32_t bodyPart = GetPart(PART_MAIN);
+	if (bodyPart >= 0 && bodyPart <= 2)
+	{
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("갑옷을 벗어야 개인 상점을 열 수 있습니다."));
+		return;
+	}
+	
+	ChatPacket(CHAT_TYPE_COMMAND, "OpenPrivateShop");
 }
 
 // MYSHOP_PRICE_LIST
@@ -1619,9 +1866,7 @@ int32_t CalculateConsumeSP(LPCHARACTER lpChar)
 	return needSP;
 }
 
-// #define ENABLE_FIREWORK_STUN
-#define ENABLE_ADDSTONE_FAILURE
-bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
+bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 {
 	int32_t iLimitRealtimeStartFirstUseFlagIndex = -1;
 	//int32_t iLimitTimerBasedOnWearFlagIndex = -1;
@@ -1652,28 +1897,31 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 		}
 	}
 
-	if (test_server)
+	if (g_bIsTestServer)
 	{
 		sys_log(0, "USE_ITEM %s, Inven %d, Cell %d, ItemType %d, SubType %d", item->GetName(), bDestInven, wDestCell, item->GetType(), item->GetSubType());
 	}
 
+	if (CBattlegroundManager::instance().IsLimitedItem(item->GetVnum()))
+	{
+		ChatPacket(CHAT_TYPE_INFO, "You can not use this item on battleground");
+		return false;
+	}
 	if ( CArenaManager::instance().IsLimitedItem( GetMapIndex(), item->GetVnum() ) == true )
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 		return false;
 	}
-#ifdef ENABLE_NEWSTUFF
 	else if (g_NoPotionsOnPVP && CPVPManager::instance().IsFighting(GetPlayerID()) && IsLimitedPotionOnPVP(item->GetVnum()))
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 		return false;
 	}
-#endif
 
 	// @fixme402 (IsLoadedAffect to block affect hacking)
 	if (!IsLoadedAffect())
 	{
-		ChatPacket(CHAT_TYPE_INFO, "Affects are not loaded yet!");
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Affects are not loaded yet!"));
 		return false;
 	}
 
@@ -1724,7 +1972,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			return ItemProcess_Polymorph(item);
 
 		case ITEM_QUEST:
-			if (GetArena() != nullptr || IsObserverMode() == true)
+			if (GetArena() || IsObserverMode() || GetWarMap())
 			{
 				if (item->GetVnum() == 50051 || item->GetVnum() == 50052 || item->GetVnum() == 50053)
 				{
@@ -1847,21 +2095,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								switch (item->GetVnum())
 								{
 									case 71049: // 비단보따리
-										if (g_bEnableBootaryCheck)
-										{
-											if (IS_BOTARYABLE_ZONE(GetMapIndex()) == true)
-											{
-												UseSilkBotary();
-											}
-											else
-											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("개인 상점을 열 수 없는 지역입니다"));
-											}
-										}
-										else
-										{
-											UseSilkBotary();
-										}
+										UseSilkBotary();
 										break;
 								}
 							}
@@ -1912,18 +2146,19 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 		
 		case ITEM_FISH:
 			{
+				if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+					return false;
+
 				if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 				{
 					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 					return false;
 				}
-#ifdef ENABLE_NEWSTUFF
 				else if (g_NoPotionsOnPVP && CPVPManager::instance().IsFighting(GetPlayerID()) && !IsAllowedPotionOnPVP(item->GetVnum()))
 				{
 					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 					return false;
 				}
-#endif
 
 				if (item->GetSubType() == FISH_ALIVE)
 					fishing::UseFish(this, item);
@@ -2025,7 +2260,6 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 		case ITEM_GIFTBOX:
 			{
-#ifdef ENABLE_NEWSTUFF
 				if (0 != g_BoxUseTimeLimitValue)
 				{
 					if (get_dword_time() < m_dwLastBoxUseTime+g_BoxUseTimeLimitValue)
@@ -2036,7 +2270,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				}
 
 				m_dwLastBoxUseTime = get_dword_time();
-#endif
+
 				uint32_t dwBoxVnum = item->GetVnum();
 				std::vector <uint32_t> dwVnums;
 				std::vector <uint32_t> dwCounts;
@@ -2050,6 +2284,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						ChatPacket(CHAT_TYPE_INFO,LC_TEXT("먼저 용혼석 퀘스트를 완료하셔야 합니다."));
 						return false;
 					}
+				}
+
+				if ((dwBoxVnum >= 71080 && dwBoxVnum <= 71082) &&
+					(GetMapIndex() == 1 || GetMapIndex() == 21 || GetMapIndex() == 41 || GetMapIndex() == 313 || GetMapIndex() == 314 || 
+					(GetMapIndex() >= 313 * 10000 && GetMapIndex() < 314 * 10000)))
+				{
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Burada metin tasi cagiramazsin."));
+					return false;
 				}
 
 				if (GiveItemFromSpecialItemGroup(dwBoxVnum, dwVnums, dwCounts, item_gets, count))
@@ -2154,16 +2396,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 				if (true == LearnSkillByBook(dwVnum))
 				{
-#ifdef ENABLE_BOOKS_STACKFIX
 					item->SetCount(item->GetCount() - 1);
-#else
-					ITEM_MANAGER::instance().RemoveItem(item);
-#endif
 
 					int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
-
-					if (distribution_test_server)
-						iReadDelay /= 3;
 
 					SetSkillNextReadTime(dwVnum, get_global_time() + iReadDelay);
 				}
@@ -2174,7 +2409,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			{
 				if (item->GetVnum() > 50800 && item->GetVnum() <= 50820)
 				{
-					if (test_server)
+					if (g_bIsTestServer)
 						sys_log (0, "ADD addtional effect : vnum(%d) subtype(%d)", item->GetOriginalVnum(), item->GetSubType());
 
 					int32_t affect_type = AFFECT_EXP_BONUS_EURO_FREE;
@@ -2240,6 +2475,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 					case USE_POTION_NODELAY:
 						{
+							if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+								return false;
+
 							if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 							{
 								if (quest::CQuestManager::instance().GetEventFlag("arena_potion_limit") > 0)
@@ -2270,13 +2508,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										break;
 								}
 							}
-#ifdef ENABLE_NEWSTUFF
+
 							else if (g_NoPotionsOnPVP && CPVPManager::instance().IsFighting(GetPlayerID()) && !IsAllowedPotionOnPVP(item->GetVnum()))
 							{
 								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 								return false;
 							}
-#endif
 
 							bool used = false;
 
@@ -2324,7 +2561,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								if (item->GetVnum() == 50085 || item->GetVnum() == 50086)
 								{
-									if (test_server)
+									if (g_bIsTestServer)
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("월병 또는 종자 를 사용하였습니다"));
 									SetUseSeedOrMoonBottleTime();
 								}
@@ -2350,21 +2587,22 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 				if (item->GetVnum() >= 27863 && item->GetVnum() <= 27883)
 				{
+					if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+						return false;
+
 					if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 					{
 						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 						return false;
 					}
-#ifdef ENABLE_NEWSTUFF
 					else if (g_NoPotionsOnPVP && CPVPManager::instance().IsFighting(GetPlayerID()) && !IsAllowedPotionOnPVP(item->GetVnum()))
 					{
 						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 						return false;
 					}
-#endif
 				}
 
-				if (test_server)
+				if (g_bIsTestServer)
 				{
 					 sys_log (0, "USE_ITEM %s Type %d SubType %d vnum %d", item->GetName(), item->GetType(), item->GetSubType(), item->GetOriginalVnum());
 				}
@@ -2395,11 +2633,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								{
 									if (item->GetVnum() == DRAGON_HEART_VNUM)
 									{
-										sprintf(buf, "Inc %ds by item{VN:%d SOC%d:%ld}", ret, item->GetVnum(), ITEM_SOCKET_CHARGING_AMOUNT_IDX, item->GetSocket(ITEM_SOCKET_CHARGING_AMOUNT_IDX));
+										sprintf(buf, "Inc %ds by item{VN:%d SOC%d:%d}", ret, item->GetVnum(), ITEM_SOCKET_CHARGING_AMOUNT_IDX, item->GetSocket(ITEM_SOCKET_CHARGING_AMOUNT_IDX));
 									}
 									else
 									{
-										sprintf(buf, "Inc %ds by item{VN:%d VAL%d:%ld}", ret, item->GetVnum(), ITEM_VALUE_CHARGING_AMOUNT_IDX, item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
+										sprintf(buf, "Inc %ds by item{VN:%d VAL%d:%d}", ret, item->GetVnum(), ITEM_VALUE_CHARGING_AMOUNT_IDX, item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
 									}
 
 									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%d초 만큼 충전되었습니다."), ret);
@@ -2411,11 +2649,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								{
 									if (item->GetVnum() == DRAGON_HEART_VNUM)
 									{
-										sprintf(buf, "No change by item{VN:%d SOC%d:%ld}", item->GetVnum(), ITEM_SOCKET_CHARGING_AMOUNT_IDX, item->GetSocket(ITEM_SOCKET_CHARGING_AMOUNT_IDX));
+										sprintf(buf, "No change by item{VN:%d SOC%d:%d}", item->GetVnum(), ITEM_SOCKET_CHARGING_AMOUNT_IDX, item->GetSocket(ITEM_SOCKET_CHARGING_AMOUNT_IDX));
 									}
 									else
 									{
-										sprintf(buf, "No change by item{VN:%d VAL%d:%ld}", item->GetVnum(), ITEM_VALUE_CHARGING_AMOUNT_IDX, item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
+										sprintf(buf, "No change by item{VN:%d VAL%d:%d}", item->GetVnum(), ITEM_VALUE_CHARGING_AMOUNT_IDX, item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
 									}
 
 									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("충전할 수 없습니다."));
@@ -2442,7 +2680,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								if (ret)
 								{
 									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%d초 만큼 충전되었습니다."), ret);
-									sprintf(buf, "Increase %ds by item{VN:%d VAL%d:%ld}", ret, item->GetVnum(), ITEM_VALUE_CHARGING_AMOUNT_IDX, item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
+									sprintf(buf, "Increase %ds by item{VN:%d VAL%d:%d}", ret, item->GetVnum(), ITEM_VALUE_CHARGING_AMOUNT_IDX, item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
 									LogManager::instance().ItemLog(this, item, "DS_CHARGING_SUCCESS", buf);
 									item->SetCount(item->GetCount() - 1);
 									return true;
@@ -2450,7 +2688,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								else
 								{
 									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("충전할 수 없습니다."));
-									sprintf(buf, "No change by item{VN:%d VAL%d:%ld}", item->GetVnum(), ITEM_VALUE_CHARGING_AMOUNT_IDX, item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
+									sprintf(buf, "No change by item{VN:%d VAL%d:%d}", item->GetVnum(), ITEM_VALUE_CHARGING_AMOUNT_IDX, item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
 									LogManager::instance().ItemLog(this, item, "DS_CHARGING_FAILED", buf);
 									return false;
 								}
@@ -2525,6 +2763,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									{
 										if (pMarriage->ch1 != nullptr)
 										{
+											if (CBattlegroundManager::instance().IsEventMap(pMarriage->ch1->GetMapIndex()))
+												break;
+
 											if (CArenaManager::instance().IsArenaMap(pMarriage->ch1->GetMapIndex()) == true)
 											{
 												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
@@ -2534,6 +2775,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 										if (pMarriage->ch2 != nullptr)
 										{
+											if (CBattlegroundManager::instance().IsEventMap(pMarriage->ch2->GetMapIndex()))
+												break;
+
 											if (CArenaManager::instance().IsArenaMap(pMarriage->ch2->GetMapIndex()) == true)
 											{
 												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
@@ -2560,6 +2804,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								//라마단 보상용 용기의 망토
 							case 70057:
 							case REWARD_BOX_UNIQUE_ITEM_CAPE_OF_COURAGE:
+								if (IsInSafezone())
+									return false;
+
 								AggregateMonster();
 								item->SetCount(item->GetCount()-1);
 								break;
@@ -2642,7 +2889,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									{
 										AutoGiveItem(bi[i].vnum, bi[i].count);
 									}
-									ITEM_MANAGER::instance().RemoveItem(item);
+									item->SetCount(item->GetCount() - 1);
 								}
 								break;
 
@@ -2657,7 +2904,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										// 처음 사용시
 										int32_t iMapIndex = GetMapIndex();
 
-										PIXEL_POSITION pos;
+										GPOS pos;
 
 										if (SECTREE_MANAGER::instance().GetRandomLocation(iMapIndex, pos, 700))
 										{
@@ -2706,7 +2953,6 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											{ 27600,  1,  0 },
 											{ 25100,  1,  0 },
 
-											{ 50001,  1,  0 },
 											{ 50003,  1,  1 },
 										};
 										TEventStoneInfo info_7[EVENT_STONE_MAX_INFO] =
@@ -2727,7 +2973,6 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											{ 27600,  1,  5 },
 											{ 25100,  1,  5 },
 
-											{ 50001,  1,  0 },
 											{ 50003,  1,  5 },
 
 										};
@@ -2749,7 +2994,6 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											{ 27600,  1,  0 },
 											{ 25100,  1, 15 },
 
-											{ 50001,  1, 10 },
 											{ 50003,  1, 50 },
 
 										};
@@ -2907,7 +3151,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										if (item->GetSocket(0) >= 6)
 										{
 											ChatPacket(CHAT_TYPE_COMMAND, "StoneDetect %u 0 0", (uint32_t)GetVID());
-											ITEM_MANAGER::instance().RemoveItem(item);
+											item->SetCount(item->GetCount() - 1);
 										}
 									}
 									break;
@@ -2919,7 +3163,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								AttackedByPoison(nullptr); // @warme008
 								break;
 
-							case 27987: // 조개
+							case fishing::SHELLFISH_VNUM: // 조개
 								// 50  돌조각 47990
 								// 30  꽝
 								// 10  백진주 47992
@@ -2933,7 +3177,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									if (r <= 50)
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("조개에서 돌조각이 나왔습니다."));
-										AutoGiveItem(27990);
+										AutoGiveItem(fishing::STONEPIECE_VNUM);
 									}
 									else
 									{
@@ -2951,17 +3195,17 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										else if (r <= prob_table[1])
 										{
 											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("조개에서 백진주가 나왔습니다."));
-											AutoGiveItem(27992);
+											AutoGiveItem(fishing::WHITE_PEARL_VNUM);
 										}
 										else if (r <= prob_table[2])
 										{
 											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("조개에서 청진주가 나왔습니다."));
-											AutoGiveItem(27993);
+											AutoGiveItem(fishing::BLUE_PEARL_VNUM);
 										}
 										else
 										{
 											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("조개에서 피진주가 나왔습니다."));
-											AutoGiveItem(27994);
+											AutoGiveItem(fishing::RED_PEARL_VNUM);
 										}
 									}
 								}
@@ -3032,14 +3276,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (LearnSkillByBook(SKILL_LEADERSHIP))
 									{
-#ifdef ENABLE_BOOKS_STACKFIX
 										item->SetCount(item->GetCount() - 1);
-#else
-										ITEM_MANAGER::instance().RemoveItem(item);
-#endif
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
-										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(SKILL_LEADERSHIP, get_global_time() + iReadDelay);
 									}
@@ -3078,14 +3317,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (LearnSkillByBook(SKILL_COMBO, iPct))
 									{
-#ifdef ENABLE_BOOKS_STACKFIX
 										item->SetCount(item->GetCount() - 1);
-#else
-										ITEM_MANAGER::instance().RemoveItem(item);
-#endif
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
-										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(SKILL_COMBO, get_global_time() + iReadDelay);
 									}
@@ -3111,14 +3345,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (LearnSkillByBook(dwSkillVnum, iPct))
 									{
-#ifdef ENABLE_BOOKS_STACKFIX
 										item->SetCount(item->GetCount() - 1);
-#else
-										ITEM_MANAGER::instance().RemoveItem(item);
-#endif
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
-										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
 									}
@@ -3144,14 +3373,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (LearnSkillByBook(dwSkillVnum, iPct))
 									{
-#ifdef ENABLE_BOOKS_STACKFIX
 										item->SetCount(item->GetCount() - 1);
-#else
-										ITEM_MANAGER::instance().RemoveItem(item);
-#endif
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
-										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
 									}
@@ -3229,14 +3453,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (LearnSkillByBook(dwSkillVnum, iPct))
 									{
-#ifdef ENABLE_BOOKS_STACKFIX
 										item->SetCount(item->GetCount() - 1);
-#else
-										ITEM_MANAGER::instance().RemoveItem(item);
-#endif
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
-										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
 									}
@@ -3264,25 +3483,20 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (LearnSkillByBook(dwSkillVnum, iPct))
 									{
-#ifdef ENABLE_BOOKS_STACKFIX
 										item->SetCount(item->GetCount() - 1);
-#else
-										ITEM_MANAGER::instance().RemoveItem(item);
-#endif
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
-										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
 
-										if (test_server) 
+										if (g_bIsTestServer) 
 										{
 											ChatPacket(CHAT_TYPE_INFO, "[TEST_SERVER] Success to learn skill ");
 										}
 									}
 									else
 									{
-										if (test_server) 
+										if (g_bIsTestServer) 
 										{
 											ChatPacket(CHAT_TYPE_INFO, "[TEST_SERVER] Failed to learn skill ");
 										}
@@ -3310,14 +3524,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (LearnSkillByBook(dwSkillVnum, iPct))
 									{
-#ifdef ENABLE_BOOKS_STACKFIX
 										item->SetCount(item->GetCount() - 1);
-#else
-										ITEM_MANAGER::instance().RemoveItem(item);
-#endif
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
-										if (distribution_test_server) iReadDelay /= 3;
 
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
 									}
@@ -3342,7 +3551,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										return false;
 									}
 
-									if (!test_server && get_global_time() < GetSkillNextReadTime(dwSkillVnum))
+									if (!g_bIsTestServer && get_global_time() < GetSkillNextReadTime(dwSkillVnum))
 									{
 										if (FindAffect(AFFECT_SKILL_NO_BOOK_DELAY))
 										{
@@ -3372,20 +3581,15 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										PointChange(POINT_HORSE_SKILL, 1);
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
-										if (distribution_test_server) iReadDelay /= 3;
 
-										if (!test_server)
+										if (!g_bIsTestServer)
 											SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
 									}
 									else
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("승마 수련서 이해에 실패하였습니다."));
 									}
-#ifdef ENABLE_BOOKS_STACKFIX
 									item->SetCount(item->GetCount() - 1);
-#else
-									ITEM_MANAGER::instance().RemoveItem(item);
-#endif
 								}
 								break;
 
@@ -3421,7 +3625,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (get_global_time() - last_use_time < interval * 60 * 60)
 									{
-										if (test_server == false)
+										if (g_bIsTestServer == false)
 										{
 											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 사용할 수 없습니다."));
 											return false;
@@ -3728,48 +3932,50 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							case 50107:
 								{
+									if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+										return false;
+
 									if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 										return false;
 									}
-#ifdef ENABLE_NEWSTUFF
 									else if (g_NoPotionsOnPVP && CPVPManager::instance().IsFighting(GetPlayerID()) && !IsAllowedPotionOnPVP(item->GetVnum()))
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 										return false;
 									}
-#endif
 
 									EffectPacket(SE_CHINA_FIREWORK);
-#ifdef ENABLE_FIREWORK_STUN
+									// 스턴 공격을 올려준다
 									
 									AddAffect(AFFECT_CHINA_FIREWORK, POINT_STUN_PCT, 30, AFF_CHINA_FIREWORK, 5*60, 0, true);
-#endif
+
 									item->SetCount(item->GetCount()-1);
 								}
 								break;
 
 							case 50108:
 								{
+									if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+										return false;
+
 									if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 										return false;
 									}
-#ifdef ENABLE_NEWSTUFF
 									else if (g_NoPotionsOnPVP && CPVPManager::instance().IsFighting(GetPlayerID()) && !IsAllowedPotionOnPVP(item->GetVnum()))
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 										return false;
 									}
-#endif
 
 									EffectPacket(SE_SPIN_TOP);
-#ifdef ENABLE_FIREWORK_STUN
+									// 스턴 공격을 올려준다
 									
 									AddAffect(AFFECT_CHINA_FIREWORK, POINT_STUN_PCT, 30, AFF_CHINA_FIREWORK, 5*60, 0, true);
-#endif
+
 									item->SetCount(item->GetCount()-1);
 								}
 								break;
@@ -3929,18 +4135,19 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							case FUCKING_BRAZIL_ITEM_AUTO_SP_RECOVERY_S:
 							case FUCKING_BRAZIL_ITEM_AUTO_HP_RECOVERY_S:
 								{
+									if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+										return false;
+
 									if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
 										return false;
 									}
-#ifdef ENABLE_NEWSTUFF
 									else if (g_NoPotionsOnPVP && CPVPManager::instance().IsFighting(GetPlayerID()) && !IsAllowedPotionOnPVP(item->GetVnum()))
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 										return false;
 									}
-#endif
 
 									EAffectTypes type = AFFECT_NONE;
 									bool isSpecialPotion = false;
@@ -4117,6 +4324,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 					case USE_POTION_NODELAY:
 						{
+							if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+								return false;
+
 							if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 							{
 								if (quest::CQuestManager::instance().GetEventFlag("arena_potion_limit") > 0)
@@ -4146,13 +4356,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										return false;
 								}
 							}
-#ifdef ENABLE_NEWSTUFF
+
 							else if (g_NoPotionsOnPVP && CPVPManager::instance().IsFighting(GetPlayerID()) && !IsAllowedPotionOnPVP(item->GetVnum()))
 							{
 								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 								return false;
 							}
-#endif
 
 							bool used = false;
 
@@ -4200,7 +4409,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								if (item->GetVnum() == 50085 || item->GetVnum() == 50086)
 								{
-									if (test_server)
+									if (g_bIsTestServer)
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("월병 또는 종자 를 사용하였습니다"));
 									SetUseSeedOrMoonBottleTime();
 								}
@@ -4220,6 +4429,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						break;
 
 					case USE_POTION:
+						if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+							return false;
+
 						if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 						{
 							if (quest::CQuestManager::instance().GetEventFlag("arena_potion_limit") > 0)
@@ -4251,13 +4463,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									return false;
 							}
 						}
-#ifdef ENABLE_NEWSTUFF
 						else if (g_NoPotionsOnPVP && CPVPManager::instance().IsFighting(GetPlayerID()) && !IsAllowedPotionOnPVP(item->GetVnum()))
 						{
 							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 							return false;
 						}
-#endif
+
 						
 						if (item->GetValue(1) != 0)
 						{
@@ -4324,18 +4535,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									if (FindAffect(AFFECT_MOV_SPEED))
 										return false;
 									AddAffect(AFFECT_MOV_SPEED, POINT_MOV_SPEED, item->GetValue(2), AFF_MOV_SPEED_POTION, item->GetValue(1), 0, true);
-#ifdef ENABLE_EFFECT_EXTRAPOT
 									EffectPacket(SE_DXUP_PURPLE);
-#endif
 									break;
 
 								case APPLY_ATT_SPEED:
 									if (FindAffect(AFFECT_ATT_SPEED))
 										return false;
 									AddAffect(AFFECT_ATT_SPEED, POINT_ATT_SPEED, item->GetValue(2), AFF_ATT_SPEED_POTION, item->GetValue(1), 0, true);
-#ifdef ENABLE_EFFECT_EXTRAPOT
 									EffectPacket(SE_SPEEDUP_GREEN);
-#endif
 									break;
 
 								case APPLY_STR:
@@ -4386,24 +4593,25 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 
 							// gm_guild_build, oxevent 맵에서 귀환부 귀환기억부 를 사용못하게 막음
-							if (GetMapIndex() == 200 || GetMapIndex() == 113)
+							if (GetMapIndex() == 200 || GetMapIndex() == OXEVENT_MAP_INDEX)
 							{
 								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("현재 위치에서 사용할 수 없습니다."));
 								return false;
 							}
+
+							if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+								return false;
 
 							if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 							{
 								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 								return false;
 							}
-#ifdef ENABLE_NEWSTUFF
 							else if (g_NoPotionsOnPVP && CPVPManager::instance().IsFighting(GetPlayerID()) && !IsAllowedPotionOnPVP(item->GetVnum()))
 							{
 								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
 								return false;
 							}
-#endif
 
 							if (m_pkWarpEvent)
 							{
@@ -4426,7 +4634,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										if (!GiveRecallItem(item))
 											return false;
 
-									PIXEL_POSITION posWarp;
+									GPOS posWarp;
 
 									if (SECTREE_MANAGER::instance().GetRecallPositionByEmpire(GetMapIndex(), GetEmpire(), posWarp))
 									{
@@ -4443,7 +4651,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								else
 								{
-									if (test_server)
+									if (g_bIsTestServer)
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("원래 위치로 복귀"));	
 
 									ProcessRecallItem(item);
@@ -4596,9 +4804,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								return false;
 
 							if (item2->IsEquipped())
-							{
-								BuffOnAttr_RemoveBuffsFromItem(item2);
-							}
+								return false;
 
 							// [NOTE] 코스튬 아이템에는 아이템 최초 생성시 랜덤 속성을 부여하되, 재경재가 등등은 막아달라는 요청이 있었음.
 							// 원래 ANTI_CHANGE_ATTRIBUTE 같은 아이템 Flag를 추가하여 기획 레벨에서 유연하게 컨트롤 할 수 있도록 할 예정이었으나
@@ -4668,36 +4874,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										return false;
 									}
 
-									if ((GM_PLAYER == GetGMLevel()) && (false == test_server) && (g_dwItemBonusChangeTime > 0))
-									{
-										//
-										
-										
-										//
-
-										// uint32_t dwChangeItemAttrCycle = quest::CQuestManager::instance().GetEventFlag(msc_szChangeItemAttrCycleFlag);
-										// if (dwChangeItemAttrCycle < msc_dwDefaultChangeItemAttrCycle)
-											// dwChangeItemAttrCycle = msc_dwDefaultChangeItemAttrCycle;
-										uint32_t dwChangeItemAttrCycle = g_dwItemBonusChangeTime;
-
-										quest::PC* pPC = quest::CQuestManager::instance().GetPC(GetPlayerID());
-
-										if (pPC)
-										{
-											uint32_t dwNowSec = get_global_time();
-
-											uint32_t dwLastChangeItemAttrSec = pPC->GetFlag(msc_szLastChangeItemAttrFlag);
-
-											if (dwLastChangeItemAttrSec + dwChangeItemAttrCycle > dwNowSec)
-											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 바꾼지 %d분 이내에는 다시 변경할 수 없습니다.(%d 분 남음)"),
-														dwChangeItemAttrCycle, dwChangeItemAttrCycle - (dwNowSec - dwLastChangeItemAttrSec));
-												return false;
-											}
-
-											pPC->SetFlag(msc_szLastChangeItemAttrFlag, dwNowSec);
-										}
-									}
+									if (item2->IsEquipped())
+										return false;
 
 									if (item->GetSubType() == USE_CHANGE_ATTRIBUTE2)
 									{
@@ -4762,7 +4940,24 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									break;
 
 								case USE_ADD_ATTRIBUTE :
+									if (ITEM_COSTUME == item2->GetType())
+									{
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
+										return false;
+									}
+
 									if (item2->GetAttributeSetIndex() == -1)
+									{
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
+										return false;
+									}
+
+									if (item2->IsExchanging())
+									{
+										return false;
+									}
+
+									if (item2->IsEquipped())
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
 										return false;
@@ -4806,16 +5001,18 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											item2->AddAttribute();
 											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성 추가에 성공하였습니다."));
 
+											/*
 											int32_t iAddedIdx = item2->GetAttributeCount() - 1;
 											LogManager::instance().ItemLog(
-													GetPlayerID(), 
+													GetPlayerID(),
 													item2->GetAttributeType(iAddedIdx),
 													item2->GetAttributeValue(iAddedIdx),
-													item->GetID(), 
+													item->GetID(),
 													"ADD_ATTRIBUTE_SUCCESS",
 													buf,
 													GetDesc()->GetHostName(),
 													item->GetOriginalVnum());
+											*/
 										}
 										else
 										{
@@ -4834,6 +5031,24 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								case USE_ADD_ATTRIBUTE2 :
 									// 축복의 구슬 
 									// 재가비서를 통해 속성을 4개 추가 시킨 아이템에 대해서 하나의 속성을 더 붙여준다.
+
+									if (ITEM_COSTUME == item2->GetType())
+									{
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
+										return false;
+									}
+
+									if (item2->IsExchanging())
+									{
+										return false;
+									}
+
+									if (item2->IsEquipped())
+									{
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
+										return false;
+									}
+
 									if (item2->GetAttributeSetIndex() == -1)
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
@@ -4851,6 +5066,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											item2->AddAttribute();
 											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성 추가에 성공하였습니다."));
 
+											/*
 											int32_t iAddedIdx = item2->GetAttributeCount() - 1;
 											LogManager::instance().ItemLog(
 													GetPlayerID(),
@@ -4861,11 +5077,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 													buf,
 													GetDesc()->GetHostName(),
 													item->GetOriginalVnum());
+											*/
 										}
 										else
 										{
 											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성 추가에 실패하였습니다."));
-											LogManager::instance().ItemLog(this, item, "ADD_ATTRIBUTE2_FAIL", buf);
+											// LogManager::instance().ItemLog(this, item, "ADD_ATTRIBUTE2_FAIL", buf);
 										}
 
 										item->SetCount(item->GetCount() - 1);
@@ -4894,11 +5111,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										{
 											if (item2->GetAccessorySocketMaxGrade() < ITEM_ACCESSORY_SOCKET_MAX_NUM)
 											{
-#ifdef ENABLE_ADDSTONE_FAILURE
 												if (number(1, 100) <= 50)
-#else
-												if (1)
-#endif
 												{
 													item2->SetAccessorySocketMaxGrade(item2->GetAccessorySocketMaxGrade() + 1);
 													ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소켓이 성공적으로 추가되었습니다."));
@@ -5158,11 +5371,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					if (item2->GetSocket(i) >= 1 && item2->GetSocket(i) <= 2 && item2->GetSocket(i) >= item->GetValue(2))
 					{
 						// 석 확률
-#ifdef ENABLE_ADDSTONE_FAILURE
 						if (number(1, 100) <= 30)
-#else
-						if (1)
-#endif
 						{
 							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("메틴석 부착에 성공하였습니다."));
 							item2->SetSocket(i, item->GetVnum());
@@ -5199,15 +5408,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 		case ITEM_BLEND:
 			// 새로운 약초들
-			sys_log(0,"ITEM_BLEND!!");
 			if (Blend_Item_find(item->GetVnum()))
 			{
 				int32_t		affect_type		= AFFECT_BLEND;
-				if (item->GetSocket(0) >= _countof(aApplyInfo))
-				{
-					sys_err ("INVALID BLEND ITEM(id : %d, vnum : %d). APPLY TYPE IS %d.", item->GetID(), item->GetVnum(), item->GetSocket(0));
-					return false;
-				}
 				int32_t		apply_type		= aApplyInfo[item->GetSocket(0)].bPointType;
 				int32_t		apply_value		= item->GetSocket(1);
 				int32_t		apply_duration	= item->GetSocket(2);
@@ -5271,7 +5474,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 int32_t g_nPortalLimitTime = 10;
 
-bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
+bool CHARACTER::UseItem(const TItemPos &Cell, const TItemPos &DestCell)
 {
 	uint16_t wCell = Cell.cell;
 	uint8_t window_type = Cell.window_type;
@@ -5285,7 +5488,8 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 	if (!IsValidItemPosition(Cell) || !(item = GetItem(Cell)))
 			return false;
 
-	sys_log(0, "%s: USE_ITEM %s (inven %d, cell: %d)", GetName(), item->GetName(), window_type, wCell);
+	if (g_bIsTestServer)
+		sys_log(0, "%s: USE_ITEM %s (inven %d, cell: %d)", GetName(), item->GetName(), window_type, wCell);
 
 	if (item->IsExchanging())
 		return false;
@@ -5329,7 +5533,7 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 		{
 			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("창고를 연후 %d초 이내에는 귀환부,귀환기억부를 사용할 수 없습니다."), g_nPortalLimitTime);
 
-			if (test_server)
+			if (g_bIsTestServer)
 				ChatPacket(CHAT_TYPE_INFO, "[TestOnly]Pulse %d LoadTime %d PASS %d", iPulse, GetSafeboxLoadTime(), PASSES_PER_SEC(g_nPortalLimitTime));
 			return false; 
 		}
@@ -5368,7 +5572,7 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 		//귀환부 거리체크
 		if (item->GetVnum() != 70302)
 		{
-			PIXEL_POSITION posWarp;
+			GPOS posWarp;
 
 			int32_t x = 0;
 			int32_t y = 0;
@@ -5403,7 +5607,7 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 			if (nDistant > nDist)
 			{
 				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이동 되어질 위치와 너무 가까워 귀환부를 사용할수 없습니다."));				
-				if (test_server)
+				if (g_bIsTestServer)
 					ChatPacket(CHAT_TYPE_INFO, "PossibleDistant %f nNowDist %f", nDistant,nDist); 
 				return false;
 			}
@@ -5443,7 +5647,7 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 	if (IS_SET(item->GetFlag(), ITEM_FLAG_LOG)) // 사용 로그를 남기는 아이템 처리
 	{
 		uint32_t vid = item->GetVID();
-		uint32_t oldCount = item->GetCount();
+//		uint32_t oldCount = item->GetCount();
 		uint32_t vnum = item->GetVnum();
 
 		char hint[ITEM_NAME_MAX_LEN + 32 + 1];
@@ -5458,18 +5662,20 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 		{
 			LogManager::instance().ItemLog(this, vid, vnum, "REMOVE", hint);
 		}
+		/*
 		else if (oldCount != item->GetCount())
 		{
 			snprintf(hint + len, sizeof(hint) - len, " %u", oldCount - 1);
 			LogManager::instance().ItemLog(this, vid, vnum, "USE_ITEM", hint);
 		}
+		*/
 		return (ret);
 	}
 	else
 		return UseItemEx(item, DestCell);
 }
 
-bool CHARACTER::DropItem(TItemPos Cell, uint8_t bCount)
+bool CHARACTER::DropItem(const TItemPos &Cell, uint8_t bCount)
 {
 	LPITEM item = nullptr; 
 
@@ -5479,7 +5685,7 @@ bool CHARACTER::DropItem(TItemPos Cell, uint8_t bCount)
 			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("강화창을 연 상태에서는 아이템을 옮길 수 없습니다."));
 		return false;
 	}
-#ifdef ENABLE_NEWSTUFF
+
 	if (0 != g_ItemDropTimeLimitValue)
 	{
 		if (get_dword_time() < m_dwLastItemDropTime+g_ItemDropTimeLimitValue)
@@ -5490,12 +5696,19 @@ bool CHARACTER::DropItem(TItemPos Cell, uint8_t bCount)
 	}
 
 	m_dwLastItemDropTime = get_dword_time();
-#endif
+
 	if (IsDead())
 		return false;
 
 	if (!IsValidItemPosition(Cell) || !(item = GetItem(Cell)))
 		return false;
+
+	if ((!item->IsGMOwner() && !GM::check_allow(GetGMLevel(), GM_ALLOW_DROP_PLAYER_ITEM)) ||
+		(item->IsGMOwner() && !GM::check_allow(GetGMLevel(), GM_ALLOW_DROP_GM_ITEM)))
+	{
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot do this with this gamemaster rank."));
+		return false;
+	}
 
 	if (item->IsExchanging())
 		return false;
@@ -5528,7 +5741,7 @@ bool CHARACTER::DropItem(TItemPos Cell, uint8_t bCount)
 	{
 		if (bCount == 0)
 		{
-			if (test_server)
+			if (g_bIsTestServer)
 				sys_log(0, "[DROP_ITEM] drop item count == 0");
 			return false;
 		}
@@ -5546,16 +5759,12 @@ bool CHARACTER::DropItem(TItemPos Cell, uint8_t bCount)
 		LogManager::instance().ItemLog(this, item, "ITEM_SPLIT", szBuf);
 	}
 
-	PIXEL_POSITION pxPos = GetXYZ();
+	GPOS pxPos = GetXYZ();
 
 	if (pkItemToDrop->AddToGround(GetMapIndex(), pxPos))
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("떨어진 아이템은 3분 후 사라집니다."));
-#ifdef ENABLE_NEWSTUFF
 		pkItemToDrop->StartDestroyEvent(g_aiItemDestroyTime[ITEM_DESTROY_TIME_DROPITEM]);
-#else
-		pkItemToDrop->StartDestroyEvent();
-#endif
 
 		ITEM_MANAGER::instance().FlushDelayedSave(pkItemToDrop);
 		
@@ -5591,7 +5800,7 @@ bool CHARACTER::DropGold(int32_t gold)
 
 	if (item)
 	{
-		PIXEL_POSITION pos = GetXYZ();
+		GPOS pos = GetXYZ();
 
 		if (item->AddToGround(GetMapIndex(), pos))
 		{
@@ -5601,11 +5810,8 @@ bool CHARACTER::DropGold(int32_t gold)
 			if (gold > 1000) 
 				LogManager::instance().CharLog(this, gold, "DROP_GOLD", "");
 
-#ifdef ENABLE_NEWSTUFF
 			item->StartDestroyEvent(g_aiItemDestroyTime[ITEM_DESTROY_TIME_DROPGOLD]);
-#else
-			item->StartDestroyEvent();
-#endif
+
 			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("떨어진 아이템은 %d분 후 사라집니다."), 150/60);
 		}
 
@@ -5616,7 +5822,7 @@ bool CHARACTER::DropGold(int32_t gold)
 	return false;
 }
 
-bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, uint8_t count)
+bool CHARACTER::MoveItem(const TItemPos &Cell, TItemPos DestCell, uint8_t count)
 {
 	LPITEM item = nullptr;
 
@@ -5760,15 +5966,14 @@ bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, uint8_t count)
 				DestCell.window_type, DestCell.cell, count);
 
 			item->SetCount(item->GetCount() - count);
-			LPITEM item2 = ITEM_MANAGER::instance().CreateItem(item->GetVnum(), count);
+			LPITEM itemnew = ITEM_MANAGER::instance().CreateItem(item->GetVnum(), count);
 
-			// copy socket -- by mhh
-			FN_copy_item_socket(item2, item);
+			FN_copy_item_socket(itemnew, item);
 
-			item2->AddToCharacter(this, DestCell);
+			itemnew->AddToCharacter(this, DestCell);
 
 			char szBuf[51+1];
-			snprintf(szBuf, sizeof(szBuf), "%u %u %u %u ", item2->GetID(), item2->GetCount(), item->GetCount(), item->GetCount() + item2->GetCount());
+			snprintf(szBuf, sizeof(szBuf), "%u %u %u %u ", itemnew->GetID(), itemnew->GetCount(), item->GetCount(), item->GetCount() + itemnew->GetCount());
 			LogManager::instance().ItemLog(this, item, "ITEM_SPLIT", szBuf);
 		}
 	}
@@ -5884,6 +6089,9 @@ void CHARACTER::GiveGold(int32_t iAmount)
 
 bool CHARACTER::PickupItem(uint32_t dwVID)
 {
+    if (IsPC() && IsDead())
+		return false;
+
 	LPITEM item = ITEM_MANAGER::instance().FindByVID(dwVID);
 
 	if (IsObserverMode())
@@ -5892,9 +6100,27 @@ bool CHARACTER::PickupItem(uint32_t dwVID)
 	if (!item || !item->GetSectree())
 		return false;
 
+	const auto abuseController = GetAbuseController();
+	if (IsDead())
+	{
+		abuseController->DeadPickup();
+		return false;
+	}
+
+	if (!abuseController->CanPickupItem())
+	{
+		abuseController->AutoPickupSuspect();
+		return false;
+	}
+
+	if (GetMyShop())
+	{
+		sys_err("cannot pickup item %u %s as shop player %u %s", item->GetID(), item->GetName(), GetPlayerID(), GetName());
+		return false;
+	}
+
 	if (item->DistanceValid(this))
 	{
-		// @fixme150 BEGIN
 		if (item->GetType() == ITEM_QUEST)
 		{
 			if (quest::CQuestManager::instance().GetPCForce(GetPlayerID())->IsRunning() == true)
@@ -6070,7 +6296,7 @@ bool CHARACTER::PickupItem(uint32_t dwVID)
 	return false;
 }
 
-bool CHARACTER::SwapItem(uint8_t bCell, uint8_t bDestCell)
+bool CHARACTER::SwapItem(uint16_t bCell, uint16_t bDestCell)
 {
 	if (!CanHandleItem())
 		return false;
@@ -6114,9 +6340,18 @@ bool CHARACTER::SwapItem(uint8_t bCell, uint8_t bDestCell)
 	    return false;
 	}
 
+	int32_t iInvenPos = item1->GetCell();
+
 	// item2가 bCell위치에 들어갈 수 있는지 확인한다.
 	if (!IsEmptyItemGrid(TItemPos (INVENTORY, item1->GetCell()), item2->GetSize(), item1->GetCell()))
-		return false;
+	{
+		iInvenPos = GetEmptyInventory(item2->GetSize());
+		if (iInvenPos == -1)
+		{
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소지품에 빈 공간이 없습니다."));
+			return false;
+		}
+	}
 
 	// 바꿀 아이템이 장비창에 있으면
 	if (TItemPos(EQUIPMENT, item2->GetCell()).IsEquipPosition())
@@ -6137,14 +6372,20 @@ bool CHARACTER::SwapItem(uint8_t bCell, uint8_t bDestCell)
 		item2->RemoveFromCharacter();
 
 		if (item1->EquipTo(this, bEquipCell))
+		{
 			item2->AddToCharacter(this, TItemPos(INVENTORY, bInvenCell));
+			item2->ModifyPoints(false);
+			ComputePoints();
+		}
 		else
+		{
 			sys_err("SwapItem cannot equip %s! item1 %s", item2->GetName(), item1->GetName());
+		}
 	}
 	else
 	{
-		uint8_t bCell1 = item1->GetCell();
-		uint8_t bCell2 = item2->GetCell();
+		uint16_t bCell1 = item1->GetCell();
+		uint16_t bCell2 = item2->GetCell();
 		
 		item1->RemoveFromCharacter();
 		item2->RemoveFromCharacter();
@@ -6180,6 +6421,9 @@ bool CHARACTER::UnequipItem(LPITEM item)
 	else
 		pos = GetEmptyInventory(item->GetSize());
 
+	if (pos == -1)
+		return false;
+
 	// HARD CODING
 	if (item->GetVnum() == UNIQUE_ITEM_HIDE_ALIGNMENT_TITLE)
 		ShowAlignment(true);
@@ -6205,16 +6449,43 @@ bool CHARACTER::EquipItem(LPITEM item, int32_t iCandidateCell)
 	if (item->IsExchanging())
 		return false;
 
-	if (false == item->IsEquipable())
+
+	if (!item->IsEquipable())
 		return false;
 
-	if (false == CanEquipNow(item))
+	if (!CanEquipNow(item))
 		return false;
 
 	int32_t iWearCell = item->FindEquipCell(this, iCandidateCell);
 
 	if (iWearCell < 0)
 		return false;
+
+	/*
+	if ((get_dword_time() - GetLastMoveTime()) < 1000) {
+		ChatPacket(CHAT_TYPE_INFO, "Hareket ederken bu eylemi gerceklestiremezsin");
+		return false;
+	}
+	*/
+
+	if (iWearCell == WEAR_BODY && IsRiding() && (item->GetVnum() >= 11901 && item->GetVnum() <= 11904))
+	{
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("YOU_CANNOT_USE_THIS_WHILE_RIDING"));
+		return false;
+	}
+
+	if (FN_check_item_costume(this, item)) 
+	{
+		if (GetWear(WEAR_BODY)) 
+		{
+			LPITEM lpGetBodyWear = GetWear(WEAR_BODY);
+			if (lpGetBodyWear->GetVnum() >= 11901 && lpGetBodyWear->GetVnum() <= 11904)
+			{
+				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Bu zirh ile kostum giyemezsin"));
+				return false;
+			}
+		}
+	}
 
 	// 무언가를 탄 상태에서 턱시도 입기 금지
 	if ((IsRiding() || GetWear(WEAR_COSTUME_BODY) || GetWear(WEAR_COSTUME_HAIR)) && (item->GetVnum() > 11900 && item->GetVnum() < 11915))
@@ -6692,11 +6963,7 @@ void CHARACTER::AutoGiveItem(LPITEM item, bool longOwnerShip)
 	else
 	{
 		item->AddToGround (GetMapIndex(), GetXYZ());
-#ifdef ENABLE_NEWSTUFF
 		item->StartDestroyEvent(g_aiItemDestroyTime[ITEM_DESTROY_TIME_AUTOGIVE]);
-#else
-		item->StartDestroyEvent();
-#endif
 
 		if (longOwnerShip)
 			item->SetOwnership (this, 300);
@@ -6713,7 +6980,7 @@ LPITEM CHARACTER::AutoGiveItem(uint32_t dwItemVnum, uint8_t bCount, int32_t iRar
 	if (!p)
 		return nullptr;
 
-	DBManager::instance().SendMoneyLog(MONEY_LOG_DROP, dwItemVnum, bCount);
+	LogManager::instance().MoneyLog(MONEY_LOG_DROP, dwItemVnum, bCount);
 
 	if (p->dwFlags & ITEM_FLAG_STACKABLE && p->bType != ITEM_BLEND) 
 	{
@@ -6817,11 +7084,7 @@ LPITEM CHARACTER::AutoGiveItem(uint32_t dwItemVnum, uint8_t bCount, int32_t iRar
 	else
 	{
 		item->AddToGround(GetMapIndex(), GetXYZ());
-#ifdef ENABLE_NEWSTUFF
 		item->StartDestroyEvent(g_aiItemDestroyTime[ITEM_DESTROY_TIME_AUTOGIVE]);
-#else
-		item->StartDestroyEvent();
-#endif
 		
 		
 		
@@ -6832,12 +7095,10 @@ LPITEM CHARACTER::AutoGiveItem(uint32_t dwItemVnum, uint8_t bCount, int32_t iRar
 		LogManager::instance().ItemLog(this, item, "SYSTEM_DROP", item->GetName());
 	}
 
-	sys_log(0, 
-		"7: %d %d", dwItemVnum, bCount);
 	return item;
 }
 
-bool CHARACTER::GiveItem(LPCHARACTER victim, TItemPos Cell)
+bool CHARACTER::GiveItem(LPCHARACTER victim, const TItemPos & Cell)
 {
 	if (!CanHandleItem())
 		return false;
@@ -7027,9 +7288,9 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 	}
 
 	//if (IS_SET(item->GetFlag(), ITEM_FLAG_QUEST_GIVE))
-	{
-		return true;
-	}
+	//{
+	//	return true;
+	//}
 
 	return false;
 }
@@ -7191,7 +7452,7 @@ bool CHARACTER::GiveItemFromSpecialItemGroup(uint32_t dwGroupNum, std::vector<ui
 	std::vector <int32_t> idxes;
 	int32_t n = pGroup->GetMultiIndex(idxes);
 
-	bool bSuccess;
+	bool bSuccess = false;
 
 	for (int32_t i = 0; i < n; i++)
 	{
@@ -7346,7 +7607,7 @@ bool CHARACTER::ItemProcess_Hair(LPITEM item, int32_t iDestCell)
 
 	item->SetCount(item->GetCount() - 1);
 
-	SetPart(PART_HAIR, hair);
+	SetPart(PART_HAIR, static_cast<uint16_t>(hair));
 	UpdatePacket();
 
 	return true;
@@ -7355,6 +7616,9 @@ bool CHARACTER::ItemProcess_Hair(LPITEM item, int32_t iDestCell)
 
 bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 {
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+		return false;
+	
 	if (IsPolymorphed())
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 둔갑중인 상태입니다."));
@@ -7407,9 +7671,7 @@ bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 				int32_t iDuration = GetSkillLevel(POLYMORPH_SKILL_ID) == 0 ? 5 : (5 + (5 + GetSkillLevel(POLYMORPH_SKILL_ID)/40 * 25));
 				iDuration *= 60;
 
-				uint32_t dwBonus = 0;
-				
-				dwBonus = (2 + GetSkillLevel(POLYMORPH_SKILL_ID)/40) * 100;
+				uint32_t dwBonus = (2 + GetSkillLevel(POLYMORPH_SKILL_ID)/40) * 100;
 
 				AddAffect(AFFECT_POLYMORPH, POINT_POLYMORPH, dwVnum, AFF_POLYMORPH, iDuration, 0, true);
 				AddAffect(AFFECT_POLYMORPH, POINT_ATT_BONUS, dwBonus, AFF_POLYMORPH, iDuration, 0, false);
@@ -7431,9 +7693,6 @@ bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 				{
 					CPolymorphUtils::instance().UpdateBookPracticeGrade(this, item);
 				}
-				else
-				{
-				}
 			}
 			break;
 
@@ -7447,7 +7706,7 @@ bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 
 bool CHARACTER::CanDoCube() const
 {
-	if (m_bIsObserver)	return false;
+	if (m_isObserver)	return false;
 	if (GetShop())		return false;
 	if (GetMyShop())	return false;
 	if (m_bUnderRefine)	return false;
@@ -7522,12 +7781,11 @@ void CHARACTER::AutoRecoveryItemProcess(const EAffectTypes type)
 	{
 		LPITEM pItem = FindItemByID(pAffect->dwFlag);
 
-		if (nullptr != pItem && true == pItem->GetSocket(0))
+		if (pItem && pItem->GetSocket(0))
 		{
-			if (!CArenaManager::instance().IsArenaMap(GetMapIndex())
-#ifdef ENABLE_NEWSTUFF
+			if (!CBattlegroundManager::instance().IsEventMap(GetMapIndex()) &&
+				!CArenaManager::instance().IsArenaMap(GetMapIndex())
 				&& !(g_NoPotionsOnPVP && CPVPManager::instance().IsFighting(GetPlayerID()) && !IsAllowedPotionOnPVP(pItem->GetVnum()))
-#endif
 			)
 			{
 				const int32_t amount_of_used = pItem->GetSocket(idx_of_amount_of_used);
@@ -7593,7 +7851,7 @@ void CHARACTER::AutoRecoveryItemProcess(const EAffectTypes type)
 	}
 }
 
-bool CHARACTER::IsValidItemPosition(TItemPos Pos) const
+bool CHARACTER::IsValidItemPosition(const TItemPos & Pos) const
 {
 	uint8_t window_type = Pos.window_type;
 	uint16_t cell = Pos.cell;

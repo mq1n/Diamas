@@ -25,11 +25,10 @@ void CEffectElementBase::GetPosition(float fTime, D3DXVECTOR3 & rPosition)
 		return;
 	}
 
-	typedef TTimeEventTablePosition::iterator iterator;
-	iterator result = std::lower_bound( m_TimeEventTablePosition.begin(), m_TimeEventTablePosition.end(), fTime );
+	const auto result = std::lower_bound(m_TimeEventTablePosition.begin(), m_TimeEventTablePosition.end(), fTime);
 
 	TEffectPosition & rEffectPosition = *result;
-	iterator rPrev = result;
+	auto rPrev = result;
 	if (m_TimeEventTablePosition.begin() != result)
 	{
 		rPrev = result-1;
@@ -40,17 +39,17 @@ void CEffectElementBase::GetPosition(float fTime, D3DXVECTOR3 & rPosition)
 		return;
 	}
 	TEffectPosition & rPrevEffectPosition = *rPrev;
-	int32_t iMovingType = rPrevEffectPosition.m_iMovingType;
+	const auto iMovingType = rPrevEffectPosition.m_iMovingType;
 
 	if (MOVING_TYPE_DIRECT == iMovingType)
 	{
-		float Head = fabs(rEffectPosition.m_fTime - fTime) / fabs(rEffectPosition.m_fTime - rPrevEffectPosition.m_fTime);
-		float Tail = 1.0f - fabs(rEffectPosition.m_fTime - fTime) / fabs(rEffectPosition.m_fTime - rPrevEffectPosition.m_fTime);
+		const auto Head = fabs(rEffectPosition.m_fTime - fTime) / fabs(rEffectPosition.m_fTime - rPrevEffectPosition.m_fTime);
+		const auto Tail = 1.0f - fabs(rEffectPosition.m_fTime - fTime) / fabs(rEffectPosition.m_fTime - rPrevEffectPosition.m_fTime);
 		rPosition = (rPrevEffectPosition.m_vecPosition*Head) + (rEffectPosition.m_vecPosition*Tail);
 	}
 	else if (MOVING_TYPE_BEZIER_CURVE == iMovingType)
 	{
-		float ft = (fTime - rPrevEffectPosition.m_fTime) / (rEffectPosition.m_fTime - rPrevEffectPosition.m_fTime);
+		const auto ft = (fTime - rPrevEffectPosition.m_fTime) / (rEffectPosition.m_fTime - rPrevEffectPosition.m_fTime);
 
 		rPosition = rPrevEffectPosition.m_vecPosition * (1.0f - ft) * (1.0f - ft) +
 					(rPrevEffectPosition.m_vecPosition + rPrevEffectPosition.m_vecControlPoint) * (1.0f - ft) * ft * 2 +
@@ -104,9 +103,7 @@ BOOL CEffectElementBase::LoadScript(CTextFileLoader & rTextFileLoader)
 {
 	CTokenVector * pTokenVector;
 	if (!rTextFileLoader.GetTokenFloat("starttime",&m_fStartTime))
-	{
 		m_fStartTime = 0.0f;
-	}
 	if (rTextFileLoader.GetTokenVector("timeeventposition", &pTokenVector))
 	{	
 		m_TimeEventTablePosition.clear();
@@ -147,7 +144,7 @@ BOOL CEffectElementBase::LoadScript(CTextFileLoader & rTextFileLoader)
 				return FALSE;
 			}
 
-			m_TimeEventTablePosition.push_back(EffectPosition);
+			m_TimeEventTablePosition.emplace_back(EffectPosition);
 		}
 	}	
 	

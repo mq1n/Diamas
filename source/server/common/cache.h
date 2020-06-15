@@ -29,6 +29,15 @@ template <typename T> class cache
 				m_bNeedQuery = true;
 		}
 
+		void Put(const T * pNew, bool bSkipQuery = false)
+		{
+			memcpy(&m_data, pNew, sizeof(T));
+			m_lastUpdateTime = time(0);
+
+			if (!bSkipQuery)
+				m_bNeedQuery = true;
+		}
+
 		bool CheckFlushTimeout()
 		{
 			if (m_bNeedQuery && time(0) - m_lastFlushTime > m_expireTime)

@@ -1,6 +1,5 @@
-
 #include "stdafx.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "char.h"
 #include "char_manager.h"
 #include "arena.h"
@@ -9,6 +8,12 @@ namespace quest
 {
 	int32_t arena_start_duel(lua_State * L)
 	{
+		if (!lua_isstring(L, 1))
+		{
+			sys_err("invalid argument");
+			return 0;
+		}
+
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 		LPCHARACTER ch2 = CHARACTER_MANAGER::instance().FindPC(lua_tostring(L,1));
 		int32_t nSetPoint = (int32_t)lua_tonumber(L, 2);
@@ -38,21 +43,23 @@ namespace quest
 			return 1;
 		}
 
+		if ( CArenaManager::instance().StartDuel(ch, ch2, nSetPoint) == false )
 		{
-			if ( CArenaManager::instance().StartDuel(ch, ch2, nSetPoint) == false )
-			{
-				lua_pushnumber(L, 3);
-				return 1;
-			}
+			lua_pushnumber(L, 3);
+			return 1;
 		}
 
 		lua_pushnumber(L, 1);
-
 		return 1;
 	}
 
 	int32_t arena_add_map(lua_State* L)
 	{
+		if (!lua_isnumber(L, 1))
+		{
+			sys_err("invalid argument");
+			return 0;
+		}
 		int32_t mapIdx		= (int32_t)lua_tonumber(L, 1);
 		int32_t startposAX	= (int32_t)lua_tonumber(L, 2);
 		int32_t startposAY	= (int32_t)lua_tonumber(L, 3);
@@ -80,40 +87,52 @@ namespace quest
 
 	int32_t arena_add_observer(lua_State* L)
 	{
+		if (!lua_isnumber(L, 1))
+		{
+			sys_err("invalid argument");
+			return 0;
+		}
 		int32_t mapIdx = (int32_t)lua_tonumber(L, 1);
 		int32_t ObPointX = (int32_t)lua_tonumber(L, 2);
 		int32_t ObPointY = (int32_t)lua_tonumber(L, 3);
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("null ch");
+			return 0;
+		}
 
 		CArenaManager::instance().AddObserver(ch, mapIdx, ObPointX, ObPointY);
-
-		return 1;
+		return 0;
 	}
 
 	int32_t arena_is_in_arena(lua_State* L)
 	{
+		if (!lua_isnumber(L, 1))
+		{
+			sys_err("invalid argument");
+			return 0;
+		}
 		uint32_t pid = (uint32_t)lua_tonumber(L, 1);
 
-		LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pid);
-
-		if ( ch == nullptr )
+		LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(pid);
+		if (!ch)
 		{
 			lua_pushnumber(L, 1);
+			return 1;
 		}
-		else
+		
+		if (!ch->GetArena() || ch->GetArenaObserverMode() == false)
 		{
-			if ( ch->GetArena() == nullptr || ch->GetArenaObserverMode() == true )
-			{
-				if ( CArenaManager::instance().IsMember(ch->GetMapIndex(), ch->GetPlayerID()) == MEMBER_DUELIST )
-					lua_pushnumber(L, 1);
-				else
-					lua_pushnumber(L, 0);
-			}
-			else
-			{
-				lua_pushnumber(L, 0);
-			}
+			lua_pushnumber(L, 0);
+			return 1;
 		}
+
+		if ( CArenaManager::instance().IsMember(ch->GetMapIndex(), ch->GetPlayerID()) == MEMBER_DUELIST )
+			lua_pushnumber(L, 1);
+		else
+			lua_pushnumber(L, 0);
+
 		return 1;
 	}
 

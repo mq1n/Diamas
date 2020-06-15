@@ -7,7 +7,7 @@
 // #define _PACKETDUMP
 //#define __PERFORMANCE_CHECK__
 
-// #define ENABLE_ANTICHEAT
+//#define ENABLE_ANTICHEAT
 #ifdef ENABLE_ANTICHEAT
 	#define ENABLE_ANTICHEAT_AGGRESSIVE_MODE false
 	#define ENABLE_DEBUGGER_ALLOW_BY_ANTICHEAT
@@ -46,6 +46,8 @@
 #endif
 // ### New From LocaleInc ###
 //////////////////////////////////////////////////////////////////////////
+
+// #define ENABLE_NO_RECV_GAME_LIMIT
 
 //////////////////////////////////////////////////////////////////////////
 // ### From GameLib ###

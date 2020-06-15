@@ -7,9 +7,9 @@ namespace UI
 	class CWindowManager : public CSingleton<CWindowManager>
 	{
 		public:
-			typedef std::map<std::string, CWindow *> TLayerContainer;
-			typedef std::list<CWindow *> TWindowContainer;
-			typedef std::map<int32_t, CWindow *> TKeyCaptureWindowMap;
+			using TLayerContainer =  std::map<std::string, CWindow*>;
+			using TWindowContainer = std::list<CWindow*>;
+			using TKeyCaptureWindowMap = std::map<int32_t, CWindow*>;
 
 		public:
 			CWindowManager();
@@ -31,7 +31,7 @@ namespace UI
 			int32_t		GetScreenWidth()		{ return m_lWidth; }
 			int32_t		GetScreenHeight()		{ return m_lHeight; }
 			void		GetMousePosition(int32_t & rx, int32_t & ry);
-			BOOL		IsDragging();
+			bool		IsDragging();
 
 			CWindow *	GetLockWindow()		{ return m_pLockWindow; }
 			CWindow *	GetPointWindow()	{ return m_pPointWindow; }
@@ -59,7 +59,7 @@ namespace UI
 				WT_BAR,
 				WT_LINE,
 				WT_BAR3D,
-				WT_NUMLINE,				
+				WT_NUMLINE
 			};
 
 			CWindow *	RegisterWindow(PyObject * po, const char * c_szLayer);
@@ -87,7 +87,7 @@ namespace UI
 			void		NotifyDestroyWindow(CWindow * pWindow);
 
 			// Attaching Icon
-			BOOL		IsAttaching();
+			bool		IsAttaching();
 			uint32_t		GetAttachingType();
 			uint32_t		GetAttachingIndex();
 			uint32_t		GetAttachingSlotNumber();
@@ -95,7 +95,9 @@ namespace UI
 			void		GetAttachingIconSize(uint8_t * pbyWidth, uint8_t * pbyHeight);
 			void		AttachIcon(uint32_t dwType, uint32_t dwIndex, uint32_t dwSlotNumber, uint8_t byWidth, uint8_t byHeight);
 			void		DeattachIcon();
-			void		SetAttachingFlag(BOOL bFlag);
+			void		SetAttachingFlag(bool bFlag);
+			void SetDisableDeattach(bool bFlag) { m_bIsDisableDettach = bFlag; }
+			bool IsDisableDeattach() { return m_bIsDisableDettach; }
 			void		SetAttachingRealSlotNumber(uint32_t dwRealslotNumber);
 			// Attaching Icon
 
@@ -159,18 +161,19 @@ namespace UI
 			int32_t					m_lDragX, m_lDragY;
 			int32_t					m_lPickedX, m_lPickedY;
 
-			BOOL					m_bOnceIgnoreMouseLeftButtonUpEventFlag;
-			int32_t						m_iIgnoreEndTime;
+			bool					m_bOnceIgnoreMouseLeftButtonUpEventFlag;
+			uint32_t m_dwIgnoreEndTime;
 
 			// Attaching Icon
 			PyObject *				m_poMouseHandler;
-			BOOL					m_bAttachingFlag;
+			bool					m_bAttachingFlag;
 			uint32_t					m_dwAttachingType;
 			uint32_t					m_dwAttachingIndex;
 			uint32_t					m_dwAttachingSlotNumber;
 			uint32_t					m_dwAttachingRealSlotNumber;
 			uint8_t					m_byAttachingIconWidth;
 			uint8_t					m_byAttachingIconHeight;
+			bool m_bIsDisableDettach;
 			// Attaching Icon
 
 			CWindow	*				m_pActiveWindow;

@@ -20,6 +20,7 @@ RETSIGTYPE checkpointing(int sig)
     if (!tics)
     {
         sys_err("CHECKPOINT shutdown: tics did not updated.");
+		abort();
     }
     else
 		tics = 0;

@@ -15,7 +15,7 @@ class CGraphicTextInstance
 		{
 			HORIZONTAL_ALIGN_LEFT		= 0x01,
 			HORIZONTAL_ALIGN_CENTER		= 0x02,
-			HORIZONTAL_ALIGN_RIGHT		= 0x03,
+		HORIZONTAL_ALIGN_RIGHT = 0x03
 		};
 		enum EVerticalAlign
 		{
@@ -31,7 +31,9 @@ class CGraphicTextInstance
 	public:
 		CGraphicTextInstance();
 		virtual ~CGraphicTextInstance();
-
+	
+		uint16_t GetLineHeight();
+	
 		void Destroy();
 		
 		void Update();

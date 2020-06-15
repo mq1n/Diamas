@@ -53,9 +53,7 @@ bool CGraphicText::OnLoad(int32_t /*iSize*/, const void* /*c_pvBuf*/)
 
 		int32_t i = 0;
 		while (*p && isdigit(*p))
-		{
 			num[i++] = *(p++);
-		}
 
 		num[i] = '\0';
 		if(*p == 'i')

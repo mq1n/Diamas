@@ -13,7 +13,6 @@
 #include "buffer_manager.h"
 #include "guild.h"
 #include "guild_manager.h"
-#include "TrafficProfiler.h"
 #include "locale_service.h"
 #include "log.h"
 
@@ -41,6 +40,7 @@ void DESC::Initialize()
 	m_dwHandle = 0;
 
 	m_wPort = 0;
+	m_wListenPort = 0;
 	m_LastTryToConnectTime = 0;
 
 	m_lpInputBuffer = nullptr;
@@ -82,10 +82,6 @@ void DESC::Initialize()
 	memset( m_adwEncryptionKey, 0, sizeof(m_adwEncryptionKey) );
 #endif
 
-	m_outtime = 0;
-	m_playtime = 0;
-	m_offtime = 0;
-
 	m_pkDisconnectEvent = nullptr;
 }
 
@@ -110,9 +106,13 @@ void DESC::Destroy()
 
 	if (m_lpCharacter)
 	{
-		m_lpCharacter->Disconnect("DESC::~DESC");
+		const char * closeReason = GetCloseReason().c_str();
+		m_lpCharacter->Disconnect(*closeReason ? closeReason : "DESC::~DESC");
+
 		m_lpCharacter = nullptr;
 	}
+
+	m_closeReason.clear();
 
 	SAFE_BUFFER_DELETE(m_lpOutputBuffer);
 	SAFE_BUFFER_DELETE(m_lpInputBuffer);
@@ -167,6 +167,7 @@ EVENTFUNC(ping_event)
 	{
 		sys_log(0, "PING_EVENT: no pong %s", desc->GetHostName());
 
+		desc->SetCloseReason("NO_PONG");
 		desc->SetPhase(PHASE_CLOSE);
 
 		return (ping_event_second_cycle);
@@ -203,7 +204,7 @@ bool DESC::Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSoc
 	m_wPort			= c_rSockAddr.sin_port;
 	m_dwHandle		= _handle;
 
-	m_lpOutputBuffer = buffer_new(DEFAULT_PACKET_BUFFER_SIZE * 2);
+	m_lpOutputBuffer = buffer_new(DEFAULT_PACKET_BUFFER_SIZE * 3);
 
 	m_iMinInputBufferLen = MAX_INPUT_LEN >> 1;
 	m_lpInputBuffer = buffer_new(MAX_INPUT_LEN);
@@ -431,11 +432,6 @@ void DESC::Packet(const void * c_pvData, int32_t iSize)
 			iSize = buffer_size(m_lpBufferedOutputBuffer);
 		}
 
-		// TRAFFIC_PROFILE
-		if (g_bTrafficProfileOn)
-			TrafficProfiler::instance().Report(TrafficProfiler::IODIR_OUTPUT, *(uint8_t *) c_pvData, iSize);
-		// END_OF_TRAFFIC_PROFILER
-
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 		void* buf = buffer_write_peek(m_lpOutputBuffer);
 
@@ -507,7 +503,10 @@ void DESC::SetPhase(int32_t _phase)
 	TPacketGCPhase pack;
 	pack.header = HEADER_GC_PHASE;
 	pack.phase = _phase;
+	pack.stage = game_stage;
 	Packet(&pack, sizeof(TPacketGCPhase));
+
+//	sys_log(0, "phase %d", _phase);
 
 	switch (m_iPhase)
 	{
@@ -621,7 +620,7 @@ bool DESC::HandshakeProcess(uint32_t dwTime, int32_t lDelta, bool bInfiniteRetry
 
 	int32_t bias = (int32_t) (dwCurTime - (dwTime + lDelta));
 
-	if (bias >= 0 && bias <= 50)
+	if (bias >= -50 && bias <= 50)
 	{
 		if (bInfiniteRetry)
 		{
@@ -650,6 +649,7 @@ bool DESC::HandshakeProcess(uint32_t dwTime, int32_t lDelta, bool bInfiniteRetry
 	sys_log(1, "Handshake: ServerTime %u dwTime %u lDelta %d SentTime %u lNewDelta %d", dwCurTime, dwTime, lDelta, m_dwHandshakeSentTime, lNewDelta);
 
 	if (!bInfiniteRetry)
+	{
 		if (++m_iHandshakeRetry > HANDSHAKE_RETRY_LIMIT)
 		{
 			sys_err("handshake retry limit reached! (limit %d character %s)", 
@@ -657,6 +657,7 @@ bool DESC::HandshakeProcess(uint32_t dwTime, int32_t lDelta, bool bInfiniteRetry
 			SetPhase(PHASE_CLOSE);
 			return false;
 		}
+	}
 
 	SendHandshake(dwCurTime, lNewDelta);
 	return false;
@@ -818,6 +819,7 @@ EVENTFUNC(disconnect_event)
 	LPDESC d = info->desc;
 
 	d->m_pkDisconnectEvent = nullptr;
+	d->SetCloseReason("DELAYED_DC");
 	d->SetPhase(PHASE_CLOSE);
 	return 0;
 }

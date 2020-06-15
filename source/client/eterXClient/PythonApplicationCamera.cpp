@@ -1,8 +1,7 @@
 #include "StdAfx.h"
 #include "PythonApplication.h"
-
-#include "../eterbase/timer.h"
-#include "../eterlib/Camera.h"
+#include "../eterBase/Timer.h"
+#include "../eterLib/Camera.h"
 
 float BlendValueByLinear(float fElapsedTime, float fDuration, float fBeginValue, float fEndValue)
 {
@@ -294,9 +293,7 @@ bool CPythonApplication::IsLockCurrentCamera()
 void CPythonApplication::SetEventCamera(const SCameraSetting & c_rCameraSetting)
 {
 	if (CCameraManager::DEFAULT_PERSPECTIVE_CAMERA == CCameraManager::Instance().GetCurrentCameraNum())
-	{
 		GetCameraSetting(&m_DefaultCameraSetting);
-	}
 
 	/////
 
@@ -511,24 +508,30 @@ bool CPythonApplication::LoadCameraSetting(const char * c_szFileName)
 	CTokenVector * pCameraSetting;
 	CTokenVector * pCmrPos;
 	if (TextFileLoader.GetTokenVector3("centerpos", &v3CenterPosition))
-	if (TextFileLoader.GetTokenVector("camerasetting", &pCameraSetting))
-	if (TextFileLoader.GetTokenVector("cmrpos", &pCmrPos))
-	if (3 == pCameraSetting->size())
-	if (3 == pCmrPos->size())
 	{
-		SCameraSetting CameraSetting;
-		CameraSetting.v3CenterPosition = v3CenterPosition;
+		if (TextFileLoader.GetTokenVector("camerasetting", &pCameraSetting))
+		{
+			if (TextFileLoader.GetTokenVector("cmrpos", &pCmrPos))
+				if (3 == pCameraSetting->size())
+				{
+					if (3 == pCmrPos->size())
+					{
+						SCameraSetting CameraSetting;
+						CameraSetting.v3CenterPosition = v3CenterPosition;
 
-		CameraSetting.fZoom					= atof(pCameraSetting->at(0).c_str());
+						CameraSetting.fZoom = atof(pCameraSetting->at(0).c_str());
 		CameraSetting.fPitch				= atof(pCameraSetting->at(1).c_str());
 		CameraSetting.fRotation				= atof(pCameraSetting->at(2).c_str());
 
 		CameraSetting.kCmrPos.m_fUpDir		= atof(pCmrPos->at(0).c_str());
-		CameraSetting.kCmrPos.m_fViewDir	= atof(pCmrPos->at(1).c_str());
-		CameraSetting.kCmrPos.m_fCrossDir	= atof(pCmrPos->at(2).c_str());
+						CameraSetting.kCmrPos.m_fViewDir = atof(pCmrPos->at(1).c_str());
+						CameraSetting.kCmrPos.m_fCrossDir = atof(pCmrPos->at(2).c_str());
 
-		SetEventCamera(CameraSetting);
-		return true;
+						SetEventCamera(CameraSetting);
+						return true;
+					}
+				}
+		}
 	}
 
 	return false;

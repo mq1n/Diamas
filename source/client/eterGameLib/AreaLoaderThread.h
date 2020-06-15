@@ -25,7 +25,7 @@ public:
 
 	void						Request(CTerrain * pTerrain);
 
-	bool						Fetch(CTerrain ** ppTerrian);
+	bool 						Fetch(CTerrain ** ppTerrain);
 
 	void						Request(CArea * pArea);
 	

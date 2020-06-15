@@ -17,49 +17,36 @@ auto g_stLogFileName = ""s;
 
 class CLogFile : public CSingleton<CLogFile>
 {
-	public:
-		CLogFile() : m_fp(nullptr)
-		{
-		}
+public:
+	CLogFile() = default;
 
-		virtual ~CLogFile()
-		{
-			if (m_fp)
-				fclose(m_fp);
+	~CLogFile() = default;
 
-			m_fp = nullptr;
-		}
+	void Initialize()
+	{
+		auto st = std::time(nullptr);
+		auto timestamp = static_cast<std::chrono::seconds>(st).count();
+		g_stLogFileName = fmt::format("logs/sys_log_{}_{}.txt", GetCurrentProcessId(), static_cast<uint64_t>(timestamp));
+	
+		m_fPtr.open(g_stLogFileName, "w");
+	}
 
-		void Initialize()
-		{
-			auto st = std::time(nullptr);
-			auto timestamp = static_cast<std::chrono::seconds>(st).count();
-			g_stLogFileName = fmt::format("logs/sys_log_{}_{}.txt", GetCurrentProcessId(), static_cast<uint64_t>(timestamp));
+	void Write(const char* c_pszMsg) const
+	{
+		if (!m_fPtr)
+			return;
 
-			m_fp = fopen(g_stLogFileName.c_str(), "w");
-		}
+		time_t ct = time(nullptr);
+		struct tm ctm = *localtime(&ct);
 
-		void Write(const char * c_pszMsg)
-		{
-			if (!m_fp)
-				return;
+		fprintf(m_fPtr.get(), "%02d%02d %02d:%02d:%05u :: %s", ctm.tm_mon + 1, ctm.tm_mday, ctm.tm_hour, ctm.tm_min,
+			ELTimer_GetMSec() % 60000, c_pszMsg);
 
-			time_t ct = time(0);
-			struct tm ctm = *localtime(&ct);
+		fflush(m_fPtr.get());
+	}
 
-			fprintf(m_fp, "%02d%02d %02d:%02d:%05u :: %s", 
-				ctm.tm_mon + 1, 
-				ctm.tm_mday,
-				ctm.tm_hour,
-				ctm.tm_min,
-				ELTimer_GetMSec() % 60000,
-				c_pszMsg);
-
-			fflush(m_fp);
-		}
-
-	protected:
-		FILE *	m_fp;
+protected:
+	msl::file_ptr m_fPtr;
 };
 
 static CLogFile gs_logfile;
@@ -201,10 +188,8 @@ void Tracef(const char* c_szFormat, ...)
 		LogFile(szBuf);
 }
 
-void TraceError(const char* c_szFormat, ...)
+void TraceErrorFunc(const char* func, const char* c_szFormat, ...)
 {
-#ifndef _DISTRIBUTE 
-
 	char szBuf[DEBUG_STRING_MAX_LEN+2];
 
 	strncpy_s(szBuf, "SYSERR: ", DEBUG_STRING_MAX_LEN);
@@ -218,18 +203,19 @@ void TraceError(const char* c_szFormat, ...)
 	szBuf[len] = '\n';
 	szBuf[len + 1] = '\0';
 
-	time_t ct = time(0);
+	time_t ct = time(nullptr);
 	struct tm ctm = *localtime(&ct);
 
-	fprintf(stderr, "%02d%02d %02d:%02d:%05u :: %s", 
-					ctm.tm_mon + 1, 
-					ctm.tm_mday,
-					ctm.tm_hour,
-					ctm.tm_min,
-					ELTimer_GetMSec() % 60000,
+	fprintf(stderr, "%02d%02d %02d:%02d:%05u (%s) :: %s",
+		ctm.tm_mon + 1,
+		ctm.tm_mday,
+		ctm.tm_hour,
+		ctm.tm_min,
+		ELTimer_GetMSec() % 60000,
+		func,
 					szBuf + 8);
 	fflush(stderr);
-	
+
 #ifdef _DEBUG
 	OutputDebugString(szBuf);
 	fputs(szBuf, stdout);
@@ -237,31 +223,58 @@ void TraceError(const char* c_szFormat, ...)
 
 	if (isLogFile)
 		LogFile(szBuf);
+}
 
+void TraceError(const char* c_szFormat, ...)
+{
+	char szBuf[DEBUG_STRING_MAX_LEN + 2];
+
+	strncpy(szBuf, "SYSERR: ", DEBUG_STRING_MAX_LEN);
+	int32_t len = strlen(szBuf);
+
+	va_list args;
+	va_start(args, c_szFormat);
+	len = _vsnprintf(szBuf + len, sizeof(szBuf) - (len + 1), c_szFormat, args) + len;
+	va_end(args);
+
+	szBuf[len] = '\n';
+	szBuf[len + 1] = '\0';
+
+	time_t ct = time(nullptr);
+	struct tm ctm = *localtime(&ct);
+
+	fprintf(stderr, "%02d%02d %02d:%02d:%05u :: %s", ctm.tm_mon + 1, ctm.tm_mday, ctm.tm_hour, ctm.tm_min, ELTimer_GetMSec() % 60000,
+		szBuf + 8);
+	fflush(stderr);
+
+#ifdef _DEBUG
+	OutputDebugString(szBuf);
+	fputs(szBuf, stdout);
 #endif
+
+	if (isLogFile)
+		LogFile(szBuf);
 }
 
 void TraceErrorWithoutEnter(const char* c_szFormat, ...)
 {
-#ifndef _DISTRIBUTE 
+	char szBuf[DEBUG_STRING_MAX_LEN + 1];
 
-	char szBuf[DEBUG_STRING_MAX_LEN];
+	strncpy(szBuf, "SYSERR: ", DEBUG_STRING_MAX_LEN);
+	int32_t len = strlen(szBuf);
 
 	va_list args;
 	va_start(args, c_szFormat);
-	_vsnprintf(szBuf, sizeof(szBuf), c_szFormat, args);
+	len = _vsnprintf(szBuf + len, sizeof(szBuf) - (len + 1), c_szFormat, args) + len;
 	va_end(args);
 
-	time_t ct = time(0);
+	szBuf[len] = '\0';
+
+	time_t ct = time(nullptr);
 	struct tm ctm = *localtime(&ct);
 
-	fprintf(stderr, "%02d%02d %02d:%02d:%05u :: %s", 
-					ctm.tm_mon + 1, 
-					ctm.tm_mday,
-					ctm.tm_hour,
-					ctm.tm_min,
-					ELTimer_GetMSec() % 60000,
-					szBuf + 8);
+	fprintf(stderr, "%02d%02d %02d:%02d:%05u :: %s", ctm.tm_mon + 1, ctm.tm_mday, ctm.tm_hour, ctm.tm_min, ELTimer_GetMSec() % 60000,
+		szBuf + 8);
 	fflush(stderr);
 
 #ifdef _DEBUG
@@ -271,7 +284,6 @@ void TraceErrorWithoutEnter(const char* c_szFormat, ...)
 
 	if (isLogFile)
 		LogFile(szBuf);
-#endif
 }
 
 void LogBoxf(const char* c_szFormat, ...)
@@ -311,19 +323,17 @@ void LogFilef(const char * c_szMessage, ...)
 
 void OpenLogFile(bool bUseLogFIle)
 {
-#ifndef _DISTRIBUTE 
     auto st = std::time(nullptr);
     auto timestamp = static_cast<std::chrono::seconds>(st).count();
 	g_stSyserrFileName = fmt::format("logs/sys_err_{}_{}.txt", GetCurrentProcessId(), static_cast<uint64_t>(timestamp));
 
     freopen(g_stSyserrFileName.c_str(), "w", stderr);
-	
+
 	if (bUseLogFIle)
 	{
 		isLogFile = true;
 		CLogFile::Instance().Initialize();
 	}
-#endif
 }
 
 void OpenConsoleWindow()
@@ -332,4 +342,9 @@ void OpenConsoleWindow()
 
 	freopen("CONOUT$", "a", stdout);
 	freopen("CONIN$", "r", stdin);
+}
+
+void CloseConsoleWindow()
+{
+	FreeConsole();
 }

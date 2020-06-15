@@ -1,6 +1,7 @@
 #ifndef _OBJECT_ALLOCATOR_H_
 #define _OBJECT_ALLOCATOR_H_
 
+#include "../../common/service.h"
 #include "debug_allocator.h"
 
 #include <assert.h>

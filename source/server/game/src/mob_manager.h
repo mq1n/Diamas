@@ -1,14 +1,20 @@
 #ifndef __INC_METIN_II_MOB_MANAGER_H__
 #define __INC_METIN_II_MOB_MANAGER_H__
 
+#include "../../common/tables.h"
+#include "typedef.h"
+#include "GPosition.h"
+#include <vector>
+#include <string>
+#include <map>
+
 typedef struct SMobSplashAttackInfo
 {
 	uint32_t	dwTiming; // 스킬 사용 후 실제로 데미지 먹힐때까지 기다리는 시간 (ms)
 	uint32_t	dwHitDistance; // 스킬 사용시 실제로 스킬 계산이 되는 거리 (전방 몇cm)
 
-	SMobSplashAttackInfo(uint32_t dwTiming, uint32_t dwHitDistance)
-		: dwTiming(dwTiming)
-		, dwHitDistance(dwHitDistance)
+	SMobSplashAttackInfo(uint32_t dwTiming, uint32_t dwHitDistance) :
+        dwTiming(dwTiming), dwHitDistance(dwHitDistance)
 		{}
 } TMobSplashAttackInfo;
 
@@ -37,7 +43,7 @@ class CMobInstance
 	public:
 		CMobInstance();
 
-		PIXEL_POSITION	m_posLastAttacked;	// 마지막 맞은 위치
+		GPOS	m_posLastAttacked;	// 마지막 맞은 위치
 		uint32_t		m_dwLastAttackedTime;	// 마지막 맞은 시간
 		uint32_t		m_dwLastWarpTime;
 

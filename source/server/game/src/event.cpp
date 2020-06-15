@@ -5,8 +5,8 @@
  *      Author: ±èÇÑÁÖ (aka. ºñ¿±, Cronan), ¼Û¿µÁø (aka. myevan, ºøÀÚ·ç)
  */
 #include "stdafx.h"
-
 #include "event_queue.h"
+#include "../../common/service.h"
 
 extern void ContinueOnFatalError();
 extern void ShutdownOnFatalError();
@@ -136,14 +136,12 @@ int32_t event_process(int32_t pulse)
 		}
 		else
 		{
+			the_event->q_el = nullptr;
+
 			//sys_log(0, "EVENT: %s %d event %p info %p", the_event->file, the_event->line, the_event, the_event->info);
 			new_time = (the_event->func) (get_pointer(the_event), processing_time);
-			
-			if (new_time <= 0 || the_event->is_force_to_end)
-			{
-				the_event->q_el = nullptr;
-			}
-			else
+
+			if (new_time > 0 && !the_event->is_force_to_end)
 			{
 				the_event->q_el = cxx_q.Enqueue(the_event, new_time, pulse);
 				the_event->is_processing = FALSE;
@@ -203,11 +201,13 @@ int32_t event_count()
 	return cxx_q.Size();
 }
 
-void intrusive_ptr_add_ref(EVENT* p) {
+void intrusive_ptr_add_ref(EVENT* p)
+{
 	++(p->ref_count);
 }
 
-void intrusive_ptr_release(EVENT* p) {
+void intrusive_ptr_release(EVENT* p)
+{
 	if ( --(p->ref_count) == 0 ) {
 #ifdef M2_USE_POOL
 		event_pool.Destroy(p);

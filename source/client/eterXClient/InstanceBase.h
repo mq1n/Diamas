@@ -817,6 +817,9 @@ class CInstanceBase
 		void SetFishEmoticon();
 		bool IsPossibleEmoticon();
 
+	public:
+		bool __CanSkipCollision();
+
 	protected:
 		uint32_t					__LessRenderOrder_GetLODLevel();
 		void					__Initialize();
@@ -1059,7 +1062,7 @@ class CInstanceBase
 			TPixelPosition m_kPPosDst;
 		};
 
-		typedef std::list<SCommand> CommandQueue;
+		using CommandQueue = std::list<SCommand>;
 
 		uint32_t		m_dwBaseChkTime;
 		uint32_t		m_dwBaseCmdTime;
@@ -1078,7 +1081,7 @@ class CInstanceBase
 			BOOL bTarget;
 		};
 
-		typedef std::list<SEffectDamage> CommandDamageQueue;
+		using CommandDamageQueue = std::list<SEffectDamage>;
 		CommandDamageQueue m_DamageQueue;
 
 		void ProcessDamage();

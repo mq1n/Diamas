@@ -40,8 +40,8 @@ int32_t CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture * pFontTexture
 
 	if (pInsCharInfo)
 	{
-		m_dwColorInfoVector.push_back(dwColor);
-		m_pCharInfoVector.push_back(pInsCharInfo);
+		m_dwColorInfoVector.emplace_back(dwColor);
+		m_pCharInfoVector.emplace_back(pInsCharInfo);
 
 		m_textWidth += pInsCharInfo->advance;
 		m_textHeight = std::max<uint16_t>(pInsCharInfo->height, m_textHeight);
@@ -168,7 +168,7 @@ void CGraphicTextInstance::Update()
 					else
 					{
 						kHyperlink.text = hyperlinkBuffer;
-						m_hyperlinkVector.push_back(kHyperlink);
+								m_hyperlinkVector.emplace_back(kHyperlink);
 
 						hyperlinkStep = 0;
 						hyperlinkBuffer.clear();
@@ -546,14 +546,14 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, dwLighting);
 
 	//금강경 링크 띄워주는 부분.
-	if (m_hyperlinkVector.size() != 0)
+	if (!m_hyperlinkVector.empty())
 	{
 		int32_t lx = gs_mx - m_v3Position.x;
 		int32_t ly = gs_my - m_v3Position.y;
 
 		if (lx >= 0 && ly >= 0 && lx < m_textWidth && ly < m_textHeight)
 		{
-			std::vector<SHyperlink>::iterator it = m_hyperlinkVector.begin();
+			auto it = m_hyperlinkVector.begin();
 
 			while (it != m_hyperlinkVector.end())
 			{
@@ -617,7 +617,7 @@ void CGraphicTextInstance::SetColor(uint32_t color)
 {
 	if (m_dwTextColor != color)
 	{
-		for (int32_t i = 0; i < m_pCharInfoVector.size(); ++i)
+		for (uint32_t i = 0; i < m_pCharInfoVector.size(); ++i)
 			if (m_dwColorInfoVector[i] == m_dwTextColor)
 				m_dwColorInfoVector[i] = color;
 
@@ -653,13 +653,9 @@ void CGraphicTextInstance::SetOutline(bool Value)
 void CGraphicTextInstance::SetFeather(bool Value)
 {
 	if (Value)
-	{
 		m_fFontFeather = c_fFontFeather;
-	}
 	else
-	{
 		m_fFontFeather = 0.0f;
-	}
 }
 
 void CGraphicTextInstance::SetMultiLine(bool Value)
@@ -689,7 +685,7 @@ void CGraphicTextInstance::SetLimitWidth(float fWidth)
 
 void CGraphicTextInstance::SetValueString(const std::string& c_stValue)
 {
-	if (0 == m_stText.compare(c_stValue))
+	if (c_stValue == m_stText)
 		return;
 
 	m_stText = c_stValue;
@@ -811,6 +807,11 @@ void CGraphicTextInstance::Destroy()
 	m_hyperlinkVector.clear();
 
 	__Initialize();
+}
+
+uint16_t CGraphicTextInstance::GetLineHeight()
+{
+	return m_textHeight;
 }
 
 CGraphicTextInstance::CGraphicTextInstance()

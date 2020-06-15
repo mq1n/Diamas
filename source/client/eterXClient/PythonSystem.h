@@ -3,23 +3,6 @@
 class CPythonSystem : public CSingleton<CPythonSystem>
 {
 	public:
-		enum EWindow
-		{
-			WINDOW_STATUS,
-			WINDOW_INVENTORY,
-			WINDOW_ABILITY,
-			WINDOW_SOCIETY,
-			WINDOW_JOURNAL,
-			WINDOW_COMMAND,
-
-			WINDOW_QUICK,
-			WINDOW_GAUGE,
-			WINDOW_MINIMAP,
-			WINDOW_CHAT,
-
-			WINDOW_MAX_NUM,
-		};
-
 		enum
 		{
 			FREQUENCY_MAX_NUM  = 30,
@@ -36,16 +19,6 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 			uint8_t	frequency_count;
 		} TResolution;
 
-		typedef struct SWindowStatus
-		{
-			int32_t		isVisible;
-			int32_t		isMinimized;
-
-			int32_t		ixPosition;
-			int32_t		iyPosition;
-			int32_t		iHeight;
-		} TWindowStatus;
-
 		typedef struct SConfig
 		{
 			uint32_t			width;
@@ -59,19 +32,16 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 			int32_t				iShadowLevel;
 
 			float			music_volume;
-			uint8_t			voice_volume;
+		float voice_volume;
 
 			int32_t				gamma;
-
-			int32_t				isSaveID;
-			char			SaveID[20];
 
 			bool			bWindowed;
 			bool			bDecompressDDS;
 			bool			bNoSoundCard;
 			bool			bUseDefaultIME;
 			bool			bViewChat;
-			bool			bAlwaysShowName;
+			uint8_t			bShowNameFlag;
 			bool			bShowDamage;
 			bool			bShowSalesText;
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
@@ -95,15 +65,9 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 		bool							LoadConfig();
 		bool							SaveConfig();
 		void							ApplyConfig();
-		void							SetConfig(TConfig * set_config);
+		void SetConfig(const TConfig * pNewConfig);
 		TConfig *						GetConfig();
 		void							ChangeSystem();
-
-		// Interface
-		bool							LoadInterfaceStatus();
-		void							SaveInterfaceStatus();
-		bool							isInterfaceConfig();
-		const TWindowStatus &			GetWindowStatusReference(int32_t iIndex);
 
 		uint32_t							GetWidth();
 		uint32_t							GetHeight();
@@ -112,13 +76,14 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 		bool							IsSoftwareCursor();
 		bool							IsWindowed();
 		bool							IsViewChat();
+		uint8_t							GetShowNameFlag();
 		bool							IsAlwaysShowName();
 		bool							IsShowDamage();
 		bool							IsShowSalesText();
 		bool							IsUseDefaultIME();
 		bool							IsNoSoundCard();
 		void							SetViewChatFlag(int32_t iFlag);
-		void							SetAlwaysShowNameFlag(int32_t iFlag);
+		void							SetShowNameFlag(int32_t iFlag);
 		void							SetShowDamageFlag(int32_t iFlag);
 		void							SetShowSalesTextFlag(int32_t iFlag);
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
@@ -129,15 +94,6 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 		bool							IsShowMobLevel();
 		void							SetShowMobLevelFlag(int32_t iFlag);
 #endif
-
-		// Window
-		void							SaveWindowStatus(int32_t iIndex, int32_t iVisible, int32_t iMinimized, int32_t ix, int32_t iy, int32_t iHeight);
-
-		// SaveID
-		int32_t								IsSaveID();
-		const char *					GetSaveID();
-		void							SetSaveID(int32_t iValue, const char * c_szSaveID);
-
 		/// Display
 		void							GetDisplaySettings();
 
@@ -151,9 +107,9 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 
 		// Sound
 		float							GetMusicVolume();
-		int32_t								GetSoundVolume();
+		float							GetSoundVolume();
 		void							SetMusicVolume(float fVolume);
-		void							SetSoundVolumef(float fVolume);
+		void							SetSoundVolume(float fVolume);
 
 		int32_t								GetDistance();
 		int32_t								GetShadowLevel();
@@ -166,7 +122,5 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 		TConfig							m_Config;
 		TConfig							m_OldConfig;
 
-		bool							m_isInterfaceConfig;
 		PyObject *						m_poInterfaceHandler;
-		TWindowStatus					m_WindowStatus[WINDOW_MAX_NUM];
 };

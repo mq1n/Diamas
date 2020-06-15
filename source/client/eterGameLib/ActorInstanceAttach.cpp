@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "../eterEffectLib/EffectManager.h"
-
 #include "ActorInstance.h"
 #include "ItemData.h"
 #include "ItemManager.h"
@@ -102,29 +101,22 @@ void CActorInstance::AttachWeapon(uint32_t dwParentPartIndex, uint32_t dwPartInd
 	if (!pItemData)
 		return;
 
-#if defined(ENABLE_WOLFMAN_CHARACTER) && defined(AUTODETECT_LYCAN_RODNPICK_BONE)
 	const char * szBoneName;
+#if defined(ENABLE_WOLFMAN_CHARACTER) && defined(AUTODETECT_LYCAN_RODNPICK_BONE)
 	if ((GetRace()==8) && (pItemData->GetType()==CItemData::ITEM_TYPE_ROD || pItemData->GetType()==CItemData::ITEM_TYPE_PICK))
-	{
 		szBoneName = "equip_right";
-	}
 	else if (!GetAttachingBoneName(dwPartIndex, &szBoneName))
 		return;
 #else
-	const char * szBoneName;
 	if (!GetAttachingBoneName(dwPartIndex, &szBoneName))
 		return;
 #endif
 
 	// NOTE : (이도류처리)단도일 경우 형태가 다른 것으로 얻는다. 없을 경우 디폴트를 리턴
 	if (CRaceData::PART_WEAPON_LEFT == dwPartIndex)
-	{
 		RegisterModelThing(dwPartIndex, pItemData->GetSubModelThing());
-	}
 	else
-	{
 		RegisterModelThing(dwPartIndex, pItemData->GetModelThing());
-	}
 
 	for (uint32_t i = 0; i < pItemData->GetLODModelThingCount(); ++i)
 	{
@@ -155,13 +147,13 @@ void CActorInstance::AttachWeapon(uint32_t dwParentPartIndex, uint32_t dwPartInd
 	{
 		CWeaponTrace * pWeaponTrace = CWeaponTrace::New();		
 		pWeaponTrace->SetWeaponInstance(this, dwPartIndex, szBoneName);
-		m_WeaponTraceVector.push_back(pWeaponTrace);
+		m_WeaponTraceVector.emplace_back(pWeaponTrace);
 	}
 }
 
 void  CActorInstance::DettachEffect(uint32_t dwEID)
 {
-	std::list<TAttachingEffect>::iterator i = m_AttachingEffectList.begin();
+	auto i = m_AttachingEffectList.begin();
 
 	while (i != m_AttachingEffectList.end())
 	{
@@ -173,9 +165,7 @@ void  CActorInstance::DettachEffect(uint32_t dwEID)
 			CEffectManager::Instance().DestroyEffectInstance(dwEID);
 		}
 		else
-		{
 			++i;
-		}
 	}
 }
 
@@ -198,13 +188,9 @@ uint32_t CActorInstance::AttachEffectByID(uint32_t dwParentPartIndex, const char
 	ae.dwEffectIndex = CEffectManager::Instance().GetEmptyIndex();
 	ae.isAttaching = TRUE;
 	if (c_pv3Position)
-	{
 		D3DXMatrixTranslation(&ae.matTranslation, c_pv3Position->x, c_pv3Position->y, c_pv3Position->z);
-	}
 	else
-	{
 		D3DXMatrixIdentity(&ae.matTranslation);
-	}
 	CEffectManager& rkEftMgr=CEffectManager::Instance();
 	rkEftMgr.CreateEffectInstance(ae.dwEffectIndex, dwEffectID);
 
@@ -228,7 +214,7 @@ uint32_t CActorInstance::AttachEffectByID(uint32_t dwParentPartIndex, const char
 		ae.iBoneIndex = -1;
 	}
 
-	m_AttachingEffectList.push_back(ae);
+	m_AttachingEffectList.emplace_back(ae);
 
 	return ae.dwEffectIndex;
 }
@@ -274,10 +260,10 @@ void CActorInstance::RefreshActorInstance()
 						//m_AttackingPointInstanceList.push_back(PointInstance);
 						break;
 					case NRaceData::COLLISION_TYPE_DEFENDING:
-						m_DefendingPointInstanceList.push_back(PointInstance);
+						m_DefendingPointInstanceList.emplace_back(PointInstance);
 						break;
 					case NRaceData::COLLISION_TYPE_BODY:
-						m_BodyPointInstanceList.push_back(PointInstance);
+						m_BodyPointInstanceList.emplace_back(PointInstance);
 						break;
 				}
 			}
@@ -318,13 +304,9 @@ void CActorInstance::RefreshActorInstance()
 //				}
 
 				if (c_pAttachingData->isAttaching)
-				{
 					AttachEffectByName(0, c_pAttachingData->strAttachingBoneName.c_str(), c_pAttachingData->pEffectData->strFileName.c_str());
-				}
 				else
-				{
-					AttachEffectByName(0, 0, c_pAttachingData->pEffectData->strFileName.c_str());
-				}
+					AttachEffectByName(0, nullptr, c_pAttachingData->pEffectData->strFileName.c_str());
 				break;
 
 			case NRaceData::ATTACHING_DATA_TYPE_OBJECT:
@@ -372,10 +354,10 @@ void CActorInstance::RefreshActorInstance()
 							//m_AttackingPointInstanceList.push_back(PointInstance);
 							break;
 						case NRaceData::COLLISION_TYPE_DEFENDING:
-							m_DefendingPointInstanceList.push_back(PointInstance);
+					m_DefendingPointInstanceList.emplace_back(PointInstance);
 							break;
 						case NRaceData::COLLISION_TYPE_BODY:
-							m_BodyPointInstanceList.push_back(PointInstance);
+					m_BodyPointInstanceList.emplace_back(PointInstance);
 							break;
 						}
 					}
@@ -386,7 +368,8 @@ void CActorInstance::RefreshActorInstance()
 					{
 						uint32_t dwCRC;
 						StringPath(c_pAttachingData->pEffectData->strFileName);
-						dwCRC = GetCaseCRC32(c_pAttachingData->pEffectData->strFileName.c_str(),c_pAttachingData->pEffectData->strFileName.length());
+						dwCRC = GetCaseCRC32(c_pAttachingData->pEffectData->strFileName.c_str(),
+											 c_pAttachingData->pEffectData->strFileName.length());
 
 						TAttachingEffect ae;
 						ae.iLifeType = EFFECT_LIFE_INFINITE;
@@ -406,7 +389,7 @@ void CActorInstance::RefreshActorInstance()
 
 						ae.iBoneIndex = iBoneIndex;
 
-						m_AttachingEffectList.push_back(ae);
+					m_AttachingEffectList.emplace_back(ae);
 					}
 					break;
 
@@ -427,9 +410,7 @@ void CActorInstance::SetWeaponTraceTexture(const char * szTextureName)
 {
 	std::vector<CWeaponTrace*>::iterator it;
 	for (it = m_WeaponTraceVector.begin(); it != m_WeaponTraceVector.end(); ++it)
-	{
 		(*it)->SetTexture(szTextureName);
-	}
 }
 
 void CActorInstance::UseTextureWeaponTrace()
@@ -501,16 +482,6 @@ void CActorInstance::UpdateAttachingInstances()
 	}
 }
 
-void CActorInstance::ShowAllAttachingEffect()
-{
-	std::list<TAttachingEffect>::iterator it;
-	for(it = m_AttachingEffectList.begin(); it!= m_AttachingEffectList.end();++it)
-	{
-		CEffectManager::Instance().SelectEffectInstance(it->dwEffectIndex);
-		CEffectManager::Instance().ShowEffect();
-	}
-}
-
 void CActorInstance::SetActiveAllAttachingEffect()
 {
 	std::list<TAttachingEffect>::iterator it;
@@ -526,6 +497,16 @@ void CActorInstance::SetDeactiveAllAttachingEffect()
 	for (it = m_AttachingEffectList.begin(); it != m_AttachingEffectList.end(); ++it)
 	{
 		CEffectManager::Instance().DeactiveEffectInstance(it->dwEffectIndex);
+	}
+}
+
+void CActorInstance::ShowAllAttachingEffect()
+{
+	std::list<TAttachingEffect>::iterator it;
+	for (it = m_AttachingEffectList.begin(); it != m_AttachingEffectList.end(); ++it)
+	{
+		CEffectManager::Instance().SelectEffectInstance(it->dwEffectIndex);
+		CEffectManager::Instance().ShowEffect();
 	}
 }
 
@@ -545,9 +526,7 @@ void CActorInstance::__ClearAttachingEffect()
 
 	std::list<TAttachingEffect>::iterator it;
 	for(it = m_AttachingEffectList.begin(); it!= m_AttachingEffectList.end();++it)
-	{
 		CEffectManager::Instance().DestroyEffectInstance(it->dwEffectIndex);
-	}
 	m_AttachingEffectList.clear();
 }
 

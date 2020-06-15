@@ -24,9 +24,7 @@ public:
 	void SetSoundScale(float fScale);
 	void SetAmbienceSoundScale(float fScale);
 	void SetSoundVolume(float fVolume);
-	void SetSoundVolumeRatio(float fRatio);
 	void SetMusicVolume(float fVolume);
-	void SetSoundVolumeGrade(int32_t iGrade);
 	void SaveVolume();
 	void RestoreVolume();
 	float GetSoundVolume();
@@ -62,7 +60,7 @@ protected:
 		MUSIC_STATE_PLAY,
 		MUSIC_STATE_FADE_IN,
 		MUSIC_STATE_FADE_OUT,
-		MUSIC_STATE_FADE_LIMIT_OUT,
+		MUSIC_STATE_FADE_LIMIT_OUT
 	};
 	typedef struct SMusicInstance
 	{
@@ -78,9 +76,6 @@ protected:
 	BOOL GetMusicIndex(const char * c_szFileName, uint32_t * pdwIndex);
 
 protected:
-	float __ConvertGradeVolumeToApplyVolume(int32_t nVolumeGrade);
-	float __ConvertRatioVolumeToApplyVolume(float fVolumeRatio);
-	void __SetMusicVolume(float fVolume);
 	BOOL GetSoundInstance2D(const char * c_szSoundFileName, ISoundInstance ** ppInstance);
 	BOOL GetSoundInstance3D(const char * c_szFileName, ISoundInstance ** ppInstance);
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "StdAfx.h"
+#include <list>
 
 /*
  *	NPC 데이터 프로토 타잎을 관리 한다.
@@ -7,6 +8,20 @@
 class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 {
 	public:
+	enum EMobTypes
+	{
+		MONSTER,
+		NPC,
+		STONE,
+		WARP,
+		DOOR,
+		BUILDING,
+		PC,
+		POLYMORPH_PC,
+		HORSE,
+		GOTO
+	};
+
 		enum  EClickEvent
 		{
 			ON_CLICK_EVENT_NONE		= 0,
@@ -15,7 +30,7 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 			ON_CLICK_EVENT_TALK		= 3,
 			ON_CLICK_EVENT_VEHICLE	= 4,
 
-			ON_CLICK_EVENT_MAX_NUM,
+			ON_CLICK_EVENT_MAX_NUM
 		};
 
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
@@ -65,7 +80,7 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 		enum EMobMaxNum
 		{
 			MOB_ATTRIBUTE_MAX_NUM = 12,
-			MOB_SKILL_MAX_NUM = 5,
+			MOB_SKILL_MAX_NUM = 5
 		};
 
 #pragma pack(push)
@@ -560,12 +575,12 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 
 #pragma pack(pop)
 
-		typedef std::list<TMobTable *> TMobTableList;
-		typedef std::map<uint32_t, TMobTable *> TNonPlayerDataMap;
+		using TMobTableList = std::list<TMobTable*>;
+		using TNonPlayerDataMap = std::map<uint32_t, TMobTable>;
 
 	public:
-		CPythonNonPlayer(void);
-		virtual ~CPythonNonPlayer(void);
+		CPythonNonPlayer();
+		virtual ~CPythonNonPlayer();
 
 		void Clear();
 		void Destroy();
@@ -590,7 +605,26 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 
 		// Function for outer
 		void				GetMatchableMobList(int32_t iLevel, int32_t iInterval, TMobTableList * pMobTableList);
-
+		
+		uint32_t				GetMonsterMaxHP(uint32_t dwVnum);
+		uint32_t				GetMonsterRaceFlag(uint32_t dwVnum);
+		uint32_t				GetMonsterDamage1(uint32_t dwVnum);
+		uint32_t				GetMonsterDamage2(uint32_t dwVnum);
+		uint32_t				GetMonsterExp(uint32_t dwVnum);
+		float				GetMonsterDamageMultiply(uint32_t dwVnum);
+		uint32_t				GetMonsterST(uint32_t dwVnum);
+		uint32_t				GetMonsterDX(uint32_t dwVnum);
+		bool				IsMonsterStone(uint32_t dwVnum);
+		uint8_t				GetMobRegenCycle(uint32_t dwVnum);
+		uint8_t				GetMobRegenPercent(uint32_t dwVnum);
+		uint32_t				GetMobGoldMin(uint32_t dwVnum);
+		uint32_t				GetMobGoldMax(uint32_t dwVnum);
+		
 	protected:
 		TNonPlayerDataMap	m_NonPlayerDataMap;
 };
+
+inline bool operator<(const CPythonNonPlayer::TMobTable & lhs, const CPythonNonPlayer::TMobTable & rhs)
+{
+	return lhs.dwVnum < rhs.dwVnum;
+}

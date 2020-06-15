@@ -41,6 +41,7 @@ class CMSWindow
 		virtual LRESULT	WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 		virtual void	OnSize(WPARAM wParam, LPARAM lParam);
 		
+		LPSTR GetMyClassName();
 	protected:
 		const char* RegisterWindowClass(uint32_t style, int32_t brush, WNDPROC pfnWndProc, HICON hIcon=nullptr, int32_t iCursorResource=32512);
 

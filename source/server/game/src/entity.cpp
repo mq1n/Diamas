@@ -2,6 +2,7 @@
 #include "char.h"
 #include "desc.h"
 #include "sectree_manager.h"
+#include "desc_manager.h"
 
 CEntity::CEntity()
 {
@@ -10,61 +11,62 @@ CEntity::CEntity()
 
 CEntity::~CEntity()
 {
-	if (!m_bIsDestroyed)
-		assert(!"You must call CEntity::destroy() method in your derived class destructor");
+	if (!m_isDestroyed)
+		assert(!"You must call CEntity::Destroy() method in your derived class destructor");
 }
 
 void CEntity::Initialize(int32_t type)
 {
-	m_bIsDestroyed = false;
+	m_isDestroyed = false;
 
-	m_iType = type;
-	m_iViewAge = 0;
-	m_pos.x = m_pos.y = m_pos.z = 0;
-	m_map_view.clear();
+	m_objectType = type;
+	m_viewAge = 0;
+	m_position.x = m_position.y = m_position.z = 0;
+	m_mapView.clear();
 
-	m_pSectree = nullptr;
-	m_lpDesc = nullptr;
-	m_lMapIndex = 0;
-	m_bIsObserver = false;
-	m_bObserverModeChange = false;
+	m_sectree = nullptr;
+	m_desc = nullptr;
+	m_mapIndex = 0;
+	m_isObserver = false;
+
+	m_isBattlegroundEntity = false;
 }
 
 void CEntity::Destroy()
 {
-	if (m_bIsDestroyed) {
+	if (m_isDestroyed)
 		return;
-	}
+
 	ViewCleanup();
-	m_bIsDestroyed = true;
+	m_isDestroyed = true;
 }
 
 void CEntity::SetType(int32_t type)
 {
-	m_iType = type;
+	m_objectType = type;
 }
 
 int32_t CEntity::GetType() const
 {
-	return m_iType;
+	return m_objectType;
 }
 
 bool CEntity::IsType(int32_t type) const
 {
-	return (m_iType == type ? true : false);
+	return (m_objectType == type ? true : false);
 }
 
 struct FuncPacketAround
 {
 	const void *        m_data;
-	int32_t                 m_bytes;
+	int32_t             m_bytes;
 	LPENTITY            m_except;
 
 	FuncPacketAround(const void * data, int32_t bytes, LPENTITY except = nullptr) :m_data(data), m_bytes(bytes), m_except(except)
 	{
 	}
 
-	void operator () (LPENTITY ent)
+	void operator () (LPENTITY ent) const
 	{
 		if (ent == m_except)
 			return;
@@ -76,10 +78,12 @@ struct FuncPacketAround
 
 struct FuncPacketView : public FuncPacketAround
 {
-	FuncPacketView(const void * data, int32_t bytes, LPENTITY except = nullptr) : FuncPacketAround(data, bytes, except)
-	{}
+	FuncPacketView(const void * data, int32_t bytes, LPENTITY except = nullptr) :
+		FuncPacketAround(data, bytes, except)
+	{
+	}
 
-	void operator() (const CEntity::ENTITY_MAP::value_type& v)
+	void operator() (const CEntity::MAP_VIEW::value_type& v) const
 	{
 		FuncPacketAround::operator() (v.first);
 	}
@@ -97,26 +101,59 @@ void CEntity::PacketView(const void * data, int32_t bytes, LPENTITY except)
 
 	FuncPacketView f(data, bytes, except);
 
-	// 옵저버 상태에선 내 패킷은 나만 받는다.
-	if (!m_bIsObserver)
-		for_each(m_map_view.begin(), m_map_view.end(), f);
+	// In the observer state, only my packets are received by me.
+	if (!m_isObserver)
+		std::for_each(m_mapView.begin(), m_mapView.end(), f);
 
 	f(std::make_pair(this, 0));
 }
 
+void CEntity::PacketMap(int32_t nMapIndex, const void * data, int32_t bytes)
+{
+	const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
+
+	for (const auto& pkDesc : c_ref_set)
+	{
+		if (!pkDesc->GetCharacter())
+			continue;
+
+		if (pkDesc->GetCharacter()->GetMapIndex() != nMapIndex)
+			continue;
+
+		pkDesc->Packet(data, bytes);
+	}
+}
+
 void CEntity::SetObserverMode(bool bFlag)
 {
-	if (m_bIsObserver == bFlag)
+	if (m_isObserver == bFlag)
 		return;
 
-	m_bIsObserver = bFlag;
-	m_bObserverModeChange = true;
-	UpdateSectree();
+	m_isObserver = bFlag;
+	
+	if (m_isObserver) 
+	{
+		auto f = [this](const MAP_VIEW::value_type& p)
+		{
+			EncodeRemovePacket(p.first); 
+		};
+
+		std::for_each(m_mapView.begin(), m_mapView.end(), f);
+	}
+	else 
+	{
+		auto f = [this](const MAP_VIEW::value_type& p)
+		{
+			EncodeInsertPacket(p.first); 
+		};
+
+		std::for_each(m_mapView.begin(), m_mapView.end(), f);
+	}
 
 	if (IsType(ENTITY_CHARACTER))
 	{
-		LPCHARACTER ch = (LPCHARACTER) this;
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "ObserverMode %d", m_bIsObserver ? 1 : 0);
+		auto ch = static_cast<LPCHARACTER>(this);
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "ObserverMode %d", m_isObserver ? 1 : 0);
 	}
 }
 

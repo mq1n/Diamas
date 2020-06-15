@@ -99,8 +99,6 @@ bool DragonSoulTable::GetDragonSoulGroupName(uint8_t bType, std::string& stGroup
 
 bool DragonSoulTable::ReadVnumMapper()
 {
-	std::string stName;
-
 	// Group VnumMapper Reading.
 	CGroupNode* pGroupNode = m_pLoader->GetGroup("vnummapper");
 
@@ -125,7 +123,7 @@ bool DragonSoulTable::ReadVnumMapper()
 			pGroupNode->GetRow(i, &pRow);
 			
 			std::string stDragonSoulName;
-			uint8_t bType;
+			uint8_t bType = 0;
 			if (!pRow->GetValue("dragonsoulname", stDragonSoulName))
 			{
 				sys_err ("In Group VnumMapper, No DragonSoulName column.");
@@ -282,7 +280,7 @@ bool DragonSoulTable::CheckApplyNumSettings ()
 	{
 		for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 		{
-			for (int32_t j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
+			for (uint8_t j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
 			{
 				int32_t basis, add_min, add_max;
 				if (!GetApplyNumSettings(m_vecDragonSoulTypes[i], j, basis, add_min, add_max))
@@ -310,11 +308,11 @@ bool DragonSoulTable::CheckWeightTables ()
 	{
 		for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 		{
-			for (int32_t j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
+			for (uint8_t j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
 			{
-				for (int32_t k = 0; k < DRAGON_SOUL_STEP_MAX; k++)
+				for (uint8_t k = 0; k < DRAGON_SOUL_STEP_MAX; k++)
 				{
-					for (int32_t l = 0; l < DRAGON_SOUL_STRENGTH_MAX; l++)
+					for (uint8_t l = 0; l < DRAGON_SOUL_STRENGTH_MAX; l++)
 					{
 						float fWeight;
 						if (!GetWeight(m_vecDragonSoulTypes[i], j, k, l, fWeight))
@@ -342,7 +340,7 @@ bool DragonSoulTable::CheckRefineGradeTables()
 	{
 		for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 		{
-			for (int32_t j = 0; j < DRAGON_SOUL_GRADE_MAX - 1; j++)
+			for (uint8_t j = 0; j < DRAGON_SOUL_GRADE_MAX - 1; j++)
 			{
 				int32_t need_count, fee;
 				std::vector <float> vec_probs;
@@ -396,7 +394,7 @@ bool DragonSoulTable::CheckRefineStepTables ()
 	{
 		for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 		{
-			for (int32_t j = 0; j < DRAGON_SOUL_STEP_MAX - 1; j++)
+			for (uint8_t j = 0; j < DRAGON_SOUL_STEP_MAX - 1; j++)
 			{
 				int32_t need_count, fee;
 				std::vector <float> vec_probs;
@@ -456,7 +454,7 @@ bool DragonSoulTable::CheckRefineStrengthTables()
 		{
 			int32_t fee;
 			float prob;
-			for (int32_t k = 0; k < DRAGON_SOUL_STRENGTH_MAX -1; k++)
+			for (uint8_t k = 0; k < DRAGON_SOUL_STRENGTH_MAX -1; k++)
 			{
 				if (!GetRefineStrengthValues(m_vecDragonSoulTypes[i], j, k, fee, prob))
 				{
@@ -493,7 +491,7 @@ bool DragonSoulTable::CheckDragonHeartExtTables()
 	}
 	for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 	{
-		for (int32_t j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
+		for (uint8_t j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
 		{
 			std::vector <float> vec_chargings;
 			std::vector <float> vec_probs;
@@ -544,7 +542,7 @@ bool DragonSoulTable::CheckDragonSoulExtTables()
 	}
 	for (size_t i = 0; i < m_vecDragonSoulTypes.size(); i++)
 	{
-		for (int32_t j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
+		for (uint8_t j = 0; j < DRAGON_SOUL_GRADE_MAX; j++)
 		{
 			float prob;
 			uint32_t by_product;

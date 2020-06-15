@@ -1,5 +1,6 @@
 #pragma once
 #include "../eterGameLib/ItemData.h"
+#include "../eterXClient/Locale_inc.h"
 
 struct SAffects
 {
@@ -231,10 +232,10 @@ typedef struct SItemPos
 		{
 		case INVENTORY:
 			return cell < c_Inventory_Count;
-			break;
+
 		case EQUIPMENT:
 			return cell < c_DragonSoul_Equip_End;
-			break;
+
 		case DRAGON_SOUL_INVENTORY:
 			return cell < (DS_INVENTORY_MAX_NUM);
 			break;

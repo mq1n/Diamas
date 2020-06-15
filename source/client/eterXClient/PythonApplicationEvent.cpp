@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "PythonApplication.h"
-#include "../eterlib/Camera.h"
+#include "../eterLib/Camera.h"
 
 void CPythonApplication::OnCameraUpdate()
 {
@@ -141,9 +141,7 @@ void CPythonApplication::OnKeyDown(int32_t iIndex)
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 
 	if (DIK_ESCAPE == iIndex)
-	{
 		rkWndMgr.RunPressEscapeKey();
-	}
 
 	rkWndMgr.RunKeyDown(iIndex);
 }
@@ -218,7 +216,7 @@ void CPythonApplication::OnMouseUpdate()
 		//assert(!" CPythonApplication::OnMouseUpdate - Mouse handler has not set!");
 		return;
 	}
-#endif _DEBUG
+#endif //_DEBUG
 
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 	int32_t lx, ly;
@@ -234,7 +232,7 @@ void CPythonApplication::OnMouseRender()
 		//assert(!" CPythonApplication::OnMouseRender - Mouse handler has not set!");
 		return;
 	}
-#endif _DEBUG
+#endif //_DEBUG
 
 	PyCallClassMemberFunc(m_poMouseHandler, "Render", Py_BuildValue("()"));
 }

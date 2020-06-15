@@ -10,13 +10,10 @@ bool CEffectElementBaseInstance::Update(float fElapsedTime)
 
 		return OnUpdate(fElapsedTime);
 	}
-	else
-	{
-		m_fRemainingTime -= fElapsedTime;
-		if (m_fRemainingTime<=0.0f)
-			m_bStart = true;
-		return true;
-	}
+	m_fRemainingTime -= fElapsedTime;
+	if (m_fRemainingTime <= 0.0f)
+		m_bStart = true;
+	return true;
 }
 
 void CEffectElementBaseInstance::Render()

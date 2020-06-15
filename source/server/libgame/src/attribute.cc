@@ -148,17 +148,10 @@ CAttribute::CAttribute(uint32_t * attr, uint32_t width, uint32_t height) // attr
 
 CAttribute::~CAttribute()
 {
-    if (data)
 	free(data);
-
-    if (bytePtr)
-	delete [] bytePtr;
-
-    if (wordPtr)
-	delete [] wordPtr;
-
-    if (dwordPtr)
-	delete [] dwordPtr;
+	delete[] bytePtr;
+	delete[] wordPtr;
+	delete[] dwordPtr;
 }
 
 int32_t CAttribute::GetDataType()

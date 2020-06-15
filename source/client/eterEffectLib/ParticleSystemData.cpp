@@ -39,43 +39,27 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 		return FALSE;
 
 	if (!rTextFileLoader.GetTokenFloat("cyclelength", &m_EmitterProperty.m_fCycleLength))
-	{
 		m_EmitterProperty.m_fCycleLength = 0.05f;
-	}
 	if (!rTextFileLoader.GetTokenBoolean("cycleloopenable", &m_EmitterProperty.m_bCycleLoopFlag))
-	{
 		m_EmitterProperty.m_bCycleLoopFlag = FALSE;
-	}
 	if (!rTextFileLoader.GetTokenInteger("loopcount",&m_EmitterProperty.m_iLoopCount))
-	{
 		m_EmitterProperty.m_iLoopCount = 0;
-	}
 
 	if (!rTextFileLoader.GetTokenByte("emittershape", &m_EmitterProperty.m_byEmitterShape))
 		return FALSE;
-	
+
 	if (!rTextFileLoader.GetTokenByte("emitteradvancedtype", &m_EmitterProperty.m_byEmitterAdvancedType))
-	{
 		m_EmitterProperty.m_byEmitterShape = CEmitterProperty::EMITTER_ADVANCED_TYPE_FREE;
-	}
 	if (!rTextFileLoader.GetTokenPosition("emittingsize", &m_EmitterProperty.m_v3EmittingSize))
-	{
 		m_EmitterProperty.m_v3EmittingSize = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	}
 	if (!rTextFileLoader.GetTokenFloat("emittingradius", &m_EmitterProperty.m_fEmittingRadius))
-	{
 		m_EmitterProperty.m_fEmittingRadius = 0.0f;
-	}
 
 	if (!rTextFileLoader.GetTokenBoolean("emitteremitfromedgeflag", &m_EmitterProperty.m_bEmitFromEdgeFlag))
-	{
 		m_EmitterProperty.m_bEmitFromEdgeFlag = FALSE;
-	}
-	
+
 	if (!rTextFileLoader.GetTokenPosition("emittingdirection", &m_EmitterProperty.m_v3EmittingDirection))
-	{
 		m_EmitterProperty.m_v3EmittingDirection = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	}
 
 	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventemittingsize", &m_EmitterProperty.m_TimeEventEmittingSize))
 	{
@@ -83,25 +67,26 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 		TTimeEventTypeFloat TimeEventFloat;
 		TimeEventFloat.m_fTime = 0.0f;
 		TimeEventFloat.m_Value = 0.0f;
-		m_EmitterProperty.m_TimeEventEmittingSize.push_back(TimeEventFloat);
+			m_EmitterProperty.m_TimeEventEmittingSize.emplace_back(TimeEventFloat);
 	}
-	
-	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventemittingangularvelocity", &m_EmitterProperty.m_TimeEventEmittingAngularVelocity))
+
+		if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventemittingangularvelocity",
+									&m_EmitterProperty.m_TimeEventEmittingAngularVelocity))
 	{
 		m_EmitterProperty.m_TimeEventEmittingAngularVelocity.clear();
 		TTimeEventTypeFloat TimeEventFloat;
 		TimeEventFloat.m_fTime = 0.0f;
 		TimeEventFloat.m_Value = 0.0f;
-		m_EmitterProperty.m_TimeEventEmittingAngularVelocity.push_back(TimeEventFloat);
+			m_EmitterProperty.m_TimeEventEmittingAngularVelocity.emplace_back(TimeEventFloat);
 	}
-	
+
 	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventemittingdirectionx", &m_EmitterProperty.m_TimeEventEmittingDirectionX))
 	{
 		m_EmitterProperty.m_TimeEventEmittingDirectionX.clear();
 		TTimeEventTypeFloat TimeEventFloat;
 		TimeEventFloat.m_fTime = 0.0f;
 		TimeEventFloat.m_Value = 0.0f;
-		m_EmitterProperty.m_TimeEventEmittingDirectionX.push_back(TimeEventFloat);
+			m_EmitterProperty.m_TimeEventEmittingDirectionX.emplace_back(TimeEventFloat);
 	}
 	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventemittingdirectiony", &m_EmitterProperty.m_TimeEventEmittingDirectionY))
 	{
@@ -109,7 +94,7 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 		TTimeEventTypeFloat TimeEventFloat;
 		TimeEventFloat.m_fTime = 0.0f;
 		TimeEventFloat.m_Value = 0.0f;
-		m_EmitterProperty.m_TimeEventEmittingDirectionY.push_back(TimeEventFloat);
+			m_EmitterProperty.m_TimeEventEmittingDirectionY.emplace_back(TimeEventFloat);
 	}
 	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventemittingdirectionz", &m_EmitterProperty.m_TimeEventEmittingDirectionZ))
 	{
@@ -117,7 +102,7 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 		TTimeEventTypeFloat TimeEventFloat;
 		TimeEventFloat.m_fTime = 0.0f;
 		TimeEventFloat.m_Value = 0.0f;
-		m_EmitterProperty.m_TimeEventEmittingDirectionZ.push_back(TimeEventFloat);
+			m_EmitterProperty.m_TimeEventEmittingDirectionZ.emplace_back(TimeEventFloat);
 	}
 	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventemittingvelocity", &m_EmitterProperty.m_TimeEventEmittingVelocity))
 	{
@@ -125,9 +110,10 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 		TTimeEventTypeFloat TimeEventFloat;
 		TimeEventFloat.m_fTime = 0.0f;
 		TimeEventFloat.m_Value = 0.0f;
-		m_EmitterProperty.m_TimeEventEmittingVelocity.push_back(TimeEventFloat);
+			m_EmitterProperty.m_TimeEventEmittingVelocity.emplace_back(TimeEventFloat);
 	}
-	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventemissioncountpersecond", &m_EmitterProperty.m_TimeEventEmissionCountPerSecond))
+		if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventemissioncountpersecond",
+									&m_EmitterProperty.m_TimeEventEmissionCountPerSecond))
 		return FALSE;
 	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventlifetime", &m_EmitterProperty.m_TimeEventLifeTime))
 		return FALSE;
@@ -141,17 +127,11 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 	CTextFileLoader::CGotoChild GotoChild(&rTextFileLoader, "particleproperty");
 
 	if (!rTextFileLoader.GetTokenByte("srcblendtype", &m_ParticleProperty.m_bySrcBlendType))
-	{
 		m_ParticleProperty.m_bySrcBlendType = D3DBLEND_SRCALPHA;
-	}
 	if (!rTextFileLoader.GetTokenByte("destblendtype", &m_ParticleProperty.m_byDestBlendType))
-	{
 		m_ParticleProperty.m_byDestBlendType = D3DBLEND_ONE;
-	}
 	if (!rTextFileLoader.GetTokenByte("coloroperationtype", &m_ParticleProperty.m_byColorOperationType))
-	{
 		m_ParticleProperty.m_byColorOperationType = D3DTOP_MODULATE;
-	}
 
 	if (!rTextFileLoader.GetTokenByte("billboardtype", &m_ParticleProperty.m_byBillboardType))
 		return FALSE;
@@ -166,9 +146,7 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 		return FALSE;
 
 	if (!rTextFileLoader.GetTokenBoolean("attachenable", &m_ParticleProperty.m_bAttachFlag))
-	{
 		m_ParticleProperty.m_bAttachFlag = FALSE;
-	}
 	if (!rTextFileLoader.GetTokenBoolean("stretchenable", &m_ParticleProperty.m_bStretchFlag))
 		return FALSE;
 
@@ -186,12 +164,10 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 		TTimeEventTypeFloat f;
 		f.m_fTime = 0.0f;
 		f.m_Value = fGravity;
-		m_ParticleProperty.m_TimeEventGravity.push_back(f);
+			m_ParticleProperty.m_TimeEventGravity.emplace_back(f);
 	}
 	else if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventgravity", &m_ParticleProperty.m_TimeEventGravity))
-	{
 		m_ParticleProperty.m_TimeEventGravity.clear();
-	}
 
 	float fAirResistance;
 	if (rTextFileLoader.GetTokenFloat("airresistance", &fAirResistance))
@@ -199,12 +175,10 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 		TTimeEventTypeFloat f;
 		f.m_fTime = 0.0f;
 		f.m_Value = fAirResistance;
-		m_ParticleProperty.m_TimeEventAirResistance.push_back(f);
+			m_ParticleProperty.m_TimeEventAirResistance.emplace_back(f);
 	}
 	else if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventairresistance", &m_ParticleProperty.m_TimeEventAirResistance))
-	{
 		m_ParticleProperty.m_TimeEventAirResistance.clear();
-	}
 
 	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventscalex", &m_ParticleProperty.m_TimeEventScaleX))
 		return FALSE;
@@ -238,19 +212,17 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 	m_ParticleProperty.m_TimeEventColor.clear();
 	{
 		std::set<float> times;
-		int32_t i;
-		for(i=0;i<TimeEventR.size();i++)
-			times.insert(TimeEventR[i].m_fTime);
-		for(i=0;i<TimeEventG.size();i++)
-			times.insert(TimeEventG[i].m_fTime);
-		for(i=0;i<TimeEventB.size();i++)
-			times.insert(TimeEventB[i].m_fTime);
-		for(i=0;i<TimeEventA.size();i++)
-			times.insert(TimeEventA[i].m_fTime);
-		std::set<float>::iterator it;
-		for(it = times.begin(); it != times.end(); ++it)
-		{
-			float fTime = *it;
+			size_t i;
+			for (i = 0; i < TimeEventR.size(); i++)
+				times.emplace(TimeEventR[i].m_fTime);
+			for (i = 0; i < TimeEventG.size(); i++)
+				times.emplace(TimeEventG[i].m_fTime);
+			for (i = 0; i < TimeEventB.size(); i++)
+				times.emplace(TimeEventB[i].m_fTime);
+			for (i = 0; i < TimeEventA.size(); i++)
+				times.emplace(TimeEventA[i].m_fTime);
+			for (auto & fTime : times)
+			{
 			float fR, fG, fB, fA;
 			GetTimeEventBlendValue<float>(fTime, TimeEventR, &fR);
 			GetTimeEventBlendValue<float>(fTime, TimeEventG, &fG);
@@ -263,8 +235,8 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 			c.g = fG;
 			c.b = fB;
 			c.a = fA;
-			t.m_Value.m_dwColor = /*(uint32_t)*/ (uint32_t)c;
-			m_ParticleProperty.m_TimeEventColor.push_back(t);
+				t.m_Value.m_dwColor = static_cast<uint32_t>(c);
+				m_ParticleProperty.m_TimeEventColor.emplace_back(t);
 		}
 	}
 #endif
@@ -277,11 +249,9 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 	if (!rTextFileLoader.GetTokenVector("texturefiles", &pTextureVector))
 		return FALSE;
 
-	for (uint32_t i = 0; i < pTextureVector->size(); ++i)
-	{
-		std::string strTextureFileName = pTextureVector->at(i).c_str();
-
-		if (!IsGlobalFileName(strTextureFileName.c_str()))
+		for (auto & strTextureFileName : *pTextureVector)
+		{
+			if (!IsGlobalFileName(strTextureFileName.c_str()))
 			strTextureFileName = GetOnlyPathName(rTextFileLoader.GetFileName()) + strTextureFileName;
 
 		m_ParticleProperty.InsertTexture(strTextureFileName.c_str());
@@ -314,26 +284,24 @@ void CParticleSystemData::BuildDecorator(CParticleInstance * pInstance)
 	pInstance->m_pDecorator = new CNullDecorator;
 	
 	//////
-	
+
 	if (m_ParticleProperty.m_TimeEventAirResistance.size()>1)
 	{
 		pInstance->m_pDecorator=pInstance->m_pDecorator->AddChainFront(new CAirResistanceDecorator);
 		pInstance->m_pDecorator=pInstance->m_pDecorator->AddChainFront(
-			new CAirResistanceValueDecorator(m_ParticleProperty.m_TimeEventAirResistance, &pInstance->m_fAirResistance)
-			);
+			new CAirResistanceValueDecorator(m_ParticleProperty.m_TimeEventAirResistance, &pInstance->m_fAirResistance));
 	}
 	else if (m_ParticleProperty.m_TimeEventAirResistance.size()==1)
 	{
 		pInstance->m_fAirResistance = m_ParticleProperty.m_TimeEventAirResistance[0].m_Value;
 		pInstance->m_pDecorator=pInstance->m_pDecorator->AddChainFront(new CAirResistanceDecorator);
 	}
-	
+
 	if (m_ParticleProperty.m_TimeEventGravity.size() > 1)
 	{
 		pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(new CGravityDecorator);
 		pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
-			new CGravityValueDecorator(m_ParticleProperty.m_TimeEventGravity, &pInstance->m_fGravity)
-			);
+			new CGravityValueDecorator(m_ParticleProperty.m_TimeEventGravity, &pInstance->m_fGravity));
 	}
 	else if (m_ParticleProperty.m_TimeEventGravity.size() == 1)
 	{
@@ -341,39 +309,42 @@ void CParticleSystemData::BuildDecorator(CParticleInstance * pInstance)
 		pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(new CGravityDecorator);
 	}
 #ifdef WORLD_EDITOR
-	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
-	new CColorValueDecorator(m_ParticleProperty.m_TimeEventColorRed, &pInstance->m_Color.r));
-	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
-	new CColorValueDecorator(m_ParticleProperty.m_TimeEventColorGreen, &pInstance->m_Color.g));
-	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
-	new CColorValueDecorator(m_ParticleProperty.m_TimeEventColorBlue, &pInstance->m_Color.b));
-	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
-	new CColorValueDecorator(m_ParticleProperty.m_TimeEventAlpha, &pInstance->m_Color.a));
+	pInstance->m_pDecorator =
+		pInstance->m_pDecorator->AddChainFront(new CColorValueDecorator(m_ParticleProperty.m_TimeEventColorRed, &pInstance->m_Color.r));
+	pInstance->m_pDecorator =
+		pInstance->m_pDecorator->AddChainFront(new CColorValueDecorator(m_ParticleProperty.m_TimeEventColorGreen, &pInstance->m_Color.g));
+	pInstance->m_pDecorator =
+		pInstance->m_pDecorator->AddChainFront(new CColorValueDecorator(m_ParticleProperty.m_TimeEventColorBlue, &pInstance->m_Color.b));
+	pInstance->m_pDecorator =
+		pInstance->m_pDecorator->AddChainFront(new CColorValueDecorator(m_ParticleProperty.m_TimeEventAlpha, &pInstance->m_Color.a));
 #else
-	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
-		new CColorAllDecorator(m_ParticleProperty.m_TimeEventColor, &pInstance->m_dcColor));
+	pInstance->m_pDecorator =
+		pInstance->m_pDecorator->AddChainFront(new CColorAllDecorator(m_ParticleProperty.m_TimeEventColor, &pInstance->m_dcColor));
 #endif
-	
-	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
-		new CScaleValueDecorator(m_ParticleProperty.m_TimeEventScaleX, &pInstance->m_v2Scale.x));
-	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
-		new CScaleValueDecorator(m_ParticleProperty.m_TimeEventScaleY, &pInstance->m_v2Scale.y));
-	
+
+	pInstance->m_pDecorator =
+		pInstance->m_pDecorator->AddChainFront(new CScaleValueDecorator(m_ParticleProperty.m_TimeEventScaleX, &pInstance->m_v2Scale.x));
+	pInstance->m_pDecorator =
+		pInstance->m_pDecorator->AddChainFront(new CScaleValueDecorator(m_ParticleProperty.m_TimeEventScaleY, &pInstance->m_v2Scale.y));
+
 	if (m_ParticleProperty.GetTextureAnimationFrameCount()>1 &&m_ParticleProperty.GetTextureAnimationFrameDelay()>1e-6)
 	{
 		switch (pInstance->m_byTextureAnimationType)
 		{
 			case CParticleProperty::TEXTURE_ANIMATION_TYPE_CW:
 				pInstance->m_pDecorator=pInstance->m_pDecorator->AddChainFront(
-					new CTextureAnimationCWDecorator(m_ParticleProperty.GetTextureAnimationFrameDelay(), m_ParticleProperty.GetTextureAnimationFrameCount(), &pInstance->m_byFrameIndex));
+				new CTextureAnimationCWDecorator(m_ParticleProperty.GetTextureAnimationFrameDelay(),
+												 m_ParticleProperty.GetTextureAnimationFrameCount(), &pInstance->m_byFrameIndex));
 				break;
 			case CParticleProperty::TEXTURE_ANIMATION_TYPE_CCW:
 				pInstance->m_pDecorator=pInstance->m_pDecorator->AddChainFront(
-					new CTextureAnimationCCWDecorator(m_ParticleProperty.GetTextureAnimationFrameDelay(), m_ParticleProperty.GetTextureAnimationFrameCount(), &pInstance->m_byFrameIndex));
+				new CTextureAnimationCCWDecorator(m_ParticleProperty.GetTextureAnimationFrameDelay(),
+												  m_ParticleProperty.GetTextureAnimationFrameCount(), &pInstance->m_byFrameIndex));
 				break;
 			case CParticleProperty::TEXTURE_ANIMATION_TYPE_RANDOM_FRAME:
 				pInstance->m_pDecorator=pInstance->m_pDecorator->AddChainFront(
-					new CTextureAnimationRandomDecorator(m_ParticleProperty.GetTextureAnimationFrameDelay(), m_ParticleProperty.GetTextureAnimationFrameCount(), &pInstance->m_byFrameIndex));
+				new CTextureAnimationRandomDecorator(m_ParticleProperty.GetTextureAnimationFrameDelay(),
+													 m_ParticleProperty.GetTextureAnimationFrameCount(), &pInstance->m_byFrameIndex));
 				break;
 		}
 	}
@@ -381,34 +352,27 @@ void CParticleSystemData::BuildDecorator(CParticleInstance * pInstance)
 	uint8_t byRotationType = m_ParticleProperty.m_byRotationType;
 
 	if (m_ParticleProperty.m_fRotationSpeed==0.0f && byRotationType!=CParticleProperty::ROTATION_TYPE_TIME_EVENT)
-	{
 		byRotationType = CParticleProperty::ROTATION_TYPE_NONE;
-	}
 	else if (byRotationType==CParticleProperty::ROTATION_TYPE_RANDOM_DIRECTION)
-	{
 		byRotationType = (random()&1)?CParticleProperty::ROTATION_TYPE_CW:CParticleProperty::ROTATION_TYPE_CCW;
-	}
 
 	switch(byRotationType)
 	{
 		case CParticleProperty::ROTATION_TYPE_TIME_EVENT:
-			pInstance->m_pDecorator=pInstance->m_pDecorator->AddChainFront(
-				new CRotationDecorator());
+			pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(new CRotationDecorator());
 			pInstance->m_pDecorator=pInstance->m_pDecorator->AddChainFront(
 				new CRotationSpeedValueDecorator(m_ParticleProperty.m_TimeEventRotation,&pInstance->m_fRotationSpeed));
 			break;
 
 		case CParticleProperty::ROTATION_TYPE_CW:
 			pInstance->m_fRotationSpeed = m_ParticleProperty.m_fRotationSpeed;
-			pInstance->m_pDecorator=pInstance->m_pDecorator->AddChainFront(
-				new CRotationDecorator());
+			pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(new CRotationDecorator());
 			break;
 
 		case CParticleProperty::ROTATION_TYPE_CCW:
 			pInstance->m_fRotationSpeed = - m_ParticleProperty.m_fRotationSpeed;
-			pInstance->m_pDecorator=pInstance->m_pDecorator->AddChainFront(
-				new CRotationDecorator());
-			break;		
+			pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(new CRotationDecorator());
+			break;
 	}
 
 	/////
@@ -416,9 +380,5 @@ void CParticleSystemData::BuildDecorator(CParticleInstance * pInstance)
 	pInstance->m_pDecorator=pInstance->m_pDecorator->AddChainFront(new CHeaderDecorator);
 }
 
-CParticleSystemData::CParticleSystemData()
-{
-}
-CParticleSystemData::~CParticleSystemData()
-{
-}
+CParticleSystemData::CParticleSystemData() = default;
+CParticleSystemData::~CParticleSystemData() = default;

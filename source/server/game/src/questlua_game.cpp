@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #include "questlua.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "desc_client.h"
 #include "char.h"
 #include "item_manager.h"
 #include "item.h"
 #include "cmd.h"
 #include "packet.h"
+#include "desc_manager.h"
+#include "party.h"
 
 #undef sys_err
 #ifndef __WIN32__
@@ -43,8 +45,14 @@ namespace quest
 
 	int32_t game_request_make_guild(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
-		LPDESC d = q.GetCurrentCharacterPtr()->GetDesc();
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch) 
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		LPDESC d = ch->GetDesc();
 		if (d)
 		{
 			uint8_t header = HEADER_GC_REQUEST_MAKE_GUILD;
@@ -55,29 +63,57 @@ namespace quest
 
 	int32_t game_get_safebox_level(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
-		lua_pushnumber(L, q.GetCurrentCharacterPtr()->GetSafeboxSize()/SAFEBOX_PAGE_SIZE);
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		lua_pushnumber(L, ch->GetSafeboxSize()/SAFEBOX_PAGE_SIZE);
 		return 1;
 	}
 
 	int32_t game_set_safebox_level(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
 
-		//q.GetCurrentCharacterPtr()->ChangeSafeboxSize(3*(int32_t)lua_tonumber(L,-1));
+		LPDESC d = ch->GetDesc();
+		if (!d)
+		{
+			sys_err("Null desc pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
+		if (!lua_isnumber(L, -1))
+		{
+			sys_err("wrong arg");
+			return 0;
+		}
+
 		TSafeboxChangeSizePacket p;
-		p.dwID = q.GetCurrentCharacterPtr()->GetDesc()->GetAccountTable().id;
+		p.dwID = d->GetAccountTable().id;
 		p.bSize = (int32_t)lua_tonumber(L,-1);
-		db_clientdesc->DBPacket(HEADER_GD_SAFEBOX_CHANGE_SIZE,  q.GetCurrentCharacterPtr()->GetDesc()->GetHandle(), &p, sizeof(p));
+		db_clientdesc->DBPacket(HEADER_GD_SAFEBOX_CHANGE_SIZE,  d->GetHandle(), &p, sizeof(p));
 
-		q.GetCurrentCharacterPtr()->SetSafeboxSize(SAFEBOX_PAGE_SIZE * (int32_t)lua_tonumber(L,-1));
+		ch->SetSafeboxSize(SAFEBOX_PAGE_SIZE * (int32_t)lua_tonumber(L,-1));
 		return 0;
 	}
 
 	int32_t game_open_safebox(lua_State* /*L*/)
 	{
-		CQuestManager& q = CQuestManager::instance();
-		LPCHARACTER ch = q.GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
 		ch->SetSafeboxOpenPosition();
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "ShowMeSafeboxPassword");
 		return 0;
@@ -85,8 +121,13 @@ namespace quest
 
 	int32_t game_open_mall(lua_State* /*L*/)
 	{
-		CQuestManager& q = CQuestManager::instance();
-		LPCHARACTER ch = q.GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
+
 		ch->SetSafeboxOpenPosition();
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "ShowMeMallPassword");
 		return 0;
@@ -94,11 +135,18 @@ namespace quest
 
 	int32_t game_drop_item(lua_State* L)
 	{
-		//
-		// Syntax: game.drop_item(50050, 1)
-		//
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
 
+		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2))
+		{
+			sys_err("wrong arg");
+			return 0;
+		}
 		uint32_t item_vnum = (uint32_t) lua_tonumber(L, 1);
 		int32_t count = (int32_t) lua_tonumber(L, 2);
 		int32_t x = ch->GetX();
@@ -112,7 +160,7 @@ namespace quest
 			return 0;
 		}
 
-		PIXEL_POSITION pos;
+		GPOS pos;
 		pos.x = x + number(-200, 200);
 		pos.y = y + number(-200, 200);
 
@@ -125,6 +173,11 @@ namespace quest
 	int32_t game_drop_item_with_ownership(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
+			return 0;
+		}
 
 		LPITEM item = nullptr;
 		switch (lua_gettop(L))
@@ -140,7 +193,7 @@ namespace quest
 			return 0;
 		}
 
-		if ( item == nullptr )
+		if (!item)
 		{
 			return 0;
 		}
@@ -160,7 +213,7 @@ namespace quest
 		else
 			item->SetOwnership( ch );
 
-		PIXEL_POSITION pos;
+		GPOS pos;
 		pos.x = ch->GetX() + number(-200, 200);
 		pos.y = ch->GetY() + number(-200, 200);
 
@@ -173,14 +226,165 @@ namespace quest
 	int32_t game_web_mall(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-
-		if ( ch != nullptr )
-		{
+		if (ch)
 			do_in_game_mall(ch, const_cast<char*>(""), 0, 0);
-		}
+
 		return 0;
 	}
+
+#ifdef ENABLE_DICE_SYSTEM
+	int32_t game_drop_item_with_ownership_and_dice(lua_State* L)
+	{
+		CItem * item = nullptr;
+		switch (lua_gettop(L))
+		{
+		case 1:
+			item = ITEM_MANAGER::instance().CreateItem((uint32_t)lua_tonumber(L, 1));
+			break;
+		case 2:
+		case 3:
+			item = ITEM_MANAGER::instance().CreateItem((uint32_t)lua_tonumber(L, 1), (int32_t)lua_tonumber(L, 2));
+			break;
+		default:
+			return 0;
+		}
+
+		if (item == nullptr)
+		{
+			return 0;
+		}
+
+		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (ch->GetParty())
+		{
+			FPartyDropDiceRoll f(item, ch);
+			f.Process(nullptr);
+		}
+
+		if (lua_isnumber(L, 3))
+		{
+			int32_t sec = (int32_t)lua_tonumber(L, 3);
+			if (sec <= 0)
+			{
+				item->SetOwnership(ch);
+			}
+			else
+			{
+				item->SetOwnership(ch, sec);
+			}
+		}
+		else
+			item->SetOwnership(ch);
+
+		GPOS pos;
+		pos.x = ch->GetX() + number(-200, 200);
+		pos.y = ch->GetY() + number(-200, 200);
+
+		item->AddToGround(ch->GetMapIndex(), pos);
+		item->StartDestroyEvent();
+
+		return 0;
+	}
+#endif
+
 	
+	int32_t game_drop_item_and_select(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+			return 0;
+
+		CItem* item = nullptr;
+		bool bHasOwnership = false;
+		int32_t iOwnershipTime = 0;
+
+		switch (lua_gettop(L))
+		{
+			case 1:
+				if (!lua_isnumber(L, 1))
+				{
+					sys_err("Invalid arguments..");
+					return 0;
+				}
+				item = ITEM_MANAGER::instance().CreateItem((uint32_t)lua_tonumber(L, 1));
+				break;
+
+			case 2:
+			case 3:
+			case 4:
+				if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2))
+				{
+					sys_err("Invalid arguments..");
+					return 0;
+				}
+				item = ITEM_MANAGER::instance().CreateItem((uint32_t)lua_tonumber(L, 1), (int32_t)lua_tonumber(L, 2));
+				bHasOwnership = lua_isboolean(L, 3) ? (bool)lua_toboolean(L, 3) : false;
+				iOwnershipTime = lua_isnumber(L, 4) ? (int32_t)lua_tonumber(L, 4) : 250;
+				break;
+
+			default:
+				sys_err("Invalid arguments..");
+				return 0;
+		}
+
+		if (!item)
+		{
+			sys_err("Cannot created item, error occurred.");
+			return 0;
+		}
+
+		// SELECT_ITEM
+		CQuestManager::Instance().SetCurrentItem(item);
+		// END_OF_SELECT_ITEM
+
+		if (bHasOwnership)
+			item->SetOwnership(ch, iOwnershipTime);
+
+		GPOS pos;
+		pos.x = ch->GetX() + number(-100, 100);
+		pos.y = ch->GetY() + number(-100, 100);
+
+		item->AddToGround(ch->GetMapIndex(), pos);
+		item->StartDestroyEvent();
+
+		return 0;
+	}
+
+	int32_t game_drop_map(lua_State* L)
+	{
+		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		if (!ch)
+			return 0;
+
+		CItem* item = nullptr;
+		if (lua_isnumber(L, 1))
+			item = ITEM_MANAGER::instance().CreateItem((uint32_t)lua_tonumber(L, 1));
+
+		if (!item)
+			return 0;
+
+		uint32_t kordx = 0;
+		if (lua_isnumber(L, 2))
+			kordx = ((uint32_t)lua_tonumber(L, 2));
+
+		uint32_t kordy = 0;
+		if (lua_isnumber(L, 3))
+			kordy = ((uint32_t)lua_tonumber(L, 3));
+
+		if (!kordx || !kordy)
+			return 0;
+
+		GPOS pos;
+		pos.x = kordx;
+		pos.y = kordy;
+
+		item->AddToGround(ch->GetMapIndex(), pos);
+		item->StartDestroyEvent();
+		item->SetOwnership(ch);
+
+		return 0;
+	}
+
 	void RegisterGameFunctionTable()
 	{
 		luaL_reg game_functions[] = 
@@ -194,7 +398,12 @@ namespace quest
 			{ "set_event_flag",				game_set_event_flag				},
 			{ "drop_item",					game_drop_item					},
 			{ "drop_item_with_ownership",	game_drop_item_with_ownership	},
+#ifdef ENABLE_DICE_SYSTEM
+			{ "drop_item_with_ownership_and_dice",	game_drop_item_with_ownership_and_dice },
+#endif
 			{ "open_web_mall",				game_web_mall					},
+			{ "drop_item_and_select",       game_drop_item_and_select       },
+			{ "drop_item_in_map",			game_drop_map					},
 
 			{ nullptr,					nullptr				}
 		};

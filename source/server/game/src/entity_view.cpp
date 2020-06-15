@@ -1,47 +1,42 @@
 #include "stdafx.h"
-
 #include "utils.h"
 #include "char.h"
 #include "sectree_manager.h"
 #include "config.h"
+#include "Battleground.h"
 
 void CEntity::ViewCleanup()
 {
-	ENTITY_MAP::iterator it = m_map_view.begin();
+	for (const auto& p : m_mapView)
+		p.first->ViewRemove(this, false);
 
-	while (it != m_map_view.end())
-	{
-		LPENTITY entity = it->first;
-		++it;
-
-		entity->ViewRemove(this, false);
-	}
-
-	m_map_view.clear();
+	m_mapView.clear();
 }
 
 void CEntity::ViewReencode()
 {
-	if (m_bIsObserver)
+	if (m_isObserver)
 		return;
 
 	EncodeRemovePacket(this);
 	EncodeInsertPacket(this);
 
-	ENTITY_MAP::iterator it = m_map_view.begin();
-
-	while (it != m_map_view.end())
+	for (const auto& p : m_mapView) 
 	{
-		LPENTITY entity = (it++)->first;
+		auto entity = p.first;
 
-		EncodeRemovePacket(entity);
-		if (!m_bIsObserver)
+		if (!m_isObserver) 
+		{
+			EncodeRemovePacket(entity);
 			EncodeInsertPacket(entity);
+		}
 
-		if (!entity->m_bIsObserver)
+		if (!entity->m_isObserver) 
+		{
+			entity->EncodeRemovePacket(this);
 			entity->EncodeInsertPacket(this);
+		}
 	}
-
 }
 
 void CEntity::ViewInsert(LPENTITY entity, bool recursive)
@@ -49,17 +44,14 @@ void CEntity::ViewInsert(LPENTITY entity, bool recursive)
 	if (this == entity)
 		return;
 
-	ENTITY_MAP::iterator it = m_map_view.find(entity);
-
-	if (m_map_view.end() != it)
+	auto r = m_mapView.emplace(entity, m_viewAge);
+	if (!r.second) 
 	{
-		it->second = m_iViewAge;
+		r.first->second = m_viewAge;
 		return;
 	}
 
-	m_map_view.insert(ENTITY_MAP::value_type(entity, m_iViewAge));
-
-	if (!entity->m_bIsObserver)
+	if (!entity->m_isObserver)
 		entity->EncodeInsertPacket(this);
 
 	if (recursive)
@@ -68,170 +60,82 @@ void CEntity::ViewInsert(LPENTITY entity, bool recursive)
 
 void CEntity::ViewRemove(LPENTITY entity, bool recursive)
 {
-	ENTITY_MAP::iterator it = m_map_view.find(entity);
-
-	if (it == m_map_view.end())
+	auto it = m_mapView.find(entity);
+	if (it == m_mapView.end())
 		return;
 
-	m_map_view.erase(it);
+	m_mapView.erase(it);
 
-	if (!entity->m_bIsObserver)
+	if (!entity->m_isObserver)
 		entity->EncodeRemovePacket(this);
 
 	if (recursive)
 		entity->ViewRemove(this, false);
 }
 
-class CFuncViewInsert
-{
-	private:
-		int32_t dwViewRange;
-
-	public:
-		LPENTITY m_me;
-
-		CFuncViewInsert(LPENTITY ent) :
-			dwViewRange(VIEW_RANGE + VIEW_BONUS_RANGE),
-			m_me(ent)
-		{
-		}
-
-		void operator () (LPENTITY ent)
-		{
-			// 오브젝트가 아닌 것은 거리를 계산하여 거리가 멀면 추가하지 않는다.
-			if (!ent->IsType(ENTITY_OBJECT))
-				if (DISTANCE_APPROX(ent->GetX() - m_me->GetX(), ent->GetY() - m_me->GetY()) > dwViewRange)
-					return;
-
-			// 나를 대상에 추가
-			m_me->ViewInsert(ent);
-
-			// 둘다 캐릭터면
-			if (ent->IsType(ENTITY_CHARACTER) && m_me->IsType(ENTITY_CHARACTER))
-			{
-				LPCHARACTER chMe = (LPCHARACTER) m_me;
-				LPCHARACTER chEnt = (LPCHARACTER) ent;
-
-				// 대상이 NPC면 StateMachine을 킨다.
-				if (chMe->IsPC() && !chEnt->IsPC() && !chEnt->IsWarp() && !chEnt->IsGoto())
-					chEnt->StartStateMachine();
-			}
-		}
-};
-
 void CEntity::UpdateSectree()
 {
-	if (!GetSectree())
+	if (!GetSectree()) 
 	{
-		if (IsType(ENTITY_CHARACTER))
+		if (IsType(ENTITY_CHARACTER)) 
 		{
-			LPCHARACTER tch = (LPCHARACTER) this;
-			sys_err("null sectree name: %s %d %d",  tch->GetName(), GetX(), GetY());
+			auto tch = static_cast<CHARACTER*>(this);
+			sys_err("null sectree name: %s %d %d", tch->GetName(), GetX(), GetY());
 		}
 
 		return;
 	}
 
-	++m_iViewAge;
+	++m_viewAge;
 
-	CFuncViewInsert f(this); // 나를 섹트리에 있는 사람들에게 추가
-	GetSectree()->ForEachAround(f);
-
-	ENTITY_MAP::iterator it, this_it;
-
-	//
-	// m_map_view에서 필요 없는 녀석들 지우기
-	// 
-	if (m_bObserverModeChange)
+	auto f = [&](LPENTITY ent)
 	{
-		if (m_bIsObserver)
+		// Objects that are not objects are calculated by distance.
+		if (!ent->IsType(ENTITY_OBJECT) /* && !CBattlegroundManager::instance().IsEventMap(m_mapIndex) */)
 		{
-			it = m_map_view.begin();
-
-			while (it != m_map_view.end())
-			{
-				this_it = it++;
-				if (this_it->second < m_iViewAge)
-				{
-					LPENTITY ent = this_it->first;
-
-					// 나로 부터 상대방을 지운다.
-					ent->EncodeRemovePacket(this);
-					m_map_view.erase(this_it);
-
-					// 상대로 부터 나를 지운다.
-					ent->ViewRemove(this, false);
-				}
-				else
-				{
-
-					LPENTITY ent = this_it->first;
-
-					// 나로 부터 상대방을 지운다.
-					//ent->EncodeRemovePacket(this);
-					//m_map_view.erase(this_it);
-
-					// 상대로 부터 나를 지운다.
-					//ent->ViewRemove(this, false);
-					EncodeRemovePacket(ent);
-				}
-			}
-		}
-		else
-		{
-			it = m_map_view.begin();
-
-			while (it != m_map_view.end())
-			{
-				this_it = it++;
-
-				if (this_it->second < m_iViewAge)
-				{
-					LPENTITY ent = this_it->first;
-
-					// 나로 부터 상대방을 지운다.
-					ent->EncodeRemovePacket(this);
-					m_map_view.erase(this_it);
-
-					// 상대로 부터 나를 지운다.
-					ent->ViewRemove(this, false);
-				}
-				else
-				{
-					LPENTITY ent = this_it->first;
-					ent->EncodeInsertPacket(this);
-					EncodeInsertPacket(ent);
-
-					ent->ViewInsert(this, true);
-				}
-			}
+			if (DISTANCE_APPROX(ent->GetX() - this->GetX(), ent->GetY() - this->GetY()) > VIEW_RANGE + VIEW_BONUS_RANGE)
+				return;
 		}
 
-		m_bObserverModeChange = false;
-	}
-	else
-	{
-		if (!m_bIsObserver)
+		// Add me to target
+		this->ViewInsert(ent);
+
+		// If both entities are characters
+		if (ent->IsType(ENTITY_CHARACTER) && this->IsType(ENTITY_CHARACTER)) 
 		{
-			it = m_map_view.begin();
+			auto chMe = static_cast<CHARACTER*>(this);
+			auto chEnt = static_cast<CHARACTER*>(ent);
 
-			while (it != m_map_view.end())
+			// If the target is an NPC, the StateMachine is started.
+			if (chMe->IsPC() && !chEnt->IsPC() && !chEnt->IsWarp() && !chEnt->IsGoto())
+				chEnt->StartStateMachine();
+		}
+	};
+
+	GetSectree()->ForEachAround(f); // PC ONLY
+//	GetSectree()->ForEachEntity(f);
+
+	auto it = m_mapView.begin();
+	auto end = m_mapView.end();
+
+	while (it != end) 
+	{
+		if (it->second < m_viewAge) 
+		{
+			auto entity = it->first;
+			if (entity && entity->IsType(ENTITY_CHARACTER) && (static_cast<CHARACTER*>(entity)->IsDead() || !entity->IsBattlegroundEntity()))
 			{
-				this_it = it++;
+				if (!entity->m_isObserver)
+					entity->EncodeRemovePacket(this);
 
-				if (this_it->second < m_iViewAge)
-				{
-					LPENTITY ent = this_it->first;
+				entity->ViewRemove(this, false);
 
-					// 나로 부터 상대방을 지운다.
-					ent->EncodeRemovePacket(this);
-					m_map_view.erase(this_it);
-
-					// 상대로 부터 나를 지운다.
-					ent->ViewRemove(this, false);
-				}
+				it = m_mapView.erase(it);
 			}
+		} 
+		else 
+		{
+			++it;
 		}
 	}
 }
-

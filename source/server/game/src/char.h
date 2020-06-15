@@ -2,7 +2,9 @@
 #define __INC_METIN_II_CHAR_H__
 
 #include <unordered_map>
+
 #include "../../common/stl.h"
+#include "../../common/service.h"
 #include "entity.h"
 #include "FSM.h"
 #include "horse_rider.h"
@@ -12,27 +14,35 @@
 #include "affect_flag.h"
 #include "cube.h"
 #include "mining.h"
-#include "../../common/service.h"
+#include "abuse.h"
+#include "sectree_manager.h"
+#include "GPosition.h"
+#include "activity.h"
 
-#define ENABLE_ANTI_CMD_FLOOD
-#define ENABLE_OPEN_SHOP_WITH_ARMOR
 enum eMountType {MOUNT_TYPE_NONE=0, MOUNT_TYPE_NORMAL=1, MOUNT_TYPE_COMBAT=2, MOUNT_TYPE_MILITARY=3};
 eMountType GetMountLevelByVnum(uint32_t dwMountVnum, bool IsNew);
-const uint32_t GetRandomSkillVnum(uint8_t bJob = JOB_MAX_NUM);
+uint32_t GetRandomSkillVnum(uint8_t bJob = JOB_MAX_NUM);
 
 class CBuffOnAttributes;
 class CPetSystem;
+class CBattleground;
 
-#define INSTANT_FLAG_DEATH_PENALTY		(1 << 0)
-#define INSTANT_FLAG_SHOP			(1 << 1)
-#define INSTANT_FLAG_EXCHANGE			(1 << 2)
-#define INSTANT_FLAG_STUN			(1 << 3)
-#define INSTANT_FLAG_NO_REWARD			(1 << 4)
+enum EInstantFlags
+{
+	INSTANT_FLAG_DEATH_PENALTY	= (1 << 0),
+	INSTANT_FLAG_SHOP			= (1 << 1),
+	INSTANT_FLAG_EXCHANGE		= (1 << 2),
+	INSTANT_FLAG_STUN			= (1 << 3),
+	INSTANT_FLAG_NO_REWARD		= (1 << 4),
+};
 
-#define AI_FLAG_NPC				(1 << 0)
-#define AI_FLAG_AGGRESSIVE			(1 << 1)
-#define AI_FLAG_HELPER				(1 << 2)
-#define AI_FLAG_STAYZONE			(1 << 3)
+enum EAiFlags
+{
+	AI_FLAG_NPC 			= (1 << 0),
+	AI_FLAG_AGGRESSIVE		= (1 << 1),
+	AI_FLAG_HELPER			= (1 << 2),
+	AI_FLAG_STAYZONE		= (1 << 3),
+};
 
 extern int32_t g_nPortalLimitTime;
 
@@ -52,7 +62,7 @@ enum
 	MAIN_RACE_MAX_NUM,
 };
 
-enum
+enum EOther
 {
 	POISON_LENGTH = 30,
 #ifdef ENABLE_WOLFMAN_CHARACTER
@@ -66,7 +76,7 @@ enum
 	SUMMON_MONSTER_COUNT = 3,
 };
 
-enum
+enum FlyTypes
 {
 	FLY_NONE,
 	FLY_EXP,
@@ -104,6 +114,7 @@ enum EDamageType
 #ifdef ENABLE_WOLFMAN_CHARACTER
 	DAMAGE_TYPE_BLEEDING,
 #endif
+	DAMAGE_TYPE_MAX_NUM,
 };
 
 enum DamageFlag
@@ -322,9 +333,7 @@ enum EPointTypes
 #ifdef ENABLE_ACCE_SYSTEM
 	POINT_ACCEDRAIN_RATE = 143,
 #endif
-#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
 	POINT_RESIST_MAGIC_REDUCTION = 144,
-#endif
 
 	//POINT_MAX_NUM = 129	common/length.h
 };
@@ -540,7 +549,6 @@ namespace marriage
 	class WeddingMap;
 }
 
-#define NEW_ICEDAMAGE_SYSTEM
 class CHARACTER : public CEntity, public CFSM, public CHorseRider
 {
 	protected:
@@ -548,6 +556,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// Entity 관련
 		virtual void	EncodeInsertPacket(LPENTITY entity);
 		virtual void	EncodeRemovePacket(LPENTITY entity);
+		virtual void	PacketView(const void * data, int32_t bytes, LPENTITY except = nullptr);
 		//////////////////////////////////////////////////////////////////////////////////
 
 	public:
@@ -598,10 +607,15 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void				SetAttackMob();
 		bool				IsAttackMob() const;
 
+		void				SetNoMove();
+
+		bool				CanNPCFollowTarget(LPCHARACTER pkTarget);
+
 		virtual void			BeginStateEmpty();
 		virtual void			EndStateEmpty() {}
 
 		void				RestartAtSamePos();
+		void				RestartAtPos(int32_t lX, int32_t lY);
 
 	protected:
 		uint32_t				m_dwStateDuration;
@@ -611,7 +625,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		CHARACTER();
 		virtual ~CHARACTER();
 
-		void			Create(const char * c_pszName, uint32_t vid, bool isPC);
+		void			Create(std::string stName, uint32_t vid, bool isPC);
 		void			Destroy();
 
 		void			Disconnect(const char * c_pszReason);
@@ -635,6 +649,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			FlushDelayedSaveItem();
 
 		const char *	GetName() const;
+		std::string	GetStringName() const;
+		const char* GetProtoName() const;
+
 		const VID &		GetVID() const		{ return m_vid;		}
 
 		void			SetName(const std::string& name) { m_stName = name; }
@@ -665,9 +682,16 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		int32_t				GetLevel() const		{ return m_points.level;	}
 		void			SetLevel(uint8_t level);
 
-		uint8_t			GetGMLevel() const;
+		uint8_t			GetGMLevel(bool bIgnoreTestServer = false) const;
 		BOOL 			IsGM() const;
 		void			SetGMLevel(); 
+
+		bool			IsGMInvisible() const { return m_bGMInvisible; }
+		bool			IsGMInvisibleChanged() const { return m_bGMInvisibleChanged; }
+		void			SetGMInvisible(bool bActive);
+		void			ResetGMInvisibleChanged() { m_bGMInvisibleChanged = false; }
+
+		int32_t				GetChannel() const;
 
 		uint32_t			GetExp() const		{ return m_points.exp;	}
 		void			SetExp(uint32_t exp)	{ m_points.exp = exp;	}
@@ -675,6 +699,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		LPCHARACTER		DistributeExp();	// 제일 많이 때린 사람을 리턴한다.
 		void			DistributeHP(LPCHARACTER pkKiller);
 		void			DistributeSP(LPCHARACTER pkKiller, int32_t iMethod=0);
+		bool			CanFall();
 #ifdef __ENABLE_KILL_EVENT_FIX__
 		LPCHARACTER		GetMostAttacked();
 #endif
@@ -718,6 +743,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		void			SetPoint(uint8_t idx, int32_t val);
 		int32_t				GetPoint(uint8_t idx) const;
+		int32_t				GetConvPoint(uint8_t idx) const;
 		int32_t				GetLimitPoint(uint8_t idx) const;
 		int32_t				GetPolymorphPoint(uint8_t idx) const;
 
@@ -767,7 +793,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			ApplyPoint(uint8_t bApplyType, int32_t iVal);
 		void			CheckMaximumPoints();	// HP, SP 등의 현재 값이 최대값 보다 높은지 검사하고 높다면 낮춘다.
 
-		bool			Show(int32_t lMapIndex, int32_t x, int32_t y, int32_t z = LONG_MAX, bool bShowSpawnMotion = false);
+		bool			Show(int32_t lMapIndex, int32_t x, int32_t y, int32_t z = INT_MAX, bool bShowSpawnMotion = false);
 
 		void			Sitdown(int32_t is_ground);
 		void			Standup();
@@ -794,15 +820,21 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		uint32_t			GetPolymorphVnum() const	{ return m_dwPolymorphRace; }
 		int32_t				GetPolymorphPower() const;
 
+		void			StartAnticheatCommunication();
+	    void            StartCheckWallhack();
+
 		// FISING	
+		bool            IsNearWater() const;
 		void			fishing();
 		void			fishing_take();
+		bool 			IsFishing() const { return m_pkFishingEvent ? true : false; }
 		// END_OF_FISHING
 
 		// MINING
 		void			mining(LPCHARACTER chLoad);
 		void			mining_cancel();
 		void			mining_take();
+		bool 			IsMining() const { return m_pkMiningEvent ? true : false; }
 		// END_OF_MINING
 
 		void			ResetPlayTime(uint32_t dwTimeRemain = 0);
@@ -812,6 +844,10 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			ResetChatCounter();
 		uint8_t			IncreaseChatCounter();
 		uint8_t			GetChatCounter() const;
+
+		bool			IsExpBlocked() { return block_exp; }
+		void			BlockExp() { block_exp = true; }
+		void			UnblockExp() { block_exp = false; }
 
 	protected:
 		uint32_t			m_dwPolymorphRace;
@@ -825,11 +861,22 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		CHARACTER_POINT		m_points;
 		CHARACTER_POINT_INSTANT	m_pointsInstant;
 
+		GPOS			m_lastMoveAblePos;
+		int32_t			m_lastMoveableMapIndex;
+        
+		LPEVENT			m_pkAnticheatEvent;
+		LPEVENT         m_pkCheckWallHackEvent;
+
+		bool			block_exp;
+
 		int32_t				m_iMoveCount;
 		uint32_t			m_dwPlayStartTime;
 		uint8_t			m_bAddChrState;
 		bool			m_bSkipSave;
 		uint8_t			m_bChatCounter;
+
+		bool			m_bGMInvisible;
+		bool			m_bGMInvisibleChanged;
 
 		// End of Basic Points
 
@@ -844,6 +891,8 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			SetNowWalking(bool bWalkFlag);	
 		void			ResetWalking()			{ SetNowWalking(m_bWalking); }
 
+		void			SetMovingWay(const TNPCMovingPosition* pWay, int32_t iMaxNum, bool bRepeat = false, bool bLocal = false);
+		bool			DoMovingWay();
 		bool			Goto(int32_t x, int32_t y);	// 바로 이동 시키지 않고 목표 위치로 BLENDING 시킨다.
 		void			Stop();
 
@@ -870,8 +919,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		bool			WarpSet(int32_t x, int32_t y, int32_t lRealMapIndex = 0);
 		void			SetWarpLocation(int32_t lMapIndex, int32_t x, int32_t y);
+		void			GetExitLocation(int32_t& lMapIndex, int32_t& x, int32_t& y);
 		void			WarpEnd();
-		const PIXEL_POSITION & GetWarpPosition() const { return m_posWarp; }
+		const GPOS & GetWarpPosition() const { return m_posWarp; }
 		bool			WarpToPID(uint32_t dwPID);
 
 		void			SaveExitLocation();
@@ -885,6 +935,26 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			ResetStopTime();
 		uint32_t			GetStopTime() const;
 
+        const GPOS& GetLastMoveAblePosition(int32_t index = 0)
+        {
+            return m_lastMoveAblePos;
+        }
+
+        void SetLastMoveAblePosition(const GPOS& lastPos)
+        {
+            m_lastMoveAblePos = lastPos;
+        }
+
+        void SetLastMoveableMapIndex()
+        {
+            m_lastMoveableMapIndex = GetMapIndex();
+        }
+
+        int32_t GetLastMoveableMapIndex()
+        {
+            return m_lastMoveableMapIndex;
+        }
+
 	protected:
 		void			ClearSync();
 
@@ -892,12 +962,19 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		LPCHARACTER		m_pkChrSyncOwner;
 		CHARACTER_LIST	m_kLst_pkChrSyncOwned;	// 내가 SyncOwner인 자들
 
-		PIXEL_POSITION	m_posDest;
-		PIXEL_POSITION	m_posStart;
-		PIXEL_POSITION	m_posWarp;
+		const TNPCMovingPosition*	m_pMovingWay;
+		int32_t							m_iMovingWayIndex;
+		int32_t							m_iMovingWayMaxNum;
+		bool						m_bMovingWayRepeat;
+		int32_t						m_lMovingWayBaseX;
+		int32_t						m_lMovingWayBaseY;
+
+		GPOS	m_posDest;
+		GPOS	m_posStart;
+		GPOS	m_posWarp;
 		int32_t			m_lWarpMapIndex;
 
-		PIXEL_POSITION	m_posExit;
+		GPOS	m_posExit;
 		int32_t			m_lExitMapIndex;
 
 		uint32_t			m_dwMoveStartTime;
@@ -1091,16 +1168,17 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		void			ClearItem();
 #ifdef ENABLE_HIGHLIGHT_NEW_ITEM
-		void			SetItem(TItemPos Cell, LPITEM item, bool bWereMine = false);
+		void			SetItem(const TItemPos & Cell, LPITEM item, bool bWereMine = false);
 #else
-		void			SetItem(TItemPos Cell, LPITEM item);
+		void			SetItem(const TItemPos & Cell, LPITEM item);
 #endif
-		LPITEM			GetItem(TItemPos Cell) const;
+		LPITEM			GetItem(const TItemPos & Cell) const;
 		LPITEM			GetInventoryItem(uint16_t wCell) const;
-		bool			IsEmptyItemGrid(TItemPos Cell, uint8_t size, int32_t iExceptionCell = -1) const;
+		bool			IsEmptyItemGrid(const TItemPos & Cell, uint8_t size, int32_t iExceptionCell = -1) const;
+		bool			IsEmptyItemGridSpecial(const TItemPos &Cell, uint8_t bSize, int32_t iExceptionCell, std::vector<uint16_t>& vec) const;
 
-		void			SetWear(uint8_t bCell, LPITEM item);
-		LPITEM			GetWear(uint8_t bCell) const;
+		void			SetWear(uint16_t bCell, LPITEM item);
+		LPITEM			GetWear(uint16_t bCell) const;
 
 		// MYSHOP_PRICE_LIST
 		void			UseSilkBotary(void); 		/// 비단 보따리 아이템의 사용
@@ -1115,8 +1193,11 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			UseSilkBotaryReal(const TPacketMyshopPricelistHeader* p);
 		// END_OF_MYSHOP_PRICE_LIST
 
-		bool			UseItemEx(LPITEM item, TItemPos DestCell);
-		bool			UseItem(TItemPos Cell, TItemPos DestCell = NPOS);
+		bool			UseItemEx(LPITEM item, const TItemPos & DestCell);
+		bool			UseItem(const TItemPos & Cell, const TItemPos & DestCell = NPOS);
+
+
+		bool			IsInSafezone();
 
 		// ADD_REFINE_BUILDING
 		bool			IsRefineThroughGuild() const;
@@ -1127,7 +1208,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// END_OF_ADD_REFINE_BUILDING
 
 		bool			RefineItem(LPITEM pkItem, LPITEM pkTarget);
-		bool			DropItem(TItemPos Cell,  uint8_t bCount=0);
+		bool			DropItem(const TItemPos &Cell,  uint8_t bCount=0);
 		bool			GiveRecallItem(LPITEM item);
 		void			ProcessRecallItem(LPITEM item);
 
@@ -1140,18 +1221,18 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// END_OF_ADD_MONSTER_REFINE
 
 		bool			DoRefineWithScroll(LPITEM item);
-		bool			RefineInformation(uint8_t bCell, uint8_t bType, int32_t iAdditionalCell = -1);
+		bool			RefineInformation(uint16_t bCell, uint8_t bType, int32_t iAdditionalCell = -1);
 
 		void			SetRefineMode(int32_t iAdditionalCell = -1);
 		void			ClearRefineMode();
 
-		bool			GiveItem(LPCHARACTER victim, TItemPos Cell);
+		bool			GiveItem(LPCHARACTER victim, const TItemPos &Cell);
 		bool			CanReceiveItem(LPCHARACTER from, LPITEM item) const;
 		void			ReceiveItem(LPCHARACTER from, LPITEM item);
 		bool			GiveItemFromSpecialItemGroup(uint32_t dwGroupNum, std::vector <uint32_t> &dwItemVnums, 
 							std::vector <uint32_t> &dwItemCounts, std::vector <LPITEM> &item_gets, int32_t &count);
 
-		bool			MoveItem(TItemPos pos, TItemPos change_pos, uint8_t num);
+		bool			MoveItem(const TItemPos &pos, TItemPos change_pos, uint8_t num);
 		bool			PickupItem(uint32_t vid);
 		bool			EquipItem(LPITEM item, int32_t iCandidateCell = -1);
 		bool			UnequipItem(LPITEM item);
@@ -1162,9 +1243,11 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// 착용중인 item을 벗을 수 있는 지 확인하고, 불가능 하다면 캐릭터에게 이유를 알려주는 함수
 		bool			CanUnequipNow(const LPITEM item, const TItemPos& srcCell = NPOS, const TItemPos& destCell = NPOS);
 
-		bool			SwapItem(uint8_t bCell, uint8_t bDestCell);
+		bool			SwapItem(uint16_t bCell, uint16_t bDestCell);
+		int32_t				GetEmptyInventoryCount(uint8_t size) const;
 		LPITEM			AutoGiveItem(uint32_t dwItemVnum, uint8_t bCount=1, int32_t iRarePct = -1, bool bMsg = true);
 		void			AutoGiveItem(LPITEM item, bool longOwnerShip = false);
+		int32_t				GetEmptyDragonSoulInventoryWithExceptions(LPITEM pItem, std::vector<uint16_t>& vec /*= -1*/) const;
 		
 		int32_t				GetEmptyInventory(uint8_t size) const;
 		int32_t				GetEmptyDragonSoulInventory(LPITEM pItem) const;
@@ -1219,14 +1302,14 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// Shop related
 	public:
 		void			SetShop(LPSHOP pkShop);
-		LPSHOP			GetShop() const { return m_pkShop; }
+		LPSHOP			GetShop() const { return m_pkShop; };
 		void			ShopPacket(uint8_t bSubHeader);
 
-		void			SetShopOwner(LPCHARACTER ch) { m_pkChrShopOwner = ch; }
-		LPCHARACTER		GetShopOwner() const { return m_pkChrShopOwner;}
+		void			SetShopOwner(LPCHARACTER ch) { m_pkChrShopOwner = ch; };
+		LPCHARACTER		GetShopOwner() const { return m_pkChrShopOwner; };
 
 		void			OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, uint8_t bItemCount);
-		LPSHOP			GetMyShop() const { return m_pkMyShop; }
+		LPSHOP			GetMyShop() const { return m_pkMyShop; };
 		void			CloseMyShop();
 
 	protected:
@@ -1287,6 +1370,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool				IsDead() const;
 		void				Dead(LPCHARACTER pkKiller = nullptr, bool bImmediateDead=false);
 
+		void				SetNoRewardFlag() { SET_BIT(m_pointsInstant.instant_flag, INSTANT_FLAG_NO_REWARD); }
+		void				RemoveNoRewardFlag() { REMOVE_BIT(m_pointsInstant.instant_flag, INSTANT_FLAG_NO_REWARD); }
+		bool				HasNoRewardFlag() const { return IS_SET(m_pointsInstant.instant_flag, INSTANT_FLAG_NO_REWARD); }
 		void				Reward(bool bItemDrop);
 		void				RewardGold(LPCHARACTER pkAttacker);
 
@@ -1415,7 +1501,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool				IsLearnableSkill(uint32_t dwSkillVnum) const;
 		// END_OF_ADD_GRANDMASTER_SKILL
 
-		bool				CheckSkillHitCount(const uint8_t SkillID, const VID dwTargetVID);
+		bool				CheckSkillHitCount(const uint8_t SkillID, const VID & dwTargetVID);
 		bool				CanUseSkill(uint32_t dwSkillVnum) const;
 		bool				IsUsableSkillMotion(uint32_t dwMotionIndex) const;
 		int32_t					GetSkillLevel(uint32_t dwVnum) const;
@@ -1431,7 +1517,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 #ifdef ENABLE_WOLFMAN_CHARACTER
 		int32_t					ComputeSkillParty(uint32_t dwVnum, LPCHARACTER pkVictim, uint8_t bSkillLevel = 0);
 #endif
-		int32_t					ComputeSkillAtPosition(uint32_t dwVnum, const PIXEL_POSITION& posTarget, uint8_t bSkillLevel = 0);
+		int32_t					ComputeSkillAtPosition(uint32_t dwVnum, const GPOS& posTarget, uint8_t bSkillLevel = 0);
 		void				ComputeSkillPoints();
 
 		void				SetSkillGroup(uint8_t bSkillGroup); 
@@ -1495,6 +1581,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		//
 		// Skill levels
 		//
+	public:
+		const TPlayerSkill*	GetPlayerSkills() const { return m_pSkillLevels; }
+
 	protected:
 		TPlayerSkill*					m_pSkillLevels;
 		std::unordered_map<uint8_t, int32_t>		m_SkillDamageBonus;
@@ -1536,6 +1625,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 	public:
 		void				SetTarget(LPCHARACTER pkChrTarget);
+		void				SendTargetDrop();
 		void				BroadcastTargetPacket();
 		void				ClearTarget();
 		void				CheckTarget();
@@ -1588,9 +1678,49 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		CSafebox *			m_pkMall;
 		int32_t					m_iMallLoadTime;
 
-		PIXEL_POSITION		m_posSafeboxOpen;
+		GPOS		m_posSafeboxOpen;
 
 		////////////////////////////////////////////////////////////////////////////////////////
+
+	public:
+		void SetBattleground(CBattleground* pkBattleground, uint8_t nBGTeamID)
+		{
+			m_pkBattleground = pkBattleground;
+			m_nBGTeamID = nBGTeamID;
+			m_isBattlegroundEntity = true;
+		};
+		CBattleground*		GetBattleground() { return m_pkBattleground; };
+		uint8_t				GetBattlegroundTeamID() { return m_nBGTeamID; };
+		
+		void				RegisterBattlegroundMovingWay(uint8_t step, int32_t x, int32_t y);
+		void				MoveBattlegroundMinnion();
+		bool				DoMoveBattlegroundMinnion();
+
+		bool				HasBattlegroundMoveTarget() { return m_bBGHasMoveTarget && !m_bBGMoveCompleted; };
+		LPCHARACTER			GetEnemyNexus() { return m_pkCharBattlegroundEnemyNexus; };
+
+		void				SetBattlegroundProtege(LPCHARACTER pkChar) { m_pkCharBattlegroundProtege = pkChar; };
+		void				SetEnemyNexus(LPCHARACTER pkChar) { m_pkCharBattlegroundEnemyNexus = pkChar; };
+		
+	private:
+		CBattleground*		m_pkBattleground;
+		uint8_t				m_nBGTeamID;
+
+		GPOS				m_pkBattlegroundMobFirstMovePos;
+		GPOS				m_pkBattlegroundMobSecondMovePos;
+		GPOS				m_pkBattlegroundMobLastMovePos;
+
+		GPOS				m_pkBattlegroundCurrentMovePos;
+		uint8_t				m_nBGCurrentMovingWayIndex;
+
+		int32_t				m_nBGMovingWayBaseXpos; 
+		int32_t				m_nBGMovingWayBaseYpos; 
+		bool				m_bBGMoveCompleted;
+		bool				m_bBGHasMoveTarget;
+		bool				m_bBGHasMovedFirstTime;
+
+		LPCHARACTER			m_pkCharBattlegroundProtege;
+		LPCHARACTER			m_pkCharBattlegroundEnemyNexus;
 
 		////////////////////////////////////////////////////////////////////////////////////////
 		// Mounting
@@ -1615,7 +1745,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		virtual void		SendHorseInfo();
 		virtual	void		ClearHorseInfo();
 
-		void				HorseSummon(bool bSummon, bool bFromFar = false, uint32_t dwVnum = 0, const char* name = 0);
+		void				HorseSummon(bool bSummon, bool bFromFar = false, uint32_t dwVnum = 0);
 
 		LPCHARACTER			GetHorse() const			{ return m_chHorse; }	 // 현재 소환중인 말
 		LPCHARACTER			GetRider() const; // rider on horse
@@ -1623,7 +1753,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		bool				IsRiding() const;
 
-#ifdef __PET_SYSTEM__
 	public:
 		CPetSystem*			GetPetSystem()				{ return m_petSystem; }
 
@@ -1631,7 +1760,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		CPetSystem*			m_petSystem;
 
 	public:
-#endif 
 
 	protected:
 		LPCHARACTER			m_chHorse;
@@ -1661,7 +1789,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void				SetRegen(LPREGEN pkRegen);
 
 	protected:
-		PIXEL_POSITION			m_posRegen;
+		GPOS			m_posRegen;
 		float				m_fRegenAngle;
 		LPREGEN				m_pkRegen;
 		size_t				regen_id_; // to help dungeon regen identification
@@ -1838,32 +1966,32 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	public:
 		int32_t		GetSkillPowerByLevel(int32_t level, bool bMob = false) const;
 		
-		//PREVENT_REFINE_HACK
-		int32_t		GetRefineTime() const { return m_iRefineTime; }
-		void	SetRefineTime() { m_iRefineTime = thecore_pulse(); } 
-		int32_t		m_iRefineTime;
-		//END_PREVENT_REFINE_HACK
+		int32_t	GetRefineTime() const { return m_iRefineTime; }
+		void	SetRefineTime() { m_iRefineTime = thecore_pulse(); }
 
-		//RESTRICT_USE_SEED_OR_MOONBOTTLE
-		int32_t 	GetUseSeedOrMoonBottleTime() const { return m_iSeedTime; }
+		int32_t GetUseSeedOrMoonBottleTime() const { return m_iSeedTime; }
 		void  	SetUseSeedOrMoonBottleTime() { m_iSeedTime = thecore_pulse(); }
-		int32_t 	m_iSeedTime;
-		//END_RESTRICT_USE_SEED_OR_MOONBOTTLE
-		
-		//PREVENT_PORTAL_AFTER_EXCHANGE
-		int32_t		GetExchangeTime() const { return m_iExchangeTime; }
+
+		int32_t	GetExchangeTime() const { return m_iExchangeTime; }
 		void	SetExchangeTime() { m_iExchangeTime = thecore_pulse(); }
-		int32_t		m_iExchangeTime;
-		//END_PREVENT_PORTAL_AFTER_EXCHANGE
-		
-		int32_t 	m_iMyShopTime;
-		int32_t		GetMyShopTime() const	{ return m_iMyShopTime; }
+
+		int32_t	GetMyShopTime() const	{ return m_iMyShopTime; }
 		void	SetMyShopTime() { m_iMyShopTime = thecore_pulse(); }
+
+		uint32_t GetLastPrivateShopOpenTime() const { return m_dwLastShopOpenTime; }
+		void	 SetLastPrivateShopOpenTime() { m_dwLastShopOpenTime = get_dword_time(); }
 
 		// Hack 방지를 위한 체크.
 		bool	IsHack(bool bSendMsg = true, bool bCheckShopOwner = true, int32_t limittime = g_nPortalLimitTime);
 
-		void Say(const std::string & s);
+		void	Say(const std::string & s);
+
+	private:
+		int32_t m_iSeedTime;
+		int32_t	m_iExchangeTime;
+		int32_t	m_iRefineTime;
+		int32_t m_iMyShopTime;
+		uint32_t m_dwLastShopOpenTime;
 
 	public:
 		bool ItemProcess_Polymorph(LPITEM item);
@@ -1904,9 +2032,10 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 	public :
 		const std::string GetNewName() const { return this->m_strNewName; }
-		void SetNewName(const std::string name) { this->m_strNewName = name; }
+		void SetNewName(const std::string & name) { this->m_strNewName = name; }
 
 	public :
+		bool IsInHome();
 		void GoHome();
 
 	private :
@@ -1929,14 +2058,12 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 	private:
 		uint32_t m_dwLastGoldDropTime;
-#ifdef ENABLE_NEWSTUFF
 		uint32_t m_dwLastItemDropTime;
 		uint32_t m_dwLastBoxUseTime;
 		uint32_t m_dwLastBuySellTime;
 	public:
 		uint32_t GetLastBuySellTime() const { return m_dwLastBuySellTime; }
 		void SetLastBuySellTime(uint32_t dwLastBuySellTime) { m_dwLastBuySellTime = dwLastBuySellTime; }
-#endif
 
 	public:
 		void AutoRecoveryItemProcess (const EAffectTypes);
@@ -1958,19 +2085,17 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	private:
 		bool cannot_dead;
 
-#ifdef __PET_SYSTEM__
 	private:
 		bool m_bIsPet;
 	public:
 		void SetPet() { m_bIsPet = true; }
 		bool IsPet() { return m_bIsPet; }
-#endif
-#ifdef NEW_ICEDAMAGE_SYSTEM
+
 	private:
 		uint32_t m_dwNDRFlag;
 		std::set<uint32_t> m_setNDAFlag;
 	public:
-		const uint32_t GetNoDamageRaceFlag();
+		uint32_t GetNoDamageRaceFlag();
 		void SetNoDamageRaceFlag(uint32_t dwRaceFlag);
 		void UnsetNoDamageRaceFlag(uint32_t dwRaceFlag);
 		void ResetNoDamageRaceFlag();
@@ -1978,7 +2103,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void SetNoDamageAffectFlag(uint32_t dwAffectFlag);
 		void UnsetNoDamageAffectFlag(uint32_t dwAffectFlag);
 		void ResetNoDamageAffectFlag();
-#endif
+
 
 	
 	private:
@@ -1991,7 +2116,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void SetDamMul(float newDamMul) {this->m_fDamMul = newDamMul; }
 
 	private:
-		bool IsValidItemPosition(TItemPos Pos) const;
+		bool IsValidItemPosition(const TItemPos & Pos) const;
 
 	public:
 		
@@ -2036,7 +2161,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void		 SetItemAward_vnum(uint32_t vnum) { itemAward_vnum = vnum; }
 		void		 SetItemAward_cmd(char* cmd) { strcpy(itemAward_cmd,cmd); }
 		//void		 SetItemAward_flag(bool flag) { itemAward_flag = flag; }
-#ifdef ENABLE_ANTI_CMD_FLOOD
 	private:
 		int32_t m_dwCmdAntiFloodPulse;
 		uint32_t m_dwCmdAntiFloodCount;
@@ -2046,17 +2170,50 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		uint32_t IncreaseCmdAntiFloodCount(){return ++m_dwCmdAntiFloodCount;}
 		void SetCmdAntiFloodPulse(int32_t dwPulse){m_dwCmdAntiFloodPulse=dwPulse;}
 		void SetCmdAntiFloodCount(uint32_t dwCount){m_dwCmdAntiFloodCount=dwCount;}
-#endif
 	private:
 		
 		
 		timeval		m_tvLastSyncTime;
-		int32_t			m_iSyncHackCount;
+		int32_t			m_iSyncPlayerHackCount;
+		int32_t			m_iSyncMonsterHackCount;
+		int32_t			m_iSyncNoHackCount;
+
 	public:
-		void			SetLastSyncTime(const timeval &tv) { memcpy(&m_tvLastSyncTime, &tv, sizeof(timeval)); }
-		const timeval&	GetLastSyncTime() { return m_tvLastSyncTime; }
-		void			SetSyncHackCount(int32_t iCount) { m_iSyncHackCount = iCount;}
-		int32_t				GetSyncHackCount() { return m_iSyncHackCount; }
+		void			SetLastSyncTime(const timeval& tv) { memcpy(&m_tvLastSyncTime, &tv, sizeof(timeval)); }
+		const timeval& GetLastSyncTime() { return m_tvLastSyncTime; }
+		void			UpdateSyncHackCount(const std::string& who, bool increase);
+		int32_t				GetSyncHackCount(const std::string& who) const;
+
+		//Overload
+		int32_t				GetSyncHackCount() { return m_iSyncMonsterHackCount + m_iSyncPlayerHackCount; }
+
+		//No hack counters
+		int32_t				GetNoHackCount() { return m_iSyncNoHackCount; }
+		void			SetNoHackCount(int32_t iCount) { m_iSyncNoHackCount = iCount; }
+
+	//Abuse
+	private:
+		spAbuseController	m_abuse;
+
+	public:
+		spAbuseController	GetAbuseController() const { return m_abuse; }
+
+	//Activity
+	public:
+		spActivityHandler GetActivityHandler() { return m_activityHandler; }
+
+		int32_t GetActivity() const;
+		void LoadActivity(TActivityTable* data) const;
+	private:
+		spActivityHandler m_activityHandler;
+
+		void	SetCoins(int32_t val);
+		void	UpdateCoins(uint32_t dwAID, int32_t val);
+		int32_t	GetCoins();
+
+	public:
+		bool		IsPrivateMap(int32_t lMapIndex = 0) const;
+
 
 #ifdef ENABLE_ACCE_SYSTEM
 	protected:

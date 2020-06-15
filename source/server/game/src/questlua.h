@@ -4,7 +4,7 @@
 #include "quest.h"
 #include "buffer_manager.h"
 
-extern int32_t test_server;
+extern int32_t g_bIsTestServer;
 
 namespace quest
 {
@@ -27,7 +27,6 @@ namespace quest
 	extern void RegisterForkedFunctionTable();
 	extern void RegisterOXEventFunctionTable();
 	extern void RegisterDanceEventFunctionTable();
-	extern void RegisterDragonLairFunctionTable();
 	extern void RegisterDragonSoulFunctionTable();
 
 	extern void combine_lua_string(lua_State* L, std::ostringstream &s);
@@ -41,7 +40,7 @@ namespace quest
 		FSetWarpLocation (int32_t _map_index, int32_t _x, int32_t _y) :
 			map_index (_map_index), x (_x), y (_y)
 		{}
-		void operator () (LPCHARACTER ch);
+		void operator () (LPCHARACTER ch) const;
 	};
 
 	struct FSetQuestFlag
@@ -49,7 +48,7 @@ namespace quest
 		std::string flagname;
 		int32_t value;
 
-		void operator () (LPCHARACTER ch);
+		void operator () (LPCHARACTER ch) const;
 	};
 
 	struct FPartyCheckFlagLt

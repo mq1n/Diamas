@@ -139,7 +139,7 @@ bool CGrannyModel::LoadIndices()
 
 	void * indices;
 
-	if (!m_idxBuf.Lock((void**)&indices))
+	if (!m_idxBuf.Lock(static_cast<void **>(&indices)))
 		return false;
 
 	for (int32_t m = 0; m < m_pgrnModel->MeshBindingCount; ++m)

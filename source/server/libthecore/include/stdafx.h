@@ -118,6 +118,7 @@ inline unsigned sleep(unsigned sec) {
 #ifdef _WIN32
 #define isdigit iswdigit
 #define isspace iswspace
+#define isalpha iswalpha
 #endif
 
 #include "typedef.h"

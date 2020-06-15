@@ -106,7 +106,7 @@ bool CPythonNetworkStream::RecvCharacterAppendPacket()
 	kNetActorData.m_bType=chrAddPacket.bType;
 	kNetActorData.m_dwMovSpd=chrAddPacket.bMovingSpeed;
 	kNetActorData.m_dwAtkSpd=chrAddPacket.bAttackSpeed;
-	kNetActorData.m_dwRace=chrAddPacket.wRaceNum;
+	kNetActorData.m_dwRace=chrAddPacket.dwRaceNum;
 	
 	kNetActorData.m_dwStateFlags=chrAddPacket.bStateFlag;
 	kNetActorData.m_dwVID=chrAddPacket.dwVID;
@@ -131,7 +131,8 @@ bool CPythonNetworkStream::RecvCharacterAppendPacket()
 #endif
 	kNetActorData.m_dwMountVnum=0;/*chrAddPacket.dwMountVnum*/;	
 
-	kNetActorData.m_dwLevel = 0; // 몬스터 레벨 표시 안함
+	kNetActorData.m_dwLevel = chrAddPacket.dwLevel; // 몬스터 레벨 표시 안함
+	kNetActorData.m_dwGuildID = chrAddPacket.dwGuild; //Guild building flags bugfix!
 
 	if(kNetActorData.m_bType != CActorInstance::TYPE_PC && 	kNetActorData.m_bType != CActorInstance::TYPE_NPC && kNetActorData.m_bType != CActorInstance::TYPE_SHOP)
 	{
@@ -144,10 +145,7 @@ bool CPythonNetworkStream::RecvCharacterAppendPacket()
 
 		__RecvCharacterAppendPacket(&kNetActorData);
 	}
-	else
-	{
-		s_kNetActorData = kNetActorData;
-	}
+	s_kNetActorData = kNetActorData;
 
 	return true;
 }
@@ -189,77 +187,9 @@ bool CPythonNetworkStream::RecvCharacterAdditionalInfo()
 	return true;
 }
 
-bool CPythonNetworkStream::RecvCharacterAppendPacketNew()
-{
-	TraceError("TPacketGCCharacterAdd2 is packet that doesn't write.");
-	TPacketGCCharacterAdd2 chrAddPacket;
-	if (!Recv(sizeof(chrAddPacket), &chrAddPacket))
-		return false;
-	if(IsInvisibleRace(chrAddPacket.wRaceNum))
-		return true;
-
-	__GlobalPositionToLocalPosition(chrAddPacket.x, chrAddPacket.y);
-
-	SNetworkActorData kNetActorData;
-	kNetActorData.m_dwLevel = 0;
-	kNetActorData.m_bType=chrAddPacket.bType;
-	kNetActorData.m_dwGuildID=chrAddPacket.dwGuild;
-	kNetActorData.m_dwEmpireID=chrAddPacket.bEmpire;	
-	kNetActorData.m_dwMovSpd=chrAddPacket.bMovingSpeed;
-	kNetActorData.m_dwAtkSpd=chrAddPacket.bAttackSpeed;
-	kNetActorData.m_dwRace=chrAddPacket.wRaceNum;
-	kNetActorData.m_dwArmor=chrAddPacket.awPart[CHR_EQUIPPART_ARMOR];
-	kNetActorData.m_dwWeapon=chrAddPacket.awPart[CHR_EQUIPPART_WEAPON];
-	kNetActorData.m_dwHair=chrAddPacket.awPart[CHR_EQUIPPART_HAIR];
-#ifdef ENABLE_ACCE_SYSTEM
-	kNetActorData.m_dwAcce		= chrAddPacket.awPart[CHR_EQUIPPART_ACCE];
-#endif
-	kNetActorData.m_dwStateFlags=chrAddPacket.bStateFlag;
-	kNetActorData.m_dwVID=chrAddPacket.dwVID;
-	kNetActorData.m_dwMountVnum=chrAddPacket.dwMountVnum;
-	kNetActorData.m_fRot=chrAddPacket.angle;
-	kNetActorData.m_kAffectFlags.CopyData(0, sizeof(chrAddPacket.dwAffectFlag[0]), &chrAddPacket.dwAffectFlag[0]);
-	kNetActorData.m_kAffectFlags.CopyData(32, sizeof(chrAddPacket.dwAffectFlag[1]), &chrAddPacket.dwAffectFlag[1]);
-	kNetActorData.SetPosition(chrAddPacket.x, chrAddPacket.y);
-	kNetActorData.m_sAlignment=chrAddPacket.sAlignment;
-	kNetActorData.m_byPKMode=chrAddPacket.bPKMode;
-	kNetActorData.m_stName=chrAddPacket.name;
-	__RecvCharacterAppendPacket(&kNetActorData);
-
-	return true;
-}
-
 bool CPythonNetworkStream::RecvCharacterUpdatePacket()
 {
 	TPacketGCCharacterUpdate chrUpdatePacket;
-	if (!Recv(sizeof(chrUpdatePacket), &chrUpdatePacket))
-		return false;
-
-	SNetworkUpdateActorData kNetUpdateActorData;
-	kNetUpdateActorData.m_dwGuildID=chrUpdatePacket.dwGuildID;
-	kNetUpdateActorData.m_dwMovSpd=chrUpdatePacket.bMovingSpeed;
-	kNetUpdateActorData.m_dwAtkSpd=chrUpdatePacket.bAttackSpeed;
-	kNetUpdateActorData.m_dwArmor=chrUpdatePacket.awPart[CHR_EQUIPPART_ARMOR];
-	kNetUpdateActorData.m_dwWeapon=chrUpdatePacket.awPart[CHR_EQUIPPART_WEAPON];
-	kNetUpdateActorData.m_dwHair=chrUpdatePacket.awPart[CHR_EQUIPPART_HAIR];
-#ifdef ENABLE_ACCE_SYSTEM
-	kNetUpdateActorData.m_dwAcce		= chrUpdatePacket.awPart[CHR_EQUIPPART_ACCE];
-#endif
-	kNetUpdateActorData.m_dwVID=chrUpdatePacket.dwVID;	
-	kNetUpdateActorData.m_kAffectFlags.CopyData(0, sizeof(chrUpdatePacket.dwAffectFlag[0]), &chrUpdatePacket.dwAffectFlag[0]);
-	kNetUpdateActorData.m_kAffectFlags.CopyData(32, sizeof(chrUpdatePacket.dwAffectFlag[1]), &chrUpdatePacket.dwAffectFlag[1]);
-	kNetUpdateActorData.m_sAlignment=chrUpdatePacket.sAlignment;
-	kNetUpdateActorData.m_byPKMode=chrUpdatePacket.bPKMode;
-	kNetUpdateActorData.m_dwStateFlags=chrUpdatePacket.bStateFlag;
-	kNetUpdateActorData.m_dwMountVnum=chrUpdatePacket.dwMountVnum;
-	__RecvCharacterUpdatePacket(&kNetUpdateActorData);
-
-	return true;
-}
-
-bool CPythonNetworkStream::RecvCharacterUpdatePacketNew()
-{
-	TPacketGCCharacterUpdate2 chrUpdatePacket;
 	if (!Recv(sizeof(chrUpdatePacket), &chrUpdatePacket))
 		return false;
 

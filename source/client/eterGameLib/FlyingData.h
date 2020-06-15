@@ -17,7 +17,7 @@ public:
 		FLY_ATTACH_TYPE_LINE,
 		FLY_ATTACH_TYPE_MULTI_LINE,
 		FLY_ATTACH_TYPE_SINE,
-		FLY_ATTACH_TYPE_EXP,
+		FLY_ATTACH_TYPE_EXP
 	};
 
 	struct TFlyingAttachData
@@ -103,7 +103,11 @@ protected:
 
 public:
 	static CFlyingData *  New() { return ms_kPool.Alloc(); }
-	static void Delete(CFlyingData * pData) { pData->Destroy(); ms_kPool.Free(pData); }
+	static void Delete(CFlyingData * pData)
+	{
+		pData->Destroy();
+		ms_kPool.Free(pData);
+	}
 
 	static void DestroySystem() { ms_kPool.Destroy(); }
 

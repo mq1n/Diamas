@@ -12,7 +12,7 @@ bool PyTuple_GetWindow(PyObject* poArgs, int32_t pos, UI::CWindow ** ppRetWindow
 	if (!iHandle)
 		return false;
 
-	*ppRetWindow = (UI::CWindow*)iHandle;
+	*ppRetWindow = reinterpret_cast<UI::CWindow *>(iHandle);
 	return true;
 }
 
@@ -335,14 +335,10 @@ PyObject * wndMgrKillFocus(PyObject * poSelf, PyObject * poArgs)
 	if (PyTuple_GetWindow(poArgs, 0, &pWin))
 	{
 		if (pWin == UI::CWindowManager::Instance().GetActivateWindow())
-		{
 			UI::CWindowManager::Instance().DeactivateWindow();
-		}
 	}
 	else
-	{
 		UI::CWindowManager::Instance().DeactivateWindow();
-	}
 
 	return Py_BuildNone();
 }
@@ -599,7 +595,7 @@ PyObject * wndMgrIsIn(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
 		return Py_BuildException();
 
-	return Py_BuildValue("i", pWin == UI::CWindowManager::Instance().GetPointWindow());
+	return PyBool_FromLong(pWin == UI::CWindowManager::Instance().GetPointWindow());
 }
 
 PyObject * wndMgrGetMouseLocalPosition(PyObject * poSelf, PyObject * poArgs)
@@ -987,11 +983,11 @@ PyObject * wndMgrSetCoverButton(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetString(poArgs, 5, &szDisableImageName))
 		return Py_BuildException();
 
-	int32_t iLeftButtonEnable;
-	if (!PyTuple_GetInteger(poArgs, 6, &iLeftButtonEnable))
+	bool iLeftButtonEnable;
+	if (!PyTuple_GetBoolean(poArgs, 6, &iLeftButtonEnable))
 		return Py_BuildException();
-	int32_t iRightButtonEnable;
-	if (!PyTuple_GetInteger(poArgs, 7, &iRightButtonEnable))
+	bool iRightButtonEnable;
+	if (!PyTuple_GetBoolean(poArgs, 7, &iRightButtonEnable))
 		return Py_BuildException();
 
 	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWindow;
@@ -1215,8 +1211,8 @@ PyObject * wndMgrSetUseMode(PyObject * poSelf, PyObject * poArgs)
 	UI::CWindow * pWin;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
 		return Py_BuildException();
-	int32_t iFlag;
-	if (!PyTuple_GetInteger(poArgs, 1, &iFlag))
+	bool iFlag;
+	if (!PyTuple_GetBoolean(poArgs, 1, &iFlag))
 		return Py_BuildException();
 
 	if (!pWin->IsType(UI::CSlotWindow::Type()))
@@ -1233,8 +1229,8 @@ PyObject * wndMgrSetUsableItem(PyObject * poSelf, PyObject * poArgs)
 	UI::CWindow * pWin;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
 		return Py_BuildException();
-	int32_t iFlag;
-	if (!PyTuple_GetInteger(poArgs, 1, &iFlag))
+	bool iFlag;
+	if (!PyTuple_GetBoolean(poArgs, 1, &iFlag))
 		return Py_BuildException();
 
 	if (!pWin->IsType(UI::CSlotWindow::Type()))
@@ -1844,8 +1840,8 @@ PyObject * wndMgrDeattachIcon(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * wndMgrSetAttachingFlag(PyObject * poSelf, PyObject * poArgs)
 {
-	BOOL bFlag;
-	if (!PyTuple_GetInteger(poArgs, 0, &bFlag))
+	bool bFlag;
+	if (!PyTuple_GetBoolean(poArgs, 0, &bFlag))
 		return Py_BuildException();
 
 	UI::CWindowManager::Instance().SetAttachingFlag(bFlag);
@@ -1894,8 +1890,8 @@ PyObject * wndTextSetSecret(PyObject * poSelf, PyObject * poArgs)
 	UI::CWindow * pWindow;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
 		return Py_BuildException();
-	int32_t iFlag;
-	if (!PyTuple_GetInteger(poArgs, 1, &iFlag))
+	bool iFlag;
+	if (!PyTuple_GetBoolean(poArgs, 1, &iFlag))
 		return Py_BuildException();
 
 	((UI::CTextLine*)pWindow)->SetSecret(iFlag);
@@ -1906,8 +1902,8 @@ PyObject * wndTextSetOutline(PyObject * poSelf, PyObject * poArgs)
 	UI::CWindow * pWindow;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
 		return Py_BuildException();
-	int32_t iFlag;
-	if (!PyTuple_GetInteger(poArgs, 1, &iFlag))
+	bool iFlag;
+	if (!PyTuple_GetBoolean(poArgs, 1, &iFlag))
 		return Py_BuildException();
 
 	((UI::CTextLine*)pWindow)->SetOutline(iFlag);
@@ -1918,8 +1914,8 @@ PyObject * wndTextSetFeather(PyObject * poSelf, PyObject * poArgs)
 	UI::CWindow * pWindow;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
 		return Py_BuildException();
-	int32_t iFlag;
-	if (!PyTuple_GetInteger(poArgs, 1, &iFlag))
+	bool iFlag;
+	if (!PyTuple_GetBoolean(poArgs, 1, &iFlag))
 		return Py_BuildException();
 
 	((UI::CTextLine*)pWindow)->SetFeather(iFlag);
@@ -1930,8 +1926,8 @@ PyObject * wndTextSetMultiLine(PyObject * poSelf, PyObject * poArgs)
 	UI::CWindow * pWindow;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
 		return Py_BuildException();
-	int32_t iFlag;
-	if (!PyTuple_GetInteger(poArgs, 1, &iFlag))
+	bool iFlag;
+	if (!PyTuple_GetBoolean(poArgs, 1, &iFlag))
 		return Py_BuildException();
 
 	((UI::CTextLine*)pWindow)->SetMultiLine(iFlag);
@@ -2550,27 +2546,27 @@ PyObject * wndButtonIsDown(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildValue("i", ((UI::CButton*)pWindow)->IsPressed());
 }
 
-extern BOOL g_bOutlineBoxEnable;
-extern BOOL g_bShowOverInWindowName;
+extern bool g_bOutlineBoxEnable;
+extern bool g_bShowOverInWindowName;
 
 PyObject * wndMgrSetOutlineFlag(PyObject * poSelf, PyObject * poArgs)
 {
-	int32_t iFlag;
-	if (!PyTuple_GetInteger(poArgs, 0, &iFlag))
+	bool bFlag;
+	if (!PyTuple_GetBoolean(poArgs, 0, &bFlag))
 		return Py_BuildException();
 
-	g_bOutlineBoxEnable = iFlag;
+	g_bOutlineBoxEnable = bFlag;
 
 	return Py_BuildNone();
 }
 
 PyObject * wndMgrShowOverInWindowName(PyObject * poSelf, PyObject * poArgs)
 {
-	int32_t iFlag;
-	if (!PyTuple_GetInteger(poArgs, 0, &iFlag))
+	bool bFlag;
+	if (!PyTuple_GetBoolean(poArgs, 0, &bFlag))
 		return Py_BuildException();
 
-	g_bShowOverInWindowName = iFlag;
+	g_bShowOverInWindowName = bFlag;
 
 	return Py_BuildNone();
 }
@@ -2838,6 +2834,28 @@ PyObject* wndMgrSetRenderTargetAlwaysRotate(PyObject* poSelf, PyObject* poArgs) 
 	return Py_BuildNone();
 }
 
+PyObject * wndMgrSetSlotRefineLevel(PyObject * poSelf, PyObject * poArgs)
+{
+	UI::CWindow * pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	int iSlotIndex;
+	if (!PyTuple_GetInteger(poArgs, 1, &iSlotIndex))
+		return Py_BuildException();
+
+	char* pszLevel;
+	if (!PyTuple_GetString(poArgs, 2, &pszLevel))
+		return Py_BuildException();
+
+	if (!pWin->IsType(UI::CSlotWindow::Type()))
+		return Py_BuildException();
+
+	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWin;
+	pSlotWin->SetSlotRefineLevel(iSlotIndex, pszLevel);
+
+	return Py_BuildNone();
+}
 
 void initwndMgr()
 {
@@ -2931,6 +2949,7 @@ void initwndMgr()
 		{ "HasSlot",					wndMgrHasSlot,						METH_VARARGS },
 		{ "SetSlot",					wndMgrSetSlot,						METH_VARARGS },
 		{ "SetSlotScale",				wndMgrSetSlotScale,					METH_VARARGS },
+		{ "SetSlotRefineLevel",			wndMgrSetSlotRefineLevel,			METH_VARARGS },
 		{ "SetSlotBaseImageScale",		wndMgrSetSlotBaseImageScale,		METH_VARARGS },
 		{ "AppendImageScale",			wndImageAppendImageScale,			METH_VARARGS },
 		{ "SetSlotCount",				wndMgrSetSlotCount,					METH_VARARGS },

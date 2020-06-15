@@ -22,7 +22,7 @@ class CPlayerTableCache : public cache<TPlayerTable>
 
 	virtual void OnFlush();
 
-	uint32_t GetLastUpdateTime() { return m_lastUpdateTime; }
+	uint32_t GetLastUpdateTime() { return static_cast<uint32_t>(m_lastUpdateTime); }
 };
 
 // MYSHOP_PRICE_LIST
@@ -59,5 +59,16 @@ class CItemPriceListTableCache : public cache< TItemPriceListTable >
 	static const int32_t	s_nMinFlushSec;		///< Minimum cache expire time
 };
 // END_OF_MYSHOP_PRICE_LIST
+
+class CActivityCache : public cache <TActivityTable>
+{
+public:
+	CActivityCache();
+	virtual ~CActivityCache();
+
+	virtual void OnFlush();
+
+	uint32_t GetLastUpdateTime() { return m_lastUpdateTime; }
+};
 
 #endif

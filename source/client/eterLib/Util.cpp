@@ -67,7 +67,7 @@ bool LoadMultipleTextData(const char * c_szFileName, CTokenVectorMap & rstTokenV
 		stl_lowers(stTokenVector[0]);
 
 		// Start or End
-		if (0 == stTokenVector[0].compare("start"))
+		if ("start" == stTokenVector[0])
 		{
 			CTokenVector stSubTokenVector;
 
@@ -82,24 +82,20 @@ bool LoadMultipleTextData(const char * c_szFileName, CTokenVectorMap & rstTokenV
 
 				stl_lowers(stSubTokenVector[0]);
 
-				if (0 == stSubTokenVector[0].compare("end"))
-				{
+				if ("end" == stSubTokenVector[0])
 					break;
-				}
 
-				for (uint32_t j = 0; j < stSubTokenVector.size(); ++j)
-				{
-					stTokenVector.push_back(stSubTokenVector[j]);
-				}
+				for (auto & j : stSubTokenVector)
+					stTokenVector.emplace_back(j);
 			}
 
-			rstTokenVectorMap.insert(CTokenVectorMap::value_type(key, stTokenVector));
+			rstTokenVectorMap.emplace(key, stTokenVector);
 		}
 		else
 		{
 			std::string key = stTokenVector[0];
 			stTokenVector.erase(stTokenVector.begin());
-			rstTokenVectorMap.insert(CTokenVectorMap::value_type(key, stTokenVector));
+			rstTokenVectorMap.emplace(key, stTokenVector);
 		}
 	}
 
@@ -155,7 +151,7 @@ int32_t __base64_get( const int32_t c )
 void __strcat1(char * str,int32_t i)
 {
 	char result[2];
-	result[0] = i;
+	result[0] = static_cast<char>(i);
 	result[1] = '\0';
 	strcat(str,result);
 }
@@ -178,8 +174,9 @@ void base64_decode(const char * str,char * resultStr)
 			if(result!=-2)
 			{
 				if(result!=-1)
-					szDest[i++] = result;
-				else szDest[i++] = '@';	// It's end  (64번은 디코딩시 사용되지 않기 때문)
+					szDest[i++] = static_cast<char>(result);
+				else
+					szDest[i++] = '@';	// It's end  (64번은 디코딩시 사용되지 않기 때문)
 			}
 		}
 
@@ -219,11 +216,11 @@ void base64_decode(const char * str,char * resultStr)
 		
 	}// end of while
 
-	for (i = 0; i < strlen(resultStr); i++) 
+	for (uint32_t x = 0; x < strlen(resultStr); x++)
 	{
-		char c = resultStr[i];
-		int32_t xor = i + 5;
-		resultStr[i] = char(c ^ xor);
+		char c = resultStr[x];
+		int32_t xor = x + 5;
+		resultStr[x] = char(c ^ xor);
 	}	
 	// E
 }

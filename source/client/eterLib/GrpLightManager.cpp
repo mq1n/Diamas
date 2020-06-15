@@ -14,9 +14,7 @@ CLightManager::CLightManager()
 	m_dwSkipIndex = 0;
 }
 
-CLightManager::~CLightManager()
-{
-}
+CLightManager::~CLightManager() = default;
 
 void CLightManager::Destroy()
 {
@@ -44,7 +42,7 @@ void CLightManager::RegisterLight(ELightType /*LightType*/, TLightID * poutLight
 
 void CLightManager::DeleteLight(TLightID LightID)
 {
-	TLightMap::iterator itor = m_LightMap.find(LightID);
+	auto itor = m_LightMap.find(LightID);
 
 	if (m_LightMap.end() == itor)
 	{
@@ -64,7 +62,7 @@ void CLightManager::DeleteLight(TLightID LightID)
 
 CLight * CLightManager::GetLight(TLightID LightID)
 {
-	TLightMap::iterator itor = m_LightMap.find(LightID);
+	auto itor = m_LightMap.find(LightID);
 
 	if (m_LightMap.end() == itor)
 	{
@@ -110,7 +108,7 @@ void CLightManager::FlushLight()
 	//		 다시 Flush 하는 식으로 최적화 할 수 있다. - [levites]
 
 	// light들의 거리를 추출해 정렬한다.
-	TLightMap::iterator itor = m_LightMap.begin();
+	auto itor = m_LightMap.begin();
 
 	for (; itor != m_LightMap.end(); ++itor)
 	{
@@ -119,7 +117,7 @@ void CLightManager::FlushLight()
 		D3DXVECTOR3 v3LightPos(pLight->GetPosition());
 		D3DXVECTOR3 v3Distance(v3LightPos - m_v3CenterPosition);
 		pLight->SetDistance(D3DXVec3Length(&v3Distance));
-		m_LightSortVector.push_back(pLight);
+		m_LightSortVector.emplace_back(pLight);
 	}
 
 	// quick sort lights
@@ -128,11 +126,10 @@ void CLightManager::FlushLight()
 	// NOTE - 거리로 정렬된 라이트를 Limit 갯수 만큼 제한해서 켜준다.
 	STATEMANAGER.SaveRenderState(D3DRS_LIGHTING, TRUE);
 
-	for (uint32_t k = 0; k < std::min<uint32_t>(m_dwLimitLightCount, m_LightSortVector.size()); ++k)
+	for (uint32_t k = 0; k < std::min(m_dwLimitLightCount, m_LightSortVector.size()); ++k)
 	{
 		m_LightSortVector[k]->Update();
 		m_LightSortVector[k]->SetDeviceLight(TRUE);
-
 	}
 }
 
@@ -140,7 +137,7 @@ void CLightManager::RestoreLight()
 {
 	STATEMANAGER.RestoreRenderState(D3DRS_LIGHTING);
 
-	for (uint32_t k = 0; k < std::min<uint32_t>(m_dwLimitLightCount, m_LightSortVector.size()); ++k)
+	for (uint32_t k = 0; k < std::min(m_dwLimitLightCount, m_LightSortVector.size()); ++k)
 		m_LightSortVector[k]->SetDeviceLight(FALSE);
 }
 
@@ -158,7 +155,7 @@ TLightID CLightManager::NewLightID()
 
 void CLightManager::ReleaseLightID(TLightID LightID)
 {
-	m_NonUsingLightIDDeque.push_back(LightID);
+	m_NonUsingLightIDDeque.emplace_back(LightID);
 }
 
 void CLightManager::Update()
@@ -208,9 +205,7 @@ void CLight::SetDeviceLight(BOOL bActive)
 			ms_lpd3dDevice->SetLight(m_LightID, &m_d3dLight);
 	}
 	if (ms_lpd3dDevice)
-	{
 		ms_lpd3dDevice->LightEnable(m_LightID, bActive);
-	}
 }
 
 void CLight::SetParameter(TLightID id, const D3DLIGHT9 & c_rLight)

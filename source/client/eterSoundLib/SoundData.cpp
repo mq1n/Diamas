@@ -70,9 +70,9 @@ bool CSoundData::ReadFromDisk()
 {
 	assert(m_assigned == true);
 
-	U32* s = (U32 *) AIL_file_read(m_filename, FILE_READ_WITH_SIZE);
+	auto * s = (U32 *) AIL_file_read(m_filename, FILE_READ_WITH_SIZE);
 
-	if (s == nullptr)
+	if (!s)
 		return false;
 
 	S32 type = AIL_file_type(s + 1, s[0]);
@@ -98,7 +98,7 @@ bool CSoundData::ReadFromDisk()
 
 		case AILFILETYPE_MPEG_L3_AUDIO:
 			{
-				AIL_decompress_ASI(s + 1, *((S32 *) s), m_filename, &m_data, &m_size, 0);
+		AIL_decompress_ASI(s + 1, *((S32 *) s), m_filename, &m_data, &m_size, nullptr);
 				AIL_mem_free_lock(s);
 			}
 			break;
@@ -143,7 +143,7 @@ U32 AILCALLBACK CSoundData::open_callback(char const * filename, U32 *file_handl
 
 	if (!FileSystemManager::Instance().OpenFile(filename, ms_SoundFile[iIndex]))
 	{
-		TraceError("sound file: %s can not open", filename);
+		TraceError("Could not load sound file %s", filename);
 		return 0;
 	}
 

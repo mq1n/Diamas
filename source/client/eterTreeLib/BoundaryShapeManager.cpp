@@ -2,7 +2,7 @@
 #include "StdAfx.h"
 
 #include <Windows.h>
-#include "../EterBase/Random.h"
+#include "../eterBase/Random.h"
 #include "../eterBase/file_ptr.h"
 #include "BoundaryShapeManager.h"
 

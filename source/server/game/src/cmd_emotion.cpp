@@ -7,6 +7,8 @@
 #include "buffer_manager.h"
 #include "unique_item.h"
 #include "wedding.h"
+#include "config.h"
+#include "desc.h"
 
 #define NEED_TARGET	(1 << 0)
 #define NEED_PC		(1 << 1)
@@ -90,6 +92,9 @@ std::set<std::pair<uint32_t, uint32_t> > s_emotion_set;
 
 ACMD(do_emotion_allow)
 {
+	if (!ch)
+		return;
+
 	if ( ch->GetArena() )
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
@@ -102,20 +107,51 @@ ACMD(do_emotion_allow)
 	if (!*arg1)
 		return;
 
-	uint32_t	val = 0; str_to_number(val, arg1);
-	s_emotion_set.insert(std::make_pair(ch->GetVID(), val));
-}
+	uint32_t dwTargetVID = 0;
+	str_to_number(dwTargetVID, arg1);
 
-#ifdef ENABLE_NEWSTUFF
-#include "config.h"
-#endif
+	LPCHARACTER tch = CHARACTER_MANAGER::instance().Find(dwTargetVID);
+	if (!tch)
+		return;
+
+	/*
+	if (tch->IsBlockMode(BLOCK_EMOTION_REQUEST))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "%s is blocked emotion requests", tch->GetName());
+		return;
+	}
+	*/
+
+	LPDESC pkVictimDesc = tch->GetDesc();
+	if (ch && pkVictimDesc)
+	{
+		TPacketGCWhisper pack;
+
+		char msg[450];
+		sprintf(msg, "You challenged %s for a emotion.", ch->GetName());
+
+		int32_t len = MIN(CHAT_MAX_LEN, strlen(msg) + 1);
+
+		pack.bHeader = HEADER_GC_WHISPER;
+		pack.wSize = sizeof(TPacketGCWhisper) + len;
+		pack.bType = WHISPER_TYPE_SYSTEM;
+		strlcpy(pack.szNameFrom, ch->GetName(), sizeof(pack.szNameFrom));
+
+		TEMP_BUFFER tmpbuf;
+		tmpbuf.write(&pack, sizeof(TPacketGCWhisper));
+		tmpbuf.write(msg, len);
+
+		pkVictimDesc->Packet(tmpbuf.read_peek(), tmpbuf.size());
+	}
+
+	s_emotion_set.insert(std::make_pair(ch->GetVID(), dwTargetVID));
+}
 
 bool CHARACTER_CanEmotion(CHARACTER& rch)
 {
-#ifdef ENABLE_NEWSTUFF
 	if (g_bDisableEmotionMask)
 		return true;
-#endif
+
 	
 	if (marriage::WeddingManager::instance().IsWeddingMap(rch.GetMapIndex()))
 		return true;

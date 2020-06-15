@@ -221,9 +221,7 @@ void CActorInstance::RestoreRenderMode()
 	//        model's default setting which had has as like specular or normal. - [levites]
 	m_iRenderMode = RENDER_MODE_NORMAL;
 	if (m_kBlendAlpha.m_isBlending)
-	{
 		m_kBlendAlpha.m_iOldRenderMode = m_iRenderMode;
-	}
 }
 
 
@@ -231,18 +229,14 @@ void CActorInstance::SetAddRenderMode()
 {
 	m_iRenderMode = RENDER_MODE_ADD;
 	if (m_kBlendAlpha.m_isBlending)
-	{
 		m_kBlendAlpha.m_iOldRenderMode = m_iRenderMode;
-	}
 }
 
 void CActorInstance::SetRenderMode(int32_t iRenderMode)
 {
 	m_iRenderMode = iRenderMode;
 	if (m_kBlendAlpha.m_isBlending)
-	{
 		m_kBlendAlpha.m_iOldRenderMode = iRenderMode;
-	}
 }
 
 void CActorInstance::SetAddColor(const D3DXCOLOR & c_rColor)
@@ -280,9 +274,7 @@ void CActorInstance::SetModulateRenderMode()
 {
 	m_iRenderMode = RENDER_MODE_MODULATE;
 	if (m_kBlendAlpha.m_isBlending)
-	{
 		m_kBlendAlpha.m_iOldRenderMode = m_iRenderMode;
-	}
 }
 
 void CActorInstance::RenderCollisionData()
@@ -328,12 +320,9 @@ void CActorInstance::RenderCollisionData()
 	for (; itor != m_DefendingPointInstanceList.end(); ++itor)
 	{
 		const TCollisionPointInstance & c_rInstance = *itor;
-		for (uint32_t i = 0; i < c_rInstance.SphereInstanceVector.size(); ++i)
+		for (const auto & c_rSphereInstance : c_rInstance.SphereInstanceVector)
 		{
-			const CDynamicSphereInstance & c_rSphereInstance = c_rInstance.SphereInstanceVector[i];
-			s_Screen.RenderCircle3d(c_rSphereInstance.v3Position.x,
-									c_rSphereInstance.v3Position.y,
-									c_rSphereInstance.v3Position.z,
+			s_Screen.RenderCircle3d(c_rSphereInstance.v3Position.x, c_rSphereInstance.v3Position.y, c_rSphereInstance.v3Position.z,
 									c_rSphereInstance.fRadius);
 		}
 	}
@@ -343,12 +332,9 @@ void CActorInstance::RenderCollisionData()
 	for (; itor != m_BodyPointInstanceList.end(); ++itor)
 	{
 		const TCollisionPointInstance & c_rInstance = *itor;
-		for (uint32_t i = 0; i < c_rInstance.SphereInstanceVector.size(); ++i)
+		for (const auto & c_rSphereInstance : c_rInstance.SphereInstanceVector)
 		{
-			const CDynamicSphereInstance & c_rSphereInstance = c_rInstance.SphereInstanceVector[i];
-			s_Screen.RenderCircle3d(c_rSphereInstance.v3Position.x,
-									c_rSphereInstance.v3Position.y,
-									c_rSphereInstance.v3Position.z,
+			s_Screen.RenderCircle3d(c_rSphereInstance.v3Position.x, c_rSphereInstance.v3Position.y, c_rSphereInstance.v3Position.z,
 									c_rSphereInstance.fRadius);
 		}
 	}
@@ -356,14 +342,11 @@ void CActorInstance::RenderCollisionData()
 	s_Screen.SetDiffuseColor(1.0f, 0.0f, 0.0f);
 //	if (m_SplashArea.fDisappearingTime > GetLocalTime())
 	{
-		CDynamicSphereInstanceVector::iterator itor = m_kSplashArea.SphereInstanceVector.begin();
+		auto itor = m_kSplashArea.SphereInstanceVector.begin();
 		for (; itor != m_kSplashArea.SphereInstanceVector.end(); ++itor)
 		{
 			const CDynamicSphereInstance & c_rInstance = *itor;
-			s_Screen.RenderCircle3d(c_rInstance.v3Position.x,
-									c_rInstance.v3Position.y,
-									c_rInstance.v3Position.z,
-									c_rInstance.fRadius);
+			s_Screen.RenderCircle3d(c_rInstance.v3Position.x, c_rInstance.v3Position.y, c_rInstance.v3Position.z, c_rInstance.fRadius);
 		}
 	}
 

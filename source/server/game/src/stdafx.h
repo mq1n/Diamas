@@ -1,36 +1,36 @@
 #ifndef __GAME_SRC_STDAFX_H__
 #define __GAME_SRC_STDAFX_H__
 
-// Basic features
-// Enable or disable memory pooling for specific object types
-//#define M2_USE_POOL
-// Enable or disable heap allocation debugging
-//#define DEBUG_ALLOC
-
 #include "debug_allocator.h"
 
 #include "../../libthecore/include/stdafx.h"
-
 #include "../../common/singleton.h"
 #include "../../common/utils.h"
 #include "../../common/service.h"
 
+#include <cmath>
+#include <cfloat>
+#include <cctype>
+
 #include <algorithm>
-#include <math.h>
 #include <list>
 #include <map>
 #include <set>
 #include <queue>
 #include <string>
 #include <vector>
-
-#include <cfloat>
 #include <unordered_map>
 #include <unordered_set>
 
 #include "typedef.h"
 #include "locale.hpp"
 #include "event.h"
+
+#ifdef _WIN32
+#define isdigit iswdigit
+#define isspace iswspace
+#define isalpha iswalpha
+#endif
 
 #define PASSES_PER_SEC(sec) ((sec) * passes_per_sec)
 

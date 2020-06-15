@@ -61,13 +61,8 @@ void CPythonNetworkStream::SelectPhase()
 				return;
 			break;
 
-		case HEADER_GC_LOGIN_SUCCESS3:
-			if (__RecvLoginSuccessPacket3())
-				return;
-			break;
-
-		case HEADER_GC_LOGIN_SUCCESS4:
-			if (__RecvLoginSuccessPacket4())
+	case HEADER_GC_LOGIN_SUCCESS:
+		if (__RecvLoginSuccessPacket())
 				return;
 			break;
 
@@ -100,34 +95,28 @@ void CPythonNetworkStream::SelectPhase()
 		case HEADER_GC_HANDSHAKE:
 			RecvHandshakePacket();
 			return;
-			break;
 
 		case HEADER_GC_HANDSHAKE_OK:
 			RecvHandshakeOKPacket();
 			return;
-			break;
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 		case HEADER_GC_KEY_AGREEMENT:
 			RecvKeyAgreementPacket();
 			return;
-			break;
 
 		case HEADER_GC_KEY_AGREEMENT_COMPLETED:
 			RecvKeyAgreementCompletedPacket();
 			return;
-			break;
 #endif
 
 		case HEADER_GC_PLAYER_POINT_CHANGE:
 			TPacketGCPointChange PointChange;
 			Recv(sizeof(TPacketGCPointChange), &PointChange);
 			return;
-			break;
 			
 		case HEADER_GC_CHAT:
 			return;
-			break;
 
 		///////////////////////////////////////////////////////////////////////////////////////////
 		case HEADER_GC_PING:
@@ -198,7 +187,7 @@ bool CPythonNetworkStream::SendCreateCharacterPacket(uint8_t index, const char *
 	createCharacterPacket.job = job;
 	createCharacterPacket.shape = shape;
 	createCharacterPacket.CON = byCON;
-	createCharacterPacket.INT = byINT;
+	createCharacterPacket.IQ = byINT;
 	createCharacterPacket.STR = bySTR;
 	createCharacterPacket.DEX = byDEX;
 
@@ -234,10 +223,10 @@ bool CPythonNetworkStream::__RecvPlayerCreateSuccessPacket()
 	if (!Recv(sizeof(kCreateSuccessPacket), &kCreateSuccessPacket))
 		return false;
 
-	if (kCreateSuccessPacket.bAccountCharacterSlot>=PLAYER_PER_ACCOUNT4)
+	if (kCreateSuccessPacket.bAccountCharacterSlot >= PLAYER_PER_ACCOUNT)
 	{
 		TraceError("CPythonNetworkStream::RecvPlayerCreateSuccessPacket - OUT OF RANGE SLOT(%d) > PLATER_PER_ACCOUNT(%d)",
-			kCreateSuccessPacket.bAccountCharacterSlot, PLAYER_PER_ACCOUNT4);
+				   kCreateSuccessPacket.bAccountCharacterSlot, PLAYER_PER_ACCOUNT);
 		return true;
 	}
 
@@ -288,7 +277,7 @@ bool CPythonNetworkStream::__RecvChangeName()
 	if (!Recv(sizeof(TPacketGCChangeName), &ChangeNamePacket))
 		return false;
 
-	for (int32_t i = 0; i < PLAYER_PER_ACCOUNT4; ++i)
+	for (int32_t i = 0; i < PLAYER_PER_ACCOUNT; ++i)
 	{
 		if (ChangeNamePacket.pid == m_akSimplePlayerInfo[i].dwID)
 		{

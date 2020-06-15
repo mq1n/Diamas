@@ -8,7 +8,7 @@
  * "Portions Copyright (C) John W. Ratcliff, 2001"
  */
 
-#include "Stdafx.h"
+#include "StdAfx.h"
 #include "spherepack.h"
 
 #if DEMO
@@ -31,15 +31,15 @@ SpherePackFactory::SpherePackFactory(int32_t maxspheres, float rootsize, float l
 	Vector3d p(0,0,0);
 	
 	mRoot = mSpheres.GetFreeLink(); // initially empty
-	mRoot->Init(this,p,6553600,0, false);
+	mRoot->Init(this, p, 6553600, nullptr, false);
 	mRoot->SetSpherePackFlag(SpherePackFlag(SPF_SUPERSPHERE | SPF_ROOTNODE | SPF_ROOT_TREE));
 	
 #if DEMO
 	mRoot->SetColor(0x00FFFFFF);
 #endif
 	
-	mLeaf = mSpheres.GetFreeLink();; // initially empty
-	mLeaf->Init(this,p,1638400,0,false);
+	mLeaf = mSpheres.GetFreeLink(); // initially empty
+	mLeaf->Init(this, p, 1638400, nullptr, false);
 	mLeaf->SetSpherePackFlag(SpherePackFlag(SPF_SUPERSPHERE | SPF_ROOTNODE | SPF_LEAF_TREE));
 	
 #if DEMO
@@ -62,13 +62,13 @@ SpherePackFactory::SpherePackFactory(int32_t maxspheres, float rootsize, float l
 #endif
 }
 
-SpherePackFactory::~SpherePackFactory(void)
+SpherePackFactory::~SpherePackFactory()
 {
 	delete mIntegrate;  // free up integration fifo
 	delete mRecompute;  // free up recomputation fifo.
 }
 
-void SpherePackFactory::Process(void)
+void SpherePackFactory::Process()
 {
 	{
 		// First recompute anybody that needs to be recomputed!!
@@ -79,10 +79,12 @@ void SpherePackFactory::Process(void)
 		for (int32_t i = 0; i < maxrecompute; ++i)
 		{
 			SpherePack * pack = mRecompute->Pop();
-			if (!pack) break;
-			pack->SetFifo1(0); // no longer on the fifo!!
+			if (!pack)
+				break;
+			pack->SetFifo1(nullptr); // no longer on the fifo!!
 			bool kill = pack->Recompute(mSuperSphereGravy);
-			if (kill) Remove(pack);
+			if (kill)
+				Remove(pack);
 		}
 	}
 	
@@ -95,7 +97,7 @@ void SpherePackFactory::Process(void)
 			SpherePack * pack = mIntegrate->Pop();
 			if (!pack)
 				break;
-			pack->SetFifo2(0);
+			pack->SetFifo2(nullptr);
 			
 			if (pack->HasSpherePackFlag(SPF_ROOT_TREE))
 				Integrate(pack,mRoot,mMaxRootSize); // integrate this one single dude against the root node.
@@ -107,11 +109,7 @@ void SpherePackFactory::Process(void)
 }
 
 
-SpherePack * SpherePackFactory::AddSphere_(const Vector3d &pos,
-                                          float radius,
-                                          void *userdata,
-										  bool isSphere,
-                                          int32_t flags)
+SpherePack * SpherePackFactory::AddSphere_(const Vector3d & pos, float radius, void * userdata, bool isSphere, int32_t flags)
 {
 	
 	SpherePack *pack = mSpheres.GetFreeLink();
@@ -166,7 +164,7 @@ void SpherePackFactory::AddRecompute(SpherePack *recompute)
 	}
 }
 
-void SpherePackFactory::Render(void)
+void SpherePackFactory::Render()
 {
 #if DEMO
 	mRoot->Render(mRoot->GetColor());
@@ -187,7 +185,8 @@ void SpherePack::Render(uint32_t /*color*/)
 		}
 		else
 		{
-			if (mParent->HasSpherePackFlag(SPF_ROOTNODE)) color = 0x00FFFFFF;
+			if (mParent->HasSpherePackFlag(SPF_ROOTNODE))
+				color = 0x00FFFFFF;
 		}
 #if DEMO
 		DrawCircle(int32_t(mCenter.x), int32_t(mCenter.y),int32_t(GetRadius()),color);
@@ -241,8 +240,10 @@ void SpherePack::Render(uint32_t /*color*/)
 
 bool SpherePack::Recompute(float gravy)
 {
-	if (!mChildren) return true; // kill it!
-	if (HasSpherePackFlag(SPF_ROOTNODE)) return false; // don't recompute root nodes!
+	if (!mChildren)
+		return true; // kill it!
+	if (HasSpherePackFlag(SPF_ROOTNODE))
+		return false; // don't recompute root nodes!
 	
 #if 1
 	// recompute bounding sphere!
@@ -343,28 +344,28 @@ void SpherePack::LostChild(SpherePack *t)
 	{
 		SpherePack *next = t->_GetNextSibling();
 		prev->SetNextSibling(next); // my previous now points to my next
-		if (next) next->SetPrevSibling(prev);
+		if (next)
+			next->SetPrevSibling(prev);
 		// list is patched!
 	}
 	else
 	{
 		SpherePack *next = t->_GetNextSibling();
 		mChildren = next;
-		if (mChildren) mChildren->SetPrevSibling(0);
+		if (mChildren)
+			mChildren->SetPrevSibling(nullptr);
 	}
 	
 	mChildCount--;
 	
 	if (!mChildCount && HasSpherePackFlag(SPF_SUPERSPHERE))
-	{
 		mFactory->Remove(this);
-	}
 }
 
 void SpherePackFactory::Remove(SpherePack*pack)
 {
-	
-	if (pack->HasSpherePackFlag(SPF_ROOTNODE)) return; // CAN NEVER REMOVE THE ROOT NODE EVER!!!
+	if (pack->HasSpherePackFlag(SPF_ROOTNODE))
+		return; // CAN NEVER REMOVE THE ROOT NODE EVER!!!
 	
 	if (pack->HasSpherePackFlag(SPF_SUPERSPHERE) && pack->HasSpherePackFlag(SPF_LEAF_TREE))
 	{
@@ -372,7 +373,7 @@ void SpherePackFactory::Remove(SpherePack*pack)
 		if (!pack->IS_SPHERE)
 			puts("SpherePackFactory::Remove");
 #endif
-		SpherePack *link = (SpherePack *) pack->GetUserData();
+		auto * link = (SpherePack *) pack->GetUserData();
 		
 		Remove(link);
 	}
@@ -387,24 +388,23 @@ uint32_t SpherePackFactory::GetColor(void)
 {
 	uint32_t ret = mColors[mColorCount];
 	mColorCount++;
-	if (mColorCount == MAXCOLORS) mColorCount = 0;
+	if (mColorCount == MAXCOLORS)
+		mColorCount = 0;
 	return ret;
 }
 #endif
 
-void SpherePackFactory::Integrate(SpherePack *pack,
-                                  SpherePack *supersphere,
-                                  float node_size)
+void SpherePackFactory::Integrate(SpherePack * pack, SpherePack * supersphere, float node_size)
 {
 	// ok..time to integrate this sphere with the tree
 	// first find which supersphere we are closest to the center of
 	
 	SpherePack *search = supersphere->GetChildren();
 	
-	SpherePack *nearest1 = 0;  // nearest supersphere we are completely
+	SpherePack * nearest1 = nullptr; // nearest supersphere we are completely
 	float neardist1 = 1e38f;     // enclosed within
 	
-	SpherePack *nearest2 = 0; // supersphere we must grow the least to
+	SpherePack * nearest2 = nullptr; // supersphere we must grow the least to
 	float neardist2 = 1e38f;    // add ourselves to.
 	
 	//int32_t scount = 1;
@@ -470,7 +470,7 @@ void SpherePackFactory::Integrate(SpherePack *pack,
 		if (!nearest1->IS_SPHERE)
 			puts("SpherePackFactory::Integrate1");
 #endif
-			SpherePack *link = (SpherePack *) nearest1->GetUserData();
+			auto * link = (SpherePack *) nearest1->GetUserData();
 			link->NewPosRadius(nearest1->GetPos(), nearest1->GetRadius());
 		}
 		
@@ -498,7 +498,7 @@ void SpherePackFactory::Integrate(SpherePack *pack,
 				if (!nearest2->IS_SPHERE)
 					puts("SpherePackFactory::Integrate2");
 #endif
-					SpherePack *link = (SpherePack *) nearest2->GetUserData();
+					auto * link = (SpherePack *) nearest2->GetUserData();
 					link->NewPosRadius(nearest2->GetPos(), nearest2->GetRadius());
 				}
 				
@@ -516,7 +516,7 @@ void SpherePackFactory::Integrate(SpherePack *pack,
 			
 			SpherePack *parent = mSpheres.GetFreeLink();
 			assert(parent);
-			parent->Init(this, pack->GetPos(), pack->GetRadius()+mSuperSphereGravy, 0, false);
+			parent->Init(this, pack->GetPos(), pack->GetRadius() + mSuperSphereGravy, nullptr, false);
 			
 			if (supersphere->HasSpherePackFlag(SPF_ROOT_TREE))
 				parent->SetSpherePackFlag(SPF_ROOT_TREE);
@@ -564,19 +564,16 @@ void SpherePack::VisibilityTest(const Frustum &f,SpherePackCallback *callback,Vi
 		state = f.ViewVolumeTest(mCenter, GetRadius());
 #if DEMO
 		if (state != VS_OUTSIDE)
-		{
 			DrawCircle(int32_t(mCenter.x), int32_t(mCenter.y), int32_t(GetRadius()), 0x404040);
-		}
 #endif
 	}
 	
 	if (HasSpherePackFlag(SPF_SUPERSPHERE))
 	{
-		
-		
 		if (state == VS_OUTSIDE)
 		{
-			if (HasSpherePackFlag(SPF_HIDDEN)) return; // no state change
+			if (HasSpherePackFlag(SPF_HIDDEN))
+				return; // no state change
 			ClearSpherePackFlag(SpherePackFlag(SPF_INSIDE | SPF_PARTIAL));
 			SetSpherePackFlag(SPF_HIDDEN);
 		}
@@ -584,7 +581,8 @@ void SpherePack::VisibilityTest(const Frustum &f,SpherePackCallback *callback,Vi
 		{
 			if (state == VS_INSIDE)
 			{
-				if (HasSpherePackFlag(SPF_INSIDE)) return; // no state change
+				if (HasSpherePackFlag(SPF_INSIDE))
+					return; // no state change
 				ClearSpherePackFlag(SpherePackFlag(SPF_PARTIAL | SPF_HIDDEN));
 				SetSpherePackFlag(SPF_INSIDE);
 			}
@@ -637,9 +635,7 @@ void SpherePack::VisibilityTest(const Frustum &f,SpherePackCallback *callback,Vi
 	}
 }
 
-void SpherePackFactory::RayTrace(const Vector3d &p1,
-                                 const Vector3d &p2,
-                                 SpherePackCallback *callback)
+void SpherePackFactory::RayTrace(const Vector3d & p1, const Vector3d & p2, SpherePackCallback * callback)
 {
 	// test case here, just traverse children.
 	Vector3d dir = p2;
@@ -655,8 +651,7 @@ void SpherePackFactory::RangeTest(const Vector3d &center,float radius,SpherePack
 #ifdef __STATIC_RANGE__
 	if (!center.IsInStaticRange())
 	{
-		TraceError("SpherePackFactory::RangeTest - RANGE ERROR %f, %f, %f",
-			center.x, center.y, center.z);
+		TraceError("SpherePackFactory::RangeTest - RANGE ERROR %f, %f, %f", center.x, center.y, center.z);
 		assert("SpherePackFactory::RangeTest - RANGE ERROR");
 		return;
 	}
@@ -670,8 +665,7 @@ void SpherePackFactory::PointTest2d(const Vector3d &center, SpherePackCallback *
 #ifdef __STATIC_RANGE__
 	if (!center.IsInStaticRange())
 	{
-		TraceError("SpherePackFactory::RangeTest2d - RANGE ERROR %f, %f, %f",
-			center.x, center.y, center.z);
+		TraceError("SpherePackFactory::RangeTest2d - RANGE ERROR %f, %f, %f", center.x, center.y, center.z);
 		assert("SpherePackFactory::RangeTest2d - RANGE ERROR");
 		return;
 	}
@@ -690,34 +684,30 @@ void SpherePackFactory::PointTest2d(const Vector3d &center, SpherePackCallback *
 	
 }
 
-void SpherePack::RangeTest(const Vector3d &p,
-                           float distance,
-                           SpherePackCallback *callback,
-                           ViewState state)
+void SpherePack::RangeTest(const Vector3d & p, float distance, SpherePackCallback * callback, ViewState state)
 {	
-
 	if (state == VS_PARTIAL)
 	{
 		float d = p.Distance(mCenter);
-		if ((d-distance) > GetRadius()) return;;
-		if ((GetRadius()+d) < distance) state = VS_INSIDE;
+		if ((d - distance) > GetRadius())
+			return;
+		
+		if ((GetRadius() + d) < distance)
+			state = VS_INSIDE;
 	}
 	
 	if (HasSpherePackFlag(SPF_SUPERSPHERE))
 	{
 #if DEMO
 		if (state == VS_PARTIAL)
-		{
 			DrawCircle(int32_t(mCenter.x), int32_t(mCenter.y), int32_t(GetRadius()), 0x404040);
-		}
 #endif
-		SpherePack *pack = mChildren;
+		SpherePack * pack = mChildren;
 		while (pack)
 		{
-			pack->RangeTest(p,distance,callback,state);
+			pack->RangeTest(p, distance, callback, state);
 			pack = pack->_GetNextSibling();
 		}
-		
 	}
 	else
 	{		
@@ -725,9 +715,7 @@ void SpherePack::RangeTest(const Vector3d &p,
 	}
 }
 
-void SpherePack::PointTest2d(const Vector3d &p,
-                           SpherePackCallback *callback,
-                           ViewState state)
+void SpherePack::PointTest2d(const Vector3d & p, SpherePackCallback * callback, ViewState state)
 {
 	if (state == VS_PARTIAL)
 	{
@@ -735,17 +723,18 @@ void SpherePack::PointTest2d(const Vector3d &p,
 		float dy=p.y-mCenter.y;
 		float distSquare = (dx*dx)+(dy*dy);
 
-		if (distSquare > GetRadius2()) return;;
-		if (GetRadius2() < -distSquare) state = VS_INSIDE;
+		if (distSquare > GetRadius2())
+			return;
+		;
+		if (GetRadius2() < -distSquare)
+			state = VS_INSIDE;
 	}
-	
+
 	if (HasSpherePackFlag(SPF_SUPERSPHERE))
 	{
 #if DEMO
 		if (state == VS_PARTIAL)
-		{
 			DrawCircle(int32_t(mCenter.x), int32_t(mCenter.y), int32_t(GetRadius()), 0x404040);
-		}
 #endif
 		SpherePack *pack = mChildren;
 		while (pack)
@@ -777,8 +766,9 @@ void SpherePackFactory::RangeTestCallback(const Vector3d &p,float distance,Spher
 	if (!sphere->IS_SPHERE)
 		puts("SpherePackFactory::RangeTestCallback");
 #endif
-	SpherePack *link = (SpherePack *) sphere->GetUserData();
-	if (link) link->RangeTest(p,distance,mCallback,state);
+	auto * link = (SpherePack *) sphere->GetUserData();
+	if (link)
+		link->RangeTest(p, distance, mCallback, state);
 };
 
 void SpherePackFactory::PointTest2dCallback(const Vector3d &p, SpherePack *sphere,ViewState state)
@@ -787,21 +777,18 @@ void SpherePackFactory::PointTest2dCallback(const Vector3d &p, SpherePack *spher
 	if (!sphere->IS_SPHERE)
 		puts("SpherePackFactory::PointTest2dCallback");
 #endif
-	SpherePack *link = (SpherePack *) sphere->GetUserData();
-	if (link) link->PointTest2d(p, mCallback,state);
+	auto * link = (SpherePack *) sphere->GetUserData();
+	if (link)
+		link->PointTest2d(p, mCallback, state);
 };
 
-void SpherePack::RayTrace(const Vector3d &p1,
-                          const Vector3d &dir,
-                          float distance,
-                          SpherePackCallback *callback)
+void SpherePack::RayTrace(const Vector3d & p1, const Vector3d & dir, float distance, SpherePackCallback * callback)
 {
 	bool hit = false;
 	
 	if (HasSpherePackFlag(SPF_SUPERSPHERE))
 	{
-		
-		hit = RayIntersectionInFront(p1,dir,0);
+		hit = RayIntersectionInFront(p1, dir, nullptr);
 		
 		if (hit)
 		{
@@ -823,9 +810,7 @@ void SpherePack::RayTrace(const Vector3d &p1,
 		Vector3d sect;
 		hit = RayIntersection(p1,dir,distance,&sect);
 		if (hit)
-		{
 			callback->RayTraceCallback(p1,dir,distance,sect,this);
-		}
 	}
 }
 
@@ -839,21 +824,20 @@ void SpherePackFactory::RayTraceCallback(const Vector3d &p1,          // source 
 	if (!sphere->IS_SPHERE)
 		puts("SpherePackFactory::RayTraceCallback");
 #endif
-	SpherePack *link = (SpherePack *) sphere->GetUserData();
-	if (link) link->RayTrace(p1,dir,distance,mCallback);
+	auto * link = (SpherePack *) sphere->GetUserData();
+	if (link)
+		link->RayTrace(p1, dir, distance, mCallback);
 };
 
 
-
-
-void SpherePackFactory::Reset(void)
+void SpherePackFactory::Reset()
 {
 	mRoot->Reset();
 	mLeaf->Reset();
 }
 
 
-void SpherePack::Reset(void)
+void SpherePack::Reset()
 {
 	ClearSpherePackFlag(SpherePackFlag(SPF_HIDDEN | SPF_PARTIAL | SPF_INSIDE));
 	
@@ -871,6 +855,7 @@ void SpherePackFactory::VisibilityCallback(const Frustum &f,SpherePack *sphere,V
 	if (!sphere->IS_SPHERE)
 		puts("SpherePackFactory::VisibilityCallback");
 #endif
-	SpherePack *link = (SpherePack *) sphere->GetUserData();
-	if (link) link->VisibilityTest(f,mCallback,state);
+	auto * link = (SpherePack *) sphere->GetUserData();
+	if (link)
+		link->VisibilityTest(f, mCallback, state);
 }

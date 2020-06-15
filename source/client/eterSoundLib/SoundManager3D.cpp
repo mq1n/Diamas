@@ -7,9 +7,7 @@ CSoundManager3D::CSoundManager3D()
 	m_pListener = nullptr;
 }
 
-CSoundManager3D::~CSoundManager3D()
-{
-}
+CSoundManager3D::~CSoundManager3D() = default;
 
 bool CSoundManager3D::Initialize()
 {
@@ -126,7 +124,7 @@ void CSoundManager3D::SetListenerVelocity(float fDistanceX, float fDistanceY, fl
 int32_t CSoundManager3D::SetInstance(const char * c_pszFileName)
 {
 	uint32_t dwFileCRC = GetFileCRC(c_pszFileName);
-	TSoundDataMap::iterator itor = ms_dataMap.find(dwFileCRC);
+	auto itor = ms_dataMap.find(dwFileCRC);
 
 	CSoundData * pkSoundData;
 

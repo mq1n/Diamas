@@ -33,99 +33,6 @@ PyObject * systemReserveResource(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
-PyObject * systemisInterfaceConfig(PyObject* poSelf, PyObject* poArgs)
-{
-	int32_t isInterfaceConfig = CPythonSystem::Instance().isInterfaceConfig();
-	return Py_BuildValue("i", isInterfaceConfig);
-}
-
-PyObject * systemSaveWindowStatus(PyObject* poSelf, PyObject* poArgs)
-{
-	int32_t iIndex;
-	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
-		return Py_BuildException();
-
-	int32_t iVisible;
-	if (!PyTuple_GetInteger(poArgs, 1, &iVisible))
-		return Py_BuildException();
-
-	int32_t iMinimized;
-	if (!PyTuple_GetInteger(poArgs, 2, &iMinimized))
-		return Py_BuildException();
-
-	int32_t ix;
-	if (!PyTuple_GetInteger(poArgs, 3, &ix))
-		return Py_BuildException();
-
-	int32_t iy;
-	if (!PyTuple_GetInteger(poArgs, 4, &iy))
-		return Py_BuildException();
-
-	int32_t iHeight;
-	if (!PyTuple_GetInteger(poArgs, 5, &iHeight))
-		return Py_BuildException();
-
-	CPythonSystem::Instance().SaveWindowStatus(iIndex, iVisible, iMinimized, ix, iy, iHeight);
-	return Py_BuildNone();
-}
-
-PyObject * systemGetWindowStatus(PyObject* poSelf, PyObject* poArgs)
-{
-	int32_t iIndex;
-	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
-		return Py_BuildException();
-
-	const CPythonSystem::TWindowStatus & c_rWindowStatus = CPythonSystem::Instance().GetWindowStatusReference(iIndex);
-	return Py_BuildValue("iiiii", c_rWindowStatus.isVisible,
-								  c_rWindowStatus.isMinimized,
-								  c_rWindowStatus.ixPosition,
-								  c_rWindowStatus.iyPosition,
-								  c_rWindowStatus.iHeight);
-}
-
-PyObject * systemGetConfig(PyObject * poSelf, PyObject * poArgs)
-{
-	CPythonSystem::TConfig *tmp = CPythonSystem::Instance().GetConfig();
-
-	int32_t iRes = CPythonSystem::Instance().GetResolutionIndex(tmp->width, tmp->height, tmp->bpp);
-	int32_t iFrequency = CPythonSystem::Instance().GetFrequencyIndex(iRes, tmp->frequency);
-
-	return Py_BuildValue("iiiiiiii",  iRes,
-									  iFrequency,
-									  tmp->is_software_cursor,
-									  tmp->is_object_culling,
-									  tmp->music_volume,
-									  tmp->voice_volume,
-									  tmp->gamma,
-									  tmp->iDistance);
-}
-
-PyObject * systemSetSaveID(PyObject * poSelf, PyObject * poArgs)
-{
-	int32_t iValue;
-	if (!PyTuple_GetInteger(poArgs, 0, &iValue))
-		return Py_BuildException();
-
-	char * szSaveID;
-	if (!PyTuple_GetString(poArgs, 1, &szSaveID))
-		return Py_BuildException();
-
-	CPythonSystem::Instance().SetSaveID(iValue, szSaveID);
-	return Py_BuildNone();
-}
-
-PyObject * systemisSaveID(PyObject * poSelf, PyObject * poArgs)
-{
-	int32_t value = CPythonSystem::Instance().IsSaveID();
-	return Py_BuildValue("i", value);
-}
-
-PyObject * systemGetSaveID(PyObject * poSelf, PyObject * poArgs)
-{
-	const char * c_szSaveID = CPythonSystem::Instance().GetSaveID();
-	return Py_BuildValue("s", c_szSaveID);
-}
-
 PyObject * systemGetMusicVolume(PyObject * poSelf, PyObject * poArgs)
 {
 	return Py_BuildValue("f", CPythonSystem::Instance().GetMusicVolume());
@@ -133,7 +40,7 @@ PyObject * systemGetMusicVolume(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * systemGetSoundVolume(PyObject * poSelf, PyObject * poArgs)
 {
-	return Py_BuildValue("i", CPythonSystem::Instance().GetSoundVolume());
+	return Py_BuildValue("f", CPythonSystem::Instance().GetSoundVolume());
 }
 
 PyObject * systemSetMusicVolume(PyObject * poSelf, PyObject * poArgs)
@@ -146,13 +53,13 @@ PyObject * systemSetMusicVolume(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildNone();
 }
 
-PyObject * systemSetSoundVolumef(PyObject * poSelf, PyObject * poArgs)
+PyObject * systemSetSoundVolume(PyObject * poSelf, PyObject * poArgs)
 {
 	float fVolume;
 	if (!PyTuple_GetFloat(poArgs, 0, &fVolume))
 		return Py_BuildException();
 
-	CPythonSystem::Instance().SetSoundVolumef(fVolume);
+	CPythonSystem::Instance().SetSoundVolume(fVolume);
 	return Py_BuildNone();
 }
 
@@ -177,13 +84,13 @@ PyObject * systemIsViewChat(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildValue("i", CPythonSystem::Instance().IsViewChat());
 }
 
-PyObject * systemSetAlwaysShowNameFlag(PyObject * poSelf, PyObject * poArgs)
+PyObject * systemSetShowNameFlag(PyObject * poSelf, PyObject * poArgs)
 {
 	int32_t iFlag;
 	if (!PyTuple_GetInteger(poArgs, 0, &iFlag))
 		return Py_BuildException();
 
-	CPythonSystem::Instance().SetAlwaysShowNameFlag(iFlag);
+	CPythonSystem::Instance().SetShowNameFlag(iFlag);
 
 	return Py_BuildNone();
 }
@@ -264,9 +171,9 @@ PyObject * systemSetShowMobLevel(PyObject * poSelf, PyObject * poArgs)
 #endif
 #endif
 
-PyObject * systemIsAlwaysShowName(PyObject * poSelf, PyObject * poArgs)
+PyObject * systemGetShowNameFlag(PyObject * poSelf, PyObject * poArgs)
 {
-	return Py_BuildValue("i", CPythonSystem::Instance().IsAlwaysShowName());
+	return Py_BuildValue("i", CPythonSystem::Instance().GetShowNameFlag());
 }
 
 PyObject * systemIsShowDamage(PyObject * poSelf, PyObject * poArgs)
@@ -279,85 +186,6 @@ PyObject * systemIsShowSalesText(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildValue("i", CPythonSystem::Instance().IsShowSalesText());
 }
 
-PyObject * systemSetConfig(PyObject * poSelf, PyObject * poArgs)
-{
-	int32_t res_index;
-	int32_t width;
-	int32_t height;
-	int32_t bpp;
-	int32_t frequency_index;
-	int32_t frequency;
-	int32_t software_cursor;
-	int32_t shadow;
-	int32_t object_culling;
-	int32_t music_volume;
-	int32_t voice_volume;
-	int32_t gamma;
-	int32_t distance;
-
-	if (!PyTuple_GetInteger(poArgs, 0, &res_index))
-		return Py_BuildException();
-
-	if (!PyTuple_GetInteger(poArgs, 1, &frequency_index))
-		return Py_BuildException();
-
-	if (!PyTuple_GetInteger(poArgs, 2, &software_cursor))
-		return Py_BuildException();
-
-	if (!PyTuple_GetInteger(poArgs, 3, &shadow))
-		return Py_BuildException();
-
-	if (!PyTuple_GetInteger(poArgs, 4, &object_culling))
-		return Py_BuildException();
-
-	if (!PyTuple_GetInteger(poArgs, 5, &music_volume))
-		return Py_BuildException();
-
-	if (!PyTuple_GetInteger(poArgs, 6, &voice_volume))
-		return Py_BuildException();
-
-	if (!PyTuple_GetInteger(poArgs, 7, &gamma))
-		return Py_BuildException();
-
-	if (!PyTuple_GetInteger(poArgs, 8, &distance))
-		return Py_BuildException();
-
-	if (!CPythonSystem::Instance().GetResolution(res_index, (uint32_t *) &width, (uint32_t *) &height, (uint32_t *) &bpp))
-		return Py_BuildNone();
-
-	if (!CPythonSystem::Instance().GetFrequency(res_index,frequency_index, (uint32_t *) &frequency))
-		return Py_BuildNone();
-
-	CPythonSystem::TConfig tmp;
-
-	memcpy(&tmp, CPythonSystem::Instance().GetConfig(), sizeof(tmp));
-
-	tmp.width				= width;
-	tmp.height				= height;
-	tmp.bpp					= bpp;
-	tmp.frequency			= frequency;
-	tmp.is_software_cursor	= software_cursor ? true : false;
-	tmp.is_object_culling	= object_culling ? true : false;
-	tmp.music_volume		= (char) music_volume;
-	tmp.voice_volume		= (char) voice_volume;
-	tmp.gamma				= gamma;
-	tmp.iDistance			= distance;
-
-	CPythonSystem::Instance().SetConfig(&tmp);
-	return Py_BuildNone();
-}
-
-PyObject * systemApplyConfig(PyObject * poSelf, PyObject * poArgs)
-{
-	CPythonSystem::Instance().ApplyConfig();
-	return Py_BuildNone();
-}
-
-PyObject * systemSaveConfig(PyObject * poSelf, PyObject * poArgs)
-{
-	int32_t ret = CPythonSystem::Instance().SaveConfig();
-	return Py_BuildValue("i", ret);
-}
 
 PyObject * systemGetResolutionCount(PyObject * poSelf, PyObject * poArgs)
 {
@@ -436,10 +264,6 @@ void initsystemSetting()
 		{ "DestroyInterfaceHandler",	systemDestroyInterfaceHandler,	METH_VARARGS },
 		{ "ReserveResource",			systemReserveResource,			METH_VARARGS },
 
-		{ "isInterfaceConfig",			systemisInterfaceConfig,		METH_VARARGS },
-		{ "SaveWindowStatus",			systemSaveWindowStatus,			METH_VARARGS },
-		{ "GetWindowStatus",			systemGetWindowStatus,			METH_VARARGS },
-
 		{ "GetResolutionCount",			systemGetResolutionCount,		METH_VARARGS },
 		{ "GetFrequencyCount",			systemGetFrequencyCount,		METH_VARARGS },
 
@@ -448,27 +272,18 @@ void initsystemSetting()
 		{ "GetResolution",				systemGetResolution,			METH_VARARGS },
 		{ "GetFrequency",				systemGetFrequency,				METH_VARARGS },
 
-		{ "ApplyConfig",				systemApplyConfig,				METH_VARARGS },
-		{ "SetConfig",					systemSetConfig,				METH_VARARGS },
-		{ "SaveConfig",					systemSaveConfig,				METH_VARARGS },
-		{ "GetConfig",					systemGetConfig,				METH_VARARGS },
-
-		{ "SetSaveID",					systemSetSaveID,				METH_VARARGS },
-		{ "isSaveID",					systemisSaveID,					METH_VARARGS },
-		{ "GetSaveID",					systemGetSaveID,				METH_VARARGS },
-
 		{ "GetMusicVolume",				systemGetMusicVolume,			METH_VARARGS },
 		{ "GetSoundVolume",				systemGetSoundVolume,			METH_VARARGS },
 
 		{ "SetMusicVolume",				systemSetMusicVolume,			METH_VARARGS },
-		{ "SetSoundVolumef",			systemSetSoundVolumef,			METH_VARARGS },
+		{ "SetSoundVolume",				systemSetSoundVolume,			METH_VARARGS },
 		{ "IsSoftwareCursor",			systemIsSoftwareCursor,			METH_VARARGS },
 
 		{ "SetViewChatFlag",			systemSetViewChatFlag,			METH_VARARGS },
 		{ "IsViewChat",					systemIsViewChat,				METH_VARARGS },
 
-		{ "SetAlwaysShowNameFlag",		systemSetAlwaysShowNameFlag,	METH_VARARGS },
-		{ "IsAlwaysShowName",			systemIsAlwaysShowName,			METH_VARARGS },
+		{ "SetShowNameFlag",			systemSetShowNameFlag,			METH_VARARGS },
+		{ "GetShowNameFlag",			systemGetShowNameFlag,			METH_VARARGS },
 
 		{ "SetShowDamageFlag",			systemSetShowDamageFlag,		METH_VARARGS },
 		{ "IsShowDamage",				systemIsShowDamage,				METH_VARARGS },
@@ -491,16 +306,4 @@ void initsystemSetting()
 	};
 
 	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(SYSTEM_MODULE).c_str(), s_methods);
-
-	PyModule_AddIntConstant(poModule, "WINDOW_STATUS",		CPythonSystem::WINDOW_STATUS);
-	PyModule_AddIntConstant(poModule, "WINDOW_INVENTORY",	CPythonSystem::WINDOW_INVENTORY);
-	PyModule_AddIntConstant(poModule, "WINDOW_ABILITY",		CPythonSystem::WINDOW_ABILITY);
-	PyModule_AddIntConstant(poModule, "WINDOW_SOCIETY",		CPythonSystem::WINDOW_SOCIETY);
-	PyModule_AddIntConstant(poModule, "WINDOW_JOURNAL",		CPythonSystem::WINDOW_JOURNAL);
-	PyModule_AddIntConstant(poModule, "WINDOW_COMMAND",		CPythonSystem::WINDOW_COMMAND);
-
-	PyModule_AddIntConstant(poModule, "WINDOW_QUICK",		CPythonSystem::WINDOW_QUICK);
-	PyModule_AddIntConstant(poModule, "WINDOW_GAUGE",		CPythonSystem::WINDOW_GAUGE);
-	PyModule_AddIntConstant(poModule, "WINDOW_MINIMAP",		CPythonSystem::WINDOW_MINIMAP);
-	PyModule_AddIntConstant(poModule, "WINDOW_CHAT",		CPythonSystem::WINDOW_CHAT);
 }

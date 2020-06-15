@@ -10,9 +10,7 @@ CPythonPlayerEventHandler& CPythonPlayerEventHandler::GetSingleton()
 	return s_kPlayerEventHandler;
 }
 
-CPythonPlayerEventHandler::~CPythonPlayerEventHandler()
-{
-}
+CPythonPlayerEventHandler::~CPythonPlayerEventHandler() = default;
 
 void CPythonPlayerEventHandler::OnClearAffects()
 {
@@ -160,7 +158,7 @@ void CPythonPlayerEventHandler::OnHit(uint32_t uSkill, CActorInstance& rkActorVi
 
 	rkActorVictim.TEMP_Push(kVictim.m_lPixelX, kVictim.m_lPixelY);
 
-	m_kVctkVictim.push_back(kVictim);
+	m_kVctkVictim.emplace_back(kVictim);
 }
 
 void CPythonPlayerEventHandler::FlushVictimList()

@@ -1,12 +1,7 @@
 #ifndef __INC_ETERBASE_STL_H__
 #define __INC_ETERBASE_STL_H__
 
-#pragma warning(disable:4786)	// identifier was truncated to '255' characters in the browser information
-#pragma warning(disable:4018)	// signed <-> uint32_t mismatch
-#pragma warning(disable:4503)	// decorated name length exceeded, name was truncated
-#pragma warning(disable:4018)	// '<' : signed/uint32_t mismatch
-
-#include <assert.h>
+#include <cassert>
 
 #pragma warning ( push, 3 )
 
@@ -20,7 +15,7 @@
 #include <map>
 #include <queue>
 #include <functional>
-#include <SSTREAM>
+#include <sstream>
 #include <cstdint>
 
 #pragma warning ( pop )
@@ -50,55 +45,55 @@ namespace std
 	};
 #endif // _HAS_CXX17
 
-	template <class _Ty>
-	class void_mem_fun_t
-		: public unary_function<_Ty *, void> {
-	public:
-		explicit void_mem_fun_t(void (_Ty::*_Pm)())
-			: _Ptr(_Pm) {}
-		void operator()(_Ty *_P) const
-		{((_P->*_Ptr)()); }
-	private:
-		void (_Ty::*_Ptr)();
-		};
-	template<class _Ty> inline
-	void_mem_fun_t<_Ty> void_mem_fun(void (_Ty::*_Pm)())
-	{return (void_mem_fun_t<_Ty>(_Pm)); }
-
-	template<class _Ty>
-	class void_mem_fun_ref_t : public unary_function<_Ty, void> {
-	public:
-		explicit void_mem_fun_ref_t(void (_Ty::*_Pm)())
-			: _Ptr(_Pm) {}
-		void operator()(_Ty& _X) const
-		{return ((_X.*_Ptr)()); }
-	private:
-		void (_Ty::*_Ptr)();
-	};
-
-	template<class _Ty> inline
-	void_mem_fun_ref_t<_Ty> void_mem_fun_ref(void (_Ty::*_Pm)())
-	{return (void_mem_fun_ref_t< _Ty>(_Pm)); }
-
-
-		// TEMPLATE CLASS mem_fun1_t
-template<class _R, class _Ty, class _A>
-	class void_mem_fun1_t : public binary_function<_Ty *, _A, _R> {
+template <class _Ty> class void_mem_fun_t : public unary_function<_Ty *, void>
+{
 public:
-	explicit void_mem_fun1_t(_R (_Ty::*_Pm)(_A))
-		: _Ptr(_Pm) {}
-	_R operator()(_Ty *_P, _A _Arg) const
-		{return ((_P->*_Ptr)(_Arg)); }
+	explicit void_mem_fun_t(void (_Ty::*_Pm)()) : _Ptr(_Pm) {}
+	void operator()(_Ty * _P) const { ((_P->*_Ptr)()); }
+
 private:
-	_R (_Ty::*_Ptr)(_A);
-	};
-		// TEMPLATE FUNCTION mem_fun1
-template<class _R, class _Ty, class _A> inline
-	void_mem_fun1_t<_R, _Ty, _A> void_mem_fun1(_R (_Ty::*_Pm)(_A))
-	{return (void_mem_fun1_t<_R, _Ty, _A>(_Pm)); }
-
-
+	void (_Ty::*_Ptr)();
+};
+template <class _Ty> void_mem_fun_t<_Ty> void_mem_fun(void (_Ty::*_Pm)())
+{
+	return (void_mem_fun_t<_Ty>(_Pm));
 }
+
+template <class _Ty> class void_mem_fun_ref_t : public unary_function<_Ty, void>
+{
+public:
+	explicit void_mem_fun_ref_t(void (_Ty::*_Pm)()) : _Ptr(_Pm) {}
+	void operator()(_Ty & _X) const { return ((_X.*_Ptr)()); }
+
+private:
+	void (_Ty::*_Ptr)();
+};
+
+template <class _Ty> void_mem_fun_ref_t<_Ty> void_mem_fun_ref(void (_Ty::*_Pm)())
+{
+	return (void_mem_fun_ref_t<_Ty>(_Pm));
+}
+
+
+// TEMPLATE CLASS mem_fun1_t
+template <class _R, class _Ty, class _A> class void_mem_fun1_t : public binary_function<_Ty *, _A, _R>
+{
+public:
+	explicit void_mem_fun1_t(_R (_Ty::*_Pm)(_A)) : _Ptr(_Pm) {}
+	_R operator()(_Ty * _P, _A _Arg) const { return ((_P->*_Ptr)(_Arg)); }
+
+private:
+	_R(_Ty::*_Ptr)
+	(_A);
+};
+// TEMPLATE FUNCTION mem_fun1
+template <class _R, class _Ty, class _A> void_mem_fun1_t<_R, _Ty, _A> void_mem_fun1(_R (_Ty::*_Pm)(_A))
+{
+	return (void_mem_fun1_t<_R, _Ty, _A>(_Pm));
+}
+
+
+} // namespace std
 
 struct stl_sz_less
 {
@@ -216,13 +211,9 @@ void DeleteVectorItem(std::vector<T> * pVector, T pItem)
 		if (pItem == *itor)
 		{
 			if (1 == pVector->size())
-			{
 				pVector->clear();
-			}
 			else
-			{
 				pVector->erase(itor);
-			}
 			break;
 		}
 	}
@@ -237,13 +228,9 @@ void DeleteListItem(std::list<T> * pList, T pItem)
 		if (pItem == *itor)
 		{
 			if (1 == pList->size())
-			{
 				pList->clear();
-			}
 			else
-			{
 				pList->erase(itor);
-			}
 			break;
 		}
 	}
@@ -252,7 +239,8 @@ void DeleteListItem(std::list<T> * pList, T pItem)
 template<typename T, typename F>
 void stl_vector_qsort(std::vector<T>& rdataVector, F comp)
 {
-	if (rdataVector.empty()) return;
+	if (rdataVector.empty())
+		return;
 	qsort(&rdataVector[0], rdataVector.size(), sizeof(T), comp);
 }
 
@@ -306,7 +294,7 @@ class stl_stack_pool
 			return &m_dataVector[0];
 		}
 		
-		int32_t size()
+		int32_t size() const
 		{
 			return m_pos;
 		}
@@ -365,7 +353,8 @@ class stl_circle_pool
 			THandle loop=max;
 			while (loop--)
 			{
-				int32_t cur=m_pos%max;++m_pos;
+				int32_t cur = m_pos % max;
+				++m_pos;
 				if (!m_flags[cur])				
 				{				
 					m_flags[cur]=true;
@@ -382,16 +371,18 @@ class stl_circle_pool
 			assert(check(handle) && "Out of RANGE");
 			m_flags[handle]=false;
 		}
-		inline bool check(THandle handle)
+
+		bool check(THandle handle)
 		{
-			if (handle>=m_size) return false;
+			if (handle >= m_size)
+				return false;
 			return true;
 		}
-		inline int32_t size()
+		int32_t size() const
 		{
 			return m_size;
 		}
-		inline TData& refer(THandle handle)
+		TData& refer(THandle handle)
 		{
 			assert(check(handle) && "Out of RANGE");
 			return m_datas[handle];
@@ -489,28 +480,4 @@ public:
 		TMapType::iterator m_itEnd;
 };
 */
-
-struct stringhash
-{
-	size_t GetHash(const std::string & str) const
-	{
-       const uint8_t * s = (const uint8_t*) str.c_str();
-       const uint8_t * end = s + str.size();
-       size_t h = 0;
-
-       while (s < end)
-       {
-           h *= 16777619;
-           h ^= (uint8_t) *(uint8_t *) (s++);
-       }
-
-       return h;
-	}
-
-    size_t operator () (const std::string & str) const
-    {
-		return GetHash(str);
-    }
-};
-
 #endif

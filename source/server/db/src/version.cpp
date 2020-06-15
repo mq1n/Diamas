@@ -3,13 +3,12 @@
 
 void WriteVersion()
 {
-#ifndef __WIN32__
 	FILE* fp(fopen("VERSION.txt", "w"));
 
-	if (nullptr != fp)
+	if (fp)
 	{
-		fprintf(fp, "__DB_VERSION__: %s\n", __DB_VERSION__);
-		fprintf(fp, "%s@%s:%s\n", __USER__, __HOSTNAME__, __PWD__);
+		fprintf(fp, "db_cache perforce revision: %s\n", _GIT_VERSION_);
+		fprintf(fp, "Hostname: %s Path: %s\n", _HOSTNAME_, _DIRECTORY_);
 		fclose(fp);
 	}
 	else
@@ -17,6 +16,5 @@ void WriteVersion()
 		fprintf(stderr, "cannot open VERSION.txt\n");
 		exit(0);
 	}
-#endif
 }
 

@@ -8,8 +8,8 @@
 #include "db.h"
 #include "log.h"
 #include "skill.h"
+#include "../../common/service.h"
 
-#define ENABLE_PICKAXE_RENEWAL
 namespace mining
 {
 	enum
@@ -138,7 +138,7 @@ namespace mining
 			return;
 		}
 
-		PIXEL_POSITION pos;
+		GPOS pos;
 		pos.x = ch->GetX() + number(-200, 200);
 		pos.y = ch->GetY() + number(-200, 200);
 
@@ -146,7 +146,7 @@ namespace mining
 		item->StartDestroyEvent();
 		item->SetOwnership(ch, 15);
 
-		DBManager::instance().SendMoneyLog(MONEY_LOG_DROP, item->GetVnum(), item->GetCount());
+		LogManager::instance().MoneyLog(MONEY_LOG_DROP, item->GetVnum(), item->GetCount());
 	}
 
 	int32_t GetOrePct(LPCHARACTER ch)
@@ -199,13 +199,12 @@ namespace mining
 		pick.SetSocket(0, cur + 1);
 	}
 
-#ifdef ENABLE_PICKAXE_RENEWAL
 	void Pick_SetPenaltyExp(CItem& pick)
 	{
 		int32_t cur = Pick_GetCurExp(pick);
 		pick.SetSocket(0, (cur > 0) ? (cur - (cur * 10 / 100)) : 0);
 	}
-#endif
+
 	void Pick_MaxCurExp(CItem& pick)
 	{
 		int32_t max = Pick_GetMaxExp(pick);
@@ -262,7 +261,7 @@ namespace mining
 			LPITEM pkNewPick = ITEM_MANAGER::instance().CreateItem(rkOldPick.GetRefinedVnum(), 1);
 			if (pkNewPick)
 			{
-				uint8_t bCell = rkOldPick.GetCell();
+				auto bCell = rkOldPick.GetCell();
 				rkItemMgr.RemoveItem(item, "REMOVE (REFINE PICK)");
 				pkNewPick->AddToCharacter(ch, TItemPos(INVENTORY, bCell));
 				LogManager::instance().ItemLog(ch, pkNewPick, "REFINE PICK SUCCESS", pkNewPick->GetName());
@@ -275,28 +274,14 @@ namespace mining
 		{
 			rkLogMgr.RefineLog(ch->GetPlayerID(), rkOldPick.GetName(), rkOldPick.GetID(), iAdv, 0, "PICK");
 
-#ifdef ENABLE_PICKAXE_RENEWAL
-			{
-				// if (test_server) ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Pickax> PRE %u"), Pick_GetCurExp(*item));
-				Pick_SetPenaltyExp(*item);
-				// if (test_server) ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Pickax> POST %u"), Pick_GetCurExp(*item));
-				// ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Pickax> The upgrade has failed, and the pickax has lost 10%% of its mastery points."));
-				rkLogMgr.ItemLog(ch, item, "REFINE PICK FAIL", item->GetName());
-				return 0;
-			}
-#else
-			LPITEM pkNewPick = ITEM_MANAGER::instance().CreateItem(rkOldPick.GetValue(4), 1);
+			// if (g_bIsTestServer) ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Pickax> PRE %u"), Pick_GetCurExp(*item));
+			Pick_SetPenaltyExp(*item);
 
-			if (pkNewPick)
-			{
-				uint8_t bCell = rkOldPick.GetCell();
-				rkItemMgr.RemoveItem(item, "REMOVE (REFINE PICK)");
-				pkNewPick->AddToCharacter(ch, TItemPos(INVENTORY, bCell));
-				rkLogMgr.ItemLog(ch, pkNewPick, "REFINE PICK FAIL", pkNewPick->GetName());
-				return 0;
-			}
-#endif
-			return 2;
+			// if (g_bIsTestServer) ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Pickax> POST %u"), Pick_GetCurExp(*item));
+			// ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Pickax> The upgrade has failed, and the pickax has lost 10%% of its mastery points."));
+			
+			rkLogMgr.ItemLog(ch, item, "REFINE PICK FAIL", item->GetName());
+			return 0;
 		}
 	}
 
@@ -397,6 +382,7 @@ namespace mining
 			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("채광에 실패하였습니다."));
 		}
 
+		ch->GetActivityHandler()->MarkMining();
 		PracticePick(ch, pick);
 
 		return 0;

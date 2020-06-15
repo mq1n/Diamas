@@ -68,7 +68,7 @@ crc_t get_crc32(const char * buf, size_t len)
 	} while (len >= 16);
     }
 
-    if (0 != len)
+    if (len)
     {
 	do
 	{

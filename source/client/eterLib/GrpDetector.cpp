@@ -105,9 +105,7 @@ VOID D3D_CAdapterDisplayModeList::Build(IDirect3D9& rkD3D, D3DFORMAT eD3DFmtDefa
 
 			// IsNewFormat
 			if (peD3DFmtFind==peD3DFmtEnd && uD3DFmtNum<D3DFORMAT_MAX)
-			{
 				aeD3DFmt[uD3DFmtNum++]=kD3DDMCur.Format;
-			}											
 		}				
 	}
 

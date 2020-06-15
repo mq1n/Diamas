@@ -1,7 +1,7 @@
 #ifndef __ETER_FILE_DIR__
 #define __ETER_FILE_DIR__
 
-#include <windows.h>
+#include <Windows.h>
 
 class CDir
 {
@@ -17,7 +17,7 @@ class CDir
 		virtual bool OnFile(const char* c_szPath, const char* c_szName) = 0;
 		
 	protected:
-		bool IsFolder();
+		bool IsFolder() const;
 		
 		void Initialize();
 		

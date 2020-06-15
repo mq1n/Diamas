@@ -6,6 +6,7 @@
 #include "mob_manager.h"
 #include "config.h"
 #include "skill_power.h"
+#include "../../common/service.h"
 
 extern std::string				g_stQuestDir;
 extern std::set <std::string> 	g_setQuestObjectDir;
@@ -13,7 +14,7 @@ extern std::set <std::string> 	g_setQuestObjectDir;
 std::string g_stServiceBasePath = ".";
 std::string g_stServiceMapPath = "data/map";
 
-std::string g_stLocale = "latin1";
+std::string g_stLocale = "latin5";
 std::string g_stLocaleBasePath = "locale/turkey";
 
 int32_t(*check_name) (const char* str) = nullptr;

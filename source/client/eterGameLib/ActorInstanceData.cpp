@@ -4,8 +4,8 @@
 #include "ItemManager.h"
 #include "RaceData.h"
 
-#include "../eterlib/ResourceManager.h"
-#include "../etergrnlib/util.h"
+#include "../eterLib/ResourceManager.h"
+#include "../eterGrnLib/Util.h"
 
 uint32_t CActorInstance::GetVirtualID()
 {
@@ -68,9 +68,7 @@ bool CActorInstance::SetRace(uint32_t eRace)
 
 	CAttributeData * pAttributeData = pRaceData->GetAttributeDataPtr();
 	if (pAttributeData)
-	{
 		__CreateAttributeInstance(pAttributeData);
-	}
 
 	memset(m_adwPartItemID, 0, sizeof(m_adwPartItemID));
 
@@ -101,7 +99,7 @@ bool CActorInstance::SetRace(uint32_t eRace)
 			uint16_t wMotionMode = itor->first;
 			CRaceData::TMotionModeData * pMotionModeData = itor->second;
 
-			CRaceData::TMotionVectorMap::iterator itorMotion = pMotionModeData->MotionVectorMap.begin();
+			auto itorMotion = pMotionModeData->MotionVectorMap.begin();
 			for (; itorMotion != pMotionModeData->MotionVectorMap.end(); ++itorMotion)
 			{
 				uint16_t wMotionIndex = itorMotion->first;
@@ -114,8 +112,7 @@ bool CActorInstance::SetRace(uint32_t eRace)
 					CGraphicThingInstance::RegisterMotionThing(dwMotionKey, it->pMotion);
 				}
 			}
-		}
-		while (pRaceData->NextMotionModeIterator(itor));
+		} while (pRaceData->NextMotionModeIterator(itor));
 	}
 
 	return true;
@@ -283,13 +280,9 @@ void CActorInstance::SetShape(uint32_t eShape, float fSpecular)
 		{
 			case NRaceData::ATTACHING_DATA_TYPE_EFFECT:
 				if (c_pAttachingData->isAttaching)
-				{
 					AttachEffectByName(0, c_pAttachingData->strAttachingBoneName.c_str(), c_pAttachingData->pEffectData->strFileName.c_str());
-				}
 				else
-				{
-					AttachEffectByName(0, 0, c_pAttachingData->pEffectData->strFileName.c_str());
-				}
+					AttachEffectByName(0, nullptr, c_pAttachingData->pEffectData->strFileName.c_str());
 				break;
 		}
 	}
@@ -309,7 +302,7 @@ void CActorInstance::ChangeMaterial(const char * c_szFileName)
 	if (c_rkVct_kSkin.empty())
 		return;
 
-	std::vector<CRaceData::SSkin>::const_iterator i = c_rkVct_kSkin.begin();
+	auto i = c_rkVct_kSkin.begin();
 	const CRaceData::SSkin& c_rkSkinItem = *i;
 
 	std::string dstFileName = c_szFileName;
@@ -372,7 +365,7 @@ void CActorInstance::SetSpecularInfo(bool bEnable, int32_t iPart, float fAlpha)
 	if (pkShape->m_kVct_kSkin.empty())
 		return;
 
-	std::string filename = pkShape->m_kVct_kSkin[0].m_stSrcFileName.c_str();
+	std::string filename = pkShape->m_kVct_kSkin[0].m_stSrcFileName;
 	CFileNameHelper::ChangeDosPath(filename);
 
 	CGraphicThingInstance::SetSpecularInfo(iPart, filename.c_str(), bEnable, fAlpha);

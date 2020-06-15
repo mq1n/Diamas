@@ -5,6 +5,22 @@
 
 namespace building
 {
+	enum EBuildingOptions
+	{
+		// ADD_SUPPLY_BUILDING
+		BUILDING_INCREASE_GROUP_VNUM = 4,
+		BUILDING_INCREASE_GUILD_MEMBER_COUNT_SMALL = 14061,
+		BUILDING_INCREASE_GUILD_MEMBER_COUNT_MEDIUM = 14062,
+		BUILDING_INCREASE_GUILD_MEMBER_COUNT_LARGE = 14063,
+		// END_OF_ADD_SUPPLY_BUILDING
+
+		FLAG_VNUM = 14200,
+		WALL_DOOR_VNUM	= 14201,
+		WALL_BACK_VNUM	= 14202,
+		WALL_LEFT_VNUM	= 14203,
+		WALL_RIGHT_VNUM	= 14204,
+	};
+
 	class CLand;
 
 	class CObject : public CEntity
@@ -22,6 +38,8 @@ namespace building
 
 			void	SetVID(uint32_t dwVID);
 			uint32_t	GetVID() { return m_dwVID; }
+			void	SetGuildID(uint32_t dwGuild) { m_guildID = dwGuild; }
+			uint32_t	GetGuildID() { return m_guildID; }
 
 			bool	Show(int32_t lMapIndex, int32_t x, int32_t y);
 
@@ -49,6 +67,7 @@ namespace building
 			TObject		m_data;
 			uint32_t		m_dwVID;
 			CLand *		m_pkLand;
+			uint32_t		m_guildID;
 
 			LPCHARACTER		m_chNPC;
 	};
@@ -61,7 +80,7 @@ namespace building
 
 			void	Destroy();
 
-			const TLand & GetData();
+			const TLand & GetData() const;
 			void	PutData(const TLand * data);
 
 			uint32_t	GetID() const { return m_data.dwID; }
@@ -76,11 +95,11 @@ namespace building
 			LPOBJECT	FindObjectByNPC(LPCHARACTER npc);
 			void DeleteObject(uint32_t dwID);
 
-			bool	RequestCreateObject(uint32_t dwVnum, int32_t lMapIndex, int32_t x, int32_t y, float xRot, float yRot, float zRot, bool checkAnother);
+			bool	RequestCreateObject(uint32_t dwVnum, int32_t lMapIndex, int32_t x, int32_t y, float xRot, float yRot, float zRot, bool checkAnother) const;
 			void	RequestDeleteObject(uint32_t dwID);
 			void	RequestDeleteObjectByVID(uint32_t dwVID);
 
-			void	RequestUpdate(uint32_t dwGuild);
+			void	RequestUpdate(uint32_t dwGuild) const;
 
 			// LAND_CLEAR
 			void	ClearLand();
@@ -103,7 +122,7 @@ namespace building
 
 			// BUILD_WALL
 		private :
-			void DrawWall(uint32_t dwVnum, int32_t nMapIndex, int32_t& centerX, int32_t& centerY, char length, float zRot);
+			void DrawWall(uint32_t dwVnum, int32_t nMapIndex, int32_t& centerX, int32_t& centerY, char length, float zRot) const;
 			// END_BUILD_WALL
 	};
 
@@ -130,7 +149,7 @@ namespace building
 			void	DeleteObject(uint32_t dwID);
 			void	UnregisterObject(LPOBJECT pkObj);
 
-			LPOBJECT	FindObjectByVID(uint32_t dwVID);
+			LPOBJECT FindObjectByVID(uint32_t dwVID);
 
 			void	SendLandList(LPDESC d, int32_t lMapIndex);
 

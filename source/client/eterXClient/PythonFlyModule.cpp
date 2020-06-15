@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "../eterGameLib/FlyingObjectManager.h"
 PyObject * flyUpdate(PyObject * poSelf, PyObject * poArgs)
 {

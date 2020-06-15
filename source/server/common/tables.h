@@ -5,6 +5,8 @@
 #include "item_length.h"
 #include "service.h"
 
+#include <cstdint>
+#include <cstring>
 typedef	uint32_t IDENT;
 
 /**
@@ -23,7 +25,6 @@ enum
 	HEADER_GD_LOGIN_KEY			= 7,
 	// 8 empty
 	HEADER_GD_BOOT				= 9,
-	HEADER_GD_PLAYER_COUNT		= 10,
 	HEADER_GD_QUEST_SAVE		= 11,
 	HEADER_GD_SAFEBOX_LOAD		= 12,
 	HEADER_GD_SAFEBOX_SAVE		= 13,
@@ -71,8 +72,6 @@ enum
 	HEADER_GD_REQUEST_EMPIRE_PRIV	= 48,
 	HEADER_GD_REQUEST_GUILD_PRIV	= 49,
 
-	HEADER_GD_MONEY_LOG				= 50,
-
 	HEADER_GD_GUILD_DEPOSIT_MONEY				= 51,
 	HEADER_GD_GUILD_WITHDRAW_MONEY				= 52,
 	HEADER_GD_GUILD_WITHDRAW_MONEY_GIVE_REPLY	= 53,
@@ -97,6 +96,8 @@ enum
 	HEADER_GD_WEDDING_READY		= 74,
 	HEADER_GD_WEDDING_END		= 75,
 
+	HEADER_GD_SAVE_ACTIVITY		= 76,
+
 	HEADER_GD_AUTH_LOGIN		= 100,
 	HEADER_GD_LOGIN_BY_KEY		= 101,
 	HEADER_GD_MALL_LOAD			= 107,
@@ -112,9 +113,6 @@ enum
 	HEADER_GD_REQ_CHANGE_GUILD_MASTER	= 129,
 
 	HEADER_GD_REQ_SPARE_ITEM_ID_RANGE	= 130,
-
-	HEADER_GD_UPDATE_HORSE_NAME		= 131,
-	HEADER_GD_REQ_HORSE_NAME		= 132,
 
 	HEADER_GD_DC					= 133,		// Login Key를 지움
 
@@ -160,6 +158,7 @@ enum
 	HEADER_DG_AFFECT_LOAD		= 50,
 	HEADER_DG_MALL_LOAD			= 51,
 
+	HEADER_DG_ACTIVITY_LOAD		= 54,
 	HEADER_DG_DIRECT_ENTER		= 55,
 
 	HEADER_DG_GUILD_SKILL_UPDATE	= 56,
@@ -204,8 +203,6 @@ enum
 
 	HEADER_DG_CHANGE_EMPIRE_PRIV	= 124,
 	HEADER_DG_CHANGE_GUILD_PRIV		= 125,
-
-	HEADER_DG_MONEY_LOG			= 126,
 
 	HEADER_DG_CHANGE_CHARACTER_PRIV	= 127,
 
@@ -275,9 +272,8 @@ typedef struct SSimplePlayer
 	uint8_t		bChangeName;
 	uint16_t		wHairPart;
 #ifdef ENABLE_ACCE_SYSTEM
-	uint16_t		wAccePart;
+	uint32_t		dwAccePart;
 #endif
-	uint8_t		bDummy[4];
 	int32_t		x, y;
 	int32_t		lAddr;
 	uint16_t		wPort;
@@ -320,6 +316,7 @@ typedef struct SPlayerItem
 	TPlayerItemAttribute    aAttr[ITEM_ATTRIBUTE_MAX_NUM];
 
 	uint32_t	owner;
+	bool	is_gm_owner;
 } TPlayerItem;
 
 typedef struct SQuickslot
@@ -338,7 +335,8 @@ typedef struct SPlayerSkill
 struct	THorseInfo
 {
 	uint8_t	bLevel;
-	uint8_t	bRiding;
+	char	szName[CHARACTER_NAME_MAX_LEN + 1];
+	bool	bRiding;
 	int16_t	sStamina;
 	int16_t	sHealth;
 	uint32_t	dwHorseHealthDropTime;
@@ -359,11 +357,11 @@ typedef struct SPlayerTable
 	int16_t	st, ht, dx, iq;
 
 	uint32_t	exp;
-	INT		gold;
+	int32_t		gold;
 
 	uint8_t	dir;
-	INT		x, y, z;
-	INT		lMapIndex;
+	int32_t		x, y, z;
+	int32_t		lMapIndex;
 
 	int32_t	lExitX, lExitY;
 	int32_t	lExitMapIndex;
@@ -401,7 +399,28 @@ typedef struct SPlayerTable
 	uint32_t	logoff_interval;
 
 	int32_t		aiPremiumTimes[PREMIUM_MAX_NUM];
+
+	bool	is_gm_invisible;
 } TPlayerTable;
+
+enum EAttTypes
+{
+	ATT_ELEC,
+	ATT_FIRE,
+	ATT_ICE,
+	ATT_WIND,
+	ATT_EARTH,
+	ATT_DARK,
+	ATT_MAX
+};
+
+enum EResistTypes
+{
+	RESIST_DARK,
+	RESIST_ICE,
+	RESIST_EARTH,
+	RESIST_MAX
+};
 
 typedef struct SMobSkillLevel
 {
@@ -562,6 +581,267 @@ typedef struct SItemApply
 
 typedef struct SItemTable : public SEntityTable
 {
+	char* GetOriginalName()
+	{
+		return szName;
+	}
+
+	char* GetName()
+	{
+		return szLocaleName;
+	}
+
+	uint8_t GetType() const
+	{
+		return bType;
+	}
+
+	uint8_t GetSubType() const
+	{
+		return bSubType;
+	}
+
+	uint8_t GetWeight() const
+	{
+		return bWeight;
+	}
+
+	uint8_t GetSize() const
+	{
+		return bSize;
+	}
+
+	uint32_t GetAntiFlags() const
+	{
+		return dwAntiFlags;
+	}
+
+	uint32_t GetFlags() const
+	{
+		return dwAntiFlags;
+	}
+
+	uint32_t GetWearFlags() const
+	{
+		return dwWearFlags;
+	}
+
+	uint32_t GetImmuneFlags() const
+	{
+		return dwImmuneFlag;
+	}
+
+	uint32_t GetBuyPrice() const
+	{
+		return dwGold;
+	}
+
+	uint32_t GetSellPrice() const
+	{
+		return dwShopBuyPrice;
+	}
+
+	int32_t GetValue(uint32_t index)
+	{
+		return alValues[index];
+	}
+
+	uint8_t GetLimitType(uint32_t idx) const
+	{
+		return aLimits[idx].bType;
+	}
+
+	int32_t GetLimitValue(uint32_t idx) const
+	{
+		return aLimits[idx].lValue;
+	}
+
+	// Weapon
+	bool IsWeapon() const
+	{
+		return GetType() == ITEM_WEAPON;
+	}
+
+	bool IsSword() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_SWORD;
+	}
+
+	bool IsDagger() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_DAGGER;
+	}
+
+	bool IsBow() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_BOW;
+	}
+
+	bool IsTwoHandSword() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_TWO_HANDED;
+	}
+
+	bool IsBell() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_BELL;
+	}
+
+	bool IsFan() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_FAN;
+	}
+
+	bool IsArrow() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_ARROW;
+	}
+
+	bool IsMountSpear() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_MOUNT_SPEAR;
+	}
+
+	bool IsClaw() const
+	{
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_CLAW;
+#else
+		return false;
+#endif
+	}
+
+	bool IsQuiver() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_NUM_TYPES;
+	}
+
+	// Armor
+	bool IsArmor() const
+	{
+		return GetType() == ITEM_ARMOR;
+	}
+
+	bool IsArmorBody() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_BODY;
+	}
+
+	bool IsHelmet() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_HEAD;
+	}
+
+	bool IsShield() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_SHIELD;
+	}
+
+	bool IsWrist() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_WRIST;
+	}
+
+	bool IsShoe() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_FOOTS;
+	}
+
+	bool IsNecklace() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_NECK;
+	}
+
+	bool IsEarRing() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_EAR;
+	}
+
+
+	bool IsRing() const
+	{
+		return GetType() == ITEM_RING;
+	}
+
+	bool IsCostume() const
+	{
+		return GetType() == ITEM_COSTUME;
+	}
+
+#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
+	bool IsCostumeMount() const
+	{
+		return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_MOUNT;
+	}
+#endif
+
+	bool IsCostumeHair() const
+	{
+		return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_HAIR;
+	}
+
+	bool IsCostumeBody() const
+	{
+		return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_BODY;
+	}
+
+   bool IsCostumeAcce() const
+	{
+#ifdef ENABLE_ACCE_SYSTEM
+		return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_ACCE;
+#else
+		return false;
+#endif
+	}
+
+	bool IsCostumeAura() const
+	{
+#ifdef ENABLE_AURA_SYSTEM
+		return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_AURA;
+#else
+		return false;
+#endif
+	}
+
+	bool IsCostumeWeapon() const
+	{
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+		return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_WEAPON;
+#else
+		return false;
+#endif
+	}
+
+	bool IsCostumeModifyItem() const
+	{
+		return GetType() == ITEM_USE && (GetSubType() == USE_CHANGE_COSTUME_ATTR || GetSubType() == USE_RESET_COSTUME_ATTR);
+	}
+
+	bool IsBelt() const
+	{
+		return GetType() == ITEM_BELT;
+	}
+
+	int32_t GetApplyValue(uint32_t i) const
+	{
+		return aApplies[i].lValue;
+	}
+
+	int32_t GetApplyType(uint32_t i) const
+	{
+		return aApplies[i].bType;
+	}
+
+	int32_t FindApplyValue(uint32_t applyType) const
+	{
+		for (int32_t i = 0; i < ITEM_APPLY_MAX_NUM; ++i)
+		{
+			if (aApplies[i].bType == applyType)
+				return aApplies[i].lValue;
+		}
+
+		return 0;
+	}
 	uint32_t		dwVnumRange;
 	char        szName[ITEM_NAME_MAX_LEN + 1];
 	char	szLocaleName[ITEM_NAME_MAX_LEN + 1];
@@ -733,6 +1013,7 @@ typedef struct SPacketDGP2P
 {
 	char	szHost[MAX_HOST_LENGTH + 1];
 	uint16_t	wPort;
+	uint16_t	wListenPort;
 	uint8_t	bChannel;
 } TPacketDGP2P;
 
@@ -1020,6 +1301,20 @@ typedef struct SPacketDGChangeCharacterPriv
 	uint8_t bLog;
 } TPacketDGChangeCharacterPriv;
 
+typedef struct SActivityTable
+{
+	uint32_t pid;
+	struct
+	{
+		int32_t pvp;
+		int32_t gk;
+		int32_t pve;
+		int32_t other;
+	} today;
+	int32_t		total;
+	uint32_t	lastUpdate;
+} TActivityTable;
+
 /**
  * @version 05/06/08	Bang2ni - 지속시간 추가
  */
@@ -1041,35 +1336,28 @@ typedef struct SPacketDGChangeEmpirePriv
 	uint32_t end_time_sec;
 } TPacketDGChangeEmpirePriv;
 
-typedef struct SPacketMoneyLog
-{
-	uint8_t type;
-	uint32_t vnum;
-	INT gold;
-} TPacketMoneyLog;
-
 typedef struct SPacketGDGuildMoney
 {
 	uint32_t dwGuild;
-	INT iGold;
+	int32_t iGold;
 } TPacketGDGuildMoney;
 
 typedef struct SPacketDGGuildMoneyChange
 {
 	uint32_t dwGuild;
-	INT iTotalGold;
+	int32_t iTotalGold;
 } TPacketDGGuildMoneyChange;
 
 typedef struct SPacketDGGuildMoneyWithdraw
 {
 	uint32_t dwGuild;
-	INT iChangeGold;
+	int32_t iChangeGold;
 } TPacketDGGuildMoneyWithdraw;
 
 typedef struct SPacketGDGuildMoneyWithdrawGiveReply
 {
 	uint32_t dwGuild;
-	INT iChangeGold;
+	int32_t iChangeGold;
 	uint8_t bGiveSuccess;
 } TPacketGDGuildMoneyWithdrawGiveReply;
 
@@ -1093,8 +1381,8 @@ typedef struct SPacketGDCreateObject
 {
 	uint32_t	dwVnum;
 	uint32_t	dwLandID;
-	INT		lMapIndex;
-	INT	 	x, y;
+	int32_t		lMapIndex;
+	int32_t	 	x, y;
 	float	xRot;
 	float	yRot;
 	float	zRot;
@@ -1140,7 +1428,7 @@ typedef struct
 {
 	uint32_t dwPID1;
 	uint32_t dwPID2;
-	INT  iLovePoint;
+	int32_t  iLovePoint;
 	uint8_t  byMarried;
 } TPacketMarriageUpdate;
 
@@ -1211,10 +1499,15 @@ typedef struct TAdminInfo
 	int32_t m_ID;				//고유ID
 	char m_szAccount[32];	//계정
 	char m_szName[32];		//캐릭터이름
-	char m_szContactIP[16];	//접근아이피
-	char m_szServerIP[16];  //서버아이피
 	int32_t m_Authority;		//권한
 } tAdminInfo;
+
+typedef struct SPacketGGUpdateRights
+{
+	uint8_t	header;
+	char	name[CHARACTER_NAME_MAX_LEN + 1];
+	uint8_t	gm_level;
+} TPacketGGUpdateRights;
 //END_ADMIN_MANAGER
 
 //BOOT_LOCALIZATION
@@ -1246,12 +1539,6 @@ typedef struct tItemIDRange
 	uint32_t dwUsableItemIDMin;
 } TItemIDRangeTable;
 
-typedef struct tUpdateHorseName
-{
-	uint32_t dwPlayerID;
-	char szHorseName[CHARACTER_NAME_MAX_LEN + 1];
-} TPacketUpdateHorseName;
-
 typedef struct tDC
 {
 	char	login[LOGIN_MAX_LEN + 1];
@@ -1277,9 +1564,15 @@ typedef struct tDeleteAwardID
 
 typedef struct SChannelStatus
 {
-	int16_t nPort;
+	uint16_t nPort;
 	uint8_t bStatus;
 } TChannelStatus;
+
+typedef struct TPlayerCount
+{
+	uint16_t nPort;
+	uint32_t dwUserCount;
+} TPlayerCount;
 
 #pragma pack()
 #endif

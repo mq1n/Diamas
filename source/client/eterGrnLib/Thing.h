@@ -6,10 +6,10 @@
 class CGraphicThing : public CResource
 {
 	public:
-		typedef CRef<CGraphicThing> TRef;
+		using TRef = CRef<CGraphicThing>;
 
 	public:
-		static CGraphicThing::TType Type();
+		static TType Type();
 
 	public:
 		CGraphicThing(const FileSystem::CFileName& filename);

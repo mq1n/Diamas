@@ -314,7 +314,7 @@ void parse(char* filename)
 		{
 		case ST_START:
 		{
-			assert(nested == 0);
+					assert(!nested);
 			if (t.token == TK_QUEST)
 				ps = ST_QUEST;
 			else
@@ -323,7 +323,7 @@ void parse(char* filename)
 		break;
 		case ST_QUEST:
 		{
-			assert(nested == 0);
+					assert(!nested);
 			if (t.token == TK_NAME || t.token == TK_STRING)
 			{
 				quest_name = getstr(lexstate.t.seminfo.ts);
@@ -335,10 +335,10 @@ void parse(char* filename)
 		}
 		break;
 		case ST_QUEST_WITH_OR_BEGIN:
-			assert(nested == 0);
+				assert(!nested);
 			if (t.token == TK_WITH)
 			{
-				assert(nested == 0);
+					assert(!nested);
 				next(&lexstate);
 				ostringstream os;
 				os << (lexstate.t);
@@ -634,7 +634,7 @@ void parse(char* filename)
 					}
 				}
 
-				if (lexstate.t.token == TK_NAME && ((strcmp(getstr(lexstate.t.seminfo.ts), "set_state") == 0) || (strcmp(getstr(lexstate.t.seminfo.ts), "newstate") == 0) || (strcmp(getstr(lexstate.t.seminfo.ts), "setstate") == 0)))
+						if (lexstate.t.token == TK_NAME && ((!strcmp(getstr(lexstate.t.seminfo.ts),"set_state")) || (!strcmp(getstr(lexstate.t.seminfo.ts),"newstate")) || (!strcmp(getstr(lexstate.t.seminfo.ts),"setstate"))))
 				{
 					state_check = 2;
 				}
@@ -786,7 +786,7 @@ void parse(char* filename)
 		} // end of switch
 
 	}
-	assert(nested == 0);
+	assert(!nested);
 	for (map<int, string>::iterator it = used_state_name_map.begin(); it != used_state_name_map.end(); ++it)
 	{
 		if (define_state_name_set.find(it->second) == define_state_name_set.end())
@@ -797,7 +797,7 @@ void parse(char* filename)
 
 	if (!define_state_name_set.empty())
 	{
-		if (0 != mkdir(OUTPUT_FOLDER "/state", S_IRWXU))
+		if (mkdir(OUTPUT_FOLDER "/state", S_IRWXU))
 		{
 			if (errno != EEXIST)
 			{
@@ -854,7 +854,7 @@ void parse(char* filename)
 
 	if (!start_condition.empty())
 	{
-		if (0 != mkdir(OUTPUT_FOLDER "/begin_condition", S_IRWXU))
+		if (mkdir(OUTPUT_FOLDER "/begin_condition", S_IRWXU))
 		{
 			if (errno != EEXIST)
 			{

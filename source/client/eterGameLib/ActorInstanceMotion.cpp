@@ -16,7 +16,7 @@ void CActorInstance::__MotionEventProcess(BOOL isPC)
 {
 	if (isAttacking())
 	{
-		uint32_t dwNextFrame = uint32_t(GetAttackingElapsedTime() * g_fGameFPS);
+		auto dwNextFrame = uint32_t(GetAttackingElapsedTime() * g_fGameFPS);
 		for (; m_kCurMotNode.dwcurFrame < dwNextFrame; ++m_kCurMotNode.dwcurFrame)
 		{
 			MotionEventProcess();
@@ -71,7 +71,7 @@ void CActorInstance::ReservingMotionProcess()
 				SetEndStopMotion();
 
 				// 이후의 모션 전부 1초씩 딜레이
-				TMotionDeque::iterator itor = m_MotionDeque.begin();
+			auto itor = m_MotionDeque.begin();
 				for (; itor != m_MotionDeque.end(); ++itor)
 				{
 					TReservingMotionNode & rNode = *itor;
@@ -188,9 +188,7 @@ void CActorInstance::CurrentMotionProcess()
 		else if (!m_kQue_kFlyTarget.empty())
 		{
 			if (!m_kBackupFlyTarget.IsObject())
-			{
 				m_kBackupFlyTarget = m_kFlyTarget;
-			}
 
 			if (fCurrentTime - m_kCurMotNode.fStartTime > m_pkCurRaceMotionData->GetLoopEndTime())
 			{
@@ -237,9 +235,7 @@ void CActorInstance::CurrentMotionProcess()
 			else if (MOTION_TYPE_LOOP == m_kCurMotNode.iMotionType)
 			{
 				if (CRaceMotionData::NAME_WAIT == dwMotionIndex)
-				{
 					PushLoopMotion(CRaceMotionData::NAME_WAIT, 0.5f);
-				}
 			}
 		}
 	}
@@ -281,7 +277,7 @@ void CActorInstance::PushMotion(EMotionPushType iMotionType, uint32_t dwMotionKe
 	MotionNode.fSpeedRatio = fSpeedRatio;
 	MotionNode.fDuration = GetMotionDuration(dwMotionKey);
 
-	m_MotionDeque.push_back(MotionNode);
+	m_MotionDeque.emplace_back(MotionNode);
 }
 
 bool CActorInstance::InterceptOnceMotion(uint32_t dwMotion, float fBlendTime, uint32_t uSkill, float fSpeedRatio)
@@ -373,9 +369,7 @@ bool CActorInstance::InterceptMotion(EMotionPushType iMotionType, uint16_t wMoti
 	if (m_pFlyEventHandler)
 	{
 		if (__IsNeedFlyTargetMotion())
-		{		
 			m_pFlyEventHandler->OnSetFlyTarget();
-		}	
 	}
 
 	assert(nullptr != m_pkCurRaceMotionData);
@@ -616,24 +610,26 @@ MOTION_KEY CActorInstance::GetRandomMotionKey(MOTION_KEY dwMotionKey)
 
 	const CRaceData::TMotionVector * c_pMotionVector;
 	if (m_pkCurRaceData->GetMotionVectorPointer(wMode, wIndex, &c_pMotionVector))
-	if (c_pMotionVector->size() > 1)
 	{
-		int32_t iPercentage = random() % 100;
-		for (uint32_t i = 0; i < c_pMotionVector->size(); ++i)
+		if (c_pMotionVector->size() > 1)
 		{
-			const CRaceData::TMotion & c_rMotion = c_pMotionVector->at(i);
-			iPercentage -= c_rMotion.byPercentage;
-
-			if (iPercentage < 0)
+			int32_t iPercentage = random() % 100;
+			for (uint32_t i = 0; i < c_pMotionVector->size(); ++i)
 			{
-				dwMotionKey = MAKE_RANDOM_MOTION_KEY(wMode, wIndex, i);
+				const CRaceData::TMotion & c_rMotion = c_pMotionVector->at(i);
+				iPercentage -= c_rMotion.byPercentage;
 
-				// Temporary
-				// NOTE: 현재로선 여기서 해봤자 의미없다. 전체적으로 확인결과 아래는 씹히는 코드고 다른곳에서 해결해야 하므로 일단 주석처리함. 나중에 통채로 지우자..
-				// m_kCurMotNode.fEndTime = m_kCurMotNode.fStartTime + GetMotionDuration(dwMotionKey);
-				// Temporary
+				if (iPercentage < 0)
+				{
+					dwMotionKey = MAKE_RANDOM_MOTION_KEY(wMode, wIndex, i);
 
-				return dwMotionKey;
+					// Temporary
+					// NOTE: 현재로선 여기서 해봤자 의미없다. 전체적으로 확인결과 아래는 씹히는 코드고 다른곳에서 해결해야 하므로 일단 주석처리함. 나중에 통채로 지우자..
+					// m_kCurMotNode.fEndTime = m_kCurMotNode.fStartTime + GetMotionDuration(dwMotionKey);
+					// Temporary
+
+					return dwMotionKey;
+				}
 			}
 		}
 	}
@@ -673,14 +669,10 @@ uint32_t CActorInstance::__SetMotion(const SSetMotionData& c_rkSetMotData, uint3
 			return 0;
 	}
 	if (IsUsingSkill())
-	{
 		__OnStop();
-	}
 
 	if (__IsStandUpMotion())
-	{
 		__OnStop();
-	}
 
 
 	if (__IsMoveMotion())
@@ -694,27 +686,19 @@ uint32_t CActorInstance::__SetMotion(const SSetMotionData& c_rkSetMotData, uint3
 			}
 		}
 
-		if (uNextMot!=CRaceMotionData::NAME_RUN &&
-			uNextMot!=CRaceMotionData::NAME_WALK &&
-			!__IsMovingSkill(c_rkSetMotData.uSkill))
-		{
+		if (uNextMot!=CRaceMotionData::NAME_RUN && uNextMot!=CRaceMotionData::NAME_WALK && !__IsMovingSkill(c_rkSetMotData.uSkill))
 			__OnStop();
-		}
 	}
 	else
 	{
 		if (uNextMot==CRaceMotionData::NAME_RUN || __IsMovingSkill(c_rkSetMotData.uSkill))
-		{
 			__OnMove();
-		}
 	}
 
 
 	// NOTE : 스킬 사용중 사라지는 문제를 위한 안전 장치 - [levites]
 	if (__IsHiding())
-	{
 		__ShowEvent();
-	}
 
 
 	if (-1 != m_iFishingEffectID)

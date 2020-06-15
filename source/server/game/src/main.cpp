@@ -17,7 +17,7 @@
 #include "skill.h"
 #include "pvp.h"
 #include "party.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "profiler.h"
 #include "lzo_manager.h"
 #include "messenger_manager.h"
@@ -37,32 +37,40 @@
 #include "wedding.h"
 #include "fishing.h"
 #include "item_addon.h"
-#include "TrafficProfiler.h"
 #include "locale_service.h"
 #include "arena.h"
-#include "OXEvent.h"
+#include "ox_event.h"
 #include "polymorph.h"
 #include "blend_item.h"
 #include "ani.h"
-#include "horsename_manager.h"
-#include "MarkManager.h"
+#include "mark_manager.h"
 #include "spam.h"
 #include "threeway_war.h"
-#include "DragonLair.h"
 #include "skill_power.h"
-#include "DragonSoul.h"
+#include "dragon_soul.h"
+#include "anticheat_manager.h"
+#include "nearby_scanner.h"
+#include "battleground.h"
+#include "desc.h"
 #include "desc_client.h"
+#include "../../common/service.h"
+#include "../../libthecore/include/winminidump.h"
 
 #ifdef USE_STACKTRACE
-#include <execinfo.h>
+	#ifdef _WIN32
+		#include <DbgHelp.h>
+	#else
+		#include <execinfo.h>
+	#endif
 #endif
 
-extern void WriteVersion();
-//extern const char * _malloc_options;
+#include <signal.h>
+
 #if defined(__FreeBSD__) && defined(DEBUG_ALLOC)
 extern void (*_malloc_message)(const char* p1, const char* p2, const char* p3, const char* p4);
 // FreeBSD _malloc_message replacement
-void WriteMallocMessage(const char* p1, const char* p2, const char* p3, const char* p4) {
+void WriteMallocMessage(const char* p1, const char* p2, const char* p3, const char* p4)
+{
 	FILE* fp = ::fopen(DBGALLOC_LOG_FILENAME, "a");
 	if (fp == nullptr) {
 		return;
@@ -72,11 +80,7 @@ void WriteMallocMessage(const char* p1, const char* p2, const char* p3, const ch
 }
 #endif
 
-// TRAFFIC_PROFILER
-static const uint32_t	TRAFFIC_PROFILE_FLUSH_CYCLE = 3600;	///< TrafficProfiler 의 Flush cycle. 1시간 간격
-// END_OF_TRAFFIC_PROFILER
 
-// 게임과 연결되는 소켓
 volatile int32_t	num_events_called = 0;
 int32_t             max_bytes_written = 0;
 int32_t             current_bytes_written = 0;
@@ -90,11 +94,9 @@ LPFDWATCH	main_fdw = nullptr;
 
 int32_t		io_loop(LPFDWATCH fdw);
 
-int32_t		start(int32_t argc, char **argv);
 int32_t		idle();
 void	destroy();
 
-void 	test();
 
 enum EProfile
 {
@@ -111,12 +113,52 @@ int32_t g_shutdown_disconnect_pulse;
 int32_t g_shutdown_disconnect_force_pulse;
 int32_t g_shutdown_core_pulse;
 bool g_bShutdown=false;
+bool g_bSignalHandled=false;
 
 extern void CancelReloadSpamEvent();
 
 void ContinueOnFatalError()
 {
 #ifdef USE_STACKTRACE
+	#ifdef _WIN32
+		void *frames[64] = { 0 };
+		auto wCapturedFrames = RtlCaptureStackBackTrace(2, 64, frames, nullptr);
+
+		std::ostringstream oss;
+		oss << std::endl;
+
+		for (auto i = 0; i < wCapturedFrames; i++)
+		{
+			uint8_t buffer[sizeof(IMAGEHLP_SYMBOL64) + 128];
+			auto symbol64 = reinterpret_cast<IMAGEHLP_SYMBOL64*>(buffer);
+			memset(symbol64, 0, sizeof(IMAGEHLP_SYMBOL64) + 128);
+			symbol64->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL64);
+			symbol64->MaxNameLength = 128;
+
+			DWORD64 displacement = 0;
+			auto result = SymGetSymFromAddr64(GetCurrentProcess(), (DWORD64)frames[i], &displacement, symbol64);
+			if (result)
+			{
+				IMAGEHLP_LINE64 line64;
+				memset(&line64, 0, sizeof(IMAGEHLP_LINE64));
+				line64.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+
+				auto dwDisplacement = 0UL;
+				result = SymGetLineFromAddr64(GetCurrentProcess(), (DWORD64)frames[i], &dwDisplacement, &line64);
+				if (result)
+				{
+					oss << "  Stack> " << symbol64->Name << " File: " << line64.FileName << " Line: " << (int32_t)line64.LineNumber << std::endl;
+				}
+				else
+				{
+					oss << "  Stack> " << symbol64->Name << std::endl;
+				}
+			}
+		}
+
+		sys_err("FatalError on %s", oss.str().c_str());
+
+	#else
 	void* array[200];
 	std::size_t size;
 	char** symbols;
@@ -133,9 +175,22 @@ void ContinueOnFatalError()
 	free(symbols);
 
 	sys_err("FatalError on %s", oss.str().c_str());
+	#endif
 #else
 	sys_err("FatalError");
 #endif
+}
+
+void __cdecl InterruptHandler(int)
+{
+	ContinueOnFatalError();
+	g_bSignalHandled = true;
+}
+
+void TerminateHandler()
+{
+	ContinueOnFatalError();
+	g_bSignalHandled = true;
 }
 
 void ShutdownOnFatalError()
@@ -187,6 +242,7 @@ namespace
 			if (d->IsPhase(PHASE_P2P))
 				return;
 
+			d->SetCloseReason("DC_FUNC");
 			d->SetPhase(PHASE_CLOSE);
 		}
 	};
@@ -197,9 +253,7 @@ uint32_t save_idx = 0;
 
 void heartbeat(LPHEART ht, int32_t pulse) 
 {
-	uint32_t t;
-
-	t = get_dword_time();
+	auto t = get_dword_time();
 	num_events_called += event_process(pulse);
 	s_dwProfiler[PROF_EVENT] += (get_dword_time() - t);
 
@@ -208,22 +262,11 @@ void heartbeat(LPHEART ht, int32_t pulse)
 	// 1초마다
 	if (!(pulse % ht->passes_per_sec))
 	{
-
-
-		if (!g_bAuthServer)
-		{
-			TPlayerCountPacket pack;
-			pack.dwCount = DESC_MANAGER::instance().GetLocalUserCount();
-			db_clientdesc->DBPacket(HEADER_GD_PLAYER_COUNT, 0, &pack, sizeof(TPlayerCountPacket));
-		}
-		else
-		{
-			DESC_MANAGER::instance().ProcessExpiredLoginKey();
-		}
+		DESC_MANAGER::instance().ProcessExpiredLoginKey();
 
 		{
-			int32_t count = 0;
 
+			int count = 0;
 			if (save_idx < g_vec_save.size())
 			{
 				count = MIN(100, g_vec_save.size() - save_idx);
@@ -277,21 +320,111 @@ void heartbeat(LPHEART ht, int32_t pulse)
 	}
 }
 
-static void CleanUpForEarlyExit() {
+static void CleanUpForEarlyExit()
+{
 	CancelReloadSpamEvent();
+}
+
+
+int32_t start()
+{
+#if defined(__FreeBSD__) && defined(DEBUG_ALLOC)
+	_malloc_message = WriteMallocMessage;
+#endif
+
+	config_init("");
+
+	bool bVerbose = false;
+#ifdef _WIN32
+	bVerbose = true;
+#endif
+	if (!bVerbose)
+		freopen("stdout", "a", stdout);
+
+	thecore_init();
+	bool is_thecore_initialized = thecore_set(25, heartbeat);
+	if (!is_thecore_initialized)
+	{
+		fprintf(stderr, "Could not initialize thecore, check owner of pid, syslog\n");
+		exit(0);
+	}
+	sys_log(0, "the core init completed");
+
+	if (false == CThreeWayWar::instance().LoadSetting("forkedmapindex.txt"))
+	{
+		if (false == g_bAuthServer)
+		{
+			fprintf(stderr, "Could not Load ThreeWayWar Setting file");
+			exit(0);
+		}
+	}
+
+	signal_timer_disable();
+	
+	main_fdw = fdwatch_new(4096);
+
+	if ((tcp_socket = socket_tcp_bind(g_szPublicIP, mother_port)) == INVALID_SOCKET)
+	{
+		sys_err("socket_tcp_bind: tcp_socket");
+		perror("socket_tcp_bind: tcp_socket");
+		return 0;
+	}
+
+	// if internal ip exists, p2p socket uses internal ip, if not use public ip
+	//if ((p2p_socket = socket_tcp_bind(*g_szInternalIP ? g_szInternalIP : g_szPublicIP, p2p_port)) == INVALID_SOCKET)
+	if ((p2p_socket = socket_tcp_bind(g_szPublicIP, p2p_port)) == INVALID_SOCKET)
+	{
+		sys_err("socket_tcp_bind: p2p_socket");
+		perror("socket_tcp_bind: p2p_socket");
+		return 0;
+	}
+
+	fdwatch_add_fd(main_fdw, tcp_socket, nullptr, FDW_READ, false);
+	fdwatch_add_fd(main_fdw, p2p_socket, nullptr, FDW_READ, false);
+
+	db_clientdesc = DESC_MANAGER::instance().CreateConnectionDesc(main_fdw, db_addr, db_port, PHASE_DBCLIENT, true);
+	if (!g_bAuthServer) 
+	{
+		db_clientdesc->UpdateChannelStatus(0, true);
+	}
+
+	if (g_bAuthServer)
+	{
+		if (g_stAuthMasterIP.length() != 0)
+		{
+			fprintf(stderr, "SlaveAuth\n");
+			g_pkAuthMasterDesc = DESC_MANAGER::instance().CreateConnectionDesc(main_fdw, g_stAuthMasterIP.c_str(), g_wAuthMasterPort, PHASE_P2P, true); 
+			P2P_MANAGER::instance().RegisterConnector(g_pkAuthMasterDesc);
+			g_pkAuthMasterDesc->SetP2P(g_stAuthMasterIP.c_str(), g_wAuthMasterPort, g_bChannel);
+
+		}
+		else
+		{
+			fprintf(stderr, "MasterAuth\n");
+		}
+	}
+
+	signal_timer_enable(30);
+	return 1;
 }
 
 int32_t main(int32_t argc, char **argv)
 {
+	if (setup_minidump_generator() == false)
+		return 1;
+
+#ifdef USE_STACKTRACE
+	#ifdef _WIN32
+		SymInitialize(GetCurrentProcess(), nullptr, TRUE);
+	#endif
+#endif
+
 #ifdef DEBUG_ALLOC
 	DebugAllocator::StaticSetUp();
 #endif
 
-
 	ilInit(); // DevIL Initialize
 
-	WriteVersion();
-	
 	SECTREE_MANAGER	sectree_manager;
 	CHARACTER_MANAGER	char_manager;
 	ITEM_MANAGER	item_manager;
@@ -322,43 +455,59 @@ int32_t main(int32_t argc, char **argv)
 	CItemAddonManager	item_addon_manager;
 	CArenaManager arena_manager;
 	COXEventManager OXEvent_manager;
-	CHorseNameManager horsename_manager;
-
+	CNearbyScanner	nearby_scanner;
 	DESC_MANAGER	desc_manager;
-
-	TrafficProfiler	trafficProfiler;
 	CTableBySkill SkillPowerByLevel;
 	CPolymorphUtils polymorph_utils;
 	CProfiler		profiler;
 	SpamManager		spam_mgr;
 	CThreeWayWar	threeway_war;
-	CDragonLairManager	dl_manager;
-
 	DSManager dsManager;
+	CBattlegroundManager bgManager;
 
-	if (!start(argc, argv)) {
+	if (!start()) 
+	{
 		CleanUpForEarlyExit();
 		return 0;
 	}
 
 	quest::CQuestManager quest_manager;
 
-	if (!quest_manager.Initialize()) {
+	if (!quest_manager.Initialize())
+	{
 		CleanUpForEarlyExit();
 		return 0;
 	}
 
+	CAnticheatManager ACManager;
 	MessengerManager::instance().Initialize();
 	CGuildManager::instance().Initialize();
 	fishing::Initialize();
 	OXEvent_manager.Initialize();
+	bgManager.Initialize();
 
 	Cube_init();
 	Blend_Item_init();
 	ani_init();
 
-	if ( g_bTrafficProfileOn )
-		TrafficProfiler::instance().Initialize( TRAFFIC_PROFILE_FLUSH_CYCLE, "ProfileLog" );
+	if (!g_bAuthServer)
+	{
+		if (!ACManager.Initialize())
+		{
+			fprintf(stderr, "Failed To Initialize AC");
+			CleanUpForEarlyExit();
+			return 0;
+		}
+	}
+	/*
+	_set_abort_behavior(0, _CALL_REPORTFAULT | _WRITE_ABORT_MSG);
+
+	signal(SIGTERM, &InterruptHandler);
+	signal(SIGABRT, &InterruptHandler);
+	signal(SIGSEGV, &InterruptHandler);
+
+	std::set_terminate(&TerminateHandler);
+	*/
 
 	while (idle());
 
@@ -417,106 +566,21 @@ int32_t main(int32_t argc, char **argv)
 	quest_manager.Destroy();
 	sys_log(0, "<shutdown> Destroying building::CManager...");
 	building_manager.Destroy();
+	sys_log(0, "<shutdown> Destroying BATTLEGROUND_MANAGER...");
+	bgManager.Destroy();
 
-	sys_log(0, "<shutdown> Flushing TrafficProfiler...");
-	trafficProfiler.Flush();
-
+	if (!g_bAuthServer)
+	{
+		sys_log(0, "<shutdown> Releasing Anticheat manager...");
+		ACManager.Release();
+	}
+	
 	destroy();
 
 #ifdef DEBUG_ALLOC
 	DebugAllocator::StaticTearDown();
 #endif
 
-	return 1;
-}
-
-
-int32_t start(int32_t argc, char **argv)
-{
-	std::string st_localeServiceName;
-
-	bool bVerbose = false;
-	char ch;
-
-	//_malloc_options = "A";
-#if defined(__FreeBSD__) && defined(DEBUG_ALLOC)
-	_malloc_message = WriteMallocMessage;
-#endif
-
-
-	// LOCALE_SERVICE
-	config_init(st_localeServiceName);
-	// END_OF_LOCALE_SERVICE
-
-#ifdef __WIN32__
-	// In Windows dev mode, "verbose" option is [on] by default.
-	bVerbose = true;
-#endif
-	if (!bVerbose)
-		freopen("stdout", "a", stdout);
-
-	thecore_init();
-	bool is_thecore_initialized = thecore_set(25, heartbeat);
-
-	if (!is_thecore_initialized)
-	{
-		fprintf(stderr, "Could not initialize thecore, check owner of pid, syslog\n");
-		exit(0);
-	}
-
-	if (false == CThreeWayWar::instance().LoadSetting("forkedmapindex.txt"))
-	{
-		if (false == g_bAuthServer)
-		{
-			fprintf(stderr, "Could not Load ThreeWayWar Setting file");
-			exit(0);
-		}
-	}
-
-	signal_timer_disable();
-	
-	main_fdw = fdwatch_new(4096);
-
-	if ((tcp_socket = socket_tcp_bind(g_szPublicIP, mother_port)) == INVALID_SOCKET)
-	{
-		perror("socket_tcp_bind: tcp_socket");
-		return 0;
-	}
-
-
-	// if internal ip exists, p2p socket uses internal ip, if not use public ip
-	//if ((p2p_socket = socket_tcp_bind(*g_szInternalIP ? g_szInternalIP : g_szPublicIP, p2p_port)) == INVALID_SOCKET)
-	if ((p2p_socket = socket_tcp_bind(g_szPublicIP, p2p_port)) == INVALID_SOCKET)
-	{
-		perror("socket_tcp_bind: p2p_socket");
-		return 0;
-	}
-
-	fdwatch_add_fd(main_fdw, tcp_socket, nullptr, FDW_READ, false);
-	fdwatch_add_fd(main_fdw, p2p_socket, nullptr, FDW_READ, false);
-
-	db_clientdesc = DESC_MANAGER::instance().CreateConnectionDesc(main_fdw, db_addr, db_port, PHASE_DBCLIENT, true);
-	if (!g_bAuthServer) {
-		db_clientdesc->UpdateChannelStatus(0, true);
-	}
-
-	if (g_bAuthServer)
-	{
-		if (g_stAuthMasterIP.length() != 0)
-		{
-			fprintf(stderr, "SlaveAuth");
-			g_pkAuthMasterDesc = DESC_MANAGER::instance().CreateConnectionDesc(main_fdw, g_stAuthMasterIP.c_str(), g_wAuthMasterPort, PHASE_P2P, true); 
-			P2P_MANAGER::instance().RegisterConnector(g_pkAuthMasterDesc);
-			g_pkAuthMasterDesc->SetP2P(g_stAuthMasterIP.c_str(), g_wAuthMasterPort, g_bChannel);
-
-		}
-		else
-		{
-			fprintf(stderr, "MasterAuth\n");
-		}
-	}
-
-	signal_timer_enable(30);
 	return 1;
 }
 
@@ -563,7 +627,8 @@ int32_t idle()
 
 	uint32_t t;
 
-	while (passed_pulses--) {
+	while (passed_pulses--) 
+	{
 		heartbeat(thecore_heart, ++thecore_heart->pulse);
 
 		// To reduce the possibility of abort() in checkpointing
@@ -576,41 +641,33 @@ int32_t idle()
 	s_dwProfiler[PROF_CHR_UPDATE] += (get_dword_time() - t);
 
 	t = get_dword_time();
-	if (!io_loop(main_fdw)) return 0;
+	if (!io_loop(main_fdw)) 
+		return 0;
 	s_dwProfiler[PROF_IO] += (get_dword_time() - t);
 
 	log_rotate();
 
-	gettimeofday(&now, (struct timezone *) 0);
+	gettimeofday(&now, (struct timezone *) nullptr);
 	++process_time_count;
 
 	if (now.tv_sec - pta.tv_sec > 0)
 	{
-		pt_log("[%3d] event %5d/%-5d event %-4ld heartbeat %-4ld I/O %-4ld chrUpate %-4ld | WRITE: %-7d | PULSE: %d",
-				process_time_count,
-				num_events_called,
-				event_count(),
-				s_dwProfiler[PROF_EVENT],
-				s_dwProfiler[PROF_HEARTBEAT],
-				s_dwProfiler[PROF_IO],
-				s_dwProfiler[PROF_CHR_UPDATE],
-				current_bytes_written,
-				thecore_pulse());
-
 		num_events_called = 0;
 		current_bytes_written = 0;
 
-		process_time_count = 0; 
-		gettimeofday(&pta, (struct timezone *) 0);
+		process_time_count = 0;
+		gettimeofday(&pta, (struct timezone *) nullptr);
 
 		memset(&s_dwProfiler[0], 0, sizeof(s_dwProfiler));
 	}
 
-#ifdef __WIN32__
-	if (_kbhit()) {
+#ifdef _WIN32
+	if (_kbhit()) 
+	{
 		int32_t c = _getch();
-		switch (c) {
-			case 0x1b: // Esc
+		switch (c) 
+		{
+			case VK_ESCAPE:
 				return 0; // shutdown
 				break;
 			default:
@@ -630,7 +687,7 @@ int32_t io_loop(LPFDWATCH fdw)
 	DESC_MANAGER::instance().DestroyClosed(); // PHASE_CLOSE인 접속들을 끊어준다.
 	DESC_MANAGER::instance().TryConnect();
 
-	if ((num_events = fdwatch(fdw, 0)) < 0)
+	if ((num_events = fdwatch(fdw, nullptr)) < 0)
 		return 0;
 
 	for (event_idx = 0; event_idx < num_events; ++event_idx)
@@ -666,11 +723,13 @@ int32_t io_loop(LPFDWATCH fdw)
 
 					if (size < 0)
 					{
+						d->SetCloseReason("WRONG_READ");
 						d->SetPhase(PHASE_CLOSE);
 					}
 				}
 				else if (d->ProcessInput() < 0)
 				{
+					d->SetCloseReason("INVALID_INPUT");
 					d->SetPhase(PHASE_CLOSE);
 				}
 				break;
@@ -685,6 +744,7 @@ int32_t io_loop(LPFDWATCH fdw)
 
 					if (ret < 0)
 					{
+						d->SetCloseReason("WRONG_WRITE");
 						d->SetPhase(PHASE_CLOSE);
 					}
 
@@ -693,12 +753,14 @@ int32_t io_loop(LPFDWATCH fdw)
 				}
 				else if (d->ProcessOutput() < 0)
 				{
+					d->SetCloseReason("INVALID_OUT");
 					d->SetPhase(PHASE_CLOSE);
 				}
 				break;
 
 			case FDW_EOF:
 				{
+					d->SetCloseReason("FDW_END");
 					d->SetPhase(PHASE_CLOSE);
 				}
 				break;

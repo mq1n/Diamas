@@ -9,7 +9,7 @@
 #include "locale_service.h"
 #include "packet.h"
 #include "char.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "questlua.h"
 #include "start_position.h"
 #include "char_manager.h"
@@ -298,7 +298,7 @@ void CThreeWayWar::onDead(LPCHARACTER pChar, LPCHARACTER pkKiller)
 	if (false == pChar->IsPC())
 		return;
 
-	if (GM_PLAYER != pChar->GetGMLevel() && false == test_server)
+	if (GM_PLAYER != pChar->GetGMLevel() && false == g_bIsTestServer)
 		return;
 
 	if (-1 == GetRegenFlag())
@@ -325,7 +325,7 @@ void CThreeWayWar::onDead(LPCHARACTER pChar, LPCHARACTER pkKiller)
 		SetKillScore(pkKiller->GetEmpire(), nKillScore);
 	}
 
-	if (nKillScore != 0 && (test_server || (nKillScore % 5) == 0))
+	if (nKillScore != 0 && (g_bIsTestServer || (nKillScore % 5) == 0))
 	{
 		char szBuf[64 + 1];
 
@@ -506,7 +506,7 @@ void CThreeWayWar::onDead(LPCHARACTER pChar, LPCHARACTER pkKiller)
 
 			pack_script.header = HEADER_GC_SCRIPT;
 			pack_script.skin = 1;
-			pack_script.src_size = Script.size();
+			pack_script.src_size = static_cast<uint16_t>(Script.size());
 
 			quest::FSendPacketToEmpire fSend;
 			fSend.bEmpire = nVictoryEmpireIndex;

@@ -72,9 +72,7 @@ BOOL CSpeedTreeForest::GetMainTree(uint32_t dwCRC, CSpeedTreeWrapper ** ppMainTr
 	{
         CFile file;
         if(!FileSystemManager::Instance().OpenFile(c_pszFileName, file))
-        {
             return FALSE;
-        }
 
 		pTree = new CSpeedTreeWrapper(new CSpeedTreeRT);
 

@@ -4,28 +4,32 @@
 #include "../eterXClient/Locale_inc.h"
 #include "../eterLib/GrpRenderTargetTexture.h"
 
+#ifdef LoadImage
+#undef LoadImage
+#endif
+
 namespace UI
 {
 	class CWindow
 	{
 		public:
-			typedef std::list<CWindow *> TWindowContainer;
+			using TWindowContainer = std::list<CWindow *>;
 
 			static uint32_t Type();
-			BOOL IsType(uint32_t dwType);
+			bool IsType(uint32_t dwType);
 
 			enum EHorizontalAlign
 			{
 				HORIZONTAL_ALIGN_LEFT = 0,
 				HORIZONTAL_ALIGN_CENTER = 1,
-				HORIZONTAL_ALIGN_RIGHT = 2,					
+				HORIZONTAL_ALIGN_RIGHT = 2
 			};
 
 			enum EVerticalAlign
 			{
 				VERTICAL_ALIGN_TOP = 0,
 				VERTICAL_ALIGN_CENTER = 1,
-				VERTICAL_ALIGN_BOTTOM = 2,
+				VERTICAL_ALIGN_BOTTOM = 2
 			};
 
 			enum EFlags
@@ -135,48 +139,48 @@ namespace UI
 
 			///////////////////////////////////////
 
-			BOOL			RunIMETabEvent();
-			BOOL			RunIMEReturnEvent();
-			BOOL			RunIMEKeyDownEvent(int32_t ikey);
+			bool			RunIMETabEvent();
+			bool			RunIMEReturnEvent();
+			bool			RunIMEKeyDownEvent(int32_t ikey);
 
 			CWindow *		RunKeyDownEvent(int32_t ikey);
-			BOOL			RunKeyUpEvent(int32_t ikey);
-			BOOL			RunPressEscapeKeyEvent();
-			BOOL			RunPressExitKeyEvent();
+			bool			RunKeyUpEvent(int32_t ikey);
+			bool			RunPressEscapeKeyEvent();
+			bool			RunPressExitKeyEvent();
 
-			virtual BOOL	OnIMETabEvent();
-			virtual BOOL	OnIMEReturnEvent();
-			virtual BOOL	OnIMEKeyDownEvent(int32_t ikey);
+			virtual bool	OnIMETabEvent();
+			virtual bool	OnIMEReturnEvent();
+			virtual bool	OnIMEKeyDownEvent(int32_t ikey);
 
-			virtual BOOL	OnIMEChangeCodePage();
-			virtual BOOL	OnIMEOpenCandidateListEvent();
-			virtual BOOL	OnIMECloseCandidateListEvent();
-			virtual BOOL	OnIMEOpenReadingWndEvent();
-			virtual BOOL	OnIMECloseReadingWndEvent();
+			virtual bool	OnIMEChangeCodePage();
+			virtual bool	OnIMEOpenCandidateListEvent();
+			virtual bool	OnIMECloseCandidateListEvent();
+			virtual bool	OnIMEOpenReadingWndEvent();
+			virtual bool	OnIMECloseReadingWndEvent();
 
-			virtual BOOL	OnMouseLeftButtonDown();
-			virtual BOOL	OnMouseLeftButtonUp();
-			virtual BOOL	OnMouseLeftButtonDoubleClick();
-			virtual BOOL	OnMouseRightButtonDown();
-			virtual BOOL	OnMouseRightButtonUp();
-			virtual BOOL	OnMouseRightButtonDoubleClick();
-			virtual BOOL	OnMouseMiddleButtonDown();
-			virtual BOOL	OnMouseMiddleButtonUp();
+			virtual bool	OnMouseLeftButtonDown();
+			virtual bool	OnMouseLeftButtonUp();
+			virtual bool	OnMouseLeftButtonDoubleClick();
+			virtual bool	OnMouseRightButtonDown();
+			virtual bool	OnMouseRightButtonUp();
+			virtual bool	OnMouseRightButtonDoubleClick();
+			virtual bool	OnMouseMiddleButtonDown();
+			virtual bool	OnMouseMiddleButtonUp();
 #ifdef ENABLE_MOUSEWHEEL_EVENT
-			virtual BOOL	OnMouseWheelScroll(int16_t wDelta);
+			virtual bool	OnMouseWheelScroll(int16_t wDelta);
 			virtual void	SetScrollable();
 #endif
-			virtual BOOL	OnKeyDown(int32_t ikey);
-			virtual BOOL	OnKeyUp(int32_t ikey);
-			virtual BOOL	OnPressEscapeKey();
-			virtual BOOL	OnPressExitKey();
+			virtual bool	OnKeyDown(int32_t ikey);
+			virtual bool	OnKeyUp(int32_t ikey);
+			virtual bool	OnPressEscapeKey();
+			virtual bool	OnPressExitKey();
 			///////////////////////////////////////
 
 			virtual void	SetColor(uint32_t dwColor){}
-			virtual BOOL	OnIsType(uint32_t dwType);
+			virtual bool	OnIsType(uint32_t dwType);
 			/////////////////////////////////////
 
-			virtual BOOL	IsWindow() { return TRUE; }
+			virtual bool	IsWindow() { return true; }
 			/////////////////////////////////////
 
 		protected:
@@ -199,7 +203,7 @@ namespace UI
 			CWindow	*			m_pParent;
 			TWindowContainer	m_pChildList;
 
-			BOOL				m_isUpdatingChildren;
+			bool				m_isUpdatingChildren;
 			TWindowContainer	m_pReserveChildList;
 			
 			uint8_t				m_windowType; // to recognize window type
@@ -220,7 +224,7 @@ namespace UI
 			CLayer(PyObject * ppyObject) : CWindow(ppyObject) {}
 			virtual ~CLayer() {}
 
-			BOOL IsWindow() { return FALSE; }
+			bool IsWindow() { return false; }
 	};
 
 	class CBox : public CWindow
@@ -298,10 +302,10 @@ namespace UI
 			void SetMax(int32_t iMax);
 			void SetHorizontalAlign(int32_t iType);
 			void SetVerticalAlign(int32_t iType);
-			void SetSecret(BOOL bFlag);
-			void SetOutline(BOOL bFlag);
-			void SetFeather(BOOL bFlag);
-			void SetMultiLine(BOOL bFlag);
+			void SetSecret(bool bFlag);
+			void SetOutline(bool bFlag);
+			void SetFeather(bool bFlag);
+			void SetMultiLine(bool bFlag);
 			void SetFontName(const char * c_szFontName);
 			void SetFontColor(uint32_t dwColor);
 			void SetLimitWidth(float fWidth);
@@ -358,7 +362,7 @@ namespace UI
 			CImageBox(PyObject * ppyObject);
 			virtual ~CImageBox();
 
-			BOOL LoadImage(const char * c_szFileName);
+			bool LoadImage(const char * c_szFileName);
 			void SetDiffuseColor(float fr, float fg, float fb, float fa);
 			void SetScale(float sx, float sy);
 
@@ -420,7 +424,7 @@ namespace UI
 			virtual void OnUpdate();
 			virtual void OnRender();
 
-			BOOL OnIsType(uint32_t dwType);
+			bool OnIsType(uint32_t dwType);
 	};
 	class CAniImageBox : public CWindow
 	{
@@ -431,6 +435,7 @@ namespace UI
 			CAniImageBox(PyObject * ppyObject);
 			virtual ~CAniImageBox();
 
+			void SetScale(float fx, float fy);
 			void SetDelay(int32_t iDelay);
 			void AppendImageScale(const char * c_szFileName, float scale_x, float scale_y);
 #ifdef ENABLE_ACCE_SYSTEM
@@ -449,7 +454,7 @@ namespace UI
 			void OnChangePosition();
 			virtual void OnEndFrame();
 
-			BOOL OnIsType(uint32_t dwType);
+			bool OnIsType(uint32_t dwType);
 
 		protected:
 			uint8_t m_bycurDelay;
@@ -465,10 +470,10 @@ namespace UI
 			CButton(PyObject * ppyObject);
 			virtual ~CButton();
 
-			BOOL SetUpVisual(const char * c_szFileName);
-			BOOL SetOverVisual(const char * c_szFileName);
-			BOOL SetDownVisual(const char * c_szFileName);
-			BOOL SetDisableVisual(const char * c_szFileName);
+			bool SetUpVisual(const char * c_szFileName);
+			bool SetOverVisual(const char * c_szFileName);
+			bool SetDownVisual(const char * c_szFileName);
+			bool SetDisableVisual(const char * c_szFileName);
 
 			const char * GetUpVisualFileName();
 			const char * GetOverVisualFileName();
@@ -484,29 +489,29 @@ namespace UI
 			void Over();
 			void Down();
 
-			BOOL IsDisable();
-			BOOL IsPressed();
+			bool IsDisable();
+			bool IsPressed();
 
 		protected:
 			void OnUpdate();
 			void OnRender();
 			void OnChangePosition();
 
-			BOOL OnMouseLeftButtonDown();
-			BOOL OnMouseLeftButtonDoubleClick();
-			BOOL OnMouseLeftButtonUp();
+			bool OnMouseLeftButtonDown();
+			bool OnMouseLeftButtonDoubleClick();
+			bool OnMouseLeftButtonUp();
 			void OnMouseOverIn();
 			void OnMouseOverOut();
 
-			BOOL IsEnable();
+			bool IsEnable();
 
 			void SetCurrentVisual(CGraphicImageInstance * pVisual);
 
 		protected:
-			BOOL m_bEnable;
-			BOOL m_isPressed;
-			BOOL m_isFlash;
-			BOOL m_isFlashEx;
+			bool m_bEnable;
+			bool m_isPressed;
+			bool m_isFlash;
+			bool m_isFlashEx;
 			CGraphicImageInstance * m_pcurVisual;
 			CGraphicImageInstance m_upVisual;
 			CGraphicImageInstance m_overVisual;
@@ -520,8 +525,8 @@ namespace UI
 			virtual ~CRadioButton();
 
 		protected:
-			BOOL OnMouseLeftButtonDown();
-			BOOL OnMouseLeftButtonUp();
+			bool OnMouseLeftButtonDown();
+			bool OnMouseLeftButtonUp();
 			void OnMouseOverIn();
 			void OnMouseOverOut();
 	};
@@ -532,8 +537,8 @@ namespace UI
 			virtual ~CToggleButton();
 
 		protected:
-			BOOL OnMouseLeftButtonDown();
-			BOOL OnMouseLeftButtonUp();
+			bool OnMouseLeftButtonDown();
+			bool OnMouseLeftButtonUp();
 			void OnMouseOverIn();
 			void OnMouseOverOut();
 	};
@@ -558,7 +563,7 @@ namespace UI
 	{
 		public:
 			static uint32_t Type();
-			BOOL OnIsType(uint32_t dwType) { return dwType == Type(); }
+			bool OnIsType(uint32_t dwType) { return dwType == Type(); }
 
 			CRenderTarget(PyObject* ppyObject);
 			virtual ~CRenderTarget();
@@ -587,4 +592,4 @@ namespace UI
 
 };
 
-extern BOOL g_bOutlineBoxEnable;
+extern bool g_bOutlineBoxEnable;

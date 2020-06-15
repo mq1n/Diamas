@@ -1,9 +1,9 @@
 #pragma once
 #include <d3dx9.h>
 
-#include "../eterlib/GrpScreen.h"
-#include "../eterlib/Resource.h"
-#include "../eterlib/GrpImageInstance.h"
+#include "../eterLib/GrpScreen.h"
+#include "../eterLib/Resource.h"
+#include "../eterLib/GrpImageInstance.h"
 #include "../eterLib/TextFileLoader.h"
 
 #include "Type.h"
@@ -40,7 +40,7 @@ class CEffectMesh : public CResource
 
 	// About Resource Code
 	public:
-		typedef CRef<CEffectMesh> TRef;
+		using TRef = CRef<CEffectMesh>;
 
 	public:
 		static TType Type();
@@ -104,7 +104,7 @@ class CEffectMeshScript : public CEffectElementBase
 				TimeEventAlpha.clear();
 			}
 		} TMeshData;
-		typedef std::vector<TMeshData> TMeshDataVector;
+		using TMeshDataVector = std::vector<TMeshData>;
 
 	public:
 		CEffectMeshScript();

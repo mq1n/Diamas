@@ -1,13 +1,25 @@
+#pragma once
+#include <stdint.h>
+#include <string>
+#include <set>
 
-#ifndef __INC_METIN_II_GAME_CONFIG_H__
-#define __INC_METIN_II_GAME_CONFIG_H__
+#define ADDRESS_MAX_LEN 15
 
-enum
+enum EGameStage
 {
-	ADDRESS_MAX_LEN = 15
+	STAGE_NULL,
+	STAGE_DEV_GAME,
+	STAGE_TEST_GAME,
+	STAGE_LIVE_GAME,
 };
 
-enum ItemDestroyTime {ITEM_DESTROY_TIME_AUTOGIVE, ITEM_DESTROY_TIME_DROPGOLD, ITEM_DESTROY_TIME_DROPITEM, ITEM_DESTROY_TIME_MAX};
+enum EItemDestroyTime
+{
+	ITEM_DESTROY_TIME_AUTOGIVE, 
+	ITEM_DESTROY_TIME_DROPGOLD, 
+	ITEM_DESTROY_TIME_DROPITEM,
+	ITEM_DESTROY_TIME_MAX
+};
 
 void config_init(const std::string& st_localeServiceName); // default "" is CONFIG
 
@@ -22,10 +34,10 @@ extern uint16_t db_port;
 extern int32_t passes_per_sec;
 extern int32_t save_event_second_cycle;
 extern int32_t ping_event_second_cycle;
-extern int32_t test_server;
+extern int32_t g_bIsTestServer;
+extern int32_t game_stage;
 extern bool	guild_mark_server;
 extern uint8_t guild_mark_min_level;
-extern bool	distribution_test_server;
 
 extern bool	g_bNoMoreClient;
 extern bool	g_bNoRegen;
@@ -41,7 +53,6 @@ extern uint32_t g_dwItemBonusChangeTime;
 extern bool	g_bAllMountAttack;
 extern bool	g_bEnableBootaryCheck;
 extern bool	g_bGMHostCheck;
-extern bool	g_bGuildInviteLimit;
 extern bool	g_bGuildInfiniteMembers;
 extern bool	g_bEnableSpeedHackCrash;
 extern int32_t g_iStatusPointGetLevelLimit;
@@ -57,7 +68,6 @@ extern int32_t g_aiItemDestroyTime[ITEM_DESTROY_TIME_MAX];
 extern bool	g_bDisableEmpireLanguageCheck;
 // #endif
 
-extern bool	g_bTrafficProfileOn;		///< true ÀÌ¸é TrafficProfiler ¸¦ ÄÒ´Ù.
 
 extern uint8_t	g_bChannel;
 
@@ -68,11 +78,9 @@ extern bool	no_wander;
 extern int32_t	g_iUserLimit;
 extern time_t	g_global_time;
 
-const char *	get_table_postfix();
 
 extern std::string	g_stHostname;
 extern std::string	g_stLocale;
-extern std::string	g_stLocaleFilename;
 
 extern char		g_szPublicIP[16];
 extern char		g_szInternalIP[16];
@@ -83,13 +91,12 @@ extern bool		g_bSkillDisable;
 
 extern int32_t		g_iFullUserCount;
 extern int32_t		g_iBusyUserCount;
-extern void		LoadStateUserCount();
 
 extern bool	g_bEmpireWhisper;
 
 extern uint8_t	g_bAuthServer;
 
-extern uint8_t	PK_PROTECT_LEVEL;
+extern uint8_t	g_bPKProtectLevel;
 
 extern std::string	g_stAuthMasterIP;
 extern uint16_t		g_wAuthMasterPort;
@@ -100,14 +107,13 @@ extern std::string	g_stQuestDir;
 //extern std::string	g_stQuestObjectDir;
 extern std::set<std::string> g_setQuestObjectDir;
 
-
-extern std::vector<std::string>	g_stAdminPageIP;
-extern std::string	g_stAdminPagePassword;
-
 extern int32_t	SPEEDHACK_LIMIT_COUNT;
 extern int32_t 	SPEEDHACK_LIMIT_BONUS;
 
 extern int32_t g_iSyncHackLimitCount;
+
+extern bool	g_bDisableMovspeedHacklog;
+extern double g_dMovspeedHackThreshold;
 
 extern int32_t g_server_id;
 extern std::string g_strWebMallURL;
@@ -147,5 +153,4 @@ extern uint32_t g_uiSpamReloadCycle;
 extern void map_allow_log();
 // missing end
 
-#endif /* __INC_METIN_II_GAME_CONFIG_H__ */
 

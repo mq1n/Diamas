@@ -5,7 +5,6 @@
 
 namespace marriage
 {
-	const uint32_t WEDDING_MAP_INDEX = 81;
 	typedef CHARACTER_SET charset_t;
 
 	class WeddingMap

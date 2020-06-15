@@ -1,8 +1,9 @@
 #include "StdAfx.h"
 #include "PythonSystem.h"
 #include "PythonBackground.h"
-#include "../eterlib/StateManager.h"
+#include "../eterLib/StateManager.h"
 #include "../eterGameLib/MapOutDoor.h"
+#include "../eterSecurity/PythonStackCheck.h"
 #include "PythonCharacterManager.h"
 #include "PythonMiniMap.h"
 #include "PythonDynamicModuleNames.h"
@@ -31,6 +32,8 @@ PyObject * backgroundTextureChange(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundEnableSnow(PyObject * poSelf, PyObject * poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_background_EnableSnow, PY_REF_FILE, PY_REF_FUNC);
+
 	int32_t nIsEnable;
 	if (!PyTuple_GetInteger(poArgs, 0, &nIsEnable))
 		return Py_BadArgument();
@@ -59,6 +62,8 @@ PyObject* backgroundIsRainEnabled(PyObject* poSelf, PyObject* poArgs) {
 
 PyObject * backgroundLoadMap(PyObject * poSelf, PyObject * poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_background_LoadMap, PY_REF_FILE, PY_REF_FUNC);
+
 	char * pszMapPathName;
 
 	if (!PyTuple_GetString(poArgs, 0, &pszMapPathName))
@@ -97,6 +102,8 @@ PyObject * backgroundDestroy(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundRegisterEnvironmentData(PyObject * poSelf, PyObject * poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_background_RegisterEnvironmentData, PY_REF_FILE, PY_REF_FUNC);
+
 	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BadArgument();
@@ -119,6 +126,8 @@ PyObject * backgroundRegisterEnvironmentData(PyObject * poSelf, PyObject * poArg
 
 PyObject * backgroundSetEnvironmentData(PyObject * poSelf, PyObject * poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_background_SetEnvironmentData, PY_REF_FILE, PY_REF_FUNC);
+
 	int32_t iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BadArgument();
@@ -134,8 +143,28 @@ PyObject * backgroundSetEnvironmentData(PyObject * poSelf, PyObject * poArgs)
 
 PyObject * backgroundGetCurrentMapName(PyObject * poSelf, PyObject * poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_background_GetCurrentMapName, PY_REF_FILE, PY_REF_FUNC);
+
 	CPythonBackground& rkBG=CPythonBackground::Instance();
 	return Py_BuildValue("s", rkBG.GetWarpMapName());
+}
+
+PyObject * backgroundGetMapName(PyObject * poSelf, PyObject * poArgs)
+{
+	uint32_t dwX;
+	if (!PyTuple_GetUnsignedLong(poArgs, 0, &dwX))
+		return Py_BadArgument();
+
+	uint32_t dwY;
+	if (!PyTuple_GetUnsignedLong(poArgs, 1, &dwY))
+		return Py_BadArgument();
+
+	CPythonBackground& rkBG = CPythonBackground::Instance();
+	std::string szMapName = rkBG.GetMapName(dwX, dwY);
+	if (szMapName.empty() || szMapName == "")
+		return Py_BuildNone();
+
+	return Py_BuildValue("s", szMapName.c_str());
 }
 
 PyObject * backgroundGetPickingPoint(PyObject * poSelf, PyObject * poArgs)
@@ -264,7 +293,7 @@ PyObject * backgroundRenderCharacterShadowToTexture(PyObject * poSelf, PyObject 
 
 PyObject * backgroundRenderDungeon(PyObject * poSelf, PyObject * poArgs)
 {
-	assert(!"background.RenderDungeon() - Don't use this function - [levites]");
+	assert(!"background.RenderDungeon() - Don't use this function");
 	return Py_BuildNone();
 }
 
@@ -292,9 +321,8 @@ PyObject * backgroundGetRenderedSplatNum(PyObject * poSelf, PyObject * poArgs)
 
 	char szOutput[MAX_PATH] = "";
 	int32_t iOutput = 0;
-	for( std::vector<int32_t>::iterator it = aTextureNumVector.begin(); it != aTextureNumVector.end(); ++it ) {
-		iOutput += _snprintf_s(szOutput + iOutput, sizeof(szOutput) - iOutput, sizeof(szOutput) - iOutput, "%d ", *it);
-	}
+	for (auto & it : aTextureNumVector)
+		iOutput += _snprintf_s(szOutput + iOutput, sizeof(szOutput) - iOutput, sizeof(szOutput) - iOutput, "%d ", it);
 	//std::copy(aTextureNumVector.begin(),aTextureNumVector.end(),std::ostream_iterator<int32_t>(ostr," "));
 
 	return Py_BuildValue("iifs", iPatch, iSplat, fSplatRatio, szOutput);
@@ -475,6 +503,8 @@ PyObject * backgroundGlobalPositionToLocalPosition(PyObject * poSelf, PyObject *
 
 PyObject * backgroundGlobalPositionToMapInfo(PyObject * poSelf, PyObject * poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_background_GlobalPositionToMapInfo, PY_REF_FILE, PY_REF_FUNC);
+
 	int32_t iX;
 	if (!PyTuple_GetInteger(poArgs, 0, &iX))
 		return Py_BadArgument();
@@ -538,6 +568,31 @@ PyObject * backgroundDisableGuildArea(PyObject * poSelf, PyObject * poArgs)
 	CPythonBackground::Instance().DisableGuildArea();
 	return Py_BuildNone();
 }
+PyObject * backgroundGetMapInfoCount(PyObject * poSelf, PyObject * poArgs)
+{
+	const CPythonBackground::TMapInfoVector& rkVec = CPythonBackground::Instance().GetMapInfoVector();
+	return Py_BuildValue("i", rkVec.size());
+}
+
+PyObject * backgroundGetMapPathByIndex(PyObject * poSelf, PyObject * poArgs)
+{
+	int32_t iIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
+		return Py_BadArgument();
+
+	const CPythonBackground::TMapInfoVector& rkVec = CPythonBackground::Instance().GetMapInfoVector();
+	return Py_BuildValue("s", rkVec[iIndex].m_strName.c_str());
+}
+
+PyObject * backgroundGetMapInfoByIndex(PyObject * poSelf, PyObject * poArgs)
+{
+	int32_t iIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
+		return Py_BadArgument();
+
+	const CPythonBackground::TMapInfoVector& rkVec = CPythonBackground::Instance().GetMapInfoVector();
+	return Py_BuildValue("sii", rkVec[iIndex].m_strLocaleName.c_str(), rkVec[iIndex].m_dwBaseX, rkVec[iIndex].m_dwBaseY);
+}
 
 PyObject* backgroundIsPrimalMap(PyObject* poSelf, PyObject* poArgs) {
 	return Py_BuildValue("b", CPythonBackground::Instance().IsPrimalMap());
@@ -577,6 +632,7 @@ void initBackground()
 		{ "RegisterEnvironmentData",			backgroundRegisterEnvironmentData,			METH_VARARGS },
 		{ "SetEnvironmentData",					backgroundSetEnvironmentData,				METH_VARARGS },
 		{ "GetCurrentMapName",					backgroundGetCurrentMapName,				METH_VARARGS },
+		{ "GetMapName",							backgroundGetMapName,						METH_VARARGS },
 		{ "GetPickingPoint",					backgroundGetPickingPoint,					METH_VARARGS },
 
 		{ "BeginEnvironment",					backgroundBeginEnvironment,					METH_VARARGS },
@@ -619,7 +675,9 @@ void initBackground()
 		{ "VisibleGuildArea",					backgroundVisibleGuildArea,					METH_VARARGS },
 		{ "DisableGuildArea",					backgroundDisableGuildArea,					METH_VARARGS },
 
+#ifdef _DEBUG
 		{ "WarpTest",							backgroundWarpTest,							METH_VARARGS },
+#endif
 
 		{ "ToggleRain",							backgroundToggleRain,						METH_VARARGS },
 		{ "IsRainEnabled",						backgroundIsRainEnabled,					METH_VARARGS },
@@ -631,6 +689,9 @@ void initBackground()
 		{ "SetEnvironmentFog",					backgroundSetEnvironmentFog,				METH_VARARGS }, 
 #endif
 
+		{ "GetMapInfoCount",					backgroundGetMapInfoCount,					METH_VARARGS },
+		{ "GetMapPathByIndex",					backgroundGetMapPathByIndex,				METH_VARARGS },
+		{ "GetMapInfoByIndex",					backgroundGetMapInfoByIndex,				METH_VARARGS },
 		{ nullptr, nullptr, 0 },
 	};
 

@@ -35,9 +35,12 @@ bool CPythonApplication::CreateCursors()
 		HANDLE hCursor = LoadImage(ms_hInstance, MAKEINTRESOURCE(ResourceID[i]), IMAGE_CURSOR, 32, 32, LR_VGACOLOR);
 
 		if (nullptr == hCursor)
+		{
+			TraceError("CreateCursor fail! Image: %d Error: %u", ResourceID[i], GetLastError());
 			return false;
+		}
 
-		m_CursorHandleMap.insert(TCursorHandleMap::value_type(i, hCursor));
+		m_CursorHandleMap.emplace(i, hCursor);
 	}
 
 	return true;
@@ -45,11 +48,8 @@ bool CPythonApplication::CreateCursors()
 
 void CPythonApplication::DestroyCursors()
 {
-	TCursorHandleMap::iterator itor;
-	for (itor = m_CursorHandleMap.begin(); itor != m_CursorHandleMap.end(); ++itor)
-	{
-		DestroyCursor((HCURSOR) itor->second);
-	}
+	for (auto & itor : m_CursorHandleMap)
+		DestroyCursor(static_cast<HCURSOR>(itor.second));
 }
 
 void CPythonApplication::SetCursorVisible(BOOL bFlag, bool bLiarCursorOn)
@@ -59,7 +59,7 @@ void CPythonApplication::SetCursorVisible(BOOL bFlag, bool bLiarCursorOn)
 	
 	if (CURSOR_MODE_HARDWARE == m_iCursorMode)
 	{
-		int32_t iShowNum;
+		int32_t iShowNum{0};
 		if (FALSE == m_bCursorVisible)
 		{
 			do
@@ -103,7 +103,6 @@ BOOL CPythonApplication::__IsContinuousChangeTypeCursor(int32_t iCursorNum)
 		case CURSOR_SHAPE_BUY:
 		case CURSOR_SHAPE_SELL:
 			return TRUE;
-			break;
 	}
 
 	return FALSE;
@@ -114,9 +113,7 @@ BOOL CPythonApplication::SetCursorNum(int32_t iCursorNum)
 	if (CURSOR_SHAPE_NORMAL == iCursorNum)
 	{
 		if (!__IsContinuousChangeTypeCursor(m_iCursorNum))
-		{
 			iCursorNum = m_iContinuousCursorNum;
-		}
 	}
 	else
 	{
@@ -128,11 +125,11 @@ BOOL CPythonApplication::SetCursorNum(int32_t iCursorNum)
 
 	if (CURSOR_MODE_HARDWARE == m_iCursorMode)
 	{
-		TCursorHandleMap::iterator itor = m_CursorHandleMap.find(iCursorNum);
+		auto itor = m_CursorHandleMap.find(iCursorNum);
 		if (m_CursorHandleMap.end() == itor)
 			return FALSE;
 
-		HCURSOR hCursor = (HCURSOR)itor->second;
+		auto hCursor = static_cast<HCURSOR>(itor->second);
 
 		SetCursor(hCursor);
 		m_hCurrentCursor = hCursor;

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "PythonMessenger.h"
 #include "PythonDynamicModuleNames.h"
 
@@ -9,7 +9,7 @@ void CPythonMessenger::RemoveFriend(const char * c_szKey)
 
 void CPythonMessenger::OnFriendLogin(const char * c_szKey/*, const char * c_szName*/)
 {
-	m_FriendNameMap.insert(c_szKey);
+	m_FriendNameMap.emplace(c_szKey);
 
 	if (m_poMessengerHandler)
 		PyCallClassMemberFunc(m_poMessengerHandler, "OnLogin", Py_BuildValue("(is)", MESSENGER_GRUOP_INDEX_FRIEND, c_szKey));
@@ -17,7 +17,7 @@ void CPythonMessenger::OnFriendLogin(const char * c_szKey/*, const char * c_szNa
 
 void CPythonMessenger::OnFriendLogout(const char * c_szKey)
 {
-	m_FriendNameMap.insert(c_szKey);
+	m_FriendNameMap.emplace(c_szKey);
 
 	if (m_poMessengerHandler)
 		PyCallClassMemberFunc(m_poMessengerHandler, "OnLogout", Py_BuildValue("(is)", MESSENGER_GRUOP_INDEX_FRIEND, c_szKey));
@@ -73,12 +73,14 @@ void CPythonMessenger::LogoutGuildMember(const char * c_szName)
 
 void CPythonMessenger::RefreshGuildMember()
 {
-	for (TGuildMemberStateMap::iterator itor = m_GuildMemberStateMap.begin(); itor != m_GuildMemberStateMap.end(); ++itor)
+	for (auto & itor : m_GuildMemberStateMap)
 	{
-		if (itor->second)
-			PyCallClassMemberFunc(m_poMessengerHandler, "OnLogin", Py_BuildValue("(is)", MESSENGER_GRUOP_INDEX_GUILD, (itor->first).c_str()));
+		if (itor.second)
+			PyCallClassMemberFunc(m_poMessengerHandler, "OnLogin",
+								  Py_BuildValue("(is)", MESSENGER_GRUOP_INDEX_GUILD, (itor.first).c_str()));
 		else
-			PyCallClassMemberFunc(m_poMessengerHandler, "OnLogout", Py_BuildValue("(is)", MESSENGER_GRUOP_INDEX_GUILD, (itor->first).c_str()));
+			PyCallClassMemberFunc(m_poMessengerHandler, "OnLogout",
+								  Py_BuildValue("(is)", MESSENGER_GRUOP_INDEX_GUILD, (itor.first).c_str()));
 	}
 }
 

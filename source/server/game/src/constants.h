@@ -3,12 +3,61 @@
 
 #include "../../common/tables.h"
 
+// MAP_INDEX
+enum EMapIndexList
+{
+	HOME_MAP_INDEX_RED_1 = 1,
+	HOME_MAP_INDEX_RED_2 = 3,
+	GUILD_MAP_INDEX_RED = 5,
+	HOME_MAP_INDEX_YELLOW_1 = 21,
+	HOME_MAP_INDEX_YELLOW_2 = 23,
+	GUILD_MAP_INDEX_YELLOW = 25,
+	HOME_MAP_INDEX_BLUE_1 = 41,
+	HOME_MAP_INDEX_BLUE_2 = 43,
+	GUILD_MAP_INDEX_BLUE = 45,
+
+	SNOW_MAP_INDEX = 61,
+	FLAME_MAP_INDEX = 62,
+	DESERT_MAP_INDEX = 63,
+	THREEWAY_MAP_INDEX = 64,
+	MILGYO_MAP_INDEX = 65,
+	TRENT_1_MAP_INDEX = 66,
+	TRENT_2_MAP_INDEX = 67,
+	NUSLUCK_MAP_INDEX = 68,
+	DUEL_MAP_INDEX = 69,
+
+	MONKEY_EASY_MAP_INDEX_1 = 71,
+	MONKEY_EASY_MAP_INDEX_2 = 72,
+	MONKEY_EASY_MAP_INDEX_3 = 73,
+	MONKEY_MEDIUM_MAP_INDEX = 74,
+	MONKEY_EXPERT_MAP_INDEX = 75,
+	DEVILTOWER_MAP_INDEX = 76,
+	DEVILSCATACOMB_MAP_INDEX = 77,
+	SPIDER_MAP_INDEX_1 = 78,
+	SPIDER_MAP_INDEX_2 = 79,
+	SKIPIA_MAP_INDEX_1 = 80,
+	SKIPIA_MAP_INDEX_2 = 81,
+	SKIPIA_MAP_INDEX_BOSS = 82,
+
+	GUILD_WAR_MAP_INDEX = 91,
+	GUILD_FLAG_WAR_MAP_INDEX = 92,
+	WEDDING_MAP_INDEX = 93,
+	OXEVENT_MAP_INDEX = 94,
+};
+// MAP_INDEX_END
+
+typedef struct SNPCMovingPosition
+{
+	int32_t	lX;
+	int32_t	lY;
+	bool	bRun;
+} TNPCMovingPosition;
+
 enum EMonsterChatState
 {
-	MONSTER_CHAT_WAIT,
-	MONSTER_CHAT_ATTACK,
-	MONSTER_CHAT_CHASE,
-	MONSTER_CHAT_ATTACKED,
+	MONSTER_CHAT_WAIT		= 0,
+	MONSTER_CHAT_ATTACK		= 1,
+	MONSTER_CHAT_ATTACKED	= 2,
 };
 
 typedef struct SMobRankStat
@@ -54,17 +103,6 @@ typedef struct SApplyInfo
 	uint8_t	bPointType;                          // APPLY -> POINT
 } TApplyInfo;
 
-enum {
-	FORTUNE_BIG_LUCK,
-	FORTUNE_LUCK,
-	FORTUNE_SMALL_LUCK,
-	FORTUNE_NORMAL,
-	FORTUNE_SMALL_BAD_LUCK,
-	FORTUNE_BAD_LUCK,
-	FORTUNE_BIG_BAD_LUCK,
-	FORTUNE_MAX_NUM,
-};
-
 const int32_t STONE_INFO_MAX_NUM = 10;
 const int32_t STONE_LEVEL_MAX_NUM = 4;
 
@@ -97,7 +135,7 @@ extern TBattleTypeStat		BattleTypeStats[BATTLE_TYPE_MAX_NUM];
 
 extern const uint32_t		party_exp_distribute_table[PLAYER_EXP_TABLE_MAX + 1];
 
-extern const uint32_t		exp_table_common[PLAYER_EXP_TABLE_MAX + 1];
+extern const uint32_t		exp_table_common[PLAYER_MAX_LEVEL_CONST + 1];
 
 extern const uint32_t*		exp_table;
 
@@ -154,6 +192,7 @@ extern const int32_t * aiChainLightningCountBySkillLevel;
 extern const int32_t aiChainLightningCountBySkillLevel_euckr[SKILL_MAX_LEVEL + 1];
 
 extern const char * c_apszEmpireNames[EMPIRE_MAX_NUM];
+extern const char * c_apszEmpireNamesAlt[EMPIRE_MAX_NUM];
 extern const char * c_apszPrivNames[MAX_PRIV_NUM];
 extern const SStoneDropInfo aStoneDrop[STONE_INFO_MAX_NUM];
 

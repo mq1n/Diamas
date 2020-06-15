@@ -16,14 +16,11 @@ class CLightData : public CEffectElementBase
 
 		void GetRange(float fTime, float& rRange);
 		float GetDuration();
-		BOOL isLoop()
-		{
-			return m_bLoopFlag;
-		}
-		int32_t GetLoopCount()
-		{
-			return m_iLoopCount;
-		}
+
+		BOOL isLoop() const { return m_bLoopFlag; }
+
+		int32_t GetLoopCount() const { return m_iLoopCount; }
+
 		void InitializeLight(D3DLIGHT9& light);
 
 	protected:

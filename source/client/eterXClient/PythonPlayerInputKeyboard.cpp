@@ -9,10 +9,12 @@ void CPythonPlayer::SetAttackKeyState(bool isPress)
 	{
 		CInstanceBase* pkInstMain = NEW_GetMainActorPtr();
 		if (pkInstMain)
-		if (pkInstMain->IsFishingMode())
 		{
-			NEW_Fishing();
-			return;
+			if (pkInstMain->IsFishingMode())
+			{
+				NEW_Fishing();
+				return;
+			}
 		}
 	}
 
@@ -93,41 +95,33 @@ float CPythonPlayer::GetDegreeFromDirection(int32_t iUD, int32_t iLR)
 	switch(iUD)
 	{
 		case KEYBOARD_UD_UP:
-			if (KEYBOARD_LR_LEFT == iLR)
-			{
-				return +45.0f;
-			}
-			else if (KEYBOARD_LR_RIGHT == iLR)
-			{
-				return -45.0f;
-			}
+	{
+		if (KEYBOARD_LR_LEFT == iLR)
+			return +45.0f;
+		if (KEYBOARD_LR_RIGHT == iLR)
+			return -45.0f;
+	}
 
-			return 0.0f;
-			break;
+		return 0.0f;
 
-		case KEYBOARD_UD_DOWN:
-			if (KEYBOARD_LR_LEFT == iLR)
-			{
-				return +135.0f;
-			}
-			else if (KEYBOARD_LR_RIGHT == iLR)
-			{
-				return -135.0f;
-			}
+	case KEYBOARD_UD_DOWN:
+	{
+		if (KEYBOARD_LR_LEFT == iLR)
+			return +135.0f;
+		if (KEYBOARD_LR_RIGHT == iLR)
+			return -135.0f;
+	}
 
-			return +180.0f;
-			break;
+		return +180.0f;
 
-		case KEYBOARD_UD_NONE:
-			if (KEYBOARD_LR_LEFT == iLR)
-			{
-				return +90.0f;
-			}
-			else if (KEYBOARD_LR_RIGHT == iLR)
-			{
-				return -90.0f;
-			}
-			break;
+	case KEYBOARD_UD_NONE:
+	{
+		if (KEYBOARD_LR_LEFT == iLR)
+			return +90.0f;
+		if (KEYBOARD_LR_RIGHT == iLR)
+			return -90.0f;
+	}
+	break;
 	}
 
 	return 0.0f;

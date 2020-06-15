@@ -3,6 +3,7 @@
 #include "PythonItem.h"
 #include "PythonDynamicModuleNames.h"
 #include "../eterGameLib/ItemManager.h"
+#include "../eterSecurity/PythonStackCheck.h"
 
 PyObject * chatSetChatColor(PyObject* poSelf, PyObject* poArgs)
 {
@@ -211,6 +212,8 @@ PyObject * chatGetLineStep(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chatAppendChat(PyObject* poSelf, PyObject* poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_chat_AppendChat, PY_REF_FILE, PY_REF_FUNC);
+
 	int32_t iType;
 	if (!PyTuple_GetInteger(poArgs, 0, &iType))
 		return Py_BuildException();
@@ -226,6 +229,8 @@ PyObject * chatAppendChat(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chatAppendChatWithDelay(PyObject* poSelf, PyObject* poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_chat_AppendChatWithDelay, PY_REF_FILE, PY_REF_FUNC);
+
 	int32_t iType;
 	if (!PyTuple_GetInteger(poArgs, 0, &iType))
 		return Py_BuildException();
@@ -289,6 +294,8 @@ PyObject * chatCreateWhisper(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chatAppendWhisper(PyObject* poSelf, PyObject* poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_chat_AppendWhisper, PY_REF_FILE, PY_REF_FUNC);
+
 	int32_t iType;
 	if (!PyTuple_GetInteger(poArgs, 0, &iType))
 		return Py_BuildException();
@@ -393,6 +400,8 @@ PyObject * chatInitWhisper(PyObject* poSelf, PyObject* poArgs)
 
 PyObject * chatGetLinkFromHyperlink(PyObject * poSelf, PyObject * poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_chat_GetLinkFromHyperlink, PY_REF_FILE, PY_REF_FUNC);
+
 	char * szHyperlink;
 	
 	if (!PyTuple_GetString(poArgs, 0, &szHyperlink))
@@ -418,7 +427,7 @@ PyObject * chatGetLinkFromHyperlink(PyObject * poSelf, PyObject * poArgs)
 			int32_t len;
 			bool isAttr = false;
 
-			len = snprintf(itemlink, sizeof(itemlink), "item:%x:%x:%x:%x:%x", 
+			len = _snprintf_s(itemlink, sizeof(itemlink), "item:%x:%x:%x:%x:%x",
 					htoi(results[1].c_str()),
 					htoi(results[2].c_str()),
 					htoi(results[3].c_str()),
@@ -427,9 +436,9 @@ PyObject * chatGetLinkFromHyperlink(PyObject * poSelf, PyObject * poArgs)
 
 			if (results.size() >= 8)
 			{
-				for (int32_t i = 6; i < results.size(); i += 2)
+				for (uint32_t i = 6; i < results.size(); i += 2)
 				{
-					len += snprintf(itemlink + len, sizeof(itemlink) - len, ":%x:%d", 
+					len += _snprintf_s(itemlink + len, sizeof(itemlink) - len, sizeof(itemlink) - len, ":%x:%lld",
 							htoi(results[i].c_str()),
 							atoi(results[i+1].c_str()));
 					isAttr = true;
@@ -438,15 +447,25 @@ PyObject * chatGetLinkFromHyperlink(PyObject * poSelf, PyObject * poArgs)
 
 			if (isAttr)
 				//"item:锅龋:敲贰弊:家南0:家南1:家南2"
-				snprintf(buf, sizeof(buf), "|cffffc700|H%s|h[%s]|h|r", itemlink, pItemData->GetName());
+				_snprintf_s(buf, sizeof(buf), "|cffffc700|H%s|h[%s]|h|r", itemlink, pItemData->GetName());
 			else
-				snprintf(buf, sizeof(buf), "|cfff1e6c0|H%s|h[%s]|h|r", itemlink, pItemData->GetName());
+				_snprintf_s(buf, sizeof(buf), "|cfff1e6c0|H%s|h[%s]|h|r", itemlink, pItemData->GetName());
 
 			return Py_BuildValue("s", buf);
 		}
 	}
 
 	return Py_BuildValue("s", "");
+}
+
+PyObject * chatGetLastWhisper(PyObject* poSelf, PyObject* poArgs)
+{
+	char * szName;
+	if (!PyTuple_GetString(poArgs, 0, &szName))
+		return Py_BuildException();
+
+	CWhisper * pWhisper;
+	return Py_BuildValue("s", CPythonChat::Instance().GetWhisper(szName, &pWhisper));
 }
 
 void initChat()
@@ -491,6 +510,8 @@ void initChat()
 		{ "SetWhisperPosition",		chatSetWhisperPosition,		METH_VARARGS },
 		{ "ClearWhisper",			chatClearWhisper,			METH_VARARGS },
 		{ "InitWhisper",			chatInitWhisper,			METH_VARARGS },
+
+		{ "GetLastWhisper",			chatGetLastWhisper,			METH_VARARGS },
 
 		// Link
 		{ "GetLinkFromHyperlink",	chatGetLinkFromHyperlink,	METH_VARARGS },

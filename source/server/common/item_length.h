@@ -1,7 +1,6 @@
-#ifndef __INC_METIN2_ITEM_LENGTH_H__
-#define __INC_METIN2_ITEM_LENGTH_H__
-
+#pragma once
 #include "service.h"
+#include <stdint.h>
 
 enum EItemMisc
 {
@@ -29,6 +28,7 @@ enum EItemMisc
 	REFINE_MATERIAL_MAX_NUM		= 5,
 
 	ITEM_ELK_VNUM				= 50026,
+	DRAGON_SOUL_BOX_SIZE		= 32
 };
 
 const uint8_t ITEM_SOCKET_REMAIN_SEC = 0;
@@ -36,7 +36,7 @@ enum EItemValueIdice
 {
 	ITEM_VALUE_DRAGON_SOUL_POLL_OUT_BONUS_IDX = 0,
 	ITEM_VALUE_CHARGING_AMOUNT_IDX = 0,
-	ITEM_VALUE_SECONDARY_COIN_UNIT_IDX = 0,
+	ITEM_VALUE_SECONDARY_COIN_UNIT_IDX = 0
 };
 enum EItemDragonSoulSockets
 {
@@ -85,15 +85,16 @@ enum EItemTypes
 	ITEM_DS,				//29 //용혼석
 	ITEM_SPECIAL_DS,		//30 // 특수한 용혼석 (DS_SLOT에 착용하는 UNIQUE 아이템이라 생각하면 됨)
 	ITEM_EXTRACT,			//31 추출도구.
-	ITEM_SECONDARY_COIN,	//32 ?? 명도전??
+	ITEM_SECONDARY_COIN_UNUSED,	//32 ?? 명도전??
 	ITEM_RING,				//33 반지
 	ITEM_BELT,				//34 벨트
+	ITEM_MAX_NUM
 };
 
 enum EMetinSubTypes
 {
 	METIN_NORMAL,
-	METIN_GOLD,
+	METIN_GOLD
 };
 
 enum EWeaponSubTypes
@@ -109,7 +110,7 @@ enum EWeaponSubTypes
 #ifdef ENABLE_WOLFMAN_CHARACTER
 	WEAPON_CLAW,
 #endif
-	WEAPON_NUM_TYPES,
+	WEAPON_NUM_TYPES
 };
 
 enum EArmorSubTypes
@@ -137,7 +138,7 @@ enum ECostumeSubTypes
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
 	COSTUME_WEAPON	= 4,
 #endif
-	COSTUME_NUM_TYPES,
+	COSTUME_NUM_TYPES
 };
 
 enum EDragonSoulSubType
@@ -148,7 +149,7 @@ enum EDragonSoulSubType
 	DS_SLOT4,
 	DS_SLOT5,
 	DS_SLOT6,
-	DS_SLOT_MAX,
+	DS_SLOT_MAX
 };
 
 #ifdef ENABLE_ACCE_SYSTEM
@@ -185,7 +186,7 @@ enum EDragonSoulGradeTypes
 	DRAGON_SOUL_GRADE_RARE,
 	DRAGON_SOUL_GRADE_ANCIENT,
 	DRAGON_SOUL_GRADE_LEGENDARY,
-	DRAGON_SOUL_GRADE_MAX,
+	DRAGON_SOUL_GRADE_MAX
 
 };
 
@@ -196,19 +197,19 @@ enum EDragonSoulStepTypes
 	DRAGON_SOUL_STEP_MID,
 	DRAGON_SOUL_STEP_HIGH,
 	DRAGON_SOUL_STEP_HIGHEST,
-	DRAGON_SOUL_STEP_MAX,
+	DRAGON_SOUL_STEP_MAX
 };
 #define DRAGON_SOUL_STRENGTH_MAX 7
 
 enum EDSInventoryMaxNum
 {
-	DRAGON_SOUL_INVENTORY_MAX_NUM = DS_SLOT_MAX * DRAGON_SOUL_GRADE_MAX * DRAGON_SOUL_BOX_SIZE,
+	DRAGON_SOUL_INVENTORY_MAX_NUM = DS_SLOT_MAX * DRAGON_SOUL_GRADE_MAX * DRAGON_SOUL_BOX_SIZE
 };
 
 enum EFishSubTypes
 {
 	FISH_ALIVE,
-	FISH_DEAD,
+	FISH_DEAD
 };
 
 enum EResourceSubTypes
@@ -224,7 +225,7 @@ enum EResourceSubTypes
 	RESOURCE_GEM,
 	RESOURCE_STONE,
 	RESOURCE_METIN,
-	RESOURCE_ORE,
+	RESOURCE_ORE
 };
 
 enum EUniqueSubTypes
@@ -232,7 +233,7 @@ enum EUniqueSubTypes
 	UNIQUE_NONE,
 	UNIQUE_BOOK,
 	UNIQUE_SPECIAL_RIDE,
-	UNIQUE_SPECIAL_MOUNT_RIDE,
+	UNIQUE_SPECIAL_MOUNT_RIDE
 };
 
 enum EUseSubTypes
@@ -269,13 +270,13 @@ enum EUseSubTypes
 	USE_PUT_INTO_BELT_SOCKET,			// 29 벨트 소켓에 사용할 수 있는 아이템 
 	USE_PUT_INTO_RING_SOCKET,			// 30 반지 소켓에 사용할 수 있는 아이템 (유니크 반지 말고, 새로 추가된 반지 슬롯)
 	USE_CHANGE_COSTUME_ATTR,			// 31
-	USE_RESET_COSTUME_ATTR,				// 32
+	USE_RESET_COSTUME_ATTR				// 32
 };
 
 enum EExtractSubTypes
 {
 	EXTRACT_DRAGON_SOUL,
-	EXTRACT_DRAGON_HEART,
+	EXTRACT_DRAGON_HEART
 };
 
 enum EAutoUseSubTypes
@@ -297,7 +298,7 @@ enum EMaterialSubTypes
 	MATERIAL_JEWEL,
 	MATERIAL_DS_REFINE_NORMAL, 
 	MATERIAL_DS_REFINE_BLESSED, 
-	MATERIAL_DS_REFINE_HOLLY,
+	MATERIAL_DS_REFINE_HOLLY
 };
 
 enum ESpecialSubTypes
@@ -413,7 +414,7 @@ enum EAttrAddonTypes
 {
 	ATTR_ADDON_NONE,
 	// positive values are reserved for set
-	ATTR_DAMAGE_ADDON = -1,
+	ATTR_DAMAGE_ADDON = -1
 };
 
 enum ERefineType
@@ -427,4 +428,3 @@ enum ERefineType
 	REFINE_TYPE_BDRAGON,
 };
 
-#endif

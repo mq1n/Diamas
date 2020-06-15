@@ -33,7 +33,7 @@ static const char *const token2string [] = {
     "end", "false", "for", "function", "if",
     "in", "local", "nil", "not", "or", "repeat",
     "return", "then", "true", "until", "while", 
-	"quest", "state", "with", "when", 
+	"quest", "state", "with", "when", "define",
 	"do",
 	"*name", "..", "...", "==", ">=", "<=", "~=",
     "*number", "*string", "<eof>"

@@ -9,7 +9,7 @@ bool PyTuple_GetTextInstance(PyObject* poArgs, int32_t pos, CGraphicTextInstance
 	if (!handle)
 		return false;
 
-	*ppTextInstance=(CGraphicTextInstance*)handle;	
+	*ppTextInstance = reinterpret_cast<CGraphicTextInstance *>(handle);
 
 	return true;
 }
@@ -54,7 +54,7 @@ PyObject* grpTextSetPosition(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 2, &iy))
 		return Py_BuildException();
 
-	pTextInstance->SetPosition((float) ix, (float) iy);
+	pTextInstance->SetPosition(static_cast<float>(ix), static_cast<float>(iy));
 	return Py_BuildNone();
 }
 

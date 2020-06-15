@@ -5,27 +5,29 @@
 #include "packet.h"
 #include "guild.h"
 #include "vector.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "item.h"
-#include "horsename_manager.h"
 #include "locale_service.h"
 #include "arena.h"
+#include "war_map.h"
+#include "Battleground.h"
 
 #include "../../common/VnumHelper.h"
 
 bool CHARACTER::StartRiding()
 {
-#ifdef ENABLE_NEWSTUFF
 	if (g_NoMountAtGuildWar && GetWarMap())
 	{
 		RemoveAffect(AFFECT_MOUNT);
 		RemoveAffect(AFFECT_MOUNT_BONUS);
+		
 		if (IsRiding())
 			StopRiding();
+			
 		return false;
 	}
-#endif
-	if (IsDead() == true)
+
+	if (IsDead())
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("쓰러진 상태에서는 말에 탈 수 없습니다."));
 		return false;
@@ -46,10 +48,14 @@ bool CHARACTER::StartRiding()
 		return false;
 	}
 
-	// @warme005
+	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()) && !IsGM())
+		return false;
+
 	if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 		return false;
 
+	if (CWarMapManager::instance().IsWarMap(GetMapIndex()))
+		return false;
 
 	uint32_t dwMountVnum = m_chHorse ? m_chHorse->GetRaceNum() : GetMyHorseVnum();
 
@@ -70,8 +76,11 @@ bool CHARACTER::StartRiding()
 
 	MountVnum(dwMountVnum);
 
-	if(test_server)
+	if(g_bIsTestServer)
 		sys_log(0, "Ride Horse : %s ", GetName());
+
+	if (IsPC())
+		GetAbuseController()->ResetMovementSpeedhackChecker();
 
 	return true;
 }
@@ -101,6 +110,9 @@ bool CHARACTER::StopRiding()
 		PointChange(POINT_DX, 0);
 		PointChange(POINT_HT, 0);
 		PointChange(POINT_IQ, 0);
+
+        if (IsPC())
+			GetAbuseController()->ResetMovementSpeedhackChecker();
 
 		return true;
 	}
@@ -144,7 +156,7 @@ LPCHARACTER CHARACTER::GetRider() const
 }
 
 
-void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, uint32_t dwVnum, const char* pPetName)
+void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, uint32_t dwVnum)
 {
 	if ( bSummon )
 	{
@@ -203,9 +215,9 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, uint32_t dwVnum, const 
 
 		m_chHorse->SetLevel(GetHorseLevel());
 
-		const char* pHorseName = CHorseNameManager::instance().GetHorseName(GetPlayerID());
+		const char* pHorseName = GetHorseName();
 
-		if ( pHorseName != nullptr && strlen(pHorseName) != 0 )
+		if ( pHorseName != nullptr && pHorseName[0] != '\0' && strlen(pHorseName) != 0 )
 		{
 			m_chHorse->m_stName = pHorseName;
 		}
@@ -215,6 +227,8 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, uint32_t dwVnum, const 
 			m_chHorse->m_stName += LC_TEXT("님의 말");
 		}
 
+		m_chHorse->SetRider(this);
+
 		if (!m_chHorse->Show(GetMapIndex(), x, y, GetZ()))
 		{
 			M2_DESTROY_CHARACTER(m_chHorse);
@@ -223,15 +237,13 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, uint32_t dwVnum, const 
 			return;
 		}
 
-		if ((GetHorseHealth() <= 0))
+		if (GetHorseHealth() <= 0)
 		{
 			TPacketGCDead pack;
 			pack.header	= HEADER_GC_DEAD;
 			pack.vid    = m_chHorse->GetVID();
 			PacketAround(&pack, sizeof(pack));
 		}
-
-		m_chHorse->SetRider(this);
 	}
 	else
 	{
@@ -369,10 +381,8 @@ bool CHARACTER::CanUseHorseSkill()
 	{
 		if (GetHorseGrade() == 3)
 			return true;
-		else
-			return false;
 
-		if(GetMountVnum())
+		if (GetMountVnum())
 		{
 			if (GetMountVnum() >= 20209 && GetMountVnum() <= 20212)
 				return true;
@@ -381,9 +391,6 @@ bool CHARACTER::CanUseHorseSkill()
 			if (CMobVnumHelper::IsRamadanBlackHorse(GetMountVnum()))
 				return true;
 		}
-		else
-			return false;
-
 	}
 
 	return false;

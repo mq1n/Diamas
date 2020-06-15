@@ -17,13 +17,12 @@
 #include "locale_service.h"
 #include "spam.h"
 
-DBManager::DBManager() : m_bIsConnect(false)
+DBManager::DBManager() :
+	m_bIsConnect(false)
 {
 }
 
-DBManager::~DBManager()
-{
-}
+DBManager::~DBManager() = default;
 
 bool DBManager::Connect(const char * host, const int32_t port, const char * user, const char * pwd, const char * db)
 {
@@ -62,6 +61,40 @@ SQLMsg * DBManager::DirectQuery(const char * c_pszFormat, ...)
 //	return m_sql_direct.DirectQuery(szQuery);
 	std::string sQuery(szQuery);
 	return m_sql_direct.DirectQuery(sQuery.substr(0, sQuery.find_first_of(";") == std::string::npos ? sQuery.length() : sQuery.find_first_of(";")).c_str());
+}
+
+void DBManager::FuncQuery(std::function<void(SQLMsg*)> f, const char* c_pszFormat, ...)
+{
+	char szQuery[4096];
+	va_list args;
+
+	va_start(args, c_pszFormat);
+	vsnprintf(szQuery, 4096, c_pszFormat, args);
+	va_end(args);
+
+	auto p = M2_NEW CFuncQueryInfo;
+
+	p->iQueryType = QUERY_TYPE_FUNCTION;
+	p->f = f;
+
+	m_sql.ReturnQuery(szQuery, p);
+}
+
+void DBManager::FuncAfterQuery(std::function<void()> f, const char* c_pszFormat, ...)
+{
+	char szQuery[4096];
+	va_list args;
+
+	va_start(args, c_pszFormat);
+	vsnprintf(szQuery, 4096, c_pszFormat, args);
+	va_end(args);
+
+	auto  p = M2_NEW CFuncAfterQueryInfo;
+
+	p->iQueryType = QUERY_TYPE_AFTER_FUNCTION;
+	p->f = f;
+
+	m_sql.ReturnQuery(szQuery, p);
 }
 
 bool DBManager::IsConnected()
@@ -316,31 +349,25 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 					char szCreateDate[256] = "00000000";
 
-					{
-						str_to_number(aiPremiumTimes[PREMIUM_EXP], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_ITEM], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_SAFEBOX], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_AUTOLOOT], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_FISH_MIND], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_MARRIAGE_FAST], row[col++]);
-						str_to_number(aiPremiumTimes[PREMIUM_GOLD], row[col++]);
+					str_to_number(aiPremiumTimes[PREMIUM_EXP], row[col++]);
+					str_to_number(aiPremiumTimes[PREMIUM_ITEM], row[col++]);
+					str_to_number(aiPremiumTimes[PREMIUM_SAFEBOX], row[col++]);
+					str_to_number(aiPremiumTimes[PREMIUM_AUTOLOOT], row[col++]);
+					str_to_number(aiPremiumTimes[PREMIUM_FISH_MIND], row[col++]);
+					str_to_number(aiPremiumTimes[PREMIUM_MARRIAGE_FAST], row[col++]);
+					str_to_number(aiPremiumTimes[PREMIUM_GOLD], row[col++]);
 
-						{
-							int32_t retValue = 0;
-							str_to_number(retValue, row[col]);
+					int32_t retValue = 0;
+					str_to_number(retValue, row[col]);
 
-							time_t create_time = retValue;
-							struct tm * tm1;
-							tm1 = localtime(&create_time);
-							strftime(szCreateDate, 255, "%Y%m%d", tm1);
-
-							sys_log(0, "Create_Time %d %s", retValue, szCreateDate);
-							sys_log(0, "Block Time %d ", strncmp(szCreateDate, g_stBlockDate.c_str(), 8));
-						}
-					}
+					time_t create_time = retValue;
+					struct tm * tm1;
+					tm1 = localtime(&create_time);
+					strftime(szCreateDate, 255, "%Y%m%d", tm1);
+					sys_log(0, "Create_Time %d %s", retValue, szCreateDate);
+					sys_log(0, "Block Time %d ", strncmp(szCreateDate, g_stBlockDate.c_str(), 8));
 
 					int32_t nPasswordDiff = strcmp(szEncrytPassword, szPassword);
-
 					if (nPasswordDiff)
 					{
 						LoginFailure(d, "WRONGPWD");
@@ -367,20 +394,18 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 					}
 					else
 					{
+						//stBlockData >= 0 == 날짜가 BlockDate 보다 미래
+						if (strncmp(szCreateDate, g_stBlockDate.c_str(), 8) >= 0)
 						{
-							//stBlockData >= 0 == 날짜가 BlockDate 보다 미래 
-							if (strncmp(szCreateDate, g_stBlockDate.c_str(), 8) >= 0)
-							{
-								LoginFailure(d, "BLKLOGIN");
-								sys_log(0, "   BLKLOGIN");
-								M2_DELETE(pinfo);
-								break;
-							}
-
-							char szQuery[1024];
-							snprintf(szQuery, sizeof(szQuery), "UPDATE account SET last_play=NOW() WHERE id=%u", dwID);
-							std::unique_ptr<SQLMsg> msg( DBManager::instance().DirectQuery(szQuery) );
+							LoginFailure(d, "BLKLOGIN");
+							sys_log(0, "   BLKLOGIN");
+							M2_DELETE(pinfo);
+							break;
 						}
+
+						char szQuery[1024];
+						snprintf(szQuery, sizeof(szQuery), "UPDATE account SET last_play=NOW() WHERE id=%u", dwID);
+						std::unique_ptr<SQLMsg> msg( DBManager::instance().DirectQuery(szQuery) );
 
 						TAccountTable & r = d->GetAccountTable();
 
@@ -394,7 +419,6 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 				
 						LoginPrepare(d, pinfo->adwClientKey, aiPremiumTimes);
 						M2_DELETE(pinfo);
-						break;
 					}
 				}
 			}
@@ -448,21 +472,11 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 	M2_DELETE(qi);
 }
 
-void DBManager::SendMoneyLog(uint8_t type, uint32_t vnum, int32_t gold)
-{
-	if (!gold)
-		return;
-	TPacketMoneyLog p;
-	p.type = type;
-	p.vnum = vnum;
-	p.gold = gold;
-	db_clientdesc->DBPacket(HEADER_GD_MONEY_LOG, 0, &p, sizeof(p));
-}
-
 size_t DBManager::EscapeString(char* dst, size_t dstSize, const char *src, size_t srcSize)
 {
 	return m_sql_direct.EscapeString(dst, dstSize, src, srcSize);
 }
+
 
 //
 // Common SQL 
@@ -477,7 +491,7 @@ bool AccountDB::IsConnected()
 	return m_IsConnect;
 }
 
-bool AccountDB::Connect(const char * host, const int32_t port, const char * user, const char * pwd, const char * db)
+bool AccountDB::Connect(const char* host, const int32_t port, const char* user, const char* pwd, const char* db)
 {
 	m_IsConnect = m_sql_direct.Setup(host, user, pwd, db, "", true, port);
 
@@ -490,18 +504,18 @@ bool AccountDB::Connect(const char * host, const int32_t port, const char * user
 	return m_IsConnect;
 }
 
-bool AccountDB::ConnectAsync(const char * host, const int32_t port, const char * user, const char * pwd, const char * db, const char * locale)
+bool AccountDB::ConnectAsync(const char* host, const int32_t port, const char* user, const char* pwd, const char* db, const char* locale)
 {
 	m_sql.Setup(host, user, pwd, db, locale, false, port);
 	return true;
 }
 
-void AccountDB::SetLocale(const std::string & stLocale)
+void AccountDB::SetLocale(const std::string& stLocale)
 {
 	m_sql_direct.SetLocale(stLocale);
 }
 
-SQLMsg* AccountDB::DirectQuery(const char * query)
+SQLMsg* AccountDB::DirectQuery(const char* query)
 {
 	return m_sql_direct.DirectQuery(query);
 }
@@ -511,7 +525,7 @@ void AccountDB::AsyncQuery(const char* query)
 	m_sql.AsyncQuery(query);
 }
 
-void AccountDB::ReturnQuery(int32_t iType, uint32_t dwIdent, void * pvData, const char * c_pszFormat, ...)
+void AccountDB::ReturnQuery(int32_t iType, uint32_t dwIdent, void* pvData, const char* c_pszFormat, ...)
 {
 	char szQuery[4096];
 	va_list args;
@@ -520,7 +534,7 @@ void AccountDB::ReturnQuery(int32_t iType, uint32_t dwIdent, void * pvData, cons
 	vsnprintf(szQuery, sizeof(szQuery), c_pszFormat, args);
 	va_end(args);
 
-	CReturnQueryInfo * p = M2_NEW CReturnQueryInfo;
+	CReturnQueryInfo* p = M2_NEW CReturnQueryInfo;
 
 	p->iQueryType = QUERY_TYPE_RETURN;
 	p->iType = iType;
@@ -530,9 +544,9 @@ void AccountDB::ReturnQuery(int32_t iType, uint32_t dwIdent, void * pvData, cons
 	m_sql.ReturnQuery(szQuery, p);
 }
 
-SQLMsg * AccountDB::PopResult()
+SQLMsg* AccountDB::PopResult()
 {
-	SQLMsg * p;
+	SQLMsg* p;
 
 	if (m_sql.PopResult(&p))
 		return p;
@@ -546,13 +560,13 @@ void AccountDB::Process()
 
 	while ((pMsg = PopResult()))
 	{
-		CQueryInfo* qi = (CQueryInfo *) pMsg->pvUserData;
+		CQueryInfo* qi = (CQueryInfo*)pMsg->pvUserData;
 
 		switch (qi->iQueryType)
 		{
-			case QUERY_TYPE_RETURN:
-				AnalyzeReturnQuery(pMsg);
-				break;
+		case QUERY_TYPE_RETURN:
+			AnalyzeReturnQuery(pMsg);
+			break;
 		}
 	}
 
@@ -566,7 +580,6 @@ enum EAccountQID
 	QID_SPAM_DB,
 };
 
-// 10분마다 리로드
 static LPEVENT s_pkReloadSpamEvent = nullptr;
 
 EVENTINFO(reload_spam_event_info)
@@ -597,25 +610,25 @@ void CancelReloadSpamEvent() {
 	s_pkReloadSpamEvent = nullptr;
 }
 
-void AccountDB::AnalyzeReturnQuery(SQLMsg * pMsg)
+void AccountDB::AnalyzeReturnQuery(SQLMsg* pMsg)
 {
-	CReturnQueryInfo * qi = (CReturnQueryInfo *) pMsg->pvUserData;
+	CReturnQueryInfo* qi = (CReturnQueryInfo*)pMsg->pvUserData;
 
 	switch (qi->iType)
 	{
-		case QID_SPAM_DB:
-			{
-				if (pMsg->Get()->uiNumRows > 0)
-				{
-					MYSQL_ROW row;
+	case QID_SPAM_DB:
+	{
+		if (pMsg->Get()->uiNumRows > 0)
+		{
+			MYSQL_ROW row;
 
-					SpamManager::instance().Clear();
+			SpamManager::instance().Clear();
 
-					while ((row = mysql_fetch_row(pMsg->Get()->pSQLResult)))
-						SpamManager::instance().Insert(row[0], atoi(row[1]));
-				}
-			}
-			break;
+			while ((row = mysql_fetch_row(pMsg->Get()->pSQLResult)))
+				SpamManager::instance().Insert(row[0], atoi(row[1]));
+		}
+	}
+	break;
 	}
 
 	M2_DELETE(qi);

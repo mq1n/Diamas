@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "GuildMarkDownloader.h"
 #include "PythonCharacterManager.h"
-#include "Packet.h"
 #include "PythonApplication.h"
+#include "Packet.h"
 
 // MARK_BUG_FIX
 struct SMarkIndex
@@ -180,7 +180,6 @@ uint32_t CGuildMarkDownloader::__GetPacketSize(uint32_t header) const
 			return sizeof(TPacketKeyAgreement);
 		case HEADER_GC_KEY_AGREEMENT_COMPLETED:
 			return sizeof(TPacketKeyAgreementCompleted);
-
 #endif
 	}
 	return 0;
@@ -285,6 +284,7 @@ bool CGuildMarkDownloader::__LoginState_RecvPhase()
 		}
 	}
 
+	CPythonApplication::Instance().SetGameStage(kPacketPhase.stage);
 	return true;
 }			 
 
@@ -418,9 +418,7 @@ bool CGuildMarkDownloader::__LoginState_RecvKeyAgreement()
 {
 	TPacketKeyAgreement packet;
 	if (!Recv(sizeof(packet), &packet))
-	{
 		return false;
-	}
 
 	Tracenf("KEY_AGREEMENT RECV %u", packet.wDataLength);
 
@@ -439,8 +437,8 @@ bool CGuildMarkDownloader::__LoginState_RecvKeyAgreement()
 	{
 		// Key agreement 성공, 응답 전송
 		packetToSend.bHeader = HEADER_CG_KEY_AGREEMENT;
-		packetToSend.wAgreedLength = (uint16_t)agreedLength;
-		packetToSend.wDataLength = (uint16_t)dataLength;
+		packetToSend.wAgreedLength = static_cast<uint16_t>(agreedLength);
+		packetToSend.wDataLength = static_cast<uint16_t>(dataLength);
 
 		if (!Send(sizeof(packetToSend), &packetToSend))
 		{
@@ -462,9 +460,7 @@ bool CGuildMarkDownloader::__LoginState_RecvKeyAgreementCompleted()
 {
 	TPacketKeyAgreementCompleted packet;
 	if (!Recv(sizeof(packet), &packet))
-	{
 		return false;
-	}
 
 	Tracenf("KEY_AGREEMENT_COMPLETED RECV");
 
@@ -545,12 +541,10 @@ bool CGuildMarkDownloader::__LoginState_RecvSymbolData()
 
 	std::string strFileName = GetGuildSymbolFileName(dwGuildID);
 
-	FILE * File = fopen(strFileName.c_str(), "wb");
-	if (!File)
+	msl::file_ptr fPtr(strFileName.c_str(), "wb");
+	if (!fPtr)
 		return false;
-		
-	fwrite(pbyBuf.data(), wDataSize, 1, File);
-	fclose(File);
+	fwrite(pbyBuf.data(), wDataSize, 1, fPtr.get());
 
 	// Let's reload the file in the game
 	CResource * pResource = CResourceManager::Instance().GetResourcePointer(strFileName.c_str());

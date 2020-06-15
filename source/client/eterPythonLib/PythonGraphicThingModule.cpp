@@ -9,7 +9,7 @@ bool PyTuple_GetThingInstance(PyObject* poArgs, int32_t pos, CGraphicThingInstan
 	if (!handle)
 		return false;
 
-	*ppRetThingInstance = (CGraphicThingInstance*)handle;	
+	*ppRetThingInstance = reinterpret_cast<CGraphicThingInstance*>(handle);
 	return true;
 }
 

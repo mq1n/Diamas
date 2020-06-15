@@ -6,9 +6,9 @@
 #include "PythonCharacterManager.h"
 #include "AbstractPlayer.h"
 #include "AbstractApplication.h"
-#include "packet.h"
+#include "Packet.h"
 
-#include "../eterlib/StateManager.h"
+#include "../eterLib/StateManager.h"
 #include "../eterGameLib/ItemManager.h"
 #include "locale_inc.h"
 
@@ -21,7 +21,7 @@ BOOL HAIR_COLOR_ENABLE=FALSE;
 BOOL USE_ARMOR_SPECULAR=FALSE;
 BOOL RIDE_HORSE_ENABLE=TRUE;
 const float c_fDefaultRotationSpeed = 1200.0f;
-const float c_fDefaultHorseRotationSpeed = 600.0f;
+const float c_fDefaultHorseRotationSpeed = 300.0f;
 
 
 bool IsWall(uint32_t race)
@@ -33,7 +33,6 @@ bool IsWall(uint32_t race)
 		case 14203:
 		case 14204:
 			return true;
-			break;
 	}
 	return false;
 }
@@ -127,7 +126,13 @@ CActorInstance* CInstanceBase::SHORSE::GetActorPtr()
 	return m_pkActor;
 }
 
-enum eMountType {MOUNT_TYPE_NONE=0, MOUNT_TYPE_NORMAL=1, MOUNT_TYPE_COMBAT=2, MOUNT_TYPE_MILITARY=3};
+enum eMountType
+{
+	MOUNT_TYPE_NONE = 0,
+	MOUNT_TYPE_NORMAL = 1,
+	MOUNT_TYPE_COMBAT = 2,
+	MOUNT_TYPE_MILITARY = 3
+};
 eMountType GetMountLevelByVnum(uint32_t dwMountVnum, bool IsNew)
 {
 	if (!dwMountVnum)
@@ -176,7 +181,6 @@ eMountType GetMountLevelByVnum(uint32_t dwMountVnum, bool IsNew)
 		case 20225: // Dyno Lv3 (yes skill, yes atk)
 		case 20230: // Turkey Lv3 (yes skill, yes atk)
 			return MOUNT_TYPE_MILITARY;
-			break;
 		// ### NO SKILL YES ATK
 		// @fixme116 begin
 		case 20104: // normal combat horse (no guild)
@@ -199,7 +203,6 @@ eMountType GetMountLevelByVnum(uint32_t dwMountVnum, bool IsNew)
 		case 20231: // Leopard (no skill, yes atk)
 		case 20232: // Black Panther (no skill, yes atk)
 			return MOUNT_TYPE_COMBAT;
-			break;
 		// ### NO SKILL NO ATK
 		// @fixme116 begin
 		case 20101: // normal beginner horse (no guild)
@@ -219,10 +222,8 @@ eMountType GetMountLevelByVnum(uint32_t dwMountVnum, bool IsNew)
 		case 20223: // Dyno Lv1 (no skill, no atk)
 		case 20228: // Turkey Lv1 (no skill, no atk)
 			return MOUNT_TYPE_NORMAL;
-			break;
 		default:
 			return MOUNT_TYPE_NONE;
-			break;
 	}
 }
 
@@ -343,7 +344,7 @@ bool __ArmorVnumToShape(int32_t iVnum, uint32_t * pdwShape)
 
 	enum
 	{
-		SHAPE_VALUE_SLOT_INDEX = 3,
+		SHAPE_VALUE_SLOT_INDEX = 3
 	};
 
 	*pdwShape = pItemData->GetValue(SHAPE_VALUE_SLOT_INDEX);
@@ -479,6 +480,11 @@ void CInstanceBase::__DisableSkipCollision()
 	m_GraphicThingInstance.DisableSkipCollision();
 }
 
+bool CInstanceBase::__CanSkipCollision()
+{
+	return m_GraphicThingInstance.CanSkipCollision();
+}
+
 uint32_t CInstanceBase::__GetShadowMapColor(float x, float y)
 {
 	CPythonBackground& rkBG=CPythonBackground::Instance();
@@ -583,7 +589,6 @@ int32_t CInstanceBase::GetAlignmentType()
 		case 3:
 		{
 			return ALIGNMENT_TYPE_WHITE;
-			break;
 		}
 
 		case 5:
@@ -592,7 +597,6 @@ int32_t CInstanceBase::GetAlignmentType()
 		case 8:
 		{
 			return ALIGNMENT_TYPE_DARK;
-			break;
 		}
 	}
 
@@ -722,8 +726,7 @@ bool CInstanceBase::__IsExistMainInstance()
 {
 	if(__GetMainInstancePtr())
 		return true;
-	else
-		return false;
+	return false;
 }
 
 bool CInstanceBase::__MainCanSeeHiddenThing()
@@ -839,9 +842,7 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 	}
 
 	if (!IsGuildWall())
-	{
 		SetAffectFlagContainer(c_rkCreateData.m_kAffectFlags);
-	}	
 
 	// NOTE : 반드시 Affect 셋팅 후에 해야 함
 	AttachTextTail();
@@ -853,18 +854,12 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 			__AttachEffect(EFFECT_SPAWN_APPEAR);
 
 		if (IsPC())
-		{
 			Refresh(CRaceMotionData::NAME_WAIT, true);
-		}
 		else
-		{
 			Refresh(CRaceMotionData::NAME_SPAWN, false);
-		}
 	}
 	else
-	{
 		Refresh(CRaceMotionData::NAME_WAIT, true);
-	}
 
 	__AttachEmpireEffect(c_rkCreateData.m_dwEmpireID);
 
@@ -960,6 +955,9 @@ void CInstanceBase::__Create_SetWarpName(const SCreateData& c_rkCreateData)
 	if (CPythonNonPlayer::Instance().GetName(c_rkCreateData.m_dwRace, &c_szName))
 	{
 		std::string strName = c_szName;
+//		int32_t iFindingPos = strName.find_first_of(' ', 0);
+//		if (iFindingPos > 0)
+//			strName.resize(iFindingPos);
 		SetNameString(strName.c_str(), strName.length());
 	}
 	else
@@ -1007,8 +1005,7 @@ BOOL CInstanceBase::__IsChangableWeapon(int32_t iWeaponID)
 
 		return false;
 	}
-	else
-		return true;
+	return true;
 }
 
 BOOL CInstanceBase::IsWearingDress()
@@ -1267,7 +1264,7 @@ void CInstanceBase::PushTCPStateExpanded(uint32_t dwCmdTime, const TPixelPositio
 	kCmdNew.m_eFunc = eFunc;
 	kCmdNew.m_uArg = uArg;
 	kCmdNew.m_uTargetVID = uTargetVID;
-	m_kQue_kCmdNew.push_back(kCmdNew);
+	m_kQue_kCmdNew.emplace_back(kCmdNew);
 }
 
 void CInstanceBase::PushTCPState(uint32_t dwCmdTime, const TPixelPosition& c_rkPPosDst, float fDstRot, uint32_t eFunc, uint32_t uArg)
@@ -1302,7 +1299,7 @@ void CInstanceBase::PushTCPState(uint32_t dwCmdTime, const TPixelPosition& c_rkP
 	kCmdNew.m_fDstRot = fDstRot;
 	kCmdNew.m_eFunc = eFunc;
 	kCmdNew.m_uArg = uArg;
-	m_kQue_kCmdNew.push_back(kCmdNew);
+	m_kQue_kCmdNew.emplace_back(kCmdNew);
 
 	//int32_t nApplyGap=kCmdNew.m_dwChkTime-ELTimer_GetServerFrameMSec();
 
@@ -1344,16 +1341,12 @@ BOOL CInstanceBase::__CanProcessNetworkStatePacket()
 BOOL CInstanceBase::__IsEnableTCPProcess(uint32_t eCurFunc)
 {
 	if (m_GraphicThingInstance.IsActEmotion())
-	{
 		return FALSE;
-	}
 
 	if (!m_bEnableTCPState)
 	{
 		if (FUNC_EMOTION != eCurFunc)
-		{
 			return FALSE;
-		}
 	}
 
 	return TRUE;
@@ -1361,7 +1354,7 @@ BOOL CInstanceBase::__IsEnableTCPProcess(uint32_t eCurFunc)
 
 void CInstanceBase::StateProcess()
 {	
-	while (1)
+	while (true)
 	{
 		if (m_kQue_kCmdNew.empty())
 			return;	
@@ -1407,9 +1400,7 @@ void CInstanceBase::StateProcess()
 		}
 
 		if (!__IsEnableTCPProcess(eFunc))
-		{
 			return;
-		}
 
 		switch (eFunc)
 		{
@@ -1734,9 +1725,7 @@ void CInstanceBase::MovementProcess()
 
 				// 이동중이라면 다음번에 멈추게 한다
 				if (FUNC_MOVE == m_kMovAfterFunc.eFunc)
-				{
 					m_kMovAfterFunc.eFunc = FUNC_WAIT;
-				}
 			}
 			// 도착했다면...
 			else if (fCurLen <= fTotalLen && fTotalLen <= fNextLen)
@@ -1841,9 +1830,7 @@ void CInstanceBase::MovementProcess()
 								SetAdvancingRotation(m_fDstRot);
 								BlendRotation(m_fDstRot);
 								if (!IsWaiting())
-								{
 									EndWalking();
-								}
 
 								//Tracenf("VID %d 정지 (%f, %f) rot %f IsWalking %d", GetVirtualID(), NEW_GetDstPixelPositionRef().x, NEW_GetDstPixelPositionRef().y, m_fDstRot, IsWalking());
 							}
@@ -1866,13 +1853,9 @@ void CInstanceBase::MovementProcess()
 		if (DEGREE_DIRECTION_SAME != m_iRotatingDirection)
 		{
 			if (DEGREE_DIRECTION_LEFT == iDirection)
-			{
-				fRotation = fmodf(fRotation + m_fRotSpd*m_GraphicThingInstance.GetSecondElapsed(), 360.0f);
-			}
+				fRotation = fmodf(fRotation + m_fRotSpd * m_GraphicThingInstance.GetSecondElapsed(), 360.0f);
 			else if (DEGREE_DIRECTION_RIGHT == iDirection)
-			{
-				fRotation = fmodf(fRotation - m_fRotSpd*m_GraphicThingInstance.GetSecondElapsed() + 360.0f, 360.0f);
-			}
+				fRotation = fmodf(fRotation - m_fRotSpd * m_GraphicThingInstance.GetSecondElapsed() + 360.0f, 360.0f);
 
 			if (m_iRotatingDirection != GetRotatingDirection(fRotation, fAdvancingRotation))
 			{
@@ -1994,9 +1977,7 @@ void CInstanceBase::Update()
 
 	m_GraphicThingInstance.MotionProcess(IsPC());
 	if (IsMountingHorse())
-	{
 		m_kHorse.m_pkActor->HORSE_MotionProcess(FALSE);
-	}
 
 	__ComboProcess();	
 	
@@ -2322,8 +2303,7 @@ bool CInstanceBase::IsAttackableInstance(CInstanceBase& rkInstVictim)
 				case DUEL_START:
 					if(__FindDUELKey(GetVirtualID(),rkInstVictim.GetVirtualID()))
 						return true;
-					else
-						return false;
+					return false;
 				}
 			}
 			if (PK_MODE_GUILD == GetPKMode())
@@ -2555,15 +2535,11 @@ BOOL CInstanceBase::IsWoodenDoor()
 		int32_t vnum = GetVirtualNumber();
 		if (vnum == 13000) // 나무문
 			return true;
-		else if (vnum >= 30111 && vnum <= 30119) // 사귀문
+		if (vnum >= 30111 && vnum <= 30119) // 사귀문
 			return true;
-		else
-			return false;
-	}
-	else
-	{
 		return false;
 	}
+	return false;
 }
 
 BOOL CInstanceBase::IsStoneDoor()
@@ -2594,7 +2570,7 @@ BOOL CInstanceBase::IsForceVisible()
 	return FALSE;
 }
 
-int32_t	CInstanceBase::GetInstanceType()
+int32_t CInstanceBase::GetInstanceType()
 {
 	return m_GraphicThingInstance.GetActorType();
 }
@@ -2775,8 +2751,7 @@ void CInstanceBase::SetArmor(uint32_t dwArmor)
 			__GetRefinedEffect(pItemData);
 			return;
 		}
-		else
-			__ClearArmorRefineEffect();
+		__ClearArmorRefineEffect();
 	}
 
 	SetShape(dwArmor);
@@ -2855,17 +2830,12 @@ void CInstanceBase::ClearAcceEffect()
 void CInstanceBase::SetShape(uint32_t eShape, float fSpecular)
 {
 	if (IsPoly())
-	{
-		m_GraphicThingInstance.SetShape(0);	
-	}
+		m_GraphicThingInstance.SetShape(0);
 	else
-	{
-		m_GraphicThingInstance.SetShape(eShape, fSpecular);		
-	}
+		m_GraphicThingInstance.SetShape(eShape, fSpecular);
 
 	m_eShape = eShape;
 }
-
 
 
 uint32_t CInstanceBase::GetWeaponType()
@@ -2976,8 +2946,7 @@ uint32_t CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 		{
 			uint32_t vnum = pItem->GetIndex();
 
-			if (
-				(12010 <= vnum && vnum <= 12049)
+			if ((12010 <= vnum && vnum <= 12049)
 #ifdef ENABLE_WOLFMAN_CHARACTER
 				|| (21080 <= vnum && vnum <= 21089)
 #endif
@@ -2988,9 +2957,7 @@ uint32_t CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 			}
 #ifdef ENABLE_LVL115_ARMOR_EFFECT
 			else if (20760 <= vnum && vnum <= 20959)
-			{
 				__AttachEffect(EFFECT_REFINED+EFFECT_BODYARMOR_SPECIAL3);
-			}
 #endif //ENABLE_LVL115_ARMOR_EFFECT
 		}
 

@@ -6,8 +6,9 @@
 #include "regen.h"
 #include "sectree.h"
 #include "text_file_loader.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "locale_service.h"
+#include "../../common/service.h"
 
 CMob::CMob()
 {

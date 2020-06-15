@@ -1,18 +1,22 @@
 #ifndef __INC_METIN_II_GAME_CHARACTER_MANAGER_H__
 #define __INC_METIN_II_GAME_CHARACTER_MANAGER_H__
 
+#include "../../common/stl.h"
+#include "../../common/length.h"
+#include "../../common/service.h"
+
 #ifdef M2_USE_POOL
 #include "pool.h"
 #endif
 
-#include "../../common/stl.h"
-#include "../../common/length.h"
-
+#include "packet.h"
 #include "vid.h"
+#include <unordered_map>
 
 class CDungeon;
 class CHARACTER;
 class CharacterVectorInteractor;
+class CharacterSetSnapshot;
 
 class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 {
@@ -28,7 +32,7 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 
 		uint32_t			AllocVID();
 
-		LPCHARACTER             CreateCharacter(const char * name, uint32_t dwPID = 0);
+		LPCHARACTER             CreateCharacter(std::string stName, uint32_t dwPID = 0);
 #ifndef DEBUG_ALLOC
 		void DestroyCharacter(LPCHARACTER ch);
 #else
@@ -37,9 +41,9 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 
 		void			Update(int32_t iPulse);
 
-		LPCHARACTER		SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int32_t x, int32_t y, int32_t z, bool bSpawnMotion = false, int32_t iRot = -1, bool bShow = true);
+		LPCHARACTER		SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int32_t x, int32_t y, int32_t z, bool bSpawnMotion = false, int32_t iRot = -1, bool bShow = true, bool bBattleground = false);
 		LPCHARACTER		SpawnMobRange(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, bool bIsException=false, bool bSpawnMotion = false , bool bAggressive = false);
-		LPCHARACTER		SpawnGroup(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, LPREGEN pkRegen = nullptr, bool bAggressive_ = false, LPDUNGEON pDungeon = nullptr);
+		LPCHARACTER		SpawnGroup(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, LPREGEN pkRegen = nullptr, bool bAggressive_ = false, LPDUNGEON pDungeon = nullptr, bool bRandom = false);
 		bool			SpawnGroupGroup(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, LPREGEN pkRegen = nullptr, bool bAggressive_ = false, LPDUNGEON pDungeon = nullptr);
 		bool			SpawnMoveGroup(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, int32_t tx, int32_t ty, LPREGEN pkRegen = nullptr, bool bAggressive_ = false);
 		LPCHARACTER		SpawnMobRandomPosition(uint32_t dwVnum, int32_t lMapIndex);
@@ -50,7 +54,7 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 
 		LPCHARACTER		Find(uint32_t dwVID);
 		LPCHARACTER		Find(const VID & vid);
-		LPCHARACTER		FindPC(const char * name);
+		LPCHARACTER		FindPC(std::string stName);
 		LPCHARACTER		FindByPID(uint32_t dwPID);
 
 		bool			AddToStateList(LPCHARACTER ch);
@@ -70,7 +74,8 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 		void			RegisterRaceNum(uint32_t dwVnum);
 		void			RegisterRaceNumMap(LPCHARACTER ch);
 		void			UnregisterRaceNumMap(LPCHARACTER ch);
-		bool			GetCharactersByRaceNum(uint32_t dwRaceNum, CharacterVectorInteractor & i);
+		CharacterSetSnapshot	GetCharactersByRaceNum(uint32_t dwRaceNum);
+		int32_t					CountCharactersByRaceNum(uint32_t dwRaceNum);
 
 		LPCHARACTER		FindSpecifyPC(uint32_t uiJobFlag, int32_t lMapIndex, LPCHARACTER except=nullptr, int32_t iMinLevel = 1, int32_t iMaxLevel = PLAYER_MAX_LEVEL_CONST);
 
@@ -87,13 +92,13 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 
 		void			SetUserDamageRatePremium(int32_t value)	{ m_iUserDamageRatePremium = value; }
 		void			SetUserDamageRate(int32_t value ) { m_iUserDamageRate = value; }
-		int32_t			GetMobItemRate(LPCHARACTER ch);
-		int32_t			GetMobDamageRate(LPCHARACTER ch);
-		int32_t			GetMobGoldAmountRate(LPCHARACTER ch);
-		int32_t			GetMobGoldDropRate(LPCHARACTER ch);
-		int32_t			GetMobExpRate(LPCHARACTER ch);
+		int32_t			GetMobItemRate(LPCHARACTER ch) const;
+		int32_t			GetMobDamageRate(LPCHARACTER ch) const;
+		int32_t			GetMobGoldAmountRate(LPCHARACTER ch) const;
+		int32_t			GetMobGoldDropRate(LPCHARACTER ch) const;
+		int32_t			GetMobExpRate(LPCHARACTER ch) const;
 
-		int32_t			GetUserDamageRate(LPCHARACTER ch);
+		int32_t			GetUserDamageRate(LPCHARACTER ch) const;
 		void		SendScriptToMap(int32_t lMapIndex, const std::string & s); 
 
 		bool			BeginPendingDestroy();
@@ -118,6 +123,7 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 		std::unordered_map<uint32_t, LPCHARACTER> m_map_pkChrByVID;
 		std::unordered_map<uint32_t, LPCHARACTER> m_map_pkChrByPID;
 		NAME_MAP			m_map_pkPCChr;
+		std::unordered_set <LPCHARACTER>			m_map_pkBGMob;
 
 		char				dummy1[1024];	// memory barrier
 		CHARACTER_SET		m_set_pkChrState;	// FSM이 돌아가고 있는 놈들
@@ -149,16 +155,32 @@ Func CHARACTER_MANAGER::for_each_pc(Func f)
 	return f;
 }
 
-class CharacterVectorInteractor : public CHARACTER_VECTOR
+class CharacterSnapshotGuard
 {
-	public:
-		CharacterVectorInteractor() : m_bMyBegin(false) { }
+public:
+	CharacterSnapshotGuard();
+	~CharacterSnapshotGuard();
 
-		CharacterVectorInteractor(const CHARACTER_SET & r);
-		virtual ~CharacterVectorInteractor();
+private:
+	bool m_hasPendingOwnership;
+};
 
-	private:
-		bool m_bMyBegin;
+class CharacterSetSnapshot
+{
+public:
+	CharacterSetSnapshot();
+	CharacterSetSnapshot(const std::unordered_set<CHARACTER*>& chars);
+
+	std::unordered_set<CHARACTER*>::const_iterator begin() const;
+	std::unordered_set<CHARACTER*>::const_iterator end() const;
+	bool empty() const
+	{
+		return !m_chars || m_chars->empty();
+	}
+
+private:
+	CharacterSnapshotGuard m_guard;
+	const std::unordered_set<CHARACTER*>* m_chars;
 };
 
 #ifndef DEBUG_ALLOC

@@ -30,4 +30,5 @@ public:
 	}	
 };
 
-template <typename T> T * TAbstractSingleton<T>::ms_singleton = nullptr;
+template <typename T>
+T * TAbstractSingleton<T>::ms_singleton = nullptr;

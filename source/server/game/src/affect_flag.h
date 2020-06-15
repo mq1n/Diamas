@@ -29,7 +29,7 @@ struct TAffectFlag
 		if (AFF_BITS_MAX <= flag || 0 >= flag)
 			return false;
 
-		return IS_SET(bits[(flag - 1) >> 5], (((uint32_t)1) << ((flag - 1) & 31))); 
+		return IS_SET(bits[(flag - 1) >> 5], ((static_cast<uint32_t>(1)) << ((flag - 1) & 31))); 
 	}
 
 	inline void Set(int32_t flag)
@@ -37,7 +37,7 @@ struct TAffectFlag
 		if (AFF_BITS_MAX <= flag || 0 >= flag)
 			return;
 
-		SET_BIT(bits[(flag-1)>>5], (((uint32_t)1)<<((flag-1)&31))); 
+		SET_BIT(bits[(flag-1)>>5], ((static_cast<uint32_t>(1))<<((flag-1)&31))); 
 	}
 
 	inline void Reset(int32_t flag)
@@ -45,7 +45,7 @@ struct TAffectFlag
 		if (AFF_BITS_MAX <= flag || 0 >= flag)
 			return;
 
-		REMOVE_BIT(bits[(flag-1)>>5], (((uint32_t)1)<<((flag-1)&31)));
+		REMOVE_BIT(bits[(flag-1)>>5], ((static_cast<uint32_t>(1))<<((flag-1)&31)));
 	}
 
 	inline TAffectFlag& operator = (const TAffectFlag& rhs)

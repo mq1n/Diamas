@@ -5,11 +5,12 @@
 #include "Config.h"
 #include "QID.h"
 #include "Cache.h"
+#include "../../common/service.h"
 
 extern std::string g_stLocale;
 extern bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab);
-extern int32_t g_test_server;
-extern int32_t g_log;
+extern bool g_test_server;
+extern bool g_log;
 
 bool CClientManager::InsertLogonAccount(const char * c_pszLogin, uint32_t dwHandle, const char * c_pszIP)
 {
@@ -47,7 +48,7 @@ bool CClientManager::DeleteLogonAccount(const char * c_pszLogin, uint32_t dwHand
 
 	if (pkLD->GetConnectedPeerHandle() != dwHandle)
 	{
-		sys_err("%s tried to logout in other peer handle %lu, current handle %lu", szLogin, dwHandle, pkLD->GetConnectedPeerHandle());
+		sys_err("%s tried to logout in other peer handle %u, current handle %u", szLogin, dwHandle, pkLD->GetConnectedPeerHandle());
 		return false;
 	}
 
@@ -84,16 +85,15 @@ void CClientManager::QUERY_LOGIN_BY_KEY(CPeer * pkPeer, uint32_t dwHandle, TPack
 
 	if (!pkLoginData)
 	{
-		sys_log(0, "LOGIN_BY_KEY key not exist %s %lu", szLogin, p->dwLoginKey);
+		sys_log(0, "LOGIN_BY_KEY key not exist %s %u", szLogin, p->dwLoginKey);
 		pkPeer->EncodeReturn(HEADER_DG_LOGIN_NOT_EXIST, dwHandle);
 		return;
 	}
 
 	TAccountTable & r = pkLoginData->GetAccountRef();
-
 	if (FindLogonAccount(r.login))
 	{
-		sys_log(0, "LOGIN_BY_KEY already login %s %lu", r.login, p->dwLoginKey);
+		sys_log(0, "LOGIN_BY_KEY already login %s %u", r.login, p->dwLoginKey);
 		TPacketDGLoginAlready ptog;
 		strlcpy(ptog.szLogin, szLogin, sizeof(ptog.szLogin));
 		pkPeer->EncodeHeader(HEADER_DG_LOGIN_ALREADY, dwHandle, sizeof(TPacketDGLoginAlready));
@@ -103,7 +103,7 @@ void CClientManager::QUERY_LOGIN_BY_KEY(CPeer * pkPeer, uint32_t dwHandle, TPack
 
 	if (strcasecmp(r.login, szLogin))
 	{
-		sys_log(0, "LOGIN_BY_KEY login differ %s %lu input %s", r.login, p->dwLoginKey, szLogin);
+		sys_log(0, "LOGIN_BY_KEY login differ %s %u input %s", r.login, p->dwLoginKey, szLogin);
 		pkPeer->EncodeReturn(HEADER_DG_LOGIN_NOT_EXIST, dwHandle);
 		return;
 	}
@@ -112,7 +112,7 @@ void CClientManager::QUERY_LOGIN_BY_KEY(CPeer * pkPeer, uint32_t dwHandle, TPack
 	{
 		const uint32_t * pdwClientKey = pkLoginData->GetClientKey();
 
-		sys_log(0, "LOGIN_BY_KEY client key differ %s %lu %lu %lu %lu, %lu %lu %lu %lu",
+		sys_log(0, "LOGIN_BY_KEY client key differ %s %u %u %u %u, %u %u %u %u",
 				r.login,
 				p->adwClientKey[0], p->adwClientKey[1], p->adwClientKey[2], p->adwClientKey[3],
 				pdwClientKey[0], pdwClientKey[1], pdwClientKey[2], pdwClientKey[3]);
@@ -121,7 +121,7 @@ void CClientManager::QUERY_LOGIN_BY_KEY(CPeer * pkPeer, uint32_t dwHandle, TPack
 		return;
 	}
 
-	TAccountTable * pkTab = new TAccountTable;
+	auto pkTab = new TAccountTable;
 	memset(pkTab, 0, sizeof(TAccountTable));
 
 	pkTab->id = r.id;
@@ -130,24 +130,20 @@ void CClientManager::QUERY_LOGIN_BY_KEY(CPeer * pkPeer, uint32_t dwHandle, TPack
 	strlcpy(pkTab->social_id, r.social_id, sizeof(pkTab->social_id));
 	strlcpy(pkTab->status, "OK", sizeof(pkTab->status));
 
-	ClientHandleInfo * info = new ClientHandleInfo(dwHandle);
+	auto info = new ClientHandleInfo(dwHandle);
 	info->pAccountTable = pkTab;
 	strlcpy(info->ip, p->szIP, sizeof(info->ip));
 
-	sys_log(0, "LOGIN_BY_KEY success %s %lu %s", r.login, p->dwLoginKey, info->ip);
-	char szQuery[QUERY_MAX_LEN];
-#ifdef ENABLE_PLAYER_PER_ACCOUNT5
-	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), r.id);
-#else
-	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), r.id);
-#endif
+	sys_log(0, "LOGIN_BY_KEY success %s %u %s", r.login, p->dwLoginKey, info->ip);
+	char szQuery[ASQL_QUERY_MAX_LEN];
+	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index WHERE id=%u", r.id);
 	CDBManager::instance().ReturnQuery(szQuery, QID_LOGIN_BY_KEY, pkPeer->GetHandle(), info);
 }
 
 void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 {
-	CQueryInfo * qi = (CQueryInfo *) msg->pvUserData;
-	ClientHandleInfo * info = (ClientHandleInfo *) qi->pvData;
+	CQueryInfo * qi = static_cast<CQueryInfo *>(msg->pvUserData);
+	ClientHandleInfo * info = static_cast<ClientHandleInfo *>(qi->pvData);
 
 	if (msg->uiSQLErrno != 0)
 	{
@@ -156,17 +152,11 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 		return;
 	}
 
-	char szQuery[QUERY_MAX_LEN];
-
 	if (msg->Get()->uiNumRows == 0)
 	{
 		uint32_t account_id = info->pAccountTable->id;
-		char szQuery[QUERY_MAX_LEN];
-#ifdef ENABLE_PLAYER_PER_ACCOUNT5
-		snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), account_id);
-#else
-		snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), account_id);
-#endif
+		char szQuery[ASQL_QUERY_MAX_LEN];
+		snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index WHERE id=%u", account_id);
 		std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(szQuery, SQL_PLAYER));
 		
 		sys_log(0, "RESULT_LOGIN_BY_KEY FAIL player_index's nullptr : ID:%d", account_id);
@@ -175,11 +165,9 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 		{
 			sys_log(0, "RESULT_LOGIN_BY_KEY FAIL player_index's nullptr : ID:%d", account_id);
 
-			// PLAYER_INDEX_CREATE_BUG_FIX
-			//snprintf(szQuery, sizeof(szQuery), "INSERT IGNORE INTO player_index%s (id) VALUES(%lu)", GetTablePostfix(), info->pAccountTable->id);
-			snprintf(szQuery, sizeof(szQuery), "INSERT INTO player_index%s (id) VALUES(%u)", GetTablePostfix(), info->pAccountTable->id);
+			//snprintf(szQuery, sizeof(szQuery), "INSERT IGNORE INTO player_index (id) VALUES(%u)", info->pAccountTable->id);
+			snprintf(szQuery, sizeof(szQuery), "INSERT INTO player_index (id) VALUES(%u)", info->pAccountTable->id);
 			CDBManager::instance().ReturnQuery(szQuery, QID_PLAYER_INDEX_CREATE, peer->GetHandle(), info);
-			// END_PLAYER_INDEX_CREATE_BUF_FIX
 		}
 		return;
 	}
@@ -192,30 +180,19 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 		str_to_number(info->pAccountTable->players[col].dwID, row[col]);
 
 	str_to_number(info->pAccountTable->bEmpire, row[col++]);
+	if (info->pAccountTable->bEmpire > 3)
+		info->pAccountTable->bEmpire = 3;
+		
 	info->account_index = 1;
 
-	extern std::string g_stLocale;
-	if (g_stLocale == "gb2312")
-	{
-		snprintf(szQuery, sizeof(szQuery),
-				"SELECT id, name, job, level, alignment, st, ht, dx, iq, part_main, part_hair,"
+	char szQuery[ASQL_QUERY_MAX_LEN];
+	snprintf(szQuery, sizeof(szQuery),
+		"SELECT id, name, job, level, playtime, st, ht, dx, iq, part_main, part_hair, "
 #ifdef ENABLE_ACCE_SYSTEM
-				"part_acce,"
+        "part_acce, "
 #endif
-			
-				" x, y, skill_group, change_name FROM player%s WHERE account_id=%u",
-				GetTablePostfix(), info->pAccountTable->id);
-	}
-	else
-	{
-		snprintf(szQuery, sizeof(szQuery),
-				"SELECT id, name, job, level, playtime, st, ht, dx, iq, part_main, part_hair,"
-#ifdef ENABLE_ACCE_SYSTEM
-				"part_acce,"
-#endif
-			" x, y, skill_group, change_name FROM player%s WHERE account_id=%u",
-				GetTablePostfix(), info->pAccountTable->id);
-	}
+        "x, y, skill_group, change_name FROM player WHERE account_id=%u",
+		info->pAccountTable->id);
 
 	CDBManager::instance().ReturnQuery(szQuery, QID_LOGIN, peer->GetHandle(), info);
 }
@@ -226,14 +203,8 @@ void CClientManager::RESULT_PLAYER_INDEX_CREATE(CPeer * pkPeer, SQLMsg * msg)
 	CQueryInfo * qi = (CQueryInfo *) msg->pvUserData;
 	ClientHandleInfo * info = (ClientHandleInfo *) qi->pvData;
 
-	char szQuery[QUERY_MAX_LEN];
-#ifdef ENABLE_PLAYER_PER_ACCOUNT5
-	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index%s WHERE id=%u", GetTablePostfix(),
-			info->pAccountTable->id);
-#else
-	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), 
-			info->pAccountTable->id);
-#endif
+	char szQuery[ASQL_QUERY_MAX_LEN];
+	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index WHERE id=%u", info->pAccountTable->id);
 	CDBManager::instance().ReturnQuery(szQuery, QID_LOGIN_BY_KEY, pkPeer->GetHandle(), info);
 }
 // END_PLAYER_INDEX_CREATE_BUG_FIX
@@ -247,7 +218,7 @@ TAccountTable * CreateAccountTableFromRes(MYSQL_RES * res)
 	row = mysql_fetch_row(res);
 	col = 0;
 
-	TAccountTable * pkTab = new TAccountTable;
+	auto pkTab = new TAccountTable;
 	memset(pkTab, 0, sizeof(TAccountTable));
 
 	// 첫번째 컬럼 것만 참고 한다 (JOIN QUERY를 위한 것 임)
@@ -311,7 +282,7 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 					pkTab->players[j].wMainPart			= pt->parts[PART_MAIN];
 					pkTab->players[j].wHairPart			= pt->parts[PART_HAIR];
 #ifdef ENABLE_ACCE_SYSTEM
-					pkTab->players[j].wAccePart			= pt->parts[PART_ACCE];
+					pkTab->players[j].dwAccePart			= pt->parts[PART_ACCE];
 #endif
 					pkTab->players[j].x				= pt->x;
 					pkTab->players[j].y				= pt->y;
@@ -335,7 +306,7 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 					pkTab->players[j].wMainPart		= 0;
 					pkTab->players[j].wHairPart		= 0;
 #ifdef ENABLE_ACCE_SYSTEM
-					pkTab->players[j].wAccePart		= 0;
+					pkTab->players[j].dwAccePart		= 0;
 #endif
 					pkTab->players[j].x				= 0;
 					pkTab->players[j].y				= 0;
@@ -352,7 +323,7 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 					str_to_number(pkTab->players[j].wMainPart, row[col++]);
 					str_to_number(pkTab->players[j].wHairPart, row[col++]);
 #ifdef ENABLE_ACCE_SYSTEM
-					str_to_number(pkTab->players[j].wAccePart, row[col++]);
+					str_to_number(pkTab->players[j].dwAccePart, row[col++]);
 #endif
 					str_to_number(pkTab->players[j].x, row[col++]);
 					str_to_number(pkTab->players[j].y, row[col++]);
@@ -360,14 +331,14 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 					str_to_number(pkTab->players[j].bChangeName, row[col++]);
 				}
 
-				sys_log(0, "%s %lu %lu hair %u",
+				sys_log(0, "%s %u %u hair %u",
 						pkTab->players[j].szName, pkTab->players[j].x, pkTab->players[j].y, pkTab->players[j].wHairPart);
 				break;
 			}
 		}
 		/*
 		   if (j == PLAYER_PER_ACCOUNT)
-		   sys_err("cannot find player_id on this account (login: %s id %lu account %lu %lu %lu)", 
+		   sys_err("cannot find player_id on this account (login: %s id %u account %u %u %u)", 
 		   pkTab->login, player_id,
 		   pkTab->players[0].dwID,
 		   pkTab->players[1].dwID,
@@ -405,27 +376,13 @@ void CClientManager::RESULT_LOGIN(CPeer * peer, SQLMsg * msg)
 			++info->account_index;
 
 			char queryStr[512];
-			extern std::string g_stLocale;
-			if (g_stLocale == "gb2312")
-			{
-				snprintf(queryStr, sizeof(queryStr),
-						"SELECT id, name, job, level, alignment, st, ht, dx, iq, part_main, part_hair,"
+			snprintf(queryStr, sizeof(queryStr),
+				"SELECT id, name, job, level, playtime, st, ht, dx, iq, part_main, part_hair, "
 #ifdef ENABLE_ACCE_SYSTEM
-						"part_acce, "
+				"part_acce, "
 #endif
-						" x, y, skill_group, change_name FROM player%s WHERE account_id=%u",
-						GetTablePostfix(), info->pAccountTable->id);
-			}
-			else
-			{
-				snprintf(queryStr, sizeof(queryStr),
-						"SELECT id, name, job, level, playtime, st, ht, dx, iq, part_main, part_hair,"
-#ifdef ENABLE_ACCE_SYSTEM
-						"part_acce, "
-#endif
-						" x, y, skill_group, change_name FROM player%s WHERE account_id=%u",
-						GetTablePostfix(), info->pAccountTable->id);
-			}
+                "x, y, skill_group, change_name FROM player WHERE account_id=%u",
+				info->pAccountTable->id);
 
 			CDBManager::instance().ReturnQuery(queryStr, QID_LOGIN, peer->GetHandle(), info);
 		}
@@ -453,7 +410,7 @@ void CClientManager::RESULT_LOGIN(CPeer * peer, SQLMsg * msg)
 		}
 		else
 		{
-			sys_log(0, "RESULT_LOGIN: login success %s rows: %lu", info->pAccountTable->login, msg->Get()->uiNumRows);
+			sys_log(0, "RESULT_LOGIN: login success %s rows: %u", info->pAccountTable->login, msg->Get()->uiNumRows);
 
 			if (msg->Get()->uiNumRows > 0)
 				CreateAccountPlayerDataFromRes(msg->Get()->pSQLResult, info->pAccountTable);
@@ -474,7 +431,7 @@ void CClientManager::RESULT_LOGIN(CPeer * peer, SQLMsg * msg)
 	}
 }
 
-void CClientManager::QUERY_LOGOUT(CPeer * peer, uint32_t dwHandle,const char * data)
+void CClientManager::QUERY_LOGOUT(CPeer * peer, uint32_t, const char * data)
 {
 	TLogoutPacket* packet = (TLogoutPacket*)data;
 
@@ -514,9 +471,10 @@ void CClientManager::QUERY_LOGOUT(CPeer * peer, uint32_t dwHandle,const char * d
 
 void CClientManager::QUERY_CHANGE_NAME(CPeer * peer, uint32_t dwHandle, TPacketGDChangeName * p)
 {
-	char queryStr[QUERY_MAX_LEN];
+	char queryStr[ASQL_QUERY_MAX_LEN];
+
 	snprintf(queryStr, sizeof(queryStr),
-		"SELECT COUNT(*) as count FROM player%s WHERE name='%s' AND id <> %u", GetTablePostfix(), p->name, p->pid);
+		"SELECT COUNT(*) as count FROM player WHERE name='%s' AND id <> %u", p->name, p->pid);
 
 	std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(queryStr, SQL_PLAYER));
 
@@ -543,7 +501,7 @@ void CClientManager::QUERY_CHANGE_NAME(CPeer * peer, uint32_t dwHandle, TPacketG
 	}
 
 	snprintf(queryStr, sizeof(queryStr),
-			"UPDATE player%s SET name='%s',change_name=0 WHERE id=%u", GetTablePostfix(), p->name, p->pid);
+			"UPDATE player SET name='%s',change_name=0 WHERE id=%u", p->name, p->pid);
 
 	std::unique_ptr<SQLMsg> pMsg0(CDBManager::instance().DirectQuery(queryStr, SQL_PLAYER));
 

@@ -17,7 +17,7 @@ class CGraphicExpandedImageInstance : public CGraphicImageInstance
 			RENDERING_MODE_NORMAL,
 			RENDERING_MODE_SCREEN,
 			RENDERING_MODE_COLOR_DODGE,
-			RENDERING_MODE_MODULATE,
+			RENDERING_MODE_MODULATE
 		};
 
 	public:

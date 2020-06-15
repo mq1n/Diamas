@@ -40,6 +40,7 @@ class DESC_MANAGER : public singleton<DESC_MANAGER>
 
 		LPDESC			FindByCharacterName(const char* name);
 		LPDESC			FindByLoginName(const std::string& login);
+		LPDESC			FindByAID(uint32_t dwAID);
 		void			ConnectAccount(const std::string& login, LPDESC d);
 		void			DisconnectAccount(const std::string& login);
 
@@ -49,7 +50,7 @@ class DESC_MANAGER : public singleton<DESC_MANAGER>
 		uint32_t			GetLocalUserCount() { return m_iLocalUserCount; }
 		void			GetUserCount(int32_t & iTotal, int32_t ** paiEmpireUserCount, int32_t & iLocalCount);
 
-		const DESC_SET &	GetClientSet();
+		const DESC_SET & GetClientSet() const;
 
 		uint32_t			MakeRandomKey(uint32_t dwHandle);
 		bool			GetRandomKey(uint32_t dwHandle, uint32_t* prandom_key);
@@ -58,14 +59,11 @@ class DESC_MANAGER : public singleton<DESC_MANAGER>
 		LPDESC			FindByLoginKey(uint32_t dwKey);
 		void			ProcessExpiredLoginKey();
 
-		bool			IsDisconnectInvalidCRC() { return m_bDisconnectInvalidCRC; }
-		void			SetDisconnectInvalidCRCMode(bool bMode) { m_bDisconnectInvalidCRC = bMode; }
-
 		bool			IsP2PDescExist(const char * szHost, uint16_t wPort);
 
-	private:
-		bool				m_bDisconnectInvalidCRC;
+		void			BroadcastCommand(const std::string& cmd) const;
 
+	private:
 		DESC_HANDLE_RANDOM_KEY_MAP	m_map_handle_random_key;
 
 		CLIENT_DESC_SET		m_set_pkClientDesc;
@@ -73,7 +71,7 @@ class DESC_MANAGER : public singleton<DESC_MANAGER>
 
 		DESC_HANDLE_MAP			m_map_handle;
 		DESC_HANDSHAKE_MAP		m_map_handshake;
-		//DESC_ACCOUNTID_MAP		m_AccountIDMap;
+		DESC_ACCOUNTID_MAP		m_AccountIDMap;
 		DESC_LOGINNAME_MAP		m_map_loginName;
 		std::map<uint32_t, CLoginKey *>	m_map_pkLoginKey;
 
@@ -83,7 +81,16 @@ class DESC_MANAGER : public singleton<DESC_MANAGER>
 
 		int32_t				m_iLocalUserCount;
 		int32_t				m_aiEmpireUserCount[EMPIRE_MAX_NUM];
+		int32_t				m_iTotalUserCount;
 
+		typedef std::unordered_map<int16_t, uint32_t> TPlayerCountMap;
+
+public:
+	void UpdateUserCountOnServer(int16_t port, uint32_t userCount);
+	TPlayerCountMap GetCountOnServerMap() const { return m_userCountMap; }
+private:
+
+	TPlayerCountMap m_userCountMap;
 		bool			m_bDestroyed;
 };
 

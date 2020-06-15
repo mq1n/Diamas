@@ -497,7 +497,7 @@ void socket_timeout(socket_t s, long sec, long usec)
     }
 
 #ifndef _WIN32
-    sys_log(1, "SYSTEM: %d: TIMEOUT RCV: %d.%ld, SND: %d.%ld", s, rcvopt.tv_sec, rcvopt.tv_usec, sndopt.tv_sec, sndopt.tv_usec);
+    sys_log(1, "SYSTEM: %d: TIMEOUT RCV: %d.%d, SND: %d.%d", s, rcvopt.tv_sec, rcvopt.tv_usec, sndopt.tv_sec, sndopt.tv_usec);
 #endif
 }
 

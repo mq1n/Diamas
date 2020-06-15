@@ -7,7 +7,6 @@ CPeer::CPeer()
 	m_state = 0;
 	m_bChannel = 0;
 	m_dwHandle = 0;
-	m_dwUserCount = 0;
 	m_wListenPort = 0;
 	m_wP2PPort = 0;
 
@@ -57,16 +56,6 @@ uint32_t CPeer::GetHandle()
 	return m_dwHandle;
 }
 
-uint32_t CPeer::GetUserCount()
-{
-	return m_dwUserCount;
-}
-
-void CPeer::SetUserCount(uint32_t dwCount)
-{
-	m_dwUserCount = dwCount;
-}
-
 bool CPeer::PeekPacket(int32_t & iBytesProceed, uint8_t & header, uint32_t & dwHandle, uint32_t & dwLength, const char ** data)
 {
 	if (GetRecvLength() < iBytesProceed + 9)
@@ -86,8 +75,8 @@ bool CPeer::PeekPacket(int32_t & iBytesProceed, uint8_t & header, uint32_t & dwH
 	//sys_log(0, "%d header %d handle %u length %u", GetRecvLength(), header, dwHandle, dwLength);
 	if (iBytesProceed + dwLength + 9 > (uint32_t) GetRecvLength())
 	{
-		sys_log(0, "PeekPacket: not enough buffer size: len %u, recv %d", 
-				9+dwLength, GetRecvLength()-iBytesProceed);
+		sys_log(0, "PeekPacket: not enough buffer size: len %u, recv %d, header %d",
+			9 + dwLength, GetRecvLength() - iBytesProceed, header);
 		return false;
 	}
 
@@ -127,7 +116,7 @@ void CPeer::SetP2PPort(uint16_t wPort)
 	m_wP2PPort = wPort;
 }
 
-void CPeer::SetMaps(int32_t * pl)
+void CPeer::SetMaps(const int32_t * pl)
 {
 	memcpy(m_alMaps, pl, sizeof(m_alMaps));
 }
@@ -154,7 +143,7 @@ void CPeer::SendSpareItemIDRange()
 	}
 }
 
-bool CPeer::SetItemIDRange(TItemIDRangeTable itemRange)
+bool CPeer::SetItemIDRange(const TItemIDRangeTable &itemRange)
 {
 	if (itemRange.dwMin == 0 || itemRange.dwMax == 0 || itemRange.dwUsableItemIDMin == 0) return false;
 
@@ -164,7 +153,7 @@ bool CPeer::SetItemIDRange(TItemIDRangeTable itemRange)
 	return true;
 }
 
-bool CPeer::SetSpareItemIDRange(TItemIDRangeTable itemRange)
+bool CPeer::SetSpareItemIDRange(const TItemIDRangeTable &itemRange)
 {
 	if (itemRange.dwMin == 0 || itemRange.dwMax == 0 || itemRange.dwUsableItemIDMin == 0) return false;
 
@@ -175,7 +164,7 @@ bool CPeer::SetSpareItemIDRange(TItemIDRangeTable itemRange)
 	return true;
 }
 
-bool CPeer::CheckItemIDRangeCollision(TItemIDRangeTable itemRange)
+bool CPeer::CheckItemIDRangeCollision(const TItemIDRangeTable &itemRange)
 {
 	if (m_itemRange.dwMin < itemRange.dwMax && m_itemRange.dwMax > itemRange.dwMin)
 	{

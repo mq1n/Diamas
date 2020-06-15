@@ -2,6 +2,7 @@
 #include "PythonIME.h"
 #include "PythonApplication.h"
 #include "PythonDynamicModuleNames.h"
+#include "../eterSecurity/PythonStackCheck.h"
 
 PyObject* imeEnable(PyObject* poSelf, PyObject* poArgs)
 {
@@ -223,6 +224,8 @@ PyObject* imeEnablePaste(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* imePasteString(PyObject * poSelf, PyObject * poArgs)
 {
+	CPythonStackController::Instance().CheckStackReference(CHEAT_TYPE_ime_PasteString, PY_REF_FILE, PY_REF_FUNC);
+
 	char* szText;
 	if (!PyTuple_GetString(poArgs, 0, &szText))
 		return Py_BuildException();

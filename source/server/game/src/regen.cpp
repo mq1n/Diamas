@@ -9,21 +9,6 @@
 LPREGEN	regen_list = nullptr;
 LPREGEN_EXCEPTION regen_exception_list = nullptr;
 
-enum ERegenModes
-{
-	MODE_TYPE = 0,
-	MODE_SX,
-	MODE_SY,
-	MODE_EX,
-	MODE_EY,
-	MODE_Z_SECTION,
-	MODE_DIRECTION,
-	MODE_REGEN_TIME,
-	MODE_REGEN_PERCENT,
-	MODE_MAX_COUNT,
-	MODE_VNUM
-};
-
 static bool get_word(FILE *fp, char *buf) // 워드단위로 받는다.
 {
 	int32_t i = 0;
@@ -629,7 +614,7 @@ bool regen_load(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t
 			tmp.type == REGEN_TYPE_GROUP_GROUP ||
 			tmp.type == REGEN_TYPE_ANYWHERE)
 		{
-			if (test_server)
+			if (g_bIsTestServer)
 			{
 				CMobManager::instance().IncRegenCount(tmp.type, tmp.vnum, tmp.max_count, tmp.time);
 			}

@@ -71,7 +71,7 @@ bool CDir::Create(const char * c_szFilter, const char* c_szPath, BOOL bCheckedEx
 				{
 					std::string strFirstFilter = std::string(c_szFilter).substr(0, iPos);
 					std::string strSecondFilter = std::string(c_szFilter).substr(iPos+1, strlen(c_szFilter));
-					if (0 != strFirstFilter.compare(c_szExtension+1) && 0 != strSecondFilter.compare(c_szExtension+1))
+					if (c_szExtension + 1 != strFirstFilter && c_szExtension + 1 != strSecondFilter)
 						continue;
 				}
 				else
@@ -84,19 +84,15 @@ bool CDir::Create(const char * c_szFilter, const char* c_szPath, BOOL bCheckedEx
 			if (!OnFile(stPath.c_str(), m_wfd.cFileName))
 				return false;
 		}
-	} 			
-	while (FindNextFile(m_hFind, &m_wfd));
+	} while (FindNextFile(m_hFind, &m_wfd));
 
 	return true;
 }
 
-bool CDir::IsFolder()
+bool CDir::IsFolder() const
 {
-	if (m_wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-		return true;
-	
-	return false;
-}		
+	return (m_wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+}
 
 void CDir::Initialize()
 {

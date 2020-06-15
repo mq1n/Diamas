@@ -1,10 +1,13 @@
 #include "stdafx.h"
+#include <random>
+#include <cctype>
+#include "../../common/stl.h"
 
-static int32_t global_time_gap = 0;
+static time_t global_time_gap = 0;
 
 time_t get_global_time()
 {
-	return time(0) + global_time_gap;
+	return time(nullptr) + global_time_gap;
 }
 
 void set_global_time(time_t t)
@@ -58,9 +61,16 @@ size_t str_lower(const char * src, char * dest, size_t dest_size)
 	return len;
 }
 
+bool IsEqualStr(std::string rhs, std::string lhs)
+{
+	std::transform(rhs.begin(), rhs.end(), rhs.begin(), ::tolower);
+	std::transform(lhs.begin(), lhs.end(), lhs.begin(), ::tolower);
+	return (lhs == rhs);
+}
+
 void skip_spaces(const char **string)
 {   
-	for (; **string != '\0' && isnhspace(**string); ++(*string));
+	for (; **string != '\0' && isspace(**string); ++(*string));
 }
 
 const char *one_argument(const char *argument, char *first_arg, size_t first_size)
@@ -89,7 +99,7 @@ const char *one_argument(const char *argument, char *first_arg, size_t first_siz
 			continue;   
 		}
 
-		if (!mark && isnhspace(*argument))      
+		if (!mark && isspace(*argument))
 			break;
 
 		*(first_arg++) = *argument;
@@ -116,7 +126,7 @@ const char *first_cmd(const char *argument, char *first_arg, size_t first_arg_si
 	// \0 자리 확보
 	first_arg_size -= 1;
 
-	while (*argument && !isnhspace(*argument) && cur_len < first_arg_size)
+	while (*argument && !isspace(*argument) && cur_len < first_arg_size)
 	{
 		*(first_arg++) = LOWER(*argument);
 		++argument;
@@ -128,28 +138,46 @@ const char *first_cmd(const char *argument, char *first_arg, size_t first_arg_si
 	return (argument);
 }
 
-int32_t CalculateDuration(int32_t iSpd, int32_t iDur)
+void split_argument(const char *argument, std::vector<std::string> & vecArgs)
 {
-	int32_t i = 100 - iSpd;
-
-	if (i > 0) 
-		i = 100 + i;
-	else if (i < 0) 
-		i = 10000 / (100 - i);
-	else
-		i = 100;
-
-	return iDur * i / 100;
+	std::string arg = argument;
+	vecArgs = string_split(arg, " ");
 }
+
+int32_t CalculateDuration(int32_t speed, int32_t duration)
+{
+	assert(speed != 0 && "Divide by zero");
+	return duration * 100 / speed;
+}
+
 double uniform_random(double a, double b)
 {
-	return thecore_random() / (RAND_MAX + 1.f) * (b - a) + a;
+	// Use random_device to generate a seed for Mersenne twister engine.
+	std::random_device rd;
+
+	// Use Mersenne twister engine to generate pseudo-random numbers.
+	std::mt19937 engine(rd());
+
+	// Establish the limit of [a, b) to the random generator
+	std::uniform_real_distribution<double> dist(a, b);
+
+	return dist(engine);
 }
 
-float gauss_random(float avg, float sigma)
+int32_t uniform_random(int32_t a, int32_t b)
+{
+	std::random_device rd;
+	std::mt19937 engine(rd());
+
+	// Set the random interval to [a, b]
+	std::uniform_int_distribution<int32_t> dist(a, b);
+
+	return dist(engine);
+}
+double gauss_random(double avg, double sigma)
 {
 	static bool haveNextGaussian = false;
-	static float nextGaussian = 0.0f;
+	static double nextGaussian = 0.0f;
 
 	if (haveNextGaussian) 
 	{
@@ -160,13 +188,11 @@ float gauss_random(float avg, float sigma)
 	{
 		double v1, v2, s;
 		do { 
-			//v1 = 2 * nextDouble() - 1;   // between -1.0 and 1.0
-			//v2 = 2 * nextDouble() - 1;   // between -1.0 and 1.0
-			v1 = uniform_random(-1.f, 1.f);
-			v2 = uniform_random(-1.f, 1.f);
+			v1 = uniform_random(-1.0, 1.0);
+			v2 = uniform_random(-1.0, 1.0);
 			s = v1 * v1 + v2 * v2;
 		} while (s >= 1.f || fabs(s) < FLT_EPSILON);
-		double multiplier = sqrtf(-2 * logf(s)/s);
+		double multiplier = sqrt(-2 * log(s)/s);
 		nextGaussian = v2 * multiplier;
 		haveNextGaussian = true;
 		return v1 * multiplier * sigma + avg;
@@ -235,10 +261,11 @@ bool WildCaseCmp(const char *w, const char *s)
 		switch(*w)
 		{
 			case '*':
-				if ('\0' == w[1])
+				if (!w[1])
 					return true;
 				{
-					for (size_t i = 0; i <= strlen(s); ++i)
+					size_t sLength = strlen(s);
+					for (size_t i = 0; i <= sLength; ++i)
 					{
 						if (true == WildCaseCmp(w + 1, s + i))
 							return true;
@@ -247,7 +274,7 @@ bool WildCaseCmp(const char *w, const char *s)
 				return false;
 
 			case '?':
-				if ('\0' == *s)
+				if (!*s)
 					return false;
 
 				++w;
@@ -261,7 +288,7 @@ bool WildCaseCmp(const char *w, const char *s)
 						return false;
 				}
 
-				if ('\0' == *w)
+				if (!*w)
 					return true;
 
 				++w;
@@ -273,3 +300,7 @@ bool WildCaseCmp(const char *w, const char *s)
 	return false;
 }
 
+bool is_digits(const std::string &str)
+{
+    return str.find_first_not_of("0123456789") == std::string::npos;
+}

@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "../eterlib/Camera.h"
+#include "../eterLib/Camera.h"
 #include "../eterTerrainLib/StdAfx.h"
 
 #include "MapOutdoor.h"
@@ -12,29 +12,19 @@
 class PCBlocker_CDynamicSphereInstanceVector
 {
 	public:
-		typedef CDynamicSphereInstance* Iterator;
+		using Iterator = CDynamicSphereInstance *;
 
 		enum
 		{
-			SIZE = 4,
+			SIZE = 4
 		};
 
 	public:
-		PCBlocker_CDynamicSphereInstanceVector()
-		{
-		}
-		~PCBlocker_CDynamicSphereInstanceVector()
-		{
-		}
+		PCBlocker_CDynamicSphereInstanceVector() = default;
+		~PCBlocker_CDynamicSphereInstanceVector() = default;
 
-		Iterator Begin()
-		{
-			return m_aDSI+0;
-		}
-		Iterator End()
-		{
-			return m_aDSI+4;
-		}
+		Iterator Begin() { return m_aDSI + 0; }
+		Iterator End() { return m_aDSI + 4; }
 
 	private:
 		CDynamicSphereInstance m_aDSI[4];
@@ -180,7 +170,7 @@ struct FGetShadowReceiverFromCollisionData
 			return;
 		if (pInstance->CollisionDynamicSphere(*m_pdsi))
 		{
-			m_pkVct_pkShadowReceiver->push_back(pInstance);
+			m_pkVct_pkShadowReceiver->emplace_back(pInstance);
 			m_bCollide = true;
 		}
 	}
@@ -332,7 +322,7 @@ struct FGetShadowReceiverFromHeightData
 {
 	enum
 	{
-		COLLECT_MAX = 100,
+		COLLECT_MAX = 100
 	};
 	
 	uint32_t m_dwCollectOverCount;
@@ -419,7 +409,7 @@ void CMapOutdoor::__CollectShadowReceiver(D3DXVECTOR3& v3Target, D3DXVECTOR3& v3
 		{
 			CGraphicObjectInstance * pObjInstEach = kGetShadowReceiverFromHeightData.GetCollectItem(i);
 			if (!__IsInShadowReceiverList(pObjInstEach))
-				m_ShadowReceiverVector.push_back(pObjInstEach);	
+				m_ShadowReceiverVector.emplace_back(pObjInstEach);
 		}
 	}
 
@@ -444,12 +434,12 @@ void CMapOutdoor::__CollectShadowReceiver(D3DXVECTOR3& v3Target, D3DXVECTOR3& v3
 
 struct PCBlocker_SInstanceList
 {
-	typedef CGraphicObjectInstance* Item;
-	typedef Item* Iterator;
+	using Item = CGraphicObjectInstance *;
+	using Iterator = Item *;
 
 	enum
 	{
-		CAPACITY = 512,
+		CAPACITY = 512
 	};
 
 	uint32_t m_dwInstCount;
@@ -569,15 +559,11 @@ struct PCBlocker_SInstanceList
 					return;
 				}
 				else if (THING_OBJECT == pInstance->GetType())
-				{
 					__AppendObject(pInstance);
-				}
 				else if (ACTOR_OBJECT == pInstance->GetType())
 				{
 					if (((CActorInstance *)pInstance)->IsBuilding())
-					{
 						__AppendObject(pInstance);
-					}
 				}
 			}
 		}
@@ -648,7 +634,7 @@ void CMapOutdoor::__CollectCollisionPCBlocker(D3DXVECTOR3& v3Eye, D3DXVECTOR3& v
 
 			if (!__IsInShadowReceiverList(pObjInstEach))
 				if (!__IsInPCBlockerList(pObjInstEach))
-					m_PCBlockerVector.push_back(pObjInstEach);
+					m_PCBlockerVector.emplace_back(pObjInstEach);
 		}
 	}
 #ifdef __PERFORMANCE_CHECKER__
@@ -702,7 +688,7 @@ void CMapOutdoor::__CollectCollisionShadowReceiver(D3DXVECTOR3& v3Target, D3DXVE
 		CGraphicObjectInstance * pObjInstEach = *i;
 		if (!__IsInPCBlockerList(pObjInstEach))
 			if (!__IsInShadowReceiverList(pObjInstEach))				
-				m_ShadowReceiverVector.push_back(pObjInstEach);			
+				m_ShadowReceiverVector.emplace_back(pObjInstEach);
 	}	
 }
 
@@ -753,7 +739,7 @@ void CMapOutdoor::UpdateTerrain(float fX, float fY)
 
 void CMapOutdoor::FPushTerrainToDeleteVector::operator () (CTerrain * pTerrain)
 {
-	TTerrainPtrVectorIterator aIterator = std::find(m_ReturnTerrainVector.begin(), m_ReturnTerrainVector.end(), pTerrain);
+	auto aIterator = std::find(m_ReturnTerrainVector.begin(), m_ReturnTerrainVector.end(), pTerrain);
 	if (aIterator != m_ReturnTerrainVector.end())
 		return;
 
@@ -768,11 +754,11 @@ void CMapOutdoor::FPushTerrainToDeleteVector::operator () (CTerrain * pTerrain)
 	{
 	case DELETE_LEFT:
 		if (wCoordX < wReferenceCoordX - LOAD_SIZE_WIDTH)
-			m_ReturnTerrainVector.push_back(pTerrain);
+			m_ReturnTerrainVector.emplace_back(pTerrain);
 		break;
 	case DELETE_RIGHT:
 		if (wCoordX > wReferenceCoordX + LOAD_SIZE_WIDTH)
-			m_ReturnTerrainVector.push_back(pTerrain);
+			m_ReturnTerrainVector.emplace_back(pTerrain);
 		break;
 	}
 
@@ -784,18 +770,18 @@ void CMapOutdoor::FPushTerrainToDeleteVector::operator () (CTerrain * pTerrain)
 	{
 	case DELETE_TOP:
 		if (wCoordY < wReferenceCoordY - LOAD_SIZE_WIDTH)
-			m_ReturnTerrainVector.push_back(pTerrain);
+			m_ReturnTerrainVector.emplace_back(pTerrain);
 		break;
 	case DELETE_BOTTOM:
 		if (wCoordY > wReferenceCoordY + LOAD_SIZE_WIDTH)
-			m_ReturnTerrainVector.push_back(pTerrain);
+			m_ReturnTerrainVector.emplace_back(pTerrain);
 		break;
 	}
 }
 
 void CMapOutdoor::FPushAreaToDeleteVector::operator () (CArea * pArea)
 {
-	TAreaPtrVectorIterator aIterator = std::find(m_ReturnAreaVector.begin(), m_ReturnAreaVector.end(), pArea);
+	auto aIterator = std::find(m_ReturnAreaVector.begin(), m_ReturnAreaVector.end(), pArea);
 	if (aIterator != m_ReturnAreaVector.end())
 		return;
 
@@ -809,11 +795,11 @@ void CMapOutdoor::FPushAreaToDeleteVector::operator () (CArea * pArea)
 	{
 	case DELETE_LEFT:
 		if (wCoordX < wReferenceCoordX - LOAD_SIZE_WIDTH)
-			m_ReturnAreaVector.push_back(pArea);
+			m_ReturnAreaVector.emplace_back(pArea);
 		break;
 	case DELETE_RIGHT:
 		if (wCoordX > wReferenceCoordX + LOAD_SIZE_WIDTH)
-			m_ReturnAreaVector.push_back(pArea);
+			m_ReturnAreaVector.emplace_back(pArea);
 		break;
 	}
 	
@@ -825,11 +811,11 @@ void CMapOutdoor::FPushAreaToDeleteVector::operator () (CArea * pArea)
 	{
 	case DELETE_TOP:
 		if (wCoordY < wReferenceCoordY - LOAD_SIZE_WIDTH)
-			m_ReturnAreaVector.push_back(pArea);
+			m_ReturnAreaVector.emplace_back(pArea);
 		break;
 	case DELETE_BOTTOM:
 		if (wCoordY > wReferenceCoordY + LOAD_SIZE_WIDTH)
-			m_ReturnAreaVector.push_back(pArea);
+			m_ReturnAreaVector.emplace_back(pArea);
 		break;
 	}
 }
@@ -852,7 +838,7 @@ void CMapOutdoor::__UpdateGarvage()
 	{
 		if (ELTimer_GetMSec() - dwEraseTime <= dwTerrainEraseInterval)
 			return;
-		TTerrainPtrVectorIterator aTerrainPtrDeleteItertor = m_TerrainDeleteVector.begin();
+		auto aTerrainPtrDeleteItertor = m_TerrainDeleteVector.begin();
 		CTerrain * pTerrain = *aTerrainPtrDeleteItertor;
 		CTerrain::Delete(pTerrain);
  		
@@ -866,7 +852,7 @@ void CMapOutdoor::__UpdateGarvage()
 	{
 		if (ELTimer_GetMSec() - dwEraseTime <= dwTerrainEraseInterval)
 			return;
-		TAreaPtrVectorIterator aAreaPtrDeleteItertor = m_AreaDeleteVector.begin();
+		auto aAreaPtrDeleteItertor = m_AreaDeleteVector.begin();
 
 		CArea * pArea = *aAreaPtrDeleteItertor;
 		CArea::Delete(pArea);
@@ -1115,9 +1101,8 @@ void CMapOutdoor::UpdateQuadTreeHeights(CTerrainQuadtreeNode *Node)
 	Node->center.y = (maxy + miny) * 0.5f;
 	Node->center.z = (maxz + minz) * 0.5f;
 	
-	Node->radius = sqrtf((maxx-minx)*(maxx-minx) +
-		(maxy-miny)*(maxy-miny) +
-		(maxz-minz)*(maxz-minz)) / 2.0f;
+	Node->radius = sqrtf((maxx - minx) * (maxx - minx) + (maxy - miny) * (maxy - miny) + (maxz - minz) * (maxz - minz)) / 2.0f;
+
 	
 	if (Node->NW_Node != nullptr)
 		UpdateQuadTreeHeights(Node->NW_Node);

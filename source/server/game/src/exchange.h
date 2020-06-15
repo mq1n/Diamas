@@ -19,7 +19,7 @@ class CExchange
 		void		Cancel();
 
 		bool		AddGold(int32_t lGold);
-		bool		AddItem(TItemPos item_pos, uint8_t display_pos);
+		bool		AddItem(const TItemPos &item_pos, uint8_t display_pos);
 		bool		RemoveItem(uint8_t pos);
 
 		LPCHARACTER	GetOwner()	{ return m_pOwner;	}

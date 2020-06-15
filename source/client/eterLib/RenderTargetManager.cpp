@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 #include "RenderTargetManager.h"
-#include "../EterBase/stl.h"
+#include "../eterBase/stl.h"
 #include "GrpBase.h"
 
 CRenderTargetManager::CRenderTargetManager(): m_widht(800),

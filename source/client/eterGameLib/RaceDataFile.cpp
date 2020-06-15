@@ -22,9 +22,7 @@ BOOL CRaceData::LoadRaceData(const char * c_szFileName)
 	TextFileLoader.GetTokenString("motionlistfilename", &m_strMotionListFileName);
 
 	if (!m_strTreeFileName.empty())
-	{
 		CFileNameHelper::StringPath(m_strTreeFileName);
-	}
 
 	CTokenVector* pSmokeTokenVector;
 	if (TextFileLoader.GetTokenVector("smokefilename", &pSmokeTokenVector))
@@ -68,27 +66,21 @@ BOOL CRaceData::LoadRaceData(const char * c_szFileName)
 			for (uint32_t i = 0; i < dwShapeDataCount; ++i)
 			{
 				if (!TextFileLoader.SetChildNode("shapedata", i))
-				{
 					continue;
-				}
 
 				/////////////////////////
 				// Temporary - 이벤트를 위한 임시 기능
 				TextFileLoader.GetTokenString("specialpath", &strPathName);
 				/////////////////////////
 
-				uint32_t dwShapeIndex;
+				uint32_t dwShapeIndex = 0;
 				if (!TextFileLoader.GetTokenDoubleWord("shapeindex", &dwShapeIndex))
-				{
 					continue;
-				}
 
 				// LOCAL_PATH_SUPPORT
 				std::string strModel;				
 				if (TextFileLoader.GetTokenString("model", &strModel))
-				{
 					SetShapeModel(dwShapeIndex, (strPathName + strModel).c_str());
-				}
 				else
 				{					
 					if (!TextFileLoader.GetTokenString("local_model", &strModel))					
@@ -155,21 +147,17 @@ BOOL CRaceData::LoadRaceData(const char * c_szFileName)
 			for (uint32_t i = 0; i < dwHairDataCount; ++i)
 			{
 				if (!TextFileLoader.SetChildNode("hairdata", i))
-				{
 					continue;
-				}
 
 				/////////////////////////
 				// Temporary - 이벤트를 위한 임시 기능
 				TextFileLoader.GetTokenString("specialpath", &strPathName);
 				/////////////////////////
 
-				uint32_t dwShapeIndex;
+				uint32_t dwShapeIndex = 0;
 				if (!TextFileLoader.GetTokenDoubleWord("hairindex", &dwShapeIndex))
-				{
 					continue;
-				}
-				
+
 				std::string strModel;
 				std::string strSourceSkin;
 				std::string strTargetSkin;

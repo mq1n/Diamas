@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "PeerBase.h"
+#include "../../common/service.h"
 
-CPeerBase::CPeerBase() : m_fd(INVALID_SOCKET), m_BytesRemain(0), m_outBuffer(nullptr), m_inBuffer(nullptr)
+CPeerBase::CPeerBase() : m_fd(INVALID_SOCKET), m_wPort(0), m_BytesRemain(0), m_outBuffer(nullptr), m_inBuffer(nullptr)
 {
 }
 
@@ -53,7 +54,7 @@ bool CPeerBase::Accept(socket_t fd_accept)
 	std::string targetIP = inet_ntoa(peer.sin_addr);
 	if (targetIP.rfind("127.0.0.1", 0) && targetIP.rfind("192.168.", 0) && targetIP.rfind("10.", 0))
 	{
-		sys_log(0, "BLOCK CONNECTION FROM %s", inet_ntoa(peer.sin_addr));
+		sys_err("BLOCK CONNECTION FROM %s", inet_ntoa(peer.sin_addr));
 		Destroy();
 		return false;
 	}
@@ -145,6 +146,17 @@ void CPeerBase::EncodeDWORD(uint32_t dw)
 	fdwatch_add_fd(m_fdWatcher, m_fd, this, FDW_WRITE, true);
 }
 
+void CPeerBase::EncodeQWORD(uint64_t dw)
+{
+	if (!m_outBuffer)
+	{
+		sys_err("Not ready to write");
+		return;
+	}
+	buffer_write(m_outBuffer, &dw, 8);
+	fdwatch_add_fd(m_fdWatcher, m_fd, this, FDW_WRITE, true);
+}
+
 void CPeerBase::Encode(const void* data, uint32_t size)
 {
 	if (!m_outBuffer)
@@ -214,7 +226,7 @@ int32_t CPeerBase::Send()
 	if (iBytesToWrite == 0)
 		return 0;
 
-	int32_t result = socket_write(m_fd, (const char *) buffer_read_peek(m_outBuffer), iBytesToWrite);
+	int32_t result = socket_write(m_fd, reinterpret_cast<const char *>(buffer_read_peek(m_outBuffer)), iBytesToWrite);
 
 	if (result == 0)
 	{

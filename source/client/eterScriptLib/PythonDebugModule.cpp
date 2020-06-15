@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include "../eterSecurity/PythonStackCheck.h"
 
 PyObject* dbgLogBox(PyObject* poSelf, PyObject* poArgs)
 {	
@@ -7,13 +8,9 @@ PyObject* dbgLogBox(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szMsg))
 		return Py_BuildException();
 	if (!PyTuple_GetString(poArgs, 1, &szCaption))
-	{
 		LogBox(szMsg);
-	}
 	else
-	{
-		LogBox(szMsg,szCaption);
-	}
+		LogBox(szMsg, szCaption);
 	return Py_BuildNone();	
 }
 
@@ -43,7 +40,13 @@ PyObject* dbgTraceError(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szMsg)) 
 		return Py_BuildException();
 
+#ifdef _DEBUG
+	auto stRefFile = PY_REF_FILE;
+	auto stRefFunc = PY_REF_FUNC;
+	TraceError( "%s-%s | %s", stRefFile.c_str(), stRefFunc.c_str(), szMsg );
+#else
 	TraceError( "%s", szMsg );
+#endif
 	return Py_BuildNone();
 }
 

@@ -31,11 +31,12 @@ class CPeerBase : public CNetBase
 	void		Disconnect();
 	void		Destroy();
 
-	socket_t	GetFd() { return m_fd; }
+	socket_t	GetFd() const { return m_fd; }
 
 	void		EncodeBYTE(uint8_t b);
 	void		EncodeWORD(uint16_t w);
 	void		EncodeDWORD(uint32_t dw);
+	void		EncodeQWORD(uint64_t dw);
 	void		Encode(const void* data, uint32_t size);
 	int32_t		Send();
 
@@ -46,8 +47,8 @@ class CPeerBase : public CNetBase
 
 	int32_t		GetSendLength();
 
-	const char *	GetHost() { return m_host; }
-	uint16_t	GetPort() { return m_wPort; }
+	const char *	GetHost() const { return m_host; }
+	uint16_t		GetPort() const { return m_wPort; }
 
     protected:
 	char		m_host[MAX_HOST_LENGTH + 1];

@@ -2,7 +2,6 @@
 
 #include "../eterLib/MSApplication.h"
 #include "../eterLib/Input.h"
-#include "../eterLib/Profiler.h"
 #include "../eterLib/GrpDevice.h"
 #include "../eterLib/NetDevice.h"
 #include "../eterLib/GrpLightManager.h"
@@ -56,13 +55,13 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		{
 			DEVICE_STATE_FALSE,
 			DEVICE_STATE_SKIP,
-			DEVICE_STATE_OK,
+			DEVICE_STATE_OK
 		};
 
 		enum ECursorMode
 		{
 			CURSOR_MODE_HARDWARE,
-			CURSOR_MODE_SOFTWARE,
+			CURSOR_MODE_SOFTWARE
 		};
 
 		enum ECursorShape
@@ -92,7 +91,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 			ATTACK = CURSOR_SHAPE_ATTACK,
 			TARGET = CURSOR_SHAPE_TARGET,
 			CAMERA_ROTATE = CURSOR_SHAPE_CAMERA_ROTATE,
-			CURSOR_COUNT = CURSOR_SHAPE_COUNT,
+			CURSOR_COUNT = CURSOR_SHAPE_COUNT
 		};
 
 		enum EInfo
@@ -100,14 +99,14 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 			INFO_ACTOR,
 			INFO_EFFECT,
 			INFO_ITEM,
-			INFO_TEXTTAIL,
+			INFO_TEXTTAIL
 		};
 
 		enum ECameraControlDirection
 		{
 			CAMERA_TO_POSITIVE = 1,
 			CAMERA_TO_NEGITIVE = -1,
-			CAMERA_STOP = 0,
+			CAMERA_STOP = 0
 		};
 
 		enum
@@ -117,7 +116,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 			CAMERA_MODE_BLEND = 2,
 			CAMERA_MODE_FREE = 3,
 
-			EVENT_CAMERA_NUMBER = 101,
+			EVENT_CAMERA_NUMBER = 101
 		};
 
 		struct SCameraSpeed
@@ -265,6 +264,11 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 
 	public:
 		void SetTitle(const char* szTitle);
+		
+		void FlashApplication();
+
+		int32_t GetGameStage() const;
+		void SetGameStage(int32_t iNewStage);
 
 	protected:
 		LRESULT WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wParam, LPARAM lParam);
@@ -343,7 +347,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 
 		CPythonDynamicModule m_pkPyDynamicModuleMgr;
 		CPythonStackController		m_kPyStackController;
-		CAnticheatManager			m_kAnticheatManager;
+//		CAnticheatManager			m_kAnticheatManager;
 		
 		CGuildMarkManager			m_kGuildMarkManager;
 		CGuildMarkDownloader		m_kGuildMarkDownloader;
@@ -430,6 +434,8 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		// Connect Data
 		std::string					m_strIP;
 		int32_t							m_iPort;
+
+	int32_t m_iGameStage;
 
 		static CPythonApplication*	ms_pInstance;
 

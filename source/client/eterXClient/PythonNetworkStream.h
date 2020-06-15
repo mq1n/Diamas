@@ -1,13 +1,12 @@
 #pragma once
-
 #include "../eterLib/FuncObject.h"
-#include "../eterlib/NetStream.h"
+#include "../eterLib/NetStream.h"
 #include "../eterLib/NetPacketHeaderMap.h"
 #include "../eterSecurity/CheatQueueManager.h"
 
 #include "InsultChecker.h"
 #include "Locale_inc.h"
-#include "packet.h"
+#include "Packet.h"
 
 class CInstanceBase;
 class CNetworkActorManager;
@@ -73,7 +72,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 			PHASE_WINDOW_LOAD,
 			PHASE_WINDOW_GAME,
 			PHASE_WINDOW_EMPIRE,
-			PHASE_WINDOW_NUM,
+			PHASE_WINDOW_NUM
 		};
 
 	public:
@@ -136,6 +135,8 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool SendCharacterStatePacket(const TPixelPosition& c_rkPPosDst, float fDstRot, uint32_t eFunc, uint32_t uArg);
 		bool SendUseSkillPacket(uint32_t dwSkillIndex, uint32_t dwTargetVID=0);
 		bool SendTargetPacket(uint32_t dwVID);
+	bool SendTargetDropPacket();
+	bool SendChestDropInfo(uint16_t wInventoryCell);
 
 		bool SendCharacterPositionPacket(uint8_t iPosition);
 
@@ -218,7 +219,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool SendGuildChangeMemberGradePacket(uint32_t dwPID, uint8_t byGrade);
 		bool SendGuildUseSkillPacket(uint32_t dwSkillID, uint32_t dwTargetVID);
 		bool SendGuildChangeMemberGeneralPacket(uint32_t dwPID, uint8_t byFlag);
-		bool SendGuildInvitePacket(uint32_t dwVID);
 		bool SendGuildInviteAnswerPacket(uint32_t dwGuildID, uint8_t byAnswer);
 		bool SendGuildChargeGSPPacket(uint32_t dwMoney);
 		bool SendGuildDepositMoneyPacket(uint32_t dwMoney);
@@ -257,7 +257,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 		bool RecvKeyAgreementPacket();
 		bool RecvKeyAgreementCompletedPacket();
-
 #endif
 		// ETC
 		uint32_t GetMainActorVID();
@@ -289,7 +288,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		// Login Phase
 		bool SendLoginPacket(const char * c_szName, const char * c_szPassword);
 		bool SendLoginPacketNew(const char * c_szName, const char * c_szPassword);
-		bool SendDirectEnterPacket(const char * c_szName, const char * c_szPassword, uint32_t uChrSlot);
 
 		bool SendEnterGame();
 
@@ -351,7 +349,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 			RefreshGuildWindowSkillPage = (1 << 13),
 			RefreshGuildWindowGradePage = (1 << 14),
 			RefreshTargetBoard = (1 << 15),
-			RefreshMallWindow = (1 << 16),
+			RefreshMallWindow = (1 << 16)
 		};
 
 		void __RefreshStatus();
@@ -388,8 +386,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool RecvPhasePacket();
 
 		// Login Phase
-		bool __RecvLoginSuccessPacket3();
-		bool __RecvLoginSuccessPacket4();
+	bool __RecvLoginSuccessPacket();
 		bool __RecvLoginFailurePacket();
 		bool __RecvEmpirePacket();
 		bool __RecvLoginKeyPacket();
@@ -399,13 +396,11 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool __RecvPlayerCreateFailurePacket();
 		bool __RecvPlayerDestroySuccessPacket();
 		bool __RecvPlayerDestroyFailurePacket();
-		bool __RecvPreserveItemPacket();
 		bool __RecvPlayerPoints();
 		bool __RecvChangeName();
 
 		// Loading Phase
 		bool RecvMainCharacter();		
-		bool RecvMainCharacter2_EMPIRE();
 		bool RecvMainCharacter3_BGM();
 		bool RecvMainCharacter4_BGM_VOL();
 
@@ -415,14 +410,13 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 		// Main Game Phase
 		bool RecvWarpPacket();
+	bool RecvCheatBlacklist();
 		bool RecvPVPPacket();
 		bool RecvDuelStartPacket();
-        bool RecvGlobalTimePacket();
+
 		bool RecvCharacterAppendPacket();
 		bool RecvCharacterAdditionalInfo();
-		bool RecvCharacterAppendPacketNew();
 		bool RecvCharacterUpdatePacket();
-		bool RecvCharacterUpdatePacketNew();
 		bool RecvCharacterDeletePacket();
 		bool RecvChatPacket();
 		bool RecvOwnerShipPacket();
@@ -461,17 +455,15 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool RecvRequestMakeGuild();
 
 		// Skill
-		bool RecvSkillLevel();
 		bool RecvSkillLevelNew();
-		bool RecvSkillCoolTimeEnd();
 
 		// Target
 		bool RecvTargetPacket();
-		bool RecvViewEquipPacket();
-		bool RecvDamageInfoPacket();
+	bool RecvTargetDropPacket();
+	bool RecvViewEquipPacket();
+	bool RecvDamageInfoPacket();
 
-		// Mount
-		bool RecvMountPacket();
+	bool RecvChestDropInfo();
 
 		// Fly
 		bool RecvCreateFlyPacket();
@@ -498,7 +490,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool RecvSafeBoxDelPacket();
 		bool RecvSafeBoxWrongPasswordPacket();
 		bool RecvSafeBoxSizePacket();
-		bool RecvSafeBoxMoneyChangePacket();
 
 		// Fishing
 		bool RecvFishing();
@@ -516,7 +507,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool RecvChangeSkillGroupPacket();
 
 		// Refine
-		bool RecvRefineInformationPacket();
 		bool RecvRefineInformationPacketNew();
 
 		// Use Potion
@@ -589,8 +579,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 		void __ClearSelectCharacterData();
 
-		// DELETEME
-		//void __SendWarpPacket();
 
 		void __RecvCharacterAppendPacket(SNetworkActorData * pkNetActorData);
 		void __RecvCharacterUpdatePacket(SNetworkUpdateActorData * pkNetUpdateActorData);
@@ -645,9 +633,9 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 		CCheatDetectQueueMgr		m_kCheatQueueManager;
 
-		TSimplePlayerInformation			m_akSimplePlayerInfo[PLAYER_PER_ACCOUNT4];
-		uint32_t								m_adwGuildID[PLAYER_PER_ACCOUNT4];
-		std::string							m_astrGuildName[PLAYER_PER_ACCOUNT4];
+	TSimplePlayerInformation m_akSimplePlayerInfo[PLAYER_PER_ACCOUNT];
+	uint32_t m_adwGuildID[PLAYER_PER_ACCOUNT];
+	std::string m_astrGuildName[PLAYER_PER_ACCOUNT];
 		bool m_bSimplePlayerInfo;
 
 		CRef<CNetworkActorManager>			m_rokNetActorMgr;

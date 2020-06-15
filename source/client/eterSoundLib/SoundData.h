@@ -10,7 +10,7 @@ class CSoundData
 		enum
 		{
 			FLAG_DATA_SIZE = 1,
-			SOUND_FILE_MAX_NUM = 5,
+			SOUND_FILE_MAX_NUM = 5
 		};
 
 	public:

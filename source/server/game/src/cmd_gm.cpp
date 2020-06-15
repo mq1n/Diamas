@@ -17,7 +17,7 @@
 #include "buffer_manager.h"
 #include "fishing.h"
 #include "mining.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "vector.h"
 #include "affect.h"
 #include "db.h"
@@ -31,12 +31,18 @@
 #include "log.h"
 #include "threeway_war.h"
 #include "unique_item.h"
-#include "DragonSoul.h"
+#include "dragon_soul.h"
+#include "Anticheat_Manager.h"
+#include "map_location.h"
+#include "gm.h"
+#include "Battleground.h"
+
+#include "../../common/service.h"
 
 extern bool DropEvent_RefineBox_SetValue(const std::string& name, int32_t value);
 
 // ADD_COMMAND_SLOW_STUN
-enum
+enum ECommandAffect
 {
 	COMMANDAFFECT_STUN,
 	COMMANDAFFECT_SLOW,
@@ -59,6 +65,11 @@ void Command_ApplyAffect(LPCHARACTER ch, const char* argument, const char* affec
 	if (!tch)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "%s is not in same map", arg1);
+		return;
+	}
+	else if (!tch->IsGM())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s GM degil"), arg1);
 		return;
 	}
 
@@ -123,7 +134,7 @@ ACMD(do_transfer)
 			ch->ChatPacket(CHAT_TYPE_INFO, "Transfer requested.");
 		}
 		else
-			ch->ChatPacket(CHAT_TYPE_INFO, "There is no character(%s) by that name", arg1);
+			ch->ChatPacket(CHAT_TYPE_INFO, "%s -> There is no character(%s) by that name", ch->GetName(), arg1);
 
 		return;
 	}
@@ -134,6 +145,7 @@ ACMD(do_transfer)
 		return;
 	}
 
+	tch->ChatPacket(CHAT_TYPE_INFO, "%s isimli oyuncunun yanina isinlaniyorsun", ch->GetName());
 	//tch->Show(ch->GetMapIndex(), ch->GetX(), ch->GetY(), ch->GetZ());
 	tch->WarpSet(ch->GetX(), ch->GetY(), ch->GetMapIndex());
 }
@@ -187,7 +199,8 @@ void CHARACTER_AddGotoInfo(const std::string& c_st_name, uint8_t empire, int32_t
 	newGotoInfo.y = y;
 	gs_vec_gotoInfo.push_back(newGotoInfo);
 
-	sys_log(0, "AddGotoInfo(name=%s, empire=%d, mapIndex=%d, pos=(%d, %d))", c_st_name.c_str(), empire, mapIndex, x, y);
+	if (g_bIsTestServer)
+		sys_log(0, "AddGotoInfo(name=%s, empire=%d, mapIndex=%d, pos=(%d, %d))", c_st_name.c_str(), empire, mapIndex, x, y);
 }
 
 bool FindInString(const char * c_pszFind, const char * c_pszIn)
@@ -239,8 +252,19 @@ bool CHARACTER_GoToName(LPCHARACTER ch, uint8_t empire, int32_t mapIndex, const 
 
 		if (c_eachGotoInfo.empire == 0 || c_eachGotoInfo.empire == empire)
 		{
-			int32_t x = c_eachGotoInfo.x * 100;
-			int32_t y = c_eachGotoInfo.y * 100;
+			int32_t x, y;
+			if (c_eachGotoInfo.x == 0 && c_eachGotoInfo.y == 0)
+			{
+				GPOS pos;
+				SECTREE_MANAGER::instance().GetRecallPositionByEmpire(c_eachGotoInfo.mapIndex, empire, pos);
+				x = pos.x;
+				y = pos.y;
+			}
+			else
+			{
+				x = c_eachGotoInfo.x * 100;
+				y = c_eachGotoInfo.y * 100;
+			}
 
 			ch->ChatPacket(CHAT_TYPE_INFO, "You warp to ( %d, %d )", x, y);
 			ch->WarpSet(x, y);
@@ -312,12 +336,12 @@ ACMD(do_goto)
 		return;
 	}
 
-	if (isnhdigit(*arg1) && isnhdigit(*arg2))
+	if (isdigit(*arg1) && isdigit(*arg2))
 	{
 		str_to_number(x, arg1);
 		str_to_number(y, arg2);
 
-		PIXEL_POSITION p;
+		GPOS p;
 
 		if (SECTREE_MANAGER::instance().GetMapBasePosition(ch->GetX(), ch->GetY(), p))
 		{
@@ -335,7 +359,7 @@ ACMD(do_goto)
 		if (*arg1 == '#')
 			str_to_number(mapIndex,  (arg1 + 1));
 
-		if (*arg2 && isnhdigit(*arg2))
+		if (*arg2 && isdigit(*arg2))
 		{
 			str_to_number(empire, arg2);
 			empire = MINMAX(1, empire, 3);
@@ -398,11 +422,9 @@ ACMD(do_warp)
 	}
 
 	int32_t x = 0, y = 0;
-#ifdef ENABLE_CMD_WARP_IN_DUNGEON
 	int32_t mapIndex = 0;
-#endif
 
-	if (isnhdigit(*arg1) && isnhdigit(*arg2))
+	if (isdigit(*arg1) && isdigit(*arg2))
 	{
 		str_to_number(x, arg1);
 		str_to_number(y, arg2);
@@ -436,33 +458,24 @@ ACMD(do_warp)
 		{
 			x = tch->GetX() / 100;
 			y = tch->GetY() / 100;
-#ifdef ENABLE_CMD_WARP_IN_DUNGEON
 			mapIndex = tch->GetMapIndex();
-#endif
 		}
 	}
 
 	x *= 100;
 	y *= 100;
 
-#ifdef ENABLE_CMD_WARP_IN_DUNGEON
 	ch->ChatPacket(CHAT_TYPE_INFO, "You warp to ( %d, %d, %d )", x, y, mapIndex);
 	ch->WarpSet(x, y, mapIndex);
-#else
-	ch->ChatPacket(CHAT_TYPE_INFO, "You warp to ( %d, %d )", x, y);
-	ch->WarpSet(x, y);
-#endif
 	ch->Stop();
 }
 
-#ifdef ENABLE_NEWSTUFF
 ACMD(do_rewarp)
 {
 	ch->ChatPacket(CHAT_TYPE_INFO, "You warp to ( %d, %d )", ch->GetX(), ch->GetY());
 	ch->WarpSet(ch->GetX(), ch->GetY());
 	ch->Stop();
 }
-#endif
 
 ACMD(do_item)
 {
@@ -485,7 +498,7 @@ ACMD(do_item)
 
 	uint32_t dwVnum;
 
-	if (isnhdigit(*arg1))
+	if (isdigit(*arg1))
 		str_to_number(dwVnum, arg1);
 	else
 	{
@@ -514,7 +527,7 @@ ACMD(do_item)
 				M2_DESTROY_ITEM(item);
 				if (!ch->DragonSoul_IsQualified())
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, "인벤이 활성화 되지 않음.");
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Bunu kullanabilmek icin gerekli yetkiye sahip degilsin."));
 				}
 				else
 					ch->ChatPacket(CHAT_TYPE_INFO, "Not enough inventory space.");
@@ -572,7 +585,7 @@ ACMD(do_group)
 	uint32_t dwVnum = 0;
 	str_to_number(dwVnum, arg1);
 
-	if (test_server)
+	if (g_bIsTestServer)
 		sys_log(0, "COMMAND GROUP SPAWN %u at %u %u %u", dwVnum, ch->GetMapIndex(), ch->GetX(), ch->GetY());
 
 	CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, ch->GetMapIndex(), ch->GetX() - 500, ch->GetY() - 500, ch->GetX() + 500, ch->GetY() + 500);
@@ -736,7 +749,7 @@ ACMD(do_mob)
 
 	const CMob* pkMob = nullptr;
 
-	if (isnhdigit(*arg1))
+	if (isdigit(*arg1))
 	{
 		str_to_number(vnum, arg1);
 
@@ -764,7 +777,7 @@ ACMD(do_mob)
 	else
 		iCount = 1;
 
-	if (test_server)
+	if (g_bIsTestServer)
 		iCount = MIN(40, iCount);
 	else
 		iCount = MIN(20, iCount);
@@ -797,7 +810,7 @@ ACMD(do_mob_ld)
 
 	const CMob* pkMob = nullptr;
 
-	if (isnhdigit(*arg1))
+	if (isdigit(*arg1))
 	{
 		str_to_number(vnum, arg1);
 
@@ -875,20 +888,34 @@ ACMD(do_purge)
 
 	FuncPurge func(ch);
 
-	if (*arg1 && !strcmp(arg1, "all"))
+	bool bMap = false;
+	if (*arg1 && (!strcmp(arg1, "all") || !strcmp(arg1, "map")))
+	{
 		func.m_bAll = true;
+		if (!strcmp(arg1, "map"))
+			bMap = true;
+	}
 
-	LPSECTREE sectree = ch->GetSectree();
-	if (sectree) // #431
-		sectree->ForEachAround(func);
+	if (!bMap)
+	{
+		LPSECTREE sectree = ch->GetSectree();
+		if (sectree)
+			sectree->ForEachAround(func);
+		else
+			sys_err("PURGE_ERROR.NULL_SECTREE(mapIndex=%d, pos=(%d, %d)", ch->GetMapIndex(), ch->GetX(), ch->GetY());
+	}
 	else
-		sys_err("PURGE_ERROR.NULL_SECTREE(mapIndex=%d, pos=(%d, %d)", ch->GetMapIndex(), ch->GetX(), ch->GetY());
+	{
+		LPSECTREE_MAP sectree_map = SECTREE_MANAGER::instance().GetMap(ch->GetMapIndex());
+		if (sectree_map)
+			sectree_map->for_each(func);
+		else
+			sys_err("PURGE_ERROR.NULL_MAP(mapIndex=%d)", ch->GetMapIndex());
+	}
 }
 
-#define ENABLE_CMD_IPURGE_EX
 ACMD(do_item_purge)
 {
-#ifdef ENABLE_CMD_IPURGE_EX
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 	if (!*arg1)
@@ -968,26 +995,6 @@ ACMD(do_item_purge)
 			}
 		}
 	}
-#else
-	int32_t         i;
-	LPITEM      item;
-
-	for (i = 0; i < INVENTORY_AND_EQUIP_SLOT_MAX; ++i)
-	{
-		if ((item = ch->GetInventoryItem(i)))
-		{
-			ITEM_MANAGER::instance().RemoveItem(item, "PURGE");
-			ch->SyncQuickslot(QUICKSLOT_TYPE_ITEM, i, 255);
-		}
-	}   
-	for (i = 0; i < DRAGON_SOUL_INVENTORY_MAX_NUM; ++i)
-	{
-		if ((item = ch->GetItem(TItemPos(DRAGON_SOUL_INVENTORY, i ))))
-		{
-			ITEM_MANAGER::instance().RemoveItem(item, "PURGE");
-		}
-	}   
-#endif
 }
 
 ACMD(do_state)
@@ -1017,16 +1024,29 @@ ACMD(do_state)
 		tch = ch;
 
 	if (!tch)
-		return;
-
+	{
+		CCI* pkCCI = P2P_MANAGER::instance().Find (arg1);
+		if (!pkCCI || !pkCCI->pkDesc)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT ("Player %s isn't currently online."), arg1);
+			return;
+		}
+		else
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT ("Player %s is on channel %d."), arg1, (int32_t) pkCCI->bChannel);
+			return;
+		}
+	}
 	char buf[256];
 
-	snprintf(buf, sizeof(buf), "%s's State: ", tch->GetName());
+	snprintf (buf, sizeof (buf), "%s's VID:(%d) CH:(%d) State: ", tch->GetName(), (uint32_t) tch->GetVID(), g_bChannel);
 
 	if (tch->IsPosition(POS_FIGHTING))
 		strlcat(buf, "Battle", sizeof(buf));
 	else if (tch->IsPosition(POS_DEAD))
 		strlcat(buf, "Dead", sizeof(buf));
+	else if (tch->IsPosition (POS_FISHING))
+		strlcat (buf, "Fishing", sizeof (buf));
 	else
 		strlcat(buf, "Standing", sizeof(buf));
 
@@ -1039,8 +1059,8 @@ ACMD(do_state)
 	ch->ChatPacket(CHAT_TYPE_INFO, "%s", buf);
 
 	int32_t len;
-	len = snprintf(buf, sizeof(buf), "Coordinate %ldx%ld (%ldx%ld)", 
-			tch->GetX(), tch->GetY(), tch->GetX() / 100, tch->GetY() / 100);
+	len = snprintf(buf, sizeof(buf), "Coordinate %dx%d (%dx%d) (rotation %.2f)",
+			tch->GetX(), tch->GetY(), tch->GetX() / 100, tch->GetY() / 100, tch->GetRotation());
 
 	if (len < 0 || len >= (int32_t) sizeof(buf))
 		len = sizeof(buf) - 1;
@@ -1050,13 +1070,13 @@ ACMD(do_state)
 	if (pSec)
 	{
 		TMapSetting& map_setting = SECTREE_MANAGER::instance().GetMap(tch->GetMapIndex())->m_setting;
-		snprintf(buf + len, sizeof(buf) - len, " MapIndex %ld Attribute %08X Local Position (%ld x %ld)", 
+		snprintf(buf + len, sizeof(buf) - len, " MapIndex %d Attribute %08X Local Position (%d x %d)", 
 			tch->GetMapIndex(), pSec->GetAttribute(tch->GetX(), tch->GetY()), (tch->GetX() - map_setting.iBaseX)/100, (tch->GetY() - map_setting.iBaseY)/100);
 	}
 
 	ch->ChatPacket(CHAT_TYPE_INFO, "%s", buf);
 
-	ch->ChatPacket(CHAT_TYPE_INFO, "LEV %d", tch->GetLevel());
+	ch->ChatPacket (CHAT_TYPE_INFO, "Level %d", tch->GetLevel());
 	ch->ChatPacket(CHAT_TYPE_INFO, "HP %d/%d", tch->GetHP(), tch->GetMaxHP());
 	ch->ChatPacket(CHAT_TYPE_INFO, "SP %d/%d", tch->GetSP(), tch->GetMaxSP());
 	ch->ChatPacket(CHAT_TYPE_INFO, "ATT %d MAGIC_ATT %d SPD %d CRIT %d%% PENE %d%% ATT_BONUS %d%%",
@@ -1112,9 +1132,8 @@ ACMD(do_state)
 			tch->GetPoint(POINT_RESIST_ICE),
 			tch->GetPoint(POINT_RESIST_EARTH),
 			tch->GetPoint(POINT_RESIST_DARK));
-#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+
 	ch->ChatPacket(CHAT_TYPE_INFO, "   MAGICREDUCT:%3d%%", tch->GetPoint(POINT_RESIST_MAGIC_REDUCTION));
-#endif
 
 	ch->ChatPacket(CHAT_TYPE_INFO, "MALL:");
 	ch->ChatPacket(CHAT_TYPE_INFO, "   ATT:%3d%% DEF:%3d%% EXP:%3d%% ITEMx%d GOLDx%d",
@@ -1168,7 +1187,18 @@ ACMD(do_state)
 		tch->GetPoint(POINT_IMMUNE_SLOW),
 		tch->GetPoint(POINT_IMMUNE_FALL));
 
+	ch->ChatPacket(CHAT_TYPE_INFO, "MARRIAGE:");
+	ch->ChatPacket(CHAT_TYPE_INFO, "   PENE:%d EXP:%d CRIT:%d TRAN:%d ATT:%d DEF:%d",
+		tch->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_PENETRATE_BONUS),
+		tch->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_EXP_BONUS),
+		tch->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_CRITICAL_BONUS),
+		tch->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_TRANSFER_DAMAGE),
+		tch->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_ATTACK_BONUS),
+		tch->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_DEFENSE_BONUS)
+	);
+
 	for (int32_t i = 0; i < MAX_PRIV_NUM; ++i)
+	{
 		if (CPrivManager::instance().GetPriv(tch, i))
 		{
 			int32_t iByEmpire = CPrivManager::instance().GetPrivByEmpire(tch->GetEmpire(), i);
@@ -1189,16 +1219,13 @@ ACMD(do_state)
 				ch->ChatPacket(CHAT_TYPE_INFO, "%s for player : %d", LC_TEXT(c_apszPrivNames[i]), iByPlayer);
 		}
 }
+}
 
 struct notice_packet_func
 {
 	const char * m_str;
-#ifdef ENABLE_FULL_NOTICE
 	bool m_bBigFont;
 	notice_packet_func(const char * str, bool bBigFont=false) : m_str(str), m_bBigFont(bBigFont)
-#else
-	notice_packet_func(const char * str) : m_str(str)
-#endif
 	{
 	}
 
@@ -1206,26 +1233,40 @@ struct notice_packet_func
 	{
 		if (!d->GetCharacter())
 			return;
-#ifdef ENABLE_FULL_NOTICE
-		d->GetCharacter()->ChatPacket((m_bBigFont)?CHAT_TYPE_BIG_NOTICE:CHAT_TYPE_NOTICE, "%s", m_str);
-#else
-		d->GetCharacter()->ChatPacket(CHAT_TYPE_NOTICE, "%s", m_str);
-#endif
+
+		d->GetCharacter()->ChatPacket((m_bBigFont) ? CHAT_TYPE_BIG_NOTICE : CHAT_TYPE_NOTICE, "%s", m_str);
 	}
 };
 
-#ifdef ENABLE_FULL_NOTICE
+struct command_chat_packet_func
+{
+	const char * m_str;
+
+	command_chat_packet_func(const char * str) : m_str(str)
+	{
+	}
+
+	void operator () (LPDESC d)
+	{
+		if (!d->GetCharacter())
+			return;
+
+		d->GetCharacter()->ChatPacket(CHAT_TYPE_COMMAND, "%s", m_str);
+		if (d->GetCharacter()->IsGM())
+			d->GetCharacter()->ChatPacket(CHAT_TYPE_INFO, "<CMD-INFO> %s", m_str);
+	}
+};
+
 void SendNotice(const char * c_pszBuf, bool bBigFont)
-#else
-void SendNotice(const char * c_pszBuf)
-#endif
 {
 	const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
-#ifdef ENABLE_FULL_NOTICE
 	std::for_each(c_ref_set.begin(), c_ref_set.end(), notice_packet_func(c_pszBuf, bBigFont));
-#else
-	std::for_each(c_ref_set.begin(), c_ref_set.end(), notice_packet_func(c_pszBuf));
-#endif
+}
+
+void SendCmdchat(const char * c_pszBuf)
+{
+	const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
+	std::for_each(c_ref_set.begin(), c_ref_set.end(), command_chat_packet_func(c_pszBuf));
 }
 
 struct notice_map_packet_func
@@ -1278,18 +1319,10 @@ void SendLog(const char * c_pszBuf)
 	std::for_each(c_ref_set.begin(), c_ref_set.end(), log_packet_func(c_pszBuf));
 }
 
-#ifdef ENABLE_FULL_NOTICE
 void BroadcastNotice(const char * c_pszBuf, bool bBigFont)
-#else
-void BroadcastNotice(const char * c_pszBuf)
-#endif
 {
 	TPacketGGNotice p;
-#ifdef ENABLE_FULL_NOTICE
 	p.bHeader = (bBigFont)?HEADER_GG_BIG_NOTICE:HEADER_GG_NOTICE;
-#else
-	p.bHeader = HEADER_GG_NOTICE;
-#endif
 	p.lSize = strlen(c_pszBuf) + 1;
 
 	TEMP_BUFFER buf;
@@ -1298,13 +1331,25 @@ void BroadcastNotice(const char * c_pszBuf)
 
 	P2P_MANAGER::instance().Send(buf.read_peek(), buf.size()); // HEADER_GG_NOTICE
 
-#ifdef ENABLE_FULL_NOTICE
 	SendNotice(c_pszBuf, bBigFont);
-#else
-	SendNotice(c_pszBuf);
-#endif
 }
 
+void BroadcastCmdchat(const char * c_pszBuf)
+{
+	TPacketGCChat pack_chat;
+	pack_chat.header = HEADER_GC_CHAT;
+	pack_chat.size = sizeof(TPacketGCChat) + strlen(c_pszBuf);
+	pack_chat.type = CHAT_TYPE_COMMAND;
+	pack_chat.id = 0;
+
+	TEMP_BUFFER buf;
+	buf.write(&pack_chat, sizeof(TPacketGCChat));
+	buf.write(c_pszBuf, strlen(c_pszBuf));
+
+	P2P_MANAGER::instance().Send(buf.read_peek(), buf.size());
+
+	SendCmdchat(c_pszBuf);
+}
 
 ACMD(do_notice)
 {
@@ -1318,14 +1363,14 @@ ACMD(do_map_notice)
 
 ACMD(do_big_notice)
 {
-#ifdef ENABLE_FULL_NOTICE
 	BroadcastNotice(argument, true);
-#else
-	ch->ChatPacket(CHAT_TYPE_BIG_NOTICE, "%s", argument);
-#endif
 }
 
-#ifdef ENABLE_FULL_NOTICE
+ACMD(do_cmdchati)
+{
+	BroadcastCmdchat(argument);
+}
+
 ACMD(do_map_big_notice)
 {
 	SendNoticeMap(argument, ch->GetMapIndex(), true);
@@ -1340,7 +1385,97 @@ ACMD(do_big_notice_test)
 {
 	ch->ChatPacket(CHAT_TYPE_BIG_NOTICE, "%s", argument);
 }
-#endif
+
+ACMD(do_get_ip)
+{
+	char arg1[256], arg2[256], szQuery[1024], szQuery_[1024];
+	int32_t limit = 0;
+
+	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+
+	if (!*arg1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Wrong syntax, use: /get_ip <char name> [< LIMIT >]");
+		return;
+	}
+
+	if (*arg2)
+		str_to_number(limit, arg2);
+	else
+		limit = 0;
+
+	snprintf(szQuery, sizeof(szQuery), "SELECT id FROM player.player WHERE name = '%s'", arg1);
+	std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
+
+	if (msg->Get()->uiNumRows == 0)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "The character doesn't exist!");
+		return;
+	}
+
+	MYSQL_ROW row = mysql_fetch_row(msg->Get()->pSQLResult);
+
+	if (limit == 0) {
+		snprintf(szQuery_, sizeof(szQuery_), "SELECT INET_NTOA(ip) AS connect_ip FROM log.loginlog2 WHERE pid = %s", row[0]);
+	}
+	else if (limit > 0) {
+		snprintf(szQuery_, sizeof(szQuery_), "SELECT INET_NTOA(ip) AS connect_ip FROM log.loginlog2 WHERE pid = %s LIMIT %d", row[0], limit);
+	}
+	std::unique_ptr<SQLMsg> msg_(DBManager::instance().DirectQuery(szQuery_));
+
+	if (msg_->Get()->uiNumRows == 0)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "The character has never connected to the game!");
+		return;
+	}
+	ch->ChatPacket(CHAT_TYPE_INFO, "The ips from the character %s is:", arg1);
+
+	while (MYSQL_ROW row1 = mysql_fetch_row(msg_->Get()->pSQLResult))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "%s", row1[0]);
+	}
+}
+
+ACMD(do_drop_item)
+{
+	//#Pass 1. With one arg:  args[0] = Cell
+	//#Pass 2. With two args: args[0] = BeginCell args[1] = EndCell
+	char args[2][256];
+
+	argument = two_arguments(argument, args[0], 256, args[1], 256);
+	if (!*args[0])
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Usage: /drop_item <SlotPos> or");
+		ch->ChatPacket(CHAT_TYPE_INFO, "           /drop_item <BeginPos> <EndPos>");
+		return;
+	}
+
+	if (!*args[1])
+	{
+		int32_t Cell = 0;
+		str_to_number(Cell, args[0]);
+		if (Cell >= 0 && Cell < INVENTORY_MAX_NUM)
+			ch->DropItem(TItemPos(INVENTORY, Cell));
+		else
+			ch->ChatPacket(CHAT_TYPE_INFO, "Invalid argument! (Cell:%d)", Cell);
+	}
+	else
+	{
+		int32_t beginPos = 0;
+		str_to_number(beginPos, args[0]);
+		int32_t endPos = 0;
+		str_to_number(endPos, args[1]);
+		sys_log(0, "do_drop_item: beginPos: %d, endPos: %d", beginPos, endPos);
+		if (beginPos >= 0 && endPos < INVENTORY_MAX_NUM && beginPos < endPos)
+		{
+			for (int32_t Cell = beginPos; Cell <= endPos; Cell++)
+				ch->DropItem(TItemPos(INVENTORY, Cell));
+		}
+		else
+			ch->ChatPacket(CHAT_TYPE_INFO, "Invalid arguments! (beginPos:%d; endPos:%d)", beginPos, endPos);
+	}
+}
+
 
 ACMD(do_who)
 {
@@ -1415,6 +1550,50 @@ ACMD(do_user)
 	ch->ChatPacket(CHAT_TYPE_INFO, "Total %d", func.count);
 }
 
+ACMD(do_bg_admin)
+{
+	char arg1[256], arg2[256], arg3[256];
+	argument = two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+	one_argument(argument, arg3, sizeof(arg3));
+
+//	if (!*arg1 || !*arg2 || !*arg3)
+//		return;
+
+	int32_t nArg1 = 0;
+	str_to_number(nArg1, arg1);
+	int32_t nArg2 = 0;
+	str_to_number(nArg2, arg2);
+	int32_t nArg3 = 0;
+	str_to_number(nArg3, arg3);
+
+	switch (nArg1)
+	{
+		case 1: // force initialize battleground
+		{
+			CBattlegroundManager::instance().SetStarted(true);
+		} break;
+		case 2: // force start event
+		{
+			if (CBattlegroundManager::instance().StartEvent(nArg2) == false)
+			{
+				sys_err("Battleground can not started!");
+				return;			
+			}
+		} break;
+		case 3: // force close event
+		{
+			CBattlegroundManager::instance().CloseEvent(nArg2);
+		} break;
+		case 4: // force finalize battleground
+		{
+			CBattlegroundManager::instance().Destroy();
+		} break;
+		default:
+			sys_err("Unknown first param: %s", arg1);
+			break;
+	}
+}
+
 ACMD(do_disconnect)
 {
 	char arg1[256];
@@ -1432,6 +1611,12 @@ ACMD(do_disconnect)
 	if (!tch)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "%s: no such a player.", arg1);
+		return;
+	}
+
+	if (tch->GetGMLevel() > ch->GetGMLevel()) 
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Kendinizden yetkili birini oyundan atamazsiniz."));
 		return;
 	}
 
@@ -1464,10 +1649,15 @@ ACMD(do_kill)
 		return;
 	}
 
+	if (tch->GetGMLevel() > ch->GetGMLevel()) 
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Kendinizden yetkili birini olduremezsiniz."));
+		return;
+	}
+
 	tch->Dead();
 }
 
-#ifdef ENABLE_NEWSTUFF
 ACMD(do_poison)
 {
 	char arg1[256];
@@ -1490,7 +1680,7 @@ ACMD(do_poison)
 
 	tch->AttackedByPoison(nullptr);
 }
-#endif
+
 #ifdef ENABLE_WOLFMAN_CHARACTER
 ACMD(do_bleeding)
 {
@@ -1562,7 +1752,6 @@ ACMD(do_set)
 	if (!*arg1 || !*arg2 || !*arg3)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "Usage: set <name> <field> <value>");
-#ifdef ENABLE_NEWSTUFF
 		ch->ChatPacket(CHAT_TYPE_INFO, "List of the fields available:");
 		for (i = 0; *(set_fields[i].cmd) != '\n'; i++)
 		{
@@ -1570,7 +1759,6 @@ ACMD(do_set)
 			if (set_fields[i].help != nullptr)
 				ch->ChatPacket(CHAT_TYPE_INFO, "  Help: %s", set_fields[i].help);
 		}
-#endif
 		return;
 	}
 
@@ -1579,6 +1767,12 @@ ACMD(do_set)
 	if (!tch)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "%s not exist", arg1);
+		return;
+	}
+
+	if (!g_bIsTestServer && !tch->IsGM())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s GM degil"), arg1);
 		return;
 	}
 
@@ -1594,13 +1788,12 @@ ACMD(do_set)
 			{
 				int32_t gold = 0;
 				str_to_number(gold, arg3);
-				DBManager::instance().SendMoneyLog(MONEY_LOG_MISC, 3, gold);
+				LogManager::instance().MoneyLog(MONEY_LOG_MISC, 3, gold);
 				tch->PointChange(POINT_GOLD, gold, true);
 			}
 			break;
 
 		case DoSetTypes::RACE: // race
-#ifdef ENABLE_NEWSTUFF
 			{
 				int32_t amount = 0;
 				str_to_number(amount, arg3);
@@ -1638,11 +1831,9 @@ ACMD(do_set)
 					// quick mesh change workaround end
 				}
 			}
-#endif
 			break;
 
 		case DoSetTypes::SEX: // sex
-#ifdef ENABLE_NEWSTUFF
 			{
 				int32_t amount = 0;
 				str_to_number(amount, arg3);
@@ -1656,11 +1847,9 @@ ACMD(do_set)
 					// quick mesh change workaround end
 				}
 			}
-#endif
 			break;
 
 		case DoSetTypes::JOB: // job
-#ifdef ENABLE_NEWSTUFF
 			{
 				int32_t amount = 0;
 				str_to_number(amount, arg3);
@@ -1671,7 +1860,6 @@ ACMD(do_set)
 					tch->SetSkillGroup(amount);
 				}
 			}
-#endif
 			break;
 
 		case DoSetTypes::EXP: // exp
@@ -1724,6 +1912,45 @@ ACMD(do_set)
 	}
 }
 
+struct FuncKillAll
+{
+	LPCHARACTER m_ch;
+
+	FuncKillAll(LPCHARACTER ch) :
+		m_ch(ch)
+	{
+	}
+
+	void operator()(LPENTITY ent)
+	{
+		if (ent->IsType(ENTITY_CHARACTER))
+		{
+			LPCHARACTER ch = (LPCHARACTER)ent;
+
+			if (!ch->IsPC() || m_ch == ch || ch->IsGM() || ch->IsDead() || ch->GetHP() <= 0 || ch->GetExchange() || ch->GetMyShop() || ch->IsOpenSafebox() || ch->GetShopOwner() || ch->IsCubeOpen())
+				return;
+
+			float fDist = DISTANCE_APPROX(m_ch->GetX() - ch->GetX(), m_ch->GetY() - ch->GetY());
+			if (fDist > 7000.f)
+				return;
+
+			int32_t damage = ch->GetHP() + number(1, 4250);
+			ch->EffectPacket(SE_CRITICAL);
+			ch->PointChange(POINT_HP, -damage, false);
+			ch->Dead();
+		}
+	}
+};
+ACMD(do_kill_all)
+{
+	LPSECTREE pSec = ch->GetSectree();
+	if (pSec)
+	{
+		FuncKillAll f(ch);
+		pSec->ForEachAround(f);
+	}
+}
+
 ACMD(do_reset)
 {
 	ch->PointChange(POINT_HP, ch->GetMaxHP() - ch->GetHP());
@@ -1747,6 +1974,12 @@ ACMD(do_advance)
 	if (!tch)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "%s not exist", arg1);
+		return;
+	}
+
+	if (!g_bIsTestServer && !tch->IsGM())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s GM degil"), arg1);
 		return;
 	}
 
@@ -1903,14 +2136,7 @@ ACMD(do_fishing_simul)
 
 ACMD(do_invisibility)
 {
-	if (ch->IsAffectFlag(AFF_INVISIBILITY))
-	{
-		ch->RemoveAffect(AFFECT_INVISIBILITY);
-	}
-	else
-	{
-		ch->AddAffect(AFFECT_INVISIBILITY, POINT_NONE, 0, AFF_INVISIBILITY, INFINITE_AFFECT_DURATION, 0, true);
-	}
+	ch->SetGMInvisible(!ch->IsGMInvisible());
 }
 
 ACMD(do_event_flag)
@@ -1936,7 +2162,7 @@ ACMD(do_event_flag)
 			!strcmp(arg1, "mob_gold_buyer") ||
 			!strcmp(arg1, "mob_gold_pct_buyer")
 	   )
-		value = MINMAX(0, value, 1000);
+		value = MINMAX(0, value, EVENT_MOB_RATE_LIMIT);
 
 	//quest::CQuestManager::instance().SetEventFlag(arg1, atoi(arg2));
 	quest::CQuestManager::instance().RequestSetEventFlag(arg1, value);
@@ -1946,7 +2172,11 @@ ACMD(do_event_flag)
 
 ACMD(do_get_event_flag)
 {
-	quest::CQuestManager::instance().SendEventFlagList(ch);
+	// Filter
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	quest::CQuestManager::instance().SendEventFlagList(ch, arg1);
 }
 
 ACMD(do_private)
@@ -2157,7 +2387,7 @@ ACMD(do_book)
 
 	CSkillProto * pkProto;
 
-	if (isnhdigit(*arg1))
+	if (isdigit(*arg1))
 	{
 		uint32_t vnum = 0;
 		str_to_number(vnum, arg1);
@@ -2195,6 +2425,12 @@ ACMD(do_setskillother)
 	if (!tch)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "There is no such character.");
+		return;
+	}
+
+	if (!g_bIsTestServer && !tch->IsGM())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s GM degil"), arg1);
 		return;
 	}
 
@@ -2292,49 +2528,97 @@ ACMD(do_reload)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
+	TPacketGGReloadCommand p2p_packet;
+	p2p_packet.header = HEADER_GG_RELOAD_COMMAND;
+	strlcpy(p2p_packet.argument, arg1, sizeof(p2p_packet.argument));
+	bool bSendP2P = false;
+
 	if (*arg1)
 	{
 		switch (LOWER(*arg1))
 		{
-			case 'u':
-				ch->ChatPacket(CHAT_TYPE_INFO, "Reloading state_user_count.");
-				LoadStateUserCount();
-				break;
-
 			case 'p':
-				ch->ChatPacket(CHAT_TYPE_INFO, "Reloading prototype tables,");
+				if (ch)
+					ch->ChatPacket(CHAT_TYPE_INFO, "Reloading prototype tables,");
 				db_clientdesc->DBPacket(HEADER_GD_RELOAD_PROTO, 0, nullptr, 0);
 				break;
 
 			case 'q':
-				ch->ChatPacket(CHAT_TYPE_INFO, "Reloading quest.");
+				if (ch)
+					ch->ChatPacket(CHAT_TYPE_INFO, "Reloading quest.");
 				quest::CQuestManager::instance().Reload();
+				bSendP2P = true;
 				break;
 
 			case 'f':
 				fishing::Initialize();
+				if (ch)
+					ch->ChatPacket(CHAT_TYPE_INFO, "Reloading fishing infomation.");
+				bSendP2P = true;
 				break;
 
 				//RELOAD_ADMIN
 			case 'a':
-				ch->ChatPacket(CHAT_TYPE_INFO, "Reloading Admin infomation.");
-				db_clientdesc->DBPacket(HEADER_GD_RELOAD_ADMIN, 0, nullptr, 0);
+				if (ch)
+					ch->ChatPacket(CHAT_TYPE_INFO, "Reloading Admin infomation.");
+
+				TPacketReloadAdmin pack;
+				strlcpy(pack.szIP, g_szPublicIP, sizeof(pack.szIP));
+				db_clientdesc->DBPacket(HEADER_GD_RELOAD_ADMIN, 0, &pack, sizeof(TPacketReloadAdmin));
+
 				sys_log(0, "Reloading admin infomation.");
 				break;
 				//END_RELOAD_ADMIN
+
 			case 'c':	// cube
-				// 로컬 프로세스만 갱산한다.
-				Cube_init ();
+				if (ch)
+					ch->ChatPacket(CHAT_TYPE_INFO, "Reloading cube infomation.");
+				Cube_init();
+				bSendP2P = true;
+				break;
+
+			case 'm':
+				char szMOBDropItemFileName[256];
+				snprintf(szMOBDropItemFileName, sizeof(szMOBDropItemFileName),
+					"%s/mob_drop_item.txt", LocaleService_GetBasePath().c_str());
+
+				ITEM_MANAGER::Instance().DestroyMobDropItem();
+
+
+				if (!ITEM_MANAGER::Instance().ReadMonsterDropItemGroup(szMOBDropItemFileName))
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, "Mob_drop_item.txt yenilenemiyor.");
+					return;
+				}
+				ch->ChatPacket(CHAT_TYPE_INFO, "Mob_drop_item.txt yenilendi!");
+				bSendP2P = true;
+				break;
+				
+			case 'x':
+				ch->ChatPacket(CHAT_TYPE_INFO, "Reloading anticheat blacklist.");
+				if (CAnticheatManager::instance().ReloadCheatBlacklists() == false)
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, "Anticheat blacklist reload fail.");
+					return;
+				}
+				bSendP2P = true;
 				break;
 		}
 	}
 	else
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, "Reloading state_user_count.");
-		LoadStateUserCount();
+		if (ch)
+			ch->ChatPacket(CHAT_TYPE_INFO, "Reloading state_user_count.");
 
-		ch->ChatPacket(CHAT_TYPE_INFO, "Reloading prototype tables,");
+		if (ch)
+			ch->ChatPacket(CHAT_TYPE_INFO, "Reloading prototype tables,");
 		db_clientdesc->DBPacket(HEADER_GD_RELOAD_PROTO, 0, nullptr, 0);
+	}
+
+	if (ch && bSendP2P)
+	{
+		P2P_MANAGER::instance().Send(&p2p_packet, sizeof(p2p_packet));
+		ch->ChatPacket(CHAT_TYPE_INFO, "Reloading other cores / channels.");
 	}
 }
 
@@ -2493,26 +2777,22 @@ ACMD(do_getqf)
 		pPC->SendFlagList(ch);
 }
 
-#define ENABLE_SET_STATE_WITH_TARGET
 ACMD(do_set_state)
 {
 	char arg1[256];
 	char arg2[256];
 
-	argument = two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 
 	if (!*arg1 || !*arg2)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO,
 			"Syntax: set_state <questname> <statename>"
-#ifdef ENABLE_SET_STATE_WITH_TARGET
 			" [<character name>]"
-#endif
 		);
 		return;
 	}
 
-#ifdef ENABLE_SET_STATE_WITH_TARGET
 	LPCHARACTER tch = ch;
 	char arg3[256];
 	argument = one_argument(argument, arg3, sizeof(arg3));
@@ -2526,9 +2806,7 @@ ACMD(do_set_state)
 		}
 	}
 	quest::PC* pPC = quest::CQuestManager::instance().GetPCForce(tch->GetPlayerID());
-#else
-	quest::PC* pPC = quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID());
-#endif
+
 	std::string questname = arg1;
 	std::string statename = arg2;
 
@@ -2736,7 +3014,7 @@ ACMD(do_priv_empire)
 	str_to_number(empire, arg1);
 	str_to_number(type,	arg2);
 	str_to_number(value,	arg3);
-	value = MINMAX(0, value, 1000);
+	value = MINMAX(0, value, PRIV_EMPIRE_RATE_LIMIT);
 	str_to_number(duration, arg4);
 
 	if (empire < 0 || 3 < empire)
@@ -2773,8 +3051,6 @@ USAGE:
  */
 ACMD(do_priv_guild)
 {
-	static const char msg[] = { '\0' };
-
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
@@ -2794,7 +3070,7 @@ ACMD(do_priv_guild)
 		else
 		{
 			char buf[1024+1];
-			snprintf(buf, sizeof(buf), msg, g->GetID());
+			snprintf(buf, sizeof(buf), "%u", g->GetID());
 
 			using namespace quest;
 			PC * pc = CQuestManager::instance().GetPC(ch->GetPlayerID());
@@ -2910,60 +3186,8 @@ ACMD(do_block_chat_list)
 	}
 
 	DBManager::instance().ReturnQuery(QID_BLOCK_CHAT_LIST, ch->GetPlayerID(), nullptr, 
-			"SELECT p.name, a.lDuration FROM affect%s as a, player%s as p WHERE a.bType = %d AND a.dwPID = p.id",
-			get_table_postfix(), get_table_postfix(), AFFECT_BLOCK_CHAT);
-}
-
-ACMD(do_vote_block_chat)
-{
-	return;
-
-	char arg1[256];
-	argument = one_argument(argument, arg1, sizeof(arg1));
-
-	if (!*arg1)
-	{
-		ch->ChatPacket(CHAT_TYPE_INFO, "Usage: vote_block_chat <name>");
-		return;
-	}
-
-	const char* name = arg1;
-	int32_t lBlockDuration = 10;
-	sys_log(0, "vote_block_chat %s %d", name, lBlockDuration);
-
-	LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(name);
-
-	if (!tch)
-	{
-		CCI * pkCCI = P2P_MANAGER::instance().Find(name);
-
-		if (pkCCI)
-		{
-			TPacketGGBlockChat p;
-
-			p.bHeader = HEADER_GG_BLOCK_CHAT;
-			strlcpy(p.szName, name, sizeof(p.szName));
-			p.lBlockDuration = lBlockDuration;
-			P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGBlockChat));
-		}
-		else
-		{
-			TPacketBlockChat p;
-
-			strlcpy(p.szName, name, sizeof(p.szName));
-			p.lDuration = lBlockDuration;
-			db_clientdesc->DBPacket(HEADER_GD_BLOCK_CHAT, ch ? ch->GetDesc()->GetHandle() : 0, &p, sizeof(p));
-
-		}
-
-		if (ch)
-			ch->ChatPacket(CHAT_TYPE_INFO, "Chat block requested.");
-
-		return;
-	}
-
-	if (tch && ch != tch)
-		tch->AddAffect(AFFECT_BLOCK_CHAT, POINT_NONE, 0, AFF_NONE, lBlockDuration, 0, true);
+			"SELECT p.name, a.lDuration FROM affect as a, player as p WHERE a.bType = %d AND a.dwPID = p.id",
+			AFFECT_BLOCK_CHAT);
 }
 
 ACMD(do_block_chat)
@@ -3132,7 +3356,7 @@ ACMD(do_build)
 					}
 				}
 
-				if (test_server || GMLevel == GM_PLAYER)
+				if (g_bIsTestServer || GMLevel == GM_PLAYER)
 				{
 					// GM이 아닐경우만 (테섭에서는 GM도 소모)
 					// 건설 비용 체크
@@ -3194,12 +3418,12 @@ ACMD(do_build)
 
 				if (!isSuccess)
 				{
-					if (test_server)
+					if (g_bIsTestServer)
 						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("건물을 지을 수 없는 위치입니다."));
 					return;
 				}
 
-				if (test_server || GMLevel == GM_PLAYER)
+				if (g_bIsTestServer || GMLevel == GM_PLAYER)
 					// 건설 재료 소모하기 (테섭에서는 GM도 소모)
 				{
 					// 건설 비용 소모
@@ -3523,9 +3747,25 @@ ACMD(do_affect_remove)
 
 ACMD(do_change_attr)
 {
-	LPITEM weapon = ch->GetWear(WEAR_WEAPON);
-	if (weapon)
-		weapon->ChangeAttribute();
+	char cArg1[256];
+	one_argument(argument, cArg1, sizeof(cArg1));
+
+	if (!*cArg1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Syntax: /change_attr <EWearPositions>");
+		return;
+	}
+
+	uint8_t byType = 0;
+	str_to_number(byType, cArg1);
+	uint8_t byFlags = WEAR_BODY | WEAR_HEAD | WEAR_FOOTS | WEAR_WRIST | WEAR_WEAPON | WEAR_NECK | WEAR_EAR | WEAR_SHIELD;
+
+	if (byFlags & byType)
+	{
+		LPITEM item = ch->GetWear(byType);
+		if (item)
+			item->ChangeAttribute();
+	}
 }
 
 ACMD(do_add_attr)
@@ -3542,7 +3782,6 @@ ACMD(do_add_socket)
 		weapon->AddSocket();
 }
 
-#ifdef ENABLE_NEWSTUFF
 ACMD(do_change_rare_attr)
 {
 	LPITEM weapon = ch->GetWear(WEAR_WEAPON);
@@ -3556,7 +3795,7 @@ ACMD(do_add_rare_attr)
 	if (weapon)
 		weapon->AddRareAttribute();
 }
-#endif
+
 ACMD(do_show_arena_list)
 {
 	CArenaManager::instance().SendArenaMapListTo(ch);
@@ -3667,7 +3906,6 @@ ACMD(do_duel)
 	}
 }
 
-#define ENABLE_STATPLUS_NOLIMIT
 ACMD(do_stat_plus_amount)
 {
 	char szPoint[256];
@@ -3706,7 +3944,6 @@ ACMD(do_stat_plus_amount)
 		return;
 	}
 	
-#ifndef ENABLE_STATPLUS_NOLIMIT
 	switch (subcmd)
 	{
 		case POINT_HT : // 체력
@@ -3742,7 +3979,6 @@ ACMD(do_stat_plus_amount)
 			return;
 			break;
 	}
-#endif
 
 	if (nPoint != 0)
 	{
@@ -3911,6 +4147,15 @@ ACMD(do_event_helper)
 struct FMobCounter
 {
 	int32_t nCount;
+	int32_t nStoneCount;
+	uint32_t dwSpecificVnum;
+
+	FMobCounter(uint32_t tdwSpecificVnum) 
+	{
+		dwSpecificVnum = tdwSpecificVnum;
+		nCount = 0;
+		nStoneCount = 0;
+	}
 
 	void operator () (LPENTITY ent)
 	{
@@ -3918,27 +4163,44 @@ struct FMobCounter
 		{
 			LPCHARACTER pChar = static_cast<LPCHARACTER>(ent);
 
-			if (pChar->IsMonster() == true || pChar->IsStone())
+			if (dwSpecificVnum) 
 			{
-				nCount++;
+				if (pChar->GetRaceNum() == dwSpecificVnum)
+					nCount++;
+
+				return;
 			}
+
+			if (pChar->IsMonster())
+				nCount++;
+
+			if (pChar->IsStone())
+				nStoneCount++;
 		}
 	}
 };
 
 ACMD(do_get_mob_count)
 {
-	LPSECTREE_MAP pSectree = SECTREE_MANAGER::instance().GetMap(ch->GetMapIndex());
+	char arg1[50];
+	one_argument(argument, arg1, sizeof(arg1));
+	if (!*arg1)
+		return;
 
+	uint32_t specificVnum = 0;
+	str_to_number(specificVnum, arg1);
+
+	LPSECTREE_MAP pSectree = SECTREE_MANAGER::instance().GetMap(ch->GetMapIndex());
 	if (pSectree == nullptr)
 		return;
 
-	FMobCounter f;
-	f.nCount = 0;
-
+	FMobCounter f(specificVnum);
 	pSectree->for_each(f);
 
-	ch->ChatPacket(CHAT_TYPE_INFO, "MapIndex: %d MobCount %d", ch->GetMapIndex(), f.nCount);
+	if (specificVnum)
+		ch->ChatPacket(CHAT_TYPE_INFO, "MapIndex: %d - Count of %u: %d", ch->GetMapIndex(), specificVnum, f.nCount);
+	else
+		ch->ChatPacket(CHAT_TYPE_INFO, "MapIndex: %d - Mob count: %d, Stone count: %d", ch->GetMapIndex(), f.nCount, f.nStoneCount);
 }
 
 ACMD(do_clear_land)
@@ -4505,3 +4767,179 @@ ACMD (do_ds_list)
 			ch->ChatPacket(CHAT_TYPE_INFO, "cell : %d, name : %s, id : %d", item->GetCell(), item->GetName(), item->GetID());
 	}
 }
+
+ACMD(do_remove_rights)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "usage: remove_rights <player name>");
+		return;
+	}
+
+	if (!strcasecmp(ch->GetName(), arg1))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "You cannot remove your own rights.");
+		return;
+	}
+
+	if (GM::get_level(arg1) == GM_PLAYER)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "No player %s with GM-Rights has been found.", arg1);
+		return;
+	}
+
+	GM::remove(arg1);
+
+	LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(arg1);
+	if (tch)
+		tch->SetGMLevel();
+
+	TPacketGGUpdateRights packet;
+	packet.header = HEADER_GG_UPDATE_RIGHTS;
+	strlcpy(packet.name, arg1, sizeof(packet.name));
+	packet.gm_level = GM_PLAYER;
+	P2P_MANAGER::instance().Send(&packet, sizeof(packet));
+
+	ch->ChatPacket(CHAT_TYPE_INFO, "The rights of %s has been removed (new status: GM_PLAYER).", arg1);
+}
+
+ACMD(do_give_rights)
+{
+	char arg1[256], arg2[256];
+	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+
+	if (!*arg1 || !*arg2)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "usage: give_rights <right name[\"LOW_WIZARD\",\"WIZARD\",\"HIGH_WIZARD\",\"GOD\",\"IMPLEMENTOR\"]/id[1-5]) <player name>");
+		return;
+	}
+
+	uint8_t bAuthority;
+	if (str_is_number(arg1))
+	{
+		str_to_number(bAuthority, arg1);
+		if (bAuthority <= GM_PLAYER || bAuthority > GM_IMPLEMENTOR)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Unkown right-ID %u [expected number between 1 and 5]", bAuthority);
+			return;
+		}
+	}
+	else
+	{
+		if (!strcasecmp(arg1, "LOW_WIZARD"))
+			bAuthority = GM_LOW_WIZARD;
+		else if (!strcasecmp(arg1, "WIZARD"))
+			bAuthority = GM_WIZARD;
+		else if (!strcasecmp(arg1, "HIGH_WIZARD"))
+			bAuthority = GM_HIGH_WIZARD;
+		else if (!strcasecmp(arg1, "GOD"))
+			bAuthority = GM_GOD;
+		else if (!strcasecmp(arg1, "IMPLEMENTOR"))
+			bAuthority = GM_IMPLEMENTOR;
+		else
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Unkown right-name %s [expected \"LOW_WIZARD\", \"WIZARD\", \"HIGH_WIZARD\", \"GOD\" or \"IMPLEMENTOR\"]", arg1);
+			return;
+		}
+	}
+
+	if (!strcasecmp(ch->GetName(), arg2))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "You cannot give rights to yourself.");
+		return;
+	}
+
+	LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(arg2);
+	if (!tch)
+	{
+		CCI* p2pCCI = P2P_MANAGER::instance().Find(arg2);
+		if (!p2pCCI)
+		{
+			std::unique_ptr<SQLMsg> pMsg(DBManager::instance().DirectQuery("SELECT name FROM player WHERE name LIKE '%s'", arg2));
+			if (pMsg->Get()->uiNumRows == 0)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, "The player %s does not exist.", arg2);
+				return;
+			}
+
+			strlcpy(arg2, *mysql_fetch_row(pMsg->Get()->pSQLResult), sizeof(arg2));
+		}
+		else
+			strlcpy(arg2, p2pCCI->szName, sizeof(arg2));
+	}
+	else
+		strlcpy(arg2, tch->GetName(), sizeof(arg2));
+
+	tAdminInfo info;
+	memset(&info, 0, sizeof(info));
+	info.m_Authority = bAuthority;
+	strlcpy(info.m_szName, arg2, sizeof(info.m_szName));
+	strlcpy(info.m_szAccount, "[ALL]", sizeof(info.m_szAccount));
+	GM::insert(info);
+
+	if (tch)
+		tch->SetGMLevel();
+
+	TPacketGGUpdateRights packet;
+	packet.header = HEADER_GG_UPDATE_RIGHTS;
+	strlcpy(packet.name, arg2, sizeof(packet.name));
+	packet.gm_level = bAuthority;
+	P2P_MANAGER::instance().Send(&packet, sizeof(packet));
+
+	ch->ChatPacket(CHAT_TYPE_INFO, "The rights of %s has been changed to %s.", arg2, arg1);
+}
+
+ACMD(do_get_distance)
+{
+	char arg1[256], arg2[256];
+	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+	if (!*arg1 || !str_is_number(arg1) || !*arg2 || !str_is_number(arg2))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "usage: get_distance <local_x> <local_y>");
+		return;
+	}
+
+	int32_t lX, lY;
+	str_to_number(lX, arg1);
+	str_to_number(lY, arg2);
+
+	GPOS basePos;
+	if (!SECTREE_MANAGER::instance().GetMapBasePositionByMapIndex(ch->GetMapIndex(), basePos))
+		return;
+
+	int32_t iDistance = DISTANCE_APPROX(ch->GetX() - (lX + basePos.x), ch->GetY() - (lY + basePos.y));
+	ch->ChatPacket(CHAT_TYPE_INFO, "Distance to (%ld, %ld) is %d.", lX, lY, iDistance);
+}
+
+ACMD(do_gamemaster)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1 || !str_is_number(arg1))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "usage: gamemaster <mode [0/1]>");
+		return;
+	}
+
+	int32_t arg1_int = 0;
+	str_to_number(arg1_int, arg1);
+
+	bool mode = (arg1_int > 0);
+
+	uint32_t dwVnum = 0;
+
+	if (mode)
+		dwVnum = 20082;
+	else
+		dwVnum = 1;
+
+	ch->SetGMInvisible(true);
+	ch->SetPolymorph(dwVnum, false);
+	ch->WarpSet(ch->GetX() + (rand() % 100) + 50, ch->GetY() + (rand() % 100) + 50, ch->GetMapIndex());
+	ch->SetGMInvisible(false);
+}
+

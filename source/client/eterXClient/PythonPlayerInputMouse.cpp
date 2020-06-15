@@ -1,8 +1,7 @@
 #include "StdAfx.h"
 #include "PythonPlayer.h"
 #include "PythonApplication.h"
-
-#include "../eterlib/Camera.h"
+#include "../eterLib/Camera.h"
 
 void CPythonPlayer::NEW_SetMouseMoveState(int32_t eMBS)
 {
@@ -30,8 +29,8 @@ bool CPythonPlayer::NEW_MoveToMouseScreenDirection()
 
 	int32_t lScrWidth = rkWndMgr.GetScreenWidth();
 	int32_t lScrHeight = rkWndMgr.GetScreenHeight();
-	float fMouseX=lMouseX/float(lScrWidth);
-	float fMouseY=lMouseY/float(lScrHeight);
+	float fMouseX = lMouseX / static_cast<float>(lScrWidth);
+	float fMouseY = lMouseY / static_cast<float>(lScrHeight);
 
 	float fDirRot;
 	NEW_GetMouseDirRotation(fMouseX, fMouseY, &fDirRot);
@@ -82,9 +81,7 @@ void CPythonPlayer::NEW_SetMouseCameraState(int32_t eMBS)
 
 				CInstanceBase * pkInstPicked;
 				if (__GetPickedActorPtr(&pkInstPicked))
-				{
 					OpenCharacterMenu(pkInstPicked->GetVirtualID());
-				}
 			}
 		}
 	}
@@ -95,7 +92,8 @@ void CPythonPlayer::NEW_SetMouseCameraState(int32_t eMBS)
 void CPythonPlayer::NEW_SetMouseSmartState(int32_t eMBS, bool isAuto)
 {
 	CInstanceBase* pkInstMain=NEW_GetMainActorPtr();
-	if (!pkInstMain) return;
+	if (!pkInstMain)
+		return;
 
 	// PrivateShop
 	if (IsOpenPrivateShop())
@@ -107,15 +105,11 @@ void CPythonPlayer::NEW_SetMouseSmartState(int32_t eMBS, bool isAuto)
 
 	// Emotion
 	if (__IsProcessingEmotion())
-	{
 		return;
-	}
 
 	// AFFECT_STUN Ã³¸®
 	if (pkInstMain->IsSleep())
-	{
 		return;
-	}
 
 	if (MBS_PRESS==eMBS)
 	{
@@ -142,21 +136,13 @@ void CPythonPlayer::__OnPressSmart(CInstanceBase& rkInstMain, bool isAuto)
 	bool isPickedGroundPos=__GetPickedGroundPos(&kPPosPickedGround);
 
 	if (isPickedItemID)
-	{
 		__OnPressItem(rkInstMain, dwPickedItemID);
-	}
 	else if (isPickedActorID && dwPickedActorID != GetMainCharacterIndex())
-	{
 		__OnPressActor(rkInstMain, dwPickedActorID, isAuto);
-	}
 	else if (isPickedGroundPos)
-	{
 		__OnPressGround(rkInstMain, kPPosPickedGround);
-	}
 	else
-	{
 		__OnPressScreen(rkInstMain);
-	}
 }
 
 void CPythonPlayer::__OnClickSmart(CInstanceBase& rkInstMain, bool isAuto)
@@ -165,21 +151,13 @@ void CPythonPlayer::__OnClickSmart(CInstanceBase& rkInstMain, bool isAuto)
 	uint32_t dwPickedActorID;
 	TPixelPosition kPPosPickedGround;
 	if (__GetPickedItemID(&dwPickedItemID))
-	{
 		__OnClickItem(rkInstMain, dwPickedItemID);
-	}
 	else if (__GetPickedActorID(&dwPickedActorID))
-	{
 		__OnClickActor(rkInstMain, dwPickedActorID, isAuto);
-	}
 	else if (__GetPickedGroundPos(&kPPosPickedGround))
-	{
 		__OnClickGround(rkInstMain, kPPosPickedGround);
-	}
 	else
-	{
 		rkInstMain.NEW_Stop();
-	}
 }
 
 void CPythonPlayer::__ShowPickedEffect(const TPixelPosition& c_rkPPosPickedGround)
@@ -225,13 +203,9 @@ bool CPythonPlayer::NEW_SetMouseState(int32_t eMBT, int32_t eMBS)
 			break;
 		case MBF_SMART:
 			if (CPythonApplication::Instance().IsPressed(DIK_LCONTROL) || CPythonApplication::Instance().IsPressed(DIK_RCONTROL))
-			{
-				NEW_Attack();
-			}
-			else
-			{
-				NEW_SetMouseSmartState(eMBS, false);
-			}
+			NEW_Attack();
+		else
+			NEW_SetMouseSmartState(eMBS, false);
 			break;
 		case MBF_CAMERA:
 			NEW_SetMouseCameraState(eMBS);
@@ -271,7 +245,8 @@ void CPythonPlayer::NEW_SetMouseMiddleButtonState(int32_t eMBState)
 void CPythonPlayer::NEW_RefreshMouseWalkingDirection()
 {
 	CInstanceBase* pkInstMain = NEW_GetMainActorPtr();
-	if (!pkInstMain) return;
+	if (!pkInstMain)
+		return;
 
 	switch (m_eReservedMode)
 	{

@@ -44,17 +44,28 @@ void CAnticheatManager::CheckMainFolderFiles()
 			file.substr(file.find_last_of(".") + 1) == xorstr("def").crypt_get() ||
 			file.substr(file.find_last_of(".") + 1) == xorstr("py").crypt_get())
 		{
+#ifdef _DEBUG
+			auto vAllowedFiles = std::vector <std::string> {
+				"find_files.py",
+				"make_patch.py"
+			};
+
+			if (std::find(vAllowedFiles.begin(), vAllowedFiles.end(), file) != vAllowedFiles.end())
+				continue;
+#endif
+
 			TraceError(xorstr("Unallowed file found on main folder! File: %s").crypt_get(), file.c_str());
 			abort();
 		}
 
-		if (file == xorstr("mss32.dll").crypt_get() && GetFileMd5(file) != "6400e224b8b44ece59a992e6d8233719")
+		auto stCorrectHash = GetFileMd5(file);
+		if (file == xorstr("mss32.dll").crypt_get() && stCorrectHash != "6400e224b8b44ece59a992e6d8233719")
 		{
 			TraceError(xorstr("mss32.dll file is corrupted! Please delete it and restart game").crypt_get());
 			abort();
 		}
 
-		if (file == xorstr("devil.dll").crypt_get() && GetFileMd5(file) != "26eec5cc3d26cb38c93de01a3eb84cff")
+		if (file == xorstr("devil.dll").crypt_get() && stCorrectHash != "8df4d4324e5755f1a0567db3c5be4c58")
 		{
 			TraceError(xorstr("devil.dll file is corrupted! Please delete it and restart game").crypt_get());
 			abort();

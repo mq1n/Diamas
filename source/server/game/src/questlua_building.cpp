@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "config.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "sectree_manager.h"
 #include "char.h"
 #include "guild.h"
@@ -97,7 +97,7 @@ namespace quest
 			lua_pushboolean(L, false);
 		*/
 
-		std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT COUNT(*) FROM land%s WHERE guild_id = %d", get_table_postfix(), (uint32_t)lua_tonumber(L,1)));
+		std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT COUNT(*) FROM land WHERE guild_id = %d", (uint32_t)lua_tonumber(L,1)));
 
 		if ( pmsg->Get()->uiNumRows > 0 )
 		{
@@ -127,6 +127,11 @@ namespace quest
 	{
 		using namespace building;
 
+		if (!lua_isnumber(L, 1))
+		{
+			sys_err("invalid argument");
+			return 0;
+		}
 		uint32_t dwNewBuilding = (uint32_t)lua_tonumber(L, 1);
 
 		CQuestManager& q = CQuestManager::instance();

@@ -2,14 +2,15 @@
 #define __INC_METIN_II_GAME_INPUT_PROCESSOR__
 
 #include "packet_info.h"
+#include "typedef.h"
+#include "../../common/service.h"
 
-enum
+enum EInprocState
 {
 	INPROC_CLOSE,
 	INPROC_HANDSHAKE,
 	INPROC_LOGIN,
 	INPROC_MAIN,
-	INPROC_DEAD,
 	INPROC_DB,
 	INPROC_P2P,
 	INPROC_AUTH,
@@ -131,6 +132,8 @@ class CInputMain : public CInputProcessor
 		void		QuestInputString(LPCHARACTER ch, const void * pvData);
 		void		QuestConfirm(LPCHARACTER ch, const void* pvData);
 		void		Target(LPCHARACTER ch, const char * pcData);
+		void		TargetDrop(LPCHARACTER ch, const char * pcData);
+		void		ChestDropInfo(LPCHARACTER ch, const char * c_pData);
 		void		Warp(LPCHARACTER ch, const char * pcData);
 		void		SafeboxCheckin(LPCHARACTER ch, const char * c_pData);
 		void		SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMall);
@@ -186,6 +189,7 @@ protected:
 	void		P2P(const char * c_pData);
 	void		ItemLoad(LPDESC d, const char * c_pData);
 	void		AffectLoad(LPDESC d, const char * c_pData);
+	void		ActivityLoad(LPDESC d, const char* c_pData);
 
 	void		GuildLoad(const char * c_pData);
 	void		GuildSkillUpdate(const char* c_pData);
@@ -228,8 +232,6 @@ protected:
 	void		ChangeEmpirePriv(const char* c_pData);
 	void		ChangeGuildPriv(const char* c_pData);
 	void		ChangeCharacterPriv(const char* c_pData);
-
-	void		MoneyLog(const char* c_pData);
 
 	void		SetEventFlag(const char* c_pData);
 
@@ -285,11 +287,7 @@ class CInputP2P : public CInputProcessor
 		void		Login(LPDESC d, const char * c_pData);
 		void		Logout(LPDESC d, const char * c_pData);
 		int32_t			Relay(LPDESC d, const char * c_pData, size_t uiBytes);
-#ifdef ENABLE_FULL_NOTICE
 		int32_t			Notice(LPDESC d, const char * c_pData, size_t uiBytes, bool bBigFont=false);
-#else
-		int32_t			Notice(LPDESC d, const char * c_pData, size_t uiBytes);
-#endif
 		int32_t			Guild(LPDESC d, const char* c_pData, size_t uiBytes);
 		void		Shout(const char * c_pData);
 		void		Disconnect(const char * c_pData);
@@ -304,6 +302,12 @@ class CInputP2P : public CInputProcessor
 		void		LoginPing(LPDESC d, const char * c_pData);
 		void		BlockChat(const char * c_pData);
 		void		IamAwake(LPDESC d, const char * c_pData);
+
+		void		UpdateRights(const char * c_pData);
+
+		void		MessengerRequest(const char * c_pData);
+		void		MessengerRequestFail(const char * c_pData);
+
 
 	protected:
 		CPacketInfoGG 	m_packetInfoGG;

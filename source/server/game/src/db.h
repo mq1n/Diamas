@@ -2,20 +2,21 @@
 #define __INC_METIN_II_DB_MANAGER_H__
 
 #include "../../libsql/include/AsyncSQL.h"
+#include "../../common/length.h"
 #include <functional>
 
-enum
+enum EQuertyType
 {
-	QUERY_TYPE_RETURN = 1,
-	QUERY_TYPE_FUNCTION = 2,
-	QUERY_TYPE_AFTER_FUNCTION = 3,
+	QUERY_TYPE_RETURN			= 0,
+	QUERY_TYPE_FUNCTION			= 1,
+	QUERY_TYPE_AFTER_FUNCTION	= 2,
 };
 
-enum
+enum EQid
 {
-	QID_SAFEBOX_SIZE,
-	QID_AUTH_LOGIN,
-	QID_BLOCK_CHAT_LIST,
+	QID_SAFEBOX_SIZE			= 0,
+	QID_AUTH_LOGIN				= 1,
+	QID_BLOCK_CHAT_LIST			= 2,
 };
 
 typedef struct SUseTime
@@ -72,8 +73,6 @@ class DBManager : public singleton<DBManager>
 		void			Process();
 		void			AnalyzeReturnQuery(SQLMsg * pmsg);
 
-		void			SendMoneyLog(uint8_t type, uint32_t vnum, int32_t gold);
-
 		void			LoginPrepare(LPDESC d, uint32_t * pdwClientKey, int32_t * paiPremiumTimes = nullptr);
 		void			SendAuthLogin(LPDESC d);
 		void			SendLoginPing(const char * c_pszLogin);
@@ -86,8 +85,8 @@ class DBManager : public singleton<DBManager>
 		uint32_t			CountQueryResult()	{ return m_sql.CountResult(); }
 		void			ResetQueryResult()	{ m_sql.ResetQueryFinished(); }
 
-		template<class Functor> void FuncQuery(Functor f, const char * c_pszFormat, ...); // 결과를 f인자로 호출함 (SQLMsg *) 알아서 해제됨
-		template<class Functor> void FuncAfterQuery(Functor f, const char * c_pszFormat, ...); // 끝나고 나면 f가 호출됨 void			f(void) 형태
+		void FuncQuery(std::function<void(SQLMsg*)> f, const char * c_pszFormat, ...); 
+		void FuncAfterQuery(std::function<void()> f, const char * c_pszFormat, ...);
 
 		size_t EscapeString(char* dst, size_t dstSize, const char *src, size_t srcSize);
 
@@ -101,40 +100,6 @@ class DBManager : public singleton<DBManager>
 		std::map<uint32_t, CLoginData *>		m_map_pkLoginData;
 		std::vector<TUseTime>			m_vec_kUseTime;
 };
-
-template <class Functor> void DBManager::FuncQuery(Functor f, const char* c_pszFormat, ...)
-{
-	char szQuery[4096];
-	va_list args;
-
-	va_start(args, c_pszFormat);
-	vsnprintf(szQuery, 4096, c_pszFormat, args);
-	va_end(args);
-
-	CFuncQueryInfo * p = M2_NEW CFuncQueryInfo;
-
-	p->iQueryType = QUERY_TYPE_FUNCTION;
-	p->f = f;
-
-	m_sql.ReturnQuery(szQuery, p);
-}
-
-template <class Functor> void DBManager::FuncAfterQuery(Functor f, const char* c_pszFormat, ...)
-{
-	char szQuery[4096];
-	va_list args;
-
-	va_start(args, c_pszFormat);
-	vsnprintf(szQuery, 4096, c_pszFormat, args);
-	va_end(args);
-
-	CFuncAfterQueryInfo * p = M2_NEW CFuncAfterQueryInfo;
-
-	p->iQueryType = QUERY_TYPE_AFTER_FUNCTION;
-	p->f = f;
-
-	m_sql.ReturnQuery(szQuery, p);
-}
 
 // ACCOUNT_DB
 class AccountDB : public singleton<AccountDB>

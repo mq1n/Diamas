@@ -10,7 +10,7 @@
 #include "crc32.h"
 #include "char.h"
 #include "char_manager.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 
 // @fixme142 BEGIN
 static char	__account[CHARACTER_NAME_MAX_LEN*2+1];
@@ -55,7 +55,7 @@ void MessengerManager::Login(MessengerManager::keyA account)
 	// @fixme142 END
 
 	DBManager::instance().FuncQuery(std::bind(&MessengerManager::LoadList, this, std::placeholders::_1),
-			"SELECT account, companion FROM messenger_list%s WHERE account='%s'", get_table_postfix(), __account);
+			"SELECT account, companion FROM messenger_list WHERE account='%s'", __account);
 
 	m_set_loginAccount.insert(account);
 }
@@ -120,6 +120,65 @@ void MessengerManager::Logout(MessengerManager::keyA account)
 	}
 
 	m_Relation.erase(account);
+}
+
+void MessengerManager::RequestToAdd(LPCHARACTER ch, const char* pszTargetName)
+{
+	if (!ch || !ch->IsPC())
+		return;
+
+	CCI* pCCI = P2P_MANAGER::instance().Find(pszTargetName);
+	if (!(pCCI && pCCI->pkDesc))
+	{
+		LPCHARACTER target = CHARACTER_MANAGER::instance().FindPC(pszTargetName);
+		if (target)
+			RequestToAdd(ch, target);
+		return;
+	}
+
+	if (quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID())->IsRunning() == true)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 친구 추가를 받을 수 없는 상태입니다."));
+		return;
+	}
+
+	TPacketGGMessengerRequest pack;
+	pack.bHeader = HEADER_GG_MESSENGER_REQUEST;
+	strlcpy(pack.szRequestor, ch->GetName(), sizeof(pack.szRequestor));
+	pack.dwTargetPID = pCCI->dwPID;
+	pCCI->pkDesc->Packet(&pack, sizeof(TPacketGGMessengerRequest));
+}
+
+void MessengerManager::RequestToAdd(const char* pszName, LPCHARACTER target)
+{
+	if (!target || !target->IsPC())
+		return;
+
+	CCI* pCCI = P2P_MANAGER::instance().Find(pszName);
+	if (!(pCCI && pCCI->pkDesc))
+	{
+		LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(pszName);
+		if (ch)
+			RequestToAdd(ch, target);
+		return;
+	}
+
+	if (quest::CQuestManager::instance().GetPCForce(target->GetPlayerID())->IsRunning() == true)
+	{
+		target->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 친구 추가를 받을 수 없는 상태입니다."));
+		return;
+	}
+
+	uint32_t dw1 = GetCRC32(pszName, strlen(pszName));
+	uint32_t dw2 = GetCRC32(target->GetName(), strlen(target->GetName()));
+
+	char buf[64];
+	snprintf(buf, sizeof(buf), "%u:%u", dw1, dw2);
+	uint32_t dwComplex = GetCRC32(buf, strlen(buf));
+
+	m_set_requestToAdd.insert(dwComplex);
+
+	target->ChatPacket(CHAT_TYPE_COMMAND, "messenger_auth %s", pszName);
 }
 
 void MessengerManager::RequestToAdd(LPCHARACTER ch, LPCHARACTER target)
@@ -189,7 +248,7 @@ void MessengerManager::__AddToList(MessengerManager::keyA account, MessengerMana
 
 	LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(companion.c_str());
 
-	if (tch)
+	if (tch || P2P_MANAGER::instance().Find(companion.c_str()))
 		SendLogin(account, companion);
 	else
 		SendLogout(account, companion);
@@ -211,8 +270,7 @@ void MessengerManager::AddToList(MessengerManager::keyA account, MessengerManage
 	// @fixme142 END
 
 	sys_log(0, "Messenger Add %s %s", account.c_str(), companion.c_str());
-	DBManager::instance().Query("INSERT INTO messenger_list%s VALUES ('%s', '%s')",
-			get_table_postfix(), __account, __companion);
+	DBManager::instance().Query("INSERT INTO messenger_list VALUES ('%s', '%s')",  __account, __companion);
 
 	__AddToList(account, companion);
 
@@ -249,8 +307,7 @@ void MessengerManager::RemoveFromList(MessengerManager::keyA account, MessengerM
 	// @fixme142 END
 
 	sys_log(1, "Messenger Remove %s %s", account.c_str(), companion.c_str());
-	DBManager::instance().Query("DELETE FROM messenger_list%s WHERE account='%s' AND companion = '%s'",
-			get_table_postfix(), __account, __companion);
+	DBManager::instance().Query("DELETE FROM messenger_list WHERE account='%s' AND companion = '%s'", __account, __companion);
 
 	__RemoveFromList(account, companion);
 
@@ -273,8 +330,7 @@ void MessengerManager::RemoveAllList(keyA account)
 	// @fixme142 END
 
 	/* SQL Data 삭제 */
-	DBManager::instance().Query("DELETE FROM messenger_list%s WHERE account='%s' OR companion='%s'",
-			get_table_postfix(), __account, __account);
+	DBManager::instance().Query("DELETE FROM messenger_list WHERE account='%s' OR companion='%s'", __account, __account);
 
 	/* 내가 가지고있는 리스트 삭제 */
 	for (std::set<keyT>::iterator iter = company.begin();
@@ -370,7 +426,7 @@ void MessengerManager::SendLogin(MessengerManager::keyA account, MessengerManage
 	if (!d->GetCharacter())
 		return;
 
-	if (ch->GetGMLevel() == GM_PLAYER && gm_get_level(companion.c_str()) != GM_PLAYER)
+	if (ch->GetGMLevel() == GM_PLAYER && GM::get_level(companion.c_str()) != GM_PLAYER)
 		return;
 
 	uint8_t bLen = companion.size();

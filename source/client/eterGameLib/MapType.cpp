@@ -143,13 +143,9 @@ bool PropertyBuildingStringToData(CProperty * pProperty, TPropertyBuilding * pDa
 
 	const char * c_pszShadowFlag;
 	if (!pProperty->GetString("ShadowFlag", &c_pszShadowFlag))
-	{
 		pData->isShadowFlag = FALSE;
-	}
 	else
-	{
 		pData->isShadowFlag = atoi(c_pszShadowFlag);
-	}
 
 	return true;
 }
@@ -203,11 +199,11 @@ bool PropertyAmbienceDataToString(TPropertyAmbience * pData, CProperty * pProper
 	pProperty->PutString("MaxVolumeAreaPercentage", FloatNumberToString(pData->fMaxVolumeAreaPercentage));
 
 	CTokenVector AmbienceSoundVector;
-	std::vector<std::string>::iterator itor = pData->AmbienceSoundVector.begin();
+	auto itor = pData->AmbienceSoundVector.begin();
 	for (; itor != pData->AmbienceSoundVector.end(); ++itor)
 	{
 		std::string & rstrToken = *itor;
-		AmbienceSoundVector.push_back(rstrToken.c_str());
+		AmbienceSoundVector.emplace_back(rstrToken.c_str());
 	}
 	pProperty->PutVector("AmbienceSoundVector", AmbienceSoundVector);
 	return true;
@@ -243,9 +239,7 @@ bool PropertyAmbienceStringToData(CProperty * pProperty, TPropertyAmbience * pDa
 	if (!pProperty->GetString("PlayIntervalVariation", &c_pszPlayIntervalVariation))
 		return false;
 	if (!pProperty->GetString("MaxVolumeAreaPercentage", &c_pszMaxVolumeAreaPercentage))
-	{
 		pData->fMaxVolumeAreaPercentage = 0.0f;
-	}
 	if (!pProperty->GetVector("AmbienceSoundVector", AmbienceSoundVector))
 		return false;
 
@@ -254,8 +248,8 @@ bool PropertyAmbienceStringToData(CProperty * pProperty, TPropertyAmbience * pDa
 	pData->fPlayIntervalVariation = atof(c_pszPlayIntervalVariation);
 	if (c_pszMaxVolumeAreaPercentage)
 		pData->fMaxVolumeAreaPercentage = atof(c_pszMaxVolumeAreaPercentage);
-	for (CTokenVector::iterator itor = AmbienceSoundVector.begin(); itor != AmbienceSoundVector.end(); ++itor)
-		pData->AmbienceSoundVector.push_back(*itor);
+	for (auto & itor : AmbienceSoundVector)
+		pData->AmbienceSoundVector.emplace_back(itor);
 
 	return true;
 }

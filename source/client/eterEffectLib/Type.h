@@ -1,6 +1,6 @@
 #pragma once
 
-#define Clamp(x, min, max)  x = (x<min  ? min : x<max ? x : max);
+#define Clamp(x, min, max) x = ((x) < (min) ? (min) : (x) < (max) ? (x) : (max));
 #define GRAVITY			D3DXVECTOR3(0.0f, 0.0f, -9.8f)
 
 #define	MAX_FRAME		20
@@ -40,7 +40,12 @@ typedef	struct	_FVF_PDT
 inline FVF_PDT _FVF_PDT(float x, float y, float z, uint32_t dif, float u, float v)
 {
 	FVF_PDT	result;
-	result.x = x; result.y = y; result.z = z; result.color = dif; result.tu = u; result.tv = v;
+	result.x = x;
+	result.y = y;
+	result.z = z;
+	result.color = dif;
+	result.tu = u;
+	result.tv = v;
 	return	result;
 }
 
@@ -49,7 +54,7 @@ enum EEffectType
 	EFFECT_TYPE_PARTICLE = 1,
 	EFFECT_TYPE_ANIMATION_TEXTURE = 2,
 	EFFECT_TYPE_MESH = 3,
-	EFFECT_TYPE_SIMPLE_LIGHT		= 4,
+	EFFECT_TYPE_SIMPLE_LIGHT = 4
 };
 
 
@@ -83,7 +88,7 @@ enum EBillBoardType
 enum EMovingType
 {
 	MOVING_TYPE_DIRECT,
-	MOVING_TYPE_BEZIER_CURVE,
+	MOVING_TYPE_BEZIER_CURVE
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,7 +124,7 @@ class CTimeEvent
 public:
 	CTimeEvent(): m_fTime(0)
 	{}
-	~CTimeEvent(){}
+	~CTimeEvent() = default;
 
 	float m_fTime;
 	T m_Value;
@@ -146,13 +151,9 @@ struct DWORDCOLOR
 
 	DWORDCOLOR& operator *= (float f)
 	{
-		uint32_t idx = uint32_t(f * 256);
-		m_dwColor = 
-			(((uint32_t)(((m_dwColor & AG_MASK)>>8) * idx)) & AG_MASK)
-			+((uint32_t)(((m_dwColor & RB_MASK) * idx)>>8) & RB_MASK);
-		//m_dwColor = 
-		//	((uint32_t)((m_dwColor & AG_MASK) * f) & AG_MASK)
-		//	+((uint32_t)((m_dwColor & RB_MASK) * f) & RB_MASK);
+		const auto idx = static_cast<uint32_t>(f * 256);
+		m_dwColor = ((static_cast<uint32_t>(((m_dwColor & AG_MASK) >> 8) * idx)) & AG_MASK) +
+			(static_cast<uint32_t>(((m_dwColor & RB_MASK) * idx) >> 8) & RB_MASK);
 		return *this;
 	}
 	DWORDCOLOR& operator += (const DWORDCOLOR& r)
@@ -160,7 +161,7 @@ struct DWORDCOLOR
 		m_dwColor += r.m_dwColor;
 		return *this;
 	}
-	operator uint32_t()
+	operator uint32_t() const
 	{
 		return m_dwColor;
 	}
@@ -200,25 +201,25 @@ __forceinline bool operator < (const float & lhs, const CTimeEvent<T> & rhs)
 	return lhs < rhs.m_fTime;
 }
 
-typedef CTimeEvent<char>						TTimeEventTypeCharacter;
-typedef CTimeEvent<int16_t>						TTimeEventTypeShort;
-typedef CTimeEvent<float>						TTimeEventTypeFloat;
-typedef CTimeEvent<uint16_t>						TTimeEventTypeWord;
-typedef CTimeEvent<uint32_t>						TTimeEventTypeDoubleWord;
-typedef CTimeEvent<DWORDCOLOR>					TTimeEventTypeColor;
-typedef CTimeEvent<D3DXVECTOR2>					TTimeEventTypeVector2;
-typedef CTimeEvent<D3DXVECTOR3>					TTimeEventTypeVector3;
+using TTimeEventTypeCharacter = CTimeEvent<char>;
+using TTimeEventTypeShort = CTimeEvent<int16_t>;
+using TTimeEventTypeFloat = CTimeEvent<float>;
+using TTimeEventTypeWord = CTimeEvent<uint16_t>;
+using TTimeEventTypeDoubleWord = CTimeEvent<uint32_t>;
+using TTimeEventTypeColor = CTimeEvent<DWORDCOLOR>;
+using TTimeEventTypeVector2 = CTimeEvent<D3DXVECTOR2>;
+using TTimeEventTypeVector3 = CTimeEvent<D3DXVECTOR3>;
 
-typedef std::vector<float>						TTimeEventTable;
-typedef std::vector<TEffectPosition>			TTimeEventTablePosition;
-typedef std::vector<TTimeEventTypeCharacter>	TTimeEventTableCharacter;
-typedef std::vector<TTimeEventTypeShort>		TTimeEventTableShort;
-typedef std::vector<TTimeEventTypeFloat>		TTimeEventTableFloat;
-typedef std::vector<TTimeEventTypeWord>			TTimeEventTableWord;
-typedef std::vector<TTimeEventTypeDoubleWord>	TTimeEventTableDoubleWord;
-typedef std::vector<TTimeEventTypeColor>		TTimeEventTableColor;
-typedef std::vector<TTimeEventTypeVector2>		TTimeEventTableVector2;
-typedef std::vector<TTimeEventTypeVector3>		TTimeEventTableVector3;
+using TTimeEventTable = std::vector<float>;
+using TTimeEventTablePosition = std::vector<TEffectPosition>;
+using TTimeEventTableCharacter = std::vector<TTimeEventTypeCharacter>;
+using TTimeEventTableShort = std::vector<TTimeEventTypeShort>;
+using TTimeEventTableFloat = std::vector<TTimeEventTypeFloat>;
+using TTimeEventTableWord = std::vector<TTimeEventTypeWord>;
+using TTimeEventTableDoubleWord = std::vector<TTimeEventTypeDoubleWord>;
+using TTimeEventTableColor = std::vector<TTimeEventTypeColor>;
+using TTimeEventTableVector2 = std::vector<TTimeEventTypeVector2>;
+using TTimeEventTableVector3 = std::vector<TTimeEventTypeVector3>;
 
 
 // NOTE : TimeEventValue 함수들은 값을 넘겨 받지 말아야 하는 때도 있으므로
@@ -278,5 +279,5 @@ void InsertItemTimeEvent(std::vector<CTimeEvent<T> > * pTable, float fTime, T fV
 	TimeEvent.m_fTime = fTime;
 	TimeEvent.m_Value = fValue;
 
-	pTable->insert(itor, TimeEvent);
+	pTable->emplace(itor, TimeEvent);
 }

@@ -1,7 +1,9 @@
 #ifndef __INC_METIN_II_GAME_ITEM_H__
 #define __INC_METIN_II_GAME_ITEM_H__
 
+#include "../../common/tables.h"
 #include "entity.h"
+#include "GPosition.h"
 
 class CItem : public CEntity
 {
@@ -34,12 +36,12 @@ class CItem : public CEntity
 		uint32_t		GetID()			{ return m_dwID; }
 
 		void			SetProto(const TItemTable * table);
-		TItemTable const *	GetProto()	{ return m_pProto; }
+		TItemTable const *	GetProto() const	{ return m_pProto; }
 
 		int32_t		GetGold();
 		int32_t		GetShopBuyPrice();
-		const char *	GetName()		{ return m_pProto ? m_pProto->szLocaleName : nullptr; }
-		const char *	GetBaseName()		{ return m_pProto ? m_pProto->szName : nullptr; }
+		const char *	GetName()  const { return m_pProto ? m_pProto->szLocaleName : nullptr; }
+		const char *	GetBaseName() const		{ return m_pProto ? m_pProto->szName : nullptr; }
 		uint8_t		GetSize()		{ return m_pProto ? m_pProto->bSize : 0;	}
 
 		void		SetFlag(int32_t flag)	{ m_lFlag = flag;	}
@@ -69,18 +71,81 @@ class CItem : public CEntity
 		uint8_t		GetSubType() const	{ return m_pProto ? m_pProto->bSubType : 0;	}
 		uint8_t		GetLimitType(uint32_t idx) const { return m_pProto ? m_pProto->aLimits[idx].bType : 0;	}
 		int32_t		GetLimitValue(uint32_t idx) const { return m_pProto ? m_pProto->aLimits[idx].lValue : 0;	}
+		int32_t		GetLevel() const { return m_pProto ? (m_pProto->aLimits[0].bType == LIMIT_LEVEL ?  m_pProto->aLimits[0].lValue : 0) : 0 ; }
 
-		int32_t		GetValue(uint32_t idx);
+		// New Getters for some Code refactoring
+		
+		bool IsSocketModifyingItem() const
+		{
+			return GetType() == ITEM_USE && 
+				(
+					GetSubType() == USE_PUT_INTO_BELT_SOCKET || 
+					GetSubType() == USE_PUT_INTO_RING_SOCKET ||
+					GetSubType() == USE_PUT_INTO_ACCESSORY_SOCKET ||
+					GetSubType() == USE_ADD_ACCESSORY_SOCKET || 
+					GetSubType() == USE_CLEAN_SOCKET
+				);
+		}
+
+		// Weapon
+		bool IsWeapon() const;
+
+		bool IsSword() const { return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_SWORD; }
+		bool IsDagger() const { return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_DAGGER; }
+		bool IsBow() const { return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_BOW; }
+		bool IsTwoHandSword() const { return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_TWO_HANDED; }
+		bool IsBell() const { return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_BELL; }
+		bool IsFan() const { return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_FAN; }
+		bool IsArrow() const { return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_ARROW; }
+		bool IsMountSpear() const { return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_MOUNT_SPEAR; }
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		bool IsClaw() const { return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_CLAW; }
+#endif
+		bool IsQuiver() const { return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_NUM_TYPES; }
+
+		// Armor
+		bool IsArmor ()		const { return GetType() == ITEM_ARMOR; }
+		bool IsArmorBody()	const { return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_BODY; }
+		bool IsHelmet()		const { return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_HEAD; }
+		bool IsShield()		const { return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_SHIELD; }
+		bool IsWrist()		const { return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_WRIST; }
+		bool IsShoe()		const { return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_FOOTS; }
+		bool IsNecklace()	const { return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_NECK; }
+		bool IsEarRing()	const { return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_EAR; }
+
+		bool IsRing()			const { return GetType() == ITEM_RING; }
+		bool IsCostume()		const { return GetType() == ITEM_COSTUME;  }
+//		bool IsCostumeMount()	const { return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_MOUNT; }
+		bool IsCostumeHair()	const { return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_HAIR; }
+		bool IsCostumeBody()	const { return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_BODY; }
+#ifdef ENABLE_ACCE_SYSTEM
+		bool IsCostumeAcce()	const { return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_ACCE; }
+#endif
+//		bool IsCostumeWeapon()	const { return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_WEAPON; }
+		bool IsOldHair()		const { return GetVnum() >= 74001 && GetVnum() <= 75620; }
+		bool IsCostumeModifyItem() const { return GetType() == ITEM_USE && (GetSubType() == USE_CHANGE_COSTUME_ATTR || GetSubType() == USE_RESET_COSTUME_ATTR); }
+
+		bool IsBelt() const { return GetType() == ITEM_BELT; }
+
+		int32_t	GetValue(uint32_t idx) const;
+
+		template < typename T >
+		T GetValue(uint32_t idx)
+		{
+			assert(idx < ITEM_VALUES_MAX_NUM);
+
+			return static_cast<T>(GetProto()->values[idx]);
+		}
 
 		void		SetCell(LPCHARACTER ch, uint16_t pos)	{ m_pOwner = ch, m_wCell = pos;	}
 		uint16_t		GetCell()				{ return m_wCell;	}
 
 		LPITEM		RemoveFromCharacter();
-		bool		AddToCharacter(LPCHARACTER ch, TItemPos Cell);
+		bool		AddToCharacter(LPCHARACTER ch, const TItemPos &Cell);
 		LPCHARACTER	GetOwner()		{ return m_pOwner; }
 
 		LPITEM		RemoveFromGround();
-		bool		AddToGround(int32_t lMapIndex, const PIXEL_POSITION & pos, bool skipOwnerCheck = false);
+		bool		AddToGround(int32_t lMapIndex, const GPOS & pos, bool skipOwnerCheck = false);
 
 		int32_t			FindEquipCell(LPCHARACTER ch, int32_t bCandidateCell = -1);
 		bool		IsEquipped() const		{ return m_bEquipped;	}
@@ -129,7 +194,7 @@ class CItem : public CEntity
 		bool		HasRareAttr(uint8_t bApply);
 
 		void		SetDestroyEvent(LPEVENT pkEvent);
-		void		StartDestroyEvent(int32_t iSec=300);
+		void		StartDestroyEvent(int32_t iSec=90);
 
 		uint32_t		GetRefinedVnum()	{ return m_pProto ? m_pProto->dwRefinedVnum : 0; }
 		uint32_t		GetRefineFromVnum();
@@ -142,10 +207,8 @@ class CItem : public CEntity
 		void		SetOwnership(LPCHARACTER ch, int32_t iSec = 10);
 		void		SetOwnershipEvent(LPEVENT pkEvent);
 
-		uint32_t		GetLastOwnerPID()	{ return m_dwLastOwnerPID; }
-#ifdef ENABLE_HIGHLIGHT_NEW_ITEM
+		uint32_t	GetLastOwnerPID()	{ return m_dwLastOwnerPID; }
 		void		SetLastOwnerPID(uint32_t pid) { m_dwLastOwnerPID = pid; }
-#endif
 
 		int32_t		GetAttributeSetIndex(); // 속성 붙는것을 지정한 배열의 어느 인덱스를 사용하는지 돌려준다.
 		void		AlterToMagicItem();
@@ -161,6 +224,7 @@ class CItem : public CEntity
 
 		void		StartRealTimeExpireEvent();
 		bool		IsRealTimeItem();
+		bool		IsUsedTimeItem();
 
 		void		StopUniqueExpireEvent();
 		void		StopTimerBasedOnWearExpireEvent();
@@ -307,6 +371,18 @@ class CItem : public CEntity
 		{
 			return m_dwSIGVnum;
 		}
+
+	private:
+		enum EGMOwnerTypes : uint8_t
+		{
+			GM_OWNER_UNSET,
+			GM_OWNER_PLAYER,
+			GM_OWNER_GM,
+		};
+		uint8_t		m_bIsGMOwner;
+	public:
+		bool		IsGMOwner() const { return m_bIsGMOwner == GM_OWNER_GM; }
+		void		SetGMOwner(bool bGMOwner) { m_bIsGMOwner = bGMOwner ? GM_OWNER_GM : GM_OWNER_PLAYER; }
 };
 
 EVENTINFO(item_event_info)

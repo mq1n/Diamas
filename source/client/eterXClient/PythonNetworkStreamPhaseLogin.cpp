@@ -21,12 +21,8 @@ void CPythonNetworkStream::LoginPhase()
 				return;
 			break;
 
-		case HEADER_GC_LOGIN_SUCCESS3:
-			if (__RecvLoginSuccessPacket3())
-				return;
-			break;
-		case HEADER_GC_LOGIN_SUCCESS4:
-			if (__RecvLoginSuccessPacket4())
+	case HEADER_GC_LOGIN_SUCCESS:
+		if (__RecvLoginSuccessPacket())
 				return;
 			break;
 
@@ -121,42 +117,14 @@ bool CPythonNetworkStream::__RecvEmpirePacket()
 	return true;
 }
 
-bool CPythonNetworkStream::__RecvLoginSuccessPacket3()
+bool CPythonNetworkStream::__RecvLoginSuccessPacket()
 {
-	TPacketGCLoginSuccess3 kPacketLoginSuccess;
+	TPacketGCLoginSuccess kPacketLoginSuccess;
 
 	if (!Recv(sizeof(kPacketLoginSuccess), &kPacketLoginSuccess))
-		return false;	
-	
-	for (int32_t i = 0; i<PLAYER_PER_ACCOUNT3; ++i)
-	{
-		m_akSimplePlayerInfo[i]=kPacketLoginSuccess.akSimplePlayerInformation[i];
-		m_adwGuildID[i]=kPacketLoginSuccess.guild_id[i];
-		m_astrGuildName[i]=kPacketLoginSuccess.guild_name[i];
-	}
+		return false;
 
-	m_kMarkAuth.m_dwHandle=kPacketLoginSuccess.handle;
-	m_kMarkAuth.m_dwRandomKey=kPacketLoginSuccess.random_key;	
-
-	if (__DirectEnterMode_IsSet())
-	{
-	}
-	else
-	{
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_SELECT], "Refresh", Py_BuildValue("()"));		
-	}
-
-	return true;
-}
-
-bool CPythonNetworkStream::__RecvLoginSuccessPacket4()
-{
-	TPacketGCLoginSuccess4 kPacketLoginSuccess;
-
-	if (!Recv(sizeof(kPacketLoginSuccess), &kPacketLoginSuccess))
-		return false;	
-	
-	for (int32_t i = 0; i<PLAYER_PER_ACCOUNT4; ++i)
+	for (int32_t i = 0; i < PLAYER_PER_ACCOUNT; ++i)
 	{
 		m_akSimplePlayerInfo[i]=kPacketLoginSuccess.akSimplePlayerInformation[i];
 		m_adwGuildID[i]=kPacketLoginSuccess.guild_id[i];
@@ -181,13 +149,9 @@ bool CPythonNetworkStream::__RecvLoginSuccessPacket4()
 void CPythonNetworkStream::OnConnectFailure()
 {
 	if (__DirectEnterMode_IsSet())
-	{
 		ClosePhase();
-	}
 	else
-	{
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_LOGIN], "OnConnectFailure", Py_BuildValue("()"));	
-	}
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_LOGIN], "OnConnectFailure", Py_BuildValue("()"));
 }
 
 
@@ -201,23 +165,6 @@ bool CPythonNetworkStream::__RecvLoginFailurePacket()
 #ifdef _DEBUG
 	Tracef(" RecvLoginFailurePacket : [%s]\n", packet_failure.szStatus);
 #endif
-	return true;
-}
-
-bool CPythonNetworkStream::SendDirectEnterPacket(const char* c_szID, const char* c_szPassword, uint32_t uChrSlot)
-{
-	TPacketCGDirectEnter kPacketDirectEnter;
-	kPacketDirectEnter.bHeader=HEADER_CG_DIRECT_ENTER;
-	kPacketDirectEnter.index=uChrSlot;
-	strncpy_s(kPacketDirectEnter.login, c_szID, ID_MAX_NUM);
-	strncpy_s(kPacketDirectEnter.passwd, c_szPassword, PASS_MAX_NUM);
-
-	if (!Send(sizeof(kPacketDirectEnter), &kPacketDirectEnter))
-	{
-		Tracen("SendDirectEnter");
-		return false;
-	}
-
 	return true;
 }
 

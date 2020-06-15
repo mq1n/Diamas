@@ -1,4 +1,4 @@
-#include "Stdafx.h"
+#include "StdAfx.h"
 
 #include "FlyingData.h"
 #include "FlyingInstance.h"
@@ -8,7 +8,7 @@
 
 CFlyingManager::CFlyingManager(): m_IDCounter(0)
 {
-	m_pMapManager = 0;
+	m_pMapManager = nullptr;
 }
 
 CFlyingManager::~CFlyingManager()
@@ -49,7 +49,7 @@ void CFlyingManager::Destroy()
 	__DestroyFlyingInstanceList();
 	__DestroyFlyingDataMap();
 	
-	m_pMapManager = 0;
+	m_pMapManager = nullptr;
 }
 
 bool CFlyingManager::RegisterFlyingData(const char* c_szFilename)
@@ -59,9 +59,8 @@ bool CFlyingManager::RegisterFlyingData(const char* c_szFilename)
 	uint32_t dwRetCRC = GetCaseCRC32(s.c_str(),s.size());
 
 	if (m_kMap_pkFlyData.find(dwRetCRC) != m_kMap_pkFlyData.end())
-	{
 		return false;
-	}
+
 	
 	CFlyingData * pFlyingData = CFlyingData::New();
 	if (!pFlyingData->LoadScriptFile(c_szFilename))
@@ -71,7 +70,7 @@ bool CFlyingManager::RegisterFlyingData(const char* c_szFilename)
 		return false;
 	}
 
-	m_kMap_pkFlyData.insert(std::make_pair(dwRetCRC,pFlyingData));
+	m_kMap_pkFlyData.emplace(dwRetCRC, pFlyingData);
 	return true;
 }
 
@@ -96,7 +95,7 @@ bool CFlyingManager::RegisterFlyingData(const char* c_szFilename, uint32_t & r_d
 		
 	}
 
-	m_kMap_pkFlyData.insert(std::make_pair(r_dwRetCRC,pFlyingData));
+	m_kMap_pkFlyData.emplace(r_dwRetCRC, pFlyingData);
 	return true;
 }
 
@@ -114,7 +113,7 @@ CFlyingInstance * CFlyingManager::CreateFlyingInstanceFlyTarget(const uint32_t d
 	CFlyingInstance * pFlyingInstance = CFlyingInstance::New();
 	pFlyingInstance->Create(m_kMap_pkFlyData[dwID], v3StartPosition, cr_FlyTarget, canAttack);
 	
-	m_kLst_pkFlyInst.push_back(pFlyingInstance);
+	m_kLst_pkFlyInst.emplace_back(pFlyingInstance);
 
 	pFlyingInstance->ID = m_IDCounter++;
 	return pFlyingInstance;
@@ -122,7 +121,7 @@ CFlyingInstance * CFlyingManager::CreateFlyingInstanceFlyTarget(const uint32_t d
 
 void CFlyingManager::Update()
 {
-	TFlyingInstanceList::iterator i=m_kLst_pkFlyInst.begin();
+	auto i = m_kLst_pkFlyInst.begin();
 
 	while (i!=m_kLst_pkFlyInst.end())
 	{
@@ -161,7 +160,7 @@ bool CFlyingManager::RegisterIndexedFlyData(uint32_t dwIndex, uint8_t byType, co
 	TIndexFlyData IndexFlyData;
 	IndexFlyData.byType = byType;
 	IndexFlyData.dwCRC = dwCRC;
-	m_kMap_dwIndexFlyData.insert(std::make_pair(dwIndex, IndexFlyData));
+	m_kMap_dwIndexFlyData.emplace(dwIndex, IndexFlyData);
 
 	return true;
 }

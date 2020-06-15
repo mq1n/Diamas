@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "../eterLib/StateManager.h"
 #include "../eterLib/Camera.h"
 
@@ -63,9 +63,7 @@ void CFlyTrace::UpdateNewPosition(const D3DXVECTOR3 & v3Position)
 	m_TimePositionDeque.push_front(TTimePosition(CTimer::Instance().GetCurrentSecond(),v3Position));
 	//Tracenf("%f %f",m_TimePositionDeque.back().first, CTimer::Instance().GetCurrentSecond());
 	while(!m_TimePositionDeque.empty() && m_TimePositionDeque.back().first+m_fTailLength<CTimer::Instance().GetCurrentSecond())
-	{
 		m_TimePositionDeque.pop_back();
-	}
 }
 
 void CFlyTrace::Create(const CFlyingData::TFlyingAttachData & rFlyingAttachData)
@@ -162,7 +160,8 @@ void CFlyTrace::Render()
 	
 	
 	D3DXMATRIX m;
-	CScreen s;s.UpdateViewMatrix();
+	CScreen s;
+	s.UpdateViewMatrix();
 	CCamera * pCurrentCamera = CCameraManager::Instance().GetCurrentCamera();
 	if (!pCurrentCamera)
 		return;
@@ -264,17 +263,13 @@ void CFlyTrace::Render()
 		//for(i=0;i<6;i++)
 		//	Tracenf("#%d:%f %f %f", i, v[i].p.x,v[i].p.y,v[i].p.z);
 		
-		VSVector.push_back(std::make_pair(-D3DXVec3Dot(&E,&pCurrentCamera->GetView()),TFlyVertexSet(v)));
-		//OLD: STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 4, v, sizeof(TVertex));
-		//OLD: STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, v+1, sizeof(TVertex));		
+		VSVector.emplace_back(-D3DXVec3Dot(&E, &pCurrentCamera->GetView()), TFlyVertexSet(v));
 	}
 
 	std::sort(VSVector.begin(),VSVector.end());
 
-	for(TFlyVertexSetVector::iterator it = VSVector.begin();it!=VSVector.end();++it)
-	{
-		STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 4, it->second.v, sizeof(TVertex));
-	}
+	for (auto & it : VSVector)
+		STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 4, it.second.v, sizeof(TVertex));
 	STATEMANAGER.RestoreRenderState(D3DRS_DESTBLEND);
 	STATEMANAGER.RestoreRenderState(D3DRS_SRCBLEND);
 	STATEMANAGER.RestoreRenderState(D3DRS_ALPHABLENDENABLE);

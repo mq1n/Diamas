@@ -23,12 +23,12 @@ void CResourceManager::LoadStaticCache(const char* c_szFileName)
 	}
 
 	uint32_t dwCacheKey=GetCRC32(c_szFileName, strlen(c_szFileName));
-	TResourcePointerMap::iterator f=m_pCacheMap.find(dwCacheKey);
+	auto f = m_pCacheMap.find(dwCacheKey);
 	if (m_pCacheMap.end()!=f)
 		return;
 
 	pkRes->AddReference();
-	m_pCacheMap.insert(TResourcePointerMap::value_type(dwCacheKey, pkRes));
+	m_pCacheMap.emplace(dwCacheKey, pkRes);
 }
 
 void CResourceManager::__DestroyCacheMap()
@@ -46,8 +46,8 @@ void CResourceManager::__DestroyCacheMap()
 void CResourceManager::__DestroyDeletingResourceMap()
 {
 	Tracenf("CResourceManager::__DestroyDeletingResourceMap %d", m_ResourceDeletingMap.size());
-	for (TResourceDeletingMap::iterator i = m_ResourceDeletingMap.begin(); i != m_ResourceDeletingMap.end(); ++i)
-		(i->first)->Clear();
+	for (auto & i : m_ResourceDeletingMap)
+		(i.first)->Clear();
 
 	m_ResourceDeletingMap.clear();
 }
@@ -87,7 +87,7 @@ void CResourceManager::RegisterResourceNewFunctionPointer(const char* c_szFileEx
 
 CResource * CResourceManager::InsertResourcePointer(uint64_t nameHash, CResource* pResource)
 {
-	TResourcePointerMap::iterator itor = m_pResMap.find(nameHash);
+	auto itor = m_pResMap.find(nameHash);
 	if (m_pResMap.end() != itor)
 	{
 		const auto& stRefResourceName = pResource->GetFileNameString();
@@ -148,7 +148,7 @@ CResource * CResourceManager::GetResourcePointer(const char* c_szFileName)
 
 CResource* CResourceManager::FindResourcePointer(uint64_t nameHash)
 {
-	TResourcePointerMap::iterator itor = m_pResMap.find(nameHash);
+	auto itor = m_pResMap.find(nameHash);
 	if (m_pResMap.end() == itor)
 		return nullptr;
 
@@ -157,9 +157,10 @@ CResource* CResourceManager::FindResourcePointer(uint64_t nameHash)
 
 bool CResourceManager::isResourcePointerData(uint64_t nameHash)
 {
-	TResourcePointerMap::iterator itor = m_pResMap.find(nameHash);
+	auto itor = m_pResMap.find(nameHash);
+
 	if (m_pResMap.end() == itor)
-		return nullptr;
+		return false;
 
 	return (itor->second)->IsData();
 }
@@ -209,9 +210,9 @@ void CResourceManager::DumpFileListToTextFile(const char* c_szFileName)
 {
 	std::vector<TDumpData> dumpVector;
 
-	for (TResourcePointerMap::iterator i = m_pResMap.begin(); i != m_pResMap.end(); ++i)
+	for (auto & i : m_pResMap)
 	{
-		CResource* pResource = i->second;
+		CResource * pResource = i.second;
 		TDumpData data;
 
 		if (pResource->IsEmpty())
@@ -228,45 +229,39 @@ void CResourceManager::DumpFileListToTextFile(const char* c_szFileName)
 			filesize = ((CGraphicImage*) pResource)->GetWidth() * ((CGraphicImage*) pResource)->GetHeight() * 4;
 		else
 		{
-			FILE * fp2 = fopen(data.filename, "rb");
+			msl::file_ptr fPtr2(data.filename, "rb");
 
-			if (fp2)
-			{
-				fseek(fp2, 0L, SEEK_END);
-				filesize = ftell(fp2);
-				fclose(fp2);
-			}
+			if (fPtr2)
+				filesize = fPtr2.size();
 			else
 				filesize = 0;
 		}
 
 		data.KB = (float) filesize / (float) 1024;
-		//data.cost = pResource->GetLoadCostMilliSecond();
+//		data.cost = pResource->GetLoadCostMilliSecond();
 
-		dumpVector.push_back(data);
+		dumpVector.emplace_back(data);
 	}
 
-	FILE * fp = fopen(c_szFileName, "w");
+	msl::file_ptr fPtr(c_szFileName, "w");
 
-	if (fp)
+	if (fPtr)
 	{
 		std::sort(dumpVector.begin(), dumpVector.end(), DumpKBCompare);
-		
+
 		FDumpPrint DumpPrint;
-		DumpPrint.m_fp = fp;
+		DumpPrint.m_fp = fPtr.get();
 		DumpPrint.m_totalKB = 0;
 
 		std::for_each(dumpVector.begin(), dumpVector.end(), DumpPrint);
-		fprintf(fp,	"total: %.2fmb", DumpPrint.m_totalKB / 1024.0f);
+		fprintf(fPtr.get(), "total: %.2fmb", DumpPrint.m_totalKB / 1024.0f);
 
 		FDumpCostPrint DumpCostPrint;
-		DumpCostPrint.m_fp = fp;
+		DumpCostPrint.m_fp = fPtr.get();
 
 		std::sort(dumpVector.begin(), dumpVector.end(), DumpCostCompare);
 		std::for_each(dumpVector.begin(), dumpVector.end(), DumpCostPrint);
-		fprintf(fp,	"total: %.2fmb", DumpPrint.m_totalKB / 1024.0f);
-
-		fclose(fp);
+		fprintf(fPtr.get(), "total: %.2fmb", DumpPrint.m_totalKB / 1024.0f);
 	}
 }
 
@@ -281,7 +276,7 @@ void CResourceManager::Update()
 	CResource * pResource;
 	int32_t Count = 0;
 
-	TResourceDeletingMap::iterator itor = m_ResourceDeletingMap.begin();
+	auto itor = m_ResourceDeletingMap.begin();
 
 	while (itor != m_ResourceDeletingMap.end())
 	{
@@ -308,16 +303,12 @@ void CResourceManager::Update()
 void CResourceManager::ReserveDeletingResource(CResource * pResource)
 {
 	uint32_t dwCurrentTime = ELTimer_GetMSec();
-	m_ResourceDeletingMap.insert(TResourceDeletingMap::value_type(pResource, dwCurrentTime + c_Deleting_Wait_Time));
+	m_ResourceDeletingMap.emplace(pResource, dwCurrentTime + c_Deleting_Wait_Time);
 }
 
-CResourceManager::CResourceManager()
-{
-	//ms_loadingThread.Create(0);
-}
+CResourceManager::CResourceManager() = default;
 
 CResourceManager::~CResourceManager()
 {
 	Destroy();
-	//ms_loadingThread.Shutdown();
 }

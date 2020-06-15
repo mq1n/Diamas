@@ -13,7 +13,7 @@
 
 float CInstanceBase::ms_fDustGap;
 float CInstanceBase::ms_fHorseDustGap;
-uint32_t CInstanceBase::ms_adwCRCAffectEffect[CInstanceBase::EFFECT_NUM];
+uint32_t CInstanceBase::ms_adwCRCAffectEffect[EFFECT_NUM];
 std::string CInstanceBase::ms_astAffectEffectAttachBone[EFFECT_NUM];
 
 #define BYTE_COLOR_TO_D3DX_COLOR(r, g, b) D3DXCOLOR(float(r)/255.0f, float(g)/255.0f, float(b)/255.0f, 1.0f)
@@ -432,14 +432,14 @@ void CInstanceBase::InsertPVPKey(uint32_t dwVIDSrc, uint32_t dwVIDDst)
 {
 	uint32_t dwPVPKey=__GetPVPKey(dwVIDSrc, dwVIDDst);
 
-	g_kSet_dwPVPKey.insert(dwPVPKey);
+	g_kSet_dwPVPKey.emplace(dwPVPKey);
 }
 
 void CInstanceBase::InsertPVPReadyKey(uint32_t dwVIDSrc, uint32_t dwVIDDst)
 {
 	uint32_t dwPVPReadyKey=__GetPVPKey(dwVIDSrc, dwVIDDst);
 
-	g_kSet_dwPVPKey.insert(dwPVPReadyKey);
+	g_kSet_dwPVPKey.emplace(dwPVPReadyKey);
 }
 
 void CInstanceBase::RemovePVPKey(uint32_t dwVIDSrc, uint32_t dwVIDDst)
@@ -452,7 +452,7 @@ void CInstanceBase::RemovePVPKey(uint32_t dwVIDSrc, uint32_t dwVIDDst)
 void CInstanceBase::InsertGVGKey(uint32_t dwSrcGuildVID, uint32_t dwDstGuildVID)
 {
 	uint32_t dwGVGKey = __GetPVPKey(dwSrcGuildVID, dwDstGuildVID);
-	g_kSet_dwGVGKey.insert(dwGVGKey);
+	g_kSet_dwGVGKey.emplace(dwGVGKey);
 }
 
 void CInstanceBase::RemoveGVGKey(uint32_t dwSrcGuildVID, uint32_t dwDstGuildVID)
@@ -465,7 +465,7 @@ void CInstanceBase::InsertDUELKey(uint32_t dwVIDSrc, uint32_t dwVIDDst)
 {
 	uint32_t dwPVPKey=__GetPVPKey(dwVIDSrc, dwVIDDst);
 
-	g_kSet_dwDUELKey.insert(dwPVPKey);
+	g_kSet_dwDUELKey.emplace(dwPVPKey);
 }
 
 uint32_t CInstanceBase::__GetPVPKey(uint32_t dwVIDSrc, uint32_t dwVIDDst)
@@ -477,14 +477,14 @@ uint32_t CInstanceBase::__GetPVPKey(uint32_t dwVIDSrc, uint32_t dwVIDDst)
 	awSrc[0]=dwVIDSrc;
 	awSrc[1]=dwVIDDst;
 
-    const uint8_t * s = (const uint8_t *) awSrc;
+	const auto * s = reinterpret_cast<const uint8_t *>(awSrc);
     const uint8_t * end = s + sizeof(awSrc);
     uint32_t h = 0;
 
     while (s < end)
     {
         h *= 16777619;
-        h ^= (uint8_t) *(uint8_t *) (s++);
+		h ^= *const_cast<uint8_t *>(s++);
     }
 
     return h;
@@ -584,10 +584,11 @@ uint32_t CInstanceBase::GetNameColorIndex()
 				case DUEL_CANNOTATTACK:
 					return NAMECOLOR_PC + GetEmpireID();
 				case DUEL_START:
-					if(__FindDUELKey(dwVIDMain, dwVIDSelf))
+				{
+					if (__FindDUELKey(dwVIDMain, dwVIDSelf))
 						return NAMECOLOR_PVP;
-					else
-						return NAMECOLOR_PC + GetEmpireID();
+					return NAMECOLOR_PC + GetEmpireID();
+				}
 				}
 			}
 
@@ -610,20 +611,13 @@ uint32_t CInstanceBase::GetNameColorIndex()
 			return NAMECOLOR_PARTY;
 
 		return NAMECOLOR_PC + GetEmpireID();
-		
 	}
-	else if (IsNPC())
-	{
+	if (IsNPC())
 		return NAMECOLOR_NPC;
-	}
-	else if (IsEnemy())
-	{
+	if (IsEnemy())
 		return NAMECOLOR_MOB;
-	}
-	else if (IsPoly())
-	{
+	if (IsPoly())
 		return NAMECOLOR_MOB;
-	}
 
 
 	return D3DXCOLOR(0xffffffff);
@@ -667,9 +661,7 @@ void CInstanceBase::AttachTextTail()
 
 	// CHARACTER_LEVEL
 	if (m_dwLevel)
-	{
 		UpdateTextTailLevel(m_dwLevel);
-	}
 }
 
 void CInstanceBase::DetachTextTail()
@@ -703,7 +695,7 @@ void CInstanceBase::RefreshTextTail()
 	}
 	else
 	{
-		std::map<int32_t, std::string>::iterator itor = g_TitleNameMap.find(iAlignmentGrade);
+		auto itor = g_TitleNameMap.find(iAlignmentGrade);
 		if (g_TitleNameMap.end() != itor)
 		{
 			const std::string & c_rstrTitleName = itor->second;
@@ -788,9 +780,7 @@ void CInstanceBase::__SetStoneSmokeFlagContainer(const CAffectFlagContainer& c_r
 void CInstanceBase::SetAffectFlagContainer(const CAffectFlagContainer& c_rkAffectFlagContainer)
 {
 	if (IsBuilding())
-	{
 		return;		
-	}
 
 	uint32_t dwVnum = GetVirtualNumber();
 	BOOL bIsStone = IsStone();
@@ -820,7 +810,8 @@ void CInstanceBase::SCRIPT_SetAffect(uint32_t eAffect, bool isVisible)
 
 void CInstanceBase::__SetReviveInvisibilityAffect(bool isVisible)
 {
-	if (isVisible) {
+	if (isVisible) 
+	{
 		m_GraphicThingInstance.SetReviving(TRUE);
 		// NOTE : Dress does not support alpha operations properly.
 		if (IsWearingDress())
@@ -950,7 +941,6 @@ void CInstanceBase::__SetAffect(uint32_t eAffect, bool isVisible)
 		case AFFECT_GEOMGYEONG:
 			__Warrior_SetGeomgyeongAffect(isVisible);
 			return;
-			break;
 		case AFFECT_REVIVE_INVISIBILITY:
 			__SetReviveInvisibilityAffect(isVisible);
 			m_kAffectFlagContainer.Set(eAffect, isVisible);
@@ -994,7 +984,6 @@ void CInstanceBase::__SetAffect(uint32_t eAffect, bool isVisible)
 				RefreshTextTail();
 			}
 			return;
-			break;
 //		case AFFECT_FAINT:
 //			m_GraphicThingInstance.SetFaint(isVisible);
 //			break;
@@ -1102,34 +1091,23 @@ uint32_t CInstanceBase::__AttachEffect(uint32_t eEftType)
 		return 0;
 
 	if (ms_astAffectEffectAttachBone[eEftType].empty())
-	{
 		return m_GraphicThingInstance.AttachEffectByID(0, nullptr, ms_adwCRCAffectEffect[eEftType]);
+	std::string & rstrBoneName = ms_astAffectEffectAttachBone[eEftType];
+	const char * c_szBoneName;
+	// 양손에 붙일 때 사용한다.
+		// 이런 식의 예외 처리를 해놓은 것은 캐릭터 마다 Equip 의 Bone Name 이 다르기 때문.
+	if ("PART_WEAPON" == rstrBoneName)
+	{
+		if (m_GraphicThingInstance.GetAttachingBoneName(CRaceData::PART_WEAPON, &c_szBoneName))
+			return m_GraphicThingInstance.AttachEffectByID(0, c_szBoneName, ms_adwCRCAffectEffect[eEftType]);
+	}
+	else if ("PART_WEAPON_LEFT" == rstrBoneName)
+	{
+		if (m_GraphicThingInstance.GetAttachingBoneName(CRaceData::PART_WEAPON_LEFT, &c_szBoneName))
+			return m_GraphicThingInstance.AttachEffectByID(0, c_szBoneName, ms_adwCRCAffectEffect[eEftType]);
 	}
 	else
-	{
-		std::string & rstrBoneName = ms_astAffectEffectAttachBone[eEftType];
-		const char * c_szBoneName;
-		// 양손에 붙일 때 사용한다.
-		// 이런 식의 예외 처리를 해놓은 것은 캐릭터 마다 Equip 의 Bone Name 이 다르기 때문.
-		if (0 == rstrBoneName.compare("PART_WEAPON"))
-		{
-			if (m_GraphicThingInstance.GetAttachingBoneName(CRaceData::PART_WEAPON, &c_szBoneName))
-			{
-				return m_GraphicThingInstance.AttachEffectByID(0, c_szBoneName, ms_adwCRCAffectEffect[eEftType]);
-			}
-		}
-		else if (0 == rstrBoneName.compare("PART_WEAPON_LEFT"))
-		{
-			if (m_GraphicThingInstance.GetAttachingBoneName(CRaceData::PART_WEAPON_LEFT, &c_szBoneName))
-			{
-				return m_GraphicThingInstance.AttachEffectByID(0, c_szBoneName, ms_adwCRCAffectEffect[eEftType]);
-			}
-		}
-		else
-		{
-			return m_GraphicThingInstance.AttachEffectByID(0, rstrBoneName.c_str(), ms_adwCRCAffectEffect[eEftType]);
-		}
-	}
+		return m_GraphicThingInstance.AttachEffectByID(0, rstrBoneName.c_str(), ms_adwCRCAffectEffect[eEftType]);
 
 	return 0;
 }
@@ -1174,14 +1152,17 @@ bool CInstanceBase::RegisterEffect(uint32_t eEftType, const char* c_szEftAttachB
 
 void CInstanceBase::RegisterTitleName(int32_t iIndex, const char * c_szTitleName)
 {
-	g_TitleNameMap.insert(std::make_pair(iIndex, c_szTitleName));
+	g_TitleNameMap.emplace(iIndex, c_szTitleName);
 }
 
 D3DXCOLOR __RGBToD3DXColoru(uint32_t r, uint32_t g, uint32_t b)
 {
-	uint32_t dwColor=0xff;dwColor<<=8;
-	dwColor|=r;dwColor<<=8;
-	dwColor|=g;dwColor<<=8;
+	uint32_t dwColor = 0xff;
+	dwColor <<= 8;
+	dwColor |= r;
+	dwColor <<= 8;
+	dwColor |= g;
+	dwColor <<= 8;
 	dwColor|=b;
 
 	return D3DXCOLOR(dwColor);

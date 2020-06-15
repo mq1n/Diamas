@@ -1,6 +1,8 @@
 #ifndef _DEBUG_PTR_H_
 #define _DEBUG_PTR_H_
 
+#include "../../common/service.h"
+
 // Intended to be include only in "debug_allocator.h"
 #ifdef DEBUG_ALLOC
 

@@ -1,13 +1,9 @@
 #include "Stdafx.h"
 #include "SoundManager2D.h"
 
-CSoundManager2D::CSoundManager2D()
-{
-}
+CSoundManager2D::CSoundManager2D() = default;
 
-CSoundManager2D::~CSoundManager2D()
-{	
-}
+CSoundManager2D::~CSoundManager2D() = default;
 
 bool CSoundManager2D::Initialize()
 {
@@ -45,7 +41,7 @@ void CSoundManager2D::Destroy()
 ISoundInstance * CSoundManager2D::GetInstance(const char * c_pszFileName)
 {
 	uint32_t dwFileCRC = GetFileCRC(c_pszFileName);
-	TSoundDataMap::iterator itor = ms_dataMap.find(dwFileCRC);
+	auto itor = ms_dataMap.find(dwFileCRC);
 
 	CSoundData * pkSoundData;
 

@@ -7,9 +7,9 @@ class CPythonSafeBox : public CSingleton<CPythonSafeBox>
 		{
 			SAFEBOX_SLOT_X_COUNT = 5,
 			SAFEBOX_SLOT_Y_COUNT = 9,
-			SAFEBOX_PAGE_SIZE = SAFEBOX_SLOT_X_COUNT * SAFEBOX_SLOT_Y_COUNT,
+			SAFEBOX_PAGE_SIZE = SAFEBOX_SLOT_X_COUNT * SAFEBOX_SLOT_Y_COUNT
 		};
-		typedef std::vector<TItemData> TItemInstanceVector;
+		using TItemInstanceVector = std::vector<TItemData>;
 
 	public:
 		CPythonSafeBox();

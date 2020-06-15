@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "../eterTerrainLib/StdAfx.h"
 #include "../eterLib/ResourceManager.h"
-#include "../eterlib/StateManager.h"
+#include "../eterLib/StateManager.h"
 #include <FileSystemIncl.hpp>
 
 #include "AreaTerrain.h"
@@ -391,15 +391,16 @@ float CTerrain::GetHeight(int32_t x, int32_t y)
 	x /= CELLSCALE;
 	y /= CELLSCALE;
 
-	x2 = x; y2 = y;
+	x2 = x;
+	y2 = y;
 	/* Get the height and color of the pixel at the top left corner */
-	h1 = (float) GetHeightMapValue(x2, y2) * m_fHeightScale;
+	h1 = (float) GetHeightMapValue((int16_t)x2, (int16_t)y2) * m_fHeightScale;
 	
 	/* Get the height and color of the pixel at the bottom right corner */
 	x2 = x + 1;
 	y2 = y + 1;
 
-	h2 = (float) GetHeightMapValue(x2, y2) * m_fHeightScale;
+	h2 = (float) GetHeightMapValue((int16_t)x2, (int16_t)y2) * m_fHeightScale;
 	
 	/* Left triangle */
 	if (xdist <= ydist)
@@ -407,7 +408,7 @@ float CTerrain::GetHeight(int32_t x, int32_t y)
 		x2 = x;
 		y2 = y + 1;
 
-		h3 = (float) GetHeightMapValue(x2, y2) * m_fHeightScale;
+		h3 = (float) GetHeightMapValue((int16_t)x2, (int16_t)y2) * m_fHeightScale;
 
 		/* Get the height of the pixel at the bottom left corner */
 		xslope = (h2 - h3) * ooscale;
@@ -420,7 +421,7 @@ float CTerrain::GetHeight(int32_t x, int32_t y)
 	x2 = x + 1;
 	y2 = y;
 
-	h3 = (float) GetHeightMapValue(x2, y2) * m_fHeightScale;
+	h3 = (float) GetHeightMapValue((int16_t)x2, (int16_t)y2) * m_fHeightScale;
 
 	/* Get the height of the pixel at the top right corner */
 	xslope = (h3 - h1) * ooscale;
@@ -436,8 +437,8 @@ void CTerrain::CalculateNormal(int32_t x, int32_t y)
 {
 	D3DXVECTOR3 normal;
 
-	normal.x = -m_fHeightScale * ((float)GetHeightMapValue((x-1),y)-(float)GetHeightMapValue((x+1),y));
-	normal.y = -m_fHeightScale * ((float)GetHeightMapValue(x,(y-1))-(float)GetHeightMapValue(x,(y+1)));
+	normal.x = -m_fHeightScale * ((float)GetHeightMapValue((uint16_t)(x - 1), (uint16_t)y) - (float)GetHeightMapValue((uint16_t)(x + 1), (uint16_t)y));
+	normal.y = -m_fHeightScale * ((float)GetHeightMapValue((uint16_t)x, (uint16_t)(y - 1)) - (float)GetHeightMapValue((uint16_t)x, (uint16_t)(y + 1)));
 
 	normal.z = 2.0f * CELLSCALE;
 	normal *= 127.0f / D3DXVec3Length(&normal);
@@ -814,7 +815,7 @@ LPDIRECT3DTEXTURE9 CTerrain::AddTexture32(uint8_t byImageNum, uint8_t * pbyImage
 		}
 
 		D3DLOCKED_RECT  d3dlr;
-		hr = pkTex->LockRect(0, &d3dlr, 0, 0);
+		hr = pkTex->LockRect(0, &d3dlr, nullptr, 0);
 		if (FAILED(hr))
 		{
 			pkTex->Release();
@@ -854,7 +855,7 @@ LPDIRECT3DTEXTURE9 CTerrain::AddTexture32(uint8_t byImageNum, uint8_t * pbyImage
 
 		D3DLOCKED_RECT  d3dlr;
 	
-		hr = pkTex->LockRect(uMipMapLevel, &d3dlr, 0, 0);
+		hr = pkTex->LockRect(uMipMapLevel, &d3dlr, nullptr, 0);
 		if (FAILED(hr))
 			continue;
 
@@ -932,6 +933,9 @@ CTerrainPatch * CTerrain::GetTerrainPatchPtr(uint8_t byPatchNumX, uint8_t byPatc
 
 void CTerrain::_CalculateTerrainPatch(uint8_t byPatchNumX, uint8_t byPatchNumY)
 {
+	if (!m_awRawHeightMap || !m_acNormalMap || !m_abyWaterMap)
+		return;
+
 	uint32_t dwPatchNum = byPatchNumY * PATCH_XCOUNT + byPatchNumX;
 
 	CTerrainPatch& rkTerrainPatch=m_TerrainPatchList[dwPatchNum];
@@ -955,9 +959,9 @@ void CTerrain::_CalculateTerrainPatch(uint8_t byPatchNumX, uint8_t byPatchNumY)
 	char * chOrigNormalPtr = m_acNormalMap + (dwStartY * dwNormalWidth) + dwStartX * 3;
 	uint8_t * byOrigWaterPtr = m_abyWaterMap + (dwStartY * WATERMAP_XSIZE) + dwStartX;
 	
-	float fX, fY, fOrigX, fOrigY;
+	float fX, fY, fOrigX;
 	fOrigX = fX = (float)(m_wX * XSIZE * CELLSCALE) + (float)(dwStartX * CELLSCALE);
-	fOrigY = fY = (float)(m_wY * YSIZE * CELLSCALE) + (float)(dwStartY * CELLSCALE);
+	fY = (float)(m_wY * YSIZE * CELLSCALE) + (float)(dwStartY * CELLSCALE);
 
 	rkTerrainPatch.SetMinX(fX);
 	rkTerrainPatch.SetMaxX(fX + (float)(PATCH_XSIZE*CELLSCALE));
@@ -1159,7 +1163,7 @@ void CTerrain::AllocateMarkedSplats(uint8_t * pbyAlphaMap)
 	D3DLOCKED_RECT d3dlr;
 	do
 	{
-		hr = m_lpMarkedTexture->LockRect(0, &d3dlr, 0, 0);
+		hr = m_lpMarkedTexture->LockRect(0, &d3dlr, nullptr, 0);
 	} while(FAILED(hr));
 
 	PutImage32(pbyAlphaMap, (uint8_t*) d3dlr.pBits, ATTRMAP_XSIZE, d3dlr.Pitch, ATTRMAP_XSIZE, ATTRMAP_YSIZE);

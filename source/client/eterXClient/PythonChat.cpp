@@ -3,7 +3,7 @@
 
 #include "AbstractApplication.h"
 #include "PythonCharacterManager.h"
-#include "../eterbase/Timer.h"
+#include "../EterBase/Timer.h"
 
 int32_t CPythonChat::TChatSet::ms_iChatModeSize = CHAT_TYPE_MAX_NUM;
 
@@ -30,7 +30,7 @@ CPythonChat::SChatLine* CPythonChat::SChatLine::New()
 	return ms_kPool.Alloc();
 }
 
-void CPythonChat::SChatLine::Delete(CPythonChat::SChatLine* pkChatLine)
+void CPythonChat::SChatLine::Delete(SChatLine * pkChatLine)
 {
 	pkChatLine->Instance.Destroy();
 	ms_kPool.Free(pkChatLine);
@@ -84,7 +84,7 @@ CPythonChat::SChatLine::~SChatLine()
 
 int32_t CPythonChat::CreateChatSet(uint32_t dwID)
 {
-	m_ChatSetMap.insert(std::make_pair(dwID, TChatSet()));
+	m_ChatSetMap.emplace(dwID, TChatSet());
 	return dwID;
 }
 
@@ -103,8 +103,7 @@ void CPythonChat::UpdateViewMode(uint32_t dwID)
 	int32_t iLineIndex = pLineList->size();
 	int32_t iHeight = -(int32_t(pLineList->size()+1) * pChatSet->m_iStep);
 
-	TChatLineList::iterator itor;
-	for (itor = pLineList->begin(); itor != pLineList->end();)
+	for (auto itor = pLineList->begin(); itor != pLineList->end();)
 	{
 		TChatLine * pChatLine = (*itor);
 
@@ -116,18 +115,12 @@ void CPythonChat::UpdateViewMode(uint32_t dwID)
 			rColor.a -= rColor.a / 10.0f;
 
 			if (rColor.a <= 0.1f)
-			{
 				itor = pLineList->erase(itor);
-			}
 			else
-			{
 				++itor;
-			}
 		}
 		else
-		{
 			++itor;
-		}
 
 		/////
 
@@ -158,7 +151,7 @@ void CPythonChat::UpdateEditMode(uint32_t dwID)
 	TChatLineList * pLineList = &(pChatSet->m_ShowingChatLineList);
 	int32_t iHeight = -(int32_t(pLineList->size()+1) * pChatSet->m_iStep);
 
-	for (TChatLineList::iterator itor = pLineList->begin(); itor != pLineList->end(); ++itor)
+	for (auto itor = pLineList->begin(); itor != pLineList->end(); ++itor)
 	{
 		TChatLine * pChatLine = (*itor);
 
@@ -190,7 +183,7 @@ void CPythonChat::UpdateLogMode(uint32_t dwID)
 	TChatLineList * pLineList = &(pChatSet->m_ShowingChatLineList);
 	int32_t iHeight = 0;
 
-	for (TChatLineList::reverse_iterator itor = pLineList->rbegin(); itor != pLineList->rend(); ++itor)
+	for (auto itor = pLineList->rbegin(); itor != pLineList->rend(); ++itor)
 	{
 		TChatLine * pChatLine = (*itor);
 
@@ -221,7 +214,7 @@ void CPythonChat::Update(uint32_t dwID)
 	}
 
 	uint32_t dwcurTime = CTimer::Instance().GetCurrentMillisecond();
-	for (TWaitChatList::iterator itor = m_WaitChatList.begin(); itor != m_WaitChatList.end();)
+	for (auto itor = m_WaitChatList.begin(); itor != m_WaitChatList.end();)
 	{
 		TWaitChat & rWaitChat = *itor;
 
@@ -244,9 +237,9 @@ void CPythonChat::Render(uint32_t dwID)
 	if (!pLineList)
 		return;
 
-	for (TChatLineList::iterator itor = pLineList->begin(); itor != pLineList->end(); ++itor)
+	for (auto & itor : *pLineList)
 	{
-		CGraphicTextInstance & rInstance = (*itor)->Instance;
+		CGraphicTextInstance & rInstance = itor->Instance;
 		rInstance.Render();
 	}
 }
@@ -357,9 +350,9 @@ int32_t CPythonChat::GetLineCount(uint32_t dwID)
 		return 0;
 
 	int32_t iCount = 0;
-	for (uint32_t i = 0; i < m_ChatLineDeque.size(); ++i)
+	for (auto & i : m_ChatLineDeque)
 	{
-		if (!pChatSet->CheckMode(m_ChatLineDeque[i]->iType))
+		if (!pChatSet->CheckMode(i->iType))
 			continue;
 
 		++iCount;
@@ -379,7 +372,7 @@ int32_t CPythonChat::GetLineStep(uint32_t dwID)
 
 CPythonChat::TChatLineList * CPythonChat::GetChatLineListPtr(uint32_t dwID)
 {
-	TChatSetMap::iterator itor = m_ChatSetMap.find(dwID);
+	auto itor = m_ChatSetMap.find(dwID);
 	if (m_ChatSetMap.end() == itor)
 		return nullptr;
 
@@ -389,7 +382,7 @@ CPythonChat::TChatLineList * CPythonChat::GetChatLineListPtr(uint32_t dwID)
 
 CPythonChat::TChatSet * CPythonChat::GetChatSetPtr(uint32_t dwID)
 {
-	TChatSetMap::iterator itor = m_ChatSetMap.find(dwID);
+	auto itor = m_ChatSetMap.find(dwID);
 	if (m_ChatSetMap.end() == itor)
 		return nullptr;
 
@@ -406,11 +399,11 @@ void CPythonChat::ArrangeShowingChat(uint32_t dwID)
 	pChatSet->m_ShowingChatLineList.clear();
 
 	TChatLineDeque TempChatLineDeque;
-	for (TChatLineDeque::iterator itor = m_ChatLineDeque.begin(); itor != m_ChatLineDeque.end(); ++itor)
+	for (auto itor = m_ChatLineDeque.begin(); itor != m_ChatLineDeque.end(); ++itor)
 	{
 		TChatLine * pChatLine = *itor;
 		if (pChatSet->CheckMode(pChatLine->iType))
-			TempChatLineDeque.push_back(pChatLine);
+			TempChatLineDeque.emplace_back(pChatLine);
 	}
 
 	int32_t icurLineCount = TempChatLineDeque.size();
@@ -426,9 +419,7 @@ void CPythonChat::ArrangeShowingChat(uint32_t dwID)
 			continue;
 
 		if (pChatSet->m_iHeight + pChatSet->m_iStep <= iHeight)
-		{
 			break;
-		}
 
 		pChatSet->m_ShowingChatLineList.push_front(TempChatLineDeque[i]);
 
@@ -461,7 +452,7 @@ void CPythonChat::AppendChat(int32_t iType, const char * c_szChat)
 	pChatLine->fAppendedTime = rApp.GetGlobalTime();
 	pChatLine->SetColorAll(GetChatColor(iType));
 
-	m_ChatLineDeque.push_back(pChatLine);
+	m_ChatLineDeque.emplace_back(pChatLine);
 	if (m_ChatLineDeque.size() > CHAT_LINE_MAX_NUM)
 	{
 		SChatLine * pChatLine = m_ChatLineDeque.front();
@@ -469,23 +460,19 @@ void CPythonChat::AppendChat(int32_t iType, const char * c_szChat)
 		m_ChatLineDeque.pop_front();
 	}
 
-	for (TChatSetMap::iterator itor = m_ChatSetMap.begin(); itor != m_ChatSetMap.end(); ++itor)
+	for (auto & itor : m_ChatSetMap)
 	{
-		TChatSet * pChatSet = &(itor->second);
+		TChatSet * pChatSet = &(itor.second);
 		//pChatLine->SetColor(itor->first, GetChatColor(iType));
 
 		// Edit Mode 를 억지로 끼워 맞추기 위해 추가
 		if (BOARD_STATE_EDIT == pChatSet->m_iBoardState)
+			ArrangeShowingChat(itor.first);
+		else // if (BOARD_STATE_VIEW == pChatSet->m_iBoardState)
 		{
-			ArrangeShowingChat(itor->first);
-		}
-		else// if (BOARD_STATE_VIEW == pChatSet->m_iBoardState)
-		{
-			pChatSet->m_ShowingChatLineList.push_back(pChatLine);
+			pChatSet->m_ShowingChatLineList.emplace_back(pChatLine);
 			if (pChatSet->m_ShowingChatLineList.size() > CHAT_LINE_MAX_NUM)
-			{
 				pChatSet->m_ShowingChatLineList.pop_front();
-			}
 		}
 	}
 }
@@ -496,37 +483,33 @@ void CPythonChat::AppendChatWithDelay(int32_t iType, const char * c_szChat, int3
 	WaitChat.iType = iType;
 	WaitChat.strChat = c_szChat;
 	WaitChat.dwAppendingTime = CTimer::Instance().GetCurrentMillisecond() + iDelay;
-	m_WaitChatList.push_back(WaitChat);
+	m_WaitChatList.emplace_back(WaitChat);
 }
 
 uint32_t CPythonChat::GetChatColor(int32_t iType)
 {
 	if (iType<CHAT_TYPE_MAX_NUM)
-	{
 		return m_akD3DXClrChat[iType];
-	}
 
 	return D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
 }
 
 void CPythonChat::IgnoreCharacter(const char * c_szName)
 {
-	TIgnoreCharacterSet::iterator itor = m_IgnoreCharacterSet.find(c_szName);
+	auto itor = m_IgnoreCharacterSet.find(c_szName);
 	// NOTE : 이미 차단 중이라면..
 	if (m_IgnoreCharacterSet.end() != itor)
 	{
 		m_IgnoreCharacterSet.erase(itor);
+		// NOTE : 차단이 되지 않은 캐릭터라면..
 	}
-	// NOTE : 차단이 되지 않은 캐릭터라면..
 	else
-	{
-		m_IgnoreCharacterSet.insert(c_szName);
-	}
+		m_IgnoreCharacterSet.emplace(c_szName);
 }
 
 BOOL CPythonChat::IsIgnoreCharacter(const char * c_szName)
 {
-	TIgnoreCharacterSet::iterator itor = m_IgnoreCharacterSet.find(c_szName);
+	auto itor = m_IgnoreCharacterSet.find(c_szName);
 
 	if (m_IgnoreCharacterSet.end() == itor)
 		return FALSE;
@@ -537,31 +520,26 @@ BOOL CPythonChat::IsIgnoreCharacter(const char * c_szName)
 CWhisper * CPythonChat::CreateWhisper(const char * c_szName)
 {
 	CWhisper * pWhisper = CWhisper::New();
-	m_WhisperMap.insert(TWhisperMap::value_type(c_szName, pWhisper));
+	m_WhisperMap.emplace(c_szName, pWhisper);
 	return pWhisper;
 }
 
 void CPythonChat::AppendWhisper(int32_t iType, const char * c_szName, const char * c_szChat)
 {
-	TWhisperMap::iterator itor = m_WhisperMap.find(c_szName);
+	CWhisper * pWhisper{};
+	auto itor = m_WhisperMap.find(c_szName); 
 
-	CWhisper * pWhisper;
-	if (itor == m_WhisperMap.end())
-	{
-		pWhisper = CreateWhisper(c_szName);
-	}
-	else
-	{
+	if (itor != m_WhisperMap.end())
 		pWhisper = itor->second;
-	}
+	else
+		pWhisper = CreateWhisper(c_szName);
 
 	pWhisper->AppendChat(iType, c_szChat);
 }
 
 void CPythonChat::ClearWhisper(const char * c_szName)
 {
-	TWhisperMap::iterator itor = m_WhisperMap.find(c_szName);
-
+	auto itor = m_WhisperMap.find(c_szName);
 	if (itor != m_WhisperMap.end())
 	{
 		CWhisper * pWhisper = itor->second;
@@ -573,20 +551,18 @@ void CPythonChat::ClearWhisper(const char * c_szName)
 
 BOOL CPythonChat::GetWhisper(const char * c_szName, CWhisper ** ppWhisper)
 {
-	TWhisperMap::iterator itor = m_WhisperMap.find(c_szName);
-
-	if (itor == m_WhisperMap.end())
-		return FALSE;
-
-	*ppWhisper = itor->second;
-
-	return TRUE;
+	auto itor = m_WhisperMap.find(c_szName);
+	if (itor != m_WhisperMap.end())
+	{
+		*ppWhisper = itor->second;
+		return TRUE;
+	}
+	return FALSE;
 }
 
 void CPythonChat::InitWhisper(PyObject * ppyObject)
 {
-	TWhisperMap::iterator itor = m_WhisperMap.begin();
-	for (; itor != m_WhisperMap.end(); ++itor)
+	for (auto itor = m_WhisperMap.begin(); itor != m_WhisperMap.end(); ++itor)
 	{
 		std::string strName = itor->first;
 		PyCallClassMemberFunc(ppyObject, "MakeWhisperButton", Py_BuildValue("(s)", strName.c_str()));
@@ -595,26 +571,19 @@ void CPythonChat::InitWhisper(PyObject * ppyObject)
 
 void CPythonChat::__DestroyWhisperMap()
 {
-	TWhisperMap::iterator itor = m_WhisperMap.begin();
-	for (; itor != m_WhisperMap.end(); ++itor)
-	{
+	for (auto itor = m_WhisperMap.begin(); itor != m_WhisperMap.end(); ++itor)
 		CWhisper::Delete(itor->second);
-	}
 	m_WhisperMap.clear();
 }
 
 void CPythonChat::Close()
 {
-	TChatSetMap::iterator itor = m_ChatSetMap.begin();
-	for (; itor != m_ChatSetMap.end(); ++itor)
+	for (auto itor = m_ChatSetMap.begin(); itor != m_ChatSetMap.end(); ++itor)
 	{
 		TChatSet & rChatSet = itor->second;
 		TChatLineList * pLineList = &(rChatSet.m_ShowingChatLineList);
-		for (TChatLineList::iterator itor = pLineList->begin(); itor != pLineList->end(); ++itor)
-		{
-			TChatLine * pChatLine = (*itor);
+		for (auto & pChatLine : *pLineList)
 			pChatLine->fAppendedTime = 0.0f;
-		}
 	}
 }
 
@@ -688,12 +657,17 @@ void CWhisper::SetPosition(float fPosition)
 	__ArrangeChat();
 }
 
+const char * CWhisper::GetLastWhisper()
+{
+	return m_lastWhisper;
+}
+
 void CWhisper::SetBoxSize(float fWidth, float fHeight)
 {
 	m_fWidth = fWidth;
 	m_fHeight = fHeight;
 
-	for (TChatLineDeque::iterator itor = m_ChatLineDeque.begin(); itor != m_ChatLineDeque.end(); ++itor)
+	for (auto itor = m_ChatLineDeque.begin(); itor != m_ChatLineDeque.end(); ++itor)
 	{
 		TChatLine * pChatLine = *itor;
 		pChatLine->Instance.SetLimitWidth(fWidth);
@@ -716,6 +690,8 @@ void CWhisper::AppendChat(int32_t iType, const char * c_szChat)
 	SChatLine * pChatLine = SChatLine::New();
 	pChatLine->Instance.SetValue(c_szChat);
 
+	m_lastWhisper = c_szChat;
+
 	// DEFAULT_FONT
 	pChatLine->Instance.SetTextPointer(pkDefaultFont);
 	// END_OF_DEFAULT_FONT
@@ -737,14 +713,14 @@ void CWhisper::AppendChat(int32_t iType, const char * c_szChat)
 			break;
 	}
 
-	m_ChatLineDeque.push_back(pChatLine);
+	m_ChatLineDeque.emplace_back(pChatLine);
 
 	__ArrangeChat();
 }
 
 void CWhisper::__ArrangeChat()
 {
-	for (TChatLineDeque::iterator itor = m_ChatLineDeque.begin(); itor != m_ChatLineDeque.end(); ++itor)
+	for (auto itor = m_ChatLineDeque.begin(); itor != m_ChatLineDeque.end(); ++itor)
 	{
 		TChatLine * pChatLine = *itor;
 		pChatLine->Instance.Update();
@@ -759,13 +735,9 @@ void CWhisper::Render(float fx, float fy)
 	int32_t iLineCount = int32_t(m_ChatLineDeque.size());
 	int32_t iStartLine = -1;
 	if (iLineCount > iViewCount)
-	{
-		iStartLine = int32_t(float(iLineCount-iViewCount) * m_fcurPosition) + iViewCount - 1;
-	}
+		iStartLine = int32_t(float(iLineCount - iViewCount) * m_fcurPosition) + iViewCount - 1;
 	else if (!m_ChatLineDeque.empty())
-	{
 		iStartLine = iLineCount - 1;
-	}
 
 	RECT Rect = { fx, fy, fx+m_fWidth, fy+m_fHeight };
 
@@ -791,6 +763,7 @@ void CWhisper::__Initialize()
 	m_fWidth = 300.0f;
 	m_fHeight = 120.0f;
 	m_fcurPosition = 1.0f;
+	m_lastWhisper = "";
 }
 
 void CWhisper::Destroy()
@@ -819,7 +792,7 @@ CWhisper::SChatLine* CWhisper::SChatLine::New()
 	return ms_kPool.Alloc();
 }
 
-void CWhisper::SChatLine::Delete(CWhisper::SChatLine* pkChatLine)
+void CWhisper::SChatLine::Delete(SChatLine * pkChatLine)
 {
 	pkChatLine->Instance.Destroy();
 	ms_kPool.Free(pkChatLine);

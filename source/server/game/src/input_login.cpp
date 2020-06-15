@@ -17,17 +17,21 @@
 #include "party.h"
 #include "dungeon.h"
 #include "war_map.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "building.h"
 #include "wedding.h"
 #include "affect.h"
 #include "arena.h"
-#include "OXEvent.h"
+#include "ox_event.h"
 #include "priv_manager.h"
 #include "dev_log.h"
 #include "log.h"
-#include "horsename_manager.h"
-#include "MarkManager.h"
+#include "mark_manager.h"
+#include "gm.h"
+#include "item.h"
+#include "Battleground.h"
+
+#include "../../common/service.h"
 
 #ifdef ENABLE_WOLFMAN_CHARACTER
 
@@ -123,11 +127,12 @@ void CInputLogin::Login(LPDESC d, const char * data)
 
 	TPacketGCLoginFailure failurePacket;
 
-	if (!test_server)
+	if (!g_bIsTestServer)
 	{
 		failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 		strlcpy(failurePacket.szStatus, "VERSION", sizeof(failurePacket.szStatus));
 		d->Packet(&failurePacket, sizeof(TPacketGCLoginFailure));
+		sys_log(0, "LOGIN_FAIL: VERSION | %s", login);
 		return;
 	}
 
@@ -136,6 +141,7 @@ void CInputLogin::Login(LPDESC d, const char * data)
 		failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 		strlcpy(failurePacket.szStatus, "SHUTDOWN", sizeof(failurePacket.szStatus));
 		d->Packet(&failurePacket, sizeof(TPacketGCLoginFailure));
+		sys_log(0, "LOGIN_FAIL: SHUTDOWN | %s", login);
 		return;
 	}
 
@@ -464,6 +470,13 @@ void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 		return;
 	}
 	
+	if (!GM::check_account_allow(d->GetAccountTable().login, GM_ALLOW_CREATE_PLAYER))
+	{
+		sys_err("gm may not create a character");
+		d->Packet(&packFailure, sizeof(packFailure));
+		return;
+	}
+
 	if (!check_name(pinfo->name) || pinfo->shape > 1)
 	{
 		d->Packet(&packFailure, sizeof(packFailure));
@@ -532,6 +545,14 @@ void CInputLogin::CharacterDelete(LPDESC d, const char * data)
 		return;
 	}
 
+
+	if (!GM::check_allow(GM::get_level(c_rAccountTable.players[pinfo->index].szName, c_rAccountTable.login), GM_ALLOW_DELETE_PLAYER))
+	{
+		sys_err("PlayerDelete: cannot delete gm character [%s]", c_rAccountTable.players[pinfo->index].szName);
+		d->Packet(encode_byte(HEADER_GC_CHARACTER_DELETE_WRONG_SOCIAL_ID), 1);
+		return;
+	}
+
 	TPlayerDeletePacket	player_delete_packet;
 
 	trim_and_lower(c_rAccountTable.login, player_delete_packet.login, sizeof(player_delete_packet.login));
@@ -541,15 +562,6 @@ void CInputLogin::CharacterDelete(LPDESC d, const char * data)
 
 	db_clientdesc->DBPacket(HEADER_GD_PLAYER_DELETE, d->GetHandle(), &player_delete_packet, sizeof(TPlayerDeletePacket));
 }
-
-#pragma pack(1)
-typedef struct SPacketGTLogin
-{
-	uint8_t header;
-	uint16_t empty;
-	uint32_t id;
-} TPacketGTLogin;
-#pragma pack()
 
 void CInputLogin::Entergame(LPDESC d, const char * data)
 {
@@ -561,11 +573,11 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		return;
 	}
 
-	PIXEL_POSITION pos = ch->GetXYZ();
+	GPOS pos = ch->GetXYZ();
 
 	if (!SECTREE_MANAGER::instance().GetMovablePosition(ch->GetMapIndex(), pos.x, pos.y, pos))
 	{
-		PIXEL_POSITION pos2;
+		GPOS pos2;
 		SECTREE_MANAGER::instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos2);
 
 		sys_err("!GetMovablePosition (name %s %dx%d map %d changed to %dx%d)", 
@@ -582,15 +594,14 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	ch->Show(ch->GetMapIndex(), pos.x, pos.y, pos.z);
 
 	SECTREE_MANAGER::instance().SendNPCPosition(ch);
-	ch->ReviveInvisible(5);
 
 	d->SetPhase(PHASE_GAME);
 
-	if(ch->GetItemAward_cmd())																		//게임페이즈 들어가면
-		quest::CQuestManager::instance().ItemInformer(ch->GetPlayerID(),ch->GetItemAward_vnum());	//questmanager 호출
-	
-	sys_log(0, "ENTERGAME: %s %dx%dx%d %s map_index %d", 
+	sys_log(0, "ENTERGAME: %s %dx%dx%d %s map_index %d",
 			ch->GetName(), ch->GetX(), ch->GetY(), ch->GetZ(), d->GetHostName(), ch->GetMapIndex());
+
+	if (ch->GetItemAward_cmd())																		//게임페이즈 들어가면
+		quest::CQuestManager::instance().ItemInformer(ch->GetPlayerID(),ch->GetItemAward_vnum());	//questmanager 호출
 
 	if (ch->GetHorseLevel() > 0)
 	{
@@ -604,6 +615,11 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	ch->StartSaveEvent();
 	ch->StartRecoveryEvent();
 	ch->StartCheckSpeedHackEvent();
+
+	ch->SetLastMoveAblePosition(ch->GetXYZ());
+	ch->SetLastMoveableMapIndex();
+
+	ch->StartCheckWallhack();
 
 	CPVPManager::instance().Connect(ch);
 	CPVPManager::instance().SendList(d);
@@ -627,6 +643,11 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	p2.channel = g_bChannel;
 	d->Packet(&p2, sizeof(p2));
 
+	if (!ch->IsGMInvisible())
+		ch->ReviveInvisible(5);
+	else
+		ch->ReviveInvisible(INFINITE_AFFECT_DURATION);
+
 	_send_bonus_info(ch);
 	
 	for (int32_t i = 0; i <= PREMIUM_MAX_NUM; ++i)
@@ -640,7 +661,7 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		sys_log(0, "PREMIUM: %s type %d %dmin", ch->GetName(), i, remain);
 	}
 
-	if (ch->IsGM() == true)
+	if (ch->IsGM())
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "ConsoleEnable");
 
 	if (ch->GetMapIndex() >= 10000)
@@ -700,15 +721,17 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		}
 		else if (memberFlag == MEMBER_NO)		
 		{
+			sys_err("input_login.cpp: memberFlag == MEMBER_NO)");
 			if (ch->GetGMLevel() == GM_PLAYER)
 				ch->WarpSet(EMPIRE_START_X(ch->GetEmpire()), EMPIRE_START_Y(ch->GetEmpire()));
 		}
 		else
 		{
+			sys_err("input_login.cpp: Unknown member flag: %d Member: %s", memberFlag, ch->GetName());
 			// wtf
 		}
 	}
-	else if (ch->GetMapIndex() == 113)
+	else if (ch->GetMapIndex() == OXEVENT_MAP_INDEX)
 	{
 		// ox 이벤트 맵
 		if (COXEventManager::instance().Enter(ch) == false)
@@ -723,17 +746,9 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		if (CWarMapManager::instance().IsWarMap(ch->GetMapIndex()) ||
 				marriage::WeddingManager::instance().IsWeddingMap(ch->GetMapIndex()))
 		{
-			if (!test_server)
+			if (!g_bIsTestServer)
 				ch->WarpSet(EMPIRE_START_X(ch->GetEmpire()), EMPIRE_START_Y(ch->GetEmpire()));
 		}
-	}
-
-	if (ch->GetHorseLevel() > 0)
-	{
-		uint32_t pid = ch->GetPlayerID();
-
-		if (pid != 0 && CHorseNameManager::instance().GetHorseName(pid) == nullptr)
-			db_clientdesc->DBPacket(HEADER_GD_REQ_HORSE_NAME, 0, &pid, sizeof(uint32_t));
 	}
 
 	// 중립맵에 들어갔을때 안내하기
@@ -746,6 +761,18 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 			ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("본인의 주성 및 부성으로 돌아가시기 바랍니다."));
 		}
 	}
+
+	if (CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+		CBattlegroundManager::instance().OnLogin(ch);
+
+	if (g_bIsTestServer && ch->IsGM())
+		ch->ChatPacket(CHAT_TYPE_BIG_NOTICE, "Test Server Aktif");
+
+	if (ch->GetPoint(POINT_ST) > 150 || ch->GetPoint(POINT_HT) > 150 || ch->GetPoint(POINT_DX) > 150 || ch->GetPoint(POINT_IQ) > 150)
+		LogManager::instance().HackLog("STAT_OVERFLOW", ch);
+
+	// Compute Points
+	// ch->ComputePoints();
 }
 
 void CInputLogin::Empire(LPDESC d, const char * c_pData)
@@ -803,7 +830,7 @@ int32_t CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiB
 	}
 
 	// 땅을 소유하지 않은 길드인 경우.
-	if (!test_server)
+	if (!g_bIsTestServer)
 		if (!building::CManager::instance().FindLandByGuild(p->guild_id))
 		{
 			d->SetPhase(PHASE_CLOSE);
@@ -998,6 +1025,18 @@ int32_t CInputLogin::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 			///////////////////////////////////////
 			// Guild Mark
 			/////////////////////////////////////
+		case HEADER_CG_MARK_LOGIN:
+			if (!guild_mark_server)
+			{
+				sys_err("Guild Mark login requested but i'm not a mark server!");
+				d->SetPhase(PHASE_CLOSE);
+				break;
+			}
+
+			sys_log(0, "MARK_SERVER: Login");
+			d->SetPhase(PHASE_LOGIN);
+			break;
+
 		case HEADER_CG_MARK_CRCLIST:
 			GuildMarkCRCList(d, c_pData);
 			break;
@@ -1024,6 +1063,7 @@ int32_t CInputLogin::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 			/////////////////////////////////////
 
 		case HEADER_CG_HACK:
+		case HEADER_CG_CHAT:
 			break;
 
 		case HEADER_CG_CHANGE_NAME:

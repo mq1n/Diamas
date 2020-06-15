@@ -8,7 +8,7 @@
  * "Portions Copyright (C) John W. Ratcliff, 2001"
  */
 
-#include "Stdafx.h"
+#include "StdAfx.h"
 #include "frustum.h"
 
 //#include "frustum.h"
@@ -26,17 +26,12 @@ ViewState Frustum::ViewVolumeTest(const Vector3d &c_v3Center,const float c_fRadi
 {
 	if (m_bUsingSphere)
 	{
-		D3DXVECTOR3 v(
-				c_v3Center.x-m_v3Center.x,
-				c_v3Center.y-m_v3Center.y,
-				c_v3Center.z-m_v3Center.z);
+		D3DXVECTOR3 v(c_v3Center.x - m_v3Center.x, c_v3Center.y - m_v3Center.y, c_v3Center.z - m_v3Center.z);
 
 		if ((c_fRadius + m_fRadius) * (c_fRadius + m_fRadius) < D3DXVec3LengthSq(&v))
-		{
 			return VS_OUTSIDE;
-		}
-	}	
-	
+	}
+
 	const int32_t count=6;
 
 	D3DXVECTOR3 center = c_v3Center;
@@ -81,7 +76,7 @@ void Frustum::BuildViewFrustum(D3DXMATRIX & mat)
 void Frustum::BuildViewFrustum2(D3DXMATRIX & mat, float fNear, float fFar, float fFov, float fAspect, const D3DXVECTOR3 & vCamera, const D3DXVECTOR3 & vLook)
 {
 	float fViewLen = fFar-fNear;
-	float fH = fViewLen * tan(fFov*0.5f);
+	float fH = static_cast<float>(fViewLen * tan(fFov*0.5f));
 	float fW = fH*fAspect;
 	D3DXVECTOR3 P(0.0f, 0.0f, fNear+fViewLen*0.5f);
 	D3DXVECTOR3 Q(fW, fH, fViewLen);

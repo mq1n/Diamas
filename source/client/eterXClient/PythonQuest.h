@@ -26,7 +26,8 @@ class CPythonQuest : public CSingleton<CPythonQuest>
 
 			int32_t				iStartTime;
 		};
-		typedef std::vector<SQuestInstance> TQuestInstanceContainer;
+
+	using TQuestInstanceContainer = std::vector<SQuestInstance>;
 
 	public:
 		CPythonQuest();
@@ -47,7 +48,7 @@ class CPythonQuest : public CSingleton<CPythonQuest>
 		void SetQuestCounterValue(uint32_t dwIndex, int32_t iCounterValue);
 		void SetQuestIconFileName(uint32_t dwIndex, const char * c_szIconFileName);
 
-		int32_t GetQuestCount();
+		int32_t GetQuestCount() const;
 		bool GetQuestInstancePtr(uint32_t dwArrayIndex, SQuestInstance ** ppQuestInstance);
 
 	protected:

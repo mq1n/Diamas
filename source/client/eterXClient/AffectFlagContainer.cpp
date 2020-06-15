@@ -65,7 +65,7 @@ void CAffectFlagContainer::Set(uint32_t uPos, bool isSet)
 
 	uint8_t& rElement=(uint8_t)m_aElement[uPos/8];
 
-	uint8_t bMask=uint8_t(1<<(uPos&7));
+	auto bMask = uint8_t(1 << (uPos & 7));
 	if (isSet)
 		rElement|=bMask;
 	else
@@ -82,7 +82,7 @@ bool CAffectFlagContainer::IsSet(uint32_t uPos) const
 
 	const uint8_t& c_rElement=m_aElement[uPos/8];
 
-	uint8_t bMask=uint8_t(1<<(uPos&7));
+	auto bMask = uint8_t(1 << (uPos & 7));
 	if (c_rElement&bMask)
 		return true;
 

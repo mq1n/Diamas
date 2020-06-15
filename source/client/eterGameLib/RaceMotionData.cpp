@@ -364,7 +364,7 @@ bool CRaceMotionData::LoadMotionData(const char * c_szFileName)
 
 		rkTextFileLoader.GetCurrentNodeName(&strNodeName);
 
-		if (0 == strNodeName.compare("comboinputdata"))
+		if ("comboinputdata" == strNodeName)
 		{
 			m_isComboMotion = TRUE;
 
@@ -375,32 +375,28 @@ bool CRaceMotionData::LoadMotionData(const char * c_szFileName)
 			if (!rkTextFileLoader.GetTokenFloat("inputlimittime", &m_ComboInputData.fInputEndTime))
 				return false;
 		}
-		else if (0 == strNodeName.compare("attackingdata"))
+		else if ("attackingdata" == strNodeName)
 		{
 			m_isAttackingMotion = TRUE;
 
 			if (!NRaceData::LoadMotionAttackData(rkTextFileLoader, &m_MotionAttackData))
 				return false;
 		}
-		else if (0 == strNodeName.compare("loopdata"))
+		else if ("loopdata" == strNodeName)
 		{
 			m_isLoopMotion = TRUE;
 			if (!rkTextFileLoader.GetTokenInteger("motionloopcount", &m_iLoopCount))
-			{
 				m_iLoopCount = -1;
-			}
 			if (!rkTextFileLoader.GetTokenInteger("loopcancelenable", &m_bCancelEnableSkill))
-			{
 				m_bCancelEnableSkill = FALSE;
-			}
 			if (!rkTextFileLoader.GetTokenFloat("loopstarttime", &m_fLoopStartTime))
 				return false;
 			if (!rkTextFileLoader.GetTokenFloat("loopendtime", &m_fLoopEndTime))
 				return false;
 		}
-		else if (0 == strNodeName.compare("motioneventdata"))
+		else if ("motioneventdata" == strNodeName)
 		{
-			uint32_t dwMotionEventDataCount;
+			uint32_t dwMotionEventDataCount = 0;
 
 			if (!rkTextFileLoader.GetTokenDoubleWord("motioneventdatacount", &dwMotionEventDataCount))
 				continue;
@@ -493,81 +489,78 @@ bool CRaceMotionData::LoadMotionData(const char * c_szFileName)
 #ifdef WORLD_EDITOR
 bool CRaceMotionData::SaveMotionData(const char * c_szFileName)
 {
-	FILE * File;
-
 	SetFileAttributes(c_szFileName, FILE_ATTRIBUTE_NORMAL);
-	File = fopen(c_szFileName, "w");
+	msl::file_ptr fPtr(c_szFileName, "w");
 
-	if (!File)
+	if (!fPtr)
 	{
 		TraceError("CRaceMotionData::SaveMotionData : cannot open file for writing (filename: %s)", c_szFileName);
 		return false;
 	}
 
-	fprintf(File, "ScriptType               MotionData\n");
-	fprintf(File, "\n");
+	fprintf(fPtr.get(), "ScriptType               MotionData\n");
+	fprintf(fPtr.get(), "\n");
 
-	fprintf(File, "MotionFileName           \"%s\"\n", m_strMotionFileName.c_str());
-	fprintf(File, "MotionDuration           %f\n", m_fMotionDuration);
+	fprintf(fPtr.get(), "MotionFileName           \"%s\"\n", m_strMotionFileName.c_str());
+	fprintf(fPtr.get(), "MotionDuration           %f\n", m_fMotionDuration);
 
 	if (m_isAccumulationMotion)
-		fprintf(File, "Accumulation           %.2f\t%.2f\t%.2f\n", m_accumulationPosition.x, m_accumulationPosition.y, m_accumulationPosition.z);
+		fprintf(fPtr.get(), "Accumulation           %.2f\t%.2f\t%.2f\n", m_accumulationPosition.x, m_accumulationPosition.y,
+				m_accumulationPosition.z);
 
-	fprintf(File, "\n");
+	fprintf(fPtr.get(), "\n");
 
 	if (m_isComboMotion)
 	{
-		fprintf(File, "Group ComboInputData\n");
-		fprintf(File, "{\n");
-		fprintf(File, "    PreInputTime             %f\n", m_ComboInputData.fInputStartTime);
-		fprintf(File, "    DirectInputTime          %f\n", m_ComboInputData.fNextComboTime);
-		fprintf(File, "    InputLimitTime           %f\n", m_ComboInputData.fInputEndTime);
-		fprintf(File, "}\n");
-		fprintf(File, "\n");
+		fprintf(fPtr.get(), "Group ComboInputData\n");
+		fprintf(fPtr.get(), "{\n");
+		fprintf(fPtr.get(), "    PreInputTime             %f\n", m_ComboInputData.fInputStartTime);
+		fprintf(fPtr.get(), "    DirectInputTime          %f\n", m_ComboInputData.fNextComboTime);
+		fprintf(fPtr.get(), "    InputLimitTime           %f\n", m_ComboInputData.fInputEndTime);
+		fprintf(fPtr.get(), "}\n");
+		fprintf(fPtr.get(), "\n");
 	}
 
 	if (m_isAttackingMotion)
 	{
-		fprintf(File, "Group AttackingData\n");
-		fprintf(File, "{\n");
-		NRaceData::SaveMotionAttackData(File, 1, m_MotionAttackData);
-		fprintf(File, "}\n");
-		fprintf(File, "\n");
+		fprintf(fPtr.get(), "Group AttackingData\n");
+		fprintf(fPtr.get(), "{\n");
+		NRaceData::SaveMotionAttackData(fPtr.get(), 1, m_MotionAttackData);
+		fprintf(fPtr.get(), "}\n");
+		fprintf(fPtr.get(), "\n");
 	}
 
 	if (m_isLoopMotion)
 	{
-		fprintf(File, "Group LoopData\n");
-		fprintf(File, "{\n");
-		fprintf(File, "    MotionLoopCount          %d\n", m_iLoopCount);
-		fprintf(File, "    LoopCancelEnable         %d\n", m_bCancelEnableSkill);
-		fprintf(File, "    LoopStartTime            %f\n", m_fLoopStartTime);
-		fprintf(File, "    LoopEndTime              %f\n", m_fLoopEndTime);
-		fprintf(File, "}\n");
-		fprintf(File, "\n");
+		fprintf(fPtr.get(), "Group LoopData\n");
+		fprintf(fPtr.get(), "{\n");
+		fprintf(fPtr.get(), "    MotionLoopCount          %d\n", m_iLoopCount);
+		fprintf(fPtr.get(), "    LoopCancelEnable         %d\n", m_bCancelEnableSkill);
+		fprintf(fPtr.get(), "    LoopStartTime            %f\n", m_fLoopStartTime);
+		fprintf(fPtr.get(), "    LoopEndTime              %f\n", m_fLoopEndTime);
+		fprintf(fPtr.get(), "}\n");
+		fprintf(fPtr.get(), "\n");
 	}
 
 	if (!m_MotionEventDataVector.empty())
 	{
-		fprintf(File, "Group MotionEventData\n");
-		fprintf(File, "{\n");
-		fprintf(File, "    MotionEventDataCount     %d\n", m_MotionEventDataVector.size());
+		fprintf(fPtr.get(), "Group MotionEventData\n");
+		fprintf(fPtr.get(), "{\n");
+		fprintf(fPtr.get(), "    MotionEventDataCount     %d\n", m_MotionEventDataVector.size());
 
 		for (uint32_t j = 0; j < m_MotionEventDataVector.size(); ++j)
 		{
 			TMotionEventData * c_pData = m_MotionEventDataVector[j];
 
-			fprintf(File, "    Group Event%02d\n", j);
-			fprintf(File, "    {\n");
-			fprintf(File, "        MotionEventType      %d\n", c_pData->iType);
-			fprintf(File, "        StartingTime         %f\n", c_pData->fStartingTime);
-			c_pData->Save(File, 2);
-			fprintf(File, "    }\n");
+			fprintf(fPtr.get(), "    Group Event%02d\n", j);
+			fprintf(fPtr.get(), "    {\n");
+			fprintf(fPtr.get(), "        MotionEventType      %d\n", c_pData->iType);
+			fprintf(fPtr.get(), "        StartingTime         %f\n", c_pData->fStartingTime);
+			c_pData->Save(fPtr.get(), 2);
+			fprintf(fPtr.get(), "    }\n");
 		}
-		fprintf(File, "}\n");
+		fprintf(fPtr.get(), "}\n");
 	}
-
-	fclose(File);
 	return true;
 }
 #endif
@@ -575,9 +568,8 @@ bool CRaceMotionData::LoadSoundScriptData(const char * c_szFileName)
 {
 	NSound::TSoundDataVector SoundDataVector;
 	if (!NSound::LoadSoundInformationPiece(c_szFileName, SoundDataVector))
-	{	
 		return false;
-	}
+
 	
 	NSound::DataToInstance(SoundDataVector, &m_SoundInstanceVector);	
 	return true;

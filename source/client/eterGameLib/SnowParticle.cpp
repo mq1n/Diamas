@@ -79,9 +79,7 @@ void CSnowParticle::Init(const D3DXVECTOR3 & c_rv3Pos, bool bIsRain)
 CSnowParticle * CSnowParticle::New()
 {
 	if (ms_kVct_SnowParticlePool.empty())
-	{
 		return new CSnowParticle;
-	}
 
 	CSnowParticle * pParticle = ms_kVct_SnowParticlePool.back();
 	ms_kVct_SnowParticlePool.pop_back();
@@ -90,7 +88,7 @@ CSnowParticle * CSnowParticle::New()
 
 void CSnowParticle::Delete(CSnowParticle * pSnowParticle)
 {
-	ms_kVct_SnowParticlePool.push_back(pSnowParticle);
+	ms_kVct_SnowParticlePool.emplace_back(pSnowParticle);
 }
 
 void CSnowParticle::DestroyPool()

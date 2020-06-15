@@ -2,6 +2,9 @@
 #include "PythonNetworkStream.h"
 #include "AccountConnector.h"
 #include "PythonGuild.h"
+#include "PythonChat.h"
+#include "PythonSystem.h"
+#include "PythonApplication.h"
 #include "AbstractPlayer.h"
 #include "PythonDynamicModuleNames.h"
 
@@ -67,7 +70,7 @@ PyObject* netStartGame(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netIsTest(PyObject* poSelf, PyObject* poArgs)
 {
-	return Py_BuildValue("i", 0);
+	return Py_BuildValue("i", CPythonApplication::Instance().GetGameStage() == STAGE_TEST_GAME);
 }
 
 PyObject* netWarp(PyObject* poSelf, PyObject* poArgs)
@@ -786,9 +789,9 @@ PyObject* netSendItemPickUpPacket(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netSendGiveItemPacket(PyObject* poSelf, PyObject* poArgs)
 {
-	int32_t iTargetVID;
+	int32_t iTargetVID = 0;
 	TItemPos Cell;
-	int32_t iItemCount;
+	int32_t iItemCount = 0;
 	switch (PyTuple_Size(poArgs))
 	{
 	case 3:
@@ -1156,7 +1159,7 @@ PyObject* netSendSafeboxWithdrawMoneyPacket(PyObject* poSelf, PyObject* poArgs)
 PyObject* netSendSafeboxCheckinPacket(PyObject* poSelf, PyObject* poArgs)
 {
 	TItemPos InventoryPos;
-	int32_t iSafeBoxPos;
+	int32_t iSafeBoxPos = 0;
 
 	switch (PyTuple_Size(poArgs))
 	{
@@ -1610,6 +1613,26 @@ PyObject* netDisconnectUploader(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
+PyObject* netSendTargetDropPacket(PyObject* poSelf, PyObject* poArgs)
+{
+	CPythonNetworkStream& rns = CPythonNetworkStream::Instance();
+	rns.SendTargetDropPacket();
+
+	return Py_BuildNone();
+}
+
+PyObject* netSendChestDropInfo(PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t iSlotIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iSlotIndex))
+		return Py_BadArgument();
+
+	CPythonNetworkStream& rkNetStream = CPythonNetworkStream::Instance();
+	rkNetStream.SendChestDropInfo(iSlotIndex);
+
+	return Py_BuildNone();
+}
+
 void initnet()
 {
 	static PyMethodDef s_methods[] =
@@ -1768,6 +1791,9 @@ void initnet()
 		{ "SendGuildSymbol",						netSendGuildSymbol,							METH_VARARGS },
 		{ "DisconnectUploader",						netDisconnectUploader,						METH_VARARGS },
 
+		{ "SendTargetDropPacket",					netSendTargetDropPacket,					METH_VARARGS },
+		{ "SendChestDropInfo",						netSendChestDropInfo,						METH_VARARGS },
+
 		{ nullptr,										nullptr,										0 },
 	};
 
@@ -1790,7 +1816,6 @@ void initnet()
 	PyModule_AddIntConstant(poModule, "PHASE_WINDOW_LOAD", CPythonNetworkStream::PHASE_WINDOW_LOAD);
 	PyModule_AddIntConstant(poModule, "PHASE_WINDOW_GAME", CPythonNetworkStream::PHASE_WINDOW_GAME);
 	PyModule_AddIntConstant(poModule, "PHASE_WINDOW_EMPIRE", CPythonNetworkStream::PHASE_WINDOW_EMPIRE);
-	PyModule_AddIntConstant(poModule, "PHASE_WINDOW_LOGO", CPythonNetworkStream::PHASE_WINDOW_LOGO);
 
 	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_ID", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_ID);
 	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_NAME", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_NAME);

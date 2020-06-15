@@ -17,7 +17,7 @@ public:
 
 	enum
 	{
-		MAX_DECAL_VERTICES	= 256,
+		MAX_DECAL_VERTICES = 256
 	};
 
 	CDecal();

@@ -1,4 +1,4 @@
-#include "Stdafx.h"
+#include "StdAfx.h"
 #include "../eterLib/GrpMath.h"
 #include "../eterEffectLib/EffectManager.h"
 
@@ -91,7 +91,7 @@ void CFlyingInstance::BuildAttachInstance()
 					}
 					rem.CreateEffectInstance(aei.dwEffectInstanceIndex,dwCRC);
 
-					m_vecAttachEffectInstance.push_back(aei);
+					m_vecAttachEffectInstance.emplace_back(aei);
 				}
 				break;
 		}
@@ -113,9 +113,7 @@ void CFlyingInstance::__SetTargetDirection(const CFlyTarget& c_rkTarget)
 
 	// 임시 코드
 	if (m_pData->m_bMaintainParallel)
-	{
 		v3TargetPos.z += 50.0f;
-	}
 
 	D3DXVECTOR3 v3TargetDir=v3TargetPos-m_v3Position;
 
@@ -277,7 +275,8 @@ void CFlyingInstance::UpdateAttachInstance()
 			it->pFlyTrace->UpdateNewPosition(D3DXVECTOR3(m._41,m._42,m._43));
 	}
 }
-struct FCheckBackgroundDuringFlying {
+struct FCheckBackgroundDuringFlying
+{
 	CDynamicSphereInstance s;
 	bool bHit;
 	FCheckBackgroundDuringFlying(const D3DXVECTOR3 & v1, const D3DXVECTOR3 & v2)
@@ -295,9 +294,7 @@ struct FCheckBackgroundDuringFlying {
 		if (!bHit && p->GetType() != ACTOR_OBJECT)
 		{
 			if (p->CollisionDynamicSphere(s))
-			{
 				bHit = true; 
-			}
 		}
 	}
 	bool IsHitted()
@@ -306,7 +303,8 @@ struct FCheckBackgroundDuringFlying {
 	}
 };
 
-struct FCheckAnotherMonsterDuringFlying {
+struct FCheckAnotherMonsterDuringFlying
+{
 	CDynamicSphereInstance s;
 	CGraphicObjectInstance * pInst;
 	const IActorInstance * pOwner;
@@ -316,7 +314,7 @@ struct FCheckAnotherMonsterDuringFlying {
 		s.fRadius = 10.0f;
 		s.v3LastPosition = v1;
 		s.v3Position = v2;
-		pInst = 0;
+		pInst = nullptr;
 	}
 	void operator () (CGraphicObjectInstance * p)
 	{
@@ -327,19 +325,11 @@ struct FCheckAnotherMonsterDuringFlying {
 		{
 			IActorInstance * pa = (IActorInstance*) p;
 			if (pa != pOwner && pa->TestCollisionWithDynamicSphere(s))
-			{
-				pInst = p; 
-			}
+				pInst = p;
 		}
 	}
-	bool IsHitted()
-	{
-		return pInst!=0;
-	}
-	CGraphicObjectInstance * GetHittedObject()
-	{
-		return pInst;
-	}
+	bool IsHitted() { return pInst != nullptr; }
+	CGraphicObjectInstance * GetHittedObject() { return pInst; }
 };
 
 
@@ -388,15 +378,11 @@ bool CFlyingInstance::Update()
 				{
 					IFlyTargetableObject* pVictim=m_FlyTarget.GetFlyTarget();
 					if (pVictim)
-					{
 						pVictim->OnShootDamage();
-					}
 				}
 
 				if (m_pHandler)
-				{
 					m_pHandler->OnExplodingAtTarget(m_dwSkillIndex);
-				}
 
 				if (m_iPierceCount)
 				{
@@ -437,12 +423,10 @@ bool CFlyingInstance::Update()
 			IActorInstance * pHittedInstance = (IActorInstance*)kCheckAnotherMonsterDuringFlying.GetHittedObject();
 			if (m_HittedObjectSet.end() == m_HittedObjectSet.find(pHittedInstance))
 			{
-				m_HittedObjectSet.insert(pHittedInstance);
+				m_HittedObjectSet.emplace(pHittedInstance);
 
 				if (m_pHandler)
-				{
 					m_pHandler->OnExplodingAtAnotherTarget(m_dwSkillIndex, pHittedInstance->GetVirtualID());
-				}
 
 				if (m_iPierceCount)
 				{
@@ -569,8 +553,7 @@ void CFlyingInstance::SetDataPointer(CFlyingData * pData, const D3DXVECTOR3 & v3
 void CFlyingInstance::__SetDataPointer(CFlyingData * pData, const D3DXVECTOR3 & v3StartPosition)
 {
 	m_pData = pData;
-	m_qRot = D3DXQUATERNION(0.0f,0.0f,0.0f,1.0f), 
-	m_v3Position = (v3StartPosition);
+	m_qRot = D3DXQUATERNION(0.0f, 0.0f, 0.0f, 1.0f), m_v3Position = (v3StartPosition);
 	m_bAlive = (true);
 
 	m_fStartTime = CTimer::Instance().GetCurrentSecond();

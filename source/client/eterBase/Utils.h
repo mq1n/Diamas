@@ -1,42 +1,84 @@
 #ifndef __INC_ETER2_ETERBASE_UTILS_H__
 #define __INC_ETER2_ETERBASE_UTILS_H__
 
-#include <windows.h>
+#include <Windows.h>
+#include <cstdint>
 #include <vector>
 #include <string>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 #ifndef SAFE_DELETE
-#define SAFE_DELETE(p)			{ if (p) { delete (p);		(p) = nullptr; } }
+#define SAFE_DELETE(p)     \
+		{                      \
+			if (p)             \
+			{                  \
+				delete (p);    \
+				(p) = nullptr; \
+			}                  \
+		}
 #endif
 
 #ifndef SAFE_DELETE_ARRAY
-#define SAFE_DELETE_ARRAY(p)	{ if (p) { delete[] (p);	(p) = nullptr; } }
+#define SAFE_DELETE_ARRAY(p) \
+		{                        \
+			if (p)               \
+			{                    \
+				delete[](p);     \
+				(p) = nullptr;   \
+			}                    \
+		}
 #endif
 
 #ifndef SAFE_RELEASE
-#define SAFE_RELEASE(p)			{ if (p) { (p)->Release();	(p) = nullptr; } }
+#define SAFE_RELEASE(p)     \
+		{                       \
+			if (p)              \
+			{                   \
+				(p)->Release(); \
+				(p) = nullptr;  \
+			}                   \
+		}
 #endif
 
 #ifndef SAFE_FREE_GLOBAL
-#define SAFE_FREE_GLOBAL(p)		{ if (p) { ::GlobalFree(p);	(p) = nullptr; } }
+#define SAFE_FREE_GLOBAL(p)  \
+		{                        \
+			if (p)               \
+			{                    \
+				::GlobalFree(p); \
+				(p) = nullptr;   \
+			}                    \
+		}
 #endif
 
 #ifndef SAFE_FREE_LIBRARY
-#define SAFE_FREE_LIBRARY(p)	{ if (p) { ::FreeLibrary(p); (p) = nullptr; } }
+#define SAFE_FREE_LIBRARY(p)  \
+		{                         \
+			if (p)                \
+			{                     \
+				::FreeLibrary(p); \
+				(p) = nullptr;    \
+			}                     \
+		}
 #endif
 
-#define AssertLog(str)	TraceError(str); assert(!str)
+#define AssertLog(str) \
+	TraceError(str);   \
+	assert(!(str))
 
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)                                      \
-				((uint32_t)(uint8_t) (ch0       ) | ((uint32_t)(uint8_t) (ch1) <<  8) | \
-				((uint32_t)(uint8_t) (ch2) << 16) | ((uint32_t)(uint8_t) (ch3) << 24))
+		((uint32_t)(uint8_t)(ch0) | ((uint32_t)(uint8_t)(ch1) << 8) | \
+		((uint32_t)(uint8_t)(ch2) << 16) | ((uint32_t)(uint8_t)(ch3) << 24))
 #endif // defined(MAKEFOURCC)
 
 #ifndef IS_SET
 #define IS_SET(flag,bit)                ((flag) & (bit))
+#endif
+
+#ifndef IS_SET_SINGLE_BIT
+#define IS_SET_SINGLE_BIT(flag, bit)	(flag & (1 << bit)) != 0
 #endif
 
 #ifndef SET_BIT
@@ -95,8 +137,8 @@ template<typename T>
 void ELPlainCoord_GetRotatedPixelPosition(T centerX, T centerY, T distance, T rotDegree, T* pdstX, T* pdstY)
 {	
 	T rotRadian=EL_DegreeToRadian(rotDegree);
-	*pdstX=centerX+distance*T(sin((double)rotRadian));
-	*pdstY=centerY+distance*T(cos((double)rotRadian));
+	*pdstX = centerX + distance * T(sin(static_cast<double>(rotRadian)));
+	*pdstY = centerY + distance * T(cos(static_cast<double>(rotRadian)));
 }
 
 template<typename T>
@@ -216,5 +258,22 @@ typedef std::vector<std::string> TTokenVector;
 void StringExceptCharacter(std::string * pstrString, const char * c_szCharacter);
 
 extern void GetExcutedFileName(std::string & r_str);
+
+struct ci_less
+{
+	// case-independent (ci) compare_less binary function
+	struct nocase_compare
+	{
+		bool operator() (const unsigned char& c1, const unsigned char& c2) const {
+			return tolower(c1) < tolower(c2);
+		}
+	};
+	bool operator() (const std::string& s1, const std::string& s2) const {
+		return std::lexicographical_compare
+		(s1.begin(), s1.end(),   // source range
+			s2.begin(), s2.end(),   // dest range
+			nocase_compare());  // comparison
+	}
+};
 
 #endif

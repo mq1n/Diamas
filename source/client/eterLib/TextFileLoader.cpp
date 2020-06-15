@@ -15,7 +15,7 @@ CTokenVector* CTextFileLoader::SGroupNode::GetTokenVector(const std::string& c_r
 {
 	uint32_t dwGroupNameKey=GenNameKey(c_rstGroupName.c_str(), c_rstGroupName.length());
 
-	std::map<uint32_t, CTokenVector>::iterator f=m_kMap_dwKey_kVct_stToken.find(dwGroupNameKey);
+	auto f = m_kMap_dwKey_kVct_stToken.find(dwGroupNameKey);
 	if (m_kMap_dwKey_kVct_stToken.end()==f)
 		return nullptr;
 
@@ -36,7 +36,7 @@ void CTextFileLoader::SGroupNode::InsertTokenVector(const std::string& c_rstGrou
 {
 	uint32_t dwGroupNameKey=GenNameKey(c_rstGroupName.c_str(), c_rstGroupName.length());
 
-	m_kMap_dwKey_kVct_stToken.insert(std::map<uint32_t, CTokenVector>::value_type(dwGroupNameKey, c_rkVct_stToken));
+	m_kMap_dwKey_kVct_stToken.emplace(dwGroupNameKey, c_rkVct_stToken);
 }
 
 uint32_t CTextFileLoader::SGroupNode::GenNameKey(const char* c_szGroupName, uint32_t uGroupNameLen)
@@ -91,7 +91,7 @@ void CTextFileLoader::SGroupNode::DestroySystem()
 CTextFileLoader* CTextFileLoader::Cache(const char* c_szFileName, bool silentFailure)
 {
 	uint32_t dwNameKey=GetCRC32(c_szFileName, strlen(c_szFileName));
-	std::map<uint32_t, CTextFileLoader*>::iterator f=ms_kMap_dwNameKey_pkTextFileLoader.find(dwNameKey);
+	auto f = ms_kMap_dwNameKey_pkTextFileLoader.find(dwNameKey);
 	if (ms_kMap_dwNameKey_pkTextFileLoader.end()!=f)
 	{
 		if (!ms_isCacheMode)
@@ -109,7 +109,7 @@ CTextFileLoader* CTextFileLoader::Cache(const char* c_szFileName, bool silentFai
 	CTextFileLoader* pkNewTextFileLoader=new CTextFileLoader;
 	pkNewTextFileLoader->Load(c_szFileName, silentFailure);
 
-	ms_kMap_dwNameKey_pkTextFileLoader.insert(std::map<uint32_t, CTextFileLoader*>::value_type(dwNameKey, pkNewTextFileLoader));
+	ms_kMap_dwNameKey_pkTextFileLoader.emplace(dwNameKey, pkNewTextFileLoader);
 	return pkNewTextFileLoader;
 }
 
@@ -121,9 +121,8 @@ void CTextFileLoader::SetCacheMode()
 void CTextFileLoader::DestroySystem()
 {
 	{
-		std::map<uint32_t, CTextFileLoader*>::iterator i;
-		for (i=ms_kMap_dwNameKey_pkTextFileLoader.begin(); i!=ms_kMap_dwNameKey_pkTextFileLoader.end(); ++i)
-			delete i->second;
+		for (auto & i : ms_kMap_dwNameKey_pkTextFileLoader)
+			delete i.second;
 		ms_kMap_dwNameKey_pkTextFileLoader.clear();
 	}
 
@@ -223,13 +222,14 @@ bool CTextFileLoader::LoadGroup(TGroupNode * pGroupNode)
 			continue;
 		}
 
-		if ('}' == stTokenVector[0][0]) {
+		if ('}' == stTokenVector[0][0])
+		{
 			nLocalGroupDepth--;
 			break;
 		}
 
 		// Group
-		if (0 == stTokenVector[0].compare("group"))
+		if ("group" == stTokenVector[0])
 		{
 			if (2 != stTokenVector.size())
 			{
@@ -238,11 +238,11 @@ bool CTextFileLoader::LoadGroup(TGroupNode * pGroupNode)
 			}
 
 			TGroupNode * pNewNode = TGroupNode::New();
-			m_kVct_pkNode.push_back(pNewNode);
+			m_kVct_pkNode.emplace_back(pNewNode);
 
 			pNewNode->pParentNode = pGroupNode;
 			pNewNode->SetGroupName(stTokenVector[1]);			
-			pGroupNode->ChildNodeVector.push_back(pNewNode);
+			pGroupNode->ChildNodeVector.emplace_back(pNewNode);
 
 			++m_dwcurLineIndex;
 
@@ -250,7 +250,7 @@ bool CTextFileLoader::LoadGroup(TGroupNode * pGroupNode)
 				return false;
 		}
 		// List
-		else if (0 == stTokenVector[0].compare("list"))
+		else if ("list" == stTokenVector[0])
 		{
 			if (2 != stTokenVector.size())
 			{
@@ -277,10 +277,8 @@ bool CTextFileLoader::LoadGroup(TGroupNode * pGroupNode)
 				if ('}' == stSubTokenVector[0][0])
 					break;
 
-				for (uint32_t j = 0; j < stSubTokenVector.size(); ++j)
-				{
-					stTokenVector.push_back(stSubTokenVector[j]);
-				}
+				for (auto & j : stSubTokenVector)
+					stTokenVector.emplace_back(j);
 			}
 
 			pGroupNode->InsertTokenVector(key, stTokenVector);
@@ -334,9 +332,8 @@ BOOL CTextFileLoader::SetChildNode(const char * c_szKey)
 
 	uint32_t dwKey=SGroupNode::GenNameKey(c_szKey, strlen(c_szKey));
 
-	for (uint32_t i = 0; i < m_pcurNode->ChildNodeVector.size(); ++i)
+	for (auto pGroupNode : m_pcurNode->ChildNodeVector)
 	{
-		TGroupNode * pGroupNode = m_pcurNode->ChildNodeVector[i];
 		if (pGroupNode->IsGroupNameKey(dwKey))
 		{
 			m_pcurNode = pGroupNode;

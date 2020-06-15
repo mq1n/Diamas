@@ -103,7 +103,7 @@ void CTextureSet::Clear()
 void CTextureSet::AddEmptyTexture()
 {
 	TTerrainTexture eraser;
-	m_Textures.push_back(eraser);
+	m_Textures.emplace_back(eraser);
 }
 
 uint32_t CTextureSet::GetTextureCount()
@@ -273,41 +273,37 @@ bool CTextureSet::RemoveTexture(uint32_t ulIndex)
 	if (GetTextureCount() <= ulIndex)
 		return false;
 
-	TTextureVector::iterator itor = m_Textures.begin() + ulIndex;
+	auto itor = m_Textures.begin() + ulIndex;
 	m_Textures.erase(itor);
 	return true;
 }
 
 bool CTextureSet::Save(const char * c_pszFileName)
 {
-	FILE * pFile = fopen(c_pszFileName, "w");
-	
-	if (!pFile)
+	msl::file_ptr fPtr(c_pszFileName, "w");
+	if (!fPtr)
 		return false;
-	
-	fprintf(pFile, "TextureSet\n");
-	fprintf(pFile, "\n");
-	
-	// @fixme004
-	fprintf(pFile, "TextureCount %u\n", GetTextureCount()?(GetTextureCount() - 1):0);	// -1 을 하는 이유는 지우개 때문임
-	fprintf(pFile, "\n");
+
+	fprintf(fPtr.get(), "TextureSet\n");
+	fprintf(fPtr.get(), "\n");
+
+	fprintf(fPtr.get(), "TextureCount %u\n", GetTextureCount() ? (GetTextureCount() - 1) : 0);	// -1 을 하는 이유는 지우개 때문임
+	fprintf(fPtr.get(), "\n");
 
 	for (uint32_t i = 1; i < GetTextureCount(); ++i)
 	{
 		TTerrainTexture & rTex = m_Textures[i];
-		
-		fprintf(pFile, "Start Texture%03u\n", i);
-		fprintf(pFile, "    \"%s\"\n", rTex.stFilename.c_str());
-		fprintf(pFile, "    %f\n", rTex.UScale);
-		fprintf(pFile, "    %f\n", rTex.VScale);
-		fprintf(pFile, "    %f\n", rTex.UOffset);
-		fprintf(pFile, "    %f\n", rTex.VOffset);
-		fprintf(pFile, "    %d\n", rTex.bSplat);
-		fprintf(pFile, "    %hu\n", rTex.Begin);
-		fprintf(pFile, "    %hu\n", rTex.End);
-		fprintf(pFile, "End Texture%03u\n", i);
+
+		fprintf(fPtr.get(), "Start Texture%03u\n", i);
+		fprintf(fPtr.get(), "    \"%s\"\n", rTex.stFilename.c_str());
+		fprintf(fPtr.get(), "    %f\n", rTex.UScale);
+		fprintf(fPtr.get(), "    %f\n", rTex.VScale);
+		fprintf(fPtr.get(), "    %f\n", rTex.UOffset);
+		fprintf(fPtr.get(), "    %f\n", rTex.VOffset);
+		fprintf(fPtr.get(), "    %d\n", rTex.bSplat);
+		fprintf(fPtr.get(), "    %hu\n", rTex.Begin);
+		fprintf(fPtr.get(), "    %hu\n", rTex.End);
+		fprintf(fPtr.get(), "End Texture%03u\n", i);
 	}
-	
-	fclose(pFile);
 	return true;
 }

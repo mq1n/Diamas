@@ -25,7 +25,7 @@ CREATE TABLE `exp_table`  (
   `level` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `exp` int(10) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`level`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 121 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 121 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of exp_table
@@ -152,18 +152,31 @@ INSERT INTO `exp_table` VALUES (119, 2490000000);
 INSERT INTO `exp_table` VALUES (120, 2500000000);
 
 -- ----------------------------
--- Table structure for gmhost
+-- Table structure for gmconfig
 -- ----------------------------
-DROP TABLE IF EXISTS `gmhost`;
-CREATE TABLE `gmhost`  (
-  `mIP` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
-  PRIMARY KEY (`mIP`) USING BTREE
+DROP TABLE IF EXISTS `gmconfig`;
+CREATE TABLE `gmconfig`  (
+  `authority` enum('IMPLEMENTOR','GOD','HIGH_WIZARD','WIZARD','LOW_WIZARD','PLAYER') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'PLAYER',
+  `can_drop_player_item` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `can_drop_gm_item` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `can_exchange_player_item_to_gm` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `can_exchange_player_item_to_player` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `can_exchange_gm_item_to_gm` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `can_exchange_gm_item_to_player` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `can_exchange_to_gm` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `can_exchange_to_player` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `can_buy_private_item` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `can_create_private_shop` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `can_use_safebox` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `can_create_player` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  `can_delete_player` tinyint(1) UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`authority`) USING BTREE
 ) ENGINE = MyISAM CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of gmhost
+-- Records of gmconfig
 -- ----------------------------
-INSERT INTO `gmhost` VALUES ('127.0.0.1');
+INSERT INTO `gmconfig` VALUES ('IMPLEMENTOR', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 
 -- ----------------------------
 -- Table structure for gmlist
@@ -200,7 +213,7 @@ INSERT INTO `locale` VALUES ('SKILL_POWER_BY_LEVEL_TYPE4', '0 5 6 8 10 12 14 16 
 INSERT INTO `locale` VALUES ('SKILL_POWER_BY_LEVEL_TYPE5', '0 5 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 50 52 54 56 58 60 63 66 69 72 82 85 88 91 94 98 102 106 110 115 125 125 125 125 125');
 INSERT INTO `locale` VALUES ('SKILL_POWER_BY_LEVEL_TYPE6', '0 5 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 50 52 54 56 58 60 63 66 69 72 82 85 88 91 94 98 102 106 110 115 125 125 125 125 125');
 INSERT INTO `locale` VALUES ('SKILL_POWER_BY_LEVEL_TYPE7', '0 5 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 50 52 54 56 58 60 63 66 69 72 82 85 88 91 94 98 102 106 110 115 125 125 125 125 125');
-INSERT INTO `locale` VALUES ('LOCALE', 'germany');
+INSERT INTO `locale` VALUES ('LOCALE', 'turkey');
 INSERT INTO `locale` VALUES ('DB_NAME_COLUMN', 'locale_name');
 INSERT INTO `locale` VALUES ('SKILL_DAMAGE_BY_LEVEL_UNDER_90', '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0');
 INSERT INTO `locale` VALUES ('SKILL_DAMAGE_BY_LEVEL_UNDER_45', '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0');
@@ -217,15 +230,15 @@ CREATE TABLE `priv_settings`  (
   `value` int(11) NOT NULL DEFAULT 0 COMMENT '0~1000%',
   `duration` datetime(0) NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`priv_type`, `id`, `type`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of priv_settings
 -- ----------------------------
-INSERT INTO `priv_settings` VALUES ('EMPIRE', 0, 1, 200, '2020-01-01 00:00:00');
-INSERT INTO `priv_settings` VALUES ('EMPIRE', 0, 2, 200, '2020-01-01 00:00:00');
-INSERT INTO `priv_settings` VALUES ('EMPIRE', 0, 3, 200, '2020-01-01 00:00:00');
-INSERT INTO `priv_settings` VALUES ('EMPIRE', 0, 4, 200, '2020-01-01 00:00:00');
+INSERT INTO `priv_settings` VALUES ('EMPIRE', 0, 1, 200, '2023-01-01 00:00:00');
+INSERT INTO `priv_settings` VALUES ('EMPIRE', 0, 2, 200, '2023-01-01 00:00:00');
+INSERT INTO `priv_settings` VALUES ('EMPIRE', 0, 3, 200, '2023-01-01 00:00:00');
+INSERT INTO `priv_settings` VALUES ('EMPIRE', 0, 4, 200, '2023-01-01 00:00:00');
 
 -- ----------------------------
 -- Table structure for spam_db

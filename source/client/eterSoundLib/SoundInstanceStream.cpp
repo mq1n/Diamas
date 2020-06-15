@@ -91,7 +91,7 @@ void CSoundInstanceStream::SetVolume(float volume) const
 	if (!IsData())
 		return;
 
-	volume = std::max<float>(0.0f, std::min<float>(1.0f, volume));
+	volume = std::max(0.0f, std::min(1.0f, volume));
 	AIL_set_stream_volume_levels(m_stream, volume, volume);
 }
 

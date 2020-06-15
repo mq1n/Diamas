@@ -41,33 +41,45 @@ public:
 	
 	bool operator==(const Vector3d &a) const
 	{
-		if ( a.x == x && a.y == y && a.z == z ) return true;
+		if (a.x == x && a.y == y && a.z == z)
+			return true;
 		return false;
 	};
 	
 	bool operator!=(const Vector3d &a) const
 	{
-		if ( a.x != x || a.y != y || a.z != z ) return true;
+		if (a.x != x || a.y != y || a.z != z)
+			return true;
 		return false;
 	};
 	
 	
 	// Operators
     Vector3d& operator = (const Vector3d& A)          // ASSIGNMENT (=)
-	{ x=A.x; y=A.y; z=A.z;
-	return(*this);  };
+	{
+		x = A.x;
+		y = A.y;
+		z = A.z;
+		return (*this);
+	};
 	
     Vector3d operator + (const Vector3d& A) const     // ADDITION (+)
-	{ Vector3d Sum(x+A.x, y+A.y, z+A.z);
-	return(Sum); };
+	{
+		Vector3d Sum(x + A.x, y + A.y, z + A.z);
+		return (Sum);
+	};
 	
     Vector3d operator - (const Vector3d& A) const     // SUBTRACTION (-)
-	{ Vector3d Diff(x-A.x, y-A.y, z-A.z);
-	return(Diff); };
+	{
+		Vector3d Diff(x - A.x, y - A.y, z - A.z);
+		return (Diff);
+	};
 	
     Vector3d operator * (const float s) const       // MULTIPLY BY SCALAR (*)
-	{ Vector3d Scaled(x*s, y*s, z*s);
-	return(Scaled); };
+	{
+		Vector3d Scaled(x * s, y * s, z * s);
+		return (Scaled);
+	};
 	
     Vector3d operator / (const float s) const       // DIVIDE BY SCALAR (/)
     { 
@@ -76,23 +88,41 @@ public:
         return(Scaled); 
     };
 	
-    void operator += (const Vector3d &A)             // ACCUMULATED VECTOR ADDITION (+=)
-	{ x+=A.x; y+=A.y; z+=A.z; };
-    void operator -= (const Vector3d &A)             // ACCUMULATED VECTOR SUBTRACTION (+=)
-	{ x-=A.x; y-=A.y; z-=A.z; };
+	void operator+=(const Vector3d A) // ACCUMULATED VECTOR ADDITION (+=)
+	{
+		x += A.x;
+		y += A.y;
+		z += A.z;
+	};
+	void operator-=(const Vector3d A) // ACCUMULATED VECTOR SUBTRACTION (+=)
+	{
+		x -= A.x;
+		y -= A.y;
+		z -= A.z;
+	};
     void operator *= (const float s)        // ACCUMULATED SCALAR MULTIPLICATION (*=) (bpc 4/24/2000)
-	{x*=s; y*=s; z*=s;}
-	
-    Vector3d operator - (void) const                // NEGATION (-)
-	{ Vector3d Negated(-x, -y, -z);
-	return(Negated); };
-	
-    float operator [] (const int32_t i) const         // ALLOWS VECTOR ACCESS AS AN ARRAY.
-	{ return( (i==0)?x:((i==1)?y:z) ); };
+	{
+		x *= s;
+		y *= s;
+		z *= s;
+	}
+
+	Vector3d operator-(void) const // NEGATION (-)
+	{
+		Vector3d Negated(-x, -y, -z);
+		return (Negated);
+	};
+
+	float operator[](const int32_t i) const // ALLOWS VECTOR ACCESS AS AN ARRAY.
+	{
+		return ((i == 0) ? x : ((i == 1) ? y : z));
+	};
     float & operator [] (const int32_t i)
-	{ return( (i==0)?x:((i==1)?y:z) ); };
+	{
+		return ((i == 0) ? x : ((i == 1) ? y : z));
+	};
 	//
-	
+
 	// accessor methods.
 	float GetX(void) const { return x; };
 	float GetY(void) const { return y; };
@@ -123,7 +153,7 @@ public:
 		result.z = -z;
 		return result;
 	}
-	
+
 	float Magnitude(void) const
 	{
 		return (sqrtf(x * x + y * y + z * z));
@@ -138,7 +168,7 @@ public:
 	
 	float Length(void) const          // length of vector.
 	{
-		return float(sqrtf( x*x + y*y + z*z ));
+		return static_cast<float>(sqrtf(x * x + y * y + z * z));
 	};
 	
 	float Length2(void) const         // squared distance, prior to square root.
@@ -219,7 +249,8 @@ public:
 typedef std::vector< Vector3d > Vector3dVector;
 
 inline Vector3d operator * (float s, const Vector3d &v )
-{ Vector3d Scaled(v.x*s, v.y*s, v.z*s);
-return(Scaled); };
-
+{
+	Vector3d Scaled(v.x * s, v.y * s, v.z * s);
+	return (Scaled);
+};
 

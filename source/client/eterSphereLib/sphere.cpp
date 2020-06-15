@@ -8,13 +8,13 @@
  * "Portions Copyright (C) John W. Ratcliff, 2001"
  */
 
-#include "Stdafx.h"
+#include "StdAfx.h"
 #include "sphere.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <cassert>
 
 bool Vector3d::IsInStaticRange() const
 {
@@ -42,9 +42,7 @@ void Sphere::Set(const Vector3d &center, float radius)
 // **NOTE** There is a bug in this Graphics Gem.  If the origin
 // of the ray is *inside* the sphere being tested, it reports the
 // wrong intersection location.  This code has a fix for the bug.
-bool Sphere::RayIntersection(const Vector3d &rayOrigin,
-														 const Vector3d &dir,
-														 Vector3d *intersect)
+bool Sphere::RayIntersection(const Vector3d & rayOrigin, const Vector3d & dir, Vector3d * intersect)
 {
 	//notation:
 	//point E  = rayOrigin
@@ -55,7 +53,8 @@ bool Sphere::RayIntersection(const Vector3d &rayOrigin,
   float dist2 = EO.x*EO.x + EO.y*EO.y + EO.z * EO.z;
   // Bug Fix For Gem, if origin is *inside* the sphere, invert the
   // direction vector so that we get a valid intersection location.
-  if ( dist2 < mRadius2 ) V*=-1;
+	if (dist2 < mRadius2)
+		V *= -1;
 
 	float v = EO.Dot(V);
 
@@ -81,28 +80,25 @@ bool Sphere::RayIntersection(const Vector3d &rayOrigin,
 }
 
 //
-bool Sphere::RayIntersection(const Vector3d &rayOrigin,
-							 const Vector3d &V,
-							 float distance,
-							 Vector3d *intersect)
+bool Sphere::RayIntersection(const Vector3d & rayOrigin, const Vector3d & V, float distance, Vector3d * intersect)
 {
-  Vector3d sect;
-  bool hit = RayIntersectionInFront(rayOrigin,V,&sect);
+	Vector3d sect;
+	bool hit = RayIntersectionInFront(rayOrigin, V, &sect);
 
-  if ( hit )
-  {
-    float d = rayOrigin.DistanceSq(sect);
-    if ( d > (distance*distance) ) return false;
-    if ( intersect ) *intersect = sect;
-    return true;
-  }
-  return false;
+	if (hit)
+	{
+		float d = rayOrigin.DistanceSq(sect);
+		if (d > (distance * distance))
+			return false;
+		if (intersect)
+			*intersect = sect;
+		return true;
+	}
+	return false;
 }
 
 
-bool Sphere::RayIntersectionInFront(const Vector3d &rayOrigin,
-														        const Vector3d &V,
-        														Vector3d *intersect)
+bool Sphere::RayIntersectionInFront(const Vector3d & rayOrigin, const Vector3d & V, Vector3d * intersect)
 {
   Vector3d sect;
   bool hit = RayIntersection(rayOrigin,V,&sect);
@@ -116,14 +112,15 @@ bool Sphere::RayIntersectionInFront(const Vector3d &rayOrigin,
 
     if ( dot >= 0  ) // then it's in front!
     {
-      if ( intersect ) *intersect = sect;
+			if (intersect)
+				*intersect = sect;
       return true;
     }
   }
   return false;
 }
 
-void Sphere::Report(void)
+void Sphere::Report()
 {
 }
 
@@ -162,12 +159,18 @@ void Sphere::Compute(const SphereInterface &source)
     Vector3d caller_p;
     source.GetVertex(i,caller_p);
 
-  	if (caller_p.GetX()<xmin.GetX()) 	xmin = caller_p; /* New xminimum point */
-  	if (caller_p.GetX()>xmax.GetX())	xmax = caller_p;
-  	if (caller_p.GetY()<ymin.GetY())	ymin = caller_p;
-  	if (caller_p.GetY()>ymax.GetY())	ymax = caller_p;
-  	if (caller_p.GetZ()<zmin.GetZ())	zmin = caller_p;
-  	if (caller_p.GetZ()>zmax.GetZ()) zmax = caller_p;
+		if (caller_p.GetX() < xmin.GetX())
+			xmin = caller_p; /* New xminimum point */
+		if (caller_p.GetX() > xmax.GetX())
+			xmax = caller_p;
+		if (caller_p.GetY() < ymin.GetY())
+			ymin = caller_p;
+		if (caller_p.GetY() > ymax.GetY())
+			ymax = caller_p;
+		if (caller_p.GetZ() < zmin.GetZ())
+			zmin = caller_p;
+		if (caller_p.GetZ() > zmax.GetZ())
+			zmax = caller_p;
 	}
 
   /* Set xspan = distance between the 2 points xmin & xmax (squared) */
@@ -230,7 +233,7 @@ void Sphere::Compute(const SphereInterface &source)
 	  float old_to_p_sq = dx*dx + dy*dy + dz*dz;
   	if (old_to_p_sq > mRadius2) 	/* do r**2 test first */
 		{ 	/* this point is outside of current sphere */
-	  	float old_to_p = float(sqrt(old_to_p_sq));
+		auto old_to_p = float(sqrt(old_to_p_sq));
 		  /* calc radius of new sphere */
   		mRadius = (mRadius + old_to_p) * 0.5f;
 	  	mRadius2 = mRadius*mRadius; 	/* for next r**2 compare */

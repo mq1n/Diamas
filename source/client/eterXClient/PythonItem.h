@@ -13,12 +13,12 @@ class CPythonItem : public CSingleton<CPythonItem>
 	public:
 		enum
 		{
-			INVALID_ID = 0xffffffff,
+			INVALID_ID = 0xffffffff
 		};
 
 		enum
 		{
-			VNUM_MONEY = 1,
+			VNUM_MONEY = 1
 		};
 
 		enum
@@ -31,7 +31,7 @@ class CPythonItem : public CSingleton<CPythonItem>
 			USESOUND_ACCESSORY,
 			USESOUND_POTION,
 			USESOUND_PORTAL,
-			USESOUND_NUM,
+			USESOUND_NUM
 		};
 
 		enum

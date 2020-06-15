@@ -1,6 +1,6 @@
 #ifndef __INC_ETERLIB_MUTEX_H__
 #define __INC_ETERLIB_MUTEX_H__
-
+#include <mutex>
 class Mutex
 {
 	public:
@@ -11,7 +11,7 @@ class Mutex
 		void Unlock();
 
 	private:
-		CRITICAL_SECTION lock;		
+		std::mutex lock;		
 };
 
 #endif

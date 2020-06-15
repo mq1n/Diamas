@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-#include "../eterbase/Debug.h"
-#include "../eterlib/Camera.h"
+#include "../eterBase/Debug.h"
+#include "../eterLib/Camera.h"
 #include "../eterBase/Timer.h"
 #include "ThingInstance.h"
 #include "Thing.h"
@@ -223,7 +223,7 @@ bool CGraphicThingInstance::CheckModelThingIndex(int32_t iModelThing)
 
 bool CGraphicThingInstance::CheckMotionThingIndex(uint32_t dwMotionKey)
 {
-	std::map<uint32_t, CGraphicThing::TRef *>::iterator itor = m_roMotionThingMap.find(dwMotionKey);
+	auto itor = m_roMotionThingMap.find(dwMotionKey);
 
 	if (m_roMotionThingMap.end() == itor)
 		return false;
@@ -382,12 +382,12 @@ bool CGraphicThingInstance::SetModelInstance(int32_t iDstModelInstance, int32_t 
 	pController->Clear();
 
 
-	for (uint32_t i = 0; i < rModelThingSet.m_pLODThingRefVector.size(); ++i)
+	for (auto & i : rModelThingSet.m_pLODThingRefVector)
 	{
-		if (rModelThingSet.m_pLODThingRefVector[i]->IsNull())
+		if (i->IsNull())
 			return false;
 
-		pController->AddModel(rModelThingSet.m_pLODThingRefVector[i]->GetPointer(), iSrcModel, pSkelController);
+		pController->AddModel(i->GetPointer(), iSrcModel, pSkelController);
 	}
 	return true;
 }
@@ -462,7 +462,7 @@ bool CGraphicThingInstance::SetMotion(uint32_t dwMotionKey, float blendTime, int
 	if (!CheckMotionThingIndex(dwMotionKey))
 		return false;
 
-	std::map<uint32_t, CGraphicThing::TRef *>::iterator itor = m_roMotionThingMap.find(dwMotionKey);
+	auto itor = m_roMotionThingMap.find(dwMotionKey);
 	CGraphicThing::TRef * proMotionThing = itor->second;
 	CGraphicThing * pMotionThing = proMotionThing->GetPointer();
 
@@ -487,7 +487,7 @@ bool CGraphicThingInstance::ChangeMotion(uint32_t dwMotionKey, int32_t loopCount
 	if (!CheckMotionThingIndex(dwMotionKey))
 		return false;
 
-	std::map<uint32_t, CGraphicThing::TRef *>::iterator itor = m_roMotionThingMap.find(dwMotionKey);
+	auto itor = m_roMotionThingMap.find(dwMotionKey);
 	CGraphicThing::TRef * proMotionThing = itor->second;
 	CGraphicThing * pMotionThing = proMotionThing->GetPointer();
 
@@ -531,14 +531,14 @@ void CGraphicThingInstance::RegisterLODThing(int32_t iModelThing, CGraphicThing 
 	assert(CheckModelThingIndex(iModelThing));
 	CGraphicThing::TRef * pModelRef = new CGraphicThing::TRef;
 	pModelRef->SetPointer(pModelThing);
-	m_modelThingSetVector[iModelThing].m_pLODThingRefVector.push_back(pModelRef);
+	m_modelThingSetVector[iModelThing].m_pLODThingRefVector.emplace_back(pModelRef);
 }
 
 void CGraphicThingInstance::RegisterMotionThing(uint32_t dwMotionKey, CGraphicThing* pMotionThing)
 {
 	CGraphicThing::TRef * pMotionRef = new CGraphicThing::TRef;
 	pMotionRef->SetPointer(pMotionThing);
-	m_roMotionThingMap.insert(std::map<uint32_t, CGraphicThing::TRef *>::value_type(dwMotionKey, pMotionRef));
+	m_roMotionThingMap.emplace(dwMotionKey, pMotionRef);
 }
 
 void CGraphicThingInstance::ResetLocalTime()
@@ -590,11 +590,8 @@ bool CGraphicThingInstance::Intersect(float* pu, float* pv, float* pt)
 		return false;
 
 	if (m_LODControllerVector.empty())
-	{
-		//TraceError("CGraphicThingInstance::Intersect - m_LODControllerVector is empty");
 		return false;
-	}
-	
+
 	return m_LODControllerVector[0]->Intersect(&GetTransform(), pu, pv, pt);
 }
 
@@ -645,42 +642,26 @@ BOOL CGraphicThingInstance::GetCompositeBoneMatrix(uint32_t dwModelInstanceIndex
 
 	CGrannyModelInstance * pModelInstance = m_LODControllerVector[dwModelInstanceIndex]->GetModelInstance();
 	if (!pModelInstance)
-	{
-		//TraceError("CGraphicThingInstance::GetCompositeBoneMatrix(dwModelInstanceIndex=%d, dwBoneIndex=%d, D3DXMATRIX ** ppMatrix)", dwModelInstanceIndex, dwBoneIndex);
 		return FALSE;
-	}
-	
-	*ppMatrix = (D3DXMATRIX *)pModelInstance->GetCompositeBoneMatrixPointer(dwBoneIndex);
+
+	*ppMatrix = (D3DXMATRIX*)pModelInstance->GetCompositeBoneMatrixPointer(dwBoneIndex);
 
 	return TRUE;
 }
 
 void CGraphicThingInstance::UpdateTransform(D3DXMATRIX * pMatrix, float fSecondsElapsed, int32_t iModelInstanceIndex)
 {
-	//TraceError("%s",GetBaseThingPtr()->GetFileName());
 	int32_t nLODCount=m_LODControllerVector.size();
-	if (iModelInstanceIndex>=nLODCount)
-	{
-		//TraceError("void CGraphicThingInstance::UpdateTransform(pMatrix, fSecondsElapsed=%f, iModelInstanceIndex=%d/nLODCount=%d)",
-		//	fSecondsElapsed, iModelInstanceIndex, nLODCount);
+	if (iModelInstanceIndex >= nLODCount)
 		return;
-	}
 
 	CGrannyLODController* pkLODCtrl=m_LODControllerVector[iModelInstanceIndex];
 	if (!pkLODCtrl)
-	{
-		//TraceError("void CGraphicThingInstance::UpdateTransform(pMatrix, fSecondsElapsed=%f, iModelInstanceIndex=%d/nLODCount=%d) - m_LODControllerVector[iModelInstanceIndex] == nullptr",
-		//	fSecondsElapsed, iModelInstanceIndex, nLODCount);
 		return;
-	}
 
 	CGrannyModelInstance * pModelInstance = pkLODCtrl->GetModelInstance();
 	if (!pModelInstance)
-	{
-	/*	TraceError("void CGraphicThingInstance::UpdateTransform(pMatrix, fSecondsElapsed=%f, iModelInstanceIndex=%d/nLODCount=%d) - pkLODCtrl->GetModelInstance() == nullptr",
-			fSecondsElapsed, iModelInstanceIndex, nLODCount);*/
 		return;
-	}
 
 	pModelInstance->UpdateTransform(pMatrix, fSecondsElapsed);
 }
@@ -950,9 +931,9 @@ void CGraphicThingInstance::ReloadTexture()
 
 bool CGraphicThingInstance::HaveBlendThing()
 {
-	for (int32_t i = 0; i < m_LODControllerVector.size(); i++)
+	for (auto & i : m_LODControllerVector)
 	{
-		if (m_LODControllerVector[i]->HaveBlendThing())
+		if (i->HaveBlendThing())
 			return true;
 	}
 	return false;
@@ -972,8 +953,8 @@ void CGraphicThingInstance::OnClear()
 	stl_wipe(m_LODControllerVector);
 	stl_wipe_second(m_roMotionThingMap);
 
-	for (uint32_t d = 0; d < m_modelThingSetVector.size(); ++d)
-		m_modelThingSetVector[d].Clear();
+	for (auto & d : m_modelThingSetVector)
+		d.Clear();
 }
 
 void CGraphicThingInstance::OnInitialize()
@@ -995,6 +976,4 @@ CGraphicThingInstance::CGraphicThingInstance()
 	Initialize();
 }
 
-CGraphicThingInstance::~CGraphicThingInstance()
-{
-}
+CGraphicThingInstance::~CGraphicThingInstance() = default;

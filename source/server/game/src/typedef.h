@@ -1,6 +1,8 @@
 #ifndef __INC_METIN_II_GAME_TYPEDEF_H__
 #define __INC_METIN_II_GAME_TYPEDEF_H__
 
+#include "../../common/service.h"
+
 class DESC;
 #ifdef USE_DEBUG_PTR
 typedef DebugPtr<DESC> LPDESC;
@@ -39,7 +41,8 @@ typedef DebugPtr<CItem> LPITEM;
 typedef CItem* LPITEM;
 #endif
 
-namespace building {
+namespace building
+{
 class CObject;
 #ifdef USE_DEBUG_PTR
 typedef DebugPtr<CObject> LPOBJECT;
@@ -88,11 +91,6 @@ typedef DebugPtr<CParty> LPPARTY;
 #else
 typedef CParty* LPPARTY;
 #endif
-
-typedef struct pixel_position_s
-{
-	INT x, y, z;
-} PIXEL_POSITION;
 
 enum EEntityTypes
 {

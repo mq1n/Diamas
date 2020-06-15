@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "../eterLib/StateManager.h"
-#include "../eterlib/Camera.h"
+#include "../eterLib/Camera.h"
 
 #include "MapOutdoor.h"
 

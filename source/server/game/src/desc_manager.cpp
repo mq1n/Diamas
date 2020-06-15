@@ -12,6 +12,7 @@
 #include "p2p.h"
 #include "ip_ban.h"
 #include "dev_log.h"
+#include "../../libthecore/include/Random.h"
 
 DESC_MANAGER::DESC_MANAGER() : m_bDestroyed(false)
 {
@@ -30,7 +31,6 @@ void DESC_MANAGER::Initialize()
 	m_iHandleCount = 0;
 	m_iLocalUserCount = 0;
 	memset(m_aiEmpireUserCount, 0, sizeof(m_aiEmpireUserCount));
-	m_bDisconnectInvalidCRC = false;
 }
 
 void DESC_MANAGER::Destroy()
@@ -72,7 +72,7 @@ void DESC_MANAGER::Destroy()
 
 	m_set_pkClientDesc.clear();
 
-	//m_AccountIDMap.clear();
+	m_AccountIDMap.clear();
 	m_map_loginName.clear();
 	m_map_handle.clear();
 
@@ -182,14 +182,20 @@ LPDESC DESC_MANAGER::AcceptP2PDesc(LPFDWATCH fdw, socket_t bind_fd)
 
 void DESC_MANAGER::ConnectAccount(const std::string& login, LPDESC d)
 {
-dev_log(LOG_DEB0, "BBBB ConnectAccount(%s)", login.c_str());
+	dev_log(LOG_DEB0, "ConnectAccount(%s)", login.c_str());
 	m_map_loginName.insert(DESC_LOGINNAME_MAP::value_type(login,d));
+	m_AccountIDMap.insert(DESC_ACCOUNTID_MAP::value_type(d->GetAccountTable().id, d));
 }
 
 void DESC_MANAGER::DisconnectAccount(const std::string& login)
 {
-dev_log(LOG_DEB0, "BBBB DisConnectAccount(%s)", login.c_str());
-	m_map_loginName.erase(login);
+	dev_log(LOG_DEB0, "DisConnectAccount(%s)", login.c_str());
+	DESC_LOGINNAME_MAP::iterator it = m_map_loginName.find(login);
+	if (it != m_map_loginName.end())
+	{
+		m_AccountIDMap.erase(it->second->GetAccountTable().id);
+		m_map_loginName.erase(it);
+	}
 }
 
 void DESC_MANAGER::DestroyDesc(LPDESC d, bool bEraseFromSet)
@@ -251,6 +257,16 @@ LPDESC DESC_MANAGER::FindByLoginName(const std::string& login)
 	return (it->second); 
 }
 
+LPDESC DESC_MANAGER::FindByAID(uint32_t dwAID)
+{
+	DESC_ACCOUNTID_MAP::iterator it = m_AccountIDMap.find(dwAID);
+
+	if (m_AccountIDMap.end() == it)
+		return nullptr;
+
+	return (it->second);
+}
+
 LPDESC DESC_MANAGER::FindByHandle(uint32_t handle)
 {
 	DESC_HANDLE_MAP::iterator it = m_map_handle.find(handle);
@@ -261,7 +277,7 @@ LPDESC DESC_MANAGER::FindByHandle(uint32_t handle)
 	return (it->second); 
 }
 
-const DESC_MANAGER::DESC_SET & DESC_MANAGER::GetClientSet()
+const DESC_MANAGER::DESC_SET & DESC_MANAGER::GetClientSet() const
 {
 	return m_set_pkDesc;
 }
@@ -287,6 +303,31 @@ LPDESC DESC_MANAGER::FindByCharacterName(const char *name)
 {
 	DESC_SET::iterator it = std::find_if (m_set_pkDesc.begin(), m_set_pkDesc.end(), name_with_desc_func(name));
 	return (it == m_set_pkDesc.end()) ? nullptr : (*it);
+}
+
+void DESC_MANAGER::BroadcastCommand(const std::string& cmd) const
+{
+	const DESC_SET& c_ref_set = GetClientSet();
+
+	for (auto it : c_ref_set)
+	{
+		CHARACTER* ch = it->GetCharacter();
+		if (!ch)
+			continue;
+
+		ch->ChatPacket(CHAT_TYPE_COMMAND, cmd.c_str());
+	}
+}
+
+void DESC_MANAGER::UpdateUserCountOnServer(int16_t port, uint32_t userCount)
+{
+	auto it = m_userCountMap.find(port);
+	if (it != m_userCountMap.end()) {
+		it->second = userCount;
+	}
+	else {
+		m_userCountMap.insert(TPlayerCountMap::value_type(port, userCount));
+	}
 }
 
 LPCLIENT_DESC DESC_MANAGER::CreateConnectionDesc(LPFDWATCH fdw, const char * host, uint16_t port, int32_t iPhaseWhenSucceed, bool bRetryWhenClosed)

@@ -75,9 +75,8 @@ CTimer::CTimer()
 	m_dwBaseTime = 0;
 }
 
-CTimer::~CTimer()
-{
-}
+
+CTimer::~CTimer() = default;
 
 void CTimer::SetBaseTime()
 {
@@ -113,7 +112,7 @@ void CTimer::Adjust(int32_t iTimeGap)
 	m_dwCurrentTime += iTimeGap;
 }
 
-float CTimer::GetCurrentSecond()
+float CTimer::GetCurrentSecond() const
 {
 	if (m_bUseRealTime)
 		return ELTimer_GetMSec() / 1000.0f;
@@ -121,7 +120,7 @@ float CTimer::GetCurrentSecond()
 	return m_fCurrentTime;
 }
 
-uint32_t CTimer::GetCurrentMillisecond()
+uint32_t CTimer::GetCurrentMillisecond() const
 {
 	if (m_bUseRealTime)
 		return ELTimer_GetMSec();
@@ -134,7 +133,7 @@ float CTimer::GetElapsedSecond()
 	return GetElapsedMilliecond() / 1000.0f;
 }
 
-uint32_t CTimer::GetElapsedMilliecond()
+uint32_t CTimer::GetElapsedMilliecond() const
 {
 	if (!m_bUseRealTime)
 		return 16 + (m_index & 1);

@@ -11,10 +11,10 @@
 #include "char_manager.h"
 #include "packet.h"
 #include "war_map.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "locale_service.h"
 #include "guild_manager.h"
-#include "MarkManager.h"
+#include "mark_manager.h"
 
 namespace
 {
@@ -62,12 +62,12 @@ CGuildManager::~CGuildManager()
 
 int32_t CGuildManager::GetDisbandDelay()
 {
-	return quest::CQuestManager::instance().GetEventFlag("guild_disband_delay") * (test_server ? 60 : 86400);
+	return quest::CQuestManager::instance().GetEventFlag("guild_disband_delay") * (g_bIsTestServer ? 60 : 86400);
 }
 
 int32_t CGuildManager::GetWithdrawDelay()
 {
-	return quest::CQuestManager::instance().GetEventFlag("guild_withdraw_delay") * (test_server ? 60 : 86400);
+	return quest::CQuestManager::instance().GetEventFlag("guild_withdraw_delay") * (g_bIsTestServer ? 60 : 86400);
 }
 
 uint32_t CGuildManager::CreateGuild(TGuildCreateParameter& gcp)
@@ -88,8 +88,7 @@ uint32_t CGuildManager::CreateGuild(TGuildCreateParameter& gcp)
 		return 0;
 	// @fixme143 END
 
-	std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT COUNT(*) FROM guild%s WHERE name = '%s'",
-				get_table_postfix(), __guild_name));
+	std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT COUNT(*) FROM guild WHERE name = '%s'", __guild_name));
 
 	if (pmsg->Get()->uiNumRows > 0)
 	{
@@ -191,7 +190,7 @@ CGuild* CGuildManager::FindGuild(uint32_t guild_id)
 	return it->second;
 }
 
-CGuild*	CGuildManager::FindGuildByName(const std::string guild_name)
+CGuild*	CGuildManager::FindGuildByName(const std::string & guild_name)
 {
 	for (auto it = m_mapGuild.begin(); it!=m_mapGuild.end(); ++it)
 	{
@@ -211,7 +210,7 @@ void CGuildManager::Initialize()
 		return;
 	}
 
-	std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT id FROM guild%s", get_table_postfix()));
+	std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT id FROM guild"));
 
 	std::vector<uint32_t> vecGuildID;
 	vecGuildID.reserve(pmsg->Get()->uiNumRows);
@@ -290,7 +289,7 @@ int32_t CGuildManager::GetRank(CGuild* g)
 	return rank;
 }
 
-struct FGuildCompare : public std::binary_function<CGuild*, CGuild*, bool>
+struct FGuildCompare : public std::function<bool(CGuild*, CGuild*)>
 {
 	bool operator () (CGuild* g1, CGuild* g2) const
 	{
@@ -495,7 +494,7 @@ void CGuildManager::RequestEndWar(uint32_t guild_id1, uint32_t guild_id2)
 	db_clientdesc->DBPacket(HEADER_GD_GUILD_WAR, 0, &p, sizeof(p));
 }
 
-void CGuildManager::RequestWarOver(uint32_t dwGuild1, uint32_t dwGuild2, uint32_t dwGuildWinner, int32_t lReward)
+void CGuildManager::RequestWarOver(uint32_t dwGuild1, uint32_t dwGuild2, uint32_t dwGuildWinner)
 {
 	CGuild * g1 = TouchGuild(dwGuild1);
 	CGuild * g2 = TouchGuild(dwGuild2);

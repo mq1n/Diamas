@@ -1,11 +1,12 @@
 #include "stdafx.h"
+#include <fstream>
 #include "constants.h"
 #include "config.h"
 #include "packet.h"
 #include "desc.h"
 #include "buffer_manager.h"
 #include "start_position.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "char.h"
 #include "char_manager.h"
 #include "arena.h"
@@ -28,6 +29,29 @@ CArena::CArena(uint16_t startA_X, uint16_t startA_Y, uint16_t startB_X, uint16_t
 	m_pTimeOutEvent = nullptr;
 
 	Clear();
+}
+
+bool CArenaManager::Initialize()
+{
+	std::ifstream inf((LocaleService_GetBasePath() + "/arena_forbidden_items.txt").c_str());
+
+	if (!inf.is_open())
+	{
+		sys_err("ArenaManager cannot open 'arena_forbidden_items.txt'!");
+		return false;
+	}
+
+	std::string ln;
+	while (getline(inf, ln))
+	{
+		if (ln.empty())
+			continue;
+		
+		uint32_t iVnum = atoi(ln.c_str());
+		m_listForbidden.push_back(iVnum);
+	}
+
+	return true;
 }
 
 void CArena::Clear()
@@ -54,11 +78,10 @@ bool CArenaManager::AddArena(uint32_t mapIdx, uint16_t startA_X, uint16_t startA
 {
 	CArenaMap *pArenaMap = nullptr;
 	auto iter = m_mapArenaMap.find(mapIdx);
-
 	if (iter == m_mapArenaMap.end())
 	{
 		pArenaMap = M2_NEW CArenaMap;
-		m_mapArenaMap.insert(std::make_pair(mapIdx, pArenaMap));
+		m_mapArenaMap.emplace(mapIdx, pArenaMap);
 	}
 	else
 	{
@@ -76,11 +99,9 @@ bool CArenaManager::AddArena(uint32_t mapIdx, uint16_t startA_X, uint16_t startA
 
 bool CArenaMap::AddArena(uint32_t mapIdx, uint16_t startA_X, uint16_t startA_Y, uint16_t startB_X, uint16_t startB_Y)
 {
-	auto iter = m_listArena.begin();
-
-	for (; iter != m_listArena.end(); iter++)
+	for (const auto & arena : m_listArena)
 	{
-		if ((CArena*)(*iter)->CheckArea(startA_X, startA_Y, startB_X, startB_Y) == false)
+		if (arena->CheckArea(startA_X, startA_Y, startB_X, startB_Y) == false)
 		{
 			sys_log(0, "CArenaMap::AddArena - Same Start Position set. stA(%d, %d) stB(%d, %d)", startA_X, startA_Y, startB_X, startB_Y);
 			return false;
@@ -89,7 +110,7 @@ bool CArenaMap::AddArena(uint32_t mapIdx, uint16_t startA_X, uint16_t startA_Y, 
 
 	m_dwMapIndex = mapIdx;
 
-	CArena *pArena = M2_NEW CArena(startA_X, startA_Y, startB_X, startB_Y);
+	auto pArena = M2_NEW CArena(startA_X, startA_Y, startB_X, startB_Y);
 	m_listArena.push_back(pArena);
 
 	return true;
@@ -97,9 +118,7 @@ bool CArenaMap::AddArena(uint32_t mapIdx, uint16_t startA_X, uint16_t startA_Y, 
 
 void CArenaManager::Destroy()
 {
-	auto iter = m_mapArenaMap.begin();
-
-	for (; iter != m_mapArenaMap.end(); iter++)
+	for (auto iter = m_mapArenaMap.begin(); iter != m_mapArenaMap.end(); ++iter)
 	{
 		CArenaMap* pArenaMap = iter->second;
 		pArenaMap->Destroy();
@@ -111,11 +130,9 @@ void CArenaManager::Destroy()
 
 void CArenaMap::Destroy()
 {
-	auto iter = m_listArena.begin();
-
 	sys_log(0, "ARENA: ArenaMap will be destroy. mapIndex(%d)", m_dwMapIndex);
 
-	for (; iter != m_listArena.end(); iter++)
+	for (auto iter = m_listArena.begin(); iter != m_listArena.end(); ++iter)
 	{
 		CArena* pArena = *iter;
 		pArena->EndDuel();
@@ -127,17 +144,15 @@ void CArenaMap::Destroy()
 
 bool CArena::CheckArea(uint16_t startA_X, uint16_t startA_Y, uint16_t startB_X, uint16_t startB_Y)
 {
-	if (m_StartPointA.x == startA_X && m_StartPointA.y == startA_Y &&
-			m_StartPointB.x == startB_X && m_StartPointB.y == startB_Y)
+	if (m_StartPointA.x == startA_X && m_StartPointA.y == startA_Y && m_StartPointB.x == startB_X && m_StartPointB.y == startB_Y)
 		return false;	
+
 	return true;
 }
 
 void CArenaManager::SendArenaMapListTo(LPCHARACTER pChar)
 {
-	auto iter = m_mapArenaMap.begin();
-
-	for (; iter != m_mapArenaMap.end(); iter++)
+	for (auto iter = m_mapArenaMap.begin(); iter != m_mapArenaMap.end(); ++iter)
 	{
 		CArenaMap* pArena = iter->second;
 		pArena->SendArenaMapListTo(pChar, (iter->first));
@@ -146,25 +161,23 @@ void CArenaManager::SendArenaMapListTo(LPCHARACTER pChar)
 
 void CArenaMap::SendArenaMapListTo(LPCHARACTER pChar, uint32_t mapIdx)
 {
-	if (pChar == nullptr) return;
+	if (pChar == nullptr)
+		return;
 
-	auto iter = m_listArena.begin();
-
-	for (; iter != m_listArena.end(); iter++)
+	for (auto const & arena : m_listArena)
 	{
-		pChar->ChatPacket(CHAT_TYPE_INFO, "ArenaMapInfo Map: %d stA(%d, %d) stB(%d, %d)", mapIdx, 
-				(CArena*)(*iter)->GetStartPointA().x, (CArena*)(*iter)->GetStartPointA().y,
-				(CArena*)(*iter)->GetStartPointB().x, (CArena*)(*iter)->GetStartPointB().y);
+		pChar->ChatPacket(CHAT_TYPE_INFO, "ArenaMapInfo Map: %u stA(%d, %d) stB(%d, %d)", mapIdx, 
+			arena->GetStartPointA().x, arena->GetStartPointA().y,
+			arena->GetStartPointB().x, arena->GetStartPointB().y);
 	}
 }
 
 bool CArenaManager::StartDuel(LPCHARACTER pCharFrom, LPCHARACTER pCharTo, int32_t nSetPoint, int32_t nMinute)
 {
-	if (pCharFrom == nullptr || pCharTo == nullptr) return false;
+	if (pCharFrom == nullptr || pCharTo == nullptr) 
+		return false;
 
-	auto iter = m_mapArenaMap.begin();
-
-	for (; iter != m_mapArenaMap.end(); iter++)
+	for (auto iter = m_mapArenaMap.begin(); iter != m_mapArenaMap.end(); ++iter)
 	{
 		CArenaMap* pArenaMap = iter->second;
 		if (pArenaMap->StartDuel(pCharFrom, pCharTo, nSetPoint, nMinute) == true)
@@ -178,14 +191,11 @@ bool CArenaManager::StartDuel(LPCHARACTER pCharFrom, LPCHARACTER pCharTo, int32_
 
 bool CArenaMap::StartDuel(LPCHARACTER pCharFrom, LPCHARACTER pCharTo, int32_t nSetPoint, int32_t nMinute)
 {
-	auto iter = m_listArena.begin();
-
-	for (; iter != m_listArena.end(); iter++)
+	for (const auto & arena : m_listArena)
 	{
-		CArena* pArena = *iter;
-		if (pArena->IsEmpty() == true)
+		if (arena->IsEmpty() == true)
 		{
-			return pArena->StartDuel(pCharFrom, pCharTo, nSetPoint, nMinute);
+			return arena->StartDuel(pCharFrom, pCharTo, nSetPoint, nMinute);
 		}
 	}
 
@@ -197,9 +207,8 @@ EVENTINFO(TArenaEventInfo)
 	CArena *pArena;
 	uint8_t state;
 
-	TArenaEventInfo()
-	: pArena(0)
-	, state(0)
+	TArenaEventInfo() :
+		pArena(nullptr), state(0)
 	{
 	}
 };
@@ -238,16 +247,14 @@ EVENTFUNC(ready_to_start_event)
 		if (chA != nullptr)
 		{
 			chA->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 상대가 사라져 대련을 종료합니다."));
-			sys_log(0, "ARENA: Oppernent is disappered. MyPID(%d) OppPID(%d)", pArena->GetPlayerAPID(), pArena->GetPlayerBPID());
+			sys_log(0, "ARENA: Oppernent is disappered. MyPID(%u) OppPID(%u)", pArena->GetPlayerAPID(), pArena->GetPlayerBPID());
 		}
 
 		if (chB != nullptr)
 		{
 			chB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 상대가 사라져 대련을 종료합니다."));
-			sys_log(0, "ARENA: Oppernent is disappered. MyPID(%d) OppPID(%d)", pArena->GetPlayerBPID(), pArena->GetPlayerAPID());
+			sys_log(0, "ARENA: Oppernent is disappered. MyPID(%u) OppPID(%u)", pArena->GetPlayerBPID(), pArena->GetPlayerAPID());
 		}
-
-		pArena->SendChatPacketToObserver(CHAT_TYPE_NOTICE, LC_TEXT("대련 상대가 사라져 대련을 종료합니다."));
 
 		pArena->EndDuel();
 		return 0;
@@ -277,7 +284,6 @@ EVENTFUNC(ready_to_start_event)
 				}
 				chA->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("10초뒤 대련이 시작됩니다."));
 				chB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("10초뒤 대련이 시작됩니다."));
-				pArena->SendChatPacketToObserver(CHAT_TYPE_INFO, LC_TEXT("10초뒤 대련이 시작됩니다."));
 
 				info->state++;
 				return PASSES_PER_SEC(10);
@@ -288,7 +294,6 @@ EVENTFUNC(ready_to_start_event)
 			{
 				chA->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련이 시작되었습니다."));
 				chB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련이 시작되었습니다."));
-				pArena->SendChatPacketToObserver(CHAT_TYPE_INFO, LC_TEXT("대련이 시작되었습니다."));
 
 				TPacketGCDuelStart duelStart;
 				duelStart.header = HEADER_GC_DUEL_START;
@@ -348,19 +353,18 @@ EVENTFUNC(ready_to_start_event)
 				duelStart.header = HEADER_GC_DUEL_START;
 				duelStart.wSize = sizeof(TPacketGCDuelStart) + 4;
 
-				dwOppList[0] = (uint32_t)chB->GetVID();
+				dwOppList[0] = static_cast<uint32_t>(chB->GetVID());
 				buf.write(&duelStart, sizeof(TPacketGCDuelStart));
 				buf.write(&dwOppList[0], 4);
 				chA->GetDesc()->Packet(buf.read_peek(), buf.size());
 
-				dwOppList[0] = (uint32_t)chA->GetVID();
+				dwOppList[0] = static_cast<uint32_t>(chA->GetVID());
 				buf2.write(&duelStart, sizeof(TPacketGCDuelStart));
 				buf2.write(&dwOppList[0], 4);
 				chB->GetDesc()->Packet(buf2.read_peek(), buf2.size());
 
 				chA->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련이 시작되었습니다."));
 				chB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련이 시작되었습니다."));
-				pArena->SendChatPacketToObserver(CHAT_TYPE_INFO, LC_TEXT("대련이 시작되었습니다."));
 
 				pArena->ClearEvent();
 
@@ -372,7 +376,6 @@ EVENTFUNC(ready_to_start_event)
 			{
 				chA->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장 문제로 인하여 대련을 종료합니다."));
 				chB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장 문제로 인하여 대련을 종료합니다."));
-				pArena->SendChatPacketToObserver(CHAT_TYPE_INFO, LC_TEXT("대련장 문제로 인하여 대련을 종료합니다."));
 
 				sys_log(0, "ARENA: Something wrong in event func. info->state(%d)", info->state);
 
@@ -385,8 +388,11 @@ EVENTFUNC(ready_to_start_event)
 
 EVENTFUNC(duel_time_out)
 {
-	if (event == nullptr) return 0;
-	if (event->info == nullptr) return 0;
+	if (event == nullptr)
+		return 0;
+
+	if (event->info == nullptr)
+		return 0;
 
 	TArenaEventInfo* info = dynamic_cast<TArenaEventInfo*>(event->info);
 
@@ -412,16 +418,14 @@ EVENTFUNC(duel_time_out)
 		if (chA != nullptr)
 		{
 			chA->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 상대가 사라져 대련을 종료합니다."));
-			sys_log(0, "ARENA: Oppernent is disappered. MyPID(%d) OppPID(%d)", pArena->GetPlayerAPID(), pArena->GetPlayerBPID());
+			sys_log(0, "ARENA: Oppernent is disappered. MyPID(%u) OppPID(%u)", pArena->GetPlayerAPID(), pArena->GetPlayerBPID());
 		}
 
 		if (chB != nullptr)
 		{
 			chB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 상대가 사라져 대련을 종료합니다."));
-			sys_log(0, "ARENA: Oppernent is disappered. MyPID(%d) OppPID(%d)", pArena->GetPlayerBPID(), pArena->GetPlayerAPID());
+			sys_log(0, "ARENA: Oppernent is disappered. MyPID(%u) OppPID(%u)", pArena->GetPlayerBPID(), pArena->GetPlayerAPID());
 		}
-
-		pArena->SendChatPacketToObserver(CHAT_TYPE_INFO, LC_TEXT("대련 상대가 사라져 대련을 종료합니다."));
 
 		pArena->EndDuel();
 		return 0;
@@ -431,9 +435,6 @@ EVENTFUNC(duel_time_out)
 		switch (info->state)
 		{
 			case 0:
-				pArena->SendChatPacketToObserver(CHAT_TYPE_NOTICE, LC_TEXT("대련 시간 초과로 대련을 중단합니다."));
-				pArena->SendChatPacketToObserver(CHAT_TYPE_NOTICE, LC_TEXT("10초뒤 마을로 이동합니다."));
-
 				chA->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("대련 시간 초과로 대련을 중단합니다."));
 				chA->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("10초뒤 마을로 이동합니다."));
 
@@ -449,7 +450,7 @@ EVENTFUNC(duel_time_out)
 
 				info->state++;
 
-				sys_log(0, "ARENA: Because of time over, duel is end. PIDA(%d) vs PIDB(%d)", pArena->GetPlayerAPID(), pArena->GetPlayerBPID());
+				sys_log(0, "ARENA: Because of time over, duel is end. PIDA(%u) vs PIDB(%u)", pArena->GetPlayerAPID(), pArena->GetPlayerBPID());
 
 				return PASSES_PER_SEC(10);
 				break;
@@ -500,15 +501,13 @@ bool CArena::StartDuel(LPCHARACTER pCharFrom, LPCHARACTER pCharTo, int32_t nSetP
 	pCharTo->PointChange(POINT_HP, pCharTo->GetMaxHP() - pCharTo->GetHP());
 	pCharTo->PointChange(POINT_SP, pCharTo->GetMaxSP() - pCharTo->GetSP());
 
-	sys_log(0, "ARENA: Start Duel with PID_A(%d) vs PID_B(%d)", GetPlayerAPID(), GetPlayerBPID());
+	sys_log(0, "ARENA: Start Duel with PID_A(%u) vs PID_B(%u)", GetPlayerAPID(), GetPlayerBPID());
 	return true;
 }
 
 void CArenaManager::EndAllDuel()
 {
-	auto iter = m_mapArenaMap.begin();
-
-	for (; iter != m_mapArenaMap.end(); iter++)
+	for (auto iter = m_mapArenaMap.begin(); iter != m_mapArenaMap.end(); ++iter)
 	{
 		CArenaMap *pArenaMap = iter->second;
 		if (pArenaMap != nullptr)
@@ -520,9 +519,7 @@ void CArenaManager::EndAllDuel()
 
 void CArenaMap::EndAllDuel()
 {
-	auto iter = m_listArena.begin();
-
-	for (; iter != m_listArena.end(); iter++)
+	for (auto iter = m_listArena.begin(); iter != m_listArena.end(); ++iter)
 	{
 		CArena *pArena = *iter;
 		if (pArena != nullptr)
@@ -568,9 +565,7 @@ void CArena::EndDuel()
 		playerB->WarpSet(ARENA_RETURN_POINT_X(playerB->GetEmpire()), ARENA_RETURN_POINT_Y(playerB->GetEmpire()));
 	}
 
-	auto iter = m_mapObserver.begin();
-
-	for (; iter != m_mapObserver.end(); iter++)
+	for (auto iter = m_mapObserver.begin(); iter != m_mapObserver.end(); ++iter)
 	{
 		LPCHARACTER pChar = CHARACTER_MANAGER::instance().FindByPID(iter->first);
 		if (pChar != nullptr)
@@ -581,19 +576,18 @@ void CArena::EndDuel()
 
 	m_mapObserver.clear();
 
-	sys_log(0, "ARENA: End Duel PID_A(%d) vs PID_B(%d)", GetPlayerAPID(), GetPlayerBPID());
+	sys_log(0, "ARENA: End Duel PID_A(%u) vs PID_B(%u)", GetPlayerAPID(), GetPlayerBPID());
 
 	Clear();
 }
 
 void CArenaManager::GetDuelList(lua_State* L)
 {
-	auto iter = m_mapArenaMap.begin();
-
 	int32_t index = 1;
+
 	lua_newtable(L);
 
-	for (; iter != m_mapArenaMap.end(); iter++)
+	for (auto iter = m_mapArenaMap.begin(); iter != m_mapArenaMap.end(); ++iter)
 	{
 		CArenaMap* pArenaMap = iter->second;
 		if (pArenaMap != nullptr)
@@ -603,9 +597,7 @@ void CArenaManager::GetDuelList(lua_State* L)
 
 int32_t CArenaMap::GetDuelList(lua_State* L, int32_t index)
 {
-	auto iter = m_listArena.begin();
-
-	for (; iter != m_listArena.end(); iter++)
+	for (auto iter = m_listArena.begin(); iter != m_listArena.end(); ++iter)
 	{
 		CArena* pArena = *iter;
 
@@ -645,31 +637,34 @@ int32_t CArenaMap::GetDuelList(lua_State* L, int32_t index)
 
 bool CArenaManager::CanAttack(LPCHARACTER pCharAttacker, LPCHARACTER pCharVictim)
 {
-	if (pCharAttacker == nullptr || pCharVictim == nullptr) return false;
+	if (pCharAttacker == nullptr || pCharVictim == nullptr) 
+		return false;
 
-	if (pCharAttacker == pCharVictim) return false;
+	if (pCharAttacker == pCharVictim) 
+		return false;
 
 	int32_t mapIndex = pCharAttacker->GetMapIndex();
-	if (mapIndex != pCharVictim->GetMapIndex()) return false;
+	if (mapIndex != pCharVictim->GetMapIndex())
+		return false;
 
 	auto iter = m_mapArenaMap.find(mapIndex);
 
-	if (iter == m_mapArenaMap.end()) return false;
+	if (iter == m_mapArenaMap.end())
+		return false;
 
-	CArenaMap* pArenaMap = (CArenaMap*)(iter->second);
+	CArenaMap* pArenaMap = static_cast<CArenaMap*>(iter->second);
 	return pArenaMap->CanAttack(pCharAttacker, pCharVictim);
 }
 
 bool CArenaMap::CanAttack(LPCHARACTER pCharAttacker, LPCHARACTER pCharVictim)
 {
-	if (pCharAttacker == nullptr || pCharVictim == nullptr) return false;
+	if (pCharAttacker == nullptr || pCharVictim == nullptr) 
+		return false;
 
 	uint32_t dwPIDA = pCharAttacker->GetPlayerID();
 	uint32_t dwPIDB = pCharVictim->GetPlayerID();
 
-	auto iter = m_listArena.begin();
-
-	for (; iter != m_listArena.end(); iter++)
+	for (auto iter = m_listArena.begin(); iter != m_listArena.end(); ++iter)
 	{
 		CArena* pArena = *iter;
 		if (pArena->CanAttack(dwPIDA, dwPIDB) == true)
@@ -683,23 +678,29 @@ bool CArenaMap::CanAttack(LPCHARACTER pCharAttacker, LPCHARACTER pCharVictim)
 bool CArena::CanAttack(uint32_t dwPIDA, uint32_t dwPIDB)
 {
 	// 1:1 전용 다대다 할 경우 수정 필요
-	if (m_dwPIDA == dwPIDA && m_dwPIDB == dwPIDB) return true;
-	if (m_dwPIDA == dwPIDB && m_dwPIDB == dwPIDA) return true;
+	if (m_dwPIDA == dwPIDA && m_dwPIDB == dwPIDB)
+		return true;
+
+	if (m_dwPIDA == dwPIDB && m_dwPIDB == dwPIDA)
+		return true;
 
 	return false;
 }
 
 bool CArenaManager::OnDead(LPCHARACTER pCharKiller, LPCHARACTER pCharVictim)
 {
-	if (pCharKiller == nullptr || pCharVictim == nullptr) return false;
+	if (pCharKiller == nullptr || pCharVictim == nullptr) 
+		return false;
 
 	int32_t mapIndex = pCharKiller->GetMapIndex();
-	if (mapIndex != pCharVictim->GetMapIndex()) return false;
+	if (mapIndex != pCharVictim->GetMapIndex()) 
+		return false;
 
 	auto iter = m_mapArenaMap.find(mapIndex);
-	if (iter == m_mapArenaMap.end()) return false;
+	if (iter == m_mapArenaMap.end()) 
+		return false;
 
-	CArenaMap* pArenaMap = (CArenaMap*)(iter->second);
+	CArenaMap* pArenaMap = iter->second;
 	return pArenaMap->OnDead(pCharKiller,  pCharVictim);
 }
 
@@ -708,9 +709,7 @@ bool CArenaMap::OnDead(LPCHARACTER pCharKiller, LPCHARACTER pCharVictim)
 	uint32_t dwPIDA = pCharKiller->GetPlayerID();
 	uint32_t dwPIDB = pCharVictim->GetPlayerID();
 
-	auto iter = m_listArena.begin();
-
-	for (; iter != m_listArena.end(); iter++)
+	for (auto iter = m_listArena.begin(); iter != m_listArena.end(); ++iter)
 	{
 		CArena* pArena = *iter;
 
@@ -733,19 +732,16 @@ bool CArena::OnDead(uint32_t dwPIDA, uint32_t dwPIDB)
 	if (pCharA == nullptr && pCharB == nullptr)
 	{
 		// 둘다 접속이 끊어졌다 ?!
-		SendChatPacketToObserver(CHAT_TYPE_NOTICE, LC_TEXT("대련자 문제로 인하여 대련을 중단합니다."));
 		restart = false;
 	}
 	else if (pCharA == nullptr && pCharB != nullptr)
 	{
 		pCharB->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("상대방 캐릭터의 문제로 인하여 대련을 종료합니다."));
-		SendChatPacketToObserver(CHAT_TYPE_NOTICE, LC_TEXT("대련자 문제로 인하여 대련을 종료합니다."));
 		restart = false;
 	}
 	else if (pCharA != nullptr && pCharB == nullptr)
 	{
 		pCharA->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("상대방 캐릭터의 문제로 인하여 대련을 종료합니다."));
-		SendChatPacketToObserver(CHAT_TYPE_NOTICE, LC_TEXT("대련자 문제로 인하여 대련을 종료합니다."));
 		restart = false;
 	}
 	else if (pCharA != nullptr && pCharB != nullptr)
@@ -758,23 +754,20 @@ bool CArena::OnDead(uint32_t dwPIDA, uint32_t dwPIDB)
 			{
 				pCharA->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("%s 님이 대련에서 승리하였습니다."), pCharA->GetName());
 				pCharB->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("%s 님이 대련에서 승리하였습니다."), pCharA->GetName());
-				SendChatPacketToObserver(CHAT_TYPE_NOTICE, LC_TEXT("%s 님이 대련에서 승리하였습니다."), pCharA->GetName());
 
-				sys_log(0, "ARENA: Duel is end. Winner %s(%d) Loser %s(%d)",
+				sys_log(0, "ARENA: Duel is end. Winner %s(%u) Loser %s(%u)",
 						pCharA->GetName(), GetPlayerAPID(), pCharB->GetName(), GetPlayerBPID());
 			}
 			else
 			{
 				restart = true;
 				pCharA->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님이 승리하였습니다."), pCharA->GetName());
-				pCharA->ChatPacket(CHAT_TYPE_NOTICE, "%s %d : %d %s", pCharA->GetName(), m_dwSetPointOfA, m_dwSetPointOfB, pCharB->GetName());
+				pCharA->ChatPacket(CHAT_TYPE_NOTICE, "%s %u : %u %s", pCharA->GetName(), m_dwSetPointOfA, m_dwSetPointOfB, pCharB->GetName());
 
 				pCharB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님이 승리하였습니다."), pCharA->GetName());
-				pCharB->ChatPacket(CHAT_TYPE_NOTICE, "%s %d : %d %s", pCharA->GetName(), m_dwSetPointOfA, m_dwSetPointOfB, pCharB->GetName());
+				pCharB->ChatPacket(CHAT_TYPE_NOTICE, "%s %u : %u %s", pCharA->GetName(), m_dwSetPointOfA, m_dwSetPointOfB, pCharB->GetName());
 
-				SendChatPacketToObserver(CHAT_TYPE_NOTICE, "%s %d : %d %s", pCharA->GetName(), m_dwSetPointOfA, m_dwSetPointOfB, pCharB->GetName());
-
-				sys_log(0, "ARENA: %s(%d) won a round vs %s(%d)",
+				sys_log(0, "ARENA: %s(%u) won a round vs %s(%u)",
 						pCharA->GetName(), GetPlayerAPID(), pCharB->GetName(), GetPlayerBPID());
 			}
 		}
@@ -785,7 +778,6 @@ bool CArena::OnDead(uint32_t dwPIDA, uint32_t dwPIDB)
 			{
 				pCharA->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("%s 님이 대련에서 승리하였습니다."), pCharB->GetName());
 				pCharB->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("%s 님이 대련에서 승리하였습니다."), pCharB->GetName());
-				SendChatPacketToObserver(CHAT_TYPE_NOTICE, LC_TEXT("%s 님이 대련에서 승리하였습니다."), pCharB->GetName());
 
 				sys_log(0, "ARENA: Duel is end. Winner(%d) Loser(%d)", GetPlayerBPID(), GetPlayerAPID());
 			}
@@ -793,29 +785,23 @@ bool CArena::OnDead(uint32_t dwPIDA, uint32_t dwPIDB)
 			{
 				restart = true;
 				pCharA->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님이 승리하였습니다."), pCharB->GetName());
-				pCharA->ChatPacket(CHAT_TYPE_NOTICE, "%s %d : %d %s", pCharA->GetName(), m_dwSetPointOfA, m_dwSetPointOfB, pCharB->GetName());
+				pCharA->ChatPacket(CHAT_TYPE_NOTICE, "%s %u : %u %s", pCharA->GetName(), m_dwSetPointOfA, m_dwSetPointOfB, pCharB->GetName());
 
 				pCharB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님이 승리하였습니다."), pCharB->GetName());
-				pCharB->ChatPacket(CHAT_TYPE_NOTICE, "%s %d : %d %s", pCharA->GetName(), m_dwSetPointOfA, m_dwSetPointOfB, pCharB->GetName());
+				pCharB->ChatPacket(CHAT_TYPE_NOTICE, "%s %u : %u %s", pCharA->GetName(), m_dwSetPointOfA, m_dwSetPointOfB, pCharB->GetName());
 
-				SendChatPacketToObserver(CHAT_TYPE_NOTICE, "%s %d : %d %s", pCharA->GetName(), m_dwSetPointOfA, m_dwSetPointOfB, pCharB->GetName());
-
-				sys_log(0, "ARENA : PID(%d) won a round. Opp(%d)", GetPlayerBPID(), GetPlayerAPID());
+				sys_log(0, "ARENA : PID(%u) won a round. Opp(%u)", GetPlayerBPID(), GetPlayerAPID());
 			}
 		}
 		else
 		{
 			// wtf
-			sys_log(0, "ARENA : OnDead Error (%d, %d) (%d, %d)", m_dwPIDA, m_dwPIDB, dwPIDA, dwPIDB);
+			sys_log(0, "ARENA : OnDead Error (%u, %u) (%u, %u)", m_dwPIDA, m_dwPIDB, dwPIDA, dwPIDB);
 		}
 
 		int32_t potion = quest::CQuestManager::instance().GetEventFlag("arena_potion_limit_count");
 		pCharA->SetPotionLimit(potion);
 		pCharB->SetPotionLimit(potion);
-	}
-	else
-	{
-		// 오면 안된다 ?!
 	}
 
 	if (restart == false)
@@ -823,10 +809,8 @@ bool CArena::OnDead(uint32_t dwPIDA, uint32_t dwPIDB)
 		if (pCharA != nullptr)
 			pCharA->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("10초뒤 마을로 되돌아갑니다."));
 
-		if (	pCharB != nullptr)
+		if (pCharB != nullptr)
 			pCharB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("10초뒤 마을로 되돌아갑니다."));
-
-		SendChatPacketToObserver(CHAT_TYPE_INFO, LC_TEXT("10초뒤 마을로 되돌아갑니다."));
 
 		if (m_pEvent != nullptr) {
 			event_cancel(&m_pEvent);
@@ -847,8 +831,6 @@ bool CArena::OnDead(uint32_t dwPIDA, uint32_t dwPIDB)
 		if (pCharB != nullptr)
 			pCharB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("10초뒤 다음 판을 시작합니다."));
 
-		SendChatPacketToObserver(CHAT_TYPE_INFO, LC_TEXT("10초뒤 다음 판을 시작합니다."));
-
 		if (m_pEvent != nullptr) {
 			event_cancel(&m_pEvent);
 		}
@@ -867,8 +849,8 @@ bool CArena::OnDead(uint32_t dwPIDA, uint32_t dwPIDB)
 bool CArenaManager::AddObserver(LPCHARACTER pChar, uint32_t mapIdx, uint16_t ObserverX, uint16_t ObserverY)
 {
 	auto iter = m_mapArenaMap.find(mapIdx);
-
-	if (iter == m_mapArenaMap.end()) return false;
+	if (iter == m_mapArenaMap.end())
+		return false;
 
 	CArenaMap* pArenaMap = iter->second;
 	return pArenaMap->AddObserver(pChar, ObserverX, ObserverY);
@@ -876,13 +858,11 @@ bool CArenaManager::AddObserver(LPCHARACTER pChar, uint32_t mapIdx, uint16_t Obs
 
 bool CArenaMap::AddObserver(LPCHARACTER pChar, uint16_t ObserverX, uint16_t ObserverY)
 {
-	auto iter = m_listArena.begin();
-
-	for (; iter != m_listArena.end(); iter++)
+	for (auto iter = m_listArena.begin(); iter != m_listArena.end(); ++iter)
 	{
 		CArena* pArena = *iter;
 
-		if (pArena->IsMyObserver(ObserverX, ObserverY) == true)
+		if (pArena->IsMyObserver(ObserverX, ObserverY))
 		{
 			pChar->SetArena(pArena);
 			return pArena->AddObserver(pChar);
@@ -929,14 +909,15 @@ MEMBER_IDENTITY CArenaManager::IsMember(uint32_t dwMapIndex, uint32_t PID)
 
 MEMBER_IDENTITY CArenaMap::IsMember(uint32_t PID)
 {
-	auto iter = m_listArena.begin();
-
-	for (; iter != m_listArena.end(); iter++)
+	for (auto iter = m_listArena.begin(); iter != m_listArena.end(); ++iter)
 	{
 		CArena* pArena = *iter;
 
-		if (pArena->IsObserver(PID) == true) return MEMBER_OBSERVER;
-		if (pArena->IsMember(PID) == true) return MEMBER_DUELIST;
+		if (pArena->IsObserver(PID)) 
+			return MEMBER_OBSERVER;
+
+		if (pArena->IsMember(PID)) 
+			return MEMBER_DUELIST;
 	}
 	return MEMBER_NO;
 }
@@ -955,7 +936,7 @@ void CArena::OnDisconnect(uint32_t pid)
 		if (GetPlayerB() != nullptr)
 			GetPlayerB()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방 캐릭터가 접속을 종료하여 대련을 중지합니다."));
 
-		sys_log(0, "ARENA : Duel is end because of Opp(%d) is disconnect. MyPID(%d)", GetPlayerAPID(), GetPlayerBPID());
+		sys_log(0, "ARENA : Duel is end because of Opp(%u) is disconnect. MyPID(%u)", GetPlayerAPID(), GetPlayerBPID());
 		EndDuel();
 	}
 	else if (m_dwPIDB == pid)
@@ -963,7 +944,7 @@ void CArena::OnDisconnect(uint32_t pid)
 		if (GetPlayerA() != nullptr)
 			GetPlayerA()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방 캐릭터가 접속을 종료하여 대련을 중지합니다."));
 
-		sys_log(0, "ARENA : Duel is end because of Opp(%d) is disconnect. MyPID(%d)", GetPlayerBPID(), GetPlayerAPID());
+		sys_log(0, "ARENA : Duel is end because of Opp(%u) is disconnect. MyPID(%u)", GetPlayerBPID(), GetPlayerAPID());
 		EndDuel();
 	}
 }
@@ -971,77 +952,26 @@ void CArena::OnDisconnect(uint32_t pid)
 void CArena::RemoveObserver(uint32_t pid)
 {
 	auto iter = m_mapObserver.find(pid);
-
 	if (iter != m_mapObserver.end())
 	{
 		m_mapObserver.erase(iter);
 	}
 }
 
-void CArena::SendPacketToObserver(const void * c_pvData, int32_t iSize)
-{
-	/*
-	auto iter = m_mapObserver.begin();
-
-	for (; iter != m_mapObserver.end(); iter++)
-	{
-		LPCHARACTER pChar = iter->second;
-
-		if (pChar != nullptr)
-		{
-			if (pChar->GetDesc() != nullptr)
-			{
-				pChar->GetDesc()->Packet(c_pvData, iSize);
-			}
-		}
-	}
-	*/
-}
-
-void CArena::SendChatPacketToObserver(uint8_t type, const char * format, ...)
-{
-	/*
-	char chatbuf[CHAT_MAX_LEN + 1];
-	va_list args;
-
-	va_start(args, format);
-	vsnprintf(chatbuf, sizeof(chatbuf), format, args);
-	va_end(args);
-
-	auto iter = m_mapObserver.begin();
-
-	for (; iter != m_mapObserver.end(); iter++)
-	{
-		LPCHARACTER pChar = iter->second;
-
-		if (pChar != nullptr)
-		{
-			if (pChar->GetDesc() != nullptr)
-			{
-				pChar->ChatPacket(type, chatbuf);
-			}
-		}
-	}
-	*/
-}
-
 bool CArenaManager::EndDuel(uint32_t pid)
 {
-	auto iter = m_mapArenaMap.begin();
-
-	for (; iter != m_mapArenaMap.end(); iter++)
+	for (auto iter = m_mapArenaMap.begin(); iter != m_mapArenaMap.end(); ++iter)
 	{
 		CArenaMap* pArenaMap = iter->second;
-		if (pArenaMap->EndDuel(pid) == true) return true;
+		if (pArenaMap->EndDuel(pid) == true)
+			return true;
 	}
 	return false;
 }
 
 bool CArenaMap::EndDuel(uint32_t pid)
 {
-	auto iter = m_listArena.begin();
-
-	for (; iter != m_listArena.end(); iter++)
+	for (auto iter = m_listArena.begin(); iter != m_listArena.end(); ++iter)
 	{
 		CArena* pArena = *iter;
 		if (pArena->IsMember(pid) == true)
@@ -1055,13 +985,13 @@ bool CArenaMap::EndDuel(uint32_t pid)
 
 bool CArenaManager::RegisterObserverPtr(LPCHARACTER pChar, uint32_t mapIdx, uint16_t ObserverX, uint16_t ObserverY)
 {
-	if (pChar == nullptr) return false;
+	if (pChar == nullptr) 
+		return false;
 
 	auto iter = m_mapArenaMap.find(mapIdx);
-
 	if (iter == m_mapArenaMap.end())
 	{
-		sys_log(0, "ARENA : Cannot find ArenaMap. %d %d %d", mapIdx, ObserverX, ObserverY);
+		sys_log(0, "ARENA : Cannot find ArenaMap. %u %d %d", mapIdx, ObserverX, ObserverY);
 		return false;
 	}
 
@@ -1071,9 +1001,7 @@ bool CArenaManager::RegisterObserverPtr(LPCHARACTER pChar, uint32_t mapIdx, uint
 
 bool CArenaMap::RegisterObserverPtr(LPCHARACTER pChar, uint32_t mapIdx, uint16_t ObserverX, uint16_t ObserverY)
 {
-	auto iter = m_listArena.begin();
-
-	for (; iter != m_listArena.end(); ++iter)
+	for (auto iter = m_listArena.begin(); iter != m_listArena.end(); ++iter)
 	{
 		CArena* pArena = *iter;
 
@@ -1130,11 +1058,9 @@ bool IsLimitedPotionOnPVP(uint32_t dwVnum)
 
 bool IsLimitedPotion(uint32_t dwVnum)
 {
-	// @fixme122
-	if ((50801 <= dwVnum) && (dwVnum <= 50826))
+	if (dwVnum >= 50801 && dwVnum <= 50826)
 		return true;
 
-	// @warme005
 	switch (dwVnum)
 	{
 		case 50020:

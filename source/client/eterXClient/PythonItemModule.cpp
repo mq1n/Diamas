@@ -1,8 +1,7 @@
 #include "StdAfx.h"
 #include "PythonItem.h"
-
 #include "../eterGameLib/ItemManager.h"
-#include "locale_inc.h"
+#include "Locale_inc.h"
 #include "InstanceBase.h"
 #include "AbstractApplication.h"
 #include "PythonDynamicModuleNames.h"
@@ -47,6 +46,16 @@ PyObject * itemSelectItem(PyObject * poSelf, PyObject * poArgs)
 
 	if (!CItemManager::Instance().SelectItemData(iIndex))
 	{
+		PyThreadState * ts = PyThreadState_Get();
+		PyFrameObject* frame = ts->frame;
+		while (frame != 0)
+		{
+			char const* filename = PyString_AsString(frame->f_code->co_filename);
+			char const* name = PyString_AsString(frame->f_code->co_name);
+			TraceError("filename=%s, name=%s", filename, name);
+			frame = frame->f_back;
+		}
+
 		TraceError("Cannot find item by %d", iIndex);
 		CItemManager::Instance().SelectItemData(60001);
 	}
@@ -121,7 +130,8 @@ PyObject * itemGetItemSize(PyObject * poSelf, PyObject * poArgs)
 	if (!pItemData)
 		return Py_BuildException("no selected item data");
 
-	return Py_BuildValue("(ii)", 1, pItemData->GetSize());
+	return Py_BuildValue("i", pItemData->GetSize());
+//	return Py_BuildValue("(ii)", 1, pItemData->GetSize());
 }
 
 PyObject * itemGetItemType(PyObject * poSelf, PyObject * poArgs)
@@ -574,7 +584,9 @@ void initItem()
 
 		{ "Update",							itemUpdate,								METH_VARARGS },
 		{ "Render",							itemRender,								METH_VARARGS },
+#ifdef _DEBUG
 		{ "CreateItem",						itemCreateItem,							METH_VARARGS },
+#endif
 		{ "DeleteItem",						itemDeleteItem,							METH_VARARGS },
 		{ "Pick",							itemPick,								METH_VARARGS },
 

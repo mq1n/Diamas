@@ -12,14 +12,14 @@ class CEmitterProperty
 			EMITTER_SHAPE_POINT,
 			EMITTER_SHAPE_ELLIPSE,
 			EMITTER_SHAPE_SQUARE,
-			EMITTER_SHAPE_SPHERE,
+			EMITTER_SHAPE_SPHERE
 		};
 
 		enum
 		{
 			EMITTER_ADVANCED_TYPE_FREE,
 			EMITTER_ADVANCED_TYPE_OUTER,
-			EMITTER_ADVANCED_TYPE_INNER,
+			EMITTER_ADVANCED_TYPE_INNER
 		};
 
 	public:
@@ -28,26 +28,14 @@ class CEmitterProperty
 
 		void Clear();
 
-		uint32_t GetMaxEmissionCount()
-		{
-			return m_dwMaxEmissionCount;
-		}
-		
-		float GetCycleLength()
-		{
-			return m_fCycleLength;
-		}
+		uint32_t GetMaxEmissionCount() const { return m_dwMaxEmissionCount; }
 
-		BOOL isCycleLoop()
-		{
-			return m_bCycleLoopFlag;
-		}
-			
-		int32_t	GetLoopCount()
-		{
-			return m_iLoopCount;
-		}
-			
+		float GetCycleLength() const { return m_fCycleLength; }
+
+		BOOL isCycleLoop() const { return m_bCycleLoopFlag; }
+
+		int32_t GetLoopCount() const { return m_iLoopCount; }
+
 
 		uint8_t GetEmitterShape();
 		uint8_t GetEmitterAdvancedType();

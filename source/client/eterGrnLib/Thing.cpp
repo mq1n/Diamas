@@ -97,7 +97,7 @@ bool CGraphicThing::OnIsEmpty() const
 
 bool CGraphicThing::OnIsType(TType type)
 {
-	if (CGraphicThing::Type() == type)
+	if (Type() == type)
 		return true;
 
 	return CResource::OnIsType(type);

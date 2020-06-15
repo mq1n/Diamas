@@ -12,7 +12,7 @@
 #include "affect.h"
 #include "p2p.h"
 #include "war_map.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "sectree_manager.h"
 #include "locale_service.h"
 #include "guild_manager.h"
@@ -142,11 +142,14 @@ uint32_t CGuild::GetGuildWarMapIndex(uint32_t dwOppGID)
 
 bool CGuild::CanStartWar(uint8_t bGuildWarType) // 타입에 따라 다른 조건이 생길 수도 있음
 {
+	if (g_bIsTestServer)
+		return true;
+
 	if (bGuildWarType >= GUILD_WAR_TYPE_MAX_NUM)
 		return false;
 
 	// 테스트시에는 인원수를 확인하지 않는다.
-	if (test_server || quest::CQuestManager::instance().GetEventFlag("guild_war_test") != 0)
+	if (g_bIsTestServer || quest::CQuestManager::instance().GetEventFlag("guild_war_test") != 0)
 		return GetLadderPoint() > 0;
 
 	return GetLadderPoint() > 0 && GetMemberCount() >= GUILD_WAR_MIN_MEMBER_COUNT;
@@ -365,7 +368,7 @@ void CGuild::RequestDeclareWar(uint32_t dwOppGID, uint8_t type)
 				p.lWarPrice = guildWarInfo.iWarPrice;
 				p.lInitialScore = guildWarInfo.iInitialScore;
 
-				if (test_server) 
+				if (g_bIsTestServer) 
 					p.lInitialScore /= 10;
 
 				db_clientdesc->DBPacket(HEADER_GD_GUILD_WAR, 0, &p, sizeof(p));
@@ -656,21 +659,39 @@ void CGuild::GuildWarEntryAccept(uint32_t dwOppGID, LPCHARACTER ch)
 	if (!gw.map_index)
 		return;
 
-	PIXEL_POSITION pos;
+	GPOS pos;
 
 	if (!CWarMapManager::instance().GetStartPosition(gw.map_index, GetID() < dwOppGID ? 0 : 1, pos))
 		return;
-#ifdef ENABLE_NEWSTUFF
+
 	if (g_NoMountAtGuildWar)
 	{
 		ch->RemoveAffect(AFFECT_MOUNT);
 		ch->RemoveAffect(AFFECT_MOUNT_BONUS);
+
 		if (ch->IsRiding())
 			ch->StopRiding();
 	}
-#endif
+
+	if (ch->IsPolymorphed())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You can not join to guild war as int32_t as you polymorphed!"));
+		return;
+	}
+
 	quest::PC * pPC = quest::CQuestManager::instance().GetPC(ch->GetPlayerID());
-	pPC->SetFlag("war.is_war_member", 1);
+	if (pPC)
+	{
+		int32_t iBlockTime = pPC->GetFlag("guild_war_join.savasengeli");
+		if (iBlockTime)
+		{
+			int32_t iDifference = (int32_t)ceil((iBlockTime - get_global_time()) / 60);
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You kicked from war! You can join war after %d minutes later."), iDifference);
+			return;
+		}
+
+		pPC->SetFlag("war.is_war_member", 1);
+	}
 
 	ch->SaveExitLocation();
 	ch->WarpSet(pos.x, pos.y, gw.map_index);
@@ -694,7 +715,7 @@ void CGuild::GuildWarEntryAsk(uint32_t dwOppGID)
 		return;
 	}
 
-	PIXEL_POSITION pos;
+	GPOS pos;
 	if (!CWarMapManager::instance().GetStartPosition(gw.map_index, GetID() < dwOppGID ? 0 : 1, pos))
 	{
 		sys_err("GuildWar.GuildWarEntryAsk.START_POSITION_ERROR id(%d vs %d), pos(%d, %d)", GetID(), dwOppGID, pos.x, pos.y);

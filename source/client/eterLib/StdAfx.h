@@ -4,22 +4,12 @@
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-#include "../eterXClient/Locale_inc.h"
 
 #define _WIN32_DCOM
 
-#pragma warning(disable:4710)	// not inlined
-#pragma warning(disable:4786)	// character 255 넘어가는거 끄기
 #pragma warning(disable:4244)	// type conversion possible lose of data
-
-#pragma warning(disable:4018)
-#pragma warning(disable:4245)
-#pragma warning(disable:4512)
-#pragma warning(disable:4201)
-
-#if _MSC_VER >= 1400
-#pragma warning(disable:4201 4512 4238 4239)
-#endif
+#pragma warning(disable:4838)	// conversion requires a narrowing conversion
+#pragma warning(disable:5033)	// 'register' is no longer a supported storage class
 
 #include <d3dx9.h>
 #include <DxErr.h>
@@ -35,10 +25,12 @@
 #include <time.h>
 #include <direct.h>
 #include <malloc.h>
+#include <algorithm>
 
 #include "../eterBase/StdAfx.h"
 #include "../eterBase/Debug.h"
 #include "../eterBase/CodePageId.h"
+#include "../eterXClient/Locale_inc.h"
 
 #ifndef VC_EXTRALEAN
 #include <winsock.h>

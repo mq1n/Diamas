@@ -14,12 +14,12 @@ ItemAwardManager::ItemAwardManager()
 }
 
 ItemAwardManager::~ItemAwardManager()
-{
-}
+= default;
+
 
 void ItemAwardManager::RequestLoad()
 {
-	char szQuery[QUERY_MAX_LEN];
+	char szQuery[ASQL_QUERY_MAX_LEN];
 	snprintf(szQuery, sizeof(szQuery), "SELECT id,login,vnum,count,socket0,socket1,socket2,mall,why FROM item_award WHERE taken_time IS NULL and id > %d", g_dwLastCachedItemAwardID);
 	CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_AWARD_LOAD, 0, nullptr);
 }
@@ -28,7 +28,7 @@ void ItemAwardManager::Load(SQLMsg * pMsg)
 {
 	MYSQL_RES * pRes = pMsg->Get()->pSQLResult;
 
-	for (size_t i = 0; i < pMsg->Get()->uiNumRows; ++i)
+	for (uint32_t i = 0; i < pMsg->Get()->uiNumRows; ++i)
 	{
 		MYSQL_ROW row = mysql_fetch_row(pRes);
 		int32_t col = 0;
@@ -39,7 +39,7 @@ void ItemAwardManager::Load(SQLMsg * pMsg)
 		if (m_map_award.find(dwID) != m_map_award.end())
 			continue;
 
-		TItemAward * kData = new TItemAward;
+		auto kData = new TItemAward;
 		memset(kData, 0, sizeof(TItemAward));
 
 		kData->dwID	= dwID;
@@ -74,7 +74,7 @@ void ItemAwardManager::Load(SQLMsg * pMsg)
 		m_map_award.insert(std::make_pair(dwID, kData));
 
 		printf("ITEM_AWARD load id %u bMall %d \n", kData->dwID, kData->bMall);
-		sys_log(0, "ITEM_AWARD: load id %lu login %s vnum %lu count %u socket %lu", kData->dwID, kData->szLogin, kData->dwVnum, kData->dwCount, kData->dwSocket0);
+		sys_log(0, "ITEM_AWARD: load id %u login %s vnum %u count %u socket %u", kData->dwID, kData->szLogin, kData->dwVnum, kData->dwCount, kData->dwSocket0);
 		std::set<TItemAward *> & kSet = m_map_kSetAwardByLogin[kData->szLogin];
 		kSet.insert(kData);
 
@@ -99,7 +99,7 @@ void ItemAwardManager::Taken(uint32_t dwAwardID, uint32_t dwItemID)
 
 	if (it == m_map_award.end())
 	{
-		sys_log(0, "ITEM_AWARD: Taken ID not exist %lu", dwAwardID);
+		sys_log(0, "ITEM_AWARD: Taken ID not exist %u", dwAwardID);
 		return;
 	}
 
@@ -109,10 +109,10 @@ void ItemAwardManager::Taken(uint32_t dwAwardID, uint32_t dwItemID)
 	//
 	// Update taken_time in database to prevent not to give him again.
 	// 
-	char szQuery[QUERY_MAX_LEN];
+	char szQuery[ASQL_QUERY_MAX_LEN];
 
 	snprintf(szQuery, sizeof(szQuery), 
-			"UPDATE item_award SET taken_time=NOW(),item_id=%u WHERE id=%u AND taken_time IS nullptr", 
+			"UPDATE item_award SET taken_time=NOW(),item_id=%u WHERE id=%u AND taken_time IS NULL", 
 			dwItemID, dwAwardID);
 
 	CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_AWARD_TAKEN, 0, nullptr);

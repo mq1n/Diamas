@@ -1,8 +1,8 @@
 #pragma once
 
 //#define CACHE_DEFORMED_VERTEX
-#include "../eterlib/GrpImage.h"
-#include "../eterlib/GrpCollisionObject.h"
+#include "../eterLib/GrpImage.h"
+#include "../eterLib/GrpCollisionObject.h"
 
 #include "Model.h"
 #include "Motion.h"
@@ -13,7 +13,7 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		enum
 		{
 			ANIFPS_MIN = 30,
-			ANIFPS_MAX = 120,
+			ANIFPS_MAX = 120
 		};
 	public:
 		static void DestroySystem();
@@ -26,14 +26,12 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 	public:
 		struct FCreateDeviceObjects
 		{
-			void operator() (CGrannyModelInstance * pModelInstance)
-			{pModelInstance->CreateDeviceObjects();}
+			void operator()(CGrannyModelInstance * pModelInstance) const { pModelInstance->CreateDeviceObjects(); }
 		};
 
 		struct FDestroyDeviceObjects
 		{
-			void operator() (CGrannyModelInstance * pModelInstance)
-			{pModelInstance->DestroyDeviceObjects();}
+			void operator()(CGrannyModelInstance * pModelInstance) const { pModelInstance->DestroyDeviceObjects(); }
 		};
 
 	public:

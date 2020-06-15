@@ -90,9 +90,7 @@ void CActorInstance::GetPixelPosition(TPixelPosition * pPixelPosition)
 void CActorInstance::SetPixelPosition(const TPixelPosition& c_rPixelPos)
 {
 	if (m_pkTree)
-	{
 		__SetTreePosition(c_rPixelPos.x, c_rPixelPos.y, c_rPixelPos.z);
-	}
 
 	if (m_pkHorse)
 		m_pkHorse->SetPixelPosition(c_rPixelPos);

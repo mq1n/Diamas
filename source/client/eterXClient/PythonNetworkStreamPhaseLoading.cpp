@@ -3,9 +3,7 @@
 #include "Packet.h"
 #include "PythonApplication.h"
 #include "NetworkActorManager.h"
-
 #include "AbstractPlayer.h"
-
 #include <FileSystemIncl.hpp>
 
 void CPythonNetworkStream::EnableChatInsultFilter(bool isEnable)
@@ -69,8 +67,10 @@ bool CPythonNetworkStream::LoadConvertTable(uint32_t dwEmpireID, const char* c_s
 	char* pcData = (char*)file.GetData();
 
 	STextConvertTable& rkTextConvTable=m_aTextConvTable[dwEmpireID-1];		
-	memcpy(rkTextConvTable.acUpper, pcData, dwEngCount);pcData+=dwEngCount;
-	memcpy(rkTextConvTable.acLower, pcData, dwEngCount);pcData+=dwEngCount;
+	memcpy(rkTextConvTable.acUpper, pcData, dwEngCount);
+	pcData += dwEngCount;
+	memcpy(rkTextConvTable.acLower, pcData, dwEngCount);
+	pcData += dwEngCount;
 	memcpy(rkTextConvTable.aacHan, pcData, dwHanSize);
 
 	return true;
@@ -97,12 +97,6 @@ void CPythonNetworkStream::LoadingPhase()
 
 		case HEADER_GC_MAIN_CHARACTER:
 			if (RecvMainCharacter())
-				return;
-			break;
-
-		// SUPPORT_BGM
-		case HEADER_GC_MAIN_CHARACTER2_EMPIRE:
-			if (RecvMainCharacter2_EMPIRE())
 				return;
 			break;
 
@@ -152,7 +146,6 @@ void CPythonNetworkStream::LoadingPhase()
 		default:
 			GamePhase();
 			return;
-			break;
 	}
 
 	RecvErrorPacket(header);
@@ -183,31 +176,6 @@ void CPythonNetworkStream::SetLoadingPhase()
 }
 
 bool CPythonNetworkStream::RecvMainCharacter()
-{
-	TPacketGCMainCharacter MainChrPacket;
-	if (!Recv(sizeof(TPacketGCMainCharacter), &MainChrPacket))
-		return false;
-
-	m_dwMainActorVID = MainChrPacket.dwVID;
-	m_dwMainActorRace = MainChrPacket.wRaceNum;
-	m_dwMainActorEmpire = 0;
-	m_dwMainActorSkillGroup = MainChrPacket.bySkillGroup;
-
-	m_rokNetActorMgr->SetMainActorVID(m_dwMainActorVID);
-
-	CPythonPlayer& rkPlayer=CPythonPlayer::Instance();
-	rkPlayer.SetName(MainChrPacket.szName);
-	rkPlayer.SetMainCharacterIndex(GetMainActorVID());
-
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_LOAD], "LoadData", Py_BuildValue("(ii)", MainChrPacket.lX, MainChrPacket.lY));
-
-	//Tracef(" >> RecvMainCharacter\n");
-
-	return true;
-}
-
-// SUPPORT_BGM
-bool CPythonNetworkStream::RecvMainCharacter2_EMPIRE()
 {
 	TPacketGCMainCharacter2_EMPIRE mainChrPacket;
 	if (!Recv(sizeof(mainChrPacket), &mainChrPacket))

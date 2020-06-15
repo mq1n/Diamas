@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "utils.h"
 #include "config.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "sectree_manager.h"
 #include "char.h"
 #include "char_manager.h"

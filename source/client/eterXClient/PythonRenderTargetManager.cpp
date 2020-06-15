@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 #include "PythonRenderTargetManager.h"
-#include "../EterLib/Camera.h"
-#include "../EterLib/RenderTargetManager.h"
-#include "../EterPythonLib/PythonGraphic.h"
+#include "../eterLib/Camera.h"
+#include "../eterLib/RenderTargetManager.h"
+#include "../eterPythonLib/PythonGraphic.h"
 #include "PythonApplication.h"
 
 CPythonRenderTargetManager::CPythonRenderTargetManager() {

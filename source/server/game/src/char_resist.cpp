@@ -57,7 +57,7 @@ EVENTFUNC(poison_event)
 	LPCHARACTER pkAttacker = CHARACTER_MANAGER::instance().FindByPID(info->attacker_pid);
 
 	int32_t dam = ch->GetMaxHP() * GetPoisonDamageRate(ch) / 1000;
-	if (test_server) ch->ChatPacket(CHAT_TYPE_NOTICE, "Poison Damage %d", dam);
+	if (g_bIsTestServer) ch->ChatPacket(CHAT_TYPE_NOTICE, "Poison Damage %d", dam);
 
 	if (ch->Damage(pkAttacker, dam, DAMAGE_TYPE_POISON))
 	{
@@ -130,7 +130,7 @@ EVENTFUNC(bleeding_event)
 	LPCHARACTER pkAttacker = CHARACTER_MANAGER::instance().FindByPID(info->attacker_pid);
 
 	int32_t dam = ch->GetMaxHP() * GetBleedingDamageRate(ch) / 1000;
-	if (test_server) ch->ChatPacket(CHAT_TYPE_NOTICE, "Bleeding Damage %d", dam);
+	if (g_bIsTestServer) ch->ChatPacket(CHAT_TYPE_NOTICE, "Bleeding Damage %d", dam);
 
 	if (ch->Damage(pkAttacker, dam, DAMAGE_TYPE_BLEEDING))
 	{
@@ -183,7 +183,7 @@ EVENTFUNC(fire_event)
 	LPCHARACTER pkAttacker = CHARACTER_MANAGER::instance().FindByPID(info->attacker_pid);
 
 	int32_t dam = info->amount;
-	if (test_server) ch->ChatPacket(CHAT_TYPE_NOTICE, "Fire Damage %d", dam);
+	if (g_bIsTestServer) ch->ChatPacket(CHAT_TYPE_NOTICE, "Fire Damage %d", dam);
 
 	if (ch->Damage(pkAttacker, dam, DAMAGE_TYPE_FIRE))
 	{
@@ -298,7 +298,7 @@ void CHARACTER::AttackedByPoison(LPCHARACTER pkAttacker)
 
 	m_pkPoisonEvent = event_create(poison_event, info, 1);
 
-	if (test_server && pkAttacker)
+	if (g_bIsTestServer && pkAttacker)
 	{
 		char buf[256];
 		snprintf(buf, sizeof(buf), "POISON %s -> %s", pkAttacker->GetName(), GetName());
@@ -348,7 +348,7 @@ void CHARACTER::AttackedByBleeding(LPCHARACTER pkAttacker)
 
 	m_pkBleedingEvent = event_create(bleeding_event, info, 1);
 
-	if (test_server && pkAttacker)
+	if (g_bIsTestServer && pkAttacker)
 	{
 		char buf[256];
 		snprintf(buf, sizeof(buf), "BLEEDING %s -> %s", pkAttacker->GetName(), GetName());
@@ -410,30 +410,26 @@ bool CHARACTER::IsImmune(uint32_t dwImmuneFlag)
 	// ChatPacket(CHAT_TYPE_PARTY, "<IMMUNE_IS> (%u == %u)", m_pointsInstant.dwImmuneFlag, dwImmuneFlag);
 	if (IS_SET(m_pointsInstant.dwImmuneFlag, dwImmuneFlag))
 	{
-#ifdef ENABLE_IMMUNE_PERC
 		int32_t immune_pct = 90;
 		int32_t	percent = number(1, 100);
 
 		if (percent <= immune_pct)	// 90% Immune
-#else
-		if (true)
-#endif
 		{
-			if (test_server && IsPC())
+			if (g_bIsTestServer && IsPC())
 				ChatPacket(CHAT_TYPE_PARTY, "<IMMUNE_SUCCESS> (%s)", GetName()); 
 
 			return true;
 		}
 		else
 		{
-			if (test_server && IsPC())
+			if (g_bIsTestServer && IsPC())
 				ChatPacket(CHAT_TYPE_PARTY, "<IMMUNE_FAIL> (%s)", GetName());
 
 			return false;
 		}
 	}
 
-	if (test_server && IsPC())
+	if (g_bIsTestServer && IsPC())
 		ChatPacket(CHAT_TYPE_PARTY, "<IMMUNE_FAIL> (%s) NO_IMMUNE_FLAG", GetName());
 
 	return false;

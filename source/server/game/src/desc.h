@@ -74,6 +74,9 @@ class DESC
 		const char *	GetHostName()		{ return m_stHost.c_str(); }
 		uint16_t			GetPort()	{ return m_wPort; }
 
+		void			SetListenPort(uint16_t w) { m_wListenPort = w; }
+		uint16_t		GetListenPort() { return m_wListenPort; }
+
 		void			SetP2P(const char * h, uint16_t w, uint8_t b) { m_stP2PHost = h; m_wP2PPort = w; m_bP2PChannel = b; }
 		const char *	GetP2PHost()		{ return m_stP2PHost.c_str();	}
 		uint16_t			GetP2PPort() const		{ return m_wP2PPort; }
@@ -98,6 +101,7 @@ class DESC
 		LPCHARACTER		GetCharacter()		{ return m_lpCharacter; }
 
 		bool			IsPhase(int32_t phase) const	{ return m_iPhase == phase ? true : false; }
+		int32_t			GetPhase() { return m_iPhase; };
 
 		const struct sockaddr_in & GetAddr()		{ return m_SockAddr;	}
 
@@ -148,6 +152,9 @@ class DESC
 		bool			isChannelStatusRequested() const { return m_bChannelStatusRequested; }
 		void			SetChannelStatusRequested(bool bChannelStatusRequested) { m_bChannelStatusRequested = bChannelStatusRequested; }
 
+		void			SetCloseReason(const std::string &reason) { m_closeReason = reason; }
+		std::string		GetCloseReason() const { return m_closeReason; }
+
 	protected:
 		void			Initialize();
 
@@ -167,6 +174,7 @@ class DESC
 
 		std::string		m_stHost;
 		uint16_t			m_wPort;
+		uint16_t			m_wListenPort;
 		time_t			m_LastTryToConnectTime;
 
 		LPBUFFER		m_lpInputBuffer;
@@ -201,12 +209,11 @@ class DESC
 		uint32_t			m_dwLoginKey;
 
 		std::string		m_Login;
-		int32_t				m_outtime;
-		int32_t				m_playtime;
-		int32_t				m_offtime;
 
 		bool			m_bDestroyed;
 		bool			m_bChannelStatusRequested;
+
+		std::string		m_closeReason;
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 		Cipher cipher_;
@@ -220,14 +227,9 @@ class DESC
 	public:
 		LPEVENT			m_pkDisconnectEvent;
 
-	public:
 		void SetLogin( const std::string & login ) { m_Login = login; }
 		void SetLogin( const char * login ) { m_Login = login; }
 		const std::string& GetLogin() { return m_Login; }
-
-		void SetOutTime( int32_t outtime ) { m_outtime = outtime; }
-		void SetOffTime( int32_t offtime ) { m_offtime = offtime; }
-		void SetPlayTime( int32_t playtime ) { m_playtime = playtime; }
 
 		void RawPacket(const void * c_pvData, int32_t iSize);
 		void ChatPacket(uint8_t type, const char * format, ...);

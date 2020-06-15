@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../eterlib/GrpObjectInstance.h"
-#include "../eterlib/Pool.h"
+#include "../eterLib/GrpObjectInstance.h"
+#include "../eterLib/Pool.h"
 #include "../eterSoundLib/Type.h"
 
 #include "EffectElementBaseInstance.h"
@@ -13,7 +13,7 @@
 class CEffectInstance : public CGraphicObjectInstance
 {
 	public:
- 		typedef std::vector<CEffectElementBaseInstance*> TEffectElementInstanceVector;
+		using TEffectElementInstanceVector = std::vector<CEffectElementBaseInstance *>;
 
 		enum
 		{

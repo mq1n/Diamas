@@ -5,6 +5,8 @@
 #include "../eterTreeLib/SpeedTreeForestDirectX9.h"
 #include "../eterTreeLib/SpeedTreeWrapper.h"
 #include "RaceManager.h"
+#include "../eterXClient/Locale.h"
+#include "../eterSecurity/CheatQueueManager.h"
 
 enum
 {
@@ -191,11 +193,17 @@ void CActorInstance::SetComboType(uint16_t wComboType)
 
 void CActorInstance::SetAttackSpeed(float fAtkSpd)
 {
+	if (fAtkSpd > 3.0f)
+		CCheatDetectQueueMgr::Instance().AppendDetection(CHEAT_ATTACK_SPEED_OVERFLOW, 0, std::to_string(fAtkSpd));
+
 	m_fAtkSpd=fAtkSpd;
 }
 
 void CActorInstance::SetMoveSpeed(float fMovSpd)
 {
+	if (fMovSpd > 3.0f)
+		CCheatDetectQueueMgr::Instance().AppendDetection(CHEAT_MOVE_SPEED_OVERFLOW, 0, std::to_string(fMovSpd));
+
 	if (m_fMovSpd==fMovSpd)
 		return;
 
@@ -217,13 +225,9 @@ void CActorInstance::SetFishingPosition(D3DXVECTOR3 & rv3Position)
 void  CActorInstance::Move()
 {
 	if (m_isWalking)
-	{
 		SetLoopMotion(CRaceMotionData::NAME_WALK, 0.15f, m_fMovSpd);
-	}
 	else
-	{
 		SetLoopMotion(CRaceMotionData::NAME_RUN, 0.15f, m_fMovSpd);
-	}
 }
 
 void  CActorInstance::Stop(float fBlendingTime)
@@ -355,15 +359,11 @@ void CActorInstance::Die()
 	SetAdvancingRotation(GetRotation());
 
 	if (IsStone())
-	{
 		InterceptOnceMotion(CRaceMotionData::NAME_DEAD);
-	}
 	else
 	{
 		if (!__IsDieMotion())
-		{
 			InterceptOnceMotion(CRaceMotionData::NAME_DEAD);
-		}
 	}
 
 	m_isRealDead = TRUE;
@@ -616,15 +616,13 @@ void CActorInstance::AdjustDynamicCollisionMovement(const CActorInstance * c_pAc
 		if (move_length>gc_fActorSlideMoveSpeed)
 			m_v3Movement*=gc_fActorSlideMoveSpeed/move_length;
 
-		TCollisionPointInstanceListIterator itMain = m_BodyPointInstanceList.begin();
+		auto itMain = m_BodyPointInstanceList.begin();
 		for (; itMain != m_BodyPointInstanceList.end(); ++itMain)
 		{
 			CDynamicSphereInstanceVector & c_rMainSphereVector = (*itMain).SphereInstanceVector;
-			for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
+			for (auto & c_rMainSphere : c_rMainSphereVector)
 			{
-				CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
-
-				TCollisionPointInstanceList::const_iterator itOpp = c_pActorInstance->m_BodyPointInstanceList.begin();
+				auto itOpp = c_pActorInstance->m_BodyPointInstanceList.begin();
 				for(;itOpp != c_pActorInstance->m_BodyPointInstanceList.end();++itOpp)
 				{
 					CSphereCollisionInstance s;
@@ -668,14 +666,12 @@ void CActorInstance::__AdjustCollisionMovement(const CGraphicObjectInstance * c_
 	if (move_length>gc_fActorSlideMoveSpeed)
 		m_v3Movement*=gc_fActorSlideMoveSpeed/move_length;
 
-	TCollisionPointInstanceListIterator itMain = m_BodyPointInstanceList.begin();
+	auto itMain = m_BodyPointInstanceList.begin();
 	for (; itMain != m_BodyPointInstanceList.end(); ++itMain)
 	{
 		CDynamicSphereInstanceVector & c_rMainSphereVector = (*itMain).SphereInstanceVector;
-		for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
+		for (auto & c_rMainSphere : c_rMainSphereVector)
 		{
-			CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
-
 			D3DXVECTOR3 v3Delta = c_pGraphicObjectInstance->GetCollisionMovementAdjust(c_rMainSphere);
 			m_v3Movement+=v3Delta;
 			c_rMainSphere.v3Position+=v3Delta;
@@ -724,14 +720,11 @@ BOOL CActorInstance::IsMovement()
 
 bool CActorInstance::IntersectDefendingSphere()
 {
-	for (TCollisionPointInstanceList::iterator it = m_DefendingPointInstanceList.begin(); it != m_DefendingPointInstanceList.end(); ++it)
+	for (auto & it : m_DefendingPointInstanceList)
 	{
-		CDynamicSphereInstanceVector & rSphereInstanceVector = (*it).SphereInstanceVector;
-
-		CDynamicSphereInstanceVector::iterator it2 = rSphereInstanceVector.begin();
-		for (; it2 != rSphereInstanceVector.end(); ++it2)
+		CDynamicSphereInstanceVector & rSphereInstanceVector = it.SphereInstanceVector;
+		for (auto & rInstance : rSphereInstanceVector)
 		{
-			CDynamicSphereInstance & rInstance = *it2;
 			D3DXVECTOR3 v3SpherePosition = rInstance.v3Position;
 			float fRadius = rInstance.fRadius;
 
@@ -923,6 +916,8 @@ void CActorInstance::__Initialize()
 	m_eActorType = TYPE_PC;
 	m_eRace = 0;
 
+	m_bPushFlag = false;
+
 	m_eShape = 0;
 	m_eHair = 0;
 
@@ -935,7 +930,7 @@ void CActorInstance::__Initialize()
 
 	m_pAttributeInstance = nullptr;
 
-	m_pFlyEventHandler = 0;
+	m_pFlyEventHandler = nullptr;
 
 	m_v3FishingPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_iFishingEffectID = -1;

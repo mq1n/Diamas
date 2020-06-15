@@ -63,9 +63,7 @@ m_isLock(false)
     SetViewParams(D3DXVECTOR3(0.0f,0.0f,1.0f), D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(0.0f,1.0f,0.0f));
 }
 
-CCamera::~CCamera()
-{
-}
+CCamera::~CCamera() = default;
 
 void CCamera::Lock()
 {
@@ -440,13 +438,9 @@ void CCamera::RotateEyeAroundTarget(float fPitchDegree, float fRollDegree)
 
 	// 머리위로 넘어가기 막기...
 	if (m_fPitch + fPitchDegree > 80.0f)
-	{
 		fPitchDegree = 80.0f - m_fPitch;
-	}
-	else if( m_fPitch + fPitchDegree < -80.0f)
-	{
+	else if (m_fPitch + fPitchDegree < -80.0f)
 		fPitchDegree = -80.0f - m_fPitch;
-	}
 
 	D3DXMatrixRotationAxis(&matRotPitch, &m_v3Cross, D3DXToRadian(fPitchDegree));
 
@@ -532,9 +526,7 @@ void CCamera::CalculateRoll()
 	fDot *= (180.0f / D3DX_PI);
 	float fCross = D3DXVec2CCW (&v2ViewXY, &D3DXVECTOR2(0.0f, 1.0f));
 	if ( 0 > fCross)
-	{
 		fDot = -fDot;
-	}
 
 	m_fRoll = fDot;
 
@@ -545,8 +537,8 @@ void CCamera::CalculateRoll()
 //////////////////////////////////////////////////////////////////////////
 
 CCameraManager::CCameraManager() :
-m_pCurrentCamera(nullptr),
-m_pPreviousCamera(nullptr)
+	m_pCurrentCamera(nullptr),
+	m_pPreviousCamera(nullptr)
 {
 	AddCamera(DEFAULT_PERSPECTIVE_CAMERA);
 	AddCamera(DEFAULT_ORTHO_CAMERA);
@@ -557,10 +549,8 @@ m_pPreviousCamera(nullptr)
 
 CCameraManager::~CCameraManager()
 {
-	for (TCameraMap::iterator itor = m_CameraMap.begin(); itor != m_CameraMap.end(); ++itor)
-	{
-		delete (*itor).second;
-	}
+	for (auto & itor : m_CameraMap)
+		delete itor.second;
 	m_CameraMap.clear();
 }
 
@@ -599,13 +589,13 @@ bool CCameraManager::AddCamera(uint8_t ucCameraNum)
 {
 	if(m_CameraMap.end() != m_CameraMap.find(ucCameraNum))
 		return false;
-	m_CameraMap.insert(TCameraMap::value_type(ucCameraNum, new CCamera));
+	m_CameraMap.emplace(ucCameraNum, new CCamera);
 	return true;
 }
 
 bool CCameraManager::RemoveCamera(uint8_t ucCameraNum)
 {
-	TCameraMap::iterator itor = m_CameraMap.find(ucCameraNum);
+	auto itor = m_CameraMap.find(ucCameraNum);
 	if(m_CameraMap.end() == itor)
 		return false;
 	m_CameraMap.erase(itor);
@@ -616,9 +606,9 @@ uint8_t CCameraManager::GetCurrentCameraNum()
 {
 	if (!m_pCurrentCamera)
 		return NO_CURRENT_CAMERA;
-	for (TCameraMap::iterator itor = m_CameraMap.begin(); itor != m_CameraMap.end(); ++itor)
-		if(m_pCurrentCamera == (*itor).second)
-			return (*itor).first;
+	for (auto & itor : m_CameraMap)
+		if (m_pCurrentCamera == itor.second)
+			return itor.first;
 	return NO_CURRENT_CAMERA;
 }
 

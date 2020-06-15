@@ -48,22 +48,18 @@ void CPythonNetworkStream::HandShakePhase()
 				CTimer::Instance().SetBaseTime();
 				return;
 			}
-			break;
 		case HEADER_GC_PING:
 			RecvPingPacket();
 			return;
-			break;
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 		case HEADER_GC_KEY_AGREEMENT:
 			RecvKeyAgreementPacket();
 			return;
-			break;
 
 		case HEADER_GC_KEY_AGREEMENT_COMPLETED:
 			RecvKeyAgreementCompletedPacket();
 			return;
-			break;
 #endif
 	}
 
@@ -141,9 +137,7 @@ bool CPythonNetworkStream::RecvKeyAgreementPacket()
 {
 	TPacketKeyAgreement packet;
 	if (!Recv(sizeof(packet), &packet))
-	{
 		return false;
-	}
 
 	Tracenf("KEY_AGREEMENT RECV %u", packet.wDataLength);
 
@@ -162,8 +156,8 @@ bool CPythonNetworkStream::RecvKeyAgreementPacket()
 	{
 		// Key agreement 성공, 응답 전송
 		packetToSend.bHeader = HEADER_CG_KEY_AGREEMENT;
-		packetToSend.wAgreedLength = (uint16_t)agreedLength;
-		packetToSend.wDataLength = (uint16_t)dataLength;
+		packetToSend.wAgreedLength = static_cast<uint16_t>(agreedLength);
+		packetToSend.wDataLength = static_cast<uint16_t>(dataLength);
 
 		if (!Send(sizeof(packetToSend), &packetToSend))
 		{
@@ -185,9 +179,7 @@ bool CPythonNetworkStream::RecvKeyAgreementCompletedPacket()
 {
 	TPacketKeyAgreementCompleted packet;
 	if (!Recv(sizeof(packet), &packet))
-	{
 		return false;
-	}
 
 	Tracenf("KEY_AGREEMENT_COMPLETED RECV");
 

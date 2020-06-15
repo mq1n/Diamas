@@ -19,7 +19,7 @@ const char * CreateTempFileName(const char * c_pszPrefix)
 
 	GetTempFileName(szTempPath,									// directory for temp files 
 					c_pszPrefix ? c_pszPrefix : "etb",		    // temp file name prefix 
-					c_pszPrefix ? true : false,					// create unique name 
+					c_pszPrefix != nullptr, 					// create unique name
 					szTempName);								// buffer for name 
 
 	return (szTempName);
@@ -87,8 +87,10 @@ void GetFileExtension(const char* c_szFile, int32_t len, std::string* pstExt)
 			break;
 		}
 
-		if (c=='/') break;
-		else if (c=='\\') break;
+		if (c == '/')
+			break;
+		else if (c == '\\')
+			break;
 	}
 
 	++ext;		
@@ -114,8 +116,10 @@ void GetFileNameParts(const char* c_szFile, int32_t len, char* pszPath, char* ps
 			break;
 		}
 
-		if (c=='/') break;
-		else if (c=='\\') break;
+		if (c == '/')
+			break;
+		else if (c == '\\')
+			break;
 	}
 
 	while (pos>0)
@@ -123,17 +127,17 @@ void GetFileNameParts(const char* c_szFile, int32_t len, char* pszPath, char* ps
 		--pos;
 		char c=c_szFile[pos];
 
-		if (c=='/') break;
-		else if (c=='\\') break;
+		if (c == '/')
+			break;
+		else if (c == '\\')
+			break;
 	}
 
 	if (pos) 
 	{
 		++pos;
 		for (int32_t i = 0; i < pos; ++i)
-		{
 			pszPath[i] = c_szFile[i];
-		}
 		pszPath[pos] = '\0';
 	}
 
@@ -141,9 +145,7 @@ void GetFileNameParts(const char* c_szFile, int32_t len, char* pszPath, char* ps
 	{
 		int32_t count = 0;
 		for (int32_t i = pos; i < ext; ++i)
-		{
 			pszName[count++] = c_szFile[i];
-		}
 		pszName[count] = '\0';
 	}
 
@@ -152,9 +154,7 @@ void GetFileNameParts(const char* c_szFile, int32_t len, char* pszPath, char* ps
 	{
 		int32_t count = 0;
 		for (int32_t i = ext; i < len; ++i)
-		{
 			pszExt[count++] = c_szFile[i];
-		}
 		pszExt[count] = '\0';
 	}
 }
@@ -225,10 +225,8 @@ void GetOnlyPathName(const char * sz_Name, std::string & OnlyPathName)
 	OnlyPathName.clear();
 
 	for (int32_t j=0; j<i; ++j)
-	{
 		OnlyPathName += sz_Name[j];
-	}
-	OnlyPathName += "\0";
+	OnlyPathName += '\0';
 }
 
 const char * GetOnlyPathName(const char * c_szName)
@@ -272,19 +270,17 @@ void GetWorkingFolder(std::string & strFileName)
 void StringLowers(char * String)
 {
 	for (uint32_t i = 0; i < strlen(String); ++i)
-	{
 		String[i] = ascii_tolower(String[i]);
-	}
 }
 
 void StringPath(std::string & rString)
 {
-	for (uint32_t i = 0; i < rString.length(); ++i)
+	for (char & i : rString)
 	{
-		if (rString[i] == '\\')
-			rString[i] = '/';
+		if (i == '\\')
+			i = '/';
 		else
-			rString[i] = ascii_tolower(rString[i]);
+			i = ascii_tolower(i);
 	}
 }
 
@@ -388,8 +384,7 @@ int32_t MINMAX(int32_t min, int32_t value, int32_t max)
 	if (max < min)
 		return MAX(min, value);
 
-    register int32_t tv;
-    tv = (min > value ? min : value);
+	int32_t tv = (min > value ? min : value);
     return (max < tv) ? max : tv;
 }
 
@@ -405,15 +400,13 @@ float fMAX(float a, float b)
 
 float fMINMAX(float min, float value, float max)
 {               
-    register float tv;
-	
-    tv = (min > value ? min : value);
+	float tv = (min > value ? min : value);
     return (max < tv) ? max : tv;
 }
 
 bool IsFile(const char* filename)
 {
-	return _access(filename, 0) == 0 ? true : false;
+	return _access(filename, 0) == 0;
 }
 
 bool IsGlobalFileName(const char * c_szFileName)
@@ -467,8 +460,7 @@ class CDirRemover : public CDir
 
 		bool OnFolder(const char* c_szFilter, const char* c_szPathName, const char* c_szFileName)
 		{
-			std::string strFullPathName;
-			strFullPathName = c_szPathName;
+			std::string strFullPathName = c_szPathName;
 			strFullPathName += c_szFileName; 
 
 			CDirRemover remover;
@@ -479,13 +471,12 @@ class CDirRemover : public CDir
 			strWorkingFolder += strFullPathName;
 			strWorkingFolder += "/";
 			StringPath(strWorkingFolder);
-			ms_strDirectoryDeque.push_back(strWorkingFolder);
+			ms_strDirectoryDeque.emplace_back(strWorkingFolder);
 			return true;
 		}
 		bool OnFile(const char* c_szPathName, const char* c_szFileName)
 		{
-			std::string strFullPathName;
-			strFullPathName = c_szPathName;
+			std::string strFullPathName = c_szPathName;
 			strFullPathName += c_szFileName; 
 			_chmod(strFullPathName.c_str(), _S_IWRITE);
 			DeleteFileA(strFullPathName.c_str());
@@ -494,7 +485,7 @@ class CDirRemover : public CDir
 
 		static void RemoveAllDirectory()
 		{
-			for (std::deque<std::string>::iterator itor = ms_strDirectoryDeque.begin(); itor != ms_strDirectoryDeque.end(); ++itor)
+			for (auto itor = ms_strDirectoryDeque.begin(); itor != ms_strDirectoryDeque.end(); ++itor)
 			{
 				const std::string & c_rstrDirectory = *itor;
 				RemoveDirectoryA(c_rstrDirectory.c_str());
@@ -565,7 +556,7 @@ bool SplitLine(const char * c_szLine, const char * c_szDelimeter, std::vector<st
 			basePos = endPos;
 		}
 
-		pkVec_strToken->push_back(strLine.substr(beginPos, endPos - beginPos));
+		pkVec_strToken->emplace_back(strLine.substr(beginPos, endPos - beginPos));
 	} while (basePos < strLine.length());
 
 	return true;

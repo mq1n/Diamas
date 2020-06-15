@@ -34,8 +34,8 @@ namespace script
         std::string     name;
         TArgList        argList;
 
-		SCmd()
-		{}
+		SCmd() = default;
+
 		SCmd(const SCmd& c_cmd)
 		{
 			name = c_cmd.name;

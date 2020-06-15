@@ -5,9 +5,7 @@
 #include "char.h"
 #include "desc.h"
 #include "item_manager.h"
-#ifdef ENABLE_NEWSTUFF
 #include "config.h"
-#endif
 
 const int32_t MAX_NORM_ATTR_NUM = ITEM_MANAGER::MAX_NORM_ATTR_NUM;
 const int32_t MAX_RARE_ATTR_NUM = ITEM_MANAGER::MAX_RARE_ATTR_NUM;
@@ -332,16 +330,6 @@ void CItem::SetAttribute(int32_t i, uint8_t bType, int16_t sValue)
 	m_aAttr[i].sValue = sValue;
 	UpdatePacket();
 	Save();
-
-	if (bType)
-	{
-		const char * pszIP = nullptr;
-
-		if (GetOwner() && GetOwner()->GetDesc())
-			pszIP = GetOwner()->GetDesc()->GetHostName();
-
-		LogManager::instance().ItemLog(i, bType, sValue, GetID(), "SET_ATTR", "", pszIP ? pszIP : "", GetOriginalVnum());
-	}
 }
 
 void CItem::SetForceAttribute(int32_t i, uint8_t bType, int16_t sValue)
@@ -352,16 +340,6 @@ void CItem::SetForceAttribute(int32_t i, uint8_t bType, int16_t sValue)
 	m_aAttr[i].sValue = sValue;
 	UpdatePacket();
 	Save();
-
-	if (bType)
-	{
-		const char * pszIP = nullptr;
-
-		if (GetOwner() && GetOwner()->GetDesc())
-			pszIP = GetOwner()->GetDesc()->GetHostName();
-
-		LogManager::instance().ItemLog(i, bType, sValue, GetID(), "SET_FORCE_ATTR", "", pszIP ? pszIP : "", GetOriginalVnum());
-	}
 }
 
 
@@ -395,11 +373,6 @@ bool CItem::ChangeRareAttribute()
 		m_aAttr[i + ITEM_ATTRIBUTE_RARE_START].bType = 0;
 		m_aAttr[i + ITEM_ATTRIBUTE_RARE_START].sValue = 0;
 	}
-
-	if (GetOwner() && GetOwner()->GetDesc())
-		LogManager::instance().ItemLog(GetOwner(), this, "SET_RARE_CHANGE", "");
-	else
-		LogManager::instance().ItemLog(0, 0, 0, GetID(), "SET_RARE_CHANGE", "", "", GetOriginalVnum());
 
 	for (int32_t i = 0; i < cnt; ++i)
 	{
@@ -445,12 +418,6 @@ bool CItem::AddRareAttribute()
 
 	Save();
 
-	const char * pszIP = nullptr;
-
-	if (GetOwner() && GetOwner()->GetDesc())
-		pszIP = GetOwner()->GetDesc()->GetHostName();
-
-	LogManager::instance().ItemLog(pos, attr.bType, attr.sValue, GetID(), "SET_RARE", "", pszIP ? pszIP : "", GetOriginalVnum());
 	return true;
 }
 

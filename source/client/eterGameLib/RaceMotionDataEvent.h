@@ -104,9 +104,7 @@ namespace NMotionEvent
 			if (!rTextFileLoader.GetTokenPosition("effectposition", &v3EffectPosition))
 				return false;
 			if (!rTextFileLoader.GetTokenBoolean("followingenable", &isFollowing))
-			{
 				isFollowing = FALSE;
-			}
 			dwEffectIndex = GetCaseCRC32(strEffectFileName.c_str(), strEffectFileName.length());
 			CEffectManager::Instance().RegisterEffect(strEffectFileName.c_str());
 
@@ -143,14 +141,10 @@ namespace NMotionEvent
 			if (!rTextFileLoader.GetTokenPosition("effectposition", &v3EffectPosition))
 				return false;
 			if (!rTextFileLoader.GetTokenBoolean("followingenable", &isFollowing))
-			{
-				isFollowing = FALSE;
-			}
-			if (!rTextFileLoader.GetTokenBoolean("fishingeffectflag", &isFishingEffect))
-			{
-				isFishingEffect = FALSE;
-			}
-			dwEffectIndex = GetCaseCRC32(strEffectFileName.c_str(), strEffectFileName.length());
+			isFollowing = FALSE;
+		if (!rTextFileLoader.GetTokenBoolean("fishingeffectflag", &isFishingEffect))
+			isFishingEffect = FALSE;
+		dwEffectIndex = GetCaseCRC32(strEffectFileName.c_str(), strEffectFileName.length());
 #ifndef _DEBUG
 			CEffectManager::Instance().RegisterEffect(strEffectFileName.c_str());
 #endif
@@ -228,9 +222,7 @@ namespace NMotionEvent
 				return false;
 
 			if (!rTextFileLoader.GetTokenBoolean("enablehitprocess", &isEnableHitProcess))
-			{
 				isEnableHitProcess = TRUE;
-			}
 
 			if (!NRaceData::LoadAttackData(rTextFileLoader, &AttackData))
 				return false;

@@ -76,8 +76,8 @@ void CActorInstance::UpdatePointInstance(TCollisionPointInstance * pPointInstanc
 	}
 
 	// Update Collsion Sphere
-	CSphereCollisionInstanceVector::const_iterator sit = pPointInstance->c_pCollisionData->SphereDataVector.begin();
-	CDynamicSphereInstanceVector::iterator dit=pPointInstance->SphereInstanceVector.begin();
+	auto sit = pPointInstance->c_pCollisionData->SphereDataVector.begin();
+	auto dit = pPointInstance->SphereInstanceVector.begin();
 	for (;sit!=pPointInstance->c_pCollisionData->SphereDataVector.end();++sit,++dit)
 	{
 		const TSphereData & c = sit->GetAttribute();//c_pCollisionData->SphereDataVector[j].GetAttribute();
@@ -107,7 +107,7 @@ void CActorInstance::UpdateAdvancingPointInstance()
 	D3DXMATRIX matPoint;
 	D3DXMATRIX matCenter;
 
-	TCollisionPointInstanceListIterator itor = m_BodyPointInstanceList.begin();
+	auto itor = m_BodyPointInstanceList.begin();
 	for (; itor != m_BodyPointInstanceList.end(); ++itor)
 	{
 		TCollisionPointInstance & rInstance = *itor;
@@ -227,8 +227,7 @@ bool CActorInstance::CreateCollisionInstancePiece(uint32_t dwAttachingModelIndex
 
 		CGrannyModelInstance * pModelInstance = m_LODControllerVector[dwAttachingModelIndex]->GetModelInstance();
 
-		if (pModelInstance && pModelInstance->GetBoneIndexByName(c_pAttachingData->strAttachingBoneName.c_str(),
-												&iAttachingBoneIndex))
+		if (pModelInstance && pModelInstance->GetBoneIndexByName(c_pAttachingData->strAttachingBoneName.c_str(), &iAttachingBoneIndex))
 		{
 			pPointInstance->isAttached = TRUE;
 			pPointInstance->dwBoneIndex = iAttachingBoneIndex;
@@ -256,7 +255,7 @@ bool CActorInstance::CreateCollisionInstancePiece(uint32_t dwAttachingModelIndex
 	{
 		const TSphereData & c_rSphereData = it->GetAttribute();
 		dsi.fRadius = c_rSphereData.fRadius;
-		pPointInstance->SphereInstanceVector.push_back(dsi);
+		pPointInstance->SphereInstanceVector.emplace_back(dsi);
 	}
 
 	return true;
@@ -281,9 +280,7 @@ BOOL CActorInstance::__SplashAttackProcess(CActorInstance & rVictim)
 
 	// NOTE : 이미 때렸다면 때릴 수 없음
 	if (rHittedInstanceMap.end() != rHittedInstanceMap.find(&rVictim))
-	{
 		return FALSE;
-	}
 
 	// NOTE : Snipe 모드이고..
 	if (NRaceData::ATTACK_TYPE_SNIPE == c_rAttackData.iAttackType)
@@ -310,7 +307,7 @@ BOOL CActorInstance::__SplashAttackProcess(CActorInstance & rVictim)
 	D3DXVECTOR3 v3HitPosition;
 	if (rVictim.CheckCollisionDetection(&m_kSplashArea.SphereInstanceVector, &v3HitPosition))
 	{
-		rHittedInstanceMap.insert(std::make_pair(&rVictim, GetLocalTime()+c_rAttackData.fInvisibleTime));
+		rHittedInstanceMap.emplace(&rVictim, GetLocalTime() + c_rAttackData.fInvisibleTime);
 
 		int32_t iCurrentHitCount = rHittedInstanceMap.size();
 		int32_t iMaxHitCount = (0 == c_rAttackData.iHitLimitCount ? 16 : c_rAttackData.iHitLimitCount);
@@ -357,13 +354,13 @@ BOOL CActorInstance::__NormalAttackProcess(CActorInstance & rVictim)
 
 	const float motiontime = GetAttackingElapsedTime();
 
-	NRaceData::THitDataContainer::const_iterator itorHitData = pad->HitDataContainer.begin();
+	auto itorHitData = pad->HitDataContainer.begin();
 	for (; itorHitData != pad->HitDataContainer.end(); ++itorHitData)
 	{
 		const NRaceData::THitData & c_rHitData = *itorHitData;
 
 		// NOTE : 이미 맞았는지 체크
-		THitDataMap::iterator itHitData = m_HitDataMap.find(&c_rHitData);
+		auto itHitData = m_HitDataMap.find(&c_rHitData);
 		if (itHitData != m_HitDataMap.end())
 		{
 			THittedInstanceMap & rHittedInstanceMap = itHitData->second;
@@ -377,15 +374,6 @@ BOOL CActorInstance::__NormalAttackProcess(CActorInstance & rVictim)
 		}
 
 		NRaceData::THitTimePositionMap::const_iterator range_start, range_end;
-		// NOTE : 공격시 공격 속도가 빨라지면 일부 MotionData가 skip되는 현상때문에 임시로 이렇게 고쳤다. (Mantis #75176)
-		// 이 코드도 공격 판정 데이터와 실제 결과가 달라질 수 있는 문제가 있어 좋은 코드는 못되지만 공격이 아예 안들어가는것보단(..) 나으므로
-		// 일단 이렇게 고쳐둔다.. 완벽하게 고치려면 모션중 판정 데이터와 관련된 모든 코드를 갈아엎는게 빠르다.
-		
-		// 주요 문제점은 이전 Frame에서의 time과 현재 Frame에서의 time의 오차가 크면 중간에 처리가 skip되는 hitdata가 생긴다.
-		// motiontime-CTimer::Instance().GetElapsedSecond() 이걸로 어떻게 해보려했던것 같지만 로그찍어본 결과 그렇게 안되더라.
-		// ~ ityz ~
-
-		/*------------------------수정된 코드------------------------------*/
 		range_start = c_rHitData.mapHitPosition.begin();
 		range_end = c_rHitData.mapHitPosition.end();
 		
@@ -394,21 +382,11 @@ BOOL CActorInstance::__NormalAttackProcess(CActorInstance & rVictim)
 
 		for(;range_start!=range_end;++range_start)
 		{
-			if(c_rHitData.fAttackStartTime > motiontime) break;
-			if(c_rHitData.fAttackEndTime < motiontime) break;
+			if (c_rHitData.fAttackStartTime > motiontime)
+				break;
 
-		/*------------------------------------------------------------------*/
-
-		/*-------------------------원본 코드------------------------------
-		range_start = c_rHitData.mapHitPosition.lower_bound(motiontime-CTimer::Instance().GetElapsedSecond());
-		range_end = c_rHitData.mapHitPosition.upper_bound(motiontime);
-		
-		float c = cosf(D3DXToRadian(GetRotation()));
-		float s = sinf(D3DXToRadian(GetRotation()));
-
-		for(;range_start!=range_end;++range_start)
-		{
-		----------------------------------------------------------------*/
+			if (c_rHitData.fAttackEndTime < motiontime) 
+				break;
 
 			const CDynamicSphereInstance& dsiSrc=range_start->second;
 
@@ -445,19 +423,18 @@ BOOL CActorInstance::__NormalAttackProcess(CActorInstance & rVictim)
 					const CDynamicSphereInstance& sub = *dsit;
 					if (DetectCollisionDynamicZCylinderVSDynamicZCylinder(dsi, sub))
 					{
-						THitDataMap::iterator itHitData = m_HitDataMap.find(&c_rHitData);
+						auto itHitData = m_HitDataMap.find(&c_rHitData);
 						if (itHitData == m_HitDataMap.end())
 						{
 							THittedInstanceMap HittedInstanceMap;
-							HittedInstanceMap.insert(std::make_pair(&rVictim, GetLocalTime()+pad->fInvisibleTime));
-							//HittedInstanceMap.insert(make_pair(&rVictim, GetLocalTime()+HIT_COOL_TIME));
-							m_HitDataMap.insert(make_pair(&c_rHitData, HittedInstanceMap));
+							HittedInstanceMap.emplace(&rVictim, GetLocalTime() + pad->fInvisibleTime);
+							m_HitDataMap.emplace(&c_rHitData, HittedInstanceMap);
 
 							//Tracef(" ----------- First Hit\n");
 						}
 						else
 						{
-							itHitData->second.insert(std::make_pair(&rVictim, GetLocalTime()+pad->fInvisibleTime));
+							itHitData->second.emplace(&rVictim, GetLocalTime() + pad->fInvisibleTime);
 							//itHitData->second.insert(make_pair(&rVictim, GetLocalTime()+HIT_COOL_TIME));
 
 							//Tracef(" ----------- Next Hit : %d\n", itHitData->second.size());
@@ -485,12 +462,10 @@ BOOL CActorInstance::__NormalAttackProcess(CActorInstance & rVictim)
 						D3DXVECTOR3 v3HitPosition = (GetPosition() + rVictim.GetPosition()) *0.5f;
 
 						// #0000780: [M2KR] 수룡 타격구 문제
-						extern bool IS_HUGE_RACE(uint32_t vnum);
+
 						if (IS_HUGE_RACE(rVictim.GetRace()))
-						{
-							v3HitPosition = (GetPosition() + sub.v3Position) * 0.5f;							
-						}
-						
+							v3HitPosition = (GetPosition() + sub.v3Position) * 0.5f;
+
 						__ProcessDataAttackSuccess(*pad, rVictim, v3HitPosition, m_kCurMotNode.uSkill);
 						return TRUE;
 					}
@@ -550,8 +525,8 @@ BOOL CActorInstance::TestPhysicsBlendingCollision(CActorInstance & rVictim)
 	D3DXVECTOR3 prevLastPosition, prevPosition;
 	const int32_t nSubCheckCount = 50;
 
-	TCollisionPointInstanceListIterator itorMain = pMainList->begin();
-	TCollisionPointInstanceListIterator itorVictim = pVictimList->begin();
+	auto itorMain = pMainList->begin();
+	auto itorVictim = pVictimList->begin();
 	for (; itorMain != pMainList->end(); ++itorMain)
 	{
 		for (; itorVictim != pVictimList->end(); ++itorVictim)
@@ -559,9 +534,8 @@ BOOL CActorInstance::TestPhysicsBlendingCollision(CActorInstance & rVictim)
 			CDynamicSphereInstanceVector & c_rMainSphereVector = (*itorMain).SphereInstanceVector;
 			CDynamicSphereInstanceVector & c_rVictimSphereVector = (*itorVictim).SphereInstanceVector;
 
-			for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
+			for (auto & c_rMainSphere : c_rMainSphereVector)
 			{
-				CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
 				//adjust main sphere center
 				prevLastPosition = c_rMainSphere.v3LastPosition;
 				prevPosition	 = c_rMainSphere.v3Position;
@@ -572,13 +546,12 @@ BOOL CActorInstance::TestPhysicsBlendingCollision(CActorInstance & rVictim)
 				{
 					c_rMainSphere.v3Position = prevPosition + (float)(i/(float)nSubCheckCount) * kPDelta;
 
-					for (uint32_t j = 0; j < c_rVictimSphereVector.size(); ++j)
+					for (auto & c_rVictimSphere : c_rVictimSphereVector)
 					{
-						CDynamicSphereInstance & c_rVictimSphere = c_rVictimSphereVector[j];
-
 						if (DetectCollisionDynamicSphereVSDynamicSphere(c_rMainSphere, c_rVictimSphere))
 						{
-							BOOL bResult = GetVector3Distance(c_rMainSphere.v3Position, c_rVictimSphere.v3Position) <= GetVector3Distance(c_rMainSphere.v3LastPosition, c_rVictimSphere.v3Position);
+							BOOL bResult = GetVector3Distance(c_rMainSphere.v3Position, c_rVictimSphere.v3Position) <=
+								GetVector3Distance(c_rMainSphere.v3LastPosition, c_rVictimSphere.v3Position);
 
 							c_rMainSphere.v3LastPosition = prevLastPosition;
 							c_rMainSphere.v3Position	 = prevPosition;
@@ -643,31 +616,26 @@ BOOL CActorInstance::TestActorCollision(CActorInstance & rVictim)
 		pVictimList = &rVictim.m_BodyPointInstanceList;
 	}
 
-	TCollisionPointInstanceListIterator itorMain = pMainList->begin();
-	TCollisionPointInstanceListIterator itorVictim = pVictimList->begin();
+	auto itorMain = pMainList->begin();
+	auto itorVictim = pVictimList->begin();
 	for (; itorMain != pMainList->end(); ++itorMain)
-	for (; itorVictim != pVictimList->end(); ++itorVictim)
-	{
-		const CDynamicSphereInstanceVector & c_rMainSphereVector = (*itorMain).SphereInstanceVector;
-		const CDynamicSphereInstanceVector & c_rVictimSphereVector = (*itorVictim).SphereInstanceVector;
-
-		for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
-		for (uint32_t j = 0; j < c_rVictimSphereVector.size(); ++j)
+		for (; itorVictim != pVictimList->end(); ++itorVictim)
 		{
-			const CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
-			const CDynamicSphereInstance & c_rVictimSphere = c_rVictimSphereVector[j];
+			const CDynamicSphereInstanceVector & c_rMainSphereVector = (*itorMain).SphereInstanceVector;
+			const CDynamicSphereInstanceVector & c_rVictimSphereVector = (*itorVictim).SphereInstanceVector;
 
-			if (DetectCollisionDynamicSphereVSDynamicSphere(c_rMainSphere, c_rVictimSphere))
-			{
-				if (GetVector3Distance(c_rMainSphere.v3Position, c_rVictimSphere.v3Position) <=
-					GetVector3Distance(c_rMainSphere.v3LastPosition, c_rVictimSphere.v3Position))
+			for (const auto & c_rMainSphere : c_rMainSphereVector)
+				for (const auto & c_rVictimSphere : c_rVictimSphereVector)
 				{
-					return TRUE;
+					if (DetectCollisionDynamicSphereVSDynamicSphere(c_rMainSphere, c_rVictimSphere))
+					{
+						if (GetVector3Distance(c_rMainSphere.v3Position, c_rVictimSphere.v3Position) <=
+							GetVector3Distance(c_rMainSphere.v3LastPosition, c_rVictimSphere.v3Position))
+							return TRUE;
+						return FALSE;
+					}
 				}
-				return FALSE;
-			}
 		}
-	}
 
 	return FALSE;
 }
@@ -722,14 +690,12 @@ BOOL CActorInstance::__TestObjectCollision(const CGraphicObjectInstance * c_pObj
 	if (m_v3Movement.x == 0.0f && m_v3Movement.y == 0.0f && m_v3Movement.z == 0.0f) 
 		return FALSE;
 
-	TCollisionPointInstanceListIterator itorMain = m_BodyPointInstanceList.begin();
+	auto itorMain = m_BodyPointInstanceList.begin();
 	for (; itorMain != m_BodyPointInstanceList.end(); ++itorMain)
 	{
 		const CDynamicSphereInstanceVector & c_rMainSphereVector = (*itorMain).SphereInstanceVector;
-		for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
+		for (const auto & c_rMainSphere : c_rMainSphereVector)
 		{
-			const CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
-
 			if (c_pObjectInstance->MovementCollisionDynamicSphere(c_rMainSphere))
 			{
 				//const D3DXVECTOR3 & c_rv3Position = c_pObjectInstance->GetPosition();
@@ -750,18 +716,14 @@ BOOL CActorInstance::__TestObjectCollision(const CGraphicObjectInstance * c_pObj
 
 bool CActorInstance::TestCollisionWithDynamicSphere(const CDynamicSphereInstance & dsi)
 {
-	TCollisionPointInstanceListIterator itorMain = m_BodyPointInstanceList.begin();
+	auto itorMain = m_BodyPointInstanceList.begin();
 	for (; itorMain != m_BodyPointInstanceList.end(); ++itorMain)
 	{
 		const CDynamicSphereInstanceVector & c_rMainSphereVector = (*itorMain).SphereInstanceVector;
-		for (uint32_t i = 0; i < c_rMainSphereVector.size(); ++i)
+		for (const auto & c_rMainSphere : c_rMainSphereVector)
 		{
-			const CDynamicSphereInstance & c_rMainSphere = c_rMainSphereVector[i];
-			
 			if (DetectCollisionDynamicSphereVSDynamicSphere(c_rMainSphere, dsi))
-			{
 				return true;
-			}
 		}
 	}
 	

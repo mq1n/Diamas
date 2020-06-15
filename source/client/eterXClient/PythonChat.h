@@ -10,9 +10,7 @@ class CWhisper
 		{
 			CGraphicTextInstance Instance;
 
-			SChatLine()
-			{
-			}
+			SChatLine() = default;
 			~SChatLine()
 			{
 				Instance.Destroy();
@@ -26,8 +24,8 @@ class CWhisper
 			static CDynamicPool<SChatLine> ms_kPool;
 		} TChatLine;
 
-		typedef std::deque<TChatLine*> TChatLineDeque;
-		typedef std::list<TChatLine*> TChatLineList;
+		using TChatLineDeque = std::deque<TChatLine *>;
+		using TChatLineList = std::list<TChatLine *>;
 
 	public:
 		CWhisper();
@@ -39,6 +37,7 @@ class CWhisper
 		void SetBoxSize(float fWidth, float fHeight);
 		void AppendChat(int32_t iType, const char* c_szChat);
 		void Render(float fx, float fy);
+	const char * GetLastWhisper();
 
 	protected:
 		void __Initialize();
@@ -49,6 +48,7 @@ class CWhisper
 		float m_fWidth;
 		float m_fHeight;
 		float m_fcurPosition;
+	const char * m_lastWhisper;
 
 		TChatLineDeque m_ChatLineDeque;
 		TChatLineList m_ShowingChatLineList;
@@ -80,13 +80,13 @@ class CPythonChat : public CSingleton<CPythonChat>, public IAbstractChat
 		{
 			BOARD_STATE_VIEW,
 			BOARD_STATE_EDIT,
-			BOARD_STATE_LOG,
+		BOARD_STATE_LOG
 		};
 
 		enum
 		{
 			CHAT_LINE_MAX_NUM = 300,
-			CHAT_LINE_COLOR_ARRAY_MAX_NUM = 3,
+		CHAT_LINE_COLOR_ARRAY_MAX_NUM = 3
 		};
 
 		typedef struct SChatLine
@@ -118,12 +118,12 @@ class CPythonChat : public CSingleton<CPythonChat>, public IAbstractChat
 			uint32_t dwAppendingTime;
 		} TWaitChat;
 
-		typedef std::deque<TChatLine*> TChatLineDeque;
-		typedef std::list<TChatLine*> TChatLineList;
+		using TChatLineDeque = std::deque<TChatLine *>;
+		using TChatLineList = std::list<TChatLine *>;
 
-		typedef std::map<std::string, CWhisper*> TWhisperMap;
-		typedef std::set<std::string> TIgnoreCharacterSet;
-		typedef std::list<TWaitChat> TWaitChatList;
+		using TWhisperMap = std::map<std::string, CWhisper *>;
+		using TIgnoreCharacterSet = std::set<std::string>;
+		using TWaitChatList = std::list<TWaitChat>;
 
 		typedef struct SChatSet
 		{

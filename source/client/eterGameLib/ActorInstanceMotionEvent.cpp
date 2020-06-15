@@ -190,11 +190,10 @@ void CActorInstance::ProcessMotionEventEffectToTargetEvent(const CRaceMotionData
 		CEffectManager& rkEftMgr=CEffectManager::Instance();
 
 		if (-1 != m_iFishingEffectID)
-		{
  			rkEftMgr.DeactiveEffectInstance(m_iFishingEffectID);
-		}
 
-		m_iFishingEffectID = rkEftMgr.CreateEffect(c_pEffectToTargetData->dwEffectIndex, m_v3FishingPosition, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+		m_iFishingEffectID =
+			rkEftMgr.CreateEffect(c_pEffectToTargetData->dwEffectIndex, m_v3FishingPosition, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	}
 	else
 	{
@@ -301,9 +300,7 @@ void CActorInstance::ProcessMotionEventFly(const CRaceMotionData::TMotionEventDa
 		}
 
 		if (m_pFlyEventHandler)
-		{
 			m_pFlyEventHandler->OnShoot(m_kCurMotNode.uSkill);
-		}
 	}
 	else
 	{
@@ -375,7 +372,6 @@ void CActorInstance::ProcessMotionEventUnk11(uint32_t dwcurFrame, int32_t iIndex
 		}
 	}
 
-	return;
 }
 
 void CActorInstance::ProcessMotionEventUnk12(uint32_t dwcurFrame, int32_t iIndex, const CRaceMotionData::TMotionEventData * c_pData) // AniSpeed OFF
@@ -389,7 +385,6 @@ void CActorInstance::ProcessMotionEventUnk12(uint32_t dwcurFrame, int32_t iIndex
 	{
 	}
 
-	return;
 }
 #endif
 

@@ -7,7 +7,7 @@ void CNetworkPacketHeaderMap::Set(int32_t header, TPacketType & rPacketType)
 }
 bool CNetworkPacketHeaderMap::Get(int32_t header, TPacketType * pPacketType)
 {
-	std::map<int32_t, TPacketType>::iterator f=m_headerMap.find(header);
+	auto f = m_headerMap.find(header);
 	
 	if (m_headerMap.end()==f)
 		return false;
@@ -17,10 +17,6 @@ bool CNetworkPacketHeaderMap::Get(int32_t header, TPacketType * pPacketType)
 	return true;
 }
 
-CNetworkPacketHeaderMap::CNetworkPacketHeaderMap()
-{
-}
+CNetworkPacketHeaderMap::CNetworkPacketHeaderMap() = default;
 
-CNetworkPacketHeaderMap::~CNetworkPacketHeaderMap()
-{
-}
+CNetworkPacketHeaderMap::~CNetworkPacketHeaderMap() = default;

@@ -51,11 +51,6 @@ float CGrannyMotion::GetDuration() const
 
 void CGrannyMotion::GetTextTrack(const char * c_szTextTrackName, int32_t * pCount, float * pArray) const
 {
-	if (m_pgrnAni->TrackGroupCount != 1)
-	{
-//		assert(!"CGrannyMotion::GetTextTrack - TrackCount is not 1");
-	}
-
 	granny_track_group * pTrack = m_pgrnAni->TrackGroups[0];
 
 	for (int32_t i = 0; i < pTrack->TextTrackCount; ++i)

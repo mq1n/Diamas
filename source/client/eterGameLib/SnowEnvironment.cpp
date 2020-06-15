@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "SnowEnvironment.h"
-
 #include "../eterLib/StateManager.h"
 #include "../eterLib/Camera.h"
 #include "../eterLib/ResourceManager.h"
@@ -12,9 +11,7 @@ static const std::string rain_resource_filename = "d:/ymir work/pc/common/effect
 void CSnowEnvironment::Enable()
 {
 	if (!m_bSnowEnable)
-	{
 		Create();
-	}
 
 	m_bSnowEnable = TRUE;
 }
@@ -59,7 +56,7 @@ void CSnowEnvironment::Deform()
 	D3DXVECTOR3 v3ChangedPos = c_rv3View * 3500.0f + c_rv3Pos;
 	v3ChangedPos.z = c_rv3Pos.z;
 
-	std::vector<CSnowParticle*>::iterator itor = m_kVct_pkParticleSnow.begin();
+	auto itor = m_kVct_pkParticleSnow.begin();
 	for (; itor != m_kVct_pkParticleSnow.end();)
 	{
 		CSnowParticle * pSnow = *itor;
@@ -83,7 +80,7 @@ void CSnowEnvironment::Deform()
 		{
 			CSnowParticle * pSnowParticle = CSnowParticle::New();
 			pSnowParticle->Init(v3ChangedPos, m_bRainEnable);
-			m_kVct_pkParticleSnow.push_back(pSnowParticle);
+			m_kVct_pkParticleSnow.emplace_back(pSnowParticle);
 		}
 	}
 }
@@ -178,7 +175,7 @@ void CSnowEnvironment::Render()
 
 	__BeginBlur();
 
-	uint32_t dwParticleCount = std::min<uint32_t>(m_dwParticleMaxNum, m_kVct_pkParticleSnow.size());
+	uint32_t dwParticleCount = std::min(m_dwParticleMaxNum, m_kVct_pkParticleSnow.size());
 
 	CCamera * pCamera = CCameraManager::Instance().GetCurrentCamera();
 	if (!pCamera)
@@ -190,16 +187,13 @@ void CSnowEnvironment::Render()
 	SParticleVertex * pv3Verticies;
 	if (SUCCEEDED(m_pVB->Lock(0, sizeof(SParticleVertex)*dwParticleCount*4, (void**) &pv3Verticies, D3DLOCK_DISCARD)))
 	{
-		int32_t i = 0;
-		std::vector<CSnowParticle*>::iterator itor = m_kVct_pkParticleSnow.begin();
+		uint32_t i = 0;
+		auto itor = m_kVct_pkParticleSnow.begin();
 		for (; i < dwParticleCount && itor != m_kVct_pkParticleSnow.end(); ++i, ++itor)
 		{
 			CSnowParticle * pSnow = *itor;
 			pSnow->SetCameraVertex(c_rv3Up, c_rv3Cross);
-			pSnow->GetVerticies(pv3Verticies[i*4+0],
-								pv3Verticies[i*4+1],
-								pv3Verticies[i*4+2],
-								pv3Verticies[i*4+3]);
+			pSnow->GetVerticies(pv3Verticies[i * 4 + 0], pv3Verticies[i * 4 + 1], pv3Verticies[i * 4 + 2], pv3Verticies[i * 4 + 3]);
 		}
 		m_pVB->Unlock();
 	}
@@ -273,13 +267,11 @@ bool CSnowEnvironment::__CreateGeometry()
 	if (FAILED(m_pIB->Lock(0, sizeof(uint16_t)*m_dwParticleMaxNum*6, (void**)&dstIndices, 0)))
 		return false;
 
-	const uint16_t c_awFillRectIndices[6] = { 0, 2, 1, 2, 3, 1, };
-	for (int32_t i = 0; i < m_dwParticleMaxNum; ++i)
+	const uint16_t c_awFillRectIndices[6] = {0, 2, 1, 2, 3, 1};
+	for (uint32_t i = 0; i < m_dwParticleMaxNum; ++i)
 	{
 		for (int32_t j = 0; j < 6; ++j)
-		{
 			dstIndices[i*6 + j] = i*4 + c_awFillRectIndices[j];
-		}
 	}
 
 	m_pIB->Unlock();

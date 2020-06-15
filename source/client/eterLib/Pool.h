@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include "../eterBase/Debug.h"
 
 //#define DYNAMIC_POOL_STRICT
@@ -63,7 +64,7 @@ class CDynamicPool
 			if (m_kVct_pkFree.empty())
 			{
 				T* pkNewData=new T;
-				m_kVct_pkData.push_back(pkNewData);
+				m_kVct_pkData.emplace_back(pkNewData);
 				++m_uUsedCapacity;
 				return pkNewData;
 			}
@@ -78,7 +79,7 @@ class CDynamicPool
 			assert(__IsValidData(pkData));
 			assert(!__IsFreeData(pkData));
 #endif
-			m_kVct_pkFree.push_back(pkData);
+		m_kVct_pkFree.emplace_back(pkData);
 		}
 		void FreeAll()
 		{
@@ -173,7 +174,7 @@ class CDynamicPoolEx
 			if (m_kVct_pkFree.empty())
 			{
 				T* pkNewData=New();
-				m_kVct_pkData.push_back(pkNewData);
+				m_kVct_pkData.emplace_back(pkNewData);
 				++m_uUsedCapacity;
 				return pkNewData;
 			}
@@ -188,7 +189,7 @@ class CDynamicPoolEx
 			assert(__IsValidData(pkData));
 			assert(!__IsFreeData(pkData));
 #endif
-			m_kVct_pkFree.push_back(pkData);
+			m_kVct_pkFree.emplace_back(pkData);
 		}
 		void FreeAll()
 		{

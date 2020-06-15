@@ -1,9 +1,19 @@
 #pragma once
+
+#include "StdAfx.h"
 #include "Locale.h"
 #include "../eterGameLib/RaceData.h"
 #include "../eterGameLib/ItemData.h"
 
-typedef uint8_t TPacketHeader;
+using TPacketHeader = uint8_t;
+
+enum EGameStage
+{
+	STAGE_NULL,
+	STAGE_DEV_GAME,
+	STAGE_TEST_GAME,
+	STAGE_LIVE_GAME,
+};
 
 enum
 {
@@ -70,8 +80,8 @@ enum
 	//HEADER_BLANK59								= 59,
 	HEADER_CG_ITEM_USE_TO_ITEM					= 60,
     HEADER_CG_TARGET                            = 61,
-	//HEADER_BLANK62								= 62,
-	//HEADER_BLANK63								= 63,
+	HEADER_CG_TARGET_DROP						= 62,
+	HEADER_CG_CHEST_DROP_INFO					= 63,
 	//HEADER_BLANK64								= 64,
 	HEADER_CG_WARP								= 65, 
     HEADER_CG_SCRIPT_BUTTON						= 66,
@@ -139,7 +149,6 @@ enum
 	HEADER_GC_CHARACTER_MOVE					= 3,
 	HEADER_GC_CHAT								= 4,
 	HEADER_GC_SYNC_POSITION 					= 5,
-	HEADER_GC_LOGIN_SUCCESS3					= 6,
 	HEADER_GC_LOGIN_FAILURE						= 7,
 	HEADER_GC_PLAYER_CREATE_SUCCESS				= 8,
 	HEADER_GC_PLAYER_CREATE_FAILURE				= 9,
@@ -149,7 +158,7 @@ enum
 	HEADER_GC_STUN								= 13,
 	HEADER_GC_DEAD								= 14,
 
-	HEADER_GC_MAIN_CHARACTER					= 15,
+	HEADER_GC_MAIN_CHARACTER_OLD					= 15,
 	HEADER_GC_PLAYER_POINTS						= 16,
 	HEADER_GC_PLAYER_POINT_CHANGE				= 17,
 	HEADER_GC_CHANGE_SPEED						= 18,
@@ -165,7 +174,7 @@ enum
     HEADER_GC_QUICKSLOT_DEL                     = 29,
     HEADER_GC_QUICKSLOT_SWAP                    = 30,
 	HEADER_GC_ITEM_OWNERSHIP					= 31,
-	HEADER_GC_LOGIN_SUCCESS4					= 32,
+	HEADER_GC_LOGIN_SUCCESS						= 32,
 	HEADER_GC_ITEM_UNBIND_TIME					= 33,
 	HEADER_GC_WHISPER							= 34,
 	HEADER_GC_ALERT								= 35,
@@ -189,7 +198,9 @@ enum
 	HEADER_GC_MOUNT								= 61,
 	HEADER_GC_OWNERSHIP                         = 62, 
     HEADER_GC_TARGET                            = 63,
+	HEADER_GC_TARGET_DROP                       = 64,
 	HEADER_GC_WARP								= 65, 
+	HEADER_GC_CHEST_DROP_INFO					= 66, 
 	HEADER_GC_ADD_FLY_TARGETING                 = 69,
 
 	HEADER_GC_CREATE_FLY						= 70,
@@ -209,7 +220,6 @@ enum
     HEADER_GC_REQUEST_MAKE_GUILD                = 82,
 	HEADER_GC_PARTY_PARAMETER                   = 83,
 
-    HEADER_GC_SAFEBOX_MONEY_CHANGE              = 84,
     HEADER_GC_SAFEBOX_SET                       = 85,
     HEADER_GC_SAFEBOX_DEL                       = 86,
     HEADER_GC_SAFEBOX_WRONG_PASSWORD            = 87,
@@ -242,10 +252,10 @@ enum
 	HEADER_GC_CHANGE_SKILL_GROUP				= 112,
 
 	// SUPPORT_BGM
-	HEADER_GC_MAIN_CHARACTER2_EMPIRE			= 113,
+	HEADER_GC_MAIN_CHARACTER			= 113,
 	// END_OF_SUPPORT_BGM
 
-    HEADER_GC_SEPCIAL_EFFECT                    = 114,
+    HEADER_GC_SPECIAL_EFFECT                    = 114,
 	HEADER_GC_NPC_POSITION						= 115,
 
     HEADER_GC_CHARACTER_UPDATE2                 = 117,
@@ -257,7 +267,7 @@ enum
     HEADER_GC_MALL_OPEN                         = 122,
 	HEADER_GC_TARGET_UPDATE                     = 123,
 	HEADER_GC_TARGET_DELETE                     = 124,
-	HEADER_GC_TARGET_CREATE_NEW                 = 125,
+	HEADER_GC_TARGET_CREATE						= 125,
 
 	HEADER_GC_AFFECT_ADD                        = 126,
 	HEADER_GC_AFFECT_REMOVE                     = 127,
@@ -287,6 +297,7 @@ enum
 	// @fixme007
 	HEADER_GC_UNK_213							= 213,
 
+	HEADER_GC_CHEAT_BLACKLIST					= 249,
 	HEADER_GC_KEY_AGREEMENT_COMPLETED			= 0xfa, // _IMPROVED_PACKET_ENCRYPTION_
 	HEADER_GC_KEY_AGREEMENT						= 0xfb, // _IMPROVED_PACKET_ENCRYPTION_
 	HEADER_GC_HANDSHAKE_OK						= 0xfc, // 252
@@ -302,12 +313,10 @@ enum
 	PATH_NODE_MAX_NUM = 64,
 	SHOP_SIGN_MAX_LEN = 32,
 
-	PLAYER_PER_ACCOUNT3 = 3,
-#ifndef ENABLE_PLAYER_PER_ACCOUNT5
-	PLAYER_PER_ACCOUNT4 = 4,
+#ifdef ENABLE_PLAYER_PER_ACCOUNT5
+	PLAYER_PER_ACCOUNT = 5,
 #else
-	PLAYER_PER_ACCOUNT4 = 5,
-	PLAYER_PER_ACCOUNT5 = 5,
+	PLAYER_PER_ACCOUNT = 4,
 #endif
 
 	PLAYER_ITEM_SLOT_MAX_NUM = 20,		// 플래이어의 슬롯당 들어가는 갯수.
@@ -478,14 +487,6 @@ typedef struct command_login3
 } TPacketCGLogin3;
 // end - 권한 서버 접속을 위한 패킷들
 
-typedef struct command_direct_enter
-{
-    uint8_t        bHeader;
-    char        login[ID_MAX_NUM + 1];
-    char        passwd[PASS_MAX_NUM + 1];
-    uint8_t        index;
-} TPacketCGDirectEnter;
-
 typedef struct command_player_select
 {
 	uint8_t	header;
@@ -598,7 +599,7 @@ enum
     SHOP_SUBHEADER_CG_END,
 	SHOP_SUBHEADER_CG_BUY,
 	SHOP_SUBHEADER_CG_SELL,
-	SHOP_SUBHEADER_CG_SELL2,
+	SHOP_SUBHEADER_CG_SELL2
 };
 
 typedef struct command_shop
@@ -707,7 +708,7 @@ enum
 	MESSENGER_SUBHEADER_GC_LIST,
 	MESSENGER_SUBHEADER_GC_LOGIN,
 	MESSENGER_SUBHEADER_GC_LOGOUT,
-	MESSENGER_SUBHEADER_GC_INVITE,
+	MESSENGER_SUBHEADER_GC_INVITE
 };
 
 typedef struct packet_messenger
@@ -726,7 +727,7 @@ typedef struct packet_messenger_list_offline
 enum
 {
 	MESSENGER_CONNECTED_STATE_OFFLINE,
-	MESSENGER_CONNECTED_STATE_ONLINE,
+	MESSENGER_CONNECTED_STATE_ONLINE
 };
 
 typedef struct packet_messenger_list_online
@@ -752,7 +753,7 @@ enum
 {
     MESSENGER_SUBHEADER_CG_ADD_BY_VID,
     MESSENGER_SUBHEADER_CG_ADD_BY_NAME,
-    MESSENGER_SUBHEADER_CG_REMOVE,
+    MESSENGER_SUBHEADER_CG_REMOVE
 };
 
 typedef struct command_messenger
@@ -874,7 +875,7 @@ enum
 	GUILD_SUBHEADER_CG_GUILD_INVITE_ANSWER,
 	GUILD_SUBHEADER_CG_CHARGE_GSP,
 	GUILD_SUBHEADER_CG_DEPOSIT_MONEY,
-	GUILD_SUBHEADER_CG_WITHDRAW_MONEY,
+	GUILD_SUBHEADER_CG_WITHDRAW_MONEY
 };
 
 typedef struct command_guild
@@ -903,6 +904,12 @@ typedef struct SPacketCGHack
 	char        szBuf[255 + 1];
 	char        szInfo[255 + 1];
 } TPacketCGHack;
+
+typedef struct packet_cheat_blacklist
+{
+	uint8_t	header;
+	char	content[1024];
+} TPacketGCCheatBlacklist;
 
 typedef struct command_dungeon
 {
@@ -995,6 +1002,7 @@ typedef struct packet_phase
 {
     uint8_t        header;
     uint8_t        phase;
+	uint8_t stage;
 } TPacketGCPhase;
 
 typedef struct packet_blank		// 공백패킷.
@@ -1035,46 +1043,23 @@ typedef struct SSimplePlayerInformation
     uint8_t                bChangeName;
 	uint16_t				wHairPart;
 #ifdef ENABLE_ACCE_SYSTEM
-	uint16_t				wAccePart;
+	uint32_t				dwAccePart;
 #endif
-    uint8_t                bDummy[4];
 	int32_t				x, y;
 	int32_t				lAddr;
 	uint16_t				wPort;
 	uint8_t				bySkillGroup;
 } TSimplePlayerInformation;
 
-typedef struct packet_login_success3
+typedef struct packet_login_success
 {
 	uint8_t						header;
-	TSimplePlayerInformation	akSimplePlayerInformation[PLAYER_PER_ACCOUNT3];
-    uint32_t						guild_id[PLAYER_PER_ACCOUNT3];
-    char						guild_name[PLAYER_PER_ACCOUNT3][GUILD_NAME_MAX_LEN+1];
+	TSimplePlayerInformation	akSimplePlayerInformation[PLAYER_PER_ACCOUNT];
+    uint32_t						guild_id[PLAYER_PER_ACCOUNT];
+    char						guild_name[PLAYER_PER_ACCOUNT][GUILD_NAME_MAX_LEN+1];
 	uint32_t handle;
 	uint32_t random_key;
-} TPacketGCLoginSuccess3;
-
-typedef struct packet_login_success4
-{
-	uint8_t						header;
-	TSimplePlayerInformation	akSimplePlayerInformation[PLAYER_PER_ACCOUNT4];
-    uint32_t						guild_id[PLAYER_PER_ACCOUNT4];
-    char						guild_name[PLAYER_PER_ACCOUNT4][GUILD_NAME_MAX_LEN+1];
-	uint32_t handle;
-	uint32_t random_key;
-} TPacketGCLoginSuccess4;
-
-#ifdef ENABLE_PLAYER_PER_ACCOUNT5
-typedef struct packet_login_success5
-{
-	uint8_t						header;
-	TSimplePlayerInformation	akSimplePlayerInformation[PLAYER_PER_ACCOUNT5];
-    uint32_t						guild_id[PLAYER_PER_ACCOUNT5];
-    char						guild_name[PLAYER_PER_ACCOUNT5][GUILD_NAME_MAX_LEN+1];
-	uint32_t handle;
-	uint32_t random_key;
-} TPacketGCLoginSuccess5;
-#endif
+} TPacketGCLoginSuccess;
 
 enum { LOGIN_STATUS_MAX_LEN = 8 };
 typedef struct packet_login_failure
@@ -1091,7 +1076,7 @@ typedef struct command_player_create
 	uint16_t        job;
 	uint8_t		shape;
 	uint8_t		CON;
-	uint8_t		INT;
+	uint8_t		IQ;
 	uint8_t		STR;
 	uint8_t		DEX;
 } TPacketCGCreateCharacter;
@@ -1183,7 +1168,7 @@ typedef struct packet_add_char
     int32_t        z;
 
 	uint8_t		bType;
-    uint16_t        wRaceNum;
+    uint32_t        dwRaceNum;
     //uint16_t        awPart[CHR_EQUIPPART_NUM];
     uint8_t        bMovingSpeed;
     uint8_t        bAttackSpeed;
@@ -1195,36 +1180,11 @@ typedef struct packet_add_char
     //int16_t     sAlignment;	
 	//uint8_t		bPKMode;
 	//uint32_t		dwMountVnum;
+	
+	uint32_t	dwGuild;
+	uint32_t	dwLevel;
+
 } TPacketGCCharacterAdd;
-
-typedef struct packet_add_char2
-{
-    uint8_t        header;
-
-    uint32_t       dwVID;
-
-    char        name[CHARACTER_NAME_MAX_LEN + 1];
-
-    float       angle;
-    int32_t        x;
-    int32_t        y;
-    int32_t        z;
-
-	uint8_t		bType;
-    uint16_t        wRaceNum;
-    uint16_t        awPart[CHR_EQUIPPART_NUM];
-    uint8_t        bMovingSpeed;
-    uint8_t        bAttackSpeed;
-
-    uint8_t        bStateFlag;
-    uint32_t       dwAffectFlag[2];        // ??
-    uint8_t        bEmpire;
-
-    uint32_t       dwGuild;
-    int16_t       sAlignment;
-	uint8_t		bPKMode;
-	uint32_t		dwMountVnum;
-} TPacketGCCharacterAdd2;
 
 typedef struct packet_update_char
 {
@@ -1243,24 +1203,6 @@ typedef struct packet_update_char
 	uint8_t		bPKMode;
 	uint32_t		dwMountVnum;
 } TPacketGCCharacterUpdate;
-
-typedef struct packet_update_char2
-{
-    uint8_t        header;
-    uint32_t       dwVID;
-
-    uint16_t        awPart[CHR_EQUIPPART_NUM];
-    uint8_t        bMovingSpeed;
-	uint8_t		bAttackSpeed;
-
-    uint8_t        bStateFlag;
-    uint32_t       dwAffectFlag[2];
-
-	uint32_t		dwGuildID;
-    int16_t       sAlignment;
-	uint8_t		bPKMode;
-	uint32_t		dwMountVnum;
-} TPacketGCCharacterUpdate2;
 
 typedef struct packet_del_char
 {
@@ -1319,16 +1261,6 @@ typedef struct packet_dead
 	uint8_t		header;
 	uint32_t		vid;
 } TPacketGCDead;
-
-typedef struct packet_main_character
-{
-    uint8_t        header;
-    uint32_t       dwVID;
-	uint16_t		wRaceNum;
-    char        szName[CHARACTER_NAME_MAX_LEN + 1];
-    int32_t        lX, lY, lZ;
-	uint8_t		bySkillGroup;
-} TPacketGCMainCharacter;
 
 // SUPPORT_BGM
 typedef struct packet_main_character2_empire
@@ -1664,6 +1596,7 @@ typedef struct packet_quickslot_swap
 
 typedef struct packet_shop_start
 {
+	uint32_t   owner_vid;
 	struct packet_shop_item		items[SHOP_HOST_ITEM_MAX_NUM];
 } TPacketGCShopStart;
 
@@ -1770,6 +1703,36 @@ typedef struct packet_target
     uint8_t        bHPPercent;
 } TPacketGCTarget;
 
+typedef struct packet_target_drop
+{
+	uint8_t			header;
+	uint32_t		dwVID;
+	uint8_t			size;
+	int32_t			drop[60];
+	int32_t			bonuses;
+} TPacketGCTargetDrop;
+
+typedef struct SPacketCGChestDropInfo
+{
+	uint8_t	header;
+	uint16_t	wInventoryCell;
+} TPacketCGChestDropInfo;
+
+typedef struct SChestDropInfoTable 
+{
+	uint8_t	bPageIndex;
+	uint8_t	bSlotIndex;
+	uint32_t	dwItemVnum;
+	uint8_t	bItemCount;
+} TChestDropInfoTable;
+
+typedef struct SPacketGCChestDropInfo 
+{
+	uint8_t	bHeader;
+	uint16_t	wSize;
+	uint32_t	dwChestVnum;
+} TPacketGCChestDropInfo;
+
 typedef struct packet_damage_info
 {
 	uint8_t header;
@@ -1777,15 +1740,6 @@ typedef struct packet_damage_info
 	uint8_t flag;
 	int32_t  damage;
 } TPacketGCDamageInfo;
-
-typedef struct packet_mount
-{
-    uint8_t        header;
-    uint32_t       vid;
-    uint32_t       mount_vid;
-    uint8_t        pos;
-	uint32_t		_x, _y;
-} TPacketGCMount;
 
 typedef struct packet_change_speed
 {
@@ -1870,12 +1824,6 @@ typedef struct packet_ownership
 
 #define	SKILL_MAX_NUM 255
 
-typedef struct packet_skill_level
-{
-    uint8_t        bHeader;
-    uint8_t        abSkillLevels[SKILL_MAX_NUM];
-} TPacketGCSkillLevel;
-
 typedef struct SPlayerSkill
 {
 	uint8_t bMasterType;
@@ -1903,7 +1851,7 @@ enum EPVPModes
 	PVP_MODE_NONE,
     PVP_MODE_AGREE,
     PVP_MODE_FIGHT,
-    PVP_MODE_REVENGE,
+    PVP_MODE_REVENGE
 };
 
 typedef struct packet_duel_start
@@ -1919,12 +1867,6 @@ typedef struct packet_pvp
 	uint32_t		dwVIDDst;
 	uint8_t		bMode;
 } TPacketGCPVP;
-
-typedef struct packet_skill_cooltime_end
-{
-	uint8_t		header;
-	uint8_t		bSkill;
-} TPacketGCSkillCoolTimeEnd;
 
 typedef struct packet_warp
 {
@@ -1963,8 +1905,8 @@ typedef struct packet_party_remove
     uint32_t pid;
 } TPacketGCPartyRemove;
 
-typedef TPacketCGSafeboxCheckout TPacketGCSafeboxCheckout;
-typedef TPacketCGSafeboxCheckin TPacketGCSafeboxCheckin;
+using TPacketGCSafeboxCheckout = TPacketCGSafeboxCheckout;
+using TPacketGCSafeboxCheckin = TPacketCGSafeboxCheckin;
 
 typedef struct packet_safebox_wrong_password
 {
@@ -2187,13 +2129,6 @@ typedef struct SRefineTable
     TMaterial materials[REFINE_MATERIAL_MAX_NUM];
 } TRefineTable;
 
-typedef struct SPacketGCRefineInformation
-{
-	uint8_t			header;
-	uint8_t			pos;
-	TRefineTable	refine_table;
-} TPacketGCRefineInformation;
-
 typedef struct SPacketGCRefineInformationNew
 {
 	uint8_t			header;
@@ -2271,7 +2206,7 @@ enum EBlockAction
     BLOCK_GUILD_INVITE          = (1 << 2),
     BLOCK_WHISPER               = (1 << 3),
     BLOCK_MESSENGER_INVITE      = (1 << 4),
-    BLOCK_PARTY_REQUEST         = (1 << 5),
+    BLOCK_PARTY_REQUEST         = (1 << 5)
 };
 
 typedef struct packet_login_key
@@ -2301,7 +2236,7 @@ typedef struct SEquipmentItemSet
 	TPlayerItemAttribute aAttr[ITEM_ATTRIBUTE_SLOT_MAX_NUM];
 } TEquipmentItemSet;
 
-typedef struct pakcet_view_equip
+typedef struct packet_view_equip
 {
     uint8_t header;
 	uint32_t dwVID;
@@ -2499,7 +2434,7 @@ typedef struct SPacketGCDragonSoulRefine
 
 typedef struct SChannelStatus
 {
-	int16_t nPort;
+	uint16_t nPort;
 	uint8_t bStatus;
 } TChannelStatus;
 

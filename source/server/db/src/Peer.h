@@ -34,31 +34,28 @@ class CPeer : public CPeerBase
 	bool 	PeekPacket(int32_t & iBytesProceed, uint8_t & header, uint32_t & dwHandle, uint32_t & dwLength, const char ** data);
 	void	EncodeReturn(uint8_t header, uint32_t dwHandle);
 
-	void	ProcessInput();
 	int32_t	Send();
 
 	uint32_t	GetHandle();
-	uint32_t	GetUserCount();
-	void	SetUserCount(uint32_t dwCount);
 
 	void	SetPublicIP(const char * ip)	{ m_stPublicIP = ip; }
-	const char * GetPublicIP()		{ return m_stPublicIP.c_str(); }
+	const char * GetPublicIP() const { return m_stPublicIP.c_str(); }
 
 	void	SetChannel(uint8_t bChannel)	{ m_bChannel = bChannel; }
-	uint8_t	GetChannel()			{ return m_bChannel; }
+	uint8_t		GetChannel() const { return m_bChannel; }
 
 	void	SetListenPort(uint16_t wPort) { m_wListenPort = wPort; }
-	uint16_t	GetListenPort() { return m_wListenPort; }
+	uint16_t	GetListenPort() const { return m_wListenPort; }
 
 	void	SetP2PPort(uint16_t wPort);
-	uint16_t	GetP2PPort() { return m_wP2PPort; }
+	uint16_t	GetP2PPort() const { return m_wP2PPort; }
 
-	void	SetMaps(int32_t* pl);
+	void		SetMaps(const int32_t* pl);
 	int32_t *	GetMaps() { return &m_alMaps[0]; }
 
-	bool	SetItemIDRange(TItemIDRangeTable itemRange);
-	bool	SetSpareItemIDRange(TItemIDRangeTable itemRange);
-	bool	CheckItemIDRangeCollision(TItemIDRangeTable itemRange);
+	bool	SetItemIDRange(const TItemIDRangeTable &itemRange);
+	bool	SetSpareItemIDRange(const TItemIDRangeTable &itemRange);
+	bool	CheckItemIDRangeCollision(const TItemIDRangeTable &itemRange);
 	void	SendSpareItemIDRange();
 
     private:
@@ -66,7 +63,6 @@ class CPeer : public CPeerBase
 
 	uint8_t	m_bChannel;
 	uint32_t	m_dwHandle;
-	uint32_t	m_dwUserCount;
 	uint16_t	m_wListenPort;	// 게임서버가 클라이언트를 위해 listen 하는 포트
 	uint16_t	m_wP2PPort;	// 게임서버가 게임서버 P2P 접속을 위해 listen 하는 포트
 	int32_t	m_alMaps[MAP_ALLOW_LIMIT];	

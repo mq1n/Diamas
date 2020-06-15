@@ -1,7 +1,7 @@
 #ifndef __INC_SINGLETON_H__
 #define __INC_SINGLETON_H__
 
-#include <assert.h>
+#include <cassert>
 
 template <typename T> class singleton 
 { 
@@ -11,8 +11,7 @@ template <typename T> class singleton
 		singleton()
 		{ 
 			assert(!ms_singleton);
-			int32_t offset = (int32_t) (T*) 1 - (int32_t) (singleton <T>*) (T*) 1; 
-			ms_singleton = (T*) ((int32_t) this + offset);
+			ms_singleton = static_cast<T*>(this);
 		} 
 
 		virtual ~singleton()
@@ -39,6 +38,7 @@ template <typename T> class singleton
 		}
 };
 
-template <typename T> T * singleton <T>::ms_singleton = nullptr;
+template <typename T>
+T * singleton <T>::ms_singleton = nullptr;
 
 #endif

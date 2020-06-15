@@ -1,5 +1,6 @@
 #ifndef __INC_METIN_II_GAME_SHOP_H__
 #define __INC_METIN_II_GAME_SHOP_H__
+#include "../../common/service.h"
 
 enum
 {

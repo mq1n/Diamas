@@ -21,7 +21,7 @@ class CGuildManager : public singleton<CGuildManager>
 
 		uint32_t		CreateGuild(TGuildCreateParameter& gcp);
 		CGuild *	FindGuild(uint32_t guild_id);
-		CGuild *	FindGuildByName(const std::string guild_name);
+		CGuild *	FindGuildByName(const std::string & guild_name);
 		void		LoadGuild(uint32_t guild_id);
 		CGuild *	TouchGuild(uint32_t guild_id);
 		void		DisbandGuild(uint32_t guild_id);
@@ -43,7 +43,7 @@ class CGuildManager : public singleton<CGuildManager>
 
 		void		RequestEndWar(uint32_t guild_id1, uint32_t guild_id2);
 		void		RequestCancelWar(uint32_t guild_id1, uint32_t guild_id2);
-		void		RequestWarOver(uint32_t dwGuild1, uint32_t dwGuild2, uint32_t dwGuildWinner, int32_t lReward);
+		void		RequestWarOver(uint32_t dwGuild1, uint32_t dwGuild2, uint32_t dwGuildWinner);
 
 		void		DeclareWar(uint32_t guild_id1, uint32_t guild_id2, uint8_t bType);
 		void		RefuseWar(uint32_t guild_id1, uint32_t guild_id2);

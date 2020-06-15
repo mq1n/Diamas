@@ -27,7 +27,7 @@ namespace
     }
 
     /// \brief 주어진 문장에 있는 알파벳을 모두 소문자로 바꾼다.
-    std::string Lower(std::string original)
+	std::string stl_lowers_2(std::string original)
     {
         std::transform(original.begin(), original.end(), original.begin(), tolower);
         return original;
@@ -41,7 +41,7 @@ namespace
 ////////////////////////////////////////////////////////////////////////////////
 void cCsvAlias::AddAlias(const char* name, size_t index)
 {
-    std::string converted(Lower(name));
+    std::string converted(stl_lowers_2(name));
 
     Assert(m_Name2Index.find(converted) == m_Name2Index.end());
     Assert(m_Index2Name.find(index) == m_Index2Name.end());
@@ -66,7 +66,7 @@ void cCsvAlias::Destroy()
 ////////////////////////////////////////////////////////////////////////////////
 const char* cCsvAlias::operator [] (size_t index) const
 {
-    INDEX2NAME_MAP::const_iterator itr(m_Index2Name.find(index));
+	auto itr(m_Index2Name.find(index));
     if (itr == m_Index2Name.end())
     {
 //        LogToFile(nullptr, "cannot find suitable conversion for %d", index);
@@ -84,7 +84,7 @@ const char* cCsvAlias::operator [] (size_t index) const
 ////////////////////////////////////////////////////////////////////////////////
 size_t cCsvAlias::operator [] (const char* name) const
 {
-    NAME2INDEX_MAP::const_iterator itr(m_Name2Index.find(Lower(name)));
+	auto itr(m_Name2Index.find(stl_lowers_2(name)));
     if (itr == m_Name2Index.end())
     {
 //        LogToFile(nullptr, "cannot find suitable conversion for %s", name);
@@ -114,12 +114,11 @@ bool cCsvFile::Load(const char* fileName, const char seperator, const char quote
     cCsvRow* row = nullptr;
     ParseState state = STATE_NORMAL;
     std::string token = "";
-    char buf[2048+1] = {0,};
+	std::string buf;
 
     while (file.good())
     {
-        file.getline(buf, 2048);
-        buf[sizeof(buf)-1] = 0;
+        getline(file,buf);
 
         std::string line(Trim(buf));
         if (line.empty() || (state == STATE_NORMAL && line[0] == '#')) continue;
@@ -256,10 +255,10 @@ bool cCsvFile::Save(const char* fileName, bool append, char seperator, char quot
             {
                 line += quote;
 
-                for (size_t k=0; k<token.size(); k++)
+                for (char k : token)
                 {
-                    if (token[k] == quote) line += quote_escape_string;
-                    else line += token[k];
+                    if (k == quote) line += quote_escape_string;
+                    else line += k;
                 }
 
                 line += quote;
@@ -281,8 +280,8 @@ bool cCsvFile::Save(const char* fileName, bool append, char seperator, char quot
 ////////////////////////////////////////////////////////////////////////////////
 void cCsvFile::Destroy()
 {
-    for (ROWS::iterator itr(m_Rows.begin()); itr != m_Rows.end(); ++itr)
-        delete *itr;
+    for (auto & m_Row : m_Rows)
+        delete m_Row;
 
     m_Rows.clear();
 }
@@ -321,8 +320,7 @@ cCsvTable::cCsvTable()
 /// \brief 소멸자
 ////////////////////////////////////////////////////////////////////////////////
 cCsvTable::~cCsvTable()
-{
-}
+= default;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief 지정된 이름의 CSV 파일을 로드한다.
@@ -412,7 +410,7 @@ void cCsvTable::Destroy()
 /// 포인터를 반환하고, 더 이상 액세스 가능한 행이 없는 경우에는 NULL을 
 /// 반환한다.
 ////////////////////////////////////////////////////////////////////////////////
-const cCsvRow* const cCsvTable::CurRow() const
+const cCsvRow* cCsvTable::CurRow() const
 {
     if (m_CurRow < 0)
     {

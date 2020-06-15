@@ -33,6 +33,8 @@ enum QID
     QID_ITEMPRICE_LOAD_FOR_UPDATE,	///< 23, 가격정보 업데이트를 위한 아이템 가격정보 로드 쿼리
     QID_ITEMPRICE_LOAD,			///< 24, 아이템 가격정보 로드 쿼리
 	// END_OF_MYSHOP_PRICE_LIST
+
+	QID_ACTIVITY,
 };
 
 #endif

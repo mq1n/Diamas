@@ -49,138 +49,124 @@ enum ESkillIndexes
 {
 	SKILL_RESERVED = 0,
 
-	// 무사 전사 계열
+	// ¹≪≫c Au≫c °e¿­		// - bedensel
 	// A
-	SKILL_SAMYEON = 1,		// 삼연참(세번베기)
-	SKILL_PALBANG,		// 팔방풍우
+	SKILL_SAMYEON = 1,		// 3 yonlu kesme
+	SKILL_PALBANG,			// kılıc cevirme
 	// S
-	SKILL_JEONGWI,		// 전귀혼
-	SKILL_GEOMKYUNG,		// 검경
-	SKILL_TANHWAN,		// 탄환격
+	SKILL_JEONGWI,			// ofke
+	SKILL_GEOMKYUNG,		// hava
+	SKILL_TANHWAN,			// hamle
 
-	// 무사 기공 계열
+	// ¹≪≫c ±a°ø °e¿­		// - zihinsel
 	// A
-	SKILL_GIGONGCHAM = 16,	// 기공참
-	SKILL_GYOKSAN,		// 격산타우
-	SKILL_DAEJINGAK,		// 대진각
+	SKILL_GIGONGCHAM = 16,	// ruh
+	SKILL_GYOKSAN,			// ?iddetli vurul
+	SKILL_DAEJINGAK,		// guclu vuru?
 	// S
-	SKILL_CHUNKEON,		// 천근추
-	SKILL_GEOMPUNG,		// 검풍
+	SKILL_CHUNKEON,			// guclu beden
+	SKILL_GEOMPUNG,			// kılıc darbesi
 
-	// 자객 암살 계열
+	// AU°´ ¾I≫i °e¿­		// - yakın dovu?
 	// A
-	SKILL_AMSEOP = 31,		// 암습 
-	SKILL_GUNGSIN,		// 궁신탄영 
-	SKILL_CHARYUN,		// 차륜살 
+	SKILL_AMSEOP = 31,		// suikast
+	SKILL_GUNGSIN,			// hızlı saldırı
+	SKILL_CHARYUN,			// bıcak cevirme
 	// S
-	SKILL_EUNHYUNG,		// 은형법 
-	SKILL_SANGONG,		// 산공분
+	SKILL_EUNHYUNG,			// kamuflaj 
+	SKILL_SANGONG,			// zehirli bulut
 
-	// 자객 궁수 계열
+	// AU°´ ±A¼o °e¿­		// - uzak dovu?
 	// A
-	SKILL_YEONSA = 46,		// 연사 
-	SKILL_KWANKYEOK,		// 관격술 
-	SKILL_HWAJO,		// 화조파
+	SKILL_YEONSA = 46,		// tekrarlanan atı?
+	SKILL_KWANKYEOK,		// ok ya?muru
+	SKILL_HWAJO,			// ate?li ok
 	// S
-	SKILL_GYEONGGONG,		// 경공술 
-	SKILL_GIGUNG,		// 기궁
+	SKILL_GYEONGGONG,		// hafif adım
+	SKILL_GIGUNG,			// zehirli ok
 
-	// 수라 검
+	// ¼o¶o °E				// - buyulu silah
 	// A
-	SKILL_SWAERYUNG = 61,	// 쇄령지 
-	SKILL_YONGKWON,		// 용권파 
+	SKILL_SWAERYUNG = 61,	// parmak darbesi
+	SKILL_YONGKWON,			// ejderha donu?u
 	// S
-	SKILL_GWIGEOM,		// 귀검
-	SKILL_TERROR,		// 공포 
-	SKILL_JUMAGAP,		// 주마갑 
-	SKILL_PABEOB,		// 파법술
+	SKILL_GWIGEOM,			// buyulu keskinlik
+	SKILL_TERROR,			// deh?et
+	SKILL_JUMAGAP,			// buyulu zırh
+	SKILL_PABEOB,			// buyu cozme
 
-	// 수라 마법
+	// ¼o¶o ¸¶¹ı			// - kara buyu
 	// A
-	SKILL_MARYUNG = 76,		// 마령 
-	SKILL_HWAYEOMPOK,		// 화염폭 
-	SKILL_MUYEONG,		// 무영진 
+	SKILL_MARYUNG = 76,		// karanlık vuru?
+	SKILL_HWAYEOMPOK,		// ate? vuru?
+	SKILL_MUYEONG,			// ate? hayaleti
 	// S
-	SKILL_MANASHILED,		// 흑신수호
-	SKILL_TUSOK,		// 투속마령 
-	SKILL_MAHWAN,		// 마환격
+	SKILL_MANASHIELD,		// karanlık koruma
+	SKILL_TUSOK,			// hayalet vuru?
+	SKILL_MAHWAN,			// karanlık kure
 
-	// 무당 용신
-	// A
-	SKILL_BIPABU = 91,
-	SKILL_YONGBI,		// 용비광사파 
-	SKILL_PAERYONG,		// 패룡나한무
+	// ¹≪´c ¿e½A
+	// A					// - ejderha gucu
+	SKILL_BIPABU = 91,		// ucan tılsım
+	SKILL_YONGBI,			// ejderha atı?ı
+	SKILL_PAERYONG,			// ejderha kukremesi
 	// S
-	//SKILL_BUDONG,		// 부동박부 
-	SKILL_HOSIN,		// 호신 
-	SKILL_REFLECT,		// 보호
-	SKILL_GICHEON,		// 기천대공
+	//SKILL_BUDONG,			// pasif yada eski ?aman skilli
+	SKILL_HOSIN,			// kutsama
+	SKILL_REFLECT,			// yansıtma
+	SKILL_GICHEON,			// ejderha yardımı
 
-	// 무당 뇌신
-	// A
-	SKILL_NOEJEON = 106,	// 뇌전령 
-	SKILL_BYEURAK,		// 벼락 
-	SKILL_CHAIN,		// 체인라이트닝 
+	// ¹≪´c ³u½A
+	// A					// - Iyile?tirme
+	SKILL_NOEJEON = 106,	// ?im?ek atma
+	SKILL_BYEURAK,			// ?im?ek Ca?ırma
+	SKILL_CHAIN,			// ?im?ek pencesi
 	// S
-	SKILL_JEONGEOP,		// 정업인 
-	SKILL_KWAESOK,		// 이동속도업
-	SKILL_JEUNGRYEOK,		// 증력술
+	SKILL_JEONGEOP,			// Iyile?tirme
+	SKILL_KWAESOK,			// Hız
+	SKILL_JEUNGRYEOK,		// Yuksek saldırı
 
-	// 공통 스킬
-	// 7
-	SKILL_7_A_ANTI_TANHWAN = 112,
-	SKILL_7_B_ANTI_AMSEOP,
-	SKILL_7_C_ANTI_SWAERYUNG,
-	SKILL_7_D_ANTI_YONGBI,
+	// º¸A¶ ½ºA³
 
-	// 8
-	SKILL_8_A_ANTI_GIGONGCHAM,
-	SKILL_8_B_ANTI_YEONSA,
-	SKILL_8_C_ANTI_MAHWAN,
-	SKILL_8_D_ANTI_BYEURAK,
+	SKILL_LEADERSHIP	= 121,	// Liderlik
+	SKILL_COMBO			= 122,	// Kombo
+	SKILL_CREATE		= 123,	// ?? - Uzman recetesi ile yukseltilen skill
+	SKILL_MINING		= 124,	// Madencilik
 
-	// 보조 스킬
+	SKILL_LANGUAGE1		= 126,	// Shinsoo lisan 
+	SKILL_LANGUAGE2		= 127,	// Chunjo Lisan
+	SKILL_LANGUAGE3		= 128,	// Jinno Lisan
+	SKILL_POLYMORPH		= 129,	// Donu?me
 
-	SKILL_LEADERSHIP = 121,	// 통솔력
-	SKILL_COMBO	= 122,		// 연계기
-	SKILL_CREATE = 123,		// 제조
-	SKILL_MINING = 124,
+	SKILL_HORSE						= 130,	// Binicilik
+	SKILL_HORSE_SUMMON				= 131,	// At ca?ırma
+	SKILL_HORSE_WILDATTACK			= 137,	// At uzerinde saldırı
+	SKILL_HORSE_CHARGE				= 138,	// At yuruyu?u
+	SKILL_HORSE_ESCAPE				= 139,	// Guc dalgası
+	SKILL_HORSE_WILDATTACK_RANGE	= 140,	// Ok fırtınası
 
-	SKILL_LANGUAGE1 = 126,	// 신수어 능력
-	SKILL_LANGUAGE2 = 127,	// 천조어 능력
-	SKILL_LANGUAGE3 = 128,	// 진노어 능력
-	SKILL_POLYMORPH = 129,	// 둔갑
+	SKILL_ADD_HP			= 141,	// HP uretme - Pasif skill 		/ Aktif de?il
+	SKILL_RESIST_PENETRATE	= 142,	// Delici vuru? - Pasif skill 	/ Aktif de?il
 
-	SKILL_HORSE			= 130,	// 승마 스킬
-	SKILL_HORSE_SUMMON		= 131,	// 말 소환 스킬
-	SKILL_HORSE_WILDATTACK	= 137,	// 난무
-	SKILL_HORSE_CHARGE		= 138,	// 돌격
-	SKILL_HORSE_ESCAPE		= 139,	// 탈출
-	SKILL_HORSE_WILDATTACK_RANGE = 140,	// 난무(활)
+	GUILD_SKILL_START		= 151,			// [LONCA] Ba?langıc
+	GUILD_SKILL_EYE			= 151,			// Ejderha Gozleri 				/ Ejderha Hayaletleri
+	GUILD_SKILL_BLOOD		= 152,			// Ejderha Tanrısı Kanı 		/ Max HP
+	GUILD_SKILL_BLESS		= 153,			// Ejderha Tanrısı Kutsaması 	/ Max SP
+	GUILD_SKILL_SEONGHWI	= 154,			// Kutsal Zırh 					/ Savunma
+	GUILD_SKILL_ACCEL		= 155,			// Hızlandırma 					/ Hareket Hızı
+	GUILD_SKILL_BUNNO		= 156,			// Ejderha Tanrısı ofkesi 		/ Kritik
+	GUILD_SKILL_JUMUN		= 157,			// Buyu hızı deste?i 			/ Buyu hızı
+	GUILD_SKILL_END			= 162,			// [LONCA] Son
 
-	SKILL_ADD_HP	=	141,			// 증혈
-	SKILL_RESIST_PENETRATE	=	142,	// 철통
+	GUILD_SKILL_COUNT		= GUILD_SKILL_END - GUILD_SKILL_START + 1,
 
-	GUILD_SKILL_START = 151,
-	GUILD_SKILL_EYE = 151,
-	GUILD_SKILL_BLOOD = 152,
-	GUILD_SKILL_BLESS = 153,
-	GUILD_SKILL_SEONGHWI = 154,
-	GUILD_SKILL_ACCEL = 155,
-	GUILD_SKILL_BUNNO = 156,
-	GUILD_SKILL_JUMUN = 157,
-	GUILD_SKILL_TELEPORT = 158,
-	GUILD_SKILL_DOOR = 159,
-	GUILD_SKILL_END = 162,
-
-	GUILD_SKILL_COUNT = GUILD_SKILL_END - GUILD_SKILL_START + 1,
 #ifdef ENABLE_WOLFMAN_CHARACTER
-	SKILL_CHAYEOL		= 170,			
-	SKILL_SALPOONG		= 171,			
-	SKILL_GONGDAB		= 172,			
-	SKILL_PASWAE		= 173,			
-	SKILL_JEOKRANG		= 174,			
-	SKILL_CHEONGRANG	= 175,			
+	SKILL_CHAYEOL			= 170,			// Yırtma	Parcalama
+	SKILL_SALPOONG			= 171,			// Kurt Nefesi
+	SKILL_GONGDAB			= 172,			// Kurt Atlayı?ı
+	SKILL_PASWAE			= 173,			// Kurt Pencesi
+	SKILL_JEOKRANG			= 174,			// Kırmızı Kurt Ruhu
+	SKILL_CHEONGRANG		= 175,			// Civit Kurt Ruhu
 #endif
 };
 

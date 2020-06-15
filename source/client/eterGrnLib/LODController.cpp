@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "LODController.h"
 
+#include <ctime>
+
 static float LODHEIGHT_ACTOR		=	500.0f;
 static float LODDISTANCE_ACTOR		=	5000.0f;
 static float LODDISTANCE_BUILDING	=	25000.0f;
@@ -22,14 +24,12 @@ enum
 	SHARED_VB_3000	= 5,
 	SHARED_VB_3500	= 6,
 	SHARED_VB_4000	= 7,
-	SHARED_VB_NUM	= 9,
+	SHARED_VB_NUM	= 9
 };
 
 static std::vector<CGraphicVertexBuffer*> gs_vbs[SHARED_VB_NUM];
 
 static CGraphicVertexBuffer gs_emptyVB;
-
-#include <time.h>
 
 static CGraphicVertexBuffer* __AllocDeformVertexBuffer(uint32_t deformableVertexCount)
 {
@@ -79,7 +79,7 @@ void __FreeDeformVertexBuffer(CGraphicVertexBuffer* pkDelVB)
 		uint32_t index = (pkDelVB->GetVertexCount() - 1) / 500;
 		if (index < SHARED_VB_NUM)
 		{	
-			gs_vbs[index].push_back(pkDelVB);			
+			gs_vbs[index].emplace_back(pkDelVB);
 		}
 		else
 		{
@@ -197,9 +197,7 @@ CGrannyLODController::~CGrannyLODController()
 void CGrannyLODController::Clear()
 {
 	if (m_pAttachedParentModel)
-	{
 		m_pAttachedParentModel->DetachModelInstance(this);
-	}
 
 	m_pCurrentModelInstance = nullptr;
 	m_pAttachedParentModel = nullptr;
@@ -207,12 +205,8 @@ void CGrannyLODController::Clear()
 	std::for_each(m_que_pkModelInst.begin(), m_que_pkModelInst.end(), CGrannyModelInstance::Delete);
 	m_que_pkModelInst.clear();
 
-	std::vector<TAttachingModelData>::iterator itor = m_AttachedModelDataVector.begin();
-	for (; m_AttachedModelDataVector.end() != itor; ++itor)
-	{
-		TAttachingModelData & rData = *itor;
+	for (auto & rData : m_AttachedModelDataVector)
 		rData.pkLODController->m_pAttachedParentModel = nullptr;
-	}
 
 	m_AttachedModelDataVector.clear();
 }
@@ -249,13 +243,9 @@ void CGrannyLODController::AddModel(CGraphicThing * pThing, int32_t iSrcModel, C
 	__ReserveSharedDeformableVertexBuffer(pModel->GetDeformVertexCount());
 
 	if (pSkelLODController)
-	{
 		pModelInstance->SetLinkedModelPointer(pModel, m_pkSharedDeformableVertexBuffer, &pSkelLODController->m_pCurrentModelInstance);
-	}
 	else
-	{		
 		pModelInstance->SetLinkedModelPointer(pModel, m_pkSharedDeformableVertexBuffer, nullptr);
-	}
 
 	// END_OF_WORK
 	
@@ -311,9 +301,7 @@ void CGrannyLODController::AttachModelInstance(CGrannyLODController * pSrcLODCon
 
 	CGrannyModelInstance * pDestInstance = GetModelInstance();
 	if (pDestInstance)
-	{
 		pSrcInstance->SetParentModelInstance(pDestInstance, c_szBoneName);
-	}
 
 	if (!pSrcLODController->GetModelInstance())
 		return;
@@ -322,24 +310,20 @@ void CGrannyLODController::AttachModelInstance(CGrannyLODController * pSrcLODCon
 	pSrcLODController->m_pAttachedParentModel = this;
 
 	// Link Child Data
-	std::vector<TAttachingModelData>::iterator itor = m_AttachedModelDataVector.begin();
+	auto itor = m_AttachedModelDataVector.begin();
 	for (; m_AttachedModelDataVector.end() != itor;)
 	{
 		TAttachingModelData & rData = *itor;
 		if (pSrcLODController == rData.pkLODController)
-		{
 			itor = m_AttachedModelDataVector.erase(itor);
-		}
 		else
-		{
 			++itor;
-		}
 	}
 
 	TAttachingModelData AttachingModelData;
 	AttachingModelData.pkLODController = pSrcLODController;
 	AttachingModelData.strBoneName = c_szBoneName;
-	m_AttachedModelDataVector.push_back(AttachingModelData);
+	m_AttachedModelDataVector.emplace_back(AttachingModelData);
 }
 
 void CGrannyLODController::DetachModelInstance(CGrannyLODController * pSrcLODController)
@@ -350,26 +334,20 @@ void CGrannyLODController::DetachModelInstance(CGrannyLODController * pSrcLODCon
 
 	CGrannyModelInstance * pDestInstance = GetModelInstance();
 	if (pDestInstance)
-	{
 		pSrcInstance->SetParentModelInstance(nullptr, 0);
-	}
 
 //	if (!pSrcLODController->GetModelInstance())
 //		return;
 
 	// Unlink Child Data
-	std::vector<TAttachingModelData>::iterator itor = m_AttachedModelDataVector.begin();
+	auto itor = m_AttachedModelDataVector.begin();
 	for (; m_AttachedModelDataVector.end() != itor;)
 	{
 		TAttachingModelData & rData = *itor;
 		if (pSrcLODController == rData.pkLODController)
-		{
 			itor = m_AttachedModelDataVector.erase(itor);
-		}
 		else
-		{
 			++itor;
-		}
 	}
 
 	// Unlink Parent Data
@@ -385,22 +363,18 @@ void CGrannyLODController::SetLODLevel(uint8_t bLodLevel)
 {
 	assert(m_que_pkModelInst.size() > 0);
 	
-	if (m_que_pkModelInst.size() > 0)
-		m_bLODLevel	= (uint8_t) MIN(m_que_pkModelInst.size() - 1, bLodLevel);
+	if (!m_que_pkModelInst.empty())
+		m_bLODLevel = static_cast<uint8_t>(MIN(m_que_pkModelInst.size() - 1, bLodLevel));
 }
 
 void CGrannyLODController::CreateDeviceObjects()
 {
-	std::for_each(m_que_pkModelInst.begin(),
-				  m_que_pkModelInst.end(),
-				  CGrannyModelInstance::FCreateDeviceObjects());
+	std::for_each(m_que_pkModelInst.begin(), m_que_pkModelInst.end(), CGrannyModelInstance::FCreateDeviceObjects());
 }
 
 void CGrannyLODController::DestroyDeviceObjects()
 {
-	std::for_each(m_que_pkModelInst.begin(),
-				  m_que_pkModelInst.end(),
-				  CGrannyModelInstance::FDestroyDeviceObjects());
+	std::for_each(m_que_pkModelInst.begin(), m_que_pkModelInst.end(), CGrannyModelInstance::FDestroyDeviceObjects());
 }
 
 void CGrannyLODController::RenderWithOneTexture()
@@ -477,26 +451,18 @@ void CGrannyLODController::UpdateLODLevel(float fDistanceFromCenter, float fDist
 		m_dwLODAniFPS *= 10;
 
 		float fLODStep = m_fLODDistance / m_que_pkModelInst.size();
-		uint8_t bLODLevel = uint8_t(fLODFactor / fLODStep);
+		auto bLODLevel = uint8_t(fLODFactor / fLODStep);
 
 		if (m_fLODDistance <= 5000.0f)
 		{
 			if (fDistanceFromCamera < 500.0f)
-			{
 				bLODLevel = 0;
-			}
 			else if (fDistanceFromCamera < 1500.0f)
-			{
 				bLODLevel = 1;
-			}
 			else if (fDistanceFromCamera < 2500.0f)
-			{
 				bLODLevel = 2;
-			}
 			else
-			{
 				bLODLevel = 3;
-			}
 
 			bLODLevel = (uint8_t) (m_que_pkModelInst.size() - std::min<uint32_t>(bLODLevel, m_que_pkModelInst.size()) - 1);
 		}
@@ -507,20 +473,16 @@ void CGrannyLODController::UpdateLODLevel(float fDistanceFromCenter, float fDist
 		SetLODLevel(bLODLevel);
 
 		if (m_pCurrentModelInstance != m_que_pkModelInst[m_bLODLevel])
-		{
 			SetCurrentModelInstance(m_que_pkModelInst[m_bLODLevel]);
-		}
 	}
 	else
 	{
 		m_dwLODAniFPS=CGrannyModelInstance::ANIFPS_MAX;
-		
+
 		if (!m_que_pkModelInst.empty())
 		{
 			if (m_pCurrentModelInstance != m_que_pkModelInst.back())
-			{
 				SetCurrentModelInstance(m_que_pkModelInst.back());
-			}
 		}
 	}
 }
@@ -570,9 +532,7 @@ void CGrannyLODController::SetCurrentModelInstance(CGrannyModelInstance * pgrnMo
 
 	// Change parent attaching link
 	if (m_pAttachedParentModel)
-	{
 		m_pAttachedParentModel->RefreshAttachedModelInstance();
-	}
 }
 
 void CGrannyLODController::RefreshAttachedModelInstance()

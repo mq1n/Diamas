@@ -14,9 +14,7 @@ void CPythonApplication::ShowWebPage(const char* c_szURL, const RECT& c_rcWebPag
 
 	m_grpDevice.EnableWebBrowserMode(c_rcWebPage);
 	if (!WebBrowser_Show(GetWindowHandle(), c_szURL, &c_rcWebPage))
-	{
 		TraceError("CREATE_WEBBROWSER_ERROR:%d", GetLastError());
-	}
 
 	SetCursorMode(CURSOR_MODE_HARDWARE);
 }

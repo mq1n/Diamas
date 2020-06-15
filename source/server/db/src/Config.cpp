@@ -155,8 +155,7 @@ std::string * CConfig::Search(const char* key)
 
 	if (i == m_valueMap.end())
 		return nullptr;
-	else
-		return (&i->second);
+	return (&i->second);
 }
 
 bool CConfig::GetParam(const char*key, int32_t index, uint32_t *Param)
@@ -165,7 +164,7 @@ bool CConfig::GetParam(const char*key, int32_t index, uint32_t *Param)
 	if (!pstStr)
 		return false;
 
-	char szParam[5][32];
+	char szParam[5][32]{};
 
 	sscanf(pstStr->c_str(), "%s %s %s %s %s", szParam[0],szParam[1],szParam[2],szParam[3],szParam[4]);
 

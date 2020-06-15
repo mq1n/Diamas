@@ -5,7 +5,7 @@
 #include "PythonExchange.h"
 #include "PythonSafeBox.h"
 #include "PythonCharacterManager.h"
-
+#include "PythonPlayer.h"
 #include "AbstractPlayer.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -125,18 +125,6 @@ bool CPythonNetworkStream::RecvSafeBoxSizePacket()
 
 	CPythonSafeBox::Instance().OpenSafeBox(kSafeBoxSize.bSize);
 	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OpenSafeboxWindow", Py_BuildValue("(i)", kSafeBoxSize.bSize));
-
-	return true;
-}
-
-bool CPythonNetworkStream::RecvSafeBoxMoneyChangePacket()
-{
-	TPacketGCSafeboxMoneyChange kMoneyChange;
-	if (!Recv(sizeof(kMoneyChange), &kMoneyChange))
-		return false;
-
-	CPythonSafeBox::Instance().SetMoney(kMoneyChange.dwMoney);
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "RefreshSafeboxMoney", Py_BuildValue("()"));
 
 	return true;
 }

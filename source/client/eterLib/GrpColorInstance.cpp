@@ -8,9 +8,7 @@ CGraphicColorInstance::CGraphicColorInstance()
 	m_blendTime=0;
 }
 
-CGraphicColorInstance::~CGraphicColorInstance()
-{
-}
+CGraphicColorInstance::~CGraphicColorInstance() = default;
 
 void CGraphicColorInstance::Clear()
 {
@@ -44,13 +42,9 @@ void CGraphicColorInstance::Update()
 	uint32_t elapsedTime = curTime - m_baseTime;
 
 	if (elapsedTime < m_blendTime)
-	{
 		m_curColor.Blend(elapsedTime/float(m_blendTime), m_srcColor, m_dstColor);
-	}
 	else
-	{
 		m_curColor=m_dstColor;
-	}
 }
 
 uint32_t CGraphicColorInstance::GetCurrentTime()

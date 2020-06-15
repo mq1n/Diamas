@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "CheatQueueManager.h"
 #include <nb30.h>
+#include <xorstr.hpp>
 
 CCheatDetectQueueMgr::CCheatDetectQueueMgr() :
 	m_pNetReportCallbackFunc(nullptr)
@@ -22,7 +23,7 @@ void CCheatDetectQueueMgr::RegisterReportFunction(TNetworkReportCallback NetRepo
 std::string CCheatDetectQueueMgr::GetHardwareIdentifier()
 {
 	char szMacAddr[128] = { 0 };
-#if 0
+
 	typedef struct _ASTAT_
 	{
 		ADAPTER_STATUS adapt;
@@ -61,7 +62,7 @@ std::string CCheatDetectQueueMgr::GetHardwareIdentifier()
 			pRet = Netbios(&ncb);
 			if (pRet == NRC_GOODRET)
 			{
-				sprintf(szMacAddr, XOR("%02X-%02X-%02X-%02X-%02X-%02X"),
+				sprintf(szMacAddr, xorstr("%02X-%02X-%02X-%02X-%02X-%02X").crypt_get(),
 					pAdapter.adapt.adapter_address[0],
 					pAdapter.adapt.adapter_address[1],
 					pAdapter.adapt.adapter_address[2],
@@ -72,7 +73,6 @@ std::string CCheatDetectQueueMgr::GetHardwareIdentifier()
 			}
 		}
 	}
-#endif
 	return szMacAddr;
 }
 

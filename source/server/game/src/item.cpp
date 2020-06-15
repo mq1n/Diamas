@@ -17,17 +17,18 @@
 #include "item.h"
 #include "item_manager.h"
 #include "affect.h"
-#include "DragonSoul.h"
+#include "dragon_soul.h"
 #include "buff_on_attributes.h"
 #include "belt_inventory_helper.h"
 #include "../../common/VnumHelper.h"
+#include "../../common/service.h"
 
 CItem::CItem(uint32_t dwVnum)
 	: m_dwVnum(dwVnum), m_bWindow(0), m_dwID(0), m_bEquipped(false), m_dwVID(0), m_wCell(0), m_dwCount(0), m_lFlag(0), m_dwLastOwnerPID(0),
 	m_bExchanging(false), m_pkDestroyEvent(nullptr), m_pkExpireEvent(nullptr), m_pkUniqueExpireEvent(nullptr),
 	m_pkTimerBasedOnWearExpireEvent(nullptr), m_pkRealTimeExpireEvent(nullptr),
    	m_pkAccessorySocketExpireEvent(nullptr), m_pkOwnershipEvent(nullptr), m_dwOwnershipPID(0), m_bSkipSave(false), m_isLocked(false),
-	m_dwMaskVnum(0), m_dwSIGVnum (0)
+	m_dwMaskVnum(0), m_dwSIGVnum (0), m_bIsGMOwner(false)
 {
 	memset( &m_alSockets, 0, sizeof(m_alSockets) );
 	memset( &m_aAttr, 0, sizeof(m_aAttr) );
@@ -63,6 +64,8 @@ void CItem::Initialize()
 
 	m_bSkipSave = false;
 	m_dwLastOwnerPID = 0;
+
+	m_bIsGMOwner = false;
 }
 
 void CItem::Destroy()
@@ -110,6 +113,9 @@ void CItem::StartDestroyEvent(int32_t iSec)
 	if (m_pkDestroyEvent)
 		return;
 
+	if (!m_pkOwnershipEvent)
+		iSec = 30;
+
 	item_event_info* info = AllocEventInfo<item_event_info>();
 	info->item = this;
 
@@ -123,7 +129,7 @@ void CItem::EncodeInsertPacket(LPENTITY ent)
 	if (!(d = ent->GetDesc()))
 		return;
 
-	const PIXEL_POSITION & c_pos = GetXYZ();
+	const GPOS & c_pos = GetXYZ();
 
 	struct packet_item_ground_add pack;
 
@@ -224,11 +230,10 @@ void CItem::UpdatePacket()
 
 uint32_t CItem::GetCount()
 {
-	if (GetType() == ITEM_ELK) return MIN(m_dwCount, INT_MAX);
-	else
-	{
-		return MIN(m_dwCount, g_bItemCountLimit);
-	}
+	if (GetType() == ITEM_ELK)
+		return MIN(m_dwCount, INT_MAX);
+
+	return MIN(m_dwCount, g_bItemCountLimit);
 }
 
 bool CItem::SetCount(uint32_t count)
@@ -285,6 +290,11 @@ bool CItem::SetCount(uint32_t count)
 	return true;
 }
 
+bool CItem::IsWeapon() const
+{
+	return GetType() == ITEM_WEAPON;
+}
+
 LPITEM CItem::RemoveFromCharacter()
 {
 	if (!m_pOwner)
@@ -292,8 +302,6 @@ LPITEM CItem::RemoveFromCharacter()
 		sys_err("Item::RemoveFromCharacter owner null");
 		return (this);
 	}
-
-	LPCHARACTER pOwner = m_pOwner;
 
 	if (m_bEquipped)	// 장착되었는가?
 	{
@@ -313,7 +321,7 @@ LPITEM CItem::RemoveFromCharacter()
 				if (m_wCell >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 					sys_err("CItem::RemoveFromCharacter: pos >= DRAGON_SOUL_INVENTORY_MAX_NUM");
 				else
-					pOwner->SetItem(TItemPos(m_bWindow, m_wCell), nullptr);
+					m_pOwner->SetItem(TItemPos(m_bWindow, m_wCell), nullptr);
 			}
 			else
 			{
@@ -323,7 +331,7 @@ LPITEM CItem::RemoveFromCharacter()
 					sys_err("CItem::RemoveFromCharacter: Invalid Item Position");
 				else
 				{
-					pOwner->SetItem(cell, nullptr);
+					m_pOwner->SetItem(cell, nullptr);
 				}
 			}
 		}
@@ -337,10 +345,11 @@ LPITEM CItem::RemoveFromCharacter()
 	}
 }
 
-bool CItem::AddToCharacter(LPCHARACTER ch, TItemPos Cell)
+bool CItem::AddToCharacter(LPCHARACTER ch, const TItemPos & Cell)
 {
 	assert(GetSectree() == nullptr);
 	assert(m_pOwner == nullptr);
+
 	uint16_t pos = Cell.cell;
 	uint8_t window_type = Cell.window_type;
 	
@@ -408,6 +417,9 @@ bool CItem::AddToCharacter(LPCHARACTER ch, TItemPos Cell)
 #endif
 	m_pOwner = ch;
 
+	if (m_bIsGMOwner == GM_OWNER_UNSET)
+		m_bIsGMOwner = ch->IsGM() ? GM_OWNER_GM : GM_OWNER_PLAYER;
+
 	Save();
 	return true;
 }
@@ -428,7 +440,7 @@ LPITEM CItem::RemoveFromGround()
 	return (this);
 }
 
-bool CItem::AddToGround(int32_t lMapIndex, const PIXEL_POSITION & pos, bool skipOwnerCheck)
+bool CItem::AddToGround(int32_t lMapIndex, const GPOS & pos, bool skipOwnerCheck)
 {
 	if (0 == lMapIndex)
 	{
@@ -679,7 +691,11 @@ void CItem::ModifyPoints(bool bAdd)
 						if (p->aApplies[i].bType == APPLY_SKILL)
 							m_pOwner->ApplyPoint(p->aApplies[i].bType, bAdd ? p->aApplies[i].lValue : p->aApplies[i].lValue ^ 0x00800000);
 						else
-							m_pOwner->ApplyPoint(p->aApplies[i].bType, bAdd ? p->aApplies[i].lValue : -p->aApplies[i].lValue);
+						{
+							int32_t lValue = p->aApplies[i].lValue;
+
+							m_pOwner->ApplyPoint(p->aApplies[i].bType, bAdd ? lValue : -lValue);
+						}
 					}
 				}
 			}
@@ -804,7 +820,8 @@ void CItem::ModifyPoints(bool bAdd)
 			if (0 != accessoryGrade)
 				value += MAX(accessoryGrade, value * aiAccessorySocketEffectivePct[accessoryGrade] / 100);
 
-			m_pOwner->ApplyPoint(m_pProto->aApplies[i].bType, bAdd ? value : -value);
+			if (m_pOwner)
+				m_pOwner->ApplyPoint(m_pProto->aApplies[i].bType, bAdd ? value : -value);
 		}
 	}
 	// 초승달의 반지, 할로윈 사탕, 행복의 반지, 영원한 사랑의 펜던트의 경우
@@ -1093,7 +1110,7 @@ bool CItem::EquipTo(LPCHARACTER ch, uint8_t bWearCell)
 	ch->BuffOnAttr_AddBuffsFromItem(this);
 
 	m_pOwner->ComputeBattlePoints();
-
+	m_pOwner->CheckMaximumPoints();
 	m_pOwner->UpdatePacket();
 
 	Save();
@@ -1161,7 +1178,7 @@ bool CItem::Unequip()
 #endif
 
 	m_pOwner->ComputeBattlePoints();
-
+	m_pOwner->CheckMaximumPoints();
 	m_pOwner->UpdatePacket();
 
 	m_pOwner = nullptr;
@@ -1171,7 +1188,7 @@ bool CItem::Unequip()
 	return true;
 }
 
-int32_t CItem::GetValue(uint32_t idx)
+int32_t CItem::GetValue(uint32_t idx) const
 {
 	assert(idx < ITEM_VALUES_MAX_NUM);
 	return GetProto()->alValues[idx];
@@ -1323,6 +1340,11 @@ void CItem::SetOwnership(LPCHARACTER ch, int32_t iSec)
 	strlcpy(p.szName, ch->GetName(), sizeof(p.szName));
 
 	PacketAround(&p, sizeof(p));
+}
+
+bool CItem::IsUsedTimeItem()
+{
+	return (m_pkRealTimeExpireEvent != nullptr);
 }
 
 int32_t CItem::GetSocketCount()
@@ -1715,7 +1737,7 @@ void CItem::SetAccessorySocketGrade(int32_t iGrade)
 
 	int32_t iDownTime = aiAccessorySocketDegradeTime[GetAccessorySocketGrade()];
 
-	//if (test_server)
+	//if (g_bIsTestServer)
 	//	iDownTime /= 60;
 
 	SetAccessorySocketDownGradeTime(iDownTime);
@@ -1730,7 +1752,7 @@ void CItem::SetAccessorySocketDownGradeTime(uint32_t time)
 { 
 	SetSocket(2, time); 
 
-	if (test_server && GetOwner())
+	if (g_bIsTestServer && GetOwner())
 		GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s에서 소켓 빠질때까지 남은 시간 %d"), GetName(), time);
 }
 
@@ -1890,7 +1912,7 @@ void CItem::AccessorySocketDegrade()
 
 		int32_t iDownTime = aiAccessorySocketDegradeTime[GetAccessorySocketGrade()];
 
-		if (test_server)
+		if (g_bIsTestServer)
 			iDownTime /= 60;
 
 		SetAccessorySocketDownGradeTime(iDownTime);
@@ -1901,7 +1923,7 @@ void CItem::AccessorySocketDegrade()
 }
 
 // ring에 item을 박을 수 있는지 여부를 체크해서 리턴
-static const bool CanPutIntoRing(LPITEM ring, LPITEM item)
+static bool CanPutIntoRing(LPITEM ring, LPITEM item)
 {
 	//const uint32_t vnum = item->GetVnum();
 	return false;
@@ -2073,6 +2095,8 @@ int32_t CItem::GetAccessorySocketDownGradeTime()
 
 void CItem::AttrLog()
 {
+	return;
+#if 0
 	const char * pszIP = nullptr;
 
 	if (GetOwner() && GetOwner()->GetDesc())
@@ -2092,8 +2116,11 @@ void CItem::AttrLog()
 		int32_t value	= m_aAttr[i].sValue;
 
 		if (type)
+		{
 			LogManager::instance().ItemLog(i, type, value, GetID(), "INFO_ATTR", "", pszIP ? pszIP : "", GetOriginalVnum());
+		}
 	}
+#endif
 }
 
 int32_t CItem::GetLevelLimit()

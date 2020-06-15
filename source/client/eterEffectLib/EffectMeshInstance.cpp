@@ -2,7 +2,7 @@
 #include "../eterLib/StateManager.h"
 #include "../eterLib/ResourceManager.h"
 #include "EffectMeshInstance.h"
-#include "../eterlib/GrpMath.h"
+#include "../eterLib/GrpMath.h"
 
 CDynamicPool<CEffectMeshInstance>		CEffectMeshInstance::ms_kPool;
 
@@ -30,10 +30,10 @@ BOOL CEffectMeshInstance::isActive()
 	if (!m_MeshFrameController.isActive())
 		return FALSE;
 
-	for (uint32_t j = 0; j < m_TextureInstanceVector.size(); ++j)
+	for (auto & j : m_TextureInstanceVector)
 	{
 		int32_t iCurrentFrame = m_MeshFrameController.GetCurrentFrame();
-		if (m_TextureInstanceVector[j].TextureFrameController.isActive(iCurrentFrame))
+		if (j.TextureFrameController.isActive(iCurrentFrame))
 			return TRUE;
 	}
 
@@ -48,11 +48,11 @@ bool CEffectMeshInstance::OnUpdate(float fElapsedTime)
 	if (m_MeshFrameController.isActive())
 		m_MeshFrameController.Update(fElapsedTime);
 
-	for (uint32_t j = 0; j < m_TextureInstanceVector.size(); ++j)
+	for (auto & j : m_TextureInstanceVector)
 	{
 		int32_t iCurrentFrame = m_MeshFrameController.GetCurrentFrame();
-		if (m_TextureInstanceVector[j].TextureFrameController.isActive(iCurrentFrame))
-			m_TextureInstanceVector[j].TextureFrameController.Update(fElapsedTime);
+		if (j.TextureFrameController.isActive(iCurrentFrame))
+			j.TextureFrameController.Update(fElapsedTime);
 	}
 
 	return true;
@@ -227,12 +227,11 @@ void CEffectMeshInstance::OnSetDataPointer(CEffectElementBase * pElement)
 		std::vector<CGraphicImageInstance*> & rImageInstanceVector = m_TextureInstanceVector[j].TextureInstanceVector;
 		rImageInstanceVector.clear();
 		rImageInstanceVector.reserve(rTextureVector.size());
-		for (std::vector<CGraphicImage*>::iterator itor = rTextureVector.begin(); itor != rTextureVector.end(); ++itor)
+		for (auto & pImage : rTextureVector)
 		{
-			CGraphicImage * pImage = *itor;
 			CGraphicImageInstance * pImageInstance = CGraphicImageInstance::ms_kPool.Alloc();
 			pImageInstance->SetImagePointer(pImage);
-			rImageInstanceVector.push_back(pImageInstance);
+			rImageInstanceVector.emplace_back(pImageInstance);
 		}
 	}
 }

@@ -40,7 +40,7 @@ PyObject * exchangeGetItemVnumFromSelf(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
 
-	return Py_BuildValue("i", CPythonExchange::Instance().GetItemVnumFromSelf((char) pos));
+	return Py_BuildValue("i", CPythonExchange::Instance().GetItemVnumFromSelf(static_cast<char>(pos)));
 }
 
 PyObject * exchangeGetItemVnumFromTarget(PyObject * poTarget, PyObject * poArgs)
@@ -50,7 +50,7 @@ PyObject * exchangeGetItemVnumFromTarget(PyObject * poTarget, PyObject * poArgs)
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
 
-	return Py_BuildValue("i", CPythonExchange::Instance().GetItemVnumFromTarget((char) pos));
+	return Py_BuildValue("i", CPythonExchange::Instance().GetItemVnumFromTarget(static_cast<char>(pos)));
 }
 
 PyObject * exchangeGetItemCountFromSelf(PyObject * poSelf, PyObject * poArgs)
@@ -60,7 +60,7 @@ PyObject * exchangeGetItemCountFromSelf(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
 
-	return Py_BuildValue("i", CPythonExchange::Instance().GetItemCountFromSelf((char) pos));
+	return Py_BuildValue("i", CPythonExchange::Instance().GetItemCountFromSelf(static_cast<char>(pos)));
 }
 
 PyObject * exchangeGetItemCountFromTarget(PyObject * poTarget, PyObject * poArgs)
@@ -70,7 +70,7 @@ PyObject * exchangeGetItemCountFromTarget(PyObject * poTarget, PyObject * poArgs
 	if (!PyTuple_GetInteger(poArgs, 0, &pos))
 		return Py_BuildException();
 
-	return Py_BuildValue("i", CPythonExchange::Instance().GetItemCountFromTarget((char) pos));
+	return Py_BuildValue("i", CPythonExchange::Instance().GetItemCountFromTarget(static_cast<char>(pos)));
 }
 
 PyObject * exchangeGetNameFromSelf(PyObject * poTarget, PyObject * poArgs)

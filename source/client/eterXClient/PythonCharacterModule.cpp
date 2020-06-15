@@ -15,6 +15,19 @@ PyObject * chrRaceToJob(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildValue("i", RaceToJob(race));
 }
 
+PyObject * chrIsInvisible(PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t iVID;
+	if (!PyTuple_GetInteger(poArgs, 0, &iVID))
+		return Py_BadArgument();
+
+	CInstanceBase * pCharacterInstance = CPythonCharacterManager::Instance().GetInstancePtr(iVID);
+	if (!pCharacterInstance)
+		return Py_BuildNone();
+
+	return Py_BuildValue("i", (int32_t)pCharacterInstance->IsInvisibility());
+}
+
 PyObject * chrRaceToSex(PyObject * poSelf, PyObject * poArgs)
 {
 	int32_t race;
@@ -1315,7 +1328,9 @@ void initchr()
 		{ "HasInstance",				chrHasInstance,						METH_VARARGS },
 		{ "IsEnemy",					chrIsEnemy,							METH_VARARGS },
 		{ "IsNPC",						chrIsNPC,							METH_VARARGS },
+#ifdef _DEBUG
 		{ "IsGameMaster",				chrIsGameMaster,					METH_VARARGS },
+#endif
 		{ "IsPartyMember",				chrIsPartyMember,					METH_VARARGS },
 
 		{ "Select",						chrSelect,							METH_VARARGS },
@@ -1327,6 +1342,8 @@ void initchr()
 		{ "Show",						chrShow,							METH_VARARGS },
 		{ "Pick",						chrPick,							METH_VARARGS },
 		{ "PickAll",					chrPickAll,							METH_VARARGS },
+
+		{ "IsInvisible",				chrIsInvisible,						METH_VARARGS },
 
 		{ "SetArmor",					chrSetArmor,						METH_VARARGS },
 		{ "SetWeapon",					chrSetWeapon,						METH_VARARGS },
@@ -1376,13 +1393,17 @@ void initchr()
 		// For Test
 		{ "testGetPKData",					chrtestGetPKData,					METH_VARARGS },
 		{ "FaintTest",						chrFaintTest,						METH_VARARGS },
+#ifdef _DEBUG
 		{ "SetMoveSpeed",					chrSetMoveSpeed,					METH_VARARGS },
 		{ "SetAttackSpeed",					chrSetAttackSpeed,					METH_VARARGS },
+#endif
 		{ "WeaponTraceSetTexture",			chrWeaponTraceSetTexture,			METH_VARARGS },
 		{ "WeaponTraceUseAlpha",			chrWeaponTraceUseAlpha,				METH_VARARGS },
 		{ "WeaponTraceUseTexture",			chrWeaponTraceUseTexture,			METH_VARARGS },
-		//{ "MoveToDestPosition",				chrMoveToDestPosition,				METH_VARARGS },
+#ifdef _DEBUG
+		{ "MoveToDestPosition",				chrMoveToDestPosition,				METH_VARARGS },
 		{ "testSetComboType",				chrtestSetComboType,				METH_VARARGS },
+#endif
 		{ "testSetAddRenderMode",			chrtestSetAddRenderMode,			METH_VARARGS },
 		{ "testSetModulateRenderMode",		chrtestSetModulateRenderMode,		METH_VARARGS },
 		{ "testSetAddRenderModeRGB",		chrtestSetAddRenderModeRGB,			METH_VARARGS },

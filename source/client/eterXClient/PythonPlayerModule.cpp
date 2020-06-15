@@ -133,6 +133,34 @@ PyObject * playerSetGameWindow(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
+PyObject * playerIsAntiFlagBySlot(PyObject * poSelf, PyObject * poArgs)
+{
+	TItemPos Cell;
+	int32_t antiflag;
+	switch (PyTuple_Size(poArgs))
+	{
+	case 2:
+		if (!PyTuple_GetInteger(poArgs, 0, &Cell.cell))
+			return Py_BadArgument();
+		if (!PyTuple_GetInteger(poArgs, 1, &antiflag))
+			return Py_BadArgument();
+		break;
+
+	case 3:
+		if (!PyTuple_GetInteger(poArgs, 0, &Cell.window_type))
+			return Py_BadArgument();
+		if (!PyTuple_GetInteger(poArgs, 1, &Cell.cell))
+			return Py_BadArgument();
+		if (!PyTuple_GetInteger(poArgs, 2, &antiflag))
+			return Py_BadArgument();
+		break;
+	default:
+		return Py_BuildException();
+	}
+
+	uint32_t itemAntiFlags = CPythonPlayer::Instance().GetItemAntiFlags(Cell);
+	return Py_BuildValue("i", IS_SET(itemAntiFlags, antiflag) != 0 ? TRUE : FALSE);
+}
 
 PyObject * playerGetItemTypeBySlot(PyObject * poSelf, PyObject * poArgs)
 {
@@ -178,6 +206,32 @@ PyObject * playerGetItemSubTypeBySlot(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildValue("i", CPythonPlayer::Instance().GetItemSubTypeBySlot(Cell));
 }
 
+PyObject * playerIsSameItemVnum(PyObject * poSelf, PyObject * poArgs)
+{
+	TItemPos Cell;
+	int32_t iItemVNum;
+	switch (PyTuple_Size(poArgs))
+	{
+	case 2:
+		if (!PyTuple_GetInteger(poArgs, 0, &iItemVNum))
+			return Py_BadArgument();
+		if (!PyTuple_GetInteger(poArgs, 1, &Cell.cell))
+			return Py_BadArgument();
+		break;
+	case 3:
+		if (!PyTuple_GetInteger(poArgs, 0, &iItemVNum))
+			return Py_BadArgument();
+		if (!PyTuple_GetInteger(poArgs, 1, &Cell.window_type))
+			return Py_BadArgument();
+		if (!PyTuple_GetInteger(poArgs, 2, &Cell.cell))
+			return Py_BadArgument();
+		break;
+	default:
+		return Py_BuildException();
+	}
+
+	return Py_BuildValue("i", (iItemVNum == CPythonPlayer::Instance().GetItemIndex(Cell)) ? TRUE : FALSE);
+}
 
 PyObject * playerSetQuickCameraMode(PyObject* poSelf, PyObject* poArgs)
 {
@@ -735,7 +789,7 @@ PyObject * playerGetSkillSlotIndex(PyObject* poSelf, PyObject* poArgs)
 
 	uint32_t dwSlotIndex;
 	if (!CPythonPlayer::Instance().GetSkillSlotIndex(iSkillIndex, &dwSlotIndex))
-		return Py_BuildException();
+		return Py_BuildNone();
 
 	return Py_BuildValue("i", dwSlotIndex);
 }
@@ -1094,17 +1148,27 @@ PyObject * playerGetItemLink(PyObject * poSelf, PyObject * poArgs)
 		{
 			// if (pPlayerItem->aAttr[i].bType != 0) // @fixme009 (this line must be commented)
 			{
-				len += snprintf(itemlink + len, sizeof(itemlink) - len, ":%x:%d",
+				len += _snprintf_s(itemlink + len, sizeof(itemlink) - len, sizeof(itemlink) - len, ":%x:%d",
 						pPlayerItem->aAttr[i].bType, pPlayerItem->aAttr[i].sValue);
 				isAttr = true;
 			}
 		}
+		std::string name = pItemData->GetName();
+#if 0
+		if(pItemData->GetIndex() == 50300)
+		{
+			CPythonSkill::SSkillData * c_pSkillData;
+			if (!CPythonSkill::Instance().GetSkillData(pPlayerItem->alSockets[0], &c_pSkillData))
+				return Py_BuildException("player.GetItemLink - Failed to find skill by %d", pPlayerItem->alSockets[0]);
 
+			name = c_pSkillData->strName + " " + name;
+		}
+#endif
 		if (isAttr)
 			//"item:锅龋:敲贰弊:家南0:家南1:家南2"
-			snprintf(buf, sizeof(buf), "|cffffc700|H%s|h[%s]|h|r", itemlink, pItemData->GetName());
+			_snprintf_s(buf, sizeof(buf), "|cffffc700|H%s|h[%s]|h|r", itemlink, name.c_str());
 		else
-			snprintf(buf, sizeof(buf), "|cfff1e6c0|H%s|h[%s]|h|r", itemlink, pItemData->GetName());
+			_snprintf_s(buf, sizeof(buf), "|cfff1e6c0|H%s|h[%s]|h|r", itemlink, name.c_str());
 	}
 	else
 		buf[0] = '\0';
@@ -1495,9 +1559,7 @@ PyObject * playerCanRefine(PyObject * poSelf, PyObject * poArgs)
 	}
 
 	if (CPythonPlayer::Instance().IsEquipmentSlot(TargetSlotIndex))
-	{
 		return Py_BuildValue("i", REFINE_CANT_REFINE_METIN_TO_EQUIPMENT);
-	}
 
 	// Scroll
 	CItemManager::Instance().SelectItemData(iScrollItemIndex);
@@ -1962,7 +2024,7 @@ PyObject * playerRegisterEmotionIcon(PyObject* poSelf, PyObject* poArgs)
 		return Py_BuildException();
 
 	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(szFileName);
-	m_kMap_iEmotionIndex_pkIconImage.insert(std::make_pair(iIndex, pImage));
+	m_kMap_iEmotionIndex_pkIconImage.emplace(iIndex, pImage);
 
 	return Py_BuildNone();
 }
@@ -2042,9 +2104,9 @@ PyObject * playerSetItemMetinSocket(PyObject* poSelf, PyObject* poArgs)
 PyObject * playerSetItemAttribute(PyObject* poSelf, PyObject* poArgs)
 {
 	TItemPos ItemPos;
-	int32_t iAttributeSlotIndex;
-	int32_t iAttributeType;
-	int32_t iAttributeValue;
+	int32_t iAttributeSlotIndex = 0;
+	int32_t iAttributeType = 0;
+	int32_t iAttributeValue = 0;
 
 	switch (PyTuple_Size(poArgs))
 	{
@@ -2187,7 +2249,7 @@ PyObject* playerSendDragonSoulRefine(PyObject* poSelf, PyObject* poArgs)
 		{
 			if (!PyTuple_GetObject(poArgs, 1, &pDic))
 				return Py_BuildException();
-			int32_t pos = 0;
+			Py_ssize_t pos = 0;
 			PyObject* key, *value;
 			int32_t size = PyDict_Size(pDic);
 
@@ -2212,6 +2274,39 @@ PyObject* playerSendDragonSoulRefine(PyObject* poSelf, PyObject* poArgs)
 	
 	return Py_BuildNone();
 }
+
+PyObject * playerGetItemList(PyObject* poSelf, PyObject* poArgs)
+{
+	PyObject * poList = PyList_New(0);
+
+	for (int i = 0; i <= 164400; i++)
+	{
+		if (CItemManager::Instance().SelectItemData(i))
+		{
+			CItemData * pItemData = CItemManager::Instance().GetSelectedItemDataPointer();
+			if (pItemData)
+			{
+				PyObject * poItemVnum = PyInt_FromLong(pItemData->GetIndex());
+				PyObject * poItemName = PyString_FromString(pItemData->GetName());
+
+				PyObject* poDict = PyDict_New();
+				PyDict_SetItemString(poDict, "vnum", poItemVnum);
+				PyDict_SetItemString(poDict, "name", poItemName);
+
+				PyList_Append(poList, poDict);
+			}
+		}
+	}
+	return poList;
+}
+
+
+PyObject * playerIsGameMaster(PyObject* poSelf, PyObject* poArgs)
+{
+	CInstanceBase* pkInst = CPythonPlayer::Instance().NEW_GetMainActorPtr();
+	return Py_BuildValue("b", pkInst && pkInst->IsGameMaster());
+}
+
 void initPlayer()
 {
 	static PyMethodDef s_methods[] =
@@ -2282,6 +2377,7 @@ void initPlayer()
 		{ "MoveItem",							playerMoveItem,								METH_VARARGS },
 		{ "SendClickItemPacket",				playerSendClickItemPacket,					METH_VARARGS },
 
+		{ "GetItemList", playerGetItemList, METH_VARARGS },
 		///////////////////////////////////////////////////////////////////////////////////////////
 
 		{ "GetName",					playerGetName,						METH_VARARGS },
@@ -2329,8 +2425,10 @@ void initPlayer()
 		{ "IsAvailableBeltInventoryCell",	playerIsAvailableBeltInventoryCell,	METH_VARARGS },		
 #endif
 
+		{ "IsAntiFlagBySlot",			playerIsAntiFlagBySlot,				METH_VARARGS },
 		{ "GetItemTypeBySlot",			playerGetItemTypeBySlot,			METH_VARARGS },
 		{ "GetItemSubTypeBySlot",		playerGetItemSubTypeBySlot,			METH_VARARGS },
+		{ "IsSameItemVnum",				playerIsSameItemVnum,				METH_VARARGS },
 
 		// Refine
 		{ "GetItemGrade",				playerGetItemGrade,					METH_VARARGS },
@@ -2371,7 +2469,9 @@ void initPlayer()
 		{ "ToggleLevelLimit",			playerToggleLevelLimit,				METH_VARARGS },
 		{ "GetTargetVID",				playerGetTargetVID,					METH_VARARGS },
 
+#ifdef _DEBUG
 		{ "SetItemData",				playerSetItemData,					METH_VARARGS },
+#endif
 		{ "SetItemMetinSocket",			playerSetItemMetinSocket,			METH_VARARGS },
 		{ "SetItemAttribute",			playerSetItemAttribute,				METH_VARARGS },
 		{ "SetItemCount",				playerSetItemCount,					METH_VARARGS },
@@ -2468,6 +2568,8 @@ void initPlayer()
 	PyModule_AddIntConstant(poModule, "INVENTORY_SLOT_COUNT",	c_Inventory_Count);
 	PyModule_AddIntConstant(poModule, "EQUIPMENT_SLOT_START",	c_Equipment_Start);
 	PyModule_AddIntConstant(poModule, "EQUIPMENT_PAGE_COUNT",	c_Equipment_Count);
+
+	PyModule_AddIntConstant (poModule, "ITEM_SLOT_COUNT", c_ItemSlot_Count);
 
 #ifdef ENABLE_NEW_EQUIPMENT_SYSTEM
 	PyModule_AddIntConstant(poModule, "NEW_EQUIPMENT_SLOT_START",	c_New_Equipment_Start);

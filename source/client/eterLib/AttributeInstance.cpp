@@ -17,28 +17,31 @@ bool CAttributeInstance::Picking(const D3DXVECTOR3 & v, const D3DXVECTOR3 & dir,
 	float nx = 0;
 	float ny = 0;
 
-	for (uint32_t i = 0; i < m_v3HeightDataVector.size(); ++i)
-		for (uint32_t j = 0; j < m_v3HeightDataVector[i].size(); j+=3)
+	for (auto & i : m_v3HeightDataVector)
+		for (uint32_t j = 0; j < i.size(); j += 3)
 		{
-			const D3DXVECTOR3 & cv0 = m_v3HeightDataVector[i][j];
-			const D3DXVECTOR3 & cv2 = m_v3HeightDataVector[i][j+1];
-			const D3DXVECTOR3 & cv1 = m_v3HeightDataVector[i][j+2];
+			const D3DXVECTOR3 & cv0 = i[j];
+			const D3DXVECTOR3 & cv2 = i[j + 1];
+			const D3DXVECTOR3 & cv1 = i[j + 2];
 
 			D3DXVECTOR3 n;
-			D3DXVec3Cross(&n,&(cv1-cv0),&(cv2-cv0));
+			D3DXVec3Cross(&n, &(cv1 - cv0), &(cv2 - cv0));
 			D3DXVECTOR3 x;
 			float t;
-			t = - D3DXVec3Dot(&(v-cv0),&n)/D3DXVec3Dot(&dir,&n);
-			
-			x = v+t*dir;
+			t = -D3DXVec3Dot(&(v - cv0), &n) / D3DXVec3Dot(&dir, &n);
+
+			x = v + t * dir;
 
 			D3DXVECTOR3 temp;
-			D3DXVec3Cross(&temp,&(cv1-cv0),&(x-cv0));
-			if (D3DXVec3Dot(&temp,&n)<0) continue;
-			D3DXVec3Cross(&temp,&(cv2-cv1),&(x-cv1));
-			if (D3DXVec3Dot(&temp,&n)<0) continue;
-			D3DXVec3Cross(&temp,&(cv0-cv2),&(x-cv2));
-			if (D3DXVec3Dot(&temp,&n)<0) continue;
+			D3DXVec3Cross(&temp, &(cv1 - cv0), &(x - cv0));
+			if (D3DXVec3Dot(&temp, &n) < 0)
+				continue;
+			D3DXVec3Cross(&temp, &(cv2 - cv1), &(x - cv1));
+			if (D3DXVec3Dot(&temp, &n) < 0)
+				continue;
+			D3DXVec3Cross(&temp, &(cv0 - cv2), &(x - cv2));
+			if (D3DXVec3Dot(&temp, &n) < 0)
+				continue;
 
 			if (bPicked)
 			{
@@ -75,24 +78,20 @@ BOOL CAttributeInstance::GetHeight(float fx, float fy, float * pfHeight)
 
 	BOOL bFlag = FALSE;
 
-	for (uint32_t i = 0; i < m_v3HeightDataVector.size(); ++i)
-	for (uint32_t j = 0; j < m_v3HeightDataVector[i].size(); j+=3)
-	{
-		const D3DXVECTOR3 & c_rv3Vertex0 = m_v3HeightDataVector[i][j];
-		const D3DXVECTOR3 & c_rv3Vertex1 = m_v3HeightDataVector[i][j+1];
-		const D3DXVECTOR3 & c_rv3Vertex2 = m_v3HeightDataVector[i][j+2];
+	for (auto & i : m_v3HeightDataVector)
+		for (uint32_t j = 0; j < i.size(); j += 3)
+		{
+			const D3DXVECTOR3 & c_rv3Vertex0 = i[j];
+			const D3DXVECTOR3 & c_rv3Vertex1 = i[j + 1];
+			const D3DXVECTOR3 & c_rv3Vertex2 = i[j + 2];
 
-		if (
-			fx<c_rv3Vertex0.x && fx<c_rv3Vertex1.x && fx<c_rv3Vertex2.x ||
-			fx>c_rv3Vertex0.x && fx>c_rv3Vertex1.x && fx>c_rv3Vertex2.x ||
-			fy<c_rv3Vertex0.y && fy<c_rv3Vertex1.y && fy<c_rv3Vertex2.y ||
-			fy>c_rv3Vertex0.y && fy>c_rv3Vertex1.y && fy>c_rv3Vertex2.y
-			)
-			continue;
+			if ((fx < c_rv3Vertex0.x && fx < c_rv3Vertex1.x && fx < c_rv3Vertex2.x) ||
+				(fx > c_rv3Vertex0.x && fx > c_rv3Vertex1.x && fx > c_rv3Vertex2.x) ||
+				(fy < c_rv3Vertex0.y && fy < c_rv3Vertex1.y && fy < c_rv3Vertex2.y) ||
+				(fy > c_rv3Vertex0.y && fy > c_rv3Vertex1.y && fy > c_rv3Vertex2.y))
+				continue;
 
-		if (IsInTriangle2D(c_rv3Vertex0.x, c_rv3Vertex0.y,
-						   c_rv3Vertex1.x, c_rv3Vertex1.y,
-						   c_rv3Vertex2.x, c_rv3Vertex2.y, fx, fy))
+			if (IsInTriangle2D(c_rv3Vertex0.x, c_rv3Vertex0.y, c_rv3Vertex1.x, c_rv3Vertex1.y, c_rv3Vertex2.x, c_rv3Vertex2.y, fx, fy))
 		{
 			D3DXVECTOR3 v3Line1 = c_rv3Vertex1 - c_rv3Vertex0;
 			D3DXVECTOR3 v3Line2 = c_rv3Vertex2 - c_rv3Vertex0;
@@ -157,9 +156,7 @@ void CAttributeInstance::RefreshObject(const D3DXMATRIX & c_rmatGlobal)
 		m_v3HeightDataVector[i].clear();
 		m_v3HeightDataVector[i].resize(dwVertexCount);
 		for (uint32_t j = 0; j < dwVertexCount; ++j)
-		{
 			D3DXVec3TransformCoord(&m_v3HeightDataVector[i][j], &c_pHeightData->v3VertexVector[j], &m_matGlobal);
-		}
 	}
 }
 

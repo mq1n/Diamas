@@ -11,8 +11,7 @@ CTargaImage::CTargaImage()
 
 CTargaImage::~CTargaImage()
 {
-    if (m_pbuf)
-		delete [] m_pbuf;
+	delete [] m_pbuf;
 }
 
 char * CTargaImage::GetBasePointer(int32_t line)
@@ -25,8 +24,8 @@ void CTargaImage::Create(int32_t x, int32_t y)
     memset(&m_header, 0, sizeof(m_header));
 
     m_header.imgType	= 2;
-    m_header.width	= x;
-    m_header.height	= y;
+    m_header.width	= (uint16_t)x;
+    m_header.height	= (uint16_t)y;
     m_header.colorBits	= 32;
     m_header.desc	= 0x20;
 

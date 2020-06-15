@@ -1,20 +1,19 @@
-
 #include "stdafx.h"
 #include "Cache.h"
-
+#include "../../common/tables.h"
 #include "QID.h"
 #include "ClientManager.h"
 #include "Main.h"
 
-extern CPacketInfo g_item_info;
 extern int32_t g_iPlayerCacheFlushSeconds;
 extern int32_t g_iItemCacheFlushSeconds;
-extern int32_t g_test_server;
+extern bool g_test_server;
 // MYSHOP_PRICE_LIST
 extern int32_t g_iItemPriceListTableCacheFlushSeconds;
+const int32_t CItemPriceListTableCache::s_nMinFlushSec = 1800;
 // END_OF_MYSHOP_PRICE_LIST
 //
-extern int32_t g_item_count;
+extern int32_t g_iActivityCacheFlushSeconds;
 
 CItemCache::CItemCache()
 {
@@ -22,8 +21,7 @@ CItemCache::CItemCache()
 }
 
 CItemCache::~CItemCache()
-{
-}
+= default;
 
 // 이거 이상한데...
 // Delete를 했으면, Cache도 해제해야 하는것 아닌가???
@@ -45,7 +43,7 @@ void CItemCache::Delete()
 
 	m_data.vnum = 0;
 	m_bNeedQuery = true;
-	m_lastUpdateTime = time(0);
+	m_lastUpdateTime = time(nullptr);
 	OnFlush();
 	
 	//m_bNeedQuery = false;
@@ -56,8 +54,8 @@ void CItemCache::OnFlush()
 {
 	if (m_data.vnum == 0) // vnum이 0이면 삭제하라고 표시된 것이다.
 	{
-		char szQuery[QUERY_MAX_LEN];
-		snprintf(szQuery, sizeof(szQuery), "DELETE FROM item%s WHERE id=%u", GetTablePostfix(), m_data.id);
+		char szQuery[ASQL_QUERY_MAX_LEN];
+		snprintf(szQuery, sizeof(szQuery), "DELETE FROM item WHERE id=%u", m_data.id);
 		CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_DESTROY, 0, nullptr);
 
 		if (g_test_server)
@@ -80,25 +78,25 @@ void CItemCache::OnFlush()
 		if (memcmp(aAttr, p->aAttr, sizeof(TPlayerItemAttribute) * ITEM_ATTRIBUTE_MAX_NUM))
 			isAttr = true;
 
-		char szColumns[QUERY_MAX_LEN];
-		char szValues[QUERY_MAX_LEN];
-		char szUpdate[QUERY_MAX_LEN];
+		char szColumns[ASQL_QUERY_MAX_LEN];
+		char szValues[ASQL_QUERY_MAX_LEN];
+		char szUpdate[ASQL_QUERY_MAX_LEN];
 
-		int32_t iLen = snprintf(szColumns, sizeof(szColumns), "id, owner_id, `window`, pos, count, vnum");
+		int32_t iLen = snprintf(szColumns, sizeof(szColumns), "id, owner_id, `window`, pos, count, vnum, is_gm_owner");
 
-		int32_t iValueLen = snprintf(szValues, sizeof(szValues), "%u, %u, %d, %d, %u, %u",
-				p->id, p->owner, p->window, p->pos, p->count, p->vnum);
+		int32_t iValueLen = snprintf(szValues, sizeof(szValues), "%u, %u, %d, %d, %u, %u, %u",
+				p->id, p->owner, p->window, p->pos, p->count, p->vnum, p->is_gm_owner);
 
-		int32_t iUpdateLen = snprintf(szUpdate, sizeof(szUpdate), "owner_id=%u, `window`=%d, pos=%d, count=%u, vnum=%u",
-				p->owner, p->window, p->pos, p->count, p->vnum);
+		int32_t iUpdateLen = snprintf(szUpdate, sizeof(szUpdate), "owner_id=%u, window=%d, pos=%d, count=%u, vnum=%u, is_gm_owner=%u",
+				p->owner, p->window, p->pos, p->count, p->vnum, p->is_gm_owner);
 
 		if (isSocket)
 		{
 			iLen += snprintf(szColumns + iLen, sizeof(szColumns) - iLen, ", socket0, socket1, socket2");
 			iValueLen += snprintf(szValues + iValueLen, sizeof(szValues) - iValueLen,
-					", %lu, %lu, %lu", p->alSockets[0], p->alSockets[1], p->alSockets[2]);
+					", %u, %u, %u", p->alSockets[0], p->alSockets[1], p->alSockets[2]);
 			iUpdateLen += snprintf(szUpdate + iUpdateLen, sizeof(szUpdate) - iUpdateLen,
-					", socket0=%lu, socket1=%lu, socket2=%lu", p->alSockets[0], p->alSockets[1], p->alSockets[2]);
+					", socket0=%u, socket1=%u, socket2=%u", p->alSockets[0], p->alSockets[1], p->alSockets[2]);
 		}
 
 		if (isAttr)
@@ -134,16 +132,13 @@ void CItemCache::OnFlush()
 					p->aAttr[6].bType, p->aAttr[6].sValue);
 		}
 
-		char szItemQuery[QUERY_MAX_LEN + QUERY_MAX_LEN];
-		snprintf(szItemQuery, sizeof(szItemQuery), "REPLACE INTO item%s (%s) VALUES(%s)", GetTablePostfix(), szColumns, szValues);
+		char szItemQuery[ASQL_QUERY_MAX_LEN + ASQL_QUERY_MAX_LEN];
+		snprintf(szItemQuery, sizeof(szItemQuery), "REPLACE INTO item (%s) VALUES(%s)", szColumns, szValues);
 
 		if (g_test_server)	
 			sys_log(0, "ItemCache::Flush :REPLACE  (%s)", szItemQuery);
 
 		CDBManager::instance().ReturnQuery(szItemQuery, QID_ITEM_SAVE, 0, nullptr);
-
-		//g_item_info.Add(p->vnum);
-		++g_item_count;
 	}
 
 	m_bNeedQuery = false;
@@ -158,15 +153,14 @@ CPlayerTableCache::CPlayerTableCache()
 }
 
 CPlayerTableCache::~CPlayerTableCache()
-{
-}
+= default;
 
 void CPlayerTableCache::OnFlush()
 {
 	if (g_test_server)
 		sys_log(0, "PlayerTableCache::Flush : %s", m_data.name);
 
-	char szQuery[QUERY_MAX_LEN];
+	char szQuery[ASQL_QUERY_MAX_LEN];
 	CreatePlayerSaveQuery(szQuery, sizeof(szQuery), &m_data);
 	CDBManager::instance().ReturnQuery(szQuery, QID_PLAYER_SAVE, 0, nullptr);
 }
@@ -176,7 +170,6 @@ void CPlayerTableCache::OnFlush()
 // CItemPriceListTableCache class implementation
 //
 
-const int32_t CItemPriceListTableCache::s_nMinFlushSec = 1800;
 
 CItemPriceListTableCache::CItemPriceListTableCache()
 {
@@ -191,7 +184,7 @@ void CItemPriceListTableCache::UpdateList(const TItemPriceListTable* pUpdateList
 
 	std::vector<TItemPriceInfo> tmpvec;
 
-	for (size_t idx = 0; idx < m_data.byCount; ++idx)
+	for (uint32_t idx = 0; idx < m_data.byCount; ++idx)
 	{
 		const TItemPriceInfo* pos = pUpdateList->aPriceInfo;
 		for (; pos != pUpdateList->aPriceInfo + pUpdateList->byCount && m_data.aPriceInfo[idx].dwVnum != pos->dwVnum; ++pos)
@@ -217,7 +210,7 @@ void CItemPriceListTableCache::UpdateList(const TItemPriceListTable* pUpdateList
 
 	int32_t nDeletedNum;	// 삭제된 가격정보의 갯수
 
-	if (pUpdateList->byCount < SHOP_PRICELIST_MAX_NUM)
+	if (pUpdateList->byCount < SHOP_PRICELIST_MAX_NUM && tmpvec.size() > 0)
 	{
 		size_t sizeAddOldDataSize = SHOP_PRICELIST_MAX_NUM - pUpdateList->byCount;
 
@@ -226,12 +219,12 @@ void CItemPriceListTableCache::UpdateList(const TItemPriceListTable* pUpdateList
 		if (tmpvec.size() != 0)
 		{
 			memcpy(m_data.aPriceInfo + pUpdateList->byCount, &tmpvec[0], sizeof(TItemPriceInfo) * sizeAddOldDataSize);
-			m_data.byCount += sizeAddOldDataSize;
+			m_data.byCount += static_cast<uint8_t>(sizeAddOldDataSize);
 		}
-		nDeletedNum = tmpvec.size() - sizeAddOldDataSize;
+		nDeletedNum = static_cast<int32_t>(tmpvec.size() - sizeAddOldDataSize);
 	}
 	else
-		nDeletedNum = tmpvec.size();
+		nDeletedNum = static_cast<int32_t>(tmpvec.size());
 
 	m_bNeedQuery = true;
 
@@ -242,13 +235,13 @@ void CItemPriceListTableCache::UpdateList(const TItemPriceListTable* pUpdateList
 
 void CItemPriceListTableCache::OnFlush()
 {
-	char szQuery[QUERY_MAX_LEN];
+	char szQuery[ASQL_QUERY_MAX_LEN];
 
 	//
 	// 이 캐시의 소유자에 대한 기존에 DB 에 저장된 아이템 가격정보를 모두 삭제한다.
 	//
 
-	snprintf(szQuery, sizeof(szQuery), "DELETE FROM myshop_pricelist%s WHERE owner_id = %u", GetTablePostfix(), m_data.dwOwnerID);
+	snprintf(szQuery, sizeof(szQuery), "DELETE FROM myshop_pricelist WHERE owner_id = %u", m_data.dwOwnerID);
 	CDBManager::instance().ReturnQuery(szQuery, QID_ITEMPRICE_DESTROY, 0, nullptr);
 
 	//
@@ -258,8 +251,8 @@ void CItemPriceListTableCache::OnFlush()
 	for (int32_t idx = 0; idx < m_data.byCount; ++idx)
 	{
 		snprintf(szQuery, sizeof(szQuery),
-				"REPLACE myshop_pricelist%s(owner_id, item_vnum, price) VALUES(%u, %u, %u)", // @fixme204 (INSERT INTO -> REPLACE)
-				GetTablePostfix(), m_data.dwOwnerID, m_data.aPriceInfo[idx].dwVnum, m_data.aPriceInfo[idx].dwPrice);
+				"REPLACE myshop_pricelist(owner_id, item_vnum, price) VALUES(%u, %u, %u)", 
+				m_data.dwOwnerID, m_data.aPriceInfo[idx].dwVnum, m_data.aPriceInfo[idx].dwPrice);
 		CDBManager::instance().ReturnQuery(szQuery, QID_ITEMPRICE_SAVE, 0, nullptr);
 	}
 
@@ -272,3 +265,38 @@ CItemPriceListTableCache::~CItemPriceListTableCache()
 {
 }
 // END_OF_MYSHOP_PRICE_LIST
+
+//
+// CActivityCache
+//
+CActivityCache::CActivityCache()
+{
+	m_expireTime = MIN(600, g_iActivityCacheFlushSeconds);
+}
+
+CActivityCache::~CActivityCache()
+= default;
+
+void CActivityCache::OnFlush()
+{
+	if (g_test_server)
+		sys_log(0, "ActivityCache::Flush: %u", m_data.pid);
+
+	//Save the main shop info
+	char szQuery[ASQL_QUERY_MAX_LEN];
+	snprintf(szQuery, sizeof(szQuery),
+		"INSERT INTO activity (pid, today_pve, today_pvp, today_gk, today_other, total, last_update) "
+		"VALUES (%u, %d, %d, %d, %d, %d, %u) "
+		"ON DUPLICATE KEY UPDATE today_pve = VALUES(today_pve), today_pvp = VALUES(today_pvp), today_gk = VALUES(today_gk), "
+		"today_other = VALUES(today_other), total = VALUES(total), last_update = VALUES(last_update)",
+		m_data.pid,
+		m_data.today.pve,
+		m_data.today.pvp,
+		m_data.today.gk,
+		m_data.today.other,
+		m_data.total,
+		m_data.lastUpdate);
+
+	CDBManager::instance().AsyncQuery(szQuery);
+}
+

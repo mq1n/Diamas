@@ -10,18 +10,17 @@
 #include "guild_manager.h"
 #include "db.h"
 #include "party.h"
-
-extern LPFDWATCH	main_fdw;
+#include "../../common/service.h"
 
 LPCLIENT_DESC db_clientdesc = nullptr;
 LPCLIENT_DESC g_pkAuthMasterDesc = nullptr;
 
 static const char* GetKnownClientDescName(LPCLIENT_DESC desc) {
-	if (desc == db_clientdesc) {
+	if (desc == db_clientdesc)
 		return "db_clientdesc";
-	} else if (desc == g_pkAuthMasterDesc) {
+	else if (desc == g_pkAuthMasterDesc)
 		return "g_pkAuthMasterDesc";
-	}
+
 	return "unknown";
 }
 
@@ -280,7 +279,8 @@ void CLIENT_DESC::UpdateChannelStatus(uint32_t t, bool fForce)
 		CHANNELSTATUS_UPDATE_PERIOD = 5*60*1000,	// 5ºÐ¸¶´Ù
 	};
 	uint32_t tLCSUP = m_tLastChannelStatusUpdateTime+CHANNELSTATUS_UPDATE_PERIOD;
-	if (fForce || tLCSUP < t) {
+	if (fForce || tLCSUP < t)
+	{
 		int32_t iTotal; 
 		int32_t * paiEmpireUserCount;
 		int32_t iLocal;
@@ -289,10 +289,13 @@ void CLIENT_DESC::UpdateChannelStatus(uint32_t t, bool fForce)
 		TChannelStatus channelStatus;
 		channelStatus.nPort = mother_port;
 
-		if (g_bNoMoreClient) channelStatus.bStatus = 0;
-		else channelStatus.bStatus = iTotal > g_iFullUserCount ? 3 : iTotal > g_iBusyUserCount ? 2 : 1;
+		if (g_bNoMoreClient)
+			channelStatus.bStatus = 0;
+		else
+			channelStatus.bStatus = iTotal > g_iFullUserCount ? 3 : iTotal > g_iBusyUserCount ? 2 : 1;
 
 		DBPacket(HEADER_GD_UPDATE_CHANNELSTATUS, 0, &channelStatus, sizeof(channelStatus));
+
 		m_tLastChannelStatusUpdateTime = t;
 	}
 }

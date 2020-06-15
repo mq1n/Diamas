@@ -2,6 +2,7 @@
 #define __INC_GUILD_H
 
 #include "skill.h"
+#include "char.h"
 
 struct SQLMsg;
 
@@ -215,7 +216,7 @@ class CGuild
 		void		SaveMember(uint32_t pid);
 
 		int32_t		GetMaxMemberCount(); 
-		int32_t		GetMemberCount() { return m_member.size(); }
+		int32_t		GetMemberCount() { return static_cast<int32_t>(m_member.size()); }
 		int32_t		GetTotalLevel() const;
 
 		// GUILD_MEMBER_COUNT_BONUS
@@ -398,27 +399,22 @@ class CGuild
 
 		typedef std::map< uint32_t, LPEVENT >	EventMap;
 		EventMap	m_GuildInviteEventMap;	///< 길드 초청 Event map. key: 초대받은 캐릭터의 PID
+    protected:
+        int32_t         m_guildPostCommentPulse;
 		// END_OF_GUILD_JOIN_BUG_FIX
-#ifdef ENABLE_D_NJGUILD
 	private:
 		LPDUNGEON	m_pkDungeon_for_Only_guild;
 	public:
 		template <class Func> void ForEachOnMapMember (Func & f, int32_t lMapIndex);
 		void SetDungeon_for_Only_guild(LPDUNGEON pDungeon);
 		LPDUNGEON GetDungeon_for_Only_guild();
-#endif
-#ifdef ENABLE_NEWSTUFF
 	public:
 		void SetSkillLevel(uint32_t dwVnum, uint8_t level, uint8_t point = 0);
 		uint32_t GetSkillPoint();
 		void SetSkillPoint(uint8_t point);
-#endif
 };
 
 
-// #define ENABLE_NEWGUILDMAKE
-
-#ifdef ENABLE_D_NJGUILD
 #include "char.h"
 template <class Func> void CGuild::ForEachOnMapMember (Func & f, int32_t lMapIndex)
 {
@@ -434,6 +430,5 @@ template <class Func> void CGuild::ForEachOnMapMember (Func & f, int32_t lMapInd
 		}
 	}
 }
-#endif
 
 #endif

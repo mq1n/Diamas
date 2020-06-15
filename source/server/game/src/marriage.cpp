@@ -7,7 +7,7 @@
 #include "wedding.h"
 #include "config.h"
 #include "utils.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 
 extern bool g_bShutdown;
 
@@ -25,8 +25,8 @@ namespace marriage
 		{ 71070,	{ 10,	12,	15,	20, } }, // 경험치 증가
 		{ 71071,	{ 4,	5,	6,	8,  } }, // 크리티컬 증가
 		{ 71072,	{ -4,	-5,	-6,	-8, } }, // 상대방 공격력 감소
-		{ 71073,	{ 20,	25,	30,	40, } }, // 공격력 증가 (절대값)
-		{ 71074,	{ 12,	16,	20,	30, } }, // 방어력 증가 (절대값)
+		{ 71073,	{ 8,	10,	12,	15, } }, // 공격력 증가 (절대값) // decresead values
+		{ 71074,	{ 5,	6,	8,	10, } }, // 방어력 증가 (절대값) // decresead values
 
 		//{ 71069,	1,	2,	3,	6,	8,  }, // 관통 증가
 		//{ 71070,	5,	7,	10,	15,	20, }, // 경험치 증가
@@ -76,7 +76,7 @@ namespace marriage
 
 	int32_t TMarriage::GetMarriagePoint()
 	{
-		if (test_server)
+		if (g_bIsTestServer)
 		{
 			int32_t value = quest::CQuestManager::instance().GetEventFlag("lovepoint");
 			if (value)
@@ -96,7 +96,7 @@ namespace marriage
 		}
 
 		int32_t days = (get_global_time() - marry_time);
-		if (test_server)
+		if (g_bIsTestServer)
 			days /= 60;
 		else
 			days /= 86400;
@@ -435,7 +435,7 @@ namespace marriage
 			uint64_t llActualPoints = static_cast<uint64_t>(love_point) + point;
 			love_point = MIN( llActualPoints, 2000000000 );
 
-			if (test_server)
+			if (g_bIsTestServer)
 			{
 				LPCHARACTER ch;
 				ch = CHARACTER_MANAGER::instance().FindByPID(m_pid1);
@@ -456,7 +456,7 @@ namespace marriage
 		LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(dwPID);
 		if (ch)
 		{
-			PIXEL_POSITION pos;
+			GPOS pos;
 			if (!SECTREE_MANAGER::instance().GetRecallPositionByEmpire(pWeddingInfo->dwMapIndex/10000, 0, pos))
 			{
 				sys_err("cannot get warp position");

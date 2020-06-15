@@ -2,8 +2,13 @@
 #define __INC_METIN_II_LENGTH_H__
 
 #include "service.h"
+#include "item_length.h"
+
+#include <stdint.h>
 
 #define WORD_MAX 0xffff
+#define GOLD_MAX 2000000000
+
 enum EMisc
 {
 	MAX_HOST_LENGTH			= 15,
@@ -45,7 +50,7 @@ enum EMisc
 
 	JOURNAL_MAX_NUM			= 2,
 
-	QUERY_MAX_LEN			= 8192,
+//	QUERY_MAX_LEN			= 8192,
 
 	FILE_MAX_LEN			= 128,
 
@@ -68,7 +73,7 @@ enum EMisc
 	MOB_SKILL_MAX_NUM		= 5,
 
     POINT_MAX_NUM = 255,
-	DRAGON_SOUL_BOX_SIZE = 32,
+	
 	DRAGON_SOUL_BOX_COLUMN_NUM = 8,
 	DRAGON_SOUL_BOX_ROW_NUM = DRAGON_SOUL_BOX_SIZE / DRAGON_SOUL_BOX_COLUMN_NUM,
 	DRAGON_SOUL_REFINE_GRID_SIZE = 15,
@@ -76,17 +81,13 @@ enum EMisc
 
 	WEAR_MAX_NUM				= 32,
 
-	//LIMIT_GOLD
-	GOLD_MAX = 2000000000,
-	//END_LIMIT_GOLD
-
 	SHOP_TAB_NAME_MAX = 32,
 	SHOP_TAB_COUNT_MAX = 3,
 
 	BELT_INVENTORY_SLOT_WIDTH = 4,
 	BELT_INVENTORY_SLOT_HEIGHT= 4,
 
-	BELT_INVENTORY_SLOT_COUNT = BELT_INVENTORY_SLOT_WIDTH * BELT_INVENTORY_SLOT_HEIGHT,
+	BELT_INVENTORY_SLOT_COUNT = BELT_INVENTORY_SLOT_WIDTH * BELT_INVENTORY_SLOT_HEIGHT
 
 
 /**
@@ -156,45 +157,13 @@ enum EDragonSoulDeckType
 	DRAGON_SOUL_DECK_1,
 	DRAGON_SOUL_DECK_MAX_NUM = 2,
 
-	DRAGON_SOUL_DECK_RESERVED_MAX_NUM = 3,	// NOTE: 중요! 아직 사용중이진 않지만, 3페이지 분량을 예약 해 둠. DS DECK을 늘릴 경우 반드시 그 수만큼 RESERVED에서 차감해야 함!
+	DRAGON_SOUL_DECK_RESERVED_MAX_NUM = 3	// NOTE: 중요! 아직 사용중이진 않지만, 3페이지 분량을 예약 해 둠. DS DECK을 늘릴 경우 반드시 그 수만큼 RESERVED에서 차감해야 함!
 };
 
 enum ESex
 {
 	SEX_MALE,
 	SEX_FEMALE
-};
-
-enum EDirection
-{
-	DIR_NORTH,
-	DIR_NORTHEAST,
-	DIR_EAST,
-	DIR_SOUTHEAST,
-	DIR_SOUTH,
-	DIR_SOUTHWEST,
-	DIR_WEST,
-	DIR_NORTHWEST,
-	DIR_MAX_NUM
-};
-
-#define ABILITY_MAX_LEVEL	10  /* 기술 최대 레벨 */
-
-enum EAbilityDifficulty
-{
-	DIFFICULTY_EASY,
-	DIFFICULTY_NORMAL,
-	DIFFICULTY_HARD,
-	DIFFICULTY_VERY_HARD,
-	DIFFICULTY_NUM_TYPES
-};
-
-enum EAbilityCategory
-{
-	CATEGORY_PHYSICAL,	/* 신체적 어빌리티 */
-	CATEGORY_MENTAL,	/* 정신적 어빌리티 */
-	CATEGORY_ATTRIBUTE,	/* 능력 어빌리티 */
-	CATEGORY_NUM_TYPES
 };
 
 enum EJobs
@@ -211,7 +180,7 @@ enum EJobs
 
 enum ESkillGroups
 {
-	SKILL_GROUP_MAX_NUM = 2,
+	SKILL_GROUP_MAX_NUM = 2
 };
 
 enum ERaceFlags
@@ -232,7 +201,7 @@ enum ERaceFlags
 	RACE_FLAG_ATT_ICE	= (1 << 13),
 	RACE_FLAG_ATT_WIND	= (1 << 14),
 	RACE_FLAG_ATT_EARTH	= (1 << 15),
-	RACE_FLAG_ATT_DARK	= (1 << 16),
+	RACE_FLAG_ATT_DARK	= (1 << 16)
 };
 
 enum ELoads
@@ -250,7 +219,7 @@ enum
 	QUICKSLOT_TYPE_ITEM,
 	QUICKSLOT_TYPE_SKILL,
 	QUICKSLOT_TYPE_COMMAND,
-	QUICKSLOT_TYPE_MAX_NUM,
+	QUICKSLOT_TYPE_MAX_NUM
 };
 
 enum EParts
@@ -299,10 +268,8 @@ enum ECharacterPosition
 {
 	POSITION_GENERAL,
 	POSITION_BATTLE,
-	POSITION_DYING,
 	POSITION_SITTING_CHAIR,
 	POSITION_SITTING_GROUND,
-	POSITION_INTRO,
 	POSITION_MAX_NUM
 };
 
@@ -314,7 +281,24 @@ enum EGMLevels
 	GM_HIGH_WIZARD,
 	GM_GOD,
 	GM_IMPLEMENTOR,
-	GM_DISABLE,
+	GM_MAX_NUM,
+};
+
+enum EGMAllowFlags
+{
+	GM_ALLOW_DROP_PLAYER_ITEM = 1 << 0,
+	GM_ALLOW_DROP_GM_ITEM = 1 << 1,
+	GM_ALLOW_EXCHANGE_PLAYER_ITEM_TO_GM = 1 << 2,
+	GM_ALLOW_EXCHANGE_PLAYER_ITEM_TO_PLAYER = 1 << 3,
+	GM_ALLOW_EXCHANGE_GM_ITEM_TO_GM = 1 << 4,
+	GM_ALLOW_EXCHANGE_GM_ITEM_TO_PLAYER = 1 << 5,
+	GM_ALLOW_EXCHANGE_TO_GM = 1 << 6,
+	GM_ALLOW_EXCHANGE_TO_PLAYER = 1 << 7,
+	GM_ALLOW_BUY_PRIVATE_ITEM = 1 << 8,
+	GM_ALLOW_CREATE_PRIVATE_SHOP = 1 << 9,
+	GM_ALLOW_USE_SAFEBOX = 1 << 10,
+	GM_ALLOW_CREATE_PLAYER = 1 << 11,
+	GM_ALLOW_DELETE_PLAYER = 1 << 12,
 };
 
 enum EMobRank
@@ -432,8 +416,8 @@ enum EApplyTypes
 	APPLY_NORMAL_HIT_DAMAGE_BONUS,	// 72 평타 데미지 * (100+x)%
 	APPLY_SKILL_DEFEND_BONUS,		// 73 스킬 데미지 방어 * (100-x)%
 	APPLY_NORMAL_HIT_DEFEND_BONUS,	// 74 평타 데미지 방어 * (100-x)%
-	APPLY_PC_BANG_EXP_BONUS,		// 75 PC방 아이템 EXP 보너스
-	APPLY_PC_BANG_DROP_BONUS,		// 76 PC방 아이템 드롭율 보너스
+	UNUSED_APPLY_PC_BANG_EXP_BONUS,		// 75 PC방 아이템 EXP 보너스
+	UNUSED_APPLY_PC_BANG_DROP_BONUS,		// 76 PC방 아이템 드롭율 보너스
 
 	APPLY_EXTRACT_HP_PCT,			// 77 사용시 HP 소모
 
@@ -466,9 +450,7 @@ enum EApplyTypes
 	APPLY_ACCEDRAIN_RATE			= 97,			//97
 #endif
 
-#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
 	APPLY_RESIST_MAGIC_REDUCTION	= 98,	//98
-#endif
 
 	MAX_APPLY_NUM					= 99,
 };
@@ -479,13 +461,6 @@ enum EOnClickEvents
 	ON_CLICK_SHOP,
 	ON_CLICK_TALK,
 	ON_CLICK_MAX_NUM
-};
-
-enum EOnIdleEvents
-{
-	ON_IDLE_NONE,
-	ON_IDLE_GENERAL,
-	ON_IDLE_MAX_NUM
 };
 
 enum EWindows
@@ -543,7 +518,7 @@ enum EImmuneFlags
 	IMMUNE_CURSE	= (1 << 3),
 	IMMUNE_POISON	= (1 << 4),
 	IMMUNE_TERROR	= (1 << 5),
-	IMMUNE_REFLECT	= (1 << 6),
+	IMMUNE_REFLECT	= (1 << 6)
 };
 
 enum EMobEnchants
@@ -587,13 +562,11 @@ enum
 	SKILL_ATTR_TYPE_NORMAL = 1,
 	SKILL_ATTR_TYPE_MELEE,
 	SKILL_ATTR_TYPE_RANGE,
-	SKILL_ATTR_TYPE_MAGIC
-		/*
-		   SKILL_ATTR_TYPE_FIRE,
-		   SKILL_ATTR_TYPE_ICE,
-		   SKILL_ATTR_TYPE_ELEC,
-		   SKILL_ATTR_TYPE_DARK,
-		   */
+	SKILL_ATTR_TYPE_MAGIC,
+	SKILL_ATTR_TYPE_FIRE,
+	SKILL_ATTR_TYPE_ICE,
+	SKILL_ATTR_TYPE_ELEC,
+	SKILL_ATTR_TYPE_DARK
 };
 
 enum
@@ -601,7 +574,7 @@ enum
 	SKILL_NORMAL,
 	SKILL_MASTER,
 	SKILL_GRAND_MASTER,
-	SKILL_PERFECT_MASTER,
+	SKILL_PERFECT_MASTER
 };
 
 enum EGuildWarType
@@ -623,11 +596,7 @@ enum EGuildWarState
 	GUILD_WAR_ON_WAR,
 	GUILD_WAR_END,
 	GUILD_WAR_OVER,
-	GUILD_WAR_RESERVE,
-
-	GUILD_WAR_DURATION = 30*60, // 1시간
-	GUILD_WAR_WIN_POINT = 1000,
-	GUILD_WAR_LADDER_HALF_PENALTY_TIME = 12*60*60,
+	GUILD_WAR_RESERVE
 };
 
 enum EAttributeSet 
@@ -657,7 +626,7 @@ enum EPrivType
 	PRIV_GOLD_DROP,
 	PRIV_GOLD10_DROP,
 	PRIV_EXP_PCT,
-	MAX_PRIV_NUM,
+	MAX_PRIV_NUM
 };
 
 enum EMoneyLogType
@@ -671,7 +640,7 @@ enum EMoneyLogType
 	MONEY_LOG_MISC,
 	MONEY_LOG_MONSTER_KILL,
 	MONEY_LOG_DROP,
-	MONEY_LOG_TYPE_MAX_NUM,
+	MONEY_LOG_TYPE_MAX_NUM
 };
 
 enum EPremiumTypes
@@ -723,7 +692,6 @@ enum SPECIAL_EFFECT
 #endif
 };
 
-#include "item_length.h"
 
 // inventory의 position을 나타내는 구조체
 // int32_t와의 암시적 형변환이 있는 이유는,
@@ -781,16 +749,13 @@ typedef struct SItemPos
 		case SAFEBOX:
 		case MALL:
 			return false;
-		default:
-			return false;
 		}
 		return false;
 	}
 	
 	bool IsEquipPosition() const
 	{
-		return ((INVENTORY == window_type || EQUIPMENT == window_type) && cell >= INVENTORY_MAX_NUM && cell < INVENTORY_MAX_NUM + WEAR_MAX_NUM)
-			|| IsDragonSoulEquipPosition();
+		return (INVENTORY == window_type || EQUIPMENT == window_type) && ((cell >= INVENTORY_MAX_NUM && cell < INVENTORY_MAX_NUM + WEAR_MAX_NUM) || IsDragonSoulEquipPosition());
 	}
 
 	bool IsDragonSoulEquipPosition() const
@@ -812,19 +777,24 @@ typedef struct SItemPos
 	{
 		return (window_type == rhs.window_type) && (cell == rhs.cell);
 	}
+	bool operator!=(const struct SItemPos& rhs) const
+	{
+		return (window_type != rhs.window_type) || (cell != rhs.cell);
+	}
 	bool operator<(const struct SItemPos& rhs) const
 	{
 		return (window_type < rhs.window_type) || ((window_type == rhs.window_type) && (cell < rhs.cell));
 	}
 } TItemPos;
 
-const TItemPos NPOS (RESERVED_WINDOW, WORD_MAX);
+const SItemPos NPOS (RESERVED_WINDOW, WORD_MAX);
 
-typedef enum
-{
-	SHOP_COIN_TYPE_GOLD, // DEFAULT VALUE
-	SHOP_COIN_TYPE_SECONDARY_COIN,
-} EShopCoinType;
+enum GuildWarStatus {
+	GUILD_WAR_RESULT_OK,
+	GUILD_WAR_RESULT_UNDETERMINED,
+	GUILD_WAR_RESULT_TIMEOUT = 99,
+};
+
 
 #pragma pack(pop)
 

@@ -1,12 +1,10 @@
-// vim:ts=4 sw=4
-#include <map>
 #include "stdafx.h"
 #include "ClientManager.h"
 #include "Main.h"
 #include "CsvReader.h"
 #include "ProtoReader.h"
-
-using namespace std;
+#include <map>
+#include <cctype>
 
 extern int32_t g_test_server;
 extern std::string g_stLocaleNameColumn;
@@ -22,6 +20,7 @@ bool CClientManager::InitializeTables()
 		sys_err("InitializeMobTable FAILED");
 		return false;
 	}
+	sys_log(0, "Mob table initialized!");
 #ifdef ENABLE_PROTO_FROM_DB
 	if (!(bIsProtoReadFromDB?InitializeItemTableFromDB():InitializeItemTable()))
 #else
@@ -31,6 +30,7 @@ bool CClientManager::InitializeTables()
 		sys_err("InitializeItemTable FAILED");
 		return false;
 	}
+	sys_log(0, "Item table initialized!");
 
 #ifdef ENABLE_PROTO_FROM_DB
 	extern bool g_bMirror2DB;
@@ -48,24 +48,28 @@ bool CClientManager::InitializeTables()
 		}
 	}
 #endif
+	sys_log(0, "Mirror tables initialized!");
 
 	if (!InitializeShopTable())
 	{
 		sys_err("InitializeShopTable FAILED");
 		return false;
 	}
+	sys_log(0, "Shop table initialized!");
 
 	if (!InitializeSkillTable())
 	{
 		sys_err("InitializeSkillTable FAILED");
 		return false;
 	}
+	sys_log(0, "Skill table initialized!");
 
 	if (!InitializeRefineTable())
 	{
 		sys_err("InitializeRefineTable FAILED");
 		return false;
 	}
+	sys_log(0, "Refine table initialized!");
 
 	if (!InitializeItemAttrTable())
 	{
@@ -108,13 +112,7 @@ bool CClientManager::InitializeTables()
 
 bool CClientManager::InitializeRefineTable()
 {
-	char query[2048];
-
-	snprintf(query, sizeof(query),
-			"SELECT id, cost, prob, vnum0, count0, vnum1, count1, vnum2, count2,  vnum3, count3, vnum4, count4 FROM refine_proto%s",
-			GetTablePostfix());
-
-	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery("SELECT id, cost, prob, vnum0, count0, vnum1, count1, vnum2, count2, vnum3, count3, vnum4, count4 FROM refine_proto"));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!pRes->uiNumRows)
@@ -127,7 +125,7 @@ bool CClientManager::InitializeRefineTable()
 		m_pRefineTable = nullptr;
 	}
 
-	m_iRefineTableSize = pRes->uiNumRows;
+	m_iRefineTableSize = static_cast<int32_t>(pRes->uiNumRows);
 
 	m_pRefineTable	= new TRefineTable[m_iRefineTableSize];
 	memset(m_pRefineTable, 0, sizeof(TRefineTable) * m_iRefineTableSize);
@@ -150,7 +148,7 @@ bool CClientManager::InitializeRefineTable()
 		//@ikd tofix material == 0 
 		prt->material_count = REFINE_MATERIAL_MAX_NUM;
 
-		for (int32_t i = 0; i < REFINE_MATERIAL_MAX_NUM; i++)
+		for (uint8_t i = 0; i < REFINE_MATERIAL_MAX_NUM; i++)
 		{
 			str_to_number(prt->materials[i].vnum, data[col++]);
 			str_to_number(prt->materials[i].count, data[col++]);
@@ -161,7 +159,7 @@ bool CClientManager::InitializeRefineTable()
 			}
 		}
 
-		sys_log(0, "REFINE: id %ld cost %d prob %d mat1 %lu cnt1 %d", prt->id, prt->cost, prt->prob, prt->materials[0].vnum, prt->materials[0].count);
+		sys_log(0, "REFINE: id %d cost %d prob %d mat1 %u cnt1 %d", prt->id, prt->cost, prt->prob, prt->materials[0].vnum, prt->materials[0].count);
 
 		prt++;
 	}
@@ -177,54 +175,30 @@ class FCompareVnum
 		}
 };
 
-bool CClientManager::InitializeMobTable()
+bool CClientManager::InitializeMobTableFile()
 {
-	//================== 함수 설명 ==================//
-	//1. 요약 : 'mob_proto.txt', 'mob_proto_test.txt', 'mob_names.txt' 파일을 읽고,
-	//		(!)[mob_table] 테이블 오브젝트를 생성한다. (타입 : TMobTable)
-	//2. 순서
-	//	1) 'mob_names.txt' 파일을 읽어서 (a)[localMap](vnum:name) 맵을 만든다.
-	//	2) 'mob_proto_test.txt'파일과 (a)[localMap] 맵으로
-	//		(b)[test_map_mobTableByVnum](vnum:TMobTable) 맵을 생성한다.
-	//	3) 'mob_proto.txt' 파일과  (a)[localMap] 맵으로
-	//		(!)[mob_table] 테이블을 만든다.
-	//			<참고>
-	//			각 row 들 중, 
-	//			(b)[test_map_mobTableByVnum],(!)[mob_table] 모두에 있는 row는
-	//			(b)[test_map_mobTableByVnum]의 것을 사용한다.
-	//	4) (b)[test_map_mobTableByVnum]의 row중, (!)[mob_table]에 없는 것을 추가한다.
-	//3. 테스트
-	//	1)'mob_proto.txt' 정보가 mob_table에 잘 들어갔는지. -> 완료
-	//	2)'mob_names.txt' 정보가 mob_table에 잘 들어갔는지.
-	//	3)'mob_proto_test.txt' 에서 [겹치는] 정보가 mob_table 에 잘 들어갔는지.
-	//	4)'mob_proto_test.txt' 에서 [새로운] 정보가 mob_table 에 잘 들어갔는지.
-	//	5) (최종) 게임 클라이언트에서 제대로 작동 하는지.
-	//_______________________________________________//
+	std::map<int32_t, const char*> localMap;
 
-
-	//===============================================//
-	//	1) 'mob_names.txt' 파일을 읽어서 (a)[localMap] 맵을 만든다.
-	//<(a)localMap 맵 생성>
-	map<int32_t,const char*> localMap;
-	//bool isNameFile = true;
-	//<파일 읽기>
 	cCsvTable nameData;
-	if(!nameData.Load("mob_names.txt",'\t'))
+	if (!nameData.Load("mob_names.txt", '\t'))
 	{
-		fprintf(stderr, "Could not load mob_names.txt\n");
-	} else {
-		nameData.Next();	//설명row 생략.
-		while(nameData.Next()) {
-			localMap[atoi(nameData.AsStringByIndex(0))] = nameData.AsStringByIndex(1);
-		}
+		fprintf(stderr, "mob_names.txt doesn't exist/incorrect format. Using mob_proto names!\n");
+		return false;
 	}
-	//________________________________________________//
+
+	nameData.Next();
+
+	while (nameData.Next())
+	{
+		localMap[atoi(nameData.AsStringByIndex(0))] = nameData.AsStringByIndex(1);
+	}
+
 
 	cCsvTable data;
 
 	if(!data.Load("mob_proto.txt",'\t'))
 	{
-		fprintf(stderr, "Could not load mob_proto.txt. Wrong file format?\n");
+		fprintf(stderr, "mob_proto.txt doesn't exist or is incorrectly formatted\n");
 		return false;
 	}
 	data.Next(); 
@@ -238,22 +212,35 @@ bool CClientManager::InitializeMobTable()
 	memset(&m_vec_mobTable[0], 0, sizeof(TMobTable) * m_vec_mobTable.size());
 	TMobTable * mob_table = &m_vec_mobTable[0];
 	
-	while (data.Next())
+	for (; data.Next(); ++mob_table)
 	{
 
 		if (!Set_Proto_Mob_Table(mob_table, data, localMap))
-		{
-			fprintf(stderr, "Could not process entry.\n");
-		}
+			fprintf(stderr, "Unable to set current proto table entry into mob_table VNUM: %d.\n", mob_table->dwVnum);
 
-		sys_log(1, "MOB #%-5d %-24s %-24s level: %-3u rank: %u empire: %d", mob_table->dwVnum, mob_table->szName, mob_table->szLocaleName, mob_table->bLevel, mob_table->bRank, mob_table->bEmpire);
-		++mob_table;
-
+		sys_log(0, "MOB #%-5d %-24s level: %-3u rank: %u empire: %d", mob_table->dwVnum, mob_table->szLocaleName, mob_table->bLevel, mob_table->bRank, mob_table->bEmpire);
 	}
 	//_____________________________________________________//
 
 	sort(m_vec_mobTable.begin(), m_vec_mobTable.end(), FCompareVnum());
+
+	data.Destroy();
+	nameData.Destroy();
 	return true;
+}
+
+
+bool CClientManager::InitializeMobTable()
+{
+	sys_log(0, "InitializeMobTable: Loading from file ...");
+	bool res = InitializeMobTableFile();
+	if (!res)
+	{
+		sys_log(0, "InitializeMobTable: Loading from file failed.");
+	}
+	sys_log(0, "InitializeMobTable: Loaded %u mobs.\n", m_vec_mobTable.size());
+
+	return res;
 }
 
 bool CClientManager::InitializeShopTable()
@@ -339,113 +326,22 @@ bool CClientManager::InitializeShopTable()
 	return true;
 }
 
-bool CClientManager::InitializeQuestItemTable()
+bool CClientManager::InitializeItemTableFile()
 {
-	using namespace std;
-
-	static const char * s_szQuery = "SELECT vnum, name, %s FROM quest_item_proto ORDER BY vnum";
-
-	char query[1024];
-	snprintf(query, sizeof(query), s_szQuery, g_stLocaleNameColumn.c_str());
-
-	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
-	SQLResult * pRes = pkMsg->Get();
-
-	if (!pRes->uiNumRows)
-	{
-		sys_err("query error or no rows: %s", query);
-		return false;
-	}
-
-	MYSQL_ROW row;
-
-	while ((row = mysql_fetch_row(pRes->pSQLResult)))
-	{
-		int32_t col = 0;
-
-		TItemTable tbl;
-		memset(&tbl, 0, sizeof(tbl));
-
-		str_to_number(tbl.dwVnum, row[col++]);
-
-		if (row[col])
-			strlcpy(tbl.szName, row[col], sizeof(tbl.szName));
-
-		col++;
-
-		if (row[col])
-			strlcpy(tbl.szLocaleName, row[col], sizeof(tbl.szLocaleName));
-
-		col++;
-
-		if (m_map_itemTableByVnum.find(tbl.dwVnum) != m_map_itemTableByVnum.end())
-		{
-			sys_err("QUEST_ITEM_ERROR! %lu vnum already exist! (name %s)", tbl.dwVnum, tbl.szLocaleName);
-			continue;
-		}
-
-		tbl.bType = ITEM_QUEST; // quest_item_proto 테이블에 있는 것들은 모두 ITEM_QUEST 유형
-		tbl.bSize = 1;
-
-		m_vec_itemTable.push_back(tbl);
-	}
-
-	return true;
-}
-
-bool CClientManager::InitializeItemTable()
-{
-	//================== 함수 설명 ==================//
-	//1. 요약 : 'item_proto.txt', 'item_proto_test.txt', 'item_names.txt' 파일을 읽고,
-	//		<item_table>(TItemTable), <m_map_itemTableByVnum> 오브젝트를 생성한다.
-	//2. 순서
-	//	1) 'item_names.txt' 파일을 읽어서 (a)[localMap](vnum:name) 맵을 만든다.
-	//	2) 'item_proto_text.txt'파일과 (a)[localMap] 맵으로
-	//		(b)[test_map_itemTableByVnum](vnum:TItemTable) 맵을 생성한다.
-	//	3) 'item_proto.txt' 파일과  (a)[localMap] 맵으로
-	//		(!)[item_table], <m_map_itemTableByVnum>을 만든다.
-	//			<참고>
-	//			각 row 들 중, 
-	//			(b)[test_map_itemTableByVnum],(!)[mob_table] 모두에 있는 row는
-	//			(b)[test_map_itemTableByVnum]의 것을 사용한다.
-	//	4) (b)[test_map_itemTableByVnum]의 row중, (!)[item_table]에 없는 것을 추가한다.
-	//3. 테스트
-	//	1)'item_proto.txt' 정보가 item_table에 잘 들어갔는지. -> 완료
-	//	2)'item_names.txt' 정보가 item_table에 잘 들어갔는지.
-	//	3)'item_proto_test.txt' 에서 [겹치는] 정보가 item_table 에 잘 들어갔는지.
-	//	4)'item_proto_test.txt' 에서 [새로운] 정보가 item_table 에 잘 들어갔는지.
-	//	5) (최종) 게임 클라이언트에서 제대로 작동 하는지.
-	//_______________________________________________//
-
-
-
-	//=================================================================================//
-	//	1) 'item_names.txt' 파일을 읽어서 (a)[localMap](vnum:name) 맵을 만든다.
-	//=================================================================================//
-	map<int32_t,const char*> localMap;
+	std::map<int32_t, const char *> localMap;
 	cCsvTable nameData;
-	if(!nameData.Load("item_names.txt",'\t'))
+	if (!nameData.Load("item_names.txt", '\t'))
 	{
-		fprintf(stderr, "Could not load item_names.txt.\n");
-	} else {
-		nameData.Next();
-		while(nameData.Next()) {
-			localMap[atoi(nameData.AsStringByIndex(0))] = nameData.AsStringByIndex(1);
-		}
+		fprintf(stderr, "item_names.txt couldn't be loaded or its format is incorrect.\n");
+		return false; // There's no reason to continue without names for us (i dont like korean)
 	}
-	//_________________________________________________________________//
 
+	nameData.Next(); // skip the description
 
-
-	
-	cCsvTable data;
-	if(!data.Load("item_proto.txt",'\t'))
+	while (nameData.Next())
 	{
-		fprintf(stderr, "Could not load item_proto.txt. Wrong file format?\n");
-		return false;
+		localMap[atoi(nameData.AsStringByIndex(0))] = nameData.AsStringByIndex(1);
 	}
-	data.Next(); 
-
 	if (!m_vec_itemTable.empty())
 	{
 		sys_log(0, "RELOAD: item_proto");
@@ -453,65 +349,48 @@ bool CClientManager::InitializeItemTable()
 		m_map_itemTableByVnum.clear();
 	}
 
-	
-	data.Destroy();
+	//data를 다시 첫줄로 옮긴다.(다시 읽어온다;;)
+	cCsvTable data;
 	if(!data.Load("item_proto.txt",'\t'))
 	{
-		fprintf(stderr, "Could not load item_proto.txt. Wrong file format?\n");
+		fprintf(stderr, "item_proto.txt couldn't be loaded or the format is incorrect \n");
 		return false;
 	}
-	data.Next(); 
+	data.Next(); //맨 윗줄 제외 (아이템 칼럼을 설명하는 부분)
 
 	m_vec_itemTable.resize(data.m_File.GetRowCount() - 1);
 	memset(&m_vec_itemTable[0], 0, sizeof(TItemTable) * m_vec_itemTable.size());
 
 	TItemTable * item_table = &m_vec_itemTable[0];
 
-	while (data.Next())
+	for (; data.Next(); ++item_table)
 	{
 		if (!Set_Proto_Item_Table(item_table, data, localMap))
-		{
-			fprintf(stderr, "Failed to load item_proto table.\n");
-		}
-
-		m_map_itemTableByVnum.insert(std::map<uint32_t, TItemTable *>::value_type(item_table->dwVnum, item_table));
-		++item_table;
-	}
-	//_______________________________________________________________________//
-
-	// QUEST_ITEM_PROTO_DISABLE
-	// InitializeQuestItemTable();
-	// END_OF_QUEST_ITEM_PROTO_DISABLE
-
-	m_map_itemTableByVnum.clear();
-
-	auto it = m_vec_itemTable.begin();
-
-	while (it != m_vec_itemTable.end())
-	{
-		TItemTable * item_table = &(*(it++));
-
-		sys_log(1, "ITEM: #%-5lu %-24s %-24s VAL: %ld %ld %ld %ld %ld %ld WEAR %lu ANTI %lu IMMUNE %lu REFINE %lu REFINE_SET %u MAGIC_PCT %u", 
-				item_table->dwVnum,
-				item_table->szName,
-				item_table->szLocaleName,
-				item_table->alValues[0],
-				item_table->alValues[1],
-				item_table->alValues[2],
-				item_table->alValues[3],
-				item_table->alValues[4],
-				item_table->alValues[5],
-				item_table->dwWearFlags,
-				item_table->dwAntiFlags,
-				item_table->dwImmuneFlag,
-				item_table->dwRefinedVnum,
-				item_table->wRefineSet,
-				item_table->bAlterToMagicItemPct);
+			fprintf(stderr, "Invalid item table. VNUM: %d\n", item_table->dwVnum);
 
 		m_map_itemTableByVnum.insert(std::map<uint32_t, TItemTable *>::value_type(item_table->dwVnum, item_table));
 	}
+	
 	sort(m_vec_itemTable.begin(), m_vec_itemTable.end(), FCompareVnum());
+
+	data.Destroy();
+	nameData.Destroy();
+
 	return true;
+
+}
+
+bool CClientManager::InitializeItemTable()
+{
+	sys_log(0, "InitializeItemTable: Loading from file ...");
+	bool res = InitializeItemTableFile();
+	if (!res)
+	{
+		sys_log(0, "InitializeItemTable: Loading from file failed.");
+	}
+	sys_log(0, "InitializeItemTable: Loaded %u items.\n", m_vec_itemTable.size());
+
+	return res;
 }
 
 
@@ -525,8 +404,7 @@ bool CClientManager::InitializeSkillTable()
 		"szPointOn2, szPointPoly2, szDurationPoly2, setAffectFlag2+0, "
 		"szPointOn3, szPointPoly3, szDurationPoly3, szGrandMasterAddSPCostPoly, "
 		"bLevelStep, bLevelLimit, prerequisiteSkillVnum, prerequisiteSkillLevel, iMaxHit, szSplashAroundDamageAdjustPoly, eSkillType+0, dwTargetRange "
-		"FROM skill_proto%s ORDER BY dwVnum",
-		GetTablePostfix());
+		"FROM skill_proto ORDER BY dwVnum");
 
 	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
@@ -543,7 +421,7 @@ bool CClientManager::InitializeSkillTable()
 		m_vec_skillTable.clear();
 	}
 
-	m_vec_skillTable.reserve(pRes->uiNumRows);
+	m_vec_skillTable.reserve(static_cast<uint32_t>(pRes->uiNumRows));
 
 	MYSQL_ROW	data;
 	int32_t		col;
@@ -644,8 +522,7 @@ bool CClientManager::InitializeItemAttrTable()
 			", costume_weapon"
 #endif
 #endif
-			" FROM item_attr%s ORDER BY apply",
-			GetTablePostfix());
+			" FROM item_attr ORDER BY apply");
 
 	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
@@ -662,7 +539,7 @@ bool CClientManager::InitializeItemAttrTable()
 		m_vec_itemAttrTable.clear();
 	}
 
-	m_vec_itemAttrTable.reserve(pRes->uiNumRows);
+	m_vec_itemAttrTable.reserve(static_cast<uint32_t>(pRes->uiNumRows));
 
 	MYSQL_ROW	data;
 
@@ -746,8 +623,7 @@ bool CClientManager::InitializeItemRareTable()
 			", costume_weapon"
 #endif
 #endif
-			" FROM item_attr_rare%s ORDER BY apply",
-			GetTablePostfix());
+			" FROM item_attr_rare ORDER BY apply");
 
 	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
@@ -764,7 +640,7 @@ bool CClientManager::InitializeItemRareTable()
 		m_vec_itemRareTable.clear();
 	}
 
-	m_vec_itemRareTable.reserve(pRes->uiNumRows);
+	m_vec_itemRareTable.reserve(static_cast<uint32_t>(pRes->uiNumRows));
 
 	MYSQL_ROW	data;
 
@@ -845,8 +721,7 @@ bool CClientManager::InitializeLandTable()
 
 	snprintf(query, sizeof(query),
 		"SELECT id, map_index, x, y, width, height, guild_id, guild_level_limit, price "
-		"FROM land%s WHERE enable='YES' ORDER BY id",
-		GetTablePostfix());
+		"FROM land WHERE enable='YES' ORDER BY id");
 
 	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
@@ -857,7 +732,7 @@ bool CClientManager::InitializeLandTable()
 		m_vec_kLandTable.clear();
 	}
 
-	m_vec_kLandTable.reserve(pRes->uiNumRows);
+	m_vec_kLandTable.reserve(static_cast<uint32_t>(pRes->uiNumRows));
 
 	MYSQL_ROW	data;
 
@@ -880,7 +755,7 @@ bool CClientManager::InitializeLandTable()
 			str_to_number(t.bGuildLevelLimit, data[col++]);
 			str_to_number(t.dwPrice, data[col++]);
 
-			sys_log(0, "LAND: %lu map %-4ld %7ldx%-7ld w %-4ld h %-4ld", t.dwID, t.lMapIndex, t.x, t.y, t.width, t.height);
+			sys_log(0, "LAND: %u map %-4ld %7ldx%-7ld w %-4ld h %-4ld", t.dwID, t.lMapIndex, t.x, t.y, t.width, t.height);
 
 			m_vec_kLandTable.push_back(t);
 		}
@@ -900,9 +775,9 @@ void parse_pair_number_string(const char * c_pszString, std::vector<std::pair<in
 
 	while (p)
 	{
-		if (isnhdigit(*t))
+		if (isdigit(*t))
 		{
-			strlcpy(szNum, t, MIN(sizeof(szNum), (p-t)+1));
+			strlcpy(szNum, t, MIN(sizeof(szNum), static_cast<std::size_t>((p-t)+1)));
 
 			comma = strchr(szNum, ',');
 
@@ -922,7 +797,7 @@ void parse_pair_number_string(const char * c_pszString, std::vector<std::pair<in
 		p = strchr(t, '/');
 	}
 
-	if (isnhdigit(*t))
+	if (isdigit(*t))
 	{
 		strlcpy(szNum, t, sizeof(szNum));
 
@@ -945,70 +820,72 @@ bool CClientManager::InitializeObjectProto()
 {
 	using namespace building;
 
-	char query[4096];
-	snprintf(query, sizeof(query),
-			"SELECT vnum, price, materials, upgrade_vnum, upgrade_limit_time, life, reg_1, reg_2, reg_3, reg_4, npc, group_vnum, dependent_group "
-			"FROM object_proto%s ORDER BY vnum",
-			GetTablePostfix());
-
-	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
-	SQLResult * pRes = pkMsg->Get();
-
 	if (!m_vec_kObjectProto.empty())
 	{
 		sys_log(0, "RELOAD: object_proto");
 		m_vec_kObjectProto.clear();
 	}
 
-	m_vec_kObjectProto.reserve(MAX(0, pRes->uiNumRows));
+	cCsvTable data;
+	if (!data.Load("object_proto.txt", '\t'))
+	{
+		fprintf(stderr, "object_proto.txt couldn't be loaded or the format is incorrect \n");
+		return false;
+	}
 
-	MYSQL_ROW	data;
+	data.Next(); // skip first row (descriptions)
 
-	if (pRes->uiNumRows > 0)
-		while ((data = mysql_fetch_row(pRes->pSQLResult)))
+	m_vec_kObjectProto.resize(data.m_File.GetRowCount() - 1); // set the size of the vector
+	memset(&m_vec_kObjectProto[0], 0, sizeof(TObjectProto) * m_vec_kObjectProto.size()); // zero initialize
+
+	while (data.Next())
+	{
+		TObjectProto t;
+
+		memset(&t, 0, sizeof(t));
+
+		str_to_number(t.dwVnum, data.AsStringByIndex(0));
+
+		str_to_number(t.lRegion[0], data.AsStringByIndex(4));
+		str_to_number(t.lRegion[1], data.AsStringByIndex(5));
+		str_to_number(t.lRegion[2], data.AsStringByIndex(6));
+		str_to_number(t.lRegion[3], data.AsStringByIndex(7));
+
+		str_to_number(t.dwPrice, data.AsStringByIndex(11));
+		
+		std::vector<std::pair<int32_t, int32_t> > vec;
+		parse_pair_number_string(data.AsStringByIndex(12), vec);
+
+		for (uint32_t i = 0; i < OBJECT_MATERIAL_MAX_NUM && i < vec.size(); ++i)
 		{
-			TObjectProto t;
+			std::pair<int32_t, int32_t> & r = vec[i];
 
-			memset(&t, 0, sizeof(t));
-
-			int32_t col = 0;
-
-			str_to_number(t.dwVnum, data[col++]);
-			str_to_number(t.dwPrice, data[col++]);
-
-			std::vector<std::pair<int32_t, int32_t> > vec;
-			parse_pair_number_string(data[col++], vec);
-
-			for (uint32_t i = 0; i < OBJECT_MATERIAL_MAX_NUM && i < vec.size(); ++i)
-			{
-				std::pair<int32_t, int32_t> & r = vec[i];
-
-				t.kMaterials[i].dwItemVnum = r.first;
-				t.kMaterials[i].dwCount = r.second;
-			}
-
-			str_to_number(t.dwUpgradeVnum, data[col++]);
-			str_to_number(t.dwUpgradeLimitTime, data[col++]);
-			str_to_number(t.lLife, data[col++]);
-			str_to_number(t.lRegion[0], data[col++]);
-			str_to_number(t.lRegion[1], data[col++]);
-			str_to_number(t.lRegion[2], data[col++]);
-			str_to_number(t.lRegion[3], data[col++]);
-
-			// ADD_BUILDING_NPC
-			str_to_number(t.dwNPCVnum, data[col++]);
-			str_to_number(t.dwGroupVnum, data[col++]);
-			str_to_number(t.dwDependOnGroupVnum, data[col++]);
-
-			t.lNPCX = 0;
-			t.lNPCY = MAX(t.lRegion[1], t.lRegion[3])+300;
-			// END_OF_ADD_BUILDING_NPC
-
-			sys_log(0, "OBJ_PROTO: vnum %lu price %lu mat %lu %lu",
-					t.dwVnum, t.dwPrice, t.kMaterials[0].dwItemVnum, t.kMaterials[0].dwCount);
-
-			m_vec_kObjectProto.push_back(t);
+			t.kMaterials[i].dwItemVnum = r.first;
+			t.kMaterials[i].dwCount = r.second;
 		}
+
+		// ADD_BUILDING_NPC
+		str_to_number(t.dwNPCVnum, data.AsStringByIndex(13));
+		str_to_number(t.dwGroupVnum, data.AsStringByIndex(14));
+		str_to_number(t.dwDependOnGroupVnum, data.AsStringByIndex(15));
+
+		t.lNPCX = 0;
+		t.lNPCY = MAX(t.lRegion[1], t.lRegion[3])+300;
+		// END_OF_ADD_BUILDING_NPC
+
+		sys_log(0, "OBJ_PROTO: vnum %u price %u mat %u %u", t.dwVnum, t.dwPrice, t.kMaterials[0].dwItemVnum, t.kMaterials[0].dwCount);
+
+		m_vec_kObjectProto.push_back(t);
+	}
+
+	std::sort(m_vec_kObjectProto.begin(), m_vec_kObjectProto.end(),
+		[](const TObjectProto& a, const TObjectProto& b) -> bool
+		{
+			return a.dwVnum > b.dwVnum;
+		}
+	);
+
+	data.Destroy();
 
 	return true;
 }
@@ -1018,7 +895,7 @@ bool CClientManager::InitializeObjectTable()
 	using namespace building;
 
 	char query[4096];
-	snprintf(query, sizeof(query), "SELECT id, land_id, vnum, map_index, x, y, x_rot, y_rot, z_rot, life FROM object%s ORDER BY id", GetTablePostfix());
+	snprintf(query, sizeof(query), "SELECT id, land_id, vnum, map_index, x, y, x_rot, y_rot, z_rot, life FROM object ORDER BY id");
 
 	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
@@ -1034,7 +911,7 @@ bool CClientManager::InitializeObjectTable()
 	if (pRes->uiNumRows > 0)
 		while ((data = mysql_fetch_row(pRes->pSQLResult)))
 		{
-			TObject * k = new TObject;
+			auto k = new TObject;
 
 			memset(k, 0, sizeof(TObject));
 
@@ -1051,7 +928,7 @@ bool CClientManager::InitializeObjectTable()
 			str_to_number(k->zRot, data[col++]);
 			str_to_number(k->lLife, data[col++]);
 
-			sys_log(0, "OBJ: %lu vnum %lu map %-4ld %7ldx%-7ld life %ld", 
+			sys_log(0, "OBJ: %u vnum %u map %-4ld %7ldx%-7ld life %d",
 					k->dwID, k->dwVnum, k->lMapIndex, k->x, k->y, k->lLife);
 
 			m_map_pkObjectTable.insert(std::make_pair(k->dwID, k));
@@ -1069,7 +946,7 @@ bool CClientManager::MirrorMobTableIntoDB()
 		if (g_stLocaleNameColumn == "name")
 		{
 			snprintf(query, sizeof(query),
-				"replace into mob_proto%s "
+				"replace into mob_proto "
 				"("
 				"vnum, name, type, `rank`, battle_type, level, size, ai_flag, setRaceFlag, setImmuneFlag, "
 				"on_click, empire, drop_item, resurrection_vnum, folder, "
@@ -1101,8 +978,6 @@ bool CClientManager::MirrorMobTableIntoDB()
 				"%u, %u, %u, %u, "
 				"%u, %u, %u, %u, %u"
 				")",
-				GetTablePostfix(), /*g_stLocaleNameColumn.c_str(),*/
-
 				t.dwVnum, t.szName, /*t.szLocaleName, */t.bType, t.bRank, t.bBattleType, t.bLevel, t.bSize, t.dwAIFlag, t.dwRaceFlag, t.dwImmuneFlag,
 				t.bOnClickType, t.bEmpire, t.dwDropItemVnum, t.dwResurrectionVnum, t.szFolder,
 				t.bStr, t.bDex, t.bCon, t.bInt, t.dwDamageRange[0], t.dwDamageRange[1], t.dwMaxHP, t.bRegenCycle, t.bRegenPercent, t.dwExp,
@@ -1121,7 +996,7 @@ bool CClientManager::MirrorMobTableIntoDB()
 		else
 		{
 			snprintf(query, sizeof(query),
-				"replace into mob_proto%s "
+				"replace into mob_proto "
 				"("
 				"vnum, name, %s, type, `rank`, battle_type, level, size, ai_flag, setRaceFlag, setImmuneFlag, "
 				"on_click, empire, drop_item, resurrection_vnum, folder, "
@@ -1153,7 +1028,7 @@ bool CClientManager::MirrorMobTableIntoDB()
 				"%u, %u, %u, %u, "
 				"%u, %u, %u, %u, %u"
 				")",
-				GetTablePostfix(), g_stLocaleNameColumn.c_str(),
+				g_stLocaleNameColumn.c_str(),
 
 				t.dwVnum, t.szName, t.szLocaleName, t.bType, t.bRank, t.bBattleType, t.bLevel, t.bSize, t.dwAIFlag, t.dwRaceFlag, t.dwImmuneFlag,
 				t.bOnClickType, t.bEmpire, t.dwDropItemVnum, t.dwResurrectionVnum, t.szFolder,
@@ -1185,7 +1060,7 @@ bool CClientManager::MirrorItemTableIntoDB()
 			const TItemTable& t = *it;
 			char query[4096];
 			snprintf(query, sizeof(query),
-				"replace into item_proto%s ("
+				"replace into item_proto (" //1
 				"vnum, type, subtype, name, %s, gold, shop_buy_price, weight, size, "
 				"flag, wearflag, antiflag, immuneflag, "
 				"refined_vnum, refine_set, magic_pct, socket_pct, addon_type, "
@@ -1196,10 +1071,10 @@ bool CClientManager::MirrorItemTableIntoDB()
 				"%u, %u, %u, \"%s\", \"%s\", %u, %u, %u, %u, " //11
 				"%u, %u, %u, %u, " //15
 				"%u, %d, %u, %u, %d, " //20
-				"%u, %ld, %u, %ld, " //24
-				"%u, %ld, %u, %ld, %u, %ld, " //30
-				"%ld, %ld, %ld, %ld, %ld, %ld )", //36
-				GetTablePostfix(), g_stLocaleNameColumn.c_str(), 
+				"%u, %d, %u, %d, " //24
+				"%u, %d, %u, %d, %u, %d, " //30
+				"%d, %d, %d, %d, %d, %d )", //36
+				g_stLocaleNameColumn.c_str(), //2
 				t.dwVnum, t.bType, t.bSubType, t.szName, t.szLocaleName, t.dwGold, t.dwShopBuyPrice, t.bWeight, t.bSize,
 				t.dwFlags, t.dwWearFlags, t.dwAntiFlags, t.dwImmuneFlag, 
 				t.dwRefinedVnum, t.wRefineSet, t.bAlterToMagicItemPct, t.bGainSocketPct, t.sAddonType,
@@ -1213,7 +1088,7 @@ bool CClientManager::MirrorItemTableIntoDB()
 			const TItemTable& t = *it;
 			char query[4096];
 			snprintf(query, sizeof(query),
-				"replace into item_proto%s ("
+				"replace into item_proto ("
 				"vnum, type, subtype, name, gold, shop_buy_price, weight, size, "
 				"flag, wearflag, antiflag, immuneflag, "
 				"refined_vnum, refine_set, magic_pct, socket_pct, addon_type, "
@@ -1224,10 +1099,9 @@ bool CClientManager::MirrorItemTableIntoDB()
 				"%d, %d, %d, \"%s\", %d, %d, %d, %d, "
 				"%d, %d, %d, %d, "
 				"%d, %d, %d, %d, %d, "
-				"%d, %ld, %d, %ld, "
-				"%d, %ld, %d, %ld, %d, %ld, "
-				"%ld, %ld, %ld, %ld, %ld, %ld )",
-				GetTablePostfix(), 
+				"%d, %d, %d, %d, "
+				"%d, %d, %d, %d, %d, %d, "
+				"%d, %d, %d, %d, %d, %d )",
 				t.dwVnum, t.bType, t.bSubType, t.szName, t.dwGold, t.dwShopBuyPrice, t.bWeight, t.bSize,
 				t.dwFlags, t.dwWearFlags, t.dwAntiFlags, t.dwImmuneFlag, 
 				t.dwRefinedVnum, t.wRefineSet, t.bAlterToMagicItemPct, t.bGainSocketPct, t.sAddonType,
@@ -1296,9 +1170,8 @@ bool CClientManager::InitializeMobTableFromDB()
 		" resist_fire, resist_elect, resist_magic, resist_wind, resist_poison, dam_multiply, summon, drain_sp,"
 		" skill_vnum0, skill_level0, skill_vnum1, skill_level1, skill_vnum2, skill_level2, skill_vnum3, skill_level3,"
 		" skill_vnum4, skill_level4, sp_berserk, sp_stoneskin, sp_godspeed, sp_deathblow, sp_revive"
-		" FROM mob_proto%s ORDER BY vnum;",
-		g_stLocaleNameColumn.c_str(),
-		GetTablePostfix()
+		" FROM mob_proto ORDER BY vnum;",
+		g_stLocaleNameColumn.c_str()
 	);
 
 	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
@@ -1450,8 +1323,9 @@ enum IProtoT
 
 bool CClientManager::InitializeItemTableFromDB()
 {
-	char query[2048];
 	fprintf(stdout, "Loading item_proto from MySQL\n");
+
+	char query[2048];
 	snprintf(query, sizeof(query),
 		"SELECT vnum, type, subtype, name, %s, gold, shop_buy_price, weight, size,"
 		" flag, wearflag, antiflag, immuneflag+0, refined_vnum, refine_set, magic_pct,"
@@ -1461,9 +1335,8 @@ bool CClientManager::InitializeItemTableFromDB()
 #if !defined(ENABLE_AUTODETECT_VNUMRANGE)
 		" , vnum_range"
 #endif
-		" FROM item_proto%s ORDER BY vnum;",
-		g_stLocaleNameColumn.c_str(),
-		GetTablePostfix()
+		" FROM item_proto ORDER BY vnum;",
+		g_stLocaleNameColumn.c_str()
 	);
 
 	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
@@ -1555,7 +1428,7 @@ bool CClientManager::InitializeItemTableFromDB()
 #endif
 
 		m_map_itemTableByVnum.insert(std::map<uint32_t, TItemTable *>::value_type(item_table->dwVnum, item_table));
-		sys_log(0, "ITEM: #%-5lu %-24s %-24s VAL: %d %ld %d %d %d %d WEAR %d ANTI %d IMMUNE %d REFINE %lu REFINE_SET %u MAGIC_PCT %u",
+		sys_log(0, "ITEM: #%-5lu %-24s %-24s VAL: %d %d %d %d %d %d WEAR %d ANTI %d IMMUNE %d REFINE %u REFINE_SET %u MAGIC_PCT %u",
 			item_table->dwVnum,
 			item_table->szName,
 			item_table->szLocaleName,

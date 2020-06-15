@@ -9,7 +9,7 @@ class CSoundManagerStream : public CSoundBase
 	public:
 		enum
 		{
-			MUSIC_INSTANCE_MAX_NUM = 3,
+			MUSIC_INSTANCE_MAX_NUM = 3
 		};
 
 	public:

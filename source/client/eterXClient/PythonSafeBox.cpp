@@ -8,11 +8,8 @@ void CPythonSafeBox::OpenSafeBox(int32_t iSize)
 	m_ItemInstanceVector.clear();
 	m_ItemInstanceVector.resize(SAFEBOX_SLOT_X_COUNT * iSize);
 
-	for (uint32_t i = 0; i < m_ItemInstanceVector.size(); ++i)
-	{
-		TItemData & rInstance = m_ItemInstanceVector[i];
+	for (auto & rInstance : m_ItemInstanceVector)
 		ZeroMemory(&rInstance, sizeof(rInstance));
-	}
 }
 
 void CPythonSafeBox::SetItemData(uint32_t dwSlotIndex, const TItemData & rItemInstance)
@@ -84,11 +81,8 @@ void CPythonSafeBox::OpenMall(int32_t iSize)
 	m_MallItemInstanceVector.clear();
 	m_MallItemInstanceVector.resize(SAFEBOX_SLOT_X_COUNT * iSize);
 
-	for (uint32_t i = 0; i < m_MallItemInstanceVector.size(); ++i)
-	{
-		TItemData & rInstance = m_MallItemInstanceVector[i];
+	for (auto & rInstance : m_MallItemInstanceVector)
 		ZeroMemory(&rInstance, sizeof(rInstance));
-	}
 }
 
 void CPythonSafeBox::SetMallItemData(uint32_t dwSlotIndex, const TItemData & rItemData)

@@ -7,6 +7,10 @@
 #endif
 #include "../eterBase/tea.h"
 #include "NetAddress.h"
+#include <vector>
+#ifndef VC_EXTRALEAN
+	#include <winsock.h>
+#endif
 
 class CNetworkStream
 {

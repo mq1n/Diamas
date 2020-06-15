@@ -1,9 +1,10 @@
 #include "StdAfx.h"
-#include "../eterlib/Camera.h"
+#include "../eterLib/Camera.h"
 #include "../eterLib/TextBar.h"
 #include "../eterLib/GrpDummyFrameBuffer.h"
 
-#include <shlobj.h>
+#include <ShlObj.h>
+#include <filesystem>
 
 PyObject* grpCreateTextBar(PyObject* poSelf, PyObject* poArgs)
 {
@@ -14,7 +15,7 @@ PyObject* grpCreateTextBar(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 1, &iHeight))
 		return Py_BuildException();
 
-	CTextBar * pTextBar = new CTextBar(12, false);
+	auto* pTextBar = new CTextBar(12, false);
 	if (!pTextBar->Create(nullptr, iWidth, iHeight))
 	{
 		delete pTextBar;
@@ -37,7 +38,7 @@ PyObject* grpCreateBigTextBar(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 2, &iFontSize))
 		return Py_BuildException();
 
-	CTextBar * pTextBar = new CTextBar(iFontSize, true);
+	auto* pTextBar = new CTextBar(iFontSize, true);
 	if (!pTextBar->Create(nullptr, iWidth, iHeight))
 	{
 		delete pTextBar;
@@ -53,7 +54,7 @@ PyObject* grpDestroyTextBar(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
 
-	CTextBar * pTextBar = (CTextBar *)iHandle;
+	auto* pTextBar = reinterpret_cast<CTextBar*>(iHandle);
 	delete pTextBar;
 
 	return Py_BuildNone();
@@ -71,7 +72,7 @@ PyObject* grpRenderTextBar(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 2, &iy))
 		return Py_BuildException();
 
-	CTextBar * pTextBar = (CTextBar *)iHandle;
+	auto* pTextBar = reinterpret_cast<CTextBar*>(iHandle);
 	if (pTextBar)
 		pTextBar->Render(ix, iy);
 
@@ -93,7 +94,7 @@ PyObject* grpTextBarSetTextColor(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 3, &b))
 		return Py_BuildException();
 	
-	CTextBar * pTextBar = (CTextBar *)iHandle;
+	auto* pTextBar = reinterpret_cast<CTextBar*>(iHandle);
 	if (pTextBar)
 		pTextBar->SetTextColor(r, g, b);
 
@@ -110,7 +111,7 @@ PyObject* grpTextBarGetTextExtent(PyObject* poSelf, PyObject* poArgs)
 		return Py_BuildException();
 
 	SIZE size = {0, 0};
-	CTextBar * pTextBar = (CTextBar *)iHandle;
+	auto* pTextBar = reinterpret_cast<CTextBar*>(iHandle);
 	if (pTextBar)
 		pTextBar->GetTextExtent(szText, &size);
 
@@ -132,7 +133,7 @@ PyObject* grpTextBarTextOut(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 3, &szText))
 		return Py_BuildException();
 
-	CTextBar * pTextBar = (CTextBar *)iHandle;
+	auto* pTextBar = reinterpret_cast<CTextBar*>(iHandle);
 	if (pTextBar)
 		pTextBar->TextOut(ix, iy, szText);
 
@@ -145,7 +146,7 @@ PyObject* grpClearTextBar(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 0, &iHandle))
 		return Py_BuildException();
 
-	CTextBar * pTextBar = (CTextBar *)iHandle;
+	auto* pTextBar = reinterpret_cast<CTextBar*>(iHandle);
 	if (pTextBar)
 		pTextBar->ClearBar();
 
@@ -170,7 +171,7 @@ PyObject* grpSetTextBarClipRect(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 4, &iey))
 		return Py_BuildException();
 
-	CTextBar * pTextBar = (CTextBar *)iHandle;
+	auto* pTextBar = reinterpret_cast<CTextBar*>(iHandle);
 	if (pTextBar)
 	{
 		RECT rect;
@@ -452,16 +453,16 @@ PyObject* grpGenerateColor(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetFloat(poArgs, 3, &a))
 		return Py_BuildException();
 	
-	return Py_BuildValue("l", CPythonGraphic::Instance().GenerateColor(r, g, b, a));
+	return PyLong_FromUnsignedLong(CPythonGraphic::Instance().GenerateColor(r, g, b, a));
 }
 
 PyObject* grpSetColor(PyObject* poSelf, PyObject* poArgs)
 {
-	int32_t color;
-	if (!PyTuple_GetInteger(poArgs, 0, &color))
+	uint32_t color = 0;
+	if (!PyTuple_GetUnsignedLong(poArgs, 0, &color))
 		return Py_BuildException();
 
-	CPythonGraphic::Instance().SetDiffuseColor(uint32_t(color));
+	CPythonGraphic::Instance().SetDiffuseColor(color);
 	return Py_BuildNone();
 }
 
@@ -513,7 +514,8 @@ PyObject* grpRenderLine(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BuildException();
 
-	CPythonGraphic::Instance().RenderLine2d((float) x, (float) y, (float) x+width, (float) y+height);
+	CPythonGraphic::Instance().RenderLine2d(static_cast<float>(x), static_cast<float>(y), static_cast<float>(x) + width,
+		static_cast<float>(y) + height);
 	return Py_BuildNone();
 }
 
@@ -535,10 +537,10 @@ PyObject* grpRenderRoundBox(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BuildException();
 
-	float fx = float(x);
-	float fy = float(y);
-	float fWidth = float(width);
-	float fHeight = float(height);
+	auto fx = float(x);
+	auto fy = float(y);
+	auto fWidth = float(width);
+	auto fHeight = float(height);
 
 	CPythonGraphic::Instance().RenderLine2d(fx+2.0f, fy, fx+2.0f + (fWidth-3.0f), fy);
 	CPythonGraphic::Instance().RenderLine2d(fx+2.0f, fy+fHeight, fx+2.0f + (fWidth-3.0f), fy+fHeight);
@@ -569,7 +571,8 @@ PyObject* grpRenderBox(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BuildException();
 
-	CPythonGraphic::Instance().RenderBox2d((float) x, (float) y, (float) x+width, (float) y+height);
+	CPythonGraphic::Instance().RenderBox2d(static_cast<float>(x), static_cast<float>(y), static_cast<float>(x) + width,
+		static_cast<float>(y) + height);
 	return Py_BuildNone();
 }
 
@@ -591,7 +594,8 @@ PyObject* grpRenderBar(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BuildException();
 
-	CPythonGraphic::Instance().RenderBar2d((float) x, (float) y, (float) x+width, (float) y+height);
+	CPythonGraphic::Instance().RenderBar2d(static_cast<float>(x), static_cast<float>(y), static_cast<float>(x) + width,
+		static_cast<float>(y) + height);
 	return Py_BuildNone();
 }
 
@@ -673,15 +677,16 @@ PyObject * grpRenderGradationBar(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BadArgument();
 
-	int32_t iStartColor;
-	if (!PyTuple_GetInteger(poArgs, 4, &iStartColor))
+	uint32_t iStartColor;
+	if (!PyTuple_GetUnsignedLong(poArgs, 4, &iStartColor))
 		return Py_BadArgument();
 
-	int32_t iEndColor;
-	if (!PyTuple_GetInteger(poArgs, 5, &iEndColor))
+	uint32_t iEndColor;
+	if (!PyTuple_GetUnsignedLong(poArgs, 5, &iEndColor))
 		return Py_BadArgument();
 
-	CPythonGraphic::Instance().RenderGradationBar2d((float)x, (float)y, (float)x+width, (float)y+height, iStartColor, iEndColor);
+	CPythonGraphic::Instance().RenderGradationBar2d(static_cast<float>(x), static_cast<float>(y), static_cast<float>(x) + width,
+													static_cast<float>(y) + height, iStartColor, iEndColor);
 	return Py_BuildNone();
 }
 
@@ -703,7 +708,8 @@ PyObject* grpRenderDownButton(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BuildException();
 
-	CPythonGraphic::Instance().RenderDownButton((float) x, (float) y, (float) x+width, (float) y+height);
+	CPythonGraphic::Instance().RenderDownButton(static_cast<float>(x), static_cast<float>(y), static_cast<float>(x) + width,
+		static_cast<float>(y) + height);
 	return Py_BuildNone();
 }
 
@@ -725,7 +731,8 @@ PyObject* grpRenderUpButton(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetInteger(poArgs, 3, &height))
 		return Py_BuildException();
 
-	CPythonGraphic::Instance().RenderUpButton((float) x, (float) y, (float) x+width, (float) y+height);
+	CPythonGraphic::Instance().RenderUpButton(static_cast<float>(x), static_cast<float>(y), static_cast<float>(x) + width,
+		static_cast<float>(y) + height);
 	return Py_BuildNone();
 }
 
@@ -755,7 +762,7 @@ PyObject* grpRenderBox3d(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetFloat(poArgs, 5, &ez))
 		return Py_BuildException();
 
-	CPythonGraphic::Instance().RenderBox3d((float) sx, (float) sy, (float) sz, (float) ex, (float) ey, (float) ez);
+	CPythonGraphic::Instance().RenderBox3d(sx, sy, sz, ex, ey, ez);
 	return Py_BuildNone();
 }
 
@@ -818,46 +825,39 @@ PyObject * grpSaveScreenShotToPath(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetString(poArgs, 0, &szBasePath))
 		return Py_BuildException();
 
-	struct tm * tmNow;
 	time_t ct;
 
-	ct = time(0);
-	tmNow = localtime(&ct);
+	ct = time(nullptr);
+	struct tm* tmNow = localtime(&ct);
 
 	char szPath[MAX_PATH + 256];
-	_snprintf_s(szPath, sizeof(szPath), "%s%02d%02d_%02d%02d%02d.jpg", 
-			szBasePath,
-			tmNow->tm_mon + 1,
-			tmNow->tm_mday,
-			tmNow->tm_hour,
-			tmNow->tm_min,
-			tmNow->tm_sec);
+	_snprintf_s(szPath, sizeof(szPath), "%s%02d%02d_%02d%02d%02d.jpg", szBasePath, tmNow->tm_mon + 1, tmNow->tm_mday, tmNow->tm_hour,
+		tmNow->tm_min, tmNow->tm_sec);
 
-	BOOL bResult = CPythonGraphic::Instance().SaveScreenShot(szPath);
+	bool bResult = CPythonGraphic::Instance().SaveScreenShot(szPath);
 	return Py_BuildValue("(is)", bResult, szPath);
 }
 // END_OF_SCREENSHOT_CWDSAVE
 
 PyObject * grpSaveScreenShot(PyObject * poSelf, PyObject * poArgs)
 {
-	struct tm * tmNow;
 	time_t ct;
 
-	ct = time(0);
-	tmNow = localtime(&ct);
+	ct = time(nullptr);
+	struct tm* tmNow = localtime(&ct);
 
 	char szPath[MAX_PATH + 256];
-	SHGetSpecialFolderPath(nullptr, szPath, CSIDL_PERSONAL, TRUE);
-	//GetTempPath();
-	strcat(szPath, "\\METIN2\\");
+	SHGetSpecialFolderPath(nullptr, szPath, CSIDL_PERSONAL, true);
+	strcat(szPath, "\\Screenshots\\");
 
-	if (-1 == _access(szPath, 0))
+	if (!std::filesystem::exists(szPath))
+	{
 		if (!CreateDirectory(szPath, nullptr))
 		{
 			TraceError("Failed to create directory [%s]\n", szPath);
-			return Py_BuildValue("(is)", FALSE, "");
+			return Py_BuildValue("(is)", 0, "");
 		}
-
+	}
 	sprintf_s(szPath + strlen(szPath),sizeof(szPath), "%02d%02d_%02d%02d%02d.jpg",
 			tmNow->tm_mon + 1,
 			tmNow->tm_mday,
@@ -865,7 +865,7 @@ PyObject * grpSaveScreenShot(PyObject * poSelf, PyObject * poArgs)
 			tmNow->tm_min,
 			tmNow->tm_sec);
 
-	BOOL bResult = CPythonGraphic::Instance().SaveScreenShot(szPath);
+	bool bResult = CPythonGraphic::Instance().SaveScreenShot(szPath);
 	return Py_BuildValue("(is)", bResult, szPath);
 }
 

@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-#include "../eterlib/StateManager.h"
-#include "../eterlib/Camera.h"
+#include "../eterLib/StateManager.h"
+#include "../eterLib/Camera.h"
 #include "../eterTerrainLib/StdAfx.h"
 #include "../eterEffectLib/EffectManager.h"
 
@@ -83,8 +83,7 @@ CMapOutdoor::~CMapOutdoor()
 
 bool CMapOutdoor::Initialize()
 {
-	uint8_t i;
-	for (i = 0; i < AROUND_AREA_NUM; ++i)
+	for (auto i = 0; i < AROUND_AREA_NUM; ++i)
 	{
  		m_pArea[i] = nullptr;
 		m_pTerrain[i] = nullptr;
@@ -111,14 +110,18 @@ bool CMapOutdoor::Initialize()
 	m_pwIndices = nullptr;
 #else
 	memset(m_pwaIndices, 0, sizeof(m_pwaIndices));
-	for (i = 0; i < TERRAINPATCH_LODMAX; ++i)
+	for (auto i = 0; i < TERRAINPATCH_LODMAX; ++i)
 		m_IndexBuffer[i].Destroy();
 #endif
 
 	m_bSettingTerrainVisible = false;
 	m_bSettingIsLavaMap = false;
 	m_bDrawWireFrame	= false;
+#ifdef WORLD_EDITOR
+	m_bDrawShadow		= true;
+#else
 	m_bDrawShadow		= false;
+#endif
 	m_bDrawChrShadow	= false;
 
 	m_iSplatLimit = 50000;
@@ -241,6 +244,7 @@ void CMapOutdoor::OnBeginEnvironment()
 		mc_pEnvironmentData->GetFogFarDistance()
 	);
 
+//	const D3DLIGHT9& c_rkLight = mc_pEnvironmentData->DirLights[ENV_DIRLIGHT_CHARACTER];
 	const D3DLIGHT9& c_rkLight = mc_pEnvironmentData->DirLights[ENV_DIRLIGHT_BACKGROUND];
 	rkForest.SetLight(
 		(const float *)&c_rkLight.Direction,
@@ -906,7 +910,7 @@ float CMapOutdoor::GetCacheHeight(float fx, float fy)
 		SHeightCache::SItem kItem;
 		kItem.m_dwKey=dwKey;
 		kItem.m_fHeight=fHeight;
-		pkVct_kItem->push_back(kItem);
+		pkVct_kItem->emplace_back(kItem);
 	}
 	
 	return fHeight;
@@ -1080,7 +1084,7 @@ uint32_t CMapOutdoor::GetShadowMapColor(float fx, float fy)
 	if (fy < 0)
 		fy = -fy;
 
-	float fTerrainSize = (float) (CTerrainImpl::TERRAIN_XSIZE);
+	auto fTerrainSize = (float) (CTerrainImpl::TERRAIN_XSIZE);
 	float fXRef = fx - (float) (m_lCurCoordStartX);
 	float fYRef = fy - (float) (m_lCurCoordStartY);
 
@@ -1299,7 +1303,7 @@ void CMapOutdoor::SpecialEffect_Create(uint32_t dwID, float x, float y, float z,
 {
 	CEffectManager& rkEffMgr = CEffectManager::Instance();
 
-	TSpecialEffectMap::iterator itor = m_kMap_dwID_iEffectID.find(dwID);
+	auto itor = m_kMap_dwID_iEffectID.find(dwID);
 	if (m_kMap_dwID_iEffectID.end() != itor)
 	{
 		uint32_t dwEffectID = itor->second;
@@ -1319,12 +1323,12 @@ void CMapOutdoor::SpecialEffect_Create(uint32_t dwID, float x, float y, float z,
 	uint32_t dwEffectID = rkEffMgr.CreateEffect(c_szEffName,
 											 D3DXVECTOR3(x, y, z),
 											 D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-	m_kMap_dwID_iEffectID.insert(std::make_pair(dwID, dwEffectID));
+	m_kMap_dwID_iEffectID.emplace(dwID, dwEffectID);
 }
 
 void CMapOutdoor::SpecialEffect_Delete(uint32_t dwID)
 {
-	TSpecialEffectMap::iterator itor = m_kMap_dwID_iEffectID.find(dwID);
+	auto itor = m_kMap_dwID_iEffectID.find(dwID);
 
 	if (m_kMap_dwID_iEffectID.end() == itor)
 		return;
@@ -1338,7 +1342,7 @@ void CMapOutdoor::SpecialEffect_Destroy()
 {
 	CEffectManager& rkEffMgr = CEffectManager::Instance();
 
-	TSpecialEffectMap::iterator itor = m_kMap_dwID_iEffectID.begin();
+	auto itor = m_kMap_dwID_iEffectID.begin();
 	for (; itor != m_kMap_dwID_iEffectID.end(); ++itor)
 	{
 		int32_t iEffectID = itor->second;
@@ -1358,14 +1362,14 @@ void CMapOutdoor::RegisterGuildArea(int32_t isx, int32_t isy, int32_t iex, int32
 	rect.top = isy;
 	rect.right = iex;
 	rect.bottom = iey;
-	m_rkList_kGuildArea.push_back(rect);
+	m_rkList_kGuildArea.emplace_back(rect);
 }
 
 void CMapOutdoor::VisibleMarkedArea()
 {
 	std::map<int32_t, uint8_t*> kMap_pbyMarkBuf;
 
-	std::list<RECT>::iterator itorRect = m_rkList_kGuildArea.begin();
+	auto itorRect = m_rkList_kGuildArea.begin();
 	for (; itorRect != m_rkList_kGuildArea.end(); ++itorRect)
 	{
 		const RECT & rkRect = *itorRect;
@@ -1393,34 +1397,36 @@ void CMapOutdoor::VisibleMarkedArea()
 		iy2Cell = iy2Cell + wy2TerrainNum*CTerrain::ATTRMAP_YSIZE;
 
 		for (int32_t ixCell = ix1Cell; ixCell <= ix2Cell; ++ixCell)
-		for (int32_t iyCell = iy1Cell; iyCell <= iy2Cell; ++iyCell)
 		{
-			int32_t ixLocalCell = ixCell % CTerrain::ATTRMAP_XSIZE;
-			int32_t iyLocalCell = iyCell % CTerrain::ATTRMAP_YSIZE;
-			int32_t ixTerrain = ixCell / CTerrain::ATTRMAP_XSIZE;
-			int32_t iyTerrain = iyCell / CTerrain::ATTRMAP_YSIZE;
-			int32_t iTerrainNum = ixTerrain+iyTerrain*100;
-
-			uint8_t byTerrainNum;
-			if (!GetTerrainNumFromCoord(ixTerrain, iyTerrain, &byTerrainNum))
-				continue;
-			CTerrain * pTerrain;
-			if (!GetTerrainPointer(byTerrainNum, &pTerrain))
-				continue;
-
-			if (kMap_pbyMarkBuf.end() == kMap_pbyMarkBuf.find(iTerrainNum))
+			for (int32_t iyCell = iy1Cell; iyCell <= iy2Cell; ++iyCell)
 			{
-				uint8_t * pbyBuf = new uint8_t [CTerrain::ATTRMAP_XSIZE*CTerrain::ATTRMAP_YSIZE];
-				ZeroMemory(pbyBuf, CTerrain::ATTRMAP_XSIZE*CTerrain::ATTRMAP_YSIZE);
-				kMap_pbyMarkBuf[iTerrainNum] = pbyBuf;
-			}
+				int32_t ixLocalCell = ixCell % CTerrain::ATTRMAP_XSIZE;
+				int32_t iyLocalCell = iyCell % CTerrain::ATTRMAP_YSIZE;
+				int32_t ixTerrain = ixCell / CTerrain::ATTRMAP_XSIZE;
+				int32_t iyTerrain = iyCell / CTerrain::ATTRMAP_YSIZE;
+				int32_t iTerrainNum = ixTerrain + iyTerrain * 100;
 
-			uint8_t * pbyBuf = kMap_pbyMarkBuf[iTerrainNum];
-			pbyBuf[ixLocalCell+iyLocalCell*CTerrain::ATTRMAP_XSIZE] = 0xff;
+				uint8_t byTerrainNum;
+				if (!GetTerrainNumFromCoord(ixTerrain, iyTerrain, &byTerrainNum))
+					continue;
+				CTerrain * pTerrain;
+				if (!GetTerrainPointer(byTerrainNum, &pTerrain))
+					continue;
+
+				if (kMap_pbyMarkBuf.end() == kMap_pbyMarkBuf.find(iTerrainNum))
+				{
+					auto * pbyBuf = new uint8_t[CTerrain::ATTRMAP_XSIZE * CTerrain::ATTRMAP_YSIZE];
+					ZeroMemory(pbyBuf, CTerrain::ATTRMAP_XSIZE * CTerrain::ATTRMAP_YSIZE);
+					kMap_pbyMarkBuf[iTerrainNum] = pbyBuf;
+				}
+
+				uint8_t * pbyBuf = kMap_pbyMarkBuf[iTerrainNum];
+				pbyBuf[ixLocalCell + iyLocalCell * CTerrain::ATTRMAP_XSIZE] = 0xff;
+			}
 		}
 	}
 
-	std::map<int32_t, uint8_t*>::iterator itorTerrain = kMap_pbyMarkBuf.begin();
+	auto itorTerrain = kMap_pbyMarkBuf.begin();
 	for (; itorTerrain != kMap_pbyMarkBuf.end(); ++itorTerrain)
 	{
 		int32_t iTerrainNum = itorTerrain->first;
@@ -1464,8 +1470,8 @@ void CMapOutdoor::ConvertToMapCoords(float fx, float fy, int32_t *iCellX, int32_
 	*pwTerrainNumX = ix / (CTerrainImpl::TERRAIN_XSIZE);
 	*pwTerrainNumY = iy / (CTerrainImpl::TERRAIN_YSIZE);
 	
-	float maxx = (float) CTerrainImpl::TERRAIN_XSIZE;
-	float maxy = (float) CTerrainImpl::TERRAIN_YSIZE;
+	auto maxx = (float) CTerrainImpl::TERRAIN_XSIZE;
+	auto maxy = (float) CTerrainImpl::TERRAIN_YSIZE;
 	
 	while (fx < 0)
 		fx += maxx;

@@ -3,8 +3,8 @@
 class CPythonMessenger : public CSingleton<CPythonMessenger>
 {
 	public:
-		typedef std::set<std::string> TFriendNameMap;
-		typedef std::map<std::string, uint8_t> TGuildMemberStateMap;
+		using TFriendNameMap = std::set<std::string, ci_less>;
+		using TGuildMemberStateMap = std::map<std::string, uint8_t>;
 
 		enum EMessengerGroupIndex
 		{

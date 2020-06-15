@@ -1,12 +1,3 @@
-/*********************************************************************
- * date        : 2006.09.07
- * file        : dev_log.cpp
- * author      : mhh
- * description : 
- */
-
-#define _dev_log_cpp_
-
 #include "stdafx.h"
 #include "config.h"
 #include "dev_log.h"
@@ -31,24 +22,26 @@ static int32_t	s_log_mask = 0xffffffff;
 
 void dev_log(const char *file, int32_t line, const char *function, int32_t level, const char *fmt, ...)
 {
-	// 테스트 서버에서만 남기며, 마스크가 꺼져있으면 남기지 않는다.
-	if (!test_server || !IS_SET(s_log_mask, level))
+	if (!g_bIsTestServer || !IS_SET(s_log_mask, level))
 		return;
 
 	static char	buf[1024*1024];	// 1M
 	int32_t			fd;
     char        strtime[64+1];
     const char        *strlevel;
-    struct      timeval tv;
-    struct      tm      ltm;
-    int32_t         mon, day, hour, min, sec, usec;
+    int32_t         mon, day, hour, min, sec;
     int32_t         nlen;
     va_list     args;
+	struct tm curr_tm;
+	time_t time_s;
+
+	time_s = time(0);
+	curr_tm = *localtime(&time_s);
 
 	// ---------------------------------------
 	// open file
 	// ---------------------------------------
-#ifndef __WIN32__
+#ifndef _WIN32
 	fd = ::open("DEV_LOG.log", O_WRONLY|O_APPEND|O_CREAT, 0666);
 #else
 	fd = ::_open("DEV_LOG.log", _O_WRONLY|_O_APPEND|_O_CREAT, 0666);
@@ -60,20 +53,15 @@ void dev_log(const char *file, int32_t line, const char *function, int32_t level
     // ---------------------------------------
     // set time string
     // ---------------------------------------
-    gettimeofday (&tv, nullptr);
+    mon         = curr_tm.tm_mon + 1;
+    day         = curr_tm.tm_mday;
+    hour        = curr_tm.tm_hour;
+    min         = curr_tm.tm_min;
+    sec         = curr_tm.tm_sec;
 
-    localtime_r((time_t*) &tv.tv_sec, &ltm);
+	nlen = snprintf(strtime, sizeof(strtime), "%02d%02d %02d:%02d.%02d", mon, day, hour, min, sec);
 
-    mon         = ltm.tm_mon + 1;
-    day         = ltm.tm_mday;
-    hour        = ltm.tm_hour;
-    min         = ltm.tm_min;
-    sec         = ltm.tm_sec;
-    usec        = tv.tv_usec;
-
-	nlen = snprintf(strtime, sizeof(strtime), "%02d%02d %02d:%02d.%02d.%06d", mon, day, hour, min, sec, usec);
-
-	if (nlen < 0 || nlen >= (int32_t) sizeof(strtime))
+	if (nlen < 0 || nlen >= static_cast<int32_t>(sizeof(strtime)))
 		nlen = sizeof(strtime) - 1;
 
 	strtime[nlen - 2] = '\0';
@@ -131,8 +119,13 @@ void dev_log(const char *file, int32_t line, const char *function, int32_t level
 	buf[nlen++] = '\n';
 	buf[nlen] = 0;
 
+#ifndef _WIN32
 	::write(fd, buf, nlen);
 	::close(fd);
+#else
+	::_write(fd, buf, nlen);
+	::_close(fd);
+#endif
 }
 
 void dev_log_add_level(int32_t level)

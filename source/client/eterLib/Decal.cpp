@@ -2,7 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Decal.h"
 #include "StateManager.h"
 
@@ -82,7 +82,7 @@ bool CDecal::AddPolygon(uint32_t dwAddCount, const D3DXVECTOR3 *c_pv3Vertex, con
 	aTriangleFanStruct.m_dwPrimitiveCount = dwAddCount - 2;
 	aTriangleFanStruct.m_dwVBOffset = m_dwVertexCount;
 
-	m_TriangleFanStructVector.push_back(aTriangleFanStruct);
+	m_TriangleFanStructVector.emplace_back(aTriangleFanStruct);
 
 	uint32_t dwCount = m_dwVertexCount;
 

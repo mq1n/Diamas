@@ -28,12 +28,12 @@ class CRaceData
 			PART_ACCE,
 #endif
 
-			PART_MAX_NUM,
+			PART_MAX_NUM
 		};
 		
 		enum
 		{
-			SMOKE_NUM = 4, 
+			SMOKE_NUM = 4
 		};
 
 		/////////////////////////////////////////////////////////////////////////////////

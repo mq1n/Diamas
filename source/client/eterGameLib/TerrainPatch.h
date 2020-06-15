@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "../eterlib/GrpVertexBuffer.h"
+#include "../eterLib/GrpVertexBuffer.h"
 #include "../eterTerrainLib/Terrain.h"
 
 #pragma pack(push)
@@ -35,7 +35,7 @@ public:
 	{
 		PATCH_TYPE_PLAIN = 0,
 		PATCH_TYPE_HILL,
-		PATCH_TYPE_CLIFF,
+		PATCH_TYPE_CLIFF
 	};
 
 	enum

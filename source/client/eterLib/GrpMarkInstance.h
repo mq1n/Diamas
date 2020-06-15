@@ -41,7 +41,7 @@ class CGraphicMarkInstance
 		enum
 		{
 			MARK_WIDTH = 16,
-			MARK_HEIGHT = 12,
+			MARK_HEIGHT = 12
 		};
 
 		void Initialize();

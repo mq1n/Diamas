@@ -1,6 +1,4 @@
 #include "stdafx.h"
-#include "../../common/stl.h"
-
 #include "constants.h"
 #include "config.h"
 #include "p2p.h"
@@ -14,6 +12,8 @@
 #include "marriage.h"
 #include "utils.h"
 #include "locale_service.h"
+#include "map_location.h"
+#include "../../common/stl.h"
 #include <sstream>
 
 P2P_MANAGER::P2P_MANAGER()
@@ -46,6 +46,7 @@ void P2P_MANAGER::Boot(LPDESC d)
 		p.bEmpire = ch->GetEmpire();
 		p.lMapIndex = SECTREE_MANAGER::instance().GetMapIndex(ch->GetX(), ch->GetY());
 		p.bChannel = g_bChannel;
+		p.iLevel = ch->GetLevel();
 
 		d->Packet(&p, sizeof(p));
 	}
@@ -85,6 +86,7 @@ void P2P_MANAGER::RegisterConnector(LPDESC d)
 	TPacketGGSetup p;
 	p.bHeader = HEADER_GG_SETUP;
 	p.wPort = p2p_port;
+	p.wListenPort = mother_port;
 	p.bChannel = g_bChannel;
 	d->Packet(&p, sizeof(p));
 }
@@ -130,6 +132,40 @@ void P2P_MANAGER::Send(const void * c_pvData, int32_t iSize, LPDESC except)
 	}
 }
 
+
+bool P2P_MANAGER::Send(const void * c_pvData, int32_t iSize, uint16_t wPort, bool bP2PPort)
+{
+	auto it = m_set_pkPeers.begin();
+
+	while (it != m_set_pkPeers.end())
+	{
+		LPDESC pkDesc = *it++;
+
+		if ((bP2PPort && pkDesc->GetP2PPort() == wPort) || (!bP2PPort && pkDesc->GetListenPort() == wPort)) {
+			sys_log(0, "P2P_Send: send to port %u", wPort);
+			pkDesc->Packet(c_pvData, iSize);
+			return true;
+		}
+		else
+			sys_log(0, "P2P_Send: wrong port %u [p2p %u, listen %u] [searched %u]", pkDesc->GetPort(), pkDesc->GetP2PPort(), pkDesc->GetListenPort(), wPort);
+	}
+
+	return false;
+}
+
+void P2P_MANAGER::SendByPID(uint32_t dwPID, const void * c_pvData, int32_t iSize)
+{
+	CCI* pkCCI = FindByPID(dwPID);
+	if (!pkCCI)
+		return;
+
+	if (iSize <= 0)
+		return;
+
+	pkCCI->pkDesc->SetRelay(pkCCI->szName);
+	pkCCI->pkDesc->Packet(c_pvData, iSize);
+}
+
 void P2P_MANAGER::Login(LPDESC d, const TPacketGGLogin * p)
 {
 	CCI* pkCCI = Find(p->szName);
@@ -165,13 +201,15 @@ void P2P_MANAGER::Login(LPDESC d, const TPacketGGLogin * p)
 	pkCCI->lMapIndex = p->lMapIndex;
 	pkCCI->pkDesc = d;
 	pkCCI->bChannel = p->bChannel;
+	pkCCI->iLevel = p->iLevel;
 	sys_log(0, "P2P: Login %s", pkCCI->szName);
 
 	CGuildManager::instance().P2PLoginMember(pkCCI->dwPID);
 	CPartyManager::instance().P2PLogin(pkCCI->dwPID, pkCCI->szName);
 
 	// CCI가 생성시에만 메신저를 업데이트하면 된다.
-	if (UpdateP2P) {
+	if (UpdateP2P) 
+	{
 		std::string name(pkCCI->szName);
 	    MessengerManager::instance().P2PLogin(name);
 	}
@@ -270,4 +308,24 @@ void P2P_MANAGER::GetP2PHostNames(std::string& hostNames)
 
 	}
 	hostNames += oss.str();
+}
+
+LPDESC P2P_MANAGER::GetP2PDescByMapIndex(int32_t lMapIndex)
+{
+	uint16_t wPort = CMapLocation::instance().GetPort(lMapIndex);
+	if (wPort == 0 || wPort == mother_port)
+		return nullptr;
+
+	for (auto it = m_set_pkPeers.begin(); it != m_set_pkPeers.end(); ++it)
+	{
+		LPDESC pkDesc = *it;
+		if (pkDesc->GetListenPort() == wPort)
+			return pkDesc;
+
+		sys_log(0, "listenPort %hu != wPort %hu", pkDesc->GetListenPort(), wPort);
+	}
+
+	sys_err("cannot find peer by port %hu", wPort);
+
+	return nullptr;
 }

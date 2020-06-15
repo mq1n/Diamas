@@ -5,8 +5,8 @@
  *      Author: ±èÇÑÁÖ (aka. ºñ¿±, Cronan), ¼Û¿µÁø (aka. myevan, ºøÀÚ·ç)
  */
 #include "stdafx.h"
-
 #include "event_queue.h"
+#include "../../common/service.h"
 
 CEventQueue::CEventQueue()
 {

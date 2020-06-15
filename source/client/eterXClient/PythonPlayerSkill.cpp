@@ -396,7 +396,7 @@ uint32_t CPythonPlayer::__GetSkillTargetRange(CPythonSkill::TSkillData& rkSkillD
 bool CPythonPlayer::__ProcessEnemySkillTargetRange(CInstanceBase& rkInstMain, CInstanceBase& rkInstTarget, CPythonSkill::TSkillData& rkSkillData, uint32_t dwSkillSlotIndex)
 {
 	uint32_t dwSkillTargetRange=__GetSkillTargetRange(rkSkillData);
-	float fSkillTargetRange = float(dwSkillTargetRange);
+	auto fSkillTargetRange = float(dwSkillTargetRange);
 	if (fSkillTargetRange <= 0.0f)
 		return true;
 
@@ -449,9 +449,7 @@ bool CPythonPlayer::__CanUseSkill()
 	// 뉴마운트. 승마스킬레벨 20 미만인 경우, 고급 마운트를 타고 승마 관련 스킬 못 쓰도록 못하도록 하드 코딩... 
 	// 나중에 시간 나면 can use skill 체크를 서버에서 해주자...
 	if (pkInstMain->IsMountingHorse() && (GetSkillGrade(109) < 1 && GetSkillLevel(109) < 20))
-	{
 		return false;
-	}
 
 	return pkInstMain->CanUseSkill();
 }
@@ -461,14 +459,10 @@ bool CPythonPlayer::__UseSkill(uint32_t dwSlotIndex)
 {
 	// PrivateShop
 	if (IsOpenPrivateShop())
-	{
 		return true;
-	}
 
 	if (!__CanUseSkill())
-	{
 		return false;
-	}
 
 	if (dwSlotIndex >= SKILL_MAX_NUM)
 	{
@@ -479,9 +473,7 @@ bool CPythonPlayer::__UseSkill(uint32_t dwSlotIndex)
 	TSkillInstance & rkSkillInst = m_playerStatus.aSkill[dwSlotIndex];
 
 	if (__CheckSpecialSkill(rkSkillInst.dwIndex))
-	{
 		return true;
-	}
 
 	CPythonSkill::TSkillData * pSkillData;
 	if (!CPythonSkill::Instance().GetSkillData(rkSkillInst.dwIndex, &pSkillData))
@@ -500,9 +492,7 @@ bool CPythonPlayer::__UseSkill(uint32_t dwSlotIndex)
 	}
 
 	if (!__CheckSkillUsable(dwSlotIndex))
-	{
 		return false;
-	}
 
 	CInstanceBase * pkInstMain = NEW_GetMainActorPtr();
 	if (!pkInstMain)
@@ -512,9 +502,7 @@ bool CPythonPlayer::__UseSkill(uint32_t dwSlotIndex)
 	}
 
 	if (pkInstMain->IsUsingSkill())
-	{
 		return false;
-	}
 
 	CInstanceBase * pkInstTarget = nullptr;
 
@@ -606,13 +594,9 @@ bool CPythonPlayer::__UseSkill(uint32_t dwSlotIndex)
 			if (pkInstMain != pkInstTarget)
 			{
 				if (pkInstMain->IsFlyTargetObject())
-				{
 					pkInstMain->NEW_LookAtFlyTarget();
-				}
 				else
-				{
 					pkInstMain->NEW_LookAtDestInstance(*pkInstTarget);
-				}
 			}
 		}
 		else
@@ -656,24 +640,18 @@ bool CPythonPlayer::__UseSkill(uint32_t dwSlotIndex)
 		uint32_t dwPickedActorID;
 		TPixelPosition kPPosPickedGround;
 
-		if (pkInstTarget && pkInstTarget!=pkInstMain)
-		{
+		if (pkInstTarget && pkInstTarget != pkInstMain)
 			pkInstMain->NEW_LookAtDestInstance(*pkInstTarget);
-		}
 		else if (__GetPickedActorID(&dwPickedActorID))
 		{
-			CInstanceBase* pkInstVictim=NEW_FindActorPtr(dwPickedActorID);
+			CInstanceBase * pkInstVictim = NEW_FindActorPtr(dwPickedActorID);
 			if (pkInstVictim)
 				pkInstMain->NEW_LookAtDestInstance(*pkInstVictim);
 		}
 		else if (__GetPickedGroundPos(&kPPosPickedGround))
-		{
 			pkInstMain->NEW_LookAtDestPixelPosition(kPPosPickedGround);
-		}
 		else
-		{
 			Tracenf("CPythonPlayer::__UseSkill(%d) - The screen direction settings should be as standard", dwSlotIndex);
-		}
 	}
 
 	// 관격술 처리
@@ -688,18 +666,16 @@ bool CPythonPlayer::__UseSkill(uint32_t dwSlotIndex)
 		{
 			if (pkInstMain->NEW_GetInstanceVectorInFanRange(float(dwRange), *pkInstTarget, &kVct_pkInstTarget))
 			{
-				std::vector<CInstanceBase*>::iterator i;
-				for (i=kVct_pkInstTarget.begin(); i!=kVct_pkInstTarget.end(); ++i)
+				for (auto pkInstEach : kVct_pkInstTarget)
 				{
-					if (dwTargetCount>=dwTargetMaxCount)
+					if (dwTargetCount >= dwTargetMaxCount)
 						break;
 
-					CInstanceBase* pkInstEach=*i;
-
-					if (pkInstTarget!=pkInstEach && !pkInstEach->IsDead())
+					if (pkInstTarget != pkInstEach && !pkInstEach->IsDead())
 					{
 						pkInstMain->AddFlyTargetInstance(*pkInstEach);
-						CPythonNetworkStream::Instance().SendAddFlyTargetingPacket(pkInstEach->GetVirtualID(), pkInstEach->GetGraphicThingInstanceRef().OnGetFlyTargetPosition());
+						CPythonNetworkStream::Instance().SendAddFlyTargetingPacket(
+							pkInstEach->GetVirtualID(), pkInstEach->GetGraphicThingInstanceRef().OnGetFlyTargetPosition());
 
 						dwTargetCount++;
 					}
@@ -710,18 +686,16 @@ bool CPythonPlayer::__UseSkill(uint32_t dwSlotIndex)
 		{
 			if (pkInstMain->NEW_GetInstanceVectorInCircleRange(float(dwRange), &kVct_pkInstTarget))
 			{
-				std::vector<CInstanceBase*>::iterator i;
-				for (i=kVct_pkInstTarget.begin(); i!=kVct_pkInstTarget.end(); ++i)
+				for (auto pkInstEach : kVct_pkInstTarget)
 				{
-					if (dwTargetCount>=dwTargetMaxCount)
+					if (dwTargetCount >= dwTargetMaxCount)
 						break;
 
-					CInstanceBase* pkInstEach=*i;
-
-					if (pkInstTarget!=pkInstEach && !pkInstEach->IsDead())
+					if (pkInstTarget != pkInstEach && !pkInstEach->IsDead())
 					{
 						pkInstMain->AddFlyTargetInstance(*pkInstEach);
-						CPythonNetworkStream::Instance().SendAddFlyTargetingPacket(pkInstEach->GetVirtualID(), pkInstEach->GetGraphicThingInstanceRef().OnGetFlyTargetPosition());
+						CPythonNetworkStream::Instance().SendAddFlyTargetingPacket(
+							pkInstEach->GetVirtualID(), pkInstEach->GetGraphicThingInstanceRef().OnGetFlyTargetPosition());
 
 						dwTargetCount++;
 					}
@@ -826,10 +800,12 @@ bool CPythonPlayer::__HasEnoughArrow()
 {
 	CItemData * pItemData;
 	if (CItemManager::Instance().GetItemDataPointer(GetItemIndex(TItemPos(INVENTORY, c_Equipment_Arrow)), &pItemData))
-	if (CItemData::ITEM_TYPE_WEAPON == pItemData->GetType())
-	if (CItemData::WEAPON_ARROW == pItemData->GetSubType())
 	{
-		return true;
+		if (CItemData::ITEM_TYPE_WEAPON == pItemData->GetType())
+		{
+			if (CItemData::WEAPON_ARROW == pItemData->GetSubType())
+				return true;
+		}
 	}
 
 	PyCallClassMemberFunc(m_ppyGameWindow, "OnCannotShotError", Py_BuildValue("(is)", GetMainCharacterIndex(), "EMPTY_ARROW"));
@@ -903,9 +879,7 @@ void CPythonPlayer::UseGuildSkill(uint32_t dwSkillSlotIndex)
 
 	uint32_t dwMotionIndex = pSkillData->GetSkillMotionIndex();
 	if (!pkInstMain->NEW_UseSkill(dwSkillIndex, dwMotionIndex, 1, false))
-	{
 		Tracenf("CPythonPlayer::UseGuildSkill(%d) - pkInstMain->NEW_UseSkill - ERROR", dwSkillIndex);
-	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -929,7 +903,7 @@ void CPythonPlayer::SetComboSkillFlag(BOOL bFlag)
 		return;
 	}
 
-	iLevel = MIN(iLevel, 2);
+	iLevel = std::min(iLevel, 2);
 
 	CInstanceBase* pkInstMain = NEW_GetMainActorPtr();
 	if (!pkInstMain)
@@ -957,18 +931,14 @@ bool CPythonPlayer::__CheckSpecialSkill(uint32_t dwSkillIndex)
 	if (c_iSkillIndex_Fishing == dwSkillIndex)
 	{
 		if (pkInstMain->IsFishingMode())
-		{
 			NEW_Fishing();
-		}
 		else
-		{
 			PyCallClassMemberFunc(m_ppyGameWindow, "OnCannotUseSkill", Py_BuildValue("(is)", GetMainCharacterIndex(), "EQUIP_FISHING_ROD"));
-		}
 		return true;
 	}
 
 	// Combo
-	else if (c_iSkillIndex_Combo == dwSkillIndex)
+	if (c_iSkillIndex_Combo == dwSkillIndex)
 	{
 		uint32_t dwSlotIndex;
 		if (!GetSkillSlotIndex(dwSkillIndex, &dwSlotIndex))
@@ -976,13 +946,9 @@ bool CPythonPlayer::__CheckSpecialSkill(uint32_t dwSkillIndex)
 
 		int32_t iLevel = GetSkillLevel(dwSlotIndex);
 		if (iLevel > 0)
-		{
 			CPythonNetworkStream::Instance().SendUseSkillPacket(dwSkillIndex);
-		}
 		else
-		{
 			PyCallClassMemberFunc(m_ppyGameWindow, "OnCannotUseSkill", Py_BuildValue("(is)", GetMainCharacterIndex(), "NOT_YET_LEARN"));
-		}
 
 		return true;
 	}

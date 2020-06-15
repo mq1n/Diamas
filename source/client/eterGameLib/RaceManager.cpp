@@ -26,12 +26,12 @@ void __GetRaceResourcePathes(uint32_t race, std::vector <std::string>& vec_stPat
 {
 	if (__IsGuildRace(race))
 	{
-		vec_stPathes.push_back ("d:/ymir work/guild/");
-		vec_stPathes.push_back ("d:/ymir work/npc/");
-		vec_stPathes.push_back ("d:/ymir work/npc2/");
-		vec_stPathes.push_back ("d:/ymir work/npc_pet/");
-		vec_stPathes.push_back ("d:/ymir work/monster/");
-		vec_stPathes.push_back ("d:/ymir work/monster2/");
+		vec_stPathes.emplace_back("d:/ymir work/guild/");
+		vec_stPathes.emplace_back("d:/ymir work/npc/");
+		vec_stPathes.emplace_back("d:/ymir work/npc2/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_pet/");
+		vec_stPathes.emplace_back("d:/ymir work/monster/");
+		vec_stPathes.emplace_back("d:/ymir work/monster2/");
 	}
 	else if (__IsNPCRace(race))
 	{
@@ -39,89 +39,89 @@ void __GetRaceResourcePathes(uint32_t race, std::vector <std::string>& vec_stPat
 		{
 			if (race>=34028 && race<=34099) // last known 34072
 			{
-				vec_stPathes.push_back ("d:/ymir work/npc_pet/");
-				vec_stPathes.push_back ("d:/ymir work/npc2/");
+				vec_stPathes.emplace_back("d:/ymir work/npc_pet/");
+				vec_stPathes.emplace_back("d:/ymir work/npc2/");
 			}
 			else
 			{
-				vec_stPathes.push_back ("d:/ymir work/npc2/");
-				vec_stPathes.push_back ("d:/ymir work/npc_pet/");
+				vec_stPathes.emplace_back("d:/ymir work/npc2/");
+				vec_stPathes.emplace_back("d:/ymir work/npc_pet/");
 			}
-			vec_stPathes.push_back ("d:/ymir work/npc/");
-			vec_stPathes.push_back ("d:/ymir work/npc_mount/");
-			vec_stPathes.push_back ("d:/ymir work/monster/");
-			vec_stPathes.push_back ("d:/ymir work/monster2/");
-			vec_stPathes.push_back ("d:/ymir work/guild/");
+			vec_stPathes.emplace_back("d:/ymir work/npc/");
+			vec_stPathes.emplace_back("d:/ymir work/npc_mount/");
+			vec_stPathes.emplace_back("d:/ymir work/monster/");
+			vec_stPathes.emplace_back("d:/ymir work/monster2/");
+			vec_stPathes.emplace_back("d:/ymir work/guild/");
 		}
 		else
 		{
 			if (race>=20233 && race<=20299) // last known 20247
 			{
-				vec_stPathes.push_back ("d:/ymir work/npc_mount/");
-				vec_stPathes.push_back ("d:/ymir work/npc/");
+				vec_stPathes.emplace_back("d:/ymir work/npc_mount/");
+				vec_stPathes.emplace_back("d:/ymir work/npc/");
 			}
 			else
 			{
-				vec_stPathes.push_back ("d:/ymir work/npc/");
-				vec_stPathes.push_back ("d:/ymir work/npc_mount/");
+				vec_stPathes.emplace_back("d:/ymir work/npc/");
+				vec_stPathes.emplace_back("d:/ymir work/npc_mount/");
 			}
-			vec_stPathes.push_back ("d:/ymir work/npc2/");
-			vec_stPathes.push_back ("d:/ymir work/npc_pet/");
-			vec_stPathes.push_back ("d:/ymir work/monster/");
-			vec_stPathes.push_back ("d:/ymir work/monster2/");
-			vec_stPathes.push_back ("d:/ymir work/guild/");
+			vec_stPathes.emplace_back("d:/ymir work/npc2/");
+			vec_stPathes.emplace_back("d:/ymir work/npc_pet/");
+			vec_stPathes.emplace_back("d:/ymir work/monster/");
+			vec_stPathes.emplace_back("d:/ymir work/monster2/");
+			vec_stPathes.emplace_back("d:/ymir work/guild/");
 		}
 	}
 	// 만우절 이벤트용 예외 몬스터
 	else if (8507 == race || 8510 == race)
 	{
-		vec_stPathes.push_back ("d:/ymir work/monster2/");
-		vec_stPathes.push_back ("d:/ymir work/monster/");
-		vec_stPathes.push_back ("d:/ymir work/npc/");
-		vec_stPathes.push_back ("d:/ymir work/npc2/");
-		vec_stPathes.push_back ("d:/ymir work/npc_pet/");
-		vec_stPathes.push_back ("d:/ymir work/npc_mount/");
-		vec_stPathes.push_back ("d:/ymir work/guild/");
+		vec_stPathes.emplace_back("d:/ymir work/monster2/");
+		vec_stPathes.emplace_back("d:/ymir work/monster/");
+		vec_stPathes.emplace_back("d:/ymir work/npc/");
+		vec_stPathes.emplace_back("d:/ymir work/npc2/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_pet/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_mount/");
+		vec_stPathes.emplace_back("d:/ymir work/guild/");
 	}
 	else if (race > 8000)
 	{
-		vec_stPathes.push_back ("d:/ymir work/monster/");
-		vec_stPathes.push_back ("d:/ymir work/monster2/");
-		vec_stPathes.push_back ("d:/ymir work/npc/");
-		vec_stPathes.push_back ("d:/ymir work/npc2/");
-		vec_stPathes.push_back ("d:/ymir work/npc_pet/");
-		vec_stPathes.push_back ("d:/ymir work/npc_mount/");
-		vec_stPathes.push_back ("d:/ymir work/guild/");
+		vec_stPathes.emplace_back("d:/ymir work/monster/");
+		vec_stPathes.emplace_back("d:/ymir work/monster2/");
+		vec_stPathes.emplace_back("d:/ymir work/npc/");
+		vec_stPathes.emplace_back("d:/ymir work/npc2/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_pet/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_mount/");
+		vec_stPathes.emplace_back("d:/ymir work/guild/");
 	}
 	else if (race > 2000)
 	{
-		vec_stPathes.push_back ("d:/ymir work/monster2/");
-		vec_stPathes.push_back ("d:/ymir work/monster/");
-		vec_stPathes.push_back ("d:/ymir work/npc/");
-		vec_stPathes.push_back ("d:/ymir work/npc2/");
-		vec_stPathes.push_back ("d:/ymir work/npc_pet/");
-		vec_stPathes.push_back ("d:/ymir work/npc_mount/");
-		vec_stPathes.push_back ("d:/ymir work/guild/");
+		vec_stPathes.emplace_back("d:/ymir work/monster2/");
+		vec_stPathes.emplace_back("d:/ymir work/monster/");
+		vec_stPathes.emplace_back("d:/ymir work/npc/");
+		vec_stPathes.emplace_back("d:/ymir work/npc2/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_pet/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_mount/");
+		vec_stPathes.emplace_back("d:/ymir work/guild/");
 	}
 	else if (race>=1400 && race<=1700)
 	{
-		vec_stPathes.push_back ("d:/ymir work/monster2/");
-		vec_stPathes.push_back ("d:/ymir work/monster/");
-		vec_stPathes.push_back ("d:/ymir work/npc/");
-		vec_stPathes.push_back ("d:/ymir work/npc2/");
-		vec_stPathes.push_back ("d:/ymir work/npc_pet/");
-		vec_stPathes.push_back ("d:/ymir work/npc_mount/");
-		vec_stPathes.push_back ("d:/ymir work/guild/");
+		vec_stPathes.emplace_back("d:/ymir work/monster2/");
+		vec_stPathes.emplace_back("d:/ymir work/monster/");
+		vec_stPathes.emplace_back("d:/ymir work/npc/");
+		vec_stPathes.emplace_back("d:/ymir work/npc2/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_pet/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_mount/");
+		vec_stPathes.emplace_back("d:/ymir work/guild/");
 	}
 	else
 	{
-		vec_stPathes.push_back ("d:/ymir work/monster/");
-		vec_stPathes.push_back ("d:/ymir work/monster2/");
-		vec_stPathes.push_back ("d:/ymir work/npc/");
-		vec_stPathes.push_back ("d:/ymir work/npc2/");
-		vec_stPathes.push_back ("d:/ymir work/npc_pet/");
-		vec_stPathes.push_back ("d:/ymir work/npc_mount/");
-		vec_stPathes.push_back ("d:/ymir work/guild/");
+		vec_stPathes.emplace_back("d:/ymir work/monster/");
+		vec_stPathes.emplace_back("d:/ymir work/monster2/");
+		vec_stPathes.emplace_back("d:/ymir work/npc/");
+		vec_stPathes.emplace_back("d:/ymir work/npc2/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_pet/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_mount/");
+		vec_stPathes.emplace_back("d:/ymir work/guild/");
 	}
 	// @fixme021 add season folders
 	vec_stPathes.emplace_back("#season1/npc/");
@@ -132,7 +132,7 @@ void __GetRaceResourcePathes(uint32_t race, std::vector <std::string>& vec_stPat
 
 CRaceData* CRaceManager::__LoadRaceData(uint32_t dwRaceIndex)
 {
-	std::map<uint32_t, std::string>::iterator fRaceName=m_kMap_dwRaceKey_stRaceName.find(dwRaceIndex);
+	auto fRaceName = m_kMap_dwRaceKey_stRaceName.find(dwRaceIndex);
 	if (m_kMap_dwRaceKey_stRaceName.end()==fRaceName)
 		return nullptr;
 
@@ -170,11 +170,11 @@ CRaceData* CRaceManager::__LoadRaceData(uint32_t dwRaceIndex)
 	CRaceData * pRaceData = CRaceData::New();
 	pRaceData->SetRace(dwRaceIndex);
 	
-	for (int32_t i = 0; i < vec_stFullPathName.size(); i++)
+	for (uint32_t i = 0; i < vec_stFullPathName.size(); i++)
 	{
 		std::string stFullPathName = vec_stFullPathName[i];
 		{
-			std::map<std::string, std::string>::iterator fRaceSrcName=m_kMap_stRaceName_stSrcName.find(c_rstRaceName);
+			auto fRaceSrcName = m_kMap_stRaceName_stSrcName.find(c_rstRaceName);
 			if (m_kMap_stRaceName_stSrcName.end()==fRaceSrcName)
 				stFullPathName+=c_rstRaceName;
 			else
@@ -230,55 +230,55 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 	{
 		s_isInit=true;
 
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPAWN", CRaceMotionData::NAME_SPAWN));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("WAIT", CRaceMotionData::NAME_WAIT));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("WAIT1", CRaceMotionData::NAME_WAIT));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("WAIT2", CRaceMotionData::NAME_WAIT));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("WALK", CRaceMotionData::NAME_WALK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("WALK1", CRaceMotionData::NAME_WALK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("WALK2", CRaceMotionData::NAME_WALK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("RUN", CRaceMotionData::NAME_RUN));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("RUN1", CRaceMotionData::NAME_RUN));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("RUN2", CRaceMotionData::NAME_RUN));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("STOP", CRaceMotionData::NAME_STOP));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("DEAD", CRaceMotionData::NAME_DEAD));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("COMBO_ATTACK", CRaceMotionData::NAME_COMBO_ATTACK_1));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("COMBO_ATTACK1", CRaceMotionData::NAME_COMBO_ATTACK_2));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("COMBO_ATTACK2", CRaceMotionData::NAME_COMBO_ATTACK_3));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("NORMAL_ATTACK", CRaceMotionData::NAME_NORMAL_ATTACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("NORMAL_ATTACK1", CRaceMotionData::NAME_NORMAL_ATTACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("NORMAL_ATTACK2", CRaceMotionData::NAME_NORMAL_ATTACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DAMAGE", CRaceMotionData::NAME_DAMAGE));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DAMAGE1", CRaceMotionData::NAME_DAMAGE));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DAMAGE2", CRaceMotionData::NAME_DAMAGE));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DAMAGE3", CRaceMotionData::NAME_DAMAGE));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DEAD", CRaceMotionData::NAME_DEAD));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DEAD1", CRaceMotionData::NAME_DEAD));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_DEAD2", CRaceMotionData::NAME_DEAD));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_KNOCKDOWN", CRaceMotionData::NAME_DAMAGE_FLYING));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_KNOCKDOWN1", CRaceMotionData::NAME_DAMAGE_FLYING));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_STANDUP", CRaceMotionData::NAME_STAND_UP));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("FRONT_STANDUP1", CRaceMotionData::NAME_STAND_UP));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_DAMAGE", CRaceMotionData::NAME_DAMAGE_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_DAMAGE1", CRaceMotionData::NAME_DAMAGE_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_DEAD", CRaceMotionData::NAME_DEAD_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_DEAD1", CRaceMotionData::NAME_DEAD_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_DEAD2", CRaceMotionData::NAME_DEAD_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_KNOCKDOWN", CRaceMotionData::NAME_DAMAGE_FLYING_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_KNOCKDOWN1", CRaceMotionData::NAME_DAMAGE_FLYING_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_STANDUP", CRaceMotionData::NAME_STAND_UP_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("BACK_STANDUP1", CRaceMotionData::NAME_STAND_UP_BACK));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPECIAL", CRaceMotionData::NAME_SPECIAL_1));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPECIAL1", CRaceMotionData::NAME_SPECIAL_2));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPECIAL2", CRaceMotionData::NAME_SPECIAL_3));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPECIAL3", CRaceMotionData::NAME_SPECIAL_4));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPECIAL4", CRaceMotionData::NAME_SPECIAL_5));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SPECIAL5", CRaceMotionData::NAME_SPECIAL_6));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SKILL1", CRaceMotionData::NAME_SKILL+121));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SKILL2", CRaceMotionData::NAME_SKILL+122));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SKILL3", CRaceMotionData::NAME_SKILL+123));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SKILL4", CRaceMotionData::NAME_SKILL+124));
-		s_kMap_stType_dwIndex.insert(std::map<std::string, uint32_t>::value_type("SKILL5", CRaceMotionData::NAME_SKILL+125));
+		s_kMap_stType_dwIndex.emplace("SPAWN", CRaceMotionData::NAME_SPAWN);
+		s_kMap_stType_dwIndex.emplace("WAIT", CRaceMotionData::NAME_WAIT);
+		s_kMap_stType_dwIndex.emplace("WAIT1", CRaceMotionData::NAME_WAIT);
+		s_kMap_stType_dwIndex.emplace("WAIT2", CRaceMotionData::NAME_WAIT);
+		s_kMap_stType_dwIndex.emplace("WALK", CRaceMotionData::NAME_WALK);
+		s_kMap_stType_dwIndex.emplace("WALK1", CRaceMotionData::NAME_WALK);
+		s_kMap_stType_dwIndex.emplace("WALK2", CRaceMotionData::NAME_WALK);
+		s_kMap_stType_dwIndex.emplace("RUN", CRaceMotionData::NAME_RUN);
+		s_kMap_stType_dwIndex.emplace("RUN1", CRaceMotionData::NAME_RUN);
+		s_kMap_stType_dwIndex.emplace("RUN2", CRaceMotionData::NAME_RUN);
+		s_kMap_stType_dwIndex.emplace("STOP", CRaceMotionData::NAME_STOP);
+		s_kMap_stType_dwIndex.emplace("DEAD", CRaceMotionData::NAME_DEAD);
+		s_kMap_stType_dwIndex.emplace("COMBO_ATTACK", CRaceMotionData::NAME_COMBO_ATTACK_1);
+		s_kMap_stType_dwIndex.emplace("COMBO_ATTACK1", CRaceMotionData::NAME_COMBO_ATTACK_2);
+		s_kMap_stType_dwIndex.emplace("COMBO_ATTACK2", CRaceMotionData::NAME_COMBO_ATTACK_3);
+		s_kMap_stType_dwIndex.emplace("NORMAL_ATTACK", CRaceMotionData::NAME_NORMAL_ATTACK);
+		s_kMap_stType_dwIndex.emplace("NORMAL_ATTACK1", CRaceMotionData::NAME_NORMAL_ATTACK);
+		s_kMap_stType_dwIndex.emplace("NORMAL_ATTACK2", CRaceMotionData::NAME_NORMAL_ATTACK);
+		s_kMap_stType_dwIndex.emplace("FRONT_DAMAGE", CRaceMotionData::NAME_DAMAGE);
+		s_kMap_stType_dwIndex.emplace("FRONT_DAMAGE1", CRaceMotionData::NAME_DAMAGE);
+		s_kMap_stType_dwIndex.emplace("FRONT_DAMAGE2", CRaceMotionData::NAME_DAMAGE);
+		s_kMap_stType_dwIndex.emplace("FRONT_DAMAGE3", CRaceMotionData::NAME_DAMAGE);
+		s_kMap_stType_dwIndex.emplace("FRONT_DEAD", CRaceMotionData::NAME_DEAD);
+		s_kMap_stType_dwIndex.emplace("FRONT_DEAD1", CRaceMotionData::NAME_DEAD);
+		s_kMap_stType_dwIndex.emplace("FRONT_DEAD2", CRaceMotionData::NAME_DEAD);
+		s_kMap_stType_dwIndex.emplace("FRONT_KNOCKDOWN", CRaceMotionData::NAME_DAMAGE_FLYING);
+		s_kMap_stType_dwIndex.emplace("FRONT_KNOCKDOWN1", CRaceMotionData::NAME_DAMAGE_FLYING);
+		s_kMap_stType_dwIndex.emplace("FRONT_STANDUP", CRaceMotionData::NAME_STAND_UP);
+		s_kMap_stType_dwIndex.emplace("FRONT_STANDUP1", CRaceMotionData::NAME_STAND_UP);
+		s_kMap_stType_dwIndex.emplace("BACK_DAMAGE", CRaceMotionData::NAME_DAMAGE_BACK);
+		s_kMap_stType_dwIndex.emplace("BACK_DAMAGE1", CRaceMotionData::NAME_DAMAGE_BACK);
+		s_kMap_stType_dwIndex.emplace("BACK_DEAD", CRaceMotionData::NAME_DEAD_BACK);
+		s_kMap_stType_dwIndex.emplace("BACK_DEAD1", CRaceMotionData::NAME_DEAD_BACK);
+		s_kMap_stType_dwIndex.emplace("BACK_DEAD2", CRaceMotionData::NAME_DEAD_BACK);
+		s_kMap_stType_dwIndex.emplace("BACK_KNOCKDOWN", CRaceMotionData::NAME_DAMAGE_FLYING_BACK);
+		s_kMap_stType_dwIndex.emplace("BACK_KNOCKDOWN1", CRaceMotionData::NAME_DAMAGE_FLYING_BACK);
+		s_kMap_stType_dwIndex.emplace("BACK_STANDUP", CRaceMotionData::NAME_STAND_UP_BACK);
+		s_kMap_stType_dwIndex.emplace("BACK_STANDUP1", CRaceMotionData::NAME_STAND_UP_BACK);
+		s_kMap_stType_dwIndex.emplace("SPECIAL", CRaceMotionData::NAME_SPECIAL_1);
+		s_kMap_stType_dwIndex.emplace("SPECIAL1", CRaceMotionData::NAME_SPECIAL_2);
+		s_kMap_stType_dwIndex.emplace("SPECIAL2", CRaceMotionData::NAME_SPECIAL_3);
+		s_kMap_stType_dwIndex.emplace("SPECIAL3", CRaceMotionData::NAME_SPECIAL_4);
+		s_kMap_stType_dwIndex.emplace("SPECIAL4", CRaceMotionData::NAME_SPECIAL_5);
+		s_kMap_stType_dwIndex.emplace("SPECIAL5", CRaceMotionData::NAME_SPECIAL_6);
+		s_kMap_stType_dwIndex.emplace("SKILL1", CRaceMotionData::NAME_SKILL + 121);
+		s_kMap_stType_dwIndex.emplace("SKILL2", CRaceMotionData::NAME_SKILL + 122);
+		s_kMap_stType_dwIndex.emplace("SKILL3", CRaceMotionData::NAME_SKILL + 123);
+		s_kMap_stType_dwIndex.emplace("SKILL4", CRaceMotionData::NAME_SKILL + 124);
+		s_kMap_stType_dwIndex.emplace("SKILL5", CRaceMotionData::NAME_SKILL + 125);
 	}
 	
 	CFile kMappedFile;
@@ -304,12 +304,13 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 	stMotionFileName.clear();
 
 	uint32_t uLineCount=kTextFileLoader.GetLineCount();
-	for (uint32_t uLineIndex=0, szTypeLen = strlen(szType); uLineIndex<uLineCount; ++uLineIndex)
+	for (uint32_t uLineIndex=0; uLineIndex<uLineCount; ++uLineIndex)
 	{
+		uint32_t motionType = CRaceMotionData::NAME_NONE;
 		const std::string& c_rstLine=kTextFileLoader.GetLineString(uLineIndex);
 		sscanf(c_rstLine.c_str(), "%s %s %s %d", szMode, szType, szFile, &nPercent);
 
-		std::map<std::string, uint32_t>::iterator fTypeIndex=s_kMap_stType_dwIndex.find(szType);
+		auto fTypeIndex = s_kMap_stType_dwIndex.find(szType);
 
 		if (s_kMap_stType_dwIndex.end() == fTypeIndex)
 		{
@@ -318,11 +319,11 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 			const size_t c_cutLengthLimit = 2;
 			bool bFound = false;
 
-			if (c_cutLengthLimit < szTypeLen + 1)
+			if (c_cutLengthLimit < strlen(szType) + 1)
 			{
 				for (size_t i = 1; i <= c_cutLengthLimit; ++i)
 				{
-					std::string typeName = std::string(szType).substr(0, szTypeLen - i);
+					std::string typeName = std::string(szType).substr(0, strlen(szType) - i);
 					fTypeIndex = s_kMap_stType_dwIndex.find(typeName);
 
 					if (s_kMap_stType_dwIndex.end() != fTypeIndex)
@@ -337,12 +338,12 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 				continue;
 		}
 
-		uint32_t motionType = fTypeIndex->second;
+		motionType = fTypeIndex->second;
 
 		stMotionFileName = pathName;
 		stMotionFileName += szFile; 
 
-		rkRaceData.RegisterMotionData(CRaceMotionData::MODE_GENERAL, motionType, stMotionFileName.c_str(), nPercent);
+		rkRaceData.RegisterMotionData(CRaceMotionData::MODE_GENERAL, static_cast<uint16_t>(motionType), stMotionFileName.c_str(), static_cast<uint8_t>(nPercent));
 
 		switch (motionType)
 		{
@@ -356,9 +357,7 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 	}
 
 	if (!isSpawn && !stSpawnMotionFileName.empty())
-	{
-		rkRaceData.RegisterMotionData(CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SPAWN, stSpawnMotionFileName.c_str(), nPercent);
-	}
+		rkRaceData.RegisterMotionData(CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SPAWN, stSpawnMotionFileName.c_str(), static_cast<uint8_t>(nPercent));
 
 	rkRaceData.RegisterNormalAttack(CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_NORMAL_ATTACK);
 
@@ -367,12 +366,12 @@ bool CRaceManager::__LoadRaceMotionList(CRaceData& rkRaceData, const char* pathN
 
 void CRaceManager::RegisterRaceSrcName(const char * c_szName, const char * c_szSrcName)
 {
-	m_kMap_stRaceName_stSrcName.insert(std::map<std::string, std::string>::value_type(c_szName, c_szSrcName));
+	m_kMap_stRaceName_stSrcName.emplace(c_szName, c_szSrcName);
 }
 
 void CRaceManager::RegisterRaceName(uint32_t dwRaceIndex, const char * c_szName)
 {	
-	m_kMap_dwRaceKey_stRaceName.insert(std::map<uint32_t, std::string>::value_type(dwRaceIndex, c_szName));
+	m_kMap_dwRaceKey_stRaceName.emplace(dwRaceIndex, c_szName);
 }
 
 void CRaceManager::CreateRace(uint32_t dwRaceIndex)
@@ -385,14 +384,14 @@ void CRaceManager::CreateRace(uint32_t dwRaceIndex)
 
 	CRaceData * pRaceData = CRaceData::New();
 	pRaceData->SetRace(dwRaceIndex);
-	m_RaceDataMap.insert(TRaceDataMap::value_type(dwRaceIndex, pRaceData));
+	m_RaceDataMap.emplace(dwRaceIndex, pRaceData);
 
 	Tracenf("CRaceManager::CreateRace(dwRaceIndex=%d)", dwRaceIndex);
 }
 
 void CRaceManager::SelectRace(uint32_t dwRaceIndex)
 {
-	TRaceDataIterator itor = m_RaceDataMap.find(dwRaceIndex);
+	auto itor = m_RaceDataMap.find(dwRaceIndex);
 	if (m_RaceDataMap.end() == itor)
 	{
 		assert(!"Failed to select race data!");
@@ -409,7 +408,7 @@ CRaceData * CRaceManager::GetSelectedRaceDataPointer()
 
 BOOL CRaceManager::GetRaceDataPointer(uint32_t dwRaceIndex, CRaceData ** ppRaceData)
 {
-	TRaceDataIterator itor = m_RaceDataMap.find(dwRaceIndex);
+	auto itor = m_RaceDataMap.find(dwRaceIndex);
 
 	if (m_RaceDataMap.end() == itor)
 	{
@@ -417,7 +416,7 @@ BOOL CRaceManager::GetRaceDataPointer(uint32_t dwRaceIndex, CRaceData ** ppRaceD
 
 		if (pRaceData)
 		{
-			m_RaceDataMap.insert(TRaceDataMap::value_type(dwRaceIndex, pRaceData));
+			m_RaceDataMap.emplace(dwRaceIndex, pRaceData);
 			*ppRaceData = pRaceData;
 			return TRUE;
 		}

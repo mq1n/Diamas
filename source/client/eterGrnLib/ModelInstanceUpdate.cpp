@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "../eterbase/Debug.h"
+#include "../eterBase/Debug.h"
 #include "ModelInstance.h"
 #include "Model.h"
 
@@ -9,7 +9,7 @@ void CGrannyModelInstance::Update(uint32_t dwAniFPS)
 	if (!dwAniFPS)
 		return;
 
-	const uint32_t c_dwCurUpdateFrame = (uint32_t) (GetLocalTime() * ANIFPS_MAX);
+	const auto c_dwCurUpdateFrame = static_cast<uint32_t>(GetLocalTime() * ANIFPS_MAX);
 	const uint32_t ANIFPS_STEP = ANIFPS_MAX/dwAniFPS;
 	if (c_dwCurUpdateFrame>ANIFPS_STEP && c_dwCurUpdateFrame/ANIFPS_STEP==m_dwOldUpdateFrame/ANIFPS_STEP)
 		return;
@@ -69,7 +69,7 @@ void CGrannyModelInstance::Deform(const D3DXMATRIX * c_pWorldMatrix)
 		// WORK
 		CGraphicVertexBuffer& rkDeformableVertexBuffer = __GetDeformableVertexBufferRef();
 		TPNTVertex* pntVertices;
-		if (rkDeformableVertexBuffer.LockRange(m_pModel->GetDeformVertexCount(), (void **)&pntVertices))
+		if (rkDeformableVertexBuffer.LockRange(m_pModel->GetDeformVertexCount(), reinterpret_cast<void **>(&pntVertices)))
 		{
 			DeformPNTVertices(pntVertices);
 			rkDeformableVertexBuffer.Unlock();

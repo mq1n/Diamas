@@ -77,10 +77,10 @@ public:
 	
 	Type * GetNext(bool &looped)
 	{
-		
 		looped = false; //default value
-		
-		if ( !mHead ) return 0; // there is no data to process.
+
+		if (!mHead)
+			return 0; // there is no data to process.
 		Type *ret;
 		
 		if ( !mCurrent )
@@ -93,15 +93,16 @@ public:
 			ret = mCurrent;
 		}
 		
-		if ( ret ) mCurrent = ret->GetNext();
-		
+		if (ret)
+			mCurrent = ret->GetNext();
 		
 		return ret;
 	};
 	
 	bool IsEmpty(void) const
 	{
-		if ( !mHead ) return true;
+		if (!mHead)
+			return true;
 		return false;
 	};
 	
@@ -116,29 +117,27 @@ public:
 	
 	Type * GetNext(void)
 	{
-		if ( !mHead ) return 0; // there is no data to process.
+		if (!mHead)
+			return 0; // there is no data to process.
 		
 		Type *ret;
 		
 		if ( !mCurrent )
-		{
 			ret = mHead;
-		}
 		else
-		{
 			ret = mCurrent;
-		}
-		
-		if ( ret ) mCurrent = ret->GetNext();
-		
+
+		if (ret)
+			mCurrent = ret->GetNext();
+
 		
 		return ret;
 	};
 	
 	void Release(Type *t)
 	{
-		
-		if ( t == mCurrent ) mCurrent = t->GetNext();
+		if (t == mCurrent)
+			mCurrent = t->GetNext();
 		
 		// first patch old linked list.. his previous now points to his next
 		Type *prev = t->GetPrevious();
@@ -147,14 +146,16 @@ public:
 		{
 			Type *next = t->GetNext();
 			prev->SetNext( next ); // my previous now points to my next
-			if ( next ) next->SetPrevious(prev);
+			if (next)
+				next->SetPrevious(prev);
 			// list is patched!
 		}
 		else
 		{
 			Type *next = t->GetNext();
 			mHead = next;
-			if ( mHead ) mHead->SetPrevious(0);
+			if (mHead)
+				mHead->SetPrevious(0);
 		}
 		
 		Type *temp = mFree; // old head of free list.
@@ -169,7 +170,8 @@ public:
 	Type * GetFreeNoLink(void) // get free, but don't link it to the used list!!
 	{
 		// Free allocated items are always added to the head of the list
-		if ( !mFree ) return 0;
+		if (!mFree)
+			return 0;
 		Type *ret = mFree;
 		mFree = ret->GetNext(); // new head of free list
 		mUsedCount++;
@@ -182,12 +184,14 @@ public:
 	Type * GetFreeLink(void)
 	{
 		// Free allocated items are always added to the head of the list
-		if ( !mFree ) return 0;
+		if (!mFree)
+			return 0;
 		Type *ret = mFree;
 		mFree = ret->GetNext(); // new head of free list
 		Type *temp = mHead; // current head of list
 		mHead = ret;        // new head of list is this free one
-		if ( temp ) temp->SetPrevious(ret);
+		if (temp)
+			temp->SetPrevious(ret);
 		mHead->SetNext(temp);
 		mHead->SetPrevious(0);
 		mUsedCount++;
@@ -204,7 +208,8 @@ public:
 			e->SetNext(item);
 			item->SetNext(enext);
 			item->SetPrevious(e);
-			if ( enext ) enext->SetPrevious(item);
+			if (enext)
+				enext->SetPrevious(item);
 		}
 		else
 		{

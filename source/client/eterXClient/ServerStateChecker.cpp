@@ -7,10 +7,10 @@
 #pragma pack(push)
 #pragma pack(1)
 
-typedef uint8_t ServerStateChecker_Header;
-typedef uint32_t ServerStateChecker_Key;
-typedef uint32_t ServerStateChecker_Index;
-typedef uint8_t ServerStateChecker_State;
+using ServerStateChecker_Header = uint8_t;
+using ServerStateChecker_Key = uint32_t;
+using ServerStateChecker_Index = uint32_t;
+using ServerStateChecker_State = uint8_t;
 
 #pragma pack(pop)
 
@@ -37,20 +37,18 @@ void CServerStateChecker::AddChannel(uint32_t uServerIndex, const char* c_szAddr
 	c.c_szAddr = c_szAddr;
 	c.uPort = uPort;
 
-	m_lstChannel.push_back(c);
+	m_lstChannel.emplace_back(c);
 }
 
 void CServerStateChecker::Request()
 {
-	if (m_lstChannel.empty()) { 
+	if (m_lstChannel.empty())
 		return; 
-	}
 
 	if (!m_kStream.Connect(m_lstChannel.begin()->c_szAddr, m_lstChannel.begin()->uPort))
 	{
-		for (std::list<TChannel>::const_iterator it = m_lstChannel.begin(); it != m_lstChannel.end(); ++it) {
+		for (std::list<TChannel>::const_iterator it = m_lstChannel.begin(); it != m_lstChannel.end(); ++it)
 			PyCallClassMemberFunc(m_poWnd, "NotifyChannelState", Py_BuildValue("(ii)", it->uServerIndex, 0));
-		}
 		return;
 	}
 	m_kStream.ClearRecvBuffer();
@@ -60,11 +58,9 @@ void CServerStateChecker::Request()
 	uint8_t bHeader = HEADER_CG_STATE_CHECKER;
 	if (!m_kStream.Send(sizeof(bHeader), &bHeader))
 	{
-		for (std::list<TChannel>::const_iterator it = m_lstChannel.begin(); it != m_lstChannel.end(); ++it) {
+		for (std::list<TChannel>::const_iterator it = m_lstChannel.begin(); it != m_lstChannel.end(); ++it)
 			PyCallClassMemberFunc(m_poWnd, "NotifyChannelState", Py_BuildValue("(ii)", it->uServerIndex, 0));
-		}
 		Initialize();
-		return;
 	}
 }
 
@@ -73,23 +69,22 @@ void CServerStateChecker::Update()
 	m_kStream.Process();
 
 	uint8_t bHeader;
-	if (!m_kStream.Recv(sizeof(bHeader), &bHeader)) {
+	if (!m_kStream.Recv(sizeof(bHeader), &bHeader))
 		return;
-	}
-	if (HEADER_GC_RESPOND_CHANNELSTATUS != bHeader) {
+	if (HEADER_GC_RESPOND_CHANNELSTATUS != bHeader)
 		return;
-	}
 	int32_t nSize;
-	if (!m_kStream.Recv(sizeof(nSize), &nSize)) {
+	if (!m_kStream.Recv(sizeof(nSize), &nSize))
 		return;
-	}
-	for (int32_t i = 0; i < nSize; i++) {
+	for (int32_t i = 0; i < nSize; i++)
+	{
 		TChannelStatus channelStatus;
-		if (!m_kStream.Recv(sizeof(channelStatus), &channelStatus)) {
+		if (!m_kStream.Recv(sizeof(channelStatus), &channelStatus))
 			return;
-		}
-		for (std::list<TChannel>::const_iterator it = m_lstChannel.begin(); it != m_lstChannel.end(); ++it) {
-			if (channelStatus.nPort == it->uPort) {
+		for (std::list<TChannel>::const_iterator it = m_lstChannel.begin(); it != m_lstChannel.end(); ++it)
+		{
+			if (channelStatus.nPort == it->uPort)
+			{
 				PyCallClassMemberFunc(m_poWnd, "NotifyChannelState", Py_BuildValue("(ii)", it->uServerIndex, channelStatus.bStatus));
 				break;
 			}

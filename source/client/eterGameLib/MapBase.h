@@ -7,7 +7,7 @@ class CMapBase : public CScreen
 		{
 			MAPTYPE_INVALID,
 			MAPTYPE_INDOOR,
-			MAPTYPE_OUTDOOR,
+			MAPTYPE_OUTDOOR
 		};
 
 	public:

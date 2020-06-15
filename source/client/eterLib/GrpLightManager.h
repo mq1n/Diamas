@@ -77,7 +77,7 @@ class CLightManager : public CGraphicBase, public CLightBase, public CSingleton<
 	public:
 		enum
 		{
-			LIGHT_LIMIT_DEFAULT = 3,
+			LIGHT_LIMIT_DEFAULT = 3
 //			LIGHT_MAX_NUM = 32,
 		};
 

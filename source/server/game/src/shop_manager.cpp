@@ -14,14 +14,15 @@
 #include "packet.h"
 #include "log.h"
 #include "db.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "mob_manager.h"
 #include "locale_service.h"
 #include "desc_client.h"
 #include "shop_manager.h"
 #include "group_text_parse_tree.h"
-#include "shopEx.h"
+#include "shop_extented.h"
 #include "shop_manager.h"
+#include "sectree_manager.h"
 #include <cctype>
 
 CShopManager::CShopManager()
@@ -107,6 +108,9 @@ bool CShopManager::StartShopping(LPCHARACTER pkChr, LPCHARACTER pkChrShopKeeper,
 	if (pkChrShopKeeper->IsPC())
 		return false;
 
+	if (pkChr->IsDead())
+		return false;
+
 	//PREVENT_TRADE_WINDOW
 	if (pkChr->IsOpenSafebox() || pkChr->GetExchange() || pkChr->GetMyShop() || pkChr->IsCubeOpen())
 	{
@@ -188,9 +192,8 @@ void CShopManager::DestroyPCShop(LPCHARACTER ch)
 // 상점 거래를 종료
 void CShopManager::StopShopping(LPCHARACTER ch)
 {
-	LPSHOP shop;
-
-	if (!(shop = ch->GetShop()))
+	LPSHOP shop = ch->GetShop();
+	if (!shop)
 		return;
 
 	//PREVENT_ITEM_COPY;
@@ -204,7 +207,6 @@ void CShopManager::StopShopping(LPCHARACTER ch)
 // 아이템 구입
 void CShopManager::Buy(LPCHARACTER ch, uint8_t pos)
 {
-#ifdef ENABLE_NEWSTUFF
 	if (0 != g_BuySellTimeLimitValue)
 	{
 		if (get_dword_time() < ch->GetLastBuySellTime()+g_BuySellTimeLimitValue)
@@ -215,7 +217,7 @@ void CShopManager::Buy(LPCHARACTER ch, uint8_t pos)
 	}
 
 	ch->SetLastBuySellTime(get_dword_time());
-#endif
+
 	if (!ch->GetShop())
 		return;
 
@@ -229,23 +231,8 @@ void CShopManager::Buy(LPCHARACTER ch, uint8_t pos)
 	}
 
 	CShop* pkShop = ch->GetShop();
-
-	if (!pkShop->IsPCShop())
-	{
-		//if (pkShop->GetVnum() == 0)
-		//	return;
-		//const CMob* pkMob = CMobManager::instance().Get(pkShop->GetNPCVnum());
-		//if (!pkMob)
-		//	return;
-
-		//if (pkMob->m_table.bType != CHAR_TYPE_NPC)
-		//{
-		//	return;
-		//}
-	}
-	else
-	{
-	}
+	if (!pkShop || !pkShop->IsPCShop())
+		return;
 
 	//PREVENT_ITEM_COPY
 	ch->SetMyShopTime();
@@ -261,13 +248,14 @@ void CShopManager::Buy(LPCHARACTER ch, uint8_t pos)
 		pack.subheader	= ret;
 		pack.size	= sizeof(TPacketGCShop);
 
-		ch->GetDesc()->Packet(&pack, sizeof(pack));
+		if (ch->GetDesc()) {
+			ch->GetDesc()->Packet(&pack, sizeof(pack));
+		}
 	}
 }
 
 void CShopManager::Sell(LPCHARACTER ch, uint8_t bCell, uint8_t bCount)
 {
-#ifdef ENABLE_NEWSTUFF
 	if (0 != g_BuySellTimeLimitValue)
 	{
 		if (get_dword_time() < ch->GetLastBuySellTime()+g_BuySellTimeLimitValue)
@@ -278,7 +266,7 @@ void CShopManager::Sell(LPCHARACTER ch, uint8_t bCell, uint8_t bCount)
 	}
 
 	ch->SetLastBuySellTime(get_dword_time());
-#endif
+
 	if (!ch->GetShop())
 		return;
 
@@ -302,19 +290,26 @@ void CShopManager::Sell(LPCHARACTER ch, uint8_t bCell, uint8_t bCount)
 	if (!item)
 		return;
 
-	if (item->IsEquipped() == true)
+	if (item->IsEquipped())
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("착용 중인 아이템은 판매할 수 없습니다."));
 		return;
 	}
 
-	if (true == item->isLocked())
-	{
+	if (item->isLocked())
 		return;
-	}
 
 	if (IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_SELL))
 		return;
+
+	if (item->GetVnum() >= 80003 && item->GetVnum() <= 80007) 
+	{
+		if (item->GetCount() != 1) 
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Altin ve Gumus barlari ust uste koyulu halde satamazsin"));
+			return;
+		}
+	}
 
 	uint32_t dwPrice;
 
@@ -344,7 +339,7 @@ void CShopManager::Sell(LPCHARACTER ch, uint8_t bCell, uint8_t bCount)
 		dwPrice -= dwTax;
 	}
 
-	if (test_server)
+	if (g_bIsTestServer)
 		sys_log(0, "Sell Item price id %d %s itemid %d", ch->GetPlayerID(), ch->GetName(), item->GetID());
 
 	const int64_t nTotalMoney = static_cast<int64_t>(ch->GetGold()) + static_cast<int64_t>(dwPrice);
@@ -362,7 +357,7 @@ void CShopManager::Sell(LPCHARACTER ch, uint8_t bCell, uint8_t bCount)
 	if (iVal > 0)
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("판매금액의 %d %% 가 세금으로 나가게됩니다"), iVal);
 
-	DBManager::instance().SendMoneyLog(MONEY_LOG_SHOP, item->GetVnum(), dwPrice);
+	LogManager::instance().MoneyLog(MONEY_LOG_SHOP, item->GetVnum(), dwPrice);
 
 	if (bCount == item->GetCount())
 		ITEM_MANAGER::instance().RemoveItem(item, "SELL");
@@ -407,11 +402,11 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 		stCoinType = "Gold";
 	}
 	
-	if (stCoinType == "Gold")
+	if (IsEqualStr(stCoinType, "Gold"))
 	{
 		shopTable.coinType = SHOP_COIN_TYPE_GOLD;
 	}
-	else if (stCoinType == "SecondaryCoin")
+	else if (IsEqualStr(stCoinType, "SecondaryCoin"))
 	{
 		shopTable.coinType = SHOP_COIN_TYPE_SECONDARY_COIN;
 	}
@@ -461,11 +456,11 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 		stSort = "None";
 	}
 
-	if (stSort == "Asc")
+	if (IsEqualStr(stSort, "Asc"))
 	{
 		std::sort(shopItems.begin(), shopItems.end(), CompareShopItemName);
 	}
-	else if (stSort == "Desc")
+	else if(IsEqualStr(stSort, "Desc"))
 	{
 		std::sort(shopItems.rbegin(), shopItems.rend(), CompareShopItemName);
 	}
@@ -490,7 +485,7 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 		shopTable.items[iPos] = shopItems[i];
 	}
 
-	shopTable.byItemCount = shopItems.size();
+	shopTable.byItemCount = static_cast<uint8_t>(shopItems.size());
 	return true;
 }
 

@@ -11,11 +11,11 @@
 #include "guild_manager.h"
 #include "affect.h"
 #include "p2p.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "building.h"
 #include "locale_service.h"
 #include "log.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 
 	SGuildMember::SGuildMember(LPCHARACTER ch, uint8_t grade, uint32_t offer_exp)
 : pid(ch->GetPlayerID()), grade(grade), is_general(0), job(ch->GetJob()), level(ch->GetLevel()), offer_exp(offer_exp), name(ch->GetName())
@@ -73,17 +73,16 @@ CGuild::CGuild(TGuildCreateParameter & cp)
 	}
 
 	std::unique_ptr<SQLMsg> pmsg (DBManager::instance().DirectQuery(
-				"INSERT INTO guild%s(name, master, sp, level, exp, skill_point, skill) "
+				"INSERT INTO guild(name, master, sp, level, exp, skill_point, skill) "
 				"VALUES('%s', %u, 1000, 1, 0, 0, '\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0')", 
-				get_table_postfix(), m_data.name, m_data.master_pid));
+				m_data.name, m_data.master_pid));
 
 	// TODO if error occur?
 	m_data.guild_id = pmsg->Get()->uiInsertID;
 
 	for (int32_t i = 0; i < GUILD_GRADE_COUNT; ++i)
 	{
-		DBManager::instance().Query("INSERT INTO guild_grade%s VALUES(%u, %d, '%s', %d)", 
-				get_table_postfix(),
+		DBManager::instance().Query("INSERT INTO guild_grade VALUES(%u, %d, '%s', %d)",
 				m_data.guild_id, 
 				i + 1, 
 				m_data.grade_array[i].grade_name, 
@@ -228,9 +227,6 @@ bool CGuild::RemoveMember(uint32_t pid)
 		ch->SetGuild(nullptr);
 	}
 
-	if (g_bGuildInviteLimit)
-		DBManager::instance().Query("REPLACE INTO guild_invite_limit VALUES(%d, %d)", GetID(), get_global_time());
-
 	return true;
 }
 
@@ -238,7 +234,7 @@ void CGuild::P2PLoginMember(uint32_t pid)
 {
 	if (m_member.find(pid) == m_member.end())
 	{
-		sys_err("GUILD [%d] is not a memeber of guild.", pid);
+		sys_err("GUILD [%d] is not a member of guild.", pid);
 		return;
 	}
 
@@ -255,7 +251,7 @@ void CGuild::LoginMember(LPCHARACTER ch)
 {
 	if (m_member.find(ch->GetPlayerID()) == m_member.end())
 	{
-		sys_err("GUILD %s[%d] is not a memeber of guild.", ch->GetName(), ch->GetPlayerID());
+		sys_err("GUILD %s[%d] is not a member of guild.", ch->GetName(), ch->GetPlayerID());
 		return;
 	}
 
@@ -282,7 +278,7 @@ void CGuild::P2PLogoutMember(uint32_t pid)
 {
 	if (m_member.find(pid)==m_member.end())
 	{
-		sys_err("GUILD [%d] is not a memeber of guild.", pid);
+		sys_err("GUILD [%d] is not a member of guild.", pid);
 		return;
 	}
 
@@ -300,7 +296,7 @@ void CGuild::LogoutMember(LPCHARACTER ch)
 {
 	if (m_member.find(ch->GetPlayerID())==m_member.end())
 	{
-		sys_err("GUILD %s[%d] is not a memeber of guild.", ch->GetName(), ch->GetPlayerID());
+		sys_err("GUILD %s[%d] is not a member of guild.", ch->GetName(), ch->GetPlayerID());
 		return;
 	}
 
@@ -421,6 +417,9 @@ void CGuild::SendListPacket(LPCHARACTER ch)
 	   ] * Count
 
 	 */
+	if (!ch)
+		return;
+
 	LPDESC d;
 	if (!(d=ch->GetDesc()))
 		return;
@@ -438,7 +437,7 @@ void CGuild::SendListPacket(LPCHARACTER ch)
 
 	char c[CHARACTER_NAME_MAX_LEN+1];
 
-	for (TGuildMemberContainer::iterator it = m_member.begin(); it != m_member.end(); ++it)
+	for (auto it = m_member.begin(); it != m_member.end(); ++it)
 	{
 		it->second._dummy = 1;
 
@@ -448,18 +447,18 @@ void CGuild::SendListPacket(LPCHARACTER ch)
 
 		buf.write(c, CHARACTER_NAME_MAX_LEN+1 );
 
-		if ( test_server )
+		if ( g_bIsTestServer )
 			sys_log(0 ,"name %s job %d  ", it->second.name.c_str(), it->second.job );
 	}
 
 	d->Packet(buf.read_peek(), buf.size());
 
-	for (TGuildMemberOnlineContainer::iterator it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)
+	for (auto it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)
 	{
 		SendLoginPacket(ch, *it);
 	}
 
-	for (TGuildMemberP2POnlineContainer::iterator it = m_memberP2POnline.begin(); it != m_memberP2POnline.end(); ++it)
+	for (auto it = m_memberP2POnline.begin(); it != m_memberP2POnline.end(); ++it)
 	{
 		SendLoginPacket(ch, *it);
 	}
@@ -624,20 +623,20 @@ void CGuild::Load(uint32_t guild_id)
 	m_data.guild_id = guild_id;
 
 	DBManager::instance().FuncQuery(std::bind(&CGuild::LoadGuildData, this, std::placeholders::_1),
-			"SELECT master, level, exp, name, skill_point, skill, sp, ladder_point, win, draw, loss, gold FROM guild%s WHERE id = %u", get_table_postfix(), m_data.guild_id);
+			"SELECT master, level, exp, name, skill_point, skill, sp, ladder_point, win, draw, loss, gold FROM guild WHERE id = %u", m_data.guild_id);
 
 	sys_log(0, "GUILD: loading guild id %12s %u", m_data.name, guild_id);
 
 	DBManager::instance().FuncQuery(std::bind(&CGuild::LoadGuildGradeData, this, std::placeholders::_1),
-			"SELECT grade, name, auth+0 FROM guild_grade%s WHERE guild_id = %u", get_table_postfix(), m_data.guild_id);
+			"SELECT grade, name, auth+0 FROM guild_grade WHERE guild_id = %u", m_data.guild_id);
 
 	DBManager::instance().FuncQuery(std::bind(&CGuild::LoadGuildMemberData, this, std::placeholders::_1),
-			"SELECT pid, grade, is_general, offer, level, job, name FROM guild_member%s, player%s WHERE guild_id = %u and pid = id", get_table_postfix(), get_table_postfix(), guild_id);
+			"SELECT pid, grade, is_general, offer, level, job, name FROM guild_member, player WHERE guild_id = %u and pid = id", guild_id);
 }
 
 void CGuild::SaveLevel()
 {
-	DBManager::instance().Query("UPDATE guild%s SET level=%d, exp=%u, skill_point=%d WHERE id = %u", get_table_postfix(), m_data.level,m_data.exp, m_data.skill_point,m_data.guild_id);
+	DBManager::instance().Query("UPDATE guild SET level=%d, exp=%u, skill_point=%d WHERE id = %u", m_data.level,m_data.exp, m_data.skill_point,m_data.guild_id);
 }
 
 void CGuild::SendDBSkillUpdate(int32_t amount)
@@ -656,8 +655,8 @@ void CGuild::SaveSkill()
 	char text[GUILD_SKILL_COUNT * 2 + 1];
 
 	DBManager::instance().EscapeString(text, sizeof(text), (const char *) m_data.abySkill, sizeof(m_data.abySkill));
-	DBManager::instance().Query("UPDATE guild%s SET sp = %d, skill_point=%d, skill='%s' WHERE id = %u",
-			get_table_postfix(), m_data.power, m_data.skill_point, text, m_data.guild_id);
+	DBManager::instance().Query("UPDATE guild SET sp = %d, skill_point=%d, skill='%s' WHERE id = %u",
+			m_data.power, m_data.skill_point, text, m_data.guild_id);
 }
 
 TGuildMember* CGuild::GetMember(uint32_t pid)
@@ -762,7 +761,7 @@ void CGuild::__P2PUpdateGrade(SQLMsg* pmsg)
 void CGuild::P2PChangeGrade(uint8_t grade)
 {
 	DBManager::instance().FuncQuery(std::bind(&CGuild::__P2PUpdateGrade, this, std::placeholders::_1),
-			"SELECT grade, name, auth+0 FROM guild_grade%s WHERE guild_id = %u and grade = %d", get_table_postfix(), m_data.guild_id, grade);
+			"SELECT grade, name, auth+0 FROM guild_grade WHERE guild_id = %u and grade = %d", m_data.guild_id, grade);
 }
 
 namespace 
@@ -805,7 +804,7 @@ void CGuild::ChangeGradeName(uint8_t grade, const char* grade_name)
 	char text[GUILD_NAME_MAX_LEN * 2 + 1];
 
 	DBManager::instance().EscapeString(text, sizeof(text), grade_name, strlen(grade_name));
-	DBManager::instance().FuncAfterQuery(FSendChangeGrade(GetID(), grade), "UPDATE guild_grade%s SET name = '%s' where guild_id = %u and grade = %d", get_table_postfix(), text, m_data.guild_id, grade);
+	DBManager::instance().FuncAfterQuery(FSendChangeGrade(GetID(), grade), "UPDATE guild_grade SET name = '%s' where guild_id = %u and grade = %d", text, m_data.guild_id, grade);
 
 	grade--;
 	strlcpy(m_data.grade_array[grade].grade_name, grade_name, sizeof(m_data.grade_array[grade].grade_name));
@@ -844,7 +843,7 @@ void CGuild::ChangeGradeAuth(uint8_t grade, uint8_t auth)
 		return;
 	}
 
-	DBManager::instance().FuncAfterQuery(FSendChangeGrade(GetID(),grade), "UPDATE guild_grade%s SET auth = %d where guild_id = %u and grade = %d", get_table_postfix(), auth, m_data.guild_id, grade);
+	DBManager::instance().FuncAfterQuery(FSendChangeGrade(GetID(),grade), "UPDATE guild_grade SET auth = %d where guild_id = %u and grade = %d", auth, m_data.guild_id, grade);
 
 	grade--;
 
@@ -917,6 +916,12 @@ bool CGuild::OfferExp(LPCHARACTER ch, int32_t amount)
 
 	if (amount < 0)
 		return false;
+
+	if (ch->IsExpBlocked()) 
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Anti Exp Aktif"));
+		return false;
+	}
 
 	if (ch->GetExp() < (uint32_t) amount)
 	{
@@ -1011,16 +1016,23 @@ void CGuild::RequestDisband(uint32_t pid)
 
 void CGuild::AddComment(LPCHARACTER ch, const std::string& str)
 {
-	if (str.length() > GUILD_COMMENT_MAX_LEN)
+    if (str.length() > GUILD_COMMENT_MAX_LEN || str.length() == 0) // Added string null verification
 		return;
 
+    if (m_guildPostCommentPulse > thecore_pulse()) {
+        int32_t deltaInSeconds = ((m_guildPostCommentPulse / PASSES_PER_SEC(1)) - (thecore_pulse() / PASSES_PER_SEC(1)));
+        int32_t minutes = deltaInSeconds / 60;
+        int32_t seconds = (deltaInSeconds - (minutes * 60));
+        ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You can post a new comment in: %02d minutes and %02d seconds!"), minutes, seconds);
+        return;
+    }
 	char text[GUILD_COMMENT_MAX_LEN * 2 + 1];
 	DBManager::instance().EscapeString(text, sizeof(text), str.c_str(), str.length());
 
-	auto callback = [this, ch]() { RefreshCommentForce(ch->GetPlayerID()); };
-	DBManager::instance().FuncAfterQuery(callback,
-			"INSERT INTO guild_comment%s(guild_id, name, notice, content, time) VALUES(%u, '%s', %d, '%s', NOW())", 
-			get_table_postfix(), m_data.guild_id, ch->GetName(), (str[0] == '!') ? 1 : 0, text);
+	DBManager::instance().FuncAfterQuery(std::bind(&CGuild::RefreshCommentForce, this, ch->GetPlayerID()),
+			"INSERT INTO guild_comment(guild_id, name, notice, content, time) VALUES(%u, '%s', %d, '%s', NOW())",
+			m_data.guild_id, ch->GetName(), (str[0] == '!') ? 1 : 0, text);
+    m_guildPostCommentPulse = thecore_pulse() + PASSES_PER_SEC(10*60);
 }
 
 void CGuild::DeleteComment(LPCHARACTER ch, uint32_t comment_id)
@@ -1028,9 +1040,9 @@ void CGuild::DeleteComment(LPCHARACTER ch, uint32_t comment_id)
 	SQLMsg * pmsg;
 
 	if (GetMember(ch->GetPlayerID())->grade == GUILD_LEADER_GRADE)
-		pmsg = DBManager::instance().DirectQuery("DELETE FROM guild_comment%s WHERE id = %u AND guild_id = %u",get_table_postfix(), comment_id, m_data.guild_id);
+		pmsg = DBManager::instance().DirectQuery("DELETE FROM guild_comment WHERE id = %u AND guild_id = %u", comment_id, m_data.guild_id);
 	else
-		pmsg = DBManager::instance().DirectQuery("DELETE FROM guild_comment%s WHERE id = %u AND guild_id = %u AND name = '%s'",get_table_postfix(), comment_id, m_data.guild_id, ch->GetName());
+		pmsg = DBManager::instance().DirectQuery("DELETE FROM guild_comment WHERE id = %u AND guild_id = %u AND name = '%s'", comment_id, m_data.guild_id, ch->GetName());
 
 	if (pmsg->Get()->uiAffectedRows == 0 || pmsg->Get()->uiAffectedRows == (uint32_t)-1)
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 삭제할 수 없는 글입니다."));
@@ -1052,7 +1064,7 @@ void CGuild::RefreshCommentForce(uint32_t player_id)
 		return;
 	}
 
-	std::unique_ptr<SQLMsg> pmsg (DBManager::instance().DirectQuery("SELECT id, name, content FROM guild_comment%s WHERE guild_id = %u ORDER BY notice DESC, id DESC LIMIT %d", get_table_postfix(), m_data.guild_id, GUILD_COMMENT_MAX_COUNT));
+	std::unique_ptr<SQLMsg> pmsg (DBManager::instance().DirectQuery("SELECT id, name, content FROM guild_comment WHERE guild_id = %u ORDER BY notice DESC, id DESC LIMIT %d", m_data.guild_id, GUILD_COMMENT_MAX_COUNT));
 
 	TPacketGCGuild pack;
 	pack.header = HEADER_GC_GUILD;
@@ -1237,8 +1249,6 @@ void CGuild::SkillLevelUp(uint32_t dwVnum)
 
 void CGuild::UseSkill(uint32_t dwVnum, LPCHARACTER ch, uint32_t pid)
 {
-	LPCHARACTER victim = nullptr;
-
 	if (!GetMember(ch->GetPlayerID()) || !HasGradeAuth(GetMember(ch->GetPlayerID())->grade, GUILD_AUTH_USE_SKILL))
 		return;
 
@@ -1268,8 +1278,6 @@ void CGuild::UseSkill(uint32_t dwVnum, LPCHARACTER ch, uint32_t pid)
 		// 이미 걸려 있으므로 사용하지 않음.
 		if (ch->FindAffect(pkSk->dwVnum))
 			return;
-
-		victim = ch;
 	}
 
 	if (ch->IsAffectFlag(AFF_REVIVE_INVISIBLE))
@@ -1311,79 +1319,27 @@ void CGuild::UseSkill(uint32_t dwVnum, LPCHARACTER ch, uint32_t pid)
 	//PointChange(POINT_SP, -iNeededSP);
 	//GuildPointChange(POINT_SP, -iNeededSP);
 
-	if (test_server)
+	if (g_bIsTestServer)
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> %d 스킬을 사용함 (%d, %d) to %u"), dwVnum, GetSP(), iNeededSP, pid);
 
-	switch (dwVnum)
+	/*if (ch->GetPlayerID() != GetMasterPID())
 	{
-		case GUILD_SKILL_TELEPORT:
-			// 현재 서버에 있는 사람을 먼저 시도.
-			SendDBSkillUpdate(-iNeededSP);
-			if ((victim = (CHARACTER_MANAGER::instance().FindByPID(pid))))
-				ch->WarpSet(victim->GetX(), victim->GetY());
-			else
-			{
-				if (m_memberP2POnline.find(pid) != m_memberP2POnline.end())
-				{
-					// 다른 서버에 로그인된 사람이 있음 -> 메시지 보내 좌표를 받아오자
-					// 1. A.pid, B.pid 를 뿌림
-					// 2. B.pid를 가진 서버가 뿌린서버에게 A.pid, 좌표 를 보냄
-					// 3. 워프
-					CCI * pcci = P2P_MANAGER::instance().FindByPID(pid);
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드장만 길드 스킬을 사용할 수 있습니다."));
+		return;
+	}*/
 
-					if (pcci->bChannel != g_bChannel)
-					{
-						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 상대가 %d 채널에 있습니다. (현재 채널 %d)"), pcci->bChannel, g_bChannel);
-					}
-					else
-					{
-						TPacketGGFindPosition p;
-						p.header = HEADER_GG_FIND_POSITION;
-						p.dwFromPID = ch->GetPlayerID();
-						p.dwTargetPID = pid;
-						pcci->pkDesc->Packet(&p, sizeof(TPacketGGFindPosition));
-						if (test_server) ch->ChatPacket(CHAT_TYPE_PARTY, "sent find position packet for guild teleport");
-					}
-				}
-				else
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 상대가 온라인 상태가 아닙니다."));
-			}
-			break;
+	if (!UnderAnyWar())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드 스킬은 길드전 중에만 사용할 수 있습니다."));
+		return;
+	}
 
-			/*case GUILD_SKILL_ACCEL:
-			  ch->RemoveAffect(dwVnum);
-			  ch->AddAffect(dwVnum, POINT_MOV_SPEED, m_data.abySkill[dwRealVnum]*3, pkSk->dwAffectFlag, (int32_t)pkSk->kDurationPoly.Eval(), 0, false);
-			  ch->AddAffect(dwVnum, POINT_ATT_SPEED, m_data.abySkill[dwRealVnum]*3, pkSk->dwAffectFlag, (int32_t)pkSk->kDurationPoly.Eval(), 0, false);
-			  break;*/
+	SendDBSkillUpdate(-iNeededSP);
 
-		default:
-			{
-				/*if (ch->GetPlayerID() != GetMasterPID())
-				  {
-				  ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드장만 길드 스킬을 사용할 수 있습니다."));
-				  return;
-				  }*/
-
-				if (!UnderAnyWar())
-				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드 스킬은 길드전 중에만 사용할 수 있습니다."));
-					return;
-				}
-
-				SendDBSkillUpdate(-iNeededSP);
-
-				for (auto it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)
-				{
-					LPCHARACTER victim = *it;
-					victim->RemoveAffect(dwVnum);
-					ch->ComputeSkill(dwVnum, victim, m_data.abySkill[dwRealVnum]);
-				}
-			}
-			break;
-			/*if (!victim)
-			  return;
-
-			  ch->ComputeSkill(dwVnum, victim, m_data.abySkill[dwRealVnum]);*/
+	for (auto & member : m_memberOnline)
+	{
+		member->RemoveAffect(dwVnum);
+		ch->ComputeSkill(dwVnum, member, m_data.abySkill[dwRealVnum]);
 	}
 }
 
@@ -1570,8 +1526,8 @@ void CGuild::SaveMember(uint32_t pid)
 		return;
 
 	DBManager::instance().Query(
-			"UPDATE guild_member%s SET grade = %d, offer = %u, is_general = %d WHERE pid = %u and guild_id = %u",
-			get_table_postfix(), it->second.grade, it->second.offer_exp, it->second.is_general, pid, m_data.guild_id);
+			"UPDATE guild_member SET grade = %d, offer = %u, is_general = %d WHERE pid = %u and guild_id = %u",
+			it->second.grade, it->second.offer_exp, it->second.is_general, pid, m_data.guild_id);
 }
 
 void CGuild::LevelChange(uint32_t pid, uint8_t level)
@@ -1722,7 +1678,7 @@ bool CGuild::ChargeSP(LPCHARACTER ch, int32_t iSP)
 	}
 
 	ch->PointChange(POINT_GOLD, -gold);
-	DBManager::instance().SendMoneyLog(MONEY_LOG_GUILD, 1, -gold);
+	LogManager::instance().MoneyLog(MONEY_LOG_GUILD, 1, -gold);
 
 	SendDBSkillUpdate(iSP);
 	{
@@ -1947,6 +1903,11 @@ void CGuild::Invite( LPCHARACTER pchInviter, LPCHARACTER pchInvitee )
 		pchInviter->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<길드> 다른 제국 사람을 길드에 초대할 수 없습니다.") );
 		return;
 	}
+	else if (pchInvitee->GetLevel() < 5)
+	{
+		pchInviter->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Oyuncu yeterli seviyede degil"));
+		return;
+	}
 
 	GuildJoinErrCode errcode = VerifyGuildJoinableCondition( pchInvitee );
 	switch ( errcode ) 
@@ -2071,28 +2032,6 @@ CGuild::GuildJoinErrCode CGuild::VerifyGuildJoinableCondition( const LPCHARACTER
 	{
 		return GERR_GUILD_IS_IN_WAR;
 	}
-	else if (g_bGuildInviteLimit)
-	{
-		std::unique_ptr<SQLMsg> pMsg( DBManager::instance().DirectQuery("SELECT value FROM guild_invite_limit WHERE id=%d", GetID()) );
-
-		if ( pMsg->Get()->uiNumRows > 0 )
-		{
-			MYSQL_ROW row = mysql_fetch_row(pMsg->Get()->pSQLResult);
-			uint32_t limit_time=0;
-			str_to_number( limit_time, row[0] );
-
-			if ( test_server == true )
-			{
-				limit_time += quest::CQuestManager::instance().GetEventFlag("guild_invite_limit") * 60;
-			}
-			else
-			{
-				limit_time += quest::CQuestManager::instance().GetEventFlag("guild_invite_limit") * 24 * 60 * 60;
-			}
-
-			if ( get_global_time() < limit_time ) return GERR_INVITE_LIMIT;
-		}
-	}
 
 	return GERR_NONE;
 }
@@ -2123,7 +2062,6 @@ void CGuild::SendGuildDataUpdateToAllMember()
 	}
 }
 
-#ifdef ENABLE_D_NJGUILD
 void CGuild::SetDungeon_for_Only_guild(LPDUNGEON pDungeon)
 {
 	m_pkDungeon_for_Only_guild = pDungeon;
@@ -2134,9 +2072,7 @@ LPDUNGEON CGuild::GetDungeon_for_Only_guild()
 	return m_pkDungeon_for_Only_guild;
 }
 
-#endif
 
-#ifdef ENABLE_NEWSTUFF
 void CGuild::SetSkillLevel(uint32_t dwVnum, uint8_t level, uint8_t point)
 {
 	uint32_t dwRealVnum = dwVnum - GUILD_SKILL_START;
@@ -2185,5 +2121,5 @@ void CGuild::SetSkillPoint(uint8_t point)
 	std::for_each(m_memberOnline.begin(), m_memberOnline.end(), std::bind(&CGuild::SendSkillInfoPacket, this, std::placeholders::_1));
 }
 
-#endif
+
 

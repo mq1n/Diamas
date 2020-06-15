@@ -1,9 +1,9 @@
 #include "StdAfx.h"
 #include "PythonApplication.h"
-#include "../eterlib/Camera.h"
+#include "../eterLib/Camera.h"
 #include "../eterWebBrowser/CWebBrowser.h"
 
-#include <winuser.h>
+#include <WinUser.h>
 
 static int32_t gs_nMouseCaptureRef = 0;
 
@@ -31,18 +31,13 @@ void CPythonApplication::__SetFullScreenWindow(HWND hWnd, uint32_t dwWidth, uint
 
 	int32_t Error = ChangeDisplaySettings(&DevMode, CDS_FULLSCREEN);
 	if(Error == DISP_CHANGE_RESTART)
-	{
-		ChangeDisplaySettings(0,0);
-	}
+		ChangeDisplaySettings(nullptr, 0);
 }
 
 void CPythonApplication::__MinimizeFullScreenWindow(HWND hWnd, uint32_t dwWidth, uint32_t dwHeight)
 {
-	ChangeDisplaySettings(0, 0);
-	SetWindowPos(hWnd, 0, 0, 0,
-				 dwWidth,
-				 dwHeight,
-				 SWP_SHOWWINDOW);
+	ChangeDisplaySettings(nullptr, 0);
+	SetWindowPos(hWnd, nullptr, 0, 0, dwWidth, dwHeight, SWP_SHOWWINDOW);
 	ShowWindow(hWnd, SW_MINIMIZE);
 }
 
@@ -66,9 +61,7 @@ LRESULT CPythonApplication::WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wP
 					//////////////////
 
 					if (m_isWindowFullScreenEnable)
-					{
 						__SetFullScreenWindow(hWnd, m_dwWidth, m_dwHeight, m_pySystem.GetBPP());
-					}
 				}
 				else
 				{
@@ -77,40 +70,32 @@ LRESULT CPythonApplication::WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wP
 					//////////////////
 
 					if (m_isWindowFullScreenEnable)
-					{
 						__MinimizeFullScreenWindow(hWnd, m_dwWidth, m_dwHeight);
-					}
 				}
 			}
 			break;
 
 		case WM_INPUTLANGCHANGE:
-			return CPythonIME::Instance().WMInputLanguage(hWnd, uiMsg, wParam, lParam);
-			break;
+		return CPythonIME::Instance().WMInputLanguage(hWnd, uiMsg, wParam, lParam);
 
-		case WM_IME_STARTCOMPOSITION:
-			return CPythonIME::Instance().WMStartComposition(hWnd, uiMsg, wParam, lParam);
-			break;
+	case WM_IME_STARTCOMPOSITION:
+		return CPythonIME::Instance().WMStartComposition(hWnd, uiMsg, wParam, lParam);
 
-		case WM_IME_COMPOSITION:
-			return CPythonIME::Instance().WMComposition(hWnd, uiMsg, wParam, lParam);
-			break;
+	case WM_IME_COMPOSITION:
+		return CPythonIME::Instance().WMComposition(hWnd, uiMsg, wParam, lParam);
 
-		case WM_IME_ENDCOMPOSITION:
-			return CPythonIME::Instance().WMEndComposition(hWnd, uiMsg, wParam, lParam);
-			break;
+	case WM_IME_ENDCOMPOSITION:
+		return CPythonIME::Instance().WMEndComposition(hWnd, uiMsg, wParam, lParam);
 
-		case WM_IME_NOTIFY:
-			return CPythonIME::Instance().WMNotify(hWnd, uiMsg, wParam, lParam);
-			break;
+	case WM_IME_NOTIFY:
+		return CPythonIME::Instance().WMNotify(hWnd, uiMsg, wParam, lParam);
 
-		case WM_IME_SETCONTEXT:
-			lParam &= ~(ISC_SHOWUICOMPOSITIONWINDOW | ISC_SHOWUIALLCANDIDATEWINDOW);
-			break;
+	case WM_IME_SETCONTEXT:
+		lParam &= ~(ISC_SHOWUICOMPOSITIONWINDOW | ISC_SHOWUIALLCANDIDATEWINDOW);
+		break;
 
-		case WM_CHAR:
-			return CPythonIME::Instance().WMChar(hWnd, uiMsg, wParam, lParam);
-			break;
+	case WM_CHAR:
+		return CPythonIME::Instance().WMChar(hWnd, uiMsg, wParam, lParam);
 
 		case WM_KEYDOWN:
 			OnIMEKeyDown(LOWORD(wParam));
@@ -190,11 +175,10 @@ LRESULT CPythonApplication::WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wP
 				int32_t  yPos		= GET_Y_LPARAM(lParam);
 				int16_t zDelta	= GET_WHEEL_DELTA_WPARAM(wParam);
 
-				if(OnMouseWheelScroll(xPos, yPos, zDelta))
+				if (OnMouseWheelScroll(xPos, yPos, zDelta))
 					break;
 				
 #endif
-
 				OnMouseWheel(int16_t(HIWORD(wParam)));
 			}
 			break;
@@ -249,7 +233,6 @@ LRESULT CPythonApplication::WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wP
 			{
 				case 18:
 					return FALSE;
-					break;
 				case VK_F10:
 					break;
 			}
@@ -260,15 +243,14 @@ LRESULT CPythonApplication::WindowProcedure(HWND hWnd, uint32_t uiMsg, WPARAM wP
 			{
 				if (m_bCursorVisible && CURSOR_MODE_HARDWARE == m_iCursorMode)
 				{
-					SetCursor((HCURSOR) m_hCurrentCursor);
-					return 0;
-				}
-				else
-				{
-					SetCursor(nullptr);
-					return 0;
-				}
+				SetCursor(static_cast<HCURSOR>(m_hCurrentCursor));
+				return 0;
 			}
+
+
+			SetCursor(nullptr);
+			return 0;
+		}
 			break;
 
 		case WM_CLOSE:

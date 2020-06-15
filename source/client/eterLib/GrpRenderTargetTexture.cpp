@@ -2,7 +2,7 @@
 #include "../eterBase/Stl.h"
 #include "GrpRenderTargetTexture.h"
 #include "StateManager.h"
-#include "../EterBase/vk.h"
+#include "../eterBase/vk.h"
 
 void CGraphicRenderTargetTexture::ReleaseTextures()
 {

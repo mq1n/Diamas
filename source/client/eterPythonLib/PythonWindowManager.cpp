@@ -6,7 +6,7 @@
 
 //#define __WINDOW_LEAK_CHECK__
 
-BOOL g_bShowOverInWindowName = FALSE;
+bool g_bShowOverInWindowName = false;
 
 namespace UI
 {	
@@ -27,9 +27,9 @@ namespace UI
 		m_lMouseX(0), m_lMouseY(0),
 		m_lDragX(0), m_lDragY(0),
 		m_lPickedX(0), m_lPickedY(0),
-		m_bOnceIgnoreMouseLeftButtonUpEventFlag(FALSE), m_iIgnoreEndTime(0),
+		m_bOnceIgnoreMouseLeftButtonUpEventFlag(false), m_dwIgnoreEndTime(0),
 		m_poMouseHandler(nullptr),
-		m_bAttachingFlag(FALSE),
+		m_bAttachingFlag(false),
 		m_dwAttachingType(0),
 		m_dwAttachingIndex(0),
 		m_dwAttachingSlotNumber(0),
@@ -47,14 +47,14 @@ namespace UI
 
 		const char * layerTbl[] = {"GAME","UI_BOTTOM","UI","TOP_MOST","CURTAIN"};
 
-		for(uint32_t layer = 0; layer < sizeof(layerTbl)/sizeof(layerTbl[0]); layer++)
-		{
-			CWindow * pLayer = new CLayer(nullptr);
-			pLayer->SetName(layerTbl[layer]);
-			pLayer->Show();
-			m_LayerWindowMap.insert(TLayerContainer::value_type(layerTbl[layer], pLayer));
-			m_pRootWindow->AddChild(pLayer);
-			m_LayerWindowList.push_back(pLayer);
+	for (auto & layer : layerTbl)
+	{
+		CWindow * pLayer = new CLayer(nullptr);
+		pLayer->SetName(layer);
+		pLayer->Show();
+		m_LayerWindowMap.emplace(layer, pLayer);
+		m_pRootWindow->AddChild(pLayer);
+		m_LayerWindowList.emplace_back(pLayer);
 		}
 
 		m_ActiveWindowList.clear();
@@ -408,17 +408,13 @@ namespace UI
 		m_ActiveWindowList.remove(pWindow);
 		m_PickAlwaysWindowList.remove(pWindow);
 
-		TKeyCaptureWindowMap::iterator itor = m_KeyCaptureWindowMap.begin();
+		auto itor = m_KeyCaptureWindowMap.begin();
 		for (; itor != m_KeyCaptureWindowMap.end();)
 		{
 			if (pWindow == itor->second)
-			{
 				itor = m_KeyCaptureWindowMap.erase(itor);
-			}
 			else
-			{
 				++itor;
-			}
 		}
 	}
 
@@ -431,20 +427,20 @@ namespace UI
 			pParentWin->DeleteChild(pWin);
 		}
 		pWin->Clear();
-		m_ReserveDeleteWindowList.push_back(pWin);
+		m_ReserveDeleteWindowList.emplace_back(pWin);
 	}
 
-	BOOL CWindowManager::IsDragging()
+	bool CWindowManager::IsDragging()
 	{
 		int32_t ldx = abs(m_lMouseX - m_lPickedX);
 		int32_t ldy = abs(m_lMouseY - m_lPickedY);
 		if (ldx+ldy < 10)
-			return FALSE;
+			return false;
 
-		return TRUE;
+		return true;
 	}
 
-	BOOL CWindowManager::IsAttaching()
+	bool CWindowManager::IsAttaching()
 	{
 		return m_bAttachingFlag;
 	}
@@ -477,7 +473,7 @@ namespace UI
 
 	void CWindowManager::AttachIcon(uint32_t dwType, uint32_t dwIndex, uint32_t dwSlotNumber, uint8_t byWidth, uint8_t byHeight)
 	{
-		m_bAttachingFlag = TRUE;
+		m_bAttachingFlag = true;
 		m_dwAttachingType = dwType;
 		m_dwAttachingIndex = dwIndex;
 		m_dwAttachingSlotNumber = dwSlotNumber;
@@ -486,7 +482,7 @@ namespace UI
 		m_byAttachingIconHeight = byHeight;
 	}
 
-	void CWindowManager::SetAttachingFlag(BOOL bFlag)
+	void CWindowManager::SetAttachingFlag(bool bFlag)
 	{
 		m_bAttachingFlag = bFlag;
 	}
@@ -498,7 +494,9 @@ namespace UI
 
 	void CWindowManager::DeattachIcon()
 	{
-		SetAttachingFlag(FALSE);
+		if (IsDisableDeattach())
+			return;
+		SetAttachingFlag(false);
 		if (m_poMouseHandler)
 			PyCallClassMemberFunc(m_poMouseHandler, "DeattachObject", BuildEmptyTuple());
 	}
@@ -532,13 +530,13 @@ namespace UI
 
 	void CWindowManager::SetPickAlways(CWindow * pWindow)
 	{
-		m_PickAlwaysWindowList.push_back(pWindow);
+		m_PickAlwaysWindowList.emplace_back(pWindow);
 	}
 
 	void CWindowManager::OnceIgnoreMouseLeftButtonUpEvent()
 	{
-		m_bOnceIgnoreMouseLeftButtonUpEventFlag = TRUE;
-		m_iIgnoreEndTime = timeGetTime() + 500;
+		m_bOnceIgnoreMouseLeftButtonUpEventFlag = true;
+		m_dwIgnoreEndTime = timeGetTime() + 500;
 	}
 
 	void CWindowManager::LockWindow(CWindow * pWin)
@@ -554,7 +552,7 @@ namespace UI
 			if (m_pLockWindow==pWin)
 				return;
 
-			m_LockWindowList.push_back(m_pLockWindow);
+			m_LockWindowList.emplace_back(m_pLockWindow);
 		}
 
 		m_pLockWindow = pWin;
@@ -589,16 +587,14 @@ namespace UI
 		{
 			// NOTE : 누적된 Window가 많아지면 Clear를 해줘야 할까?
 			//        일단은 중복 누적이 안되며 포커스 되는 갯수 자체가 5개 미만이니 굳이 필요하지는 않을 듯.. - [levites]
-			m_ActiveWindowList.push_back(m_pActiveWindow);
+			m_ActiveWindowList.emplace_back(m_pActiveWindow);
 			m_pActiveWindow->OnKillFocus();
 		}
 
 		m_pActiveWindow = pWin;
 
 		if (m_pActiveWindow)
-		{
 			m_pActiveWindow->OnSetFocus();
-		}
 	}
 
 	void CWindowManager::DeactivateWindow()
@@ -641,15 +637,13 @@ namespace UI
 			return;
 
 		// GameLayer에 속해 있는 윈도우가 피킹 됐다면 무조건 SetTop을 해준다.
-		TLayerContainer::iterator itor = m_LayerWindowMap.find("UI");
+		auto itor = m_LayerWindowMap.find("UI");
 		if (itor == m_LayerWindowMap.end())
 			return;
 		CWindow * pGameLayer = itor->second;
 		CWindow * pTopWindow = pGameLayer->PickTopWindow(m_lMouseX, m_lMouseY);
 		if (pTopWindow)
-		{
 			SetTop(pTopWindow);
-		}
 	}
 
 	CWindow * CWindowManager::GetActivateWindow()
@@ -683,10 +677,8 @@ namespace UI
 		m_lWidth	= lWidth;
 		m_lHeight	= lHeight;
 
-		for (TLayerContainer::iterator itor = m_LayerWindowMap.begin(); itor != m_LayerWindowMap.end(); ++itor)
-		{
-			itor->second->SetSize(lWidth, lHeight);
-		}
+		for (auto& itor : m_LayerWindowMap)
+			itor.second->SetSize(lWidth, lHeight);
 	}
 
 	void CWindowManager::__ClearReserveDeleteWindowList()
@@ -718,19 +710,18 @@ namespace UI
 	CWindow * CWindowManager::__PickWindow(int32_t x, int32_t y)
 	{
 		if (m_pLockWindow)
-		{
 			return m_pLockWindow->PickWindow(x, y);
-		}
 
-		for (TWindowContainer::iterator itor = m_PickAlwaysWindowList.begin(); itor != m_PickAlwaysWindowList.end(); ++itor)
+		for (auto pWindow : m_PickAlwaysWindowList)
 		{
-			CWindow * pWindow = *itor;
 			if (pWindow->IsRendering())
-			if (pWindow->IsIn(x, y))
-				return pWindow;
+			{
+				if (pWindow->IsIn(x, y))
+					return pWindow;
+			}
 		}
 
-		for (TWindowContainer::reverse_iterator ritor = m_LayerWindowList.rbegin(); ritor != m_LayerWindowList.rend(); ++ritor)
+		for (auto ritor = m_LayerWindowList.rbegin(); ritor != m_LayerWindowList.rend(); ++ritor)
 		{
 			CWindow * pLayer = *ritor;
 			CWindow * pPickedWindow = pLayer->PickWindow(x, y);
@@ -777,8 +768,8 @@ namespace UI
 		{
 			if (pPointWindow)
 			{
-				static std::string strPickWindowName = "";
-				if (0 != strPickWindowName.compare(pPointWindow->GetName()))
+			static std::string strPickWindowName;
+			if (pPointWindow->GetName() != strPickWindowName)
 				{
 					Tracef(" OverInWindowName [%s]\n", pPointWindow->GetName());
 					strPickWindowName = pPointWindow->GetName();
@@ -792,51 +783,47 @@ namespace UI
 
 			if (pWin->IsFlag(CWindow::FLAG_MOVABLE))
 			{
-				int32_t x = m_lMouseX - m_lDragX;
-				int32_t y = m_lMouseY - m_lDragY;
-				if (pWin->HasParent())
-				{
-					x -= pWin->GetParent()->GetRect().left;
-					y -= pWin->GetParent()->GetRect().top;
-				}
-
-				int32_t lx, ly;
-				pWin->GetPosition(&lx, &ly);
-				if (pWin->IsFlag(CWindow::FLAG_RESTRICT_X))
-				{
-					x = lx;
-				}
-				if (pWin->IsFlag(CWindow::FLAG_RESTRICT_Y))
-				{
-					y = ly;
-				}
-
-				if (pWin->IsFlag(CWindow::FLAG_LIMIT))
-				{
-					RECT limitRect = pWin->GetLimitBias();
-
-					limitRect.right = m_lWidth - limitRect.right;
-					limitRect.bottom = m_lHeight - limitRect.bottom;
-
-					if (x < limitRect.left)
-						x = limitRect.left;
-					else if (x + pWin->GetWidth() >= limitRect.right)
-						x = limitRect.right - pWin->GetWidth();
-
-					if (y < limitRect.top)
-						y = limitRect.top;
-					else if (y + pWin->GetHeight() >= limitRect.bottom)
-						y = limitRect.bottom - pWin->GetHeight();
-				}
-
-				pWin->SetPosition(x, y);
-				pWin->OnMoveWindow(x, y);
-			}
-			else if (m_pLeftCaptureWindow->IsFlag(CWindow::FLAG_DRAGABLE))
+			int32_t localX = m_lMouseX - m_lDragX;
+			int32_t localY = m_lMouseY - m_lDragY;
+			if (pWin->HasParent())
 			{
-				int32_t x = m_lMouseX - m_lDragX;
-				int32_t y = m_lMouseY - m_lDragY;
-				m_pLeftCaptureWindow->OnMouseDrag(x, y);
+				localX -= pWin->GetParent()->GetRect().left;
+				localY -= pWin->GetParent()->GetRect().top;
+			}
+
+			int32_t lx, ly;
+			pWin->GetPosition(&lx, &ly);
+			if (pWin->IsFlag(CWindow::FLAG_RESTRICT_X))
+				localX = lx;
+			if (pWin->IsFlag(CWindow::FLAG_RESTRICT_Y))
+				localY = ly;
+
+			if (pWin->IsFlag(CWindow::FLAG_LIMIT))
+			{
+				RECT limitRect = pWin->GetLimitBias();
+
+				limitRect.right = m_lWidth - limitRect.right;
+				limitRect.bottom = m_lHeight - limitRect.bottom;
+
+				if (localX < limitRect.left)
+					localX = limitRect.left;
+				else if (localX + pWin->GetWidth() >= limitRect.right)
+					localX = limitRect.right - pWin->GetWidth();
+
+				if (localY < limitRect.top)
+					localY = limitRect.top;
+				else if (localY + pWin->GetHeight() >= limitRect.bottom)
+					localY = limitRect.bottom - pWin->GetHeight();
+			}
+
+			pWin->SetPosition(localX, localY);
+			pWin->OnMoveWindow(localX, localY);
+		}
+		else if (m_pLeftCaptureWindow->IsFlag(CWindow::FLAG_DRAGABLE))
+		{
+			const int32_t localX = m_lMouseX - m_lDragX;
+			const int32_t localY = m_lMouseY - m_lDragY;
+			m_pLeftCaptureWindow->OnMouseDrag(localX, localY);
 			}
 		}
 
@@ -862,9 +849,7 @@ namespace UI
 		}
 
 		if (m_pPointWindow)
-		{
 			m_pPointWindow->OnMouseOver();
-		}
 	}
 
 	void CWindowManager::RunMouseLeftButtonDown(int32_t x, int32_t y)
@@ -900,12 +885,10 @@ namespace UI
 	{
 		if (m_bOnceIgnoreMouseLeftButtonUpEventFlag)
 		{
-			m_bOnceIgnoreMouseLeftButtonUpEventFlag = FALSE;
+			m_bOnceIgnoreMouseLeftButtonUpEventFlag = false;
 
-			if (timeGetTime() < m_iIgnoreEndTime)
-			{
+			if (timeGetTime() < m_dwIgnoreEndTime)
 				return;
-			}
 		}
 
 		SetMousePosition(x, y);
@@ -985,9 +968,7 @@ namespace UI
 
 		CWindow * pWin = GetPointWindow();
 		if (pWin)
-		{
 			pWin->OnMouseRightButtonDoubleClick();
-		}
 	}
 
 	void CWindowManager::RunMouseMiddleButtonDown(int32_t x, int32_t y)
@@ -1033,7 +1014,7 @@ namespace UI
 		if (!pWin)
 			return false;
 
-		return pWin->OnMouseWheelScroll(wDelta) == TRUE;
+		return pWin->OnMouseWheelScroll(wDelta) == true;
 	}
 #endif
 
@@ -1062,10 +1043,12 @@ namespace UI
 			return;
 		}
 		if (m_pActiveWindow)
-		if (m_pActiveWindow->IsRendering())
 		{
-			if (m_pActiveWindow->OnIMETabEvent())
-				return;
+			if (m_pActiveWindow->IsRendering())
+			{
+				if (m_pActiveWindow->OnIMETabEvent())
+					return;
+			}
 		}
 
 		if (!m_pRootWindow->RunIMETabEvent())
@@ -1107,10 +1090,12 @@ namespace UI
 			return;
 		}
 		if (m_pActiveWindow)
-		if (m_pActiveWindow->IsRendering())
 		{
-			if (m_pActiveWindow->OnIMEReturnEvent())
-				return;
+			if (m_pActiveWindow->IsRendering())
+			{
+				if (m_pActiveWindow->OnIMEReturnEvent())
+					return;
+			}
 		}
 
 		m_pRootWindow->RunIMEReturnEvent();
@@ -1124,10 +1109,12 @@ namespace UI
 			return;
 		}
 		if (m_pActiveWindow)
-		if (m_pActiveWindow->IsRendering())
 		{
-			if (m_pActiveWindow->OnIMEKeyDownEvent(vkey))
-				return;
+			if (m_pActiveWindow->IsRendering())
+			{
+				if (m_pActiveWindow->OnIMEKeyDownEvent(vkey))
+					return;
+			}
 		}
 
 		// NOTE : 전체로 돌리지 않고 Activate되어있는 EditLine에만 보내는 이벤트
@@ -1136,10 +1123,12 @@ namespace UI
 	void CWindowManager::RunChangeCodePage()
 	{
 		if (m_pActiveWindow)
-		if (m_pActiveWindow->IsRendering())
 		{
-			if (m_pActiveWindow->OnIMEChangeCodePage())
-				return;
+			if (m_pActiveWindow->IsRendering())
+			{
+				if (m_pActiveWindow->OnIMEChangeCodePage())
+					return;
+			}
 		}
 	}
 	void CWindowManager::RunOpenCandidate()
@@ -1150,10 +1139,12 @@ namespace UI
 			return;
 		}
 		if (m_pActiveWindow)
-		if (m_pActiveWindow->IsRendering())
 		{
-			if (m_pActiveWindow->OnIMEOpenCandidateListEvent())
-				return;
+			if (m_pActiveWindow->IsRendering())
+			{
+				if (m_pActiveWindow->OnIMEOpenCandidateListEvent())
+					return;
+			}
 		}
 	}
 
@@ -1165,10 +1156,12 @@ namespace UI
 			return;
 		}
 		if (m_pActiveWindow)
-		if (m_pActiveWindow->IsRendering())
 		{
-			if (m_pActiveWindow->OnIMECloseCandidateListEvent())
-				return;
+			if (m_pActiveWindow->IsRendering())
+			{
+				if (m_pActiveWindow->OnIMECloseCandidateListEvent())
+					return;
+			}
 		}
 	}
 
@@ -1180,10 +1173,12 @@ namespace UI
 			return;
 		}
 		if (m_pActiveWindow)
-		if (m_pActiveWindow->IsRendering())
 		{
-			if (m_pActiveWindow->OnIMEOpenReadingWndEvent())
-				return;
+			if (m_pActiveWindow->IsRendering())
+			{
+				if (m_pActiveWindow->OnIMEOpenReadingWndEvent())
+					return;
+			}
 		}
 	}
 
@@ -1195,10 +1190,12 @@ namespace UI
 			return;
 		}
 		if (m_pActiveWindow)
-		if (m_pActiveWindow->IsRendering())
 		{
-			if (m_pActiveWindow->OnIMECloseReadingWndEvent())
-				return;
+			if (m_pActiveWindow->IsRendering())
+			{
+				if (m_pActiveWindow->OnIMECloseReadingWndEvent())
+					return;
+			}
 		}
 	}
 	// IME
@@ -1208,30 +1205,33 @@ namespace UI
 		if (m_pLockWindow)
 		{
 			m_pLockWindow->OnKeyDown(vkey);
-			m_KeyCaptureWindowMap.insert(std::make_pair(vkey, m_pLockWindow));
+			m_KeyCaptureWindowMap.emplace(vkey, m_pLockWindow);
 			return;
 		}
 		if (m_pActiveWindow)
-		if (m_pActiveWindow->IsShow())
 		{
-			if (m_pActiveWindow->OnKeyDown(vkey))
+			if (m_pActiveWindow->IsShow())
 			{
-				m_KeyCaptureWindowMap.insert(std::make_pair(vkey, m_pActiveWindow));
-				return;
+				if (m_pActiveWindow->OnKeyDown(vkey))
+				{
+					m_KeyCaptureWindowMap.emplace(vkey, m_pActiveWindow);
+					return;
+				}
 			}
 		}
 
 		CWindow * pKeyCaptureWindow = m_pRootWindow->RunKeyDownEvent(vkey);
 		if (pKeyCaptureWindow)
-		if (m_ReserveDeleteWindowList.end() == std::find(m_ReserveDeleteWindowList.begin(), m_ReserveDeleteWindowList.end(), pKeyCaptureWindow))
 		{
-			m_KeyCaptureWindowMap.insert(TKeyCaptureWindowMap::value_type(vkey, pKeyCaptureWindow));
+			if (m_ReserveDeleteWindowList.end() ==
+				std::find(m_ReserveDeleteWindowList.begin(), m_ReserveDeleteWindowList.end(), pKeyCaptureWindow))
+				m_KeyCaptureWindowMap.emplace(vkey, pKeyCaptureWindow);
 		}
 	}
 
 	void CWindowManager::RunKeyUp(int32_t vkey)
 	{
-		TKeyCaptureWindowMap::iterator itor = m_KeyCaptureWindowMap.find(vkey);
+		auto itor = m_KeyCaptureWindowMap.find(vkey);
 		if (m_KeyCaptureWindowMap.end() != itor)
 		{
 			CWindow * pKeyCaptureWindow = itor->second;

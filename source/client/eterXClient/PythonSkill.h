@@ -16,7 +16,7 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 			SKILL_TYPE_SUPPORT,
 			SKILL_TYPE_GUILD,
 			SKILL_TYPE_HORSE,
-			SKILL_TYPE_MAX_NUM,
+			SKILL_TYPE_MAX_NUM
 		};
 
 		enum ESkillTableTokenType
@@ -48,7 +48,7 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 			TABLE_TOKEN_TYPE_SPLASH_AROUND_DAMAGE_ADJUST_POLY,
 			TABLE_TOKEN_TYPE_TARGET_RANGE,
 			TABLE_TOKEN_TYPE_SPLASH_RANGE,
-			TABLE_TOKEN_TYPE_MAX_NUM,
+			TABLE_TOKEN_TYPE_MAX_NUM
 		};
 
 		enum ESkillDescTokenType
@@ -85,7 +85,7 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 
 			CONDITION_COLUMN_COUNT = 3,
 			AFFECT_COLUMN_COUNT = 3,
-			AFFECT_STEP_COUNT = 3,
+			AFFECT_STEP_COUNT = 3
 		};
 
 		enum
@@ -113,7 +113,7 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 			SKILL_ATTRIBUTE_MOVING_SKILL			= (1 << 20),
 			SKILL_ATTRIBUTE_HORSE_SKILL				= (1 << 21),
 			SKILL_ATTRIBUTE_CIRCLE_RANGE			= (1 << 22),
-			SKILL_ATTRIBUTE_SEARCH_TARGET			= (1 << 23),
+			SKILL_ATTRIBUTE_SEARCH_TARGET			= (1 << 23)
 		};
 
 		enum
@@ -130,14 +130,14 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 #ifdef ENABLE_WOLFMAN_CHARACTER
 			SKILL_NEED_WEAPON_CLAW				= (1 << CItemData::WEAPON_CLAW),
 #endif
-			SKILL_NEED_WEAPON_EMPTY_HAND		= (1 << CItemData::WEAPON_NONE),
+			SKILL_NEED_WEAPON_EMPTY_HAND		= (1 << CItemData::WEAPON_NONE)
 		};
 
 		enum
 		{
 			VALUE_TYPE_FREE,
 			VALUE_TYPE_MIN,
-			VALUE_TYPE_MAX,
+			VALUE_TYPE_MAX
 		};
 
 		enum
@@ -145,7 +145,7 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 			SKILL_GRADE_COUNT = 3,
 			SKILL_EFFECT_COUNT = 4,	//스킬은 초,중,고급 이외에 마스터일때 이펙트 추가.
 			SKILL_GRADE_STEP_COUNT = 20,
-			SKILL_GRADEGAP = 25,
+			SKILL_GRADEGAP = 25
 		};
 
 		typedef struct SAffectData
@@ -284,8 +284,6 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 
 		void SetPathName(const char * c_szFileName);
 		const char * GetPathName();
-
-		void TEST();
 
 	protected:
 		void __RegisterGradeIconImage(TSkillData & rData, const char * c_szHeader, const char * c_szImageName);

@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "DungeonBlock.h"
 
-#include "../eterlib/StateManager.h"
+#include "../eterLib/StateManager.h"
 
 class CDungeonModelInstance : public CGrannyModelInstance
 {
@@ -134,9 +134,7 @@ void CDungeonBlock::OnUpdateCollisionData(const CStaticCollisionDataVector * psc
 	assert(pscdVector);
 	CStaticCollisionDataVector::const_iterator it;
 	for(it = pscdVector->begin();it!=pscdVector->end();++it)
-	{
 		AddCollision(&(*it),&GetTransform());
-	}
 }
 
 void CDungeonBlock::OnUpdateHeighInstance(CAttributeInstance * pAttributeInstance)
@@ -163,7 +161,7 @@ void CDungeonBlock::BuildBoundingSphere()
 
 bool CDungeonBlock::Intersect(float * pfu, float * pfv, float * pft)
 {
-	TModelInstanceContainer::iterator itor = m_ModelInstanceContainer.begin();
+	auto itor = m_ModelInstanceContainer.begin();
 	for (; itor != m_ModelInstanceContainer.end(); ++itor)
 	{
 		CDungeonModelInstance * pInstance = *itor;
@@ -183,7 +181,7 @@ void CDungeonBlock::GetBoundBox(D3DXVECTOR3 * pv3Min, D3DXVECTOR3 * pv3Max)
 	pv3Max->y = -10000000.0f;
 	pv3Max->z = -10000000.0f;
 
-	TModelInstanceContainer::iterator itor = m_ModelInstanceContainer.begin();
+	auto itor = m_ModelInstanceContainer.begin();
 	for (; itor != m_ModelInstanceContainer.end(); ++itor)
 	{
 		CDungeonModelInstance * pInstance = *itor;
@@ -227,7 +225,7 @@ bool CDungeonBlock::Load(const char * c_szFileName)
 			D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1, 
 			D3DUSAGE_WRITEONLY, 
 			D3DPOOL_MANAGED);	
-		m_ModelInstanceContainer.push_back(pModelInstance);
+		m_ModelInstanceContainer.emplace_back(pModelInstance);
 	}
 
 	return true;

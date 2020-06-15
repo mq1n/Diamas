@@ -85,10 +85,9 @@ BOOL CParticleInstance::Update(float fElapsedTime, float fAngle)
 	{
 		if (m_pParticleProperty->m_bAttachFlag)
 		{
-			float fCos, fSin;
 			fAngle = D3DXToRadian(fAngle);
-			fCos = cos(fAngle);
-			fSin = sin(fAngle);
+			float fCos = cos(fAngle);
+			float fSin = sin(fAngle);
 
 			float rx = m_v3Position.x - m_v3StartPosition.x;
 			float ry = m_v3Position.y - m_v3StartPosition.y;
@@ -140,7 +139,8 @@ void CParticleInstance::Transform(const D3DXMATRIX * c_matLocal)
 		const D3DXVECTOR3 & c_rv3Up = pCurrentCamera->GetUp();
 		const D3DXVECTOR3 & c_rv3Cross = pCurrentCamera->GetCross();
 
-		switch(m_pParticleProperty->m_byBillboardType) {
+		switch (m_pParticleProperty->m_byBillboardType)
+		{
 		case BILLBOARD_TYPE_LIE:
 			{
 				float fCos = cosf(D3DXToRadian(m_fRotation)), fSin = sinf(D3DXToRadian(m_fRotation));
@@ -240,9 +240,7 @@ void CParticleInstance::Transform(const D3DXMATRIX * c_matLocal)
 		// NOTE: 속도가 길이에 주는 영향 : log(velocity)만큼 늘어난다.
 		float length = D3DXVec3Length(&v3Up);
 		if (length == 0.0f)
-		{
 			v3Up = D3DXVECTOR3(0.0f,0.0f,1.0f);
-		}
 		else
 			v3Up *=(1+log(1+length))/length;
 
@@ -280,7 +278,7 @@ void CParticleInstance::Transform(const D3DXMATRIX * c_matLocal, const float c_f
 #ifdef WORLD_EDITOR
 	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, m_Color);
 #else
-	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, (uint32_t)m_dcColor);
+	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, static_cast<uint32_t>(m_dcColor));
 #endif
 
 	/////
@@ -294,7 +292,8 @@ void CParticleInstance::Transform(const D3DXMATRIX * c_matLocal, const float c_f
 		const D3DXVECTOR3 & c_rv3Up = pCurrentCamera->GetUp();
 		const D3DXVECTOR3 & c_rv3Cross = pCurrentCamera->GetCross();
 
-		switch(m_pParticleProperty->m_byBillboardType) {
+		switch (m_pParticleProperty->m_byBillboardType)
+		{
 		case BILLBOARD_TYPE_LIE:
 			{
 				float fCos = cosf(D3DXToRadian(m_fRotation)), fSin = sinf(D3DXToRadian(m_fRotation));
@@ -372,9 +371,7 @@ void CParticleInstance::Transform(const D3DXMATRIX * c_matLocal, const float c_f
 		// NOTE: 속도가 길이에 주는 영향 : log(velocity)만큼 늘어난다.
 		float length = D3DXVec3Length(&v3Up);
 		if (length == 0.0f)
-		{
 			v3Up = D3DXVECTOR3(0.0f,0.0f,1.0f);
-		}
 		else
 			v3Up *=(1+log(1+length))/length;
 		//D3DXVec3Normalize(&v3Up,&v3Up);
@@ -389,12 +386,11 @@ void CParticleInstance::Transform(const D3DXMATRIX * c_matLocal, const float c_f
 
 	if (c_fZRotation)
 	{
-		float x, y;
 		float fCos = cosf(c_fZRotation);
 		float fSin = sinf(c_fZRotation);
 
-		x = v3Up.x;
-		y = v3Up.y;
+		float x = v3Up.x;
+		float y = v3Up.y;
 		v3Up.x = x * fCos - y * fSin;
 		v3Up.y = y * fCos + x * fSin;
 
