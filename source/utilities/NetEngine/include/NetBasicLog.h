@@ -1,5 +1,7 @@
 #pragma once
+#ifdef _WIN32
 #include <Windows.h>
+#endif
 #include <iostream>
 #include <fstream>
 #include <stdarg.h>
@@ -27,7 +29,9 @@ namespace net_engine
 
     static void DebugLog(const char * c_szLogData)
     {
+#ifdef _WIN32
         OutputDebugStringA(c_szLogData);
+#endif
     }
 
     static void DebugLogf(const char* c_szFormat, ...)
@@ -36,7 +40,7 @@ namespace net_engine
         
         va_list vaArgList;
         va_start(vaArgList, c_szFormat);
-        vsprintf_s(szBuffer, c_szFormat, vaArgList);
+        vsprintf(szBuffer, c_szFormat, vaArgList);
         va_end(vaArgList);
 
         DebugLog(szBuffer);
@@ -53,7 +57,7 @@ namespace net_engine
 
         va_list vaArgList;
         va_start(vaArgList, c_szFormat);
-        vsprintf_s(szBuffer, c_szFormat, vaArgList);
+        vsprintf(szBuffer, c_szFormat, vaArgList);
         va_end(vaArgList);
 
         ConsoleLog(szBuffer);
@@ -65,7 +69,7 @@ namespace net_engine
 
         va_list vaArgList;
         va_start(vaArgList, c_szFormat);
-        vsprintf_s(szBuffer, c_szFormat, vaArgList);
+        vsprintf(szBuffer, c_szFormat, vaArgList);
         va_end(vaArgList);
 
 #ifdef _DEBUG

@@ -1,4 +1,6 @@
+#ifdef _WIN32
 #include <Windows.h>
+#endif
 #include <sstream>
 #include "../include/NetLogHelper.h"
 
@@ -9,7 +11,9 @@ namespace net_engine
     static void LogErrorHandler(const std::string& stMessage)
     {
         Logf(CUSTOM_LOG_FILENAME, "Log error handled: %s\n", stMessage.c_str());
+#ifdef _WIN32
         MessageBoxA(0, stMessage.c_str(), "Logger initilization fail!", 0);
+#endif
         abort();
     }
 
@@ -76,7 +80,7 @@ namespace net_engine
         char szTmpBuffer[8192] = { 0 };
         va_list vaArgList;
         va_start(vaArgList, c_szFormat);
-        vsprintf_s(szTmpBuffer, c_szFormat, vaArgList);
+        vsprintf(szTmpBuffer, c_szFormat, vaArgList);
         va_end(vaArgList);
 
         std::stringstream ss;
