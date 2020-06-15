@@ -3,7 +3,7 @@
 
 #include "../../libthecore/include/utils.h"
 #include "typedef.h"
-#include "GPosition.h"
+#include "gposition.h"
 #include <vector>
 #include <memory>
 

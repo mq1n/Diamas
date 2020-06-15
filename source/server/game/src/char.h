@@ -16,7 +16,7 @@
 #include "mining.h"
 #include "abuse.h"
 #include "sectree_manager.h"
-#include "GPosition.h"
+#include "gposition.h"
 #include "activity.h"
 
 enum eMountType {MOUNT_TYPE_NONE=0, MOUNT_TYPE_NORMAL=1, MOUNT_TYPE_COMBAT=2, MOUNT_TYPE_MILITARY=3};

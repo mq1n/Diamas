@@ -3,7 +3,7 @@
 
 #include "../../common/tables.h"
 #include "entity.h"
-#include "GPosition.h"
+#include "gposition.h"
 
 class CItem : public CEntity
 {

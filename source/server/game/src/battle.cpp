@@ -5,7 +5,7 @@
 #include "char.h"
 #include "char_manager.h"
 #include "battle.h"
-#include "GPosition.h"
+#include "gposition.h"
 #include "item.h"
 #include "item_manager.h"
 #include "mob_manager.h"

@@ -1,7 +1,7 @@
 #ifndef __INC_METIN_II_GAME_ENTITY_H__
 #define __INC_METIN_II_GAME_ENTITY_H__
 
-#include "GPosition.h"
+#include "gposition.h"
 #include "typedef.h"
 #include <unordered_map>
 #include <functional>

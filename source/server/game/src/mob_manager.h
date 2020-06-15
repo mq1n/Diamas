@@ -3,7 +3,7 @@
 
 #include "../../common/tables.h"
 #include "typedef.h"
-#include "GPosition.h"
+#include "gposition.h"
 #include <vector>
 #include <string>
 #include <map>

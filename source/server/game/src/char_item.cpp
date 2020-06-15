@@ -7,7 +7,7 @@
 #include "desc.h"
 #include "desc_client.h"
 #include "desc_manager.h"
-#include "GPosition.h"
+#include "gposition.h"
 #include "packet.h"
 #include "affect.h"
 #include "skill.h"
