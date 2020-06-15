@@ -134,7 +134,7 @@ class CItem : public CEntity
 		{
 			assert(idx < ITEM_VALUES_MAX_NUM);
 
-			return static_cast<T>(GetProto()->values[idx]);
+			return static_cast<T>(GetProto()->alValues[idx]);
 		}
 
 		void		SetCell(LPCHARACTER ch, uint16_t pos)	{ m_pOwner = ch, m_wCell = pos;	}
