@@ -1,2 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+cryptopp-static.lib filter=lfs diff=lfs merge=lfs -text
+cryptopp-static_debug.lib filter=lfs diff=lfs merge=lfs -text
