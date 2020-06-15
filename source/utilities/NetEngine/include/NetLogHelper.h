@@ -45,12 +45,20 @@ namespace net_engine
 
 #ifndef DEBUG_LOG
 	#if defined(_DEBUG)
-		#define DEBUG_LOG(level, log, ...)	if (net_engine::gs_pNetLogInstance) { net_engine::gs_pNetLogInstance->Log(__FUNCTION__,  level, log, __VA_ARGS__); }
+        #ifdef _WIN32
+            #define DEBUG_LOG(level, log, ...)	if (net_engine::gs_pNetLogInstance) { net_engine::gs_pNetLogInstance->Log(__FUNCTION__,  level, log, __VA_ARGS__); }
+        #else
+            #define DEBUG_LOG(level, log, args...) if (net_engine::gs_pNetLogInstance) { net_engine::gs_pNetLogInstance->Log(__FUNCTION__,  level, log, ##args); }
+        #endif
 	#else
 		#define DEBUG_LOG(level, log, ...)
 	#endif
 #endif
 
 #ifndef NET_LOG
-    #define NET_LOG(level, log, ...)	if (net_engine::gs_pNetLogInstance) { net_engine::gs_pNetLogInstance->Log(__FUNCTION__,  level, log, __VA_ARGS__); }
+    #ifdef _WIN32
+        #define NET_LOG(level, log, ...)    if (net_engine::gs_pNetLogInstance) { net_engine::gs_pNetLogInstance->Log(__FUNCTION__,  level, log, __VA_ARGS__); }
+    #else
+        #define NET_LOG(level, log, args...)    if (net_engine::gs_pNetLogInstance) { net_engine::gs_pNetLogInstance->Log(__FUNCTION__,  level, log, ##args); }
+    #endif
 #endif
