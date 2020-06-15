@@ -7,7 +7,7 @@
 #ifndef lstring_h
 #define lstring_h
 
-
+#include <cstring>
 #include "lobject.h"
 #include "lstate.h"
 
