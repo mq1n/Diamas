@@ -43,7 +43,7 @@ namespace
 }
 #endif
 
-#if !USE_SELECT
+#if !defined(USE_SELECT)
 
 LPFDWATCH fdwatch_new(int nfiles)
 {
