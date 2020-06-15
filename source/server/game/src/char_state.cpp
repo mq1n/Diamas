@@ -21,7 +21,7 @@
 #include "war_map.h"
 #include "locale_service.h"
 #include "blue_dragon.h"
-#include "Battleground.h"
+#include "battleground.h"
 
 #include "../../common/VnumHelper.h"
 

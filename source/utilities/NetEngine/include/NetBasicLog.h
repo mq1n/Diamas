@@ -1,6 +1,7 @@
 #pragma once
 #ifdef _WIN32
 #include <Windows.h>
+#define vsprintf vsprintf_s
 #endif
 #include <iostream>
 #include <fstream>

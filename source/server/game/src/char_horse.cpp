@@ -10,7 +10,7 @@
 #include "locale_service.h"
 #include "arena.h"
 #include "war_map.h"
-#include "Battleground.h"
+#include "battleground.h"
 
 #include "../../common/VnumHelper.h"
 

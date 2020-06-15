@@ -3,7 +3,7 @@
 #include "char.h"
 #include "sectree_manager.h"
 #include "config.h"
-#include "Battleground.h"
+#include "battleground.h"
 
 void CEntity::ViewCleanup()
 {

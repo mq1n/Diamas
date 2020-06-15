@@ -29,7 +29,7 @@
 #include "mark_manager.h"
 #include "gm.h"
 #include "item.h"
-#include "Battleground.h"
+#include "battleground.h"
 
 #include "../../common/service.h"
 

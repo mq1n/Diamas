@@ -50,7 +50,7 @@
 #include "dragon_soul.h"
 #include "pet_system.h"
 #include "anticheat_manager.h"
-#include "Battleground.h"
+#include "battleground.h"
 
 #include "../../common/VnumHelper.h"
 #include "../../common/service.h"

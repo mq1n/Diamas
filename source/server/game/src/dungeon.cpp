@@ -14,7 +14,7 @@
 #include "item_manager.h"
 #include "utils.h"
 #include "quest_manager.h"
-#include "Battleground.h"
+#include "battleground.h"
 
 CDungeon::CDungeon(IdType id, int32_t lOriginalMapIndex, int32_t lMapIndex)
 	: m_id(id),

@@ -35,7 +35,7 @@
 #include "anticheat_manager.h"
 #include "map_location.h"
 #include "gm.h"
-#include "Battleground.h"
+#include "battleground.h"
 
 #include "../../common/service.h"
 

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Battleground.h"
+#include "battleground.h"
 #include "constants.h"
 #include "config.h"
 #include "quest_manager.h"

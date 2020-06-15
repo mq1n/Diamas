@@ -7,7 +7,7 @@
 #include "affect.h"
 #include "shop_manager.h"
 #include "item.h"
-#include "Battleground.h"
+#include "battleground.h"
 
 int32_t	OnClickShop(TRIGGERPARAM);
 int32_t	OnClickTalk(TRIGGERPARAM);
