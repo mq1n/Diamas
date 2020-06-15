@@ -21,7 +21,7 @@ namespace net_engine
 
         va_list vaArgList;
         va_start(vaArgList, c_szFormat);
-        vsprintf_s(szBuffer, c_szFormat, vaArgList);
+        vsprintf(szBuffer, c_szFormat, vaArgList);
         va_end(vaArgList);
 
         FileLog(stFileName.c_str(), szBuffer);
