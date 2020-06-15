@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Anticheat_Manager.h"
+#include "anticheat_manager.h"
 #include "db.h"
 #include "char.h"
 #include "desc.h"

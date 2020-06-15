@@ -32,7 +32,7 @@
 #include "threeway_war.h"
 #include "unique_item.h"
 #include "dragon_soul.h"
-#include "Anticheat_Manager.h"
+#include "anticheat_manager.h"
 #include "map_location.h"
 #include "gm.h"
 #include "Battleground.h"

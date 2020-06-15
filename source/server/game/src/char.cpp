@@ -49,7 +49,7 @@
 #include "ox_event.h"
 #include "dragon_soul.h"
 #include "pet_system.h"
-#include "Anticheat_Manager.h"
+#include "anticheat_manager.h"
 #include "Battleground.h"
 
 #include "../../common/VnumHelper.h"

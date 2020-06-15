@@ -35,7 +35,7 @@
 #include "map_location.h"
 #include "dragon_soul.h"
 #include "desc_client.h"
-#include "Anticheat_Manager.h"
+#include "anticheat_manager.h"
 #include "safebox.h"
 #include "../../common/service.h"
 
