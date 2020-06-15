@@ -59,20 +59,3 @@ jobs:
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
       run: ctest --timeout 20 -C Debug -j12
-
-  macos:
-    timeout-minutes: 20
-    runs-on: macOS-10.14
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Compile tests
-      working-directory: sql
-      run: |
-        cmake -DBUILD_TESTING=ON ..
-        make -j12
-    - name: Run tests
-      working-directory: sql
-      env:
-        CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 20 -C Debug -j12
