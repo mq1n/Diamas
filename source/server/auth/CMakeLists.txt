@@ -61,14 +61,16 @@ if (MSVC)
 else()
 	add_executable(${EXE_NAME} ${AUTH_HEADERS} ${AUTH_SOURCES})
 
-	FIND_LIBRARY(MYSQL_LIBRARY libmysqlclient.a ${MYSQL_DIR}/lib NO_DEFAULT_PATH)
+	if(NOT MYSQL_LIBRARIES)
+		FIND_LIBRARY(MYSQL_LIBRARIES libmysqlclient.a ${MYSQL_DIR}/lib NO_DEFAULT_PATH)
+	endif()
 #	FIND_LIBRARY(LIBZ libz.a /usr/lib)
 
 	# Static
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 	# Link
-	target_link_libraries(${EXE_NAME} ${LIBZ} ${MYSQL_LIBRARY} pthread -static-libgcc -static-libstdc++ NetEngine)
+	target_link_libraries(${EXE_NAME} ${LIBZ} ${MYSQL_LIBRARIES} pthread -static-libgcc -static-libstdc++ NetEngine)
 
 endif()
 

@@ -132,13 +132,13 @@ if(NOT WIN32)
 	set(BUILD_CLIENT OFF)
 	
 	# Register MySQL path
-#	set(MYSQL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/mysql/${COMPILER_SUBDIR})
-#	MESSAGE(STATUS "MYSQL_DIR: ${MYSQL_DIR}")
-
 	if(MYSQL_FOUND)
 		include_directories(${MYSQL_INCLUDE_DIR})
 	else()
-		message(FATAL_ERROR "MySQL not found")
+		message(STATUS "FindMySQL has been failed! Set MySQL path manually.")
+
+		set(MYSQL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/mysql/${COMPILER_SUBDIR})
+		include_directories(${PROJECT_SOURCE_DIR}/extern/include/mysql_incl)
 	endif()
 endif()
 

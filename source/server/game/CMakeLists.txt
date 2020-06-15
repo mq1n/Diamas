@@ -80,8 +80,10 @@ else()
 	add_executable(${EXE_NAME} ${GAMESERVER_HEADERS} ${GAMESERVER_SOURCES})
 
 	set(IL_LIBRARIES IL png tiff mng lcms jpeg jbig)
-#	FIND_LIBRARY(MYSQL_LIBRARY libmysqlclient.a ${MYSQL_DIR}/lib NO_DEFAULT_PATH)
 
+	if(NOT MYSQL_LIBRARIES)
+		FIND_LIBRARY(MYSQL_LIBRARIES libmysqlclient.a ${MYSQL_DIR}/lib NO_DEFAULT_PATH)
+	endif()
 #	FIND_LIBRARY(LIBZ libz.a /usr/lib)
 
 	# Static

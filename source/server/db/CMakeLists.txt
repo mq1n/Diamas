@@ -69,8 +69,9 @@ if (MSVC)
 else()
 	add_executable(${EXE_NAME} ${DBCACHE_HEADERS} ${DBCACHE_SOURCES})
 
-#	FIND_LIBRARY(MYSQL_LIBRARY libmysqlclient.a ${MYSQL_DIR}/lib NO_DEFAULT_PATH)
-
+	if(NOT MYSQL_LIBRARIES)
+		FIND_LIBRARY(MYSQL_LIBRARIES libmysqlclient.a ${MYSQL_DIR}/lib NO_DEFAULT_PATH)
+	endif()
 #	FIND_LIBRARY(LIBZ libz.a /usr/lib)
 
 	# Static
