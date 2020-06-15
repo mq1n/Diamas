@@ -53,9 +53,9 @@ add_definitions(-DCMAKE_BUILD_SYSTEM)
 if (ENABLE_STATIC_ANALYSIS)
 	include(${CMAKE_MODULE_PATH}/PVS-Studio.cmake)
 endif()
-if(NOT WIN32)
-	include(${CMAKE_MODULE_PATH}/FindMYSQL.cmake)
-endif()
+#if(NOT WIN32)
+#	include(${CMAKE_MODULE_PATH}/FindMYSQL.cmake)
+#endif()
 
 # C++ options
 set(CMAKE_CXX_STANDARD 17)
@@ -132,14 +132,14 @@ if(NOT WIN32)
 	set(BUILD_CLIENT OFF)
 	
 	# Register MySQL path
-	if(MYSQL_FOUND)
-		include_directories(${MYSQL_INCLUDE_DIR})
-	else()
-		message(STATUS "FindMySQL has been failed! Set MySQL path manually.")
+	#if(MYSQL_FOUND)
+	#	include_directories(${MYSQL_INCLUDE_DIR})
+	#else()
+	#	message(STATUS "FindMySQL has been failed! Set MySQL path manually.")
 
-		set(MYSQL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/mysql/${COMPILER_SUBDIR})
-		include_directories(${PROJECT_SOURCE_DIR}/extern/include/mysql_incl)
-	endif()
+	set(MYSQL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/mysql/${COMPILER_SUBDIR})
+	include_directories(${PROJECT_SOURCE_DIR}/extern/include/mysql_incl)
+	#endif()
 endif()
 
 # Check enabled projects

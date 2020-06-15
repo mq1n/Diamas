@@ -92,6 +92,8 @@ class CEntity
 		ENTITY_REQ_FUNC m_fReq;
 };
 
+class CharacterSnapshotGuard;
+
 template <typename Function>
 void CEntity::ForEachSeen(Function& f)
 {

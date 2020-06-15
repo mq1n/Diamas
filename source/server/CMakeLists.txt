@@ -48,8 +48,8 @@ if(NOT MSVC)
 # CHECKME: msse2 - mssse3 ?
 
 	#  CHECKME: Static build
-#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
-#	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static")
 
 	# Disable encoding warnings
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
