@@ -80,14 +80,15 @@ else()
 	add_executable(${EXE_NAME} ${GAMESERVER_HEADERS} ${GAMESERVER_SOURCES})
 
 	set(IL_LIBRARIES IL png tiff mng lcms jpeg jbig)
-	FIND_LIBRARY(MYSQL_LIBRARY libmysqlclient.a ${MYSQL_DIR}/lib NO_DEFAULT_PATH)
+#	FIND_LIBRARY(MYSQL_LIBRARY libmysqlclient.a ${MYSQL_DIR}/lib NO_DEFAULT_PATH)
+
 #	FIND_LIBRARY(LIBZ libz.a /usr/lib)
 
 	# Static
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 	# Link
-	target_link_libraries(${EXE_NAME} -pthread ${LIBZ} -static-libgcc -static-libstdc++ ${MYSQL_LIBRARY} ${IL_LIBRARIES} lualib thecorelib sqllib gamelib) # x64: z ve lzma
+	target_link_libraries(${EXE_NAME} -pthread ${LIBZ} -static-libgcc -static-libstdc++ ${MYSQL_LIBRARIES} ${IL_LIBRARIES} lualib thecorelib sqllib gamelib) # x64: z ve lzma
 
 endif()
 

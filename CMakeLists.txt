@@ -47,6 +47,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR})
 # Colored output configration
 SET(CMAKE_COLOR_MAKEFILE ON)
 
+# CMake modules
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/extern/cmake")
+add_definitions(-DCMAKE_BUILD_SYSTEM)
+if (ENABLE_STATIC_ANALYSIS)
+	include(${CMAKE_MODULE_PATH}/PVS-Studio.cmake)
+endif()
+if(NOT WIN32)
+	include(${CMAKE_MODULE_PATH}/FindMYSQL.cmake)
+endif()
+
 # C++ options
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -122,8 +132,14 @@ if(NOT WIN32)
 	set(BUILD_CLIENT OFF)
 	
 	# Register MySQL path
-	set(MYSQL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/mysql/${COMPILER_SUBDIR})
-	MESSAGE(STATUS "MYSQL_DIR: ${MYSQL_DIR}")
+#	set(MYSQL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/mysql/${COMPILER_SUBDIR})
+#	MESSAGE(STATUS "MYSQL_DIR: ${MYSQL_DIR}")
+
+	if(MYSQL_FOUND)
+		include_directories(${MYSQL_INCLUDE_DIR})
+	else()
+		message(FATAL_ERROR "MySQL not found")
+	endif()
 endif()
 
 # Check enabled projects
@@ -131,13 +147,6 @@ if("${BUILD_UTILITIES}" STREQUAL "OFF" AND "${BUILD_TOOLS}" STREQUAL "OFF" AND
    "${BUILD_SERVER}" STREQUAL "OFF" AND "${BUILD_CLIENT}" STREQUAL "OFF")
 	message(FATAL_ERROR "Nothing to build")
 	return()
-endif()
-
-# CMake modules
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/extern/cmake")
-add_definitions(-DCMAKE_BUILD_SYSTEM)
-if (ENABLE_STATIC_ANALYSIS)
-	include(${CMAKE_MODULE_PATH}/PVS-Studio.cmake)
 endif()
 
 # MSVC specific settings ( MD -> MT, Multi processor, Disable SAFESH, Disable linking libci.lib )
