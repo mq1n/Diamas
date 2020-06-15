@@ -43,7 +43,7 @@ namespace
 }
 #endif
 
-#if !defined(USE_SELECT)
+#if !defined(USE_SELECT) && defined(__FreeBSD__)
 
 LPFDWATCH fdwatch_new(int nfiles)
 {

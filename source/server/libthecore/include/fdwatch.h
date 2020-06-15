@@ -1,6 +1,9 @@
 #ifndef __INC_LIBTHECORE_FDWATCH_H__
 #define __INC_LIBTHECORE_FDWATCH_H__
 
+#include <cstdint>
+#include <climits>
+
 #ifdef __FreeBSD__
 
     typedef struct fdwatch	FDWATCH;
