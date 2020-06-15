@@ -123,6 +123,7 @@ if(NOT WIN32)
 	
 	# Register MySQL path
 	set(MYSQL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/mysql/${COMPILER_SUBDIR})
+	MESSAGE(STATUS "MYSQL_DIR: ${MYSQL_DIR}")
 endif()
 
 # Check enabled projects
