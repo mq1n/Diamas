@@ -69,7 +69,9 @@ else()
 endif()
 
 # Additional languages
-enable_language(RC)
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	enable_language(RC)
+endif()
 
 # Git
 execute_process ( COMMAND git rev-list HEAD OUTPUT_VARIABLE GIT_REV_LIST_OUTPUT ERROR_VARIABLE GIT_REV_LIST_OUTPUT RESULT_VARIABLE GIT_REV_LIST_RESULT WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
