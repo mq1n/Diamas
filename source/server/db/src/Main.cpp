@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "Config.h"
 #include "Peer.h"
 #include "DBManager.h"
 #include "ClientManager.h"
@@ -10,7 +9,7 @@
 #include "Marriage.h"
 #include "ItemIDRangeManager.h"
 #include <signal.h>
-
+#include "../../common/json_helper.h"
 #include "../../libthecore/include/winminidump.h"
 
 void SetPlayerDBName(const char* c_pszPlayerDBName);
@@ -18,7 +17,8 @@ void SetAccountDBName(const char* c_pszAccountDBName);
 bool Start();
 
 std::string g_stLocaleNameColumn = "name";
-std::string g_stLocale = "latin1"; // default: euckr
+std::string g_stLocaleName = "turkey";
+std::string g_stLocale = "latin5"; // default: euckr
 std::string g_stPlayerDBName = "";
 std::string g_stAccountDBName = "";
 
@@ -28,19 +28,15 @@ bool g_log = true;
 //단위 초
 int32_t g_iPlayerCacheFlushSeconds = 60*7;
 int32_t g_iItemCacheFlushSeconds = 60*5;
-
-//g_iLogoutSeconds 수치는 g_iPlayerCacheFlushSeconds 와 g_iItemCacheFlushSeconds 보다 길어야 한다.
+int32_t g_gwTimeDivisor = 1;
 int32_t g_iLogoutSeconds = 60*10;
-// MYSHOP_PRICE_LIST
 int32_t g_iItemPriceListTableCacheFlushSeconds = 360;
 int32_t g_iActivityCacheFlushSeconds = 600;
 
-// END_OF_MYSHOP_PRICE_LIST
 
 
 extern void WriteVersion();
 
-//#ifndef _DEBUG
 void emergency_sig(int32_t sig)
 {
 	if (sig == SIGSEGV)
@@ -51,7 +47,6 @@ void emergency_sig(int32_t sig)
 	if (sig == SIGSEGV)
 		abort();
 }
-//#endif
 
 int32_t main()
 {
@@ -60,7 +55,7 @@ int32_t main()
 
 	WriteVersion();
 
-	CConfig Config;
+	CConfigManager configManager;
 	CNetPoller poller;
 	CDBManager DBManager; 
 	CClientManager ClientManager;
@@ -80,7 +75,7 @@ int32_t main()
 	MarriageManager.Initialize();
 	ItemIDRangeManager.Build();
 
-	sys_log(0, "Metin2DBCacheServer Start\n");
+	sys_log(0, "DBCacheServer Start\n");
 
 	CClientManager::instance().MainLoop();
 
@@ -118,148 +113,195 @@ void emptybeat(LPHEART heart, int32_t pulse)
 //
 bool Start()
 {
-	if (!CConfig::instance().LoadFile("conf.txt"))
-	{
-		fprintf(stderr, "Loading conf.txt failed.\n");
-		return false;
-	}
+	int32_t nHeartBeatFPS = 50;
+	int8_t cbDatabaseConnectRetries = 5;
+	std::vector <std::string> pkVecDatabases = { "SQL_PLAYER", "SQL_ACCOUNT", "SQL_COMMON" };
+	std::vector <std::string> pkVecConnectedDatabases;
 
-	int test_srv = 0;
-	if (!CConfig::instance().GetValue("TEST_SERVER", &test_srv))
-	{
-		fprintf(stderr, "Real Server\n");
-	}
-	else
-		fprintf(stderr, "Test Server\n");
-	g_test_server = !!test_srv;
-
-	int logon = 0;
-	if (!CConfig::instance().GetValue("LOG", &logon))
-	{
-		fprintf(stderr, "Log Off");
-		logon = 0;
-	}
-	else
-	{
-		logon = 1;
-		fprintf(stderr, "Log On");
-	}
-	g_log = !!logon;
-	
-	int32_t tmpValue;
-
-	int32_t heart_beat = 50;
-	if (!CConfig::instance().GetValue("CLIENT_HEART_FPS", &heart_beat))
-	{
-		fprintf(stderr, "Cannot find CLIENT_HEART_FPS configuration.\n");
-		return false;
-	}
-
-	log_set_expiration_days(3);
-
-	if (CConfig::instance().GetValue("LOG_KEEP_DAYS", &tmpValue))
-	{
-		tmpValue = MINMAX(3, tmpValue, 30);
-		log_set_expiration_days(tmpValue);
-		fprintf(stderr, "Setting log keeping days to %d\n", tmpValue);
-	}
-
+	// Initialize lib-thecore
 	thecore_init();
-	thecore_set(heart_beat, emptybeat);
+
+	// Parse config file
+	if (!CConfigManager::instance().ParseFile("CONFIG.json"))
+	{
+		sys_err("Loading CONFIG.json failed.");
+		return false;		
+	}
+
+	auto stConfigBuffer = CConfigManager::instance().GetConfigFileContent();
+	if (stConfigBuffer.empty())
+	{
+		sys_err("nullptr CONFIG.json content.");
+		return false;				
+	}
+//	sys_log(0, "%s", stConfigBuffer.c_str());
+
+	Document document;
+	document.Parse<rapidjson::kParseStopWhenDoneFlag>(stConfigBuffer.c_str());
+
+	if (document.HasParseError())
+	{
+		sys_err("CONFIG.json parse failed. Error: %s offset: %u", GetParseError_En(document.GetParseError()), document.GetErrorOffset());
+		return false;
+	}
+
+	if (!document.IsObject())
+	{
+		sys_err("CONFIG.json file base is NOT object");
+		return false;
+	}
+
+	auto& pkStage = document["stage"];
+	if (!pkStage.IsString())
+		return false;
+//	sys_log(0, "stage: %s", pkStage.GetString());
+
+	auto& pkConfigContent = document[pkStage];
+	if (!pkConfigContent.IsObject() || pkConfigContent.IsNull())
+		return false;
+//	sys_log(0, "config: %s", pkConfigContent.GetString());
+
+	// Register config values
+	auto& pkIsTestServer = pkConfigContent["test_server"];
+	if (!pkIsTestServer.IsNull() && pkIsTestServer.IsBool())
+	{
+		g_test_server = pkIsTestServer.GetBool();
+		sys_log(0, "%s Server", g_test_server ? "Test" : "Real");
+	}
+
+	auto& pkIsLogsEnabled = pkConfigContent["logs_enable"];
+	if (!pkIsLogsEnabled.IsNull() && pkIsLogsEnabled.IsBool())
+	{
+		g_log = pkIsLogsEnabled.GetBool();
+		sys_log(0, "Logs: %s", g_log ? "Enabled" : "Disabled");
+	}
+
+	auto& pkNumHeartbeat = pkConfigContent["heartbeat"];
+	if (pkNumHeartbeat.IsNull() || !pkNumHeartbeat.IsNumber())
+	{
+		sys_err("Cannot find heartbeat configuration.");
+		return false;
+	}
+	nHeartBeatFPS = pkNumHeartbeat.GetInt();
+
+	auto& pkNumLogKeepDays = pkConfigContent["log_keep_days"];
+	if (!pkNumLogKeepDays.IsNull() && pkNumLogKeepDays.IsNumber())
+		log_set_expiration_days(pkNumLogKeepDays.GetInt());
+	else
+		log_set_expiration_days(3);
+
+	thecore_set(nHeartBeatFPS, emptybeat);
 	signal_timer_enable(60);
 
-	char szBuf[256+1];
-
-	if (CConfig::instance().GetValue("LOCALE", szBuf, 256))
+	auto& pkStrCharset = pkConfigContent["charset"];
+	if (!pkStrCharset.IsNull() && pkStrCharset.IsString())
 	{
-		g_stLocale = szBuf;
+		g_stLocale = pkStrCharset.GetString();
 		sys_log(0, "LOCALE set to %s", g_stLocale.c_str());
 	}
 
-	if (CConfig::instance().GetValue("PLAYER_CACHE_FLUSH_SECONDS", szBuf, 256))
+	// Quick gw time division for test server
+	auto& pkNumGwTimeDivisor = pkConfigContent["guildwar_time_divisor"];
+	if (!pkNumGwTimeDivisor.IsNull() && pkNumGwTimeDivisor.IsNumber())
 	{
-		str_to_number(g_iPlayerCacheFlushSeconds, szBuf);
+		g_gwTimeDivisor = pkNumGwTimeDivisor.GetInt();
+		sys_log(0, "GUILDWAR_TIME_DIVISOR: %d", g_gwTimeDivisor);
+	}
+
+	auto& pkNumPlayerCacheDelay = pkConfigContent["player_cache_flush_seconds"];
+	if (!pkNumPlayerCacheDelay.IsNull() && pkNumPlayerCacheDelay.IsNumber())
+	{
+		g_iPlayerCacheFlushSeconds = pkNumPlayerCacheDelay.GetInt();
 		sys_log(0, "PLAYER_CACHE_FLUSH_SECONDS: %d", g_iPlayerCacheFlushSeconds);
 	}
 
-	if (CConfig::instance().GetValue("ITEM_CACHE_FLUSH_SECONDS", szBuf, 256))
+	auto& pkNumItemCacheDelay = pkConfigContent["item_cache_flush_seconds"];
+	if (!pkNumItemCacheDelay.IsNull() && pkNumItemCacheDelay.IsNumber())
 	{
-		str_to_number(g_iItemCacheFlushSeconds, szBuf);
+		g_iItemCacheFlushSeconds = pkNumItemCacheDelay.GetInt();
 		sys_log(0, "ITEM_CACHE_FLUSH_SECONDS: %d", g_iItemCacheFlushSeconds);
 	}
 
-	// MYSHOP_PRICE_LIST
-	if (CConfig::instance().GetValue("ITEM_PRICELIST_CACHE_FLUSH_SECONDS", szBuf, 256)) 
+	auto& pkNumPricelistCacheDelay = pkConfigContent["item_pricelist_cache_flush_seconds"];
+	if (!pkNumPricelistCacheDelay.IsNull() && pkNumPricelistCacheDelay.IsNumber())
 	{
-		str_to_number(g_iItemPriceListTableCacheFlushSeconds, szBuf);
+		g_iItemPriceListTableCacheFlushSeconds = pkNumPricelistCacheDelay.GetInt();
 		sys_log(0, "ITEM_PRICELIST_CACHE_FLUSH_SECONDS: %d", g_iItemPriceListTableCacheFlushSeconds);
 	}
-	// END_OF_MYSHOP_PRICE_LIST
-	//
 
-	if (CConfig::instance().GetValue("ACTIVITY_CACHE_FLUSH_SECONDS", szBuf, 256))
+	auto& pkNumActivityCacheDelay = pkConfigContent["activity_cache_flush_seconds"];
+	if (!pkNumActivityCacheDelay.IsNull() && pkNumActivityCacheDelay.IsNumber())
 	{
-		str_to_number(g_iActivityCacheFlushSeconds, szBuf);
+		g_iActivityCacheFlushSeconds = pkNumActivityCacheDelay.GetInt();
 		sys_log(0, "ACTIVITY_CACHE_FLUSH_SECONDS: %d", g_iActivityCacheFlushSeconds);
 	}
 
-	if (CConfig::instance().GetValue("CACHE_FLUSH_LIMIT_PER_SECOND", szBuf, 256))
+	auto& pkNumCacheFlushLimit = pkConfigContent["cache_flush_limit_per_second"];
+	if (!pkNumCacheFlushLimit.IsNull() && pkNumCacheFlushLimit.IsNumber())
+		CClientManager::instance().SetCacheFlushCountLimit(pkNumCacheFlushLimit.GetUint());
+
+	auto& pkStrLocalName = pkConfigContent["locale_name"];
+	if (!pkStrLocalName.IsNull() && pkStrLocalName.IsString())
 	{
-		uint32_t dwVal = 0; str_to_number(dwVal, szBuf);
-		CClientManager::instance().SetCacheFlushCountLimit(dwVal);
+		g_stLocaleName = pkStrLocalName.GetString();
+		sys_log(0, "LOCALE_NAME set to %s", g_stLocaleName.c_str());
 	}
 
-	int32_t iIDStart;
-	if (!CConfig::instance().GetValue("PLAYER_ID_START", &iIDStart))
+	auto& pkObjDatabaseTree = pkConfigContent["databases"];
+	if (pkObjDatabaseTree.IsNull() || !pkObjDatabaseTree.IsObject())
 	{
-		sys_err("PLAYER_ID_START not configured");
+		sys_err("DATABASES not configured");
 		return false;
 	}
 
-	CClientManager::instance().SetPlayerIDStart(iIDStart);
-
-	if (CConfig::instance().GetValue("NAME_COLUMN", szBuf, 256))
+	for (auto i = 0U; i < pkVecDatabases.size(); ++i)
 	{
-		fprintf(stderr, "%s %s", g_stLocaleNameColumn.c_str(), szBuf);
-		g_stLocaleNameColumn = szBuf;
-	}
+		auto stDatabase = pkVecDatabases.at(i);
 
-	char szAddr[64], szDB[64], szUser[64], szPassword[64];
-	int32_t iPort;
-	char line[256+1];
-
-	std::string databases[] = { "SQL_PLAYER", "SQL_ACCOUNT", "SQL_COMMON" };
-
-	for (size_t dataBase = 0; dataBase < sizeof(databases) / sizeof(databases[0]); dataBase++)
-	{
-		const char * DB_NAME = databases[dataBase].c_str();
-
-		if (!CConfig::instance().GetValue(DB_NAME, line, 256))
+		auto& pkObjDatabase = pkObjDatabaseTree[stDatabase.c_str()];
+		if (pkObjDatabase.IsNull() || !pkObjDatabase.IsObject())
 		{
-			sys_err("%s not configured",DB_NAME);
+			sys_err("Database: %s not well configured.", stDatabase.c_str());
 			return false;
 		}
+		sys_log(0, "connecting to MySQL server (%s)", stDatabase.c_str());
 
-		sscanf(line, " %s %s %s %s %d ", szAddr, szDB, szUser, szPassword, &iPort);
+		auto& pkStrHost = pkObjDatabase["address"];
+		auto& pkNumPort = pkObjDatabase["port"];
+		auto& pkStrDatabase = pkObjDatabase["database"];
+		auto& pkStrUsername = pkObjDatabase["user"];
+		auto& pkStrPassword = pkObjDatabase["password"];
 
-		for (int32_t retries = 1; retries < 4; ++retries)
+		if (pkStrHost.IsNull() || pkNumPort.IsNull() || pkStrDatabase.IsNull() || pkStrUsername.IsNull() || pkStrPassword.IsNull())
 		{
-			if (CDBManager::instance().Connect(dataBase, szAddr, iPort, szDB, szUser, szPassword))
-				break;
-
-			fprintf(stderr, "Connection to %s failed, try: [%d|3]\n", szDB, retries);
-
-			if (retries == 3) 
-				return false;
-
-			sleep(2);
+			sys_err("Database: %s context not well configured.", stDatabase.c_str());
+			return false;			
 		}
-		fprintf(stderr, "Established connection with database [%s]\n", szDB);
 
-		if (dataBase == 0)
-			SetPlayerDBName(szDB);
-		else if (dataBase == 1)
-			SetAccountDBName(szDB);
+		do
+		{
+			if (CDBManager::instance().Connect(i, pkStrHost.GetString(), pkNumPort.GetInt(), pkStrDatabase.GetString(),
+				pkStrUsername.GetString(), pkStrPassword.GetString()))
+			{
+				sys_log(0, "Connection to: %s: OK", stDatabase.c_str());
+				pkVecConnectedDatabases.emplace_back(stDatabase);
+				break;
+			}
+
+			sys_log(0, "Connection to: %s failed, retrying in 5 seconds", stDatabase.c_str());
+			sleep(5);
+		} while (cbDatabaseConnectRetries--);
+
+		if (stDatabase == "SQL_PLAYER")
+			SetPlayerDBName(pkStrDatabase.GetString());
+		else if (stDatabase == "SQL_ACCOUNT")
+			SetAccountDBName(pkStrDatabase.GetString());
+	}
+
+	if (pkVecConnectedDatabases.size() != pkVecDatabases.size())
+	{
+		sys_err("Cannot connected to a database");
+		return false;		
 	}
 	
 	if (!CNetPoller::instance().Create())
@@ -268,15 +310,15 @@ bool Start()
 		return false;
 	}
 
-	sys_log(0, "ClientManager initialization.. ");
+	sys_log(0, "ClientManager initializing...");
 
-	if (!CClientManager::instance().Initialize())
+	if (!CClientManager::instance().Initialize(stConfigBuffer))
 	{
-		sys_log(0, "ClientManager initialization failed"); 
+		sys_log(0, "ClientManager initialization failed.");
 		return false;
 	}
 
-	sys_log(0, "DB initialization OK");
+	sys_log(0, "ClientManager initialized.");
 
 //#ifndef _DEBUG
 	#ifndef _WIN32

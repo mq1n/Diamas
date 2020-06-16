@@ -101,7 +101,7 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	CClientManager();
 	~CClientManager();
 
-	bool	Initialize();
+	bool Initialize(const std::string& stConfigBuffer);
 	time_t	GetCurrentTime();
 
 	void	MainLoop();
@@ -474,7 +474,7 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	TItemIDRangeTable m_itemRange;
 
     public :
-	bool InitializeNowItemID();
+	bool InitializeItemIDRange(uint32_t min, uint32_t max);
 	uint32_t GetItemID();
 	uint32_t GainItemID();
 	TItemIDRangeTable GetItemRange() const
@@ -482,17 +482,7 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 		return m_itemRange;
 	}
 
-	//BOOT_LOCALIZATION
-    public:
-	/* 로컬 정보 초기화 
-	 **/
-	bool InitializeLocalization(); 
-
-    private:
-	std::vector<tLocale> m_vec_Locale;
-	//END_BOOT_LOCALIZATION
 	//ADMIN_MANAGER
-
 	bool __GetAdminInfo(std::vector<tAdminInfo> & rAdminVec);
 	bool __GetAdminConfig(uint32_t pAdminConfig[GM_MAX_NUM]);
 	//END_ADMIN_MANAGER

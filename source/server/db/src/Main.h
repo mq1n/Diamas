@@ -1,5 +1,5 @@
 #pragma once
-#include <stdint.h>
+#include <cstdint>
 
 bool Start();
 void End();

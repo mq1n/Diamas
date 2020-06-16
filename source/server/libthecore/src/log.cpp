@@ -117,7 +117,7 @@ void _sys_err(const char *func, int line, const char *format, ...)
 	int len;
 
 	time_s[strlen(time_s) - 1] = '\0';
-	len = snprintf(buf, 1024, "SYSERR: %-15.15s :: %s: ", time_s + 4, func);
+	len = snprintf(buf, 1024, "SYSERR: %-15.15s.%ld :: %s: ", time_s + 4, tv.tv_usec,  func);
 	buf[1025] = '\0';
 
 	if (len < 1024)
@@ -156,7 +156,7 @@ void _net_err(const char *func, int line, const char *format, ...)
 	int len;
 	
 	time_s[strlen(time_s) - 1] = '\0';
-	len = snprintf(buf, 1024, "NETERR: %-15.15s.%d :: %s: ", time_s + 4, tv.tv_usec, func);
+	len = snprintf(buf, 1024, "NETERR: %-15.15s.%ld :: %s: ", time_s + 4, tv.tv_usec, func);
 	buf[1025] = '\0';
 
 	if (len < 1024)
@@ -278,7 +278,7 @@ void sys_log(unsigned int bit, const char *format, ...)
 		fprintf(log_file_sys->fp, "%s", sys_log_header_string);
 
 		time_s[strlen(time_s) - 1] = '\0';
-		fprintf(log_file_sys->fp, "%-15.15s.%d :: ", time_s + 4, tv.tv_usec );
+		fprintf(log_file_sys->fp, "%-15.15s.%ld :: ", time_s + 4, tv.tv_usec );
 
 		va_start(args, format);
 		vfprintf(log_file_sys->fp, format, args);

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "ClientManager.h"
 #include "Main.h"
-#include "Config.h"
 #include "DBManager.h"
 #include "QID.h"
 #include "GuildManager.h"
@@ -18,6 +17,7 @@
 #include "../../common/VnumHelper.h"
 #include "../../common/tables.h"
 #include "../../libgame/include/grid.h"
+#include "../../common/json_helper.h"
 
 extern int32_t g_iPlayerCacheFlushSeconds;
 extern int32_t g_iItemCacheFlushSeconds;
@@ -189,92 +189,105 @@ static bool __UpdateDefaultPriv(const char* priv_type, uint32_t id, uint8_t type
 	return pMsg->Get()->uiAffectedRows;
 }
 
-bool CClientManager::Initialize()
-{
-	int32_t tmpValue;
-	
-	//BOOT_LOCALIZATION
-	if (!InitializeLocalization())
+bool CClientManager::Initialize(const std::string& stConfigBuffer)
+{	
+	Document document;
+	document.Parse<rapidjson::kParseStopWhenDoneFlag>(stConfigBuffer.c_str());
+
+	auto& pkStage = document["stage"];
+	auto& pkConfigContent = document[pkStage];
+
+	auto& pkObjItemIDRange = pkConfigContent["item_id_range"];
+	if (pkObjItemIDRange.IsNull() || !pkObjItemIDRange.IsObject())
 	{
-		fprintf(stderr, "Failed Localization Infomation so exit\n");
+		sys_err("Cannot find item_id_range configuration.");
+		return false;
+	}	
+
+	if (!InitializeItemIDRange(pkObjItemIDRange["min"].GetUint(), pkObjItemIDRange["max"].GetUint()))
+	{
+		sys_err("Item range Initialize Failed. Exit DBCache Server");
 		return false;
 	}
-	
+
 	if (!__InitializeDefaultPriv())
 	{
-		fprintf(stderr, "Failed Default Priv Setting so exit\n");
+		sys_err("Failed Default Priv Setting so exit\n");
 		return false;
 	}
-
-	//END_BOOT_LOCALIZATION
-	//ITEM_UNIQUE_ID
-	
-	if (!InitializeNowItemID())
-	{
-		fprintf(stderr, " Item range Initialize Failed. Exit DBCache Server\n");
-		return false;
-	}
-	//END_ITEM_UNIQUE_ID
 
 #ifdef ENABLE_PROTO_FROM_DB
-	int32_t iTemp;
-	if (CConfig::instance().GetValue("PROTO_FROM_DB", &iTemp))
+	auto& pkObjProtoFromDB = pkConfigContent["proto_from_db"];
+	if (pkObjProtoFromDB.IsNull() || !pkObjProtoFromDB.IsBool())
 	{
-		bIsProtoReadFromDB = !!iTemp;
-		fprintf(stdout, "PROTO_FROM_DB: %s\n", (bIsProtoReadFromDB)?"Enabled":"Disabled");
+		sys_err("Cannot find proto_from_db configuration.");
+		return false;
 	}
-	if (!bIsProtoReadFromDB && CConfig::instance().GetValue("MIRROR2DB", &iTemp))
+	bIsProtoReadFromDB = pkObjProtoFromDB.GetBool();
+	sys_log(0, "PROTO_FROM_DB: %s\n", (bIsProtoReadFromDB) ? "Enabled" : "Disabled");
+
+	auto& pkObjMirrorToDB = pkConfigContent["mirror_to_db"];
+	if (pkObjMirrorToDB.IsNull() || !pkObjMirrorToDB.IsBool())
 	{
-		g_bMirror2DB = !!iTemp;
-		fprintf(stdout, "MIRROR2DB: %s\n", (g_bMirror2DB)?"Enabled":"Disabled");
+		sys_err("Cannot find proto_from_db configuration.");
+		return false;
 	}
+	g_bMirror2DB = pkObjMirrorToDB.GetBool();
+	sys_log(0, "MIRROR2DB: %s\n", (g_bMirror2DB) ? "Enabled" : "Disabled");
 #endif
+
 	if (!InitializeTables())
 	{
 		sys_err("Table Initialize FAILED");
 		return false;
 	}
 
+	auto& pkNumPlayerDeleteLevelLimit = pkConfigContent["player_delete_level_limit"];
+	if (!pkNumPlayerDeleteLevelLimit.IsNull() && pkNumPlayerDeleteLevelLimit.IsNumber())
+		m_iPlayerDeleteLevelLimit = pkNumPlayerDeleteLevelLimit.GetInt();
+	else
+		m_iPlayerDeleteLevelLimitLower = PLAYER_MAX_LEVEL_CONST + 1;
+
+	auto& pkNumPlayerDeleteLevelLimitLower = pkConfigContent["player_delete_level_limit_lower"];
+	if (!pkNumPlayerDeleteLevelLimitLower.IsNull() && pkNumPlayerDeleteLevelLimitLower.IsNumber())
+		m_iPlayerDeleteLevelLimitLower = pkNumPlayerDeleteLevelLimitLower.GetInt();
+	else
+		m_iPlayerDeleteLevelLimitLower = 0;
+
+	sys_log(0, "PLAYER_DELETE_LEVEL_LIMIT set to %d", m_iPlayerDeleteLevelLimit);
+	sys_log(0, "PLAYER_DELETE_LEVEL_LIMIT_LOWER set to %d", m_iPlayerDeleteLevelLimitLower);
+
 	CGuildManager::instance().BootReserveWar();
 
-	if (!CConfig::instance().GetValue("BIND_PORT", &tmpValue))
-		tmpValue = 5300;
+	auto& pkStrBindIP = pkConfigContent["bind_ip"];
+	if (pkStrBindIP.IsNull() || !pkStrBindIP.IsString())
+	{
+		sys_err("Cannot find BIND_IP in config file; DB initialization failed");
+		return false;		
+	}
+	std::string stBindIP = pkStrBindIP.GetString();
 
-	char szBindIP[128];
+	auto& pkNumBindPort = pkConfigContent["bind_port"];
+	if (pkNumBindPort.IsNull() || !pkNumBindPort.IsNumber())
+	{
+		sys_err("Cannot find BIND_PORT in config file; DB initialization failed");
+		return false;		
+	}
+	auto nBindPort = pkNumBindPort.GetInt();
 
-	if (!CConfig::instance().GetValue("BIND_IP", szBindIP, 128))
-		strlcpy(szBindIP, "127.0.0.1", sizeof(szBindIP));
-
-	m_fdAccept = socket_tcp_bind(szBindIP, tmpValue);
+	m_fdAccept = socket_tcp_bind(stBindIP.c_str(), nBindPort);
 	if (m_fdAccept < 0)
 	{
-		sys_err("socket bind fail");
+		sys_err("Could not open socket at %s:%d", stBindIP.c_str(), nBindPort);
+		perror("socket");
 		return false;
 	}
 
 	sys_log(0, "ACCEPT_HANDLE: %u", m_fdAccept);
 	fdwatch_add_fd(m_fdWatcher, m_fdAccept, nullptr, FDW_READ, false);
 
-	if (!CConfig::instance().GetValue("BACKUP_LIMIT_SEC", &tmpValue))
-		tmpValue = 600;
-
 	m_looping = true;
-
-	if (!CConfig::instance().GetValue("PLAYER_DELETE_LEVEL_LIMIT", &m_iPlayerDeleteLevelLimit))
-	{
-		sys_err("conf.txt: Cannot find PLAYER_DELETE_LEVEL_LIMIT, use default level %d", PLAYER_MAX_LEVEL_CONST + 1);
-		m_iPlayerDeleteLevelLimit = PLAYER_MAX_LEVEL_CONST + 1;
-	}
-
-	if (!CConfig::instance().GetValue("PLAYER_DELETE_LEVEL_LIMIT_LOWER", &m_iPlayerDeleteLevelLimitLower))
-		m_iPlayerDeleteLevelLimitLower = 0;
-
-	sys_log(0, "PLAYER_DELETE_LEVEL_LIMIT set to %d", m_iPlayerDeleteLevelLimit);
-	sys_log(0, "PLAYER_DELETE_LEVEL_LIMIT_LOWER set to %d", m_iPlayerDeleteLevelLimitLower);
-
-
 	LoadEventFlag();
-
 	return true;
 }
 
@@ -2852,27 +2865,17 @@ time_t CClientManager::GetCurrentTime()
 }
 
 // ITEM_UNIQUE_ID
-bool CClientManager::InitializeNowItemID()
+bool CClientManager::InitializeItemIDRange(uint32_t min, uint32_t max)
 {
-	uint32_t dwMin = 0, dwMax = 0;
-
-	//아이템 ID를 초기화 한다.
-	if (!CConfig::instance().GetTwoValue("ITEM_ID_RANGE", &dwMin, &dwMax))
-	{
-		sys_err("conf.txt: Cannot find ITEM_ID_RANGE [start_item_id] [end_item_id]");
-		return false;
-	}
-
-	sys_log(0, "ItemRange From File %u ~ %u ", dwMin, dwMax);
+	sys_log(0, "ItemRange From File %lu ~ %lu ", min, max);
 	
-	if (CItemIDRangeManager::instance().BuildRange(dwMin, dwMax, m_itemRange) == false)
+	if (CItemIDRangeManager::instance().BuildRange(min, max, m_itemRange) == false)
 	{
 		sys_err("Can not build ITEM_ID_RANGE");
 		return false;
 	}
-	
-	sys_log(0, " Init Success Start %u End %u Now %u\n", m_itemRange.dwMin, m_itemRange.dwMax, m_itemRange.dwUsableItemIDMin);
 
+	sys_log(0, " Init Success Start %lu End %lu Now %lu\n", m_itemRange.dwMin, m_itemRange.dwMax, m_itemRange.dwUsableItemIDMin);
 	return true;
 }
 
@@ -2886,48 +2889,8 @@ uint32_t CClientManager::GetItemID()
 	return m_itemRange.dwUsableItemIDMin;
 }
 // ITEM_UNIQUE_ID_END
-//BOOT_LOCALIZATION
 
-bool CClientManager::InitializeLocalization() 
-{
-	char szQuery[512];	
-	snprintf(szQuery, sizeof(szQuery), "SELECT mValue, mKey FROM locale");
-	SQLMsg * pMsg = CDBManager::instance().DirectQuery(szQuery, SQL_COMMON);
-
-	if (pMsg->Get()->uiNumRows == 0)
-	{
-		sys_err("InitializeLocalization() ==> DirectQuery failed(%s)", szQuery);
-		delete pMsg;
-		return false;
-	}
-
-	sys_log(0, "InitializeLocalization() - LoadLocaleTable(count:%d)", pMsg->Get()->uiNumRows);
-
-	m_vec_Locale.clear();
-
-	MYSQL_ROW row = nullptr;
-
-	for (int32_t n = 0; (row = mysql_fetch_row(pMsg->Get()->pSQLResult)) != nullptr; ++n)
-	{
-		int32_t col = 0;
-		tLocale locale;
-
-		strlcpy(locale.szValue, row[col++], sizeof(locale.szValue));
-		strlcpy(locale.szKey, row[col++], sizeof(locale.szKey));
-
-		g_stLocale = "latin5";
-		g_stLocaleNameColumn = "locale_name";
-        
-		m_vec_Locale.push_back(locale);
-	}	
-
-	delete pMsg;
-
-	return true;
-}
-//END_BOOT_LOCALIZATION
 //ADMIN_MANAGER
-
 bool CClientManager::__GetAdminInfo(std::vector<tAdminInfo> & rAdminVec)
 {
 	char szQuery[512];

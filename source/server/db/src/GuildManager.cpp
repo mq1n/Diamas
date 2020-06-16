@@ -3,7 +3,6 @@
 #include "Main.h"
 #include "ClientManager.h"
 #include "QID.h"
-#include "Config.h"
 #include <math.h>
 
 extern std::string g_stLocale;
@@ -140,18 +139,12 @@ void CGuildManager::Initialize()
 	if (pmsg->Get()->uiNumRows)
 		ParseResult(pmsg->Get());
 
-	char str[128 + 1];
-
-	if (!CConfig::instance().GetValue("POLY_POWER", str, sizeof(str)))
-		*str = '\0';
+	char str[128 + 1]{ '\0' };
 
 	if (!polyPower.Analyze(str))
 		sys_err("cannot set power poly: %s", str);
 	else
 		sys_log(0, "POWER_POLY: %s", str);
-
-	if (!CConfig::instance().GetValue("POLY_HANDICAP", str, sizeof(str)))
-		*str = '\0';
 
 	if (!polyHandicap.Analyze(str))
 		sys_err("cannot set handicap poly: %s", str);
