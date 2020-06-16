@@ -115,7 +115,7 @@ if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 
 # Compiler subdir for MySQL libs
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") # TODO: AppleClang 
 	set(COMPILER_SUBDIR "clang")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(COMPILER_SUBDIR "gcc")
