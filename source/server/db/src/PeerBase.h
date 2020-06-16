@@ -1,12 +1,9 @@
-// vim: ts=8 sw=4
-#ifndef __INC_PEERBASE_H__
-#define __INC_PEERBASE_H__
-
+#pragma once
 #include "NetBase.h"
 
 class CPeerBase : public CNetBase
 {
-    public:
+public:
 	enum
 	{ 
 	    MAX_HOST_LENGTH		= 30,
@@ -14,17 +11,17 @@ class CPeerBase : public CNetBase
 	    DEFAULT_PACKET_BUFFER_SIZE	= 1024 * 1024 * 2
 	};
 
-    protected:
+ protected:
 	virtual void	OnAccept() = 0;
 	virtual void	OnConnect() = 0;
 	virtual void	OnClose() = 0;
 
-    public:
+public:
 	bool		Accept(socket_t accept_fd);
 	bool		Connect(const char* host, uint16_t port);
 	void		Close();
 
-    public:
+public:
 	CPeerBase();
 	virtual ~CPeerBase();
 
@@ -50,15 +47,13 @@ class CPeerBase : public CNetBase
 	const char *	GetHost() const { return m_host; }
 	uint16_t		GetPort() const { return m_wPort; }
 
-    protected:
+protected:
 	char		m_host[MAX_HOST_LENGTH + 1];
 	socket_t	m_fd;
 	uint16_t		m_wPort;
 
-    private:
+private:
 	int32_t		m_BytesRemain;
 	LPBUFFER	m_outBuffer;
 	LPBUFFER	m_inBuffer;
 };
-
-#endif

@@ -1,4 +1,4 @@
-#include "../include/NetEngine.h"
+#include "../include/NetEngine.hpp"
 
 namespace net_engine
 {

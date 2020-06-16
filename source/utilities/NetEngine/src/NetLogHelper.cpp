@@ -2,11 +2,17 @@
 #include <Windows.h>
 #endif
 #include <sstream>
-#include "../include/NetLogHelper.h"
+#include "../include/NetLogHelper.hpp"
+
+#ifdef _DEBUG
+	#pragma comment( lib, "fmt_debug.lib" )
+#else
+	#pragma comment( lib, "fmt.lib" )
+#endif
 
 namespace net_engine
 {
-    CNetLogger* gs_pNetLogInstance = nullptr;
+    static CNetLogger* gs_pNetLogInstance = nullptr;
 
     static void LogErrorHandler(const std::string& stMessage)
     {
@@ -45,8 +51,6 @@ namespace net_engine
 
             m_pkLoggerImpl = std::make_shared<spdlog::logger>(m_stLoggerName.c_str(), sinks.begin(), sinks.end());
             m_pkLoggerImpl->set_error_handler(LogErrorHandler);
-
-            spdlog::register_logger(m_pkLoggerImpl);
         }
         catch (const spdlog::spdlog_ex & ex)
         {
@@ -72,8 +76,9 @@ namespace net_engine
 
     void CNetLogger::Log(const std::string& stFunction, int nLevel, const char* c_szFormat, ...)
     {
-	    auto pkLoggerInterface = spdlog::get("NetEngineLogger");
-        if (!pkLoggerInterface)
+ 		std::lock_guard <std::recursive_mutex> __lock(m_pkMtMutex);
+
+        if (!m_pkLoggerImpl.get())
         {
             Logf(CUSTOM_LOG_FILENAME, "Logger interface not found");
             return;
@@ -95,25 +100,31 @@ namespace net_engine
             switch (nLevel)
             {
                 case LL_SYS:
-                    pkLoggerInterface->info(stBuffer.c_str());
+                    m_pkLoggerImpl->info(stBuffer.c_str());
                     break;
                 case LL_CRI:
-                    pkLoggerInterface->critical(stBuffer.c_str());
+                    m_pkLoggerImpl->critical(stBuffer.c_str());
                     break;
                 case LL_ERR:
-                    pkLoggerInterface->error(stBuffer.c_str());
+                    m_pkLoggerImpl->error(stBuffer.c_str());
                     break;
                 case LL_DEV:
-                    pkLoggerInterface->debug(stBuffer.c_str());
+                    m_pkLoggerImpl->debug(stBuffer.c_str());
                     break;
                 case LL_TRACE:
-                    pkLoggerInterface->trace(stBuffer.c_str());
+                    m_pkLoggerImpl->trace(stBuffer.c_str());
                     break;
                 case LL_WARN:
-                    pkLoggerInterface->warn(stBuffer.c_str());
+                    m_pkLoggerImpl->warn(stBuffer.c_str());
                     break;
             }
-            pkLoggerInterface->flush();
+
+            m_pkLoggerImpl->flush();
+
+            if (nLevel == LL_CRI)
+            {
+                abort();
+            }
         }
         catch (const spdlog::spdlog_ex& ex)
         {

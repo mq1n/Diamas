@@ -1,7 +1,4 @@
-// vim:ts=8 sw=4
-#ifndef __INC_GUILD_MANAGER_H
-#define __INC_GUILD_MANAGER_H
-
+#pragma once
 #include "Peer.h"
 #include <queue>
 #include <utility>
@@ -257,5 +254,3 @@ class CGuildManager : public singleton<CGuildManager>
 	// GID Ranking
 	std::map<uint32_t, int32_t>					map_kLadderPointRankingByGID;
 };
-
-#endif

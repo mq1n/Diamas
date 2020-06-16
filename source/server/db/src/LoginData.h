@@ -1,6 +1,4 @@
-// vim:ts=8 sw=4
-#ifndef __INC_METIN_II_DB_LOGINDATA_H__
-#define __INC_METIN_II_DB_LOGINDATA_H__
+#pragma once
 
 class CLoginData
 {
@@ -54,5 +52,3 @@ class CLoginData
 
 	TAccountTable   m_data;
 };
-
-#endif

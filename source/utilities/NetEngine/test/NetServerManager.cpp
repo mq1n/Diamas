@@ -1,21 +1,28 @@
-#include "../include/NetEngine.h"
-#include "NetServerManager.h"
-#include "NetPeerManager.h"
-#include "Packet.h"
+#include "../include/NetEngine.hpp"
+#include "NetServerManager.hpp"
+#include "NetPeerManager.hpp"
+#include "Packet.hpp"
 
 namespace net_engine
 {	
-#define THREE_ARG_HOLDER std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
-
 	CNetworkServerManager::CNetworkServerManager(NetServiceBase& netService, const std::string& ip_address, uint16_t port) :
 		NetServerBase(netService()), m_netService(netService), m_updateTimer(netService()),
 		m_ip_address(ip_address), m_port(port),
 		m_stopped(false)
 	{
+		NET_LOG(LL_TRACE, "Creating server on %s:%u", ip_address.c_str(), port);
+
+		m_net_manager = std::make_shared<CNetworkConnectionManager>(
+			m_netService, 
+			std::static_pointer_cast<CNetworkServerManager>(shared_from_this()),
+			ESecurityLevel::SECURITY_LEVEL_NONE, 
+			DEFAULT_CRYPT_KEY
+		);
 	}
 	CNetworkServerManager::~CNetworkServerManager()
 	{
-        Stop();
+		NET_LOG(LL_TRACE, "Stopping server...");
+		Stop();
 	}
 
     void CNetworkServerManager::OnUpdate()
@@ -54,10 +61,20 @@ namespace net_engine
 		{
 			NET_LOG(LL_SYS, "Network engine binding to %s:%u", m_ip_address.c_str(), m_port);
 			Bind(m_ip_address, m_port);
-			m_umPeerMap.clear(); // remove own peer
 
 			NET_LOG(LL_SYS, "Network engine initializing...");
-			Init();
+			// TODO: Config, pre initilization
+
+			RegisterPacket(
+				HEADER_CG_LOGIN, EPacketTypes::PacketTypeOutgoing, false, std::bind(&CNetworkServerManager::OnRecvLoginPacket, this, std::placeholders::_1, std::placeholders::_2)
+			);
+			RegisterPacket(
+				HEADER_CG_CHAT, EPacketTypes::PacketTypeOutgoing, false, std::bind(&CNetworkServerManager::OnRecvChatPacket, this, std::placeholders::_1, std::placeholders::_2)
+			);
+
+			// TODO: DB Connection and other stuffs
+
+			NET_LOG(LL_SYS, "Server initialized");
 
      	 	m_updateTimer.expires_from_now(std::chrono::milliseconds(10));
      	  	m_updateTimer.async_wait(std::bind(&CNetworkServerManager::OnUpdate, this));
@@ -100,13 +117,15 @@ namespace net_engine
 	// test only
 	void CNetworkServerManager::BroadcastMessage(const std::string& msg)
 	{
-		for (const auto& [id, peer] : m_umPeerMap)
+		/*
+		for (const auto& [id, peer] : m_peers)
 		{
 			if (peer && peer.get())
 			{
 				peer->SendChatPacket(msg);
 			}
 		}
+		*/
 	}
 
 	// I/O Service wrappers
@@ -130,23 +149,11 @@ namespace net_engine
 		return m_netService;
 	}
 
-	// Init & Final funcs
-	void CNetworkServerManager::Init()
-	{
-		// TODO: Config, pre initilization
-
-		SetupPacketDispatchers();
-
-		// TODO: DB Connection and other stuffs
-
-		NET_LOG(LL_SYS, "Server initialized");
-	}
-
 	// Peer stuffs
-	std::shared_ptr <CNetworkPeer> CNetworkServerManager::FindPeer(int32_t id) const
+	std::shared_ptr <CNetworkConnectionManager> CNetworkServerManager::FindPeer(int32_t id) const
 	{
-		auto iter = m_umPeerMap.find(id);
-		if (iter != m_umPeerMap.end())
+		auto iter = m_peers.find(id);
+		if (iter != m_peers.end())
 			return iter->second;
 
 		return nullptr;
@@ -154,70 +161,26 @@ namespace net_engine
 
 	std::shared_ptr <NetPeerBase> CNetworkServerManager::NewPeer()
 	{
-		auto peer = std::make_shared<CNetworkPeer>(std::static_pointer_cast<CNetworkServerManager>(shared_from_this()));
+//		auto peer = std::make_shared<CNetworkConnectionManager>(std::static_pointer_cast<CNetworkServerManager>(shared_from_this()));
 
-#ifdef _DEBUG
-		peer->SetLogLevel(LL_ONREAD | LL_ONWRITE_PRE | LL_ONWRITE_POST | LL_ONREGISTERPACKET);
-#endif
-
-		m_umPeerMap.emplace(peer->GetId(), peer);
-		return peer;
+#//ifdef _DEBUG
+//		peer->SetLogLevel(LL_ONREAD | LL_ONWRITE_PRE | LL_ONWRITE_POST | LL_ONREGISTERPACKET);
+//#endif
+//
+//		m_peers.emplace(peer->GetId(), peer);
+		return {};
 	}
 
 	void CNetworkServerManager::RemovePeer(int32_t id)
 	{
-		auto iter = m_umPeerMap.find(id);
-		if (iter != m_umPeerMap.end())
-			m_umPeerMap.erase(iter);
+		auto iter = m_peers.find(id);
+		if (iter != m_peers.end())
+			m_peers.erase(iter);
 	}
 
-	// Packet handler
-	std::size_t CNetworkServerManager::ProcessInput(std::shared_ptr <CNetworkPeer> peer, const void* data, std::size_t maxlength)
+	std::size_t CNetworkServerManager::OnRecvLoginPacket(const void* data, std::size_t maxlength)
 	{
-		NET_LOG(LL_SYS, "Peer: %s(%d) Data: %p Max length: %u", peer->GetIP().c_str(), peer->GetId(), data, maxlength);
-
-		auto pData = reinterpret_cast<const uint8_t *>(data);
-
-		std::size_t offset = 0;
-		while (offset < maxlength) 
-		{
-			uint32_t packetId = 0;
-			while (offset < maxlength && (packetId = pData[offset]) == 0) ++offset;
-
-			auto handler = m_handlers.find(packetId);
-			if (handler == m_handlers.end()) 
-			{
-				// log + kick? unkwnown packet dc
-				NET_LOG(LL_ERR, "Unknown Packet with id %d (%02x) received from PEER %d",
-					packetId, packetId, peer->GetId()
-				);
-
-				asio::error_code e;
-				peer->Disconnect(e);
-				return 0;
-			}
-
-			std::size_t handlerResult = handler->second.second(peer, pData + offset, maxlength - offset);
-			if (handlerResult == 0) 
-				break; // handler returned 0 == too little data
-			offset += handlerResult;
-		}
-		return offset;
-	}
-
-	void CNetworkServerManager::SetupPacketDispatchers()
-	{
-		RegisterPacket<SNetPacketGCLogin>(HEADER_GC_LOGIN,
-			std::bind(&CNetworkServerManager::OnRecvLoginPacket, this, THREE_ARG_HOLDER)
-		);
-		RegisterPacket<SNetPacketGCChat>(HEADER_GC_CHAT,
-			std::bind(&CNetworkServerManager::OnRecvChatPacket, this, THREE_ARG_HOLDER)
-		);
-	}
-
-	std::size_t CNetworkServerManager::OnRecvLoginPacket(std::shared_ptr<CNetworkPeer> peer, const void* data, std::size_t maxlength)
-	{
-		auto packet = reinterpret_cast<const SNetPacketGCLogin*>(data);
+		auto packet = reinterpret_cast<const SNetPacketCGLogin*>(data);
 
 		if (maxlength < packet->size())
 			return 0;
@@ -232,14 +195,14 @@ namespace net_engine
 
 		SNetPacketGCChat retPacket;
 		strcpy_s(retPacket.msg, "done!");
-		peer->SendCrypted(retPacket, true);
+		//peer->SendCrypted(retPacket, true);
 
 		// ...
 
 		return packet->size();
 	}
 
-	std::size_t CNetworkServerManager::OnRecvChatPacket(std::shared_ptr<CNetworkPeer> peer, const void* data, std::size_t maxlength)
+	std::size_t CNetworkServerManager::OnRecvChatPacket(const void* data, std::size_t maxlength)
 	{
 		auto packet = reinterpret_cast<const SNetPacketGCChat*>(data);
 

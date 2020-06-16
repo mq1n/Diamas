@@ -1,7 +1,4 @@
-// vim:ts=8 sw=4
-#ifndef __INC_CLIENTMANAGER_H__
-#define __INC_CLIENTMANAGER_H__
-
+#pragma once
 #include <unordered_map>
 #include <unordered_set>
 
@@ -546,4 +543,3 @@ Func CClientManager::for_each_peer(Func f)
     }
     return f;
 }
-#endif

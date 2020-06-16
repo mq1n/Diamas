@@ -1,10 +1,11 @@
-#include "../include/NetEngine.h"
+#include "../include/NetEngine.hpp"
 
 namespace net_engine
 {
 	NetServerBase::NetServerBase(asio::io_context& service) :
 		m_service(service), m_acceptor(service)
 	{
+		static PacketManager packet_manager;
 	}
 
 	bool NetServerBase::Bind(const asio::ip::tcp::endpoint& endpoint)

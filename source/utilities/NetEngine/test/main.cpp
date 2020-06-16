@@ -1,7 +1,7 @@
-#include "../include/NetEngine.h"
-#include "NetServerManager.h"
-#include "NetClientManager.h"
-#include "config.h"
+#include "../include/NetEngine.hpp"
+#include "NetServerManager.hpp"
+#include "NetClientManager.hpp"
+#include "config.hpp"
 using namespace net_engine;
 
 std::shared_ptr <CNetworkServerManager> netServer;
@@ -46,7 +46,7 @@ bool InitializeClient()
 	}
 	catch (DWORD dwNumber)
 	{
-		printf("Exception handled: %p\n", dwNumber);
+		printf("Exception handled: %p\n", (void*)dwNumber);
 		abort();
 	}
 	catch (...)

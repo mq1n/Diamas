@@ -1,6 +1,4 @@
-#ifndef __INC_METiN_II_DBSERV_STDAFX_H__
-#define __INC_METiN_II_DBSERV_STDAFX_H__
-
+#pragma once
 #include "../../libthecore/include/stdafx.h"
 
 #ifndef _WIN32
@@ -17,5 +15,3 @@
 #include "../../common/singleton.h"
 #include "../../common/utils.h"
 #include "../../common/stl.h"
-
-#endif

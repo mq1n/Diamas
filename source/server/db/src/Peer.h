@@ -1,18 +1,15 @@
-// vim: ts=8 sw=4
-#ifndef __INC_PEER_H__
-#define __INC_PEER_H__
-
+#pragma once
 #include "PeerBase.h"
 #include "../../common/service.h"
 
 class CPeer : public CPeerBase
 {
-    protected:
+protected:
 	virtual void OnAccept();
 	virtual void OnClose();
 	virtual void OnConnect();
 
-    public:
+public:
 #pragma pack(1)
 	typedef struct _header
 	{   
@@ -58,7 +55,7 @@ class CPeer : public CPeerBase
 	bool	CheckItemIDRangeCollision(const TItemIDRangeTable &itemRange);
 	void	SendSpareItemIDRange();
 
-    private:
+private:
 	int32_t	m_state;
 
 	uint8_t	m_bChannel;
@@ -72,5 +69,3 @@ class CPeer : public CPeerBase
 
 	std::string m_stPublicIP;
 };
-
-#endif

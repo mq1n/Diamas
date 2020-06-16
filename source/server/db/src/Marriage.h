@@ -1,11 +1,7 @@
-// vim: ts=4 sw=4
-#ifndef __MARRIAGE_H
-#define __MARRIAGE_H
-
+#pragma once
 #include <set>
 #include <queue>
 #include <deque>
-
 #include "Peer.h"
 
 namespace marriage
@@ -15,6 +11,7 @@ namespace marriage
 		uint32_t dwTime;
 		uint32_t dwPID1;
 		uint32_t dwPID2;
+
 		TWeddingInfo(uint32_t time, uint32_t pid1, uint32_t pid2)
 			: dwTime(time),
 			dwPID1(pid1),
@@ -109,5 +106,3 @@ namespace marriage
 			std::map<std::pair<uint32_t, uint32_t>, TWedding> m_mapRunningWedding;
 	};
 }
-
-#endif

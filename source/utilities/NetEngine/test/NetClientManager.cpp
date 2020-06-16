@@ -1,16 +1,14 @@
-#include "../include/NetEngine.h"
-#include "NetClientManager.h"
-#include "Packet.h"
+#include "../include/NetEngine.hpp"
+#include "NetClientManager.hpp"
+#include "Packet.hpp"
 
 namespace net_engine
 {	
-#define TWO_ARG_HOLDER std::placeholders::_1, std::placeholders::_2
-
 	CNetworkClientManager::CNetworkClientManager(NetServiceBase& service) :
 		NetClientBase(service(), 5000), m_pNetService(service)
 	{
-		RegisterPacket<SNetPacketGCChat>(HEADER_GC_CHAT, 
-			std::bind(&CNetworkClientManager::OnRecvChatPacket, this, TWO_ARG_HOLDER)
+		RegisterPacket(
+			HEADER_GC_CHAT, EPacketTypes::PacketTypeIncoming, false, std::bind(&CNetworkClientManager::OnRecvChatPacket, this, std::placeholders::_1, std::placeholders::_2)
 		);
 	}
 
@@ -36,7 +34,7 @@ namespace net_engine
 	{
 		NET_LOG(LL_SYS, "Connected to %s:%u", GetIP().c_str(), GetPort());
 
-		SNetPacketGCLogin packet;
+		SNetPacketCGLogin packet;
 		strcpy_s(packet.login, "id_Test");
 		strcpy_s(packet.password, "pwd_test");
 		SendCrypted(packet, true);
@@ -48,8 +46,9 @@ namespace net_engine
 		NET_LOG(LL_ERR, "Disconnected from: %s Reason: %d", GetIP().c_str(), e.value());
 	//	Reconnect(); // aktif edip 3ten fazla ise kapat
 	}
-	std::size_t CNetworkClientManager::OnRead(const void* data, std::size_t length)
+	void CNetworkClientManager::OnRead(std::shared_ptr <Packet> packet)
 	{
+#if 0
 		NET_LOG(LL_SYS, "OnRead triggered! %p-%u", data, length);
 		if (!data || !length) 
 		{
@@ -67,6 +66,7 @@ namespace net_engine
 		}
 
 		return ProcessInput(data, length);
+#endif
 	}
 	std::size_t CNetworkClientManager::OnWritePre(const void* data, std::size_t length)
 	{
@@ -124,8 +124,12 @@ namespace net_engine
 			uint32_t packetId = 0;
 			while (offset < maxlength && (packetId = pData[offset]) == 0) ++offset;
 
+			/*
 			auto handler = m_handlers.find(packetId);
 			if (handler == m_handlers.end()) 
+			*/
+			const auto packet = CPacketContainer::Instance().GetPacket(packetId);
+			if (!packet.get())
 			{
 				// log + kick? unkwnown packet dc
 				NET_LOG(LL_ERR, "Unknown Packet with id %d (%02x)",
@@ -137,7 +141,7 @@ namespace net_engine
 				return 0;
 			}
 
-			std::size_t handlerResult = handler->second.second(pData + offset, maxlength - offset);
+			std::size_t handlerResult = packet->handler(pData + offset, maxlength - offset);
 			if (handlerResult == 0) 
 				break; // handler returned 0 == too little data
 			offset += handlerResult;
@@ -196,7 +200,7 @@ namespace net_engine
 		else
 #endif
 		{
-			Send(packet.data(), packet.size(), flush);
+//			Send(packet.data(), packet.size());
 		}
 	}
 

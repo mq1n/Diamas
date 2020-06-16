@@ -1,48 +1,57 @@
-#include "../include/NetEngine.h"
-#include "NetPeerManager.h"
-#include "NetServerManager.h"
-#include "Packet.h"
+#include "../include/NetEngine.hpp"
+#include "NetPeerManager.hpp"
+#include "NetServerManager.hpp"
+#include "Packet.hpp"
 
 namespace net_engine
 {
-	CNetworkPeer::CNetworkPeer(std::shared_ptr <CNetworkServerManager> server) :
-		NetPeerBase(server->GetServiceInstance()()), m_pServer(server)
+	CNetworkConnectionManager::CNetworkConnectionManager(
+		NetServiceBase& netService, std::shared_ptr <CNetworkServerManager> server, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
+		NetPeerBase(server->GetServiceInstance()()), m_server(server), m_netService(netService), m_crypt_key(cryptKey)
 	{
+		NET_LOG(LL_TRACE, "Creating connection object");
+		m_packets = std::make_shared<CPacketContainer>();
+
+#if ENABLE_CRYPT
+		_handshake(_server->GetApplication()->GetRandomNumber<uint32_t>(std::numeric_limits<uint32_t>::min(),
+			std::numeric_limits<uint32_t>::max())
+
+		if (securityLevel == SECURITY_LEVEL_KEY_AGREEMENT) {
+			_cryptation = std::make_unique<KeyAgreementCryptation>();
+	}
+		else if (securityLevel == SECURITY_LEVEL_XTEA) {
+			_cryptation = std::make_unique<XTEACryptation>();
+			_cryptation->AddData(XTEA_CRYPTATION_START_KEY, defaultKey, 16);
+		}
+#endif
+	}
+	CNetworkConnectionManager::~CNetworkConnectionManager()
+	{
+		NET_LOG(LL_TRACE, "Destroying connection object");
 	}
 
-	// Getter setter
-	std::shared_ptr <CNetworkServerManager> CNetworkPeer::GetServer() const
+	void CNetworkConnectionManager::Destroy()
 	{
-		return m_pServer.lock();
-	}
-	int32_t CNetworkPeer::GetId() const
-	{
-		return UniqueId();
-	}
-
-	void CNetworkPeer::SetData(const std::string& key, const std::string& value)
-	{
-		m_pkMapDataContainer.emplace(key, value);
-	}
-	std::string CNetworkPeer::GetData(const std::string& key) const
-	{
-		auto it = m_pkMapDataContainer.find(key);
-		if (it != m_pkMapDataContainer.end())
-			return it->second;
-		
-		NET_LOG(LL_ERR, "Key not found: %s", key.c_str());
-		return "";
+		GetServer()->RemovePeer(GetId());
 	}
 
 	// net callbacks
-	void CNetworkPeer::OnConnect()
+	void CNetworkConnectionManager::OnConnect()
 	{
 		NET_LOG(LL_SYS, "Client connected %s (%d)", GetIP().c_str(), GetId());
 
-		SetData("phase", "conn_req");
 		BeginRead();
+
+#if ENABLE_CRYPT
+		if (_securityLevel >= SECURITY_LEVEL_NONE) {
+			StartHandshake();
+		}
+		else {
+			_server->CallNewConnectionHandler(shared_from_this());
+		}
+#endif
 	}
-	void CNetworkPeer::OnDisconnect(const asio::error_code& er)
+	void CNetworkConnectionManager::OnDisconnect(const asio::error_code& er)
 	{
 		NET_LOG(LL_SYS, "Client disconnected %s (%d) Reason: %d", GetIP().c_str(), GetId(), er.value());
 
@@ -50,8 +59,276 @@ namespace net_engine
 		if (server)
 			server->RemovePeer(GetId());
 	}
+	void CNetworkConnectionManager::OnRead(std::shared_ptr <Packet> packet)
+	{
+	}
+	std::size_t CNetworkConnectionManager::OnWritePre(const void* data, std::size_t length)
+	{
+		return length;
+	}
+	void CNetworkConnectionManager::OnWritePost(bool bCompleted)
+	{
+	}
+	void CNetworkConnectionManager::OnError(uint32_t error_type, const asio::error_code& er)
+	{
+		NET_LOG(LL_ERR, "Network error handled! ID: %u System error: %d(%s)", error_type, er.value(), er.message().c_str());
+	}
 
-	std::size_t CNetworkPeer::OnRead(const void* data, std::size_t length)
+
+	// Getter setter
+	std::shared_ptr <CNetworkServerManager> CNetworkConnectionManager::GetServer() const
+	{
+		return m_server.lock();
+	}
+	int32_t CNetworkConnectionManager::GetId() const
+	{
+		return UniqueId();
+	}
+	std::string CNetworkConnectionManager::GetData(const std::string& key) const
+	{
+		const auto it = m_data_container.find(key);
+		if (it != m_data_container.end())
+			return it->second;
+		
+		NET_LOG(LL_ERR, "Key not found: %s", key.c_str());
+		return "";
+	}
+
+	void CNetworkConnectionManager::SetData(const std::string& key, const std::string& value)
+	{
+		m_data_container.emplace(key, value);
+	}
+
+
+#if 0
+	void Connection::SetPhase(uint8_t phase) {
+		CORE_LOGGING(trace) << "Set phase to " << boost::format("0x%02x") % (int)phase;
+
+		auto packet =
+			_server->GetPacketManager()->CreatePacket(ReservedOutgoingHeaders::HEADER_OUT_PHASE, Direction::Outgoing);
+		packet->SetField<uint8_t>("phase", phase);
+
+		_phase = phase;
+
+		Send(packet);
+	}
+
+	void Connection::SendAsReply(std::shared_ptr<Packet> request, std::shared_ptr<Packet> reply) {
+		auto id = request->GetField<uint64_t>("__REFERENCE_ID");
+
+		reply->SetField<uint64_t>("__REFERENCE_ID", id);
+		reply->SetField<uint8_t>("__REFERENCE_TYPE", 1);
+
+		Send(reply);
+	}
+	std::shared_ptr<Server> Connection::GetServer() {
+
+
+		bool Connection::HasProperty(const std::string & property) const {
+			return _properties.find(property) != _properties.end();
+		}
+
+		void Connection::SetProperty(const std::string & property, ConnectionProperty value) {
+			_properties[property] = std::move(value);
+		}
+
+		ConnectionProperty Connection::GetProperty(const std::string & property) const {
+			return _properties.at(property);
+		}
+
+
+
+		void Connection::HandleHandshake(std::shared_ptr<Packet> packet) {
+			auto handshake = packet->GetField<uint32_t>("handshake");
+			auto time = packet->GetField<uint32_t>("time");
+			auto delta = packet->GetField<uint32_t>("delta");
+
+			if (handshake != _handshake) {
+				CORE_LOGGING(warning) << "Closing connection because of handshake mismatch";
+				Close();
+				return;
+			}
+
+			auto currentTime = _server->GetApplication()->GetCoreTime();
+
+			auto diff = currentTime - (time + delta);
+			if (diff >= 0 && diff <= 50) {
+				CORE_LOGGING(trace) << "Time sync done, handshake done";
+
+				if (_securityLevel >= SECURITY_LEVEL_KEY_AGREEMENT) {
+					StartKeyAgreement();
+				}
+				else {
+					_handshaking = false;
+					_server->CallNewConnectionHandler(shared_from_this());
+
+					if (_securityLevel == SECURITY_LEVEL_XTEA) {
+						CORE_LOGGING(trace) << "(XTEA) Cryptation enabled";
+						if (!_cryptation->Finalize()) {
+							Close();
+						}
+
+						_cryptation->Activate();
+					}
+				}
+				return;
+			}
+
+			auto newDelta = (currentTime - time) / 2;
+			if (newDelta < 0) {
+				CORE_LOGGING(error) << "Failed to sync time";
+				Close();
+				return;
+			}
+
+			// todo max retries?
+			SendHandshake(currentTime, newDelta);
+		}
+
+		return _server;
+	}
+
+	void Connection::StartHandshake() {
+		_handshaking = true;
+
+		SetPhase(Phases::PHASE_HANDSHAKE);
+		SendHandshake(_server->GetApplication()->GetCoreTime(), 0);
+	}
+
+	void Connection::SendHandshake(uint32_t time, uint32_t delta) {
+		auto packet = _server->GetPacketManager()->CreatePacket(ReservedOutgoingHeaders::HEADER_OUT_HANDSHAKE,
+			Direction::Outgoing);
+		packet->SetField<uint32_t>("handshake", _handshake);
+		packet->SetField<uint32_t>("time", time);
+		packet->SetField<uint32_t>("delta", 0);
+
+		Send(packet);
+	}
+
+
+	void Connection::StartKeyAgreement() {
+		CORE_LOGGING(trace) << "(KEYS) Agreement start!";
+		const CryptoPP::SecByteBlock* staticKey;
+		const CryptoPP::SecByteBlock* ephemeralKey;
+		const uint32_t* agreedValue;
+
+		if (!_cryptation->Initialize()) {
+			CORE_LOGGING(trace) << "(KEYS) Cannot initialize!";
+			Close();
+			return;
+		}
+
+		staticKey = (const CryptoPP::SecByteBlock*)(_cryptation->GetData(KEY_AGREEMENT_DATA_PUBLIC_STATIC_SERVER_KEY));
+		ephemeralKey =
+			(const CryptoPP::SecByteBlock*)(_cryptation->GetData(KEY_AGREEMENT_DATA_PUBLIC_EPHEMERAL_SERVER_KEY));
+
+		agreedValue = (const uint32_t*)_cryptation->GetData(KEY_AGREEMENT_DATA_AGREED_VALUE);
+		if (*agreedValue < 1 || staticKey->size() < 1 || ephemeralKey->size() < 1 ||
+			(ephemeralKey->size() + staticKey->size() > 256)) {
+			CORE_LOGGING(trace) << "(KEYS) Invalid values!";
+			Close();
+			return;
+		}
+
+		char keys[256];
+		memset(keys, 0, sizeof(keys));
+		memcpy(keys, staticKey->data(), staticKey->size());
+		memcpy(keys + staticKey->size(), ephemeralKey->data(), ephemeralKey->size());
+
+		auto packet = _server->GetPacketManager()->CreatePacket(ReservedOutgoingHeaders::HEADER_OUT_KEY_AGREEMENT,
+			Direction::Outgoing);
+		packet->SetField<uint16_t>("valuelen", static_cast<uint16_t>(*agreedValue));
+		packet->SetField<uint16_t>("datalen", static_cast<uint16_t>(ephemeralKey->size() + staticKey->size()));
+		packet->SetField("data", (uint8_t*)keys, sizeof(keys));
+
+		Send(packet);
+	}
+
+	void Connection::HandleKeyAgreement(std::shared_ptr<Packet> packet) {
+		PROFILE_FUNCTION();
+		if (!_cryptation->IsInitialized()) {
+			CORE_LOGGING(trace) << "(KEYS) Connection sent handle keys without "
+				"letting the server initialize them";
+			Close();
+			return;
+		}
+
+		uint8_t* data = (uint8_t*)packet->GetField("data");
+
+		{
+			PROFILE_SCOPE("Generate keys");
+			const CryptoPP::SecByteBlock* staticKey =
+				(const CryptoPP::SecByteBlock*)_cryptation->GetData(KEY_AGREEMENT_DATA_PUBLIC_STATIC_SERVER_KEY);
+			const CryptoPP::SecByteBlock* ephemeralKey =
+				(const CryptoPP::SecByteBlock*)_cryptation->GetData(KEY_AGREEMENT_DATA_PUBLIC_EPHEMERAL_SERVER_KEY);
+
+			uint16_t agreedValue = packet->GetField<uint16_t>("valuelen");
+			_cryptation->AddData(KEY_AGREEMENT_DATA_AGREED_VALUE, &agreedValue, sizeof(agreedValue));
+
+			_cryptation->AddData(KEY_AGREEMENT_DATA_PUBLIC_STATIC_CLIENT_KEY, data, staticKey->size());
+			_cryptation->AddData(
+				KEY_AGREEMENT_DATA_PUBLIC_EPHEMERAL_CLIENT_KEY, data + staticKey->size(), ephemeralKey->size());
+		}
+
+		if (!_cryptation->Finalize()) {
+			CORE_LOGGING(trace) << "(KEYS) Cannot agree";
+			Close();
+			return;
+		}
+
+		Send(_server->GetPacketManager()->CreatePacket(ReservedOutgoingHeaders::HEADER_OUT_KEY_AGREEMENT_COMPLETED,
+			Direction::Outgoing));
+
+		CORE_LOGGING(trace) << "(KEYS) Agreement completed!";
+		_handshaking = false;
+		_server->CallNewConnectionHandler(shared_from_this());
+	}
+
+	void Connection::ChangeXTEAKey(uint32_t* key) { _cryptation->AddData(XTEA_CRYPTATION_LOGIN_DECRYPT_KEY, key, 16); }
+
+#endif
+
+#if 0
+
+	// Packet handler
+	std::size_t CNetworkConnectionManager::ProcessInput(const void* data, std::size_t maxlength)
+	{
+		NET_LOG(LL_SYS, "Peer: %s(%d) Data: %p Max length: %u", GetIP().c_str(), GetId(), data, maxlength);
+
+		auto pData = reinterpret_cast<const uint8_t*>(data);
+
+		std::size_t offset = 0;
+		while (offset < maxlength)
+		{
+			uint32_t packetId = 0;
+			while (offset < maxlength && (packetId = pData[offset]) == 0) ++offset;
+
+			/*
+			auto handler = m_handlers.find(packetId);
+			if (handler == m_handlers.end())
+			*/
+			const auto packet = CPacketContainer::Instance().GetPacket(packetId);
+			if (!packet.get())
+			{
+				// log + kick? unkwnown packet dc
+				NET_LOG(LL_ERR, "Unknown Packet with id %d (%02x) received from PEER %d",
+					packetId, packetId, GetId()
+				);
+
+				asio::error_code e;
+				Disconnect(e);
+				return 0;
+			}
+
+			std::size_t handlerResult = packet->handler(pData + offset, maxlength - offset);
+			if (handlerResult == 0)
+				break; // handler returned 0 == too little data
+			offset += handlerResult;
+		}
+		return offset;
+	}
+
+	std::size_t CNetworkConnectionManager::OnRead(const void* data, std::size_t length)
 	{
 		auto pServer = GetServer();
 		if (!pServer || !pServer.get())
@@ -78,9 +355,9 @@ namespace net_engine
 			);
 		}
 
-		return pServer->ProcessInput(std::static_pointer_cast<CNetworkPeer>(shared_from_this()), data, length);
+		return ProcessInput(data, length);
 	}
-	std::size_t CNetworkPeer::OnWritePre(const void* data, std::size_t length)
+	std::size_t CNetworkConnectionManager::OnWritePre(const void* data, std::size_t length)
 	{
 		if (!data || !length)
 		{
@@ -112,19 +389,21 @@ namespace net_engine
 		return length;
 	}
 
-	void CNetworkPeer::OnWritePost(bool bCompleted)
+	void CNetworkConnectionManager::OnWritePost(bool bCompleted)
 	{
 		if (IsAssignedFlag(LL_ONWRITE_POST))
 		{
 			NET_LOG(LL_SYS, "Write completed! Result: %d", bCompleted ? 1 : 0);
 		}
 	}
-	void CNetworkPeer::OnError(uint32_t error_type, const asio::error_code& er)
+	void CNetworkConnectionManager::OnError(uint32_t error_type, const asio::error_code& er)
 	{
 		NET_LOG(LL_ERR, "Network error handled! ID: %u System error: %d(%s)", error_type, er.value(), er.message().c_str());
 	}
 
-	void CNetworkPeer::SendCrypted(const SNetPacket& packet, bool flush)
+
+
+	void CNetworkConnectionManager::SendCrypted(const SNetPacket& packet, bool flush)
 	{
 #if 0
 		NET_LOG(LL_SYS, "Original data: %p-%u", pData, ulSize);
@@ -175,12 +454,7 @@ namespace net_engine
 		}
 	}
 
-	void CNetworkPeer::Destroy()
-	{
-		GetServer()->RemovePeer(GetId());
-	}
-
-	void CNetworkPeer::SendChatPacket(const std::string& data)
+	void CNetworkConnectionManager::SendChatPacket(const std::string& data)
 	{
 		SNetPacketGCChat retPacket;
 		strcpy_s(retPacket.msg, data.c_str());
@@ -218,4 +492,6 @@ namespace net_engine
 		}
 #endif
 	}
+
+#endif
 }

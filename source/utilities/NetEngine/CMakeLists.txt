@@ -22,7 +22,7 @@ add_definitions(-DUSE_ASIO)
 add_definitions(-D_WIN32_WINNT=0x0601)
 
 file(GLOB NETENGINE_HEADERS
-	"${PROJECT_SOURCE_DIR}/include/*.h"
+	"${PROJECT_SOURCE_DIR}/include/*.hpp"
 )
 file(GLOB NETENGINE_SOURCES
 	"${PROJECT_SOURCE_DIR}/src/*.cpp"
@@ -30,9 +30,22 @@ file(GLOB NETENGINE_SOURCES
 
 add_library(${PROJECT_NAME} STATIC ${NETENGINE_HEADERS} ${NETENGINE_SOURCES})
 
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CMAKE_CXX_EXTENSIONS OFF)
+
+option(NETENGINE_BUILD_TEST "Build the network engine test binaries" ON)
 if(NETENGINE_BUILD_TEST)
 	include_directories(include)
-	add_executable(${PROJECT_NAME}Test ${NETENGINE_HEADERS} test/main.cpp test/NetClientManager.cpp test/NetServerManager.cpp test/NetPeerManager.cpp)
+
+	file(GLOB NETENGINE_TEST_HEADERS
+		"${PROJECT_SOURCE_DIR}/test/*.hpp"
+	)
+	file(GLOB NETENGINE_TEST_SOURCES
+		"${PROJECT_SOURCE_DIR}/test/*.cpp"
+	)
+
+	add_executable(${PROJECT_NAME}Test ${NETENGINE_HEADERS} ${NETENGINE_TEST_SOURCES} ${NETENGINE_TEST_HEADERS})
 	target_link_libraries(${PROJECT_NAME}Test ${PROJECT_NAME})
 endif()
 

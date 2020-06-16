@@ -1,4 +1,4 @@
-#include "../include/NetEngine.h"
+#include "../include/NetEngine.hpp"
 
 namespace net_engine
 {
@@ -6,6 +6,7 @@ namespace net_engine
 		NetPeerBase(service), m_autoReconnectCycle(autoReconnectCycle), m_reconnectTimer(service), m_isReconnectOnce(false)
 	{
 		// ctor
+		static PacketManager packet_manager;
 	}
 
 	bool NetClientBase::Connect(const std::string& host, uint16_t port)
@@ -14,7 +15,7 @@ namespace net_engine
 	}
 	bool NetClientBase::Connect(const std::string& host, const std::string& service)
 	{
-		asio::ip::tcp::resolver resolver(GetSocket().get_io_service());
+		asio::ip::tcp::resolver resolver(GetSocket().get_executor());
 		asio::ip::tcp::resolver::query q(host, service);
 		m_endpointStart = resolver.resolve(q);
 		return Connect(m_endpointStart);
@@ -78,7 +79,7 @@ namespace net_engine
 			}
 			else
 			{
-				_this->OnError(NET_PEER_ERR_CONN_FAIL, er);
+				_this->OnError(PeerErrorConnectionFail, er);
 			}
 
 			if (_this->m_isReconnectOnce)

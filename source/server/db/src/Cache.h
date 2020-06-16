@@ -1,7 +1,4 @@
-// vim:ts=8 sw=4
-#ifndef __INC_DB_CACHE_H__
-#define __INC_DB_CACHE_H__
-
+#pragma once
 #include "../../common/cache.h"
 
 class CItemCache : public cache<TPlayerItem>
@@ -70,5 +67,3 @@ public:
 
 	uint32_t GetLastUpdateTime() { return m_lastUpdateTime; }
 };
-
-#endif

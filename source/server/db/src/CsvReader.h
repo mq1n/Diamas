@@ -1,6 +1,4 @@
-#ifndef __CSVFILE_H__
-#define __CSVFILE_H__
-
+#pragma once
 #include <string>
 #include <vector>
 #include <map>
@@ -308,5 +306,3 @@ private:
     /// \brief 대입 연산자 금지
     const cCsvTable& operator = (const cCsvTable&) { return *this; }
 };
-
-#endif //__CSVFILE_H__
