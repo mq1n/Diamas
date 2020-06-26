@@ -1566,6 +1566,7 @@ CREATE TABLE `shop_item`  (
   `shop_vnum` int(11) NOT NULL DEFAULT 0,
   `item_vnum` int(11) NOT NULL DEFAULT 0,
   `count` tinyint(4) UNSIGNED NOT NULL DEFAULT 1,
+  `currency` tinyint(2) UNSIGNED NOT NULL DEFAULT 1,
   UNIQUE INDEX `vnum_unique`(`shop_vnum`, `item_vnum`, `count`) USING BTREE
 ) ENGINE = MyISAM CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Fixed;
 
