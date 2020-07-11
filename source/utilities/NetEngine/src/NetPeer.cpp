@@ -270,7 +270,7 @@ namespace net_engine
 
 				NET_LOG(LL_TRACE, "Received header: 0x%02x", header);
 
-				auto packet = PacketManager::Instance().CreatePacket(header, Incoming);
+				auto packet = PacketManager::Instance().CreatePacket(header, EPacketDirection::Incoming);
 				if (!packet)
 				{
 					NET_LOG(LL_TRACE, "Received unknown header: 0x%02x", header);

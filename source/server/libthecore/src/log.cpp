@@ -113,6 +113,9 @@ void _sys_err(const char *func, int line, const char *format, ...)
 	time_t ct = time(nullptr);  
 	char *time_s = asctime(localtime(&ct));
 
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+
 	char buf[1024 + 2]; // \n을 붙이기 위해..
 	int len;
 
@@ -149,7 +152,6 @@ void _net_err(const char *func, int line, const char *format, ...)
 	char *time_s = asctime(localtime(&ct));
 
 	struct timeval tv;
-	int nMiliSec = 0;
 	gettimeofday(&tv, NULL);
 
 	char buf[1024 + 2]; // \n을 붙이기 위해..

@@ -39,7 +39,6 @@ namespace net_engine
 		std::shared_ptr <NetServerBase> _this(self.lock());
 		if (_this)
 		{
-			NET_LOG(LL_CRI, "1");
 			if (!er)
 			{
 				if (peer && peer.get())
@@ -52,7 +51,6 @@ namespace net_engine
 			{
 				NET_LOG(LL_CRI, "Fatal error: %u(%s)", er.value(), er.message().c_str());
 			}
-			NET_LOG(LL_CRI, "2");
 
 			_this->AsyncAccept();
 		}

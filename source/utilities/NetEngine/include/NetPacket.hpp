@@ -8,7 +8,7 @@
 
 namespace net_engine
 {
-	enum EPacketDirection
+	enum class EPacketDirection
 	{
 		Incoming,
 		Outgoing
