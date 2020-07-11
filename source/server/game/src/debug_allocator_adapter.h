@@ -1,6 +1,4 @@
-#ifndef _DEBUG_ADAPTER_H_
-#define _DEBUG_ADAPTER_H_
-
+#pragma once
 // Intended to be included only in "debug_allocator.h"
 
 #define DBGALLOC_NO_STACKTRACE
@@ -306,5 +304,3 @@ private:
 	Detail detail_;
 	AllocMapType alloc_map_;
 };
-
-#endif // _DEBUG_ADAPTER_H_

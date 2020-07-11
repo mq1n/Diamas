@@ -1,6 +1,4 @@
-#ifndef __CLASS_ARENA_MANAGER__
-#define __CLASS_ARENA_MANAGER__
-
+#pragma once
 #include <lua.h>
 
 enum MEMBER_IDENTITY
@@ -138,6 +136,3 @@ class CArenaManager : public singleton<CArenaManager>
 
 		bool IsLimitedItem( int32_t lMapIndex, uint32_t dwVnum );
 };
-
-#endif /*__CLASS_ARENA_MANAGER__*/
-

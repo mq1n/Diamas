@@ -1,5 +1,4 @@
-#ifndef _OBJECT_ALLOCATOR_H_
-#define _OBJECT_ALLOCATOR_H_
+#pragma once
 
 #include "../../common/service.h"
 #include "debug_allocator.h"
@@ -168,5 +167,3 @@ private:
 #define M2_OBJ_NEW new
 #define M2_OBJ_DELETE(p) delete (p)
 #endif // DEBUG_ALLOC
-
-#endif // _OBJECT_ALLOCATOR_H_

@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_TEXTFILELOADER_H__
-#define __INC_METIN_II_TEXTFILELOADER_H__
-
+#pragma once
 #include "../../common/d3dtype.h"
 #include "../../common/pool.h"
 #include "file_loader.h"
@@ -76,6 +74,3 @@ class CTextFileLoader
 	private:
 		static CDynamicPool<TGroupNode>			ms_groupNodePool;
 };
-
-#endif
-

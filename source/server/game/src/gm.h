@@ -1,6 +1,4 @@
-#ifndef __GAME_SRC_GM_H__
-#define __GAME_SRC_GM_H__
-
+#pragma once
 #include <set>
 #include <vector>
 #include <string>
@@ -24,5 +22,3 @@ namespace GM
 	extern std::map<std::string, tGM> g_map_GM;
 	extern std::vector<std::string> get_gm_list();
 }
-
-#endif

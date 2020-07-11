@@ -1,6 +1,4 @@
-#ifndef __INC_REFINE_H
-#define __INC_REFINE_H
-
+#pragma once
 #include "constants.h"
 
 enum ERefineVnumNpc
@@ -33,4 +31,3 @@ class CRefineManager : public singleton<CRefineManager>
 	TRefineRecipeMap    m_map_RefineRecipe;
 
 };
-#endif

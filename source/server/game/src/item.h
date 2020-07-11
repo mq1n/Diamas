@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_ITEM_H__
-#define __INC_METIN_II_GAME_ITEM_H__
-
+#pragma once
 #include "../../common/tables.h"
 #include "entity.h"
 #include "gposition.h"
@@ -406,5 +404,3 @@ EVENTINFO(item_vid_event_info)
 	{
 	}
 };
-
-#endif

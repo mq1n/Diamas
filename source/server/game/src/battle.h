@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_BATTLE_H__
-#define __INC_METIN_II_GAME_BATTLE_H__
-
+#pragma once
 #include "char.h"
 
 enum EBattleTypes       // 상대방 기준
@@ -97,5 +95,3 @@ uint32_t	GET_ATTACK_SPEED(LPCHARACTER ch);
 void	SET_ATTACK_TIME(LPCHARACTER ch, LPCHARACTER victim, uint32_t current_time);
 void	SET_ATTACKED_TIME(LPCHARACTER ch, LPCHARACTER victim, uint32_t current_time);
 bool	IS_SPEED_HACK(LPCHARACTER ch, LPCHARACTER victim, uint32_t current_time);
-
-#endif

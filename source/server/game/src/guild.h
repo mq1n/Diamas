@@ -1,6 +1,4 @@
-#ifndef __INC_GUILD_H
-#define __INC_GUILD_H
-
+#pragma once
 #include "skill.h"
 #include "char.h"
 
@@ -393,5 +391,3 @@ template <class Func> void CGuild::ForEachOnMapMember (Func & f, int32_t lMapInd
 		}
 	}
 }
-
-#endif

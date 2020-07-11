@@ -1,5 +1,4 @@
-#ifndef _FIFO_ALLOCATOR_H_
-#define _FIFO_ALLOCATOR_H_
+#pragma once
 
 #include <deque>
 #include <unordered_map>
@@ -71,5 +70,3 @@ private:
 	PoolMapType pool_map_;
 	AllocMapType alloc_map_;
 };
-
-#endif // _FIFO_ALLOCATOR_H_

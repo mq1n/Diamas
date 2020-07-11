@@ -1,5 +1,4 @@
-#ifndef _INC_BLUE_DRAGON_SKILL_H__INC_
-#define _INC_BLUE_DRAGON_SKILL_H__INC_
+#pragma once
 #include "../../common/service.h"
 #include "blue_dragon_binder.h"
 
@@ -358,5 +357,3 @@ struct FSkillEarthQuake
 		}
 	}
 };
-#endif
-

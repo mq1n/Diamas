@@ -1,5 +1,4 @@
-#ifndef __GUILD_MANAGER_H
-#define __GUILD_MANAGER_H
+#pragma once
 
 class CGuild;
 struct TGuildCreateParameter;
@@ -104,5 +103,3 @@ template <typename Func> void CGuildManager::for_each_war(Func & f)
 }
 
 extern void SendGuildWarScore(uint32_t dwGuild, uint32_t dwGuildOpp, int32_t iDelta, int32_t iBetScoreDelta = 0);
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef __INC_ITEM_MANAGER__
-#define __INC_ITEM_MANAGER__
-
+#pragma once
 #include "../../common/service.h"
 #include "../../common/singleton.h"
 #include "../../libthecore/include/utils.h"
@@ -506,6 +504,4 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 #define M2_DESTROY_ITEM(ptr) ITEM_MANAGER::instance().DestroyItem(ptr)
 #else
 #define M2_DESTROY_ITEM(ptr) ITEM_MANAGER::instance().DestroyItem(ptr, __FILE__, __LINE__)
-#endif
-
 #endif

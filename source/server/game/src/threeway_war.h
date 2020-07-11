@@ -1,9 +1,5 @@
-
-#ifndef THREE_WAY_WAR_EVENT_
-#define THREE_WAY_WAR_EVENT_
-
+#pragma once
 #include <unordered_map>
-
 #include "../../common/stl.h"
 
 struct ForkedSungziMapInfo
@@ -76,6 +72,3 @@ int32_t GetSungziStartX( uint8_t bEmpire );
 int32_t GetSungziStartY( uint8_t bEmpire );
 int32_t GetPassStartX( uint8_t bEmpire );
 int32_t GetPassStartY( uint8_t bEmpire );
-
-#endif /* THREE_WAY_WAR_EVENT_ */
-

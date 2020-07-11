@@ -1,5 +1,4 @@
-#ifndef	__HEADER_PET_SYSTEM__
-#define	__HEADER_PET_SYSTEM__
+#pragma once
 
 class CHARACTER;
 
@@ -110,8 +109,3 @@ private:
 	uint32_t			m_dwLastUpdateTime;
 	LPEVENT			m_pkPetSystemUpdateEvent;
 };
-
-
-
-
-#endif	//__HEADER_PET_SYSTEM__

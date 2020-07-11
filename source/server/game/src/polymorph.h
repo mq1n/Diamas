@@ -1,7 +1,4 @@
-
-#ifndef __POLYMORPH_UTILS__
-#define __POLYMORPH_UTILS__
-
+#pragma once
 #include <unordered_map>
 
 #define POLYMORPH_SKILL_ID	129
@@ -32,5 +29,3 @@ class CPolymorphUtils : public singleton<CPolymorphUtils>
 		bool GiveBook(LPCHARACTER pChar, uint32_t dwMobVnum, uint32_t dwPracticeCount, uint8_t BookLevel, uint8_t LevelLimit);
 		bool BookUpgrade(LPCHARACTER pChar, LPITEM pItem);
 };
-
-#endif /*__POLYMORPH_UTILS__*/

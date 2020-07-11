@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_UTILS_H__
-#define __INC_METIN_II_UTILS_H__
-
+#pragma once
 #include <cmath>
 #include <sstream>
 #include <iostream>
@@ -151,6 +149,3 @@ namespace ext
 		}
 	}
 }
-
-#endif /* __INC_METIN_II_UTILS_H__ */
-

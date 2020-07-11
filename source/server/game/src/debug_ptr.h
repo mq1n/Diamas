@@ -1,6 +1,4 @@
-#ifndef _DEBUG_PTR_H_
-#define _DEBUG_PTR_H_
-
+#pragma once
 #include "../../common/service.h"
 
 // Intended to be include only in "debug_allocator.h"
@@ -155,4 +153,3 @@ bool operator<(const DebugPtr<T>& lhs, const DebugPtr<T>& rhs) {
 } // namespace std
 
 #endif // DEBUG_ALLOC
-#endif // _DEBUG_PTR_H_

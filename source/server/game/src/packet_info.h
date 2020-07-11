@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_PACKET_HEADER_INFO_H__
-#define __INC_METIN_II_GAME_PACKET_HEADER_INFO_H__
-
+#pragma once
 #include "packet.h"
 
 typedef struct SPacketElement
@@ -48,5 +46,3 @@ class CPacketInfoGG : public CPacketInfo
 		CPacketInfoGG();
 		virtual ~CPacketInfoGG();
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef __WEDDING_H
-#define __WEDDING_H
+#pragma once
 
 #include "marriage.h"
 
@@ -67,12 +66,10 @@ namespace marriage
 
 			WeddingMap* Find(uint32_t dwMapIndex);
 
-		private:
+		protected:
 			uint32_t __CreateWeddingMap(uint32_t dwPID1, uint32_t dwPID2);
 
 		private:
-
-			std::map<uint32_t, WeddingMap*> m_mapWedding;
+			std::map <uint32_t, WeddingMap*> m_mapWedding;
 	};
 }
-#endif

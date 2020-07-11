@@ -1,5 +1,4 @@
-#ifndef __MARRIAGE_H
-#define __MARRIAGE_H
+#pragma once
 
 namespace marriage
 {
@@ -147,5 +146,3 @@ namespace marriage
 		}
 
 }
-
-#endif

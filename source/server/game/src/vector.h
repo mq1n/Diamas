@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_VECTOR_H__
-#define __INC_METIN_II_GAME_VECTOR_H__
-
+#pragma once
 typedef struct SVector
 {
 	float x;
@@ -15,4 +13,3 @@ extern void     GetDeltaByDegree(float fDegree, float fDistance, float *x, float
 extern float	GetDegreeDelta(float iDegree, float iDegree2);
 
 void RotateRegion(int32_t& sx, int32_t& sy, int32_t& ex, int32_t& ey, float xRot, float yRot, float zRot);
-#endif

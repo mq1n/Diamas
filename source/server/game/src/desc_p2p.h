@@ -1,3 +1,4 @@
+#pragma once
 #include "desc.h"
 
 class DESC_P2P : public DESC

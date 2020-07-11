@@ -1,6 +1,4 @@
-#ifndef __METIN2_SERVER_QUEST_MANAGER__
-#define __METIN2_SERVER_QUEST_MANAGER__
-
+#pragma once
 #include <unordered_map>
 #include "quest_npc.h"
 
@@ -260,5 +258,3 @@ namespace quest
 			std::vector <uint32_t>	m_vecPCStack;
 	};
 };
-
-#endif

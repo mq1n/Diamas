@@ -1,5 +1,4 @@
-#ifndef __INC_XMAS_EVENT_H
-#define __INC_XMAS_EVENT_H
+#pragma once
 
 namespace xmas
 {
@@ -15,4 +14,3 @@ namespace xmas
 	void SpawnSanta(int32_t lMapIndex, int32_t iTimeGapSec);
 	void SpawnEventHelper(bool spawn);
 }
-#endif

@@ -1,6 +1,4 @@
-#ifndef __START_POSITION_H
-#define __START_POSITION_H
-
+#pragma once
 #include "locale_service.h"
 
 extern char g_nation_name[4][32];
@@ -72,5 +70,3 @@ inline uint32_t CREATE_START_Y(uint8_t e)
 
 	return 0;
 }
-
-#endif

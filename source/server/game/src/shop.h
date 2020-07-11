@@ -1,5 +1,4 @@
-#ifndef __INC_METIN_II_GAME_SHOP_H__
-#define __INC_METIN_II_GAME_SHOP_H__
+#pragma once
 #include "../../common/service.h"
 
 enum
@@ -75,5 +74,3 @@ class CShop
 
 		LPCHARACTER			m_pkPC;
 };
-
-#endif 

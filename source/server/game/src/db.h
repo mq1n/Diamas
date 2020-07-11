@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_DB_MANAGER_H__
-#define __INC_METIN_II_DB_MANAGER_H__
-
+#pragma once
 #include "../../libsql/include/AsyncSQL.h"
 #include "../../common/length.h"
 #include <functional>
@@ -129,5 +127,3 @@ class AccountDB : public singleton<AccountDB>
 
 };
 //END_ACCOUNT_DB
-
-#endif

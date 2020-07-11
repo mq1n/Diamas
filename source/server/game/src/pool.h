@@ -1,5 +1,4 @@
-#ifndef __INC_GAME_POOL_H__
-#define __INC_GAME_POOL_H__
+#pragma once
 
 template<typename T>
 struct PoolNode {
@@ -267,5 +266,3 @@ private:
 	ObjectPool(const ObjectPool&);
 	void operator=(const ObjectPool&);
 };
-
-#endif

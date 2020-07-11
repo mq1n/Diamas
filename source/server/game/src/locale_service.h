@@ -1,5 +1,4 @@
-#ifndef __LOCALE_SERVCICE__
-#define __LOCALE_SERVCICE__
+#pragma once
 
 extern void Locale_Init();
 
@@ -8,5 +7,3 @@ void LocaleService_TransferDefaultSetting();
 const std::string& LocaleService_GetBasePath();
 const std::string& LocaleService_GetMapPath();
 const std::string& LocaleService_GetQuestPath();
-
-#endif

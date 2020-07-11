@@ -1082,7 +1082,7 @@ void CParty::RemoveBonusForOne(uint32_t pid)
 void CParty::HealParty()
 {
 	return;
-	
+#if 0
 	if (!m_bPartyHealReady)
 		return;
 
@@ -1105,6 +1105,7 @@ void CParty::HealParty()
 
 	m_bPartyHealReady = false;
 	m_dwPartyHealTime = get_dword_time();
+#endif
 }
 
 void CParty::SummonToLeader(uint32_t pid)

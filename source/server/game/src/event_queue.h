@@ -1,6 +1,4 @@
-#ifndef __INC_LIBTHECORE_EVENT_QUEUE_H__
-#define __INC_LIBTHECORE_EVENT_QUEUE_H__
-
+#pragma once
 #include "../../common/service.h"
 
 #ifdef M2_USE_POOL
@@ -49,6 +47,3 @@ class CEventQueue
 		ObjectPool<TQueueElement> pool_;
 #endif
 };
-
-#endif
-

@@ -1,5 +1,4 @@
-#ifndef _ANTICHEAT_MANAGER_H_
-#define _ANTICHEAT_MANAGER_H_
+#pragma once
 #include <vector>
 
 enum EAnticheatScanIDs
@@ -29,6 +28,3 @@ class CAnticheatManager : public singleton <CAnticheatManager>
 	private:
 		std::vector <std::string> m_vSerializedBlacklists;
 };
-
-#endif /* _ANTICHEAT_MANAGER_H_ */
-

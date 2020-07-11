@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_SECTREE_MANAGER_H__
-#define __INC_METIN_II_GAME_SECTREE_MANAGER_H__
-
+#pragma once
 #include "sectree.h"
 #include "vid.h"
 #include "../../common/length.h"
@@ -257,6 +255,3 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		using PrivateIndexMapType = std::unordered_map<int32_t, int32_t>;
 		PrivateIndexMapType next_private_index_map_;
 };
-
-#endif
-

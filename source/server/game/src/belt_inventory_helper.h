@@ -1,6 +1,4 @@
-#ifndef __HEADER_BELT_INVENTORY_HELPER__
-#define __HEADER_BELT_INVENTORY_HELPER__
-
+#pragma once
 #include "char.h"
 #include "item.h"
 
@@ -158,5 +156,3 @@ public:
 	}
 
 };
-
-#endif //__HEADER_BELT_INVENTORY_HELPER__

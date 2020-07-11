@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_TARGET_H__
-#define __INC_METIN_II_GAME_TARGET_H__
-
+#pragma once
 enum ETargetTypes
 {
 	TARGET_TYPE_POS	= (1 << 0),
@@ -66,5 +64,3 @@ class CTargetManager : public singleton<CTargetManager>
 		std::map<uint32_t, std::list<LPEVENT> > m_map_kListEvent;
 		int32_t m_iID;
 };
-
-#endif

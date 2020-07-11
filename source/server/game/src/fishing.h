@@ -1,6 +1,4 @@
-#ifndef __INC_FISHING_H
-#define __INC_FISHING_H
-
+#pragma once
 #include "item.h"
 
 namespace fishing
@@ -84,4 +82,3 @@ namespace fishing
 	extern bool RefinableRod(LPITEM rod);
 	extern int32_t RealRefineRod(LPCHARACTER ch, LPITEM rod);
 }
-#endif

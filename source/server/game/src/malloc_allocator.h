@@ -1,5 +1,4 @@
-#ifndef _MALLOC_ALLOCATOR_H_
-#define _MALLOC_ALLOCATOR_H_
+#pragma once
 
 // Allocator implementation detail based on default CRT malloc/free.
 class MallocAllocator {
@@ -17,5 +16,3 @@ public:
 		::free(p);
 	}
 };
-
-#endif // _MALLOC_ALLOCATOR_H_

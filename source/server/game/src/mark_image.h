@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_MARKIMAGE_H__
-#define __INC_METIN_II_MARKIMAGE_H__
-
+#pragma once
 #include <IL/il.h>
 #include "minilzo.h"
 
@@ -107,5 +105,3 @@ class CGuildMarkImage
 
 		ILuint m_uImg;
 };
-
-#endif

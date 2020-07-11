@@ -1,7 +1,4 @@
-#ifndef _fsm_fsm_h
-#define _fsm_fsm_h
-
-// Local Includes
+#pragma once
 #include "state.h"
 
 // FSM Class
@@ -30,5 +27,3 @@ class CFSM
 		virtual void StateInitial() {}
 		virtual void EndStateInitial() {}
 };
-
-#endif

@@ -1,15 +1,4 @@
-/*********************************************************************
- * date        : 2006.09.07
- * file        : dev_log.h
- * author      : mhh
- * description : 개발자용 로그함수 테스트 서버에서만 기록된다.
- *				example)
- *				dev_log(LOG_DEB0, "My Name is %s", name);
- */
-
-#ifndef _dev_log_h_
-#define _dev_log_h_
-
+#pragma once
 
 // -----------------------------------------------
 // define log level
@@ -68,12 +57,7 @@
 
 
 
-
 void dev_log(const char *file, int32_t line, const char *function, int32_t level, const char *fmt, ...);
 void dev_log_add_level(int32_t level);
 void dev_log_del_level(int32_t level);
 void dev_log_set_level(int32_t mask);
-
-
-#endif	/* _dev_log_h_ */
-

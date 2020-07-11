@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_ACTIVITY_H__
-#define __INC_METIN_II_ACTIVITY_H__
-
+#pragma once
 #include <array>
 #include "../../common/tables.h"
 
@@ -69,7 +67,4 @@ private:
 	bool m_doSave;
 };
 
-typedef std::shared_ptr<ActivityHandler> spActivityHandler;
-
-#endif
-
+typedef std::shared_ptr <ActivityHandler> spActivityHandler;

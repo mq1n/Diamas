@@ -285,7 +285,7 @@ void CGrannyLODController::AddModel(CGraphicThing * pThing, int32_t iSrcModel, C
 void CGrannyLODController::__ReserveSharedDeformableVertexBuffer(uint32_t deformableVertexCount)
 {
 	if (m_pkSharedDeformableVertexBuffer && 
-		m_pkSharedDeformableVertexBuffer->GetVertexCount() >= deformableVertexCount)
+		m_pkSharedDeformableVertexBuffer->GetVertexCount() >= static_cast<int32_t>(deformableVertexCount))
 		return;	
 
 	__FreeDeformVertexBuffer(m_pkSharedDeformableVertexBuffer);

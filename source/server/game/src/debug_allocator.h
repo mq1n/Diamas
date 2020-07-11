@@ -1,6 +1,4 @@
-#ifndef _DEBUG_ALLOCATOR_H_
-#define _DEBUG_ALLOCATOR_H_
-
+#pragma once
 #include <cstdlib>
 #include <new>
 
@@ -169,5 +167,3 @@ template<typename T>
 T* get_pointer(T* p) {
 	return p;
 }
-
-#endif // _DEBUG_ALLOCATOR_H_

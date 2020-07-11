@@ -1,12 +1,4 @@
-/*
- *    Filename: event.h
- * Description: 이벤트 관련 (timed event)
- *
- *      Author: 김한주 (aka. 비엽, Cronan), 송영진 (aka. myevan, 빗자루)
- */
-#ifndef __INC_LIBTHECORE_EVENT_H__
-#define __INC_LIBTHECORE_EVENT_H__
-
+#pragma once
 #include "../../common/service.h"
 #include <intrusive_ptr.h>
 
@@ -92,5 +84,3 @@ extern void		event_cancel(LPEVENT * event);			// 이벤트 취소
 extern int32_t		event_processing_time(LPEVENT event);	// 수행 시간 리턴
 extern int32_t		event_time(LPEVENT event);			// 남은 시간 리턴
 extern void		event_reset_time(LPEVENT event, int32_t when);	// 실행 시간 재 설정
-
-#endif

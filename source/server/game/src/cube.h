@@ -1,17 +1,6 @@
-/*********************************************************************
- * date        : 2006.11.20
- * file        : cube.h
- * author      : mhh
- * description : 큐브시스템
- */
-
-#ifndef _cube_h_
-#define _cube_h_
-
-
+#pragma once
 #define CUBE_MAX_NUM	24	// OLD:INVENTORY_MAX_NUM
 #define CUBE_MAX_DISTANCE	1000
-
 
 struct CUBE_VALUE
 {
@@ -60,6 +49,3 @@ void Cube_request_material_info(LPCHARACTER ch, int32_t request_start_index, int
 void Cube_print();
 
 bool Cube_InformationInitialize();
-
-#endif	/* _cube_h_ */
-

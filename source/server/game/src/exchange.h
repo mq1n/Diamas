@@ -1,5 +1,4 @@
-#ifndef __INC_METIN_II_GAME_EXCHANGE_H__
-#define __INC_METIN_II_GAME_EXCHANGE_H__
+#pragma once
 
 class CGrid;
 
@@ -49,5 +48,3 @@ class CExchange
 		CGrid *		m_pGrid;
 
 };
-
-#endif

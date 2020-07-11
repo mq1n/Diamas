@@ -1,5 +1,4 @@
-#ifndef __INC_AFFECT_H
-#define __INC_AFFECT_H
+#pragma once
 
 class CAffect
 {
@@ -189,5 +188,3 @@ enum AffectVariable
 	INFINITE_AFFECT_DURATION = 60 * 365 * 24 * 60 * 60
 };
 // END_AFFECT_DURATION_BUG_FIX
-
-#endif

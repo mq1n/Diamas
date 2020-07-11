@@ -1,6 +1,4 @@
-#ifndef __GUILD_WAR_MAP_MANAGER_H
-#define __GUILD_WAR_MAP_MANAGER_H
-
+#pragma once
 #include "constants.h"
 #include "guild.h"
 
@@ -171,5 +169,3 @@ template <typename Func> Func CWarMapManager::for_each(Func f)
 
 	return f;
 }
-
-#endif

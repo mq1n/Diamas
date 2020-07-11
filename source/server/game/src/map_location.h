@@ -1,4 +1,4 @@
-
+#pragma once
 #include "../../common/stl.h"
 
 class CMapLocation : public singleton<CMapLocation>

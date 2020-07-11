@@ -1,6 +1,4 @@
-#ifndef __INC_GAME_MOTION_H__
-#define __INC_GAME_MOTION_H__
-
+#pragma once
 #include "../../common/d3dtype.h"
 #include "../../common/service.h"
 
@@ -144,5 +142,3 @@ class CMotionManager : public singleton<CMotionManager>
 		std::map<uint32_t, float> m_map_normalAttackDuration;
 		// END_OF_POLYMORPH_BUG_FIX
 };
-
-#endif

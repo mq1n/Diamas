@@ -1,6 +1,4 @@
-#ifndef __INC_SECTREE_H__
-#define __INC_SECTREE_H__
-
+#pragma once
 #include "entity.h"
 
 enum ESectree
@@ -188,5 +186,3 @@ class SECTREE
 
 		CAttribute *		m_pkAttribute;
 };
-
-#endif

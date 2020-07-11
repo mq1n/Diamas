@@ -1,5 +1,4 @@
-#ifndef __METIN2_SERVER_QUEST_H__
-#define __METIN2_SERVER_QUEST_H__
+#pragma once
 
 #define INDUCTION_LEVEL3	(1 << 0)
 #define INDUCTION_LEVEL8	(1 << 1)
@@ -135,4 +134,3 @@ namespace quest
 		{}
 	};
 }
-#endif

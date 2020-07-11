@@ -1,5 +1,4 @@
-#ifndef __MINING_H
-#define __MINING_H
+#pragma once
 
 namespace mining
 {
@@ -15,5 +14,3 @@ namespace mining
 
 	bool IsVeinOfOre (uint32_t vnum);
 }
-
-#endif

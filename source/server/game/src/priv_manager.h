@@ -1,12 +1,5 @@
-#ifndef __PRIV_MANAGER_H
-#define __PRIV_MANAGER_H
+#pragma once
 
-/**
- * @version 05/06/08	Bang2ni - Guild privilege 관련 함수 지속 시간 추가
- * 			          RequestGiveGuildPriv, GiveGuildPriv 함수 프로토타잎 수정
- * 			          m_aPrivGuild 타잎 수정
- * 			          구조체 SPrivGuildData, 멤버 함수 GetPrivByGuildEx 추가
- */
 class CPrivManager : public singleton<CPrivManager>
 {
 	public:
@@ -58,4 +51,3 @@ class CPrivManager : public singleton<CPrivManager>
 		std::map<uint32_t, SPrivGuildData> m_aPrivGuild[MAX_PRIV_NUM];
 		std::map<uint32_t, int32_t> m_aPrivChar[MAX_PRIV_NUM];
 };
-#endif

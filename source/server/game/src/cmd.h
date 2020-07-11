@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_CMD_H__
-#define __INC_METIN_II_GAME_CMD_H__
-
+#pragma once
 #include "typedef.h"
 #include <stdint.h>
 #include <string>
@@ -69,5 +67,3 @@ void CHARACTER_AddBGMInfo(uint32_t mapIndex, const char* name, float vol);
 // LUA_ADD_GOTO_INFO
 extern void CHARACTER_AddGotoInfo(const std::string& c_st_name, uint8_t empire, int32_t mapIndex, uint32_t x, uint32_t y);
 // END_OF_LUA_ADD_GOTO_INFO
-
-#endif

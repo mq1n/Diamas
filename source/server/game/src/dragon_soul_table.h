@@ -1,5 +1,4 @@
-#ifndef __INC_METIN_II_DRAGON_SOUL_TABLE_H__
-#define __INC_METIN_II_DRAGON_SOUL_TABLE_H__
+#pragma once
 
 struct SApply
 {
@@ -70,5 +69,3 @@ private:
 	bool	CheckDragonHeartExtTables();
 	bool	CheckDragonSoulExtTables();
 };
-
-#endif

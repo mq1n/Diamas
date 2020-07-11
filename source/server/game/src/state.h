@@ -1,6 +1,4 @@
-#ifndef _fsm_state_h
-#define _fsm_state_h
-
+#pragma once
 // System Includes
 
 //==================================================================================================
@@ -83,6 +81,3 @@ class CStateTemplate : public CState
 			(m_pInstance->*m_pfnEndState)();
 		}
 };
-
-#endif
-

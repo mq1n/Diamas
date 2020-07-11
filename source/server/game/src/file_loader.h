@@ -1,5 +1,4 @@
-#ifndef __INC_METIN_II_COMMON_FILE_LOADER_H__
-#define __INC_METIN_II_COMMON_FILE_LOADER_H__
+#pragma once
 
 typedef std::vector< std::string > TTokenVector;
 
@@ -18,6 +17,3 @@ class CMemoryTextFileLoader
 	protected:
 		std::vector<std::string> m_stLineVector;
 };
-
-#endif /* __INC_METIN_II_COMMON_FILE_LOADER_H__ */
-

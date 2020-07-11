@@ -1,5 +1,4 @@
-#ifndef __INC_GAME_OX_EVENT_H__
-#define __INC_GAME_OX_EVENT_H__
+#pragma once
 
 struct tag_Quiz
 {
@@ -71,5 +70,3 @@ class COXEventManager : public singleton<COXEventManager>
 
 		uint32_t GetAttenderCount() { return m_map_attender.size(); }
 };
-
-#endif

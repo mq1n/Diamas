@@ -1,6 +1,4 @@
-#ifndef QUEST_NPC
-#define QUEST_NPC
-
+#pragma once
 #include "quest_pc.h"
 
 extern int32_t g_bIsTestServer;
@@ -131,4 +129,3 @@ namespace quest
 			}
 		}
 }
-#endif

@@ -1,5 +1,8 @@
+#pragma once
+
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif
 
 #include <lua.h>

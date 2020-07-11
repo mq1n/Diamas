@@ -1,5 +1,4 @@
-#ifndef __INC_METIN2_GAME_LOCALE_H__
-#define __INC_METIN2_GAME_LOCALE_H__
+#pragma once
 
 extern "C"
 {
@@ -8,5 +7,3 @@ extern "C"
 
 #define LC_TEXT(str) locale_find(str)
 };
-
-#endif

@@ -1,9 +1,5 @@
-
-#ifndef P2P_MANAGER_H_
-#define P2P_MANAGER_H_
-
+#pragma once
 #include <unordered_map>
-
 #include "input.h"
 #include "../../common/stl.h"
 
@@ -72,6 +68,3 @@ class P2P_MANAGER : public singleton<P2P_MANAGER>
 		TPIDCCIMap		m_map_dwPID_pkCCI;
 		int32_t			m_aiEmpireUserCount[EMPIRE_MAX_NUM];
 };
-
-#endif /* P2P_MANAGER_H_ */
-

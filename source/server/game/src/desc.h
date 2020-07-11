@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_DESC_H__
-#define __INC_METIN_II_GAME_DESC_H__
-
+#pragma once
 #include "constants.h"
 #include "input.h"
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
@@ -234,5 +232,3 @@ class DESC
 		void RawPacket(const void * c_pvData, int32_t iSize);
 		void ChatPacket(uint8_t type, const char * format, ...);
 };
-
-#endif

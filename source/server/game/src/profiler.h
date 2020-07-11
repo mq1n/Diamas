@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_PROFILER_H__
-#define __INC_METIN_II_GAME_PROFILER_H__
-
+#pragma once
 #include <unordered_map>
 
 class CProfiler : public singleton<CProfiler>
@@ -270,5 +268,3 @@ template <typename T> class CProfileUnit
 };
 
 #define PROF_UNIT CProfileUnit<void>
-
-#endif

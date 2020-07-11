@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_MOB_MANAGER_H__
-#define __INC_METIN_II_MOB_MANAGER_H__
-
+#pragma once
 #include "../../common/tables.h"
 #include "typedef.h"
 #include "gposition.h"
@@ -161,5 +159,3 @@ class CMobManager : public singleton<CMobManager>
 
 		std::map<uint32_t, double> m_mapRegenCount;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef __INC_METIN_II_GAME_BUFFER_MANAGER_H__
-#define __INC_METIN_II_GAME_BUFFER_MANAGER_H__
+#pragma once
 
 class TEMP_BUFFER
 {
@@ -18,5 +17,3 @@ class TEMP_BUFFER
 		LPBUFFER	buf;
 		bool		forceDelete;
 };
-
-#endif

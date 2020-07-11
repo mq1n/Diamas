@@ -1,8 +1,5 @@
-#ifndef __INC_METIN_II_GAME_DESC_MANAGER_H__
-#define __INC_METIN_II_GAME_DESC_MANAGER_H__
-
+#pragma once
 #include <unordered_map>
-
 #include "../../common/stl.h"
 #include "../../common/length.h"
 
@@ -93,5 +90,3 @@ private:
 	TPlayerCountMap m_userCountMap;
 		bool			m_bDestroyed;
 };
-
-#endif

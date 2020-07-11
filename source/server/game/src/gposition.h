@@ -1,6 +1,4 @@
-#ifndef _GPOSITION_H
-#define _GPOSITION_H
-
+#pragma once
 #include <cmath>
 #include <cstdint>
 
@@ -222,5 +220,3 @@ inline bool GPOS::operator != (const GPOS& v) const
 {
 	return x != v.x || y != v.y || z != v.z;
 }
-
-#endif  /* _GPOSITION_H */

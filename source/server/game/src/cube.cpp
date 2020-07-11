@@ -1,12 +1,3 @@
-/*********************************************************************
- * date        : 2006.11.20
- * file        : cube.cpp
- * author      : mhh
- * description : 
- */
-
-#define _cube_cpp_
-
 #include "stdafx.h"
 #include "config.h"
 #include "constants.h"

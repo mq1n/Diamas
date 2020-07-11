@@ -1,5 +1,4 @@
-#ifndef __INC_METIN_II_GAME_SHOP_SECONDARY_COIN_H__
-#define __INC_METIN_II_GAME_SHOP_SECONDARY_COIN_H__
+#pragma once
 #include "typedef.h"
 #include "shop.h"
 
@@ -40,5 +39,3 @@ private:
 	std::vector <TShopTableEx> m_vec_shopTabs;
 };
 typedef CShopEx* LPSHOPEX;
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef __CLIENT_H__
-#define __CLIENT_H__
-
+#pragma once
 #include "desc.h"
 
 class CLIENT_DESC : public DESC
@@ -46,5 +44,3 @@ class CLIENT_DESC : public DESC
 
 extern LPCLIENT_DESC db_clientdesc;
 extern LPCLIENT_DESC g_pkAuthMasterDesc;
-
-#endif

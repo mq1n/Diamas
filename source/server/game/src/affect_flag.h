@@ -1,5 +1,4 @@
-#ifndef __INC_METIN_II_AFFECT_FLAG_H__
-#define __INC_METIN_II_AFFECT_FLAG_H__
+#pragma once
 
 #ifndef IS_SET
 #define IS_SET(flag, bit)                ((flag) & (bit))
@@ -65,5 +64,3 @@ inline bool operator != (const TAffectFlag& lhs, const TAffectFlag& rhs)
 {
 	return !(lhs == rhs);
 }
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef __CIPHER_H__
-#define __CIPHER_H__
-
+#pragma once
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 
 #include <cryptopp/cryptlib.h>
@@ -63,5 +61,3 @@ class Cipher {
 };
 
 #endif // _IMPROVED_PACKET_ENCRYPTION_
-
-#endif // __CIPHER_H__

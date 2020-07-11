@@ -1,5 +1,4 @@
-#ifndef __ITEM_ADDON_H
-#define __ITEM_ADDON_H
+#pragma once
 
 class CItemAddonManager : public singleton<CItemAddonManager>
 {
@@ -9,5 +8,3 @@ class CItemAddonManager : public singleton<CItemAddonManager>
 
 		void ApplyAddonTo(int32_t iAddonType, LPITEM pItem);
 };
-
-#endif

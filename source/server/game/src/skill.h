@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_CSkillManager_H__
-#define __INC_METIN_II_GAME_CSkillManager_H__
-
+#pragma once
 #include "../../libthecore/include/poly.h"
 #include "../../common/service.h"
 
@@ -239,7 +237,5 @@ class CSkillManager : public singleton<CSkillManager>
 		CSkillProto * Get(const char * c_pszSkillName);
 
 	protected:
-		std::map<uint32_t, CSkillProto *> m_map_pkSkillProto;
+		std::map <uint32_t, CSkillProto *> m_map_pkSkillProto;
 };
-
-#endif

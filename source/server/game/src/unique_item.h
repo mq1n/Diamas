@@ -1,5 +1,4 @@
-#ifndef __INC_METIN2_UNIQUE_ITEM_H
-#define __INC_METIN2_UNIQUE_ITEM_H
+#pragma once
 
 enum EUniqueItems
 {
@@ -112,6 +111,3 @@ enum EUniqueItems
 	// 용혼석에서 추출할 때 주는 용심.
 	DRAGON_HEART_VNUM = 100000,
 };
-
-#endif /* __INC_METIN2_UNIQUE_ITEM_H */
-

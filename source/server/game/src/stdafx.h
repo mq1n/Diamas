@@ -1,6 +1,4 @@
-#ifndef __GAME_SRC_STDAFX_H__
-#define __GAME_SRC_STDAFX_H__
-
+#pragma once
 #include "debug_allocator.h"
 
 #include "../../libthecore/include/stdafx.h"
@@ -43,5 +41,3 @@
 
 #define IN
 #define OUT
-
-#endif

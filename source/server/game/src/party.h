@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_PARTY_H__
-#define __INC_METIN_II_GAME_PARTY_H__
-
+#pragma once
 #include "char.h"
 
 enum // unit : minute
@@ -424,6 +422,4 @@ struct FPartyDropDiceRoll
 		}
 	}
 };
-#endif
-
 #endif

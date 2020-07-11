@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_BUILDING_H__
-#define __INC_METIN_II_BUILDING_H__
-
+#pragma once
 #include "../../common/building.h"
 
 namespace building
@@ -166,5 +164,3 @@ namespace building
 			std::map<uint32_t, LPOBJECT>		m_map_pkObjByVID;
 	};
 }
-
-#endif

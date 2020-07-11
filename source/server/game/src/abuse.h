@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_ABUSE_H__
-#define __INC_METIN_II_ABUSE_H__
-
+#pragma once
 #include "../../libthecore/include/utils.h"
 #include "typedef.h"
 #include "gposition.h"
@@ -76,7 +74,7 @@ private:
 	int32_t m_mshStartX;
 	int32_t m_mshStartY;
 	int32_t m_mshStartZ;
-	std::vector<double> m_mshRates;
+	std::vector <double> m_mshRates;
 	uint32_t m_mshStartDetect;
 	uint32_t m_mshLastDetect;
 	uint32_t m_mshIgnoreUntil;
@@ -172,5 +170,3 @@ T getAverage(std::vector<T>& values, size_t vectorSize)
 }
 
 typedef std::shared_ptr<AbuseController> spAbuseController;
-
-#endif // !__INC_METIN_II_ABUSE_H__

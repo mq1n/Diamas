@@ -1,6 +1,4 @@
-
-#ifndef STABLE_PRIORITY_QUEUE_H_
-#define STABLE_PRIORITY_QUEUE_H_
+#pragma once
 
 template<class T, class Container = std::list<T>, class Compare = std::less<typename Container::value_type> >
 class stable_priority_queue
@@ -38,6 +36,3 @@ class stable_priority_queue
 			c.insert(std::lower_bound(c.begin(), c.end(), x, comp), x);
 		}
 };
-
-#endif /* STABLE_PRIORITY_QUEUE_H_ */
-

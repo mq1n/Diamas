@@ -1,6 +1,4 @@
-#ifndef __QUEST_PC_H
-#define __QUEST_PC_H
-
+#pragma once
 #include "quest.h"
 
 class CHARACTER;
@@ -211,5 +209,3 @@ namespace quest
 		return m_RunningQuestState;
 	}
 }
-
-#endif

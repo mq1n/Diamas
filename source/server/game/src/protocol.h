@@ -1,5 +1,4 @@
-#ifndef __PROTOCOL_H__
-#define __PROTOCOL_H__
+#pragma once
 
 inline const char *encode_byte(char ind)
 {
@@ -57,5 +56,3 @@ inline bool __packet_encode(LPBUFFER pbuf, const void * data, int32_t length, co
 	buffer_write(pbuf, data, length);
 	return true;
 }
-
-#endif

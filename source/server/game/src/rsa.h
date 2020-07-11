@@ -1,4 +1,5 @@
 #pragma once
+#include "../../../common/defines.h"
 
 #ifdef RSA_NET_PACKET_ENCRYPTION
 

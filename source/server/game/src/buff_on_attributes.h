@@ -1,5 +1,4 @@
-#ifndef __METIN2_BUFF_ON_ATTRIBUTES_H
-#define __METIN2_BUFF_ON_ATTRIBUTES_H
+#pragma once
 
 class CHARACTER;
 
@@ -28,5 +27,3 @@ private:
 	TMapAttr m_map_additional_attrs;
 
 };
-
-#endif

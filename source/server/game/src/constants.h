@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_CONSTANTS_H__
-#define __INC_METIN_II_GAME_CONSTANTS_H__
-
+#pragma once
 #include "../../common/tables.h"
 
 // MAP_INDEX
@@ -223,5 +221,3 @@ int32_t FN_get_apply_type(const char *apply_type_string);
 // END_OF_ACCESSORY_REFINE
 
 int32_t FN_get_apply_type(const char *apply_type_string);
-#endif
-

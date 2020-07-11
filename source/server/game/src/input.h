@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_INPUT_PROCESSOR__
-#define __INC_METIN_II_GAME_INPUT_PROCESSOR__
-
+#pragma once
 #include "packet_info.h"
 #include "typedef.h"
 #include "../../common/service.h"
@@ -324,6 +322,3 @@ class CInputAuth : public CInputProcessor
 		void		Login(LPDESC d, const char * c_pData);
 
 };
-
-#endif /* __INC_METIN_II_GAME_INPUT_PROCESSOR__ */
-

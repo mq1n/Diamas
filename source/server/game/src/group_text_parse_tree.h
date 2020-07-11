@@ -1,10 +1,9 @@
-#ifndef __INC_METIN_II_GROUP_TEXT_PARSE_TREE_H__
-#define __INC_METIN_II_GROUP_TEXT_PARSE_TREE_H__
-
+#pragma once
 #include "../../common/d3dtype.h"
 #include "../../common/pool.h"
 #include "file_loader.h"
 #include <sstream>
+
 typedef std::map<std::string, TTokenVector>	TTokenVectorMap;
 typedef std::map<std::string, int32_t> TMapNameToIndex;
 
@@ -229,6 +228,3 @@ bool CGroupNode::CGroupNodeRow::GetValue(int32_t idx, OUT T& value) const
 		return false;
 	return from_string(value, m_vec_values[idx]);
 }
-
-#endif
-

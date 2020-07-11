@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_ENTITY_H__
-#define __INC_METIN_II_GAME_ENTITY_H__
-
+#pragma once
 #include "gposition.h"
 #include "typedef.h"
 #include <unordered_map>
@@ -120,4 +118,3 @@ void CEntity::ForEachSeen(Function& f)
 	for (const auto& e : seen)
 		f(e);
 }
-#endif

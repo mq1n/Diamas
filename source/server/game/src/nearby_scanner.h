@@ -1,5 +1,4 @@
-#ifndef __INC_METIN_II_GAME_SCANNER_H__
-#define __INC_METIN_II_GAME_SCANNER_H__
+#pragma once
 
 EVENTINFO(ScannerInfo)
 {
@@ -39,5 +38,3 @@ class CNearbyScanner : public singleton<CNearbyScanner>
 		//Internal id counter
 		uint32_t m_iID; 
 };
-
-#endif

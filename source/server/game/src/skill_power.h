@@ -1,6 +1,4 @@
-
-#ifndef METIN2_TABLE_BY_SKILL_
-#define METIN2_TABLE_BY_SKILL_
+#pragma once
 
 class CTableBySkill : public singleton<CTableBySkill>
 {
@@ -38,6 +36,3 @@ class CTableBySkill : public singleton<CTableBySkill>
 		int32_t * m_aiSkillPowerByLevelFromType[JOB_MAX_NUM*2];
 		int32_t * m_aiSkillDamageByLevel;
 };
-
-#endif /* METIN2_TABLE_BY_SKILL_ */
-

@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_DUNGEON_H
-#define __INC_METIN_II_GAME_DUNGEON_H
-
+#pragma once
 #include "sectree_manager.h"
 
 class CParty;
@@ -201,5 +199,3 @@ class CDungeonManager : public singleton<CDungeonManager>
 	// <Factor> Introduced uint32_t 32-bit dungeon identifier
 	CDungeon::IdType next_id_;
 };
-
-#endif

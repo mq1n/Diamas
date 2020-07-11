@@ -1,5 +1,4 @@
-#ifndef __QUEST_EVENT_H
-#define __QUEST_EVENT_H
+#pragma once
 
 namespace quest
 {
@@ -39,5 +38,3 @@ namespace quest
 	extern LPEVENT quest_create_timer_event(const char* name, uint32_t player_id, double when, uint32_t npc_id=QUEST_NO_NPC, bool loop = false);
 	extern void CancelTimerEvent(LPEVENT* ppEvent);
 }
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GUILDLIB_MARK_MANAGER_H__
-#define __INC_METIN_II_GUILDLIB_MARK_MANAGER_H__
-
+#pragma once
 #include "mark_image.h"
 
 class CGuildMarkManager : public singleton<CGuildMarkManager>
@@ -78,5 +76,3 @@ class CGuildMarkManager : public singleton<CGuildMarkManager>
 		//
 		std::map<uint32_t, TGuildSymbol> m_mapSymbol;
 };
-
-#endif

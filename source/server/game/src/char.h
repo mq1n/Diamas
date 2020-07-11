@@ -1,8 +1,5 @@
-#ifndef __INC_METIN_II_CHAR_H__
-#define __INC_METIN_II_CHAR_H__
-
+#pragma once
 #include <unordered_map>
-
 #include "../../common/stl.h"
 #include "../../common/service.h"
 #include "entity.h"
@@ -2219,5 +2216,3 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 };
 
 ESex GET_SEX(LPCHARACTER ch);
-
-#endif
