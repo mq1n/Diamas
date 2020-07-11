@@ -2,8 +2,8 @@
 
 namespace net_engine
 {
-	NetClientBase::NetClientBase(asio::io_context& service, uint32_t autoReconnectCycle) :
-		NetPeerBase(service), m_autoReconnectCycle(autoReconnectCycle), m_reconnectTimer(service), m_isReconnectOnce(false)
+	NetClientBase::NetClientBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey, uint32_t autoReconnectCycle) :
+		NetPeerBase(service, securityLevel, cryptKey), m_autoReconnectCycle(autoReconnectCycle), m_reconnectTimer(service), m_isReconnectOnce(false)
 	{
 		// ctor
 		static PacketManager packet_manager;
@@ -68,7 +68,8 @@ namespace net_engine
 			if (!er)
 			{
 				_this->m_isReconnectOnce = false;
-				_this->OnConnect();
+				_this->SetupPeer();
+				// _this->OnConnect();
 			}
 			else if (endpoint_iterator != asio::ip::tcp::resolver::iterator())
 			{

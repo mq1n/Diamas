@@ -32,7 +32,7 @@ namespace net_engine
 	class NetPeerBase : asio::noncopyable, public std::enable_shared_from_this <NetPeerBase>
 	{
 		public:
-			NetPeerBase(asio::io_context& service);
+			NetPeerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey);
 			virtual ~NetPeerBase() {};
 
 			asio::ip::tcp::socket& GetSocket();
@@ -41,11 +41,13 @@ namespace net_engine
 			uint16_t GetPort() const;
 			bool IsConnected() const;
 
-			void Send(std::shared_ptr <Packet> packet);
+			void SetupPeer();
 
 			void BeginRead();
+			void Send(std::shared_ptr <Packet> packet);
 
 			void Disconnect(const asio::error_code& er);
+			void Disconnect2();
 			void DelayedDisconnect(int timeOut);
 			void PostShutdown();
 
@@ -61,24 +63,49 @@ namespace net_engine
 			virtual void OnWritePost(bool bCompleted) = 0;
 			virtual void OnError(uint32_t ulErrorType, const asio::error_code& er) = 0;
 
+			// IO
+			uint32_t GetCoreTime() const;
+			void SetCoreTime(uint32_t time);
+
+			void SetPhase(uint8_t phase);
+
+			void StartHandshake();
+			void SendHandshake(uint32_t time, uint32_t delta);
+			void HandleHandshake(std::shared_ptr <Packet> packet);
+
+			void StartKeyAgreement();
+			void HandleKeyAgreement(std::shared_ptr <Packet> packet);
+
+			void ChangeXTEAKey(uint32_t* key);
+
 		private:
-			asio::io_context& m_service;
 			asio::strand<asio::io_context::executor_type> m_strand;
 			asio::ip::tcp::socket m_socket;
+			asio::io_context& m_service;
 
-			std::mutex m_sendMutex;
+			std::atomic <bool> m_isShutingDown;
 
 			asio::streambuf m_buffer;
 			asio::streambuf m_writeBuffer;
+
+			std::mutex m_sendMutex;
 			std::queue<std::shared_ptr<Packet>> m_sendQueue;
 
 			std::string m_ip;
 			uint16_t m_port;
-
 			asio::high_resolution_timer disconnect_timer;
-			std::atomic <bool> m_isShutingDown;
 
 			uint32_t m_logFlag;
+
+			TPacketCryptKey m_crypt_key;
+			uint8_t m_securityLevel;
+			uint8_t m_phase;
+			uint32_t m_core_time;
+
+			bool m_handshaking;
+			uint32_t m_handshake;
+
+			std::unique_ptr <CryptationBase> m_cryptation;
 
 		private:
 			static void HandleReadHeader(std::weak_ptr <NetPeerBase> self, const asio::error_code& er, std::size_t succesed_size);

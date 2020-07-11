@@ -1,16 +1,19 @@
 #pragma once
 #include "../include/NetEngine.hpp"
 #include <unordered_map>
+#include <variant>
 
 namespace net_engine
 {	
+	using ConnectionProperty = std::variant<std::string, uint32_t, uint8_t>;
+
 	class CNetworkServerManager;
 
 	class CNetworkConnectionManager : public NetPeerBase, public IUniqueID <CNetworkConnectionManager, uint32_t>
 	{
 		public:
 			CNetworkConnectionManager(
-				NetServiceBase& netService, std::shared_ptr <CNetworkServerManager> server,
+				std::shared_ptr <CNetworkServerManager> server,
 				uint8_t securityLevel, const TPacketCryptKey& cryptKey
 			);
 			virtual ~CNetworkConnectionManager();
@@ -29,11 +32,19 @@ namespace net_engine
 			// Getter
 			std::shared_ptr <CNetworkServerManager> GetServer() const;
 			int32_t GetId() const;
-			std::string GetData(const std::string& key) const;
 
-			// Setter
-			void SetData(const std::string& key, const std::string& value);
+			// Property
+			bool HasProperty(const std::string& property) const;
+			void SetProperty(const std::string& property, ConnectionProperty value);
+			ConnectionProperty GetProperty(const std::string& property) const;
+			template <typename T>
+			T GetProperty(const std::string& property) const {
+				return std::get<T>(GetProperty(property));
+			}
 
+
+			// IO
+			void SendAsReply(std::shared_ptr<Packet> request, std::shared_ptr<Packet> reply);
 #if 0
 			std::size_t ProcessInput(const void* data, std::size_t maxlength);
 			
@@ -45,13 +56,7 @@ namespace net_engine
 #endif
 
 		private:
-			NetServiceBase& m_netService;
-
-			std::weak_ptr   <CNetworkServerManager>		m_server;
-			std::shared_ptr <CPacketContainer>			m_packets;
-
-			TPacketCryptKey m_crypt_key;
-
-			std::unordered_map <std::string, std::string> 	m_data_container;
+			std::weak_ptr <CNetworkServerManager>		m_server;
+			std::map<std::string, ConnectionProperty>	m_properties;
 	};
 }

@@ -8,231 +8,121 @@
 
 namespace net_engine
 {
-	using TNetOpcode   = uint16_t;
-	using THandlerFunc = std::function <std::size_t /* sent_length */(const void* /* data */, std::size_t /* length */)>;
-
-	enum EPacketTypes : uint8_t
+	enum EPacketDirection
 	{
-		PacketTypeNone,
-		PacketTypeIncoming,
-		PacketTypeOutgoing,
-		PacketTypeBoth
+		Incoming,
+		Outgoing
 	};
-	struct SPacketContext
-	{
-		TNetOpcode header;
-		std::string name;
-		uint8_t type;
-		THandlerFunc handler;
-		bool is_dynamic;
 
-		SPacketContext(TNetOpcode header, std::string name, uint8_t type, THandlerFunc handler, bool is_dynamic)
-		{
-			this->header = header;
-			this->name = name;
-			this->type = type;
-			this->handler = handler;
-			this->is_dynamic = is_dynamic;
-		}
+	enum EReservedCommonHeaders : uint8_t
+	{
+		HEADER_KEY_AGREEMENT = 254,
+		HEADER_HANDSHAKE = 255
+	};
+
+	enum ReservedGCHeaders : uint8_t
+	{
+		HEADER_GC_KEY_AGREEMENT_COMPLETED = 252,
+		HEADER_GC_PHASE = 253,
+		HEADER_GC_KEY_AGREEMENT = HEADER_KEY_AGREEMENT,
+		HEADER_GC_HANDSHAKE = HEADER_HANDSHAKE
+	};
+
+	enum EPhases : uint8_t
+	{
+		PHASE_HANDSHAKE = 1,
+		PHASE_LOGIN = 2,
+		PHASE_SELECT = 3,
+		PHASE_LOADING = 4,
+		PHASE_GAME = 5,
+		PHASE_AUTH = 10
+	};
+
+	enum ESecurityLevels : uint8_t
+	{
+		SECURITY_LEVEL_NONE = 0,  // No handshake
+		SECURITY_LEVEL_BASIC = 1, // Basic handshake (No keys or Diffie-Hellman)
+		SECURITY_LEVEL_XTEA = 2,  // Key/Pong keys
+		SECURITY_LEVEL_KEY_AGREEMENT = 3 // Diffie-Hellman Key agreement
 	};
 
 	class Packet
 	{
 	public:
-		explicit Packet(std::shared_ptr<PacketDefinition> definition);
+		explicit Packet(std::shared_ptr <PacketDefinition> definition);
 		virtual ~Packet();
 
-		void CopyData(std::vector<uint8_t>& data, unsigned int offset = 0);
+		void CopyData(std::vector <uint8_t>& data, uint32_t offset = 0);
 		void CopyData(asio::streambuf& buffer);
-		std::vector<uint8_t> GetData();
-		unsigned int GetSize();
-		uint8_t GetHeader();
-		const std::string& GetName() const { return _definition->GetName(); }
 
 		void* GetField(std::string name);
-
 		template <typename T>
 		T GetField(std::string name) {
 			return *reinterpret_cast<T*>(GetField(name));
 		}
 
-		std::string GetString(std::string name);
-
-		std::shared_ptr<Packet> GetRepeatedSubField(std::string name,
-			unsigned int index);
-		std::shared_ptr<Packet> GetSubField(std::string name);
-
-		void SetRepeatedField(std::string name, unsigned int index,
-			uint8_t* value, unsigned int length);
-		void SetField(std::string name, uint8_t* value, unsigned int length);
-
-		void SetString(std::string name, const char* value,
-			unsigned int length);
-		void SetString(std::string name, std::string value);
-
+		void SetField(std::string name, uint8_t* value, uint32_t length);
 		template <typename T>
 		void SetField(std::string name, T value) {
 			SetField(name, reinterpret_cast<uint8_t*>(&value), sizeof(T));
 		}
 
+		void SetRepeatedField(std::string name, uint32_t index, uint8_t* value, uint32_t length);
 		template <typename T>
-		void SetRepeatedField(std::string name, unsigned int index, T value) {
-			SetRepeatedField(name, index, reinterpret_cast<uint8_t*>(&value),
-				sizeof(T));
+		void SetRepeatedField(std::string name, uint32_t index, T value) {
+			SetRepeatedField(name, index, reinterpret_cast<uint8_t*>(&value), sizeof(T));
 		}
 
+		std::shared_ptr <Packet> GetSubField(std::string name);
+		std::shared_ptr <Packet> GetRepeatedSubField(std::string name, uint32_t index);
+
+		std::string GetString(std::string name) const;
+		void SetString(std::string name, const char* value, uint32_t length);
+		void SetString(std::string name, std::string value);
+
 		void SetDynamicString(const std::string& str);
-		std::string GetDynamicString();
-		void SetDynamicData(std::vector<uint8_t> data);
+		std::string GetDynamicString() const;
+		void SetDynamicData(std::vector <uint8_t> data);
 
 		bool IsReply();
 		bool IsRequest();
-		bool IsDynamicSized();
-		bool HasSequence();
+		bool IsDynamicSized() const;
+		bool HasSequence() const;
 		uint64_t GetReferenceId();
 
-	private:
-		void InitializeSubPackets();
-		void SyncInternalBuffer();
+		std::vector <uint8_t> GetData();
+		uint32_t GetSize() const;
+		uint8_t GetHeader() const;
+		const std::string& GetName() const { return m_definition->GetName(); }
 
 	private:
-		std::shared_ptr<PacketDefinition> _definition;
-		std::map<std::string, std::vector<std::shared_ptr<Packet>>> _subPackets;
+		void __InitializeSubPackets();
+		void __SyncInternalBuffer();
 
-		std::vector<uint8_t> _data;
-		std::vector<uint8_t> _dynamicData;
-		uint8_t _sequence;
+	private:
+		std::shared_ptr <PacketDefinition> m_definition;
+		std::map <std::string, std::vector <std::shared_ptr<Packet>>> m_subPackets;
+
+		std::vector <uint8_t> m_data;
+		std::vector <uint8_t> m_dynamicData;
+		uint8_t m_sequence;
 	};
 
-
-	enum Direction { Incoming, Outgoing };
-
-	class PacketManager {
-	public:
-		PacketManager();
-		virtual ~PacketManager();
-
-		static PacketManager* InstancePtr();
-		static PacketManager& Instance();
-
-		std::shared_ptr<PacketDefinition> RegisterPacket(
-			const std::string& name, uint8_t header, bool incoming,
-			bool outgoing);
-
-		std::shared_ptr<Packet> CreatePacket(uint8_t header,
-			Direction direction = Outgoing);
-
-	private:
-		std::map<uint8_t, std::shared_ptr<PacketDefinition>> _incomingPackets;
-		std::map<uint8_t, std::shared_ptr<PacketDefinition>> _outgoingPackets;
-	};
-
-
-
-
-
-
-
-
-
-	class CPacketContainer
+	class PacketManager
 	{
 		public:
-			CPacketContainer();
-			~CPacketContainer();
+			PacketManager();
+			virtual ~PacketManager();
 
-			static CPacketContainer* InstancePtr();
-			static CPacketContainer& Instance();
+			static PacketManager* InstancePtr();
+			static PacketManager& Instance();
 
-			std::shared_ptr <SPacketContext> GetPacket(TNetOpcode target_header);
-			std::string GetPacketName(TNetOpcode target_header);
-			std::string GetPacketName(const char* buf);
-			void AppendPacket(TNetOpcode header, const std::string& name, uint8_t type, THandlerFunc handler, bool is_dynamic);
-			void RemovePacket(TNetOpcode header, const std::string& name);
+			std::shared_ptr <PacketDefinition> RegisterPacket(const std::string& name, uint8_t header, bool incoming, bool outgoing);
+
+			std::shared_ptr <Packet> CreatePacket(uint8_t header, EPacketDirection direction);
 
 		private:
-			mutable std::recursive_mutex m_rec_mutex;
-			std::list <std::shared_ptr<SPacketContext>> m_packets;
+			std::map <uint8_t, std::shared_ptr <PacketDefinition>> m_incomingPackets;
+			std::map <uint8_t, std::shared_ptr <PacketDefinition>> m_outgoingPackets;
 	};
-	
-
-#pragma pack(1)
-	struct SPacketHeader
-	{
-		TNetOpcode opcode;
-		uint8_t version;
-		uint32_t flags;
-		uint32_t size;
-
-		SPacketHeader() : 
-			version(0), flags(0), opcode(0), size(0)
-		{
-			// default ctor
-		}
-		explicit SPacketHeader(uint8_t version_, uint32_t flags_, TNetOpcode opcode_, uint32_t size_)
-		{
-			version = version_;
-			flags = flags_;
-			opcode = opcode_;
-			size = size_;
-		}
-		explicit SPacketHeader(TNetOpcode opcode_)
-		{
-			version = PACKET_VERSION;
-			flags = 0; // PACKET_FLAG_RAW;
-			size = 0;
-			opcode = opcode_;
-		}
-		explicit SPacketHeader(const char* buf_)
-		{
-			version = PACKET_VERSION;
-			flags = 0; // PACKET_FLAG_RAW;
-			size = 0;
-			opcode = *(TNetOpcode*)buf_;
-		}
-	};
-
-	struct SNetPacket
-	{
-		SPacketHeader m_header;
-
-		explicit SNetPacket(TNetOpcode header_) :
-			m_header(header_)
-		{
-			// ctor
-		}
-		explicit SNetPacket(const char* buf)
-		{
-			// copy
-			memcpy(&m_header, buf, sizeof(m_header));
-		}
-
-		const char* data() const
-		{
-			return reinterpret_cast<const char*>(this);
-		}
-
-		size_t size() const
-		{
-			return m_header.size;
-		}
-		void set_size(size_t len_)
-		{
-			m_header.size = len_;
-		}
-
-		const char* body() const
-		{
-			return reinterpret_cast<const char*>(this) + sizeof(SNetPacket);
-		}
-	};
-#pragma pack()
-
-	constexpr auto packet_header_min_size = sizeof(SPacketHeader);
-}
-
-#define NET_DECLARE_PACKET(header, context)\
-	context() : SNetPacket(header)\
-	{\
-		set_size(sizeof(context));\
-	}
+};

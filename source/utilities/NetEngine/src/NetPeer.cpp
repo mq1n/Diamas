@@ -1,13 +1,37 @@
 #include "../include/NetEngine.hpp"
+#include <random.hpp>
+#include <functional>
 
 namespace net_engine
 {
-	NetPeerBase::NetPeerBase(asio::io_context& service) :
+	using Random = effolkronium::random_static;
+
+	NetPeerBase::NetPeerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
 		m_strand(asio::make_strand(service.get_executor())),
+		m_socket(m_strand),
 		m_service(service), 
-		m_socket(asio::make_strand(service.get_executor())), // , m_socket(service),
-		m_port(0), disconnect_timer(service)
+		m_isShutingDown(false),
+		m_buffer(),
+		m_writeBuffer(),
+		m_port(0), disconnect_timer(service),
+		m_logFlag(0),
+		m_crypt_key(cryptKey), m_securityLevel(securityLevel), m_phase(0), m_core_time(0),
+		m_handshaking(false)
 	{
+		m_handshake = Random::get<uint32_t>(
+			std::numeric_limits<uint32_t>::min(),
+			std::numeric_limits<uint32_t>::max()
+		);
+
+		if (securityLevel == SECURITY_LEVEL_KEY_AGREEMENT)
+		{
+			m_cryptation = std::make_unique<KeyAgreementCryptation>();
+		}
+		else if (securityLevel == SECURITY_LEVEL_XTEA)
+		{
+			m_cryptation = std::make_unique<XTEACryptation>();
+			m_cryptation->AddData(XTEA_CRYPTATION_START_KEY, m_crypt_key.data(), PACKET_CRYPT_KEY_LENGTH);
+		}
 	}
 
 	const std::string& NetPeerBase::GetIP() const
@@ -41,6 +65,22 @@ namespace net_engine
 		return m_socket;
 	}
 
+	void NetPeerBase::SetupPeer()
+	{
+		NET_LOG(LL_SYS, "New connection: %s handled!", m_socket.remote_endpoint().address().to_string().c_str());
+
+		BeginRead();
+
+		if (m_securityLevel >= SECURITY_LEVEL_NONE)
+		{
+			StartHandshake();
+		}
+		else
+		{
+			OnConnect();
+		}
+	}
+
 	void NetPeerBase::Disconnect(const asio::error_code& er)
 	{
 		try
@@ -53,8 +93,6 @@ namespace net_engine
 
 			if (m_socket.is_open())
 			{
-				OnDisconnect(er);
-
 				asio::error_code ec;
 
 				m_socket.shutdown(asio::socket_base::shutdown_both, ec);
@@ -68,6 +106,8 @@ namespace net_engine
 				{
 					NET_LOG(LL_ERR, "Failed to close connection. Error: %d(%s)", ec.value(), ec.message().c_str());
 				}
+
+				OnDisconnect(er);
 			}
 		}
 		catch (const asio::system_error& e)
@@ -79,6 +119,11 @@ namespace net_engine
 			NET_LOG(LL_ERR, "Unhandled exception occured");
 		}
 	}
+	void NetPeerBase::Disconnect2()
+	{
+		asio::error_code er;
+		Disconnect(er);
+	}
 
 	// this supposed to be called outside of the network thread
 	void NetPeerBase::PostShutdown()
@@ -86,11 +131,14 @@ namespace net_engine
 		if (m_isShutingDown.exchange(true))
 			return;
 
-//		asio::post(m_strand, std::bind(&NetPeerBase::Disconnect, shared_from_this(), std::placeholders::_1));
+		asio::post(m_strand, std::bind(&NetPeerBase::Disconnect2, shared_from_this()));
 	}
 
 	void NetPeerBase::Send(std::shared_ptr <Packet> packet)
 	{
+		if (m_isShutingDown)
+			return;
+
 		std::lock_guard<std::mutex> guard(m_sendMutex);
 		m_sendQueue.push(packet);
 
@@ -102,42 +150,14 @@ namespace net_engine
 		}
 	}
 
-	void NetPeerBase::HandleWrite(std::weak_ptr<NetPeerBase> self, const asio::error_code& er, std::size_t succesed_size)
-	{
-		std::shared_ptr <NetPeerBase> _this(self.lock());
-		if (_this)
-		{
-			_this->m_writeBuffer.consume(succesed_size);
-
-			if (!er)
-			{
-				if (_this->m_sendQueue.empty())
-					return;
-
-				_this->m_sendQueue.pop();
-
-				if (_this->m_sendQueue.empty())
-					return;
-				
-				HandleSend(self);
-			}
-			else
-			{
-				if (er != asio::error::operation_aborted)
-				{
-					NET_LOG(LL_CRI, "Write operation fail! Error: %u(%s)", er.value(), er.message().c_str());
-					_this->OnError(PeerErrorWriteFail, er);
-					_this->Disconnect(er);
-				}
-			}
-		}
-	}
-
 	void NetPeerBase::HandleSend(std::weak_ptr<NetPeerBase> self)
 	{
 		std::shared_ptr <NetPeerBase> _this(self.lock());
 		if (_this)
 		{
+			if (_this->m_isShutingDown)
+				return;
+
 			if (!_this->m_socket.is_open())
 				return;
 			
@@ -152,14 +172,12 @@ namespace net_engine
 			auto data = packet->GetData();
 			auto buffer = _this->m_writeBuffer.prepare(1 + data.size());
 
-#if ENABLE_CRYPT
-			if (_cryptation && _cryptation->IsReady())
+			if (_this->m_cryptation && _this->m_cryptation->IsReady())
 			{
-				_cryptation->Encrypt(static_cast<uint8_t*>(buffer.data()), &header, 1);
-				_cryptation->Encrypt(static_cast<uint8_t*>(buffer.data()) + 1, data.data(), data.size());
+				_this->m_cryptation->Encrypt(static_cast<uint8_t*>(buffer.data()), &header, 1);
+				_this->m_cryptation->Encrypt(static_cast<uint8_t*>(buffer.data()) + 1, data.data(), data.size());
 			}
 			else
-#endif
 			{
 				asio::buffer_copy(asio::buffer(buffer, 1), asio::buffer(&header, 1));
 				asio::buffer_copy(asio::buffer(buffer + 1, data.size()), asio::buffer(data.data(), data.size()));
@@ -172,6 +190,38 @@ namespace net_engine
 					std::bind(&NetPeerBase::HandleWrite, self, std::placeholders::_1, std::placeholders::_2)
 				)
 			);
+		}
+	}
+
+	void NetPeerBase::HandleWrite(std::weak_ptr<NetPeerBase> self, const asio::error_code& er, std::size_t succesed_size)
+	{
+		std::shared_ptr <NetPeerBase> _this(self.lock());
+		if (_this)
+		{
+			_this->m_writeBuffer.consume(succesed_size);
+
+			if (!er)
+			{
+				{
+					if (_this->m_sendQueue.empty())
+						return;
+
+					_this->m_sendQueue.pop();
+
+					if (_this->m_sendQueue.empty())
+						return;
+				}
+				HandleSend(self);
+			}
+			else
+			{
+				if (er != asio::error::operation_aborted)
+				{
+					NET_LOG(LL_CRI, "Write operation fail! Error: %u(%s)", er.value(), er.message().c_str());
+					_this->OnError(PeerErrorWriteFail, er);
+					_this->Disconnect(er);
+				}
+			}
 		}
 	}
 
@@ -202,22 +252,20 @@ namespace net_engine
 				uint8_t header;
 				asio::buffer_copy(asio::buffer(&header, sizeof(header)), _this->m_buffer.data());
 
-#if ENABLE_CRYPT
-				if (_cryptation)
+				if (_this->m_cryptation)
 				{
-					if (_phase > PHASE_HANDSHAKE && !_cryptation->IsReady()) {
+					if (_this->m_phase > PHASE_HANDSHAKE && !_this->m_cryptation->IsReady())
+					{
 						// workaround for broken client implementation
-						_cryptation->Activate();
+						_this->m_cryptation->Activate();
 					}
 
-					if (_cryptation->IsReady()) {
-						_cryptation->Decrypt(
-							&header,
-							reinterpret_cast<const uint8_t*>(asio::buffer(_buffer.data(), sizeof(header)).data()),
-							1);
+					if (_this->m_cryptation->IsReady())
+					{
+						_this->m_cryptation->Decrypt(&header, reinterpret_cast<const uint8_t*>(asio::buffer(_this->m_buffer.data(), sizeof(header)).data()), 1);
 					}
 				}
-#endif
+
 				_this->m_buffer.consume(1);
 
 				NET_LOG(LL_TRACE, "Received header: 0x%02x", header);
@@ -276,6 +324,7 @@ namespace net_engine
 			}
 		}
 	}
+
 	void NetPeerBase::HandleReadSize(std::weak_ptr <NetPeerBase> self, std::shared_ptr<Packet> packet, const asio::error_code& er, std::size_t succesed_size)
 	{
         assert(succesed_size == 2);
@@ -291,18 +340,16 @@ namespace net_engine
 			{
 				uint32_t size = 0;
 
-#if ENABLE_CRYPT
-				if (_cryptation && _cryptation->IsReady())
+				if (_this->m_cryptation && _this->m_cryptation->IsReady())
 				{
-					std::vector<uint8_t> buf(transferred);
+					std::vector<uint8_t> buf(succesed_size);
 
-					_cryptation->Decrypt(buf.data(), reinterpret_cast<const uint8_t*>(_buffer.data().data()), transferred);
-					_buffer.consume(transferred);
+					_this->m_cryptation->Decrypt(buf.data(), reinterpret_cast<const uint8_t*>(_this->m_buffer.data().data()), succesed_size);
+					_this->m_buffer.consume(succesed_size);
 
 					size = (buf[1] << 8) | buf[0];
 				}
 				else
-#endif
 				{
 					asio::buffer_copy(asio::buffer(static_cast<void*>(&size), 2), _this->m_buffer.data());  // todo: clean solution
 				}
@@ -350,18 +397,16 @@ namespace net_engine
 
 			if (!er)
 			{
-#if ENABLE_CRYPT
-				if (_cryptation && _cryptation->IsReady())
+				if (_this->m_cryptation && _this->m_cryptation->IsReady())
 				{
-					std::vector<uint8_t> buf(transferred);
+					std::vector<uint8_t> buf(succesed_size);
 
-					_cryptation->Decrypt(buf.data(), reinterpret_cast<const uint8_t*>(_buffer.data().data()), transferred);
-					_buffer.consume(transferred);
+					_this->m_cryptation->Decrypt(buf.data(), reinterpret_cast<const uint8_t*>(_this->m_buffer.data().data()), succesed_size);
+					_this->m_buffer.consume(succesed_size);
 
 					packet->CopyData(buf, packet->IsDynamicSized() ? 2 : 0);
 				}
 				else
-#endif
 				{
 					packet->CopyData(_this->m_buffer);
 				}
@@ -403,5 +448,193 @@ namespace net_engine
 				_this->Disconnect(er);
 			}
 		}
+	}
+
+
+	// TODO: Call & set right time
+	uint32_t NetPeerBase::GetCoreTime() const
+	{
+		return m_core_time;
+	}
+
+	void NetPeerBase::SetCoreTime(uint32_t time)
+	{
+		m_core_time = time;
+	}
+
+
+
+	void NetPeerBase::SetPhase(uint8_t phase)
+	{
+		NET_LOG(LL_SYS, "Set phase to 0X%X", phase);
+
+		auto packet = PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_PHASE, EPacketDirection::Outgoing);
+		packet->SetField<uint8_t>("phase", phase);
+
+		m_phase = phase;
+
+		Send(packet);
+	}
+
+
+	void NetPeerBase::StartHandshake()
+	{
+		m_handshaking = true;
+
+		SetPhase(EPhases::PHASE_HANDSHAKE);
+		SendHandshake(m_core_time, 0);
+	}
+
+	void NetPeerBase::SendHandshake(uint32_t time, uint32_t delta)
+	{
+		auto packet = PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_HANDSHAKE, EPacketDirection::Outgoing);
+		packet->SetField<uint32_t>("handshake", m_handshake);
+		packet->SetField<uint32_t>("time", time);
+		packet->SetField<uint32_t>("delta", 0);
+
+		Send(packet);
+	}
+
+	void NetPeerBase::HandleHandshake(std::shared_ptr <Packet> packet)
+	{
+		auto handshake = packet->GetField<uint32_t>("handshake");
+		auto time = packet->GetField<uint32_t>("time");
+		auto delta = packet->GetField<uint32_t>("delta");
+
+		asio::error_code er;
+
+		if (handshake != m_handshake)
+		{
+			NET_LOG(LL_ERR, "Closing connection because of handshake mismatch");
+			Disconnect(er);
+			return;
+		}
+
+		auto currentTime = GetCoreTime();
+
+		auto diff = currentTime - (time + delta);
+		if (diff >= 0 && diff <= 50)
+		{
+			NET_LOG(LL_SYS, "Time sync done, handshake done");
+
+			if (m_securityLevel >= SECURITY_LEVEL_KEY_AGREEMENT)
+			{
+				StartKeyAgreement();
+			}
+			else
+			{
+				m_handshaking = false;
+				OnConnect();
+
+				if (m_securityLevel == SECURITY_LEVEL_XTEA)
+				{
+					NET_LOG(LL_SYS, "(XTEA) Cryptation enabled");
+
+					if (!m_cryptation->Finalize())
+					{
+						Disconnect(er);
+					}
+
+					m_cryptation->Activate();
+				}
+			}
+			return;
+		}
+
+		auto newDelta = (currentTime - time) / 2;
+		if (newDelta < 0)
+		{
+			NET_LOG(LL_ERR, "Failed to sync time");
+			Disconnect(er);
+			return;
+		}
+
+		// TODO: max retries?
+		SendHandshake(currentTime, newDelta);
+	}
+
+	void NetPeerBase::StartKeyAgreement()
+	{
+		NET_DEBUG_LOG(LL_SYS, "(KEYS) Agreement start!");
+
+		asio::error_code er;
+
+		const CryptoPP::SecByteBlock* staticKey;
+		const CryptoPP::SecByteBlock* ephemeralKey;
+		const uint32_t* agreedValue;
+
+		if (!m_cryptation->Initialize())
+		{
+			NET_LOG(LL_ERR, "(KEYS) Cannot initialize!");
+			Disconnect(er);
+			return;
+		}
+
+		staticKey = (const CryptoPP::SecByteBlock*)(m_cryptation->GetData(KEY_AGREEMENT_DATA_PUBLIC_STATIC_SERVER_KEY));
+		ephemeralKey = (const CryptoPP::SecByteBlock*)(m_cryptation->GetData(KEY_AGREEMENT_DATA_PUBLIC_EPHEMERAL_SERVER_KEY));
+
+		agreedValue = (const uint32_t*)m_cryptation->GetData(KEY_AGREEMENT_DATA_AGREED_VALUE);
+		if (*agreedValue < 1 || staticKey->size() < 1 || ephemeralKey->size() < 1 || (ephemeralKey->size() + staticKey->size() > 256))
+		{
+			NET_LOG(LL_ERR, "(KEYS) Invalid values!");
+			Disconnect(er);
+			return;
+		}
+
+		char keys[256];
+		memset(keys, 0, sizeof(keys));
+		memcpy(keys, staticKey->data(), staticKey->size());
+		memcpy(keys + staticKey->size(), ephemeralKey->data(), ephemeralKey->size());
+
+		auto packet = PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT, EPacketDirection::Outgoing);
+		packet->SetField<uint16_t>("valuelen", static_cast<uint16_t>(*agreedValue));
+		packet->SetField<uint16_t>("datalen", static_cast<uint16_t>(ephemeralKey->size() + staticKey->size()));
+		packet->SetField("data", (uint8_t*)keys, sizeof(keys));
+
+		Send(packet);
+	}
+
+	void NetPeerBase::HandleKeyAgreement(std::shared_ptr<Packet> packet)
+	{
+		asio::error_code er;
+
+		if (!m_cryptation->IsInitialized())
+		{
+			NET_LOG(LL_ERR, "(KEYS) Connection sent handle keys without letting the server initialize them");
+			Disconnect(er);
+			return;
+		}
+
+		uint8_t* data = (uint8_t*)packet->GetField("data");
+
+		{
+			const CryptoPP::SecByteBlock* staticKey = (const CryptoPP::SecByteBlock*)m_cryptation->GetData(KEY_AGREEMENT_DATA_PUBLIC_STATIC_SERVER_KEY);
+			const CryptoPP::SecByteBlock* ephemeralKey = (const CryptoPP::SecByteBlock*)m_cryptation->GetData(KEY_AGREEMENT_DATA_PUBLIC_EPHEMERAL_SERVER_KEY);
+
+			uint16_t agreedValue = packet->GetField<uint16_t>("valuelen");
+			m_cryptation->AddData(KEY_AGREEMENT_DATA_AGREED_VALUE, &agreedValue, sizeof(agreedValue));
+
+			m_cryptation->AddData(KEY_AGREEMENT_DATA_PUBLIC_STATIC_CLIENT_KEY, data, staticKey->size());
+			m_cryptation->AddData(KEY_AGREEMENT_DATA_PUBLIC_EPHEMERAL_CLIENT_KEY, data + staticKey->size(), ephemeralKey->size());
+		}
+
+		if (!m_cryptation->Finalize())
+		{
+			NET_LOG(LL_ERR, "(KEYS) Cannot agree");
+			Disconnect(er);
+			return;
+		}
+
+		Send(PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT_COMPLETED, EPacketDirection::Outgoing));
+
+		NET_LOG(LL_SYS, "(KEYS) Agreement completed!");
+		m_handshaking = false;
+		
+		OnConnect();
+	}
+
+	void NetPeerBase::ChangeXTEAKey(uint32_t* key)
+	{
+		m_cryptation->AddData(XTEA_CRYPTATION_LOGIN_DECRYPT_KEY, key, 16);
 	}
 }

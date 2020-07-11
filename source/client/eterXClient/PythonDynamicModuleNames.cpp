@@ -4,7 +4,6 @@
 #include <FileSystemIncl.hpp>
 #include "../eterSecurity/PythonStackCheck.h"
 #include <xorstr.hpp>
-#include <nameof.hpp>
 
 auto charset()
 {

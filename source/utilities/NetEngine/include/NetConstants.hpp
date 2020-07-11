@@ -15,14 +15,13 @@ namespace net_engine
 {
 	static const auto PACKET_MAGIC 				= NET_CREATEMAGIC('S', 'N', 'E', 'T');
 	static const auto PACKET_VERSION			= 1;
-	static const auto PACKET_CRYPT_KEY_LENGTH	= 32;
+	static const auto PACKET_CRYPT_KEY_LENGTH	= 16;
 
 	using TPacketCryptKey = std::array <uint8_t, PACKET_CRYPT_KEY_LENGTH>;
 	static const auto DEFAULT_CRYPT_KEY = TPacketCryptKey // TODO: XOR
 	{
-		// Key: 0 - 32
-		0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
-		0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2
+		// Key: 0 - 16
+		0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
 	};
 
 #if 0
@@ -37,7 +36,6 @@ namespace net_engine
 		PACKET_FLAG_RC5 	= 1 << 6,
 		PACKET_FLAG_MAX		= PACKET_FLAG_RC5 | PACKET_FLAG_ZLIB
 	};
-#endif
 
 	enum ESecurityLevel : uint8_t
 	{
@@ -46,4 +44,5 @@ namespace net_engine
 		SECURITY_LEVEL_XTEA = 2,  // Key/Pong keys
 		SECURITY_LEVEL_KEY_AGREEMENT = 3,  // Diffie-Hellman Key agreement
 	};
+#endif
 }

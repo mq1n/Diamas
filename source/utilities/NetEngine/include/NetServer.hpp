@@ -6,7 +6,7 @@ namespace net_engine
 	class NetServerBase : asio::noncopyable, public std::enable_shared_from_this <NetServerBase>
 	{
 		public:
-			NetServerBase(asio::io_context& service);
+			NetServerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey);
 			virtual ~NetServerBase() {};
 
 			bool Bind(uint16_t port);

@@ -2,7 +2,7 @@
 
 namespace net_engine
 {
-	NetServerBase::NetServerBase(asio::io_context& service) :
+	NetServerBase::NetServerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
 		m_service(service), m_acceptor(service)
 	{
 		static PacketManager packet_manager;
@@ -36,16 +36,23 @@ namespace net_engine
 	}
 	void NetServerBase::HandleAccept(std::weak_ptr <NetServerBase> self, const asio::error_code& er, std::shared_ptr <NetPeerBase> peer)
 	{
-		std::shared_ptr<NetServerBase> _this(self.lock());
+		std::shared_ptr <NetServerBase> _this(self.lock());
 		if (_this)
 		{
+			NET_LOG(LL_CRI, "1");
 			if (!er)
 			{
 				if (peer && peer.get())
 				{
-					peer->OnConnect();
+					peer->SetupPeer();
+					// peer->OnConnect();
 				}
 			}
+			else
+			{
+				NET_LOG(LL_CRI, "Fatal error: %u(%s)", er.value(), er.message().c_str());
+			}
+			NET_LOG(LL_CRI, "2");
 
 			_this->AsyncAccept();
 		}

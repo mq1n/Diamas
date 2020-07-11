@@ -2,6 +2,7 @@
 #include <NetPacket.hpp>
 using namespace net_engine;
 
+#if 0
 enum ENetHeaders : uint8_t
 {
     // CG
@@ -10,16 +11,6 @@ enum ENetHeaders : uint8_t
 
     // GC
     HEADER_GC_CHAT = 69
-};
-
-enum ENetPhases : uint8_t
-{
-    PHASE_HANDSHAKE = 1,
-    PHASE_LOGIN = 2,
-    PHASE_SELECT = 3,
-    PHASE_LOADING = 4,
-    PHASE_GAME = 5,
-    PHASE_AUTH = 10,
 };
 
 struct SNetPacketCGLogin : SNetPacket
@@ -43,3 +34,4 @@ struct SNetPacketGCChat : SNetPacket
 
     NET_DECLARE_PACKET(HEADER_GC_CHAT, SNetPacketGCChat);
 };
+#endif

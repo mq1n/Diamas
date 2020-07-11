@@ -7,10 +7,13 @@ using namespace net_engine;
 std::shared_ptr <CNetworkServerManager> netServer;
 std::shared_ptr <CNetworkClientManager> netClient;
 
+static const auto gsc_securityLevel = ESecurityLevels::SECURITY_LEVEL_NONE;
+static const auto gsc_cryptKey = DEFAULT_CRYPT_KEY;
+
 bool InitializeServer()
 {
 	NetServiceBase _net_service;
-	netServer = std::make_shared<CNetworkServerManager>(_net_service, ip_address, port);
+	netServer = std::make_shared<CNetworkServerManager>(_net_service, ip_address, port, gsc_securityLevel, gsc_cryptKey);
 	if (!netServer || !netServer.get()) 
 	{
 		printf("netServer can NOT initialized! Last error: %u\n", GetLastError());
@@ -22,7 +25,7 @@ bool InitializeServer()
 bool InitializeClient()
 {
 	NetServiceBase _net_service;
-	netClient = std::make_shared<CNetworkClientManager>(_net_service);
+	netClient = std::make_shared<CNetworkClientManager>(_net_service, gsc_securityLevel, gsc_cryptKey);
 	if (!netClient || !netClient.get()) 
 	{
 		printf("netClient can NOT initialized! Last error: %u\n", GetLastError());

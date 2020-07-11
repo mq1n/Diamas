@@ -11,7 +11,7 @@ namespace net_engine
 //		using TPacketHandler = std::unordered_map <TNetOpcode, THandlerFunc>;
 
 	public:
-		CNetworkServerManager(NetServiceBase& netService, const std::string& ip_address, uint16_t port);
+		CNetworkServerManager(NetServiceBase& netService, const std::string& ip_address, uint16_t port, uint8_t securityLevel, const TPacketCryptKey& cryptKey);
 		virtual ~CNetworkServerManager();	
 
 		NetServiceBase & GetServiceInstance();
@@ -27,7 +27,9 @@ namespace net_engine
 	
 		virtual std::shared_ptr <CNetworkConnectionManager> FindPeer(int32_t id) const;
 		virtual void RemovePeer(int32_t id);
-		
+
+
+		/*
 		inline void RegisterPacket(TNetOpcode header, uint8_t type, bool is_dynamic, THandlerFunc handler)
 		{ 
 			CPacketContainer::Instance().AppendPacket(header, NAMEOF(header).data(), type, handler, is_dynamic);
@@ -40,6 +42,7 @@ namespace net_engine
 //			if (iter != m_handlers.end())
 //				m_handlers.erase(iter);
 		}
+		*/
 
 		void BroadcastMessage(const std::string& msg);
 	
@@ -50,8 +53,6 @@ namespace net_engine
 		std::size_t OnRecvChatPacket(const void * data, std::size_t maxlength);
 
 	private:
-		std::shared_ptr <CNetworkConnectionManager> m_net_manager;
-
 		std::string m_ip_address;
 		uint16_t m_port;
 
@@ -61,6 +62,9 @@ namespace net_engine
 //		TPacketHandler		m_handlers;
 
 		asio::high_resolution_timer m_updateTimer;
+
+		TPacketCryptKey m_crypt_key;
+		uint8_t m_securityLevel;
 
 		std::unordered_map <int32_t, std::shared_ptr <CNetworkConnectionManager> >	m_peers;
 	};

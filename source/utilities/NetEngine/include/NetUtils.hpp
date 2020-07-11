@@ -3,6 +3,8 @@
 #include <istream>
 #include <sstream>
 #include <cstdint>
+#include <random.hpp>
+#include "NetLogHelper.hpp"
 
 namespace net_engine
 {
@@ -22,6 +24,7 @@ namespace net_engine
             return endpoint.endpoint().address().to_string();
         }
 
+        NET_DEBUG_LOG(LL_ERR, "Failed to get local address of core");
         return "127.0.0.1";
     }
 
@@ -44,6 +47,8 @@ namespace net_engine
         ret |= (c & 0xFF) << 8;
         ret |= (a & 0xFF) << 0;
 
+        NET_DEBUG_LOG(LL_TRACE, "%s -> %u %u %u %u -> %u", ip.c_str(), a, b, c, d, ret);
+        
         return ret;
     }
 
@@ -56,6 +61,9 @@ namespace net_engine
 
         std::ostringstream buffer;
         buffer << a << "." << b << "." << c << "." << d;
+ 
+        NET_DEBUG_LOG(LL_TRACE, "%u -> %u %u %u %u -> %s", ip, a, b, c, d, buffer.str().c_str());
+
         return buffer.str();
     }
 };

@@ -3,6 +3,7 @@
 
 #include "NetConstants.hpp"
 #include "NetUtils.hpp"
+#include "NetCrypt.hpp"
 #include "NetPacketDefinition.hpp"
 #include "NetPacket.hpp"
 #include "NetService.hpp"

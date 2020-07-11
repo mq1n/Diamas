@@ -6,7 +6,7 @@ namespace net_engine
 	class NetClientBase : public NetPeerBase
 	{
 		public:
-			NetClientBase(asio::io_context& service, uint32_t autoReconnectCycle = 0);
+			NetClientBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey, uint32_t autoReconnectCycle = 0);
 			virtual ~NetClientBase() {};
 
 			bool Connect(const std::string& host, uint16_t port);

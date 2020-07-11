@@ -5,19 +5,13 @@
 
 namespace net_engine
 {	
-	CNetworkServerManager::CNetworkServerManager(NetServiceBase& netService, const std::string& ip_address, uint16_t port) :
-		NetServerBase(netService()), m_netService(netService), m_updateTimer(netService()),
+	CNetworkServerManager::CNetworkServerManager(NetServiceBase& netService, const std::string& ip_address, uint16_t port, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
+		NetServerBase(netService(), securityLevel, cryptKey), m_netService(netService), m_updateTimer(netService()),
 		m_ip_address(ip_address), m_port(port),
-		m_stopped(false)
+		m_stopped(false),
+		m_securityLevel(securityLevel), m_crypt_key(cryptKey)
 	{
 		NET_LOG(LL_TRACE, "Creating server on %s:%u", ip_address.c_str(), port);
-
-		m_net_manager = std::make_shared<CNetworkConnectionManager>(
-			m_netService, 
-			std::static_pointer_cast<CNetworkServerManager>(shared_from_this()),
-			ESecurityLevel::SECURITY_LEVEL_NONE, 
-			DEFAULT_CRYPT_KEY
-		);
 	}
 	CNetworkServerManager::~CNetworkServerManager()
 	{
@@ -25,6 +19,7 @@ namespace net_engine
 		Stop();
 	}
 
+#if 0
     void CNetworkServerManager::OnUpdate()
     {
         if (m_stopped)
@@ -54,6 +49,7 @@ namespace net_engine
         }), _sockets.end());
 #endif
 	}
+#endif
 
 	void CNetworkServerManager::ServerWorker()
 	{
@@ -65,25 +61,33 @@ namespace net_engine
 			NET_LOG(LL_SYS, "Network engine initializing...");
 			// TODO: Config, pre initilization
 
+			/*
 			RegisterPacket(
 				HEADER_CG_LOGIN, EPacketTypes::PacketTypeOutgoing, false, std::bind(&CNetworkServerManager::OnRecvLoginPacket, this, std::placeholders::_1, std::placeholders::_2)
 			);
 			RegisterPacket(
 				HEADER_CG_CHAT, EPacketTypes::PacketTypeOutgoing, false, std::bind(&CNetworkServerManager::OnRecvChatPacket, this, std::placeholders::_1, std::placeholders::_2)
 			);
+			*/
 
 			// TODO: DB Connection and other stuffs
 
 			NET_LOG(LL_SYS, "Server initialized");
 
-     	 	m_updateTimer.expires_from_now(std::chrono::milliseconds(10));
+#if 0
+			m_updateTimer.expires_from_now(std::chrono::milliseconds(10));
      	  	m_updateTimer.async_wait(std::bind(&CNetworkServerManager::OnUpdate, this));
+#endif
 
 			NET_LOG(LL_SYS, "Network engine started!");
 			Run();
 
 			NET_LOG(LL_SYS, "Network engine shutting down...");
 			Shutdown();
+		}
+		catch (const asio::system_error& e)
+		{
+			NET_LOG(LL_CRI, "Exception handled: %s", e.what());
 		}
 		catch (std::exception& e)
 		{
@@ -161,14 +165,14 @@ namespace net_engine
 
 	std::shared_ptr <NetPeerBase> CNetworkServerManager::NewPeer()
 	{
-//		auto peer = std::make_shared<CNetworkConnectionManager>(std::static_pointer_cast<CNetworkServerManager>(shared_from_this()));
+		auto peer = std::make_shared<CNetworkConnectionManager>(std::static_pointer_cast<CNetworkServerManager>(shared_from_this()), m_securityLevel, m_crypt_key);
 
 #//ifdef _DEBUG
 //		peer->SetLogLevel(LL_ONREAD | LL_ONWRITE_PRE | LL_ONWRITE_POST | LL_ONREGISTERPACKET);
 //#endif
 //
-//		m_peers.emplace(peer->GetId(), peer);
-		return {};
+		m_peers.emplace(peer->GetId(), peer);
+		return peer;
 	}
 
 	void CNetworkServerManager::RemovePeer(int32_t id)
@@ -178,6 +182,7 @@ namespace net_engine
 			m_peers.erase(iter);
 	}
 
+#if 0
 	std::size_t CNetworkServerManager::OnRecvLoginPacket(const void* data, std::size_t maxlength)
 	{
 		auto packet = reinterpret_cast<const SNetPacketCGLogin*>(data);
@@ -220,4 +225,5 @@ namespace net_engine
 
 		return packet->size();
 	}
+#endif
 }

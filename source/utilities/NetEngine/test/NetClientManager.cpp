@@ -4,12 +4,12 @@
 
 namespace net_engine
 {	
-	CNetworkClientManager::CNetworkClientManager(NetServiceBase& service) :
-		NetClientBase(service(), 5000), m_pNetService(service)
+	CNetworkClientManager::CNetworkClientManager(NetServiceBase& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
+		NetClientBase(service(), securityLevel, cryptKey, 5000), m_pNetService(service)
 	{
-		RegisterPacket(
-			HEADER_GC_CHAT, EPacketTypes::PacketTypeIncoming, false, std::bind(&CNetworkClientManager::OnRecvChatPacket, this, std::placeholders::_1, std::placeholders::_2)
-		);
+		//RegisterPacket(
+		//	HEADER_GC_CHAT, EPacketTypes::PacketTypeIncoming, false, std::bind(&CNetworkClientManager::OnRecvChatPacket, this, std::placeholders::_1, std::placeholders::_2)
+		//);
 	}
 
 	// I/O Service wrappers
@@ -34,12 +34,12 @@ namespace net_engine
 	{
 		NET_LOG(LL_SYS, "Connected to %s:%u", GetIP().c_str(), GetPort());
 
+		/*
 		SNetPacketCGLogin packet;
 		strcpy_s(packet.login, "id_Test");
 		strcpy_s(packet.password, "pwd_test");
 		SendCrypted(packet, true);
-
-		BeginRead();
+		*/
 	}
 	void CNetworkClientManager::OnDisconnect(const asio::error_code& e)
 	{
@@ -76,6 +76,7 @@ namespace net_engine
 			return length;
 		}
 
+		/*
 		if (data && IsAssignedFlag(LL_ONWRITE_PRE) && length >= packet_header_min_size)
 		{
 			SNetPacket packet(reinterpret_cast<const char*>(data));
@@ -84,6 +85,7 @@ namespace net_engine
 				packet.m_header.version, packet.m_header.flags, packet.m_header.opcode, packet.m_header.size
 			);
 		}
+		*/
 		
 #if 0
 		if (data && ulSize == GetPacketCapacity(pPsuedoPacket->uiPacketID))
@@ -111,7 +113,7 @@ namespace net_engine
 		NET_LOG(LL_ERR, "Network error handled! ID: %u System error: %d(%s)", error_type, er.value(), er.message().c_str());
 	}
 
-
+#if 0
 	std::size_t CNetworkClientManager::ProcessInput(const void* data, std::size_t maxlength)
 	{
 		NET_LOG(LL_TRACE, "Data: %p Max length: %u", data, maxlength);
@@ -222,5 +224,5 @@ namespace net_engine
 
 		return packet->size();
 	}
-
+#endif
 }

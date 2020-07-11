@@ -9,7 +9,7 @@ namespace net_engine
 //		using TPacketHandler = std::unordered_map <TNetOpcode, THandlerFunc>;
 		
 	public:
-		CNetworkClientManager(NetServiceBase& service);
+		CNetworkClientManager(NetServiceBase& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey);
 		virtual ~CNetworkClientManager() {};
 
 		NetServiceBase & GetServiceInstance() const;
@@ -26,14 +26,14 @@ namespace net_engine
 		virtual void		OnWritePost(bool bCompleted);
 		virtual void		OnError(std::uint32_t ulErrorType, const asio::error_code & e);
 
-		void SendCrypted(const SNetPacket& packet, bool flush = false);
+//		void SendCrypted(const SNetPacket& packet, bool flush = false);
 
 		std::size_t ProcessInput(const void* data, std::size_t maxlength);
 	
 
 		std::size_t OnRecvChatPacket(const void* data, std::size_t maxlength);
 
-
+		/*
 		inline void RegisterPacket(TNetOpcode header, uint8_t type, bool is_dynamic, THandlerFunc handler)
 		{
 			CPacketContainer::Instance().AppendPacket(header, NAMEOF(header).data(), type, handler, is_dynamic);
@@ -47,6 +47,7 @@ namespace net_engine
 //			if (iter != m_handlers.end())
 //				m_handlers.erase(iter);
 		}
+		*/
 
 	private:
 		NetServiceBase & m_pNetService;
