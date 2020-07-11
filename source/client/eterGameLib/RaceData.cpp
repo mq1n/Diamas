@@ -308,7 +308,7 @@ void CRaceData::RegisterMotionMode(uint16_t wMotionModeIndex)
 
 CGraphicThing* CRaceData::NEW_RegisterMotion(CRaceMotionData* pkMotionData, uint16_t wMotionModeIndex, uint16_t wMotionIndex, const char * c_szFileName, uint8_t byPercentage)
 {	
-	CGraphicThing * pMotionThing = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	CGraphicThing* pMotionThing = CResourceManager::Instance().GetResourcePointer<CGraphicThing>(c_szFileName);
 
 	TMotionModeData * pMotionModeData;
 	if (!GetMotionModeDataPointer(wMotionModeIndex, &pMotionModeData))
@@ -359,7 +359,7 @@ CGraphicThing* CRaceData::RegisterMotionData(uint16_t wMotionMode, uint16_t wMot
 
 void CRaceData::OLD_RegisterMotion(uint16_t wMotionModeIndex, uint16_t wMotionIndex, const char * c_szFileName, uint8_t byPercentage)
 {
-	CGraphicThing * pThing = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	CGraphicThing* pThing = CResourceManager::Instance().GetResourcePointer<CGraphicThing>(c_szFileName);
 
 	TMotion	Motion;
 	Motion.byPercentage	= byPercentage;
@@ -493,7 +493,7 @@ const char* CRaceData::GetMotionListFileName() const
 CGraphicThing * CRaceData::GetBaseModelThing()
 {
 	if (!m_pBaseModelThing)
-		m_pBaseModelThing = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(m_strBaseModelFileName.c_str());
+		m_pBaseModelThing = CResourceManager::Instance().GetResourcePointer<CGraphicThing>(m_strBaseModelFileName);
 
 	return m_pBaseModelThing;
 }
@@ -504,7 +504,7 @@ CGraphicThing * CRaceData::GetLODModelThing()
 	{
 		std::string strLODFileName = CFileNameHelper::NoExtension(m_strBaseModelFileName) + "_lod_01.gr2";
 		if (CResourceManager::Instance().IsFileExist(strLODFileName.c_str()))
-			m_pLODModelThing = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(strLODFileName.c_str());
+			m_pLODModelThing = CResourceManager::Instance().GetResourcePointer<CGraphicThing>(strLODFileName);
 	}
 
 	return m_pLODModelThing;
@@ -518,7 +518,7 @@ CAttributeData * CRaceData::GetAttributeDataPtr()
 	if (!CResourceManager::Instance().IsFileExist(m_strAttributeFileName.c_str()))
 		return nullptr;
 
-	return (CAttributeData *)CResourceManager::Instance().GetResourcePointer(m_strAttributeFileName.c_str());
+	return CResourceManager::Instance().GetResourcePointer<CAttributeData>(m_strAttributeFileName);
 }
 
 BOOL CRaceData::GetAttachingBoneName(uint32_t dwPartIndex, const char ** c_pszBoneName)

@@ -278,4 +278,4 @@ class CStateManager : public CSingleton<CStateManager>
 
 #define STATEMANAGER (CStateManager::Instance())
 
-#endif __CSTATEMANAGER_H
+#endif

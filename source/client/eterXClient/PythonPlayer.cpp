@@ -490,6 +490,7 @@ void CPythonPlayer::NotifyCharacterUpdate(uint32_t dwVID)
 void CPythonPlayer::NotifyDeadMainCharacter()
 {
 	__ClearAutoAttackTargetActorID();
+	__ClearReservedAction();
 }
 
 void CPythonPlayer::NotifyChangePKMode()

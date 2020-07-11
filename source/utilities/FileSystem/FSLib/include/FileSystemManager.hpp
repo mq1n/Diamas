@@ -54,6 +54,7 @@ namespace FileSystem
 
 			bool AddArchive(const CFileName& filename, const std::array <uint8_t, ARCHIVE_KEY_LENGTH>& key);
 			CArchive* GetArchive(const CFileName& archivename);
+			TArchiveKey GetArchiveKey(const CFileName& archivename);
 
 			bool DoesFileExist(const CFileName& path, bool mapped_only = false) const;
 			bool OpenFile(const CFileName& path, CFile& fp, bool silent_failure = false) const;

@@ -20,7 +20,7 @@ void CGraphicText::DestroyDeviceObjects()
 	m_fontTexture.DestroyDeviceObjects();
 }
 
-CGraphicFontTexture* CGraphicText::GetFontTexturePointer()
+CGraphicFontTexture* CGraphicText::GetTexturePointer()
 {
 	return &m_fontTexture;
 }

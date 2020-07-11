@@ -2436,7 +2436,8 @@ PyObject * wndButtonGetUpVisualFileName(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
 		return Py_BuildException();
 
-	return Py_BuildValue("s", ((UI::CButton*)pWindow)->GetUpVisualFileName());
+	auto name = ((UI::CButton*)pWindow)->GetUpVisualFileName();
+	return Py_BuildValue("s", name.c_str());
 }
 PyObject * wndButtonGetOverVisualFileName(PyObject * poSelf, PyObject * poArgs)
 {
@@ -2444,7 +2445,8 @@ PyObject * wndButtonGetOverVisualFileName(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
 		return Py_BuildException();
 
-	return Py_BuildValue("s", ((UI::CButton*)pWindow)->GetOverVisualFileName());
+	auto name = ((UI::CButton*)pWindow)->GetOverVisualFileName();
+	return Py_BuildValue("s", name.c_str());
 }
 PyObject * wndButtonGetDownVisualFileName(PyObject * poSelf, PyObject * poArgs)
 {
@@ -2452,7 +2454,8 @@ PyObject * wndButtonGetDownVisualFileName(PyObject * poSelf, PyObject * poArgs)
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
 		return Py_BuildException();
 
-	return Py_BuildValue("s", ((UI::CButton*)pWindow)->GetDownVisualFileName());
+	auto name = ((UI::CButton*)pWindow)->GetDownVisualFileName();
+	return Py_BuildValue("s", name.c_str());
 }
 PyObject * wndButtonFlash(PyObject * poSelf, PyObject * poArgs)
 {

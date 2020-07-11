@@ -354,7 +354,7 @@ void CWeaponTrace::UseTexture()
 
 void CWeaponTrace::SetTexture(const char * c_szFileName)
 {
-	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer("lot_ade10-2.tga");
+	CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>("lot_ade10-2.tga");
 	m_ImageInstance.SetImagePointer(pImage);
 
 	//CGraphicTexture * pTexture = m_ImageInstance.GetTexturePointer();

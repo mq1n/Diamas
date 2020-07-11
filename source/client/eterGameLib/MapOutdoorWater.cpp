@@ -16,7 +16,7 @@ void CMapOutdoor::LoadWaterTexture()
 		} else {
 			sprintf_s(buf, "d:/ymir Work/special/water/%02d.dds", i + 1);	
 		}
-		m_WaterInstances[i].SetImagePointer((CGraphicImage *) CResourceManager::Instance().GetResourcePointer(buf));
+		m_WaterInstances[i].SetImagePointer(CResourceManager::Instance().GetResourcePointer<CGraphicImage>(buf));
 	}
 }
 
@@ -44,7 +44,10 @@ void CMapOutdoor::RenderWater()
 	STATEMANAGER.SaveRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_COLOR1);
 	STATEMANAGER.SaveRenderState(D3DRS_COLORVERTEX, TRUE);
 
-	STATEMANAGER.SetTexture(0, m_WaterInstances[((ELTimer_GetMSec() / 70) % 30)].GetTexturePointer()->GetD3DTexture());
+	auto pWaterTexture = m_WaterInstances[((ELTimer_GetMSec() / 70) % 30)].GetTexturePointer();
+	if (!pWaterTexture)
+		return;
+	STATEMANAGER.SetTexture(0, pWaterTexture->GetD3DTexture());
 
 	D3DXMatrixScaling(&matTexTransformWater, m_fWaterTexCoordBase, -m_fWaterTexCoordBase, 0.0f);
 	D3DXMatrixMultiply(&matTexTransformWater, &m_matViewInverse, &matTexTransformWater);

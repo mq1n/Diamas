@@ -8,7 +8,7 @@
 
 #define ENABLE_OBJ_SCALLING
 
-enum
+enum : int64_t
 {
 	THING_OBJECT   = 0xadf21f13,
 	TREE_OBJECT    = 0x8ac9f7a6,

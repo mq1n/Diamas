@@ -284,7 +284,7 @@ namespace UI
 			void SetColor(uint32_t dwLeft, uint32_t dwRight, uint32_t dwCenter);
 
 		protected:
-			void OnRender();
+			void OnRender() override;
 
 		protected:
 			uint32_t m_dwLeftColor;
@@ -475,9 +475,9 @@ namespace UI
 			bool SetDownVisual(const char * c_szFileName);
 			bool SetDisableVisual(const char * c_szFileName);
 
-			const char * GetUpVisualFileName();
-			const char * GetOverVisualFileName();
-			const char * GetDownVisualFileName();
+			std::string GetUpVisualFileName();
+			std::string GetOverVisualFileName();
+			std::string GetDownVisualFileName();
 
 			void Flash();
 			void FlashEx();

@@ -155,7 +155,7 @@ CGraphicImageInstance * CSkyObject::GenerateTexture(const char * szfilename)
 	if (strlen(szfilename) <= 0)
 		assert(false);
 
-	CResource * pResource = CResourceManager::Instance().GetResourcePointer(szfilename);
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(szfilename);
 
 	if (!pResource->IsType(CGraphicImage::Type()))
 	{

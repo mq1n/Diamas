@@ -199,14 +199,14 @@ CGraphicImage* CGrannyMaterial::__GetImagePointer(const char* fileName)
 		if (localFileName_len < sizeof(localFileName) - 1)
 		{
 			_snprintf_s(localFileName, sizeof(localFileName), "%s%s", GetModelLocalPath().c_str(), fileName);
-			CResource* pResource = rkResMgr.GetResourcePointer(localFileName);
+			CResource* pResource = rkResMgr.GetResourcePointer<CResource>(localFileName);
 			return static_cast<CGraphicImage*>(pResource);
 		}		
 	}
 	// END_OF_SUPPORT_LOCAL_TEXTURE
 	
 
-	CResource* pResource = rkResMgr.GetResourcePointer(fileName);
+	CResource* pResource = rkResMgr.GetResourcePointer<CResource>(fileName);
 	return static_cast<CGraphicImage*>(pResource);
 }
 
@@ -358,7 +358,7 @@ void CGrannyMaterial::__RestoreSpecularRenderState()
 void CGrannyMaterial::CreateSphereMap(uint32_t uMapIndex, const char* c_szSphereMapImageFileName)
 {
 	CResourceManager& rkResMgr = CResourceManager::Instance();
-	CGraphicImage * pImage = (CGraphicImage *)rkResMgr.GetResourcePointer(c_szSphereMapImageFileName);
+	CGraphicImage* pImage = rkResMgr.GetResourcePointer<CGraphicImage>(c_szSphereMapImageFileName);
 	ms_akSphereMapInstance[uMapIndex].SetImagePointer(pImage);
 }
 

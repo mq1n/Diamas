@@ -298,7 +298,7 @@ void CLensFlare::SetMainFlare(const string &strSunFile, float fSunSize)
 	if (m_bEnabled && m_bShowMainFlare)
 	{
 		m_fSunSize = fSunSize;
-		CResource * pResource = CResourceManager::Instance().GetResourcePointer(strSunFile.c_str()); 
+		CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(strSunFile);
 
 		if (!pResource->IsType(CGraphicImage::Type()))
 			assert(false);
@@ -508,8 +508,8 @@ void CFlare::Init(std::string strPath)
 
 	while (!g_strFiles[i].empty())
 	{
-		CResource * pResource = CResourceManager::Instance().GetResourcePointer((strPath + "/" + string(g_strFiles[i])).c_str());
-		
+		CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>((strPath + "/" + string(g_strFiles[i])));
+
 		if (!pResource->IsType(CGraphicImage::Type()))
 			assert(false);
 

@@ -12,7 +12,6 @@
 #include "MapBase.h"
 #include "Area.h"
 #include "AreaTerrain.h"
-#include "AreaLoaderThread.h"
 
 
 #define LOAD_SIZE_WIDTH				1
@@ -82,7 +81,6 @@ class CMapOutdoor : public CMapBase
 		void			SetInverseViewAndDynamicShaodwMatrices();
 		virtual bool	Load(float x, float y, float z);
 		virtual float	GetHeight(float x, float y);
-		virtual float	GetCacheHeight(float x, float y);
 
 		virtual bool	Update(float fX, float fY, float fZ);
 		virtual void	UpdateAroundAmbience(float fX, float fY, float fZ);
@@ -97,7 +95,7 @@ class CMapOutdoor : public CMapBase
 
 		bool			LoadSetting(const char * c_szFileName);
 
-		void			ApplyLight(uint32_t dwVersion, const D3DLIGHT9& c_rkLight);
+		void			ApplyLight(uint32_t dwVersion, const D3DLIGHT9& c_rkLight) override;
 		void			SetEnvironmentScreenFilter();
 		void			SetEnvironmentSkyBox();
 		void			SetEnvironmentLensFlare();
@@ -391,8 +389,6 @@ class CMapOutdoor : public CMapBase
 		std::vector<std::pair<float, int32_t> > m_PatchVector;
 		std::vector<TPatchDrawStruct> m_PatchDrawStructVector;
 
-		void					SetPatchDrawVector();
-
 		void					NEW_DrawWireFrame(CTerrainPatchProxy * pTerrainPatchProxy, uint16_t wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType);
 
 		void					DrawWireFrame(int32_t patchnum, uint16_t wPrimitiveCount, D3DPRIMITIVETYPE ePrimitiveType);
@@ -629,28 +625,6 @@ class CMapOutdoor : public CMapBase
 		void SpecialEffect_Create(uint32_t dwID, float x, float y, float z, const char* c_szEffName);
 		void SpecialEffect_Delete(uint32_t dwID);
 		void SpecialEffect_Destroy();
-
-	private:
-		struct SHeightCache 
-		{
-			struct SItem
-			{
-				uint32_t	m_dwKey;
-				float	m_fHeight;
-			};
-
-			enum
-			{
-				HASH_SIZE = 100
-			};
-
-			std::vector<SItem> m_akVct_kItem[HASH_SIZE];
-
-			bool m_isUpdated;
-		} m_kHeightCache;
-		
-		void __HeightCache_Init();
-		void __HeightCache_Update();
 
 	public:
 		void SetEnvironmentDataName(const std::string& strEnvironmentDataName);

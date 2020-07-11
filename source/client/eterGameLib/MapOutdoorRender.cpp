@@ -668,63 +668,6 @@ void CMapOutdoor::SelectIndexBuffer(uint8_t byLODLevel, uint16_t * pwPrimitiveCo
 #endif
 }
 
-void CMapOutdoor::SetPatchDrawVector()
-{
-	assert(nullptr!=m_pTerrainPatchProxyList && "CMapOutdoor::__SetPatchDrawVector");
-
-	m_PatchDrawStructVector.clear();
-
-	std::vector<std::pair<float, int32_t> >::iterator aDistancePatchVectorIterator;
-
-	TPatchDrawStruct aPatchDrawStruct;
-
-	aDistancePatchVectorIterator = m_PatchVector.begin();
-	while(aDistancePatchVectorIterator != m_PatchVector.end())
-	{
-		std::pair<float, int32_t> adistancePatchPair = *aDistancePatchVectorIterator;
-
-		CTerrainPatchProxy * pTerrainPatchProxy = &m_pTerrainPatchProxyList[adistancePatchPair.second];
-
-		if (!pTerrainPatchProxy->isUsed())
-		{
-			++aDistancePatchVectorIterator;
-			continue;
-		}
-
-		int32_t lPatchNum = pTerrainPatchProxy->GetPatchNum();
-		if (lPatchNum < 0)
-		{
-			++aDistancePatchVectorIterator;
-			continue;
-		}
-
-		uint8_t byTerrainNum = pTerrainPatchProxy->GetTerrainNum();
-		if (0xFF == byTerrainNum)
-		{
-			++aDistancePatchVectorIterator;
-			continue;
-		}
-
-		CTerrain * pTerrain;
-		if (!GetTerrainPointer(byTerrainNum, &pTerrain))
-		{
-			++aDistancePatchVectorIterator;
-			continue;
-		}
-
-		aPatchDrawStruct.fDistance				= adistancePatchPair.first;
-		aPatchDrawStruct.byTerrainNum			= byTerrainNum;
-		aPatchDrawStruct.lPatchNum				= lPatchNum;
-		aPatchDrawStruct.pTerrainPatchProxy		= pTerrainPatchProxy;
-
-		m_PatchDrawStructVector.emplace_back(aPatchDrawStruct);
-
-		++aDistancePatchVectorIterator;
-	}
-
-	std::stable_sort(m_PatchDrawStructVector.begin(), m_PatchDrawStructVector.end(), FSortPatchDrawStructWithTerrainNum());
-}
-
 float CMapOutdoor::__GetNoFogDistance()
 {
 	return static_cast<float>(CTerrainImpl::CELLSCALE * m_lViewRadius) * 0.5f;

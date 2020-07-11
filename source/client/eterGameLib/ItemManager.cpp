@@ -303,9 +303,9 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 
 				if (CResourceManager::Instance().IsFileExist(szName) == false)
 				{
-					#ifdef _DEBUG
-					TraceError("%16s(#%-5d) cannot find icon file. setting to default.", table->szName, dwVnum);
-					#endif
+#ifdef _DEBUG
+					TraceError("%16s(#%-5d) cannot find icon file. setting to default.", table->szLocaleName, dwVnum);
+#endif
 					const uint32_t EmptyBowl = 27995;
 					_snprintf_s(szName, sizeof(szName), "icon/item/%05d.tga", EmptyBowl);
 				}

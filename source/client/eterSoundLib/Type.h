@@ -19,7 +19,7 @@ namespace NSound
 	typedef std::vector<TSoundData> TSoundDataVector;
 	typedef std::vector<TSoundInstance> TSoundInstanceVector;
 
-	bool			LoadSoundInformationPiece(const char * c_szFileName, TSoundDataVector & rSoundDataVector, const char * c_szPathHeader = nullptr);
+	bool			LoadSoundInformationPiece(const char * c_szFileName, TSoundDataVector & rSoundDataVector, const char * c_szPathHeader = nullptr, bool silent_failure = false);
 	bool			SaveSoundInformationPiece(const char * c_szFileName, TSoundDataVector & rSoundDataVector);
 	void			DataToInstance(const TSoundDataVector & c_rSoundDataVector, TSoundInstanceVector * pSoundInstanceVector);
 

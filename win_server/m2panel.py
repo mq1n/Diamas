@@ -235,9 +235,9 @@ class WinSFHelper:
 			symlink_targets_file.append(["game99\\DevIL.dll", "..\\extern\\bin\\DevIL_x64.dll"])
 			symlink_targets_file.append(["kanal\\DevIL.dll",  "..\\extern\\bin\\DevIL_x64.dll"])
 		elif self.arch == "86":
-			symlink_targets_file.append(["auth\\DevIL.dll",   "..\\extern\\bin\\DevIL.dll"])
-			symlink_targets_file.append(["game99\\DevIL.dll", "..\\extern\\bin\\DevIL.dll"])
-			symlink_targets_file.append(["kanal\\DevIL.dll",  "..\\extern\\bin\\DevIL.dll"])
+			symlink_targets_file.append(["auth\\DevIL.dll",   "..\\extern\\bin\\DevIL_x86.dll"])
+			symlink_targets_file.append(["game99\\DevIL.dll", "..\\extern\\bin\\DevIL_x86.dll"])
+			symlink_targets_file.append(["kanal\\DevIL.dll",  "..\\extern\\bin\\DevIL_x86.dll"])
 			
 		for i in symlink_targets_dir:
 			target_file = "{} {}".format(i[0], i[1])

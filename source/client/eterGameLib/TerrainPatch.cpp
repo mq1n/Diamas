@@ -68,7 +68,7 @@ void CTerrainPatch::__BuildHardwareTerrainVertexBuffer(HardwareTransformPatch_SS
 	}
 }
 
-uint32_t CTerrainPatch::GetWaterFaceCount()
+uint32_t CTerrainPatch::GetWaterFaceCount() const
 {
 	return m_dwWaterPriCount;
 }
@@ -101,7 +101,7 @@ bool CTerrainPatchProxy::IsIn(const D3DXVECTOR3& c_rv3Target, float fRadius)
 	return false;
 }
 
-CGraphicVertexBuffer* CTerrainPatchProxy::HardwareTransformPatch_GetVertexBufferPtr()
+CGraphicVertexBuffer* CTerrainPatchProxy::HardwareTransformPatch_GetVertexBufferPtr() const
 {
 	if (m_pTerrainPatch)
 		return m_pTerrainPatch->HardwareTransformPatch_GetVertexBufferPtr();

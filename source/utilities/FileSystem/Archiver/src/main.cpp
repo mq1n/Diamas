@@ -215,7 +215,7 @@ bool InitializeConfigFile(FileSystemManager * fs, const std::string & strConfigF
 			auto stTargetArchiveName = GetNameFromPath(dir);
 			if (!stSpecificArchive.empty() && stSpecificArchive != stTargetArchiveName)
 			{
-				FileSystem::Log(0, "Archive: %s passed", stSpecificArchive.c_str());
+				FileSystem::Log(0, "Archive: %s passed but current is: %s", stSpecificArchive.c_str(), stTargetArchiveName.c_str());
 				continue;
 			}
 			specificArchiveFound = true;

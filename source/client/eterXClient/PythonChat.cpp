@@ -455,8 +455,9 @@ void CPythonChat::AppendChat(int32_t iType, const char * c_szChat)
 	m_ChatLineDeque.emplace_back(pChatLine);
 	if (m_ChatLineDeque.size() > CHAT_LINE_MAX_NUM)
 	{
-		SChatLine * pChatLine = m_ChatLineDeque.front();
-		SChatLine::Delete(pChatLine);
+		SChatLine* pkChatLine = m_ChatLineDeque.front();
+		if (pkChatLine)
+			SChatLine::Delete(pkChatLine);
 		m_ChatLineDeque.pop_front();
 	}
 

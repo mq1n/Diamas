@@ -1,8 +1,6 @@
 #pragma once
-
 #include "GrpImage.h"
 #include "GrpIndexBuffer.h"
-#include "GrpVertexBufferDynamic.h"
 #include "Pool.h"
 
 class CGraphicImageInstance
@@ -29,6 +27,7 @@ class CGraphicImageInstance
 
 		int32_t GetWidth();
 		int32_t GetHeight();
+		void GetPositon(D3DXVECTOR2& pos);
 
 		CGraphicTexture * GetTexturePointer();
 		const CGraphicTexture &	GetTextureReference() const;

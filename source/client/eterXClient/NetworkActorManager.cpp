@@ -412,22 +412,9 @@ void CNetworkActorManager::AppendActor(const SNetworkActorData& c_rkNetActorData
 {
 	if (__IsMainActorVID(c_rkNetActorData.m_dwVID))
 	{
-		bool bChangeMountStatus = false;
-
-		CInstanceBase* pMainInstance = CPythonCharacterManager::Instance().GetInstancePtr(c_rkNetActorData.m_dwVID);
-		if( pMainInstance )
-		{
-			BOOL bIsMountingHorse = pMainInstance->IsMountingHorse();
-			bChangeMountStatus = (bIsMountingHorse && c_rkNetActorData.m_dwMountVnum == 0) || (!bIsMountingHorse && c_rkNetActorData.m_dwMountVnum != 0);
-		}
-
-		if( !bChangeMountStatus )
-		{
-			//__RemoveAllActors();
-			__RemoveDynamicActors();
-			__RemoveAllGroundItems();
-		}
-
+		//__RemoveAllActors();
+		__RemoveDynamicActors();
+		__RemoveAllGroundItems();
 	}
 
 	SNetworkActorData& rkNetActorData=m_kNetActorDict[c_rkNetActorData.m_dwVID];

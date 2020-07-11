@@ -516,9 +516,9 @@ bool CPythonMiniMap::Create()
 	const std::string strWhiteMark = strImageRoot + "minimap/whitemark.sub";
 
 	// 미니맵 커버
-	CGraphicImage * pImage = (CGraphicImage *) CResourceManager::Instance().GetResourcePointer(strImageFilter.c_str());
+	CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(strImageFilter);
 	m_MiniMapFilterGraphicImageInstance.SetImagePointer(pImage);
-	pImage = (CGraphicImage *) CResourceManager::Instance().GetResourcePointer(strImageCamera.c_str());
+	pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(strImageCamera);
 	m_MiniMapCameraraphicImageInstance.SetImagePointer(pImage);
 
 	m_matMiniMapCover._11 = 1.0f / ((float)m_MiniMapFilterGraphicImageInstance.GetWidth());
@@ -526,45 +526,45 @@ bool CPythonMiniMap::Create()
 	m_matMiniMapCover._33 = 0.0f;
 
 	// 캐릭터 마크
-	CGraphicSubImage * pSubImage = (CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(strPlayerMark.c_str());
+	CGraphicSubImage* pSubImage = CResourceManager::Instance().GetResourcePointer<CGraphicSubImage>(strPlayerMark);
 	m_PlayerMark.SetImagePointer(pSubImage);
 
-	pSubImage = (CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(strWhiteMark.c_str());
+	pSubImage = CResourceManager::Instance().GetResourcePointer<CGraphicSubImage>(strWhiteMark);
 	m_WhiteMark.SetImagePointer(pSubImage);
 
 	char buf[256];
 	for (int32_t i = 0; i < MINI_WAYPOINT_IMAGE_COUNT; ++i)
 	{
 		sprintf_s(buf, "%sminimap/mini_waypoint%02d.sub", strImageRoot.c_str(), i+1);
-		m_MiniWayPointGraphicImageInstances[i].SetImagePointer((CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(buf));
+		m_MiniWayPointGraphicImageInstances[i].SetImagePointer(CResourceManager::Instance().GetResourcePointer<CGraphicSubImage>(buf));
 		m_MiniWayPointGraphicImageInstances[i].SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
 	}
 	for (int32_t j = 0; j < WAYPOINT_IMAGE_COUNT; ++j)
 	{
 		sprintf_s(buf, "%sminimap/waypoint%02d.sub", strImageRoot.c_str(), j + 1);
-		m_WayPointGraphicImageInstances[j].SetImagePointer((CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(buf));
+		m_WayPointGraphicImageInstances[j].SetImagePointer(CResourceManager::Instance().GetResourcePointer<CGraphicSubImage>(buf));
 		m_WayPointGraphicImageInstances[j].SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
 	}
 	for (int32_t k = 0; k < TARGET_MARK_IMAGE_COUNT; ++k)
 	{
 		sprintf_s(buf, "%sminimap/targetmark%02d.sub", strImageRoot.c_str(), k + 1);
-		m_TargetMarkGraphicImageInstances[k].SetImagePointer((CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(buf));
+		m_TargetMarkGraphicImageInstances[k].SetImagePointer(CResourceManager::Instance().GetResourcePointer<CGraphicSubImage>(buf));
 		m_TargetMarkGraphicImageInstances[k].SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
 	}
 	for (int32_t l = 0; l < STORM_CIRCLE_IMAGE_COUNT; ++l)
 	{
 		sprintf_s(buf, "%sgame/primal_law/atlasmap_circle.dds", strImageRoot.c_str());
-		m_StormIndicatorInstances[l].SetImagePointer((CGraphicSubImage *)CResourceManager::Instance().GetResourcePointer(buf));
+		m_StormIndicatorInstances[l].SetImagePointer(CResourceManager::Instance().GetResourcePointer<CGraphicSubImage>(buf));
 		m_StormIndicatorInstances[l].SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
 	}
 	for (int32_t m = 0; m < SAFE_ZONE_IMAGE_COUNT; ++m)
 	{
 		sprintf_s(buf, "%sgame/primal_law/atlasmap_circle.dds", strImageRoot.c_str());
-		m_NextSafezoneIndicatorInstances[m].SetImagePointer((CGraphicSubImage *)CResourceManager::Instance().GetResourcePointer(buf));
+		m_NextSafezoneIndicatorInstances[m].SetImagePointer(CResourceManager::Instance().GetResourcePointer<CGraphicSubImage>(buf));
 		m_NextSafezoneIndicatorInstances[m].SetRenderingMode(CGraphicExpandedImageInstance::RENDERING_MODE_SCREEN);
 	}
 
-	m_GuildAreaFlagImageInstance.SetImagePointer((CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer("d:/ymir work/ui/minimap/GuildArea01.sub"));
+	m_GuildAreaFlagImageInstance.SetImagePointer(CResourceManager::Instance().GetResourcePointer<CGraphicSubImage>("d:/ymir work/ui/minimap/GuildArea01.sub"));
 
 	// 그려질 폴리곤 세팅
 #pragma pack(push)
@@ -960,7 +960,7 @@ bool CPythonMiniMap::LoadAtlas()
 	
 	m_AtlasImageInstance.Destroy();
 	m_AtlasPlayerMark.Destroy();
-	CGraphicImage* pkGrpImgAtlas = (CGraphicImage *) CResourceManager::Instance().GetResourcePointer(atlasFileName);
+	CGraphicImage* pkGrpImgAtlas = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(atlasFileName);
 	if (pkGrpImgAtlas)
 	{
 		m_AtlasImageInstance.SetImagePointer(pkGrpImgAtlas);
@@ -971,7 +971,7 @@ bool CPythonMiniMap::LoadAtlas()
 			m_bAtlas=true;		
 	}
 
-	m_AtlasPlayerMark.SetImagePointer((CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(playerMarkFileName));
+	m_AtlasPlayerMark.SetImagePointer(CResourceManager::Instance().GetResourcePointer<CGraphicSubImage>(playerMarkFileName));
 
 	int16_t sTerrainCountX, sTerrainCountY;  
 	rkMap.GetBaseXY(&m_dwAtlasBaseX, &m_dwAtlasBaseY);

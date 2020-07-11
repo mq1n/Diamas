@@ -212,7 +212,7 @@ BOOL CEffectMesh::__LoadData_Ver002(int32_t iSize, const uint8_t * c_pbBuf)
 					std::string strTextureFileName = strPathName;
 					strTextureFileName += c_rstrFileName;
 
-					CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(strTextureFileName.c_str());
+					CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(strTextureFileName);
 
 					pMeshData->pImageVector.emplace_back(pImage);
 				}
@@ -220,7 +220,7 @@ BOOL CEffectMesh::__LoadData_Ver002(int32_t iSize, const uint8_t * c_pbBuf)
 		}
 		else
 		{
-			CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(pMeshData->szDiffuseMapFileName);
+			CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(pMeshData->szDiffuseMapFileName);
 
 			pMeshData->pImageVector.emplace_back(pImage);
 		}
@@ -353,7 +353,7 @@ BOOL CEffectMesh::__LoadData_Ver001(int32_t iSize, const uint8_t * c_pbBuf)
 					std::string strTextureFileName = strPathName;
 					strTextureFileName += c_rstrFileName;
 
-					CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(strTextureFileName.c_str());
+					CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(strTextureFileName);
 
 					pMeshData->pImageVector.emplace_back(pImage);
 				}
@@ -361,7 +361,7 @@ BOOL CEffectMesh::__LoadData_Ver001(int32_t iSize, const uint8_t * c_pbBuf)
 		}
 		else
 		{
-			CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(pMeshData->szDiffuseMapFileName);
+			CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(pMeshData->szDiffuseMapFileName);
 
 			pMeshData->pImageVector.emplace_back(pImage);
 		}

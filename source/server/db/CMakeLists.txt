@@ -56,14 +56,14 @@ if (MSVC)
 	set(EXTRA_LIBS ws2_32 dbghelp shlwapi)
 
 	if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb_debug mariadbclient_debug DevIL_debug)
+		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb_debug mariadbclient_debug)
 	else()
-		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb mariadbclient DevIL)
+		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb mariadbclient)
 	endif()
 
 	add_executable(${EXE_NAME} ${DBCACHE_HEADERS} ${DBCACHE_SOURCES})
 	
-	target_link_libraries(${EXE_NAME} sourceCommon thecorelib sqllib gamelib ${EXTRA_LIBS})
+	target_link_libraries(${EXE_NAME} sourceCommon thecorelib sqllib gamelib ${EXTRA_LIBS} DevIL)
 #	set_target_properties(${EXE_NAME} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT")
 
 else()

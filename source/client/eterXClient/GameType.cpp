@@ -44,13 +44,13 @@ bool ReloadDefaultFonts()
 
 	gs_isReloadDefaultFont = false;
 
-	CResource* pkNewFont = rkResMgr.GetResourcePointer(gs_strDefaultFontName.c_str());
+	CResource* pkNewFont = rkResMgr.GetResourcePointer<CResource>(gs_strDefaultFontName);
 	pkNewFont->AddReference();
 	if (gs_pkDefaultFont)
 		gs_pkDefaultFont->Release();
 	gs_pkDefaultFont = pkNewFont;
 
-	CResource* pkNewItalicFont = rkResMgr.GetResourcePointer(gs_strDefaultItalicFontName.c_str());
+	CResource* pkNewItalicFont = rkResMgr.GetResourcePointer<CResource>(gs_strDefaultItalicFontName.c_str());
 	pkNewItalicFont->AddReference();
 	if (gs_pkDefaultItalicFont)
 		gs_pkDefaultItalicFont->Release();

@@ -481,7 +481,7 @@ bool CRaceMotionData::LoadMotionData(const char * c_szFileName)
 		m_strSoundScriptDataFileName = "sound/";
 		m_strSoundScriptDataFileName += c_szHeader;
 
-		LoadSoundScriptData(m_strSoundScriptDataFileName.c_str());
+		LoadSoundScriptData(m_strSoundScriptDataFileName.c_str(), true);
 	}
 
 	return true;
@@ -564,10 +564,10 @@ bool CRaceMotionData::SaveMotionData(const char * c_szFileName)
 	return true;
 }
 #endif
-bool CRaceMotionData::LoadSoundScriptData(const char * c_szFileName)
+bool CRaceMotionData::LoadSoundScriptData(const char * c_szFileName, bool silent_failure)
 {
 	NSound::TSoundDataVector SoundDataVector;
-	if (!NSound::LoadSoundInformationPiece(c_szFileName, SoundDataVector))
+	if (!NSound::LoadSoundInformationPiece(c_szFileName, SoundDataVector, nullptr, silent_failure))
 		return false;
 
 	

@@ -113,6 +113,11 @@ CGraphicImage * CGraphicImageInstance::GetGraphicImagePointer()
 	return m_roImage.GetPointer();
 }
 
+void CGraphicImageInstance::GetPositon(D3DXVECTOR2& pos)
+{
+	pos = m_v2Position;
+}
+
 int32_t CGraphicImageInstance::GetWidth()
 {
 	if (IsEmpty())

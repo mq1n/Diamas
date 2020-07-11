@@ -4,7 +4,7 @@
 
 void CParticleProperty::InsertTexture(const char * c_szFileName)
 {
-	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(c_szFileName);
 
 	m_ImageVector.emplace_back(pImage);
 #ifdef WORLD_EDITOR

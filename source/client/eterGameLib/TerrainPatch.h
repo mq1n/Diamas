@@ -84,7 +84,7 @@ public:
 	void NeedUpdate(bool bNeedUpdate)						{ m_bNeedUpdate = bNeedUpdate;}
 	bool NeedUpdate()										{ return m_bNeedUpdate; }
 
-	uint32_t GetWaterFaceCount();
+	uint32_t GetWaterFaceCount() const;
 
 	void BuildTerrainVertexBuffer(HardwareTransformPatch_SSourceVertex* akSrcVertex);
 	void BuildWaterVertexBuffer(SWaterVertex* akSrcVertex, uint32_t uWaterVertexCount);
@@ -157,7 +157,7 @@ public:
 	float GetMinZ();
 	float GetMaxZ();
 	CGraphicVertexBuffer * GetWaterVertexBufferPointer();
-	CGraphicVertexBuffer* HardwareTransformPatch_GetVertexBufferPtr();
+	CGraphicVertexBuffer* HardwareTransformPatch_GetVertexBufferPtr() const;
 
 protected:
 	bool					m_bUsed;

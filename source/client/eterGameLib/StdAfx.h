@@ -11,6 +11,7 @@
 #include "../eterLib/StdAfx.h"
 #include "../eterSoundLib/StdAfx.h"
 #include "../eterEffectLib/StdAfx.h"
+#include "../eterScriptLib/StdAfx.h"
 
 #include "GameType.h"
 #include "GameUtil.h"

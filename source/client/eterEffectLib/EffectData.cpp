@@ -88,17 +88,17 @@ bool CEffectData::LoadScript(const char * c_szFileName)
 		strSoundFileName += &strNoExtensionName[strPathHeader.size()];
 		strSoundFileName += ".mss";
 
-		LoadSoundScriptData(strSoundFileName.c_str());
+		LoadSoundScriptData(strSoundFileName.c_str(), true);
 	}
 
 	return true;
 }
 
-bool CEffectData::LoadSoundScriptData(const char * c_szFileName)
+bool CEffectData::LoadSoundScriptData(const char * c_szFileName, bool silent_failure)
 {
 	NSound::TSoundDataVector SoundDataVector;
 
-	if (NSound::LoadSoundInformationPiece(c_szFileName, SoundDataVector))
+	if (NSound::LoadSoundInformationPiece(c_szFileName, SoundDataVector, nullptr, silent_failure))
 	{
 		NSound::DataToInstance(SoundDataVector, &m_SoundInstanceVector);
 		return false;

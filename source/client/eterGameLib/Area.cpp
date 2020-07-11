@@ -591,7 +591,7 @@ void CArea::__SetObjectInstance_SetBuilding(TObjectInstance * pObjectInstance, c
 
 	CResourceManager& rkResMgr=CResourceManager::Instance();
 
-	CGraphicThing * pThing = (CGraphicThing *)rkResMgr.GetResourcePointer(Data.strFileName.c_str());
+	CGraphicThing* pThing = rkResMgr.GetResourcePointer<CGraphicThing>(Data.strFileName);
 	pThing->AddReference();
 
 	if (pThing->IsEmpty())
@@ -627,7 +627,7 @@ void CArea::__SetObjectInstance_SetBuilding(TObjectInstance * pObjectInstance, c
 			if (!rkResMgr.IsFileExist(stLODModelFileName.c_str()))
 				break;
 
-			CGraphicThing* pLODModelThing = (CGraphicThing *)rkResMgr.GetResourcePointer(stLODModelFileName.c_str());
+			CGraphicThing* pLODModelThing = rkResMgr.GetResourcePointer<CGraphicThing>(stLODModelFileName.c_str());
 			if (!pLODModelThing)
 				break;
 
@@ -698,7 +698,7 @@ void CArea::__LoadAttribute(TObjectInstance * pObjectInstance, const char * c_sz
 	// OBB를 사용한 충돌 정보 자동 생성.
 	const bool bFileExist = CResourceManager::Instance().IsFileExist(c_szAttributeFileName);
 	
-	CAttributeData * pAttributeData = (CAttributeData *) CResourceManager::Instance().GetResourcePointer(c_szAttributeFileName);
+	CAttributeData* pAttributeData = CResourceManager::Instance().GetResourcePointer<CAttributeData>(c_szAttributeFileName);
 
 	CAttributeInstance * pAttrInstance = ms_AttributeInstancePool.Alloc();
 	pAttrInstance->Clear();
@@ -725,7 +725,7 @@ void CArea::__LoadAttribute(TObjectInstance * pObjectInstance, const char * c_sz
 				CStaticCollisionData collision;
 				collision.dwType = COLLISION_TYPE_OBB;
 				D3DXQuaternionRotationYawPitchRoll(&collision.quatRotation, object->GetYaw(), object->GetPitch(), object->GetRoll());
-				strcpy(collision.szName, "DummyCollisionOBB");
+				strcpy_s(collision.szName, "DummyCollisionOBB");
 				collision.v3Position = (v3Min + v3Max) * 0.5f;
 
 				D3DXVECTOR3 vDelta = (v3Max - v3Min);

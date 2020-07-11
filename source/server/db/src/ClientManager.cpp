@@ -2739,7 +2739,7 @@ int32_t CClientManager::Process()
 
 			case FDW_WRITE:
 				if (peer == m_pkAuthPeer)
-					if (g_log)
+					if (g_log && peer->GetSendLength() > 0)
 						sys_log(0, "AUTH_PEER_WRITE: size %d", peer->GetSendLength());
 
 				if (peer->Send() < 0)

@@ -76,7 +76,7 @@ void CSnowEnvironment::Deform()
 
 	if (m_bSnowEnable)
 	{
-		for (int32_t p = 0; p < std::min(10U, m_dwParticleMaxNum - m_kVct_pkParticleSnow.size()); ++p)
+		for (uint32_t p = 0; p < std::min(10U, m_dwParticleMaxNum - m_kVct_pkParticleSnow.size()); ++p)
 		{
 			CSnowParticle * pSnowParticle = CSnowParticle::New();
 			pSnowParticle->Init(v3ChangedPos, m_bRainEnable);
@@ -288,7 +288,7 @@ bool CSnowEnvironment::Create()
 	if (!__CreateGeometry())
 		return false;
 
-	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(snow_resource_filename.c_str());
+	CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(snow_resource_filename);
 	m_pImageInstance = CGraphicImageInstance::New();
 	m_pImageInstance->SetImagePointer(pImage);
 
@@ -356,7 +356,7 @@ void CSnowEnvironment::ToggleRain(bool enable) {
 		Create();
 
 		// Change the image
-		CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(rain_resource_filename.c_str());
+		CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(rain_resource_filename);
 		m_pImageInstance = CGraphicImageInstance::New();
 		m_pImageInstance->SetImagePointer(pImage);
 

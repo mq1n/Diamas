@@ -55,11 +55,11 @@ void CGraphicFontTexture::DestroyDeviceObjects()
 {
 }
 
-bool CGraphicFontTexture::Create(const char* c_szFontName, int32_t fontSize, bool bItalic)
+bool CGraphicFontTexture::Create(const std::string& fontName, int32_t fontSize, bool bItalic)
 {
 	Destroy();
 	
-	strncpy_s(m_fontName, c_szFontName, sizeof(m_fontName)-1);
+	m_fontName = fontName;
 	m_fontSize	= fontSize;
 	m_bItalic	= bItalic;
 
@@ -107,7 +107,11 @@ HFONT CGraphicFontTexture::GetFont()
 	logFont.lfClipPrecision		= CLIP_CHARACTER_PRECIS; // CLIP_DEFAULT_PRECIS;
 	logFont.lfQuality			= m_bItalic ? CLEARTYPE_QUALITY : ANTIALIASED_QUALITY;
 	logFont.lfPitchAndFamily	= DEFAULT_PITCH;
-	strcpy(logFont.lfFaceName, m_fontName);
+
+	if (!m_fontName.copy(logFont.lfFaceName, LF_FACESIZE)) {
+		TraceError("Font name (%s) is too long", m_fontName.c_str());
+		return nullptr;
+	}
 
 	return CreateFontIndirect(&logFont);
 }

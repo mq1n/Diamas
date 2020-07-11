@@ -72,7 +72,7 @@ namespace FileSystem
 			return false;
 		}
 
-		DEBUG_LOG(LL_SYS,
+		DEBUG_LOG(LL_TRACE,
 			"Target file: %ls(%lu) Data: %p(%u) Hash: %lu Flags: %u",
 			filename.GetPathW().c_str(), filename.GetHash(), rawdata.data(), entry.cryptedSize, entry.fileHash, entry.flags
 		);

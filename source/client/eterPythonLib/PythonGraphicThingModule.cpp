@@ -22,7 +22,7 @@ PyObject* grpThingGenerate(PyObject* poSelf, PyObject* poArgs)
 	if (strlen(szFileName) <= 0)
 		return Py_BuildValue("i", 0);
 
-	CResource* pResource = CResourceManager::Instance().GetResourcePointer(szFileName);
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(szFileName);
 
 	if (!pResource->IsType(CGraphicThing::Type()))
 		return Py_BuildException();
@@ -55,7 +55,7 @@ PyObject* grpThingSetFileName(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 1, &szFileName))
 		return Py_BuildException();
 
-	CResource* pResource = CResourceManager::Instance().GetResourcePointer(szFileName);
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(szFileName);
 
 	if (!pResource->IsType(CGraphicThing::Type()))
 		return Py_BuildException();

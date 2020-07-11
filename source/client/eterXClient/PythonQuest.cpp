@@ -191,14 +191,14 @@ PyObject * questGetQuestData(PyObject * poSelf, PyObject * poArgs)
 	{
 		std::string strIconFileName = "d:/ymir work/ui/game/quest/questicon/";
 		strIconFileName += pQuestInstance->strIconFileName;
-		pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(strIconFileName.c_str());
+		pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(strIconFileName);
 	}
 	else
 	{
 		{
 			// 비어있을 경우 디폴트 이미지를 넣는다.
 			std::string strIconFileName = "season1/icon/scroll_open.tga";
-			pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(strIconFileName.c_str());
+			pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(strIconFileName);
 		}
 	}
 

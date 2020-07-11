@@ -68,17 +68,19 @@ struct FGetPickingPoint
 
 CMapOutdoor::CMapOutdoor()
 {
-	CGraphicImage * pAttrImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer("d:/ymir work/special/white.dds");
-	CGraphicImage * pBuildTransparentImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer("d:/ymir Work/special/PCBlockerAlpha.dds");
+	CGraphicImage* pAttrImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>("d:/ymir work/special/white.dds");
+	CGraphicImage* pBuildTransparentImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>("d:/ymir Work/special/PCBlockerAlpha.dds");
 	m_attrImageInstance.SetImagePointer(pAttrImage);
 	m_BuildingTransparentImageInstance.SetImagePointer(pBuildTransparentImage);
 
-	Initialize();
+	LoadWaterTexture();
+
+	CMapOutdoor::Initialize();
 }
 
 CMapOutdoor::~CMapOutdoor()
 {
-	Destroy();
+	CMapOutdoor::Destroy();
 }
 
 bool CMapOutdoor::Initialize()
@@ -184,6 +186,7 @@ bool CMapOutdoor::Initialize()
 	m_bEnablePortal = FALSE;
 
 	m_wShadowMapSize = 512;
+
 	return true;
 }
 
@@ -748,19 +751,6 @@ void CMapOutdoor::BuildViewFrustum(D3DXMATRIX & mat)
 bool MAPOUTDOOR_GET_HEIGHT_USE2D = true;
 bool MAPOUTDOOR_GET_HEIGHT_TRACE = false;
 
-void CMapOutdoor::__HeightCache_Update()
-{
-	m_kHeightCache.m_isUpdated=true;
-}
-
-void CMapOutdoor::__HeightCache_Init()
-{
-	m_kHeightCache.m_isUpdated=false;
-
-	for (uint32_t uIndex=0; uIndex!=SHeightCache::HASH_SIZE; ++uIndex)
-		m_kHeightCache.m_akVct_kItem[uIndex].clear();
-}
-
 float CMapOutdoor::GetHeight(float fx, float fy)
 {
 	float fTerrainHeight = GetTerrainHeight(fx, fy);
@@ -787,133 +777,6 @@ float CMapOutdoor::GetHeight(float fx, float fy)
 	}
 
 	return fTerrainHeight;
-}
-
-float CMapOutdoor::GetCacheHeight(float fx, float fy)
-{
-	uint32_t nx=int32_t(fx);
-	uint32_t ny=int32_t(fy);
-
-	uint32_t dwKey=0;
-
-#ifdef __HEIGHT_CACHE_TRACE__
-	static uint32_t s_dwTotalCount=0;
-	static uint32_t s_dwHitCount=0;
-	static uint32_t s_dwErrorCount=0;
-
-	s_dwTotalCount++;
-#endif
-
-	std::vector<SHeightCache::SItem>* pkVct_kItem=nullptr;
-	if (m_kHeightCache.m_isUpdated && nx<16*30000 && ny<16*30000)
-	{
-		nx>>=4;
-		ny>>=4;
-		//int16_t aPos[2]={nx, ny};
-
-		dwKey=(ny<<16)|nx;//CalcCRC16Words(2, aPos);
-		pkVct_kItem=&m_kHeightCache.m_akVct_kItem[dwKey%SHeightCache::HASH_SIZE];
-		std::vector<SHeightCache::SItem>::iterator i;
-		for (i=pkVct_kItem->begin(); i!=pkVct_kItem->end(); ++i)
-		{
-			SHeightCache::SItem& rkItem=*i;
-			if (rkItem.m_dwKey==dwKey)
-			{
-#ifdef __HEIGHT_CACHE_TRACE__
-				s_dwHitCount++;
-				
-				if (s_dwTotalCount>1000)
-				{
-					uint32_t dwHitRate=s_dwHitCount*1000/s_dwTotalCount;
-					static uint32_t s_dwMaxHitRate=0;
-					if (s_dwMaxHitRate<dwHitRate)
-					{
-						s_dwMaxHitRate=dwHitRate;
-						printf("HitRate %f\n", s_dwMaxHitRate*0.1f);
-					}
-
-
-				}			
-#endif
-				return rkItem.m_fHeight;
-			}
-		}		
-	}
-	else
-	{
-#ifdef __HEIGHT_CACHE_TRACE__
-		s_dwErrorCount++;
-		//printf("NoCache (%f, %f)\n", fx/100.0f, fy/100.0f);
-#endif
-	}
-#ifdef __HEIGHT_CACHE_TRACE__	
-	if (s_dwTotalCount>=1000000)
-	{
-		printf("HitRate %f\n", s_dwHitCount*1000/s_dwTotalCount*0.1f);
-		printf("ErrRate %f\n", s_dwErrorCount*1000/s_dwTotalCount*0.1f);
-		s_dwHitCount=0;
-		s_dwTotalCount=0;
-		s_dwErrorCount=0;
-	}
-#endif
-	
-	float fTerrainHeight = GetTerrainHeight(fx, fy);
-#ifdef SPHERELIB_STRICT
-	if (MAPOUTDOOR_GET_HEIGHT_TRACE)
-		printf("Terrain %f\n", fTerrainHeight);
-#endif
-	CCullingManager & rkCullingMgr = CCullingManager::Instance();
-
-	float CHECK_HEIGHT = 25000.0f;
-	float fObjectHeight = -CHECK_HEIGHT;
-
-	if (MAPOUTDOOR_GET_HEIGHT_USE2D)
-	{
-		Vector3d aVector3d;
-		aVector3d.Set(fx, -fy, fTerrainHeight);
-		
-		FGetObjectHeight kGetObjHeight(fx, fy);
-		
-		RangeTester<FGetObjectHeight> kRangeTester_kGetObjHeight(&kGetObjHeight);
-		rkCullingMgr.PointTest2d(aVector3d, &kRangeTester_kGetObjHeight);
-
-		if (kGetObjHeight.m_bHeightFound)
-			fObjectHeight = kGetObjHeight.m_fReturnHeight;
-	}
-	else
-	{
-		Vector3d aVector3d;
-		aVector3d.Set(fx, -fy, fTerrainHeight);
-
-		Vector3d toTop;
-		toTop.Set(0,0,CHECK_HEIGHT);
-
-		FGetObjectHeight kGetObjHeight(fx, fy);
-		rkCullingMgr.ForInRay(aVector3d, toTop, &kGetObjHeight);
-
-		if (kGetObjHeight.m_bHeightFound)
-			fObjectHeight = kGetObjHeight.m_fReturnHeight;
-	}
-
-	float fHeight=fMAX(fObjectHeight, fTerrainHeight);
-
-	if (pkVct_kItem)
-	{
-		if (pkVct_kItem->size()>=200)
-		{
-#ifdef __HEIGHT_CACHE_TRACE__
-			printf("ClearCacheHeight[%d]\n", dwKey%SHeightCache::HASH_SIZE);
-#endif
-			pkVct_kItem->clear();
-		}
-		
-		SHeightCache::SItem kItem;
-		kItem.m_dwKey=dwKey;
-		kItem.m_fHeight=fHeight;
-		pkVct_kItem->emplace_back(kItem);
-	}
-	
-	return fHeight;
 }
 
 bool CMapOutdoor::GetNormal(int32_t ix, int32_t iy, D3DXVECTOR3 * pv3Normal)

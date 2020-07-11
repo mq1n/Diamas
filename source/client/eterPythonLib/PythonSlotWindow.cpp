@@ -15,7 +15,7 @@ class CSlotWindow::CSlotButton : public CButton
 		enum ESlotButtonType
 		{
 			SLOT_BUTTON_TYPE_PLUS,
-		SLOT_BUTTON_TYPE_COVER
+			SLOT_BUTTON_TYPE_COVER
 		};
 
 	public:
@@ -1534,7 +1534,7 @@ void CSlotWindow::SetSlotBackground(uint32_t dwIndex, const char* c_szFileName)
 		pSlot->pBackgroundInstance = nullptr;
 	}
 
-	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(c_szFileName);
 	pSlot->pBackgroundInstance = CGraphicImageInstance::New();
 	pSlot->pBackgroundInstance->SetImagePointer(pImage);
 }
@@ -1634,7 +1634,7 @@ void CSlotWindow::__CreateBaseImage(const char * c_szFileName, float fr, float f
 {
 	__DestroyBaseImage();
 
-	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(c_szFileName);
 	m_pBaseImageInstance = CGraphicImageInstance::New();
 	m_pBaseImageInstance->SetImagePointer(pImage);
 	m_pBaseImageInstance->SetDiffuseColor(fr, fg, fb, fa);
@@ -1644,7 +1644,7 @@ void CSlotWindow::__CreateBaseImageScale(const char * c_szFileName, float fr, fl
 {
 	__DestroyBaseImage();
 
-	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(c_szFileName);
 	m_pBaseImageInstance = CGraphicImageInstance::New();
 	m_pBaseImageInstance->SetImagePointer(pImage);
 	m_pBaseImageInstance->SetDiffuseColor(fr, fg, fb, fa);

@@ -110,9 +110,17 @@ bool PackInitialize(const std::string& folder)
 			continue;
 		}
 
-		const std::wstring archiveTarget = L"data/" + std::wstring(ArchiveName.begin(), ArchiveName.end());
+		const auto archiveTarget = L"data/"s + std::wstring(ArchiveName.begin(), ArchiveName.end());
 
-		if (FileSystemManager::Instance().AddArchive(archiveTarget, DEFAULT_ARCHIVE_KEY))
+		if (!std::filesystem::exists(archiveTarget))
+		{
+			TraceError("Archive: %ls does not exist!", archiveTarget.c_str());
+			continue;
+		}
+
+		const auto& key = FileSystemManager::Instance().GetArchiveKey(ArchiveName);
+
+		if (FileSystemManager::Instance().AddArchive(archiveTarget, key))
 			Tracenf("%ls succesfully loaded!", archiveTarget.c_str());
 		else
 			TraceError("%ls can not loaded!", archiveTarget.c_str());

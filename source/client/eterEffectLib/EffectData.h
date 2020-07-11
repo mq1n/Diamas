@@ -19,7 +19,7 @@ class CEffectData
 
 		void							Clear();
 		bool							LoadScript(const char * c_szFileName);
-		bool							LoadSoundScriptData(const char * c_szFileName);
+		bool							LoadSoundScriptData(const char * c_szFileName, bool silent_failure = false);
 
 		uint32_t							GetParticleCount();
 		CParticleSystemData *			GetParticlePointer(uint32_t dwPosition);

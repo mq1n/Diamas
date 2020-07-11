@@ -35,7 +35,7 @@ void CGraphicSubImage::SetImagePointer(CGraphicImage* pImage)
 
 bool CGraphicSubImage::SetImageFileName(const char* c_szFileName)
 {
-	CResource* pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(c_szFileName);
 
 	if (!pResource->IsType(CGraphicImage::Type()))
 		return false;

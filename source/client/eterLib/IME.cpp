@@ -126,7 +126,7 @@ IIMEEventSink* CIME::ms_pEvent;
 int CIME::ms_ulbegin;
 int CIME::ms_ulend;
 
-UINT CIME::ms_uOutputCodePage = 0;
+UINT CIME::ms_uOutputCodePage = CP_UTF8;
 UINT CIME::ms_uInputCodePage = 0;
 
 extern DWORD gs_codePage=0;
@@ -599,36 +599,29 @@ void CIME::PasteTextFromClipBoard()
 	if (!OpenClipboard(NULL))
 		return;
 
-	HANDLE handle = GetClipboardData(CF_TEXT);
+	HANDLE handle = GetClipboardData(CF_UNICODETEXT);
 	if (!handle) // @fixme008
 	{
 		CloseClipboard();
 		return;
 	}
-	char * buffer = (char*)GlobalLock(handle);
-	if (!buffer) // @fixme008
+
+	wchar_t* buffer = (wchar_t*)GlobalLock(handle);
+	if (buffer)
 	{
+		const auto len = std::wcslen(buffer);
+		if (0 != len)
+		{
+			InsertString(buffer, len);
+
+			if (ms_pEvent)
+				ms_pEvent->OnUpdate();
+		}
+
 		GlobalUnlock(handle);
-		CloseClipboard();
-		return;
 	}
-	std::string strClipboard = buffer;
-	GlobalUnlock(handle);
+
 	CloseClipboard();
-
-	if (strClipboard.empty())
-		return;
-
-	const char* begin = strClipboard.c_str();
-	const char* end = begin + strClipboard.length();
-	wchar_t m_wText[IMESTR_MAXLEN];
-	int wstrLen = MultiByteToWideChar(ms_uInputCodePage, 0, begin, end-begin, m_wText, IMESTR_MAXLEN);
-	if (wstrLen <= 0) // @fixme008
-		return;
-
-	InsertString(m_wText, wstrLen);
-	if(ms_pEvent)
-		ms_pEvent->OnUpdate();
 }
 
 void CIME::FinalizeString(bool bSend)

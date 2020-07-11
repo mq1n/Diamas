@@ -388,7 +388,7 @@ bool CGuildMarkDownloader::__LoginState_RecvMarkBlock()
 
 		if (CGuildMarkManager::Instance().GetMarkImageFilename(kPacket.imgIdx, imagePath))
 		{
-			CResource * pResource = CResourceManager::Instance().GetResourcePointer(imagePath.c_str());
+			CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(imagePath);
 			if (pResource->IsType(CGraphicImage::Type()))
 			{
 				CGraphicImage* pkGrpImg=static_cast<CGraphicImage*>(pResource);
@@ -525,8 +525,8 @@ bool CGuildMarkDownloader::__LoginState_RecvSymbolData()
 
 	uint16_t wDataSize = kPacketSymbolData.size - sizeof(kPacketSymbolData);
 
-	std::vector<uint8_t> pbyBuf(wDataSize);
-	if (!Recv(wDataSize, pbyBuf.data()))
+	std::unique_ptr<unsigned char[]> pbyBuf(new unsigned char[wDataSize]());
+	if (!Recv(wDataSize, pbyBuf.get()))
 		return false;
 
 	MyCreateDirectory(g_strGuildSymbolPathName.c_str());
@@ -536,11 +536,11 @@ bool CGuildMarkDownloader::__LoginState_RecvSymbolData()
 	msl::file_ptr fPtr(strFileName.c_str(), "wb");
 	if (!fPtr)
 		return false;
-	fwrite(pbyBuf.data(), wDataSize, 1, fPtr.get());
+	fwrite(pbyBuf.get(), wDataSize, 1, fPtr.get());
 
 	// Let's reload the file in the game
-	CResource * pResource = CResourceManager::Instance().GetResourcePointer(strFileName.c_str());
-	if (pResource->IsType(CGraphicImage::Type()))
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(strFileName);
+	if (pResource && pResource->IsType(CGraphicImage::Type()))
 	{
 		CGraphicImage* pkGrpImg = static_cast<CGraphicImage*>(pResource);
 		pkGrpImg->Reload();

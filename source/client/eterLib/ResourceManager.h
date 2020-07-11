@@ -1,5 +1,6 @@
 #pragma once
 #include "../eterBase/Singleton.h"
+#include "../eterBase/cast.h"
 #include "Resource.h"
 #include "FileLoaderThread.h"
 
@@ -7,8 +8,13 @@
 #include <map>
 #include <string>
 
-class CResourceManager : public CSingleton<CResourceManager>
+class CResourceManager : public CSingleton <CResourceManager>
 {
+	using TNewFunc				= std::function<CResource*(const FileSystem::CFileName&)>;
+	using NewFunc				= std::pair <std::string, TNewFunc>;
+	using TResourcePointerMap	= std::unordered_map <uint64_t, CResource*>;
+	using TResourceDeletingMap  = std::unordered_map<CResource*, uint64_t>;
+
 	public:
 		CResourceManager();
 		virtual ~CResourceManager();
@@ -21,15 +27,12 @@ class CResourceManager : public CSingleton<CResourceManager>
 		CResource* InsertResourcePointer(uint64_t nameHash, CResource* pResource);
 		CResource* FindResourcePointer(uint64_t nameHash);
 
-		// CResource* GetResourcePointer(const char* c_szFileName);
 		template <typename T>
 		T* GetResourcePointer(std::string stFileName);
 
-		// Ãß°¡
 		bool isResourcePointerData(uint64_t nameHash);
 
-		void RegisterResourceNewFunctionPointer(const char* c_szFileExt,
-		                                        CResource* (*pResNewFunc)(const FileSystem::CFileName&));
+		void RegisterResourceNewFunctionPointer(const char* c_szFileExt, TNewFunc pResNewFunc);
 
 		void DumpFileListToTextFile(const char* c_szFileName);
 		static bool IsFileExist(const char * c_szFileName);
@@ -38,18 +41,15 @@ class CResourceManager : public CSingleton<CResourceManager>
 		void ReserveDeletingResource(CResource * pResource);
 
 	protected:
-		typedef std::pair<std::string, CResource* (*)(const FileSystem::CFileName&)> NewFunc;
-		typedef std::unordered_map<uint64_t, CResource*> TResourcePointerMap;
-		typedef std::unordered_map<CResource*, uint64_t> TResourceDeletingMap;
-
 		void __DestroyDeletingResourceMap();
 		void __DestroyResourceMap();
 		void __DestroyCacheMap();
 
-		TResourcePointerMap m_pCacheMap;
-		TResourcePointerMap m_pResMap;
-		std::vector<NewFunc> m_newFuncs;
-		TResourceDeletingMap m_ResourceDeletingMap;
+	private:
+		TResourcePointerMap		m_pCacheMap;
+		TResourcePointerMap		m_pResMap;
+		std::vector <NewFunc>	m_newFuncs;
+		TResourceDeletingMap	m_ResourceDeletingMap;
 };
 
 template <typename T>
@@ -66,10 +66,11 @@ T* CResourceManager::GetResourcePointer(std::string stFileName)
 
 	auto pResource = FindResourcePointer(hash);
 	if (pResource)
-		return static_cast<T*>(pResource);
+		return msl::inherit_cast<T*>(pResource);
 
-	CResource* (*newFunc) (const FileSystem::CFileName&) = nullptr;
+	TNewFunc newFunc = nullptr;
 
+	stFileName = filename.GetPathA(); // Set lowered filename
 	const auto fileExt = stFileName.rfind('.');
 	if (fileExt != std::string::npos)
 	{
@@ -94,5 +95,5 @@ T* CResourceManager::GetResourcePointer(std::string stFileName)
 	}
 
 	pResource = InsertResourcePointer(hash, newFunc(filename));
-	return static_cast<T*>(pResource);
+	return msl::inherit_cast<T*>(pResource);
 }

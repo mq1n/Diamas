@@ -103,7 +103,7 @@ void CActorInstance::AttachWeapon(uint32_t dwParentPartIndex, uint32_t dwPartInd
 
 	const char * szBoneName;
 #if defined(ENABLE_WOLFMAN_CHARACTER) && defined(AUTODETECT_LYCAN_RODNPICK_BONE)
-	if ((GetRace()==8) && (pItemData->GetType()==ITEM_TYPE_ROD || pItemData->GetType()==ITEM_TYPE_PICK))
+	if (GetRace() == 8 && (pItemData->GetType() == ITEM_TYPE_ROD || pItemData->GetType() == ITEM_TYPE_PICK))
 		szBoneName = "equip_right";
 	else if (!GetAttachingBoneName(dwPartIndex, &szBoneName))
 		return;

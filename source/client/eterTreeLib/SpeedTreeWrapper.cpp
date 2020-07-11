@@ -963,7 +963,7 @@ void CSpeedTreeWrapper::PositionTree(void) const
 }
 bool CSpeedTreeWrapper::LoadTexture(const char * pFilename, CGraphicImageInstance & rImage)
 {
-	CResource * pResource = CResourceManager::Instance().GetResourcePointer(pFilename);
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(pFilename);
 	rImage.SetImagePointer(static_cast<CGraphicImage *>(pResource));
 
 	if (rImage.IsEmpty())
@@ -1121,6 +1121,8 @@ void CSpeedTreeWrapper::OnUpdateCollisionData(const CStaticCollisionDataVector *
 			CollisionData.fDimensions[1] = CollisionData.fDimensions[1];
 
 			break;
+		case CSpeedTreeRT::CO_BOX: break;
+		default:;
 
 		}
 		AddCollision(&CollisionData, &mat);

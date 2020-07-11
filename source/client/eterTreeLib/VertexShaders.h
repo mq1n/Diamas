@@ -34,7 +34,7 @@
 #include "SpeedTreeConfig.h"
 #include <map>
 #include <string>
-
+#include "../eterBase/Debug.h"
 
 ///////////////////////////////////////////////////////////////////////
 //  Branch & Frond Vertex Formats

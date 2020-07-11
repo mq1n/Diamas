@@ -1,6 +1,7 @@
 #include "../include/FileSystemManager.hpp"
 #include "../include/LogHelper.hpp"
 #include "../include/Constants.hpp"
+#include "../include/Keys.hpp"
 #include "../include/FileSystem.hpp"
 #include "../include/File.hpp"
 #include "../include/Utils.hpp"
@@ -136,7 +137,7 @@ namespace FileSystem
 			return false;
 		}
 
-		m_archives.push_back(std::move(pack));
+		m_archives.emplace_back(std::move(pack));
 		return true;
 	}
 
@@ -152,6 +153,22 @@ namespace FileSystem
 			}
 		}
 		return nullptr;
+	}
+
+	TArchiveKey FileSystemManager::GetArchiveKey(const CFileName& archivename)
+	{
+		std::lock_guard <std::recursive_mutex> __lock(m_fsMutex);
+
+		for (const auto& key : gs_vecFileAndKeys)
+		{
+			if (std::get<KEY_CONTAINER_FILENAME>(key).GetHash() == archivename.GetHash())
+			{
+				return std::get<KEY_CONTAINER_KEY>(key);
+			}
+		}
+
+		DEBUG_LOG(LL_ERR, "Archive: %s key does not exist!", archivename.GetPathA().c_str());
+		return DEFAULT_ARCHIVE_KEY;
 	}
 
 	bool FileSystemManager::EnumerateFiles(const CFileName& archivename, TEnumFiles pfnEnumFiles, LPVOID pvUserContext)
@@ -208,7 +225,7 @@ namespace FileSystem
 			}
 		}
 
-		if (fp.Create(path.GetPathW(), FILEMODE_READ, true))
+		if (fp.Create(path.GetPathW(), FILEMODE_READ, true, silent_failure))
 			return true;
 
 		if (!silent_failure)

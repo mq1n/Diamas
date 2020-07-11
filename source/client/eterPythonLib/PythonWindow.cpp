@@ -1092,7 +1092,7 @@ namespace UI
 		stFontName += ".fnt";
 		
 		CResourceManager& rkResMgr=CResourceManager::Instance();
-		CResource* pkRes = rkResMgr.GetResourcePointer(stFontName.c_str());
+		CResource* pkRes = rkResMgr.GetResourcePointer<CResource>(stFontName);
 		CGraphicText* pkResFont=static_cast<CGraphicText*>(pkRes);
 		m_TextInstance.SetTextPointer(pkResFont);
 	}
@@ -1225,7 +1225,7 @@ namespace UI
 			if (!CResourceManager::Instance().IsFileExist(strImageFileName.c_str()))
 				continue;
 
-			CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(strImageFileName.c_str());
+			CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(strImageFileName.c_str());
 
 			CGraphicImageInstance * pInstance = CGraphicImageInstance::New();
 			pInstance->SetImagePointer(pImage);
@@ -1313,7 +1313,7 @@ namespace UI
 
 		OnCreateInstance();
 
-		CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+		CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(c_szFileName);
 		if (!pResource)
 		{
 			TraceError("Resource: %s not found!", c_szFileName);
@@ -1605,7 +1605,7 @@ namespace UI
 	void CAniImageBox::AppendImage(const char * c_szFileName)
 #endif
 	{
-		CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+		CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(c_szFileName);
 		if (!pResource || !pResource->IsType(CGraphicImage::Type()))
 			return;
 
@@ -1627,7 +1627,7 @@ namespace UI
 
 	void CAniImageBox::AppendImageScale(const char * c_szFileName, float scale_x, float scale_y)
 	{
-		CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+		CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(c_szFileName);
 		if (!pResource || !pResource->IsType(CGraphicImage::Type()))
 			return;
 
@@ -1769,7 +1769,7 @@ namespace UI
 
 	bool CButton::SetUpVisual(const char * c_szFileName)
 	{
-		CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+		CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(c_szFileName);
 		if (!pResource || !pResource->IsType(CGraphicImage::Type()))
 			return false;
 
@@ -1786,7 +1786,7 @@ namespace UI
 	}
 	bool CButton::SetOverVisual(const char * c_szFileName)
 	{
-		CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+		CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(c_szFileName);
 		if (!pResource || !pResource->IsType(CGraphicImage::Type()))
 			return false;
 
@@ -1800,7 +1800,7 @@ namespace UI
 	}
 	bool CButton::SetDownVisual(const char * c_szFileName)
 	{
-		CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+		CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(c_szFileName);
 		if (!pResource || !pResource->IsType(CGraphicImage::Type()))
 			return false;
 
@@ -1814,7 +1814,7 @@ namespace UI
 	}
 	bool CButton::SetDisableVisual(const char * c_szFileName)
 	{
-		CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+		CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(c_szFileName);
 		if (!pResource || !pResource->IsType(CGraphicImage::Type()))
 			return false;
 
@@ -1827,35 +1827,35 @@ namespace UI
 		return true;
 	}
 
-	const char * CButton::GetUpVisualFileName()
+	std::string CButton::GetUpVisualFileName()
 	{
 		auto pImage = m_upVisual.GetGraphicImagePointer();
 		if (!pImage)
 		{
-			return "<nullptr_GetUpVisualFileName>";
+			return "<nullptr_GetUpVisualFileName>"s;
 		}
 		auto stResourceName = pImage->GetFileNameString();
-		return stResourceName.c_str();
+		return stResourceName;
 	}
-	const char * CButton::GetOverVisualFileName()
+	std::string CButton::GetOverVisualFileName()
 	{
 		auto pImage = m_overVisual.GetGraphicImagePointer();
 		if (!pImage)
 		{
-			return "<nullptr_GetOverVisualFileName>";
+			return "<nullptr_GetOverVisualFileName>"s;
 		}
 		auto stResourceName = pImage->GetFileNameString();
-		return stResourceName.c_str();
+		return stResourceName;
 	}
-	const char * CButton::GetDownVisualFileName()
+	std::string CButton::GetDownVisualFileName()
 	{
 		auto pImage = m_downVisual.GetGraphicImagePointer();
 		if (!pImage)
 		{
-			return "<nullptr_GetDownVisualFileName>";
+			return "<nullptr_GetDownVisualFileName>"s;
 		}
 		auto stResourceName = pImage->GetFileNameString();
-		return stResourceName.c_str();
+		return stResourceName;
 	}
 
 	void CButton::Flash()

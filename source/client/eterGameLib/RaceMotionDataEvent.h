@@ -126,7 +126,7 @@ namespace NMotionEvent
 		{}
 		virtual ~SMotionEventDataEffectToTarget() {}
 
-		void Save(FILE * File, int32_t iTabs)
+		void Save(FILE * File, int32_t iTabs) override
 		{
 			PrintfTabs(File, iTabs, "\n");
 			PrintfTabs(File, iTabs, "EffectFileName       \"%s\"\n", strEffectFileName.c_str());
@@ -167,7 +167,7 @@ namespace NMotionEvent
 		{}
 		virtual ~SMotionEventDataFly() {}
 
-		void Save(FILE * File, int32_t iTabs)
+		void Save(FILE * File, int32_t iTabs) override
 		{
 			PrintfTabs(File, iTabs, "\n");
 			PrintfTabs(File, iTabs, "AttachingEnable      %d\n", isAttaching);
@@ -175,7 +175,7 @@ namespace NMotionEvent
 			PrintfTabs(File, iTabs, "FlyFileName       \"%s\"\n", strFlyFileName.c_str());
 			PrintfTabs(File, iTabs, "FlyPosition       %f %f %f\n", v3FlyPosition.x, v3FlyPosition.y, v3FlyPosition.z);
 		}
-		bool Load(CTextFileLoader & rTextFileLoader)
+		bool Load(CTextFileLoader & rTextFileLoader) override
 		{
 			if (!rTextFileLoader.GetTokenBoolean("attachingenable", &isAttaching))
 				return false;
@@ -199,15 +199,15 @@ namespace NMotionEvent
 	// Attacking
 	typedef struct SMotionEventDataAttack : public SMotionEventData
 	{
-		NRaceData::TCollisionData CollisionData;
-		NRaceData::TAttackData AttackData;
+		NRaceData::TCollisionData CollisionData{};
+		NRaceData::TAttackData AttackData{};
 		BOOL isEnableHitProcess;
 
 		SMotionEventDataAttack(): isEnableHitProcess(0)
 		{}
 		virtual ~SMotionEventDataAttack() {}
 
-		void Save(FILE * File, int32_t iTabs)
+		void Save(FILE * File, int32_t iTabs) override
 		{
 			PrintfTabs(File, iTabs, "DuringTime           %f\n", fDurationTime);
 			PrintfTabs(File, iTabs, "EnableHitProcess     %d\n", isEnableHitProcess);
@@ -216,7 +216,7 @@ namespace NMotionEvent
 			NRaceData::SaveAttackData(File, iTabs, AttackData);
 			NRaceData::SaveCollisionData(File, iTabs, CollisionData);
 		}
-		bool Load(CTextFileLoader & rTextFileLoader)
+		bool Load(CTextFileLoader & rTextFileLoader) override
 		{
 			if (!rTextFileLoader.GetTokenFloat("duringtime", &fDurationTime))
 				return false;
@@ -242,12 +242,12 @@ namespace NMotionEvent
 		SMotionEventDataSound() {}
 		virtual ~SMotionEventDataSound() {}
 
-		void Save(FILE * File, int32_t iTabs)
+		void Save(FILE * File, int32_t iTabs) override
 		{
 			PrintfTabs(File, iTabs, "\n");
 			PrintfTabs(File, iTabs, "SoundFileName        \"%s\"\n", strSoundFileName.c_str());
 		}
-		bool Load(CTextFileLoader & rTextFileLoader)
+		bool Load(CTextFileLoader & rTextFileLoader) override
 		{
 			if (!rTextFileLoader.GetTokenString("soundfilename", &strSoundFileName))
 				return false;
@@ -262,7 +262,7 @@ namespace NMotionEvent
 		SMotionEventDataCharacterShow() {}
 		virtual ~SMotionEventDataCharacterShow() {}
 
-		void Save(FILE * File, int32_t iTabs) {}
+		void Save(FILE * File, int32_t iTabs) override {}
 		void Load() {}
 	} TMotionEventDataCharacterShow;
 
@@ -272,8 +272,8 @@ namespace NMotionEvent
 		SMotionEventDataCharacterHide() {}
 		virtual ~SMotionEventDataCharacterHide() {}
 
-		void Save(FILE * File, int32_t iTabs) {}
-		void Load() {}
+		void Save(FILE * File, int32_t iTabs) override {}
+		void Load() const {}
 	} TMotionEventDataCharacterHide;
 
 	// Warp
@@ -282,7 +282,7 @@ namespace NMotionEvent
 		SMotionEventDataWarp() {}
 		virtual ~SMotionEventDataWarp() {}
 
-		void Save(FILE * File, int32_t iTabs) {}
+		void Save(FILE * File, int32_t iTabs) override {}
 		void Load() {}
 	} TMotionWarpEventData;
 
@@ -292,7 +292,7 @@ namespace NMotionEvent
 	{
 		int32_t iAniSpeed;
 
-		SMotionEventDataUnk11() {}
+		SMotionEventDataUnk11() : iAniSpeed(0) {}
 		virtual ~SMotionEventDataUnk11() {}
 
 		void Save(FILE * File, int32_t iTabs)
@@ -314,7 +314,7 @@ namespace NMotionEvent
 	{
 		int32_t iAniSpeed;
 
-		SMotionEventDataUnk12() {}
+		SMotionEventDataUnk12() : iAniSpeed(0) {}
 		virtual ~SMotionEventDataUnk12() {}
 
 		void Save(FILE * File, int32_t iTabs) {}

@@ -6,6 +6,7 @@
 
 #include "../eterLib/ResourceManager.h"
 #include "../eterGrnLib/Util.h"
+#include "../eterXClient/PythonSystem.h"
 
 uint32_t CActorInstance::GetVirtualID()
 {
@@ -132,7 +133,7 @@ void CActorInstance::SetHair(uint32_t eHair, float fSpecular)
 	{
 		if (!pkHair->m_stModelFileName.empty())
 		{
-			CGraphicThing * pkHairThing = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(pkHair->m_stModelFileName.c_str());
+			CGraphicThing* pkHairThing = CResourceManager::Instance().GetResourcePointer<CGraphicThing>(pkHair->m_stModelFileName);
 			RegisterModelThing(CRaceData::PART_HAIR, pkHairThing);
 			SetModelInstance(CRaceData::PART_HAIR, CRaceData::PART_HAIR, 0, CRaceData::PART_MAIN);
 		}
@@ -143,7 +144,7 @@ void CActorInstance::SetHair(uint32_t eHair, float fSpecular)
 		{
 			const CRaceData::SSkin& c_rkSkinItem = *i;
 
-			CResource * pkRes = CResourceManager::Instance().GetResourcePointer(c_rkSkinItem.m_stDstFileName.c_str());
+			CResource* pkRes = CResourceManager::Instance().GetResourcePointer<CResource>(c_rkSkinItem.m_stDstFileName);
 
 			if (pkRes)
 			{
@@ -168,6 +169,11 @@ void CActorInstance::SetHair(uint32_t eHair, float fSpecular)
 
 void CActorInstance::SetShape(uint32_t eShape, float fSpecular)
 {
+//	if ((IsNPC() || IsPoly() || IsEnemy()) && CPythonSystem::Instance().IsShowSpecular())
+//	{
+//		fSpecular = 1.0;
+//	}
+
 	m_eShape = eShape;
 
 	CRaceData * pRaceData;
@@ -186,7 +192,7 @@ void CActorInstance::SetShape(uint32_t eShape, float fSpecular)
 		}
 		else
 		{
-			CGraphicThing* pModelThing = (CGraphicThing *)rkResMgr.GetResourcePointer(pkShape->m_stModelFileName.c_str());
+			CGraphicThing* pModelThing = rkResMgr.GetResourcePointer<CGraphicThing>(pkShape->m_stModelFileName);
 			RegisterModelThing(0, pModelThing);
 		}		
 
@@ -201,7 +207,7 @@ void CActorInstance::SetShape(uint32_t eShape, float fSpecular)
 				if (!rkResMgr.IsFileExist(stLODModelFileName.c_str()))
 					break;
 				
-				CGraphicThing* pLODModelThing = (CGraphicThing *)rkResMgr.GetResourcePointer(stLODModelFileName.c_str());
+				CGraphicThing* pLODModelThing = rkResMgr.GetResourcePointer<CGraphicThing>(stLODModelFileName);
 				if (!pLODModelThing)
 					break;
 
@@ -217,7 +223,7 @@ void CActorInstance::SetShape(uint32_t eShape, float fSpecular)
 		{
 			const CRaceData::SSkin& c_rkSkinItem = *i;
 
-			CResource * pkRes = CResourceManager::Instance().GetResourcePointer(c_rkSkinItem.m_stDstFileName.c_str());
+			CResource* pkRes = CResourceManager::Instance().GetResourcePointer<CResource>(c_rkSkinItem.m_stDstFileName);
 
 			if (pkRes)
 			{
@@ -307,11 +313,11 @@ void CActorInstance::ChangeMaterial(const char * c_szFileName)
 
 	std::string dstFileName = c_szFileName;
 
-	CResource * pkRes = CResourceManager::Instance().GetResourcePointer(dstFileName.c_str());
+	CGraphicImage* pkRes = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(dstFileName);
 	if (!pkRes)
 		return;
 
- 	SetMaterialImagePointer(c_rkSkinItem.m_ePart, c_rkSkinItem.m_stSrcFileName.c_str(), static_cast<CGraphicImage*>(pkRes));
+	SetMaterialImagePointer(c_rkSkinItem.m_ePart, c_rkSkinItem.m_stSrcFileName.c_str(), pkRes);
 }
 /*
 void CActorInstance::SetPart(uint32_t dwPartIndex, uint32_t dwItemID)

@@ -80,7 +80,7 @@ void CResourceManager::Destroy()
 	__DestroyResourceMap();
 }
 
-void CResourceManager::RegisterResourceNewFunctionPointer(const char* c_szFileExt, CResource* (*pNewFunc)(const FileSystem::CFileName&))
+void CResourceManager::RegisterResourceNewFunctionPointer(const char* c_szFileExt, TNewFunc pNewFunc)
 {
 	m_newFuncs.push_back(std::make_pair(c_szFileExt, pNewFunc));
 }

@@ -42,7 +42,7 @@ PyObject* grpImageGenerate(PyObject * poSelf, PyObject* poArgs)
 	if (!*szFileName)
 		return Py_BuildValue("i", 0);
 
-	CResource * pResource = CResourceManager::Instance().GetResourcePointer(szFileName);
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(szFileName);
 
 	if (!pResource->IsType(CGraphicImage::Type()))
 		return Py_BuildException("Resource is not an image (filename: %s)", szFileName);
@@ -66,7 +66,7 @@ PyObject* grpImageGenerateExpanded(PyObject* poSelf, PyObject* poArgs)
 	if (strlen(szFileName) <= 0)
 		return Py_BuildValue("i", 0);
 
-	CResource* pResource = CResourceManager::Instance().GetResourcePointer(szFileName);
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(szFileName);
 
 	if (!pResource->IsType(CGraphicImage::Type()))
 		return Py_BuildException("Resource is not an image (filename: %s)", szFileName);
@@ -127,7 +127,7 @@ PyObject* grpImageSetFileName(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 1, &szFileName))
 		return Py_BadArgument();
 
-	CResource * pResource = CResourceManager::Instance().GetResourcePointer(szFileName);
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(szFileName);
 
 	if (!pResource->IsType(CGraphicImage::Type()))
 		return Py_BuildException("Resource is not an image (filename: %s)", szFileName);

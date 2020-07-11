@@ -70,7 +70,9 @@ class CGraphicTextInstance
 
 		int32_t PixelPositionToCharacterPosition(int32_t iPixelPosition);
 		int32_t GetHorizontalAlign();
-		
+
+		D3DXVECTOR3& GetPosition();
+
 	protected:
 		void __Initialize();
 		int32_t  __DrawCharacter(CGraphicFontTexture * pFontTexture, wchar_t text, uint32_t dwColor);

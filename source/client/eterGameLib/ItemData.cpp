@@ -144,24 +144,23 @@ void CItemData::__LoadFiles()
 {
 	// Model File Name
 	if (!m_strModelFileName.empty())
-		m_pModelThing = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(m_strModelFileName.c_str());
+		m_pModelThing = CResourceManager::Instance().GetResourcePointer<CGraphicThing> (m_strModelFileName);
 
 	if (!m_strSubModelFileName.empty())
-		m_pSubModelThing = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(m_strSubModelFileName.c_str());
+		m_pSubModelThing = CResourceManager::Instance().GetResourcePointer<CGraphicThing> (m_strSubModelFileName);
 
 	if (!m_strDropModelFileName.empty())
-		m_pDropModelThing = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(m_strDropModelFileName.c_str());
+		m_pDropModelThing = CResourceManager::Instance().GetResourcePointer<CGraphicThing> (m_strDropModelFileName);
 
 
 	if (!m_strLODModelFileNameVector.empty())
 	{
 		m_pLODModelThingVector.clear();
-		m_pLODModelThingVector.resize(m_strLODModelFileNameVector.size());
+		m_pLODModelThingVector.resize (m_strLODModelFileNameVector.size());
 
-		for (uint32_t i = 0; i < m_strLODModelFileNameVector.size(); ++i)
+		for (auto i = 0u; i < m_strLODModelFileNameVector.size(); ++i)
 		{
-			const std::string & c_rstrLODModelFileName = m_strLODModelFileNameVector[i];
-			m_pLODModelThingVector[i] = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(c_rstrLODModelFileName.c_str());
+			m_pLODModelThingVector[i] = CResourceManager::Instance().GetResourcePointer<CGraphicThing> (m_strLODModelFileNameVector[i]);
 		}
 	}
 }
@@ -176,11 +175,11 @@ void CItemData::__SetIconImage(const char * c_szFileName, bool renew)
 #ifdef ENABLE_LOAD_ALTER_ITEMICON
 		static const char* c_szAlterIconImage = "icon/item/27995.tga";
 		if (CResourceManager::Instance().IsFileExist(c_szAlterIconImage))
-			m_pIconImage = (CGraphicSubImage *)CResourceManager::Instance().GetResourcePointer(c_szAlterIconImage);
+			m_pIconImage = CResourceManager::Instance().GetResourcePointer<CGraphicSubImage>(c_szAlterIconImage);
 #endif
 	}
 	else if (m_pIconImage == nullptr || renew)
-		m_pIconImage = (CGraphicSubImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
+		m_pIconImage = CResourceManager::Instance().GetResourcePointer<CGraphicSubImage>(c_szFileName);
 }
 
 void CItemData::SetItemTableData(TItemTable * pItemTable)

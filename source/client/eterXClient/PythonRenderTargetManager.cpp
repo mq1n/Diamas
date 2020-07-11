@@ -225,7 +225,7 @@ bool CPythonRenderTargetManager::CPythonRenderTarget::BuildBackround(const char*
 	float fHeight = (float)CPythonApplication::Instance().GetHeight();
 
 	m_pImageBG = new CGraphicExpandedImageInstance;
-	m_pImageBG->SetImagePointer(static_cast<CGraphicImage*>(CResourceManager::Instance().GetResourcePointer(background_image)));
+	m_pImageBG->SetImagePointer(CResourceManager::Instance().GetResourcePointer<CGraphicImage>(background_image));
 	m_pImageBG->SetScale(fWidth / (float) m_pImageBG->GetWidth(), fHeight / (float) m_pImageBG->GetHeight());
 	return true;
 }

@@ -122,7 +122,6 @@ bool CMapOutdoor::Update(float fX, float fY, float fZ)
 #ifdef __PERFORMANCE_CHECKER__	
 	uint32_t t8=ELTimer_GetMSec();
 #endif
-	__HeightCache_Update();
 
 #ifdef __PERFORMANCE_CHECKER__
 	{
@@ -694,7 +693,7 @@ void CMapOutdoor::__CollectCollisionShadowReceiver(D3DXVECTOR3& v3Target, D3DXVE
 
 bool CMapOutdoor::__IsInShadowReceiverList(CGraphicObjectInstance* pkObjInstTest)
 {
-	if (m_ShadowReceiverVector.end() == std::find(m_ShadowReceiverVector.begin(), m_ShadowReceiverVector.end(), pkObjInstTest))
+	if (std::find(m_ShadowReceiverVector.begin(), m_ShadowReceiverVector.end(), pkObjInstTest) == m_ShadowReceiverVector.end())
 		return false;
 
 	return true;
@@ -702,7 +701,7 @@ bool CMapOutdoor::__IsInShadowReceiverList(CGraphicObjectInstance* pkObjInstTest
 
 bool CMapOutdoor::__IsInPCBlockerList(CGraphicObjectInstance* pkObjInstTest)
 {
-	if (m_PCBlockerVector.end() == std::find(m_PCBlockerVector.begin(), m_PCBlockerVector.end(), pkObjInstTest))
+	if (std::find(m_PCBlockerVector.begin(), m_PCBlockerVector.end(), pkObjInstTest) == m_PCBlockerVector.end())
 		return false;
 
 	return true;
@@ -760,6 +759,9 @@ void CMapOutdoor::FPushTerrainToDeleteVector::operator () (CTerrain * pTerrain)
 		if (wCoordX > wReferenceCoordX + LOAD_SIZE_WIDTH)
 			m_ReturnTerrainVector.emplace_back(pTerrain);
 		break;
+	case DELETE_TOP: break;
+	case DELETE_BOTTOM: break;
+	default: break;
 	}
 
 	aIterator = std::find(m_ReturnTerrainVector.begin(), m_ReturnTerrainVector.end(), pTerrain);
@@ -776,6 +778,9 @@ void CMapOutdoor::FPushTerrainToDeleteVector::operator () (CTerrain * pTerrain)
 		if (wCoordY > wReferenceCoordY + LOAD_SIZE_WIDTH)
 			m_ReturnTerrainVector.emplace_back(pTerrain);
 		break;
+	case DELETE_LEFT: break;
+	case DELETE_RIGHT: break;
+	default: break;
 	}
 }
 

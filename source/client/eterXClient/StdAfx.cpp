@@ -18,17 +18,16 @@
 #pragma comment( lib, "dmoguids.lib" )
 #pragma comment( lib, "wtsapi32.lib" )
 #pragma comment( lib, "Netapi32.lib" )
+#pragma comment( lib, "DevIL.lib" )
 
 #ifdef _DEBUG
 	#pragma comment( lib, "cryptopp-static_debug.lib" )
 	#pragma comment( lib, "python27_debug.lib" )
-	#pragma comment( lib, "DevIL_debug.lib" )
 	#pragma comment( lib, "fmt_debug.lib" )
 	#pragma comment( lib, "lzo2_debug.lib" )
 #else
 	#pragma comment( lib, "cryptopp-static.lib" )
 	#pragma comment( lib, "python27.lib" )
-	#pragma comment( lib, "DevIL.lib" )
 	#pragma comment( lib, "fmt.lib" )
 	#pragma comment( lib, "lzo2.lib" )
 #endif

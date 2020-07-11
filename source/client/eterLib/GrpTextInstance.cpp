@@ -89,7 +89,7 @@ void CGraphicTextInstance::Update()
 	if (m_roText->IsEmpty())
 		return;
 
-	CGraphicFontTexture* pFontTexture = m_roText->GetFontTexturePointer();
+	auto pFontTexture = m_roText->GetTexturePointer();
 	if (!pFontTexture)
 		return;
 
@@ -189,11 +189,11 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 	if (!m_isUpdate)
 		return;	
 
-	CGraphicText* pkText=m_roText.GetPointer();
+	auto pkText=m_roText.GetPointer();
 	if (!pkText)
 		return;
 
-	CGraphicFontTexture* pFontTexture = pkText->GetFontTexturePointer();
+	auto pFontTexture = pkText->GetTexturePointer();
 	if (!pFontTexture)
 		return;
 
@@ -380,7 +380,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 		fCurX=fStanX;
 		fCurY=fStanY;
 
-		for (int32_t i = 0; i < m_pCharInfoVector.size(); ++i)
+		for (uint32_t i = 0; i < m_pCharInfoVector.size(); ++i)
 		{
 			pCurCharInfo = m_pCharInfoVector[i];
 
@@ -812,6 +812,11 @@ void CGraphicTextInstance::Destroy()
 uint16_t CGraphicTextInstance::GetLineHeight()
 {
 	return m_textHeight;
+}
+
+D3DXVECTOR3& CGraphicTextInstance::GetPosition()
+{
+	return m_v3Position;
 }
 
 CGraphicTextInstance::CGraphicTextInstance()

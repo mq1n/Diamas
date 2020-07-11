@@ -203,7 +203,7 @@ bool CDungeonBlock::Load(const char * c_szFileName)
 {
 	Destroy();
 
-	m_pThing = (CGraphicThing *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	m_pThing = CResourceManager::Instance().GetResourcePointer<CGraphicThing>(c_szFileName);
 
 	m_pThing->AddReference();
 	if (m_pThing->GetModelCount() <= 0)

@@ -5,8 +5,6 @@
 
 CDynamicPool<CAttributeInstance> CAttributeInstance::ms_kPool;
 
-const float c_fStepSize = 50.0f;
-
 bool CAttributeInstance::Picking(const D3DXVECTOR3 & v, const D3DXVECTOR3 & dir, float & out_x, float & out_y)
 {
 	if (IsEmpty())
@@ -17,38 +15,57 @@ bool CAttributeInstance::Picking(const D3DXVECTOR3 & v, const D3DXVECTOR3 & dir,
 	float nx = 0;
 	float ny = 0;
 
-	for (auto & i : m_v3HeightDataVector)
+	for (auto& i : m_v3HeightDataVector)
+	{
 		for (uint32_t j = 0; j < i.size(); j += 3)
 		{
-			const D3DXVECTOR3 & cv0 = i[j];
-			const D3DXVECTOR3 & cv2 = i[j + 1];
-			const D3DXVECTOR3 & cv1 = i[j + 2];
+			const D3DXVECTOR3& cv0 = i[j];
+			const D3DXVECTOR3& cv2 = i[j + 1];
+			const D3DXVECTOR3& cv1 = i[j + 2];
+
+			auto vecTemp1(cv1 - cv0);
+			auto vecTemp2(cv2 - cv0);
+			auto vecTemp3(v - cv0);
+			auto vecTemp4(cv1 - cv0);
+			auto vecTemp5(cv2 - cv1);
 
 			D3DXVECTOR3 n;
-			D3DXVec3Cross(&n, &(cv1 - cv0), &(cv2 - cv0));
+			D3DXVec3Cross(&n, &vecTemp1, &vecTemp2);
 			D3DXVECTOR3 x;
 			float t;
-			t = -D3DXVec3Dot(&(v - cv0), &n) / D3DXVec3Dot(&dir, &n);
+			t = -D3DXVec3Dot(&vecTemp3, &n) / D3DXVec3Dot(&dir, &n);
 
 			x = v + t * dir;
 
+			auto vecTemp6(x - cv0);
+			auto vecTemp7(x - cv1);
+
 			D3DXVECTOR3 temp;
-			D3DXVec3Cross(&temp, &(cv1 - cv0), &(x - cv0));
+			D3DXVec3Cross(&temp, &vecTemp4, &vecTemp6);
 			if (D3DXVec3Dot(&temp, &n) < 0)
+			{
 				continue;
-			D3DXVec3Cross(&temp, &(cv2 - cv1), &(x - cv1));
+			}
+			D3DXVec3Cross(&temp, &vecTemp5, &vecTemp7);
 			if (D3DXVec3Dot(&temp, &n) < 0)
+			{
 				continue;
-			D3DXVec3Cross(&temp, &(cv0 - cv2), &(x - cv2));
+			}
+
+			auto v1 = (cv0 - cv2);
+			auto v2 = (x - cv2);
+			D3DXVec3Cross(&temp, &v1, &v2);
 			if (D3DXVec3Dot(&temp, &n) < 0)
+			{
 				continue;
+			}
 
 			if (bPicked)
 			{
-				if ((v.x-x.x)*(v.x-x.x)+(v.y-x.y)*(v.y-x.y)<(v.x-nx)*(v.x-nx)+(v.y-ny)*(v.y-ny))
+				if ((v.x - x.x) * (v.x - x.x) + (v.y - x.y) * (v.y - x.y) < (v.x - nx) * (v.x - nx) + (v.y - ny) * (v.y - ny))
 				{
-					nx=x.x;
-					ny=x.y;
+					nx = x.x;
+					ny = x.y;
 				}
 			}
 			else
@@ -57,7 +74,8 @@ bool CAttributeInstance::Picking(const D3DXVECTOR3 & v, const D3DXVECTOR3 & dir,
 				ny = x.y;
 			}
 			bPicked = true;
-	}	
+		}
+	}
 	if (bPicked)
 	{
 		out_x = nx;

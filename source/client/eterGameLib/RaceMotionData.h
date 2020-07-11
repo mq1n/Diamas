@@ -283,7 +283,7 @@ class CRaceMotionData
 		bool			SaveMotionData(const char * c_szFileName);
 #endif
 		bool			LoadMotionData(const char * c_szFileName);
-		bool			LoadSoundScriptData(const char * c_szFileName);
+		bool			LoadSoundScriptData(const char * c_szFileName, bool silent_failure = false);
 
 	protected:
 		void			SetType(uint32_t eType);

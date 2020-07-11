@@ -2023,7 +2023,7 @@ PyObject * playerRegisterEmotionIcon(PyObject* poSelf, PyObject* poArgs)
 	if (!PyTuple_GetString(poArgs, 1, &szFileName))
 		return Py_BuildException();
 
-	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(szFileName);
+	CGraphicImage* pImage = CResourceManager::Instance().GetResourcePointer<CGraphicImage>(szFileName);
 	m_kMap_iEmotionIndex_pkIconImage.emplace(iIndex, pImage);
 
 	return Py_BuildNone();

@@ -19,7 +19,7 @@ class CGraphicText : public CResource
 		virtual bool			CreateDeviceObjects();
 		virtual void			DestroyDeviceObjects();
 
-		CGraphicFontTexture *	GetFontTexturePointer();
+		CGraphicFontTexture * GetTexturePointer();
 
 	protected:
 		bool		OnLoad(int32_t iSize, const void * c_pvBuf);

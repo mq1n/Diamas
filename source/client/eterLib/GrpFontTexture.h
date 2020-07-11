@@ -30,7 +30,7 @@ public:
 	virtual ~CGraphicFontTexture();
 
 	void Destroy();
-	bool Create(const char* c_szFontName, int32_t fontSize, bool bItalic);
+	bool Create(const std::string& fontName, int32_t fontSize, bool bItalic);
 
 	bool CreateDeviceObjects();
 	void DestroyDeviceObjects();
@@ -71,7 +71,7 @@ protected:
 	int32_t m_step;		
 	bool m_isDirty;
 
-	TCHAR	m_fontName[LF_FACESIZE];
+	std::string m_fontName;
 	LONG	m_fontSize;
 	bool	m_bItalic;
 };

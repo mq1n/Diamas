@@ -177,7 +177,7 @@ void CGraphicMarkInstance::Load()
 	if (GetImageFileName().empty())
 		return;
 
-	CResource * pResource = CResourceManager::Instance().GetResourcePointer(GetImageFileName().c_str());
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(GetImageFileName().c_str());
 
 	if (!pResource)
 	{

@@ -179,12 +179,12 @@ void CEffectMeshInstance::OnRender()
 
 void CEffectMeshInstance::OnSetDataPointer(CEffectElementBase * pElement)
 {
-	CEffectMeshScript * pMesh = (CEffectMeshScript *)pElement;
+	CEffectMeshScript* pMesh = static_cast<CEffectMeshScript*>(pElement);
 	m_pMeshScript = pMesh;
 
 	const char * c_szMeshFileName = pMesh->GetMeshFileName();
 
-	m_pEffectMesh = (CEffectMesh *) CResourceManager::Instance().GetResourcePointer(c_szMeshFileName);
+	m_pEffectMesh = CResourceManager::Instance().GetResourcePointer<CEffectMesh>(c_szMeshFileName);
 
 	if (!m_pEffectMesh)
 		return;
@@ -243,7 +243,7 @@ void CEffectMeshInstance_DeleteImageInstance(CGraphicImageInstance * pkInstance)
 
 void CEffectMeshInstance_DeleteTextureInstance(CEffectMeshInstance::TTextureInstance & rkInstance)
 {
-	std::vector<CGraphicImageInstance*> & rVector = rkInstance.TextureInstanceVector;
+	std::vector<CGraphicImageInstance*>& rVector = rkInstance.TextureInstanceVector;
 	for_each(rVector.begin(), rVector.end(), CEffectMeshInstance_DeleteImageInstance);
 	rVector.clear();
 }

@@ -27,7 +27,7 @@ namespace FileSystem
 
 		auto filename_conv = GetAbsolutePath(filename.GetPathW());
 
-		DEBUG_LOG(LL_SYS, "File: %ls(%ls) Mode: %u", filename.GetPathW().c_str(), filename_conv.c_str(), filemode);
+		DEBUG_LOG(LL_TRACE, "File: %ls(%ls) Mode: %u", filename.GetPathW().c_str(), filename_conv.c_str(), filemode);
 
 		uint32_t dwMode = 0, dwShareMode = FILE_SHARE_READ;
 		if (filemode == FILEMODE_WRITE)
@@ -65,7 +65,7 @@ namespace FileSystem
 
 		Close();
 
-		DEBUG_LOG(LL_SYS, "File: %ls", filename.GetPathW().c_str());
+		DEBUG_LOG(LL_TRACE, "File: %ls", filename.GetPathW().c_str());
 
 		m_fileHandle = CreateFileW(filename.GetPathW().c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (m_fileHandle && m_fileHandle != INVALID_HANDLE_VALUE)
@@ -132,7 +132,7 @@ namespace FileSystem
 
 		Close();
 
-		DEBUG_LOG(LL_SYS, "%ls", filename.GetPathW().c_str());
+		DEBUG_LOG(LL_TRACE, "%ls", filename.GetPathW().c_str());
 
 		m_fileHandle = CreateFileW(GetAbsolutePath(filename.GetPathW()).c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (!m_fileHandle || m_fileHandle == INVALID_HANDLE_VALUE)
@@ -169,7 +169,7 @@ namespace FileSystem
 		m_rawData = m_mappedData + (offset % sys.dwAllocationGranularity);
 		m_rawSize = std::min<uint64_t>(size, s.QuadPart);
 
-		DEBUG_LOG(LL_SYS, "%ls, %llu, %u/%u", filename.GetPathW().c_str(), offset, size, (uint32_t)m_rawSize);
+		DEBUG_LOG(LL_TRACE, "%ls, %llu, %u/%u", filename.GetPathW().c_str(), offset, size, (uint32_t)m_rawSize);
 
 		m_currPos = 0;
 	
@@ -189,7 +189,7 @@ namespace FileSystem
 
 		Close();
 
-		DEBUG_LOG(LL_SYS, "%ls, %p, %u, %s", filename.GetPathW().c_str(), memory, length, copy ? "copy" : "assign");
+		DEBUG_LOG(LL_TRACE, "%ls, %p, %u, %s", filename.GetPathW().c_str(), memory, length, copy ? "copy" : "assign");
 
 		if (copy)
 		{
@@ -260,7 +260,7 @@ namespace FileSystem
 	{
 		std::lock_guard <std::recursive_mutex> __lock(m_fileMutex);
 
-		DEBUG_LOG(LL_SYS, "%ls, %p, %u", m_fileName.c_str(), buffer, size);
+		DEBUG_LOG(LL_TRACE, "%ls, %p, %u", m_fileName.c_str(), buffer, size);
 
 		if (!IsWriteable())
 			return 0;
@@ -279,7 +279,7 @@ namespace FileSystem
 	{
 		std::lock_guard <std::recursive_mutex> __lock(m_fileMutex);		
 
-		DEBUG_LOG(LL_SYS, "%ls, %u, %d", m_fileName.c_str(), offset, iSeekType);
+		DEBUG_LOG(LL_TRACE, "%ls, %u, %d", m_fileName.c_str(), offset, iSeekType);
 
 		if (!IsValid())
 			return 0;
@@ -309,8 +309,7 @@ namespace FileSystem
 	{
 		std::lock_guard <std::recursive_mutex> __lock(m_fileMutex);		
 
-//		DEBUG_LOG(LL_TRACE, "%ls, %lld, %s", m_fileName.c_str(), offset, relative ? "relative" : "absolute");
-		DEBUG_LOG(LL_SYS, "%ls, %lld, %s", m_fileName.c_str(), offset, relative ? "relative" : "absolute");
+		DEBUG_LOG(LL_TRACE, "%ls, %lld, %s", m_fileName.c_str(), offset, relative ? "relative" : "absolute");
 
 		if (!IsValid())
 			return;

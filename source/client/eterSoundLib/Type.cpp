@@ -14,12 +14,12 @@ void NSound::SetResultString(const char * c_pszStr)
 	strResult.assign(c_pszStr);
 }
 
-bool NSound::LoadSoundInformationPiece(const char * c_szFileName, NSound::TSoundDataVector & rSoundDataVector, const char * c_szPathHeader)
+bool NSound::LoadSoundInformationPiece(const char * c_szFileName, NSound::TSoundDataVector & rSoundDataVector, const char * c_szPathHeader, bool silent_failure)
 {
 	std::string strResult;
 	strResult = c_szFileName;
 
-	CTextFileLoader* pkTextFileLoader=CTextFileLoader::Cache(c_szFileName);
+	CTextFileLoader* pkTextFileLoader=CTextFileLoader::Cache(c_szFileName, silent_failure);
 	if (!pkTextFileLoader)
 		return false;
 

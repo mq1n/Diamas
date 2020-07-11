@@ -17,7 +17,7 @@ void CTextureSet::Initialize()
 
 void CTextureSet::Create()
 {
-	CResource * pResource = CResourceManager::Instance().GetResourcePointer("d:/ymir work/special/error.tga");
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>("d:/ymir work/special/error.tga");
 	m_ErrorTexture.ImageInstance.SetImagePointer(static_cast<CGraphicImage *> (pResource));
 	AddEmptyTexture();	// 지우개 텍스춰를 처음에 추가 해야 함
 }
@@ -137,7 +137,7 @@ bool CTextureSet::SetTexture(uint32_t ulIndex,
 		return false;
 	}
 
-	CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(c_szFileName);
 	if (!pResource)
 		return false;
 
@@ -174,7 +174,7 @@ void CTextureSet::Reload(float fTerrainTexCoordBase)
 	{
 		TTerrainTexture & tex = m_Textures[dwIndex];
 
-		tex.ImageInstance.ReloadImagePointer((CGraphicImage *) CResourceManager::Instance().GetResourcePointer(tex.stFilename.c_str()));
+		tex.ImageInstance.ReloadImagePointer(CResourceManager::Instance().GetResourcePointer<CGraphicImage>(tex.stFilename));
 		tex.pd3dTexture = tex.ImageInstance.GetTexturePointer()->GetD3DTexture();
 
 		D3DXMatrixScaling(&tex.m_matTransform, fTerrainTexCoordBase * tex.UScale, -fTerrainTexCoordBase * tex.VScale, 0.0f);
@@ -239,7 +239,7 @@ bool CTextureSet::AddTexture(const char * c_szFileName,
 		}
 	}
 
-	CResource * pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(c_szFileName);
 	if (!pResource)
 		return false;
 

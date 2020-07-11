@@ -91,7 +91,7 @@ bool CPythonBackground::SetShadowLevel(int32_t eLevel)
 	{
 		case SHADOW_NONE:
 			rkMap.SetDrawShadow(false);
-			rkMap.SetShadowTextureSize(512);
+			rkMap.SetShadowTextureSize(256);
 			break;
 
 		case SHADOW_GROUND:
@@ -103,25 +103,25 @@ bool CPythonBackground::SetShadowLevel(int32_t eLevel)
 		case SHADOW_GROUND_AND_SOLO:
 			rkMap.SetDrawShadow(true);
 			rkMap.SetDrawCharacterShadow(true);
-			rkMap.SetShadowTextureSize(512);
+			rkMap.SetShadowTextureSize(1024);
 			break;
 
 		case SHADOW_ALL:
 			rkMap.SetDrawShadow(true);	
 			rkMap.SetDrawCharacterShadow(true);
-			rkMap.SetShadowTextureSize(512);
+			rkMap.SetShadowTextureSize(1024);
 			break;
 
 		case SHADOW_ALL_HIGH:
 			rkMap.SetDrawShadow(true);	
 			rkMap.SetDrawCharacterShadow(true);
-			rkMap.SetShadowTextureSize(1024);
+			rkMap.SetShadowTextureSize(2048);
 			break;
 
 		case SHADOW_ALL_MAX:
 			rkMap.SetDrawShadow(true);	
 			rkMap.SetDrawCharacterShadow(true);
-			rkMap.SetShadowTextureSize(2048);
+			rkMap.SetShadowTextureSize(4096);
 			break;
 	}
 
@@ -730,7 +730,6 @@ void CPythonBackground::Warp(uint32_t dwX, uint32_t dwY)
 
 	if (m_kSet_strDungeonMapName.end() != m_kSet_strDungeonMapName.find(m_strMapName))
 	{
-		EnableTerrainOnlyForHeight();
 
 		CMapOutdoor& rkMap=GetMapOutdoorRef();
 		rkMap.EnablePortal(TRUE);

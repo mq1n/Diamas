@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "MapOutdoor.h"
 #include "AreaTerrain.h"
-#include "AreaLoaderThread.h"
 #include "../eterLib/ResourceManager.h"
 #include <FileSystemIncl.hpp>
 
@@ -28,8 +27,6 @@ bool CMapOutdoor::Load(float x, float y, float z)
 	CSpeedTreeForestDirectX9::Instance().SetRenderingDevice(ms_lpd3dDevice);
 
 	Update(x, y, z);
-
-	__HeightCache_Init();
 
 	// LOCAL_ENVIRONMENT_DATA
 	std::string local_envDataName = GetMapDataDirectory() + "\\" + m_settings_envDataName;

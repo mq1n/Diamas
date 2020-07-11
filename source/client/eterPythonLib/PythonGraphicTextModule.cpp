@@ -122,7 +122,7 @@ PyObject* grpTextSetFontName(PyObject* poSelf, PyObject* poArgs)
 	std::string stFontName = szFontName;
 	stFontName += ".fnt";
 
-	CResource* pResource = CResourceManager::Instance().GetResourcePointer(stFontName.c_str());
+	CResource* pResource = CResourceManager::Instance().GetResourcePointer<CResource>(stFontName.c_str());
 	pTextInstance->SetTextPointer(static_cast<CGraphicText*>(pResource));
 	return Py_BuildNone();
 }

@@ -5,7 +5,7 @@
 
 CDynamicPool<CGraphicExpandedImageInstance>		CGraphicExpandedImageInstance::ms_kPool;
 
-void CGraphicExpandedImageInstance::CreateSystem(uint32_t uCapacity)
+void CGraphicExpandedImageInstance::CreateSystem(UINT uCapacity)
 {
 	ms_kPool.Create(uCapacity);
 }
