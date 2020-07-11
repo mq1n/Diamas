@@ -74,7 +74,7 @@ int32_t CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
 		char buf[1024];
 		memcpy(buf, c_pbData, MIN(p->lSize, sizeof(buf)));
 
-		TPacketGCWhisper* p2 = (TPacketGCWhisper*) buf;
+		SPacketGCWhisper* p2 = (SPacketGCWhisper*) buf;
 		// bType 상위 4비트: Empire 번호
 		// bType 하위 4비트: EWhisperType
 		uint8_t bToEmpire = (p2->bType >> 4);

@@ -21,12 +21,12 @@ uint32_t CActorInstance::AttachSmokeEffect(uint32_t eSmoke)
 
 bool CActorInstance::__IsLeftHandWeapon(uint32_t type)
 {
-	if (CItemData::WEAPON_DAGGER == type || (CItemData::WEAPON_FAN == type && __IsMountingHorse()))
+	if (WEAPON_DAGGER == type || (WEAPON_FAN == type && __IsMountingHorse()))
 		return true;
-	else if (CItemData::WEAPON_BOW == type)
+	else if (WEAPON_BOW == type)
 		return true;
 #ifdef ENABLE_WOLFMAN_CHARACTER
-	else if (CItemData::WEAPON_CLAW == type)
+	else if (WEAPON_CLAW == type)
 		return true;
 #endif
 	else
@@ -35,12 +35,12 @@ bool CActorInstance::__IsLeftHandWeapon(uint32_t type)
 
 bool CActorInstance::__IsRightHandWeapon(uint32_t type)
 {
-	if (CItemData::WEAPON_DAGGER == type || (CItemData::WEAPON_FAN == type && __IsMountingHorse()))
+	if (WEAPON_DAGGER == type || (WEAPON_FAN == type && __IsMountingHorse()))
 		return true;
-	else if (CItemData::WEAPON_BOW == type)
+	else if (WEAPON_BOW == type)
 		return false;
 #ifdef ENABLE_WOLFMAN_CHARACTER
-	else if (CItemData::WEAPON_CLAW == type)
+	else if (WEAPON_CLAW == type)
 		return true;
 #endif
 	else 
@@ -51,9 +51,9 @@ bool CActorInstance::__IsWeaponTrace(uint32_t weaponType)
 {
 	switch(weaponType)
 	{
-	case CItemData::WEAPON_BELL:
-	case CItemData::WEAPON_FAN:
-	case CItemData::WEAPON_BOW:
+	case WEAPON_BELL:
+	case WEAPON_FAN:
+	case WEAPON_BOW:
 		return false;
 	default:
 		return true;
@@ -103,7 +103,7 @@ void CActorInstance::AttachWeapon(uint32_t dwParentPartIndex, uint32_t dwPartInd
 
 	const char * szBoneName;
 #if defined(ENABLE_WOLFMAN_CHARACTER) && defined(AUTODETECT_LYCAN_RODNPICK_BONE)
-	if ((GetRace()==8) && (pItemData->GetType()==CItemData::ITEM_TYPE_ROD || pItemData->GetType()==CItemData::ITEM_TYPE_PICK))
+	if ((GetRace()==8) && (pItemData->GetType()==ITEM_TYPE_ROD || pItemData->GetType()==ITEM_TYPE_PICK))
 		szBoneName = "equip_right";
 	else if (!GetAttachingBoneName(dwPartIndex, &szBoneName))
 		return;

@@ -125,20 +125,20 @@ ACMD(do_emotion_allow)
 	LPDESC pkVictimDesc = tch->GetDesc();
 	if (ch && pkVictimDesc)
 	{
-		TPacketGCWhisper pack;
+		SPacketGCWhisper pack;
 
 		char msg[450];
 		sprintf(msg, "You challenged %s for a emotion.", ch->GetName());
 
 		int32_t len = MIN(CHAT_MAX_LEN, strlen(msg) + 1);
 
-		pack.bHeader = HEADER_GC_WHISPER;
-		pack.wSize = sizeof(TPacketGCWhisper) + len;
+		pack.header = HEADER_GC_WHISPER;
+		pack.wSize = sizeof(SPacketGCWhisper) + len;
 		pack.bType = WHISPER_TYPE_SYSTEM;
 		strlcpy(pack.szNameFrom, ch->GetName(), sizeof(pack.szNameFrom));
 
 		TEMP_BUFFER tmpbuf;
-		tmpbuf.write(&pack, sizeof(TPacketGCWhisper));
+		tmpbuf.write(&pack, sizeof(SPacketGCWhisper));
 		tmpbuf.write(msg, len);
 
 		pkVictimDesc->Packet(tmpbuf.read_peek(), tmpbuf.size());
@@ -292,13 +292,13 @@ ACMD(do_emotion)
 
 	++len;  // \0 문자 포함
 
-	TPacketGCChat pack_chat;
+	SPacketGCChat pack_chat;
 	pack_chat.header = HEADER_GC_CHAT;
-	pack_chat.size = sizeof(TPacketGCChat) + len;
+	pack_chat.size = sizeof(SPacketGCChat) + len;
 	pack_chat.type = CHAT_TYPE_COMMAND;
-	pack_chat.id = 0;
+	pack_chat.dwVID = 0;
 	TEMP_BUFFER buf;
-	buf.write(&pack_chat, sizeof(TPacketGCChat));
+	buf.write(&pack_chat, sizeof(SPacketGCChat));
 	buf.write(chatbuf, len);
 
 	ch->PacketAround(buf.read_peek(), buf.size());

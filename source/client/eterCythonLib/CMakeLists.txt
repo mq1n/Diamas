@@ -90,7 +90,7 @@ set(ETERCYTHONLIB_SOURCES
 	${PROJECT_SOURCE_DIR}/../../../../Diamas_Client/CRYPTION/source/cyTemp/utils.cpp
 )
 
-	set(PYTHON_CMD C:/Python27/python)
+set(PYTHON_CMD C:/Python27/python)
 
 add_custom_target(special_process COMMAND ${PYTHON_CMD} special_process.py WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/../../../../Diamas_Client/CRYPTION)
 add_custom_target(root_process COMMAND ${PYTHON_CMD} conv/root_process.py cython WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/../../../../Diamas_Client/CRYPTION DEPENDS special_process)

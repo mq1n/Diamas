@@ -801,9 +801,9 @@ bool CPythonPlayer::__HasEnoughArrow()
 	CItemData * pItemData;
 	if (CItemManager::Instance().GetItemDataPointer(GetItemIndex(TItemPos(INVENTORY, c_Equipment_Arrow)), &pItemData))
 	{
-		if (CItemData::ITEM_TYPE_WEAPON == pItemData->GetType())
+		if (ITEM_TYPE_WEAPON == pItemData->GetType())
 		{
-			if (CItemData::WEAPON_ARROW == pItemData->GetSubType())
+			if (WEAPON_ARROW == pItemData->GetSubType())
 				return true;
 		}
 	}

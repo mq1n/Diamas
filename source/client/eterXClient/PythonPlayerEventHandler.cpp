@@ -51,7 +51,7 @@ void CPythonPlayerEventHandler::OnWaiting(const SState& c_rkState)
 	m_kPPosPrevWaiting=c_rkPPosCurWaiting;
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_WAIT, 0);
+	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, FUNC_WAIT, 0);
 
 	//Trace("waiting\n");
 }
@@ -67,7 +67,7 @@ void CPythonPlayerEventHandler::OnMoving(const SState& c_rkState)
 	m_dwNextMovingNotifyTime = dwCurTime + 175; // If we keep moving delaying the stream of packets is fine!
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_MOVE, 0);
+	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, FUNC_MOVE, 0);
 
 //	Trace("moving\n");
 }
@@ -80,7 +80,7 @@ void CPythonPlayerEventHandler::OnMove(const SState& c_rkState)
 	m_dwNextMovingNotifyTime=dwCurTime + 100;
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_MOVE, 0);
+	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, FUNC_MOVE, 0);
 
 //	Trace("move\n");
 }
@@ -89,7 +89,7 @@ void CPythonPlayerEventHandler::OnMove(const SState& c_rkState)
 void CPythonPlayerEventHandler::OnStop(const SState& c_rkState)
 {
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_WAIT, 0);
+	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, FUNC_WAIT, 0);
 
 //	Trace("stop\n");
 }
@@ -97,7 +97,7 @@ void CPythonPlayerEventHandler::OnStop(const SState& c_rkState)
 void CPythonPlayerEventHandler::OnWarp(const SState& c_rkState)
 {
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_WAIT, 0);
+	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, FUNC_WAIT, 0);
 }
 
 void CPythonPlayerEventHandler::OnAttack(const SState& c_rkState, uint16_t wMotionIndex)
@@ -106,13 +106,13 @@ void CPythonPlayerEventHandler::OnAttack(const SState& c_rkState, uint16_t wMoti
 	assert(wMotionIndex < 255);
 
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_COMBO, wMotionIndex);
+	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, FUNC_COMBO, wMotionIndex);
 }
 
 void CPythonPlayerEventHandler::OnUseSkill(const SState& c_rkState, uint32_t uMotSkill, uint32_t uArg)
 {
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, CInstanceBase::FUNC_SKILL|uMotSkill, uArg);
+	rkNetStream.SendCharacterStatePacket(c_rkState.kPPosSelf, c_rkState.fAdvRotSelf, FUNC_SKILL|uMotSkill, uArg);
 }
 
 void CPythonPlayerEventHandler::OnUpdate()
@@ -172,9 +172,8 @@ void CPythonPlayerEventHandler::FlushVictimList()
 
 	CPythonNetworkStream& rkStream=CPythonNetworkStream::Instance();
 
-	TPacketCGSyncPosition kPacketSyncPos;
-	kPacketSyncPos.bHeader=HEADER_CG_SYNC_POSITION;
-	kPacketSyncPos.wSize=sizeof(kPacketSyncPos)+sizeof(TPacketCGSyncPositionElement) * uiVictimCount;
+	SPacketCGSyncPosition kPacketSyncPos;
+	kPacketSyncPos.wSize=sizeof(kPacketSyncPos)+sizeof(SPacketSyncPositionElement) * uiVictimCount;
 
 	rkStream.Send(sizeof(kPacketSyncPos), &kPacketSyncPos);
 

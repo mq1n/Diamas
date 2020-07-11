@@ -16,16 +16,16 @@ void CHARACTER::SyncQuickslot(uint8_t bType, uint8_t bOldPos, uint8_t bNewPos) /
 
 	for (int32_t i = 0; i < QUICKSLOT_MAX_NUM; ++i)
 	{
-		if (m_quickslot[i].type == bType && m_quickslot[i].pos == bOldPos)
+		if (m_quickslot[i].Type == bType && m_quickslot[i].Position == bOldPos)
 		{
 			if (bNewPos == 255)
 				DelQuickslot(i);
 			else
 			{
-				TQuickslot slot;
+				TQuickSlot slot;
 
-				slot.type = bType;
-				slot.pos = bNewPos;
+				slot.Type = bType;
+				slot.Position = bNewPos;
 
 				SetQuickslot(i, slot);
 			}
@@ -33,7 +33,7 @@ void CHARACTER::SyncQuickslot(uint8_t bType, uint8_t bOldPos, uint8_t bNewPos) /
 	}
 }
 
-bool CHARACTER::GetQuickslot(uint8_t pos, TQuickslot ** ppSlot)
+bool CHARACTER::GetQuickslot(uint8_t pos, TQuickSlot** ppSlot)
 {
 	if (pos >= QUICKSLOT_MAX_NUM)
 		return false;
@@ -42,27 +42,27 @@ bool CHARACTER::GetQuickslot(uint8_t pos, TQuickslot ** ppSlot)
 	return true;
 }
 
-bool CHARACTER::SetQuickslot(uint8_t pos, TQuickslot & rSlot)
+bool CHARACTER::SetQuickslot(uint8_t pos, TQuickSlot& rSlot)
 {
-	struct packet_quickslot_add pack_quickslot_add;
+	SPacketGCQuickSlotAdd pack_quickslot_add;
 
 	if (pos >= QUICKSLOT_MAX_NUM)
 		return false;
 
-	if (rSlot.type >= QUICKSLOT_TYPE_MAX_NUM)
+	if (rSlot.Type >= QUICKSLOT_TYPE_MAX_NUM)
 		return false;
 
 	for (int32_t i = 0; i < QUICKSLOT_MAX_NUM; ++i)
 	{
-		if (rSlot.type == 0)
+		if (rSlot.Type == 0)
 			continue;
-		else if (m_quickslot[i].type == rSlot.type && m_quickslot[i].pos == rSlot.pos)
+		else if (m_quickslot[i].Type == rSlot.Type && m_quickslot[i].Position == rSlot.Position)
 			DelQuickslot(i);
 	}
 
-	TItemPos srcCell(INVENTORY, rSlot.pos);
+	TItemPos srcCell(INVENTORY, rSlot.Position);
 
-	switch (rSlot.type)
+	switch (rSlot.Type)
 	{
 		case QUICKSLOT_TYPE_ITEM:
 			if (false == srcCell.IsDefaultInventoryPosition() && false == srcCell.IsBeltInventoryPosition())
@@ -71,7 +71,7 @@ bool CHARACTER::SetQuickslot(uint8_t pos, TQuickslot & rSlot)
 			break;
 
 		case QUICKSLOT_TYPE_SKILL:
-			if ((int32_t) rSlot.pos >= SKILL_MAX_NUM)
+			if ((int32_t) rSlot.Position >= SKILL_MAX_NUM)
 				return false;
 
 			break;
@@ -99,12 +99,12 @@ bool CHARACTER::SetQuickslot(uint8_t pos, TQuickslot & rSlot)
 
 bool CHARACTER::DelQuickslot(uint8_t pos)
 {
-	struct packet_quickslot_del pack_quickslot_del;
+	SPacketGCQuickSlotDel pack_quickslot_del;
 
 	if (pos >= QUICKSLOT_MAX_NUM)
 		return false;
 
-	memset(&m_quickslot[pos], 0, sizeof(TQuickslot));
+	memset(&m_quickslot[pos], 0, sizeof(TQuickSlot));
 
 	pack_quickslot_del.header	= HEADER_GC_QUICKSLOT_DEL;
 	pack_quickslot_del.pos	= pos;
@@ -115,8 +115,8 @@ bool CHARACTER::DelQuickslot(uint8_t pos)
 
 bool CHARACTER::SwapQuickslot(uint8_t a, uint8_t b)
 {
-	struct packet_quickslot_swap pack_quickslot_swap;
-	TQuickslot quickslot;
+	SPacketGCQuickSlotSwap pack_quickslot_swap;
+	TQuickSlot quickslot;
 
 	if (a >= QUICKSLOT_MAX_NUM || b >= QUICKSLOT_MAX_NUM)
 		return false;
@@ -129,7 +129,7 @@ bool CHARACTER::SwapQuickslot(uint8_t a, uint8_t b)
 
 	pack_quickslot_swap.header	= HEADER_GC_QUICKSLOT_SWAP;
 	pack_quickslot_swap.pos	= a;
-	pack_quickslot_swap.pos_to	= b;
+	pack_quickslot_swap.change_pos = b;
 
 	GetDesc()->Packet(&pack_quickslot_swap, sizeof(pack_quickslot_swap));
 	return true;
@@ -141,11 +141,11 @@ void CHARACTER::ChainQuickslotItem(LPITEM pItem, uint8_t bType, uint8_t bOldPos)
 		return;
 	for ( int32_t i=0; i < QUICKSLOT_MAX_NUM; ++i )
 	{
-		if ( m_quickslot[i].type == bType && m_quickslot[i].pos == bOldPos )
+		if ( m_quickslot[i].Type == bType && m_quickslot[i].Position == bOldPos )
 		{
-			TQuickslot slot;
-			slot.type = bType;
-			slot.pos = pItem->GetCell();
+			TQuickSlot slot;
+			slot.Type = bType;
+			slot.Position = pItem->GetCell();
 
 			SetQuickslot(i, slot);
 

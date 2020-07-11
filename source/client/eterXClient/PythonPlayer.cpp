@@ -885,17 +885,17 @@ bool CPythonPlayer::IsBeltInventorySlot(TItemPos Cell)
 
 bool CPythonPlayer::IsInventorySlot(TItemPos Cell)
 {
-	return !Cell.IsEquipCell() && Cell.IsValidCell();
+	return !Cell.IsEquipPosition() && Cell.IsValidCell();
 }
 
 bool CPythonPlayer::IsEquipmentSlot(TItemPos Cell)
 {
-	return Cell.IsEquipCell();
+	return Cell.IsEquipPosition();
 }
 
 bool CPythonPlayer::IsEquipItemInSlot(TItemPos Cell)
 {
-	if (!Cell.IsEquipCell())
+	if (!Cell.IsEquipPosition())
 		return false;
 
 	const TItemData * pData = GetItemData(Cell);
@@ -1176,7 +1176,7 @@ void CPythonPlayer::SendClickItemPacket(uint32_t dwIID)
 	{
 		if (c_szOwnerName[0] != '\0' && 0 != strcmp(c_szOwnerName, GetName()))
 		{
-			if (!IsPartyMemberByName(c_szOwnerName) || pItemData->IsAntiFlag(CItemData::ITEM_ANTIFLAG_DROP | CItemData::ITEM_ANTIFLAG_GIVE))
+			if (!IsPartyMemberByName(c_szOwnerName) || pItemData->IsAntiFlag(ITEM_ANTIFLAG_DROP | ITEM_ANTIFLAG_GIVE))
 			{
 				PyCallClassMemberFunc(m_ppyGameWindow, "OnCannotPickItem", Py_BuildValue("()"));
 				return;

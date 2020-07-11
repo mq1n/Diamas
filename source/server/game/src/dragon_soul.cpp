@@ -1004,10 +1004,10 @@ bool DSManager::DoRefineStrength(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_S
 
 void DSManager::SendRefineResultPacket(LPCHARACTER ch, uint8_t bSubHeader, const TItemPos& pos)
 {
-	TPacketGCDragonSoulRefine pack;
+	SPacketGCDragonSoulRefine pack;
 	pack.bSubType = bSubHeader;
 
-	if (pos.IsValidItemPosition())
+	if (pos.IsValidCell())
 	{
 		pack.Pos = pos;
 	}

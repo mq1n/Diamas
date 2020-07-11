@@ -269,7 +269,7 @@ uint8_t CItemData::GetSubType() const
 
 const char* CItemData::GetUseTypeString() const
 {
-	if (GetType() != CItemData::ITEM_TYPE_USE)
+	if (GetType() != ITEM_TYPE_USE)
 		return "NOT_USE_TYPE";
 
 	switch (GetSubType())
@@ -308,7 +308,7 @@ const char* CItemData::GetUseTypeString() const
 uint32_t CItemData::GetWeaponType() const
 {
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
-	if (GetType()==CItemData::ITEM_TYPE_COSTUME && GetSubType()==CItemData::COSTUME_WEAPON)
+	if (GetType()==ITEM_TYPE_COSTUME && GetSubType()==COSTUME_WEAPON)
 		return GetValue(3);
 #endif
 	return m_ItemTable.bSubType;

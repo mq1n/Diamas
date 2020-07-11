@@ -70,18 +70,31 @@ bool CSafebox::Add(uint32_t dwPos, LPITEM pkItem)
 	m_pkGrid->Put(dwPos, 1, pkItem->GetSize());
 	m_pkItems[dwPos] = pkItem;
 
-	TPacketGCItemSet pack;
-
-	pack.header	= m_bWindowMode == SAFEBOX ? HEADER_GC_SAFEBOX_SET : HEADER_GC_MALL_SET;
-	pack.Cell	= TItemPos(m_bWindowMode, dwPos);
-	pack.vnum	= pkItem->GetVnum();
-	pack.count	= pkItem->GetCount();
-	pack.flags	= pkItem->GetFlag();
-	pack.anti_flags	= pkItem->GetAntiFlag();
-	memcpy(pack.alSockets, pkItem->GetSockets(), sizeof(pack.alSockets));
-	memcpy(pack.aAttr, pkItem->GetAttributes(), sizeof(pack.aAttr));
-
-	m_pkChrOwner->GetDesc()->Packet(&pack, sizeof(pack));
+	if (m_pkChrOwner->GetDesc())
+	{
+		if (m_bWindowMode == SAFEBOX)
+		{
+			SPacketGCSafeboxSet pack;
+			pack.header = HEADER_GC_SAFEBOX_SET;
+			pack.Cell = TItemPos(m_bWindowMode, dwPos);
+			pack.vnum = pkItem->GetVnum();
+			pack.count = pkItem->GetCount();
+			memcpy(pack.alSockets, pkItem->GetSockets(), sizeof(pack.alSockets));
+			memcpy(pack.aAttr, pkItem->GetAttributes(), sizeof(pack.aAttr));
+			m_pkChrOwner->GetDesc()->Packet(&pack, sizeof(pack));
+		}
+		else
+		{
+			SPacketGCMallSet pack;
+			pack.header = HEADER_GC_MALL_SET;
+			pack.Cell = TItemPos(m_bWindowMode, dwPos);
+			pack.vnum = pkItem->GetVnum();
+			pack.count = pkItem->GetCount();
+			memcpy(pack.alSockets, pkItem->GetSockets(), sizeof(pack.alSockets));
+			memcpy(pack.aAttr, pkItem->GetAttributes(), sizeof(pack.aAttr));
+			m_pkChrOwner->GetDesc()->Packet(&pack, sizeof(pack));
+		}
+	}
 	sys_log(1, "SAFEBOX: ADD %s %s count %d", m_pkChrOwner->GetName(), pkItem->GetName(), pkItem->GetCount());
 	return true;
 }
@@ -110,12 +123,26 @@ LPITEM CSafebox::Remove(uint32_t dwPos)
 
 	m_pkItems[dwPos] = nullptr;
 
-	TPacketGCItemDel pack;
+	if (m_pkChrOwner->GetDesc())
+	{
+		if (m_bWindowMode == SAFEBOX)
+		{
+			SPacketGCSafeboxDel pack;
 
-	pack.header	= m_bWindowMode == SAFEBOX ? HEADER_GC_SAFEBOX_DEL : HEADER_GC_MALL_DEL;
-	pack.pos	= dwPos;
+			pack.header = HEADER_GC_SAFEBOX_DEL;
+			pack.pos = dwPos;
+			m_pkChrOwner->GetDesc()->Packet(&pack, sizeof(pack));
+		}
+		else
+		{
+			SPacketGCMallDel pack;
 
-	m_pkChrOwner->GetDesc()->Packet(&pack, sizeof(pack));
+			pack.header = HEADER_GC_MALL_DEL;
+			pack.pos = dwPos;
+			m_pkChrOwner->GetDesc()->Packet(&pack, sizeof(pack));
+		}
+	}
+
 	sys_log(1, "SAFEBOX: REMOVE %s %s count %d", m_pkChrOwner->GetName(), pkItem->GetName(), pkItem->GetCount());
 	return pkItem;
 }

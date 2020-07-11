@@ -1,208 +1,15 @@
 #ifndef __INC_METIN_II_LENGTH_H__
 #define __INC_METIN_II_LENGTH_H__
 
+#include "../../common/constants.h"
 #include "service.h"
 #include "item_length.h"
 
 #include <stdint.h>
 
-#define WORD_MAX 0xffff
-#define GOLD_MAX 2000000000
-
-enum EMisc
-{
-	MAX_HOST_LENGTH			= 15,
-	IP_ADDRESS_LENGTH		= 15,
-	LOGIN_MAX_LEN			= 30,
-	PASSWD_MAX_LEN			= 16,
-#ifdef ENABLE_PLAYER_PER_ACCOUNT5
-	PLAYER_PER_ACCOUNT		= 5,
-#else
-	PLAYER_PER_ACCOUNT		= 4,
-#endif
-	ACCOUNT_STATUS_MAX_LEN	= 8,
-	CHARACTER_NAME_MAX_LEN	= 24,
-	SHOP_SIGN_MAX_LEN		= 32,
-	INVENTORY_PAGE_COLUMN	= 5, // 5 (default)
-	INVENTORY_PAGE_ROW		= 9, // 9 (default)
-	INVENTORY_PAGE_SIZE		= INVENTORY_PAGE_COLUMN*INVENTORY_PAGE_ROW,
-#ifdef ENABLE_EXTEND_INVEN_SYSTEM
-	INVENTORY_PAGE_COUNT	= 4, // 2 (default)
-#else
-	INVENTORY_PAGE_COUNT	= 2, // 2 (default)
-#endif
-	INVENTORY_MAX_NUM		= INVENTORY_PAGE_SIZE*INVENTORY_PAGE_COUNT, // 90 (default)
-	ABILITY_MAX_NUM			= 50,
-	EMPIRE_MAX_NUM			= 4,
-	BANWORD_MAX_LEN			= 24,
-	SOCIAL_ID_MAX_LEN		= 18,
-
-	GUILD_NAME_MAX_LEN		= 12,
-
-	SHOP_HOST_ITEM_MAX_NUM	= 40,	/* 호스트의 최대 아이템 개수 */
-	SHOP_GUEST_ITEM_MAX_NUM = 18,	/* 게스트의 최대 아이템 개수 */
-
-	SHOP_PRICELIST_MAX_NUM	= 40,	///< 개인상점 가격정보 리스트에서 유지할 가격정보의 최대 갯수
-
-	CHAT_MAX_LEN			= 512,
-
-	QUICKSLOT_MAX_NUM		= 36,
-
-	JOURNAL_MAX_NUM			= 2,
-
-//	QUERY_MAX_LEN			= 8192,
-
-	FILE_MAX_LEN			= 128,
-
-	PLAYER_EXP_TABLE_MAX	= 120,
-	PLAYER_MAX_LEVEL_CONST	= 120,
-
-	GUILD_MAX_LEVEL			= 20,
-	MOB_MAX_LEVEL			= 100,
-
-	ATTRIBUTE_MAX_VALUE		= 20,
-	CHARACTER_PATH_MAX_NUM	= 64,
-	SKILL_MAX_NUM			= 255,
-	SKILLBOOK_DELAY_MIN		= 64800,
-	SKILLBOOK_DELAY_MAX		= 108000, 
-	SKILL_MAX_LEVEL			= 40,
-
-	APPLY_NAME_MAX_LEN		= 32,
-	EVENT_FLAG_NAME_MAX_LEN = 32,
-
-	MOB_SKILL_MAX_NUM		= 5,
-
-    POINT_MAX_NUM = 255,
-	
-	DRAGON_SOUL_BOX_COLUMN_NUM = 8,
-	DRAGON_SOUL_BOX_ROW_NUM = DRAGON_SOUL_BOX_SIZE / DRAGON_SOUL_BOX_COLUMN_NUM,
-	DRAGON_SOUL_REFINE_GRID_SIZE = 15,
-	MAX_AMOUNT_OF_MALL_BONUS	= 20,
-
-	WEAR_MAX_NUM				= 32,
-
-	SHOP_TAB_NAME_MAX = 32,
-	SHOP_TAB_COUNT_MAX = 3,
-
-	BELT_INVENTORY_SLOT_WIDTH = 4,
-	BELT_INVENTORY_SLOT_HEIGHT= 4,
-
-	BELT_INVENTORY_SLOT_COUNT = BELT_INVENTORY_SLOT_WIDTH * BELT_INVENTORY_SLOT_HEIGHT
 
 
-/**
-	 **** 현재까지 할당 된 아이템 영역 정리 (DB상 Item Position) ****
-	+------------------------------------------------------+ 0
-	| 캐릭터 기본 인벤토리 (45칸 * 2페이지) 90칸           | 
-	+------------------------------------------------------+ 90 = INVENTORY_MAX_NUM(90)
-	| 캐릭터 장비 창 (착용중인 아이템) 32칸                |
-	+------------------------------------------------------+ 122 = INVENTORY_MAX_NUM(90) + WEAR_MAX_NUM(32)
-	| 용혼석 장비 창 (착용중인 용혼석) 12칸                | 
-	+------------------------------------------------------+ 134 = 122 + DS_SLOT_MAX(6) * DRAGON_SOUL_DECK_MAX_NUM(2)
-	| 용혼석 장비 창 예약 (아직 미사용) 18칸               | 
-	+------------------------------------------------------+ 152 = 134 + DS_SLOT_MAX(6) * DRAGON_SOUL_DECK_RESERVED_MAX_NUM(3)
-	| 벨트 인벤토리 (벨트 착용시에만 벨트 레벨에 따라 활성)|
-	+------------------------------------------------------+ 168 = 152 + BELT_INVENTORY_SLOT_COUNT(16) = INVENTORY_AND_EQUIP_CELL_MAX
-	| 미사용                                               |
-	+------------------------------------------------------+ ??
-*/
-};
 
-enum EWearPositions
-{
-	WEAR_BODY,		// 0
-	WEAR_HEAD,		// 1
-	WEAR_FOOTS,		// 2
-	WEAR_WRIST,		// 3
-	WEAR_WEAPON,	// 4
-	WEAR_NECK,		// 5
-	WEAR_EAR,		// 6
-	WEAR_UNIQUE1,	// 7
-	WEAR_UNIQUE2,	// 8
-	WEAR_ARROW,		// 9
-	WEAR_SHIELD,	// 10
-    WEAR_ABILITY1,  // 11
-    WEAR_ABILITY2,  // 12
-    WEAR_ABILITY3,  // 13
-    WEAR_ABILITY4,  // 14
-    WEAR_ABILITY5,  // 15
-    WEAR_ABILITY6,  // 16
-    WEAR_ABILITY7,  // 17
-    WEAR_ABILITY8,  // 18
-	WEAR_COSTUME_BODY,	// 19
-	WEAR_COSTUME_HAIR,	// 20
-	
-	WEAR_RING1,			// 21	: 신규 반지슬롯1 (왼쪽)
-#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
-	WEAR_COSTUME_MOUNT = WEAR_RING1, // costume_mount == ring1
-#endif
-
-	WEAR_RING2,			
-#ifdef ENABLE_ACCE_SYSTEM
-	WEAR_COSTUME_ACCE = WEAR_RING2, // costume_acce == ring2
-#endif
-
-	WEAR_BELT,			
-
-#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
-	WEAR_COSTUME_WEAPON,
-#endif
-
-	WEAR_MAX = 32	// 
-};
-
-enum EDragonSoulDeckType
-{
-	DRAGON_SOUL_DECK_0,
-	DRAGON_SOUL_DECK_1,
-	DRAGON_SOUL_DECK_MAX_NUM = 2,
-
-	DRAGON_SOUL_DECK_RESERVED_MAX_NUM = 3	// NOTE: 중요! 아직 사용중이진 않지만, 3페이지 분량을 예약 해 둠. DS DECK을 늘릴 경우 반드시 그 수만큼 RESERVED에서 차감해야 함!
-};
-
-enum ESex
-{
-	SEX_MALE,
-	SEX_FEMALE
-};
-
-enum EJobs
-{
-	JOB_WARRIOR,
-	JOB_ASSASSIN,
-	JOB_SURA,
-	JOB_SHAMAN,
-#ifdef ENABLE_WOLFMAN_CHARACTER
-	JOB_WOLFMAN,		
-#endif
-	JOB_MAX_NUM
-};
-
-enum ESkillGroups
-{
-	SKILL_GROUP_MAX_NUM = 2
-};
-
-enum ERaceFlags
-{
-	RACE_FLAG_ANIMAL	= (1 << 0),
-	RACE_FLAG_UNDEAD	= (1 << 1),
-	RACE_FLAG_DEVIL		= (1 << 2),
-	RACE_FLAG_HUMAN		= (1 << 3),
-	RACE_FLAG_ORC		= (1 << 4),
-	RACE_FLAG_MILGYO	= (1 << 5),
-	RACE_FLAG_INSECT	= (1 << 6),
-	RACE_FLAG_FIRE		= (1 << 7),
-	RACE_FLAG_ICE		= (1 << 8),
-	RACE_FLAG_DESERT	= (1 << 9),
-	RACE_FLAG_TREE		= (1 << 10),
-	RACE_FLAG_ATT_ELEC	= (1 << 11),
-	RACE_FLAG_ATT_FIRE	= (1 << 12),
-	RACE_FLAG_ATT_ICE	= (1 << 13),
-	RACE_FLAG_ATT_WIND	= (1 << 14),
-	RACE_FLAG_ATT_EARTH	= (1 << 15),
-	RACE_FLAG_ATT_DARK	= (1 << 16)
-};
 
 enum ELoads
 {
@@ -234,34 +41,6 @@ enum EParts
 #endif
 	PART_MAX_NUM,
 	PART_WEAPON_SUB,
-};
-
-enum EChatType
-{
-	CHAT_TYPE_TALKING,	/* 그냥 채팅 */
-	CHAT_TYPE_INFO,	/* 정보 (아이템을 집었다, 경험치를 얻었다. 등) */
-	CHAT_TYPE_NOTICE,	/* 공지사항 */
-	CHAT_TYPE_PARTY,	/* 파티말 */
-	CHAT_TYPE_GUILD,	/* 길드말 */
-	CHAT_TYPE_COMMAND,	/* 일반 명령 */
-	CHAT_TYPE_SHOUT,	/* 외치기 */
-	CHAT_TYPE_WHISPER,
-	CHAT_TYPE_BIG_NOTICE,
-#ifdef ENABLE_DICE_SYSTEM
-	CHAT_TYPE_DICE_INFO, //11
-#endif
-	CHAT_TYPE_MAX_NUM
-};
-
-enum EWhisperType
-{
-	WHISPER_TYPE_NORMAL		= 0,
-	WHISPER_TYPE_NOT_EXIST		= 1,
-	WHISPER_TYPE_TARGET_BLOCKED	= 2,
-	WHISPER_TYPE_SENDER_BLOCKED	= 3,
-	WHISPER_TYPE_ERROR		= 4,
-	WHISPER_TYPE_GM			= 5,
-	WHISPER_TYPE_SYSTEM		= 0xFF
 };
 
 enum ECharacterPosition
@@ -463,18 +242,6 @@ enum EOnClickEvents
 	ON_CLICK_MAX_NUM
 };
 
-enum EWindows
-{
-	RESERVED_WINDOW,
-	INVENTORY,
-	EQUIPMENT,
-	SAFEBOX,
-	MALL,
-	DRAGON_SOUL_INVENTORY,
-	BELT_INVENTORY,
-	GROUND
-};
-
 enum EMobSizes
 {
 	MOBSIZE_RESERVED,
@@ -508,17 +275,6 @@ enum EMobStatType
 	MOB_STATTYPE_RANGE,
 	MOB_STATTYPE_MAGIC,
 	MOB_STATTYPE_MAX_NUM
-};
-
-enum EImmuneFlags
-{
-	IMMUNE_STUN		= (1 << 0),
-	IMMUNE_SLOW		= (1 << 1),
-	IMMUNE_FALL		= (1 << 2),
-	IMMUNE_CURSE	= (1 << 3),
-	IMMUNE_POISON	= (1 << 4),
-	IMMUNE_TERROR	= (1 << 5),
-	IMMUNE_REFLECT	= (1 << 6)
 };
 
 enum EMobEnchants
@@ -584,21 +340,6 @@ enum EGuildWarType
 	GUILD_WAR_TYPE_FLAG,
 	GUILD_WAR_TYPE_MAX_NUM
 };
-
-enum EGuildWarState
-{
-	GUILD_WAR_NONE,
-	GUILD_WAR_SEND_DECLARE,
-	GUILD_WAR_REFUSE,
-	GUILD_WAR_RECV_DECLARE,
-	GUILD_WAR_WAIT_START,
-	GUILD_WAR_CANCEL,
-	GUILD_WAR_ON_WAR,
-	GUILD_WAR_END,
-	GUILD_WAR_OVER,
-	GUILD_WAR_RESERVE
-};
-
 enum EAttributeSet 
 {            
 	ATTRIBUTE_SET_WEAPON,
@@ -655,147 +396,6 @@ enum EPremiumTypes
 	PREMIUM_MAX_NUM = 9
 };
 
-enum SPECIAL_EFFECT
-{
-	SE_NONE,
 
-	SE_HPUP_RED,
-	SE_SPUP_BLUE,
-	SE_SPEEDUP_GREEN,
-	SE_DXUP_PURPLE,
-	SE_CRITICAL,
-	SE_PENETRATE,
-	SE_BLOCK,
-	SE_DODGE,
-	SE_CHINA_FIREWORK,
-	SE_SPIN_TOP,
-	SE_SUCCESS,
-	SE_FAIL,
-	SE_FR_SUCCESS,
-	SE_LEVELUP_ON_14_FOR_GERMANY,
-	SE_LEVELUP_UNDER_15_FOR_GERMANY,
-	SE_PERCENT_DAMAGE1,
-	SE_PERCENT_DAMAGE2,
-	SE_PERCENT_DAMAGE3,
-
-	SE_AUTO_HPUP,
-	SE_AUTO_SPUP,
-
-	SE_EQUIP_RAMADAN_RING,		// 라마단 초승달의 반지(71135) 착용할 때 이펙트 (발동이펙트임, 지속이펙트 아님)
-	SE_EQUIP_HALLOWEEN_CANDY,		// 할로윈 사탕을 착용(-_-;)한 순간에 발동하는 이펙트
-	SE_EQUIP_HAPPINESS_RING,		// 크리스마스 행복의 반지(71143) 착용할 때 이펙트 (발동이펙트임, 지속이펙트 아님)
-	SE_EQUIP_LOVE_PENDANT,		// 발렌타인 사랑의 팬던트(71145) 착용할 때 이펙트 (발동이펙트임, 지속이펙트 아님)
-
-#ifdef ENABLE_ACCE_SYSTEM
-	SE_EFFECT_ACCE_SUCCEDED,
-	SE_EFFECT_ACCE_EQUIP,
-#endif
-};
-
-
-// inventory의 position을 나타내는 구조체
-// int32_t와의 암시적 형변환이 있는 이유는,
-// 인벤 관련된 모든 함수가 window_type은 받지 않고, cell 하나만 받았기 때문에,(기존에는 인벤이 하나 뿐이어서 inventory type이란게 필요없었기 때문에,)
-// 인벤 관련 모든 함수 호출부분을 수정하는 것이 난감하기 떄문이다.
-
-enum EDragonSoulRefineWindowSize
-{
-	DRAGON_SOUL_REFINE_GRID_MAX = 15,
-};
-
-enum EMisc2
-{
-	DRAGON_SOUL_EQUIP_SLOT_START = INVENTORY_MAX_NUM + WEAR_MAX_NUM,
-	DRAGON_SOUL_EQUIP_SLOT_END = DRAGON_SOUL_EQUIP_SLOT_START + (DS_SLOT_MAX * DRAGON_SOUL_DECK_MAX_NUM),
-	DRAGON_SOUL_EQUIP_RESERVED_SLOT_END = DRAGON_SOUL_EQUIP_SLOT_END + (DS_SLOT_MAX * DRAGON_SOUL_DECK_RESERVED_MAX_NUM),
-
-	BELT_INVENTORY_SLOT_START = DRAGON_SOUL_EQUIP_RESERVED_SLOT_END,
-	BELT_INVENTORY_SLOT_END = BELT_INVENTORY_SLOT_START + BELT_INVENTORY_SLOT_COUNT,
-
-	INVENTORY_AND_EQUIP_SLOT_MAX = BELT_INVENTORY_SLOT_END,
-};
-
-#pragma pack(push, 1)
-
-typedef struct SItemPos
-{
-	uint8_t window_type;
-	uint16_t cell;
-    SItemPos ()
-    {
-        window_type = INVENTORY;
-		cell = WORD_MAX;
-    }
-
-	SItemPos (uint8_t _window_type, uint16_t _cell)
-    {
-        window_type = _window_type;
-        cell = _cell;
-    }
-
-	bool IsValidItemPosition() const
-	{
-		switch (window_type)
-		{
-		case RESERVED_WINDOW:
-			return false;
-		case INVENTORY:
-		case EQUIPMENT:
-		case BELT_INVENTORY:
-			return cell < INVENTORY_AND_EQUIP_SLOT_MAX;
-		case DRAGON_SOUL_INVENTORY:
-			return cell < (DRAGON_SOUL_INVENTORY_MAX_NUM);
-		// 동적으로 크기가 정해지는 window는 valid 체크를 할 수가 없다.
-		case SAFEBOX:
-		case MALL:
-			return false;
-		}
-		return false;
-	}
-	
-	bool IsEquipPosition() const
-	{
-		return (INVENTORY == window_type || EQUIPMENT == window_type) && ((cell >= INVENTORY_MAX_NUM && cell < INVENTORY_MAX_NUM + WEAR_MAX_NUM) || IsDragonSoulEquipPosition());
-	}
-
-	bool IsDragonSoulEquipPosition() const
-	{
-		return (DRAGON_SOUL_EQUIP_SLOT_START <= cell) && (DRAGON_SOUL_EQUIP_SLOT_END > cell);
-	}
-
-	bool IsBeltInventoryPosition() const
-	{
-		return (BELT_INVENTORY_SLOT_START <= cell) && (BELT_INVENTORY_SLOT_END > cell);
-	}
-
-	bool IsDefaultInventoryPosition() const
-	{
-		return INVENTORY == window_type && cell < INVENTORY_MAX_NUM;
-	}
-
-	bool operator==(const struct SItemPos& rhs) const
-	{
-		return (window_type == rhs.window_type) && (cell == rhs.cell);
-	}
-	bool operator!=(const struct SItemPos& rhs) const
-	{
-		return (window_type != rhs.window_type) || (cell != rhs.cell);
-	}
-	bool operator<(const struct SItemPos& rhs) const
-	{
-		return (window_type < rhs.window_type) || ((window_type == rhs.window_type) && (cell < rhs.cell));
-	}
-} TItemPos;
-
-const SItemPos NPOS (RESERVED_WINDOW, WORD_MAX);
-
-enum GuildWarStatus {
-	GUILD_WAR_RESULT_OK,
-	GUILD_WAR_RESULT_UNDETERMINED,
-	GUILD_WAR_RESULT_TIMEOUT = 99,
-};
-
-
-#pragma pack(pop)
 
 #endif

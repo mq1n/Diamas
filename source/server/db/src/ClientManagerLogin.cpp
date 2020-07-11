@@ -285,7 +285,7 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 #endif
 					pkTab->players[j].x				= pt->x;
 					pkTab->players[j].y				= pt->y;
-					pkTab->players[j].skill_group		= pt->skill_group;
+					pkTab->players[j].bySkillGroup		= pt->skill_group;
 					pkTab->players[j].bChangeName		= 0;
 				}
 				else
@@ -309,7 +309,7 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 #endif
 					pkTab->players[j].x				= 0;
 					pkTab->players[j].y				= 0;
-					pkTab->players[j].skill_group	= 0;
+					pkTab->players[j].bySkillGroup = 0;
 					pkTab->players[j].bChangeName	= 0;
 
 					str_to_number(pkTab->players[j].byJob, row[col++]);
@@ -326,7 +326,7 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 #endif
 					str_to_number(pkTab->players[j].x, row[col++]);
 					str_to_number(pkTab->players[j].y, row[col++]);
-					str_to_number(pkTab->players[j].skill_group, row[col++]);
+					str_to_number(pkTab->players[j].bySkillGroup, row[col++]);
 					str_to_number(pkTab->players[j].bChangeName, row[col++]);
 				}
 

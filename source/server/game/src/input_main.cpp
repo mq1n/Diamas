@@ -272,12 +272,12 @@ int32_t ProcessTextTag(LPCHARACTER ch, const char * c_pszText, size_t len)
 
 int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 {
-	const TPacketCGWhisper* pinfo = reinterpret_cast<const TPacketCGWhisper*>(data);
+	const SPacketCGWhisper* pinfo = reinterpret_cast<const SPacketCGWhisper*>(data);
 
 	if (uiBytes < pinfo->wSize)
 		return -1;
 
-	int32_t iExtraLen = pinfo->wSize - sizeof(TPacketCGWhisper);
+	int32_t iExtraLen = pinfo->wSize - sizeof(SPacketCGWhisper);
 
 	if (iExtraLen < 0)
 	{
@@ -324,10 +324,10 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 	{
 		if (ch->GetDesc())
 		{
-			TPacketGCWhisper pack;
-			pack.bHeader = HEADER_GC_WHISPER;
+			SPacketGCWhisper pack;
+			pack.header = HEADER_GC_WHISPER;
 			pack.bType = WHISPER_TYPE_SENDER_BLOCKED;
-			pack.wSize = sizeof(TPacketGCWhisper);
+			pack.wSize = sizeof(SPacketGCWhisper);
 			strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
 			ch->GetDesc()->Packet(&pack, sizeof(pack));
 		}
@@ -364,13 +364,13 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 	{
 		if (ch->GetDesc())
 		{
-			TPacketGCWhisper pack;
+			SPacketGCWhisper pack;
 
-			pack.bHeader = HEADER_GC_WHISPER;
+			pack.header = HEADER_GC_WHISPER;
 			pack.bType = WHISPER_TYPE_NOT_EXIST;
-			pack.wSize = sizeof(TPacketGCWhisper);
+			pack.wSize = sizeof(SPacketGCWhisper);
 			strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
-			ch->GetDesc()->Packet(&pack, sizeof(TPacketGCWhisper));
+			ch->GetDesc()->Packet(&pack, sizeof(SPacketGCWhisper));
 			sys_log(0, "WHISPER: no player");
 		}
 	}
@@ -380,10 +380,10 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 		{
 			if (ch->GetDesc())
 			{
-				TPacketGCWhisper pack;
-				pack.bHeader = HEADER_GC_WHISPER;
+				SPacketGCWhisper pack;
+				pack.header = HEADER_GC_WHISPER;
 				pack.bType = WHISPER_TYPE_SENDER_BLOCKED;
-				pack.wSize = sizeof(TPacketGCWhisper);
+				pack.wSize = sizeof(SPacketGCWhisper);
 				strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
 				ch->GetDesc()->Packet(&pack, sizeof(pack));
 			}
@@ -392,10 +392,10 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 		{
 			if (ch->GetDesc())
 			{
-				TPacketGCWhisper pack;
-				pack.bHeader = HEADER_GC_WHISPER;
+				SPacketGCWhisper pack;
+				pack.header = HEADER_GC_WHISPER;
 				pack.bType = WHISPER_TYPE_TARGET_BLOCKED;
-				pack.wSize = sizeof(TPacketGCWhisper);
+				pack.wSize = sizeof(SPacketGCWhisper);
 				strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
 				ch->GetDesc()->Packet(&pack, sizeof(pack));
 			}
@@ -405,7 +405,7 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 			uint8_t bType = WHISPER_TYPE_NORMAL;
 
 			char buf[CHAT_MAX_LEN + 1];
-			strlcpy(buf, data + sizeof(TPacketCGWhisper), MIN(iExtraLen + 1, sizeof(buf)));
+			strlcpy(buf, data + sizeof(SPacketCGWhisper), MIN(iExtraLen + 1, sizeof(buf)));
 			const size_t buflen = strlen(buf);
 
 			if (SpamBlockCheck(ch, buf, buflen))
@@ -445,11 +445,11 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 						++len;  // \0 문자 포함
 
-						TPacketGCWhisper pack;
+						SPacketGCWhisper pack;
 
-						pack.bHeader = HEADER_GC_WHISPER;
+						pack.header = HEADER_GC_WHISPER;
 						pack.bType = WHISPER_TYPE_ERROR;
-						pack.wSize = sizeof(TPacketGCWhisper) + len;
+						pack.wSize = sizeof(SPacketGCWhisper) + len;
 						strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
 
 						ch->GetDesc()->BufferedPacket(&pack, sizeof(pack));
@@ -469,10 +469,10 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 			if (buflen > 0)
 			{
-				TPacketGCWhisper pack;
+				SPacketGCWhisper pack;
 
-				pack.bHeader = HEADER_GC_WHISPER;
-				pack.wSize = sizeof(TPacketGCWhisper) + buflen;
+				pack.header = HEADER_GC_WHISPER;
+				pack.wSize = sizeof(SPacketGCWhisper) + buflen;
 				pack.bType = bType;
 				strlcpy(pack.szNameFrom, ch->GetName(), sizeof(pack.szNameFrom));
 
@@ -523,7 +523,7 @@ struct RawPacketToCharacterFunc
 
 struct FEmpireChatPacket
 {
-	packet_chat& p;
+	SPacketGCChat& p;
 	const char* orig_msg;
 	int32_t orig_len;
 
@@ -531,7 +531,7 @@ struct FEmpireChatPacket
 	int32_t iMapIndex;
 	int32_t namelen;
 
-	FEmpireChatPacket(packet_chat& p, const char* chat_msg, int32_t len, uint8_t bEmpire, int32_t iMapIndex, int32_t iNameLen)
+	FEmpireChatPacket(SPacketGCChat& p, const char* chat_msg, int32_t len, uint8_t bEmpire, int32_t iMapIndex, int32_t iNameLen)
 		: p(p), orig_msg(chat_msg), orig_len(len), bEmpire(bEmpire), iMapIndex(iMapIndex), namelen(iNameLen)
 	{
 	}
@@ -544,29 +544,29 @@ struct FEmpireChatPacket
 		if (d->GetCharacter()->GetMapIndex() != iMapIndex)
 			return;
 
-		d->BufferedPacket(&p, sizeof(packet_chat));
+		d->BufferedPacket(&p, sizeof(SPacketGCChat));
 		d->Packet(orig_msg, orig_len);
 	}
 };
 
 int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 {
-	const TPacketCGChat* pinfo = reinterpret_cast<const TPacketCGChat*>(data);
+	const SPacketCGChat* pinfo = reinterpret_cast<const SPacketCGChat*>(data);
 
-	if (uiBytes < pinfo->size)
+	if (uiBytes < pinfo->length)
 		return -1;
 
-	const int32_t iExtraLen = pinfo->size - sizeof(TPacketCGChat);
+	const int32_t iExtraLen = pinfo->length - sizeof(SPacketCGChat);
 
 	if (iExtraLen < 0)
 	{
-		sys_err("invalid packet length (len %d size %u buffer %u)", iExtraLen, pinfo->size, uiBytes);
+		sys_err("invalid packet length (len %d size %u buffer %u)", iExtraLen, pinfo->length, uiBytes);
 		ch->GetDesc()->SetPhase(PHASE_CLOSE);
 		return -1;
 	}
 
 	char buf[CHAT_MAX_LEN - (CHARACTER_NAME_MAX_LEN + 3) + 1];
-	strlcpy(buf, data + sizeof(TPacketCGChat), MIN(iExtraLen + 1, sizeof(buf)));
+	strlcpy(buf, data + sizeof(SPacketCGChat), MIN(iExtraLen + 1, sizeof(buf)));
 	const size_t buflen = strlen(buf);
 
 	if (buflen > 1 && *buf == '/')
@@ -675,12 +675,12 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 		return (iExtraLen);
 	}
 
-	TPacketGCChat pack_chat;
+	SPacketGCChat pack_chat;
 
 	pack_chat.header = HEADER_GC_CHAT;
-	pack_chat.size = sizeof(TPacketGCChat) + len;
+	pack_chat.size = sizeof(SPacketGCChat) + len;
 	pack_chat.type = pinfo->type;
-	pack_chat.id = ch->GetVID();
+	pack_chat.dwVID = ch->GetVID();
 
 	switch (pinfo->type)
 	{
@@ -763,14 +763,14 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 void CInputMain::ItemUse(LPCHARACTER ch, const char * data)
 {
-	ch->UseItem(((struct command_item_use *) data)->Cell);
+	ch->UseItem(((SPacketCGItemUse*) data)->pos);
 }
 
 void CInputMain::ItemToItem(LPCHARACTER ch, const char * pcData)
 {
-	TPacketCGItemUseToItem * p = (TPacketCGItemUseToItem *) pcData;
+	SPacketCGItemUseToItem * p = (SPacketCGItemUseToItem *) pcData;
 	if (ch)
-		ch->UseItem(p->Cell, p->TargetCell);
+		ch->UseItem(p->source_pos, p->target_pos);
 }
 
 void CInputMain::ItemDrop(LPCHARACTER ch, const char * data)
@@ -778,16 +778,16 @@ void CInputMain::ItemDrop(LPCHARACTER ch, const char * data)
 	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
-	struct command_item_drop * pinfo = (struct command_item_drop *) data;
+	SPacketCGItemDrop* pinfo = (SPacketCGItemDrop*) data;
 
 	if (!ch)
 		return;
 
 	// 엘크가 0보다 크면 엘크를 버리는 것 이다.
-	if (pinfo->gold > 0)
-		ch->DropGold(pinfo->gold);
+	if (pinfo->elk > 0)
+		ch->DropGold(pinfo->elk);
 	else
-		ch->DropItem(pinfo->Cell);
+		ch->DropItem(pinfo->pos);
 }
 
 void CInputMain::ItemDrop2(LPCHARACTER ch, const char * data)
@@ -795,7 +795,7 @@ void CInputMain::ItemDrop2(LPCHARACTER ch, const char * data)
 	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
-	TPacketCGItemDrop2 * pinfo = (TPacketCGItemDrop2 *) data;
+	SPacketCGItemDrop2 * pinfo = (SPacketCGItemDrop2 *) data;
 
 	// 엘크가 0보다 크면 엘크를 버리는 것 이다.
 	
@@ -804,34 +804,34 @@ void CInputMain::ItemDrop2(LPCHARACTER ch, const char * data)
 	if (pinfo->gold > 0)
 		ch->DropGold(pinfo->gold);
 	else
-		ch->DropItem(pinfo->Cell, pinfo->count);
+		ch->DropItem(pinfo->pos, pinfo->count);
 }
 
 void CInputMain::ItemMove(LPCHARACTER ch, const char * data)
 {
-	struct command_item_move * pinfo = (struct command_item_move *) data;
+	SPacketCGItemMove* pinfo = (SPacketCGItemMove*) data;
 
 	if (ch)
-		ch->MoveItem(pinfo->Cell, pinfo->CellTo, pinfo->count);
+		ch->MoveItem(pinfo->pos, pinfo->change_pos, pinfo->num);
 }
 
 void CInputMain::ItemPickup(LPCHARACTER ch, const char * data)
 {
-	struct command_item_pickup * pinfo = (struct command_item_pickup*) data;
+	SPacketCGItemPickUp* pinfo = (SPacketCGItemPickUp*) data;
 	if (ch)
 		ch->PickupItem(pinfo->vid);
 }
 
 void CInputMain::QuickslotAdd(LPCHARACTER ch, const char * data)
 {
-	struct command_quickslot_add * pinfo = (struct command_quickslot_add *) data;
+	SPacketCGQuickSlotAdd* pinfo = (SPacketCGQuickSlotAdd*) data;
 	if (!ch || !pinfo)
 		return;
 
-    if (pinfo->slot.type == QUICKSLOT_TYPE_ITEM)
+    if (pinfo->slot.Type == QUICKSLOT_TYPE_ITEM)
     {
         LPITEM item = nullptr;
-        TItemPos srcCell(INVENTORY, pinfo->slot.pos);
+        TItemPos srcCell(INVENTORY, pinfo->slot.Position);
         if (!(item = ch->GetItem(srcCell)))
             return;
         if (item->GetType() != ITEM_USE && item->GetType() != ITEM_QUEST)
@@ -842,68 +842,68 @@ void CInputMain::QuickslotAdd(LPCHARACTER ch, const char * data)
 
 void CInputMain::QuickslotDelete(LPCHARACTER ch, const char * data)
 {
-	struct command_quickslot_del * pinfo = (struct command_quickslot_del *) data;
+	SPacketCGQuickSlotDel* pinfo = (SPacketCGQuickSlotDel*) data;
 	if (ch)
 		ch->DelQuickslot(pinfo->pos);
 }
 
 void CInputMain::QuickslotSwap(LPCHARACTER ch, const char * data)
 {
-	struct command_quickslot_swap * pinfo = (struct command_quickslot_swap *) data;
+	SPacketCGQuickSlotSwap* pinfo = (SPacketCGQuickSlotSwap*) data;
 	if (ch)
 		ch->SwapQuickslot(pinfo->pos, pinfo->change_pos);
 }
 
 int32_t CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
 {
-	TPacketCGMessenger* p = (TPacketCGMessenger*) c_pData;
+	SPacketCGMessenger* p = (SPacketCGMessenger*) c_pData;
 	
-	if (uiBytes < sizeof(TPacketCGMessenger))
+	if (uiBytes < sizeof(SPacketCGMessenger))
 		return -1;
 
-	c_pData += sizeof(TPacketCGMessenger);
-	uiBytes -= sizeof(TPacketCGMessenger);
+	c_pData += sizeof(SPacketCGMessenger);
+	uiBytes -= sizeof(SPacketCGMessenger);
 
 	switch (p->subheader)
 	{
 		case MESSENGER_SUBHEADER_CG_ADD_BY_VID:
 			{
-				if (uiBytes < sizeof(TPacketCGMessengerAddByVID))
+				if (uiBytes < sizeof(TPacketMessengerAddByVID))
 					return -1;
 
-				TPacketCGMessengerAddByVID * p2 = (TPacketCGMessengerAddByVID *) c_pData;
+				TPacketMessengerAddByVID* p2 = (TPacketMessengerAddByVID*) c_pData;
 				LPCHARACTER ch_companion = CHARACTER_MANAGER::instance().Find(p2->vid);
 
 				if (!ch_companion)
-					return sizeof(TPacketCGMessengerAddByVID);
+					return sizeof(TPacketMessengerAddByVID);
 
 				if (ch->IsObserverMode())
-					return sizeof(TPacketCGMessengerAddByVID);
+					return sizeof(TPacketMessengerAddByVID);
 
 				if (ch_companion->IsBlockMode(BLOCK_MESSENGER_INVITE))
 				{
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 메신져 추가 거부 상태입니다."));
-					return sizeof(TPacketCGMessengerAddByVID);
+					return sizeof(TPacketMessengerAddByVID);
 				}
 
 				LPDESC d = ch_companion->GetDesc();
 
 				if (!d)
-					return sizeof(TPacketCGMessengerAddByVID);
+					return sizeof(TPacketMessengerAddByVID);
 
 				if (ch->GetGMLevel() == GM_PLAYER && ch_companion->GetGMLevel() != GM_PLAYER)
 				{
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<메신져> 운영자는 메신져에 추가할 수 없습니다."));
-					return sizeof(TPacketCGMessengerAddByVID);
+					return sizeof(TPacketMessengerAddByVID);
 				}
 
 				if (ch->GetDesc() == d) // 자신은 추가할 수 없다.
-					return sizeof(TPacketCGMessengerAddByVID);
+					return sizeof(TPacketMessengerAddByVID);
 
 				MessengerManager::instance().RequestToAdd(ch, ch_companion);
 				//MessengerManager::instance().AddToList(ch->GetName(), ch_companion->GetName());
 			}
-			return sizeof(TPacketCGMessengerAddByVID);
+			return sizeof(TPacketMessengerAddByVID);
 
 		case MESSENGER_SUBHEADER_CG_ADD_BY_NAME:
 			{
@@ -964,9 +964,9 @@ int32_t CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiByte
 
 int32_t CInputMain::Shop(LPCHARACTER ch, const char * data, size_t uiBytes)
 {
-	TPacketCGShop * p = (TPacketCGShop *) data;
+	SPacketCGShop * p = (SPacketCGShop *) data;
 
-	if (uiBytes < sizeof(TPacketCGShop))
+	if (uiBytes < sizeof(SPacketCGShop))
 		return -1;
 
 	if (g_bIsTestServer)
@@ -976,8 +976,8 @@ int32_t CInputMain::Shop(LPCHARACTER ch, const char * data, size_t uiBytes)
 	if (!ch->GetDesc())
 		return -1;
 
-	const char * c_pData = data + sizeof(TPacketCGShop);
-	uiBytes -= sizeof(TPacketCGShop);
+	const char * c_pData = data + sizeof(SPacketCGShop);
+	uiBytes -= sizeof(SPacketCGShop);
 
 	switch (p->subheader)
 	{
@@ -1032,7 +1032,7 @@ int32_t CInputMain::Shop(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 void CInputMain::OnClick(LPCHARACTER ch, const char * data)
 {
-	struct command_on_click *	pinfo = (struct command_on_click *) data;
+	SPacketCGOnClick*	pinfo = (SPacketCGOnClick*) data;
 	LPCHARACTER			victim;
 
 	if ((victim = CHARACTER_MANAGER::instance().Find(pinfo->vid)))
@@ -1048,7 +1048,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
-	struct command_exchange * pinfo = (struct command_exchange *) data;
+	SPacketCGExchange* pinfo = (SPacketCGExchange*) data;
 	LPCHARACTER	to_ch = nullptr;
 
 	if (!ch->CanHandleItem())
@@ -1070,7 +1070,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 		}
 	}
 
-	sys_log(0, "CInputMain()::Exchange()  SubHeader %d ", pinfo->sub_header);
+	sys_log(0, "CInputMain()::Exchange()  SubHeader %d ", pinfo->subheader);
 
 	if (iPulse - ch->GetSafeboxLoadTime() < PASSES_PER_SEC(g_nPortalLimitTime))
 	{
@@ -1079,7 +1079,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 	}
 
 
-	switch (pinfo->sub_header)
+	switch (pinfo->subheader)
 	{
 		case EXCHANGE_SUBHEADER_CG_START:	// arg1 == vid of target character
 			if (!ch->GetExchange())
@@ -1190,7 +1190,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 
 void CInputMain::Position(LPCHARACTER ch, const char * data)
 {
-	struct command_position * pinfo = (struct command_position *) data;
+	SPacketCGPosition* pinfo = (SPacketCGPosition*) data;
 
 	switch (pinfo->position)
 	{
@@ -1458,7 +1458,7 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 	if (!ch->CanMove())
 		return;
 
-	struct command_move * pinfo = (struct command_move *) data;
+	SPacketCGMove* pinfo = (SPacketCGMove*) data;
 
 	if (pinfo->bFunc >= FUNC_MAX_NUM && !(pinfo->bFunc & 0x80))
 	{
@@ -1604,9 +1604,9 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 		ch->StopStaminaConsume();
 	}
 
-	TPacketGCMove pack;
+	SPacketGCMove pack;
 
-	pack.bHeader      = HEADER_GC_MOVE;
+	pack.header       = HEADER_GC_CHARACTER_MOVE;
 	pack.bFunc        = pinfo->bFunc;
 	pack.bArg         = pinfo->bArg;
 	pack.rot          = pinfo->rot;
@@ -1616,7 +1616,7 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 	pack.dwTime       = pinfo->dwTime;
 	pack.dwDuration   = (pinfo->bFunc == FUNC_MOVE) ? ch->GetCurrentMoveDuration() : 0;
 
-	ch->PacketAround(&pack, sizeof(TPacketGCMove), ch);
+	ch->PacketAround(&pack, sizeof(SPacketGCMove), ch);
 /*
 	if (pinfo->dwTime == 10653691) // 디버거 발견
 	{
@@ -1696,9 +1696,9 @@ void CInputMain::Attack(LPCHARACTER ch, const uint8_t header, const char* data)
 				if (nullptr == ch->GetDesc())
 					return;
 
-				const TPacketCGAttack* packMelee = reinterpret_cast<const TPacketCGAttack*>(data);
+				const SPacketCGAttack* packMelee = reinterpret_cast<const SPacketCGAttack*>(data);
 
-				LPCHARACTER	victim = CHARACTER_MANAGER::instance().Find(packMelee->dwVID);
+				LPCHARACTER	victim = CHARACTER_MANAGER::instance().Find(packMelee->dwVictimVID);
 
 				if (nullptr == victim || ch == victim)
 					return;
@@ -1725,7 +1725,7 @@ void CInputMain::Attack(LPCHARACTER ch, const uint8_t header, const char* data)
 
 		case HEADER_CG_SHOOT:
 			{
-				const TPacketCGShoot* const packShoot = reinterpret_cast<const TPacketCGShoot*>(data);
+				const SPacketCGShoot* const packShoot = reinterpret_cast<const SPacketCGShoot*>(data);
 
 				ch->Shoot(packShoot->bType);
 			}
@@ -1735,12 +1735,12 @@ void CInputMain::Attack(LPCHARACTER ch, const uint8_t header, const char* data)
 
 int32_t CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t uiBytes)
 {
-	const TPacketCGSyncPosition* pinfo = reinterpret_cast<const TPacketCGSyncPosition*>( c_pcData );
+	const SPacketCGSyncPosition* pinfo = reinterpret_cast<const SPacketCGSyncPosition*>( c_pcData );
 
 	if (uiBytes < pinfo->wSize)
 		return -1;
 
-	int32_t iExtraLen = pinfo->wSize - sizeof(TPacketCGSyncPosition);
+	int32_t iExtraLen = pinfo->wSize - sizeof(SPacketCGSyncPosition);
 
 	if (iExtraLen < 0)
 	{
@@ -1749,13 +1749,13 @@ int32_t CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t u
 		return -1;
 	}
 
-	if (0 != (iExtraLen % sizeof(TPacketCGSyncPositionElement)))
+	if (0 != (iExtraLen % sizeof(SPacketSyncPositionElement)))
 	{
 		sys_err("invalid packet length %d (name: %s)", pinfo->wSize, ch->GetName());
 		return iExtraLen;
 	}
 
-	int32_t iCount = iExtraLen / sizeof(TPacketCGSyncPositionElement);
+	int32_t iCount = iExtraLen / sizeof(SPacketSyncPositionElement);
 
 	if (iCount <= 0)
 		return iExtraLen;
@@ -1774,11 +1774,10 @@ int32_t CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t u
 	TEMP_BUFFER tbuf;
 	LPBUFFER lpBuf = tbuf.getptr();
 
-	TPacketGCSyncPosition * pHeader = (TPacketGCSyncPosition *) buffer_write_peek(lpBuf);
-	buffer_write_proceed(lpBuf, sizeof(TPacketGCSyncPosition));
+	SPacketGCSyncPosition * pHeader = (SPacketGCSyncPosition *) buffer_write_peek(lpBuf);
+	buffer_write_proceed(lpBuf, sizeof(SPacketGCSyncPosition));
 
-	const TPacketCGSyncPositionElement* e = 
-		reinterpret_cast<const TPacketCGSyncPositionElement*>(c_pcData + sizeof(TPacketCGSyncPosition));
+	auto e = reinterpret_cast<const SPacketSyncPositionElement*>(c_pcData + sizeof(SPacketCGSyncPosition));
 
 	timeval tvCurTime;
 	gettimeofday(&tvCurTime, nullptr);
@@ -1889,13 +1888,13 @@ int32_t CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t u
 			}
 			victim->SetLastSyncTime(tvCurTime);
 			victim->Sync(e->lX, e->lY);
-			buffer_write(lpBuf, e, sizeof(TPacketCGSyncPositionElement));
+			buffer_write(lpBuf, e, sizeof(SPacketSyncPositionElement));
 		}
 	}
 
-	if (buffer_size(lpBuf) != sizeof(TPacketGCSyncPosition))
+	if (buffer_size(lpBuf) != sizeof(SPacketGCSyncPosition))
 	{
-		pHeader->bHeader = HEADER_GC_SYNC_POSITION;
+		pHeader->header = HEADER_GC_SYNC_POSITION;
 		pHeader->wSize = buffer_size(lpBuf);
 
 		ch->PacketAround(buffer_read_peek(lpBuf), buffer_size(lpBuf), ch);
@@ -1906,22 +1905,22 @@ int32_t CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t u
 
 void CInputMain::FlyTarget(LPCHARACTER ch, const char * pcData, uint8_t bHeader)
 {
-	TPacketCGFlyTargeting * p = (TPacketCGFlyTargeting *) pcData;
-	ch->FlyTarget(p->dwTargetVID, p->x, p->y, bHeader);
+	SPacketCGFlyTargeting * p = (SPacketCGFlyTargeting *) pcData;
+	ch->FlyTarget(p->dwTargetVID, p->lX, p->lY, bHeader);
 }
 
 void CInputMain::UseSkill(LPCHARACTER ch, const char * pcData)
 {
-	TPacketCGUseSkill * p = (TPacketCGUseSkill *) pcData;
+	SPacketCGUseSkill * p = (SPacketCGUseSkill *) pcData;
 	if (!ch->CanUseSkill(p->dwVnum))
 		return;
 
-	ch->UseSkill(p->dwVnum, CHARACTER_MANAGER::instance().Find(p->dwVID));
+	ch->UseSkill(p->dwVnum, CHARACTER_MANAGER::instance().Find(p->dwTargetVID));
 }
 
 void CInputMain::ScriptButton(LPCHARACTER ch, const void* c_pData)
 {
-	TPacketCGScriptButton * p = (TPacketCGScriptButton *) c_pData;
+	SPacketCGScriptButton * p = (SPacketCGScriptButton *) c_pData;
 	sys_log(0, "QUEST ScriptButton pid %d idx %u", ch->GetPlayerID(), p->idx);
 
 	quest::PC* pc = quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID());
@@ -1935,7 +1934,7 @@ void CInputMain::ScriptButton(LPCHARACTER ch, const void* c_pData)
 
 void CInputMain::ScriptAnswer(LPCHARACTER ch, const void* c_pData)
 {
-	TPacketCGScriptAnswer * p = (TPacketCGScriptAnswer *) c_pData;
+	SPacketCGScriptAnswer * p = (SPacketCGScriptAnswer *) c_pData;
 	sys_log(0, "QUEST ScriptAnswer pid %d answer %d", ch->GetPlayerID(), p->answer);
 
 	if (p->answer > 250) // 다음 버튼에 대한 응답으로 온 패킷인 경우
@@ -1952,7 +1951,7 @@ void CInputMain::ScriptAnswer(LPCHARACTER ch, const void* c_pData)
 // SCRIPT_SELECT_ITEM
 void CInputMain::ScriptSelectItem(LPCHARACTER ch, const void* c_pData)
 {
-	TPacketCGScriptSelectItem* p = (TPacketCGScriptSelectItem*) c_pData;
+	SPacketCGScriptSelectItem* p = (SPacketCGScriptSelectItem*) c_pData;
 	sys_log(0, "QUEST ScriptSelectItem pid %d answer %d", ch->GetPlayerID(), p->selection);
 	quest::CQuestManager::Instance().SelectItem(ch->GetPlayerID(), p->selection);
 }
@@ -1960,10 +1959,10 @@ void CInputMain::ScriptSelectItem(LPCHARACTER ch, const void* c_pData)
 
 void CInputMain::QuestInputString(LPCHARACTER ch, const void* c_pData)
 {
-	TPacketCGQuestInputString * p = (TPacketCGQuestInputString*) c_pData;
+	SPacketCGQuestInputString * p = (SPacketCGQuestInputString*) c_pData;
 
 	char msg[65];
-	strlcpy(msg, p->msg, sizeof(msg));
+	strlcpy(msg, p->szString, sizeof(msg));
 	sys_log(0, "QUEST InputString pid %u msg %s", ch->GetPlayerID(), msg);
 
 	quest::CQuestManager::Instance().Input(ch->GetPlayerID(), msg);
@@ -1971,7 +1970,7 @@ void CInputMain::QuestInputString(LPCHARACTER ch, const void* c_pData)
 
 void CInputMain::QuestConfirm(LPCHARACTER ch, const void* c_pData)
 {
-	TPacketCGQuestConfirm* p = (TPacketCGQuestConfirm*) c_pData;
+	SPacketCGQuestConfirm* p = (SPacketCGQuestConfirm*) c_pData;
 	LPCHARACTER ch_wait = CHARACTER_MANAGER::instance().FindByPID(p->requestPID);
 	if (p->answer)
 		p->answer = quest::CONFIRM_YES;
@@ -1984,24 +1983,19 @@ void CInputMain::QuestConfirm(LPCHARACTER ch, const void* c_pData)
 
 void CInputMain::Target(LPCHARACTER ch, const char * pcData)
 {
-	TPacketCGTarget * p = (TPacketCGTarget *) pcData;
+	SPacketCGTarget * p = (SPacketCGTarget *) pcData;
 
 	building::LPOBJECT pkObj = building::CManager::instance().FindObjectByVID(p->dwVID);
 
 	if (pkObj)
 	{
-		TPacketGCTarget pckTarget;
+		SPacketGCTarget pckTarget;
 		pckTarget.header = HEADER_GC_TARGET;
 		pckTarget.dwVID = p->dwVID;
-		ch->GetDesc()->Packet(&pckTarget, sizeof(TPacketGCTarget));
+		ch->GetDesc()->Packet(&pckTarget, sizeof(SPacketGCTarget));
 	}
 	else
 		ch->SetTarget(CHARACTER_MANAGER::instance().Find(p->dwVID));
-}
-
-void CInputMain::Warp(LPCHARACTER ch, const char * pcData)
-{
-	ch->WarpEnd();
 }
 
 void CInputMain::TargetDrop(LPCHARACTER ch, const char * pcData)
@@ -2011,7 +2005,7 @@ void CInputMain::TargetDrop(LPCHARACTER ch, const char * pcData)
 
 void CInputMain::ChestDropInfo(LPCHARACTER ch, const char* c_pData)
 {
-	TPacketCGChestDropInfo* p = (TPacketCGChestDropInfo*)c_pData;
+	SPacketCGChestDropInfo* p = (SPacketCGChestDropInfo*)c_pData;
 
 	if (p->wInventoryCell >= INVENTORY_MAX_NUM)
 		return;
@@ -2035,8 +2029,8 @@ void CInputMain::ChestDropInfo(LPCHARACTER ch, const char* c_pData)
 	if (vec_ItemList.size() == 0)
 		return;
 
-	TPacketGCChestDropInfo packet;
-	packet.bHeader = HEADER_GC_CHEST_DROP_INFO;
+	SPacketGCChestDropInfo packet;
+	packet.header = HEADER_GC_CHEST_DROP_INFO;
 	packet.wSize = sizeof(packet) + sizeof(TChestDropInfoTable) * vec_ItemList.size();
 	packet.dwChestVnum = pkItem->GetVnum();
 
@@ -2049,7 +2043,7 @@ void CInputMain::SafeboxCheckin(LPCHARACTER ch, const char * c_pData)
 	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
-	TPacketCGSafeboxCheckin * p = (TPacketCGSafeboxCheckin *)c_pData;
+	SPacketCGSafeboxCheckin * p = (SPacketCGSafeboxCheckin *)c_pData;
 
 	quest::PC* pc = quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID());
 	if (pc && pc->IsRunning() == true)
@@ -2145,7 +2139,7 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
-	TPacketCGSafeboxCheckout * p = (TPacketCGSafeboxCheckout *) c_pData;
+	SPacketCGSafeboxCheckout * p = (SPacketCGSafeboxCheckout *) c_pData;
 
 	if (!ch->CanHandleItem())
 		return;
@@ -2233,7 +2227,7 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 
 void CInputMain::SafeboxItemMove(LPCHARACTER ch, const char * data)
 {
-	struct command_item_move * pinfo = (struct command_item_move *) data;
+	SPacketCGSafeboxItemMove * pinfo = (SPacketCGSafeboxItemMove*) data;
 
 	if (!ch->CanHandleItem())
 		return;
@@ -2241,7 +2235,7 @@ void CInputMain::SafeboxItemMove(LPCHARACTER ch, const char * data)
 	if (!ch->GetSafebox())
 		return;
 
-	ch->GetSafebox()->MoveItem(pinfo->Cell.cell, pinfo->CellTo.cell, pinfo->count);
+	ch->GetSafebox()->MoveItem(pinfo->pos.cell, pinfo->change_pos.cell, pinfo->num);
 }
 
 // PARTY_JOIN_BUG_FIX
@@ -2259,7 +2253,7 @@ void CInputMain::PartyInvite(LPCHARACTER ch, const char * c_pData)
 		return;
 	}
 
-	TPacketCGPartyInvite * p = (TPacketCGPartyInvite*) c_pData;
+	SPacketCGPartyInvite * p = (SPacketCGPartyInvite*) c_pData;
 
 	LPCHARACTER pInvitee = CHARACTER_MANAGER::instance().Find(p->vid);
 
@@ -2286,7 +2280,7 @@ void CInputMain::PartyInviteAnswer(LPCHARACTER ch, const char * c_pData)
 		return;
 	}
 
-	TPacketCGPartyInviteAnswer * p = (TPacketCGPartyInviteAnswer*) c_pData;
+	SPacketCGPartyInviteAnswer * p = (SPacketCGPartyInviteAnswer*) c_pData;
 
 	LPCHARACTER pInviter = CHARACTER_MANAGER::instance().Find(p->leader_vid);
 
@@ -2309,7 +2303,7 @@ void CInputMain::PartySetState(LPCHARACTER ch, const char* c_pData)
 		return;
 	}
 
-	TPacketCGPartySetState* p = (TPacketCGPartySetState*) c_pData;
+	SPacketCGPartySetState* p = (SPacketCGPartySetState*) c_pData;
 
 	if (!ch->GetParty())
 		return;
@@ -2320,16 +2314,16 @@ void CInputMain::PartySetState(LPCHARACTER ch, const char* c_pData)
 		return;
 	}
 
-	if (!ch->GetParty()->IsMember(p->pid))
+	if (!ch->GetParty()->IsMember(p->dwPID))
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 상태를 변경하려는 사람이 파티원이 아닙니다."));
 		return;
 	}
 
-	uint32_t pid = p->pid;
-	sys_log(0, "PARTY SetRole pid %d to role %d state %s", pid, p->byRole, p->flag ? "on" : "off");
+	uint32_t pid = p->dwPID;
+	sys_log(0, "PARTY SetRole pid %d to role %d state %s", pid, p->byState, p->byFlag ? "on" : "off");
 
-	switch (p->byRole)
+	switch (p->byState)
 	{
 		case PARTY_ROLE_NORMAL:
 			break;
@@ -2340,13 +2334,13 @@ void CInputMain::PartySetState(LPCHARACTER ch, const char* c_pData)
 		case PARTY_ROLE_SKILL_MASTER:
 		case PARTY_ROLE_HASTE:
 		case PARTY_ROLE_DEFENDER:
-			if (ch->GetParty()->SetRole(pid, p->byRole, p->flag))
+			if (ch->GetParty()->SetRole(pid, p->byState, p->byFlag))
 			{
 				TPacketPartyStateChange pack;
 				pack.dwLeaderPID = ch->GetPlayerID();
-				pack.dwPID = p->pid;
-				pack.bRole = p->byRole;
-				pack.bFlag = p->flag;
+				pack.dwPID = p->dwPID;
+				pack.bRole = p->byState;
+				pack.bFlag = p->byFlag;
 				db_clientdesc->DBPacket(HEADER_GD_PARTY_STATE_CHANGE, 0, &pack, sizeof(pack));
 			}
 			/* else
@@ -2354,7 +2348,7 @@ void CInputMain::PartySetState(LPCHARACTER ch, const char* c_pData)
 			break;
 
 		default:
-			sys_err("wrong byRole in PartySetState Packet name %s state %d", ch->GetName(), p->byRole);
+			sys_err("wrong byRole in PartySetState Packet name %s state %d", ch->GetName(), p->byState);
 			break;
 	}
 }
@@ -2382,7 +2376,7 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 		return;
 	}
 
-	TPacketCGPartyRemove* p = (TPacketCGPartyRemove*) c_pData;
+	SPacketCGPartyRemove* p = (SPacketCGPartyRemove*) c_pData;
 
 	LPPARTY pParty = ch->GetParty();
 	if (pParty->GetLeaderPID() == ch->GetPlayerID())
@@ -2461,7 +2455,7 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 
 void CInputMain::AnswerMakeGuild(LPCHARACTER ch, const char* c_pData)
 {
-	TPacketCGAnswerMakeGuild* p = (TPacketCGAnswerMakeGuild*) c_pData;
+	SPacketCGAnswerMakeGuild* p = (SPacketCGAnswerMakeGuild*) c_pData;
 
 	if (ch->GetGold() < 200000 || ch->GetLevel() < 40)
 		return;
@@ -2523,7 +2517,7 @@ void CInputMain::AnswerMakeGuild(LPCHARACTER ch, const char* c_pData)
 
 void CInputMain::PartyUseSkill(LPCHARACTER ch, const char* c_pData)
 {
-	TPacketCGPartyUseSkill* p = (TPacketCGPartyUseSkill*) c_pData; 
+	SPacketCGPartyUseSkill* p = (SPacketCGPartyUseSkill*) c_pData; 
 	if (!ch->GetParty())
 		return;
 
@@ -2540,7 +2534,7 @@ void CInputMain::PartyUseSkill(LPCHARACTER ch, const char* c_pData)
 			break;
 		case PARTY_SKILL_WARP:
 			{
-				LPCHARACTER pch = CHARACTER_MANAGER::instance().Find(p->vid);
+				LPCHARACTER pch = CHARACTER_MANAGER::instance().Find(p->dwTargetVID);
 				if (pch && pch->IsPC() && ch->GetParty() == pch->GetParty())
 				{
 					if (ch->GetWarMap())
@@ -2564,13 +2558,13 @@ void CInputMain::PartyUseSkill(LPCHARACTER ch, const char* c_pData)
 
 void CInputMain::PartyParameter(LPCHARACTER ch, const char * c_pData)
 {
-	TPacketCGPartyParameter * p = (TPacketCGPartyParameter *) c_pData;
+	SPacketCGPartyParameter * p = (SPacketCGPartyParameter *) c_pData;
 
 	if (ch->GetParty())
 		ch->GetParty()->SetParameter(p->bDistributeMode);
 }
 
-size_t GetSubPacketSize(const GUILD_SUBHEADER_CG& header)
+size_t GetSubPacketSize(const EPacketCGGuildSubHeaderType& header)
 {
 	switch (header)
 	{
@@ -2586,7 +2580,7 @@ size_t GetSubPacketSize(const GUILD_SUBHEADER_CG& header)
 		case GUILD_SUBHEADER_CG_DELETE_COMMENT:				return sizeof(uint32_t);
 		case GUILD_SUBHEADER_CG_REFRESH_COMMENT:			return 0;
 		case GUILD_SUBHEADER_CG_CHANGE_MEMBER_GRADE:		return sizeof(uint32_t) + sizeof(uint8_t);
-		case GUILD_SUBHEADER_CG_USE_SKILL:					return sizeof(TPacketCGGuildUseSkill);
+		case GUILD_SUBHEADER_CG_USE_SKILL:					return sizeof(TPacketGuildUseSkill);
 		case GUILD_SUBHEADER_CG_CHANGE_MEMBER_GENERAL:		return sizeof(uint32_t) + sizeof(uint8_t);
 		case GUILD_SUBHEADER_CG_GUILD_INVITE_ANSWER:		return sizeof(uint32_t) + sizeof(uint8_t);
 	}
@@ -2596,15 +2590,15 @@ size_t GetSubPacketSize(const GUILD_SUBHEADER_CG& header)
 
 int32_t CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 {
-	if (uiBytes < sizeof(TPacketCGGuild))
+	if (uiBytes < sizeof(SPacketCGGuild))
 		return -1;
 
-	const TPacketCGGuild* p = reinterpret_cast<const TPacketCGGuild*>(data);
-	const char* c_pData = data + sizeof(TPacketCGGuild);
+	const SPacketCGGuild* p = reinterpret_cast<const SPacketCGGuild*>(data);
+	const char* c_pData = data + sizeof(SPacketCGGuild);
 
-	uiBytes -= sizeof(TPacketCGGuild);
+	uiBytes -= sizeof(SPacketCGGuild);
 
-	const GUILD_SUBHEADER_CG SubHeader = static_cast<GUILD_SUBHEADER_CG>(p->subheader);
+	const EPacketCGGuildSubHeaderType SubHeader = static_cast<EPacketCGGuildSubHeaderType>(p->bySubHeader);
 	const size_t SubPacketLen = GetSubPacketSize(SubHeader);
 
 	if (uiBytes < SubPacketLen)
@@ -2951,7 +2945,7 @@ void CInputMain::Fishing(LPCHARACTER ch, const char* c_pData)
 	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
-	TPacketCGFishing* p = (TPacketCGFishing*)c_pData;
+	SPacketCGFishing* p = (SPacketCGFishing*)c_pData;
 	ch->SetRotation(p->dir * 5);
 	ch->fishing();
 	return;
@@ -2962,7 +2956,7 @@ void CInputMain::ItemGive(LPCHARACTER ch, const char* c_pData)
 	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
-	TPacketCGGiveItem* p = (TPacketCGGiveItem*) c_pData;
+	SPacketCGGiveItem* p = (SPacketCGGiveItem*) c_pData;
 	LPCHARACTER to_ch = CHARACTER_MANAGER::instance().Find(p->dwTargetVID);
 
 	if (to_ch)
@@ -2973,7 +2967,7 @@ void CInputMain::ItemGive(LPCHARACTER ch, const char* c_pData)
 
 void CInputMain::Hack(LPCHARACTER ch, const char * c_pData)
 {
-	TPacketCGHack * p = (TPacketCGHack *) c_pData;
+	SPacketCGHack * p = (SPacketCGHack *) c_pData;
 	if (!p || p->szBuf == '\0')
 		return;
 
@@ -3005,10 +2999,10 @@ void CInputMain::Hack(LPCHARACTER ch, const char * c_pData)
 
 int32_t CInputMain::MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes)
 {
-	TPacketCGMyShop * p = (TPacketCGMyShop *) c_pData;
+	SPacketCGMyShop * p = (SPacketCGMyShop *) c_pData;
 	int32_t iExtraLen = p->bCount * sizeof(TShopItemTable);
 
-	if (uiBytes < sizeof(TPacketCGMyShop) + iExtraLen)
+	if (uiBytes < sizeof(SPacketCGMyShop) + iExtraLen)
 		return -1;
 
 	if (ch->GetGold() >= GOLD_MAX)
@@ -3028,13 +3022,13 @@ int32_t CInputMain::MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes)
 	}
 
 	sys_log(0, "MyShop count %d", p->bCount);
-	ch->OpenMyShop(p->szSign, (TShopItemTable *) (c_pData + sizeof(TPacketCGMyShop)), p->bCount);
+	ch->OpenMyShop(p->szSign, (TShopItemTable *) (c_pData + sizeof(SPacketCGMyShop)), p->bCount);
 	return (iExtraLen);
 }
 
 void CInputMain::Refine(LPCHARACTER ch, const char* c_pData)
 {
-	const TPacketCGRefine* p = reinterpret_cast<const TPacketCGRefine*>(c_pData);
+	const SPacketCGRefine* p = reinterpret_cast<const SPacketCGRefine*>(c_pData);
 
 	if (ch->GetExchange() || ch->IsOpenSafebox() || ch->GetShopOwner() || ch->GetMyShop() || ch->IsCubeOpen())
 	{
@@ -3155,7 +3149,7 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 
 	int32_t iExtraLen = 0;
 	
-	if (g_bIsTestServer && bHeader != HEADER_CG_MOVE)
+	if (g_bIsTestServer && bHeader != HEADER_CG_CHARACTER_MOVE)
 		sys_log(0, "CInputMain::Analyze() ==> Header [%d] ", bHeader);
 
 	switch (bHeader)
@@ -3172,7 +3166,7 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 			if (g_bIsTestServer)
 			{
 				char* pBuf = (char*)c_pData;
-				sys_log(0, "%s", pBuf + sizeof(TPacketCGChat));
+				sys_log(0, "%s", pBuf + sizeof(SPacketCGChat));
 			}
 	
 			if ((iExtraLen = Chat(ch, c_pData, m_iBufferLeft)) < 0)
@@ -3184,7 +3178,7 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 				return -1;
 			break;
 
-		case HEADER_CG_MOVE:
+		case HEADER_CG_CHARACTER_MOVE:
 			Move(ch, c_pData);
 			break;
 
@@ -3230,7 +3224,7 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 				ItemToItem(ch, c_pData);
 			break;
 
-		case HEADER_CG_ITEM_GIVE:
+		case HEADER_CG_GIVE_ITEM:
 			if (!ch->IsObserverMode())
 				ItemGive(ch, c_pData);
 			break;
@@ -3323,10 +3317,6 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 			ChestDropInfo(ch, c_pData);
 			break;
 
-		case HEADER_CG_WARP:
-			Warp(ch, c_pData);
-			break;
-
 		case HEADER_CG_SAFEBOX_CHECKIN:
 			SafeboxCheckin(ch, c_pData);
 			break;
@@ -3395,23 +3385,23 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 
 		case HEADER_CG_DRAGON_SOUL_REFINE:
 			{
-				TPacketCGDragonSoulRefine* p = reinterpret_cast <TPacketCGDragonSoulRefine*>((void*)c_pData);
+				SPacketCGDragonSoulRefine* p = reinterpret_cast <SPacketCGDragonSoulRefine*>((void*)c_pData);
 				switch(p->bSubType)
 				{
 				case DS_SUB_HEADER_CLOSE:
 					ch->DragonSoul_RefineWindow_Close();
 					break;
-				case DS_SUB_HEADER_DO_REFINE_GRADE:
+				case DS_SUB_HEADER_DO_UPGRADE:
 					{
 						DSManager::instance().DoRefineGrade(ch, p->ItemGrid);
 					}
 					break;
-				case DS_SUB_HEADER_DO_REFINE_STEP:
+				case DS_SUB_HEADER_DO_IMPROVEMENT:
 					{
 						DSManager::instance().DoRefineStep(ch, p->ItemGrid);
 					}
 					break;
-				case DS_SUB_HEADER_DO_REFINE_STRENGTH:
+				case DS_SUB_HEADER_DO_REFINE:
 					{
 						DSManager::instance().DoRefineStrength(ch, p->ItemGrid);
 					}

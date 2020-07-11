@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.2)
 project(sourceCommon)
 
 file(GLOB SOURCECOMMON_HEADERS
-    "*.h"
-    "*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp"
 )
 
 add_library(${PROJECT_NAME} INTERFACE)

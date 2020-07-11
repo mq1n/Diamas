@@ -42,7 +42,7 @@ namespace
 
 		uint32_t		id;
 		const char *	name;
-		TPacketGCGuild	p;
+		SPacketGCGuild	p;
 	};
 }
 
@@ -614,7 +614,7 @@ struct FSendWarList
 	}
 
 	uint32_t gid1, gid2;
-	TPacketGCGuild p;
+	SPacketGCGuild p;
 };
 
 void CGuildManager::StartWar(uint32_t guild_id1, uint32_t guild_id2)
@@ -800,7 +800,7 @@ void CGuildManager::SendGuildWar(LPCHARACTER ch)
 		return;
 
 	TEMP_BUFFER buf;
-	TPacketGCGuild p;
+	SPacketGCGuild p;
 	p.header= HEADER_GC_GUILD;
 	p.subheader = GUILD_SUBHEADER_GC_GUILD_WAR_LIST;
 	p.size = sizeof(p) + (sizeof(uint32_t) * 2) * m_GuildWar.size();

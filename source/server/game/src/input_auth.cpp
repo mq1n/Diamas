@@ -42,7 +42,7 @@ CInputAuth::CInputAuth()
 
 void CInputAuth::Login(LPDESC d, const char * c_pData)
 {
-	TPacketCGLogin3 * pinfo = (TPacketCGLogin3 *) c_pData;
+	SPacketCGLogin3 * pinfo = (SPacketCGLogin3 *) c_pData;
 
 	if (!g_bAuthServer)
 	{
@@ -54,10 +54,10 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 
 	// string 무결성을 위해 복사
 	char login[LOGIN_MAX_LEN + 1];
-	trim_and_lower(pinfo->login, login, sizeof(login));
+	trim_and_lower(pinfo->name, login, sizeof(login));
 
 	char passwd[PASSWD_MAX_LEN + 1];
-	strlcpy(passwd, pinfo->passwd, sizeof(passwd));
+	strlcpy(passwd, pinfo->pwd, sizeof(passwd));
 
 	sys_log(0, "InputAuth::Login : %s(%d) desc %p",
 			login, strlen(login), get_pointer(d));
@@ -79,7 +79,7 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 
 	if (g_bNoMoreClient)
 	{
-		TPacketGCLoginFailure failurePacket;
+		SPacketGCLoginFailure failurePacket;
 
 		failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 		strlcpy(failurePacket.szStatus, "SHUTDOWN", sizeof(failurePacket.szStatus));
@@ -98,8 +98,8 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 
 	sys_log (0, "InputAuth::Login : key %u: login %s", dwKey, login);
 
-	TPacketCGLogin3 * p = M2_NEW TPacketCGLogin3;
-	memcpy(p, pinfo, sizeof(TPacketCGLogin3));
+	auto p = M2_NEW SPacketCGLogin3;
+	memcpy(p, pinfo, sizeof(SPacketCGLogin3));
 
 	char szPasswd[PASSWD_MAX_LEN * 2 + 1];
 	DBManager::instance().EscapeString(szPasswd, sizeof(szPasswd), passwd, strlen(passwd));

@@ -609,7 +609,7 @@ void CWarMap::Packet(const void * p, int32_t size)
 
 void CWarMap::SendWarPacket(LPDESC d)
 {
-	TPacketGCGuild pack;
+	SPacketGCGuild pack;
 	TPacketGCGuildWar pack2;
 
 	pack.header		= HEADER_GC_GUILD;
@@ -627,7 +627,7 @@ void CWarMap::SendWarPacket(LPDESC d)
 
 void CWarMap::SendScorePacket(uint8_t bIdx, LPDESC d)
 {
-	TPacketGCGuild p;
+	SPacketGCGuild p;
 
 	p.header = HEADER_GC_GUILD;
 	p.subheader = GUILD_SUBHEADER_GC_WAR_SCORE;

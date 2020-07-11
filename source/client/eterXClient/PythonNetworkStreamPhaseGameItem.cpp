@@ -30,8 +30,7 @@ bool CPythonNetworkStream::SendSafeBoxCheckinPacket(TItemPos InventoryPos, uint8
 {
 	__PlayInventoryItemDropSound(InventoryPos);
 
-	TPacketCGSafeboxCheckin kSafeboxCheckin;
-	kSafeboxCheckin.bHeader = HEADER_CG_SAFEBOX_CHECKIN;
+	SPacketCGSafeboxCheckin kSafeboxCheckin;
 	kSafeboxCheckin.ItemPos = InventoryPos;
 	kSafeboxCheckin.bSafePos = bySafeBoxPos;
 	if (!Send(sizeof(kSafeboxCheckin), &kSafeboxCheckin))
@@ -44,8 +43,7 @@ bool CPythonNetworkStream::SendSafeBoxCheckoutPacket(uint8_t bySafeBoxPos, TItem
 {
 	__PlaySafeBoxItemDropSound(bySafeBoxPos);
 
-	TPacketCGSafeboxCheckout kSafeboxCheckout;
-	kSafeboxCheckout.bHeader = HEADER_CG_SAFEBOX_CHECKOUT;
+	SPacketCGSafeboxCheckout kSafeboxCheckout;
 	kSafeboxCheckout.bSafePos = bySafeBoxPos;
 	kSafeboxCheckout.ItemPos = InventoryPos;
 	if (!Send(sizeof(kSafeboxCheckout), &kSafeboxCheckout))
@@ -58,8 +56,7 @@ bool CPythonNetworkStream::SendSafeBoxItemMovePacket(uint8_t bySourcePos, uint8_
 {
 	__PlaySafeBoxItemDropSound(bySourcePos);
 
-	TPacketCGItemMove kItemMove;
-	kItemMove.header = HEADER_CG_SAFEBOX_ITEM_MOVE;
+	SPacketCGItemMove kItemMove;
 	kItemMove.pos = TItemPos(INVENTORY, bySourcePos);
 	kItemMove.num = byCount;
 	kItemMove.change_pos = TItemPos(INVENTORY, byTargetPos);
@@ -71,15 +68,13 @@ bool CPythonNetworkStream::SendSafeBoxItemMovePacket(uint8_t bySourcePos, uint8_
 
 bool CPythonNetworkStream::RecvSafeBoxSetPacket()
 {
-	TPacketGCItemSet2 kItemSet;
+	SPacketGCSafeboxSet kItemSet;
 	if (!Recv(sizeof(kItemSet), &kItemSet))
 		return false;
 
 	TItemData kItemData;
 	kItemData.vnum	= kItemSet.vnum;
 	kItemData.count = kItemSet.count;
-	kItemData.flags = kItemSet.flags;
-	kItemData.anti_flags = kItemSet.anti_flags;
 	for (int32_t isocket=0; isocket<ITEM_SOCKET_SLOT_MAX_NUM; ++isocket)
 		kItemData.alSockets[isocket] = kItemSet.alSockets[isocket];
 	for (int32_t iattr=0; iattr<ITEM_ATTRIBUTE_SLOT_MAX_NUM; ++iattr)
@@ -94,7 +89,7 @@ bool CPythonNetworkStream::RecvSafeBoxSetPacket()
 
 bool CPythonNetworkStream::RecvSafeBoxDelPacket()
 {
-	TPacketGCItemDel kItemDel;
+	SPacketGCSafeboxDel kItemDel;
 	if (!Recv(sizeof(kItemDel), &kItemDel))
 		return false;
 
@@ -107,7 +102,7 @@ bool CPythonNetworkStream::RecvSafeBoxDelPacket()
 
 bool CPythonNetworkStream::RecvSafeBoxWrongPasswordPacket()
 {
-	TPacketGCSafeboxWrongPassword kSafeboxWrongPassword;
+	SPacketGCSafeboxWrongPassword kSafeboxWrongPassword;
 
 	if (!Recv(sizeof(kSafeboxWrongPassword), &kSafeboxWrongPassword))
 		return false;
@@ -119,7 +114,7 @@ bool CPythonNetworkStream::RecvSafeBoxWrongPasswordPacket()
 
 bool CPythonNetworkStream::RecvSafeBoxSizePacket()
 {
-	TPacketGCSafeboxSize kSafeBoxSize;
+	SPacketGCSafeboxSize kSafeBoxSize;
 	if (!Recv(sizeof(kSafeBoxSize), &kSafeBoxSize))
 		return false;
 
@@ -138,8 +133,7 @@ bool CPythonNetworkStream::SendMallCheckoutPacket(uint8_t byMallPos, TItemPos In
 {
 	__PlayMallItemDropSound(byMallPos);
 
-	TPacketCGMallCheckout kMallCheckoutPacket;
-	kMallCheckoutPacket.bHeader = HEADER_CG_MALL_CHECKOUT;
+	SPacketCGMallCheckout kMallCheckoutPacket;
 	kMallCheckoutPacket.bMallPos = byMallPos;
 	kMallCheckoutPacket.ItemPos = InventoryPos;
 	if (!Send(sizeof(kMallCheckoutPacket), &kMallCheckoutPacket))
@@ -150,7 +144,7 @@ bool CPythonNetworkStream::SendMallCheckoutPacket(uint8_t byMallPos, TItemPos In
 
 bool CPythonNetworkStream::RecvMallOpenPacket()
 {
-	TPacketGCMallOpen kMallOpen;
+	SPacketGCMallOpen kMallOpen;
 	if (!Recv(sizeof(kMallOpen), &kMallOpen))
 		return false;
 
@@ -161,15 +155,13 @@ bool CPythonNetworkStream::RecvMallOpenPacket()
 }
 bool CPythonNetworkStream::RecvMallItemSetPacket()
 {
-	TPacketGCItemSet2 kItemSet;
+	SPacketGCMallSet kItemSet;
 	if (!Recv(sizeof(kItemSet), &kItemSet))
 		return false;
 
 	TItemData kItemData;
 	kItemData.vnum = kItemSet.vnum;
 	kItemData.count = kItemSet.count;
-	kItemData.flags = kItemSet.flags;
-	kItemData.anti_flags = kItemSet.anti_flags;
 	for (int32_t isocket=0; isocket<ITEM_SOCKET_SLOT_MAX_NUM; ++isocket)
 		kItemData.alSockets[isocket] = kItemSet.alSockets[isocket];
 	for (int32_t iattr=0; iattr<ITEM_ATTRIBUTE_SLOT_MAX_NUM; ++iattr)
@@ -183,7 +175,7 @@ bool CPythonNetworkStream::RecvMallItemSetPacket()
 }
 bool CPythonNetworkStream::RecvMallItemDelPacket()
 {
-	TPacketGCItemDel kItemDel;
+	SPacketGCMallDel kItemDel;
 	if (!Recv(sizeof(kItemDel), &kItemDel))
 		return false;
 
@@ -201,9 +193,9 @@ bool CPythonNetworkStream::RecvMallItemDelPacket()
 // Recieve
 bool CPythonNetworkStream::RecvItemSetPacket()
 {
-	TPacketGCItemSet packet_item_set;
+	SPacketGCItemSet packet_item_set;
 
-	if (!Recv(sizeof(TPacketGCItemSet), &packet_item_set))
+	if (!Recv(sizeof(SPacketGCItemSet), &packet_item_set))
 		return false;
 
 	TItemData kItemData;
@@ -225,9 +217,9 @@ bool CPythonNetworkStream::RecvItemSetPacket()
 
 bool CPythonNetworkStream::RecvItemSetPacket2()
 {
-	TPacketGCItemSet2 packet_item_set;
+	SPacketGCItemSet2 packet_item_set;
 
-	if (!Recv(sizeof(TPacketGCItemSet2), &packet_item_set))
+	if (!Recv(sizeof(SPacketGCItemSet2), &packet_item_set))
 		return false;
 
 	TItemData kItemData;
@@ -254,9 +246,9 @@ bool CPythonNetworkStream::RecvItemSetPacket2()
 
 bool CPythonNetworkStream::RecvItemUsePacket()
 {
-	TPacketGCItemUse packet_item_use;
+	SPacketGCItemUse packet_item_use;
 
-	if (!Recv(sizeof(TPacketGCItemUse), &packet_item_use))
+	if (!Recv(sizeof(SPacketGCItemUse), &packet_item_use))
 		return false;
 
 	__RefreshInventoryWindow();
@@ -265,9 +257,9 @@ bool CPythonNetworkStream::RecvItemUsePacket()
 
 bool CPythonNetworkStream::RecvItemUpdatePacket()
 {
-	TPacketGCItemUpdate packet_item_update;
+	SPacketGCItemUpdate packet_item_update;
 
-	if (!Recv(sizeof(TPacketGCItemUpdate), &packet_item_update))
+	if (!Recv(sizeof(SPacketGCItemUpdate), &packet_item_update))
 		return false;
 
 	IAbstractPlayer& rkPlayer=IAbstractPlayer::GetSingleton();
@@ -283,9 +275,9 @@ bool CPythonNetworkStream::RecvItemUpdatePacket()
 
 bool CPythonNetworkStream::RecvItemGroundAddPacket()
 {
-	TPacketGCItemGroundAdd packet_item_ground_add;
+	SPacketGCItemGroundAdd packet_item_ground_add;
 
-	if (!Recv(sizeof(TPacketGCItemGroundAdd), &packet_item_ground_add))
+	if (!Recv(sizeof(SPacketGCItemGroundAdd), &packet_item_ground_add))
 		return false;
 
 	__GlobalPositionToLocalPosition(packet_item_ground_add.lX, packet_item_ground_add.lY);
@@ -301,9 +293,9 @@ bool CPythonNetworkStream::RecvItemGroundAddPacket()
 
 bool CPythonNetworkStream::RecvItemOwnership()
 {
-	TPacketGCItemOwnership p;
+	SPacketGCItemOwnership p;
 
-	if (!Recv(sizeof(TPacketGCItemOwnership), &p))
+	if (!Recv(sizeof(SPacketGCItemOwnership), &p))
 		return false;
 
 	CPythonItem::Instance().SetOwnership(p.dwVID, p.szName);
@@ -312,9 +304,9 @@ bool CPythonNetworkStream::RecvItemOwnership()
 
 bool CPythonNetworkStream::RecvItemGroundDelPacket()
 {
-	TPacketGCItemGroundDel	packet_item_ground_del;
+	SPacketGCItemGroundDel	packet_item_ground_del;
 
-	if (!Recv(sizeof(TPacketGCItemGroundDel), &packet_item_ground_del))
+	if (!Recv(sizeof(SPacketGCItemGroundDel), &packet_item_ground_del))
 		return false;
 
 	CPythonItem::Instance().DeleteItem(packet_item_ground_del.vid);
@@ -323,9 +315,9 @@ bool CPythonNetworkStream::RecvItemGroundDelPacket()
 
 bool CPythonNetworkStream::RecvQuickSlotAddPacket()
 {
-	TPacketGCQuickSlotAdd packet_quick_slot_add;
+	SPacketGCQuickSlotAdd packet_quick_slot_add;
 
-	if (!Recv(sizeof(TPacketGCQuickSlotAdd), &packet_quick_slot_add))
+	if (!Recv(sizeof(SPacketGCQuickSlotAdd), &packet_quick_slot_add))
 		return false;
 
 	IAbstractPlayer& rkPlayer=IAbstractPlayer::GetSingleton();
@@ -338,9 +330,9 @@ bool CPythonNetworkStream::RecvQuickSlotAddPacket()
 
 bool CPythonNetworkStream::RecvQuickSlotDelPacket()
 {
-	TPacketGCQuickSlotDel packet_quick_slot_del;
+	SPacketGCQuickSlotDel packet_quick_slot_del;
 
-	if (!Recv(sizeof(TPacketGCQuickSlotDel), &packet_quick_slot_del))
+	if (!Recv(sizeof(SPacketGCQuickSlotDel), &packet_quick_slot_del))
 		return false;
 
 	IAbstractPlayer& rkPlayer=IAbstractPlayer::GetSingleton();
@@ -353,9 +345,9 @@ bool CPythonNetworkStream::RecvQuickSlotDelPacket()
 
 bool CPythonNetworkStream::RecvQuickSlotMovePacket()
 {
-	TPacketGCQuickSlotSwap packet_quick_slot_swap;
+	SPacketGCQuickSlotSwap packet_quick_slot_swap;
 
-	if (!Recv(sizeof(TPacketGCQuickSlotSwap), &packet_quick_slot_swap))
+	if (!Recv(sizeof(SPacketGCQuickSlotSwap), &packet_quick_slot_swap))
 		return false;
 
 	IAbstractPlayer& rkPlayer=IAbstractPlayer::GetSingleton();
@@ -376,8 +368,7 @@ bool CPythonNetworkStream::SendShopEndPacket()
 	if (!__CanActMainInstance())
 		return true;
 
-	TPacketCGShop packet_shop;
-	packet_shop.header = HEADER_CG_SHOP;
+	SPacketCGShop packet_shop;
 	packet_shop.subheader = SHOP_SUBHEADER_CG_END;
 
 	if (!Send(sizeof(packet_shop), &packet_shop))
@@ -394,11 +385,10 @@ bool CPythonNetworkStream::SendShopBuyPacket(uint8_t bPos)
 	if (!__CanActMainInstance())
 		return true;
 	
-	TPacketCGShop PacketShop;
-	PacketShop.header = HEADER_CG_SHOP;
+	SPacketCGShop PacketShop;
 	PacketShop.subheader = SHOP_SUBHEADER_CG_BUY;
 
-	if (!Send(sizeof(TPacketCGShop), &PacketShop))
+	if (!Send(sizeof(PacketShop), &PacketShop))
 	{
 		Tracef("SendShopBuyPacket Error\n");
 		return false;
@@ -425,11 +415,10 @@ bool CPythonNetworkStream::SendShopSellPacket(uint8_t bySlot)
 	if (!__CanActMainInstance())
 		return true;
 
-	TPacketCGShop PacketShop;
-	PacketShop.header = HEADER_CG_SHOP;
+	SPacketCGShop PacketShop;
 	PacketShop.subheader = SHOP_SUBHEADER_CG_SELL;
 
-	if (!Send(sizeof(TPacketCGShop), &PacketShop))
+	if (!Send(sizeof(PacketShop), &PacketShop))
 	{
 		Tracef("SendShopSellPacket Error\n");
 		return false;
@@ -448,11 +437,10 @@ bool CPythonNetworkStream::SendShopSellPacketNew(uint8_t bySlot, uint8_t byCount
 	if (!__CanActMainInstance())
 		return true;
 
-	TPacketCGShop PacketShop;
-	PacketShop.header = HEADER_CG_SHOP;
+	SPacketCGShop PacketShop;
 	PacketShop.subheader = SHOP_SUBHEADER_CG_SELL2;
 
-	if (!Send(sizeof(TPacketCGShop), &PacketShop))
+	if (!Send(sizeof(PacketShop), &PacketShop))
 	{
 		Tracef("SendShopSellPacket Error\n");
 		return false;
@@ -499,11 +487,10 @@ bool CPythonNetworkStream::SendItemUsePacket(TItemPos pos)
 
 	__PlayInventoryItemUseSound(pos);
 
-	TPacketCGItemUse itemUsePacket;
-	itemUsePacket.header = HEADER_CG_ITEM_USE;
+	SPacketCGItemUse itemUsePacket;
 	itemUsePacket.pos = pos;
 
-	if (!Send(sizeof(TPacketCGItemUse), &itemUsePacket))
+	if (!Send(sizeof(itemUsePacket), &itemUsePacket))
 	{
 		Tracen("SendItemUsePacket Error");
 		return false;
@@ -517,12 +504,11 @@ bool CPythonNetworkStream::SendItemUseToItemPacket(TItemPos source_pos, TItemPos
 	if (!__CanActMainInstance())
 		return true;	
 
-	TPacketCGItemUseToItem itemUseToItemPacket;
-	itemUseToItemPacket.header = HEADER_CG_ITEM_USE_TO_ITEM;
+	SPacketCGItemUseToItem itemUseToItemPacket;
 	itemUseToItemPacket.source_pos = source_pos;
 	itemUseToItemPacket.target_pos = target_pos;
 
-	if (!Send(sizeof(TPacketCGItemUseToItem), &itemUseToItemPacket))
+	if (!Send(sizeof(itemUseToItemPacket), &itemUseToItemPacket))
 	{
 		Tracen("SendItemUseToItemPacket Error");
 		return false;
@@ -540,12 +526,11 @@ bool CPythonNetworkStream::SendItemDropPacket(TItemPos pos, uint32_t elk)
 	if (!__CanActMainInstance())
 		return true;
 
-	TPacketCGItemDrop itemDropPacket;
-	itemDropPacket.header = HEADER_CG_ITEM_DROP;
+	SPacketCGItemDrop itemDropPacket;
 	itemDropPacket.pos = pos;
 	itemDropPacket.elk = elk;
 
-	if (!Send(sizeof(TPacketCGItemDrop), &itemDropPacket))
+	if (!Send(sizeof(itemDropPacket), &itemDropPacket))
 	{
 		Tracen("SendItemDropPacket Error");
 		return false;
@@ -559,8 +544,7 @@ bool CPythonNetworkStream::SendItemDropPacketNew(TItemPos pos, uint32_t elk, uin
 	if (!__CanActMainInstance())
 		return true;
 
-	TPacketCGItemDrop2 itemDropPacket;
-	itemDropPacket.header = HEADER_CG_ITEM_DROP2;
+	SPacketCGItemDrop2 itemDropPacket;
 	itemDropPacket.pos = pos;
 	itemDropPacket.gold = elk;
 	itemDropPacket.count = count;
@@ -640,7 +624,7 @@ bool CPythonNetworkStream::SendItemMovePacket(TItemPos pos, TItemPos change_pos,
 	{
 		if (CPythonExchange::Instance().isTrading())
 		{
-			if (pos.IsEquipCell() || change_pos.IsEquipCell())
+			if (pos.IsEquipPosition() || change_pos.IsEquipPosition())
 			{
 				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_AppendNotifyMessage", Py_BuildValue("(s)", "CANNOT_EQUIP_EXCHANGE"));
 				return true;
@@ -649,7 +633,7 @@ bool CPythonNetworkStream::SendItemMovePacket(TItemPos pos, TItemPos change_pos,
 
 		if (CPythonShop::Instance().IsOpen())
 		{
-			if (pos.IsEquipCell() || change_pos.IsEquipCell())
+			if (pos.IsEquipPosition() || change_pos.IsEquipPosition())
 			{
 				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_AppendNotifyMessage", Py_BuildValue("(s)", "CANNOT_EQUIP_SHOP"));
 				return true;
@@ -662,13 +646,12 @@ bool CPythonNetworkStream::SendItemMovePacket(TItemPos pos, TItemPos change_pos,
 
 	__PlayInventoryItemDropSound(pos);
 
-	TPacketCGItemMove	itemMovePacket;
-	itemMovePacket.header = HEADER_CG_ITEM_MOVE;
+	SPacketCGItemMove	itemMovePacket;
 	itemMovePacket.pos = pos;
 	itemMovePacket.change_pos = change_pos;
 	itemMovePacket.num = num;
 
-	if (!Send(sizeof(TPacketCGItemMove), &itemMovePacket))
+	if (!Send(sizeof(itemMovePacket), &itemMovePacket))
 	{
 		Tracen("SendItemMovePacket Error");
 		return false;
@@ -682,11 +665,10 @@ bool CPythonNetworkStream::SendItemPickUpPacket(uint32_t vid)
 	if (!__CanActMainInstance())
 		return true;
 
-	TPacketCGItemPickUp	itemPickUpPacket;
-	itemPickUpPacket.header = HEADER_CG_ITEM_PICKUP;
+	SPacketCGItemPickUp	itemPickUpPacket;
 	itemPickUpPacket.vid = vid;
 
-	if (!Send(sizeof(TPacketCGItemPickUp), &itemPickUpPacket))
+	if (!Send(sizeof(itemPickUpPacket), &itemPickUpPacket))
 	{
 		Tracen("SendItemPickUpPacket Error");
 		return false;
@@ -701,14 +683,12 @@ bool CPythonNetworkStream::SendQuickSlotAddPacket(uint8_t wpos, uint8_t type, ui
 	if (!__CanActMainInstance())
 		return true;
 
-	TPacketCGQuickSlotAdd quickSlotAddPacket;
-
-	quickSlotAddPacket.header		= HEADER_CG_QUICKSLOT_ADD;
+	SPacketCGQuickSlotAdd quickSlotAddPacket;
 	quickSlotAddPacket.pos			= wpos;
 	quickSlotAddPacket.slot.Type	= type;
 	quickSlotAddPacket.slot.Position = pos;
 
-	if (!Send(sizeof(TPacketCGQuickSlotAdd), &quickSlotAddPacket))
+	if (!Send(sizeof(quickSlotAddPacket), &quickSlotAddPacket))
 	{
 		Tracen("SendQuickSlotAddPacket Error");
 		return false;
@@ -722,12 +702,10 @@ bool CPythonNetworkStream::SendQuickSlotDelPacket(uint8_t pos)
 	if (!__CanActMainInstance())
 		return true;
 
-	TPacketCGQuickSlotDel quickSlotDelPacket;
-
-	quickSlotDelPacket.header = HEADER_CG_QUICKSLOT_DEL;
+	SPacketCGQuickSlotDel quickSlotDelPacket;
 	quickSlotDelPacket.pos = pos;
 
-	if (!Send(sizeof(TPacketCGQuickSlotDel), &quickSlotDelPacket))
+	if (!Send(sizeof(quickSlotDelPacket), &quickSlotDelPacket))
 	{
 		Tracen("SendQuickSlotDelPacket Error");
 		return false;
@@ -741,13 +719,11 @@ bool CPythonNetworkStream::SendQuickSlotMovePacket(uint8_t pos, uint8_t change_p
 	if (!__CanActMainInstance())
 		return true;
 
-	TPacketCGQuickSlotSwap quickSlotSwapPacket;
-
-	quickSlotSwapPacket.header = HEADER_CG_QUICKSLOT_SWAP;
+	SPacketCGQuickSlotSwap quickSlotSwapPacket;
 	quickSlotSwapPacket.pos = pos;
 	quickSlotSwapPacket.change_pos = change_pos;
 
-	if (!Send(sizeof(TPacketCGQuickSlotSwap), &quickSlotSwapPacket))
+	if (!Send(sizeof(quickSlotSwapPacket), &quickSlotSwapPacket))
 	{
 		Tracen("SendQuickSlotSwapPacket Error");
 		return false;
@@ -758,7 +734,7 @@ bool CPythonNetworkStream::SendQuickSlotMovePacket(uint8_t pos, uint8_t change_p
 
 bool CPythonNetworkStream::RecvSpecialEffect()
 {
-	TPacketGCSpecialEffect kSpecialEffect;
+	SPacketGCSpecialEffect kSpecialEffect;
 	if (!Recv(sizeof(kSpecialEffect), &kSpecialEffect))
 		return false;
 
@@ -861,7 +837,7 @@ bool CPythonNetworkStream::RecvSpecialEffect()
 #endif
 
 		default:
-			TraceError("%d is not a special effect number. TPacketGCSpecialEffect",kSpecialEffect.type);
+			TraceError("%d is not a special effect number. SPacketGCSpecialEffect",kSpecialEffect.type);
 			break;
 	}
 
@@ -893,7 +869,7 @@ bool CPythonNetworkStream::RecvSpecialEffect()
 
 bool CPythonNetworkStream::RecvSpecificEffect()
 {
-	TPacketGCSpecificEffect kSpecificEffect;
+	SPacketGCSpecificEffect kSpecificEffect;
 	if (!Recv(sizeof(kSpecificEffect), &kSpecificEffect))
 		return false;
 
@@ -910,7 +886,7 @@ bool CPythonNetworkStream::RecvSpecificEffect()
 
 bool CPythonNetworkStream::RecvDragonSoulRefine()
 {
-	TPacketGCDragonSoulRefine kDragonSoul;
+	SPacketGCDragonSoulRefine kDragonSoul;
 
 	if (!Recv(sizeof(kDragonSoul), &kDragonSoul))
 		return false;

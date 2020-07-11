@@ -502,7 +502,7 @@ void CThreeWayWar::onDead(LPCHARACTER pChar, LPCHARACTER pkKiller)
 					LC_TEXT(". 너희가 성지의 수호자를 잡게 된다면 너희는 성지의 주인이 된다.[ENTER][ENTER] ") +
 					"[ENTER][DONE]");
 
-			struct packet_script pack_script;
+			SPacketGCScript pack_script;
 
 			pack_script.header = HEADER_GC_SCRIPT;
 			pack_script.skin = 1;
@@ -511,8 +511,8 @@ void CThreeWayWar::onDead(LPCHARACTER pChar, LPCHARACTER pkKiller)
 			quest::FSendPacketToEmpire fSend;
 			fSend.bEmpire = nVictoryEmpireIndex;
 
-			pack_script.size = pack_script.src_size + sizeof(struct packet_script);
-			fSend.buf.write(&pack_script, sizeof(struct packet_script));
+			pack_script.size = pack_script.src_size + sizeof(SPacketGCScript);
+			fSend.buf.write(&pack_script, sizeof(SPacketGCScript));
 			fSend.buf.write(&Script[0], Script.size());
 
 			pSecMap->for_each(fSend);

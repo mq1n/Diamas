@@ -696,7 +696,7 @@ PyObject * playerGetStatus(PyObject* poSelf, PyObject* poArgs)
 	if (POINT_ATT_SPEED == iType)
 	{
 		CInstanceBase * pInstance = CPythonPlayer::Instance().NEW_GetMainActorPtr();
-		if (pInstance && (CItemData::WEAPON_TWO_HANDED == pInstance->GetWeaponType()))
+		if (pInstance && (WEAPON_TWO_HANDED == pInstance->GetWeaponType()))
 		{
 			iValue -= TWOHANDED_WEWAPON_ATT_SPEED_DECREASE_VALUE;
 		}
@@ -1202,7 +1202,7 @@ PyObject * playerGetISellItemPrice(PyObject * poSelf, PyObject * poArgs)
 
 	int32_t iPrice;
 
-	if (pItemData->IsFlag(CItemData::ITEM_FLAG_COUNT_PER_1GOLD))
+	if (pItemData->IsFlag(ITEM_FLAG_COUNT_PER_1GOLD))
 		iPrice = CPythonPlayer::Instance().GetItemCount(Cell) / pItemData->GetISellItemPrice();
 	else
 		iPrice = pItemData->GetISellItemPrice() * CPythonPlayer::Instance().GetItemCount(Cell);
@@ -1568,9 +1568,9 @@ PyObject * playerCanRefine(PyObject * poSelf, PyObject * poArgs)
 		return Py_BuildValue("i", REFINE_CANT);
 	int32_t iScrollType = pScrollItemData->GetType();
 	int32_t iScrollSubType = pScrollItemData->GetSubType();
-	if (iScrollType != CItemData::ITEM_TYPE_USE)
+	if (iScrollType != ITEM_TYPE_USE)
 		return Py_BuildValue("i", REFINE_CANT);
-	if (iScrollSubType != CItemData::USE_TUNING)
+	if (iScrollSubType != USE_TUNING)
 		return Py_BuildValue("i", REFINE_CANT);
 
 	// Target Item
@@ -1581,7 +1581,7 @@ PyObject * playerCanRefine(PyObject * poSelf, PyObject * poArgs)
 		return Py_BuildValue("i", REFINE_CANT);
 	int32_t iTargetType = pTargetItemData->GetType();
 	//int32_t iTargetSubType = pTargetItemData->GetSubType();
-	if (CItemData::ITEM_TYPE_ROD == iTargetType)
+	if (ITEM_TYPE_ROD == iTargetType)
 		return Py_BuildValue("i", REFINE_CANT_REFINE_ROD);
 
 	if (pTargetItemData->HasNextGrade())
@@ -1648,7 +1648,7 @@ PyObject * playerCanAttachMetin(PyObject* poSelf, PyObject* poArgs)
 	uint32_t dwTargetWearFlags = pTargetItemData->GetWearFlags();
 	if (0 == (dwMetinWearFlags & dwTargetWearFlags))
 		return Py_BuildValue("i", ATTACH_METIN_NOT_MATCHABLE_ITEM);
-	if (CItemData::ITEM_TYPE_ROD == pTargetItemData->GetType())
+	if (ITEM_TYPE_ROD == pTargetItemData->GetType())
 		return Py_BuildValue("i", ATTACH_METIN_CANT);
 
 	BOOL bNotExistGoldSocket = FALSE;
@@ -1657,7 +1657,7 @@ PyObject * playerCanAttachMetin(PyObject* poSelf, PyObject* poArgs)
 	for (int32_t i = 0; i < ITEM_SOCKET_SLOT_MAX_NUM; ++i)
 	{
 		uint32_t dwSocketType = CPythonPlayer::Instance().GetItemMetinSocket(TargetSlotIndex, i);
-		if (CItemData::METIN_NORMAL == iSubType)
+		if (METIN_NORMAL == iSubType)
 		{
 			if (CPythonPlayer::METIN_SOCKET_TYPE_SILVER == dwSocketType ||
 				CPythonPlayer::METIN_SOCKET_TYPE_GOLD == dwSocketType)
@@ -1665,7 +1665,7 @@ PyObject * playerCanAttachMetin(PyObject* poSelf, PyObject* poArgs)
 				return Py_BuildValue("i", ATTACH_METIN_OK);
 			}
 		}
-		else if (CItemData::METIN_GOLD == iSubType)
+		else if (METIN_GOLD == iSubType)
 		{
 			if (CPythonPlayer::METIN_SOCKET_TYPE_GOLD == dwSocketType)
 			{
@@ -1723,9 +1723,9 @@ PyObject * playerCanDetach(PyObject * poSelf, PyObject * poArgs)
 		return Py_BuildException("Can't find item data");
 	int32_t iScrollType = pScrollItemData->GetType();
 	int32_t iScrollSubType = pScrollItemData->GetSubType();
-	if (iScrollType != CItemData::ITEM_TYPE_USE)
+	if (iScrollType != ITEM_TYPE_USE)
 		return Py_BuildValue("i", DETACH_METIN_CANT);
-	if (iScrollSubType != CItemData::USE_DETACHMENT)
+	if (iScrollSubType != USE_DETACHMENT)
 		return Py_BuildValue("i", DETACH_METIN_CANT);
 
 	// Target Item
@@ -1738,7 +1738,7 @@ PyObject * playerCanDetach(PyObject * poSelf, PyObject * poArgs)
 #ifdef ENABLE_ACCE_SYSTEM
 	if (pScrollItemData->GetValue(0) == ACCE_CLEAN_ATTR_VALUE0)
 	{
-		if ((pTargetItemData->GetType() != CItemData::ITEM_TYPE_COSTUME) || (pTargetItemData->GetSubType() != CItemData::COSTUME_ACCE))
+		if ((pTargetItemData->GetType() != ITEM_TYPE_COSTUME) || (pTargetItemData->GetSubType() != COSTUME_ACCE))
 			return Py_BuildValue("i", DETACH_METIN_CANT);
 
 		const TItemData * pPlayerItem = CPythonPlayer::Instance().GetItemData(TargetSlotIndex);
@@ -1757,7 +1757,7 @@ PyObject * playerCanDetach(PyObject * poSelf, PyObject * poArgs)
 	//int32_t iTargetType = pTargetItemData->GetType();
 	//int32_t iTargetSubType = pTargetItemData->GetSubType();
 
-	if (pTargetItemData->IsFlag(CItemData::ITEM_FLAG_REFINEABLE))
+	if (pTargetItemData->IsFlag(ITEM_FLAG_REFINEABLE))
 	{
 		for (int32_t iSlotCount = 0; iSlotCount < METIN_SOCKET_COUNT; ++iSlotCount)
 			if (CPythonPlayer::Instance().GetItemMetinSocket(TargetSlotIndex, iSlotCount) > 2)
@@ -1799,7 +1799,7 @@ PyObject * playerCanUnlock(PyObject * poSelf, PyObject * poArgs)
 	if (!pKeyItemData)
 		return Py_BuildException("Can't find item data");
 	int32_t iKeyType = pKeyItemData->GetType();
-	if (iKeyType != CItemData::ITEM_TYPE_TREASURE_KEY)
+	if (iKeyType != ITEM_TYPE_TREASURE_KEY)
 		return Py_BuildValue("i", FALSE);
 
 	// Target Item
@@ -1809,7 +1809,7 @@ PyObject * playerCanUnlock(PyObject * poSelf, PyObject * poArgs)
 	if (!pTargetItemData)
 		return Py_BuildException("Can't find item data");
 	int32_t iTargetType = pTargetItemData->GetType();
-	if (iTargetType != CItemData::ITEM_TYPE_TREASURE_BOX)
+	if (iTargetType != ITEM_TYPE_TREASURE_BOX)
 		return Py_BuildValue("i", FALSE);
 
 	return Py_BuildValue("i", TRUE);
@@ -2724,7 +2724,7 @@ void initPlayer()
 	PyModule_AddIntConstant(poModule, "DRAGON_SOUL_PAGE_COUNT",	DRAGON_SOUL_GRADE_MAX);
 	PyModule_AddIntConstant(poModule, "DRAGON_SOUL_SLOT_COUNT",	c_DragonSoul_Inventory_Count);
 	PyModule_AddIntConstant(poModule, "DRAGON_SOUL_EQUIPMENT_SLOT_START",	c_DragonSoul_Equip_Start);
-	PyModule_AddIntConstant(poModule, "DRAGON_SOUL_EQUIPMENT_PAGE_COUNT",	DS_DECK_MAX_NUM);
+	PyModule_AddIntConstant(poModule, "DRAGON_SOUL_EQUIPMENT_PAGE_COUNT", DRAGON_SOUL_DECK_MAX_NUM);
 	PyModule_AddIntConstant(poModule, "DRAGON_SOUL_EQUIPMENT_FIRST_SIZE",	c_DragonSoul_Equip_Slot_Max);
 
 	// 용혼석 개량창

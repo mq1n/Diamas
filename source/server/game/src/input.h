@@ -134,7 +134,6 @@ class CInputMain : public CInputProcessor
 		void		Target(LPCHARACTER ch, const char * pcData);
 		void		TargetDrop(LPCHARACTER ch, const char * pcData);
 		void		ChestDropInfo(LPCHARACTER ch, const char * c_pData);
-		void		Warp(LPCHARACTER ch, const char * pcData);
 		void		SafeboxCheckin(LPCHARACTER ch, const char * c_pData);
 		void		SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMall);
 		void		SafeboxItemMove(LPCHARACTER ch, const char * data);
@@ -237,7 +236,6 @@ protected:
 
 	void		CreateObject(const char * c_pData);
 	void		DeleteObject(const char * c_pData);
-	void		UpdateLand(const char * c_pData);
 
 	void		Notice(const char * c_pData);
 

@@ -377,8 +377,8 @@ void CHARACTER::SetItem(const TItemPos & Cell, LPITEM pItem)
 		// 확장 아이템: 서버에서 아이템 플래그 정보를 보낸다
 		if (pItem)
 		{
-			TPacketGCItemSet pack;
-			pack.header = HEADER_GC_ITEM_SET;
+			SPacketGCItemSet2 pack;
+			pack.header = HEADER_GC_ITEM_SET2;
 			pack.Cell = Cell;
 
 			pack.count = pItem->GetCount();
@@ -394,19 +394,19 @@ void CHARACTER::SetItem(const TItemPos & Cell, LPITEM pItem)
 			memcpy(pack.alSockets, pItem->GetSockets(), sizeof(pack.alSockets));
 			memcpy(pack.aAttr, pItem->GetAttributes(), sizeof(pack.aAttr));
 
-			GetDesc()->Packet(&pack, sizeof(TPacketGCItemSet));
+			GetDesc()->Packet(&pack, sizeof(pack));
 		}
 		else
 		{
-			TPacketGCItemDelDeprecated pack;
-			pack.header = HEADER_GC_ITEM_DEL;
+			SPacketGCItemSet pack;
+			pack.header = HEADER_GC_ITEM_SET;
 			pack.Cell = Cell;
 			pack.count = 0;
 			pack.vnum = 0;
 			memset(pack.alSockets, 0, sizeof(pack.alSockets));
 			memset(pack.aAttr, 0, sizeof(pack.aAttr));
 
-			GetDesc()->Packet(&pack, sizeof(TPacketGCItemDelDeprecated));
+			GetDesc()->Packet(&pack, sizeof(pack));
 		}
 	}
 
@@ -1471,15 +1471,15 @@ bool CHARACTER::RefineInformation(uint16_t bCell, uint8_t bType, int32_t iAdditi
 	}
 	// END_OF_REFINE_COST
 
-	TPacketGCRefineInformation p;
+	SPacketGCRefineInformation p;
 
 	p.header = HEADER_GC_REFINE_INFORMATION;
-	p.pos = bCell;
-	p.src_vnum = item->GetVnum();
-	p.result_vnum = item->GetRefinedVnum();
 	p.type = bType;
+	p.pos = bCell;
+	p.refine_table.src_vnum = item->GetVnum();
+	p.refine_table.result_vnum = item->GetRefinedVnum();
 
-	if (p.result_vnum == 0)
+	if (p.refine_table.result_vnum == 0)
 	{
 		sys_err("RefineInformation p.result_vnum == 0");
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템은 개량할 수 없습니다."));
@@ -1527,26 +1527,26 @@ bool CHARACTER::RefineInformation(uint16_t bCell, uint8_t bType, int32_t iAdditi
 			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("무료 개량 기회는 20 이하의 무기만 가능합니다"));
 			return false;
 		}
-		p.cost = 0;
+		p.refine_table.cost = 0;
 	}
 	else
-		p.cost = ComputeRefineFee(prt->cost);
+		p.refine_table.cost = ComputeRefineFee(prt->cost);
 	
 	//END_MAIN_QUEST_LV7
-	p.prob = prt->prob;
+	p.refine_table.prob = prt->prob;
 	if (bType == REFINE_TYPE_MONEY_ONLY)
 	{
-		p.material_count = 0;
-		memset(p.materials, 0, sizeof(p.materials));
+		p.refine_table.material_count = 0;
+		memset(p.refine_table.materials, 0, sizeof(p.refine_table.materials));
 	}
 	else
 	{
-		p.material_count = prt->material_count;
-		memcpy(&p.materials, prt->materials, sizeof(prt->materials));
+		p.refine_table.material_count = prt->material_count;
+		memcpy(&p.refine_table.materials, prt->materials, sizeof(prt->materials));
 	}
 	// END_OF_REFINE_COST
 
-	GetDesc()->Packet(&p, sizeof(TPacketGCRefineInformation));
+	GetDesc()->Packet(&p, sizeof(SPacketGCRefineInformation));
 
 	SetRefineMode(iAdditionalCell);
 	return true;
@@ -3031,16 +3031,16 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 
 										++len;  // \0 문자까지 보내기
 
-										TPacketGCChat pack_chat;
+										SPacketGCChat pack_chat;
 										pack_chat.header	= HEADER_GC_CHAT;
-										pack_chat.size		= sizeof(TPacketGCChat) + len;
+										pack_chat.size		= sizeof(SPacketGCChat) + len;
 										pack_chat.type		= CHAT_TYPE_COMMAND;
-										pack_chat.id		= 0;
+										pack_chat.dwVID		= 0;
 										pack_chat.bEmpire	= GetDesc()->GetEmpire();
 										//pack_chat.id	= vid;
 
 										TEMP_BUFFER buf;
-										buf.write(&pack_chat, sizeof(TPacketGCChat));
+										buf.write(&pack_chat, sizeof(SPacketGCChat));
 										buf.write(chatbuf, len);
 
 										PacketAround(buf.read_peek(), buf.size());
@@ -3077,16 +3077,16 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 
 										++len;  // \0 문자까지 보내기
 
-										TPacketGCChat pack_chat;
+										SPacketGCChat pack_chat;
 										pack_chat.header	= HEADER_GC_CHAT;
-										pack_chat.size		= sizeof(TPacketGCChat) + len;
+										pack_chat.size		= sizeof(SPacketGCChat) + len;
 										pack_chat.type		= CHAT_TYPE_COMMAND;
-										pack_chat.id		= 0;
+										pack_chat.dwVID		= 0;
 										pack_chat.bEmpire	= GetDesc()->GetEmpire();
 										//pack_chat.id		= vid;
 
 										TEMP_BUFFER buf;
-										buf.write(&pack_chat, sizeof(TPacketGCChat));
+										buf.write(&pack_chat, sizeof(SPacketGCChat));
 										buf.write(chatbuf, len);
 
 										PacketAround(buf.read_peek(), buf.size());
@@ -6949,13 +6949,13 @@ void CHARACTER::AutoGiveItem(LPITEM item, bool longOwnerShip)
 
 		if (item->GetType() == ITEM_USE && item->GetSubType() == USE_POTION)
 		{
-			TQuickslot * pSlot;
+			TQuickSlot* pSlot;
 
-			if (GetQuickslot(0, &pSlot) && pSlot->type == QUICKSLOT_TYPE_NONE)
+			if (GetQuickslot(0, &pSlot) && pSlot->Type == QUICKSLOT_TYPE_NONE)
 			{
-				TQuickslot slot;
-				slot.type = QUICKSLOT_TYPE_ITEM;
-				slot.pos = cell;
+				TQuickSlot slot;
+				slot.Type = QUICKSLOT_TYPE_ITEM;
+				slot.Position = cell;
 				SetQuickslot(0, slot);
 			}
 		}
@@ -7070,13 +7070,13 @@ LPITEM CHARACTER::AutoGiveItem(uint32_t dwItemVnum, uint8_t bCount, int32_t iRar
 
 		if (item->GetType() == ITEM_USE && item->GetSubType() == USE_POTION)
 		{
-			TQuickslot * pSlot;
+			TQuickSlot* pSlot;
 
-			if (GetQuickslot(0, &pSlot) && pSlot->type == QUICKSLOT_TYPE_NONE)
+			if (GetQuickslot(0, &pSlot) && pSlot->Type == QUICKSLOT_TYPE_NONE)
 			{
-				TQuickslot slot;
-				slot.type = QUICKSLOT_TYPE_ITEM;
-				slot.pos = iEmptyCell;
+				TQuickSlot slot;
+				slot.Type = QUICKSLOT_TYPE_ITEM;
+				slot.Position = iEmptyCell;
 				SetQuickslot(0, slot);
 			}
 		}

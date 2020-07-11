@@ -63,7 +63,7 @@ if (MSVC)
 
 	add_executable(${EXE_NAME} ${DBCACHE_HEADERS} ${DBCACHE_SOURCES})
 	
-	target_link_libraries(${EXE_NAME} thecorelib sqllib gamelib ${EXTRA_LIBS})
+	target_link_libraries(${EXE_NAME} sourceCommon thecorelib sqllib gamelib ${EXTRA_LIBS})
 #	set_target_properties(${EXE_NAME} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT")
 
 else()
@@ -78,7 +78,7 @@ else()
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 	# Link
-	target_link_libraries(${EXE_NAME} ${LIBZ} ${MYSQL_LIBRARIES} pthread -static-libgcc -static-libstdc++ thecorelib sqllib gamelib)
+	target_link_libraries(${EXE_NAME} sourceCommon ${LIBZ} ${MYSQL_LIBRARIES} pthread -static-libgcc -static-libstdc++ thecorelib sqllib gamelib)
 
 endif()
 

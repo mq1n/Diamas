@@ -537,9 +537,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool	RecvAccePacket(bool bReturn = false);
 #endif
 
-		// @fixme007
-		bool RecvUnk213();
-
 	protected:
 		// 이모티콘
 		bool ParseEmoticon(const char * pChatMsg, uint32_t * pdwEmoticon);
@@ -588,7 +585,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		void __SetGuildID(uint32_t id);
 
 	protected:
-		TPacketGCHandshake m_HandshakeData;
+		SPacketHandshake m_HandshakeData;
 		uint32_t m_dwChangingPhaseTime;
 		uint32_t m_dwBindupRetryCount;
 		uint32_t m_dwMainActorVID;
@@ -597,11 +594,11 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		uint32_t m_dwMainActorSkillGroup;
 		BOOL m_isGameOnline;
 		BOOL m_isStartGame;
-	BOOL m_isChatEnable;
+		BOOL m_isChatEnable;
 
 		uint32_t m_dwGuildID;
 		uint32_t m_dwEmpireID;
-	int32_t	  m_nextDownloadMarkTime;
+		int32_t	  m_nextDownloadMarkTime;
 		
 		struct SServerTimeSync
 		{

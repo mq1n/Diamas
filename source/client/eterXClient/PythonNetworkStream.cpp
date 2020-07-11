@@ -23,149 +23,144 @@ class CMainPacketHeaderMap : public CNetworkPacketHeaderMap
 	public:
 		CMainPacketHeaderMap()
 		{
-		Set(HEADER_GC_EMPIRE, TPacketType(sizeof(TPacketGCEmpire), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_WARP, TPacketType(sizeof(TPacketGCWarp), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_QUEST_INFO, TPacketType(sizeof(TPacketGCQuestInfo), DYNAMIC_SIZE_PACKET));
-		Set(HEADER_GC_REQUEST_MAKE_GUILD, TPacketType(sizeof(TPacketGCBlank), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_PVP, TPacketType(sizeof(TPacketGCPVP), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_DUEL_START, TPacketType(sizeof(TPacketGCDuelStart), DYNAMIC_SIZE_PACKET));
-		Set(HEADER_GC_CHARACTER_ADD, TPacketType(sizeof(TPacketGCCharacterAdd), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_CHAR_ADDITIONAL_INFO, TPacketType(sizeof(TPacketGCCharacterAdditionalInfo), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_CHARACTER_UPDATE, TPacketType(sizeof(TPacketGCCharacterUpdate), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_CHARACTER_DEL, TPacketType(sizeof(TPacketGCCharacterDelete), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_CHARACTER_MOVE, TPacketType(sizeof(TPacketGCMove), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_CHAT, TPacketType(sizeof(TPacketGCChat), DYNAMIC_SIZE_PACKET));
-		Set(HEADER_GC_SYNC_POSITION, TPacketType(sizeof(TPacketGCC2C), DYNAMIC_SIZE_PACKET));
+//			packetsdeki gibi düzenle
+			Set(HEADER_GC_EMPIRE, TPacketType(sizeof(SPacketGCEmpire), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_WARP, TPacketType(sizeof(SPacketGCWarp), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_QUEST_INFO, TPacketType(sizeof(SPacketGCQuestInfo), DYNAMIC_SIZE_PACKET));
+			Set(HEADER_GC_REQUEST_MAKE_GUILD, TPacketType(sizeof(SPacketGCRequestGuildMake), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PVP, TPacketType(sizeof(SPacketGCPVP), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_DUEL_START, TPacketType(sizeof(SPacketGCDuelStart), DYNAMIC_SIZE_PACKET));
+			Set(HEADER_GC_CHARACTER_ADD, TPacketType(sizeof(SPacketGCCharacterAdd), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_CHAR_ADDITIONAL_INFO, TPacketType(sizeof(SPacketGCCharacterAdditionalInfo), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_CHARACTER_UPDATE, TPacketType(sizeof(SPacketGCCharacterUpdate), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_CHARACTER_DEL, TPacketType(sizeof(SPacketGCCharacterDelete), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_CHARACTER_MOVE, TPacketType(sizeof(SPacketGCMove), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_CHAT, TPacketType(sizeof(SPacketGCChat), DYNAMIC_SIZE_PACKET));
+			Set(HEADER_GC_SYNC_POSITION, TPacketType(sizeof(SPacketGCSyncPosition), DYNAMIC_SIZE_PACKET));
 
-		Set(HEADER_GC_LOGIN_SUCCESS, TPacketType(sizeof(TPacketGCLoginSuccess), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_LOGIN_FAILURE, TPacketType(sizeof(TPacketGCLoginFailure), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_LOGIN_SUCCESS, TPacketType(sizeof(SPacketGCLoginSuccess), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_LOGIN_FAILURE, TPacketType(sizeof(SPacketGCLoginFailure), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_PLAYER_CREATE_SUCCESS, TPacketType(sizeof(TPacketGCPlayerCreateSuccess), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_PLAYER_CREATE_FAILURE, TPacketType(sizeof(TPacketGCCreateFailure), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_PLAYER_DELETE_SUCCESS, TPacketType(sizeof(TPacketGCBlank), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_PLAYER_DELETE_WRONG_SOCIAL_ID, TPacketType(sizeof(TPacketGCBlank), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PLAYER_CREATE_SUCCESS, TPacketType(sizeof(SPacketGCPlayerCreateSuccess), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PLAYER_CREATE_FAILURE, TPacketType(sizeof(SPacketGCCreateFailure), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PLAYER_DELETE_SUCCESS, TPacketType(sizeof(SPacketGCPlayerDeleteSuccess), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PLAYER_DELETE_WRONG_SOCIAL_ID, TPacketType(sizeof(SPacketGCPlayerDeleteWrongSocialID), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_STUN, TPacketType(sizeof(TPacketGCStun), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_DEAD, TPacketType(sizeof(TPacketGCDead), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_STUN, TPacketType(sizeof(SPacketGCStun), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_DEAD, TPacketType(sizeof(SPacketGCDead), STATIC_SIZE_PACKET));
 
-		// SUPPORT_BGM
-		Set(HEADER_GC_MAIN_CHARACTER, TPacketType(sizeof(TPacketGCMainCharacter2_EMPIRE), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_MAIN_CHARACTER3_BGM, TPacketType(sizeof(TPacketGCMainCharacter3_BGM), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_MAIN_CHARACTER4_BGM_VOL, TPacketType(sizeof(TPacketGCMainCharacter4_BGM_VOL), STATIC_SIZE_PACKET));
-		// END_OFSUPPORT_BGM
+			Set(HEADER_GC_MAIN_CHARACTER, TPacketType(sizeof(SPacketGCMainCharacter), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_MAIN_CHARACTER3_BGM, TPacketType(sizeof(SPacketGCMainCharacter3_BGM), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_MAIN_CHARACTER4_BGM_VOL, TPacketType(sizeof(SPacketGCMainCharacter4_BGM_VOL), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_PLAYER_POINTS, TPacketType(sizeof(TPacketGCPoints), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_PLAYER_POINT_CHANGE, TPacketType(sizeof(TPacketGCPointChange), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PLAYER_POINTS, TPacketType(sizeof(SPacketGCPoints), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PLAYER_POINT_CHANGE, TPacketType(sizeof(SPacketGCPointChange), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_ITEM_SET, TPacketType(sizeof(TPacketGCItemSet), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_ITEM_SET2, TPacketType(sizeof(TPacketGCItemSet2), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_ITEM_SET, TPacketType(sizeof(SPacketGCItemSet), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_ITEM_SET2, TPacketType(sizeof(SPacketGCItemSet2), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_ITEM_USE, TPacketType(sizeof(TPacketGCItemUse), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_ITEM_UPDATE, TPacketType(sizeof(TPacketGCItemUpdate), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_ITEM_USE, TPacketType(sizeof(SPacketGCItemUse), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_ITEM_UPDATE, TPacketType(sizeof(SPacketGCItemUpdate), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_ITEM_GROUND_ADD, TPacketType(sizeof(TPacketGCItemGroundAdd), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_ITEM_GROUND_DEL, TPacketType(sizeof(TPacketGCItemGroundDel), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_ITEM_OWNERSHIP, TPacketType(sizeof(TPacketGCItemOwnership), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_ITEM_GROUND_ADD, TPacketType(sizeof(SPacketGCItemGroundAdd), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_ITEM_GROUND_DEL, TPacketType(sizeof(SPacketGCItemGroundDel), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_ITEM_OWNERSHIP, TPacketType(sizeof(SPacketGCItemOwnership), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_QUICKSLOT_ADD, TPacketType(sizeof(TPacketGCQuickSlotAdd), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_QUICKSLOT_DEL, TPacketType(sizeof(TPacketGCQuickSlotDel), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_QUICKSLOT_SWAP, TPacketType(sizeof(TPacketGCQuickSlotSwap), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_QUICKSLOT_ADD, TPacketType(sizeof(SPacketGCQuickSlotAdd), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_QUICKSLOT_DEL, TPacketType(sizeof(SPacketGCQuickSlotDel), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_QUICKSLOT_SWAP, TPacketType(sizeof(SPacketGCQuickSlotSwap), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_WHISPER, TPacketType(sizeof(TPacketGCWhisper), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_WHISPER, TPacketType(sizeof(SPacketGCWhisper), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_CHARACTER_POSITION, TPacketType(sizeof(TPacketGCPosition), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_MOTION, TPacketType(sizeof(TPacketGCMotion), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_CHARACTER_POSITION, TPacketType(sizeof(SPacketGCPosition), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_MOTION, TPacketType(sizeof(SPacketGCMotion), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_SHOP, TPacketType(sizeof(TPacketGCShop), DYNAMIC_SIZE_PACKET));
-		Set(HEADER_GC_SHOP_SIGN, TPacketType(sizeof(TPacketGCShopSign), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_EXCHANGE, TPacketType(sizeof(TPacketGCExchange), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_SHOP, TPacketType(sizeof(SPacketGCShop), DYNAMIC_SIZE_PACKET));
+			Set(HEADER_GC_SHOP_SIGN, TPacketType(sizeof(SPacketGCShopSign), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_EXCHANGE, TPacketType(sizeof(SPacketGCExchange), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_PING, TPacketType(sizeof(TPacketGCPing), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PING, TPacketType(sizeof(SPacketGCPing), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_SCRIPT, TPacketType(sizeof(TPacketGCScript), DYNAMIC_SIZE_PACKET));
-		Set(HEADER_GC_QUEST_CONFIRM, TPacketType(sizeof(TPacketGCQuestConfirm), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_SCRIPT, TPacketType(sizeof(SPacketGCScript), DYNAMIC_SIZE_PACKET));
+			Set(HEADER_GC_QUEST_CONFIRM, TPacketType(sizeof(SPacketGCQuestConfirm), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_TARGET, TPacketType(sizeof(TPacketGCTarget), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_TARGET_DROP, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCTargetDrop), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_CHEST_DROP_INFO, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCChestDropInfo), DYNAMIC_SIZE_PACKET));
+			Set(HEADER_GC_TARGET, TPacketType(sizeof(SPacketGCTarget), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_TARGET_DROP, CNetworkPacketHeaderMap::TPacketType(sizeof(SPacketGCTargetDrop), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_CHEST_DROP_INFO, CNetworkPacketHeaderMap::TPacketType(sizeof(SPacketGCChestDropInfo), DYNAMIC_SIZE_PACKET));
 
+			Set(HEADER_GC_CHANGE_SPEED, TPacketType(sizeof(SPacketGCChangeSpeed), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_CHANGE_SPEED, TPacketType(sizeof(TPacketGCChangeSpeed), STATIC_SIZE_PACKET));
-
-		Set(HEADER_GC_HANDSHAKE, TPacketType(sizeof(TPacketGCHandshake), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_HANDSHAKE_OK, TPacketType(sizeof(TPacketGCBlank), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_OWNERSHIP, TPacketType(sizeof(TPacketGCOwnership), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_CREATE_FLY, TPacketType(sizeof(TPacketGCCreateFly), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_HANDSHAKE, TPacketType(sizeof(SPacketHandshake), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_HANDSHAKE_OK, TPacketType(sizeof(SPacketGCHandshakeOK), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_OWNERSHIP, TPacketType(sizeof(SPacketGCOwnership), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_CREATE_FLY, TPacketType(sizeof(SPacketGCCreateFly), STATIC_SIZE_PACKET));
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
-		Set(HEADER_GC_KEY_AGREEMENT, TPacketType(sizeof(TPacketKeyAgreement), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_KEY_AGREEMENT_COMPLETED, TPacketType(sizeof(TPacketKeyAgreementCompleted), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_KEY_AGREEMENT, TPacketType(sizeof(SPacketKeyAgreement), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_KEY_AGREEMENT_COMPLETED, TPacketType(sizeof(SPacketGCKeyAgreementCompleted), STATIC_SIZE_PACKET));
 #endif
-		Set(HEADER_GC_ADD_FLY_TARGETING, TPacketType(sizeof(TPacketGCFlyTargeting), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_FLY_TARGETING, TPacketType(sizeof(TPacketGCFlyTargeting), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_ADD_FLY_TARGETING, TPacketType(sizeof(SPacketGCFlyTargeting), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_FLY_TARGETING, TPacketType(sizeof(SPacketGCFlyTargeting), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_PHASE, TPacketType(sizeof(TPacketGCPhase), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_SKILL_LEVEL_NEW, TPacketType(sizeof(TPacketGCSkillLevelNew), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PHASE, TPacketType(sizeof(SPacketGCPhase), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_SKILL_LEVEL, TPacketType(sizeof(SPacketGCSkillLevel), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_MESSENGER, TPacketType(sizeof(TPacketGCMessenger), DYNAMIC_SIZE_PACKET));
-		Set(HEADER_GC_GUILD, TPacketType(sizeof(TPacketGCGuild), DYNAMIC_SIZE_PACKET));
+			Set(HEADER_GC_MESSENGER, TPacketType(sizeof(SPacketGCMessenger), DYNAMIC_SIZE_PACKET));
+			Set(HEADER_GC_GUILD, TPacketType(sizeof(SPacketGCGuild), DYNAMIC_SIZE_PACKET));
 
-		Set(HEADER_GC_PARTY_INVITE, TPacketType(sizeof(TPacketGCPartyInvite), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_PARTY_ADD, TPacketType(sizeof(TPacketGCPartyAdd), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_PARTY_UPDATE, TPacketType(sizeof(TPacketGCPartyUpdate), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_PARTY_REMOVE, TPacketType(sizeof(TPacketGCPartyRemove), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_PARTY_LINK, TPacketType(sizeof(TPacketGCPartyLink), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_PARTY_UNLINK, TPacketType(sizeof(TPacketGCPartyUnlink), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_PARTY_PARAMETER, TPacketType(sizeof(TPacketGCPartyParameter), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PARTY_INVITE, TPacketType(sizeof(SPacketGCPartyInvite), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PARTY_ADD, TPacketType(sizeof(SPacketGCPartyAdd), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PARTY_UPDATE, TPacketType(sizeof(SPacketGCPartyUpdate), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PARTY_REMOVE, TPacketType(sizeof(SPacketGCPartyRemove), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PARTY_LINK, TPacketType(sizeof(SPacketGCPartyLink), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PARTY_UNLINK, TPacketType(sizeof(SPacketGCPartyUnlink), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_PARTY_PARAMETER, TPacketType(sizeof(SPacketGCPartyParameter), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_SAFEBOX_SET, TPacketType(sizeof(TPacketGCItemSet), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_SAFEBOX_DEL, TPacketType(sizeof(TPacketGCItemDel), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_SAFEBOX_WRONG_PASSWORD, TPacketType(sizeof(TPacketGCSafeboxWrongPassword), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_SAFEBOX_SIZE, TPacketType(sizeof(TPacketGCSafeboxSize), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_FISHING, TPacketType(sizeof(TPacketGCFishing), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_DUNGEON, TPacketType(sizeof(TPacketGCDungeon), DYNAMIC_SIZE_PACKET));
-		//Set(HEADER_GC_SLOW_TIMER, CNetworkPacketHeaderMap::TPacketType(sizeof(uint8_t), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_TIME, TPacketType(sizeof(TPacketGCTime), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_WALK_MODE, TPacketType(sizeof(TPacketGCWalkMode), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_CHANGE_SKILL_GROUP, TPacketType(sizeof(TPacketGCChangeSkillGroup), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_REFINE_INFORMATION_NEW, TPacketType(sizeof(TPacketGCRefineInformationNew), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_SPECIAL_EFFECT, TPacketType(sizeof(TPacketGCSpecialEffect), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_NPC_POSITION, TPacketType(sizeof(TPacketGCNPCPosition), DYNAMIC_SIZE_PACKET));
-		Set(HEADER_GC_CHANGE_NAME, TPacketType(sizeof(TPacketGCChangeName), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_SAFEBOX_SET, TPacketType(sizeof(SPacketGCSafeboxSet), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_SAFEBOX_DEL, TPacketType(sizeof(SPacketGCSafeboxDel), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_SAFEBOX_WRONG_PASSWORD, TPacketType(sizeof(SPacketGCSafeboxWrongPassword), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_SAFEBOX_SIZE, TPacketType(sizeof(SPacketGCSafeboxSize), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_FISHING, TPacketType(sizeof(SPacketGCFishing), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_DUNGEON, TPacketType(sizeof(SPacketGCDungeon), DYNAMIC_SIZE_PACKET));
+			Set(HEADER_GC_TIME, TPacketType(sizeof(SPacketGCTime), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_WALK_MODE, TPacketType(sizeof(SPacketGCWalkMode), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_CHANGE_SKILL_GROUP, TPacketType(sizeof(SPacketGCChangeSkillGroup), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_REFINE_INFORMATION, TPacketType(sizeof(SPacketGCRefineInformation), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_SPECIAL_EFFECT, TPacketType(sizeof(SPacketGCSpecialEffect), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_NPC_POSITION, TPacketType(sizeof(SPacketGCNPCPosition), DYNAMIC_SIZE_PACKET));
+			Set(HEADER_GC_CHANGE_NAME, TPacketType(sizeof(SPacketGCChangeName), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_LOGIN_KEY, TPacketType(sizeof(TPacketGCLoginKey), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_LOGIN_KEY, TPacketType(sizeof(SPacketGCLoginKey), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_AUTH_SUCCESS, TPacketType(sizeof(TPacketGCAuthSuccess), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_CHANNEL, TPacketType(sizeof(TPacketGCChannel), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_VIEW_EQUIP, TPacketType(sizeof(TPacketGCViewEquip), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_LAND_LIST, TPacketType(sizeof(TPacketGCLandList), DYNAMIC_SIZE_PACKET));
+			Set(HEADER_GC_AUTH_SUCCESS, TPacketType(sizeof(SPacketGCAuthSuccess), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_CHANNEL, TPacketType(sizeof(SPacketGCChannel), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_VIEW_EQUIP, TPacketType(sizeof(SPacketGCViewEquip), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_LAND_LIST, TPacketType(sizeof(SPacketGCLandList), DYNAMIC_SIZE_PACKET));
 
-		Set(HEADER_GC_TARGET_UPDATE, TPacketType(sizeof(TPacketGCTargetUpdate), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_TARGET_DELETE, TPacketType(sizeof(TPacketGCTargetDelete), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_TARGET_CREATE, TPacketType(sizeof(TPacketGCTargetCreateNew), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_TARGET_UPDATE, TPacketType(sizeof(SPacketGCTargetUpdate), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_TARGET_DELETE, TPacketType(sizeof(SPacketGCTargetDelete), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_TARGET_CREATE, TPacketType(sizeof(SPacketGCTargetCreate), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_AFFECT_ADD, TPacketType(sizeof(TPacketGCAffectAdd), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_AFFECT_REMOVE, TPacketType(sizeof(TPacketGCAffectRemove), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_AFFECT_ADD, TPacketType(sizeof(SPacketGCAffectAdd), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_AFFECT_REMOVE, TPacketType(sizeof(SPacketGCAffectRemove), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_MALL_OPEN, TPacketType(sizeof(TPacketGCMallOpen), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_MALL_SET, TPacketType(sizeof(TPacketGCItemSet), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_MALL_DEL, TPacketType(sizeof(TPacketGCItemDel), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_MALL_OPEN, TPacketType(sizeof(SPacketGCMallOpen), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_MALL_SET, TPacketType(sizeof(SPacketGCMallSet), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_MALL_DEL, TPacketType(sizeof(SPacketGCMallDel), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_LOVER_INFO, TPacketType(sizeof(TPacketGCLoverInfo), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_LOVE_POINT_UPDATE, TPacketType(sizeof(TPacketGCLovePointUpdate), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_LOVER_INFO, TPacketType(sizeof(SPacketGCLoverInfo), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_LOVE_POINT_UPDATE, TPacketType(sizeof(SPacketGCLovePointUpdate), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_DIG_MOTION, TPacketType(sizeof(TPacketGCDigMotion), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_DAMAGE_INFO, TPacketType(sizeof(TPacketGCDamageInfo), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_DIG_MOTION, TPacketType(sizeof(SPacketGCDigMotion), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_DAMAGE_INFO, TPacketType(sizeof(SPacketGCDamageInfo), STATIC_SIZE_PACKET));
 
-		Set(HEADER_GC_SPECIFIC_EFFECT, TPacketType(sizeof(TPacketGCSpecificEffect), STATIC_SIZE_PACKET));
-		Set(HEADER_GC_DRAGON_SOUL_REFINE, TPacketType(sizeof(TPacketGCDragonSoulRefine), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_SPECIFIC_EFFECT, TPacketType(sizeof(SPacketGCSpecificEffect), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_DRAGON_SOUL_REFINE, TPacketType(sizeof(SPacketGCDragonSoulRefine), STATIC_SIZE_PACKET));
 		
-			Set(HEADER_GC_CHEAT_BLACKLIST, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCCheatBlacklist), DYNAMIC_SIZE_PACKET));
-
+			Set(HEADER_GC_CHEAT_BLACKLIST, TPacketType(sizeof(SPacketGCCheatBlacklist), DYNAMIC_SIZE_PACKET));
 
 #ifdef ENABLE_ACCE_SYSTEM
-			Set(HEADER_GC_ACCE, CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketAcce), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_ACCE, TPacketType(sizeof(SPacketAcce), STATIC_SIZE_PACKET));
 #endif
-			Set(HEADER_GC_UNK_213,			CNetworkPacketHeaderMap::TPacketType(sizeof(TPacketGCUnk213), STATIC_SIZE_PACKET)); // @fixme007
 		}
 };
 
@@ -457,7 +452,8 @@ void CPythonNetworkStream::SetLoginKey(uint32_t dwLoginKey)
 	m_dwLoginKey = dwLoginKey;
 }
 
-bool CPythonNetworkStream::CheckPacket(TPacketHeader * pRetHeader)
+
+bool CPythonNetworkStream::CheckPacket(TPacketHeader* pRetHeader)
 {
 	*pRetHeader = 0;
 
@@ -474,7 +470,7 @@ bool CPythonNetworkStream::CheckPacket(TPacketHeader * pRetHeader)
 	{
 		if (!Recv(packetHeaderSize, &header))
 			return false;
-		
+
 		while (Peek(packetHeaderSize, &header))
 		{
 			if (0 == header)
@@ -506,14 +502,14 @@ bool CPythonNetworkStream::CheckPacket(TPacketHeader * pRetHeader)
 	// Code for dynamic size packet
 	if (PacketType.isDynamicSizePacket)
 	{
-		TDynamicSizePacketHeader DynamicSizePacketHeader;
+		SDynamicSizePacketHeader DynamicSizePacketHeader;
 
-		if (!Peek(sizeof(TDynamicSizePacketHeader), &DynamicSizePacketHeader))
+		if (!Peek(sizeof(DynamicSizePacketHeader), &DynamicSizePacketHeader))
 			return false;
 
 		if (!Peek(DynamicSizePacketHeader.size))
 		{
-			Tracef("CPythonNetworkStream::CheckPacket - Not enough dynamic packet size: header %d packet size: %d\n", 
+			Tracef("CPythonNetworkStream::CheckPacket - Not enough dynamic packet size: header %d packet size: %d\n",
 				DynamicSizePacketHeader.header,
 				DynamicSizePacketHeader.size);
 			return false;
@@ -534,7 +530,7 @@ bool CPythonNetworkStream::CheckPacket(TPacketHeader * pRetHeader)
 	if (!header)
 		return false;
 
-	*pRetHeader = header;	
+	*pRetHeader = header;
 
 	g_iLastPacket[0] = g_iLastPacket[1];
 	g_iLastPacket[1] = header;
@@ -554,9 +550,9 @@ bool CPythonNetworkStream::RecvErrorPacket(int32_t header)
 
 bool CPythonNetworkStream::RecvPhasePacket()
 {
-	TPacketGCPhase packet_phase;
+	SPacketGCPhase packet_phase;
 
-	if (!Recv(sizeof(TPacketGCPhase), &packet_phase))
+	if (!Recv(sizeof(SPacketGCPhase), &packet_phase))
 		return false;
 
 	switch (packet_phase.phase)
@@ -595,7 +591,7 @@ bool CPythonNetworkStream::RecvPhasePacket()
 			m_isChatEnable = TRUE;
 			break;
 
-		case PHASE_DEAD:				// Á×¾úÀ» ¶§.. (°ÔÀÓ ¾È¿¡ ÀÖ´Â °ÍÀÏ ¼öµµ..)
+		case PHASE_DEAD:
 			break;
 	}
 
@@ -607,17 +603,15 @@ bool CPythonNetworkStream::RecvPingPacket()
 {
 	Tracef("recv ping packet. (securitymode %u)\n", IsSecurityMode());
 
-	TPacketGCPing kPacketPing;
+	SPacketGCPing kPacketPing;
 
-	if (!Recv(sizeof(TPacketGCPing), &kPacketPing))
+	if (!Recv(sizeof(SPacketGCPing), &kPacketPing))
 		return false;
 
 	m_dwLastGamePingTime = ELTimer_GetMSec();
 
-	TPacketCGPong kPacketPong;
-	kPacketPong.bHeader = HEADER_CG_PONG;
-
-	if (!Send(sizeof(TPacketCGPong), &kPacketPong))
+	SPacketCGPong kPacketPong;
+	if (!Send(sizeof(SPacketCGPong), &kPacketPong))
 		return false;
 
 	return true;
@@ -648,7 +642,7 @@ bool CPythonNetworkStream::OnProcess()
 	if (m_phaseProcessFunc.IsEmpty())
 		return true;
 
-	//TPacketHeader header;
+	//SPacketHeader header;
 	//while(CheckPacket(&header))
 	{
 		m_phaseProcessFunc.Run();

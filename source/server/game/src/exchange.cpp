@@ -24,10 +24,10 @@ void exchange_packet(LPCHARACTER ch, uint8_t sub_header, bool is_me, uint32_t ar
 	if (!ch->GetDesc())
 		return;
 
-	struct packet_exchange pack_exchg;
+	SPacketGCExchange pack_exchg;
 
 	pack_exchg.header 		= HEADER_GC_EXCHANGE;
-	pack_exchg.sub_header 	= sub_header;
+	pack_exchg.subheader 	= sub_header;
 	pack_exchg.is_me		= is_me;
 	pack_exchg.arg1		= arg1;
 	pack_exchg.arg2		= arg2;
@@ -152,7 +152,7 @@ bool CExchange::AddItem(const TItemPos &item_pos, uint8_t display_pos)
 {
 	assert(m_pOwner != nullptr && GetCompany());
 
-	if (!item_pos.IsValidItemPosition())
+	if (!item_pos.IsValidCell())
 		return false;
 
 	// 장비는 교환할 수 없음
@@ -298,7 +298,7 @@ bool CExchange::AddGold(int32_t gold)
 	if (GetOwner()->GetGold() < gold)
 	{
 		// 가지고 있는 돈이 부족.
-		exchange_packet(GetOwner(), EXCHANGE_SUBHEADER_GC_LESS_GOLD, 0, 0, NPOS, 0);
+		exchange_packet(GetOwner(), EXCHANGE_SUBHEADER_GC_LESS_ELK, 0, 0, NPOS, 0);
 		return false;
 	}
 
@@ -310,7 +310,7 @@ bool CExchange::AddGold(int32_t gold)
 	{
 		if (victim->GetGold() + m_lGold > GOLD_MAX)
 		{
-			exchange_packet(GetOwner(), EXCHANGE_SUBHEADER_GC_LESS_GOLD, 0, 0, NPOS, 0);
+			exchange_packet(GetOwner(), EXCHANGE_SUBHEADER_GC_LESS_ELK, 0, 0, NPOS, 0);
 			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Karsi oyuncu daha fazla yang alamaz"));
 			return false;
 		}
@@ -321,8 +321,8 @@ bool CExchange::AddGold(int32_t gold)
 
 	m_lGold = gold;
 
-	exchange_packet(GetOwner(), EXCHANGE_SUBHEADER_GC_GOLD_ADD, true, m_lGold, NPOS, 0);
-	exchange_packet(GetCompany()->GetOwner(), EXCHANGE_SUBHEADER_GC_GOLD_ADD, false, m_lGold, NPOS, 0);
+	exchange_packet(GetOwner(), EXCHANGE_SUBHEADER_GC_ELK_ADD, true, m_lGold, NPOS, 0);
+	exchange_packet(GetCompany()->GetOwner(), EXCHANGE_SUBHEADER_GC_ELK_ADD, false, m_lGold, NPOS, 0);
 	return true;
 }
 
@@ -339,7 +339,7 @@ bool CExchange::Check(int32_t * piItemCount)
 		if (!m_apItems[i])
 			continue;
 
-		if (!m_aItemPos[i].IsValidItemPosition())
+		if (!m_aItemPos[i].IsValidCell())
 			return false;
 
 		if (m_apItems[i] != GetOwner()->GetItem(m_aItemPos[i]))

@@ -221,20 +221,20 @@ void CGuildMarkUploader::__LoginState_Set()
 
 bool CGuildMarkUploader::__LoginState_Process()
 {
-	if (!__AnalyzePacket(HEADER_GC_PHASE, sizeof(TPacketGCPhase), &CGuildMarkUploader::__LoginState_RecvPhase))
+	if (!__AnalyzePacket(HEADER_GC_PHASE, sizeof(SPacketGCPhase), &CGuildMarkUploader::__LoginState_RecvPhase))
 		return false;
 
-	if (!__AnalyzePacket(HEADER_GC_HANDSHAKE, sizeof(TPacketGCHandshake), &CGuildMarkUploader::__LoginState_RecvHandshake))
+	if (!__AnalyzePacket(HEADER_GC_HANDSHAKE, sizeof(SPacketHandshake), &CGuildMarkUploader::__LoginState_RecvHandshake))
 		return false;
 
-	if (!__AnalyzePacket(HEADER_GC_PING, sizeof(TPacketGCPing), &CGuildMarkUploader::__LoginState_RecvPing))
+	if (!__AnalyzePacket(HEADER_GC_PING, sizeof(SPacketGCPing), &CGuildMarkUploader::__LoginState_RecvPing))
 		return false;
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
-	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT, sizeof(TPacketKeyAgreement), &CGuildMarkUploader::__LoginState_RecvKeyAgreement))
+	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT, sizeof(SPacketKeyAgreement), &CGuildMarkUploader::__LoginState_RecvKeyAgreement))
 		return false;
 
-	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT_COMPLETED, sizeof(TPacketKeyAgreementCompleted), &CGuildMarkUploader::__LoginState_RecvKeyAgreementCompleted))
+	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT_COMPLETED, sizeof(SPacketGCKeyAgreementCompleted), &CGuildMarkUploader::__LoginState_RecvKeyAgreementCompleted))
 		return false;
 #endif
 
@@ -243,8 +243,7 @@ bool CGuildMarkUploader::__LoginState_Process()
 
 bool CGuildMarkUploader::__SendMarkPacket()
 {
-	TPacketCGMarkUpload kPacketMarkUpload;
-	kPacketMarkUpload.header=HEADER_CG_MARK_UPLOAD;
+	SPacketCGMarkUpload kPacketMarkUpload;
 	kPacketMarkUpload.gid=m_dwGuildID;
 
 	assert(sizeof(kPacketMarkUpload.image) == sizeof(m_kMark.m_apxBuf));
@@ -260,12 +259,11 @@ bool CGuildMarkUploader::__SendSymbolPacket()
 	if (m_pbySymbolBuf.empty())
 		return false;
 
-	TPacketCGSymbolUpload kPacketSymbolUpload;
-	kPacketSymbolUpload.header=HEADER_CG_GUILD_SYMBOL_UPLOAD;
-	kPacketSymbolUpload.handle=m_dwGuildID;
-	kPacketSymbolUpload.size = static_cast<uint16_t>(sizeof(TPacketCGSymbolUpload) + m_pbySymbolBuf.size());
+	SPacketCGGuildSymbolUpload kPacketSymbolUpload;
+	kPacketSymbolUpload.guild_id=m_dwGuildID;
+	kPacketSymbolUpload.size = static_cast<uint16_t>(sizeof(SPacketCGGuildSymbolUpload) + m_pbySymbolBuf.size());
 
-	if (!Send(sizeof(TPacketCGSymbolUpload), &kPacketSymbolUpload))
+	if (!Send(sizeof(SPacketCGGuildSymbolUpload), &kPacketSymbolUpload))
 		return false;
 	if (!Send(m_pbySymbolBuf.size(), m_pbySymbolBuf.data()))
 		return false;
@@ -279,7 +277,7 @@ bool CGuildMarkUploader::__SendSymbolPacket()
 
 bool CGuildMarkUploader::__LoginState_RecvPhase()
 {
-	TPacketGCPhase kPacketPhase;
+	SPacketGCPhase kPacketPhase;
 	if (!Recv(sizeof(kPacketPhase), &kPacketPhase))
 		return false;
 
@@ -308,13 +306,12 @@ bool CGuildMarkUploader::__LoginState_RecvPhase()
 
 bool CGuildMarkUploader::__LoginState_RecvHandshake()
 {
-	TPacketGCHandshake kPacketHandshake;
+	SPacketHandshake kPacketHandshake;
 	if (!Recv(sizeof(kPacketHandshake), &kPacketHandshake))
 		return false;
 
 	{
-		TPacketCGMarkLogin kPacketMarkLogin;
-		kPacketMarkLogin.header=HEADER_CG_MARK_LOGIN;
+		SPacketCGMarkLogin kPacketMarkLogin;
 		kPacketMarkLogin.handle=m_dwHandle;
 		kPacketMarkLogin.random_key=m_dwRandomKey;
 		if (!Send(sizeof(kPacketMarkLogin), &kPacketMarkLogin))
@@ -326,14 +323,12 @@ bool CGuildMarkUploader::__LoginState_RecvHandshake()
 
 bool CGuildMarkUploader::__LoginState_RecvPing()
 {
-	TPacketGCPing kPacketPing;
+	SPacketGCPing kPacketPing;
 	if (!Recv(sizeof(kPacketPing), &kPacketPing))
 		return false;
 
-	TPacketCGPong kPacketPong;
-	kPacketPong.bHeader = HEADER_CG_PONG;
-
-	if (!Send(sizeof(TPacketCGPong), &kPacketPong))
+	SPacketCGPong kPacketPong;
+	if (!Send(sizeof(SPacketCGPong), &kPacketPong))
 		return false;
 
 	return true;
@@ -342,14 +337,14 @@ bool CGuildMarkUploader::__LoginState_RecvPing()
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 bool CGuildMarkUploader::__LoginState_RecvKeyAgreement()
 {
-	TPacketKeyAgreement packet;
+	SPacketKeyAgreement packet;
 	if (!Recv(sizeof(packet), &packet))
 		return false;
 
 	Tracenf("KEY_AGREEMENT RECV %u", packet.wDataLength);
 
-	TPacketKeyAgreement packetToSend;
-	size_t dataLength = TPacketKeyAgreement::MAX_DATA_LEN;
+	SPacketKeyAgreement packetToSend;
+	size_t dataLength = SPacketKeyAgreement::MAX_DATA_LEN;
 	size_t agreedLength = Prepare(packetToSend.data, &dataLength);
 	if (agreedLength == 0)
 	{
@@ -357,12 +352,11 @@ bool CGuildMarkUploader::__LoginState_RecvKeyAgreement()
 		Disconnect();
 		return false;
 	}
-	assert(dataLength <= TPacketKeyAgreement::MAX_DATA_LEN);
+	assert(dataLength <= SPacketKeyAgreement::MAX_DATA_LEN);
 
 	if (Activate(packet.wAgreedLength, packet.data, packet.wDataLength))
 	{
 		// Key agreement 성공, 응답 전송
-		packetToSend.bHeader = HEADER_CG_KEY_AGREEMENT;
 		packetToSend.wAgreedLength = static_cast<uint16_t>(agreedLength);
 		packetToSend.wDataLength = static_cast<uint16_t>(dataLength);
 
@@ -384,7 +378,7 @@ bool CGuildMarkUploader::__LoginState_RecvKeyAgreement()
 
 bool CGuildMarkUploader::__LoginState_RecvKeyAgreementCompleted()
 {
-	TPacketKeyAgreementCompleted packet;
+	SPacketGCKeyAgreementCompleted packet;
 	if (!Recv(sizeof(packet), &packet))
 		return false;
 

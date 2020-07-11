@@ -102,14 +102,14 @@ bool CHARACTER::CanFight() const
 
 void CHARACTER::CreateFly(uint8_t bType, LPCHARACTER pkVictim)
 {
-	TPacketGCCreateFly packFly;
+	SPacketGCCreateFly packFly;
 
-	packFly.bHeader         = HEADER_GC_CREATE_FLY;
+	packFly.header         = HEADER_GC_CREATE_FLY;
 	packFly.bType           = bType;
 	packFly.dwStartVID      = GetVID();
 	packFly.dwEndVID        = pkVictim->GetVID();
 
-	PacketAround(&packFly, sizeof(TPacketGCCreateFly));
+	PacketAround(&packFly, sizeof(SPacketGCCreateFly));
 }
 
 void CHARACTER::DistributeSP(LPCHARACTER pkKiller, int32_t iMethod)
@@ -422,7 +422,7 @@ void CHARACTER::Stun()
 
 	event_cancel(&m_pkRecoveryEvent); // 회복 이벤트를 죽인다.
 
-	TPacketGCStun pack;
+	SPacketGCStun pack;
 	pack.header	= HEADER_GC_STUN;
 	pack.vid	= m_vid;
 	PacketAround(&pack, sizeof(pack));
@@ -1497,7 +1497,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 	}
 	// END_OF_BOSS_KILL_LOG
 
-	TPacketGCDead pack;
+	SPacketGCDead pack;
 	pack.header	= HEADER_GC_DEAD;
 	pack.vid	= m_vid;
 	PacketAround(&pack, sizeof(pack));
@@ -1608,8 +1608,8 @@ void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int32_t Damage, uint8_t 
 {
 	if (IsPC() == true || (pAttacker->IsPC() == true && pAttacker->GetTarget() == this))
 	{
-		TPacketGCDamageInfo damageInfo;
-		memset(&damageInfo, 0, sizeof(TPacketGCDamageInfo));
+		SPacketGCDamageInfo damageInfo;
+		memset(&damageInfo, 0, sizeof(SPacketGCDamageInfo));
 
 		damageInfo.header = HEADER_GC_DAMAGE_INFO;
 		damageInfo.dwVID = (uint32_t)GetVID();
@@ -1618,17 +1618,17 @@ void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int32_t Damage, uint8_t 
 
 		if (GetDesc() != nullptr)
 		{
-			GetDesc()->Packet(&damageInfo, sizeof(TPacketGCDamageInfo));
+			GetDesc()->Packet(&damageInfo, sizeof(SPacketGCDamageInfo));
 		}
 
 		if (pAttacker->GetDesc() != nullptr)
 		{
-			pAttacker->GetDesc()->Packet(&damageInfo, sizeof(TPacketGCDamageInfo));
+			pAttacker->GetDesc()->Packet(&damageInfo, sizeof(SPacketGCDamageInfo));
 		}
 		/*
 		   if (GetArenaObserverMode() == false && GetArena() != nullptr)
 		   {
-		   GetArena()->SendPacketToObserver(&damageInfo, sizeof(TPacketGCDamageInfo));
+		   GetArena()->SendPacketToObserver(&damageInfo, sizeof(SPacketGCDamageInfo));
 		   }
 		 */		
 	}
@@ -3257,17 +3257,17 @@ bool CHARACTER::Shoot(uint8_t bType)
 void CHARACTER::FlyTarget(uint32_t dwTargetVID, int32_t x, int32_t y, uint8_t bHeader)
 {
 	LPCHARACTER pkVictim = CHARACTER_MANAGER::instance().Find(dwTargetVID);
-	TPacketGCFlyTargeting pack;
+	SPacketGCFlyTargeting pack;
 
 	//pack.bHeader	= HEADER_GC_FLY_TARGETING;
-	pack.bHeader	= (bHeader == HEADER_CG_FLY_TARGETING) ? HEADER_GC_FLY_TARGETING : HEADER_GC_ADD_FLY_TARGETING;
+	pack.header	= (bHeader == HEADER_CG_FLY_TARGETING) ? HEADER_GC_FLY_TARGETING : HEADER_GC_ADD_FLY_TARGETING;
 	pack.dwShooterVID	= GetVID();
 
 	if (pkVictim)
 	{
 		pack.dwTargetVID = pkVictim->GetVID();
-		pack.x = pkVictim->GetX();
-		pack.y = pkVictim->GetY();
+		pack.lX = pkVictim->GetX();
+		pack.lY = pkVictim->GetY();
 
 		if (bHeader == HEADER_CG_FLY_TARGETING)
 			m_dwFlyTargetID = dwTargetVID;
@@ -3277,11 +3277,11 @@ void CHARACTER::FlyTarget(uint32_t dwTargetVID, int32_t x, int32_t y, uint8_t bH
 	else
 	{
 		pack.dwTargetVID = 0;
-		pack.x = x;
-		pack.y = y;
+		pack.lX = x;
+		pack.lY = y;
 	}
 
-	sys_log(1, "FlyTarget %s vid %d x %d y %d", GetName(), pack.dwTargetVID, pack.x, pack.y);
+	sys_log(1, "FlyTarget %s vid %d x %d y %d", GetName(), pack.dwTargetVID, pack.lX, pack.lY);
 	PacketAround(&pack, sizeof(pack), this);
 }
 

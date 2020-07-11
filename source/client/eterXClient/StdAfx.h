@@ -6,6 +6,7 @@
 #endif
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include "../../common/common_incl.hpp"
 #include "../eterLib/StdAfx.h"
 #include "../eterPythonLib/StdAfx.h"
 #include "../eterGameLib/StdAfx.h"
@@ -33,13 +34,6 @@
 #ifdef __USE_CYTHON__
 #include "PythonrootlibManager.h"
 #endif
-
-enum
-{
-	POINT_MAX_NUM = 255,	
-	CHARACTER_NAME_MAX_LEN = 24,
-	PLAYER_NAME_MAX_LEN = 12,
-};
 
 void initapp();
 void initime();

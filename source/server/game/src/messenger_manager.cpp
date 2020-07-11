@@ -370,11 +370,11 @@ void MessengerManager::SendList(MessengerManager::keyA account)
 	if (m_Relation[account].empty())
 		return;
 
-	TPacketGCMessenger pack;
+	SPacketGCMessenger pack;
 
 	pack.header		= HEADER_GC_MESSENGER;
 	pack.subheader	= MESSENGER_SUBHEADER_GC_LIST;
-	pack.size		= sizeof(TPacketGCMessenger);
+	pack.size		= sizeof(SPacketGCMessenger);
 
 	TPacketGCMessengerListOffline pack_offline;
 	TPacketGCMessengerListOnline pack_online;
@@ -411,7 +411,7 @@ void MessengerManager::SendList(MessengerManager::keyA account)
 
 	pack.size += buf.size();
 
-	d->BufferedPacket(&pack, sizeof(TPacketGCMessenger));
+	d->BufferedPacket(&pack, sizeof(SPacketGCMessenger));
 	d->Packet(buf.read_peek(), buf.size());
 }
 
@@ -431,13 +431,13 @@ void MessengerManager::SendLogin(MessengerManager::keyA account, MessengerManage
 
 	uint8_t bLen = companion.size();
 
-	TPacketGCMessenger pack;
+	SPacketGCMessenger pack;
 
 	pack.header			= HEADER_GC_MESSENGER;
 	pack.subheader		= MESSENGER_SUBHEADER_GC_LOGIN;
-	pack.size			= sizeof(TPacketGCMessenger) + sizeof(uint8_t) + bLen;
+	pack.size			= sizeof(SPacketGCMessenger) + sizeof(uint8_t) + bLen;
 
-	d->BufferedPacket(&pack, sizeof(TPacketGCMessenger));
+	d->BufferedPacket(&pack, sizeof(SPacketGCMessenger));
 	d->BufferedPacket(&bLen, sizeof(uint8_t));
 	d->Packet(companion.c_str(), companion.size());
 }
@@ -455,13 +455,13 @@ void MessengerManager::SendLogout(MessengerManager::keyA account, MessengerManag
 
 	uint8_t bLen = companion.size();
 
-	TPacketGCMessenger pack;
+	SPacketGCMessenger pack;
 
 	pack.header		= HEADER_GC_MESSENGER;
 	pack.subheader	= MESSENGER_SUBHEADER_GC_LOGOUT;
-	pack.size		= sizeof(TPacketGCMessenger) + sizeof(uint8_t) + bLen;
+	pack.size		= sizeof(SPacketGCMessenger) + sizeof(uint8_t) + bLen;
 
-	d->BufferedPacket(&pack, sizeof(TPacketGCMessenger));
+	d->BufferedPacket(&pack, sizeof(SPacketGCMessenger));
 	d->BufferedPacket(&bLen, sizeof(uint8_t));
 	d->Packet(companion.c_str(), companion.size());
 }

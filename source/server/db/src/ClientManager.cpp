@@ -1924,32 +1924,6 @@ void CClientManager::DeleteObject(uint32_t dwID)
 	ForwardPacket(HEADER_DG_DELETE_OBJECT, &dwID, sizeof(uint32_t));
 }
 
-void CClientManager::UpdateLand(uint32_t * pdw)
-{
-	uint32_t dwID = pdw[0];
-	uint32_t dwGuild = pdw[1];
-
-	building::TLand * p = &m_vec_kLandTable[0];
-
-	uint32_t i;
-
-	for (i = 0; i < m_vec_kLandTable.size(); ++i, ++p)
-	{
-		if (p->dwID == dwID)
-		{
-			char buf[256];
-			snprintf(buf, sizeof(buf), "UPDATE land SET guild_id=%u WHERE id=%u", dwGuild, dwID);
-			CDBManager::instance().AsyncQuery(buf);
-
-			p->dwGuildID = dwGuild;
-			break;
-		}
-	}
-
-	if (i < m_vec_kLandTable.size())
-		ForwardPacket(HEADER_DG_UPDATE_LAND, p, sizeof(building::TLand));
-}
-
 // BLOCK_CHAT
 void CClientManager::BlockChat(TPacketBlockChat* p)
 {
@@ -2349,10 +2323,6 @@ void CClientManager::ProcessPackets(CPeer * peer)
 				DeleteObject(*(uint32_t *) data);
 				break;
 
-			case HEADER_GD_UPDATE_LAND:
-				UpdateLand((uint32_t *) data);
-				break;
-
 			case HEADER_GD_MARRIAGE_ADD:
 				MarriageAdd((TPacketMarriageAdd *) data);
 				break;
@@ -2501,7 +2471,7 @@ void CClientManager::RemovePeer(CPeer * pPeer)
 	delete pPeer;
 }
 
-CPeer * CClientManager::GetPeer(IDENT ident)
+CPeer * CClientManager::GetPeer(uint32_t ident)
 {
 	for (auto tmp : m_peerList)
 	{

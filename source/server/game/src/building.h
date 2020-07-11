@@ -143,7 +143,6 @@ namespace building
 			CLand *	FindLand(uint32_t dwID);
 			CLand *	FindLand(int32_t lMapIndex, int32_t x, int32_t y);
 			CLand *	FindLandByGuild(uint32_t GID);
-			void	UpdateLand(TLand * pTable);
 
 			bool	LoadObject(TObject * pTable, bool isBoot=false);
 			void	DeleteObject(uint32_t dwID);

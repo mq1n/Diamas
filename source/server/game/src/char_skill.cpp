@@ -149,11 +149,11 @@ void CHARACTER::SetSkillGroup(uint8_t bSkillGroup)
 
 	m_points.skill_group = bSkillGroup; 
 
-	TPacketGCChangeSkillGroup p;
-	p.header = HEADER_GC_SKILL_GROUP;
+	SPacketGCChangeSkillGroup p;
+	p.header = HEADER_GC_CHANGE_SKILL_GROUP;
 	p.skill_group = m_points.skill_group;
 
-	GetDesc()->Packet(&p, sizeof(TPacketGCChangeSkillGroup));
+	GetDesc()->Packet(&p, sizeof(SPacketGCChangeSkillGroup));
 }
 
 int32_t CHARACTER::ComputeCooltime(int32_t time)
@@ -166,11 +166,11 @@ void CHARACTER::SkillLevelPacket()
 	if (!GetDesc())
 		return;
 
-	TPacketGCSkillLevel pack;
+	SPacketGCSkillLevel pack;
 
-	pack.bHeader = HEADER_GC_SKILL_LEVEL;
+	pack.header = HEADER_GC_SKILL_LEVEL;
 	memcpy(&pack.skills, m_pSkillLevels, sizeof(TPlayerSkill) * SKILL_MAX_NUM);
-	GetDesc()->Packet(&pack, sizeof(TPacketGCSkillLevel));
+	GetDesc()->Packet(&pack, sizeof(SPacketGCSkillLevel));
 }
 
 void CHARACTER::SetSkillLevel(uint32_t dwVnum, uint8_t bLev)

@@ -91,7 +91,7 @@ struct FSendDestPosition
 {
 	FSendDestPosition(int32_t x, int32_t y)
 	{
-		p1.bHeader = HEADER_GC_DUNGEON;
+		p1.header = HEADER_GC_DUNGEON;
 		p1.subheader = DUNGEON_SUBHEADER_GC_DESTINATION_POSITION;
 		p2.x = x;
 		p2.y = y;
@@ -100,12 +100,12 @@ struct FSendDestPosition
 
 	void operator()(LPCHARACTER ch)
 	{
-		ch->GetDesc()->BufferedPacket(&p1, sizeof(TPacketGCDungeon));
-		ch->GetDesc()->Packet(&p2, sizeof(TPacketGCDungeonDestPosition));
+		ch->GetDesc()->BufferedPacket(&p1, sizeof(SPacketGCDungeon));
+		ch->GetDesc()->Packet(&p2, sizeof(TPacketDungeonDestPosition));
 	}
 
-	TPacketGCDungeon p1;
-	TPacketGCDungeonDestPosition p2;
+	SPacketGCDungeon p1;
+	TPacketDungeonDestPosition p2;
 };
 
 void CDungeon::SendDestPositionToParty(LPPARTY pParty, int32_t x, int32_t y)

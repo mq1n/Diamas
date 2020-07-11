@@ -69,7 +69,7 @@ SQLMsg * CDBManager::DirectQuery(const char * c_pszQuery, uint32_t slot)
 	return m_directSQL[slot].DirectQuery(c_pszQuery);
 }
 
-void CDBManager::ReturnQuery(const char* c_pszQuery, int32_t iType, IDENT dwIdent, void * udata, uint32_t slot)
+void CDBManager::ReturnQuery(const char* c_pszQuery, int32_t iType, uint32_t dwIdent, void * udata, uint32_t slot)
 {
 	assert(slot < SQL_MAX_NUM && "Out of bounds");
 

@@ -974,15 +974,15 @@ namespace quest
 
 		//sys_log(0, "Send Quest Script to %s", GetCurrentCharacterPtr()->GetName());
 		//send -_-!
-		struct ::packet_script packet_script;
+		SPacketGCScript packet_script;
 
 		packet_script.header = HEADER_GC_SCRIPT;
 		packet_script.skin = m_iCurrentSkin;
 		packet_script.src_size = static_cast<uint16_t>(m_strScript.size());
-		packet_script.size = packet_script.src_size + sizeof(struct packet_script);
+		packet_script.size = packet_script.src_size + sizeof(SPacketGCScript);
 
 		TEMP_BUFFER buf;
-		buf.write(&packet_script, sizeof(struct packet_script));
+		buf.write(&packet_script, sizeof(SPacketGCScript));
 		buf.write(&m_strScript[0], m_strScript.size());
 
 		CHARACTER * ch = GetCurrentCharacterPtr();

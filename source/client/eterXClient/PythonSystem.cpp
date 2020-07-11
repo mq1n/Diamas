@@ -435,6 +435,12 @@ bool CPythonSystem::LoadConfig()
 			m_Config.width = maxWidth;
 		if (m_Config.height > maxHeight)
 			m_Config.height = maxHeight;
+
+		if (m_Config.width < 800)
+			m_Config.width = 800;
+
+		if (m_Config.height < 600)
+			m_Config.height = 600;
 	}
 	
 	m_OldConfig = m_Config;

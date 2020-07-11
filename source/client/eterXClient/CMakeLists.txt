@@ -57,7 +57,7 @@ file(GLOB ETERCLIENT_OTHER_INPUT
 add_executable(${EXE_NAME} WIN32 ${ETERCLIENT_HEADERS} ${ETERCLIENT_SOURCES} ${ETERCLIENT_OTHER_INPUT})
 
 SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES LINK_FLAGS    "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:WINDOWS")
-target_link_libraries(${EXE_NAME} eterBase eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterSecurity eterTerrainLib eterTreeLib eterWebBrowser ${EXTRA_LIBS})
+target_link_libraries(${EXE_NAME} sourceCommon eterBase eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterSecurity eterTerrainLib eterTreeLib eterWebBrowser ${EXTRA_LIBS})
 
 set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)

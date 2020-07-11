@@ -1,5 +1,4 @@
-#include "stdafx.h"
-
+#include "StdAfx.h"
 #include "cipher.h"
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_

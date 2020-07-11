@@ -6,7 +6,6 @@
 */
 #include "StdAfx.h"
 #include "tea.h"
-#include <memory.h>
 
 /*
 * TEA Encryption Module Instruction

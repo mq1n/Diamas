@@ -177,7 +177,7 @@ void CPythonNetworkStream::SetLoadingPhase()
 
 bool CPythonNetworkStream::RecvMainCharacter()
 {
-	TPacketGCMainCharacter2_EMPIRE mainChrPacket;
+	SPacketGCMainCharacter mainChrPacket;
 	if (!Recv(sizeof(mainChrPacket), &mainChrPacket))
 		return false;
 
@@ -201,7 +201,7 @@ bool CPythonNetworkStream::RecvMainCharacter()
 
 bool CPythonNetworkStream::RecvMainCharacter3_BGM()
 {
-	TPacketGCMainCharacter3_BGM mainChrPacket;
+	SPacketGCMainCharacter3_BGM mainChrPacket;
 	if (!Recv(sizeof(mainChrPacket), &mainChrPacket))
 		return false;
 
@@ -227,7 +227,7 @@ bool CPythonNetworkStream::RecvMainCharacter3_BGM()
 
 bool CPythonNetworkStream::RecvMainCharacter4_BGM_VOL()
 {
-	TPacketGCMainCharacter4_BGM_VOL mainChrPacket;
+	SPacketGCMainCharacter4_BGM_VOL mainChrPacket;
 	if (!Recv(sizeof(mainChrPacket), &mainChrPacket))
 		return false;
 
@@ -280,9 +280,9 @@ float CPythonNetworkStream::GetFieldMusicVolume()
 
 bool CPythonNetworkStream::__RecvPlayerPoints()
 {
-	TPacketGCPoints PointsPacket;
+	SPacketGCPoints PointsPacket;
 
-	if (!Recv(sizeof(TPacketGCPoints), &PointsPacket))
+	if (!Recv(sizeof(SPacketGCPoints), &PointsPacket))
 		return false;
 
 	for (uint32_t i = 0; i < POINT_MAX_NUM; ++i)
@@ -300,10 +300,7 @@ void CPythonNetworkStream::StartGame()
 	
 bool CPythonNetworkStream::SendEnterGame()
 {
-	TPacketCGEnterFrontGame EnterFrontGamePacket;
-
-	EnterFrontGamePacket.header = HEADER_CG_ENTERGAME;
-
+	SPacketCGEnterFrontGame EnterFrontGamePacket;
 	if (!Send(sizeof(EnterFrontGamePacket), &EnterFrontGamePacket))
 	{
 		Tracen("Send EnterFrontGamePacket");

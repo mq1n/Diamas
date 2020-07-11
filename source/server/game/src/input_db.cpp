@@ -129,7 +129,7 @@ void CInputDB::LoginSuccess(uint32_t dwHandle, const char *data)
 
 	for (int32_t i = 0; i != PLAYER_PER_ACCOUNT; ++i)
 	{
-		TSimplePlayer& player = pTab->players[i];
+		TSimplePlayerInformation& player = pTab->players[i];
 		sys_log(0, "\tplayer(%s).job(%d)", player.szName, player.byJob);
 	}
 
@@ -139,15 +139,15 @@ void CInputDB::LoginSuccess(uint32_t dwHandle, const char *data)
 
 	if (!bFound) // 캐릭터가 없으면 랜덤한 제국으로 보낸다.. -_-
 	{
-		TPacketGCEmpire pe;
-		pe.bHeader = HEADER_GC_EMPIRE;
+		SPacketGCEmpire pe;
+		pe.header = HEADER_GC_EMPIRE;
 		pe.bEmpire = number(1, 3);
 		d->Packet(&pe, sizeof(pe));
 	}
 	else
 	{
-		TPacketGCEmpire pe;
-		pe.bHeader = HEADER_GC_EMPIRE;
+		SPacketGCEmpire pe;
+		pe.header = HEADER_GC_EMPIRE;
 		pe.bEmpire = d->GetEmpire();
 		d->Packet(&pe, sizeof(pe));
 	}
@@ -163,9 +163,9 @@ void CInputDB::PlayerCreateFailure(LPDESC d, uint8_t bType)
 	if (!d)
 		return;
 
-	TPacketGCCreateFailure pack;
+	SPacketGCCreateFailure pack;
 
-	pack.header	= HEADER_GC_CHARACTER_CREATE_FAILURE;
+	pack.header	= HEADER_GC_PLAYER_CREATE_FAILURE;
 	pack.bType	= bType;
 
 	d->Packet(&pack, sizeof(pack));
@@ -180,7 +180,7 @@ void CInputDB::PlayerCreateSuccess(LPDESC d, const char * data)
 
 	if (pPacketDB->bAccountCharacterIndex >= PLAYER_PER_ACCOUNT)
 	{
-		d->Packet(encode_byte(HEADER_GC_CHARACTER_CREATE_FAILURE), 1);
+		d->Packet(encode_byte(HEADER_GC_PLAYER_CREATE_FAILURE), 1);
 		return;
 	}
 
@@ -202,18 +202,18 @@ void CInputDB::PlayerCreateSuccess(LPDESC d, const char * data)
 	TAccountTable & r_Tab = d->GetAccountTable();
 	r_Tab.players[pPacketDB->bAccountCharacterIndex] = pPacketDB->player;
 
-	TPacketGCPlayerCreateSuccess pack;
+	SPacketGCPlayerCreateSuccess pack;
 
-	pack.header = HEADER_GC_CHARACTER_CREATE_SUCCESS;
-	pack.bAccountCharacterIndex = pPacketDB->bAccountCharacterIndex;
-	pack.player = pPacketDB->player;
+	pack.header = HEADER_GC_PLAYER_CREATE_SUCCESS;
+	pack.bAccountCharacterSlot = pPacketDB->bAccountCharacterIndex;
+	pack.kSimplePlayerInfomation = pPacketDB->player;
 #ifdef ENABLE_NEWSTUFF
 	if (!g_stProxyIP.empty())
-		pack.player.lAddr=inet_addr(g_stProxyIP.c_str());
+		pack.kSimplePlayerInfomation.lAddr=inet_addr(g_stProxyIP.c_str());
 #endif
-	d->Packet(&pack, sizeof(TPacketGCPlayerCreateSuccess));
+	d->Packet(&pack, sizeof(SPacketGCPlayerCreateSuccess));
 
-	LogManager::instance().CharLog(pack.player.dwID, 0, 0, 0, "CREATE PLAYER", "", d->GetHostName());
+	LogManager::instance().CharLog(pack.kSimplePlayerInfomation.dwID, 0, 0, 0, "CREATE PLAYER", "", d->GetHostName());
 }
 
 void CInputDB::PlayerDeleteSuccess(LPDESC d, const char * data)
@@ -223,8 +223,8 @@ void CInputDB::PlayerDeleteSuccess(LPDESC d, const char * data)
 
 	uint8_t account_index;
 	account_index = decode_byte(data);
-	d->BufferedPacket(encode_byte(HEADER_GC_CHARACTER_DELETE_SUCCESS),	1);
-	d->Packet(encode_byte(account_index),			1);
+	d->BufferedPacket(encode_byte(HEADER_GC_PLAYER_DELETE_SUCCESS),	1);
+	d->Packet(encode_byte(account_index), 1);
 
 	d->GetAccountTable().players[account_index].dwID = 0;
 }
@@ -234,7 +234,7 @@ void CInputDB::PlayerDeleteFail(LPDESC d)
 	if (!d)
 		return;
 
-	d->Packet(encode_byte(HEADER_GC_CHARACTER_DELETE_WRONG_SOCIAL_ID),	1);
+	d->Packet(encode_byte(HEADER_GC_PLAYER_DELETE_WRONG_SOCIAL_ID),	1);
 	//d->Packet(encode_byte(account_index),			1);
 
 	//d->GetAccountTable().players[account_index].dwID = 0;
@@ -258,13 +258,13 @@ void CInputDB::ChangeName(LPDESC d, const char * data)
 			strlcpy(r.players[i].szName, p->name, sizeof(r.players[i].szName));
 			r.players[i].bChangeName = 0;
 
-			TPacketGCChangeName pgc;
+			SPacketGCChangeName pgc;
 
 			pgc.header = HEADER_GC_CHANGE_NAME;
 			pgc.pid = p->pid;
 			strlcpy(pgc.name, p->name, sizeof(pgc.name));
 
-			d->Packet(&pgc, sizeof(TPacketGCChangeName));
+			d->Packet(&pgc, sizeof(SPacketGCChangeName));
 			break;
 		}
 }
@@ -1077,8 +1077,8 @@ void CInputDB::SafeboxWrongPassword(LPDESC d)
 	if (!d->GetCharacter())
 		return;
 
-	TPacketCGSafeboxWrongPassword p;
-	p.bHeader = HEADER_GC_SAFEBOX_WRONG_PASSWORD;
+	SPacketGCSafeboxWrongPassword p;
+	p.header = HEADER_GC_SAFEBOX_WRONG_PASSWORD;
 	d->Packet(&p, sizeof(p));
 
 	d->GetCharacter()->CancelSafeboxLoad();
@@ -1160,17 +1160,19 @@ void CInputDB::EmpireSelect(LPDESC d, const char * c_pData)
 	TAccountTable & rTable = d->GetAccountTable();
 	rTable.bEmpire = *(uint8_t *) c_pData;
 
-	TPacketGCEmpire pe;
-	pe.bHeader = HEADER_GC_EMPIRE;
+	SPacketGCEmpire pe;
+	pe.header = HEADER_GC_EMPIRE;
 	pe.bEmpire = rTable.bEmpire;
 	d->Packet(&pe, sizeof(pe));
 
-	for (int32_t i = 0; i < PLAYER_PER_ACCOUNT; ++i) 
+	for (int32_t i = 0; i < PLAYER_PER_ACCOUNT; ++i)
+	{
 		if (rTable.players[i].dwID)
 		{
 			rTable.players[i].x = EMPIRE_START_X(rTable.bEmpire);
 			rTable.players[i].y = EMPIRE_START_Y(rTable.bEmpire);
 		}
+	}
 
 	GetServerLocation(d->GetAccountTable(), rTable.bEmpire);
 
@@ -1628,9 +1630,9 @@ void CInputDB::AuthLogin(LPDESC d, const char * c_pData)
 
 	uint8_t bResult = *(uint8_t *) c_pData;
 
-	TPacketGCAuthSuccess ptoc;
+	SPacketGCAuthSuccess ptoc;
 
-	ptoc.bHeader = HEADER_GC_AUTH_SUCCESS;
+	ptoc.header = HEADER_GC_AUTH_SUCCESS;
 
 	if (bResult)
 	{
@@ -1643,7 +1645,7 @@ void CInputDB::AuthLogin(LPDESC d, const char * c_pData)
 
 	ptoc.bResult = bResult;
 
-	d->Packet(&ptoc, sizeof(TPacketGCAuthSuccess));
+	d->Packet(&ptoc, sizeof(SPacketGCAuthSuccess));
 	sys_log(0, "AuthLogin result %u key %u", bResult, d->GetLoginKey());
 }
 
@@ -1712,12 +1714,6 @@ void CInputDB::DeleteObject(const char * c_pData)
 {
 	using namespace building;
 	CManager::instance().DeleteObject(*(uint32_t *) c_pData);
-}
-
-void CInputDB::UpdateLand(const char * c_pData)
-{
-	using namespace building;
-	CManager::instance().UpdateLand((TLand *) c_pData);
 }
 
 void CInputDB::Notice(const char * c_pData)
@@ -2056,10 +2052,6 @@ int32_t CInputDB::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 
 	case HEADER_DG_DELETE_OBJECT:
 		DeleteObject(c_pData);
-		break;
-
-	case HEADER_DG_UPDATE_LAND:
-		UpdateLand(c_pData);
 		break;
 
 	case HEADER_DG_NOTICE:

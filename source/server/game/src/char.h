@@ -338,16 +338,6 @@ enum EPointTypes
 	//POINT_MAX_NUM = 129	common/length.h
 };
 
-enum EPKModes
-{
-	PK_MODE_PEACE,
-	PK_MODE_REVENGE,
-	PK_MODE_FREE,
-	PK_MODE_PROTECT,
-	PK_MODE_GUILD,
-	PK_MODE_MAX_NUM
-};
-
 enum EPositions
 {
 	POS_DEAD,
@@ -358,16 +348,6 @@ enum EPositions
 	POS_FIGHTING,
 	POS_MOUNTING,
 	POS_STANDING
-};
-
-enum EBlockAction
-{
-	BLOCK_EXCHANGE		= (1 << 0),
-	BLOCK_PARTY_INVITE		= (1 << 1),
-	BLOCK_GUILD_INVITE		= (1 << 2),
-	BLOCK_WHISPER		= (1 << 3),
-	BLOCK_MESSENGER_INVITE	= (1 << 4),
-	BLOCK_PARTY_REQUEST		= (1 << 5),
 };
 
 // <Factor> Dynamically evaluated CHARACTER* equivalent.
@@ -802,7 +782,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			SetRotationToXY(int32_t x, int32_t y);
 		float			GetRotation() const	{ return m_pointsInstant.fRot; }
 
-		void			MotionPacketEncode(uint8_t motion, LPCHARACTER victim, struct packet_motion * packet);
+		void			MotionPacketEncode(uint8_t motion, LPCHARACTER victim, SPacketGCMotion* packet);
 		void			Motion(uint8_t motion, LPCHARACTER victim = nullptr);
 
 		void			ChatPacket(uint8_t type, const char *format, ...);
@@ -993,14 +973,14 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		// Quickslot ฐüทร
 	public:
 		void			SyncQuickslot(uint8_t bType, uint8_t bOldPos, uint8_t bNewPos);
-		bool			GetQuickslot(uint8_t pos, TQuickslot ** ppSlot);
-		bool			SetQuickslot(uint8_t pos, TQuickslot & rSlot);
+		bool			GetQuickslot(uint8_t pos, TQuickSlot ** ppSlot);
+		bool			SetQuickslot(uint8_t pos, TQuickSlot& rSlot);
 		bool			DelQuickslot(uint8_t pos);
 		bool			SwapQuickslot(uint8_t a, uint8_t b);
 		void			ChainQuickslotItem(LPITEM pItem, uint8_t bType, uint8_t bOldPos);
 
 	protected:
-		TQuickslot		m_quickslot[QUICKSLOT_MAX_NUM];
+		TQuickSlot		m_quickslot[QUICKSLOT_MAX_NUM];
 
 		////////////////////////////////////////////////////////////////////////////////////////
 		// Affect
@@ -1067,7 +1047,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		 */
 		void			PartyInviteDeny(uint32_t dwPID);
 
-		bool			BuildUpdatePartyPacket(TPacketGCPartyUpdate & out);
+		bool			BuildUpdatePartyPacket(SPacketGCPartyUpdate & out);
 		int32_t				GetLeadershipSkillLevel() const;
 
 		bool			CanSummon(int32_t iLeaderShip);
@@ -1214,7 +1194,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		//	void			PotionPacket(int32_t iPotionType);
 		void			EffectPacket(int32_t enumEffectType);
-		void			SpecificEffectPacket(const char filename[128]);
+		void			SpecificEffectPacket(const char* filename);
 
 		// ADD_MONSTER_REFINE
 		bool			DoRefine(LPITEM item, bool bMoneyOnly = false);

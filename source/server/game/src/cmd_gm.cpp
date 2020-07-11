@@ -1336,14 +1336,14 @@ void BroadcastNotice(const char * c_pszBuf, bool bBigFont)
 
 void BroadcastCmdchat(const char * c_pszBuf)
 {
-	TPacketGCChat pack_chat;
+	SPacketGCChat pack_chat;
 	pack_chat.header = HEADER_GC_CHAT;
-	pack_chat.size = sizeof(TPacketGCChat) + strlen(c_pszBuf);
+	pack_chat.size = sizeof(SPacketGCChat) + strlen(c_pszBuf);
 	pack_chat.type = CHAT_TYPE_COMMAND;
-	pack_chat.id = 0;
+	pack_chat.dwVID = 0;
 
 	TEMP_BUFFER buf;
-	buf.write(&pack_chat, sizeof(TPacketGCChat));
+	buf.write(&pack_chat, sizeof(SPacketGCChat));
 	buf.write(c_pszBuf, strlen(c_pszBuf));
 
 	P2P_MANAGER::instance().Send(buf.read_peek(), buf.size());

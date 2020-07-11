@@ -26,22 +26,8 @@ typedef          __int32  int32_t;
 /// zlib's CRC32 polynomial
 const uint32_t Polynomial = 0xEDB88320;
 
-/// swap endianess
-static inline uint32_t swap(uint32_t x)
-{
-#if defined(__GNUC__) || defined(__clang__)
-	return __builtin_bswap32(x);
-#else
-	return (x >> 24) |
-		((x >> 8) & 0x0000FF00) |
-		((x << 8) & 0x00FF0000) |
-		(x << 24);
-#endif
-}
-
 /// forward declaration, table is at the end of this file
 extern const uint32_t Crc32Lookup[8][256]; // extern is needed to keep compiler happey
-
 
 /// compute CRC32 (bitwise algorithm)
 uint32_t crc32_bitwise(const void* data, size_t length, uint32_t previousCrc32 = 0)

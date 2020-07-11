@@ -94,7 +94,7 @@ bool CLIENT_DESC::Connect(int32_t iPhaseWhenSucceed)
 	}
 	else
 	{
-		SetPhase(PHASE_CLIENT_CONNECTING);
+		SetPhase(PHASE_DBCLIENT_CONNECTING);
 		return false;
 	}
 }
@@ -115,7 +115,7 @@ void CLIENT_DESC::SetPhase(int32_t iPhase)
 {
 	switch (iPhase)
 	{
-		case PHASE_CLIENT_CONNECTING:
+		case PHASE_DBCLIENT_CONNECTING:
 			sys_log(1, "PHASE_CLIENT_DESC::CONNECTING");
 			m_pInputProcessor = nullptr;
 			break;

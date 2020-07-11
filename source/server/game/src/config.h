@@ -5,14 +5,6 @@
 
 #define ADDRESS_MAX_LEN 15
 
-enum EGameStage
-{
-	STAGE_NULL,
-	STAGE_DEV_GAME,
-	STAGE_TEST_GAME,
-	STAGE_LIVE_GAME,
-};
-
 enum EItemDestroyTime
 {
 	ITEM_DESTROY_TIME_AUTOGIVE, 

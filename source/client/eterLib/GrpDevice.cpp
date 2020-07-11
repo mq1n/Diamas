@@ -422,16 +422,16 @@ RETRY:
 		switch (ms_hLastResult)
 		{
 			case D3DERR_INVALIDCALL:
-				Tracen("IDirect3DDevice.CreateDevice - ERROR D3DERR_INVALIDCALL\nThe method call is invalid. For example, a method's parameter may have an invalid value.");					
+				TraceError("IDirect3DDevice.CreateDevice - ERROR D3DERR_INVALIDCALL\nThe method call is invalid. For example, a method's parameter may have an invalid value.");					
 				break;
 			case D3DERR_NOTAVAILABLE:
-				Tracen("IDirect3DDevice.CreateDevice - ERROR D3DERR_NOTAVAILABLE\nThis device does not support the queried technique. ");
+				TraceError("IDirect3DDevice.CreateDevice - ERROR D3DERR_NOTAVAILABLE\nThis device does not support the queried technique. ");
 				break;
 			case D3DERR_OUTOFVIDEOMEMORY:
-				Tracen("IDirect3DDevice.CreateDevice - ERROR D3DERR_OUTOFVIDEOMEMORY\nDirect3D does not have enough display memory to perform the operation");
+				TraceError("IDirect3DDevice.CreateDevice - ERROR D3DERR_OUTOFVIDEOMEMORY\nDirect3D does not have enough display memory to perform the operation");
 				break;
 			default:
-				Tracenf("IDirect3DDevice.CreateDevice - ERROR %d", ms_hLastResult);
+				TraceError("IDirect3DDevice.CreateDevice - ERROR %p", ms_hLastResult);
 				break;
 		}
 

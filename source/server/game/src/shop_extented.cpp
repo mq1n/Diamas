@@ -63,7 +63,7 @@ bool CShopEx::AddGuest(LPCHARACTER ch,uint32_t owner_vid, bool bOtherEmpire)
 
 	m_map_guest.insert(GuestMapType::value_type(ch, bOtherEmpire));
 
-	TPacketGCShop pack;
+	SPacketGCShop pack;
 	pack.header		= HEADER_GC_SHOP;
 	pack.subheader	= SHOP_SUBHEADER_GC_START_EX;
 
@@ -79,7 +79,7 @@ bool CShopEx::AddGuest(LPCHARACTER ch,uint32_t owner_vid, bool bOtherEmpire)
 	for (auto it = m_vec_shopTabs.begin(); it != m_vec_shopTabs.end(); it++)
 	{
 		const TShopTableEx& shop_tab = *it;
-		TPacketGCShopStartEx::TSubPacketShopTab pack_tab;
+		TSubPacketShopTab pack_tab;
 		pack_tab.coin_type = shop_tab.coinType;
 		memcpy(pack_tab.name, shop_tab.name.c_str(), SHOP_TAB_NAME_MAX);
 		
@@ -110,7 +110,7 @@ bool CShopEx::AddGuest(LPCHARACTER ch,uint32_t owner_vid, bool bOtherEmpire)
 
 	pack.size = static_cast<uint16_t>(sizeof(pack) + sizeof(pack2) + size);
 
-	ch->GetDesc()->BufferedPacket(&pack, sizeof(TPacketGCShop));
+	ch->GetDesc()->BufferedPacket(&pack, sizeof(SPacketGCShop));
 	ch->GetDesc()->BufferedPacket(&pack2, sizeof(TPacketGCShopStartEx));
 	ch->GetDesc()->Packet(temp, size);
 

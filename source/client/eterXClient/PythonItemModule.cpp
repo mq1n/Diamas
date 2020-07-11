@@ -102,7 +102,7 @@ PyObject * itemGetIconImage(PyObject * poSelf, PyObject * poArgs)
 			return Py_BuildValue("i", pItemData->GetIconImage(szFileName));
 	
 	return Py_BuildValue("i", pItemData->GetIconImage());
-//	if (CItemData::ITEM_TYPE_SKILLBOOK == pItemData->GetType())
+//	if (ITEM_TYPE_SKILLBOOK == pItemData->GetType())
 //	{
 //		char szItemName[64+1];
 //		_snprintf_s(szItemName, "d:/ymir work/ui/items/etc/book_%02d.sub", );
@@ -218,7 +218,7 @@ PyObject * itemIs1GoldItem(PyObject * poSelf, PyObject * poArgs)
 	if (!pItemData)
 		return Py_BuildException("no selected item data");
 
-	return Py_BuildValue("i", pItemData->IsFlag(CItemData::ITEM_FLAG_COUNT_PER_1GOLD));
+	return Py_BuildValue("i", pItemData->IsFlag(ITEM_FLAG_COUNT_PER_1GOLD));
 }
 
 PyObject * itemGetLimit(PyObject * poSelf, PyObject * poArgs)
@@ -252,7 +252,7 @@ PyObject * itemGetAffect(PyObject * poSelf, PyObject * poArgs)
 	if (!pItemData->GetApply(iValueIndex, &ItemApply))
 		return Py_BuildException();
 
-	if ((CItemData::APPLY_ATT_SPEED == ItemApply.bType) && (CItemData::ITEM_TYPE_WEAPON == pItemData->GetType()) && (CItemData::WEAPON_TWO_HANDED == pItemData->GetSubType()))
+	if ((CItemData::APPLY_ATT_SPEED == ItemApply.bType) && (ITEM_TYPE_WEAPON == pItemData->GetType()) && (WEAPON_TWO_HANDED == pItemData->GetSubType()))
 	{
 		ItemApply.lValue -= TWOHANDED_WEWAPON_ATT_SPEED_DECREASE_VALUE;
 	}
@@ -353,12 +353,12 @@ PyObject * itemIsRefineScroll(PyObject * poSelf, PyObject * poArgs)
 	if (!pItemData)
 		return Py_BuildException("Can't find select item data");
 
-	if (pItemData->GetType() != CItemData::ITEM_TYPE_USE)
+	if (pItemData->GetType() != ITEM_TYPE_USE)
 		return Py_BuildValue("i", FALSE);
 	
 	switch (pItemData->GetSubType())
 	{
-		case CItemData::USE_TUNING:
+		case USE_TUNING:
 			return Py_BuildValue("i", TRUE);
 			break;
 	}
@@ -379,8 +379,8 @@ PyObject * itemIsDetachScroll(PyObject * poSelf, PyObject * poArgs)
 
 	int32_t iType = pItemData->GetType();
 	int32_t iSubType = pItemData->GetSubType();
-	if (iType == CItemData::ITEM_TYPE_USE)
-	if (iSubType == CItemData::USE_DETACHMENT)
+	if (iType == ITEM_TYPE_USE)
+	if (iSubType == USE_DETACHMENT)
 	{
 		return Py_BuildValue("i", TRUE);
 	}
@@ -399,7 +399,7 @@ PyObject * itemCanAddToQuickSlotItem(PyObject * poSelf, PyObject * poArgs)
 	if (!pItemData)
 		return Py_BuildException("Can't find select item data");
 
-	if (CItemData::ITEM_TYPE_USE == pItemData->GetType() || CItemData::ITEM_TYPE_QUEST == pItemData->GetType())
+	if (ITEM_TYPE_USE == pItemData->GetType() || ITEM_TYPE_QUEST == pItemData->GetType())
 	{
 		return Py_BuildValue("i", TRUE);
 	}
@@ -418,7 +418,7 @@ PyObject * itemIsKey(PyObject * poSelf, PyObject * poArgs)
 	if (!pItemData)
 		return Py_BuildException("Can't find select item data");
 
-	if (CItemData::ITEM_TYPE_TREASURE_KEY == pItemData->GetType())
+	if (ITEM_TYPE_TREASURE_KEY == pItemData->GetType())
 	{
 		return Py_BuildValue("i", TRUE);
 	}
@@ -437,7 +437,7 @@ PyObject * itemIsMetin(PyObject * poSelf, PyObject * poArgs)
 	if (!pItemData)
 		return Py_BuildException("Can't find select item data");
 
-	if (CItemData::ITEM_TYPE_METIN == pItemData->GetType())
+	if (ITEM_TYPE_METIN == pItemData->GetType())
 	{
 		return Py_BuildValue("i", TRUE);
 	}
@@ -638,50 +638,50 @@ void initItem()
 	PyModule_AddIntConstant(poModule, "EQUIPMENT_BELT",				c_Equipment_Belt);
 #endif
 
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_NONE",				CItemData::ITEM_TYPE_NONE);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_WEAPON",			CItemData::ITEM_TYPE_WEAPON);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_ARMOR",			CItemData::ITEM_TYPE_ARMOR);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_USE",				CItemData::ITEM_TYPE_USE);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_AUTOUSE",			CItemData::ITEM_TYPE_AUTOUSE);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_MATERIAL",			CItemData::ITEM_TYPE_MATERIAL);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_SPECIAL",			CItemData::ITEM_TYPE_SPECIAL);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_TOOL",				CItemData::ITEM_TYPE_TOOL);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_LOTTERY",			CItemData::ITEM_TYPE_LOTTERY);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_ELK",				CItemData::ITEM_TYPE_ELK);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_METIN",			CItemData::ITEM_TYPE_METIN);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_CONTAINER",		CItemData::ITEM_TYPE_CONTAINER);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_FISH",				CItemData::ITEM_TYPE_FISH);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_ROD",				CItemData::ITEM_TYPE_ROD);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_RESOURCE",			CItemData::ITEM_TYPE_RESOURCE);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_CAMPFIRE",			CItemData::ITEM_TYPE_CAMPFIRE);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_UNIQUE",			CItemData::ITEM_TYPE_UNIQUE);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_SKILLBOOK",		CItemData::ITEM_TYPE_SKILLBOOK);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_QUEST",			CItemData::ITEM_TYPE_QUEST);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_POLYMORPH",		CItemData::ITEM_TYPE_POLYMORPH);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_TREASURE_BOX",		CItemData::ITEM_TYPE_TREASURE_BOX);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_TREASURE_KEY",		CItemData::ITEM_TYPE_TREASURE_KEY);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_PICK",				CItemData::ITEM_TYPE_PICK);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_BLEND",			CItemData::ITEM_TYPE_BLEND);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_DS",				CItemData::ITEM_TYPE_DS);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_SPECIAL_DS",		CItemData::ITEM_TYPE_SPECIAL_DS);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_RING",				CItemData::ITEM_TYPE_RING);
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_BELT",				CItemData::ITEM_TYPE_BELT);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_NONE",				ITEM_TYPE_NONE);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_WEAPON",			ITEM_TYPE_WEAPON);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_ARMOR",			ITEM_TYPE_ARMOR);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_USE",				ITEM_TYPE_USE);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_AUTOUSE",			ITEM_TYPE_AUTOUSE);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_MATERIAL",			ITEM_TYPE_MATERIAL);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_SPECIAL",			ITEM_TYPE_SPECIAL);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_TOOL",				ITEM_TYPE_TOOL);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_LOTTERY",			ITEM_TYPE_LOTTERY);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_ELK",				ITEM_TYPE_ELK);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_METIN",			ITEM_TYPE_METIN);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_CONTAINER",		ITEM_TYPE_CONTAINER);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_FISH",				ITEM_TYPE_FISH);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_ROD",				ITEM_TYPE_ROD);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_RESOURCE",			ITEM_TYPE_RESOURCE);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_CAMPFIRE",			ITEM_TYPE_CAMPFIRE);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_UNIQUE",			ITEM_TYPE_UNIQUE);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_SKILLBOOK",		ITEM_TYPE_SKILLBOOK);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_QUEST",			ITEM_TYPE_QUEST);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_POLYMORPH",		ITEM_TYPE_POLYMORPH);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_TREASURE_BOX",		ITEM_TYPE_TREASURE_BOX);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_TREASURE_KEY",		ITEM_TYPE_TREASURE_KEY);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_PICK",				ITEM_TYPE_PICK);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_BLEND",			ITEM_TYPE_BLEND);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_DS",				ITEM_TYPE_DS);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_SPECIAL_DS",		ITEM_TYPE_SPECIAL_DS);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_RING",				ITEM_TYPE_RING);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_BELT",				ITEM_TYPE_BELT);
 
 
 #ifdef ENABLE_COSTUME_SYSTEM
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_COSTUME",			CItemData::ITEM_TYPE_COSTUME);
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_COSTUME",			ITEM_TYPE_COSTUME);
 
 	// Item Sub Type
-	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_BODY",			CItemData::COSTUME_BODY);
-	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_HAIR",			CItemData::COSTUME_HAIR);
+	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_BODY",			COSTUME_BODY);
+	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_HAIR",			COSTUME_HAIR);
 #ifdef ENABLE_MOUNT_COSTUME_SYSTEM
-	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_MOUNT",			CItemData::COSTUME_MOUNT);
+	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_MOUNT",			COSTUME_MOUNT);
 #endif
 #ifdef ENABLE_ACCE_SYSTEM
-	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_ACCE",			CItemData::COSTUME_ACCE);
+	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_ACCE",			COSTUME_ACCE);
 #endif
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
-	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_WEAPON",		CItemData::COSTUME_WEAPON);
+	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_WEAPON",		COSTUME_WEAPON);
 #endif
 
 	// 인벤토리 및 장비창에서의 슬롯 번호
@@ -693,7 +693,7 @@ void initItem()
 	PyModule_AddIntConstant(poModule, "COSTUME_SLOT_MOUNT",			c_Costume_Slot_Mount);
 #endif
 #ifdef ENABLE_ACCE_SYSTEM
-	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_ACCE", CItemData::COSTUME_ACCE);
+	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_ACCE", COSTUME_ACCE);
 	PyModule_AddIntConstant(poModule, "COSTUME_SLOT_ACCE",			c_Costume_Slot_Acce);
 #endif
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
@@ -709,126 +709,126 @@ void initItem()
 
 #endif
 
-	PyModule_AddIntConstant(poModule, "WEAPON_SWORD",				CItemData::WEAPON_SWORD);
-	PyModule_AddIntConstant(poModule, "WEAPON_DAGGER",				CItemData::WEAPON_DAGGER);
-	PyModule_AddIntConstant(poModule, "WEAPON_BOW",					CItemData::WEAPON_BOW);
-	PyModule_AddIntConstant(poModule, "WEAPON_TWO_HANDED",			CItemData::WEAPON_TWO_HANDED);
-	PyModule_AddIntConstant(poModule, "WEAPON_BELL",				CItemData::WEAPON_BELL);
-	PyModule_AddIntConstant(poModule, "WEAPON_FAN",					CItemData::WEAPON_FAN);
-	PyModule_AddIntConstant(poModule, "WEAPON_ARROW",				CItemData::WEAPON_ARROW);
-	PyModule_AddIntConstant(poModule, "WEAPON_MOUNT_SPEAR",			CItemData::WEAPON_MOUNT_SPEAR);
+	PyModule_AddIntConstant(poModule, "WEAPON_SWORD",				WEAPON_SWORD);
+	PyModule_AddIntConstant(poModule, "WEAPON_DAGGER",				WEAPON_DAGGER);
+	PyModule_AddIntConstant(poModule, "WEAPON_BOW",					WEAPON_BOW);
+	PyModule_AddIntConstant(poModule, "WEAPON_TWO_HANDED",			WEAPON_TWO_HANDED);
+	PyModule_AddIntConstant(poModule, "WEAPON_BELL",				WEAPON_BELL);
+	PyModule_AddIntConstant(poModule, "WEAPON_FAN",					WEAPON_FAN);
+	PyModule_AddIntConstant(poModule, "WEAPON_ARROW",				WEAPON_ARROW);
+	PyModule_AddIntConstant(poModule, "WEAPON_MOUNT_SPEAR",			WEAPON_MOUNT_SPEAR);
 #ifdef ENABLE_WOLFMAN_CHARACTER
-	PyModule_AddIntConstant(poModule, "WEAPON_CLAW",				CItemData::WEAPON_CLAW);
+	PyModule_AddIntConstant(poModule, "WEAPON_CLAW",				WEAPON_CLAW);
 #endif
-	PyModule_AddIntConstant(poModule, "WEAPON_NUM_TYPES",			CItemData::WEAPON_NUM_TYPES);
+	PyModule_AddIntConstant(poModule, "WEAPON_NUM_TYPES",			WEAPON_NUM_TYPES);
 
-	PyModule_AddIntConstant(poModule, "USE_POTION",					CItemData::USE_POTION);
-	PyModule_AddIntConstant(poModule, "USE_TALISMAN",				CItemData::USE_TALISMAN);
-	PyModule_AddIntConstant(poModule, "USE_TUNING",					CItemData::USE_TUNING);
-	PyModule_AddIntConstant(poModule, "USE_MOVE",					CItemData::USE_MOVE);
-	PyModule_AddIntConstant(poModule, "USE_TREASURE_BOX",			CItemData::USE_TREASURE_BOX);
-	PyModule_AddIntConstant(poModule, "USE_MONEYBAG",				CItemData::USE_MONEYBAG);
-	PyModule_AddIntConstant(poModule, "USE_BAIT",					CItemData::USE_BAIT);
-	PyModule_AddIntConstant(poModule, "USE_ABILITY_UP",				CItemData::USE_ABILITY_UP);
-	PyModule_AddIntConstant(poModule, "USE_AFFECT",					CItemData::USE_AFFECT);
-	PyModule_AddIntConstant(poModule, "USE_CREATE_STONE",			CItemData::USE_CREATE_STONE);
-	PyModule_AddIntConstant(poModule, "USE_SPECIAL",				CItemData::USE_SPECIAL);
-	PyModule_AddIntConstant(poModule, "USE_POTION_NODELAY",			CItemData::USE_POTION_NODELAY);
-	PyModule_AddIntConstant(poModule, "USE_CLEAR",					CItemData::USE_CLEAR);
-	PyModule_AddIntConstant(poModule, "USE_INVISIBILITY",			CItemData::USE_INVISIBILITY);
-	PyModule_AddIntConstant(poModule, "USE_DETACHMENT",				CItemData::USE_DETACHMENT);
-	PyModule_AddIntConstant(poModule, "USE_TIME_CHARGE_PER",		CItemData::USE_TIME_CHARGE_PER);
-	PyModule_AddIntConstant(poModule, "USE_TIME_CHARGE_FIX",		CItemData::USE_TIME_CHARGE_FIX);
+	PyModule_AddIntConstant(poModule, "USE_POTION",					USE_POTION);
+	PyModule_AddIntConstant(poModule, "USE_TALISMAN",				USE_TALISMAN);
+	PyModule_AddIntConstant(poModule, "USE_TUNING",					USE_TUNING);
+	PyModule_AddIntConstant(poModule, "USE_MOVE",					USE_MOVE);
+	PyModule_AddIntConstant(poModule, "USE_TREASURE_BOX",			USE_TREASURE_BOX);
+	PyModule_AddIntConstant(poModule, "USE_MONEYBAG",				USE_MONEYBAG);
+	PyModule_AddIntConstant(poModule, "USE_BAIT",					USE_BAIT);
+	PyModule_AddIntConstant(poModule, "USE_ABILITY_UP",				USE_ABILITY_UP);
+	PyModule_AddIntConstant(poModule, "USE_AFFECT",					USE_AFFECT);
+	PyModule_AddIntConstant(poModule, "USE_CREATE_STONE",			USE_CREATE_STONE);
+	PyModule_AddIntConstant(poModule, "USE_SPECIAL",				USE_SPECIAL);
+	PyModule_AddIntConstant(poModule, "USE_POTION_NODELAY",			USE_POTION_NODELAY);
+	PyModule_AddIntConstant(poModule, "USE_CLEAR",					USE_CLEAR);
+	PyModule_AddIntConstant(poModule, "USE_INVISIBILITY",			USE_INVISIBILITY);
+	PyModule_AddIntConstant(poModule, "USE_DETACHMENT",				USE_DETACHMENT);
+	PyModule_AddIntConstant(poModule, "USE_TIME_CHARGE_PER",		USE_TIME_CHARGE_PER);
+	PyModule_AddIntConstant(poModule, "USE_TIME_CHARGE_FIX",		USE_TIME_CHARGE_FIX);
 
-	PyModule_AddIntConstant(poModule, "MATERIAL_DS_REFINE_NORMAL",	CItemData::MATERIAL_DS_REFINE_NORMAL);
-	PyModule_AddIntConstant(poModule, "MATERIAL_DS_REFINE_BLESSED",	CItemData::MATERIAL_DS_REFINE_BLESSED);
-	PyModule_AddIntConstant(poModule, "MATERIAL_DS_REFINE_HOLLY",	CItemData::MATERIAL_DS_REFINE_HOLLY);
+	PyModule_AddIntConstant(poModule, "MATERIAL_DS_REFINE_NORMAL",	MATERIAL_DS_REFINE_NORMAL);
+	PyModule_AddIntConstant(poModule, "MATERIAL_DS_REFINE_BLESSED",	MATERIAL_DS_REFINE_BLESSED);
+	PyModule_AddIntConstant(poModule, "MATERIAL_DS_REFINE_HOLLY",	MATERIAL_DS_REFINE_HOLLY);
 
-	PyModule_AddIntConstant(poModule, "METIN_NORMAL",				CItemData::METIN_NORMAL);
-	PyModule_AddIntConstant(poModule, "METIN_GOLD",					CItemData::METIN_GOLD);
+	PyModule_AddIntConstant(poModule, "METIN_NORMAL",				METIN_NORMAL);
+	PyModule_AddIntConstant(poModule, "METIN_GOLD",					METIN_GOLD);
 
-	PyModule_AddIntConstant(poModule, "LIMIT_NONE",					CItemData::LIMIT_NONE);
-	PyModule_AddIntConstant(poModule, "LIMIT_LEVEL",				CItemData::LIMIT_LEVEL);
-	PyModule_AddIntConstant(poModule, "LIMIT_STR",					CItemData::LIMIT_STR);
-	PyModule_AddIntConstant(poModule, "LIMIT_DEX",					CItemData::LIMIT_DEX);
-	PyModule_AddIntConstant(poModule, "LIMIT_INT",					CItemData::LIMIT_INT);
-	PyModule_AddIntConstant(poModule, "LIMIT_CON",					CItemData::LIMIT_CON);
-	PyModule_AddIntConstant(poModule, "LIMIT_PCBANG",				CItemData::LIMIT_PCBANG);
-	PyModule_AddIntConstant(poModule, "LIMIT_REAL_TIME",			CItemData::LIMIT_REAL_TIME);
-	PyModule_AddIntConstant(poModule, "LIMIT_REAL_TIME_START_FIRST_USE",	CItemData::LIMIT_REAL_TIME_START_FIRST_USE);
-	PyModule_AddIntConstant(poModule, "LIMIT_TIMER_BASED_ON_WEAR",	CItemData::LIMIT_TIMER_BASED_ON_WEAR);
-	PyModule_AddIntConstant(poModule, "LIMIT_TYPE_MAX_NUM",			CItemData::LIMIT_MAX_NUM);
-	PyModule_AddIntConstant(poModule, "LIMIT_MAX_NUM",				CItemData::ITEM_LIMIT_MAX_NUM);
+	PyModule_AddIntConstant(poModule, "LIMIT_NONE",					LIMIT_NONE);
+	PyModule_AddIntConstant(poModule, "LIMIT_LEVEL",				LIMIT_LEVEL);
+	PyModule_AddIntConstant(poModule, "LIMIT_STR",					LIMIT_STR);
+	PyModule_AddIntConstant(poModule, "LIMIT_DEX",					LIMIT_DEX);
+	PyModule_AddIntConstant(poModule, "LIMIT_INT",					LIMIT_INT);
+	PyModule_AddIntConstant(poModule, "LIMIT_CON",					LIMIT_CON);
+	PyModule_AddIntConstant(poModule, "LIMIT_PCBANG",				LIMIT_PCBANG);
+	PyModule_AddIntConstant(poModule, "LIMIT_REAL_TIME",			LIMIT_REAL_TIME);
+	PyModule_AddIntConstant(poModule, "LIMIT_REAL_TIME_START_FIRST_USE",	LIMIT_REAL_TIME_START_FIRST_USE);
+	PyModule_AddIntConstant(poModule, "LIMIT_TIMER_BASED_ON_WEAR",	LIMIT_TIMER_BASED_ON_WEAR);
+	PyModule_AddIntConstant(poModule, "LIMIT_TYPE_MAX_NUM",			LIMIT_MAX_NUM);
+	PyModule_AddIntConstant(poModule, "LIMIT_MAX_NUM",				ITEM_LIMIT_MAX_NUM);
 
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_FEMALE",		CItemData::ITEM_ANTIFLAG_FEMALE);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_MALE",			CItemData::ITEM_ANTIFLAG_MALE);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_WARRIOR",		CItemData::ITEM_ANTIFLAG_WARRIOR);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_ASSASSIN",		CItemData::ITEM_ANTIFLAG_ASSASSIN);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_SURA",			CItemData::ITEM_ANTIFLAG_SURA);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_SHAMAN",		CItemData::ITEM_ANTIFLAG_SHAMAN);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_FEMALE",		ITEM_ANTIFLAG_FEMALE);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_MALE",			ITEM_ANTIFLAG_MALE);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_WARRIOR",		ITEM_ANTIFLAG_WARRIOR);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_ASSASSIN",		ITEM_ANTIFLAG_ASSASSIN);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_SURA",			ITEM_ANTIFLAG_SURA);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_SHAMAN",		ITEM_ANTIFLAG_SHAMAN);
 #ifdef ENABLE_WOLFMAN_CHARACTER
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_WOLFMAN",		CItemData::ITEM_ANTIFLAG_WOLFMAN);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_WOLFMAN",		ITEM_ANTIFLAG_WOLFMAN);
 #endif
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_GET",			CItemData::ITEM_ANTIFLAG_GET);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_DROP",			CItemData::ITEM_ANTIFLAG_DROP);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_SELL",			CItemData::ITEM_ANTIFLAG_SELL);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_EMPIRE_A",		CItemData::ITEM_ANTIFLAG_EMPIRE_A);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_EMPIRE_B",		CItemData::ITEM_ANTIFLAG_EMPIRE_B);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_EMPIRE_R",		CItemData::ITEM_ANTIFLAG_EMPIRE_R);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_SAVE",			CItemData::ITEM_ANTIFLAG_SAVE);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_GIVE",			CItemData::ITEM_ANTIFLAG_GIVE);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_PKDROP",		CItemData::ITEM_ANTIFLAG_PKDROP);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_STACK",		CItemData::ITEM_ANTIFLAG_STACK);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_MYSHOP",		CItemData::ITEM_ANTIFLAG_MYSHOP);
-	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_SAFEBOX",		CItemData::ITEM_ANTIFLAG_SAFEBOX);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_GET",			ITEM_ANTIFLAG_GET);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_DROP",			ITEM_ANTIFLAG_DROP);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_SELL",			ITEM_ANTIFLAG_SELL);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_EMPIRE_A",		ITEM_ANTIFLAG_EMPIRE_A);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_EMPIRE_B",		ITEM_ANTIFLAG_EMPIRE_B);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_EMPIRE_R",		ITEM_ANTIFLAG_EMPIRE_R);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_SAVE",			ITEM_ANTIFLAG_SAVE);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_GIVE",			ITEM_ANTIFLAG_GIVE);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_PKDROP",		ITEM_ANTIFLAG_PKDROP);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_STACK",		ITEM_ANTIFLAG_STACK);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_MYSHOP",		ITEM_ANTIFLAG_MYSHOP);
+	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_SAFEBOX",		ITEM_ANTIFLAG_SAFEBOX);
 
-	PyModule_AddIntConstant(poModule, "ITEM_FLAG_RARE",				CItemData::ITEM_FLAG_RARE);
-	PyModule_AddIntConstant(poModule, "ITEM_FLAG_UNIQUE",			CItemData::ITEM_FLAG_UNIQUE);
-	PyModule_AddIntConstant(poModule, "ITEM_FLAG_CONFIRM_WHEN_USE",	CItemData::ITEM_FLAG_CONFIRM_WHEN_USE);
+	PyModule_AddIntConstant(poModule, "ITEM_FLAG_RARE",				ITEM_FLAG_RARE);
+	PyModule_AddIntConstant(poModule, "ITEM_FLAG_UNIQUE",			ITEM_FLAG_UNIQUE);
+	PyModule_AddIntConstant(poModule, "ITEM_FLAG_CONFIRM_WHEN_USE",	ITEM_FLAG_CONFIRM_WHEN_USE);
 
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_FEMALE",			CItemData::ITEM_ANTIFLAG_FEMALE);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_MALE",				CItemData::ITEM_ANTIFLAG_MALE);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_WARRIOR",			CItemData::ITEM_ANTIFLAG_WARRIOR);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_ASSASSIN",			CItemData::ITEM_ANTIFLAG_ASSASSIN);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_SURA",				CItemData::ITEM_ANTIFLAG_SURA);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_SHAMAN",			CItemData::ITEM_ANTIFLAG_SHAMAN);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_FEMALE",			ITEM_ANTIFLAG_FEMALE);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_MALE",				ITEM_ANTIFLAG_MALE);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_WARRIOR",			ITEM_ANTIFLAG_WARRIOR);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_ASSASSIN",			ITEM_ANTIFLAG_ASSASSIN);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_SURA",				ITEM_ANTIFLAG_SURA);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_SHAMAN",			ITEM_ANTIFLAG_SHAMAN);
 #ifdef ENABLE_WOLFMAN_CHARACTER
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_WOLFMAN",			CItemData::ITEM_ANTIFLAG_WOLFMAN);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_WOLFMAN",			ITEM_ANTIFLAG_WOLFMAN);
 #endif
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_GET",				CItemData::ITEM_ANTIFLAG_GET);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_DROP",				CItemData::ITEM_ANTIFLAG_DROP);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_SELL",				CItemData::ITEM_ANTIFLAG_SELL);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_EMPIRE_A",			CItemData::ITEM_ANTIFLAG_EMPIRE_A);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_EMPIRE_B",			CItemData::ITEM_ANTIFLAG_EMPIRE_B);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_EMPIRE_R",			CItemData::ITEM_ANTIFLAG_EMPIRE_R);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_SAVE",				CItemData::ITEM_ANTIFLAG_SAVE);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_GIVE",				CItemData::ITEM_ANTIFLAG_GIVE);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_PKDROP",			CItemData::ITEM_ANTIFLAG_PKDROP);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_STACK",				CItemData::ITEM_ANTIFLAG_STACK);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_MYSHOP",			CItemData::ITEM_ANTIFLAG_MYSHOP);
-	PyModule_AddIntConstant(poModule, "ANTIFLAG_SAFEBOX",			CItemData::ITEM_ANTIFLAG_SAFEBOX);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_GET",				ITEM_ANTIFLAG_GET);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_DROP",				ITEM_ANTIFLAG_DROP);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_SELL",				ITEM_ANTIFLAG_SELL);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_EMPIRE_A",			ITEM_ANTIFLAG_EMPIRE_A);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_EMPIRE_B",			ITEM_ANTIFLAG_EMPIRE_B);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_EMPIRE_R",			ITEM_ANTIFLAG_EMPIRE_R);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_SAVE",				ITEM_ANTIFLAG_SAVE);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_GIVE",				ITEM_ANTIFLAG_GIVE);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_PKDROP",			ITEM_ANTIFLAG_PKDROP);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_STACK",				ITEM_ANTIFLAG_STACK);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_MYSHOP",			ITEM_ANTIFLAG_MYSHOP);
+	PyModule_AddIntConstant(poModule, "ANTIFLAG_SAFEBOX",			ITEM_ANTIFLAG_SAFEBOX);
 
-	PyModule_AddIntConstant(poModule, "WEARABLE_BODY",				CItemData::WEARABLE_BODY);
-	PyModule_AddIntConstant(poModule, "WEARABLE_HEAD",				CItemData::WEARABLE_HEAD);
-	PyModule_AddIntConstant(poModule, "WEARABLE_FOOTS",				CItemData::WEARABLE_FOOTS);
-	PyModule_AddIntConstant(poModule, "WEARABLE_WRIST",				CItemData::WEARABLE_WRIST);
-	PyModule_AddIntConstant(poModule, "WEARABLE_WEAPON",			CItemData::WEARABLE_WEAPON);
-	PyModule_AddIntConstant(poModule, "WEARABLE_NECK",				CItemData::WEARABLE_NECK);
-	PyModule_AddIntConstant(poModule, "WEARABLE_EAR",				CItemData::WEARABLE_EAR);
-	PyModule_AddIntConstant(poModule, "WEARABLE_UNIQUE",			CItemData::WEARABLE_UNIQUE);
-	PyModule_AddIntConstant(poModule, "WEARABLE_SHIELD",			CItemData::WEARABLE_SHIELD);
-	PyModule_AddIntConstant(poModule, "WEARABLE_ARROW",				CItemData::WEARABLE_ARROW);
+	PyModule_AddIntConstant(poModule, "WEARABLE_BODY",				WEARABLE_BODY);
+	PyModule_AddIntConstant(poModule, "WEARABLE_HEAD",				WEARABLE_HEAD);
+	PyModule_AddIntConstant(poModule, "WEARABLE_FOOTS",				WEARABLE_FOOTS);
+	PyModule_AddIntConstant(poModule, "WEARABLE_WRIST",				WEARABLE_WRIST);
+	PyModule_AddIntConstant(poModule, "WEARABLE_WEAPON",			WEARABLE_WEAPON);
+	PyModule_AddIntConstant(poModule, "WEARABLE_NECK",				WEARABLE_NECK);
+	PyModule_AddIntConstant(poModule, "WEARABLE_EAR",				WEARABLE_EAR);
+	PyModule_AddIntConstant(poModule, "WEARABLE_UNIQUE",			WEARABLE_UNIQUE);
+	PyModule_AddIntConstant(poModule, "WEARABLE_SHIELD",			WEARABLE_SHIELD);
+	PyModule_AddIntConstant(poModule, "WEARABLE_ARROW",				WEARABLE_ARROW);
 
-	PyModule_AddIntConstant(poModule, "ARMOR_BODY",					CItemData::ARMOR_BODY);
-	PyModule_AddIntConstant(poModule, "ARMOR_HEAD",					CItemData::ARMOR_HEAD);
-	PyModule_AddIntConstant(poModule, "ARMOR_SHIELD",				CItemData::ARMOR_SHIELD);
-	PyModule_AddIntConstant(poModule, "ARMOR_WRIST",				CItemData::ARMOR_WRIST);
-	PyModule_AddIntConstant(poModule, "ARMOR_FOOTS",				CItemData::ARMOR_FOOTS);
-	PyModule_AddIntConstant(poModule, "ARMOR_NECK",					CItemData::ARMOR_NECK);
-	PyModule_AddIntConstant(poModule, "ARMOR_EAR",					CItemData::ARMOR_EAR);
+	PyModule_AddIntConstant(poModule, "ARMOR_BODY",					ARMOR_BODY);
+	PyModule_AddIntConstant(poModule, "ARMOR_HEAD",					ARMOR_HEAD);
+	PyModule_AddIntConstant(poModule, "ARMOR_SHIELD",				ARMOR_SHIELD);
+	PyModule_AddIntConstant(poModule, "ARMOR_WRIST",				ARMOR_WRIST);
+	PyModule_AddIntConstant(poModule, "ARMOR_FOOTS",				ARMOR_FOOTS);
+	PyModule_AddIntConstant(poModule, "ARMOR_NECK",					ARMOR_NECK);
+	PyModule_AddIntConstant(poModule, "ARMOR_EAR",					ARMOR_EAR);
 	
-	PyModule_AddIntConstant(poModule, "ITEM_APPLY_MAX_NUM",			CItemData::ITEM_APPLY_MAX_NUM);
-	PyModule_AddIntConstant(poModule, "ITEM_SOCKET_MAX_NUM",		CItemData::ITEM_SOCKET_MAX_NUM);
+	PyModule_AddIntConstant(poModule, "ITEM_APPLY_MAX_NUM",			ITEM_APPLY_MAX_NUM);
+	PyModule_AddIntConstant(poModule, "ITEM_SOCKET_MAX_NUM",		ITEM_SOCKET_MAX_NUM);
 
 	PyModule_AddIntConstant(poModule, "APPLY_NONE",					CItemData::APPLY_NONE);
 	PyModule_AddIntConstant(poModule, "APPLY_STR",					CItemData::APPLY_STR);

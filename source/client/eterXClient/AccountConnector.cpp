@@ -104,20 +104,20 @@ bool CAccountConnector::__StateProcess()
 
 bool CAccountConnector::__HandshakeState_Process()
 {
-	if (!__AnalyzePacket(HEADER_GC_PHASE, sizeof(TPacketGCPhase), &CAccountConnector::__AuthState_RecvPhase))
+	if (!__AnalyzePacket(HEADER_GC_PHASE, sizeof(SPacketGCPhase), &CAccountConnector::__AuthState_RecvPhase))
 		return false;
 
-	if (!__AnalyzePacket(HEADER_GC_HANDSHAKE, sizeof(TPacketGCHandshake), &CAccountConnector::__AuthState_RecvHandshake))
+	if (!__AnalyzePacket(HEADER_GC_HANDSHAKE, sizeof(SPacketHandshake), &CAccountConnector::__AuthState_RecvHandshake))
 		return false;
 
-	if (!__AnalyzePacket(HEADER_GC_PING, sizeof(TPacketGCPing), &CAccountConnector::__AuthState_RecvPing))
+	if (!__AnalyzePacket(HEADER_GC_PING, sizeof(SPacketGCPing), &CAccountConnector::__AuthState_RecvPing))
 		return false;
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
-	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT, sizeof(TPacketKeyAgreement), &CAccountConnector::__AuthState_RecvKeyAgreement))
+	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT, sizeof(SPacketKeyAgreement), &CAccountConnector::__AuthState_RecvKeyAgreement))
 		return false;
 
-	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT_COMPLETED, sizeof(TPacketKeyAgreementCompleted), &CAccountConnector::__AuthState_RecvKeyAgreementCompleted))
+	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT_COMPLETED, sizeof(SPacketGCKeyAgreementCompleted), &CAccountConnector::__AuthState_RecvKeyAgreementCompleted))
 		return false;
 #endif
 
@@ -129,26 +129,26 @@ bool CAccountConnector::__AuthState_Process()
 	if (!__AnalyzePacket(0, sizeof(uint8_t), &CAccountConnector::__AuthState_RecvEmpty))
 		return true;
 
-	if (!__AnalyzePacket(HEADER_GC_PHASE, sizeof(TPacketGCPhase), &CAccountConnector::__AuthState_RecvPhase))
+	if (!__AnalyzePacket(HEADER_GC_PHASE, sizeof(SPacketGCPhase), &CAccountConnector::__AuthState_RecvPhase))
 		return false;
 
-	if (!__AnalyzePacket(HEADER_GC_PING, sizeof(TPacketGCPing), &CAccountConnector::__AuthState_RecvPing))
+	if (!__AnalyzePacket(HEADER_GC_PING, sizeof(SPacketGCPing), &CAccountConnector::__AuthState_RecvPing))
 		return false;
 
-	if (!__AnalyzePacket(HEADER_GC_AUTH_SUCCESS, sizeof(TPacketGCAuthSuccess), &CAccountConnector::__AuthState_RecvAuthSuccess))
+	if (!__AnalyzePacket(HEADER_GC_AUTH_SUCCESS, sizeof(SPacketGCAuthSuccess), &CAccountConnector::__AuthState_RecvAuthSuccess))
 		return true;
 
-	if (!__AnalyzePacket(HEADER_GC_LOGIN_FAILURE, sizeof(TPacketGCAuthSuccess), &CAccountConnector::__AuthState_RecvAuthFailure))
+	if (!__AnalyzePacket(HEADER_GC_LOGIN_FAILURE, sizeof(SPacketGCAuthSuccess), &CAccountConnector::__AuthState_RecvAuthFailure))
 		return true;
 
-	if (!__AnalyzePacket(HEADER_GC_HANDSHAKE, sizeof(TPacketGCHandshake), &CAccountConnector::__AuthState_RecvHandshake))
+	if (!__AnalyzePacket(HEADER_GC_HANDSHAKE, sizeof(SPacketHandshake), &CAccountConnector::__AuthState_RecvHandshake))
 		return false;
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
-	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT, sizeof(TPacketKeyAgreement), &CAccountConnector::__AuthState_RecvKeyAgreement))
+	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT, sizeof(SPacketKeyAgreement), &CAccountConnector::__AuthState_RecvKeyAgreement))
 		return false;
 
-	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT_COMPLETED, sizeof(TPacketKeyAgreementCompleted), &CAccountConnector::__AuthState_RecvKeyAgreementCompleted))
+	if (!__AnalyzePacket(HEADER_GC_KEY_AGREEMENT_COMPLETED, sizeof(SPacketGCKeyAgreementCompleted), &CAccountConnector::__AuthState_RecvKeyAgreementCompleted))
 		return false;
 #endif
 
@@ -164,7 +164,7 @@ bool CAccountConnector::__AuthState_RecvEmpty()
 
 bool CAccountConnector::__AuthState_RecvPhase()
 {
-	TPacketGCPhase kPacketPhase;
+	SPacketGCPhase kPacketPhase;
 	if (!Recv(sizeof(kPacketPhase), &kPacketPhase))
 		return false;
 
@@ -181,13 +181,11 @@ bool CAccountConnector::__AuthState_RecvPhase()
 		SetSecurityMode(true, key);
 #endif
 
-		TPacketCGLogin3 LoginPacket;
-		LoginPacket.header = HEADER_CG_LOGIN3;
-
-		strncpy_s(LoginPacket.name, m_strID.c_str(), ID_MAX_NUM);
-		strncpy_s(LoginPacket.pwd, m_strPassword.c_str(), PASS_MAX_NUM);
-		LoginPacket.name[ID_MAX_NUM] = '\0';
-		LoginPacket.pwd[PASS_MAX_NUM] = '\0';
+		SPacketCGLogin3 LoginPacket;
+		strncpy_s(LoginPacket.name, m_strID.c_str(), LOGIN_MAX_LEN);
+		strncpy_s(LoginPacket.pwd, m_strPassword.c_str(), PASSWD_MAX_LEN);
+		LoginPacket.name[LOGIN_MAX_LEN] = '\0';
+		LoginPacket.pwd[PASSWD_MAX_LEN] = '\0';
 
 		LoginPacket.version = CLIENT_VERSION_TIMESTAMP;
 		
@@ -215,7 +213,7 @@ bool CAccountConnector::__AuthState_RecvPhase()
 
 bool CAccountConnector::__AuthState_RecvHandshake()
 {
-	TPacketGCHandshake kPacketHandshake;
+	SPacketHandshake kPacketHandshake;
 	if (!Recv(sizeof(kPacketHandshake), &kPacketHandshake))
 		return false;
 
@@ -245,7 +243,7 @@ bool CAccountConnector::__AuthState_RecvHandshake()
 
 bool CAccountConnector::__AuthState_RecvPing()
 {
-	TPacketGCPing kPacketPing;
+	SPacketGCPing kPacketPing;
 	if (!Recv(sizeof(kPacketPing), &kPacketPing))
 		return false;
 
@@ -256,8 +254,7 @@ bool CAccountConnector::__AuthState_RecvPing()
 
 bool CAccountConnector::__AuthState_SendPong()
 {
-	TPacketCGPong kPacketPong;
-	kPacketPong.bHeader = HEADER_CG_PONG;
+	SPacketCGPong kPacketPong;
 	if (!Send(sizeof(kPacketPong), &kPacketPong))
 		return false;
 		
@@ -266,7 +263,7 @@ bool CAccountConnector::__AuthState_SendPong()
 
 bool CAccountConnector::__AuthState_RecvAuthSuccess()
 {
-	TPacketGCAuthSuccess kAuthSuccessPacket;
+	SPacketGCAuthSuccess kAuthSuccessPacket;
 	if (!Recv(sizeof(kAuthSuccessPacket), &kAuthSuccessPacket))
 		return false;
 
@@ -290,8 +287,8 @@ bool CAccountConnector::__AuthState_RecvAuthSuccess()
 
 bool CAccountConnector::__AuthState_RecvAuthFailure()
 {
-	TPacketGCLoginFailure packet_failure;
-	if (!Recv(sizeof(TPacketGCLoginFailure), &packet_failure))
+	SPacketGCLoginFailure packet_failure;
+	if (!Recv(sizeof(packet_failure), &packet_failure))
 		return false;
 
 	if (m_poHandler)
@@ -305,14 +302,14 @@ bool CAccountConnector::__AuthState_RecvAuthFailure()
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 bool CAccountConnector::__AuthState_RecvKeyAgreement()
 {
-	TPacketKeyAgreement packet;
+	SPacketKeyAgreement packet;
 	if (!Recv(sizeof(packet), &packet))
 		return false;
 
 	Tracenf("KEY_AGREEMENT RECV %u", packet.wDataLength);
 
-	TPacketKeyAgreement packetToSend;
-	size_t dataLength = TPacketKeyAgreement::MAX_DATA_LEN;
+	SPacketKeyAgreement packetToSend;
+	size_t dataLength = SPacketKeyAgreement::MAX_DATA_LEN;
 	size_t agreedLength = Prepare(packetToSend.data, &dataLength);
 	if (agreedLength == 0)
 	{
@@ -320,12 +317,11 @@ bool CAccountConnector::__AuthState_RecvKeyAgreement()
 		Disconnect();
 		return false;
 	}
-	assert(dataLength <= TPacketKeyAgreement::MAX_DATA_LEN);
+	assert(dataLength <= SPacketKeyAgreement::MAX_DATA_LEN);
 
 	if (Activate(packet.wAgreedLength, packet.data, packet.wDataLength))
 	{
 		// Key agreement 성공, 응답 전송
-		packetToSend.bHeader = HEADER_CG_KEY_AGREEMENT;
 		packetToSend.wAgreedLength = static_cast<uint16_t>(agreedLength);
 		packetToSend.wDataLength = static_cast<uint16_t>(dataLength);
 
@@ -347,7 +343,7 @@ bool CAccountConnector::__AuthState_RecvKeyAgreement()
 
 bool CAccountConnector::__AuthState_RecvKeyAgreementCompleted()
 {
-	TPacketKeyAgreementCompleted packet;
+	SPacketGCKeyAgreementCompleted packet;
 	if (!Recv(sizeof(packet), &packet))
 		return false;
 
@@ -383,7 +379,7 @@ bool CAccountConnector::__AnalyzeVarSizePacket(uint32_t uHeader, bool (CAccountC
 	if (bHeader!=uHeader)
 		return true;
 
-	TDynamicSizePacketHeader dynamicHeader;
+	SDynamicSizePacketHeader dynamicHeader;
 
 	if (!Peek(sizeof(dynamicHeader), &dynamicHeader))
 		return true;

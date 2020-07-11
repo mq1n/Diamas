@@ -364,7 +364,7 @@ int32_t DetermineFish(LPCHARACTER ch)
 
 void FishingReact(LPCHARACTER ch)
 {
-	TPacketGCFishing p;
+	SPacketGCFishing p;
 	p.header = HEADER_GC_FISHING;
 	p.subheader = FISHING_SUBHEADER_GC_REACT;
 	p.info = ch->GetVID();
@@ -373,7 +373,7 @@ void FishingReact(LPCHARACTER ch)
 
 void FishingSuccess(LPCHARACTER ch)
 {
-	TPacketGCFishing p;
+	SPacketGCFishing p;
 	p.header = HEADER_GC_FISHING;
 	p.subheader = FISHING_SUBHEADER_GC_SUCCESS;
 	p.info = ch->GetVID();
@@ -384,7 +384,7 @@ void FishingSuccess(LPCHARACTER ch)
 
 void FishingFail(LPCHARACTER ch)
 {
-	TPacketGCFishing p;
+	SPacketGCFishing p;
 	p.header = HEADER_GC_FISHING;
 	p.subheader = FISHING_SUBHEADER_GC_FAIL;
 	p.info = ch->GetVID();
@@ -462,11 +462,11 @@ EVENTFUNC(fishing_event)
 
 			if (PredictFish(ch))
 			{
-				TPacketGCFishing p;
+				SPacketGCFishing p;
 				p.header	= HEADER_GC_FISHING;
 				p.subheader	= FISHING_SUBHEADER_GC_FISH;
 				p.info	= fish_info[info->fish_id].vnum;
-				ch->GetDesc()->Packet(&p, sizeof(TPacketGCFishing));
+				ch->GetDesc()->Packet(&p, sizeof(SPacketGCFishing));
 			}
 			return (PASSES_PER_SEC(6));
 
@@ -492,12 +492,12 @@ LPEVENT CreateFishingEvent(LPCHARACTER ch)
 
 	int32_t time = number(10, 40);
 
-	TPacketGCFishing p;
+	SPacketGCFishing p;
 	p.header	= HEADER_GC_FISHING;
 	p.subheader	= FISHING_SUBHEADER_GC_START;
 	p.info		= ch->GetVID();
 	p.dir		= (uint8_t)(ch->GetRotation()/5);
-	ch->PacketAround(&p, sizeof(TPacketGCFishing));
+	ch->PacketAround(&p, sizeof(SPacketGCFishing));
 
 	return event_create(fishing_event, info, PASSES_PER_SEC(time));
 }
@@ -586,11 +586,11 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 				{
 					FishingSuccess(ch);
 
-					TPacketGCFishing p;
+					SPacketGCFishing p;
 					p.header = HEADER_GC_FISHING;
 					p.subheader = FISHING_SUBHEADER_GC_FISH;
 					p.info = item_vnum;
-					ch->GetDesc()->Packet(&p, sizeof(TPacketGCFishing));
+					ch->GetDesc()->Packet(&p, sizeof(SPacketGCFishing));
 
 					LPITEM item = ch->AutoGiveItem(item_vnum, 1, -1, false);
 
@@ -639,7 +639,7 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 	}
 	else
 	{
-		TPacketGCFishing p;
+		SPacketGCFishing p;
 		p.header = HEADER_GC_FISHING;
 		p.subheader = FISHING_SUBHEADER_GC_STOP;
 		p.info = ch->GetVID();

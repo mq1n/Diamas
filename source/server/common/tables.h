@@ -1,243 +1,16 @@
 #ifndef __INC_TABLES_H__
 #define __INC_TABLES_H__
 
+#include "../../common/packets.h"
+#include "../../common/tables.h"
+
 #include "length.h"
 #include "item_length.h"
 #include "service.h"
 
 #include <cstdint>
 #include <cstring>
-typedef	uint32_t IDENT;
 
-/**
- * @version 05/06/10	Bang2ni - Myshop Pricelist 관련 패킷 HEADER_XX_MYSHOP_PRICELIST_XXX 추가
- */
-enum
-{
-	HEADER_GD_LOGIN				= 1,
-	HEADER_GD_LOGOUT			= 2,
-
-	HEADER_GD_PLAYER_LOAD		= 3,
-	HEADER_GD_PLAYER_SAVE		= 4,
-	HEADER_GD_PLAYER_CREATE		= 5,
-	HEADER_GD_PLAYER_DELETE		= 6,
-
-	HEADER_GD_LOGIN_KEY			= 7,
-	// 8 empty
-	HEADER_GD_BOOT				= 9,
-	HEADER_GD_QUEST_SAVE		= 11,
-	HEADER_GD_SAFEBOX_LOAD		= 12,
-	HEADER_GD_SAFEBOX_SAVE		= 13,
-	HEADER_GD_SAFEBOX_CHANGE_SIZE	= 14,
-	HEADER_GD_EMPIRE_SELECT		= 15,
-
-	HEADER_GD_SAFEBOX_CHANGE_PASSWORD		= 16,
-	HEADER_GD_SAFEBOX_CHANGE_PASSWORD_SECOND	= 17, // Not really a packet, used internal
-	HEADER_GD_DIRECT_ENTER		= 18,
-
-	HEADER_GD_GUILD_SKILL_UPDATE	= 19,
-	HEADER_GD_GUILD_EXP_UPDATE		= 20,
-	HEADER_GD_GUILD_ADD_MEMBER		= 21,
-	HEADER_GD_GUILD_REMOVE_MEMBER	= 22,
-	HEADER_GD_GUILD_CHANGE_GRADE	= 23,
-	HEADER_GD_GUILD_CHANGE_MEMBER_DATA	= 24,
-	HEADER_GD_GUILD_DISBAND		= 25,
-	HEADER_GD_GUILD_WAR			= 26,
-	HEADER_GD_GUILD_WAR_SCORE		= 27,
-	HEADER_GD_GUILD_CREATE		= 28,
-
-	HEADER_GD_ITEM_SAVE			= 30,
-	HEADER_GD_ITEM_DESTROY		= 31,
-
-	HEADER_GD_ADD_AFFECT		= 32,
-	HEADER_GD_REMOVE_AFFECT		= 33,
-
-	HEADER_GD_ITEM_FLUSH		= 35,
-
-	HEADER_GD_PARTY_CREATE		= 36,
-	HEADER_GD_PARTY_DELETE		= 37,
-	HEADER_GD_PARTY_ADD			= 38,
-	HEADER_GD_PARTY_REMOVE		= 39,
-	HEADER_GD_PARTY_STATE_CHANGE	= 40,
-	HEADER_GD_PARTY_HEAL_USE		= 41,
-
-	HEADER_GD_FLUSH_CACHE		= 42,
-	HEADER_GD_RELOAD_PROTO		= 43,
-
-	HEADER_GD_CHANGE_NAME		= 44,
-
-	HEADER_GD_GUILD_CHANGE_LADDER_POINT	= 46,
-	HEADER_GD_GUILD_USE_SKILL		= 47,
-
-	HEADER_GD_REQUEST_EMPIRE_PRIV	= 48,
-	HEADER_GD_REQUEST_GUILD_PRIV	= 49,
-
-	HEADER_GD_GUILD_DEPOSIT_MONEY				= 51,
-	HEADER_GD_GUILD_WITHDRAW_MONEY				= 52,
-	HEADER_GD_GUILD_WITHDRAW_MONEY_GIVE_REPLY	= 53,
-
-	HEADER_GD_REQUEST_CHARACTER_PRIV	= 54,
-
-	HEADER_GD_SET_EVENT_FLAG			= 55,
-
-	HEADER_GD_PARTY_SET_MEMBER_LEVEL	= 56,
-
-	HEADER_GD_GUILD_WAR_BET		= 57,
-
-	HEADER_GD_CREATE_OBJECT		= 60,
-	HEADER_GD_DELETE_OBJECT		= 61,
-	HEADER_GD_UPDATE_LAND		= 62,
-
-	HEADER_GD_MARRIAGE_ADD		= 70,
-	HEADER_GD_MARRIAGE_UPDATE	= 71,
-	HEADER_GD_MARRIAGE_REMOVE	= 72,
-
-	HEADER_GD_WEDDING_REQUEST	= 73,
-	HEADER_GD_WEDDING_READY		= 74,
-	HEADER_GD_WEDDING_END		= 75,
-
-	HEADER_GD_SAVE_ACTIVITY		= 76,
-
-	HEADER_GD_AUTH_LOGIN		= 100,
-	HEADER_GD_LOGIN_BY_KEY		= 101,
-	HEADER_GD_MALL_LOAD			= 107,
-
-	HEADER_GD_MYSHOP_PRICELIST_UPDATE	= 108,		///< 가격정보 갱신 요청
-	HEADER_GD_MYSHOP_PRICELIST_REQ		= 109,		///< 가격정보 리스트 요청
-
-	HEADER_GD_BLOCK_CHAT				= 110,
-
-	HEADER_GD_RELOAD_ADMIN			= 115,			///<운영자 정보 요청
-	HEADER_GD_BREAK_MARRIAGE		= 116,			///< 결혼 파기
-
-	HEADER_GD_REQ_CHANGE_GUILD_MASTER	= 129,
-
-	HEADER_GD_REQ_SPARE_ITEM_ID_RANGE	= 130,
-
-	HEADER_GD_DC					= 133,		// Login Key를 지움
-
-	HEADER_GD_VALID_LOGOUT			= 134,
-
-	HEADER_GD_REQUEST_CHARGE_CASH	= 137,
-
-	HEADER_GD_DELETE_AWARDID	= 138,	// delete gift notify icon
-	
-	HEADER_GD_UPDATE_CHANNELSTATUS	= 139,
-	HEADER_GD_REQUEST_CHANNELSTATUS	= 140,
-
-	HEADER_GD_SETUP			= 0xff,
-
-	///////////////////////////////////////////////
-	HEADER_DG_NOTICE			= 1,
-
-	HEADER_DG_LOGIN_SUCCESS			= 30,
-	HEADER_DG_LOGIN_NOT_EXIST		= 31,
-	HEADER_DG_LOGIN_WRONG_PASSWD	= 33,
-	HEADER_DG_LOGIN_ALREADY			= 34,
-
-	HEADER_DG_PLAYER_LOAD_SUCCESS	= 35,
-	HEADER_DG_PLAYER_LOAD_FAILED	= 36,
-	HEADER_DG_PLAYER_CREATE_SUCCESS	= 37,
-	HEADER_DG_PLAYER_CREATE_ALREADY	= 38,
-	HEADER_DG_PLAYER_CREATE_FAILED	= 39,
-	HEADER_DG_PLAYER_DELETE_SUCCESS	= 40,
-	HEADER_DG_PLAYER_DELETE_FAILED	= 41,
-
-	HEADER_DG_ITEM_LOAD			= 42,
-
-	HEADER_DG_BOOT				= 43,
-	HEADER_DG_QUEST_LOAD		= 44,
-
-	HEADER_DG_SAFEBOX_LOAD					= 45,
-	HEADER_DG_SAFEBOX_CHANGE_SIZE			= 46,
-	HEADER_DG_SAFEBOX_WRONG_PASSWORD		= 47,
-	HEADER_DG_SAFEBOX_CHANGE_PASSWORD_ANSWER = 48,
-
-	HEADER_DG_EMPIRE_SELECT		= 49,
-
-	HEADER_DG_AFFECT_LOAD		= 50,
-	HEADER_DG_MALL_LOAD			= 51,
-
-	HEADER_DG_ACTIVITY_LOAD		= 54,
-	HEADER_DG_DIRECT_ENTER		= 55,
-
-	HEADER_DG_GUILD_SKILL_UPDATE	= 56,
-	HEADER_DG_GUILD_SKILL_RECHARGE	= 57,
-	HEADER_DG_GUILD_EXP_UPDATE		= 58,
-
-	HEADER_DG_PARTY_CREATE		= 59,
-	HEADER_DG_PARTY_DELETE		= 60,
-	HEADER_DG_PARTY_ADD			= 61,
-	HEADER_DG_PARTY_REMOVE		= 62,
-	HEADER_DG_PARTY_STATE_CHANGE	= 63,
-	HEADER_DG_PARTY_HEAL_USE		= 64,
-	HEADER_DG_PARTY_SET_MEMBER_LEVEL	= 65,
-
-	HEADER_DG_TIME			= 90,
-	HEADER_DG_ITEM_ID_RANGE		= 91,
-
-	HEADER_DG_GUILD_ADD_MEMBER		= 92,
-	HEADER_DG_GUILD_REMOVE_MEMBER	= 93,
-	HEADER_DG_GUILD_CHANGE_GRADE	= 94,
-	HEADER_DG_GUILD_CHANGE_MEMBER_DATA	= 95,
-	HEADER_DG_GUILD_DISBAND		= 96,
-	HEADER_DG_GUILD_WAR			= 97,
-	HEADER_DG_GUILD_WAR_SCORE		= 98,
-	HEADER_DG_GUILD_TIME_UPDATE		= 99,
-	HEADER_DG_GUILD_LOAD		= 100,
-	HEADER_DG_GUILD_LADDER		= 101,
-	HEADER_DG_GUILD_SKILL_USABLE_CHANGE	= 102,
-	HEADER_DG_GUILD_MONEY_CHANGE	= 103,
-	HEADER_DG_GUILD_WITHDRAW_MONEY_GIVE	= 104,
-
-	HEADER_DG_SET_EVENT_FLAG		= 105,
-
-	HEADER_DG_GUILD_WAR_RESERVE_ADD	= 106,
-	HEADER_DG_GUILD_WAR_RESERVE_DEL	= 107,
-	HEADER_DG_GUILD_WAR_BET		= 108,
-
-	HEADER_DG_RELOAD_PROTO		= 120,
-	HEADER_DG_CHANGE_NAME		= 121,
-
-	HEADER_DG_AUTH_LOGIN		= 122,
-
-	HEADER_DG_CHANGE_EMPIRE_PRIV	= 124,
-	HEADER_DG_CHANGE_GUILD_PRIV		= 125,
-
-	HEADER_DG_CHANGE_CHARACTER_PRIV	= 127,
-
-	HEADER_DG_CREATE_OBJECT		= 140,
-	HEADER_DG_DELETE_OBJECT		= 141,
-	HEADER_DG_UPDATE_LAND		= 142,
-
-	HEADER_DG_MARRIAGE_ADD		= 150,
-	HEADER_DG_MARRIAGE_UPDATE		= 151,
-	HEADER_DG_MARRIAGE_REMOVE		= 152,
-
-	HEADER_DG_WEDDING_REQUEST		= 153,
-	HEADER_DG_WEDDING_READY		= 154,
-	HEADER_DG_WEDDING_START		= 155,
-	HEADER_DG_WEDDING_END		= 156,
-
-	HEADER_DG_MYSHOP_PRICELIST_RES	= 157,		///< 가격정보 리스트 응답
-	HEADER_DG_RELOAD_ADMIN = 158, 				///< 운영자 정보 리로드 
-	HEADER_DG_BREAK_MARRIAGE = 159,				///< 결혼 파기
-
-	HEADER_DG_ACK_CHANGE_GUILD_MASTER = 173,
-
-	HEADER_DG_ACK_SPARE_ITEM_ID_RANGE = 174,
-
-	HEADER_DG_UPDATE_HORSE_NAME 	= 175,
-	HEADER_DG_ACK_HORSE_NAME		= 176,
-
-	HEADER_DG_NEED_LOGIN_LOG		= 177,
-	HEADER_DG_RESULT_CHARGE_CASH	= 179,
-	HEADER_DG_ITEMAWARD_INFORMER	= 180,	//gift notify
-	HEADER_DG_RESPOND_CHANNELSTATUS		= 181,
-
-	HEADER_DG_MAP_LOCATIONS		= 0xfe,
-	HEADER_DG_P2P			= 0xff,
-};
 
 /* ----------------------------------------------
  * table
@@ -246,39 +19,7 @@ enum
 
 /* game Server -> DB Server */
 #pragma pack(1)
-enum ERequestChargeType
-{
-	ERequestCharge_Cash = 0,
-	ERequestCharge_Mileage,
-};
 
-typedef struct SRequestChargeCash
-{
-	uint32_t		dwAID;		// id(primary key) - Account Table
-	uint32_t		dwAmount;
-	ERequestChargeType	eChargeType;
-
-} TRequestChargeCash;
-
-typedef struct SSimplePlayer
-{
-	uint32_t		dwID;
-	char		szName[CHARACTER_NAME_MAX_LEN + 1];
-	uint8_t		byJob;
-	uint8_t		byLevel;
-	uint32_t		dwPlayMinutes;
-	uint8_t		byST, byHT, byDX, byIQ;
-	uint16_t		wMainPart;
-	uint8_t		bChangeName;
-	uint16_t		wHairPart;
-#ifdef ENABLE_ACCE_SYSTEM
-	uint32_t		dwAccePart;
-#endif
-	int32_t		x, y;
-	int32_t		lAddr;
-	uint16_t		wPort;
-	uint8_t		skill_group;
-} TSimplePlayer;
 
 typedef struct SAccountTable
 {
@@ -288,20 +29,14 @@ typedef struct SAccountTable
 	char		social_id[SOCIAL_ID_MAX_LEN + 1];
 	char		status[ACCOUNT_STATUS_MAX_LEN + 1];
 	uint8_t		bEmpire;
-	TSimplePlayer	players[PLAYER_PER_ACCOUNT];
+	TSimplePlayerInformation	players[PLAYER_PER_ACCOUNT];
 } TAccountTable;
 
 typedef struct SPacketDGCreateSuccess
 {
 	uint8_t		bAccountCharacterIndex;
-	TSimplePlayer	player;
+	TSimplePlayerInformation	player;
 } TPacketDGCreateSuccess;
-
-typedef struct TPlayerItemAttribute
-{
-	uint8_t	bType;
-	int16_t	sValue;
-} TPlayerItemAttribute;
 
 typedef struct SPlayerItem
 {
@@ -319,18 +54,6 @@ typedef struct SPlayerItem
 	bool	is_gm_owner;
 } TPlayerItem;
 
-typedef struct SQuickslot
-{
-	uint8_t	type;
-	uint8_t	pos;
-} TQuickslot;
-
-typedef struct SPlayerSkill
-{
-	uint8_t	bMasterType;
-	uint8_t	bLevel;
-	uint32_t	tNextRead;
-} TPlayerSkill;
 
 struct	THorseInfo
 {
@@ -382,7 +105,7 @@ typedef struct SPlayerTable
 
 	TPlayerSkill skills[SKILL_MAX_NUM];
 
-	TQuickslot  quickslot[QUICKSLOT_MAX_NUM];
+	TQuickSlot  quickslot[QUICKSLOT_MAX_NUM];
 
 	uint8_t	part_base;
 	uint16_t	parts[PART_MAX_NUM];
@@ -537,24 +260,10 @@ typedef struct SSkillTable
 	uint32_t	dwTargetRange;
 } TSkillTable;
 
-typedef struct SShopItemTable
+typedef struct command_messenger_add_by_vid
 {
-	uint32_t		vnum;
-	uint8_t		count;
-
-    TItemPos	pos;			// PC 상점에만 이용
-	uint32_t		price;	// PC, shop_table_ex.txt 상점에만 이용
-	uint8_t		display_pos; // PC, shop_table_ex.txt 상점에만 이용, 보일 위치.
-} TShopItemTable;
-
-typedef struct SShopTable
-{
-	uint32_t		dwVnum;
-	uint32_t		dwNPCVnum;
-
-	uint8_t		byItemCount;
-	TShopItemTable	items[SHOP_HOST_ITEM_MAX_NUM];
-} TShopTable;
+	uint32_t vid;
+} TPacketMessengerAddByVID;
 
 #define QUEST_NAME_MAX_LEN	32
 #define QUEST_STATE_MAX_LEN	64
@@ -899,7 +608,7 @@ struct TItemAttrTable
 typedef struct SConnectTable
 {
 	char	login[LOGIN_MAX_LEN + 1];
-	IDENT	ident;
+	uint32_t	ident;
 } TConnectTable;
 
 typedef struct SLoginPacket
@@ -1054,21 +763,17 @@ typedef struct SPacketGuildChangeMemberData
 	uint8_t grade;
 } TPacketGuildChangeMemberData;
 
+typedef struct packet_dungeon_dest_position
+{
+	int32_t x;
+	int32_t y;
+} TPacketDungeonDestPosition;
 
 typedef struct SPacketDGLoginAlready
 {
 	char	szLogin[LOGIN_MAX_LEN + 1];
 } TPacketDGLoginAlready;
 
-typedef struct TPacketAffectElement
-{
-	uint32_t	dwType;
-	uint8_t	bApplyOn;
-	int32_t	lApplyValue;
-	uint32_t	dwFlag;
-	int32_t	lDuration;
-	int32_t	lSPCost;
-} TPacketAffectElement;
 
 typedef struct SPacketGDAddAffect
 {
@@ -1177,17 +882,6 @@ typedef struct SRefineMaterial
 	uint32_t vnum;
 	int32_t count;
 } TRefineMaterial;
-
-typedef struct SRefineTable
-{
-	//uint32_t src_vnum;
-	//uint32_t result_vnum;
-	uint32_t id;
-	uint8_t material_count;
-	int32_t cost; // 소요 비용
-	int32_t prob; // 확률
-	TRefineMaterial materials[REFINE_MATERIAL_MAX_NUM];
-} TRefineTable;
 
 typedef struct SBanwordTable
 {
@@ -1561,12 +1255,6 @@ typedef struct tDeleteAwardID
 {
 	uint32_t dwID;
 } TPacketDeleteAwardID;
-
-typedef struct SChannelStatus
-{
-	uint16_t nPort;
-	uint8_t bStatus;
-} TChannelStatus;
 
 typedef struct TPlayerCount
 {

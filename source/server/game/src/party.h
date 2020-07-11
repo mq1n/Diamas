@@ -25,13 +25,6 @@ enum EPartyRole
 	PARTY_ROLE_MAX_NUM, 
 };  
 
-enum EPartyExpDistributionModes
-{
-	PARTY_EXP_DISTRIBUTION_NON_PARITY,
-	PARTY_EXP_DISTRIBUTION_PARITY,
-	PARTY_EXP_DISTRIBUTION_MAX_NUM
-};
-
 class CParty;
 class CDungeon;
 

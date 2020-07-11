@@ -202,7 +202,7 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 
 	void		AddPeer(socket_t fd);
 	void		RemovePeer(CPeer * pPeer);
-	CPeer *		GetPeer(IDENT ident);
+	CPeer *		GetPeer(uint32_t ident);
 
 	int32_t		AnalyzeQueryResult(SQLMsg * msg);
 	int32_t		AnalyzeErrorMsg(CPeer * peer, SQLMsg * msg);
@@ -375,7 +375,6 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	// Building
 	void		CreateObject(TPacketGDCreateObject * p);
 	void		DeleteObject(uint32_t dwID);
-	void		UpdateLand(uint32_t * pdw);
 
 	// BLOCK_CHAT
 	void		BlockChat(TPacketBlockChat * p);

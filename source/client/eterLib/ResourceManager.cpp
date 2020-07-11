@@ -15,7 +15,7 @@ const int32_t c_Reference_Decrease_Wait_Time = 30000;	// 선로딩 리소스의 해제 대
 
 void CResourceManager::LoadStaticCache(const char* c_szFileName)
 {
-	CResource* pkRes=GetResourcePointer(c_szFileName);
+	CResource* pkRes = GetResourcePointer<CResource>(c_szFileName);
 	if (!pkRes)
 	{
 		Lognf(1, "CResourceManager::LoadStaticCache %s - FAILED", c_szFileName);
@@ -103,49 +103,6 @@ CResource * CResourceManager::InsertResourcePointer(uint64_t nameHash, CResource
 	return pResource;
 }
 
-CResource * CResourceManager::GetResourcePointer(const char* c_szFileName)
-{
-	if (!c_szFileName || !*c_szFileName)
-	{
-		TraceError("CResourceManager::GetResourcePointer: filename error!");
-		return nullptr;
-	}
-
-	FileSystem::CFileName filename(c_szFileName);
-
-	CResource * pResource = FindResourcePointer(filename.GetHash());
-	if (pResource) // 이미 리소스가 있으면 리턴 한다.
-		return pResource;
-
-	CResource* (*newFunc) (const FileSystem::CFileName&) = nullptr;
-
-	auto stFileName = filename.GetPathA();
-	const auto fileExt = stFileName.rfind('.');
-	if (fileExt != std::string::npos)
-	{
-		const auto it = std::find_if(m_newFuncs.begin(), m_newFuncs.end(), [&filename, fileExt, &stFileName] (const NewFunc& nf)
-		{
-			return 0 == stFileName.compare(fileExt + 1, std::string::npos, nf.first);
-		});
-
-		if (it != m_newFuncs.end())
-			newFunc = it->second;
-	}
-	else
-	{
-		TraceError("ResourceManager::GetResourcePointer: BROKEN FILE NAME: %s", stFileName.c_str());
-		return nullptr;
-	}
-
-	if (!newFunc)
-	{
-		TraceError("ResourceManager::GetResourcePointer: NOT SUPPORT FILE %s", stFileName.c_str());
-		return nullptr;
-	}
-
-	return InsertResourcePointer(filename.GetHash(), newFunc(filename));
-}
-
 CResource* CResourceManager::FindResourcePointer(uint64_t nameHash)
 {
 	auto itor = m_pResMap.find(nameHash);
@@ -187,7 +144,7 @@ struct FDumpPrint
 	FILE * m_fp;
 	static float m_totalKB;
 
-	void operator () (TDumpData & data)
+	void operator () (TDumpData & data) const
 	{
 		m_totalKB += data.KB;
 		fprintf(m_fp, "%6.1f %s\n", data.KB, data.filename);
@@ -200,7 +157,7 @@ struct FDumpCostPrint
 {
 	FILE * m_fp;
 
-	void operator() (TDumpData & data)
+	void operator() (TDumpData & data) const
 	{
 		fprintf(m_fp, "%-4u %s\n", data.cost, data.filename);
 	}

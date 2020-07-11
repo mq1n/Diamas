@@ -73,7 +73,7 @@ if (MSVC)
 
 	add_executable(${EXE_NAME} ${GAMESERVER_HEADERS} ${GAMESERVER_SOURCES})
 	
-	target_link_libraries(${EXE_NAME} lualib thecorelib sqllib gamelib ${EXTRA_LIBS})
+	target_link_libraries(${EXE_NAME} sourceCommon lualib thecorelib sqllib gamelib ${EXTRA_LIBS})
 #	set_target_properties(${EXE_NAME} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT")
 
 else()
@@ -90,7 +90,7 @@ else()
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 	# Link
-	target_link_libraries(${EXE_NAME} -pthread ${LIBZ} -static-libgcc -static-libstdc++ ${MYSQL_LIBRARIES} ${IL_LIBRARIES} lualib thecorelib sqllib gamelib) # x64: z ve lzma
+	target_link_libraries(${EXE_NAME} sourceCommon -pthread ${LIBZ} -static-libgcc -static-libstdc++ ${MYSQL_LIBRARIES} ${IL_LIBRARIES} lualib thecorelib sqllib gamelib) # x64: z ve lzma
 
 endif()
 

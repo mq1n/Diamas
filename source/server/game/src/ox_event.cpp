@@ -458,14 +458,14 @@ bool COXEventManager::CheckAnswer(bool answer)
 				// \0 문자 포함
 				++len;
 
-				TPacketGCChat pack_chat;
+				SPacketGCChat pack_chat;
 				pack_chat.header = HEADER_GC_CHAT;
-				pack_chat.size = sizeof(TPacketGCChat) + len;
+				pack_chat.size = sizeof(SPacketGCChat) + len;
 				pack_chat.type = CHAT_TYPE_COMMAND;
-				pack_chat.id = 0;
+				pack_chat.dwVID = 0;
 
 				TEMP_BUFFER buf;
-				buf.write(&pack_chat, sizeof(TPacketGCChat));
+				buf.write(&pack_chat, sizeof(SPacketGCChat));
 				buf.write(chatbuf, len);
 
 				pkChar->PacketAround(buf.read_peek(), buf.size());

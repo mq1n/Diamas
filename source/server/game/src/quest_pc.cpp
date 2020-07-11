@@ -233,10 +233,10 @@ namespace quest
 		assert(m_iSendToClient);
 		assert(m_RunningQuestState);
 
-		packet_quest_info qi;
+		SPacketGCQuestInfo qi;
 
 		qi.header = HEADER_GC_QUEST_INFO;
-		qi.size = sizeof(struct packet_quest_info);
+		qi.size = sizeof(SPacketGCQuestInfo);
 		qi.index = m_RunningQuestState->iIndex;
 		qi.flag = m_iSendToClient;
 

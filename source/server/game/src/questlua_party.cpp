@@ -59,7 +59,7 @@ namespace quest
     struct FRunCinematicSender
     {
         std::string data;
-        struct packet_script pack;
+		SPacketGCScript pack;
 
         FRunCinematicSender(const char* str)
         {
@@ -71,7 +71,7 @@ namespace quest
             pack.skin = CQuestManager::QUEST_SKIN_CINEMATIC;
             //pack.skin = CQuestManager::QUEST_SKIN_NOWINDOW;
 			pack.src_size = static_cast<uint16_t>(data.size());
-			pack.size = pack.src_size + sizeof(struct packet_script);
+			pack.size = pack.src_size + sizeof(SPacketGCScript);
 		}
 
 		void operator()(CHARACTER* ch) const
@@ -82,7 +82,7 @@ namespace quest
 
 				if (ch->GetDesc()) {
 					sys_log(0, "CINEMASEND %s", ch->GetName());
-					ch->GetDesc()->BufferedPacket(&pack, sizeof(struct packet_script));
+					ch->GetDesc()->BufferedPacket(&pack, sizeof(SPacketGCScript));
 					ch->GetDesc()->Packet(data.c_str(), data.size());
 				}
 			}
@@ -172,7 +172,7 @@ namespace quest
 	struct FCinematicSender 
 	{
 		const char* str;
-		struct ::packet_script packet_script;
+		SPacketGCScript packet_script;
 		int32_t len;
 
 		FCinematicSender(const char* str) : 
@@ -183,7 +183,7 @@ namespace quest
 			packet_script.header = HEADER_GC_SCRIPT;
 			packet_script.skin = CQuestManager::QUEST_SKIN_CINEMATIC;
 			packet_script.src_size = len;
-			packet_script.size = packet_script.src_size + sizeof(struct packet_script);
+			packet_script.size = packet_script.src_size + sizeof(SPacketGCScript);
 		}
 
 		void operator()(CHARACTER* ch) const
@@ -195,7 +195,7 @@ namespace quest
 				if (ch->GetDesc()) {
 					sys_log(0, "CINEMASEND %s", ch->GetName());
 					ch->GetDesc()->BufferedPacket(&packet_script,
-						sizeof(struct packet_script));
+						sizeof(SPacketGCScript));
 					ch->GetDesc()->Packet(str, len);
 				}
 			}

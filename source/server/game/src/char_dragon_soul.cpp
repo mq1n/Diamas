@@ -122,7 +122,7 @@ bool CHARACTER::DragonSoul_RefineWindow_Open(LPENTITY pEntity)
 		m_pointsInstant.m_pDragonSoulRefineWindowOpener = pEntity;
 	}
 
-	TPacketGCDragonSoulRefine PDS;
+	SPacketGCDragonSoulRefine PDS;
 	PDS.header = HEADER_GC_DRAGON_SOUL_REFINE;
 	PDS.bSubType = DS_SUB_HEADER_OPEN;
 	LPDESC d = GetDesc();

@@ -118,20 +118,20 @@ static bool FN_is_battle_zone(LPCHARACTER ch)
 
 void CInputLogin::Login(LPDESC d, const char * data)
 {
-	TPacketCGLogin * pinfo = (TPacketCGLogin *) data;
+	SPacketCGLogin * pinfo = (SPacketCGLogin *) data;
 
 	char login[LOGIN_MAX_LEN + 1];
 	trim_and_lower(pinfo->login, login, sizeof(login));
 
 	sys_log(0, "InputLogin::Login : %s", login);
 
-	TPacketGCLoginFailure failurePacket;
+	SPacketGCLoginFailure failurePacket;
 
 	if (!g_bIsTestServer)
 	{
 		failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 		strlcpy(failurePacket.szStatus, "VERSION", sizeof(failurePacket.szStatus));
-		d->Packet(&failurePacket, sizeof(TPacketGCLoginFailure));
+		d->Packet(&failurePacket, sizeof(SPacketGCLoginFailure));
 		sys_log(0, "LOGIN_FAIL: VERSION | %s", login);
 		return;
 	}
@@ -140,7 +140,7 @@ void CInputLogin::Login(LPDESC d, const char * data)
 	{
 		failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 		strlcpy(failurePacket.szStatus, "SHUTDOWN", sizeof(failurePacket.szStatus));
-		d->Packet(&failurePacket, sizeof(TPacketGCLoginFailure));
+		d->Packet(&failurePacket, sizeof(SPacketGCLoginFailure));
 		sys_log(0, "LOGIN_FAIL: SHUTDOWN | %s", login);
 		return;
 	}
@@ -157,7 +157,7 @@ void CInputLogin::Login(LPDESC d, const char * data)
 		{
 			failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 			strlcpy(failurePacket.szStatus, "FULL", sizeof(failurePacket.szStatus));
-			d->Packet(&failurePacket, sizeof(TPacketGCLoginFailure));
+			d->Packet(&failurePacket, sizeof(SPacketGCLoginFailure));
 			return;
 		}
 	}
@@ -172,18 +172,18 @@ void CInputLogin::Login(LPDESC d, const char * data)
 
 void CInputLogin::LoginByKey(LPDESC d, const char * data)
 {
-	TPacketCGLogin2 * pinfo = (TPacketCGLogin2 *) data;
+	SPacketCGLogin2 * pinfo = (SPacketCGLogin2 *) data;
 
 	char login[LOGIN_MAX_LEN + 1];
-	trim_and_lower(pinfo->login, login, sizeof(login));
+	trim_and_lower(pinfo->name, login, sizeof(login));
 
 	if (g_bNoMoreClient)
 	{
-		TPacketGCLoginFailure failurePacket;
+		SPacketGCLoginFailure failurePacket;
 
 		failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 		strlcpy(failurePacket.szStatus, "SHUTDOWN", sizeof(failurePacket.szStatus));
-		d->Packet(&failurePacket, sizeof(TPacketGCLoginFailure));
+		d->Packet(&failurePacket, sizeof(SPacketGCLoginFailure));
 		return;
 	}
 
@@ -197,19 +197,19 @@ void CInputLogin::LoginByKey(LPDESC d, const char * data)
 
 		if (g_iUserLimit <= iTotal)
 		{
-			TPacketGCLoginFailure failurePacket;
+			SPacketGCLoginFailure failurePacket;
 
 			failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 			strlcpy(failurePacket.szStatus, "FULL", sizeof(failurePacket.szStatus));
 
-			d->Packet(&failurePacket, sizeof(TPacketGCLoginFailure));
+			d->Packet(&failurePacket, sizeof(SPacketGCLoginFailure));
 			return;
 		}
 	}
 
-	sys_log(0, "LOGIN_BY_KEY: %s key %u", login, pinfo->dwLoginKey);
+	sys_log(0, "LOGIN_BY_KEY: %s key %u", login, pinfo->login_key);
 
-	d->SetLoginKey(pinfo->dwLoginKey);
+	d->SetLoginKey(pinfo->login_key);
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
 	d->SetSecurityKey(pinfo->adwClientKey);
 #endif
@@ -217,7 +217,7 @@ void CInputLogin::LoginByKey(LPDESC d, const char * data)
 	TPacketGDLoginByKey ptod;
 
 	strlcpy(ptod.szLogin, login, sizeof(ptod.szLogin));
-	ptod.dwLoginKey = pinfo->dwLoginKey;
+	ptod.dwLoginKey = pinfo->login_key;
 	memcpy(ptod.adwClientKey, pinfo->adwClientKey, sizeof(uint32_t) * 4);
 	strlcpy(ptod.szIP, d->GetHostName(), sizeof(ptod.szIP));
 
@@ -226,7 +226,7 @@ void CInputLogin::LoginByKey(LPDESC d, const char * data)
 
 void CInputLogin::ChangeName(LPDESC d, const char * data)
 {
-	TPacketCGChangeName * p = (TPacketCGChangeName *) data;
+	SPacketCGChangeName * p = (SPacketCGChangeName *) data;
 	const TAccountTable & c_r = d->GetAccountTable();
 
 	if (!c_r.id)
@@ -240,8 +240,8 @@ void CInputLogin::ChangeName(LPDESC d, const char * data)
 
 	if (!check_name(p->name))
 	{
-		TPacketGCCreateFailure pack;
-		pack.header = HEADER_GC_CHARACTER_CREATE_FAILURE;
+		SPacketGCCreateFailure pack;
+		pack.header = HEADER_GC_PLAYER_CREATE_FAILURE;
 		pack.bType = 0;
 		d->Packet(&pack, sizeof(pack));
 		return;
@@ -256,10 +256,10 @@ void CInputLogin::ChangeName(LPDESC d, const char * data)
 
 void CInputLogin::CharacterSelect(LPDESC d, const char * data)
 {
-	struct command_player_select * pinfo = (struct command_player_select *) data;
+	SPacketCGSelectCharacter* pinfo = (SPacketCGSelectCharacter*) data;
 	const TAccountTable & c_r = d->GetAccountTable();
 
-	sys_log(0, "player_select: login: %s index: %d", c_r.login, pinfo->index);
+	sys_log(0, "player_select: login: %s index: %d", c_r.login, pinfo->player_index);
 
 	if (!c_r.id)
 	{
@@ -267,24 +267,24 @@ void CInputLogin::CharacterSelect(LPDESC d, const char * data)
 		return;
 	}
 
-	if (pinfo->index >= PLAYER_PER_ACCOUNT)
+	if (pinfo->player_index >= PLAYER_PER_ACCOUNT)
 	{
-		sys_err("index overflow %d, login: %s", pinfo->index, c_r.login);
+		sys_err("index overflow %d, login: %s", pinfo->player_index, c_r.login);
 		return;
 	}
 
-	if (c_r.players[pinfo->index].bChangeName)
+	if (c_r.players[pinfo->player_index].bChangeName)
 	{
 		sys_err("name must be changed idx %d, login %s, name %s", 
-				pinfo->index, c_r.login, c_r.players[pinfo->index].szName);
+				pinfo->player_index, c_r.login, c_r.players[pinfo->player_index].szName);
 		return;
 	}
 
 	TPlayerLoadPacket player_load_packet;
 
 	player_load_packet.account_id	= c_r.id;
-	player_load_packet.player_id	= c_r.players[pinfo->index].dwID;
-	player_load_packet.account_index	= pinfo->index;
+	player_load_packet.player_id	= c_r.players[pinfo->player_index].dwID;
+	player_load_packet.account_index	= pinfo->player_index;
 
 	db_clientdesc->DBPacket(HEADER_GD_PLAYER_LOAD, d->GetHandle(), &player_load_packet, sizeof(TPlayerLoadPacket));
 }
@@ -445,7 +445,7 @@ bool NewPlayerTable2(TPlayerTable * table, const char * name, uint8_t race, uint
 
 void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 {
-	struct command_player_create * pinfo = (struct command_player_create *) data;
+	SPacketCGCreateCharacter* pinfo = (SPacketCGCreateCharacter *) data;
 	TPlayerCreatePacket player_create_packet;
 
 	sys_log(0, "PlayerCreate: name %s pos %d job %d shape %d",
@@ -454,9 +454,9 @@ void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 			pinfo->job, 
 			pinfo->shape);
 
-	TPacketGCLoginFailure packFailure;
+	SPacketGCLoginFailure packFailure;
 	memset(&packFailure, 0, sizeof(packFailure));
-	packFailure.header = HEADER_GC_CHARACTER_CREATE_FAILURE;
+	packFailure.header = HEADER_GC_PLAYER_CREATE_FAILURE;
 
 	if (g_BlockCharCreation)
 	{
@@ -487,8 +487,8 @@ void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 
 	if (0 == strcmp(c_rAccountTable.login, pinfo->name))
 	{
-		TPacketGCCreateFailure pack;
-		pack.header = HEADER_GC_CHARACTER_CREATE_FAILURE;
+		SPacketGCCreateFailure pack;
+		pack.header = HEADER_GC_PLAYER_CREATE_FAILURE;
 		pack.bType = 1;
 
 		d->Packet(&pack, sizeof(pack));
@@ -521,7 +521,7 @@ void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 
 void CInputLogin::CharacterDelete(LPDESC d, const char * data)
 {
-	struct command_player_delete * pinfo = (struct command_player_delete *) data;
+	SPacketCGDestroyCharacter* pinfo = (SPacketCGDestroyCharacter*) data;
 	const TAccountTable & c_rAccountTable = d->GetAccountTable();
 
 	if (!c_rAccountTable.id)
@@ -530,7 +530,7 @@ void CInputLogin::CharacterDelete(LPDESC d, const char * data)
 		return;
 	}
 
-	sys_log(0, "PlayerDelete: login: %s index: %d, social_id %s", c_rAccountTable.login, pinfo->index, pinfo->private_code);
+	sys_log(0, "PlayerDelete: login: %s index: %d, social_id %s", c_rAccountTable.login, pinfo->index, pinfo->szPrivateCode);
 
 	if (pinfo->index >= PLAYER_PER_ACCOUNT)
 	{
@@ -541,7 +541,7 @@ void CInputLogin::CharacterDelete(LPDESC d, const char * data)
 	if (!c_rAccountTable.players[pinfo->index].dwID)
 	{
 		sys_err("PlayerDelete: Wrong Social ID index %d, login: %s", pinfo->index, c_rAccountTable.login);
-		d->Packet(encode_byte(HEADER_GC_CHARACTER_DELETE_WRONG_SOCIAL_ID), 1);
+		d->Packet(encode_byte(HEADER_GC_PLAYER_DELETE_WRONG_SOCIAL_ID), 1);
 		return;
 	}
 
@@ -549,7 +549,7 @@ void CInputLogin::CharacterDelete(LPDESC d, const char * data)
 	if (!GM::check_allow(GM::get_level(c_rAccountTable.players[pinfo->index].szName, c_rAccountTable.login), GM_ALLOW_DELETE_PLAYER))
 	{
 		sys_err("PlayerDelete: cannot delete gm character [%s]", c_rAccountTable.players[pinfo->index].szName);
-		d->Packet(encode_byte(HEADER_GC_CHARACTER_DELETE_WRONG_SOCIAL_ID), 1);
+		d->Packet(encode_byte(HEADER_GC_PLAYER_DELETE_WRONG_SOCIAL_ID), 1);
 		return;
 	}
 
@@ -558,7 +558,7 @@ void CInputLogin::CharacterDelete(LPDESC d, const char * data)
 	trim_and_lower(c_rAccountTable.login, player_delete_packet.login, sizeof(player_delete_packet.login));
 	player_delete_packet.player_id	= c_rAccountTable.players[pinfo->index].dwID;
 	player_delete_packet.account_index	= pinfo->index;
-	strlcpy(player_delete_packet.private_code, pinfo->private_code, sizeof(player_delete_packet.private_code));
+	strlcpy(player_delete_packet.private_code, pinfo->szPrivateCode, sizeof(player_delete_packet.private_code));
 
 	db_clientdesc->DBPacket(HEADER_GD_PLAYER_DELETE, d->GetHandle(), &player_delete_packet, sizeof(TPlayerDeletePacket));
 }
@@ -633,12 +633,12 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 
 	marriage::CManager::instance().Login(ch);
 
-	TPacketGCTime p;
-	p.bHeader = HEADER_GC_TIME;
+	SPacketGCTime p;
+	p.header = HEADER_GC_TIME;
 	p.time = get_global_time();
 	d->Packet(&p, sizeof(p));
 
-	TPacketGCChannel p2;
+	SPacketGCChannel p2;
 	p2.header = HEADER_GC_CHANNEL;
 	p2.channel = g_bChannel;
 	d->Packet(&p2, sizeof(p2));
@@ -694,11 +694,11 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		}
 		else if (memberFlag == MEMBER_DUELIST)
 		{
-			TPacketGCDuelStart duelStart;
+			SPacketGCDuelStart duelStart;
 			duelStart.header = HEADER_GC_DUEL_START;
-			duelStart.wSize = sizeof(TPacketGCDuelStart);
+			duelStart.wSize = sizeof(SPacketGCDuelStart);
 
-			ch->GetDesc()->Packet(&duelStart, sizeof(TPacketGCDuelStart));
+			ch->GetDesc()->Packet(&duelStart, sizeof(SPacketGCDuelStart));
 
 			if (ch->IsHorseRiding() == true)
 			{
@@ -777,7 +777,7 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 
 void CInputLogin::Empire(LPDESC d, const char * c_pData)
 {
-	const TPacketCGEmpire* p = reinterpret_cast<const TPacketCGEmpire*>(c_pData);
+	const SPacketCGEmpire* p = reinterpret_cast<const SPacketCGEmpire*>(c_pData);
 
 	if (EMPIRE_MAX_NUM <= p->bEmpire)
 	{
@@ -809,17 +809,17 @@ void CInputLogin::Empire(LPDESC d, const char * c_pData)
 
 int32_t CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiBytes)
 {
-	if (uiBytes < sizeof(TPacketCGGuildSymbolUpload))
+	if (uiBytes < sizeof(SPacketCGGuildSymbolUpload))
 		return -1;
 
 	sys_log(0, "GuildSymbolUpload uiBytes %u", uiBytes);
 
-	TPacketCGGuildSymbolUpload* p = (TPacketCGGuildSymbolUpload*) c_pData;
+	SPacketCGGuildSymbolUpload* p = (SPacketCGGuildSymbolUpload*) c_pData;
 
 	if (uiBytes < p->size)
 		return -1;
 
-	int32_t iSymbolSize = p->size - sizeof(TPacketCGGuildSymbolUpload);
+	int32_t iSymbolSize = p->size - sizeof(SPacketCGGuildSymbolUpload);
 
 	if (iSymbolSize <= 0 || iSymbolSize > 64 * 1024)
 	{
@@ -846,24 +846,24 @@ int32_t CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiB
 
 void CInputLogin::GuildSymbolCRC(LPDESC d, const char* c_pData)
 {
-	const TPacketCGSymbolCRC & CGPacket = *((TPacketCGSymbolCRC *) c_pData);
+	const SPacketCGGuildSymbolCRC& CGPacket = *((SPacketCGGuildSymbolCRC*) c_pData);
 
-	sys_log(0, "GuildSymbolCRC %u %u %u", CGPacket.guild_id, CGPacket.crc, CGPacket.size);
+	sys_log(0, "GuildSymbolCRC %u %u %u", CGPacket.dwGuildID, CGPacket.dwCRC, CGPacket.dwSize);
 
-	const CGuildMarkManager::TGuildSymbol * pkGS = CGuildMarkManager::instance().GetGuildSymbol(CGPacket.guild_id);
+	const CGuildMarkManager::TGuildSymbol * pkGS = CGuildMarkManager::instance().GetGuildSymbol(CGPacket.dwGuildID);
 
 	if (!pkGS)
 		return;
 
 	sys_log(0, "  Server %u %u", pkGS->crc, pkGS->raw.size());
 
-	if (pkGS->raw.size() != CGPacket.size || pkGS->crc != CGPacket.crc)
+	if (pkGS->raw.size() != CGPacket.dwSize || pkGS->crc != CGPacket.dwCRC)
 	{
-		TPacketGCGuildSymbolData GCPacket;
+		SPacketGCGuildSymbolData GCPacket;
 
-		GCPacket.header = HEADER_GC_SYMBOL_DATA;
+		GCPacket.header = HEADER_GC_GUILD_SYMBOL_DATA;
 		GCPacket.size = sizeof(GCPacket) + pkGS->raw.size();
-		GCPacket.guild_id = CGPacket.guild_id;
+		GCPacket.guild_id = CGPacket.dwGuildID;
 
 		d->BufferedPacket(&GCPacket, sizeof(GCPacket));
 		d->Packet(&pkGS->raw[0], pkGS->raw.size());
@@ -875,7 +875,7 @@ void CInputLogin::GuildSymbolCRC(LPDESC d, const char* c_pData)
 
 void CInputLogin::GuildMarkUpload(LPDESC d, const char* c_pData)
 {
-	TPacketCGMarkUpload * p = (TPacketCGMarkUpload *) c_pData;
+	SPacketCGMarkUpload * p = (SPacketCGMarkUpload *) c_pData;
 	CGuildManager& rkGuildMgr = CGuildManager::instance();
 	CGuild * pkGuild;
 
@@ -920,7 +920,7 @@ void CInputLogin::GuildMarkIDXList(LPDESC d, const char* c_pData)
 		rkMarkMgr.CopyMarkIdx(buf);
 	}
 
-	TPacketGCMarkIDXList p;
+	SPacketGCMarkIDXList p;
 	p.header = HEADER_GC_MARK_IDXLIST;
 	p.bufSize = sizeof(p) + bufSize;
 	p.count = rkMarkMgr.GetMarkCount();
@@ -939,7 +939,7 @@ void CInputLogin::GuildMarkIDXList(LPDESC d, const char* c_pData)
 
 void CInputLogin::GuildMarkCRCList(LPDESC d, const char* c_pData)
 {
-	TPacketCGMarkCRCList * pCG = (TPacketCGMarkCRCList *) c_pData;
+	SPacketCGMarkCRCList * pCG = (SPacketCGMarkCRCList *) c_pData;
 
 	std::map<uint8_t, const SGuildMarkBlock *> mapDiffBlocks;
 	CGuildMarkManager::instance().GetDiffBlocks(pCG->imgIdx, pCG->crclist, mapDiffBlocks);
@@ -959,22 +959,22 @@ void CInputLogin::GuildMarkCRCList(LPDESC d, const char* c_pData)
 		++blockCount;
 	}
 
-	TPacketGCMarkBlock pGC;
+	SPacketGCMarkBlock pGC;
 
 	pGC.header = HEADER_GC_MARK_BLOCK;
 	pGC.imgIdx = pCG->imgIdx;
-	pGC.bufSize = buf.size() + sizeof(TPacketGCMarkBlock);
+	pGC.bufSize = buf.size() + sizeof(SPacketGCMarkBlock);
 	pGC.count = blockCount;
 
 	sys_log(0, "MARK_SERVER: Sending blocks. (imgIdx %u diff %u size %u)", pCG->imgIdx, mapDiffBlocks.size(), pGC.bufSize);
 
 	if (buf.size() > 0)
 	{
-		d->BufferedPacket(&pGC, sizeof(TPacketGCMarkBlock));
+		d->BufferedPacket(&pGC, sizeof(SPacketGCMarkBlock));
 		d->LargePacket(buf.read_peek(), buf.size());
 	}
 	else
-		d->Packet(&pGC, sizeof(TPacketGCMarkBlock));
+		d->Packet(&pGC, sizeof(SPacketGCMarkBlock));
 }
 
 int32_t CInputLogin::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
@@ -999,15 +999,15 @@ int32_t CInputLogin::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 			LoginByKey(d, c_pData);
 			break;
 
-		case HEADER_CG_CHARACTER_SELECT:
+		case HEADER_CG_PLAYER_SELECT:
 			CharacterSelect(d, c_pData);
 			break;
 
-		case HEADER_CG_CHARACTER_CREATE:
+		case HEADER_CG_PLAYER_CREATE:
 			CharacterCreate(d, c_pData);
 			break;
 
-		case HEADER_CG_CHARACTER_DELETE:
+		case HEADER_CG_PLAYER_DESTROY:
 			CharacterDelete(d, c_pData);
 			break;
 
@@ -1019,7 +1019,7 @@ int32_t CInputLogin::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 			Empire(d, c_pData);
 			break;
 
-		case HEADER_CG_MOVE:
+		case HEADER_CG_CHARACTER_MOVE:
 			break;
 
 			///////////////////////////////////////
@@ -1057,7 +1057,7 @@ int32_t CInputLogin::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 				return -1;
 			break;
 
-		case HEADER_CG_SYMBOL_CRC:
+		case HEADER_CG_GUILD_SYMBOL_CRC:
 			GuildSymbolCRC(d, c_pData);
 			break;
 			/////////////////////////////////////

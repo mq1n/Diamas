@@ -60,17 +60,6 @@ class CInstanceBase
 			DIR_MAX_NUM
 		};
 
-		enum EFunc
-		{
-			FUNC_WAIT,
-			FUNC_MOVE,
-			FUNC_ATTACK,
-			FUNC_COMBO,
-			FUNC_MOB_SKILL,
-			FUNC_EMOTION,
-			FUNC_SKILL = 0x80
-		};
-
 		enum
 		{
 			AFFECT_YMIR,

@@ -109,7 +109,7 @@ void CPythonNetworkStream::SetLoginPhase()
 
 bool CPythonNetworkStream::__RecvEmpirePacket()
 {
-	TPacketGCEmpire kPacketEmpire;
+	SPacketGCEmpire kPacketEmpire;
 	if (!Recv(sizeof(kPacketEmpire), &kPacketEmpire))
 		return false;
 
@@ -119,7 +119,7 @@ bool CPythonNetworkStream::__RecvEmpirePacket()
 
 bool CPythonNetworkStream::__RecvLoginSuccessPacket()
 {
-	TPacketGCLoginSuccess kPacketLoginSuccess;
+	SPacketGCLoginSuccess kPacketLoginSuccess;
 
 	if (!Recv(sizeof(kPacketLoginSuccess), &kPacketLoginSuccess))
 		return false;
@@ -157,8 +157,8 @@ void CPythonNetworkStream::OnConnectFailure()
 
 bool CPythonNetworkStream::__RecvLoginFailurePacket()
 {
-	TPacketGCLoginFailure packet_failure;
-	if (!Recv(sizeof(TPacketGCLoginFailure), &packet_failure))
+	SPacketGCLoginFailure packet_failure;
+	if (!Recv(sizeof(SPacketGCLoginFailure), &packet_failure))
 		return false;
 
 	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_LOGIN], "OnLoginFailure", Py_BuildValue("(s)", packet_failure.szStatus));
@@ -170,14 +170,12 @@ bool CPythonNetworkStream::__RecvLoginFailurePacket()
 
 bool CPythonNetworkStream::SendLoginPacket(const char* c_szName, const char* c_szPassword)
 {
-	TPacketCGLogin LoginPacket;
-	LoginPacket.header = HEADER_CG_LOGIN;
+	SPacketCGLogin LoginPacket;
+	strncpy_s(LoginPacket.login, c_szName, sizeof(LoginPacket.login) - 1);
+	strncpy_s(LoginPacket.passwd, c_szPassword, sizeof(LoginPacket.passwd) - 1);
 
-	strncpy_s(LoginPacket.name, c_szName, sizeof(LoginPacket.name) - 1);
-	strncpy_s(LoginPacket.pwd, c_szPassword, sizeof(LoginPacket.pwd) - 1);
-
-	LoginPacket.name[ID_MAX_NUM]='\0';
-	LoginPacket.pwd[PASS_MAX_NUM]='\0';
+	LoginPacket.login[LOGIN_MAX_LEN]='\0';
+	LoginPacket.passwd[PASSWD_MAX_LEN]='\0';
 
 	if (!Send(sizeof(LoginPacket), &LoginPacket))
 	{
@@ -190,12 +188,11 @@ bool CPythonNetworkStream::SendLoginPacket(const char* c_szName, const char* c_s
 
 bool CPythonNetworkStream::SendLoginPacketNew(const char * c_szName, const char * c_szPassword)
 {
-	TPacketCGLogin2 LoginPacket;
-	LoginPacket.header = HEADER_CG_LOGIN2;
+	SPacketCGLogin2 LoginPacket;
 	LoginPacket.login_key = m_dwLoginKey;
 
 	strncpy_s(LoginPacket.name, c_szName, sizeof(LoginPacket.name) - 1);
-	LoginPacket.name[ID_MAX_NUM]='\0';
+	LoginPacket.name[LOGIN_MAX_LEN]='\0';
 
 	extern uint32_t g_adwEncryptKey[4];
 	extern uint32_t g_adwDecryptKey[4];
@@ -218,8 +215,8 @@ bool CPythonNetworkStream::SendLoginPacketNew(const char * c_szName, const char 
 
 bool CPythonNetworkStream::__RecvLoginKeyPacket()
 {
-	TPacketGCLoginKey kLoginKeyPacket;
-	if (!Recv(sizeof(TPacketGCLoginKey), &kLoginKeyPacket))
+	SPacketGCLoginKey kLoginKeyPacket;
+	if (!Recv(sizeof(SPacketGCLoginKey), &kLoginKeyPacket))
 		return false;
 
 	m_dwLoginKey = kLoginKeyPacket.dwLoginKey;

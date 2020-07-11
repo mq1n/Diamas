@@ -783,17 +783,17 @@ CPythonSkill::CPythonSkill()
 #ifdef ENABLE_WOLFMAN_CHARACTER
 	m_SkillNeedWeaponIndexMap.emplace("CLAW", SKILL_NEED_WEAPON_CLAW);
 #endif
-	m_SkillWeaponTypeIndexMap.emplace("SWORD", CItemData::WEAPON_SWORD);
-	m_SkillWeaponTypeIndexMap.emplace("DAGGER", CItemData::WEAPON_DAGGER);
-	m_SkillWeaponTypeIndexMap.emplace("BOW", CItemData::WEAPON_BOW);
-	m_SkillWeaponTypeIndexMap.emplace("TWO_HANDED", CItemData::WEAPON_TWO_HANDED);
-	m_SkillWeaponTypeIndexMap.emplace("DOUBLE_SWORD", CItemData::WEAPON_DAGGER);
-	m_SkillWeaponTypeIndexMap.emplace("BELL", CItemData::WEAPON_BELL);
-	m_SkillWeaponTypeIndexMap.emplace("FAN", CItemData::WEAPON_FAN);
-	m_SkillWeaponTypeIndexMap.emplace("ARROW", CItemData::WEAPON_ARROW);
-	m_SkillWeaponTypeIndexMap.emplace("MOUNT_SPEAR", CItemData::WEAPON_MOUNT_SPEAR);
+	m_SkillWeaponTypeIndexMap.emplace("SWORD", WEAPON_SWORD);
+	m_SkillWeaponTypeIndexMap.emplace("DAGGER", WEAPON_DAGGER);
+	m_SkillWeaponTypeIndexMap.emplace("BOW", WEAPON_BOW);
+	m_SkillWeaponTypeIndexMap.emplace("TWO_HANDED", WEAPON_TWO_HANDED);
+	m_SkillWeaponTypeIndexMap.emplace("DOUBLE_SWORD", WEAPON_DAGGER);
+	m_SkillWeaponTypeIndexMap.emplace("BELL", WEAPON_BELL);
+	m_SkillWeaponTypeIndexMap.emplace("FAN", WEAPON_FAN);
+	m_SkillWeaponTypeIndexMap.emplace("ARROW", WEAPON_ARROW);
+	m_SkillWeaponTypeIndexMap.emplace("MOUNT_SPEAR", WEAPON_MOUNT_SPEAR);
 #ifdef ENABLE_WOLFMAN_CHARACTER
-	m_SkillWeaponTypeIndexMap.emplace("CLAW", CItemData::WEAPON_CLAW);
+	m_SkillWeaponTypeIndexMap.emplace("CLAW", WEAPON_CLAW);
 #endif
 	SSkillData::ms_StatusNameMap.emplace("chain", POINT_NONE);
 	SSkillData::ms_StatusNameMap.emplace("HR", POINT_HIT_RATE);

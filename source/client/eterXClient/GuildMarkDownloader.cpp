@@ -164,22 +164,22 @@ uint32_t CGuildMarkDownloader::__GetPacketSize(uint32_t header) const
 	switch (header)
 	{
 		case HEADER_GC_PHASE:
-			return sizeof(TPacketGCPhase);
+			return sizeof(SPacketGCPhase);
 		case HEADER_GC_HANDSHAKE:
-			return sizeof(TPacketGCHandshake);
+			return sizeof(SPacketHandshake);
 		case HEADER_GC_PING:
-			return sizeof(TPacketGCPing);
+			return sizeof(SPacketGCPing);
 		case HEADER_GC_MARK_IDXLIST:
-			return sizeof(TPacketGCMarkIDXList);
+			return sizeof(SPacketGCMarkIDXList);
 		case HEADER_GC_MARK_BLOCK:
-			return sizeof(TPacketGCMarkBlock);
+			return sizeof(SPacketGCMarkBlock);
 		case HEADER_GC_GUILD_SYMBOL_DATA:
-			return sizeof(TPacketGCGuildSymbolData);
+			return sizeof(SPacketGCGuildSymbolData);
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 		case HEADER_GC_KEY_AGREEMENT:
-			return sizeof(TPacketKeyAgreement);
+			return sizeof(SPacketKeyAgreement);
 		case HEADER_GC_KEY_AGREEMENT_COMPLETED:
-			return sizeof(TPacketKeyAgreementCompleted);
+			return sizeof(SPacketGCKeyAgreementCompleted);
 #endif
 	}
 	return 0;
@@ -214,13 +214,11 @@ bool CGuildMarkDownloader::__DispatchPacket(uint32_t header)
 
 bool CGuildMarkDownloader::__LoginState_RecvHandshake()
 {
-	TPacketGCHandshake kPacketHandshake;
+	SPacketHandshake kPacketHandshake;
 	if (!Recv(sizeof(kPacketHandshake), &kPacketHandshake))
 		return false;
 
-	TPacketCGMarkLogin kPacketMarkLogin;
-
-	kPacketMarkLogin.header = HEADER_CG_MARK_LOGIN;
+	SPacketCGMarkLogin kPacketMarkLogin;
 	kPacketMarkLogin.handle = m_dwHandle;
 	kPacketMarkLogin.random_key = m_dwRandomKey;
 
@@ -232,15 +230,13 @@ bool CGuildMarkDownloader::__LoginState_RecvHandshake()
 
 bool CGuildMarkDownloader::__LoginState_RecvPing()
 {
-	TPacketGCPing kPacketPing;
+	SPacketGCPing kPacketPing;
 
 	if (!Recv(sizeof(kPacketPing), &kPacketPing))
 		return false;
 
-	TPacketCGPong kPacketPong;
-	kPacketPong.bHeader = HEADER_CG_PONG;
-
-	if (!Send(sizeof(TPacketCGPong), &kPacketPong))
+	SPacketCGPong kPacketPong;
+	if (!Send(sizeof(SPacketCGPong), &kPacketPong))
 		return false;
 
 	return true;
@@ -248,7 +244,7 @@ bool CGuildMarkDownloader::__LoginState_RecvPing()
 
 bool CGuildMarkDownloader::__LoginState_RecvPhase()
 {
-	TPacketGCPhase kPacketPhase;
+	SPacketGCPhase kPacketPhase;
 
 	if (!Recv(sizeof(kPacketPhase), &kPacketPhase))
 		return false;
@@ -291,8 +287,7 @@ bool CGuildMarkDownloader::__LoginState_RecvPhase()
 // MARK_BUG_FIX
 bool CGuildMarkDownloader::__SendMarkIDXList()
 {
-	TPacketCGMarkIDXList kPacketMarkIDXList;
-	kPacketMarkIDXList.header = HEADER_CG_MARK_IDXLIST;
+	SPacketCGMarkIDXList kPacketMarkIDXList;
 	if (!Send(sizeof(kPacketMarkIDXList), &kPacketMarkIDXList))
 		return false;
 
@@ -301,7 +296,7 @@ bool CGuildMarkDownloader::__SendMarkIDXList()
 
 bool CGuildMarkDownloader::__LoginState_RecvMarkIndex()
 {
-	TPacketGCMarkIDXList kPacketMarkIndex;
+	SPacketGCMarkIDXList kPacketMarkIndex;
 
 	if (!Peek(sizeof(kPacketMarkIndex), &kPacketMarkIndex))
 		return false;
@@ -334,13 +329,12 @@ bool CGuildMarkDownloader::__LoginState_RecvMarkIndex()
 
 bool CGuildMarkDownloader::__SendMarkCRCList()
 {
-	TPacketCGMarkCRCList kPacketMarkCRCList;
+	SPacketCGMarkCRCList kPacketMarkCRCList;
 
 	if (!CGuildMarkManager::Instance().GetBlockCRCList(m_currentRequestingImageIndex, kPacketMarkCRCList.crclist))
 		__CompleteMarkState_Set();
 	else
 	{
-		kPacketMarkCRCList.header = HEADER_CG_MARK_CRCLIST;
 		kPacketMarkCRCList.imgIdx = m_currentRequestingImageIndex;
 		++m_currentRequestingImageIndex;
 
@@ -352,7 +346,7 @@ bool CGuildMarkDownloader::__SendMarkCRCList()
 
 bool CGuildMarkDownloader::__LoginState_RecvMarkBlock()
 {
-	TPacketGCMarkBlock kPacket;
+	SPacketGCMarkBlock kPacket;
 
 	if (!Peek(sizeof(kPacket), &kPacket))
 		return false;
@@ -416,14 +410,14 @@ bool CGuildMarkDownloader::__LoginState_RecvMarkBlock()
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 bool CGuildMarkDownloader::__LoginState_RecvKeyAgreement()
 {
-	TPacketKeyAgreement packet;
+	SPacketKeyAgreement packet;
 	if (!Recv(sizeof(packet), &packet))
 		return false;
 
 	Tracenf("KEY_AGREEMENT RECV %u", packet.wDataLength);
 
-	TPacketKeyAgreement packetToSend;
-	size_t dataLength = TPacketKeyAgreement::MAX_DATA_LEN;
+	SPacketKeyAgreement packetToSend;
+	size_t dataLength = SPacketKeyAgreement::MAX_DATA_LEN;
 	size_t agreedLength = Prepare(packetToSend.data, &dataLength);
 	if (agreedLength == 0)
 	{
@@ -431,12 +425,11 @@ bool CGuildMarkDownloader::__LoginState_RecvKeyAgreement()
 		Disconnect();
 		return false;
 	}
-	assert(dataLength <= TPacketKeyAgreement::MAX_DATA_LEN);
+	assert(dataLength <= SPacketKeyAgreement::MAX_DATA_LEN);
 
 	if (Activate(packet.wAgreedLength, packet.data, packet.wDataLength))
 	{
 		// Key agreement 성공, 응답 전송
-		packetToSend.bHeader = HEADER_CG_KEY_AGREEMENT;
 		packetToSend.wAgreedLength = static_cast<uint16_t>(agreedLength);
 		packetToSend.wDataLength = static_cast<uint16_t>(dataLength);
 
@@ -458,7 +451,7 @@ bool CGuildMarkDownloader::__LoginState_RecvKeyAgreement()
 
 bool CGuildMarkDownloader::__LoginState_RecvKeyAgreementCompleted()
 {
-	TPacketKeyAgreementCompleted packet;
+	SPacketGCKeyAgreementCompleted packet;
 	if (!Recv(sizeof(packet), &packet))
 		return false;
 
@@ -481,8 +474,7 @@ bool CGuildMarkDownloader::__SendSymbolCRCList()
 
 	for (auto guildID : m_kSet_dwGuildID)
 	{
-		TPacketCGSymbolCRC kSymbolCRCPacket;
-		kSymbolCRCPacket.header = HEADER_CG_GUILD_SYMBOL_CRC;
+		SPacketCGGuildSymbolCRC kSymbolCRCPacket;
 		kSymbolCRCPacket.dwGuildID = guildID;
 		kSymbolCRCPacket.isLastEntry = (m_dwSymbolLastGuildID == guildID) ? 1 : 0;
 
@@ -505,8 +497,8 @@ bool CGuildMarkDownloader::__SendSymbolCRCList()
 bool CGuildMarkDownloader::__LoginState_RecvSymbolData()
 {
 	//Lets peek the size of the packet and find out if it is too big for our receive buffer
-	TPacketGCBlankDynamic packet;
-	if (!Peek(sizeof(TPacketGCBlankDynamic), &packet))
+	SDynamicSizePacketHeader packet;
+	if (!Peek(sizeof(packet), &packet))
 		return false;
 
 #ifdef _DEBUG
@@ -517,7 +509,7 @@ bool CGuildMarkDownloader::__LoginState_RecvSymbolData()
 
 	//////////////////////////////////////////////////////////////
 
-	TPacketGCGuildSymbolData kPacketSymbolData;
+	SPacketGCGuildSymbolData kPacketSymbolData;
 	if (!Recv(sizeof(kPacketSymbolData), &kPacketSymbolData))
 		return false;
 

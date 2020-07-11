@@ -24,7 +24,7 @@ void CPythonNetworkStream::HandShakePhase()
 
 		case HEADER_GC_HANDSHAKE:
 			{
-				if (!Recv(sizeof(TPacketGCHandshake), &m_HandshakeData))
+				if (!Recv(sizeof(SPacketHandshake), &m_HandshakeData))
 					return;
 
 				Tracenf("HANDSHAKE RECV %u %d", m_HandshakeData.dwTime, m_HandshakeData.lDelta);
@@ -39,7 +39,7 @@ void CPythonNetworkStream::HandShakePhase()
 
 				Tracenf("HANDSHAKE SEND %u", m_HandshakeData.dwTime);
 
-				if (!Send(sizeof(TPacketGCHandshake), &m_HandshakeData))
+				if (!Send(sizeof(SPacketHandshake), &m_HandshakeData))
 				{
 					assert(!"Failed Sending Handshake");
 					return;
@@ -95,8 +95,8 @@ void CPythonNetworkStream::SetHandShakePhase()
 
 bool CPythonNetworkStream::RecvHandshakePacket()
 {
-	TPacketGCHandshake kHandshakeData;
-	if (!Recv(sizeof(TPacketGCHandshake), &kHandshakeData))
+	SPacketHandshake kHandshakeData;
+	if (!Recv(sizeof(SPacketHandshake), &kHandshakeData))
 		return false;
 
 	Tracenf("HANDSHAKE RECV %u %d", kHandshakeData.dwTime, kHandshakeData.lDelta);
@@ -108,9 +108,7 @@ bool CPythonNetworkStream::RecvHandshakePacket()
 	kHandshakeData.lDelta = 0;
 
 	Tracenf("HANDSHAKE SEND %u", kHandshakeData.dwTime);
-
-	kHandshakeData.header = HEADER_CG_TIME_SYNC;
-	if (!Send(sizeof(TPacketGCHandshake), &kHandshakeData))
+	if (!Send(sizeof(SPacketHandshake), &kHandshakeData))
 	{
 		assert(!"Failed Sending Handshake");
 		return false;
@@ -120,8 +118,8 @@ bool CPythonNetworkStream::RecvHandshakePacket()
 
 bool CPythonNetworkStream::RecvHandshakeOKPacket()
 {
-	TPacketGCBlank kBlankPacket;
-	if (!Recv(sizeof(TPacketGCBlank), &kBlankPacket))
+	SPacketGCHandshakeOK packet;
+	if (!Recv(sizeof(packet), &packet))
 		return false;
 
 	uint32_t dwDelta=ELTimer_GetMSec()-m_kServerTimeSync.m_dwChangeClientTime;
@@ -135,14 +133,14 @@ bool CPythonNetworkStream::RecvHandshakeOKPacket()
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 bool CPythonNetworkStream::RecvKeyAgreementPacket()
 {
-	TPacketKeyAgreement packet;
+	SPacketKeyAgreement packet;
 	if (!Recv(sizeof(packet), &packet))
 		return false;
 
 	Tracenf("KEY_AGREEMENT RECV %u", packet.wDataLength);
 
-	TPacketKeyAgreement packetToSend;
-	size_t dataLength = TPacketKeyAgreement::MAX_DATA_LEN;
+	SPacketKeyAgreement packetToSend;
+	size_t dataLength = SPacketKeyAgreement::MAX_DATA_LEN;
 	size_t agreedLength = Prepare(packetToSend.data, &dataLength);
 	if (agreedLength == 0)
 	{
@@ -150,12 +148,11 @@ bool CPythonNetworkStream::RecvKeyAgreementPacket()
 		Disconnect();
 		return false;
 	}
-	assert(dataLength <= TPacketKeyAgreement::MAX_DATA_LEN);
+	assert(dataLength <= SPacketKeyAgreement::MAX_DATA_LEN);
 
 	if (Activate(packet.wAgreedLength, packet.data, packet.wDataLength))
 	{
 		// Key agreement 성공, 응답 전송
-		packetToSend.bHeader = HEADER_CG_KEY_AGREEMENT;
 		packetToSend.wAgreedLength = static_cast<uint16_t>(agreedLength);
 		packetToSend.wDataLength = static_cast<uint16_t>(dataLength);
 
@@ -177,7 +174,7 @@ bool CPythonNetworkStream::RecvKeyAgreementPacket()
 
 bool CPythonNetworkStream::RecvKeyAgreementCompletedPacket()
 {
-	TPacketKeyAgreementCompleted packet;
+	SPacketGCKeyAgreementCompleted packet;
 	if (!Recv(sizeof(packet), &packet))
 		return false;
 

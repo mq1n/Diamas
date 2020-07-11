@@ -1087,7 +1087,7 @@ namespace quest
 
 				if (ch && ch->IsPC() && ch->GetDesc()) 
 				{
-					packet_script packet_script;
+					SPacketGCScript packet_script;
 					TEMP_BUFFER buf;
 
 					for (const auto& it : *item_group) 
@@ -1097,9 +1097,9 @@ namespace quest
 							packet_script.header = HEADER_GC_SCRIPT;
 							packet_script.skin = quest::CQuestManager::QUEST_SKIN_NORMAL;
 							packet_script.src_size = static_cast<uint16_t>(can_enter_ment.size());
-							packet_script.size = packet_script.src_size + sizeof(struct packet_script);
+							packet_script.size = packet_script.src_size + sizeof(SPacketGCScript);
 
-							buf.write(&packet_script, sizeof(struct packet_script));
+							buf.write(&packet_script, sizeof(SPacketGCScript));
 							buf.write(&can_enter_ment[0], can_enter_ment.size());
 							ch->GetDesc()->Packet(buf.read_peek(), buf.size());
 							return;
@@ -1109,9 +1109,9 @@ namespace quest
 					packet_script.header = HEADER_GC_SCRIPT;
 					packet_script.skin = quest::CQuestManager::QUEST_SKIN_NORMAL;
 					packet_script.src_size = static_cast<uint16_t>(cant_enter_ment.size());
-					packet_script.size = packet_script.src_size + sizeof(struct packet_script);
+					packet_script.size = packet_script.src_size + sizeof(SPacketGCScript);
 
-					buf.write(&packet_script, sizeof(struct packet_script));
+					buf.write(&packet_script, sizeof(SPacketGCScript));
 					buf.write(&cant_enter_ment[0], cant_enter_ment.size());
 					ch->GetDesc()->Packet(buf.read_peek(), buf.size());
 				}

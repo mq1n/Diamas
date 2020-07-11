@@ -49,7 +49,7 @@ void __SetWeaponPower(IAbstractPlayer& rkPlayer, uint32_t dwWeaponID)
 	CItemData* pkWeapon;
 	if (CItemManager::Instance().GetItemDataPointer(dwWeaponID, &pkWeapon))
 	{
-		if (pkWeapon->GetType()==CItemData::ITEM_TYPE_WEAPON)
+		if (pkWeapon->GetType()==ITEM_TYPE_WEAPON)
 		{
 			minPower=pkWeapon->GetValue(3);
 			maxPower=pkWeapon->GetValue(4);
@@ -58,7 +58,7 @@ void __SetWeaponPower(IAbstractPlayer& rkPlayer, uint32_t dwWeaponID)
 			addPower=pkWeapon->GetValue(5);
 		}
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
-		else if (pkWeapon->GetType()==CItemData::ITEM_TYPE_COSTUME && pkWeapon->GetSubType()==CItemData::COSTUME_WEAPON)
+		else if (pkWeapon->GetType()==ITEM_TYPE_COSTUME && pkWeapon->GetSubType()==COSTUME_WEAPON)
 		{
 			CItemData* pkRealWeapon;
 			if (CItemManager::Instance().GetItemDataPointer(CPythonPlayer::Instance().GetItemIndex(TItemPos(INVENTORY, c_Equipment_Weapon)), &pkRealWeapon))
@@ -96,7 +96,7 @@ static SNetworkActorData s_kNetActorData;
 
 bool CPythonNetworkStream::RecvCharacterAppendPacket()
 {
-	TPacketGCCharacterAdd chrAddPacket;
+	SPacketGCCharacterAdd chrAddPacket;
 	if (!Recv(sizeof(chrAddPacket), &chrAddPacket))
 		return false;
 
@@ -152,7 +152,7 @@ bool CPythonNetworkStream::RecvCharacterAppendPacket()
 
 bool CPythonNetworkStream::RecvCharacterAdditionalInfo()
 {
-	TPacketGCCharacterAdditionalInfo chrInfoPacket;
+	SPacketGCCharacterAdditionalInfo chrInfoPacket;
 	if (!Recv(sizeof(chrInfoPacket), &chrInfoPacket))
 		return false;
 
@@ -182,14 +182,14 @@ bool CPythonNetworkStream::RecvCharacterAdditionalInfo()
 	}
 	else
 	{
-		TraceError("TPacketGCCharacterAdditionalInfo name=%s vid=%d race=%d Error",chrInfoPacket.name,chrInfoPacket.dwVID,kNetActorData.m_dwRace);
+		TraceError("SPacketGCCharacterAdditionalInfo name=%s vid=%d race=%d Error",chrInfoPacket.name,chrInfoPacket.dwVID,kNetActorData.m_dwRace);
 	}
 	return true;
 }
 
 bool CPythonNetworkStream::RecvCharacterUpdatePacket()
 {
-	TPacketGCCharacterUpdate chrUpdatePacket;
+	SPacketGCCharacterUpdate chrUpdatePacket;
 	if (!Recv(sizeof(chrUpdatePacket), &chrUpdatePacket))
 		return false;
 
@@ -282,7 +282,7 @@ void CPythonNetworkStream::__RecvCharacterUpdatePacket(SNetworkUpdateActorData *
 
 bool CPythonNetworkStream::RecvCharacterDeletePacket()
 {
-	TPacketGCCharacterDelete chrDelPacket;
+	SPacketGCCharacterDelete chrDelPacket;
 
 	if (!Recv(sizeof(chrDelPacket), &chrDelPacket))
 	{
@@ -305,8 +305,8 @@ bool CPythonNetworkStream::RecvCharacterDeletePacket()
 
 bool CPythonNetworkStream::RecvCharacterMovePacket()
 {
-	TPacketGCMove kMovePacket;
-	if (!Recv(sizeof(TPacketGCMove), &kMovePacket))
+	SPacketGCMove kMovePacket;
+	if (!Recv(sizeof(SPacketGCMove), &kMovePacket))
 	{
 		Tracen("CPythonNetworkStream::RecvCharacterMovePacket - PACKET READ ERROR");
 		return false;
@@ -331,7 +331,7 @@ bool CPythonNetworkStream::RecvCharacterMovePacket()
 
 bool CPythonNetworkStream::RecvOwnerShipPacket()
 {
-	TPacketGCOwnership kPacketOwnership;
+	SPacketGCOwnership kPacketOwnership;
 
 	if (!Recv(sizeof(kPacketOwnership), &kPacketOwnership))
 		return false;
@@ -343,16 +343,16 @@ bool CPythonNetworkStream::RecvOwnerShipPacket()
 
 bool CPythonNetworkStream::RecvSyncPositionPacket()
 {
-	TPacketGCSyncPosition kPacketSyncPos;
+	SPacketGCSyncPosition kPacketSyncPos;
 	if (!Recv(sizeof(kPacketSyncPos), &kPacketSyncPos))
 		return false;
 
-	TPacketGCSyncPositionElement kSyncPos;
+	SPacketSyncPositionElement kSyncPos;
 
 	uint32_t uSyncPosCount=(kPacketSyncPos.wSize-sizeof(kPacketSyncPos))/sizeof(kSyncPos);
 	for (uint32_t iSyncPos=0; iSyncPos<uSyncPosCount; ++iSyncPos)
 	{		
-		if (!Recv(sizeof(TPacketGCSyncPositionElement), &kSyncPos))
+		if (!Recv(sizeof(kSyncPos), &kSyncPos))
 			return false;
 
 		//Tracenf("CPythonNetworkStream::RecvSyncPositionPacket %d (%d, %d)", kSyncPos.dwVID, kSyncPos.lX, kSyncPos.lY);
@@ -378,7 +378,7 @@ bool CPythonNetworkStream::RecvSyncPositionPacket()
 /*
 bool CPythonNetworkStream::RecvCharacterAppendPacket()
 {
-	TPacketGCCharacterAdd chrAddPacket;
+	SPacketGCCharacterAdd chrAddPacket;
 
 	if (!Recv(sizeof(chrAddPacket), &chrAddPacket))
 		return false;

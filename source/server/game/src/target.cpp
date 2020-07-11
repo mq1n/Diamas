@@ -12,38 +12,38 @@
 /////////////////////////////////////////////////////////////////////
 // Packet
 /////////////////////////////////////////////////////////////////////
-void SendTargetCreatePacket(LPDESC d, TargetInfo * info)
+void SendTargetCreatePacket(LPDESC d, TargetInfo* info)
 {
-if (!info->bSendToClient)
-return;
+	if (!info->bSendToClient)
+		return;
 
-TPacketGCTargetCreate pck;
+	SPacketGCTargetCreate pck;
 
-pck.bHeader = HEADER_GC_TARGET_CREATE;
-pck.lID = info->iID;
-pck.bType = info->iType;
-pck.dwVID = info->iArg1;
-strlcpy(pck.szName, info->szTargetDesc, sizeof(pck.szName));
-d->Packet(&pck, sizeof(TPacketGCTargetCreate));
+	pck.header = HEADER_GC_TARGET_CREATE;
+	pck.lID = info->iID;
+	pck.byType = info->iType;
+	pck.dwVID = info->iArg1;
+	strlcpy(pck.szTargetName, info->szTargetDesc, sizeof(pck.szTargetName));
+	d->Packet(&pck, sizeof(SPacketGCTargetCreate));
 }
 
 void SendTargetUpdatePacket(LPDESC d, int32_t iID, int32_t x, int32_t y)
 {
-TPacketGCTargetUpdate pck;
-pck.bHeader = HEADER_GC_TARGET_UPDATE;
-pck.lID = iID;
-pck.lX = x;
-pck.lY = y;
-d->Packet(&pck, sizeof(TPacketGCTargetUpdate));
-sys_log(0, "SendTargetUpdatePacket %d %dx%d", iID, x, y);
+	SPacketGCTargetUpdate pck;
+	pck.header = HEADER_GC_TARGET_UPDATE;
+	pck.lID = iID;
+	pck.lX = x;
+	pck.lY = y;
+	d->Packet(&pck, sizeof(SPacketGCTargetUpdate));
+	sys_log(0, "SendTargetUpdatePacket %d %dx%d", iID, x, y);
 }
 
 void SendTargetDeletePacket(LPDESC d, int32_t iID)
 {
-TPacketGCTargetDelete pck;
-pck.bHeader = HEADER_GC_TARGET_DELETE;
-pck.lID = iID;
-d->Packet(&pck, sizeof(TPacketGCTargetDelete));
+	SPacketGCTargetDelete pck;
+	pck.header = HEADER_GC_TARGET_DELETE;
+	pck.lID = iID;
+	d->Packet(&pck, sizeof(SPacketGCTargetDelete));
 }
 /////////////////////////////////////////////////////////////////////
 CTargetManager::CTargetManager() : m_iID(0)
@@ -56,16 +56,16 @@ CTargetManager::~CTargetManager()
 
 EVENTFUNC(target_event)
 {
-	TargetInfo * info = dynamic_cast<TargetInfo *>( event->info );
+	TargetInfo* info = dynamic_cast<TargetInfo*>(event->info);
 
-	if ( info == nullptr )
+	if (info == nullptr)
 	{
-		sys_err( "target_event> <Factor> Null pointer" );
+		sys_err("target_event> <Factor> Null pointer");
 		return 0;
 	}
 
-// <Factor> Raplaced direct pointer reference with key searching.
-	//LPCHARACTER pkChr = info->pkChr;
+	// <Factor> Raplaced direct pointer reference with key searching.
+		//LPCHARACTER pkChr = info->pkChr;
 	LPCHARACTER pkChr = CHARACTER_MANAGER::instance().FindByPID(info->dwPID);
 	if (pkChr == nullptr) {
 		return 0; // <Factor> need to be confirmed
@@ -79,24 +79,24 @@ EVENTFUNC(target_event)
 
 	switch (info->iType)
 	{
-		case TARGET_TYPE_POS:
-			x = info->iArg1;
-			y = info->iArg2;
+	case TARGET_TYPE_POS:
+		x = info->iArg1;
+		y = info->iArg2;
+		iDist = DISTANCE_APPROX(pkChr->GetX() - x, pkChr->GetY() - y);
+		break;
+
+	case TARGET_TYPE_VID:
+	{
+		tch = CHARACTER_MANAGER::instance().Find(info->iArg1);
+
+		if (tch && tch->GetMapIndex() == pkChr->GetMapIndex())
+		{
+			x = tch->GetX();
+			y = tch->GetY();
 			iDist = DISTANCE_APPROX(pkChr->GetX() - x, pkChr->GetY() - y);
-			break;
-
-		case TARGET_TYPE_VID:
-			{
-				tch = CHARACTER_MANAGER::instance().Find(info->iArg1);
-
-				if (tch && tch->GetMapIndex() == pkChr->GetMapIndex())
-				{
-					x = tch->GetX();
-					y = tch->GetY();
-					iDist = DISTANCE_APPROX(pkChr->GetX() - x, pkChr->GetY() - y);
-				}
-			}
-			break;
+		}
+	}
+	break;
 	}
 
 	bool bRet = true;
@@ -132,17 +132,17 @@ EVENTFUNC(target_event)
 }
 
 void CTargetManager::CreateTarget(uint32_t dwPID,
-		uint32_t dwQuestIndex,
-		const char * c_pszTargetName,
-		int32_t iType,
-		int32_t iArg1,
-		int32_t iArg2,
-		int32_t iMapIndex,
-		const char * c_pszTargetDesc, 
-		int32_t iSendFlag)
+	uint32_t dwQuestIndex,
+	const char* c_pszTargetName,
+	int32_t iType,
+	int32_t iArg1,
+	int32_t iArg2,
+	int32_t iMapIndex,
+	const char* c_pszTargetDesc,
+	int32_t iSendFlag)
 {
 	sys_log(0, "CreateTarget : target pid %u quest %u name %s arg %d %d %d",
-			dwPID, dwQuestIndex, c_pszTargetName, iType, iArg1, iArg2);
+		dwPID, dwQuestIndex, c_pszTargetName, iType, iArg1, iArg2);
 
 	LPCHARACTER pkChr = CHARACTER_MANAGER::instance().FindByPID(dwPID);
 
@@ -237,7 +237,7 @@ void CTargetManager::CreateTarget(uint32_t dwPID,
 	}
 }
 
-void CTargetManager::DeleteTarget(uint32_t dwPID, uint32_t dwQuestIndex, const char * c_pszTargetName)
+void CTargetManager::DeleteTarget(uint32_t dwPID, uint32_t dwQuestIndex, const char* c_pszTargetName)
 {
 	auto it = m_map_kListEvent.find(dwPID);
 
@@ -249,11 +249,11 @@ void CTargetManager::DeleteTarget(uint32_t dwPID, uint32_t dwQuestIndex, const c
 	while (it2 != it->second.end())
 	{
 		LPEVENT pkEvent = *it2;
-		TargetInfo * info = dynamic_cast<TargetInfo*>(pkEvent->info);
+		TargetInfo* info = dynamic_cast<TargetInfo*>(pkEvent->info);
 
-		if ( info == nullptr )
+		if (info == nullptr)
 		{
-			sys_err( "CTargetManager::DeleteTarget> <Factor> Null pointer" );
+			sys_err("CTargetManager::DeleteTarget> <Factor> Null pointer");
 			++it2;
 			continue;
 		}
@@ -281,7 +281,7 @@ void CTargetManager::DeleteTarget(uint32_t dwPID, uint32_t dwQuestIndex, const c
 	}
 }
 
-LPEVENT CTargetManager::GetTargetEvent(uint32_t dwPID, uint32_t dwQuestIndex, const char * c_pszTargetName)
+LPEVENT CTargetManager::GetTargetEvent(uint32_t dwPID, uint32_t dwQuestIndex, const char* c_pszTargetName)
 {
 	auto it = m_map_kListEvent.find(dwPID);
 
@@ -293,11 +293,11 @@ LPEVENT CTargetManager::GetTargetEvent(uint32_t dwPID, uint32_t dwQuestIndex, co
 	while (it2 != it->second.end())
 	{
 		LPEVENT pkEvent = *(it2++);
-		TargetInfo * info = dynamic_cast<TargetInfo*>(pkEvent->info);
+		TargetInfo* info = dynamic_cast<TargetInfo*>(pkEvent->info);
 
-		if ( info == nullptr )
+		if (info == nullptr)
 		{
-			sys_err( "CTargetManager::GetTargetEvent> <Factor> Null pointer" );
+			sys_err("CTargetManager::GetTargetEvent> <Factor> Null pointer");
 
 			continue;
 		}
@@ -314,7 +314,7 @@ LPEVENT CTargetManager::GetTargetEvent(uint32_t dwPID, uint32_t dwQuestIndex, co
 	return nullptr;
 }
 
-TargetInfo * CTargetManager::GetTargetInfo(uint32_t dwPID, int32_t iType, int32_t iArg1)
+TargetInfo* CTargetManager::GetTargetInfo(uint32_t dwPID, int32_t iType, int32_t iArg1)
 {
 	auto it = m_map_kListEvent.find(dwPID);
 
@@ -326,11 +326,11 @@ TargetInfo * CTargetManager::GetTargetInfo(uint32_t dwPID, int32_t iType, int32_
 	while (it2 != it->second.end())
 	{
 		LPEVENT pkEvent = *(it2++);
-		TargetInfo * info = dynamic_cast<TargetInfo*>(pkEvent->info);
+		TargetInfo* info = dynamic_cast<TargetInfo*>(pkEvent->info);
 
-		if ( info == nullptr )
+		if (info == nullptr)
 		{
-			sys_err( "CTargetManager::GetTargetInfo> <Factor> Null pointer" );
+			sys_err("CTargetManager::GetTargetInfo> <Factor> Null pointer");
 
 			continue;
 		}

@@ -1122,14 +1122,14 @@ namespace quest
 		Script += "[ENTER]";
 		Script += "[DONE]";
 		
-		packet_script packet_script;
+		SPacketGCScript packet_script;
 		packet_script.header = HEADER_GC_SCRIPT;
 		packet_script.skin = CQuestManager::QUEST_SKIN_NORMAL;
 		packet_script.src_size = static_cast<uint16_t>(Script.size());
-		packet_script.size = packet_script.src_size + sizeof(struct packet_script);
+		packet_script.size = packet_script.src_size + sizeof(SPacketGCScript);
 
 		FSendPacket f;
-		f.buf.write(&packet_script, sizeof(struct packet_script));
+		f.buf.write(&packet_script, sizeof(SPacketGCScript));
 		f.buf.write(&Script[0], Script.size());
 
 		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap( iMapIndex );

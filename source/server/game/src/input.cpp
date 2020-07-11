@@ -66,7 +66,7 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int32_t iByt
 
 		if (bHeader)
 		{
-			if (g_bIsTestServer && bHeader != HEADER_CG_MOVE)
+			if (g_bIsTestServer && bHeader != HEADER_CG_CHARACTER_MOVE)
 				sys_log(0, "Packet Analyze [Header %d][bufferLeft %d] ", bHeader, m_iBufferLeft);
 
 			m_pPacketInfo->Start();
@@ -105,7 +105,7 @@ void CInputProcessor::Pong(LPDESC d)
 
 void CInputProcessor::Handshake(LPDESC d, const char * c_pData)
 {
-	TPacketCGHandshake * p = (TPacketCGHandshake *) c_pData;
+	const auto p = reinterpret_cast<const SPacketHandshake*>(c_pData);
 
 	if (d->GetHandshake() != p->dwHandshake)
 	{
@@ -138,7 +138,7 @@ void LoginFailure(LPDESC d, const char * c_pszStatus)
 	if (!d)
 		return;
 
-	TPacketGCLoginFailure failurePacket;
+	SPacketGCLoginFailure failurePacket;
 
 	failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 	strlcpy(failurePacket.szStatus, c_pszStatus, sizeof(failurePacket.szStatus));
@@ -213,7 +213,7 @@ int32_t CInputHandshake::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData
 		// Flush socket output before going encrypted
 		d->ProcessOutput();
 
-		TPacketKeyAgreement* p = (TPacketKeyAgreement*)c_pData;
+		const auto p = reinterpret_cast<const SPacketKeyAgreement*>(c_pData);
 		if (!d->IsCipherPrepared())
 		{
 			sys_err ("Cipher isn't prepared. %s maybe a Hacker.", inet_ntoa(d->GetAddr().sin_addr));

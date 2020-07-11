@@ -295,16 +295,16 @@ EVENTFUNC(ready_to_start_event)
 				chA->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련이 시작되었습니다."));
 				chB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련이 시작되었습니다."));
 
-				TPacketGCDuelStart duelStart;
+				SPacketGCDuelStart duelStart;
 				duelStart.header = HEADER_GC_DUEL_START;
-				duelStart.wSize = sizeof(TPacketGCDuelStart) + 4;
+				duelStart.wSize = sizeof(SPacketGCDuelStart) + 4;
 
 				uint32_t dwOppList[8]; // 최대 파티원 8명 이므로..
 
 				dwOppList[0] = (uint32_t)chB->GetVID();
 				TEMP_BUFFER buf;
 
-				buf.write(&duelStart, sizeof(TPacketGCDuelStart));
+				buf.write(&duelStart, sizeof(SPacketGCDuelStart));
 				buf.write(&dwOppList[0], 4);
 				chA->GetDesc()->Packet(buf.read_peek(), buf.size());
 
@@ -312,7 +312,7 @@ EVENTFUNC(ready_to_start_event)
 				dwOppList[0] = (uint32_t)chA->GetVID();
 				TEMP_BUFFER buf2;
 
-				buf2.write(&duelStart, sizeof(TPacketGCDuelStart));
+				buf2.write(&duelStart, sizeof(SPacketGCDuelStart));
 				buf2.write(&dwOppList[0], 4);
 				chB->GetDesc()->Packet(buf2.read_peek(), buf2.size());
 
@@ -349,17 +349,17 @@ EVENTFUNC(ready_to_start_event)
 				TEMP_BUFFER buf;
 				TEMP_BUFFER buf2;
 				uint32_t dwOppList[8]; // 최대 파티원 8명 이므로..
-				TPacketGCDuelStart duelStart;
+				SPacketGCDuelStart duelStart;
 				duelStart.header = HEADER_GC_DUEL_START;
-				duelStart.wSize = sizeof(TPacketGCDuelStart) + 4;
+				duelStart.wSize = sizeof(SPacketGCDuelStart) + 4;
 
 				dwOppList[0] = static_cast<uint32_t>(chB->GetVID());
-				buf.write(&duelStart, sizeof(TPacketGCDuelStart));
+				buf.write(&duelStart, sizeof(SPacketGCDuelStart));
 				buf.write(&dwOppList[0], 4);
 				chA->GetDesc()->Packet(buf.read_peek(), buf.size());
 
 				dwOppList[0] = static_cast<uint32_t>(chA->GetVID());
-				buf2.write(&duelStart, sizeof(TPacketGCDuelStart));
+				buf2.write(&duelStart, sizeof(SPacketGCDuelStart));
 				buf2.write(&dwOppList[0], 4);
 				chB->GetDesc()->Packet(buf2.read_peek(), buf2.size());
 
@@ -435,25 +435,27 @@ EVENTFUNC(duel_time_out)
 		switch (info->state)
 		{
 			case 0:
+			{
 				chA->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("대련 시간 초과로 대련을 중단합니다."));
 				chA->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("10초뒤 마을로 이동합니다."));
 
 				chB->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("대련 시간 초과로 대련을 중단합니다."));
 				chB->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("10초뒤 마을로 이동합니다."));
 
-				TPacketGCDuelStart duelStart;
+				SPacketGCDuelStart duelStart;
 				duelStart.header = HEADER_GC_DUEL_START;
-				duelStart.wSize = sizeof(TPacketGCDuelStart);
-
-				chA->GetDesc()->Packet(&duelStart, sizeof(TPacketGCDuelStart));
-				chA->GetDesc()->Packet(&duelStart, sizeof(TPacketGCDuelStart));
+				duelStart.wSize = sizeof(SPacketGCDuelStart);
+				if (chA->GetDesc())
+					chA->GetDesc()->Packet(&duelStart, sizeof(SPacketGCDuelStart));
+				if (chB->GetDesc())
+					chB->GetDesc()->Packet(&duelStart, sizeof(SPacketGCDuelStart));
 
 				info->state++;
 
 				sys_log(0, "ARENA: Because of time over, duel is end. PIDA(%u) vs PIDB(%u)", pArena->GetPlayerAPID(), pArena->GetPlayerBPID());
 
 				return PASSES_PER_SEC(10);
-				break;
+			} break;
 
 			case 1:
 				pArena->EndDuel();

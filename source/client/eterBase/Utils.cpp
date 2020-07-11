@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <sys/stat.h>
 #include "Utils.h"
-#include "filedir.h"
+#include "FileDir.h"
 
 char ascii_tolower(const char c);
 

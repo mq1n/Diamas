@@ -6,22 +6,6 @@
 
 struct SQLMsg;
 
-enum
-{
-	GUILD_GRADE_NAME_MAX_LEN = 8,
-	GUILD_GRADE_COUNT = 15,
-	GUILD_COMMENT_MAX_COUNT = 12,
-	GUILD_COMMENT_MAX_LEN = 50,
-	GUILD_LEADER_GRADE = 1,
-	GUILD_BASE_POWER = 400,
-	GUILD_POWER_PER_SKILL_LEVEL = 200,
-	GUILD_POWER_PER_LEVEL = 100,
-	GUILD_MINIMUM_LEADERSHIP = 40, 
-	GUILD_WAR_MIN_MEMBER_COUNT = 8,
-	GUILD_LADDER_POINT_PER_LEVEL = 1000,
-	GUILD_CREATE_ITEM_VNUM = 70101,
-};
-
 struct SGuildMaster
 {
 	uint32_t pid;
@@ -58,19 +42,6 @@ typedef struct SGuildMemberPacketData
 	char name[CHARACTER_NAME_MAX_LEN+1];
 } TGuildMemberPacketData;
 
-typedef struct packet_guild_sub_info
-{
-	uint16_t member_count;
-	uint16_t max_member_count;
-	uint32_t guild_id;
-	uint32_t master_pid;
-	uint32_t exp;
-	uint8_t level;
-	char name[GUILD_NAME_MAX_LEN+1];
-	uint32_t gold;
-	uint8_t has_land;
-} TPacketGCGuildInfo;
-
 typedef struct SGuildGrade
 {
 	char grade_name[GUILD_GRADE_NAME_MAX_LEN+1]; // 8+1 길드장, 길드원 등의 이름
@@ -89,14 +60,6 @@ struct TOneGradeAuthPacket
 	uint8_t auth;
 };
 #pragma pack()
-
-enum
-{
-	GUILD_AUTH_ADD_MEMBER	= (1 << 0),
-	GUILD_AUTH_REMOVE_MEMBER	= (1 << 1),
-	GUILD_AUTH_NOTICE		= (1 << 2),
-	GUILD_AUTH_USE_SKILL	= (1 << 3),
-};
 
 typedef struct SGuildData
 {

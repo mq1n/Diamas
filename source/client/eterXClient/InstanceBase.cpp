@@ -2843,7 +2843,7 @@ uint32_t CInstanceBase::GetWeaponType()
 	uint32_t dwWeapon = GetPart(CRaceData::PART_WEAPON);
 	CItemData * pItemData;
 	if (!CItemManager::Instance().GetItemDataPointer(dwWeapon, &pItemData))
-		return CItemData::WEAPON_NONE;
+		return WEAPON_NONE;
 
 	return pItemData->GetWeaponType();
 }
@@ -2900,32 +2900,32 @@ uint32_t CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 #ifdef ENABLE_SIMPLE_REFINED_EFFECT_CHECK
 	uint32_t refine = pItem->GetRefine();
 #else
-	uint32_t refine = std::max<uint32_t>(pItem->GetRefine() + pItem->GetSocketCount(),CItemData::ITEM_SOCKET_MAX_NUM) - CItemData::ITEM_SOCKET_MAX_NUM;
+	uint32_t refine = std::max<uint32_t>(pItem->GetRefine() + pItem->GetSocketCount(),ITEM_SOCKET_MAX_NUM) - ITEM_SOCKET_MAX_NUM;
 #endif
 	switch (pItem->GetType())
 	{
-	case CItemData::ITEM_TYPE_WEAPON:
+	case ITEM_TYPE_WEAPON:
 		__ClearWeaponRefineEffect();		
 		if (refine < 7)	//현재 제련도 7 이상만 이펙트가 있습니다.
 			return 0;
 		switch(pItem->GetSubType())
 		{
-		case CItemData::WEAPON_DAGGER:
+		case WEAPON_DAGGER:
 			m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_SMALLSWORD_REFINED7+refine-7;
 			m_swordRefineEffectLeft = EFFECT_REFINED+EFFECT_SMALLSWORD_REFINED7_LEFT+refine-7;
 			break;
-		case CItemData::WEAPON_FAN:
+		case WEAPON_FAN:
 			m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_FANBELL_REFINED7+refine-7;
 			break;
-		case CItemData::WEAPON_ARROW:
-		case CItemData::WEAPON_BELL:
+		case WEAPON_ARROW:
+		case WEAPON_BELL:
 			m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_SMALLSWORD_REFINED7+refine-7;
 			break;
-		case CItemData::WEAPON_BOW:
+		case WEAPON_BOW:
 			m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_BOW_REFINED7+refine-7;
 			break;
 #ifdef ENABLE_WOLFMAN_CHARACTER
-		case CItemData::WEAPON_CLAW:
+		case WEAPON_CLAW:
 			m_swordRefineEffectRight = EFFECT_REFINED + EFFECT_SMALLSWORD_REFINED7 + refine - 7;
 			m_swordRefineEffectLeft = EFFECT_REFINED + EFFECT_SMALLSWORD_REFINED7_LEFT + refine - 7;
 			break;
@@ -2938,11 +2938,11 @@ uint32_t CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 		if (m_swordRefineEffectLeft)
 			m_swordRefineEffectLeft = __AttachEffect(m_swordRefineEffectLeft);
 		break;
-	case CItemData::ITEM_TYPE_ARMOR:
+	case ITEM_TYPE_ARMOR:
 		__ClearArmorRefineEffect();
 
 		// 갑옷 특화 이펙트
-		if (pItem->GetSubType() == CItemData::ARMOR_BODY)
+		if (pItem->GetSubType() == ARMOR_BODY)
 		{
 			uint32_t vnum = pItem->GetIndex();
 
@@ -2964,37 +2964,37 @@ uint32_t CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 		if (refine < 7)	//현재 제련도 7 이상만 이펙트가 있습니다.
 			return 0;
 
-		if (pItem->GetSubType() == CItemData::ARMOR_BODY)
+		if (pItem->GetSubType() == ARMOR_BODY)
 		{
 			m_armorRefineEffect = EFFECT_REFINED+EFFECT_BODYARMOR_REFINED7+refine-7;
 			__AttachEffect(m_armorRefineEffect);
 		}
 		break;
-	case CItemData::ITEM_TYPE_COSTUME:
+	case ITEM_TYPE_COSTUME:
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
-		if (pItem->GetSubType() == CItemData::COSTUME_WEAPON)
+		if (pItem->GetSubType() == COSTUME_WEAPON)
 		{
 			__ClearWeaponRefineEffect();
 
 #ifdef USE_WEAPON_COSTUME_WITH_EFFECT
 			switch(pItem->GetValue(3))
 			{
-				case CItemData::WEAPON_DAGGER:
+				case WEAPON_DAGGER:
 					m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_SMALLSWORD_REFINED9;
 					m_swordRefineEffectLeft = EFFECT_REFINED+EFFECT_SMALLSWORD_REFINED9_LEFT;
 					break;
-				case CItemData::WEAPON_FAN:
+				case WEAPON_FAN:
 					m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_FANBELL_REFINED9;
 					break;
-				case CItemData::WEAPON_ARROW:
-				case CItemData::WEAPON_BELL:
+				case WEAPON_ARROW:
+				case WEAPON_BELL:
 					m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_SMALLSWORD_REFINED9;
 					break;
-				case CItemData::WEAPON_BOW:
+				case WEAPON_BOW:
 					m_swordRefineEffectRight = EFFECT_REFINED+EFFECT_BOW_REFINED9;
 					break;
 #ifdef ENABLE_WOLFMAN_CHARACTER
-				case CItemData::WEAPON_CLAW:
+				case WEAPON_CLAW:
 					m_swordRefineEffectRight = EFFECT_REFINED + EFFECT_SMALLSWORD_REFINED9;
 					m_swordRefineEffectLeft = EFFECT_REFINED + EFFECT_SMALLSWORD_REFINED9_LEFT;
 					break;
@@ -3011,7 +3011,7 @@ uint32_t CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 		}
 #endif
 #ifdef USE_BODY_COSTUME_WITH_EFFECT
-		if (pItem->GetSubType() == CItemData::COSTUME_BODY)
+		if (pItem->GetSubType() == COSTUME_BODY)
 		{
 			__ClearArmorRefineEffect();
 
@@ -3049,29 +3049,29 @@ bool CInstanceBase::SetWeapon(uint32_t eWeapon)
 
 	if (CPythonBackground::Instance().IsPrimalMap())
 	{
-		uint32_t weaponType = CItemData::WEAPON_NONE;
+		uint32_t weaponType = WEAPON_NONE;
 		CItemData * pItemData;
 		if (CItemManager::Instance().GetItemDataPointer(eWeapon, &pItemData))
 			weaponType = pItemData->GetWeaponType();
 
 		switch (weaponType)
 		{
-		case CItemData::WEAPON_SWORD:
+		case WEAPON_SWORD:
 			eWeapon = 19;
 			break;
-		case CItemData::WEAPON_DAGGER:
+		case WEAPON_DAGGER:
 			eWeapon = 1009;
 			break;
-		case CItemData::WEAPON_BOW:
+		case WEAPON_BOW:
 			eWeapon = 2009;
 			break;
-		case CItemData::WEAPON_TWO_HANDED:
+		case WEAPON_TWO_HANDED:
 			eWeapon = 3009;
 			break;
-		case CItemData::WEAPON_BELL:
+		case WEAPON_BELL:
 			eWeapon = 5009;
 			break;
-		case CItemData::WEAPON_FAN:
+		case WEAPON_FAN:
 			eWeapon = 7009;
 			break;
 		}
@@ -3093,29 +3093,29 @@ void CInstanceBase::ChangeWeapon(uint32_t eWeapon)
 {
 	if (CPythonBackground::Instance().IsPrimalMap())
 	{
-		uint32_t weaponType = CItemData::WEAPON_NONE;
+		uint32_t weaponType = WEAPON_NONE;
 		CItemData * pItemData;
 		if (CItemManager::Instance().GetItemDataPointer(eWeapon, &pItemData))
 			weaponType = pItemData->GetWeaponType();
 
 		switch (weaponType)
 		{
-		case CItemData::WEAPON_SWORD:
+		case WEAPON_SWORD:
 			eWeapon = 19;
 			break;
-		case CItemData::WEAPON_DAGGER:
+		case WEAPON_DAGGER:
 			eWeapon = 1009;
 			break;
-		case CItemData::WEAPON_BOW:
+		case WEAPON_BOW:
 			eWeapon = 2009;
 			break;
-		case CItemData::WEAPON_TWO_HANDED:
+		case WEAPON_TWO_HANDED:
 			eWeapon = 3009;
 			break;
-		case CItemData::WEAPON_BELL:
+		case WEAPON_BELL:
 			eWeapon = 5009;
 			break;
-		case CItemData::WEAPON_FAN:
+		case WEAPON_FAN:
 			eWeapon = 7009;
 			break;
 		}
@@ -3235,7 +3235,7 @@ void CInstanceBase::RefreshState(uint32_t dwMotIndex, bool isLoop)
 		else
 			SetMotionMode(CRaceMotionData::MODE_GENERAL);
 	}
-	else if (CItemData::ITEM_TYPE_ROD == byItemType)
+	else if (ITEM_TYPE_ROD == byItemType)
 	{
 		if (m_kHorse.IsMounting())
 			SetMotionMode(CRaceMotionData::MODE_HORSE);
@@ -3246,31 +3246,31 @@ void CInstanceBase::RefreshState(uint32_t dwMotIndex, bool isLoop)
 	{
 		switch (bySubType)
 		{
-			case CItemData::WEAPON_SWORD:
+			case WEAPON_SWORD:
 				SetMotionMode(CRaceMotionData::MODE_HORSE_ONEHAND_SWORD);
 				break;
 
-			case CItemData::WEAPON_TWO_HANDED:
+			case WEAPON_TWO_HANDED:
 				SetMotionMode(CRaceMotionData::MODE_HORSE_TWOHAND_SWORD); // Only Warrior
 				break;
 
-			case CItemData::WEAPON_DAGGER:
+			case WEAPON_DAGGER:
 				SetMotionMode(CRaceMotionData::MODE_HORSE_DUALHAND_SWORD); // Only Assassin
 				break;
 
-			case CItemData::WEAPON_FAN:
+			case WEAPON_FAN:
 				SetMotionMode(CRaceMotionData::MODE_HORSE_FAN); // Only Shaman
 				break;
 
-			case CItemData::WEAPON_BELL:
+			case WEAPON_BELL:
 				SetMotionMode(CRaceMotionData::MODE_HORSE_BELL); // Only Shaman
 				break;
 
-			case CItemData::WEAPON_BOW:
+			case WEAPON_BOW:
 				SetMotionMode(CRaceMotionData::MODE_HORSE_BOW); // Only Shaman
 				break;
 #ifdef ENABLE_WOLFMAN_CHARACTER
-			case CItemData::WEAPON_CLAW:
+			case WEAPON_CLAW:
 				SetMotionMode(CRaceMotionData::MODE_HORSE_CLAW); // Only Wolfman
 				break;
 #endif
@@ -3283,35 +3283,35 @@ void CInstanceBase::RefreshState(uint32_t dwMotIndex, bool isLoop)
 	{
 		switch (bySubType)
 		{
-			case CItemData::WEAPON_SWORD:
+			case WEAPON_SWORD:
 				SetMotionMode(CRaceMotionData::MODE_ONEHAND_SWORD);
 				break;
 
-			case CItemData::WEAPON_TWO_HANDED:
+			case WEAPON_TWO_HANDED:
 				SetMotionMode(CRaceMotionData::MODE_TWOHAND_SWORD); // Only Warrior
 				break;
 
-			case CItemData::WEAPON_DAGGER:
+			case WEAPON_DAGGER:
 				SetMotionMode(CRaceMotionData::MODE_DUALHAND_SWORD); // Only Assassin
 				break;
 
-			case CItemData::WEAPON_BOW:
+			case WEAPON_BOW:
 				SetMotionMode(CRaceMotionData::MODE_BOW); // Only Assassin
 				break;
 
-			case CItemData::WEAPON_FAN:
+			case WEAPON_FAN:
 				SetMotionMode(CRaceMotionData::MODE_FAN); // Only Shaman
 				break;
 
-			case CItemData::WEAPON_BELL:
+			case WEAPON_BELL:
 				SetMotionMode(CRaceMotionData::MODE_BELL); // Only Shaman
 				break;
 #ifdef ENABLE_WOLFMAN_CHARACTER
-			case CItemData::WEAPON_CLAW:
+			case WEAPON_CLAW:
 				SetMotionMode(CRaceMotionData::MODE_CLAW); // Only Wolfman
 				break;
 #endif
-			case CItemData::WEAPON_ARROW:
+			case WEAPON_ARROW:
 			default:
 				SetMotionMode(CRaceMotionData::MODE_GENERAL);
 				break;

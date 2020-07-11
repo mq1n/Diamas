@@ -265,7 +265,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 	{
 		case QID_AUTH_LOGIN:
 			{
-				TPacketCGLogin3 * pinfo = (TPacketCGLogin3 *) qi->pvData;
+				SPacketCGLogin3 * pinfo = (SPacketCGLogin3*) qi->pvData;
 				LPDESC d = DESC_MANAGER::instance().FindByLoginKey(qi->dwIdent);
 
 				if (!d)
@@ -274,7 +274,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 					break;
 				}
 				//위치 변경 - By SeMinZ
-				d->SetLogin(pinfo->login);
+				d->SetLogin(pinfo->name);
 
 				sys_log(0, "QID_AUTH_LOGIN: START %u %p", qi->dwIdent, get_pointer(d));
 
@@ -380,7 +380,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 						sys_log(0, "   NOTAVAIL");
 						M2_DELETE(pinfo);
 					}
-					else if (DESC_MANAGER::instance().FindByLoginName(pinfo->login))
+					else if (DESC_MANAGER::instance().FindByLoginName(pinfo->name))
 					{
 						LoginFailure(d, "ALREADY");
 						sys_log(0, "   ALREADY");
@@ -410,12 +410,12 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 						TAccountTable & r = d->GetAccountTable();
 
 						r.id = dwID;
-						trim_and_lower(pinfo->login, r.login, sizeof(r.login));
-						strlcpy(r.passwd, pinfo->passwd, sizeof(r.passwd));
+						trim_and_lower(pinfo->name, r.login, sizeof(r.login));
+						strlcpy(r.passwd, pinfo->pwd, sizeof(r.passwd));
 						strlcpy(r.social_id, szSocialID, sizeof(r.social_id));
 						DESC_MANAGER::instance().ConnectAccount(r.login, d);
 
-						sys_log(0, "QID_AUTH_LOGIN: SUCCESS %s", pinfo->login);
+						sys_log(0, "QID_AUTH_LOGIN: SUCCESS %s", pinfo->name);
 				
 						LoginPrepare(d, pinfo->adwClientKey, aiPremiumTimes);
 						M2_DELETE(pinfo);

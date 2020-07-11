@@ -984,15 +984,15 @@ void CHARACTER_MANAGER::SendScriptToMap(int32_t lMapIndex, const std::string & s
 	if (nullptr == pSecMap)
 		return;
 
-	struct packet_script p;
+	SPacketGCScript p;
 
 	p.header = HEADER_GC_SCRIPT;
 	p.skin = 1;
 	p.src_size = static_cast<uint16_t>(s.size());
 
 	quest::FSendPacket f;
-	p.size = p.src_size + sizeof(struct packet_script);
-	f.buf.write(&p, sizeof(struct packet_script));
+	p.size = p.src_size + sizeof(SPacketGCScript);
+	f.buf.write(&p, sizeof(SPacketGCScript));
 	f.buf.write(&s[0], s.size());
 
 	pSecMap->for_each(f);

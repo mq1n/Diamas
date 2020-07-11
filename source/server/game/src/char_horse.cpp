@@ -239,7 +239,7 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, uint32_t dwVnum)
 
 		if (GetHorseHealth() <= 0)
 		{
-			TPacketGCDead pack;
+			SPacketGCDead pack;
 			pack.header	= HEADER_GC_DEAD;
 			pack.vid    = m_chHorse->GetVID();
 			PacketAround(&pack, sizeof(pack));

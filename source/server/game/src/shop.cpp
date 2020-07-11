@@ -30,11 +30,11 @@ CShop::CShop() :
 
 CShop::~CShop()
 {
-	TPacketGCShop pack;
+	SPacketGCShop pack;
 
 	pack.header		= HEADER_GC_SHOP;
 	pack.subheader	= SHOP_SUBHEADER_GC_END;
-	pack.size		= sizeof(TPacketGCShop);
+	pack.size		= sizeof(SPacketGCShop);
 
 	Broadcast(&pack, sizeof(pack));
 
@@ -390,7 +390,7 @@ bool CShop::AddGuest(LPCHARACTER ch, uint32_t owner_vid, bool bOtherEmpire)
 
 	m_map_guest.insert(GuestMapType::value_type(ch, bOtherEmpire));
 
-	TPacketGCShop pack;
+	SPacketGCShop pack;
 
 	pack.header		= HEADER_GC_SHOP;
 	pack.subheader	= SHOP_SUBHEADER_GC_START;
@@ -427,7 +427,7 @@ bool CShop::AddGuest(LPCHARACTER ch, uint32_t owner_vid, bool bOtherEmpire)
 
 	pack.size = sizeof(pack) + sizeof(pack2);
 
-	ch->GetDesc()->BufferedPacket(&pack, sizeof(TPacketGCShop));
+	ch->GetDesc()->BufferedPacket(&pack, sizeof(SPacketGCShop));
 	ch->GetDesc()->Packet(&pack2, sizeof(TPacketGCShopStart));
 	return true;
 }
@@ -440,11 +440,11 @@ void CShop::RemoveGuest(LPCHARACTER ch)
 	m_map_guest.erase(ch);
 	ch->SetShop(nullptr);
 
-	TPacketGCShop pack;
+	SPacketGCShop pack;
 
 	pack.header		= HEADER_GC_SHOP;
 	pack.subheader	= SHOP_SUBHEADER_GC_END;
-	pack.size		= sizeof(TPacketGCShop);
+	pack.size		= sizeof(SPacketGCShop);
 
 	ch->GetDesc()->Packet(&pack, sizeof(pack));
 }
@@ -470,7 +470,7 @@ void CShop::Broadcast(const void * data, int32_t bytes)
 
 void CShop::BroadcastUpdateItem(uint8_t pos)
 {
-	TPacketGCShop pack;
+	SPacketGCShop pack;
 	TPacketGCShopUpdateItem pack2;
 
 	pack.header		= HEADER_GC_SHOP;

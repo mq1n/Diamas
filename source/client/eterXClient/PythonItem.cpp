@@ -191,24 +191,24 @@ uint32_t CPythonItem::__GetDropSoundType(const CItemData& c_rkItemData)
 {
 	switch (c_rkItemData.GetType())
 	{
-		case CItemData::ITEM_TYPE_WEAPON:
+		case ITEM_TYPE_WEAPON:
 			switch (c_rkItemData.GetWeaponType())
 			{
-				case CItemData::WEAPON_BOW:
+				case WEAPON_BOW:
 					return DROPSOUND_BOW;
-				case CItemData::WEAPON_ARROW:
+				case WEAPON_ARROW:
 					return DROPSOUND_DEFAULT;
 				default:
 					return DROPSOUND_WEAPON;
 			}
 			break;
-		case CItemData::ITEM_TYPE_ARMOR:
+		case ITEM_TYPE_ARMOR:
 			switch (c_rkItemData.GetSubType())
 			{
-				case CItemData::ARMOR_NECK:
-				case CItemData::ARMOR_EAR:
+				case ARMOR_NECK:
+				case ARMOR_EAR:
 					return DROPSOUND_ACCESSORY;
-				case CItemData::ARMOR_BODY:
+				case ARMOR_BODY:
 					return DROPSOUND_ARMOR;
 				default:
 					return DROPSOUND_DEFAULT;		
@@ -224,37 +224,37 @@ uint32_t CPythonItem::__GetUseSoundType(const CItemData& c_rkItemData)
 {
 	switch (c_rkItemData.GetType())
 	{
-		case CItemData::ITEM_TYPE_WEAPON:
+		case ITEM_TYPE_WEAPON:
 			switch (c_rkItemData.GetWeaponType())
 			{
-				case CItemData::WEAPON_BOW:
+				case WEAPON_BOW:
 					return USESOUND_BOW;
-				case CItemData::WEAPON_ARROW:
+				case WEAPON_ARROW:
 					return USESOUND_DEFAULT;
 				default:
 					return USESOUND_WEAPON;
 			}
 			break;
-		case CItemData::ITEM_TYPE_ARMOR:
+		case ITEM_TYPE_ARMOR:
 			switch (c_rkItemData.GetSubType())
 			{
-				case CItemData::ARMOR_NECK:
-				case CItemData::ARMOR_EAR:
+				case ARMOR_NECK:
+				case ARMOR_EAR:
 					return USESOUND_ACCESSORY;
-				case CItemData::ARMOR_BODY:
+				case ARMOR_BODY:
 					return USESOUND_ARMOR;
 				default:
 					return USESOUND_DEFAULT;		
 			}
 			break;
-		case CItemData::ITEM_TYPE_USE:
+		case ITEM_TYPE_USE:
 			switch (c_rkItemData.GetSubType())
 			{
-				case CItemData::USE_ABILITY_UP:
+				case USE_ABILITY_UP:
 					return USESOUND_POTION;
-				case CItemData::USE_POTION:
+				case USE_POTION:
 					return USESOUND_NONE;
-				case CItemData::USE_TALISMAN:
+				case USE_TALISMAN:
 					return USESOUND_PORTAL;
 				default:
 					return USESOUND_DEFAULT;		
@@ -285,12 +285,12 @@ void CPythonItem::CreateItem(uint32_t dwVirtualID, uint32_t dwVirtualNumber, flo
 		z = CPythonBackground::Instance().GetHeight(x, y) + 10.0f;
 
 #ifdef __OBSOLETE__
-		if (pItemData->GetType()==CItemData::ITEM_TYPE_WEAPON &&
-			(pItemData->GetWeaponType() == CItemData::WEAPON_SWORD ||
-				pItemData->GetWeaponType() == CItemData::WEAPON_ARROW
+		if (pItemData->GetType()==ITEM_TYPE_WEAPON &&
+			(pItemData->GetWeaponType() == WEAPON_SWORD ||
+				pItemData->GetWeaponType() == WEAPON_ARROW
 			)
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
-			|| (pItemData->GetType()==CItemData::ITEM_TYPE_COSTUME && pItemData->GetSubType()==CItemData::COSTUME_WEAPON)
+			|| (pItemData->GetType()==ITEM_TYPE_COSTUME && pItemData->GetSubType()==COSTUME_WEAPON)
 #endif
 		)
 			bStabGround = true;

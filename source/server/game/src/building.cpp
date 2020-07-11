@@ -77,9 +77,9 @@ void CObject::EncodeInsertPacket(LPENTITY entity)
 			m_dwVID, m_data.dwVnum, m_data.xRot, m_data.yRot, m_data.zRot);
 	bool setGuildID = (m_data.dwVnum == 14200) || (m_pProto && m_pProto->dwNPCVnum != 0);
 
-	TPacketGCCharacterAdd pack;
+	SPacketGCCharacterAdd pack;
 
-	memset(&pack, 0, sizeof(TPacketGCCharacterAdd));
+	memset(&pack, 0, sizeof(SPacketGCCharacterAdd));
 
 	pack.header         = HEADER_GC_CHARACTER_ADD;
 	pack.dwVID          = m_dwVID;
@@ -89,8 +89,8 @@ void CObject::EncodeInsertPacket(LPENTITY entity)
 	pack.y              = GetY();
 	pack.z              = GetZ();
 	pack.dwRaceNum      = m_data.dwVnum;
-	pack.guildID		= setGuildID ? GetGuildID() : 0;
-	pack.level			= 0;
+	pack.dwGuild		= setGuildID ? GetGuildID() : 0;
+	pack.dwLevel			= 0;
 	// 빌딩 회전 정보(벽일때는 문 위치)를 변환
 	pack.dwAffectFlag[0] = uint32_t(m_data.xRot);
 	pack.dwAffectFlag[1] = uint32_t(m_data.yRot);
@@ -106,12 +106,12 @@ void CObject::EncodeRemovePacket(LPENTITY entity)
 
 	sys_log(0, "ObjectRemovePacket vid %u", m_dwVID);
 
-	TPacketGCCharacterDelete pack;
+	SPacketGCCharacterDelete pack;
 
 	pack.header = HEADER_GC_CHARACTER_DEL;
-	pack.id     = m_dwVID;
+	pack.dwVID     = m_dwVID;
 
-	d->Packet(&pack, sizeof(TPacketGCCharacterDelete));
+	d->Packet(&pack, sizeof(SPacketGCCharacterDelete));
 }
 
 void CObject::SetVID(uint32_t dwVID)
@@ -585,7 +585,6 @@ void CLand::RequestUpdate(uint32_t dwGuild) const
 	a[0] = GetID();
 	a[1] = dwGuild;
 
-	db_clientdesc->DBPacket(HEADER_GD_UPDATE_LAND, 0, &a[0], sizeof(uint32_t) * 2);
 	sys_log(0, "RequestUpdate id %u guild %u", a[0], a[1]);
 }
 
@@ -855,27 +854,6 @@ void CManager::UnregisterObject(LPOBJECT pkObj)
 	m_map_pkObjByVID.erase(pkObj->GetVID());
 }
 
-void CManager::UpdateLand(TLand * pTable)
-{
-	CLand * pkLand = FindLand(pTable->dwID);
-	if (!pkLand)
-	{
-		sys_err("cannot find land by id %u", pTable->dwID);
-		return;
-	}
-	pkLand->PutData(pTable);
-
-	TPacketGCGuildLandUpdate p;
-	p.header = HEADER_GC_UPDATE_LAND;
-	p.landID = pTable->dwID;
-	p.guildID = pTable->dwGuildID;
-
-	const DESC_MANAGER::DESC_SET & cont = DESC_MANAGER::instance().GetClientSet();
-	for (auto *desc : cont) {
-		if (desc->GetCharacter() && desc->GetCharacter()->GetMapIndex() == pTable->lMapIndex)
-			desc->Packet(&p, sizeof(TPacketGCGuildLandUpdate));
-	}
-}
 void CManager::SendLandList(LPDESC d, int32_t lMapIndex)
 {
 	TLandPacketElement e;
@@ -918,12 +896,12 @@ void CManager::SendLandList(LPDESC d, int32_t lMapIndex)
 
 	if (wCount != 0)
 	{
-		TPacketGCLandList p;
+		SPacketGCLandList p;
 
 		p.header = HEADER_GC_LAND_LIST;
-		p.size = sizeof(TPacketGCLandList) + buf.size();
+		p.size = sizeof(SPacketGCLandList) + buf.size();
 
-		d->BufferedPacket(&p, sizeof(TPacketGCLandList));
+		d->BufferedPacket(&p, sizeof(SPacketGCLandList));
 		d->Packet(buf.read_peek(), buf.size());
 	}
 }

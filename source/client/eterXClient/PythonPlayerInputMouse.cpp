@@ -265,7 +265,7 @@ void CPythonPlayer::NEW_RefreshMouseWalkingDirection()
 					pkInstMain->NEW_GetPixelPosition(&kPPosCur);
 
 					float fCurRot=pkInstMain->GetRotation();
-					rkNetStream.SendCharacterStatePacket(kPPosCur,  fCurRot, CInstanceBase::FUNC_WAIT, 0);
+					rkNetStream.SendCharacterStatePacket(kPPosCur,  fCurRot, FUNC_WAIT, 0);
 					SendClickItemPacket(m_dwIIDReserved);
 
 					pkInstMain->NEW_Stop();

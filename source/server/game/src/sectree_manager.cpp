@@ -1080,7 +1080,7 @@ void SECTREE_MANAGER::SendNPCPosition(LPCHARACTER ch)
 		return;
 
 	TEMP_BUFFER buf;
-	TPacketGCNPCPosition p;
+	SPacketGCNPCPosition p;
 	p.header = HEADER_GC_NPC_POSITION;
 	p.count = static_cast<uint16_t>(m_mapNPCPosition[lMapIndex].size());
 
@@ -1098,14 +1098,14 @@ void SECTREE_MANAGER::SendNPCPosition(LPCHARACTER ch)
 
 	if (buf.size())
 	{
-		d->BufferedPacket(&p, sizeof(TPacketGCNPCPosition));
+		d->BufferedPacket(&p, sizeof(SPacketGCNPCPosition));
 		d->Packet(buf.read_peek(), buf.size());
 
 		if (g_bIsTestServer)
 			sys_log(0, "SendNPCPosition size %u", sizeof(p) + buf.size());
 	}
 	else
-		d->Packet(&p, sizeof(TPacketGCNPCPosition));
+		d->Packet(&p, sizeof(SPacketGCNPCPosition));
 	buf.reset();
 }
 

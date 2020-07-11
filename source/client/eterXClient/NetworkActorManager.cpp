@@ -403,7 +403,7 @@ CInstanceBase* CNetworkActorManager::__AppendCharacterManagerActor(SNetworkActor
 		kPPosDst.x=float(rkNetActorData.m_lDstX);
 		kPPosDst.y=float(rkNetActorData.m_lDstY);
 		kPPosDst.z=0;
-		pNewInstance->PushTCPState(rkNetActorData.m_dwServerSrcTime+dwElapsedTime, kPPosDst, rkNetActorData.m_fRot, CInstanceBase::FUNC_MOVE, 0);		
+		pNewInstance->PushTCPState(rkNetActorData.m_dwServerSrcTime+dwElapsedTime, kPPosDst, rkNetActorData.m_fRot, FUNC_MOVE, 0);		
 	}
 	return pNewInstance;
 }

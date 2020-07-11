@@ -174,9 +174,9 @@ EVENTFUNC(ping_event)
 	}
 	else
 	{
-		TPacketGCPing p;
+		SPacketGCPing p;
 		p.header = HEADER_GC_PING;
-		desc->Packet(&p, sizeof(struct packet_ping));
+		desc->Packet(&p, sizeof(SPacketGCPing));
 		desc->SetPong(false);
 	}
 
@@ -500,11 +500,11 @@ void DESC::SetPhase(int32_t _phase)
 {
 	m_iPhase = _phase;
 
-	TPacketGCPhase pack;
+	SPacketGCPhase pack;
 	pack.header = HEADER_GC_PHASE;
 	pack.phase = _phase;
 	pack.stage = game_stage;
-	Packet(&pack, sizeof(TPacketGCPhase));
+	Packet(&pack, sizeof(SPacketGCPhase));
 
 //	sys_log(0, "phase %d", _phase);
 
@@ -595,14 +595,14 @@ void DESC::StartHandshake(uint32_t _handshake)
 
 void DESC::SendHandshake(uint32_t dwCurTime, int32_t lNewDelta)
 {
-	TPacketGCHandshake pack;
+	SPacketHandshake pack;
 
-	pack.bHeader		= HEADER_GC_HANDSHAKE;
+	pack.header		= HEADER_GC_HANDSHAKE;
 	pack.dwHandshake	= m_dwHandshake;
 	pack.dwTime			= dwCurTime;
 	pack.lDelta			= lNewDelta;
 
-	Packet(&pack, sizeof(TPacketGCHandshake));
+	Packet(&pack, sizeof(SPacketHandshake));
 
 	m_dwHandshakeSentTime = dwCurTime;
 	m_bHandshaking = true;
@@ -624,7 +624,7 @@ bool DESC::HandshakeProcess(uint32_t dwTime, int32_t lDelta, bool bInfiniteRetry
 	{
 		if (bInfiniteRetry)
 		{
-			uint8_t bHeader = HEADER_GC_TIME_SYNC;
+			uint8_t bHeader = HEADER_GC_HANDSHAKE_OK;
 			Packet(&bHeader, sizeof(uint8_t));
 		}
 
@@ -676,18 +676,18 @@ uint32_t DESC::GetClientTime()
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 void DESC::SendKeyAgreement()
 {
-	TPacketKeyAgreement packet;
+	SPacketKeyAgreement packet;
 
-	size_t data_length = TPacketKeyAgreement::MAX_DATA_LEN;
+	size_t data_length = SPacketKeyAgreement::MAX_DATA_LEN;
 	size_t agreed_length = cipher_.Prepare(packet.data, &data_length);
 	if (agreed_length == 0) {
 		// Initialization failure
 		SetPhase(PHASE_CLOSE);
 		return;
 	}
-	assert(data_length <= TPacketKeyAgreement::MAX_DATA_LEN);
+	assert(data_length <= SPacketKeyAgreement::MAX_DATA_LEN);
 
-	packet.bHeader = HEADER_GC_KEY_AGREEMENT;
+	packet.header = HEADER_GC_KEY_AGREEMENT;
 	packet.wAgreedLength = (uint16_t)agreed_length;
 	packet.wDataLength = (uint16_t)data_length;
 
@@ -696,9 +696,9 @@ void DESC::SendKeyAgreement()
 
 void DESC::SendKeyAgreementCompleted()
 {
-	TPacketKeyAgreementCompleted packet;
+	SPacketGCKeyAgreementCompleted packet;
 
-	packet.bHeader = HEADER_GC_KEY_AGREEMENT_COMPLETED;
+	packet.header = HEADER_GC_KEY_AGREEMENT_COMPLETED;
 
 	Packet(&packet, sizeof(packet));
 }
@@ -867,13 +867,13 @@ void DESC::SendLoginSuccessPacket()
 {
 	TAccountTable & rTable = GetAccountTable();
 
-	TPacketGCLoginSuccess p;
+	SPacketGCLoginSuccess p;
 
-	p.bHeader    = HEADER_GC_LOGIN_SUCCESS_NEWSLOT;
+	p.header    = HEADER_GC_LOGIN_SUCCESS;
 
 	p.handle     = GetHandle();
 	p.random_key = DESC_MANAGER::instance().MakeRandomKey(GetHandle()); // FOR MARK
-	memcpy(p.players, rTable.players, sizeof(rTable.players));
+	memcpy(p.akSimplePlayerInformation, rTable.players, sizeof(rTable.players));
 
 	for (int32_t i = 0; i < PLAYER_PER_ACCOUNT; ++i)
 	{   
@@ -895,7 +895,7 @@ void DESC::SendLoginSuccessPacket()
 		}
 	}
 
-	Packet(&p, sizeof(TPacketGCLoginSuccess));
+	Packet(&p, sizeof(SPacketGCLoginSuccess));
 }
 
 void DESC::SetLoginKey(uint32_t dwKey)
@@ -969,16 +969,16 @@ void DESC::ChatPacket(uint8_t type, const char * format, ...)
 	int32_t len = vsnprintf(chatbuf, sizeof(chatbuf), format, args);
 	va_end(args);
 
-	struct packet_chat pack_chat;
+	SPacketGCChat pack_chat;
 
 	pack_chat.header    = HEADER_GC_CHAT;
-	pack_chat.size      = sizeof(struct packet_chat) + len;
+	pack_chat.size      = sizeof(SPacketGCChat) + len;
 	pack_chat.type      = type;
-	pack_chat.id        = 0;
+	pack_chat.dwVID        = 0;
 	pack_chat.bEmpire   = GetEmpire();
 
 	TEMP_BUFFER buf;
-	buf.write(&pack_chat, sizeof(struct packet_chat));
+	buf.write(&pack_chat, sizeof(SPacketGCChat));
 	buf.write(chatbuf, len);
 
 	Packet(buf.read_peek(), buf.size());

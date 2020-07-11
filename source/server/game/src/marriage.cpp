@@ -38,15 +38,14 @@ namespace marriage
 
 	const int32_t MARRIAGE_POINT_PER_DAY = 1;
 	const int32_t MARRIAGE_POINT_PER_DAY_FAST = 2;
-	using namespace std;
 
-	void SendLoverInfo(LPCHARACTER ch, const string& lover_name, int32_t love_point)
+	void SendLoverInfo(LPCHARACTER ch, const std::string& lover_name, int32_t love_point)
 	{
-		TPacketGCLoverInfo p;
+		SPacketGCLoverInfo p;
 
 		p.header = HEADER_GC_LOVER_INFO;
-		strlcpy(p.name, lover_name.c_str(), sizeof(p.name));
-		p.love_point = love_point;
+		strlcpy(p.szName, lover_name.c_str(), sizeof(p.szName));
+		p.byLovePoint = love_point;
 		ch->GetDesc()->Packet(&p, sizeof(p));
 	}
 
@@ -347,9 +346,9 @@ namespace marriage
 		if (byLastLovePoint != GetMarriagePoint())
 		{
 			byLastLovePoint = GetMarriagePoint();
-			TPacketGCLovePointUpdate p;
+			SPacketGCLovePointUpdate p;
 			p.header = HEADER_GC_LOVE_POINT_UPDATE;
-			p.love_point = byLastLovePoint;
+			p.byLovePoint = byLastLovePoint;
 
 			ch1->GetDesc()->Packet(&p, sizeof(p));
 			ch2->GetDesc()->Packet(&p, sizeof(p));
@@ -573,8 +572,8 @@ namespace marriage
 
 		TMarriage* pMarriage = M2_NEW TMarriage(dwPID1, dwPID2, 0, tMarryTime, szName1, szName2);
 		m_Marriages.insert(pMarriage);
-		m_MarriageByPID.insert(make_pair(dwPID1, pMarriage));
-		m_MarriageByPID.insert(make_pair(dwPID2, pMarriage));
+		m_MarriageByPID.insert(std::make_pair(dwPID1, pMarriage));
+		m_MarriageByPID.insert(std::make_pair(dwPID2, pMarriage));
 		{
 			LPCHARACTER A = CHARACTER_MANAGER::instance().FindByPID(dwPID1);
 			LPCHARACTER B = CHARACTER_MANAGER::instance().FindByPID(dwPID2);
@@ -708,7 +707,7 @@ namespace marriage
 		pMarriage->WarpToWeddingMap(dwPID2);
 
 		// 등록해서 메뉴창에서 이름나와야함
-		m_setWedding.insert(make_pair(dwPID1, dwPID2));
+		m_setWedding.insert(std::make_pair(dwPID1, dwPID2));
 	}
 
 	void CManager::WeddingEnd(uint32_t dwPID1, uint32_t dwPID2)
@@ -737,7 +736,7 @@ namespace marriage
 		M2_DELETE(pMarriage->pWeddingInfo);
 		pMarriage->pWeddingInfo = nullptr;
 
-		m_setWedding.erase(make_pair(dwPID1, dwPID2));
+		m_setWedding.erase(std::make_pair(dwPID1, dwPID2));
 	}
 
 	void CManager::RequestEndWedding(uint32_t dwPID1, uint32_t dwPID2)
