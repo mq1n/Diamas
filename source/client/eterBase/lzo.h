@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_371GNFBQOCJ_LZO_H__
-#define __INC_METIN_II_371GNFBQOCJ_LZO_H__
-
+#pragma once
 #include <Windows.h>
 #include <lzo/lzo_asm.h>
 #include <lzo/lzo1x.h>
@@ -76,5 +74,3 @@ public:
 private:
 	uint8_t * m_pWorkMem;
 };
-
-#endif

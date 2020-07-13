@@ -1670,7 +1670,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 	if (GetRaceNum() == 5001)
 	{
 		bool bDropMoney = false;
-		int32_t iPercent = 0; // @fixme136
+		int32_t iPercent = 0;
 		if (GetMaxHP() >= 0)
 			iPercent = (GetHP() * 100) / GetMaxHP();
 
@@ -2024,7 +2024,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 			// Ä¥ ¶§¸¶´Ù HPÈ¸º¹
 			if (pAttacker->GetPoint(POINT_HIT_HP_RECOVERY) && number(0, 4) > 0) // 80% È®·ü
 			{
-				int32_t i = ((iCurHP>=0)?MIN(dam, iCurHP):dam) * pAttacker->GetPoint(POINT_HIT_HP_RECOVERY) / 100; //@fixme107
+				int32_t i = ((iCurHP>=0)?MIN(dam, iCurHP):dam) * pAttacker->GetPoint(POINT_HIT_HP_RECOVERY) / 100;
 
 				if (i)
 				{
@@ -2036,7 +2036,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 			// Ä¥ ¶§¸¶´Ù SPÈ¸º¹
 			if (pAttacker->GetPoint(POINT_HIT_SP_RECOVERY) && number(0, 4) > 0) // 80% È®·ü
 			{
-				int32_t i = ((iCurHP>=0)?MIN(dam, iCurHP):dam) * pAttacker->GetPoint(POINT_HIT_SP_RECOVERY) / 100; //@fixme107
+				int32_t i = ((iCurHP>=0)?MIN(dam, iCurHP):dam) * pAttacker->GetPoint(POINT_HIT_SP_RECOVERY) / 100;
 
 				if (i)
 				{
@@ -2397,7 +2397,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 
 		if (g_bIsTestServer)
 		{
-			int32_t iTmpPercent = 0; // @fixme136
+			int32_t iTmpPercent = 0;
 			if (GetMaxHP() >= 0)
 				iTmpPercent = (GetHP() * 100) / GetMaxHP();
 
@@ -2429,7 +2429,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 	//
 	if (!cannot_dead)
 	{
-		if (GetHP() - dam <= 0) // @fixme137
+		if (GetHP() - dam <= 0)
 			dam = GetHP();
 		PointChange(POINT_HP, -dam, false);
 	}

@@ -169,7 +169,7 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName)
 		if ("attr" == stType)
 		{
 			CSpecialAttrGroup * pkGroup = M2_NEW CSpecialAttrGroup(iVnum);
-			for (int32_t k = 1; k < 1024; ++k) // @fixme148 256 -> 1024
+			for (int32_t k = 1; k < 1024; ++k)
 			{
 				char buf[4];
 				snprintf(buf, sizeof(buf), "%d", k);
@@ -212,7 +212,7 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName)
 		else
 		{
 			CSpecialItemGroup * pkGroup = M2_NEW CSpecialItemGroup(iVnum, type);
-			for (int32_t k = 1; k < 1024; ++k) // @fixme148 256 -> 1024
+			for (int32_t k = 1; k < 1024; ++k)
 			{
 				char buf[4];
 				snprintf(buf, sizeof(buf), "%d", k);
@@ -359,14 +359,12 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 			stl_lowers(str);
 			if (str == "pct")
 				type = 1;
-			// @fixme148 BEGIN
 			else if (str == "quest")
 				type = 2;
 			else if (str == "special")
 				type = 3;
 			else if (str == "attr")
 				type = 4;
-			// @fixme148 END
 		}
 
 		TTokenVector * pTok;
@@ -376,16 +374,14 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 		fprintf(fp, "	Vnum	%i\n", iVnum);
 		if (type==1)
 			fprintf(fp, "	Type	Pct\n");
-			// @fixme148 BEGIN
 		else if (type==2)
 			fprintf(fp, "	Type	Quest\n");
 		else if (type==3)
 			fprintf(fp, "	Type	special\n");
 		else if (type==4)
 			fprintf(fp, "	Type	ATTR\n");
-			// @fixme148 END
 
-		for (int32_t k = 1; k < 1024; ++k) // @fixme148 256 -> 1024
+		for (int32_t k = 1; k < 1024; ++k)
 		{
 			char buf[4];
 			snprintf(buf, sizeof(buf), "%d", k);
@@ -410,13 +406,11 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 					{
 						dwVnum = 0;
 					}
-					// @fixme148 BEGIN
 					else if (name == "°æÇèÄ¡")
 					{
 						dwVnum = 0;
 						name = "exp";
 					}
-					// @fixme148 END
 					else
 					{
 						str_to_number(dwVnum, name.c_str());
@@ -433,19 +427,16 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 				int32_t iCount = 0;
 				str_to_number(iCount, pTok->at(1).c_str());
 				int32_t iProb = 0;
-				// @fixme148 BEGIN
+
 				if (pTok->size() > 2)
 					str_to_number(iProb, pTok->at(2).c_str());
-				// @fixme148 END
 
 				int32_t iRarePct = 0;
 				if (pTok->size() > 3)
 					str_to_number(iRarePct, pTok->at(3).c_str());
 
-				// @fixme148 BEGIN
 				if (type==4)
 					fprintf(fp, "	%d	%u	%d\n", k, dwVnum, iCount);
-				// @fixme148 END
 				else
 				{
 					

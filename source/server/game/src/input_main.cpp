@@ -39,7 +39,7 @@
 #include "ox_event.h"
 #include "locale_service.h"
 #include "dragon_soul.h"
-#include "belt_inventory_helper.h" // @fixme119
+#include "belt_inventory_helper.h"
 #include "battleground.h"
 
 #include "../../common/service.h"
@@ -485,7 +485,6 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 				pkDesc->Packet(tmpbuf.read_peek(), tmpbuf.size());
 
-				// @warme006
 				// sys_log(0, "WHISPER: %s -> %s : %s", ch->GetName(), pinfo->szNameTo, buf);
 
 				if (ch->IsGM())
@@ -599,7 +598,6 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 //		return iExtraLen;
 //	}
 
-	// @fixme133 begin
 	CBanwordManager::instance().ConvertString(buf, buflen);
 
 	int32_t processReturn = ProcessTextTag(ch, buf, buflen);
@@ -1485,7 +1483,6 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 
 	{
 		const float fDist = DISTANCE_SQRT((ch->GetX() - pinfo->lX) / 100, (ch->GetY() - pinfo->lY) / 100);
-		// @fixme106 (changed 40 to 60)
 		if (((false == ch->IsRiding() && fDist > 25) || fDist > 60) && OXEVENT_MAP_INDEX != ch->GetMapIndex())
 		{
 			const GPOS & warpPos = ch->GetWarpPosition();
@@ -2116,13 +2113,11 @@ void CInputMain::SafeboxCheckin(LPCHARACTER ch, const char * c_pData)
 	}
 #endif
 
-	// @fixme140 BEGIN
 	if (ITEM_BELT == pkItem->GetType() && CBeltInventoryHelper::IsExistItemInBeltInventory(ch))
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("벨트 인벤토리에 아이템이 존재하면 해제할 수 없습니다."));
 		return;
 	}
-	// @fixme140 END
 
 	pkItem->RemoveFromCharacter();
 	if (!pkItem->IsDragonSoul())
@@ -2201,7 +2196,7 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<창고> 옮길 수 없는 위치입니다."));
 			return;
 		}
-		// @fixme119
+
 		if (p->ItemPos.IsBeltInventoryPosition() && false == CBeltInventoryHelper::CanMoveIntoBeltInventory(pkItem))
 		{
 			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템은 벨트 인벤토리로 옮길 수 없습니다."));
@@ -2670,10 +2665,8 @@ int32_t CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 					return SubPacketLen;
 				}
 
-				// @fixme145 BEGIN (+newmember ispc check)
 				if (!ch->IsPC() || !newmember->IsPC())
 					return SubPacketLen;
-				// @fixme145 END
 
 				pGuild->Invite(ch, newmember);
 			}
@@ -3082,7 +3075,7 @@ void CInputMain::Refine(LPCHARACTER ch, const char* c_pData)
 			}
 			else
 			{
-				if (ch->GetQuestFlag("deviltower_zone.can_refine") > 0) // @fixme158 (allow multiple refine attempts)
+				if (ch->GetQuestFlag("deviltower_zone.can_refine") > 0)
 				{
 					if (ch->DoRefine(item2, true))
 						ch->SetQuestFlag("deviltower_zone.can_refine", ch->GetQuestFlag("deviltower_zone.can_refine") - 1);

@@ -325,14 +325,12 @@ void CPythonPlayer::__OnPressActor(CInstanceBase& rkInstMain, uint32_t dwPickedA
 		}
 	}
 
-	// @fixme014 BEGIN (moved below all the checks)
 	if (isAuto)
 	{
 		// 2004.10.21.myevan.공격가능한 상대만 자동 공격
 		if (rkInstMain.IsAttackableInstance(rkInstVictim))
 			__SetAutoAttackTargetActorID(rkInstVictim.GetVirtualID());
 	}
-	// @fixme014 END
 
 	if (!rkInstMain.NEW_IsClickableDistanceDestInstance(rkInstVictim))
 	{

@@ -32,7 +32,7 @@ class CShop
 		} SHOP_ITEM;
 
 		CShop();
-		virtual ~CShop(); // @fixme139 (+virtual)
+		virtual ~CShop();
 
 		bool	Create(uint32_t dwVnum, uint32_t dwNPCVnum, TShopItemTable * pItemTable);
 		void	SetShopItems(TShopItemTable * pItemTable, uint8_t bItemCount);

@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_GAME_CHARACTER_MANAGER_H__
-#define __INC_METIN_II_GAME_CHARACTER_MANAGER_H__
-
+#pragma once
 #include "../../common/stl.h"
 #include "../../common/length.h"
 #include "../../common/service.h"
@@ -187,6 +185,4 @@ private:
 #define M2_DESTROY_CHARACTER(ptr) CHARACTER_MANAGER::instance().DestroyCharacter(ptr)
 #else
 #define M2_DESTROY_CHARACTER(ptr) CHARACTER_MANAGER::instance().DestroyCharacter(ptr, __FILE__, __LINE__)
-#endif
-
 #endif

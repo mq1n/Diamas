@@ -600,7 +600,7 @@ void CIME::PasteTextFromClipBoard()
 		return;
 
 	HANDLE handle = GetClipboardData(CF_UNICODETEXT);
-	if (!handle) // @fixme008
+	if (!handle)
 	{
 		CloseClipboard();
 		return;
@@ -833,7 +833,7 @@ void CIME::OnChar(wchar_t c)
 		if (!iswdigit(c))
 			return;
 
-	if ((c >= 0x00 && c<=0x1f) || (c == 0x7f)) // @fixme011
+	if ((c >= 0x00 && c<=0x1f) || (c == 0x7f))
 		return;
 
 	if (!__IsWritable(c))

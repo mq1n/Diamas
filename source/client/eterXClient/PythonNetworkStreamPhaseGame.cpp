@@ -1703,7 +1703,7 @@ bool CPythonNetworkStream::RecvShopPacket()
 			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnShopError", Py_BuildValue("(s)", "NOT_ENOUGH_MONEY_EX"));
 			break;
 
-		case SHOP_SUBHEADER_GC_SOLDOUT:
+		case SHOP_SUBHEADER_GC_SOLD_OUT:
 			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnShopError", Py_BuildValue("(s)", "SOLDOUT"));
 			break;
 

@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_D3DTYPE_H__
-#define __INC_METIN_II_D3DTYPE_H__
-
+#pragma once
 typedef struct D3DXVECTOR2
 {
 	float x, y;
@@ -35,6 +33,3 @@ typedef struct _D3DCOLORVALUE
 } D3DCOLORVALUE;
 
 typedef D3DXVECTOR3 D3DVECTOR;
-
-#endif
-

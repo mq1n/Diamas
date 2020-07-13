@@ -507,7 +507,6 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 
 	if (pkChr->GetEmpire() != pkVictim->GetEmpire())
 	{
-		// @warme005
 		{
 			if ( pkChr->GetPKMode() == PK_MODE_PROTECT || pkVictim->GetPKMode() == PK_MODE_PROTECT )
 			{

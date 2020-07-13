@@ -345,7 +345,6 @@ bool CHARACTER::LearnGrandMasterSkill(uint32_t dwSkillVnum)
 
 static bool FN_should_check_exp(LPCHARACTER ch)
 {
-	// @warme005
 	return ch->GetLevel() < gPlayerMaxLevel;
 }
 
@@ -3496,13 +3495,11 @@ eMountType GetMountLevelByVnum(uint32_t dwMountVnum, bool IsNew) // updated to 2
 	switch (dwMountVnum)
 	{
 		// ### YES SKILL
-		// @fixme116 begin
 		case 20107: // normal military horse (no guild)
 		case 20108: // normal military horse (guild member)
 		case 20109: // normal military horse (guild master)
 			if (IsNew)
 				return MOUNT_TYPE_NONE;
-		// @fixme116 end
 		// Classic
 		case 20110: // Classic Boar
 		case 20111: // Classic Wolf
@@ -3538,13 +3535,11 @@ eMountType GetMountLevelByVnum(uint32_t dwMountVnum, bool IsNew) // updated to 2
 			return MOUNT_TYPE_MILITARY;
 			break;
 		// ### NO SKILL YES ATK
-		// @fixme116 begin
 		case 20104: // normal combat horse (no guild)
 		case 20105: // normal combat horse (guild member)
 		case 20106: // normal combat horse (guild master)
 			if (IsNew)
 				return MOUNT_TYPE_NONE;
-		// @fixme116 end
 		case 20119: // Black Horse (no skill, yes atk)
 		case 20214: // Rudolph m Lv2 (no skill, yes atk)
 		case 20217: // Rudolph f Lv2 (no skill, yes atk)
@@ -3561,13 +3556,11 @@ eMountType GetMountLevelByVnum(uint32_t dwMountVnum, bool IsNew) // updated to 2
 			return MOUNT_TYPE_COMBAT;
 			break;
 		// ### NO SKILL NO ATK
-		// @fixme116 begin
 		case 20101: // normal beginner horse (no guild)
 		case 20102: // normal beginner horse (guild member)
 		case 20103: // normal beginner horse (guild master)
 			if (IsNew)
 				return MOUNT_TYPE_NONE;
-		// @fixme116 end
 		case 20213: // Rudolph m Lv1 (no skill, no atk)
 		case 20216: // Rudolph f Lv1 (no skill, no atk)
 		// Special Lv1

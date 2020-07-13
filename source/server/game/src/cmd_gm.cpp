@@ -4379,7 +4379,6 @@ ACMD (do_all_skill_master)
 		{
 			switch(i)
 			{
-				// @fixme154 BEGIN
 				// taking out the it->second->bMaxLevel from map_pkSkillProto (&& 1==40|SKILL_MAX_LEVEL) will be very resource-wasting, so we go full ugly so far
 				case SKILL_COMBO:
 					ch->SetSkillLevel(i, 2);
@@ -4402,7 +4401,6 @@ ACMD (do_all_skill_master)
 				case SKILL_HORSE_WILDATTACK_RANGE:
 					ch->SetSkillLevel(i, 20);
 					break;
-				// @fixme154 END
 				default:
 					ch->SetSkillLevel(i, SKILL_MAX_LEVEL);
 					break;
@@ -4416,7 +4414,7 @@ ACMD (do_all_skill_master)
 			case SKILL_HORSE_CHARGE:
 			case SKILL_HORSE_ESCAPE:
 			case SKILL_HORSE_WILDATTACK_RANGE:
-				ch->SetSkillLevel(i, 20); // @fixme154 40 -> 20
+				ch->SetSkillLevel(i, 20);
 				break;
 			}
 		}

@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_LENGTH_H__
-#define __INC_METIN_II_LENGTH_H__
-
+#pragma once
 #include "../../common/constants.h"
 #include "service.h"
 #include "item_length.h"
@@ -397,5 +395,3 @@ enum EPremiumTypes
 };
 
 
-
-#endif

@@ -1577,7 +1577,7 @@ EVENTFUNC(real_time_expire_event)
 
 	if (current > item->GetSocket(0))
 	{
-		if (item->GetVnum() && item->IsNewMountItem()) // @fixme152
+		if (item->GetVnum() && item->IsNewMountItem())
 			item->ClearMountAttributeAndAffect();
 
 		ITEM_MANAGER::instance().RemoveItem(item, "REAL_TIME_EXPIRE");
@@ -1887,7 +1887,7 @@ bool CItem::IsNewMountItem()
 #ifdef ENABLE_MOUNT_COSTUME_SYSTEM
 			   || (ITEM_COSTUME == GetType() && COSTUME_MOUNT == GetSubType())
 #endif
-		   ); // @fixme152
+		   );
 }
 
 void CItem::SetAccessorySocketExpireEvent(LPEVENT pkEvent)

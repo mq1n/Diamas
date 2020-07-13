@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_COMMON_POOL_H__
-#define __INC_METIN_II_COMMON_POOL_H__
-
+#pragma once
 #include <assert.h>
 #ifdef _WIN32
 #include <string>
@@ -183,5 +181,3 @@ class CDynamicPool
 		uint32_t		m_nodeCount;
 		std::string	m_stName;
 };
-
-#endif

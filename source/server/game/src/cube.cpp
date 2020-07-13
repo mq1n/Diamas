@@ -866,7 +866,7 @@ void Cube_request_result_list(LPCHARACTER ch)
 
 	uint32_t npcVNUM = npc->GetRaceNum();
 
-	if (!FN_check_valid_npc(npcVNUM)) // @fixme127
+	if (!FN_check_valid_npc(npcVNUM))
 	{
 		if (g_bIsTestServer)
 			dev_log(LOG_DEB0, "cube not valid NPC");
@@ -894,7 +894,7 @@ void Cube_request_result_list(LPCHARACTER ch)
 
 		resultCount = resultList.size();
 
-		if (resultText.size() != 0) // @fixme127
+		if (resultText.size() != 0)
 			resultText.erase(resultText.size() - 1);
 
 		// 채팅 패킷의 한계를 넘어가면 에러 남김... 기획자 분들 께 조정해달라고 요청하거나, 나중에 다른 방식으로 바꾸거나...
@@ -933,7 +933,7 @@ void Cube_request_material_info(LPCHARACTER ch, int32_t requestStartIndex, int32
 		return;
 
 	uint32_t npcVNUM = npc->GetRaceNum();
-	if (!FN_check_valid_npc(npcVNUM)) // @fixme127
+	if (!FN_check_valid_npc(npcVNUM))
 	{
 		if (g_bIsTestServer)
 			dev_log(LOG_DEB0, "cube not valid NPC");
@@ -969,7 +969,7 @@ void Cube_request_material_info(LPCHARACTER ch, int32_t requestStartIndex, int32
 		return;
 	}
 
-	if (materialInfoText.size() != 0) // @fixme127
+	if (materialInfoText.size() != 0)
 		materialInfoText.erase(materialInfoText.size() - 1);
 
 	// 

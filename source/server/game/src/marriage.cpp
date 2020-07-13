@@ -430,7 +430,7 @@ namespace marriage
 		if (point > 0 && is_married)
 		{
 			bSave = true;
-			// @fixme126
+
 			uint64_t llActualPoints = static_cast<uint64_t>(love_point) + point;
 			love_point = MIN( llActualPoints, 2000000000 );
 

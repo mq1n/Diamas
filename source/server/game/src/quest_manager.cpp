@@ -443,8 +443,8 @@ namespace quest
 				return;
 
 			// kill call script
-			if (npc >= MAIN_RACE_MAX_NUM) //@fixme109
-				m_mapNPC[npc].OnKill(*pPC); //@warme004
+			if (npc >= MAIN_RACE_MAX_NUM)
+				m_mapNPC[npc].OnKill(*pPC);
 			m_mapNPC[QUEST_NO_NPC].OnKill(*pPC);
 
 			// party_kill call script
@@ -454,8 +454,8 @@ namespace quest
 			if (leader)
 			{
 				m_pCurrentPartyMember = ch;
-				if (npc >= MAIN_RACE_MAX_NUM) //@fixme109
-					m_mapNPC[npc].OnPartyKill(*GetPC(leader->GetPlayerID())); //@warme004
+				if (npc >= MAIN_RACE_MAX_NUM)
+					m_mapNPC[npc].OnPartyKill(*GetPC(leader->GetPlayerID()));
 				m_mapNPC[QUEST_NO_NPC].OnPartyKill(*GetPC(leader->GetPlayerID()));
 
 				pPC = GetPC(pc);

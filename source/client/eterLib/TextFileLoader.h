@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_TEXTFILELOADER_H__
-#define __INC_METIN_II_TEXTFILELOADER_H__
-
+#pragma once
 #include "../eterBase/FileLoader.h"
 #include "../eterLib/Util.h"
 #include "../eterLib/Pool.h"
@@ -127,5 +125,3 @@ class CTextFileLoader
 		static std::map<uint32_t, CTextFileLoader*> ms_kMap_dwNameKey_pkTextFileLoader;
 		static bool ms_isCacheMode;
 };
-
-#endif

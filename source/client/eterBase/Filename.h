@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 //	CFilename Class
 //
-//	(c) 2003 IDV, Inc. (half-fixed by martysama0134)
+//	(c) 2003 IDV, Inc.
 //
 //	*** INTERACTIVE DATA VISUALIZATION (IDV) PROPRIETARY INFORMATION ***
 //

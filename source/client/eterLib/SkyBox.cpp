@@ -530,7 +530,6 @@ void CSkyBox::Refresh()
 		m_Faces[4].m_strfacename = "top";
 
 		////// Face 5: BOTTOM
-		// @fixme005
 		// v3QuadPoints[0] = D3DXVECTOR3(1.0f, -1.0f, -1.0f);
 		// v3QuadPoints[1] = D3DXVECTOR3(1.0f, 1.0f, -1.0f);
 		// v3QuadPoints[2] = D3DXVECTOR3(-1.0f, -1.0f, -1.0f);

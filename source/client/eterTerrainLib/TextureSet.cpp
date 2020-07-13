@@ -252,7 +252,6 @@ bool CTextureSet::AddTexture(const char * c_szFileName,
 	
 	m_Textures.reserve(m_Textures.size() + 1);
 
-	// @fixme003
 	AddEmptyTexture();
 	SetTexture(m_Textures.size() - 1,
 			   c_szFileName,

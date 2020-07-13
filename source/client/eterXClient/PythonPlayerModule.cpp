@@ -1146,7 +1146,7 @@ PyObject * playerGetItemLink(PyObject * poSelf, PyObject * poArgs)
 
 		for (int32_t i = 0; i < ITEM_ATTRIBUTE_SLOT_MAX_NUM; ++i)
 		{
-			// if (pPlayerItem->aAttr[i].bType != 0) // @fixme009 (this line must be commented)
+			// if (pPlayerItem->aAttr[i].bType != 0) // (this line must be commented)
 			{
 				len += _snprintf_s(itemlink + len, sizeof(itemlink) - len, sizeof(itemlink) - len, ":%x:%d",
 						pPlayerItem->aAttr[i].bType, pPlayerItem->aAttr[i].sValue);
@@ -1446,7 +1446,7 @@ PyObject * playerIsValuableItem(PyObject* poSelf, PyObject* poArgs)
 	case 2:
 		if (!PyTuple_GetInteger(poArgs, 0, &SlotIndex.window_type))
 			return Py_BuildException();
-		if (!PyTuple_GetInteger(poArgs, 1, &SlotIndex.cell)) // @fixme013 arg idx from 0 to 1
+		if (!PyTuple_GetInteger(poArgs, 1, &SlotIndex.cell))
 			return Py_BuildException();
 		break;
 	default:

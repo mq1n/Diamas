@@ -123,7 +123,7 @@ void __GetRaceResourcePathes(uint32_t race, std::vector <std::string>& vec_stPat
 		vec_stPathes.emplace_back("d:/ymir work/npc_mount/");
 		vec_stPathes.emplace_back("d:/ymir work/guild/");
 	}
-	// @fixme021 add season folders
+	// add season folders
 	vec_stPathes.emplace_back("#season1/npc/");
 	vec_stPathes.emplace_back("#season2/npc/");
 	vec_stPathes.emplace_back("#season1/monster/");
@@ -184,7 +184,7 @@ CRaceData* CRaceManager::__LoadRaceData(uint32_t dwRaceIndex)
 		stFullPathName+="/";
 
 		std::string stMSMFileName=stFullPathName;
-		if (stFullPathName[0] == '#') // @fixme021 #season reads shape.msm only
+		if (stFullPathName[0] == '#') // #season reads shape.msm only
 		{
 			stMSMFileName += "shape.msm";
 			stFullPathName.erase(0, 1);

@@ -988,7 +988,7 @@ void CGuild::Disband()
 		LPCHARACTER ch = *it;
 		ch->SetGuild(nullptr);
 		SendOnlineRemoveOnePacket(ch->GetPlayerID());
-		// @fixme401
+
 		ch->SetQuestFlag("guild_manage.new_disband_time", get_global_time());
 	}
 

@@ -13,7 +13,7 @@
 #include "../../common/length.h"
 #include "exchange.h"
 #include "dragon_soul.h"
-#include "quest_manager.h" // @fixme150
+#include "quest_manager.h"
 #include "gm.h"
 
 void exchange_packet(LPCHARACTER ch, uint8_t sub_header, bool is_me, uint32_t arg1, const TItemPos &arg2, uint32_t arg3, void * pvData = nullptr);
@@ -590,7 +590,6 @@ bool CExchange::Accept(bool bAccept)
 		victim->SetExchangeTime();		
 		//END_PREVENT_PORTAL_AFTER_EXCHANGE
 
-		// @fixme150 BEGIN
 		if (quest::CQuestManager::instance().GetPCForce(GetOwner()->GetPlayerID())->IsRunning() == true)
 		{
 			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot trade if you're using quests"));
@@ -603,7 +602,6 @@ bool CExchange::Accept(bool bAccept)
 			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot trade if the other part using quests"));
 			goto EXCHANGE_END;
 		}
-		// @fixme150 END
 		// 를 리턴한다.
 		if (!Check(&iItemCount))
 		{

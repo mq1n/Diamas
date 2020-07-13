@@ -171,7 +171,6 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 
 	void			SendNotice(const char * c_pszFormat, ...);
 
-	// @fixme203 directly GetCommand instead of strcpy
 	char*			GetCommand(char* str, char* command);		
 	void			ItemAward(CPeer * peer, char* login);	//독일 선물 기능
 
@@ -361,7 +360,7 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 	/**
 	 * @param [in]	pPacket 패킷 데이터의 포인터
 	 */
-	void		MyshopPricelistUpdate(const TItemPriceListTable* pPacket); // @fixme403 (TPacketMyshopPricelistHeader to TItemPriceListTable)
+	void		MyshopPricelistUpdate(const TItemPriceListTable* pPacket);
 
 	/// 아이템 가격정보 리스트 요청 패킷(HEADER_GD_MYSHOP_PRICELIST_REQ) 처리함수
 	/**

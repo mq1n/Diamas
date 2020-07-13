@@ -1918,14 +1918,12 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 		return false;
 	}
 
-	// @fixme402 (IsLoadedAffect to block affect hacking)
 	if (!IsLoadedAffect())
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Affects are not loaded yet!"));
 		return false;
 	}
 
-	// @fixme141 BEGIN
 	if (TItemPos(item->GetWindow(), item->GetCell()).IsBeltInventoryPosition())
 	{
 		LPITEM beltItem = GetWear(WEAR_BELT);
@@ -1942,7 +1940,6 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 			return false;
 		}
 	}
-	// @fixme141 END
 
 	if (-1 != iLimitRealtimeStartFirstUseFlagIndex)
 	{
@@ -2179,7 +2176,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 				if (!GetItem(DestCell) || !(item2 = GetItem(DestCell)))
 					return false;
 
-				if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
+				if (item2->IsExchanging() || item2->IsEquipped())
 					return false;
 
 				if (item2->GetType() != ITEM_TREASURE_BOX)
@@ -2739,13 +2736,11 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 										지속시간  value 0 (단위 초)
 
 									*/
-									// @fixme147 BEGIN
 									if (FindAffect(AFFECT_RAMADAN_ABILITY))
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 효과가 걸려 있습니다."));
 										return false;
 									}
-									// @fixme147 END
 									int32_t time = item->GetValue(0);
 									int32_t moveSpeedPer	= item->GetValue(1);
 									int32_t attPer	= item->GetValue(2);
@@ -3160,7 +3155,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 
 							case 27996: 
 								item->SetCount(item->GetCount() - 1);
-								AttackedByPoison(nullptr); // @warme008
+								AttackedByPoison(nullptr);
 								break;
 
 							case fishing::SHELLFISH_VNUM: // 조개
@@ -3671,7 +3666,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 									if (!IsValidItemPosition(DestCell) || !(item2 = GetItem(DestCell)))
 										return false;
 
-									if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
+									if (item2->IsExchanging() || item2->IsEquipped())
 										return false;
 
 									if (item2->GetSocketCount() == 0)
@@ -4038,13 +4033,13 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 									if (!IsValidItemPosition(DestCell) || !(item2 = GetInventoryItem(wDestCell)))
 										return false;
 
-									if (ITEM_COSTUME == item2->GetType()) // @fixme124
+									if (ITEM_COSTUME == item2->GetType())
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
 										return false;
 									}
 
-									if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
+									if (item2->IsExchanging() || item2->IsEquipped())
 										return false;
 
 									if (item2->GetAttributeSetIndex() == -1)
@@ -4088,13 +4083,13 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 									if (!IsValidItemPosition(DestCell) || !(item2 = GetItem(DestCell)))
 										return false;
 
-									if (ITEM_COSTUME == item2->GetType()) // @fixme124
+									if (ITEM_COSTUME == item2->GetType())
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
 										return false;
 									}
 
-									if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
+									if (item2->IsExchanging() || item2->IsEquipped())
 										return false;
 
 									if (item2->GetAttributeSetIndex() == -1)
@@ -4693,7 +4688,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 							if (!IsValidItemPosition(DestCell) || !(item2 = GetItem(DestCell)))
 								return false;
 
-							if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
+							if (item2->IsExchanging() || item2->IsEquipped())
 								return false;
 
 							if (item2->GetVnum() >= 28330 && item2->GetVnum() <= 28343) 
@@ -4746,7 +4741,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 								return false;
 							}
 
-							if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
+							if (item2->IsExchanging() || item2->IsEquipped())
 								return false;
 
 							if (item2->GetAttributeSetIndex() == -1)
@@ -4815,7 +4810,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 								return false;
 							}
 
-							if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
+							if (item2->IsExchanging() || item2->IsEquipped())
 								return false;
 
 							switch (item->GetSubType())
@@ -4861,7 +4856,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 									break;
 
 								case USE_CHANGE_ATTRIBUTE :
-								case USE_CHANGE_ATTRIBUTE2 : // @fixme123
+								case USE_CHANGE_ATTRIBUTE2 :
 									if (item2->GetAttributeSetIndex() == -1)
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
@@ -5318,7 +5313,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 				if (!IsValidItemPosition(DestCell) || !(item2 = GetItem(DestCell)))
 					return false;
 
-				if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
+				if (item2->IsExchanging() || item2->IsEquipped())
 					return false;
 
 				if (item2->GetType() == ITEM_PICK) return false;
@@ -5636,13 +5631,11 @@ bool CHARACTER::UseItem(const TItemPos &Cell, const TItemPos &DestCell)
 	}
 	//END_PREVENT_TRADE_WINDOW
 
-	// @fixme150 BEGIN
 	if (quest::CQuestManager::instance().GetPCForce(GetPlayerID())->IsRunning() == true)
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot use this item if you're using quests"));
 		return false;
 	}
-	// @fixme150 END
 
 	if (IS_SET(item->GetFlag(), ITEM_FLAG_LOG)) // 사용 로그를 남기는 아이템 처리
 	{
@@ -6129,7 +6122,6 @@ bool CHARACTER::PickupItem(uint32_t dwVID)
 				return false;
 			}
 		}
-		// @fixme150 END
 
 		if (item->IsOwnership(this))
 		{
@@ -6234,7 +6226,6 @@ bool CHARACTER::PickupItem(uint32_t dwVID)
 			GetParty()->ForEachOnlineMember(funcFindOwnership);
 
 			LPCHARACTER owner = funcFindOwnership.owner;
-			// @fixme115
 			if (!owner)
 				return false;
 
@@ -6360,7 +6351,7 @@ bool CHARACTER::SwapItem(uint16_t bCell, uint16_t bDestCell)
 		uint8_t bInvenCell = item1->GetCell();
 
 		
-		if (item2->IsDragonSoul() || item2->GetType() == ITEM_BELT) // @fixme117
+		if (item2->IsDragonSoul() || item2->GetType() == ITEM_BELT)
 		{
 			if (false == CanUnequipNow(item2) || false == CanEquipNow(item1))
 				return false;
@@ -6665,7 +6656,7 @@ bool CHARACTER::EquipItem(LPITEM item, int32_t iCandidateCell)
 		else if ((item->GetType() == ITEM_COSTUME) && (item->GetSubType() == COSTUME_ACCE))
 			this->EffectPacket(SE_EFFECT_ACCE_EQUIP);
 #endif
-		if (item->IsNewMountItem()) // @fixme152
+		if (item->IsNewMountItem())
 		{
 			quest::CQuestManager::instance().UseItem(GetPlayerID(), item, false);
 		}
@@ -7103,13 +7094,11 @@ bool CHARACTER::GiveItem(LPCHARACTER victim, const TItemPos & Cell)
 	if (!CanHandleItem())
 		return false;
 
-	// @fixme150 BEGIN
 	if (quest::CQuestManager::instance().GetPCForce(GetPlayerID())->IsRunning() == true)
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot take this item if you're using quests"));
 		return false;
 	}
-	// @fixme150 END
 
 	LPITEM item = GetItem(Cell);
 

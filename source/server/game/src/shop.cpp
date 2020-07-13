@@ -229,7 +229,7 @@ int32_t CShop::Buy(LPCHARACTER ch, uint8_t pos)
 					ch->GetPlayerID(),
 					m_pkPC->GetPlayerID());
 
-			return SHOP_SUBHEADER_GC_SOLD_OUT; // @fixme132 false to SHOP_SUBHEADER_GC_SOLD_OUT
+			return SHOP_SUBHEADER_GC_SOLD_OUT;
 		}
 
 		if ((pkSelectedItem->GetOwner() != m_pkPC))
@@ -238,7 +238,7 @@ int32_t CShop::Buy(LPCHARACTER ch, uint8_t pos)
 					ch->GetPlayerID(),
 					m_pkPC->GetPlayerID());
 
-			return SHOP_SUBHEADER_GC_SOLD_OUT; // @fixme132 false to SHOP_SUBHEADER_GC_SOLD_OUT
+			return SHOP_SUBHEADER_GC_SOLD_OUT;
 		}
 	}
 

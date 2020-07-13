@@ -474,7 +474,6 @@ void CClientManager::ItemAward(CPeer *,char* login)
 		char cmdStr[100] = "";	//why콜룸에서 읽은 값을 임시 문자열에 복사해둠
 		strcpy(cmdStr,whyStr);	//명령어 얻는 과정에서 토큰쓰면 원본도 토큰화 되기 때문
 		char command[20] = "";
-		// @fixme203 directly GetCommand instead of strcpy
 		GetCommand(cmdStr, command);			// command 얻기
 		if( !(strcmp(command,"GIFT") ))	// command 가 GIFT이면
 		{
@@ -486,7 +485,7 @@ void CClientManager::ItemAward(CPeer *,char* login)
 		}
 	}
 }
-char* CClientManager::GetCommand(char* str, char* command) // @fixme203
+char* CClientManager::GetCommand(char* str, char* command)
 {
 	char* tok;
 
@@ -722,14 +721,12 @@ void CClientManager::RESULT_ITEM_LOAD(CPeer * peer, MYSQL_RES * pRes, uint32_t d
 	}
 }
 
-// @fixme402 (RESULT_AFFECT_LOAD +dwRealPID)
 void CClientManager::RESULT_AFFECT_LOAD(CPeer * peer, MYSQL_RES * pRes, uint32_t dwHandle, uint32_t dwRealPID)
 {
 	uint32_t dwNumRows = static_cast<uint32_t>(mysql_num_rows(pRes));
 
 	if (dwNumRows == 0) // 데이터 없음
 	{
-		// @fixme402 begin
 		static uint32_t dwPID;
 		static uint32_t dwCount = 0; //1;
 		static TPacketAffectElement paeTable = {0};
@@ -741,7 +738,6 @@ void CClientManager::RESULT_AFFECT_LOAD(CPeer * peer, MYSQL_RES * pRes, uint32_t
 		peer->Encode(&dwPID, sizeof(uint32_t));
 		peer->Encode(&dwCount, sizeof(uint32_t));
 		peer->Encode(&paeTable, sizeof(TPacketAffectElement) * dwCount);
-		// @fixme402 end
 		return;
 	}
 

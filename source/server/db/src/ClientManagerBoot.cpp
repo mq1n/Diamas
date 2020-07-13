@@ -1399,7 +1399,7 @@ bool CClientManager::InitializeItemTableFromDB()
 
 		if ((LIMIT_NONE!=item_table->aLimits[0].bType) && // just checking the first limit one is enough
 			(item_table->aLimits[0].bType == item_table->aLimits[1].bType))
-			sys_log(0, "vnum(%u): limittype0(%u)==limittype1(%u)", item_table->dwVnum, item_table->aLimits[0].bType, item_table->aLimits[1].bType); // @warme012
+			sys_log(0, "vnum(%u): limittype0(%u)==limittype1(%u)", item_table->dwVnum, item_table->aLimits[0].bType, item_table->aLimits[1].bType);
 
 		// ## APPLY
 		VERIFY_IFIELD(IProto::applytype0,		item_table->aApplies[0].bType);

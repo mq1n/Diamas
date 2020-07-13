@@ -1993,7 +1993,7 @@ void CClientManager::WeddingEnd(TPacketWeddingEnd * p)
 // 캐시에 가격정보가 있으면 캐시를 업데이트 하고 캐시에 가격정보가 없다면
 // 우선 기존의 데이터를 로드한 뒤에 기존의 정보로 캐시를 만들고 새로 받은 가격정보를 업데이트 한다.
 //
-void CClientManager::MyshopPricelistUpdate(const TItemPriceListTable* pPacket) // @fixme403 (TPacketMyshopPricelistHeader to TItemPriceListTable)
+void CClientManager::MyshopPricelistUpdate(const TItemPriceListTable* pPacket)
 {
 	if (pPacket->byCount > SHOP_PRICELIST_MAX_NUM)
 	{
@@ -2355,7 +2355,7 @@ void CClientManager::ProcessPackets(CPeer * peer)
 
 				// MYSHOP_PRICE_LIST
 			case HEADER_GD_MYSHOP_PRICELIST_UPDATE:
-				MyshopPricelistUpdate((TItemPriceListTable*)data); // @fixme403 (TPacketMyshopPricelistHeader to TItemPriceListTable)
+				MyshopPricelistUpdate((TItemPriceListTable*)data);
 				break;
 
 			case HEADER_GD_MYSHOP_PRICELIST_REQ:

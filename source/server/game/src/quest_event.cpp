@@ -70,7 +70,7 @@ namespace quest
 END_OF_TIMER_EVENT:
 			PC * pPC = q.GetPC(info->player_id);
 
-			if (pPC && info->name) // @fixme168
+			if (pPC && info->name)
 				pPC->RemoveTimerNotCancel(info->name);
 			else
 				sys_err("quest::PC pointer null. player_id: %u", info->player_id);

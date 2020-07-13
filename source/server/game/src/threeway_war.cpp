@@ -266,12 +266,12 @@ int32_t GetKillValue(int32_t level)
 	int32_t iMinLevelFor1Point, iMaxLevelFor1Point;
 	int32_t iMinLevelFor2Point, iMaxLevelFor2Point;
 	int32_t iMinLevelFor3Point, iMaxLevelFor3Point;
-	int32_t iMinLevelFor4Point, iMaxLevelFor4Point; // @fixme153
+	int32_t iMinLevelFor4Point, iMaxLevelFor4Point;
 
 	iMinLevelFor1Point = 30; iMaxLevelFor1Point = 39;
 	iMinLevelFor2Point = 40; iMaxLevelFor2Point = 49;
 	iMinLevelFor3Point = 50; iMaxLevelFor3Point = 99;
-	iMinLevelFor4Point = 100; iMaxLevelFor4Point = gPlayerMaxLevel; // @fixme153
+	iMinLevelFor4Point = 100; iMaxLevelFor4Point = gPlayerMaxLevel;
 
 	if (iMinLevelFor1Point <= level && level <= iMaxLevelFor1Point)
 	{
@@ -285,7 +285,7 @@ int32_t GetKillValue(int32_t level)
 	{
 		return 3;
 	}
-	else if (iMinLevelFor4Point <= level && level <= iMaxLevelFor4Point)  // @fixme153
+	else if (iMinLevelFor4Point <= level && level <= iMaxLevelFor4Point)
 	{
 		return 4;
 	}

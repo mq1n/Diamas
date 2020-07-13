@@ -686,12 +686,10 @@ int32_t SECTREE_MANAGER::Build(const char * c_pszListFileName, const char* c_psz
 
 	while (fgets(buf, 256, fp))
 	{
-		// @fixme144 BEGIN
 		char * szEndline = strrchr(buf, '\n');
 		if (!szEndline)
 			continue;
 		*szEndline = '\0';
-		// @fixme144 END
 
 		if (!strncmp(buf, "//", 2) || *buf == '#')
 			continue;

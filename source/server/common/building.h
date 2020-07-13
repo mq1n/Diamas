@@ -1,6 +1,4 @@
-#ifndef __METIN_II_COMMON_BUILDING_H__
-#define __METIN_II_COMMON_BUILDING_H__
-
+#pragma once
 namespace building 
 {
 	enum
@@ -59,5 +57,3 @@ namespace building
 		int32_t	lLife;
 	} TObject;
 };
-
-#endif

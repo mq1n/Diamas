@@ -1645,7 +1645,7 @@ ACMD(do_messenger_auth)
 		return;
 
 	char answer = LOWER(*arg1);
-	// @fixme130 AuthToAdd void -> bool
+
 	bool bIsDenied = answer != 'y';
 	bool bIsAdded = MessengerManager::instance().AuthToAdd(ch->GetName(), arg2, bIsDenied); // DENY
 	if (bIsAdded && bIsDenied)

@@ -89,7 +89,6 @@ typedef struct SPlayerTable
 	int32_t	lExitX, lExitY;
 	int32_t	lExitMapIndex;
 
-	// @fixme301
 	int32_t		hp;
 	int32_t		sp;
 

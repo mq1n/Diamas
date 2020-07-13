@@ -243,7 +243,7 @@ class WinSFHelper:
 			target_file = "{} {}".format(i[0], i[1])
 
 			try:
-				os.system("mklink /D/J {}".format(target_file))
+				os.system("mklink /D/J {}".format(target_file)) # Directory & junction
 			except OSError as e:
 				self.sys_err("'{}' could not linked. Error: {}".format(target_file, e))
 				pass	
@@ -254,7 +254,7 @@ class WinSFHelper:
 			target_file = "{} {}".format(i[0], i[1])
 
 			try:
-				os.system("mklink /H {}".format(target_file))
+				os.system("mklink /H {}".format(target_file)) # Hardlink
 			except OSError as e:
 				self.sys_err("'{}' could not linked. Error: {}".format(target_file, e))
 				pass	

@@ -1070,7 +1070,6 @@ int32_t CInputLogin::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 			ChangeName(d, c_pData);
 			break;
 
-		// @fixme120
 		case HEADER_CG_ITEM_USE:
 		case HEADER_CG_TARGET:
 			break;

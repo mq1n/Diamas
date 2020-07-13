@@ -55,7 +55,6 @@ bool CGraphicImageTexture::CreateDeviceObjects()
 		if (!FileSystemManager::Instance().OpenFile(m_stFileName, mappedFile))
 			return false;
 
-		//@fixme002
 		if (!CreateFromMemoryFile(mappedFile.GetSize(), mappedFile.GetData(), m_d3dFmt, m_dwFilter))
 		{
 			const auto& stRefFilename = m_stFileName.GetPathA();

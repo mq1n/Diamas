@@ -715,7 +715,7 @@ void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, uint
 		return;
 	}
 
-	if (!CanHandleItem()) // @fixme149
+	if (!CanHandleItem())
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot handle more item"));
 		return;
@@ -823,7 +823,6 @@ void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, uint
 	// 보따리 개수를 감소시킨다. 
 	if (CountSpecifyItem(71049))
 	{
-		// @fixme403 BEGIN
 		TItemPriceListTable header;
 		memset(&header, 0, sizeof(TItemPriceListTable));
 
@@ -839,7 +838,6 @@ void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, uint
 		}
 
 		db_clientdesc->DBPacket(HEADER_GD_MYSHOP_PRICELIST_UPDATE, GetDesc()->GetHandle(), &header, sizeof(TItemPriceListTable));
-		// @fixme403 END
 	} 
 	// END_OF_MYSHOP_PRICE_LIST
 	else if (CountSpecifyItem(50200))
@@ -2493,7 +2491,6 @@ void CHARACTER::ComputePoints()
 	PointChange(POINT_MAX_SP, 0);
 
 	SetMaxStamina(iMaxStamina);
-	// @fixme118 part1
 	int32_t iCurHP = this->GetHP();
 	int32_t iCurSP = this->GetSP();
 
@@ -2540,7 +2537,6 @@ void CHARACTER::ComputePoints()
 	if (nullptr != pPetSystem)
 		pPetSystem->RefreshBuff();
 
-	// @fixme118 part2 (after petsystem stuff)
 	if (IsPC())
 	{
 		if (this->GetHP() != iCurHP)
@@ -3579,7 +3575,7 @@ void CHARACTER::PointChange(uint8_t type, int32_t amount, bool bAmount, bool bBr
 					case 2:
 					case 3:
 						if ((GetLevel() <= g_iStatusPointGetLevelLimit) &&
-							(GetLevel() <= gPlayerMaxLevel) ) // @fixme104
+							(GetLevel() <= gPlayerMaxLevel) )
 							PointChange(POINT_STAT, 1);
 						break;
 
@@ -4355,7 +4351,6 @@ void CHARACTER::mining(LPCHARACTER chLoad)
 	if (!chLoad)
 		return;
 
-	// @fixme128
 	if (GetMapIndex() != chLoad->GetMapIndex() || DISTANCE_APPROX(GetX() - chLoad->GetX(), GetY() - chLoad->GetY()) > 1000)
 		return;
 
@@ -4590,7 +4585,7 @@ bool CHARACTER::SetSyncOwner(LPCHARACTER ch, bool bRemoveFromList)
 		return false;
 	// END_OF_TRENT_MONSTER
 
-	if (ch) // @fixme131
+	if (ch)
 	{
 		if (!battle_is_attackable(ch, this))
 		{
@@ -5580,7 +5575,7 @@ void CHARACTER::SetTarget(LPCHARACTER pkChrTarget)
 			}
 			else
 			{
-				if (m_pkChrTarget->GetMaxHP() <= 0) // @fixme136
+				if (m_pkChrTarget->GetMaxHP() <= 0)
 					p.bHPPercent = 0;
 				else
 				p.bHPPercent = MINMAX(0, (m_pkChrTarget->GetHP() * 100) / m_pkChrTarget->GetMaxHP(), 100);
@@ -5608,7 +5603,7 @@ void CHARACTER::BroadcastTargetPacket()
 
 	if (IsPC())
 		p.bHPPercent = 0;
-	else if (GetMaxHP() <= 0) // @fixme136
+	else if (GetMaxHP() <= 0)
 		p.bHPPercent = 0;
 	else
 		p.bHPPercent = MINMAX(0, (GetHP() * 100) / GetMaxHP(), 100);
@@ -6247,7 +6242,7 @@ bool CHARACTER::BuildUpdatePartyPacket(SPacketGCPartyUpdate & out)
 
 	out.header		= HEADER_GC_PARTY_UPDATE;
 	out.pid		= GetPlayerID();
-	if (GetMaxHP() <= 0) // @fixme136
+	if (GetMaxHP() <= 0)
 		out.percent_hp	= 0;
 	else
 		out.percent_hp	= MINMAX(0, GetHP() * 100 / GetMaxHP(), 100);
@@ -6392,7 +6387,6 @@ void CHARACTER::ResetPoint(int32_t iLv)
 	SetRandomHP((iLv - 1) * number(JobInitialPoints[GetJob()].hp_per_lv_begin, JobInitialPoints[GetJob()].hp_per_lv_end));
 	SetRandomSP((iLv - 1) * number(JobInitialPoints[GetJob()].sp_per_lv_begin, JobInitialPoints[GetJob()].sp_per_lv_end));
 
-	// @fixme104
 	PointChange(POINT_STAT, (MINMAX(1, iLv, g_iStatusPointGetLevelLimit) * 3) + GetPoint(POINT_LEVEL_STEP) - GetPoint(POINT_STAT));
 
 	ComputePoints();
@@ -6795,7 +6789,7 @@ void CHARACTER::MountVnum(uint32_t vnum)
 
 	if (m_dwMountVnum == vnum)
 		return;
-	if ((m_dwMountVnum != 0)&&(vnum!=0)) //@fixme108 set recursively to 0 for eventuality
+	if ((m_dwMountVnum != 0)&&(vnum!=0))
 		MountVnum(0);
 
 	m_dwMountVnum = vnum;
@@ -7281,7 +7275,7 @@ ESex GET_SEX(LPCHARACTER ch)
 
 int32_t CHARACTER::GetHPPct() const
 {
-	if (GetMaxHP() <= 0) // @fixme136
+	if (GetMaxHP() <= 0)
 		return 0;
 	return (GetHP() * 100) / GetMaxHP();
 }

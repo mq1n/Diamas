@@ -19,7 +19,7 @@
 #include "battleground.h"
 #include "../../common/service.h"
 
-#define IS_NO_SAVE_AFFECT(type) ((type) == AFFECT_WAR_FLAG || (type) == AFFECT_REVIVE_INVISIBLE || ((type) >= AFFECT_PREMIUM_START && (type) <= AFFECT_PREMIUM_END) || (type) == AFFECT_MOUNT_BONUS) // @fixme156 added MOUNT_BONUS (if the game core crashes, the bonus would double if present in player.affect)
+#define IS_NO_SAVE_AFFECT(type) ((type) == AFFECT_WAR_FLAG || (type) == AFFECT_REVIVE_INVISIBLE || ((type) >= AFFECT_PREMIUM_START && (type) <= AFFECT_PREMIUM_END) || (type) == AFFECT_MOUNT_BONUS) // added MOUNT_BONUS (if the game core crashes, the bonus would double if present in player.affect)
 #define IS_NO_CLEAR_ON_DEATH_AFFECT(type) ((type) == AFFECT_BLOCK_CHAT || ((type) >= 500 && (type) < 600))
 
 void SendAffectRemovePacket(LPDESC d, uint32_t pid, uint32_t type, uint8_t point)
@@ -534,10 +534,9 @@ void CHARACTER::LoadAffect(uint32_t dwCount, TPacketAffectElement * pElements)
 
 	m_bIsLoadedAffect = true;
 
-	ComputePoints(); // @fixme156
+	ComputePoints();
 	DragonSoul_Initialize();
 
-	// @fixme118 BEGIN (regain affect hp/mp)
 	if (!IsDead())
 	{
 		PointChange(POINT_HP, GetMaxHP() - GetHP());
@@ -723,7 +722,7 @@ bool CHARACTER::RemoveAffect(CAffect * pkAff)
 
 	if (AFFECT_REVIVE_INVISIBLE != pkAff->dwType && AFFECT_MOUNT != pkAff->dwType)
 		ComputePoints();
-	else  // @fixme110
+	else
 		UpdatePacket();
 
 	CheckMaximumPoints();

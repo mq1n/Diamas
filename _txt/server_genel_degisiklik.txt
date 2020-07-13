@@ -1,0 +1,5 @@
+thecore_memcpy
+auto it;
+boost/tr1
+auto_ptr
+* veri tipleri

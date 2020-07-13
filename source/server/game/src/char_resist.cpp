@@ -385,7 +385,7 @@ void CHARACTER::ApplyMobAttribute(const TMobTable* table)
 	}
 #if defined(ENABLE_WOLFMAN_CHARACTER) && defined(USE_MOB_BLEEDING_AS_POISON)
 	if (table->cEnchants[MOB_ENCHANT_POISON] != 0)
-		ApplyPoint(APPLY_BLEEDING_PCT, table->cEnchants[MOB_ENCHANT_POISON]/50); // @warme009
+		ApplyPoint(APPLY_BLEEDING_PCT, table->cEnchants[MOB_ENCHANT_POISON]/50);
 #endif
 
 	for (int32_t i = 0; i < MOB_RESISTS_MAX_NUM; ++i)

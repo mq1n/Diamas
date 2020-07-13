@@ -534,8 +534,7 @@ bool COXEventManager::CloseEvent()
 			pkChar->WarpSet(EMPIRE_START_X(pkChar->GetEmpire()), EMPIRE_START_Y(pkChar->GetEmpire()));
 	}
 
-	Initialize(); // @fixme157 (instead of simply doing m_map_char.clear();)
-
+	Initialize();
 	return true;
 }
 

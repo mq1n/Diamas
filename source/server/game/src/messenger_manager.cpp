@@ -12,10 +12,8 @@
 #include "char_manager.h"
 #include "quest_manager.h"
 
-// @fixme142 BEGIN
 static char	__account[CHARACTER_NAME_MAX_LEN*2+1];
 static char	__companion[CHARACTER_NAME_MAX_LEN*2+1];
-// @fixme142 END
 
 MessengerManager::MessengerManager()
 {
@@ -48,11 +46,9 @@ void MessengerManager::Login(MessengerManager::keyA account)
 	if (m_set_loginAccount.find(account) != m_set_loginAccount.end())
 		return;
 
-	// @fixme142 BEGIN
 	DBManager::instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
 	if (account.compare(__account))
 		return;
-	// @fixme142 END
 
 	DBManager::instance().FuncQuery(std::bind(&MessengerManager::LoadList, this, std::placeholders::_1),
 			"SELECT account, companion FROM messenger_list WHERE account='%s'", __account);
@@ -207,7 +203,6 @@ void MessengerManager::RequestToAdd(LPCHARACTER ch, LPCHARACTER target)
 	target->ChatPacket(CHAT_TYPE_COMMAND, "messenger_auth %s", ch->GetName());
 }
 
-// @fixme130 void -> bool
 bool MessengerManager::AuthToAdd(MessengerManager::keyA account, MessengerManager::keyA companion, bool bDeny)
 {
 	uint32_t dw1 = GetCRC32(companion.c_str(), companion.length());
@@ -262,12 +257,10 @@ void MessengerManager::AddToList(MessengerManager::keyA account, MessengerManage
 	if (m_Relation[account].find(companion) != m_Relation[account].end())
 		return;
 
-	// @fixme142 BEGIN
 	DBManager::instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
 	DBManager::instance().EscapeString(__companion, sizeof(__companion), companion.c_str(), companion.size());
 	if (account.compare(__account) || companion.compare(__companion))
 		return;
-	// @fixme142 END
 
 	sys_log(0, "Messenger Add %s %s", account.c_str(), companion.c_str());
 	DBManager::instance().Query("INSERT INTO messenger_list VALUES ('%s', '%s')",  __account, __companion);
@@ -299,12 +292,10 @@ void MessengerManager::RemoveFromList(MessengerManager::keyA account, MessengerM
 	if (companion.size() == 0)
 		return;
 
-	// @fixme142 BEGIN
 	DBManager::instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
 	DBManager::instance().EscapeString(__companion, sizeof(__companion), companion.c_str(), companion.size());
 	if (account.compare(__account) || companion.compare(__companion))
 		return;
-	// @fixme142 END
 
 	sys_log(1, "Messenger Remove %s %s", account.c_str(), companion.c_str());
 	DBManager::instance().Query("DELETE FROM messenger_list WHERE account='%s' AND companion = '%s'", __account, __companion);
@@ -323,11 +314,9 @@ void MessengerManager::RemoveAllList(keyA account)
 {
 	std::set<keyT>	company(m_Relation[account]);
 
-	// @fixme142 BEGIN
 	DBManager::instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
 	if (account.compare(__account))
 		return;
-	// @fixme142 END
 
 	/* SQL Data ªË¡¶ */
 	DBManager::instance().Query("DELETE FROM messenger_list WHERE account='%s' OR companion='%s'", __account, __account);

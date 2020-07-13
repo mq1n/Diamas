@@ -1,6 +1,4 @@
-#ifndef __INC_METIN_II_MARKIMAGE_H__
-#define __INC_METIN_II_MARKIMAGE_H__
-
+#pragma once
 #include <IL/il.h>
 
 using Pixel = uint32_t;
@@ -106,5 +104,3 @@ class CGuildMarkImage
 
 		ILuint m_uImg;
 };
-
-#endif
