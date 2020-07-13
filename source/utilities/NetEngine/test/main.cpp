@@ -7,11 +7,19 @@ using namespace net_engine;
 std::shared_ptr <CNetworkServerManager> netServer;
 std::shared_ptr <CNetworkClientManager> netClient;
 
-static const auto gsc_securityLevel = ESecurityLevels::SECURITY_LEVEL_NONE;
+/*
+		SECURITY_LEVEL_NONE = 0,  // No handshake
+		SECURITY_LEVEL_BASIC = 1, // Basic handshake (No keys or Diffie-Hellman)
+		SECURITY_LEVEL_XTEA = 2,  // Key/Pong keys
+		SECURITY_LEVEL_KEY_AGREEMENT = 3 // Diffie-Hellman Key agreement
+*/
+static const auto gsc_securityLevel = ESecurityLevels::SECURITY_LEVEL_KEY_AGREEMENT;
 static const auto gsc_cryptKey = DEFAULT_CRYPT_KEY;
 
 bool InitializeServer()
 {
+	SetConsoleTitleA("NetEngineTest Server");
+
 	NetServiceBase _net_service;
 	netServer = std::make_shared<CNetworkServerManager>(_net_service, ip_address, port, gsc_securityLevel, gsc_cryptKey);
 	if (!netServer || !netServer.get()) 
@@ -24,6 +32,8 @@ bool InitializeServer()
 }
 bool InitializeClient()
 {
+	SetConsoleTitleA("NetEngineTest Client");
+
 	NetServiceBase _net_service;
 	netClient = std::make_shared<CNetworkClientManager>(_net_service, gsc_securityLevel, gsc_cryptKey);
 	if (!netClient || !netClient.get()) 
@@ -91,17 +101,6 @@ int main(int argc, char* argv[])
 		{
 			printf("Server cannot initialized\n");
 			return EXIT_FAILURE;
-		}
-
-		printf("Enter message: ");
-
-		std::string msg;
-		while (true)
-		{
-			std::getline(std::cin, msg);
-			if (msg.empty() || msg == "x")
-				break;
-			netServer->BroadcastMessage(msg);
 		}
 	}
 	else

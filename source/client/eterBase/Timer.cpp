@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "Timer.h"
 
-//static LARGE_INTEGER gs_liTickCountPerSec;
 static uint32_t gs_dwBaseTime=0;
 static uint32_t gs_dwServerTime=0;
 static uint32_t gs_dwClientTime=0;

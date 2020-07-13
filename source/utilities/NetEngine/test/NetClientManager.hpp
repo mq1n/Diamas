@@ -1,56 +1,71 @@
 #pragma once
 #include "../include/NetEngine.hpp"
 #include "nameof.hpp"
+#include "ClientCipher.hpp"
 
 namespace net_engine
 {	
 	class CNetworkClientManager : public NetClientBase
 	{
-//		using TPacketHandler = std::unordered_map <TNetOpcode, THandlerFunc>;
-		
+		using THandlerFunc 		 = std::function <void(std::shared_ptr <Packet> packet)>;
+		using TPacketHandler 	 = std::unordered_map <TNetOpcode, THandlerFunc>;
+		using TOnPacketRegister	 = std::function <void(std::shared_ptr <PacketDefinition>)>;
+
 	public:
 		CNetworkClientManager(NetServiceBase& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey);
 		virtual ~CNetworkClientManager() {};
 
 		NetServiceBase & GetServiceInstance() const;
 	
-//		virtual void Init();
 		virtual void Run();
 		virtual void Shutdown();
 		virtual bool IsShuttingDown() const;
 
-		virtual void		OnConnect();
-		virtual void		OnDisconnect(const asio::error_code& e);
-		virtual void		OnRead(std::shared_ptr <Packet> packet);
-		virtual std::size_t	OnWritePre(const void* data, std::size_t length);
-		virtual void		OnWritePost(bool bCompleted);
-		virtual void		OnError(std::uint32_t ulErrorType, const asio::error_code & e);
-
-//		void SendCrypted(const SNetPacket& packet, bool flush = false);
-
-		std::size_t ProcessInput(const void* data, std::size_t maxlength);
+		virtual void OnConnect();
+		virtual void OnDisconnect(const asio::error_code& e);
+		virtual void OnRead(std::shared_ptr <Packet> packet);
+		virtual void OnError(std::uint32_t ulErrorType, const asio::error_code & e);
 	
-
-		std::size_t OnRecvChatPacket(const void* data, std::size_t maxlength);
-
-		/*
-		inline void RegisterPacket(TNetOpcode header, uint8_t type, bool is_dynamic, THandlerFunc handler)
-		{
-			CPacketContainer::Instance().AppendPacket(header, NAMEOF(header).data(), type, handler, is_dynamic);
-//			m_handlers.emplace(header, handler);
+		inline bool RegisterPacket(const std::string& name, TNetOpcode header, THandlerFunc handler, bool incoming, bool outgoing, TOnPacketRegister on_register)
+		{ 
+			std::shared_ptr <PacketDefinition> def;
+			if ((def = PacketManager::Instance().RegisterPacket(name, header, incoming, outgoing)))
+			{
+				if (handler)
+					m_handlers.emplace(header, handler);
+				if (on_register)
+					on_register(def);
+				return true;
+			}
+			return false;
 		}
-
-		inline void DeregisterPacket(uint8_t header)
+		inline bool DeregisterPacket(TNetOpcode header, bool incoming, bool outgoing)
 		{
-			CPacketContainer::Instance().RemovePacket(header, NAMEOF(header).data());
-//			auto iter = m_handlers.find(header);
-//			if (iter != m_handlers.end())
-//				m_handlers.erase(iter);
+			auto iter = m_handlers.find(header);
+			if (iter != m_handlers.end())
+			{
+				m_handlers.erase(iter);
+				return PacketManager::Instance().DeregisterPacket(header, incoming, outgoing);
+			}
+			return false;
 		}
-		*/
+		
+	protected:
+		void OnRecvKeyAgreementCompletedPacket(std::shared_ptr <Packet> packet);
+		void OnRecvPhasePacket(std::shared_ptr <Packet> packet);
+		void OnRecvKeyAgreementPacket(std::shared_ptr <Packet> packet);
+		void OnRecvHandshakePacket(std::shared_ptr <Packet> packet);
 
 	private:
 		NetServiceBase & m_pNetService;
-//		TPacketHandler m_handlers;
+		TPacketHandler m_handlers;
+
+		struct SServerTimeSync
+		{
+			uint32_t m_dwChangeServerTime;
+			uint32_t m_dwChangeClientTime;
+		} m_kServerTimeSync;
+
+		Cipher	m_cipher;
 	};
 };

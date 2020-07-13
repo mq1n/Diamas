@@ -8,6 +8,8 @@
 
 namespace net_engine
 {
+	using TNetOpcode = uint8_t;
+
 	enum class EPacketDirection
 	{
 		Incoming,
@@ -26,6 +28,12 @@ namespace net_engine
 		HEADER_GC_PHASE = 253,
 		HEADER_GC_KEY_AGREEMENT = HEADER_KEY_AGREEMENT,
 		HEADER_GC_HANDSHAKE = HEADER_HANDSHAKE
+	};
+
+	enum ReservedCGHeaders : uint8_t
+	{
+		HEADER_CG_KEY_AGREEMENT = HEADER_KEY_AGREEMENT,
+		HEADER_CG_HANDSHAKE = HEADER_HANDSHAKE
 	};
 
 	enum EPhases : uint8_t
@@ -118,6 +126,7 @@ namespace net_engine
 			static PacketManager& Instance();
 
 			std::shared_ptr <PacketDefinition> RegisterPacket(const std::string& name, uint8_t header, bool incoming, bool outgoing);
+			bool DeregisterPacket(uint8_t header, bool incoming, bool outgoing);
 
 			std::shared_ptr <Packet> CreatePacket(uint8_t header, EPacketDirection direction);
 
@@ -125,4 +134,25 @@ namespace net_engine
 			std::map <uint8_t, std::shared_ptr <PacketDefinition>> m_incomingPackets;
 			std::map <uint8_t, std::shared_ptr <PacketDefinition>> m_outgoingPackets;
 	};
+
+
+	using THandlerFunc 		 = std::function <void(std::shared_ptr <Packet> packet)>;
+	using TOnPacketRegister	 = std::function <void(std::shared_ptr <PacketDefinition>)>;
+
+	static inline bool RegisterPacket(const std::string& name, TNetOpcode header, THandlerFunc handler, bool incoming, bool outgoing, TOnPacketRegister on_register)
+	{ 
+		std::shared_ptr <PacketDefinition> def;
+		if ((def = PacketManager::Instance().RegisterPacket(name, header, incoming, outgoing)))
+		{
+			on_register(def);
+			return true;
+		}
+		return false;
+	}
+	static inline bool DeregisterPacket(TNetOpcode header, bool incoming, bool outgoing)
+	{
+		return PacketManager::Instance().DeregisterPacket(header, incoming, outgoing);
+	}
+
+	void SetupPackets(bool is_server);
 };

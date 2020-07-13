@@ -1,14 +1,12 @@
 #include "../include/NetEngine.hpp"
 #include "NetServerManager.hpp"
 #include "NetPeerManager.hpp"
-#include "Packet.hpp"
 
 namespace net_engine
 {	
 	CNetworkServerManager::CNetworkServerManager(NetServiceBase& netService, const std::string& ip_address, uint16_t port, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
-		NetServerBase(netService(), securityLevel, cryptKey), m_netService(netService), m_updateTimer(netService()),
+		NetServerBase(netService(), securityLevel, cryptKey), m_netService(netService),
 		m_ip_address(ip_address), m_port(port),
-		m_stopped(false),
 		m_securityLevel(securityLevel), m_crypt_key(cryptKey)
 	{
 		NET_LOG(LL_TRACE, "Creating server on %s:%u", ip_address.c_str(), port);
@@ -19,75 +17,67 @@ namespace net_engine
 		Stop();
 	}
 
-#if 0
-    void CNetworkServerManager::OnUpdate()
-    {
-        if (m_stopped)
-            return;
+	bool CNetworkServerManager::ParseCommandLine()
+	{
+		NET_LOG(LL_SYS, "ParseCommandLine triggered!");
 
-        m_updateTimer.expires_from_now(std::chrono::milliseconds(10));
-        m_updateTimer.async_wait(std::bind(&CNetworkServerManager::OnUpdate, this));
-
-		BroadcastMessage("tick");
-#if 0
-        AddNewSockets();
-
-        _sockets.erase(std::remove_if(_sockets.begin(), _sockets.end(), [this](std::shared_ptr<SocketType> sock)
-        {
-            if (!sock->Update())
-            {
-                if (sock->IsOpen())
-                    sock->CloseSocket();
-
-                this->SocketRemoved(sock);
-
-                --this->_connections;
-                return true;
-            }
-
-            return false;
-        }), _sockets.end());
-#endif
+		return true;
 	}
-#endif
+
+	bool CNetworkServerManager::ParseConfigFile()
+	{
+		NET_LOG(LL_SYS, "ParseConfigFile triggered!");
+
+		return true;
+	}
+
+	bool CNetworkServerManager::CreateDBConnection()
+	{
+		NET_LOG(LL_SYS, "CreateDBConnection triggered!");
+
+		return true;
+	}
 
 	void CNetworkServerManager::ServerWorker()
 	{
-		try
+		//try
 		{
+			NET_LOG(LL_SYS, "Network engine initializing...");
+
+			if (!ParseCommandLine())
+			{
+				NET_LOG(LL_ERR, "ParseCommandLine has been failed!");
+				return;
+			}
+
+			if (!ParseConfigFile())
+			{
+				NET_LOG(LL_ERR, "ParseConfigFile has been failed!");
+				return;
+			}
+
+			if (!CreateDBConnection())
+			{
+				NET_LOG(LL_ERR, "CreateDBConnection has been failed!");
+				return;
+			}
+
 			NET_LOG(LL_SYS, "Network engine binding to %s:%u", m_ip_address.c_str(), m_port);
 			Bind(m_ip_address, m_port);
 
-			NET_LOG(LL_SYS, "Network engine initializing...");
-			// TODO: Config, pre initilization
-
-			/*
-			RegisterPacket(
-				HEADER_CG_LOGIN, EPacketTypes::PacketTypeOutgoing, false, std::bind(&CNetworkServerManager::OnRecvLoginPacket, this, std::placeholders::_1, std::placeholders::_2)
-			);
-			RegisterPacket(
-				HEADER_CG_CHAT, EPacketTypes::PacketTypeOutgoing, false, std::bind(&CNetworkServerManager::OnRecvChatPacket, this, std::placeholders::_1, std::placeholders::_2)
-			);
-			*/
-
-			// TODO: DB Connection and other stuffs
-
 			NET_LOG(LL_SYS, "Server initialized");
 
-#if 0
-			m_updateTimer.expires_from_now(std::chrono::milliseconds(10));
-     	  	m_updateTimer.async_wait(std::bind(&CNetworkServerManager::OnUpdate, this));
-#endif
-
-			NET_LOG(LL_SYS, "Network engine started!");
+			NET_LOG(LL_SYS, "Network engine starting...");
 			Run();
 
 			NET_LOG(LL_SYS, "Network engine shutting down...");
 			Shutdown();
 		}
+		/*
 		catch (const asio::system_error& e)
 		{
 			NET_LOG(LL_CRI, "Exception handled: %s", e.what());
+			abort();
 		}
 		catch (std::exception& e)
 		{
@@ -104,6 +94,7 @@ namespace net_engine
 			NET_LOG(LL_CRI, "Unhandled exception");
 			abort();
 		}
+		*/
 	}
 
 	bool CNetworkServerManager::Initialize()
@@ -114,23 +105,38 @@ namespace net_engine
 	}
 	void CNetworkServerManager::Stop()
     {
-        m_stopped = true;
         Shutdown();
     }
 
-	// test only
-	void CNetworkServerManager::BroadcastMessage(const std::string& msg)
+	void CNetworkServerManager::BroadcastPacket(std::shared_ptr <Packet> packet)
 	{
-		/*
 		for (const auto& [id, peer] : m_peers)
 		{
 			if (peer && peer.get())
 			{
-				peer->SendChatPacket(msg);
+				peer->Send(packet);
 			}
 		}
-		*/
 	}
+	void CNetworkServerManager::SendTo(std::shared_ptr <Packet> packet, std::function<bool(CNetworkConnectionManager*)> filter)
+	{
+		for (const auto& [id, peer] : m_peers)
+		{
+			if (peer && peer.get())
+			{
+				if (filter && filter(peer.get()))
+				{
+					peer->Send(packet);
+				}
+			}
+		}		
+	}
+    void CNetworkServerManager::SendToPhase(std::shared_ptr <Packet> packet, uint8_t phase)
+	{
+        SendTo(std::move(packet), [phase](CNetworkConnectionManager* connection) {
+            return connection->GetPhase() == phase;
+        });
+    }
 
 	// I/O Service wrappers
 	void CNetworkServerManager::Run()
@@ -139,9 +145,6 @@ namespace net_engine
 	}
 	void CNetworkServerManager::Shutdown()
 	{
-		// _newSockets.clear();
-        // _sockets.clear();
-
 		m_netService.Stop();
 	}
 	bool CNetworkServerManager::IsShuttingDown()
@@ -166,12 +169,8 @@ namespace net_engine
 	std::shared_ptr <NetPeerBase> CNetworkServerManager::NewPeer()
 	{
 		auto peer = std::make_shared<CNetworkConnectionManager>(std::static_pointer_cast<CNetworkServerManager>(shared_from_this()), m_securityLevel, m_crypt_key);
-
-#//ifdef _DEBUG
-//		peer->SetLogLevel(LL_ONREAD | LL_ONWRITE_PRE | LL_ONWRITE_POST | LL_ONREGISTERPACKET);
-//#endif
-//
 		m_peers.emplace(peer->GetId(), peer);
+
 		return peer;
 	}
 
@@ -181,49 +180,4 @@ namespace net_engine
 		if (iter != m_peers.end())
 			m_peers.erase(iter);
 	}
-
-#if 0
-	std::size_t CNetworkServerManager::OnRecvLoginPacket(const void* data, std::size_t maxlength)
-	{
-		auto packet = reinterpret_cast<const SNetPacketCGLogin*>(data);
-
-		if (maxlength < packet->size())
-			return 0;
-
-//		if (maxlength != SNetPacketGCLogin::size())
-//		{
-//			NET_LOG(LL_CRI, "Packet size mismatch it can be combined packet!");
-//			return SNetPacketGCLogin::size();
-//		}
-
-		NET_LOG(LL_SYS, "Recv login packet! ID: %s PWD: %s", packet->login, packet->password);
-
-		SNetPacketGCChat retPacket;
-		strcpy_s(retPacket.msg, "done!");
-		//peer->SendCrypted(retPacket, true);
-
-		// ...
-
-		return packet->size();
-	}
-
-	std::size_t CNetworkServerManager::OnRecvChatPacket(const void* data, std::size_t maxlength)
-	{
-		auto packet = reinterpret_cast<const SNetPacketGCChat*>(data);
-
-		if (maxlength < packet->size())
-			return 0;
-
-//		if (maxlength != SNetPacketGCChat::size())
-//		{
-//			NET_LOG(LL_CRI, "Packet size mismatch it can be combined packet!");
-//			return SNetPacketGCChat::size();
-//		}
-
-
-		// ...
-
-		return packet->size();
-	}
-#endif
 }

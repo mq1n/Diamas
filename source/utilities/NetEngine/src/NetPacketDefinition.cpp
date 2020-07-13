@@ -2,191 +2,197 @@
 
 #include <utility>
 
-namespace net_engine {
-	PacketDefinition::PacketDefinition(std::string name, unsigned char header)
-		: _header(header),
-		  _name(std::move(name)),
-		  _size(0),
-		  _fields(),
-		  _sequence(false),
-		  _dynamicSizedPacket(false) {}
-
+namespace net_engine
+{
+	PacketDefinition::PacketDefinition(std::string name, uint8_t header) :
+		m_header(header),
+		m_name(std::move(name)),
+		m_size(0),
+		m_fields(),
+		m_sequence(false),
+		m_dynamicSizedPacket(false)
+	{
+	}
 	PacketDefinition::~PacketDefinition() = default;
 
-	uint8_t PacketDefinition::GetHeader() { return _header; }
-
-	uint32_t PacketDefinition::GetSize() { return _size; }
-
-	const std::string &PacketDefinition::GetName() { return _name; }
-
-	Field PacketDefinition::GetField(std::string name) {
-		if (_fields.find(name) == _fields.end()) {
+	uint8_t PacketDefinition::GetHeader() const
+	{
+		return m_header;
+	}
+	uint32_t PacketDefinition::GetSize() const
+	{
+		return m_size;
+	}
+	const std::string &PacketDefinition::GetName()
+	{
+		return m_name;
+	}
+	Field PacketDefinition::GetField(const std::string& name)
+	{
+		if (m_fields.find(name) == m_fields.end())
+		{
 			throw std::runtime_error("Field is not definied");
 		}
 
-		return _fields[name];
+		return m_fields[name];
+	}
+	const std::map <std::string, Field> &PacketDefinition::GetFields()
+	{
+		return m_fields;
+	}
+	std::shared_ptr <PacketDefinition> PacketDefinition::GetNestedType(const std::string& name)
+	{
+		return m_subDefinitions[name];
+	}
+	bool PacketDefinition::IsDynamicSized() const
+	{
+		return m_dynamicSizedPacket;
+	}
+	bool PacketDefinition::HasSequence() const
+	{
+		return m_sequence;
 	}
 
-	const std::map<std::string, Field> &PacketDefinition::GetFields() {
-		return _fields;
-	}
-
-	std::shared_ptr<PacketDefinition> PacketDefinition::GetNestedType(
-		std::string name) {
-		return _subDefinitions[name];
-	}
-
-	bool PacketDefinition::IsDynamicSized() { return _dynamicSizedPacket; }
-
-	void PacketDefinition::AddField(std::string name, uint32_t length) {
-		if (_fields.find(name) != _fields.end()) {
- //           CORE_LOGGING(warning)
-//                << "Field " << name << " already exists in " << _name;
+	void PacketDefinition::AddField(std::string name, uint32_t length)
+	{
+		if (m_fields.find(name) != m_fields.end())
+		{
+			NET_LOG(LL_ERR, "Field: %s already exist in: %s", name.c_str(), m_name.c_str());
 			return;  // todo: throw exception
 		}
 
 		Field field;
-		field.position = _size;
+		field.position = m_size;
 		field.length = length;
-		_fields[name] = field;
+		m_fields[name] = field;
 
-		_size += length;
+		m_size += length;
 
- //       CORE_LOGGING(trace)
- //           << "Added field " << name << " at " << field.position
- //           << " with length " << field.length << " in packet " << _name;
+		NET_LOG(LL_TRACE, "Added field %s at %u with length %u in packet %s", name.c_str(), field.position, field.length, m_name.c_str());
 	}
 
-	void PacketDefinition::AddRepeatedField(std::string name,
-											uint32_t count,
-											uint32_t entryLength) {
-		if (_fields.find(name) != _fields.end()) {
- //           CORE_LOGGING(warning)
- //               << "Field " << name << " already exists in " << _name;
+	void PacketDefinition::AddRepeatedField(std::string name, uint32_t count, uint32_t entryLength)
+	{
+		if (m_fields.find(name) != m_fields.end())
+		{
+			NET_LOG(LL_ERR, "Field: %s already exist in: %s", name.c_str(), m_name.c_str());
 			return;  // todo: throw exception
 		}
 
 		Field field;
-		field.position = _size;
+		field.position = m_size;
 		field.length = entryLength * count;
 		field.count = count;
-		_fields[name] = field;
+		m_fields[name] = field;
 
-		_size += entryLength * count;
+		m_size += entryLength * count;
 
- //       CORE_LOGGING(trace)
-//            << "Added repeated field " << name << " at " << field.position
-//            << " with length " << field.length << " in packet " << _name;
+		NET_LOG(LL_TRACE, "Added repeated field %s at %u with length %u in packet %s", name.c_str(), field.position, field.length, m_name.c_str());
 	}
 
-	void PacketDefinition::AddString(std::string name, uint32_t length) {
-		if (_fields.find(name) != _fields.end()) {
- //           CORE_LOGGING(warning)
- //               << "Field " << name << " already exists in " << _name;
+	void PacketDefinition::AddString(std::string name, uint32_t length)
+	{
+		if (m_fields.find(name) != m_fields.end())
+		{
+			NET_LOG(LL_ERR, "Field: %s already exist in: %s", name.c_str(), m_name.c_str());
 			return;  // todo: throw exception
 		}
 
 		Field field;
 		field.length = length;
-		field.position = _size;
+		field.position = m_size;
 
-		_fields[name] = field;
+		m_fields[name] = field;
 
-		_size += length;
+		m_size += length;
 
-  //      CORE_LOGGING(trace)
-  //          << "Added string field " << name << " at " << field.position
- //           << " with length " << field.length << " in packet " << _name;
+ 		NET_LOG(LL_TRACE, "Added string field %s at %u with length %u in packet %s", name.c_str(), field.position, field.length, m_name.c_str());
 	}
 
-	void PacketDefinition::AddRepeatedString(std::string name,
-											 uint32_t count,
-											 uint32_t entryLength) {
-		if (_fields.find(name) != _fields.end()) {
- //           CORE_LOGGING(warning)
-//                << "Field " << name << " already exists in " << _name;
+	void PacketDefinition::AddRepeatedString(std::string name, uint32_t count, uint32_t entryLength)
+	{
+		if (m_fields.find(name) != m_fields.end())
+		{
+			NET_LOG(LL_ERR, "Field: %s already exist in: %s", name.c_str(), m_name.c_str());
 			return;  // todo: throw exception
 		}
 
 		Field field;
 		field.length = count * entryLength;
 		field.count = count;
-		field.position = _size;
+		field.position = m_size;
 
-		_fields[name] = field;
+		m_fields[name] = field;
 
-		_size += count * entryLength;
+		m_size += count * entryLength;
 
-  //      CORE_LOGGING(trace) << "Added repeated string field " << name << " at "
- //                           << field.position << " with length " << field.length
-  //                          << " in packet " << _name;
+  		NET_LOG(LL_TRACE, "Added repeated string field %s at %u with length %u in packet %s", name.c_str(), field.position, field.length, m_name.c_str());
 	}
 
-	void PacketDefinition::AddSubField(
-		std::string name, std::shared_ptr<PacketDefinition> subType) {
-		if (_fields.find(name) != _fields.end()) {
- //           CORE_LOGGING(warning)
-  //              << "Field " << name << " already exists in " << _name;
+	void PacketDefinition::AddSubField(std::string name, std::shared_ptr<PacketDefinition> subType)
+	{
+		if (m_fields.find(name) != m_fields.end())
+		{
+			NET_LOG(LL_ERR, "Field: %s already exist in: %s", name.c_str(), m_name.c_str());
 			return;  // todo: throw exception
 		}
 
 		Field field;
 		field.length = subType->GetSize();
-		field.position = _size;
+		field.position = m_size;
 		field.isSubType = true;
 		field.subType = subType->GetName();
 
-		_fields[name] = field;
+		m_fields[name] = field;
 
-		_size += subType->GetSize();
+		m_size += subType->GetSize();
 
- //       CORE_LOGGING(trace)
- //           << "Added sub type (" << subType->GetName() << ") field " << name
- //           << " at " << field.position << " with length " << field.length
-  //          << " in packet " << _name;
+  		NET_LOG(LL_TRACE, "Added sub type ( %s ) field %s at %u with length %u in packet %s",
+		  	subType->GetName().c_str(), name.c_str(), field.position, field.length, m_name.c_str());
 	}
 
-	void PacketDefinition::AddRepeatedSubField(
-		std::string name, uint32_t count,
-		std::shared_ptr<PacketDefinition> subType) {
-		if (_fields.find(name) != _fields.end()) {
- //           CORE_LOGGING(warning)
-//                << "Field " << name << " already exists in " << _name;
+	void PacketDefinition::AddRepeatedSubField(std::string name, uint32_t count, std::shared_ptr <PacketDefinition> subType)
+	{
+		if (m_fields.find(name) != m_fields.end())
+		{
+			NET_LOG(LL_ERR, "Field: %s already exist in: %s", name.c_str(), m_name.c_str());
 			return;  // todo: throw exception
 		}
 
 		Field field;
 		field.length = subType->GetSize() * count;
 		field.count = count;
-		field.position = _size;
+		field.position = m_size;
 		field.isSubType = true;
 		field.subType = subType->GetName();
 
-		_fields[name] = field;
+		m_fields[name] = field;
 
-		_size += subType->GetSize() * count;
+		m_size += subType->GetSize() * count;
 
-  //      CORE_LOGGING(trace)
-  //          << "Added repeated sub type (" << subType->GetName() << ") field "
- //           << name << " at " << field.position << " with length "
-//           << field.length << " in packet " << _name;
+   		NET_LOG(LL_TRACE, "Added repeated sub type ( %s ) field %s at %u with length %u in packet %s",
+		  	subType->GetName().c_str(), name.c_str(), field.position, field.length, m_name.c_str());
 	}
 
-	std::shared_ptr<PacketDefinition> PacketDefinition::CreateNestedType(
-		const std::string &name) {
+	std::shared_ptr <PacketDefinition> PacketDefinition::CreateNestedType(const std::string &name)
+	{
 		auto definition = std::make_shared<PacketDefinition>(name, 0);
-		_subDefinitions[name] = definition;
+		m_subDefinitions[name] = definition;
 		return definition;
 	}
 
-	void PacketDefinition::EnableDirectResponse() {
+	void PacketDefinition::EnableDirectResponse()
+	{
 		AddField<uint8_t>("__REFERENCE_TYPE");  // 0 = request, 1 = reply
 		AddField<uint64_t>("__REFERENCE_ID");   // unique message id to identify
 	}
 
-	void PacketDefinition::EnableSequence() { _sequence = true; }
-
-	bool PacketDefinition::HasSequence() { return _sequence; }
-
-	void PacketDefinition::EnableDynamicData() { _dynamicSizedPacket = true; }
-}  // namespace core::networking
+	void PacketDefinition::EnableSequence()
+	{
+		m_sequence = true;
+	}
+	void PacketDefinition::EnableDynamicData()
+	{
+		m_dynamicSizedPacket = true;
+	}
+}

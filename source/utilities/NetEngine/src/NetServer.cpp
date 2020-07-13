@@ -44,7 +44,6 @@ namespace net_engine
 				if (peer && peer.get())
 				{
 					peer->SetupPeer();
-					// peer->OnConnect();
 				}
 			}
 			else

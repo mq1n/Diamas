@@ -6,7 +6,7 @@ namespace net_engine
 {
 	using Random = effolkronium::random_static;
 
-	NetPeerBase::NetPeerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
+	NetPeerBase::NetPeerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey, bool is_server) :
 		m_strand(asio::make_strand(service.get_executor())),
 		m_socket(m_strand),
 		m_service(service), 
@@ -16,7 +16,8 @@ namespace net_engine
 		m_port(0), disconnect_timer(service),
 		m_logFlag(0),
 		m_crypt_key(cryptKey), m_securityLevel(securityLevel), m_phase(0), m_core_time(0),
-		m_handshaking(false)
+		m_handshaking(false),
+		m_is_server(is_server)
 	{
 		m_handshake = Random::get<uint32_t>(
 			std::numeric_limits<uint32_t>::min(),
@@ -71,9 +72,9 @@ namespace net_engine
 
 		BeginRead();
 
-		if (m_securityLevel >= SECURITY_LEVEL_NONE)
+		if (m_securityLevel > SECURITY_LEVEL_NONE && m_is_server)
 		{
-			StartHandshake();
+			StartHandshakeGC();
 		}
 		else
 		{
@@ -85,7 +86,7 @@ namespace net_engine
 	{
 		try
 		{
-			NET_LOG(LL_TRACE, "Shuting down connection: %s", m_socket.remote_endpoint().address().to_string().c_str());
+			NET_LOG(LL_SYS, "Shuting down connection: %s", m_socket.remote_endpoint().address().to_string().c_str());
 
 			m_isShutingDown = true;
 
@@ -139,15 +140,9 @@ namespace net_engine
 		if (m_isShutingDown)
 			return;
 
-		std::lock_guard<std::mutex> guard(m_sendMutex);
-		m_sendQueue.push(packet);
+		m_send_queue.Enqueue(packet);
 
-		// if the send queue has data before push it means that the HandleSend
-		// is already posted or its running from the HandleWrite
-		if (m_sendQueue.size() == 1)
-		{
-			asio::post(m_strand, std::bind(&NetPeerBase::HandleSend, shared_from_this()));
-		}
+		asio::post(m_strand, std::bind(&NetPeerBase::HandleSend, shared_from_this()));
 	}
 
 	void NetPeerBase::HandleSend(std::weak_ptr<NetPeerBase> self)
@@ -161,35 +156,48 @@ namespace net_engine
 			if (!_this->m_socket.is_open())
 				return;
 			
-			if (_this->m_sendQueue.empty())
-				return;
+			std::shared_ptr <Packet> packet;
+			if (_this->m_send_queue.Dequeue(packet))
+    		{
+				auto header = packet->GetHeader();
+				auto data 	= packet->GetData();
+				auto buffer = _this->m_writeBuffer.prepare(1 + data.size());
 
-			auto packet = _this->m_sendQueue.front();
+				NET_LOG(LL_SYS, "Sending packet: %s %u(0x%x) Size: %u",
+					packet->GetName().c_str(), header, header, data.size());
 
-			NET_LOG(LL_TRACE, "Sending packet: %s(%u)", packet->GetName().c_str(), packet->GetHeader());
 
-			uint8_t header = packet->GetHeader();
-			auto data = packet->GetData();
-			auto buffer = _this->m_writeBuffer.prepare(1 + data.size());
+				// debug
+				/*
+				std::stringstream ss;
 
-			if (_this->m_cryptation && _this->m_cryptation->IsReady())
-			{
-				_this->m_cryptation->Encrypt(static_cast<uint8_t*>(buffer.data()), &header, 1);
-				_this->m_cryptation->Encrypt(static_cast<uint8_t*>(buffer.data()) + 1, data.data(), data.size());
+				ss << "Data: \n";
+				for (size_t i = 0; i < data.size(); ++i)
+					ss << "0x" << std::hex << std::to_string(data.at(i)) << ", ";
+
+				auto str = ss.str();
+				std::cout << str.substr(0, str.size() - 2) << std::endl;
+				*/
+
+				if (_this->m_cryptation && _this->m_cryptation->IsReady())
+				{
+					_this->m_cryptation->Encrypt(static_cast<uint8_t*>(buffer.data()), &header, 1);
+					_this->m_cryptation->Encrypt(static_cast<uint8_t*>(buffer.data()) + 1, data.data(), data.size());
+				}
+				else
+				{
+					asio::buffer_copy(asio::buffer(buffer, 1), asio::buffer(&header, 1));
+					asio::buffer_copy(asio::buffer(buffer + 1, data.size()), asio::buffer(data.data(), data.size()));
+				}
+
+				_this->m_writeBuffer.commit(buffer.size());
+
+				_this->m_socket.async_write_some(buffer,
+					asio::bind_executor(_this->m_strand,
+						std::bind(&NetPeerBase::HandleWrite, self, std::placeholders::_1, std::placeholders::_2)
+					)
+				);
 			}
-			else
-			{
-				asio::buffer_copy(asio::buffer(buffer, 1), asio::buffer(&header, 1));
-				asio::buffer_copy(asio::buffer(buffer + 1, data.size()), asio::buffer(data.data(), data.size()));
-			}
-
-			_this->m_writeBuffer.commit(buffer.size());
-
-			_this->m_socket.async_write_some(buffer,
-				asio::bind_executor(_this->m_strand,
-					std::bind(&NetPeerBase::HandleWrite, self, std::placeholders::_1, std::placeholders::_2)
-				)
-			);
 		}
 	}
 
@@ -202,15 +210,7 @@ namespace net_engine
 
 			if (!er)
 			{
-				{
-					if (_this->m_sendQueue.empty())
-						return;
-
-					_this->m_sendQueue.pop();
-
-					if (_this->m_sendQueue.empty())
-						return;
-				}
+				NET_LOG(LL_SYS, "Written: %u bytes!", succesed_size);
 				HandleSend(self);
 			}
 			else
@@ -227,7 +227,7 @@ namespace net_engine
 
 	void NetPeerBase::BeginRead()
 	{
-		NET_LOG(LL_TRACE, "Reading next packet");
+		NET_LOG(LL_SYS, "Reading next packet");
 
 		asio::async_read(
 			m_socket,
@@ -243,11 +243,17 @@ namespace net_engine
 		std::shared_ptr <NetPeerBase> _this(self.lock());
 		if (_this)
 		{
+			if (_this->m_isShutingDown)
+				return;
+
+			if (!_this->m_socket.is_open())
+				return;
+				
 			_this->m_buffer.commit(succesed_size);
 
 			if (!er)
 			{
-				NET_LOG(LL_TRACE, "(HEADER) Received %u bytes", succesed_size);
+				NET_LOG(LL_SYS, "(HEADER) Received %u bytes", succesed_size);
 
 				uint8_t header;
 				asio::buffer_copy(asio::buffer(&header, sizeof(header)), _this->m_buffer.data());
@@ -268,12 +274,12 @@ namespace net_engine
 
 				_this->m_buffer.consume(1);
 
-				NET_LOG(LL_TRACE, "Received header: 0x%02x", header);
+				NET_LOG(LL_SYS, "Received header: %d(0x%02x)", header, header);
 
 				auto packet = PacketManager::Instance().CreatePacket(header, EPacketDirection::Incoming);
 				if (!packet)
 				{
-					NET_LOG(LL_TRACE, "Received unknown header: 0x%02x", header);
+					NET_LOG(LL_SYS, "Received unknown header: %d(0x%02x)", header, header);
 					_this->OnError(PeerErrorUnknownHeader, er);
 					_this->Disconnect(er);
 					return;
@@ -282,7 +288,7 @@ namespace net_engine
 				// Check if packet is dynamic size
 				if (packet->IsDynamicSized())
 				{
-					NET_LOG(LL_TRACE, "Reading dynamic packet size");
+					NET_LOG(LL_SYS, "Reading dynamic packet size");
 
 					// We have to read our packet size first
 					asio::async_read(
@@ -299,7 +305,7 @@ namespace net_engine
 				if (packet->HasSequence())
 					sizeToRead += 1;
 
-				NET_LOG(LL_TRACE, "Reading the next %u bytes", sizeToRead);
+				NET_LOG(LL_SYS, "Reading the next %u bytes", sizeToRead);
 
 				asio::async_read(
 					_this->m_socket,
@@ -332,7 +338,7 @@ namespace net_engine
 		std::shared_ptr <NetPeerBase> _this(self.lock());
 		if (_this)
 		{
-			NET_LOG(LL_TRACE, "(SIZE) Received %u bytes", succesed_size);
+			NET_LOG(LL_SYS, "(SIZE) Received %u bytes", succesed_size);
 
 			_this->m_buffer.commit(succesed_size);
 
@@ -354,7 +360,7 @@ namespace net_engine
 					asio::buffer_copy(asio::buffer(static_cast<void*>(&size), 2), _this->m_buffer.data());  // todo: clean solution
 				}
 
-				NET_LOG(LL_TRACE, "Size of packet is %u", size);
+				NET_LOG(LL_SYS, "Size of packet is %u", size);
 
 				auto sizeToRead = size - 1 - 2;  // already read header (1byte) and size (2bytes)
 				if (packet->HasSequence())
@@ -362,7 +368,7 @@ namespace net_engine
 					sizeToRead += 1;
 				}
 
-				NET_LOG(LL_TRACE, "Reading the next %u bytes", sizeToRead);
+				NET_LOG(LL_SYS, "Reading the next %u bytes", sizeToRead);
 				asio::async_read(
 					_this->m_socket,
 					_this->m_buffer.prepare(sizeToRead), asio::transfer_exactly(sizeToRead),
@@ -392,7 +398,7 @@ namespace net_engine
 		std::shared_ptr <NetPeerBase> _this(self.lock());
 		if (_this)
 		{
-			NET_LOG(LL_TRACE, "(DATA) Received %u bytes", succesed_size);
+			NET_LOG(LL_SYS, "(DATA) Received %u bytes", succesed_size);
 			_this->m_buffer.commit(succesed_size);
 
 			if (!er)
@@ -439,7 +445,7 @@ namespace net_engine
 
 	void NetPeerBase::HandleDelayedDisconnect(std::weak_ptr<NetPeerBase> self, const asio::error_code& er)
 	{
-		std::shared_ptr<NetPeerBase> _this(self.lock());
+		std::shared_ptr <NetPeerBase> _this(self.lock());
 		if (_this)
 		{
 			if (!er)
@@ -464,11 +470,18 @@ namespace net_engine
 
 
 
-	void NetPeerBase::SetPhase(uint8_t phase)
+	void NetPeerBase::SetPhaseGC(uint8_t phase)
 	{
 		NET_LOG(LL_SYS, "Set phase to 0X%X", phase);
 
 		auto packet = PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_PHASE, EPacketDirection::Outgoing);
+		if (!packet)
+		{
+			NET_LOG(LL_CRI, "Phase packet could not created!");
+			abort();
+			return;
+		}
+
 		packet->SetField<uint8_t>("phase", phase);
 
 		m_phase = phase;
@@ -477,17 +490,23 @@ namespace net_engine
 	}
 
 
-	void NetPeerBase::StartHandshake()
+	void NetPeerBase::StartHandshakeGC()
 	{
 		m_handshaking = true;
 
-		SetPhase(EPhases::PHASE_HANDSHAKE);
-		SendHandshake(m_core_time, 0);
+		SetPhaseGC(EPhases::PHASE_HANDSHAKE);
+		SendHandshakeGC(m_core_time, 0);
 	}
 
-	void NetPeerBase::SendHandshake(uint32_t time, uint32_t delta)
+	void NetPeerBase::SendHandshakeGC(uint32_t time, uint32_t delta)
 	{
 		auto packet = PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_HANDSHAKE, EPacketDirection::Outgoing);
+		if (!packet)
+		{
+			NET_LOG(LL_CRI, "Handshake packet could not created!");
+			abort();
+			return;
+		}
 		packet->SetField<uint32_t>("handshake", m_handshake);
 		packet->SetField<uint32_t>("time", time);
 		packet->SetField<uint32_t>("delta", 0);
@@ -495,7 +514,7 @@ namespace net_engine
 		Send(packet);
 	}
 
-	void NetPeerBase::HandleHandshake(std::shared_ptr <Packet> packet)
+	void NetPeerBase::HandleHandshakeGC(std::shared_ptr <Packet> packet)
 	{
 		auto handshake = packet->GetField<uint32_t>("handshake");
 		auto time = packet->GetField<uint32_t>("time");
@@ -519,7 +538,7 @@ namespace net_engine
 
 			if (m_securityLevel >= SECURITY_LEVEL_KEY_AGREEMENT)
 			{
-				StartKeyAgreement();
+				StartKeyAgreementGC();
 			}
 			else
 			{
@@ -550,10 +569,10 @@ namespace net_engine
 		}
 
 		// TODO: max retries?
-		SendHandshake(currentTime, newDelta);
+		SendHandshakeGC(currentTime, newDelta);
 	}
 
-	void NetPeerBase::StartKeyAgreement()
+	void NetPeerBase::StartKeyAgreementGC()
 	{
 		NET_DEBUG_LOG(LL_SYS, "(KEYS) Agreement start!");
 
@@ -587,6 +606,12 @@ namespace net_engine
 		memcpy(keys + staticKey->size(), ephemeralKey->data(), ephemeralKey->size());
 
 		auto packet = PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT, EPacketDirection::Outgoing);
+		if (!packet)
+		{
+			NET_LOG(LL_CRI, "Key agreement packet could not created!");
+			abort();
+			return;
+		}
 		packet->SetField<uint16_t>("valuelen", static_cast<uint16_t>(*agreedValue));
 		packet->SetField<uint16_t>("datalen", static_cast<uint16_t>(ephemeralKey->size() + staticKey->size()));
 		packet->SetField("data", (uint8_t*)keys, sizeof(keys));
@@ -594,7 +619,7 @@ namespace net_engine
 		Send(packet);
 	}
 
-	void NetPeerBase::HandleKeyAgreement(std::shared_ptr<Packet> packet)
+	void NetPeerBase::HandleKeyAgreementGC(std::shared_ptr<Packet> packet)
 	{
 		asio::error_code er;
 
@@ -625,7 +650,14 @@ namespace net_engine
 			return;
 		}
 
-		Send(PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT_COMPLETED, EPacketDirection::Outgoing));
+		auto packet2 = PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT_COMPLETED, EPacketDirection::Outgoing);
+		if (!packet2)
+		{
+			NET_LOG(LL_CRI, "Key agreement completed packet could not created!");
+			abort();
+			return;
+		}
+		Send(packet2);
 
 		NET_LOG(LL_SYS, "(KEYS) Agreement completed!");
 		m_handshaking = false;
@@ -633,7 +665,7 @@ namespace net_engine
 		OnConnect();
 	}
 
-	void NetPeerBase::ChangeXTEAKey(uint32_t* key)
+	void NetPeerBase::ChangeXTEAKeyGC(uint32_t* key)
 	{
 		m_cryptation->AddData(XTEA_CRYPTATION_LOGIN_DECRYPT_KEY, key, 16);
 	}

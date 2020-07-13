@@ -1,11 +1,16 @@
 #pragma once
 #include "../include/NetEngine.hpp"
 #include <unordered_map>
+#include <functional>
 #include <variant>
+#include <memory>
 
 namespace net_engine
 {	
-	using ConnectionProperty = std::variant<std::string, uint32_t, uint8_t>;
+	using ConnectionProperty = std::variant <std::string, uint32_t, uint8_t>;
+	using THandlerFunc 		 = std::function <void(std::shared_ptr <Packet> packet)>;
+	using TPacketHandler 	 = std::unordered_map <TNetOpcode, THandlerFunc>;
+	using TOnPacketRegister	 = std::function <void(std::shared_ptr <PacketDefinition>)>;
 
 	class CNetworkServerManager;
 
@@ -25,9 +30,9 @@ namespace net_engine
 			virtual void OnConnect();
 			virtual void OnDisconnect(const asio::error_code& er);
 			virtual void OnRead(std::shared_ptr <Packet> packet);
-			virtual std::size_t OnWritePre(const void* data, std::size_t length);
-			virtual void OnWritePost(bool bCompleted);
 			virtual void OnError(uint32_t ulErrorType, const asio::error_code& er);
+
+			void CheckDeadlineStatus();
 
 			// Getter
 			std::shared_ptr <CNetworkServerManager> GetServer() const;
@@ -42,21 +47,41 @@ namespace net_engine
 				return std::get<T>(GetProperty(property));
 			}
 
+			inline bool RegisterPacket(const std::string& name, TNetOpcode header, THandlerFunc handler, bool incoming, bool outgoing, TOnPacketRegister on_register)
+			{ 
+				std::shared_ptr <PacketDefinition> def;
+				if ((def = PacketManager::Instance().RegisterPacket(name, header, incoming, outgoing)))
+				{
+					if (handler)
+						m_handlers.emplace(header, handler);
+					if (on_register)
+						on_register(def);
+					return true;
+				}
+				return false;
+			}
+			inline bool DeregisterPacket(TNetOpcode header, bool incoming, bool outgoing)
+			{
+				auto iter = m_handlers.find(header);
+				if (iter != m_handlers.end())
+				{
+					m_handlers.erase(iter);
+					return PacketManager::Instance().DeregisterPacket(header, incoming, outgoing);
+				}
+				return false;
+			}
 
 			// IO
-			void SendAsReply(std::shared_ptr<Packet> request, std::shared_ptr<Packet> reply);
-#if 0
-			std::size_t ProcessInput(const void* data, std::size_t maxlength);
-			
-			// packet crypter & sender
-			virtual void SendCrypted(const SNetPacket& packet, bool flush = false);
+			void SendAsReply(std::shared_ptr <Packet> request, std::shared_ptr <Packet> reply);
 
-			// packet funcs
-			virtual void SendChatPacket(const std::string& data);
-#endif
+		protected:
+			void OnRecvKeyAgreementPacket(std::shared_ptr <Packet> packet);
+			void OnRecvHandshakePacket(std::shared_ptr <Packet> packet);
 
 		private:
 			std::weak_ptr <CNetworkServerManager>		m_server;
-			std::map<std::string, ConnectionProperty>	m_properties;
+			std::map <std::string, ConnectionProperty>	m_properties;
+			TPacketHandler								m_handlers;
+			asio::high_resolution_timer 				m_deadline_timer;
 	};
 }

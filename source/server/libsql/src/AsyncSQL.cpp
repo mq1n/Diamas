@@ -313,7 +313,7 @@ void CAsyncSQL::PushQuery(SQLMsg* p)
 	m_sem.Release();
 }
 
-std::queue<SQLMsg*> CAsyncSQL::PopPendingQueries()
+std::queue <SQLMsg*> CAsyncSQL::PopPendingQueries()
 {
 	std::lock_guard<std::mutex> lock(m_queryMutex);
 
@@ -356,7 +356,6 @@ void CAsyncSQL::ChildLoop()
 					continue;
 			}
 
-			// 0.5? ?? ???? ??? ???
 			const auto runTime = get_dword_time() - startTime;
 			if (runTime > 5000)
 				sys_log(1, "Query %s took %d ms", p->stQuery.c_str(), runTime);
@@ -432,13 +431,12 @@ size_t CAsyncSQL::EscapeString(char* dst, size_t dstSize, const char *src, size_
 
 	if (dstSize < srcSize * 2 + 1)
 	{
-		// \0? ????? ?? ???? 256 ???? ???? ??? ??
 		char tmp[256];
-		size_t tmpLen = sizeof(tmp) > srcSize ? srcSize : sizeof(tmp); // ? ?? ?? ??
+		size_t tmpLen = sizeof(tmp) > srcSize ? srcSize : sizeof(tmp);
 		strlcpy(tmp, src, tmpLen);
 
 		sys_err(
-			"Buffer overflow (dstSize {0} srcSize {1} src{2}: {3})",
+			"Buffer overflow (dstSize %u srcSize %u src %s: %s)",
 			dstSize, srcSize,
 			tmpLen != srcSize ? " (trimmed to 255 characters)" : "",
 			tmp);

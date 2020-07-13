@@ -7,19 +7,15 @@ namespace net_engine
 {	
 	class CNetworkServerManager : public NetServerBase
 	{
-//		using THandlerFunc = std::function <std::size_t /* sent_length */(std::shared_ptr <CNetworkConnectionManager> /* peer */, const void* /* data */, std::size_t /* length */)>;
-//		using TPacketHandler = std::unordered_map <TNetOpcode, THandlerFunc>;
-
 	public:
 		CNetworkServerManager(NetServiceBase& netService, const std::string& ip_address, uint16_t port, uint8_t securityLevel, const TPacketCryptKey& cryptKey);
 		virtual ~CNetworkServerManager();	
 
 		NetServiceBase & GetServiceInstance();
 
-		void ServerWorker();
 		bool Initialize();
 		void Stop();
-		void OnUpdate();
+		void ServerWorker();
 	
 		virtual void Run();
 		virtual void Shutdown();
@@ -28,44 +24,26 @@ namespace net_engine
 		virtual std::shared_ptr <CNetworkConnectionManager> FindPeer(int32_t id) const;
 		virtual void RemovePeer(int32_t id);
 
-
-		/*
-		inline void RegisterPacket(TNetOpcode header, uint8_t type, bool is_dynamic, THandlerFunc handler)
-		{ 
-			CPacketContainer::Instance().AppendPacket(header, NAMEOF(header).data(), type, handler, is_dynamic);
-//			m_handlers.emplace(header, handler);
-		}
-		inline void DeregisterPacket(TNetOpcode header)
-		{
-			CPacketContainer::Instance().RemovePacket(header, NAMEOF(header).data());
-//			auto iter = m_handlers.find(header);
-//			if (iter != m_handlers.end())
-//				m_handlers.erase(iter);
-		}
-		*/
-
-		void BroadcastMessage(const std::string& msg);
+		void BroadcastPacket(std::shared_ptr <Packet> packet);
+		void SendTo(std::shared_ptr <Packet> packet, std::function<bool(CNetworkConnectionManager*)> filter);
+		void SendToPhase(std::shared_ptr <Packet> packet, uint8_t phase);
 	
 	protected:
 		virtual std::shared_ptr <NetPeerBase> NewPeer();
 		
-		std::size_t OnRecvLoginPacket(const void * data, std::size_t maxlength);
-		std::size_t OnRecvChatPacket(const void * data, std::size_t maxlength);
+		bool ParseCommandLine();
+		bool ParseConfigFile();
+		bool CreateDBConnection();
 
 	private:
 		std::string m_ip_address;
 		uint16_t m_port;
 
-		std::atomic <bool> m_stopped;
-
-		NetServiceBase&		m_netService;
-//		TPacketHandler		m_handlers;
-
-		asio::high_resolution_timer m_updateTimer;
+		NetServiceBase&	m_netService;
 
 		TPacketCryptKey m_crypt_key;
 		uint8_t m_securityLevel;
 
-		std::unordered_map <int32_t, std::shared_ptr <CNetworkConnectionManager> >	m_peers;
+		std::unordered_map <uint32_t, std::shared_ptr <CNetworkConnectionManager> >	m_peers;
 	};
 };

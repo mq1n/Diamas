@@ -331,7 +331,7 @@ namespace net_engine
 		}
 		if (outgoing)
 		{
-			if (m_incomingPackets.find(header) != m_incomingPackets.end())
+			if (m_outgoingPackets.find(header) != m_outgoingPackets.end())
 			{
 				NET_LOG(LL_ERR, "Tried to register packet %u for outgoing which is already in use", header);
 				return nullptr;
@@ -348,6 +348,38 @@ namespace net_engine
 			m_outgoingPackets[header] = packet;
 
 		return packet;
+	}
+	bool PacketManager::DeregisterPacket(uint8_t header, bool incoming, bool outgoing)
+	{
+		if (!incoming && !outgoing)
+		{
+			NET_LOG(LL_ERR, "Tried to deregister packet %u with incoming & outgoing traffic disabled", header);
+			return false;
+		}
+
+		if (incoming)
+		{
+			auto it = m_incomingPackets.find(header);
+			if (it == m_incomingPackets.end())
+			{
+				NET_LOG(LL_ERR, "Tried to deregister packet %u for incoming which is not registired", header);
+				return false;
+			}
+			m_incomingPackets.erase(it);
+			return true;
+		}
+		if (outgoing)
+		{
+			auto it = m_outgoingPackets.find(header);
+			if (it == m_outgoingPackets.end())
+			{
+				NET_LOG(LL_ERR, "Tried to deregister packet %u for outgoing which is not registired", header);
+				return false;
+			}
+			m_outgoingPackets.erase(it);
+			return true;
+		}	
+		return false;	
 	}
 
 	std::shared_ptr <Packet> PacketManager::CreatePacket(uint8_t header, EPacketDirection direction)

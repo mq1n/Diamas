@@ -1,15 +1,62 @@
 #include "../include/NetEngine.hpp"
 #include "NetClientManager.hpp"
-#include "Packet.hpp"
+#include "ClientCipher.hpp"
 
 namespace net_engine
 {	
 	CNetworkClientManager::CNetworkClientManager(NetServiceBase& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
 		NetClientBase(service(), securityLevel, cryptKey, 5000), m_pNetService(service)
 	{
-		//RegisterPacket(
-		//	HEADER_GC_CHAT, EPacketTypes::PacketTypeIncoming, false, std::bind(&CNetworkClientManager::OnRecvChatPacket, this, std::placeholders::_1, std::placeholders::_2)
-		//);
+		// TODO: SERVER-CLIENT TEK DOSYADA BÝRLEÞTÝR
+		
+		RegisterPacket(
+			"GC_KEY_AGREEMENT_COMPLETED", ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT_COMPLETED, std::bind(&CNetworkClientManager::OnRecvKeyAgreementCompletedPacket, this, std::placeholders::_1), true, false, nullptr
+		);
+		RegisterPacket(
+			"GC_PHASE", ReservedGCHeaders::HEADER_GC_PHASE, std::bind(&CNetworkClientManager::OnRecvPhasePacket, this, std::placeholders::_1), true, false,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint8_t>("phase");
+			}
+		);
+		RegisterPacket(
+			"GC_KEY_AGREEMENT", ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT, std::bind(&CNetworkClientManager::OnRecvKeyAgreementPacket, this, std::placeholders::_1), true, false,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint16_t>("valuelen");
+				packet_def->AddField<uint16_t>("datalen");
+				packet_def->AddField<char[256]>("data");
+			}
+		);
+		RegisterPacket(
+			"GC_HANDSHAKE", ReservedGCHeaders::HEADER_GC_HANDSHAKE, std::bind(&CNetworkClientManager::OnRecvHandshakePacket, this, std::placeholders::_1), true, false,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint32_t>("handshake");
+				packet_def->AddField<uint32_t>("time");
+				packet_def->AddField<uint32_t>("delta");
+			}
+		);
+
+		// ---
+
+		RegisterPacket(
+			"CG_KEY_AGREEMENT", ReservedCGHeaders::HEADER_CG_KEY_AGREEMENT, nullptr, false, true,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint16_t>("valuelen");
+				packet_def->AddField<uint16_t>("datalen");
+				packet_def->AddField<char[256]>("data");
+			}
+		);
+		RegisterPacket(
+			"CG_HANDSHAKE", ReservedCGHeaders::HEADER_CG_HANDSHAKE, nullptr, false, true,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint32_t>("handshake");
+				packet_def->AddField<uint32_t>("time");
+				packet_def->AddField<uint32_t>("delta");
+			}
+		);
+
+		// ---
+
+		m_kServerTimeSync = {0, 0};
 	}
 
 	// I/O Service wrappers
@@ -33,13 +80,6 @@ namespace net_engine
 	void CNetworkClientManager::OnConnect()
 	{
 		NET_LOG(LL_SYS, "Connected to %s:%u", GetIP().c_str(), GetPort());
-
-		/*
-		SNetPacketCGLogin packet;
-		strcpy_s(packet.login, "id_Test");
-		strcpy_s(packet.password, "pwd_test");
-		SendCrypted(packet, true);
-		*/
 	}
 	void CNetworkClientManager::OnDisconnect(const asio::error_code& e)
 	{
@@ -48,181 +88,105 @@ namespace net_engine
 	}
 	void CNetworkClientManager::OnRead(std::shared_ptr <Packet> packet)
 	{
-#if 0
-		NET_LOG(LL_SYS, "OnRead triggered! %p-%u", data, length);
-		if (!data || !length) 
-		{
-			NET_LOG(LL_SYS, "Null data read!");
-			return 0;
-		}
+		const auto header = packet->GetHeader();
+		NET_LOG(LL_SYS, "Packet: %u(0x%x) is ready for process!", header, header);
 
-		if (IsAssignedFlag(LL_ONREAD) && length >= packet_header_min_size)
+		const auto packet_map = m_handlers.find(header);
+		if (packet_map == m_handlers.end())
 		{
-			SNetPacket packet(reinterpret_cast<const char*>(data));
-			NET_LOG(LL_SYS, "Data: %p Size: %u Packet %u-%u-%u-%u", 
-				data, length,
-				packet.m_header.version, packet.m_header.flags, packet.m_header.opcode, packet.m_header.size
-			);
+			NET_LOG(LL_ERR, "Unknown header: %u(0x%x) for process", header, header);
+			return;
 		}
-
-		return ProcessInput(data, length);
-#endif
-	}
-	std::size_t CNetworkClientManager::OnWritePre(const void* data, std::size_t length)
-	{
-		if (!data || !length)
-		{
-			NET_LOG(LL_CRI, "Null data writed!");
-			return length;
-		}
-
-		/*
-		if (data && IsAssignedFlag(LL_ONWRITE_PRE) && length >= packet_header_min_size)
-		{
-			SNetPacket packet(reinterpret_cast<const char*>(data));
-			NET_LOG(LL_SYS, "Data: %p Size: %u Packet %u-%u-%u-%u", 
-				data, length,
-				packet.m_header.version, packet.m_header.flags, packet.m_header.opcode, packet.m_header.size
-			);
-		}
-		*/
-		
-#if 0
-		if (data && ulSize == GetPacketCapacity(pPsuedoPacket->uiPacketID))
-		{
-			auto pPacketSum = g_nmApp->NetworkMgrInstance()->CreateChecksum(pData, ulSize - (NET_CHECKSUM_LENGTH /* hash */ + NET_CHECKSUM_LENGTH /* sum */));
-			(*(uint32_t*)((uint32_t)pData + ulSize - (NET_CHECKSUM_LENGTH /* hash */ + NET_CHECKSUM_LENGTH /* sum */))) = pPacketSum;
-			NET_LOG(LL_SYS, "Sum: %p", pPacketSum);
-
-			auto pPacketHash = XXH32(pData, ulSize - NET_CHECKSUM_LENGTH, NET_PACKET_HASH_MAGIC);
-			(*(uint32_t*)((uint32_t)pData + ulSize - NET_CHECKSUM_LENGTH)) = pPacketHash;
-			NET_LOG(LL_SYS, "Hash: %p", pPacketHash);
-		}
-#endif
-		return length;
-	}
-	void CNetworkClientManager::OnWritePost(bool bCompleted)
-	{
-		if (IsAssignedFlag(LL_ONWRITE_POST))
-		{
-			NET_LOG(LL_SYS, "Write completed! Result: %d", bCompleted ? 1 : 0);
-		}
+		packet_map->second(packet);
 	}
 	void CNetworkClientManager::OnError(std::uint32_t error_type, const asio::error_code& er)
 	{
 		NET_LOG(LL_ERR, "Network error handled! ID: %u System error: %d(%s)", error_type, er.value(), er.message().c_str());
 	}
 
-#if 0
-	std::size_t CNetworkClientManager::ProcessInput(const void* data, std::size_t maxlength)
+
+	void CNetworkClientManager::OnRecvPhasePacket(std::shared_ptr <Packet> packet)
 	{
-		NET_LOG(LL_TRACE, "Data: %p Max length: %u", data, maxlength);
 
-		auto pData = reinterpret_cast<const uint8_t *>(data);
-
-		std::size_t offset = 0;
-		while (offset < maxlength) 
-		{
-			uint32_t packetId = 0;
-			while (offset < maxlength && (packetId = pData[offset]) == 0) ++offset;
-
-			/*
-			auto handler = m_handlers.find(packetId);
-			if (handler == m_handlers.end()) 
-			*/
-			const auto packet = CPacketContainer::Instance().GetPacket(packetId);
-			if (!packet.get())
-			{
-				// log + kick? unkwnown packet dc
-				NET_LOG(LL_ERR, "Unknown Packet with id %d (%02x)",
-					packetId, packetId
-				);
-
-				asio::error_code e;
-				Disconnect(e);
-				return 0;
-			}
-
-			std::size_t handlerResult = packet->handler(pData + offset, maxlength - offset);
-			if (handlerResult == 0) 
-				break; // handler returned 0 == too little data
-			offset += handlerResult;
-		}
-		return offset;
 	}
 
-
-	void CNetworkClientManager::SendCrypted(const SNetPacket& packet, bool flush)
+	void CNetworkClientManager::OnRecvKeyAgreementCompletedPacket(std::shared_ptr <Packet> packet)
 	{
-		if (IsConnected() == false)
-			return;
+		NET_LOG(LL_SYS, "KEY_AGREEMENT_COMPLETED RECV");
 
-#if 0
-		NET_LOG(LL_SYS, "Original data: %p-%u Packet: %u", pData, ulSize, ulPacketID);
+		m_cipher.set_activated(true);
+	}
 
-		// Process packet security contents
-		auto pPacketMagic = (*(uint32_t*)gs_pNetworkMagicValue);
-		(*(uint32_t*)((uint32_t)pData)) = pPacketMagic;
+	void CNetworkClientManager::OnRecvKeyAgreementPacket(std::shared_ptr <Packet> packet)
+	{
+		auto valuelen = packet->GetField<uint16_t>("valuelen");
+		auto datalen = packet->GetField<uint16_t>("datalen");
+		auto data = packet->GetField("data");
 
-		NET_LOG(LL_SYS, "Magic: %p", pPacketMagic);
+		NET_LOG(LL_SYS, "KEY_AGREEMENT RECV %u", datalen);
 
-		auto pPacketSum = g_nmApp->NetworkMgrInstance()->CreateChecksum(pData, ulSize - (NET_CHECKSUM_LENGTH /* hash */ + NET_CHECKSUM_LENGTH /* sum */));
-		(*(uint32_t*)((uint32_t)pData + ulSize - (NET_CHECKSUM_LENGTH /* hash */ + NET_CHECKSUM_LENGTH /* sum */))) = pPacketSum;
-
-		NET_LOG(LL_SYS, "Sum: %p", pPacketSum);
-
-		auto pPacketHash = XXH32(pData, ulSize - NET_CHECKSUM_LENGTH, NET_PACKET_HASH_MAGIC);
-		(*(uint32_t*)((uint32_t)pData + ulSize - NET_CHECKSUM_LENGTH)) = pPacketHash;
-
-		NET_LOG(LL_SYS, "Hash: %p", pPacketHash);
-
-
-		if (m_bRSACompleted || m_bPreCryptCompleted)
+		auto reply_packet = PacketManager::Instance().CreatePacket(ReservedCGHeaders::HEADER_CG_KEY_AGREEMENT, EPacketDirection::Outgoing);
+		if (!reply_packet)
 		{
-			// Crypt packet content
-			auto cryptedPacket = NAES256::Encrypt(reinterpret_cast<const uint8_t *>(pData), ulSize, m_bRSACompleted ? m_pRSAKey : m_pPreCryptKey);
-			NET_LOG(LL_SYS, "Crpyted data: %p-%u", cryptedPacket.get_data(), cryptedPacket.get_size());
+			NET_LOG(LL_CRI, "Handshake packet could not created!");
+			abort();
+			return;
+		}			
+		auto reply_data = reply_packet->GetField("data");
 
-			auto cryptedPacketData = std::make_unique<TCryptedPacket>();
-			if (IS_VALID_SMART_PTR(cryptedPacketData))
-			{
-				memcpy(cryptedPacketData->pContext, cryptedPacket.get_data(), cryptedPacket.get_size());
+		size_t dataLength = 256;
+		size_t agreedLength = m_cipher.Prepare(reply_data, &dataLength);
+		if (agreedLength == 0)
+		{
+			Disconnect2();
+			return;
+		}
 
-				cryptedPacketData->uiDecryptedPacketId = ulPacketID;
-				cryptedPacketData->ulCryptedSize = cryptedPacket.get_size();
-				cryptedPacketData->ulDecryptedSize = ulSize;
-				cryptedPacketData->ulCryptedSum = XXH32(cryptedPacket.get_data(), cryptedPacket.get_size(), NET_PACKET_HASH_MAGIC);
-				cryptedPacketData->ulDecryptedSum = XXH32(pData, ulSize - (NET_CHECKSUM_LENGTH /* hash */ + NET_CHECKSUM_LENGTH /* sum */), NET_PACKET_HASH_MAGIC);
+		assert(dataLength <= 256);
 
-				NET_LOG(LL_SYS, "Built crpyted packet! Data: %p Size: %u Container size: %u", cryptedPacketData.get(), cryptedPacket.get_size(), cryptedPacketData->size());
-
-				Send(cryptedPacketData.get(), cryptedPacketData->size());
-			}
+		if (m_cipher.Activate(true, valuelen, data, dataLength))
+		{
+			reply_packet->SetField<uint16_t>("valuelen", static_cast<uint16_t>(agreedLength));
+			reply_packet->SetField<uint16_t>("datalen", static_cast<uint16_t>(dataLength));
+	
+			Send(reply_packet);
+			NET_LOG(LL_SYS, "KEY_AGREEMENT SEND %u", dataLength);
 		}
 		else
-#endif
 		{
-//			Send(packet.data(), packet.size());
+			Disconnect2();
+			return;
 		}
 	}
 
-
-	std::size_t CNetworkClientManager::OnRecvChatPacket(const void* data, std::size_t maxlength)
+	void CNetworkClientManager::OnRecvHandshakePacket(std::shared_ptr <Packet> packet)
 	{
-		auto packet = reinterpret_cast<const SNetPacketGCChat*>(data);
+		// auto timestamp = ELTimer_GetMSec();
+		auto st = std::time(nullptr);
+		auto timestamp = static_cast<uint32_t>(static_cast<std::chrono::seconds>(st).count());
 
-		if (maxlength < packet->size())
-			return 0;
 
-//		if (maxlength != SNetPacketGCChat::size())
-//		{
-//			NET_LOG(LL_CRI, "Packet size mismatch it can be combined packet!");
-//			return SNetPacketGCChat::size();
-//		}
+		auto handshake = packet->GetField<uint32_t>("handshake");
+		auto time = packet->GetField<uint32_t>("time");
+		auto delta = packet->GetField<uint32_t>("delta");
 
-		NET_LOG(LL_SYS, "Recv chat packet! Msg: %s", packet->msg);
+		NET_LOG(LL_SYS, "HANDSHAKE RECV %u %d", time, delta);
 
-		return packet->size();
+		m_kServerTimeSync.m_dwChangeServerTime = time + delta;
+		m_kServerTimeSync.m_dwChangeClientTime = timestamp;	
+
+		auto reply_packet = PacketManager::Instance().CreatePacket(ReservedCGHeaders::HEADER_CG_HANDSHAKE, EPacketDirection::Outgoing);
+		if (!reply_packet)
+		{
+			NET_LOG(LL_CRI, "Handshake packet could not created!");
+			abort();
+			return;
+		}	
+
+		reply_packet->SetField<uint32_t>("handshake", handshake);
+		reply_packet->SetField<uint32_t>("time", time + delta + delta);
+		reply_packet->SetField<uint32_t>("delta", 0);
+
+		Send(reply_packet);
 	}
-#endif
 }
