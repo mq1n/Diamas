@@ -1,17 +1,6 @@
-// Camera.h: interface for the CCamera class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_CAMERA_H__C5D086BE_7A03_4246_9145_336747C47D9E__INCLUDED_)
-#define AFX_CAMERA_H__C5D086BE_7A03_4246_9145_336747C47D9E__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 #include <map>
-
-#include "../eterBase/Singleton.h"
+#include "../../common/Singleton.h"
 #include "Ray.h"
 
 const float CAMERA_TARGET_STANDARD = 100.0f;		
@@ -281,6 +270,3 @@ class CCameraManager : public CSingleton<CCameraManager>
 		CCamera *		m_pCurrentCamera;
 		CCamera *		m_pPreviousCamera;		
 };
-
-
-#endif // !defined(AFX_CAMERA_H__C5D086BE_7A03_4246_9145_336747C47D9E__INCLUDED_)

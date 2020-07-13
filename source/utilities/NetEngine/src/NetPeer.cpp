@@ -1,6 +1,7 @@
 #include "../include/NetEngine.hpp"
 #include <random.hpp>
 #include <functional>
+#include "../../../common/constants.h"
 
 namespace net_engine
 {
@@ -494,7 +495,7 @@ namespace net_engine
 	{
 		m_handshaking = true;
 
-		SetPhaseGC(EPhases::PHASE_HANDSHAKE);
+		SetPhaseGC(PHASE_HANDSHAKE);
 		SendHandshakeGC(m_core_time, 0);
 	}
 

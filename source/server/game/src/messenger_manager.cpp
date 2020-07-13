@@ -46,11 +46,11 @@ void MessengerManager::Login(MessengerManager::keyA account)
 	if (m_set_loginAccount.find(account) != m_set_loginAccount.end())
 		return;
 
-	DBManager::instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
+	DBManager::Instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
 	if (account.compare(__account))
 		return;
 
-	DBManager::instance().FuncQuery(std::bind(&MessengerManager::LoadList, this, std::placeholders::_1),
+	DBManager::Instance().FuncQuery(std::bind(&MessengerManager::LoadList, this, std::placeholders::_1),
 			"SELECT account, companion FROM messenger_list WHERE account='%s'", __account);
 
 	m_set_loginAccount.insert(account);
@@ -123,16 +123,16 @@ void MessengerManager::RequestToAdd(LPCHARACTER ch, const char* pszTargetName)
 	if (!ch || !ch->IsPC())
 		return;
 
-	CCI* pCCI = P2P_MANAGER::instance().Find(pszTargetName);
+	CCI* pCCI = P2P_MANAGER::Instance().Find(pszTargetName);
 	if (!(pCCI && pCCI->pkDesc))
 	{
-		LPCHARACTER target = CHARACTER_MANAGER::instance().FindPC(pszTargetName);
+		LPCHARACTER target = CHARACTER_MANAGER::Instance().FindPC(pszTargetName);
 		if (target)
 			RequestToAdd(ch, target);
 		return;
 	}
 
-	if (quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID())->IsRunning() == true)
+	if (quest::CQuestManager::Instance().GetPCForce(ch->GetPlayerID())->IsRunning() == true)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 친구 추가를 받을 수 없는 상태입니다."));
 		return;
@@ -150,16 +150,16 @@ void MessengerManager::RequestToAdd(const char* pszName, LPCHARACTER target)
 	if (!target || !target->IsPC())
 		return;
 
-	CCI* pCCI = P2P_MANAGER::instance().Find(pszName);
+	CCI* pCCI = P2P_MANAGER::Instance().Find(pszName);
 	if (!(pCCI && pCCI->pkDesc))
 	{
-		LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(pszName);
+		LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindPC(pszName);
 		if (ch)
 			RequestToAdd(ch, target);
 		return;
 	}
 
-	if (quest::CQuestManager::instance().GetPCForce(target->GetPlayerID())->IsRunning() == true)
+	if (quest::CQuestManager::Instance().GetPCForce(target->GetPlayerID())->IsRunning() == true)
 	{
 		target->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 친구 추가를 받을 수 없는 상태입니다."));
 		return;
@@ -182,13 +182,13 @@ void MessengerManager::RequestToAdd(LPCHARACTER ch, LPCHARACTER target)
 	if (!ch->IsPC() || !target->IsPC())
 		return;
 	
-	if (quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID())->IsRunning() == true)
+	if (quest::CQuestManager::Instance().GetPCForce(ch->GetPlayerID())->IsRunning() == true)
 	{
 	    ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 친구 추가를 받을 수 없는 상태입니다."));
 	    return;
 	}
 
-	if (quest::CQuestManager::instance().GetPCForce(target->GetPlayerID())->IsRunning() == true)
+	if (quest::CQuestManager::Instance().GetPCForce(target->GetPlayerID())->IsRunning() == true)
 		return;
 
 	uint32_t dw1 = GetCRC32(ch->GetName(), strlen(ch->GetName()));
@@ -233,7 +233,7 @@ void MessengerManager::__AddToList(MessengerManager::keyA account, MessengerMana
 	m_Relation[account].insert(companion);
 	m_InverseRelation[companion].insert(account);
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(account.c_str());
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindPC(account.c_str());
 	LPDESC d = ch ? ch->GetDesc() : nullptr;
 
 	if (d)
@@ -241,9 +241,9 @@ void MessengerManager::__AddToList(MessengerManager::keyA account, MessengerMana
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<메신져> %s 님을 친구로 추가하였습니다."), companion.c_str());
 	}
 
-	LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(companion.c_str());
+	LPCHARACTER tch = CHARACTER_MANAGER::Instance().FindPC(companion.c_str());
 
-	if (tch || P2P_MANAGER::instance().Find(companion.c_str()))
+	if (tch || P2P_MANAGER::Instance().Find(companion.c_str()))
 		SendLogin(account, companion);
 	else
 		SendLogout(account, companion);
@@ -257,13 +257,13 @@ void MessengerManager::AddToList(MessengerManager::keyA account, MessengerManage
 	if (m_Relation[account].find(companion) != m_Relation[account].end())
 		return;
 
-	DBManager::instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
-	DBManager::instance().EscapeString(__companion, sizeof(__companion), companion.c_str(), companion.size());
+	DBManager::Instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
+	DBManager::Instance().EscapeString(__companion, sizeof(__companion), companion.c_str(), companion.size());
 	if (account.compare(__account) || companion.compare(__companion))
 		return;
 
 	sys_log(0, "Messenger Add %s %s", account.c_str(), companion.c_str());
-	DBManager::instance().Query("INSERT INTO messenger_list VALUES ('%s', '%s')",  __account, __companion);
+	DBManager::Instance().Query("INSERT INTO messenger_list VALUES ('%s', '%s')",  __account, __companion);
 
 	__AddToList(account, companion);
 
@@ -272,7 +272,7 @@ void MessengerManager::AddToList(MessengerManager::keyA account, MessengerManage
 	p2ppck.bHeader = HEADER_GG_MESSENGER_ADD;
 	strlcpy(p2ppck.szAccount, account.c_str(), sizeof(p2ppck.szAccount));
 	strlcpy(p2ppck.szCompanion, companion.c_str(), sizeof(p2ppck.szCompanion));
-	P2P_MANAGER::instance().Send(&p2ppck, sizeof(TPacketGGMessenger));
+	P2P_MANAGER::Instance().Send(&p2ppck, sizeof(TPacketGGMessenger));
 }
 
 void MessengerManager::__RemoveFromList(MessengerManager::keyA account, MessengerManager::keyA companion)
@@ -280,7 +280,7 @@ void MessengerManager::__RemoveFromList(MessengerManager::keyA account, Messenge
 	m_Relation[account].erase(companion);
 	m_InverseRelation[companion].erase(account);
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(account.c_str());
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindPC(account.c_str());
 	LPDESC d = ch ? ch->GetDesc() : nullptr;
 
 	if (d)
@@ -292,13 +292,13 @@ void MessengerManager::RemoveFromList(MessengerManager::keyA account, MessengerM
 	if (companion.size() == 0)
 		return;
 
-	DBManager::instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
-	DBManager::instance().EscapeString(__companion, sizeof(__companion), companion.c_str(), companion.size());
+	DBManager::Instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
+	DBManager::Instance().EscapeString(__companion, sizeof(__companion), companion.c_str(), companion.size());
 	if (account.compare(__account) || companion.compare(__companion))
 		return;
 
 	sys_log(1, "Messenger Remove %s %s", account.c_str(), companion.c_str());
-	DBManager::instance().Query("DELETE FROM messenger_list WHERE account='%s' AND companion = '%s'", __account, __companion);
+	DBManager::Instance().Query("DELETE FROM messenger_list WHERE account='%s' AND companion = '%s'", __account, __companion);
 
 	__RemoveFromList(account, companion);
 
@@ -307,19 +307,19 @@ void MessengerManager::RemoveFromList(MessengerManager::keyA account, MessengerM
 	p2ppck.bHeader = HEADER_GG_MESSENGER_REMOVE;
 	strlcpy(p2ppck.szAccount, account.c_str(), sizeof(p2ppck.szAccount));
 	strlcpy(p2ppck.szCompanion, companion.c_str(), sizeof(p2ppck.szCompanion));
-	P2P_MANAGER::instance().Send(&p2ppck, sizeof(TPacketGGMessenger));
+	P2P_MANAGER::Instance().Send(&p2ppck, sizeof(TPacketGGMessenger));
 }
 
 void MessengerManager::RemoveAllList(keyA account)
 {
 	std::set<keyT>	company(m_Relation[account]);
 
-	DBManager::instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
+	DBManager::Instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
 	if (account.compare(__account))
 		return;
 
 	/* SQL Data 삭제 */
-	DBManager::instance().Query("DELETE FROM messenger_list WHERE account='%s' OR companion='%s'", __account, __account);
+	DBManager::Instance().Query("DELETE FROM messenger_list WHERE account='%s' OR companion='%s'", __account, __account);
 
 	/* 내가 가지고있는 리스트 삭제 */
 	for (std::set<keyT>::iterator iter = company.begin();
@@ -343,7 +343,7 @@ void MessengerManager::RemoveAllList(keyA account)
 
 void MessengerManager::SendList(MessengerManager::keyA account)
 {
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(account.c_str());
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindPC(account.c_str());
 
 	if (!ch)
 		return;
@@ -406,7 +406,7 @@ void MessengerManager::SendList(MessengerManager::keyA account)
 
 void MessengerManager::SendLogin(MessengerManager::keyA account, MessengerManager::keyA companion)
 {
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(account.c_str());
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindPC(account.c_str());
 	LPDESC d = ch ? ch->GetDesc() : nullptr;
 
 	if (!d)
@@ -436,7 +436,7 @@ void MessengerManager::SendLogout(MessengerManager::keyA account, MessengerManag
 	if (!companion.size())
 		return;
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(account.c_str());
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindPC(account.c_str());
 	LPDESC d = ch ? ch->GetDesc() : nullptr;
 
 	if (!d)

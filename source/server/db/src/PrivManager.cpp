@@ -22,7 +22,7 @@ CPrivManager::~CPrivManager()
 //
 void CPrivManager::Update()
 {
-	time_t now = CClientManager::instance().GetCurrentTime();
+	time_t now = CClientManager::Instance().GetCurrentTime();
 
 	while (!m_pqPrivGuild.empty() && m_pqPrivGuild.top().first <= now)
 	{
@@ -93,7 +93,7 @@ void CPrivManager::AddCharPriv(uint32_t pid, uint8_t type, int32_t value)
 	if (!value)
 		return;
 
-	time_t now = CClientManager::instance().GetCurrentTime();
+	time_t now = CClientManager::Instance().GetCurrentTime();
 	auto p = new TPrivCharData(type, value, pid);
 
 	int32_t iDuration = CHARACTER_BAD_PRIV_DURATION;
@@ -122,7 +122,7 @@ void CPrivManager::AddGuildPriv(uint32_t guild_id, uint8_t type, int32_t value, 
 
 	auto it = m_aPrivGuild[type].find(guild_id);
 
-	time_t now = CClientManager::instance().GetCurrentTime();
+	time_t now = CClientManager::Instance().GetCurrentTime();
 	time_t end = now + duration_sec;
 	auto p = new TPrivGuildData(type, value, guild_id, end);
 	m_pqPrivGuild.push(std::make_pair(end, p));
@@ -152,7 +152,7 @@ void CPrivManager::AddEmpirePriv(uint8_t empire, uint8_t type, int32_t value, ti
 	if (duration_sec < 0)
 		duration_sec = 0;
 
-	time_t now = CClientManager::instance().GetCurrentTime();
+	time_t now = CClientManager::Instance().GetCurrentTime();
 	time_t end = now+duration_sec;
 
 	// 이전 설정값 무효화
@@ -243,20 +243,20 @@ struct FSendChangeCharPriv
 // ADD_GUILD_PRIV_TIME
 void CPrivManager::SendChangeGuildPriv(uint32_t guild_id, uint8_t type, int32_t value, time_t end_time_sec)
 {
-	CClientManager::instance().for_each_peer(FSendChangeGuildPriv(guild_id, type, value, end_time_sec));
+	CClientManager::Instance().for_each_peer(FSendChangeGuildPriv(guild_id, type, value, end_time_sec));
 }
 // END_OF_ADD_GUILD_PRIV_TIME
 
 // ADD_EMPIRE_PRIV_TIME
 void CPrivManager::SendChangeEmpirePriv(uint8_t empire, uint8_t type, int32_t value, time_t end_time_sec)
 {
-	CClientManager::instance().for_each_peer(FSendChangeEmpirePriv(empire, type, value, end_time_sec));
+	CClientManager::Instance().for_each_peer(FSendChangeEmpirePriv(empire, type, value, end_time_sec));
 }
 // END_OF_ADD_EMPIRE_PRIV_TIME
 
 void CPrivManager::SendChangeCharPriv(uint32_t pid, uint8_t type, int32_t value)
 {
-	CClientManager::instance().for_each_peer(FSendChangeCharPriv(pid, type, value));
+	CClientManager::Instance().for_each_peer(FSendChangeCharPriv(pid, type, value));
 }
 
 void CPrivManager::SendPrivOnSetup(CPeer* peer)

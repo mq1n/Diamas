@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include "GrpBase.h"
 #include "GrpScreen.h"
-#include "../eterBase/Singleton.h"
+#include "../../common/Singleton.h"
 #include "GrpRenderTargetTexture.h"
 
 class CRenderTargetManager : public CGraphicBase, public CSingleton<CRenderTargetManager>

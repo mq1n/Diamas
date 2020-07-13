@@ -1,7 +1,6 @@
 #pragma once
-
 #include <Windows.h>
-#include "Singleton.h"
+#include "../../common/singleton.h"
 
 class CTimer : public CSingleton<CTimer>
 {

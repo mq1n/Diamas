@@ -267,7 +267,7 @@ EVENTFUNC(ready_to_start_event)
 				chA->SetArena(pArena);
 				chB->SetArena(pArena);
 
-				int32_t count = quest::CQuestManager::instance().GetEventFlag("arena_potion_limit_count");
+				int32_t count = quest::CQuestManager::Instance().GetEventFlag("arena_potion_limit_count");
 
 				if (count > 10000)
 				{
@@ -569,7 +569,7 @@ void CArena::EndDuel()
 
 	for (auto iter = m_mapObserver.begin(); iter != m_mapObserver.end(); ++iter)
 	{
-		LPCHARACTER pChar = CHARACTER_MANAGER::instance().FindByPID(iter->first);
+		LPCHARACTER pChar = CHARACTER_MANAGER::Instance().FindByPID(iter->first);
 		if (pChar != nullptr)
 		{
 			pChar->WarpSet(ARENA_RETURN_POINT_X(pChar->GetEmpire()), ARENA_RETURN_POINT_Y(pChar->GetEmpire()));
@@ -801,7 +801,7 @@ bool CArena::OnDead(uint32_t dwPIDA, uint32_t dwPIDB)
 			sys_log(0, "ARENA : OnDead Error (%u, %u) (%u, %u)", m_dwPIDA, m_dwPIDB, dwPIDA, dwPIDB);
 		}
 
-		int32_t potion = quest::CQuestManager::instance().GetEventFlag("arena_potion_limit_count");
+		int32_t potion = quest::CQuestManager::Instance().GetEventFlag("arena_potion_limit_count");
 		pCharA->SetPotionLimit(potion);
 		pCharB->SetPotionLimit(potion);
 	}

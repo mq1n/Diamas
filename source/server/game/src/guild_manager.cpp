@@ -62,12 +62,12 @@ CGuildManager::~CGuildManager()
 
 int32_t CGuildManager::GetDisbandDelay()
 {
-	return quest::CQuestManager::instance().GetEventFlag("guild_disband_delay") * (g_bIsTestServer ? 60 : 86400);
+	return quest::CQuestManager::Instance().GetEventFlag("guild_disband_delay") * (g_bIsTestServer ? 60 : 86400);
 }
 
 int32_t CGuildManager::GetWithdrawDelay()
 {
-	return quest::CQuestManager::instance().GetEventFlag("guild_withdraw_delay") * (g_bIsTestServer ? 60 : 86400);
+	return quest::CQuestManager::Instance().GetEventFlag("guild_withdraw_delay") * (g_bIsTestServer ? 60 : 86400);
 }
 
 uint32_t CGuildManager::CreateGuild(TGuildCreateParameter& gcp)
@@ -82,11 +82,11 @@ uint32_t CGuildManager::CreateGuild(TGuildCreateParameter& gcp)
 	}
 
 	static char	__guild_name[GUILD_NAME_MAX_LEN*2+1];
-	DBManager::instance().EscapeString(__guild_name, sizeof(__guild_name), gcp.name, strnlen(gcp.name, sizeof(gcp.name)));
+	DBManager::Instance().EscapeString(__guild_name, sizeof(__guild_name), gcp.name, strnlen(gcp.name, sizeof(gcp.name)));
 	if (strncmp(__guild_name, gcp.name, strnlen(gcp.name, sizeof(gcp.name))))
 		return 0;
 
-	std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT COUNT(*) FROM guild WHERE name = '%s'", __guild_name));
+	std::unique_ptr<SQLMsg> pmsg(DBManager::Instance().DirectQuery("SELECT COUNT(*) FROM guild WHERE name = '%s'", __guild_name));
 
 	if (pmsg->Get()->uiNumRows > 0)
 	{
@@ -172,7 +172,7 @@ CGuild* CGuildManager::TouchGuild(uint32_t guild_id)
 		m_mapGuild.insert(std::make_pair(guild_id, M2_NEW CGuild(guild_id)));
 		it = m_mapGuild.find(guild_id);
 
-		CHARACTER_MANAGER::instance().for_each_pc(FGuildNameSender(guild_id, it->second->GetName()));
+		CHARACTER_MANAGER::Instance().for_each_pc(FGuildNameSender(guild_id, it->second->GetName()));
 	}
 
 	return it->second;
@@ -208,7 +208,7 @@ void CGuildManager::Initialize()
 		return;
 	}
 
-	std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT id FROM guild"));
+	std::unique_ptr<SQLMsg> pmsg(DBManager::Instance().DirectQuery("SELECT id FROM guild"));
 
 	std::vector<uint32_t> vecGuildID;
 	vecGuildID.reserve(pmsg->Get()->uiNumRows);
@@ -222,7 +222,7 @@ void CGuildManager::Initialize()
 		vecGuildID.push_back(guild_id);
 	}
 
-	CGuildMarkManager & rkMarkMgr = CGuildMarkManager::instance();
+	CGuildMarkManager & rkMarkMgr = CGuildMarkManager::Instance();
 
 	rkMarkMgr.SetMarkPathPrefix("mark");
 
@@ -260,7 +260,7 @@ void CGuildManager::DisbandGuild(uint32_t guild_id)
 	M2_DELETE(it->second);
 	m_mapGuild.erase(it);
 
-	CGuildMarkManager::instance().DeleteMark(guild_id);
+	CGuildMarkManager::Instance().DeleteMark(guild_id);
 }
 
 void CGuildManager::SkillRecharge()
@@ -635,7 +635,7 @@ void CGuildManager::StartWar(uint32_t guild_id1, uint32_t guild_id2)
 	if (guild_id1 > guild_id2)
 		std::swap(guild_id1, guild_id2);
 
-	CHARACTER_MANAGER::instance().for_each_pc(FSendWarList(GUILD_SUBHEADER_GC_GUILD_WAR_LIST, guild_id1, guild_id2));
+	CHARACTER_MANAGER::Instance().for_each_pc(FSendWarList(GUILD_SUBHEADER_GC_GUILD_WAR_LIST, guild_id1, guild_id2));
 	m_GuildWar.insert(std::make_pair(guild_id1, guild_id2));
 }
 
@@ -702,7 +702,7 @@ bool CGuildManager::EndWar(uint32_t guild_id1, uint32_t guild_id2)
 		g2->EndWar(guild_id1);
 
 	m_GuildWarEndTime[k] = get_global_time();
-	CHARACTER_MANAGER::instance().for_each_pc(FSendWarList(GUILD_SUBHEADER_GC_GUILD_WAR_END_LIST, guild_id1, guild_id2));
+	CHARACTER_MANAGER::Instance().for_each_pc(FSendWarList(GUILD_SUBHEADER_GC_GUILD_WAR_END_LIST, guild_id1, guild_id2));
 	m_GuildWar.erase(it);
 
 	return true;
@@ -858,8 +858,8 @@ void CGuildManager::StopAllGuildWar()
 {
 	for (auto it = m_GuildWar.begin(); it != m_GuildWar.end(); ++it)
 	{
-		CGuild * g = CGuildManager::instance().TouchGuild(it->first);
-		CGuild * pg = CGuildManager::instance().TouchGuild(it->second);
+		CGuild * g = CGuildManager::Instance().TouchGuild(it->first);
+		CGuild * pg = CGuildManager::Instance().TouchGuild(it->second);
 		g->EndWar(it->second);
 		pg->EndWar(it->first);
 	}

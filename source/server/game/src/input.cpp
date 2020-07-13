@@ -15,10 +15,6 @@
 #include "utils.h"
 #include "desc_client.h"
 
-#include "../../common/service.h"
-
-#include <sstream>
-
 CInputProcessor::CInputProcessor() : m_pPacketInfo(nullptr), m_iBufferLeft(0)
 {
 	if (!m_pPacketInfo)

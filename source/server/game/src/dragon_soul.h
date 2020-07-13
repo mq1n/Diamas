@@ -1,12 +1,12 @@
 #pragma once
-#include "../../common/length.h"
+#include "../../../common/common_incl.hpp"
 
 class CHARACTER;
 class CItem;
 
 class DragonSoulTable;
 
-class DSManager : public singleton<DSManager>
+class DSManager : public CSingleton<DSManager>
 {
 public:
 	DSManager();

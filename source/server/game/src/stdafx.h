@@ -1,15 +1,10 @@
 #pragma once
-#include "debug_allocator.h"
-
 #include "../../libthecore/include/stdafx.h"
-#include "../../common/singleton.h"
-#include "../../common/utils.h"
-#include "../../common/service.h"
+#include "../../../common/common_incl.hpp"
 
 #include <cmath>
 #include <cfloat>
 #include <cctype>
-
 #include <algorithm>
 #include <list>
 #include <map>
@@ -19,7 +14,11 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <sstream>
+#include <stack>
+#include <functional>
 
+#include "debug_allocator.h"
 #include "typedef.h"
 #include "locale.hpp"
 #include "event.h"

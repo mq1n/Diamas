@@ -45,7 +45,7 @@ EVENTINFO(TargetInfo)
 	}
 };
 
-class CTargetManager : public singleton<CTargetManager>
+class CTargetManager : public CSingleton<CTargetManager>
 {
 	public:
 		CTargetManager();

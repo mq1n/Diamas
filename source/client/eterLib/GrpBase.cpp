@@ -82,7 +82,6 @@ bool					CGraphicBase::ms_isLowTextureMemory = false;
 bool					CGraphicBase::ms_isHighTextureMemory = false;
 int32_t						CGraphicBase::ms_nonPow2Support = 0;
 bool					CGraphicBase::ms_bEnableGlobalAntialiasing = false;
-// 2004.11.18.myevan.DynamicVertexBuffer·Î ±³Ã¼
 /*
 std::vector<TIndex>		CGraphicBase::ms_lineIdxVector;
 std::vector<TIndex>		CGraphicBase::ms_lineTriIdxVector;

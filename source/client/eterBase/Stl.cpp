@@ -21,12 +21,6 @@ std::string& stl_static_string(const char * c_sz)
 	return s_stList.back();
 }
 
-void stl_lowers(std::string& rstRet)
-{
-	for (char & i : rstRet)
-		i = ascii_tolower(i);
-}
-
 int32_t split_string(const std::string& input, const std::string& delimiter, std::vector<std::string>& results, bool includeEmpties)
 {
 	int32_t iPos = 0;

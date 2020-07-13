@@ -25,20 +25,20 @@ add_definitions(-DNOMINMAX)
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 	add_definitions(-D_DEBUG)
-    add_definitions(-DDEBUG)
-    set(BUILD_MODE "debug")
+	add_definitions(-DDEBUG)
+	set(BUILD_MODE "debug")
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release")
 	add_definitions(-D_NDEBUG)
 	add_definitions(-DNDEBUG)
-    set(BUILD_MODE "normal")
+	set(BUILD_MODE "normal")
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
 	add_definitions(-D_NDEBUG)
 	add_definitions(-DNDEBUG)
-    set(BUILD_MODE "normal")
+	set(BUILD_MODE "normal")
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel")
 	add_definitions(-D_NDEBUG)
 	add_definitions(-DNDEBUG)
-    set(BUILD_MODE "normal")
+	set(BUILD_MODE "normal")
 endif()
 
 # Project files
@@ -46,12 +46,10 @@ file(GLOB GAMESERVER_HEADERS
 	"${PROJECT_SOURCE_DIR}/../common/*.h"
 	"${PROJECT_SOURCE_DIR}/src/*.h"
 	"${PROJECT_SOURCE_DIR}/src/*.hpp"
-	"${PROJECT_SOURCE_DIR}/../../../extern/3rd/xxHash/*.h"
 )
 file(GLOB GAMESERVER_SOURCES
 	"${PROJECT_SOURCE_DIR}/src/*.c"
 	"${PROJECT_SOURCE_DIR}/src/*.cpp"
-	"${PROJECT_SOURCE_DIR}/../../../extern/3rd/xxHash/xxhash.c"
 )
 
 #if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

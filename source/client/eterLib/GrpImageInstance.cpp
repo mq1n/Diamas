@@ -83,7 +83,6 @@ void CGraphicImageInstance::OnRender()
 	vertices[3].texCoord	= TTextureCoordinate(eu, ev);	
 	vertices[3].diffuse		= m_DiffuseColor;
 
-	// 2004.11.18.myevan.ctrl+alt+del 반복 사용시 튕기는 문제 
 	if (CGraphicBase::SetPDTStream(vertices, 4))
 	{
 		CGraphicBase::SetDefaultIndexBuffer(CGraphicBase::DEFAULT_IB_FILL_RECT);

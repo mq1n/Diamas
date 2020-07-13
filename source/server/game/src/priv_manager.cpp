@@ -98,7 +98,7 @@ void CPrivManager::GiveGuildPriv(uint32_t guild_id, uint8_t type, int32_t value,
 	m_aPrivGuild[type][guild_id].value = value;
 	m_aPrivGuild[type][guild_id].end_time_sec = end_time_sec;
 
-	CGuild* g = CGuildManager::instance().FindGuild(guild_id);
+	CGuild* g = CGuildManager::Instance().FindGuild(guild_id);
 
 	if (g)
 	{
@@ -117,7 +117,7 @@ void CPrivManager::GiveGuildPriv(uint32_t guild_id, uint8_t type, int32_t value,
 
 		if (bLog)
 		{
-			LogManager::instance().CharLog(0, guild_id, type, value, "GUILD_PRIV", "", "");
+			LogManager::Instance().CharLog(0, guild_id, type, value, "GUILD_PRIV", "", "");
 		}
 	}
 }
@@ -137,7 +137,7 @@ void CPrivManager::GiveCharacterPriv(uint32_t pid, uint8_t type, int32_t value, 
 	m_aPrivChar[type][pid] = value;
 
 	if (bLog)
-		LogManager::instance().CharLog(pid, 0, type, value, "CHARACTER_PRIV", "", "");
+		LogManager::Instance().CharLog(pid, 0, type, value, "CHARACTER_PRIV", "", "");
 }
 
 void CPrivManager::GiveEmpirePriv(uint8_t empire, uint8_t type, int32_t value, uint8_t bLog, time_t end_time_sec)
@@ -180,7 +180,7 @@ void CPrivManager::GiveEmpirePriv(uint8_t empire, uint8_t type, int32_t value, u
 
 	if (bLog)
 	{
-		LogManager::instance().CharLog(0, empire, type, value, "EMPIRE_PRIV", "", "");
+		LogManager::Instance().CharLog(0, empire, type, value, "EMPIRE_PRIV", "", "");
 	}
 }
 

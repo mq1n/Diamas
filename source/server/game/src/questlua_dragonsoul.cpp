@@ -5,30 +5,30 @@
 
 #undef sys_err
 #ifndef __WIN32__
-#define sys_err(fmt, args...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
+#define sys_err(fmt, args...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
 #else
-#define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
+#define sys_err(fmt, ...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
 namespace quest 
 {
 	int32_t ds_open_refine_window(lua_State* L)
 	{
-		const LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		const LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (nullptr == ch)
 		{
 			sys_err ("nullptr POINT ERROR");
 			return 0;
 		}
 		if (ch->DragonSoul_IsQualified())
-			ch->DragonSoul_RefineWindow_Open(CQuestManager::instance().GetCurrentNPCCharacterPtr());
+			ch->DragonSoul_RefineWindow_Open(CQuestManager::Instance().GetCurrentNPCCharacterPtr());
 
 		return 0;
 	}
 
 	int32_t ds_give_qualification(lua_State* L)
 	{
-		const LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		const LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (nullptr == ch)
 		{
 			sys_err ("nullptr POINT ERROR");
@@ -41,7 +41,7 @@ namespace quest
 
 	int32_t ds_is_qualified(lua_State* L)
 	{
-		const LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		const LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (nullptr == ch)
 		{
 			sys_err ("nullptr POINT ERROR");
@@ -63,6 +63,6 @@ namespace quest
 			{ nullptr					, nullptr					}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("ds", ds_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("ds", ds_functions);
 	}
 };

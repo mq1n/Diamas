@@ -1,7 +1,5 @@
 #pragma once
 #include "../../../common/packets.h"
-
-#include "../../common/length.h"
 #include "../../common/tables.h"
 #include <cstdint>
 
@@ -286,21 +284,6 @@ typedef struct packet_handshake
 	int32_t	lDelta;
 } TPacketGCHandshake;
 
-enum EPhase
-{
-	PHASE_CLOSE,
-	PHASE_HANDSHAKE,
-	PHASE_LOGIN,
-	PHASE_SELECT,
-	PHASE_LOADING,
-	PHASE_GAME,
-	PHASE_DEAD,
-
-	PHASE_CLIENT_CONNECTING,
-	PHASE_DBCLIENT,
-	PHASE_P2P,
-	PHASE_AUTH,
-};
 
 typedef struct packet_phase
 {

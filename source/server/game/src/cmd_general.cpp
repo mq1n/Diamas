@@ -36,7 +36,7 @@
 
 ACMD(do_user_horse_ride)
 {
-	if (ch && CBattlegroundManager::instance().HasBattleground())
+	if (ch && CBattlegroundManager::Instance().HasBattleground())
 		return;
 
 	if (ch->IsObserverMode())
@@ -107,13 +107,13 @@ ACMD(do_user_horse_feed)
 		ch->RemoveSpecifyItem(dwFood, 1);
 		ch->FeedHorse();
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("말에게 %s%s 주었습니다."), 
-			ITEM_MANAGER::instance().GetTable(dwFood)->szLocaleName,
+			ITEM_MANAGER::Instance().GetTable(dwFood)->szLocaleName,
 			""
 		);
 	}
 	else
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 아이템이 필요합니다"), ITEM_MANAGER::instance().GetTable(dwFood)->szLocaleName);
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 아이템이 필요합니다"), ITEM_MANAGER::Instance().GetTable(dwFood)->szLocaleName);
 	}
 }
 
@@ -192,7 +192,7 @@ EVENTFUNC(shutdown_event)
 
 		if (--*pSec == -10)
 		{
-			const DESC_MANAGER::DESC_SET & c_set_desc = DESC_MANAGER::instance().GetClientSet();
+			const DESC_MANAGER::DESC_SET & c_set_desc = DESC_MANAGER::Instance().GetClientSet();
 			std::for_each(c_set_desc.begin(), c_set_desc.end(), DisconnectFunc());
 			return passes_per_sec;
 		}
@@ -203,7 +203,7 @@ EVENTFUNC(shutdown_event)
 	}
 	else if (*pSec == 0)
 	{
-		const DESC_MANAGER::DESC_SET & c_set_desc = DESC_MANAGER::instance().GetClientSet();
+		const DESC_MANAGER::DESC_SET & c_set_desc = DESC_MANAGER::Instance().GetClientSet();
 		std::for_each(c_set_desc.begin(), c_set_desc.end(), SendDisconnectFunc());
 		g_bNoMoreClient = true;
 		--*pSec;
@@ -228,8 +228,8 @@ void Shutdown(int32_t iSec)
 		return;
 	}
 
-	CBattlegroundManager::instance().Destroy();
-	CWarMapManager::instance().OnShutdown();
+	CBattlegroundManager::Instance().Destroy();
+	CWarMapManager::Instance().OnShutdown();
 
 	char buf[64];
 	snprintf(buf, sizeof(buf), LC_TEXT("%d초 후 게임이 셧다운 됩니다."), iSec);
@@ -249,10 +249,10 @@ ACMD(do_shutdown)
 
 	if (!*arg1 || (*arg1 && strcmp(arg1, "force")))
 	{
-		if (ch && CBattlegroundManager::instance().HasBattleground())
+		if (ch && CBattlegroundManager::Instance().HasBattleground())
 		{
 			ch->ChatPacket(CHAT_TYPE_INFO, "You can not shutdown while running any battleground! Use force param.");
-			CBattlegroundManager::instance().BlockCreateBattleground();
+			CBattlegroundManager::Instance().BlockCreateBattleground();
 			return;
 		}
 	}
@@ -263,7 +263,7 @@ ACMD(do_shutdown)
 
 		TPacketGGShutdown p;
 		p.bHeader = HEADER_GG_SHUTDOWN;
-		P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGShutdown));
+		P2P_MANAGER::Instance().Send(&p, sizeof(TPacketGGShutdown));
 
 		Shutdown(10);
 	}
@@ -300,7 +300,7 @@ EVENTFUNC(timed_event)
 
 					db_clientdesc->DBPacket( HEADER_GD_VALID_LOGOUT, 0, &acc_info, sizeof(acc_info) );
 
-					LogManager::instance().DetailLoginLog( false, ch );
+					LogManager::Instance().DetailLoginLog( false, ch );
 				}
 				break;
 		}
@@ -375,7 +375,7 @@ ACMD(do_cmd)
 	int32_t nExitLimitTime = 10;
 
 	if (ch->IsHack(false, true, nExitLimitTime) &&
-		false == CThreeWayWar::instance().IsSungZiMapIndex(ch->GetMapIndex()) &&
+		false == CThreeWayWar::Instance().IsSungZiMapIndex(ch->GetMapIndex()) &&
 	   	(!ch->GetWarMap() || ch->GetWarMap()->GetType() == GUILD_WAR_TYPE_FLAG))
 	{
 		return;
@@ -408,7 +408,7 @@ ACMD(do_cmd)
 
 ACMD(do_fishing)
 {
-	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
 		return;
 		
 	char arg1[256];
@@ -443,9 +443,9 @@ ACMD(do_restart)
 
 	int32_t iTimeToDead = (event_time(ch->m_pkDeadEvent) / passes_per_sec);
 
-	if (CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
 	{
-		CBattlegroundManager::instance().OnRevive(ch, iTimeToDead);
+		CBattlegroundManager::Instance().OnRevive(ch, iTimeToDead);
 		return;
 	}
 
@@ -467,7 +467,7 @@ ACMD(do_restart)
 			if (ch->IsHack())
 			{
 				//성지 맵일경우에는 체크 하지 않는다.
-				if (false == CThreeWayWar::instance().IsSungZiMapIndex(ch->GetMapIndex()))
+				if (false == CThreeWayWar::Instance().IsSungZiMapIndex(ch->GetMapIndex()))
 				{
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 재시작 할 수 없습니다. (%d초 남음)"), iTimeToDead - (180 - g_nPortalLimitTime));
 					return;
@@ -491,7 +491,7 @@ ACMD(do_restart)
 		{
 			//길드맵, 성지맵에서는 체크 하지 않는다.
 			if ((!ch->GetWarMap() || ch->GetWarMap()->GetType() == GUILD_WAR_TYPE_FLAG) ||
-			   	false == CThreeWayWar::instance().IsSungZiMapIndex(ch->GetMapIndex()))
+			   	false == CThreeWayWar::Instance().IsSungZiMapIndex(ch->GetMapIndex()))
 			{
 				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 재시작 할 수 없습니다. (%d초 남음)"), iTimeToDead - (180 - g_nPortalLimitTime));
 				return;
@@ -514,12 +514,12 @@ ACMD(do_restart)
 
 	//FORKED_LOAD
 	//DESC: 삼거리 전투시 부활을 할경우 맵의 입구가 아닌 삼거리 전투의 시작지점으로 이동하게 된다.
-	if (1 == quest::CQuestManager::instance().GetEventFlag("threeway_war"))
+	if (1 == quest::CQuestManager::Instance().GetEventFlag("threeway_war"))
 	{
 		if (subcmd == SCMD_RESTART_TOWN || subcmd == SCMD_RESTART_HERE)
 		{
-			if (true == CThreeWayWar::instance().IsThreeWayWarMapIndex(ch->GetMapIndex()) &&
-					false == CThreeWayWar::instance().IsSungZiMapIndex(ch->GetMapIndex()))
+			if (true == CThreeWayWar::Instance().IsThreeWayWarMapIndex(ch->GetMapIndex()) &&
+					false == CThreeWayWar::Instance().IsSungZiMapIndex(ch->GetMapIndex()))
 			{
 				ch->WarpSet(EMPIRE_START_X(ch->GetEmpire()), EMPIRE_START_Y(ch->GetEmpire()));
 
@@ -531,9 +531,9 @@ ACMD(do_restart)
 			}
 
 			//성지 
-			if (true == CThreeWayWar::instance().IsSungZiMapIndex(ch->GetMapIndex()))
+			if (true == CThreeWayWar::Instance().IsSungZiMapIndex(ch->GetMapIndex()))
 			{
-				if (CThreeWayWar::instance().GetReviveTokenForPlayer(ch->GetPlayerID()) <= 0)
+				if (CThreeWayWar::Instance().GetReviveTokenForPlayer(ch->GetPlayerID()) <= 0)
 				{
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("성지에서 부활 기회를 모두 잃었습니다! 마을로 이동합니다!"));
 					ch->WarpSet(EMPIRE_START_X(ch->GetEmpire()), EMPIRE_START_Y(ch->GetEmpire()));
@@ -570,7 +570,7 @@ ACMD(do_restart)
 					sys_log(0, "do_restart: restart town");
 					GPOS pos;
 
-					if (CWarMapManager::instance().GetStartPosition(ch->GetMapIndex(), ch->GetGuild()->GetID() < dwGuildOpponent ? 0 : 1, pos))
+					if (CWarMapManager::Instance().GetStartPosition(ch->GetMapIndex(), ch->GetGuild()->GetID() < dwGuildOpponent ? 0 : 1, pos))
 						ch->Show(ch->GetMapIndex(), pos.x, pos.y);
 					else
 						ch->ExitToSavedLocation();
@@ -602,7 +602,7 @@ ACMD(do_restart)
 			sys_log(0, "do_restart: restart town");
 			GPOS pos;
 
-			if (SECTREE_MANAGER::instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos))
+			if (SECTREE_MANAGER::Instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos))
 				ch->WarpSet(pos.x, pos.y);
 			else
 				ch->GoHome();
@@ -720,23 +720,23 @@ ACMD(do_search_bg)
 	str_to_number(nQueueType, arg3);
 
 
-	CBattlegroundManager::instance().SearchBattleground(ch, nGameMode, nGameType, nQueueType);
+	CBattlegroundManager::Instance().SearchBattleground(ch, nGameMode, nGameType, nQueueType);
 }
 
 ACMD(do_recv_bg_details)
 {
-	if (CBattlegroundManager::instance().IsStarted() == false)
+	if (CBattlegroundManager::Instance().IsStarted() == false)
 	{
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "bg_details 0");
 		ch->ChatPacket(CHAT_TYPE_INFO, "Battleground is not active yet");
 		return;
 	}
-	ch->ChatPacket(CHAT_TYPE_COMMAND, "bg_details %u", CBattlegroundManager::instance().GetBattlegroundJoinType());
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "bg_details %u", CBattlegroundManager::Instance().GetBattlegroundJoinType());
 }
 
 ACMD(do_recv_create_bg_details)
 {
-	auto arrReqItems = CBattlegroundManager::instance().GetBattlegroundRequiredItems();
+	auto arrReqItems = CBattlegroundManager::Instance().GetBattlegroundRequiredItems();
 
 	ch->ChatPacket(CHAT_TYPE_COMMAND, "bg_create_ret %u %u %u", arrReqItems.at(0), arrReqItems.at(1), arrReqItems.at(2));
 }
@@ -760,13 +760,13 @@ ACMD(do_create_battleground)
 	uint8_t nQueueType = 0;
 	str_to_number(nQueueType, arg3);
 
-	if (CBattlegroundManager::instance().IsBattlegroundCreateBlocked())
+	if (CBattlegroundManager::Instance().IsBattlegroundCreateBlocked())
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "Battleground create blocked by server administration");
 		return;		
 	}
 
-	auto arrReqItems = CBattlegroundManager::instance().GetBattlegroundRequiredItems();
+	auto arrReqItems = CBattlegroundManager::Instance().GetBattlegroundRequiredItems();
 	auto dwReqItem1 = arrReqItems.at(0);
 	auto dwReqItem2 = arrReqItems.at(1);
 	auto dwReqItem3 = arrReqItems.at(2);
@@ -795,14 +795,14 @@ ACMD(do_create_battleground)
 		ch->RemoveSpecifyItem(dwReqItem3);
 
 
-	auto dwRoomID = CBattlegroundManager::instance().CreateBattlegroundRoom(ch, nGameMode, nGameType, nQueueType);
+	auto dwRoomID = CBattlegroundManager::Instance().CreateBattlegroundRoom(ch, nGameMode, nGameType, nQueueType);
 	if (!dwRoomID)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "Battleground room can not created!");
 		return;
 	}
 
-	auto pkBgRoom = CBattlegroundManager::instance().FindBattlegroundRoom(dwRoomID);
+	auto pkBgRoom = CBattlegroundManager::Instance().FindBattlegroundRoom(dwRoomID);
 	if (pkBgRoom)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "Battleground room succesfully created!");
@@ -830,13 +830,13 @@ ACMD(do_join_bg_queue)
 	str_to_number(nQueueType, arg3);
 
 
-	auto bRet = CBattlegroundManager::instance().JoinBattlegroundQueue(ch->GetPlayerID(), nGameMode, nGameType, nQueueType);
+	auto bRet = CBattlegroundManager::Instance().JoinBattlegroundQueue(ch->GetPlayerID(), nGameMode, nGameType, nQueueType);
 	ch->ChatPacket(CHAT_TYPE_COMMAND, "bg_queue_ret %d", bRet ? 1 : 0);
 }
 
 ACMD(do_bg_start)
 {
-	auto pkRoom = CBattlegroundManager::instance().FindBattlegroundRoomByLeader(ch->GetPlayerID());
+	auto pkRoom = CBattlegroundManager::Instance().FindBattlegroundRoomByLeader(ch->GetPlayerID());
 	if (pkRoom)
 	{
 		pkRoom->StartBattleground();
@@ -854,7 +854,7 @@ ACMD(do_bg_join_room)
 	uint32_t dwRoomID = 0;
 	str_to_number(dwRoomID, arg1);
 
-	auto pkRoom = CBattlegroundManager::instance().FindBattlegroundRoom(dwRoomID);
+	auto pkRoom = CBattlegroundManager::Instance().FindBattlegroundRoom(dwRoomID);
 	if (pkRoom)
 	{
 		if (pkRoom->JoinToRoom(ch->GetPlayerID(), number(BG_TEAM_BLUE, BG_TEAM_RED)))
@@ -873,7 +873,7 @@ ACMD(do_bg_join_team)
 	uint8_t nTeamID = 0;
 	str_to_number(nTeamID, arg1);
 
-	auto pkRoom = CBattlegroundManager::instance().FindBattlegroundRoomByAttender(ch->GetPlayerID());
+	auto pkRoom = CBattlegroundManager::Instance().FindBattlegroundRoomByAttender(ch->GetPlayerID());
 	if (pkRoom)
 	{
 		pkRoom->SetTeamID(ch->GetPlayerID(), nTeamID);
@@ -891,7 +891,7 @@ ACMD(do_bg_change_state)
 	uint8_t nNewState = 0;
 	str_to_number(nNewState, arg1);
 
-	auto pkRoom = CBattlegroundManager::instance().FindBattlegroundRoomByAttender(ch->GetPlayerID());
+	auto pkRoom = CBattlegroundManager::Instance().FindBattlegroundRoomByAttender(ch->GetPlayerID());
 	if (pkRoom)
 	{
 		pkRoom->SetAttenderState(ch->GetPlayerID(), nNewState);
@@ -900,7 +900,7 @@ ACMD(do_bg_change_state)
 
 ACMD(do_bg_leaved)
 {
-	auto pkRoom = CBattlegroundManager::instance().FindBattlegroundRoomByAttender(ch->GetPlayerID());
+	auto pkRoom = CBattlegroundManager::Instance().FindBattlegroundRoomByAttender(ch->GetPlayerID());
 	if (pkRoom)
 	{
 		pkRoom->LeaveFromRoom(ch->GetPlayerID());
@@ -915,7 +915,7 @@ ACMD(do_bg_kick)
 	if (!*arg1)
 		return;
 
-	auto pkRoom = CBattlegroundManager::instance().FindBattlegroundRoomByLeader(ch->GetPlayerID());
+	auto pkRoom = CBattlegroundManager::Instance().FindBattlegroundRoomByLeader(ch->GetPlayerID());
 	if (pkRoom)
 	{
 		pkRoom->KickPlayer(arg1);
@@ -943,7 +943,7 @@ ACMD(do_bg_test)
 	{
 		case 1: // create map index
 		{
-			auto lMapIndex = SECTREE_MANAGER::instance().CreatePrivateMap(BATTLEGROUND_NORMAL_MAP_INDEX);
+			auto lMapIndex = SECTREE_MANAGER::Instance().CreatePrivateMap(BATTLEGROUND_NORMAL_MAP_INDEX);
 			if (!lMapIndex)
 			{
 				sys_err("Battleground dungeon can not created!");
@@ -985,7 +985,7 @@ ACMD(do_bg_test)
 #if 0
 		case 1:
 		{
-			auto mob1 = CHARACTER_MANAGER::instance().SpawnMob(301, 218, 9516500, 9524000, 0, true);
+			auto mob1 = CHARACTER_MANAGER::Instance().SpawnMob(301, 218, 9516500, 9524000, 0, true);
 			if (mob1)
 				ch->ChatPacket(CHAT_TYPE_INFO, "vmob1 id: %u", mob1->GetVID());		
 		} break;
@@ -994,8 +994,8 @@ ACMD(do_bg_test)
 		{
 			sys_err("%u -> %u", narg2, narg3);
 
-			auto attacker = CHARACTER_MANAGER::instance().Find(narg2);
-			auto victim = CHARACTER_MANAGER::instance().Find(narg3);
+			auto attacker = CHARACTER_MANAGER::Instance().Find(narg2);
+			auto victim = CHARACTER_MANAGER::Instance().Find(narg3);
 
 			attacker->Attack(victim);
 		} break;
@@ -1011,7 +1011,7 @@ ACMD(do_bg_test)
 } TNPCMovingPosition;
 			 */
 			// 		void			SetMovingWay(const TNPCMovingPosition* pWay, int32_t iMaxNum, bool bRepeat = false, bool bLocal = false);
-			auto charr = CHARACTER_MANAGER::instance().Find(narg2);
+			auto charr = CHARACTER_MANAGER::Instance().Find(narg2);
 
 			///*
 			TNPCMovingPosition cmd;
@@ -1086,10 +1086,10 @@ ACMD(do_stat)
 
 ACMD(do_pvp)
 {
-	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
-	if (ch->GetArena() != nullptr || CArenaManager::instance().IsArenaMap(ch->GetMapIndex()) == true)
+	if (ch->GetArena() != nullptr || CArenaManager::Instance().IsArenaMap(ch->GetMapIndex()) == true)
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
 		return;
@@ -1100,7 +1100,7 @@ ACMD(do_pvp)
 
 	uint32_t vid = 0;
 	str_to_number(vid, arg1);
-	LPCHARACTER pkVictim = CHARACTER_MANAGER::instance().Find(vid);
+	LPCHARACTER pkVictim = CHARACTER_MANAGER::Instance().Find(vid);
 
 	if (!pkVictim)
 		return;
@@ -1114,7 +1114,7 @@ ACMD(do_pvp)
 		return;
 	}
 
-	CPVPManager::instance().Insert(ch, pkVictim);
+	CPVPManager::Instance().Insert(ch, pkVictim);
 }
 
 ACMD(do_deny_pvp)
@@ -1127,7 +1127,7 @@ ACMD(do_deny_pvp)
 
 	uint32_t vid = 0;
 	str_to_number(vid, arg1);
-	LPCHARACTER pkVictim = CHARACTER_MANAGER::instance().Find(vid);
+	LPCHARACTER pkVictim = CHARACTER_MANAGER::Instance().Find(vid);
 
 	if (!pkVictim)
 		return;
@@ -1135,7 +1135,7 @@ ACMD(do_deny_pvp)
 	if (!pkVictim->IsPC())
 		return;
 
-	CPVPManager::instance().Reject(ch, pkVictim);
+	CPVPManager::Instance().Reject(ch, pkVictim);
 }
 
 ACMD(do_guildskillup)
@@ -1213,7 +1213,7 @@ ACMD(do_safebox_close)
 //
 ACMD(do_safebox_password)
 {
-	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
 	char arg1[256];
@@ -1254,7 +1254,7 @@ ACMD(do_safebox_change_password)
 
 ACMD(do_mall_password)
 {
-	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
 	if (!ch || !ch->GetDesc())
@@ -1308,7 +1308,7 @@ ACMD(do_ungroup)
 	if (!ch->GetParty())
 		return;
 
-	if (!CPartyManager::instance().IsEnablePCParty())
+	if (!CPartyManager::Instance().IsEnablePCParty())
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 서버 문제로 파티 관련 처리를 할 수 없습니다."));
 		return;
@@ -1325,7 +1325,7 @@ ACMD(do_ungroup)
 	if (pParty->GetMemberCount() == 2)
 	{
 		// party disband
-		CPartyManager::instance().DeleteParty(pParty);
+		CPartyManager::Instance().DeleteParty(pParty);
 	}
 	else
 	{
@@ -1359,7 +1359,7 @@ ACMD(do_set_run_mode)
 
 ACMD(do_war)
 {
-	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
 	//내 길드 정보를 얻어오고
@@ -1399,7 +1399,7 @@ ACMD(do_war)
 	}
 
 	//상대 길드를 얻어오고
-	CGuild * opp_g = CGuildManager::instance().FindGuildByName(arg1);
+	CGuild * opp_g = CGuildManager::Instance().FindGuildByName(arg1);
 
 	if (!opp_g)
 	{
@@ -1503,7 +1503,7 @@ ACMD(do_war)
 		if (g->GetMasterCharacter() != nullptr)
 			break;
 
-		CCI *pCCI = P2P_MANAGER::instance().FindByPID(g->GetMasterPID());
+		CCI *pCCI = P2P_MANAGER::Instance().FindByPID(g->GetMasterPID());
 
 		if (pCCI != nullptr)
 			break;
@@ -1519,7 +1519,7 @@ ACMD(do_war)
 		if (opp_g->GetMasterCharacter() != nullptr)
 			break;
 		
-		CCI *pCCI = P2P_MANAGER::instance().FindByPID(opp_g->GetMasterPID());
+		CCI *pCCI = P2P_MANAGER::Instance().FindByPID(opp_g->GetMasterPID());
 		
 		if (pCCI != nullptr)
 			break;
@@ -1553,7 +1553,7 @@ ACMD(do_nowar)
 		return;
 	}
 
-	CGuild* opp_g = CGuildManager::instance().FindGuildByName(arg1);
+	CGuild* opp_g = CGuildManager::Instance().FindGuildByName(arg1);
 
 	if (!opp_g)
 	{
@@ -1566,7 +1566,7 @@ ACMD(do_nowar)
 
 ACMD(do_pkmode)
 {
-	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
 	char arg1[256];
@@ -1598,7 +1598,7 @@ ACMD(do_disband_gwar)
 	if (!ch->GetWarMap())
 		return;
 
-	LPDESC d = DESC_MANAGER::instance().FindByCharacterName(arg1);
+	LPDESC d = DESC_MANAGER::Instance().FindByCharacterName(arg1);
 	LPCHARACTER	tch = d ? d->GetCharacter() : nullptr;
 
 	if (!tch || !tch->IsPC())
@@ -1624,12 +1624,12 @@ ACMD(do_disband_gwar)
 
 	tch->SetQuestFlag("guild_war_join.savasengeli", get_global_time() + 3600);
 
-	DESC_MANAGER::instance().DestroyDesc(d);
+	DESC_MANAGER::Instance().DestroyDesc(d);
 }
 
 ACMD(do_messenger_auth)
 {
-	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
 	if (ch->GetArena())
@@ -1647,14 +1647,14 @@ ACMD(do_messenger_auth)
 	char answer = LOWER(*arg1);
 
 	bool bIsDenied = answer != 'y';
-	bool bIsAdded = MessengerManager::instance().AuthToAdd(ch->GetName(), arg2, bIsDenied); // DENY
+	bool bIsAdded = MessengerManager::Instance().AuthToAdd(ch->GetName(), arg2, bIsDenied); // DENY
 	if (bIsAdded && bIsDenied)
 	{
-		LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(arg2);
+		LPCHARACTER tch = CHARACTER_MANAGER::Instance().FindPC(arg2);
 
 		if (tch)
 			tch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님으로 부터 친구 등록을 거부 당했습니다."), ch->GetName());
-		else if (CCI* pCCI = P2P_MANAGER::instance().Find(arg2))
+		else if (CCI* pCCI = P2P_MANAGER::Instance().Find(arg2))
 		{
 			if (pCCI->pkDesc)
 			{
@@ -1728,7 +1728,7 @@ ACMD(do_observer_exit)
 
 ACMD(do_view_equip)
 {
-	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
 	if (!ch)
@@ -1747,7 +1747,7 @@ ACMD(do_view_equip)
 	{
 		uint32_t vid = 0;
 		str_to_number(vid, arg1);
-		LPCHARACTER tch = CHARACTER_MANAGER::instance().Find(vid);
+		LPCHARACTER tch = CHARACTER_MANAGER::Instance().Find(vid);
 
 		if (!tch)
 			return;
@@ -1770,7 +1770,7 @@ ACMD(do_view_equip)
 
 ACMD(do_party_request)
 {
-	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
 		return;
 
 	if (ch->GetArena())
@@ -1793,7 +1793,7 @@ ACMD(do_party_request)
 
 	uint32_t vid = 0;
 	str_to_number(vid, arg1);
-	LPCHARACTER tch = CHARACTER_MANAGER::instance().Find(vid);
+	LPCHARACTER tch = CHARACTER_MANAGER::Instance().Find(vid);
 
 	if (tch)
 		if (!ch->RequestToParty(tch))
@@ -1802,7 +1802,7 @@ ACMD(do_party_request)
 
 ACMD(do_party_request_accept)
 {
-	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
+	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
 		return;
 		
 	char arg1[256];
@@ -1813,7 +1813,7 @@ ACMD(do_party_request_accept)
 
 	uint32_t vid = 0;
 	str_to_number(vid, arg1);
-	LPCHARACTER tch = CHARACTER_MANAGER::instance().Find(vid);
+	LPCHARACTER tch = CHARACTER_MANAGER::Instance().Find(vid);
 
 	if (tch)
 		ch->AcceptToParty(tch);
@@ -1829,7 +1829,7 @@ ACMD(do_party_request_deny)
 
 	uint32_t vid = 0;
 	str_to_number(vid, arg1);
-	LPCHARACTER tch = CHARACTER_MANAGER::instance().Find(vid);
+	LPCHARACTER tch = CHARACTER_MANAGER::Instance().Find(vid);
 
 	if (tch)
 		ch->DenyToParty(tch);
@@ -2341,7 +2341,7 @@ ACMD(do_click_safebox)
 }
 ACMD(do_force_logout)
 {
-	LPDESC pDesc=DESC_MANAGER::instance().FindByCharacterName(ch->GetName());
+	LPDESC pDesc=DESC_MANAGER::Instance().FindByCharacterName(ch->GetName());
 	if (!pDesc)
 		return;
 	pDesc->DelayedDisconnect(0);
@@ -2358,7 +2358,7 @@ ACMD(do_ride)
     if (ch->IsDead() || ch->IsStun())
 	return;
 
-	if (ch && CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()) && !ch->IsGM())
+	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()) && !ch->IsGM())
 		return;
 
 	/*

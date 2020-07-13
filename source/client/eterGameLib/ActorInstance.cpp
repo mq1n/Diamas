@@ -120,7 +120,6 @@ void CActorInstance::OnUpdate()
 }
 
 
-// 2004.07.05.myevan. ±Ã½ÅÅº¿µ ¸Ê¿¡ ³¢ÀÌ´Â ¹®Á¦ÇØ°á
 IBackground& CActorInstance::GetBackground()
 {
 	return IBackground::Instance();

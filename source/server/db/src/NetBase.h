@@ -10,7 +10,7 @@ protected:
 	static LPFDWATCH	m_fdWatcher;
 };
 
-class CNetPoller : public CNetBase, public singleton<CNetPoller>
+class CNetPoller : public CNetBase, public CSingleton<CNetPoller>
 {
 public:
 	CNetPoller();

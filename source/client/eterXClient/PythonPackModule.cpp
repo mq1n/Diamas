@@ -1,16 +1,8 @@
 #include "StdAfx.h"
 #include <FileSystemIncl.hpp>
 #include "../eterGameLib/RaceManager.h"
-#include "../eterBase/stl_utils.h"
 #include "../eterSecurity/PythonStackCheck.h"
 #include "PythonDynamicModuleNames.h"
-
-std::string trim(std::string& str)
-{
-	size_t first = str.find_first_not_of(' ');
-	size_t last = str.find_last_not_of(' ');
-	return str.substr(first, (last - first + 1));
-}
 
 PyObject * packExist(PyObject * poSelf, PyObject * poArgs)
 {

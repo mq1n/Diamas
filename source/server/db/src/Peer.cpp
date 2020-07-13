@@ -44,7 +44,7 @@ void CPeer::OnClose()
 	sys_log(0, "Connection closed. (host: %s)", m_host);
 	sys_log(0, "ItemIDRange: returned. %u ~ %u", m_itemRange.dwMin, m_itemRange.dwMax);
 
-	CItemIDRangeManager::instance().UpdateRange(m_itemRange.dwMin, m_itemRange.dwMax);
+	CItemIDRangeManager::Instance().UpdateRange(m_itemRange.dwMin, m_itemRange.dwMax);
 
 	m_itemRange.dwMin = 0;
 	m_itemRange.dwMax = 0;
@@ -132,7 +132,7 @@ void CPeer::SendSpareItemIDRange()
 	{
 		SetItemIDRange(m_itemSpareRange);
 
-		if (SetSpareItemIDRange(CItemIDRangeManager::instance().GetRange()) == false)
+		if (SetSpareItemIDRange(CItemIDRangeManager::Instance().GetRange()) == false)
 		{
 			sys_log(0, "ItemIDRange: spare range set error");
 			m_itemSpareRange.dwMin = m_itemSpareRange.dwMax = m_itemSpareRange.dwUsableItemIDMin = 0;

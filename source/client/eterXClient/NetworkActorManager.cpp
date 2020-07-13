@@ -277,7 +277,6 @@ bool CNetworkActorManager::__IsVisibleActor(const SNetworkActorData& c_rkNetActo
 	if (__IsMainActorVID(c_rkNetActorData.m_dwVID))
 		return true;
 
-	// 2004.08.02.myevan.항상 보이기 플래그
 	if (c_rkNetActorData.m_kAffectFlags.IsSet(CInstanceBase::AFFECT_SHOW_ALWAYS))
 		return true;
 

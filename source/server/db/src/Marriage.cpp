@@ -36,8 +36,8 @@ namespace marriage
 		snprintf(szQuery, sizeof(szQuery),
 				"SELECT pid1, pid2, love_point, time, is_married, p1.name, p2.name FROM marriage, player as p1, player as p2 WHERE p1.id = pid1 AND p2.id = pid2");
 
-		std::unique_ptr<SQLMsg> pmsg_delete(CDBManager::instance().DirectQuery("DELETE FROM marriage WHERE is_married = 0"));
-		std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> pmsg_delete(CDBManager::Instance().DirectQuery("DELETE FROM marriage WHERE is_married = 0"));
+		std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 		SQLResult * pRes = pmsg->Get();
 		sys_log(0, "MarriageList(size=%u)", pRes->uiNumRows);
@@ -85,7 +85,7 @@ namespace marriage
 
 	void CManager::Add(uint32_t dwPID1, uint32_t dwPID2, const char* szName1, const char* szName2)
 	{
-		uint32_t now = CClientManager::instance().GetCurrentTime();
+		uint32_t now = CClientManager::Instance().GetCurrentTime();
 		if (IsMarried(dwPID1) || IsMarried(dwPID2))
 		{
 			sys_err("cannot marry already married character. %d - %d", dwPID1, dwPID2);
@@ -97,7 +97,7 @@ namespace marriage
 		char szQuery[512];
 		snprintf(szQuery, sizeof(szQuery), "INSERT INTO marriage(pid1, pid2, love_point, time) VALUES (%u, %u, 0, %u)", dwPID1, dwPID2, now);
 
-		std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 		SQLResult* res = pmsg->Get();
 		if (res->uiAffectedRows == 0 || res->uiAffectedRows == (uint32_t)-1)
@@ -119,7 +119,7 @@ namespace marriage
 		p.tMarryTime = now;
 		strlcpy(p.szName1, szName1, sizeof(p.szName1));
 		strlcpy(p.szName2, szName2, sizeof(p.szName2));
-		CClientManager::instance().ForwardPacket(HEADER_DG_MARRIAGE_ADD, &p, sizeof(p));
+		CClientManager::Instance().ForwardPacket(HEADER_DG_MARRIAGE_ADD, &p, sizeof(p));
 	}
 
 	void CManager::Update(uint32_t dwPID1, uint32_t dwPID2, INT iLovePoint, uint8_t byMarried)
@@ -141,7 +141,7 @@ namespace marriage
 		snprintf(szQuery, sizeof(szQuery), "UPDATE marriage SET love_point = %d, is_married = %d WHERE pid1 = %u AND pid2 = %u", 
 				iLovePoint, byMarried, pMarriage->pid1, pMarriage->pid2);
 
-		std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 		SQLResult* res = pmsg->Get();
 		if (res == nullptr)
@@ -165,7 +165,7 @@ namespace marriage
 		p.dwPID2 = dwPID2;
 		p.iLovePoint = pMarriage->love_point;
 		p.byMarried = pMarriage->is_married;
-		CClientManager::instance().ForwardPacket(HEADER_DG_MARRIAGE_UPDATE, &p, sizeof(p));
+		CClientManager::Instance().ForwardPacket(HEADER_DG_MARRIAGE_UPDATE, &p, sizeof(p));
 	}
 
 	void CManager::Remove(uint32_t dwPID1, uint32_t dwPID2)
@@ -193,7 +193,7 @@ namespace marriage
 		char szQuery[512];
 		snprintf(szQuery, sizeof(szQuery), "DELETE FROM marriage WHERE pid1 = %u AND pid2 = %u", dwPID1, dwPID2);
 
-		std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 		SQLResult* res = pmsg->Get();
 		if (res->uiAffectedRows == 0 || res->uiAffectedRows == (uint32_t)-1)
@@ -211,7 +211,7 @@ namespace marriage
 		TPacketMarriageRemove p;
 		p.dwPID1 = dwPID1;
 		p.dwPID2 = dwPID2;
-		CClientManager::instance().ForwardPacket(HEADER_DG_MARRIAGE_REMOVE, &p, sizeof(p));
+		CClientManager::Instance().ForwardPacket(HEADER_DG_MARRIAGE_REMOVE, &p, sizeof(p));
 
 		delete pMarriage;
 	}
@@ -237,7 +237,7 @@ namespace marriage
 		snprintf(szQuery, sizeof(szQuery), "UPDATE marriage SET is_married = 1 WHERE pid1 = %u AND pid2 = %u", 
 				pMarriage->pid1, pMarriage->pid2);
 
-		std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 		SQLResult* res = pmsg->Get();
 		if (res->uiAffectedRows == 0 || res->uiAffectedRows == (uint32_t)-1)
@@ -254,7 +254,7 @@ namespace marriage
 		p.dwPID2 = dwPID2;
 		p.iLovePoint = pMarriage->love_point;
 		p.byMarried = pMarriage->is_married;
-		CClientManager::instance().ForwardPacket(HEADER_DG_MARRIAGE_UPDATE, &p, sizeof(p));
+		CClientManager::Instance().ForwardPacket(HEADER_DG_MARRIAGE_UPDATE, &p, sizeof(p));
 	}
 
 	void CManager::OnSetup(CPeer* peer)
@@ -308,7 +308,7 @@ namespace marriage
 
 	void CManager::ReadyWedding(uint32_t dwMapIndex, uint32_t dwPID1, uint32_t dwPID2)
 	{
-		uint32_t dwStartTime = CClientManager::instance().GetCurrentTime();
+		uint32_t dwStartTime = CClientManager::Instance().GetCurrentTime();
 		m_pqWeddingStart.push(TWedding(dwStartTime + 5, dwMapIndex, dwPID1, dwPID2));
 	}
 
@@ -326,13 +326,13 @@ namespace marriage
 		TPacketWeddingEnd p;
 		p.dwPID1 = w.dwPID1;
 		p.dwPID2 = w.dwPID2;
-		CClientManager::instance().ForwardPacket(HEADER_DG_WEDDING_END, &p, sizeof(p));
+		CClientManager::Instance().ForwardPacket(HEADER_DG_WEDDING_END, &p, sizeof(p));
 		m_mapRunningWedding.erase(it);
 	}
 
 	void CManager::Update()
 	{
-		uint32_t now = CClientManager::instance().GetCurrentTime();
+		uint32_t now = CClientManager::Instance().GetCurrentTime();
 
 		if (!m_pqWeddingEnd.empty())
 		{
@@ -350,7 +350,7 @@ namespace marriage
 				TPacketWeddingEnd p;
 				p.dwPID1 = w.dwPID1;
 				p.dwPID2 = w.dwPID2;
-				CClientManager::instance().ForwardPacket(HEADER_DG_WEDDING_END, &p, sizeof(p));
+				CClientManager::Instance().ForwardPacket(HEADER_DG_WEDDING_END, &p, sizeof(p));
 				m_mapRunningWedding.erase(it);
 
 				auto it_marriage = m_MarriageByPID.find(w.dwPID1);
@@ -375,7 +375,7 @@ namespace marriage
 				TPacketWeddingStart p;
 				p.dwPID1 = w.dwPID1;
 				p.dwPID2 = w.dwPID2;
-				CClientManager::instance().ForwardPacket(HEADER_DG_WEDDING_START, &p, sizeof(p));
+				CClientManager::Instance().ForwardPacket(HEADER_DG_WEDDING_START, &p, sizeof(p));
 
 				w.dwTime += WEDDING_LENGTH;
 				m_pqWeddingEnd.push(TWeddingInfo(w.dwTime, w.dwPID1, w.dwPID2));

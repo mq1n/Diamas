@@ -17,7 +17,7 @@ enum ERefineVnumNpc
 	BLACKSMITH2_MOB	= 20091,
 };
 
-class CRefineManager : public singleton<CRefineManager>
+class CRefineManager : public CSingleton<CRefineManager>
 {
 	typedef std::map<uint32_t, TRefineTable> TRefineRecipeMap;
 	public:

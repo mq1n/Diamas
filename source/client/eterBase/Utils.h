@@ -99,7 +99,6 @@ extern void			GetFileExtension(const char* c_szFile, int32_t len, std::string* p
 extern void			GetFileNameParts(const char* c_szFile, int32_t len, char* pszPath, char* pszName, char* pszExt);
 extern void			GetOldIndexingName(char * szName, int32_t Index);
 extern void			GetIndexingName(char * szName, uint32_t Index);
-extern void			stl_lowers(std::string& rstRet);
 extern void			GetOnlyFileName(const char * sz_Name, std::string & strFileName);
 extern void			GetOnlyPathName(const char * sz_Name, std::string & OnlyPathName);
 extern const char *	GetOnlyPathName(const char * c_szName);

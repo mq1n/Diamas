@@ -549,7 +549,7 @@ bool Cube_make (LPCHARACTER ch)
 		new_item = ch->AutoGiveItem(reward_value->vnum, reward_value->count);
 		if (new_item)
 		{
-			LogManager::instance().CubeLog(ch->GetPlayerID(), ch->GetX(), ch->GetY(),
+			LogManager::Instance().CubeLog(ch->GetPlayerID(), ch->GetX(), ch->GetY(),
 				reward_value->vnum, new_item->GetID(), reward_value->count, 1);
 		}
 		return true;
@@ -558,7 +558,7 @@ bool Cube_make (LPCHARACTER ch)
 	// 실패
 	ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("제조에 실패하였습니다."));	// 2012.11.12 새로 추가된 메세지 (locale_string.txt 에 추가해야 함)
 	ch->ChatPacket(CHAT_TYPE_COMMAND, "cube fail");
-	LogManager::instance().CubeLog(ch->GetPlayerID(), ch->GetX(), ch->GetY(),
+	LogManager::Instance().CubeLog(ch->GetPlayerID(), ch->GetX(), ch->GetY(),
 			reward_value->vnum, 0, 0, 0);
 	return false;
 }

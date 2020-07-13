@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include "input.h"
-#include "../../common/stl.h"
+#include "../../../common/stl.h"
 
 typedef struct _CCI
 {
@@ -15,7 +15,7 @@ typedef struct _CCI
 	int32_t		iLevel;
 } CCI;
 
-class P2P_MANAGER : public singleton<P2P_MANAGER>
+class P2P_MANAGER : public CSingleton<P2P_MANAGER>
 {
 	typedef std::unordered_map<std::string, CCI *, stringhash> TCCIMap;
 	typedef std::unordered_map<uint32_t, CCI*> TPIDCCIMap;

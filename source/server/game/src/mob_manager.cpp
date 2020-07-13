@@ -8,7 +8,6 @@
 #include "text_file_loader.h"
 #include "quest_manager.h"
 #include "locale_service.h"
-#include "../../common/service.h"
 
 CMob::CMob()
 {
@@ -81,9 +80,9 @@ bool CMobManager::Initialize(TMobTable * pTable, int32_t iSize)
 				t->dwVnum, t->szLocaleName, t->bLevel, t->dwMaxHP, t->wDef, t->dwExp, t->dwDropItemVnum, SkillCount);
 
 		if (t->bType == CHAR_TYPE_NPC || t->bType == CHAR_TYPE_WARP || t->bType == CHAR_TYPE_GOTO)
-			CHARACTER_MANAGER::instance().RegisterRaceNum(t->dwVnum);
+			CHARACTER_MANAGER::Instance().RegisterRaceNum(t->dwVnum);
 
-		quest::CQuestManager::instance().RegisterNPCVnum(t->dwVnum);
+		quest::CQuestManager::Instance().RegisterNPCVnum(t->dwVnum);
 	}
 
 
@@ -110,7 +109,7 @@ bool CMobManager::Initialize(TMobTable * pTable, int32_t iSize)
 	// END_OF_LOCALE_SERVICE
 
 	//exit(1);
-	CHARACTER_MANAGER::instance().for_each_pc(std::bind(&CMobManager::RebindMobProto, this, std::placeholders::_1));
+	CHARACTER_MANAGER::Instance().for_each_pc(std::bind(&CMobManager::RebindMobProto, this, std::placeholders::_1));
 	return true;
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 
-class CProfiler : public singleton<CProfiler>
+class CProfiler : public CSingleton<CProfiler>
 {
 	public:
 		enum
@@ -244,7 +244,7 @@ template <typename T> class CProfileUnit
 		CProfileUnit(const char * c_pszName)
 		{
 			m_stName = c_pszName;
-			CProfiler::instance().PushAccum(m_stName.c_str());
+			CProfiler::Instance().PushAccum(m_stName.c_str());
 			m_bPushed = true;
 		}
 
@@ -258,7 +258,7 @@ template <typename T> class CProfileUnit
 		{
 			if (m_bPushed)
 			{
-				CProfiler::instance().PopAccum(m_stName.c_str());
+				CProfiler::Instance().PopAccum(m_stName.c_str());
 				m_bPushed = false;
 			}
 		}

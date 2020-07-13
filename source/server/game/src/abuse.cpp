@@ -231,7 +231,7 @@ void AbuseController::AnalyzeAttacks()
 			+ " mcc" + std::to_string(monsterClusters.size())
 			+ " m" + std::to_string(m_ch->GetMapIndex());
 
-		LogManager::instance().HackLog(log.c_str(), m_ch);
+		LogManager::Instance().HackLog(log.c_str(), m_ch);
 
 		// Make sure we don't analyze the same piece of data anymore
 		m_vecPullInfo.clear();
@@ -257,7 +257,7 @@ void AbuseController::DeadWalk()
 		return;
 
 	std::string info = "DEAD_WALK t" + std::to_string(now - m_lastDeathTime);
-	LogManager::instance().HackLog(info.c_str(), m_ch);
+	LogManager::Instance().HackLog(info.c_str(), m_ch);
 	m_ch->GetDesc()->DelayedDisconnect(10);
 
 	m_nextDeadWalkLog = now + 3 * 1000;
@@ -275,7 +275,7 @@ void AbuseController::DeadPickup()
 	std::string info = "DEAD_PICKUP #%d t" + std::to_string(now - m_lastDeathTime);
 
 	m_ch->GetDesc()->DelayedDisconnect(10);
-	LogManager::instance().HackLog(info.c_str(), m_ch);
+	LogManager::Instance().HackLog(info.c_str(), m_ch);
 
 	m_nextDeadPickupLog = now + 3 * 1000;
 }
@@ -385,7 +385,7 @@ void AbuseController::VerifyCoordinates(LPSECTREE tree, int32_t x, int32_t y, in
 			info += " cy" + std::to_string(y);
 			info += " m" + std::to_string(m_ch->GetMapIndex());
 
-			LogManager::instance().HackLog(info.c_str(), m_ch);
+			LogManager::Instance().HackLog(info.c_str(), m_ch);
 
 			//Disconnect after some minutes
 			if (hackDist > 2000)
@@ -504,7 +504,7 @@ void AbuseController::CheckSpeedhack(int32_t x, int32_t y)
 				+ " t" + std::to_string((now - m_mshFirstDetect) / 1000)
 				+ " (" + std::to_string(m_ch->GetX()) + ", " + std::to_string(m_ch->GetY()) + ")";
 
-			LogManager::instance().HackLog(info.c_str(), m_ch);
+			LogManager::Instance().HackLog(info.c_str(), m_ch);
 
 			if (g_bIsTestServer)
 				m_ch->ChatPacket(CHAT_TYPE_INFO, "Speedhack detected");
@@ -571,7 +571,7 @@ void AbuseController::NotifyFishedWithBubbleHide(bool valid, int32_t ms)
 	if (valid)
 	{
 		auto reason = "POSSIBLE_FISHBOT [req] " + std::to_string(ms) + "ms";
-		LogManager::instance().HackLog(reason.c_str(), m_ch);
+		LogManager::Instance().HackLog(reason.c_str(), m_ch);
 
 		if (m_bubbleHideTimes < 7) //If we didn't scan this guy to death already, let's try to confirm
 			m_bubbleHideTimes += 2;
@@ -617,7 +617,7 @@ void AbuseController::ReceiveAttackPacket()
 			std::string desc = "WAITDMG " + std::to_string(median);
 			desc += " (" + std::to_string(m_moveAttackTimes[0]) + ", " + std::to_string(m_moveAttackTimes[count - 1]) + ")";
 
-			LogManager::instance().HackLog(desc.c_str(), m_ch);
+			LogManager::Instance().HackLog(desc.c_str(), m_ch);
 
 			m_ch->GetDesc()->DelayedDisconnect(5);
 
@@ -637,7 +637,7 @@ void AbuseController::AutoPickupSuspect()
 	if (m_pickupBotSuspectCount >= 10)
 	{
 		//Fishy!
-		LogManager::instance().HackLog("POSSIBLE_PICKUP_BOT", m_ch);
+		LogManager::Instance().HackLog("POSSIBLE_PICKUP_BOT", m_ch);
 		m_pickupBotSuspectCount = 0;
 	}
 }

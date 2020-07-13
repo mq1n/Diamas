@@ -17,7 +17,7 @@ EVENTINFO(ScannerInfo)
 	}
 };
 
-class CNearbyScanner : public singleton<CNearbyScanner>
+class CNearbyScanner : public CSingleton<CNearbyScanner>
 {
 	public:
 		CNearbyScanner();

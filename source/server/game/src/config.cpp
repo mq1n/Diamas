@@ -410,9 +410,9 @@ static bool __LoadConnectConfigFile(const char* configName)
 	}
 
 	// Common DB 가 Locale 정보를 가지고 있기 때문에 가장 먼저 접속해야 한다.
-	AccountDB::instance().Connect(db_host[1], mysql_db_port[1], db_user[1], db_pwd[1], db_db[1]);
+	AccountDB::Instance().Connect(db_host[1], mysql_db_port[1], db_user[1], db_pwd[1], db_db[1]);
 
-	if (false == AccountDB::instance().IsConnected())
+	if (false == AccountDB::Instance().IsConnected())
 	{
 		fprintf(stderr, "cannot start server while no common sql connected\n");
 		exit(1);
@@ -426,14 +426,14 @@ static bool __LoadConnectConfigFile(const char* configName)
 	// 참고로 g_stLocale 정보는 LocaleService_Init() 내부에서 세팅된다.
 	fprintf(stdout, "Setting DB to locale %s\n", g_stLocale.c_str());
 
-	AccountDB::instance().SetLocale(g_stLocale);
+	AccountDB::Instance().SetLocale(g_stLocale);
 
-	AccountDB::instance().ConnectAsync(db_host[1], mysql_db_port[1], db_user[1], db_pwd[1], db_db[1], g_stLocale.c_str());
+	AccountDB::Instance().ConnectAsync(db_host[1], mysql_db_port[1], db_user[1], db_pwd[1], db_db[1], g_stLocale.c_str());
 
 	// Player DB 접속
-	DBManager::instance().Connect(db_host[0], mysql_db_port[0], db_user[0], db_pwd[0], db_db[0]);
+	DBManager::Instance().Connect(db_host[0], mysql_db_port[0], db_user[0], db_pwd[0], db_db[0]);
 
-	if (!DBManager::instance().IsConnected())
+	if (!DBManager::Instance().IsConnected())
 	{
 		fprintf(stderr, "PlayerSQL.ConnectError\n");
 		exit(1);
@@ -444,9 +444,9 @@ static bool __LoadConnectConfigFile(const char* configName)
 	if (false == g_bAuthServer) // 인증 서버가 아닐 경우
 	{
 		// Log DB 접속
-		LogManager::instance().Connect(log_host, log_port, log_user, log_pwd, log_db);
+		LogManager::Instance().Connect(log_host, log_port, log_user, log_pwd, log_db);
 
-		if (!LogManager::instance().IsConnected())
+		if (!LogManager::Instance().IsConnected())
 		{
 			fprintf(stderr, "LogSQL.ConnectError\n");
 			exit(1);
@@ -454,16 +454,16 @@ static bool __LoadConnectConfigFile(const char* configName)
 
 		fprintf(stdout, "LogSQL connected\n");
 
-		LogManager::instance().BootLog(g_stHostname.c_str(), g_bChannel);
+		LogManager::Instance().BootLog(g_stHostname.c_str(), g_bChannel);
 	}
 
 	// SKILL_POWER_BY_LEVEL
-	// 스트링 비교의 문제로 인해서 AccountDB::instance().SetLocale(g_stLocale) 후부터 한다.
+	// 스트링 비교의 문제로 인해서 AccountDB::Instance().SetLocale(g_stLocale) 후부터 한다.
 	// 물론 국내는 별로 문제가 안된다(해외가 문제)
 	{
 		char szQuery[256];
 		snprintf(szQuery, sizeof(szQuery), "SELECT mValue FROM locale WHERE mKey='SKILL_POWER_BY_LEVEL'");
-		std::unique_ptr<SQLMsg> pMsg(AccountDB::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> pMsg(AccountDB::Instance().DirectQuery(szQuery));
 
 		if (pMsg->Get()->uiNumRows == 0)
 		{
@@ -504,12 +504,12 @@ static bool __LoadConnectConfigFile(const char* configName)
 		for (int32_t job = 0; job < JOB_MAX_NUM * 2; ++job)
 		{
 			snprintf(szQuery, sizeof(szQuery), "SELECT mValue from locale where mKey='SKILL_POWER_BY_LEVEL_TYPE%d' ORDER BY CAST(mValue AS unsigned)", job);
-			std::unique_ptr<SQLMsg> pMsg(AccountDB::instance().DirectQuery(szQuery));
+			std::unique_ptr<SQLMsg> pMsg(AccountDB::Instance().DirectQuery(szQuery));
 
 			// 세팅이 안되어있으면 기본테이블을 사용한다.
 			if (pMsg->Get()->uiNumRows == 0)
 			{
-				CTableBySkill::instance().SetSkillPowerByLevelFromType(job, aiBaseSkillPowerByLevelTable);
+				CTableBySkill::Instance().SetSkillPowerByLevelFromType(job, aiBaseSkillPowerByLevelTable);
 				continue;
 			}
 
@@ -538,7 +538,7 @@ static bool __LoadConnectConfigFile(const char* configName)
 				}
 			}
 
-			CTableBySkill::instance().SetSkillPowerByLevelFromType(job, aiSkillTable);
+			CTableBySkill::Instance().SetSkillPowerByLevelFromType(job, aiSkillTable);
 		}		
 	}
 	// END_SKILL_POWER_BY_LEVEL
@@ -1265,7 +1265,7 @@ static bool __LoadDefaultCMDFile(const char* cmdName)
 #ifdef ENABLE_EXPTABLE_FROMDB
 static bool __LoadExpTableFromDB(void)
 {
-	std::unique_ptr<SQLMsg> pMsg(AccountDB::instance().DirectQuery("SELECT level, exp FROM exp_table"));
+	std::unique_ptr<SQLMsg> pMsg(AccountDB::Instance().DirectQuery("SELECT level, exp FROM exp_table"));
 	if (pMsg->Get()->uiNumRows == 0)
 		return false;
 
@@ -1363,7 +1363,7 @@ void config_init(const string& st_localeServiceName)
 	std::string st_cmdFileName("CMD");
 	__LoadDefaultCMDFile(st_cmdFileName.c_str());
 
-	CWarMapManager::instance().LoadWarMapInfo(nullptr);
+	CWarMapManager::Instance().LoadWarMapInfo(nullptr);
 
 	if (g_szPublicIP[0] == '0')
 	{

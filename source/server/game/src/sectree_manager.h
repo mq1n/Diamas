@@ -1,7 +1,7 @@
 #pragma once
 #include "sectree.h"
 #include "vid.h"
-#include "../../common/length.h"
+#include "../../../common/common_incl.hpp"
 
 // Generic finder for all players in a given sectree
 struct FCharacterFinder
@@ -131,7 +131,7 @@ enum EAttrRegionMode
 	ATTR_REGION_MODE_CHECK,
 };
 
-class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
+class SECTREE_MANAGER : public CSingleton<SECTREE_MANAGER>
 {
 	public:
 		SECTREE_MANAGER();
@@ -144,7 +144,7 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		template< typename Func >
 		void for_each( int32_t iMapIndex, Func & rfunc )
 		{
-			LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap( iMapIndex );
+			LPSECTREE_MAP pSecMap = SECTREE_MANAGER::Instance().GetMap( iMapIndex );
 			if ( pSecMap )
 			{
 				pSecMap->for_each( rfunc );

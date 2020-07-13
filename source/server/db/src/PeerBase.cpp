@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "PeerBase.h"
-#include "../../common/service.h"
 
 CPeerBase::CPeerBase() : m_fd(INVALID_SOCKET), m_wPort(0), m_BytesRemain(0), m_outBuffer(nullptr), m_inBuffer(nullptr)
 {

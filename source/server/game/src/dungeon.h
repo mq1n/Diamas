@@ -178,7 +178,7 @@ class CDungeon
 	void SetPartyNull();
 };
 
-class CDungeonManager : public singleton<CDungeonManager>
+class CDungeonManager : public CSingleton<CDungeonManager>
 {
 	typedef std::map<CDungeon::IdType, LPDUNGEON> TDungeonMap;
 	typedef std::map<int32_t, LPDUNGEON> TMapDungeon;

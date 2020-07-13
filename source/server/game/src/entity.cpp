@@ -110,7 +110,7 @@ void CEntity::PacketView(const void * data, int32_t bytes, LPENTITY except)
 
 void CEntity::PacketMap(int32_t nMapIndex, const void * data, int32_t bytes)
 {
-	const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
+	const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::Instance().GetClientSet();
 
 	for (const auto& pkDesc : c_ref_set)
 	{

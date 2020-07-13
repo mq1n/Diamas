@@ -74,6 +74,6 @@ class CAccountConnector : public CNetworkStream, public CSingleton<CAccountConne
 		PyObject * m_poHandler;
 
 		// CHINA_CRYPT_KEY
-		void __BuildClientKey_20050304Myevan();
+		void __BuildSpecialClientKey();
 		// END_OF_CHINA_CRYPT_KEY
 };

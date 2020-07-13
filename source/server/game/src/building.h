@@ -124,7 +124,7 @@ namespace building
 			// END_BUILD_WALL
 	};
 
-	class CManager : public singleton<CManager>
+	class CManager : public CSingleton<CManager>
 	{
 		public:
 			CManager();

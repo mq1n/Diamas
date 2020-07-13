@@ -22,16 +22,6 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 		GOTO
 	};
 
-		enum  EClickEvent
-		{
-			ON_CLICK_EVENT_NONE		= 0,
-			ON_CLICK_EVENT_BATTLE	= 1,
-			ON_CLICK_EVENT_SHOP		= 2,
-			ON_CLICK_EVENT_TALK		= 3,
-			ON_CLICK_EVENT_VEHICLE	= 4,
-
-			ON_CLICK_EVENT_MAX_NUM
-		};
 
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
 		enum EAIFlags

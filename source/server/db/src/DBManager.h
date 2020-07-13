@@ -1,6 +1,6 @@
 #pragma once
 #include <mysql/mysql.h>
-#include "../../common/singleton.h"
+#include "../../../common/common_incl.hpp"
 #include "../../libsql/include/AsyncSQL.h"
 #include <memory>
 
@@ -22,7 +22,7 @@ enum eSQL_SLOT
 	SQL_MAX_NUM,
 };
 
-class CDBManager : public singleton<CDBManager>
+class CDBManager : public CSingleton<CDBManager>
 {
 public:
 	CDBManager();

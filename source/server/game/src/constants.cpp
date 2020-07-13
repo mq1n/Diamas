@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "char.h"
-#include "../../common/service.h"
 
 TJobInitialPoints JobInitialPoints[JOB_MAX_NUM] = 
 /*
@@ -975,7 +974,6 @@ const int32_t aiAccessorySocketPutPct[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1] =
 };
 // END_OF_ACCESSORY_REFINE
 
-#include "../../common/length.h"
 // from import_item_proto.c
 typedef struct SValueName
 {
@@ -1068,8 +1066,8 @@ TValueName c_aApplyTypeNames[] =
     { "RESIST_ASSASSIN",	APPLY_RESIST_ASSASSIN},
     { "RESIST_SURA",		APPLY_RESIST_SURA},
     { "RESIST_SHAMAN",	APPLY_RESIST_SHAMAN},
-    // by mhh game/affect.h 정의되어있음. INFINITE_AFFECT_DURATION = 0x1FFFFFFF
-    { "INFINITE_AFFECT_DURATION", 0x1FFFFFFF	},
+
+	{ "INFINITE_AFFECT_DURATION", 0x1FFFFFFF	},
 	{ "ENERGY", APPLY_ENERGY },		//	기력
 	{ "COSTUME_ATTR_BONUS", APPLY_COSTUME_ATTR_BONUS },		//	기력
 	{ "MAGIC_ATTBONUS_PER",	APPLY_MAGIC_ATTBONUS_PER	},

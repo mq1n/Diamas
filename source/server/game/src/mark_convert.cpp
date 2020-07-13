@@ -112,7 +112,7 @@ bool GuildMarkConvert(const std::vector<uint32_t> & vecGuildID)
 		}
 
 		// 새 길드 마크 시스템에 넣는다.
-		CGuildMarkManager::instance().SaveMark(guild_id, (uint8_t *) mark);
+		CGuildMarkManager::Instance().SaveMark(guild_id, (uint8_t *) mark);
 		line[0] = '\0';
 	}
 

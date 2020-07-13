@@ -43,7 +43,7 @@ void CHARACTER::AssignTriggers(const TMobTable * table)
  */
 int32_t OnClickShop(TRIGGERPARAM)
 {
-	CShopManager::instance().StartShopping(causer, ch);
+	CShopManager::Instance().StartShopping(causer, ch);
 	return 1;
 }
 

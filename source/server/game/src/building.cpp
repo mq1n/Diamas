@@ -34,7 +34,7 @@ void CObject::Destroy()
 {
 	if (m_pProto)
 	{
-		SECTREE_MANAGER::instance().ForAttrRegion(GetMapIndex(),
+		SECTREE_MANAGER::Instance().ForAttrRegion(GetMapIndex(),
 				GetX() + m_pProto->lRegion[0],
 				GetY() + m_pProto->lRegion[1],
 				GetX() + m_pProto->lRegion[2],
@@ -56,7 +56,7 @@ void CObject::Destroy()
 // BUILDING_NPC
 void CObject::Reconstruct(uint32_t dwVnum)
 {
-	const TMapRegion * r = SECTREE_MANAGER::instance().GetMapRegion(m_data.lMapIndex);
+	const TMapRegion * r = SECTREE_MANAGER::Instance().GetMapRegion(m_data.lMapIndex);
 	if (!r)
 		return;
 
@@ -121,7 +121,7 @@ void CObject::SetVID(uint32_t dwVID)
 
 bool CObject::Show(int32_t lMapIndex, int32_t x, int32_t y)
 {
-	LPSECTREE tree = SECTREE_MANAGER::instance().Get(lMapIndex, x, y);
+	LPSECTREE tree = SECTREE_MANAGER::Instance().Get(lMapIndex, x, y);
 
 	if (!tree)
 	{
@@ -147,7 +147,7 @@ bool CObject::Show(int32_t lMapIndex, int32_t x, int32_t y)
 	tree->InsertEntity(this);
 	UpdateSectree();
 
-	SECTREE_MANAGER::instance().ForAttrRegion(GetMapIndex(),
+	SECTREE_MANAGER::Instance().ForAttrRegion(GetMapIndex(),
 			x + m_pProto->lRegion[0],
 			y + m_pProto->lRegion[1],
 			x + m_pProto->lRegion[2],
@@ -176,7 +176,7 @@ void CObject::ApplySpecialEffect()
 			uint32_t guild_id = 0;
 			if (pLand)
 				guild_id = pLand->GetOwner();
-			CGuild* pGuild = CGuildManager::instance().FindGuild(guild_id);
+			CGuild* pGuild = CGuildManager::Instance().FindGuild(guild_id);
 			if (pGuild)
 			{
 				switch (m_pProto->dwVnum)
@@ -214,7 +214,7 @@ void CObject::RemoveSpecialEffect()
 			uint32_t guild_id = 0;
 			if (pLand)
 				guild_id = pLand->GetOwner();
-			CGuild* pGuild = CGuildManager::instance().FindGuild(guild_id);
+			CGuild* pGuild = CGuildManager::Instance().FindGuild(guild_id);
 			if (pGuild)
 			{
 				pGuild->SetMemberCountBonus(0);
@@ -239,7 +239,7 @@ void CObject::RegenNPC()
 		return;
 
 	uint32_t dwGuildID = m_pkLand->GetOwner();
-	CGuild* pGuild = CGuildManager::instance().FindGuild(dwGuildID);
+	CGuild* pGuild = CGuildManager::Instance().FindGuild(dwGuildID);
 
 	if (!pGuild)
 		return;
@@ -253,7 +253,7 @@ void CObject::RegenNPC()
 	newX = static_cast<int32_t>(( x * cos(rot)) + ( y * sin(rot)));
 	newY = static_cast<int32_t>(( y * cos(rot)) - ( x * sin(rot)));
 
-	m_chNPC = CHARACTER_MANAGER::instance().SpawnMob(m_pProto->dwNPCVnum,
+	m_chNPC = CHARACTER_MANAGER::Instance().SpawnMob(m_pProto->dwNPCVnum,
 			GetMapIndex(),
 			GetX() + newX,
 			GetY() + newY,
@@ -273,7 +273,7 @@ void CObject::RegenNPC()
 	// 힘의 신전일 경우 길드 레벨을 길마에게 저장해놓는다
 	if ( m_pProto->dwVnum == 14061 || m_pProto->dwVnum == 14062 || m_pProto->dwVnum == 14063 )
 	{
-		quest::PC* pPC = quest::CQuestManager::instance().GetPC(pGuild->GetMasterPID());
+		quest::PC* pPC = quest::CQuestManager::Instance().GetPC(pGuild->GetMasterPID());
 
 		if ( pPC != nullptr )
 		{
@@ -302,7 +302,7 @@ void CLand::Destroy()
 	while (it != m_map_pkObject.end())
 	{
 		LPOBJECT pkObj = (it++)->second;
-		CManager::instance().UnregisterObject(pkObj);
+		CManager::Instance().UnregisterObject(pkObj);
 		M2_DELETE(pkObj);
 	}
 
@@ -322,11 +322,11 @@ void CLand::PutData(const TLand * data)
 	if (!m_data.dwGuildID)
 		return;
 
-	const TMapRegion * r = SECTREE_MANAGER::instance().GetMapRegion(m_data.lMapIndex);
+	const TMapRegion * r = SECTREE_MANAGER::Instance().GetMapRegion(m_data.lMapIndex);
 	if (!r)
 		return;
 
-	const auto chars = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(20040);
+	const auto chars = CHARACTER_MANAGER::Instance().GetCharactersByRaceNum(20040);
 	for (auto ch : chars)
 	{
 		if (ch->GetMapIndex() != m_data.lMapIndex)
@@ -425,7 +425,7 @@ void CLand::DeleteObject(uint32_t dwID)
 		return;
 
 	sys_log(0, "Land::DeleteObject %u", dwID);
-	CManager::instance().UnregisterObject(pkObj);
+	CManager::Instance().UnregisterObject(pkObj);
 	M2_DESTROY_CHARACTER (pkObj->GetNPC());
 
 	m_map_pkObject.erase(dwID);
@@ -464,8 +464,8 @@ struct FIsIn
 
 bool CLand::RequestCreateObject(uint32_t dwVnum, int32_t lMapIndex, int32_t x, int32_t y, float xRot, float yRot, float zRot, bool checkAnother) const
 {
-	SECTREE_MANAGER& rkSecTreeMgr = SECTREE_MANAGER::instance();
-	TObjectProto * pkProto = CManager::instance().GetObjectProto(dwVnum);
+	SECTREE_MANAGER& rkSecTreeMgr = SECTREE_MANAGER::Instance();
+	TObjectProto * pkProto = CManager::Instance().GetObjectProto(dwVnum);
 
 	if (!pkProto)
 	{
@@ -627,7 +627,7 @@ bool CManager::LoadObjectProto(const TObjectProto * pProto, int32_t size) // fro
 			if (!kMaterial.dwItemVnum)
 				break;
 
-			if (nullptr == ITEM_MANAGER::instance().GetTable(kMaterial.dwItemVnum))
+			if (nullptr == ITEM_MANAGER::Instance().GetTable(kMaterial.dwItemVnum))
 			{
 				sys_err("          mat: ERROR!! no item by vnum %u", kMaterial.dwItemVnum);
 				return false;
@@ -684,7 +684,7 @@ CLand * CManager::FindLand(int32_t lMapIndex, int32_t x, int32_t y)
 {
 	sys_log(0, "BUILDING: FindLand %d %d %d", lMapIndex, x, y);
 
-	const TMapRegion * r = SECTREE_MANAGER::instance().GetMapRegion(lMapIndex);
+	const TMapRegion * r = SECTREE_MANAGER::Instance().GetMapRegion(lMapIndex);
 
 	if (!r)
 		return nullptr;
@@ -751,7 +751,7 @@ bool CManager::LoadObject(TObject * pTable, bool isBoot) // from DB
 
 	LPOBJECT pkObj = M2_NEW CObject(pTable, pkProto);
 
-	uint32_t dwVID = CHARACTER_MANAGER::instance().AllocVID();
+	uint32_t dwVID = CHARACTER_MANAGER::Instance().AllocVID();
 	pkObj->SetVID(dwVID);
 	pkObj->SetGuildID(pkLand->GetData().dwGuildID);
 
@@ -818,11 +818,11 @@ void CManager::FinalizeBoot()
 		if (!map_allow_find(r.lMapIndex))
 			continue;
 
-		const TMapRegion * region = SECTREE_MANAGER::instance().GetMapRegion(r.lMapIndex);
+		const TMapRegion * region = SECTREE_MANAGER::Instance().GetMapRegion(r.lMapIndex);
 		if (!region)
 			continue;
 
-		CHARACTER_MANAGER::instance().SpawnMob(20040, r.lMapIndex, region->sx + r.x + (r.width / 2), region->sy + r.y + (r.height / 2), 0);
+		CHARACTER_MANAGER::Instance().SpawnMob(20040, r.lMapIndex, region->sx + r.x + (r.width / 2), region->sy + r.y + (r.height / 2), 0);
 	}
 }
 
@@ -876,7 +876,7 @@ void CManager::SendLandList(LPDESC d, int32_t lMapIndex)
 		LPCHARACTER ch  = d->GetCharacter();
 		if (ch)
 		{
-			CGuild *guild = CGuildManager::instance().FindGuild(r.dwGuildID);
+			CGuild *guild = CGuildManager::Instance().FindGuild(r.dwGuildID);
 			ch->SendGuildName(guild);
 		}
 		//
@@ -950,9 +950,9 @@ void CLand::ClearLand()
 	SetOwner(0);
 
 	const TLand & r = GetData();
-	const TMapRegion * region = SECTREE_MANAGER::instance().GetMapRegion(r.lMapIndex);
+	const TMapRegion * region = SECTREE_MANAGER::Instance().GetMapRegion(r.lMapIndex);
 
-	CHARACTER_MANAGER::instance().SpawnMob(20040, r.lMapIndex, region->sx + r.x + (r.width / 2), region->sy + r.y + (r.height / 2), 0);
+	CHARACTER_MANAGER::Instance().SpawnMob(20040, r.lMapIndex, region->sx + r.x + (r.width / 2), region->sy + r.y + (r.height / 2), 0);
 }
 // END_LAND_CLEAR
 

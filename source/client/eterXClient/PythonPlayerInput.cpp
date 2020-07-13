@@ -264,7 +264,6 @@ void CPythonPlayer::__OnClickActor(CInstanceBase& rkInstMain, uint32_t dwPickedA
 	CInstanceBase& rkInstVictim=*pkInstVictim;
 
 	
-	// 2005.01.28.myevan
 	// 초급말 상태에서는 공격이 안되나 NPC 클릭이되어야함
 	if (rkInstMain.IsAttackableInstance(*pkInstVictim))
 		if (!__CanAttack())
@@ -327,7 +326,6 @@ void CPythonPlayer::__OnPressActor(CInstanceBase& rkInstMain, uint32_t dwPickedA
 
 	if (isAuto)
 	{
-		// 2004.10.21.myevan.공격가능한 상대만 자동 공격
 		if (rkInstMain.IsAttackableInstance(rkInstVictim))
 			__SetAutoAttackTargetActorID(rkInstVictim.GetVirtualID());
 	}

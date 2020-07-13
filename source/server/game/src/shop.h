@@ -1,5 +1,5 @@
 #pragma once
-#include "../../common/service.h"
+#include "../../../common/defines.h"
 
 enum
 {

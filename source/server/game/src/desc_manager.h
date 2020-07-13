@@ -1,11 +1,10 @@
 #pragma once
 #include <unordered_map>
-#include "../../common/stl.h"
-#include "../../common/length.h"
+#include "../../../common/stl.h"
 
 class CLoginKey;
 
-class DESC_MANAGER : public singleton<DESC_MANAGER>
+class DESC_MANAGER : public CSingleton<DESC_MANAGER>
 {
 	public:
 		typedef std::unordered_set<LPDESC>			DESC_SET;

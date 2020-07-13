@@ -1,8 +1,6 @@
 #include "stdafx.h"
-#include "../../common/stl.h"
-
-#include "constants.h"
 #include "skill.h"
+#include "constants.h"
 #include "char.h"
 
 void CSkillProto::SetPointVar(const std::string& strName, double dVar)

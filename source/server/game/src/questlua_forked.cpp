@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "config.h"
 #include "threeway_war.h"
-#include "../../common/stl.h"
 #include "questlua.h"
 #include "quest_manager.h"
 #include "char.h"
@@ -18,13 +17,13 @@ namespace quest
 
 	int32_t forked_set_dead_count( lua_State* L )
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 
 		if (nullptr != ch)
 		{
-			CThreeWayWar::instance().SetReviveTokenForPlayer( ch->GetPlayerID(), q.GetEventFlag("threeway_war_dead_count") );
+			CThreeWayWar::Instance().SetReviveTokenForPlayer( ch->GetPlayerID(), q.GetEventFlag("threeway_war_dead_count") );
 		}
 
 		return 0; 
@@ -32,11 +31,11 @@ namespace quest
 
 	int32_t forked_get_dead_count( lua_State* L )
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 
 		if (nullptr != ch)
 		{
-			lua_pushnumber( L, CThreeWayWar::instance().GetReviveTokenForPlayer(ch->GetPlayerID()) );
+			lua_pushnumber( L, CThreeWayWar::Instance().GetReviveTokenForPlayer(ch->GetPlayerID()) );
 		}
 		else
 		{
@@ -48,26 +47,26 @@ namespace quest
 
 	int32_t forked_init_kill_count_per_empire( lua_State* L )
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 
-		CThreeWayWar::instance().SetKillScore( ch->GetEmpire(), 0 );
+		CThreeWayWar::Instance().SetKillScore( ch->GetEmpire(), 0 );
 
 		return 0;
 	}
 
 	int32_t forked_init( lua_State* L )
 	{
-		CThreeWayWar::instance().Initialize();
-		CThreeWayWar::instance().RandomEventMapSet();
+		CThreeWayWar::Instance().Initialize();
+		CThreeWayWar::Instance().RandomEventMapSet();
 
 		return 0;
 	}
 
 	int32_t forked_sungzi_start_pos( lua_State* L )
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 
-		const ForkedSungziMapInfo& info = CThreeWayWar::instance().GetEventSungZiMapInfo();
+		const ForkedSungziMapInfo& info = CThreeWayWar::Instance().GetEventSungZiMapInfo();
 
 		lua_pushnumber( L, info.m_iForkedSungziStartPosition[ch->GetEmpire()-1][0] );
 		lua_pushnumber( L, info.m_iForkedSungziStartPosition[ch->GetEmpire()-1][1] );
@@ -77,9 +76,9 @@ namespace quest
 
 	int32_t forked_pass_start_pos( lua_State* L )
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 
-		const ForkedPassMapInfo& info = CThreeWayWar::instance().GetEventPassMapInfo();
+		const ForkedPassMapInfo& info = CThreeWayWar::Instance().GetEventPassMapInfo();
 
 		lua_pushnumber( L, info.m_iForkedPassStartPosition[ch->GetEmpire()-1][0] );
 		lua_pushnumber( L, info.m_iForkedPassStartPosition[ch->GetEmpire()-1][1] );
@@ -105,7 +104,7 @@ namespace quest
 
 	int32_t forked_get_pass_path_my_empire( lua_State *L )
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 
 		lua_pushstring( L, GetPassMapPath( ch->GetEmpire() ) );
 
@@ -124,14 +123,14 @@ namespace quest
 
 	int32_t forked_is_forked_mapindex( lua_State * L )
 	{
-		lua_pushboolean( L, CThreeWayWar::instance().IsThreeWayWarMapIndex(lua_tonumber(L,1)) );
+		lua_pushboolean( L, CThreeWayWar::Instance().IsThreeWayWarMapIndex(lua_tonumber(L,1)) );
 
 		return 1;
 	}
 
 	int32_t forked_is_sungzi_mapindex( lua_State * L )
 	{
-		lua_pushboolean( L, CThreeWayWar::instance().IsSungZiMapIndex(lua_tonumber(L,1)) );
+		lua_pushboolean( L, CThreeWayWar::Instance().IsSungZiMapIndex(lua_tonumber(L,1)) );
 
 		return 1;
 	}
@@ -181,7 +180,7 @@ namespace quest
 			return 0;
 		}
 
-		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap( info->m_iMapIndexFrom );
+		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::Instance().GetMap( info->m_iMapIndexFrom );
 		if ( pSecMap )
 		{
 			FWarpInMap f;
@@ -216,11 +215,11 @@ namespace quest
 
 	int32_t forked_is_registered_user( lua_State* L )
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 
 		if (nullptr != ch)
 		{
-			lua_pushboolean( L, CThreeWayWar::instance().IsRegisteredUser(ch->GetPlayerID()) );
+			lua_pushboolean( L, CThreeWayWar::Instance().IsRegisteredUser(ch->GetPlayerID()) );
 		}
 		else
 		{
@@ -232,11 +231,11 @@ namespace quest
 
 	int32_t forked_register_user( lua_State* L )
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 
 		if (nullptr != ch)
 		{
-			CThreeWayWar::instance().RegisterUser( ch->GetPlayerID() );
+			CThreeWayWar::Instance().RegisterUser( ch->GetPlayerID() );
 		}
 
 		return 0;
@@ -244,14 +243,14 @@ namespace quest
 
 	int32_t forked_purge_all_monsters( lua_State* L )
 	{
-		CThreeWayWar::instance().RemoveAllMonstersInThreeWay();
+		CThreeWayWar::Instance().RemoveAllMonstersInThreeWay();
 
 		return 0;
 	}
 
 	int32_t forked_get_kill_score(lua_State* L)
 	{
-		lua_pushnumber(L, CThreeWayWar::instance().GetKillScore(lua_tonumber(L, 1)));
+		lua_pushnumber(L, CThreeWayWar::Instance().GetKillScore(lua_tonumber(L, 1)));
 		return 1;
 	}
 
@@ -279,7 +278,7 @@ namespace quest
 			{ nullptr,				nullptr			}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("forked", forked_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("forked", forked_functions);
 	}
 }
 

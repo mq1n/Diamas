@@ -233,13 +233,13 @@ PyObject * chrSelect(PyObject* poSelf, PyObject* poArgs)
 
 	switch (CPythonNonPlayer::Instance().GetEventType(pkInst->GetVirtualNumber()))
 	{
-		case CPythonNonPlayer::ON_CLICK_EVENT_SHOP:
+		case ON_CLICK_SHOP:
 			pkInst->SetAddRenderMode();
 			pkInst->SetAddColor(D3DXCOLOR(0.0f, 0.3f, 0.0f, 1.0f));
 			break;
 
 		default:
-			// NOTE: 빨간색으로 나오게 하면 스샷 찍을 때 보기가 안좋아서 코멘트 하였습니다 [cronan 040226]
+			// NOTE: 빨간색으로 나오게 하면 스샷 찍을 때 보기가 안좋아서 코멘트 하였습니다
 			//pkInst->SetAddColor(D3DXCOLOR(0.3f, 0.0f, 0.0f, 1.0f));
 			break;
 	}

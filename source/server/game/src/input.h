@@ -1,7 +1,7 @@
 #pragma once
 #include "packet_info.h"
 #include "typedef.h"
-#include "../../common/service.h"
+#include "../../../common/defines.h"
 
 enum EInprocState
 {

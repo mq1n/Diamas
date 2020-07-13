@@ -1,5 +1,5 @@
 #pragma once
-#include "../EterBase/Singleton.h"
+#include "../../common/singleton.h"
 #include <WbemCli.h>
 #include <WbemIdl.h>
 

@@ -20,7 +20,7 @@ CDungeon::CDungeon(IdType id, int32_t lOriginalMapIndex, int32_t lMapIndex)
 	: m_id(id),
 	m_lOrigMapIndex(lOriginalMapIndex),
 	m_lMapIndex(lMapIndex),
-	m_map_Area(SECTREE_MANAGER::instance().GetDungeonArea(lOriginalMapIndex))
+	m_map_Area(SECTREE_MANAGER::Instance().GetDungeonArea(lOriginalMapIndex))
 {
 	Initialize();
 	//sys_log(0,"DUNGEON create orig %d real %d", lOriginalMapIndex, lMapIndex);
@@ -125,7 +125,7 @@ struct FWarpToDungeon
 	FWarpToDungeon(int32_t lMapIndex, LPDUNGEON d)
 		: m_lMapIndex(lMapIndex), m_pkDungeon(d)
 		{
-			LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(lMapIndex);
+			LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(lMapIndex);
 			m_x = pkSectreeMap->m_setting.posSpawn.x;
 			m_y = pkSectreeMap->m_setting.posSpawn.y; 
 		}
@@ -145,7 +145,7 @@ struct FWarpToDungeon
 
 void CDungeon::Join(LPCHARACTER ch)
 {
-	if (SECTREE_MANAGER::instance().GetMap(m_lMapIndex) == nullptr) {
+	if (SECTREE_MANAGER::Instance().GetMap(m_lMapIndex) == nullptr) {
 		sys_err("CDungeon: SECTREE_MAP not found for #%d", m_lMapIndex);
 		return;
 	}
@@ -157,7 +157,7 @@ void CDungeon::JoinParty(LPPARTY pParty)
 	pParty->SetDungeon(this);
 	m_map_pkParty.insert(std::make_pair(pParty,0));
 
-	if (SECTREE_MANAGER::instance().GetMap(m_lMapIndex) == nullptr) {
+	if (SECTREE_MANAGER::Instance().GetMap(m_lMapIndex) == nullptr) {
 		sys_err("CDungeon: SECTREE_MAP not found for #%d", m_lMapIndex);
 		return;
 	}
@@ -196,14 +196,14 @@ EVENTFUNC(dungeon_dead_event)
 		return 0;
 	}
 
-	LPDUNGEON pDungeon = CDungeonManager::instance().Find(info->dungeon_id);
+	LPDUNGEON pDungeon = CDungeonManager::Instance().Find(info->dungeon_id);
 	if (pDungeon == nullptr) {
 		return 0;
 	}
 
 	pDungeon->deadEvent = nullptr;
 
-	CDungeonManager::instance().Destroy(info->dungeon_id);
+	CDungeonManager::Instance().Destroy(info->dungeon_id);
 	return 0;
 }
 
@@ -225,7 +225,7 @@ void CDungeon::DecMember(LPCHARACTER ch)
 
 	m_set_pkCharacter.erase(it);
 
-	if (m_set_pkCharacter.empty() && !CBattlegroundManager::instance().IsEventMap(m_lMapIndex))
+	if (m_set_pkCharacter.empty() && !CBattlegroundManager::Instance().IsEventMap(m_lMapIndex))
 	{
 		dungeon_id_info* info = AllocEventInfo<dungeon_id_info>();
 		info->dungeon_id = m_id;
@@ -323,7 +323,7 @@ void CDungeon::JumpAll(int32_t lFromMapIndex, int32_t x, int32_t y)
 	x *= 100;
 	y *= 100;
 
-	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(lFromMapIndex);
+	LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(lFromMapIndex);
 
 	if (!pMap)
 	{
@@ -342,7 +342,7 @@ void CDungeon::WarpAll(int32_t lFromMapIndex, int32_t x, int32_t y)
 	x *= 100;
 	y *= 100;
 
-	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(lFromMapIndex);
+	LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(lFromMapIndex);
 
 	if (!pMap)
 	{
@@ -361,7 +361,7 @@ void CDungeon::JumpGuild(CGuild* pGuild, int32_t lFromMapIndex, int32_t x, int32
 	x *= 100;
 	y *= 100;
 
-	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(lFromMapIndex);
+	LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(lFromMapIndex);
 
 	if (!pMap)
 	{
@@ -393,7 +393,7 @@ void CDungeon::JumpParty(LPPARTY pParty, int32_t lFromMapIndex, int32_t x, int32
 	x *= 100;
 	y *= 100;
 
-	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(lFromMapIndex);
+	LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(lFromMapIndex);
 
 	if (!pMap)
 	{
@@ -439,9 +439,9 @@ void CDungeonManager::Destroy(CDungeon::IdType dungeon_id)
 	m_map_pkMapDungeon.erase(lMapIndex);
 
 	uint32_t server_timer_arg = lMapIndex;
-	quest::CQuestManager::instance().CancelServerTimers(server_timer_arg);
+	quest::CQuestManager::Instance().CancelServerTimers(server_timer_arg);
 
-	SECTREE_MANAGER::instance().DestroyPrivateMap(lMapIndex);
+	SECTREE_MANAGER::Instance().DestroyPrivateMap(lMapIndex);
 	M2_DELETE(pDungeon);
 }
 
@@ -464,7 +464,7 @@ LPDUNGEON CDungeonManager::FindByMapIndex(int32_t lMapIndex)
 
 LPDUNGEON CDungeonManager::Create(int32_t lOriginalMapIndex)
 {
-	uint32_t lMapIndex = SECTREE_MANAGER::instance().CreatePrivateMap(lOriginalMapIndex);
+	uint32_t lMapIndex = SECTREE_MANAGER::Instance().CreatePrivateMap(lOriginalMapIndex);
 
 	if (!lMapIndex) 
 	{
@@ -554,7 +554,7 @@ void CDungeon::SpawnMoveUnique(const char* key, uint32_t vnum, const char* pos_f
 	if (dir==-1)
 		dir = number(0,359);
 
-	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 	if (pkSectreeMap == nullptr) {
 		sys_err("CDungeon: SECTREE_MAP not found for #%d", m_lMapIndex);
 		return;
@@ -566,7 +566,7 @@ void CDungeon::SpawnMoveUnique(const char* key, uint32_t vnum, const char* pos_f
 		int32_t tx = number(ai_to.sx, ai_to.ex);
 		int32_t ty = number(ai_to.sy, ai_to.ey);
 
-		LPCHARACTER ch = CHARACTER_MANAGER::instance().SpawnMob(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+dx, pkSectreeMap->m_setting.iBaseY+dy, 0, false, dir);
+		LPCHARACTER ch = CHARACTER_MANAGER::Instance().SpawnMob(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+dx, pkSectreeMap->m_setting.iBaseY+dy, 0, false, dir);
 
 		if (ch)
 		{
@@ -599,7 +599,7 @@ void CDungeon::SpawnUnique(const char* key, uint32_t vnum, const char* pos)
 	if (dir==-1)
 		dir = number(0,359);
 
-	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 	if (pkSectreeMap == nullptr) {
 		sys_err("CDungeon: SECTREE_MAP not found for #%d", m_lMapIndex);
 		return;
@@ -609,7 +609,7 @@ void CDungeon::SpawnUnique(const char* key, uint32_t vnum, const char* pos)
 		int32_t dx = number(ai.sx, ai.ex);
 		int32_t dy = number(ai.sy, ai.ey);
 
-		LPCHARACTER ch = CHARACTER_MANAGER::instance().SpawnMob(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+dx, pkSectreeMap->m_setting.iBaseY+dy, 0, false, dir);
+		LPCHARACTER ch = CHARACTER_MANAGER::Instance().SpawnMob(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+dx, pkSectreeMap->m_setting.iBaseY+dy, 0, false, dir);
 
 		if (ch)
 		{
@@ -627,7 +627,7 @@ void CDungeon::SpawnUnique(const char* key, uint32_t vnum, const char* pos)
 
 void CDungeon::SetUnique(const char* key, uint32_t vid)
 {
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().Find(vid);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().Find(vid);
 	if (ch)
 	{
 		m_map_UniqueMob.insert(make_pair(std::string(key), ch));
@@ -744,7 +744,7 @@ void CDungeon::Spawn(uint32_t vnum, const char* pos)
 	if (dir==-1)
 		dir = number(0,359);
 
-	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 	if (pkSectreeMap == nullptr)
 	{
 		sys_err("cannot find map by index %d", m_lMapIndex);
@@ -753,21 +753,21 @@ void CDungeon::Spawn(uint32_t vnum, const char* pos)
 	int32_t dx = number(ai.sx, ai.ex);
 	int32_t dy = number(ai.sy, ai.ey);
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().SpawnMob(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+dx, pkSectreeMap->m_setting.iBaseY+dy, 0, false, dir);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().SpawnMob(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+dx, pkSectreeMap->m_setting.iBaseY+dy, 0, false, dir);
 	if (ch)
 		ch->SetDungeon(this);
 }
 
 LPCHARACTER CDungeon::SpawnMob(uint32_t vnum, int32_t x, int32_t y, int32_t dir)
 {
-	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 	if (pkSectreeMap == nullptr) {
 		sys_err("CDungeon: SECTREE_MAP not found for #%d", m_lMapIndex);
 		return nullptr;
 	}
 	sys_log(0, "CDungeon::SpawnMob %u %d %d", vnum, x,  y);
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().SpawnMob(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+x*100, pkSectreeMap->m_setting.iBaseY+y*100, 0, false, dir == 0 ? -1 : (dir - 1) * 45);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().SpawnMob(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+x*100, pkSectreeMap->m_setting.iBaseY+y*100, 0, false, dir == 0 ? -1 : (dir - 1) * 45);
 
 	if (ch)
 	{
@@ -780,14 +780,14 @@ LPCHARACTER CDungeon::SpawnMob(uint32_t vnum, int32_t x, int32_t y, int32_t dir)
 
 LPCHARACTER CDungeon::SpawnMob_ac_dir(uint32_t vnum, int32_t x, int32_t y, int32_t dir)
 {
-	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 	if (pkSectreeMap == nullptr) {
 		sys_err("CDungeon: SECTREE_MAP not found for #%d", m_lMapIndex);
 		return nullptr;
 	}
 	sys_log(0, "CDungeon::SpawnMob %u %d %d", vnum, x,  y);
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().SpawnMob(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+x*100, pkSectreeMap->m_setting.iBaseY+y*100, 0, false, dir);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().SpawnMob(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+x*100, pkSectreeMap->m_setting.iBaseY+y*100, 0, false, dir);
 
 	if (ch)
 	{
@@ -800,13 +800,13 @@ LPCHARACTER CDungeon::SpawnMob_ac_dir(uint32_t vnum, int32_t x, int32_t y, int32
 
 void CDungeon::SpawnNameMob(uint32_t vnum, int32_t x, int32_t y, const char* name)
 {
-	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 	if (pkSectreeMap == nullptr) {
 		sys_err("CDungeon: SECTREE_MAP not found for #%d", m_lMapIndex);
 		return;
 	}
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().SpawnMob(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+x, pkSectreeMap->m_setting.iBaseY+y, 0, false, -1);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().SpawnMob(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+x, pkSectreeMap->m_setting.iBaseY+y, 0, false, -1);
 	if (ch)
 	{
 		ch->SetName(name);
@@ -818,7 +818,7 @@ void CDungeon::SpawnGotoMob(int32_t lFromX, int32_t lFromY, int32_t lToX, int32_
 {
 	const int32_t MOB_GOTO_VNUM = 20039;
 
-	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 	if (pkSectreeMap == nullptr) {
 		sys_err("CDungeon: SECTREE_MAP not found for #%d", m_lMapIndex);
 		return;
@@ -829,7 +829,7 @@ void CDungeon::SpawnGotoMob(int32_t lFromX, int32_t lFromY, int32_t lToX, int32_
 	lFromX = pkSectreeMap->m_setting.iBaseX+lFromX*100;
 	lFromY = pkSectreeMap->m_setting.iBaseY+lFromY*100;
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().SpawnMob(MOB_GOTO_VNUM, m_lMapIndex, lFromX, lFromY, 0, false, -1);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().SpawnMob(MOB_GOTO_VNUM, m_lMapIndex, lFromX, lFromY, 0, false, -1);
 
 	if (ch)
 	{
@@ -843,7 +843,7 @@ void CDungeon::SpawnGotoMob(int32_t lFromX, int32_t lFromY, int32_t lToX, int32_
 
 LPCHARACTER CDungeon::SpawnGroup(uint32_t vnum, int32_t x, int32_t y, float radius, bool bAggressive, int32_t count)
 {
-	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 	if (pkSectreeMap == nullptr) {
 		sys_err("CDungeon: SECTREE_MAP not found for #%d", m_lMapIndex);
 		return nullptr;
@@ -860,7 +860,7 @@ LPCHARACTER CDungeon::SpawnGroup(uint32_t vnum, int32_t x, int32_t y, float radi
 
 	while (count--)
 	{
-		LPCHARACTER chLeader = CHARACTER_MANAGER::instance().SpawnGroup(vnum, m_lMapIndex, sx, sy, ex, ey, nullptr, bAggressive, this);
+		LPCHARACTER chLeader = CHARACTER_MANAGER::Instance().SpawnGroup(vnum, m_lMapIndex, sx, sy, ex, ey, nullptr, bAggressive, this);
 		if (chLeader && !ch)
 			ch = chLeader;
 	}
@@ -876,7 +876,7 @@ void CDungeon::SpawnRegen(const char* filename, bool bOnce)
 		return;
 	}
 
-	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 	if (!pkSectreeMap)
 	{
 		sys_err("CDungeon::SpawnRegen(filename=%s, bOnce=%d) - m_lMapIndex[%d]", filename, bOnce, m_lMapIndex); 
@@ -938,7 +938,7 @@ void CDungeon::SpawnMoveGroup(uint32_t vnum, const char* pos_from, const char* p
 	if (dir == -1)
 		dir = number(0,359);
 
-	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 	if (pkSectreeMap == nullptr) {
 		sys_err("CDungeon: SECTREE_MAP not found for #%d", m_lMapIndex);
 		return;
@@ -948,7 +948,7 @@ void CDungeon::SpawnMoveGroup(uint32_t vnum, const char* pos_from, const char* p
 	{
 		int32_t tx = number(ai_to.sx, ai_to.ex)+pkSectreeMap->m_setting.iBaseX;
 		int32_t ty = number(ai_to.sy, ai_to.ey)+pkSectreeMap->m_setting.iBaseY;
-		CHARACTER_MANAGER::instance().SpawnMoveGroup(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+ai.sx, pkSectreeMap->m_setting.iBaseY+ai.sy, pkSectreeMap->m_setting.iBaseX+ai.ex, pkSectreeMap->m_setting.iBaseY+ai.ey, tx, ty, nullptr, true);
+		CHARACTER_MANAGER::Instance().SpawnMoveGroup(vnum, m_lMapIndex, pkSectreeMap->m_setting.iBaseX+ai.sx, pkSectreeMap->m_setting.iBaseY+ai.sy, pkSectreeMap->m_setting.iBaseX+ai.ex, pkSectreeMap->m_setting.iBaseY+ai.ey, tx, ty, nullptr, true);
 	}
 }
 
@@ -996,7 +996,7 @@ namespace
 // DUNGEON_KILL_ALL_BUG_FIX
 void CDungeon::KillAll()
 {
-	LPSECTREE_MAP pkMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pkMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 	if (pkMap == nullptr) {
 		sys_err("CDungeon: SECTREE_MAP not found for #%d", m_lMapIndex);
 		return;
@@ -1008,7 +1008,7 @@ void CDungeon::KillAll()
 
 void CDungeon::Purge()
 {
-	LPSECTREE_MAP pkMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pkMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 	if (pkMap == nullptr) {
 		sys_err("CDungeon: SECTREE_MAP not found for #%d", m_lMapIndex);
 		return;
@@ -1071,7 +1071,7 @@ struct FCountMonster
 
 int32_t CDungeon::CountRealMonster()
 {
-	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(m_lOrigMapIndex);
+	LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(m_lOrigMapIndex);
 
 	if (!pMap)
 	{
@@ -1102,7 +1102,7 @@ struct FExitDungeon
 
 void CDungeon::ExitAll()
 {
-	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 
 	if (!pMap)
 	{
@@ -1142,7 +1142,7 @@ namespace
 void CDungeon::Notice(const char* msg)
 {
 	sys_log(0, "XXX Dungeon Notice %p %s", this, msg);
-	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 
 	if (!pMap)
 	{
@@ -1179,7 +1179,7 @@ namespace
 void CDungeon::CmdChat(const char* msg)
 {
 	sys_log(0, "XXX Dungeon CmdChat %p %s", this, msg);
-	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 
 	if (!pMap)
 	{
@@ -1203,7 +1203,7 @@ struct FExitDungeonToStartPosition
 				GPOS posWarp;
 
 				// 현재 맵 인덱스를 넣는 것이 아니라 시작하는 맵 인덱스를 넣는다.
-				if (SECTREE_MANAGER::instance().GetRecallPositionByEmpire(g_start_map[ch->GetEmpire()], ch->GetEmpire(), posWarp))
+				if (SECTREE_MANAGER::Instance().GetRecallPositionByEmpire(g_start_map[ch->GetEmpire()], ch->GetEmpire(), posWarp))
 					ch->WarpSet(posWarp.x, posWarp.y);
 				else
 					ch->ExitToSavedLocation();
@@ -1214,7 +1214,7 @@ struct FExitDungeonToStartPosition
 
 void CDungeon::ExitAllToStartPosition()
 {
-	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 
 	if (!pMap)
 	{
@@ -1238,7 +1238,7 @@ EVENTFUNC(dungeon_jump_to_event)
 		return 0;
 	}
 
-	LPDUNGEON pDungeon = CDungeonManager::instance().Find(info->dungeon_id);
+	LPDUNGEON pDungeon = CDungeonManager::Instance().Find(info->dungeon_id);
 	pDungeon->jump_to_event_ = nullptr;
 
 	if (pDungeon)
@@ -1259,7 +1259,7 @@ EVENTFUNC(dungeon_exit_all_event)
 		return 0;
 	}
 
-	LPDUNGEON pDungeon = CDungeonManager::instance().Find(info->dungeon_id);
+	LPDUNGEON pDungeon = CDungeonManager::Instance().Find(info->dungeon_id);
 	pDungeon->exit_all_event_ = nullptr;
 
 	if (pDungeon)
@@ -1338,7 +1338,7 @@ void CDungeon::SetWarpAtEliminate(int32_t time, int32_t lMapIndex, int32_t x, in
 
 void CDungeon::JumpToEliminateLocation()
 {
-	LPDUNGEON pDungeon = CDungeonManager::instance().FindByMapIndex(m_lWarpMapIndex);
+	LPDUNGEON pDungeon = CDungeonManager::Instance().FindByMapIndex(m_lWarpMapIndex);
 
 	if (pDungeon)
 	{
@@ -1353,7 +1353,7 @@ void CDungeon::JumpToEliminateLocation()
 	else
 	{
 		// 일반 맵으로 워프
-		LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+		LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 
 		if (!pMap)
 		{
@@ -1400,7 +1400,7 @@ struct FNearPosition
 
 bool CDungeon::IsAllPCNearTo(int32_t x, int32_t y, int32_t dist)
 {
-	LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
+	LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(m_lMapIndex);
 
 	if (!pMap)
 	{

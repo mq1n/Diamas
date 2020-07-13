@@ -1,13 +1,14 @@
 #pragma once
-#include "GAccountManager.h"
-#include "GDBClient.h"
+#include "AccountManager.hpp"
+#include "DBClient.hpp"
+#include <array>
 
 class GAuthPeer;
 
 class GAuthServer : public net_engine::NetServerBase
 {
 private:
-	typedef std::unordered_map<uint8_t, std::pair<std::size_t, std::function<std::size_t(std::shared_ptr<GAuthPeer>, const void*, std::size_t)> > > MapPacketHandlers;
+	typedef std::unordered_map <uint8_t, std::pair<std::size_t, std::function<std::size_t(std::shared_ptr<GAuthPeer>, const void*, std::size_t)> > > MapPacketHandlers;
 	struct DBConfig
 	{
 		std::string address;
@@ -18,22 +19,20 @@ private:
 	};
 	
 public:
-	GAuthServer(net_engine::NetServiceBase& netService);
+	GAuthServer(net_engine::NetServiceBase& netService, uint8_t securityLevel, const net_engine::TPacketCryptKey& cryptKey);
 	virtual ~GAuthServer();
 	
-	net_engine::NetServiceBase& GetService() const;
-	GAccountManager& GetAccountManager();
-	
+	net_engine::NetServiceBase& GetService() 	{ return m_netService; };
+	GAccountManager& GetAccountManager()		{ return m_accountManager; };
+
 	virtual void Init(int argc, char** argv);
 	virtual void Run();
 	virtual void Shutdown();
 	virtual bool IsShuttingDown() const;
 	
-	virtual std::shared_ptr<GAuthPeer> FindPeer(int32_t id) const;
-	virtual void RemovePeer(int32_t id);
-	
-	virtual std::size_t ProcessInput(std::shared_ptr<GAuthPeer> peer, const void* data, std::size_t maxlength);
-	
+	virtual std::shared_ptr <GAuthPeer> FindPeer(uint32_t id) const;
+	virtual void RemovePeer(uint32_t id);
+		
 	template<typename PacketT, typename HandlerT> inline void RegisterPacket(uint8_t type, HandlerT handler) { m_handlers.insert(std::make_pair(type, std::make_pair(PacketT::size(), handler))); }
 	inline void RemovePacket(uint8_t type)
 	{
@@ -61,8 +60,8 @@ private:
 	net_engine::NetServiceBase& m_netService;
 	GAccountManager m_accountManager;
 	std::shared_ptr<GDBClient> m_dbClient;
-	amy::mariadb_connector m_dbManager;
-	std::unordered_map<int32_t, std::shared_ptr<GAuthPeer> > m_peers;
+	amy::connector m_dbManager;
+	std::unordered_map<uint32_t, std::shared_ptr<GAuthPeer> > m_peers;
 	MapPacketHandlers m_handlers;
 	
 	// config
@@ -80,4 +79,7 @@ private:
 	DBConfig m_playerCfg;
 	DBConfig m_commonCfg;
 	DBConfig m_logCfg;
+
+	uint8_t m_securityLevel;
+	net_engine::TPacketCryptKey m_crypt_key;
 };

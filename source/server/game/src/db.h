@@ -1,6 +1,6 @@
 #pragma once
 #include "../../libsql/include/AsyncSQL.h"
-#include "../../common/length.h"
+#include "../../../common/common_incl.hpp"
 #include <functional>
 
 enum EQuertyType
@@ -54,7 +54,7 @@ class CFuncAfterQueryInfo : public CQueryInfo
 class CLoginData;
 
 
-class DBManager : public singleton<DBManager>
+class DBManager : public CSingleton<DBManager>
 {
 	public:
 		DBManager();
@@ -100,7 +100,7 @@ class DBManager : public singleton<DBManager>
 };
 
 // ACCOUNT_DB
-class AccountDB : public singleton<AccountDB>
+class AccountDB : public CSingleton<AccountDB>
 {
 	public:
 		AccountDB();

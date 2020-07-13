@@ -1,6 +1,5 @@
 #pragma once
-#include "../../common/service.h"
-#include "../../common/singleton.h"
+#include "../../../common/defines.h"
 #include "../../libthecore/include/utils.h"
 #include "packet.h"
 #include "typedef.h"
@@ -373,7 +372,7 @@ class CBuyerThiefGlovesItemGroup
 
 class ITEM;
 
-class ITEM_MANAGER : public singleton<ITEM_MANAGER>
+class ITEM_MANAGER : public CSingleton<ITEM_MANAGER>
 {
 	public:
 		ITEM_MANAGER();
@@ -501,7 +500,7 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 };
 
 #ifndef DEBUG_ALLOC
-#define M2_DESTROY_ITEM(ptr) ITEM_MANAGER::instance().DestroyItem(ptr)
+#define M2_DESTROY_ITEM(ptr) ITEM_MANAGER::Instance().DestroyItem(ptr)
 #else
-#define M2_DESTROY_ITEM(ptr) ITEM_MANAGER::instance().DestroyItem(ptr, __FILE__, __LINE__)
+#define M2_DESTROY_ITEM(ptr) ITEM_MANAGER::Instance().DestroyItem(ptr, __FILE__, __LINE__)
 #endif

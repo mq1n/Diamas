@@ -915,7 +915,6 @@ bool CArea::__Load_LoadObject(const char * c_szFileName)
 		ObjectData.Position.z = atof(c_rstrzPosition.c_str());
 		ObjectData.dwCRC = atoi	(c_rstrCRC.c_str());
 
-		// 20041217.myevan.로테이션 공식 변경
 		ObjectData.InitializeRotation(); //ObjectData.m_fYaw = ObjectData.m_fPitch = ObjectData.m_fRoll = 0;
 		if (rVector.size() > 4)
 		{
@@ -1011,7 +1010,6 @@ bool CArea::__Load_LoadAmbience(const char * c_szFileName)
 		ObjectData.dwCRC = atoi	(c_rstrCRC.c_str());
 		ObjectData.dwRange = atoi(c_rstrRange.c_str());
 
-		// 20041217.myevan.로테이션 초기화
 		ObjectData.InitializeRotation();
 		ObjectData.m_fHeightBias = 0.0f;
 		ObjectData.fMaxVolumeAreaPercentage = 0.0f;

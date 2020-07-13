@@ -110,7 +110,7 @@ ACMD(do_emotion_allow)
 	uint32_t dwTargetVID = 0;
 	str_to_number(dwTargetVID, arg1);
 
-	LPCHARACTER tch = CHARACTER_MANAGER::instance().Find(dwTargetVID);
+	LPCHARACTER tch = CHARACTER_MANAGER::Instance().Find(dwTargetVID);
 	if (!tch)
 		return;
 
@@ -153,7 +153,7 @@ bool CHARACTER_CanEmotion(CHARACTER& rch)
 		return true;
 
 	
-	if (marriage::WeddingManager::instance().IsWeddingMap(rch.GetMapIndex()))
+	if (marriage::WeddingManager::Instance().IsWeddingMap(rch.GetMapIndex()))
 		return true;
 
 	// 열정의 가면 착용시 사용할 수 있다.
@@ -259,9 +259,9 @@ ACMD(do_emotion)
 		{
 			if (s_emotion_set.find(std::make_pair(victim->GetVID(), ch->GetVID())) == s_emotion_set.end())
 			{
-				if (true == marriage::CManager::instance().IsMarried( ch->GetPlayerID() ))
+				if (true == marriage::CManager::Instance().IsMarried( ch->GetPlayerID() ))
 				{
-					const marriage::TMarriage* marriageInfo = marriage::CManager::instance().Get( ch->GetPlayerID() );
+					const marriage::TMarriage* marriageInfo = marriage::CManager::Instance().Get( ch->GetPlayerID() );
 
 					const uint32_t other = marriageInfo->GetOther( ch->GetPlayerID() );
 

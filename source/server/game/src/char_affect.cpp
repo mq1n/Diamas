@@ -17,7 +17,6 @@
 #include "party.h"
 #include "skill.h"
 #include "battleground.h"
-#include "../../common/service.h"
 
 #define IS_NO_SAVE_AFFECT(type) ((type) == AFFECT_WAR_FLAG || (type) == AFFECT_REVIVE_INVISIBLE || ((type) >= AFFECT_PREMIUM_START && (type) <= AFFECT_PREMIUM_END) || (type) == AFFECT_MOUNT_BONUS) // added MOUNT_BONUS (if the game core crashes, the bonus would double if present in player.affect)
 #define IS_NO_CLEAR_ON_DEATH_AFFECT(type) ((type) == AFFECT_BLOCK_CHAT || ((type) >= 500 && (type) < 600))
@@ -395,7 +394,7 @@ EVENTFUNC(load_affect_login_event)
 	}
 
 	uint32_t dwPID = info->pid;
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(dwPID);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(dwPID);
 
 	if (!ch)
 	{
@@ -515,12 +514,12 @@ void CHARACTER::LoadAffect(uint32_t dwCount, TPacketAffectElement * pElements)
 	
 	}
 
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 	{
 		RemoveBadAffect();
 		RemoveGoodAffect();
 	}
-	if ( CArenaManager::instance().IsArenaMap(GetMapIndex()) == true )
+	if ( CArenaManager::Instance().IsArenaMap(GetMapIndex()) == true )
 	{
 		RemoveGoodAffect();
 	}
@@ -543,8 +542,8 @@ void CHARACTER::LoadAffect(uint32_t dwCount, TPacketAffectElement * pElements)
 		PointChange(POINT_SP, GetMaxSP() - GetSP());
 	}
 
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
-		CBattlegroundManager::instance().OnAffectLoad(this);
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
+		CBattlegroundManager::Instance().OnAffectLoad(this);
 }
 
 bool CHARACTER::AddAffect(uint32_t dwType, uint8_t bApplyOn, int32_t lApplyValue, uint32_t dwFlag, int32_t lDuration, int32_t lSPCost, bool bOverride, bool IsCube )

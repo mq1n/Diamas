@@ -56,7 +56,7 @@ void CItemCache::OnFlush()
 	{
 		char szQuery[ASQL_QUERY_MAX_LEN];
 		snprintf(szQuery, sizeof(szQuery), "DELETE FROM item WHERE id=%u", m_data.id);
-		CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_DESTROY, 0, nullptr);
+		CDBManager::Instance().ReturnQuery(szQuery, QID_ITEM_DESTROY, 0, nullptr);
 
 		if (g_test_server)
 			sys_log(0, "ItemCache::Flush : DELETE %u %s", m_data.id, szQuery);
@@ -138,7 +138,7 @@ void CItemCache::OnFlush()
 		if (g_test_server)	
 			sys_log(0, "ItemCache::Flush :REPLACE  (%s)", szItemQuery);
 
-		CDBManager::instance().ReturnQuery(szItemQuery, QID_ITEM_SAVE, 0, nullptr);
+		CDBManager::Instance().ReturnQuery(szItemQuery, QID_ITEM_SAVE, 0, nullptr);
 	}
 
 	m_bNeedQuery = false;
@@ -162,7 +162,7 @@ void CPlayerTableCache::OnFlush()
 
 	char szQuery[ASQL_QUERY_MAX_LEN];
 	CreatePlayerSaveQuery(szQuery, sizeof(szQuery), &m_data);
-	CDBManager::instance().ReturnQuery(szQuery, QID_PLAYER_SAVE, 0, nullptr);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_PLAYER_SAVE, 0, nullptr);
 }
 
 // MYSHOP_PRICE_LIST
@@ -242,7 +242,7 @@ void CItemPriceListTableCache::OnFlush()
 	//
 
 	snprintf(szQuery, sizeof(szQuery), "DELETE FROM myshop_pricelist WHERE owner_id = %u", m_data.dwOwnerID);
-	CDBManager::instance().ReturnQuery(szQuery, QID_ITEMPRICE_DESTROY, 0, nullptr);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_ITEMPRICE_DESTROY, 0, nullptr);
 
 	//
 	// 캐시의 내용을 모두 DB 에 쓴다.
@@ -253,7 +253,7 @@ void CItemPriceListTableCache::OnFlush()
 		snprintf(szQuery, sizeof(szQuery),
 				"REPLACE myshop_pricelist(owner_id, item_vnum, price) VALUES(%u, %u, %u)", 
 				m_data.dwOwnerID, m_data.aPriceInfo[idx].dwVnum, m_data.aPriceInfo[idx].dwPrice);
-		CDBManager::instance().ReturnQuery(szQuery, QID_ITEMPRICE_SAVE, 0, nullptr);
+		CDBManager::Instance().ReturnQuery(szQuery, QID_ITEMPRICE_SAVE, 0, nullptr);
 	}
 
 	sys_log(0, "ItemPriceListTableCache::Flush : OwnerID[%u] Update [%u]Items", m_data.dwOwnerID, m_data.byCount);
@@ -297,6 +297,6 @@ void CActivityCache::OnFlush()
 		m_data.total,
 		m_data.lastUpdate);
 
-	CDBManager::instance().AsyncQuery(szQuery);
+	CDBManager::Instance().AsyncQuery(szQuery);
 }
 

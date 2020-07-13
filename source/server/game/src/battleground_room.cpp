@@ -65,7 +65,7 @@ bool CBattlegroundRoom::StartBattleground()
 		m_bIsLocked = false;
 		return false;		
 	}
-	auto pkLeadChar = CHARACTER_MANAGER::instance().FindByPID(m_dwLeaderPlayerID);
+	auto pkLeadChar = CHARACTER_MANAGER::Instance().FindByPID(m_dwLeaderPlayerID);
 	if (!pkLeadChar)
 	{
 		sys_err("Unknown battleground leader! pid: %u", m_dwLeaderPlayerID);
@@ -106,7 +106,7 @@ bool CBattlegroundRoom::StartBattleground()
 					break;
 			}
 
-			if (!CHARACTER_MANAGER::instance().FindByPID(pid))
+			if (!CHARACTER_MANAGER::Instance().FindByPID(pid))
 			{
 				pkLeadChar->ChatPacket(CHAT_TYPE_INFO, "All attenders must be online!");
 				m_bIsLocked = false;
@@ -132,7 +132,7 @@ bool CBattlegroundRoom::StartBattleground()
 	}
 
 	// Start battleground
-	auto pkBattlegroundInfo = CBattlegroundManager::instance().CreateBattleground(m_nGameMode, m_nGameType, m_nQueueType);
+	auto pkBattlegroundInfo = CBattlegroundManager::Instance().CreateBattleground(m_nGameMode, m_nGameType, m_nQueueType);
 	if (!pkBattlegroundInfo)
 	{
 		sys_err("Battleground dungeon can not created! room id: %u", m_dwRoomID);
@@ -158,12 +158,12 @@ bool CBattlegroundRoom::StartBattleground()
 	// Send notification & warp for all attenders
 	for (const auto& [pid, tid] : m_pkMapAttenders)
 	{
-		auto pkCurrChar = CHARACTER_MANAGER::instance().FindByPID(pid);
+		auto pkCurrChar = CHARACTER_MANAGER::Instance().FindByPID(pid);
 		if (pkCurrChar)
 		{
 			// pkCurrChar->ChatPacket(CHAT_TYPE_INFO, "Battleground created, you will join within 10 seconds!");
 			m_pkBattleground->Enter(pkCurrChar, tid);
-			CBattlegroundManager::instance().WarpToBattlegroundMap(pkCurrChar, m_dwBattlegroundVID, tid);
+			CBattlegroundManager::Instance().WarpToBattlegroundMap(pkCurrChar, m_dwBattlegroundVID, tid);
 		}
 	}
 
@@ -176,13 +176,13 @@ void CBattlegroundRoom::DestroyRoom()
 	{
 		for (const auto& [pid, tid] : m_pkMapAttenders)
 		{
-			auto pkCurrChar = CHARACTER_MANAGER::instance().FindByPID(pid);
+			auto pkCurrChar = CHARACTER_MANAGER::Instance().FindByPID(pid);
 			if (pkCurrChar)
 				pkCurrChar->ChatPacket(CHAT_TYPE_COMMAND, "bg_room_ntf destroy NONE 0 0 0 0 0");
 		}
 	}
 
-	CBattlegroundManager::instance().DeleteBattlegroundRoom(m_dwRoomID);
+	CBattlegroundManager::Instance().DeleteBattlegroundRoom(m_dwRoomID);
 }
 
 void CBattlegroundRoom::SetRoomID(uint32_t dwRoomID)
@@ -226,7 +226,7 @@ bool CBattlegroundRoom::JoinToRoom(uint32_t dwPlayerID, uint8_t nTeamID)
 		return false;
 	}
 
-	auto pkChar = CHARACTER_MANAGER::instance().FindByPID(dwPlayerID);
+	auto pkChar = CHARACTER_MANAGER::Instance().FindByPID(dwPlayerID);
 	if (!pkChar)
 	{
 		sys_err("Attender %u is not online", dwPlayerID);
@@ -256,7 +256,7 @@ bool CBattlegroundRoom::JoinToRoom(uint32_t dwPlayerID, uint8_t nTeamID)
 
 	for (const auto& [pid, tid] : m_pkMapAttenders)
 	{
-		auto pkCurrChar = CHARACTER_MANAGER::instance().FindByPID(pid);
+		auto pkCurrChar = CHARACTER_MANAGER::Instance().FindByPID(pid);
 		if (pkCurrChar)
 		{
 			pkCurrChar->ChatPacket(CHAT_TYPE_COMMAND, "bg_room_ntf join %s %u %d %u %u %d",
@@ -305,7 +305,7 @@ void CBattlegroundRoom::LeaveFromRoom(uint32_t dwPlayerID)
 
 	for (const auto& [pid, tid] : m_pkMapAttenders)
 	{
-		auto pkCurrChar = CHARACTER_MANAGER::instance().FindByPID(pid);
+		auto pkCurrChar = CHARACTER_MANAGER::Instance().FindByPID(pid);
 		if (pkCurrChar)
 		{
 			pkCurrChar->ChatPacket(CHAT_TYPE_COMMAND, "bg_room_ntf leave %s %u 0 0 0 0", stName.c_str(), nTeamID);
@@ -337,7 +337,7 @@ bool CBattlegroundRoom::KickPlayer(const std::string& strName)
 
 	m_pkSetKickedPlayers.emplace(strName);
 
-	auto pkChar = CHARACTER_MANAGER::instance().FindPC(strName.c_str());
+	auto pkChar = CHARACTER_MANAGER::Instance().FindPC(strName.c_str());
 	if (pkChar)
 	{
 		LeaveFromRoom(pkChar->GetPlayerID());
@@ -365,12 +365,12 @@ void CBattlegroundRoom::SetAttenderState(uint32_t dwPlayerID, bool bNewState)
 	}
 	it->second = bNewState;
 
-	auto pkChar = CHARACTER_MANAGER::instance().FindByPID(dwPlayerID);
+	auto pkChar = CHARACTER_MANAGER::Instance().FindByPID(dwPlayerID);
 	if (pkChar)
 	{
 		for (const auto& [pid, state] : m_pkMapAttenderStates)
 		{
-			auto pkCurrChar = CHARACTER_MANAGER::instance().FindByPID(pid);
+			auto pkCurrChar = CHARACTER_MANAGER::Instance().FindByPID(pid);
 			if (pkCurrChar)
 				pkCurrChar->ChatPacket(CHAT_TYPE_COMMAND, "bg_room_ntf state %s %d 0 0 0 0", pkChar->GetName(), bNewState ? 1 : 0);
 		}
@@ -392,7 +392,7 @@ void CBattlegroundRoom::SetLeaderPlayerID(uint32_t dwLeaderPlayerID)
 {
 	m_dwLeaderPlayerID = dwLeaderPlayerID;
 
-	auto pkLeaderChar = CHARACTER_MANAGER::instance().FindByPID(dwLeaderPlayerID);
+	auto pkLeaderChar = CHARACTER_MANAGER::Instance().FindByPID(dwLeaderPlayerID);
 	if (pkLeaderChar)
 		m_strLeaderName = pkLeaderChar->GetName();
 }
@@ -455,7 +455,7 @@ void CBattlegroundRoom::SendRoomDetails(LPCHARACTER pkChar)
 
 	for (const auto& [pid, tid] : m_pkMapAttenders)
 	{
-		auto pkCurrChar = CHARACTER_MANAGER::instance().FindByPID(pid);
+		auto pkCurrChar = CHARACTER_MANAGER::Instance().FindByPID(pid);
 		if (pkCurrChar)
 		{
 			pkChar->ChatPacket(CHAT_TYPE_COMMAND, "bg_room_player_info %u %s %d %u %u %u",
@@ -491,12 +491,12 @@ void CBattlegroundRoom::SetTeamID(uint32_t dwPlayerID, uint8_t nTeamID)
 
 	it->second = nTeamID;
 
-	auto pkChar = CHARACTER_MANAGER::instance().FindByPID(dwPlayerID);
+	auto pkChar = CHARACTER_MANAGER::Instance().FindByPID(dwPlayerID);
 	if (pkChar)
 	{
 		for (const auto& [pid, tid] : m_pkMapAttenders)
 		{
-			auto pkCurrChar = CHARACTER_MANAGER::instance().FindByPID(pid);
+			auto pkCurrChar = CHARACTER_MANAGER::Instance().FindByPID(pid);
 			if (pkCurrChar)
 				pkCurrChar->ChatPacket(CHAT_TYPE_COMMAND, "bg_room_ntf team_id %s %u 0 0 0 0", pkChar->GetName(), nTeamID);
 		}

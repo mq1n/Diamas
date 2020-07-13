@@ -8,7 +8,6 @@
 #include "db.h"
 #include "log.h"
 #include "skill.h"
-#include "../../common/service.h"
 
 namespace mining
 {
@@ -130,7 +129,7 @@ namespace mining
 			return;
 		}
 
-		LPITEM item = ITEM_MANAGER::instance().CreateItem(dwRawOreVnum, GetFractionCount());
+		LPITEM item = ITEM_MANAGER::Instance().CreateItem(dwRawOreVnum, GetFractionCount());
 
 		if (!item)
 		{
@@ -146,7 +145,7 @@ namespace mining
 		item->StartDestroyEvent();
 		item->SetOwnership(ch, 15);
 
-		LogManager::instance().MoneyLog(MONEY_LOG_DROP, item->GetVnum(), item->GetCount());
+		LogManager::Instance().MoneyLog(MONEY_LOG_DROP, item->GetVnum(), item->GetCount());
 	}
 
 	int32_t GetOrePct(LPCHARACTER ch)
@@ -234,8 +233,8 @@ namespace mining
 		if (!ch || !item)
 			return 2;
 
-		LogManager& rkLogMgr = LogManager::instance();
-		ITEM_MANAGER& rkItemMgr = ITEM_MANAGER::instance();
+		LogManager& rkLogMgr = LogManager::Instance();
+		ITEM_MANAGER& rkItemMgr = ITEM_MANAGER::Instance();
 
 		if (!Pick_Check(*item))
 		{
@@ -258,13 +257,13 @@ namespace mining
 		{
 			rkLogMgr.RefineLog(ch->GetPlayerID(), rkOldPick.GetName(), rkOldPick.GetID(), iAdv, 1, "PICK");
 
-			LPITEM pkNewPick = ITEM_MANAGER::instance().CreateItem(rkOldPick.GetRefinedVnum(), 1);
+			LPITEM pkNewPick = ITEM_MANAGER::Instance().CreateItem(rkOldPick.GetRefinedVnum(), 1);
 			if (pkNewPick)
 			{
 				auto bCell = rkOldPick.GetCell();
 				rkItemMgr.RemoveItem(item, "REMOVE (REFINE PICK)");
 				pkNewPick->AddToCharacter(ch, TItemPos(INVENTORY, bCell));
-				LogManager::instance().ItemLog(ch, pkNewPick, "REFINE PICK SUCCESS", pkNewPick->GetName());
+				LogManager::Instance().ItemLog(ch, pkNewPick, "REFINE PICK SUCCESS", pkNewPick->GetName());
 				return 1;
 			}
 
@@ -346,8 +345,8 @@ namespace mining
 			return 0;
 		}
 
-		LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(info->pid);
-		LPCHARACTER load = CHARACTER_MANAGER::instance().Find(info->vid_load);
+		LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(info->pid);
+		LPCHARACTER load = CHARACTER_MANAGER::Instance().Find(info->vid_load);
 
 		if (!ch)
 			return 0;
@@ -429,7 +428,7 @@ namespace mining
 		ch->PayRefineFee(iCost);
 
 		if (metinstone_item)
-			ITEM_MANAGER::instance().RemoveItem(metinstone_item, "REMOVE (MELT)");
+			ITEM_MANAGER::Instance().RemoveItem(metinstone_item, "REMOVE (MELT)");
 
 		if (number(1, 100) <= pct)
 		{

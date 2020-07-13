@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "../../common/stl.h"
+#include "../../../common/stl.h"
 
 struct ForkedSungziMapInfo
 {
@@ -17,7 +17,7 @@ struct ForkedPassMapInfo
 	std::string m_stMapName[3];
 };
 
-class CThreeWayWar : public singleton<CThreeWayWar>
+class CThreeWayWar : public CSingleton<CThreeWayWar>
 {
 	public:
 		CThreeWayWar ();

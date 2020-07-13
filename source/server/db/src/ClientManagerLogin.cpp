@@ -1,10 +1,8 @@
-
 #include "stdafx.h"
 #include "ClientManager.h"
 #include "Main.h"
 #include "QID.h"
 #include "Cache.h"
-#include "../../common/service.h"
 
 extern std::string g_stLocale;
 extern bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab);
@@ -136,7 +134,7 @@ void CClientManager::QUERY_LOGIN_BY_KEY(CPeer * pkPeer, uint32_t dwHandle, TPack
 	sys_log(0, "LOGIN_BY_KEY success %s %u %s", r.login, p->dwLoginKey, info->ip);
 	char szQuery[ASQL_QUERY_MAX_LEN];
 	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index WHERE id=%u", r.id);
-	CDBManager::instance().ReturnQuery(szQuery, QID_LOGIN_BY_KEY, pkPeer->GetHandle(), info);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_LOGIN_BY_KEY, pkPeer->GetHandle(), info);
 }
 
 void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
@@ -156,7 +154,7 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 		uint32_t account_id = info->pAccountTable->id;
 		char szQuery[ASQL_QUERY_MAX_LEN];
 		snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index WHERE id=%u", account_id);
-		std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(szQuery, SQL_PLAYER));
+		std::unique_ptr<SQLMsg> pMsg(CDBManager::Instance().DirectQuery(szQuery, SQL_PLAYER));
 		
 		sys_log(0, "RESULT_LOGIN_BY_KEY FAIL player_index's nullptr : ID:%d", account_id);
 
@@ -166,7 +164,7 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 
 			//snprintf(szQuery, sizeof(szQuery), "INSERT IGNORE INTO player_index (id) VALUES(%u)", info->pAccountTable->id);
 			snprintf(szQuery, sizeof(szQuery), "INSERT INTO player_index (id) VALUES(%u)", info->pAccountTable->id);
-			CDBManager::instance().ReturnQuery(szQuery, QID_PLAYER_INDEX_CREATE, peer->GetHandle(), info);
+			CDBManager::Instance().ReturnQuery(szQuery, QID_PLAYER_INDEX_CREATE, peer->GetHandle(), info);
 		}
 		return;
 	}
@@ -193,7 +191,7 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
         "x, y, skill_group, change_name FROM player WHERE account_id=%u",
 		info->pAccountTable->id);
 
-	CDBManager::instance().ReturnQuery(szQuery, QID_LOGIN, peer->GetHandle(), info);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_LOGIN, peer->GetHandle(), info);
 }
 
 // PLAYER_INDEX_CREATE_BUG_FIX
@@ -204,7 +202,7 @@ void CClientManager::RESULT_PLAYER_INDEX_CREATE(CPeer * pkPeer, SQLMsg * msg)
 
 	char szQuery[ASQL_QUERY_MAX_LEN];
 	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index WHERE id=%u", info->pAccountTable->id);
-	CDBManager::instance().ReturnQuery(szQuery, QID_LOGIN_BY_KEY, pkPeer->GetHandle(), info);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_LOGIN_BY_KEY, pkPeer->GetHandle(), info);
 }
 // END_PLAYER_INDEX_CREATE_BUG_FIX
 
@@ -264,7 +262,7 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 		{
 			if (pkTab->players[j].dwID == player_id)
 			{
-				CPlayerTableCache * pc = CClientManager::instance().GetPlayerCache(player_id);
+				CPlayerTableCache * pc = CClientManager::Instance().GetPlayerCache(player_id);
 				TPlayerTable * pt = pc ? pc->Get(false) : nullptr;
 
 				if (pt)
@@ -383,7 +381,7 @@ void CClientManager::RESULT_LOGIN(CPeer * peer, SQLMsg * msg)
                 "x, y, skill_group, change_name FROM player WHERE account_id=%u",
 				info->pAccountTable->id);
 
-			CDBManager::instance().ReturnQuery(queryStr, QID_LOGIN, peer->GetHandle(), info);
+			CDBManager::Instance().ReturnQuery(queryStr, QID_LOGIN, peer->GetHandle(), info);
 		}
 		return;
 	}
@@ -475,7 +473,7 @@ void CClientManager::QUERY_CHANGE_NAME(CPeer * peer, uint32_t dwHandle, TPacketG
 	snprintf(queryStr, sizeof(queryStr),
 		"SELECT COUNT(*) as count FROM player WHERE name='%s' AND id <> %u", p->name, p->pid);
 
-	std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(queryStr, SQL_PLAYER));
+	std::unique_ptr<SQLMsg> pMsg(CDBManager::Instance().DirectQuery(queryStr, SQL_PLAYER));
 
 	if (pMsg->Get()->uiNumRows)
 	{
@@ -502,7 +500,7 @@ void CClientManager::QUERY_CHANGE_NAME(CPeer * peer, uint32_t dwHandle, TPacketG
 	snprintf(queryStr, sizeof(queryStr),
 			"UPDATE player SET name='%s',change_name=0 WHERE id=%u", p->name, p->pid);
 
-	std::unique_ptr<SQLMsg> pMsg0(CDBManager::instance().DirectQuery(queryStr, SQL_PLAYER));
+	std::unique_ptr<SQLMsg> pMsg0(CDBManager::Instance().DirectQuery(queryStr, SQL_PLAYER));
 
 	TPacketDGChangeName pdg;
 	peer->EncodeHeader(HEADER_DG_CHANGE_NAME, dwHandle, sizeof(TPacketDGChangeName));

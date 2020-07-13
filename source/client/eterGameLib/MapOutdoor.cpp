@@ -162,8 +162,6 @@ bool CMapOutdoor::Initialize()
 	
 	m_PatchVector.clear();
 	
-	// 2004.10.14.myevan.TEMP_CAreaLoaderThread
-	//m_bBGLoadingEnable = false;
 	m_eTerrainRenderSort = DISTANCE_SORT;
 
 	D3DXMatrixIdentity(&m_matWorldForCommonUse);

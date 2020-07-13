@@ -2,9 +2,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "../../common/stl.h"
+#include "../../../common/common_incl.hpp"
 #include "../../common/building.h"
-#include "../../common/service.h"
 
 #include "Peer.h"
 #include "DBManager.h"
@@ -30,7 +29,7 @@ class CPacketInfo
 
 size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * pkTab);
 
-class CClientManager : public CNetBase, public singleton<CClientManager>
+class CClientManager : public CNetBase, public CSingleton<CClientManager>
 {
     public:
 	typedef std::list<CPeer *>			TPeerList;

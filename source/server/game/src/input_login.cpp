@@ -31,8 +31,6 @@
 #include "item.h"
 #include "battleground.h"
 
-#include "../../common/service.h"
-
 #ifdef ENABLE_WOLFMAN_CHARACTER
 
 // #define USE_LYCAN_CREATE_POSITION
@@ -72,10 +70,10 @@ static void _send_bonus_info(LPCHARACTER ch)
 	int32_t gold10_drop_bonus	= 0;
 	int32_t exp_bonus		= 0;
 
-	item_drop_bonus		= CPrivManager::instance().GetPriv(ch, PRIV_ITEM_DROP);
-	gold_drop_bonus		= CPrivManager::instance().GetPriv(ch, PRIV_GOLD_DROP);
-	gold10_drop_bonus	= CPrivManager::instance().GetPriv(ch, PRIV_GOLD10_DROP);
-	exp_bonus			= CPrivManager::instance().GetPriv(ch, PRIV_EXP_PCT);
+	item_drop_bonus		= CPrivManager::Instance().GetPriv(ch, PRIV_ITEM_DROP);
+	gold_drop_bonus		= CPrivManager::Instance().GetPriv(ch, PRIV_GOLD_DROP);
+	gold10_drop_bonus	= CPrivManager::Instance().GetPriv(ch, PRIV_GOLD10_DROP);
+	exp_bonus			= CPrivManager::Instance().GetPriv(ch, PRIV_EXP_PCT);
 
 	if (item_drop_bonus)
 	{
@@ -151,7 +149,7 @@ void CInputLogin::Login(LPDESC d, const char * data)
 		int32_t * paiEmpireUserCount;
 		int32_t iLocal;
 
-		DESC_MANAGER::instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
+		DESC_MANAGER::Instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
 
 		if (g_iUserLimit <= iTotal)
 		{
@@ -193,7 +191,7 @@ void CInputLogin::LoginByKey(LPDESC d, const char * data)
 		int32_t * paiEmpireUserCount;
 		int32_t iLocal;
 
-		DESC_MANAGER::instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
+		DESC_MANAGER::Instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
 
 		if (g_iUserLimit <= iTotal)
 		{
@@ -575,10 +573,10 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 
 	GPOS pos = ch->GetXYZ();
 
-	if (!SECTREE_MANAGER::instance().GetMovablePosition(ch->GetMapIndex(), pos.x, pos.y, pos))
+	if (!SECTREE_MANAGER::Instance().GetMovablePosition(ch->GetMapIndex(), pos.x, pos.y, pos))
 	{
 		GPOS pos2;
-		SECTREE_MANAGER::instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos2);
+		SECTREE_MANAGER::Instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos2);
 
 		sys_err("!GetMovablePosition (name %s %dx%d map %d changed to %dx%d)", 
 				ch->GetName(),
@@ -588,12 +586,12 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		pos = pos2;
 	}
 
-	CGuildManager::instance().LoginMember(ch);
+	CGuildManager::Instance().LoginMember(ch);
 
 	// 캐릭터를 맵에 추가 
 	ch->Show(ch->GetMapIndex(), pos.x, pos.y, pos.z);
 
-	SECTREE_MANAGER::instance().SendNPCPosition(ch);
+	SECTREE_MANAGER::Instance().SendNPCPosition(ch);
 
 	d->SetPhase(PHASE_GAME);
 
@@ -601,7 +599,7 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 			ch->GetName(), ch->GetX(), ch->GetY(), ch->GetZ(), d->GetHostName(), ch->GetMapIndex());
 
 	if (ch->GetItemAward_cmd())																		//게임페이즈 들어가면
-		quest::CQuestManager::instance().ItemInformer(ch->GetPlayerID(),ch->GetItemAward_vnum());	//questmanager 호출
+		quest::CQuestManager::Instance().ItemInformer(ch->GetPlayerID(),ch->GetItemAward_vnum());	//questmanager 호출
 
 	if (ch->GetHorseLevel() > 0)
 	{
@@ -621,17 +619,17 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 
 	ch->StartCheckWallhack();
 
-	CPVPManager::instance().Connect(ch);
-	CPVPManager::instance().SendList(d);
+	CPVPManager::Instance().Connect(ch);
+	CPVPManager::Instance().SendList(d);
 
-	MessengerManager::instance().Login(ch->GetName());
+	MessengerManager::Instance().Login(ch->GetName());
 
-	CPartyManager::instance().SetParty(ch);
-	CGuildManager::instance().SendGuildWar(ch);
+	CPartyManager::Instance().SetParty(ch);
+	CGuildManager::Instance().SendGuildWar(ch);
 
-	building::CManager::instance().SendLandList(d, ch->GetMapIndex());
+	building::CManager::Instance().SendLandList(d, ch->GetMapIndex());
 
-	marriage::CManager::instance().Login(ch);
+	marriage::CManager::Instance().Login(ch);
 
 	SPacketGCTime p;
 	p.header = HEADER_GC_TIME;
@@ -666,22 +664,22 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 
 	if (ch->GetMapIndex() >= 10000)
 	{
-		if (CWarMapManager::instance().IsWarMap(ch->GetMapIndex()))
-			ch->SetWarMap(CWarMapManager::instance().Find(ch->GetMapIndex()));
-		else if (marriage::WeddingManager::instance().IsWeddingMap(ch->GetMapIndex()))
-			ch->SetWeddingMap(marriage::WeddingManager::instance().Find(ch->GetMapIndex()));
+		if (CWarMapManager::Instance().IsWarMap(ch->GetMapIndex()))
+			ch->SetWarMap(CWarMapManager::Instance().Find(ch->GetMapIndex()));
+		else if (marriage::WeddingManager::Instance().IsWeddingMap(ch->GetMapIndex()))
+			ch->SetWeddingMap(marriage::WeddingManager::Instance().Find(ch->GetMapIndex()));
 		else {
-			ch->SetDungeon(CDungeonManager::instance().FindByMapIndex(ch->GetMapIndex()));
+			ch->SetDungeon(CDungeonManager::Instance().FindByMapIndex(ch->GetMapIndex()));
 		}
 	}
-	else if (CArenaManager::instance().IsArenaMap(ch->GetMapIndex()) == true)
+	else if (CArenaManager::Instance().IsArenaMap(ch->GetMapIndex()) == true)
 	{
-		int32_t memberFlag = CArenaManager::instance().IsMember(ch->GetMapIndex(), ch->GetPlayerID());
+		int32_t memberFlag = CArenaManager::Instance().IsMember(ch->GetMapIndex(), ch->GetPlayerID());
 		if (memberFlag == MEMBER_OBSERVER)
 		{
 			ch->SetObserverMode(true);
 			ch->SetArenaObserverMode(true);
-			if (CArenaManager::instance().RegisterObserverPtr(ch, ch->GetMapIndex(), ch->GetX()/100, ch->GetY()/100))
+			if (CArenaManager::Instance().RegisterObserverPtr(ch, ch->GetMapIndex(), ch->GetX()/100, ch->GetY()/100))
 			{
 				sys_log(0, "ARENA : Observer add failed");
 			}
@@ -711,7 +709,7 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 			{
 				if (pParty->GetMemberCount() == 2)
 				{
-					CPartyManager::instance().DeleteParty(pParty);
+					CPartyManager::Instance().DeleteParty(pParty);
 				}
 				else
 				{
@@ -734,7 +732,7 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	else if (ch->GetMapIndex() == OXEVENT_MAP_INDEX)
 	{
 		// ox 이벤트 맵
-		if (COXEventManager::instance().Enter(ch) == false)
+		if (COXEventManager::Instance().Enter(ch) == false)
 		{
 			// ox 맵 진입 허가가 나지 않음. 플레이어면 마을로 보내자
 			if (ch->GetGMLevel() == GM_PLAYER)
@@ -743,8 +741,8 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	}
 	else
 	{
-		if (CWarMapManager::instance().IsWarMap(ch->GetMapIndex()) ||
-				marriage::WeddingManager::instance().IsWeddingMap(ch->GetMapIndex()))
+		if (CWarMapManager::Instance().IsWarMap(ch->GetMapIndex()) ||
+				marriage::WeddingManager::Instance().IsWeddingMap(ch->GetMapIndex()))
 		{
 			if (!g_bIsTestServer)
 				ch->WarpSet(EMPIRE_START_X(ch->GetEmpire()), EMPIRE_START_Y(ch->GetEmpire()));
@@ -762,14 +760,14 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		}
 	}
 
-	if (CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()))
-		CBattlegroundManager::instance().OnLogin(ch);
+	if (CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
+		CBattlegroundManager::Instance().OnLogin(ch);
 
 	if (g_bIsTestServer && ch->IsGM())
 		ch->ChatPacket(CHAT_TYPE_BIG_NOTICE, "Test Server Aktif");
 
 	if (ch->GetPoint(POINT_ST) > 150 || ch->GetPoint(POINT_HT) > 150 || ch->GetPoint(POINT_DX) > 150 || ch->GetPoint(POINT_IQ) > 150)
-		LogManager::instance().HackLog("STAT_OVERFLOW", ch);
+		LogManager::Instance().HackLog("STAT_OVERFLOW", ch);
 
 	// Compute Points
 	// ch->ComputePoints();
@@ -831,7 +829,7 @@ int32_t CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiB
 
 	// 땅을 소유하지 않은 길드인 경우.
 	if (!g_bIsTestServer)
-		if (!building::CManager::instance().FindLandByGuild(p->guild_id))
+		if (!building::CManager::Instance().FindLandByGuild(p->guild_id))
 		{
 			d->SetPhase(PHASE_CLOSE);
 			return 0;
@@ -839,8 +837,8 @@ int32_t CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiB
 
 	sys_log(0, "GuildSymbolUpload Do Upload %02X%02X%02X%02X %d", c_pData[7], c_pData[8], c_pData[9], c_pData[10], sizeof(*p));
 
-	CGuildMarkManager::instance().UploadSymbol(p->guild_id, iSymbolSize, (const uint8_t*)(c_pData + sizeof(*p)));
-	CGuildMarkManager::instance().SaveSymbol(GUILD_SYMBOL_FILENAME);
+	CGuildMarkManager::Instance().UploadSymbol(p->guild_id, iSymbolSize, (const uint8_t*)(c_pData + sizeof(*p)));
+	CGuildMarkManager::Instance().SaveSymbol(GUILD_SYMBOL_FILENAME);
 	return iSymbolSize;
 }
 
@@ -850,7 +848,7 @@ void CInputLogin::GuildSymbolCRC(LPDESC d, const char* c_pData)
 
 	sys_log(0, "GuildSymbolCRC %u %u %u", CGPacket.dwGuildID, CGPacket.dwCRC, CGPacket.dwSize);
 
-	const CGuildMarkManager::TGuildSymbol * pkGS = CGuildMarkManager::instance().GetGuildSymbol(CGPacket.dwGuildID);
+	const CGuildMarkManager::TGuildSymbol * pkGS = CGuildMarkManager::Instance().GetGuildSymbol(CGPacket.dwGuildID);
 
 	if (!pkGS)
 		return;
@@ -876,7 +874,7 @@ void CInputLogin::GuildSymbolCRC(LPDESC d, const char* c_pData)
 void CInputLogin::GuildMarkUpload(LPDESC d, const char* c_pData)
 {
 	SPacketCGMarkUpload * p = (SPacketCGMarkUpload *) c_pData;
-	CGuildManager& rkGuildMgr = CGuildManager::instance();
+	CGuildManager& rkGuildMgr = CGuildManager::Instance();
 	CGuild * pkGuild;
 
 	if (!(pkGuild = rkGuildMgr.FindGuild(p->gid)))
@@ -891,7 +889,7 @@ void CInputLogin::GuildMarkUpload(LPDESC d, const char* c_pData)
 		return;
 	}
 
-	CGuildMarkManager & rkMarkMgr = CGuildMarkManager::instance();
+	CGuildMarkManager & rkMarkMgr = CGuildMarkManager::Instance();
 
 	sys_log(0, "MARK_SERVER: GuildMarkUpload: gid %u", p->gid);
 
@@ -909,7 +907,7 @@ void CInputLogin::GuildMarkUpload(LPDESC d, const char* c_pData)
 
 void CInputLogin::GuildMarkIDXList(LPDESC d, const char* c_pData)
 {
-	CGuildMarkManager & rkMarkMgr = CGuildMarkManager::instance();
+	CGuildMarkManager & rkMarkMgr = CGuildMarkManager::Instance();
 	
 	uint32_t bufSize = sizeof(uint16_t) * 2 * rkMarkMgr.GetMarkCount();
 	char * buf = nullptr;
@@ -942,7 +940,7 @@ void CInputLogin::GuildMarkCRCList(LPDESC d, const char* c_pData)
 	SPacketCGMarkCRCList * pCG = (SPacketCGMarkCRCList *) c_pData;
 
 	std::map<uint8_t, const SGuildMarkBlock *> mapDiffBlocks;
-	CGuildMarkManager::instance().GetDiffBlocks(pCG->imgIdx, pCG->crclist, mapDiffBlocks);
+	CGuildMarkManager::Instance().GetDiffBlocks(pCG->imgIdx, pCG->crclist, mapDiffBlocks);
 
 	uint32_t blockCount = 0;
 	TEMP_BUFFER buf(1024 * 1024); // 1M 버퍼

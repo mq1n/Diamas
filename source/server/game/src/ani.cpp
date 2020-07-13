@@ -1,18 +1,8 @@
-/*********************************************************************
- * date        : 2007.11.16
- * file        : ani.cpp
- * author      : mhh
- * description : 
- */
-
-#define _ani_cpp_
-
 #include "stdafx.h"
 #include "char.h"
 #include "item.h"
 #include "ani.h"
 #include "dev_log.h"
-#include "../../common/service.h"
 
 const char* FN_race_name(int32_t race)
 {

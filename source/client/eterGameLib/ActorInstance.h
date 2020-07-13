@@ -66,7 +66,6 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 				virtual void OnChangeShape() = 0;
 		};
 
-	// 2004.07.05.myevan.궁신탄영 맵에 끼이는 문제해결
 	private:
 		static IBackground& GetBackground();
 
@@ -220,7 +219,6 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		CActorInstance();
 		virtual ~CActorInstance();
 
-		// 20041201.myevan.인스턴스베이스용 함수
 		void INSTANCEBASE_Transform();
 		void INSTANCEBASE_Deform();
 

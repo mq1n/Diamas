@@ -158,12 +158,12 @@ public:
     }
 
     row const& operator[](const_iterator::difference_type index) const {
-        BOOST_ASSERT(!expired());
+        ASIO_ASSERT(!expired());
         return values_->at(index);
     }
 
     row const& at(const_iterator::difference_type index) const {
-        BOOST_ASSERT(!expired());
+        ASIO_ASSERT(!expired());
         return values_->at(index);
     }
 
@@ -173,7 +173,7 @@ public:
     }
 
     fields_info_type const& fields_info() const {
-        BOOST_ASSERT(!expired());
+        ASIO_ASSERT(!expired());
         return *fields_info_;
     }
 

@@ -14,8 +14,8 @@ namespace quest
 			return 0;
 		}
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		LPCHARACTER ch2 = CHARACTER_MANAGER::instance().FindPC(lua_tostring(L,1));
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch2 = CHARACTER_MANAGER::Instance().FindPC(lua_tostring(L,1));
 		int32_t nSetPoint = (int32_t)lua_tonumber(L, 2);
 
 		if ( ch == nullptr || ch2 == nullptr )
@@ -36,14 +36,14 @@ namespace quest
 			ch2->HorseSummon(false);
 		}
 
-		if ( CArenaManager::instance().IsMember(ch->GetMapIndex(), ch->GetPlayerID()) != MEMBER_NO || 
-				CArenaManager::instance().IsMember(ch2->GetMapIndex(), ch2->GetPlayerID()) != MEMBER_NO	)
+		if ( CArenaManager::Instance().IsMember(ch->GetMapIndex(), ch->GetPlayerID()) != MEMBER_NO || 
+				CArenaManager::Instance().IsMember(ch2->GetMapIndex(), ch2->GetPlayerID()) != MEMBER_NO	)
 		{
 			lua_pushnumber(L, 2);
 			return 1;
 		}
 
-		if ( CArenaManager::instance().StartDuel(ch, ch2, nSetPoint) == false )
+		if ( CArenaManager::Instance().StartDuel(ch, ch2, nSetPoint) == false )
 		{
 			lua_pushnumber(L, 3);
 			return 1;
@@ -66,7 +66,7 @@ namespace quest
 		int32_t startposBX	= (int32_t)lua_tonumber(L, 4);
 		int32_t startposBY	= (int32_t)lua_tonumber(L, 5);
 
-		if ( CArenaManager::instance().AddArena(mapIdx, startposAX, startposAY, startposBX, startposBY) == false )
+		if ( CArenaManager::Instance().AddArena(mapIdx, startposAX, startposAY, startposBX, startposBY) == false )
 		{
 			sys_log(0, "Failed to load arena map info(map:%d AX:%d AY:%d BX:%d BY:%d", mapIdx, startposAX, startposAY, startposBX, startposBY);
 		}
@@ -80,7 +80,7 @@ namespace quest
 
 	int32_t arena_get_duel_list(lua_State* L)
 	{
-		CArenaManager::instance().GetDuelList(L);
+		CArenaManager::Instance().GetDuelList(L);
 
 		return 1;
 	}
@@ -95,14 +95,14 @@ namespace quest
 		int32_t mapIdx = (int32_t)lua_tonumber(L, 1);
 		int32_t ObPointX = (int32_t)lua_tonumber(L, 2);
 		int32_t ObPointY = (int32_t)lua_tonumber(L, 3);
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch");
 			return 0;
 		}
 
-		CArenaManager::instance().AddObserver(ch, mapIdx, ObPointX, ObPointY);
+		CArenaManager::Instance().AddObserver(ch, mapIdx, ObPointX, ObPointY);
 		return 0;
 	}
 
@@ -128,7 +128,7 @@ namespace quest
 			return 1;
 		}
 
-		if ( CArenaManager::instance().IsMember(ch->GetMapIndex(), ch->GetPlayerID()) == MEMBER_DUELIST )
+		if ( CArenaManager::Instance().IsMember(ch->GetMapIndex(), ch->GetPlayerID()) == MEMBER_DUELIST )
 			lua_pushnumber(L, 1);
 		else
 			lua_pushnumber(L, 0);
@@ -149,7 +149,7 @@ namespace quest
 			{nullptr,	nullptr}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("arena", arena_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("arena", arena_functions);
 	}
 }
 

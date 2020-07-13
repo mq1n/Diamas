@@ -45,7 +45,7 @@ void SECTREE::Destroy()
 						sys_err("Sectree: destroying character: %s is_pc %d", ch->GetName(), ch->IsPC() ? 1 : 0);
 
 						if (ch->GetDesc())
-							DESC_MANAGER::instance().DestroyDesc(ch->GetDesc());
+							DESC_MANAGER::Instance().DestroyDesc(ch->GetDesc());
 						else
 							M2_DESTROY_CHARACTER(ch);
 					}

@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 
-class CBanwordManager : public singleton<CBanwordManager>
+class CBanwordManager : public CSingleton<CBanwordManager>
 {
 	public:
 		CBanwordManager();

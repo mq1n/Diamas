@@ -1,8 +1,6 @@
 #pragma once
-
 #include "GrpScreen.h"
-
-#include "../eterBase/Singleton.h"
+#include "../../common/Singleton.h"
 #include "../eterSphereLib/spherepack.h"
 
 class CGraphicObjectInstance;

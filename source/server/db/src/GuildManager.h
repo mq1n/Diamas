@@ -4,7 +4,7 @@
 #include <utility>
 #include "../../libsql/include/libsql.h"
 #include "../../libthecore/include/poly.h"
-#include "../../common/service.h"
+#include "../../../common/common_incl.hpp"
 
 enum
 {
@@ -156,7 +156,7 @@ class CGuildWarReserve
 	int32_t						m_iLastNoticeMin;
 };
 
-class CGuildManager : public singleton<CGuildManager>
+class CGuildManager : public CSingleton<CGuildManager>
 {
     public:
 	CGuildManager();

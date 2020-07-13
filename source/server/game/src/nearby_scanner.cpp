@@ -25,7 +25,7 @@ EVENTFUNC(scanner_event)
 		return 0;
 	}
 
-	LPCHARACTER pkChr = CHARACTER_MANAGER::instance().Find(info->dwVID);
+	LPCHARACTER pkChr = CHARACTER_MANAGER::Instance().Find(info->dwVID);
 	if (!pkChr) 
 		return 0;
 
@@ -49,12 +49,12 @@ EVENTFUNC(scanner_event)
 						return;
 
 					uint32_t vid = m_ch->GetVID();
-					ScannerInfo * info = CNearbyScanner::instance().GetScannerInfo(vid); //Find the running event
+					ScannerInfo * info = CNearbyScanner::Instance().GetScannerInfo(vid); //Find the running event
 					if (!info)
 						return; //Already finished
 
 					info->found(info->dwVID, ch->GetPlayerID()); //Exec callback
-					CNearbyScanner::instance().EndScanner(vid); //Finish
+					CNearbyScanner::Instance().EndScanner(vid); //Finish
 					return;
 				}
 			}
@@ -73,7 +73,7 @@ void CNearbyScanner::BeginScanner(uint32_t dwVID, void(*found) (uint32_t, uint32
 {
 	sys_log(0, "StartScannerCreation: vid %u", dwVID);
 
-	LPCHARACTER pkChr = CHARACTER_MANAGER::instance().Find(dwVID);
+	LPCHARACTER pkChr = CHARACTER_MANAGER::Instance().Find(dwVID);
 	if (!pkChr)
 	{
 		sys_err("Cannot find character ptr by VID %u", dwVID);

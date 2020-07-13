@@ -17,7 +17,6 @@
 #include "party.h"
 #include "locale_service.h"
 #include "dungeon.h"
-#include "../../common/service.h"
 
 uint32_t g_GoldDropTimeLimitValue = 0;
 uint32_t g_ItemDropTimeLimitValue = 0;
@@ -594,7 +593,7 @@ namespace quest
 			// call script
 			if (!CheckQuestLoaded(pPC))
 			{
-				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
+				LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(pc);
 
 				if (ch)
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
@@ -620,7 +619,7 @@ namespace quest
 			// call script
 			if (!CheckQuestLoaded(pPC))
 			{
-				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
+				LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(pc);
 				if (ch)
 				{
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
@@ -645,7 +644,7 @@ namespace quest
 		{
 			if (!CheckQuestLoaded(pPC))
 			{
-				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
+				LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(pc);
 				if (ch)
 				{
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
@@ -669,7 +668,7 @@ namespace quest
 		{
 			if (!CheckQuestLoaded(pPC))
 			{
-				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
+				LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(pc);
 				if (ch)
 				{
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
@@ -710,7 +709,7 @@ namespace quest
 		{
 			if (!CheckQuestLoaded(pPC))
 			{
-				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
+				LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(pc);
 				if (ch)
 				{
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
@@ -739,7 +738,7 @@ namespace quest
 			if (!CheckQuestLoaded(pPC))
 				return false;
 
-			TargetInfo * pInfo = CTargetManager::instance().GetTargetInfo(pc, TARGET_TYPE_VID, pkChr->GetVID());
+			TargetInfo * pInfo = CTargetManager::Instance().GetTargetInfo(pc, TARGET_TYPE_VID, pkChr->GetVID());
 
 			if (pInfo)
 			{
@@ -761,7 +760,7 @@ namespace quest
 		{
 			if (!CheckQuestLoaded(pPC))
 			{
-				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
+				LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(pc);
 
 				if (ch)
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
@@ -769,7 +768,7 @@ namespace quest
 				return false;
 			}
 
-			TargetInfo * pInfo = CTargetManager::instance().GetTargetInfo(pc, TARGET_TYPE_VID, pkChrTarget->GetVID());
+			TargetInfo * pInfo = CTargetManager::Instance().GetTargetInfo(pc, TARGET_TYPE_VID, pkChrTarget->GetVID());
 			if (g_bIsTestServer)
 			{
 				sys_log(0, "CQuestManager::Click(pid=%d, npc_name=%s) - target_info(%x)", pc, pkChrTarget->GetName(), pInfo);
@@ -931,7 +930,7 @@ namespace quest
 
 	PC * CQuestManager::GetPC(uint32_t pc)
 	{
-		LPCHARACTER pkChr = CHARACTER_MANAGER::instance().FindByPID(pc);
+		LPCHARACTER pkChr = CHARACTER_MANAGER::Instance().FindByPID(pc);
 
 		if (!pkChr)
 			return nullptr;
@@ -1231,47 +1230,47 @@ namespace quest
 
 		if (name == "mob_item")
 		{
-			CHARACTER_MANAGER::instance().SetMobItemRate(value);
+			CHARACTER_MANAGER::Instance().SetMobItemRate(value);
 		}
 		else if (name == "mob_dam")
 		{
-			CHARACTER_MANAGER::instance().SetMobDamageRate(value);
+			CHARACTER_MANAGER::Instance().SetMobDamageRate(value);
 		}
 		else if (name == "mob_gold")
 		{
-			CHARACTER_MANAGER::instance().SetMobGoldAmountRate(value);
+			CHARACTER_MANAGER::Instance().SetMobGoldAmountRate(value);
 		}
 		else if (name == "mob_gold_pct")
 		{
-			CHARACTER_MANAGER::instance().SetMobGoldDropRate(value);
+			CHARACTER_MANAGER::Instance().SetMobGoldDropRate(value);
 		}
 		else if (name == "user_dam")
 		{
-			CHARACTER_MANAGER::instance().SetUserDamageRate(value);
+			CHARACTER_MANAGER::Instance().SetUserDamageRate(value);
 		}
 		else if (name == "user_dam_buyer")
 		{
-			CHARACTER_MANAGER::instance().SetUserDamageRatePremium(value);
+			CHARACTER_MANAGER::Instance().SetUserDamageRatePremium(value);
 		}
 		else if (name == "mob_exp")
 		{
-			CHARACTER_MANAGER::instance().SetMobExpRate(value);
+			CHARACTER_MANAGER::Instance().SetMobExpRate(value);
 		}
 		else if (name == "mob_item_buyer")
 		{
-			CHARACTER_MANAGER::instance().SetMobItemRatePremium(value);
+			CHARACTER_MANAGER::Instance().SetMobItemRatePremium(value);
 		}
 		else if (name == "mob_exp_buyer")
 		{
-			CHARACTER_MANAGER::instance().SetMobExpRatePremium(value);
+			CHARACTER_MANAGER::Instance().SetMobExpRatePremium(value);
 		}
 		else if (name == "mob_gold_buyer")
 		{
-			CHARACTER_MANAGER::instance().SetMobGoldAmountRatePremium(value);
+			CHARACTER_MANAGER::Instance().SetMobGoldAmountRatePremium(value);
 		}
 		else if (name == "mob_gold_pct_buyer")
 		{
-			CHARACTER_MANAGER::instance().SetMobGoldDropRatePremium(value);
+			CHARACTER_MANAGER::Instance().SetMobGoldDropRatePremium(value);
 		}
 
 		else if (name == "gold_drop_limit_time")
@@ -1304,12 +1303,12 @@ namespace quest
 		}
 		else if (name == "newyear_boom")
 		{
-			DESC_MANAGER::instance().BroadcastCommand(std::string("newyear_boom ") + std::to_string(value));
+			DESC_MANAGER::Instance().BroadcastCommand(std::string("newyear_boom ") + std::to_string(value));
 		}
 		else if ( name == "eclipse" )
 		{
 			std::string mode = value == 1 ? "dark" : "light";
-			DESC_MANAGER::instance().BroadcastCommand(std::string("DayMode ") + mode);
+			DESC_MANAGER::Instance().BroadcastCommand(std::string("DayMode ") + mode);
 		}
 		else if (name == "new_xmas_event")
 		{
@@ -1320,7 +1319,7 @@ namespace quest
 				auto map21_santa_exist = false;
 				auto map41_santa_exist = false;
 
-				const auto chars = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(new_santa);
+				const auto chars = CHARACTER_MANAGER::Instance().GetCharactersByRaceNum(new_santa);
 				for (auto ch : chars) {
 					if (ch->GetMapIndex() == 1)
 						map1_santa_exist = true;
@@ -1332,23 +1331,23 @@ namespace quest
 
 				if (map_allow_find(1) && !map1_santa_exist)
 				{
-					auto pkSectreeMap = SECTREE_MANAGER::instance().GetMap(1);
-					CHARACTER_MANAGER::instance().SpawnMob(new_santa, 1, 60800, 61700, 0, false, 90, true);
+					auto pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(1);
+					CHARACTER_MANAGER::Instance().SpawnMob(new_santa, 1, 60800, 61700, 0, false, 90, true);
 				}
 				if (map_allow_find(21) && !map21_santa_exist)
 				{
-					auto pkSectreeMap = SECTREE_MANAGER::instance().GetMap(21);
-					CHARACTER_MANAGER::instance().SpawnMob(new_santa, 21, 59600, 61000, 0, false, 110, true);
+					auto pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(21);
+					CHARACTER_MANAGER::Instance().SpawnMob(new_santa, 21, 59600, 61000, 0, false, 110, true);
 				}
 				if (map_allow_find(41) && !map41_santa_exist)
 				{
-					auto pkSectreeMap = SECTREE_MANAGER::instance().GetMap(41);
-					CHARACTER_MANAGER::instance().SpawnMob(new_santa, 41, 35700, 74300, 0, false, 140, true);
+					auto pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(41);
+					CHARACTER_MANAGER::Instance().SpawnMob(new_santa, 41, 35700, 74300, 0, false, 140, true);
 				}
 			}
 			else
 			{
-				const auto chars = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(new_santa);
+				const auto chars = CHARACTER_MANAGER::Instance().GetCharactersByRaceNum(new_santa);
 				for (auto ch : chars)
 					M2_DESTROY_CHARACTER(ch);
 			}
@@ -1373,14 +1372,14 @@ namespace quest
 		std::vector<std::string> flags = { { "xmas_snow", "xmas_boom", "xmas_tree", "newyear_boom", "halloween_box", "mini_game_okey", "valentine_drop", "e_easter_monsterback", "carnival_event", "mini_game_okey_normal", "e_summer_event" } };
 		for (const auto flag : flags) 
 		{
-			iEventFlagValue = quest::CQuestManager::instance().GetEventFlag(flag);
+			iEventFlagValue = quest::CQuestManager::Instance().GetEventFlag(flag);
 			if (iEventFlagValue) {
 				ch->ChatPacket(CHAT_TYPE_COMMAND, "%s %d", flag.c_str(), iEventFlagValue);
 			}
 		}
 
 
-		if ( (iEventFlagValue = quest::CQuestManager::instance().GetEventFlag("eclipse")) )
+		if ( (iEventFlagValue = quest::CQuestManager::Instance().GetEventFlag("eclipse")) )
 		{
 			ch->ChatPacket(CHAT_TYPE_COMMAND, "DayMode %s", iEventFlagValue == 1 ? "dark" : "light");
 		}
@@ -1425,13 +1424,13 @@ namespace quest
 
 	bool CQuestManager::ExecuteQuestScript(PC& pc, uint32_t quest_index, const int32_t state, const char* code, const int32_t code_size, std::vector<AArgScript*>* pChatScripts, bool bUseCache)
 	{
-		return ExecuteQuestScript(pc, CQuestManager::instance().GetQuestNameByIndex(quest_index), state, code, code_size, pChatScripts, bUseCache);
+		return ExecuteQuestScript(pc, CQuestManager::Instance().GetQuestNameByIndex(quest_index), state, code, code_size, pChatScripts, bUseCache);
 	}
 
 	bool CQuestManager::ExecuteQuestScript(PC& pc, const std::string& quest_name, const int32_t state, const char* code, const int32_t code_size, std::vector<AArgScript*>* pChatScripts, bool bUseCache)
 	{
 		// 실행공간을 생성
-		QuestState qs = CQuestManager::instance().OpenState(quest_name, state);
+		QuestState qs = CQuestManager::Instance().OpenState(quest_name, state);
 		if (pChatScripts)
 			qs.chat_scripts.swap(*pChatScripts);
 
@@ -1479,9 +1478,9 @@ namespace quest
 
 		// 실행
 		QuestState& rqs = *pc.GetRunningQuestState();
-		if (!CQuestManager::instance().RunState(rqs))
+		if (!CQuestManager::Instance().RunState(rqs))
 		{
-			CQuestManager::instance().CloseState(rqs);
+			CQuestManager::Instance().CloseState(rqs);
 			pc.EndRunning();
 			return false;
 		}
@@ -1647,7 +1646,7 @@ namespace quest
 		{
 			if (!CheckQuestLoaded(pPC))
 			{
-				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
+				LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(pc);
 				if (ch)
 				{
 					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));

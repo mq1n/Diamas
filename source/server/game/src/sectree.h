@@ -37,7 +37,7 @@ struct FCollectEntity
 		if (entity->IsType(ENTITY_CHARACTER)) {
 			LPCHARACTER character = (LPCHARACTER)entity;
 			uint32_t vid = character->GetVID();
-			LPCHARACTER found = CHARACTER_MANGAER::instance().Find(vid);
+			LPCHARACTER found = CHARACTER_MANGAER::Instance().Find(vid);
 			if (found == nullptr || vid != found->GetVID()) {
 				sys_err("<Factor> Invalid character %p", get_pointer(character));
 				return;
@@ -45,7 +45,7 @@ struct FCollectEntity
 		} else if (entity->IsType(ENTITY_ITEM)) {
 			LPITEM item = (LPITEM)entity;
 			uint32_t vid = item->GetVID();
-			LPITEM found = ITEM_MANGAER::instance().FindByVID(vid);
+			LPITEM found = ITEM_MANGAER::Instance().FindByVID(vid);
 			if (found == nullptr || vid != found->GetVID()) {
 				sys_err("<Factor> Invalid item %p", get_pointer(item));
 				return;
@@ -53,7 +53,7 @@ struct FCollectEntity
 		} else if (entity->IsType(ENTITY_OBJECT)) {
 			LPOBJECT object = (LPOBJECT)entity;
 			uint32_t vid = object->GetVID();
-			LPOBJECT found = CManager::instance().FindObjectByVID(vid);
+			LPOBJECT found = CManager::Instance().FindObjectByVID(vid);
 			if (found == nullptr || vid != found->GetVID()) {
 				sys_err("<Factor> Invalid object %p", get_pointer(object));
 				return;

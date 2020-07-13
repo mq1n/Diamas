@@ -1,15 +1,8 @@
-/*
-*    Filename: tea.c
-* Description: TEA ¾ÏÈ£È­ ¸ğµâ
-*
-*      Author: ±èÇÑÁÖ (aka. ºñ¿±, Cronan), ¼Û¿µÁø (aka. myevan, ºøÀÚ·ç)
-*/
 #include "StdAfx.h"
 #include "tea.h"
 
 /*
 * TEA Encryption Module Instruction
-*					Edited by ±èÇÑÁÖ aka. ºñ¿±, Cronan
 *
 * void tea_code(const uint32_t sz, const uint32_t sy, const uint32_t *key, uint32_t *dest)
 * void tea_decode(const uint32_t sz, const uint32_t sy, const uint32_t *key, uint32_t *dest)

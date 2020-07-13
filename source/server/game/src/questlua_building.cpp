@@ -23,7 +23,7 @@ namespace quest
 			return 1;
 		}
 
-		CLand * pkLand = CManager::instance().FindLand((int32_t) lua_tonumber(L, 1), (int32_t) lua_tonumber(L, 2), (int32_t) lua_tonumber(L, 3));
+		CLand * pkLand = CManager::Instance().FindLand((int32_t) lua_tonumber(L, 1), (int32_t) lua_tonumber(L, 2), (int32_t) lua_tonumber(L, 3));
 		lua_pushnumber(L, pkLand ? pkLand->GetID() : 0);
 		return 1;
 	}
@@ -38,7 +38,7 @@ namespace quest
 		{
 			using namespace building;
 
-			CLand * pkLand = CManager::instance().FindLand((uint32_t) lua_tonumber(L, 1));
+			CLand * pkLand = CManager::Instance().FindLand((uint32_t) lua_tonumber(L, 1));
 
 			if (pkLand)
 			{
@@ -68,7 +68,7 @@ namespace quest
 
 		using namespace building;
 
-		CLand * pkLand = CManager::instance().FindLand((uint32_t) lua_tonumber(L, 1));
+		CLand * pkLand = CManager::Instance().FindLand((uint32_t) lua_tonumber(L, 1));
 
 		if (pkLand)
 		{
@@ -91,13 +91,13 @@ namespace quest
 		}
 
 		/*
-		if (CManager::instance().FindLandByGuild((uint32_t) lua_tonumber(L, 1)))
+		if (CManager::Instance().FindLandByGuild((uint32_t) lua_tonumber(L, 1)))
 			lua_pushboolean(L, true);
 		else
 			lua_pushboolean(L, false);
 		*/
 
-		std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("SELECT COUNT(*) FROM land WHERE guild_id = %d", (uint32_t)lua_tonumber(L,1)));
+		std::unique_ptr<SQLMsg> pmsg(DBManager::Instance().DirectQuery("SELECT COUNT(*) FROM land WHERE guild_id = %d", (uint32_t)lua_tonumber(L,1)));
 
 		if ( pmsg->Get()->uiNumRows > 0 )
 		{
@@ -134,7 +134,7 @@ namespace quest
 		}
 		uint32_t dwNewBuilding = (uint32_t)lua_tonumber(L, 1);
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 		if (!npc)
@@ -144,7 +144,7 @@ namespace quest
 		if (!pGuild)
 			return 0;
 
-		CLand* pLand = CManager::instance().FindLandByGuild(pGuild->GetID());
+		CLand* pLand = CManager::Instance().FindLandByGuild(pGuild->GetID());
 		if (!pLand)
 			return 0;
 
@@ -169,6 +169,6 @@ namespace quest
 			{ nullptr,		nullptr			}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("building", functions);
+		CQuestManager::Instance().AddLuaFunctionTable("building", functions);
 	}
 };

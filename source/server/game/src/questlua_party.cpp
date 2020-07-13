@@ -10,9 +10,9 @@
 
 #undef sys_err
 #ifndef __WIN32__
-#define sys_err(fmt, args...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
+#define sys_err(fmt, args...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
 #else
-#define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
+#define sys_err(fmt, ...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
 namespace quest
@@ -22,7 +22,7 @@ namespace quest
 	//
 	int32_t party_clear_ready(lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -41,7 +41,7 @@ namespace quest
 
 	int32_t party_get_max_level(lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -94,7 +94,7 @@ namespace quest
 		if (!lua_isstring(L, 1))
 			return 0;
 		
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -116,7 +116,7 @@ namespace quest
 
 	int32_t party_get_min_level(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -133,7 +133,7 @@ namespace quest
 
 	int32_t party_leave_party(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -144,7 +144,7 @@ namespace quest
 		if (pParty)
 		{
 			if (pParty->GetMemberCount() == 2)
-				CPartyManager::instance().DeleteParty(pParty);
+				CPartyManager::Instance().DeleteParty(pParty);
 			else
 				pParty->Quit(ch->GetPlayerID());
 		}
@@ -155,7 +155,7 @@ namespace quest
 
 	int32_t party_delete_party(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -163,7 +163,7 @@ namespace quest
 		}
 
 		if (ch->GetParty() && ch->GetParty()->GetLeaderPID() == ch->GetPlayerID())
-			CPartyManager::instance().DeleteParty(ch->GetParty());
+			CPartyManager::Instance().DeleteParty(ch->GetParty());
 
 		lua_pushboolean(L, ch->GetParty() == nullptr);
 		return 1;
@@ -207,7 +207,7 @@ namespace quest
 		if (!lua_isstring(L, 1))
 			return 0;
 
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -228,7 +228,7 @@ namespace quest
 
 	int32_t party_get_members_count(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -245,7 +245,7 @@ namespace quest
 
 	int32_t party_get_near_count(lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -262,7 +262,7 @@ namespace quest
 
 	int32_t party_syschat(lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -285,7 +285,7 @@ namespace quest
 
 	int32_t party_is_leader(lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -302,7 +302,7 @@ namespace quest
 
 	int32_t party_is_party(lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -315,7 +315,7 @@ namespace quest
 
 	int32_t party_get_leader_pid(lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -331,7 +331,7 @@ namespace quest
 	}
 	int32_t party_chat(lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -354,14 +354,14 @@ namespace quest
 
 	int32_t party_is_map_member_flag_lt(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -391,7 +391,7 @@ namespace quest
 
 	int32_t party_set_flag(lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -408,7 +408,7 @@ namespace quest
 
 	int32_t party_get_flag(lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -425,14 +425,14 @@ namespace quest
 
 	int32_t party_set_quest_flag(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -452,7 +452,7 @@ namespace quest
 			if (!member || !member->IsPC())
 				return;
 
-			auto pPC = CQuestManager::instance().GetPCForce(member->GetPlayerID());
+			auto pPC = CQuestManager::Instance().GetPCForce(member->GetPlayerID());
 			if (pPC)
 				pPC->SetFlag(flagname, value);
 		};
@@ -467,7 +467,7 @@ namespace quest
 
 	int32_t party_is_in_dungeon (lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -486,7 +486,7 @@ namespace quest
 
 	int32_t party_give_buff(lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -538,7 +538,7 @@ namespace quest
 
 	int32_t party_get_member_pids(lua_State *L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -575,7 +575,7 @@ namespace quest
 
 	int32_t party_get_member_vids(lua_State* L)
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -609,7 +609,7 @@ namespace quest
 		} 
 		else
 		{
-			ch = CQuestManager::instance().GetCurrentCharacterPtr();
+			ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		}
 
 		if (!ch)
@@ -621,7 +621,7 @@ namespace quest
 
 		if (pParty->GetMemberCount() == 2 || pParty->GetLeaderPID() == ch->GetPlayerID())
 		{
-			CPartyManager::instance().DeleteParty(pParty);
+			CPartyManager::Instance().DeleteParty(pParty);
 		}
 		else 
 		{
@@ -663,7 +663,7 @@ namespace quest
 			{ nullptr,				nullptr				}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("party", party_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("party", party_functions);
 	}
 }
 

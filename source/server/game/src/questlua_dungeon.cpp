@@ -14,7 +14,6 @@
 #include "utils.h"
 #include "config.h"
 #include "guild_manager.h"
-#include "../../common/stl.h"
 #include "db.h"
 #include "affect.h"
 #include "p2p.h"
@@ -23,9 +22,9 @@
 
 #undef sys_err
 #ifndef __WIN32__
-#define sys_err(fmt, args...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
+#define sys_err(fmt, args...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
 #else
-#define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
+#define sys_err(fmt, ...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
 template <class Func> Func CDungeon::ForEachMember(Func f)
@@ -52,7 +51,7 @@ namespace quest
 		if (!lua_isstring(L, 1))
 			return 0;
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -62,7 +61,7 @@ namespace quest
 
 	int32_t dungeon_set_quest_flag(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -75,7 +74,7 @@ namespace quest
 		auto flagname = pPC->GetCurrentQuestName() + "." + lua_tostring(L, 1);
 		auto value = static_cast<int32_t>(rint(lua_tonumber(L, 2)));
 
-		auto pDungeon = CQuestManager::instance().GetCurrentDungeon();
+		auto pDungeon = CQuestManager::Instance().GetCurrentDungeon();
 		if (pDungeon)
 		{
 			pDungeon->ForEachMember([&](CHARACTER* ch) 
@@ -83,7 +82,7 @@ namespace quest
 				if (!ch || !ch->IsPC())
 					return;
 
-				auto pPC2 = CQuestManager::instance().GetPCForce(ch->GetPlayerID());
+				auto pPC2 = CQuestManager::Instance().GetPCForce(ch->GetPlayerID());
 				if (pPC2)
 					pPC2->SetFlag(flagname, value);
 			});
@@ -101,7 +100,7 @@ namespace quest
 		const char* sz = lua_tostring(L, 1);
 		int32_t value = int32_t(lua_tonumber(L, 2));
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 		if (!pDungeon) 
 		{
@@ -123,7 +122,7 @@ namespace quest
 		}
 		const char* sz = lua_tostring(L, 1);
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (!pDungeon)
@@ -154,7 +153,7 @@ namespace quest
 			return 1;
 		}
 
-		LPDUNGEON pDungeon = CDungeonManager::instance().FindByMapIndex(dwMapIndex);
+		LPDUNGEON pDungeon = CDungeonManager::Instance().FindByMapIndex(dwMapIndex);
 		if (!pDungeon)
 		{
 			sys_err("no dungeon !!!");
@@ -169,7 +168,7 @@ namespace quest
 
 	int32_t dungeon_get_map_index(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -194,7 +193,7 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -210,7 +209,7 @@ namespace quest
 			sys_err("wrong filename");
 			return 0;
 		}
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -220,7 +219,7 @@ namespace quest
 
 	int32_t dungeon_clear_regen(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 		if (pDungeon)
 			pDungeon->ClearRegen();
@@ -229,7 +228,7 @@ namespace quest
 
 	int32_t dungeon_check_eliminated(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 		if (pDungeon)
 			pDungeon->CheckEliminated();
@@ -244,7 +243,7 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -284,7 +283,7 @@ namespace quest
 		if (lua_gettop(L) >= 5)
 			c_pszRegenFile = lua_tostring(L,5);
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 		if (!pDungeon)
 		{
@@ -315,14 +314,14 @@ namespace quest
 		}
 		int32_t lMapIndex = static_cast<int32_t>(lua_tonumber(L, 1));
 
-		LPDUNGEON pDungeon = CDungeonManager::instance().Create(lMapIndex);
+		LPDUNGEON pDungeon = CDungeonManager::Instance().Create(lMapIndex);
 		if (!pDungeon) 
 		{
 			sys_err("cannot create dungeon %d", lMapIndex);
 			return 0;
 		}
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
@@ -342,14 +341,14 @@ namespace quest
 		}
 		auto lMapIndex = static_cast<int32_t>(lua_tonumber(L, 1));
 
-		auto pDungeon = CDungeonManager::instance().Create(lMapIndex);
+		auto pDungeon = CDungeonManager::Instance().Create(lMapIndex);
 		if (!pDungeon) 
 		{
 			sys_err("cannot create dungeon %d", lMapIndex);
 			return 0;
 		}
 
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
@@ -370,14 +369,14 @@ namespace quest
 		}
 		int32_t lMapIndex = static_cast<int32_t>(lua_tonumber(L, 1));
 
-		LPDUNGEON pDungeon = CDungeonManager::instance().Create(lMapIndex);
+		LPDUNGEON pDungeon = CDungeonManager::Instance().Create(lMapIndex);
 		if (!pDungeon) 
 		{
 			sys_err("cannot create dungeon %d", lMapIndex);
 			return 0;
 		}
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
@@ -400,7 +399,7 @@ namespace quest
 		if (lua_gettop(L)<2 || !lua_isnumber(L, 1) || !lua_isnumber(L,2))
 			return 0;
 
-		LPDUNGEON pDungeon = CQuestManager::instance().GetCurrentDungeon();
+		LPDUNGEON pDungeon = CQuestManager::Instance().GetCurrentDungeon();
 		if (!pDungeon)
 			return 0;
 
@@ -413,7 +412,7 @@ namespace quest
 		if (lua_gettop(L)<2 || !lua_isnumber(L, 1) || !lua_isnumber(L,2))
 			return 0;
 
-		LPDUNGEON pDungeon = CQuestManager::instance().GetCurrentDungeon();
+		LPDUNGEON pDungeon = CQuestManager::Instance().GetCurrentDungeon();
 		if (!pDungeon)
 			return 0;
 
@@ -430,7 +429,7 @@ namespace quest
 		}
 
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -451,7 +450,7 @@ namespace quest
 			return 1;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -472,7 +471,7 @@ namespace quest
 			return 1;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -493,7 +492,7 @@ namespace quest
 			return 1;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -511,12 +510,12 @@ namespace quest
 		if (!lua_isnumber(L,1) || !lua_isnumber(L,2))
 			return 0;
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 			return 0;
 
 		LPPARTY pParty = ch->GetParty();
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon && pParty)
@@ -530,7 +529,7 @@ namespace quest
 		if (!lua_isstring(L,1) || !lua_isnumber(L,2))
 			return 0;
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -544,7 +543,7 @@ namespace quest
 		if (!lua_isstring(L,1) || !lua_isnumber(L,2))
 			return 0;
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -558,7 +557,7 @@ namespace quest
 		if (!lua_isstring(L,1) || !lua_isnumber(L,2))
 			return 0;
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -575,7 +574,7 @@ namespace quest
 			return 1;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -596,7 +595,7 @@ namespace quest
 			return 1;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon) 
@@ -616,7 +615,7 @@ namespace quest
 
 		sys_log(0, "QUEST_DUNGEON_PURGE_UNIQUE %s", lua_tostring(L, 1));
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -667,7 +666,7 @@ namespace quest
 		auto x2 = static_cast<int32_t>(lua_tonumber(L, 3));
 		auto y2 = static_cast<int32_t>(lua_tonumber(L, 4));
 
-		auto& q = CQuestManager::instance();
+		auto& q = CQuestManager::Instance();
 		auto pDungeon = q.GetCurrentDungeon();
 		if (!pDungeon)
 			return 0;
@@ -679,10 +678,10 @@ namespace quest
 			return 0;
 		}
 
-		LPSECTREE_MAP pSectree = SECTREE_MANAGER::instance().GetMap(mapIndex);
+		LPSECTREE_MAP pSectree = SECTREE_MANAGER::Instance().GetMap(mapIndex);
 		if (pSectree) 
 		{
-			FPurgeArea func(x1, y1, x2, y2, CQuestManager::instance().GetCurrentNPCCharacterPtr());
+			FPurgeArea func(x1, y1, x2, y2, CQuestManager::Instance().GetCurrentNPCCharacterPtr());
 			pSectree->for_each(func);
 		}
 
@@ -694,7 +693,7 @@ namespace quest
 		if (!lua_isstring(L,1))
 			return 0;
 
-		auto pChar = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto pChar = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!pChar)
 		{
 			sys_err("Attempt to kill unique monster without char!? Cowardly refusing..");
@@ -703,7 +702,7 @@ namespace quest
 
 		sys_log(0,"QUEST_DUNGEON_KILL_UNIQUE %s", lua_tostring(L,1));
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -718,7 +717,7 @@ namespace quest
 			return 0;
 		sys_log(0,"QUEST_DUNGEON_SPAWN_STONE_DOOR %s %s", lua_tostring(L,1), lua_tostring(L,2));
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -733,7 +732,7 @@ namespace quest
 			return 0;
 		sys_log(0,"QUEST_DUNGEON_SPAWN_WOODEN_DOOR %s %s", lua_tostring(L,1), lua_tostring(L,2));
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -749,7 +748,7 @@ namespace quest
 
 		sys_log(0, "QUEST_DUNGEON_SPAWN_MOVE_GROUP %d %s %s", static_cast<int32_t>(lua_tonumber(L, 1)), lua_tostring(L, 2), lua_tostring(L, 3));
 
-		auto& q = CQuestManager::instance();
+		auto& q = CQuestManager::Instance();
 		auto pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -764,7 +763,7 @@ namespace quest
 			return 0;
 		sys_log(0, "QUEST_DUNGEON_SPAWN_MOVE_UNIQUE %s %d %s %s", lua_tostring(L, 1), static_cast<int32_t>(lua_tonumber(L, 2)), lua_tostring(L, 3), lua_tostring(L, 4));
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -779,7 +778,7 @@ namespace quest
 			return 0;
 		sys_log(0, "QUEST_DUNGEON_SPAWN_UNIQUE %s %d %s", lua_tostring(L, 1), static_cast<int32_t>(lua_tonumber(L, 2)), lua_tostring(L, 3));
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -795,7 +794,7 @@ namespace quest
 
 		sys_log(0, "QUEST_DUNGEON_SPAWN %d %s", static_cast<int32_t>(lua_tonumber(L, 1)), lua_tostring(L, 2));
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -811,7 +810,7 @@ namespace quest
 
 		uint32_t vid = static_cast<uint32_t>(lua_tonumber(L, 2));
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -828,7 +827,7 @@ namespace quest
 			return 1;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -849,7 +848,7 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		uint32_t vid = 0;
@@ -915,7 +914,7 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		uint32_t vid = 0;
@@ -943,7 +942,7 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		uint32_t vid = 0;
@@ -973,7 +972,7 @@ namespace quest
 		auto lToX = static_cast<int32_t>(lua_tonumber(L, 3));
 		auto lToY = static_cast<int32_t>(lua_tonumber(L, 4));
 
-		auto& q = CQuestManager::instance();
+		auto& q = CQuestManager::Instance();
 		auto pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -987,7 +986,7 @@ namespace quest
 		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2) || !lua_isnumber(L, 3) || !lua_isstring(L, 4))
 			return 0;
 
-		auto& q = CQuestManager::instance();
+		auto& q = CQuestManager::Instance();
 		auto pDungeon = q.GetCurrentDungeon();
 		if (pDungeon)
 		{
@@ -1013,7 +1012,7 @@ namespace quest
 
 		uint32_t vid = 0;
 
-		auto& q = CQuestManager::instance();
+		auto& q = CQuestManager::Instance();
 		auto pDungeon = q.GetCurrentDungeon();
 		if (pDungeon)
 		{
@@ -1039,11 +1038,11 @@ namespace quest
 			return 0;
 
 		auto lMapIndex = static_cast<int32_t>(lua_tonumber(L, 1));
-		auto pDungeon = CDungeonManager::instance().Create(lMapIndex);
+		auto pDungeon = CDungeonManager::Instance().Create(lMapIndex);
 		if (!pDungeon)
 			return 0;
 
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 			return 0;
 
@@ -1057,7 +1056,7 @@ namespace quest
 
 	int32_t dungeon_exit(lua_State* L) // 던전에 들어오기 전 위치로 보냄
 	{
-		auto ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (ch)
 			ch->ExitToSavedLocation();
 		return 0;
@@ -1065,7 +1064,7 @@ namespace quest
 
 	int32_t dungeon_exit_all(lua_State* L) // 던전에 있는 모든 사람을 던전에 들어오기 전 위치로 보냄
 	{
-		auto& q = CQuestManager::instance();
+		auto& q = CQuestManager::Instance();
 		auto pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -1129,7 +1128,7 @@ namespace quest
 		}
 		std::string group_name(lua_tostring(L, 1));
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		CDungeon * pDungeon = q.GetCurrentDungeon();
 
 		if(!pDungeon)
@@ -1138,7 +1137,7 @@ namespace quest
 			return 0;
 		}
 
-		SECTREE_MAP * pMap = SECTREE_MANAGER::instance().GetMap(pDungeon->GetMapIndex());
+		SECTREE_MAP * pMap = SECTREE_MANAGER::Instance().GetMap(pDungeon->GetMapIndex());
 
 		if (!pMap)
 		{
@@ -1173,7 +1172,7 @@ namespace quest
 		}
 		std::string group_name(lua_tostring(L, 1));
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		CDungeon * pDungeon = q.GetCurrentDungeon();
 
 		if(!pDungeon)
@@ -1182,7 +1181,7 @@ namespace quest
 			return 0;
 		}
 
-		SECTREE_MAP * pMap = SECTREE_MANAGER::instance().GetMap(pDungeon->GetMapIndex());
+		SECTREE_MAP * pMap = SECTREE_MANAGER::Instance().GetMap(pDungeon->GetMapIndex());
 
 		if (!pMap)
 		{
@@ -1219,7 +1218,7 @@ namespace quest
 		}
 		std::string group_name(lua_tostring(L, 1));
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		CDungeon * pDungeon = q.GetCurrentDungeon();
 
 		if(!pDungeon)
@@ -1228,7 +1227,7 @@ namespace quest
 			return 0;
 		}
 
-		SECTREE_MAP * pMap = SECTREE_MANAGER::instance().GetMap(pDungeon->GetMapIndex());
+		SECTREE_MAP * pMap = SECTREE_MANAGER::Instance().GetMap(pDungeon->GetMapIndex());
 
 		if (!pMap)
 		{
@@ -1260,7 +1259,7 @@ namespace quest
 
 	int32_t dungeon_kill_all(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -1271,7 +1270,7 @@ namespace quest
 
 	int32_t dungeon_purge(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -1282,7 +1281,7 @@ namespace quest
 
 	int32_t dungeon_exit_all_to_start_position(lua_State * L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -1293,7 +1292,7 @@ namespace quest
 
 	int32_t dungeon_count_monster(lua_State * L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		if (!pDungeon)
@@ -1312,22 +1311,22 @@ namespace quest
 		uint32_t dwMapIndex = static_cast<uint32_t>(lua_tonumber(L, 1));
 		if (!dwMapIndex)
 		{
-			CQuestManager::instance().SelectDungeon(nullptr);
+			CQuestManager::Instance().SelectDungeon(nullptr);
 
 			lua_pushboolean(L, false);
 			return 1;
 		}
 
-		LPDUNGEON pDungeon = CDungeonManager::instance().FindByMapIndex(dwMapIndex);
+		LPDUNGEON pDungeon = CDungeonManager::Instance().FindByMapIndex(dwMapIndex);
 		if (!pDungeon)
 		{
-			CQuestManager::instance().SelectDungeon(nullptr);
+			CQuestManager::Instance().SelectDungeon(nullptr);
 
 			lua_pushboolean(L, false);
 			return 1;
 		}
 
-		CQuestManager::instance().SelectDungeon(pDungeon);
+		CQuestManager::Instance().SelectDungeon(pDungeon);
 
 		lua_pushboolean(L, true);
 		return 1;
@@ -1338,7 +1337,7 @@ namespace quest
 		uint32_t dwMapIndex = static_cast<uint32_t>(lua_tonumber(L, 1));
 		if (dwMapIndex) 
 		{
-			LPDUNGEON pDungeon = CDungeonManager::instance().FindByMapIndex(dwMapIndex);
+			LPDUNGEON pDungeon = CDungeonManager::Instance().FindByMapIndex(dwMapIndex);
 			if (pDungeon)
 				lua_pushboolean(L, true);
 			else
@@ -1354,7 +1353,7 @@ namespace quest
 		if (lua_gettop(L) < 2 || !lua_isnumber(L, 1) || !lua_isnumber(L, 2))
 			return 0;
 
-		LPDUNGEON pDungeon = CQuestManager::instance().GetCurrentDungeon();
+		LPDUNGEON pDungeon = CQuestManager::Instance().GetCurrentDungeon();
 		if (pDungeon) 
 		{
 			lua_pushboolean(L, pDungeon->IsAllPCNearTo(static_cast<int32_t>(lua_tonumber(L, 1)), static_cast<int32_t>(lua_tonumber(L, 2)), 30));
@@ -1367,7 +1366,7 @@ namespace quest
 
 	int32_t dungeon_set_warp_location (lua_State* L)
 	{
-		LPDUNGEON pDungeon = CQuestManager::instance().GetCurrentDungeon();
+		LPDUNGEON pDungeon = CQuestManager::Instance().GetCurrentDungeon();
 		if (!pDungeon)
 			return 0;
 
@@ -1408,7 +1407,7 @@ namespace quest
 			);
 		}
 
-		LPDUNGEON pDungeon = CQuestManager::instance().GetCurrentDungeon();
+		LPDUNGEON pDungeon = CQuestManager::Instance().GetCurrentDungeon();
 		if (!pDungeon) 
 			return 0;
 
@@ -1426,7 +1425,7 @@ namespace quest
 		auto flagname = std::string(lua_tostring(L, 1)) + "." + lua_tostring(L, 2);
 		auto value = static_cast<int32_t>(rint(lua_tonumber(L, 3)));
 
-		auto& q = CQuestManager::instance();
+		auto& q = CQuestManager::Instance();
 		auto pDungeon = q.GetCurrentDungeon();
 
 		if (pDungeon)
@@ -1436,7 +1435,7 @@ namespace quest
 				if (!ch || !ch->IsPC())
 					return;
 
-				auto pPC = CQuestManager::instance().GetPCForce(ch->GetPlayerID());
+				auto pPC = CQuestManager::Instance().GetPCForce(ch->GetPlayerID());
 				if (pPC)
 					pPC->SetFlag(flagname, value);
 			});
@@ -1460,7 +1459,7 @@ namespace quest
 
 		int32_t lMapIndex = (int32_t)lua_tonumber(L, 1);
 
-		LPDUNGEON pDungeon = CDungeonManager::instance().Create(lMapIndex);
+		LPDUNGEON pDungeon = CDungeonManager::Instance().Create(lMapIndex);
 
 		if (!pDungeon)
 		{
@@ -1480,14 +1479,14 @@ namespace quest
 		}
 		int32_t lMapIndex = (int32_t)lua_tonumber(L, 1);
 
-		LPDUNGEON pDungeon = CDungeonManager::instance().Create(lMapIndex);
+		LPDUNGEON pDungeon = CDungeonManager::Instance().Create(lMapIndex);
 		if (!pDungeon)
 		{
 			sys_err("cannot create dungeon %d", lMapIndex);
 			return 0;
 		}
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch || !ch->GetGuild())
 		{
 			sys_err("cannot go to dungeon alone.");
@@ -1501,7 +1500,7 @@ namespace quest
 
 	int32_t dungeon_is_available(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 
 		lua_pushboolean(L, pDungeon != nullptr);
@@ -1581,6 +1580,6 @@ namespace quest
 			{ nullptr,				nullptr			}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("d", dungeon_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("d", dungeon_functions);
 	}
 }

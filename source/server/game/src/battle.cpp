@@ -22,7 +22,6 @@
 #include "ani.h"
 #include "locale_service.h"
 #include "affect_flag.h"
-#include "../../common/service.h"
 #include "quest_manager.h"
 #include "db.h"
 #include "log.h"
@@ -163,13 +162,13 @@ bool battle_is_attackable(LPCHARACTER ch, LPCHARACTER victim)
 		}
 	}
 
-	if (CArenaManager::instance().CanAttack(ch, victim) == true)
+	if (CArenaManager::Instance().CanAttack(ch, victim) == true)
 		return true;
 
-	if (CBattlegroundManager::instance().IsEventMap(ch->GetMapIndex()) && ch->IsMonster())
+	if (CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()) && ch->IsMonster())
 		return true;
 
-	return CPVPManager::instance().CanAttack(ch, victim);
+	return CPVPManager::Instance().CanAttack(ch, victim);
 }
 
 int32_t battle_melee_attack(LPCHARACTER ch, LPCHARACTER victim)
@@ -317,7 +316,7 @@ int32_t CalcAttBonus(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, int32_t iAtk)
 
 	if (pkAttacker->IsNPC() && pkVictim->IsPC())
 	{
-		iAtk = (iAtk * CHARACTER_MANAGER::instance().GetMobDamageRate(pkAttacker)) / 100;
+		iAtk = (iAtk * CHARACTER_MANAGER::Instance().GetMobDamageRate(pkAttacker)) / 100;
 	}
 
 	if (pkVictim->IsNPC())
@@ -496,7 +495,7 @@ int32_t CalcMeleeDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, bool bIgno
 		// END_OF_MONKEY_ROD_ATTACK_BUG_FIX
 
 		uint32_t dwMobVnum = pkAttacker->GetPolymorphVnum();
-		const CMob * pMob = CMobManager::instance().Get(dwMobVnum);
+		const CMob * pMob = CMobManager::Instance().Get(dwMobVnum);
 
 		if (pMob)
 		{
@@ -534,7 +533,6 @@ int32_t CalcMeleeDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, bool bIgno
 	{
 		iAtk += pWeapon->GetValue(5) * 2;
 
-		// 2004.11.12.myevan.TESTSERVER_SHOW_ATTACKINFO
 		DEBUG_iDamBonus = pWeapon->GetValue(5) * 2;
 		///////////////////////////////////////////////
 	}

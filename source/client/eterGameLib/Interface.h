@@ -1,6 +1,5 @@
 #pragma once
 
-// 2004.07.05.myevan.±Ã½ÅÅº¿µ ¸Ê¿¡ ³¢ÀÌ´Â ¹®Á¦ÇØ°á
 class IBackground : public CSingleton<IBackground>
 {
 	public:

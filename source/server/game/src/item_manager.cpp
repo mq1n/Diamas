@@ -19,9 +19,6 @@
 #include "item_manager.h"
 #include "dragon_soul.h"
 #include "cube.h"
-
-#include "../../common/service.h"
-#include "../../common/VnumHelper.h"
 #include "../../libgame/include/grid.h"
 
 ITEM_MANAGER::ITEM_MANAGER()
@@ -87,7 +84,7 @@ bool ITEM_MANAGER::Initialize(TItemTable * table, int32_t size)
 			|| (m_vec_prototype[i].bType == ITEM_COSTUME && m_vec_prototype[i].bSubType == COSTUME_MOUNT)
 #endif
 		)
-			quest::CQuestManager::instance().RegisterNPCVnum(m_vec_prototype[i].dwVnum);
+			quest::CQuestManager::Instance().RegisterNPCVnum(m_vec_prototype[i].dwVnum);
 
 		m_map_vid.insert( std::map<uint32_t,TItemTable>::value_type( m_vec_prototype[i].dwVnum, m_vec_prototype[i] ) ); 
 		if ( g_bIsTestServer )
@@ -345,7 +342,7 @@ LPITEM ITEM_MANAGER::CreateItem(uint32_t vnum, uint32_t count, uint32_t id, bool
 			{
 				dwSkillVnum = number(112, 119);
 
-				if (nullptr != CSkillManager::instance().Get(dwSkillVnum))
+				if (nullptr != CSkillManager::Instance().Get(dwSkillVnum))
 					break;
 			} while (true);
 
@@ -385,7 +382,7 @@ LPITEM ITEM_MANAGER::CreateItem(uint32_t vnum, uint32_t count, uint32_t id, bool
 	// 새로 생성되는 용혼석 처리.
 	if (item->IsDragonSoul() && 0 == id)
 	{
-		DSManager::instance().DragonSoulItemInitialize(item);
+		DSManager::Instance().DragonSoulItemInitialize(item);
 	}
 	return item;
 }
@@ -494,7 +491,7 @@ void ITEM_MANAGER::RemoveItem(LPITEM item, const char * c_pszReason)
 	{
 		char szHint[64];
 		snprintf(szHint, sizeof(szHint), "%s %u ", item->GetName(), item->GetCount());
-		LogManager::instance().ItemLog(o, item, c_pszReason ? c_pszReason : "REMOVE", szHint);
+		LogManager::Instance().ItemLog(o, item, c_pszReason ? c_pszReason : "REMOVE", szHint);
 
 		// SAFEBOX_TIME_LIMIT_ITEM_BUG_FIX
 		if (item->GetWindow() == MALL || item->GetWindow() == SAFEBOX)
@@ -531,7 +528,7 @@ void ITEM_MANAGER::DestroyItem(LPITEM item, const char* file, size_t line)
 
 	if (item->GetOwner())
 	{
-		if (CHARACTER_MANAGER::instance().Find(item->GetOwner()->GetPlayerID()) != nullptr)
+		if (CHARACTER_MANAGER::Instance().Find(item->GetOwner()->GetPlayerID()) != nullptr)
 		{
 			sys_err("DestroyItem (%u): GetOwner %s %s!!", item->GetID(), item->GetName(), item->GetOwner()->GetName());
 			item->RemoveFromCharacter();
@@ -710,7 +707,7 @@ int32_t GetDropPerKillPct(int32_t iMinimum, int32_t iDefault, int32_t iDeltaPerc
 {
 	int32_t iVal = 0;
 
-	if ((iVal = quest::CQuestManager::instance().GetEventFlag(c_pszFlag)))
+	if ((iVal = quest::CQuestManager::Instance().GetEventFlag(c_pszFlag)))
 	{
 		if (!g_bIsTestServer)
 		{
@@ -751,7 +748,7 @@ bool ITEM_MANAGER::GetDropPct(LPCHARACTER pkChr, LPCHARACTER pkKiller, OUT int32
 		iDeltaPercent += 500;
 
 	sys_log(3, "CreateDropItem for level: %d rank: %u pct: %d", iLevel, bRank, iDeltaPercent);
-	iDeltaPercent = iDeltaPercent * CHARACTER_MANAGER::instance().GetMobItemRate(pkKiller) / 100;
+	iDeltaPercent = iDeltaPercent * CHARACTER_MANAGER::Instance().GetMobItemRate(pkKiller) / 100;
 
 	// ADD_APPLY
 	if (pkKiller->GetPoint(POINT_ITEM_DROP_BONUS) > 0)
@@ -773,7 +770,7 @@ bool ITEM_MANAGER::GetDropPct(LPCHARACTER pkChr, LPCHARACTER pkKiller, OUT int32
 	iRandRange = 4000000;
 	iRandRange = iRandRange * 100 / 
 		(100 + 
-		 CPrivManager::instance().GetPriv(pkKiller, PRIV_ITEM_DROP) + 
+		 CPrivManager::Instance().GetPriv(pkKiller, PRIV_ITEM_DROP) + 
 		 (pkKiller->IsEquipUniqueItem(UNIQUE_ITEM_DOUBLE_ITEM)?100:0));
 
 	return true;
@@ -869,7 +866,7 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 			CMobItemGroup* pGroup = it2->second;
 
 			// MOB_DROP_ITEM_BUG_FIX
-			// 20050805.myevan.MobDropItem 에 아이템이 없을 경우 CMobItemGroup::GetOne() 접근시 문제 발생 수정
+			// 에 아이템이 없을 경우 CMobItemGroup::GetOne() 접근시 문제 발생 수정
 			if (pGroup && !pGroup->IsEmpty())
 			{
 				int32_t iPercent = 40000 * iDeltaPercent / pGroup->GetKillPerDrop();
@@ -989,7 +986,7 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 	for (auto it2 = vec_item.begin(); it2 != vec_item.end(); ++it2)
 	{
 		LPITEM item2 = *it2;
-		LogManager::instance().MoneyLog(MONEY_LOG_DROP, item2->GetVnum(), item2->GetCount());
+		LogManager::Instance().MoneyLog(MONEY_LOG_DROP, item2->GetVnum(), item2->GetCount());
 	}
 
 	return vec_item.size();
@@ -1405,7 +1402,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	__DropEvent_RefineBox_DropItem(*pkKiller, *pkChr, *this, vec_item);
 
 	// corap drop
-	if (quest::CQuestManager::instance().GetEventFlag("xmas_sock"))
+	if (quest::CQuestManager::Instance().GetEventFlag("xmas_sock"))
 	{
 		const uint32_t SOCK_ITEM_VNUM = 50010;
 
@@ -1433,7 +1430,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	}
 
 	// ay isigi define sandigi
-	if (quest::CQuestManager::instance().GetEventFlag("drop_moon"))
+	if (quest::CQuestManager::Instance().GetEventFlag("drop_moon"))
 	{
 		const uint32_t ITEM_VNUM = 50011;
 
@@ -1462,7 +1459,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	// oyma tas
 	if (pkKiller->GetLevel() >= 15 && abs(pkKiller->GetLevel() - pkChr->GetLevel()) <= 5)
 	{
-		int32_t pct = quest::CQuestManager::instance().GetEventFlag("hc_drop");
+		int32_t pct = quest::CQuestManager::Instance().GetEventFlag("hc_drop");
 
 		if (pct > 0)
 		{
@@ -1663,7 +1660,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	}
 
 	// 무신의 축복서용 만년한철 drop
-	if (pkKiller->GetLevel() >= 15 && quest::CQuestManager::instance().GetEventFlag("mars_drop"))
+	if (pkKiller->GetLevel() >= 15 && quest::CQuestManager::Instance().GetEventFlag("mars_drop"))
 	{
 		const uint32_t ITEM_HANIRON = 70035;
 		int32_t iDropMultiply[MOB_RANK_MAX_NUM] =

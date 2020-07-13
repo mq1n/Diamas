@@ -66,6 +66,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_definitions(-DJM_XORSTR_DISABLE_AVX_INTRINSICS) # xorstr
 add_definitions(-DCRYPTOPP_ENABLE_NAMESPACE_WEAK=1) # cryptopp
 add_definitions(-DASIO_STANDALONE) # websocketpp
+add_definitions(-DUSE_BOOST_ASIO=0) # amy
 
 # Platform defination
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)

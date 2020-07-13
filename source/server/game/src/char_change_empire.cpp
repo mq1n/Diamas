@@ -1,4 +1,3 @@
-
 #include "stdafx.h"
 #include "config.h"
 #include "char.h"
@@ -7,7 +6,6 @@
 #include "guild_manager.h"
 #include "marriage.h"
 #include "desc.h"
-#include "../../common/service.h"
 
 /*
    Return Value
@@ -33,7 +31,7 @@ int32_t CHARACTER::ChangeEmpire(uint8_t empire)
 		snprintf(szQuery, sizeof(szQuery),
 				"SELECT id, pid1, pid2, pid3, pid4, pid5 FROM player_index WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
 				GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
-		std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> msg(DBManager::Instance().DirectQuery(szQuery));
 
 		if (msg->Get()->uiNumRows == 0)
 		{
@@ -62,7 +60,7 @@ int32_t CHARACTER::ChangeEmpire(uint8_t empire)
 		{
 			snprintf(szQuery, sizeof(szQuery), "SELECT guild_id FROM guild_member WHERE pid=%u", dwPID[i]);
 
-			pMsg = DBManager::instance().DirectQuery(szQuery);
+			pMsg = DBManager::Instance().DirectQuery(szQuery);
 
 			if (pMsg != nullptr)
 			{
@@ -72,7 +70,7 @@ int32_t CHARACTER::ChangeEmpire(uint8_t empire)
 
 					str_to_number(dwGuildID[i], row[0]);
 
-					pGuild[i] = CGuildManager::instance().FindGuild(dwGuildID[i]);
+					pGuild[i] = CGuildManager::Instance().FindGuild(dwGuildID[i]);
 
 					if (pGuild[i] != nullptr)
 					{
@@ -96,7 +94,7 @@ int32_t CHARACTER::ChangeEmpire(uint8_t empire)
 		//   한 캐릭터라도 결혼 상태라면 제국 이동을 할 수 없다.
 		for (int32_t i = 0; i < loop; ++i)
 		{
-			if (marriage::CManager::instance().IsEngagedOrMarried(dwPID[i]) == true)
+			if (marriage::CManager::Instance().IsEngagedOrMarried(dwPID[i]) == true)
 				return 3;
 		}
 	}
@@ -105,7 +103,7 @@ int32_t CHARACTER::ChangeEmpire(uint8_t empire)
 		// 4. db의 제국 정보를 업데이트 한다.
 		snprintf(szQuery, sizeof(szQuery), "UPDATE player_index SET empire=%u WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
 				empire, GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
-		std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> msg(DBManager::Instance().DirectQuery(szQuery));
 
 		if (msg->Get()->uiAffectedRows > 0)
 		{
@@ -130,7 +128,7 @@ int32_t CHARACTER::GetChangeEmpireCount() const
 
 	snprintf(szQuery, sizeof(szQuery), "SELECT change_count FROM change_empire WHERE account_id = %u", dwAID);
 
-	SQLMsg * pMsg = DBManager::instance().DirectQuery(szQuery);
+	SQLMsg * pMsg = DBManager::Instance().DirectQuery(szQuery);
 
 	if (pMsg != nullptr)
 	{
@@ -174,7 +172,7 @@ void CHARACTER::SetChangeEmpireCount()
 		snprintf(szQuery, sizeof(szQuery), "UPDATE change_empire SET change_count=%d WHERE account_id=%u", count, dwAID);
 	}
 
-	std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> pmsg(DBManager::Instance().DirectQuery(szQuery));
 }
 
 uint32_t CHARACTER::GetAID() const
@@ -190,7 +188,7 @@ uint32_t CHARACTER::GetAID() const
 	uint32_t dwAID = 0;
 	snprintf(szQuery, sizeof(szQuery), "SELECT id FROM player_index WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
 			GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());
-	SQLMsg* pMsg = DBManager::instance().DirectQuery(szQuery);
+	SQLMsg* pMsg = DBManager::Instance().DirectQuery(szQuery);
 
 	if (pMsg != nullptr)
 	{

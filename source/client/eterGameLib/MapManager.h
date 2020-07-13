@@ -112,9 +112,6 @@ class CMapManager : public CScreen, public IPhysicsWorld
 		CSpeedTreeForestDirectX9	m_Forest;
 
 	public:
-		// 2004.10.14.myevan.TEMP_CAreaLoaderThread
-		//bool	BGLoadingEnable();
-		//void	BGLoadingEnable(bool bBGLoadingEnable);
 		void	SetTerrainRenderSort(CMapOutdoor::ETerrainRenderSort eTerrainRenderSort);
 		CMapOutdoor::ETerrainRenderSort	GetTerrainRenderSort();
 		

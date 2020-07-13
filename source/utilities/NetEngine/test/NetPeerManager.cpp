@@ -1,6 +1,7 @@
 #include "../include/NetEngine.hpp"
 #include "NetPeerManager.hpp"
 #include "NetServerManager.hpp"
+#include "../../../common/constants.h"
 
 namespace net_engine
 {

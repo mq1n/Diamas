@@ -21,7 +21,7 @@ void ItemAwardManager::RequestLoad()
 {
 	char szQuery[ASQL_QUERY_MAX_LEN];
 	snprintf(szQuery, sizeof(szQuery), "SELECT id,login,vnum,count,socket0,socket1,socket2,mall,why FROM item_award WHERE taken_time IS NULL and id > %d", g_dwLastCachedItemAwardID);
-	CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_AWARD_LOAD, 0, nullptr);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_ITEM_AWARD_LOAD, 0, nullptr);
 }
 
 void ItemAwardManager::Load(SQLMsg * pMsg)
@@ -59,7 +59,7 @@ void ItemAwardManager::Load(SQLMsg * pMsg)
 			char cmdStr[100] = "";	//why콜룸에서 읽은 값을 임시 문자열에 복사해둠
 			strcpy(cmdStr,whyStr);	//명령어 얻는 과정에서 토큰쓰면 원본도 토큰화 되기 때문
 			char command[20] = "";
-			CClientManager::instance().GetCommand(cmdStr, command);				// command 얻기
+			CClientManager::Instance().GetCommand(cmdStr, command);				// command 얻기
 			//sys_err("%d,  %s",pItemAward->dwID,command);
 			if( !(strcmp(command,"GIFT") ))	// command 가 GIFT이면
 			{
@@ -67,7 +67,7 @@ void ItemAwardManager::Load(SQLMsg * pMsg)
 				strcpy(giftData.login, kData->szLogin);	//로그인 아이디 복사
 				strcpy(giftData.command, command);					//명령어 복사
 				giftData.vnum = kData->dwVnum;				//아이템 vnum도 복사
-				CClientManager::instance().ForwardPacket(HEADER_DG_ITEMAWARD_INFORMER,&giftData,sizeof(TPacketItemAwardInfromer));
+				CClientManager::Instance().ForwardPacket(HEADER_DG_ITEMAWARD_INFORMER,&giftData,sizeof(TPacketItemAwardInfromer));
 			}
 		}
 
@@ -115,7 +115,7 @@ void ItemAwardManager::Taken(uint32_t dwAwardID, uint32_t dwItemID)
 			"UPDATE item_award SET taken_time=NOW(),item_id=%u WHERE id=%u AND taken_time IS NULL", 
 			dwItemID, dwAwardID);
 
-	CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_AWARD_TAKEN, 0, nullptr);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_ITEM_AWARD_TAKEN, 0, nullptr);
 }
 
 std::map<uint32_t, TItemAward *>& ItemAwardManager::GetMapAward()

@@ -1,5 +1,5 @@
 #pragma once
-#include "../eterBase/Singleton.h"
+#include "../../common/Singleton.h"
 #include "CheatQuarentineManager.h"
 #include "WMI_Monitor.h"
 #include "NTDefinations.h"

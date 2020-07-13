@@ -726,7 +726,7 @@ void interpret_command(LPCHARACTER ch, const char * argument, size_t len)
 			char buf[1024];
 			snprintf( buf, sizeof(buf), "%s", argument );
 
-			LogManager::instance().GMCommandLog(ch->GetPlayerID(), ch->GetName(), ch->GetDesc()->GetHostName(), g_bChannel, buf);
+			LogManager::Instance().GMCommandLog(ch->GetPlayerID(), ch->GetName(), ch->GetDesc()->GetHostName(), g_bChannel, buf);
 		}
 	}
 }

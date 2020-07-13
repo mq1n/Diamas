@@ -165,13 +165,13 @@ size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * p
 	// Binary 로 바꾸기 위한 임시 공간
 	static char text[8192 + 1];
 
-	CDBManager::instance().EscapeString(text, pkTab->horse.szName, strlen(pkTab->horse.szName));
+	CDBManager::Instance().EscapeString(text, pkTab->horse.szName, strlen(pkTab->horse.szName));
 	queryLen += snprintf(pszQuery + queryLen, querySize - queryLen, "horse_name = '%s', ", text);
 
-	CDBManager::instance().EscapeString(text, pkTab->skills, sizeof(pkTab->skills));
+	CDBManager::Instance().EscapeString(text, pkTab->skills, sizeof(pkTab->skills));
 	queryLen += snprintf(pszQuery + queryLen, querySize - queryLen, "skill_level = '%s', ", text);
 
-	CDBManager::instance().EscapeString(text, pkTab->quickslot, sizeof(pkTab->quickslot));
+	CDBManager::Instance().EscapeString(text, pkTab->quickslot, sizeof(pkTab->quickslot));
 	queryLen += snprintf(pszQuery + queryLen, querySize - queryLen, "quickslot = '%s' ", text);
 
 	queryLen += snprintf(pszQuery + queryLen, querySize - queryLen, " WHERE id=%d", pkTab->id);
@@ -347,13 +347,13 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, uint32_t dwHandle, TPlayerL
 			snprintf(szQuery, sizeof(szQuery),
 					"SELECT dwPID,szName,szState,lValue FROM quest WHERE dwPID=%d AND lValue<>0", pTab->id);
 
-			CDBManager::instance().ReturnQuery(szQuery, QID_QUEST, peer->GetHandle(), new ClientHandleInfo(dwHandle,0,packet->account_id));
+			CDBManager::Instance().ReturnQuery(szQuery, QID_QUEST, peer->GetHandle(), new ClientHandleInfo(dwHandle,0,packet->account_id));
 
 			// Affect
 			snprintf(szQuery, sizeof(szQuery),
 					"SELECT dwPID,bType,bApplyOn,lApplyValue,dwFlag,lDuration,lSPCost FROM affect WHERE dwPID=%d",
 					pTab->id);
-			CDBManager::instance().ReturnQuery(szQuery, QID_AFFECT, peer->GetHandle(), new ClientHandleInfo(dwHandle, pTab->id));
+			CDBManager::Instance().ReturnQuery(szQuery, QID_AFFECT, peer->GetHandle(), new ClientHandleInfo(dwHandle, pTab->id));
 		}
 		/////////////////////////////////////////////
 		// 2) 아이템이 DBCache 에 없음 : DB 에서 가져옴 
@@ -365,7 +365,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, uint32_t dwHandle, TPlayerL
 					"FROM item WHERE owner_id=%d AND (window in ('INVENTORY','EQUIPMENT','DRAGON_SOUL_INVENTORY','BELT_INVENTORY'))",
 					pTab->id);
 
-			CDBManager::instance().ReturnQuery(szQuery,
+			CDBManager::Instance().ReturnQuery(szQuery,
 					QID_ITEM,
 					peer->GetHandle(),
 					new ClientHandleInfo(dwHandle, pTab->id));
@@ -373,7 +373,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, uint32_t dwHandle, TPlayerL
 					"SELECT dwPID, szName, szState, lValue FROM quest WHERE dwPID=%d",
 					pTab->id);
 
-			CDBManager::instance().ReturnQuery(szQuery,
+			CDBManager::Instance().ReturnQuery(szQuery,
 					QID_QUEST,
 					peer->GetHandle(),
 					new ClientHandleInfo(dwHandle, pTab->id));
@@ -381,7 +381,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, uint32_t dwHandle, TPlayerL
 					"SELECT dwPID, bType, bApplyOn, lApplyValue, dwFlag, lDuration, lSPCost FROM affect WHERE dwPID=%d",
 					pTab->id);
 
-			CDBManager::instance().ReturnQuery(szQuery,
+			CDBManager::Instance().ReturnQuery(szQuery,
 					QID_AFFECT,
 					peer->GetHandle(),
 					new ClientHandleInfo(dwHandle, pTab->id));
@@ -416,7 +416,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, uint32_t dwHandle, TPlayerL
 
 		auto pkInfo = new ClientHandleInfo(dwHandle, packet->player_id);
 		pkInfo->account_id = packet->account_id;
-		CDBManager::instance().ReturnQuery(queryStr, QID_PLAYER, peer->GetHandle(), pkInfo);
+		CDBManager::Instance().ReturnQuery(queryStr, QID_PLAYER, peer->GetHandle(), pkInfo);
 
 		//--------------------------------------------------------------
 		// 아이템 가져오기 
@@ -425,7 +425,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, uint32_t dwHandle, TPlayerL
 				"SELECT id,window+0,pos,count,vnum,is_gm_owner,socket0,socket1,socket2,attrtype0,attrvalue0,attrtype1,attrvalue1,attrtype2,attrvalue2,attrtype3,attrvalue3,attrtype4,attrvalue4,attrtype5,attrvalue5,attrtype6,attrvalue6 "
 				"FROM item WHERE owner_id=%d AND (window in ('INVENTORY','EQUIPMENT','DRAGON_SOUL_INVENTORY','BELT_INVENTORY'))",
 				packet->player_id);
-		CDBManager::instance().ReturnQuery(queryStr, QID_ITEM, peer->GetHandle(), new ClientHandleInfo(dwHandle, packet->player_id));
+		CDBManager::Instance().ReturnQuery(queryStr, QID_ITEM, peer->GetHandle(), new ClientHandleInfo(dwHandle, packet->player_id));
 
 		//--------------------------------------------------------------
 		// QUEST 가져오기
@@ -433,7 +433,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, uint32_t dwHandle, TPlayerL
 		snprintf(queryStr, sizeof(queryStr),
 				"SELECT dwPID,szName,szState,lValue FROM quest WHERE dwPID=%d",
 				packet->player_id);
-		CDBManager::instance().ReturnQuery(queryStr, QID_QUEST, peer->GetHandle(), new ClientHandleInfo(dwHandle, packet->player_id,packet->account_id));
+		CDBManager::Instance().ReturnQuery(queryStr, QID_QUEST, peer->GetHandle(), new ClientHandleInfo(dwHandle, packet->player_id,packet->account_id));
 		//독일 선물 기능에서 item_award테이블에서 login 정보를 얻기위해 account id도 넘겨준다
 		//--------------------------------------------------------------
 		// AFFECT 가져오기
@@ -441,7 +441,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, uint32_t dwHandle, TPlayerL
 		snprintf(queryStr, sizeof(queryStr),
 				"SELECT dwPID,bType,bApplyOn,lApplyValue,dwFlag,lDuration,lSPCost FROM affect WHERE dwPID=%d",
 				packet->player_id);
-		CDBManager::instance().ReturnQuery(queryStr, QID_AFFECT, peer->GetHandle(), new ClientHandleInfo(dwHandle, packet->player_id));
+		CDBManager::Instance().ReturnQuery(queryStr, QID_AFFECT, peer->GetHandle(), new ClientHandleInfo(dwHandle, packet->player_id));
 	}
 
 	// Activity (Try to load from cache first)
@@ -456,14 +456,14 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, uint32_t dwHandle, TPlayerL
 		snprintf(queryStr, sizeof(queryStr),
 			"SELECT today_pvp, today_pve, today_other, today_gk, total, last_update FROM activity WHERE pid =%d",
 			packet->player_id);
-		CDBManager::instance().ReturnQuery(queryStr, QID_ACTIVITY, peer->GetHandle(), new ClientHandleInfo(dwHandle, packet->player_id));
+		CDBManager::Instance().ReturnQuery(queryStr, QID_ACTIVITY, peer->GetHandle(), new ClientHandleInfo(dwHandle, packet->player_id));
 	}
 }
 void CClientManager::ItemAward(CPeer *,char* login)
 {
 	char login_t[LOGIN_MAX_LEN + 1]{};
 	strlcpy(login_t,login,LOGIN_MAX_LEN + 1);	
-	auto pSet = ItemAwardManager::instance().GetByLogin(login_t);
+	auto pSet = ItemAwardManager::Instance().GetByLogin(login_t);
 	if(pSet == nullptr)
 		return;
 	auto it = pSet->begin();	//taken_time이 NULL인것들 읽어옴	
@@ -894,7 +894,7 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, uint32_t dwHandle, TPlay
 	queryLen = snprintf(queryStr, sizeof(queryStr), 
 			"SELECT pid%u FROM player_index WHERE id=%d", packet->account_index + 1, packet->account_id);
 
-	std::unique_ptr<SQLMsg> pMsg0(CDBManager::instance().DirectQuery(queryStr));
+	std::unique_ptr<SQLMsg> pMsg0(CDBManager::Instance().DirectQuery(queryStr));
 
 	if (pMsg0->Get()->uiNumRows != 0)
 	{
@@ -923,7 +923,7 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, uint32_t dwHandle, TPlay
 	snprintf(queryStr, sizeof(queryStr), 
 			"SELECT COUNT(*) as count FROM player WHERE name='%s'", packet->player_table.name);
 
-	std::unique_ptr<SQLMsg> pMsg1(CDBManager::instance().DirectQuery(queryStr));
+	std::unique_ptr<SQLMsg> pMsg1(CDBManager::Instance().DirectQuery(queryStr));
 
 	if (pMsg1->Get()->uiNumRows)
 	{
@@ -982,15 +982,15 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, uint32_t dwHandle, TPlay
 
 	static char text[4096 + 1];
 
-	CDBManager::instance().EscapeString(text, packet->player_table.skills, sizeof(packet->player_table.skills));
+	CDBManager::Instance().EscapeString(text, packet->player_table.skills, sizeof(packet->player_table.skills));
 	queryLen += snprintf(queryStr + queryLen, sizeof(queryStr) - queryLen, "'%s', ", text);
 	if (g_test_server)
 		sys_log(0, "Create_Player queryLen[%d] TEXT[%s]", queryLen, text);
 
-	CDBManager::instance().EscapeString(text, packet->player_table.quickslot, sizeof(packet->player_table.quickslot));
+	CDBManager::Instance().EscapeString(text, packet->player_table.quickslot, sizeof(packet->player_table.quickslot));
 	queryLen += snprintf(queryStr + queryLen, sizeof(queryStr) - queryLen, "'%s')", text);
 
-	std::unique_ptr<SQLMsg> pMsg2(CDBManager::instance().DirectQuery(queryStr));
+	std::unique_ptr<SQLMsg> pMsg2(CDBManager::Instance().DirectQuery(queryStr));
 	if (g_test_server)
 		sys_log(0, "Create_Player queryLen[%d] TEXT[%s]", queryLen, text);
 
@@ -1005,14 +1005,14 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, uint32_t dwHandle, TPlay
 
 	snprintf(queryStr, sizeof(queryStr), "UPDATE player_index SET pid%d=%u WHERE id=%u", 
 			packet->account_index + 1, player_id, packet->account_id);
-	std::unique_ptr<SQLMsg> pMsg3(CDBManager::instance().DirectQuery(queryStr));
+	std::unique_ptr<SQLMsg> pMsg3(CDBManager::Instance().DirectQuery(queryStr));
 
 	if (pMsg3->Get()->uiAffectedRows <= 0)
 	{
 		sys_err("QUERY_ERROR: %s", queryStr);
 
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM player WHERE id=%d", player_id);
-		CDBManager::instance().DirectQuery(queryStr);
+		CDBManager::Instance().DirectQuery(queryStr);
 
 		peer->EncodeHeader(HEADER_DG_PLAYER_CREATE_FAILED, dwHandle, 0);
 		return;
@@ -1096,7 +1096,7 @@ void CClientManager::__QUERY_PLAYER_DELETE(CPeer* peer, uint32_t dwHandle, TPlay
 	pi->account_index = packet->account_index;
 
 	sys_log(0, "PLAYER_DELETE TRY: %s %d pid%d", packet->login, packet->player_id, packet->account_index + 1);
-	CDBManager::instance().ReturnQuery(szQuery, QID_PLAYER_DELETE, peer->GetHandle(), pi);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_PLAYER_DELETE, peer->GetHandle(), pi);
 }
 
 //
@@ -1139,7 +1139,7 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 		char queryStr[ASQL_QUERY_MAX_LEN];
 
 		snprintf(queryStr, sizeof(queryStr), "INSERT INTO player_deleted SELECT * FROM player WHERE id=%d", pi->player_id);
-		std::unique_ptr<SQLMsg> pIns(CDBManager::instance().DirectQuery(queryStr));
+		std::unique_ptr<SQLMsg> pIns(CDBManager::Instance().DirectQuery(queryStr));
 
 		if (pIns->Get()->uiAffectedRows == 0 || pIns->Get()->uiAffectedRows == static_cast<uint32_t>(-1))
 		{
@@ -1190,7 +1190,7 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 				pi->account_index + 1, 
 				pi->player_id);
 
-		std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(queryStr));
+		std::unique_ptr<SQLMsg> pMsg(CDBManager::Instance().DirectQuery(queryStr));
 
 		if (pMsg->Get()->uiAffectedRows == 0 || pMsg->Get()->uiAffectedRows == static_cast<uint32_t>(-1))
 		{
@@ -1201,27 +1201,27 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 		}
 
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM player WHERE id=%u", pi->player_id);
-		delete CDBManager::instance().DirectQuery(queryStr);
+		delete CDBManager::Instance().DirectQuery(queryStr);
 
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM item WHERE owner_id=%d AND (window in ('INVENTORY','EQUIPMENT','DRAGON_SOUL_INVENTORY','BELT_INVENTORY'))", pi->player_id);
-		delete CDBManager::instance().DirectQuery(queryStr);
+		delete CDBManager::Instance().DirectQuery(queryStr);
 
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM quest WHERE dwPID=%u", pi->player_id);
-		CDBManager::instance().AsyncQuery(queryStr);
+		CDBManager::Instance().AsyncQuery(queryStr);
 
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM affect WHERE dwPID=%u", pi->player_id);
-		CDBManager::instance().AsyncQuery(queryStr);
+		CDBManager::Instance().AsyncQuery(queryStr);
 
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM guild_member WHERE pid=%u", pi->player_id);
-		CDBManager::instance().AsyncQuery(queryStr);
+		CDBManager::Instance().AsyncQuery(queryStr);
 
 		// MYSHOP_PRICE_LIST
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM myshop_pricelist WHERE owner_id=%u", pi->player_id);
-		CDBManager::instance().AsyncQuery(queryStr);
+		CDBManager::Instance().AsyncQuery(queryStr);
 		// END_OF_MYSHOP_PRICE_LIST
 
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM messenger_list WHERE account='%s' OR companion='%s'", szName, szName);
-		CDBManager::instance().AsyncQuery(queryStr);
+		CDBManager::Instance().AsyncQuery(queryStr);
 
 		peer->EncodeHeader(HEADER_DG_PLAYER_DELETE_SUCCESS, pi->dwHandle, 1);
 		peer->EncodeBYTE(pi->account_index);
@@ -1266,7 +1266,7 @@ void CClientManager::QUERY_ADD_AFFECT(CPeer *, TPacketGDAddAffect * p)
 			p->elem.lDuration,
 			p->elem.lSPCost);
 
-	CDBManager::instance().AsyncQuery(queryStr);
+	CDBManager::Instance().AsyncQuery(queryStr);
 }
 
 void CClientManager::QUERY_REMOVE_AFFECT(CPeer *, TPacketGDRemoveAffect * p)
@@ -1276,7 +1276,7 @@ void CClientManager::QUERY_REMOVE_AFFECT(CPeer *, TPacketGDRemoveAffect * p)
 	snprintf(queryStr, sizeof(queryStr),
 			"DELETE FROM affect WHERE dwPID=%u AND bType=%u AND bApplyOn=%u", p->dwPID, p->dwType, p->bApplyOn);
 
-	CDBManager::instance().AsyncQuery(queryStr);
+	CDBManager::Instance().AsyncQuery(queryStr);
 }
 
 void CClientManager::InsertLogoutPlayer(uint32_t pid)

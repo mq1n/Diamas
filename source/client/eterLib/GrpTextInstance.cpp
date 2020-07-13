@@ -358,7 +358,6 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 				akVertex[2].y=fFontSy-fFontHalfWeight-feather;
 				akVertex[3].y=fFontEy-fFontHalfWeight+feather;
 
-				// 20041216.myevan.DrawPrimitiveUP
 				if (CGraphicBase::SetPDTStream((SPDTVertex*)akVertex, 4))
 					STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 				
@@ -368,7 +367,6 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 				akVertex[2].y=fFontSy+fFontHalfWeight-feather;
 				akVertex[3].y=fFontEy+fFontHalfWeight+feather;
 
-				// 20041216.myevan.DrawPrimitiveUP
 				if (CGraphicBase::SetPDTStream((SPDTVertex*)akVertex, 4))
 					STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 				
@@ -444,7 +442,6 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 			//m_dwTextColor;
 			akVertex[0].color = akVertex[1].color = akVertex[2].color = akVertex[3].color = m_dwColorInfoVector[i];
 
-			// 20041216.myevan.DrawPrimitiveUP
 			if (CGraphicBase::SetPDTStream((SPDTVertex*)akVertex, 4))
 				STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 			//STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, akVertex, sizeof(SVertex));
@@ -507,8 +504,6 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 
 		STATEMANAGER.SetTexture(0, nullptr);
 
-
-		// 2004.11.18.myevan.DrawIndexPrimitiveUP -> DynamicVertexBuffer
 		CGraphicBase::SetDefaultIndexBuffer(CGraphicBase::DEFAULT_IB_FILL_RECT);
 		if (CGraphicBase::SetPDTStream(vertices, 4))
 			STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);

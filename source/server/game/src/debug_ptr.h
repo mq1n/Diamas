@@ -1,5 +1,5 @@
 #pragma once
-#include "../../common/service.h"
+#include "../../../common/defines.h"
 
 // Intended to be include only in "debug_allocator.h"
 #ifdef DEBUG_ALLOC

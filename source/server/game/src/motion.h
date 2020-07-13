@@ -1,6 +1,6 @@
 #pragma once
-#include "../../common/d3dtype.h"
-#include "../../common/service.h"
+#include "../../../common/d3dtype.h"
+#include "../../../common/defines.h"
 
 enum EMotionMode
 {
@@ -115,7 +115,7 @@ class CMotionSet
 		TContainer			m_map_pkMotion;
 };
 
-class CMotionManager : public singleton<CMotionManager>
+class CMotionManager : public CSingleton<CMotionManager>
 {
 	public:
 		typedef std::map<uint32_t, CMotionSet *> TContainer;

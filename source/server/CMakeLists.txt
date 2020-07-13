@@ -17,6 +17,7 @@ if(MSVC)
 	set(WARNINGS_DISABLE
 		# ignore
 		4100 # 'identifier' : unreferenced formal parameter
+		4505 # unreferenced local function has been removed
 		4996 # function or variable may be unsafe(_s)
 		4706 # assignment within conditional expression
 	)
@@ -88,6 +89,6 @@ add_subdirectory(liblua)
 add_subdirectory(libcrypt)
 add_subdirectory(db)
 add_subdirectory(game)
-#add_subdirectory(auth)
+add_subdirectory(auth)
 add_subdirectory(quest_compiler)
 add_subdirectory(vrunner)

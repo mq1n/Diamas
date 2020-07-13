@@ -1,6 +1,6 @@
 #pragma once
 #include "PeerBase.h"
-#include "../../common/service.h"
+#include "../../../common/common_incl.hpp"
 
 class CPeer : public CPeerBase
 {

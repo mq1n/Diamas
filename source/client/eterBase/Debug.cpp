@@ -3,7 +3,6 @@
 #include <chrono>
 #include <stdio.h>
 #include "Debug.h"
-#include "Singleton.h"
 #include "Timer.h"
 #include <fmt/format.h>
 

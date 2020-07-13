@@ -77,7 +77,7 @@ namespace marriage
 	{
 		if (g_bIsTestServer)
 		{
-			int32_t value = quest::CQuestManager::instance().GetEventFlag("lovepoint");
+			int32_t value = quest::CQuestManager::Instance().GetEventFlag("lovepoint");
 			if (value)
 				return MINMAX(0, value, 100);
 		}
@@ -226,7 +226,7 @@ namespace marriage
 
 			if (!d1)
 			{
-				pkCCI = P2P_MANAGER::instance().FindByPID(m_pid1);
+				pkCCI = P2P_MANAGER::Instance().FindByPID(m_pid1);
 
 				if (pkCCI)
 				{
@@ -239,7 +239,7 @@ namespace marriage
 
 			if (!d2)
 			{
-				pkCCI = P2P_MANAGER::instance().FindByPID(m_pid2);
+				pkCCI = P2P_MANAGER::Instance().FindByPID(m_pid2);
 
 				if (pkCCI)
 				{
@@ -286,7 +286,7 @@ namespace marriage
 
 			if (!d1)
 			{
-				pkCCI = P2P_MANAGER::instance().FindByPID(m_pid1);
+				pkCCI = P2P_MANAGER::Instance().FindByPID(m_pid1);
 
 				if (pkCCI)
 				{
@@ -303,7 +303,7 @@ namespace marriage
 
 			if (!d2)
 			{
-				pkCCI = P2P_MANAGER::instance().FindByPID(m_pid2);
+				pkCCI = P2P_MANAGER::Instance().FindByPID(m_pid2);
 
 				if (pkCCI)
 				{
@@ -401,7 +401,7 @@ namespace marriage
 		sys_log(0, "TMarriage::Save() - RequestUpdate.bSave=%d", bSave);
 		if (bSave)
 		{
-			CManager::instance().RequestUpdate(m_pid1, m_pid2, love_point, is_married);
+			CManager::Instance().RequestUpdate(m_pid1, m_pid2, love_point, is_married);
 			bSave = false;
 		}
 	}
@@ -437,10 +437,10 @@ namespace marriage
 			if (g_bIsTestServer)
 			{
 				LPCHARACTER ch;
-				ch = CHARACTER_MANAGER::instance().FindByPID(m_pid1);
+				ch = CHARACTER_MANAGER::Instance().FindByPID(m_pid1);
 				if (ch)
 					ch->ChatPacket(CHAT_TYPE_PARTY, "lovepoint bykill %.3g total %d", love_point / 1000000., GetMarriagePoint());
-				ch = CHARACTER_MANAGER::instance().FindByPID(m_pid2);
+				ch = CHARACTER_MANAGER::Instance().FindByPID(m_pid2);
 				if (ch)
 					ch->ChatPacket(CHAT_TYPE_PARTY, "lovepoint bykill %.3g total %d", love_point / 1000000., GetMarriagePoint());
 			}
@@ -452,11 +452,11 @@ namespace marriage
 		if (!pWeddingInfo)
 			return;
 
-		LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(dwPID);
+		LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(dwPID);
 		if (ch)
 		{
 			GPOS pos;
-			if (!SECTREE_MANAGER::instance().GetRecallPositionByEmpire(pWeddingInfo->dwMapIndex/10000, 0, pos))
+			if (!SECTREE_MANAGER::Instance().GetRecallPositionByEmpire(pWeddingInfo->dwMapIndex/10000, 0, pos))
 			{
 				sys_err("cannot get warp position");
 				return;
@@ -470,7 +470,7 @@ namespace marriage
 	{
 		if (!pWeddingInfo)
 			return;
-		CManager::instance().RequestEndWedding(m_pid1, m_pid2);
+		CManager::Instance().RequestEndWedding(m_pid1, m_pid2);
 	}
 
 	CManager::CManager()
@@ -575,8 +575,8 @@ namespace marriage
 		m_MarriageByPID.insert(std::make_pair(dwPID1, pMarriage));
 		m_MarriageByPID.insert(std::make_pair(dwPID2, pMarriage));
 		{
-			LPCHARACTER A = CHARACTER_MANAGER::instance().FindByPID(dwPID1);
-			LPCHARACTER B = CHARACTER_MANAGER::instance().FindByPID(dwPID2);
+			LPCHARACTER A = CHARACTER_MANAGER::Instance().FindByPID(dwPID1);
+			LPCHARACTER B = CHARACTER_MANAGER::Instance().FindByPID(dwPID2);
 
 			if (A && B)
 			{
@@ -727,7 +727,7 @@ namespace marriage
 
 		// ¸Ê¿¡¼­ »©³»¾ßÇÕ´Ï´Ù
 		if (map_allow_find(WEDDING_MAP_INDEX))
-			if (!WeddingManager::instance().End(pMarriage->pWeddingInfo->dwMapIndex))
+			if (!WeddingManager::Instance().End(pMarriage->pWeddingInfo->dwMapIndex))
 			{
 				sys_err("wedding map error: map_index=%d", pMarriage->pWeddingInfo->dwMapIndex);
 				return;

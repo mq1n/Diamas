@@ -1,5 +1,10 @@
 #pragma once
 #include "../../libthecore/include/stdafx.h"
+#include "../../../common/common_incl.hpp"
+
+#include <cmath>
+#include <sstream>
+#include <array>
 
 #ifndef _WIN32
 #include <semaphore.h>
@@ -9,9 +14,4 @@
 #define isalpha iswalpha
 #endif
 
-#include "../../common/service.h"
-#include "../../common/length.h"
 #include "../../common/tables.h"
-#include "../../common/singleton.h"
-#include "../../common/utils.h"
-#include "../../common/stl.h"

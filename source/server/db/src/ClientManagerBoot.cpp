@@ -112,7 +112,7 @@ bool CClientManager::InitializeTables()
 
 bool CClientManager::InitializeRefineTable()
 {
-	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery("SELECT id, cost, prob, vnum0, count0, vnum1, count1, vnum2, count2, vnum3, count3, vnum4, count4 FROM refine_proto"));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::Instance().DirectQuery("SELECT id, cost, prob, vnum0, count0, vnum1, count1, vnum2, count2, vnum3, count3, vnum4, count4 FROM refine_proto"));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!pRes->uiNumRows)
@@ -257,7 +257,7 @@ bool CClientManager::InitializeShopTable()
 		"FROM shop LEFT JOIN shop_item "
 		"ON shop.vnum = shop_item.shop_vnum ORDER BY shop.vnum, shop_item.item_vnum";
 
-	std::unique_ptr<SQLMsg> pkMsg2(CDBManager::instance().DirectQuery(s_szQuery));
+	std::unique_ptr<SQLMsg> pkMsg2(CDBManager::Instance().DirectQuery(s_szQuery));
 
 	// shop의 vnum은 있는데 shop_item 이 없을경우... 실패로 처리되니 주의 요망.
 	// 고처야할부분
@@ -406,7 +406,7 @@ bool CClientManager::InitializeSkillTable()
 		"bLevelStep, bLevelLimit, prerequisiteSkillVnum, prerequisiteSkillLevel, iMaxHit, szSplashAroundDamageAdjustPoly, eSkillType+0, dwTargetRange "
 		"FROM skill_proto ORDER BY dwVnum");
 
-	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::Instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!pRes->uiNumRows)
@@ -487,7 +487,7 @@ bool CClientManager::InitializeBanwordTable()
 {
 	m_vec_banwordTable.clear();
 
-	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery("SELECT word FROM banword"));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::Instance().DirectQuery("SELECT word FROM banword"));
 
 	SQLResult * pRes = pkMsg->Get();
 
@@ -524,7 +524,7 @@ bool CClientManager::InitializeItemAttrTable()
 #endif
 			" FROM item_attr ORDER BY apply");
 
-	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::Instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!pRes->uiNumRows)
@@ -625,7 +625,7 @@ bool CClientManager::InitializeItemRareTable()
 #endif
 			" FROM item_attr_rare ORDER BY apply");
 
-	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::Instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!pRes->uiNumRows)
@@ -723,7 +723,7 @@ bool CClientManager::InitializeLandTable()
 		"SELECT id, map_index, x, y, width, height, guild_id, guild_level_limit, price "
 		"FROM land WHERE enable='YES' ORDER BY id");
 
-	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::Instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!m_vec_kLandTable.empty())
@@ -897,7 +897,7 @@ bool CClientManager::InitializeObjectTable()
 	char query[4096];
 	snprintf(query, sizeof(query), "SELECT id, land_id, vnum, map_index, x, y, x_rot, y_rot, z_rot, life FROM object ORDER BY id");
 
-	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::Instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	if (!m_map_pkObjectTable.empty())
@@ -1046,7 +1046,7 @@ bool CClientManager::MirrorMobTableIntoDB()
 				);
 		}
 
-		CDBManager::instance().AsyncQuery(query);
+		CDBManager::Instance().AsyncQuery(query);
 	}
 	return true;
 }
@@ -1081,7 +1081,7 @@ bool CClientManager::MirrorItemTableIntoDB()
 				t.aLimits[0].bType, t.aLimits[0].lValue, t.aLimits[1].bType, t.aLimits[1].lValue,
 				t.aApplies[0].bType, t.aApplies[0].lValue, t.aApplies[1].bType, t.aApplies[1].lValue, t.aApplies[2].bType, t.aApplies[2].lValue,
 				t.alValues[0], t.alValues[1], t.alValues[2], t.alValues[3], t.alValues[4], t.alValues[5]);
-			CDBManager::instance().AsyncQuery(query);
+			CDBManager::Instance().AsyncQuery(query);
 		}
 		else
 		{
@@ -1108,7 +1108,7 @@ bool CClientManager::MirrorItemTableIntoDB()
 				t.aLimits[0].bType, t.aLimits[0].lValue, t.aLimits[1].bType, t.aLimits[1].lValue,
 				t.aApplies[0].bType, t.aApplies[0].lValue, t.aApplies[1].bType, t.aApplies[1].lValue, t.aApplies[2].bType, t.aApplies[2].lValue,
 				t.alValues[0], t.alValues[1], t.alValues[2], t.alValues[3], t.alValues[4], t.alValues[5]);
-			CDBManager::instance().AsyncQuery(query);
+			CDBManager::Instance().AsyncQuery(query);
 		}
 	}
 	return true;
@@ -1174,7 +1174,7 @@ bool CClientManager::InitializeMobTableFromDB()
 		g_stLocaleNameColumn.c_str()
 	);
 
-	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::Instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	uint32_t addNumber = pRes->uiNumRows;
@@ -1339,7 +1339,7 @@ bool CClientManager::InitializeItemTableFromDB()
 		g_stLocaleNameColumn.c_str()
 	);
 
-	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
+	std::unique_ptr<SQLMsg> pkMsg(CDBManager::Instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
 	uint32_t addNumber = pRes->uiNumRows;

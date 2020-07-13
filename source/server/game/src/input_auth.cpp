@@ -88,13 +88,13 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 		return;
 	}
 
-	if (DESC_MANAGER::instance().FindByLoginName(login))
+	if (DESC_MANAGER::Instance().FindByLoginName(login))
 	{
 		LoginFailure(d, "ALREADY");
 		return;
 	}
 
-	uint32_t dwKey = DESC_MANAGER::instance().CreateLoginKey(d);
+	uint32_t dwKey = DESC_MANAGER::Instance().CreateLoginKey(d);
 
 	sys_log (0, "InputAuth::Login : key %u: login %s", dwKey, login);
 
@@ -102,17 +102,17 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 	memcpy(p, pinfo, sizeof(SPacketCGLogin3));
 
 	char szPasswd[PASSWD_MAX_LEN * 2 + 1];
-	DBManager::instance().EscapeString(szPasswd, sizeof(szPasswd), passwd, strlen(passwd));
+	DBManager::Instance().EscapeString(szPasswd, sizeof(szPasswd), passwd, strlen(passwd));
 
 	char szLogin[LOGIN_MAX_LEN * 2 + 1];
-	DBManager::instance().EscapeString(szLogin, sizeof(szLogin), login, strlen(login));
+	DBManager::Instance().EscapeString(szLogin, sizeof(szLogin), login, strlen(login));
 
 	// CHANNEL_SERVICE_LOGIN
 	if (Login_IsInChannelService(szLogin))
 	{
 		sys_log(0, "ChannelServiceLogin [%s]", szLogin);
 
-		DBManager::instance().ReturnQuery(QID_AUTH_LOGIN, dwKey, p,
+		DBManager::Instance().ReturnQuery(QID_AUTH_LOGIN, dwKey, p,
 				"SELECT '%s',password,social_id,id,status,availDt - NOW() > 0,"
 				"UNIX_TIMESTAMP(silver_expire),"
 				"UNIX_TIMESTAMP(gold_expire),"
@@ -129,7 +129,7 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 	// END_OF_CHANNEL_SERVICE_LOGIN
 	else
 	{
-		DBManager::instance().ReturnQuery(QID_AUTH_LOGIN, dwKey, p, 
+		DBManager::Instance().ReturnQuery(QID_AUTH_LOGIN, dwKey, p, 
 				"SELECT PASSWORD('%s'),password,social_id,id,status,availDt - NOW() > 0,"
 				"UNIX_TIMESTAMP(silver_expire),"
 				"UNIX_TIMESTAMP(gold_expire),"

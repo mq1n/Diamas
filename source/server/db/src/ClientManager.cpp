@@ -12,7 +12,6 @@
 
 #include <sstream>
 
-#include "../../common/service.h"
 #include "../../common/building.h"
 #include "../../common/VnumHelper.h"
 #include "../../common/tables.h"
@@ -101,10 +100,10 @@ static bool __InitializeDefaultPriv()
 {
 	if (bCleanOldPriv)
 	{
-		std::unique_ptr<SQLMsg> pCleanStuff(CDBManager::instance().DirectQuery("DELETE FROM priv_settings WHERE value <= 0 OR duration <= NOW();", SQL_COMMON));
+		std::unique_ptr<SQLMsg> pCleanStuff(CDBManager::Instance().DirectQuery("DELETE FROM priv_settings WHERE value <= 0 OR duration <= NOW();", SQL_COMMON));
 		printf("DEFAULT_PRIV_EMPIRE: removed %u expired priv settings.\n", pCleanStuff->Get()->uiAffectedRows);
 	}
-	std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery("SELECT priv_type, id, type, value, UNIX_TIMESTAMP(duration) FROM priv_settings", SQL_COMMON));
+	std::unique_ptr<SQLMsg> pMsg(CDBManager::Instance().DirectQuery("SELECT priv_type, id, type, value, UNIX_TIMESTAMP(duration) FROM priv_settings", SQL_COMMON));
 	if (pMsg->Get()->uiNumRows == 0)
 		return false;
 	MYSQL_ROW row = nullptr;
@@ -123,14 +122,14 @@ static bool __InitializeDefaultPriv()
 			str_to_number(value, row[3]);
 			str_to_number(duration_sec, row[4]);
 			// recalibrate time
-			uint32_t now_time_sec = CClientManager::instance().GetCurrentTime();
+			uint32_t now_time_sec = CClientManager::Instance().GetCurrentTime();
 			if (now_time_sec>duration_sec)
 				duration_sec = 0;
 			else
 				duration_sec -= now_time_sec;
 			// send priv
 			printf("DEFAULT_PRIV_EMPIRE: set empire(%u), type(%u), value(%d), duration(%u)\n", empire, type, value, duration_sec);
-			CPrivManager::instance().AddEmpirePriv(empire, type, value, duration_sec);
+			CPrivManager::Instance().AddEmpirePriv(empire, type, value, duration_sec);
 		}
 		else if (!strcmp(row[0], "GUILD"))
 		{
@@ -145,7 +144,7 @@ static bool __InitializeDefaultPriv()
 			str_to_number(value, row[3]);
 			str_to_number(duration_sec, row[4]);
 			// recalibrate time
-			uint32_t now_time_sec = CClientManager::instance().GetCurrentTime();
+			uint32_t now_time_sec = CClientManager::Instance().GetCurrentTime();
 			if (now_time_sec>duration_sec)
 				duration_sec = 0;
 			else
@@ -154,7 +153,7 @@ static bool __InitializeDefaultPriv()
 			if (guild_id)
 			{
 				printf("DEFAULT_PRIV_GUILD: set guild_id(%u), type(%u), value(%d), duration(%u)\n", guild_id, type, value, duration_sec);
-				CPrivManager::instance().AddGuildPriv(guild_id, type, value, duration_sec);
+				CPrivManager::Instance().AddGuildPriv(guild_id, type, value, duration_sec);
 			}
 		}
 		else if (!strcmp(row[0], "PLAYER"))
@@ -171,7 +170,7 @@ static bool __InitializeDefaultPriv()
 			if (pid)
 			{
 				printf("DEFAULT_PRIV_PLAYER: set pid(%u), type(%u), value(%d)\n", pid, type, value);
-				CPrivManager::instance().AddCharPriv(pid, type, value);
+				CPrivManager::Instance().AddCharPriv(pid, type, value);
 			}
 		}
 	}
@@ -185,7 +184,7 @@ static bool __UpdateDefaultPriv(const char* priv_type, uint32_t id, uint8_t type
 		"REPLACE INTO priv_settings SET priv_type='%s', id=%u, type=%u, value=%d, duration=DATE_ADD(NOW(), INTERVAL %u SECOND);",
 		priv_type, id, type, value, duration_sec
 	);
-	std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(szQuery, SQL_COMMON));
+	std::unique_ptr<SQLMsg> pMsg(CDBManager::Instance().DirectQuery(szQuery, SQL_COMMON));
 	return pMsg->Get()->uiAffectedRows;
 }
 
@@ -257,7 +256,7 @@ bool CClientManager::Initialize(const std::string& stConfigBuffer)
 	sys_log(0, "PLAYER_DELETE_LEVEL_LIMIT set to %d", m_iPlayerDeleteLevelLimit);
 	sys_log(0, "PLAYER_DELETE_LEVEL_LIMIT_LOWER set to %d", m_iPlayerDeleteLevelLimitLower);
 
-	CGuildManager::instance().BootReserveWar();
+	CGuildManager::Instance().BootReserveWar();
 
 	auto& pkStrBindIP = pkConfigContent["bind_ip"];
 	if (pkStrBindIP.IsNull() || !pkStrBindIP.IsString())
@@ -300,7 +299,7 @@ void CClientManager::MainLoop()
 	// 메인루프
 	while (!m_bShutdowned)
 	{
-		while ((tmp = CDBManager::instance().PopResult()))
+		while ((tmp = CDBManager::Instance().PopResult()))
 		{
 			AnalyzeQueryResult(tmp);
 			delete tmp;
@@ -479,8 +478,8 @@ void CClientManager::QUERY_BOOT(CPeer* peer, TPacketGDBoot * p)
 	time_t now = time(nullptr);
 	peer->Encode(&now, sizeof(time_t));
 
-	TItemIDRangeTable itemRange = CItemIDRangeManager::instance().GetRange();
-	TItemIDRangeTable itemRangeSpare = CItemIDRangeManager::instance().GetRange();
+	TItemIDRangeTable itemRange = CItemIDRangeManager::Instance().GetRange();
+	TItemIDRangeTable itemRangeSpare = CItemIDRangeManager::Instance().GetRange();
 
 	peer->EncodeWORD(sizeof(TItemIDRangeTable));
 	peer->EncodeWORD(1);
@@ -559,7 +558,7 @@ void CClientManager::QUERY_QUEST_SAVE(CPeer * pkPeer, TQuestTable * pTable, uint
 					pTable->dwPID, pTable->szName, pTable->szState, pTable->lValue);
 		}
 
-		CDBManager::instance().ReturnQuery(szQuery, QID_QUEST_SAVE, pkPeer->GetHandle(), nullptr);
+		CDBManager::Instance().ReturnQuery(szQuery, QID_QUEST_SAVE, pkPeer->GetHandle(), nullptr);
 	}
 }
 
@@ -578,7 +577,7 @@ void CClientManager::QUERY_SAFEBOX_LOAD(CPeer * pkPeer, uint32_t dwHandle, TSafe
 	if (g_log)
 		sys_log(0, "HEADER_GD_SAFEBOX_LOAD (handle: %d account.id %u is_mall %d)", dwHandle, packet->dwID, bMall ? 1 : 0);
 
-	CDBManager::instance().ReturnQuery(szQuery, QID_SAFEBOX_LOAD, pkPeer->GetHandle(), pi);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_SAFEBOX_LOAD, pkPeer->GetHandle(), pi);
 }
 
 void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
@@ -669,7 +668,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 
 		pi->account_index = 1;
 
-		CDBManager::instance().ReturnQuery(szQuery, QID_SAFEBOX_LOAD, pkPeer->GetHandle(), pi);
+		CDBManager::Instance().ReturnQuery(szQuery, QID_SAFEBOX_LOAD, pkPeer->GetHandle(), pi);
 	}
 	else
 	{
@@ -694,7 +693,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 		static std::vector<TPlayerItem> s_items;
 		CreateItemTableFromRes(msg->Get()->pSQLResult, &s_items, pi->account_id);
 
-		std::set<TItemAward *> * pSet = ItemAwardManager::instance().GetByLogin(pi->login);
+		std::set<TItemAward *> * pSet = ItemAwardManager::Instance().GetByLogin(pi->login);
 
 		if (pSet && !m_vec_itemTable.empty())
 		{
@@ -859,7 +858,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 								pItemAward->dwVnum, pItemAward->dwCount, pItemAward->dwSocket0, pItemAward->dwSocket1, dwSocket2);
 					}
 
-					std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+					std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 					SQLResult * pRes = pmsg->Get();
 					sys_log(0, "SAFEBOX Query : [%s]", szQuery);
 
@@ -881,7 +880,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 				}
 
 				for (uint32_t i = 0; i < vec_dwFinishedAwardID.size(); ++i)
-					ItemAwardManager::instance().Taken(vec_dwFinishedAwardID[i].first, vec_dwFinishedAwardID[i].second);
+					ItemAwardManager::Instance().Taken(vec_dwFinishedAwardID[i].first, vec_dwFinishedAwardID[i].second);
 			}
 		}
 
@@ -909,7 +908,7 @@ void CClientManager::QUERY_SAFEBOX_CHANGE_SIZE(CPeer * pkPeer, uint32_t dwHandle
 	{
 		snprintf(szQuery, sizeof(szQuery), "UPDATE safebox SET size=1 WHERE account_id=%u", p->dwID);
 
-		std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(szQuery, SQL_PLAYER));
+		std::unique_ptr<SQLMsg> pMsg(CDBManager::Instance().DirectQuery(szQuery, SQL_PLAYER));
 
 		if (pMsg->Get()->uiAffectedRows == 0)
 			snprintf(szQuery, sizeof(szQuery), "INSERT INTO safebox (account_id, size) VALUES(%u, 1)", p->dwID);
@@ -917,7 +916,7 @@ void CClientManager::QUERY_SAFEBOX_CHANGE_SIZE(CPeer * pkPeer, uint32_t dwHandle
 	else {
 		snprintf(szQuery, sizeof(szQuery), "UPDATE safebox SET size=%u WHERE account_id=%u", p->bSize, p->dwID);
 	}
-	CDBManager::instance().ReturnQuery(szQuery, QID_SAFEBOX_CHANGE_SIZE, pkPeer->GetHandle(), pi);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_SAFEBOX_CHANGE_SIZE, pkPeer->GetHandle(), pi);
 }
 
 void CClientManager::RESULT_SAFEBOX_CHANGE_SIZE(CPeer * pkPeer, SQLMsg * msg)
@@ -946,7 +945,7 @@ void CClientManager::QUERY_SAFEBOX_CHANGE_PASSWORD(CPeer * pkPeer, uint32_t dwHa
 	char szQuery[ASQL_QUERY_MAX_LEN];
 	snprintf(szQuery, sizeof(szQuery), "SELECT password FROM safebox WHERE account_id=%u", p->dwID);
 
-	CDBManager::instance().ReturnQuery(szQuery, QID_SAFEBOX_CHANGE_PASSWORD, pkPeer->GetHandle(), pi);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_SAFEBOX_CHANGE_PASSWORD, pkPeer->GetHandle(), pi);
 }
 
 void CClientManager::RESULT_SAFEBOX_CHANGE_PASSWORD(CPeer * pkPeer, SQLMsg * msg)
@@ -963,11 +962,11 @@ void CClientManager::RESULT_SAFEBOX_CHANGE_PASSWORD(CPeer * pkPeer, SQLMsg * msg
 		{
 			char szQuery[ASQL_QUERY_MAX_LEN];
 			char escape_pwd[64];
-			CDBManager::instance().EscapeString(escape_pwd, p->safebox_password, strlen(p->safebox_password));
+			CDBManager::Instance().EscapeString(escape_pwd, p->safebox_password, strlen(p->safebox_password));
 
 			snprintf(szQuery, sizeof(szQuery), "UPDATE safebox SET password='%s' WHERE account_id=%u", escape_pwd, p->account_id);
 
-			CDBManager::instance().ReturnQuery(szQuery, QID_SAFEBOX_CHANGE_PASSWORD_SECOND, pkPeer->GetHandle(), p);
+			CDBManager::Instance().ReturnQuery(szQuery, QID_SAFEBOX_CHANGE_PASSWORD_SECOND, pkPeer->GetHandle(), p);
 			return;
 		}
 	}
@@ -1071,7 +1070,7 @@ void CClientManager::QUERY_SAFEBOX_SAVE(CPeer * pkPeer, TSafeboxTable * pTable)
 		"UPDATE safebox SET gold='%u' WHERE account_id=%u", 
 		pTable->dwGold, pTable->dwID);
 
-	CDBManager::instance().ReturnQuery(szQuery, QID_SAFEBOX_SAVE, pkPeer->GetHandle(), nullptr);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_SAFEBOX_SAVE, pkPeer->GetHandle(), nullptr);
 }
 
 void CClientManager::QUERY_EMPIRE_SELECT(CPeer * pkPeer, uint32_t dwHandle, TEmpireSelectPacket * p)
@@ -1081,14 +1080,14 @@ void CClientManager::QUERY_EMPIRE_SELECT(CPeer * pkPeer, uint32_t dwHandle, TEmp
 	char szQuery[ASQL_QUERY_MAX_LEN];
 
 	snprintf(szQuery, sizeof(szQuery), "UPDATE player_index SET empire=%u WHERE id=%u", p->bEmpire, p->dwAccountID);
-	CDBManager::instance().AsyncQuery(szQuery);
+	CDBManager::Instance().AsyncQuery(szQuery);
 
 	sys_log(0, "EmpireSelect: %s", szQuery);
 	{
 		snprintf(szQuery, sizeof(szQuery),
 				"SELECT pid1, pid2, pid3, pid4, pid5 FROM player_index WHERE id=%u", p->dwAccountID);
 
-		std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 		SQLResult * pRes = pmsg->Get();
 
@@ -1132,7 +1131,7 @@ void CClientManager::QUERY_EMPIRE_SELECT(CPeer * pkPeer, uint32_t dwHandle, TEmp
 							g_start_position[p->bEmpire][1],
 							pids[i]);
 
-					CDBManager::instance().AsyncQuery(szQuery);
+					CDBManager::Instance().AsyncQuery(szQuery);
 				}
 			}
 		}
@@ -1317,10 +1316,10 @@ void CClientManager::QUERY_SETUP(CPeer * peer, uint32_t, const char * c_pData)
 	}
 
 	SendPartyOnSetup(peer);
-	CGuildManager::instance().OnSetup(peer);
-	CPrivManager::instance().SendPrivOnSetup(peer);
+	CGuildManager::Instance().OnSetup(peer);
+	CPrivManager::Instance().SendPrivOnSetup(peer);
 	SendEventFlagsOnSetup(peer);
-	marriage::CManager::instance().OnSetup(peer);
+	marriage::CManager::Instance().OnSetup(peer);
 }
 
 void CClientManager::QUERY_ITEM_FLUSH(CPeer *, const char * c_pData)
@@ -1392,7 +1391,7 @@ void CClientManager::QUERY_ITEM_SAVE(CPeer * pkPeer, const char * c_pData)
 			p->aAttr[5].bType, p->aAttr[5].sValue,
 			p->aAttr[6].bType, p->aAttr[6].sValue);
 
-		CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_SAVE, pkPeer->GetHandle(), nullptr);
+		CDBManager::Instance().ReturnQuery(szQuery, QID_ITEM_SAVE, pkPeer->GetHandle(), nullptr);
 	}
 	else
 	{
@@ -1652,9 +1651,9 @@ void CClientManager::QUERY_ITEM_DESTROY(CPeer * pkPeer, const char * c_pData)
 			sys_log(0, "HEADER_GD_ITEM_DESTROY: PID %u ID %u", dwPID, dwID);
 
 		if (dwPID == 0) // 아무도 가진 사람이 없었다면, 비동기 쿼리
-			CDBManager::instance().AsyncQuery(szQuery);
+			CDBManager::Instance().AsyncQuery(szQuery);
 		else
-			CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_DESTROY, pkPeer->GetHandle(), nullptr);
+			CDBManager::Instance().ReturnQuery(szQuery, QID_ITEM_DESTROY, pkPeer->GetHandle(), nullptr);
 	}
 }
 
@@ -1717,14 +1716,14 @@ void CClientManager::QUERY_RELOAD_PROTO()
  */
 void CClientManager::AddGuildPriv(TPacketGiveGuildPriv* p)
 {
-	CPrivManager::instance().AddGuildPriv(p->guild_id, p->type, p->value, p->duration_sec);
+	CPrivManager::Instance().AddGuildPriv(p->guild_id, p->type, p->value, p->duration_sec);
 
 	__UpdateDefaultPriv("GUILD", p->guild_id, p->type, p->value, p->duration_sec);
 }
 
 void CClientManager::AddEmpirePriv(TPacketGiveEmpirePriv* p)
 {
-	CPrivManager::instance().AddEmpirePriv(p->empire, p->type, p->value, p->duration_sec);
+	CPrivManager::Instance().AddEmpirePriv(p->empire, p->type, p->value, p->duration_sec);
 
 	__UpdateDefaultPriv("EMPIRE", p->empire, p->type, p->value, p->duration_sec);
 }
@@ -1732,7 +1731,7 @@ void CClientManager::AddEmpirePriv(TPacketGiveEmpirePriv* p)
 
 void CClientManager::AddCharacterPriv(TPacketGiveCharacterPriv* p)
 {
-	CPrivManager::instance().AddCharPriv(p->pid, p->type, p->value);
+	CPrivManager::Instance().AddCharPriv(p->pid, p->type, p->value);
 
 	__UpdateDefaultPriv("PLAYER", p->pid, p->type, p->value, 0);
 }
@@ -1843,22 +1842,22 @@ void CClientManager::QUERY_AUTH_LOGIN(CPeer * pkPeer, uint32_t dwHandle, TPacket
 
 void CClientManager::GuildDepositMoney(TPacketGDGuildMoney* p)
 {
-	CGuildManager::instance().DepositMoney(p->dwGuild, p->iGold);
+	CGuildManager::Instance().DepositMoney(p->dwGuild, p->iGold);
 }
 
 void CClientManager::GuildWithdrawMoney(CPeer* peer, TPacketGDGuildMoney* p)
 {
-	CGuildManager::instance().WithdrawMoney(peer, p->dwGuild, p->iGold);
+	CGuildManager::Instance().WithdrawMoney(peer, p->dwGuild, p->iGold);
 }
 
 void CClientManager::GuildWithdrawMoneyGiveReply(TPacketGDGuildMoneyWithdrawGiveReply* p)
 {
-	CGuildManager::instance().WithdrawMoneyReply(p->dwGuild, p->bGiveSuccess, p->iChangeGold);
+	CGuildManager::Instance().WithdrawMoneyReply(p->dwGuild, p->bGiveSuccess, p->iChangeGold);
 }
 
 void CClientManager::GuildWarBet(TPacketGDGuildWarBet * p)
 {
-	CGuildManager::instance().Bet(p->dwWarID, p->szLogin, p->dwGold, p->dwGuild);
+	CGuildManager::Instance().Bet(p->dwWarID, p->szLogin, p->dwGold, p->dwGuild);
 }
 
 void CClientManager::CreateObject(TPacketGDCreateObject * p)
@@ -1871,7 +1870,7 @@ void CClientManager::CreateObject(TPacketGDCreateObject * p)
 			"INSERT INTO object (land_id, vnum, map_index, x, y, x_rot, y_rot, z_rot) VALUES(%u, %u, %d, %d, %d, %f, %f, %f)",
 			p->dwLandID, p->dwVnum, p->lMapIndex, p->x, p->y, p->xRot, p->yRot, p->zRot);
 
-	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 	if (pmsg->Get()->uiInsertID == 0)
 	{
@@ -1905,7 +1904,7 @@ void CClientManager::DeleteObject(uint32_t dwID)
 
 	snprintf(szQuery, sizeof(szQuery), "DELETE FROM object WHERE id=%u", dwID);
 
-	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 	if (pmsg->Get()->uiAffectedRows == 0 || pmsg->Get()->uiAffectedRows == static_cast<uint32_t>(-1))
 	{
@@ -1930,7 +1929,7 @@ void CClientManager::BlockChat(TPacketBlockChat* p)
 	char szQuery[256];
 	snprintf(szQuery, sizeof(szQuery), "SELECT id FROM player WHERE name = '%s'", p->szName);
 
-	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 	SQLResult * pRes = pmsg->Get();
 
 	if (pRes->uiNumRows)
@@ -1954,39 +1953,39 @@ void CClientManager::BlockChat(TPacketBlockChat* p)
 void CClientManager::MarriageAdd(TPacketMarriageAdd * p)
 {
 	sys_log(0, "MarriageAdd %u %u %s %s", p->dwPID1, p->dwPID2, p->szName1, p->szName2);
-	marriage::CManager::instance().Add(p->dwPID1, p->dwPID2, p->szName1, p->szName2);
+	marriage::CManager::Instance().Add(p->dwPID1, p->dwPID2, p->szName1, p->szName2);
 }
 
 void CClientManager::MarriageUpdate(TPacketMarriageUpdate * p)
 {
 	sys_log(0, "MarriageUpdate PID:%u %u LP:%d ST:%d", p->dwPID1, p->dwPID2, p->iLovePoint, p->byMarried);
-	marriage::CManager::instance().Update(p->dwPID1, p->dwPID2, p->iLovePoint, p->byMarried);
+	marriage::CManager::Instance().Update(p->dwPID1, p->dwPID2, p->iLovePoint, p->byMarried);
 }
 
 void CClientManager::MarriageRemove(TPacketMarriageRemove * p)
 {
 	sys_log(0, "MarriageRemove %u %u", p->dwPID1, p->dwPID2);
-	marriage::CManager::instance().Remove(p->dwPID1, p->dwPID2);
+	marriage::CManager::Instance().Remove(p->dwPID1, p->dwPID2);
 }
 
 void CClientManager::WeddingRequest(TPacketWeddingRequest * p)
 {
 	sys_log(0, "WeddingRequest %u %u", p->dwPID1, p->dwPID2);
 	ForwardPacket(HEADER_DG_WEDDING_REQUEST, p, sizeof(TPacketWeddingRequest));
-	//marriage::CManager::instance().RegisterWedding(p->dwPID1, p->szName1, p->dwPID2, p->szName2);
+	//marriage::CManager::Instance().RegisterWedding(p->dwPID1, p->szName1, p->dwPID2, p->szName2);
 }
 
 void CClientManager::WeddingReady(TPacketWeddingReady * p)
 {
 	sys_log(0, "WeddingReady %u %u", p->dwPID1, p->dwPID2);
 	ForwardPacket(HEADER_DG_WEDDING_READY, p, sizeof(TPacketWeddingReady));
-	marriage::CManager::instance().ReadyWedding(p->dwMapIndex, p->dwPID1, p->dwPID2);
+	marriage::CManager::Instance().ReadyWedding(p->dwMapIndex, p->dwPID1, p->dwPID2);
 }
 
 void CClientManager::WeddingEnd(TPacketWeddingEnd * p)
 {
 	sys_log(0, "WeddingEnd %u %u", p->dwPID1, p->dwPID2);
-	marriage::CManager::instance().EndWedding(p->dwPID1, p->dwPID2);
+	marriage::CManager::Instance().EndWedding(p->dwPID1, p->dwPID2);
 }
 
 //
@@ -2026,7 +2025,7 @@ void CClientManager::MyshopPricelistUpdate(const TItemPriceListTable* pPacket)
 
 		char szQuery[ASQL_QUERY_MAX_LEN];
 		snprintf(szQuery, sizeof(szQuery), "SELECT item_vnum, price FROM myshop_pricelist WHERE owner_id=%u", pUpdateTable->dwOwnerID);
-		CDBManager::instance().ReturnQuery(szQuery, QID_ITEMPRICE_LOAD_FOR_UPDATE, 0, pUpdateTable);
+		CDBManager::Instance().ReturnQuery(szQuery, QID_ITEMPRICE_LOAD_FOR_UPDATE, 0, pUpdateTable);
 	}
 }
 
@@ -2060,7 +2059,7 @@ void CClientManager::MyshopPricelistRequest(CPeer* peer, uint32_t dwHandle, uint
 
 		char szQuery[ASQL_QUERY_MAX_LEN];
 		snprintf(szQuery, sizeof(szQuery), "SELECT item_vnum, price FROM myshop_pricelist WHERE owner_id=%u", dwPlayerID);
-		CDBManager::instance().ReturnQuery(szQuery, QID_ITEMPRICE_LOAD, peer->GetHandle(), new TItemPricelistReqInfo(dwHandle, dwPlayerID));
+		CDBManager::Instance().ReturnQuery(szQuery, QID_ITEMPRICE_LOAD, peer->GetHandle(), new TItemPricelistReqInfo(dwHandle, dwPlayerID));
 	}
 }
 // END_OF_MYSHOP_PRICE_LIST
@@ -2501,12 +2500,12 @@ int32_t CClientManager::AnalyzeQueryResult(SQLMsg * msg)
 	switch (qi->iType)
 	{
 		case QID_ITEM_AWARD_LOAD:
-			ItemAwardManager::instance().Load(msg);
+			ItemAwardManager::Instance().Load(msg);
 			delete qi;
 			return true;
 
 		case QID_GUILD_RANKING:
-			CGuildManager::instance().ResultRanking(msg->Get()->pSQLResult);
+			CGuildManager::Instance().ResultRanking(msg->Get()->pSQLResult);
 			break;
 
 			// MYSHOP_PRICE_LIST
@@ -2648,9 +2647,9 @@ int32_t CClientManager::Process()
 		if (!(thecore_heart->pulse % thecore_heart->passes_per_sec))
 		{
 
-			CDBManager::instance().ResetCounter();
+			CDBManager::Instance().ResetCounter();
 
-			uint32_t dwCount = CClientManager::instance().GetUserCount();
+			uint32_t dwCount = CClientManager::Instance().GetUserCount();
 
 			g_dwUsageAvg += dwCount;
 			g_dwUsageMax = MAX(g_dwUsageMax, dwCount);
@@ -2674,24 +2673,24 @@ int32_t CClientManager::Process()
 
 			UpdateActivityCache();
 
-			CGuildManager::instance().Update();
-			CPrivManager::instance().Update();
-			marriage::CManager::instance().Update();
+			CGuildManager::Instance().Update();
+			CPrivManager::Instance().Update();
+			marriage::CManager::Instance().Update();
 		}
 #ifdef ENABLE_ITEMAWARD_REFRESH
 		if (!(thecore_heart->pulse % (thecore_heart->passes_per_sec * 5)))
 		{
-			ItemAwardManager::instance().RequestLoad();
+			ItemAwardManager::Instance().RequestLoad();
 		}
 #endif
 
 		if (!(thecore_heart->pulse % (thecore_heart->passes_per_sec * 60)))	// 60초에 한번
 		{
 			// 유니크 아이템을 위한 시간을 보낸다.
-			CClientManager::instance().SendTime();
+			CClientManager::Instance().SendTime();
 			
 			std::string st;
-			CClientManager::instance().GetPeerP2PHostNames(st);
+			CClientManager::Instance().GetPeerP2PHostNames(st);
 			sys_log(0, "Current Peer host names...\n%s", st.c_str());
 		}
 	}
@@ -2839,7 +2838,7 @@ bool CClientManager::InitializeItemIDRange(uint32_t min, uint32_t max)
 {
 	sys_log(0, "ItemRange From File %lu ~ %lu ", min, max);
 	
-	if (CItemIDRangeManager::instance().BuildRange(min, max, m_itemRange) == false)
+	if (CItemIDRangeManager::Instance().BuildRange(min, max, m_itemRange) == false)
 	{
 		sys_err("Can not build ITEM_ID_RANGE");
 		return false;
@@ -2867,7 +2866,7 @@ bool CClientManager::__GetAdminInfo(std::vector<tAdminInfo> & rAdminVec)
 	snprintf(szQuery, sizeof(szQuery),
 		"SELECT mID,mAccount,mName,mAuthority FROM gmlist");
 
-	std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(szQuery, SQL_COMMON));
+	std::unique_ptr<SQLMsg> pMsg(CDBManager::Instance().DirectQuery(szQuery, SQL_COMMON));
 
 	if (pMsg->Get()->uiNumRows == 0)
 	{
@@ -2920,7 +2919,7 @@ bool CClientManager::__GetAdminConfig(uint32_t pAdminConfig[GM_MAX_NUM])
 		"can_exchange_gm_item_to_gm, can_exchange_gm_item_to_player, can_exchange_to_gm, can_exchange_to_player, "
 		"can_buy_private_item, can_create_private_shop, can_use_safebox, can_create_player, can_delete_player FROM gmconfig");
 
-	std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(szQuery, SQL_COMMON));
+	std::unique_ptr<SQLMsg> pMsg(CDBManager::Instance().DirectQuery(szQuery, SQL_COMMON));
 
 	if (pMsg->Get()->uiNumRows == 0)
 	{
@@ -3069,7 +3068,7 @@ void CClientManager::BreakMarriage(CPeer *, const char * data)
 	data += sizeof(int32_t);
 
 	sys_log(0, "Breaking off a marriage engagement! pid %d and pid %d", pid1, pid2);
-	marriage::CManager::instance().Remove(pid1, pid2);
+	marriage::CManager::Instance().Remove(pid1, pid2);
 }
 //END_BREAK_MARIIAGE
 

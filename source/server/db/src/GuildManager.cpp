@@ -134,7 +134,7 @@ void CGuildManager::Initialize()
 {
 	char szQuery[1024];
 	snprintf(szQuery, sizeof(szQuery), "SELECT id, name, ladder_point, win, draw, loss, gold, level FROM guild");
-	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 	if (pmsg->Get()->uiNumRows)
 		ParseResult(pmsg->Get());
@@ -159,7 +159,7 @@ void CGuildManager::Load(uint32_t dwGuildID)
 	char szQuery[1024];
 
 	snprintf(szQuery, sizeof(szQuery), "SELECT id, name, ladder_point, win, draw, loss, gold, level FROM guild WHERE id=%u", dwGuildID);
-	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 	if (pmsg->Get()->uiNumRows)
 		ParseResult(pmsg->Get());
@@ -170,7 +170,7 @@ void CGuildManager::QueryRanking()
 	char szQuery[256];
 	snprintf(szQuery, sizeof(szQuery), "SELECT id,name,ladder_point FROM guild ORDER BY ladder_point DESC LIMIT 20");
 
-	CDBManager::instance().ReturnQuery(szQuery, QID_GUILD_RANKING, 0, 0);
+	CDBManager::Instance().ReturnQuery(szQuery, QID_GUILD_RANKING, 0, 0);
 }
 
 int32_t CGuildManager::GetRanking(uint32_t dwGID)
@@ -213,7 +213,7 @@ void CGuildManager::Update()
 {
 	ProcessReserveWar(); // 예약 전쟁 처리
 
-	time_t now = CClientManager::instance().GetCurrentTime();
+	time_t now = CClientManager::Instance().GetCurrentTime();
 
 	if (!m_pqOnWar.empty())
 	{
@@ -250,7 +250,7 @@ void CGuildManager::Update()
 	while (!m_pqSkill.empty() && m_pqSkill.top().first <= now)
 	{
 		const TGuildSkillUsed& s = m_pqSkill.top().second;
-		CClientManager::instance().SendGuildSkillUsable(s.GID, s.dwSkillVnum, true);
+		CClientManager::Instance().SendGuildSkillUsable(s.GID, s.dwSkillVnum, true);
 		m_pqSkill.pop();
 	}
 	// END_OF_GUILD_SKILL_COOLTIME_BUG_FIX
@@ -275,7 +275,7 @@ void CGuildManager::Update()
 		p.dwGuildFrom	= ws.GID[0];
 		p.dwGuildTo	= ws.GID[1];
 
-		CClientManager::instance().ForwardPacket(HEADER_DG_GUILD_WAR, &p, sizeof(p));
+		CClientManager::Instance().ForwardPacket(HEADER_DG_GUILD_WAR, &p, sizeof(p));
 		sys_log(0, "GuildWar: GUILD sending start of wait start war %d %d", ws.GID[0], ws.GID[1]);
 	}
 }
@@ -321,7 +321,7 @@ void CGuildManager::GuildWarWin(uint32_t GID)
 
 	char buf[1024];
 	snprintf(buf, sizeof(buf), "UPDATE guild SET win=%d WHERE id=%u", it->second.win, GID);
-	CDBManager::instance().AsyncQuery(buf);
+	CDBManager::Instance().AsyncQuery(buf);
 }
 
 void CGuildManager::GuildWarLose(uint32_t GID)
@@ -335,7 +335,7 @@ void CGuildManager::GuildWarLose(uint32_t GID)
 
 	char buf[1024];
 	snprintf(buf, sizeof(buf), "UPDATE guild SET loss=%d WHERE id=%u", it->second.loss, GID);
-	CDBManager::instance().AsyncQuery(buf);
+	CDBManager::Instance().AsyncQuery(buf);
 }
 
 void CGuildManager::GuildWarDraw(uint32_t GID)
@@ -349,7 +349,7 @@ void CGuildManager::GuildWarDraw(uint32_t GID)
 
 	char buf[1024];
 	snprintf(buf, sizeof(buf), "UPDATE guild SET draw=%d WHERE id=%u", it->second.draw, GID);
-	CDBManager::instance().AsyncQuery(buf);
+	CDBManager::Instance().AsyncQuery(buf);
 }
 
 bool CGuildManager::IsHalfWinLadderPoint(uint32_t dwGuildWinner, uint32_t dwGuildLoser)
@@ -363,7 +363,7 @@ bool CGuildManager::IsHalfWinLadderPoint(uint32_t dwGuildWinner, uint32_t dwGuil
 	auto it = m_mapGuildWarEndTime[GID1].find(GID2);
 
 	if (it != m_mapGuildWarEndTime[GID1].end() && 
-			it->second + GUILD_WAR_LADDER_HALF_PENALTY_TIME > CClientManager::instance().GetCurrentTime())
+			it->second + GUILD_WAR_LADDER_HALF_PENALTY_TIME > CClientManager::Instance().GetCurrentTime())
 		return true;
 
 	return false;
@@ -422,7 +422,7 @@ void CGuildManager::RemoveWar(uint32_t GID1, uint32_t GID2)
 	if (it->second.pElement)
 		it->second.pElement->bEnd = true;
 
-	m_mapGuildWarEndTime[GID1][GID2] = CClientManager::instance().GetCurrentTime();
+	m_mapGuildWarEndTime[GID1][GID2] = CClientManager::Instance().GetCurrentTime();
 
 	m_WarMap[GID1].erase(it);
 
@@ -486,7 +486,7 @@ void CGuildManager::WarEnd(uint32_t GID1, uint32_t GID2, bool bForceDraw)
 		ProcessWinLose(win_guild, lose_guild);
 
 	// DB 서버에서 자체적으로 끝낼 때도 있기 때문에 따로 패킷을 보내줘야 한다.
-	CClientManager::instance().for_each_peer(FSendPeerWar(0, GUILD_WAR_END, GID1, GID2));
+	CClientManager::Instance().for_each_peer(FSendPeerWar(0, GUILD_WAR_END, GID1, GID2));
 
 	RemoveWar(GID1, GID2);
 }
@@ -553,9 +553,9 @@ void CGuildManager::StartWar(uint8_t bType, uint32_t GID1, uint32_t GID2, CGuild
 	TGuildWarInfo & gw = m_WarMap[GID1][GID2]; // map insert
 
 	if (bType == GUILD_WAR_TYPE_FIELD)
-		gw.tEndTime = CClientManager::instance().GetCurrentTime() + GUILD_WAR_DURATION;
+		gw.tEndTime = CClientManager::Instance().GetCurrentTime() + GUILD_WAR_DURATION;
 	else
-		gw.tEndTime = CClientManager::instance().GetCurrentTime() + 172800;
+		gw.tEndTime = CClientManager::Instance().GetCurrentTime() + 172800;
 
 	gw.pElement = new TGuildWarPQElement(bType, GID1, GID2);
 	gw.pkReserve = pkReserve;
@@ -606,7 +606,7 @@ void CGuildManager::UpdateScore(uint32_t dwGainGID, uint32_t dwOppGID, int32_t i
 		sys_log(0, "GuildWar: SendGuildWarScore guild %u wartype %u score_delta %d betscore_delta %d result %u, %u",
 				dwGainGID, p->bType, iScoreDelta, iBetScoreDelta, iNewScore, iNewBetScore);
 
-		CClientManager::instance().for_each_peer(FSendGuildWarScore(dwGainGID, dwOppGID, iNewScore, iNewBetScore));
+		CClientManager::Instance().for_each_peer(FSendGuildWarScore(dwGainGID, dwOppGID, iNewScore, iNewBetScore));
 	}
 }
 
@@ -667,7 +667,7 @@ bool CGuildManager::WaitStart(TPacketGuildWar * p)
 		if (!TakeBetPrice(p->dwGuildFrom, p->dwGuildTo, p->lWarPrice))
 			return false;
 
-	uint32_t dwCurTime = CClientManager::instance().GetCurrentTime();
+	uint32_t dwCurTime = CClientManager::Instance().GetCurrentTime();
 
 	TGuildWaitStartInfo info(p->bType, p->dwGuildFrom, p->dwGuildTo, p->lWarPrice, p->lInitialScore, nullptr);
 	m_pqWaitStart.push(std::make_pair(dwCurTime + GetGuildWarWaitStartDuration(), info));
@@ -708,7 +708,7 @@ void CGuildManager::ChangeLadderPoint(uint32_t GID, int32_t change)
 
 	char buf[1024];
 	snprintf(buf, sizeof(buf), "UPDATE guild SET ladder_point=%d WHERE id=%u", r.ladder_point, GID);
-	CDBManager::instance().AsyncQuery(buf);
+	CDBManager::Instance().AsyncQuery(buf);
 
 	sys_log(0, "GuildManager::ChangeLadderPoint %u %d", GID, r.ladder_point);
 	sys_log(0, "%s", buf);
@@ -722,14 +722,14 @@ void CGuildManager::ChangeLadderPoint(uint32_t GID, int32_t change)
 	p.lDraw = r.draw;
 	p.lLoss = r.loss;
 
-	CClientManager::instance().ForwardPacket(HEADER_DG_GUILD_LADDER, &p, sizeof(TPacketGuildLadder));
+	CClientManager::Instance().ForwardPacket(HEADER_DG_GUILD_LADDER, &p, sizeof(TPacketGuildLadder));
 }
 
 void CGuildManager::UseSkill(uint32_t GID, uint32_t dwSkillVnum, uint32_t dwCooltime)
 {
 	// GUILD_SKILL_COOLTIME_BUG_FIX
-	sys_log(0, "UseSkill(gid=%d, skill=%d) CoolTime(%d:%d)", GID, dwSkillVnum, dwCooltime, CClientManager::instance().GetCurrentTime() + dwCooltime);
-	m_pqSkill.push(std::make_pair(CClientManager::instance().GetCurrentTime() + dwCooltime, TGuildSkillUsed(GID, dwSkillVnum)));
+	sys_log(0, "UseSkill(gid=%d, skill=%d) CoolTime(%d:%d)", GID, dwSkillVnum, dwCooltime, CClientManager::Instance().GetCurrentTime() + dwCooltime);
+	m_pqSkill.push(std::make_pair(CClientManager::Instance().GetCurrentTime() + dwCooltime, TGuildSkillUsed(GID, dwSkillVnum)));
 	// END_OF_GUILD_SKILL_COOLTIME_BUG_FIX
 }
 
@@ -740,11 +740,11 @@ void CGuildManager::MoneyChange(uint32_t dwGuild, uint32_t dwGold)
 	TPacketDGGuildMoneyChange p;
 	p.dwGuild = dwGuild;
 	p.iTotalGold = dwGold;
-	CClientManager::instance().ForwardPacket(HEADER_DG_GUILD_MONEY_CHANGE, &p, sizeof(p));
+	CClientManager::Instance().ForwardPacket(HEADER_DG_GUILD_MONEY_CHANGE, &p, sizeof(p));
 
 	char buf[1024];
 	snprintf(buf, sizeof(buf), "UPDATE guild SET gold=%u WHERE id = %u", dwGold, dwGuild);
-	CDBManager::instance().AsyncQuery(buf);
+	CDBManager::Instance().AsyncQuery(buf);
 }
 
 void CGuildManager::DepositMoney(uint32_t dwGuild, INT iGold)
@@ -869,7 +869,7 @@ void CGuildManager::BootReserveWar()
 
 	for (int32_t i = 0; i < 2; ++i)
 	{
-		std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(c_apszQuery[i]));
+		std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(c_apszQuery[i]));
 
 		if (pmsg->Get()->uiNumRows == 0)
 			continue;
@@ -902,8 +902,8 @@ void CGuildManager::BootReserveWar()
 			snprintf(buf, sizeof(buf), "GuildWar: BootReserveWar : step %d id %u GID1 %u GID2 %u", i, t.dwID, t.dwGuildFrom, t.dwGuildTo);
 			// i == 0 이면 길드전 도중 DB가 튕긴 것이므로 무승부 처리한다.
 			// 또는, 5분 이하 남은 예약 길드전도 무승부 처리한다. (각자의 배팅액을 돌려준다)
-			//if (i == 0 || (int32_t) t.dwTime - CClientManager::instance().GetCurrentTime() < 60 * 5)
-			if (i == 0 || (int32_t) t.dwTime - CClientManager::instance().GetCurrentTime() < 0)
+			//if (i == 0 || (int32_t) t.dwTime - CClientManager::Instance().GetCurrentTime() < 60 * 5)
+			if (i == 0 || (int32_t) t.dwTime - CClientManager::Instance().GetCurrentTime() < 0)
 			{
 				if (i == 0)
 					sys_log(0, "%s : DB was shutdowned while war is being.", buf);
@@ -929,7 +929,7 @@ int32_t GetAverageGuildMemberLevel(uint32_t dwGID)
 	snprintf(szQuery, sizeof(szQuery), 
 			"SELECT AVG(level) FROM guild_member, player AS p WHERE guild_id=%u AND guild_member.pid=p.id", dwGID);
 
-	std::unique_ptr<SQLMsg> msg(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> msg(CDBManager::Instance().DirectQuery(szQuery));
 
 	MYSQL_ROW row;
 	row = mysql_fetch_row(msg->Get()->pSQLResult);
@@ -944,7 +944,7 @@ int32_t GetGuildMemberCount(uint32_t dwGID)
 
 	snprintf(szQuery, sizeof(szQuery), "SELECT COUNT(*) FROM guild_member WHERE guild_id=%u", dwGID);
 
-	std::unique_ptr<SQLMsg> msg(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> msg(CDBManager::Instance().DirectQuery(szQuery));
 
 	MYSQL_ROW row;
 	row = mysql_fetch_row(msg->Get()->pSQLResult);
@@ -970,7 +970,7 @@ bool CGuildManager::ReserveWar(TPacketGuildWar * p)
 
 	t.dwGuildFrom = GID1;
 	t.dwGuildTo = GID2;
-	t.dwTime = CClientManager::instance().GetCurrentTime() + GetGuildWarReserveSeconds();
+	t.dwTime = CClientManager::Instance().GetCurrentTime() + GetGuildWarReserveSeconds();
 	t.bType = p->bType;
 	t.lWarPrice = p->lWarPrice;
 	t.lInitialScore = p->lInitialScore;
@@ -1032,7 +1032,7 @@ bool CGuildManager::ReserveWar(TPacketGuildWar * p)
 			"VALUES(%u, %u, DATE_ADD(NOW(), INTERVAL 180 SECOND), %u, %d, %d, %d, %d, %d)",
 			GID1, GID2, p->bType, p->lWarPrice, p->lInitialScore, t.lPowerFrom, t.lPowerTo, t.lHandicap);
 
-	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 	if (pmsg->Get()->uiAffectedRows == 0 || pmsg->Get()->uiInsertID == 0 || pmsg->Get()->uiAffectedRows == (uint32_t)-1)
 	{
@@ -1044,13 +1044,13 @@ bool CGuildManager::ReserveWar(TPacketGuildWar * p)
 
 	m_map_kWarReserve.insert(std::make_pair(t.dwID, new CGuildWarReserve(t)));
 
-	CClientManager::instance().ForwardPacket(HEADER_DG_GUILD_WAR_RESERVE_ADD, &t, sizeof(TGuildWarReserve));
+	CClientManager::Instance().ForwardPacket(HEADER_DG_GUILD_WAR_RESERVE_ADD, &t, sizeof(TGuildWarReserve));
 	return true;
 }
 
 void CGuildManager::ProcessReserveWar()
 {
-	uint32_t dwCurTime = CClientManager::instance().GetCurrentTime();
+	uint32_t dwCurTime = CClientManager::Instance().GetCurrentTime();
 
 	auto it = m_map_kWarReserve.begin();
 
@@ -1074,9 +1074,9 @@ void CGuildManager::ProcessReserveWar()
 			{
 				char szQuery[128];
 				snprintf(szQuery, sizeof(szQuery), "UPDATE guild_war_reservation SET started=1 WHERE id=%u", r.dwID);
-				CDBManager::instance().AsyncQuery(szQuery);
+				CDBManager::Instance().AsyncQuery(szQuery);
 
-				CClientManager::instance().ForwardPacket(HEADER_DG_GUILD_WAR_RESERVE_DEL, &r.dwID, sizeof(uint32_t));
+				CClientManager::Instance().ForwardPacket(HEADER_DG_GUILD_WAR_RESERVE_DEL, &r.dwID, sizeof(uint32_t));
 
 				r.bStarted = true;
 
@@ -1092,7 +1092,7 @@ void CGuildManager::ProcessReserveWar()
 				pck.lWarPrice = r.lWarPrice;
 				pck.lInitialScore = r.lInitialScore;
 
-				CClientManager::instance().ForwardPacket(HEADER_DG_GUILD_WAR, &pck, sizeof(TPacketGuildWar));
+				CClientManager::Instance().ForwardPacket(HEADER_DG_GUILD_WAR, &pck, sizeof(TPacketGuildWar));
 				//m_map_kWarReserve.erase(it2);
 			}
 			else
@@ -1101,7 +1101,7 @@ void CGuildManager::ProcessReserveWar()
 				{
 					pk->SetLastNoticeMin(iMin);
 
-					CClientManager::instance().SendNotice("The war between %s and %s will start after %d minutes!", r_1.szName, r_2.szName, iMin);
+					CClientManager::Instance().SendNotice("The war between %s and %s will start after %d minutes!", r_1.szName, r_2.szName, iMin);
 				}
 			}
 		}
@@ -1119,7 +1119,7 @@ bool CGuildManager::Bet(uint32_t dwID, const char * c_pszLogin, uint32_t dwGold,
 		sys_log(0, "WAR_RESERVE: Bet: cannot find reserve war by id %u", dwID);
 		snprintf(szQuery, sizeof(szQuery), "INSERT INTO item_award (login, vnum, socket0, given_time) VALUES('%s', %d, %u, NOW())",
 				c_pszLogin, ITEM_ELK_VNUM, dwGold);
-		CDBManager::instance().AsyncQuery(szQuery);
+		CDBManager::Instance().AsyncQuery(szQuery);
 		return false;
 	}
 
@@ -1128,7 +1128,7 @@ bool CGuildManager::Bet(uint32_t dwID, const char * c_pszLogin, uint32_t dwGold,
 		sys_log(0, "WAR_RESERVE: Bet: cannot bet id %u, login %s, gold %u, guild %u", dwID, c_pszLogin, dwGold, dwGuild);
 		snprintf(szQuery, sizeof(szQuery), "INSERT INTO item_award (login, vnum, socket0, given_time) VALUES('%s', %d, %u, NOW())", 
 				c_pszLogin, ITEM_ELK_VNUM, dwGold);
-		CDBManager::instance().AsyncQuery(szQuery);
+		CDBManager::Instance().AsyncQuery(szQuery);
 		return false;
 	}
 
@@ -1151,13 +1151,13 @@ bool CGuildManager::ChangeMaster(uint32_t dwGID, uint32_t dwFrom, uint32_t dwTo)
 	char szQuery[1024];
 
 	snprintf(szQuery, sizeof(szQuery), "UPDATE guild SET master=%u WHERE id=%u", dwTo, dwGID);
-	delete CDBManager::instance().DirectQuery(szQuery);
+	delete CDBManager::Instance().DirectQuery(szQuery);
 
 	snprintf(szQuery, sizeof(szQuery), "UPDATE guild_member SET grade=1 WHERE pid=%u", dwTo);
-	delete CDBManager::instance().DirectQuery(szQuery);
+	delete CDBManager::Instance().DirectQuery(szQuery);
 
 	snprintf(szQuery, sizeof(szQuery), "UPDATE guild_member SET grade=15 WHERE pid=%u", dwFrom);
-	delete CDBManager::instance().DirectQuery(szQuery);
+	delete CDBManager::Instance().DirectQuery(szQuery);
 
 	return true;
 }
@@ -1178,7 +1178,7 @@ void CGuildWarReserve::Initialize()
 	char szQuery[256];
 	snprintf(szQuery, sizeof(szQuery), "SELECT login, guild, gold FROM guild_war_bet WHERE war_id=%u", m_data.dwID);
 
-	std::unique_ptr<SQLMsg> msgbet(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> msgbet(CDBManager::Instance().DirectQuery(szQuery));
 
 	if (msgbet->Get()->uiNumRows)
 	{
@@ -1255,7 +1255,7 @@ bool CGuildWarReserve::Bet(const char * pszLogin, uint32_t dwGold, uint32_t dwGu
 			"INSERT INTO guild_war_bet (war_id, login, gold, guild) VALUES(%u, '%s', %u, %u)",
 			m_data.dwID, pszLogin, dwGold, dwGuild);
 
-	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 	if (pmsg->Get()->uiAffectedRows == 0 || pmsg->Get()->uiAffectedRows == (uint32_t)-1)
 	{
@@ -1268,12 +1268,12 @@ bool CGuildWarReserve::Bet(const char * pszLogin, uint32_t dwGold, uint32_t dwGu
 	else
 		m_data.dwBetTo += dwGold;
 
-	CClientManager::instance().ForwardPacket(HEADER_DG_GUILD_WAR_RESERVE_ADD, &m_data, sizeof(TGuildWarReserve));
+	CClientManager::Instance().ForwardPacket(HEADER_DG_GUILD_WAR_RESERVE_ADD, &m_data, sizeof(TGuildWarReserve));
 
 	snprintf(szQuery, sizeof(szQuery), "UPDATE guild_war_reservation SET bet_from=%u,bet_to=%u WHERE id=%u", 
 			m_data.dwBetFrom, m_data.dwBetTo, m_data.dwID);
 
-	CDBManager::instance().AsyncQuery(szQuery);
+	CDBManager::Instance().AsyncQuery(szQuery);
 
 	sys_log(0, "GuildWarReserve::Bet: success. %s %u war_id %u bet %u : %u", pszLogin, dwGuild, m_data.dwID, m_data.dwBetFrom, m_data.dwBetTo);
 	mapBet.insert(std::make_pair(pszLogin, std::make_pair(dwGuild, dwGold)));
@@ -1284,7 +1284,7 @@ bool CGuildWarReserve::Bet(const char * pszLogin, uint32_t dwGold, uint32_t dwGu
 	pckBet.dwGuild = dwGuild;
 	pckBet.dwGold = dwGold;
 
-	CClientManager::instance().ForwardPacket(HEADER_DG_GUILD_WAR_BET, &pckBet, sizeof(TPacketGDGuildWarBet));
+	CClientManager::Instance().ForwardPacket(HEADER_DG_GUILD_WAR_BET, &pckBet, sizeof(TPacketGDGuildWarBet));
 	return true;
 }
 
@@ -1297,7 +1297,7 @@ void CGuildWarReserve::Draw()
 	char szQuery[1024];
 
 	snprintf(szQuery, sizeof(szQuery), "UPDATE guild_war_reservation SET started=1,winner=0 WHERE id=%u", m_data.dwID);
-	CDBManager::instance().AsyncQuery(szQuery);
+	CDBManager::Instance().AsyncQuery(szQuery);
 
 	if (mapBet.empty())
 		return;
@@ -1333,7 +1333,7 @@ void CGuildWarReserve::Draw()
 		if (iRow > 0)
 		{
 			sys_log(0, "WAR_REWARD: QUERY: %s", szQuery);
-			CDBManager::instance().AsyncQuery(szQuery);
+			CDBManager::Instance().AsyncQuery(szQuery);
 		}
 
 		if (it == mapBet.end())
@@ -1377,7 +1377,7 @@ void CGuildWarReserve::End(int32_t iScoreFrom, int32_t iScoreTo)
 	char szQuery[1024];
 	snprintf(szQuery, sizeof(szQuery), "UPDATE guild_war_reservation SET started=1,winner=%u,result1=%d,result2=%d WHERE id=%u", 
 			dwWinner, iScoreFrom, iScoreTo, m_data.dwID);
-	CDBManager::instance().AsyncQuery(szQuery);
+	CDBManager::Instance().AsyncQuery(szQuery);
 
 	if (mapBet.empty())
 		return;
@@ -1445,7 +1445,7 @@ void CGuildWarReserve::End(int32_t iScoreFrom, int32_t iScoreTo)
 		if (iRow > 0)
 		{
 			sys_log(0, "WAR_REWARD: query: %s", szQuery);
-			CDBManager::instance().AsyncQuery(szQuery);
+			CDBManager::Instance().AsyncQuery(szQuery);
 		}
 
 		if (it == mapBet.end())

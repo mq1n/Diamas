@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.2)
-project(auth_server CXX)
+project(auth_server)
 set(EXE_NAME auth_server)
 
 # Output dir
 set(OUTPUT_DIR ${PROJECT_SOURCE_DIR}/../../../Bin)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR})
@@ -15,6 +14,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR})
 if (MSVC)
 	add_definitions(-DWIN32)
 	add_definitions(-D_WIN32)
+	add_definitions(-D__WIN32__)
 endif()
 
 add_definitions(-DNOMINMAX)
@@ -23,39 +23,42 @@ add_definitions(-DUSE_ASIO)
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 	add_definitions(-D_DEBUG)
 	add_definitions(-DDEBUG)
+	set(BUILD_MODE "debug")
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release")
 	add_definitions(-D_NDEBUG)
 	add_definitions(-DNDEBUG)
+	set(BUILD_MODE "normal")
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
 	add_definitions(-D_NDEBUG)
 	add_definitions(-DNDEBUG)
+	set(BUILD_MODE "normal")
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel")
 	add_definitions(-D_NDEBUG)
 	add_definitions(-DNDEBUG)
+	set(BUILD_MODE "normal")
 endif()
 
 # Project files
 file(GLOB AUTH_HEADERS
-    "src/*.h"
-    "src/*.hpp"
+	"${PROJECT_SOURCE_DIR}/../common/*.h"
+	"${PROJECT_SOURCE_DIR}/src/*.hpp"
 )
 file(GLOB AUTH_SOURCES
-    "src/*.c"
-    "src/*.cpp"
+	"${PROJECT_SOURCE_DIR}/src/*.cpp"
 )
 
 if (MSVC)
 	set(EXTRA_LIBS ws2_32 dbghelp shlwapi NetEngine)
 
 	if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb_debug mariadbclient_debug DevIL_debug)
+		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb_debug mariadbclient_debug)
 	else()
-		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb mariadbclient DevIL)
+		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb mariadbclient)
 	endif()
 
-	add_executable(${EXE_NAME} WIN32 ${AUTH_HEADERS} ${AUTH_SOURCES})
+	add_executable(${EXE_NAME} ${AUTH_HEADERS} ${AUTH_SOURCES})
 	
-	target_link_libraries(${EXE_NAME} ${EXTRA_LIBS})
+	target_link_libraries(${EXE_NAME} thecorelib ${EXTRA_LIBS} DevIL)
 #	set_target_properties(${EXE_NAME} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT")
 
 else()
@@ -70,7 +73,7 @@ else()
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 	# Link
-	target_link_libraries(${EXE_NAME} ${LIBZ} ${MYSQL_LIBRARIES} pthread -static-libgcc -static-libstdc++ NetEngine)
+	target_link_libraries(${EXE_NAME} ${LIBZ} ${MYSQL_LIBRARIES} pthread -static-libgcc -static-libstdc++ thecorelib NetEngine)
 
 endif()
 

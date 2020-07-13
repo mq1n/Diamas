@@ -1,9 +1,8 @@
 #pragma once
-
-#include "../../common/service.h"
+#include "../../../common/defines.h"
 #include "debug_allocator.h"
 
-#include <assert.h>
+#include <cassert>
 #include <deque>
 
 enum { DEFAULT_FREE_TRIGGER_COUNT = 32 };

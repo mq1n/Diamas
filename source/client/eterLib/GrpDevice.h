@@ -23,8 +23,8 @@ public:
 		CREATE_GET_DEVICE_CAPS2 = (1 << 3),
 		CREATE_DEVICE			= (1 << 4),
 		CREATE_REFRESHRATE		= (1 << 5),
-		CREATE_ENUM				= (1 << 6), // 2003. 01. 09. myevan 모드 리스트 얻기 실패
-		CREATE_DETECT			= (1 << 7), // 2003. 01. 09. myevan 모드 선택 실패
+		CREATE_ENUM				= (1 << 6),
+		CREATE_DETECT			= (1 << 7),
 		CREATE_NO_TNL			= (1 << 8),
 	};
 

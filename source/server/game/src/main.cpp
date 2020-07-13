@@ -53,7 +53,6 @@
 #include "battleground.h"
 #include "desc.h"
 #include "desc_client.h"
-#include "../../common/service.h"
 #include "../../libthecore/include/winminidump.h"
 
 #ifdef USE_STACKTRACE
@@ -262,7 +261,7 @@ void heartbeat(LPHEART ht, int32_t pulse)
 	// 1초마다
 	if (!(pulse % ht->passes_per_sec))
 	{
-		DESC_MANAGER::instance().ProcessExpiredLoginKey();
+		DESC_MANAGER::Instance().ProcessExpiredLoginKey();
 
 		{
 
@@ -285,32 +284,32 @@ void heartbeat(LPHEART ht, int32_t pulse)
 
 	// 약 1.16초마다
 	if (!(pulse % (passes_per_sec + 4)))
-		CHARACTER_MANAGER::instance().ProcessDelayedSave();
+		CHARACTER_MANAGER::Instance().ProcessDelayedSave();
 
 	// 약 5.08초마다
 	if (!(pulse % (passes_per_sec * 5 + 2)))
 	{
-		ITEM_MANAGER::instance().Update();
-		DESC_MANAGER::instance().UpdateLocalUserCount();
+		ITEM_MANAGER::Instance().Update();
+		DESC_MANAGER::Instance().UpdateLocalUserCount();
 	}
 
 	s_dwProfiler[PROF_HEARTBEAT] += (get_dword_time() - t);
 
-	DBManager::instance().Process();
-	AccountDB::instance().Process();
-	CPVPManager::instance().Process();
+	DBManager::Instance().Process();
+	AccountDB::Instance().Process();
+	CPVPManager::Instance().Process();
 
 	if (g_bShutdown)
 	{
 		if (thecore_pulse() > g_shutdown_disconnect_pulse)
 		{
-			const DESC_MANAGER::DESC_SET & c_set_desc = DESC_MANAGER::instance().GetClientSet();
+			const DESC_MANAGER::DESC_SET & c_set_desc = DESC_MANAGER::Instance().GetClientSet();
 			std::for_each(c_set_desc.begin(), c_set_desc.end(), ::SendDisconnectFunc());
 			g_shutdown_disconnect_pulse = INT_MAX;
 		}
 		else if (thecore_pulse() > g_shutdown_disconnect_force_pulse)
 		{
-			const DESC_MANAGER::DESC_SET & c_set_desc = DESC_MANAGER::instance().GetClientSet();
+			const DESC_MANAGER::DESC_SET & c_set_desc = DESC_MANAGER::Instance().GetClientSet();
 			std::for_each(c_set_desc.begin(), c_set_desc.end(), ::DisconnectFunc());
 		}
 		else if (thecore_pulse() > g_shutdown_disconnect_force_pulse + PASSES_PER_SEC(5))
@@ -350,7 +349,7 @@ int32_t start()
 	}
 	sys_log(0, "the core init completed");
 
-	if (false == CThreeWayWar::instance().LoadSetting("forkedmapindex.txt"))
+	if (false == CThreeWayWar::Instance().LoadSetting("forkedmapindex.txt"))
 	{
 		if (false == g_bAuthServer)
 		{
@@ -382,7 +381,7 @@ int32_t start()
 	fdwatch_add_fd(main_fdw, tcp_socket, nullptr, FDW_READ, false);
 	fdwatch_add_fd(main_fdw, p2p_socket, nullptr, FDW_READ, false);
 
-	db_clientdesc = DESC_MANAGER::instance().CreateConnectionDesc(main_fdw, db_addr, db_port, PHASE_DBCLIENT, true);
+	db_clientdesc = DESC_MANAGER::Instance().CreateConnectionDesc(main_fdw, db_addr, db_port, PHASE_DBCLIENT, true);
 	if (!g_bAuthServer) 
 	{
 		db_clientdesc->UpdateChannelStatus(0, true);
@@ -393,8 +392,8 @@ int32_t start()
 		if (g_stAuthMasterIP.length() != 0)
 		{
 			fprintf(stderr, "SlaveAuth\n");
-			g_pkAuthMasterDesc = DESC_MANAGER::instance().CreateConnectionDesc(main_fdw, g_stAuthMasterIP.c_str(), g_wAuthMasterPort, PHASE_P2P, true); 
-			P2P_MANAGER::instance().RegisterConnector(g_pkAuthMasterDesc);
+			g_pkAuthMasterDesc = DESC_MANAGER::Instance().CreateConnectionDesc(main_fdw, g_stAuthMasterIP.c_str(), g_wAuthMasterPort, PHASE_P2P, true); 
+			P2P_MANAGER::Instance().RegisterConnector(g_pkAuthMasterDesc);
 			g_pkAuthMasterDesc->SetP2P(g_stAuthMasterIP.c_str(), g_wAuthMasterPort, g_bChannel);
 
 		}
@@ -480,8 +479,8 @@ int32_t main(int32_t argc, char **argv)
 	}
 
 	CAnticheatManager ACManager;
-	MessengerManager::instance().Initialize();
-	CGuildManager::instance().Initialize();
+	MessengerManager::Instance().Initialize();
+	CGuildManager::Instance().Initialize();
 	fishing::Initialize();
 	OXEvent_manager.Initialize();
 	bgManager.Initialize();
@@ -517,12 +516,12 @@ int32_t main(int32_t argc, char **argv)
 
 	if (g_bAuthServer)
 	{
-		int32_t iLimit = DBManager::instance().CountQuery() / 50;
+		int32_t iLimit = DBManager::Instance().CountQuery() / 50;
 		int32_t i = 0;
 
 		do
 		{
-			uint32_t dwCount = DBManager::instance().CountQuery();
+			uint32_t dwCount = DBManager::Instance().CountQuery();
 			sys_log(0, "Queries %u", dwCount);
 
 			if (dwCount == 0)
@@ -531,7 +530,7 @@ int32_t main(int32_t argc, char **argv)
 			usleep(500000);
 
 			if (++i >= iLimit)
-				if (dwCount == DBManager::instance().CountQuery())
+				if (dwCount == DBManager::Instance().CountQuery())
 					break;
 		} while (1);
 	}
@@ -636,7 +635,7 @@ int32_t idle()
 	}
 
 	t = get_dword_time();
-	CHARACTER_MANAGER::instance().Update(thecore_heart->pulse);
+	CHARACTER_MANAGER::Instance().Update(thecore_heart->pulse);
 	db_clientdesc->Update(t);
 	s_dwProfiler[PROF_CHR_UPDATE] += (get_dword_time() - t);
 
@@ -684,8 +683,8 @@ int32_t io_loop(LPFDWATCH fdw)
 	LPDESC	d;
 	int32_t		num_events, event_idx;
 
-	DESC_MANAGER::instance().DestroyClosed(); // PHASE_CLOSE인 접속들을 끊어준다.
-	DESC_MANAGER::instance().TryConnect();
+	DESC_MANAGER::Instance().DestroyClosed(); // PHASE_CLOSE인 접속들을 끊어준다.
+	DESC_MANAGER::Instance().TryConnect();
 
 	if ((num_events = fdwatch(fdw, nullptr)) < 0)
 		return 0;
@@ -698,12 +697,12 @@ int32_t io_loop(LPFDWATCH fdw)
 		{
 			if (FDW_READ == fdwatch_check_event(fdw, tcp_socket, event_idx))
 			{
-				DESC_MANAGER::instance().AcceptDesc(fdw, tcp_socket);
+				DESC_MANAGER::Instance().AcceptDesc(fdw, tcp_socket);
 				fdwatch_clear_event(fdw, tcp_socket, event_idx);
 			}
 			else if (FDW_READ == fdwatch_check_event(fdw, p2p_socket, event_idx))
 			{
-				DESC_MANAGER::instance().AcceptP2PDesc(fdw, p2p_socket);
+				DESC_MANAGER::Instance().AcceptP2PDesc(fdw, p2p_socket);
 				fdwatch_clear_event(fdw, p2p_socket, event_idx);
 			}
 			continue; 

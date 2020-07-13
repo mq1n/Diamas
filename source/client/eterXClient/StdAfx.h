@@ -7,6 +7,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include "../../common/common_incl.hpp"
+#include "../eterBase/StdAfx.h"
 #include "../eterLib/StdAfx.h"
 #include "../eterPythonLib/StdAfx.h"
 #include "../eterGameLib/StdAfx.h"

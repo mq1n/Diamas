@@ -138,7 +138,7 @@ class CWarMap
 		CHARACTER_SET m_set_pkChr;
 };
 
-class CWarMapManager : public singleton<CWarMapManager>
+class CWarMapManager : public CSingleton<CWarMapManager>
 {
 	public:
 		CWarMapManager();

@@ -176,7 +176,7 @@ LPDESC DESC_MANAGER::AcceptP2PDesc(LPFDWATCH fdw, socket_t bind_fd)
 	++m_iSocketsConnected;
 
 	sys_log(0, "DESC_MANAGER::AcceptP2PDesc  %s:%u", host, peer.sin_port);
-	P2P_MANAGER::instance().RegisterAcceptor(pkDesc);
+	P2P_MANAGER::Instance().RegisterAcceptor(pkDesc);
 	return (pkDesc);
 }
 
@@ -417,19 +417,19 @@ void DESC_MANAGER::UpdateLocalUserCount()
 	m_iLocalUserCount = f.iTotalCount;
 	memcpy(m_aiEmpireUserCount, f.aiEmpireUserCount, sizeof(m_aiEmpireUserCount));
 
-	m_aiEmpireUserCount[1] += P2P_MANAGER::instance().GetEmpireUserCount(1);
-	m_aiEmpireUserCount[2] += P2P_MANAGER::instance().GetEmpireUserCount(2);
-	m_aiEmpireUserCount[3] += P2P_MANAGER::instance().GetEmpireUserCount(3);
+	m_aiEmpireUserCount[1] += P2P_MANAGER::Instance().GetEmpireUserCount(1);
+	m_aiEmpireUserCount[2] += P2P_MANAGER::Instance().GetEmpireUserCount(2);
+	m_aiEmpireUserCount[3] += P2P_MANAGER::Instance().GetEmpireUserCount(3);
 }
 
 void DESC_MANAGER::GetUserCount(int32_t & iTotal, int32_t ** paiEmpireUserCount, int32_t & iLocalCount)
 {
 	*paiEmpireUserCount = &m_aiEmpireUserCount[0];
 	
-	int32_t iCount = P2P_MANAGER::instance().GetCount();
+	int32_t iCount = P2P_MANAGER::Instance().GetCount();
 	if (iCount < 0)
 	{
-		sys_err("P2P_MANAGER::instance().GetCount() == -1");
+		sys_err("P2P_MANAGER::Instance().GetCount() == -1");
 	}
 	iTotal = m_iLocalUserCount + iCount;
 	iLocalCount = m_iLocalUserCount;

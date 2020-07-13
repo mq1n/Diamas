@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __INC_GAME_POOL_H__
+#define __INC_GAME_POOL_H__
 
 template<typename T>
 struct PoolNode {
@@ -46,11 +47,11 @@ template<typename T>
 class ArrayPool {
 public:
 	ArrayPool(size_t array_size, size_t initial_capacity = 0)
-			: free_(nullptr),
-			  array_size_(array_size),
-			  capacity_(0),
-			  alloc_count_(0),
-			  alloc_index_of_last_release_(0) {
+		: free_(nullptr),
+		array_size_(array_size),
+		capacity_(0),
+		alloc_count_(0),
+		alloc_index_of_last_release_(0) {
 		assert(array_size_ != 0);
 		if (initial_capacity != 0) {
 			Reserve(initial_capacity);
@@ -165,7 +166,7 @@ private:
 
 		NodeType* tail = free_;
 		NodeType** link = &free_;
-		for (size_t i = 0; i < increment ; ++i, ++node, p += array_size_) {
+		for (size_t i = 0; i < increment; ++i, ++node, p += array_size_) {
 			node->block = p;
 			*link = node;
 			link = &(node->next);
@@ -199,7 +200,7 @@ public:
 	MemoryPool() {}
 	~MemoryPool() {
 		PoolMapType::iterator it = pools_.begin(), end = pools_.end();
-		for ( ; it != end; ++it) {
+		for (; it != end; ++it) {
 			delete (it->second);
 		}
 	}
@@ -209,7 +210,8 @@ public:
 		PoolMapType::iterator it = pools_.find(size);
 		if (it != pools_.end()) {
 			pool = it->second;
-		} else {
+		}
+		else {
 			pool = new Pool(size);
 			pools_.insert(PoolMapType::value_type(size, pool));
 		}
@@ -266,3 +268,5 @@ private:
 	ObjectPool(const ObjectPool&);
 	void operator=(const ObjectPool&);
 };
+
+#endif

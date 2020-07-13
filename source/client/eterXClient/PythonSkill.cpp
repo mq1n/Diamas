@@ -805,12 +805,12 @@ CPythonSkill::CPythonSkill()
 	SSkillData::ms_StatusNameMap.emplace("MaxMWEP", POINT_MAX_WEP);
 	SSkillData::ms_StatusNameMap.emplace("MinWEP", POINT_MIN_WEP);
 	SSkillData::ms_StatusNameMap.emplace("MaxWEP", POINT_MAX_WEP);
-	SSkillData::ms_StatusNameMap.emplace("MinATK", POINT_MIN_ATK);
-	SSkillData::ms_StatusNameMap.emplace("MaxATK", POINT_MAX_ATK);
+	SSkillData::ms_StatusNameMap.emplace("MinATK", POINT_WEAPON_MIN);
+	SSkillData::ms_StatusNameMap.emplace("MaxATK", POINT_WEAPON_MAX);
 	SSkillData::ms_StatusNameMap.emplace("ATKSPD", POINT_ATT_SPEED);
-	SSkillData::ms_StatusNameMap.emplace("AttackPower", POINT_MIN_ATK);
-	SSkillData::ms_StatusNameMap.emplace("AtkMin", POINT_MIN_ATK);
-	SSkillData::ms_StatusNameMap.emplace("AtkMax", POINT_MAX_ATK);
+	SSkillData::ms_StatusNameMap.emplace("AttackPower", POINT_WEAPON_MIN);
+	SSkillData::ms_StatusNameMap.emplace("AtkMin", POINT_WEAPON_MIN);
+	SSkillData::ms_StatusNameMap.emplace("AtkMax", POINT_WEAPON_MAX);
 	SSkillData::ms_StatusNameMap.emplace("DefencePower", POINT_DEF_GRADE);
 	SSkillData::ms_StatusNameMap.emplace("DEF", POINT_DEF_GRADE);
 	SSkillData::ms_StatusNameMap.emplace("MWEP", POINT_MAGIC_ATT_GRADE);
@@ -821,8 +821,8 @@ CPythonSkill::CPythonSkill()
 	SSkillData::ms_StatusNameMap.emplace("DEX", POINT_DX);
 	SSkillData::ms_StatusNameMap.emplace("CON", POINT_HT);
 
-	SSkillData::ms_StatusNameMap.emplace("minatk", POINT_MIN_ATK);
-	SSkillData::ms_StatusNameMap.emplace("maxatk", POINT_MAX_ATK);
+	SSkillData::ms_StatusNameMap.emplace("minatk", POINT_WEAPON_MIN);
+	SSkillData::ms_StatusNameMap.emplace("maxatk", POINT_WEAPON_MAX);
 	SSkillData::ms_StatusNameMap.emplace("minmtk", POINT_MIN_WEP);
 	SSkillData::ms_StatusNameMap.emplace("maxmtk", POINT_MAX_WEP);
 
@@ -845,7 +845,7 @@ CPythonSkill::CPythonSkill()
 
 	/////
 
-	SSkillData::ms_NewMinStatusNameMap.emplace("atk", POINT_MIN_ATK);
+	SSkillData::ms_NewMinStatusNameMap.emplace("atk", POINT_WEAPON_MIN);
 	SSkillData::ms_NewMinStatusNameMap.emplace("mtk", POINT_MIN_WEP);
 	SSkillData::ms_NewMinStatusNameMap.emplace("wep", POINT_MIN_WEP);
 	SSkillData::ms_NewMinStatusNameMap.emplace("lv", POINT_LEVEL);
@@ -855,7 +855,7 @@ CPythonSkill::CPythonSkill()
 	SSkillData::ms_NewMinStatusNameMap.emplace("dex", POINT_DX);
 	SSkillData::ms_NewMinStatusNameMap.emplace("con", POINT_HT);
 
-	SSkillData::ms_NewMaxStatusNameMap.emplace("atk", POINT_MAX_ATK);
+	SSkillData::ms_NewMaxStatusNameMap.emplace("atk", POINT_WEAPON_MAX);
 	SSkillData::ms_NewMaxStatusNameMap.emplace("mtk", POINT_MAX_WEP);
 	SSkillData::ms_NewMaxStatusNameMap.emplace("wep", POINT_MAX_WEP);
 	SSkillData::ms_NewMaxStatusNameMap.emplace("lv", POINT_LEVEL);

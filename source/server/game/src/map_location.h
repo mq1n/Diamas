@@ -1,7 +1,7 @@
 #pragma once
-#include "../../common/stl.h"
+#include "../../../common/stl.h"
 
-class CMapLocation : public singleton<CMapLocation>
+class CMapLocation : public CSingleton<CMapLocation>
 {
 	public:
 		typedef struct SLocation

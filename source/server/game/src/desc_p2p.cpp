@@ -3,7 +3,6 @@
 #include "protocol.h"
 #include "p2p.h"
 #include "config.h"
-#include "../../common/service.h"
 
 DESC_P2P::~DESC_P2P()
 {
@@ -14,7 +13,7 @@ void DESC_P2P::Destroy()
 	if (m_sock == INVALID_SOCKET)
 		return;
 
-	P2P_MANAGER::instance().UnregisterAcceptor(this);
+	P2P_MANAGER::Instance().UnregisterAcceptor(this);
 
 	fdwatch_del_fd(m_lpFdw, m_sock);
 

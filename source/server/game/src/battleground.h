@@ -1,11 +1,5 @@
 #pragma once
-/*
- * @file	Battleground.h
- * @author	Koray (mq1n@protonmail.com)
- * @version	0.1 / 2019-06-08
- */
-#include "../../common/singleton.h"
-
+#include "../../../common/singleton.h"
 #include "vid.h"
 #include "char.h"
 #include "event.h"
@@ -483,7 +477,7 @@ private:
 
 // ------------------------------------------------- MANAGER --------------------------------------------
 
-class CBattlegroundManager : public singleton <CBattlegroundManager>
+class CBattlegroundManager : public CSingleton <CBattlegroundManager>
 {
 public:
 	CBattlegroundManager();

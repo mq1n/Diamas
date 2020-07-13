@@ -789,7 +789,6 @@ class CInstanceBase
 		bool __Background_IsWaterPixelPosition(const TPixelPosition& c_rkPPos);
 		bool __Background_GetWaterHeight(const TPixelPosition& c_rkPPos, float* pfHeight);
 
-		// 2004.07.25.myevan.이펙트 안나오는 문제
 		/////////////////////////////////////////////////////////////
 		void __ClearAffectFlagContainer();
 		void __ClearAffects();

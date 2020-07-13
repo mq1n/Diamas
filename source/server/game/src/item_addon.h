@@ -1,6 +1,6 @@
 #pragma once
 
-class CItemAddonManager : public singleton<CItemAddonManager>
+class CItemAddonManager : public CSingleton<CItemAddonManager>
 {
 	public:
 		CItemAddonManager();

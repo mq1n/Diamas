@@ -138,7 +138,7 @@ uint32_t CPetActor::Summon(const char* petName, LPITEM pSummonItem, bool bSpawnF
 		return m_dwVID;
 	}
 
-	m_pkChar = CHARACTER_MANAGER::instance().SpawnMob(
+	m_pkChar = CHARACTER_MANAGER::Instance().SpawnMob(
 				m_dwVnum,
 				m_pkOwner->GetMapIndex(),
 				x, y, z,
@@ -182,8 +182,8 @@ bool CPetActor::_UpdatAloneActionAI(float fMinDist, float fMaxDist)
 	//GetDeltaByDegree(m_pkChar->GetRotation(), fDist, &fx, &fy);
 
 	// 느슨한 못감 속성 체크; 최종 위치와 중간 위치가 갈수없다면 가지 않는다.
-	//if (!(SECTREE_MANAGER::instance().IsMovablePosition(m_pkChar->GetMapIndex(), m_pkChar->GetX() + (int32_t) fx, m_pkChar->GetY() + (int32_t) fy)
-	//			&& SECTREE_MANAGER::instance().IsMovablePosition(m_pkChar->GetMapIndex(), m_pkChar->GetX() + (int32_t) fx/2, m_pkChar->GetY() + (int32_t) fy/2)))
+	//if (!(SECTREE_MANAGER::Instance().IsMovablePosition(m_pkChar->GetMapIndex(), m_pkChar->GetX() + (int32_t) fx, m_pkChar->GetY() + (int32_t) fy)
+	//			&& SECTREE_MANAGER::Instance().IsMovablePosition(m_pkChar->GetMapIndex(), m_pkChar->GetX() + (int32_t) fx/2, m_pkChar->GetY() + (int32_t) fy/2)))
 	//	return true;
 
 	m_pkChar->SetNowWalking(true);
@@ -286,8 +286,8 @@ bool CPetActor::Update(uint32_t deltaTime)
 	// 펫 주인이 죽었거나, 소환된 펫의 상태가 이상하다면 펫을 없앰. (NOTE: 가끔가다 이런 저런 이유로 소환된 펫이 DEAD 상태에 빠지는 경우가 있음-_-;)
 	// 펫을 소환한 아이템이 없거나, 내가 가진 상태가 아니라면 펫을 없앰.
 	if (m_pkOwner->IsDead() || (IsSummoned() && m_pkChar->IsDead())
-		|| nullptr == ITEM_MANAGER::instance().FindByVID(this->GetSummonItemVID())
-		|| ITEM_MANAGER::instance().FindByVID(this->GetSummonItemVID())->GetOwner() != this->GetOwner()
+		|| nullptr == ITEM_MANAGER::Instance().FindByVID(this->GetSummonItemVID())
+		|| ITEM_MANAGER::Instance().FindByVID(this->GetSummonItemVID())->GetOwner() != this->GetOwner()
 		)
 	{
 		this->Unsummon();
@@ -365,7 +365,7 @@ void CPetActor::GiveBuff()
 	// 파황 펫 버프는 던전에서만 발생함.
 	if (!__PetCheckBuff(this))
 		return;
-	LPITEM item = ITEM_MANAGER::instance().FindByVID(m_dwSummonItemVID);
+	LPITEM item = ITEM_MANAGER::Instance().FindByVID(m_dwSummonItemVID);
 	if (nullptr != item)
 		item->ModifyPoints(true);
 	return ;
@@ -376,7 +376,7 @@ void CPetActor::ClearBuff()
 	if (nullptr == m_pkOwner)
 		return;
 
-	TItemTable* item_proto = ITEM_MANAGER::instance().GetTable(m_dwSummonItemVnum);
+	TItemTable* item_proto = ITEM_MANAGER::Instance().GetTable(m_dwSummonItemVnum);
 	if (nullptr == item_proto)
 		return;
 
@@ -450,7 +450,7 @@ bool CPetSystem::Update(uint32_t deltaTime)
 		{
 			LPCHARACTER pPet = petActor->GetCharacter();
 
-			if (nullptr == CHARACTER_MANAGER::instance().Find(pPet->GetVID()))
+			if (nullptr == CHARACTER_MANAGER::Instance().Find(pPet->GetVID()))
 			{
 				v_garbageActor.push_back(petActor);
 			}

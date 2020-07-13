@@ -43,7 +43,7 @@ namespace marriage
 			pMap->WarpAll(); 
 			return PASSES_PER_SEC(15);
 		}
-		WeddingManager::instance().DestroyWeddingMap(pMap);
+		WeddingManager::Instance().DestroyWeddingMap(pMap);
 		return 0;
 	}
 
@@ -143,7 +143,7 @@ namespace marriage
 			sys_log(0, "WeddingMap::DestroyAll: %s", ch->GetName());
 
 			if (ch->GetDesc())
-				DESC_MANAGER::instance().DestroyDesc(ch->GetDesc());
+				DESC_MANAGER::Instance().DestroyDesc(ch->GetDesc());
 			else
 				M2_DESTROY_CHARACTER(ch);
 		}
@@ -306,7 +306,7 @@ namespace marriage
 
 	uint32_t WeddingManager::__CreateWeddingMap(uint32_t dwPID1, uint32_t dwPID2)
 	{
-		SECTREE_MANAGER& rkSecTreeMgr = SECTREE_MANAGER::instance();
+		SECTREE_MANAGER& rkSecTreeMgr = SECTREE_MANAGER::Instance();
 
 		uint32_t dwMapIndex = rkSecTreeMgr.CreatePrivateMap(WEDDING_MAP_INDEX);
 
@@ -347,7 +347,7 @@ namespace marriage
 		sys_log(0, "DestroyWeddingMap(index=%u)", pMap->GetMapIndex());
 		pMap->DestroyAll();
 		m_mapWedding.erase(pMap->GetMapIndex());
-		SECTREE_MANAGER::instance().DestroyPrivateMap(pMap->GetMapIndex());
+		SECTREE_MANAGER::Instance().DestroyPrivateMap(pMap->GetMapIndex());
 		M2_DELETE(pMap);
 	}
 

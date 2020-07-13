@@ -26,15 +26,15 @@ namespace quest
 				iShopVnum = (int32_t) lua_tonumber(L, 1);
 		}
 
-		if (CQuestManager::instance().GetCurrentNPCCharacterPtr())
-			CShopManager::instance().StartShopping(CQuestManager::instance().GetCurrentCharacterPtr(), CQuestManager::instance().GetCurrentNPCCharacterPtr(), iShopVnum);
+		if (CQuestManager::Instance().GetCurrentNPCCharacterPtr())
+			CShopManager::Instance().StartShopping(CQuestManager::Instance().GetCurrentCharacterPtr(), CQuestManager::Instance().GetCurrentNPCCharacterPtr(), iShopVnum);
 		return 0;
 	}
 
 
 	int32_t npc_get_name(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 		if(npc)
 			lua_pushstring(L, npc->GetName());
@@ -46,7 +46,7 @@ namespace quest
 
 	int32_t npc_is_pc(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 		if (npc && npc->IsPC())
 			lua_pushboolean(L, true);
@@ -58,7 +58,7 @@ namespace quest
 
 	int32_t npc_get_empire(lua_State * L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 		if (npc)
 			lua_pushnumber(L, npc->GetEmpire());
@@ -69,13 +69,13 @@ namespace quest
 
 	int32_t npc_get_race(lua_State * L)
 	{
-		lua_pushnumber(L, CQuestManager::instance().GetCurrentNPCRace());
+		lua_pushnumber(L, CQuestManager::Instance().GetCurrentNPCRace());
 		return 1;
 	}
 
 	int32_t npc_get_guild(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 		CGuild* pGuild = nullptr;
 
@@ -88,7 +88,7 @@ namespace quest
 
 	int32_t npc_get_remain_skill_book_count(lua_State* L)
 	{
-		LPCHARACTER npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
+		LPCHARACTER npc = CQuestManager::Instance().GetCurrentNPCCharacterPtr();
 		if (!npc || npc->IsPC())
 		{
 			lua_pushnumber(L, 0);
@@ -101,7 +101,7 @@ namespace quest
 
 	int32_t npc_dec_remain_skill_book_count(lua_State* L)
 	{
-		LPCHARACTER npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
+		LPCHARACTER npc = CQuestManager::Instance().GetCurrentNPCCharacterPtr();
 		if (!npc || npc->IsPC())
 		{
 			return 0;
@@ -113,7 +113,7 @@ namespace quest
 
 	int32_t npc_get_remain_hairdye_count(lua_State* L)
 	{
-		LPCHARACTER npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
+		LPCHARACTER npc = CQuestManager::Instance().GetCurrentNPCCharacterPtr();
 		if (!npc || npc->IsPC())
 		{
 			lua_pushnumber(L, 0);
@@ -126,7 +126,7 @@ namespace quest
 
 	int32_t npc_dec_remain_hairdye_count(lua_State* L)
 	{
-		LPCHARACTER npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
+		LPCHARACTER npc = CQuestManager::Instance().GetCurrentNPCCharacterPtr();
 		if (!npc || npc->IsPC())
 		{
 			return 0;
@@ -138,7 +138,7 @@ namespace quest
 
 	int32_t npc_is_quest(lua_State * L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 
 		if (npc)
@@ -158,7 +158,7 @@ namespace quest
 
 	int32_t npc_kill(lua_State * L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 
@@ -177,7 +177,7 @@ namespace quest
 
 	int32_t npc_purge(lua_State * L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 
@@ -196,7 +196,7 @@ namespace quest
 
 	int32_t npc_is_near(lua_State * L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 
@@ -226,8 +226,8 @@ namespace quest
 			return 1;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
-		LPCHARACTER ch = CHARACTER_MANAGER::instance().Find((uint32_t)lua_tonumber(L, 1));
+		CQuestManager& q = CQuestManager::Instance();
+		LPCHARACTER ch = CHARACTER_MANAGER::Instance().Find((uint32_t)lua_tonumber(L, 1));
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 
 		lua_Number dist = 10;
@@ -249,7 +249,7 @@ namespace quest
 
 	int32_t npc_unlock(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 		if (!ch)
@@ -273,7 +273,7 @@ namespace quest
 
 	int32_t npc_lock(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 
@@ -304,7 +304,7 @@ namespace quest
 
 	int32_t npc_get_leader_vid(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 
 		if (!npc)
@@ -332,7 +332,7 @@ namespace quest
 
 	int32_t npc_get_vid(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 
 		if (!npc)
@@ -354,7 +354,7 @@ namespace quest
 		}
 		uint32_t vid = (uint32_t)lua_tonumber(L, 1);
 
-		LPCHARACTER targetChar = CHARACTER_MANAGER::instance().Find(vid);
+		LPCHARACTER targetChar = CHARACTER_MANAGER::Instance().Find(vid);
 
 		if (targetChar)
 			lua_pushnumber(L, targetChar->GetAttMul());
@@ -412,7 +412,7 @@ namespace quest
 		uint32_t vid = (uint32_t)lua_tonumber(L, 1);
 		float damage_mul = (float)lua_tonumber(L, 2);
 
-		LPCHARACTER targetChar = CHARACTER_MANAGER::instance().Find(vid);
+		LPCHARACTER targetChar = CHARACTER_MANAGER::Instance().Find(vid);
 
 		if (targetChar)
 			targetChar->SetDamMul(damage_mul);
@@ -443,7 +443,7 @@ namespace quest
 		}
 		else
 		{
-			CQuestManager& q = CQuestManager::instance();
+			CQuestManager& q = CQuestManager::Instance();
 			LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 
 			if (!npc) 
@@ -475,7 +475,7 @@ namespace quest
 		}
 		else
 		{
-			CQuestManager& q = CQuestManager::instance();
+			CQuestManager& q = CQuestManager::Instance();
 			npc = q.GetCurrentNPCCharacterPtr();
 		}
 
@@ -487,12 +487,12 @@ namespace quest
 
 	int32_t npc_get_local_x(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 		if (!npc)
 			return 0;
 
-		LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(npc->GetMapIndex());
+		LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(npc->GetMapIndex());
 		
 		if (pMap)
 			lua_pushnumber(L, (npc->GetX() - pMap->m_setting.iBaseX) / 100);
@@ -504,12 +504,12 @@ namespace quest
 
 	int32_t npc_get_local_y(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 		if (!npc)
 			return 0;
 
-		LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(npc->GetMapIndex());
+		LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(npc->GetMapIndex());
 
 		if (pMap)
 			lua_pushnumber(L, (npc->GetY() - pMap->m_setting.iBaseY) / 100);
@@ -528,8 +528,8 @@ namespace quest
 		}
 		uint32_t vid = (uint32_t)lua_tonumber(L, 1);
 
-		CHARACTER* pc = CQuestManager::instance().GetCurrentCharacterPtr();
-		CHARACTER* ch = CHARACTER_MANAGER::instance().Find(vid);
+		CHARACTER* pc = CQuestManager::Instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CHARACTER_MANAGER::Instance().Find(vid);
 		if (ch && pc)
 		{
 			pc->SetQuestNPCID(vid);
@@ -543,43 +543,43 @@ namespace quest
 
 	int32_t npc_get_rank(lua_State* L)
 	{
-		if (!CQuestManager::instance().GetCurrentNPCCharacterPtr())
+		if (!CQuestManager::Instance().GetCurrentNPCCharacterPtr())
 			return 0;
 
-		lua_pushnumber(L, CQuestManager::instance().GetCurrentNPCCharacterPtr()->GetMobRank());
+		lua_pushnumber(L, CQuestManager::Instance().GetCurrentNPCCharacterPtr()->GetMobRank());
 		return 1;
 	}
 
 	int32_t npc_get_type(lua_State* L)
 	{
-		if (!CQuestManager::instance().GetCurrentNPCCharacterPtr())
+		if (!CQuestManager::Instance().GetCurrentNPCCharacterPtr())
 			return 0;
 
-		lua_pushnumber(L, CQuestManager::instance().GetCurrentNPCCharacterPtr()->GetMobTable().bType);
+		lua_pushnumber(L, CQuestManager::Instance().GetCurrentNPCCharacterPtr()->GetMobTable().bType);
 		return 1;
 	}
 
 	int32_t npc_is_metin(lua_State* L)
 	{
-		if (!CQuestManager::instance().GetCurrentNPCCharacterPtr())
+		if (!CQuestManager::Instance().GetCurrentNPCCharacterPtr())
 			return 0;
 
-		lua_pushboolean(L, CQuestManager::instance().GetCurrentNPCCharacterPtr()->IsStone());
+		lua_pushboolean(L, CQuestManager::Instance().GetCurrentNPCCharacterPtr()->IsStone());
 		return 1;
 	}
 
 	int32_t npc_is_boss(lua_State* L)
 	{
-		if (!CQuestManager::instance().GetCurrentNPCCharacterPtr())
+		if (!CQuestManager::Instance().GetCurrentNPCCharacterPtr())
 			return 0;
 
-		lua_pushboolean(L, CQuestManager::instance().GetCurrentNPCCharacterPtr()->GetMobRank() == MOB_RANK_BOSS);
+		lua_pushboolean(L, CQuestManager::Instance().GetCurrentNPCCharacterPtr()->GetMobRank() == MOB_RANK_BOSS);
 		return 1;
 	}
 
 	int32_t npc_get_ip(lua_State* L)
 	{
-		CHARACTER* npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
+		CHARACTER* npc = CQuestManager::Instance().GetCurrentNPCCharacterPtr();
 
 		if (npc && npc->IsPC() && npc->GetDesc())
 			lua_pushstring(L, npc->GetDesc()->GetHostName());
@@ -591,7 +591,7 @@ namespace quest
 
 	int32_t npc_get_job(lua_State* L)
 	{
-		CHARACTER* npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
+		CHARACTER* npc = CQuestManager::Instance().GetCurrentNPCCharacterPtr();
 		if (npc && npc->IsPC())
 			lua_pushnumber(L, npc->GetJob());
 		else
@@ -601,16 +601,16 @@ namespace quest
 
 	int32_t npc_get_exp(lua_State* L)
 	{
-		if (!CQuestManager::instance().GetCurrentNPCCharacterPtr())
+		if (!CQuestManager::Instance().GetCurrentNPCCharacterPtr())
 			return 0;
 
-		lua_pushnumber(L, CQuestManager::instance().GetCurrentNPCCharacterPtr()->GetMobTable().dwExp);
+		lua_pushnumber(L, CQuestManager::Instance().GetCurrentNPCCharacterPtr()->GetMobTable().dwExp);
 		return 1;
 	}
 
 	int32_t npc_get_pid(lua_State* L)
 	{
-		CQuestManager & q = CQuestManager::instance();
+		CQuestManager & q = CQuestManager::Instance();
 		CHARACTER* npc = q.GetCurrentNPCCharacterPtr();
 		if (!npc)
 			return 0;
@@ -621,7 +621,7 @@ namespace quest
 
 	int32_t npc_show_effect_on_target(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		CHARACTER* ch = q.GetCurrentCharacterPtr();
 		CHARACTER* tch = q.GetCurrentNPCCharacterPtr();
 
@@ -636,7 +636,7 @@ namespace quest
 
 	int32_t npc_get_vnum(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		CHARACTER* npc = q.GetCurrentNPCCharacterPtr();
 		if (!npc)
 			return 0;
@@ -647,7 +647,7 @@ namespace quest
 
 	int32_t npc_is_available(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		CHARACTER* npc = q.GetCurrentNPCCharacterPtr();
 
 		lua_pushboolean(L, npc != nullptr);
@@ -662,12 +662,12 @@ namespace quest
 			return 0;
 		}
 
-		CHARACTER* pc = CQuestManager::instance().GetCurrentCharacterPtr();
-		CHARACTER* npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
+		CHARACTER* pc = CQuestManager::Instance().GetCurrentCharacterPtr();
+		CHARACTER* npc = CQuestManager::Instance().GetCurrentNPCCharacterPtr();
 		if (!pc || !npc)
 			return 0;
 
-		LPSECTREE sectree = SECTREE_MANAGER::instance().Get(pc->GetMapIndex(), (uint32_t)lua_tonumber(L, 1), (uint32_t)lua_tonumber(L, 2));
+		LPSECTREE sectree = SECTREE_MANAGER::Instance().Get(pc->GetMapIndex(), (uint32_t)lua_tonumber(L, 1), (uint32_t)lua_tonumber(L, 2));
 		if (!sectree)
 		{
 			sys_err("npc_do_move >> wrong coordinates");
@@ -734,6 +734,6 @@ namespace quest
 			{ nullptr,				nullptr			    	}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("npc", npc_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("npc", npc_functions);
 	}
 };

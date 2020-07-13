@@ -414,7 +414,6 @@ RETRY:
 				ms_iD3DAdapterInfo,
 				D3DDEVTYPE_HAL,
 				hWnd,
-				// 2004. 1. 9 myevan 버텍스 프로세싱 방식 자동 선택 추가
 				pkD3DModeInfo->m_dwD3DBehavior,
 				&ms_d3dPresentParameter,
 				&ms_lpd3dDevice)))
@@ -438,7 +437,6 @@ RETRY:
 		if (ErrorCorrection)
 			return CREATE_DEVICE;
 	
-		// 2004. 1. 9 myevan 큰의미 없는 코드인듯.. 에러나면 표시하고 종료하자
 		iRefreshRate = 0;
 		++ErrorCorrection;
 		iRet = CREATE_REFRESHRATE;

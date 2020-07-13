@@ -139,7 +139,7 @@ int32_t CShopEx::Buy(LPCHARACTER ch, uint8_t pos)
 
 	if (r_item.price <= 0)
 	{
-		LogManager::instance().HackLog("SHOP_BUY_GOLD_OVERFLOW", ch);
+		LogManager::Instance().HackLog("SHOP_BUY_GOLD_OVERFLOW", ch);
 		return SHOP_SUBHEADER_GC_NOT_ENOUGH_MONEY;
 	}
 
@@ -171,7 +171,7 @@ int32_t CShopEx::Buy(LPCHARACTER ch, uint8_t pos)
 	
 	LPITEM item;
 
-	item = ITEM_MANAGER::instance().CreateItem(r_item.vnum, r_item.count);
+	item = ITEM_MANAGER::Instance().CreateItem(r_item.vnum, r_item.count);
 
 	if (!item)
 		return SHOP_SUBHEADER_GC_SOLD_OUT;
@@ -209,15 +209,15 @@ int32_t CShopEx::Buy(LPCHARACTER ch, uint8_t pos)
 	else
 		item->AddToCharacter(ch, TItemPos(INVENTORY, iEmptyPos));
 
-	ITEM_MANAGER::instance().FlushDelayedSave(item);
-	LogManager::instance().ItemLog(ch, item, "BUY", item->GetName());
+	ITEM_MANAGER::Instance().FlushDelayedSave(item);
+	LogManager::Instance().ItemLog(ch, item, "BUY", item->GetName());
 
 	if (item->GetVnum() >= 80003 && item->GetVnum() <= 80007)
 	{
-		LogManager::instance().GoldBarLog(ch->GetPlayerID(), item->GetID(), PERSONAL_SHOP_BUY, "");
+		LogManager::Instance().GoldBarLog(ch->GetPlayerID(), item->GetID(), PERSONAL_SHOP_BUY, "");
 	}
 
-	LogManager::instance().MoneyLog(MONEY_LOG_SHOP, item->GetVnum(), -dwPrice);
+	LogManager::Instance().MoneyLog(MONEY_LOG_SHOP, item->GetVnum(), -dwPrice);
 
 	if (item)
 		sys_log(0, "ShopEx: BUY: name %s %s(x %d):%u price %u", ch->GetName(), item->GetName(), item->GetCount(), item->GetID(), dwPrice);

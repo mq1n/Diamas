@@ -1,5 +1,5 @@
 #pragma once
-#include "../../common/singleton.h"
+#include "../../../common/singleton.h"
 #include "../../libsql/include/AsyncSQL.h"
 #include "typedef.h"
 
@@ -14,7 +14,7 @@ enum GOLDBAR_HOW
 	QUEST				= 7 ,
 };
 
-class LogManager : public singleton<LogManager>
+class LogManager : public CSingleton<LogManager>
 {
 	public:
 		LogManager();

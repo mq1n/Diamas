@@ -40,7 +40,7 @@ void CSafebox::__Destroy()
 		if (m_pkItems[i])
 		{
 			m_pkItems[i]->SetSkipSave(true);
-			ITEM_MANAGER::instance().FlushDelayedSave(m_pkItems[i]);
+			ITEM_MANAGER::Instance().FlushDelayedSave(m_pkItems[i]);
 
 			M2_DESTROY_ITEM(m_pkItems[i]->RemoveFromCharacter());
 			m_pkItems[i] = nullptr;
@@ -65,7 +65,7 @@ bool CSafebox::Add(uint32_t dwPos, LPITEM pkItem)
 	pkItem->SetWindow(m_bWindowMode);
 	pkItem->SetCell(m_pkChrOwner, dwPos);
 	pkItem->Save(); // 강제로 Save를 불러줘야 한다.
-	ITEM_MANAGER::instance().FlushDelayedSave(pkItem);
+	ITEM_MANAGER::Instance().FlushDelayedSave(pkItem);
 
 	m_pkGrid->Put(dwPos, 1, pkItem->GetSize());
 	m_pkItems[dwPos] = pkItem;

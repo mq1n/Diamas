@@ -46,7 +46,7 @@ class CPVP
 		uint32_t   m_dwLastFightTime;
 };
 
-class CPVPManager : public singleton<CPVPManager>
+class CPVPManager : public CSingleton<CPVPManager>
 {
 	typedef std::map<uint32_t, std::unordered_set<CPVP*> > CPVPSetMap;
 

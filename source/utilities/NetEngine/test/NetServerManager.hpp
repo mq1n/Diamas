@@ -21,8 +21,8 @@ namespace net_engine
 		virtual void Shutdown();
 		virtual bool IsShuttingDown();
 	
-		virtual std::shared_ptr <CNetworkConnectionManager> FindPeer(int32_t id) const;
-		virtual void RemovePeer(int32_t id);
+		virtual std::shared_ptr <CNetworkConnectionManager> FindPeer(uint32_t id) const;
+		virtual void RemovePeer(uint32_t id);
 
 		void BroadcastPacket(std::shared_ptr <Packet> packet);
 		void SendTo(std::shared_ptr <Packet> packet, std::function<bool(CNetworkConnectionManager*)> filter);

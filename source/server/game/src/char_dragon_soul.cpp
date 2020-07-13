@@ -51,7 +51,7 @@ void CHARACTER::DragonSoul_GiveQualification()
 {
 	if(nullptr == FindAffect(AFFECT_DRAGON_SOUL_QUALIFIED))
 	{
-		LogManager::instance().CharLog(this, 0, "DS_QUALIFIED", "");
+		LogManager::Instance().CharLog(this, 0, "DS_QUALIFIED", "");
 	}
 	AddAffect(AFFECT_DRAGON_SOUL_QUALIFIED, APPLY_NONE, 0, AFF_NONE, INFINITE_AFFECT_DURATION, 0, false, false);
 	//SetQuestFlag("dragon_soul.is_qualified", 1);
@@ -91,7 +91,7 @@ bool CHARACTER::DragonSoul_ActivateDeck(int32_t deck_idx)
 	{
 		LPITEM pItem = GetInventoryItem(i);
 		if (nullptr != pItem)
-			DSManager::instance().ActivateDragonSoul(pItem);
+			DSManager::Instance().ActivateDragonSoul(pItem);
 	}
 	return true;
 }
@@ -100,7 +100,7 @@ void CHARACTER::DragonSoul_DeactivateAll()
 {
 	for (int32_t i = DRAGON_SOUL_EQUIP_SLOT_START; i < DRAGON_SOUL_EQUIP_SLOT_END; i++)
 	{
-		DSManager::instance().DeactivateDragonSoul(GetInventoryItem(i), true);
+		DSManager::Instance().DeactivateDragonSoul(GetInventoryItem(i), true);
 	}
 	m_pointsInstant.iDragonSoulActiveDeck = -1;
 	RemoveAffect(AFFECT_DRAGON_SOUL_DECK_0);
@@ -111,7 +111,7 @@ void CHARACTER::DragonSoul_CleanUp()
 {
 	for (int32_t i = DRAGON_SOUL_EQUIP_SLOT_START; i < DRAGON_SOUL_EQUIP_SLOT_END; i++)
 	{
-		DSManager::instance().DeactivateDragonSoul(GetInventoryItem(i), true);
+		DSManager::Instance().DeactivateDragonSoul(GetInventoryItem(i), true);
 	}
 }
 

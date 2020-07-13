@@ -10,7 +10,7 @@ uint32_t g_adwEncryptKey[4];
 uint32_t g_adwDecryptKey[4];
 // END_OF_CHINA_CRYPT_KEY
 
-inline const uint8_t* GetKey_20050304Myevan()
+inline const uint8_t* GetSpecialKey()
 {
 	volatile static uint32_t s_adwKey[1938];
 
@@ -42,9 +42,9 @@ void CAccountConnector::ClearLoginInfo()
 	m_strPassword.clear();
 }
 
-void CAccountConnector::__BuildClientKey_20050304Myevan()
+void CAccountConnector::__BuildSpecialClientKey()
 {
-	const uint8_t* c_pszKey = GetKey_20050304Myevan();
+	const uint8_t* c_pszKey = GetSpecialKey();
 	memcpy(g_adwEncryptKey, c_pszKey + 157, 16);
 
 	for (uint32_t i = 0; i < 4; ++i)
@@ -66,7 +66,7 @@ bool CAccountConnector::Connect(const char * c_szAddr, int32_t iPort, const char
 	__OfflineState_Set();
 
 	// CHINA_CRYPT_KEY
-	__BuildClientKey_20050304Myevan();		
+	__BuildSpecialClientKey();
 	// END_OF_CHINA_CRYPT_KEY
 
 	return CNetworkStream::Connect(c_szAccountAddr, iAccountPort);

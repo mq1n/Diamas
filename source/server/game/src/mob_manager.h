@@ -124,7 +124,7 @@ class CMobGroup
 		std::vector<uint32_t>      m_vec_dwMemberVnum;
 };
 
-class CMobManager : public singleton<CMobManager>
+class CMobManager : public CSingleton<CMobManager>
 {
 	public:
 		typedef std::map<uint32_t, CMob *>::iterator iterator;

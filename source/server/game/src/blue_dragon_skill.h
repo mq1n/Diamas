@@ -1,5 +1,5 @@
 #pragma once
-#include "../../common/service.h"
+#include "../../../common/defines.h"
 #include "blue_dragon_binder.h"
 
 struct FSkillBreath
@@ -306,7 +306,7 @@ struct FSkillEarthQuake
 
 					for (int32_t i=0 ; i < 5 ; ++i)
 					{
-						if (true == SECTREE_MANAGER::instance().IsMovablePosition( ch->GetMapIndex(), tx, ty ))
+						if (true == SECTREE_MANAGER::Instance().IsMovablePosition( ch->GetMapIndex(), tx, ty ))
 						{
 							break;
 						}

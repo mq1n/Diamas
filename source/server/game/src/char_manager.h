@@ -1,7 +1,6 @@
 #pragma once
-#include "../../common/stl.h"
-#include "../../common/length.h"
-#include "../../common/service.h"
+#include "../../../common/stl.h"
+#include "../../../common/defines.h"
 
 #ifdef M2_USE_POOL
 #include "pool.h"
@@ -16,7 +15,7 @@ class CHARACTER;
 class CharacterVectorInteractor;
 class CharacterSetSnapshot;
 
-class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
+class CHARACTER_MANAGER : public CSingleton<CHARACTER_MANAGER>
 {
 	public:
 		typedef std::unordered_map<std::string, LPCHARACTER> NAME_MAP;
@@ -182,7 +181,7 @@ private:
 };
 
 #ifndef DEBUG_ALLOC
-#define M2_DESTROY_CHARACTER(ptr) CHARACTER_MANAGER::instance().DestroyCharacter(ptr)
+#define M2_DESTROY_CHARACTER(ptr) CHARACTER_MANAGER::Instance().DestroyCharacter(ptr)
 #else
-#define M2_DESTROY_CHARACTER(ptr) CHARACTER_MANAGER::instance().DestroyCharacter(ptr, __FILE__, __LINE__)
+#define M2_DESTROY_CHARACTER(ptr) CHARACTER_MANAGER::Instance().DestroyCharacter(ptr, __FILE__, __LINE__)
 #endif

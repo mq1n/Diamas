@@ -10,7 +10,7 @@
 #include <rapidjson/filereadstream.h>
 using namespace rapidjson;
 
-class CConfigManager : public singleton <CConfigManager>
+class CConfigManager : public CSingleton <CConfigManager>
 {
 	public:
 		CConfigManager() : m_bHasParsed(false)

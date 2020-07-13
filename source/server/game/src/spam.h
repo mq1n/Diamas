@@ -1,14 +1,13 @@
 #pragma once
+#include "../../../common/singleton.h"
 #include <string.h>
 #include <ctype.h>
 #include <string>
 #include <vector>
 #include <utility>
-
-#include "../../common/singleton.h"
 #include "utils.h"
 
-class SpamManager : public singleton<SpamManager>
+class SpamManager : public CSingleton<SpamManager>
 {
 	public:
 		inline const char * GetSpamScore(const char * src, size_t len, uint32_t & score)

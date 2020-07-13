@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <new>
 
-#include "../../common/service.h"
+#include "../../../common/defines.h"
 
 #ifdef DEBUG_ALLOC
 

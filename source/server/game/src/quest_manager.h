@@ -11,7 +11,7 @@ namespace quest
 	bool IsScriptTrue(const char* code, int32_t size);
 	std::string ScriptToString(const std::string& str);
 
-	class CQuestManager : public singleton<CQuestManager>
+	class CQuestManager : public CSingleton<CQuestManager>
 	{
 		public:
 			enum

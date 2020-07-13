@@ -1,5 +1,5 @@
 #pragma once
-#include "../eterBase/Singleton.h"
+#include "../../common/Singleton.h"
 #include "../eterBase/WorkQueue.h"
 #include "../eterBase/SimpleTimer.h"
 

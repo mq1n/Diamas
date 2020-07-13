@@ -1,7 +1,7 @@
 #pragma once
 #include "mark_image.h"
 
-class CGuildMarkManager : public singleton<CGuildMarkManager>
+class CGuildMarkManager : public CSingleton<CGuildMarkManager>
 {
 	public:
 		enum

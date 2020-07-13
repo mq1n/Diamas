@@ -85,8 +85,6 @@ bool CPythonNonPlayer::GetName(uint32_t dwVnum, const char ** c_pszName)
 bool CPythonNonPlayer::GetInstanceType(uint32_t dwVnum, uint8_t* pbType)
 {
 	const TMobTable * p = GetTable(dwVnum);
-
-	// dwVnum를 찾을 수 없으면 플레이어 캐릭터로 간주 한다. 문제성 코드 -_- [cronan]
 	if (!p)
 		return false;
 
@@ -111,7 +109,7 @@ uint8_t CPythonNonPlayer::GetEventType(uint32_t dwVnum)
 	if (!p)
 	{
 		//Tracef("CPythonNonPlayer::GetEventType - Failed to find virtual number\n");
-		return ON_CLICK_EVENT_NONE;
+		return ON_CLICK_NONE;
 	}
 
 	return p->bOnClickType;
@@ -146,7 +144,7 @@ uint8_t CPythonNonPlayer::GetEventTypeByVID(uint32_t dwVID)
 	if (nullptr == pInstance)
 	{
 		//Tracef("CPythonNonPlayer::GetEventTypeByVID - There is no Virtual Number\n");
-		return ON_CLICK_EVENT_NONE;
+		return ON_CLICK_NONE;
 	}
 
 	uint32_t dwVnum = pInstance->GetVirtualNumber();

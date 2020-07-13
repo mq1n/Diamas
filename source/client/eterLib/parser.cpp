@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "parser.h"
-#include "../eterBase/stl_utils.h"
 
 using namespace script;
 
@@ -21,7 +20,7 @@ int32_t LocaleString_FindChar(const std::string &base, int32_t start, int32_t un
 */
 void LocaleString_Skip(const std::string &base, int32_t& pos)
 {
-	for (; pos < base.size(); ++pos) {
+	for (; pos < static_cast<int32_t>(base.size()); ++pos) {
 		if (!isspace((uint8_t)base[pos]) && base[pos] != '\n' && base[pos] != '\r')
 			break;
 	}

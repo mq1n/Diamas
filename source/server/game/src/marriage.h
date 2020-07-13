@@ -84,7 +84,7 @@ namespace marriage
 		LPEVENT eventNearCheck;
 	};
 
-	class CManager : public singleton<CManager>
+	class CManager : public CSingleton<CManager>
 	{
 		public:
 			CManager();

@@ -5,9 +5,9 @@
 
 #undef sys_err
 #ifndef __WIN32__
-#define sys_err(fmt, args...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
+#define sys_err(fmt, args...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
 #else
-#define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
+#define sys_err(fmt, ...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
 namespace quest
@@ -17,7 +17,7 @@ namespace quest
 	//
 	int32_t quest_start(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -31,7 +31,7 @@ namespace quest
 
 	int32_t quest_done(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -45,7 +45,7 @@ namespace quest
 
 	int32_t quest_set_title(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -61,7 +61,7 @@ namespace quest
 
 	int32_t quest_set_another_title(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -76,7 +76,7 @@ namespace quest
 
 	int32_t quest_set_clock_name(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -92,7 +92,7 @@ namespace quest
 
 	int32_t quest_set_clock_value(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -108,7 +108,7 @@ namespace quest
 
 	int32_t quest_set_counter_name(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -124,7 +124,7 @@ namespace quest
 
 	int32_t quest_set_counter_value(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -140,7 +140,7 @@ namespace quest
 
 	int32_t quest_set_icon_file(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -162,7 +162,7 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		QuestState * pqs = q.GetCurrentState();
 		PC* pPC = q.GetCurrentPC();
 		if (!pPC)
@@ -190,7 +190,7 @@ namespace quest
 
 	int32_t quest_coroutine_yield(lua_State * L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		// other_pc_block 내부에서는 yield가 일어나서는 안된다. 절대로.
 		if (q.IsInOtherPCBlock())
 		{
@@ -225,14 +225,14 @@ namespace quest
 
 	int32_t quest_no_send(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		q.SetNoSend();
 		return 0;
 	}
 
 	int32_t quest_get_current_quest_index(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		PC* pPC = q.GetCurrentPC();
 		if (!pPC)
 		{
@@ -254,14 +254,14 @@ namespace quest
 		}
 		uint32_t pid = (uint32_t)lua_tonumber(L, -1);
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		q.BeginOtherPCBlock(pid);
 		return 0;
 	}
 
 	int32_t quest_end_other_pc_block(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		q.EndOtherPCBlock();
 		return 0;
 	}
@@ -279,7 +279,7 @@ namespace quest
 
 	int32_t quest_get_command(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		PC* pPC = q.GetCurrentPC();
 		if (!pPC)
 		{
@@ -300,7 +300,7 @@ namespace quest
 			return 1;
 		}
 		
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();		
 		if (!ch )
 		{
@@ -328,7 +328,7 @@ namespace quest
 	
 	int32_t quest_get_current_quest_name(lua_State* L)
 	{
-		PC* pc = CQuestManager::instance().GetCurrentPC();
+		PC* pc = CQuestManager::Instance().GetCurrentPC();
 
 		lua_pushstring(L, pc ? pc->GetCurrentQuestName().c_str() : "");
 		return 1;
@@ -379,7 +379,7 @@ namespace quest
 			{ nullptr,						nullptr						}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("q", quest_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("q", quest_functions);
 	}
 }
 

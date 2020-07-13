@@ -51,7 +51,7 @@ namespace marriage
 			std::string m_stMusicFileName;
 	};
 
-	class WeddingManager : public singleton<WeddingManager>
+	class WeddingManager : public CSingleton<WeddingManager>
 	{
 		public:
 			WeddingManager();

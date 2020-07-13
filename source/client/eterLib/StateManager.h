@@ -1,12 +1,10 @@
-#ifndef __CSTATEMANAGER_H
-#define __CSTATEMANAGER_H
-
+#pragma once
 #include <d3d9.h>
 #include <d3dx9.h>
 
 #include <vector>
 
-#include "../eterBase/Singleton.h"
+#include "../../common/Singleton.h"
 
 #define CHECK_D3DAPI(a)		\
 {							\
@@ -277,5 +275,3 @@ class CStateManager : public CSingleton<CStateManager>
 };
 
 #define STATEMANAGER (CStateManager::Instance())
-
-#endif

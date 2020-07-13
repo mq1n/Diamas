@@ -47,22 +47,6 @@ bool CEffectManager::IsAliveEffect(uint32_t dwInstanceIndex)
 
 void CEffectManager::Update()
 {
-
-	// 2004. 3. 1. myevan. 이펙트 모니터링 하는 코드
-	/*
-	if (GetAsyncKeyState(VK_F9))
-	{
-		Tracenf("CEffectManager::m_EffectInstancePool %d", m_EffectInstancePool.GetCapacity());
-		Tracenf("CEffectManager::m_EffectDataPool %d", m_EffectDataPool.GetCapacity());
-		Tracenf("CEffectInstance::ms_LightInstancePool %d", CEffectInstance::ms_LightInstancePool.GetCapacity());
-		Tracenf("CEffectInstance::ms_MeshInstancePool %d", CEffectInstance::ms_MeshInstancePool.GetCapacity());
-		Tracenf("CEffectInstance::ms_ParticleSystemInstancePool %d", CEffectInstance::ms_ParticleSystemInstancePool.GetCapacity());
-		Tracenf("CParticleInstance::ms_ParticleInstancePool %d", CParticleInstance::ms_kPool.GetCapacity());
-		Tracenf("CRayParticleInstance::ms_RayParticleInstancePool %d", CRayParticleInstance::ms_kPool.GetCapacity());		
-		Tracen("---------------------------------------------");
-	}
-	*/
-
 	for (auto itor = m_kEftInstMap.begin(); itor != m_kEftInstMap.end();)
 	{
 		CEffectInstance * pEffectInstance = itor->second;

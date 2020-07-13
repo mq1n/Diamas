@@ -7,7 +7,7 @@
 //#define QUEST_DIR "./quest/"
 
 #include "lua_incl.h"
-#include "../../common/service.h"
+#include "../../../common/defines.h"
 
 namespace quest
 {

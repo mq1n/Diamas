@@ -10,7 +10,6 @@
 #include "log.h"
 #include "db.h"
 #include "locale_service.h"
-#include "../../common/length.h"
 #include "exchange.h"
 #include "dragon_soul.h"
 #include "quest_manager.h"
@@ -428,7 +427,7 @@ bool CExchange::CheckSpace()
 			}
 
 			bool bExistEmptySpace = false;
-			uint16_t wBasePos = DSManager::instance().GetBasePosition(item);
+			uint16_t wBasePos = DSManager::Instance().GetBasePosition(item);
 			if (wBasePos >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 				return false;
 			
@@ -528,22 +527,22 @@ bool CExchange::Done()
 			item->AddToCharacter(victim, TItemPos(DRAGON_SOUL_INVENTORY, empty_pos));
 		else
 			item->AddToCharacter(victim, TItemPos(INVENTORY, empty_pos));
-		ITEM_MANAGER::instance().FlushDelayedSave(item);
+		ITEM_MANAGER::Instance().FlushDelayedSave(item);
 
 		item->SetExchanging(false);
 		{
 			char exchange_buf[51];
 
 			snprintf(exchange_buf, sizeof(exchange_buf), "%s %u %u", item->GetName(), GetOwner()->GetPlayerID(), item->GetCount());
-			LogManager::instance().ItemLog(victim, item, "EXCHANGE_TAKE", exchange_buf);
+			LogManager::Instance().ItemLog(victim, item, "EXCHANGE_TAKE", exchange_buf);
 
 			snprintf(exchange_buf, sizeof(exchange_buf), "%s %u %u", item->GetName(), victim->GetPlayerID(), item->GetCount());
-			LogManager::instance().ItemLog(GetOwner(), item, "EXCHANGE_GIVE", exchange_buf);
+			LogManager::Instance().ItemLog(GetOwner(), item, "EXCHANGE_GIVE", exchange_buf);
 
 			if (item->GetVnum() >= 80003 && item->GetVnum() <= 80007)
 			{
-				LogManager::instance().GoldBarLog(victim->GetPlayerID(), item->GetID(), EXCHANGE_TAKE, "");
-				LogManager::instance().GoldBarLog(GetOwner()->GetPlayerID(), item->GetID(), EXCHANGE_GIVE, "");
+				LogManager::Instance().GoldBarLog(victim->GetPlayerID(), item->GetID(), EXCHANGE_TAKE, "");
+				LogManager::Instance().GoldBarLog(GetOwner()->GetPlayerID(), item->GetID(), EXCHANGE_GIVE, "");
 			}
 		}
 
@@ -559,10 +558,10 @@ bool CExchange::Done()
 		{
 			char exchange_buf[51];
 			snprintf(exchange_buf, sizeof(exchange_buf), "%u %s", GetOwner()->GetPlayerID(), GetOwner()->GetName());
-			LogManager::instance().CharLog(victim, m_lGold, "EXCHANGE_GOLD_TAKE", exchange_buf);
+			LogManager::Instance().CharLog(victim, m_lGold, "EXCHANGE_GOLD_TAKE", exchange_buf);
 
 			snprintf(exchange_buf, sizeof(exchange_buf), "%u %s", victim->GetPlayerID(), victim->GetName());
-			LogManager::instance().CharLog(GetOwner(), m_lGold, "EXCHANGE_GOLD_GIVE", exchange_buf);
+			LogManager::Instance().CharLog(GetOwner(), m_lGold, "EXCHANGE_GOLD_GIVE", exchange_buf);
 		}
 	}
 
@@ -590,13 +589,13 @@ bool CExchange::Accept(bool bAccept)
 		victim->SetExchangeTime();		
 		//END_PREVENT_PORTAL_AFTER_EXCHANGE
 
-		if (quest::CQuestManager::instance().GetPCForce(GetOwner()->GetPlayerID())->IsRunning() == true)
+		if (quest::CQuestManager::Instance().GetPCForce(GetOwner()->GetPlayerID())->IsRunning() == true)
 		{
 			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot trade if you're using quests"));
 			victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot trade if the other part using quests"));
 			goto EXCHANGE_END;
 		}
-		else if (quest::CQuestManager::instance().GetPCForce(victim->GetPlayerID())->IsRunning() == true)
+		else if (quest::CQuestManager::Instance().GetPCForce(victim->GetPlayerID())->IsRunning() == true)
 		{
 			victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot trade if you're using quests"));
 			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot trade if the other part using quests"));

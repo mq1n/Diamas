@@ -131,7 +131,6 @@ void CActorInstance::AttachWeapon(uint32_t dwParentPartIndex, uint32_t dwPartInd
 	SetModelInstance(dwPartIndex, dwPartIndex, 0);
 	AttachModelInstance(dwParentPartIndex, szBoneName, dwPartIndex);
 
-	// 20041208.myevan.무기스펙큘러(값옷은 SetShape에서 직접 해준다.)
 	if (USE_WEAPON_SPECULAR)
 	{
 		SMaterialData kMaterialData;

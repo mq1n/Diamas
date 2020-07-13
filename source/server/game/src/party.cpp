@@ -142,14 +142,14 @@ LPPARTY CPartyManager::CreateParty(LPCHARACTER pLeader)
 		//p.header	= HEADER_GG_PARTY;
 		//p.subheader	= PARTY_SUBHEADER_GG_CREATE;
 		//p.pid		= pLeader->GetPlayerID();
-		//P2P_MANAGER::instance().Send(&p, sizeof(p));
+		//P2P_MANAGER::Instance().Send(&p, sizeof(p));
 		TPacketPartyCreate p;
 		p.dwLeaderPID = pLeader->GetPlayerID();
 
 		db_clientdesc->DBPacket(HEADER_GD_PARTY_CREATE, 0, &p, sizeof(TPacketPartyCreate));
 
 		sys_log(0, "PARTY: Create %s pid %u", pLeader->GetName(), pLeader->GetPlayerID());
-		LogManager::instance().CharLog(pLeader, 0, "PARTY_CREATE", "");
+		LogManager::Instance().CharLog(pLeader, 0, "PARTY_CREATE", "");
 		pParty->SetPCParty(true);
 		pParty->Join(pLeader->GetPlayerID());
 
@@ -171,7 +171,7 @@ void CPartyManager::DeleteParty(LPPARTY pParty)
 	//p.header = HEADER_GG_PARTY;
 	//p.subheader = PARTY_SUBHEADER_GG_DESTROY;
 	//p.pid = pParty->GetLeaderPID();
-	//P2P_MANAGER::instance().Send(&p, sizeof(p));
+	//P2P_MANAGER::Instance().Send(&p, sizeof(p));
 	TPacketPartyDelete p;
 	p.dwLeaderPID = pParty->GetLeaderPID();
 
@@ -179,7 +179,7 @@ void CPartyManager::DeleteParty(LPPARTY pParty)
 
 	m_set_pkPCParty.erase(pParty);
 	if (pParty->GetLeaderPID() != 0)
-		LogManager::instance().CharLog(pParty->GetLeader(), 0, "PARTY_DESTROY", "");
+		LogManager::Instance().CharLog(pParty->GetLeader(), 0, "PARTY_DESTROY", "");
 	M2_DELETE(pParty);
 }
 
@@ -233,7 +233,7 @@ EVENTFUNC(party_update_event)
 	}
 
 	uint32_t pid = info->pid;
-	LPCHARACTER leader = CHARACTER_MANAGER::instance().FindByPID(pid);
+	LPCHARACTER leader = CHARACTER_MANAGER::Instance().FindByPID(pid);
 
 	if (leader && leader->GetDesc())
 	{
@@ -303,7 +303,7 @@ void CParty::Destroy()
 	if (m_bPCParty)
 	{
 		for (TMemberMap::iterator it = m_memberMap.begin(); it != m_memberMap.end(); ++it)
-			CPartyManager::instance().SetPartyMember(it->first, nullptr);
+			CPartyManager::Instance().SetPartyMember(it->first, nullptr);
 	}
 
 	event_cancel(&m_eventUpdate); 
@@ -406,7 +406,7 @@ void CParty::P2PJoin(uint32_t dwPID)
 
 		if (m_bPCParty)
 		{
-			LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(dwPID);
+			LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(dwPID);
 
 			if (ch)
 			{
@@ -418,7 +418,7 @@ void CParty::P2PJoin(uint32_t dwPID)
 			}
 			else
 			{
-				CCI * pcci = P2P_MANAGER::instance().FindByPID(dwPID);
+				CCI * pcci = P2P_MANAGER::Instance().FindByPID(dwPID);
 
 				if (!pcci);
 				else if (pcci->bChannel == g_bChannel)
@@ -437,10 +437,10 @@ void CParty::P2PJoin(uint32_t dwPID)
 
 		if (m_bPCParty)
 		{
-			CPartyManager::instance().SetPartyMember(dwPID, this);
+			CPartyManager::Instance().SetPartyMember(dwPID, this);
 			SendPartyJoinOneToAll(dwPID);
 
-			LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(dwPID);
+			LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(dwPID);
 
 			if (ch)
 				SendParameter(ch);
@@ -465,7 +465,7 @@ void CParty::Join(uint32_t dwPID)
 		p.bState = PARTY_ROLE_NORMAL; // #0000790: [M2EU] CZ 크래쉬 증가: 초기화 중요! 
 		db_clientdesc->DBPacket(HEADER_GD_PARTY_ADD, 0, &p, sizeof(p));
 		if (dwPID != 0)
-			LogManager::instance().CharLog(CHARACTER_MANAGER::instance().FindByPID(dwPID), 0, "PARTY_JOIN", "");
+			LogManager::Instance().CharLog(CHARACTER_MANAGER::Instance().FindByPID(dwPID), 0, "PARTY_JOIN", "");
 	}
 }
 
@@ -509,15 +509,15 @@ void CParty::P2PQuit(uint32_t dwPID)
 	}
 
 	if (m_bPCParty)
-		CPartyManager::instance().SetPartyMember(dwPID, nullptr);
+		CPartyManager::Instance().SetPartyMember(dwPID, nullptr);
 
 	// 리더가 나가면 파티는 해산되어야 한다.
 	if (bRole == PARTY_ROLE_LEADER)
-		CPartyManager::instance().DeleteParty(this);
+		CPartyManager::Instance().DeleteParty(this);
 	else if (dwPID != 0) {
-		LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(dwPID);
+		LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(dwPID);
 		if (ch)
-			LogManager::instance().CharLog(ch, 0, "PARTY_LEAVE", "");
+			LogManager::Instance().CharLog(ch, 0, "PARTY_LEAVE", "");
 	}
 
 	// 이 아래는 코드를 추가하지 말 것!!! 위 DeleteParty 하면 this는 없다.
@@ -535,7 +535,7 @@ void CParty::Quit(uint32_t dwPID)
 		//p.subheader = PARTY_SUBHEADER_GG_QUIT;
 		//p.pid = dwPID;
 		//p.leaderpid = GetLeaderPID();
-		//P2P_MANAGER::instance().Send(&p, sizeof(p));
+		//P2P_MANAGER::Instance().Send(&p, sizeof(p));
 		TPacketPartyRemove p;
 		p.dwPID = dwPID;
 		p.dwLeaderPID = GetLeaderPID();
@@ -940,7 +940,7 @@ void CParty::SendMessage(LPCHARACTER ch, uint8_t bMsg, uint32_t dwArg1, uint32_t
 
 		case PM_AGGRO_INCREASE:
 			{
-				LPCHARACTER victim = CHARACTER_MANAGER::instance().Find(dwArg2);
+				LPCHARACTER victim = CHARACTER_MANAGER::Instance().Find(dwArg2);
 
 				if (!victim)
 					return;
@@ -1129,7 +1129,7 @@ void CParty::SummonToLeader(uint32_t pid)
 	int32_t n = 0;
 	int32_t x[12], y[12];
 
-	SECTREE_MANAGER & s = SECTREE_MANAGER::instance();
+	SECTREE_MANAGER & s = SECTREE_MANAGER::Instance();
 	LPCHARACTER l = GetLeaderCharacter();
 
 	if (m_memberMap.find(pid) == m_memberMap.end())

@@ -376,14 +376,14 @@ uint32_t CPythonPlayer::__GetEvadeRate()
 void CPythonPlayer::__UpdateBattleStatus()
 {
 	m_playerStatus.SetPoint(POINT_NONE, 0);
-	m_playerStatus.SetPoint(POINT_EVADE_RATE, __GetEvadeRate());
+	m_playerStatus.SetPoint(POINT_ATT_GRADE, __GetEvadeRate());
 	m_playerStatus.SetPoint(POINT_HIT_RATE, __GetHitRate());
 	m_playerStatus.SetPoint(POINT_MIN_WEP, m_dwWeaponMinPower+m_dwWeaponAddPower);
 	m_playerStatus.SetPoint(POINT_MAX_WEP, m_dwWeaponMaxPower+m_dwWeaponAddPower);
 	m_playerStatus.SetPoint(POINT_MIN_MAGIC_WEP, m_dwWeaponMinMagicPower+m_dwWeaponAddPower);
 	m_playerStatus.SetPoint(POINT_MAX_MAGIC_WEP, m_dwWeaponMaxMagicPower+m_dwWeaponAddPower);
-	m_playerStatus.SetPoint(POINT_MIN_ATK, __GetTotalAtk(m_dwWeaponMinPower, m_dwWeaponAddPower));
-	m_playerStatus.SetPoint(POINT_MAX_ATK, __GetTotalAtk(m_dwWeaponMaxPower, m_dwWeaponAddPower));	
+	m_playerStatus.SetPoint(POINT_WEAPON_MIN, __GetTotalAtk(m_dwWeaponMinPower, m_dwWeaponAddPower));
+	m_playerStatus.SetPoint(POINT_WEAPON_MAX, __GetTotalAtk(m_dwWeaponMaxPower, m_dwWeaponAddPower));	
 }
 
 void CPythonPlayer::SetStatus(uint32_t dwType, int32_t lValue)
@@ -413,10 +413,10 @@ void CPythonPlayer::SetStatus(uint32_t dwType, int32_t lValue)
 	{
 		case POINT_MIN_WEP:
 		case POINT_MAX_WEP:
-		case POINT_MIN_ATK:
-		case POINT_MAX_ATK:
+		case POINT_WEAPON_MIN:
+		case POINT_WEAPON_MAX:
 		case POINT_HIT_RATE:
-		case POINT_EVADE_RATE:
+		case POINT_ATT_GRADE:
 		case POINT_LEVEL:
 		case POINT_ST:
 		case POINT_DX:
@@ -1579,7 +1579,6 @@ void CPythonPlayer::NEW_ClearSkillData(bool bAll)
 
 	for (int32_t j = 0; j < SKILL_MAX_NUM; ++j)
 	{
-		// 2004.09.30.myevan.스킬갱신시 스킬 포인트업[+] 버튼이 안나와 처리
 		m_playerStatus.aSkill[j].iGrade = 0;
 		m_playerStatus.aSkill[j].fcurEfficientPercentage=0.0f;
 		m_playerStatus.aSkill[j].fnextEfficientPercentage=0.05f;

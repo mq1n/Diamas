@@ -127,13 +127,11 @@ void CMapOutdoor::ApplyLight(uint32_t dwVersion, const D3DLIGHT9& c_rkLight)
 	STATEMANAGER.SetLight(0, &c_rkLight);
 }
 
-// 2004. 2. 17. myevan. 모든 부분을 보이게 초기화 한다
 void CMapOutdoor::InitializeVisibleParts()
 {
 	m_dwVisiblePartFlags=0xffffffff;
 }
 
-// 2004. 2. 17. myevan. 특정 부분을 보이게 하거나 감추는 함수
 void CMapOutdoor::SetVisiblePart(int32_t ePart, bool isVisible)
 {
 	uint32_t dwMask=(1<<ePart);
@@ -148,7 +146,6 @@ void CMapOutdoor::SetVisiblePart(int32_t ePart, bool isVisible)
 	}
 }
 
-// 2004. 2. 17. myevan. 특정 부분이 보이는지 알아내는 함수
 bool CMapOutdoor::IsVisiblePart(int32_t ePart)
 {
 	uint32_t dwMask=(1<<ePart);

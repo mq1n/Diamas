@@ -2,9 +2,6 @@
 #define __INC_ETERBASE_STL_H__
 
 #include <cassert>
-
-#pragma warning ( push, 3 )
-
 #include <algorithm>
 #include <string>
 #include <vector>
@@ -17,34 +14,14 @@
 #include <functional>
 #include <sstream>
 #include <cstdint>
-
-#pragma warning ( pop )
+#include "../../common/stl.h"
 
 extern char ascii_tolower(const char c);
 extern std::string& stl_static_string(const char* c_sz);
-extern void stl_lowers(std::string& rstRet);
 extern int32_t split_string(const std::string & input, const std::string & delimiter, std::vector<std::string>& results, bool includeEmpties);
 
 namespace std
 {
-#if _HAS_CXX17
-	// FUNCTIONAL STUFF (from <functional>)
-	// STRUCT TEMPLATE unary_function
-	template <class _Arg, class _Result> struct unary_function
-	{ // base class for unary functions
-		typedef _Arg argument_type;
-		typedef _Result result_type;
-	};
-
-	// STRUCT TEMPLATE binary_function
-	template <class _Arg1, class _Arg2, class _Result> struct binary_function
-	{ // base class for binary functions
-		typedef _Arg1 first_argument_type;
-		typedef _Arg2 second_argument_type;
-		typedef _Result result_type;
-	};
-#endif // _HAS_CXX17
-
 template <class _Ty> class void_mem_fun_t : public unary_function<_Ty *, void>
 {
 public:

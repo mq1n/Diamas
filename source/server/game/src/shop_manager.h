@@ -3,7 +3,7 @@
 class CShop;
 typedef class CShop * LPSHOP;
 
-class CShopManager : public singleton<CShopManager>
+class CShopManager : public CSingleton<CShopManager>
 {
 public:
 	typedef std::map<uint32_t, CShop *> TShopMap;

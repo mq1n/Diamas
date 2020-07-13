@@ -51,8 +51,6 @@
 #include "pet_system.h"
 #include "anticheat_manager.h"
 #include "battleground.h"
-#include "../../common/VnumHelper.h"
-#include "../../common/service.h"
 
 extern const uint8_t g_aBuffOnAttrPoints;
 extern bool RaceToJob(uint32_t race, uint32_t *ret_job);
@@ -73,10 +71,10 @@ bool CAN_ENTER_ZONE(const LPCHARACTER& ch, int32_t map_index)
 	}
 
 	// oxevent only if running
-	if (map_index == OXEVENT_MAP_INDEX && COXEventManager::instance().GetStatus() != OXEVENT_OPEN)
+	if (map_index == OXEVENT_MAP_INDEX && COXEventManager::Instance().GetStatus() != OXEVENT_OPEN)
 	{
 		sys_err("%s tries to enter ox event while not running", ch->GetName());
-		LogManager::instance().HackLog("ENTER_OX", ch);
+		LogManager::Instance().HackLog("ENTER_OX", ch);
 		return false;
 	}
 
@@ -133,13 +131,13 @@ bool IS_MOUNTABLE_ZONE(int32_t map_index, bool isHorse)
 	if (map_index >= 10000)
 		map_index /= 10000;
 
-	if (CBattlegroundManager::instance().IsEventMap(map_index))
+	if (CBattlegroundManager::Instance().IsEventMap(map_index))
 		return false;
 
-	if (CWarMapManager::instance().IsWarMap(map_index))
+	if (CWarMapManager::Instance().IsWarMap(map_index))
 		return false;
 
-	if (CArenaManager::instance().IsArenaMap(map_index))
+	if (CArenaManager::Instance().IsArenaMap(map_index))
 		return false;
 
 	// Only mounts allowed on ED map
@@ -167,9 +165,9 @@ bool IS_MOUNTABLE_ZONE(int32_t map_index, bool isHorse)
 LPCHARACTER DynamicCharacterPtr::Get() const {
 	LPCHARACTER p = nullptr;
 	if (is_pc) {
-		p = CHARACTER_MANAGER::instance().FindByPID(id);
+		p = CHARACTER_MANAGER::Instance().FindByPID(id);
 	} else {
-		p = CHARACTER_MANAGER::instance().Find(id);
+		p = CHARACTER_MANAGER::Instance().Find(id);
 	}
 	return p;
 }
@@ -413,7 +411,7 @@ void CHARACTER::Initialize()
 
 	// ARENA
 	m_pArena = nullptr;
-	m_nPotionLimit = quest::CQuestManager::instance().GetEventFlag("arena_potion_limit_count");
+	m_nPotionLimit = quest::CQuestManager::Instance().GetEventFlag("arena_potion_limit_count");
 	// END_ARENA
 
 	//PREVENT_TRADE_WINDOW
@@ -554,7 +552,7 @@ void CHARACTER::Destroy()
 
 	if (IsPC())
 	{
-		CAnticheatManager::instance().DeleteClientHandle(GetPlayerID());
+		CAnticheatManager::Instance().DeleteClientHandle(GetPlayerID());
 	}
 
 	if (GetDesc())
@@ -734,7 +732,7 @@ void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, uint
 	}
 
 	// 진행중인 퀘스트가 있으면 상점을 열 수 없다.
-	quest::PC * pPC = quest::CQuestManager::instance().GetPCForce(GetPlayerID());
+	quest::PC * pPC = quest::CQuestManager::Instance().GetPCForce(GetPlayerID());
 
 	// GetPCForce는 NULL일 수 없으므로 따로 확인하지 않음
 	if (pPC->IsRunning())
@@ -767,7 +765,7 @@ void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, uint
 	if (m_stShopSign.length() == 0)
 		return;
 
-	if (CBanwordManager::instance().CheckString(m_stShopSign.c_str(), m_stShopSign.length()))
+	if (CBanwordManager::Instance().CheckString(m_stShopSign.c_str(), m_stShopSign.length()))
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("비속어나 은어가 포함된 상점 이름으로 상점을 열 수 없습니다."));
 		return;
@@ -856,7 +854,7 @@ void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, uint
 
 	PacketAround(&p, sizeof(SPacketGCShopSign));
 
-	m_pkMyShop = CShopManager::instance().CreatePCShop(this, pTable, bItemCount);
+	m_pkMyShop = CShopManager::Instance().CreatePCShop(this, pTable, bItemCount);
 
 	if (IsPolymorphed() == true)
 	{
@@ -883,7 +881,7 @@ void CHARACTER::CloseMyShop()
 	if (GetMyShop())
 	{
 		m_stShopSign.clear();
-		CShopManager::instance().DestroyPCShop(this);
+		CShopManager::Instance().DestroyPCShop(this);
 		m_pkMyShop = nullptr;
 
 		SPacketGCShopSign p;
@@ -920,7 +918,7 @@ void CHARACTER::RestartAtPos(int32_t lX, int32_t lY)
 	if (m_isObserver)
 		return;
 
-	LPSECTREE sectree = SECTREE_MANAGER::instance().Get(GetMapIndex(), lX, lY);
+	LPSECTREE sectree = SECTREE_MANAGER::Instance().Get(GetMapIndex(), lX, lY);
 	if (!sectree)
 	{
 		sys_log(0, "cannot find sectree by %dx%d mapindex %d (pid %u race %u)", lX, lY, GetMapIndex(), GetPlayerID(), GetRaceNum());
@@ -1194,7 +1192,7 @@ void CHARACTER::UpdatePacket()
 	if (IsPC() && (!GetDesc() || !GetDesc()->GetCharacter()))
 		return;
 
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 	{
 //		if (IsGM())
 //			m_bPKMode = PK_MODE_PROTECT;
@@ -1285,7 +1283,7 @@ void CHARACTER::SetPosition(int32_t pos)
 void CHARACTER::Save()
 {
 	if (!m_bSkipSave)
-		CHARACTER_MANAGER::instance().DelayedSave(this);
+		CHARACTER_MANAGER::Instance().DelayedSave(this);
 }
 
 void CHARACTER::CreatePlayerProto(TPlayerTable & tab)
@@ -1418,7 +1416,7 @@ void CHARACTER::SaveReal()
 
 	db_clientdesc->DBPacket(HEADER_GD_PLAYER_SAVE, GetDesc()->GetHandle(), &table, sizeof(TPlayerTable));
 
-	quest::PC * pkQuestPC = quest::CQuestManager::instance().GetPCForce(GetPlayerID());
+	quest::PC * pkQuestPC = quest::CQuestManager::Instance().GetPCForce(GetPlayerID());
 
 	if (!pkQuestPC)
 		sys_err("CHARACTER::Save : null quest::PC pointer! (name %s)", GetName());
@@ -1428,7 +1426,7 @@ void CHARACTER::SaveReal()
 	}
 
 	//Save marriage (if existing)
-	marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(GetPlayerID());
+	marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(GetPlayerID());
 	if (pMarriage)
 		pMarriage->Save();
 
@@ -1445,7 +1443,7 @@ void CHARACTER::FlushDelayedSaveItem()
 
 	for (int32_t i = 0; i < INVENTORY_AND_EQUIP_SLOT_MAX; ++i)
 		if ((item = GetInventoryItem(i)))
-			ITEM_MANAGER::instance().FlushDelayedSave(item);
+			ITEM_MANAGER::Instance().FlushDelayedSave(item);
 }
 
 void CHARACTER::Disconnect(const char * c_pszReason)
@@ -1470,15 +1468,15 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 		GetParty()->UpdateOfflineState(GetPlayerID());
 	}
 
-	marriage::CManager::instance().Logout(this);
+	marriage::CManager::Instance().Logout(this);
 
 	// P2P Logout
 	TPacketGGLogout p;
 	p.bHeader = HEADER_GG_LOGOUT;
 	p.dwPID = GetPlayerID();
 	strlcpy(p.szName, GetName(), sizeof(p.szName));
-	P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGLogout));
-	LogManager::instance().CharLog(this, 0, "LOGOUT", "");
+	P2P_MANAGER::Instance().Send(&p, sizeof(TPacketGGLogout));
+	LogManager::Instance().CharLog(this, 0, "LOGOUT", "");
 
 	if (m_pWarMap)
 		SetWarMap(nullptr);
@@ -1491,7 +1489,7 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 	if (GetGuild())
 		GetGuild()->LogoutMember(this);
 
-	quest::CQuestManager::instance().LogoutPC(this);
+	quest::CQuestManager::Instance().LogoutPC(this);
 
 	if (GetParty())
 		GetParty()->Unlink(this);
@@ -1504,7 +1502,7 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 	}
 
 
-	if (!CHARACTER_MANAGER::instance().FlushDelayedSave(this))
+	if (!CHARACTER_MANAGER::Instance().FlushDelayedSave(this))
 	{
 		SaveReal();
 	}
@@ -1516,20 +1514,20 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 
 	m_bSkipSave = true; // 이 이후에는 더이상 저장하면 안된다.
 
-	quest::CQuestManager::instance().DisconnectPC(this);
+	quest::CQuestManager::Instance().DisconnectPC(this);
 
 	CloseSafebox();
 
 	CloseMall();
 
-	CPVPManager::instance().Disconnect(this);
+	CPVPManager::Instance().Disconnect(this);
 
-	CTargetManager::instance().Logout(GetPlayerID());
+	CTargetManager::Instance().Logout(GetPlayerID());
 
-	MessengerManager::instance().Logout(GetName());
+	MessengerManager::Instance().Logout(GetName());
 
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
-		CBattlegroundManager::instance().OnLogout(this);
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
+		CBattlegroundManager::Instance().OnLogout(this);
 
 	if (GetDesc())
 	{
@@ -1542,7 +1540,7 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 
 bool CHARACTER::Show(int32_t lMapIndex, int32_t x, int32_t y, int32_t z, bool bShowSpawnMotion/* = false */)
 {
-	LPSECTREE sectree = SECTREE_MANAGER::instance().Get(lMapIndex, x, y);
+	LPSECTREE sectree = SECTREE_MANAGER::Instance().Get(lMapIndex, x, y);
 
 	if (!sectree)
 	{
@@ -1969,7 +1967,7 @@ void CHARACTER::SetPlayerProto(const TPlayerTable * t)
 
 	if (GetGMLevel() != GM_PLAYER) 
 	{
-		LogManager::instance().CharLog(this, GetGMLevel(), "GM_LOGIN", "");
+		LogManager::Instance().CharLog(this, GetGMLevel(), "GM_LOGIN", "");
 		sys_log(0, "GM_LOGIN(gmlevel=%d, name=%s(%d), pos=(%d, %d)", GetGMLevel(), GetName(), GetPlayerID(), GetX(), GetY());
 	}
 
@@ -2050,7 +2048,7 @@ void CHARACTER::SetProto(const CMob * pkMob)
 		StartWarpNPCEvent();
 	}
 
-	CHARACTER_MANAGER::instance().RegisterRaceNumMap(this);
+	CHARACTER_MANAGER::Instance().RegisterRaceNumMap(this);
 
 	// XXX X-mas santa hardcoding
 	if (GetRaceNum() == xmas::MOB_SANTA_VNUM)
@@ -2198,7 +2196,7 @@ uint8_t CHARACTER::GetMobBattleType() const
 	if (!m_pkMobData)
 		return BATTLE_TYPE_MELEE;
 
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 	{
 		switch (GetRaceNum())
 		{
@@ -2219,7 +2217,7 @@ void CHARACTER::ComputeBattlePoints()
 	if (IsPolymorphed())
 	{
 		uint32_t dwMobVnum = GetPolymorphVnum();
-		const CMob * pMob = CMobManager::instance().Get(dwMobVnum);
+		const CMob * pMob = CMobManager::Instance().Get(dwMobVnum);
 		int32_t iAtt = 0;
 		int32_t iDef = 0;
 
@@ -2424,7 +2422,7 @@ void CHARACTER::ComputePoints()
 		iMaxStamina = JobInitialPoints[GetJob()].max_stamina + GetPoint(POINT_HT) * JobInitialPoints[GetJob()].stamina_per_con;
 
 		{
-			CSkillProto* pkSk = CSkillManager::instance().Get(SKILL_ADD_HP);
+			CSkillProto* pkSk = CSkillManager::Instance().Get(SKILL_ADD_HP);
 
 			if (nullptr != pkSk)
 			{
@@ -2518,7 +2516,7 @@ void CHARACTER::ComputePoints()
 			LPITEM pItem = GetWear(i);
 			if (pItem)
 			{
-				if (DSManager::instance().IsTimeLeftDragonSoul(pItem))
+				if (DSManager::Instance().IsTimeLeftDragonSoul(pItem))
 					pItem->ModifyPoints(true);
 			}
 		}
@@ -2595,7 +2593,7 @@ EVENTFUNC(recovery_event)
 				{
 					uint32_t dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
 					size_t val = BlueDragon_GetIndexFactor("DragonStone", i, "val");
-					size_t cnt = SECTREE_MANAGER::instance().GetMonsterCountInMap( ch->GetMapIndex(), dwDragonStoneID );
+					size_t cnt = SECTREE_MANAGER::Instance().GetMonsterCountInMap( ch->GetMapIndex(), dwDragonStoneID );
 
 					regenPct += (val*cnt);
 
@@ -2624,7 +2622,7 @@ EVENTFUNC(recovery_event)
 				{
 					uint32_t dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
 					size_t val = BlueDragon_GetIndexFactor("DragonStone", i, "val");
-					size_t cnt = SECTREE_MANAGER::instance().GetMonsterCountInMap( ch->GetMapIndex(), dwDragonStoneID );
+					size_t cnt = SECTREE_MANAGER::Instance().GetMonsterCountInMap( ch->GetMapIndex(), dwDragonStoneID );
 
 					return PASSES_PER_SEC(MAX(1, (ch->GetMobTable().bRegenCycle - (val*cnt))));
 				}
@@ -2771,7 +2769,7 @@ bool CHARACTER::Sync(int32_t x, int32_t y)
 		return false;
 	}
 
-	LPSECTREE new_tree = SECTREE_MANAGER::instance().Get(GetMapIndex(), x, y);
+	LPSECTREE new_tree = SECTREE_MANAGER::Instance().Get(GetMapIndex(), x, y);
 
 	if (!new_tree)
 	{
@@ -2810,13 +2808,13 @@ bool CHARACTER::Sync(int32_t x, int32_t y)
 		{
 			if (GetParty())
 			{
-				quest::CQuestManager::instance().AttrOut(GetParty()->GetLeaderPID(), this, iLastEventAttr);
-				quest::CQuestManager::instance().AttrIn(GetParty()->GetLeaderPID(), this, m_iEventAttr);
+				quest::CQuestManager::Instance().AttrOut(GetParty()->GetLeaderPID(), this, iLastEventAttr);
+				quest::CQuestManager::Instance().AttrIn(GetParty()->GetLeaderPID(), this, m_iEventAttr);
 			}
 			else
 			{
-				quest::CQuestManager::instance().AttrOut(GetPlayerID(), this, iLastEventAttr);
-				quest::CQuestManager::instance().AttrIn(GetPlayerID(), this, m_iEventAttr);
+				quest::CQuestManager::Instance().AttrOut(GetPlayerID(), this, iLastEventAttr);
+				quest::CQuestManager::Instance().AttrIn(GetPlayerID(), this, m_iEventAttr);
 			}
 		}
 	}
@@ -2897,7 +2895,7 @@ void CHARACTER::MoveBattlegroundMinnion()
 	}
 
 	GPOS pxBase;
-	if (!SECTREE_MANAGER::instance().GetMapBasePositionByMapIndex(GetMapIndex(), pxBase))
+	if (!SECTREE_MANAGER::Instance().GetMapBasePositionByMapIndex(GetMapIndex(), pxBase))
 	{
 		sys_err("cannot get map base position by index %ld", GetMapIndex());
 		return;
@@ -2987,7 +2985,7 @@ void CHARACTER::SetMovingWay(const TNPCMovingPosition* pWay, int32_t iMaxNum, bo
 	if (bLocal)
 	{
 		GPOS pxBase;
-		if (!SECTREE_MANAGER::instance().GetMapBasePositionByMapIndex(GetMapIndex(), pxBase))
+		if (!SECTREE_MANAGER::Instance().GetMapBasePositionByMapIndex(GetMapIndex(), pxBase))
 		{
 			m_pMovingWay = nullptr;
 			sys_err("cannot get map base position by index %ld", GetMapIndex());
@@ -3127,13 +3125,13 @@ float CHARACTER::GetMoveMotionSpeed() const
 	bool bIsWalking = IsPC() ? IsWalking() : m_bNowWalking;
 
 	if (!GetMountVnum())
-		pkMotion = CMotionManager::instance().GetMotion(GetRaceNum(), MAKE_MOTION_KEY(dwMode, bIsWalking ? MOTION_WALK : MOTION_RUN));
+		pkMotion = CMotionManager::Instance().GetMotion(GetRaceNum(), MAKE_MOTION_KEY(dwMode, bIsWalking ? MOTION_WALK : MOTION_RUN));
 	else
 	{
-		pkMotion = CMotionManager::instance().GetMotion(GetMountVnum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, bIsWalking ? MOTION_WALK : MOTION_RUN));
+		pkMotion = CMotionManager::Instance().GetMotion(GetMountVnum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, bIsWalking ? MOTION_WALK : MOTION_RUN));
 
 		if (!pkMotion)
-			pkMotion = CMotionManager::instance().GetMotion(GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_HORSE, bIsWalking ? MOTION_WALK : MOTION_RUN));
+			pkMotion = CMotionManager::Instance().GetMotion(GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_HORSE, bIsWalking ? MOTION_WALK : MOTION_RUN));
 	}
 
 	if (pkMotion)
@@ -3218,7 +3216,7 @@ int32_t CHARACTER::GetPolymorphPoint(uint8_t type) const
 	if (IsPolymorphed() && !IsPolyMaintainStat())
 	{
 		uint32_t dwMobVnum = GetPolymorphVnum();
-		const CMob * pMob = CMobManager::instance().Get(dwMobVnum);
+		const CMob * pMob = CMobManager::Instance().Get(dwMobVnum);
 		int32_t iPower = GetPolymorphPower();
 
 		if (pMob)
@@ -3453,7 +3451,7 @@ void CHARACTER::PointChange(uint8_t type, int32_t amount, bool bAmount, bool bBr
 
 			if (amount)
 			{
-				quest::CQuestManager::instance().LevelUp(GetPlayerID());
+				quest::CQuestManager::Instance().LevelUp(GetPlayerID());
 
 				// UpdateP2P
 				TPacketGGLogin p;
@@ -3461,12 +3459,12 @@ void CHARACTER::PointChange(uint8_t type, int32_t amount, bool bAmount, bool bBr
 				strlcpy(p.szName, GetName(), sizeof(p.szName));
 				p.dwPID = GetPlayerID();
 				p.bEmpire = GetEmpire();
-				p.lMapIndex = SECTREE_MANAGER::instance().GetMapIndex(GetX(), GetY());
+				p.lMapIndex = SECTREE_MANAGER::Instance().GetMapIndex(GetX(), GetY());
 				p.bChannel = g_bChannel;
 				p.iLevel = GetLevel();
-				P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGLogin));
+				P2P_MANAGER::Instance().Send(&p, sizeof(TPacketGGLogin));
 
-				LogManager::instance().LevelLog(this, val, GetRealPoint(POINT_PLAYTIME) + (get_dword_time() - m_dwPlayStartTime) / 60000);
+				LogManager::Instance().LevelLog(this, val, GetRealPoint(POINT_PLAYTIME) + (get_dword_time() - m_dwPlayStartTime) / 60000);
 
 				if (GetGuild())
 				{
@@ -3734,7 +3732,7 @@ void CHARACTER::PointChange(uint8_t type, int32_t amount, bool bAmount, bool bBr
 				if (GOLD_MAX <= nTotalMoney)
 				{
 					sys_err("[OVERFLOW_GOLD] OriGold %d AddedGold %d id %u Name %s ", GetGold(), amount, GetPlayerID(), GetName());
-					LogManager::instance().CharLog(this, GetGold() + amount, "OVERFLOW_GOLD", "");
+					LogManager::Instance().CharLog(this, GetGold() + amount, "OVERFLOW_GOLD", "");
 					return;
 				}
 
@@ -4339,7 +4337,7 @@ void CHARACTER::mining_cancel()
 
 void CHARACTER::mining(LPCHARACTER chLoad)
 {
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 		return;
 		
 	if (m_pkMiningEvent)
@@ -4399,7 +4397,7 @@ bool CHARACTER::IsNearWater() const
 
 void CHARACTER::fishing()
 {
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 		return;
 
 	if (m_pkFishingEvent)
@@ -4413,7 +4411,7 @@ void CHARACTER::fishing()
 
 	// 못감 속성에서 낚시를 시도한다?
 	{
-		LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(GetMapIndex());
+		LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(GetMapIndex());
 
 		int32_t	x = GetX();
 		int32_t y = GetY();
@@ -4473,7 +4471,7 @@ void CHARACTER::fishing_take()
 
 bool CHARACTER::StartStateMachine(int32_t iNextPulse)
 {
-	if (CHARACTER_MANAGER::instance().AddToStateList(this))
+	if (CHARACTER_MANAGER::Instance().AddToStateList(this))
 	{
 		m_dwNextStatePulse = thecore_heart->pulse + iNextPulse;
 		return true;
@@ -4484,7 +4482,7 @@ bool CHARACTER::StartStateMachine(int32_t iNextPulse)
 
 void CHARACTER::StopStateMachine()
 {
-	CHARACTER_MANAGER::instance().RemoveFromStateList(this);
+	CHARACTER_MANAGER::Instance().RemoveFromStateList(this);
 }
 
 void CHARACTER::UpdateStateMachine(uint32_t dwPulse)
@@ -4501,7 +4499,7 @@ void CHARACTER::UpdateStateMachine(uint32_t dwPulse)
 
 void CHARACTER::SetNextStatePulse(int32_t iNextPulse)
 {
-	CHARACTER_MANAGER::instance().AddToStateList(this);
+	CHARACTER_MANAGER::Instance().AddToStateList(this);
 	m_dwNextStatePulse = iNextPulse;
 }
 
@@ -4542,7 +4540,7 @@ uint16_t CHARACTER::GetPart(uint8_t bPartPos) const
 
 uint16_t CHARACTER::GetOriginalPart(uint8_t bPartPos) const
 {
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 	{
 		// start with 0 when buy new item from battlegroundshop save to new veriable from character class and return it
 	}
@@ -4744,7 +4742,7 @@ EVENTFUNC(party_request_event)
 		return 0;
 	}
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(info->dwGuestPID);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(info->dwGuestPID);
 
 	if (ch)
 	{
@@ -4928,7 +4926,7 @@ EVENTFUNC(party_invite_event)
 		return 0;
 	}
 
-	LPCHARACTER pchInviter = CHARACTER_MANAGER::instance().FindByPID(pInfo->dwLeaderPID);
+	LPCHARACTER pchInviter = CHARACTER_MANAGER::Instance().FindByPID(pInfo->dwLeaderPID);
 
 	if (pchInviter)
 	{
@@ -4952,9 +4950,9 @@ void CHARACTER::PartyInvite(LPCHARACTER pchInvitee)
 		return;
 	}
 
-	if (CBattlegroundManager::instance().IsEventMap(pchInvitee->GetMapIndex()) || CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(pchInvitee->GetMapIndex()) || CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 		return;
-	if (CArenaManager::instance().IsArenaMap(pchInvitee->GetMapIndex()) || CArenaManager::instance().IsArenaMap(GetMapIndex())) 
+	if (CArenaManager::Instance().IsArenaMap(pchInvitee->GetMapIndex()) || CArenaManager::Instance().IsArenaMap(GetMapIndex())) 
 	{
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Arenada oyuncu davet edemezsin"));
 		return;
@@ -5103,7 +5101,7 @@ void CHARACTER::PartyInviteAccept(LPCHARACTER pchInvitee)
 		pchInvitee->PartyJoin(this);
 	else
 	{
-		LPPARTY pParty = CPartyManager::instance().CreateParty(this);
+		LPPARTY pParty = CPartyManager::Instance().CreateParty(this);
 
 		pParty->Join(pchInvitee->GetPlayerID());
 		pParty->Link(pchInvitee);
@@ -5124,7 +5122,7 @@ void CHARACTER::PartyInviteDeny(uint32_t dwPID)
 	event_cancel(&itFind->second);
 	m_PartyInviteEventMap.erase(itFind);
 
-	LPCHARACTER pchInvitee = CHARACTER_MANAGER::instance().FindByPID(dwPID);
+	LPCHARACTER pchInvitee = CHARACTER_MANAGER::Instance().FindByPID(dwPID);
 	if (pchInvitee)
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> %s님이 파티 초대를 거절하셨습니다."), pchInvitee->GetName());
 }
@@ -5154,7 +5152,7 @@ static bool __party_can_join_by_level(LPCHARACTER leader, LPCHARACTER quest)
 
 CHARACTER::PartyJoinErrCode CHARACTER::IsPartyJoinableMutableCondition(const LPCHARACTER pchLeader, const LPCHARACTER pchGuest)
 {
-	if (!CPartyManager::instance().IsEnablePCParty())
+	if (!CPartyManager::Instance().IsEnablePCParty())
 		return PERR_SERVER;
 	else if (pchLeader->GetDungeon())
 		return PERR_DUNGEON;
@@ -5323,9 +5321,8 @@ void CHARACTER::OnClick(LPCHARACTER pkChrCauser)
 	if (IsPC())
 	{
 		// 타겟으로 설정된 경우는 PC에 의한 클릭도 퀘스트로 처리하도록 합니다.
-		if (!CTargetManager::instance().GetTargetInfo(pkChrCauser->GetPlayerID(), TARGET_TYPE_VID, GetVID()))
+		if (!CTargetManager::Instance().GetTargetInfo(pkChrCauser->GetPlayerID(), TARGET_TYPE_VID, GetVID()))
 		{
-			// 2005.03.17.myevan.타겟이 아닌 경우는 개인 상점 처리 기능을 작동시킨다.
 			if (GetMyShop())
 			{
 				if (pkChrCauser->IsDead() == true) return;
@@ -5378,7 +5375,7 @@ void CHARACTER::OnClick(LPCHARACTER pkChrCauser)
 
 	pkChrCauser->SetQuestNPCID(GetVID());
 
-	if (quest::CQuestManager::instance().Click(pkChrCauser->GetPlayerID(), this))
+	if (quest::CQuestManager::Instance().Click(pkChrCauser->GetPlayerID(), this))
 	{
 		return;
 	}
@@ -5639,7 +5636,7 @@ void CHARACTER::SendTargetDrop()
 	static std::vector<uint32_t> s_vec_itemsDrop;
 	s_vec_itemsDrop.clear();
 
-	if (ITEM_MANAGER::instance().GetPossibleItemsToDrop(m_pkChrTarget, s_vec_itemsDrop))
+	if (ITEM_MANAGER::Instance().GetPossibleItemsToDrop(m_pkChrTarget, s_vec_itemsDrop))
 	{
 		if (s_vec_itemsDrop.size() > 0)
 		{
@@ -5708,7 +5705,7 @@ bool CHARACTER::WarpSet(int32_t x, int32_t y, int32_t lPrivateMapIndex)
 	int32_t lMapIndex;
 	uint16_t wPort;
 
-	if (!CMapLocation::instance().Get(x, y, lMapIndex, lAddr, wPort))
+	if (!CMapLocation::Instance().Get(x, y, lMapIndex, lAddr, wPort))
 	{
 		sys_err("cannot find map location index %d x %d y %d name %s", lMapIndex, x, y, GetName());
 		return false;
@@ -5758,7 +5755,7 @@ bool CHARACTER::WarpSet(int32_t x, int32_t y, int32_t lPrivateMapIndex)
 
 	char buf[256];
 	snprintf(buf, sizeof(buf), "%s MapIdx %d DestMapIdx%d DestX%d DestY%d Empire%d", GetName(), GetMapIndex(), lPrivateMapIndex, x, y, GetEmpire());
-	LogManager::instance().CharLog(this, 0, "WARP", buf);
+	LogManager::Instance().CharLog(this, 0, "WARP", buf);
 
 	return true;
 }
@@ -5799,11 +5796,11 @@ void CHARACTER::WarpEnd()
 		strlcpy(p.szName, GetName(), sizeof(p.szName));
 		p.dwPID = GetPlayerID();
 		p.bEmpire = GetEmpire();
-		p.lMapIndex = SECTREE_MANAGER::instance().GetMapIndex(GetX(), GetY());
+		p.lMapIndex = SECTREE_MANAGER::Instance().GetMapIndex(GetX(), GetY());
 		p.bChannel = g_bChannel;
 		p.iLevel = GetLevel();
 
-		P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGLogin));
+		P2P_MANAGER::Instance().Send(&p, sizeof(TPacketGGLogin));
 	}
 }
 
@@ -5963,7 +5960,7 @@ bool CHARACTER::Follow(LPCHARACTER pkChr, float fMinDistance)
 			dx = x + (int32_t) fx;
 			dy = y + (int32_t) fy;
 
-			LPSECTREE tree = SECTREE_MANAGER::instance().Get(GetMapIndex(), dx, dy);
+			LPSECTREE tree = SECTREE_MANAGER::Instance().Get(GetMapIndex(), dx, dy);
 
 			if (nullptr == tree)
 				break;
@@ -6022,7 +6019,7 @@ CSafebox * CHARACTER::GetSafebox() const
 
 void CHARACTER::ReqSafeboxLoad(const char* pszPassword)
 {
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 		return;
 		
 	if (!GM::check_allow(GetGMLevel(), GM_ALLOW_USE_SAFEBOX))
@@ -6103,7 +6100,7 @@ void CHARACTER::LoadSafebox(int32_t iSize, uint32_t dwGold, int32_t iItemCount, 
 			if (!m_pkSafebox->IsValidPosition(pItems->pos))
 				continue;
 
-			LPITEM item = ITEM_MANAGER::instance().CreateItem(pItems->vnum, pItems->count, pItems->id);
+			LPITEM item = ITEM_MANAGER::Instance().CreateItem(pItems->vnum, pItems->count, pItems->id);
 
 			if (!item)
 			{
@@ -6199,7 +6196,7 @@ void CHARACTER::LoadMall(int32_t iItemCount, TPlayerItem * pItems)
 			if (!m_pkMall->IsValidPosition(pItems->pos))
 				continue;
 
-			LPITEM item = ITEM_MANAGER::instance().CreateItem(pItems->vnum, pItems->count, pItems->id);
+			LPITEM item = ITEM_MANAGER::Instance().CreateItem(pItems->vnum, pItems->count, pItems->id);
 
 			if (!item)
 			{
@@ -6275,7 +6272,7 @@ void CHARACTER::QuerySafeboxSize()
 {
 	if (m_iSafeboxSize == -1)
 	{
-		DBManager::instance().ReturnQuery(QID_SAFEBOX_SIZE,
+		DBManager::Instance().ReturnQuery(QID_SAFEBOX_SIZE,
 				GetPlayerID(),
 				nullptr, 
 				"SELECT size FROM safebox WHERE account_id = %u",
@@ -6287,7 +6284,7 @@ void CHARACTER::SetSafeboxSize(int32_t iSize)
 {
 	sys_log(1, "SetSafeboxSize: %s %d", GetName(), iSize);
 	m_iSafeboxSize = iSize;
-	DBManager::instance().Query("UPDATE safebox SET size = %d WHERE account_id = %u", iSize / SAFEBOX_PAGE_SIZE, GetDesc()->GetAccountTable().id);
+	DBManager::Instance().Query("UPDATE safebox SET size = %d WHERE account_id = %u", iSize / SAFEBOX_PAGE_SIZE, GetDesc()->GetAccountTable().id);
 }
 
 int32_t CHARACTER::GetSafeboxSize() const
@@ -6396,7 +6393,7 @@ void CHARACTER::ResetPoint(int32_t iLv)
 
 	PointsPacket();
 
-	LogManager::instance().CharLog(this, 0, "RESET_POINT", "");
+	LogManager::Instance().CharLog(this, 0, "RESET_POINT", "");
 }
 
 bool CHARACTER::IsChangeAttackPosition(LPCHARACTER target) const
@@ -6529,7 +6526,7 @@ void CHARACTER::SetQuestNPCID(uint32_t vid)
 {
 	if (m_dwQuestNPCVID)
 	{
-		quest::PC* pPC = quest::CQuestManager::instance().GetPCForce(GetPlayerID());
+		quest::PC* pPC = quest::CQuestManager::Instance().GetPCForce(GetPlayerID());
 		if (pPC && pPC->IsRunning())
 		{
 			sys_err("cannot reset quest npc id - already running quest [%u %s]", GetPlayerID(), GetName());
@@ -6541,7 +6538,7 @@ void CHARACTER::SetQuestNPCID(uint32_t vid)
 
 LPCHARACTER CHARACTER::GetQuestNPC() const
 {
-	return CHARACTER_MANAGER::instance().Find(m_dwQuestNPCVID);
+	return CHARACTER_MANAGER::Instance().Find(m_dwQuestNPCVID);
 }
 
 void CHARACTER::SetQuestItemPtr(LPITEM item)
@@ -6562,7 +6559,7 @@ LPITEM CHARACTER::GetQuestItemPtr() const
 LPDUNGEON CHARACTER::GetDungeonForce() const
 { 
 	if (m_lWarpMapIndex > 10000)
-		return CDungeonManager::instance().FindByMapIndex(m_lWarpMapIndex);
+		return CDungeonManager::Instance().FindByMapIndex(m_lWarpMapIndex);
 
 	return m_pkDungeon;
 }
@@ -6596,7 +6593,7 @@ int32_t CHARACTER::GetPolymorphPower() const
 {
 	if (g_bIsTestServer)
 	{
-		int32_t value = quest::CQuestManager::instance().GetEventFlag("poly");
+		int32_t value = quest::CQuestManager::Instance().GetEventFlag("poly");
 		if (value)
 			return value;
 	}
@@ -6605,7 +6602,7 @@ int32_t CHARACTER::GetPolymorphPower() const
 
 void CHARACTER::SetPolymorph(uint32_t dwRaceNum, bool bMaintainStat)
 {
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 		return;
 
 #ifdef ENABLE_WOLFMAN_CHARACTER
@@ -6664,7 +6661,7 @@ int32_t CHARACTER::GetQuestFlag(const std::string& flag) const
 	}
 	uint32_t pid = GetPlayerID();
 
-	quest::CQuestManager& q = quest::CQuestManager::instance();
+	quest::CQuestManager& q = quest::CQuestManager::Instance();
 	quest::PC* pPC = q.GetPC(GetPlayerID());
 
 	if (!pPC)
@@ -6680,7 +6677,7 @@ void CHARACTER::SetQuestFlag(const std::string& flag, int32_t value)
 {
 	uint32_t pid = GetPlayerID();
 
-	quest::CQuestManager& q = quest::CQuestManager::instance();
+	quest::CQuestManager& q = quest::CQuestManager::Instance();
 	quest::PC* pPC = q.GetPC(GetPlayerID());
 
 	if (!pPC)
@@ -6784,7 +6781,7 @@ bool CHARACTER::CanSummon(int32_t iLeaderShip)
 
 void CHARACTER::MountVnum(uint32_t vnum)
 {
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 		return;
 
 	if (m_dwMountVnum == vnum)
@@ -6851,7 +6848,7 @@ namespace {
 
 				if (pkWarp->IsGoto())
 				{
-					LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(pkWarp->GetMapIndex());
+					LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(pkWarp->GetMapIndex());
 					m_lTargetX += pkSectreeMap->m_setting.iBaseX;
 					m_lTargetY += pkSectreeMap->m_setting.iBaseY;
 					m_bUseWarp = false;
@@ -6994,7 +6991,7 @@ int32_t CHARACTER::GetMarriageBonus(uint32_t dwItemVnum, bool bSum)
 	if (IsNPC())
 		return 0;
 
-	marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(GetPlayerID());
+	marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(GetPlayerID());
 
 	if (!pMarriage)
 		return 0;
@@ -7028,7 +7025,7 @@ int32_t CHARACTER::GetPremiumRemainSeconds(uint8_t bType) const
 bool CHARACTER::WarpToPID(uint32_t dwPID)
 {
 	LPCHARACTER victim;
-	if ((victim = (CHARACTER_MANAGER::instance().FindByPID(dwPID))))
+	if ((victim = (CHARACTER_MANAGER::Instance().FindByPID(dwPID))))
 	{
 		int32_t mapIdx = victim->GetMapIndex();
 		if (IS_SUMMONABLE_ZONE(mapIdx))
@@ -7055,7 +7052,7 @@ bool CHARACTER::WarpToPID(uint32_t dwPID)
 		// 1. A.pid, B.pid 를 뿌림
 		// 2. B.pid를 가진 서버가 뿌린서버에게 A.pid, 좌표 를 보냄
 		// 3. 워프
-		CCI * pcci = P2P_MANAGER::instance().FindByPID(dwPID);
+		CCI * pcci = P2P_MANAGER::Instance().FindByPID(dwPID);
 
 		if (!pcci)
 		{
@@ -7097,7 +7094,7 @@ bool CHARACTER::WarpToPID(uint32_t dwPID)
 // ADD_REFINE_BUILDING
 CGuild* CHARACTER::GetRefineGuild() const
 {
-	LPCHARACTER chRefineNPC = CHARACTER_MANAGER::instance().Find(m_dwRefineNPCVID);
+	LPCHARACTER chRefineNPC = CHARACTER_MANAGER::Instance().Find(m_dwRefineNPCVID);
 
 	return (chRefineNPC ? chRefineNPC->GetGuild() : nullptr);
 }
@@ -7116,7 +7113,7 @@ int32_t CHARACTER::ComputeRefineFee(int32_t iCost, int32_t iMultiply) const
 			return iCost * iMultiply * 9 / 10;
 
 		// 다른 제국 사람이 시도하는 경우 추가로 3배 더
-		LPCHARACTER chRefineNPC = CHARACTER_MANAGER::instance().Find(m_dwRefineNPCVID);
+		LPCHARACTER chRefineNPC = CHARACTER_MANAGER::Instance().Find(m_dwRefineNPCVID);
 		if (chRefineNPC && chRefineNPC->GetEmpire() != GetEmpire())
 			return iCost * iMultiply * 3;
 
@@ -7417,7 +7414,7 @@ EVENTFUNC(check_speedhack_event)
 	if (IS_SPEED_HACK_PLAYER(ch))
 	{
 		// write hack log
-		LogManager::instance().SpeedHackLog(ch->GetPlayerID(), ch->GetX(), ch->GetY(), ch->m_speed_hack_count);
+		LogManager::Instance().SpeedHackLog(ch->GetPlayerID(), ch->GetX(), ch->GetY(), ch->m_speed_hack_count);
 
 		if (g_bEnableSpeedHackCrash)
 		{
@@ -7426,7 +7423,7 @@ EVENTFUNC(check_speedhack_event)
 
 			if (desc)
 			{
-				DESC_MANAGER::instance().DestroyDesc(desc);
+				DESC_MANAGER::Instance().DestroyDesc(desc);
 				return 0;
 			}
 		}
@@ -7509,7 +7506,7 @@ EVENTFUNC(wallhack_check)
 		HackInfo += " y" + std::to_string(Player->GetY());
 		HackInfo += " z" + std::to_string(Player->GetZ());
 		HackInfo += " m" + std::to_string(Player->GetMapIndex());
-		LogManager::instance().HackLog(HackInfo.c_str(), Player);
+		LogManager::Instance().HackLog(HackInfo.c_str(), Player);
 		Player->WarpSet(Player->GetLastMoveAblePosition().x, Player->GetLastMoveAblePosition().y, Player->GetLastMoveableMapIndex());
 	}
 	else
@@ -7588,7 +7585,7 @@ void CHARACTER::SendGuildName(CGuild* pGuild)
 
 void CHARACTER::SendGuildName(uint32_t dwGuildID)
 {
-	SendGuildName(CGuildManager::instance().FindGuild(dwGuildID));
+	SendGuildName(CGuildManager::Instance().FindGuild(dwGuildID));
 }
 
 EVENTFUNC(destroy_when_idle_event)
@@ -7675,7 +7672,7 @@ void CHARACTER::IncreaseComboHackCount(int32_t k)
 			if (GetDesc()->DelayedDisconnect(number(2, 7)))
 			{
 				sys_log(0, "COMBO_HACK_DISCONNECT: %s count: %d", GetName(), m_iComboHackCount);
-				LogManager::instance().HackLog("Combo", this);
+				LogManager::Instance().HackLog("Combo", this);
 			}
 		}
 	}
@@ -7770,7 +7767,7 @@ uint32_t CHARACTER::GetNextExp() const
 
 int32_t	CHARACTER::GetSkillPowerByLevel(int32_t level, bool bMob) const
 {
-	return CTableBySkill::instance().GetSkillPowerByLevelFromType(GetJob(), GetSkillGroup(), MINMAX(0, level, SKILL_MAX_LEVEL), bMob); 
+	return CTableBySkill::Instance().GetSkillPowerByLevelFromType(GetJob(), GetSkillGroup(), MINMAX(0, level, SKILL_MAX_LEVEL), bMob); 
 }
 
 bool CHARACTER::CanFall()
@@ -7881,7 +7878,7 @@ void CHARACTER::SetCoins(int32_t val)
 	}
 
 	int32_t value = val;
-	std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery("UPDATE account.account SET cash = '%d' WHERE id = '%d'", value, GetAID()));
+	std::unique_ptr<SQLMsg> msg(DBManager::Instance().DirectQuery("UPDATE account.account SET cash = '%d' WHERE id = '%d'", value, GetAID()));
 
 	if (msg->uiSQLErrno != 0)
 	{
@@ -7909,7 +7906,7 @@ void CHARACTER::UpdateCoins(uint32_t dwAID, int32_t val)
 	else
 		sprintf(szQuery, "UPDATE account.account SET cash = cash - '%ld' WHERE id = '%u'", value, dwTarget);
 
-	std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> msg(DBManager::Instance().DirectQuery(szQuery));
 
 	if (msg->uiSQLErrno != 0)
 	{
@@ -7926,7 +7923,7 @@ void CHARACTER::UpdateCoins(uint32_t dwAID, int32_t val)
 
 int32_t CHARACTER::GetCoins()
 {
-	std::unique_ptr<SQLMsg> msg(DBManager::instance().DirectQuery("SELECT cash FROM account.account WHERE id = '%u'", GetAID()));
+	std::unique_ptr<SQLMsg> msg(DBManager::Instance().DirectQuery("SELECT cash FROM account.account WHERE id = '%u'", GetAID()));
 
 	if (msg->uiSQLErrno != 0)
 	{
@@ -8117,7 +8114,7 @@ void CHARACTER::GetAcceCombineResult(uint32_t & dwItemVnum, uint32_t & dwMinAbs,
 			else
 			{
 				uint32_t dwMaskVnum = pkItemMaterial[0]->GetOriginalVnum();
-				TItemTable * pTable = ITEM_MANAGER::instance().GetTable(dwMaskVnum + 1);
+				TItemTable * pTable = ITEM_MANAGER::Instance().GetTable(dwMaskVnum + 1);
 				if (pTable)
 					dwMaskVnum += 1;
 
@@ -8403,7 +8400,7 @@ void CHARACTER::RefineAcceMaterials()
 		bool bSucces = (iChance <= iSuccessChance ? true : false);
 		if (bSucces)
 		{
-			LPITEM pkItem = ITEM_MANAGER::instance().CreateItem(dwItemVnum, 1, 0, false);
+			LPITEM pkItem = ITEM_MANAGER::Instance().CreateItem(dwItemVnum, 1, 0, false);
 			if (!pkItem)
 			{
 				sys_err("%d can't be created.", dwItemVnum);
@@ -8411,20 +8408,20 @@ void CHARACTER::RefineAcceMaterials()
 			}
 
 			ITEM_MANAGER::CopyAllAttrTo(pkItemMaterial[0], pkItem);
-			LogManager::instance().ItemLog(this, pkItem, "COMBINE SUCCESS", pkItem->GetName());
+			LogManager::Instance().ItemLog(this, pkItem, "COMBINE SUCCESS", pkItem->GetName());
 			uint32_t dwAbs = (dwMinAbs == dwMaxAbs ? dwMinAbs : number(dwMinAbs + 1, dwMaxAbs));
 			pkItem->SetSocket(ACCE_ABSORPTION_SOCKET, dwAbs);
 			pkItem->SetSocket(ACCE_ABSORBED_SOCKET, pkItemMaterial[0]->GetSocket(ACCE_ABSORBED_SOCKET));
 
 			PointChange(POINT_GOLD, -dwPrice);
-			LogManager::instance().MoneyLog(MONEY_LOG_REFINE, pkItemMaterial[0]->GetVnum(), -dwPrice);
+			LogManager::Instance().MoneyLog(MONEY_LOG_REFINE, pkItemMaterial[0]->GetVnum(), -dwPrice);
 
 			uint16_t wCell = pkItemMaterial[0]->GetCell();
-			ITEM_MANAGER::instance().RemoveItem(pkItemMaterial[0], "COMBINE (REFINE SUCCESS)");
-			ITEM_MANAGER::instance().RemoveItem(pkItemMaterial[1], "COMBINE (REFINE SUCCESS)");
+			ITEM_MANAGER::Instance().RemoveItem(pkItemMaterial[0], "COMBINE (REFINE SUCCESS)");
+			ITEM_MANAGER::Instance().RemoveItem(pkItemMaterial[1], "COMBINE (REFINE SUCCESS)");
 
 			pkItem->AddToCharacter(this, TItemPos(INVENTORY, wCell));
-			ITEM_MANAGER::instance().FlushDelayedSave(pkItem);
+			ITEM_MANAGER::Instance().FlushDelayedSave(pkItem);
 			pkItem->AttrLog();
 
 			if (lVal == 4)
@@ -8433,23 +8430,23 @@ void CHARACTER::RefineAcceMaterials()
 				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Success."));
 
 			EffectPacket(SE_EFFECT_ACCE_SUCCEDED);
-			LogManager::instance().AcceLog(GetPlayerID(), GetX(), GetY(), dwItemVnum, pkItem->GetID(), 1, dwAbs, 1);
+			LogManager::Instance().AcceLog(GetPlayerID(), GetX(), GetY(), dwItemVnum, pkItem->GetID(), 1, dwAbs, 1);
 
 			ClearAcceMaterials();
 		}
 		else
 		{
 			PointChange(POINT_GOLD, -dwPrice);
-			LogManager::instance().MoneyLog(MONEY_LOG_REFINE, pkItemMaterial[0]->GetVnum(), -dwPrice);
+			LogManager::Instance().MoneyLog(MONEY_LOG_REFINE, pkItemMaterial[0]->GetVnum(), -dwPrice);
 
-			ITEM_MANAGER::instance().RemoveItem(pkItemMaterial[1], "COMBINE (REFINE FAIL)");
+			ITEM_MANAGER::Instance().RemoveItem(pkItemMaterial[1], "COMBINE (REFINE FAIL)");
 
 			if (lVal == 4)
 				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("New absorption rate: %d%"), pkItemMaterial[0]->GetSocket(ACCE_ABSORPTION_SOCKET));
 			else
 				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Failed."));
 
-			LogManager::instance().AcceLog(GetPlayerID(), GetX(), GetY(), dwItemVnum, 0, 0, 0, 0);
+			LogManager::Instance().AcceLog(GetPlayerID(), GetX(), GetY(), dwItemVnum, 0, 0, 0, 0);
 
 			pkItemMaterial[1] = nullptr;
 		}
@@ -8477,7 +8474,7 @@ void CHARACTER::RefineAcceMaterials()
 	else
 	{
 		pkItemMaterial[1]->CopyAttributeTo(pkItemMaterial[0]);
-		LogManager::instance().ItemLog(this, pkItemMaterial[0], "ABSORB (REFINE SUCCESS)", pkItemMaterial[0]->GetName());
+		LogManager::Instance().ItemLog(this, pkItemMaterial[0], "ABSORB (REFINE SUCCESS)", pkItemMaterial[0]->GetName());
 		pkItemMaterial[0]->SetSocket(ACCE_ABSORBED_SOCKET, pkItemMaterial[1]->GetOriginalVnum());
 		for (int32_t i = 0; i < ITEM_ATTRIBUTE_MAX_NUM; ++i)
 		{
@@ -8485,9 +8482,9 @@ void CHARACTER::RefineAcceMaterials()
 				pkItemMaterial[0]->SetForceAttribute(i, pkItemMaterial[0]->GetAttributeType(i), 0);
 		}
 
-		ITEM_MANAGER::instance().RemoveItem(pkItemMaterial[1], "ABSORBED (REFINE SUCCESS)");
+		ITEM_MANAGER::Instance().RemoveItem(pkItemMaterial[1], "ABSORBED (REFINE SUCCESS)");
 
-		ITEM_MANAGER::instance().FlushDelayedSave(pkItemMaterial[0]);
+		ITEM_MANAGER::Instance().FlushDelayedSave(pkItemMaterial[0]);
 		pkItemMaterial[0]->AttrLog();
 
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Success."));
@@ -8529,7 +8526,7 @@ bool CHARACTER::CleanAcceAttr(LPITEM pkItem, LPITEM pkTarget)
 		pkTarget->SetForceAttribute(i, 0, 0);
 
 	pkItem->SetCount(pkItem->GetCount() - 1);
-	LogManager::instance().ItemLog(this, pkTarget, "USE_DETACHMENT (CLEAN ATTR)", pkTarget->GetName());
+	LogManager::Instance().ItemLog(this, pkTarget, "USE_DETACHMENT (CLEAN ATTR)", pkTarget->GetName());
 	return true;
 }
 #endif

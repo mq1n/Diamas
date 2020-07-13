@@ -7,7 +7,7 @@ void CClientManager::LoadEventFlag()
 {
 	char szQuery[1024];
 	snprintf(szQuery, sizeof(szQuery), "SELECT szName, lValue FROM quest WHERE dwPID = 0");
-	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> pmsg(CDBManager::Instance().DirectQuery(szQuery));
 
 	SQLResult* pRes = pmsg->Get();
 	if (pRes->uiNumRows)
@@ -50,8 +50,8 @@ void CClientManager::SetEventFlag(TPacketSetEventFlag* p)
 				"REPLACE INTO quest (dwPID, szName, szState, lValue) VALUES(0, '%s', '', %d)", p->szFlagName, p->lValue);
 		szQuery[1023] = '\0';
 
-		//CDBManager::instance().ReturnQuery(szQuery, QID_QUEST_SAVE, 0, nullptr);
-		CDBManager::instance().AsyncQuery(szQuery);
+		//CDBManager::Instance().ReturnQuery(szQuery, QID_QUEST_SAVE, 0, nullptr);
+		CDBManager::Instance().AsyncQuery(szQuery);
 		sys_log(0, "HEADER_GD_SET_EVENT_FLAG : Changed CClientmanager::SetEventFlag(%s %d) ", p->szFlagName, p->lValue);
 		return;
 	}

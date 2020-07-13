@@ -12,9 +12,9 @@
 
 #undef sys_err
 #ifndef __WIN32__
-#define sys_err(fmt, args...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
+#define sys_err(fmt, args...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
 #else
-#define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
+#define sys_err(fmt, ...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
 extern ACMD(do_in_game_mall);
@@ -23,7 +23,7 @@ namespace quest
 {
 	int32_t game_set_event_flag(lua_State* L)
 	{
-		CQuestManager & q = CQuestManager::instance();
+		CQuestManager & q = CQuestManager::Instance();
 
 		if (lua_isstring(L,1) && lua_isnumber(L, 2))
 			q.RequestSetEventFlag(lua_tostring(L,1), (int32_t)lua_tonumber(L,2));
@@ -33,7 +33,7 @@ namespace quest
 
 	int32_t game_get_event_flag(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 
 		if (lua_isstring(L,1))
 			lua_pushnumber(L, q.GetEventFlag(lua_tostring(L,1)));
@@ -45,7 +45,7 @@ namespace quest
 
 	int32_t game_request_make_guild(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -63,7 +63,7 @@ namespace quest
 
 	int32_t game_get_safebox_level(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -76,7 +76,7 @@ namespace quest
 
 	int32_t game_set_safebox_level(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -107,7 +107,7 @@ namespace quest
 
 	int32_t game_open_safebox(lua_State* /*L*/)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -121,7 +121,7 @@ namespace quest
 
 	int32_t game_open_mall(lua_State* /*L*/)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -135,7 +135,7 @@ namespace quest
 
 	int32_t game_drop_item(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -152,7 +152,7 @@ namespace quest
 		int32_t x = ch->GetX();
 		int32_t y = ch->GetY();
 
-		LPITEM item = ITEM_MANAGER::instance().CreateItem(item_vnum, count);
+		LPITEM item = ITEM_MANAGER::Instance().CreateItem(item_vnum, count);
 
 		if (!item)
 		{
@@ -172,7 +172,7 @@ namespace quest
 
 	int32_t game_drop_item_with_ownership(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -183,11 +183,11 @@ namespace quest
 		switch (lua_gettop(L))
 		{
 		case 1:
-			item = ITEM_MANAGER::instance().CreateItem((uint32_t) lua_tonumber(L, 1));
+			item = ITEM_MANAGER::Instance().CreateItem((uint32_t) lua_tonumber(L, 1));
 			break;
 		case 2:
 		case 3:
-			item = ITEM_MANAGER::instance().CreateItem((uint32_t) lua_tonumber(L, 1), (int32_t) lua_tonumber(L, 2));
+			item = ITEM_MANAGER::Instance().CreateItem((uint32_t) lua_tonumber(L, 1), (int32_t) lua_tonumber(L, 2));
 			break;
 		default:
 			return 0;
@@ -225,7 +225,7 @@ namespace quest
 
 	int32_t game_web_mall(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (ch)
 			do_in_game_mall(ch, const_cast<char*>(""), 0, 0);
 
@@ -239,11 +239,11 @@ namespace quest
 		switch (lua_gettop(L))
 		{
 		case 1:
-			item = ITEM_MANAGER::instance().CreateItem((uint32_t)lua_tonumber(L, 1));
+			item = ITEM_MANAGER::Instance().CreateItem((uint32_t)lua_tonumber(L, 1));
 			break;
 		case 2:
 		case 3:
-			item = ITEM_MANAGER::instance().CreateItem((uint32_t)lua_tonumber(L, 1), (int32_t)lua_tonumber(L, 2));
+			item = ITEM_MANAGER::Instance().CreateItem((uint32_t)lua_tonumber(L, 1), (int32_t)lua_tonumber(L, 2));
 			break;
 		default:
 			return 0;
@@ -254,7 +254,7 @@ namespace quest
 			return 0;
 		}
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (ch->GetParty())
 		{
 			FPartyDropDiceRoll f(item, ch);
@@ -290,7 +290,7 @@ namespace quest
 	
 	int32_t game_drop_item_and_select(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 			return 0;
 
@@ -306,7 +306,7 @@ namespace quest
 					sys_err("Invalid arguments..");
 					return 0;
 				}
-				item = ITEM_MANAGER::instance().CreateItem((uint32_t)lua_tonumber(L, 1));
+				item = ITEM_MANAGER::Instance().CreateItem((uint32_t)lua_tonumber(L, 1));
 				break;
 
 			case 2:
@@ -317,7 +317,7 @@ namespace quest
 					sys_err("Invalid arguments..");
 					return 0;
 				}
-				item = ITEM_MANAGER::instance().CreateItem((uint32_t)lua_tonumber(L, 1), (int32_t)lua_tonumber(L, 2));
+				item = ITEM_MANAGER::Instance().CreateItem((uint32_t)lua_tonumber(L, 1), (int32_t)lua_tonumber(L, 2));
 				bHasOwnership = lua_isboolean(L, 3) ? (bool)lua_toboolean(L, 3) : false;
 				iOwnershipTime = lua_isnumber(L, 4) ? (int32_t)lua_tonumber(L, 4) : 250;
 				break;
@@ -352,13 +352,13 @@ namespace quest
 
 	int32_t game_drop_map(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 			return 0;
 
 		CItem* item = nullptr;
 		if (lua_isnumber(L, 1))
-			item = ITEM_MANAGER::instance().CreateItem((uint32_t)lua_tonumber(L, 1));
+			item = ITEM_MANAGER::Instance().CreateItem((uint32_t)lua_tonumber(L, 1));
 
 		if (!item)
 			return 0;
@@ -408,7 +408,7 @@ namespace quest
 			{ nullptr,					nullptr				}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("game", game_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("game", game_functions);
 	}
 }
 

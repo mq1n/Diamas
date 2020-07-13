@@ -54,7 +54,7 @@ EVENTFUNC(poison_event)
 	if (ch == nullptr) { // <Factor>
 		return 0;
 	}
-	LPCHARACTER pkAttacker = CHARACTER_MANAGER::instance().FindByPID(info->attacker_pid);
+	LPCHARACTER pkAttacker = CHARACTER_MANAGER::Instance().FindByPID(info->attacker_pid);
 
 	int32_t dam = ch->GetMaxHP() * GetPoisonDamageRate(ch) / 1000;
 	if (g_bIsTestServer) ch->ChatPacket(CHAT_TYPE_NOTICE, "Poison Damage %d", dam);
@@ -127,7 +127,7 @@ EVENTFUNC(bleeding_event)
 	if (ch == nullptr) { // <Factor>
 		return 0;
 	}
-	LPCHARACTER pkAttacker = CHARACTER_MANAGER::instance().FindByPID(info->attacker_pid);
+	LPCHARACTER pkAttacker = CHARACTER_MANAGER::Instance().FindByPID(info->attacker_pid);
 
 	int32_t dam = ch->GetMaxHP() * GetBleedingDamageRate(ch) / 1000;
 	if (g_bIsTestServer) ch->ChatPacket(CHAT_TYPE_NOTICE, "Bleeding Damage %d", dam);
@@ -180,7 +180,7 @@ EVENTFUNC(fire_event)
 	if (ch == nullptr) { // <Factor>
 		return 0;
 	}
-	LPCHARACTER pkAttacker = CHARACTER_MANAGER::instance().FindByPID(info->attacker_pid);
+	LPCHARACTER pkAttacker = CHARACTER_MANAGER::Instance().FindByPID(info->attacker_pid);
 
 	int32_t dam = info->amount;
 	if (g_bIsTestServer) ch->ChatPacket(CHAT_TYPE_NOTICE, "Fire Damage %d", dam);

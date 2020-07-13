@@ -38,7 +38,6 @@ void CPythonPlayer::SetAffect(uint32_t uAffect)
 
 void CPythonPlayer::ResetAffect(uint32_t uAffect)
 {
-	// 2004.07.17.myevan.스킬 아닌 이펙트가 안 사라지는 문제 
 	PyCallClassMemberFunc(m_ppyGameWindow, "ResetAffect", Py_BuildValue("(i)", uAffect));
 
 	uint32_t dwSkillIndex;
@@ -422,7 +421,6 @@ bool CPythonPlayer::__ProcessEnemySkillTargetRange(CInstanceBase& rkInstMain, CI
 		return false;
 	}
 
-	// 2004.07.05.myevan. 궁신탄영 사용시 맵에 끼임. 사용하기전 갈수 있는곳 체크
 	TPixelPosition kPPosTarget;
 	rkInstTarget.NEW_GetPixelPosition(&kPPosTarget);
 

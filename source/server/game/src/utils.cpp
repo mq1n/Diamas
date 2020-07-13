@@ -1,7 +1,4 @@
 #include "stdafx.h"
-#include <random>
-#include <cctype>
-#include "../../common/stl.h"
 
 static time_t global_time_gap = 0;
 

@@ -30,7 +30,7 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 
 		if (!q.ServerTimer(info->npc_id, info->arg))
 			return passes_per_sec / 2 + 1;
@@ -55,11 +55,11 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager & q = CQuestManager::instance();
+		CQuestManager & q = CQuestManager::Instance();
 
-		if (CHARACTER_MANAGER::instance().FindByPID(info->player_id))
+		if (CHARACTER_MANAGER::Instance().FindByPID(info->player_id))
 		{
-			if (!CQuestManager::instance().Timer(info->player_id, info->npc_id))
+			if (!CQuestManager::Instance().Timer(info->player_id, info->npc_id))
 				return (passes_per_sec / 2 + 1);
 
 			if (0 == info->time_cycle)	// 루프가 아니라면 종료 시킨다.

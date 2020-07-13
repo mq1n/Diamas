@@ -1,9 +1,5 @@
 #include "stdafx.h"
-#include <sstream>
-#include "../../common/length.h"
-
 #include "db.h"
-
 #include "config.h"
 #include "desc_client.h"
 #include "desc_manager.h"
@@ -205,7 +201,7 @@ void DBManager::SendLoginPing(const char * c_pszLogin)
 
 	if (!g_pkAuthMasterDesc)  // If I am master, broadcast to others
 	{
-		P2P_MANAGER::instance().Send(&ptog, sizeof(TPacketGGLoginPing));
+		P2P_MANAGER::Instance().Send(&ptog, sizeof(TPacketGGLoginPing));
 	}
 	else // If I am slave send login ping to master
 	{
@@ -266,7 +262,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 		case QID_AUTH_LOGIN:
 			{
 				SPacketCGLogin3 * pinfo = (SPacketCGLogin3*) qi->pvData;
-				LPDESC d = DESC_MANAGER::instance().FindByLoginKey(qi->dwIdent);
+				LPDESC d = DESC_MANAGER::Instance().FindByLoginKey(qi->dwIdent);
 
 				if (!d)
 				{
@@ -380,7 +376,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 						sys_log(0, "   NOTAVAIL");
 						M2_DELETE(pinfo);
 					}
-					else if (DESC_MANAGER::instance().FindByLoginName(pinfo->name))
+					else if (DESC_MANAGER::Instance().FindByLoginName(pinfo->name))
 					{
 						LoginFailure(d, "ALREADY");
 						sys_log(0, "   ALREADY");
@@ -405,7 +401,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 						char szQuery[1024];
 						snprintf(szQuery, sizeof(szQuery), "UPDATE account SET last_play=NOW() WHERE id=%u", dwID);
-						std::unique_ptr<SQLMsg> msg( DBManager::instance().DirectQuery(szQuery) );
+						std::unique_ptr<SQLMsg> msg( DBManager::Instance().DirectQuery(szQuery) );
 
 						TAccountTable & r = d->GetAccountTable();
 
@@ -413,7 +409,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 						trim_and_lower(pinfo->name, r.login, sizeof(r.login));
 						strlcpy(r.passwd, pinfo->pwd, sizeof(r.passwd));
 						strlcpy(r.social_id, szSocialID, sizeof(r.social_id));
-						DESC_MANAGER::instance().ConnectAccount(r.login, d);
+						DESC_MANAGER::Instance().ConnectAccount(r.login, d);
 
 						sys_log(0, "QID_AUTH_LOGIN: SUCCESS %s", pinfo->name);
 				
@@ -426,7 +422,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 		case QID_SAFEBOX_SIZE:
 			{
-				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(qi->dwIdent);
+				LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(qi->dwIdent);
 
 				if (ch)
 				{
@@ -444,7 +440,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 			// BLOCK_CHAT
 		case QID_BLOCK_CHAT_LIST:
 			{
-				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(qi->dwIdent);
+				LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(qi->dwIdent);
 				
 				if (ch == nullptr)
 					break;
@@ -590,13 +586,13 @@ EVENTINFO(reload_spam_event_info)
 
 EVENTFUNC(reload_spam_event)
 {
-	AccountDB::instance().ReturnQuery(QID_SPAM_DB, 0, nullptr, "SELECT word, score FROM spam_db WHERE type='SPAM'");
+	AccountDB::Instance().ReturnQuery(QID_SPAM_DB, 0, nullptr, "SELECT word, score FROM spam_db WHERE type='SPAM'");
 	return PASSES_PER_SEC(g_uiSpamReloadCycle);
 }
 
 void LoadSpamDB()
 {
-	AccountDB::instance().ReturnQuery(QID_SPAM_DB, 0, nullptr, "SELECT word, score FROM spam_db WHERE type='SPAM'");
+	AccountDB::Instance().ReturnQuery(QID_SPAM_DB, 0, nullptr, "SELECT word, score FROM spam_db WHERE type='SPAM'");
 #ifdef ENABLE_SPAMDB_REFRESH
 	if (nullptr == s_pkReloadSpamEvent)
 	{
@@ -622,10 +618,10 @@ void AccountDB::AnalyzeReturnQuery(SQLMsg* pMsg)
 		{
 			MYSQL_ROW row;
 
-			SpamManager::instance().Clear();
+			SpamManager::Instance().Clear();
 
 			while ((row = mysql_fetch_row(pMsg->Get()->pSQLResult)))
-				SpamManager::instance().Insert(row[0], atoi(row[1]));
+				SpamManager::Instance().Insert(row[0], atoi(row[1]));
 		}
 	}
 	break;

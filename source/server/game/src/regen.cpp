@@ -254,7 +254,7 @@ static void regen_spawn_dungeon(LPREGEN regen, LPDUNGEON pDungeon, bool bOnce)
 
 		if (regen->type == REGEN_TYPE_ANYWHERE)
 		{
-			ch = CHARACTER_MANAGER::instance().SpawnMobRandomPosition(regen->vnum, regen->lMapIndex);
+			ch = CHARACTER_MANAGER::Instance().SpawnMobRandomPosition(regen->vnum, regen->lMapIndex);
 
 			if (ch)
 			{
@@ -264,7 +264,7 @@ static void regen_spawn_dungeon(LPREGEN regen, LPDUNGEON pDungeon, bool bOnce)
 		}
 		else if (regen->sx == regen->ex && regen->sy == regen->ey)
 		{
-			ch = CHARACTER_MANAGER::instance().SpawnMob(regen->vnum,
+			ch = CHARACTER_MANAGER::Instance().SpawnMob(regen->vnum,
 					regen->lMapIndex,
 					regen->sx,
 					regen->sy,
@@ -323,14 +323,14 @@ static void regen_spawn(LPREGEN regen, bool bOnce)
 
 		if (regen->type == REGEN_TYPE_ANYWHERE)
 		{
-			ch = CHARACTER_MANAGER::instance().SpawnMobRandomPosition(regen->vnum, regen->lMapIndex);
+			ch = CHARACTER_MANAGER::Instance().SpawnMobRandomPosition(regen->vnum, regen->lMapIndex);
 
 			if (ch)
 				++regen->count;
 		}
 		else if (regen->sx == regen->ex && regen->sy == regen->ey)
 		{
-			ch = CHARACTER_MANAGER::instance().SpawnMob(regen->vnum,
+			ch = CHARACTER_MANAGER::Instance().SpawnMob(regen->vnum,
 					regen->lMapIndex,
 					regen->sx,
 					regen->sy,
@@ -377,7 +377,7 @@ EVENTFUNC(dungeon_regen_event)
 		return 0;
 	}
 
-	LPDUNGEON pDungeon = CDungeonManager::instance().Find(info->dungeon_id);
+	LPDUNGEON pDungeon = CDungeonManager::Instance().Find(info->dungeon_id);
 	if (pDungeon == nullptr) {
 		return 0;
 	}
@@ -458,7 +458,7 @@ bool regen_do(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t b
 
 			if (regen->type == REGEN_TYPE_MOB)
 			{
-				const CMob * p = CMobManager::instance().Get(regen->vnum);
+				const CMob * p = CMobManager::Instance().Get(regen->vnum);
 
 				if (!p)
 				{
@@ -550,7 +550,7 @@ bool regen_load_in_file(const char* filename, int32_t lMapIndex, int32_t base_x,
 
 			if (regen->type == REGEN_TYPE_MOB)
 			{
-				const CMob * p = CMobManager::instance().Get(regen->vnum);
+				const CMob * p = CMobManager::Instance().Get(regen->vnum);
 
 				if (!p)
 				{
@@ -616,7 +616,7 @@ bool regen_load(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t
 		{
 			if (g_bIsTestServer)
 			{
-				CMobManager::instance().IncRegenCount(tmp.type, tmp.vnum, tmp.max_count, tmp.time);
+				CMobManager::Instance().IncRegenCount(tmp.type, tmp.vnum, tmp.max_count, tmp.time);
 			}
 
 			regen = M2_NEW REGEN;
@@ -648,7 +648,7 @@ bool regen_load(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t
 
 			if (regen->type == REGEN_TYPE_MOB)
 			{
-				const CMob * p = CMobManager::instance().Get(regen->vnum);
+				const CMob * p = CMobManager::Instance().Get(regen->vnum);
 
 				if (!p)
 				{
@@ -656,7 +656,7 @@ bool regen_load(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t
 				}
 				else if (p->m_table.bType == CHAR_TYPE_NPC || p->m_table.bType == CHAR_TYPE_WARP || p->m_table.bType == CHAR_TYPE_GOTO)
 				{
-					SECTREE_MANAGER::instance().InsertNPCPosition(lMapIndex,
+					SECTREE_MANAGER::Instance().InsertNPCPosition(lMapIndex,
 							p->m_table.bType,
 							p->m_table.szLocaleName,
 							(regen->sx+regen->ex) / 2 - base_x,

@@ -181,10 +181,10 @@ CBattleground::CBattleground(int32_t nMapIndex, uint8_t nGameMode, uint8_t nGame
 	
 	m_dwSetupTimestamp = get_dword_time();
 
-	m_pkSectreeMap = SECTREE_MANAGER::instance().GetMap(nMapIndex);
+	m_pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(nMapIndex);
 
 	GPOS pxBase;
-	if (SECTREE_MANAGER::instance().GetMapBasePositionByMapIndex(nMapIndex, pxBase))
+	if (SECTREE_MANAGER::Instance().GetMapBasePositionByMapIndex(nMapIndex, pxBase))
 		m_pkSectree = m_pkSectreeMap->Find(pxBase.x, pxBase.y);
 
 	m_pkLstSpawnedMobs.clear();
@@ -255,7 +255,7 @@ void CBattleground::Destroy()
 		m_pkMinnionSpawnEvent = nullptr;
 	}
 
-	CDungeonManager::instance().Destroy(m_pkDungeon->GetId());
+	CDungeonManager::Instance().Destroy(m_pkDungeon->GetId());
 }
 
 void CBattleground::__SpawnRandomPos(LPCHARACTER pkChar)
@@ -267,7 +267,7 @@ void CBattleground::__SpawnRandomPos(LPCHARACTER pkChar)
 		{
 			pos.x = number(pkChar->GetX() - 2000, pkChar->GetX() + 2000);
 			pos.y = number(pkChar->GetY() - 1000, pkChar->GetY() + 1000);
-			if (SECTREE_MANAGER::instance().IsMovablePosition(pkChar->GetMapIndex(), pos.x, pos.y))
+			if (SECTREE_MANAGER::Instance().IsMovablePosition(pkChar->GetMapIndex(), pos.x, pos.y))
 			{
 				pkChar->Show(pkChar->GetMapIndex(), pos.x, pos.y);
 				pkChar->Stop();
@@ -585,7 +585,7 @@ void CBattleground::Close()
 	LPCHARACTER pkChar = NULL;
 	for (; iter != m_map_char.end(); ++iter)
 	{
-		LPCHARACTER pkChar = CHARACTER_MANAGER::instance().FindByPID(iter->second);
+		LPCHARACTER pkChar = CHARACTER_MANAGER::Instance().FindByPID(iter->second);
 
 		if (pkChar != NULL){
 			if (pkChar->IsAffectFlag(AFF_STUN))
@@ -603,7 +603,7 @@ void CBattleground::Close()
 
 	for (; iter2 != m_map_miss.end(); ++iter2)
 	{
-		LPCHARACTER pkChar = CHARACTER_MANAGER::instance().FindByPID(iter2->second);
+		LPCHARACTER pkChar = CHARACTER_MANAGER::Instance().FindByPID(iter2->second);
 
 		if (pkChar != NULL){
 			if (pkChar->IsAffectFlag(AFF_STUN))

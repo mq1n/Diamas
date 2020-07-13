@@ -18,8 +18,8 @@
 #include <vector>
 #include <map>
 #include <list>
-#include <unordered_map>
 #include <set>
+#include <unordered_map>
 #include <unordered_set>
 #include <chrono>
 #include <cstdint>
@@ -27,6 +27,7 @@
 #include <cstdio>
 #include <cstring>
 #include <ctime>
+#include <csignal>
 #include <stack>
 #include <memory>
 #include <new>
@@ -36,25 +37,16 @@
 #include <condition_variable>
 #include <atomic>
 #include <random>
-#include <csignal>
-#include <cstdint>
 
-#include <NetEngine.h>
-
-#include <amy/asio.hpp>
-#include <amy/auth_info.hpp>
-#include <amy/mariadb_connector.hpp>
-#include <amy/placeholders.hpp>
+#include <NetEngine.hpp>
+#include <amy.hpp>
 
 #include <spdlog/spdlog.h>
 #if defined(_WIN32)
 #include <spdlog/sinks/msvc_sink.h>
 #endif
 
-#include "../../common/service.h"
-#include "../../common/length.h"
-
-#include "CompileConfig.h"
+#include "../../../common/common_incl.hpp"
 
 #define LL_SYS 0
 #define LL_CRI 2

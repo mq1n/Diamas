@@ -4,7 +4,7 @@
 
 uint32_t BlueDragon_GetSkillFactor(const size_t cnt, ...)
 {
-	lua_State* L = quest::CQuestManager::instance().GetLuaState();
+	lua_State* L = quest::CQuestManager::Instance().GetLuaState();
 
 	const int32_t stack_top = lua_gettop(L);
 
@@ -63,7 +63,7 @@ uint32_t BlueDragon_GetSkillFactor(const size_t cnt, ...)
 
 uint32_t BlueDragon_GetRangeFactor(const char* key, const int32_t val)
 {
-	lua_State* L = quest::CQuestManager::instance().GetLuaState();
+	lua_State* L = quest::CQuestManager::Instance().GetLuaState();
 
 	const int32_t stack_top = lua_gettop(L);
 
@@ -161,7 +161,7 @@ uint32_t BlueDragon_GetRangeFactor(const char* key, const int32_t val)
 
 uint32_t BlueDragon_GetIndexFactor(const char* container, const size_t idx, const char* key)
 {
-	lua_State* L = quest::CQuestManager::instance().GetLuaState();
+	lua_State* L = quest::CQuestManager::Instance().GetLuaState();
 
 	const int32_t stack_top = lua_gettop(L);
 

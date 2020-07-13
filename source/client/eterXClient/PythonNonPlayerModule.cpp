@@ -302,11 +302,9 @@ void initNonPlayer()
 
 	PyObject* poModule = Py_InitModule(CPythonDynamicModule::Instance().GetModule(NON_PLAYER_MODULE).c_str(), s_methods);
 
-	PyModule_AddIntConstant(poModule, "ON_CLICK_EVENT_NONE",		CPythonNonPlayer::ON_CLICK_EVENT_NONE);
-	PyModule_AddIntConstant(poModule, "ON_CLICK_EVENT_BATTLE",		CPythonNonPlayer::ON_CLICK_EVENT_BATTLE);
-	PyModule_AddIntConstant(poModule, "ON_CLICK_EVENT_SHOP",		CPythonNonPlayer::ON_CLICK_EVENT_SHOP);
-	PyModule_AddIntConstant(poModule, "ON_CLICK_EVENT_TALK",		CPythonNonPlayer::ON_CLICK_EVENT_TALK);
-	PyModule_AddIntConstant(poModule, "ON_CLICK_EVENT_VEHICLE",		CPythonNonPlayer::ON_CLICK_EVENT_VEHICLE);
+	PyModule_AddIntConstant(poModule, "ON_CLICK_EVENT_NONE",		ON_CLICK_NONE);
+	PyModule_AddIntConstant(poModule, "ON_CLICK_EVENT_SHOP",		ON_CLICK_SHOP);
+	PyModule_AddIntConstant(poModule, "ON_CLICK_EVENT_TALK",		ON_CLICK_TALK);
 
 	PyModule_AddIntConstant(poModule, "PAWN", 0);
 	PyModule_AddIntConstant(poModule, "S_PAWN", 1);

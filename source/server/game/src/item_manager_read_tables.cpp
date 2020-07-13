@@ -77,11 +77,11 @@ bool ITEM_MANAGER::ReadCommonDropItemFile(const char * c_pszFileName)
 			uint32_t dwPct = (uint32_t) (d[i].fPercent * 10000.0f);
 			uint32_t dwItemVnum = 0;
 
-			if (!ITEM_MANAGER::instance().GetVnumByOriginalName(d[i].szItemName, dwItemVnum))
+			if (!ITEM_MANAGER::Instance().GetVnumByOriginalName(d[i].szItemName, dwItemVnum))
 			{
 				// 이름으로 못찾으면 번호로 검색
 				str_to_number(dwItemVnum, d[i].szItemName);
-				if (!ITEM_MANAGER::instance().GetTable(dwItemVnum))
+				if (!ITEM_MANAGER::Instance().GetTable(dwItemVnum))
 				{
 					sys_err("No such an item (name: %s)", d[i].szItemName);
 					fclose(fp);
@@ -158,7 +158,7 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName)
 			else if (stType == "quest")
 			{
 				type = CSpecialItemGroup::QUEST;
-				quest::CQuestManager::instance().RegisterNPCVnum(iVnum);
+				quest::CQuestManager::Instance().RegisterNPCVnum(iVnum);
 			}
 			else if (stType == "special")
 			{
@@ -261,7 +261,7 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName)
 						else
 						{
 							str_to_number(dwVnum, name.c_str());
-							if (!ITEM_MANAGER::instance().GetTable(dwVnum))
+							if (!ITEM_MANAGER::Instance().GetTable(dwVnum))
 							{
 								sys_err("ReadSpecialDropItemFile : there is no item %s : node %s", name.c_str(), stName.c_str());
 								M2_DELETE(pkGroup);
@@ -414,7 +414,7 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 					else
 					{
 						str_to_number(dwVnum, name.c_str());
-						if (!ITEM_MANAGER::instance().GetTable(dwVnum) && type!=4)
+						if (!ITEM_MANAGER::Instance().GetTable(dwVnum) && type!=4)
 						{
 							sys_err("ReadSpecialDropItemFile : there is no item %s : node %s", name.c_str(), stName.c_str());
 							fclose(fp);
@@ -502,7 +502,7 @@ bool ITEM_MANAGER::ReadEtcDropItemFile(const char * c_pszFileName)
 
 		uint32_t dwItemVnum;
 
-		if (!ITEM_MANAGER::instance().GetVnumByOriginalName(szItemName, dwItemVnum))
+		if (!ITEM_MANAGER::Instance().GetVnumByOriginalName(szItemName, dwItemVnum))
 		{
 			sys_err("No such an item (name: %s)", szItemName);
 			fclose(fp);
@@ -614,7 +614,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 					if (!dwVnum)
 					{
 						GetVnumByOriginalName(name.c_str(), dwVnum);
-						if (!ITEM_MANAGER::instance().GetTable(dwVnum))
+						if (!ITEM_MANAGER::Instance().GetTable(dwVnum))
 						{
 							sys_err("ReadMonsterDropItemGroup : there is no item %s : node %s : vnum %d", name.c_str(), stName.c_str(), dwVnum);
 							return false;
@@ -683,7 +683,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 					if (!dwVnum)
 					{
 						GetVnumByOriginalName(name.c_str(), dwVnum);
-						if (!ITEM_MANAGER::instance().GetTable(dwVnum))
+						if (!ITEM_MANAGER::Instance().GetTable(dwVnum))
 						{
 							sys_err("ReadDropItemGroup : there is no item %s : node %s", name.c_str(), stName.c_str());
 							M2_DELETE(pkGroup);
@@ -738,7 +738,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 					if (!dwItemVnum)
 					{
 						GetVnumByOriginalName(name.c_str(), dwItemVnum);
-						if ( !ITEM_MANAGER::instance().GetTable(dwItemVnum) )
+						if ( !ITEM_MANAGER::Instance().GetTable(dwItemVnum) )
 						{
 							sys_err("ReadDropItemGroup : there is no item %s : node %s", name.c_str(), stName.c_str());
 							M2_DELETE(pkLevelItemGroup);
@@ -789,7 +789,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 					if (!dwVnum)
 					{
 						GetVnumByOriginalName(name.c_str(), dwVnum);
-						if (!ITEM_MANAGER::instance().GetTable(dwVnum))
+						if (!ITEM_MANAGER::Instance().GetTable(dwVnum))
 						{
 							sys_err("ReadDropItemGroup : there is no item %s : node %s", name.c_str(), stName.c_str());
 							M2_DELETE(pkGroup);
@@ -895,7 +895,7 @@ bool ITEM_MANAGER::ReadDropItemGroup(const char * c_pszFileName)
 				if (!dwVnum)
 				{
 					GetVnumByOriginalName(name.c_str(), dwVnum);
-					if (!ITEM_MANAGER::instance().GetTable(dwVnum))
+					if (!ITEM_MANAGER::Instance().GetTable(dwVnum))
 					{
 						sys_err("ReadDropItemGroup : there is no item %s : node %s", name.c_str(), stName.c_str());
 

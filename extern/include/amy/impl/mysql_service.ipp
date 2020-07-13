@@ -139,7 +139,7 @@ void mysql_service::async_connect(implementation_type& impl,
     if (!is_open(impl)) {
         AMY_SYSTEM_NS::error_code ec;
         if (!!open(impl, ec)) {
-            this->get_io_service().post(std::bind(handler, ec));
+            this->get_io_context().post(std::bind(handler, ec));
             return;
         }
     }
@@ -149,7 +149,7 @@ void mysql_service::async_connect(implementation_type& impl,
         work_io_service_->post(
                 connect_handler<Endpoint, ConnectHandler>(
                     impl, endpoint, auth, database, flags,
-                    this->get_io_service(), handler));
+                    this->get_io_context(), handler));
     }
 }
 
@@ -178,13 +178,13 @@ void mysql_service::async_query(implementation_type& impl,
                                 QueryHandler handler)
 {
     if (!is_open(impl)) {
-        this->get_io_service().post(
+        this->get_io_context().post(
                 std::bind(handler, amy::error::not_initialized));
     } else {
         if (!!work_io_service_) {
             start_work_thread();
             work_io_service_->post(query_handler<QueryHandler>(
-                        impl, stmt, this->get_io_service(), handler));
+                        impl, stmt, this->get_io_context(), handler));
         }
     }
 }
@@ -245,7 +245,7 @@ void mysql_service::async_store_result(implementation_type& impl,
                                        StoreResultHandler handler)
 {
     if (!is_open(impl)) {
-        this->get_io_service().post(
+        this->get_io_context().post(
                 std::bind(handler,
                           amy::error::not_initialized,
                           result_set::empty_set(&impl.mysql)));
@@ -254,7 +254,7 @@ void mysql_service::async_store_result(implementation_type& impl,
             start_work_thread();
             work_io_service_->post(
                     store_result_handler<StoreResultHandler>(
-                        impl, this->get_io_service(), handler));
+                        impl, this->get_io_context(), handler));
         }
     }
 }

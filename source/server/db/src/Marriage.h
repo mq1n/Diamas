@@ -67,7 +67,7 @@ namespace marriage
 		}
 	};
 
-	class CManager : public singleton<CManager>
+	class CManager : public CSingleton<CManager>
 	{
 		public:
 			CManager();

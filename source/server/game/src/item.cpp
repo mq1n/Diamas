@@ -21,7 +21,6 @@
 #include "buff_on_attributes.h"
 #include "belt_inventory_helper.h"
 #include "../../common/VnumHelper.h"
-#include "../../common/service.h"
 
 CItem::CItem(uint32_t dwVnum)
 	: m_dwVnum(dwVnum), m_bWindow(0), m_dwID(0), m_bEquipped(false), m_dwVID(0), m_wCell(0), m_dwCount(0), m_lFlag(0), m_dwLastOwnerPID(0),
@@ -460,7 +459,7 @@ bool CItem::AddToGround(int32_t lMapIndex, const GPOS & pos, bool skipOwnerCheck
 		return false;
 	}
 
-	LPSECTREE tree = SECTREE_MANAGER::instance().Get(lMapIndex, pos.x, pos.y);
+	LPSECTREE tree = SECTREE_MANAGER::Instance().Get(lMapIndex, pos.x, pos.y);
 
 	if (!tree)
 	{
@@ -672,7 +671,7 @@ void CItem::ModifyPoints(bool bAdd)
 				if ((dwVnum = GetSocket(i)) <= 2)
 					continue;
 
-				TItemTable * p = ITEM_MANAGER::instance().GetTable(dwVnum);
+				TItemTable * p = ITEM_MANAGER::Instance().GetTable(dwVnum);
 
 				if (!p)
 				{
@@ -712,7 +711,7 @@ void CItem::ModifyPoints(bool bAdd)
 #ifdef ENABLE_ACCE_SYSTEM
 	if ((GetType() == ITEM_COSTUME) && (GetSubType() == COSTUME_ACCE) && (GetSocket(ACCE_ABSORBED_SOCKET)))
 	{
-		TItemTable * pkItemAbsorbed = ITEM_MANAGER::instance().GetTable(GetSocket(ACCE_ABSORBED_SOCKET));
+		TItemTable * pkItemAbsorbed = ITEM_MANAGER::Instance().GetTable(GetSocket(ACCE_ABSORBED_SOCKET));
 		if (pkItemAbsorbed)
 		{
 			if ((pkItemAbsorbed->bType == ITEM_ARMOR) && (pkItemAbsorbed->bSubType == ARMOR_BODY))
@@ -790,7 +789,7 @@ void CItem::ModifyPoints(bool bAdd)
 #ifdef ENABLE_ACCE_SYSTEM
 		if ((GetType() == ITEM_COSTUME) && (GetSubType() == COSTUME_ACCE))
 		{
-			TItemTable * pkItemAbsorbed = ITEM_MANAGER::instance().GetTable(GetSocket(ACCE_ABSORBED_SOCKET));
+			TItemTable * pkItemAbsorbed = ITEM_MANAGER::Instance().GetTable(GetSocket(ACCE_ABSORBED_SOCKET));
 			if (pkItemAbsorbed)
 			{
 				if (pkItemAbsorbed->aApplies[i].bType == APPLY_NONE)
@@ -996,11 +995,11 @@ void CItem::ModifyPoints(bool bAdd)
 			{
 				if (0 != GetSIGVnum())
 				{
-					const CSpecialItemGroup* pItemGroup = ITEM_MANAGER::instance().GetSpecialItemGroup(GetSIGVnum());
+					const CSpecialItemGroup* pItemGroup = ITEM_MANAGER::Instance().GetSpecialItemGroup(GetSIGVnum());
 					if (nullptr == pItemGroup)
 						break;
 					uint32_t dwAttrVnum = pItemGroup->GetAttrVnum(GetVnum());
-					const CSpecialAttrGroup* pAttrGroup = ITEM_MANAGER::instance().GetSpecialAttrGroup(dwAttrVnum);
+					const CSpecialAttrGroup* pAttrGroup = ITEM_MANAGER::Instance().GetSpecialAttrGroup(dwAttrVnum);
 					if (nullptr == pAttrGroup)
 						break;
 					for (auto it = pAttrGroup->m_vecAttrs.begin(); it != pAttrGroup->m_vecAttrs.end(); it++)
@@ -1093,7 +1092,7 @@ bool CItem::EquipTo(LPCHARACTER ch, uint8_t bWearCell)
 
 	if (IsDragonSoul())
 	{
-		DSManager::instance().ActivateDragonSoul(this);
+		DSManager::Instance().ActivateDragonSoul(this);
 	}
 	else
 	{
@@ -1141,7 +1140,7 @@ bool CItem::Unequip()
 
 	if (IsDragonSoul())
 	{
-		DSManager::instance().DeactivateDragonSoul(this);
+		DSManager::Instance().DeactivateDragonSoul(this);
 	}
 	else
 	{
@@ -1204,7 +1203,7 @@ void CItem::Save()
 	if (m_bSkipSave)
 		return;
 
-	ITEM_MANAGER::instance().DelayedSave(this);
+	ITEM_MANAGER::Instance().DelayedSave(this);
 }
 
 bool CItem::CreateSocket(uint8_t bSlot, uint8_t bGold)
@@ -1241,7 +1240,7 @@ void CItem::SetSocket(int32_t i, int32_t v, bool bLog)
 	UpdatePacket();
 	Save();
 	if (bLog)
-		LogManager::instance().ItemLog(i, v, 0, GetID(), "SET_SOCKET", "", "", GetOriginalVnum());
+		LogManager::Instance().ItemLog(i, v, 0, GetID(), "SET_SOCKET", "", "", GetOriginalVnum());
 }
 
 int32_t CItem::GetGold()
@@ -1430,7 +1429,7 @@ void CItem::AlterToMagicItem()
 
 uint32_t CItem::GetRefineFromVnum()
 {
-	return ITEM_MANAGER::instance().GetRefineFromVnum(GetVnum());
+	return ITEM_MANAGER::Instance().GetRefineFromVnum(GetVnum());
 }
 
 int32_t CItem::GetRefineLevel()
@@ -1483,7 +1482,7 @@ EVENTFUNC(unique_expire_event)
 		{
 			sys_log(0, "UNIQUE_ITEM: expire %s %u", pkItem->GetName(), pkItem->GetID());
 			pkItem->SetUniqueExpireEvent(nullptr);
-			ITEM_MANAGER::instance().RemoveItem(pkItem, "UNIQUE_EXPIRE");
+			ITEM_MANAGER::Instance().RemoveItem(pkItem, "UNIQUE_EXPIRE");
 			return 0;
 		}
 		else
@@ -1499,7 +1498,7 @@ EVENTFUNC(unique_expire_event)
 		if (pkItem->GetSocket(ITEM_SOCKET_UNIQUE_REMAIN_TIME) <= cur)
 		{
 			pkItem->SetUniqueExpireEvent(nullptr);
-			ITEM_MANAGER::instance().RemoveItem(pkItem, "UNIQUE_EXPIRE");
+			ITEM_MANAGER::Instance().RemoveItem(pkItem, "UNIQUE_EXPIRE");
 			return 0;
 		}
 		else
@@ -1539,11 +1538,11 @@ EVENTFUNC(timer_based_on_wear_expire_event)
 		// 일단 timer based on wear 용혼석은 시간 다 되었다고 없애지 않는다.
 		if (pkItem->IsDragonSoul())
 		{
-			DSManager::instance().DeactivateDragonSoul(pkItem);
+			DSManager::Instance().DeactivateDragonSoul(pkItem);
 		}
 		else
 		{
-			ITEM_MANAGER::instance().RemoveItem(pkItem, "TIMER_BASED_ON_WEAR_EXPIRE");
+			ITEM_MANAGER::Instance().RemoveItem(pkItem, "TIMER_BASED_ON_WEAR_EXPIRE");
 		}
 		return 0;
 	}
@@ -1568,7 +1567,7 @@ EVENTFUNC(real_time_expire_event)
 	if (nullptr == info)
 		return 0;
 
-	const LPITEM item = ITEM_MANAGER::instance().FindByVID( info->item_vid );
+	const LPITEM item = ITEM_MANAGER::Instance().FindByVID( info->item_vid );
 
 	if (nullptr == item)
 		return 0;
@@ -1580,7 +1579,7 @@ EVENTFUNC(real_time_expire_event)
 		if (item->GetVnum() && item->IsNewMountItem())
 			item->ClearMountAttributeAndAffect();
 
-		ITEM_MANAGER::instance().RemoveItem(item, "REAL_TIME_EXPIRE");
+		ITEM_MANAGER::Instance().RemoveItem(item, "REAL_TIME_EXPIRE");
 
 		return 0;
 	}
@@ -1696,7 +1695,7 @@ void CItem::StopUniqueExpireEvent()
 	SetSocket(ITEM_SOCKET_UNIQUE_SAVE_TIME, event_time(m_pkUniqueExpireEvent) / passes_per_sec);
 	event_cancel(&m_pkUniqueExpireEvent);
 
-	ITEM_MANAGER::instance().SaveSingleItem(this);
+	ITEM_MANAGER::Instance().SaveSingleItem(this);
 }
 
 void CItem::StopTimerBasedOnWearExpireEvent()
@@ -1709,17 +1708,17 @@ void CItem::StopTimerBasedOnWearExpireEvent()
 	SetSocket(ITEM_SOCKET_REMAIN_SEC, remain_time);
 	event_cancel(&m_pkTimerBasedOnWearExpireEvent);
 
-	ITEM_MANAGER::instance().SaveSingleItem(this);
+	ITEM_MANAGER::Instance().SaveSingleItem(this);
 }
 
 void CItem::ApplyAddon(int32_t iAddonType)
 {
-	CItemAddonManager::instance().ApplyAddonTo(iAddonType, this);
+	CItemAddonManager::Instance().ApplyAddonTo(iAddonType, this);
 }
 
 int32_t CItem::GetSpecialGroup() const
 { 
-	return ITEM_MANAGER::instance().GetSpecialGroupFromItem(GetVnum()); 
+	return ITEM_MANAGER::Instance().GetSpecialGroupFromItem(GetVnum()); 
 }
 
 //
@@ -1766,7 +1765,7 @@ EVENTFUNC(accessory_socket_expire_event)
 		return 0;
 	}
 
-	LPITEM item = ITEM_MANAGER::instance().FindByVID(info->item_vid);
+	LPITEM item = ITEM_MANAGER::Instance().FindByVID(info->item_vid);
 
 	if (item->GetAccessorySocketDownGradeTime() <= 1)
 	{
@@ -2106,7 +2105,7 @@ void CItem::AttrLog()
 	{
 		if (m_alSockets[i])
 		{
-			LogManager::instance().ItemLog(i, m_alSockets[i], 0, GetID(), "INFO_SOCKET", "", pszIP ? pszIP : "", GetOriginalVnum());
+			LogManager::Instance().ItemLog(i, m_alSockets[i], 0, GetID(), "INFO_SOCKET", "", pszIP ? pszIP : "", GetOriginalVnum());
 		}
 	}
 
@@ -2117,7 +2116,7 @@ void CItem::AttrLog()
 
 		if (type)
 		{
-			LogManager::instance().ItemLog(i, type, value, GetID(), "INFO_ATTR", "", pszIP ? pszIP : "", GetOriginalVnum());
+			LogManager::Instance().ItemLog(i, type, value, GetID(), "INFO_ATTR", "", pszIP ? pszIP : "", GetOriginalVnum());
 		}
 	}
 #endif
@@ -2159,7 +2158,7 @@ int32_t CItem::GiveMoreTime_Per(float fPercent)
 {
 	if (IsDragonSoul())
 	{
-		uint32_t duration = DSManager::instance().GetDuration(this);
+		uint32_t duration = DSManager::Instance().GetDuration(this);
 		uint32_t remain_sec = GetSocket(ITEM_SOCKET_REMAIN_SEC);
 		uint32_t given_time = fPercent * duration / 100u;
 		if (remain_sec == duration)
@@ -2184,7 +2183,7 @@ int32_t CItem::GiveMoreTime_Fix(uint32_t dwTime)
 {
 	if (IsDragonSoul())
 	{
-		uint32_t duration = DSManager::instance().GetDuration(this);
+		uint32_t duration = DSManager::Instance().GetDuration(this);
 		uint32_t remain_sec = GetSocket(ITEM_SOCKET_REMAIN_SEC);
 		if (remain_sec == duration)
 			return false;

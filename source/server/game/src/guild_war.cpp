@@ -98,7 +98,7 @@ void CGuild::SendEnemyGuild(LPCHARACTER ch)
 			d->BufferedPacket(&pack2.dwGuildOpp, sizeof(uint32_t));
 			d->Packet(&lScore, sizeof(int32_t));
 
-			lScore = CGuildManager::instance().TouchGuild(pack2.dwGuildOpp)->GetWarScoreAgainstTo(pack2.dwGuildSelf);
+			lScore = CGuildManager::Instance().TouchGuild(pack2.dwGuildOpp)->GetWarScoreAgainstTo(pack2.dwGuildSelf);
 
 			d->BufferedPacket(&p, sizeof(p));
 			d->BufferedPacket(&pack2.dwGuildOpp, sizeof(uint32_t));
@@ -149,7 +149,7 @@ bool CGuild::CanStartWar(uint8_t bGuildWarType) // 타입에 따라 다른 조건이 생길 
 		return false;
 
 	// 테스트시에는 인원수를 확인하지 않는다.
-	if (g_bIsTestServer || quest::CQuestManager::instance().GetEventFlag("guild_war_test") != 0)
+	if (g_bIsTestServer || quest::CQuestManager::Instance().GetEventFlag("guild_war_test") != 0)
 		return GetLadderPoint() > 0;
 
 	return GetLadderPoint() > 0 && GetMemberCount() >= GUILD_WAR_MIN_MEMBER_COUNT;
@@ -192,8 +192,8 @@ void CGuild::SetWarScoreAgainstTo(uint32_t dwOppGID, int32_t iScore)
 
 		if (it->second.type != GUILD_WAR_TYPE_FIELD)
 		{
-			CGuild * gOpp = CGuildManager::instance().TouchGuild(dwOppGID);
-			CWarMap * pMap = CWarMapManager::instance().Find(it->second.map_index);
+			CGuild * gOpp = CGuildManager::Instance().TouchGuild(dwOppGID);
+			CWarMap * pMap = CWarMapManager::Instance().Find(it->second.map_index);
 
 			if (pMap)
 				pMap->UpdateScore(dwSelfGID, iScore, dwOppGID, gOpp->GetWarScoreAgainstTo(dwSelfGID));
@@ -215,7 +215,7 @@ void CGuild::SetWarScoreAgainstTo(uint32_t dwOppGID, int32_t iScore)
 
 			Packet(buf.read_peek(), buf.size());
 
-			CGuild * gOpp = CGuildManager::instance().TouchGuild(dwOppGID);
+			CGuild * gOpp = CGuildManager::Instance().TouchGuild(dwOppGID);
 
 			if (gOpp)
 				gOpp->Packet(buf.read_peek(), buf.size());
@@ -267,7 +267,7 @@ bool GuildWar_IsWarMap(uint32_t type)
 
 	uint32_t mapIndex = GuildWar_GetTypeMapIndex(type);
 
-	if (SECTREE_MANAGER::instance().GetMapRegion(mapIndex))
+	if (SECTREE_MANAGER::Instance().GetMapRegion(mapIndex))
 		return true;
 
 	return false;
@@ -470,7 +470,7 @@ bool CGuild::WaitStartWar(uint32_t dwOppGID)
 	gw.state = GUILD_WAR_WAIT_START;
 
 	//상대편의 길드 클래스 포인터를 얻어오고
-	CGuild* g = CGuildManager::instance().FindGuild(dwOppGID);
+	CGuild* g = CGuildManager::Instance().FindGuild(dwOppGID);
 	if (!g)
 	{
 		sys_log(0 ,"GuildWar.WaitStartWar.NOT_EXIST_GUILD id(%u -> %u)", GetID(), dwOppGID);
@@ -507,11 +507,11 @@ bool CGuild::WaitStartWar(uint32_t dwOppGID)
 		std::swap(id1, id2);
 
 	//워프 맵을 생성
-	uint32_t lMapIndex = CWarMapManager::instance().CreateWarMap(rkGuildWarInfo, id1, id2);
+	uint32_t lMapIndex = CWarMapManager::Instance().CreateWarMap(rkGuildWarInfo, id1, id2);
 	if (!lMapIndex) 
 	{
 		sys_err("GuildWar.WaitStartWar.CREATE_WARMAP_ERROR id(%u vs %u), type(%u), map(%d)", id1, id2, gw.type, rkGuildWarInfo.lMapIndex);
-		CGuildManager::instance().RequestEndWar(GetID(), dwOppGID);
+		CGuildManager::Instance().RequestEndWar(GetID(), dwOppGID);
 		return false;
 	}
 
@@ -532,7 +532,7 @@ bool CGuild::WaitStartWar(uint32_t dwOppGID)
 	p.dwGuildID2 	= id2;
 	p.lMapIndex	= lMapIndex;
 
-	P2P_MANAGER::instance().Send(&p, sizeof(p));
+	P2P_MANAGER::Instance().Send(&p, sizeof(p));
 	///////////////////////////////////////////////////////
 
 	return true;
@@ -601,7 +601,7 @@ void CGuild::EndWar(uint32_t dwOppGID)
 
 	if (it != m_EnemyGuild.end())
 	{
-		CWarMap * pMap = CWarMapManager::instance().Find(it->second.map_index);
+		CWarMap * pMap = CWarMapManager::Instance().Find(it->second.map_index);
 
 		if (pMap)
 			pMap->SetEnded();
@@ -661,7 +661,7 @@ void CGuild::GuildWarEntryAccept(uint32_t dwOppGID, LPCHARACTER ch)
 
 	GPOS pos;
 
-	if (!CWarMapManager::instance().GetStartPosition(gw.map_index, GetID() < dwOppGID ? 0 : 1, pos))
+	if (!CWarMapManager::Instance().GetStartPosition(gw.map_index, GetID() < dwOppGID ? 0 : 1, pos))
 		return;
 
 	if (g_NoMountAtGuildWar)
@@ -679,7 +679,7 @@ void CGuild::GuildWarEntryAccept(uint32_t dwOppGID, LPCHARACTER ch)
 		return;
 	}
 
-	quest::PC * pPC = quest::CQuestManager::instance().GetPC(ch->GetPlayerID());
+	quest::PC * pPC = quest::CQuestManager::Instance().GetPC(ch->GetPlayerID());
 	if (pPC)
 	{
 		int32_t iBlockTime = pPC->GetFlag("guild_war_join.savasengeli");
@@ -716,7 +716,7 @@ void CGuild::GuildWarEntryAsk(uint32_t dwOppGID)
 	}
 
 	GPOS pos;
-	if (!CWarMapManager::instance().GetStartPosition(gw.map_index, GetID() < dwOppGID ? 0 : 1, pos))
+	if (!CWarMapManager::Instance().GetStartPosition(gw.map_index, GetID() < dwOppGID ? 0 : 1, pos))
 	{
 		sys_err("GuildWar.GuildWarEntryAsk.START_POSITION_ERROR id(%d vs %d), pos(%d, %d)", GetID(), dwOppGID, pos.x, pos.y);
 		return;
@@ -731,11 +731,11 @@ void CGuild::GuildWarEntryAsk(uint32_t dwOppGID)
 		LPCHARACTER ch = *it++;
 
 		using namespace quest;
-		uint32_t questIndex=CQuestManager::instance().GetQuestIndexByName("guild_war_join");
+		uint32_t questIndex=CQuestManager::Instance().GetQuestIndexByName("guild_war_join");
 		if (questIndex)
 		{
 			sys_log(0, "GuildWar.GuildWarEntryAsk.SendLetterToMember pid(%d), qid(%d)", ch->GetPlayerID(), questIndex);
-			CQuestManager::instance().Letter(ch->GetPlayerID(), questIndex, 0);
+			CQuestManager::Instance().Letter(ch->GetPlayerID(), questIndex, 0);
 		}
 		else
 		{

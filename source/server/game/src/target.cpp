@@ -66,7 +66,7 @@ EVENTFUNC(target_event)
 
 	// <Factor> Raplaced direct pointer reference with key searching.
 		//LPCHARACTER pkChr = info->pkChr;
-	LPCHARACTER pkChr = CHARACTER_MANAGER::instance().FindByPID(info->dwPID);
+	LPCHARACTER pkChr = CHARACTER_MANAGER::Instance().FindByPID(info->dwPID);
 	if (pkChr == nullptr) {
 		return 0; // <Factor> need to be confirmed
 	}
@@ -87,7 +87,7 @@ EVENTFUNC(target_event)
 
 	case TARGET_TYPE_VID:
 	{
-		tch = CHARACTER_MANAGER::instance().Find(info->iArg1);
+		tch = CHARACTER_MANAGER::Instance().Find(info->iArg1);
 
 		if (tch && tch->GetMapIndex() == pkChr->GetMapIndex())
 		{
@@ -102,12 +102,12 @@ EVENTFUNC(target_event)
 	bool bRet = true;
 
 	if (iDist <= 500)
-		bRet = quest::CQuestManager::instance().Target(pkChr->GetPlayerID(), info->dwQuestIndex, info->szTargetName, "arrive");
+		bRet = quest::CQuestManager::Instance().Target(pkChr->GetPlayerID(), info->dwQuestIndex, info->szTargetName, "arrive");
 
 	if (!tch && info->iType == TARGET_TYPE_VID)
 	{
-		quest::CQuestManager::instance().Target(pkChr->GetPlayerID(), info->dwQuestIndex, info->szTargetName, "die");
-		CTargetManager::instance().DeleteTarget(pkChr->GetPlayerID(), info->dwQuestIndex, info->szTargetName);
+		quest::CQuestManager::Instance().Target(pkChr->GetPlayerID(), info->dwQuestIndex, info->szTargetName, "die");
+		CTargetManager::Instance().DeleteTarget(pkChr->GetPlayerID(), info->dwQuestIndex, info->szTargetName);
 	}
 
 	if (event->is_force_to_end)
@@ -144,7 +144,7 @@ void CTargetManager::CreateTarget(uint32_t dwPID,
 	sys_log(0, "CreateTarget : target pid %u quest %u name %s arg %d %d %d",
 		dwPID, dwQuestIndex, c_pszTargetName, iType, iArg1, iArg2);
 
-	LPCHARACTER pkChr = CHARACTER_MANAGER::instance().FindByPID(dwPID);
+	LPCHARACTER pkChr = CHARACTER_MANAGER::Instance().FindByPID(dwPID);
 
 	if (!pkChr)
 	{
@@ -265,7 +265,7 @@ void CTargetManager::DeleteTarget(uint32_t dwPID, uint32_t dwQuestIndex, const c
 				if (info->bSendToClient) {
 					// <Factor> Removed pkChr
 					//SendTargetDeletePacket(info->pkChr->GetDesc(), info->iID);
-					LPCHARACTER pkChr = CHARACTER_MANAGER::instance().FindByPID(info->dwPID);
+					LPCHARACTER pkChr = CHARACTER_MANAGER::Instance().FindByPID(info->dwPID);
 					if (pkChr != nullptr) {
 						SendTargetDeletePacket(pkChr->GetDesc(), info->iID);
 					}

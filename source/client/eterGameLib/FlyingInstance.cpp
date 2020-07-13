@@ -129,7 +129,7 @@ void CFlyingInstance::__SetTargetNormalizedDirection(const D3DXVECTOR3 & v3Nomal
 	Vec3TransformQuaternion(&m_v3Accel, &m_pData->m_v3Accel, &m_qRot);
 }
 
-// 2004. 3. 26. myevan. 기능을 몰라 일단 주석 처리. 적절한 네이밍이 필요. 게임에서 사용하지 않는다면 툴에서 툴 전용으로 상속받아 만들도록 하자
+// 기능을 몰라 일단 주석 처리. 적절한 네이밍이 필요. 게임에서 사용하지 않는다면 툴에서 툴 전용으로 상속받아 만들도록 하자
 void CFlyingInstance::SetFlyTarget(const CFlyTarget & cr_Target)
 {
 	//m_pFlyTarget = pTarget;

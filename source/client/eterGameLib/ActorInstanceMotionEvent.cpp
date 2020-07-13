@@ -325,7 +325,7 @@ void CActorInstance::ProcessMotionEventWarp(const CRaceMotionData::TMotionEventD
 		D3DXVec3Normalize(&v3Distance, &v3Distance);
 		TPixelPosition DestPixelPosition = c_rv3TargetPosition - (v3Distance * sc_fDistanceFromTarget);
 
-		// 2004.07.05.myevan.궁신탄영 맵에 끼이는 문제해결. 목표위치가 이동 못하는 곳일 경우 이동하지 않는다
+		// 궁신탄영 맵에 끼이는 문제해결. 목표위치가 이동 못하는 곳일 경우 이동하지 않는다
 		IBackground& rkBG=GetBackground();
 		if (!rkBG.IsBlock(DestPixelPosition.x, -DestPixelPosition.y))
 			SetPixelPosition(DestPixelPosition);
@@ -361,7 +361,6 @@ void CActorInstance::ProcessMotionEventUnk11(uint32_t dwcurFrame, int32_t iIndex
 			D3DXVec3Normalize(&v3Distance, &v3Distance);
 			TPixelPosition DestPixelPosition = c_rv3TargetPosition - (v3Distance * (sc_fDistanceFromTarget+c_pUnk11TargetData->iAniSpeed));
 
-			// 2004.07.05.myevan.궁신탄영 맵에 끼이는 문제해결. 목표위치가 이동 못하는 곳일 경우 이동하지 않는다
 			IBackground& rkBG=GetBackground();
 			if (!rkBG.IsBlock(DestPixelPosition.x, -DestPixelPosition.y))
 				SetPixelPosition(DestPixelPosition);

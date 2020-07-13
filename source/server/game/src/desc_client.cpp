@@ -10,7 +10,6 @@
 #include "guild_manager.h"
 #include "db.h"
 #include "party.h"
-#include "../../common/service.h"
 
 LPCLIENT_DESC db_clientdesc = nullptr;
 LPCLIENT_DESC g_pkAuthMasterDesc = nullptr;
@@ -42,13 +41,13 @@ void CLIENT_DESC::Destroy()
 		return;
 	}
 
-	P2P_MANAGER::instance().UnregisterConnector(this);
+	P2P_MANAGER::Instance().UnregisterConnector(this);
 
 	if (this == db_clientdesc)
 	{
-		CPartyManager::instance().DeleteAllParty();
-		CPartyManager::instance().DisablePCParty();
-		CGuildManager::instance().StopAllGuildWar();
+		CPartyManager::Instance().DeleteAllParty();
+		CPartyManager::Instance().DisablePCParty();
+		CGuildManager::Instance().StopAllGuildWar();
 	}
 
 	fdwatch_del_fd(m_lpFdw, m_sock);
@@ -154,7 +153,7 @@ void CLIENT_DESC::SetPhase(int32_t iPhase)
 					p.bAuthServer = false;
 					map_allow_copy(p.alMaps, MAP_ALLOW_LIMIT);
 
-					const DESC_MANAGER::DESC_SET & c_set = DESC_MANAGER::instance().GetClientSet();
+					const DESC_MANAGER::DESC_SET & c_set = DESC_MANAGER::Instance().GetClientSet();
 					DESC_MANAGER::DESC_SET::const_iterator it;
 
 					for (it = c_set.begin(); it != c_set.end(); ++it)
@@ -196,8 +195,8 @@ void CLIENT_DESC::SetPhase(int32_t iPhase)
 					sys_log(0, "DB_SETUP current user %d size %d", p.dwLoginCount, buf.size());
 
 					// 파티를 처리할 수 있게 됨.
-					CPartyManager::instance().EnablePCParty();
-					//CPartyManager::instance().SendPartyToDB();
+					CPartyManager::Instance().EnablePCParty();
+					//CPartyManager::Instance().SendPartyToDB();
 				}
 				else
 				{
@@ -284,7 +283,7 @@ void CLIENT_DESC::UpdateChannelStatus(uint32_t t, bool fForce)
 		int32_t iTotal; 
 		int32_t * paiEmpireUserCount;
 		int32_t iLocal;
-		DESC_MANAGER::instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
+		DESC_MANAGER::Instance().GetUserCount(iTotal, &paiEmpireUserCount, iLocal);
 
 		TChannelStatus channelStatus;
 		channelStatus.nPort = mother_port;

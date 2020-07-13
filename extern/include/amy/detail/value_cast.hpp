@@ -2,8 +2,7 @@
 #define __AMY_DETAIL_VALUE_CAST_HPP__
 
 #include <amy/sql_types.hpp>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <date/date.h>
 #include <iomanip>
 #include <string>
 #include <sstream>
@@ -55,11 +54,6 @@ inline bool value_cast(const char* s, unsigned long) {
 }
 
 template<>
-inline unsigned long long value_cast(const char* s, unsigned long) {
-    return std::strtoull(s, NULL, 10);
-}
-
-template<>
 inline unsigned long value_cast(const char* s, unsigned long) {
     return std::strtoul(s, NULL, 10);
 }
@@ -91,45 +85,21 @@ inline float value_cast(const char* s, unsigned long) {
 
 template<>
 inline sql_datetime value_cast(const char* s, unsigned long l) {
-    using namespace boost::posix_time;
-
-    std::istringstream in({s, l});
-    in.unsetf(std::ios::skipws);
-    in.imbue(std::locale(std::locale::classic(),
-                         new time_input_facet("%Y-%m-%d %H:%M:%S%F")));
-
-    sql_datetime v;
-    in >> v;
-    return v;
+	std::stringstream ss{std::string(s, l)};
+	sql_datetime v;
+	ss >> date::parse("%F %T", v);
+	if (ss.fail())
+		throw std::runtime_error("datetime parse failed" + ss.str());
+	return v;
 }
 
 template<>
-inline sql_time value_cast(const char* str, unsigned long len) {
-    using namespace boost::posix_time;
-
-    // It's a pity that Boost.Date_Time cannot correctly parse negative time
-    // durations, so we have to deal with the sign here.
-    assert(len > 0);
-    bool negative = (str[0] == '-') ? true : false;
-    if (negative) {
-        ++str;
-        --len;
-    }
-
-    time_input_facet* input_facet = new time_input_facet();
-    input_facet->time_duration_format("%H:%M:%S:%F");
-
-    std::istringstream in({str, len});
-    in.unsetf(std::ios::skipws);
-    in.imbue(std::locale(std::locale::classic(), input_facet));
-
-    sql_time v;
-    in >> v;
-
-    if (negative) {
-        v = hours(0) - v;
-    }
-
+inline sql_time value_cast(const char* s, unsigned long l) {
+	std::stringstream ss{std::string(s, l)};
+	sql_time v;
+	ss >> date::parse("%T", v);
+	if (ss.fail())
+		throw std::runtime_error("time parse failed" + ss.str());
     return v;
 }
 
@@ -146,6 +116,13 @@ template<>
 inline sql_bigint_unsigned value_cast(const char* s, unsigned long) {
     sql_bigint_unsigned v = ::_strtoui64(s, NULL, 10);
     return v;
+}
+
+#else
+
+template<>
+inline unsigned long long value_cast(const char* s, unsigned long) {
+    return std::strtoull(s, NULL, 10);
 }
 
 #endif // ifdef WIN32

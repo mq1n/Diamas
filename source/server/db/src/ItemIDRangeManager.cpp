@@ -24,8 +24,8 @@ void CItemIDRangeManager::Build()
 		if (dwMax == cs_dwMaxItemID)
 			break;
 
-		if (CClientManager::instance().GetItemRange().dwMin <= dwMin &&
-			CClientManager::instance().GetItemRange().dwMax >= dwMax)
+		if (CClientManager::Instance().GetItemRange().dwMin <= dwMin &&
+			CClientManager::Instance().GetItemRange().dwMax >= dwMax)
 		{
 			continue;
 		}
@@ -72,7 +72,7 @@ TItemIDRangeTable CItemIDRangeManager::GetRange()
 			m_listData.pop_front();
 
 			FCheckCollision f(ret);
-			CClientManager::instance().for_each_peer(f);
+			CClientManager::Instance().for_each_peer(f);
 
 			if (f.hasCollision == false) return ret;
 		}
@@ -92,7 +92,7 @@ bool CItemIDRangeManager::BuildRange(uint32_t dwMin, uint32_t dwMax, TItemIDRang
 	char szQuery[1024];
 	snprintf(szQuery, sizeof(szQuery), "SELECT MAX(`id`) FROM item WHERE `id` >= %u and `id` <= %u", dwMin, dwMax);
 
-	std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(szQuery));
+	std::unique_ptr<SQLMsg> pMsg(CDBManager::Instance().DirectQuery(szQuery));
 
 	if (pMsg.get() != nullptr)
 	{
@@ -122,7 +122,7 @@ bool CItemIDRangeManager::BuildRange(uint32_t dwMin, uint32_t dwMax, TItemIDRang
 		snprintf(szQuery, sizeof(szQuery), "SELECT COUNT(*) FROM item WHERE `id` >= %u AND `id` <= %u", 
 				range.dwUsableItemIDMin, range.dwMax);
 
-		pMsg.reset(CDBManager::instance().DirectQuery(szQuery));
+		pMsg.reset(CDBManager::Instance().DirectQuery(szQuery));
 
 		if (pMsg.get() != nullptr)
 		{

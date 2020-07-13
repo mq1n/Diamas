@@ -8,9 +8,9 @@
 
 #undef sys_err
 #ifndef __WIN32__
-#define sys_err(fmt, args...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
+#define sys_err(fmt, args...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
 #else
-#define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
+#define sys_err(fmt, ...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
 namespace quest
@@ -24,7 +24,7 @@ namespace quest
 		}
 		uint32_t vid = (uint32_t) lua_tonumber(L, 1);
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
@@ -33,38 +33,38 @@ namespace quest
 
 		LPCHARACTER ch_you = CHARACTER_MANAGER::Instance().Find(vid);
 		if (ch_you)
-			marriage::CManager::instance().RequestAdd(ch->GetPlayerID(), ch_you->GetPlayerID(), ch->GetName(), ch_you->GetName());
+			marriage::CManager::Instance().RequestAdd(ch->GetPlayerID(), ch_you->GetPlayerID(), ch->GetName(), ch_you->GetName());
 
 		return 0;
 	}
 
 	int32_t marriage_remove(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
 			return 0;
 		}
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(ch->GetPlayerID());
 		if (!pMarriage)
 		{
 			sys_err("pid[%d:%s] is not exist couple", ch->GetPlayerID(), ch->GetName());
 			return 0;
 		}
-		marriage::CManager::instance().RequestRemove(ch->GetPlayerID(), pMarriage->GetOther(ch->GetPlayerID()));
+		marriage::CManager::Instance().RequestRemove(ch->GetPlayerID(), pMarriage->GetOther(ch->GetPlayerID()));
 		return 0;
 	}
 
 	int32_t marriage_set_to_marriage(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
 			return 0;
 		}
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(ch->GetPlayerID());
 		if (!pMarriage)
 		{
 			sys_err("pid[%d:%s] is not exist couple", ch->GetPlayerID(), ch->GetName());
@@ -76,7 +76,7 @@ namespace quest
 
 	int32_t marriage_find_married_vid(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
@@ -84,10 +84,10 @@ namespace quest
 		}
 
 		uint32_t vid = 0;
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(ch->GetPlayerID());
 		if (pMarriage)
 		{
-			LPCHARACTER you = CHARACTER_MANAGER::instance().FindByPID(pMarriage->GetOther(ch->GetPlayerID()));
+			LPCHARACTER you = CHARACTER_MANAGER::Instance().FindByPID(pMarriage->GetOther(ch->GetPlayerID()));
 			if (you)
 				vid = you->GetVID();
 		}
@@ -127,7 +127,7 @@ namespace quest
 
 	int32_t marriage_get_wedding_list(lua_State* L)
 	{
-		marriage::CManager::instance().for_each_wedding(FBuildLuaWeddingMapList(L));
+		marriage::CManager::Instance().for_each_wedding(FBuildLuaWeddingMapList(L));
 		return 1;
 	}
 
@@ -142,14 +142,14 @@ namespace quest
 		uint32_t pid1 = (uint32_t) lua_tonumber(L, 1);
 		uint32_t pid2 = (uint32_t) lua_tonumber(L, 2);
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
 			return 0;
 		}
 
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(pid1);
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(pid1);
 		if (!pMarriage)
 		{
 			sys_err("pid[%d:%s] is not exist couple", ch->GetPlayerID(), ch->GetName());
@@ -171,13 +171,13 @@ namespace quest
 
 	int32_t marriage_warp_to_my_marriage_map(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
 			return 0;
 		}
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(ch->GetPlayerID());
 		if (!pMarriage)
 		{
 			sys_err("pid[%d:%s] is not exist couple", ch->GetPlayerID(), ch->GetName());
@@ -196,14 +196,14 @@ namespace quest
 
 	int32_t marriage_end_wedding(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
 			return 0;
 		}
 
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(ch->GetPlayerID());
 		if (!pMarriage)
 		{
 			sys_err("pid[%d:%s] is not exist couple", ch->GetPlayerID(), ch->GetName());
@@ -223,13 +223,13 @@ namespace quest
 			sys_err("invalid argument 1 : must be boolean");
 			return 0;
 		}
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
 			return 0;
 		}
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(ch->GetPlayerID());
 
 		if (!pMarriage)
 		{
@@ -238,7 +238,7 @@ namespace quest
 		}
 		if (pMarriage->pWeddingInfo)
 		{
-			marriage::WeddingMap* pWedding = marriage::WeddingManager::instance().Find(pMarriage->pWeddingInfo->dwMapIndex);
+			marriage::WeddingMap* pWedding = marriage::WeddingManager::Instance().Find(pMarriage->pWeddingInfo->dwMapIndex);
 			pWedding->SetDark(lua_toboolean(L, 1));
 		}
 
@@ -253,13 +253,13 @@ namespace quest
 			return 0;
 		}
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
 			return 0;
 		}
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(ch->GetPlayerID());
 		if (!pMarriage)
 		{
 			sys_err("pid[%d:%s] is not exist couple", ch->GetPlayerID(), ch->GetName());
@@ -267,7 +267,7 @@ namespace quest
 		}
 		if (pMarriage->pWeddingInfo)
 		{
-			marriage::WeddingMap* pWedding = marriage::WeddingManager::instance().Find(pMarriage->pWeddingInfo->dwMapIndex);
+			marriage::WeddingMap* pWedding = marriage::WeddingManager::Instance().Find(pMarriage->pWeddingInfo->dwMapIndex);
 			pWedding->ShoutInMap(CHAT_TYPE_COMMAND, lua_tostring(L, 1));
 		}
 		return 0;
@@ -276,13 +276,13 @@ namespace quest
 
 	int32_t marriage_wedding_is_playing_music(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
 			return 0;
 		}
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(ch->GetPlayerID());
 		if (!pMarriage)
 		{
 			sys_err("pid[%d:%s] is not exist couple", ch->GetPlayerID(), ch->GetName());
@@ -290,7 +290,7 @@ namespace quest
 		}
 		if (pMarriage->pWeddingInfo)
 		{
-			marriage::WeddingMap* pWedding = marriage::WeddingManager::instance().Find(pMarriage->pWeddingInfo->dwMapIndex);
+			marriage::WeddingMap* pWedding = marriage::WeddingManager::Instance().Find(pMarriage->pWeddingInfo->dwMapIndex);
 			if (pWedding)
 				lua_pushboolean(L, pWedding->IsPlayingMusic());
 			else
@@ -313,14 +313,14 @@ namespace quest
 			return 0;
 		}
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
 			return 0;
 		}
 
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(ch->GetPlayerID());
 		if (!pMarriage)
 		{
 			sys_err("pid[%d:%s] is not exist couple", ch->GetPlayerID(), ch->GetName());
@@ -329,7 +329,7 @@ namespace quest
 
 		if (pMarriage->pWeddingInfo)
 		{
-			marriage::WeddingMap* pWedding = marriage::WeddingManager::instance().Find(pMarriage->pWeddingInfo->dwMapIndex);
+			marriage::WeddingMap* pWedding = marriage::WeddingManager::Instance().Find(pMarriage->pWeddingInfo->dwMapIndex);
 			pWedding->SetMusic(lua_toboolean(L, 1), lua_tostring(L, 2));
 		}
 
@@ -342,13 +342,13 @@ namespace quest
 			sys_err("invalid argument 1 : must be boolean");
 			return 0;
 		}
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
 			return 0;
 		}
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(ch->GetPlayerID());
 		if (!pMarriage)
 		{
 			sys_err("pid[%d:%s] is not exist couple", ch->GetPlayerID(), ch->GetName());
@@ -356,7 +356,7 @@ namespace quest
 		}
 		if (pMarriage->pWeddingInfo)
 		{
-			marriage::WeddingMap* pWedding = marriage::WeddingManager::instance().Find(pMarriage->pWeddingInfo->dwMapIndex);
+			marriage::WeddingMap* pWedding = marriage::WeddingManager::Instance().Find(pMarriage->pWeddingInfo->dwMapIndex);
 			pWedding->SetSnow(lua_toboolean(L, 1));
 		}
 		return 0;
@@ -364,7 +364,7 @@ namespace quest
 
 	int32_t marriage_in_my_wedding(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
@@ -373,7 +373,7 @@ namespace quest
 			return 1;
 		}
 
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(ch->GetPlayerID());
 		if (pMarriage && pMarriage->pWeddingInfo)
 		{
 			lua_pushboolean(L, (ch->GetMapIndex() == pMarriage->pWeddingInfo->dwMapIndex));
@@ -385,7 +385,7 @@ namespace quest
 
 	int32_t marriage_get_married_time(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
@@ -394,7 +394,7 @@ namespace quest
 			return 1;
 		}
 
-		marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(ch->GetPlayerID());
+		marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(ch->GetPlayerID());
 
 		if (!pMarriage)
 		{
@@ -428,6 +428,6 @@ namespace quest
 			{ "get_married_time",	marriage_get_married_time   },
 			{ nullptr,			nullptr			    }
 		};
-		CQuestManager::instance().AddLuaFunctionTable("marriage", marriage_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("marriage", marriage_functions);
 	}
 }

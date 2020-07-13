@@ -77,7 +77,7 @@ int32_t main()
 
 	sys_log(0, "DBCacheServer Start\n");
 
-	CClientManager::instance().MainLoop();
+	CClientManager::Instance().MainLoop();
 
 	signal_timer_disable();
 
@@ -88,8 +88,8 @@ int32_t main()
 	{
 		iCount = 0;
 
-		iCount += CDBManager::instance().CountReturnQuery(SQL_PLAYER);
-		iCount += CDBManager::instance().CountAsyncQuery(SQL_PLAYER);
+		iCount += CDBManager::Instance().CountReturnQuery(SQL_PLAYER);
+		iCount += CDBManager::Instance().CountAsyncQuery(SQL_PLAYER);
 
 		if (iCount == 0)
 			break;
@@ -122,13 +122,13 @@ bool Start()
 	thecore_init();
 
 	// Parse config file
-	if (!CConfigManager::instance().ParseFile("CONFIG.json"))
+	if (!CConfigManager::Instance().ParseFile("CONFIG.json"))
 	{
 		sys_err("Loading CONFIG.json failed.");
 		return false;		
 	}
 
-	auto stConfigBuffer = CConfigManager::instance().GetConfigFileContent();
+	auto stConfigBuffer = CConfigManager::Instance().GetConfigFileContent();
 	if (stConfigBuffer.empty())
 	{
 		sys_err("nullptr CONFIG.json content.");
@@ -238,7 +238,7 @@ bool Start()
 
 	auto& pkNumCacheFlushLimit = pkConfigContent["cache_flush_limit_per_second"];
 	if (!pkNumCacheFlushLimit.IsNull() && pkNumCacheFlushLimit.IsNumber())
-		CClientManager::instance().SetCacheFlushCountLimit(pkNumCacheFlushLimit.GetUint());
+		CClientManager::Instance().SetCacheFlushCountLimit(pkNumCacheFlushLimit.GetUint());
 
 	auto& pkStrLocalName = pkConfigContent["locale_name"];
 	if (!pkStrLocalName.IsNull() && pkStrLocalName.IsString())
@@ -280,7 +280,7 @@ bool Start()
 
 		do
 		{
-			if (CDBManager::instance().Connect(i, pkStrHost.GetString(), pkNumPort.GetInt(), pkStrDatabase.GetString(),
+			if (CDBManager::Instance().Connect(i, pkStrHost.GetString(), pkNumPort.GetInt(), pkStrDatabase.GetString(),
 				pkStrUsername.GetString(), pkStrPassword.GetString()))
 			{
 				sys_log(0, "Connection to: %s: OK", stDatabase.c_str());
@@ -304,7 +304,7 @@ bool Start()
 		return false;		
 	}
 	
-	if (!CNetPoller::instance().Create())
+	if (!CNetPoller::Instance().Create())
 	{
 		sys_err("Cannot create network poller");
 		return false;
@@ -312,7 +312,7 @@ bool Start()
 
 	sys_log(0, "ClientManager initializing...");
 
-	if (!CClientManager::instance().Initialize(stConfigBuffer))
+	if (!CClientManager::Instance().Initialize(stConfigBuffer))
 	{
 		sys_log(0, "ClientManager initialization failed.");
 		return false;

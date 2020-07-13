@@ -60,8 +60,8 @@ class CArena
 	uint32_t GetPlayerAPID() { return m_dwPIDA; }
 	uint32_t GetPlayerBPID() { return m_dwPIDB; }
 
-	LPCHARACTER GetPlayerA() { return CHARACTER_MANAGER::instance().FindByPID(m_dwPIDA); }
-	LPCHARACTER GetPlayerB() { return CHARACTER_MANAGER::instance().FindByPID(m_dwPIDB); }
+	LPCHARACTER GetPlayerA() { return CHARACTER_MANAGER::Instance().FindByPID(m_dwPIDA); }
+	LPCHARACTER GetPlayerB() { return CHARACTER_MANAGER::Instance().FindByPID(m_dwPIDB); }
 
 	GPOS GetStartPointA() { return m_StartPointA; }
 	GPOS GetStartPointB() { return m_StartPointB; }
@@ -103,7 +103,7 @@ class CArenaMap
 	MEMBER_IDENTITY IsMember(uint32_t PID);
 };
 
-class CArenaManager : public singleton<CArenaManager>
+class CArenaManager : public CSingleton<CArenaManager>
 {
 	private :
 		std::map<uint32_t, CArenaMap*> m_mapArenaMap;

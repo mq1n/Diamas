@@ -30,9 +30,9 @@
 #include "../../libsql/include/AsyncSQL.h"
 #undef sys_err
 #ifndef __WIN32__
-#define sys_err(fmt, args...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
+#define sys_err(fmt, args...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
 #else
-#define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
+#define sys_err(fmt, ...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
 
@@ -46,7 +46,7 @@ namespace quest
 	//
 	int32_t pc_has_master_skill(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -68,7 +68,7 @@ namespace quest
 
 	int32_t pc_remove_skill_book_no_delay(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -81,7 +81,7 @@ namespace quest
 
 	int32_t pc_is_skill_book_no_delay(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -94,7 +94,7 @@ namespace quest
 
 	int32_t pc_learn_grand_master_skill(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -113,7 +113,7 @@ namespace quest
 
 	int32_t pc_set_warp_location(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -138,7 +138,7 @@ namespace quest
 
 	int32_t pc_set_warp_location_local(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -159,7 +159,7 @@ namespace quest
 
 		int32_t lMapIndex = (int32_t) lua_tonumber(L, 1);
 
-		auto region = SECTREE_MANAGER::instance().GetMapRegion(lMapIndex);
+		auto region = SECTREE_MANAGER::Instance().GetMapRegion(lMapIndex);
 		if (!region)
 		{
 			sys_err("invalid map index %d", lMapIndex);
@@ -187,7 +187,7 @@ namespace quest
 
 	int32_t pc_get_start_location(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -202,7 +202,7 @@ namespace quest
 
 	int32_t pc_warp(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -241,7 +241,7 @@ namespace quest
 
 	int32_t pc_warp_local(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -262,7 +262,7 @@ namespace quest
 
 		int32_t lMapIndex = (int32_t) lua_tonumber(L, 1);
 
-		auto region = SECTREE_MANAGER::instance().GetMapRegion(lMapIndex);
+		auto region = SECTREE_MANAGER::Instance().GetMapRegion(lMapIndex);
 		if (!region)
 		{
 			sys_err("invalid map index %d", lMapIndex);
@@ -290,7 +290,7 @@ namespace quest
 
 	int32_t pc_warp_exit(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -303,7 +303,7 @@ namespace quest
 
 	int32_t pc_in_dungeon(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -316,7 +316,7 @@ namespace quest
 
 	int32_t pc_hasguild(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -329,7 +329,7 @@ namespace quest
 
 	int32_t pc_getguild(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -342,7 +342,7 @@ namespace quest
 
 	int32_t pc_isguildmaster(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -362,7 +362,7 @@ namespace quest
 
 	int32_t pc_destroy_guild(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -382,7 +382,7 @@ namespace quest
 
 	int32_t pc_remove_from_guild(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -402,7 +402,7 @@ namespace quest
 
 	int32_t pc_give_gold(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -423,14 +423,14 @@ namespace quest
 			return 0;
 		}
 
-		LogManager::instance().MoneyLog(MONEY_LOG_QUEST, ch->GetPlayerID(), iAmount);
+		LogManager::Instance().MoneyLog(MONEY_LOG_QUEST, ch->GetPlayerID(), iAmount);
 		ch->PointChange(POINT_GOLD, iAmount, true);
 		return 0;
 	}
 
 	int32_t pc_warp_to_guild_war_observer_position(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -446,7 +446,7 @@ namespace quest
 		uint32_t gid1 = (uint32_t)lua_tonumber(L, 1);
 		uint32_t gid2 = (uint32_t)lua_tonumber(L, 2);
 
-		CGuild* g1 = CGuildManager::instance().FindGuild(gid1);
+		CGuild* g1 = CGuildManager::Instance().FindGuild(gid1);
 		if (!g1) 
 		{
 			luaL_error(L, "no such guild with id %d %d", gid1, gid2);
@@ -456,7 +456,7 @@ namespace quest
 		GPOS pos;
 		uint32_t dwMapIndex = g1->GetGuildWarMapIndex(gid2);
 
-		if (!CWarMapManager::instance().GetStartPosition(dwMapIndex, 2, pos)) 
+		if (!CWarMapManager::Instance().GetStartPosition(dwMapIndex, 2, pos)) 
 		{
 			luaL_error(L, "not under warp guild war between guild %d %d", gid1, gid2);
 			return 0;
@@ -475,7 +475,7 @@ namespace quest
 
 	int32_t pc_give_item_from_special_item_group(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -523,7 +523,7 @@ namespace quest
 
 	int32_t pc_enough_inventory(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -536,7 +536,7 @@ namespace quest
 		}
 
 		uint32_t item_vnum = (uint32_t)lua_tonumber(L, 1);
-		TItemTable* pTable = ITEM_MANAGER::instance().GetTable(item_vnum);
+		TItemTable* pTable = ITEM_MANAGER::Instance().GetTable(item_vnum);
 		if (!pTable) {
 			lua_pushboolean(L, false);
 			return 1;
@@ -549,14 +549,14 @@ namespace quest
 
 	int32_t pc_give_item(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -574,7 +574,7 @@ namespace quest
 		{
 			dwVnum = (uint32_t)lua_tonumber(L, 2);
 		}
-		else if (!ITEM_MANAGER::instance().GetVnum(lua_tostring(L, 2), dwVnum))
+		else if (!ITEM_MANAGER::Instance().GetVnum(lua_tostring(L, 2), dwVnum))
 		{
 			sys_err("QUEST Make item call error : wrong item name : %s", lua_tostring(L,1));
 			return 0;
@@ -601,14 +601,14 @@ namespace quest
 
 	int32_t pc_give_or_drop_item(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -627,7 +627,7 @@ namespace quest
 		{
 			dwVnum = (uint32_t)lua_tonumber(L, 1);
 		}
-		else if (!ITEM_MANAGER::instance().GetVnum(lua_tostring(L, 1), dwVnum))
+		else if (!ITEM_MANAGER::Instance().GetVnum(lua_tostring(L, 1), dwVnum))
 		{
 			sys_err("QUEST Make item call error : wrong item name : %s", lua_tostring(L,1));
 			lua_pushnumber (L, 0);
@@ -674,14 +674,14 @@ namespace quest
 	#ifdef ENABLE_DICE_SYSTEM
 	int32_t pc_give_or_drop_item_with_dice(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -700,7 +700,7 @@ namespace quest
 		{
 			dwVnum = static_cast<uint32_t>(lua_tonumber(L, 1));
 		} 
-		else if (!ITEM_MANAGER::instance().GetVnum(lua_tostring(L, 1), dwVnum))
+		else if (!ITEM_MANAGER::Instance().GetVnum(lua_tostring(L, 1), dwVnum))
 		{
 			sys_err("QUEST Make item call error : wrong item name : %s", lua_tostring(L, 1));
 			lua_pushnumber(L, 0);
@@ -746,14 +746,14 @@ namespace quest
 
 	int32_t pc_give_or_drop_item_and_select(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -771,7 +771,7 @@ namespace quest
 		{
 			dwVnum = (uint32_t)lua_tonumber(L, 1);
 		}
-		else if (!ITEM_MANAGER::instance().GetVnum(lua_tostring(L, 1), dwVnum))
+		else if (!ITEM_MANAGER::Instance().GetVnum(lua_tostring(L, 1), dwVnum))
 		{
 			sys_err("QUEST Make item call error : wrong item name : %s", lua_tostring(L,1));
 			return 0;
@@ -803,7 +803,7 @@ namespace quest
 		}
 
 		CQuestManager::Instance().SetCurrentItem(item);
-		CQuestManager::instance().UpdateStateItem(ch, item);
+		CQuestManager::Instance().UpdateStateItem(ch, item);
 
 		if ((dwVnum >= 80003 && dwVnum <= 80007) ||
 			(dwVnum >= 80018 && dwVnum <= 80020))
@@ -816,7 +816,7 @@ namespace quest
 
 	int32_t pc_get_current_map_index(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -829,7 +829,7 @@ namespace quest
 
 	int32_t pc_get_x(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -842,7 +842,7 @@ namespace quest
 
 	int32_t pc_get_y(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -855,14 +855,14 @@ namespace quest
 
 	int32_t pc_get_local_x(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(ch->GetMapIndex());
+		LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(ch->GetMapIndex());
 
 		if (pMap)
 			lua_pushnumber(L, (ch->GetX() - pMap->m_setting.iBaseX) / 100);
@@ -874,14 +874,14 @@ namespace quest
 
 	int32_t pc_get_local_y(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(ch->GetMapIndex());
+		LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(ch->GetMapIndex());
 
 		if (pMap)
 			lua_pushnumber(L, (ch->GetY() - pMap->m_setting.iBaseY) / 100);
@@ -893,7 +893,7 @@ namespace quest
 
 	int32_t pc_count_item(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -907,7 +907,7 @@ namespace quest
 		else if (lua_isstring(L, -1)) 
 		{
 			uint32_t item_vnum = 0;
-			if (!ITEM_MANAGER::instance().GetVnum(lua_tostring(L, 1), item_vnum)) 
+			if (!ITEM_MANAGER::Instance().GetVnum(lua_tostring(L, 1), item_vnum)) 
 			{
 				sys_err("QUEST count_item call error : wrong item name : %s", lua_tostring(L, 1));
 				lua_pushnumber(L, 0);
@@ -927,7 +927,7 @@ namespace quest
 
 	int32_t pc_find_first_item(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -953,7 +953,7 @@ namespace quest
 
 	int32_t pc_remove_item(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -970,7 +970,7 @@ namespace quest
 			}
 			else if (lua_isstring(L,1))
 			{
-				if (!ITEM_MANAGER::instance().GetVnum(lua_tostring(L,1), item_vnum))
+				if (!ITEM_MANAGER::Instance().GetVnum(lua_tostring(L,1), item_vnum))
 				{
 					sys_err("QUEST remove_item call error : wrong item name : %s", lua_tostring(L,1));
 					return 0;
@@ -995,7 +995,7 @@ namespace quest
 			}
 			else if (lua_isstring(L, 1))
 			{
-				if (!ITEM_MANAGER::instance().GetVnum(lua_tostring(L,1), item_vnum))
+				if (!ITEM_MANAGER::Instance().GetVnum(lua_tostring(L,1), item_vnum))
 				{
 					sys_err("QUEST remove_item call error : wrong item name : %s", lua_tostring(L,1));
 					return 0;
@@ -1028,7 +1028,7 @@ namespace quest
 
 	int32_t pc_get_leadership(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1041,7 +1041,7 @@ namespace quest
 
 	int32_t pc_reset_point(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1054,7 +1054,7 @@ namespace quest
 
 	int32_t pc_get_playtime(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1067,7 +1067,7 @@ namespace quest
 
 	int32_t pc_get_vid(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1079,7 +1079,7 @@ namespace quest
 	}
 	int32_t pc_get_name(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1092,7 +1092,7 @@ namespace quest
 
 	int32_t pc_get_next_exp(lua_State* L)  
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1105,7 +1105,7 @@ namespace quest
 
 	int32_t pc_get_exp(lua_State* L)  
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1118,7 +1118,7 @@ namespace quest
 
 	int32_t pc_get_race(lua_State* L)  
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1131,7 +1131,7 @@ namespace quest
 
 	int32_t pc_change_sex(lua_State* L)  
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1144,7 +1144,7 @@ namespace quest
 
 	int32_t pc_get_job(lua_State* L)  
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1157,7 +1157,7 @@ namespace quest
 
 	int32_t pc_get_max_sp(lua_State* L)  
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1170,7 +1170,7 @@ namespace quest
 
 	int32_t pc_get_sp(lua_State * L)  
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1183,7 +1183,7 @@ namespace quest
 
 	int32_t pc_change_sp(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1226,7 +1226,7 @@ namespace quest
 
 	int32_t pc_get_max_hp(lua_State * L)  
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1239,7 +1239,7 @@ namespace quest
 
 	int32_t pc_get_hp(lua_State * L)  
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1252,7 +1252,7 @@ namespace quest
 
 	int32_t pc_get_level(lua_State * L)  
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1265,14 +1265,14 @@ namespace quest
 
 	int32_t pc_set_level(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1313,7 +1313,7 @@ namespace quest
 
 	int32_t pc_get_weapon(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1331,7 +1331,7 @@ namespace quest
 
 	int32_t pc_get_armor(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1349,7 +1349,7 @@ namespace quest
 
 	int32_t pc_get_wear(lua_State * L)
 	{		
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1375,7 +1375,7 @@ namespace quest
 
 	int32_t pc_get_money(lua_State * L)
 	{ 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1386,11 +1386,11 @@ namespace quest
 		return 1;
 	}
 
-	// 20050725.myevan.은둔의 망토 사용중 혼석 수련시 선악치가 두배 소모되는 버그가 발생해
+	// 은둔의 망토 사용중 혼석 수련시 선악치가 두배 소모되는 버그가 발생해
 	// 실제 선악치를 이용해 계산을 하게 한다.
 	int32_t pc_get_real_alignment(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1403,7 +1403,7 @@ namespace quest
 
 	int32_t pc_get_alignment(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1416,7 +1416,7 @@ namespace quest
 
 	int32_t pc_change_alignment(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1437,7 +1437,7 @@ namespace quest
 
 	int32_t pc_change_money(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1455,7 +1455,7 @@ namespace quest
 			sys_err("QUEST wrong ChangeGold %d (now %d)", gold, ch->GetGold());
 		else
 		{
-			LogManager::instance().MoneyLog(MONEY_LOG_QUEST, ch->GetPlayerID(), gold);
+			LogManager::Instance().MoneyLog(MONEY_LOG_QUEST, ch->GetPlayerID(), gold);
 			ch->PointChange(POINT_GOLD, gold, true);
 		}
 		return 0;
@@ -1463,7 +1463,7 @@ namespace quest
 
 	int32_t pc_set_another_quest_flag(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1484,7 +1484,7 @@ namespace quest
 
 	int32_t pc_get_another_quest_flag(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1506,7 +1506,7 @@ namespace quest
 
 	int32_t pc_get_flag(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1526,7 +1526,7 @@ namespace quest
 
 	int32_t pc_get_quest_flag(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1549,7 +1549,7 @@ namespace quest
 
 	int32_t pc_set_flag(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1569,7 +1569,7 @@ namespace quest
 
 	int32_t pc_set_quest_flag(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1589,7 +1589,7 @@ namespace quest
 
 	int32_t pc_del_quest_flag(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1609,14 +1609,14 @@ namespace quest
 
 	int32_t pc_give_exp2(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1638,14 +1638,14 @@ namespace quest
 
 	int32_t pc_give_exp(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1666,14 +1666,14 @@ namespace quest
 
 	int32_t pc_give_exp_perc(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1710,7 +1710,7 @@ namespace quest
 
 	int32_t pc_get_empire(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			lua_pushnil(L);
@@ -1723,7 +1723,7 @@ namespace quest
 
 	int32_t pc_get_part(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1742,7 +1742,7 @@ namespace quest
 
 	int32_t pc_set_part(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1762,7 +1762,7 @@ namespace quest
 
 	int32_t pc_get_skillgroup(lua_State* L)  
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1775,7 +1775,7 @@ namespace quest
 
 	int32_t pc_set_skillgroup(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1796,7 +1796,7 @@ namespace quest
 
 	int32_t pc_is_polymorphed(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1808,7 +1808,7 @@ namespace quest
 
 	int32_t pc_remove_polymorph(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1822,7 +1822,7 @@ namespace quest
 
 	int32_t pc_polymorph(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1848,7 +1848,7 @@ namespace quest
 
 	int32_t pc_is_mount(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1863,7 +1863,7 @@ namespace quest
 
 	int32_t pc_mount(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1963,7 +1963,7 @@ namespace quest
 
 	int32_t pc_mount_bonus(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -1994,7 +1994,7 @@ namespace quest
 
 	int32_t pc_unmount(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2009,7 +2009,7 @@ namespace quest
 
 	int32_t pc_get_horse_level(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2021,7 +2021,7 @@ namespace quest
 
 	int32_t pc_get_horse_hp(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2037,7 +2037,7 @@ namespace quest
 
 	int32_t pc_get_horse_stamina(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2053,7 +2053,7 @@ namespace quest
 
 	int32_t pc_is_horse_alive(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2065,7 +2065,7 @@ namespace quest
 
 	int32_t pc_revive_horse(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2077,7 +2077,7 @@ namespace quest
 
 	int32_t pc_have_map_scroll(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2093,7 +2093,7 @@ namespace quest
 		}
 		const char* szMapName = lua_tostring(L, 1);
 
-		auto region = SECTREE_MANAGER::instance().FindRegionByPartialName(szMapName);
+		auto region = SECTREE_MANAGER::Instance().FindRegionByPartialName(szMapName);
 		if (!region) 
 		{
 			lua_pushboolean(L, false);
@@ -2128,7 +2128,7 @@ namespace quest
 
 	int32_t pc_get_war_map(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2140,7 +2140,7 @@ namespace quest
 
 	int32_t pc_have_pos_scroll(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2193,7 +2193,7 @@ namespace quest
 
 	int32_t pc_get_equip_refine_level(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2230,7 +2230,7 @@ namespace quest
 
 	int32_t pc_refine_equip(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2274,7 +2274,7 @@ namespace quest
 		{
 			lua_pushboolean(L, true);
 
-			CItem* pkNewItem = ITEM_MANAGER::instance().CreateItem(item->GetRefinedVnum(), 1, 0, false);
+			CItem* pkNewItem = ITEM_MANAGER::Instance().CreateItem(item->GetRefinedVnum(), 1, 0, false);
 			if (pkNewItem) 
 			{
 				for (int32_t i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
@@ -2297,11 +2297,11 @@ namespace quest
 
 				item->CopyAttributeTo(pkNewItem);
 
-				ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE SUCCESS)");
+				ITEM_MANAGER::Instance().RemoveItem(item, "REMOVE (REFINE SUCCESS)");
 
 				pkNewItem->EquipTo(ch, cell);
 
-				ITEM_MANAGER::instance().FlushDelayedSave(pkNewItem);
+				ITEM_MANAGER::Instance().FlushDelayedSave(pkNewItem);
 
 				LogManager::Instance().ItemLog(ch, pkNewItem, "REFINE SUCCESS (QUEST)", pkNewItem->GetName());
 			}
@@ -2314,7 +2314,7 @@ namespace quest
 
 	int32_t pc_get_skill_level(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2338,7 +2338,7 @@ namespace quest
 
 	int32_t pc_aggregate_monster(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2350,7 +2350,7 @@ namespace quest
 
 	int32_t pc_forget_my_attacker(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2362,7 +2362,7 @@ namespace quest
 
 	int32_t pc_attract_ranger(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2383,7 +2383,7 @@ namespace quest
 		}
 		uint32_t pid = (uint32_t)lua_tonumber(L, 1);
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2395,7 +2395,7 @@ namespace quest
 		CHARACTER* new_ch = CHARACTER_MANAGER::Instance().FindByPID(pid);
 		if (new_ch) 
 		{
-			CQuestManager::instance().GetPC(new_ch->GetPlayerID());
+			CQuestManager::Instance().GetPC(new_ch->GetPlayerID());
 
 			lua_pushnumber(L, ch->GetPlayerID());
 			return 1;
@@ -2416,7 +2416,7 @@ namespace quest
 		}
 		uint32_t vid = (uint32_t)lua_tonumber(L, 1);
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2428,7 +2428,7 @@ namespace quest
 		CHARACTER* new_ch = CHARACTER_MANAGER::Instance().Find(vid);
 		if (new_ch) 
 		{
-			CQuestManager::instance().GetPC(new_ch->GetPlayerID());
+			CQuestManager::Instance().GetPC(new_ch->GetPlayerID());
 
 			lua_pushnumber(L, (uint32_t)ch->GetVID());
 			return 1;
@@ -2440,7 +2440,7 @@ namespace quest
 
 	int32_t pc_get_sex(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2452,43 +2452,43 @@ namespace quest
 
 	int32_t pc_is_engaged(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
-		lua_pushboolean(L, marriage::CManager::instance().IsEngaged(ch->GetPlayerID()));
+		lua_pushboolean(L, marriage::CManager::Instance().IsEngaged(ch->GetPlayerID()));
 		return 1;
 	}
 
 	int32_t pc_is_married(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
-		lua_pushboolean(L, marriage::CManager::instance().IsMarried(ch->GetPlayerID()));
+		lua_pushboolean(L, marriage::CManager::Instance().IsMarried(ch->GetPlayerID()));
 		return 1;
 	}
 
 	int32_t pc_is_engaged_or_married(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
-		lua_pushboolean(L, marriage::CManager::instance().IsEngagedOrMarried(ch->GetPlayerID()));
+		lua_pushboolean(L, marriage::CManager::Instance().IsEngagedOrMarried(ch->GetPlayerID()));
 		return 1;
 	}
 
 	int32_t pc_is_gm(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2500,7 +2500,7 @@ namespace quest
 
 	int32_t pc_get_gm_level(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2512,14 +2512,14 @@ namespace quest
 
 	int32_t pc_mining(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		CHARACTER* npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
+		CHARACTER* npc = CQuestManager::Instance().GetCurrentNPCCharacterPtr();
 		if (!npc)
 		{
 			sys_err("Null npc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2540,9 +2540,9 @@ namespace quest
 		int32_t cost = (int32_t)lua_tonumber(L, 1);
 		int32_t pct = (int32_t)lua_tonumber(L, 2);
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		CHARACTER* npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
-		CItem* item = CQuestManager::instance().GetCurrentItem();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
+		CHARACTER* npc = CQuestManager::Instance().GetCurrentNPCCharacterPtr();
+		CItem* item = CQuestManager::Instance().GetCurrentItem();
 
 		if (ch && npc && item)
 		{
@@ -2565,9 +2565,9 @@ namespace quest
 		int32_t pct = (int32_t)lua_tonumber(L, 2);
 		int32_t metinstone_cell = (int32_t)lua_tonumber(L, 3);
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		CHARACTER* npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
-		CItem* item = CQuestManager::instance().GetCurrentItem();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
+		CHARACTER* npc = CQuestManager::Instance().GetCurrentNPCCharacterPtr();
+		CItem* item = CQuestManager::Instance().GetCurrentItem();
 
 		if (ch && npc && item)
 		{
@@ -2582,7 +2582,7 @@ namespace quest
 
 	int32_t pc_clear_skill(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2595,7 +2595,7 @@ namespace quest
 
 	int32_t pc_clear_sub_skill(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2608,7 +2608,7 @@ namespace quest
 
 	int32_t pc_set_skill_point(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2633,7 +2633,7 @@ namespace quest
 	// RESET_ONE_SKILL	
 	int32_t pc_clear_one_skill(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2657,7 +2657,7 @@ namespace quest
 
 	int32_t pc_is_clear_skill_group(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2670,7 +2670,7 @@ namespace quest
 
 	int32_t pc_save_exit_location(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2684,7 +2684,7 @@ namespace quest
 	//텔레포트 
 	int32_t pc_teleport ( lua_State * L )
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2724,11 +2724,11 @@ namespace quest
 		{
 			const char * arg1 = lua_tostring(L, 1);
 
-			LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(arg1);
+			LPCHARACTER tch = CHARACTER_MANAGER::Instance().FindPC(arg1);
 
 			if (!tch)
 			{
-				auto cci = P2P_MANAGER::instance().Find(arg1);
+				auto cci = P2P_MANAGER::Instance().Find(arg1);
 				if (cci) 
 				{
 					if (cci->bChannel != g_bChannel) 
@@ -2738,7 +2738,7 @@ namespace quest
 					else 
 					{
 						GPOS pos;
-						if (!SECTREE_MANAGER::instance().GetCenterPositionOfMap(cci->lMapIndex, pos)) 
+						if (!SECTREE_MANAGER::Instance().GetCenterPositionOfMap(cci->lMapIndex, pos)) 
 						{
 							ch->ChatPacket(CHAT_TYPE_INFO, "Cannot find map (index %d)", cci->lMapIndex);
 						} 
@@ -2750,7 +2750,7 @@ namespace quest
 						}
 					}
 				} 
-				else if (nullptr == CHARACTER_MANAGER::instance().FindPC(arg1))
+				else if (nullptr == CHARACTER_MANAGER::Instance().FindPC(arg1))
 				{
 					ch->ChatPacket(CHAT_TYPE_INFO, "There is no one by that name");
 				}
@@ -2779,7 +2779,7 @@ teleport_area:
 
 	int32_t pc_set_skill_level(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2802,7 +2802,7 @@ teleport_area:
 
 	int32_t pc_give_polymorph_book(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2815,28 +2815,28 @@ teleport_area:
 			return 0;
 		}
 
-		CPolymorphUtils::instance().GiveBook(ch, (uint32_t)lua_tonumber(L, 1), (uint32_t)lua_tonumber(L, 2), (uint8_t)lua_tonumber(L, 3), (uint8_t)lua_tonumber(L, 4));
+		CPolymorphUtils::Instance().GiveBook(ch, (uint32_t)lua_tonumber(L, 1), (uint32_t)lua_tonumber(L, 2), (uint8_t)lua_tonumber(L, 3), (uint8_t)lua_tonumber(L, 4));
 
 		return 0;
 	}
 
 	int32_t pc_upgrade_polymorph_book(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		CItem* pItem = CQuestManager::instance().GetCurrentItem();
+		CItem* pItem = CQuestManager::Instance().GetCurrentItem();
 		if (!pItem)
 		{
 			sys_err("Null item pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		bool ret = CPolymorphUtils::instance().BookUpgrade(ch, pItem);
+		bool ret = CPolymorphUtils::Instance().BookUpgrade(ch, pItem);
 
 		lua_pushboolean(L, ret);
 		return 1;
@@ -2844,7 +2844,7 @@ teleport_area:
 
 	int32_t pc_get_premium_remain_sec(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2882,7 +2882,7 @@ teleport_area:
 
 	int32_t pc_send_block_mode(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2895,7 +2895,7 @@ teleport_area:
 
 	int32_t pc_change_empire(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2916,7 +2916,7 @@ teleport_area:
 
 	int32_t pc_get_change_empire_count(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2929,7 +2929,7 @@ teleport_area:
 
 	int32_t pc_set_change_empire_count(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2942,7 +2942,7 @@ teleport_area:
 	
 	int32_t pc_change_name(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -2971,7 +2971,7 @@ teleport_area:
 
 		char szQuery[1024];
 		snprintf(szQuery, sizeof(szQuery), "SELECT COUNT(*) FROM player WHERE name='%s'", szName);
-		std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> pmsg(DBManager::Instance().DirectQuery(szQuery));
 
 		if ( pmsg->Get()->uiNumRows > 0 )
 		{
@@ -2993,13 +2993,13 @@ teleport_area:
 		db_clientdesc->Packet(&pid, sizeof(uint32_t));
 
 		/* delete messenger list */
-		MessengerManager::instance().RemoveAllList(ch->GetName());
+		MessengerManager::Instance().RemoveAllList(ch->GetName());
 
 		/* change_name_log */
 		LogManager::Instance().ChangeNameLog(pid, ch->GetName(), szName, ch->GetDesc()->GetHostName());
 
 		snprintf(szQuery, sizeof(szQuery), "UPDATE player SET name='%s' WHERE id=%u", szName, pid);
-		std::unique_ptr<SQLMsg> pmsg2(DBManager::instance().DirectQuery(szQuery));
+		std::unique_ptr<SQLMsg> pmsg2(DBManager::Instance().DirectQuery(szQuery));
 
 		ch->SetNewName(szName);
 
@@ -3009,7 +3009,7 @@ teleport_area:
 
 	int32_t pc_is_dead(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (ch) 
 		{
 			lua_pushboolean(L, ch->IsDead());
@@ -3022,7 +3022,7 @@ teleport_area:
 
 	int32_t pc_reset_status( lua_State* L )
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3121,7 +3121,7 @@ teleport_area:
 
 	int32_t pc_get_ht( lua_State* L )
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3134,7 +3134,7 @@ teleport_area:
 
 	int32_t pc_set_ht( lua_State* L )
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3157,7 +3157,7 @@ teleport_area:
 
 	int32_t pc_get_iq( lua_State* L )
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3170,7 +3170,7 @@ teleport_area:
 
 	int32_t pc_set_iq( lua_State* L )
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3193,7 +3193,7 @@ teleport_area:
 	
 	int32_t pc_get_st( lua_State* L )
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3206,7 +3206,7 @@ teleport_area:
 
 	int32_t pc_set_st( lua_State* L )
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3228,7 +3228,7 @@ teleport_area:
 	
 	int32_t pc_get_dx( lua_State* L )
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3241,7 +3241,7 @@ teleport_area:
 
 	int32_t pc_set_dx( lua_State* L )
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3266,7 +3266,7 @@ teleport_area:
 
 	int32_t pc_is_near_vid( lua_State* L )
 	{
-		CHARACTER* pMe = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* pMe = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!pMe)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3296,7 +3296,7 @@ teleport_area:
 
 	int32_t pc_get_socket_items( lua_State* L )
 	{
-		CHARACTER* pChar = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* pChar = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!pChar)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3320,7 +3320,7 @@ teleport_area:
 
 						if (socket > 2 && socket != ITEM_BROKEN_METIN_VNUM) 
 						{
-							TItemTable* pItemInfo = ITEM_MANAGER::instance().GetTable(socket);
+							TItemTable* pItemInfo = ITEM_MANAGER::Instance().GetTable(socket);
 							if (pItemInfo) 
 							{
 								if (pItemInfo->bType == ITEM_METIN)
@@ -3352,7 +3352,7 @@ teleport_area:
 
 	int32_t pc_get_empty_inventory_count(lua_State* L)
 	{
-		CHARACTER* pChar = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* pChar = CQuestManager::Instance().GetCurrentCharacterPtr();
 
 		if (pChar)
 			lua_pushnumber(L, pChar->CountEmptyInventory());
@@ -3364,7 +3364,7 @@ teleport_area:
 
 	int32_t pc_get_logoff_interval(lua_State* L)
 	{
-		CHARACTER* pChar = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* pChar = CQuestManager::Instance().GetCurrentCharacterPtr();
 
 		if (pChar) 
 			lua_pushnumber(L, pChar->GetLogOffInterval());
@@ -3376,7 +3376,7 @@ teleport_area:
 
 	int32_t pc_get_player_id( lua_State* L )
 	{
-		CHARACTER* pChar = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* pChar = CQuestManager::Instance().GetCurrentCharacterPtr();
 
 		if (pChar)
 			lua_pushnumber(L, pChar->GetPlayerID());
@@ -3388,7 +3388,7 @@ teleport_area:
 
 	int32_t pc_get_account_id( lua_State* L )
 	{
-		CHARACTER* pChar = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* pChar = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!pChar)
 		{
 			lua_pushnumber(L, 0);
@@ -3407,7 +3407,7 @@ teleport_area:
 
 	int32_t pc_get_account( lua_State* L )
 	{
-		CHARACTER* pChar = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* pChar = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!pChar)
 		{
 			lua_pushstring(L, "");
@@ -3426,7 +3426,7 @@ teleport_area:
 
 	int32_t pc_is_riding(lua_State* L)
 	{
-		CHARACTER* pChar = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* pChar = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!pChar)
 		{
 			lua_pushboolean(L, false);
@@ -3441,7 +3441,7 @@ teleport_area:
 
 	int32_t pc_get_special_ride_vnum(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3472,7 +3472,7 @@ teleport_area:
 
 	int32_t pc_can_warp(lua_State* L)
 	{
-		CHARACTER* pChar = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* pChar = CQuestManager::Instance().GetCurrentCharacterPtr();
 
 		if (pChar)
 			lua_pushboolean(L, pChar->CanWarp());
@@ -3484,7 +3484,7 @@ teleport_area:
 
 	int32_t pc_dec_skill_point(lua_State* L)
 	{
-		CHARACTER* pChar = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* pChar = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (pChar)
 			pChar->PointChange(POINT_SKILL, -1);
 
@@ -3493,7 +3493,7 @@ teleport_area:
 
 	int32_t pc_get_skill_point(lua_State* L)
 	{
-		CHARACTER* pChar = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* pChar = CQuestManager::Instance().GetCurrentCharacterPtr();
 
 		if (pChar)
 			lua_pushnumber(L, static_cast<int32_t>(pChar->GetPoint(POINT_SKILL)));
@@ -3512,14 +3512,14 @@ teleport_area:
 
 	int32_t pc_give_poly_marble(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3533,7 +3533,7 @@ teleport_area:
 		}
 		int32_t dwVnum = (int32_t)lua_tonumber(L, 1);
 
-		auto pMobInfo = CMobManager::instance().Get(dwVnum);
+		auto pMobInfo = CMobManager::Instance().Get(dwVnum);
 		if (!pMobInfo)
 		{
 			lua_pushboolean(L, false);
@@ -3546,7 +3546,7 @@ teleport_area:
 			return 1;
 		}
 
-		auto item = ITEM_MANAGER::instance().CreateItem(pMobInfo->m_table.dwPolymorphItemVnum);
+		auto item = ITEM_MANAGER::Instance().CreateItem(pMobInfo->m_table.dwPolymorphItemVnum);
 		if (!item) 
 		{
 			lua_pushboolean(L, false);
@@ -3573,7 +3573,7 @@ teleport_area:
 
 	int32_t pc_get_sig_items (lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3602,7 +3602,7 @@ teleport_area:
 
 	int32_t pc_charge_cash(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3646,7 +3646,7 @@ teleport_area:
 
 	int32_t pc_give_award(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3673,7 +3673,7 @@ teleport_area:
 
 		sys_log(0, "QUEST [award] item %d to login %s", dwVnum, desc->GetAccountTable().login);
 
-		DBManager::instance().Query(
+		DBManager::Instance().Query(
 			"INSERT INTO item_award (login, vnum, count, given_time, why, "
 			"mall)select '%s', %d, %d, now(), '%s', 1 from DUAL where not exists "
 			"(select login, why from item_award where login = '%s' and why  = "
@@ -3688,7 +3688,7 @@ teleport_area:
 	}
 	int32_t pc_give_award_socket(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3715,7 +3715,7 @@ teleport_area:
 
 		sys_log(0, "QUEST [award] item %d to login %s", dwVnum, desc->GetAccountTable().login);
 
-		DBManager::instance().Query(
+		DBManager::Instance().Query(
 			"INSERT INTO item_award (login, vnum, count, given_time, why, mall, "
 			"socket0, socket1, socket2)select '%s', %d, %d, now(), '%s', 1, %s, "
 			"%s, %s from DUAL where not exists (select login, why from item_award "
@@ -3731,7 +3731,7 @@ teleport_area:
 
 	int32_t pc_get_informer_type(lua_State* L)	//독일 선물 기능
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3746,7 +3746,7 @@ teleport_area:
 
 	int32_t pc_get_informer_item(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3761,7 +3761,7 @@ teleport_area:
 
 	int32_t pc_get_killee_drop_pct(lua_State* L)
 	{
-		CHARACTER* pChar = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* pChar = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!pChar)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3779,7 +3779,7 @@ teleport_area:
 		}
 
 		int32_t iDeltaPercent, iRandRange;
-		if (!ITEM_MANAGER::instance().GetDropPct(pKillee, pChar, iDeltaPercent, iRandRange))
+		if (!ITEM_MANAGER::Instance().GetDropPct(pKillee, pChar, iDeltaPercent, iRandRange))
 		{
 			sys_err("GetDropPct fail");
 
@@ -3797,7 +3797,7 @@ teleport_area:
 
 	int32_t pc_specific_effect(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3812,7 +3812,7 @@ teleport_area:
 
 	int32_t pc_start_duel(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3845,8 +3845,8 @@ teleport_area:
 			return 1;
 		}
 
-		CPVPManager::instance().Insert(ch, pkVictim);
-		CPVPManager::instance().Insert(pkVictim, ch);
+		CPVPManager::Instance().Insert(ch, pkVictim);
+		CPVPManager::Instance().Insert(pkVictim, ch);
 
 		lua_pushnumber(L, 0);
 		return 1;
@@ -3854,7 +3854,7 @@ teleport_area:
 
 	int32_t pc_stun_player(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3880,7 +3880,7 @@ teleport_area:
 	int32_t pc_acce_open_combine(lua_State* L)
 	{
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3903,7 +3903,7 @@ teleport_area:
 	int32_t pc_acce_open_absorb(lua_State* L)
 	{
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3925,7 +3925,7 @@ teleport_area:
 
 	int32_t pc_reencode_view(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3938,7 +3938,7 @@ teleport_area:
 
 	int32_t pc_get_mount_vnum(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -3951,7 +3951,7 @@ teleport_area:
 
 	int32_t pc_get_point(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			lua_pushnumber(L, 0);
@@ -3981,7 +3981,7 @@ teleport_area:
 
 	int32_t pc_get_real_point(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4011,7 +4011,7 @@ teleport_area:
 
 	int32_t pc_disconnect_with_delay(lua_State * L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4033,7 +4033,7 @@ teleport_area:
 
 	int32_t pc_get_ip(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 			return 0;
 
@@ -4046,7 +4046,7 @@ teleport_area:
 
 	int32_t pc_kill(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 			return 0;
 
@@ -4063,14 +4063,14 @@ teleport_area:
 		}
 		int32_t val = (int32_t)lua_tonumber(L, 1);
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		std::unique_ptr<SQLMsg> pmsg(DBManager::instance().DirectQuery("UPDATE account.account SET coins = coins + '%ld' WHERE id = '%d'", val, ch->GetAID()));
+		std::unique_ptr<SQLMsg> pmsg(DBManager::Instance().DirectQuery("UPDATE account.account SET coins = coins + '%ld' WHERE id = '%d'", val, ch->GetAID()));
 		if (pmsg->uiSQLErrno != 0)
 		{
 			sys_err("pc_update_coins query failed");
@@ -4082,7 +4082,7 @@ teleport_area:
 
 	int32_t pc_get_empire_name(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4098,7 +4098,7 @@ teleport_area:
 
 	int32_t pc_set_race(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4146,7 +4146,7 @@ teleport_area:
 
 	int32_t pc_del_another_quest_flag(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4167,7 +4167,7 @@ teleport_area:
 
 	int32_t pc_pointchange(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4186,7 +4186,7 @@ teleport_area:
 
 	int32_t pc_pullmob(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4199,7 +4199,7 @@ teleport_area:
 
 	int32_t pc_set_level2(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4221,7 +4221,7 @@ teleport_area:
 
 	int32_t pc_set_gm_level(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4234,7 +4234,7 @@ teleport_area:
 
 	int32_t pc_if_fire(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4246,7 +4246,7 @@ teleport_area:
 	}
 	int32_t pc_if_invisible(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4258,7 +4258,7 @@ teleport_area:
 	}
 	int32_t pc_if_poison(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4270,7 +4270,7 @@ teleport_area:
 	}
 	int32_t pc_if_slow(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4282,7 +4282,7 @@ teleport_area:
 	}
 	int32_t pc_if_stun(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4295,7 +4295,7 @@ teleport_area:
 
 	int32_t pc_sf_fire(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4318,7 +4318,7 @@ teleport_area:
 
 	int32_t pc_sf_invisible(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4341,7 +4341,7 @@ teleport_area:
 
 	int32_t pc_sf_poison(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4364,7 +4364,7 @@ teleport_area:
 
 	int32_t pc_sf_slow(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4386,7 +4386,7 @@ teleport_area:
 	}
 	int32_t pc_sf_stun(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4409,7 +4409,7 @@ teleport_area:
 
 	int32_t pc_open_shop(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4430,7 +4430,7 @@ teleport_area:
 		}
 		//END_PREVENT_TRADE_WINDOW
 
-		LPSHOP sh = CShopManager::instance().Get((uint32_t)lua_tonumber(L, 1)); 
+		LPSHOP sh = CShopManager::Instance().Get((uint32_t)lua_tonumber(L, 1)); 
 		if (sh)
 		{
 			sh->AddGuest(ch, 0, false);
@@ -4441,7 +4441,7 @@ teleport_area:
 
 	int32_t pc_sf_kill(lua_State* L)
 	{
-		CHARACTER* ch = CHARACTER_MANAGER::instance().FindPC(lua_tostring(L, 1));
+		CHARACTER* ch = CHARACTER_MANAGER::Instance().FindPC(lua_tostring(L, 1));
 		if (ch)
 			ch->Dead(0, 0);
 
@@ -4450,7 +4450,7 @@ teleport_area:
 
 	int32_t pc_sf_dead(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4475,7 +4475,7 @@ teleport_area:
 
 	int32_t pc_set_max_health(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4489,7 +4489,7 @@ teleport_area:
 
 	int32_t pc_dc_delayed(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4506,7 +4506,7 @@ teleport_area:
 
 	int32_t pc_dc_direct(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 			return 0;
 
@@ -4522,7 +4522,7 @@ teleport_area:
 
 	int32_t pc_is_trade(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4535,7 +4535,7 @@ teleport_area:
 
 	int32_t pc_is_busy(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4548,7 +4548,7 @@ teleport_area:
 
 	int32_t pc_is_arena(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4561,7 +4561,7 @@ teleport_area:
 
 	int32_t pc_is_arena_observer(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4574,7 +4574,7 @@ teleport_area:
 
 	int32_t pc_equip_slot(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4597,7 +4597,7 @@ teleport_area:
 
 	int32_t pc_unequip_slot(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4624,7 +4624,7 @@ teleport_area:
 			return 0;
 		int32_t iForceCheck = (int32_t)lua_tonumber(L, 1);
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!iForceCheck)
 			lua_pushboolean(L, ch != nullptr);
 		else
@@ -4635,14 +4635,14 @@ teleport_area:
 
 	int32_t pc_is_pvp(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		CHARACTER* npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
+		CHARACTER* npc = CQuestManager::Instance().GetCurrentNPCCharacterPtr();
 		if (!npc) 
 		{
 			sys_err("Null npc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4656,7 +4656,7 @@ teleport_area:
 		}
 
 		CPVP kPVP(ch->GetPlayerID(), npc->GetPlayerID());
-		CPVP * pkPVP = CPVPManager::instance().Find(kPVP.GetCRC());
+		CPVP * pkPVP = CPVPManager::Instance().Find(kPVP.GetCRC());
 
 		if (!pkPVP || !pkPVP->IsFight())
 		{
@@ -4670,7 +4670,7 @@ teleport_area:
 
 	int32_t pc_costume_hide(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4704,7 +4704,7 @@ teleport_area:
 
 	int32_t pc_set_observer_mode(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4717,7 +4717,7 @@ teleport_area:
 
 	int32_t pc_get_real_x(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4730,7 +4730,7 @@ teleport_area:
 
 	int32_t pc_get_real_y(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4743,7 +4743,7 @@ teleport_area:
 
 	int32_t pc_get_quest_data(lua_State* L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4760,7 +4760,7 @@ teleport_area:
 
 	int32_t pc_find_item_select(lua_State* L)
 	{
-		LPCHARACTER ch = quest::CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = quest::CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch || !lua_isnumber(L, 1)) 
 		{
 			return 0;
@@ -4773,14 +4773,14 @@ teleport_area:
 			return 1;
 		}
 
-		quest::CQuestManager::instance().SetCurrentItem(item);
+		quest::CQuestManager::Instance().SetCurrentItem(item);
 		lua_pushboolean(L, true);
 		return 1;
 	}
 
 	int32_t pc_damage(lua_State* L)
 	{
-		CHARACTER* ch = quest::CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = quest::CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4794,7 +4794,7 @@ teleport_area:
 		uint32_t vid = (uint32_t)lua_tonumber(L, 1);
 		int32_t dam = (int32_t)lua_tonumber(L, 2);
 
-		CHARACTER* pkVictim = CHARACTER_MANAGER::instance().Find(vid);
+		CHARACTER* pkVictim = CHARACTER_MANAGER::Instance().Find(vid);
 		if (pkVictim)
 			pkVictim->Damage(ch, dam, DAMAGE_TYPE_NORMAL);
 
@@ -4803,7 +4803,7 @@ teleport_area:
 
 	int32_t pc_pickup_item(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!lua_isnumber(L, 1) || !ch) 
 		{
 			lua_pushboolean(L, false);
@@ -4820,7 +4820,7 @@ teleport_area:
 
 	int32_t pc_get_damage(lua_State* L)
 	{
-		LPCHARACTER pc = quest::CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER pc = quest::CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!pc)
 		{
 			lua_pushnumber(L, 0);
@@ -4874,7 +4874,7 @@ teleport_area:
 
 	int32_t pc_set_hp(lua_State* L)
 	{
-		LPCHARACTER ch = quest::CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = quest::CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4890,7 +4890,7 @@ teleport_area:
 
 	int32_t pc_block_exp(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4905,7 +4905,7 @@ teleport_area:
 
 	int32_t pc_unblock_exp(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -4920,14 +4920,14 @@ teleport_area:
 
 	int32_t pc_if_in_duel(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		if (CPVPManager::instance().IsDuelingInstance(ch))
+		if (CPVPManager::Instance().IsDuelingInstance(ch))
 			lua_pushboolean(L, true);
 		else
 			lua_pushboolean(L, false);
@@ -5244,6 +5244,6 @@ teleport_area:
 			{ nullptr,			nullptr			}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("pc", pc_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("pc", pc_functions);
 	}
 };

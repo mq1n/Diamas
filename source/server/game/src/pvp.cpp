@@ -95,7 +95,7 @@ void CPVP::Packet(bool bDelete)
 		}
 	}
 
-	const DESC_MANAGER::DESC_SET & c_rSet = DESC_MANAGER::instance().GetClientSet();
+	const DESC_MANAGER::DESC_SET & c_rSet = DESC_MANAGER::Instance().GetClientSet();
 	DESC_MANAGER::DESC_SET::const_iterator it = c_rSet.begin();
 
 	while (it != c_rSet.end())
@@ -496,7 +496,7 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 		return false;
 
 	{
-		uint8_t bMapEmpire = SECTREE_MANAGER::instance().GetEmpireFromMapIndex(pkChr->GetMapIndex());
+		uint8_t bMapEmpire = SECTREE_MANAGER::Instance().GetEmpireFromMapIndex(pkChr->GetMapIndex());
 
 		if ( ((pkChr->GetPKMode() == PK_MODE_PROTECT) && (pkChr->GetEmpire() == bMapEmpire)) ||
 				((pkVictim->GetPKMode() == PK_MODE_PROTECT) && (pkVictim->GetEmpire() == bMapEmpire)) )
@@ -669,7 +669,7 @@ void CPVPManager::SendList(LPDESC d)
 
 		if (pkPVP->m_players[0].dwVID == dwVID)
 		{
-			LPCHARACTER ch = CHARACTER_MANAGER::instance().Find(pkPVP->m_players[1].dwVID);
+			LPCHARACTER ch = CHARACTER_MANAGER::Instance().Find(pkPVP->m_players[1].dwVID);
 			if (ch && ch->GetDesc())
 			{
 				LPDESC d = ch->GetDesc();
@@ -678,7 +678,7 @@ void CPVPManager::SendList(LPDESC d)
 		}
 		else if (pkPVP->m_players[1].dwVID == dwVID)
 		{
-			LPCHARACTER ch = CHARACTER_MANAGER::instance().Find(pkPVP->m_players[0].dwVID);
+			LPCHARACTER ch = CHARACTER_MANAGER::Instance().Find(pkPVP->m_players[0].dwVID);
 			if (ch && ch->GetDesc())
 			{
 				LPDESC d = ch->GetDesc();

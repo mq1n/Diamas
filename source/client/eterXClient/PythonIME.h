@@ -1,6 +1,5 @@
 #pragma once
-
-#include "../eterBase/Singleton.h"
+#include "../../common/Singleton.h"
 #include "../eterLib/IME.h"
 
 class CPythonIME :

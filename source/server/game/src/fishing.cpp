@@ -332,7 +332,7 @@ int32_t DetermineFish(LPCHARACTER ch)
 	if (ch->GetPremiumRemainSeconds(PREMIUM_FISH_MIND) > 0 ||
 			ch->IsEquipUniqueGroup(UNIQUE_GROUP_FISH_MIND)) // 월간어심 착용시 고급 물고기 확률 상승
 	{
-		if (quest::CQuestManager::instance().GetEventFlag("manwoo") != 0)
+		if (quest::CQuestManager::Instance().GetEventFlag("manwoo") != 0)
 			prob_idx = 3;
 		else
 			prob_idx = 2;
@@ -340,9 +340,9 @@ int32_t DetermineFish(LPCHARACTER ch)
 	// END_OF_ADD_PREMIUM
 
 	int32_t adjust = 0;
-	if (quest::CQuestManager::instance().GetEventFlag("fish_miss_pct") != 0)
+	if (quest::CQuestManager::Instance().GetEventFlag("fish_miss_pct") != 0)
 	{
-		int32_t fish_pct_value = MINMAX(0, quest::CQuestManager::instance().GetEventFlag("fish_miss_pct"), 200);
+		int32_t fish_pct_value = MINMAX(0, quest::CQuestManager::Instance().GetEventFlag("fish_miss_pct"), 200);
 		adjust = (100-fish_pct_value) * fish_info[0].prob[prob_idx] / 100;
 	}
 
@@ -437,7 +437,7 @@ EVENTFUNC(fishing_event)
 		return 0;
 	}
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(info->pid);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(info->pid);
 
 	if (!ch)
 		return 0;
@@ -570,7 +570,7 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 					int32_t map_idx = ch->GetMapIndex();
 					int32_t prob_idx = GetProbIndexByMapIndex(map_idx);
 
-					LogManager::instance().FishLog(
+					LogManager::Instance().FishLog(
 							ch->GetPlayerID(),
 							prob_idx,
 							info->fish_id,
@@ -597,7 +597,7 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 					int32_t map_idx = ch->GetMapIndex();
 					int32_t prob_idx = GetProbIndexByMapIndex(map_idx);
 
-					LogManager::instance().FishLog(
+					LogManager::Instance().FishLog(
 							ch->GetPlayerID(),
 							prob_idx,
 							info->fish_id,
@@ -612,7 +612,7 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 					int32_t map_idx = ch->GetMapIndex();
 					int32_t prob_idx = GetProbIndexByMapIndex(map_idx);
 
-					LogManager::instance().FishLog(
+					LogManager::Instance().FishLog(
 							ch->GetPlayerID(),
 							prob_idx,
 							info->fish_id,
@@ -628,7 +628,7 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 		int32_t map_idx = ch->GetMapIndex();
 		int32_t prob_idx = GetProbIndexByMapIndex(map_idx);
 
-		LogManager::instance().FishLog(
+		LogManager::Instance().FishLog(
 				ch->GetPlayerID(),
 				prob_idx,
 				info->fish_id,
@@ -798,7 +798,7 @@ int32_t RealRefineRod(LPCHARACTER ch, LPITEM item)
 	{
 		sys_err("REFINE_ROD_HACK pid(%u) item(%s:%d)", ch->GetPlayerID(), item->GetName(), item->GetID());
 
-		LogManager::instance().RefineLog(ch->GetPlayerID(), item->GetName(), item->GetID(), -1, 1, "ROD_HACK");
+		LogManager::Instance().RefineLog(ch->GetPlayerID(), item->GetName(), item->GetID(), -1, 1, "ROD_HACK");
 
 		return 2;
 	}
@@ -810,17 +810,17 @@ int32_t RealRefineRod(LPCHARACTER ch, LPITEM item)
 
 	if (number(1,100) <= rod->GetValue(3))
 	{
-		LogManager::instance().RefineLog(ch->GetPlayerID(), rod->GetName(), rod->GetID(), iAdv, 1, "ROD");
+		LogManager::Instance().RefineLog(ch->GetPlayerID(), rod->GetName(), rod->GetID(), iAdv, 1, "ROD");
 
-		LPITEM pkNewItem = ITEM_MANAGER::instance().CreateItem(rod->GetRefinedVnum(), 1);
+		LPITEM pkNewItem = ITEM_MANAGER::Instance().CreateItem(rod->GetRefinedVnum(), 1);
 
 		if (pkNewItem)
 		{
 			auto bCell = rod->GetCell();
 			// 낚시대 개량 성공
-			ITEM_MANAGER::instance().RemoveItem(rod, "REMOVE (REFINE FISH_ROD)");
+			ITEM_MANAGER::Instance().RemoveItem(rod, "REMOVE (REFINE FISH_ROD)");
 			pkNewItem->AddToCharacter(ch, TItemPos (INVENTORY, bCell));
-			LogManager::instance().ItemLog(ch, pkNewItem, "REFINE FISH_ROD SUCCESS", pkNewItem->GetName());
+			LogManager::Instance().ItemLog(ch, pkNewItem, "REFINE FISH_ROD SUCCESS", pkNewItem->GetName());
 			return 1;
 		}
 
@@ -828,7 +828,7 @@ int32_t RealRefineRod(LPCHARACTER ch, LPITEM item)
 		return 2;
 	}
 	
-	LogManager::instance().RefineLog(ch->GetPlayerID(), rod->GetName(), rod->GetID(), iAdv, 0, "ROD");
+	LogManager::Instance().RefineLog(ch->GetPlayerID(), rod->GetName(), rod->GetID(), iAdv, 0, "ROD");
 
 	// if (g_bIsTestServer) ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<FishRod> PRE %u"), rod->GetSocket(0));
 	int32_t cur = rod->GetSocket(0);
@@ -837,7 +837,7 @@ int32_t RealRefineRod(LPCHARACTER ch, LPITEM item)
 	// if (g_bIsTestServer) ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<FishRod> POST %u"), rod->GetSocket(0));
 	// ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<FishRod> The upgrade has failed, and the fishrod has lost 10%% of its mastery points."));
 		
-	LogManager::instance().ItemLog(ch, rod, "REFINE FISH_ROD FAIL", rod->GetName());
+	LogManager::Instance().ItemLog(ch, rod, "REFINE FISH_ROD FAIL", rod->GetName());
 	return 0;
 }
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "../../common/service.h"
+#include "../../../common/defines.h"
 #include <intrusive_ptr.h>
 
 #ifdef M2_USE_POOL

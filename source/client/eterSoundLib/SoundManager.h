@@ -1,6 +1,5 @@
 #pragma once
-
-#include "../eterBase/Singleton.h"
+#include "../../common/Singleton.h"
 
 #include "SoundManagerStream.h"
 #include "SoundManager2D.h"

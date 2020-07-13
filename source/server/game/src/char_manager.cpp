@@ -18,7 +18,6 @@
 #include "log.h"
 #include "nearby_scanner.h"
 
-#include "../../common/service.h"
 CHARACTER_MANAGER::CHARACTER_MANAGER() :
 	m_iVIDCount(0),
 	m_pkChrSelectedStone(nullptr),
@@ -150,7 +149,7 @@ void CHARACTER_MANAGER::DestroyCharacter(LPCHARACTER ch, const char* file, size_
 		sys_err("[CHARACTER_MANAGER::DestroyCharacter] <Factor> %d not found", static_cast<int32_t>(ch->GetVID()));
 		return; // prevent duplicated destrunction
 	}
-	CNearbyScanner::instance().Die(ch->GetVID());
+	CNearbyScanner::Instance().Die(ch->GetVID());
 
 	// ¢¥©ªAu¢¯¢® ¨ùO¨ùO¥ìE ¢¬o¨ö¨¬AI¢¥A ¢¥©ªAu¢¯¢®¨ù¡©¥ì¥ì ¡íeA|CI¥ì¥ì¡¤I.
 	if (ch->IsNPC() && !ch->IsPet() && ch->GetRider() == nullptr)
@@ -272,21 +271,21 @@ LPCHARACTER CHARACTER_MANAGER::FindPC(std::string stName)
 LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t lMapIndex)
 {
 	// C¨ªAA¢¬| ¨ö¨¬¨¡uCOAo ¢¬¡íAo¢¬| ¡ÆaA¢´CO ¨ùo AO¡ÆO CO
-	if (dwVnum == 5002 && !quest::CQuestManager::instance().GetEventFlag("newyear_mob"))
+	if (dwVnum == 5002 && !quest::CQuestManager::Instance().GetEventFlag("newyear_mob"))
 	{
 		sys_log(1, "HAETAE (new-year-mob) [5002] regen disabled.");
 		return nullptr;
 	}
 
 
-	if (dwVnum == 5004 && !quest::CQuestManager::instance().GetEventFlag("independence_day"))
+	if (dwVnum == 5004 && !quest::CQuestManager::Instance().GetEventFlag("independence_day"))
 	{
 		sys_log(1, "INDEPENDECE DAY [5004] regen disabled.");
 		return nullptr;
 	}
 	
 
-	const CMob * pkMob = CMobManager::instance().Get(dwVnum);
+	const CMob * pkMob = CMobManager::Instance().Get(dwVnum);
 
 	if (!pkMob)
 	{
@@ -300,7 +299,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t l
 		return nullptr;
 	}
 
-	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(lMapIndex);
+	LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(lMapIndex);
 	if (pkSectreeMap == nullptr) {
 		return nullptr;
 	}
@@ -311,7 +310,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t l
 	{
 		x = number(1, (pkSectreeMap->m_setting.iWidth / 100)  - 1) * 100 + pkSectreeMap->m_setting.iBaseX;
 		y = number(1, (pkSectreeMap->m_setting.iHeight / 100) - 1) * 100 + pkSectreeMap->m_setting.iBaseY;
-		//LPSECTREE tree = SECTREE_MANAGER::instance().Get(lMapIndex, x, y);
+		//LPSECTREE tree = SECTREE_MANAGER::Instance().Get(lMapIndex, x, y);
 		LPSECTREE tree = pkSectreeMap->Find(x, y);
 
 		if (!tree)
@@ -334,7 +333,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t l
 		return nullptr;
 	}
 
-	LPSECTREE sectree = SECTREE_MANAGER::instance().Get(lMapIndex, x, y);
+	LPSECTREE sectree = SECTREE_MANAGER::Instance().Get(lMapIndex, x, y);
 
 	if (!sectree)
 	{
@@ -342,7 +341,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t l
 		return nullptr;
 	}
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().CreateCharacter(pkMob->m_table.szLocaleName);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().CreateCharacter(pkMob->m_table.szLocaleName);
 
 	if (!ch)
 	{
@@ -355,7 +354,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t l
 	// if mob is npc with no empire assigned, assign to empire of map
 	if (pkMob->m_table.bType == CHAR_TYPE_NPC)
 		if (ch->GetEmpire() == 0)
-			ch->SetEmpire(SECTREE_MANAGER::instance().GetEmpireFromMapIndex(lMapIndex));
+			ch->SetEmpire(SECTREE_MANAGER::Instance().GetEmpireFromMapIndex(lMapIndex));
 
 	ch->SetRotation(number(0, 360));
 
@@ -380,7 +379,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t l
 
 LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int32_t x, int32_t y, int32_t z, bool bSpawnMotion, int32_t iRot, bool bShow, bool bBattleground)
 {
-	const CMob * pkMob = CMobManager::instance().Get(dwVnum);
+	const CMob * pkMob = CMobManager::Instance().Get(dwVnum);
 	if (!pkMob)
 	{
 		sys_err("SpawnMob: no mob data for vnum %u (map %d)", dwVnum, lMapIndex);
@@ -389,7 +388,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int3
 
 	if (!(pkMob->m_table.bType == CHAR_TYPE_NPC || pkMob->m_table.bType == CHAR_TYPE_WARP || pkMob->m_table.bType == CHAR_TYPE_GOTO) || mining::IsVeinOfOre (dwVnum))
 	{
-		LPSECTREE tree = SECTREE_MANAGER::instance().Get(lMapIndex, x, y);
+		LPSECTREE tree = SECTREE_MANAGER::Instance().Get(lMapIndex, x, y);
 
 		if (!tree)
 		{
@@ -407,7 +406,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int3
 		if ( is_set )
 		{
 			// SPAWN_BLOCK_LOG
-			static bool s_isLog=quest::CQuestManager::instance().GetEventFlag("spawn_block_log");
+			static bool s_isLog=quest::CQuestManager::Instance().GetEventFlag("spawn_block_log");
 			static uint32_t s_nextTime=get_global_time()+10000;
 
 			uint32_t curTime=get_global_time();
@@ -415,7 +414,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int3
 			if (curTime>s_nextTime)
 			{
 				s_nextTime=curTime;
-				s_isLog=quest::CQuestManager::instance().GetEventFlag("spawn_block_log");
+				s_isLog=quest::CQuestManager::Instance().GetEventFlag("spawn_block_log");
 
 			}
 
@@ -432,7 +431,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int3
 		}
 	}
 
-	LPSECTREE sectree = SECTREE_MANAGER::instance().Get(lMapIndex, x, y);
+	LPSECTREE sectree = SECTREE_MANAGER::Instance().Get(lMapIndex, x, y);
 
 	if (!sectree)
 	{
@@ -440,7 +439,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int3
 		return nullptr;
 	}
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().CreateCharacter(pkMob->m_table.szLocaleName);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().CreateCharacter(pkMob->m_table.szLocaleName);
 
 	if (!ch)
 	{
@@ -456,7 +455,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int3
 	// if mob is npc with no empire assigned, assign to empire of map
 	if (pkMob->m_table.bType == CHAR_TYPE_NPC)
 		if (ch->GetEmpire() == 0)
-			ch->SetEmpire(SECTREE_MANAGER::instance().GetEmpireFromMapIndex(lMapIndex));
+			ch->SetEmpire(SECTREE_MANAGER::Instance().GetEmpireFromMapIndex(lMapIndex));
 
 	ch->SetRotation(static_cast<float>(iRot));
 
@@ -475,7 +474,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int3
 
 LPCHARACTER CHARACTER_MANAGER::SpawnMobRange(uint32_t dwVnum, int32_t lMapIndex, int32_t sx, int32_t sy, int32_t ex, int32_t ey, bool bIsException, bool bSpawnMotion, bool bAggressive )
 {
-	const CMob * pkMob = CMobManager::instance().Get(dwVnum);
+	const CMob * pkMob = CMobManager::Instance().Get(dwVnum);
 
 	if (!pkMob)
 		return nullptr;
@@ -567,7 +566,7 @@ bool CHARACTER_MANAGER::SpawnMoveGroup(uint32_t dwVnum, int32_t lMapIndex, int32
 			pkChrMaster = tch;
 			pkChrMaster->SetRegen(pkRegen);
 
-			pkParty = CPartyManager::instance().CreateParty(pkChrMaster);
+			pkParty = CPartyManager::Instance().CreateParty(pkChrMaster);
 		}
 		if (bAggressive)
 			tch->SetAggressive();
@@ -660,7 +659,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnGroup(uint32_t dwVnum, int32_t lMapIndex, in
 			pkChrMaster = tch;
 			pkChrMaster->SetRegen(pkRegen);
 
-			pkParty = CPartyManager::instance().CreateParty(pkChrMaster);
+			pkParty = CPartyManager::Instance().CreateParty(pkChrMaster);
 		}
 
 		if (bAggressive)
@@ -716,7 +715,7 @@ void CHARACTER_MANAGER::Update(int32_t iPulse)
 	// Update to Santa
 	// /*
 	{
-		auto snapshot = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(xmas::MOB_SANTA_VNUM);
+		auto snapshot = CHARACTER_MANAGER::Instance().GetCharactersByRaceNum(xmas::MOB_SANTA_VNUM);
 		if (!snapshot.empty())
 		{
 			std::for_each(snapshot.begin(), snapshot.end(), [iPulse](LPCHARACTER ch)
@@ -732,7 +731,7 @@ void CHARACTER_MANAGER::Update(int32_t iPulse)
 	if (0 == (iPulse % PASSES_PER_SEC(3600)))
 	{
 		for (const auto& it : m_map_dwMobKillCount)
-			LogManager::instance().MoneyLog(MONEY_LOG_MONSTER_KILL, it.first, it.second);
+			LogManager::Instance().MoneyLog(MONEY_LOG_MONSTER_KILL, it.first, it.second);
 
 		m_map_dwMobKillCount.clear();
 	}
@@ -812,7 +811,7 @@ void CHARACTER_MANAGER::KillLog(uint32_t dwVnum)
 
 		if (it->second > SEND_LIMIT)
 		{
-			LogManager::instance().MoneyLog(MONEY_LOG_MONSTER_KILL, it->first, it->second);
+			LogManager::Instance().MoneyLog(MONEY_LOG_MONSTER_KILL, it->first, it->second);
 			m_map_dwMobKillCount.erase(it);
 		}
 	}
@@ -979,7 +978,7 @@ int32_t	CHARACTER_MANAGER::GetUserDamageRate(LPCHARACTER ch) const
 
 void CHARACTER_MANAGER::SendScriptToMap(int32_t lMapIndex, const std::string & s)
 {
-	LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap(lMapIndex);
+	LPSECTREE_MAP pSecMap = SECTREE_MANAGER::Instance().GetMap(lMapIndex);
 
 	if (nullptr == pSecMap)
 		return;
@@ -1030,7 +1029,7 @@ void CHARACTER_MANAGER::FlushPendingDestroy()
 }
 
 CharacterSnapshotGuard::CharacterSnapshotGuard()
-	: m_hasPendingOwnership(CHARACTER_MANAGER::instance().BeginPendingDestroy())
+	: m_hasPendingOwnership(CHARACTER_MANAGER::Instance().BeginPendingDestroy())
 {
 	// ctor
 }
@@ -1038,7 +1037,7 @@ CharacterSnapshotGuard::CharacterSnapshotGuard()
 CharacterSnapshotGuard::~CharacterSnapshotGuard()
 {
 	if (m_hasPendingOwnership)
-		CHARACTER_MANAGER::instance().FlushPendingDestroy();
+		CHARACTER_MANAGER::Instance().FlushPendingDestroy();
 }
 
 CharacterSetSnapshot::CharacterSetSnapshot()

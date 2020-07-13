@@ -17,7 +17,7 @@ typedef struct SItemAward
     bool	bMall;
 } TItemAward;
 
-class ItemAwardManager : public singleton<ItemAwardManager>
+class ItemAwardManager : public CSingleton<ItemAwardManager>
 {
     public:
 	ItemAwardManager();

@@ -1,6 +1,6 @@
 #pragma once
 
-class CPrivManager : public singleton<CPrivManager>
+class CPrivManager : public CSingleton<CPrivManager>
 {
 	public:
 		CPrivManager();

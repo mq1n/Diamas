@@ -327,7 +327,6 @@ PyObject * itemIsEquipmentVID(PyObject * poSelf, PyObject * poArgs)
 	return Py_BuildValue("i", pItemData->IsEquipment());
 }
 
-// 2005.05.20.myevan.통합 USE_TYPE 체크
 PyObject* itemGetUseType(PyObject * poSelf, PyObject * poArgs)
 {
 	int32_t iItemVID;

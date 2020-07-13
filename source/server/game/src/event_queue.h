@@ -1,5 +1,5 @@
 #pragma once
-#include "../../common/service.h"
+#include "../../../common/defines.h"
 
 #ifdef M2_USE_POOL
 #include "pool.h"

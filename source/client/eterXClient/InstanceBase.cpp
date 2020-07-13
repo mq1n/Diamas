@@ -346,7 +346,6 @@ bool __ArmorVnumToShape(int32_t iVnum, uint32_t * pdwShape)
 	return true;
 }
 
-// 2004.07.05.myevan.궁신탄영 끼이는 문제
 class CActorInstanceBackground : public IBackground
 {
 	public:
@@ -3146,7 +3145,6 @@ bool CInstanceBase::ChangeArmor(uint32_t dwArmor)
 	if (IsWalking())
 		EndWalking();
 
-	// 2004.07.25.myevan.이펙트 안 붙는 문제
 	//////////////////////////////////////////////////////
 	__ClearAffects();
 	//////////////////////////////////////////////////////
@@ -3174,7 +3172,6 @@ bool CInstanceBase::ChangeArmor(uint32_t dwArmor)
 		m_GraphicThingInstance.m_nextAllowedMovement = CTimer::Instance().GetCurrentMillisecond() + 250;
 	}
 
-	// 2004.07.25.myevan.이펙트 안 붙는 문제
 	/////////////////////////////////////////////////
 	SetAffectFlagContainer(kAffectFlagContainer);
 	/////////////////////////////////////////////////

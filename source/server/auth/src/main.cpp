@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "GAuthServer.h"
+#include "stdafx.hpp"
+#include "AuthServer.hpp"
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/msvc_sink.h>
@@ -9,6 +9,16 @@
 #include <spdlog/sinks/rotating_file_sink.h>
 
 #include "../../libthecore/include/winminidump.h"
+using namespace net_engine;
+
+/*
+		SECURITY_LEVEL_NONE = 0,  // No handshake
+		SECURITY_LEVEL_BASIC = 1, // Basic handshake (No keys or Diffie-Hellman)
+		SECURITY_LEVEL_XTEA = 2,  // Key/Pong keys
+		SECURITY_LEVEL_KEY_AGREEMENT = 3 // Diffie-Hellman Key agreement
+*/
+static const auto gsc_securityLevel = ESecurityLevels::SECURITY_LEVEL_KEY_AGREEMENT;
+static const auto gsc_cryptKey = DEFAULT_CRYPT_KEY;
 
 static int pid_init()
 {
@@ -49,7 +59,7 @@ int main(int argc, char** argv)
 	spdlog::register_logger(logger);
 	
 	net_engine::NetServiceBase _NetService;
-	std::shared_ptr<GAuthServer> _GAuthServer = std::make_shared<GAuthServer>(_NetService);
+	std::shared_ptr<GAuthServer> _GAuthServer = std::make_shared<GAuthServer>(_NetService, gsc_securityLevel, gsc_cryptKey);
 
 	pid_init();
 

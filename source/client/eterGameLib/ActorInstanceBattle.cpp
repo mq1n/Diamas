@@ -685,7 +685,6 @@ void CActorInstance::__ProcessDataAttackSuccess(const NRaceData::TAttackData & c
 
 	float fHeight = D3DXToDegree(atan2(-vec3Effect.x + v3Pos.x,+vec3Effect.y - v3Pos.y));
 
-	// 2004.08.03.myevan.빌딩이나 문의 경우 타격 효과가 보이지 않는다
 	if (rVictim.IsBuilding()||rVictim.IsDoor())
 	{
 		D3DXVECTOR3 vec3Delta=vec3Effect-v3Pos;

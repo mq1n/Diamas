@@ -1,6 +1,7 @@
 #pragma once
 #include "../../libthecore/include/poly.h"
-#include "../../common/service.h"
+#include "../../../common/defines.h"
+#include "../../common/tables.h"
 
 enum ESkillFlags
 {
@@ -226,7 +227,7 @@ class CSkillProto
 		void SetSPCostVar(const std::string& strName, double dVar);
 };
 
-class CSkillManager : public singleton<CSkillManager>
+class CSkillManager : public CSingleton<CSkillManager>
 {
 	public:
 		CSkillManager();

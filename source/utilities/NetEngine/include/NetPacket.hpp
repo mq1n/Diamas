@@ -36,16 +36,6 @@ namespace net_engine
 		HEADER_CG_HANDSHAKE = HEADER_HANDSHAKE
 	};
 
-	enum EPhases : uint8_t
-	{
-		PHASE_HANDSHAKE = 1,
-		PHASE_LOGIN = 2,
-		PHASE_SELECT = 3,
-		PHASE_LOADING = 4,
-		PHASE_GAME = 5,
-		PHASE_AUTH = 10
-	};
-
 	enum ESecurityLevels : uint8_t
 	{
 		SECURITY_LEVEL_NONE = 0,  // No handshake

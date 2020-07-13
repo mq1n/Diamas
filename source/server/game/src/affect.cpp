@@ -1,8 +1,6 @@
 #include "stdafx.h"
+#include "affect.h"
 #include "pool.h"
-#include "affect.h"
-#include "../../common/service.h"
-#include "affect.h"
 
 #ifndef DEBUG_ALLOC
 ObjectPool<CAffect> affect_pool;

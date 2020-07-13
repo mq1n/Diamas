@@ -157,7 +157,7 @@ namespace net_engine
 	}
 
 	// Peer stuffs
-	std::shared_ptr <CNetworkConnectionManager> CNetworkServerManager::FindPeer(int32_t id) const
+	std::shared_ptr <CNetworkConnectionManager> CNetworkServerManager::FindPeer(uint32_t id) const
 	{
 		auto iter = m_peers.find(id);
 		if (iter != m_peers.end())
@@ -174,7 +174,7 @@ namespace net_engine
 		return peer;
 	}
 
-	void CNetworkServerManager::RemovePeer(int32_t id)
+	void CNetworkServerManager::RemovePeer(uint32_t id)
 	{
 		auto iter = m_peers.find(id);
 		if (iter != m_peers.end())

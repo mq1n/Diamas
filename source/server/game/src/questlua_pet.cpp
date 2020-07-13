@@ -9,9 +9,9 @@
 
 #undef sys_err
 #ifndef __WIN32__
-#define sys_err(fmt, args...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
+#define sys_err(fmt, args...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
 #else
-#define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
+#define sys_err(fmt, ...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
 namespace quest
@@ -19,7 +19,7 @@ namespace quest
 	// syntax in LUA: pet.summon(mob_vnum, pet's name, (bool)run to me from far away)
 	int32_t pet_summon(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			lua_pushnumber(L, 0);
@@ -27,7 +27,7 @@ namespace quest
 		}
 
 		CPetSystem* petSystem = ch->GetPetSystem();
-		CItem * pItem = CQuestManager::instance().GetCurrentItem();
+		CItem * pItem = CQuestManager::Instance().GetCurrentItem();
 		if (!petSystem || !pItem)
 		{
 			lua_pushnumber (L, 0);
@@ -55,7 +55,7 @@ namespace quest
 	// syntax: pet.unsummon(mob_vnum)
 	int32_t pet_unsummon(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (nullptr == ch)
 			return 0;
 
@@ -72,7 +72,7 @@ namespace quest
 	// syntax: pet.unsummon(mob_vnum)
 	int32_t pet_count_summoned(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (nullptr == ch)
 			return 0;
 		
@@ -91,7 +91,7 @@ namespace quest
 	// syntax: pet.is_summon(mob_vnum)
 	int32_t pet_is_summon(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (nullptr == ch)
 			return 0;
 		
@@ -113,7 +113,7 @@ namespace quest
 
 	int32_t pet_spawn_effect(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (nullptr == ch)
 			return 0;
 
@@ -139,7 +139,7 @@ namespace quest
 
 	int32_t pet_is_mine(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER mch = q.GetCurrentCharacterPtr();
 		LPCHARACTER tch = q.GetCurrentNPCCharacterPtr();
 		CPetSystem* petSystem = mch->GetPetSystem();
@@ -162,6 +162,6 @@ namespace quest
 			{ nullptr,				nullptr				}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("pet", pet_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("pet", pet_functions);
 	}
 }

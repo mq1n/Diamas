@@ -24,10 +24,6 @@
 #include "ox_event.h"
 #include "item_manager.h"
 
-#include "../../common/service.h"
-
-#include <sstream>
-
 static const uint32_t s_adwSubSkillVnums[] =
 {
 	SKILL_LEADERSHIP,
@@ -198,7 +194,7 @@ void CHARACTER::SetSkillLevel(uint32_t dwVnum, uint8_t bLev)
 
 bool CHARACTER::IsLearnableSkill(uint32_t dwSkillVnum) const
 {
-	const CSkillProto * pkSkill = CSkillManager::instance().Get(dwSkillVnum);
+	const CSkillProto * pkSkill = CSkillManager::Instance().Get(dwSkillVnum);
 
 	if (!pkSkill)
 		return false;
@@ -239,7 +235,7 @@ bool CHARACTER::IsLearnableSkill(uint32_t dwSkillVnum) const
 // ADD_GRANDMASTER_SKILL
 bool CHARACTER::LearnGrandMasterSkill(uint32_t dwSkillVnum)
 {
-	CSkillProto * pkSk = CSkillManager::instance().Get(dwSkillVnum);
+	CSkillProto * pkSk = CSkillManager::Instance().Get(dwSkillVnum);
 
 	if (!pkSk)
 		return false;
@@ -331,14 +327,14 @@ bool CHARACTER::LearnGrandMasterSkill(uint32_t dwSkillVnum)
 	{
 		ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("크윽, 기가 역류하고 있어! 이거 설마 주화입마인가!? 젠장!"));
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("수련이 실패로 끝났습니다. 다시 도전해주시기 바랍니다."));
-		LogManager::instance().CharLog(this, dwSkillVnum, "GM_READ_FAIL", "");
+		LogManager::Instance().CharLog(this, dwSkillVnum, "GM_READ_FAIL", "");
 		return false;
 	}
 
 	ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("몸에서 뭔가 힘이 터져 나오는 기분이야!"));
 	ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("뜨거운 무엇이 계속 용솟음치고 있어! 이건, 이것은!"));
 	ChatPacket(CHAT_TYPE_INFO, LC_TEXT("더 높은 경지의 수련을 성공적으로 끝내셨습니다."));
-	LogManager::instance().CharLog(this, dwSkillVnum, "GM_READ_SUCCESS", "");
+	LogManager::Instance().CharLog(this, dwSkillVnum, "GM_READ_SUCCESS", "");
 	return true;
 }
 // END_OF_ADD_GRANDMASTER_SKILL
@@ -351,7 +347,7 @@ static bool FN_should_check_exp(LPCHARACTER ch)
 
 bool CHARACTER::LearnSkillByBook(uint32_t dwSkillVnum, uint8_t bProb)
 {
-	const CSkillProto* pkSk = CSkillManager::instance().Get(dwSkillVnum);
+	const CSkillProto* pkSk = CSkillManager::Instance().Get(dwSkillVnum);
 
 	if (!pkSk)
 		return false;
@@ -391,7 +387,7 @@ bool CHARACTER::LearnSkillByBook(uint32_t dwSkillVnum, uint8_t bProb)
 
 	if (get_global_time() < GetSkillNextReadTime(dwSkillVnum))
 	{
-		if (!(g_bIsTestServer && quest::CQuestManager::instance().GetEventFlag("no_read_delay")))
+		if (!(g_bIsTestServer && quest::CQuestManager::Instance().GetEventFlag("no_read_delay")))
 		{
 			if (FindAffect(AFFECT_SKILL_NO_BOOK_DELAY))
 			{
@@ -446,7 +442,7 @@ bool CHARACTER::LearnSkillByBook(uint32_t dwSkillVnum, uint8_t bProb)
 
 			PointChange(POINT_EXP, -need_exp);
 
-			quest::CQuestManager& q = quest::CQuestManager::instance();
+			quest::CQuestManager& q = quest::CQuestManager::Instance();
 			quest::PC* pPC = q.GetPC(GetPlayerID());
 
 			if (pPC)
@@ -472,7 +468,7 @@ bool CHARACTER::LearnSkillByBook(uint32_t dwSkillVnum, uint8_t bProb)
 						pPC->SetFlag(flag, 0);
 
 						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("책으로 더 높은 경지의 수련을 성공적으로 끝내셨습니다."));
-						LogManager::instance().CharLog(this, dwSkillVnum, "READ_SUCCESS", "");
+						LogManager::Instance().CharLog(this, dwSkillVnum, "READ_SUCCESS", "");
 						return true;
 					}
 					else
@@ -497,13 +493,13 @@ bool CHARACTER::LearnSkillByBook(uint32_t dwSkillVnum, uint8_t bProb)
 		ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("몸에서 뭔가 힘이 터져 나오는 기분이야!"));
 		ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("뜨거운 무엇이 계속 용솟음치고 있어! 이건, 이것은!"));
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("책으로 더 높은 경지의 수련을 성공적으로 끝내셨습니다."));
-		LogManager::instance().CharLog(this, dwSkillVnum, "READ_SUCCESS", "");
+		LogManager::Instance().CharLog(this, dwSkillVnum, "READ_SUCCESS", "");
 	}
 	else
 	{
 		ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("크윽, 기가 역류하고 있어! 이거 설마 주화입마인가!? 젠장!"));
 		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("수련이 실패로 끝났습니다. 다시 도전해주시기 바랍니다."));
-		LogManager::instance().CharLog(this, dwSkillVnum, "READ_FAIL", "");
+		LogManager::Instance().CharLog(this, dwSkillVnum, "READ_FAIL", "");
 	}
 
 	return true;
@@ -520,7 +516,7 @@ bool CHARACTER::SkillLevelDown(uint32_t dwVnum)
 	if (IsPolymorphed())
 		return false;
 
-	CSkillProto * pkSk = CSkillManager::instance().Get(dwVnum);
+	CSkillProto * pkSk = CSkillManager::Instance().Get(dwVnum);
 
 	if (!pkSk)
 	{
@@ -593,7 +589,7 @@ void CHARACTER::SkillLevelUp(uint32_t dwVnum, uint8_t bMethod)
 		return;
 	}
 
-	const CSkillProto* pkSk = CSkillManager::instance().Get(dwVnum);
+	const CSkillProto* pkSk = CSkillManager::Instance().Get(dwVnum);
 
 	if (!pkSk)
 	{
@@ -728,7 +724,7 @@ void CHARACTER::SkillLevelUp(uint32_t dwVnum, uint8_t bMethod)
 
 	sys_log(0, "%s", szSkillUp);
 
-	LogManager::instance().CharLog(this, pkSk->dwVnum, "SKILLUP", szSkillUp);
+	LogManager::Instance().CharLog(this, pkSk->dwVnum, "SKILLUP", szSkillUp);
 	Save();
 
 	ComputePoints();
@@ -780,7 +776,7 @@ void CHARACTER::ComputePassiveSkill(uint32_t dwVnum)
 	if (GetSkillLevel(dwVnum) == 0)
 		return;
 
-	CSkillProto * pkSk = CSkillManager::instance().Get(dwVnum);
+	CSkillProto * pkSk = CSkillManager::Instance().Get(dwVnum);
 	pkSk->SetPointVar("k", GetSkillLevel(dwVnum));
 	int32_t iAmount = (int32_t) pkSk->kPointPoly.Eval();
 
@@ -865,8 +861,8 @@ EVENTFUNC(ChainLightningEvent)
 {
 	chain_lightning_event_info * info = dynamic_cast<chain_lightning_event_info *>( event->info );
 
-	LPCHARACTER pkChrVictim = CHARACTER_MANAGER::instance().Find(info->dwVictim);
-	LPCHARACTER pkChr = CHARACTER_MANAGER::instance().Find(info->dwChr);
+	LPCHARACTER pkChrVictim = CHARACTER_MANAGER::Instance().Find(info->dwVictim);
+	LPCHARACTER pkChr = CHARACTER_MANAGER::Instance().Find(info->dwChr);
 	LPCHARACTER pkTarget = nullptr;
 
 	if (!pkChr || !pkChrVictim)
@@ -1523,7 +1519,7 @@ EVENTFUNC(skill_gwihwan_event)
 
 	uint32_t pid = info->pid;
 	uint8_t sklv= info->bsklv;
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pid);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(pid);
 
 	if (!ch)
 		return 0;
@@ -1535,7 +1531,7 @@ EVENTFUNC(skill_gwihwan_event)
 		GPOS pos;
 
 		// 성공
-		if (SECTREE_MANAGER::instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos))
+		if (SECTREE_MANAGER::Instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos))
 		{
 			sys_log(1, "Recall: %s %d %d -> %d %d", ch->GetName(), ch->GetX(), ch->GetY(), pos.x, pos.y);
 			ch->WarpSet(pos.x, pos.y);
@@ -1565,7 +1561,7 @@ int32_t CHARACTER::ComputeSkillAtPosition(uint32_t dwVnum, const GPOS& posTarget
 	if (g_bSkillDisable)
 		return BATTLE_NONE;
 
-	CSkillProto * pkSk = CSkillManager::instance().Get(dwVnum);
+	CSkillProto * pkSk = CSkillManager::Instance().Get(dwVnum);
 
 	if (!pkSk)
 		return BATTLE_NONE;
@@ -1896,7 +1892,7 @@ int32_t CHARACTER::ComputeSkill(uint32_t dwVnum, LPCHARACTER pkVictim, uint8_t b
 	if (g_bSkillDisable)
 		return BATTLE_NONE;
 
-	CSkillProto* pkSk = CSkillManager::instance().Get(dwVnum);
+	CSkillProto* pkSk = CSkillManager::Instance().Get(dwVnum);
 
 	if (!pkSk)
 		return BATTLE_NONE;
@@ -2332,7 +2328,7 @@ bool CHARACTER::UseSkill(uint32_t dwVnum, LPCHARACTER pkVictim, bool bUseGrandMa
 	// NO_GRANDMASTER
 	if (g_bIsTestServer)
 	{
-		if (quest::CQuestManager::instance().GetEventFlag("no_grand_master"))
+		if (quest::CQuestManager::Instance().GetEventFlag("no_grand_master"))
 		{
 			bUseGrandMaster = false;
 		}
@@ -2376,7 +2372,7 @@ bool CHARACTER::UseSkill(uint32_t dwVnum, LPCHARACTER pkVictim, bool bUseGrandMa
 	if (false == bCanUseHorseSkill && true == IsRiding())
 		return false;
 
-	CSkillProto * pkSk = CSkillManager::instance().Get(dwVnum);
+	CSkillProto * pkSk = CSkillManager::Instance().Get(dwVnum);
 	sys_log(0, "%s: USE_SKILL: %d pkVictim %p", GetName(), dwVnum, get_pointer(pkVictim));
 
 	if (!pkSk)
@@ -2858,7 +2854,7 @@ bool CHARACTER::UseMobSkill(uint32_t idx)
 	}
 
 	uint32_t dwVnum = pInfo->dwSkillVnum;
-	CSkillProto * pkSk = CSkillManager::instance().Get(dwVnum);
+	CSkillProto * pkSk = CSkillManager::Instance().Get(dwVnum);
 
 	if (!pkSk)
 	{
@@ -3479,7 +3475,7 @@ bool CHARACTER::ResetOneSkill(uint32_t dwVnum)
 
 	PointChange(POINT_SKILL, level);
 
-	LogManager::instance().CharLog(this, dwVnum, "ONE_SKILL_RESET_BY_SCROLL", "");
+	LogManager::Instance().CharLog(this, dwVnum, "ONE_SKILL_RESET_BY_SCROLL", "");
 
 	ComputePoints();
 	SkillLevelPacket();
@@ -3608,7 +3604,7 @@ uint32_t GetRandomSkillVnum(uint8_t bJob)
 			continue;
 #endif
 
-		if (dwSkillVnum != 0 && nullptr != CSkillManager::instance().Get(dwSkillVnum))
+		if (dwSkillVnum != 0 && nullptr != CSkillManager::Instance().Get(dwSkillVnum))
 			break;
 	} while (true);
 	return dwSkillVnum;

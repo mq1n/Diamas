@@ -12,7 +12,7 @@ enum POLYMORPH_BONUS_TYPE
 	POLYMORPH_SPD_BONUS,
 };
 
-class CPolymorphUtils : public singleton<CPolymorphUtils>
+class CPolymorphUtils : public CSingleton<CPolymorphUtils>
 {
 	private :
 		std::unordered_map<uint32_t, uint32_t> m_mapSPDType;

@@ -19,9 +19,9 @@
 
 #undef sys_err
 #ifndef _WIN32
-#define sys_err(fmt, args...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
+#define sys_err(fmt, args...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
 #else
-#define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
+#define sys_err(fmt, ...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
 namespace quest
@@ -29,7 +29,7 @@ namespace quest
 
 	std::string ScriptToString(const std::string& str)
 	{
-		lua_State* L = CQuestManager::instance().GetLuaState();
+		lua_State* L = CQuestManager::Instance().GetLuaState();
 		int32_t x = lua_gettop(L);
 
 		int32_t errcode = lua_dobuffer(L, ("return "+str).c_str(), str.size()+7, "ScriptToString");
@@ -62,7 +62,7 @@ namespace quest
 		if (!ch->IsPC())
 			return;
 
-		PC * pPC = CQuestManager::instance().GetPCForce(ch->GetPlayerID());
+		PC * pPC = CQuestManager::Instance().GetPCForce(ch->GetPlayerID());
 		if (pPC)
 			pPC->SetFlag(flagname, value);
 	}
@@ -74,7 +74,7 @@ namespace quest
 
 		bool returnBool = false;
 
-		PC* pPC = CQuestManager::instance().GetPCForce(ch->GetPlayerID());
+		PC* pPC = CQuestManager::Instance().GetPCForce(ch->GetPlayerID());
 		if (pPC)
 		{
 			int32_t flagValue = pPC->GetFlag(flagname);
@@ -163,7 +163,7 @@ namespace quest
 
 	void FBuildLuaGuildWarList::operator() (uint32_t g1, uint32_t g2)
 	{
-		CGuild* g = CGuildManager::instance().FindGuild(g1);
+		CGuild* g = CGuildManager::Instance().FindGuild(g1);
 
 		if (!g)
 			return;
@@ -187,7 +187,7 @@ namespace quest
 		if (size==0)
 			return true;
 
-		lua_State* L = CQuestManager::instance().GetLuaState();
+		lua_State* L = CQuestManager::Instance().GetLuaState();
 		int32_t x = lua_gettop(L);
 		int32_t errcode = lua_dobuffer(L, code, size, "IsScriptTrue");
 		int32_t bStart = lua_toboolean(L, -1);
@@ -237,7 +237,7 @@ namespace quest
 
 	int32_t member_clear_ready(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentPartyMember();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentPartyMember();
 		if (ch)
 			ch->RemoveAffect(AFFECT_DUNGEON_READY);
 		return 0;
@@ -245,7 +245,7 @@ namespace quest
 
 	int32_t member_set_ready(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentPartyMember();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentPartyMember();
 		if (ch)
 			ch->AddAffect(AFFECT_DUNGEON_READY, POINT_NONE, 0, AFF_DUNGEON_READY, 65535, 0, true);
 		return 0;
@@ -276,12 +276,12 @@ namespace quest
 			count = 10;
 		}
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(ch->GetMapIndex());
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
+		LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(ch->GetMapIndex());
 		if (!ch || !pMap)
 			return 0;
 
-		uint32_t dwQuestIdx = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
+		uint32_t dwQuestIdx = CQuestManager::Instance().GetCurrentPC()->GetCurrentQuestIndex();
 
 		bool ret = false;
 		LPCHARACTER mob = nullptr;
@@ -296,7 +296,7 @@ namespace quest
 				int32_t x = local_x + pMap->m_setting.iBaseX + (int32_t)(r * cos(angle));
 				int32_t y = local_y + pMap->m_setting.iBaseY + (int32_t)(r * sin(angle));
 
-				mob = CHARACTER_MANAGER::instance().SpawnMob(mob_vnum, ch->GetMapIndex(), x, y, 0);
+				mob = CHARACTER_MANAGER::Instance().SpawnMob(mob_vnum, ch->GetMapIndex(), x, y, 0);
 
 				if (mob)
 					break;
@@ -358,14 +358,14 @@ namespace quest
 			count = 10;
 		}
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(ch->GetMapIndex());
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
+		LPSECTREE_MAP pMap = SECTREE_MANAGER::Instance().GetMap(ch->GetMapIndex());
 		if (!ch || !pMap) 
 		{
 			lua_pushnumber(L, 0);
 			return 1;
 		}
-		uint32_t dwQuestIdx = CQuestManager::instance().GetCurrentPC()->GetCurrentQuestIndex();
+		uint32_t dwQuestIdx = CQuestManager::Instance().GetCurrentPC()->GetCurrentQuestIndex();
 
 		bool ret = false;
 		LPCHARACTER mob = nullptr;
@@ -380,7 +380,7 @@ namespace quest
 				int32_t x = local_x + pMap->m_setting.iBaseX + (int32_t)(r * cos(angle));
 				int32_t y = local_y + pMap->m_setting.iBaseY + (int32_t)(r * sin(angle));
 
-				mob = CHARACTER_MANAGER::instance().SpawnGroup(group_vnum, ch->GetMapIndex(), x, y, x, y, nullptr, bAggressive);
+				mob = CHARACTER_MANAGER::Instance().SpawnGroup(group_vnum, ch->GetMapIndex(), x, y, x, y, nullptr, bAggressive);
 
 				if (mob)
 					break;
@@ -698,7 +698,7 @@ namespace quest
 			return 0;
 		}
 
-		LPCHARACTER chWait = CHARACTER_MANAGER::instance().FindByPID(info->dwWaitPID);
+		LPCHARACTER chWait = CHARACTER_MANAGER::Instance().FindByPID(info->dwWaitPID);
 		LPCHARACTER chReply = nullptr; //CHARACTER_MANAGER::info().FindByPID(info->dwReplyPID);
 
 		if (chReply) {
@@ -706,7 +706,7 @@ namespace quest
 		}
 
 		if (chWait) {
-			CQuestManager::instance().Confirm(info->dwWaitPID, CONFIRM_TIMEOUT);
+			CQuestManager::Instance().Confirm(info->dwWaitPID, CONFIRM_TIMEOUT);
 		}
 
 		return 0;
@@ -794,7 +794,7 @@ namespace quest
 		qs.co = lua_newthread(L);
 		qs.ico = lua_ref(L, 1 /*qs.co*/);
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (ch)
 			qs._item = ch->GetQuestItemPtr();
 

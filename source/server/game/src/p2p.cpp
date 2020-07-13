@@ -13,8 +13,6 @@
 #include "utils.h"
 #include "locale_service.h"
 #include "map_location.h"
-#include "../../common/stl.h"
-#include <sstream>
 
 P2P_MANAGER::P2P_MANAGER()
 {
@@ -30,7 +28,7 @@ P2P_MANAGER::~P2P_MANAGER()
 
 void P2P_MANAGER::Boot(LPDESC d)
 {
-	CHARACTER_MANAGER::NAME_MAP & map = CHARACTER_MANAGER::instance().GetPCMap();
+	CHARACTER_MANAGER::NAME_MAP & map = CHARACTER_MANAGER::Instance().GetPCMap();
 	CHARACTER_MANAGER::NAME_MAP::iterator it = map.begin();
 
 	TPacketGGLogin p;
@@ -44,7 +42,7 @@ void P2P_MANAGER::Boot(LPDESC d)
 		strlcpy(p.szName, ch->GetName(), sizeof(p.szName));
 		p.dwPID = ch->GetPlayerID();
 		p.bEmpire = ch->GetEmpire();
-		p.lMapIndex = SECTREE_MANAGER::instance().GetMapIndex(ch->GetX(), ch->GetY());
+		p.lMapIndex = SECTREE_MANAGER::Instance().GetMapIndex(ch->GetX(), ch->GetY());
 		p.bChannel = g_bChannel;
 		p.iLevel = ch->GetLevel();
 
@@ -204,14 +202,14 @@ void P2P_MANAGER::Login(LPDESC d, const TPacketGGLogin * p)
 	pkCCI->iLevel = p->iLevel;
 	sys_log(0, "P2P: Login %s", pkCCI->szName);
 
-	CGuildManager::instance().P2PLoginMember(pkCCI->dwPID);
-	CPartyManager::instance().P2PLogin(pkCCI->dwPID, pkCCI->szName);
+	CGuildManager::Instance().P2PLoginMember(pkCCI->dwPID);
+	CPartyManager::Instance().P2PLogin(pkCCI->dwPID, pkCCI->szName);
 
 	// CCI가 생성시에만 메신저를 업데이트하면 된다.
 	if (UpdateP2P) 
 	{
 		std::string name(pkCCI->szName);
-	    MessengerManager::instance().P2PLogin(name);
+	    MessengerManager::Instance().P2PLogin(name);
 	}
 }
 
@@ -235,10 +233,10 @@ void P2P_MANAGER::Logout(CCI * pkCCI)
 
 	std::string name(pkCCI->szName);
 
-	CGuildManager::instance().P2PLogoutMember(pkCCI->dwPID);
-	CPartyManager::instance().P2PLogout(pkCCI->dwPID);
-	MessengerManager::instance().P2PLogout(name);
-	marriage::CManager::instance().Logout(pkCCI->dwPID);
+	CGuildManager::Instance().P2PLogoutMember(pkCCI->dwPID);
+	CPartyManager::Instance().P2PLogout(pkCCI->dwPID);
+	MessengerManager::Instance().P2PLogout(name);
+	marriage::CManager::Instance().Logout(pkCCI->dwPID);
 
 	m_map_pkCCI.erase(name);
 	m_map_dwPID_pkCCI.erase(pkCCI->dwPID);
@@ -312,7 +310,7 @@ void P2P_MANAGER::GetP2PHostNames(std::string& hostNames)
 
 LPDESC P2P_MANAGER::GetP2PDescByMapIndex(int32_t lMapIndex)
 {
-	uint16_t wPort = CMapLocation::instance().GetPort(lMapIndex);
+	uint16_t wPort = CMapLocation::Instance().GetPort(lMapIndex);
 	if (wPort == 0 || wPort == mother_port)
 		return nullptr;
 

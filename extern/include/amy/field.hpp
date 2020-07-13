@@ -30,7 +30,7 @@ public:
 
     template<typename SQLType>
     SQLType as() const {
-        BOOST_ASSERT(!is_null());
+        ASIO_ASSERT(!is_null());
         return detail::value_cast<SQLType>(value_str_, length_);
     }
 

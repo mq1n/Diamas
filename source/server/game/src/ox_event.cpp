@@ -39,7 +39,7 @@ void COXEventManager::Destroy()
 
 OXEventStatus COXEventManager::GetStatus()
 {
-	uint8_t ret = quest::CQuestManager::instance().GetEventFlag("oxevent_status");
+	uint8_t ret = quest::CQuestManager::Instance().GetEventFlag("oxevent_status");
 
 	switch (ret)
 	{
@@ -86,7 +86,7 @@ void COXEventManager::SetStatus(OXEventStatus status)
 			val = 0;
 			break;
 	}
-	quest::CQuestManager::instance().RequestSetEventFlag("oxevent_status", val);
+	quest::CQuestManager::Instance().RequestSetEventFlag("oxevent_status", val);
 }
 
 
@@ -340,12 +340,12 @@ EVENTFUNC(oxevent_timer)
 
 			if (info->answer == true)
 			{
-				COXEventManager::instance().CheckAnswer(true);
+				COXEventManager::Instance().CheckAnswer(true);
 				SendNoticeMap(LC_TEXT("O 입니다"), OXEVENT_MAP_INDEX, true);
 			}
 			else
 			{
-				COXEventManager::instance().CheckAnswer(false);
+				COXEventManager::Instance().CheckAnswer(false);
 				SendNoticeMap(LC_TEXT("X 입니다"), OXEVENT_MAP_INDEX, true);
 			}
 
@@ -355,8 +355,8 @@ EVENTFUNC(oxevent_timer)
 			return PASSES_PER_SEC(5);
 
 		case 2:
-			COXEventManager::instance().WarpToAudience();
-			COXEventManager::instance().SetStatus(OXEVENT_CLOSE);
+			COXEventManager::Instance().WarpToAudience();
+			COXEventManager::Instance().SetStatus(OXEVENT_CLOSE);
 			SendNoticeMap(LC_TEXT("다음 문제 준비해주세요."), OXEVENT_MAP_INDEX, true);
 			flag = 0;
 			break;
@@ -427,7 +427,7 @@ bool COXEventManager::CheckAnswer(bool answer)
 	GPOS pos;
 	for (; iter != m_map_attender.end();)
 	{
-		pkChar = CHARACTER_MANAGER::instance().FindByPID(iter->second);
+		pkChar = CHARACTER_MANAGER::Instance().FindByPID(iter->second);
 		if (pkChar != nullptr)
 		{
 			pos = pkChar->GetXYZ();
@@ -499,7 +499,7 @@ void COXEventManager::WarpToAudience()
 	
 	for (; iter != m_map_miss.end(); ++iter)
 	{
-		pkChar = CHARACTER_MANAGER::instance().FindByPID(iter->second);
+		pkChar = CHARACTER_MANAGER::Instance().FindByPID(iter->second);
 
 		if (pkChar != nullptr)
 		{
@@ -528,7 +528,7 @@ bool COXEventManager::CloseEvent()
 	LPCHARACTER pkChar = nullptr;
 	for (; iter != m_map_char.end(); ++iter)
 	{
-		pkChar = CHARACTER_MANAGER::instance().FindByPID(iter->second);
+		pkChar = CHARACTER_MANAGER::Instance().FindByPID(iter->second);
 
 		if (pkChar != nullptr)
 			pkChar->WarpSet(EMPIRE_START_X(pkChar->GetEmpire()), EMPIRE_START_Y(pkChar->GetEmpire()));
@@ -544,10 +544,10 @@ bool COXEventManager::LogWinner()
 	
 	for (; iter != m_map_attender.end(); ++iter)
 	{
-		LPCHARACTER pkChar = CHARACTER_MANAGER::instance().FindByPID(iter->second);
+		LPCHARACTER pkChar = CHARACTER_MANAGER::Instance().FindByPID(iter->second);
 
 		if (pkChar)
-			LogManager::instance().CharLog(pkChar, 0, "OXEVENT", "LastManStanding");
+			LogManager::Instance().CharLog(pkChar, 0, "OXEVENT", "LastManStanding");
 	}
 
 	return true;
@@ -559,12 +559,12 @@ bool COXEventManager::GiveItemToAttender(uint32_t dwItemVnum, uint8_t count)
 
 	for (; iter != m_map_attender.end(); ++iter)
 	{
-		LPCHARACTER pkChar = CHARACTER_MANAGER::instance().FindByPID(iter->second);
+		LPCHARACTER pkChar = CHARACTER_MANAGER::Instance().FindByPID(iter->second);
 
 		if (pkChar)
 		{
 			pkChar->AutoGiveItem(dwItemVnum, count);
-			LogManager::instance().ItemLog(pkChar->GetPlayerID(), 0, count, dwItemVnum, "OXEVENT_REWARD", "", pkChar->GetDesc()->GetHostName(), dwItemVnum);
+			LogManager::Instance().ItemLog(pkChar->GetPlayerID(), 0, count, dwItemVnum, "OXEVENT_REWARD", "", pkChar->GetDesc()->GetHostName(), dwItemVnum);
 		}
 	}
 

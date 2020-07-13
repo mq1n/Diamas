@@ -3,7 +3,7 @@
 
 #include "../../libthecore/include/stdafx.h"
 #include "../../libthecore/include/log.h"
-#include "../../common/utils.h"
+#include "../../../common/common_incl.hpp"
 
 #include <string>
 #include <queue>

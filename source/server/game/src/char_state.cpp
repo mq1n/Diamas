@@ -348,7 +348,7 @@ void CHARACTER::CowardEscape()
 			bool bIsWayBlocked = false;
 			for (int32_t j = 1; j <= 100; ++j)
 			{
-				if (!SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx*j/100, GetY() + (int32_t) fy*j/100))
+				if (!SECTREE_MANAGER::Instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx*j/100, GetY() + (int32_t) fy*j/100))
 				{
 					bIsWayBlocked = true;
 					break;
@@ -477,102 +477,102 @@ void CHARACTER::__StateIdle_Stone()
 		SetMaxSP(10);
 		SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0);
 
-		CHARACTER_MANAGER::instance().SelectStone(this);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1500, GetY() - 1500, GetX() + 1500, GetY() + 1500);
-		CHARACTER_MANAGER::instance().SelectStone(nullptr);
+		CHARACTER_MANAGER::Instance().SelectStone(this);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1500, GetY() - 1500, GetX() + 1500, GetY() + 1500);
+		CHARACTER_MANAGER::Instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 20 && GetMaxSP() < 9)
 	{
 		SetMaxSP(9);
 		SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0);
 
-		CHARACTER_MANAGER::instance().SelectStone(this);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1500, GetY() - 1500, GetX() + 1500, GetY() + 1500);
-		CHARACTER_MANAGER::instance().SelectStone(nullptr);
+		CHARACTER_MANAGER::Instance().SelectStone(this);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1500, GetY() - 1500, GetX() + 1500, GetY() + 1500);
+		CHARACTER_MANAGER::Instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 30 && GetMaxSP() < 8)
 	{
 		SetMaxSP(8);
 		SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0);
 
-		CHARACTER_MANAGER::instance().SelectStone(this);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SelectStone(nullptr);
+		CHARACTER_MANAGER::Instance().SelectStone(this);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 40 && GetMaxSP() < 7)
 	{
 		SetMaxSP(7);
 		SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0);
 
-		CHARACTER_MANAGER::instance().SelectStone(this);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SelectStone(nullptr);
+		CHARACTER_MANAGER::Instance().SelectStone(this);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 50 && GetMaxSP() < 6)
 	{
 		SetMaxSP(6);
 		SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0);
 
-		CHARACTER_MANAGER::instance().SelectStone(this);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SelectStone(nullptr);
+		CHARACTER_MANAGER::Instance().SelectStone(this);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 60 && GetMaxSP() < 5)
 	{
 		SetMaxSP(5);
 		SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0);
 
-		CHARACTER_MANAGER::instance().SelectStone(this);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
-		CHARACTER_MANAGER::instance().SelectStone(nullptr);
+		CHARACTER_MANAGER::Instance().SelectStone(this);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
+		CHARACTER_MANAGER::Instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 70 && GetMaxSP() < 4)
 	{
 		SetMaxSP(4);
 		SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0);
 
-		CHARACTER_MANAGER::instance().SelectStone(this);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SelectStone(nullptr);
+		CHARACTER_MANAGER::Instance().SelectStone(this);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 80 && GetMaxSP() < 3)
 	{
 		SetMaxSP(3);
 		SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0);
 
-		CHARACTER_MANAGER::instance().SelectStone(this);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SelectStone(nullptr);
+		CHARACTER_MANAGER::Instance().SelectStone(this);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 90 && GetMaxSP() < 2)
 	{
 		SetMaxSP(2);
 		SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0);
 
-		CHARACTER_MANAGER::instance().SelectStone(this);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
-		CHARACTER_MANAGER::instance().SelectStone(nullptr);
+		CHARACTER_MANAGER::Instance().SelectStone(this);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
+		CHARACTER_MANAGER::Instance().SelectStone(nullptr);
 	}
 	else if (iPercent <= 99 && GetMaxSP() < 1)
 	{
 		SetMaxSP(1);
 		SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0);
 
-		CHARACTER_MANAGER::instance().SelectStone(this);
-		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
-		CHARACTER_MANAGER::instance().SelectStone(nullptr);
+		CHARACTER_MANAGER::Instance().SelectStone(this);
+		CHARACTER_MANAGER::Instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
+		CHARACTER_MANAGER::Instance().SelectStone(nullptr);
 	}
 	else
 		return;
@@ -591,7 +591,7 @@ void CHARACTER::__StateIdle_NPC()
 		return;
 	else if (IsGuardNPC())
 	{
-		if (!quest::CQuestManager::instance().GetEventFlag("noguard"))
+		if (!quest::CQuestManager::Instance().GetEventFlag("noguard"))
 		{
 			FuncFindGuardVictim f(this, 50000);
 
@@ -646,7 +646,7 @@ void CHARACTER::__StateIdle_NPC()
 					p.bHeader   = HEADER_GG_XMAS_WARP_SANTA;
 					p.bChannel  = g_bChannel;
 					p.lMapIndex = lNextMapIndex;
-					P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGXmasWarpSanta));
+					P2P_MANAGER::Instance().Send(&p, sizeof(TPacketGGXmasWarpSanta));
 				}
 				return;
 			}
@@ -696,8 +696,8 @@ void CHARACTER::__StateIdle_NPC()
 				GetDeltaByDegree(GetRotation(), fDist, &fx, &fy);
 
 				// 느슨한 못감 속성 체크; 최종 위치와 중간 위치가 갈수없다면 가지 않는다.
-				if (!(SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx, GetY() + (int32_t) fy) 
-					&& SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx / 2, GetY() + (int32_t) fy / 2)))
+				if (!(SECTREE_MANAGER::Instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx, GetY() + (int32_t) fy) 
+					&& SECTREE_MANAGER::Instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx / 2, GetY() + (int32_t) fy / 2)))
 					return;
 
 				SetNowWalking(true);
@@ -787,7 +787,7 @@ void CHARACTER::__StateIdle_Monster()
 		// 선공 몬스터 처리
 		else if (!no_wander && IsAggressive())
 		{
-			if (GetMapIndex() == 61 && quest::CQuestManager::instance().GetEventFlag("xmas_tree"));
+			if (GetMapIndex() == 61 && quest::CQuestManager::Instance().GetEventFlag("xmas_tree"));
 			// 서한산에서 나무가 있으면 선공하지않는다.
 			else
 				victim = FindMobVictim(this, m_pkMobData->m_table.wAggressiveSight);
@@ -836,8 +836,8 @@ void CHARACTER::__StateIdle_Monster()
 			GetDeltaByDegree(GetRotation(), fDist, &fx, &fy);
 
 			// 느슨한 못감 속성 체크; 최종 위치와 중간 위치가 갈수없다면 가지 않는다.
-			if (!(SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx, GetY() + (int32_t) fy) 
-						&& SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx/2, GetY() + (int32_t) fy/2)))
+			if (!(SECTREE_MANAGER::Instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx, GetY() + (int32_t) fy) 
+						&& SECTREE_MANAGER::Instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx/2, GetY() + (int32_t) fy/2)))
 				return;
 
 			// NOTE: 몬스터가 IDLE 상태에서 주변을 서성거릴 때, 현재 무조건 뛰어가게 되어 있음. (절대로 걷지 않음)
@@ -1051,7 +1051,7 @@ void CHARACTER::StateMove()
 				//LPCHARACTER rider = GetRider();
 
 				if (GetBattlegroundTeamID() && IsMonster())
-					CBattlegroundManager::instance().OnSwitchIdle(this);
+					CBattlegroundManager::Instance().OnSwitchIdle(this);
 
 				m_dwStateDuration = PASSES_PER_SEC(number(1, 3));
 			}
@@ -1127,10 +1127,10 @@ void CHARACTER::StateBattle()
 
 							GetDeltaByDegree(number(0, 359), fDist, &fx, &fy);
 
-							if (SECTREE_MANAGER::instance().IsMovablePosition(victim->GetMapIndex(),
+							if (SECTREE_MANAGER::Instance().IsMovablePosition(victim->GetMapIndex(),
 										victim->GetX() + (int32_t) fx, 
 										victim->GetY() + (int32_t) fy) && 
-									SECTREE_MANAGER::instance().IsMovablePosition(victim->GetMapIndex(),
+									SECTREE_MANAGER::Instance().IsMovablePosition(victim->GetMapIndex(),
 										victim->GetX() + (int32_t) fx/2,
 										victim->GetY() + (int32_t) fy/2))
 							{
@@ -1176,7 +1176,7 @@ void CHARACTER::StateBattle()
 		if (!GetParty())
 		{
 			// 서몬해서 채워둘 파티를 만들어 둡니다.
-			CPartyManager::instance().CreateParty(this);
+			CPartyManager::Instance().CreateParty(this);
 		}
 
 		LPPARTY pParty = GetParty();
@@ -1190,7 +1190,7 @@ void CHARACTER::StateBattle()
 			int32_t ex = GetX() + 300;
 			int32_t ey = GetY() + 300;
 
-			LPCHARACTER tch = CHARACTER_MANAGER::instance().SpawnMobRange(GetSummonVnum(), GetMapIndex(), sx, sy, ex, ey, true, true);
+			LPCHARACTER tch = CHARACTER_MANAGER::Instance().SpawnMobRange(GetSummonVnum(), GetMapIndex(), sx, sy, ex, ey, true, true);
 
 			if (tch)
 			{
@@ -1312,7 +1312,7 @@ void CHARACTER::StateBattle()
 				{
 					SendMovePacket(FUNC_MOB_SKILL, iSkillIdx, GetX(), GetY(), 0, dwCurTime);
 
-					float fDuration = CMotionManager::instance().GetMotionDuration(GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_SPECIAL_1 + iSkillIdx));
+					float fDuration = CMotionManager::Instance().GetMotionDuration(GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_SPECIAL_1 + iSkillIdx));
 					m_dwStateDuration = (uint32_t) (fDuration == 0.0f ? PASSES_PER_SEC(2) : PASSES_PER_SEC(fDuration));
 
 					if (g_bIsTestServer)
@@ -1333,7 +1333,7 @@ void CHARACTER::StateBattle()
 
 		SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0, dwCurTime);
 
-		float fDuration = CMotionManager::instance().GetMotionDuration(GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_NORMAL_ATTACK));
+		float fDuration = CMotionManager::Instance().GetMotionDuration(GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_NORMAL_ATTACK));
 		m_dwStateDuration = (uint32_t) (fDuration == 0.0f ? PASSES_PER_SEC(2) : PASSES_PER_SEC(fDuration));
 	}
 }
@@ -1431,8 +1431,8 @@ void CHARACTER::StateHorse()
 		GetDeltaByDegree(GetRotation(), fDist, &fx, &fy);
 
 		// 느슨한 못감 속성 체크; 최종 위치와 중간 위치가 갈수없다면 가지 않는다.
-		if (!(SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx, GetY() + (int32_t) fy) 
-					&& SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx/2, GetY() + (int32_t) fy/2)))
+		if (!(SECTREE_MANAGER::Instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx, GetY() + (int32_t) fy) 
+					&& SECTREE_MANAGER::Instance().IsMovablePosition(GetMapIndex(), GetX() + (int32_t) fx/2, GetY() + (int32_t) fy/2)))
 			return;
 
 		SetNowWalking(true);

@@ -1,6 +1,6 @@
 #pragma once
 
-class CTableBySkill : public singleton<CTableBySkill>
+class CTableBySkill : public CSingleton<CTableBySkill>
 {
 	public:
 		CTableBySkill()

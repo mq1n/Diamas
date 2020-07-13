@@ -1,16 +1,16 @@
 #pragma once
-#include "TIdManager.h"
+#include <NetPeerIdManager.hpp>
 
 class GAuthServer;
 
-class GAuthPeer : public net_engine::NetPeerBase, public IUniqueID <GAuthPeer, int32_t>
+class GAuthPeer : public net_engine::NetPeerBase, public net_engine::IUniqueID <GAuthPeer, uint32_t>
 {
 public:
-	GAuthPeer(std::shared_ptr<GAuthServer> server);
+	GAuthPeer(std::shared_ptr <GAuthServer> server, uint8_t securityLevel, const net_engine::TPacketCryptKey& cryptKey);
 	virtual ~GAuthPeer();
 	
-	std::shared_ptr<GAuthServer> GetServer() const;
-	int32_t GetId() const;
+	std::shared_ptr <GAuthServer> GetServer() const { return m_server.lock(); }
+	uint32_t GetId() const { return m_id; }
 
 	void SetLogin(const std::string &name) { m_name.assign(name); };
 	const std::string& GetLogin() const { return m_name; };
@@ -19,10 +19,10 @@ public:
 	const std::string& GetPassword() const { return m_password; };
 
 	virtual void OnConnect();
-	virtual void OnDisconnect();
-	virtual std::size_t OnRead(const void* data, std::size_t length);
-	virtual std::size_t OnWrite(const void* data, std::size_t length);
-	
+	virtual void OnDisconnect(const asio::error_code& er);
+	virtual void OnRead(std::shared_ptr <net_engine::Packet> packet);
+	virtual void OnError(uint32_t ulErrorType, const asio::error_code& er);
+
 	virtual void Destroy();
 	
 	virtual void Phase(uint8_t phaseId);
@@ -35,20 +35,16 @@ public:
 	virtual void SetLoginKey(uint32_t loginKey);
 	virtual uint32_t GetLoginKey() const;
 	
-#if defined(AUTH_USE_HWID)
 	virtual void SetHwid(const std::string &hwid);
 	virtual const std::string& GetHwid() const;
-#endif
 
 
 private:
 	std::weak_ptr<GAuthServer> m_server;
-	int32_t m_id;
+	uint32_t m_id;
 	std::string m_name;
 	std::string m_password;
 	uint8_t m_clientKey[16];
 	uint32_t m_loginKey;
-#if defined(AUTH_USE_HWID)
 	std::string m_hwid;
-#endif
 };

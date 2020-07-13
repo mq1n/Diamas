@@ -199,7 +199,7 @@ SBattlegroundCtx* CBattlegroundManager::CreateBattleground(uint8_t nGameMode, ui
 	if (m_bStarted == false)
 		return nullptr;
 
-	auto pkDungeon = CDungeonManager::instance().Create(BATTLEGROUND_NORMAL_MAP_INDEX);
+	auto pkDungeon = CDungeonManager::Instance().Create(BATTLEGROUND_NORMAL_MAP_INDEX);
 	if (!pkDungeon) 
 	{
 		sys_err("Battleground dungeon can not created!");
@@ -211,7 +211,7 @@ SBattlegroundCtx* CBattlegroundManager::CreateBattleground(uint8_t nGameMode, ui
 	if (!pkBattleground)
 	{
 		sys_err("Battleground object can not allocated!");
-		CDungeonManager::instance().Destroy(pkDungeon->GetId());
+		CDungeonManager::Instance().Destroy(pkDungeon->GetId());
 		return nullptr;
 	}
 	sys_log(0, "Battleground pointer created: %p", pkBattleground);
@@ -223,7 +223,7 @@ SBattlegroundCtx* CBattlegroundManager::CreateBattleground(uint8_t nGameMode, ui
 		delete pkBattleground;
 		pkBattleground = nullptr;
 
-		CDungeonManager::instance().Destroy(pkDungeon->GetId());
+		CDungeonManager::Instance().Destroy(pkDungeon->GetId());
 		return nullptr;
 	}
 	sys_log(0, "Battleground succesfully initialized! VID: %u", pkBattleground->GetVID());
@@ -666,7 +666,7 @@ void CBattlegroundManager::OnRevive(LPCHARACTER pkChar, int32_t nDeadTime)
 		pkChar->SetPosition(POS_STANDING);
 		pkChar->StartRecoveryEvent();
 
-		//CDeathMatchManager::instance().SpawnRandomPos(pkChar);
+		//CDeathMatchManager::Instance().SpawnRandomPos(pkChar);
 		pkChar->RestartAtSamePos();
 		
 //		pkChar->PointChange(POINT_HP, pkChar->GetMaxHP() - pkChar->GetHP());
@@ -698,7 +698,7 @@ void CBattlegroundManager::OnLogin(LPCHARACTER pkChar)
 	{
 		// If disconnected from event send to empire
 		if (ch->GetQuestFlag("qDeathMatchPanel.is_disconnected")){
-			CDeathMatchManager::instance().ResetScore(ch);
+			CDeathMatchManager::Instance().ResetScore(ch);
 			ch->WarpSet(EMPIRE_START_X(ch->GetEmpire()), EMPIRE_START_Y(ch->GetEmpire()));
 		}
 
@@ -708,7 +708,7 @@ void CBattlegroundManager::OnLogin(LPCHARACTER pkChar)
 
 		// If player login without event is active send to empire
 		if (!ch->IsObserverMode()){
-			if (CDeathMatchManager::instance().Enter(ch) == false)
+			if (CDeathMatchManager::Instance().Enter(ch) == false)
 			{
 				if (ch->GetGMLevel() == GM_PLAYER){
 					ch->SetQuestFlag("qDeathMatchPanel.IsInLoginned", 0);
@@ -724,7 +724,7 @@ void CBattlegroundManager::OnLogin(LPCHARACTER pkChar)
 			LPPARTY pParty = ch->GetParty();
 
 			if (pParty->GetMemberCount() == 2) {
-				CPartyManager::instance().DeleteParty(pParty);
+				CPartyManager::Instance().DeleteParty(pParty);
 			}
 			else {
 				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ÆÄÆ¼> ÆÄÆ¼¿¡¼­ ³ª°¡¼Ì½À´Ï´Ù."));
@@ -740,7 +740,7 @@ void CBattlegroundManager::OnLogin(LPCHARACTER pkChar)
 		}
 
 		if(!ch->IsObserverMode())
-			CDeathMatchManager::instance().ResetScore(ch);
+			CDeathMatchManager::Instance().ResetScore(ch);
 	}
 
 	if (ch->GetMapIndex() != DEATMATCH_MAP_INDEX){
@@ -763,7 +763,7 @@ void CBattlegroundManager::OnAffectLoad(LPCHARACTER pkChar)
 	// todo ilk x saniye yürümeyi engelle
 #if 0
 	if (GetMapIndex() == DEATMATCH_MAP_INDEX){
-		if (!IsAffectFlag(AFF_STUN) && !IsObserverMode() && !IsGM() && CDeathMatchManager::instance().GetStatus() != DEATHMATCH_STARTED)
+		if (!IsAffectFlag(AFF_STUN) && !IsObserverMode() && !IsGM() && CDeathMatchManager::Instance().GetStatus() != DEATHMATCH_STARTED)
 			AddAffect(AFFECT_STUN, 0, 0, AFF_STUN, INFINITE_AFFECT_DURATION, 0, 0, 0);
 	}
 	else{
@@ -782,7 +782,7 @@ void CBattlegroundManager::OnKill(LPCHARACTER pkKiller, LPCHARACTER pkTarget)
 {
 	#if 0
 					// Old info
-				int iDMKillerOldScore = CDeathMatchManager::instance().GetScore(pkKiller->GetPlayerID()); // Get killer now score
+				int iDMKillerOldScore = CDeathMatchManager::Instance().GetScore(pkKiller->GetPlayerID()); // Get killer now score
 				int iDMKillerKillAverage = pkKiller->GetQuestFlag("qDeathMatchPanel.kill_average"); // Get killer kill average
 
 				// Set new score to system
@@ -790,20 +790,20 @@ void CBattlegroundManager::OnKill(LPCHARACTER pkKiller, LPCHARACTER pkTarget)
 				if (iDMKillerKillAverage > 0)
 					pkKiller->SetQuestFlag("qDeathMatchPanel.kill_average", iDMKillerKillAverage - 1);
 				else
-					CDeathMatchManager::instance().SetScore(pkKiller->GetPlayerID(), iDMKillerOldScore + 1);
+					CDeathMatchManager::Instance().SetScore(pkKiller->GetPlayerID(), iDMKillerOldScore + 1);
 
 				// New Info
-				int iDMKillerNewScore = CDeathMatchManager::instance().GetScore(pkKiller->GetPlayerID()); // Get killer new score
+				int iDMKillerNewScore = CDeathMatchManager::Instance().GetScore(pkKiller->GetPlayerID()); // Get killer new score
 
 				// Send info to killer
-				// CDeathMatchManager::instance().SendScoreInfo(pkKiller->GetPlayerID(), iDMKillerNewScore);
+				// CDeathMatchManager::Instance().SendScoreInfo(pkKiller->GetPlayerID(), iDMKillerNewScore);
 				// Send info to system
-				sys_log(0, "<DeathMatch> Kill Info: Killer: %s K_Score: %d Victim: %s V_Score: %d", pkKiller->GetName(), iDMKillerNewScore, GetName(), CDeathMatchManager::instance().GetScore(GetPlayerID()));
+				sys_log(0, "<DeathMatch> Kill Info: Killer: %s K_Score: %d Victim: %s V_Score: %d", pkKiller->GetName(), iDMKillerNewScore, GetName(), CDeathMatchManager::Instance().GetScore(GetPlayerID()));
 
 				// Notice
 				if (iDMKillerNewScore == 50 || iDMKillerNewScore == 50 * 2 || iDMKillerNewScore == 50 * 3 || iDMKillerNewScore == 50 * 4 || iDMKillerNewScore == 50 * 5 ||
 					iDMKillerNewScore == 50 * 6 || iDMKillerNewScore == 50 * 7 || iDMKillerNewScore == 50 * 8 || iDMKillerNewScore == 50 * 9 || iDMKillerNewScore == 50 * 10)
-					CDeathMatchManager::instance().NoticeScore(pkKiller->GetPlayerID(), iDMKillerNewScore);
+					CDeathMatchManager::Instance().NoticeScore(pkKiller->GetPlayerID(), iDMKillerNewScore);
 
 				// Info to killer
 				if (pkKiller->GetQuestFlag("qDeathMatchPanel.kill_average") != 0)
@@ -813,7 +813,7 @@ void CBattlegroundManager::OnKill(LPCHARACTER pkKiller, LPCHARACTER pkTarget)
 
 				// Victim Stuffs
 				{
-					int iDMVictimScore = CDeathMatchManager::instance().GetScore(GetPlayerID()); // Get Victim now score
+					int iDMVictimScore = CDeathMatchManager::Instance().GetScore(GetPlayerID()); // Get Victim now score
 					int iDMVictimKillCount = GetQuestFlag("qDeathMatchPanel.kill_count"); // Get Victim kill count
 					int iDMVictimLastKiller = GetQuestFlag("qDeathMatchPanel.last_killer"); // Get Victim last killer
 
@@ -826,8 +826,8 @@ void CBattlegroundManager::OnKill(LPCHARACTER pkKiller, LPCHARACTER pkTarget)
 							if (IsAffectFlag(AFF_STUN))
 								RemoveAffect(AFFECT_STUN);
 
-							CDeathMatchManager::instance().ResetScore(this);
-							CDeathMatchManager::instance().SwitchToSpectator(this);
+							CDeathMatchManager::Instance().ResetScore(this);
+							CDeathMatchManager::Instance().SwitchToSpectator(this);
 						}
 
 						SetQuestFlag("qDeathMatchPanel.kill_average", iDMVictimKillAverage + 1);
@@ -835,19 +835,19 @@ void CBattlegroundManager::OnKill(LPCHARACTER pkKiller, LPCHARACTER pkTarget)
 					}
 
 					// Check victim dead count
-					if (iDMVictimKillCount >= quest::CQuestManager::instance().GetEventFlag("deathmatch_kill_limit")){
+					if (iDMVictimKillCount >= quest::CQuestManager::Instance().GetEventFlag("deathmatch_kill_limit")){
 						ChatPacket(CHAT_TYPE_INFO, "%d defa oldugun icin eventten cikarildin", iDMVictimKillCount + 1);
 
 						if (IsAffectFlag(AFF_STUN))
 							RemoveAffect(AFFECT_STUN);
 
-						CDeathMatchManager::instance().ResetScore(this);
-						CDeathMatchManager::instance().SwitchToSpectator(this);
+						CDeathMatchManager::Instance().ResetScore(this);
+						CDeathMatchManager::Instance().SwitchToSpectator(this);
 					}
 
 					// Set new scores to system
 					SetQuestFlag("qDeathMatchPanel.kill_count", iDMVictimKillCount + 1);
-					CDeathMatchManager::instance().SetScore(GetPlayerID(), iDMVictimScore - 1);
+					CDeathMatchManager::Instance().SetScore(GetPlayerID(), iDMVictimScore - 1);
 
 					// Last killer
 					if (iDMVictimLastKiller && iDMVictimLastKiller == pkKiller->GetPlayerID()){
@@ -857,8 +857,8 @@ void CBattlegroundManager::OnKill(LPCHARACTER pkKiller, LPCHARACTER pkTarget)
 							if (IsAffectFlag(AFF_STUN))
 								RemoveAffect(AFFECT_STUN);
 
-							CDeathMatchManager::instance().ResetScore(this);
-							CDeathMatchManager::instance().SwitchToSpectator(this);
+							CDeathMatchManager::Instance().ResetScore(this);
+							CDeathMatchManager::Instance().SwitchToSpectator(this);
 						}
 
 						SetQuestFlag("qDeathMatchPanel.same_killer", GetQuestFlag("qDeathMatchPanel.same_killer") + 1);
@@ -887,13 +887,13 @@ void CBattlegroundManager::OnKill(LPCHARACTER pkKiller, LPCHARACTER pkTarget)
 						iExtraBonus += 2;
 
 					if (iExtraBonus > 0 && iDMVictimScore > 5 && iDMKillerNewScore > 5){
-						CDeathMatchManager::instance().SetScore(pkKiller->GetPlayerID(), iDMKillerNewScore + iExtraBonus);
+						CDeathMatchManager::Instance().SetScore(pkKiller->GetPlayerID(), iDMKillerNewScore + iExtraBonus);
 						pkKiller->ChatPacket(CHAT_TYPE_INFO, "Senden guclu bir oyuncuyu oldurdun ve %d ekstra bonus kazandin.", iExtraBonus);
 					}
 				}
 
 				// Check killer score with highscore
-				CDeathMatchManager::instance().CheckHighScore(pkKiller->GetPlayerID());
+				CDeathMatchManager::Instance().CheckHighScore(pkKiller->GetPlayerID());
 	#endif
 }
 int32_t CBattlegroundManager::OnDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, int32_t nOldDamage)
@@ -902,15 +902,15 @@ int32_t CBattlegroundManager::OnDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVic
 			if (GetMapIndex() == DEATMATCH_MAP_INDEX){
 				if (pAttacker->IsPC() && IsPC()){
 					// Check event stat
-					if (CDeathMatchManager::instance().GetStatus() != DEATHMATCH_STARTED /* && !pAttacker->IsGM() */){
+					if (CDeathMatchManager::Instance().GetStatus() != DEATHMATCH_STARTED /* && !pAttacker->IsGM() */){
 						pAttacker->ChatPacket(CHAT_TYPE_INFO, "Deathmarch event do without an active you can not attack on this map");
 						SendDamagePacket(pAttacker, 0, DAMAGE_BLOCK);
 						return false;
 					}
 
 					// Bonus damage stuffs
-					int iDMKillerScore = CDeathMatchManager::instance().GetScore(pAttacker->GetPlayerID());
-					int iDMVictimScore = CDeathMatchManager::instance().GetScore(GetPlayerID());
+					int iDMKillerScore = CDeathMatchManager::Instance().GetScore(pAttacker->GetPlayerID());
+					int iDMVictimScore = CDeathMatchManager::Instance().GetScore(GetPlayerID());
 
 					if (iDMVictimScore >= iDMKillerScore * 4)
 						dam += dam * 20 / 100;

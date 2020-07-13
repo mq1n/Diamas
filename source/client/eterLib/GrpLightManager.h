@@ -1,11 +1,8 @@
 #pragma once
-
-#include "../eterBase/Singleton.h"
-
+#include "../../common/Singleton.h"
 #include "GrpBase.h"
 #include "Util.h"
 #include "Pool.h"
-
 #include <deque>
 
 typedef uint32_t TLightID;

@@ -96,7 +96,7 @@ void DESC::Destroy()
 		m_pkLoginKey->Expire();
 
 	if (GetAccountTable().id)
-		DESC_MANAGER::instance().DisconnectAccount(GetAccountTable().login);
+		DESC_MANAGER::Instance().DisconnectAccount(GetAccountTable().login);
 
 	if (m_pLogFile)
 	{
@@ -512,7 +512,7 @@ void DESC::SetPhase(int32_t _phase)
 	{
 		case PHASE_CLOSE:
 			// 메신저가 캐릭터단위가 되면서 삭제
-			//MessengerManager::instance().Logout(GetAccountTable().login);
+			//MessengerManager::Instance().Logout(GetAccountTable().login);
 			m_pInputProcessor = &m_inputClose;
 			break;
 
@@ -522,7 +522,7 @@ void DESC::SetPhase(int32_t _phase)
 
 		case PHASE_SELECT:
 			// 메신저가 캐릭터단위가 되면서 삭제
-			//MessengerManager::instance().Logout(GetAccountTable().login); // 의도적으로 break 안검
+			//MessengerManager::Instance().Logout(GetAccountTable().login); // 의도적으로 break 안검
 		case PHASE_LOGIN:
 		case PHASE_LOADING:
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
@@ -553,7 +553,7 @@ void DESC::BindAccountTable(TAccountTable * pAccountTable)
 {
 	assert(pAccountTable != nullptr);
 	memcpy(&m_accountTable, pAccountTable, sizeof(TAccountTable));
-	DESC_MANAGER::instance().ConnectAccount(m_accountTable.login, this);
+	DESC_MANAGER::Instance().ConnectAccount(m_accountTable.login, this);
 }
 
 void DESC::Log(const char * format, ...)
@@ -872,7 +872,7 @@ void DESC::SendLoginSuccessPacket()
 	p.header    = HEADER_GC_LOGIN_SUCCESS;
 
 	p.handle     = GetHandle();
-	p.random_key = DESC_MANAGER::instance().MakeRandomKey(GetHandle()); // FOR MARK
+	p.random_key = DESC_MANAGER::Instance().MakeRandomKey(GetHandle()); // FOR MARK
 	memcpy(p.akSimplePlayerInformation, rTable.players, sizeof(rTable.players));
 
 	for (int32_t i = 0; i < PLAYER_PER_ACCOUNT; ++i)
@@ -881,7 +881,7 @@ void DESC::SendLoginSuccessPacket()
 		if (!g_stProxyIP.empty())
 			rTable.players[i].lAddr=inet_addr(g_stProxyIP.c_str());
 #endif
-		CGuild* g = CGuildManager::instance().GetLinkedGuild(rTable.players[i].dwID);
+		CGuild* g = CGuildManager::Instance().GetLinkedGuild(rTable.players[i].dwID);
 
 		if (g)
 		{   
@@ -917,7 +917,7 @@ uint32_t DESC::GetLoginKey()
 	return m_dwLoginKey;
 }
 
-const uint8_t* GetKey_20050304Myevan()
+const uint8_t* GetSpecialKey()
 {   
 	static bool bGenerated = false;
 	static uint32_t s_adwKey[1938]; 
@@ -944,7 +944,7 @@ void DESC::SetSecurityKey(const uint32_t * c_pdwKey)
 {
 	const uint8_t * c_pszKey = (const uint8_t *) "JyTxtHljHJlVJHorRM301vf@4fvj10-v";
 
-	c_pszKey = GetKey_20050304Myevan() + 37;
+	c_pszKey = GetSpecialKey() + 37;
 
 	memcpy(&m_adwDecryptionKey, c_pdwKey, 16);
 	TEA_Encrypt(&m_adwEncryptionKey[0], &m_adwDecryptionKey[0], (const uint32_t *) c_pszKey, 16);

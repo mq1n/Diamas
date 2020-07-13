@@ -1,7 +1,7 @@
 #pragma once
 #include "minilzo.h"
 
-class LZOManager : public singleton<LZOManager>
+class LZOManager : public CSingleton<LZOManager>
 {
 	public:
 		LZOManager();

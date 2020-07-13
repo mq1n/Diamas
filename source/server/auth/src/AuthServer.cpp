@@ -1,13 +1,12 @@
-#include "stdafx.h"
-#include "GAuthServer.h"
-#include "GAuthPeer.h"
-#include "Utils.h"
-#include "Packets.h"
-#include <random>
+#include "stdafx.hpp"
+#include "AuthServer.hpp"
+#include "AuthPeer.hpp"
+#include "Packets.hpp"
+using namespace net_engine;
 
-void HandleGenericUpdateResult(asio::error_code const &ec, uint64_t affected_rows, amy::mariadb_connector&connector, std::shared_ptr<GAuthPeer> peer, const std::string & what)
+void HandleGenericUpdateResult(asio::error_code const &ec, uint64_t affected_rows, amy::connector&connector, std::shared_ptr<GAuthPeer> peer, const std::string & what)
 {
-	if(affected_rows > 0 && peer)
+	if (affected_rows > 0 && peer)
 		sys_log(LL_SYS, "Updated %s of account %s", what.c_str(), peer->GetLogin().c_str());
 	return;
 }
@@ -28,25 +27,14 @@ static void writePid(const char *filename)
 
 
 
-GAuthServer::GAuthServer(NetService &netService) :
-	NetServer(netService()), m_netService(netService), m_dbManager(netService()), m_configXml("config.json"), m_configKey("1")
+GAuthServer::GAuthServer(NetServiceBase& netService, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
+	NetServerBase(netService(), securityLevel, cryptKey), m_netService(netService), m_dbManager(netService()),
+	m_configXml("config.json"), m_configKey("1"), m_securityLevel(securityLevel), m_crypt_key(cryptKey)
 {
 }
 GAuthServer::~GAuthServer()
 {
 }
-
-NetService &GAuthServer::GetService() const 
-{ 
-	return m_netService;
-}
-
-
-GAccountManager &GAuthServer::GetAccountManager() 
-{
-	return m_accountManager;
-}
-
 
 
 void GAuthServer::Init(int argc, char** argv) 
@@ -92,7 +80,7 @@ bool GAuthServer::IsShuttingDown() const
 }
 
 
-std::shared_ptr<GAuthPeer> GAuthServer::FindPeer(int32_t id) const
+std::shared_ptr <GAuthPeer> GAuthServer::FindPeer(uint32_t id) const
 {
 	auto iter = m_peers.find(id);
 	if (iter != m_peers.end())
@@ -102,7 +90,7 @@ std::shared_ptr<GAuthPeer> GAuthServer::FindPeer(int32_t id) const
 	return nullptr;
 }
 
-void GAuthServer::RemovePeer(int32_t id) 
+void GAuthServer::RemovePeer(uint32_t id) 
 {
 	auto iter = m_peers.find(id);
 	if (iter != m_peers.end()) 
@@ -111,43 +99,12 @@ void GAuthServer::RemovePeer(int32_t id)
 	}
 }
 
-std::shared_ptr<NetPeer> GAuthServer::NewPeer() 
+std::shared_ptr <NetPeerBase> GAuthServer::NewPeer() 
 {
-	std::shared_ptr<GAuthPeer> peer = std::make_shared<GAuthPeer>(std::static_pointer_cast<GAuthServer>(shared_from_this()));
-	m_peers.insert(std::unordered_map<int32_t, std::shared_ptr<GAuthPeer> >::value_type(peer->GetId(), peer));
+	auto peer = std::make_shared<GAuthPeer>(std::static_pointer_cast<GAuthServer>(shared_from_this()), m_securityLevel, m_crypt_key);
+	m_peers.emplace(peer->GetId(), peer);
 	return peer;
 }
-
-
-
-std::size_t GAuthServer::ProcessInput(std::shared_ptr<GAuthPeer> peer, const void* data, std::size_t maxlength) 
-{
-	auto pData = reinterpret_cast<const uint8_t *>(data);
-
-	std::size_t offset = 0;
-	while (offset < maxlength) 
-	{
-		uint8_t packetId = 0;
-		while (offset < maxlength && (packetId = pData[offset]) == 0) ++offset;
-
-		auto handler = m_handlers.find(packetId);
-		if (handler == m_handlers.end()) 
-		{
-			// log + kick? unkwnown packet dc
-			sys_log(LL_ERR, "Unknown Packet with id %d (%02x) received from client %s (%d)", packetId, packetId, peer->GetLogin().c_str(), peer->GetId());
-			peer->Disconnect();
-			return 0;
-		}
-
-		std::size_t handlerResult = handler->second.second(peer, pData + offset, maxlength - offset);
-		if (handlerResult == 0) 
-			break; // handler returned 0 == zu wenig daten
-		offset += handlerResult;
-	}
-	return offset;
-}
-
-
 
 
 void GAuthServer::__parseCmdLine(int argc, char **argv) 
@@ -208,6 +165,7 @@ void GAuthServer::__parseCmdLine(int argc, char **argv)
 
 bool GAuthServer::__parseConfig()
 {
+	/*
 	using namespace boost::property_tree;
 	ptree root;
 
@@ -277,14 +235,14 @@ bool GAuthServer::__parseConfig()
 			break;
 		}
 	}
-
+	*/
 	return true;
 }
 
 void GAuthServer::__registerHandlers()
 {
-	RegisterPacket<TPacketCGLogin3>(HEADER_CG_LOGIN3, std::bind(&GAuthServer::RecvLogin, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-	RegisterPacket<TPacketCGHack>(HEADER_CG_HACK, std::bind(&GAuthServer::RecvHack, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+//	RegisterPacket<TPacketCGLogin3>(HEADER_CG_LOGIN3, std::bind(&GAuthServer::RecvLogin, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+//	RegisterPacket<TPacketCGHack>(HEADER_CG_HACK, std::bind(&GAuthServer::RecvHack, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
 
@@ -318,14 +276,14 @@ void GAuthServer::OnMySQLConnect(std::weak_ptr<GAuthServer> self, const asio::er
 	}
 }
 
-void GAuthServer::OnLoginSQLQuery(std::weak_ptr<GAuthServer> self, const asio::error_code &e, std::shared_ptr<GAuthPeer> peer, uint32_t loginKey) 
+void GAuthServer::OnLoginSQLQuery(std::weak_ptr<GAuthServer> self, const asio::error_code &e, std::shared_ptr <GAuthPeer> peer, uint32_t loginKey) 
 {
 	std::shared_ptr<GAuthServer> _this(self.lock());
 	if (_this) 
 	{
 		if (!e) 
 		{
-			_this->m_dbManager.async_store_result(boost::bind(&GAuthServer::OnLoginSQLResult, self, _1, _2, peer, loginKey));
+			_this->m_dbManager.async_store_result(std::bind(&GAuthServer::OnLoginSQLResult, self, std::placeholders::_1, std::placeholders::_2, peer, loginKey));
 
 		}
 		else
@@ -339,7 +297,7 @@ void GAuthServer::OnLoginSQLQuery(std::weak_ptr<GAuthServer> self, const asio::e
 
 void GAuthServer::OnLoginSQLResult(std::weak_ptr<GAuthServer> self, const asio::error_code &e, amy::result_set rs, std::shared_ptr<GAuthPeer> peer, uint32_t loginKey)
 {
-	std::shared_ptr<GAuthServer> _this(self.lock());
+	std::shared_ptr <GAuthServer> _this(self.lock());
 	if (_this)
 	{
 		if (!e) 
@@ -448,15 +406,13 @@ void GAuthServer::OnLoginSQLResult(std::weak_ptr<GAuthServer> self, const asio::
 
 				amy::async_execute(_this->m_dbManager,
 						fmt::format("UPDATE account SET last_play = NOW() WHERE login = '{0}'", peer->GetLogin()),
-						boost::bind(HandleGenericUpdateResult, _1, _2, boost::ref(_this->m_dbManager), peer, std::string("Last Play")
+						std::bind(HandleGenericUpdateResult, std::placeholders::_1, std::placeholders::_2, std::ref(_this->m_dbManager), peer, std::string("Last Play")
 				));
 
 				_this->m_accountManager.ConnectAccount(peer->GetLogin(), loginKey);
 
 				_this->m_dbClient->SendAuthLogin(peer->GetId(), accId, peer->GetLogin(), socialId, lang,
-#if defined(AUTH_USE_HWID)
 						peer->GetHwid(),
-#endif
 						loginKey, aiPremiumTimes, peer->GetClientKey()
 				);
 
@@ -476,6 +432,7 @@ void GAuthServer::OnLoginSQLResult(std::weak_ptr<GAuthServer> self, const asio::
 
 std::size_t GAuthServer::RecvLogin(std::shared_ptr<GAuthPeer> peer, const void* data, std::size_t maxlength)
 {
+#if 0
 	if (maxlength < TPacketCGLogin3::size())
 		return 0;
 
@@ -486,7 +443,7 @@ std::size_t GAuthServer::RecvLogin(std::shared_ptr<GAuthPeer> peer, const void* 
 		return TPacketCGLogin3::size();
 	}
 
-	auto packet = reinterpret_cast<const TPacketCGLogin3 *>(data);
+	auto packet = reinterpret_cast<const SPacketCGLogin3 *>(data);
 
 	std::string login(packet->login, std::min<std::size_t>(strlen(packet->login), sizeof(packet->login)));
 	std::string password(packet->password, std::min<std::size_t>(strlen(packet->password), sizeof(packet->password)));
@@ -539,7 +496,8 @@ std::size_t GAuthServer::RecvLogin(std::shared_ptr<GAuthPeer> peer, const void* 
 	char szPasswd[sizeof(packet->password) * 2 + 1];
 	mysql_real_escape_string(m_dbManager.native(), szPasswd, peer->GetPassword().c_str(), peer->GetPassword().length());
 
-#if defined(AUTH_USE_HWID)
+
+
 	peer->SetHwid(packet->hwid);
 
 	char szHWID[sizeof(packet->hwid) * 2 + 1];
@@ -571,8 +529,9 @@ std::size_t GAuthServer::RecvLogin(std::shared_ptr<GAuthPeer> peer, const void* 
 
 	amy::async_execute(m_dbManager,
 			fmt::format("UPDATE account SET hwid = '{0}' WHERE login = '{0}'", szHWID, szLogin),
-			boost::bind(HandleGenericUpdateResult, _1, _2, boost::ref(m_dbManager), peer, std::string("HWID")));
-#endif
+			std::bind(HandleGenericUpdateResult, std::placeholders::_1, std::placeholders::_2, std::ref(m_dbManager), peer, std::string("HWID")));
+
+
 
 	std::string lang = std::string(packet->lang, std::min<std::size_t>(strlen(packet->lang), sizeof(packet->lang)));
 
@@ -581,7 +540,7 @@ std::size_t GAuthServer::RecvLogin(std::shared_ptr<GAuthPeer> peer, const void* 
 
 	amy::async_execute(m_dbManager,
 			fmt::format("UPDATE account SET lang = '{0}' WHERE login = '{1}'", szLang, szLogin),
-			boost::bind(HandleGenericUpdateResult, _1, _2, boost::ref(m_dbManager), peer, std::string("Language")));
+			std::bind(HandleGenericUpdateResult, std::placeholders::_1, std::placeholders::_2, std::ref(m_dbManager), peer, std::string("Language")));
 
 	std::string stQuery = fmt::format(
 			"SELECT id, PASSWORD('{0}'), password, social_id,"
@@ -600,13 +559,16 @@ std::size_t GAuthServer::RecvLogin(std::shared_ptr<GAuthPeer> peer, const void* 
 			" FROM account WHERE login = '{1}'",
 			szPasswd , szLogin);
 
-	amy::async_execute(m_dbManager, stQuery, boost::bind(&GAuthServer::OnLoginSQLQuery, std::static_pointer_cast<GAuthServer>(shared_from_this()), _1, peer, loginKey));
+	amy::async_execute(m_dbManager, stQuery, std::bind(&GAuthServer::OnLoginSQLQuery, std::static_pointer_cast<GAuthServer>(shared_from_this()), std::placeholders::_1, peer, loginKey));
 
-	return TPacketCGLogin3::size();
+//	return TPacketCGLogin3::size();
+#endif
+	return 1;
 }
 
 std::size_t GAuthServer::RecvHack(std::shared_ptr<GAuthPeer> peer, const void *data, std::size_t maxlength)
 {
+	/*
 	if (maxlength < TPacketCGHack::size())
 		return 0;
 
@@ -614,4 +576,6 @@ std::size_t GAuthServer::RecvHack(std::shared_ptr<GAuthPeer> peer, const void *d
 	sys_log(LL_SYS, "Hack detected by Client %s (%d): %s", peer->GetIP().c_str(), peer->GetId(), packet->message);
 
 	return TPacketCGHack::size();
+	*/
+	return 1;
 }

@@ -534,23 +534,6 @@ bool CMapManager::GetAttr(int32_t iX, int32_t iY, uint8_t * pbyAttr)
 	return rkMap.GetAttr(iX, iY, pbyAttr);
 }
 
-// 2004.10.14.myevan.TEMP_CAreaLoaderThread
-/*
-bool CMapManager::BGLoadingEnable()
-{
-	if (!IsMapReady())
-		return false;
-	return ((CMapOutdoor*)m_pMap)->BGLoadingEnable();
-}
-
-void CMapManager::BGLoadingEnable(bool bBGLoadingEnable)
-{
-	if (!IsMapReady())
-		return;
-	((CMapOutdoor*)m_pMap)->BGLoadingEnable(bBGLoadingEnable);
-}
-*/
-
 void CMapManager::SetTerrainRenderSort(CMapOutdoor::ETerrainRenderSort eTerrainRenderSort)
 {
 	if (!IsMapReady())

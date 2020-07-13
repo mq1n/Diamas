@@ -1,7 +1,7 @@
 #pragma once
 #include "db.h"
 
-class MessengerManager : public singleton<MessengerManager>
+class MessengerManager : public CSingleton<MessengerManager>
 {
 	public:
 		typedef std::string keyT;

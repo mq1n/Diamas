@@ -133,7 +133,7 @@ bool CPolymorphUtils::GiveBook(LPCHARACTER pChar, uint32_t dwMobVnum, uint32_t d
 	if (pItem == nullptr)
 		return false;
 
-	if (CMobManager::instance().Get(dwMobVnum) == nullptr)
+	if (CMobManager::Instance().Get(dwMobVnum) == nullptr)
 	{
 		sys_err("Wrong Polymorph vnum passed: CPolymorphUtils::GiveBook(PID(%d), %d %d %d %d)", 
 				pChar->GetPlayerID(), dwMobVnum, dwPracticeCount, BookLevel, LevelLimit);

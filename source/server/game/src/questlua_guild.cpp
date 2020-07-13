@@ -10,9 +10,9 @@
 
 #undef sys_err
 #ifndef __WIN32__
-#define sys_err(fmt, args...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
+#define sys_err(fmt, args...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
 #else
-#define sys_err(fmt, ...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
+#define sys_err(fmt, ...) quest::CQuestManager::Instance().QuestError(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
 #endif
 
 namespace quest
@@ -22,7 +22,7 @@ namespace quest
 	//
 	int32_t guild_around_ranking_string(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 		if (!ch)
 		{
@@ -37,7 +37,7 @@ namespace quest
 		}
 		
 		char szBuf[4096+1];
-		CGuildManager::instance().GetAroundRankString(ch->GetGuild()->GetID(), szBuf, sizeof(szBuf));
+		CGuildManager::Instance().GetAroundRankString(ch->GetGuild()->GetID(), szBuf, sizeof(szBuf));
 		
 		lua_pushstring(L, szBuf);
 		return 1;
@@ -45,7 +45,7 @@ namespace quest
 
 	int32_t guild_high_ranking_string(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 		if (!ch)
 		{
@@ -57,14 +57,14 @@ namespace quest
 			dwMyGuild = ch->GetGuild()->GetID();
 
 		char szBuf[4096+1];
-		CGuildManager::instance().GetHighRankString(dwMyGuild, szBuf, sizeof(szBuf));
+		CGuildManager::Instance().GetHighRankString(dwMyGuild, szBuf, sizeof(szBuf));
 		lua_pushstring(L, szBuf);
 		return 1;
 	}
 
 	int32_t guild_get_ladder_point(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 		if (!ch)
 		{
@@ -84,7 +84,7 @@ namespace quest
 
 	int32_t guild_get_rank(lua_State* L)
 	{
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 		if (!ch)
 		{
@@ -98,7 +98,7 @@ namespace quest
 		}
 		else
 		{
-			lua_pushnumber(L, CGuildManager::instance().GetRank(ch->GetGuild()));
+			lua_pushnumber(L, CGuildManager::Instance().GetRank(ch->GetGuild()));
 		}
 		return 1;
 	}
@@ -111,7 +111,7 @@ namespace quest
 			return 0;
 		}
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -134,7 +134,7 @@ namespace quest
 			return 0;
 		}
 
-		CGuild * pkGuild = CGuildManager::instance().FindGuild((uint32_t) lua_tonumber(L, 1));
+		CGuild * pkGuild = CGuildManager::Instance().FindGuild((uint32_t) lua_tonumber(L, 1));
 
 		if (pkGuild)
 			lua_pushstring(L, pkGuild->GetName());
@@ -152,7 +152,7 @@ namespace quest
 			return 0;
 		}
 
-		CGuild * pkGuild = CGuildManager::instance().FindGuild((uint32_t) lua_tonumber(L, 1));
+		CGuild * pkGuild = CGuildManager::Instance().FindGuild((uint32_t) lua_tonumber(L, 1));
 
 		if (pkGuild)
 			lua_pushnumber(L, pkGuild->GetLevel());
@@ -170,7 +170,7 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager& q = CQuestManager::instance();
+		CQuestManager& q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 		if (!ch)
 		{
@@ -186,7 +186,7 @@ namespace quest
 
 	int32_t guild_get_any_war(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -209,7 +209,7 @@ namespace quest
 			return 1;
 		}
 
-		CGuild * pkGuild = CGuildManager::instance().FindGuild((uint32_t) lua_tonumber(L, 1));
+		CGuild * pkGuild = CGuildManager::Instance().FindGuild((uint32_t) lua_tonumber(L, 1));
 
 		if (pkGuild)
 			lua_pushstring(L, pkGuild->GetName());
@@ -222,14 +222,14 @@ namespace quest
 	int32_t guild_get_warp_war_list(lua_State* L)
 	{
 		FBuildLuaGuildWarList f(L);
-		CGuildManager::instance().for_each_war(f);
+		CGuildManager::Instance().for_each_war(f);
 
 		return 1;
 	}
 
 	int32_t guild_get_member_count(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		
 		if ( ch == nullptr )
 		{
@@ -259,7 +259,7 @@ namespace quest
 		//	3 : 요청 성공
 		//	4 : 길드가 없음
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -315,7 +315,7 @@ namespace quest
 		//	6 : 지정한 캐릭터 레벨이 기준레벨보다 낮음
 		//	7 : 새 길드장이 be_other_leader 제한에 걸림
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -339,7 +339,7 @@ namespace quest
 				}
 				else
 				{
-					LPCHARACTER pNewMaster = CHARACTER_MANAGER::instance().FindPC( lua_tostring(L,1) );
+					LPCHARACTER pNewMaster = CHARACTER_MANAGER::Instance().FindPC( lua_tostring(L,1) );
 					if (pNewMaster)
 					{
 						if (pNewMaster->GetLevel() < lua_tonumber(L, 2))
@@ -349,7 +349,7 @@ namespace quest
 						else
 						{
 							int32_t nBeOtherLeader = pNewMaster->GetQuestFlag("change_guild_master.be_other_leader");
-							CQuestManager::instance().GetPC( ch->GetPlayerID() );
+							CQuestManager::Instance().GetPC( ch->GetPlayerID() );
 
 							if ( lua_toboolean(L, 6) ) 
 								nBeOtherLeader = 0;
@@ -403,7 +403,7 @@ namespace quest
 
 	int32_t guild_get_id(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -418,7 +418,7 @@ namespace quest
 
 	int32_t guild_get_sp(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -433,7 +433,7 @@ namespace quest
 
 	int32_t guild_get_maxsp(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -448,7 +448,7 @@ namespace quest
 
 	int32_t guild_get_money(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -463,7 +463,7 @@ namespace quest
 
 	int32_t guild_get_max_member(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -478,7 +478,7 @@ namespace quest
 
 	int32_t guild_get_total_member_level(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -493,7 +493,7 @@ namespace quest
 
 	int32_t guild_has_land(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -508,7 +508,7 @@ namespace quest
 
 	int32_t guild_get_win_count(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -523,7 +523,7 @@ namespace quest
 
 	int32_t guild_get_draw_count(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -538,7 +538,7 @@ namespace quest
 
 	int32_t guild_get_loss_count(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -556,7 +556,7 @@ namespace quest
 		if (!lua_isstring(L, 1))
 			return 0;
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -575,7 +575,7 @@ namespace quest
 		if (!lua_isnumber(L, 1))
 			return 0;
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -597,7 +597,7 @@ namespace quest
 
 	int32_t guild_offer_exp(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -639,7 +639,7 @@ namespace quest
 		if (!lua_isnumber(L, 1))
 			return 0;
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch) 
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -659,8 +659,8 @@ namespace quest
 		if (!lua_isstring(L, 1) || !lua_isstring(L, 2))
 			return 0;
 
-		CHARACTER* lpGuildOwn1 = CHARACTER_MANAGER::instance().FindPC(lua_tostring(L, 1));
-		CHARACTER* lpGuildOwn2 = CHARACTER_MANAGER::instance().FindPC(lua_tostring(L, 2));
+		CHARACTER* lpGuildOwn1 = CHARACTER_MANAGER::Instance().FindPC(lua_tostring(L, 1));
+		CHARACTER* lpGuildOwn2 = CHARACTER_MANAGER::Instance().FindPC(lua_tostring(L, 2));
 		if (lpGuildOwn1 || lpGuildOwn2)
 			return 0;
 
@@ -723,7 +723,7 @@ namespace quest
 			{ nullptr,						nullptr						}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("guild", guild_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("guild", guild_functions);
 	}
 }
 

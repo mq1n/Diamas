@@ -27,9 +27,9 @@ namespace quest
 
 		char buf[PATH_MAX]{};
 
-		CQuestManager::TEventNameMap::iterator itEventName = CQuestManager::instance().m_mapEventName.begin();
+		CQuestManager::TEventNameMap::iterator itEventName = CQuestManager::Instance().m_mapEventName.begin();
 
-		while (itEventName != CQuestManager::instance().m_mapEventName.end())
+		while (itEventName != CQuestManager::Instance().m_mapEventName.end())
 		{
 			auto it = itEventName;
 			++itEventName;
@@ -76,7 +76,7 @@ namespace quest
 
 		size_t i = s.find('.');
 
-		CQuestManager & q = CQuestManager::instance();
+		CQuestManager & q = CQuestManager::Instance();
 
 		//
 		// script_name examples:
@@ -275,7 +275,7 @@ namespace quest
 	{
 		bool result = HandleEvent(pc, QUEST_ITEM_TAKE_EVENT);
 		if (!result)
-			CQuestManager::instance().ClearCurrentItem();
+			CQuestManager::Instance().ClearCurrentItem();
 
 		return result;
 	}
@@ -289,7 +289,7 @@ namespace quest
 			result = HandleEvent(pc, QUEST_ITEM_USE_EVENT);
 
 		if (!result)
-			CQuestManager::instance().ClearCurrentItem();
+			CQuestManager::Instance().ClearCurrentItem();
 
 		return result;
 	}
@@ -303,7 +303,7 @@ namespace quest
 			result = HandleEvent(pc, QUEST_SIG_USE_EVENT);
 
 		if (!result)
-			CQuestManager::instance().ClearCurrentItem();
+			CQuestManager::Instance().ClearCurrentItem();
 
 		return result;
 	}
@@ -362,13 +362,13 @@ namespace quest
 		/*
 		   if (c_pszQuestName)
 		   {
-		   uint32_t dwQI = CQuestManager::instance().GetQuestIndexByName(c_pszQuestName);
+		   uint32_t dwQI = CQuestManager::Instance().GetQuestIndexByName(c_pszQuestName);
 
 		   if (dwQI)
 		   {
 		   std::string stQuestName(c_pszQuestName);
 
-		   CQuestManager & q = CQuestManager::instance();
+		   CQuestManager & q = CQuestManager::Instance();
 
 		   QuestMapType::iterator qmit = m_mapOwnQuest[QUEST_LOGIN_EVENT].begin();
 
@@ -431,7 +431,7 @@ namespace quest
 			// 없으니 새로 시작
 			uint32_t dwQuestIndex = itQuestMap->first;
 
-			if (NPC::HasStartState(itQuestMap->second) && CQuestManager::instance().CanStartQuest(dwQuestIndex))
+			if (NPC::HasStartState(itQuestMap->second) && CQuestManager::Instance().CanStartQuest(dwQuestIndex))
 			{
 				size++;
 				vdwNewStartQuestIndices.push_back(dwQuestIndex);
@@ -492,7 +492,7 @@ namespace quest
 		{
 			if (g_bIsTestServer)
 			{
-				CQuestManager & mgr = CQuestManager::instance();
+				CQuestManager & mgr = CQuestManager::Instance();
 
 				sys_err("QUEST There's suspended quest state, can't run new quest state (quest: %s pc: %s)",
 						pc.GetCurrentQuestName().c_str(),
@@ -547,7 +547,7 @@ namespace quest
 		{
 			uint32_t dwQuestIndex = itQuestMap->first;
 
-			if (NPC::HasStartState(itQuestMap->second) && CQuestManager::instance().CanStartQuest(dwQuestIndex))
+			if (NPC::HasStartState(itQuestMap->second) && CQuestManager::Instance().CanStartQuest(dwQuestIndex))
 			{
 				const NPC::AQuestScriptType & QuestScript = itQuestMap->second;
 				auto it = QuestScript.find(QUEST_START_STATE_INDEX);
@@ -556,7 +556,7 @@ namespace quest
 				{
 					bHandled = true;
 					CQuestManager::ExecuteQuestScript(
-							*CQuestManager::instance().GetCurrentPC(), 
+							*CQuestManager::Instance().GetCurrentPC(), 
 							dwQuestIndex,
 							QUEST_START_STATE_INDEX, 
 							it->second.GetCode(), 
@@ -586,7 +586,7 @@ namespace quest
 				bHandled = true;
 
 				CQuestManager::ExecuteQuestScript(
-						*CQuestManager::instance().GetCurrentPC(), 
+						*CQuestManager::Instance().GetCurrentPC(), 
 						itQuestMap->first, 
 						iPCState, 
 						itQuestScript->second.GetCode(), 
@@ -607,7 +607,7 @@ namespace quest
 		{
 			if (g_bIsTestServer)
 			{
-				CQuestManager & mgr = CQuestManager::instance();
+				CQuestManager & mgr = CQuestManager::Instance();
 
 				sys_err("QUEST There's suspended quest state, can't run new quest state (quest: %s pc: %s)",
 						pc.GetCurrentQuestName().c_str(),
@@ -645,14 +645,14 @@ namespace quest
 		{
 			uint32_t dwQuestIndex = itQuestMap->first;
 
-			if (NPC::HasStartState(itQuestMap->second) && CQuestManager::instance().CanStartQuest(dwQuestIndex))
+			if (NPC::HasStartState(itQuestMap->second) && CQuestManager::Instance().CanStartQuest(dwQuestIndex))
 			{
 				const NPC::AQuestScriptType& QuestScript = itQuestMap->second;
 				auto it = QuestScript.find(QUEST_START_STATE_INDEX);
 				if (it != QuestScript.end())
 				{
 					bHandled = true;
-					PC* pPC = CQuestManager::instance().GetCurrentPC();
+					PC* pPC = CQuestManager::Instance().GetCurrentPC();
 					if (CQuestManager::ExecuteQuestScript(
 								*pPC,
 								dwQuestIndex,
@@ -661,10 +661,10 @@ namespace quest
 								it->second.GetSize()))
 					{
 						sys_err("QUEST NOT END RUNNING on Login/Logout - %s", 
-								CQuestManager::instance().GetQuestNameByIndex(itQuestMap->first).c_str());
+								CQuestManager::Instance().GetQuestNameByIndex(itQuestMap->first).c_str());
 
 						QuestState& rqs = *pPC->GetRunningQuestState();
-						CQuestManager::instance().CloseState(rqs);
+						CQuestManager::Instance().CloseState(rqs);
 						pPC->EndRunning();
 					}
 				}
@@ -689,7 +689,7 @@ namespace quest
 
 			if (itQuestScript != QuestScript.end())
 			{
-				PC * pPC = CQuestManager::instance().GetCurrentPC();
+				PC * pPC = CQuestManager::Instance().GetCurrentPC();
 
 				if (CQuestManager::ExecuteQuestScript(
 							*pPC,
@@ -699,10 +699,10 @@ namespace quest
 							itQuestScript->second.GetSize()))
 				{
 					sys_err("QUEST NOT END RUNNING on Login/Logout - %s", 
-							CQuestManager::instance().GetQuestNameByIndex(itQuestMap->first).c_str());
+							CQuestManager::Instance().GetQuestNameByIndex(itQuestMap->first).c_str());
 
 					QuestState& rqs = *pPC->GetRunningQuestState();
-					CQuestManager::instance().CloseState(rqs);
+					CQuestManager::Instance().CloseState(rqs);
 					pPC->EndRunning();
 				}
 				bHandled = true;
@@ -724,7 +724,7 @@ namespace quest
 		{
 			if (g_bIsTestServer)
 			{
-				CQuestManager & mgr = CQuestManager::instance();
+				CQuestManager & mgr = CQuestManager::Instance();
 
 				sys_err("QUEST There's suspended quest state, can't run new quest state (quest: %s pc: %s)",
 						pc.GetCurrentQuestName().c_str(),
@@ -753,7 +753,7 @@ namespace quest
 		{
 			if (g_bIsTestServer)
 			{
-				CQuestManager & mgr = CQuestManager::instance();
+				CQuestManager & mgr = CQuestManager::Instance();
 
 				sys_err("QUEST There's suspended quest state, can't run new quest state (quest: %s pc: %s)",
 						pc.GetCurrentQuestName().c_str(),
@@ -774,7 +774,7 @@ namespace quest
 		QuestMapType & rmapEventOwnQuest = m_mapOwnQuest[EventIndex];
 		auto itQuestMap = rmapEventOwnQuest.find(quest_index);
 
-		const char * questName = CQuestManager::instance().GetQuestNameByIndex(quest_index).c_str();
+		const char * questName = CQuestManager::Instance().GetQuestNameByIndex(quest_index).c_str();
 
 		if (itQuestMap == rmapEventOwnQuest.end())
 		{
@@ -786,7 +786,7 @@ namespace quest
 
 		if (itQuestScript == itQuestMap->second.end())
 		{
-			sys_err("QUEST no info script by state %d (quest %s state %s)", itPCQuest->second.st, questName, CQuestManager::instance().GetQuestStateName(questName, itPCQuest->second.st));
+			sys_err("QUEST no info script by state %d (quest %s state %s)", itPCQuest->second.st, questName, CQuestManager::Instance().GetQuestStateName(questName, itPCQuest->second.st));
 			return false;
 		}
 
@@ -802,7 +802,7 @@ namespace quest
 		{
 			if (g_bIsTestServer)
 			{
-				CQuestManager & mgr = CQuestManager::instance();
+				CQuestManager & mgr = CQuestManager::Instance();
 
 				sys_err("QUEST There's suspended quest state, can't run new quest state (quest: %s pc: %s)",
 						pc.GetCurrentQuestName().c_str(),
@@ -830,7 +830,7 @@ namespace quest
 		else
 		{
 			// 새로 시작할까요?
-			if (CQuestManager::instance().CanStartQuest(itQuestMap->first, pc) && HasStartState(itQuestMap->second))
+			if (CQuestManager::Instance().CanStartQuest(itQuestMap->first, pc) && HasStartState(itQuestMap->second))
 				iState = 0;
 			else
 				return false;
@@ -853,7 +853,7 @@ namespace quest
 
 		void operator()(PC::QuestInfoIterator& itPCQuest, NPC::ArgQuestMapType::iterator& itQuestMap)
 		{
-			if (CQuestManager::instance().CanStartQuest(itQuestMap->first) && NPC::HasStartState(itQuestMap->second))
+			if (CQuestManager::Instance().CanStartQuest(itQuestMap->first) && NPC::HasStartState(itQuestMap->second))
 			{
 				size_t i;
 				for (i = 0; i < itQuestMap->second[QUEST_START_STATE_INDEX].size(); ++i)
@@ -899,7 +899,7 @@ namespace quest
 		{
 			if (g_bIsTestServer)
 			{
-				CQuestManager & mgr = CQuestManager::instance();
+				CQuestManager & mgr = CQuestManager::Instance();
 
 				sys_err("QUEST There's suspended quest state, can't run new quest state (quest: %s pc: %s)",
 						pc.GetCurrentQuestName().c_str(),
@@ -963,7 +963,7 @@ namespace quest
 		}
 
 		sys_log(0, "ExecuteEventScript ei %d qi %u is %d", EventIndex, dwQuestIndex, iState);
-		CQuestManager::instance().SetCurrentEventIndex(EventIndex);
+		CQuestManager::Instance().SetCurrentEventIndex(EventIndex);
 		return CQuestManager::ExecuteQuestScript(pc, dwQuestIndex, iState, itState->second.GetCode(), itState->second.GetSize());
 	}
 
@@ -976,7 +976,7 @@ namespace quest
 			result = HandleEvent(pc, QUEST_ITEM_PICK_EVENT);
 
 		if (!result)
-			CQuestManager::instance().ClearCurrentItem();
+			CQuestManager::Instance().ClearCurrentItem();
 
 		return result;
 	}
@@ -985,7 +985,7 @@ namespace quest
 	{
 		bool result = HandleEvent(pc, QUEST_ITEM_INFORMER_EVENT);
 		if (!result)
-			CQuestManager::instance().ClearCurrentItem();
+			CQuestManager::Instance().ClearCurrentItem();
 
 		return result;
 	}

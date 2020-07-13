@@ -31,13 +31,13 @@ CInputP2P::CInputP2P()
 void CInputP2P::Login(LPDESC d, const char * c_pData)
 {
 	TPacketGGLogin* p = (TPacketGGLogin *)c_pData;
-	P2P_MANAGER::instance().Login(d, p);
+	P2P_MANAGER::Instance().Login(d, p);
 }
 
 void CInputP2P::Logout(LPDESC d, const char * c_pData)
 {
 	TPacketGGLogout * p = (TPacketGGLogout *) c_pData;
-	P2P_MANAGER::instance().Logout(p->szName);
+	P2P_MANAGER::Instance().Logout(p->szName);
 }
 
 int32_t CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
@@ -56,7 +56,7 @@ int32_t CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
 
 	sys_log(0, "InputP2P::Relay : %s size %d", p->szName, p->lSize);
 
-	LPCHARACTER pkChr = CHARACTER_MANAGER::instance().FindPC(p->szName);
+	LPCHARACTER pkChr = CHARACTER_MANAGER::Instance().FindPC(p->szName);
 
 	const uint8_t* c_pbData = (const uint8_t *) (c_pData + sizeof(TPacketGGRelay));
 
@@ -118,7 +118,7 @@ int32_t CInputP2P::Guild(LPDESC d, const char* c_pData, size_t uiBytes)
 	uiBytes -= sizeof(TPacketGGGuild);
 	c_pData += sizeof(TPacketGGGuild);
 
-	CGuild * g = CGuildManager::instance().FindGuild(p->dwGuild);
+	CGuild * g = CGuildManager::Instance().FindGuild(p->dwGuild);
 
 	switch (p->bSubHeader)
 	{
@@ -141,7 +141,7 @@ int32_t CInputP2P::Guild(LPDESC d, const char* c_pData, size_t uiBytes)
 					return -1;
 
 				int32_t iBonus = *((int32_t *) c_pData);
-				CGuild* pGuild = CGuildManager::instance().FindGuild(p->dwGuild);
+				CGuild* pGuild = CGuildManager::Instance().FindGuild(p->dwGuild);
 				if (pGuild)
 				{
 					pGuild->SetMemberCountBonus(iBonus);
@@ -176,7 +176,7 @@ struct FuncShout
 
 void SendShout(const char * szText, uint8_t bEmpire)
 {
-	const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
+	const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::Instance().GetClientSet();
 	std::for_each(c_ref_set.begin(), c_ref_set.end(), FuncShout(szText, bEmpire));
 }
 
@@ -190,7 +190,7 @@ void CInputP2P::Disconnect(const char * c_pData)
 {
 	TPacketGGDisconnect * p = (TPacketGGDisconnect *) c_pData;
 
-	LPDESC d = DESC_MANAGER::instance().FindByLoginName(p->szLogin);
+	LPDESC d = DESC_MANAGER::Instance().FindByLoginName(p->szLogin);
 
 	if (!d)
 		return;
@@ -215,20 +215,20 @@ void CInputP2P::MessengerAdd(const char * c_pData)
 {
 	TPacketGGMessenger * p = (TPacketGGMessenger *) c_pData;
 	sys_log(0, "P2P: Messenger Add %s %s", p->szAccount, p->szCompanion);
-	MessengerManager::instance().__AddToList(p->szAccount, p->szCompanion);
+	MessengerManager::Instance().__AddToList(p->szAccount, p->szCompanion);
 }
 
 void CInputP2P::MessengerRemove(const char * c_pData)
 {
 	TPacketGGMessenger * p = (TPacketGGMessenger *) c_pData;
 	sys_log(0, "P2P: Messenger Remove %s %s", p->szAccount, p->szCompanion);
-	MessengerManager::instance().__RemoveFromList(p->szAccount, p->szCompanion);
+	MessengerManager::Instance().__RemoveFromList(p->szAccount, p->szCompanion);
 }
 
 void CInputP2P::FindPosition(LPDESC d, const char* c_pData)
 {
 	TPacketGGFindPosition* p = (TPacketGGFindPosition*) c_pData;
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(p->dwTargetPID);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(p->dwTargetPID);
 	if (ch)
 	{
 		TPacketGGWarpCharacter pw;
@@ -244,7 +244,7 @@ void CInputP2P::FindPosition(LPDESC d, const char* c_pData)
 void CInputP2P::WarpCharacter(const char* c_pData)
 {
 	TPacketGGWarpCharacter* p = (TPacketGGWarpCharacter*) c_pData;
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(p->pid);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindByPID(p->pid);
 	if (ch)
 		ch->WarpSet(p->x, p->y, p->mapIndex);
 }
@@ -252,7 +252,7 @@ void CInputP2P::WarpCharacter(const char* c_pData)
 void CInputP2P::GuildWarZoneMapIndex(const char* c_pData)
 {
 	TPacketGGGuildWarMapIndex * p = (TPacketGGGuildWarMapIndex*) c_pData;
-	CGuildManager & gm = CGuildManager::instance();
+	CGuildManager & gm = CGuildManager::Instance();
 
 	sys_log(0, "P2P: GuildWarZoneMapIndex g1(%u) vs g2(%u), mapIndex(%d)", p->dwGuildID1, p->dwGuildID2, p->lMapIndex);
 
@@ -270,7 +270,7 @@ void CInputP2P::Transfer(const char * c_pData)
 {
 	TPacketGGTransfer * p = (TPacketGGTransfer *) c_pData;
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(p->szName);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindPC(p->szName);
 
 	if (ch)
 		ch->WarpSet(p->lX, p->lY);
@@ -294,7 +294,7 @@ void CInputP2P::UpdateRights(const char * c_pData)
 		GM::remove(p->name);
 	}
 
-	LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(p->name);
+	LPCHARACTER tch = CHARACTER_MANAGER::Instance().FindPC(p->name);
 	if (tch)
 		tch->SetGMLevel();
 
@@ -305,15 +305,15 @@ void CInputP2P::MessengerRequest(const char * c_pData)
 {
 	TPacketGGMessengerRequest * p = (TPacketGGMessengerRequest *)c_pData;
 	sys_log(0, "P2P: Messenger Request %s %d", p->szRequestor, p->dwTargetPID);
-	MessengerManager::instance().RequestToAdd(p->szRequestor, CHARACTER_MANAGER::instance().FindByPID(p->dwTargetPID));
+	MessengerManager::Instance().RequestToAdd(p->szRequestor, CHARACTER_MANAGER::Instance().FindByPID(p->dwTargetPID));
 }
 
 void CInputP2P::MessengerRequestFail(const char * c_pData)
 {
 	TPacketGGMessengerRequest * p = (TPacketGGMessengerRequest *)c_pData;
 	sys_log(0, "P2P: Messenger Request Fail %s %d", p->szRequestor, p->dwTargetPID);
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(p->szRequestor);
-	CCI* pCCI = P2P_MANAGER::instance().FindByPID(p->dwTargetPID);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindPC(p->szRequestor);
+	CCI* pCCI = P2P_MANAGER::Instance().FindByPID(p->dwTargetPID);
 	if (ch)
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님으로 부터 친구 등록을 거부 당했습니다."), pCCI->szName);
 }
@@ -331,7 +331,7 @@ void CInputP2P::XmasWarpSanta(const char * c_pData)
 		TPacketGGXmasWarpSantaReply pack_reply;
 		pack_reply.bHeader = HEADER_GG_XMAS_WARP_SANTA_REPLY;
 		pack_reply.bChannel = g_bChannel;
-		P2P_MANAGER::instance().Send(&pack_reply, sizeof(pack_reply));
+		P2P_MANAGER::Instance().Send(&pack_reply, sizeof(pack_reply));
 	}
 }
 
@@ -341,7 +341,7 @@ void CInputP2P::XmasWarpSantaReply(const char* c_pData)
 
 	if (p->bChannel == g_bChannel)
 	{
-		auto snapshot = CHARACTER_MANAGER::instance().GetCharactersByRaceNum(xmas::MOB_SANTA_VNUM);
+		auto snapshot = CHARACTER_MANAGER::Instance().GetCharactersByRaceNum(xmas::MOB_SANTA_VNUM);
 		if (!snapshot.empty())
 		{
 			auto it = snapshot.begin();
@@ -359,7 +359,7 @@ void CInputP2P::LoginPing(LPDESC d, const char * c_pData)
 	TPacketGGLoginPing * p = (TPacketGGLoginPing *) c_pData;
 
 	if (!g_pkAuthMasterDesc) // If I am master, I have to broadcast
-		P2P_MANAGER::instance().Send(p, sizeof(TPacketGGLoginPing), d);
+		P2P_MANAGER::Instance().Send(p, sizeof(TPacketGGLoginPing), d);
 }
 
 // BLOCK_CHAT
@@ -367,7 +367,7 @@ void CInputP2P::BlockChat(const char * c_pData)
 {
 	TPacketGGBlockChat * p = (TPacketGGBlockChat *) c_pData;
 
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().FindPC(p->szName);
+	LPCHARACTER ch = CHARACTER_MANAGER::Instance().FindPC(p->szName);
 
 	if (ch)
 	{
@@ -385,8 +385,8 @@ void CInputP2P::BlockChat(const char * c_pData)
 void CInputP2P::IamAwake(LPDESC d, const char * c_pData)
 {
 	std::string hostNames;
-	P2P_MANAGER::instance().GetP2PHostNames(hostNames);
-	sys_log(0, "P2P Awakeness check from %s. My P2P connection number is %d. and details...\n%s", d->GetHostName(), P2P_MANAGER::instance().GetDescCount(), hostNames.c_str());
+	P2P_MANAGER::Instance().GetP2PHostNames(hostNames);
+	sys_log(0, "P2P Awakeness check from %s. My P2P connection number is %d. and details...\n%s", d->GetHostName(), P2P_MANAGER::Instance().GetDescCount(), hostNames.c_str());
 }
 
 int32_t CInputP2P::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)

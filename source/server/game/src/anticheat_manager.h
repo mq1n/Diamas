@@ -8,7 +8,7 @@ enum EAnticheatScanIDs
 	NET_SCAN_ID_MAX
 };
 
-class CAnticheatManager : public singleton <CAnticheatManager>
+class CAnticheatManager : public CSingleton <CAnticheatManager>
 {
 	public:
 		bool Initialize();

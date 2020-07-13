@@ -1,6 +1,6 @@
 #pragma once
 
-class CItemIDRangeManager : public singleton<CItemIDRangeManager>
+class CItemIDRangeManager : public CSingleton<CItemIDRangeManager>
 {
 	private :
 		const static uint32_t cs_dwMaxItemID = 4290000000UL;

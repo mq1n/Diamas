@@ -11,7 +11,6 @@ class CActorInstance;
 class CFlyingInstance 
 {	
 public:
-	// 2004. 3. 26. myevan. 적절한 네이밍이 필요. 게임에서 사용하지 않는다면 툴에서 툴 전용으로 상속받아 만들도록 하자
 	void Clear(); // Destroy와 같다
 	void SetDataPointer(CFlyingData * pData, const D3DXVECTOR3 & v3StartPosition);
 	void SetFlyTarget(const CFlyTarget & cr_Target); // Shot at Target	

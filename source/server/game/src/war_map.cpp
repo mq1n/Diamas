@@ -62,7 +62,7 @@ EVENTFUNC(war_end_event)
 	else
 	{
 		pMap->SetEndEvent(nullptr);
-		CWarMapManager::instance().DestroyWarMap(pMap);
+		CWarMapManager::Instance().DestroyWarMap(pMap);
 		return 0;
 	}
 }
@@ -104,11 +104,11 @@ CWarMap::CWarMap(int32_t lMapIndex, const TGuildWarInfo & r_info, TWarMapInfo * 
 
 	m_TeamData[0].Initialize();
 	m_TeamData[0].dwID = dwGuildID1;
-	m_TeamData[0].pkGuild = CGuildManager::instance().TouchGuild(dwGuildID1);
+	m_TeamData[0].pkGuild = CGuildManager::Instance().TouchGuild(dwGuildID1);
 
 	m_TeamData[1].Initialize();
 	m_TeamData[1].dwID = dwGuildID2;
-	m_TeamData[1].pkGuild = CGuildManager::instance().TouchGuild(dwGuildID2);
+	m_TeamData[1].pkGuild = CGuildManager::Instance().TouchGuild(dwGuildID2);
 	m_iObserverCount = 0;
 
 	war_map_info* info = AllocEventInfo<war_map_info>();
@@ -149,7 +149,7 @@ CWarMap::~CWarMap()
 		if (ch->GetDesc())
 		{
 			sys_log(0, "WarMap::~WarMap : disconnecting %s", ch->GetName());
-			DESC_MANAGER::instance().DestroyDesc(ch->GetDesc());
+			DESC_MANAGER::Instance().DestroyDesc(ch->GetDesc());
 		}
 	}
 
@@ -496,7 +496,7 @@ void CWarMap::CheckWarEnd()
 
 void CWarMap::Draw()
 {
-	CGuildManager::instance().RequestWarOver(m_TeamData[0].dwID, m_TeamData[1].dwID, 0);
+	CGuildManager::Instance().RequestWarOver(m_TeamData[0].dwID, m_TeamData[1].dwID, 0);
 }
 
 void CWarMap::Timeout()
@@ -556,9 +556,9 @@ void CWarMap::Timeout()
 			m_TeamData[0].dwID, m_TeamData[1].dwID, dwWinner, dwLoser, m_kMapInfo.lMapIndex);
 
 	if (dwWinner)
-		CGuildManager::instance().RequestWarOver(dwWinner, dwLoser, dwWinner);
+		CGuildManager::Instance().RequestWarOver(dwWinner, dwLoser, dwWinner);
 	else
-		CGuildManager::instance().RequestWarOver(m_TeamData[0].dwID, m_TeamData[1].dwID, dwWinner);
+		CGuildManager::Instance().RequestWarOver(m_TeamData[0].dwID, m_TeamData[1].dwID, dwWinner);
 
 	m_bTimeout = true;
 }
@@ -618,8 +618,8 @@ void CWarMap::SendWarPacket(LPDESC d)
 
 	pack2.dwGuildSelf	= m_TeamData[0].dwID;
 	pack2.dwGuildOpp	= m_TeamData[1].dwID;
-	pack2.bType		= CGuildManager::instance().TouchGuild(m_TeamData[0].dwID)->GetGuildWarType(m_TeamData[1].dwID);
-	pack2.bWarState	= CGuildManager::instance().TouchGuild(m_TeamData[0].dwID)->GetGuildWarState(m_TeamData[1].dwID);
+	pack2.bType		= CGuildManager::Instance().TouchGuild(m_TeamData[0].dwID)->GetGuildWarType(m_TeamData[1].dwID);
+	pack2.bWarState	= CGuildManager::Instance().TouchGuild(m_TeamData[0].dwID)->GetGuildWarState(m_TeamData[1].dwID);
 
 	d->BufferedPacket(&pack, sizeof(pack));
 	d->Packet(&pack2, sizeof(pack2));
@@ -711,7 +711,7 @@ bool CWarMap::CheckScore()
 			m_TeamData[1].iScore,
 			dwWinner);
 
-	CGuildManager::instance().RequestWarOver(dwWinner, dwLoser, dwWinner);
+	CGuildManager::Instance().RequestWarOver(dwWinner, dwLoser, dwWinner);
 	return true;
 }
 
@@ -825,7 +825,7 @@ void CWarMap::AddFlagBase(uint8_t bIdx, uint32_t x, uint32_t y)
 		y = m_kMapInfo.posStart[bIdx].y;
 	}
 
-	r.pkChrFlagBase = CHARACTER_MANAGER::instance().SpawnMob(warmap::WAR_FLAG_BASE_VNUM, m_kMapInfo.lMapIndex, x, y, 0);
+	r.pkChrFlagBase = CHARACTER_MANAGER::Instance().SpawnMob(warmap::WAR_FLAG_BASE_VNUM, m_kMapInfo.lMapIndex, x, y, 0);
 	sys_log(0, "WarMap::AddFlagBase %u %p id %u", bIdx, get_pointer(r.pkChrFlagBase), r.dwID);
 
 	r.pkChrFlagBase->SetPoint(POINT_STAT, r.dwID);
@@ -850,7 +850,7 @@ void CWarMap::AddFlag(uint8_t bIdx, uint32_t x, uint32_t y)
 		y = m_kMapInfo.posStart[bIdx].y;
 	}
 
-	r.pkChrFlag = CHARACTER_MANAGER::instance().SpawnMob(bIdx == 0 ? warmap::WAR_FLAG_VNUM0 : warmap::WAR_FLAG_VNUM1, m_kMapInfo.lMapIndex, x, y, 0);
+	r.pkChrFlag = CHARACTER_MANAGER::Instance().SpawnMob(bIdx == 0 ? warmap::WAR_FLAG_VNUM0 : warmap::WAR_FLAG_VNUM1, m_kMapInfo.lMapIndex, x, y, 0);
 	sys_log(0, "WarMap::AddFlag %u %p id %u", bIdx, get_pointer(r.pkChrFlag), r.dwID);
 
 	r.pkChrFlag->SetPoint(POINT_STAT, r.dwID);
@@ -1026,7 +1026,7 @@ int32_t CWarMapManager::CreateWarMap(const TGuildWarInfo& guildWarInfo, uint32_t
 		return 0;
 	}
 
-	uint32_t lMapIndex = SECTREE_MANAGER::instance().CreatePrivateMap(guildWarInfo.lMapIndex);
+	uint32_t lMapIndex = SECTREE_MANAGER::Instance().CreatePrivateMap(guildWarInfo.lMapIndex);
 
 	if (lMapIndex)
 	{
@@ -1058,7 +1058,7 @@ void CWarMapManager::DestroyWarMap(CWarMap* pMap)
 	m_mapWarMap.erase(pMap->GetMapIndex());
 	M2_DELETE(pMap);
 
-	SECTREE_MANAGER::instance().DestroyPrivateMap(mapIdx);
+	SECTREE_MANAGER::Instance().DestroyPrivateMap(mapIdx);
 }
 
 CWarMap * CWarMapManager::Find(int32_t lMapIndex)

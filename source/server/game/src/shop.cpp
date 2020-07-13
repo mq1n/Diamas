@@ -18,9 +18,8 @@
 #include "locale_service.h"
 #include "gm.h"
 #include "desc_client.h"
-
 #include "../../libgame/include/grid.h"
-#include "../../common/service.h"
+
 /* ------------------------------------------------------------------------------------ */
 CShop::CShop() :
 	m_dwVnum(0), m_dwNPCVnum(0), m_pkPC(nullptr)
@@ -60,7 +59,7 @@ void CShop::SetPCShop(LPCHARACTER ch)
 bool CShop::Create(uint32_t dwVnum, uint32_t dwNPCVnum, TShopItemTable * pTable)
 {
 	/*
-	   if (nullptr == CMobManager::instance().Get(dwNPCVnum))
+	   if (nullptr == CMobManager::Instance().Get(dwNPCVnum))
 	   {
 	   sys_err("No such a npc by vnum %d", dwNPCVnum);
 	   return false;
@@ -113,7 +112,7 @@ void CShop::SetShopItems(TShopItemTable * pTable, uint8_t bItemCount)
 			if (!pTable->vnum)
 				continue;
 
-			item_table = ITEM_MANAGER::instance().GetTable(pTable->vnum);
+			item_table = ITEM_MANAGER::Instance().GetTable(pTable->vnum);
 		}
 
 		if (!item_table)
@@ -215,11 +214,11 @@ int32_t CShop::Buy(LPCHARACTER ch, uint8_t pos)
 
 	if (r_item.price <= 0)
 	{
-		LogManager::instance().HackLog("SHOP_BUY_GOLD_OVERFLOW", ch);
+		LogManager::Instance().HackLog("SHOP_BUY_GOLD_OVERFLOW", ch);
 		return SHOP_SUBHEADER_GC_NOT_ENOUGH_MONEY;
 	}
 
-	LPITEM pkSelectedItem = ITEM_MANAGER::instance().Find(r_item.itemid);
+	LPITEM pkSelectedItem = ITEM_MANAGER::Instance().Find(r_item.itemid);
 
 	if (IsPCShop())
 	{
@@ -258,7 +257,7 @@ int32_t CShop::Buy(LPCHARACTER ch, uint8_t pos)
 	if (m_pkPC) // 피씨가 운영하는 샵은 피씨가 실제 아이템을 가지고있어야 한다.
 		item = r_item.pkItem;
 	else
-		item = ITEM_MANAGER::instance().CreateItem(r_item.vnum, r_item.count);
+		item = ITEM_MANAGER::Instance().CreateItem(r_item.vnum, r_item.count);
 
 	if (!item)
 		return SHOP_SUBHEADER_GC_SOLD_OUT;
@@ -295,7 +294,7 @@ int32_t CShop::Buy(LPCHARACTER ch, uint8_t pos)
 	int32_t iVal = 0;
 
 	{
-		iVal = quest::CQuestManager::instance().GetEventFlag("personal_shop");
+		iVal = quest::CQuestManager::Instance().GetEventFlag("personal_shop");
 
 		if (0 < iVal)
 		{
@@ -323,8 +322,8 @@ int32_t CShop::Buy(LPCHARACTER ch, uint8_t pos)
 			if (item->GetVnum() >= 80003 && item->GetVnum() <= 80007)
 			{
 				snprintf(buf, sizeof(buf), "%s FROM: %u TO: %u PRICE: %u", item->GetName(), ch->GetPlayerID(), m_pkPC->GetPlayerID(), dwPrice);
-				LogManager::instance().GoldBarLog(ch->GetPlayerID(), item->GetID(), SHOP_BUY, buf);
-				LogManager::instance().GoldBarLog(m_pkPC->GetPlayerID(), item->GetID(), SHOP_SELL, buf);
+				LogManager::Instance().GoldBarLog(ch->GetPlayerID(), item->GetID(), SHOP_BUY, buf);
+				LogManager::Instance().GoldBarLog(m_pkPC->GetPlayerID(), item->GetID(), SHOP_SELL, buf);
 			}
 			
 			item->RemoveFromCharacter();
@@ -332,14 +331,14 @@ int32_t CShop::Buy(LPCHARACTER ch, uint8_t pos)
 				item->AddToCharacter(ch, TItemPos(DRAGON_SOUL_INVENTORY, iEmptyPos));
 			else
 				item->AddToCharacter(ch, TItemPos(INVENTORY, iEmptyPos));
-			ITEM_MANAGER::instance().FlushDelayedSave(item);
+			ITEM_MANAGER::Instance().FlushDelayedSave(item);
 			
 
 			snprintf(buf, sizeof(buf), "%s %u(%s) %u %u", item->GetName(), m_pkPC->GetPlayerID(), m_pkPC->GetName(), dwPrice, item->GetCount());
-			LogManager::instance().ItemLog(ch, item, "SHOP_BUY", buf);
+			LogManager::Instance().ItemLog(ch, item, "SHOP_BUY", buf);
 
 			snprintf(buf, sizeof(buf), "%s %u(%s) %u %u", item->GetName(), ch->GetPlayerID(), ch->GetName(), dwPrice, item->GetCount());
-			LogManager::instance().ItemLog(m_pkPC, item, "SHOP_SELL", buf);
+			LogManager::Instance().ItemLog(m_pkPC, item, "SHOP_SELL", buf);
 		}
 
 		r_item.pkItem = nullptr;
@@ -356,15 +355,15 @@ int32_t CShop::Buy(LPCHARACTER ch, uint8_t pos)
 			item->AddToCharacter(ch, TItemPos(DRAGON_SOUL_INVENTORY, iEmptyPos));
 		else
 			item->AddToCharacter(ch, TItemPos(INVENTORY, iEmptyPos));
-		ITEM_MANAGER::instance().FlushDelayedSave(item);
-		LogManager::instance().ItemLog(ch, item, "BUY", item->GetName());
+		ITEM_MANAGER::Instance().FlushDelayedSave(item);
+		LogManager::Instance().ItemLog(ch, item, "BUY", item->GetName());
 
 		if (item->GetVnum() >= 80003 && item->GetVnum() <= 80007)
 		{
-			LogManager::instance().GoldBarLog(ch->GetPlayerID(), item->GetID(), PERSONAL_SHOP_BUY, "");
+			LogManager::Instance().GoldBarLog(ch->GetPlayerID(), item->GetID(), PERSONAL_SHOP_BUY, "");
 		}
 
-		LogManager::instance().MoneyLog(MONEY_LOG_SHOP, item->GetVnum(), -dwPrice);
+		LogManager::Instance().MoneyLog(MONEY_LOG_SHOP, item->GetVnum(), -dwPrice);
 	}
 
 	if (item)

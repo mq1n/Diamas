@@ -48,13 +48,13 @@ bool CHARACTER::StartRiding()
 		return false;
 	}
 
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()) && !IsGM())
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()) && !IsGM())
 		return false;
 
-	if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
+	if (CArenaManager::Instance().IsArenaMap(GetMapIndex()) == true)
 		return false;
 
-	if (CWarMapManager::instance().IsWarMap(GetMapIndex()))
+	if (CWarMapManager::Instance().IsWarMap(GetMapIndex()))
 		return false;
 
 	uint32_t dwMountVnum = m_chHorse ? m_chHorse->GetRaceNum() : GetMyHorseVnum();
@@ -89,7 +89,7 @@ bool CHARACTER::StopRiding()
 {
 	if (CHorseRider::StopRiding())
 	{
-		quest::CQuestManager::instance().Unmount(GetPlayerID());
+		quest::CQuestManager::Instance().Unmount(GetPlayerID());
 
 		if (!IsDead() && !IsStun())
 		{
@@ -190,7 +190,7 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, uint32_t dwVnum)
 			y += number(-100, 100);
 		}
 
-		m_chHorse = CHARACTER_MANAGER::instance().SpawnMob(
+		m_chHorse = CHARACTER_MANAGER::Instance().SpawnMob(
 				(0 == dwVnum) ? GetMyHorseVnum() : dwVnum, 
 				GetMapIndex(), 
 				x, y,

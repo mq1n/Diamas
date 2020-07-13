@@ -101,7 +101,7 @@ LPCHARACTER CBattlegroundTeam::Spawn(uint8_t nMobType, uint8_t nLaneID, uint32_t
 	if (!m_pkSectreeMap)
 		return nullptr;
 		
-	LPCHARACTER pkMob = CHARACTER_MANAGER::instance().SpawnMob(
+	LPCHARACTER pkMob = CHARACTER_MANAGER::Instance().SpawnMob(
 		dwVnum, m_nMapIndex,
 		m_pkSectreeMap->m_setting.iBaseX + iX * 100,
 		m_pkSectreeMap->m_setting.iBaseY + iY * 100,

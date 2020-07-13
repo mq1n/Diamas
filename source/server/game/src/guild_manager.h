@@ -12,7 +12,7 @@ class CGuildWarReserveForGame
 		std::map<std::string, std::pair<uint32_t, uint32_t> > mapBet;
 };
 
-class CGuildManager : public singleton<CGuildManager>
+class CGuildManager : public CSingleton<CGuildManager>
 {
 	public:
 		CGuildManager();

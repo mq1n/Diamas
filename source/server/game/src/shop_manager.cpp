@@ -351,16 +351,15 @@ void CShopManager::Sell(LPCHARACTER ch, uint8_t bCell, uint8_t bCount)
 		return;
 	}
 
-	// 20050802.myevan.상점 판매 로그에 아이템 ID 추가
 	sys_log(0, "SHOP: SELL: %s item name: %s(x%d):%u price: %u", ch->GetName(), item->GetName(), bCount, item->GetID(), dwPrice);
 
 	if (iVal > 0)
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("판매금액의 %d %% 가 세금으로 나가게됩니다"), iVal);
 
-	LogManager::instance().MoneyLog(MONEY_LOG_SHOP, item->GetVnum(), dwPrice);
+	LogManager::Instance().MoneyLog(MONEY_LOG_SHOP, item->GetVnum(), dwPrice);
 
 	if (bCount == item->GetCount())
-		ITEM_MANAGER::instance().RemoveItem(item, "SELL");
+		ITEM_MANAGER::Instance().RemoveItem(item, "SELL");
 	else
 		item->SetCount(item->GetCount() - bCount);
 
@@ -369,8 +368,8 @@ void CShopManager::Sell(LPCHARACTER ch, uint8_t bCell, uint8_t bCount)
 
 bool CompareShopItemName(const SShopItemTable& lhs, const SShopItemTable& rhs)
 {
-	TItemTable* lItem = ITEM_MANAGER::instance().GetTable(lhs.vnum);
-	TItemTable* rItem = ITEM_MANAGER::instance().GetTable(rhs.vnum);
+	TItemTable* lItem = ITEM_MANAGER::Instance().GetTable(lhs.vnum);
+	TItemTable* rItem = ITEM_MANAGER::Instance().GetTable(rhs.vnum);
 	if (lItem && rItem)
 		return strcmp(lItem->szLocaleName, rItem->szLocaleName) < 0;
 	return true;
@@ -472,7 +471,7 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 
 	for (size_t i = 0; i < shopItems.size(); i++)
 	{
-		TItemTable * item_table = ITEM_MANAGER::instance().GetTable(shopItems[i].vnum);
+		TItemTable * item_table = ITEM_MANAGER::Instance().GetTable(shopItems[i].vnum);
 		if (!item_table)
 		{
 			sys_err("vnum(%d) of group items of group %s does not exist", shopItems[i].vnum, pNode->GetNodeName().c_str());

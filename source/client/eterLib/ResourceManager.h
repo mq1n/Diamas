@@ -1,5 +1,5 @@
 #pragma once
-#include "../eterBase/Singleton.h"
+#include "../../common/Singleton.h"
 #include "../eterBase/cast.h"
 #include "Resource.h"
 #include "FileLoaderThread.h"

@@ -1,47 +1,6 @@
 #include "stdafx.h"
-
-#include <math.h>
-#include <sstream>
-#include <array>
-
 #include "ProtoReader.h"
 #include "CsvReader.h"
-
-inline std::string trim_left(const std::string& str)
-{
-    std::string::size_type n = str.find_first_not_of(" \t\v\n\r");
-    return n == std::string::npos ? str : str.substr(n, str.length());
-}
-inline std::string trim_right(const std::string& str)
-{
-    std::string::size_type n = str.find_last_not_of(" \t\v\n\r");
-    return n == std::string::npos ? str : str.substr(0, n + 1);
-}
-std::string trim(const std::string& str)
-{
-	return trim_left(trim_right(str));
-}
-
-std::vector <std::string> string_split_trim(const std::string & str, const std::string & tok = " ")
-{
-	std::vector <std::string> vec;
-
-	if (str.empty())
-		return vec;
-
-	size_t prev = 0;
-
-	auto cur = str.find(tok);
-	while (cur != std::string::npos)
-	{
-		vec.emplace_back(trim(str.substr(prev, cur - prev)));
-		prev = cur + tok.size();
-		cur = str.find(tok, prev);
-	}
-
-	vec.emplace_back(trim(str.substr(prev, cur - prev)));
-	return vec;
-}
 
 int32_t get_Item_Type_Value(const std::string &inputString)
 {

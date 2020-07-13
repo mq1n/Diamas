@@ -709,7 +709,6 @@ void CInstanceBase::RefreshTextTailTitle()
 	RefreshTextTail();
 }
 
-// 2004.07.25.myevan.이펙트 안 붙는 문제 해결
 /////////////////////////////////////////////////
 void CInstanceBase::__ClearAffectFlagContainer()
 {
@@ -843,7 +842,6 @@ void CInstanceBase::__Assassin_SetEunhyeongAffect(bool isVisible)
 		}
 		else
 		{
-			// 2004.10.16.myevan.은형법 완전 투명
 			m_GraphicThingInstance.BlendAlphaValue(0.0f, 1.0f);
 			m_GraphicThingInstance.HideAllAttachingEffect();
 		}

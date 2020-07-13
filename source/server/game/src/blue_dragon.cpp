@@ -15,7 +15,7 @@
 
 time_t UseBlueDragonSkill(LPCHARACTER pChar, uint32_t idx)
 {
-	LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap( pChar->GetMapIndex() );
+	LPSECTREE_MAP pSecMap = SECTREE_MANAGER::Instance().GetMap( pChar->GetMapIndex() );
 
 	if (nullptr == pSecMap)
 		return 0;
@@ -114,7 +114,7 @@ int32_t BlueDragon_StateBattle(LPCHARACTER pChar)
 		if (timeSkillCanUseTime[SkillIndex] < timeNow)
 		{
 			int32_t SkillUsingDuration =
-				static_cast<int32_t>(CMotionManager::instance().GetMotionDuration( pChar->GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_SPECIAL_1 + SkillIndex) ));
+				static_cast<int32_t>(CMotionManager::Instance().GetMotionDuration( pChar->GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_SPECIAL_1 + SkillIndex) ));
 
 			timeSkillCanUseTime[SkillIndex] = timeNow + (UseBlueDragonSkill( pChar, SkillIndex ) * 1000) + SkillUsingDuration + 3000;
 
@@ -140,7 +140,7 @@ int32_t BlueDragon_Damage (LPCHARACTER me, LPCHARACTER pAttacker, int32_t dam)
 			{
 				uint32_t dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
 				size_t val = BlueDragon_GetIndexFactor("DragonStone", i, "val");
-				size_t cnt = SECTREE_MANAGER::instance().GetMonsterCountInMap( pAttacker->GetMapIndex(), dwDragonStoneID );
+				size_t cnt = SECTREE_MANAGER::Instance().GetMonsterCountInMap( pAttacker->GetMapIndex(), dwDragonStoneID );
 
 				dam += (dam * (val*cnt))/100;
 
@@ -157,7 +157,7 @@ int32_t BlueDragon_Damage (LPCHARACTER me, LPCHARACTER pAttacker, int32_t dam)
 			{
 				uint32_t dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
 				size_t val = BlueDragon_GetIndexFactor("DragonStone", i, "val");
-				size_t cnt = SECTREE_MANAGER::instance().GetMonsterCountInMap( me->GetMapIndex(), dwDragonStoneID );
+				size_t cnt = SECTREE_MANAGER::Instance().GetMonsterCountInMap( me->GetMapIndex(), dwDragonStoneID );
 
 				dam -= (dam * (val*cnt))/100;
 

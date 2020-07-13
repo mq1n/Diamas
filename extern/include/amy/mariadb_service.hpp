@@ -10,6 +10,7 @@
 #include <amy/result_set.hpp>
 
 #if !defined(USE_BOOST_ASIO) || (USE_BOOST_ASIO == 0)
+#define ASIO_HAS_POSIX_STREAM_DESCRIPTOR
 #include <asio/posix/stream_descriptor.hpp>
 #else
 #include <boost/asio/posix/stream_descriptor.hpp>
@@ -70,7 +71,7 @@ public:
       AMY_SYSTEM_NS::error_code& ec);
 
   template <typename Endpoint, typename ConnectHandler>
-  BOOST_ASIO_INITFN_RESULT_TYPE(ConnectHandler, void(AMY_SYSTEM_NS::error_code))
+  ASIO_INITFN_RESULT_TYPE(ConnectHandler, void(AMY_SYSTEM_NS::error_code))
   async_connect(implementation_type& impl, Endpoint const& endpoint,
       auth_info const& auth, std::string const& database, client_flags flags,
       ConnectHandler handler);
@@ -79,7 +80,7 @@ public:
       std::string const& stmt, AMY_SYSTEM_NS::error_code& ec);
 
   template <typename QueryHandler>
-  BOOST_ASIO_INITFN_RESULT_TYPE(QueryHandler, void(AMY_SYSTEM_NS::error_code))
+  ASIO_INITFN_RESULT_TYPE(QueryHandler, void(AMY_SYSTEM_NS::error_code))
   async_query(
       implementation_type& impl, std::string const& stmt, QueryHandler handler);
 
@@ -89,12 +90,12 @@ public:
       implementation_type& impl, AMY_SYSTEM_NS::error_code& ec);
 
   template <typename StoreResultHandler>
-  BOOST_ASIO_INITFN_RESULT_TYPE(
+  ASIO_INITFN_RESULT_TYPE(
       StoreResultHandler, void(AMY_SYSTEM_NS::error_code, amy::result_set))
   async_store_result(implementation_type& impl, StoreResultHandler handler);
 
   template <typename Handler>
-  BOOST_ASIO_INITFN_RESULT_TYPE(
+  ASIO_INITFN_RESULT_TYPE(
       Handler, void(AMY_SYSTEM_NS::error_code, amy::result_set))
   async_query_result(implementation_type& impl,
                      std::string const& stmt, Handler handler);

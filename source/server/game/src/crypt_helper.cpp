@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "crypt_helper.h"
-#include "../../common/service.h"
 #include "../../libcrypt/include/DataBuffer.h"
 #include "../../libcrypt/include/sha256.h"
 #include "../../libcrypt/include/md5.h"

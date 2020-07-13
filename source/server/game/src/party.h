@@ -26,7 +26,7 @@ enum EPartyRole
 class CParty;
 class CDungeon;
 
-class CPartyManager : public singleton<CPartyManager>
+class CPartyManager : public CSingleton<CPartyManager>
 {
 	public:
 		typedef std::map<uint32_t, LPPARTY> TPartyMap;

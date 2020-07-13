@@ -558,7 +558,7 @@ bool DragonSoulTable::CheckDragonSoulExtTables()
 					m_vecDragonSoulNames[i].c_str(), g_astGradeName[j].c_str());
 				return false;
 			}
-			if (0 != by_product && nullptr == ITEM_MANAGER::instance().GetTable(by_product))
+			if (0 != by_product && nullptr == ITEM_MANAGER::Instance().GetTable(by_product))
 			{
 				sys_err ("In %s group of DragonSoulExtTables, ByProduct(%d) of Grade %s is not exist.", 
 					m_vecDragonSoulNames[i].c_str(), by_product, g_astGradeName[j].c_str());

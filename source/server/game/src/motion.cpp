@@ -5,9 +5,6 @@
 #include "mob_manager.h"
 #include "char.h"
 
-#include "../../common/stl.h"
-#include "../../common/service.h"
-
 // POLYMORPH_BUG_FIX
 static float MSA_GetNormalAttackDuration(const char* msaPath)
 {
@@ -336,9 +333,9 @@ bool CMotionManager::Build()
 #endif
 	}
 
-	CMobManager::iterator it = CMobManager::instance().begin();
+	CMobManager::iterator it = CMobManager::Instance().begin();
 
-	while (it != CMobManager::instance().end())
+	while (it != CMobManager::Instance().end())
 	{
 		CMob * pkMob = (it++)->second;
 		TMobTable * t = &pkMob->m_table;

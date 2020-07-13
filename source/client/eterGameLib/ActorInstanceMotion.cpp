@@ -757,7 +757,6 @@ uint32_t CActorInstance::__SetMotion(const SSetMotionData& c_rkSetMotData, uint3
 		{
 			if (!__CanNextComboAttack())
 			{
-				// 2004.11.19.myevan.동물 변신시 이부분에서 바로 리셋되어 다음동작 안나온다
 				m_dwcurComboIndex = 0; // 콤보 리셋 - [levites]
 
 				// NOTE : ClearCombo() 를 수행해서는 안된다.

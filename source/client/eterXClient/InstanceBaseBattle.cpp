@@ -202,7 +202,6 @@ bool CInstanceBase::NEW_GetInstanceVectorInFanRange(float fSkillDistance, CInsta
 
 	float fDstDirRot=NEW_GetRotationFromDestInstance(rkInstTarget);
 
-	// 2004.07.24.myevan - 비파부 가까이 있는 적부터 공격
 	std::multimap<float, CInstanceBase*> kMap_pkInstNear;
 	{
 		CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
@@ -215,7 +214,6 @@ bool CInstanceBase::NEW_GetInstanceVectorInFanRange(float fSkillDistance, CInsta
 			if (pkInstEach == nullptr)
 				continue;
 
-			// 2004.07.25.myevan - 적인 경우만 추가한다
 			if (!IsAttackableInstance(*pkInstEach))
 				continue;
 

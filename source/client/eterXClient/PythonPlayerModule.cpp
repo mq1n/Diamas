@@ -2506,14 +2506,14 @@ void initPlayer()
     PyModule_AddIntConstant(poModule, "HT",						POINT_HT);
     PyModule_AddIntConstant(poModule, "DX",						POINT_DX);
     PyModule_AddIntConstant(poModule, "IQ",						POINT_IQ);
-    PyModule_AddIntConstant(poModule, "ATT_POWER",				POINT_ATT_POWER);
-	PyModule_AddIntConstant(poModule, "ATT_MIN",				POINT_MIN_ATK);
-	PyModule_AddIntConstant(poModule, "ATT_MAX",				POINT_MAX_ATK);
+    PyModule_AddIntConstant(poModule, "ATT_POWER",				POINT_DEF_GRADE);
+	PyModule_AddIntConstant(poModule, "ATT_MIN",				POINT_WEAPON_MIN);
+	PyModule_AddIntConstant(poModule, "ATT_MAX",				POINT_WEAPON_MAX);
 	PyModule_AddIntConstant(poModule, "MIN_MAGIC_WEP",			POINT_MIN_MAGIC_WEP);
 	PyModule_AddIntConstant(poModule, "MAX_MAGIC_WEP",			POINT_MAX_MAGIC_WEP);
     PyModule_AddIntConstant(poModule, "ATT_SPEED",				POINT_ATT_SPEED);
 	PyModule_AddIntConstant(poModule, "ATT_BONUS",				POINT_ATT_GRADE_BONUS);
-    PyModule_AddIntConstant(poModule, "EVADE_RATE",				POINT_EVADE_RATE);
+    PyModule_AddIntConstant(poModule, "EVADE_RATE",				POINT_ATT_GRADE);
     PyModule_AddIntConstant(poModule, "MOVING_SPEED",			POINT_MOV_SPEED);
     PyModule_AddIntConstant(poModule, "DEF_GRADE",				POINT_DEF_GRADE);
     PyModule_AddIntConstant(poModule, "DEF_BONUS",				POINT_DEF_GRADE_BONUS);
@@ -2530,7 +2530,7 @@ void initPlayer()
 	PyModule_AddIntConstant(poModule, "BOW_DISTANCE",			POINT_BOW_DISTANCE);
 	PyModule_AddIntConstant(poModule, "HP_RECOVERY",			POINT_HP_RECOVERY);
 	PyModule_AddIntConstant(poModule, "SP_RECOVERY",			POINT_SP_RECOVERY);
-	PyModule_AddIntConstant(poModule, "ATTACKER_BONUS",			POINT_PARTY_ATT_GRADE);
+	PyModule_AddIntConstant(poModule, "ATTACKER_BONUS",			POINT_PARTY_ATTACKER_BONUS);
     PyModule_AddIntConstant(poModule, "MAX_NUM",				POINT_MAX_NUM);
 	////
 	PyModule_AddIntConstant(poModule, "POINT_CRITICAL_PCT",		POINT_CRITICAL_PCT);

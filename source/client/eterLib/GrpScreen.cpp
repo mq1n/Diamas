@@ -19,7 +19,6 @@ void CScreen::RenderLine3d(float sx, float sy, float sz, float ex, float ey, flo
 		{ ex, ey, ez, ms_diffuseColor, 0.0f, 0.0f }
 	};
 	
-	// 2004.11.18.myevan.DrawIndexPrimitiveUP -> DynamicVertexBuffer
 	if (SetPDTStream(vertices, 2))
 	{	
 		STATEMANAGER.SetTexture(0, nullptr);
@@ -48,7 +47,6 @@ void CScreen::RenderBox3d(float sx, float sy, float sz, float ex, float ey, floa
 		{ ex+1.0f, ey, ez, ms_diffuseColor, 0.0f, 0.0f }	// 3, (x가 1증가된 3)
 	};
 
-	// 2004.11.18.myevan.DrawIndexPrimitiveUP -> DynamicVertexBuffer
 	if (SetPDTStream(vertices, 8))
 	{
 		STATEMANAGER.SetTexture(0, nullptr);
@@ -395,7 +393,6 @@ void CScreen::RenderTextureBox(float sx, float sy, float ex, float ey, float z, 
 #endif
 	STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
-	// 2004.11.18.myevan.DrawIndexPrimitiveUP -> DynamicVertexBuffer
 	SetDefaultIndexBuffer(DEFAULT_IB_FILL_RECT);
 	if (SetPDTStream(vertices, 4))
 		STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);
@@ -426,7 +423,6 @@ void CScreen::RenderBillboard(D3DXVECTOR3 * Position, D3DXCOLOR & Color)
 	
 	STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
-	// 2004.11.18.myevan.DrawIndexPrimitiveUP -> DynamicVertexBuffer
 	SetDefaultIndexBuffer(DEFAULT_IB_FILL_RECT);
 	if (SetPDTStream(vertices, 4))
 		STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);

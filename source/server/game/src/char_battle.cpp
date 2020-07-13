@@ -322,7 +322,7 @@ void CHARACTER::DeathPenalty(uint8_t bTown)
 	CloseAcce();
 #endif
 
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 		return;
 
 	if (GetLevel() < 10)
@@ -465,11 +465,11 @@ EVENTFUNC(dead_event)
 
 	if (true == info->isPC)
 	{
-		ch = CHARACTER_MANAGER::instance().FindByPID( info->dwID );
+		ch = CHARACTER_MANAGER::Instance().FindByPID( info->dwID );
 	}
 	else
 	{
-		ch = CHARACTER_MANAGER::instance().Find( info->dwID );
+		ch = CHARACTER_MANAGER::Instance().Find( info->dwID );
 	}
 
 	if (nullptr == ch)
@@ -488,7 +488,7 @@ EVENTFUNC(dead_event)
 
 		GPOS pos;
 
-		if (SECTREE_MANAGER::instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos))
+		if (SECTREE_MANAGER::Instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos))
 			ch->WarpSet(pos.x, pos.y);
 		else
 		{
@@ -552,7 +552,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 	GPOS pos;
 
 	if (!isAutoLoot)
-		if (!SECTREE_MANAGER::instance().GetMovablePosition(GetMapIndex(), GetX(), GetY(), pos))
+		if (!SECTREE_MANAGER::Instance().GetMovablePosition(GetMapIndex(), GetX(), GetY(), pos))
 			return;
 
 	int32_t iTotalGold = 0;
@@ -562,12 +562,12 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 	int32_t iGoldPercent = MobRankStats[GetMobRank()].iGoldPercent;
 
 	if (pkAttacker->IsPC())
-		iGoldPercent = iGoldPercent * (100 + CPrivManager::instance().GetPriv(pkAttacker, PRIV_GOLD_DROP)) / 100;
+		iGoldPercent = iGoldPercent * (100 + CPrivManager::Instance().GetPriv(pkAttacker, PRIV_GOLD_DROP)) / 100;
 
 	if (pkAttacker->GetPoint(POINT_MALL_GOLDBONUS))
 		iGoldPercent += (iGoldPercent * pkAttacker->GetPoint(POINT_MALL_GOLDBONUS) / 100);
 
-	iGoldPercent = iGoldPercent * CHARACTER_MANAGER::instance().GetMobGoldDropRate(pkAttacker) / 100;
+	iGoldPercent = iGoldPercent * CHARACTER_MANAGER::Instance().GetMobGoldDropRate(pkAttacker) / 100;
 
 	// ADD_PREMIUM
 	if (pkAttacker->GetPremiumRemainSeconds(PREMIUM_GOLD) > 0 ||
@@ -605,7 +605,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 	// --------- 돈 드롭 배수 결정 ----------
 	//
 	if (g_bIsTestServer)
-		pkAttacker->ChatPacket(CHAT_TYPE_PARTY, "gold_mul %d rate %d", iGoldMultipler, CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker));
+		pkAttacker->ChatPacket(CHAT_TYPE_PARTY, "gold_mul %d rate %d", iGoldMultipler, CHARACTER_MANAGER::Instance().GetMobGoldAmountRate(pkAttacker));
 
 	//
 	// --------- 실제 드롭 처리 -------------
@@ -613,7 +613,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 	LPITEM item;
 
 	int32_t iGold10DropPct = 100;
-	iGold10DropPct = (iGold10DropPct * 100) / (100 + CPrivManager::instance().GetPriv(pkAttacker, PRIV_GOLD10_DROP));
+	iGold10DropPct = (iGold10DropPct * 100) / (100 + CPrivManager::Instance().GetPriv(pkAttacker, PRIV_GOLD10_DROP));
 
 	// MOB_RANK가 BOSS보다 높으면 무조건 돈폭탄
 	if (GetMobRank() >= MOB_RANK_BOSS && !IsStone() && GetMobTable().dwGoldMax != 0)
@@ -628,7 +628,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 			int32_t iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax) / iSplitCount;
 			if (g_bIsTestServer)
 				sys_log(0, "iGold %d", iGold);
-			iGold = iGold * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 100;
+			iGold = iGold * CHARACTER_MANAGER::Instance().GetMobGoldAmountRate(pkAttacker) / 100;
 			iGold *= iGoldMultipler;
 
 			if (iGold == 0)
@@ -638,12 +638,12 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 
 			if (g_bIsTestServer)
 			{
-				sys_log(0, "Drop Moeny MobGoldAmountRate %d %d", CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker), iGoldMultipler);
+				sys_log(0, "Drop Moeny MobGoldAmountRate %d %d", CHARACTER_MANAGER::Instance().GetMobGoldAmountRate(pkAttacker), iGoldMultipler);
 				sys_log(0, "Drop Money gold %d GoldMin %d GoldMax %d", iGold, GetMobTable().dwGoldMax, GetMobTable().dwGoldMax);
 			}
 
 			// NOTE: 돈 폭탄은 제 3의 손 처리를 하지 않음
-			if ((item = ITEM_MANAGER::instance().CreateItem(1, iGold)))
+			if ((item = ITEM_MANAGER::Instance().CreateItem(1, iGold)))
 			{
 				pos.x = GetX() + ((number(-14, 14) + number(-14, 14)) * 23);
 				pos.y = GetY() + ((number(-14, 14) + number(-14, 14)) * 23);
@@ -664,7 +664,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		for (int32_t i = 0; i < 10; ++i)
 		{
 			int32_t iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax);
-			iGold = iGold * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 100;
+			iGold = iGold * CHARACTER_MANAGER::Instance().GetMobGoldAmountRate(pkAttacker) / 100;
 			iGold *= iGoldMultipler;
 
 			if (iGold == 0)
@@ -673,7 +673,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 			}
 
 			// NOTE: 돈 폭탄은 제 3의 손 처리를 하지 않음
-			if ((item = ITEM_MANAGER::instance().CreateItem(1, iGold)))
+			if ((item = ITEM_MANAGER::Instance().CreateItem(1, iGold)))
 			{
 				pos.x = GetX() + (number(-7, 7) * 20);
 				pos.y = GetY() + (number(-7, 7) * 20);
@@ -691,7 +691,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		// 일반적인 방식의 돈 드롭
 		//
 		int32_t iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax);
-		iGold = iGold * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(pkAttacker) / 100;
+		iGold = iGold * CHARACTER_MANAGER::Instance().GetMobGoldAmountRate(pkAttacker) / 100;
 		iGold *= iGoldMultipler;
 
 		int32_t iSplitCount;
@@ -718,7 +718,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 				{
 					pkAttacker->GiveGold(iGold / iSplitCount);
 				}
-				else if ((item = ITEM_MANAGER::instance().CreateItem(1, iGold / iSplitCount)))
+				else if ((item = ITEM_MANAGER::Instance().CreateItem(1, iGold / iSplitCount)))
 				{
 					pos.x = GetX() + (number(-7, 7) * 20);
 					pos.y = GetY() + (number(-7, 7) * 20);
@@ -730,7 +730,7 @@ void CHARACTER::RewardGold(LPCHARACTER pkAttacker)
 		}
 	}
 
-	LogManager::instance().MoneyLog(MONEY_LOG_MONSTER, GetRaceNum(), iTotalGold);
+	LogManager::Instance().MoneyLog(MONEY_LOG_MONSTER, GetRaceNum(), iTotalGold);
 }
 
 void CHARACTER::Reward(bool bItemDrop)
@@ -739,12 +739,12 @@ void CHARACTER::Reward(bool bItemDrop)
 	{
 		GPOS pos;
 
-		if (!SECTREE_MANAGER::instance().GetMovablePosition(GetMapIndex(), GetX(), GetY(), pos))
+		if (!SECTREE_MANAGER::Instance().GetMovablePosition(GetMapIndex(), GetX(), GetY(), pos))
 			return;
 
 		LPITEM item;
 		int32_t iGold = number(GetMobTable().dwGoldMin, GetMobTable().dwGoldMax);
-		iGold = iGold * CHARACTER_MANAGER::instance().GetMobGoldAmountRate(nullptr) / 100;
+		iGold = iGold * CHARACTER_MANAGER::Instance().GetMobGoldAmountRate(nullptr) / 100;
 		iGold *= GetGoldMultipler();
 		int32_t iSplitCount = number(25, 35);
 
@@ -752,7 +752,7 @@ void CHARACTER::Reward(bool bItemDrop)
 
 		for (int32_t i = 1; i <= iSplitCount; ++i)
 		{
-			if ((item = ITEM_MANAGER::instance().CreateItem(1, iGold / iSplitCount)))
+			if ((item = ITEM_MANAGER::Instance().CreateItem(1, iGold / iSplitCount)))
 			{
 				if (i != 0)
 				{
@@ -798,8 +798,8 @@ void CHARACTER::Reward(bool bItemDrop)
 
 		pkAttacker->SetQuestNPCID(GetVID());
 		pkAttacker->GetActivityHandler()->MarkMonsterKill(this);
-		quest::CQuestManager::instance().Kill(pkAttacker->GetPlayerID(), GetRaceNum());
-		CHARACTER_MANAGER::instance().KillLog(GetRaceNum());
+		quest::CQuestManager::Instance().Kill(pkAttacker->GetPlayerID(), GetRaceNum());
+		CHARACTER_MANAGER::Instance().KillLog(GetRaceNum());
 
 		if (!number(0, 9))
 		{
@@ -824,7 +824,7 @@ void CHARACTER::Reward(bool bItemDrop)
 
 	GPOS pos = GetXYZ();
 
-	if (!SECTREE_MANAGER::instance().GetMovablePosition(GetMapIndex(), pos.x, pos.y, pos))
+	if (!SECTREE_MANAGER::Instance().GetMovablePosition(GetMapIndex(), pos.x, pos.y, pos))
 		return;
 
 	//
@@ -842,7 +842,7 @@ void CHARACTER::Reward(bool bItemDrop)
 	static std::vector<LPITEM> s_vec_item;
 	s_vec_item.clear();
 
-	if (ITEM_MANAGER::instance().CreateDropItem(this, pkAttacker, s_vec_item))
+	if (ITEM_MANAGER::Instance().CreateDropItem(this, pkAttacker, s_vec_item))
 	{
 		if (s_vec_item.size() == 0);
 		else if (s_vec_item.size() == 1)
@@ -886,7 +886,7 @@ void CHARACTER::Reward(bool bItemDrop)
 				int32_t iDamage = it->second.iTotalDamage;
 				if (iDamage > 0)
 				{
-					LPCHARACTER ch = CHARACTER_MANAGER::instance().Find(it->first);
+					LPCHARACTER ch = CHARACTER_MANAGER::Instance().Find(it->first);
 
 					if (ch)
 					{
@@ -1020,10 +1020,10 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 	if (GetLevel() < 50)
 		return;
 
-	if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+	if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 		return;
 
-	if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
+	if (CArenaManager::Instance().IsArenaMap(GetMapIndex()) == true)
 		return;
 
 	struct TItemDropPenalty * table = &aItemDropPenalty_kor[0];
@@ -1169,7 +1169,7 @@ void CHARACTER::ItemDropPenalty(LPCHARACTER pkKiller)
 		item->StartDestroyEvent();
 
 		sys_log(0, "DROP_ITEM_PK: %s %d %d from %s", item->GetName(), pos.x, pos.y, GetName());
-		LogManager::instance().ItemLog(this, item, "DEAD_DROP", (window == INVENTORY) ? "INVENTORY" : ((window == EQUIPMENT) ? "EQUIPMENT" : ""));
+		LogManager::Instance().ItemLog(this, item, "DEAD_DROP", (window == INVENTORY) ? "INVENTORY" : ((window == EQUIPMENT) ? "EQUIPMENT" : ""));
 
 		pos.x = GetX() + number(-7, 7) * 20;
 		pos.y = GetY() + number(-7, 7) * 20;
@@ -1236,7 +1236,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 	}
 
 	if (!pkKiller && m_dwKillerPID)
-		pkKiller = CHARACTER_MANAGER::instance().FindByPID(m_dwKillerPID);
+		pkKiller = CHARACTER_MANAGER::Instance().FindByPID(m_dwKillerPID);
 
 	m_dwKillerPID = 0; // 반드시 초기화 해야함 DO NOT DELETE THIS LINE UNLESS YOU ARE 1000000% SURE
 
@@ -1249,10 +1249,10 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 
 	if (pkKiller)
 	{
-		if (CBattlegroundManager::instance().IsEventMap(GetMapIndex()))
+		if (CBattlegroundManager::Instance().IsEventMap(GetMapIndex()))
 		{
 			isBattleground = true;
-			CBattlegroundManager::instance().OnKill(pkKiller, this);
+			CBattlegroundManager::Instance().OnKill(pkKiller, this);
 		}		
 	}
 
@@ -1264,9 +1264,9 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 		if (!IsPC() && pkKiller->GetDungeon())
 			pkKiller->GetDungeon()->IncKillCount(pkKiller, this);
 
-		wasDuelingInstance = CPVPManager::instance().IsDuelingInstance(this);
-		isAgreedPVP = CPVPManager::instance().Dead(this, pkKiller->GetPlayerID());
-		isDuel = CArenaManager::instance().OnDead(pkKiller, this);
+		wasDuelingInstance = CPVPManager::Instance().IsDuelingInstance(this);
+		isAgreedPVP = CPVPManager::Instance().Dead(this, pkKiller->GetPlayerID());
+		isDuel = CArenaManager::Instance().OnDead(pkKiller, this);
 
 		if (IsPC())
 		{
@@ -1278,8 +1278,8 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 					isUnderGuildWar = true;
 
 			pkKiller->SetQuestNPCID(GetVID());
-			quest::CQuestManager::instance().Kill(pkKiller->GetPlayerID(), quest::QUEST_NO_NPC);
-			CGuildManager::instance().Kill(pkKiller, this);
+			quest::CQuestManager::Instance().Kill(pkKiller->GetPlayerID(), quest::QUEST_NO_NPC);
+			CGuildManager::Instance().Kill(pkKiller, this);
 		}
 	}
 
@@ -1287,14 +1287,14 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 	{
 		if (pkKiller)
 			SetQuestNPCID(pkKiller->GetVID());
-		// quest::CQuestManager::instance().Die(GetPlayerID(), quest::QUEST_NO_NPC);
-		quest::CQuestManager::instance().Die(GetPlayerID(), (pkKiller)?pkKiller->GetRaceNum():quest::QUEST_NO_NPC);
+		// quest::CQuestManager::Instance().Die(GetPlayerID(), quest::QUEST_NO_NPC);
+		quest::CQuestManager::Instance().Die(GetPlayerID(), (pkKiller)?pkKiller->GetRaceNum():quest::QUEST_NO_NPC);
 	}
 
 	//CHECK_FORKEDROAD_WAR
 	if (IsPC())
 	{
-		if (CThreeWayWar::instance().IsThreeWayWarMapIndex(GetMapIndex()))
+		if (CThreeWayWar::Instance().IsThreeWayWarMapIndex(GetMapIndex()))
 			isForked = true;
 	}
 	//END_CHECK_FORKEDROAD_WAR
@@ -1325,7 +1325,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 
 	if (isForked)
 	{
-		CThreeWayWar::instance().onDead( this, pkKiller );
+		CThreeWayWar::Instance().onDead( this, pkKiller );
 	}
 
 	SetPosition(POS_DEAD);
@@ -1335,7 +1335,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 	{
 		if (!pkKiller->IsPC())
 		{
-			if (quest::CQuestManager::instance().GetEventFlag("olunce_exp"))
+			if (quest::CQuestManager::Instance().GetEventFlag("olunce_exp"))
 			{
 				CreateFly(FLY_EXP, pkKiller);
 				CreateFly(FLY_EXP, pkKiller);
@@ -1346,12 +1346,12 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 			{
 				sys_log(1, "DEAD: %s %p WITH PENALTY", GetName(), this);
 				SET_BIT(m_pointsInstant.instant_flag, INSTANT_FLAG_DEATH_PENALTY);
-				LogManager::instance().CharLog(this, pkKiller->GetRaceNum(), "DEAD_BY_NPC", pkKiller->GetName());
+				LogManager::Instance().CharLog(this, pkKiller->GetRaceNum(), "DEAD_BY_NPC", pkKiller->GetName());
 			}
 		}
 		else
 		{
-			if (quest::CQuestManager::instance().GetEventFlag("olunce_exp"))
+			if (quest::CQuestManager::Instance().GetEventFlag("olunce_exp"))
 			{
 				int32_t iCalcExp = GetLevel() * 100;
 				if (iCalcExp)
@@ -1372,7 +1372,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 						GetEmpire(), GetAlignment(), GetPKMode(), GetName(),
 						pkKiller->GetEmpire(), pkKiller->GetAlignment(), pkKiller->GetPKMode(), pkKiller->GetName());
 
-				LogManager::instance().CharLog(this, pkKiller->GetPlayerID(), "DEAD_BY_PC", buf);
+				LogManager::Instance().CharLog(this, pkKiller->GetPlayerID(), "DEAD_BY_PC", buf);
 			}
 			else
 			{
@@ -1415,7 +1415,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 						GetEmpire(), GetAlignment(), GetPKMode(), GetName(),
 						pkKiller->GetEmpire(), pkKiller->GetAlignment(), pkKiller->GetPKMode(), pkKiller->GetName());
 
-				LogManager::instance().CharLog(this, pkKiller->GetPlayerID(), "DEAD_BY_PC", buf);
+				LogManager::Instance().CharLog(this, pkKiller->GetPlayerID(), "DEAD_BY_PC", buf);
 			}
 
 			pkKiller->GetActivityHandler()->MarkPlayerKill(this, isUnderGuildWar);
@@ -1449,7 +1449,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 				if (GetMobTable().dwResurrectionVnum)
 				{
 					// DUNGEON_MONSTER_REBIRTH_BUG_FIX
-					LPCHARACTER chResurrect = CHARACTER_MANAGER::instance().SpawnMob(GetMobTable().dwResurrectionVnum, GetMapIndex(), GetX(), GetY(), GetZ(), true, (int32_t) GetRotation());
+					LPCHARACTER chResurrect = CHARACTER_MANAGER::Instance().SpawnMob(GetMobTable().dwResurrectionVnum, GetMapIndex(), GetX(), GetY(), GetZ(), true, (int32_t) GetRotation());
 					if (GetDungeon() && chResurrect)
 					{
 						chResurrect->SetDungeon(GetDungeon());
@@ -1480,8 +1480,8 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 		{
 			pkKiller->SetQuestNPCID(GetVID());
 			pkKiller->GetActivityHandler()->MarkMonsterKill(this);
-			quest::CQuestManager::instance().Kill(pkKiller->GetPlayerID(), GetRaceNum());
-			CHARACTER_MANAGER::instance().KillLog(GetRaceNum());
+			quest::CQuestManager::Instance().Kill(pkKiller->GetPlayerID(), GetRaceNum());
+			CHARACTER_MANAGER::Instance().KillLog(GetRaceNum());
 		}
 	}
 
@@ -1491,9 +1491,9 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 		char buf[51];
 		snprintf(buf, sizeof(buf), "%d %d", g_bChannel, pkKiller->GetMapIndex());
 		if (IsStone())
-			LogManager::instance().CharLog(pkKiller, GetRaceNum(), "STONE_KILL", buf);
+			LogManager::Instance().CharLog(pkKiller, GetRaceNum(), "STONE_KILL", buf);
 		else
-			LogManager::instance().CharLog(pkKiller, GetRaceNum(), "BOSS_KILL", buf);
+			LogManager::Instance().CharLog(pkKiller, GetRaceNum(), "BOSS_KILL", buf);
 	}
 	// END_OF_BOSS_KILL_LOG
 
@@ -1577,7 +1577,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 	if (IsPC())
 		CloseAcce();
 #endif
-	CShopManager::instance().StopShopping(this);
+	CShopManager::Instance().StopShopping(this);
 	CloseMyShop();
 	CloseSafebox();
 }
@@ -1712,7 +1712,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 				GPOS pos;
 				LPITEM item;
 
-				if ((item = ITEM_MANAGER::instance().CreateItem(1, dwGold / iSplitCount)))
+				if ((item = ITEM_MANAGER::Instance().CreateItem(1, dwGold / iSplitCount)))
 				{
 					if (i != 0)
 					{
@@ -1802,7 +1802,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 			if (iPenetratePct)
 			{
 				{
-					CSkillProto* pkSk = CSkillManager::instance().Get(SKILL_RESIST_PENETRATE);
+					CSkillProto* pkSk = CSkillManager::Instance().Get(SKILL_RESIST_PENETRATE);
 
 					if (nullptr != pkSk)
 					{
@@ -1936,7 +1936,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 				iPenetratePct += pAttacker->GetMarriageBonus(UNIQUE_ITEM_MARRIAGE_PENETRATE_BONUS);
 
 			{
-				CSkillProto* pkSk = CSkillManager::instance().Get(SKILL_RESIST_PENETRATE);
+				CSkillProto* pkSk = CSkillManager::Instance().Get(SKILL_RESIST_PENETRATE);
 
 				if (nullptr != pkSk)
 				{
@@ -2017,7 +2017,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 				{
 					int32_t iAmount = number(1, GetLevel());
 					pAttacker->PointChange(POINT_GOLD, iAmount);
-					LogManager::instance().MoneyLog(MONEY_LOG_MISC, 1, iAmount);
+					LogManager::Instance().MoneyLog(MONEY_LOG_MISC, 1, iAmount);
 				}
 			}
 
@@ -2052,9 +2052,9 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 					PointChange(POINT_SP, -50);
 			}
 
-			if (CBattlegroundManager::instance().IsEventMap(pAttacker->GetMapIndex()))
+			if (CBattlegroundManager::Instance().IsEventMap(pAttacker->GetMapIndex()))
 			{
-				dam = CBattlegroundManager::instance().OnDamage(pAttacker, this, dam);
+				dam = CBattlegroundManager::Instance().OnDamage(pAttacker, this, dam);
 			}
 		}
 	}
@@ -2136,7 +2136,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 
 		int32_t iEmpire = GetEmpire();
 		int32_t lMapIndex = GetMapIndex();
-		int32_t iMapEmpire = SECTREE_MANAGER::instance().GetEmpireFromMapIndex(lMapIndex);
+		int32_t iMapEmpire = SECTREE_MANAGER::Instance().GetEmpireFromMapIndex(lMapIndex);
 
 		if (iEmpire && iMapEmpire && iEmpire != iMapEmpire)
 			dam += (dam * 10) / 100;
@@ -2254,7 +2254,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 	// -----------------------
 	if (pAttacker && pAttacker->IsPC())
 	{
-		int32_t iDmgPct = CHARACTER_MANAGER::instance().GetUserDamageRate(pAttacker);
+		int32_t iDmgPct = CHARACTER_MANAGER::Instance().GetUserDamageRate(pAttacker);
 		dam = dam * iDmgPct / 100;
 	}
 
@@ -2311,7 +2311,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 #if 0
 		if (GetMapIndex() >= 352 * 10000 && GetMapIndex() < 353 * 10000)
 		{
-			LPDUNGEON pDungeon = quest::CQuestManager::instance().GetCurrentDungeon();
+			LPDUNGEON pDungeon = quest::CQuestManager::Instance().GetCurrentDungeon();
 
 			if (pDungeon)
 			{
@@ -2489,7 +2489,7 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int32_t iExp)
 	int32_t iBaseExp = iExp;
 	rate_t rateFactor = 100;
 
-	rateFactor += CPrivManager::instance().GetPriv(to, PRIV_EXP_PCT);
+	rateFactor += CPrivManager::Instance().GetPriv(to, PRIV_EXP_PCT);
 	if (to->IsEquipUniqueItem(UNIQUE_ITEM_LARBOR_MEDAL))
 		rateFactor += 20;
 	if (to->GetMapIndex() >= 660000 && to->GetMapIndex() < 670000)
@@ -2533,7 +2533,7 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int32_t iExp)
 	rateFactor += to->GetPoint(POINT_MALL_EXPBONUS);
 	rateFactor += to->GetPoint(POINT_EXP);
 
-	rateFactor = rateFactor * static_cast<rate_t>(CHARACTER_MANAGER::instance().GetMobExpRate(to))/100.0L;
+	rateFactor = rateFactor * static_cast<rate_t>(CHARACTER_MANAGER::Instance().GetMobExpRate(to))/100.0L;
 	// fix underflow formula
 	iExp = std::max<int32_t>(0, iExp);
 	rateFactor = std::max<rate_t>(100.0L, rateFactor);
@@ -2562,7 +2562,7 @@ static void GiveExp(LPCHARACTER from, LPCHARACTER to, int32_t iExp)
 					you->GetPremiumRemainSeconds(PREMIUM_MARRIAGE_FAST) > 0)
 				dwUpdatePoint *= 3;
 
-			marriage::TMarriage* pMarriage = marriage::CManager::instance().Get(to->GetPlayerID());
+			marriage::TMarriage* pMarriage = marriage::CManager::Instance().Get(to->GetPlayerID());
 
 			// DIVORCE_NULL_BUG_FIX
 			if (pMarriage && pMarriage->IsNear())
@@ -2664,7 +2664,7 @@ typedef struct SDamageInfo
 
 			if (g_bIsTestServer)
 			{
-				if (quest::CQuestManager::instance().GetEventFlag("exp_bonus_log") && pParty->GetExpBonusPercent())
+				if (quest::CQuestManager::Instance().GetEventFlag("exp_bonus_log") && pParty->GetExpBonusPercent())
 					pParty->ChatPacketToAllMember(CHAT_TYPE_INFO, "exp party bonus %d%%", pParty->GetExpBonusPercent());
 			}
 
@@ -2705,7 +2705,7 @@ LPCHARACTER CHARACTER::GetMostAttacked() {
 		++it;
 
 		//* finding the character from his vid
-		LPCHARACTER pAttacker = CHARACTER_MANAGER::instance().Find(c_VID);
+		LPCHARACTER pAttacker = CHARACTER_MANAGER::Instance().Find(c_VID);
 
 		//* if the attacked is now offline
 		if (!pAttacker)
@@ -2756,7 +2756,7 @@ LPCHARACTER CHARACTER::DistributeExp()
 
 		++it;
 
-		LPCHARACTER pAttacker = CHARACTER_MANAGER::instance().Find(c_VID);
+		LPCHARACTER pAttacker = CHARACTER_MANAGER::Instance().Find(c_VID);
 
 		if (!pAttacker || !pAttacker->IsPC())
 			continue;
@@ -2962,7 +2962,7 @@ class CFuncShoot
 				  m_me->m_SkillUseInfo[m_bType].ResetHitCount();*/
 			}
 
-			LPCHARACTER pkVictim = CHARACTER_MANAGER::instance().Find(dwTargetVID);
+			LPCHARACTER pkVictim = CHARACTER_MANAGER::Instance().Find(dwTargetVID);
 
 			if (!pkVictim)
 				return;
@@ -3256,7 +3256,7 @@ bool CHARACTER::Shoot(uint8_t bType)
 
 void CHARACTER::FlyTarget(uint32_t dwTargetVID, int32_t x, int32_t y, uint8_t bHeader)
 {
-	LPCHARACTER pkVictim = CHARACTER_MANAGER::instance().Find(dwTargetVID);
+	LPCHARACTER pkVictim = CHARACTER_MANAGER::Instance().Find(dwTargetVID);
 	SPacketGCFlyTargeting pack;
 
 	//pack.bHeader	= HEADER_GC_FLY_TARGETING;
@@ -3301,7 +3301,7 @@ LPCHARACTER CHARACTER::GetNearestVictim(LPCHARACTER pkChr)
 		const VID & c_VID = it->first;
 		++it;
 
-		LPCHARACTER pAttacker = CHARACTER_MANAGER::instance().Find(c_VID);
+		LPCHARACTER pAttacker = CHARACTER_MANAGER::Instance().Find(c_VID);
 
 		if (!pAttacker)
 			continue;
@@ -3341,7 +3341,7 @@ void CHARACTER::SetVictim(LPCHARACTER pkVictim)
 
 LPCHARACTER CHARACTER::GetVictim() const
 {
-	return CHARACTER_MANAGER::instance().Find(m_kVIDVictim);
+	return CHARACTER_MANAGER::Instance().Find(m_kVIDVictim);
 }
 
 LPCHARACTER CHARACTER::GetProtege() const // 보호해야 할 대상을 리턴
@@ -3711,7 +3711,7 @@ void CHARACTER::ChangeVictimByAggro(int32_t iNewAggro, LPCHARACTER pNewVictim)
 		{
 			if (it->second.iAggro > iNewAggro)
 			{
-				LPCHARACTER ch = CHARACTER_MANAGER::instance().Find(it->first);
+				LPCHARACTER ch = CHARACTER_MANAGER::Instance().Find(it->first);
 
 				if (ch && !ch->IsDead() && DISTANCE_APPROX(ch->GetX() - GetX(), ch->GetY() - GetY()) < 5000)
 				{
@@ -3724,7 +3724,7 @@ void CHARACTER::ChangeVictimByAggro(int32_t iNewAggro, LPCHARACTER pNewVictim)
 		if (itFind != m_map_kDamage.end())
 		{
 			m_iMaxAggro = iNewAggro;
-			SetVictim(CHARACTER_MANAGER::instance().Find(itFind->first));
+			SetVictim(CHARACTER_MANAGER::Instance().Find(itFind->first));
 			m_dwStateDuration = 1;
 		}
 	}

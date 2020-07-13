@@ -17,7 +17,7 @@ enum OXEventStatus
 	OXEVENT_ERR = 0xff
 };
 
-class COXEventManager : public singleton<COXEventManager>
+class COXEventManager : public CSingleton<COXEventManager>
 {
 	private :
 		std::map<uint32_t, uint32_t> m_map_char;

@@ -10,7 +10,7 @@ namespace quest
 {
 	int32_t oxevent_get_status(lua_State* L)
 	{
-		OXEventStatus ret = COXEventManager::instance().GetStatus();
+		OXEventStatus ret = COXEventManager::Instance().GetStatus();
 
 		lua_pushnumber(L, (int32_t)ret);
 
@@ -19,11 +19,11 @@ namespace quest
 
 	int32_t oxevent_open(lua_State* L)
 	{
-		COXEventManager::instance().ClearQuiz();
+		COXEventManager::Instance().ClearQuiz();
 
 		char script[256];
 		snprintf(script, sizeof(script), "%s/oxquiz.lua", LocaleService_GetBasePath().c_str());
-		int32_t result = lua_dofile(quest::CQuestManager::instance().GetLuaState(), script);
+		int32_t result = lua_dofile(quest::CQuestManager::Instance().GetLuaState(), script);
 
 		if (result != 0)
 		{
@@ -35,14 +35,14 @@ namespace quest
 			lua_pushnumber(L, 1);
 		}
 		
-		COXEventManager::instance().SetStatus(OXEVENT_OPEN);
+		COXEventManager::Instance().SetStatus(OXEVENT_OPEN);
 
 		return 1;
 	}
 	
 	int32_t oxevent_close(lua_State* L)
 	{
-		COXEventManager::instance().SetStatus(OXEVENT_CLOSE);
+		COXEventManager::Instance().SetStatus(OXEVENT_CLOSE);
 		
 		return 0;
 	}
@@ -51,7 +51,7 @@ namespace quest
 	{
 		if (lua_isnumber(L, 1) && lua_isnumber(L, 2))
 		{
-			bool ret = COXEventManager::instance().Quiz((int32_t)lua_tonumber(L, 1), (int32_t)lua_tonumber(L, 2));
+			bool ret = COXEventManager::Instance().Quiz((int32_t)lua_tonumber(L, 1), (int32_t)lua_tonumber(L, 2));
 
 			if (ret == false)
 			{
@@ -69,7 +69,7 @@ namespace quest
 	
 	int32_t oxevent_get_attender(lua_State* L)
 	{
-		lua_pushnumber(L, (int32_t)COXEventManager::instance().GetAttenderCount());
+		lua_pushnumber(L, (int32_t)COXEventManager::Instance().GetAttenderCount());
 		return 1;
 	}
 
@@ -85,13 +85,13 @@ namespace quest
 
 	EVENTFUNC(end_oxevent)
 	{
-		COXEventManager::instance().CloseEvent();
+		COXEventManager::Instance().CloseEvent();
 		return 0;
 	}
 
 	int32_t oxevent_end_event(lua_State* L)
 	{
-		COXEventManager::instance().SetStatus(OXEVENT_FINISH);
+		COXEventManager::Instance().SetStatus(OXEVENT_FINISH);
 
 		end_oxevent_info* info = AllocEventInfo<end_oxevent_info>();
 		event_create(end_oxevent, info, PASSES_PER_SEC(5));
@@ -101,8 +101,8 @@ namespace quest
 
 	int32_t oxevent_end_event_force(lua_State* L)
 	{
-		COXEventManager::instance().CloseEvent();
-		COXEventManager::instance().SetStatus(OXEVENT_FINISH);
+		COXEventManager::Instance().CloseEvent();
+		COXEventManager::Instance().SetStatus(OXEVENT_FINISH);
 
 		return 0;
 	}
@@ -111,7 +111,7 @@ namespace quest
 	{
 		if (lua_isnumber(L, 1) && lua_isnumber(L, 2))
 		{
-			COXEventManager::instance().GiveItemToAttender((int32_t)lua_tonumber(L, 1), (int32_t)lua_tonumber(L, 2));
+			COXEventManager::Instance().GiveItemToAttender((int32_t)lua_tonumber(L, 1), (int32_t)lua_tonumber(L, 2));
 		}
 
 		return 0;
@@ -119,10 +119,10 @@ namespace quest
 
 	int32_t oxevent_is_banned(lua_State* L)
 	{
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (ch)
 		{
-			lua_pushboolean(L, COXEventManager::instance().IsBanned(ch));
+			lua_pushboolean(L, COXEventManager::Instance().IsBanned(ch));
 			return 1;
 		}
 		return 0;
@@ -145,7 +145,7 @@ namespace quest
 			{ nullptr, nullptr}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("oxevent", oxevent_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("oxevent", oxevent_functions);
 	}
 }
 

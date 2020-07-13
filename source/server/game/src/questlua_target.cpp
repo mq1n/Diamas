@@ -11,14 +11,14 @@ namespace quest
 	//
 	int32_t target_pos(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -40,7 +40,7 @@ namespace quest
 
 		GPOS pos;
 
-		if (!SECTREE_MANAGER::instance().GetMapBasePositionByMapIndex(ch->GetMapIndex(), pos))
+		if (!SECTREE_MANAGER::Instance().GetMapBasePositionByMapIndex(ch->GetMapIndex(), pos))
 		{
 			sys_err("cannot find base position in this map %d", ch->GetMapIndex());
 			return 0;
@@ -49,7 +49,7 @@ namespace quest
 		int32_t x = pos.x + (int32_t) lua_tonumber(L, 2) * 100;
 		int32_t y = pos.y + (int32_t) lua_tonumber(L, 3) * 100;
 
-		CTargetManager::instance().CreateTarget(ch->GetPlayerID(),
+		CTargetManager::Instance().CreateTarget(ch->GetPlayerID(),
 				iQuestIndex,
 				lua_tostring(L, 1),
 				TARGET_TYPE_POS,
@@ -65,14 +65,14 @@ namespace quest
 
 	int32_t target_vid(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -93,7 +93,7 @@ namespace quest
 		}
 
 
-		CTargetManager::instance().CreateTarget(ch->GetPlayerID(),
+		CTargetManager::Instance().CreateTarget(ch->GetPlayerID(),
 				iQuestIndex,
 				lua_tostring(L, 1),
 				TARGET_TYPE_VID,
@@ -110,14 +110,14 @@ namespace quest
 	// 현재 퀘스트에 등록된 타겟을 삭제 한다.
 	int32_t target_delete(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -137,7 +137,7 @@ namespace quest
 			return 0;
 		}
 
-		CTargetManager::instance().DeleteTarget(ch->GetPlayerID(), iQuestIndex, lua_tostring(L, 1));
+		CTargetManager::Instance().DeleteTarget(ch->GetPlayerID(), iQuestIndex, lua_tostring(L, 1));
 
 		return 0;
 	}
@@ -145,14 +145,14 @@ namespace quest
 	// 현재 퀘스트 인덱스로 되어있는 타겟을 모두 삭제한다.
 	int32_t target_clear(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -165,21 +165,21 @@ namespace quest
 			sys_err("Null quest index triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
-		CTargetManager::instance().DeleteTarget(ch->GetPlayerID(), iQuestIndex, nullptr);
+		CTargetManager::Instance().DeleteTarget(ch->GetPlayerID(), iQuestIndex, nullptr);
 
 		return 0;
 	}
 
 	int32_t target_id(lua_State* L)
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
 			return 0;
 		}
 
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -200,7 +200,7 @@ namespace quest
 			return 1;
 		}
 
-		LPEVENT pkEvent = CTargetManager::instance().GetTargetEvent(ch->GetPlayerID(), dwQuestIndex, (const char *) lua_tostring(L, 1));
+		LPEVENT pkEvent = CTargetManager::Instance().GetTargetEvent(ch->GetPlayerID(), dwQuestIndex, (const char *) lua_tostring(L, 1));
 
 		if (pkEvent)
 		{
@@ -238,7 +238,7 @@ namespace quest
 			{ nullptr,			nullptr			},
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("target", target_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("target", target_functions);
 	}
 };
 

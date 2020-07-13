@@ -298,7 +298,7 @@ bool DSManager::DragonSoulItemInitialize(LPITEM pItem)
 	if (nullptr == pItem || !pItem->IsDragonSoul())
 		return false;
 	PutAttributes(pItem);
-	int32_t time = DSManager::instance().GetDuration(pItem);
+	int32_t time = DSManager::Instance().GetDuration(pItem);
 	if (time > 0)
 		pItem->SetSocket(ITEM_SOCKET_REMAIN_SEC, time);
 	return true;
@@ -363,14 +363,14 @@ bool DSManager::ExtractDragonHeart(LPCHARACTER ch, LPITEM pItem, LPITEM pExtract
 		{
 			pExtractor->SetCount(pExtractor->GetCount() - 1);
 		}
-		LogManager::instance().ItemLog(ch, pItem, "DS_HEART_EXTRACT_FAIL", "");
+		LogManager::Instance().ItemLog(ch, pItem, "DS_HEART_EXTRACT_FAIL", "");
 	
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("용심 추출에 실패하였습니다."));
 		return false;
 	}
 	else
 	{
-		LPITEM pDH = ITEM_MANAGER::instance().CreateItem(DRAGON_HEART_VNUM);
+		LPITEM pDH = ITEM_MANAGER::Instance().CreateItem(DRAGON_HEART_VNUM);
 		
 		if (nullptr == pDH)
 		{
@@ -390,7 +390,7 @@ bool DSManager::ExtractDragonHeart(LPCHARACTER ch, LPITEM pItem, LPITEM pExtract
 
 		std::string s = std::to_string(iCharge);
 		s += "%s";
-		LogManager::instance().ItemLog(ch, pItem, "DS_HEART_EXTRACT_SUCCESS", s.c_str());
+		LogManager::Instance().ItemLog(ch, pItem, "DS_HEART_EXTRACT_SUCCESS", s.c_str());
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("용심 추출에 성공하였습니다."));
 		return true;
 	}
@@ -466,7 +466,7 @@ bool DSManager::PullOut(LPCHARACTER ch, TItemPos DestCell, LPITEM& pItem, LPITEM
 			{
 				sprintf(buf, "dice(%.12f) prob(%.12f)", fDice, fProb);
 			}
-			LogManager::instance().ItemLog(ch, pItem, "DS_PULL_OUT_SUCCESS", buf);
+			LogManager::Instance().ItemLog(ch, pItem, "DS_PULL_OUT_SUCCESS", buf);
 			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("용혼석 추출에 성공하였습니다."));
 			pItem->AddToCharacter(ch, DestCell);
 			return true;
@@ -481,7 +481,7 @@ bool DSManager::PullOut(LPCHARACTER ch, TItemPos DestCell, LPITEM& pItem, LPITEM
 			{
 				sprintf(buf, "dice(%d) prob(%d) ByProd(VNUM:%d)", (int32_t)fDice, (int32_t)fProb, dwByProduct);
 			}
-			LogManager::instance().ItemLog(ch, pItem, "DS_PULL_OUT_FAILED", buf);
+			LogManager::Instance().ItemLog(ch, pItem, "DS_PULL_OUT_FAILED", buf);
 			M2_DESTROY_ITEM(pItem);
 			pItem = nullptr;
 			if (dwByProduct)
@@ -612,7 +612,7 @@ bool DSManager::DoRefineGrade(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_SOUL
 		return false;
 	}
 
-	LPITEM pResultItem = ITEM_MANAGER::instance().CreateItem(MakeDragonSoulVnum(ds_type, (uint8_t)result_grade, 0, 0));
+	LPITEM pResultItem = ITEM_MANAGER::Instance().CreateItem(MakeDragonSoulVnum(ds_type, (uint8_t)result_grade, 0, 0));
 
 	if (nullptr == pResultItem)
 	{
@@ -645,7 +645,7 @@ bool DSManager::DoRefineGrade(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_SOUL
 	{
 		char buf[128];
 		sprintf(buf, "GRADE : %d -> %d", grade_idx, result_grade);
-		LogManager::instance().ItemLog(ch, pResultItem, "DS_GRADE_REFINE_SUCCESS", buf);
+		LogManager::Instance().ItemLog(ch, pResultItem, "DS_GRADE_REFINE_SUCCESS", buf);
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("등급 개량에 성공했습니다."));
 		SendRefineResultPacket(ch, DS_SUB_HEADER_REFINE_SUCCEED, TItemPos (pResultItem->GetWindow(), pResultItem->GetCell()));
 		return true;
@@ -654,7 +654,7 @@ bool DSManager::DoRefineGrade(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_SOUL
 	{
 		char buf[128];
 		sprintf(buf, "GRADE : %d -> %d", grade_idx, result_grade);
-		LogManager::instance().ItemLog(ch, pResultItem, "DS_GRADE_REFINE_FAIL", buf);
+		LogManager::Instance().ItemLog(ch, pResultItem, "DS_GRADE_REFINE_FAIL", buf);
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("등급 개량에 실패했습니다."));
 		SendRefineResultPacket(ch, DS_SUB_HEADER_REFINE_FAIL, TItemPos (pResultItem->GetWindow(), pResultItem->GetCell()));
 		return false;
@@ -766,7 +766,7 @@ bool DSManager::DoRefineStep(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_SOUL_
 		return false;
 	}
 
-	LPITEM pResultItem = ITEM_MANAGER::instance().CreateItem(MakeDragonSoulVnum(ds_type, grade_idx, (uint8_t)result_step, 0));
+	LPITEM pResultItem = ITEM_MANAGER::Instance().CreateItem(MakeDragonSoulVnum(ds_type, grade_idx, (uint8_t)result_step, 0));
 
 	if (nullptr == pResultItem)
 	{
@@ -797,7 +797,7 @@ bool DSManager::DoRefineStep(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_SOUL_
 	{
 		char buf[128];
 		sprintf(buf, "STEP : %d -> %d", step_idx, result_step);
-		LogManager::instance().ItemLog(ch, pResultItem, "DS_STEP_REFINE_SUCCESS", buf);
+		LogManager::Instance().ItemLog(ch, pResultItem, "DS_STEP_REFINE_SUCCESS", buf);
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("단계 개량에 성공했습니다."));
 		SendRefineResultPacket(ch, DS_SUB_HEADER_REFINE_SUCCEED, TItemPos (pResultItem->GetWindow(), pResultItem->GetCell()));
 		return true;
@@ -806,7 +806,7 @@ bool DSManager::DoRefineStep(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_SOUL_
 	{
 		char buf[128];
 		sprintf(buf, "STEP : %d -> %d", step_idx, result_step);
-		LogManager::instance().ItemLog(ch, pResultItem, "DS_STEP_REFINE_FAIL", buf);
+		LogManager::Instance().ItemLog(ch, pResultItem, "DS_STEP_REFINE_FAIL", buf);
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("단계 개량에 실패했습니다."));
 		SendRefineResultPacket(ch, DS_SUB_HEADER_REFINE_FAIL, TItemPos (pResultItem->GetWindow(), pResultItem->GetCell()));
 		return false;
@@ -948,7 +948,7 @@ bool DSManager::DoRefineStrength(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_S
 
 	if (fnumber(0.f, 100.f) <= fProb)
 	{
-		pResult = ITEM_MANAGER::instance().CreateItem(MakeDragonSoulVnum(bType, bGrade, bStep, bStrength + 1));
+		pResult = ITEM_MANAGER::Instance().CreateItem(MakeDragonSoulVnum(bType, bGrade, bStep, bStrength + 1));
 		if (nullptr == pResult)
 		{
 			sys_err ("INVALID DRAGON SOUL(%d)", MakeDragonSoulVnum(bType, bGrade, bStep, bStrength + 1));
@@ -964,7 +964,7 @@ bool DSManager::DoRefineStrength(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_S
 
 		char buf[128];
 		sprintf(buf, "STRENGTH : %d -> %d", bStrength, bStrength + 1);
-		LogManager::instance().ItemLog(ch, pDragonSoul, "DS_STRENGTH_REFINE_SUCCESS", buf);
+		LogManager::Instance().ItemLog(ch, pDragonSoul, "DS_STRENGTH_REFINE_SUCCESS", buf);
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("강화에 성공했습니다."));
 		ch->AutoGiveItem(pResult, true);
 		bSubHeader = DS_SUB_HEADER_REFINE_SUCCEED;
@@ -973,7 +973,7 @@ bool DSManager::DoRefineStrength(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_S
 	{
 		if (bStrength != 0)
 		{
-			pResult = ITEM_MANAGER::instance().CreateItem(MakeDragonSoulVnum(bType, bGrade, bStep, bStrength - 1));
+			pResult = ITEM_MANAGER::Instance().CreateItem(MakeDragonSoulVnum(bType, bGrade, bStep, bStrength - 1));
 			if (nullptr == pResult)
 			{
 				sys_err ("INVALID DRAGON SOUL(%d)", MakeDragonSoulVnum(bType, bGrade, bStep, bStrength - 1));
@@ -987,7 +987,7 @@ bool DSManager::DoRefineStrength(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_S
 		char buf[128];
 		sprintf(buf, "STRENGTH : %d -> %d", bStrength, bStrength - 1);
 		// strength강화는 실패시 깨질 수도 있어, 원본 아이템을 바탕으로 로그를 남김.
-		LogManager::instance().ItemLog(ch, pDragonSoul, "DS_STRENGTH_REFINE_FAIL", buf);
+		LogManager::Instance().ItemLog(ch, pDragonSoul, "DS_STRENGTH_REFINE_FAIL", buf);
 
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("강화에 실패했습니다."));
 		pDragonSoul->SetCount(pDragonSoul->GetCount() - 1);
@@ -1081,7 +1081,7 @@ bool DSManager::ActivateDragonSoul(LPITEM pItem)
 		{
 			char buf[128];
 			sprintf (buf, "LEFT TIME(%d)", LeftTime(pItem));
-			LogManager::instance().ItemLog(pOwner, pItem, "DS_ACTIVATE", buf);
+			LogManager::Instance().ItemLog(pOwner, pItem, "DS_ACTIVATE", buf);
 			pItem->ModifyPoints(true);
 			pItem->SetSocket(ITEM_SOCKET_DRAGON_SOUL_ACTIVE_IDX, 1);
 
@@ -1111,7 +1111,7 @@ bool DSManager::DeactivateDragonSoul(LPITEM pItem, bool bSkipRefreshOwnerActiveS
 	pItem->ModifyPoints(false);
 
 	sprintf (buf, "LEFT TIME(%d)", LeftTime(pItem));
-	LogManager::instance().ItemLog(pOwner, pItem, "DS_DEACTIVATE", buf);
+	LogManager::Instance().ItemLog(pOwner, pItem, "DS_DEACTIVATE", buf);
 
 	if (false == bSkipRefreshOwnerActiveState)
 		RefreshDragonSoulState(pOwner);

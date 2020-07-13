@@ -9,7 +9,7 @@ CMapLocation g_mapLocations;
 
 bool CMapLocation::Get(int32_t x, int32_t y, int32_t & lIndex, int32_t & lAddr, uint16_t & wPort)
 {
-	lIndex = SECTREE_MANAGER::instance().GetMapIndex(x, y);
+	lIndex = SECTREE_MANAGER::Instance().GetMapIndex(x, y);
 
 	return Get(lIndex, lAddr, wPort);
 }

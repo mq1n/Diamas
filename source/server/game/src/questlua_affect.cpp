@@ -28,7 +28,7 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager & q = CQuestManager::instance();
+		CQuestManager & q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 
 		if (!ch)
@@ -44,7 +44,7 @@ namespace quest
 
 	int32_t affect_remove(lua_State * L)
 	{
-		PC* pPC = CQuestManager::instance().GetCurrentPC();
+		PC* pPC = CQuestManager::Instance().GetCurrentPC();
 		if (!pPC)
 		{
 			sys_err("Null pc pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -63,7 +63,7 @@ namespace quest
 		else
 			iType = pPC->GetCurrentQuestIndex() + AFFECT_QUEST_START_IDX;
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 			return 0;
 
@@ -74,7 +74,7 @@ namespace quest
 
 	int32_t affect_remove_bad(lua_State * L) // 나쁜 효과를 없앰
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (ch)
 			ch->RemoveBadAffect();
 		return 0;
@@ -82,7 +82,7 @@ namespace quest
 
 	int32_t affect_remove_good(lua_State * L) // 좋은 효과를 없앰
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (ch)
 			ch->RemoveGoodAffect();
 		return 0;
@@ -105,7 +105,7 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager & q = CQuestManager::instance();
+		CQuestManager & q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 
 		if (ch)
@@ -116,7 +116,7 @@ namespace quest
 
 	int32_t affect_remove_hair(lua_State * L) // 헤어 효과를 없앤다.
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
@@ -148,7 +148,7 @@ namespace quest
 		}
 		uint32_t affectType = (uint32_t)lua_tonumber(L, 1);
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
@@ -182,7 +182,7 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager & q = CQuestManager::instance();
+		CQuestManager & q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 
 		if (ch)
@@ -208,7 +208,7 @@ namespace quest
 			return 0;
 		}
 
-		CQuestManager & q = CQuestManager::instance();
+		CQuestManager & q = CQuestManager::Instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 
 		if (ch)
@@ -227,7 +227,7 @@ namespace quest
 		uint8_t bApply = static_cast<uint8_t>(lua_tonumber(L, 1));
 		int32_t value = static_cast<int32_t>(lua_tonumber(L, 2));
 
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("null ch ptr");
@@ -262,7 +262,7 @@ namespace quest
 
 	int32_t affect_remove_all_collect( lua_State* L )
 	{
-		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (ch)
 			ch->RemoveAffect(AFFECT_COLLECT);
 
@@ -278,7 +278,7 @@ namespace quest
 		}
 		uint32_t dwType = (uint32_t)lua_tonumber(L, 1);
 
-		CHARACTER* ch = CQuestManager::instance().GetCurrentCharacterPtr();
+		CHARACTER* ch = CQuestManager::Instance().GetCurrentCharacterPtr();
 		if (!ch)
 		{
 			sys_err("Null character pointer triggered at %s:%d", __FILE__, __LINE__);
@@ -315,6 +315,6 @@ namespace quest
 			{ nullptr,				nullptr						}
 		};
 
-		CQuestManager::instance().AddLuaFunctionTable("affect", affect_functions);
+		CQuestManager::Instance().AddLuaFunctionTable("affect", affect_functions);
 	}
 };

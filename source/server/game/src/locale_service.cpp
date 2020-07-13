@@ -6,7 +6,6 @@
 #include "mob_manager.h"
 #include "config.h"
 #include "skill_power.h"
-#include "../../common/service.h"
 
 extern std::string				g_stQuestDir;
 extern std::set <std::string> 	g_setQuestObjectDir;
@@ -21,13 +20,13 @@ int32_t(*check_name) (const char* str) = nullptr;
 
 int32_t check_name_independent(const char * str)
 {
-	if (CBanwordManager::instance().CheckString(str, strlen(str)))
+	if (CBanwordManager::Instance().CheckString(str, strlen(str)))
 		return 0;
 
 	std::string stTemp(str);
 	std::transform(stTemp.begin(), stTemp.end(), stTemp.begin(), ::tolower);
 
-	if (CMobManager::instance().Get(stTemp.c_str(), false))
+	if (CMobManager::Instance().Get(stTemp.c_str(), false))
 		return 0;
 
 	return 1;
@@ -77,7 +76,7 @@ void LocaleService_TransferDefaultSetting()
 	if (!exp_table)
 		exp_table = exp_table_common;
 
-	if (!CTableBySkill::instance().Check())
+	if (!CTableBySkill::Instance().Check())
 		exit(1);
 
 	if (!aiPercentByDeltaLevForBoss)
@@ -104,7 +103,7 @@ void Locale_LoadLocaleStringFile()
 
 void Locale_Init()
 {
-	if (!CTableBySkill::instance().Check())
+	if (!CTableBySkill::Instance().Check())
 		exit(1);
 
 	Locale_LoadLocaleStringFile();

@@ -404,7 +404,7 @@ bool SECTREE_MANAGER::LoadAttribute(LPSECTREE_MAP pkMapSectree, const char * c_p
 	fread(&iWidth, sizeof(int32_t), 1, fp);
 	fread(&iHeight, sizeof(int32_t), 1, fp);
 
-	int32_t maxMemSize = LZOManager::instance().GetMaxCompressedSize(sizeof(uint32_t) * (SECTREE_SIZE / CELL_SIZE) * (SECTREE_SIZE / CELL_SIZE));
+	int32_t maxMemSize = LZOManager::Instance().GetMaxCompressedSize(sizeof(uint32_t) * (SECTREE_SIZE / CELL_SIZE) * (SECTREE_SIZE / CELL_SIZE));
 
 	uint32_t uiSize;
 	lzo_uint uiDestSize;
@@ -455,9 +455,9 @@ bool SECTREE_MANAGER::LoadAttribute(LPSECTREE_MAP pkMapSectree, const char * c_p
 			fread(&uiSize, sizeof(int32_t), 1, fp);
 			fread(abComp, sizeof(char), uiSize, fp);
 
-			//LZOManager::instance().Decompress(abComp, uiSize, (uint8_t *) tree->GetAttributePointer(), &uiDestSize);
+			//LZOManager::Instance().Decompress(abComp, uiSize, (uint8_t *) tree->GetAttributePointer(), &uiDestSize);
 			uiDestSize = sizeof(uint32_t) * maxMemSize;
-			LZOManager::instance().Decompress(abComp, uiSize, (uint8_t *) attr, &uiDestSize);
+			LZOManager::Instance().Decompress(abComp, uiSize, (uint8_t *) attr, &uiDestSize);
 
 			if (uiDestSize != sizeof(uint32_t) * (SECTREE_SIZE / CELL_SIZE) * (SECTREE_SIZE / CELL_SIZE))
 			{
@@ -760,7 +760,7 @@ int32_t SECTREE_MANAGER::Build(const char * c_pszListFileName, const char* c_psz
 
 bool SECTREE_MANAGER::IsMovablePosition(int32_t lMapIndex, int32_t x, int32_t y)
 {
-	LPSECTREE tree = SECTREE_MANAGER::instance().Get(lMapIndex, x, y);
+	LPSECTREE tree = SECTREE_MANAGER::Instance().Get(lMapIndex, x, y);
 
 	if (!tree)
 		return false;
@@ -777,7 +777,7 @@ bool SECTREE_MANAGER::GetMovablePosition(int32_t lMapIndex, int32_t x, int32_t y
 		int32_t dx = x + aArroundCoords[i].x;
 		int32_t dy = y + aArroundCoords[i].y;
 
-		LPSECTREE tree = SECTREE_MANAGER::instance().Get(lMapIndex, dx, dy);
+		LPSECTREE tree = SECTREE_MANAGER::Instance().Get(lMapIndex, dx, dy);
 
 		if (!tree)
 			continue;
@@ -1015,7 +1015,7 @@ struct FDestroyPrivateMapEntity
 			sys_log(0, "PRIVAE_MAP: removing character %s", ch->GetName());
 
 			if (ch->GetDesc())
-				DESC_MANAGER::instance().DestroyDesc(ch->GetDesc());
+				DESC_MANAGER::Instance().DestroyDesc(ch->GetDesc());
 			else
 				M2_DESTROY_CHARACTER(ch);
 		}
@@ -1159,7 +1159,7 @@ class FRemoveIfAttr
 				{
 					GPOS pos;
 
-					if (SECTREE_MANAGER::instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos))
+					if (SECTREE_MANAGER::Instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos))
 						ch->WarpSet(pos.x, pos.y);
 					else
 						ch->GoHome();
@@ -1349,7 +1349,7 @@ struct FPurgeMonsters
 
 void SECTREE_MANAGER::PurgeMonstersInMap(int32_t lMapIndex)
 {
-	LPSECTREE_MAP sectree = SECTREE_MANAGER::instance().GetMap(lMapIndex);
+	LPSECTREE_MAP sectree = SECTREE_MANAGER::Instance().GetMap(lMapIndex);
 
 	if ( sectree != nullptr )
 	{
@@ -1377,7 +1377,7 @@ struct FPurgeStones
 
 void SECTREE_MANAGER::PurgeStonesInMap(int32_t lMapIndex)
 {
-	LPSECTREE_MAP sectree = SECTREE_MANAGER::instance().GetMap(lMapIndex);
+	LPSECTREE_MAP sectree = SECTREE_MANAGER::Instance().GetMap(lMapIndex);
 
 	if ( sectree != nullptr )
 	{
@@ -1405,7 +1405,7 @@ struct FPurgeNPCs
 
 void SECTREE_MANAGER::PurgeNPCsInMap(int32_t lMapIndex)
 {
-	LPSECTREE_MAP sectree = SECTREE_MANAGER::instance().GetMap(lMapIndex);
+	LPSECTREE_MAP sectree = SECTREE_MANAGER::Instance().GetMap(lMapIndex);
 
 	if ( sectree != nullptr )
 	{
@@ -1435,7 +1435,7 @@ struct FCountMonsters
 
 size_t SECTREE_MANAGER::GetMonsterCountInMap(int32_t lMapIndex)
 {
-	LPSECTREE_MAP sectree = SECTREE_MANAGER::instance().GetMap(lMapIndex);
+	LPSECTREE_MAP sectree = SECTREE_MANAGER::Instance().GetMap(lMapIndex);
 
 	if ( sectree != nullptr )
 	{
@@ -1475,7 +1475,7 @@ struct FCountSpecifiedMonster
 
 size_t SECTREE_MANAGER::GetMonsterCountInMap(int32_t lMapIndex, uint32_t dwVnum)
 {
-	LPSECTREE_MAP sectree = SECTREE_MANAGER::instance().GetMap(lMapIndex);
+	LPSECTREE_MAP sectree = SECTREE_MANAGER::Instance().GetMap(lMapIndex);
 
 	if (nullptr != sectree)
 	{

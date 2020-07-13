@@ -8,7 +8,6 @@
 #include "TerrainQuadtree.h"
 #include "ActorInstance.h"
 
-// 2004.08.17.myevan.std::vector 를 사용할 경우 메모리 접근에 오래걸려 스택쪽으로 계산하도록 수정
 class PCBlocker_CDynamicSphereInstanceVector
 {
 	public:

@@ -13,8 +13,6 @@
 #include <mmsystem.h>
 #include <ctime>
 #include <cstdint>
-
-#include "file_ptr.h"
 #include <algorithm>
 #include <string>
 #include <vector>
@@ -22,6 +20,9 @@
 #include <list>
 #include <map>
 #include <fmt/format.h>
+
+#include "../../common/common_incl.hpp"
+#include "file_ptr.h"
 using namespace std::string_literals;
 
 #if _MSC_VER >= 1400

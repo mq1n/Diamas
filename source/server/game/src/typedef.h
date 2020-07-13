@@ -1,5 +1,5 @@
 #pragma once
-#include "../../common/service.h"
+#include "../../../common/defines.h"
 
 class DESC;
 #ifdef USE_DEBUG_PTR

@@ -91,7 +91,7 @@ void CEntity::UpdateSectree()
 	auto f = [&](LPENTITY ent)
 	{
 		// Objects that are not objects are calculated by distance.
-		if (!ent->IsType(ENTITY_OBJECT) /* && !CBattlegroundManager::instance().IsEventMap(m_mapIndex) */)
+		if (!ent->IsType(ENTITY_OBJECT) /* && !CBattlegroundManager::Instance().IsEventMap(m_mapIndex) */)
 		{
 			if (DISTANCE_APPROX(ent->GetX() - this->GetX(), ent->GetY() - this->GetY()) > VIEW_RANGE + VIEW_BONUS_RANGE)
 				return;

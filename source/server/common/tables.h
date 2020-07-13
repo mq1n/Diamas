@@ -1,13 +1,7 @@
 #ifndef __INC_TABLES_H__
 #define __INC_TABLES_H__
 
-#include "../../common/packets.h"
-#include "../../common/tables.h"
-
-#include "length.h"
-#include "item_length.h"
-#include "service.h"
-
+#include "../../common/common_incl.hpp"
 #include <cstdint>
 #include <cstring>
 

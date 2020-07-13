@@ -1,9 +1,6 @@
 #include "stdafx.h"
-#include "config.h"
-
 #include "threeway_war.h"
-
-#include "../../common/length.h"
+#include "config.h"
 #include "../../common/tables.h"
 #include "p2p.h"
 #include "locale_service.h"
@@ -43,7 +40,7 @@ EVENTFUNC(regen_mob_event)
 	std::string szFilename(GetSungziMapPath());
 
 
-	int32_t choice = quest::CQuestManager::instance().GetEventFlag("threeway_war_choice");
+	int32_t choice = quest::CQuestManager::Instance().GetEventFlag("threeway_war_choice");
 	if (0 == choice)
 		sprintf (filename, "%sregen00.txt", GetSungziMapPath());
 	else
@@ -51,7 +48,7 @@ EVENTFUNC(regen_mob_event)
 		sprintf (filename, "%sregen00_%d.txt", GetSungziMapPath(), choice);
 	}
 
-	LPSECTREE_MAP pkMap = SECTREE_MANAGER::instance().GetMap(iMapIndex);
+	LPSECTREE_MAP pkMap = SECTREE_MANAGER::Instance().GetMap(iMapIndex);
 
 	if (nullptr != pkMap)
 	{
@@ -200,14 +197,14 @@ bool CThreeWayWar::LoadSetting(const char* szFileName)
 
 const ForkedPassMapInfo& CThreeWayWar::GetEventPassMapInfo() const
 {
-	const size_t idx = quest::CQuestManager::instance().GetEventFlag( "threeway_war_pass_idx" );
+	const size_t idx = quest::CQuestManager::Instance().GetEventFlag( "threeway_war_pass_idx" );
 
 	return PassInfoMap_[idx];
 }
 
 const ForkedSungziMapInfo& CThreeWayWar::GetEventSungZiMapInfo() const
 {
-	const size_t idx = quest::CQuestManager::instance().GetEventFlag( "threeway_war_sungzi_idx" );
+	const size_t idx = quest::CQuestManager::Instance().GetEventFlag( "threeway_war_sungzi_idx" );
 
 	return SungZiInfoMap_[idx];
 }
@@ -237,8 +234,8 @@ void CThreeWayWar::RandomEventMapSet()
 	const size_t pass_idx = number( 0, PassInfoMap_.size()-1 );
 	const size_t sung_idx = number( 0, SungZiInfoMap_.size()-1 );
 
-	quest::CQuestManager::instance().RequestSetEventFlag( "threeway_war_sungzi_idx", sung_idx );
-	quest::CQuestManager::instance().RequestSetEventFlag( "threeway_war_pass_idx", pass_idx );
+	quest::CQuestManager::Instance().RequestSetEventFlag( "threeway_war_sungzi_idx", sung_idx );
+	quest::CQuestManager::Instance().RequestSetEventFlag( "threeway_war_pass_idx", pass_idx );
 }
 
 bool CThreeWayWar::IsRegisteredUser(uint32_t PlayerID) const
@@ -335,7 +332,7 @@ void CThreeWayWar::onDead(LPCHARACTER pChar, LPCHARACTER pkKiller)
 		SendNoticeMap(szBuf, GetSungziMapIndex(), false);
 	}
 
-	const int32_t nVictoryScore = quest::CQuestManager::instance().GetEventFlag("threeway_war_kill_count");
+	const int32_t nVictoryScore = quest::CQuestManager::Instance().GetEventFlag("threeway_war_kill_count");
 
 	if (0 == GetRegenFlag())
 	{
@@ -401,7 +398,7 @@ void CThreeWayWar::onDead(LPCHARACTER pChar, LPCHARACTER pkKiller)
 				"[ENTER][DONE]"
 				);
 
-		CHARACTER_MANAGER::instance().SendScriptToMap(pChar->GetMapIndex(), Script);
+		CHARACTER_MANAGER::Instance().SendScriptToMap(pChar->GetMapIndex(), Script);
 
 		//----------------------
 		// 공지 한방 날려줌.
@@ -411,7 +408,7 @@ void CThreeWayWar::onDead(LPCHARACTER pChar, LPCHARACTER pkKiller)
 		BroadcastNotice(szNotice);
 
 		snprintf(szNotice, sizeof(szNotice), "First Step: %s exclusion", Nation.c_str());
-		LogManager::instance().CharLog(0, 0, 0, 0, "THREEWAY", szNotice, nullptr);
+		LogManager::Instance().CharLog(0, 0, 0, 0, "THREEWAY", szNotice, nullptr);
 
 		//----------------------
 		// 몹을 리젠한다.
@@ -492,7 +489,7 @@ void CThreeWayWar::onDead(LPCHARACTER pChar, LPCHARACTER pkKiller)
 		}
 
 		// 메세지를 띄워준다.
-		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap(pChar->GetMapIndex());
+		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::Instance().GetMap(pChar->GetMapIndex());
 
 		if (nullptr != pSecMap)
 		{
@@ -519,13 +516,13 @@ void CThreeWayWar::onDead(LPCHARACTER pChar, LPCHARACTER pkKiller)
 
 			char szBuf[512];
 			snprintf(szBuf, sizeof(szBuf), "Second Step: %s remain", EMPIRE_NAME( nVictoryEmpireIndex ));
-			LogManager::instance().CharLog(0, 0, 0, 0, "THREEWAY", szBuf, nullptr);
+			LogManager::Instance().CharLog(0, 0, 0, 0, "THREEWAY", szBuf, nullptr);
 		}
 
 		//------------------------------
 		// 마지막 보상 : 진구미호 소환 
 		//-----------------------------	
-		for (int32_t n = 0; n < quest::CQuestManager::instance().GetEventFlag("threeway_war_boss_count");)
+		for (int32_t n = 0; n < quest::CQuestManager::Instance().GetEventFlag("threeway_war_boss_count");)
 		{
 			int32_t x = pChar->GetX();
 			int32_t y = pChar->GetY();
@@ -539,7 +536,7 @@ void CThreeWayWar::onDead(LPCHARACTER pChar, LPCHARACTER pkKiller)
 			if (y < 0)
 				y = pChar->GetY();
 
-			LPCHARACTER ch = CHARACTER_MANAGER::instance().SpawnMob(
+			LPCHARACTER ch = CHARACTER_MANAGER::Instance().SpawnMob(
 					GetEventSungZiMapInfo().m_iBossMobVnum,
 					pChar->GetMapIndex(),
 					x, y, 0, false);
@@ -577,7 +574,7 @@ void CThreeWayWar::RemoveAllMonstersInThreeWay() const
 
 	while( iter != MapIndexSet_.end() )
 	{
-		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap( *iter );
+		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::Instance().GetMap( *iter );
 
 		if (nullptr != pSecMap)
 		{
@@ -599,7 +596,7 @@ const char* GetSungziMapPath()
 
 	snprintf(s_szMapPath, sizeof(s_szMapPath), "%s/map/%s/",
 		   	LocaleService_GetBasePath().c_str(),
-		   	CThreeWayWar::instance().GetEventSungZiMapInfo().m_stMapName.c_str());
+		   	CThreeWayWar::Instance().GetEventSungZiMapInfo().m_stMapName.c_str());
 
 	return s_szMapPath;
 }
@@ -612,7 +609,7 @@ const char* GetPassMapPath( uint8_t bEmpire )
 
 		snprintf(s_szMapPath, sizeof(s_szMapPath), "%s/map/%s/",
 				LocaleService_GetBasePath().c_str(),
-				CThreeWayWar::instance().GetEventPassMapInfo().m_stMapName[bEmpire-1].c_str());
+				CThreeWayWar::Instance().GetEventPassMapInfo().m_stMapName[bEmpire-1].c_str());
 
 		return s_szMapPath;
 	}
@@ -624,7 +621,7 @@ int32_t GetPassMapIndex( uint8_t bEmpire )
 {
 	if (bEmpire > 0 && bEmpire < EMPIRE_MAX_NUM)
 	{
-		return CThreeWayWar::instance().GetEventPassMapInfo().m_iForkedPass[bEmpire-1];
+		return CThreeWayWar::Instance().GetEventPassMapInfo().m_iForkedPass[bEmpire-1];
 	}
 
 	return 0;
@@ -634,7 +631,7 @@ int32_t GetPassStartX( uint8_t bEmpire )
 {
 	if (bEmpire > 0 && bEmpire < EMPIRE_MAX_NUM)
 	{
-		return CThreeWayWar::instance().GetEventPassMapInfo().m_iForkedPassStartPosition[bEmpire-1][0];
+		return CThreeWayWar::Instance().GetEventPassMapInfo().m_iForkedPassStartPosition[bEmpire-1][0];
 	}
 
 	return 0;
@@ -644,7 +641,7 @@ int32_t GetPassStartY( uint8_t bEmpire )
 {
 	if (bEmpire > 0 && bEmpire < EMPIRE_MAX_NUM)
 	{
-		return CThreeWayWar::instance().GetEventPassMapInfo().m_iForkedPassStartPosition[bEmpire-1][1];
+		return CThreeWayWar::Instance().GetEventPassMapInfo().m_iForkedPassStartPosition[bEmpire-1][1];
 	}
 
 	return 0;
@@ -652,14 +649,14 @@ int32_t GetPassStartY( uint8_t bEmpire )
 
 int32_t GetSungziMapIndex()
 {
-	return CThreeWayWar::instance().GetEventSungZiMapInfo().m_iForkedSung;
+	return CThreeWayWar::Instance().GetEventSungZiMapInfo().m_iForkedSung;
 }
 
 int32_t GetSungziStartX( uint8_t bEmpire )
 {
 	if (bEmpire > 0 && bEmpire < EMPIRE_MAX_NUM)
 	{
-		return CThreeWayWar::instance().GetEventSungZiMapInfo().m_iForkedSungziStartPosition[bEmpire-1][0];
+		return CThreeWayWar::Instance().GetEventSungZiMapInfo().m_iForkedSungziStartPosition[bEmpire-1][0];
 	}
 
 	return 0;
@@ -669,7 +666,7 @@ int32_t GetSungziStartY( uint8_t bEmpire )
 {
 	if (bEmpire > 0 && bEmpire < EMPIRE_MAX_NUM)
 	{
-		return CThreeWayWar::instance().GetEventSungZiMapInfo().m_iForkedSungziStartPosition[bEmpire-1][1];
+		return CThreeWayWar::Instance().GetEventSungZiMapInfo().m_iForkedSungziStartPosition[bEmpire-1][1];
 	}
 
 	return 0;
