@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "shop_extented.h"
 #include "../../libgame/include/grid.h"
 #include "constants.h"
 #include "utils.h"
@@ -11,14 +12,12 @@
 #include "item.h"
 #include "item_manager.h"
 #include "buffer_manager.h"
-#include "packet.h"
 #include "log.h"
 #include "db.h"
 #include "quest_manager.h"
 #include "mob_manager.h"
 #include "locale_service.h"
 #include "desc_client.h"
-#include "shop_extented.h"
 #include "group_text_parse_tree.h"
 
 bool CShopEx::Create(uint32_t dwVnum, uint32_t dwNPCVnum)

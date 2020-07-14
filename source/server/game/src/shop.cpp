@@ -1,8 +1,8 @@
 #include "stdafx.h"
+#include "shop.h"
 #include "constants.h"
 #include "utils.h"
 #include "config.h"
-#include "shop.h"
 #include "desc.h"
 #include "desc_manager.h"
 #include "char.h"
@@ -10,7 +10,6 @@
 #include "item.h"
 #include "item_manager.h"
 #include "buffer_manager.h"
-#include "packet.h"
 #include "log.h"
 #include "db.h"
 #include "quest_manager.h"
@@ -93,7 +92,7 @@ void CShop::SetShopItems(TShopItemTable * pTable, uint8_t bItemCount)
 	for (int32_t i = 0; i < bItemCount; ++i)
 	{
 		LPITEM pkItem = nullptr;
-		const TItemTable * item_table;
+		const SItemTable_Server * item_table;
 
 		if (m_pkPC)
 		{
@@ -171,13 +170,13 @@ void CShop::SetShopItems(TShopItemTable * pTable, uint8_t bItemCount)
 
 			if (IS_SET(item_table->dwFlags, ITEM_FLAG_COUNT_PER_1GOLD))
 			{
-				if (item_table->dwGold == 0)
+				if (item_table->dwISellItemPrice == 0)
 					item.price = item.count;
 				else
-					item.price = item.count / item_table->dwGold;
+					item.price = item.count / item_table->dwISellItemPrice;
 			}
 			else
-				item.price = item_table->dwGold * item.count;
+				item.price = item_table->dwISellItemPrice * item.count;
 		}
 
 		char name[36];

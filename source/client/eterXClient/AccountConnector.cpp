@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "AccountConnector.h"
-#include "Packet.h"
 #include "PythonNetworkStream.h"
 #include "PythonApplication.h"
 #include "../eterBase/tea.h"

@@ -1,6 +1,6 @@
 #pragma once
 #include "../../common/Singleton.h"
-#include "../eterBase/cast.h"
+#include "../../common/cast.h"
 #include "Resource.h"
 #include "FileLoaderThread.h"
 

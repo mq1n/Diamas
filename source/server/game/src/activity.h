@@ -1,6 +1,4 @@
 #pragma once
-#include <array>
-#include "../../common/tables.h"
 
 const int32_t MOB_KILLS_FOR_ACTIVITY_AWARD = 20;
 const int32_t ACTIVITY_CAP = 100;

@@ -1,10 +1,5 @@
 #pragma once
 
-#include "Packet.h"
-
-/*
- *	교환 창 관련
- */
 class CPythonExchange : public CSingleton<CPythonExchange>
 {
 	public:

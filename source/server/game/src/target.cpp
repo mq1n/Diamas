@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "target.h"
 #include "utils.h"
 #include "config.h"
 #include "quest_manager.h"
@@ -6,8 +7,6 @@
 #include "char.h"
 #include "char_manager.h"
 #include "desc.h"
-#include "packet.h"
-#include "target.h"
 
 /////////////////////////////////////////////////////////////////////
 // Packet

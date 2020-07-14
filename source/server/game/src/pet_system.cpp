@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "pet_system.h"
 #include "config.h"
 #include "utils.h"
 #include "vector.h"
@@ -6,9 +7,6 @@
 #include "sectree_manager.h"
 #include "char_manager.h"
 #include "mob_manager.h"
-#include "pet_system.h"
-#include "../../common/VnumHelper.h"
-#include "packet.h"
 #include "item_manager.h"
 #include "item.h"
 
@@ -376,7 +374,7 @@ void CPetActor::ClearBuff()
 	if (nullptr == m_pkOwner)
 		return;
 
-	TItemTable* item_proto = ITEM_MANAGER::Instance().GetTable(m_dwSummonItemVnum);
+	SItemTable_Server* item_proto = ITEM_MANAGER::Instance().GetTable(m_dwSummonItemVnum);
 	if (nullptr == item_proto)
 		return;
 

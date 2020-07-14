@@ -2,8 +2,7 @@
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 
-#include <assert.h>
-//#include <crtdbg.h>
+#include <Windows.h>
+#include <cassert>
 
-//#include "Forest.h"
 #include "SpeedTreeForestDirectX9.h"

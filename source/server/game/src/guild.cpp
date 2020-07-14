@@ -1,13 +1,12 @@
 #include "stdafx.h"
+#include "guild.h"
 #include "utils.h"
 #include "config.h"
 #include "char.h"
-#include "packet.h"
 #include "desc_client.h"
 #include "buffer_manager.h"
 #include "char_manager.h"
 #include "db.h"
-#include "guild.h"
 #include "guild_manager.h"
 #include "affect.h"
 #include "p2p.h"
@@ -17,12 +16,14 @@
 #include "log.h"
 #include "quest_manager.h"
 
-	SGuildMember::SGuildMember(LPCHARACTER ch, uint8_t grade, uint32_t offer_exp)
-: pid(ch->GetPlayerID()), grade(grade), is_general(0), job(ch->GetJob()), level(ch->GetLevel()), offer_exp(offer_exp), name(ch->GetName())
-{}
-	SGuildMember::SGuildMember(uint32_t pid, uint8_t grade, uint8_t is_general, uint8_t job, uint8_t level, uint32_t offer_exp, char* name)
-: pid(pid), grade(grade), is_general(is_general), job(job), level(level), offer_exp(offer_exp), name(name)
-{}
+SGuildMember::SGuildMember(LPCHARACTER ch, uint8_t grade, uint32_t offer_exp) :
+	pid(ch->GetPlayerID()), grade(grade), is_general(0), job(ch->GetJob()), level(ch->GetLevel()), offer_exp(offer_exp), name(ch->GetName())
+{
+}
+SGuildMember::SGuildMember(uint32_t pid, uint8_t grade, uint8_t is_general, uint8_t job, uint8_t level, uint32_t offer_exp, char* name) :
+	pid(pid), grade(grade), is_general(is_general), job(job), level(level), offer_exp(offer_exp), name(name)
+{
+}
 
 namespace 
 {

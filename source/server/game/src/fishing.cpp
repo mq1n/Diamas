@@ -1,23 +1,17 @@
 #include "stdafx.h"
-#include "constants.h"
 #include "fishing.h"
+#include "constants.h"
 #include "locale_service.h"
 #include "item_manager.h"
-
 #include "config.h"
-#include "packet.h"
-
 #include "sectree_manager.h"
 #include "char.h"
 #include "char_manager.h"
-
 #include "log.h"
-
 #include "quest_manager.h"
 #include "buffer_manager.h"
 #include "desc_client.h"
 #include "locale_service.h"
-
 #include "affect.h"
 #include "unique_item.h"
 

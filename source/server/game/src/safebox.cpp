@@ -2,7 +2,6 @@
 #include "../../libgame/include/grid.h"
 #include "constants.h"
 #include "safebox.h"
-#include "packet.h"
 #include "char.h"
 #include "desc_client.h"
 #include "item.h"

@@ -8,7 +8,6 @@
 #include "desc_client.h"
 #include "desc_manager.h"
 #include "gposition.h"
-#include "packet.h"
 #include "affect.h"
 #include "skill.h"
 #include "start_position.h"
@@ -40,7 +39,6 @@
 #include "belt_inventory_helper.h"
 #include "gm.h"
 #include "battleground.h"
-#include "../../common/VnumHelper.h"
 
 const int32_t ITEM_BROKEN_METIN_VNUM = 28960;
 
@@ -1087,7 +1085,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 	if (item->GetType() == ITEM_USE && item->GetSubType() == USE_TUNING)
 		return false;
 
-	TItemTable * pProto = ITEM_MANAGER::Instance().GetTable(item->GetRefinedVnum());
+	SItemTable_Server * pProto = ITEM_MANAGER::Instance().GetTable(item->GetRefinedVnum());
 
 	if (!pProto)
 	{
@@ -1272,7 +1270,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 		}
 	}
 
-	TItemTable * pProto = ITEM_MANAGER::Instance().GetTable(item->GetRefinedVnum());
+	SItemTable_Server * pProto = ITEM_MANAGER::Instance().GetTable(item->GetRefinedVnum());
 
 	if (!pProto)
 	{
@@ -1595,7 +1593,7 @@ bool CHARACTER::RefineItem(LPITEM pkItem, LPITEM pkTarget)
 				if (socket > 2 && socket != ITEM_BROKEN_METIN_VNUM)
 				{
 					AutoGiveItem(socket);
-					//TItemTable* pTable = ITEM_MANAGER::Instance().GetTable(pkTarget->GetSocket(i));
+					//SItemTable_Server* pTable = ITEM_MANAGER::Instance().GetTable(pkTarget->GetSocket(i));
 					//pkTarget->SetSocket(i, pTable->alValues[2]);
 					// 깨진돌로 대체해준다
 					pkTarget->SetSocket(i, ITEM_BROKEN_METIN_VNUM);
@@ -5321,7 +5319,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 					if ((dwVnum = item2->GetSocket(i)) <= 2)
 						continue;
 
-					TItemTable * p = ITEM_MANAGER::Instance().GetTable(dwVnum);
+					SItemTable_Server * p = ITEM_MANAGER::Instance().GetTable(dwVnum);
 
 					if (!p)
 						continue;
@@ -6958,7 +6956,7 @@ void CHARACTER::AutoGiveItem(LPITEM item, bool longOwnerShip)
 
 LPITEM CHARACTER::AutoGiveItem(uint32_t dwItemVnum, uint8_t bCount, int32_t iRarePct, bool bMsg)
 {
-	TItemTable * p = ITEM_MANAGER::Instance().GetTable(dwItemVnum);
+	SItemTable_Server * p = ITEM_MANAGER::Instance().GetTable(dwItemVnum);
 
 	if (!p)
 		return nullptr;
@@ -7877,7 +7875,7 @@ bool CHARACTER::IsValidItemPosition(const TItemPos & Pos) const
 /// 현재 캐릭터의 상태를 바탕으로 주어진 item을 착용할 수 있는 지 확인하고, 불가능 하다면 캐릭터에게 이유를 알려주는 함수
 bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TItemPos& destCell) /*const*/
 {
-	const TItemTable* itemTable = item->GetProto();
+	const SItemTable_Server* itemTable = item->GetProto();
 	//uint8_t itemType = item->GetType();
 	//uint8_t itemSubType = item->GetSubType();
 

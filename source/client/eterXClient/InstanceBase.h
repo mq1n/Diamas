@@ -1,12 +1,9 @@
 #pragma once
+#include "../../common/defines.h"
 
 #include "../eterGameLib/RaceData.h"
 #include "../eterGameLib/ActorInstance.h"
-#include "locale_inc.h"
-
-#ifdef ENABLE_ACCE_SYSTEM
 #include "../eterLib/GrpObjectInstance.h"
-#endif
 
 #include "AffectFlagContainer.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../../common/defines.h"
 #include "../eterBase/Utils.h"
-#include "../eterXClient/Locale_inc.h"
 #include "../eterLib/GrpRenderTargetTexture.h"
 
 #ifdef LoadImage

@@ -1,7 +1,5 @@
 #include "StdAfx.h"
-#include "Packet.h"
 #include "ServerStateChecker.h"
-
 #include "../eterLib/NetAddress.h"
 
 #pragma pack(push)

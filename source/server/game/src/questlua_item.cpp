@@ -332,7 +332,7 @@ namespace quest
 		if (lua_isnumber(L, 1))
 			vnum = (uint32_t) lua_tonumber(L, 1);
 
-		TItemTable* pTable = ITEM_MANAGER::Instance().GetTable(vnum);
+		SItemTable_Server* pTable = ITEM_MANAGER::Instance().GetTable(vnum);
 		if (pTable)
 		{
 			lua_pushnumber(L, pTable->dwRefinedVnum);
@@ -765,7 +765,7 @@ namespace quest
 			return 1;
 		}
 
-		const TItemTable* itemTable = item->GetProto();
+		const SItemTable_Server* itemTable = item->GetProto();
 		if (!itemTable)
 		{
 			sys_err("itemTable null ptr");
@@ -793,7 +793,7 @@ namespace quest
 			return 0;
 		}
 
-		const TItemTable* itemTable = item->GetProto();
+		const SItemTable_Server* itemTable = item->GetProto();
 		if (!itemTable)
 		{
 			sys_err("itemTable null ptr");

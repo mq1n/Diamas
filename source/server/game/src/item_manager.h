@@ -1,7 +1,6 @@
 #pragma once
 #include "../../../common/defines.h"
 #include "../../libthecore/include/utils.h"
-#include "packet.h"
 #include "typedef.h"
 
 #include <string>
@@ -378,7 +377,7 @@ class ITEM_MANAGER : public CSingleton<ITEM_MANAGER>
 		ITEM_MANAGER();
 		virtual ~ITEM_MANAGER();
 
-		bool                    Initialize(TItemTable * table, int32_t size);
+		bool                    Initialize(SItemTable_Server * table, int32_t size);
 		void			Destroy();
 		void			Update();	// 매 루프마다 부른다.
 		void			GracefulShutdown();
@@ -404,7 +403,7 @@ class ITEM_MANAGER : public CSingleton<ITEM_MANAGER>
 
 		LPITEM			Find(uint32_t id);
 		LPITEM                  FindByVID(uint32_t vid);
-		TItemTable *            GetTable(uint32_t vnum);
+		SItemTable_Server *            GetTable(uint32_t vnum);
 		bool			GetVnum(const char * c_pszName, uint32_t & r_dwVnum);
 		bool			GetVnumByOriginalName(const char * c_pszName, uint32_t & r_dwVnum);
 
@@ -432,7 +431,7 @@ class ITEM_MANAGER : public CSingleton<ITEM_MANAGER>
 		const CSpecialItemGroup* GetSpecialItemGroup(uint32_t dwVnum);
 		const CSpecialAttrGroup* GetSpecialAttrGroup(uint32_t dwVnum);
 
-		const std::vector<TItemTable> & GetTable() { return m_vec_prototype; }
+		const std::vector<SItemTable_Server> & GetTable() { return m_vec_prototype; }
 
 		// CHECK_UNIQUE_GROUP
 		int32_t			GetSpecialGroupFromItem(uint32_t dwVnum) const { auto it = m_ItemToSpecialGroup.find(dwVnum); return (it == m_ItemToSpecialGroup.end()) ? 0 : it->second; }
@@ -445,8 +444,8 @@ class ITEM_MANAGER : public CSingleton<ITEM_MANAGER>
 	protected:
 		typedef std::map<uint32_t, LPITEM> ITEM_VID_MAP;		
 
-		std::vector<TItemTable>		m_vec_prototype;
-		std::vector<TItemTable*> m_vec_item_vnum_range_info;
+		std::vector<SItemTable_Server>		m_vec_prototype;
+		std::vector<SItemTable_Server*> m_vec_item_vnum_range_info;
 		std::map<uint32_t, uint32_t>		m_map_ItemRefineFrom;
 		int32_t				m_iTopOfTable;
 
@@ -486,9 +485,9 @@ class ITEM_MANAGER : public CSingleton<ITEM_MANAGER>
 
 	public:	
 		uint32_t	GetMaskVnum(uint32_t dwVnum);
-		std::map<uint32_t, TItemTable>  m_map_vid;
-		std::map<uint32_t, TItemTable>&  GetVIDMap() { return m_map_vid; }
-		std::vector<TItemTable>& GetVecProto() { return m_vec_prototype; }	
+		std::map<uint32_t, SItemTable_Server>  m_map_vid;
+		std::map<uint32_t, SItemTable_Server>&  GetVIDMap() { return m_map_vid; }
+		std::vector<SItemTable_Server>& GetVecProto() { return m_vec_prototype; }	
 		
 		const static int32_t MAX_NORM_ATTR_NUM = ITEM_ATTRIBUTE_NORM_NUM;
 		const static int32_t MAX_RARE_ATTR_NUM = ITEM_ATTRIBUTE_RARE_NUM;

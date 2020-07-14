@@ -22,7 +22,6 @@
 #include <fmt/format.h>
 
 #include "../../common/common_incl.hpp"
-#include "file_ptr.h"
 using namespace std::string_literals;
 
 #if _MSC_VER >= 1400
@@ -31,11 +30,8 @@ using namespace std::string_literals;
 #define strupt _strupr
 #define strcmpi _strcmpi
 #define fileno _fileno
-//#define access _access_s
-//#define _access _access_s
 #define atoi _atoi64
 #endif
 
 #include "vk.h"
 #include "Filename.h"
-#include "../eterXClient/Locale_inc.h"

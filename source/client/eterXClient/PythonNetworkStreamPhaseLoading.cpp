@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "PythonNetworkStream.h"
-#include "Packet.h"
 #include "PythonApplication.h"
 #include "NetworkActorManager.h"
 #include "AbstractPlayer.h"

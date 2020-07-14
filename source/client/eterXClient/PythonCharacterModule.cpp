@@ -4,7 +4,6 @@
 #include "PythonNetworkStream.h"
 #include "PythonPlayer.h"
 #include "PythonDynamicModuleNames.h"
-#include "locale_inc.h"
 
 PyObject * chrRaceToJob(PyObject * poSelf, PyObject * poArgs)
 {

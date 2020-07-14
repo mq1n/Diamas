@@ -28,13 +28,13 @@ enum EGameConstants
 	PLAYER_PER_ACCOUNT = 4,
 #endif
 
-	PLAYER_ITEM_SLOT_MAX_NUM = 20,		// �÷��̾��� ���Դ� ���� ����.
+	PLAYER_ITEM_SLOT_MAX_NUM = 20,		// ÇÃ·¡ÀÌ¾îÀÇ ½½·Ô´ç µé¾î°¡´Â °¹¼ö.
 
 	QUICKSLOT_MAX_LINE = 4,
-	QUICKSLOT_MAX_COUNT_PER_LINE = 8, // Ŭ���̾�Ʈ ���� ������
+	QUICKSLOT_MAX_COUNT_PER_LINE = 8, // Å¬¶óÀÌ¾ðÆ® ÀÓÀÇ °áÞ¤°ª
 	QUICKSLOT_MAX_COUNT = QUICKSLOT_MAX_LINE * QUICKSLOT_MAX_COUNT_PER_LINE,
 
-	QUICKSLOT_MAX_NUM = 36, // ������ ������ �ִ� ��
+	QUICKSLOT_MAX_NUM = 36, // ¼­¹ö¿Þ ¸ÂÃçÞ® ÀÖ´Â °ª
 
 	METIN_SOCKET_COUNT = 6,
 
@@ -71,10 +71,10 @@ enum EGameConstants
 	BANWORD_MAX_LEN = 24,
 	SOCIAL_ID_MAX_LEN = 18,
 
-	SHOP_HOST_ITEM_MAX_NUM = 40,	/* ȣ��Ʈ�� �ִ� ������ ���� */
-	SHOP_GUEST_ITEM_MAX_NUM = 18,	/* �Խ�Ʈ�� �ִ� ������ ���� */
+	SHOP_HOST_ITEM_MAX_NUM = 40,	/* È£½ºÆ®ÀÇ ÃÖ´ë ¾ÆÀÌÅÛ °³¼ö */
+	SHOP_GUEST_ITEM_MAX_NUM = 18,	/* °Ô½ºÆ®ÀÇ ÃÖ´ë ¾ÆÀÌÅÛ °³¼ö */
 
-	SHOP_PRICELIST_MAX_NUM = 40,	///< ���λ��� �������� ����Ʈ���� ������ ���������� �ִ� ����
+	SHOP_PRICELIST_MAX_NUM = 40,	///< °³ÀÞ»óÞ¡ °¡°ÞÞ¤º¸ ¸®½ºÆ®¿¡¼­ À¯ÞöÇÒ °¡°ÞÞ¤º¸ÀÇ ÃÖ´ë °¹¼ö
 
 	CHAT_MAX_LEN = 512,
 
@@ -155,13 +155,13 @@ enum EJobs
 enum EWindows
 {
 	RESERVED_WINDOW,
-	INVENTORY,				// �⺻ �κ��丮. (45ĭ ¥���� 2������ ���� = 90ĭ)
+	INVENTORY,				// ±âº» ÀÞº¥Åä¸®. (45Ä­ Â¥¸®°¡ 2ÆäÀÌÞö Þ¸Àç = 90Ä­)
 	EQUIPMENT,
 	SAFEBOX,
 	MALL,
 	DRAGON_SOUL_INVENTORY,
-	BELT_INVENTORY,			// NOTE: W2.1 ������ ���� �߰��Ǵ� ��Ʈ ���� �������� �����ϴ� ��Ʈ �κ��丮
-	GROUND,					// NOTE: 2013�� 2��5�� ������� unused.. �� �ִ°���???
+	BELT_INVENTORY,			// NOTE: W2.1 ¹öÀü¿¡ »õ·Þ Ãß°¡µÇ´Â º§Æ® ½½·Ô ¾ÆÀÌÅÛÀÌ Þ¦°øÇÞ´Â º§Æ® ÀÞº¥Åä¸®
+	GROUND,					// NOTE: 2013³â 2¿ù5ÀÞ ÇöÀç±îÞö unused.. ¿Ö ÀÖ´Â°ÅÞö???
 
 	WINDOW_TYPE_MAX,
 };
@@ -303,7 +303,7 @@ enum EPVPModes
 	PVP_MODE_REVENGE
 };
 
-enum
+enum ECharAddState
 {
 	ADD_CHARACTER_STATE_DEAD = (1 << 0),
 	ADD_CHARACTER_STATE_SPAWN = (1 << 1),
@@ -337,14 +337,14 @@ enum ECharacterEquipmentPart
 
 enum EChatType
 {
-	CHAT_TYPE_TALKING,  /* �׳� ä�� */
-	CHAT_TYPE_INFO,     /* ���� (�������� ������, ����ġ�� �����. ��) */
-	CHAT_TYPE_NOTICE,   /* �������� */
-	CHAT_TYPE_PARTY,    /* ��Ƽ�� */
-	CHAT_TYPE_GUILD,    /* ��帻 */
-	CHAT_TYPE_COMMAND,	/* ���� */
-	CHAT_TYPE_SHOUT,	/* ��ġ�� */
-	CHAT_TYPE_WHISPER,	// �����ʹ� �������� �ʴ� Only Client Enum
+	CHAT_TYPE_TALKING,  /* ±×³É Ã¤ÆÃ */
+	CHAT_TYPE_INFO,     /* Þ¤º¸ (¾ÆÀÌÅÛÀ» Þý¾ú´Ù, °æÇèÄ¡¸¦ ¾ò¾ú´Ù. µî) */
+	CHAT_TYPE_NOTICE,   /* °øÞö»çÇ× */
+	CHAT_TYPE_PARTY,    /* ÆÄÆ¼¸» */
+	CHAT_TYPE_GUILD,    /* ±æµå¸» */
+	CHAT_TYPE_COMMAND,	/* ¸í·É */
+	CHAT_TYPE_SHOUT,	/* ¿ÜÄ¡±â */
+	CHAT_TYPE_WHISPER,	// ¼­¹ö¿Þ´Â ¿¬µ¿µÇÞö ¾Ê´Â Only Client Enum
 	CHAT_TYPE_BIG_NOTICE,
 #ifdef ENABLE_DICE_SYSTEM
 	CHAT_TYPE_DICE_INFO, //11
@@ -366,15 +366,15 @@ enum EWhisperType
 enum
 {
 	QUEST_SEND_IS_BEGIN = 1 << 0,
-	QUEST_SEND_TITLE = 1 << 1,  // 28�� ����
-	QUEST_SEND_CLOCK_NAME = 1 << 2,  // 16�� ����
+	QUEST_SEND_TITLE = 1 << 1,  // 28ÀÚ ±îÞö
+	QUEST_SEND_CLOCK_NAME = 1 << 2,  // 16ÀÚ ±îÞö
 	QUEST_SEND_CLOCK_VALUE = 1 << 3,
-	QUEST_SEND_COUNTER_NAME = 1 << 4,  // 16�� ����
+	QUEST_SEND_COUNTER_NAME = 1 << 4,  // 16ÀÚ ±îÞö
 	QUEST_SEND_COUNTER_VALUE = 1 << 5,
-	QUEST_SEND_ICON_FILE = 1 << 6,  // 24�� ���� 
+	QUEST_SEND_ICON_FILE = 1 << 6,  // 24ÀÚ ±îÞö 
 };
 
-enum
+enum EGuildAuth
 {
 	GUILD_AUTH_ADD_MEMBER = (1 << 0),
 	GUILD_AUTH_REMOVE_MEMBER = (1 << 1),
@@ -398,7 +398,7 @@ enum EGuildWarState
 	GUILD_WAR_DURATION = 2 * 60 * 60,
 };
 
-enum
+enum EWalkModes
 {
 	WALKMODE_RUN,
 	WALKMODE_WALK,
@@ -420,17 +420,17 @@ enum SPECIAL_EFFECT
 	SE_SUCCESS,
 	SE_FAIL,
 	SE_FR_SUCCESS,
-	SE_LEVELUP_ON_14_FOR_GERMANY,	//������ 14�϶� ( �������� )
-	SE_LEVELUP_UNDER_15_FOR_GERMANY,//������ 15�϶� ( �������� )
+	SE_LEVELUP_ON_14_FOR_GERMANY,	//·¹º§¾÷ 14ÀÞ¶§ ( µ¶ÀÞÀü¿ë )
+	SE_LEVELUP_UNDER_15_FOR_GERMANY,//·¹º§¾÷ 15ÀÞ¶§ ( µ¶ÀÞÀü¿ë )
 	SE_PERCENT_DAMAGE1,
 	SE_PERCENT_DAMAGE2,
 	SE_PERCENT_DAMAGE3,
 	SE_AUTO_HPUP,
 	SE_AUTO_SPUP,
-	SE_EQUIP_RAMADAN_RING,			// �ʽ´��� ������ �����ϴ� ������ �ߵ��ϴ� ����Ʈ
-	SE_EQUIP_HALLOWEEN_CANDY,		// �ҷ��� ������ ����(-_-;)�� ������ �ߵ��ϴ� ����Ʈ
-	SE_EQUIP_HAPPINESS_RING,		// ũ�������� �ູ�� ������ �����ϴ� ������ �ߵ��ϴ� ����Ʈ
-	SE_EQUIP_LOVE_PENDANT,		// �߷�Ÿ�� ����� �Ҵ�Ʈ(71145) ������ �� ����Ʈ (�ߵ�����Ʈ��, ��������Ʈ �ƴ�)
+	SE_EQUIP_RAMADAN_RING,			// ÃÊ½Â´ÞÀÇ ¹ÞÞö¸¦ Âø¿ëÇÞ´Â ¼ø°£¿¡ ¹ßµ¿ÇÞ´Â ÀÌÆåÆ®
+	SE_EQUIP_HALLOWEEN_CANDY,		// ÇÒ·ÞÀ© »çÅÞÀ» Âø¿ë(-_-;)ÇÑ ¼ø°£¿¡ ¹ßµ¿ÇÞ´Â ÀÌÆåÆ®
+	SE_EQUIP_HAPPINESS_RING,		// Å©¸®½º¸¶½º Çàº¹ÀÇ ¹ÞÞö¸¦ Âø¿ëÇÞ´Â ¼ø°£¿¡ ¹ßµ¿ÇÞ´Â ÀÌÆåÆ®
+	SE_EQUIP_LOVE_PENDANT,		// ¹ß·»Å¸ÀÞ »ç¶ûÀÇ ÆÒ´øÆ®(71145) Âø¿ëÇÒ ¶§ ÀÌÆåÆ® (¹ßµ¿ÀÌÆåÆ®ÀÓ, Þö¼ÓÀÌÆåÆ® ¾Æ´Ô)
 #ifdef ENABLE_ACCE_SYSTEM
 	SE_EFFECT_ACCE_SUCCEDED,
 	SE_EFFECT_ACCE_EQUIP,
@@ -447,7 +447,169 @@ enum EBlockAction
 	BLOCK_PARTY_REQUEST = (1 << 5)
 };
 
+enum EInstantFlags
+{
+	INSTANT_FLAG_DEATH_PENALTY	= (1 << 0),
+	INSTANT_FLAG_SHOP			= (1 << 1),
+	INSTANT_FLAG_EXCHANGE		= (1 << 2),
+	INSTANT_FLAG_STUN			= (1 << 3),
+	INSTANT_FLAG_NO_REWARD		= (1 << 4),
+};
+
+enum EAiFlags
+{
+	AI_FLAG_NPC 			= (1 << 0),
+	AI_FLAG_AGGRESSIVE		= (1 << 1),
+	AI_FLAG_HELPER			= (1 << 2),
+	AI_FLAG_STAYZONE		= (1 << 3),
+};
+
 enum
+{
+	MAIN_RACE_WARRIOR_M,
+	MAIN_RACE_ASSASSIN_W,
+	MAIN_RACE_SURA_M,
+	MAIN_RACE_SHAMAN_W,
+	MAIN_RACE_WARRIOR_W,
+	MAIN_RACE_ASSASSIN_M,
+	MAIN_RACE_SURA_W,
+	MAIN_RACE_SHAMAN_M,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	MAIN_RACE_WOLFMAN_M,
+#endif
+	MAIN_RACE_MAX_NUM,
+};
+
+enum EOther
+{
+	POISON_LENGTH = 30,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	BLEEDING_LENGTH = 30,
+#endif
+	STAMINA_PER_STEP = 1,
+	SAFEBOX_PAGE_SIZE = 9,
+	AI_CHANGE_ATTACK_POISITION_TIME_NEAR = 10000,
+	AI_CHANGE_ATTACK_POISITION_TIME_FAR = 1000,
+	AI_CHANGE_ATTACK_POISITION_DISTANCE = 100,
+	SUMMON_MONSTER_COUNT = 3,
+};
+
+enum FlyTypes
+{
+	FLY_NONE,
+	FLY_EXP,
+	FLY_HP_MEDIUM,
+	FLY_HP_BIG,
+	FLY_SP_SMALL,
+	FLY_SP_MEDIUM,
+	FLY_SP_BIG,
+	FLY_FIREWORK1,
+	FLY_FIREWORK2,
+	FLY_FIREWORK3,
+	FLY_FIREWORK4,
+	FLY_FIREWORK5,
+	FLY_FIREWORK6,
+	FLY_FIREWORK_CHRISTMAS,
+	FLY_CHAIN_LIGHTNING,
+	FLY_HP_SMALL,
+	FLY_SKILL_MUYEONG,
+};
+
+enum EDamageType
+{
+	DAMAGE_TYPE_NONE,
+	DAMAGE_TYPE_NORMAL,
+	DAMAGE_TYPE_NORMAL_RANGE,
+	//��ų
+	DAMAGE_TYPE_MELEE,
+	DAMAGE_TYPE_RANGE,
+	DAMAGE_TYPE_FIRE,
+	DAMAGE_TYPE_ICE,
+	DAMAGE_TYPE_ELEC,
+	DAMAGE_TYPE_MAGIC,
+	DAMAGE_TYPE_POISON,
+	DAMAGE_TYPE_SPECIAL,
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	DAMAGE_TYPE_BLEEDING,
+#endif
+	DAMAGE_TYPE_MAX_NUM,
+};
+
+enum DamageFlag
+{
+	DAMAGE_NORMAL	= (1 << 0),
+	DAMAGE_POISON	= (1 << 1),
+	DAMAGE_DODGE	= (1 << 2),
+	DAMAGE_BLOCK	= (1 << 3),
+	DAMAGE_PENETRATE= (1 << 4),
+	DAMAGE_CRITICAL = (1 << 5),
+#if defined(ENABLE_WOLFMAN_CHARACTER) && !defined(USE_MOB_BLEEDING_AS_POISON)
+	DAMAGE_BLEEDING	= (1 << 6),
+#endif
+};
+
+enum EPositions
+{
+	POS_DEAD,
+	POS_SLEEPING,
+	POS_RESTING,
+	POS_SITTING,
+	POS_FISHING,
+	POS_FIGHTING,
+	POS_MOUNTING,
+	POS_STANDING
+};
+
+enum EAttTypes
+{
+	ATT_ELEC,
+	ATT_FIRE,
+	ATT_ICE,
+	ATT_WIND,
+	ATT_EARTH,
+	ATT_DARK,
+	ATT_MAX
+};
+
+enum EResistTypes
+{
+	RESIST_DARK,
+	RESIST_ICE,
+	RESIST_EARTH,
+	RESIST_MAX
+};
+
+enum // unit : minute
+{
+	PARTY_ENOUGH_MINUTE_FOR_EXP_BONUS = 60, // ÆÄÆ¼ °á¼º ÈÄ 60ºÞ ÈÄ ºÞÅÞ Ãß°¡ °æÇèÄ¡ º¸³Ê½º
+	PARTY_HEAL_COOLTIME_LONG = 60,
+	PARTY_HEAL_COOLTIME_SHORT = 30,
+	PARTY_MAX_MEMBER = 8,
+	PARTY_DEFAULT_RANGE = 5000,
+};
+
+enum EPartyMessages
+{
+	PM_ATTACK,		// Attack him
+	PM_RETURN,		// Return back to position
+	PM_ATTACKED_BY,	// I was attacked by someone
+	PM_AGGRO_INCREASE,	// My aggro is increased
+};
+
+enum EPartyRole
+{   
+	PARTY_ROLE_NORMAL,  
+	PARTY_ROLE_LEADER,
+	PARTY_ROLE_ATTACKER,
+	PARTY_ROLE_TANKER,
+	PARTY_ROLE_BUFFER,  
+	PARTY_ROLE_SKILL_MASTER,
+	PARTY_ROLE_HASTE,   
+	PARTY_ROLE_DEFENDER,
+	PARTY_ROLE_MAX_NUM, 
+}; 
+
+enum ECreateTarget
 {
 	CREATE_TARGET_TYPE_NONE,
 	CREATE_TARGET_TYPE_LOCATION,
@@ -461,6 +623,23 @@ enum
 	QUICKSLOT_TYPE_SKILL,
 	QUICKSLOT_TYPE_COMMAND,
 	QUICKSLOT_TYPE_MAX_NUM
+};
+
+enum ESlotType
+{
+	SLOT_TYPE_NONE,
+	SLOT_TYPE_INVENTORY,
+	SLOT_TYPE_SKILL,
+	SLOT_TYPE_EMOTION,
+	SLOT_TYPE_SHOP,
+	SLOT_TYPE_EXCHANGE_OWNER,
+	SLOT_TYPE_EXCHANGE_TARGET,
+	SLOT_TYPE_QUICK_SLOT,
+	SLOT_TYPE_SAFEBOX,
+	SLOT_TYPE_PRIVATE_SHOP,
+	SLOT_TYPE_MALL,
+	SLOT_TYPE_DRAGON_SOUL_INVENTORY,
+	SLOT_TYPE_MAX,
 };
 
 enum EParts
@@ -504,6 +683,12 @@ enum EGMAllowFlags
 	GM_ALLOW_CREATE_PLAYER = 1 << 11,
 	GM_ALLOW_DELETE_PLAYER = 1 << 12,
 };
+
+typedef enum
+{
+	SHOP_COIN_TYPE_GOLD, // DEFAULT VALUE
+	SHOP_COIN_TYPE_SECONDARY_COIN
+} EShopCoinType;
 
 enum EMobRank
 {
@@ -616,13 +801,13 @@ enum EMoneyLogType
 
 enum EPremiumTypes
 {
-	PREMIUM_EXP,		// ����ġ�� 1.2��
-	PREMIUM_ITEM,		// ������ ������� 2��
-	PREMIUM_SAFEBOX,		// â���� 1ĭ���� 3ĭ
-	PREMIUM_AUTOLOOT,		// �� �ڵ� �ݱ�
-	PREMIUM_FISH_MIND,		// ���� ������ ���� Ȯ�� ���
-	PREMIUM_MARRIAGE_FAST,	// �ݽ� ���� ���� �������մϴ�.
-	PREMIUM_GOLD,		// �� ������� 1.5��
+	PREMIUM_EXP,		// °æÇèÄ¡°¡ 1.2¹è
+	PREMIUM_ITEM,		// ¾ÆÀÌÅÛ µå·ÓÀ²ÀÌ 2¹è
+	PREMIUM_SAFEBOX,		// Ã¢°í°¡ 1Ä­¿¡¼­ 3Ä­
+	PREMIUM_AUTOLOOT,		// µ· ÀÚµ¿ ÞÞ±â
+	PREMIUM_FISH_MIND,		// °í±Þ ¹°°í±â ³¬ÀÞ È®·ü »ó½Â
+	PREMIUM_MARRIAGE_FAST,	// ±Þ½Ç Þõ°¡ ¾çÀ» ºü¸£°ÔÇÕ´Þ´Ù.
+	PREMIUM_GOLD,		// µ· µå·ÓÀ²ÀÌ 1.5¹è
 	PREMIUM_MAX_NUM = 9
 };
 
@@ -634,3 +819,170 @@ enum ECharacterPosition
 	POSITION_SITTING_GROUND,
 	POSITION_MAX_NUM
 };
+
+enum ESkillFlags
+{
+	SKILL_FLAG_ATTACK			= (1 << 0),	// °ø°İ ±â¼ú
+	SKILL_FLAG_USE_MELEE_DAMAGE		= (1 << 1),	// ±âº» ¹Ğ¸® Å¸°İÄ¡¸¦ b °ªÀ¸·Þ »ç¿ë
+	SKILL_FLAG_COMPUTE_ATTGRADE		= (1 << 2),	// °ø°İµî±ŞÀ» °è»êÇÑ´Ù
+	SKILL_FLAG_SELFONLY			= (1 << 3),	// ÀÚ½Å¿¡°Ô¸¸ ¾µ ¼ö ÀÖÀ½
+	SKILL_FLAG_USE_MAGIC_DAMAGE		= (1 << 4),	// ±âº» ¸¶¹ı Å¸°İÄ¡¸¦ b °ªÀ¸·Þ »ç¿ë
+	SKILL_FLAG_USE_HP_AS_COST		= (1 << 5),	// HP¸¦ SP´ë½Å ¾´´Ù
+	SKILL_FLAG_COMPUTE_MAGIC_DAMAGE	= (1 << 6),
+	SKILL_FLAG_SPLASH			= (1 << 7),
+	SKILL_FLAG_GIVE_PENALTY		= (1 << 8),	// ¾²°í³ª¸é Àá½Ãµ¿¾È(3ÃÊ) 2¹è µ¥¹ÌÞö¸¦ ¹Ş´Â´Ù.
+	SKILL_FLAG_USE_ARROW_DAMAGE		= (1 << 9),	// ±âº» È­»ì Å¸°İÄ¡¸¦ b °ªÀ¸·Þ »ç¿ë
+	SKILL_FLAG_PENETRATE		= (1 << 10),	// ¹æ¾î¹«½Ã
+	SKILL_FLAG_IGNORE_TARGET_RATING	= (1 << 11),	// »ó´ë ·¹ÀÌÆÃ ¹«½Ã
+	SKILL_FLAG_SLOW			= (1 << 12),	// ½½·Þ¿ì °ø°İ
+	SKILL_FLAG_STUN			= (1 << 13),	// ½ºÅÞ °ø°İ
+	SKILL_FLAG_HP_ABSORB		= (1 << 14),	// HP Èí¼ö
+	SKILL_FLAG_SP_ABSORB		= (1 << 15),	// SP Èí¼ö
+	SKILL_FLAG_FIRE_CONT		= (1 << 16),	// FIRE Þö¼Ó µ¥¹ÌÞö
+	SKILL_FLAG_REMOVE_BAD_AFFECT	= (1 << 17),	// ³ª»ÛÈ¿°ú Þ¦°Å
+	SKILL_FLAG_REMOVE_GOOD_AFFECT	= (1 << 18),	// ³ª»ÛÈ¿°ú Þ¦°Å
+	SKILL_FLAG_CRUSH			= (1 << 19),	// »ó´ë¹æÀ» ³¯¸²
+	SKILL_FLAG_POISON			= (1 << 20),	// µ¶ °ø°İ
+	SKILL_FLAG_TOGGLE			= (1 << 21),	// Åä±Û
+	SKILL_FLAG_DISABLE_BY_POINT_UP	= (1 << 22),	// Âï¾î¼­ ¿Ã¸± ¼ö ¾ø´Ù.
+	SKILL_FLAG_CRUSH_LONG		= (1 << 23),	// »ó´ë¹æÀ» ¸Ö¸® ³¯¸²
+	SKILL_FLAG_WIND		= (1 << 24),	// ¹Ù¶÷ ¼Ó¼º 
+	SKILL_FLAG_ELEC		= (1 << 25),	// Àü±â ¼Ó¼º
+	SKILL_FLAG_FIRE		= (1 << 26),	// ºÒ ¼Ó¼º
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	SKILL_FLAG_BLEEDING	= (1 << 27),
+	SKILL_FLAG_PARTY	= (1 << 28),
+#endif
+};
+
+enum
+{
+	SKILL_PENALTY_DURATION = 3,
+	SKILL_TYPE_HORSE = 5,
+};
+
+enum ESkillIndexes
+{
+	SKILL_RESERVED = 0,
+
+	// ©ö¡ì¡íc Au¡íc ¡Æe¢¯¡©		// - bedensel
+	// A
+	SKILL_SAMYEON = 1,		// 3 yonlu kesme
+	SKILL_PALBANG,			// k©¥l©¥c cevirme
+	// S
+	SKILL_JEONGWI,			// ofke
+	SKILL_GEOMKYUNG,		// hava
+	SKILL_TANHWAN,			// hamle
+
+	// ©ö¡ì¡íc ¡¾a¡Æ©ª ¡Æe¢¯¡©		// - zihinsel
+	// A
+	SKILL_GIGONGCHAM = 16,	// ruh
+	SKILL_GYOKSAN,			// ?iddetli vurul
+	SKILL_DAEJINGAK,		// guclu vuru?
+	// S
+	SKILL_CHUNKEON,			// guclu beden
+	SKILL_GEOMPUNG,			// k©¥l©¥c darbesi
+
+	// AU¡Æ¢¥ ¨úI¡íi ¡Æe¢¯¡©		// - yak©¥n dovu?
+	// A
+	SKILL_AMSEOP = 31,		// suikast
+	SKILL_GUNGSIN,			// h©¥zl©¥ sald©¥r©¥
+	SKILL_CHARYUN,			// b©¥cak cevirme
+	// S
+	SKILL_EUNHYUNG,			// kamuflaj 
+	SKILL_SANGONG,			// zehirli bulut
+
+	// AU¡Æ¢¥ ¡¾A¨ùo ¡Æe¢¯¡©		// - uzak dovu?
+	// A
+	SKILL_YEONSA = 46,		// tekrarlanan at©¥?
+	SKILL_KWANKYEOK,		// ok ya?muru
+	SKILL_HWAJO,			// ate?li ok
+	// S
+	SKILL_GYEONGGONG,		// hafif ad©¥m
+	SKILL_GIGUNG,			// zehirli ok
+
+	// ¨ùo¢Òo ¡ÆE				// - buyulu silah
+	// A
+	SKILL_SWAERYUNG = 61,	// parmak darbesi
+	SKILL_YONGKWON,			// ejderha donu?u
+	// S
+	SKILL_GWIGEOM,			// buyulu keskinlik
+	SKILL_TERROR,			// deh?et
+	SKILL_JUMAGAP,			// buyulu z©¥rh
+	SKILL_PABEOB,			// buyu cozme
+
+	// ¨ùo¢Òo ¢¬¢Ò©ö©¥			// - kara buyu
+	// A
+	SKILL_MARYUNG = 76,		// karanl©¥k vuru?
+	SKILL_HWAYEOMPOK,		// ate? vuru?
+	SKILL_MUYEONG,			// ate? hayaleti
+	// S
+	SKILL_MANASHIELD,		// karanl©¥k koruma
+	SKILL_TUSOK,			// hayalet vuru?
+	SKILL_MAHWAN,			// karanl©¥k kure
+
+	// ©ö¡ì¢¥c ¢¯e¨öA
+	// A					// - ejderha gucu
+	SKILL_BIPABU = 91,		// ucan t©¥ls©¥m
+	SKILL_YONGBI,			// ejderha at©¥?©¥
+	SKILL_PAERYONG,			// ejderha kukremesi
+	// S
+	//SKILL_BUDONG,			// pasif yada eski ?aman skilli
+	SKILL_HOSIN,			// kutsama
+	SKILL_REFLECT,			// yans©¥tma
+	SKILL_GICHEON,			// ejderha yard©¥m©¥
+
+	// ©ö¡ì¢¥c ©øu¨öA
+	// A					// - Iyile?tirme
+	SKILL_NOEJEON = 106,	// ?im?ek atma
+	SKILL_BYEURAK,			// ?im?ek Ca?©¥rma
+	SKILL_CHAIN,			// ?im?ek pencesi
+	// S
+	SKILL_JEONGEOP,			// Iyile?tirme
+	SKILL_KWAESOK,			// H©¥z
+	SKILL_JEUNGRYEOK,		// Yuksek sald©¥r©¥
+
+	// ¨¬¢¬A¢Ò ¨ö¨¬A©ø
+
+	SKILL_LEADERSHIP	= 121,	// Liderlik
+	SKILL_COMBO			= 122,	// Kombo
+	SKILL_CREATE		= 123,	// ?? - Uzman recetesi ile yukseltilen skill
+	SKILL_MINING		= 124,	// Madencilik
+
+	SKILL_LANGUAGE1		= 126,	// Shinsoo lisan 
+	SKILL_LANGUAGE2		= 127,	// Chunjo Lisan
+	SKILL_LANGUAGE3		= 128,	// Jinno Lisan
+	SKILL_POLYMORPH		= 129,	// Donu?me
+
+	SKILL_HORSE						= 130,	// Binicilik
+	SKILL_HORSE_SUMMON				= 131,	// At ca?©¥rma
+	SKILL_HORSE_WILDATTACK			= 137,	// At uzerinde sald©¥r©¥
+	SKILL_HORSE_CHARGE				= 138,	// At yuruyu?u
+	SKILL_HORSE_ESCAPE				= 139,	// Guc dalgas©¥
+	SKILL_HORSE_WILDATTACK_RANGE	= 140,	// Ok f©¥rt©¥nas©¥
+
+	SKILL_ADD_HP			= 141,	// HP uretme - Pasif skill 		/ Aktif de?il
+	SKILL_RESIST_PENETRATE	= 142,	// Delici vuru? - Pasif skill 	/ Aktif de?il
+
+	GUILD_SKILL_START		= 151,			// [LONCA] Ba?lang©¥c
+	GUILD_SKILL_EYE			= 151,			// Ejderha Gozleri 				/ Ejderha Hayaletleri
+	GUILD_SKILL_BLOOD		= 152,			// Ejderha Tanr©¥s©¥ Kan©¥ 		/ Max HP
+	GUILD_SKILL_BLESS		= 153,			// Ejderha Tanr©¥s©¥ Kutsamas©¥ 	/ Max SP
+	GUILD_SKILL_SEONGHWI	= 154,			// Kutsal Z©¥rh 					/ Savunma
+	GUILD_SKILL_ACCEL		= 155,			// H©¥zland©¥rma 					/ Hareket H©¥z©¥
+	GUILD_SKILL_BUNNO		= 156,			// Ejderha Tanr©¥s©¥ ofkesi 		/ Kritik
+	GUILD_SKILL_JUMUN		= 157,			// Buyu h©¥z©¥ deste?i 			/ Buyu h©¥z©¥
+	GUILD_SKILL_END			= 162,			// [LONCA] Son
+
+	GUILD_SKILL_COUNT		= GUILD_SKILL_END - GUILD_SKILL_START + 1,
+
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	SKILL_CHAYEOL			= 170,			// Y©¥rtma	Parcalama
+	SKILL_SALPOONG			= 171,			// Kurt Nefesi
+	SKILL_GONGDAB			= 172,			// Kurt Atlay©¥?©¥
+	SKILL_PASWAE			= 173,			// Kurt Pencesi
+	SKILL_JEOKRANG			= 174,			// K©¥rm©¥z©¥ Kurt Ruhu
+	SKILL_CHEONGRANG		= 175,			// Civit Kurt Ruhu
+#endif
+};
+

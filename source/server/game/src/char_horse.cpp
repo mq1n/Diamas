@@ -2,7 +2,6 @@
 #include "config.h"
 #include "char.h"
 #include "char_manager.h"
-#include "packet.h"
 #include "guild.h"
 #include "vector.h"
 #include "quest_manager.h"
@@ -11,8 +10,6 @@
 #include "arena.h"
 #include "war_map.h"
 #include "battleground.h"
-
-#include "../../common/VnumHelper.h"
 
 bool CHARACTER::StartRiding()
 {

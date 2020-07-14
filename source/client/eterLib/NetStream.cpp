@@ -1,7 +1,5 @@
 #include "StdAfx.h"
 #include "NetStream.h"
-#include "../eterXClient/Locale_inc.h"
-#include "../eterXClient/Packet.h"
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
 #include "../eterBase/tea.h"
 #endif

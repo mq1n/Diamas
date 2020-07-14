@@ -1,8 +1,8 @@
 #pragma once
+#include "../../common/defines.h"
 #include "../../common/item_data.h"
 #include "../../common/tables.h"
 #include "../eterGameLib/ItemData.h"
-#include "../eterXClient/Locale_inc.h"
 
 struct SAffects
 {
@@ -39,23 +39,6 @@ extern std::string g_strGuildSymbolPathName;
 const uint32_t c_Name_Max_Length = 64;
 const uint32_t c_FileName_Max_Length = 128;
 const uint32_t c_Short_Name_Max_Length = 32;
-
-enum ESlotType
-{
-	SLOT_TYPE_NONE,
-	SLOT_TYPE_INVENTORY,
-	SLOT_TYPE_SKILL,
-	SLOT_TYPE_EMOTION,
-	SLOT_TYPE_SHOP,
-	SLOT_TYPE_EXCHANGE_OWNER,
-	SLOT_TYPE_EXCHANGE_TARGET,
-	SLOT_TYPE_QUICK_SLOT,
-	SLOT_TYPE_SAFEBOX,
-	SLOT_TYPE_PRIVATE_SHOP,
-	SLOT_TYPE_MALL,
-	SLOT_TYPE_DRAGON_SOUL_INVENTORY,
-	SLOT_TYPE_MAX,
-};
 
 const uint32_t c_QuickBar_Line_Count = 3;
 const uint32_t c_QuickBar_Slot_Count = 12;

@@ -1,15 +1,15 @@
 #include "stdafx.h"
+#include "cmd.h"
+#include "char.h"
 #include "utils.h"
+#include "quest_manager.h"
 #include "config.h"
 #include "desc_client.h"
 #include "desc_manager.h"
-#include "char.h"
 #include "char_manager.h"
 #include "item_manager.h"
 #include "sectree_manager.h"
 #include "mob_manager.h"
-#include "packet.h"
-#include "cmd.h"
 #include "regen.h"
 #include "guild.h"
 #include "guild_manager.h"
@@ -17,7 +17,6 @@
 #include "buffer_manager.h"
 #include "fishing.h"
 #include "mining.h"
-#include "quest_manager.h"
 #include "vector.h"
 #include "affect.h"
 #include "db.h"
@@ -3071,7 +3070,7 @@ ACMD(do_priv_guild)
 			snprintf(buf, sizeof(buf), "%u", g->GetID());
 
 			using namespace quest;
-			PC * pc = CQuestManager::Instance().GetPC(ch->GetPlayerID());
+			auto pc = CQuestManager::Instance().GetPC(ch->GetPlayerID());
 			QuestState qs = CQuestManager::Instance().OpenState("ADMIN_QUEST", QUEST_FISH_REFINE_STATE_INDEX);
 			luaL_loadbuffer(qs.co, buf, strlen(buf), "ADMIN_QUEST");
 			pc->SetQuest("ADMIN_QUEST", qs);

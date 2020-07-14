@@ -1,6 +1,10 @@
 #include "../include/ItemCSVReader.h"
 #include <math.h>
 
+
+TAKE SET_*** FUNCTIONS TO DB'S PROTOREADER
+
+
 bool bDebugFlag = false;
 void writeDebug(const char* szMsg, int iInput, int type_value)
 {

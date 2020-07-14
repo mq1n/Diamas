@@ -1,7 +1,5 @@
 #pragma once
-
 #include "AbstractPlayer.h"
-#include "Packet.h"
 #include "PythonSkill.h"
 
 class CInstanceBase;

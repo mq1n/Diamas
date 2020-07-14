@@ -10,7 +10,6 @@
 #include "item_manager.h"
 #include "motion.h"
 #include "vector.h"
-#include "packet.h"
 #include "cmd.h"
 #include "fishing.h"
 #include "exchange.h"
@@ -789,7 +788,7 @@ void CHARACTER::OpenMyShop(const char * c_pszSign, TShopItemTable * pTable, uint
 
 		if (pkItem)
 		{
-			const TItemTable * item_table = pkItem->GetProto();
+			const SItemTable_Server * item_table = pkItem->GetProto();
 
 			if (item_table && (IS_SET(item_table->dwAntiFlags, ITEM_ANTIFLAG_GIVE | ITEM_ANTIFLAG_MYSHOP)))
 			{
@@ -4140,14 +4139,14 @@ void CHARACTER::ApplyPoint(uint8_t bApplyType, int32_t iVal)
 		case APPLY_ATTBONUS_MILGYO:
 		case APPLY_ATTBONUS_UNDEAD:
 		case APPLY_ATTBONUS_DEVIL:
-		case APPLY_ATTBONUS_WARRIOR:	// 59
-		case APPLY_ATTBONUS_ASSASSIN:	// 60
-		case APPLY_ATTBONUS_SURA:	// 61
-		case APPLY_ATTBONUS_SHAMAN:	// 62
+		case APPLY_ATT_BONUS_TO_WARRIOR:	// 59
+		case APPLY_ATT_BONUS_TO_ASSASSIN:	// 60
+		case APPLY_ATT_BONUS_TO_SURA:	// 61
+		case APPLY_ATT_BONUS_TO_SHAMAN:	// 62
 #ifdef ENABLE_WOLFMAN_CHARACTER
-		case APPLY_ATTBONUS_WOLFMAN:
+		case APPLY_ATT_BONUS_TO_WOLFMAN:
 #endif
-		case APPLY_ATTBONUS_MONSTER:	// 63
+		case APPLY_ATT_BONUS_TO_MONSTER:	// 63
 		case APPLY_STEAL_HP:
 		case APPLY_STEAL_SP:
 		case APPLY_MANA_BURN_PCT:
@@ -8114,7 +8113,7 @@ void CHARACTER::GetAcceCombineResult(uint32_t & dwItemVnum, uint32_t & dwMinAbs,
 			else
 			{
 				uint32_t dwMaskVnum = pkItemMaterial[0]->GetOriginalVnum();
-				TItemTable * pTable = ITEM_MANAGER::Instance().GetTable(dwMaskVnum + 1);
+				SItemTable_Server * pTable = ITEM_MANAGER::Instance().GetTable(dwMaskVnum + 1);
 				if (pTable)
 					dwMaskVnum += 1;
 

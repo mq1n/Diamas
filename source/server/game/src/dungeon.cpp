@@ -5,7 +5,6 @@
 #include "party.h"
 #include "guild.h"
 #include "affect.h"
-#include "packet.h"
 #include "desc.h"
 #include "config.h"
 #include "regen.h"

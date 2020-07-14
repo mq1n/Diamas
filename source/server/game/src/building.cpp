@@ -1,10 +1,10 @@
 #include "stdafx.h"
+#include "building.h"
 #include "constants.h"
 #include "sectree_manager.h"
 #include "item_manager.h"
 #include "buffer_manager.h"
 #include "config.h"
-#include "packet.h"
 #include "char.h"
 #include "char_manager.h"
 #include "guild.h"
@@ -13,7 +13,6 @@
 #include "desc_manager.h"
 #include "desc_client.h"
 #include "quest_manager.h"
-#include "building.h"
 
 using namespace building;
 

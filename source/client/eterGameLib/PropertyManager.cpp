@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include <FileSystemIncl.hpp>
-#include "../eterBase/file_ptr.h"
 #include "PropertyManager.h"
 #include "Property.h"
 

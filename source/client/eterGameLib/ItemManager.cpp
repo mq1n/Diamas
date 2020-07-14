@@ -22,7 +22,7 @@ BOOL CItemManager::SelectItemData(uint32_t dwIndex)
 		for (int32_t i = 0; i < n; i++)
 		{
 			CItemData * p = m_vec_ItemRange[i];
-			const CItemData::TItemTable * pTable = p->GetTable(); 
+			const SItemTable * pTable = p->GetTable(); 
 			if ((pTable->dwVnum < dwIndex) &&
 				dwIndex < (pTable->dwVnum + pTable->dwVnumRange))
 			{
@@ -57,7 +57,7 @@ BOOL CItemManager::GetItemDataPointer(uint32_t dwItemID, CItemData ** ppItemData
 		for (int32_t i = 0; i < n; i++)
 		{
 			CItemData * p = m_vec_ItemRange[i];
-			const CItemData::TItemTable * pTable = p->GetTable(); 
+			const SItemTable * pTable = p->GetTable(); 
 			if ((pTable->dwVnum < dwItemID) &&
 				dwItemID < (pTable->dwVnum + pTable->dwVnumRange))
 			{
@@ -236,14 +236,12 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 			return false;
 		}
 
-#ifdef ENABLE_PROTOSTRUCT_AUTODETECT
-		if (!CItemData::TItemTableAll::IsValidStruct(dwStride))
-#else
-		if (dwStride != sizeof(CItemData::TItemTable))
-#endif
+		TraceError("item_proto size: %u", dwStride);
+
+		if (dwStride != sizeof(SItemTable))
 		{
 			TraceError("CPythonItem::LoadItemTable: invalid item_proto[%s] STRIDE[%d] != sizeof(SItemTable)", 
-				c_szFileName, dwStride, sizeof(CItemData::TItemTable));
+				c_szFileName, dwStride, sizeof(SItemTable));
 			return false;
 		}
 	}
@@ -276,13 +274,8 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 
 	for (uint32_t i = 0; i < dwElements; ++i)
 	{
-#ifdef ENABLE_PROTOSTRUCT_AUTODETECT
-		CItemData::TItemTable t = {0};
-		CItemData::TItemTableAll::Process(zObj.GetBuffer(), dwStride, i, t);
-#else
-		CItemData::TItemTable & t = *((CItemData::TItemTable *) zObj.GetBuffer() + i);
-#endif
-		CItemData::TItemTable * table = &t;
+		SItemTable & t = *((SItemTable *) zObj.GetBuffer() + i);
+		SItemTable * table = &t;
 
 		CItemData * pItemData;
 		uint32_t dwVnum = table->dwVnum;
@@ -328,7 +321,7 @@ bool CItemManager::LoadItemTable(const char* c_szFileName)
 	}
 
 //!@#
-//	CItemData::TItemTable * table = (CItemData::TItemTable *) zObj.GetBuffer();
+//	SItemTable * table = (SItemTable *) zObj.GetBuffer();
 //	for (uint32_t i = 0; i < dwElements; ++i, ++table)
 //	{
 //		CItemData * pItemData;

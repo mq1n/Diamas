@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "GuildMarkUploader.h"
-#include "Packet.h"
 #include "PythonApplication.h"
 
 CGuildMarkUploader::CGuildMarkUploader()

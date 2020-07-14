@@ -11,7 +11,6 @@
 #include "guild_manager.h"
 #include "buffer_manager.h"
 #include "db.h"
-#include "packet.h"
 #include "locale_service.h"
 
 EVENTINFO(war_map_info)
@@ -276,7 +275,7 @@ void CWarMap::UsePotion(LPCHARACTER ch, LPITEM item)
 	if (!item->GetProto())
 		return;
 
-	int32_t iPrice = item->GetProto()->dwGold;
+	int32_t iPrice = item->GetProto()->dwISellItemPrice;
 
 	uint32_t gid = ch->GetGuild()->GetID();
 

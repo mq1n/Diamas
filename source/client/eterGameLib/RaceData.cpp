@@ -5,7 +5,6 @@
 #include "RaceData.h"
 #include "RaceMotionData.h"
 #include "../eterBase/Filename.h"
-#include "../eterXClient/locale_inc.h"
 
 CDynamicPool<CRaceData> CRaceData::ms_kPool;
 CDynamicPool<CRaceData::TMotionModeData> CRaceData::ms_MotionModeDataPool;

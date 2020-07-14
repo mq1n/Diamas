@@ -166,13 +166,19 @@ bool CClientManager::InitializeRefineTable()
 	return true;
 }
 
-class FCompareVnum
+struct FCompareVnumItem
 {
-	public:
-		bool operator () (const TEntityTable & a, const TEntityTable & b) const
-		{
-			return (a.dwVnum < b.dwVnum);
-		}
+	bool operator () (const SItemTable_Server& a, const SItemTable_Server& b) const
+	{
+		return (a.dwVnum < b.dwVnum);
+	}
+};
+struct FCompareVnumMob
+{
+	bool operator () (const TMobTable& a, const TMobTable& b) const
+	{
+		return (a.dwVnum < b.dwVnum);
+	}
 };
 
 bool CClientManager::InitializeMobTableFile()
@@ -196,9 +202,9 @@ bool CClientManager::InitializeMobTableFile()
 
 	cCsvTable data;
 
-	if(!data.Load("mob_proto.txt",'\t'))
+	if(!data.Load("mob_proto.csv",'\t'))
 	{
-		fprintf(stderr, "mob_proto.txt doesn't exist or is incorrectly formatted\n");
+		fprintf(stderr, "mob_proto.csv doesn't exist or is incorrectly formatted\n");
 		return false;
 	}
 	data.Next(); 
@@ -222,7 +228,7 @@ bool CClientManager::InitializeMobTableFile()
 	}
 	//_____________________________________________________//
 
-	sort(m_vec_mobTable.begin(), m_vec_mobTable.end(), FCompareVnum());
+	sort(m_vec_mobTable.begin(), m_vec_mobTable.end(), FCompareVnumMob());
 
 	data.Destroy();
 	nameData.Destroy();
@@ -351,27 +357,27 @@ bool CClientManager::InitializeItemTableFile()
 
 	//data를 다시 첫줄로 옮긴다.(다시 읽어온다;;)
 	cCsvTable data;
-	if(!data.Load("item_proto.txt",'\t'))
+	if(!data.Load("item_proto.csv",'\t'))
 	{
-		fprintf(stderr, "item_proto.txt couldn't be loaded or the format is incorrect \n");
+		fprintf(stderr, "item_proto.csv couldn't be loaded or the format is incorrect \n");
 		return false;
 	}
 	data.Next(); //맨 윗줄 제외 (아이템 칼럼을 설명하는 부분)
 
 	m_vec_itemTable.resize(data.m_File.GetRowCount() - 1);
-	memset(&m_vec_itemTable[0], 0, sizeof(TItemTable) * m_vec_itemTable.size());
+	memset(&m_vec_itemTable[0], 0, sizeof(SItemTable_Server) * m_vec_itemTable.size());
 
-	TItemTable * item_table = &m_vec_itemTable[0];
+	SItemTable_Server * item_table = &m_vec_itemTable[0];
 
 	for (; data.Next(); ++item_table)
 	{
 		if (!Set_Proto_Item_Table(item_table, data, localMap))
 			fprintf(stderr, "Invalid item table. VNUM: %d\n", item_table->dwVnum);
 
-		m_map_itemTableByVnum.insert(std::map<uint32_t, TItemTable *>::value_type(item_table->dwVnum, item_table));
+		m_map_itemTableByVnum.insert(std::map<uint32_t, SItemTable_Server *>::value_type(item_table->dwVnum, item_table));
 	}
 	
-	sort(m_vec_itemTable.begin(), m_vec_itemTable.end(), FCompareVnum());
+	sort(m_vec_itemTable.begin(), m_vec_itemTable.end(), FCompareVnumItem());
 
 	data.Destroy();
 	nameData.Destroy();
@@ -827,9 +833,9 @@ bool CClientManager::InitializeObjectProto()
 	}
 
 	cCsvTable data;
-	if (!data.Load("object_proto.txt", '\t'))
+	if (!data.Load("object_proto.csv", '\t'))
 	{
-		fprintf(stderr, "object_proto.txt couldn't be loaded or the format is incorrect \n");
+		fprintf(stderr, "object_proto.csv couldn't be loaded or the format is incorrect \n");
 		return false;
 	}
 
@@ -1057,7 +1063,7 @@ bool CClientManager::MirrorItemTableIntoDB()
 	{
 		if (g_stLocaleNameColumn != "name")
 		{
-			const TItemTable& t = *it;
+			const SItemTable_Server& t = *it;
 			char query[4096];
 			snprintf(query, sizeof(query),
 				"replace into item_proto (" //1
@@ -1075,7 +1081,7 @@ bool CClientManager::MirrorItemTableIntoDB()
 				"%u, %d, %u, %d, %u, %d, " //30
 				"%d, %d, %d, %d, %d, %d )", //36
 				g_stLocaleNameColumn.c_str(), //2
-				t.dwVnum, t.bType, t.bSubType, t.szName, t.szLocaleName, t.dwGold, t.dwShopBuyPrice, t.bWeight, t.bSize,
+				t.dwVnum, t.bType, t.bSubType, t.szName, t.szLocaleName, t.dwISellItemPrice, t.dwIBuyItemPrice, t.bWeight, t.bSize,
 				t.dwFlags, t.dwWearFlags, t.dwAntiFlags, t.dwImmuneFlag, 
 				t.dwRefinedVnum, t.wRefineSet, t.bAlterToMagicItemPct, t.bGainSocketPct, t.sAddonType,
 				t.aLimits[0].bType, t.aLimits[0].lValue, t.aLimits[1].bType, t.aLimits[1].lValue,
@@ -1085,7 +1091,7 @@ bool CClientManager::MirrorItemTableIntoDB()
 		}
 		else
 		{
-			const TItemTable& t = *it;
+			const SItemTable_Server& t = *it;
 			char query[4096];
 			snprintf(query, sizeof(query),
 				"replace into item_proto ("
@@ -1102,7 +1108,7 @@ bool CClientManager::MirrorItemTableIntoDB()
 				"%d, %d, %d, %d, "
 				"%d, %d, %d, %d, %d, %d, "
 				"%d, %d, %d, %d, %d, %d )",
-				t.dwVnum, t.bType, t.bSubType, t.szName, t.dwGold, t.dwShopBuyPrice, t.bWeight, t.bSize,
+				t.dwVnum, t.bType, t.bSubType, t.szName, t.dwISellItemPrice, t.dwIBuyItemPrice, t.bWeight, t.bSize,
 				t.dwFlags, t.dwWearFlags, t.dwAntiFlags, t.dwImmuneFlag, 
 				t.dwRefinedVnum, t.wRefineSet, t.bAlterToMagicItemPct, t.bGainSocketPct, t.sAddonType,
 				t.aLimits[0].bType, t.aLimits[0].lValue, t.aLimits[1].bType, t.aLimits[1].lValue,
@@ -1300,7 +1306,7 @@ bool CClientManager::InitializeMobTableFromDB()
 		);
 		++mob_table;
 	}
-	sort(m_vec_mobTable.begin(), m_vec_mobTable.end(), FCompareVnum());
+	sort(m_vec_mobTable.begin(), m_vec_mobTable.end(), FCompareVnumMob());
 
 	fprintf(stdout, "Complete! %u Mobs loaded.\n", addNumber);
 	return true;
@@ -1354,8 +1360,8 @@ bool CClientManager::InitializeItemTableFromDB()
 	}
 
 	m_vec_itemTable.resize(addNumber);
-	memset(&m_vec_itemTable[0], 0, sizeof(TItemTable) * m_vec_itemTable.size());
-	TItemTable * item_table = &m_vec_itemTable[0];
+	memset(&m_vec_itemTable[0], 0, sizeof(SItemTable_Server) * m_vec_itemTable.size());
+	SItemTable_Server * item_table = &m_vec_itemTable[0];
 
 	MYSQL_ROW data = nullptr;
 	while ((data = mysql_fetch_row(pRes->pSQLResult)))
@@ -1373,8 +1379,8 @@ bool CClientManager::InitializeItemTableFromDB()
 		VERIFY_IFIELD(IProto::flag,				item_table->dwFlags);
 		VERIFY_IFIELD(IProto::wearflag,			item_table->dwWearFlags);
 		VERIFY_IFIELD(IProto::immuneflag,		item_table->dwImmuneFlag);
-		VERIFY_IFIELD(IProto::gold,				item_table->dwGold);
-		VERIFY_IFIELD(IProto::shop_buy_price,	item_table->dwShopBuyPrice);
+		VERIFY_IFIELD(IProto::gold,				item_table->dwISellItemPrice);
+		VERIFY_IFIELD(IProto::shop_buy_price,	item_table->dwIBuyItemPrice);
 		VERIFY_IFIELD(IProto::refined_vnum,		item_table->dwRefinedVnum);
 		VERIFY_IFIELD(IProto::refine_set,		item_table->wRefineSet);
 		VERIFY_IFIELD(IProto::magic_pct,		item_table->bAlterToMagicItemPct);
@@ -1427,7 +1433,7 @@ bool CClientManager::InitializeItemTableFromDB()
 			item_table->dwVnumRange = 99;
 #endif
 
-		m_map_itemTableByVnum.insert(std::map<uint32_t, TItemTable *>::value_type(item_table->dwVnum, item_table));
+		m_map_itemTableByVnum.insert(std::map<uint32_t, SItemTable_Server *>::value_type(item_table->dwVnum, item_table));
 		sys_log(0, "ITEM: #%-5lu %-24s %-24s VAL: %d %d %d %d %d %d WEAR %d ANTI %d IMMUNE %d REFINE %u REFINE_SET %u MAGIC_PCT %u",
 			item_table->dwVnum,
 			item_table->szName,
@@ -1447,7 +1453,7 @@ bool CClientManager::InitializeItemTableFromDB()
 		);
 		item_table++;
 	}
-	sort(m_vec_itemTable.begin(), m_vec_itemTable.end(), FCompareVnum());
+	sort(m_vec_itemTable.begin(), m_vec_itemTable.end(), FCompareVnumItem());
 
 	fprintf(stdout, "Complete! %u Items loaded.\n", addNumber);
 	return true;

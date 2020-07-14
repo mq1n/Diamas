@@ -1,22 +1,5 @@
 #pragma once
 
-#include "Packet.h"
-
-/*
- *	상점 처리
- *
- *	2003-01-16 anoa	일차 완료
- *	2003-12-26 levites 수정
- *
- *	2012-10-29 rtsummit 새로운 화폐 출현 및 tab 기능 추가로 인한 shop 확장.
- *
- */
-typedef enum
-{
-	SHOP_COIN_TYPE_GOLD, // DEFAULT VALUE
-	SHOP_COIN_TYPE_SECONDARY_COIN
-} EShopCoinType;
-
 class CPythonShop : public CSingleton<CPythonShop>
 {
 	public:

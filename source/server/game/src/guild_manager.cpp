@@ -9,7 +9,6 @@
 #include "desc_client.h"
 #include "buffer_manager.h"
 #include "char_manager.h"
-#include "packet.h"
 #include "war_map.h"
 #include "quest_manager.h"
 #include "locale_service.h"

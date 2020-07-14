@@ -182,9 +182,9 @@ void CItemData::__SetIconImage(const char * c_szFileName, bool renew)
 		m_pIconImage = CResourceManager::Instance().GetResourcePointer<CGraphicSubImage>(c_szFileName);
 }
 
-void CItemData::SetItemTableData(TItemTable * pItemTable)
+void CItemData::SetItemTableData(SItemTable* pItemTable)
 {
-	memcpy(&m_ItemTable, pItemTable, sizeof(TItemTable));
+	memcpy(&m_ItemTable, pItemTable, sizeof(SItemTable));
 }
 
 #ifdef ENABLE_ACCE_SYSTEM
@@ -228,7 +228,7 @@ bool CItemData::GetItemScale(uint32_t dwPos, float & fScaleX, float & fScaleY, f
 }
 #endif
 
-const CItemData::TItemTable* CItemData::GetTable() const
+const SItemTable* CItemData::GetTable() const
 {
 	return &m_ItemTable;
 }
@@ -374,7 +374,7 @@ int32_t CItemData::GetLevelLimit() const
 }
 
 
-BOOL CItemData::GetLimit(uint8_t byIndex, TItemLimit * pItemLimit) const
+BOOL CItemData::GetLimit(uint8_t byIndex, TItemLimit* pItemLimit) const
 {
 	if (byIndex >= ITEM_LIMIT_MAX_NUM)
 	{

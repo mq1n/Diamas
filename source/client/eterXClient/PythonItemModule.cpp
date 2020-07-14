@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "PythonItem.h"
 #include "../eterGameLib/ItemManager.h"
-#include "Locale_inc.h"
 #include "InstanceBase.h"
 #include "AbstractApplication.h"
 #include "PythonDynamicModuleNames.h"
@@ -231,7 +230,7 @@ PyObject * itemGetLimit(PyObject * poSelf, PyObject * poArgs)
 	if (!pItemData)
 		return Py_BuildException("Not yet select item data");
 
-	CItemData::TItemLimit ItemLimit;
+	TItemLimit ItemLimit;
 	if (!pItemData->GetLimit(iValueIndex, &ItemLimit))
 		return Py_BuildException();
 
@@ -248,11 +247,11 @@ PyObject * itemGetAffect(PyObject * poSelf, PyObject * poArgs)
 	if (!pItemData)
 		return Py_BuildException("Not yet select item data");
 
-	CItemData::TItemApply ItemApply;
+	TItemApply ItemApply;
 	if (!pItemData->GetApply(iValueIndex, &ItemApply))
 		return Py_BuildException();
 
-	if ((CItemData::APPLY_ATT_SPEED == ItemApply.bType) && (ITEM_TYPE_WEAPON == pItemData->GetType()) && (WEAPON_TWO_HANDED == pItemData->GetSubType()))
+	if ((APPLY_ATT_SPEED == ItemApply.bType) && (ITEM_TYPE_WEAPON == pItemData->GetType()) && (WEAPON_TWO_HANDED == pItemData->GetSubType()))
 	{
 		ItemApply.lValue -= TWOHANDED_WEWAPON_ATT_SPEED_DECREASE_VALUE;
 	}
@@ -829,113 +828,113 @@ void initItem()
 	PyModule_AddIntConstant(poModule, "ITEM_APPLY_MAX_NUM",			ITEM_APPLY_MAX_NUM);
 	PyModule_AddIntConstant(poModule, "ITEM_SOCKET_MAX_NUM",		ITEM_SOCKET_MAX_NUM);
 
-	PyModule_AddIntConstant(poModule, "APPLY_NONE",					CItemData::APPLY_NONE);
-	PyModule_AddIntConstant(poModule, "APPLY_STR",					CItemData::APPLY_STR);
-	PyModule_AddIntConstant(poModule, "APPLY_DEX",					CItemData::APPLY_DEX);
-	PyModule_AddIntConstant(poModule, "APPLY_CON",					CItemData::APPLY_CON);
-	PyModule_AddIntConstant(poModule, "APPLY_INT",					CItemData::APPLY_INT);
-	PyModule_AddIntConstant(poModule, "APPLY_MAX_HP",				CItemData::APPLY_MAX_HP);
-	PyModule_AddIntConstant(poModule, "APPLY_MAX_SP",				CItemData::APPLY_MAX_SP);
-	PyModule_AddIntConstant(poModule, "APPLY_HP_REGEN",				CItemData::APPLY_HP_REGEN);
-	PyModule_AddIntConstant(poModule, "APPLY_SP_REGEN",				CItemData::APPLY_SP_REGEN);
-	PyModule_AddIntConstant(poModule, "APPLY_DEF_GRADE_BONUS",		CItemData::APPLY_DEF_GRADE_BONUS);
-	PyModule_AddIntConstant(poModule, "APPLY_ATT_GRADE_BONUS",		CItemData::APPLY_ATT_GRADE_BONUS);
-	PyModule_AddIntConstant(poModule, "APPLY_ATT_SPEED",			CItemData::APPLY_ATT_SPEED);
-	PyModule_AddIntConstant(poModule, "APPLY_MOV_SPEED",			CItemData::APPLY_MOV_SPEED);
-	PyModule_AddIntConstant(poModule, "APPLY_CAST_SPEED",			CItemData::APPLY_CAST_SPEED);
-	PyModule_AddIntConstant(poModule, "APPLY_MAGIC_ATT_GRADE",		CItemData::APPLY_MAGIC_ATT_GRADE);
-	PyModule_AddIntConstant(poModule, "APPLY_MAGIC_DEF_GRADE",		CItemData::APPLY_MAGIC_DEF_GRADE);
-	PyModule_AddIntConstant(poModule, "APPLY_SKILL",				CItemData::APPLY_SKILL);
-    PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_ANIMAL",		CItemData::APPLY_ATTBONUS_ANIMAL);
-    PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_UNDEAD",		CItemData::APPLY_ATTBONUS_UNDEAD);
-    PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_DEVIL", 		CItemData::APPLY_ATTBONUS_DEVIL);
-    PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_HUMAN",		CItemData::APPLY_ATTBONUS_HUMAN);
-    PyModule_AddIntConstant(poModule, "APPLY_BOW_DISTANCE", 		CItemData::APPLY_BOW_DISTANCE);
-    PyModule_AddIntConstant(poModule, "APPLY_RESIST_BOW", 			CItemData::APPLY_RESIST_BOW);
-    PyModule_AddIntConstant(poModule, "APPLY_RESIST_FIRE", 			CItemData::APPLY_RESIST_FIRE);
-    PyModule_AddIntConstant(poModule, "APPLY_RESIST_ELEC", 			CItemData::APPLY_RESIST_ELEC);
-    PyModule_AddIntConstant(poModule, "APPLY_RESIST_MAGIC", 		CItemData::APPLY_RESIST_MAGIC);
-    PyModule_AddIntConstant(poModule, "APPLY_POISON_PCT",			CItemData::APPLY_POISON_PCT);
-    PyModule_AddIntConstant(poModule, "APPLY_SLOW_PCT", 			CItemData::APPLY_SLOW_PCT);
-    PyModule_AddIntConstant(poModule, "APPLY_STUN_PCT", 			CItemData::APPLY_STUN_PCT);
-	PyModule_AddIntConstant(poModule, "APPLY_CRITICAL_PCT",			CItemData::APPLY_CRITICAL_PCT);			// n% 확률로 두배 타격
-	PyModule_AddIntConstant(poModule, "APPLY_PENETRATE_PCT",		CItemData::APPLY_PENETRATE_PCT);		// n% 확률로 적의 방어력 무시
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_ORC",			CItemData::APPLY_ATTBONUS_ORC);			// 웅귀에게 n% 추가 데미지
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_MILGYO",		CItemData::APPLY_ATTBONUS_MILGYO);		// 밀교에게 n% 추가 데미지
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_UNDEAD",		CItemData::APPLY_ATTBONUS_UNDEAD);		// 시체에게 n% 추가 데미지
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_DEVIL",		CItemData::APPLY_ATTBONUS_DEVIL);		// 악마에게 n% 추가 데미지
-	PyModule_AddIntConstant(poModule, "APPLY_STEAL_HP",				CItemData::APPLY_STEAL_HP);				// n% 확률로 타격의 10% 를 생명력으로 흡수
-	PyModule_AddIntConstant(poModule, "APPLY_STEAL_SP",				CItemData::APPLY_STEAL_SP);				// n% 확률로 타격의 10% 를 정신력으로 흡수
-	PyModule_AddIntConstant(poModule, "APPLY_MANA_BURN_PCT",		CItemData::APPLY_MANA_BURN_PCT);		// n% 확률로 상대의 마나를 깎는다
-	PyModule_AddIntConstant(poModule, "APPLY_DAMAGE_SP_RECOVER",	CItemData::APPLY_DAMAGE_SP_RECOVER);	// n% 확률로 정신력 2 회복
-	PyModule_AddIntConstant(poModule, "APPLY_BLOCK",				CItemData::APPLY_BLOCK);				// n% 확률로 물리공격 완벽 방어
-	PyModule_AddIntConstant(poModule, "APPLY_DODGE",				CItemData::APPLY_DODGE);				// n% 확률로 물리공격 완벽 회피
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_SWORD",			CItemData::APPLY_RESIST_SWORD);			// 한손검에 의한 피해를 n% 감소
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_TWOHAND",		CItemData::APPLY_RESIST_TWOHAND);		// 양손검에 의한 피해를 n% 감소
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_DAGGER",		CItemData::APPLY_RESIST_DAGGER);		// 단도에 의한 피해를 n% 감소
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_BELL",			CItemData::APPLY_RESIST_BELL);			// 방울에 의한 피해를 n% 감소
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_FAN",			CItemData::APPLY_RESIST_FAN);			// 부채에 의한 피해를 n% 감소
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_WIND",			CItemData::APPLY_RESIST_WIND);			// 바람에 의한 피해를 n% 감소
-	PyModule_AddIntConstant(poModule, "APPLY_REFLECT_MELEE",		CItemData::APPLY_REFLECT_MELEE);		// 근접 타격 n% 를 적에게 되돌린다
-	PyModule_AddIntConstant(poModule, "APPLY_REFLECT_CURSE",		CItemData::APPLY_REFLECT_CURSE);		// 적이 나에게 저주 사용시 n% 확률로 되돌린다
-	PyModule_AddIntConstant(poModule, "APPLY_POISON_REDUCE",		CItemData::APPLY_POISON_REDUCE);		// 독에 의한 데미지 감소
-	PyModule_AddIntConstant(poModule, "APPLY_KILL_SP_RECOVER",		CItemData::APPLY_KILL_SP_RECOVER);		// 적을 죽였을때 n% 확률로 정신력 10 회복
-	PyModule_AddIntConstant(poModule, "APPLY_EXP_DOUBLE_BONUS",		CItemData::APPLY_EXP_DOUBLE_BONUS);		// n% 확률로 경험치 획득량 2배
-	PyModule_AddIntConstant(poModule, "APPLY_GOLD_DOUBLE_BONUS",	CItemData::APPLY_GOLD_DOUBLE_BONUS);	// n% 확률로 돈 획득량 2배
-	PyModule_AddIntConstant(poModule, "APPLY_ITEM_DROP_BONUS",		CItemData::APPLY_ITEM_DROP_BONUS);		// n% 확률로 아이템 획득량 2배
-	PyModule_AddIntConstant(poModule, "APPLY_POTION_BONUS",			CItemData::APPLY_POTION_BONUS);			// 물약 복용시 n% 만큼 성능 증대
-	PyModule_AddIntConstant(poModule, "APPLY_KILL_HP_RECOVER",		CItemData::APPLY_KILL_HP_RECOVER);		// 죽일때마다 생명력 회복 
-	PyModule_AddIntConstant(poModule, "APPLY_IMMUNE_STUN",			CItemData::APPLY_IMMUNE_STUN);			// 기절 하지 않는다
-	PyModule_AddIntConstant(poModule, "APPLY_IMMUNE_SLOW",			CItemData::APPLY_IMMUNE_SLOW);			// 느려지지 않는다
-	PyModule_AddIntConstant(poModule, "APPLY_IMMUNE_FALL",			CItemData::APPLY_IMMUNE_FALL);			// 넘어지지 않는다
-	PyModule_AddIntConstant(poModule, "APPLY_MAX_STAMINA",			CItemData::APPLY_MAX_STAMINA);			// 최대 스테미너 증가
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_WARRIOR",		CItemData::APPLY_ATT_BONUS_TO_WARRIOR);
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_ASSASSIN",	CItemData::APPLY_ATT_BONUS_TO_ASSASSIN);
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_SURA",		CItemData::APPLY_ATT_BONUS_TO_SURA);
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_SHAMAN",		CItemData::APPLY_ATT_BONUS_TO_SHAMAN);
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_MONSTER",		CItemData::APPLY_ATT_BONUS_TO_MONSTER);
-	PyModule_AddIntConstant(poModule, "APPLY_MALL_ATTBONUS",		CItemData::APPLY_MALL_ATTBONUS);
-	PyModule_AddIntConstant(poModule, "APPLY_MALL_DEFBONUS",		CItemData::APPLY_MALL_DEFBONUS);
-	PyModule_AddIntConstant(poModule, "APPLY_MALL_EXPBONUS",		CItemData::APPLY_MALL_EXPBONUS);
-	PyModule_AddIntConstant(poModule, "APPLY_MALL_ITEMBONUS",		CItemData::APPLY_MALL_ITEMBONUS);
-	PyModule_AddIntConstant(poModule, "APPLY_MALL_GOLDBONUS",		CItemData::APPLY_MALL_GOLDBONUS);
-	PyModule_AddIntConstant(poModule, "APPLY_MAX_HP_PCT",			CItemData::APPLY_MAX_HP_PCT);
-	PyModule_AddIntConstant(poModule, "APPLY_MAX_SP_PCT",			CItemData::APPLY_MAX_SP_PCT);
-	PyModule_AddIntConstant(poModule, "APPLY_SKILL_DAMAGE_BONUS",		CItemData::APPLY_SKILL_DAMAGE_BONUS);
-	PyModule_AddIntConstant(poModule, "APPLY_NORMAL_HIT_DAMAGE_BONUS",	CItemData::APPLY_NORMAL_HIT_DAMAGE_BONUS);
-	PyModule_AddIntConstant(poModule, "APPLY_SKILL_DEFEND_BONUS",		CItemData::APPLY_SKILL_DEFEND_BONUS);
-	PyModule_AddIntConstant(poModule, "APPLY_NORMAL_HIT_DEFEND_BONUS",	CItemData::APPLY_NORMAL_HIT_DEFEND_BONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_NONE",					APPLY_NONE);
+	PyModule_AddIntConstant(poModule, "APPLY_STR",					APPLY_STR);
+	PyModule_AddIntConstant(poModule, "APPLY_DEX",					APPLY_DEX);
+	PyModule_AddIntConstant(poModule, "APPLY_CON",					APPLY_CON);
+	PyModule_AddIntConstant(poModule, "APPLY_INT",					APPLY_INT);
+	PyModule_AddIntConstant(poModule, "APPLY_MAX_HP",				APPLY_MAX_HP);
+	PyModule_AddIntConstant(poModule, "APPLY_MAX_SP",				APPLY_MAX_SP);
+	PyModule_AddIntConstant(poModule, "APPLY_HP_REGEN",				APPLY_HP_REGEN);
+	PyModule_AddIntConstant(poModule, "APPLY_SP_REGEN",				APPLY_SP_REGEN);
+	PyModule_AddIntConstant(poModule, "APPLY_DEF_GRADE_BONUS",		APPLY_DEF_GRADE_BONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_ATT_GRADE_BONUS",		APPLY_ATT_GRADE_BONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_ATT_SPEED",			APPLY_ATT_SPEED);
+	PyModule_AddIntConstant(poModule, "APPLY_MOV_SPEED",			APPLY_MOV_SPEED);
+	PyModule_AddIntConstant(poModule, "APPLY_CAST_SPEED",			APPLY_CAST_SPEED);
+	PyModule_AddIntConstant(poModule, "APPLY_MAGIC_ATT_GRADE",		APPLY_MAGIC_ATT_GRADE);
+	PyModule_AddIntConstant(poModule, "APPLY_MAGIC_DEF_GRADE",		APPLY_MAGIC_DEF_GRADE);
+	PyModule_AddIntConstant(poModule, "APPLY_SKILL",				APPLY_SKILL);
+    PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_ANIMAL",		APPLY_ATTBONUS_ANIMAL);
+    PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_UNDEAD",		APPLY_ATTBONUS_UNDEAD);
+    PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_DEVIL", 		APPLY_ATTBONUS_DEVIL);
+    PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_HUMAN",		APPLY_ATTBONUS_HUMAN);
+    PyModule_AddIntConstant(poModule, "APPLY_BOW_DISTANCE", 		APPLY_BOW_DISTANCE);
+    PyModule_AddIntConstant(poModule, "APPLY_RESIST_BOW", 			APPLY_RESIST_BOW);
+    PyModule_AddIntConstant(poModule, "APPLY_RESIST_FIRE", 			APPLY_RESIST_FIRE);
+    PyModule_AddIntConstant(poModule, "APPLY_RESIST_ELEC", 			APPLY_RESIST_ELEC);
+    PyModule_AddIntConstant(poModule, "APPLY_RESIST_MAGIC", 		APPLY_RESIST_MAGIC);
+    PyModule_AddIntConstant(poModule, "APPLY_POISON_PCT",			APPLY_POISON_PCT);
+    PyModule_AddIntConstant(poModule, "APPLY_SLOW_PCT", 			APPLY_SLOW_PCT);
+    PyModule_AddIntConstant(poModule, "APPLY_STUN_PCT", 			APPLY_STUN_PCT);
+	PyModule_AddIntConstant(poModule, "APPLY_CRITICAL_PCT",			APPLY_CRITICAL_PCT);			// n% 확률로 두배 타격
+	PyModule_AddIntConstant(poModule, "APPLY_PENETRATE_PCT",		APPLY_PENETRATE_PCT);		// n% 확률로 적의 방어력 무시
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_ORC",			APPLY_ATTBONUS_ORC);			// 웅귀에게 n% 추가 데미지
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_MILGYO",		APPLY_ATTBONUS_MILGYO);		// 밀교에게 n% 추가 데미지
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_UNDEAD",		APPLY_ATTBONUS_UNDEAD);		// 시체에게 n% 추가 데미지
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_DEVIL",		APPLY_ATTBONUS_DEVIL);		// 악마에게 n% 추가 데미지
+	PyModule_AddIntConstant(poModule, "APPLY_STEAL_HP",				APPLY_STEAL_HP);				// n% 확률로 타격의 10% 를 생명력으로 흡수
+	PyModule_AddIntConstant(poModule, "APPLY_STEAL_SP",				APPLY_STEAL_SP);				// n% 확률로 타격의 10% 를 정신력으로 흡수
+	PyModule_AddIntConstant(poModule, "APPLY_MANA_BURN_PCT",		APPLY_MANA_BURN_PCT);		// n% 확률로 상대의 마나를 깎는다
+	PyModule_AddIntConstant(poModule, "APPLY_DAMAGE_SP_RECOVER",	APPLY_DAMAGE_SP_RECOVER);	// n% 확률로 정신력 2 회복
+	PyModule_AddIntConstant(poModule, "APPLY_BLOCK",				APPLY_BLOCK);				// n% 확률로 물리공격 완벽 방어
+	PyModule_AddIntConstant(poModule, "APPLY_DODGE",				APPLY_DODGE);				// n% 확률로 물리공격 완벽 회피
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_SWORD",			APPLY_RESIST_SWORD);			// 한손검에 의한 피해를 n% 감소
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_TWOHAND",		APPLY_RESIST_TWOHAND);		// 양손검에 의한 피해를 n% 감소
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_DAGGER",		APPLY_RESIST_DAGGER);		// 단도에 의한 피해를 n% 감소
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_BELL",			APPLY_RESIST_BELL);			// 방울에 의한 피해를 n% 감소
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_FAN",			APPLY_RESIST_FAN);			// 부채에 의한 피해를 n% 감소
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_WIND",			APPLY_RESIST_WIND);			// 바람에 의한 피해를 n% 감소
+	PyModule_AddIntConstant(poModule, "APPLY_REFLECT_MELEE",		APPLY_REFLECT_MELEE);		// 근접 타격 n% 를 적에게 되돌린다
+	PyModule_AddIntConstant(poModule, "APPLY_REFLECT_CURSE",		APPLY_REFLECT_CURSE);		// 적이 나에게 저주 사용시 n% 확률로 되돌린다
+	PyModule_AddIntConstant(poModule, "APPLY_POISON_REDUCE",		APPLY_POISON_REDUCE);		// 독에 의한 데미지 감소
+	PyModule_AddIntConstant(poModule, "APPLY_KILL_SP_RECOVER",		APPLY_KILL_SP_RECOVER);		// 적을 죽였을때 n% 확률로 정신력 10 회복
+	PyModule_AddIntConstant(poModule, "APPLY_EXP_DOUBLE_BONUS",		APPLY_EXP_DOUBLE_BONUS);		// n% 확률로 경험치 획득량 2배
+	PyModule_AddIntConstant(poModule, "APPLY_GOLD_DOUBLE_BONUS",	APPLY_GOLD_DOUBLE_BONUS);	// n% 확률로 돈 획득량 2배
+	PyModule_AddIntConstant(poModule, "APPLY_ITEM_DROP_BONUS",		APPLY_ITEM_DROP_BONUS);		// n% 확률로 아이템 획득량 2배
+	PyModule_AddIntConstant(poModule, "APPLY_POTION_BONUS",			APPLY_POTION_BONUS);			// 물약 복용시 n% 만큼 성능 증대
+	PyModule_AddIntConstant(poModule, "APPLY_KILL_HP_RECOVER",		APPLY_KILL_HP_RECOVER);		// 죽일때마다 생명력 회복 
+	PyModule_AddIntConstant(poModule, "APPLY_IMMUNE_STUN",			APPLY_IMMUNE_STUN);			// 기절 하지 않는다
+	PyModule_AddIntConstant(poModule, "APPLY_IMMUNE_SLOW",			APPLY_IMMUNE_SLOW);			// 느려지지 않는다
+	PyModule_AddIntConstant(poModule, "APPLY_IMMUNE_FALL",			APPLY_IMMUNE_FALL);			// 넘어지지 않는다
+	PyModule_AddIntConstant(poModule, "APPLY_MAX_STAMINA",			APPLY_MAX_STAMINA);			// 최대 스테미너 증가
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_WARRIOR",		APPLY_ATT_BONUS_TO_WARRIOR);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_ASSASSIN",	APPLY_ATT_BONUS_TO_ASSASSIN);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_SURA",		APPLY_ATT_BONUS_TO_SURA);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_SHAMAN",		APPLY_ATT_BONUS_TO_SHAMAN);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_MONSTER",		APPLY_ATT_BONUS_TO_MONSTER);
+	PyModule_AddIntConstant(poModule, "APPLY_MALL_ATTBONUS",		APPLY_MALL_ATTBONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_MALL_DEFBONUS",		APPLY_MALL_DEFBONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_MALL_EXPBONUS",		APPLY_MALL_EXPBONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_MALL_ITEMBONUS",		APPLY_MALL_ITEMBONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_MALL_GOLDBONUS",		APPLY_MALL_GOLDBONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_MAX_HP_PCT",			APPLY_MAX_HP_PCT);
+	PyModule_AddIntConstant(poModule, "APPLY_MAX_SP_PCT",			APPLY_MAX_SP_PCT);
+	PyModule_AddIntConstant(poModule, "APPLY_SKILL_DAMAGE_BONUS",		APPLY_SKILL_DAMAGE_BONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_NORMAL_HIT_DAMAGE_BONUS",	APPLY_NORMAL_HIT_DAMAGE_BONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_SKILL_DEFEND_BONUS",		APPLY_SKILL_DEFEND_BONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_NORMAL_HIT_DEFEND_BONUS",	APPLY_NORMAL_HIT_DEFEND_BONUS);
 
-	PyModule_AddIntConstant(poModule, "APPLY_PC_BANG_EXP_BONUS",	CItemData::APPLY_PC_BANG_EXP_BONUS);
-	PyModule_AddIntConstant(poModule, "APPLY_PC_BANG_DROP_BONUS",	CItemData::APPLY_PC_BANG_DROP_BONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_PC_BANG_EXP_BONUS",	UNUSED_APPLY_PC_BANG_EXP_BONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_PC_BANG_DROP_BONUS", UNUSED_APPLY_PC_BANG_DROP_BONUS);
 
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_WARRIOR",	CItemData::APPLY_RESIST_WARRIOR );
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_ASSASSIN",	CItemData::APPLY_RESIST_ASSASSIN );
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_SURA",		CItemData::APPLY_RESIST_SURA );
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_SHAMAN",	CItemData::APPLY_RESIST_SHAMAN );
-	PyModule_AddIntConstant(poModule, "APPLY_ENERGY",	CItemData::APPLY_ENERGY );		// 기력
-	PyModule_AddIntConstant(poModule, "APPLY_COSTUME_ATTR_BONUS",	CItemData::APPLY_COSTUME_ATTR_BONUS );		
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_WARRIOR",	APPLY_RESIST_WARRIOR );
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_ASSASSIN",	APPLY_RESIST_ASSASSIN );
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_SURA",		APPLY_RESIST_SURA );
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_SHAMAN",	APPLY_RESIST_SHAMAN );
+	PyModule_AddIntConstant(poModule, "APPLY_ENERGY",	APPLY_ENERGY );		// 기력
+	PyModule_AddIntConstant(poModule, "APPLY_COSTUME_ATTR_BONUS",	APPLY_COSTUME_ATTR_BONUS );		
 
-	PyModule_AddIntConstant(poModule, "APPLY_MAGIC_ATTBONUS_PER",	CItemData::APPLY_MAGIC_ATTBONUS_PER );		
-	PyModule_AddIntConstant(poModule, "APPLY_MELEE_MAGIC_ATTBONUS_PER",	CItemData::APPLY_MELEE_MAGIC_ATTBONUS_PER );		
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_ICE",	CItemData::APPLY_RESIST_ICE );		
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_EARTH",	CItemData::APPLY_RESIST_EARTH );		
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_DARK",	CItemData::APPLY_RESIST_DARK );		
-	PyModule_AddIntConstant(poModule, "APPLY_ANTI_CRITICAL_PCT",	CItemData::APPLY_ANTI_CRITICAL_PCT );		
-	PyModule_AddIntConstant(poModule, "APPLY_ANTI_PENETRATE_PCT",	CItemData::APPLY_ANTI_PENETRATE_PCT );		
+	PyModule_AddIntConstant(poModule, "APPLY_MAGIC_ATTBONUS_PER",	APPLY_MAGIC_ATTBONUS_PER );		
+	PyModule_AddIntConstant(poModule, "APPLY_MELEE_MAGIC_ATTBONUS_PER",	APPLY_MELEE_MAGIC_ATTBONUS_PER );		
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_ICE",	APPLY_RESIST_ICE );		
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_EARTH",	APPLY_RESIST_EARTH );		
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_DARK",	APPLY_RESIST_DARK );		
+	PyModule_AddIntConstant(poModule, "APPLY_ANTI_CRITICAL_PCT",	APPLY_ANTI_CRITICAL_PCT );		
+	PyModule_AddIntConstant(poModule, "APPLY_ANTI_PENETRATE_PCT",	APPLY_ANTI_PENETRATE_PCT );		
 #ifdef ENABLE_WOLFMAN_CHARACTER
-	PyModule_AddIntConstant(poModule, "APPLY_BLEEDING_PCT",	CItemData::APPLY_BLEEDING_PCT );
-	PyModule_AddIntConstant(poModule, "APPLY_BLEEDING_REDUCE",	CItemData::APPLY_BLEEDING_REDUCE );
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_WOLFMAN",	CItemData::APPLY_ATT_BONUS_TO_WOLFMAN );
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_WOLFMAN",	CItemData::APPLY_RESIST_WOLFMAN );
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_CLAW",	CItemData::APPLY_RESIST_CLAW );
+	PyModule_AddIntConstant(poModule, "APPLY_BLEEDING_PCT",	APPLY_BLEEDING_PCT );
+	PyModule_AddIntConstant(poModule, "APPLY_BLEEDING_REDUCE",	APPLY_BLEEDING_REDUCE );
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_WOLFMAN",	APPLY_ATT_BONUS_TO_WOLFMAN );
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_WOLFMAN",	APPLY_RESIST_WOLFMAN );
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_CLAW",	APPLY_RESIST_CLAW );
 #endif
 
 #ifdef ENABLE_ACCE_SYSTEM
-	PyModule_AddIntConstant(poModule, "APPLY_ACCEDRAIN_RATE",			CItemData::APPLY_ACCEDRAIN_RATE);
+	PyModule_AddIntConstant(poModule, "APPLY_ACCEDRAIN_RATE",			APPLY_ACCEDRAIN_RATE);
 #endif
 #ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
-	PyModule_AddIntConstant(poModule, "APPLY_RESIST_MAGIC_REDUCTION",	CItemData::APPLY_RESIST_MAGIC_REDUCTION);
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_MAGIC_REDUCTION",	APPLY_RESIST_MAGIC_REDUCTION);
 #endif
 
 #ifdef ENABLE_SEALBIND_SYSTEM

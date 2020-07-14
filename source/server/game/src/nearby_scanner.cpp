@@ -1,12 +1,11 @@
 #include "stdafx.h"
+#include "nearby_scanner.h"
 #include "utils.h"
 #include "config.h"
 #include "quest_manager.h"
 #include "sectree_manager.h"
 #include "char.h"
 #include "char_manager.h"
-#include "packet.h"
-#include "nearby_scanner.h"
 
 /////////////////////////////////////////////////////////////////////
 // Packet

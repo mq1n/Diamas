@@ -1,11 +1,9 @@
 #include "stdafx.h"
-#include <sstream>
+#include "questlua.h"
 #include "desc.h"
 #include "party.h"
 #include "char.h"
-#include "questlua.h"
 #include "quest_manager.h"
-#include "packet.h"
 #include "char_manager.h"
 
 #undef sys_err

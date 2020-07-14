@@ -7,7 +7,6 @@
 #include "char_manager.h"
 #include "item.h"
 #include "item_manager.h"
-#include "packet.h"
 #include "protocol.h"
 #include "mob_manager.h"
 #include "shop_manager.h"
@@ -416,7 +415,7 @@ void CInputDB::Boot(const char* data)
 	}
 
 	sys_log(0, "sizeof(TMobTable) = %d", sizeof(TMobTable));
-	sys_log(0, "sizeof(TItemTable) = %d", sizeof(TItemTable));
+	sys_log(0, "sizeof(SItemTable_Server) = %d", sizeof(SItemTable_Server));
 	sys_log(0, "sizeof(TShopTable) = %d", sizeof(TShopTable));
 	sys_log(0, "sizeof(TSkillTable) = %d", sizeof(TSkillTable));
 	sys_log(0, "sizeof(TRefineTable) = %d", sizeof(TRefineTable));
@@ -458,7 +457,7 @@ void CInputDB::Boot(const char* data)
 	 * ITEM
 	 */
 
-	if (decode_2bytes(data) != sizeof(TItemTable))
+	if (decode_2bytes(data) != sizeof(SItemTable_Server))
 	{
 		sys_err("item table size error");
 		thecore_shutdown();
@@ -473,8 +472,8 @@ void CInputDB::Boot(const char* data)
 
 	if (size)
 	{
-		ITEM_MANAGER::Instance().Initialize((TItemTable *) data, size);
-		data += size * sizeof(TItemTable);
+		ITEM_MANAGER::Instance().Initialize((SItemTable_Server *) data, size);
+		data += size * sizeof(SItemTable_Server);
 	}
 
 	/*
@@ -1589,8 +1588,8 @@ void CInputDB::ReloadProto(const char * c_pData)
 
 	if (wSize)
 	{
-		ITEM_MANAGER::Instance().Initialize((TItemTable *) c_pData, wSize);
-		c_pData += wSize * sizeof(TItemTable);
+		ITEM_MANAGER::Instance().Initialize((SItemTable_Server *) c_pData, wSize);
+		c_pData += wSize * sizeof(SItemTable_Server);
 	}
 
 	/*

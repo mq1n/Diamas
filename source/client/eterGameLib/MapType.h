@@ -3,9 +3,9 @@
 
 class CProperty;
 
+#include "../../common/defines.h"
 #include "../eterLib/SkyBox.h"
 #include "../eterSoundLib/SoundManager.h"
-#include "../eterXClient/Locale_inc.h"
 
 /////////////////////////////////////////////////////////////////
 // Property

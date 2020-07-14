@@ -6,7 +6,6 @@
 #include "char.h"
 #include "item.h"
 #include "item_manager.h"
-#include "packet.h"
 #include "log.h"
 #include "db.h"
 #include "locale_service.h"

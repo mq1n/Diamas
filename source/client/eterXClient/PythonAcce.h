@@ -1,7 +1,6 @@
 #pragma once
 
 #ifdef ENABLE_ACCE_SYSTEM
-#include "Packet.h"
 
 class CPythonAcce : public CSingleton<CPythonAcce>
 {

@@ -1,9 +1,6 @@
 #pragma once
 
-// class CActorInstance
-
-//		Note : 캐릭터의 Lighting, Local Point Light, Weapon Trace 등의 효과와 콤보 데이타, 사운드 데이타,
-//             모션 데이타 들을 추상적, 총체적으로 관리하는 개별 매니저가 될 것이다.
+#include "../../common/defines.h"
 
 #include "FlyTarget.h"
 #include "RaceData.h"
@@ -11,8 +8,7 @@
 #include "PhysicsObject.h"
 #include "ActorInstanceInterface.h"
 #include "Interface.h"
-//#include "../eterGrnLib/ThingInstance.h"
-#include "../eterXClient/locale_inc.h"
+
 #include <memory>
 
 class CItemData;

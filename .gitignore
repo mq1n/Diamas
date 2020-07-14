@@ -28,6 +28,7 @@ _vsproj/
 /[Bb]in/
 [Bb]in_public/*
 ![Bb]in_public/.gitkeep
+/cmake-build-*
 
 # Visual Studio 2015 cache/options directory
 .vs/

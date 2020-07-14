@@ -1,6 +1,6 @@
 #pragma once
-#include <stdint.h>
-#include "../../common/defines.h"
+#include <cstdint>
+#include "defines.h"
 
 class CItemVnumHelper
 {

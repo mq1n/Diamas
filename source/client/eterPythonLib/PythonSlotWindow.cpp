@@ -3,7 +3,6 @@
 #include "../eterBase/Filename.h"
 #include "PythonWindow.h"
 #include "PythonSlotWindow.h"
-#include "../eterXCLient/locale_inc.h"
 
 //#define __RENDER_SLOT_AREA__
 

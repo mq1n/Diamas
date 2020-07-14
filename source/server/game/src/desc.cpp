@@ -6,7 +6,6 @@
 #include "desc_manager.h"
 #include "char.h"
 #include "protocol.h"
-#include "packet.h"
 #include "messenger_manager.h"
 #include "sectree_manager.h"
 #include "p2p.h"

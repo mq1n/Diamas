@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "PythonPlayer.h"
 #include "PythonApplication.h"
-#include "Locale_inc.h"
 #include "PythonDynamicModuleNames.h"
 
 extern const uint32_t c_iSkillIndex_Tongsol	= 121;

@@ -808,7 +808,7 @@ bool Cube_InformationInitialize()
 			{
 				for (TCubeValueVector::iterator existMaterialIter = existInfo.material.begin(); existInfo.material.end() != existMaterialIter; ++existMaterialIter)
 				{
-					TItemTable* existMaterialProto = ITEM_MANAGER::Instance().GetTable(existMaterialIter->vnum);
+					SItemTable_Server* existMaterialProto = ITEM_MANAGER::Instance().GetTable(existMaterialIter->vnum);
 					if (nullptr == existMaterialProto)
 					{
 						sys_err("There is no item(%u)", existMaterialIter->vnum);
@@ -822,7 +822,7 @@ bool Cube_InformationInitialize()
 						// 중복되는 부분이 있는지 검색한다
 						for (TCubeValueVector::iterator currentMaterialIter = materialInfo.material.begin(); materialInfo.material.end() != currentMaterialIter; ++currentMaterialIter)
 						{
-							TItemTable* currentMaterialProto = ITEM_MANAGER::Instance().GetTable(currentMaterialIter->vnum);
+							SItemTable_Server* currentMaterialProto = ITEM_MANAGER::Instance().GetTable(currentMaterialIter->vnum);
 							SItemNameAndLevel currentItemInfo = SplitItemNameAndLevelFromName(currentMaterialProto->szName);
 
 							if (currentItemInfo.name == existItemInfo.name)

@@ -1,4 +1,5 @@
 #pragma once
+#include "../../common/defines.h"
 
 #include "../eterLib/MSApplication.h"
 #include "../eterLib/Input.h"
@@ -15,7 +16,6 @@
 #include "../eterSecurity/PythonStackCheck.h"
 #include "../eterSecurity/AnticheatManager.h"
 
-#include "Locale_inc.h"
 #include "PythonDynamicModuleNames.h"
 #include "PythonEventManager.h"
 #include "PythonPlayer.h"

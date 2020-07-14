@@ -6,7 +6,6 @@
 #include "desc_client.h"
 #include "desc_manager.h"
 #include "buffer_manager.h"
-#include "packet.h"
 #include "protocol.h"
 #include "char.h"
 #include "char_manager.h"
@@ -427,7 +426,7 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 			{
 				if (ch->GetDesc())
 				{
-					TItemTable * pTable = ITEM_MANAGER::Instance().GetTable(ITEM_PRISM);
+					SItemTable_Server * pTable = ITEM_MANAGER::Instance().GetTable(ITEM_PRISM);
 
 					if (pTable)
 					{
@@ -601,7 +600,7 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 	int32_t processReturn = ProcessTextTag(ch, buf, buflen);
 	if (processReturn)
 	{
-		const TItemTable* pTable = ITEM_MANAGER::Instance().GetTable(ITEM_PRISM);
+		const SItemTable_Server* pTable = ITEM_MANAGER::Instance().GetTable(ITEM_PRISM);
 
 		if (nullptr != pTable)
 		{

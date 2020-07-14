@@ -161,8 +161,7 @@ class WinSFHelper:
 			garbage_container_files = ["db.exe", "game.exe", "DevIL.dll"]
 
 		garbage_container_configs = [
-			"\\ayar\\proto\\mob_proto.txt","\\ayar\\proto\\mob_names.txt", "\\ayar\\proto\\item_names.txt", "\\ayar\\proto\\item_proto.txt",
-			"\\db\\mob_proto.txt","\\db\\mob_names.txt", "\\db\\item_names.txt", "\\db\\item_proto.txt", "\\db\\object_proto.txt",
+			"\\db\\mob_proto.csv","\\db\\mob_names.txt", "\\db\\item_names.txt", "\\db\\item_proto.csv", "\\db\\object_proto.csv",
 			"\\ayar\\kanal_config.txt", "\\ayar\\game99_config.txt", "\\ayar\\auth_config.txt", "\\ayar\\db_conf.json"
 		]
 
@@ -223,8 +222,8 @@ class WinSFHelper:
 			["kanal\\{}".format(container_core[0]),  "..\\Bin\\game_server.exe"],
 
 			["db\\item_names.txt",   "..\\share\\conf\\item_names.txt"], ["db\\mob_names.txt", "..\\share\\conf\\mob_names.txt"],
-			["db\\item_proto.txt",   "..\\share\\conf\\item_proto.txt"], ["db\\mob_proto.txt", "..\\share\\conf\\mob_proto.txt"],
-			["db\\object_proto.txt", "..\\share\\conf\\object_proto.txt"],
+			["db\\item_proto.csv",   "..\\share\\conf\\item_proto.csv"], ["db\\mob_proto.csv", "..\\share\\conf\\mob_proto.csv"],
+			["db\\object_proto.csv", "..\\share\\conf\\object_proto.csv"],
 
 			["ayar\\auth_config.txt",  "auth\\CONFIG"],  ["ayar\\game99_config.txt", "game99\\CONFIG"],
 			["ayar\\kanal_config.txt", "kanal\\CONFIG"], ["ayar\\db_conf.json",      "db\\CONFIG.json"],

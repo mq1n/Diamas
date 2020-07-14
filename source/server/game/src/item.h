@@ -1,5 +1,4 @@
 #pragma once
-#include "../../common/tables.h"
 #include "entity.h"
 #include "gposition.h"
 
@@ -33,8 +32,8 @@ class CItem : public CEntity
 		void		SetID(uint32_t id)		{ m_dwID = id;	}
 		uint32_t		GetID()			{ return m_dwID; }
 
-		void			SetProto(const TItemTable * table);
-		TItemTable const *	GetProto() const	{ return m_pProto; }
+		void			SetProto(const SItemTable_Server * table);
+		SItemTable_Server const *	GetProto() const	{ return m_pProto; }
 
 		int32_t		GetGold();
 		int32_t		GetShopBuyPrice();
@@ -325,7 +324,7 @@ class CItem : public CEntity
 		int32_t		GiveMoreTime_Fix(uint32_t dwTime);
 
 	private:
-		TItemTable const * m_pProto;		// «¡∑Œ≈‰ ≈∏¿Ÿ
+		SItemTable_Server const * m_pProto;		// «¡∑Œ≈‰ ≈∏¿Ÿ
 
 		uint32_t		m_dwVnum;
 		LPCHARACTER	m_pOwner;

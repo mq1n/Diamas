@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../../common/defines.h"
 #include "PythonWindow.h"
-#include "../eterXClient/Locale_inc.h" // ENABLE_HIGHLIGHT_NEW_ITEM
 
 namespace UI 
 {

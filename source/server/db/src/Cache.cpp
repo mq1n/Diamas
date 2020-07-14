@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Cache.h"
-#include "../../common/tables.h"
 #include "QID.h"
 #include "ClientManager.h"
 #include "Main.h"

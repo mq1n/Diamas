@@ -8,8 +8,6 @@
 #include "PrivManager.h"
 #include "Marriage.h"
 #include "ItemIDRangeManager.h"
-#include <signal.h>
-#include "../../common/json_helper.h"
 #include "../../libthecore/include/winminidump.h"
 
 void SetPlayerDBName(const char* c_pszPlayerDBName);
@@ -55,7 +53,6 @@ int32_t main()
 
 	WriteVersion();
 
-	CConfigManager configManager;
 	CNetPoller poller;
 	CDBManager DBManager; 
 	CClientManager ClientManager;
@@ -122,13 +119,14 @@ bool Start()
 	thecore_init();
 
 	// Parse config file
-	if (!CConfigManager::Instance().ParseFile("CONFIG.json"))
+	msl::file_ptr config_file("CONFIG.json");
+	if (!config_file)
 	{
 		sys_err("Loading CONFIG.json failed.");
 		return false;		
 	}
 
-	auto stConfigBuffer = CConfigManager::Instance().GetConfigFileContent();
+	auto stConfigBuffer = config_file.read();
 	if (stConfigBuffer.empty())
 	{
 		sys_err("nullptr CONFIG.json content.");
@@ -137,7 +135,7 @@ bool Start()
 //	sys_log(0, "%s", stConfigBuffer.c_str());
 
 	Document document;
-	document.Parse<rapidjson::kParseStopWhenDoneFlag>(stConfigBuffer.c_str());
+	document.Parse<rapidjson::kParseStopWhenDoneFlag>(stConfigBuffer.data());
 
 	if (document.HasParseError())
 	{
@@ -312,7 +310,7 @@ bool Start()
 
 	sys_log(0, "ClientManager initializing...");
 
-	if (!CClientManager::Instance().Initialize(stConfigBuffer))
+	if (!CClientManager::Instance().Initialize(stConfigBuffer.data()))
 	{
 		sys_log(0, "ClientManager initialization failed.");
 		return false;

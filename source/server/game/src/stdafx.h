@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cfloat>
 #include <cctype>
+#include <ctime>
 #include <algorithm>
 #include <list>
 #include <map>
@@ -12,11 +13,13 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include <array>
 #include <unordered_map>
 #include <unordered_set>
 #include <sstream>
 #include <stack>
 #include <functional>
+#include <fstream>
 
 #include "debug_allocator.h"
 #include "typedef.h"

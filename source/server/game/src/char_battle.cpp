@@ -27,7 +27,6 @@
 #include "shop_manager.h"
 #include "dev_log.h"
 #include "ani.h"
-#include "packet.h"
 #include "party.h"
 #include "affect.h"
 #include "guild.h"

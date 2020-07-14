@@ -5,7 +5,6 @@
 #include "ItemManager.h"
 #include "RaceData.h"
 #include "WeaponTrace.h"
-#include "../eterXClient/locale_inc.h"
 
 BOOL USE_WEAPON_SPECULAR = TRUE;
 

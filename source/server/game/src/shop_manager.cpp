@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "shop_manager.h"
 #include "../../libgame/include/grid.h"
 #include "constants.h"
 #include "utils.h"
@@ -11,14 +12,12 @@
 #include "item.h"
 #include "item_manager.h"
 #include "buffer_manager.h"
-#include "packet.h"
 #include "log.h"
 #include "db.h"
 #include "quest_manager.h"
 #include "mob_manager.h"
 #include "locale_service.h"
 #include "desc_client.h"
-#include "shop_manager.h"
 #include "group_text_parse_tree.h"
 #include "shop_extented.h"
 #include "shop_manager.h"
@@ -368,8 +367,8 @@ void CShopManager::Sell(LPCHARACTER ch, uint8_t bCell, uint8_t bCount)
 
 bool CompareShopItemName(const SShopItemTable& lhs, const SShopItemTable& rhs)
 {
-	TItemTable* lItem = ITEM_MANAGER::Instance().GetTable(lhs.vnum);
-	TItemTable* rItem = ITEM_MANAGER::Instance().GetTable(rhs.vnum);
+	SItemTable_Server* lItem = ITEM_MANAGER::Instance().GetTable(lhs.vnum);
+	SItemTable_Server* rItem = ITEM_MANAGER::Instance().GetTable(rhs.vnum);
 	if (lItem && rItem)
 		return strcmp(lItem->szLocaleName, rItem->szLocaleName) < 0;
 	return true;
@@ -471,7 +470,7 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 
 	for (size_t i = 0; i < shopItems.size(); i++)
 	{
-		TItemTable * item_table = ITEM_MANAGER::Instance().GetTable(shopItems[i].vnum);
+		SItemTable_Server * item_table = ITEM_MANAGER::Instance().GetTable(shopItems[i].vnum);
 		if (!item_table)
 		{
 			sys_err("vnum(%d) of group items of group %s does not exist", shopItems[i].vnum, pNode->GetNodeName().c_str());

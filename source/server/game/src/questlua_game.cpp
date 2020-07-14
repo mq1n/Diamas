@@ -6,7 +6,6 @@
 #include "item_manager.h"
 #include "item.h"
 #include "cmd.h"
-#include "packet.h"
 #include "desc_manager.h"
 #include "party.h"
 

@@ -4,11 +4,6 @@
 
 struct SShopTable;
 
-typedef enum
-{
-	SHOP_COIN_TYPE_GOLD, // DEFAULT VALUE
-	SHOP_COIN_TYPE_SECONDARY_COIN,
-} EShopCoinType;
 typedef struct SShopTableEx : SShopTable
 {
 	std::string name;

@@ -3,7 +3,6 @@
 #include "item.h"
 #include "item_manager.h"
 #include "unique_item.h"
-#include "packet.h"
 #include "desc.h"
 #include "char.h"
 #include "dragon_soul_table.h"

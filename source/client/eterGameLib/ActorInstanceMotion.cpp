@@ -2,7 +2,6 @@
 #include "ActorInstance.h"
 #include "RaceData.h"
 #include "FlyHandler.h"
-#include "../eterXClient/locale_inc.h"
 
 uint32_t CActorInstance::__GetMotionType()
 {

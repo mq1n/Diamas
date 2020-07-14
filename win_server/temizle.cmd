@@ -1,1 +1,1 @@
-c:/python27/python.exe m2panel.py temizle 86
+c:/python27/python.exe m2panel.py temizle debug 1

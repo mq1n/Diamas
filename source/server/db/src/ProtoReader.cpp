@@ -44,8 +44,7 @@ int32_t get_Item_Type_Value(const std::string &inputString)
 		"ITEM_GACHA"
 	};
 
-	
-	int32_t retInt = -1;
+	int32_t retValue = -1;
 
 	for (uint32_t i = 0; arType->size(); ++i)
 	{
@@ -54,13 +53,13 @@ int32_t get_Item_Type_Value(const std::string &inputString)
 		if (inputString.find(tempString) != std::string::npos &&
 			tempString.find(inputString) != std::string::npos)
 		{
-			retInt = i;
+			retValue = i;
 			break;
 		}
 	}
 
-	return retInt;
-
+	assert(retValue != -1);
+	return retValue;
 }
 
 int32_t get_Item_SubType_Value(uint32_t type_value, const std::string &inputString) 
@@ -233,9 +232,8 @@ int32_t get_Item_SubType_Value(uint32_t type_value, const std::string &inputStri
 	}
 
 	// Don't process if there are no subtypes for this type 
-	if (subtypes.count(type_value) == 0) {
+	if (subtypes.count(type_value) == 0)
 		return 0;
-	}
 	
 	std::string trimmedInput = trim(inputString);
 
@@ -333,7 +331,7 @@ int32_t get_Item_Flag_Value(const std::string &inputString)
 	for (size_t i = 0; i < _countof(arFlag); i++)
 	{
 		std::string tempString = arFlag[i];
-		for (size_t j = 0; j < arInputString.size(); j++) // TODO: arInputString.size() && j < 30
+		for (size_t j = 0; j < arInputString.size(); j++)
 		{
 			std::string tempString2 = arInputString[j];
 			if (tempString2.compare(tempString) == 0) 
@@ -437,7 +435,7 @@ int32_t get_Item_LimitType_Value(const std::string &inputString)
 		"TIMER_BASED_ON_WEAR"
 	};
 	
-	int32_t retInt = -1;
+	int32_t retValue = -1;
 
 	for (uint32_t i = 0; i < _countof(arLimitType); i++)
 	{
@@ -446,12 +444,13 @@ int32_t get_Item_LimitType_Value(const std::string &inputString)
 
 		if (tempInputString.compare(tempString) == 0)
 		{
-			retInt = i;
+			retValue = i;
 			break;
 		}
 	}
 
-	return retInt;
+	assert(retValue != -1);
+	return retValue;
 }
 
 
@@ -570,12 +569,9 @@ int32_t get_Item_ApplyType_Value(const std::string &inputString)
 		}
 	}
 
+	assert(retValue != -1);
 	return retValue;
 }
-
-
-//몬스터 프로토도 �?는다.
-
 
 int32_t get_Mob_Rank_Value(const std::string &inputString)
 {
@@ -588,24 +584,23 @@ int32_t get_Mob_Rank_Value(const std::string &inputString)
 		"KING"
 	};
 
-	int32_t retInt = -1;
-	//cout << "Rank : " << rankStr << " -> ";
-	int32_t sizeOf = sizeof(arRank)/sizeof(arRank[0]);
-	for (int32_t j=0;j<sizeOf;j++) {
-		std::string tempString = arRank[j];
+	int32_t retValue = -1;
+
+	for (uint32_t i = 0; i < _countof(arRank); i++)
+	{
+		std::string tempString = arRank[i];
 		std::string tempInputString = trim(inputString);
-		if	(tempInputString.compare(tempString)==0)
+
+		if (tempInputString.compare(tempString) == 0)
 		{
-			//cout << j << " ";
-			retInt =  j;
+			retValue =  i;
 			break;
 		}
 	}
-	//cout << endl;
 
-	return retInt;
+	assert(retValue != -1);
+	return retValue;
 }
-
 
 int32_t get_Mob_Type_Value(const std::string &inputString)
 {
@@ -622,22 +617,22 @@ int32_t get_Mob_Type_Value(const std::string &inputString)
 		"GOTO"
 	};
 
-	int32_t retInt = -1;
-	//cout << "Type : " << typeStr << " -> ";
-	int32_t sizeOf = sizeof(arType)/sizeof(arType[0]);
-	for (int32_t j=0;j<sizeOf ;j++) {
-		std::string tempString = arType[j];
+	int32_t retValue = -1;
+
+	for (uint32_t i = 0; i < _countof(arType); i++)
+	{
+		std::string tempString = arType[i];
 		std::string tempInputString = trim(inputString);
-		if	(tempInputString.compare(tempString)==0)
+
+		if	(tempInputString.compare(tempString) == 0)
 		{
-			//cout << j << " ";
-			retInt =  j;
+			retValue =  i;
 			break;
 		}
 	}
-	//cout << endl;
 
-	return retInt;
+	assert(retValue != -1);
+	return retValue;
 }
 
 int32_t get_Mob_BattleType_Value(const std::string &inputString)
@@ -653,22 +648,22 @@ int32_t get_Mob_BattleType_Value(const std::string &inputString)
 		"SUPER_TANKER"
 	};
 
-	int32_t retInt = -1;
-	//cout << "Battle Type : " << battleTypeStr << " -> ";
-	int32_t sizeOf = sizeof(arBattleType)/sizeof(arBattleType[0]);
-	for (int32_t j=0;j<sizeOf ;j++) {
-		std::string tempString = arBattleType[j];
+	int32_t retValue = -1;
+
+	for (uint32_t i = 0; i < _countof(arBattleType); i++)
+	{
+		std::string tempString = arBattleType[i];
 		std::string tempInputString = trim(inputString);
-		if	(tempInputString.compare(tempString)==0)
+
+		if (tempInputString.compare(tempString) == 0)
 		{
-			//cout << j << " ";
-			retInt =  j;
+			retValue = i;
 			break;
 		}
 	}
-	//cout << endl;
 
-	return retInt;
+	assert(retValue != -1);
+	return retValue;
 }
 
 int32_t get_Mob_Size_Value(const std::string &inputString)
@@ -679,7 +674,7 @@ int32_t get_Mob_Size_Value(const std::string &inputString)
 		"BIG"
 	};
 
-	int32_t retInt = 0;
+	int32_t retValue = 0;
 
 	for (uint32_t i = 0; i < _countof(arSize); i++)
 	{
@@ -688,14 +683,13 @@ int32_t get_Mob_Size_Value(const std::string &inputString)
 		std::string tempInputString = trim(inputString);
 		if (tempInputString.compare(tempString) == 0) 
 		{
-			retInt =  i + 1;
+			retValue = i + 1;
 			break;
 		}
 	}
 
-	return retInt;
+	return retValue;
 }
-
 int32_t get_Mob_AIFlag_Value(const std::string &inputString)
 {
 	std::string arAIFlag[] = {
@@ -762,7 +756,7 @@ int32_t get_Mob_RaceFlag_Value(const std::string &inputString)
 	for (size_t i = 0; i < _countof(arRaceFlag); i++)
 	{
 		std::string tempString = arRaceFlag[i];
-		for (size_t j = 0; j < arInputString.size(); j++) // TODO: arInputString.size() && j < 30
+		for (size_t j = 0; j < arInputString.size(); j++)
 		{
 			std::string tempString2 = arInputString.at(j);
 			if (tempString2.compare(tempString) == 0) 
@@ -814,16 +808,19 @@ int32_t get_Mob_ImmuneFlag_Value(const std::string &inputString)
 bool Set_Proto_Mob_Table(TMobTable *mobTable,const cCsvTable &csvTable,std::map<int32_t,const char*> &nameMap)
 {
 	int32_t col = 0;
+
 	str_to_number(mobTable->dwVnum, csvTable.AsStringByIndex(col++));
 	strlcpy(mobTable->szName, csvTable.AsStringByIndex(col++), sizeof(mobTable->szName));
 
 	// Set locale names
-	std::map<int32_t,const char*>::iterator it;
-	it = nameMap.find(mobTable->dwVnum);
-	if (it != nameMap.end()) {
+	const auto it = nameMap.find(mobTable->dwVnum);
+	if (it != nameMap.end())
+	{
 		const char * localeName = it->second;
 		strlcpy(mobTable->szLocaleName, localeName, sizeof (mobTable->szLocaleName));
-	} else {
+	}
+	else
+	{
 		strlcpy(mobTable->szLocaleName, mobTable->szName, sizeof (mobTable->szLocaleName));
 	}
 
@@ -924,7 +921,7 @@ bool Set_Proto_Mob_Table(TMobTable *mobTable,const cCsvTable &csvTable,std::map<
 	return true;
 }
 
-bool Set_Proto_Item_Table(TItemTable *itemTable,const cCsvTable &csvTable,std::map<int32_t,const char*> &nameMap)
+bool Set_Proto_Item_Table(SItemTable_Server *itemTable,const cCsvTable &csvTable,std::map<int32_t,const char*> &nameMap)
 {
 	int32_t col = 0;
 
@@ -980,7 +977,7 @@ bool Set_Proto_Item_Table(TItemTable *itemTable,const cCsvTable &csvTable,std::m
 			sys_err("ItemProto Reading Failed : Invalid value. (index: %d, col: %d, value: %s)", i, col, csvTable.AsStringByIndex(col));
 			sys_err("\t%d ~ %d Values: %s", 0, i, dataStream.str().c_str());
 
-			exit(0);
+			abort();
 		}
 
 		col = col + 1;
@@ -1025,8 +1022,8 @@ bool Set_Proto_Item_Table(TItemTable *itemTable,const cCsvTable &csvTable,std::m
 	itemTable->dwFlags = dataArray[6];
 	itemTable->dwWearFlags = dataArray[7];
 	itemTable->dwImmuneFlag = dataArray[8];
-	itemTable->dwGold = dataArray[9];
-	itemTable->dwShopBuyPrice = dataArray[10];
+	itemTable->dwISellItemPrice = dataArray[9];
+	itemTable->dwIBuyItemPrice = dataArray[10];
 	itemTable->dwRefinedVnum = dataArray[11];
 	itemTable->wRefineSet = dataArray[12];
 	itemTable->bAlterToMagicItemPct = dataArray[13];

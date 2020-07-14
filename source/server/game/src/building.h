@@ -1,5 +1,6 @@
 #pragma once
-#include "../../common/building.h"
+#include "../../../common/building.h"
+#include "char.h"
 
 namespace building
 {

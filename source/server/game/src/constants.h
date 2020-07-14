@@ -1,5 +1,4 @@
 #pragma once
-#include "../../common/tables.h"
 
 // MAP_INDEX
 enum EMapIndexList

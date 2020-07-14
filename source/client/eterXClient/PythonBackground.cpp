@@ -14,7 +14,6 @@
 #include "PythonNetworkStream.h"
 #include "PythonMiniMap.h"
 #include "PythonSystem.h"
-#include "Locale_inc.h"
 
 std::string g_strEffectName = "d:/ymir work/effect/etc/direction/direction_land.mse";
 

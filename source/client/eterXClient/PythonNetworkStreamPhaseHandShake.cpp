@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "PythonNetworkStream.h"
 #include "PythonApplication.h"
-#include "Packet.h"
 
 // HandShake ---------------------------------------------------------------------------
 void CPythonNetworkStream::HandShakePhase()

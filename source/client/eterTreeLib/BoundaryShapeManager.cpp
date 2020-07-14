@@ -1,10 +1,7 @@
-
 #include "StdAfx.h"
-
-#include <Windows.h>
-#include "../eterBase/Random.h"
-#include "../eterBase/file_ptr.h"
 #include "BoundaryShapeManager.h"
+#include "../../common/file_ptr.h"
+#include "../eterBase/Random.h"
 
 using namespace std;
 CBoundaryShapeManager::CBoundaryShapeManager() = default;

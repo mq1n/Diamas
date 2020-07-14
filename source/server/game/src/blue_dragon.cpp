@@ -10,7 +10,6 @@
 #include "affect.h"
 #include "blue_dragon_skill.h"
 #include "blue_dragon_binder.h"
-#include "packet.h"
 #include "motion.h"
 
 time_t UseBlueDragonSkill(LPCHARACTER pChar, uint32_t idx)

@@ -3,7 +3,6 @@
 #include "char.h"
 #include "char_manager.h"
 #include "motion.h"
-#include "packet.h"
 #include "buffer_manager.h"
 #include "unique_item.h"
 #include "wedding.h"

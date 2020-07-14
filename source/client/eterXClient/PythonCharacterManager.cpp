@@ -3,7 +3,6 @@
 #include "PythonBackground.h"
 #include "PythonNonPlayer.h"
 #include "AbstractPlayer.h"
-#include "Packet.h"
 #include "NetworkActorManager.h"
 #include "PythonNetworkStream.h"
 #include "../eterLib/Camera.h"

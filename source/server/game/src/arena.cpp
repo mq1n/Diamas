@@ -2,7 +2,6 @@
 #include <fstream>
 #include "constants.h"
 #include "config.h"
-#include "packet.h"
 #include "desc.h"
 #include "buffer_manager.h"
 #include "start_position.h"

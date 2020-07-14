@@ -3,25 +3,7 @@
 #include "PythonApplication.h"
 #include "PythonItem.h"
 #include "../eterBase/Timer.h"
-
 #include "AbstractPlayer.h"
-#include "Locale_inc.h"
-
-enum
-{
-	MAIN_RACE_WARRIOR_M,
-	MAIN_RACE_ASSASSIN_W,
-	MAIN_RACE_SURA_M,
-	MAIN_RACE_SHAMAN_W,
-	MAIN_RACE_WARRIOR_W,
-	MAIN_RACE_ASSASSIN_M,
-	MAIN_RACE_SURA_W,
-	MAIN_RACE_SHAMAN_M,
-#ifdef ENABLE_WOLFMAN_CHARACTER
-	MAIN_RACE_WOLFMAN_M,
-#endif
-	MAIN_RACE_MAX_NUM
-};
 
 const uint32_t POINT_MAGIC_NUMBER = 0xe73ac1da;
 

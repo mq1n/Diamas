@@ -1,8 +1,7 @@
 #pragma once
-
+#include "../../common/defines.h"
 #include "../eterEffectLib/EffectManager.h"
 #include "FlyingObjectManager.h"
-#include "../eterXClient/locale_inc.h"
 
 namespace NMotionEvent
 {

@@ -227,7 +227,7 @@ void CItem::ChangeAttribute(const int32_t* aiChangeProb)
 	if (iAttributeCount == 0)
 		return;
 
-	TItemTable const * pProto = GetProto();
+	SItemTable_Server const * pProto = GetProto();
 
 	if (pProto && pProto->sAddonType)
 	{

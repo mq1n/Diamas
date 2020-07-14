@@ -3,7 +3,6 @@
 #include "config.h"
 #include "event.h"
 #include "minilzo.h"
-#include "packet.h"
 #include "desc_manager.h"
 #include "item_manager.h"
 #include "char.h"

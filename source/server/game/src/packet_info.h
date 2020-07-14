@@ -1,5 +1,4 @@
 #pragma once
-#include "packet.h"
 
 typedef struct SPacketElement
 {
@@ -27,7 +26,7 @@ class CPacketInfo
 		TPacketElement * GetElement(int32_t header);
 
 	protected:
-		std::map<int32_t, TPacketElement *> m_pPacketMap;
+		std::map <int32_t, TPacketElement *> m_pPacketMap;
 		TPacketElement * m_pCurrentPacket;
 		uint32_t m_dwStartTime;
 };

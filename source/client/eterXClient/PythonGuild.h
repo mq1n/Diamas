@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Packet.h"
-
 class CPythonGuild : public CSingleton<CPythonGuild>
 {
 	public:

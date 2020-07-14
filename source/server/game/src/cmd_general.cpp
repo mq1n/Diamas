@@ -6,7 +6,6 @@
 #include "char.h"
 #include "char_manager.h"
 #include "motion.h"
-#include "packet.h"
 #include "affect.h"
 #include "pvp.h"
 #include "start_position.h"
@@ -31,7 +30,6 @@
 #include "gposition.h"
 #include "shop.h"
 #include "shop_manager.h"
-#include "../../common/VnumHelper.h"
 #include "battleground.h"
 
 ACMD(do_user_horse_ride)

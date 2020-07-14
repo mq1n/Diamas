@@ -6,7 +6,6 @@
 #include "pool.h"
 #endif
 
-#include "packet.h"
 #include "vid.h"
 #include <unordered_map>
 

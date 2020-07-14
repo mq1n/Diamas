@@ -45,11 +45,8 @@ bool CPythonNonPlayer::LoadNonPlayerData(const char * c_szFileName)
 
 	uint32_t structSize = zObj.GetSize() / dwElements;
 	uint32_t structDiff = zObj.GetSize() % dwElements;
-#ifdef ENABLE_PROTOSTRUCT_AUTODETECT
-	if (structDiff != 0 && !TMobTableAll::IsValidStruct(structSize))
-#else
+
 	if ((zObj.GetSize() % sizeof(TMobTable)) != 0)
-#endif
 	{
 		TraceError("CPythonNonPlayer::LoadNonPlayerData: invalid size %u check data format. structSize %u, structDiff %u", zObj.GetSize(),
 				   structSize, structDiff);
@@ -58,12 +55,7 @@ bool CPythonNonPlayer::LoadNonPlayerData(const char * c_szFileName)
 
 	for (uint32_t i = 0; i < dwElements; ++i)
 	{
-#ifdef ENABLE_PROTOSTRUCT_AUTODETECT
-		TMobTable t = {0};
-		TMobTableAll::Process(zObj.GetBuffer(), structSize, i, t);
-#else
-		CPythonNonPlayer::TMobTable & t = *((CPythonNonPlayer::TMobTable *) zObj.GetBuffer() + i);
-#endif
+		auto & t = *((TMobTable *)zObj.GetBuffer() + i);
 		m_NonPlayerDataMap.emplace(t.dwVnum, t);
 	}
 
@@ -93,7 +85,7 @@ bool CPythonNonPlayer::GetInstanceType(uint32_t dwVnum, uint8_t* pbType)
 	return true;
 }
 
-const CPythonNonPlayer::TMobTable * CPythonNonPlayer::GetTable(uint32_t dwVnum)
+const TMobTable * CPythonNonPlayer::GetTable(uint32_t dwVnum)
 {
 	auto itor = m_NonPlayerDataMap.find(dwVnum);
 	if (itor == m_NonPlayerDataMap.end())
@@ -118,7 +110,7 @@ uint8_t CPythonNonPlayer::GetEventType(uint32_t dwVnum)
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBLEVEL)
 uint32_t CPythonNonPlayer::GetMonsterLevel(uint32_t dwVnum)
 {
-	const CPythonNonPlayer::TMobTable * c_pTable = GetTable(dwVnum);
+	const TMobTable * c_pTable = GetTable(dwVnum);
 	if (!c_pTable)
 		return 0;
 
@@ -129,7 +121,7 @@ uint32_t CPythonNonPlayer::GetMonsterLevel(uint32_t dwVnum)
 #if defined(WJ_SHOW_MOB_INFO) && defined(ENABLE_SHOW_MOBAIFLAG)
 bool CPythonNonPlayer::IsAggressive(uint32_t dwVnum)
 {
-	const CPythonNonPlayer::TMobTable * c_pTable = GetTable(dwVnum);
+	const TMobTable * c_pTable = GetTable(dwVnum);
 	if (!c_pTable)
 		return 0;
 

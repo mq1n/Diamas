@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "PythonNetworkStream.h"
-#include "Packet.h"
 #include "AccountConnector.h"
 
 // Login ---------------------------------------------------------------------------

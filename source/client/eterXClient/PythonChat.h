@@ -1,6 +1,4 @@
 #pragma once
-
-#include "Packet.h"
 #include "AbstractChat.h"
 
 class CWhisper

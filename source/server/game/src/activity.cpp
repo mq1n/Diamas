@@ -1,9 +1,7 @@
 #include "stdafx.h"
-#include <ctime>
 #include "activity.h"
 #include "char.h"
 #include "desc_client.h"
-#include "../../common/tables.h"
 
 std::map<uint32_t, std::vector<uint32_t>> ActivityHandler::killMap;
 

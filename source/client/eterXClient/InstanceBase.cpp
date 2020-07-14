@@ -6,23 +6,16 @@
 #include "PythonCharacterManager.h"
 #include "AbstractPlayer.h"
 #include "AbstractApplication.h"
-#include "Packet.h"
-
 #include "../eterLib/StateManager.h"
 #include "../eterGameLib/ItemManager.h"
-#include "locale_inc.h"
-
-#ifdef WJ_SHOW_MOB_INFO
 #include "PythonSystem.h"
 #include "PythonTextTail.h"
-#endif
 
 BOOL HAIR_COLOR_ENABLE=FALSE;
 BOOL USE_ARMOR_SPECULAR=FALSE;
 BOOL RIDE_HORSE_ENABLE=TRUE;
 const float c_fDefaultRotationSpeed = 1200.0f;
 const float c_fDefaultHorseRotationSpeed = 300.0f;
-
 
 bool IsWall(uint32_t race)
 {

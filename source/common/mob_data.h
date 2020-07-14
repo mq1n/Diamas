@@ -1,5 +1,7 @@
 #pragma once
-
+#include <cstdint>
+#include "defines.h"
+#include "constants.h"
 
 enum EOnClickEvents
 {
@@ -79,3 +81,95 @@ enum EMobResists
 #endif
 	MOB_RESISTS_MAX_NUM
 };
+
+enum EMobTypes
+{
+	MONSTER,
+	NPC,
+	STONE,
+	WARP,
+	DOOR,
+	BUILDING,
+	PC,
+	POLYMORPH_PC,
+	HORSE,
+	GOTO
+};
+
+
+#pragma pack(push)
+#pragma pack(1)
+typedef struct SMobSkillLevel
+{
+	uint32_t       dwVnum;
+	uint8_t        bLevel;
+} TMobSkillLevel;
+
+typedef struct SMobTable
+{
+	uint32_t       dwVnum;
+	char        szName[CHARACTER_NAME_MAX_LEN + 1];
+	char        szLocaleName[CHARACTER_NAME_MAX_LEN + 1];
+
+	uint8_t        bType;                  // Monster, NPC
+	uint8_t        bRank;                  // PAWN, KNIGHT, KING
+	uint8_t        bBattleType;            // MELEE, etc..
+	uint8_t        bLevel;                 // Level
+	uint8_t        bSize;
+
+	uint32_t       dwGoldMin;
+	uint32_t       dwGoldMax;
+	uint32_t       dwExp;
+	uint32_t       dwMaxHP;
+	uint8_t        bRegenCycle;
+	uint8_t        bRegenPercent;
+	uint16_t        wDef;
+
+	uint32_t       dwAIFlag;
+	uint32_t       dwRaceFlag;
+	uint32_t       dwImmuneFlag;
+
+	uint8_t        bStr, bDex, bCon, bInt;
+	uint32_t       dwDamageRange[2];
+
+	int16_t       sAttackSpeed;
+	int16_t       sMovingSpeed;
+	uint8_t        bAggresiveHPPct;
+	uint16_t        wAggressiveSight;
+	uint16_t        wAttackRange;
+
+	char        cEnchants[MOB_ENCHANTS_MAX_NUM];
+	char        cResists[MOB_RESISTS_MAX_NUM];
+
+	uint32_t       dwResurrectionVnum;
+	uint32_t       dwDropItemVnum;
+
+	uint8_t        bMountCapacity;
+	uint8_t        bOnClickType;
+
+	uint8_t        bEmpire;
+	char        szFolder[64 + 1];
+
+	float       fDamMultiply;
+
+	uint32_t       dwSummonVnum;
+	uint32_t       dwDrainSP;
+	uint32_t		dwMonsterColor;
+	uint32_t       dwPolymorphItemVnum;
+
+	TMobSkillLevel	Skills[MOB_SKILL_MAX_NUM];
+
+	uint8_t		bBerserkPoint;
+	uint8_t		bStoneSkinPoint;
+	uint8_t		bGodSpeedPoint;
+	uint8_t		bDeathBlowPoint;
+	uint8_t		bRevivePoint;
+
+	bool operator<(const SMobTable& rhs)
+	{
+		return dwVnum < rhs.dwVnum;
+	}
+} TMobTable;
+
+#pragma pack(pop)
+

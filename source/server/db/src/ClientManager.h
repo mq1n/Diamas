@@ -3,7 +3,6 @@
 #include <unordered_set>
 
 #include "../../../common/common_incl.hpp"
-#include "../../common/building.h"
 
 #include "Peer.h"
 #include "DBManager.h"
@@ -192,9 +191,6 @@ class CClientManager : public CNetBase, public CSingleton<CClientManager>
 	bool		InitializeObjectProto();
 	bool		InitializeObjectTable();
 
-	// mob_proto.txt, item_proto.txt에서 읽은 mob_proto, item_proto를 real db에 반영.
-	//	item_proto, mob_proto를 db에 반영하지 않아도, 게임 돌아가는데는 문제가 없지만,
-	//	운영툴 등에서 db의 item_proto, mob_proto를 읽어 쓰기 때문에 문제가 발생한다.
 	bool		MirrorMobTableIntoDB();
 	bool		MirrorItemTableIntoDB();
 
@@ -406,8 +402,8 @@ class CClientManager : public CNetBase, public CSingleton<CClientManager>
 	int32_t					m_iPlayerDeleteLevelLimitLower;
 
 	std::vector<TMobTable>			m_vec_mobTable;
-	std::vector<TItemTable>			m_vec_itemTable;
-	std::map<uint32_t, TItemTable *>		m_map_itemTableByVnum;
+	std::vector<SItemTable_Server>			m_vec_itemTable;
+	std::map<uint32_t, SItemTable_Server *>		m_map_itemTableByVnum;
 
 	int32_t					m_iShopTableSize;
 	TShopTable *				m_pShopTable;

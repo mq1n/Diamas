@@ -9,12 +9,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${OUTPUT_DIR})
 
 file(GLOB HEADER_FILES
-    "include/*.h"
-    "include/*.hpp"
+    "${PROJECT_SOURCE_DIR}/include/*.h"
+    "${PROJECT_SOURCE_DIR}/../../source/common/singleton.h"
+    "${PROJECT_SOURCE_DIR}/../../source/client/eterBase/tea.h"
+    "${PROJECT_SOURCE_DIR}/../../source/client/eterBase/lzo.h"
+    "${PROJECT_SOURCE_DIR}/../../source/server/db/src/CsvReader.h"
+    "${PROJECT_SOURCE_DIR}/../../source/server/db/src/ProtoReader.h"
 )
 file(GLOB SOURCE_FILES
-    "src/*.c"
-    "src/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/*.cpp"
+    "${PROJECT_SOURCE_DIR}/../../source/client/eterBase/tea.cpp"
+    "${PROJECT_SOURCE_DIR}/../../source/client/eterBase/lzo.cpp"
+    "${PROJECT_SOURCE_DIR}/../../source/server/db/src/CsvReader.cpp"
+    "${PROJECT_SOURCE_DIR}/../../source/server/db/src/ProtoReader.cpp"
 )
 file(GLOB OTHER_INPUT_FILES
     "*.rc"

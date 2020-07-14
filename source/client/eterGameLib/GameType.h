@@ -2,9 +2,9 @@
 
 #include <string>
 
+#include "../../common/defines.h"
 #include "../eterLib/TextFileLoader.h"
 #include "../eterLib/CollisionData.h"
-#include "../eterXClient/locale_inc.h"
 
 extern float g_fGameFPS;
 

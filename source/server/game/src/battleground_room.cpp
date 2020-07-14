@@ -4,7 +4,6 @@
 #include "config.h"
 #include "quest_manager.h"
 #include "start_position.h"
-#include "packet.h"
 #include "buffer_manager.h"
 #include "log.h"
 #include "char.h"

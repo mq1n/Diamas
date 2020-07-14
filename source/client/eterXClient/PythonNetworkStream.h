@@ -1,12 +1,11 @@
 #pragma once
+#include "../../common/defines.h"
 #include "../eterLib/FuncObject.h"
 #include "../eterLib/NetStream.h"
 #include "../eterLib/NetPacketHeaderMap.h"
 #include "../eterSecurity/CheatQueueManager.h"
 
 #include "InsultChecker.h"
-#include "Locale_inc.h"
-#include "Packet.h"
 
 class CInstanceBase;
 class CNetworkActorManager;

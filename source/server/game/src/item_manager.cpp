@@ -56,13 +56,13 @@ void ITEM_MANAGER::GracefulShutdown()
 	m_set_pkItemForDelayedSave.clear();
 }
 
-bool ITEM_MANAGER::Initialize(TItemTable * table, int32_t size)
+bool ITEM_MANAGER::Initialize(SItemTable_Server * table, int32_t size)
 {
 	if (!m_vec_prototype.empty())
 		m_vec_prototype.clear();
 
 	m_vec_prototype.resize(size);
-	memcpy(&m_vec_prototype[0], table, sizeof(TItemTable) * size);
+	memcpy(&m_vec_prototype[0], table, sizeof(SItemTable_Server) * size);
 	for (int32_t i = 0; i < size; i++)
 	{
 		if (0 != m_vec_prototype[i].dwVnumRange)
@@ -86,7 +86,7 @@ bool ITEM_MANAGER::Initialize(TItemTable * table, int32_t size)
 		)
 			quest::CQuestManager::Instance().RegisterNPCVnum(m_vec_prototype[i].dwVnum);
 
-		m_map_vid.insert( std::map<uint32_t,TItemTable>::value_type( m_vec_prototype[i].dwVnum, m_vec_prototype[i] ) ); 
+		m_map_vid.insert( std::map<uint32_t,SItemTable_Server>::value_type( m_vec_prototype[i].dwVnum, m_vec_prototype[i] ) ); 
 		if ( g_bIsTestServer )
 			sys_log( 0, "ITEM_INFO %d %s ", m_vec_prototype[i].dwVnum, m_vec_prototype[i].szName );	
 	}
@@ -125,7 +125,7 @@ bool ITEM_MANAGER::Initialize(TItemTable * table, int32_t size)
 		LPITEM item = it->second;
 		++it;
 
-		const TItemTable* tableInfo = GetTable(item->GetOriginalVnum());
+		const SItemTable_Server* tableInfo = GetTable(item->GetOriginalVnum());
 
 		if (nullptr == tableInfo)
 		{
@@ -150,7 +150,7 @@ LPITEM ITEM_MANAGER::CreateItem(uint32_t vnum, uint32_t count, uint32_t id, bool
 		dwMaskVnum = GetMaskVnum(vnum);
 	}
 
-	const TItemTable* table = GetTable(vnum);
+	const SItemTable_Server* table = GetTable(vnum);
 
 	if (nullptr == table)
 		return nullptr;
@@ -594,7 +594,7 @@ LPITEM ITEM_MANAGER::FindByVID(uint32_t vid)
 	return (it->second);
 }
 
-TItemTable * ITEM_MANAGER::GetTable(uint32_t vnum)
+SItemTable_Server * ITEM_MANAGER::GetTable(uint32_t vnum)
 {
 	int32_t rnum = RealNumber(vnum);
 
@@ -602,7 +602,7 @@ TItemTable * ITEM_MANAGER::GetTable(uint32_t vnum)
 	{
 		for (size_t i = 0; i < m_vec_item_vnum_range_info.size(); i++)
 		{
-			TItemTable* p = m_vec_item_vnum_range_info[i];
+			SItemTable_Server* p = m_vec_item_vnum_range_info[i];
 			if ((p->dwVnum < vnum) &&
 				vnum < (p->dwVnum + p->dwVnumRange))
 			{
@@ -623,7 +623,7 @@ int32_t ITEM_MANAGER::RealNumber(uint32_t vnum)
 	bot = 0;
 	top = m_vec_prototype.size();
 
-	TItemTable * pTable = &m_vec_prototype[0];
+	SItemTable_Server * pTable = &m_vec_prototype[0];
 
 	while (1)
 	{
@@ -646,7 +646,7 @@ bool ITEM_MANAGER::GetVnum(const char * c_pszName, uint32_t & r_dwVnum)
 {
 	int32_t len = strlen(c_pszName);
 
-	TItemTable * pTable = &m_vec_prototype[0];
+	SItemTable_Server * pTable = &m_vec_prototype[0];
 
 	for (uint32_t i = 0; i < m_vec_prototype.size(); ++i, ++pTable)
 	{
@@ -664,7 +664,7 @@ bool ITEM_MANAGER::GetVnumByOriginalName(const char * c_pszName, uint32_t & r_dw
 {
 	int32_t len = strlen(c_pszName);
 
-	TItemTable * pTable = &m_vec_prototype[0];
+	SItemTable_Server * pTable = &m_vec_prototype[0];
 
 	for (uint32_t i = 0; i < m_vec_prototype.size(); ++i, ++pTable)
 	{
@@ -802,7 +802,7 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 
 		if (iPercent >= number(1, iRandRange))
 		{
-			TItemTable * table = GetTable(c_rInfo.m_dwVnum);
+			SItemTable_Server * table = GetTable(c_rInfo.m_dwVnum);
 
 			if (!table)
 				continue;
@@ -1107,7 +1107,7 @@ void ITEM_MANAGER::GetChestItemList(uint32_t dwChestVnum, std::vector<TChestDrop
 	{
 		for (int32_t i = 0; i < pGroup->GetGroupSize(); i++)
 		{
-			const TItemTable* itemTable = GetTable(pGroup->GetVnum(i));
+			const SItemTable_Server* itemTable = GetTable(pGroup->GetVnum(i));
 
 			if (itemTable)
 			{

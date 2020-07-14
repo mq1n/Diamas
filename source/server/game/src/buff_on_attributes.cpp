@@ -1,9 +1,7 @@
 #include "stdafx.h"
-#include "../../common/tables.h"
+#include "buff_on_attributes.h"
 #include "item.h"
 #include "char.h"
-#include "buff_on_attributes.h"
-#include <algorithm>
 
 CBuffOnAttributes::CBuffOnAttributes(LPCHARACTER pOwner, uint8_t point_type, std::vector <uint8_t>* p_vec_buff_wear_targets)
 :	m_pBuffOwner(pOwner), m_bPointType(point_type), m_p_vec_buff_wear_targets(p_vec_buff_wear_targets)

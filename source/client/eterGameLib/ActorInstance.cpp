@@ -8,15 +8,6 @@
 #include "../eterXClient/Locale.h"
 #include "../eterSecurity/CheatQueueManager.h"
 
-enum
-{
-#ifdef ENABLE_WOLFMAN_CHARACTER
-	MAIN_RACE_MAX_NUM = 9,
-#else
-	MAIN_RACE_MAX_NUM = 8,
-#endif
-};
-
 void CActorInstance::INSTANCEBASE_Deform()
 {
 	Deform();

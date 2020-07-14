@@ -1,28 +1,6 @@
 #pragma once
 #include "char.h"
 
-enum // unit : minute
-{
-	PARTY_ENOUGH_MINUTE_FOR_EXP_BONUS = 60, // 파티 결성 후 60분 후 부터 추가 경험치 보너스
-	PARTY_HEAL_COOLTIME_LONG = 60,
-	PARTY_HEAL_COOLTIME_SHORT = 30,
-	PARTY_MAX_MEMBER = 8,
-	PARTY_DEFAULT_RANGE = 5000,
-};
-
-enum EPartyRole
-{   
-	PARTY_ROLE_NORMAL,  
-	PARTY_ROLE_LEADER,
-	PARTY_ROLE_ATTACKER,
-	PARTY_ROLE_TANKER,
-	PARTY_ROLE_BUFFER,  
-	PARTY_ROLE_SKILL_MASTER,
-	PARTY_ROLE_HASTE,   
-	PARTY_ROLE_DEFENDER,
-	PARTY_ROLE_MAX_NUM, 
-};  
-
 class CParty;
 class CDungeon;
 
@@ -66,14 +44,6 @@ class CPartyManager : public CSingleton<CPartyManager>
 		TPCPartySet	m_set_pkPCParty;	// 사람들의 파티 전체 집합
 
 		bool		m_bEnablePCParty;	// 디비가 켜져있지 않으면 사람들의 파티 상태가 변경불가
-};
-
-enum EPartyMessages
-{
-	PM_ATTACK,		// Attack him
-	PM_RETURN,		// Return back to position
-	PM_ATTACKED_BY,	// I was attacked by someone
-	PM_AGGRO_INCREASE,	// My aggro is increased
 };
 
 class CParty

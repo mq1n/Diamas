@@ -1,13 +1,15 @@
 #pragma once
 
 class CMapBase;
+
+#include "../../common/defines.h"
+
 #include "MapOutdoor.h"
 #include "PropertyManager.h"
 
 // VICTIM_COLLISION_TEST
 #include "PhysicsObject.h"
 // VICTIM_COLLISION_TEST_END
-#include "../eterXClient/Locale_inc.h"
 
 // Map Manager
 class CMapManager : public CScreen, public IPhysicsWorld

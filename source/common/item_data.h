@@ -517,7 +517,365 @@ enum EAcceInfo
 };
 #endif
 
+#pragma pack(push)
+#pragma pack(1)
 
+struct TItemAttrTable
+{
+	TItemAttrTable() :
+		dwApplyIndex(0),
+		dwProb(0)
+	{
+		szApply[0] = 0;
+		memset(&lValues, 0, sizeof(lValues));
+		memset(&bMaxLevelBySet, 0, sizeof(bMaxLevelBySet));
+	}
+
+	char    szApply[APPLY_NAME_MAX_LEN + 1];
+	uint32_t   dwApplyIndex;
+	uint32_t   dwProb;
+	int32_t    lValues[ITEM_ATTRIBUTE_MAX_LEVEL];
+	uint8_t    bMaxLevelBySet[ATTRIBUTE_SET_MAX_NUM];
+};
+
+
+typedef struct SItemLimit
+{
+	uint8_t        bType;
+	int32_t        lValue;
+} TItemLimit;
+
+typedef struct SItemApply
+{
+	uint8_t        bType;
+	int32_t        lValue;
+} TItemApply;
+
+struct SItemTable
+{
+	uint32_t       dwVnum;
+	uint32_t       dwVnumRange;
+
+	char		   szName[ITEM_NAME_MAX_LEN + 1];
+	char	       szLocaleName[ITEM_NAME_MAX_LEN + 1];
+
+	uint8_t        bType;
+	uint8_t        bSubType;
+
+	uint8_t        bWeight;
+	uint8_t        bSize;
+
+	uint32_t       dwAntiFlags;
+	uint32_t       dwFlags;
+	uint32_t       dwWearFlags;
+	uint32_t       dwImmuneFlag;
+
+	uint32_t       dwIBuyItemPrice;
+	uint32_t		dwISellItemPrice;
+
+	TItemLimit  aLimits[ITEM_LIMIT_MAX_NUM];
+	TItemApply  aApplies[ITEM_APPLY_MAX_NUM];
+	int32_t        alValues[ITEM_VALUES_MAX_NUM];
+	int32_t        alSockets[ITEM_SOCKET_MAX_NUM];
+	uint32_t       dwRefinedVnum;
+	uint16_t		wRefineSet;
+	uint8_t        bAlterToMagicItemPct;
+	uint8_t		bSpecular;
+	uint8_t        bGainSocketPct;
+
+	int16_t	sAddonType; // ±âº» ¼Ó¼º
+
+	bool operator<(const struct SItemTable& rhs) const
+	{
+		return dwVnum < rhs.dwVnum;
+	}
+
+	char* GetOriginalName()
+	{
+		return szName;
+	}
+
+	char* GetName()
+	{
+		return szLocaleName;
+	}
+
+	uint8_t GetType() const
+	{
+		return bType;
+	}
+
+	uint8_t GetSubType() const
+	{
+		return bSubType;
+	}
+
+	uint8_t GetWeight() const
+	{
+		return bWeight;
+	}
+
+	uint8_t GetSize() const
+	{
+		return bSize;
+	}
+
+	uint32_t GetAntiFlags() const
+	{
+		return dwAntiFlags;
+	}
+
+	uint32_t GetFlags() const
+	{
+		return dwAntiFlags;
+	}
+
+	uint32_t GetWearFlags() const
+	{
+		return dwWearFlags;
+	}
+
+	uint32_t GetImmuneFlags() const
+	{
+		return dwImmuneFlag;
+	}
+
+	uint32_t GetBuyPrice() const
+	{
+		return dwIBuyItemPrice;
+	}
+
+	uint32_t GetSellPrice() const
+	{
+		return dwISellItemPrice;
+	}
+
+	int32_t GetValue(uint32_t index)
+	{
+		return alValues[index];
+	}
+
+	uint8_t GetLimitType(uint32_t idx) const
+	{
+		return aLimits[idx].bType;
+	}
+
+	int32_t GetLimitValue(uint32_t idx) const
+	{
+		return aLimits[idx].lValue;
+	}
+
+	// Weapon
+	bool IsWeapon() const
+	{
+		return GetType() == ITEM_WEAPON;
+	}
+
+	bool IsSword() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_SWORD;
+	}
+
+	bool IsDagger() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_DAGGER;
+	}
+
+	bool IsBow() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_BOW;
+	}
+
+	bool IsTwoHandSword() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_TWO_HANDED;
+	}
+
+	bool IsBell() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_BELL;
+	}
+
+	bool IsFan() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_FAN;
+	}
+
+	bool IsArrow() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_ARROW;
+	}
+
+	bool IsMountSpear() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_MOUNT_SPEAR;
+	}
+
+	bool IsClaw() const
+	{
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_CLAW;
+#else
+		return false;
+#endif
+	}
+
+	bool IsQuiver() const
+	{
+		return GetType() == ITEM_WEAPON && GetSubType() == WEAPON_NUM_TYPES;
+	}
+
+	// Armor
+	bool IsArmor() const
+	{
+		return GetType() == ITEM_ARMOR;
+	}
+
+	bool IsArmorBody() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_BODY;
+	}
+
+	bool IsHelmet() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_HEAD;
+	}
+
+	bool IsShield() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_SHIELD;
+	}
+
+	bool IsWrist() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_WRIST;
+	}
+
+	bool IsShoe() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_FOOTS;
+	}
+
+	bool IsNecklace() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_NECK;
+	}
+
+	bool IsEarRing() const
+	{
+		return GetType() == ITEM_ARMOR && GetSubType() == ARMOR_EAR;
+	}
+
+
+	bool IsRing() const
+	{
+		return GetType() == ITEM_RING;
+	}
+
+	bool IsCostume() const
+	{
+		return GetType() == ITEM_COSTUME;
+	}
+
+#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
+	bool IsCostumeMount() const
+	{
+		return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_MOUNT;
+	}
+#endif
+
+	bool IsCostumeHair() const
+	{
+		return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_HAIR;
+	}
+
+	bool IsCostumeBody() const
+	{
+		return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_BODY;
+	}
+
+	bool IsCostumeAcce() const
+	{
+#ifdef ENABLE_ACCE_SYSTEM
+		return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_ACCE;
+#else
+		return false;
+#endif
+	}
+
+	bool IsCostumeAura() const
+	{
+#ifdef ENABLE_AURA_SYSTEM
+		return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_AURA;
+#else
+		return false;
+#endif
+	}
+
+	bool IsCostumeWeapon() const
+	{
+#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
+		return GetType() == ITEM_COSTUME && GetSubType() == COSTUME_WEAPON;
+#else
+		return false;
+#endif
+	}
+
+	bool IsCostumeModifyItem() const
+	{
+		return GetType() == ITEM_USE && (GetSubType() == USE_CHANGE_COSTUME_ATTR || GetSubType() == USE_RESET_COSTUME_ATTR);
+	}
+
+	bool IsBelt() const
+	{
+		return GetType() == ITEM_BELT;
+	}
+
+	int32_t GetApplyValue(uint32_t i) const
+	{
+		return aApplies[i].lValue;
+	}
+
+	int32_t GetApplyType(uint32_t i) const
+	{
+		return aApplies[i].bType;
+	}
+
+	int32_t FindApplyValue(uint32_t applyType) const
+	{
+		for (int32_t i = 0; i < ITEM_APPLY_MAX_NUM; ++i)
+		{
+			if (aApplies[i].bType == applyType)
+				return aApplies[i].lValue;
+		}
+
+		return 0;
+	}
+};
+
+struct SItemTable_Server : SItemTable
+{
+// ¾Æ·¡ limit flagµéÀº realtime¿¡ Ã¼Å© ÇÒ ÀÏÀÌ ¸¹°í, ¾ÆÀÌÅÛ VNUM´ç °íÁ¤µÈ °ªÀÎµ¥,
+// ÇöÀç ±¸Á¶´ë·Î ¸Å¹ø ¾ÆÀÌÅÛ¸¶´Ù ÇÊ¿äÇÑ °æ¿ì¿¡ LIMIT_MAX_NUM±îÁö ·çÇÁµ¹¸é¼­ Ã¼Å©ÇÏ´Â ºÎÇÏ°¡ Ä¿¼­ ¹Ì¸® ÀúÀå ÇØ µÒ.
+	char		cLimitRealTimeFirstUseIndex;		// ¾ÆÀÌÅÛ limit ÇÊµå°ª Áß¿¡¼­ LIMIT_REAL_TIME_FIRST_USE ÇÃ·¡±×ÀÇ À§Ä¡ (¾øÀ¸¸é -1)
+	char		cLimitTimerBasedOnWearIndex;		// ¾ÆÀÌÅÛ limit ÇÊµå°ª Áß¿¡¼­ LIMIT_TIMER_BASED_ON_WEAR ÇÃ·¡±×ÀÇ À§Ä¡ (¾øÀ¸¸é -1) 
+};
+
+
+#ifdef ENABLE_ACCE_SYSTEM
+struct SScaleInfo
+{
+	float	fScaleX, fScaleY, fScaleZ;
+	float	fPositionX, fPositionY, fPositionZ;
+};
+
+typedef struct SScaleTable
+{
+	SScaleInfo	tInfo[10];
+} TScaleTable;
+#endif
+
+#pragma pack(pop)
 
 const uint32_t c_Inventory_Page_Column = 5;
 const uint32_t c_Inventory_Page_Row = 9;

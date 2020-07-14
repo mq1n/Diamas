@@ -4,7 +4,6 @@
 #include "char.h"
 #include "desc.h"
 #include "sectree_manager.h"
-#include "packet.h"
 #include "protocol.h"
 #include "log.h"
 #include "skill.h"
@@ -20,7 +19,6 @@
 #include "dragon_soul.h"
 #include "buff_on_attributes.h"
 #include "belt_inventory_helper.h"
-#include "../../common/VnumHelper.h"
 
 CItem::CItem(uint32_t dwVnum)
 	: m_dwVnum(dwVnum), m_bWindow(0), m_dwID(0), m_bEquipped(false), m_dwVID(0), m_wCell(0), m_dwCount(0), m_lFlag(0), m_dwLastOwnerPID(0),
@@ -178,7 +176,7 @@ void CItem::EncodeRemovePacket(LPENTITY ent)
 	sys_log(2, "Item::EncodeRemovePacket %s to %s", GetName(), ((LPCHARACTER) ent)->GetName());
 }
 
-void CItem::SetProto(const TItemTable * table)
+void CItem::SetProto(const SItemTable_Server * table)
 {
 	assert(table != nullptr);
 	m_pProto = table;
@@ -671,7 +669,7 @@ void CItem::ModifyPoints(bool bAdd)
 				if ((dwVnum = GetSocket(i)) <= 2)
 					continue;
 
-				TItemTable * p = ITEM_MANAGER::Instance().GetTable(dwVnum);
+				SItemTable_Server * p = ITEM_MANAGER::Instance().GetTable(dwVnum);
 
 				if (!p)
 				{
@@ -711,7 +709,7 @@ void CItem::ModifyPoints(bool bAdd)
 #ifdef ENABLE_ACCE_SYSTEM
 	if ((GetType() == ITEM_COSTUME) && (GetSubType() == COSTUME_ACCE) && (GetSocket(ACCE_ABSORBED_SOCKET)))
 	{
-		TItemTable * pkItemAbsorbed = ITEM_MANAGER::Instance().GetTable(GetSocket(ACCE_ABSORBED_SOCKET));
+		SItemTable_Server * pkItemAbsorbed = ITEM_MANAGER::Instance().GetTable(GetSocket(ACCE_ABSORBED_SOCKET));
 		if (pkItemAbsorbed)
 		{
 			if ((pkItemAbsorbed->bType == ITEM_ARMOR) && (pkItemAbsorbed->bSubType == ARMOR_BODY))
@@ -789,7 +787,7 @@ void CItem::ModifyPoints(bool bAdd)
 #ifdef ENABLE_ACCE_SYSTEM
 		if ((GetType() == ITEM_COSTUME) && (GetSubType() == COSTUME_ACCE))
 		{
-			TItemTable * pkItemAbsorbed = ITEM_MANAGER::Instance().GetTable(GetSocket(ACCE_ABSORBED_SOCKET));
+			SItemTable_Server * pkItemAbsorbed = ITEM_MANAGER::Instance().GetTable(GetSocket(ACCE_ABSORBED_SOCKET));
 			if (pkItemAbsorbed)
 			{
 				if (pkItemAbsorbed->aApplies[i].bType == APPLY_NONE)
@@ -1247,18 +1245,18 @@ int32_t CItem::GetGold()
 {
 	if (IS_SET(GetFlag(), ITEM_FLAG_COUNT_PER_1GOLD))
 	{
-		if (GetProto()->dwGold == 0)
+		if (GetProto()->dwISellItemPrice == 0)
 			return GetCount();
 		else
-			return GetCount() / GetProto()->dwGold;
+			return GetCount() / GetProto()->dwISellItemPrice;
 	}
 	else
-		return GetProto()->dwGold;
+		return GetProto()->dwISellItemPrice;
 }
 
 int32_t CItem::GetShopBuyPrice()
 {
-	return GetProto()->dwShopBuyPrice;
+	return GetProto()->dwIBuyItemPrice;
 }
 
 bool CItem::IsOwnership(LPCHARACTER ch)

@@ -12,6 +12,7 @@ enum {
 
 
 #pragma pack(push, 1)
+/*
 BEGIN_PACKET_DEF(SPacketGDSetup, HEADER_GD_SETUP)
 	uint32_t handle;
 	uint32_t packetSize;
@@ -38,10 +39,10 @@ BEGIN_PACKET_DEF(SPacketGDAuthLogin, HEADER_GD_AUTH_LOGIN)
 	char hwid[HWID_MAX_HASH_LEN + 1];
 END_PACKET_DEF(TPacketGDAuthLogin)
 
+*/
 BEGIN_PACKET_DEF(SPacketDGAuthLogin, HEADER_DG_AUTH_LOGIN)
 	uint32_t handle;
 	uint32_t packetSize;
 	uint8_t result;
 END_PACKET_DEF(TPacketDGAuthLogin)
-
 #pragma pack(pop)

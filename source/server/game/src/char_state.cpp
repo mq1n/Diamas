@@ -5,7 +5,6 @@
 #include "char.h"
 #include "battle.h"
 #include "char_manager.h"
-#include "packet.h"
 #include "motion.h"
 #include "party.h"
 #include "affect.h"
@@ -22,8 +21,6 @@
 #include "locale_service.h"
 #include "blue_dragon.h"
 #include "battleground.h"
-
-#include "../../common/VnumHelper.h"
 
 extern LPCHARACTER FindMobVictim(LPCHARACTER pkChr, int32_t iMaxDistance);
 extern LPCHARACTER FindBattlegroundMobVictim(LPCHARACTER pkChr);

@@ -1,7 +1,5 @@
 #include "StdAfx.h"
 #include "PythonNetworkStream.h"
-#include "Packet.h"
-
 #include "PythonGuild.h"
 #include "PythonCharacterManager.h"
 #include "PythonPlayer.h"

@@ -7,7 +7,6 @@
 #include "battle.h"
 #include "desc.h"
 #include "desc_manager.h"
-#include "packet.h"
 #include "affect.h"
 #include "item.h"
 #include "sectree_manager.h"

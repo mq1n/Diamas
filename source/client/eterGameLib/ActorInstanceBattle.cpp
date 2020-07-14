@@ -1,5 +1,4 @@
 #include "StdAfx.h"
-#include "../eterXClient/locale_inc.h"
 #include "../eterEffectLib/EffectManager.h"
 #include "../eterSoundLib/SoundManager.h"
 #include "../eterXClient/PythonNonPlayer.h"
@@ -548,7 +547,7 @@ float CActorInstance::__GetOwnerTime()
 bool IS_HUGE_RACE(uint32_t vnum)
 {
 	uint32_t dVnum = (uint32_t)vnum;
-	const CPythonNonPlayer::TMobTable * pMobTable = CPythonNonPlayer::Instance().GetTable(vnum);
+	const TMobTable * pMobTable = CPythonNonPlayer::Instance().GetTable(vnum);
 
 	if (!pMobTable)
 		return false;

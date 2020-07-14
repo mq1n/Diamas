@@ -1,8 +1,5 @@
 #pragma once
-
-
-
-#include "../eterXClient/Locale_inc.h"
+#include "../../common/defines.h"
 
 #include "../eterBase/Utils.h"
 #include "../eterBase/CRC32.h"
@@ -18,4 +15,3 @@
 #include "MapType.h"
 #include "MapUtil.h"
 #include "Interface.h"
-

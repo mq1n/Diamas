@@ -1,7 +1,5 @@
 #include "stdafx.h"
-#include "../../common/tables.h"
 #include "ClientManager.h"
-
 #include "Main.h"
 #include "QID.h"
 #include "ItemAwardManager.h"

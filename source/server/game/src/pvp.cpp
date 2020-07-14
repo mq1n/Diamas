@@ -2,7 +2,6 @@
 #include "constants.h"
 #include "pvp.h"
 #include "crc32.h"
-#include "packet.h"
 #include "desc.h"
 #include "desc_manager.h"
 #include "char.h"

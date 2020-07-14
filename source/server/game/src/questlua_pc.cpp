@@ -536,7 +536,7 @@ namespace quest
 		}
 
 		uint32_t item_vnum = (uint32_t)lua_tonumber(L, 1);
-		TItemTable* pTable = ITEM_MANAGER::Instance().GetTable(item_vnum);
+		SItemTable_Server* pTable = ITEM_MANAGER::Instance().GetTable(item_vnum);
 		if (!pTable) {
 			lua_pushboolean(L, false);
 			return 1;
@@ -3320,7 +3320,7 @@ teleport_area:
 
 						if (socket > 2 && socket != ITEM_BROKEN_METIN_VNUM) 
 						{
-							TItemTable* pItemInfo = ITEM_MANAGER::Instance().GetTable(socket);
+							SItemTable_Server* pItemInfo = ITEM_MANAGER::Instance().GetTable(socket);
 							if (pItemInfo) 
 							{
 								if (pItemInfo->bType == ITEM_METIN)

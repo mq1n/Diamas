@@ -1,19 +1,36 @@
 #pragma once
 
-
-#define CLIENT_VERSION_TIMESTAMP 1215955205
-#define LSS_SECURITY_KEY	"1234abcd5678efgh"
-
-#define _IMPROVED_PACKET_ENCRYPTION_
 // #define _PACKETDUMP
-//#define __PERFORMANCE_CHECK__
 
 //#define ENABLE_ANTICHEAT
 #ifdef ENABLE_ANTICHEAT
-#define ENABLE_ANTICHEAT_AGGRESSIVE_MODE false
-#define ENABLE_DEBUGGER_ALLOW_BY_ANTICHEAT
+	#define ENABLE_ANTICHEAT_AGGRESSIVE_MODE false
+	#define ENABLE_DEBUGGER_ALLOW_BY_ANTICHEAT
 #endif
+
+#define LSS_SECURITY_KEY	"1234abcd5678efgh"
+#define CLIENT_VERSION_TIMESTAMP 1215955205
+#define DISCORD_APP_CLIENT_ID	"619867464762785813"
+
 // #define PYTHON_DYNAMIC_MODULE_NAME
+
+#define _IMPROVED_PACKET_ENCRYPTION_
+//#define __PERFORMANCE_CHECK__
+
+
+
+/* ---------------- COMMON -------------------*/
+// ...
+/* ---------------- COMMON -------------------*/
+
+/* ---------------- CLIENT -------------------*/
+// ...
+/* ---------------- CLIENT -------------------*/
+
+/* ---------------- SERVER -------------------*/
+// ...
+/* ---------------- SERVER -------------------*/
+
 
 
 

@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "PythonNetworkStream.h"
-#include "Packet.h"
 
 extern uint32_t g_adwEncryptKey[4];
 extern uint32_t g_adwDecryptKey[4];

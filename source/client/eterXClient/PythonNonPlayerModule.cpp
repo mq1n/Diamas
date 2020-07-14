@@ -49,7 +49,7 @@ PyObject * nonplayerGetLevelByVID(PyObject * poSelf, PyObject * poArgs)
 	if (!pInstance)
 		return Py_BuildValue("i", -1);
 
-	const CPythonNonPlayer::TMobTable * pMobTable = CPythonNonPlayer::Instance().GetTable(pInstance->GetVirtualNumber());
+	const TMobTable * pMobTable = CPythonNonPlayer::Instance().GetTable(pInstance->GetVirtualNumber());
 
 	if (!pMobTable)
 		return Py_BuildValue("i", -1);
@@ -70,7 +70,7 @@ PyObject * nonplayerGetGradeByVID(PyObject * poSelf, PyObject * poArgs)
 	if (!pInstance)
 		return Py_BuildValue("i", -1);
 
-	const CPythonNonPlayer::TMobTable * pMobTable = CPythonNonPlayer::Instance().GetTable(pInstance->GetVirtualNumber());
+	const TMobTable * pMobTable = CPythonNonPlayer::Instance().GetTable(pInstance->GetVirtualNumber());
 
 	if (!pMobTable)
 		return Py_BuildValue("i", -1);
@@ -168,7 +168,7 @@ PyObject * nonplayerGetRaceNumByVID(PyObject * poSelf, PyObject * poArgs)
 	if (!pInstance)
 		return Py_BuildValue("i", -1);
 
-	const CPythonNonPlayer::TMobTable * pMobTable = CPythonNonPlayer::Instance().GetTable(pInstance->GetVirtualNumber());
+	const TMobTable * pMobTable = CPythonNonPlayer::Instance().GetTable(pInstance->GetVirtualNumber());
 
 	if (!pMobTable)
 		return Py_BuildValue("i", -1);

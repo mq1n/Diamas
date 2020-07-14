@@ -1,10 +1,6 @@
 #pragma once
-#include "../../common/tables.h"
 #include "typedef.h"
 #include "gposition.h"
-#include <vector>
-#include <string>
-#include <map>
 
 typedef struct SMobSplashAttackInfo
 {

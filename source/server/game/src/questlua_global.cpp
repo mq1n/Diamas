@@ -792,7 +792,7 @@ namespace quest
 		}
 		uint32_t dwVnum = (uint32_t)lua_tonumber(L,1);
 
-		TItemTable* pTable = ITEM_MANAGER::Instance().GetTable(dwVnum);
+		SItemTable_Server* pTable = ITEM_MANAGER::Instance().GetTable(dwVnum);
 		if (pTable)
 			lua_pushstring(L, pTable->szLocaleName);
 		else

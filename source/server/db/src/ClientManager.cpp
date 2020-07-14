@@ -9,14 +9,7 @@
 #include "Marriage.h"
 #include "ItemIDRangeManager.h"
 #include "Cache.h"
-
-#include <sstream>
-
-#include "../../common/building.h"
-#include "../../common/VnumHelper.h"
-#include "../../common/tables.h"
 #include "../../libgame/include/grid.h"
-#include "../../common/json_helper.h"
 
 extern int32_t g_iPlayerCacheFlushSeconds;
 extern int32_t g_iItemCacheFlushSeconds;
@@ -386,7 +379,7 @@ void CClientManager::QUERY_BOOT(CPeer* peer, TPacketGDBoot * p)
 		sizeof(uint32_t) +
 		sizeof(uint8_t) +
 		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TMobTable) * m_vec_mobTable.size() +
-		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TItemTable) * m_vec_itemTable.size() +
+		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(SItemTable_Server) * m_vec_itemTable.size() +
 		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TShopTable) * m_iShopTableSize +
 		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TSkillTable) * m_vec_skillTable.size() +
 		sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TRefineTable) * m_iRefineTableSize +
@@ -411,7 +404,7 @@ void CClientManager::QUERY_BOOT(CPeer* peer, TPacketGDBoot * p)
 	sys_log(0, "BOOT: VERSION: %d", bPacketVersion);
 
 	sys_log(0, "sizeof(TMobTable) = %d", sizeof(TMobTable));
-	sys_log(0, "sizeof(TItemTable) = %d", sizeof(TItemTable));
+	sys_log(0, "sizeof(SItemTable_Server) = %d", sizeof(SItemTable_Server));
 	sys_log(0, "sizeof(TShopTable) = %d", sizeof(TShopTable));
 	sys_log(0, "sizeof(TSkillTable) = %d", sizeof(TSkillTable));
 	sys_log(0, "sizeof(TRefineTable) = %d", sizeof(TRefineTable));
@@ -429,9 +422,9 @@ void CClientManager::QUERY_BOOT(CPeer* peer, TPacketGDBoot * p)
 	peer->EncodeWORD(static_cast<uint16_t>(m_vec_mobTable.size()));
 	peer->Encode(&m_vec_mobTable[0], sizeof(TMobTable) * m_vec_mobTable.size());
 
-	peer->EncodeWORD(sizeof(TItemTable));
+	peer->EncodeWORD(sizeof(SItemTable_Server));
 	peer->EncodeWORD(static_cast<uint16_t>(m_vec_itemTable.size()));
-	peer->Encode(&m_vec_itemTable[0], sizeof(TItemTable) * m_vec_itemTable.size());
+	peer->Encode(&m_vec_itemTable[0], sizeof(SItemTable_Server) * m_vec_itemTable.size());
 
 	peer->EncodeWORD(sizeof(TShopTable));
 	peer->EncodeWORD(static_cast<uint16_t>(m_iShopTableSize));
@@ -744,7 +737,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 						continue;
 					}
 
-					TItemTable * pItemTable = it2->second;
+					SItemTable_Server * pItemTable = it2->second;
 
 					int32_t iPos;
 
@@ -817,7 +810,7 @@ void CClientManager::RESULT_SAFEBOX_LOAD(CPeer * pkPeer, SQLMsg * msg)
 							sys_err ("Invalid item(vnum : %d). It is not in m_map_itemTableByVnum.", dwItemVnum);
 							continue;
 						}
-						TItemTable* item_table = it3->second;
+						SItemTable_Server* item_table = it3->second;
 						if (item_table == nullptr)
 						{
 							sys_err ("Invalid item_table (vnum : %d). It's value is nullptr in m_map_itemTableByVnum.", dwItemVnum);
@@ -1693,7 +1686,7 @@ void CClientManager::QUERY_RELOAD_PROTO()
 		tmp->EncodeHeader(HEADER_DG_RELOAD_PROTO, 0, 
 				sizeof(uint16_t) + sizeof(TSkillTable) * m_vec_skillTable.size() +
 				sizeof(uint16_t) + sizeof(TBanwordTable) * m_vec_banwordTable.size() +
-				sizeof(uint16_t) + sizeof(TItemTable) * m_vec_itemTable.size() +
+				sizeof(uint16_t) + sizeof(SItemTable_Server) * m_vec_itemTable.size() +
 				sizeof(uint16_t) + sizeof(TMobTable) * m_vec_mobTable.size());
 
 		tmp->EncodeWORD(static_cast<uint16_t>(m_vec_skillTable.size()));
@@ -1703,7 +1696,7 @@ void CClientManager::QUERY_RELOAD_PROTO()
 		tmp->Encode(&m_vec_banwordTable[0], sizeof(TBanwordTable) * m_vec_banwordTable.size());
 
 		tmp->EncodeWORD(static_cast<uint16_t>(m_vec_itemTable.size()));
-		tmp->Encode(&m_vec_itemTable[0], sizeof(TItemTable) * m_vec_itemTable.size());
+		tmp->Encode(&m_vec_itemTable[0], sizeof(SItemTable_Server) * m_vec_itemTable.size());
 
 		tmp->EncodeWORD(static_cast<uint16_t>(m_vec_mobTable.size()));
 		tmp->Encode(&m_vec_mobTable[0], sizeof(TMobTable) * m_vec_mobTable.size());

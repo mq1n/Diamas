@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "PythonNetworkStream.h"
 #include "PythonApplication.h"
-#include "Packet.h"
 #include "NetworkActorManager.h"
 #include "GuildMarkDownloader.h"
 #include "GuildMarkUploader.h"

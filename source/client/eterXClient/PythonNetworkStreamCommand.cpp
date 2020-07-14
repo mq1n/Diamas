@@ -65,7 +65,7 @@ void AppendMonsterList(const CPythonNonPlayer::TMobTableList & c_rMobTableList, 
 	CPythonNonPlayer::TMobTableList::const_iterator itor = c_rMobTableList.begin();
 	for (; itor!=c_rMobTableList.end(); ++itor)
 	{
-		const CPythonNonPlayer::TMobTable * c_pMobTable = *itor;
+		const TMobTable * c_pMobTable = *itor;
 		if (iType == c_pMobTable->bRank)
 		{
 			if (dwMonsterCount != 0)

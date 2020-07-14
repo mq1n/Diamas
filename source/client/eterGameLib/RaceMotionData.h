@@ -1,8 +1,8 @@
 #pragma once
 
+#include "../../common/defines.h"
 #include "../eterSoundLib/Type.h"
 #include "RaceMotionDataEvent.h"
-#include "../eterXClient/locale_inc.h"
 
 class CRaceMotionData
 {

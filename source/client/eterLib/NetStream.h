@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../eterXClient/Locale_inc.h"
+#include "../../common/defines.h"
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 #include "../eterBase/cipher.h"

@@ -3,7 +3,6 @@
 #include "char.h"
 #include "desc.h"
 #include "desc_manager.h"
-#include "packet.h"
 #include "item.h"
 
 /////////////////////////////////////////////////////////////////////////////

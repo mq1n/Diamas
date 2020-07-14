@@ -1,6 +1,5 @@
 #pragma once
 #include "InstanceBase.h"
-#include "Locale_inc.h"
 
 struct SNetworkActorData
 {

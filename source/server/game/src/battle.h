@@ -1,5 +1,6 @@
 #pragma once
 #include "char.h"
+#include "config.h"
 
 enum EBattleTypes       // 상대방 기준
 {
