@@ -6,8 +6,10 @@
 using namespace net_engine;
 
 GDBClient::GDBClient(std::shared_ptr <GAuthServer> server) :
-	net_engine::NetClientBase(server->GetService()(), 0, {}, 0, 5000), m_server(server), m_mainPort(0)
+	net_engine::NetClientBase(server->GetService()(), 0, {}, 0, EPacketType::PACKET_TYPE_DS, 5000), m_server(server), m_mainPort(0)
 {
+	auth_log(LL_TRACE, "Creating db client object");
+
 	REGISTER_PACKET_HANDLER(HEADER_DG_AUTH_LOGIN, std::bind(&GDBClient::RecvAuthLogin, this, std::placeholders::_1));
 }
 
@@ -43,8 +45,8 @@ void GDBClient::OnError(uint32_t error_type, const asio::error_code& er)
 
 void GDBClient::SendSetup(uint16_t mainPort) 
 {
-	auto packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GD_SETUP));
-	packet->SetField<uint32_t>("packetSize", packet->GetSize() - 9);
+	auto packet = NetPacketManager::Instance().CreatePacket(BuildPacketID(HEADER_GD_SETUP, PACKET_TYPE_SD));
+	packet->SetField<uint32_t>("packetSize", sizeof(TPacketGDSetup));
 	packet->SetField<uint16_t>("mainPort", mainPort);
 	packet->SetField<uint8_t>("authServer", 1);
 
@@ -54,9 +56,9 @@ void GDBClient::SendAuthLogin(
 	uint32_t peerId, uint32_t id, const std::string &login, const std::string &socialId, const std::string &lang,
 	const std::string &hwid, uint32_t loginKey, const std::vector<int32_t> &aiPremiumTimes, const uint8_t *clientKey)
 {
-	auto packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GD_AUTH_LOGIN));
+	auto packet = NetPacketManager::Instance().CreatePacket(BuildPacketID(HEADER_GD_AUTH_LOGIN, PACKET_TYPE_SD));
 	packet->SetField<uint32_t>("handle", peerId);
-	packet->SetField<uint32_t>("packetSize", packet->GetSize() - 9);
+	packet->SetField<uint32_t>("packetSize", sizeof(TPacketGDAuthLogin));
 	packet->SetField<uint32_t>("id", id);
 	packet->SetField<uint32_t>("loginKey", loginKey);
 	packet->SetString("login", login);

@@ -6,9 +6,9 @@
 namespace net_engine
 {	
 	CNetworkClientManager::CNetworkClientManager(NetServiceBase& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
-		NetClientBase(service(), securityLevel, cryptKey, STAGE_DEV_GAME, 5000), m_pNetService(service)
+		NetClientBase(service(), securityLevel, cryptKey, STAGE_DEV_GAME, EPacketType::PACKET_TYPE_SC, 5000), m_pNetService(service)
 	{
-		NetPacketManager::Instance().RegisterPackets(false);
+		NetPacketManager::Instance().RegisterPackets();
 		REGISTER_PACKET_HANDLER(HEADER_GC_KEY_AGREEMENT_COMPLETED, std::bind(&CNetworkClientManager::OnRecvKeyAgreementCompletedPacket, this, std::placeholders::_1));
 		REGISTER_PACKET_HANDLER(HEADER_GC_PHASE, std::bind(&CNetworkClientManager::OnRecvPhasePacket, this, std::placeholders::_1));
 		REGISTER_PACKET_HANDLER(HEADER_GC_KEY_AGREEMENT, std::bind(&CNetworkClientManager::OnRecvKeyAgreementPacket, this, std::placeholders::_1));
@@ -83,7 +83,7 @@ namespace net_engine
 
 		NET_LOG(LL_SYS, "KEY_AGREEMENT RECV %u", datalen);
 
-		auto reply_packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_CG_KEY_AGREEMENT));
+		auto reply_packet = NetPacketManager::Instance().CreatePacket(BuildPacketID(HEADER_CG_KEY_AGREEMENT, PACKET_TYPE_CS));
 		if (!reply_packet)
 		{
 			NET_LOG(LL_CRI, "Handshake packet could not created!");
@@ -133,7 +133,7 @@ namespace net_engine
 		m_kServerTimeSync.m_dwChangeServerTime = time + delta;
 		m_kServerTimeSync.m_dwChangeClientTime = timestamp;	
 
-		auto reply_packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_CG_HANDSHAKE));
+		auto reply_packet = NetPacketManager::Instance().CreatePacket(BuildPacketID(HEADER_CG_HANDSHAKE, PACKET_TYPE_CS));
 		if (!reply_packet)
 		{
 			NET_LOG(LL_CRI, "Handshake packet could not created!");

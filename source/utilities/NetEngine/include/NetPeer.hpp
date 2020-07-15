@@ -33,7 +33,7 @@ namespace net_engine
 	class NetPeerBase : asio::noncopyable, public std::enable_shared_from_this <NetPeerBase>
 	{
 		public:
-			NetPeerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey, bool is_server, uint8_t stage);
+			NetPeerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey, uint8_t incoming_packet_type, uint8_t stage);
 			virtual ~NetPeerBase() {};
 
 			asio::ip::tcp::socket& GetSocket();
@@ -84,6 +84,8 @@ namespace net_engine
 			asio::ip::tcp::socket m_socket;
 			asio::io_context& m_service;
 
+			uint8_t m_incoming_packet_type;
+
 			std::atomic <bool> m_isShutingDown;
 
 			asio::streambuf m_buffer;
@@ -109,7 +111,6 @@ namespace net_engine
 
 			std::unique_ptr <CryptationBase> m_cryptation;
 
-			bool m_is_server;
 			uint8_t m_stage;
 
 		private:

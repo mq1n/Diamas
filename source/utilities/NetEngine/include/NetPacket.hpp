@@ -12,12 +12,37 @@ namespace net_engine
 {
 	using TNetOpcode = uint8_t;
 
+	enum EPacketType : uint8_t
+	{
+		// Default
+		PACKET_TYPE_NONE,
+
+		// Auth/Game
+		PACKET_TYPE_SC, // Server > Client
+		PACKET_TYPE_CS, // Client > server
+		PACKET_TYPE_SS, // Server > server (P2P/Game<>Auth)
+
+		// DB
+		PACKET_TYPE_SD, // Server > DB cache
+		PACKET_TYPE_DS, // DB cache > server
+
+		// TODO: Mark server, WebAPI server, Shop server, Master (daemon) server
+
+		// EOF
+		PACKET_TYPE_MAX
+	};
+
 	struct SPacketID
 	{
 		TNetOpcode header{0};
-		bool incoming{false};
-		bool outgoing{false};
+		EPacketType type{ PACKET_TYPE_NONE };
 	};
+
+	inline SPacketID BuildPacketID(TNetOpcode header, uint8_t type)
+	{
+		SPacketID id{ header, static_cast<EPacketType>(type) };
+		return id;
+	}
 
 	enum ESecurityLevels : uint8_t
 	{
@@ -89,16 +114,16 @@ namespace net_engine
 		uint8_t m_sequence;
 	};
 
-	inline SPacketID CreateIncomingPacketID(TNetOpcode header)
+
+
+	enum EPacketContainerIndexes : uint8_t
 	{
-		SPacketID id { header, true, false };
-		return id;
-	}
-	inline SPacketID CreateOutgoingPacketID(TNetOpcode header)
-	{
-		SPacketID id { header, false, true };
-		return id;
-	}
+		PACKET_CONTAINER_HEADER,
+		PACKET_CONTAINER_TYPE
+	};
+
+	using TPacketComponent = std::tuple <TNetOpcode, EPacketType>;
+	using TPacketContainer = std::map <TPacketComponent, std::shared_ptr <PacketDefinition>>;
 
 	class NetPacketManager : public CSingleton <NetPacketManager>
 	{
@@ -116,16 +141,15 @@ namespace net_engine
 
 			std::shared_ptr <Packet> CreatePacket(const SPacketID& packet_id);
 
-			void RegisterPackets(bool is_server);
+			void RegisterPackets();
 
 		private:
-			std::map <uint8_t, std::shared_ptr <PacketDefinition>> m_incomingPackets;
-			std::map <uint8_t, std::shared_ptr <PacketDefinition>> m_outgoingPackets;
+			TPacketContainer m_packets;
 	};
 };
 
 #ifndef REGISTER_PACKET
-	#define REGISTER_PACKET(header, incoming, on_register)\
+	#define REGISTER_PACKET(header, type, on_register)\
 	if (net_engine::NetPacketManager::InstancePtr())\
-	{ net_engine::NetPacketManager::Instance().RegisterPacket(NAMEOF(header).c_str(), { header, incoming, !incoming }, on_register, __FUNCTION__); }
+	{ net_engine::NetPacketManager::Instance().RegisterPacket(NAMEOF(header).c_str(), { header, type }, on_register, __FUNCTION__); }
 #endif

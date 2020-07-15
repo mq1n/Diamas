@@ -8,7 +8,7 @@ namespace net_engine
 {
 	using Random = effolkronium::random_static;
 
-	NetPeerBase::NetPeerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey, bool is_server, uint8_t stage) :
+	NetPeerBase::NetPeerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey, uint8_t incoming_packet_type, uint8_t stage) :
 		m_strand(asio::make_strand(service.get_executor())),
 		m_socket(m_strand),
 		m_service(service), 
@@ -19,7 +19,7 @@ namespace net_engine
 		m_logFlag(0),
 		m_crypt_key(cryptKey), m_securityLevel(securityLevel), m_phase(0), m_core_time(0),
 		m_handshaking(false),
-		m_is_server(is_server), m_stage(stage)
+		m_incoming_packet_type(incoming_packet_type), m_stage(stage)
 	{
 		m_handshake = Random::get<uint32_t>(
 			std::numeric_limits<uint32_t>::min(),
@@ -74,7 +74,7 @@ namespace net_engine
 
 		BeginRead();
 
-		if (m_securityLevel > SECURITY_LEVEL_NONE && m_is_server)
+		if (m_securityLevel > SECURITY_LEVEL_NONE && m_incoming_packet_type == PACKET_TYPE_CS)
 		{
 			StartHandshakeGC();
 		}
@@ -140,6 +140,8 @@ namespace net_engine
 	void NetPeerBase::Send(std::shared_ptr <Packet> packet)
 	{
 		if (m_isShutingDown)
+			return;
+		if (!m_socket.is_open())
 			return;
 
 		m_send_queue.Enqueue(packet);
@@ -208,6 +210,12 @@ namespace net_engine
 		std::shared_ptr <NetPeerBase> _this(self.lock());
 		if (_this)
 		{
+			if (_this->m_isShutingDown)
+				return;
+
+			if (!_this->m_socket.is_open())
+				return;
+			
 			_this->m_writeBuffer.consume(succesed_size);
 
 			if (!er)
@@ -217,12 +225,16 @@ namespace net_engine
 			}
 			else
 			{
-				if (er != asio::error::operation_aborted)
+				if (er == asio::error::eof || er == asio::error::connection_reset)
+				{
+					NET_LOG(LL_SYS, "Connection closed by remote: %s", _this->m_socket.remote_endpoint().address().to_string().c_str());
+				}
+				else if (er != asio::error::operation_aborted)
 				{
 					NET_LOG(LL_CRI, "Write operation fail! Error: %u(%s)", er.value(), er.message().c_str());
 					_this->OnError(PeerErrorWriteFail, er);
-					_this->Disconnect(er);
 				}
+				_this->Disconnect(er);
 			}
 		}
 	}
@@ -284,7 +296,7 @@ namespace net_engine
 
 				NET_LOG(LL_SYS, "Received header: %d(0x%02x)", header, header);
 
-				auto packet = NetPacketManager::Instance().CreatePacket(CreateIncomingPacketID(header));
+				auto packet = NetPacketManager::Instance().CreatePacket(BuildPacketID(header, _this->m_incoming_packet_type));
 				if (!packet)
 				{
 					NET_LOG(LL_SYS, "Received unknown header: %d(0x%02x)", header, header);
@@ -482,7 +494,7 @@ namespace net_engine
 	{
 		NET_LOG(LL_SYS, "Set phase to 0x%x", phase);
 
-		auto packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GC_PHASE));
+		auto packet = NetPacketManager::Instance().CreatePacket(BuildPacketID(HEADER_GC_PHASE, PACKET_TYPE_SC));
 		if (!packet)
 		{
 			NET_LOG(LL_CRI, "Phase packet could not created!");
@@ -509,7 +521,7 @@ namespace net_engine
 
 	void NetPeerBase::SendHandshakeGC(uint32_t time, uint32_t delta)
 	{
-		auto packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GC_HANDSHAKE));
+		auto packet = NetPacketManager::Instance().CreatePacket(BuildPacketID(HEADER_GC_HANDSHAKE, PACKET_TYPE_SC));
 		if (!packet)
 		{
 			NET_LOG(LL_CRI, "Handshake packet could not created!");
@@ -614,7 +626,7 @@ namespace net_engine
 		memcpy(keys, staticKey->data(), staticKey->size());
 		memcpy(keys + staticKey->size(), ephemeralKey->data(), ephemeralKey->size());
 
-		auto packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GC_KEY_AGREEMENT));
+		auto packet = NetPacketManager::Instance().CreatePacket(BuildPacketID(HEADER_GC_KEY_AGREEMENT, PACKET_TYPE_SC));
 		if (!packet)
 		{
 			NET_LOG(LL_CRI, "Key agreement packet could not created!");
@@ -659,7 +671,7 @@ namespace net_engine
 			return;
 		}
 
-		auto packet2 = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GC_KEY_AGREEMENT_COMPLETED));
+		auto packet2 = NetPacketManager::Instance().CreatePacket(BuildPacketID(HEADER_GC_KEY_AGREEMENT_COMPLETED, PACKET_TYPE_SC));
 		if (!packet2)
 		{
 			NET_LOG(LL_CRI, "Key agreement completed packet could not created!");

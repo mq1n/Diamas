@@ -6,22 +6,6 @@
 
 using TPacketHeader = uint8_t;
 
-enum EPacketTypes : uint8_t
-{
-	PACKET_TYPE_NONE, // Default: undefined
-	PACKET_TYPE_CG,   // Client to game 
-	PACKET_TYPE_GC,   // Game to client
-	PACKET_TYPE_GG,   // Game to game
-	PACKET_TYPE_GD,   // Game to db
-	PACKET_TYPE_DG,   // Db to game
-	PACKET_TYPE_GA,   // Game to auth
-	PACKET_TYPE_AG,   // Auth to game
-	PACKET_TYPE_API   // P2P Web API
-	// TODO: Mark server
-	// TODO: Shop server
-	// TODO: Master (daemon) server
-};
-
 #pragma pack(1)
 struct SPacketHeader
 {

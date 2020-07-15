@@ -2,8 +2,8 @@
 
 namespace net_engine
 {
-	NetClientBase::NetClientBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey, uint8_t stage, uint32_t autoReconnectCycle) :
-		NetPeerBase(service, securityLevel, cryptKey, false, stage), m_autoReconnectCycle(autoReconnectCycle), m_reconnectTimer(service), m_isReconnectOnce(false)
+	NetClientBase::NetClientBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey, uint8_t stage, EPacketType incoming_packet_type, uint32_t autoReconnectCycle) :
+		NetPeerBase(service, securityLevel, cryptKey, incoming_packet_type, stage), m_autoReconnectCycle(autoReconnectCycle), m_reconnectTimer(service), m_isReconnectOnce(false)
 	{
 	}
 

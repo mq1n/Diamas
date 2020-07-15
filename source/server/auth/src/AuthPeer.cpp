@@ -17,7 +17,7 @@ void HandleGenericUpdateResult(const asio::error_code& ec, uint64_t affected_row
 }
 
 GAuthPeer::GAuthPeer(std::shared_ptr <GAuthServer> server, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
-	NetPeerBase(server->GetService()(), securityLevel, cryptKey, true, server->GetStage()), m_server(server), m_loginKey(0)
+	NetPeerBase(server->GetService()(), securityLevel, cryptKey, EPacketType::PACKET_TYPE_CS, server->GetStage()), m_server(server), m_loginKey(0)
 //	, m_deadline_timer(server->GetService()())
 {
 	auth_log(LL_TRACE, "Creating connection object");
@@ -107,13 +107,13 @@ void GAuthPeer::SendPhase(uint8_t phaseId)
 }
 void GAuthPeer::SendLoginFailure(const std::string& status)
 {
-	auto packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GC_LOGIN_FAILURE));
+	auto packet = NetPacketManager::Instance().CreatePacket(BuildPacketID(HEADER_GC_LOGIN_FAILURE, PACKET_TYPE_SC));
 	packet->SetString("szStatus", status.c_str());
 	Send(packet);
 }
 void GAuthPeer::SendLoginSuccess(uint8_t result)
 {
-	auto packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GC_AUTH_SUCCESS));
+	auto packet = NetPacketManager::Instance().CreatePacket(BuildPacketID(HEADER_GC_AUTH_SUCCESS, PACKET_TYPE_SC));
 	packet->SetField<uint32_t>("dwLoginKey", GetLoginKey());
 	packet->SetField<uint8_t>("bResult", result);
 	Send(packet);

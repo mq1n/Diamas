@@ -72,11 +72,11 @@ bool CPeer::PeekPacket(int32_t & iBytesProceed, uint8_t & header, uint32_t & dwH
 	dwLength	= *((uint32_t *) buf);
 	buf		+= sizeof(uint32_t);
 
-	//sys_log(0, "%d header %d handle %u length %u", GetRecvLength(), header, dwHandle, dwLength);
-	if (iBytesProceed + dwLength + 9 > (uint32_t) GetRecvLength())
+	auto recv_length = (uint32_t)GetRecvLength();
+	if (iBytesProceed + dwLength + 9 > recv_length)
 	{
-		sys_log(0, "PeekPacket: not enough buffer size: len %u, recv %d, header %d",
-			9 + dwLength, GetRecvLength() - iBytesProceed, header);
+		sys_log(0, "PeekPacket: not enough buffer size: recv_length: %u, header %u, handle %u, dwLength %u, processed %u, target %u",
+			recv_length, header, dwHandle, dwLength, iBytesProceed, iBytesProceed + dwLength + 9);
 		return false;
 	}
 

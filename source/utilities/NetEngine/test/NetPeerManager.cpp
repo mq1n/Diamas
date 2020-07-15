@@ -9,7 +9,7 @@ namespace net_engine
 {
 	CNetworkConnectionManager::CNetworkConnectionManager(
 		std::shared_ptr <CNetworkServerManager> server, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
-		NetPeerBase(server->GetServiceInstance()(), securityLevel, cryptKey, true, STAGE_DEV_GAME), m_server(server), m_deadline_timer(server->GetServiceInstance()())
+		NetPeerBase(server->GetServiceInstance()(), securityLevel, cryptKey, EPacketType::PACKET_TYPE_CS, STAGE_DEV_GAME), m_server(server), m_deadline_timer(server->GetServiceInstance()())
 	{
 		NET_LOG(LL_TRACE, "Creating connection object");
 

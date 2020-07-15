@@ -13,7 +13,7 @@ GAuthServer::GAuthServer(NetServiceBase& netService, uint8_t securityLevel, cons
 	m_keyMin(1), m_keyMax(0xffffffff)
 {
 	auth_log(LL_TRACE, "Creating server object");
-	NetPacketManager::Instance().RegisterPackets(true);
+	NetPacketManager::Instance().RegisterPackets();
 }
 GAuthServer::~GAuthServer()
 {
