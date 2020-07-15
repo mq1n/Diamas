@@ -1,5 +1,6 @@
 #include "stdafx.hpp"
 #include "AccountManager.hpp"
+#include "AuthLogHelper.hpp"
 using namespace net_engine;
 
 GAccountManager::GAccountManager() :
@@ -14,7 +15,7 @@ void GAccountManager::ConnectAccount(const std::string& login, uint32_t key)
 {
 	std::unique_lock <std::mutex> lk(m_mutex);
 
-	AUTH_LOG(info, "ConnectAccount {0} {1}", login.c_str(), key);
+	auth_log(LL_SYS, "ConnectAccount %s %u", login.c_str(), key);
 
 	m_accounts.emplace(login, key);
 }
@@ -22,7 +23,7 @@ void GAccountManager::DisconnectAccount(const std::string& login)
 {
 	std::unique_lock<std::mutex> lk(m_mutex);
 
-	AUTH_LOG(info, "DisconnectAccount {0}", login);
+	auth_log(LL_SYS, "DisconnectAccount %s", login.c_str());
 
 	const auto iter = m_accounts.find(login);
 	if (iter != m_accounts.end())
@@ -52,6 +53,6 @@ uint32_t GAccountManager::CreateAuthKey()
 		key = m_dist(m_mt);
 	} while (m_loginKeys.find(key) != m_loginKeys.end());
 
-	AUTH_LOG(info, "CreateAuthKey {0}", key);
+	auth_log(LL_SYS, "CreateAuthKey %u", key);
 	return key;
 }

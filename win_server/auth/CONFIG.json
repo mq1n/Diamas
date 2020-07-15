@@ -1,0 +1,30 @@
+{
+    "stage": "dev",
+
+    "dev":
+    {
+    	"version": 1215955205,
+
+        "dbcache":
+        {
+            "address": "127.0.0.1",
+            "bind_port": 15000
+        },
+
+        "auth_servers":
+        {
+        	"ports":
+        	[
+        		11055,
+        		11056,
+        		11057,
+        		11058
+        	]
+        },
+        
+        "databases":
+        {
+            "SQL_ACCOUNT": {"address": "127.0.0.1", "user": "mt2", "password": "mt2", "database": "account", "port": 3306}
+        }
+    }
+}

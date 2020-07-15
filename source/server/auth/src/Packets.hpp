@@ -6,11 +6,6 @@ static size_t size() { return sizeof(name); }\
 name() { memset(this, 0, sizeof(name)); header = type; }
 #define END_PACKET_DEF(name) } name;
 
-enum {
-    HWID_MAX_HASH_LEN = 120,
-};
-
-
 #pragma pack(push, 1)
 /*
 BEGIN_PACKET_DEF(SPacketGDSetup, HEADER_GD_SETUP)

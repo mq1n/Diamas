@@ -1,84 +1,72 @@
 #include "stdafx.hpp"
 #include "AuthServer.hpp"
-
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/msvc_sink.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_sinks.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/sinks/rotating_file_sink.h>
-
+#include "AuthLogHelper.hpp"
 #include "../../libthecore/include/winminidump.h"
 using namespace net_engine;
 
-/*
-		SECURITY_LEVEL_NONE = 0,  // No handshake
-		SECURITY_LEVEL_BASIC = 1, // Basic handshake (No keys or Diffie-Hellman)
-		SECURITY_LEVEL_XTEA = 2,  // Key/Pong keys
-		SECURITY_LEVEL_KEY_AGREEMENT = 3 // Diffie-Hellman Key agreement
-*/
+#ifdef _IMPROVED_PACKET_ENCRYPTION_
 static const auto gsc_securityLevel = ESecurityLevels::SECURITY_LEVEL_KEY_AGREEMENT;
+#else
+static const auto gsc_securityLevel = ESecurityLevels::SECURITY_LEVEL_XTEA;
+#endif
 static const auto gsc_cryptKey = DEFAULT_CRYPT_KEY;
 
-static int pid_init()
+static bool save_process_id()
 {
-#if defined(_WIN32)
-	return true;
-#else
-	FILE*	fp;
-	if ((fp = fopen("pid", "w")))
+	std::ofstream out("pid", std::ofstream::out);
+	if (out)
 	{
-		fprintf(fp, "%d", getpid());
-		fclose(fp);
+#if defined(_WIN32)
+		out << GetCurrentProcessId();
+#else
+		out << getpid();
+#endif
+		out.close();
 	}
 	else
 	{
-		printf("pid_init(): could not open file for writing. (filename: ./pid)");
+		printf("save_process_id(): could not open file for writing. (filename: ./pid)");
 		return false;
 	}
 	return true;
-#endif
 }
 
 int main(int argc, char** argv)
 {
-	if (setup_minidump_generator() == false)
-		return 1;
+	if (!setup_minidump_generator())
+		return EXIT_FAILURE;
 
-	std::vector<spdlog::sink_ptr> sinks;
-		
-#if defined(_WIN32)
-	sinks.emplace_back(std::make_shared<spdlog::sinks::wincolor_stdout_sink_mt>());
-	sinks.emplace_back(std::make_shared<spdlog::sinks::msvc_sink_mt>());
-#else
-	sinks.emplace_back(std::make_shared<spdlog::sinks::ansicolor_sink>(std::make_shared<spdlog::sinks::stdout_sink_mt>()));
-#endif
 
-	sinks.emplace_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>("auth", 1024 * 1024 * 4, 4));
-	auto logger = std::make_shared<spdlog::logger>("auth", sinks.begin(), sinks.end());
-	spdlog::register_logger(logger);
-	
-	net_engine::NetServiceBase _NetService;
-	std::shared_ptr<GAuthServer> _GAuthServer = std::make_shared<GAuthServer>(_NetService, gsc_securityLevel, gsc_cryptKey);
+	std::unique_ptr <CNetLogger> engine_logger(new CNetLogger("net_engine", CUSTOM_LOG_FILENAME));
+	std::unique_ptr <CAuthLogger> log_manager(new CAuthLogger("auth_logger", "auth.log"));
+	std::unique_ptr <NetPacketManager> packet_manager(new NetPacketManager);
 
-	pid_init();
+
+	NetServiceBase _net_service;
+	auto auth_server = std::make_shared<GAuthServer>(_net_service, gsc_securityLevel, gsc_cryptKey);
+	if (!auth_server || !auth_server.get())
+	{
+		auth_log(LL_CRI, "auth_server could NOT allocated!");
+		abort();
+	}
+
+	if (!save_process_id())
+	{
+		auth_log(LL_CRI, "process id could NOT saved!");
+		abort();
+	}
 
 	try
 	{
-		_GAuthServer->Init(argc, argv);
-		_GAuthServer->Run();
-		_GAuthServer->Shutdown();
+		auth_server->Init(argc, argv);
 	}
-	catch(std::exception& e)
+	catch (std::exception& e)
 	{
-		sys_log(LL_ERR, e.what());
+		auth_log(LL_ERR, e.what());
 	}
 	
-	_GAuthServer.reset();
+	auth_server.reset();
 	spdlog::drop_all();
-	
-	//sys_log(LL_ERR, "ERRROR")
-	//sys_log(LL_SYS, "NOERRROR")
-	
-	return 0;
+		
+	return EXIT_SUCCESS;
 }

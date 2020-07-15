@@ -70,7 +70,7 @@ PyObject* netStartGame(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* netIsTest(PyObject* poSelf, PyObject* poArgs)
 {
-	return Py_BuildValue("i", CPythonApplication::Instance().GetGameStage() == STAGE_TEST_GAME);
+	return Py_BuildValue("i", CPythonApplication::Instance().GetGameStage() == STAGE_BETA_GAME);
 }
 
 PyObject* netWarp(PyObject* poSelf, PyObject* poArgs)

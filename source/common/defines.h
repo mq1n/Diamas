@@ -1,6 +1,6 @@
 #pragma once
 
-// #define _PACKETDUMP
+#define _PACKETDUMP
 
 //#define ENABLE_ANTICHEAT
 #ifdef ENABLE_ANTICHEAT
@@ -110,7 +110,6 @@
 
 
 
-#define _IMPROVED_PACKET_ENCRYPTION_ // 패킷 암호화 개선
 #define __PET_SYSTEM__
 
 #define ENABLE_PROTO_FROM_DB

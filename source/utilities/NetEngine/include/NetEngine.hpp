@@ -6,6 +6,7 @@
 #include "NetCrypt.hpp"
 #include "NetPacketDefinition.hpp"
 #include "NetPacket.hpp"
+#include "NetPacketDispatcher.hpp"
 #include "NetService.hpp"
 #include "NetClient.hpp"
 #include "NetServer.hpp"

@@ -3,10 +3,11 @@
 #include "AuthServer.hpp"
 #include "Packets.hpp"
 #include "AuthPeer.hpp"
+#include "AuthLogHelper.hpp"
 using namespace net_engine;
 
 GDBClient::GDBClient(std::shared_ptr <GAuthServer> server) :
-	net_engine::NetClientBase(server->GetService()(), 0, {}, 5000), m_server(server), m_mainPort(0)
+	net_engine::NetClientBase(server->GetService()(), 0, {}, STAGE_DEV_GAME, 5000), m_server(server), m_mainPort(0)
 {
 	// register packets
 	RegisterPacket<TPacketDGAuthLogin>(HEADER_DG_AUTH_LOGIN, std::bind(&GDBClient::RecvAuthLogin, this, std::placeholders::_1, std::placeholders::_2));
@@ -14,13 +15,13 @@ GDBClient::GDBClient(std::shared_ptr <GAuthServer> server) :
 
 void GDBClient::OnConnect()
 {
-	sys_log(LL_SYS, "Connected to DBCache %s:%u", GetIP().c_str(), GetPort());
+	auth_log(LL_SYS, "Connected to DBCache %s:%u", GetIP().c_str(), GetPort());
 	SendSetup(m_mainPort);
 	BeginRead();
 }
 void GDBClient::OnDisconnect(const asio::error_code& er)
 {
-	sys_log(LL_SYS, "DB Client disconnected: %d(%s). Reconnecting to: %s:%u",
+	auth_log(LL_SYS, "DB Client disconnected: %d(%s). Reconnecting to: %s:%u",
 		er.value(), er.message().c_str(), GetIP().c_str(), GetPort());
 
 	Reconnect();
@@ -30,12 +31,12 @@ void GDBClient::OnRead(std::shared_ptr <Packet> packet)
 {
 	/*
 			const auto header = packet->GetHeader();
-		NET_LOG(LL_SYS, "Peer: %s(%d) Packet: %u(0x%x) is ready for process!", GetIP().c_str(), GetId(), header, header);
+		auth_log(LL_SYS, "Peer: %s(%d) Packet: %u(0x%x) is ready for process!", GetIP().c_str(), GetId(), header, header);
 
 		const auto packet_map = m_handlers.find(header);
 		if (packet_map == m_handlers.end())
 		{
-			NET_LOG(LL_ERR, "Unknown Packet with id %d (%02x) received from PEER %d",
+			auth_log(LL_ERR, "Unknown Packet with id %d (%02x) received from PEER %d",
 				header, header, GetId()
 			);
 			return;
@@ -56,7 +57,7 @@ void GDBClient::OnRead(std::shared_ptr <Packet> packet)
 		if (handler == m_handlers.end()) 
 		{
 			// unkwnown packet dc
-			sys_log(LL_ERR, "Unknown Packet with id %d (%02x) received from DBCache", packetId, packetId);
+			auth_log(LL_ERR, "Unknown Packet with id %d (%02x) received from DBCache", packetId, packetId);
 
 			asio::error_code er;
 			Disconnect(er);
@@ -73,7 +74,7 @@ void GDBClient::OnRead(std::shared_ptr <Packet> packet)
 }
 void GDBClient::OnError(uint32_t error_type, const asio::error_code& er)
 {
-	sys_log(LL_ERR, "Network error handled! ID: %u System error: %d(%s)", error_type, er.value(), er.message().c_str());
+	auth_log(LL_ERR, "Network error handled! ID: %u System error: %d(%s)", error_type, er.value(), er.message().c_str());
 }
 
 void GDBClient::SendSetup(uint16_t mainPort) 

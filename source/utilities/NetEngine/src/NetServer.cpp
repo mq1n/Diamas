@@ -5,7 +5,6 @@ namespace net_engine
 	NetServerBase::NetServerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
 		m_service(service), m_acceptor(service)
 	{
-		static PacketManager packet_manager;
 	}
 
 	bool NetServerBase::Bind(const asio::ip::tcp::endpoint& endpoint)

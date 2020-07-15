@@ -2,12 +2,13 @@
 #include <random.hpp>
 #include <functional>
 #include "../../../common/constants.h"
+#include "../../../common/packets.h"
 
 namespace net_engine
 {
 	using Random = effolkronium::random_static;
 
-	NetPeerBase::NetPeerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey, bool is_server) :
+	NetPeerBase::NetPeerBase(asio::io_context& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey, bool is_server, uint8_t stage) :
 		m_strand(asio::make_strand(service.get_executor())),
 		m_socket(m_strand),
 		m_service(service), 
@@ -18,7 +19,7 @@ namespace net_engine
 		m_logFlag(0),
 		m_crypt_key(cryptKey), m_securityLevel(securityLevel), m_phase(0), m_core_time(0),
 		m_handshaking(false),
-		m_is_server(is_server)
+		m_is_server(is_server), m_stage(stage)
 	{
 		m_handshake = Random::get<uint32_t>(
 			std::numeric_limits<uint32_t>::min(),
@@ -32,7 +33,7 @@ namespace net_engine
 		else if (securityLevel == SECURITY_LEVEL_XTEA)
 		{
 			m_cryptation = std::make_unique<XTEACryptation>();
-			m_cryptation->AddData(XTEA_CRYPTATION_START_KEY, m_crypt_key.data(), PACKET_CRYPT_KEY_LENGTH);
+			m_cryptation->AddData(XTEA_CRYPTATION_START_KEY, (void*)m_crypt_key.data(), PACKET_CRYPT_KEY_LENGTH);
 		}
 	}
 
@@ -85,7 +86,7 @@ namespace net_engine
 
 	void NetPeerBase::Disconnect(const asio::error_code& er)
 	{
-		try
+//		try
 		{
 			NET_LOG(LL_SYS, "Shuting down connection: %s", m_socket.remote_endpoint().address().to_string().c_str());
 
@@ -112,6 +113,7 @@ namespace net_engine
 				OnDisconnect(er);
 			}
 		}
+		/*
 		catch (const asio::system_error& e)
 		{
 			NET_LOG(LL_ERR, "Exception occured: %s", e.what());
@@ -120,6 +122,7 @@ namespace net_engine
 		{
 			NET_LOG(LL_ERR, "Unhandled exception occured");
 		}
+		*/
 	}
 	void NetPeerBase::Disconnect2()
 	{
@@ -228,6 +231,12 @@ namespace net_engine
 
 	void NetPeerBase::BeginRead()
 	{
+		if (m_isShutingDown)
+			return;
+
+		if (!m_socket.is_open())
+			return;
+
 		NET_LOG(LL_SYS, "Reading next packet");
 
 		asio::async_read(
@@ -277,7 +286,7 @@ namespace net_engine
 
 				NET_LOG(LL_SYS, "Received header: %d(0x%02x)", header, header);
 
-				auto packet = PacketManager::Instance().CreatePacket(header, EPacketDirection::Incoming);
+				auto packet = NetPacketManager::Instance().CreatePacket(CreateIncomingPacketID(header));
 				if (!packet)
 				{
 					NET_LOG(LL_SYS, "Received unknown header: %d(0x%02x)", header, header);
@@ -473,9 +482,9 @@ namespace net_engine
 
 	void NetPeerBase::SetPhaseGC(uint8_t phase)
 	{
-		NET_LOG(LL_SYS, "Set phase to 0X%X", phase);
+		NET_LOG(LL_SYS, "Set phase to 0x%x", phase);
 
-		auto packet = PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_PHASE, EPacketDirection::Outgoing);
+		auto packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GC_PHASE));
 		if (!packet)
 		{
 			NET_LOG(LL_CRI, "Phase packet could not created!");
@@ -484,6 +493,7 @@ namespace net_engine
 		}
 
 		packet->SetField<uint8_t>("phase", phase);
+		packet->SetField<uint8_t>("stage", m_stage);
 
 		m_phase = phase;
 
@@ -501,7 +511,7 @@ namespace net_engine
 
 	void NetPeerBase::SendHandshakeGC(uint32_t time, uint32_t delta)
 	{
-		auto packet = PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_HANDSHAKE, EPacketDirection::Outgoing);
+		auto packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GC_HANDSHAKE));
 		if (!packet)
 		{
 			NET_LOG(LL_CRI, "Handshake packet could not created!");
@@ -606,7 +616,7 @@ namespace net_engine
 		memcpy(keys, staticKey->data(), staticKey->size());
 		memcpy(keys + staticKey->size(), ephemeralKey->data(), ephemeralKey->size());
 
-		auto packet = PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT, EPacketDirection::Outgoing);
+		auto packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GC_KEY_AGREEMENT));
 		if (!packet)
 		{
 			NET_LOG(LL_CRI, "Key agreement packet could not created!");
@@ -651,7 +661,7 @@ namespace net_engine
 			return;
 		}
 
-		auto packet2 = PacketManager::Instance().CreatePacket(ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT_COMPLETED, EPacketDirection::Outgoing);
+		auto packet2 = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GC_KEY_AGREEMENT_COMPLETED));
 		if (!packet2)
 		{
 			NET_LOG(LL_CRI, "Key agreement completed packet could not created!");

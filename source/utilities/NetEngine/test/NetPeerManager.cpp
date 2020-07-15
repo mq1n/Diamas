@@ -1,60 +1,20 @@
 #include "../include/NetEngine.hpp"
 #include "NetPeerManager.hpp"
 #include "NetServerManager.hpp"
+#include "NetPacketDispatcher.hpp"
 #include "../../../common/constants.h"
+#include "../../../common/packets.h"
 
 namespace net_engine
 {
 	CNetworkConnectionManager::CNetworkConnectionManager(
 		std::shared_ptr <CNetworkServerManager> server, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
-		NetPeerBase(server->GetServiceInstance()(), securityLevel, cryptKey, true), m_server(server), m_deadline_timer(server->GetServiceInstance()())
+		NetPeerBase(server->GetServiceInstance()(), securityLevel, cryptKey, true, STAGE_DEV_GAME), m_server(server), m_deadline_timer(server->GetServiceInstance()())
 	{
 		NET_LOG(LL_TRACE, "Creating connection object");
 
-		RegisterPacket(
-			"GC_KEY_AGREEMENT_COMPLETED", ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT_COMPLETED, nullptr, false, true, nullptr
-		);
-		RegisterPacket(
-			"GC_PHASE", ReservedGCHeaders::HEADER_GC_PHASE, nullptr, false, true,
-			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
-				packet_def->AddField<uint8_t>("phase");
-			}
-		);
-		RegisterPacket(
-			"GC_KEY_AGREEMENT", ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT, nullptr, false, true,
-			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
-				packet_def->AddField<uint16_t>("valuelen");
-				packet_def->AddField<uint16_t>("datalen");
-				packet_def->AddField<char[256]>("data");
-			}
-		);
-		RegisterPacket(
-			"GC_HANDSHAKE", ReservedGCHeaders::HEADER_GC_HANDSHAKE, nullptr, false, true,
-			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
-				packet_def->AddField<uint32_t>("handshake");
-				packet_def->AddField<uint32_t>("time");
-				packet_def->AddField<uint32_t>("delta");
-			}
-		);
-
-		// ---
-
-		RegisterPacket(
-			"CG_KEY_AGREEMENT", ReservedCGHeaders::HEADER_CG_KEY_AGREEMENT, std::bind(&CNetworkConnectionManager::OnRecvKeyAgreementPacket, this, std::placeholders::_1), true, false,
-			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
-				packet_def->AddField<uint16_t>("valuelen");
-				packet_def->AddField<uint16_t>("datalen");
-				packet_def->AddField<char[256]>("data");
-			}
-		);
-		RegisterPacket(
-			"CG_HANDSHAKE", ReservedCGHeaders::HEADER_CG_HANDSHAKE, std::bind(&CNetworkConnectionManager::OnRecvHandshakePacket, this, std::placeholders::_1), true, false,
-			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
-				packet_def->AddField<uint32_t>("handshake");
-				packet_def->AddField<uint32_t>("time");
-				packet_def->AddField<uint32_t>("delta");
-			}
-		);
+		REGISTER_PACKET_HANDLER(HEADER_CG_KEY_AGREEMENT, std::bind(&CNetworkConnectionManager::OnRecvKeyAgreementPacket, this, std::placeholders::_1));
+		REGISTER_PACKET_HANDLER(HEADER_CG_HANDSHAKE, std::bind(&CNetworkConnectionManager::OnRecvHandshakePacket, this, std::placeholders::_1));
 
 		m_deadline_timer.expires_from_now(std::chrono::seconds(30));
      	m_deadline_timer.async_wait(std::bind(&CNetworkConnectionManager::CheckDeadlineStatus, this));
@@ -105,15 +65,13 @@ namespace net_engine
 		const auto header = packet->GetHeader();
 		NET_LOG(LL_SYS, "Peer: %s(%d) Packet: %u(0x%x) is ready for process!", GetIP().c_str(), GetId(), header, header);
 
-		const auto packet_map = m_handlers.find(header);
-		if (packet_map == m_handlers.end())
+		const auto handler = m_dispatcher.GetPacketHandler(header);
+		if (!handler)
 		{
-			NET_LOG(LL_ERR, "Unknown Packet with id %d (%02x) received from PEER %d",
-				header, header, GetId()
-			);
+			NET_LOG(LL_ERR, "Unknown Packet with id %d (%02x) received from PEER %d", header, header, GetId());
 			return;
 		}
-		packet_map->second(packet);
+		handler(packet);
 	}
 	void CNetworkConnectionManager::OnError(uint32_t error_type, const asio::error_code& er)
 	{

@@ -1167,9 +1167,11 @@ struct SPacketCGLogin2 : SNetPacket
 struct SPacketCGLogin3 : SNetPacket
 {
 	char		name[LOGIN_MAX_LEN + 1]{};
-	char		pwd[LOGIN_MAX_LEN + 1]{};
+	char		pwd[PASSWD_MAX_LEN + 1]{};
 	uint32_t	adwClientKey[4]{};
 	uint32_t	version{};
+	char		hwid[HWID_MAX_HASH_LEN + 1]{};
+	char		lang[LANG_MAX_LEN + 1]{};
 
 	NET_DECLARE_PACKET(HEADER_CG_LOGIN3, SPacketCGLogin3); // 60
 };

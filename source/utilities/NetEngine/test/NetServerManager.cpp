@@ -10,6 +10,7 @@ namespace net_engine
 		m_securityLevel(securityLevel), m_crypt_key(cryptKey)
 	{
 		NET_LOG(LL_TRACE, "Creating server on %s:%u", ip_address.c_str(), port);
+		NetPacketManager::Instance().RegisterPackets(true);
 	}
 	CNetworkServerManager::~CNetworkServerManager()
 	{

@@ -4,6 +4,7 @@
 #include <list>
 #include <array>
 #include <memory>
+#include "../../../common/defines.h"
 
 #define NET_CREATEMAGIC(b0, b1, b2, b3) \
 	(uint32_t(uint8_t(b0)) | (uint32_t(uint8_t(b1)) << 8) | \
@@ -17,11 +18,12 @@ namespace net_engine
 	static const auto PACKET_VERSION			= 1;
 	static const auto PACKET_CRYPT_KEY_LENGTH	= 16;
 
-	using TPacketCryptKey = std::array <uint8_t, PACKET_CRYPT_KEY_LENGTH>;
+	using TPacketCryptKey = std::array <const char, PACKET_CRYPT_KEY_LENGTH + 1>;
 	static const auto DEFAULT_CRYPT_KEY = TPacketCryptKey // TODO: XOR
 	{
 		// Key: 0 - 16
-		0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
+//		0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
+		LSS_SECURITY_KEY
 	};
 
 #if 0

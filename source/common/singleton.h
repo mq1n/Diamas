@@ -33,7 +33,7 @@ public:
 		ms_singleton = nullptr;
 	}
 
-	__forceinline static T& Instance()
+	inline static T& Instance()
 	{
 #ifdef _WIN32
 		if (!ms_singleton)
@@ -44,7 +44,7 @@ public:
 		return (*ms_singleton);
 	}
 
-	__forceinline static T* InstancePtr()
+	inline static T* InstancePtr()
 	{
 		return (ms_singleton);
 	}

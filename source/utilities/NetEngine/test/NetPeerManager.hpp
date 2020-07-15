@@ -8,9 +8,6 @@
 namespace net_engine
 {	
 	using ConnectionProperty = std::variant <std::string, uint32_t, uint8_t>;
-	using THandlerFunc 		 = std::function <void(std::shared_ptr <Packet> packet)>;
-	using TPacketHandler 	 = std::unordered_map <TNetOpcode, THandlerFunc>;
-	using TOnPacketRegister	 = std::function <void(std::shared_ptr <PacketDefinition>)>;
 
 	class CNetworkServerManager;
 
@@ -47,30 +44,6 @@ namespace net_engine
 				return std::get<T>(GetProperty(property));
 			}
 
-			inline bool RegisterPacket(const std::string& name, TNetOpcode header, THandlerFunc handler, bool incoming, bool outgoing, TOnPacketRegister on_register)
-			{ 
-				std::shared_ptr <PacketDefinition> def;
-				if ((def = PacketManager::Instance().RegisterPacket(name, header, incoming, outgoing)))
-				{
-					if (handler)
-						m_handlers.emplace(header, handler);
-					if (on_register)
-						on_register(def);
-					return true;
-				}
-				return false;
-			}
-			inline bool DeregisterPacket(TNetOpcode header, bool incoming, bool outgoing)
-			{
-				auto iter = m_handlers.find(header);
-				if (iter != m_handlers.end())
-				{
-					m_handlers.erase(iter);
-					return PacketManager::Instance().DeregisterPacket(header, incoming, outgoing);
-				}
-				return false;
-			}
-
 			// IO
 			void SendAsReply(std::shared_ptr <Packet> request, std::shared_ptr <Packet> reply);
 
@@ -80,8 +53,8 @@ namespace net_engine
 
 		private:
 			std::weak_ptr <CNetworkServerManager>		m_server;
+			NetPacketDispatcher 						m_dispatcher;
 			std::map <std::string, ConnectionProperty>	m_properties;
-			TPacketHandler								m_handlers;
 			asio::high_resolution_timer 				m_deadline_timer;
 	};
 }

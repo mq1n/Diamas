@@ -289,91 +289,122 @@ namespace net_engine
 
 
 
-	static PacketManager* gs_pNetPacketManagerInstance = nullptr;
+	bool NetPacketManager::IsRegistiredPacket(const SPacketID& packet_id)
+	{
+		if (!packet_id.incoming && !packet_id.outgoing)
+			return false;
 
-	PacketManager* PacketManager::InstancePtr()
-	{
-		return gs_pNetPacketManagerInstance;
-	}
-	PacketManager& PacketManager::Instance()
-	{
-		assert(gs_pNetPacketManagerInstance);
-		return *gs_pNetPacketManagerInstance;
-	}
-
-	PacketManager::PacketManager()
-	{
-		assert(!gs_pNetPacketManagerInstance);
-		gs_pNetPacketManagerInstance = this;
-
-	}
-	PacketManager::~PacketManager()
-	{
-		assert(gs_pNetPacketManagerInstance == this);
-		gs_pNetPacketManagerInstance = nullptr;
-	}
-
-	std::shared_ptr <PacketDefinition> PacketManager::RegisterPacket(const std::string& name, uint8_t header, bool incoming, bool outgoing)
-	{
-		if (!incoming && !outgoing)
+		if (packet_id.incoming)
 		{
-			NET_LOG(LL_ERR, "Tried to register packet %u with incoming & outgoing traffic disabled", header);
+			auto it = m_incomingPackets.find(packet_id.header);
+			if (it == m_incomingPackets.end())
+				return false;
+			return true;
+		}
+		if (packet_id.outgoing)
+		{
+			auto it = m_outgoingPackets.find(packet_id.header);
+			if (it == m_outgoingPackets.end())
+				return false;
+			return true;
+		}	
+		return false;	
+	}
+	std::shared_ptr <PacketDefinition> NetPacketManager::GetPacketDefination(const SPacketID& packet_id)
+	{
+		if (!packet_id.incoming && !packet_id.outgoing)
+		{
+			NET_LOG(LL_ERR, "Tried to get packet %u with incoming & outgoing traffic disabled", packet_id.header);
 			return nullptr;
 		}
 
-		if (incoming)
+		if (packet_id.incoming)
 		{
-			if (m_incomingPackets.find(header) != m_incomingPackets.end())
+			if (m_incomingPackets.find(packet_id.header) == m_incomingPackets.end())
 			{
-				NET_LOG(LL_ERR, "Tried to register packet %u for incoming which is already in use", header);
+				NET_LOG(LL_ERR, "Tried to get packet %u for incoming which does not found", packet_id.header);
+				return nullptr;
+			}
+			return m_incomingPackets[packet_id.header];
+		}
+		if (packet_id.outgoing)
+		{
+			if (m_outgoingPackets.find(packet_id.header) == m_outgoingPackets.end())
+			{
+				NET_LOG(LL_ERR, "Tried to get packet %u for outgoing which does not found", packet_id.header);
+				return nullptr;
+			}
+			return m_outgoingPackets[packet_id.header];
+		}
+
+		return {};
+	}
+
+	std::shared_ptr <PacketDefinition> NetPacketManager::RegisterPacket(const std::string& name, const SPacketID& packet_id, TOnPacketRegister on_register, const std::string& from_func)
+	{
+		if (!packet_id.incoming && !packet_id.outgoing)
+		{
+			NET_LOG(LL_ERR, "Tried to register packet %u with incoming & outgoing traffic disabled", packet_id.header);
+			return nullptr;
+		}
+
+		if (packet_id.incoming)
+		{
+			if (m_incomingPackets.find(packet_id.header) != m_incomingPackets.end())
+			{
+				NET_LOG(LL_ERR, "Tried to register packet %u for incoming which is already in use", packet_id.header);
 				return nullptr;
 			}
 		}
-		if (outgoing)
+		if (packet_id.outgoing)
 		{
-			if (m_outgoingPackets.find(header) != m_outgoingPackets.end())
+			if (m_outgoingPackets.find(packet_id.header) != m_outgoingPackets.end())
 			{
-				NET_LOG(LL_ERR, "Tried to register packet %u for outgoing which is already in use", header);
+				NET_LOG(LL_ERR, "Tried to register packet %u for outgoing which is already in use", packet_id.header);
 				return nullptr;
 			}
 		}
 
-		auto packet = std::make_shared<PacketDefinition>(name, header);
+		auto packet = std::make_shared<PacketDefinition>(name, packet_id.header);
 
-		NET_LOG(LL_SYS, "Registered %s packet: %s (%u/0x%X)", incoming ? "'incoming'" : "'outgoing'", name.c_str(), header, header);
+		NET_LOG(LL_SYS, "Registered %s packet: %s (%u/0x%X)", packet_id.incoming ? "'incoming'" : "'outgoing'", name.c_str(), packet_id.header, packet_id.header);
 
-		if (incoming)
-			m_incomingPackets[header] = packet;
-		if (outgoing)
-			m_outgoingPackets[header] = packet;
+		if (packet_id.incoming)
+			m_incomingPackets[packet_id.header] = packet;
+
+		if (packet_id.outgoing)
+			m_outgoingPackets[packet_id.header] = packet;
+
+		if (on_register)
+			on_register(packet);
 
 		return packet;
 	}
-	bool PacketManager::DeregisterPacket(uint8_t header, bool incoming, bool outgoing)
+	bool NetPacketManager::DeregisterPacket(const SPacketID& packet_id)
 	{
-		if (!incoming && !outgoing)
+		if (!packet_id.incoming && !packet_id.outgoing)
 		{
-			NET_LOG(LL_ERR, "Tried to deregister packet %u with incoming & outgoing traffic disabled", header);
+			NET_LOG(LL_ERR, "Tried to deregister packet %u with incoming & outgoing traffic disabled", packet_id.header);
 			return false;
 		}
 
-		if (incoming)
+		if (packet_id.incoming)
 		{
-			auto it = m_incomingPackets.find(header);
+			auto it = m_incomingPackets.find(packet_id.header);
 			if (it == m_incomingPackets.end())
 			{
-				NET_LOG(LL_ERR, "Tried to deregister packet %u for incoming which is not registired", header);
+				NET_LOG(LL_ERR, "Tried to deregister packet %u for incoming which is not registired", packet_id.header);
 				return false;
 			}
 			m_incomingPackets.erase(it);
 			return true;
 		}
-		if (outgoing)
+		if (packet_id.outgoing)
 		{
-			auto it = m_outgoingPackets.find(header);
+			auto it = m_outgoingPackets.find(packet_id.header);
 			if (it == m_outgoingPackets.end())
 			{
-				NET_LOG(LL_ERR, "Tried to deregister packet %u for outgoing which is not registired", header);
+				NET_LOG(LL_ERR, "Tried to deregister packet %u for outgoing which is not registired", packet_id.header);
 				return false;
 			}
 			m_outgoingPackets.erase(it);
@@ -382,30 +413,115 @@ namespace net_engine
 		return false;	
 	}
 
-	std::shared_ptr <Packet> PacketManager::CreatePacket(uint8_t header, EPacketDirection direction)
+	std::shared_ptr <Packet> NetPacketManager::CreatePacket(const SPacketID& packet_id)
 	{
-		if (direction == EPacketDirection::Incoming)
+		if (packet_id.incoming)
 		{
-			if (m_incomingPackets.find(header) != m_incomingPackets.end())
+			if (m_incomingPackets.find(packet_id.header) != m_incomingPackets.end())
 			{
-				return std::make_shared<Packet>(m_incomingPackets[header]);
+				return std::make_shared<Packet>(m_incomingPackets[packet_id.header]);
 			}
 			else
 			{
-				NET_LOG(LL_ERR, "Failed to find packet %u in incoming packet types", header);
+				NET_LOG(LL_ERR, "Failed to find packet %u in incoming packet types", packet_id.header);
 			}
 		}
-		else if (direction == EPacketDirection::Outgoing)
+		else if (packet_id.outgoing)
 		{
-			if (m_outgoingPackets.find(header) != m_outgoingPackets.end())
+			if (m_outgoingPackets.find(packet_id.header) != m_outgoingPackets.end())
 			{
-				return std::make_shared<Packet>(m_outgoingPackets[header]);
+				return std::make_shared<Packet>(m_outgoingPackets[packet_id.header]);
 			}
 			else
 			{
-				NET_LOG(LL_ERR, "Failed to find packet %u in outgoing packet types", header);
+				NET_LOG(LL_ERR, "Failed to find packet %u in outgoing packet types", packet_id.header);
 			}
 		}
 		return nullptr;
+	}
+
+	void NetPacketManager::RegisterPackets(bool is_server)
+	{
+		bool incoming = !is_server;
+		bool outgoing = !incoming;
+
+		REGISTER_PACKET(
+			HEADER_GC_AUTH_SUCCESS, incoming,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint32_t>("dwLoginKey");
+				packet_def->AddField<uint8_t>("bResult");
+			}
+		);
+		REGISTER_PACKET(
+			HEADER_GC_LOGIN_FAILURE, incoming,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddString("szStatus", LOGIN_STATUS_MAX_LEN + 1);
+			}
+		);
+		REGISTER_PACKET(
+			HEADER_GC_KEY_AGREEMENT_COMPLETED, incoming,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint8_t[3]>("dummy");
+			}
+		);
+		REGISTER_PACKET(
+			HEADER_GC_PHASE, incoming,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint8_t>("phase");
+				packet_def->AddField<uint8_t>("stage");
+			}
+		);
+		REGISTER_PACKET(
+			HEADER_GC_KEY_AGREEMENT, incoming,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint16_t>("valuelen");
+				packet_def->AddField<uint16_t>("datalen");
+				packet_def->AddField<char[256]>("data");
+			}
+		);
+		REGISTER_PACKET(
+			HEADER_GC_HANDSHAKE, incoming,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint32_t>("handshake");
+				packet_def->AddField<uint32_t>("time");
+				packet_def->AddField<uint32_t>("delta");
+			}
+		);
+
+		// ---
+		REGISTER_PACKET(
+			HEADER_CG_HACK, outgoing,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<char[255 + 1]>("szBuf");
+				packet_def->AddField<char[255 + 1]>("szInfo");
+			}
+		);
+		REGISTER_PACKET(
+			HEADER_CG_LOGIN3, outgoing,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddString("name", LOGIN_MAX_LEN + 1);
+				packet_def->AddString("pwd", PASSWD_MAX_LEN + 1);
+				packet_def->AddField<uint32_t[4]>("adwClientKey");
+				packet_def->AddField<uint32_t>("version");
+				packet_def->AddString("hwid", HWID_MAX_HASH_LEN + 1);
+				packet_def->AddString("lang", LANG_MAX_LEN + 1);
+			}
+		);
+		REGISTER_PACKET(
+			HEADER_CG_KEY_AGREEMENT, outgoing,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint16_t>("valuelen");
+				packet_def->AddField<uint16_t>("datalen");
+				packet_def->AddField<char[256]>("data");
+			}
+		);
+		REGISTER_PACKET(
+			HEADER_CG_HANDSHAKE, outgoing,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint32_t>("handshake");
+				packet_def->AddField<uint32_t>("time");
+				packet_def->AddField<uint32_t>("delta");
+			}
+		);
 	}
 };

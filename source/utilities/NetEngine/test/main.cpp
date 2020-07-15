@@ -87,6 +87,8 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;		
 	}
 
+	std::unique_ptr <NetPacketManager> packet_manager(new NetPacketManager);
+
 	if (type == "client")
 	{
 		if (!InitializeClient())

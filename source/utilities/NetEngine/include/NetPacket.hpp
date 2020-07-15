@@ -5,35 +5,24 @@
 #include "NetLogHelper.hpp"
 #include "NetPeer.hpp"
 #include "NetPacketDefinition.hpp"
+#include "../../../common/singleton.h"
+#include "../../../common/packets.h"
 
 namespace net_engine
 {
 	using TNetOpcode = uint8_t;
 
+	struct SPacketID
+	{
+		TNetOpcode header{0};
+		bool incoming{false};
+		bool outgoing{false};
+	};
+
 	enum class EPacketDirection
 	{
 		Incoming,
 		Outgoing
-	};
-
-	enum EReservedCommonHeaders : uint8_t
-	{
-		HEADER_KEY_AGREEMENT = 254,
-		HEADER_HANDSHAKE = 255
-	};
-
-	enum ReservedGCHeaders : uint8_t
-	{
-		HEADER_GC_KEY_AGREEMENT_COMPLETED = 252,
-		HEADER_GC_PHASE = 253,
-		HEADER_GC_KEY_AGREEMENT = HEADER_KEY_AGREEMENT,
-		HEADER_GC_HANDSHAKE = HEADER_HANDSHAKE
-	};
-
-	enum ReservedCGHeaders : uint8_t
-	{
-		HEADER_CG_KEY_AGREEMENT = HEADER_KEY_AGREEMENT,
-		HEADER_CG_HANDSHAKE = HEADER_HANDSHAKE
 	};
 
 	enum ESecurityLevels : uint8_t
@@ -106,43 +95,43 @@ namespace net_engine
 		uint8_t m_sequence;
 	};
 
-	class PacketManager
+	inline SPacketID CreateIncomingPacketID(TNetOpcode header)
 	{
+		SPacketID id { header, true, false };
+		return id;
+	}
+	inline SPacketID CreateOutgoingPacketID(TNetOpcode header)
+	{
+		SPacketID id { header, false, true };
+		return id;
+	}
+
+	class NetPacketManager : public CSingleton <NetPacketManager>
+	{
+		using TOnPacketRegister	 = std::function <void(std::shared_ptr <PacketDefinition>)>;
+
 		public:
-			PacketManager();
-			virtual ~PacketManager();
+			NetPacketManager() = default;
+			virtual ~NetPacketManager() = default;
 
-			static PacketManager* InstancePtr();
-			static PacketManager& Instance();
+			bool IsRegistiredPacket(const SPacketID& packet_id);
+			std::shared_ptr <PacketDefinition> GetPacketDefination(const SPacketID& packet_id);
 
-			std::shared_ptr <PacketDefinition> RegisterPacket(const std::string& name, uint8_t header, bool incoming, bool outgoing);
-			bool DeregisterPacket(uint8_t header, bool incoming, bool outgoing);
+			std::shared_ptr <PacketDefinition> RegisterPacket(const std::string& name, const SPacketID& packet_id, TOnPacketRegister on_register, const std::string& from_func);
+			bool DeregisterPacket(const SPacketID& packet_id);
 
-			std::shared_ptr <Packet> CreatePacket(uint8_t header, EPacketDirection direction);
+			std::shared_ptr <Packet> CreatePacket(const SPacketID& packet_id);
+
+			void RegisterPackets(bool is_server);
 
 		private:
 			std::map <uint8_t, std::shared_ptr <PacketDefinition>> m_incomingPackets;
 			std::map <uint8_t, std::shared_ptr <PacketDefinition>> m_outgoingPackets;
 	};
-
-
-	using THandlerFunc 		 = std::function <void(std::shared_ptr <Packet> packet)>;
-	using TOnPacketRegister	 = std::function <void(std::shared_ptr <PacketDefinition>)>;
-
-	static inline bool RegisterPacket(const std::string& name, TNetOpcode header, THandlerFunc handler, bool incoming, bool outgoing, TOnPacketRegister on_register)
-	{ 
-		std::shared_ptr <PacketDefinition> def;
-		if ((def = PacketManager::Instance().RegisterPacket(name, header, incoming, outgoing)))
-		{
-			on_register(def);
-			return true;
-		}
-		return false;
-	}
-	static inline bool DeregisterPacket(TNetOpcode header, bool incoming, bool outgoing)
-	{
-		return PacketManager::Instance().DeregisterPacket(header, incoming, outgoing);
-	}
-
-	void SetupPackets(bool is_server);
 };
+
+#ifndef REGISTER_PACKET
+	#define REGISTER_PACKET(header, incoming, on_register)\
+	if (net_engine::NetPacketManager::InstancePtr())\
+	{ net_engine::NetPacketManager::Instance().RegisterPacket(NAMEOF(header).c_str(), { header, incoming, !incoming }, on_register, __FUNCTION__); }
+#endif

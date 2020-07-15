@@ -1042,7 +1042,7 @@ PyObject* appIsDevStage(PyObject* poSelf, PyObject* poArgs)
 
 PyObject* appIsTestStage(PyObject* poSelf, PyObject* poArgs)
 {
-	return Py_BuildValue("i", CPythonApplication::Instance().GetGameStage() == STAGE_TEST_GAME);
+	return Py_BuildValue("i", CPythonApplication::Instance().GetGameStage() == STAGE_BETA_GAME);
 }
 
 PyObject* appIsLiveStage(PyObject* poSelf, PyObject* poArgs)

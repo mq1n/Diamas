@@ -1,7 +1,6 @@
 #pragma once
 #include "../include/NetEngine.hpp"
 #include "NetPeerManager.hpp"
-#include "nameof.hpp"
 
 namespace net_engine
 {	

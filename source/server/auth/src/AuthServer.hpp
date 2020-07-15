@@ -1,29 +1,28 @@
 #pragma once
 #include "AccountManager.hpp"
+#include "AuthPeer.hpp"
 #include "DBClient.hpp"
 #include <array>
 
-class GAuthPeer;
+struct DBConfig
+{
+	std::string address;
+	std::string user;
+	std::string password;
+	std::string database;
+	uint16_t port{ 0 };
+};
 
 class GAuthServer : public net_engine::NetServerBase
 {
-private:
-	typedef std::unordered_map <uint8_t, std::pair<std::size_t, std::function<std::size_t(std::shared_ptr<GAuthPeer>, const void*, std::size_t)> > > MapPacketHandlers;
-	struct DBConfig
-	{
-		std::string address;
-		std::string user;
-		std::string password;
-		std::string database;
-		uint16_t port = {0};
-	};
-	
 public:
 	GAuthServer(net_engine::NetServiceBase& netService, uint8_t securityLevel, const net_engine::TPacketCryptKey& cryptKey);
 	virtual ~GAuthServer();
 	
-	net_engine::NetServiceBase& GetService() 	{ return m_netService; };
-	GAccountManager& GetAccountManager()		{ return m_accountManager; };
+	auto& GetService() 			{ return m_netService; };
+	auto& GetAccountManager()	{ return m_accountManager; };
+	auto& GetDBClient()			{ return m_dbClient; };
+	auto& GetDBManager()		{ return m_dbManager; };
 
 	virtual void Init(int argc, char** argv);
 	virtual void Run();
@@ -32,43 +31,37 @@ public:
 	
 	virtual std::shared_ptr <GAuthPeer> FindPeer(uint32_t id) const;
 	virtual void RemovePeer(uint32_t id);
-		
-	template<typename PacketT, typename HandlerT> inline void RegisterPacket(uint8_t type, HandlerT handler) { m_handlers.insert(std::make_pair(type, std::make_pair(PacketT::size(), handler))); }
-	inline void RemovePacket(uint8_t type)
-	{
-		auto iter = m_handlers.find(type);
-		if(iter != m_handlers.end())
-		{
-			m_handlers.erase(iter);
-		}
-	}
-	
+
+	virtual void BroadcastPacket(std::shared_ptr <net_engine::Packet> packet);
+	virtual void SendTo(std::shared_ptr <net_engine::Packet> packet, std::function<bool(GAuthPeer*)> filter);
+	virtual void SendToPhase(std::shared_ptr <net_engine::Packet> packet, uint8_t phase);
+
+	virtual uint8_t GetStage() const { return m_config_stage; };
+
 protected:
-	virtual std::shared_ptr<net_engine::NetPeerBase> NewPeer();
+	virtual std::shared_ptr <net_engine::NetPeerBase> NewPeer();
 	
-	virtual void __parseCmdLine(int argc, char** argv);
-	virtual bool __parseConfig();
-	virtual void __registerHandlers();
+	virtual bool __ParseCommandLine(int argc, char** argv);
+	virtual bool __ParseConfigFile();
+	virtual bool __CreateDBConnection();
 	
 	static void OnMySQLConnect(std::weak_ptr<GAuthServer> self, const asio::error_code& e);
 	static void OnLoginSQLQuery(std::weak_ptr<GAuthServer> self, const asio::error_code& e, std::shared_ptr<GAuthPeer> peer, uint32_t loginKey);
 	static void OnLoginSQLResult(std::weak_ptr<GAuthServer> self, const asio::error_code& e, amy::result_set rs, std::shared_ptr<GAuthPeer> peer, uint32_t loginKey);
 
-	std::size_t RecvLogin(std::shared_ptr<GAuthPeer> peer, const void * data, std::size_t maxlength);
-	std::size_t RecvHack(std::shared_ptr<GAuthPeer> peer, const void * data, std::size_t maxlength);
 private:
-	net_engine::NetServiceBase& m_netService;
-	GAccountManager m_accountManager;
-	std::shared_ptr<GDBClient> m_dbClient;
-	amy::connector m_dbManager;
-	std::unordered_map<uint32_t, std::shared_ptr<GAuthPeer> > m_peers;
-	MapPacketHandlers m_handlers;
+	net_engine::NetServiceBase&									m_netService;
+	GAccountManager												m_accountManager;
+	std::shared_ptr <GDBClient>									m_dbClient;
+	amy::connector												m_dbManager;
+	std::unordered_map <uint32_t, std::shared_ptr <GAuthPeer> > m_peers;
 	
-	// config
-	std::string m_configXml;
-	std::string m_configKey;
-	uint32_t m_cfgClientVersion = {0};
+	uint8_t m_server_key;
+	std::string m_config_file;
+	uint8_t m_config_stage;
+	uint32_t m_cfgClientVersion{0};
 	asio::ip::tcp::endpoint m_cfgDBCache;
+
 	struct
 	{
 		std::string hostname;

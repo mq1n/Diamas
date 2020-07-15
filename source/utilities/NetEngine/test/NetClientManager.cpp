@@ -1,60 +1,18 @@
 #include "../include/NetEngine.hpp"
 #include "NetClientManager.hpp"
 #include "ClientCipher.hpp"
+#include "../../../common/packets.h"
 
 namespace net_engine
 {	
 	CNetworkClientManager::CNetworkClientManager(NetServiceBase& service, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
-		NetClientBase(service(), securityLevel, cryptKey, 5000), m_pNetService(service)
+		NetClientBase(service(), securityLevel, cryptKey, STAGE_DEV_GAME, 5000), m_pNetService(service)
 	{
-		// TODO: SERVER-CLIENT TEK DOSYADA BÝRLEÞTÝR
-		
-		RegisterPacket(
-			"GC_KEY_AGREEMENT_COMPLETED", ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT_COMPLETED, std::bind(&CNetworkClientManager::OnRecvKeyAgreementCompletedPacket, this, std::placeholders::_1), true, false, nullptr
-		);
-		RegisterPacket(
-			"GC_PHASE", ReservedGCHeaders::HEADER_GC_PHASE, std::bind(&CNetworkClientManager::OnRecvPhasePacket, this, std::placeholders::_1), true, false,
-			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
-				packet_def->AddField<uint8_t>("phase");
-			}
-		);
-		RegisterPacket(
-			"GC_KEY_AGREEMENT", ReservedGCHeaders::HEADER_GC_KEY_AGREEMENT, std::bind(&CNetworkClientManager::OnRecvKeyAgreementPacket, this, std::placeholders::_1), true, false,
-			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
-				packet_def->AddField<uint16_t>("valuelen");
-				packet_def->AddField<uint16_t>("datalen");
-				packet_def->AddField<char[256]>("data");
-			}
-		);
-		RegisterPacket(
-			"GC_HANDSHAKE", ReservedGCHeaders::HEADER_GC_HANDSHAKE, std::bind(&CNetworkClientManager::OnRecvHandshakePacket, this, std::placeholders::_1), true, false,
-			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
-				packet_def->AddField<uint32_t>("handshake");
-				packet_def->AddField<uint32_t>("time");
-				packet_def->AddField<uint32_t>("delta");
-			}
-		);
-
-		// ---
-
-		RegisterPacket(
-			"CG_KEY_AGREEMENT", ReservedCGHeaders::HEADER_CG_KEY_AGREEMENT, nullptr, false, true,
-			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
-				packet_def->AddField<uint16_t>("valuelen");
-				packet_def->AddField<uint16_t>("datalen");
-				packet_def->AddField<char[256]>("data");
-			}
-		);
-		RegisterPacket(
-			"CG_HANDSHAKE", ReservedCGHeaders::HEADER_CG_HANDSHAKE, nullptr, false, true,
-			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
-				packet_def->AddField<uint32_t>("handshake");
-				packet_def->AddField<uint32_t>("time");
-				packet_def->AddField<uint32_t>("delta");
-			}
-		);
-
-		// ---
+		NetPacketManager::Instance().RegisterPackets(false);
+		REGISTER_PACKET_HANDLER(HEADER_GC_KEY_AGREEMENT_COMPLETED, std::bind(&CNetworkClientManager::OnRecvKeyAgreementCompletedPacket, this, std::placeholders::_1));
+		REGISTER_PACKET_HANDLER(HEADER_GC_PHASE, std::bind(&CNetworkClientManager::OnRecvPhasePacket, this, std::placeholders::_1));
+		REGISTER_PACKET_HANDLER(HEADER_GC_KEY_AGREEMENT, std::bind(&CNetworkClientManager::OnRecvKeyAgreementPacket, this, std::placeholders::_1));
+		REGISTER_PACKET_HANDLER(HEADER_GC_HANDSHAKE, std::bind(&CNetworkClientManager::OnRecvHandshakePacket, this, std::placeholders::_1));
 
 		m_kServerTimeSync = {0, 0};
 	}
@@ -91,13 +49,13 @@ namespace net_engine
 		const auto header = packet->GetHeader();
 		NET_LOG(LL_SYS, "Packet: %u(0x%x) is ready for process!", header, header);
 
-		const auto packet_map = m_handlers.find(header);
-		if (packet_map == m_handlers.end())
+		const auto handler = m_dispatcher.GetPacketHandler(header);
+		if (!handler)
 		{
 			NET_LOG(LL_ERR, "Unknown header: %u(0x%x) for process", header, header);
 			return;
 		}
-		packet_map->second(packet);
+		handler(packet);
 	}
 	void CNetworkClientManager::OnError(std::uint32_t error_type, const asio::error_code& er)
 	{
@@ -125,7 +83,7 @@ namespace net_engine
 
 		NET_LOG(LL_SYS, "KEY_AGREEMENT RECV %u", datalen);
 
-		auto reply_packet = PacketManager::Instance().CreatePacket(ReservedCGHeaders::HEADER_CG_KEY_AGREEMENT, EPacketDirection::Outgoing);
+		auto reply_packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_CG_KEY_AGREEMENT));
 		if (!reply_packet)
 		{
 			NET_LOG(LL_CRI, "Handshake packet could not created!");
@@ -175,7 +133,7 @@ namespace net_engine
 		m_kServerTimeSync.m_dwChangeServerTime = time + delta;
 		m_kServerTimeSync.m_dwChangeClientTime = timestamp;	
 
-		auto reply_packet = PacketManager::Instance().CreatePacket(ReservedCGHeaders::HEADER_CG_HANDSHAKE, EPacketDirection::Outgoing);
+		auto reply_packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_CG_HANDSHAKE));
 		if (!reply_packet)
 		{
 			NET_LOG(LL_CRI, "Handshake packet could not created!");
