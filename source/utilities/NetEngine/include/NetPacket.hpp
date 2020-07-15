@@ -19,12 +19,6 @@ namespace net_engine
 		bool outgoing{false};
 	};
 
-	enum class EPacketDirection
-	{
-		Incoming,
-		Outgoing
-	};
-
 	enum ESecurityLevels : uint8_t
 	{
 		SECURITY_LEVEL_NONE = 0,  // No handshake

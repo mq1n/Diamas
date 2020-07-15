@@ -653,6 +653,8 @@ typedef struct SPacketGDAuthLogin
 	char	szSocialID[SOCIAL_ID_MAX_LEN + 1];
 	uint32_t	adwClientKey[4];
 	int32_t		iPremiumTimes[PREMIUM_MAX_NUM];
+	char hwid[HWID_MAX_HASH_LEN + 1];
+	char lang[LANG_MAX_LEN + 1];
 } TPacketGDAuthLogin;
 
 typedef struct SPacketGDLoginByKey

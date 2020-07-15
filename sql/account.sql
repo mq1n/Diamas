@@ -24,6 +24,8 @@ DROP TABLE IF EXISTS `account`;
 CREATE TABLE `account`  (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `login` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '' COMMENT 'LOGIN_MAX_LEN=30',
+  `lang` varchar(4) NOT NULL DEFAULT 'tr',
+  `hwid` varchar(255) DEFAULT NULL,
   `password` varchar(42) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '' COMMENT 'PASSWD_MAX_LEN=16; default 45 size',
   `social_id` varchar(7) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
   `email` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
@@ -134,5 +136,33 @@ CREATE TABLE `string`  (
   `text` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,
   PRIMARY KEY (`name`) USING BTREE
 ) ENGINE = MyISAM CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for hwid_allow
+-- ----------------------------
+DROP TABLE IF EXISTS `hwid_allow`;
+CREATE TABLE `hwid_allow` (
+  `id` int(11) NOT NULL,
+  `aid` int(11) NOT NULL,
+  `hwid` int(11) DEFAULT NULL,
+  `active` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=38648 DEFAULT CHARSET=ascii;
+
+-- ----------------------------
+-- Records of hwid_allow
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for hwid_block
+-- ----------------------------
+DROP TABLE IF EXISTS `hwid_block`;
+CREATE TABLE `hwid_block` (
+  `id` int(11) NOT NULL,
+  `hwid` varchar(64) DEFAULT NULL,
+  `bannedUntil` datetime DEFAULT NULL,
+  `reason` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=38648 DEFAULT CHARSET=ascii;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -1,76 +1,40 @@
 #include "stdafx.hpp"
 #include "DBClient.hpp"
 #include "AuthServer.hpp"
-#include "Packets.hpp"
 #include "AuthPeer.hpp"
 #include "AuthLogHelper.hpp"
 using namespace net_engine;
 
 GDBClient::GDBClient(std::shared_ptr <GAuthServer> server) :
-	net_engine::NetClientBase(server->GetService()(), 0, {}, STAGE_DEV_GAME, 5000), m_server(server), m_mainPort(0)
+	net_engine::NetClientBase(server->GetService()(), 0, {}, 0, 5000), m_server(server), m_mainPort(0)
 {
-	// register packets
-	RegisterPacket<TPacketDGAuthLogin>(HEADER_DG_AUTH_LOGIN, std::bind(&GDBClient::RecvAuthLogin, this, std::placeholders::_1, std::placeholders::_2));
+	REGISTER_PACKET_HANDLER(HEADER_DG_AUTH_LOGIN, std::bind(&GDBClient::RecvAuthLogin, this, std::placeholders::_1));
 }
 
 void GDBClient::OnConnect()
 {
 	auth_log(LL_SYS, "Connected to DBCache %s:%u", GetIP().c_str(), GetPort());
+
 	SendSetup(m_mainPort);
-	BeginRead();
 }
 void GDBClient::OnDisconnect(const asio::error_code& er)
 {
-	auth_log(LL_SYS, "DB Client disconnected: %d(%s). Reconnecting to: %s:%u",
-		er.value(), er.message().c_str(), GetIP().c_str(), GetPort());
+	auth_log(LL_SYS, "DB Client disconnected: %d(%s). Reconnecting to: %s:%u", er.value(), er.message().c_str(), GetIP().c_str(), GetPort());
 
 	Reconnect();
 }
-
 void GDBClient::OnRead(std::shared_ptr <Packet> packet)
 {
-	/*
-			const auto header = packet->GetHeader();
-		auth_log(LL_SYS, "Peer: %s(%d) Packet: %u(0x%x) is ready for process!", GetIP().c_str(), GetId(), header, header);
+	const auto header = packet->GetHeader();
+	auth_log(LL_SYS, "Packet: %u(0x%x) is ready for process!", header, header);
 
-		const auto packet_map = m_handlers.find(header);
-		if (packet_map == m_handlers.end())
-		{
-			auth_log(LL_ERR, "Unknown Packet with id %d (%02x) received from PEER %d",
-				header, header, GetId()
-			);
-			return;
-		}
-		packet_map->second(packet);
-	*/
-
-	/*
-	auto pData = reinterpret_cast<const uint8_t *>(data);
-
-	std::size_t offset = 0;
-	while (offset < length) 
+	const auto handler = m_dispatcher.GetPacketHandler(header);
+	if (!handler)
 	{
-		uint8_t packetId = 0;
-		while (offset < length && (packetId = pData[offset]) == 0) ++offset;
-
-		auto handler = m_handlers.find(packetId);
-		if (handler == m_handlers.end()) 
-		{
-			// unkwnown packet dc
-			auth_log(LL_ERR, "Unknown Packet with id %d (%02x) received from DBCache", packetId, packetId);
-
-			asio::error_code er;
-			Disconnect(er);
-			return 0;
-		}
-
-		std::size_t handlerResult = handler->second.second(pData + offset, length - offset);
-		if (handlerResult == 0) 
-			break; // handler returned 0 == zu wenig daten
-		offset += handlerResult;
+		auth_log(LL_ERR, "Unknown Packet with id %d (%02x) received", header, header);
+		return;
 	}
-	return offset;
-	*/
+	handler(packet);
 }
 void GDBClient::OnError(uint32_t error_type, const asio::error_code& er)
 {
@@ -79,54 +43,47 @@ void GDBClient::OnError(uint32_t error_type, const asio::error_code& er)
 
 void GDBClient::SendSetup(uint16_t mainPort) 
 {
-	/*
-	TPacketGDSetup packet;
-	packet.packetSize = packet.size() - 9;
-	packet.mainPort = mainPort;
-	packet.authServer = true;
-	Send(&packet, packet.size());
-	*/
-}
+	auto packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GD_SETUP));
+	packet->SetField<uint32_t>("packetSize", packet->GetSize() - 9);
+	packet->SetField<uint16_t>("mainPort", mainPort);
+	packet->SetField<uint8_t>("authServer", 1);
 
+	Send(packet);
+}
 void GDBClient::SendAuthLogin(
-	uint32_t peerId, int64_t id, const std::string &login, const std::string &socialId, const std::string &lang,
+	uint32_t peerId, uint32_t id, const std::string &login, const std::string &socialId, const std::string &lang,
 	const std::string &hwid, uint32_t loginKey, const std::vector<int32_t> &aiPremiumTimes, const uint8_t *clientKey)
 {
-	/*
-	TPacketGDAuthLogin packet;
-	packet.handle = peerId;
-	packet.packetSize = packet.size() - sizeof(packet.handle) - sizeof(packet.packetSize) - sizeof(packet.header);
-	packet.id = id;
-	packet.loginKey = loginKey;
-	CopyStringSafe(packet.login, login);
-	CopyStringSafe(packet.socialId, socialId);
-	CopyStringSafe(packet.lang, lang);
-	std::memcpy(packet.clientKey, clientKey, std::min<std::size_t>(sizeof(packet.clientKey), 16));
+	auto packet = NetPacketManager::Instance().CreatePacket(CreateOutgoingPacketID(HEADER_GD_AUTH_LOGIN));
+	packet->SetField<uint32_t>("handle", peerId);
+	packet->SetField<uint32_t>("packetSize", packet->GetSize() - 9);
+	packet->SetField<uint32_t>("id", id);
+	packet->SetField<uint32_t>("loginKey", loginKey);
+	packet->SetString("login", login);
+	packet->SetString("socialId", socialId);
+	packet->SetString("lang", lang);
+	packet->SetString("hwid", hwid);
+	packet->SetField("clientKey", (uint8_t*)clientKey, 16);
+	if (!aiPremiumTimes.empty())
+		packet->SetField("premiumTimes", (uint8_t*)aiPremiumTimes.data(), aiPremiumTimes.size() * sizeof(int32_t));
 
-	if (!aiPremiumTimes.empty()) 
-		memcpy(packet.premiumTimes, aiPremiumTimes.data(), std::min<std::size_t>(sizeof(packet.premiumTimes), aiPremiumTimes.size() * sizeof(int32_t)));
-
-	CopyStringSafe(packet.hwid, hwid);
-	Send(&packet, packet.size());
-	*/
+	Send(packet);
 }
 
-std::size_t GDBClient::RecvAuthLogin(const void *data, std::size_t maxlength)
+void GDBClient::RecvAuthLogin(std::shared_ptr <Packet> packet)
 {
-	std::shared_ptr<GAuthServer> server(m_server.lock());
-
-	if (maxlength < TPacketDGAuthLogin::size())
-		return 0;
-
-	auto packet = reinterpret_cast<const TPacketDGAuthLogin *>(data);
-	/*
-	auto peer = server->FindPeer(packet->handle);
-	if (peer && peer.get()) 
+	std::shared_ptr <GAuthServer> server(m_server.lock());
+	if (server)
 	{
-		AUTH_LOG(info, "Client {0} ({1}): Login success {2}", peer->GetIP(), peer->GetId(), peer->GetLogin());
-		peer->LoginSuccess(packet->result);
-		peer->DelayedDisconnect(5000);
+		auto handle = packet->GetField<uint32_t>("handle");
+		auto result = packet->GetField<uint8_t>("result");
+
+		auto peer = server->FindPeer(handle);
+		if (peer && peer.get())
+		{
+			auth_log(LL_SYS, "Client %s (%u): Login success %s", peer->GetIP().c_str(), peer->GetId(), peer->GetLogin().c_str());
+			peer->SendLoginSuccess(result);
+			peer->DelayedDisconnect(5000);
+		}
 	}
-	*/
-	return packet->size();
 }

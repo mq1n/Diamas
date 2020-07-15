@@ -487,6 +487,37 @@ namespace net_engine
 				packet_def->AddField<uint32_t>("delta");
 			}
 		);
+		// ---
+		REGISTER_PACKET(
+			HEADER_GD_SETUP, incoming,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint32_t>("handle");
+				packet_def->AddField<uint32_t>("packetSize");
+				packet_def->AddField<char[16]>("publicIp");
+				packet_def->AddField<uint8_t>("channel");
+				packet_def->AddField<uint16_t>("mainPort");
+				packet_def->AddField<uint16_t>("p2pPort");
+				packet_def->AddField<int32_t[MAP_ALLOW_LIMIT]>("maps");
+				packet_def->AddField<uint32_t>("loginCount");
+				packet_def->AddField<uint8_t>("authServer");
+			}
+		);
+		REGISTER_PACKET(
+			HEADER_GD_AUTH_LOGIN, incoming,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint32_t>("handle");
+				packet_def->AddField<uint32_t>("packetSize");
+				packet_def->AddField<uint32_t>("id");
+				packet_def->AddField<uint32_t>("loginKey");
+				packet_def->AddField<char[LOGIN_MAX_LEN + 1]>("login");
+				packet_def->AddField<char[SOCIAL_ID_MAX_LEN + 1]>("socialId");
+				packet_def->AddField<uint32_t[4]>("clientKey");
+				packet_def->AddField<int32_t[PREMIUM_MAX_NUM]>("premiumTimes");
+				packet_def->AddField<char[HWID_MAX_HASH_LEN + 1]>("hwid");
+				packet_def->AddField<char[LANG_MAX_LEN + 1]>("lang");
+			}
+		);
+
 
 		// ---
 		REGISTER_PACKET(
@@ -521,6 +552,15 @@ namespace net_engine
 				packet_def->AddField<uint32_t>("handshake");
 				packet_def->AddField<uint32_t>("time");
 				packet_def->AddField<uint32_t>("delta");
+			}
+		);
+		// ---
+		REGISTER_PACKET(
+			HEADER_DG_AUTH_LOGIN, outgoing,
+			[](std::shared_ptr <PacketDefinition> packet_def) -> void {
+				packet_def->AddField<uint32_t>("handle");
+				packet_def->AddField<uint32_t>("packetSize");
+				packet_def->AddField<uint8_t>("result");
 			}
 		);
 	}

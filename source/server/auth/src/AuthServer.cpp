@@ -2,14 +2,15 @@
 #include "AuthServer.hpp"
 #include "AuthPeer.hpp"
 #include "AuthLogHelper.hpp"
-#include "Packets.hpp"
 #include <cxxopts.hpp>
 using namespace net_engine;
 
 // Cotr & dotr
 GAuthServer::GAuthServer(NetServiceBase& netService, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
 	NetServerBase(netService(), securityLevel, cryptKey), m_netService(netService), m_dbManager(netService()),
-	m_server_key(1), m_config_file("config.json"), m_config_stage(STAGE_NULL), m_securityLevel(securityLevel), m_crypt_key(cryptKey)
+	m_server_key(1), m_config_file("config.json"), m_config_stage(STAGE_NULL),
+	m_securityLevel(securityLevel), m_crypt_key(cryptKey),
+	m_keyMin(1), m_keyMax(0xffffffff)
 {
 	auth_log(LL_TRACE, "Creating server object");
 	NetPacketManager::Instance().RegisterPackets(true);
@@ -255,6 +256,8 @@ void GAuthServer::Init(int argc, char** argv)
 		auth_log(LL_ERR, "CreateDBConnection has been failed!");
 		abort();
 	}
+
+	m_accountManager.SetKeyMinMax(m_keyMin, m_keyMax);
 	auth_log(LL_SYS, "Auth server initialized");
 
 	auth_log(LL_SYS, "Network engine starting...");
@@ -339,7 +342,7 @@ void GAuthServer::OnMySQLConnect(std::weak_ptr<GAuthServer> self, const asio::er
 	{
 		if (!e) 
 		{
-			bool reconnect = true;
+			auto reconnect = true;
 
 			if (0 != mysql_options(_this->m_dbManager.native(), MYSQL_OPT_RECONNECT, &reconnect))
 				auth_log(LL_SYS, "mysql_option: %s\n", mysql_error(_this->m_dbManager.native()));

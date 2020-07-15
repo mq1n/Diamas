@@ -59,9 +59,12 @@ public:
 	
 	void SetLoginKey(uint32_t loginKey) { m_loginKey = loginKey; };
 	uint32_t GetLoginKey() const { return m_loginKey; };
-	
+
 	void SetHwid(const std::string& hwid) { m_hwid = hwid; };
 	const std::string& GetHwid() const { return m_hwid; };
+
+	void SetLang(const std::string& lang) { m_lang = lang; };
+	const std::string& GetLang() const { return m_lang; };
 
 	// IO
 	virtual void SendAsReply(std::shared_ptr <net_engine::Packet> request, std::shared_ptr <net_engine::Packet> reply);
@@ -86,8 +89,9 @@ private:
 	uint8_t m_clientKey[16];
 	uint32_t m_loginKey;
 	std::string m_hwid;
+	std::string m_lang;
 	// end
 
 	std::map <std::string, ConnectionProperty>	m_properties;
-	asio::high_resolution_timer 				m_deadline_timer;
+//	asio::high_resolution_timer 				m_deadline_timer;
 };

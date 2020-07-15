@@ -2,19 +2,23 @@
 #include "AuthPeer.hpp"
 #include "AuthServer.hpp"
 #include "AuthLogHelper.hpp"
-#include "Packets.hpp"
 using namespace net_engine;
 
-void HandleGenericUpdateResult(asio::error_code const& ec, uint64_t affected_rows, amy::connector& connector, GAuthPeer* peer, const std::string& what)
+void HandleGenericUpdateResult(const asio::error_code& ec, uint64_t affected_rows, amy::connector& connector, GAuthPeer* peer, const std::string& what)
 {
-	if (affected_rows > 0 && peer)
-		auth_log(LL_SYS, "Updated %s of account %s", what.c_str(), peer->GetLogin().c_str());
-	return;
+	if (peer)
+	{
+		if (affected_rows) {
+			auth_log(LL_SYS, "Updated %s of account %s", what.c_str(), peer->GetLogin().c_str());
+		} else {
+			auth_log(LL_ERR, "Could not updated %s of account %s", what.c_str(), peer->GetLogin().c_str());
+		}
+	}
 }
 
 GAuthPeer::GAuthPeer(std::shared_ptr <GAuthServer> server, uint8_t securityLevel, const TPacketCryptKey& cryptKey) :
-	NetPeerBase(server->GetService()(), securityLevel, cryptKey, true, server->GetStage()), m_server(server), m_loginKey(0),
-	m_deadline_timer(server->GetService()())
+	NetPeerBase(server->GetService()(), securityLevel, cryptKey, true, server->GetStage()), m_server(server), m_loginKey(0)
+//	, m_deadline_timer(server->GetService()())
 {
 	auth_log(LL_TRACE, "Creating connection object");
 
@@ -26,8 +30,9 @@ GAuthPeer::GAuthPeer(std::shared_ptr <GAuthServer> server, uint8_t securityLevel
 	REGISTER_PACKET_HANDLER(HEADER_CG_HANDSHAKE, std::bind(&GAuthPeer::OnRecvHandshakePacket, this, std::placeholders::_1));
 
 	// ---------------------
-	m_deadline_timer.expires_from_now(std::chrono::seconds(30));
-	m_deadline_timer.async_wait(std::bind(&GAuthPeer::CheckDeadlineStatus, this));
+	// TODO: Destroy da iptal et
+//	m_deadline_timer.expires_from_now(std::chrono::seconds(30));
+//	m_deadline_timer.async_wait(std::bind(&GAuthPeer::CheckDeadlineStatus, this));
 }
 GAuthPeer::~GAuthPeer()
 {
@@ -215,11 +220,6 @@ void GAuthPeer::OnRecvLogin3Packet(std::shared_ptr <Packet> packet)
 		return;
 	}
 
-	SetLogin(login);
-	SetPassword(password);
-
-	auth_log(LL_SYS, "Client %s (%d): Trying to login %s", GetIP().c_str(), GetId(), GetLogin().c_str());
-
 	uint32_t loginKey = server->GetAccountManager().CreateAuthKey();
 	SetLoginKey(loginKey);
 	SetClientKey(reinterpret_cast<const uint8_t*>(adwClientKey));
@@ -227,15 +227,24 @@ void GAuthPeer::OnRecvLogin3Packet(std::shared_ptr <Packet> packet)
 	char szLogin[LOGIN_MAX_LEN * 2 + 1];
 	mysql_real_escape_string(server->GetDBManager().native(), szLogin, login.c_str(), login.size());
 
+	SetLogin(szLogin);
+
 	char szPasswd[PASSWD_MAX_LEN * 2 + 1];
-	mysql_real_escape_string(server->GetDBManager().native(), szPasswd, GetPassword().c_str(), GetPassword().length());
+	mysql_real_escape_string(server->GetDBManager().native(), szPasswd, password.c_str(), password.length());
 
-
-
-	SetHwid(hwid);
+	SetPassword(szPasswd);
 
 	char szHWID[HWID_MAX_HASH_LEN * 2 + 1];
-	mysql_real_escape_string(server->GetDBManager().native(), szHWID, GetHwid().c_str(), GetHwid().size());
+	mysql_real_escape_string(server->GetDBManager().native(), szHWID, hwid.c_str(), hwid.length());
+
+	SetHwid(szHWID);
+
+	char szLang[LANG_MAX_LEN * 2 + 1];
+	mysql_real_escape_string(server->GetDBManager().native(), szLang, lang.c_str(), lang.length());
+
+	SetLang(szLang);
+
+	auth_log(LL_SYS, "Client %s (%d): Trying to login %s Hwid: %s", GetIP().c_str(), GetId(), GetLogin().c_str(), GetHwid().c_str());
 
 	std::string statement = fmt::format("SELECT COUNT(hwid) as count FROM hwid_block WHERE hwid = '{0}' AND bannedUntil > NOW()", szHWID);
 	try
@@ -261,18 +270,6 @@ void GAuthPeer::OnRecvLogin3Packet(std::shared_ptr <Packet> packet)
 		}
 	}
 
-	amy::async_execute(server->GetDBManager(),
-		fmt::format("UPDATE account SET hwid = '{0}' WHERE login = '{0}'", szHWID, szLogin),
-		std::bind(HandleGenericUpdateResult, std::placeholders::_1, std::placeholders::_2, std::ref(server->GetDBManager()), this, std::string("HWID")));
-
-
-	char szLang[LANG_MAX_LEN * 2 + 1];
-	mysql_real_escape_string(server->GetDBManager().native(), szLang, lang.c_str(), lang.size());
-
-	amy::async_execute(server->GetDBManager(),
-		fmt::format("UPDATE account SET lang = '{0}' WHERE login = '{1}'", szLang, szLogin),
-		std::bind(HandleGenericUpdateResult, std::placeholders::_1, std::placeholders::_2, std::ref(server->GetDBManager()), this, std::string("Language")));
-
 	std::string stQuery = fmt::format(
 		"SELECT id, PASSWORD('{0}'), password, social_id,"
 		" status,"
@@ -285,10 +282,11 @@ void GAuthPeer::OnRecvLogin3Packet(std::shared_ptr <Packet> packet)
 		" UNIX_TIMESTAMP(fish_mind_expire),"
 		" UNIX_TIMESTAMP(marriage_fast_expire),"
 		" UNIX_TIMESTAMP(money_drop_rate_expire),"
-		" UNIX_TIMESTAMP(shop_double_up_expire),"
 		" UNIX_TIMESTAMP(create_time)"
 		" FROM account WHERE login = '{1}'",
 		szPasswd, szLogin);
+
+	// auth_log(LL_SYS, stQuery.c_str());
 
 	amy::async_execute(server->GetDBManager(),
 		stQuery,
@@ -304,7 +302,6 @@ void GAuthPeer::OnLoginSQLQuery(std::weak_ptr <GAuthServer> self, const asio::er
 		if (!e)
 		{
 			_this->GetDBManager().async_store_result(std::bind(&GAuthPeer::OnLoginSQLResult, self, std::placeholders::_1, std::placeholders::_2, peer, loginKey));
-
 		}
 		else
 		{
@@ -340,6 +337,7 @@ void GAuthPeer::OnLoginSQLResult(std::weak_ptr <GAuthServer> self, const asio::e
 				// status
 				// lang
 				// availDt - NOW() > 0
+
 				// UNIX_TIMESTAMP(silver_expire)
 				// UNIX_TIMESTAMP(gold_expire)
 				// UNIX_TIMESTAMP(safebox_expire)
@@ -347,7 +345,6 @@ void GAuthPeer::OnLoginSQLResult(std::weak_ptr <GAuthServer> self, const asio::e
 				// UNIX_TIMESTAMP(fish_mind_expire)
 				// UNIX_TIMESTAMP(marriage_fast_expire)
 				// UNIX_TIMESTAMP(money_drop_rate_expire)
-				// UNIX_TIMESTAMP(shop_double_up_expire)
 				// UNIX_TIMESTAMP(create_time)
 				const amy::field& fieldID = result[col++];
 				const amy::field& fieldPasswd1 = result[col++];
@@ -363,7 +360,6 @@ void GAuthPeer::OnLoginSQLResult(std::weak_ptr <GAuthServer> self, const asio::e
 				const amy::field& fieldFishMindExpire = result[col++];
 				const amy::field& fieldMarriageFastExpire = result[col++];
 				const amy::field& fieldMoneyDropRateExpire = result[col++];
-				const amy::field& fieldShopDoubleUpExpire = result[col++];
 
 				if (fieldID.is_null() || fieldPasswd1.is_null() || fieldPasswd2.is_null() || fieldStatus.is_null())
 				{
@@ -418,16 +414,24 @@ void GAuthPeer::OnLoginSQLResult(std::weak_ptr <GAuthServer> self, const asio::e
 				aiPremiumTimes[4] = fieldFishMindExpire.is_null() ? 0 : fieldFishMindExpire.as<amy::sql_int>();
 				aiPremiumTimes[5] = fieldMarriageFastExpire.is_null() ? 0 : fieldMarriageFastExpire.as<amy::sql_int>();
 				aiPremiumTimes[6] = fieldMoneyDropRateExpire.is_null() ? 0 : fieldMoneyDropRateExpire.as<amy::sql_int>();
-				aiPremiumTimes[7] = fieldShopDoubleUpExpire.is_null() ? 0 : fieldShopDoubleUpExpire.as<amy::sql_int>();
 
 				auto accId = fieldID.as<amy::sql_bigint>();
 				auto socialId = fieldSocialID.as<amy::sql_text>();
 				auto lang = fieldLang.as<amy::sql_text>();
 
-				amy::async_execute(_this->GetDBManager(),
-					fmt::format("UPDATE account SET last_play = NOW() WHERE login = '{0}'", peer->GetLogin()),
-					std::bind(HandleGenericUpdateResult, std::placeholders::_1, std::placeholders::_2, std::ref(_this->GetDBManager()), peer, std::string("Last Play")
-					));
+				asio::error_code ec;
+				amy::execute(_this->GetDBManager(),
+					fmt::format("UPDATE account SET last_play = NOW(), hwid = '{1}', lang = '{2}' WHERE login = '{0}'", peer->GetLogin(), peer->GetHwid(), peer->GetLang()),
+					ec
+				);
+
+				if (ec)
+				{
+					auth_log(LL_SYS, "Client %s (%d) informations could not update from database. Error: %d (%s)", peer->GetIP().c_str(), peer->GetId(), ec.value(), ec.message().c_str());
+					peer->SendLoginFailure("SQLERR");
+					peer->DelayedDisconnect(5000);
+					break;
+				}
 
 				_this->GetAccountManager().ConnectAccount(peer->GetLogin(), loginKey);
 

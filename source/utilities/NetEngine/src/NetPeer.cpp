@@ -86,7 +86,7 @@ namespace net_engine
 
 	void NetPeerBase::Disconnect(const asio::error_code& er)
 	{
-//		try
+		try
 		{
 			NET_LOG(LL_SYS, "Shuting down connection: %s", m_socket.remote_endpoint().address().to_string().c_str());
 
@@ -113,7 +113,6 @@ namespace net_engine
 				OnDisconnect(er);
 			}
 		}
-		/*
 		catch (const asio::system_error& e)
 		{
 			NET_LOG(LL_ERR, "Exception occured: %s", e.what());
@@ -122,7 +121,6 @@ namespace net_engine
 		{
 			NET_LOG(LL_ERR, "Unhandled exception occured");
 		}
-		*/
 	}
 	void NetPeerBase::Disconnect2()
 	{

@@ -55,7 +55,10 @@ private:
 	std::shared_ptr <GDBClient>									m_dbClient;
 	amy::connector												m_dbManager;
 	std::unordered_map <uint32_t, std::shared_ptr <GAuthPeer> > m_peers;
-	
+
+	std::uint32_t m_keyMin;
+	std::uint32_t m_keyMax;
+
 	uint8_t m_server_key;
 	std::string m_config_file;
 	uint8_t m_config_stage;

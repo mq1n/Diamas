@@ -10,7 +10,8 @@ public:
 	void DisconnectAccount(const std::string& login);
 	bool FindAccount(const std::string& login) const;
 	uint32_t CreateAuthKey();
-	
+	void SetKeyMinMax(std::uint32_t kMin, std::uint32_t kMax);
+
 private:
 	mutable std::mutex m_mutex;
 

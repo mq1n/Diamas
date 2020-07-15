@@ -56,3 +56,10 @@ uint32_t GAccountManager::CreateAuthKey()
 	auth_log(LL_SYS, "CreateAuthKey %u", key);
 	return key;
 }
+
+void GAccountManager::SetKeyMinMax(std::uint32_t kMin, std::uint32_t kMax)
+{
+	std::unique_lock<std::mutex> lk(m_mutex);
+	
+	m_dist = std::uniform_int_distribution<std::uint32_t>(kMin, kMax);
+}
