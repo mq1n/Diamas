@@ -19,6 +19,7 @@
 #include <deque>
 #include <list>
 #include <map>
+#include <fstream>
 #include <fmt/format.h>
 
 #include "../../common/common_incl.hpp"

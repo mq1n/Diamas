@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 project(tools)
 
 if(WIN32)
-	add_subdirectory(${PROJECT_SOURCE_DIR}/DumpProto_cmake)
+	add_subdirectory(${PROJECT_SOURCE_DIR}/DumpProto)
 #	add_subdirectory(${PROJECT_SOURCE_DIR}/M2TxtToJson)
 #	add_subdirectory(${PROJECT_SOURCE_DIR}/GrannyConverter)
 #	add_subdirectory(${PROJECT_SOURCE_DIR}/MSAMaker)

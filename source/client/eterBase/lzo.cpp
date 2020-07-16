@@ -8,6 +8,22 @@
 
 #define dbg_printf
 
+static void ErrorLog(const char* c_szFormat, ...)
+{
+	char szBuffer[8192] = { 0 };
+
+	va_list vaArgList;
+	va_start(vaArgList, c_szFormat);
+	vsprintf(szBuffer, c_szFormat, vaArgList);
+	va_end(vaArgList);
+
+	strcat(szBuffer, "\n");
+
+	std::ofstream f("lzo_error.log", std::ofstream::out | std::ofstream::app);
+	f << szBuffer << std::endl;
+	f.close();
+}
+
 static class LZOFreeMemoryMgr
 {
 public:
@@ -154,7 +170,7 @@ bool CLZObject::Compress()
 
 	if (LZO_E_OK != r)
     {
-		TraceError("LZO: lzo1x_999_compress failed");
+		ErrorLog("LZO: lzo1x_999_compress failed");
 		return false;
     }
 	
@@ -167,7 +183,7 @@ bool CLZObject::BeginDecompress(const void * pvIn)
 {
 	if (pvIn == nullptr)
 	{
-		TraceError("LZObject: pvIn = nullptr! Corrupted data");
+		ErrorLog("LZObject: pvIn = nullptr! Corrupted data");
 		return false;
 	}
 
@@ -175,7 +191,7 @@ bool CLZObject::BeginDecompress(const void * pvIn)
 
 	if (pHeader->dwFourCC != ms_dwFourCC)
 	{
-		TraceError("LZObject: not a valid data");
+		ErrorLog("LZObject: not a valid data");
 		return false;
 	}
 
@@ -239,13 +255,13 @@ bool CLZObject::Decompress(uint32_t * pdwKey)
 
 		if (*reinterpret_cast<uint32_t *>(pbDecryptedBuffer) != ms_dwFourCC)
 		{
-			TraceError("LZObject: key incorrect");
+			ErrorLog("LZObject: key incorrect");
 			return false;
 		}
 
-		if (LZO_E_OK != (r = lzo1x_decompress(pbDecryptedBuffer + sizeof(uint32_t), m_pHeader->dwCompressedSize, m_pbBuffer, (lzo_uint*)&uiSize, nullptr)))
+		if (LZO_E_OK != (r = lzo1x_decompress_safe(pbDecryptedBuffer + sizeof(uint32_t), m_pHeader->dwCompressedSize, m_pbBuffer, (lzo_uint*)&uiSize, nullptr)))
 		{
-			TraceError("LZObject: Decompress failed(decrypt) ret %d\n", r);
+			ErrorLog("LZObject: Decompress failed(decrypt) ret %d\n", r);
 			return false;
 		}
 	}
@@ -253,16 +269,16 @@ bool CLZObject::Decompress(uint32_t * pdwKey)
 	{
 		uiSize = m_pHeader->dwRealSize;
 
-		if (LZO_E_OK != (r = lzo1x_decompress(m_pbIn, m_pHeader->dwCompressedSize, m_pbBuffer, (lzo_uint*)&uiSize, nullptr)))
+		if (LZO_E_OK != (r = lzo1x_decompress_safe(m_pbIn, m_pHeader->dwCompressedSize, m_pbBuffer, (lzo_uint*)&uiSize, nullptr)))
 		{
-			TraceError("LZObject: Decompress failed : ret %d, CompressedSize %d\n", r, m_pHeader->dwCompressedSize);
+			ErrorLog("LZObject: Decompress failed : ret %d, CompressedSize %d\n", r, m_pHeader->dwCompressedSize);
 			return false;
 		}
 	}
 
     if (uiSize != m_pHeader->dwRealSize)
     {
-		TraceError("LZObject: Size differs");
+		ErrorLog("LZObject: Size differs");
 		return false;
 	}
 
@@ -312,7 +328,7 @@ CLZO::CLZO() : m_pWorkMem(nullptr)
 {
     if (lzo_init() != LZO_E_OK)
 	{
-		TraceError("LZO: cannot initialize");
+		ErrorLog("LZO: cannot initialize");
 		return;
 	}
 
@@ -324,7 +340,7 @@ CLZO::CLZO() : m_pWorkMem(nullptr)
 
 	if (nullptr == m_pWorkMem)
 	{
-		TraceError("LZO: cannot alloc memory");
+		ErrorLog("LZO: cannot alloc memory");
 		return;
     }
 }

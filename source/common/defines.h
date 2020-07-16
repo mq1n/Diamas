@@ -46,7 +46,6 @@
 //////////////////////////////////////////////////////////////////////////
 // ### New From LocaleInc ###
 #define ENABLE_CANSEEHIDDENTHING_FOR_GM
-#define ENABLE_PROTOSTRUCT_AUTODETECT
 
 #define ENABLE_PLAYER_PER_ACCOUNT5
 #define ENABLE_LEVEL_IN_TRADE

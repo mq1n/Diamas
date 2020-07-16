@@ -335,6 +335,7 @@ bool CClientManager::InitializeShopTable()
 bool CClientManager::InitializeItemTableFile()
 {
 	std::map<int32_t, const char *> localMap;
+
 	cCsvTable nameData;
 	if (!nameData.Load("item_names.txt", '\t'))
 	{
