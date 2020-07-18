@@ -149,8 +149,8 @@ namespace FileSystem
 		{
 			std::vector <uint8_t> decompresseddata(entry.rawSize);
 
-			lzo_uint decompressedsize = 0;
-			auto ret = lzo2a_decompress(
+			lzo_uint decompressedsize = decompresseddata.size();
+			auto ret = lzo2a_decompress_safe(
 				reinterpret_cast<uint8_t*>(decrypted.get_data()), decrypted.get_size(),
 				reinterpret_cast<uint8_t*>(&decompresseddata[0]), &decompressedsize,
 				nullptr
@@ -363,7 +363,7 @@ namespace FileSystem
 
 			std::vector <uint8_t> compressed(finalData.get_size());
 
-			lzo_uint outlen = 0;
+			lzo_uint outlen = finalData.get_size();
 			auto ret = lzo2a_999_compress(
 				(const uint8_t*)data_buffer.get_data(), entry.rawSize,
 				reinterpret_cast<uint8_t*>(&compressed[0]), &outlen,

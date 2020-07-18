@@ -312,6 +312,10 @@ void GAuthPeer::OnLoginSQLQuery(std::weak_ptr <GAuthServer> self, const asio::er
 	}
 }
 
+#ifdef _WIN32
+#pragma warning( push )
+#pragma warning( disable: 4702 ) // warning C4702: unreachable code
+#endif
 void GAuthPeer::OnLoginSQLResult(std::weak_ptr <GAuthServer> self, const asio::error_code& e, amy::result_set rs, GAuthPeer* peer, uint32_t loginKey)
 {
 	std::shared_ptr <GAuthServer> _this(self.lock());
@@ -451,3 +455,6 @@ void GAuthPeer::OnLoginSQLResult(std::weak_ptr <GAuthServer> self, const asio::e
 		}
 	}
 }
+#ifdef _WIN32
+#pragma warning( pop )
+#endif

@@ -308,7 +308,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		const char* GetProtoName() const;
 
 		const VID &		GetVID() const		{ return m_vid;		}
-		uint32_t		GetVID()			{ return (uint32_t)m_vid;		}
 
 		void			SetName(const std::string& name) { m_stName = name; }
 

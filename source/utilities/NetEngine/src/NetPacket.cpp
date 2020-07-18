@@ -66,7 +66,7 @@ namespace net_engine
 		if (m_definition->IsDynamicSized())
 		{
 			// Update size
-			SetField<uint16_t>("size", GetSize() + m_dynamicData.size() + 1);  // we have to add the header too
+			SetField<uint16_t>("size", static_cast<uint16_t>(GetSize() + m_dynamicData.size() + 1));  // we have to add the header too
 		}
 
 		// Copy sub type fields to internal buffer
@@ -107,7 +107,7 @@ namespace net_engine
 			std::copy_n(data.begin() + m_data.size() - offset, size, std::back_inserter(m_dynamicData));
 			NET_LOG(LL_SYS, "Copied %u (dynamic data)", size);
 
-			size += m_data.size();
+			size += static_cast<uint16_t>(m_data.size());
 			if (HasSequence())
 				size += 1;
 			
