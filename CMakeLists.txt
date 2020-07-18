@@ -175,7 +175,6 @@ endif()
 
 # Register 3rd dependecies include paths
 include_directories(${PROJECT_SOURCE_DIR}/extern/include)
-include_directories(${PROJECT_SOURCE_DIR}/extern/include/d3d9)
 include_directories(${PROJECT_SOURCE_DIR}/extern/3rd)
 
 # Register 3rd dependecies precompiled library path

@@ -33,9 +33,9 @@
 ///////////////////////////////////////////////////////////////////////  
 //	Include Files
 
-#include <d3d9.h>
-#include <d3d9types.h>
-#include <d3dx9.h>
+#include <d3d9/d3d9.h>
+#include <d3d9/d3d9types.h>
+#include <d3d9/d3dx9.h>
 
 ///////////////////////////////////////////////////////////////////////  
 //	class CSpeedTreeMaterial declaration/definiton

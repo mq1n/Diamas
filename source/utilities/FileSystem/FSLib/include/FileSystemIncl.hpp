@@ -10,4 +10,6 @@
 #include "FileNameHelper.hpp"
 #include "PropertyManager.hpp"
 
+#ifndef WORLD_EDITOR
 using namespace FileSystem;
+#endif

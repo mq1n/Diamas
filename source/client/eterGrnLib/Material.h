@@ -2,7 +2,7 @@
 
 #include <granny2/granny2.11.8.0.h>
 #include <windows.h>
-#include <d3d9.h>
+#include <d3d9/d3d9.h>
 
 #include "../eterlib/ReferenceObject.h"
 #include "../eterlib/Ref.h"

@@ -1,6 +1,8 @@
 #pragma once
 #ifdef _WIN32
+#ifndef WORLD_EDITOR
 #include <Windows.h>
+#endif
 #include <typeinfo>
 #endif
 #include <cassert>

@@ -9,8 +9,8 @@
 
 #define _WIN32_DCOM
 
-#include <d3dx9.h>
-#include <DxErr.h>
+#include <d3d9/d3dx9.h>
+#include <d3d9/DxErr.h>
 
 #define DIRECTINPUT_VERSION 0x0800
 

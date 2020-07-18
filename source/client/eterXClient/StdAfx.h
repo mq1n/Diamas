@@ -26,7 +26,7 @@
 
 #include <stdint.h>
 #include <dshow.h>
-#include <qedit.h>
+#include <d3d9/qedit.h>
 
 #include "Locale.h"
 

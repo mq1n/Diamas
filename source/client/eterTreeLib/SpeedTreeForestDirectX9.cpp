@@ -1,10 +1,9 @@
-
 #include "StdAfx.h"
 
 #include <stdio.h>
-#include <d3d9.h>
-#include <d3d9types.h>
-#include <d3dx9.h>
+#include <d3d9/d3d9.h>
+#include <d3d9/d3d9types.h>
+#include <d3d9/d3dx9.h>
 
 #include "../eterBase/Timer.h"
 #include "../eterLib/StateManager.h"

@@ -13,7 +13,7 @@ class CFileLoaderThread
 		{
 			std::string	stFileName;
 
-			CFile	File;
+			FileSystem::CFile	File;
 			LPVOID		pvBuf;
 			uint32_t		dwSize;
 		} TData;

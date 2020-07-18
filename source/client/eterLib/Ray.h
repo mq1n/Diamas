@@ -1,6 +1,6 @@
 #pragma once
-
-#include <d3dx9.h>
+#include <d3d9/d3dx9.h>
+#include <cassert>
 
 class CRay
 {

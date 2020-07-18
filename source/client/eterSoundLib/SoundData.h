@@ -53,7 +53,7 @@ class CSoundData
 		static int32_t					GetEmptySlotIndex();
 
 		static bool					ms_isSoundFile[SOUND_FILE_MAX_NUM];
-		static CFile				ms_SoundFile[SOUND_FILE_MAX_NUM];
+		static FileSystem::CFile				ms_SoundFile[SOUND_FILE_MAX_NUM];
 };
 
 #endif

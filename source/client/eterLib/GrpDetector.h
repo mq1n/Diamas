@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <d3d9.h>
+#include <d3d9/d3d9.h>
 
 typedef BOOL (*PFNCONFIRMDEVICE) (D3DCAPS9& rkD3DCaps, uint32_t uBehavior, D3DFORMAT eD3DFmt);
 

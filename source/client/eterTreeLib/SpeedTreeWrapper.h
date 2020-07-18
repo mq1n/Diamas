@@ -3,9 +3,9 @@
 #include "SpeedTreeMaterial.h"
 #include <SpeedTreeRT.h>
 
-#include <d3d9.h>
-#include <d3d9types.h>
-#include <d3dx9.h>
+#include <d3d9/d3d9.h>
+#include <d3d9/d3d9types.h>
+#include <d3d9/d3dx9.h>
 #include <vector>
 
 #include "../eterLib/GrpObjectInstance.h"

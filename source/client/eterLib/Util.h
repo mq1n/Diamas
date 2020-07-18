@@ -6,8 +6,8 @@
 #include <map>
 #include <vector>
 
-#include <d3d9.h>
-#include <d3dx9math.h>
+#include <d3d9/d3d9.h>
+#include <d3d9/d3dx9math.h>
 template<typename T>
 class CTransitor
 {

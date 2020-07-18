@@ -1,5 +1,7 @@
 #pragma once
+#ifndef WORLD_EDITOR
 #include <Windows.h>
+#endif
 #include <lzo/lzo_asm.h>
 #include <lzo/lzo1x.h>
 #include <memory>
