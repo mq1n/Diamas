@@ -403,7 +403,7 @@ namespace quest
 			return 1;
 		}
 
-		lua_pushnumber(L, get_global_time() - pMarriage->marry_time);
+		lua_pushnumber(L, get_unix_time() - pMarriage->marry_time);
 		return 1;
 	}
 

@@ -199,10 +199,10 @@ LPITEM ITEM_MANAGER::CreateItem(uint32_t vnum, uint32_t count, uint32_t id, bool
 				item->SetSocket(ITEM_SOCKET_UNIQUE_REMAIN_TIME, item->GetValue(0)); // 게임 시간 유니크
 			else
 			{
-				//int32_t globalTime = get_global_time();
+				//int32_t globalTime = get_unix_time();
 				//int32_t lastTime = item->GetValue(0);
-				//int32_t endTime = get_global_time() + item->GetValue(0);
-				item->SetSocket(ITEM_SOCKET_UNIQUE_REMAIN_TIME, get_global_time() + item->GetValue(0)); // 실시간 유니크
+				//int32_t endTime = get_unix_time() + item->GetValue(0);
+				item->SetSocket(ITEM_SOCKET_UNIQUE_REMAIN_TIME, get_unix_time() + item->GetValue(0)); // 실시간 유니크
 			}
 		}
 	}

@@ -150,7 +150,7 @@ void CPVP::SetVID(uint32_t dwPID, uint32_t dwVID)
 
 void CPVP::SetLastFightTime()
 {
-	m_dwLastFightTime = get_dword_time();
+	m_dwLastFightTime = get_unix_ms_time();
 }
 
 uint32_t CPVP::GetLastFightTime()
@@ -397,7 +397,7 @@ bool CPVPManager::Dead(LPCHARACTER pkChr, uint32_t dwKillerPID)
 				found = true;
 				break;
 			}
-			else if (get_dword_time() - pkPVP->GetLastFightTime() <= 15000)
+			else if (get_unix_ms_time() - pkPVP->GetLastFightTime() <= 15000)
 			{
 				found = true;
 				break;
@@ -690,7 +690,7 @@ void CPVPManager::Process()
 	{
 		CPVP * pvp = (it++)->second;
 
-		if (get_dword_time() - pvp->GetLastFightTime() > 600000) // 10분 이상 싸움이 없었으면
+		if (get_unix_ms_time() - pvp->GetLastFightTime() > 600000) // 10분 이상 싸움이 없었으면
 		{
 			pvp->Packet(true);
 			Delete(pvp);

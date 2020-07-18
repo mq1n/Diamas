@@ -91,7 +91,7 @@ RETRY:
 		uint32_t val = thecore_random() % (1024 * 1024);
 
 		*(uint32_t *) (crc_buf    ) = val;
-		*((uint32_t *) crc_buf + 1) = get_global_time();
+		*((uint32_t *) crc_buf + 1) = get_unix_time();
 
 		crc = GetCRC32(crc_buf, 8);
 		it = m_map_handshake.find(crc);
@@ -487,7 +487,7 @@ uint32_t DESC_MANAGER::CreateLoginKey(LPDESC d)
 
 void DESC_MANAGER::ProcessExpiredLoginKey()
 {
-	uint32_t dwCurrentTime = get_dword_time();
+	uint32_t dwCurrentTime = get_unix_ms_time();
 
 	std::map<uint32_t, CLoginKey *>::iterator it, it2;
 

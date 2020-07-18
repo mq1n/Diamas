@@ -28,7 +28,6 @@ inline void m_strlcpy(char* dst, char* src, size_t size)
 		return;
 	}
 
-
 	strlcpy(dst, src, size);
 }
 

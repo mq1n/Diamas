@@ -602,31 +602,27 @@ namespace quest
 
 		for (const auto& stQuestObjectDir : g_setQuestObjectDir)
 		{
-			char buf[PATH_MAX];
-			snprintf(buf, sizeof(buf), "%s/state/", stQuestObjectDir.c_str());
-	
-			int32_t iQuestIdx = 0;
+			std::ostringstream oss;
+			oss << stQuestObjectDir << "/state/";
 
-			DIR* pdir = opendir(buf);
-			if (pdir)
+			auto iQuestIdx = 0;
+
+			if (std::filesystem::exists(oss.str()))
 			{
-				dirent * pde;
-
-				while ((pde = readdir(pdir)))
+				for (const auto& entry : std::filesystem::directory_iterator(oss.str()))
 				{
-					if (pde->d_name[0] == '.')
-						continue;
+					if (entry.is_regular_file())
+					{
+						const auto& filename = entry.path().filename().string();
+						RegisterQuest(filename, ++iQuestIdx);
 
-					snprintf(buf + 11, sizeof(buf) - 11, "%s", pde->d_name);
+						auto ret = lua_dofile(L, (stQuestObjectDir + "/state/" + filename).c_str());
 
-					RegisterQuest(pde->d_name, ++iQuestIdx);
-					int32_t ret = lua_dofile(L, (stQuestObjectDir + "/state/" + pde->d_name).c_str());
-					sys_log(0, "QUEST: loading %s, returns %d", (stQuestObjectDir + "/state/" + pde->d_name).c_str(), ret);
+						sys_log(0, "QUEST: loading %s, returns %d", (stQuestObjectDir + "/state/" + filename).c_str(), ret);
 
-					BuildStateIndexToName(pde->d_name);
+						BuildStateIndexToName(filename.c_str());
+					}
 				}
-
-				closedir(pdir);
 			}
 		}
 

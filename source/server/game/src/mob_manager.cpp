@@ -39,8 +39,8 @@ void CMob::AddSkillSplash(int32_t iIndex, uint32_t dwTiming, uint32_t dwHitDista
 CMobInstance::CMobInstance()
 	: m_IsBerserk(false), m_IsGodSpeed(false), m_IsRevive(false)
 {
-	m_dwLastAttackedTime = get_dword_time();
-	m_dwLastWarpTime = get_dword_time();
+	m_dwLastAttackedTime = get_unix_ms_time();
+	m_dwLastWarpTime = get_unix_ms_time();
 
 	memset( &m_posLastAttacked, 0, sizeof(m_posLastAttacked) );
 }

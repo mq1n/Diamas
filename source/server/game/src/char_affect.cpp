@@ -147,7 +147,7 @@ bool CHARACTER::UpdateAffect()
 	// 스테미나 회복
 	if (GetMaxStamina() > GetStamina())
 	{
-		int32_t iSec = (get_dword_time() - GetStopTime()) / 3000;
+		int32_t iSec = (get_unix_ms_time() - GetStopTime()) / 3000;
 		if (iSec)
 			PointChange(POINT_STAMINA, GetMaxStamina()/1);    
 	}
@@ -254,7 +254,7 @@ int32_t CHARACTER::ProcessAffect()
 	if (pkAff)
 	{
 		// IF HAIR_LIMIT_TIME() < CURRENT_TIME()
-		if ( this->GetQuestFlag("hair.limit_time") < get_global_time())
+		if ( this->GetQuestFlag("hair.limit_time") < get_unix_time())
 		{
 			// SET HAIR NORMAL
 			this->SetPart(PART_HAIR, 0);

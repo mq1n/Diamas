@@ -20,8 +20,8 @@ extern "C"
     extern void		printdata(const unsigned char * data, int bytes); // data¸¦ hex¶û ascii·Î Ãâ·Â (ÆĞÅ¶ ºĞ¼® µî¿¡ ¾²ÀÓ)
     extern int		filesize(FILE * fp);	// ÆÄÀÏ Å©±â ¸®ÅÏ
 
-#define core_dump()	core_dump_unix(__FILE__, __LINE__)
-    extern void		core_dump_unix(const char *who, long line);	// ì½”ì–´ë¥¼ ê°•ì œë¡œ ë¤í”„
+#define core_dump()	core_dump_ex(__FILE__, __LINE__, __FUNCTION__)
+    extern void		core_dump_ex(const char *who, long line, char const* function);	// ì½”ì–´ë¥¼ ê°•ì œë¡œ ë¤í”„
 
 #define TOKEN(string) if (!strcasecmp(token_string, string))
     // src = ÅäÅ« : °ª
@@ -44,17 +44,17 @@ extern "C"
     // ÇöÀç ½Ã°£ curr_tmÀ¸·Î ºÎÅÍ days°¡ Áö³­ ³¯À» ¸®ÅÏ
     extern struct tm *		tm_calc(const struct tm *curr_tm, int days);
 
-    extern int MAX(int a, int b); // µÑÁß¿¡ Å« °ªÀ» ¸®ÅÏ
-    extern int MIN(int a, int b); // µÑÁß¿¡ ÀÛÀº °ªÀ» ¸®ÅÏ
-    extern int MINMAX(int min, int value, int max); // ÃÖ¼Ò ÃÖ´ë °ªÀ» ÇÔ²² ºñ±³ÇØ¼­ ¸®ÅÏ
-	
+    extern int MAX(int a, int b);
+    extern int MIN(int a, int b); 
+    extern int MINMAX(int min, int value, int max);
+
 	float	fnumber(float from, float to);
 
     extern void		thecore_sleep(struct timeval * timeout);	// timeout¸¸Å­ ÇÁ·Î¼¼½º ½¬±â
-    extern DWORD	thecore_random();				// ·£´ı ÇÔ¼ö
+    extern uint32_t	thecore_random();				// ·£´ı ÇÔ¼ö
 
     extern float	get_float_time();
-    extern DWORD	get_dword_time();
+    extern uint32_t	get_unix_ms_time();
 
     extern char *	time_str(time_t ct);
 
@@ -119,8 +119,8 @@ extern "C"
 
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)                                      \
-                ((DWORD)(BYTE) (ch0       ) | ((DWORD)(BYTE) (ch1) <<  8) | \
-                 ((DWORD)(BYTE) (ch2) << 16) | ((DWORD)(BYTE) (ch3) << 24))
+                ((uint32_t)(uint8_t) (ch0       ) | ((uint32_t)(uint8_t) (ch1) <<  8) | \
+                 ((uint32_t)(uint8_t) (ch2) << 16) | ((uint32_t)(uint8_t) (ch3) << 24))
 #endif // defined(MAKEFOURCC)
 
 #ifdef __cplusplus

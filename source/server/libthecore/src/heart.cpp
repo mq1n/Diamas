@@ -2,14 +2,13 @@
 
 LPHEART heart_new(int opt_usec, HEARTFUNC func)
 {
-    LPHEART ht;
-
     if (!func)
     {
-	sys_err("no function defined");
-	return NULL;
+	    sys_err("no function defined");
+    	return nullptr;
     }
 
+    LPHEART ht;
     CREATE(ht, HEART, 1);
 
     ht->func = func;
@@ -40,12 +39,12 @@ int heart_idle(LPHEART ht)
      */
     if (process_time.tv_sec == 0 && process_time.tv_usec < ht->opt_time.tv_usec)
     {
-	missed_pulse = 0;
+	    missed_pulse = 0;
     }
     else
     {
-	missed_pulse = process_time.tv_sec * ht->passes_per_sec;
-	missed_pulse += process_time.tv_usec / ht->opt_time.tv_usec;
+	    missed_pulse = process_time.tv_sec * ht->passes_per_sec;
+	    missed_pulse += process_time.tv_usec / ht->opt_time.tv_usec;
     }
 
 	// 바빠서 pulse도 놓쳤는데 잘 시간이 어딨어...
@@ -71,14 +70,14 @@ int heart_idle(LPHEART ht)
 
     if (missed_pulse <= 0)
     {
-	sys_err("missed_pulse is not positive! (%d)", missed_pulse);
-	missed_pulse = 1;
+	    sys_err("missed_pulse is not positive! (%d)", missed_pulse);
+	    missed_pulse = 1;
     }
 
     if (missed_pulse > (30 * ht->passes_per_sec))
     {
-	sys_err("losing %d seconds. (lag occured)", missed_pulse / ht->passes_per_sec);
-	missed_pulse = 30 * ht->passes_per_sec;
+	    sys_err("losing %d seconds. (lag occured)", missed_pulse / ht->passes_per_sec);
+	    missed_pulse = 30 * ht->passes_per_sec;
     }
 
     return missed_pulse;

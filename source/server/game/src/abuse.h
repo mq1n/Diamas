@@ -48,8 +48,8 @@ public:
 	void DeadWalk();
 	void DeadPickup();
 
-	void MarkDead() { m_lastDeathTime = get_dword_time(); }
-	bool JustDied() const { return m_lastDeathTime + 1500 > get_dword_time(); }
+	void MarkDead() { m_lastDeathTime = get_unix_ms_time(); }
+	bool JustDied() const { return m_lastDeathTime + 1500 > get_unix_ms_time(); }
 
 	/************************************************************************/
 	/* Wall hacking                                                         */
@@ -114,7 +114,7 @@ private:
 	std::vector<uint32_t> m_moveAttackTimes;
 public:
 	//Motion of attacking / combo / skill
-	void ReceiveMoveAttackPacket() { m_lastMoveAttackPacketTime = get_dword_time(); };
+	void ReceiveMoveAttackPacket() { m_lastMoveAttackPacketTime = get_unix_ms_time(); };
 
 	//Plain, raw attack packet.
 	void ReceiveAttackPacket();

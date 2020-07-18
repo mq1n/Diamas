@@ -338,7 +338,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			SetLevel(uint8_t level);
 
 		uint8_t			GetGMLevel(bool bIgnoreTestServer = false) const;
-		BOOL 			IsGM() const;
+		bool 			IsGM() const;
 		void			SetGMLevel(); 
 
 		bool			IsGMInvisible() const { return m_bGMInvisible; }
@@ -946,11 +946,11 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	public:
 		////////////////////////////////////////////////////////////////////////////////////////
 		// Money related
-		INT				GetGold() const		{ return m_points.gold;	}
-		void			SetGold(INT gold)	{ m_points.gold = gold;	}
-		bool			DropGold(INT gold);
-		INT				GetAllowedGold() const;
-		void			GiveGold(INT iAmount);	// 파티가 있으면 파티 분배, 로그 등의 처리
+		int32_t				GetGold() const		{ return m_points.gold;	}
+		void			SetGold(int32_t gold)	{ m_points.gold = gold;	}
+		bool			DropGold(int32_t gold);
+		int32_t				GetAllowedGold() const;
+		void			GiveGold(int32_t iAmount);	// 파티가 있으면 파티 분배, 로그 등의 처리
 		// End of Money
 
 		////////////////////////////////////////////////////////////////////////////////////////
@@ -1257,8 +1257,8 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool			Return();
 		bool			IsGuardNPC() const;
 		bool			IsChangeAttackPosition(LPCHARACTER target) const;
-		void			ResetChangeAttackPositionTime() { m_dwLastChangeAttackPositionTime = get_dword_time() - AI_CHANGE_ATTACK_POISITION_TIME_NEAR;}
-		void			SetChangeAttackPositionTime() { m_dwLastChangeAttackPositionTime = get_dword_time();}
+		void			ResetChangeAttackPositionTime() { m_dwLastChangeAttackPositionTime = get_unix_ms_time() - AI_CHANGE_ATTACK_POISITION_TIME_NEAR;}
+		void			SetChangeAttackPositionTime() { m_dwLastChangeAttackPositionTime = get_unix_ms_time();}
 
 		bool			OnIdle();
 
@@ -1634,7 +1634,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void	SetMyShopTime() { m_iMyShopTime = thecore_pulse(); }
 
 		uint32_t GetLastPrivateShopOpenTime() const { return m_dwLastShopOpenTime; }
-		void	 SetLastPrivateShopOpenTime() { m_dwLastShopOpenTime = get_dword_time(); }
+		void	 SetLastPrivateShopOpenTime() { m_dwLastShopOpenTime = get_unix_ms_time(); }
 
 		// Hack 방지를 위한 체크.
 		bool	IsHack(bool bSendMsg = true, bool bCheckShopOwner = true, int32_t limittime = g_nPortalLimitTime);

@@ -55,13 +55,13 @@ TPacketElement * CPacketInfo::GetElement(int32_t header)
 void CPacketInfo::Start()
 {
 	assert(m_pCurrentPacket != nullptr);
-	m_dwStartTime = get_dword_time();
+	m_dwStartTime = get_unix_ms_time();
 }
 
 void CPacketInfo::End()
 {
 	++m_pCurrentPacket->iCalled;
-	m_pCurrentPacket->dwLoad += get_dword_time() - m_dwStartTime;
+	m_pCurrentPacket->dwLoad += get_unix_ms_time() - m_dwStartTime;
 }
 
 void CPacketInfo::Log(const char * c_pszFileName)

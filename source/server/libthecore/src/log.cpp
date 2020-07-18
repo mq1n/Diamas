@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+// TODO: spdlog
+
 #ifndef _WIN32
 #define SYSLOG_FILENAME "syslog"
 #define SYSERR_FILENAME "syserr"

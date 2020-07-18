@@ -32,7 +32,7 @@ TQueueElement * CEventQueue::Enqueue(LPEVENT pvData, int32_t duration, int32_t p
 	pElem->pvData = pvData;
 	pElem->iStartTime = pulse;
 	pElem->iKey = duration + pulse;
-	pElem->bCancel = FALSE;
+	pElem->bCancel = false;
 
 	m_pq_queue.push(pElem);
 	return pElem;

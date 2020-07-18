@@ -57,7 +57,7 @@ bool InitializeClient()
 		printf("Exception handled: %s\n", e.what());
 		abort();
 	}
-	catch (DWORD dwNumber)
+	catch (uint32_t dwNumber)
 	{
 		printf("Exception handled: %p\n", (void*)dwNumber);
 		abort();

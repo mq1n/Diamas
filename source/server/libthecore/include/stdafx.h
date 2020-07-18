@@ -1,11 +1,16 @@
-#ifndef __INC_LIBTHECORE_STDAFX_H__
-#define __INC_LIBTHECORE_STDAFX_H__
+#pragma once
 
 #if defined(__GNUC__)
 #define INLINE __inline__
 #elif defined(_MSC_VER)
 #define INLINE inline
 #endif
+
+#include <random>
+#include <algorithm>
+#include <cctype>
+#include <thread>
+#include <chrono>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -28,9 +33,6 @@
 #include <io.h>
 #include <direct.h>
 #include <fcntl.h>
-
-#include "xdirent.h"
-#include "random.h"
 
 #define S_ISDIR(m)	(m & _S_IFDIR)
 #define snprintf _snprintf
@@ -104,9 +106,10 @@ inline unsigned sleep(unsigned sec) {
 
 #endif
 
-#ifndef FALSE
-#define FALSE	false
-#define TRUE	(!FALSE)
+#ifdef _WIN32
+#define isdigit iswdigit
+#define isspace iswspace
+#define isalpha iswalpha
 #endif
 
 #define ishan(ch)       (((ch) & 0xE0) > 0x90)
@@ -114,12 +117,6 @@ inline unsigned sleep(unsigned sec) {
 #define ishanalp(ch)    (isalpha(ch) || ishan(ch))
 #define isnhdigit(ch)   (!ishan(ch) && isdigit(ch))
 #define isnhspace(ch)   (!ishan(ch) && isspace(ch))
-
-#ifdef _WIN32
-#define isdigit iswdigit
-#define isspace iswspace
-#define isalpha iswalpha
-#endif
 
 #include "typedef.h"
 #include "heart.h"
@@ -131,5 +128,4 @@ inline unsigned sleep(unsigned sec) {
 #include "main.h"
 #include "utils.h"
 #include "crypt.h"
-
-#endif // __INC_LIBTHECORE_STDAFX_H__
+#include "random.h"

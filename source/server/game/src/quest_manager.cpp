@@ -1491,21 +1491,16 @@ namespace quest
 
 		m_registeredNPCVnum.insert(dwVnum);
 
-		char buf[256]{};
-		DIR* dir = nullptr;
-
-		for (auto stQuestObjectDir : g_setQuestObjectDir)
+		for (const auto& stQuestObjectDir : g_setQuestObjectDir)
 		{
 			std::string directory = string_format("%s/%u", stQuestObjectDir.c_str(), dwVnum);
 			
-			if ((dir = opendir(directory.c_str())))
+			if (std::filesystem::exists(directory) && std::filesystem::is_directory(directory))
 			{
-				closedir(dir);
-				std::string vnum = std::to_string(dwVnum);
+				auto vnum = std::to_string(dwVnum);
 				sys_log(0, "%s", vnum.c_str());
 
 				m_mapNPC[dwVnum].Set(dwVnum, vnum);
-
 			}
 		}
 	}

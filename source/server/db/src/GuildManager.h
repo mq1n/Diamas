@@ -189,10 +189,10 @@ class CGuildManager : public CSingleton<CGuildManager>
 
 	void	UseSkill(uint32_t dwGuild, uint32_t dwSkillVnum, uint32_t dwCooltime);
 
-	INT		GetGuildGold(uint32_t dwGuild);
-	void	DepositMoney(uint32_t dwGuild, INT lGold);
-	void	WithdrawMoney(CPeer* peer, uint32_t dwGuild, INT lGold);
-	void	WithdrawMoneyReply(uint32_t dwGuild, uint8_t bGiveSuccess, INT lGold);
+	int32_t		GetGuildGold(uint32_t dwGuild);
+	void	DepositMoney(uint32_t dwGuild, int32_t lGold);
+	void	WithdrawMoney(CPeer* peer, uint32_t dwGuild, int32_t lGold);
+	void	WithdrawMoneyReply(uint32_t dwGuild, uint8_t bGiveSuccess, int32_t lGold);
 
 	void	MoneyChange(uint32_t dwGuild, uint32_t dwGold);
 

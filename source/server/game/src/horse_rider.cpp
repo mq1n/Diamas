@@ -329,12 +329,12 @@ void CHorseRider::StartStaminaRegenEvent()
 // Health
 void CHorseRider::ResetHorseHealthDropTime()
 {
-	m_Horse.dwHorseHealthDropTime = get_global_time() + HORSE_HEALTH_DROP_INTERVAL;
+	m_Horse.dwHorseHealthDropTime = get_unix_time() + HORSE_HEALTH_DROP_INTERVAL;
 }
 
 void CHorseRider::CheckHorseHealthDropTime(bool bSend)
 {
-	uint32_t now = get_global_time();
+	uint32_t now = get_unix_time();
 
 	while (m_Horse.dwHorseHealthDropTime < now)
 	{

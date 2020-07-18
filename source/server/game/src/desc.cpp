@@ -19,6 +19,8 @@ extern int32_t max_bytes_written;
 extern int32_t current_bytes_written;
 extern int32_t total_bytes_written;
 
+static const std::size_t kOutputBufferLimit = 256 * 1024; // 256KiB
+
 DESC::DESC()
 {
 	Initialize();
@@ -61,6 +63,7 @@ void DESC::Initialize()
 	memset( &m_SockAddr, 0, sizeof(m_SockAddr) );
 
 	m_pLogFile = nullptr;
+	m_stRelayName.clear();
 
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
 	m_bEncrypted = false;
@@ -86,9 +89,8 @@ void DESC::Initialize()
 
 void DESC::Destroy()
 {
-	if (m_bDestroyed) {
+	if (m_bDestroyed)
 		return;
-	}
 	m_bDestroyed = true;
 
 	if (m_pkLoginKey)
@@ -178,7 +180,7 @@ EVENTFUNC(ping_event)
 		desc->SetPong(false);
 	}
 
-	desc->SendHandshake(get_dword_time(), 0);
+	desc->SendHandshake(get_unix_ms_time(), 0);
 
 	return (ping_event_second_cycle);
 }
@@ -202,7 +204,7 @@ bool DESC::Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSoc
 	m_wPort			= c_rSockAddr.sin_port;
 	m_dwHandle		= _handle;
 
-	m_lpOutputBuffer = buffer_new(DEFAULT_PACKET_BUFFER_SIZE * 3);
+	m_lpOutputBuffer = buffer_new(DEFAULT_PACKET_BUFFER_SIZE * 3); // Default: 2
 
 	m_iMinInputBufferLen = MAX_INPUT_LEN >> 1;
 	m_lpInputBuffer = buffer_new(MAX_INPUT_LEN);
@@ -220,15 +222,15 @@ bool DESC::Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSoc
 	m_pkPingEvent = event_create(ping_event, info, ping_event_second_cycle);
 
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
-	memcpy(m_adwEncryptionKey, "1234abcd5678efgh", sizeof(uint32_t) * 4);
-	memcpy(m_adwDecryptionKey, "1234abcd5678efgh", sizeof(uint32_t) * 4);
-#endif // _IMPROVED_PACKET_ENCRYPTION_
+	memcpy(m_adwEncryptionKey, LSS_SECURITY_KEY, sizeof(uint32_t) * 4);
+	memcpy(m_adwDecryptionKey, LSS_SECURITY_KEY, sizeof(uint32_t) * 4);
+#endif
 
 	// Set Phase to handshake
 	SetPhase(PHASE_HANDSHAKE);
 	StartHandshake(_handshake);
 
-	sys_log(0, "SYSTEM: new connection from [%s] fd: %d handshake %u output input_len %d, ptr %p",
+	sys_log(0, "SYSTEM: new connection from [%s] fd: %d handshake %lu output input_len %lu, ptr %p",
 			m_stHost.c_str(), m_sock, m_dwHandshake, buffer_size(m_lpInputBuffer), this);
 
 	Log("SYSTEM: new connection from [%s] fd: %d handshake %u ptr %p", m_stHost.c_str(), m_sock, m_dwHandshake, this);
@@ -239,7 +241,7 @@ int32_t DESC::ProcessInput()
 {
 	if (!m_lpInputBuffer)
 	{
-		sys_err("DESC::ProcessInput : nil input buffer");
+		net_err("DESC::ProcessInput : nil input buffer");
 		return -1;
 	}
 
@@ -254,7 +256,7 @@ int32_t DESC::ProcessInput()
 	buffer_write_proceed(m_lpInputBuffer, bytes_read);
 
 	if (!m_pInputProcessor)
-		sys_err("no input processor");
+		net_err("no input processor");
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 	else
 	{
@@ -298,7 +300,7 @@ int32_t DESC::ProcessInput()
 
 		if (iSizeBuffer > 0)
 		{
-			TEMP_BUFFER	tempbuf;
+			TEMP_BUFFER	tempbuf (8192 + 4); //Size greater than 8192 so that its on a different buffer pool than normal buffers
 			LPBUFFER lpBufferDecrypt = tempbuf.getptr();
 			buffer_adjust_size(lpBufferDecrypt, iSizeBuffer);
 
@@ -390,10 +392,11 @@ void DESC::Packet(const void * c_pvData, int32_t iSize)
 	if (m_iPhase == PHASE_CLOSE) // 끊는 상태면 보내지 않는다.
 		return;
 
-#ifdef ENABLE_SYSLOG_PACKET_SENT
-	std::string stName = GetCharacter() ? GetCharacter()->GetName() : GetHostName();
-	sys_log(0, "SENT HEADER : %u to %s  (size %d) ", *(static_cast<const uint8_t*>(c_pvData)) , stName.c_str(), iSize );
-#endif
+	if (g_bIsTestServer)
+	{
+		std::string stName = GetCharacter() ? GetCharacter()->GetName() : GetHostName();
+		sys_log(0, "SENT HEADER : %u to %s  (size %d) ", *(static_cast<const uint8_t*>(c_pvData)), stName.c_str(), iSize);
+	}
 
 	if (m_stRelayName.length() != 0)
 	{
@@ -430,11 +433,11 @@ void DESC::Packet(const void * c_pvData, int32_t iSize)
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 		void* buf = buffer_write_peek(m_lpOutputBuffer);
-
-		
+	
 		if (packet_encode(m_lpOutputBuffer, c_pvData, iSize))
 		{
-			if (cipher_.activated()) {
+			if (cipher_.activated())
+			{
 				cipher_.Encrypt(buf, iSize);
 			}
 		}
@@ -443,38 +446,47 @@ void DESC::Packet(const void * c_pvData, int32_t iSize)
 			m_iPhase = PHASE_CLOSE;
 		}
 #else
-		if (!m_bEncrypted)
+		const int32_t padding = m_bEncrypted ? 8 : 0;
+		if (buffer_has_space(m_lpOutputBuffer) < iSize + padding)
 		{
-			if (!packet_encode(m_lpOutputBuffer, c_pvData, iSize))
+			// Restrict non-admin sockets to |kOutputBufferLimit| bytes.
+			if (!m_bAdminMode && buffer_size(m_lpOutputBuffer) > kOutputBufferLimit)
 			{
-				m_iPhase = PHASE_CLOSE;
-			}
-		}
-		else
-		{
-			if (buffer_has_space(m_lpOutputBuffer) < iSize + 8)
-			{
-				sys_err("desc buffer mem_size overflow. memsize(%u) write_pos(%u) iSize(%d)", 
-						m_lpOutputBuffer->mem_size, m_lpOutputBuffer->write_point_pos, iSize);
-
+				net_err("Output buffer full. Size (%u) at(%u) iSize(%d) limit(%u)",
+				        m_lpOutputBuffer->mem_size,
+				        m_lpOutputBuffer->write_point_pos, iSize, kOutputBufferLimit);
 				m_iPhase = PHASE_CLOSE;
 			}
 			else
 			{
-				// 암호화에 필요한 충분한 버퍼 크기를 확보한다.
-				/* buffer_adjust_size(m_lpOutputBuffer, iSize + 8); */
-				uint32_t * pdwWritePoint = (uint32_t *) buffer_write_peek(m_lpOutputBuffer);
-
-				if (packet_encode(m_lpOutputBuffer, c_pvData, iSize))
-				{
-					int32_t iSize2 = TEA_Encrypt(pdwWritePoint, pdwWritePoint, GetEncryptionKey(), iSize);
-
-					if (iSize2 > iSize)
-						buffer_write_proceed(m_lpOutputBuffer, iSize2 - iSize);
-				}
+				buffer_adjust_size(m_lpOutputBuffer, iSize + padding);
 			}
 		}
-#endif // _IMPROVED_PACKET_ENCRYPTION_
+
+		if (!m_bEncrypted && m_iPhase != PHASE_CLOSE)
+		{
+			if (!packet_encode(m_lpOutputBuffer, c_pvData, iSize))
+				m_iPhase = PHASE_CLOSE;
+		}
+		else if (m_iPhase != PHASE_CLOSE)
+		{
+			uint32_t * pdwWritePoint = (uint32_t *) buffer_write_peek(m_lpOutputBuffer);
+
+			// TODO: Check whether we can delay encryption.
+			// This could save us a few bytes for small packets.
+			// (It's probably not worth it though).
+			if (packet_encode(m_lpOutputBuffer, c_pvData, iSize))
+			{
+				int32_t iSize2 = TEA_Encrypt(pdwWritePoint, pdwWritePoint, GetEncryptionKey(), iSize);
+				if (iSize2 > iSize)
+					buffer_write_proceed(m_lpOutputBuffer, iSize2 - iSize);
+			}
+			else
+			{
+				m_iPhase = PHASE_CLOSE;
+			}
+		}
+#endif
 
 		SAFE_BUFFER_DELETE(m_lpBufferedOutputBuffer);
 	}
@@ -487,7 +499,7 @@ void DESC::Packet(const void * c_pvData, int32_t iSize)
 void DESC::LargePacket(const void * c_pvData, int32_t iSize)
 {
 	buffer_adjust_size(m_lpOutputBuffer, iSize);
-	sys_log(0, "LargePacket Size %d", iSize, buffer_size(m_lpOutputBuffer));
+	sys_log(0, "LargePacket Size %d/%lu", iSize, buffer_size(m_lpOutputBuffer));
 
 	Packet(c_pvData, iSize);
 }
@@ -558,7 +570,7 @@ void DESC::Log(const char * format, ...)
 
 	va_list args;
 
-	time_t ct = get_global_time();
+	time_t ct = get_unix_time();
 	struct tm tm = *localtime(&ct);
 
 	fprintf(m_pLogFile,
@@ -583,7 +595,7 @@ void DESC::StartHandshake(uint32_t _handshake)
 	// Handshake
 	m_dwHandshake = _handshake;
 
-	SendHandshake(get_dword_time(), 0);
+	SendHandshake(get_unix_ms_time(), 0);
 
 	m_iHandshakeRetry = 0;
 }
@@ -603,17 +615,17 @@ void DESC::SendHandshake(uint32_t dwCurTime, int32_t lNewDelta)
 
 bool DESC::HandshakeProcess(uint32_t dwTime, int32_t lDelta, bool bInfiniteRetry)
 {
-	uint32_t dwCurTime = get_dword_time();
+	uint32_t dwCurTime = get_unix_ms_time();
 
 	if (lDelta < 0)
 	{
-		sys_err("Desc::HandshakeProcess : value error (lDelta %d, ip %s)", lDelta, m_stHost.c_str());
+		net_err("Desc::HandshakeProcess : value error (lDelta %ld, ip %s)", lDelta, m_stHost.c_str());
 		return false;
 	}
 
 	int32_t bias = (int32_t) (dwCurTime - (dwTime + lDelta));
 
-	if (bias >= -50 && bias <= 50)
+	if (bias >= -50 && bias <= 50) // Default lower limit: 0
 	{
 		if (bInfiniteRetry)
 		{
@@ -624,7 +636,7 @@ bool DESC::HandshakeProcess(uint32_t dwTime, int32_t lDelta, bool bInfiniteRetry
 		if (GetCharacter())
 			sys_log(0, "Handshake: client_time %u server_time %u name: %s", m_dwClientTime, dwCurTime, GetCharacter()->GetName());
 		else
-			sys_log(0, "Handshake: client_time %u server_time %u", m_dwClientTime, dwCurTime, lDelta);
+			sys_log(0, "Handshake: client_time %lu server_time %lu, delta %ld", m_dwClientTime, dwCurTime, lDelta);
 
 		m_dwClientTime = dwCurTime;
 		m_bHandshaking = false;
@@ -639,13 +651,13 @@ bool DESC::HandshakeProcess(uint32_t dwTime, int32_t lDelta, bool bInfiniteRetry
 		lNewDelta = (dwCurTime - m_dwHandshakeSentTime) / 2;
 	}
 
-	sys_log(1, "Handshake: ServerTime %u dwTime %u lDelta %d SentTime %u lNewDelta %d", dwCurTime, dwTime, lDelta, m_dwHandshakeSentTime, lNewDelta);
+	sys_log(1, "Handshake: ServerTime %lu dwTime %lu lDelta %lu SentTime %lu lNewDelta %lu", dwCurTime, dwTime, lDelta, m_dwHandshakeSentTime, lNewDelta);
 
 	if (!bInfiniteRetry)
 	{
 		if (++m_iHandshakeRetry > HANDSHAKE_RETRY_LIMIT)
 		{
-			sys_err("handshake retry limit reached! (limit %d character %s)", 
+			net_err("handshake retry limit reached! (limit %d character %s)",
 					HANDSHAKE_RETRY_LIMIT, GetCharacter() ? GetCharacter()->GetName() : "!NO CHARACTER!");
 			SetPhase(PHASE_CLOSE);
 			return false;
@@ -675,6 +687,7 @@ void DESC::SendKeyAgreement()
 	size_t agreed_length = cipher_.Prepare(packet.data, &data_length);
 	if (agreed_length == 0) {
 		// Initialization failure
+		SetCloseReason("KEY_AGR");
 		SetPhase(PHASE_CLOSE);
 		return;
 	}
@@ -728,7 +741,7 @@ void DESC::FlushOutput()
 	gettimeofday(&start_tv, nullptr);
 
 	_socket_block(m_sock);
-	sys_log(0, "FLUSH START %d", buffer_size(m_lpOutputBuffer));
+	sys_log(0, "FLUSH START %lu", buffer_size(m_lpOutputBuffer));
 
 	while (buffer_size(m_lpOutputBuffer) > 0)
 	{
@@ -752,7 +765,7 @@ void DESC::FlushOutput()
 
 		if (num_events < 0)
 		{
-			sys_err("num_events < 0 : %d", num_events);
+			net_err("num_events < 0 : %d", num_events);
 			break;
 		}
 
@@ -772,7 +785,7 @@ void DESC::FlushOutput()
 
 					if (ProcessOutput() < 0)
 					{
-						sys_err("Cannot flush output buffer");
+						net_err("Cannot flush output buffer");
 						SetPhase(PHASE_CLOSE);
 					}
 					break;
@@ -928,9 +941,7 @@ const uint8_t* GetSpecialKey()
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
 void DESC::SetSecurityKey(const uint32_t * c_pdwKey)
 {
-	const uint8_t * c_pszKey = (const uint8_t *) "JyTxtHljHJlVJHorRM301vf@4fvj10-v";
-
-	c_pszKey = GetSpecialKey() + 37;
+	const auto c_pszKey = GetSpecialKey() + 37;
 
 	memcpy(&m_adwDecryptionKey, c_pdwKey, 16);
 	TEA_Encrypt(&m_adwEncryptionKey[0], &m_adwDecryptionKey[0], (const uint32_t *) c_pszKey, 16);
@@ -967,4 +978,3 @@ void DESC::ChatPacket(uint8_t type, const char * format, ...)
 
 	Packet(buf.read_peek(), buf.size());
 }
-

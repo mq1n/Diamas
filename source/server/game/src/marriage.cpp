@@ -92,7 +92,7 @@ namespace marriage
 			}
 		}
 
-		int32_t days = (get_global_time() - marry_time);
+		int32_t days = (get_unix_time() - marry_time);
 		if (g_bIsTestServer)
 			days /= 60;
 		else

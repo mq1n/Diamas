@@ -85,7 +85,7 @@ namespace net_engine
 			NET_LOG(LL_CRI, "Exception handled: %s", e.what());
 			abort();
 		}
-		catch (DWORD dwNumber)
+		catch (uint32_t dwNumber)
 		{
 			NET_LOG(LL_CRI, "Exception handled: %p", dwNumber);
 			abort();

@@ -66,7 +66,7 @@ void AbuseController::SuspiciousAttackCooldown()
 
 void AbuseController::InitiatedFight(const GPOS& mobPos, bool aggressive)
 {
-	uint32_t now = get_dword_time();
+	uint32_t now = get_unix_ms_time();
 
 	if (m_nextDetectStart > now)
 		return;
@@ -114,7 +114,7 @@ void AbuseController::AnalyzeAttacks()
 	m_lastAttackAnalysis = thecore_pulse();
 
 	if (m_vecPullInfo.size() < 5) { //Not worth analyzing, easy to get false positives. 
-		if (!m_vecPullInfo.empty() && m_lastSuspiciousAttackTime + 3 * 1000 < get_dword_time())
+		if (!m_vecPullInfo.empty() && m_lastSuspiciousAttackTime + 3 * 1000 < get_unix_ms_time())
 			SuspiciousAttackCooldown();
 
 		return;
@@ -252,7 +252,7 @@ void AbuseController::DeadWalk()
 	if (JustDied())
 		return;
 
-	uint32_t now = get_dword_time();
+	uint32_t now = get_unix_ms_time();
 	if (m_nextDeadWalkLog > now)
 		return;
 
@@ -268,7 +268,7 @@ void AbuseController::DeadPickup()
 	if (JustDied())
 		return;
 
-	uint32_t now = get_dword_time();
+	uint32_t now = get_unix_ms_time();
 	if (m_nextDeadPickupLog > now)
 		return;
 
@@ -286,7 +286,7 @@ void AbuseController::DeadPickup()
 
 void AbuseController::VerifyCoordinates(LPSECTREE tree, int32_t x, int32_t y, int32_t z)
 {
-	uint32_t now = get_dword_time();
+	uint32_t now = get_unix_ms_time();
 	if (m_whIgnoreUntil > now)
 		return;
 
@@ -426,7 +426,7 @@ void AbuseController::ResetMovementSpeedhackChecker(bool full /* = false */)
 
 bool AbuseController::CanPickupItem()
 {
-	if (get_dword_time() - m_mshLastDetect > 3000)
+	if (get_unix_ms_time() - m_mshLastDetect > 3000)
 		return true;
 
 	size_t count = m_mshRates.size();
@@ -438,7 +438,7 @@ bool AbuseController::CanPickupItem()
 
 void AbuseController::SignalMovement(uint32_t lastStopTime)
 {
-	if (lastStopTime < get_dword_time() - 1000)
+	if (lastStopTime < get_unix_ms_time() - 1000)
 	{
 		ResetMovementSpeedhackChecker(false);
 		return;
@@ -447,7 +447,7 @@ void AbuseController::SignalMovement(uint32_t lastStopTime)
 
 void AbuseController::CheckSpeedhack(int32_t x, int32_t y)
 {
-	uint32_t now = get_dword_time();
+	uint32_t now = get_unix_ms_time();
 
 	if (g_bDisableMovspeedHacklog || m_mshIgnoreUntil > now || m_ch->IsWalking())
 		return;
@@ -588,7 +588,7 @@ void AbuseController::NotifyFishedWithBubbleHide(bool valid, int32_t ms)
 
 void AbuseController::ReceiveAttackPacket()
 {
-	uint32_t now = get_dword_time();
+	uint32_t now = get_unix_ms_time();
 	uint32_t dif = now - m_lastMoveAttackPacketTime;
 
 	if (m_ignoreWaitDmgUntil > now)

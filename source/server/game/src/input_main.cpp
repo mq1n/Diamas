@@ -1428,7 +1428,7 @@ bool CheckComboHack(LPCHARACTER ch, uint8_t bArg, uint32_t dwTime, bool CheckSpe
 	if (HackScalar)
 	{
 		// 말에 타거나 내렸을 때 1.5초간 공격은 핵으로 간주하지 않되 공격력은 없게 하는 처리
-		if (get_dword_time() - ch->GetLastMountTime() > 1500)
+		if (get_unix_ms_time() - ch->GetLastMountTime() > 1500)
 			ch->IncreaseComboHackCount(1 + HackScalar);
 
 		ch->SkipComboAttackByTime(ch->GetValidComboInterval());
@@ -1494,7 +1494,7 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 		//
 		// 스피드핵(SPEEDHACK) Check
 		//
-		uint32_t dwCurTime = get_dword_time();
+		uint32_t dwCurTime = get_unix_ms_time();
 		// 시간을 Sync하고 7초 후 부터 검사한다. (20090702 이전엔 5초였음)
 		if (descStore)
 		{
@@ -2437,7 +2437,7 @@ void CInputMain::AnswerMakeGuild(LPCHARACTER ch, const char* c_pData)
 	if (ch->GetGold() < 200000 || ch->GetLevel() < 40)
 		return;
 
-	if (get_global_time() - ch->GetQuestFlag("guild_manage.new_disband_time") <
+	if (get_unix_time() - ch->GetQuestFlag("guild_manage.new_disband_time") <
 			CGuildManager::Instance().GetDisbandDelay())
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 해산한 후 %d일 이내에는 길드를 만들 수 없습니다."), 
@@ -2445,7 +2445,7 @@ void CInputMain::AnswerMakeGuild(LPCHARACTER ch, const char* c_pData)
 		return;
 	}
 
-	if (get_global_time() - ch->GetQuestFlag("guild_manage.new_withdraw_time") <
+	if (get_unix_time() - ch->GetQuestFlag("guild_manage.new_withdraw_time") <
 			CGuildManager::Instance().GetWithdrawDelay())
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 탈퇴한 후 %d일 이내에는 길드를 만들 수 없습니다."), 
@@ -2686,7 +2686,7 @@ int32_t CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 						return SubPacketLen;
 					}
 
-					member->SetQuestFlag("guild_manage.new_withdraw_time", get_global_time());
+					member->SetQuestFlag("guild_manage.new_withdraw_time", get_unix_time());
 					pGuild->RequestRemoveMember(member->GetPlayerID());
 				}
 				else

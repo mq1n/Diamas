@@ -191,7 +191,7 @@ bool CPetActor::_UpdatAloneActionAI(float fMinDist, float fMaxDist)
 	if (!m_pkChar->IsStateMove() && m_pkChar->Goto(dest_x, dest_y))
 		m_pkChar->SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
 
-	m_dwLastActionTime = get_dword_time();
+	m_dwLastActionTime = get_unix_ms_time();
 
 	return true;
 }
@@ -224,7 +224,7 @@ bool CPetActor::_UpdateFollowAI()
 	//bool bDoMoveAlone = true;					// 캐릭터와 가까이 있을 때 혼자 여기저기 움직일건지 여부 -_-;
 	bool bRun = false;							// 뛰어야 하나?
 
-	uint32_t currentTime = get_dword_time();
+	uint32_t currentTime = get_unix_ms_time();
 
 	int32_t ownerX = m_pkOwner->GetX();		int32_t ownerY = m_pkOwner->GetY();
 	int32_t charX = m_pkChar->GetX();			int32_t charY = m_pkChar->GetY();
@@ -430,7 +430,7 @@ bool CPetSystem::Update(uint32_t deltaTime)
 {
 	bool bResult = true;
 
-	uint32_t currentTime = get_dword_time();
+	uint32_t currentTime = get_unix_ms_time();
 
 	// CHARACTER_MANAGER에서 캐릭터류 Update할 때 매개변수로 주는 (Pulse라고 되어있는)값이 이전 프레임과의 시간차이인줄 알았는데
 	// 전혀 다른 값이라서-_-; 여기에 입력으로 들어오는 deltaTime은 의미가 없음ㅠㅠ

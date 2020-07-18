@@ -90,7 +90,7 @@ inline uint16_t MAKEWORD(uint8_t a, uint8_t b)
 #endif
 
 extern void set_global_time(time_t t);
-extern time_t get_global_time();
+extern time_t get_unix_time();
 
 extern int32_t	dice(int32_t number, int32_t size);
 extern size_t str_lower(const char * src, char * dest, size_t dest_size);

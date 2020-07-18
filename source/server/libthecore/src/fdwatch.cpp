@@ -51,7 +51,7 @@ LPFDWATCH fdwatch_new(int nfiles)
 	if (kq == -1)
 	{
 		sys_err("kqueue() failed with %d", errno);
-		return NULL;
+		return nullptr;
 	}
 
 	LPFDWATCH fdw = new FDWATCH;

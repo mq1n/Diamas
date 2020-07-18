@@ -2,10 +2,13 @@
 #include "stdafx.h"
 
 #ifdef _WIN32
+
 void signal_setup() {}
 void signal_timer_disable() {}
 void signal_timer_enable(int timeout_seconds) {}
+
 #elif __FreeBSD__
+
 #define RETSIGTYPE void
 
 RETSIGTYPE reap(int sig)
@@ -30,7 +33,7 @@ RETSIGTYPE checkpointing(int sig)
 
 RETSIGTYPE hupsig(int sig)
 {
-    shutdowned = TRUE;
+    shutdowned = 1;
     sys_err("SIGHUP, SIGINT, SIGTERM signal has been received. shutting down.");
 }
 

@@ -71,10 +71,10 @@ bool CLIENT_DESC::Connect(int32_t iPhaseWhenSucceed)
 	if (iPhaseWhenSucceed != 0)
 		m_iPhaseWhenSucceed = iPhaseWhenSucceed;
 
-	if (get_global_time() - m_LastTryToConnectTime < 3)	// 3초
+	if (get_unix_time() - m_LastTryToConnectTime < 3)	// 3초
 		return false;
 
-	m_LastTryToConnectTime = get_global_time();
+	m_LastTryToConnectTime = get_unix_time();
 
 	if (m_sock != INVALID_SOCKET)
 		return false;
@@ -192,7 +192,7 @@ void CLIENT_DESC::SetPhase(int32_t iPhase)
 						}
 					}
 
-					sys_log(0, "DB_SETUP current user %d size %d", p.dwLoginCount, buf.size());
+					sys_log(0, "DB_SETUP current user %lu size %d", p.dwLoginCount, buf.size());
 
 					// 파티를 처리할 수 있게 됨.
 					CPartyManager::Instance().EnablePCParty();
@@ -243,7 +243,7 @@ void CLIENT_DESC::DBPacket(uint8_t bHeader, uint32_t dwHandle, const void * c_pv
 			GetKnownClientDescName(this));
 		return;
 	}
-	sys_log(1, "DB_PACKET: header %d handle %d size %d buffer_size %d", bHeader, dwHandle, dwSize, buffer_size(m_lpOutputBuffer));
+	sys_log(1, "DB_PACKET: header %d handle %lu size %lu buffer_size %lu", bHeader, dwHandle, dwSize, buffer_size(m_lpOutputBuffer));
 	DBPacketHeader(bHeader, dwHandle, dwSize);
 
 	if (c_pvData)
@@ -291,7 +291,7 @@ void CLIENT_DESC::UpdateChannelStatus(uint32_t t, bool fForce)
 		if (g_bNoMoreClient)
 			channelStatus.bStatus = 0;
 		else
-			channelStatus.bStatus = iTotal > g_iFullUserCount ? 3 : iTotal > g_iBusyUserCount ? 2 : 1;
+			channelStatus.bStatus = iTotal >= g_iFullUserCount ? 3 : iTotal >= g_iBusyUserCount ? 2 : 1;
 
 		DBPacket(HEADER_GD_UPDATE_CHANNELSTATUS, 0, &channelStatus, sizeof(channelStatus));
 

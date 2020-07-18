@@ -976,7 +976,7 @@ void CGuild::Disband()
 		ch->SetGuild(nullptr);
 		SendOnlineRemoveOnePacket(ch->GetPlayerID());
 
-		ch->SetQuestFlag("guild_manage.new_disband_time", get_global_time());
+		ch->SetQuestFlag("guild_manage.new_disband_time", get_unix_time());
 	}
 
 	for (TGuildMemberContainer::iterator it = m_member.begin(); it != m_member.end(); ++it)
@@ -1298,7 +1298,7 @@ void CGuild::UseSkill(uint32_t dwVnum, LPCHARACTER ch, uint32_t pid)
 	}
 	abSkillUsable[dwRealVnum] = false;
 	//abSkillUsed[dwRealVnum] = true;
-	//adwSkillNextUseTime[dwRealVnum] = get_dword_time() + iCooltime * 1000;
+	//adwSkillNextUseTime[dwRealVnum] = get_unix_ms_time() + iCooltime * 1000;
 
 	//PointChange(POINT_SP, -iNeededSP);
 	//GuildPointChange(POINT_SP, -iNeededSP);
@@ -1991,10 +1991,10 @@ void CGuild::InviteDeny( uint32_t dwPID )
 
 CGuild::GuildJoinErrCode CGuild::VerifyGuildJoinableCondition( const LPCHARACTER pchInvitee )
 {
-	if ( get_global_time() - pchInvitee->GetQuestFlag( "guild_manage.new_withdraw_time" )
+	if ( get_unix_time() - pchInvitee->GetQuestFlag( "guild_manage.new_withdraw_time" )
 			< CGuildManager::Instance().GetWithdrawDelay() )
 		return GERR_WITHDRAWPENALTY;
-	else if ( get_global_time() - pchInvitee->GetQuestFlag( "guild_manage.new_disband_time" )
+	else if ( get_unix_time() - pchInvitee->GetQuestFlag( "guild_manage.new_disband_time" )
 			< CGuildManager::Instance().GetDisbandDelay() )
 		return GERR_COMMISSIONPENALTY;
 	else if ( pchInvitee->GetGuild() )

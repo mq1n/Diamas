@@ -1476,7 +1476,7 @@ EVENTFUNC(unique_expire_event)
 	}
 	else
 	{
-		time_t cur = get_global_time();
+		time_t cur = get_unix_time();
 		
 		if (pkItem->GetSocket(ITEM_SOCKET_UNIQUE_REMAIN_TIME) <= cur)
 		{
@@ -1555,7 +1555,7 @@ EVENTFUNC(real_time_expire_event)
 	if (nullptr == item)
 		return 0;
 
-	const time_t current = get_global_time();
+	const time_t current = get_unix_time();
 
 	if (current > item->GetSocket(0))
 	{

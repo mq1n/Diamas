@@ -3,3 +3,7 @@ auto it;
 boost/tr1
 auto_ptr
 * veri tipleri
+::instance -> ::Instance
+test_server 
+get_dword_time
+get_global_time

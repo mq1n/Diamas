@@ -368,7 +368,7 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(uint32_t dwVnum, int32_t l
 	char buf[512+1];
 	int32_t local_x = x - pkSectreeMap->m_setting.iBaseX;
 	int32_t local_y = y - pkSectreeMap->m_setting.iBaseY;
-	snprintf(buf, sizeof(buf), "spawn %s[%d] random position at %d %d %d %d (time: %d)", ch->GetName(), dwVnum, x, y, local_x, local_y, static_cast<int32_t>(get_global_time()));
+	snprintf(buf, sizeof(buf), "spawn %s[%d] random position at %d %d %d %d (time: %d)", ch->GetName(), dwVnum, x, y, local_x, local_y, static_cast<int32_t>(get_unix_time()));
 	
 	if (g_bIsTestServer)
 		SendNotice(buf);
@@ -407,9 +407,9 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(uint32_t dwVnum, int32_t lMapIndex, int3
 		{
 			// SPAWN_BLOCK_LOG
 			static bool s_isLog=quest::CQuestManager::Instance().GetEventFlag("spawn_block_log");
-			static uint32_t s_nextTime=get_global_time()+10000;
+			static uint32_t s_nextTime=get_unix_time()+10000;
 
-			uint32_t curTime=get_global_time();
+			uint32_t curTime=get_unix_time();
 
 			if (curTime>s_nextTime)
 			{

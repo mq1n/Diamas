@@ -84,7 +84,7 @@ namespace marriage
 			//void	Reserve(uint32_t dwPID1, uint32_t dwPID2);
 			void	Add(uint32_t dwPID1, uint32_t dwPID2, const char* szName1, const char* szName2);
 			void	Remove(uint32_t dwPID1, uint32_t dwPID2);
-			void	Update(uint32_t dwPID1, uint32_t dwPID2, INT iLovePoint, uint8_t byMarried);
+			void	Update(uint32_t dwPID1, uint32_t dwPID2, int32_t iLovePoint, uint8_t byMarried);
 
 			void	EngageToMarriage(uint32_t dwPID1, uint32_t dwPID2);
 

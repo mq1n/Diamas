@@ -298,12 +298,12 @@ void CHARACTER::Initialize()
 
 	SetPosition(POS_STANDING);
 
-	m_dwPlayStartTime = m_dwLastMoveTime = get_dword_time();
+	m_dwPlayStartTime = m_dwLastMoveTime = get_unix_ms_time();
 
 	GotoState(m_stateIdle);
 	m_dwStateDuration = 1;
 
-	m_dwLastAttackTime = get_dword_time() - 20000;
+	m_dwLastAttackTime = get_unix_ms_time() - 20000;
 
 	m_bAddChrState = 0;
 
@@ -331,7 +331,7 @@ void CHARACTER::Initialize()
 
 	m_dwNextStatePulse = 0;
 
-	m_dwLastDeadTime = get_dword_time()-180000;
+	m_dwLastDeadTime = get_unix_ms_time()-180000;
 
 	m_bSkipSave = false;
 
@@ -362,7 +362,7 @@ void CHARACTER::Initialize()
 	m_dwQuestByVnum = 0;
 	m_pQuestItem = nullptr;
 
-	m_dwUnderGuildWarInfoMessageTime = get_dword_time()-60000;
+	m_dwUnderGuildWarInfoMessageTime = get_unix_ms_time()-60000;
 
 	m_bUnderRefine = false;
 
@@ -386,7 +386,7 @@ void CHARACTER::Initialize()
 
 	ResetStopTime();
 
-	m_dwLastVictimSetTime = get_dword_time() - 3000;
+	m_dwLastVictimSetTime = get_unix_ms_time() - 3000;
 	m_iMaxAggro = -100;
 
 	m_bSendHorseLevel = 0;
@@ -401,7 +401,7 @@ void CHARACTER::Initialize()
 	m_posSafeboxOpen.y = -1000;
 
 	// EQUIP_LAST_SKILL_DELAY
-	m_dwLastSkillTime = get_dword_time();
+	m_dwLastSkillTime = get_unix_ms_time();
 	// END_OF_EQUIP_LAST_SKILL_DELAY
 
 	// MOB_SKILL_COOLTIME
@@ -900,7 +900,7 @@ void EncodeMovePacket(SPacketGCMove & pack, uint32_t dwVID, uint8_t bFunc, uint8
 	pack.bFunc   = bFunc;
 	pack.bArg    = bArg;
 	pack.dwVID   = dwVID;
-	pack.dwTime  = dwTime ? dwTime : get_dword_time();
+	pack.dwTime  = dwTime ? dwTime : get_unix_ms_time();
 	pack.rot    = fRot;
 	pack.lX		= x;
 	pack.lY		= y;
@@ -1050,7 +1050,7 @@ void CHARACTER::EncodeInsertPacket(LPENTITY entity)
 
 	if (m_posDest.x != pack.x || m_posDest.y != pack.y)
 	{
-		iDur = (m_dwMoveStartTime + m_dwMoveDuration) - get_dword_time();
+		iDur = (m_dwMoveStartTime + m_dwMoveDuration) - get_unix_ms_time();
 
 		if (iDur <= 0)
 		{
@@ -1293,7 +1293,7 @@ void CHARACTER::CreatePlayerProto(TPlayerTable & tab)
 	tab.part_base	= m_pointsInstant.bBasePart;
 	tab.skill_group	= m_points.skill_group;
 
-	uint32_t dwPlayedTime = (get_dword_time() - m_dwPlayStartTime);
+	uint32_t dwPlayedTime = (get_unix_ms_time() - m_dwPlayStartTime);
 
 	if (dwPlayedTime > 60000)
 	{
@@ -2034,11 +2034,11 @@ void CHARACTER::SetProto(const CMob * pkMob)
 		SetPoint(POINT_DEF_GRADE_BONUS, 6);
 
 		//산타용
-		//m_dwPlayStartTime = get_dword_time() + 10 * 60 * 1000;
+		//m_dwPlayStartTime = get_unix_ms_time() + 10 * 60 * 1000;
 		//신선자 노해 
-		m_dwPlayStartTime = get_dword_time() + 30 * 1000;
+		m_dwPlayStartTime = get_unix_ms_time() + 30 * 1000;
 		if (g_bIsTestServer)
-			m_dwPlayStartTime = get_dword_time() + 30 * 1000;
+			m_dwPlayStartTime = get_unix_ms_time() + 30 * 1000;
 	}
 
 	// XXX CTF GuildWar hardcoding
@@ -2528,7 +2528,7 @@ void CHARACTER::ComputePoints()
 // 을 때 여기에 dwTimeRemain으로 넣어서 제대로 계산되도록 해주어야 한다.
 void CHARACTER::ResetPlayTime(uint32_t dwTimeRemain)
 {
-	m_dwPlayStartTime = get_dword_time() - dwTimeRemain;
+	m_dwPlayStartTime = get_unix_ms_time() - dwTimeRemain;
 }
 
 const int32_t aiRecoveryPercents[10] = { 1, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
@@ -2625,7 +2625,7 @@ EVENTFUNC(recovery_event)
 		if (ch->IsAffectFlag(AFF_BLEEDING))
 			return 3;
 #endif
-		int32_t iSec = (get_dword_time() - ch->GetLastMoveTime()) / 3000;
+		int32_t iSec = (get_unix_ms_time() - ch->GetLastMoveTime()) / 3000;
 
 		ch->DistributeSP(ch);
 
@@ -3138,7 +3138,7 @@ void CHARACTER::CalculateMoveDuration()
 				GetName(), fDist, GetLimitPoint(POINT_MOV_SPEED), m_dwMoveDuration, motionSpeed,
 				m_posStart.x, m_posStart.y, m_posDest.x, m_posDest.y);
 
-	m_dwMoveStartTime = get_dword_time();
+	m_dwMoveStartTime = get_unix_ms_time();
 }
 
 // x y 위치로 이동 한다. (이동할 수 있는 가 없는 가를 확인 하고 Sync 메소드로 실제 이동 한다)
@@ -3358,13 +3358,13 @@ void CHARACTER::SetPoint(uint8_t type, int32_t val)
 	m_pointsInstant.points[type] = val;
 
 	// 아직 이동이 다 안끝났다면 이동 시간 계산을 다시 해야 한다.
-	if (type == POINT_MOV_SPEED && get_dword_time() < m_dwMoveStartTime + m_dwMoveDuration)
+	if (type == POINT_MOV_SPEED && get_unix_ms_time() < m_dwMoveStartTime + m_dwMoveDuration)
 	{
 		CalculateMoveDuration();
 	}
 }
 
-INT CHARACTER::GetAllowedGold() const
+int32_t CHARACTER::GetAllowedGold() const
 {
 	if (GetLevel() <= 10)
 		return 100000;
@@ -3437,7 +3437,7 @@ void CHARACTER::PointChange(uint8_t type, int32_t amount, bool bAmount, bool bBr
 				p.iLevel = GetLevel();
 				P2P_MANAGER::Instance().Send(&p, sizeof(TPacketGGLogin));
 
-				LogManager::Instance().LevelLog(this, val, GetRealPoint(POINT_PLAYTIME) + (get_dword_time() - m_dwPlayStartTime) / 60000);
+				LogManager::Instance().LevelLog(this, val, GetRealPoint(POINT_PLAYTIME) + (get_unix_ms_time() - m_dwPlayStartTime) / 60000);
 
 				if (GetGuild())
 				{
@@ -5222,7 +5222,7 @@ bool CHARACTER::OnIdle()
 
 void CHARACTER::OnMove(bool bIsAttack)
 {
-	m_dwLastMoveTime = get_dword_time();
+	m_dwLastMoveTime = get_unix_ms_time();
 
 	if (bIsAttack)
 	{
@@ -5391,7 +5391,7 @@ void CHARACTER::SetGMLevel()
 	}
 }
 
-BOOL CHARACTER::IsGM() const
+bool CHARACTER::IsGM() const
 {
 	if (m_pointsInstant.gm_level != GM_PLAYER)
 		return true;
@@ -5809,7 +5809,7 @@ bool CHARACTER::Follow(LPCHARACTER pkChr, float fMinDistance)
 			// If i'm in a party. I must obey party leader's AI.
 			if (!GetParty() || !GetParty()->GetLeader() || GetParty()->GetLeader() == this)
 			{
-				if (get_dword_time() - m_pkMobInst->m_dwLastAttackedTime >= 15000) // 마지막으로 공격받은지 15초가 지났고
+				if (get_unix_ms_time() - m_pkMobInst->m_dwLastAttackedTime >= 15000) // 마지막으로 공격받은지 15초가 지났고
 				{
 					// 마지막 맞은 곳으로 부터 50미터 이상 차이나면 포기하고 돌아간다.
 					if (m_pkMobData->m_table.wAttackRange < DISTANCE_APPROX(pkChr->GetX() - GetX(), pkChr->GetY() - GetY()))
@@ -5830,7 +5830,7 @@ bool CHARACTER::Follow(LPCHARACTER pkChr, float fMinDistance)
 		// If i'm in a party. I must obey party leader's AI.
 		if (!GetParty() || !GetParty()->GetLeader() || GetParty()->GetLeader() == this)
 		{
-			if (get_dword_time() - m_pkMobInst->m_dwLastAttackedTime >= 15000) // 마지막으로 공격받은지 15초가 지났고
+			if (get_unix_ms_time() - m_pkMobInst->m_dwLastAttackedTime >= 15000) // 마지막으로 공격받은지 15초가 지났고
 			{
 				// 마지막 맞은 곳으로 부터 50미터 이상 차이나면 포기하고 돌아간다.
 				if (5000 < DISTANCE_APPROX(m_pkMobInst->m_posLastAttacked.x - GetX(), m_pkMobInst->m_posLastAttacked.y - GetY()))
@@ -6246,7 +6246,7 @@ void CHARACTER::SetNowWalking(bool bWalkFlag)
 		if (bWalkFlag)
 		{
 			m_bNowWalking = true;
-			m_dwWalkStartTime = get_dword_time();
+			m_dwWalkStartTime = get_unix_ms_time();
 		}
 		else
 		{
@@ -6300,7 +6300,7 @@ bool CHARACTER::IsStaminaHalfConsume() const
 
 void CHARACTER::ResetStopTime()
 {
-	m_dwStopTime = get_dword_time();
+	m_dwStopTime = get_unix_ms_time();
 }
 
 uint32_t CHARACTER::GetStopTime() const
@@ -6352,7 +6352,7 @@ bool CHARACTER::IsChangeAttackPosition(LPCHARACTER target) const
 		AI_CHANGE_ATTACK_POISITION_DISTANCE + GetMobAttackRange())
 		dwChangeTime = AI_CHANGE_ATTACK_POISITION_TIME_FAR;
 
-	return get_dword_time() - m_dwLastChangeAttackPositionTime > dwChangeTime; 
+	return get_unix_ms_time() - m_dwLastChangeAttackPositionTime > dwChangeTime; 
 }
 
 void CHARACTER::GiveRandomSkillBook()
@@ -6713,7 +6713,7 @@ void CHARACTER::SendEquipment(LPCHARACTER ch)
 
 bool CHARACTER::CanSummon(int32_t iLeaderShip)
 {
-	return ((iLeaderShip >= 20) || ((iLeaderShip >= 12) && ((m_dwLastDeadTime + 180) > get_dword_time())));
+	return ((iLeaderShip >= 20) || ((iLeaderShip >= 12) && ((m_dwLastDeadTime + 180) > get_unix_ms_time())));
 }
 
 
@@ -6728,7 +6728,7 @@ void CHARACTER::MountVnum(uint32_t vnum)
 		MountVnum(0);
 
 	m_dwMountVnum = vnum;
-	m_dwMountTime = get_dword_time();
+	m_dwMountTime = get_unix_ms_time();
 
 	if (m_isObserver)
 		return;
@@ -6953,7 +6953,7 @@ int32_t CHARACTER::GetPremiumRemainSeconds(uint8_t bType) const
 	if (bType >= PREMIUM_MAX_NUM)
 		return 0;
 
-	return m_aiPremiumTimes[bType] - get_global_time();
+	return m_aiPremiumTimes[bType] - get_unix_time();
 }
 
 bool CHARACTER::WarpToPID(uint32_t dwPID)
@@ -7614,7 +7614,7 @@ void CHARACTER::ResetComboHackCount()
 
 void CHARACTER::SkipComboAttackByTime(int32_t interval)
 {
-	m_dwSkipComboAttackByTime = get_dword_time() + interval;
+	m_dwSkipComboAttackByTime = get_unix_ms_time() + interval;
 }
 
 uint32_t CHARACTER::GetSkipComboAttackByTime() const

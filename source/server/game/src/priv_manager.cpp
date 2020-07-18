@@ -90,10 +90,10 @@ void CPrivManager::GiveGuildPriv(uint32_t guild_id, uint8_t type, int32_t value,
 		return;
 	}
 
-	sys_log(0,"Set Guild Priv: guild_id(%u) type(%d) value(%d) duration_sec(%d)", guild_id, type, value, end_time_sec - get_global_time());
+	sys_log(0,"Set Guild Priv: guild_id(%u) type(%d) value(%d) duration_sec(%d)", guild_id, type, value, end_time_sec - get_unix_time());
 
 	value = MINMAX(0, value, PRIV_GUILD_RATE_LIMIT);
-	end_time_sec = MINMAX(0, end_time_sec, get_global_time() + PRIV_GUILD_TIME_LIMIT);
+	end_time_sec = MINMAX(0, end_time_sec, get_unix_time() + PRIV_GUILD_TIME_LIMIT);
 
 	m_aPrivGuild[type][guild_id].value = value;
 	m_aPrivGuild[type][guild_id].end_time_sec = end_time_sec;
@@ -148,10 +148,10 @@ void CPrivManager::GiveEmpirePriv(uint8_t empire, uint8_t type, int32_t value, u
 		return;
 	}
 
-	sys_log(0, "Set Empire Priv: empire(%d) type(%d) value(%d) duration_sec(%d)", empire, type, value, end_time_sec-get_global_time());
+	sys_log(0, "Set Empire Priv: empire(%d) type(%d) value(%d) duration_sec(%d)", empire, type, value, end_time_sec-get_unix_time());
 
 	value = MINMAX(0, value, PRIV_EMPIRE_RATE_LIMIT);
-	end_time_sec = MINMAX(0, end_time_sec, get_global_time() + PRIV_EMPIRE_TIME_LIMIT);
+	end_time_sec = MINMAX(0, end_time_sec, get_unix_time() + PRIV_EMPIRE_TIME_LIMIT);
 
 	SPrivEmpireData& rkPrivEmpireData=m_aakPrivEmpireData[type][empire];
 	rkPrivEmpireData.m_value = value;

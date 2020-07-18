@@ -354,7 +354,7 @@ namespace quest
 							if ( lua_toboolean(L, 6) ) 
 								nBeOtherLeader = 0;
 
-							if ( nBeOtherLeader > get_global_time() )
+							if ( nBeOtherLeader > get_unix_time() )
 							{
 								lua_pushnumber(L, 7);
 							}

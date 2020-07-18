@@ -208,14 +208,14 @@ void CShopManager::Buy(LPCHARACTER ch, uint8_t pos)
 {
 	if (0 != g_BuySellTimeLimitValue)
 	{
-		if (get_dword_time() < ch->GetLastBuySellTime()+g_BuySellTimeLimitValue)
+		if (get_unix_ms_time() < ch->GetLastBuySellTime()+g_BuySellTimeLimitValue)
 		{
 			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 골드를 버릴 수 없습니다."));
 			return;
 		}
 	}
 
-	ch->SetLastBuySellTime(get_dword_time());
+	ch->SetLastBuySellTime(get_unix_ms_time());
 
 	if (!ch->GetShop())
 		return;
@@ -255,14 +255,14 @@ void CShopManager::Sell(LPCHARACTER ch, uint8_t bCell, uint8_t bCount)
 {
 	if (0 != g_BuySellTimeLimitValue)
 	{
-		if (get_dword_time() < ch->GetLastBuySellTime()+g_BuySellTimeLimitValue)
+		if (get_unix_ms_time() < ch->GetLastBuySellTime()+g_BuySellTimeLimitValue)
 		{
 			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 골드를 버릴 수 없습니다."));
 			return;
 		}
 	}
 
-	ch->SetLastBuySellTime(get_dword_time());
+	ch->SetLastBuySellTime(get_unix_ms_time());
 
 	if (!ch->GetShop())
 		return;

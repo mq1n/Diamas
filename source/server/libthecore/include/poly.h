@@ -2,7 +2,10 @@
 #include <string>
 #include <vector>
 #include <list>
-
+#include <string>
+#include <cmath>
+#include <cctype>
+#include <cstdlib>
 
 
 #define POLY_MAXVALUE	0

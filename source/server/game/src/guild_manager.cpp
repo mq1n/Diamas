@@ -698,7 +698,7 @@ bool CGuildManager::EndWar(uint32_t guild_id1, uint32_t guild_id2)
 	if (g2)
 		g2->EndWar(guild_id1);
 
-	m_GuildWarEndTime[k] = get_global_time();
+	m_GuildWarEndTime[k] = get_unix_time();
 	CHARACTER_MANAGER::Instance().for_each_pc(FSendWarList(GUILD_SUBHEADER_GC_GUILD_WAR_END_LIST, guild_id1, guild_id2));
 	m_GuildWar.erase(it);
 
@@ -783,7 +783,7 @@ void CGuildManager::ShowGuildWarList(LPCHARACTER ch)
 			ch->ChatPacket(CHAT_TYPE_NOTICE, "%s[%d] vs %s[%d] time %u sec.",
 					A->GetName(), A->GetID(),
 					B->GetName(), B->GetID(),
-					get_global_time() - A->GetWarStartTime(B->GetID()));
+					get_unix_time() - A->GetWarStartTime(B->GetID()));
 		}
 	}
 }

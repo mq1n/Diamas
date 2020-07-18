@@ -16,8 +16,8 @@
 
 EVENTINFO(bg_event_timer_info)
 {
-	BYTE phase;
-	DWORD time;
+	uint8_t phase;
+	uint32_t time;
 
 	bg_event_timer_info() :
 		phase(1), time(0)
@@ -42,8 +42,8 @@ EVENTFUNC(bg_event_timer_worker)
 
 EVENTINFO(bg_queue_event_info)
 {
-	BYTE phase;
-	DWORD time;
+	uint8_t phase;
+	uint32_t time;
 
 	bg_queue_event_info() :
 		phase(1), time(0)
@@ -68,8 +68,8 @@ EVENTFUNC(bg_queue_event)
 
 EVENTINFO(bg_room_timeout_checker_info)
 {
-	BYTE phase;
-	DWORD time;
+	uint8_t phase;
+	uint32_t time;
 
 	bg_room_timeout_checker_info() :
 		phase(1), time(0)
@@ -577,7 +577,7 @@ void CBattlegroundManager::DeleteBattlegroundRoom(uint32_t dwRoomID)
 }
 void CBattlegroundManager::CheckRoomTimeouts()
 {
-	auto dwNowTimestamp = get_dword_time();
+	auto dwNowTimestamp = get_unix_ms_time();
 	
 	for (const auto & room : m_pkSetBattlegroundRoomContainer)
 	{

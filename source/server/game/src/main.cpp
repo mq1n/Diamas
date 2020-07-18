@@ -251,11 +251,11 @@ uint32_t save_idx = 0;
 
 void heartbeat(LPHEART ht, int32_t pulse) 
 {
-	auto t = get_dword_time();
+	auto t = get_unix_ms_time();
 	num_events_called += event_process(pulse);
-	s_dwProfiler[PROF_EVENT] += (get_dword_time() - t);
+	s_dwProfiler[PROF_EVENT] += (get_unix_ms_time() - t);
 
-	t = get_dword_time();
+	t = get_unix_ms_time();
 
 	// 1ÃÊ¸¶´Ù
 	if (!(pulse % ht->passes_per_sec))
@@ -292,7 +292,7 @@ void heartbeat(LPHEART ht, int32_t pulse)
 		DESC_MANAGER::Instance().UpdateLocalUserCount();
 	}
 
-	s_dwProfiler[PROF_HEARTBEAT] += (get_dword_time() - t);
+	s_dwProfiler[PROF_HEARTBEAT] += (get_unix_ms_time() - t);
 
 	DBManager::Instance().Process();
 	AccountDB::Instance().Process();
@@ -633,15 +633,15 @@ int32_t idle()
 		thecore_tick();
 	}
 
-	t = get_dword_time();
+	t = get_unix_ms_time();
 	CHARACTER_MANAGER::Instance().Update(thecore_heart->pulse);
 	db_clientdesc->Update(t);
-	s_dwProfiler[PROF_CHR_UPDATE] += (get_dword_time() - t);
+	s_dwProfiler[PROF_CHR_UPDATE] += (get_unix_ms_time() - t);
 
-	t = get_dword_time();
+	t = get_unix_ms_time();
 	if (!io_loop(main_fdw)) 
 		return 0;
-	s_dwProfiler[PROF_IO] += (get_dword_time() - t);
+	s_dwProfiler[PROF_IO] += (get_unix_ms_time() - t);
 
 	log_rotate();
 

@@ -20,6 +20,7 @@
 #include <stack>
 #include <functional>
 #include <fstream>
+#include <filesystem>
 
 #include "debug_allocator.h"
 #include "typedef.h"

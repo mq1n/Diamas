@@ -122,7 +122,7 @@ namespace marriage
 		CClientManager::Instance().ForwardPacket(HEADER_DG_MARRIAGE_ADD, &p, sizeof(p));
 	}
 
-	void CManager::Update(uint32_t dwPID1, uint32_t dwPID2, INT iLovePoint, uint8_t byMarried)
+	void CManager::Update(uint32_t dwPID1, uint32_t dwPID2, int32_t iLovePoint, uint8_t byMarried)
 	{
 		TMarriage* pMarriage = Get(dwPID1);
 		if (!pMarriage || pMarriage->GetOther(dwPID1) != dwPID2)

@@ -324,7 +324,7 @@ namespace quest
 			{
 				int32_t nHorseNameDuration = g_bIsTestServer ? 60 * 5 : 60 * 60 * 24 * 30;
 
-				ch->SetQuestFlag("horse_name.valid_till", get_global_time() + nHorseNameDuration);
+				ch->SetQuestFlag("horse_name.valid_till", get_unix_time() + nHorseNameDuration);
 				ch->AddAffect(AFFECT_HORSE_NAME, 0, 0, 0, PASSES_PER_SEC(nHorseNameDuration), 0, true);
 
 				ch->HorseSummon(false, true);

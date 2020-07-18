@@ -692,7 +692,7 @@ namespace quest
 
 				os << LC_TEXT(c_apszPrivNames[type]) << " : " << 
 					pkPrivEmpireData->m_value << "%" << " (" <<
-					((pkPrivEmpireData->m_end_time_sec-get_global_time())/3600.0f) << " hours)" << '\n';
+					((pkPrivEmpireData->m_end_time_sec-get_unix_time())/3600.0f) << " hours)" << '\n';
 				found = true;
 			}
 		}
@@ -737,7 +737,7 @@ namespace quest
 					os << ", ";
 
 				os << LC_TEXT(c_apszPrivNames[type]) << " : " << pPrivGuildData->value << "%"
-					<< " (" << ((pPrivGuildData->end_time_sec - get_global_time()) / 3600.0f) << " hours)" <<  '\n';
+					<< " (" << ((pPrivGuildData->end_time_sec - get_unix_time()) / 3600.0f) << " hours)" <<  '\n';
 
 				found = true;
 			}
@@ -839,7 +839,7 @@ namespace quest
 
 	int32_t _get_global_time(lua_State* L)
 	{
-		lua_pushnumber(L, get_global_time());
+		lua_pushnumber(L, get_unix_time());
 		return 1;
 	}
 	
@@ -1836,13 +1836,13 @@ namespace quest
 
 	int32_t _get_current_time_ms(lua_State* L)
 	{
-		lua_pushnumber(L, get_dword_time());
+		lua_pushnumber(L, get_unix_ms_time());
 		return 1;
 	}
 
 	int32_t _get_current_time_s(lua_State* L)
 	{
-		uint32_t result = static_cast<uint32_t>((get_dword_time() / 1000) + 0.5);
+		uint32_t result = static_cast<uint32_t>((get_unix_ms_time() / 1000) + 0.5);
 
 		lua_pushnumber(L, result);
 		return 1;
@@ -1923,7 +1923,7 @@ namespace quest
 			{	"mob_name",						_mob_name						},
 			{	"mob_vnum",						_mob_vnum						},
 			{	"get_time",						_get_global_time				},
-			{	"get_global_time",				_get_global_time				},
+			{	"get_unix_time",				_get_global_time				},
 			{	"get_channel_id",				_get_channel_id					},
 			{	"command",						_do_command						},
 			{	"find_pc_cond",					_find_pc_cond					},

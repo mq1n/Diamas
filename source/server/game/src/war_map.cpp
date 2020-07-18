@@ -118,7 +118,7 @@ CWarMap::CWarMap(int32_t lMapIndex, const TGuildWarInfo & r_info, TWarMapInfo * 
 	m_pkTimeoutEvent = nullptr;
 	m_pkResetFlagEvent = nullptr;
 	m_bTimeout = false;
-	m_dwStartTime = get_dword_time();
+	m_dwStartTime = get_unix_ms_time();
 	m_bEnded = false;
 
 	if (GetType() == WAR_MAP_TYPE_FLAG)
@@ -511,7 +511,7 @@ void CWarMap::Timeout()
 	uint32_t dwWinner = 0;
 	uint32_t dwLoser = 0;
 
-	if (get_dword_time() - m_dwStartTime < 60000 * 5)
+	if (get_unix_ms_time() - m_dwStartTime < 60000 * 5)
 	{
 		Notice(LC_TEXT("길드전이 일찍 종료되어 무승부로 판정 되었습니다. (5분이 지나지 않음)"));
 		dwWinner = 0;
@@ -672,7 +672,7 @@ bool CWarMap::CheckScore()
 		return true;
 
 	// 30초 이후 부터 확인한다.
-	if (get_dword_time() - m_dwStartTime < 30000)
+	if (get_unix_ms_time() - m_dwStartTime < 30000)
 		return false;
 
 	// 점수가 같으면 체크하지 않는다.

@@ -166,7 +166,7 @@ int socket_bind(const char * ip, int port, int protocol)
 
     if (protocol == SOCK_STREAM)
     {
-	    sys_log(0, "SYSTEM: BINDING TCP PORT ON [%d] (fd %d)", port, s);
+	    sys_log(0, "SYSTEM: BINDING TCP PORT ON [%d] (fd %u)", port, s);
 	    listen(s, SOMAXCONN);
     }
 
@@ -212,7 +212,7 @@ socket_t socket_accept(socket_t s, struct sockaddr_in *peer)
     return desc;
 }
 
-socket_t socket_connect(const char* host, WORD port)
+socket_t socket_connect(const char* host, uint16_t port)
 {
     socket_t            s = 0;
     struct sockaddr_in  server_addr;
@@ -231,7 +231,7 @@ socket_t socket_connect(const char* host, WORD port)
 
         if ((hp = gethostbyname(host)) == NULL)
         {
-            net_err("socket_connect(): can not connect to %s:%d", host, port);
+            net_err("socket_connect(): can not connect to %s:%u", host, port);
             return (socket_t)-1;
         }
 

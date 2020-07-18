@@ -87,7 +87,7 @@ class CProfiler : public CSingleton<CProfiler>
 			TProfileStackData & rProfileStackData = m_ProfileStackDatas[m_ProfileStackDataCount++];
 
 			rProfileStackData.iCallStep = m_iCallStep;
-			rProfileStackData.iStartTime = get_dword_time();
+			rProfileStackData.iStartTime = get_unix_ms_time();
 			rProfileStackData.strName = c_szName;
 
 			++m_iCallStep;
@@ -103,7 +103,7 @@ class CProfiler : public CSingleton<CProfiler>
 				return;
 			}
 
-			pProfileStackData->iEndTime = get_dword_time();
+			pProfileStackData->iEndTime = get_unix_ms_time();
 			--m_iCallStep;
 		}
 
@@ -126,7 +126,7 @@ class CProfiler : public CSingleton<CProfiler>
 			}
 
 			TProfileAccumData & rData = it->second;
-			rData.iStartTime = get_dword_time();
+			rData.iStartTime = get_unix_ms_time();
 			++m_iAccumDepth;
 		}
 
@@ -138,7 +138,7 @@ class CProfiler : public CSingleton<CProfiler>
 				return;
 
 			TProfileAccumData & rData = it->second;
-			rData.iCollapsedTime += get_dword_time() - rData.iStartTime;
+			rData.iCollapsedTime += get_unix_ms_time() - rData.iStartTime;
 			++rData.iCallingCount;
 			--m_iAccumDepth;
 		}

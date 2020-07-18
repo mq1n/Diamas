@@ -114,8 +114,8 @@ void CHARACTER::DistributeSP(LPCHARACTER pkKiller, int32_t iMethod)
 	if (pkKiller->GetSP() >= pkKiller->GetMaxSP())
 		return;
 
-	bool bAttacking = (get_dword_time() - GetLastAttackTime()) < 3000;
-	bool bMoving = (get_dword_time() - GetLastMoveTime()) < 3000;
+	bool bAttacking = (get_unix_ms_time() - GetLastAttackTime()) < 3000;
+	bool bMoving = (get_unix_ms_time() - GetLastMoveTime()) < 3000;
 
 	if (iMethod == 1)
 	{
@@ -216,7 +216,7 @@ bool CHARACTER::Attack(LPCHARACTER pkVictim, uint8_t bType)
 		return false;
 	}
 
-	uint32_t dwCurrentTime = get_dword_time();
+	uint32_t dwCurrentTime = get_unix_ms_time();
 
 	if (IsPC())
 	{
@@ -1430,7 +1430,7 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 
 	if (IsPC())
 	{
-		m_dwLastDeadTime = get_dword_time();
+		m_dwLastDeadTime = get_unix_ms_time();
 		SetKillerMode(false);
 		GetDesc()->SetPhase(PHASE_DEAD);
 	}
@@ -1465,9 +1465,9 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 			}
 			else
 			{
-				if (pkKiller->m_dwUnderGuildWarInfoMessageTime < get_dword_time())
+				if (pkKiller->m_dwUnderGuildWarInfoMessageTime < get_unix_ms_time())
 				{
-					pkKiller->m_dwUnderGuildWarInfoMessageTime = get_dword_time() + 60000;
+					pkKiller->m_dwUnderGuildWarInfoMessageTime = get_unix_ms_time() + 60000;
 					pkKiller->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드전중에는 사냥에 따른 이익이 없습니다."));
 				}
 			}
@@ -2207,9 +2207,9 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 	if (!IsPC())
 	{
 		if (m_pkParty && m_pkParty->GetLeader())
-			m_pkParty->GetLeader()->SetLastAttacked(get_dword_time());
+			m_pkParty->GetLeader()->SetLastAttacked(get_unix_ms_time());
 		else
-			SetLastAttacked(get_dword_time());
+			SetLastAttacked(get_unix_ms_time());
 
 		// 몬스터 대사 : 맞을 때
 		MonsterChat(MONSTER_CHAT_ATTACKED);
@@ -2938,7 +2938,7 @@ class CFuncShoot
 		uint8_t		m_bType;
 		bool		m_bSucceed;
 
-		CFuncShoot(LPCHARACTER ch, uint8_t bType) : m_me(ch), m_bType(bType), m_bSucceed(FALSE)
+		CFuncShoot(LPCHARACTER ch, uint8_t bType) : m_me(ch), m_bType(bType), m_bSucceed(false)
 		{
 		}
 
@@ -2998,7 +2998,7 @@ class CFuncShoot
 							m_me->UseArrow(pkArrow, 1);
 
 							// check speed hack
-							uint32_t	dwCurrentTime	= get_dword_time();
+							uint32_t	dwCurrentTime	= get_unix_ms_time();
 							if (IS_SPEED_HACK(m_me, pkVictim, dwCurrentTime))
 								iDam	= 0;
 						}
@@ -3219,7 +3219,7 @@ class CFuncShoot
 					break;
 			}
 
-			m_bSucceed = TRUE;
+			m_bSucceed = true;
 		}
 };
 
@@ -3348,7 +3348,7 @@ void CHARACTER::SetVictim(LPCHARACTER pkVictim)
 	else
 	{
 		m_kVIDVictim = pkVictim->GetVID();
-		m_dwLastVictimSetTime = get_dword_time();
+		m_dwLastVictimSetTime = get_unix_ms_time();
 	}
 }
 
@@ -3705,7 +3705,7 @@ void CHARACTER::UpdateAggrPoint(LPCHARACTER pAttacker, EDamageType type, int32_t
 
 void CHARACTER::ChangeVictimByAggro(int32_t iNewAggro, LPCHARACTER pNewVictim)
 {
-	if (get_dword_time() - m_dwLastVictimSetTime < 3000) // 3초는 기다려야한다
+	if (get_unix_ms_time() - m_dwLastVictimSetTime < 3000) // 3초는 기다려야한다
 		return;
 
 	if (pNewVictim == GetVictim())

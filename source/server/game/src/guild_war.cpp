@@ -427,7 +427,7 @@ void CGuild::StartWar(uint32_t dwOppGID)
 		return;
 
 	gw.state = GUILD_WAR_ON_WAR;
-	gw.war_start_time = get_global_time();
+	gw.war_start_time = get_unix_time();
 
 	GuildWarPacket(dwOppGID, gw.type, GUILD_WAR_ON_WAR);
 
@@ -680,7 +680,7 @@ void CGuild::GuildWarEntryAccept(uint32_t dwOppGID, LPCHARACTER ch)
 		int32_t iBlockTime = pPC->GetFlag("guild_war_join.savasengeli");
 		if (iBlockTime)
 		{
-			int32_t iDifference = (int32_t)ceil((iBlockTime - get_global_time()) / 60);
+			int32_t iDifference = (int32_t)ceil((iBlockTime - get_unix_time()) / 60);
 			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You kicked from war! You can join war after %d minutes later."), iDifference);
 			return;
 		}

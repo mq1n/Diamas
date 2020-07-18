@@ -1881,7 +1881,7 @@ namespace quest
 		if (length < 0)
 			length = 60;
 
-		if ((get_dword_time() - ch->GetLastMoveTime()) < 1000) 
+		if ((get_unix_ms_time() - ch->GetLastMoveTime()) < 1000) 
 		{
 			ch->ChatPacket(CHAT_TYPE_INFO, "Hareket ederken bu eylemi gerceklestiremezsin");
 			return 0;
@@ -3632,8 +3632,8 @@ teleport_area:
 		packet.dwAmount		= (uint32_t)amount;
 		packet.eChargeType	= ERequestCharge_Cash;
 
-		if (0 < strChargeType.length())
-			std::transform(strChargeType.begin(), strChargeType.end(), strChargeType.begin(), std::tolower);
+		if (!strChargeType.empty())
+			stl_lowers(strChargeType);
 
 		if ("mileage" == strChargeType)
 			packet.eChargeType = ERequestCharge_Mileage;

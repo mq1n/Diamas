@@ -104,7 +104,7 @@ int32_t BlueDragon_StateBattle(LPCHARACTER pChar)
 		SkillPriority[2] = 1;
 	}
 
-	time_t timeNow = static_cast<time_t>(get_dword_time());
+	time_t timeNow = static_cast<time_t>(get_unix_ms_time());
 
 	for (int32_t i=0 ; i < SkillCount ; ++i)
 	{

@@ -1,11 +1,5 @@
 #include "poly.h"
 
-#include <string>
-#include <cmath>
-#include <cctype>
-#include <cstdlib>
-
-
 double _random()
 {
 	return std::rand() / (RAND_MAX + 1.0);

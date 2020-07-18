@@ -36,35 +36,26 @@ namespace quest
 
 			for (const auto & itObjectDir : g_setQuestObjectDir)
 			{	
-				int32_t is = snprintf(buf, sizeof(buf), "%s/%s/%s/", itObjectDir.c_str(), script_name.c_str(), it->first.c_str());
+				std::ostringstream oss;
+				oss << itObjectDir << "/" << script_name << "/" << it->first << "/";
 
-				if (is < 0 || is >= (int32_t) sizeof(buf))
-					is = sizeof(buf) - 1;
+				auto event_index = it->second;
 
-				//sys_log(0, "XXX %s", buf);
-				int32_t event_index = it->second;
-
-				DIR * pdir = opendir(buf);
-
-				if (!pdir)
+				if (!std::filesystem::exists(oss.str()))
 					continue;
 
-				dirent * pde;
-
-				while ((pde = readdir(pdir)))
+				for (const auto& entry : std::filesystem::recursive_directory_iterator(oss.str()))
 				{
-					if (pde->d_name[0] == '.')
+					if (!entry.is_regular_file())
 						continue;
 
-					if (!strncasecmp(pde->d_name, "CVS", 3))
+					const auto& filename = entry.path().filename().string();
+					if (!strncasecmp(filename.c_str(), "CVS", 3))
 						continue;
 
-					sys_log(1, "QUEST reading %s", pde->d_name);
-					strlcpy(buf + is, pde->d_name, sizeof(buf) - is);
-					LoadStateScript(event_index, buf, pde->d_name);
+					sys_log(1, "QUEST reading %s | %s", filename.c_str(), (oss.str() + filename).c_str());
+					LoadStateScript(event_index, (oss.str() + filename).c_str(), filename.c_str());
 				}
-
-				closedir(pdir);
 			}
 		}
 	}

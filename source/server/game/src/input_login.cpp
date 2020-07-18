@@ -621,7 +621,7 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	marriage::CManager::Instance().Login(ch);
 
 	SPacketGCTime p;
-	p.time = get_global_time();
+	p.time = get_unix_time();
 	d->Packet(&p, sizeof(p));
 
 	SPacketGCChannel p2;

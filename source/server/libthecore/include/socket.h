@@ -19,7 +19,7 @@ typedef int socklen_t;
 
     extern socket_t	socket_accept(socket_t s, struct sockaddr_in *peer);
     extern void		socket_close(socket_t s);
-    extern socket_t	socket_connect(const char* host, WORD port);
+    extern socket_t	socket_connect(const char* host, uint16_t port);
 
     extern void		socket_nonblock(socket_t s);
     extern void		_socket_block(socket_t s);

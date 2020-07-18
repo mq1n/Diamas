@@ -2,7 +2,7 @@
 
 static time_t global_time_gap = 0;
 
-time_t get_global_time()
+time_t get_unix_time()
 {
 	return time(nullptr) + global_time_gap;
 }
@@ -72,7 +72,7 @@ void skip_spaces(const char **string)
 
 const char *one_argument(const char *argument, char *first_arg, size_t first_size)
 {
-	char mark = FALSE;
+	char mark = 0;
 	size_t first_len = 0;
 
 	if (!argument || 0 == first_size)

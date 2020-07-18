@@ -447,7 +447,7 @@ EVENTFUNC(fishing_event)
 			++info->step;
 
 			//info->ch->Motion(MOTION_FISHING_SIGN);
-			info->hang_time = get_dword_time();
+			info->hang_time = get_unix_ms_time();
 			info->fish_id = DetermineFish(ch);
 			FishingReact(ch);
 
@@ -542,7 +542,7 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 
 	if (info->step == 1)	// 고기가 걸린 상태면..
 	{
-		int32_t ms = (int32_t) ((get_dword_time() - info->hang_time));
+		int32_t ms = (int32_t) ((get_unix_ms_time() - info->hang_time));
 		uint32_t item_vnum = 0;
 		int32_t ret = Compute(info->fish_id, ms, &item_vnum, GetFishingLevel(ch));
 

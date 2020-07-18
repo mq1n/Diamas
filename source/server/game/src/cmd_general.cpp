@@ -1620,7 +1620,7 @@ ACMD(do_disband_gwar)
 	if (!g->UnderAnyWar())
 		return;
 
-	tch->SetQuestFlag("guild_war_join.savasengeli", get_global_time() + 3600);
+	tch->SetQuestFlag("guild_war_join.savasengeli", get_unix_time() + 3600);
 
 	DESC_MANAGER::Instance().DestroyDesc(d);
 }
@@ -1961,7 +1961,7 @@ static bool FN_hair_affect_string(LPCHARACTER ch, char *buf, size_t bufsiz)
 
 	expire = ch->GetQuestFlag("hair.limit_time");
 
-	if (expire < get_global_time())
+	if (expire < get_unix_time())
 		return false;
 
 	// set apply string
@@ -2360,7 +2360,7 @@ ACMD(do_ride)
 		return;
 
 	/*
-	if ((get_dword_time() - ch->GetLastMoveTime()) < 1000) {
+	if ((get_unix_ms_time() - ch->GetLastMoveTime()) < 1000) {
 		ch->ChatPacket(CHAT_TYPE_INFO, "Hareket ederken bu eylemi gerceklestiremezsin");
 		return;
 	}

@@ -29,7 +29,7 @@ class CLoginKey
 
 		void Expire()
 		{
-			m_dwExpireTime = get_dword_time();
+			m_dwExpireTime = get_unix_ms_time();
 			m_pkDesc = nullptr;
 		}
 

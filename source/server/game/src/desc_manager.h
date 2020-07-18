@@ -81,11 +81,11 @@ class DESC_MANAGER : public CSingleton<DESC_MANAGER>
 
 		typedef std::unordered_map<int16_t, uint32_t> TPlayerCountMap;
 
-public:
-	void UpdateUserCountOnServer(int16_t port, uint32_t userCount);
-	TPlayerCountMap GetCountOnServerMap() const { return m_userCountMap; }
-private:
-
-	TPlayerCountMap m_userCountMap;
+	public:
+		void UpdateUserCountOnServer(int16_t port, uint32_t userCount);
+		TPlayerCountMap GetCountOnServerMap() const { return m_userCountMap; }
+		
+	private:
+		TPlayerCountMap m_userCountMap;
 		bool			m_bDestroyed;
 };

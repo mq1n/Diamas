@@ -134,7 +134,7 @@ EVENTFUNC(bg_managment_event)
 	{
 		if (info->This->IsStarted() == false)
 		{
-			auto dwPassedSecThenSetup = (get_dword_time() - info->This->GetSetupTime()) / 1000;
+			auto dwPassedSecThenSetup = (get_unix_ms_time() - info->This->GetSetupTime()) / 1000;
 			int32_t nStartTimeRemainingSec = BATTLEGROUND_START_TIME_SEC - dwPassedSecThenSetup;
 
 			if (nStartTimeRemainingSec <= 0)
@@ -150,7 +150,7 @@ EVENTFUNC(bg_managment_event)
 		}
 		else
 		{
-			auto dwPassedSecThenStart = (get_dword_time() - info->This->GetStartTime()) / 1000;
+			auto dwPassedSecThenStart = (get_unix_ms_time() - info->This->GetStartTime()) / 1000;
 
 			info->This->SpawnMinnions(dwPassedSecThenStart);
 
@@ -178,7 +178,7 @@ CBattleground::CBattleground(int32_t nMapIndex, uint8_t nGameMode, uint8_t nGame
 	m_strLeaderName.clear();
 	m_pkLstAttenders.clear();
 	
-	m_dwSetupTimestamp = get_dword_time();
+	m_dwSetupTimestamp = get_unix_ms_time();
 
 	m_pkSectreeMap = SECTREE_MANAGER::Instance().GetMap(nMapIndex);
 
@@ -328,7 +328,7 @@ bool CBattleground::__EnterAttender(uint32_t dwPlayerID) const
 	}
 
 	if (!pkChar->IsGM()){
-		DWORD pid = pkChar->GetPlayerID();
+		uint32_t pid = pkChar->GetPlayerID();
 		m_map_char.insert(std::make_pair(pid, pid));
 
 		SpawnRandomPos(pkChar);
@@ -358,7 +358,7 @@ bool CBattleground::EnterSpectator(LPCHARACTER pkChar) const
 		pkChar->WarpSet(95500, 12500, 200);
 
 	//RemoveFromEvent(pkChar);
-	DWORD pid = pkChar->GetPlayerID();
+	uint32_t pid = pkChar->GetPlayerID();
 	m_map_miss.insert(std::make_pair(pid, pid));
 
 	//if (test_server){
@@ -385,7 +385,7 @@ bool CBattleground::__SwitchToSpectator(LPCHARACTER pkChar) const
 	if (!x_pkChar->IsPC())
 		return true;
 
-	DWORD dwPID = x_pkChar->GetPlayerID();
+	uint32_t dwPID = x_pkChar->GetPlayerID();
 	m_map_char.erase(dwPID);
 	m_map_miss.insert(std::make_pair(dwPID, dwPID));
 
@@ -415,7 +415,7 @@ void CBattleground::Logout(LPCHARACTER pkChar)
 	if (!x_pkChar->IsPC())
 		return;
 
-	DWORD dwPID = x_pkChar->GetPlayerID();
+	uint32_t dwPID = x_pkChar->GetPlayerID();
 	m_map_char.erase(dwPID);
 
 	if (m_map_char.size() == 1 && GetStatus() == DEATHMATCH_STARTED)
@@ -562,7 +562,7 @@ bool CBattleground::Start()
 //	m_pkMinnionSpawnEvent = event_create(minnion_spawn_event, info1, PASSES_PER_SEC(1));
 	
 	m_bStarted = true;
-	m_dwStartTime = get_dword_time();
+	m_dwStartTime = get_unix_ms_time();
 
 	SendNotice("Battleground started!");
 

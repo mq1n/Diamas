@@ -272,10 +272,10 @@ void CParty::Initialize()
 	m_anMaxRole[PARTY_ROLE_LEADER] = 1;
 	m_anMaxRole[PARTY_ROLE_NORMAL] = 32;
 
-	m_dwPartyStartTime = get_dword_time();
+	m_dwPartyStartTime = get_unix_ms_time();
 	m_iLongTimeExpBonus = 0;
 
-	m_dwPartyHealTime = get_dword_time();
+	m_dwPartyHealTime = get_unix_ms_time();
 	m_bPartyHealReady = false;
 	m_bCanUsePartyHeal = false;
 
@@ -312,7 +312,7 @@ void CParty::Destroy()
 
 	TMemberMap::iterator it = m_memberMap.begin();
 
-	uint32_t dwTime = get_dword_time();
+	uint32_t dwTime = get_unix_ms_time();
 
 	while (it != m_memberMap.end())
 	{
@@ -1086,7 +1086,7 @@ void CParty::HealParty()
 	}
 
 	m_bPartyHealReady = false;
-	m_dwPartyHealTime = get_dword_time();
+	m_dwPartyHealTime = get_unix_ms_time();
 #endif
 }
 
@@ -1359,7 +1359,7 @@ void CParty::Update()
 	bool bLongTimeExpBonusChanged = false;
 
 	// 파티 결성 후 충분한 시간이 지나면 경험치 보너스를 받는다.
-	if (!m_iLongTimeExpBonus && (get_dword_time() - m_dwPartyStartTime > PARTY_ENOUGH_MINUTE_FOR_EXP_BONUS * 60 * 240))
+	if (!m_iLongTimeExpBonus && (get_unix_ms_time() - m_dwPartyStartTime > PARTY_ENOUGH_MINUTE_FOR_EXP_BONUS * 60 * 240))
 	{
 		bLongTimeExpBonusChanged = true;
 		m_iLongTimeExpBonus = 5;
@@ -1405,9 +1405,9 @@ void CParty::Update()
 		{
 			uint32_t PartyHealCoolTime = (m_iLeadership >= 40) ? 60000 : 180000;
 
-			if (get_dword_time() > m_dwPartyHealTime + PartyHealCoolTime)
+			if (get_unix_ms_time() > m_dwPartyHealTime + PartyHealCoolTime)
 			{
-				m_dwPartyHealTime = get_dword_time();
+				m_dwPartyHealTime = get_unix_ms_time();
 				m_bPartyHealReady = true;
 
 				if (GetLeaderCharacter())

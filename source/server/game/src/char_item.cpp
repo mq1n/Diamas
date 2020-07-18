@@ -1042,7 +1042,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 	//진행할수 없음
 	if (quest::CQuestManager::Instance().GetEventFlag("update_refine_time") != 0)
 	{
-		if (get_global_time() < quest::CQuestManager::Instance().GetEventFlag("update_refine_time") + (60 * 5))
+		if (get_unix_time() < quest::CQuestManager::Instance().GetEventFlag("update_refine_time") + (60 * 5))
 		{
 			sys_log(0, "can't refine %d %s", GetPlayerID(), GetName());
 			return false;
@@ -1202,7 +1202,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 	//진행할수 없음
 	if (quest::CQuestManager::Instance().GetEventFlag("update_refine_time") != 0)
 	{
-		if (get_global_time() < quest::CQuestManager::Instance().GetEventFlag("update_refine_time") + (60 * 5))
+		if (get_unix_time() < quest::CQuestManager::Instance().GetEventFlag("update_refine_time") + (60 * 5))
 		{
 			sys_log(0, "can't refine %d %s", GetPlayerID(), GetName());
 			return false;
@@ -1743,7 +1743,7 @@ void CHARACTER::__OpenPrivateShop()
 		return;
 
 	auto lastCheckTime = GetLastPrivateShopOpenTime();
-	if (lastCheckTime && get_dword_time() < lastCheckTime + 5000)
+	if (lastCheckTime && get_unix_ms_time() < lastCheckTime + 5000)
 	{
 		ChatPacket(CHAT_TYPE_INFO, "You can not use too fast");
 		return;
@@ -2246,14 +2246,14 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 			{
 				if (0 != g_BoxUseTimeLimitValue)
 				{
-					if (get_dword_time() < m_dwLastBoxUseTime+g_BoxUseTimeLimitValue)
+					if (get_unix_ms_time() < m_dwLastBoxUseTime+g_BoxUseTimeLimitValue)
 					{
 						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 골드를 버릴 수 없습니다."));
 						return false;
 					}
 				}
 
-				m_dwLastBoxUseTime = get_dword_time();
+				m_dwLastBoxUseTime = get_unix_ms_time();
 
 				uint32_t dwBoxVnum = item->GetVnum();
 				std::vector <uint32_t> dwVnums;
@@ -2384,7 +2384,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 
 					int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 
-					SetSkillNextReadTime(dwVnum, get_global_time() + iReadDelay);
+					SetSkillNextReadTime(dwVnum, get_unix_time() + iReadDelay);
 				}
 			}
 			break;
@@ -2507,7 +2507,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 								{
 									PointChange(POINT_HP, item->GetValue(0) * (100 + GetPoint(POINT_POTION_BONUS)) / 100);
 									EffectPacket(SE_HPUP_RED);
-									used = TRUE;
+									used = true;
 								}
 							}
 
@@ -2517,7 +2517,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 								{
 									PointChange(POINT_SP, item->GetValue(1) * (100 + GetPoint(POINT_POTION_BONUS)) / 100);
 									EffectPacket(SE_SPUP_BLUE);
-									used = TRUE;
+									used = true;
 								}
 							}
 
@@ -2527,7 +2527,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 								{
 									PointChange(POINT_HP, item->GetValue(3) * GetMaxHP() / 100);
 									EffectPacket(SE_HPUP_RED);
-									used = TRUE;
+									used = true;
 								}
 							}
 
@@ -2537,7 +2537,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 								{
 									PointChange(POINT_SP, item->GetValue(4) * GetMaxSP() / 100);
 									EffectPacket(SE_SPUP_BLUE);
-									used = TRUE;
+									used = true;
 								}
 							}
 
@@ -3260,7 +3260,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 
-										SetSkillNextReadTime(SKILL_LEADERSHIP, get_global_time() + iReadDelay);
+										SetSkillNextReadTime(SKILL_LEADERSHIP, get_unix_time() + iReadDelay);
 									}
 								}
 								break;
@@ -3301,7 +3301,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 
-										SetSkillNextReadTime(SKILL_COMBO, get_global_time() + iReadDelay);
+										SetSkillNextReadTime(SKILL_COMBO, get_unix_time() + iReadDelay);
 									}
 								}
 								break;
@@ -3329,7 +3329,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 
-										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
+										SetSkillNextReadTime(dwSkillVnum, get_unix_time() + iReadDelay);
 									}
 								}
 								break;
@@ -3357,7 +3357,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 
-										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
+										SetSkillNextReadTime(dwSkillVnum, get_unix_time() + iReadDelay);
 									}
 								}
 								break;
@@ -3437,7 +3437,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 
-										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
+										SetSkillNextReadTime(dwSkillVnum, get_unix_time() + iReadDelay);
 									}
 								}
 								break;
@@ -3467,7 +3467,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 
-										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
+										SetSkillNextReadTime(dwSkillVnum, get_unix_time() + iReadDelay);
 
 										if (g_bIsTestServer) 
 										{
@@ -3508,7 +3508,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 
-										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
+										SetSkillNextReadTime(dwSkillVnum, get_unix_time() + iReadDelay);
 									}
 								}
 								break;
@@ -3531,7 +3531,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 										return false;
 									}
 
-									if (!g_bIsTestServer && get_global_time() < GetSkillNextReadTime(dwSkillVnum))
+									if (!g_bIsTestServer && get_unix_time() < GetSkillNextReadTime(dwSkillVnum))
 									{
 										if (FindAffect(AFFECT_SKILL_NO_BOOK_DELAY))
 										{
@@ -3541,7 +3541,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 										}
 										else
 										{
-											SkillLearnWaitMoreTimeMessage(GetSkillNextReadTime(dwSkillVnum) - get_global_time());
+											SkillLearnWaitMoreTimeMessage(GetSkillNextReadTime(dwSkillVnum) - get_unix_time());
 											return false;
 										}
 									}
@@ -3563,7 +3563,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 										int32_t iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
 
 										if (!g_bIsTestServer)
-											SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
+											SetSkillNextReadTime(dwSkillVnum, get_unix_time() + iReadDelay);
 									}
 									else
 									{
@@ -3603,7 +3603,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 										return false; 
 									int32_t last_use_time = pPC->GetFlag("mythical_peach.last_use_time");
 
-									if (get_global_time() - last_use_time < interval * 60 * 60)
+									if (get_unix_time() - last_use_time < interval * 60 * 60)
 									{
 										if (g_bIsTestServer == false)
 										{
@@ -3632,7 +3632,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 									UpdateAlignment(val*10);
 									
 									item->SetCount(item->GetCount()-1);
-									pPC->SetFlag("mythical_peach.last_use_time", get_global_time());
+									pPC->SetFlag("mythical_peach.last_use_time", get_unix_time());
 
 									ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("마음이 맑아지는군. 가슴을 짓누르던 무언가가 좀 가벼워진 느낌이야."));
 									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("선악치가 %d 증가하였습니다."), val);
@@ -4287,13 +4287,13 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 								{
 									int32_t last_use_time = pPC->GetFlag("mirror_of_disapper.last_use_time");
 
-									if (get_global_time() - last_use_time < 10*60)
+									if (get_unix_time() - last_use_time < 10*60)
 									{
 										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 사용할 수 없습니다."));
 										return false;
 									}
 
-									pPC->SetFlag("mirror_of_disapper.last_use_time", get_global_time());
+									pPC->SetFlag("mirror_of_disapper.last_use_time", get_unix_time());
 								}
 							}
 
@@ -4351,7 +4351,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 								{
 									PointChange(POINT_HP, item->GetValue(0) * (100 + GetPoint(POINT_POTION_BONUS)) / 100);
 									EffectPacket(SE_HPUP_RED);
-									used = TRUE;
+									used = true;
 								}
 							}
 
@@ -4361,7 +4361,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 								{
 									PointChange(POINT_SP, item->GetValue(1) * (100 + GetPoint(POINT_POTION_BONUS)) / 100);
 									EffectPacket(SE_SPUP_BLUE);
-									used = TRUE;
+									used = true;
 								}
 							}
 
@@ -4371,7 +4371,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 								{
 									PointChange(POINT_HP, item->GetValue(3) * GetMaxHP() / 100);
 									EffectPacket(SE_HPUP_RED);
-									used = TRUE;
+									used = true;
 								}
 							}
 
@@ -4381,7 +4381,7 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 								{
 									PointChange(POINT_SP, item->GetValue(4) * GetMaxSP() / 100);
 									EffectPacket(SE_SPUP_BLUE);
-									used = TRUE;
+									used = true;
 								}
 							}
 
@@ -5666,14 +5666,14 @@ bool CHARACTER::DropItem(const TItemPos &Cell, uint8_t bCount)
 
 	if (0 != g_ItemDropTimeLimitValue)
 	{
-		if (get_dword_time() < m_dwLastItemDropTime+g_ItemDropTimeLimitValue)
+		if (get_unix_ms_time() < m_dwLastItemDropTime+g_ItemDropTimeLimitValue)
 		{
 			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 골드를 버릴 수 없습니다."));
 			return false;
 		}
 	}
 
-	m_dwLastItemDropTime = get_dword_time();
+	m_dwLastItemDropTime = get_unix_ms_time();
 
 	if (IsDead())
 		return false;
@@ -5764,14 +5764,14 @@ bool CHARACTER::DropGold(int32_t gold)
 
 	if (0 != g_GoldDropTimeLimitValue)
 	{
-		if (get_dword_time() < m_dwLastGoldDropTime+g_GoldDropTimeLimitValue)
+		if (get_unix_ms_time() < m_dwLastGoldDropTime+g_GoldDropTimeLimitValue)
 		{
 			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 골드를 버릴 수 없습니다."));
 			return false;
 		}
 	}
 
-	m_dwLastGoldDropTime = get_dword_time();
+	m_dwLastGoldDropTime = get_unix_ms_time();
 
 	LPITEM item = ITEM_MANAGER::Instance().CreateItem(1, gold);
 
@@ -6437,7 +6437,7 @@ bool CHARACTER::EquipItem(LPITEM item, int32_t iCandidateCell)
 		return false;
 
 	/*
-	if ((get_dword_time() - GetLastMoveTime()) < 1000) {
+	if ((get_unix_ms_time() - GetLastMoveTime()) < 1000) {
 		ChatPacket(CHAT_TYPE_INFO, "Hareket ederken bu eylemi gerceklestiremezsin");
 		return false;
 	}
@@ -6489,7 +6489,7 @@ bool CHARACTER::EquipItem(LPITEM item, int32_t iCandidateCell)
 	}
 
 	// 화살 이외에는 마지막 공격 시간 또는 스킬 사용 1.5 후에 장비 교체가 가능
-	uint32_t dwCurTime = get_dword_time();
+	uint32_t dwCurTime = get_unix_ms_time();
 
 	if (iWearCell != WEAR_ARROW 
 		&& (dwCurTime - GetLastAttackTime() <= 1500 || dwCurTime - m_dwLastSkillTime <= 1500))

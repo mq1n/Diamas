@@ -3,9 +3,9 @@
 #include "memory.h"
 #include "srandomdev.h"
 
-LPHEART		thecore_heart = NULL;
+LPHEART		thecore_heart = nullptr;
 
-volatile int	shutdowned = FALSE;
+volatile int	shutdowned = 0;
 volatile int	tics = 0;
 
 // newstuff
@@ -67,7 +67,7 @@ bool thecore_set(int fps, HEARTFUNC heartbeat_func)
 
 void thecore_shutdown()
 {
-    shutdowned = TRUE;
+    shutdowned = 1;
 }
 
 int thecore_idle(void)

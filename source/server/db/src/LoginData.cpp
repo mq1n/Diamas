@@ -54,7 +54,7 @@ uint32_t CLoginData::GetConnectedPeerHandle()
 
 void CLoginData::SetLogonTime()
 {
-	m_dwLogonTime = get_dword_time();
+	m_dwLogonTime = get_unix_ms_time();
 }
 
 uint32_t CLoginData::GetLogonTime()

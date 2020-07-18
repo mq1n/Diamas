@@ -610,11 +610,11 @@ void CHARACTER::__StateIdle_NPC()
 	{
 		if (GetRaceNum() == xmas::MOB_SANTA_VNUM) // 산타
 		{
-			if (get_dword_time() > m_dwPlayStartTime)
+			if (get_unix_ms_time() > m_dwPlayStartTime)
 			{
 				int32_t	next_warp_time = 2 * 1000;	// 2초
 
-				m_dwPlayStartTime = get_dword_time() + next_warp_time;
+				m_dwPlayStartTime = get_unix_ms_time() + next_warp_time;
 
 				// 시간이 넘었으니 워프합시다.
 				/*
@@ -883,7 +883,7 @@ bool __CHARACTER_GotoNearTarget(LPCHARACTER self, LPCHARACTER victim)
 
 void CHARACTER::StateMove()
 {
-	uint32_t dwElapsedTime = get_dword_time() - m_dwMoveStartTime;
+	uint32_t dwElapsedTime = get_unix_ms_time() - m_dwMoveStartTime;
 	float fRate = (float) dwElapsedTime / (float) m_dwMoveDuration;
 
 	if (fRate > 1.0f)
@@ -920,14 +920,14 @@ void CHARACTER::StateMove()
 		if (IsWalking() && GetStamina() < GetMaxStamina())
 		{
 			// 5초 후 부터 스테미너 증가
-			if (get_dword_time() - GetWalkStartTime() > 5000)
+			if (get_unix_ms_time() - GetWalkStartTime() > 5000)
 				PointChange(POINT_STAMINA, GetMaxStamina());
 		}
 
 		// 전투 중이면서 뛰는 중이면
 		if (!IsWalking() && !IsRiding())
 		{
-			if ((get_dword_time() - GetLastAttackTime()) < 20000)
+			if ((get_unix_ms_time() - GetLastAttackTime()) < 20000)
 			{
 				StartAffectEvent();
 
@@ -969,7 +969,7 @@ void CHARACTER::StateMove()
 			LPCHARACTER victim = GetVictim();
 
 			// 거대 거북
-			if ((GetRaceNum() == 2191 || GetRaceNum() == 2192) && number(1, 20) == 1 && get_dword_time() - m_pkMobInst->m_dwLastWarpTime > 1000)
+			if ((GetRaceNum() == 2191 || GetRaceNum() == 2192) && number(1, 20) == 1 && get_unix_ms_time() - m_pkMobInst->m_dwLastWarpTime > 1000)
 			{
 				// 워프 테스트
 				float fx, fy;
@@ -981,7 +981,7 @@ void CHARACTER::StateMove()
 				GotoState(m_stateBattle);
 				m_dwStateDuration = 1;
 				ResetMobSkillCooltime();
-				m_pkMobInst->m_dwLastWarpTime = get_dword_time();
+				m_pkMobInst->m_dwLastWarpTime = get_unix_ms_time();
 				return;
 			}
 
@@ -1275,7 +1275,7 @@ void CHARACTER::StateBattle()
 		return;
 	}
 
-	uint32_t dwCurTime = get_dword_time();
+	uint32_t dwCurTime = get_unix_ms_time();
 	uint32_t dwDuration = CalculateDuration(GetLimitPoint(POINT_ATT_SPEED), 2000);
 
 	if ((dwCurTime - m_dwLastAttackTime) < dwDuration) // 2초 마다 공격해야 한다.
@@ -1415,10 +1415,10 @@ void CHARACTER::StateHorse()
 
 		m_dwStateDuration = STATE_DURATION;
 	}
-	else if (bDoMoveAlone && (get_dword_time() > m_dwLastAttackTime))
+	else if (bDoMoveAlone && (get_unix_ms_time() > m_dwLastAttackTime))
 	{
 		// wondering-.-
-		m_dwLastAttackTime = get_dword_time() + number(5000, 12000);
+		m_dwLastAttackTime = get_unix_ms_time() + number(5000, 12000);
 
 		SetRotation(number(0, 359));        // 방향은 랜덤으로 설정
 

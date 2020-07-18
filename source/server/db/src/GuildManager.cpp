@@ -747,7 +747,7 @@ void CGuildManager::MoneyChange(uint32_t dwGuild, uint32_t dwGold)
 	CDBManager::Instance().AsyncQuery(buf);
 }
 
-void CGuildManager::DepositMoney(uint32_t dwGuild, INT iGold)
+void CGuildManager::DepositMoney(uint32_t dwGuild, int32_t iGold)
 {
 	if (iGold <= 0)
 		return;
@@ -766,7 +766,7 @@ void CGuildManager::DepositMoney(uint32_t dwGuild, INT iGold)
 	MoneyChange(dwGuild, it->second.gold);
 }
 
-void CGuildManager::WithdrawMoney(CPeer* peer, uint32_t dwGuild, INT iGold)
+void CGuildManager::WithdrawMoney(CPeer* peer, uint32_t dwGuild, int32_t iGold)
 {
 	auto it = m_map_kGuild.find(dwGuild);
 
@@ -791,7 +791,7 @@ void CGuildManager::WithdrawMoney(CPeer* peer, uint32_t dwGuild, INT iGold)
 	}
 }
 
-void CGuildManager::WithdrawMoneyReply(uint32_t dwGuild, uint8_t bGiveSuccess, INT iGold)
+void CGuildManager::WithdrawMoneyReply(uint32_t dwGuild, uint8_t bGiveSuccess, int32_t iGold)
 {
 	auto it = m_map_kGuild.find(dwGuild);
 

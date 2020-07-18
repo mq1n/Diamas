@@ -31,9 +31,9 @@ inline uint16_t decode_2bytes(const void * a)
 	return (*((uint16_t *) a));
 }
 
-inline INT decode_4bytes(const void *a)
+inline int32_t decode_4bytes(const void *a)
 {
-	return (*((INT *) a));
+	return (*((int32_t*) a));
 }
 
 #define packet_encode(buf, data, len) __packet_encode(buf, data, len, __FILE__, __LINE__)

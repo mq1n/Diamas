@@ -23,7 +23,7 @@ CBattlegroundRoom::CBattlegroundRoom(uint8_t nGameMode, uint8_t nGameType, uint8
 	m_pkMapAttenderNames.clear();
 	m_strLeaderName.clear();
 	m_pkSetKickedPlayers.clear();
-	m_dwSetupTime = get_dword_time();
+	m_dwSetupTime = get_unix_ms_time();
 }
 
 bool CBattlegroundRoom::StartBattleground()

@@ -8,11 +8,6 @@
 #include <sys/time.h>
 #endif
 
-#include <cstdlib>
-#include <cstring>
-
-
-
 namespace
 {
 
@@ -54,7 +49,8 @@ SQLResult::SQLResult()
 
 SQLResult::~SQLResult()
 {
-	if (pSQLResult) {
+	if (pSQLResult)
+	{
 		mysql_free_result(pSQLResult);
 		pSQLResult = nullptr;
 	}
@@ -117,17 +113,17 @@ CAsyncSQL::CAsyncSQL()
 	, m_bEnd(false)
 	, m_iQueryFinished(0)
 {
-	if (0 == mysql_init(&m_hDB))
-		sys_err( "mysql_init failed");
+	if (!mysql_init(&m_hDB))
+		sys_err("mysql_init failed");
 }
 
 CAsyncSQL::~CAsyncSQL()
 {
 	Quit();
 
-	if (!m_stHost.empty()) {
-		sys_log(0, "Disconnecting from %s@%s:%s",
-			m_stUser.c_str(), m_stHost.c_str(), m_stDB.c_str());
+	if (!m_stHost.empty())
+	{
+		sys_log(0, "Disconnecting from %s@%s:%s", m_stUser.c_str(), m_stHost.c_str(), m_stDB.c_str());
 	}
 
 	mysql_close(&m_hDB);
@@ -151,12 +147,12 @@ bool CAsyncSQL::Connect()
 
 	if (!mysql_connection)
 	{
-		sys_err( "mysql_real_connect to %s@%s:%s: %s", m_stUser.c_str(), m_stHost.c_str(), m_stDB.c_str(), mysql_error(&m_hDB));
+		sys_err("mysql_real_connect to %s@%s:%s: %s", m_stUser.c_str(), m_stHost.c_str(), m_stDB.c_str(), mysql_error(&m_hDB));
 		return false;
 	}
 
 	my_bool reconnect = true;
-	if (0 != mysql_options(&m_hDB, MYSQL_OPT_RECONNECT, &reconnect))
+	if (mysql_options(&m_hDB, MYSQL_OPT_RECONNECT, &reconnect))
 	{
 		sys_err("mysql_option: %s", mysql_error(&m_hDB));
 		return false;
@@ -209,7 +205,8 @@ bool CAsyncSQL::Setup(const char* c_pszHost,
 	if (c_pszLocale)
 		m_stLocale = c_pszLocale;
 
-	if (!bNoThread) {
+	if (!bNoThread)
+	{
 		auto f = [this]() {
 			mysql_thread_init();
 
@@ -344,7 +341,7 @@ void CAsyncSQL::ChildLoop()
 		{
 			auto p = queue.front();
 
-			const auto startTime = get_dword_time();
+			const auto startTime = get_unix_ms_time();
 			if (mysql_real_query(&m_hDB, p->stQuery.c_str(), p->stQuery.length())) 
 			{
 				p->uiSQLErrno = mysql_errno(&m_hDB);
@@ -356,7 +353,7 @@ void CAsyncSQL::ChildLoop()
 					continue;
 			}
 
-			const auto runTime = get_dword_time() - startTime;
+			const auto runTime = get_unix_ms_time() - startTime;
 			if (runTime > 5000)
 				sys_log(1, "Query %s took %d ms", p->stQuery.c_str(), runTime);
 

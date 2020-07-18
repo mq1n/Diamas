@@ -361,7 +361,7 @@ void CClientManager::MainLoop()
 
 void CClientManager::Quit()
 {
-	m_bShutdowned = TRUE;
+	m_bShutdowned = true;
 }
 
 void CClientManager::QUERY_BOOT(CPeer* peer, TPacketGDBoot * p)

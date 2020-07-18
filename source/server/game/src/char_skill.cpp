@@ -65,9 +65,9 @@ bool TSkillUseInfo::HitOnce(uint32_t dwVnum)
 	if (!bUsed)
 		return false;
 
-	sys_log(1, "__HitOnce NextUse %u current %u count %d scount %d", dwNextSkillUsableTime, get_dword_time(), iHitCount, iSplashCount);
+	sys_log(1, "__HitOnce NextUse %u current %u count %d scount %d", dwNextSkillUsableTime, get_unix_ms_time(), iHitCount, iSplashCount);
 
-	if (dwNextSkillUsableTime && dwNextSkillUsableTime<get_dword_time() && dwVnum != SKILL_MUYEONG && dwVnum != SKILL_HORSE_WILDATTACK)
+	if (dwNextSkillUsableTime && dwNextSkillUsableTime<get_unix_ms_time() && dwVnum != SKILL_MUYEONG && dwVnum != SKILL_HORSE_WILDATTACK)
 	{
 		sys_log(1, "__HitOnce can't hit");
 
@@ -76,13 +76,13 @@ bool TSkillUseInfo::HitOnce(uint32_t dwVnum)
 
 	if (iHitCount == -1)
 	{
-		sys_log(1, "__HitOnce OK %d %d %d", dwNextSkillUsableTime, get_dword_time(), iHitCount);
+		sys_log(1, "__HitOnce OK %d %d %d", dwNextSkillUsableTime, get_unix_ms_time(), iHitCount);
 		return true;
 	}
 
 	if (iHitCount)
 	{
-		sys_log(1, "__HitOnce OK %d %d %d", dwNextSkillUsableTime, get_dword_time(), iHitCount);
+		sys_log(1, "__HitOnce OK %d %d %d", dwNextSkillUsableTime, get_unix_ms_time(), iHitCount);
 		iHitCount--;
 		return true;
 	}
@@ -94,7 +94,7 @@ bool TSkillUseInfo::HitOnce(uint32_t dwVnum)
 bool TSkillUseInfo::UseSkill(bool isGrandMaster, uint32_t vid, uint32_t dwCooltime, int32_t splashcount, int32_t hitcount, int32_t range)
 {
 	this->isGrandMaster = isGrandMaster;
-	uint32_t dwCur = get_dword_time();
+	uint32_t dwCur = get_unix_ms_time();
 
 	// 아직 쿨타임이 끝나지 않았다.
 	if (bUsed && dwNextSkillUsableTime > dwCur)
@@ -242,7 +242,7 @@ bool CHARACTER::LearnGrandMasterSkill(uint32_t dwSkillVnum)
 		return false;
 	}
 
-	sys_log(0, "learn grand master skill[%d] cur %d, next %d", dwSkillVnum, get_global_time(), GetSkillNextReadTime(dwSkillVnum));
+	sys_log(0, "learn grand master skill[%d] cur %d, next %d", dwSkillVnum, get_unix_time(), GetSkillNextReadTime(dwSkillVnum));
 
 	if (block_exp) 
 	{
@@ -301,7 +301,7 @@ bool CHARACTER::LearnGrandMasterSkill(uint32_t dwSkillVnum)
 	int32_t n = number(1, iBookCount);
 	sys_log(0, "Number(%d)", n);
 
-	uint32_t nextTime = get_global_time() + number(g_dwSkillBookNextReadMin, g_dwSkillBookNextReadMax);
+	uint32_t nextTime = get_unix_time() + number(g_dwSkillBookNextReadMin, g_dwSkillBookNextReadMax);
 
 	sys_log(0, "GrandMaster SkillBookCount min %d cur %d max %d (next_time=%d)", iMinReadCount, iTotalReadCount, iMaxReadCount, nextTime);
 
@@ -381,7 +381,7 @@ bool CHARACTER::LearnSkillByBook(uint32_t dwSkillVnum, uint8_t bProb)
 		}
 	}
 
-	if (get_global_time() < GetSkillNextReadTime(dwSkillVnum))
+	if (get_unix_time() < GetSkillNextReadTime(dwSkillVnum))
 	{
 		if (!(g_bIsTestServer && quest::CQuestManager::Instance().GetEventFlag("no_read_delay")))
 		{
@@ -393,7 +393,7 @@ bool CHARACTER::LearnSkillByBook(uint32_t dwSkillVnum, uint8_t bProb)
 			}
 			else 	    
 			{
-				SkillLearnWaitMoreTimeMessage(GetSkillNextReadTime(dwSkillVnum) - get_global_time());
+				SkillLearnWaitMoreTimeMessage(GetSkillNextReadTime(dwSkillVnum) - get_unix_time());
 				return false;
 			}
 		}
@@ -2449,7 +2449,7 @@ bool CHARACTER::UseSkill(uint32_t dwVnum, LPCHARACTER pkVictim, bool bUseGrandMa
 
 	pkSk->SetSPCostVar("k", k);
 
-	uint32_t dwCur = get_dword_time();
+	uint32_t dwCur = get_unix_ms_time();
 
 	if (dwVnum == SKILL_TERROR && m_SkillUseInfo[dwVnum].bUsed && m_SkillUseInfo[dwVnum].dwNextSkillUsableTime > dwCur )
 	{
@@ -2557,7 +2557,7 @@ bool CHARACTER::UseSkill(uint32_t dwVnum, LPCHARACTER pkVictim, bool bUseGrandMa
 	else if (dwVnum == SKILL_MUYEONG || pkSk->IsChargeSkill())
 		ComputeSkill(dwVnum, pkVictim);
 
-	m_dwLastSkillTime = get_dword_time();
+	m_dwLastSkillTime = get_unix_ms_time();
 
 	return true;
 }
@@ -2787,7 +2787,7 @@ bool CHARACTER::CanUseMobSkill(uint32_t idx) const
 	if (!pInfo)
 		return false;
 
-	if (m_adwMobSkillCooltime[idx] > get_dword_time())
+	if (m_adwMobSkillCooltime[idx] > get_unix_ms_time())
 		return false;
 
 	if (number(0, 1))
@@ -2863,7 +2863,7 @@ bool CHARACTER::UseMobSkill(uint32_t idx)
 	pkSk->kCooldownPoly.SetVar("k", k);
 	int32_t iCooltime = (int32_t) (pkSk->kCooldownPoly.Eval() * 1000);
 
-	m_adwMobSkillCooltime[idx] = get_dword_time() + iCooltime;
+	m_adwMobSkillCooltime[idx] = get_unix_ms_time() + iCooltime;
 
 	sys_log(0, "USE_MOB_SKILL: %s idx %d vnum %u cooltime %d", GetName(), idx, dwVnum, iCooltime);
 
