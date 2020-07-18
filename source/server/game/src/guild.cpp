@@ -31,7 +31,6 @@ namespace
 	{
 		FGuildNameSender(uint32_t id, const char* guild_name) : id(id), name(guild_name)
 		{
-			p.header = HEADER_GC_GUILD;
 			p.subheader = GUILD_SUBHEADER_GC_GUILD_NAME;
 			p.size = sizeof(p) + sizeof(uint32_t) + GUILD_NAME_MAX_LEN;
 		}
@@ -317,7 +316,6 @@ void CGuild::LogoutMember(LPCHARACTER ch)
 void CGuild::SendOnlineRemoveOnePacket(uint32_t pid)
 {
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	pack.size = sizeof(pack)+4;
 	pack.subheader = GUILD_SUBHEADER_GC_REMOVE;
 
@@ -343,7 +341,6 @@ void CGuild::SendAllGradePacket(LPCHARACTER ch)
 		return;
 
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	pack.size = sizeof(pack)+1+GUILD_GRADE_COUNT*(sizeof(TGuildGrade)+1);
 	pack.subheader = GUILD_SUBHEADER_GC_GRADE;
 
@@ -370,9 +367,7 @@ void CGuild::SendListOneToAll(LPCHARACTER ch)
 
 void CGuild::SendListOneToAll(uint32_t pid)
 {
-
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	pack.size = sizeof(SPacketGCGuild);
 	pack.subheader = GUILD_SUBHEADER_GC_LIST;
 
@@ -426,7 +421,6 @@ void CGuild::SendListPacket(LPCHARACTER ch)
 		return;
 
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	pack.size = sizeof(SPacketGCGuild);
 	pack.subheader = GUILD_SUBHEADER_GC_LIST;
 
@@ -482,7 +476,6 @@ void CGuild::SendLoginPacket(LPCHARACTER ch, uint32_t pid)
 		return;
 
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	pack.size = sizeof(pack)+4;
 	pack.subheader = GUILD_SUBHEADER_GC_LOGIN;
 
@@ -511,7 +504,6 @@ void CGuild::SendLogoutPacket(LPCHARACTER ch, uint32_t pid)
 		return;
 
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	pack.size = sizeof(pack)+4;
 	pack.subheader = GUILD_SUBHEADER_GC_LOGOUT;
 
@@ -705,7 +697,6 @@ void CGuild::__P2PUpdateGrade(SQLMsg* pmsg)
 
 			SPacketGCGuild pack;
 			
-			pack.header = HEADER_GC_GUILD;
 			pack.size = sizeof(pack);
 			pack.subheader = GUILD_SUBHEADER_GC_GRADE_NAME;
 
@@ -734,7 +725,6 @@ void CGuild::__P2PUpdateGrade(SQLMsg* pmsg)
 			m_data.grade_array[grade].auth_flag = auth;
 
 			SPacketGCGuild pack;
-			pack.header = HEADER_GC_GUILD;
 			pack.size = sizeof(pack);
 			pack.subheader = GUILD_SUBHEADER_GC_GRADE_AUTH;
 
@@ -811,7 +801,6 @@ void CGuild::ChangeGradeName(uint8_t grade, const char* grade_name)
 	strlcpy(m_data.grade_array[grade].grade_name, grade_name, sizeof(m_data.grade_array[grade].grade_name));
 
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	pack.size = sizeof(pack);
 	pack.subheader = GUILD_SUBHEADER_GC_GRADE_NAME;
 
@@ -851,7 +840,6 @@ void CGuild::ChangeGradeAuth(uint8_t grade, uint8_t auth)
 	m_data.grade_array[grade].auth_flag=auth;
 
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	pack.size = sizeof(pack);
 	pack.subheader = GUILD_SUBHEADER_GC_GRADE_AUTH;
 
@@ -881,7 +869,6 @@ void CGuild::SendGuildInfoPacket(LPCHARACTER ch)
 		return;
 
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	pack.size = sizeof(SPacketGCGuild) + sizeof(TPacketGCGuildInfo);
 	pack.subheader = GUILD_SUBHEADER_GC_INFO;
 
@@ -948,7 +935,6 @@ bool CGuild::OfferExp(LPCHARACTER ch, int32_t amount)
 	cit->second._dummy = 0;
 
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 
 	for (TGuildMemberOnlineContainer::iterator it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)
 	{
@@ -1068,7 +1054,6 @@ void CGuild::RefreshCommentForce(uint32_t player_id)
 	std::unique_ptr<SQLMsg> pmsg (DBManager::Instance().DirectQuery("SELECT id, name, content FROM guild_comment WHERE guild_id = %u ORDER BY notice DESC, id DESC LIMIT %d", m_data.guild_id, GUILD_COMMENT_MAX_COUNT));
 
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	pack.size = sizeof(pack)+1;
 	pack.subheader = GUILD_SUBHEADER_GC_COMMENTS;
 
@@ -1131,7 +1116,6 @@ bool CGuild::ChangeMemberGeneral(uint32_t pid, uint8_t is_general)
 	TGuildMemberOnlineContainer::iterator itOnline = m_memberOnline.begin();
 
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	pack.size = sizeof(pack)+5;
 	pack.subheader = GUILD_SUBHEADER_GC_CHANGE_MEMBER_GENERAL;
 
@@ -1166,7 +1150,6 @@ void CGuild::ChangeMemberGrade(uint32_t pid, uint8_t grade)
 	TGuildMemberOnlineContainer::iterator itOnline = m_memberOnline.begin();
 
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	pack.size = sizeof(pack)+5;
 	pack.subheader = GUILD_SUBHEADER_GC_CHANGE_MEMBER_GRADE;
 
@@ -1353,7 +1336,6 @@ void CGuild::SendSkillInfoPacket(LPCHARACTER ch) const
 
 	SPacketGCGuild pack;
 
-	pack.header		= HEADER_GC_GUILD;
 	pack.size		= sizeof(pack) + 6 + GUILD_SKILL_COUNT;
 	pack.subheader	= GUILD_SUBHEADER_GC_SKILL_INFO;
 
@@ -1489,7 +1471,6 @@ void CGuild::GuildPointChange(uint8_t type, int32_t amount, bool save)
 			}
 
 			SPacketGCGuild pack;
-			pack.header = HEADER_GC_GUILD;
 			pack.size = sizeof(pack)+5;
 			pack.subheader = GUILD_SUBHEADER_GC_CHANGE_EXP;
 
@@ -1551,7 +1532,6 @@ void CGuild::LevelChange(uint32_t pid, uint8_t level)
 	db_clientdesc->DBPacket(HEADER_GD_GUILD_CHANGE_MEMBER_DATA, 0, &gd_guild, sizeof(gd_guild));
 
 	SPacketGCGuild pack;
-	pack.header = HEADER_GC_GUILD;
 	cit->second._dummy = 0;
 
 	for (TGuildMemberOnlineContainer::iterator it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)
@@ -1581,8 +1561,6 @@ void CGuild::ChangeMemberData(uint32_t pid, uint32_t offer, uint8_t level, uint8
 	cit->second._dummy = 0;
 
 	SPacketGCGuild pack;
-	memset(&pack, 0, sizeof(pack));
-	pack.header = HEADER_GC_GUILD;
 
 	for (TGuildMemberOnlineContainer::iterator it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)
 	{
@@ -1803,7 +1781,6 @@ void CGuild::RecvMoneyChange(int32_t iGold)
 	m_data.gold = iGold;
 
 	SPacketGCGuild p;
-	p.header = HEADER_GC_GUILD;
 	p.size = sizeof(p) + sizeof(int32_t);
 	p.subheader = GUILD_SUBHEADER_GC_MONEY_CHANGE;
 
@@ -1951,7 +1928,6 @@ void CGuild::Invite( LPCHARACTER pchInviter, LPCHARACTER pchInvitee )
 	uint32_t gid = GetID();
 
 	SPacketGCGuild p;
-	p.header	= HEADER_GC_GUILD;
 	p.size	= sizeof(p) + sizeof(uint32_t) + GUILD_NAME_MAX_LEN + 1;
 	p.subheader	= GUILD_SUBHEADER_GC_GUILD_INVITE;
 

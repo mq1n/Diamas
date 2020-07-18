@@ -1334,7 +1334,6 @@ void BroadcastNotice(const char * c_pszBuf, bool bBigFont)
 void BroadcastCmdchat(const char * c_pszBuf)
 {
 	SPacketGCChat pack_chat;
-	pack_chat.header = HEADER_GC_CHAT;
 	pack_chat.size = sizeof(SPacketGCChat) + strlen(c_pszBuf);
 	pack_chat.type = CHAT_TYPE_COMMAND;
 	pack_chat.dwVID = 0;

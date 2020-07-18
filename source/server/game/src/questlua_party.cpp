@@ -65,7 +65,6 @@ namespace quest
             data += str;
             data += "]";
 
-            pack.header = HEADER_GC_SCRIPT;
             pack.skin = CQuestManager::QUEST_SKIN_CINEMATIC;
             //pack.skin = CQuestManager::QUEST_SKIN_NOWINDOW;
 			pack.src_size = static_cast<uint16_t>(data.size());
@@ -178,7 +177,6 @@ namespace quest
 		{
 			len = strlen(str);
 
-			packet_script.header = HEADER_GC_SCRIPT;
 			packet_script.skin = CQuestManager::QUEST_SKIN_CINEMATIC;
 			packet_script.src_size = len;
 			packet_script.size = packet_script.src_size + sizeof(SPacketGCScript);

@@ -458,7 +458,6 @@ bool COXEventManager::CheckAnswer(bool answer)
 				++len;
 
 				SPacketGCChat pack_chat;
-				pack_chat.header = HEADER_GC_CHAT;
 				pack_chat.size = sizeof(SPacketGCChat) + len;
 				pack_chat.type = CHAT_TYPE_COMMAND;
 				pack_chat.dwVID = 0;

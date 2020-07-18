@@ -80,8 +80,6 @@ void CInputAuth::Login(LPDESC d, const char * c_pData)
 	if (g_bNoMoreClient)
 	{
 		SPacketGCLoginFailure failurePacket;
-
-		failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 		strlcpy(failurePacket.szStatus, "SHUTDOWN", sizeof(failurePacket.szStatus));
 
 		d->Packet(&failurePacket, sizeof(failurePacket));

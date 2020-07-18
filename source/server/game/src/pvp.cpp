@@ -64,8 +64,6 @@ void CPVP::Packet(bool bDelete)
 
 	SPacketGCPVP pack;
 
-	pack.header = HEADER_GC_PVP;
-
 	if (bDelete)
 	{
 		pack.bMode = PVP_MODE_NONE;
@@ -214,7 +212,6 @@ void CPVPManager::Insert(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 
 		int32_t len = MIN(CHAT_MAX_LEN, strlen(msg) + 1);
 
-		pack.header = HEADER_GC_WHISPER;
 		pack.wSize = sizeof(SPacketGCWhisper) + len;
 		pack.bType = WHISPER_TYPE_SYSTEM;
 		strlcpy(pack.szNameFrom, pkChr->GetName(), sizeof(pack.szNameFrom));
@@ -630,8 +627,6 @@ void CPVPManager::SendList(LPDESC d)
 	uint32_t dwVID = d->GetCharacter()->GetVID();
 
 	SPacketGCPVP pack;
-
-	pack.header = HEADER_GC_PVP;
 
 	while (it != m_map_pkPVP.end())
 	{

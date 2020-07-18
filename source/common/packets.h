@@ -2483,7 +2483,7 @@ static uint32_t GetPacketLength(TPacketHeader header, uint8_t type)
 	}
 
 	assert(!"Unknown packet header");
-	return 0UL;
+	return 0U;
 }
 #endif
 

@@ -43,8 +43,6 @@ bool CHARACTER::GetQuickslot(uint8_t pos, TQuickSlot** ppSlot)
 
 bool CHARACTER::SetQuickslot(uint8_t pos, TQuickSlot& rSlot)
 {
-	SPacketGCQuickSlotAdd pack_quickslot_add;
-
 	if (pos >= QUICKSLOT_MAX_NUM)
 		return false;
 
@@ -86,7 +84,7 @@ bool CHARACTER::SetQuickslot(uint8_t pos, TQuickSlot& rSlot)
 
 	if (GetDesc())
 	{
-		pack_quickslot_add.header	= HEADER_GC_QUICKSLOT_ADD;
+		SPacketGCQuickSlotAdd pack_quickslot_add;
 		pack_quickslot_add.pos		= pos;
 		pack_quickslot_add.slot		= m_quickslot[pos];
 
@@ -98,14 +96,12 @@ bool CHARACTER::SetQuickslot(uint8_t pos, TQuickSlot& rSlot)
 
 bool CHARACTER::DelQuickslot(uint8_t pos)
 {
-	SPacketGCQuickSlotDel pack_quickslot_del;
-
 	if (pos >= QUICKSLOT_MAX_NUM)
 		return false;
 
 	memset(&m_quickslot[pos], 0, sizeof(TQuickSlot));
 
-	pack_quickslot_del.header	= HEADER_GC_QUICKSLOT_DEL;
+	SPacketGCQuickSlotDel pack_quickslot_del;
 	pack_quickslot_del.pos	= pos;
 
 	GetDesc()->Packet(&pack_quickslot_del, sizeof(pack_quickslot_del));
@@ -114,19 +110,17 @@ bool CHARACTER::DelQuickslot(uint8_t pos)
 
 bool CHARACTER::SwapQuickslot(uint8_t a, uint8_t b)
 {
-	SPacketGCQuickSlotSwap pack_quickslot_swap;
-	TQuickSlot quickslot;
-
 	if (a >= QUICKSLOT_MAX_NUM || b >= QUICKSLOT_MAX_NUM)
 		return false;
 
 	// Äü ½½·Ô ÀÚ¸®¸¦ ¼­·Î ¹Ù²Û´Ù.
+	TQuickSlot quickslot;
 	quickslot = m_quickslot[a];
 
 	m_quickslot[a] = m_quickslot[b];
 	m_quickslot[b] = quickslot;
 
-	pack_quickslot_swap.header	= HEADER_GC_QUICKSLOT_SWAP;
+	SPacketGCQuickSlotSwap pack_quickslot_swap;
 	pack_quickslot_swap.pos	= a;
 	pack_quickslot_swap.change_pos = b;
 

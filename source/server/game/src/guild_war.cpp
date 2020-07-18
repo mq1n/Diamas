@@ -29,7 +29,6 @@ void CGuild::GuildWarPacket(uint32_t dwOppGID, uint8_t bWarType, uint8_t bWarSta
 	SPacketGCGuild pack;
 	TPacketGCGuildWar pack2;
 
-	pack.header		= HEADER_GC_GUILD;
 	pack.subheader	= GUILD_SUBHEADER_GC_WAR;
 	pack.size		= sizeof(pack) + sizeof(pack2);
 	pack2.dwGuildSelf	= GetID();
@@ -65,13 +64,11 @@ void CGuild::SendEnemyGuild(LPCHARACTER ch)
 
 	SPacketGCGuild pack;
 	TPacketGCGuildWar pack2;
-	pack.header = HEADER_GC_GUILD;
 	pack.subheader = GUILD_SUBHEADER_GC_WAR;
 	pack.size = sizeof(pack) + sizeof(pack2);
 	pack2.dwGuildSelf = GetID();
 
 	SPacketGCGuild p;
-	p.header = HEADER_GC_GUILD;
 	p.subheader = GUILD_SUBHEADER_GC_WAR_SCORE;
 	p.size = sizeof(p) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(int32_t);
 
@@ -201,7 +198,6 @@ void CGuild::SetWarScoreAgainstTo(uint32_t dwOppGID, int32_t iScore)
 		{
 			SPacketGCGuild p;
 
-			p.header = HEADER_GC_GUILD;
 			p.subheader = GUILD_SUBHEADER_GC_WAR_SCORE;
 			p.size = sizeof(p) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(int32_t);
 

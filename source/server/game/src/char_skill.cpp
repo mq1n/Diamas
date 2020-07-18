@@ -145,7 +145,6 @@ void CHARACTER::SetSkillGroup(uint8_t bSkillGroup)
 	m_points.skill_group = bSkillGroup; 
 
 	SPacketGCChangeSkillGroup p;
-	p.header = HEADER_GC_CHANGE_SKILL_GROUP;
 	p.skill_group = m_points.skill_group;
 
 	GetDesc()->Packet(&p, sizeof(SPacketGCChangeSkillGroup));
@@ -162,8 +161,6 @@ void CHARACTER::SkillLevelPacket()
 		return;
 
 	SPacketGCSkillLevel pack;
-
-	pack.header = HEADER_GC_SKILL_LEVEL;
 	memcpy(&pack.skills, m_pSkillLevels, sizeof(TPlayerSkill) * SKILL_MAX_NUM);
 	GetDesc()->Packet(&pack, sizeof(SPacketGCSkillLevel));
 }

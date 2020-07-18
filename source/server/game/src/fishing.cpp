@@ -359,7 +359,6 @@ int32_t DetermineFish(LPCHARACTER ch)
 void FishingReact(LPCHARACTER ch)
 {
 	SPacketGCFishing p;
-	p.header = HEADER_GC_FISHING;
 	p.subheader = FISHING_SUBHEADER_GC_REACT;
 	p.info = ch->GetVID();
 	ch->PacketAround(&p, sizeof(p));
@@ -368,7 +367,6 @@ void FishingReact(LPCHARACTER ch)
 void FishingSuccess(LPCHARACTER ch)
 {
 	SPacketGCFishing p;
-	p.header = HEADER_GC_FISHING;
 	p.subheader = FISHING_SUBHEADER_GC_SUCCESS;
 	p.info = ch->GetVID();
 	ch->PacketAround(&p, sizeof(p));
@@ -379,7 +377,6 @@ void FishingSuccess(LPCHARACTER ch)
 void FishingFail(LPCHARACTER ch)
 {
 	SPacketGCFishing p;
-	p.header = HEADER_GC_FISHING;
 	p.subheader = FISHING_SUBHEADER_GC_FAIL;
 	p.info = ch->GetVID();
 	ch->PacketAround(&p, sizeof(p));
@@ -457,7 +454,6 @@ EVENTFUNC(fishing_event)
 			if (PredictFish(ch))
 			{
 				SPacketGCFishing p;
-				p.header	= HEADER_GC_FISHING;
 				p.subheader	= FISHING_SUBHEADER_GC_FISH;
 				p.info	= fish_info[info->fish_id].vnum;
 				ch->GetDesc()->Packet(&p, sizeof(SPacketGCFishing));
@@ -487,7 +483,6 @@ LPEVENT CreateFishingEvent(LPCHARACTER ch)
 	int32_t time = number(10, 40);
 
 	SPacketGCFishing p;
-	p.header	= HEADER_GC_FISHING;
 	p.subheader	= FISHING_SUBHEADER_GC_START;
 	p.info		= ch->GetVID();
 	p.dir		= (uint8_t)(ch->GetRotation()/5);
@@ -581,7 +576,6 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 					FishingSuccess(ch);
 
 					SPacketGCFishing p;
-					p.header = HEADER_GC_FISHING;
 					p.subheader = FISHING_SUBHEADER_GC_FISH;
 					p.info = item_vnum;
 					ch->GetDesc()->Packet(&p, sizeof(SPacketGCFishing));
@@ -634,7 +628,6 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 	else
 	{
 		SPacketGCFishing p;
-		p.header = HEADER_GC_FISHING;
 		p.subheader = FISHING_SUBHEADER_GC_STOP;
 		p.info = ch->GetVID();
 		ch->PacketAround(&p, sizeof(p));

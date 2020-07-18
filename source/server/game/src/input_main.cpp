@@ -322,7 +322,6 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 		if (ch->GetDesc())
 		{
 			SPacketGCWhisper pack;
-			pack.header = HEADER_GC_WHISPER;
 			pack.bType = WHISPER_TYPE_SENDER_BLOCKED;
 			pack.wSize = sizeof(SPacketGCWhisper);
 			strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
@@ -362,8 +361,6 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 		if (ch->GetDesc())
 		{
 			SPacketGCWhisper pack;
-
-			pack.header = HEADER_GC_WHISPER;
 			pack.bType = WHISPER_TYPE_NOT_EXIST;
 			pack.wSize = sizeof(SPacketGCWhisper);
 			strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
@@ -378,7 +375,6 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 			if (ch->GetDesc())
 			{
 				SPacketGCWhisper pack;
-				pack.header = HEADER_GC_WHISPER;
 				pack.bType = WHISPER_TYPE_SENDER_BLOCKED;
 				pack.wSize = sizeof(SPacketGCWhisper);
 				strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
@@ -390,7 +386,6 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 			if (ch->GetDesc())
 			{
 				SPacketGCWhisper pack;
-				pack.header = HEADER_GC_WHISPER;
 				pack.bType = WHISPER_TYPE_TARGET_BLOCKED;
 				pack.wSize = sizeof(SPacketGCWhisper);
 				strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
@@ -443,8 +438,6 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 						++len;  // \0 문자 포함
 
 						SPacketGCWhisper pack;
-
-						pack.header = HEADER_GC_WHISPER;
 						pack.bType = WHISPER_TYPE_ERROR;
 						pack.wSize = sizeof(SPacketGCWhisper) + len;
 						strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
@@ -467,8 +460,6 @@ int32_t CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 			if (buflen > 0)
 			{
 				SPacketGCWhisper pack;
-
-				pack.header = HEADER_GC_WHISPER;
 				pack.wSize = sizeof(SPacketGCWhisper) + buflen;
 				pack.bType = bType;
 				strlcpy(pack.szNameFrom, ch->GetName(), sizeof(pack.szNameFrom));
@@ -671,8 +662,6 @@ int32_t CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 	}
 
 	SPacketGCChat pack_chat;
-
-	pack_chat.header = HEADER_GC_CHAT;
 	pack_chat.size = sizeof(SPacketGCChat) + len;
 	pack_chat.type = pinfo->type;
 	pack_chat.dwVID = ch->GetVID();
@@ -1599,8 +1588,6 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 	}
 
 	SPacketGCMove pack;
-
-	pack.header       = HEADER_GC_CHARACTER_MOVE;
 	pack.bFunc        = pinfo->bFunc;
 	pack.bArg         = pinfo->bArg;
 	pack.rot          = pinfo->rot;
@@ -1984,7 +1971,6 @@ void CInputMain::Target(LPCHARACTER ch, const char * pcData)
 	if (pkObj)
 	{
 		SPacketGCTarget pckTarget;
-		pckTarget.header = HEADER_GC_TARGET;
 		pckTarget.dwVID = p->dwVID;
 		ch->GetDesc()->Packet(&pckTarget, sizeof(SPacketGCTarget));
 	}
@@ -2024,7 +2010,6 @@ void CInputMain::ChestDropInfo(LPCHARACTER ch, const char* c_pData)
 		return;
 
 	SPacketGCChestDropInfo packet;
-	packet.header = HEADER_GC_CHEST_DROP_INFO;
 	packet.wSize = sizeof(packet) + sizeof(TChestDropInfoTable) * vec_ItemList.size();
 	packet.dwChestVnum = pkItem->GetVnum();
 

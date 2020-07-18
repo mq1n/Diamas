@@ -17,8 +17,6 @@ void SendTargetCreatePacket(LPDESC d, TargetInfo* info)
 		return;
 
 	SPacketGCTargetCreate pck;
-
-	pck.header = HEADER_GC_TARGET_CREATE;
 	pck.lID = info->iID;
 	pck.byType = info->iType;
 	pck.dwVID = info->iArg1;
@@ -29,7 +27,6 @@ void SendTargetCreatePacket(LPDESC d, TargetInfo* info)
 void SendTargetUpdatePacket(LPDESC d, int32_t iID, int32_t x, int32_t y)
 {
 	SPacketGCTargetUpdate pck;
-	pck.header = HEADER_GC_TARGET_UPDATE;
 	pck.lID = iID;
 	pck.lX = x;
 	pck.lY = y;
@@ -40,7 +37,6 @@ void SendTargetUpdatePacket(LPDESC d, int32_t iID, int32_t x, int32_t y)
 void SendTargetDeletePacket(LPDESC d, int32_t iID)
 {
 	SPacketGCTargetDelete pck;
-	pck.header = HEADER_GC_TARGET_DELETE;
 	pck.lID = iID;
 	d->Packet(&pck, sizeof(SPacketGCTargetDelete));
 }

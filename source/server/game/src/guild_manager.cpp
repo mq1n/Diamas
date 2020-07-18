@@ -22,7 +22,6 @@ namespace
 	{
 		FGuildNameSender(uint32_t id, const char* guild_name) : id(id), name(guild_name)
 		{
-			p.header = HEADER_GC_GUILD;
 			p.subheader = GUILD_SUBHEADER_GC_GUILD_NAME;
 			p.size = sizeof(p) + GUILD_NAME_MAX_LEN + sizeof(uint32_t);
 		}
@@ -592,7 +591,6 @@ struct FSendWarList
 		gid1 = guild_id1;
 		gid2 = guild_id2;
 
-		p.header	= HEADER_GC_GUILD;
 		p.size		= sizeof(p) + sizeof(uint32_t) * 2;
 		p.subheader	= subheader;
 	}
@@ -797,7 +795,6 @@ void CGuildManager::SendGuildWar(LPCHARACTER ch)
 
 	TEMP_BUFFER buf;
 	SPacketGCGuild p;
-	p.header= HEADER_GC_GUILD;
 	p.subheader = GUILD_SUBHEADER_GC_GUILD_WAR_LIST;
 	p.size = sizeof(p) + (sizeof(uint32_t) * 2) * m_GuildWar.size();
 	buf.write(&p, sizeof(p));

@@ -127,7 +127,6 @@ void CInputLogin::Login(LPDESC d, const char * data)
 
 	if (!g_bIsTestServer)
 	{
-		failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 		strlcpy(failurePacket.szStatus, "VERSION", sizeof(failurePacket.szStatus));
 		d->Packet(&failurePacket, sizeof(SPacketGCLoginFailure));
 		sys_log(0, "LOGIN_FAIL: VERSION | %s", login);
@@ -136,7 +135,6 @@ void CInputLogin::Login(LPDESC d, const char * data)
 
 	if (g_bNoMoreClient)
 	{
-		failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 		strlcpy(failurePacket.szStatus, "SHUTDOWN", sizeof(failurePacket.szStatus));
 		d->Packet(&failurePacket, sizeof(SPacketGCLoginFailure));
 		sys_log(0, "LOGIN_FAIL: SHUTDOWN | %s", login);
@@ -153,7 +151,6 @@ void CInputLogin::Login(LPDESC d, const char * data)
 
 		if (g_iUserLimit <= iTotal)
 		{
-			failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 			strlcpy(failurePacket.szStatus, "FULL", sizeof(failurePacket.szStatus));
 			d->Packet(&failurePacket, sizeof(SPacketGCLoginFailure));
 			return;
@@ -178,8 +175,6 @@ void CInputLogin::LoginByKey(LPDESC d, const char * data)
 	if (g_bNoMoreClient)
 	{
 		SPacketGCLoginFailure failurePacket;
-
-		failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 		strlcpy(failurePacket.szStatus, "SHUTDOWN", sizeof(failurePacket.szStatus));
 		d->Packet(&failurePacket, sizeof(SPacketGCLoginFailure));
 		return;
@@ -196,8 +191,6 @@ void CInputLogin::LoginByKey(LPDESC d, const char * data)
 		if (g_iUserLimit <= iTotal)
 		{
 			SPacketGCLoginFailure failurePacket;
-
-			failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 			strlcpy(failurePacket.szStatus, "FULL", sizeof(failurePacket.szStatus));
 
 			d->Packet(&failurePacket, sizeof(SPacketGCLoginFailure));
@@ -239,7 +232,6 @@ void CInputLogin::ChangeName(LPDESC d, const char * data)
 	if (!check_name(p->name))
 	{
 		SPacketGCCreateFailure pack;
-		pack.header = HEADER_GC_PLAYER_CREATE_FAILURE;
 		pack.bType = 0;
 		d->Packet(&pack, sizeof(pack));
 		return;
@@ -453,8 +445,6 @@ void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 			pinfo->shape);
 
 	SPacketGCLoginFailure packFailure;
-	memset(&packFailure, 0, sizeof(packFailure));
-	packFailure.header = HEADER_GC_PLAYER_CREATE_FAILURE;
 
 	if (g_BlockCharCreation)
 	{
@@ -486,7 +476,6 @@ void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 	if (0 == strcmp(c_rAccountTable.login, pinfo->name))
 	{
 		SPacketGCCreateFailure pack;
-		pack.header = HEADER_GC_PLAYER_CREATE_FAILURE;
 		pack.bType = 1;
 
 		d->Packet(&pack, sizeof(pack));
@@ -632,12 +621,10 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	marriage::CManager::Instance().Login(ch);
 
 	SPacketGCTime p;
-	p.header = HEADER_GC_TIME;
 	p.time = get_global_time();
 	d->Packet(&p, sizeof(p));
 
 	SPacketGCChannel p2;
-	p2.header = HEADER_GC_CHANNEL;
 	p2.channel = g_bChannel;
 	d->Packet(&p2, sizeof(p2));
 
@@ -693,7 +680,6 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		else if (memberFlag == MEMBER_DUELIST)
 		{
 			SPacketGCDuelStart duelStart;
-			duelStart.header = HEADER_GC_DUEL_START;
 			duelStart.wSize = sizeof(SPacketGCDuelStart);
 
 			ch->GetDesc()->Packet(&duelStart, sizeof(SPacketGCDuelStart));
@@ -858,8 +844,6 @@ void CInputLogin::GuildSymbolCRC(LPDESC d, const char* c_pData)
 	if (pkGS->raw.size() != CGPacket.dwSize || pkGS->crc != CGPacket.dwCRC)
 	{
 		SPacketGCGuildSymbolData GCPacket;
-
-		GCPacket.header = HEADER_GC_GUILD_SYMBOL_DATA;
 		GCPacket.size = sizeof(GCPacket) + pkGS->raw.size();
 		GCPacket.guild_id = CGPacket.dwGuildID;
 
@@ -919,7 +903,6 @@ void CInputLogin::GuildMarkIDXList(LPDESC d, const char* c_pData)
 	}
 
 	SPacketGCMarkIDXList p;
-	p.header = HEADER_GC_MARK_IDXLIST;
 	p.bufSize = sizeof(p) + bufSize;
 	p.count = rkMarkMgr.GetMarkCount();
 
@@ -958,8 +941,6 @@ void CInputLogin::GuildMarkCRCList(LPDESC d, const char* c_pData)
 	}
 
 	SPacketGCMarkBlock pGC;
-
-	pGC.header = HEADER_GC_MARK_BLOCK;
 	pGC.imgIdx = pCG->imgIdx;
 	pGC.bufSize = buf.size() + sizeof(SPacketGCMarkBlock);
 	pGC.count = blockCount;

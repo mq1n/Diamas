@@ -136,14 +136,12 @@ void CInputDB::LoginSuccess(uint32_t dwHandle, const char *data)
 	if (!bFound) // 캐릭터가 없으면 랜덤한 제국으로 보낸다.. -_-
 	{
 		SPacketGCEmpire pe;
-		pe.header = HEADER_GC_EMPIRE;
 		pe.bEmpire = number(1, 3);
 		d->Packet(&pe, sizeof(pe));
 	}
 	else
 	{
 		SPacketGCEmpire pe;
-		pe.header = HEADER_GC_EMPIRE;
 		pe.bEmpire = d->GetEmpire();
 		d->Packet(&pe, sizeof(pe));
 	}
@@ -160,8 +158,6 @@ void CInputDB::PlayerCreateFailure(LPDESC d, uint8_t bType)
 		return;
 
 	SPacketGCCreateFailure pack;
-
-	pack.header	= HEADER_GC_PLAYER_CREATE_FAILURE;
 	pack.bType	= bType;
 
 	d->Packet(&pack, sizeof(pack));
@@ -199,8 +195,6 @@ void CInputDB::PlayerCreateSuccess(LPDESC d, const char * data)
 	r_Tab.players[pPacketDB->bAccountCharacterIndex] = pPacketDB->player;
 
 	SPacketGCPlayerCreateSuccess pack;
-
-	pack.header = HEADER_GC_PLAYER_CREATE_SUCCESS;
 	pack.bAccountCharacterSlot = pPacketDB->bAccountCharacterIndex;
 	pack.kSimplePlayerInfomation = pPacketDB->player;
 #ifdef ENABLE_NEWSTUFF
@@ -255,8 +249,6 @@ void CInputDB::ChangeName(LPDESC d, const char * data)
 			r.players[i].bChangeName = 0;
 
 			SPacketGCChangeName pgc;
-
-			pgc.header = HEADER_GC_CHANGE_NAME;
 			pgc.pid = p->pid;
 			strlcpy(pgc.name, p->name, sizeof(pgc.name));
 
@@ -1074,7 +1066,6 @@ void CInputDB::SafeboxWrongPassword(LPDESC d)
 		return;
 
 	SPacketGCSafeboxWrongPassword p;
-	p.header = HEADER_GC_SAFEBOX_WRONG_PASSWORD;
 	d->Packet(&p, sizeof(p));
 
 	d->GetCharacter()->CancelSafeboxLoad();
@@ -1157,7 +1148,6 @@ void CInputDB::EmpireSelect(LPDESC d, const char * c_pData)
 	rTable.bEmpire = *(uint8_t *) c_pData;
 
 	SPacketGCEmpire pe;
-	pe.header = HEADER_GC_EMPIRE;
 	pe.bEmpire = rTable.bEmpire;
 	d->Packet(&pe, sizeof(pe));
 
@@ -1627,8 +1617,6 @@ void CInputDB::AuthLogin(LPDESC d, const char * c_pData)
 	uint8_t bResult = *(uint8_t *) c_pData;
 
 	SPacketGCAuthSuccess ptoc;
-
-	ptoc.header = HEADER_GC_AUTH_SUCCESS;
 
 	if (bResult)
 	{

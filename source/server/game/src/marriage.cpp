@@ -42,8 +42,6 @@ namespace marriage
 	void SendLoverInfo(LPCHARACTER ch, const std::string& lover_name, int32_t love_point)
 	{
 		SPacketGCLoverInfo p;
-
-		p.header = HEADER_GC_LOVER_INFO;
 		strlcpy(p.szName, lover_name.c_str(), sizeof(p.szName));
 		p.byLovePoint = love_point;
 		ch->GetDesc()->Packet(&p, sizeof(p));
@@ -347,7 +345,6 @@ namespace marriage
 		{
 			byLastLovePoint = GetMarriagePoint();
 			SPacketGCLovePointUpdate p;
-			p.header = HEADER_GC_LOVE_POINT_UPDATE;
 			p.byLovePoint = byLastLovePoint;
 
 			ch1->GetDesc()->Packet(&p, sizeof(p));

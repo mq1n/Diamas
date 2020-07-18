@@ -129,8 +129,6 @@ void CItem::EncodeInsertPacket(LPENTITY ent)
 	const GPOS & c_pos = GetXYZ();
 
 	SPacketGCItemGroundAdd pack;
-
-	pack.header	= HEADER_GC_ITEM_GROUND_ADD;
 	pack.lX		= c_pos.x;
 	pack.lY		= c_pos.y;
 	pack.lZ		= c_pos.z;
@@ -151,8 +149,6 @@ void CItem::EncodeInsertPacket(LPENTITY ent)
 		}
 
 		SPacketGCItemOwnership p;
-
-		p.header = HEADER_GC_ITEM_OWNERSHIP;
 		p.dwVID = m_dwVID;
 		strlcpy(p.szName, info->szOwnerName, sizeof(p.szName));
 
@@ -168,8 +164,6 @@ void CItem::EncodeRemovePacket(LPENTITY ent)
 		return;
 
 	SPacketGCItemGroundDel pack;
-
-	pack.header	= HEADER_GC_ITEM_GROUND_DEL;
 	pack.vid		= m_dwVID;
 
 	d->Packet(&pack, sizeof(pack));
@@ -188,7 +182,6 @@ void CItem::UsePacketEncode(LPCHARACTER ch, LPCHARACTER victim, SPacketGCItemUse
 	if (!GetVnum())
 		return;
 
-	packet->header 	= HEADER_GC_ITEM_USE;
 	packet->ch_vid 	= ch->GetVID();
 	packet->victim_vid 	= victim->GetVID();
 	packet->Cell = TItemPos(GetWindow(), m_wCell);
@@ -211,8 +204,6 @@ void CItem::UpdatePacket()
 		return;
 
 	SPacketGCItemUpdate pack;
-
-	pack.header = HEADER_GC_ITEM_UPDATE;
 	pack.Cell = TItemPos(GetWindow(), m_wCell);
 	pack.count	= m_dwCount;
 
@@ -1282,8 +1273,6 @@ EVENTFUNC(ownership_event)
 	pkItem->SetOwnershipEvent(nullptr);
 
 	SPacketGCItemOwnership p;
-
-	p.header	= HEADER_GC_ITEM_OWNERSHIP;
 	p.dwVID	= pkItem->GetVID();
 	p.szName[0]	= '\0';
 
@@ -1306,8 +1295,6 @@ void CItem::SetOwnership(LPCHARACTER ch, int32_t iSec)
 			m_dwOwnershipPID = 0;
 
 			SPacketGCItemOwnership p;
-
-			p.header	= HEADER_GC_ITEM_OWNERSHIP;
 			p.dwVID	= m_dwVID;
 			p.szName[0]	= '\0';
 
@@ -1331,8 +1318,6 @@ void CItem::SetOwnership(LPCHARACTER ch, int32_t iSec)
 	SetOwnershipEvent(event_create(ownership_event, info, PASSES_PER_SEC(iSec)));
 
 	SPacketGCItemOwnership p;
-
-	p.header = HEADER_GC_ITEM_OWNERSHIP;
 	p.dwVID = m_dwVID;
 	strlcpy(p.szName, ch->GetName(), sizeof(p.szName));
 

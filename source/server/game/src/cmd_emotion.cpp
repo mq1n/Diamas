@@ -131,7 +131,6 @@ ACMD(do_emotion_allow)
 
 		int32_t len = MIN(CHAT_MAX_LEN, strlen(msg) + 1);
 
-		pack.header = HEADER_GC_WHISPER;
 		pack.wSize = sizeof(SPacketGCWhisper) + len;
 		pack.bType = WHISPER_TYPE_SYSTEM;
 		strlcpy(pack.szNameFrom, ch->GetName(), sizeof(pack.szNameFrom));
@@ -292,7 +291,6 @@ ACMD(do_emotion)
 	++len;  // \0 문자 포함
 
 	SPacketGCChat pack_chat;
-	pack_chat.header = HEADER_GC_CHAT;
 	pack_chat.size = sizeof(SPacketGCChat) + len;
 	pack_chat.type = CHAT_TYPE_COMMAND;
 	pack_chat.dwVID = 0;

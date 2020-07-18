@@ -1092,7 +1092,6 @@ namespace quest
 					{
 						if (ch->CountSpecifyItem(it.first) >= it.second)
 						{
-							packet_script.header = HEADER_GC_SCRIPT;
 							packet_script.skin = quest::CQuestManager::QUEST_SKIN_NORMAL;
 							packet_script.src_size = static_cast<uint16_t>(can_enter_ment.size());
 							packet_script.size = packet_script.src_size + sizeof(SPacketGCScript);
@@ -1104,7 +1103,6 @@ namespace quest
 						}
 					}
 
-					packet_script.header = HEADER_GC_SCRIPT;
 					packet_script.skin = quest::CQuestManager::QUEST_SKIN_NORMAL;
 					packet_script.src_size = static_cast<uint16_t>(cant_enter_ment.size());
 					packet_script.size = packet_script.src_size + sizeof(SPacketGCScript);

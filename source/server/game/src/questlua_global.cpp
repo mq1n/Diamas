@@ -1123,7 +1123,6 @@ namespace quest
 		Script += "[DONE]";
 		
 		SPacketGCScript packet_script;
-		packet_script.header = HEADER_GC_SCRIPT;
 		packet_script.skin = CQuestManager::QUEST_SKIN_NORMAL;
 		packet_script.src_size = static_cast<uint16_t>(Script.size());
 		packet_script.size = packet_script.src_size + sizeof(SPacketGCScript);

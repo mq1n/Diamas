@@ -15,7 +15,6 @@ struct SPacketHeader
 		header = header_;
 	}
 
-	// REMOVEME
 	void operator=(TPacketHeader header_)
 	{
 		header = header_;

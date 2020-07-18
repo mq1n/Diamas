@@ -24,7 +24,6 @@ void exchange_packet(LPCHARACTER ch, uint8_t sub_header, bool is_me, uint32_t ar
 
 	SPacketGCExchange pack_exchg;
 
-	pack_exchg.header 		= HEADER_GC_EXCHANGE;
 	pack_exchg.subheader 	= sub_header;
 	pack_exchg.is_me		= is_me;
 	pack_exchg.arg1		= arg1;

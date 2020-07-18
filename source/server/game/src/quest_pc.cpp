@@ -235,7 +235,6 @@ namespace quest
 
 		SPacketGCQuestInfo qi;
 
-		qi.header = HEADER_GC_QUEST_INFO;
 		qi.size = sizeof(SPacketGCQuestInfo);
 		qi.index = m_RunningQuestState->iIndex;
 		qi.flag = m_iSendToClient;

@@ -90,7 +90,6 @@ struct FSendDestPosition
 {
 	FSendDestPosition(int32_t x, int32_t y)
 	{
-		p1.header = HEADER_GC_DUNGEON;
 		p1.subheader = DUNGEON_SUBHEADER_GC_DESTINATION_POSITION;
 		p2.x = x;
 		p2.y = y;

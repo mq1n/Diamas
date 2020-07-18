@@ -360,8 +360,6 @@ void MessengerManager::SendList(MessengerManager::keyA account)
 		return;
 
 	SPacketGCMessenger pack;
-
-	pack.header		= HEADER_GC_MESSENGER;
 	pack.subheader	= MESSENGER_SUBHEADER_GC_LIST;
 	pack.size		= sizeof(SPacketGCMessenger);
 
@@ -421,8 +419,6 @@ void MessengerManager::SendLogin(MessengerManager::keyA account, MessengerManage
 	uint8_t bLen = companion.size();
 
 	SPacketGCMessenger pack;
-
-	pack.header			= HEADER_GC_MESSENGER;
 	pack.subheader		= MESSENGER_SUBHEADER_GC_LOGIN;
 	pack.size			= sizeof(SPacketGCMessenger) + sizeof(uint8_t) + bLen;
 
@@ -446,7 +442,6 @@ void MessengerManager::SendLogout(MessengerManager::keyA account, MessengerManag
 
 	SPacketGCMessenger pack;
 
-	pack.header		= HEADER_GC_MESSENGER;
 	pack.subheader	= MESSENGER_SUBHEADER_GC_LOGOUT;
 	pack.size		= sizeof(SPacketGCMessenger) + sizeof(uint8_t) + bLen;
 

@@ -1077,7 +1077,6 @@ void SECTREE_MANAGER::SendNPCPosition(LPCHARACTER ch)
 
 	TEMP_BUFFER buf;
 	SPacketGCNPCPosition p;
-	p.header = HEADER_GC_NPC_POSITION;
 	p.count = static_cast<uint16_t>(m_mapNPCPosition[lMapIndex].size());
 
 	TNPCPosition np;

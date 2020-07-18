@@ -60,9 +60,9 @@ uint32_t AdjustExpByLevel(const LPCHARACTER ch, const uint32_t exp)
 		double ret = 0.95;
 		double factor = 0.1;
 
-		for (ssize_t i=0 ; i < ch->GetLevel()-100 ; ++i)
+		for (int32_t i = 0 ; i < ch->GetLevel() - 100; ++i)
 		{
-			if ( (i%10) == 0)
+			if ((i % 10) == 0)
 				factor /= 2.0;
 
 			ret *= 1.0 - factor;
@@ -102,8 +102,6 @@ bool CHARACTER::CanFight() const
 void CHARACTER::CreateFly(uint8_t bType, LPCHARACTER pkVictim)
 {
 	SPacketGCCreateFly packFly;
-
-	packFly.header         = HEADER_GC_CREATE_FLY;
 	packFly.bType           = bType;
 	packFly.dwStartVID      = GetVID();
 	packFly.dwEndVID        = pkVictim->GetVID();
@@ -422,7 +420,6 @@ void CHARACTER::Stun()
 	event_cancel(&m_pkRecoveryEvent); // 회복 이벤트를 죽인다.
 
 	SPacketGCStun pack;
-	pack.header	= HEADER_GC_STUN;
 	pack.vid	= m_vid;
 	PacketAround(&pack, sizeof(pack));
 
@@ -1497,7 +1494,6 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 	// END_OF_BOSS_KILL_LOG
 
 	SPacketGCDead pack;
-	pack.header	= HEADER_GC_DEAD;
 	pack.vid	= m_vid;
 	PacketAround(&pack, sizeof(pack));
 
@@ -1608,9 +1604,6 @@ void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int32_t Damage, uint8_t 
 	if (IsPC() == true || (pAttacker->IsPC() == true && pAttacker->GetTarget() == this))
 	{
 		SPacketGCDamageInfo damageInfo;
-		memset(&damageInfo, 0, sizeof(SPacketGCDamageInfo));
-
-		damageInfo.header = HEADER_GC_DAMAGE_INFO;
 		damageInfo.dwVID = (uint32_t)GetVID();
 		damageInfo.flag = DamageFlag;
 		damageInfo.damage = Damage;
@@ -3255,33 +3248,54 @@ bool CHARACTER::Shoot(uint8_t bType)
 
 void CHARACTER::FlyTarget(uint32_t dwTargetVID, int32_t x, int32_t y, uint8_t bHeader)
 {
-	LPCHARACTER pkVictim = CHARACTER_MANAGER::Instance().Find(dwTargetVID);
-	SPacketGCFlyTargeting pack;
-
-	//pack.bHeader	= HEADER_GC_FLY_TARGETING;
-	pack.header	= (bHeader == HEADER_CG_FLY_TARGETING) ? HEADER_GC_FLY_TARGETING : HEADER_GC_ADD_FLY_TARGETING;
-	pack.dwShooterVID	= GetVID();
-
-	if (pkVictim)
+	if (bHeader == HEADER_CG_FLY_TARGETING)
 	{
-		pack.dwTargetVID = pkVictim->GetVID();
-		pack.lX = pkVictim->GetX();
-		pack.lY = pkVictim->GetY();
+		SPacketGCFlyTargeting pack;
+		pack.dwShooterVID = GetVID();
 
-		if (bHeader == HEADER_CG_FLY_TARGETING)
+		LPCHARACTER pkVictim = CHARACTER_MANAGER::Instance().Find(dwTargetVID);
+		if (pkVictim)
+		{
+			pack.dwTargetVID = pkVictim->GetVID();
+			pack.lX = pkVictim->GetX();
+			pack.lY = pkVictim->GetY();
+
 			m_dwFlyTargetID = dwTargetVID;
+		}
 		else
-			m_vec_dwFlyTargets.push_back(dwTargetVID);
+		{
+			pack.dwTargetVID = 0;
+			pack.lX = x;
+			pack.lY = y;
+		}
+
+		sys_log(1, "FlyTarget %s vid %d x %d y %d", GetName(), pack.dwTargetVID, pack.lX, pack.lY);
+		PacketAround(&pack, sizeof(pack), this);
 	}
 	else
 	{
-		pack.dwTargetVID = 0;
-		pack.lX = x;
-		pack.lY = y;
-	}
+		SPacketGCAddFlyTargeting pack;
+		pack.dwShooterVID = GetVID();
 
-	sys_log(1, "FlyTarget %s vid %d x %d y %d", GetName(), pack.dwTargetVID, pack.lX, pack.lY);
-	PacketAround(&pack, sizeof(pack), this);
+		LPCHARACTER pkVictim = CHARACTER_MANAGER::Instance().Find(dwTargetVID);
+		if (pkVictim)
+		{
+			pack.dwTargetVID = pkVictim->GetVID();
+			pack.lX = pkVictim->GetX();
+			pack.lY = pkVictim->GetY();
+
+			m_vec_dwFlyTargets.push_back(dwTargetVID);
+		}
+		else
+		{
+			pack.dwTargetVID = 0;
+			pack.lX = x;
+			pack.lY = y;
+		}
+
+		sys_log(1, "FlyTarget %s vid %d x %d y %d", GetName(), pack.dwTargetVID, pack.lX, pack.lY);
+		PacketAround(&pack, sizeof(pack), this);
+	}
 }
 
 LPCHARACTER CHARACTER::GetNearestVictim(LPCHARACTER pkChr)

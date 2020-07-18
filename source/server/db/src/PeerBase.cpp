@@ -177,8 +177,8 @@ int32_t CPeerBase::Recv()
 	}
 
 	buffer_adjust_size(m_inBuffer, MAX_INPUT_LEN >> 2);
-	int32_t bytes_to_read = buffer_has_space(m_inBuffer);
-	ssize_t bytes_read = socket_read(m_fd, (char *) buffer_write_peek(m_inBuffer), bytes_to_read);
+	auto bytes_to_read = buffer_has_space(m_inBuffer);
+	auto bytes_read = socket_read(m_fd, (char *) buffer_write_peek(m_inBuffer), bytes_to_read);
 
 	if (bytes_read < 0)
 	{

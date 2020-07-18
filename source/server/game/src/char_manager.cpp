@@ -984,8 +984,6 @@ void CHARACTER_MANAGER::SendScriptToMap(int32_t lMapIndex, const std::string & s
 		return;
 
 	SPacketGCScript p;
-
-	p.header = HEADER_GC_SCRIPT;
 	p.skin = 1;
 	p.src_size = static_cast<uint16_t>(s.size());
 

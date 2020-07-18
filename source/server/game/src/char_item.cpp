@@ -369,7 +369,6 @@ void CHARACTER::SetItem(const TItemPos & Cell, LPITEM pItem)
 		if (pItem)
 		{
 			SPacketGCItemSet2 pack;
-			pack.header = HEADER_GC_ITEM_SET2;
 			pack.Cell = Cell;
 
 			pack.count = pItem->GetCount();
@@ -390,7 +389,6 @@ void CHARACTER::SetItem(const TItemPos & Cell, LPITEM pItem)
 		else
 		{
 			SPacketGCItemSet pack;
-			pack.header = HEADER_GC_ITEM_SET;
 			pack.Cell = Cell;
 			pack.count = 0;
 			pack.vnum = 0;
@@ -1463,8 +1461,6 @@ bool CHARACTER::RefineInformation(uint16_t bCell, uint8_t bType, int32_t iAdditi
 	// END_OF_REFINE_COST
 
 	SPacketGCRefineInformation p;
-
-	p.header = HEADER_GC_REFINE_INFORMATION;
 	p.type = bType;
 	p.pos = bCell;
 	p.refine_table.src_vnum = item->GetVnum();
@@ -3018,7 +3014,6 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 										++len;  // \0 문자까지 보내기
 
 										SPacketGCChat pack_chat;
-										pack_chat.header	= HEADER_GC_CHAT;
 										pack_chat.size		= sizeof(SPacketGCChat) + len;
 										pack_chat.type		= CHAT_TYPE_COMMAND;
 										pack_chat.dwVID		= 0;
@@ -3064,7 +3059,6 @@ bool CHARACTER::UseItemEx(LPITEM item, const TItemPos & DestCell)
 										++len;  // \0 문자까지 보내기
 
 										SPacketGCChat pack_chat;
-										pack_chat.header	= HEADER_GC_CHAT;
 										pack_chat.size		= sizeof(SPacketGCChat) + len;
 										pack_chat.type		= CHAT_TYPE_COMMAND;
 										pack_chat.dwVID		= 0;

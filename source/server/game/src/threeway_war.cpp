@@ -498,8 +498,6 @@ void CThreeWayWar::onDead(LPCHARACTER pChar, LPCHARACTER pkKiller)
 					"[ENTER][DONE]");
 
 			SPacketGCScript pack_script;
-
-			pack_script.header = HEADER_GC_SCRIPT;
 			pack_script.skin = 1;
 			pack_script.src_size = static_cast<uint16_t>(Script.size());
 

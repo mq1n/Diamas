@@ -135,8 +135,6 @@ void LoginFailure(LPDESC d, const char * c_pszStatus)
 		return;
 
 	SPacketGCLoginFailure failurePacket;
-
-	failurePacket.header = HEADER_GC_LOGIN_FAILURE;
 	strlcpy(failurePacket.szStatus, c_pszStatus, sizeof(failurePacket.szStatus));
 
 	d->Packet(&failurePacket, sizeof(failurePacket));

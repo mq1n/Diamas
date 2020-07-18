@@ -174,8 +174,7 @@ EVENTFUNC(ping_event)
 	else
 	{
 		SPacketGCPing p;
-		p.header = HEADER_GC_PING;
-		desc->Packet(&p, sizeof(SPacketGCPing));
+		desc->Packet(&p, sizeof(p));
 		desc->SetPong(false);
 	}
 
@@ -238,8 +237,6 @@ bool DESC::Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSoc
 
 int32_t DESC::ProcessInput()
 {
-	ssize_t bytes_read;
-
 	if (!m_lpInputBuffer)
 	{
 		sys_err("DESC::ProcessInput : nil input buffer");
@@ -247,7 +244,7 @@ int32_t DESC::ProcessInput()
 	}
 
 	buffer_adjust_size(m_lpInputBuffer, m_iMinInputBufferLen);
-	bytes_read = socket_read(m_sock, (char *) buffer_write_peek(m_lpInputBuffer), buffer_has_space(m_lpInputBuffer));
+	auto bytes_read = socket_read(m_sock, (char *) buffer_write_peek(m_lpInputBuffer), buffer_has_space(m_lpInputBuffer));
 
 	if (bytes_read < 0)
 		return -1;
@@ -500,10 +497,9 @@ void DESC::SetPhase(int32_t _phase)
 	m_iPhase = _phase;
 
 	SPacketGCPhase pack;
-	pack.header = HEADER_GC_PHASE;
 	pack.phase = _phase;
 	pack.stage = game_stage;
-	Packet(&pack, sizeof(SPacketGCPhase));
+	Packet(&pack, sizeof(pack));
 
 //	sys_log(0, "phase %d", _phase);
 
@@ -595,13 +591,11 @@ void DESC::StartHandshake(uint32_t _handshake)
 void DESC::SendHandshake(uint32_t dwCurTime, int32_t lNewDelta)
 {
 	SPacketHandshake pack;
-
-	pack.header		= HEADER_GC_HANDSHAKE;
 	pack.dwHandshake	= m_dwHandshake;
 	pack.dwTime			= dwCurTime;
 	pack.lDelta			= lNewDelta;
 
-	Packet(&pack, sizeof(SPacketHandshake));
+	Packet(&pack, sizeof(pack));
 
 	m_dwHandshakeSentTime = dwCurTime;
 	m_bHandshaking = true;
@@ -686,7 +680,6 @@ void DESC::SendKeyAgreement()
 	}
 	assert(data_length <= SPacketKeyAgreement::MAX_DATA_LEN);
 
-	packet.header = HEADER_GC_KEY_AGREEMENT;
 	packet.wAgreedLength = (uint16_t)agreed_length;
 	packet.wDataLength = (uint16_t)data_length;
 
@@ -696,9 +689,6 @@ void DESC::SendKeyAgreement()
 void DESC::SendKeyAgreementCompleted()
 {
 	SPacketGCKeyAgreementCompleted packet;
-
-	packet.header = HEADER_GC_KEY_AGREEMENT_COMPLETED;
-
 	Packet(&packet, sizeof(packet));
 }
 
@@ -867,9 +857,6 @@ void DESC::SendLoginSuccessPacket()
 	TAccountTable & rTable = GetAccountTable();
 
 	SPacketGCLoginSuccess p;
-
-	p.header    = HEADER_GC_LOGIN_SUCCESS;
-
 	p.handle     = GetHandle();
 	p.random_key = DESC_MANAGER::Instance().MakeRandomKey(GetHandle()); // FOR MARK
 	memcpy(p.akSimplePlayerInformation, rTable.players, sizeof(rTable.players));
@@ -969,8 +956,6 @@ void DESC::ChatPacket(uint8_t type, const char * format, ...)
 	va_end(args);
 
 	SPacketGCChat pack_chat;
-
-	pack_chat.header    = HEADER_GC_CHAT;
 	pack_chat.size      = sizeof(SPacketGCChat) + len;
 	pack_chat.type      = type;
 	pack_chat.dwVID        = 0;

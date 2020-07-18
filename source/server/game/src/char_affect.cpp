@@ -23,7 +23,6 @@
 void SendAffectRemovePacket(LPDESC d, uint32_t pid, uint32_t type, uint8_t point)
 {
 	SPacketGCAffectRemove ptoc;
-	ptoc.header	= HEADER_GC_AFFECT_REMOVE;
 	ptoc.dwType		= type;
 	ptoc.bApplyOn	= point;
 	d->Packet(&ptoc, sizeof(SPacketGCAffectRemove));
@@ -38,7 +37,6 @@ void SendAffectRemovePacket(LPDESC d, uint32_t pid, uint32_t type, uint8_t point
 void SendAffectAddPacket(LPDESC d, CAffect * pkAff)
 {
 	SPacketGCAffectAdd ptoc;
-	ptoc.header		= HEADER_GC_AFFECT_ADD;
 	ptoc.elem.dwType		= pkAff->dwType;
 	ptoc.elem.bApplyOn		= pkAff->bApplyOn;
 	ptoc.elem.lApplyValue	= pkAff->lApplyValue;

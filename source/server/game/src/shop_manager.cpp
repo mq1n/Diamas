@@ -242,8 +242,6 @@ void CShopManager::Buy(LPCHARACTER ch, uint8_t pos)
 	if (SHOP_SUBHEADER_GC_OK != ret) // 문제가 있었으면 보낸다.
 	{
 		SPacketGCShop pack;
-
-		pack.header	= HEADER_GC_SHOP;
 		pack.subheader	= ret;
 		pack.size	= sizeof(SPacketGCShop);
 

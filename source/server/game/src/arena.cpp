@@ -295,7 +295,6 @@ EVENTFUNC(ready_to_start_event)
 				chB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련이 시작되었습니다."));
 
 				SPacketGCDuelStart duelStart;
-				duelStart.header = HEADER_GC_DUEL_START;
 				duelStart.wSize = sizeof(SPacketGCDuelStart) + 4;
 
 				uint32_t dwOppList[8]; // 최대 파티원 8명 이므로..
@@ -349,7 +348,6 @@ EVENTFUNC(ready_to_start_event)
 				TEMP_BUFFER buf2;
 				uint32_t dwOppList[8]; // 최대 파티원 8명 이므로..
 				SPacketGCDuelStart duelStart;
-				duelStart.header = HEADER_GC_DUEL_START;
 				duelStart.wSize = sizeof(SPacketGCDuelStart) + 4;
 
 				dwOppList[0] = static_cast<uint32_t>(chB->GetVID());
@@ -442,7 +440,6 @@ EVENTFUNC(duel_time_out)
 				chB->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("10초뒤 마을로 이동합니다."));
 
 				SPacketGCDuelStart duelStart;
-				duelStart.header = HEADER_GC_DUEL_START;
 				duelStart.wSize = sizeof(SPacketGCDuelStart);
 				if (chA->GetDesc())
 					chA->GetDesc()->Packet(&duelStart, sizeof(SPacketGCDuelStart));

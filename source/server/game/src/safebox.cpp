@@ -74,7 +74,6 @@ bool CSafebox::Add(uint32_t dwPos, LPITEM pkItem)
 		if (m_bWindowMode == SAFEBOX)
 		{
 			SPacketGCSafeboxSet pack;
-			pack.header = HEADER_GC_SAFEBOX_SET;
 			pack.Cell = TItemPos(m_bWindowMode, dwPos);
 			pack.vnum = pkItem->GetVnum();
 			pack.count = pkItem->GetCount();
@@ -85,7 +84,6 @@ bool CSafebox::Add(uint32_t dwPos, LPITEM pkItem)
 		else
 		{
 			SPacketGCMallSet pack;
-			pack.header = HEADER_GC_MALL_SET;
 			pack.Cell = TItemPos(m_bWindowMode, dwPos);
 			pack.vnum = pkItem->GetVnum();
 			pack.count = pkItem->GetCount();
@@ -127,16 +125,12 @@ LPITEM CSafebox::Remove(uint32_t dwPos)
 		if (m_bWindowMode == SAFEBOX)
 		{
 			SPacketGCSafeboxDel pack;
-
-			pack.header = HEADER_GC_SAFEBOX_DEL;
 			pack.pos = dwPos;
 			m_pkChrOwner->GetDesc()->Packet(&pack, sizeof(pack));
 		}
 		else
 		{
 			SPacketGCMallDel pack;
-
-			pack.header = HEADER_GC_MALL_DEL;
 			pack.pos = dwPos;
 			m_pkChrOwner->GetDesc()->Packet(&pack, sizeof(pack));
 		}

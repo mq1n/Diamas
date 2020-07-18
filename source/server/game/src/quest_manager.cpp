@@ -973,7 +973,6 @@ namespace quest
 		//send -_-!
 		SPacketGCScript packet_script;
 
-		packet_script.header = HEADER_GC_SCRIPT;
 		packet_script.skin = m_iCurrentSkin;
 		packet_script.src_size = static_cast<uint16_t>(m_strScript.size());
 		packet_script.size = packet_script.src_size + sizeof(SPacketGCScript);

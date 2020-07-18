@@ -324,7 +324,6 @@ void CParty::Destroy()
 			if (rMember.pCharacter->GetDesc())
 			{
 				SPacketGCPartyRemove p;
-				p.header = HEADER_GC_PARTY_REMOVE;
 				p.pid = rMember.pCharacter->GetPlayerID();
 				rMember.pCharacter->GetDesc()->Packet(&p, sizeof(p));
 				rMember.pCharacter->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 파티가 해산 되었습니다."));
@@ -680,13 +679,10 @@ void CParty::Unlink(LPCHARACTER pkChr)
 
 void CParty::SendPartyRemoveOneToAll(uint32_t pid)
 {
-	TMemberMap::iterator it;
-
 	SPacketGCPartyRemove p;
-	p.header = HEADER_GC_PARTY_REMOVE;
 	p.pid = pid;
 
-	for (it = m_memberMap.begin(); it != m_memberMap.end(); ++it)
+	for (auto it = m_memberMap.begin(); it != m_memberMap.end(); ++it)
 	{
 		if (it->second.pCharacter && it->second.pCharacter->GetDesc())
 			it->second.pCharacter->GetDesc()->Packet(&p, sizeof(p));
@@ -698,8 +694,6 @@ void CParty::SendPartyJoinOneToAll(uint32_t pid)
 	const TMember& r = m_memberMap[pid];
 
 	SPacketGCPartyAdd p;
-
-	p.header = HEADER_GC_PARTY_ADD;
 	p.pid = pid;
 	strlcpy(p.name, r.strName.c_str(), sizeof(p.name));
 
@@ -716,8 +710,6 @@ void CParty::SendPartyJoinAllToOne(LPCHARACTER ch)
 		return;
 
 	SPacketGCPartyAdd p;
-
-	p.header = HEADER_GC_PARTY_ADD;
 	p.name[CHARACTER_NAME_MAX_LEN] = '\0';
 
 	for (TMemberMap::iterator it = m_memberMap.begin();it!= m_memberMap.end(); ++it)
@@ -735,8 +727,7 @@ void CParty::SendPartyUnlinkOneToAll(LPCHARACTER ch)
 
 	TMemberMap::iterator it;
 
-	SPacketGCPartyLink p;
-	p.header = HEADER_GC_PARTY_UNLINK;
+	SPacketGCPartyUnlink p;
 	p.pid = ch->GetPlayerID();
 	p.vid = (uint32_t)ch->GetVID();
 
@@ -757,7 +748,6 @@ void CParty::SendPartyLinkOneToAll(LPCHARACTER ch)
 	TMemberMap::iterator it;
 
 	SPacketGCPartyLink p;
-	p.header = HEADER_GC_PARTY_LINK;
 	p.vid = ch->GetVID();
 	p.pid = ch->GetPlayerID();
 
@@ -775,15 +765,11 @@ void CParty::SendPartyLinkAllToOne(LPCHARACTER ch)
 	if (!ch->GetDesc())
 		return;
 
-	TMemberMap::iterator it;
-
-	SPacketGCPartyLink p;
-	p.header = HEADER_GC_PARTY_LINK;
-
-	for (it = m_memberMap.begin();it!= m_memberMap.end(); ++it)
+	for (auto it = m_memberMap.begin();it!= m_memberMap.end(); ++it)
 	{
 		if (it->second.pCharacter)
 		{
+			SPacketGCPartyLink p;
 			p.vid = it->second.pCharacter->GetVID();
 			p.pid = it->second.pCharacter->GetPlayerID();
 			ch->GetDesc()->Packet(&p, sizeof(p));
@@ -806,8 +792,6 @@ void CParty::SendPartyInfoOneToAll(uint32_t pid)
 
 	// Data Building
 	SPacketGCPartyUpdate p;
-	memset(&p, 0, sizeof(p));
-	p.header = HEADER_GC_PARTY_UPDATE;
 	p.pid = pid;
 	p.percent_hp = 255;
 	p.state = it->second.bRole;
@@ -847,15 +831,13 @@ void CParty::SendPartyInfoAllToOne(LPCHARACTER ch)
 {
 	TMemberMap::iterator it;
 
-	SPacketGCPartyUpdate p;
-
 	for (it = m_memberMap.begin(); it != m_memberMap.end(); ++it)
 	{
+		SPacketGCPartyUpdate p;
 		if (!it->second.pCharacter)
 		{
 			uint32_t pid = it->first;
-			memset(&p, 0, sizeof(p));
-			p.header = HEADER_GC_PARTY_UPDATE;
+
 			p.pid = pid;
 			p.percent_hp = 255;
 			p.state = it->second.bRole;
@@ -1447,8 +1429,6 @@ void CParty::UpdateOnlineState(uint32_t dwPID, const char* name)
 	TMember& r = m_memberMap[dwPID];
 
 	SPacketGCPartyAdd p;
-
-	p.header = HEADER_GC_PARTY_ADD;
 	p.pid = dwPID;
 	r.strName = name;
 	strlcpy(p.name, name, sizeof(p.name));
@@ -1464,7 +1444,6 @@ void CParty::UpdateOfflineState(uint32_t dwPID)
 	//const TMember& r = m_memberMap[dwPID];
 
 	SPacketGCPartyAdd p;
-	p.header = HEADER_GC_PARTY_ADD;
 	p.pid = dwPID;
 	memset(p.name, 0, CHARACTER_NAME_MAX_LEN+1);
 
@@ -1584,8 +1563,6 @@ uint8_t CParty::CountMemberByVnum(uint32_t dwVnum)
 void CParty::SendParameter(LPCHARACTER ch)
 {
 	SPacketGCPartyParameter p;
-
-	p.header = HEADER_GC_PARTY_PARAMETER;
 	p.bDistributeMode = m_iExpDistributionMode;
 
 	LPDESC d = ch->GetDesc();

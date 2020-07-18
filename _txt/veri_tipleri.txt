@@ -22,5 +22,6 @@ ULONG
 INT
 uint
 sh_int
+ssize_t
 
 - game_source/libthecore/typedef.h

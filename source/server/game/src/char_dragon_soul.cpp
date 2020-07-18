@@ -123,10 +123,9 @@ bool CHARACTER::DragonSoul_RefineWindow_Open(LPENTITY pEntity)
 	}
 
 	SPacketGCDragonSoulRefine PDS;
-	PDS.header = HEADER_GC_DRAGON_SOUL_REFINE;
 	PDS.bSubType = DS_SUB_HEADER_OPEN;
-	LPDESC d = GetDesc();
 
+	LPDESC d = GetDesc();
 	if (nullptr == d)
 	{
 		sys_err ("User(%s)'s DESC is nullptr POINT.", GetName());

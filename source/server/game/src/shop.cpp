@@ -29,8 +29,6 @@ CShop::CShop() :
 CShop::~CShop()
 {
 	SPacketGCShop pack;
-
-	pack.header		= HEADER_GC_SHOP;
 	pack.subheader	= SHOP_SUBHEADER_GC_END;
 	pack.size		= sizeof(SPacketGCShop);
 
@@ -390,12 +388,11 @@ bool CShop::AddGuest(LPCHARACTER ch, uint32_t owner_vid, bool bOtherEmpire)
 
 	SPacketGCShop pack;
 
-	pack.header		= HEADER_GC_SHOP;
 	pack.subheader	= SHOP_SUBHEADER_GC_START;
 
 	TPacketGCShopStart pack2;
-
 	memset(&pack2, 0, sizeof(pack2));
+
 	pack2.owner_vid = owner_vid;
 
 	for (uint32_t i = 0; i < m_itemVector.size() && i < SHOP_HOST_ITEM_MAX_NUM; ++i)
@@ -440,7 +437,6 @@ void CShop::RemoveGuest(LPCHARACTER ch)
 
 	SPacketGCShop pack;
 
-	pack.header		= HEADER_GC_SHOP;
 	pack.subheader	= SHOP_SUBHEADER_GC_END;
 	pack.size		= sizeof(SPacketGCShop);
 
@@ -471,7 +467,6 @@ void CShop::BroadcastUpdateItem(uint8_t pos)
 	SPacketGCShop pack;
 	TPacketGCShopUpdateItem pack2;
 
-	pack.header		= HEADER_GC_SHOP;
 	pack.subheader	= SHOP_SUBHEADER_GC_UPDATE_ITEM;
 	pack.size		= sizeof(pack) + sizeof(pack2);
 

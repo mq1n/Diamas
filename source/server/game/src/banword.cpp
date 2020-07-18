@@ -41,7 +41,7 @@ bool CBanwordManager::CheckString(const char* c_pszString, size_t _len)
 	{
 		const std::string& r = it->first;
 		const char* tmp = c_pszString;
-		ssize_t len = _len;
+		int64_t len = _len;
 
 		while (len > 0)
 		{
@@ -67,7 +67,7 @@ void CBanwordManager::ConvertString(char* c_pszString, size_t _len)
 		const std::string& r = it->first;
 
 		char* tmp = c_pszString;
-		ssize_t len = _len;
+		int64_t len = _len;
 
 		while (len > 0)
 		{

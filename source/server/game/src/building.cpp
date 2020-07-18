@@ -77,10 +77,6 @@ void CObject::EncodeInsertPacket(LPENTITY entity)
 	bool setGuildID = (m_data.dwVnum == 14200) || (m_pProto && m_pProto->dwNPCVnum != 0);
 
 	SPacketGCCharacterAdd pack;
-
-	memset(&pack, 0, sizeof(SPacketGCCharacterAdd));
-
-	pack.header         = HEADER_GC_CHARACTER_ADD;
 	pack.dwVID          = m_dwVID;
 	pack.bType          = CHAR_TYPE_BUILDING;
 	pack.angle          = m_data.zRot;
@@ -106,8 +102,6 @@ void CObject::EncodeRemovePacket(LPENTITY entity)
 	sys_log(0, "ObjectRemovePacket vid %u", m_dwVID);
 
 	SPacketGCCharacterDelete pack;
-
-	pack.header = HEADER_GC_CHARACTER_DEL;
 	pack.dwVID     = m_dwVID;
 
 	d->Packet(&pack, sizeof(SPacketGCCharacterDelete));
@@ -896,8 +890,6 @@ void CManager::SendLandList(LPDESC d, int32_t lMapIndex)
 	if (wCount != 0)
 	{
 		SPacketGCLandList p;
-
-		p.header = HEADER_GC_LAND_LIST;
 		p.size = sizeof(SPacketGCLandList) + buf.size();
 
 		d->BufferedPacket(&p, sizeof(SPacketGCLandList));
