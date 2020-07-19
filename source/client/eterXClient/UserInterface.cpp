@@ -185,10 +185,10 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 	PyModule_AddIntConstant(builtins, "__USE_CYTHON__", 0);
 #endif
 
-	PyModule_AddStringConstant(builtins, "__COMMAND_LINE__", "");
+	PyModule_AddStringConstant(builtins, "__COMMAND_LINE__", lpCmdLine);
 
-	char szSystemMod[] = { 's', 'y', 's', 't', 'e', 'm', 0x0 }; // system
-	char szSystemFile[] = { 's', 'y', 's', 't', 'e', 'm', '.', 'p', 'y', 0x0 }; // system.py
+	char szSystemMod[] = { 's', 'y', 's', 't', 'e', 'm', '_', 'p', 'y', 't', 'h', 'o', 'n', 0x0 }; // system_python
+	char szSystemFile[] = { 's', 'y', 's', 't', 'e', 'm', '_', 'p', 'y', 't', 'h', 'o', 'n', '.', 'p', 'y', 0x0 }; // system_python.py
 	char szSystemPyFailMsg[] = { 'M', 'a', 'i', 'n', ' ', 's', 'c', 'r', 'i', 'p', 't', ' ', 'i', 'n', 'i', 't', 'i', 'l', 'i', 'z', 'a', 't', 'i', 'o', 'n', ' ', 'f', 'a', 'i', 'l', 'e', 'd', '!', 0x0 }; // Main script initilization failed!
 
 #ifdef __USE_CYTHON__
