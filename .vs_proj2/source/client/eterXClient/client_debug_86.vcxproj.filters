@@ -1,0 +1,473 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AccountConnector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AffectFlagContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\CameraProcedure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\GameType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\GuildMarkDownloader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\GuildMarkUploader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBaseBattle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBaseEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBaseEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBaseMotion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBaseMovement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBaseTransform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InsultChecker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\Locale.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\MarkImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\MarkManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\NetworkActorManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonAcce.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplicationCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplicationCursor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplicationEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplicationModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplicationProcedure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplicationWebPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonBackground.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonBackgroundModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonCharacterManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonCharacterManagerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonCharacterModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonChat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonChatModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonDynamicModuleNames.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonEffectModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonEventManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonEventManagerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonExchange.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonExchangeModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonFlyModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonGameEventManagerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonGuild.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonIME.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonIMEModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonItemModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonMessenger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonMiniMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonMiniMapModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseGameActor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseGameItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseHandShake.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseLoading.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseLogin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseOffline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseSelect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNonPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNonPlayerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPackModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerEventHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerInputKeyboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerInputMouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerSkill.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonQuest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonRenderTargetManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSafeBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonShop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSkill.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSoundManagerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSystemModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonTextTail.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonTextTailModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\ServerStateChecker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\ServerStateCheckerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\UserInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AbstractApplication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AbstractCharacterManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AbstractChat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AbstractPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AbstractSingleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AccountConnector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AffectFlagContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\GameType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\GuildMarkDownloader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\GuildMarkUploader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InsultChecker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\Locale.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\MarkImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\MarkManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\NetworkActorManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonAcce.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonBackground.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonCharacterManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonChat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonDynamicModuleNames.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonEventManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonExchange.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonGuild.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonIME.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonMessenger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonMiniMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNonPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerEventHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonQuest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonRenderTargetManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSafeBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonShop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSkill.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonTextTail.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\ServerStateChecker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\Version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\affects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\applys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\building.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\cache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\cast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\common_incl.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\d3dtype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\defines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\file_ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\item_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\mob_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\packet_def.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\packets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\points.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\singleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\stl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\vnum_helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\M2\Diamas\source\client\eterXClient\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\UserInterface.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{C19892C1-3EB1-3EC6-939F-37BD55D5B0F3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{0ECC5A90-9B54-38DD-BFC2-A9DC1EB33361}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

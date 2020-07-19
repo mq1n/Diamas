@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundInstance2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundInstance3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundInstanceStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundManager2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundManager3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundManagerStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\Stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\Type.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundManager2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundManager3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\SoundManagerStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\Stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\Type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\M2\Diamas\source\client\eterSoundLib\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{C19892C1-3EB1-3EC6-939F-37BD55D5B0F3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{0ECC5A90-9B54-38DD-BFC2-A9DC1EB33361}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

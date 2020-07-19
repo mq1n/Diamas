@@ -1,0 +1,297 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceAttach.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceBattle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceBlend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceCollisionDetection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceFly.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceMotion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceMotionEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstancePosition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceRotation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceSync.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceWeaponTrace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\Area.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\AreaTerrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\DungeonBlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyTrace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyingData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyingInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyingObjectManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\GameEventManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\GameType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\GameUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ItemData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ItemManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorCharacterShadow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorIndexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorLoad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorQuadtree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorRenderHTP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorUpdate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorWater.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\PhysicsObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\Property.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\PropertyLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\PropertyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceDataFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceMotionData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\SnowEnvironment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\SnowParticle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\TerrainDecal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\TerrainPatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\TerrainQuadtree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\WeaponTrace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\Area.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\AreaTerrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\DungeonBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyTrace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyingData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyingInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyingObjectManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\GameEventManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\GameType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\GameUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\Interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ItemData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ItemManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\PhysicsObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\Property.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\PropertyLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\PropertyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceMotionData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceMotionDataEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\SnowEnvironment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\SnowParticle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\TerrainDecal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\TerrainPatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\TerrainQuadtree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\WeaponTrace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{C19892C1-3EB1-3EC6-939F-37BD55D5B0F3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{0ECC5A90-9B54-38DD-BFC2-A9DC1EB33361}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

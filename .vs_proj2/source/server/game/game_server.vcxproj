@@ -1,0 +1,774 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B6A20A12-A779-306C-BF85-0E17FFC8F8F8}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>game_server</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Workspace\M2\Diamas\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">game_server.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">game_server</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Workspace\M2\Diamas\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">game_server.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">game_server</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Workspace\M2\Diamas\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">game_server.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">game_server</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Workspace\M2\Diamas\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">game_server.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">game_server</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\server\..\utilities\NetEngine\include;D:\Workspace\M2\Diamas\source\server\game\..\liblua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;4505;4996;4706</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_="107";_HOSTNAME_="";_DIRECTORY_="D:/Workspace/M2/Diamas";__MAJOR_VERSION__="1";__PRODUCT_VERSION__="1.107";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;_WIN32;__WIN32__;_USE_32BIT_TIME_T;NOMINMAX;_DEBUG;DEBUG;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_=\"107\";_HOSTNAME_=\"\";_DIRECTORY_=\"D:/Workspace/M2/Diamas\";__MAJOR_VERSION__=\"1\";__PRODUCT_VERSION__=\"1.107\";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;_WIN32;__WIN32__;_USE_32BIT_TIME_T;NOMINMAX;DEBUG;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\server\..\utilities\NetEngine\include;D:\Workspace\M2\Diamas\source\server\game\..\liblua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\server\..\utilities\NetEngine\include;D:\Workspace\M2\Diamas\source\server\game\..\liblua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+cd D:\Workspace\M2\Diamas\win_server
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "LINKING: C:/Program Files/CMake/bin/cmake.exe -E copy D:/Workspace/M2/Diamas/source/server/game/../../../Bin/game_server.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../share/bin/game_server.exe"
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/M2/Diamas/source/server/game/../../../Bin/game_server.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../share/bin/game_server.exe
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "DIR: D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/"
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "SYMLINK-REMOVE: C:/Python27/python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kaldir debug"
+if %errorlevel% neq 0 goto :cmEnd
+C:\Python27\python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kaldir debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "SYMLINK-SETUP: C:/Python27/python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kur debug 86"
+if %errorlevel% neq 0 goto :cmEnd
+C:\Python27\python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kur debug 86
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\liblua\lib\Debug\lualib.lib;..\libthecore\lib\Debug\thecorelib.lib;..\libsql\lib\Debug\sqllib.lib;..\libgame\lib\Debug\gamelib.lib;ws2_32.lib;dbghelp.lib;shlwapi.lib;libmariadb_debug.lib;mariadbclient_debug.lib;cryptopp-static_debug.lib;DevIL.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Workspace/M2/Diamas/Bin/Utilities;D:/Workspace/M2/Diamas/Bin/Utilities/$(Configuration);D:/Workspace/M2/Diamas/extern/lib_win_x86;D:/Workspace/M2/Diamas/extern/lib_win_x86/$(Configuration);D:/Workspace/M2/Diamas/source/server/game/../liblua/lib;D:/Workspace/M2/Diamas/source/server/game/../liblua/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libci.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ImportLibrary>D:/Workspace/M2/Diamas/bin/Debug/game_server.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Workspace/M2/Diamas/bin/game_server.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\server\..\utilities\NetEngine\include;D:\Workspace\M2\Diamas\source\server\game\..\liblua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4100;4505;4996;4706</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_="107";_HOSTNAME_="";_DIRECTORY_="D:/Workspace/M2/Diamas";__MAJOR_VERSION__="1";__PRODUCT_VERSION__="1.107";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;_WIN32;__WIN32__;_USE_32BIT_TIME_T;NOMINMAX;_DEBUG;DEBUG;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_=\"107\";_HOSTNAME_=\"\";_DIRECTORY_=\"D:/Workspace/M2/Diamas\";__MAJOR_VERSION__=\"1\";__PRODUCT_VERSION__=\"1.107\";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;_WIN32;__WIN32__;_USE_32BIT_TIME_T;NOMINMAX;_DEBUG;DEBUG;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\server\..\utilities\NetEngine\include;D:\Workspace\M2\Diamas\source\server\game\..\liblua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\server\..\utilities\NetEngine\include;D:\Workspace\M2\Diamas\source\server\game\..\liblua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+cd D:\Workspace\M2\Diamas\win_server
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "LINKING: C:/Program Files/CMake/bin/cmake.exe -E copy D:/Workspace/M2/Diamas/source/server/game/../../../Bin/game_server.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../share/bin/game_server.exe"
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/M2/Diamas/source/server/game/../../../Bin/game_server.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../share/bin/game_server.exe
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "DIR: D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/"
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "SYMLINK-REMOVE: C:/Python27/python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kaldir debug"
+if %errorlevel% neq 0 goto :cmEnd
+C:\Python27\python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kaldir debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "SYMLINK-SETUP: C:/Python27/python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kur debug 86"
+if %errorlevel% neq 0 goto :cmEnd
+C:\Python27\python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kur debug 86
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\liblua\lib\Release\lualib.lib;..\libthecore\lib\Release\thecorelib.lib;..\libsql\lib\Release\sqllib.lib;..\libgame\lib\Release\gamelib.lib;ws2_32.lib;dbghelp.lib;shlwapi.lib;libmariadb_debug.lib;mariadbclient_debug.lib;cryptopp-static_debug.lib;DevIL.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Workspace/M2/Diamas/Bin/Utilities;D:/Workspace/M2/Diamas/Bin/Utilities/$(Configuration);D:/Workspace/M2/Diamas/extern/lib_win_x86;D:/Workspace/M2/Diamas/extern/lib_win_x86/$(Configuration);D:/Workspace/M2/Diamas/source/server/game/../liblua/lib;D:/Workspace/M2/Diamas/source/server/game/../liblua/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libci.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ImportLibrary>D:/Workspace/M2/Diamas/bin/Release/game_server.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Workspace/M2/Diamas/bin/game_server.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\server\..\utilities\NetEngine\include;D:\Workspace\M2\Diamas\source\server\game\..\liblua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4100;4505;4996;4706</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_="107";_HOSTNAME_="";_DIRECTORY_="D:/Workspace/M2/Diamas";__MAJOR_VERSION__="1";__PRODUCT_VERSION__="1.107";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;_WIN32;__WIN32__;_USE_32BIT_TIME_T;NOMINMAX;_DEBUG;DEBUG;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_=\"107\";_HOSTNAME_=\"\";_DIRECTORY_=\"D:/Workspace/M2/Diamas\";__MAJOR_VERSION__=\"1\";__PRODUCT_VERSION__=\"1.107\";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;_WIN32;__WIN32__;_USE_32BIT_TIME_T;NOMINMAX;_DEBUG;DEBUG;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\server\..\utilities\NetEngine\include;D:\Workspace\M2\Diamas\source\server\game\..\liblua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\server\..\utilities\NetEngine\include;D:\Workspace\M2\Diamas\source\server\game\..\liblua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+cd D:\Workspace\M2\Diamas\win_server
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "LINKING: C:/Program Files/CMake/bin/cmake.exe -E copy D:/Workspace/M2/Diamas/source/server/game/../../../Bin/game_server.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../share/bin/game_server.exe"
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/M2/Diamas/source/server/game/../../../Bin/game_server.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../share/bin/game_server.exe
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "DIR: D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/"
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "SYMLINK-REMOVE: C:/Python27/python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kaldir debug"
+if %errorlevel% neq 0 goto :cmEnd
+C:\Python27\python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kaldir debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "SYMLINK-SETUP: C:/Python27/python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kur debug 86"
+if %errorlevel% neq 0 goto :cmEnd
+C:\Python27\python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kur debug 86
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\liblua\lib\MinSizeRel\lualib.lib;..\libthecore\lib\MinSizeRel\thecorelib.lib;..\libsql\lib\MinSizeRel\sqllib.lib;..\libgame\lib\MinSizeRel\gamelib.lib;ws2_32.lib;dbghelp.lib;shlwapi.lib;libmariadb_debug.lib;mariadbclient_debug.lib;cryptopp-static_debug.lib;DevIL.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Workspace/M2/Diamas/Bin/Utilities;D:/Workspace/M2/Diamas/Bin/Utilities/$(Configuration);D:/Workspace/M2/Diamas/extern/lib_win_x86;D:/Workspace/M2/Diamas/extern/lib_win_x86/$(Configuration);D:/Workspace/M2/Diamas/source/server/game/../liblua/lib;D:/Workspace/M2/Diamas/source/server/game/../liblua/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libci.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ImportLibrary>D:/Workspace/M2/Diamas/bin/MinSizeRel/game_server.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Workspace/M2/Diamas/bin/game_server.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\server\..\utilities\NetEngine\include;D:\Workspace\M2\Diamas\source\server\game\..\liblua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;4505;4996;4706</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_="107";_HOSTNAME_="";_DIRECTORY_="D:/Workspace/M2/Diamas";__MAJOR_VERSION__="1";__PRODUCT_VERSION__="1.107";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;_WIN32;__WIN32__;_USE_32BIT_TIME_T;NOMINMAX;_DEBUG;DEBUG;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_=\"107\";_HOSTNAME_=\"\";_DIRECTORY_=\"D:/Workspace/M2/Diamas\";__MAJOR_VERSION__=\"1\";__PRODUCT_VERSION__=\"1.107\";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;_WIN32;__WIN32__;_USE_32BIT_TIME_T;NOMINMAX;_DEBUG;DEBUG;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\server\..\utilities\NetEngine\include;D:\Workspace\M2\Diamas\source\server\game\..\liblua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\server\..\utilities\NetEngine\include;D:\Workspace\M2\Diamas\source\server\game\..\liblua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+cd D:\Workspace\M2\Diamas\win_server
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "LINKING: C:/Program Files/CMake/bin/cmake.exe -E copy D:/Workspace/M2/Diamas/source/server/game/../../../Bin/game_server.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../share/bin/game_server.exe"
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/M2/Diamas/source/server/game/../../../Bin/game_server.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../share/bin/game_server.exe
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "DIR: D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/"
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "SYMLINK-REMOVE: C:/Python27/python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kaldir debug"
+if %errorlevel% neq 0 goto :cmEnd
+C:\Python27\python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kaldir debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "SYMLINK-SETUP: C:/Python27/python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kur debug 86"
+if %errorlevel% neq 0 goto :cmEnd
+C:\Python27\python.exe D:/Workspace/M2/Diamas/.vs_proj/source/server/game/../../../../win_server/m2panel.py kur debug 86
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\liblua\lib\RelWithDebInfo\lualib.lib;..\libthecore\lib\RelWithDebInfo\thecorelib.lib;..\libsql\lib\RelWithDebInfo\sqllib.lib;..\libgame\lib\RelWithDebInfo\gamelib.lib;ws2_32.lib;dbghelp.lib;shlwapi.lib;libmariadb_debug.lib;mariadbclient_debug.lib;cryptopp-static_debug.lib;DevIL.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Workspace/M2/Diamas/Bin/Utilities;D:/Workspace/M2/Diamas/Bin/Utilities/$(Configuration);D:/Workspace/M2/Diamas/extern/lib_win_x86;D:/Workspace/M2/Diamas/extern/lib_win_x86/$(Configuration);D:/Workspace/M2/Diamas/source/server/game/../liblua/lib;D:/Workspace/M2/Diamas/source/server/game/../liblua/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libci.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ImportLibrary>D:/Workspace/M2/Diamas/bin/RelWithDebInfo/game_server.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Workspace/M2/Diamas/bin/game_server.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\M2\Diamas\source\server\game\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule D:/Workspace/M2/Diamas/source/server/game/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/M2/Diamas -BD:/Workspace/M2/Diamas/.vs_proj --check-stamp-file D:/Workspace/M2/Diamas/.vs_proj/source/server/game/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Workspace\M2\Diamas\.vs_proj\source\server\game\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule D:/Workspace/M2/Diamas/source/server/game/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/M2/Diamas -BD:/Workspace/M2/Diamas/.vs_proj --check-stamp-file D:/Workspace/M2/Diamas/.vs_proj/source/server/game/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Workspace\M2\Diamas\.vs_proj\source\server\game\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule D:/Workspace/M2/Diamas/source/server/game/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/M2/Diamas -BD:/Workspace/M2/Diamas/.vs_proj --check-stamp-file D:/Workspace/M2/Diamas/.vs_proj/source/server/game/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Workspace\M2\Diamas\.vs_proj\source\server\game\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule D:/Workspace/M2/Diamas/source/server/game/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/M2/Diamas -BD:/Workspace/M2/Diamas/.vs_proj --check-stamp-file D:/Workspace/M2/Diamas/.vs_proj/source/server/game/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Workspace\M2\Diamas\.vs_proj\source\server\game\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\FSM.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\abuse.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\activity.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\affect.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\affect_flag.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\ani.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\anticheat_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\arena.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\banword.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\battle.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\battleground.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\belt_inventory_helper.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\blend_item.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\blue_dragon.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\blue_dragon_binder.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\blue_dragon_skill.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\buff_on_attributes.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\buffer_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\building.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\char.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\char_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\cipher.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\cmd.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\config.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\constants.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\crc32.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\crypt_helper.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\cube.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\db.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\debug_allocator.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\debug_allocator_adapter.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\debug_ptr.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\desc.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\desc_client.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\desc_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\desc_p2p.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\dev_log.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\dragon_soul.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\dragon_soul_table.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\dungeon.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\entity.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\event.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\event_queue.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\exchange.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\fifo_allocator.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\file_loader.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\fishing.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\gm.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\gposition.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\group_text_parse_tree.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\guild.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\guild_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\horse_rider.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\input.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\ip_ban.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\item.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\item_addon.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\item_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\item_manager_private_types.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\locale.hpp" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\locale_service.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\log.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\login_data.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\lua_incl.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\lzo_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\lzoconf.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\lzodefs.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\malloc_allocator.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\map_location.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\mark_image.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\mark_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\marriage.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\messenger_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\minilzo.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\mining.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\mob_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\motion.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\nearby_scanner.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\object_allocator.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\ox_event.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\p2p.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\packet_info.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\party.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\pet_system.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\polymorph.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\pool.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\priv_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\profiler.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\protocol.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\pvp.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\quest.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\quest_event.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\quest_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\quest_npc.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\quest_pc.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\refine.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\regen.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\rsa.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\safebox.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\sectree.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\sectree_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\shop.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\shop_extented.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\shop_manager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\skill.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\skill_power.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\spam.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\stable_priority_queue.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\start_position.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\state.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\stdafx.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\target.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\text_file_loader.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\threeway_war.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\typedef.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\unique_item.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\utils.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\vector.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\vid.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\war_map.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\wedding.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\server\game\src\xmas_event.h" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\FSM.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\abuse.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\activity.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\affect.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\ani.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\anticheat_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\arena.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\banword.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\battle.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\battleground.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\battleground_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\battleground_queue.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\battleground_room.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\battleground_team.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\blend_item.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\blue_dragon.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\blue_dragon_binder.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\buff_on_attributes.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\buffer_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\building.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\char.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\char_affect.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\char_battle.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\char_change_empire.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\char_dragon_soul.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\char_horse.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\char_item.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\char_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\char_quickslot.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\char_resist.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\char_skill.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\char_state.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\cipher.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\cmd.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\cmd_emotion.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\cmd_general.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\cmd_gm.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\cmd_ox_event.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\config.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\constants.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\crc32.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\crypt_helper.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\cube.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\db.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\desc.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\desc_client.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\desc_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\desc_p2p.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\dev_log.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\dragon_soul.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\dragon_soul_table.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\dungeon.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\entity.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\entity_view.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\event.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\event_queue.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\exchange.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\file_loader.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\fishing.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\gm.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\group_text_parse_tree.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\guild.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\guild_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\guild_war.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\horse_rider.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\input.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\input_auth.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\input_db.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\input_login.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\input_main.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\input_p2p.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\ip_ban.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\item.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\item_addon.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\item_attribute.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\item_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\item_manager_idrange.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\item_manager_read_tables.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\locale.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\locale_service.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\log.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\login_data.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\lzo_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\main.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\map_location.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\mark_convert.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\mark_image.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\mark_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\marriage.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\messenger_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\minilzo.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\mining.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\mob_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\motion.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\nearby_scanner.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\ox_event.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\p2p.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\packet_info.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\party.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\pet_system.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\polymorph.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\priv_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\pvp.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\quest_event.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\quest_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\quest_npc.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\quest_pc.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_affect.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_arena.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_building.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_danceevent.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_dragonsoul.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_dungeon.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_forked.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_game.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_global.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_guild.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_horse.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_item.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_marriage.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_npc.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_oxevent.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_party.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_pc.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_pet.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_quest.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\questlua_target.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\refine.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\regen.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\rsa.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\safebox.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\sectree.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\sectree_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\shop.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\shop_extented.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\shop_manager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\skill.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\skill_power.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\start_position.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\target.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\text_file_loader.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\threeway_war.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\trigger.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\utils.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\vector.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\version.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\war_map.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\wedding.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\server\game\src\xmas_event.cpp" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\affects.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\applys.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\building.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\cache.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\cast.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\common_incl.hpp" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\constants.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\d3dtype.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\defines.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\file_ptr.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\item_data.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\mob_data.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\packet_def.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\packets.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\points.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\pool.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\singleton.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\stl.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\tables.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\utils.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\vnum_helper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\ZERO_CHECK.vcxproj">
+      <Project>{686D621B-9E7F-3715-B8FB-2B1D57087D64}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\server\libgame\gamelib.vcxproj">
+      <Project>{8210DBD4-B6B9-32FD-9E55-03B651D687A3}</Project>
+      <Name>gamelib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\server\liblua\lualib.vcxproj">
+      <Project>{164DF64D-727C-3C1F-BC97-70DA495ADEF6}</Project>
+      <Name>lualib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\server\libsql\sqllib.vcxproj">
+      <Project>{63BE10A2-5D5B-3388-ACBD-27BC33A7905E}</Project>
+      <Name>sqllib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\server\libthecore\thecorelib.vcxproj">
+      <Project>{BF755BD1-D443-3C1A-8353-23217ACA303E}</Project>
+      <Name>thecorelib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

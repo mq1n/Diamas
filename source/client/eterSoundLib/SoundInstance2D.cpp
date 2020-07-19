@@ -7,7 +7,7 @@ CSoundInstance2D::CSoundInstance2D() : m_sample(nullptr), m_pSoundData(nullptr)
 
 CSoundInstance2D::~CSoundInstance2D()
 {
-	Destroy();
+//	Destroy();
 }
 
 void CSoundInstance2D::Destroy()

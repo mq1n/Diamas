@@ -51,6 +51,7 @@ typedef struct _ARCHIVER_CONTEXT
 	std::wstring				strVisualDirectory;
 	int32_t						iType;
 	int32_t						iVersion;
+	bool						bCythonEnabled;
 	std::vector <std::wstring>	vIgnores;
 	std::vector <SPatchContext>	vPatches;
 } SArchiveContext;
@@ -148,6 +149,21 @@ bool InitializeConfigFile(FileSystemManager * fs, const std::string & strConfigF
 				return false;
 			}
 			FileSystem::Log(LL_SYS, "dir: %s", pkDir.GetString());
+
+			auto stDir = std::string(pkDir.GetString());
+			auto bCythonEnabled = false;
+			if (stDir == "source/root" || stDir == "root")
+			{
+				auto& pkCythonEnabled = document[i]["cython_enabled"];
+				if (pkCythonEnabled.IsNull() || !pkCythonEnabled.IsBool())
+				{
+					FileSystem::Log(LL_ERR, "'cython_enabled' key not found in current node: %u", i);
+					document.Clear();
+					return false;
+				}
+				bCythonEnabled = pkCythonEnabled.GetBool();
+				FileSystem::Log(LL_SYS, "Cython: %s", bCythonEnabled ? "enabled" : "disabled");
+			}
 			
 			auto& pkVisualDir = document[i]["visualdir"];
 			if (pkVisualDir.IsNull() || !pkVisualDir.IsString())
@@ -211,6 +227,8 @@ bool InitializeConfigFile(FileSystemManager * fs, const std::string & strConfigF
 				return false;
 			}
 			// FileSystem::Log(0, "Directory: %ls", ctx->stArchiveDirectory.c_str());
+
+			ctx->bCythonEnabled = bCythonEnabled;
 
 			auto stTargetArchiveName = GetNameFromPath(dir);
 			if (!stSpecificArchive.empty() && stSpecificArchive != stTargetArchiveName)
@@ -416,6 +434,7 @@ bool ProcessArchiveFile(FileSystemManager * fs, const std::shared_ptr <SArchiveC
 		if (entry.is_directory())
 			continue;
 
+		auto extension = entry.path().extension().wstring();
 		auto namewithoutpath = entry.path().wstring();
 		auto wstrdirectory = std::wstring(pack->stArchiveDirectory.begin(), pack->stArchiveDirectory.end());
 		std::size_t pos = namewithoutpath.find(wstrdirectory + L"\\");
@@ -453,6 +472,14 @@ bool ProcessArchiveFile(FileSystemManager * fs, const std::shared_ptr <SArchiveC
 		}
 
 		auto skipfile = false;
+
+		if (pack->bCythonEnabled &&
+			namewithoutpath.find(L'/') == std::wstring::npos &&
+			extension == L".py")
+		{
+			skipfile = true;
+		}
+
 		for (const auto & ignore : pack->vIgnores)
 		{
 			if (WildcardMatch(namewithoutpath.c_str(), ignore.c_str()))

@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5B764944-6132-368F-A07A-A181F2724A7B}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>eterGameLib</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Workspace\M2\Diamas\bin\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">eterGameLib.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">eterGameLib</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Workspace\M2\Diamas\bin\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">eterGameLib.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">eterGameLib</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Workspace\M2\Diamas\bin\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">eterGameLib.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">eterGameLib</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Workspace\M2\Diamas\bin\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">eterGameLib.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">eterGameLib</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>5033</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_="107";_HOSTNAME_="";_DIRECTORY_="D:/Workspace/M2/Diamas";__MAJOR_VERSION__="1";__PRODUCT_VERSION__="1.107";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_=\"107\";_HOSTNAME_=\"\";_DIRECTORY_=\"D:/Workspace/M2/Diamas\";__MAJOR_VERSION__=\"1\";__PRODUCT_VERSION__=\"1.107\";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>5033</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_="107";_HOSTNAME_="";_DIRECTORY_="D:/Workspace/M2/Diamas";__MAJOR_VERSION__="1";__PRODUCT_VERSION__="1.107";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_=\"107\";_HOSTNAME_=\"\";_DIRECTORY_=\"D:/Workspace/M2/Diamas\";__MAJOR_VERSION__=\"1\";__PRODUCT_VERSION__=\"1.107\";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>5033</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_="107";_HOSTNAME_="";_DIRECTORY_="D:/Workspace/M2/Diamas";__MAJOR_VERSION__="1";__PRODUCT_VERSION__="1.107";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_=\"107\";_HOSTNAME_=\"\";_DIRECTORY_=\"D:/Workspace/M2/Diamas\";__MAJOR_VERSION__=\"1\";__PRODUCT_VERSION__=\"1.107\";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>5033</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_="107";_HOSTNAME_="";_DIRECTORY_="D:/Workspace/M2/Diamas";__MAJOR_VERSION__="1";__PRODUCT_VERSION__="1.107";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_=\"107\";_HOSTNAME_=\"\";_DIRECTORY_=\"D:/Workspace/M2/Diamas\";__MAJOR_VERSION__=\"1\";__PRODUCT_VERSION__=\"1.107\";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule D:/Workspace/M2/Diamas/source/client/eterGameLib/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/M2/Diamas -BD:/Workspace/M2/Diamas/.vs_proj --check-stamp-file D:/Workspace/M2/Diamas/.vs_proj/source/client/eterGameLib/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Workspace\M2\Diamas\.vs_proj\source\client\eterGameLib\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule D:/Workspace/M2/Diamas/source/client/eterGameLib/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/M2/Diamas -BD:/Workspace/M2/Diamas/.vs_proj --check-stamp-file D:/Workspace/M2/Diamas/.vs_proj/source/client/eterGameLib/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Workspace\M2\Diamas\.vs_proj\source\client\eterGameLib\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule D:/Workspace/M2/Diamas/source/client/eterGameLib/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/M2/Diamas -BD:/Workspace/M2/Diamas/.vs_proj --check-stamp-file D:/Workspace/M2/Diamas/.vs_proj/source/client/eterGameLib/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Workspace\M2\Diamas\.vs_proj\source\client\eterGameLib\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule D:/Workspace/M2/Diamas/source/client/eterGameLib/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/M2/Diamas -BD:/Workspace/M2/Diamas/.vs_proj --check-stamp-file D:/Workspace/M2/Diamas/.vs_proj/source/client/eterGameLib/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Workspace\M2\Diamas\.vs_proj\source\client\eterGameLib\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstance.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceInterface.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\Area.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\AreaTerrain.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\DungeonBlock.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyHandler.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyTarget.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyTrace.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyingData.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyingInstance.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyingObjectManager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\GameEventManager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\GameType.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\GameUtil.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\Interface.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ItemData.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ItemManager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapBase.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapManager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoor.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapType.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapUtil.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\PhysicsObject.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\Property.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\PropertyLoader.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\PropertyManager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceData.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceManager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceMotionData.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceMotionDataEvent.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\SnowEnvironment.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\SnowParticle.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\StdAfx.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\TerrainDecal.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\TerrainPatch.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\TerrainQuadtree.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\WeaponTrace.h" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstance.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceAttach.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceBattle.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceBlend.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceCollisionDetection.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceData.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceEvent.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceFly.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceMotion.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceMotionEvent.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstancePosition.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceRender.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceRotation.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceSync.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ActorInstanceWeaponTrace.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\Area.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\AreaTerrain.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\DungeonBlock.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyTarget.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyTrace.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyingData.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyingInstance.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\FlyingObjectManager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\GameEventManager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\GameType.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\GameUtil.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ItemData.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\ItemManager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapBase.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapManager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoor.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorCharacterShadow.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorIndexBuffer.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorLoad.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorQuadtree.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorRender.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorRenderHTP.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorUpdate.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapOutdoorWater.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapType.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\MapUtil.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\PhysicsObject.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\Property.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\PropertyLoader.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\PropertyManager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceData.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceDataFile.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceManager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\RaceMotionData.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\SnowEnvironment.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\SnowParticle.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\StdAfx.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\TerrainDecal.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\TerrainPatch.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\TerrainQuadtree.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterGameLib\WeaponTrace.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\ZERO_CHECK.vcxproj">
+      <Project>{686D621B-9E7F-3715-B8FB-2B1D57087D64}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -17,6 +17,10 @@
 #include "../eterTerrainLib/StdAfx.h"
 #include "../eterTreeLib/StdAfx.h"
 
+#ifdef __USE_CYTHON__
+#include "PythonrootlibManager.h"
+#endif
+
 #ifndef __D3DRM_H__
 #define __D3DRM_H__
 #endif
@@ -31,10 +35,6 @@
 #include "Locale.h"
 
 #include "GameType.h"
-
-#ifdef __USE_CYTHON__
-#include "PythonrootlibManager.h"
-#endif
 
 void initapp();
 void initime();

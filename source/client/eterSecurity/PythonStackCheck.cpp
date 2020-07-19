@@ -16,20 +16,34 @@ CPythonStackController::~CPythonStackController()
 
 std::string CPythonStackController::GetReferenceFileName()
 {
-	PyThreadState * ts = PyThreadState_Get();
-	PyFrameObject* frame = ts->frame;
+	auto out = ""s;
 
-	char const* c_szCallerFileName = PyString_AsString(frame->f_code->co_filename);
-	return c_szCallerFileName;
+	const auto ts = PyThreadState_Get();
+	if (!ts)
+		return out;
+
+	const auto frame = ts->frame;
+	if (!frame)
+		return out;
+
+	out = PyString_AsString(frame->f_code->co_filename);
+	return out;
 }
 
 std::string CPythonStackController::GetReferenceFunctionName()
 {
-	PyThreadState * ts = PyThreadState_Get();
-	PyFrameObject* frame = ts->frame;
+	auto out = ""s;
 
-	char const* c_szCallerFunctionName = PyString_AsString(frame->f_code->co_name);
-	return c_szCallerFunctionName;
+	const auto ts = PyThreadState_Get();
+	if (!ts)
+		return out;
+
+	const auto frame = ts->frame;
+	if (!frame)
+		return out;
+
+	out = PyString_AsString(frame->f_code->co_name);
+	return out;
 }
 
 

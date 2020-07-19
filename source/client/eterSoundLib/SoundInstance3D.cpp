@@ -8,7 +8,7 @@ CSoundInstance3D::CSoundInstance3D() : m_sample(nullptr), m_pSoundData(nullptr)
 
 CSoundInstance3D::~CSoundInstance3D()
 {
-	Destroy();
+//	Destroy();
 }
 
 void CSoundInstance3D::Destroy()

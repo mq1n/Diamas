@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.2)
 project(client)
 
+if (ENABLE_CYTHON)
+	add_definitions(-DDISTRIBUTE_CYTHON=1)
+	add_definitions(-D__USE_CYTHON__)
+endif()
+
 # Kayma sorunu(?) için: add_definitions(-D_WIN32_WINNT_WINXP)
 add_definitions(-DNOMINMAX)
 add_definitions(-DBUILDING_GRANNY_STATIC=1)
@@ -29,7 +34,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS} ${MT_BUILD}")
 include_directories(${PROJECT_SOURCE_DIR}/../utilities/FileSystem/FSLib/include)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/eterBase)
-# add_subdirectory(${PROJECT_SOURCE_DIR}/eterCythonLib)
+if (ENABLE_CYTHON)
+	add_subdirectory(${PROJECT_SOURCE_DIR}/eterCythonLib)
+endif()
 add_subdirectory(${PROJECT_SOURCE_DIR}/eterEffectLib)
 add_subdirectory(${PROJECT_SOURCE_DIR}/eterGameLib)
 add_subdirectory(${PROJECT_SOURCE_DIR}/eterGrnLib)

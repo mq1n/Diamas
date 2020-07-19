@@ -1,0 +1,614 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C2F4CA0B-D36D-37E5-9403-95AEB4BB9B49}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>client_debug_86</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Workspace\M2\Diamas\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">client_debug_86.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">client_debug_86</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Workspace\M2\Diamas\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">client_debug_86.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">client_debug_86</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Workspace\M2\Diamas\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">client_debug_86.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">client_debug_86</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Workspace\M2\Diamas\bin\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">client_debug_86.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">client_debug_86</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>5033</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_="107";_HOSTNAME_="";_DIRECTORY_="D:/Workspace/M2/Diamas";__MAJOR_VERSION__="1";__PRODUCT_VERSION__="1.107";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;_DEBUG;DEBUG;USE_LOD;DUNGEON_WORK;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_=\"107\";_HOSTNAME_=\"\";_DIRECTORY_=\"D:/Workspace/M2/Diamas\";__MAJOR_VERSION__=\"1\";__PRODUCT_VERSION__=\"1.107\";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;DEBUG;USE_LOD;DUNGEON_WORK;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/M2/Diamas/source/client/eterXClient/../../../Bin/client_debug_86.exe D:/Workspace/M2/Diamas/.vs_proj/source/client/eterXClient/../../../../../Diamas_client/client_debug_86.exe
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\..\..\..\bin\Debug\eterBase.lib;..\..\..\..\bin\Debug\eterEffectLib.lib;..\..\..\..\bin\Debug\eterGameLib.lib;..\..\..\..\bin\Debug\eterGrnLib.lib;..\..\..\..\bin\Debug\eterImageLib.lib;..\..\..\..\bin\Debug\eterLib.lib;..\..\..\..\bin\Debug\eterPythonLib.lib;..\..\..\..\bin\Debug\eterScriptLib.lib;..\..\..\..\bin\Debug\eterSoundLib.lib;..\..\..\..\bin\Debug\eterSphereLib.lib;..\..\..\..\bin\Debug\eterSecurity.lib;..\..\..\..\bin\Debug\eterTerrainLib.lib;..\..\..\..\bin\Debug\eterTreeLib.lib;..\..\..\..\bin\Debug\eterWebBrowser.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Workspace/M2/Diamas/Bin/Utilities;D:/Workspace/M2/Diamas/Bin/Utilities/$(Configuration);D:/Workspace/M2/Diamas/extern/lib_win_x86;D:/Workspace/M2/Diamas/extern/lib_win_x86/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <EnableUAC>true</EnableUAC>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libci.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ImportLibrary>D:/Workspace/M2/Diamas/bin/Debug/client_debug_86.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Workspace/M2/Diamas/bin/client_debug_86.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <UACUIAccess>false</UACUIAccess>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>5033</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_="107";_HOSTNAME_="";_DIRECTORY_="D:/Workspace/M2/Diamas";__MAJOR_VERSION__="1";__PRODUCT_VERSION__="1.107";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;_DEBUG;DEBUG;USE_LOD;DUNGEON_WORK;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_=\"107\";_HOSTNAME_=\"\";_DIRECTORY_=\"D:/Workspace/M2/Diamas\";__MAJOR_VERSION__=\"1\";__PRODUCT_VERSION__=\"1.107\";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;_DEBUG;DEBUG;USE_LOD;DUNGEON_WORK;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/M2/Diamas/source/client/eterXClient/../../../Bin/client_debug_86.exe D:/Workspace/M2/Diamas/.vs_proj/source/client/eterXClient/../../../../../Diamas_client/client_debug_86.exe
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\..\..\..\bin\Release\eterBase.lib;..\..\..\..\bin\Release\eterEffectLib.lib;..\..\..\..\bin\Release\eterGameLib.lib;..\..\..\..\bin\Release\eterGrnLib.lib;..\..\..\..\bin\Release\eterImageLib.lib;..\..\..\..\bin\Release\eterLib.lib;..\..\..\..\bin\Release\eterPythonLib.lib;..\..\..\..\bin\Release\eterScriptLib.lib;..\..\..\..\bin\Release\eterSoundLib.lib;..\..\..\..\bin\Release\eterSphereLib.lib;..\..\..\..\bin\Release\eterSecurity.lib;..\..\..\..\bin\Release\eterTerrainLib.lib;..\..\..\..\bin\Release\eterTreeLib.lib;..\..\..\..\bin\Release\eterWebBrowser.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Workspace/M2/Diamas/Bin/Utilities;D:/Workspace/M2/Diamas/Bin/Utilities/$(Configuration);D:/Workspace/M2/Diamas/extern/lib_win_x86;D:/Workspace/M2/Diamas/extern/lib_win_x86/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <EnableUAC>true</EnableUAC>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libci.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ImportLibrary>D:/Workspace/M2/Diamas/bin/Release/client_debug_86.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Workspace/M2/Diamas/bin/client_debug_86.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <UACUIAccess>false</UACUIAccess>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>5033</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_="107";_HOSTNAME_="";_DIRECTORY_="D:/Workspace/M2/Diamas";__MAJOR_VERSION__="1";__PRODUCT_VERSION__="1.107";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;_DEBUG;DEBUG;USE_LOD;DUNGEON_WORK;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_=\"107\";_HOSTNAME_=\"\";_DIRECTORY_=\"D:/Workspace/M2/Diamas\";__MAJOR_VERSION__=\"1\";__PRODUCT_VERSION__=\"1.107\";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;_DEBUG;DEBUG;USE_LOD;DUNGEON_WORK;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/M2/Diamas/source/client/eterXClient/../../../Bin/client_debug_86.exe D:/Workspace/M2/Diamas/.vs_proj/source/client/eterXClient/../../../../../Diamas_client/client_debug_86.exe
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\..\..\..\bin\MinSizeRel\eterBase.lib;..\..\..\..\bin\MinSizeRel\eterEffectLib.lib;..\..\..\..\bin\MinSizeRel\eterGameLib.lib;..\..\..\..\bin\MinSizeRel\eterGrnLib.lib;..\..\..\..\bin\MinSizeRel\eterImageLib.lib;..\..\..\..\bin\MinSizeRel\eterLib.lib;..\..\..\..\bin\MinSizeRel\eterPythonLib.lib;..\..\..\..\bin\MinSizeRel\eterScriptLib.lib;..\..\..\..\bin\MinSizeRel\eterSoundLib.lib;..\..\..\..\bin\MinSizeRel\eterSphereLib.lib;..\..\..\..\bin\MinSizeRel\eterSecurity.lib;..\..\..\..\bin\MinSizeRel\eterTerrainLib.lib;..\..\..\..\bin\MinSizeRel\eterTreeLib.lib;..\..\..\..\bin\MinSizeRel\eterWebBrowser.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Workspace/M2/Diamas/Bin/Utilities;D:/Workspace/M2/Diamas/Bin/Utilities/$(Configuration);D:/Workspace/M2/Diamas/extern/lib_win_x86;D:/Workspace/M2/Diamas/extern/lib_win_x86/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <EnableUAC>true</EnableUAC>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libci.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ImportLibrary>D:/Workspace/M2/Diamas/bin/MinSizeRel/client_debug_86.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Workspace/M2/Diamas/bin/client_debug_86.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <UACUIAccess>false</UACUIAccess>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>5033</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_="107";_HOSTNAME_="";_DIRECTORY_="D:/Workspace/M2/Diamas";__MAJOR_VERSION__="1";__PRODUCT_VERSION__="1.107";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;_DEBUG;DEBUG;USE_LOD;DUNGEON_WORK;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_BUILD_SYSTEM;JM_XORSTR_DISABLE_AVX_INTRINSICS;CRYPTOPP_ENABLE_NAMESPACE_WEAK=1;ASIO_STANDALONE;USE_BOOST_ASIO=0;TARGET_ARCH=86;_GIT_VERSION_=\"107\";_HOSTNAME_=\"\";_DIRECTORY_=\"D:/Workspace/M2/Diamas\";__MAJOR_VERSION__=\"1\";__PRODUCT_VERSION__=\"1.107\";__FILE_VERSION__=1,107,0,0;__DIAMAS_VERSION__=1107;NOMINMAX;BUILDING_GRANNY_STATIC=1;_HAS_STD_BYTE=0;WINDOWS_IGNORE_PACKING_MISMATCH;_DEBUG;DEBUG;USE_LOD;DUNGEON_WORK;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Workspace\M2\Diamas\extern\include;D:\Workspace\M2\Diamas\extern\include\d3d9;D:\Workspace\M2\Diamas\extern\3rd;D:\Workspace\M2\Diamas\source\client\..\utilities\FileSystem\FSLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/M2/Diamas/source/client/eterXClient/../../../Bin/client_debug_86.exe D:/Workspace/M2/Diamas/.vs_proj/source/client/eterXClient/../../../../../Diamas_client/client_debug_86.exe
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\..\..\..\bin\RelWithDebInfo\eterBase.lib;..\..\..\..\bin\RelWithDebInfo\eterEffectLib.lib;..\..\..\..\bin\RelWithDebInfo\eterGameLib.lib;..\..\..\..\bin\RelWithDebInfo\eterGrnLib.lib;..\..\..\..\bin\RelWithDebInfo\eterImageLib.lib;..\..\..\..\bin\RelWithDebInfo\eterLib.lib;..\..\..\..\bin\RelWithDebInfo\eterPythonLib.lib;..\..\..\..\bin\RelWithDebInfo\eterScriptLib.lib;..\..\..\..\bin\RelWithDebInfo\eterSoundLib.lib;..\..\..\..\bin\RelWithDebInfo\eterSphereLib.lib;..\..\..\..\bin\RelWithDebInfo\eterSecurity.lib;..\..\..\..\bin\RelWithDebInfo\eterTerrainLib.lib;..\..\..\..\bin\RelWithDebInfo\eterTreeLib.lib;..\..\..\..\bin\RelWithDebInfo\eterWebBrowser.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Workspace/M2/Diamas/Bin/Utilities;D:/Workspace/M2/Diamas/Bin/Utilities/$(Configuration);D:/Workspace/M2/Diamas/extern/lib_win_x86;D:/Workspace/M2/Diamas/extern/lib_win_x86/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <EnableUAC>true</EnableUAC>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libci.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ImportLibrary>D:/Workspace/M2/Diamas/bin/RelWithDebInfo/client_debug_86.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Workspace/M2/Diamas/bin/client_debug_86.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <UACUIAccess>false</UACUIAccess>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\M2\Diamas\source\client\eterXClient\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule D:/Workspace/M2/Diamas/source/client/eterXClient/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/M2/Diamas -BD:/Workspace/M2/Diamas/.vs_proj --check-stamp-file D:/Workspace/M2/Diamas/.vs_proj/source/client/eterXClient/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Workspace\M2\Diamas\.vs_proj\source\client\eterXClient\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule D:/Workspace/M2/Diamas/source/client/eterXClient/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/M2/Diamas -BD:/Workspace/M2/Diamas/.vs_proj --check-stamp-file D:/Workspace/M2/Diamas/.vs_proj/source/client/eterXClient/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Workspace\M2\Diamas\.vs_proj\source\client\eterXClient\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule D:/Workspace/M2/Diamas/source/client/eterXClient/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/M2/Diamas -BD:/Workspace/M2/Diamas/.vs_proj --check-stamp-file D:/Workspace/M2/Diamas/.vs_proj/source/client/eterXClient/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Workspace\M2\Diamas\.vs_proj\source\client\eterXClient\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule D:/Workspace/M2/Diamas/source/client/eterXClient/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/M2/Diamas -BD:/Workspace/M2/Diamas/.vs_proj --check-stamp-file D:/Workspace/M2/Diamas/.vs_proj/source/client/eterXClient/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Workspace\M2\Diamas\.vs_proj\source\client\eterXClient\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AbstractApplication.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AbstractCharacterManager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AbstractChat.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AbstractPlayer.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AbstractSingleton.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AccountConnector.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AffectFlagContainer.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\GameType.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\GuildMarkDownloader.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\GuildMarkUploader.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBase.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InsultChecker.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\Locale.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\MarkImage.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\MarkManager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\NetworkActorManager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonAcce.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplication.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonBackground.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonCharacterManager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonChat.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonDynamicModuleNames.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonEventManager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonExchange.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonGuild.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonIME.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonItem.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonMessenger.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonMiniMap.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStream.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNonPlayer.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayer.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerEventHandler.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonQuest.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonRenderTargetManager.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSafeBox.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonShop.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSkill.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSystem.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonTextTail.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\ServerStateChecker.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\StdAfx.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\Version.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\client\eterXClient\resource.h" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AccountConnector.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\AffectFlagContainer.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\CameraProcedure.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\GameType.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\GuildMarkDownloader.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\GuildMarkUploader.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBase.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBaseBattle.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBaseEffect.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBaseEvent.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBaseMotion.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBaseMovement.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InstanceBaseTransform.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\InsultChecker.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\Locale.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\MarkImage.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\MarkManager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\NetworkActorManager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonAcce.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplication.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplicationCamera.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplicationCursor.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplicationEvent.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplicationModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplicationProcedure.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonApplicationWebPage.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonBackground.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonBackgroundModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonCharacterManager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonCharacterManagerModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonCharacterModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonChat.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonChatModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonDynamicModuleNames.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonEffectModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonEventManager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonEventManagerModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonExchange.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonExchangeModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonFlyModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonGameEventManagerModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonGuild.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonIME.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonIMEModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonItem.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonItemModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonMessenger.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonMiniMap.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonMiniMapModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStream.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamCommand.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamEvent.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseGame.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseGameActor.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseGameItem.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseHandShake.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseLoading.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseLogin.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseOffline.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNetworkStreamPhaseSelect.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNonPlayer.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonNonPlayerModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPackModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayer.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerEventHandler.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerInput.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerInputKeyboard.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerInputMouse.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonPlayerSkill.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonQuest.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonRenderTargetManager.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSafeBox.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonShop.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSkill.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSoundManagerModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSystem.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonSystemModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonTextTail.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\PythonTextTailModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\ServerStateChecker.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\ServerStateCheckerModule.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\StdAfx.cpp" />
+    <ClCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\UserInterface.cpp" />
+    <ResourceCompile Include="D:\Workspace\M2\Diamas\source\client\eterXClient\UserInterface.rc" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\affects.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\applys.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\building.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\cache.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\cast.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\common_incl.hpp" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\constants.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\d3dtype.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\defines.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\file_ptr.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\item_data.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\mob_data.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\packet_def.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\packets.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\points.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\pool.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\singleton.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\stl.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\tables.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\utils.h" />
+    <ClInclude Include="D:\Workspace\M2\Diamas\source\common\vnum_helper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\ZERO_CHECK.vcxproj">
+      <Project>{686D621B-9E7F-3715-B8FB-2B1D57087D64}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterBase\eterBase.vcxproj">
+      <Project>{94013AD1-168C-3806-98C4-EAA66F9D5AF4}</Project>
+      <Name>eterBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterEffectLib\eterEffectLib.vcxproj">
+      <Project>{DBE7E45F-DC6A-3DF6-9FDC-A43D87C27294}</Project>
+      <Name>eterEffectLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterGameLib\eterGameLib.vcxproj">
+      <Project>{5B764944-6132-368F-A07A-A181F2724A7B}</Project>
+      <Name>eterGameLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterGrnLib\eterGrnLib.vcxproj">
+      <Project>{341166DB-10E6-3AC9-8172-E9DC55DFACD1}</Project>
+      <Name>eterGrnLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterImageLib\eterImageLib.vcxproj">
+      <Project>{01D78922-993C-389F-9137-A75E0E475959}</Project>
+      <Name>eterImageLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterLib\eterLib.vcxproj">
+      <Project>{9B503CE6-C00E-3317-8D09-E97CEA0D739A}</Project>
+      <Name>eterLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterPythonLib\eterPythonLib.vcxproj">
+      <Project>{5B99C1EB-39BA-33B8-8A8E-AE24057FB3DB}</Project>
+      <Name>eterPythonLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterScriptLib\eterScriptLib.vcxproj">
+      <Project>{C5ABA8FA-DAE5-34D3-BBAE-8D10C6D2B004}</Project>
+      <Name>eterScriptLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterSecurity\eterSecurity.vcxproj">
+      <Project>{6B58816E-1783-353D-9BC8-5D2738054F4F}</Project>
+      <Name>eterSecurity</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterSoundLib\eterSoundLib.vcxproj">
+      <Project>{B1B95439-F134-3C0A-AC8E-9DAD55C4F453}</Project>
+      <Name>eterSoundLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterSphereLib\eterSphereLib.vcxproj">
+      <Project>{EC8730A8-90D5-3B60-BF34-097FAC2D50B0}</Project>
+      <Name>eterSphereLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterTerrainLib\eterTerrainLib.vcxproj">
+      <Project>{2F75DAB7-7498-3A9C-8BCB-CC148FB7552B}</Project>
+      <Name>eterTerrainLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterTreeLib\eterTreeLib.vcxproj">
+      <Project>{C13C346E-3984-3029-8FF6-B1737765591D}</Project>
+      <Name>eterTreeLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\M2\Diamas\.vs_proj\source\client\eterWebBrowser\eterWebBrowser.vcxproj">
+      <Project>{D81C9B45-9874-33B8-9918-18CC9BC591AA}</Project>
+      <Name>eterWebBrowser</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

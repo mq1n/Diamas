@@ -23,41 +23,43 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release")
 	add_definitions(-D_NDEBUG)
 	add_definitions(-DNDEBUG)
-	add_definitions(-DDISTRIBUTE_CYTHON=1)
 	add_definitions(-D_DISTRIBUTE)
 	add_definitions(-DUSE_LOD)
 	add_definitions(-DDUNGEON_WORK)
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
 	add_definitions(-D_NDEBUG)
 	add_definitions(-DNDEBUG)
-	add_definitions(-DDISTRIBUTE_CYTHON=1)
 	add_definitions(-D_DISTRIBUTE)
 	add_definitions(-DUSE_LOD)
 	add_definitions(-DDUNGEON_WORK)
 elseif(${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel")
 	add_definitions(-D_NDEBUG)
 	add_definitions(-DNDEBUG)
-	add_definitions(-DDISTRIBUTE_CYTHON=1)
 	add_definitions(-D_DISTRIBUTE)
 	add_definitions(-DUSE_LOD)
 	add_definitions(-DDUNGEON_WORK)
 endif()
 
 file(GLOB ETERCLIENT_HEADERS
-    "*.h"
-    "*.hpp"
+    "${PROJECT_SOURCE_DIR}/*.h"
+    "${PROJECT_SOURCE_DIR}/*.hpp"
 )
 file(GLOB ETERCLIENT_SOURCES
-    "*.c"
-    "*.cpp"
+    "${PROJECT_SOURCE_DIR}/*.c"
+    "${PROJECT_SOURCE_DIR}/*.cpp"
 )
 file(GLOB ETERCLIENT_OTHER_INPUT
-    "*.rc"
+    "${PROJECT_SOURCE_DIR}/*.rc"
 )
 add_executable(${EXE_NAME} WIN32 ${ETERCLIENT_HEADERS} ${ETERCLIENT_SOURCES} ${ETERCLIENT_OTHER_INPUT})
 
 SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES LINK_FLAGS    "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:WINDOWS")
-target_link_libraries(${EXE_NAME} sourceCommon eterBase eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterSecurity eterTerrainLib eterTreeLib eterWebBrowser ${EXTRA_LIBS})
+
+if (ENABLE_CYTHON)
+	set(CYTHON_LIB eterCythonLib)
+endif()
+
+target_link_libraries(${EXE_NAME} sourceCommon eterBase ${CYTHON_LIB} eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterSecurity eterTerrainLib eterTreeLib eterWebBrowser)
 
 set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
@@ -67,7 +69,7 @@ if (ENABLE_STATIC_ANALYSIS)
 	pvs_studio_add_target(
 		TARGET client.analyze ALL
         OUTPUT FORMAT errorfile
-        ANALYZE ${EXE_NAME} eterBase eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterSecurity eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterSecurity eterTerrainLib eterTreeLib eterWebBrowser
+        ANALYZE ${EXE_NAME} eterBase ${CYTHON_LIB} eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterSecurity eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterSecurity eterTerrainLib eterTreeLib eterWebBrowser
 		LOG client_analysis.err
 	)
 endif()

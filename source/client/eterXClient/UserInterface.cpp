@@ -187,24 +187,23 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char* lpCmdLine)
 
 	PyModule_AddStringConstant(builtins, "__COMMAND_LINE__", "");
 
-	char szSystemMod[] = { 's', 'y', 's', 't', 'e', 'm', '_', 'p', 'y', 't', 'h', 'o', 'n', 0x0 }; // system_python
-	char szSystemFile[] = { 's', 'y', 's', 't', 'e', 'm', '_', 'p', 'y', 't', 'h', 'o', 'n', '.', 'p', 'y', 0x0 }; // system_python.py
+	char szSystemMod[] = { 's', 'y', 's', 't', 'e', 'm', 0x0 }; // system
+	char szSystemFile[] = { 's', 'y', 's', 't', 'e', 'm', '.', 'p', 'y', 0x0 }; // system.py
 	char szSystemPyFailMsg[] = { 'M', 'a', 'i', 'n', ' ', 's', 'c', 'r', 'i', 'p', 't', ' ', 'i', 'n', 'i', 't', 'i', 'l', 'i', 'z', 'a', 't', 'i', 'o', 'n', ' ', 'f', 'a', 'i', 'l', 'e', 'd', '!', 0x0 }; // Main script initilization failed!
-
-	__PROTECTOR_START__("RunFile")
 
 #ifdef __USE_CYTHON__
 	initrootlibManager();
 	initsystem();
 	PyErr_Print();
 #else
+	__PROTECTOR_START__("RunFile")
 	if (!pyLauncher.RunFile(szSystemFile, szSystemMod))
 	{
 		TraceError(szSystemPyFailMsg);
 		return false;
 	}
-#endif
 	__PROTECTOR_END__("RunFile")
+#endif
 
 	return true;
 }

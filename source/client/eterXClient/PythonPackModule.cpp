@@ -4,6 +4,34 @@
 #include "../eterSecurity/PythonStackCheck.h"
 #include "PythonDynamicModuleNames.h"
 
+std::string GetPackFileData(const std::string& szFileName)
+{
+	CFile file;
+	if (FileSystemManager::Instance().OpenFile(szFileName, file))
+	{
+#ifdef ENABLE_LAYER2_FILE_ENCRYPTION
+		if (FileSystemManager::Instance().DoesFileExist(szFileName, true) && FileSystem::IsLayer2File(szFileName))
+		{ // archived & also layer2 supported file
+			auto decryptedBuffer = FileSystemManager::Instance().DecryptLayer2Protection(
+				reinterpret_cast<const uint8_t*>(file.GetData()), file.GetSize()
+			);
+			if (decryptedBuffer.empty())
+			{
+				FatalAppExitA(0, ("Fatal error, File could not open: " + szFileName).c_str());
+			}
+
+			return std::string(reinterpret_cast<const char*>(decryptedBuffer.data()), decryptedBuffer.size());
+		}
+		else
+#endif
+		{
+			return std::string(reinterpret_cast<const char*>(file.GetData()), file.GetSize());
+		}
+	}
+
+	return std::string();
+}
+
 PyObject * packExist(PyObject * poSelf, PyObject * poArgs)
 {
 	bool bIsSystem = false;
