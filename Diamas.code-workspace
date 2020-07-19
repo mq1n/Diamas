@@ -107,7 +107,8 @@
             "format": "cpp",
             "*.ch": "cpp",
             "concepts": "cpp",
-            "hash_set": "cpp"
+            "hash_set": "cpp",
+            "*.h++": "cpp"
         },
         "git.ignoreLimitWarning": true
 	}

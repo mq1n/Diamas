@@ -29,7 +29,7 @@ option(BUILD_SERVER "Build the server binaries" OFF)
 option(BUILD_TOOLS "Build the tool binaries" OFF)
 option(ENABLE_STATIC_ANALYSIS "Enable static code analysis with PVS Studio" OFF)
 option(ENABLE_AUTO_RELEASE "Enable auto release create in git repo" OFF)
-option(ENABLE_CYTHON "Cythonize python scripts" ON)
+option(ENABLE_CYTHON "Cythonize python scripts" OFF)
 
 # Output dir
 set(OUTPUT_DIR ${PROJECT_SOURCE_DIR}/Bin)

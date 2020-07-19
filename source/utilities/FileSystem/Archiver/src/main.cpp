@@ -621,23 +621,27 @@ checkIO:
 
 		if (archive)
 		{
-			std::ofstream f(pack->strArchiveName + ".log", std::ofstream::out | std::ofstream::app);
-			if (f.is_open())
+			const std::string& log_filename = pack->strArchiveName + ".log";
+			if (std::filesystem::exists(log_filename))
+				std::filesystem::remove(log_filename);
+
+			std::ofstream log_file(log_filename, std::ofstream::out | std::ofstream::app);
+			if (log_file.is_open())
 			{
-				fs->EnumerateFiles(pack->strArchiveName, [&fs, &f](const CFileName& wstArchiveName, const FSFileInformation& pcFileInformations, void* pvUserContext) -> bool {
+				fs->EnumerateFiles(pack->strArchiveName, [&fs, &log_file](const CFileName& wstArchiveName, const FSFileInformation& pcFileInformations, void* pvUserContext) -> bool {
 					char fileinfo[512];
 #ifdef SHOW_FILE_NAMES
 					sprintf_s(fileinfo, "%lu(%ls): %lu", pcFileInformations.filenameHash, pcFileInformations.filename, pcFileInformations.fileHash);
 #else
 					sprintf_s(fileinfo, "%lu: %lu", pcFileInformations.filenameHash, pcFileInformations.fileHash);
 #endif
-					f << fileinfo << std::endl;
+					log_file << fileinfo << std::endl;
 					// FileSystem::Log(0, "File: %s", fileinfo);
 
 					return true;
 				}, nullptr);
 
-				f.close();
+				log_file.close();
 			}
 		}
 	}
