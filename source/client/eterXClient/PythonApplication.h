@@ -36,17 +36,13 @@
 #include "PythonSafeBox.h"
 #include "PythonGuild.h"
 #include "PythonRenderTargetManager.h"
-
+#include "PythonAcce.h"
 #include "GuildMarkDownloader.h"
 #include "GuildMarkUploader.h"
-
 #include "AccountConnector.h"
-
 #include "ServerStateChecker.h"
 #include "AbstractApplication.h"
-#ifdef ENABLE_ACCE_SYSTEM
-#include "PythonAcce.h"
-#endif
+#include "DiscordRPCIntegration.h"
 
 class CPythonApplication : public CMSApplication, public CInputKeyboard, public IAbstractApplication
 {
@@ -366,6 +362,8 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		CRenderTargetManager		m_cRenderTargetManager;
 		CPythonRenderTargetManager	m_pyRenderTargetManager;
 
+		CDiscordRPCIntegration		m_cDiscordRPCManager;
+
 		uint32_t				m_iFPS;
 		float						m_fAveRenderTime;
 		uint32_t						m_dwCurRenderTime;
@@ -435,7 +433,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		std::string					m_strIP;
 		int32_t							m_iPort;
 
-	int32_t m_iGameStage;
+		int32_t m_iGameStage;
 
 		static CPythonApplication*	ms_pInstance;
 
@@ -450,6 +448,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 	protected:
 		int32_t m_iCursorNum;
 		int32_t m_iContinuousCursorNum;
+
 	public:
 		LPDIRECT3D9		GetDirectx9();
 		LPDIRECT3DDEVICE9 GetDevice();

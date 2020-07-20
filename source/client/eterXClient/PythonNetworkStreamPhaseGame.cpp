@@ -504,6 +504,10 @@ void CPythonNetworkStream::GamePhase()
 				ret = RecvViewEquipPacket();
 				break;
 
+			case HEADER_GC_GUILD_DCINFO:
+				ret = RecvDiscordInfoPacket();
+				break;
+
 			case HEADER_GC_LAND_LIST:
 				ret = RecvLandPacket();
 				break;
@@ -3167,6 +3171,30 @@ bool CPythonNetworkStream::RecvGuild()
 				__RefreshGuildWindowMemberPage();
 			}
 
+			CInstanceBase * pMainInstance = CPythonPlayer::Instance().NEW_GetMainActorPtr();
+			if (pMainInstance)
+			{
+				char playerInfo[128];
+				if (!pMainInstance->GetGuildName().empty())
+				{
+					sprintf_s(playerInfo, "%s - %s(%d/%d)",
+						CPythonPlayer::Instance().GetName(), pMainInstance->GetGuildName().c_str(),
+						pMainInstance->GetGuildMemberCount(), pMainInstance->GetGuildMemberCapacity()
+					);
+				}
+				else
+				{
+					sprintf_s(playerInfo, "%s", CPythonPlayer::Instance().GetName());
+				}
+
+				CDiscordRPCIntegration::Instance().UpdateDiscordState(
+					DISCORD_STATE_GAME, 
+					m_channelID,
+					CPythonBackground::Instance().GetWarpMapName(),
+					playerInfo
+				);
+			}			
+
 			Tracef(" <Remove> %d\n", dwPID);
 			break;
 		}
@@ -3932,6 +3960,40 @@ bool CPythonNetworkStream::RecvViewEquipPacket()
 			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "SetEquipmentDialogAttr", Py_BuildValue("(iiiii)", kViewEquipPacket.dwVID, i, k, rItemSet.aAttr[k].bType, rItemSet.aAttr[k].sValue));
 	}
 
+	return true;
+}
+
+bool CPythonNetworkStream::RecvDiscordInfoPacket()
+{
+	SPacketGCGuildDiscordInfo kDiscordInfo;
+	if (!Recv(sizeof(kDiscordInfo), &kDiscordInfo))
+		return false;
+
+	CInstanceBase * pMainInstance = CPythonPlayer::Instance().NEW_GetMainActorPtr();
+	if (!pMainInstance)
+		return false;
+
+	pMainInstance->SetGuildData(kDiscordInfo.szName, kDiscordInfo.dwMemberCount, kDiscordInfo.dwMaxMemberCount);
+	
+	char playerInfo[128];
+	if (strlen(kDiscordInfo.szName))
+	{
+		sprintf_s(playerInfo, "%s - %s(%d/%d)",
+			CPythonPlayer::Instance().GetName(), kDiscordInfo.szName,
+			kDiscordInfo.dwMemberCount, kDiscordInfo.dwMaxMemberCount
+		);
+	}
+	else
+	{
+		sprintf_s(playerInfo, "%s", CPythonPlayer::Instance().GetName());
+	}
+
+	CDiscordRPCIntegration::Instance().UpdateDiscordState(
+		DISCORD_STATE_GAME, 
+		GetChannelID(),
+		CPythonBackground::Instance().GetWarpMapName(),
+		playerInfo
+	);
 	return true;
 }
 

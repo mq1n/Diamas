@@ -3482,4 +3482,21 @@ void CInstanceBase::SetAlwaysRender(bool val)
 	m_IsAlwaysRender = val;
 }
 
-
+void CInstanceBase::SetGuildData(const std::string& stName, uint32_t dwMemberCount, uint32_t dwMemberCapacity)
+{
+	m_stGuildName = stName;
+	m_dwMemberCount = dwMemberCount;
+	m_dwMemberCapacity = dwMemberCapacity;
+}
+std::string CInstanceBase::GetGuildName() const
+{
+	return m_stGuildName;
+}
+uint32_t CInstanceBase::GetGuildMemberCount() const
+{
+	return m_dwMemberCount;
+}
+uint32_t CInstanceBase::GetGuildMemberCapacity() const
+{
+	return m_dwMemberCapacity;
+}

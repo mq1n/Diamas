@@ -65,7 +65,7 @@ int32_t main(int32_t, char**)
     discord::LobbyTransaction transaction{};
 
 	// Core
-    auto result = discord::Core::Create(619867464762785813, DiscordCreateFlags_Default, &core);
+    auto result = discord::Core::Create(734739162141294694, DiscordCreateFlags_NoRequireDiscord, &core);
     state.core.reset(core);
     if (!state.core)
     {

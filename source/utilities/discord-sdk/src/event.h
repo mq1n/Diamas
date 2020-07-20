@@ -8,20 +8,16 @@ namespace discord {
 template <typename... Args>
 class Event final {
 public:
-    using Token = int32_t;
+    using Token = int;
 
     Event() { slots_.reserve(4); }
 
-#if _HAS_CXX17
     Event(Event const&) = default;
     Event(Event&&) = default;
-#endif
     ~Event() = default;
 
-#if _HAS_CXX17
-	Event& operator=(Event const&) = default;
+    Event& operator=(Event const&) = default;
     Event& operator=(Event&&) = default;
-#endif
 
     template <typename EventHandler>
     Token Connect(EventHandler slot)

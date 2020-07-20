@@ -458,11 +458,12 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 		// Target
 		bool RecvTargetPacket();
-	bool RecvTargetDropPacket();
-	bool RecvViewEquipPacket();
-	bool RecvDamageInfoPacket();
+		bool RecvTargetDropPacket();
+		bool RecvViewEquipPacket();
+		bool RecvDamageInfoPacket();
+		bool RecvDiscordInfoPacket();
 
-	bool RecvChestDropInfo();
+		bool RecvChestDropInfo();
 
 		// Fly
 		bool RecvCreateFlyPacket();
@@ -707,4 +708,11 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		void __BettingGuildWar_Initialize();
 		void __BettingGuildWar_SetObserverCount(uint32_t uObserverCount);
 		void __BettingGuildWar_SetBettingMoney(uint32_t uBettingMoney);
+
+	public:
+		void RegisterChannelID(int32_t channelID) { m_channelID = channelID; };
+		int32_t GetChannelID() const { return m_channelID; };
+
+	private:
+		int32_t m_channelID;
 };

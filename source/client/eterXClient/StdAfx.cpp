@@ -19,6 +19,7 @@
 #pragma comment( lib, "wtsapi32.lib" )
 #pragma comment( lib, "Netapi32.lib" )
 #pragma comment( lib, "DevIL.lib" )
+#pragma comment( lib, "discord-rpc.lib" )
 
 #ifdef _DEBUG
 	#pragma comment( lib, "cryptopp-static_debug.lib" )

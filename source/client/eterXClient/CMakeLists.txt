@@ -59,7 +59,13 @@ if (ENABLE_CYTHON)
 	set(CYTHON_LIB eterCythonLib)
 endif()
 
-target_link_libraries(${EXE_NAME} sourceCommon eterBase ${CYTHON_LIB} eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterPythonLib eterScriptLib eterSoundLib eterSphereLib eterSecurity eterTerrainLib eterTreeLib eterWebBrowser)
+target_link_libraries(
+	${EXE_NAME}
+	sourceCommon
+	eterBase ${CYTHON_LIB} eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterPythonLib
+	eterScriptLib eterSoundLib eterSphereLib eterSecurity eterTerrainLib eterTreeLib eterWebBrowser
+	discord_sdk
+)
 
 set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)

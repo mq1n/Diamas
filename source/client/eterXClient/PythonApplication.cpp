@@ -1049,6 +1049,9 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_
 		CGrannyMaterial::CreateSphereMap(0, "d:/ymir work/special/spheremap.jpg");
 		CGrannyMaterial::CreateSphereMap(1, "d:/ymir work/special/spheremap01.jpg");
 
+		// Discord
+		m_cDiscordRPCManager.InitializeDiscordAPI(m_hWnd);
+
 		// Render Target
 		for (int32_t i = 0; i < CPythonRenderTargetManager::RENDER_TYPE_MAX_NUM; i++) {
 			if (!CRenderTargetManager::Instance().CreateRenderTargetWithIndex(m_dwWidth, m_dwHeight, i))
@@ -1248,6 +1251,8 @@ void CPythonApplication::Destroy()
 	CTextFileLoader::DestroySystem();
 	DestroyCursors();
 
+	m_cDiscordRPCManager.ReleaseDiscordAPI();
+	
 	CMSApplication::Destroy();
 
 	STICKYKEYS sStickKeys;

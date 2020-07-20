@@ -1,12 +1,9 @@
 cmake_minimum_required(VERSION 3.2)
 project(discord_sdk)
 
-#if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-#	add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
-#endif()
-
 # Output folder
 set(OUTPUT_DIR ${PROJECT_SOURCE_DIR}/../../../Bin/Utilities)
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR})

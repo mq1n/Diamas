@@ -1159,6 +1159,17 @@ class CInstanceBase
 		bool IsMiningVID(uint32_t vid);
 		void StartMining(uint32_t vid);
 		void CancelMining();
+
+	public:
+		void SetGuildData(const std::string& stName, uint32_t dwMemberCount, uint32_t dwMemberCapacity);
+		std::string GetGuildName() const;
+		uint32_t GetGuildMemberCount() const;
+		uint32_t GetGuildMemberCapacity() const;
+
+	private:
+		std::string m_stGuildName;
+		uint32_t m_dwMemberCount;
+		uint32_t m_dwMemberCapacity;
 };
 
 inline int32_t RaceToJob(int32_t race)

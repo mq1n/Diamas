@@ -41,20 +41,20 @@ typedef struct DiscordRichPresence {
     int8_t instance;
 } DiscordRichPresence;
 
-typedef struct DiscordUser {
+typedef struct DiscordRpcUser {
     const char* userId;
     const char* username;
     const char* discriminator;
     const char* avatar;
-} DiscordUser;
+} DiscordRpcUser;
 
 typedef struct DiscordEventHandlers {
-    void (*ready)(const DiscordUser* request);
+    void (*ready)(const DiscordRpcUser* request);
     void (*disconnected)(int errorCode, const char* message);
     void (*errored)(int errorCode, const char* message);
     void (*joinGame)(const char* joinSecret);
     void (*spectateGame)(const char* spectateSecret);
-    void (*joinRequest)(const DiscordUser* request);
+    void (*joinRequest)(const DiscordRpcUser* request);
 } DiscordEventHandlers;
 
 #define DISCORD_REPLY_NO 0

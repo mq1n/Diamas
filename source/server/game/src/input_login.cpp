@@ -628,6 +628,16 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	p2.channel = g_bChannel;
 	d->Packet(&p2, sizeof(p2));
 
+	SPacketGCGuildDiscordInfo p3;
+	auto pGuild = ch->GetGuild();
+    if (pGuild)
+    {
+        p3.dwMemberCount = pGuild->GetMemberCount();
+        p3.dwMaxMemberCount = pGuild->GetMaxMemberCount();
+        strcpy(p3.szName, pGuild->GetName());
+    }
+    d->Packet(&p3, sizeof(p3));
+
 	if (!ch->IsGMInvisible())
 		ch->ReviveInvisible(5);
 	else

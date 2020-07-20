@@ -215,6 +215,7 @@ enum EGameToClientHeaders : TPacketHeader
 
 	HEADER_GC_SKILL_LEVEL = 101,
 	HEADER_GC_ACCE = 102,
+	HEADER_GC_GUILD_DCINFO = 103,
 
 	HEADER_GC_PHASE = 251,
 	HEADER_GC_KEY_AGREEMENT_COMPLETED = 252,
@@ -2101,6 +2102,15 @@ struct SPacketGCSkillLevel : SNetPacket
 	TPlayerSkill skills[SKILL_MAX_NUM]{};
 
 	NET_DECLARE_PACKET(HEADER_GC_SKILL_LEVEL, SPacketGCSkillLevel); // 101
+};
+
+struct SPacketGCGuildDiscordInfo : SNetPacket
+{
+	uint32_t dwMemberCount;
+	uint32_t dwMaxMemberCount;
+	char szName[GUILD_NAME_MAX_LEN];
+	
+	NET_DECLARE_PACKET(HEADER_GC_GUILD_DCINFO, SPacketGCGuildDiscordInfo); // 103
 };
 
 struct SPacketGCPhase : SNetPacket

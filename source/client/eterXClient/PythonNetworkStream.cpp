@@ -160,6 +160,9 @@ class CMainPacketHeaderMap : public CNetworkPacketHeaderMap
 #ifdef ENABLE_ACCE_SYSTEM
 			Set(HEADER_GC_ACCE, TPacketType(sizeof(SPacketAcce), STATIC_SIZE_PACKET));
 #endif
+
+			Set(HEADER_GC_GUILD_DCINFO, TPacketType(sizeof(SPacketGCGuildDiscordInfo), STATIC_SIZE_PACKET));
+
 		}
 };
 
@@ -558,6 +561,7 @@ bool CPythonNetworkStream::RecvPhasePacket()
 	{
 		case PHASE_CLOSE:				// 끊기는 상태 (또는 끊기 전 상태)
 			ClosePhase();
+			CDiscordRPCIntegration::Instance().UpdateDiscordState(DISCORD_STATE_INITIALIZE);
 			m_isChatEnable = FALSE;
 			break;
 
@@ -568,6 +572,7 @@ bool CPythonNetworkStream::RecvPhasePacket()
 
 		case PHASE_LOGIN:				// 로그인 중
 			SetLoginPhase();
+			CDiscordRPCIntegration::Instance().UpdateDiscordState(DISCORD_STATE_INITIALIZE);
 			m_isChatEnable = FALSE;
 			break;
 
@@ -578,10 +583,13 @@ bool CPythonNetworkStream::RecvPhasePacket()
 			// MARK_BUG_FIX
 			__DownloadMark();
 			// END_OF_MARK_BUG_FIX
+
+			CDiscordRPCIntegration::Instance().UpdateDiscordState(DISCORD_STATE_SELECT);
 			break;
 
 		case PHASE_LOADING:				// 선택 후 로딩 화면
 			SetLoadingPhase();
+			CDiscordRPCIntegration::Instance().UpdateDiscordState(DISCORD_STATE_LOAD);
 			m_isChatEnable = FALSE;
 			break;
 
@@ -830,6 +838,8 @@ CPythonNetworkStream::CPythonNetworkStream()
 	m_dwMainActorEmpire = 0;
 	m_dwMainActorSkillGroup = 0;
 	m_poHandler = nullptr;
+
+	m_channelID = 0;
 
 	m_dwLastGamePingTime = 0;
 

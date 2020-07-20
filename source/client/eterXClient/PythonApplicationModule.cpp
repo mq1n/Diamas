@@ -1056,7 +1056,6 @@ PyObject* appFlashApplication(PyObject* poSelf, PyObject* poArgs)
    return Py_BuildNone();
 }
 
-
 PyObject* appSetTitle(PyObject* poSelf, PyObject* poArgs)
 {
 	char* szTitle;
@@ -1066,10 +1065,46 @@ PyObject* appSetTitle(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
+PyObject* appSetDiscordInformations(PyObject* poSelf, PyObject* poArgs)
+{
+	int32_t channel;
+	if (!PyTuple_GetInteger(poArgs, 0, &channel))
+		return Py_BuildException();
+
+	CPythonNetworkStream::Instance().RegisterChannelID(channel + 1);
+
+	CInstanceBase * pMainInstance = CPythonPlayer::Instance().NEW_GetMainActorPtr();
+	if (pMainInstance)
+	{
+		char playerInfo[128];
+		if (!pMainInstance->GetGuildName().empty())
+		{
+			sprintf_s(playerInfo, "%s - %s(%d/%d)",
+				CPythonPlayer::Instance().GetName(), pMainInstance->GetGuildName().c_str(),
+				pMainInstance->GetGuildMemberCount(), pMainInstance->GetGuildMemberCapacity()
+			);
+		}
+		else
+		{
+			sprintf_s(playerInfo, "%s", CPythonPlayer::Instance().GetName());
+		}
+
+		CDiscordRPCIntegration::Instance().UpdateDiscordState(
+			DISCORD_STATE_GAME, 
+			channel + 1,
+			CPythonBackground::Instance().GetWarpMapName(),
+			playerInfo
+		);
+	}
+	return Py_BuildNone();
+}
+
 void initapp()
 {
 	static PyMethodDef s_methods[] =
 	{	
+		{ "SetDiscordInformations",		appSetDiscordInformations,		METH_VARARGS },
+
 		{ "IsDevStage",					appIsDevStage,					METH_VARARGS },
 		{ "IsTestStage",				appIsTestStage,					METH_VARARGS },
 		{ "IsLiveStage",				appIsLiveStage,					METH_VARARGS },
