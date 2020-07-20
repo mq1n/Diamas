@@ -2106,9 +2106,9 @@ struct SPacketGCSkillLevel : SNetPacket
 
 struct SPacketGCGuildDiscordInfo : SNetPacket
 {
-	uint32_t dwMemberCount;
-	uint32_t dwMaxMemberCount;
-	char szName[GUILD_NAME_MAX_LEN];
+	uint32_t dwMemberCount{};
+	uint32_t dwMaxMemberCount{};
+	char szName[GUILD_NAME_MAX_LEN]{};
 	
 	NET_DECLARE_PACKET(HEADER_GC_GUILD_DCINFO, SPacketGCGuildDiscordInfo); // 103
 };
