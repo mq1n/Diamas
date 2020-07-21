@@ -33,7 +33,10 @@
 #ifndef FMT_FORMAT_H_
 #define FMT_FORMAT_H_
 
+#ifdef _WIN32
 #pragma warning(disable:4189)
+#endif
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>
