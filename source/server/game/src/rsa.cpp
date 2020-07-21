@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "RSA.h"
+#include "rsa.h"
 
 #ifdef RSA_NET_PACKET_ENCRYPTION
 

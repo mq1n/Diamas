@@ -37,7 +37,7 @@
 #include "blue_dragon.h"
 #include "battleground.h"
 
-#include "../../libthecore/include/Random.h"
+#include "../../libthecore/include/random.h"
 
 static uint32_t __GetPartyExpNP(const uint32_t level)
 {
