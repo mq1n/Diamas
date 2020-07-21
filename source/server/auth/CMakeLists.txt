@@ -65,7 +65,7 @@ else()
 	add_executable(${EXE_NAME} ${AUTH_HEADERS} ${AUTH_SOURCES})
 
 	if(NOT MYSQL_LIBRARIES)
-		FIND_LIBRARY(MYSQL_LIBRARIES libmysqlclient.a ${MYSQL_DIR}/lib NO_DEFAULT_PATH)
+		FIND_LIBRARY(MYSQL_LIBRARIES libmysqlclient.a ${MYSQL_DIR} NO_DEFAULT_PATH)
 	endif()
 #	FIND_LIBRARY(LIBZ libz.a /usr/lib)
 

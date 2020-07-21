@@ -180,6 +180,7 @@ link_directories(${PROJECT_SOURCE_DIR}/Bin/Utilities)
 link_directories(${PROJECT_SOURCE_DIR}/extern/lib_win_x${TARGET_ARCH_STR})
 if (NOT MSVC)
 	link_directories(${PROJECT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR})
+	link_directories(${PROJECT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/cryptopp/${COMPILER_SUBDIR})
 endif()
 
 # Sub-projects

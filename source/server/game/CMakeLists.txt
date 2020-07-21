@@ -73,7 +73,7 @@ else()
 	set(IL_LIBRARIES IL png tiff mng lcms jpeg jbig)
 
 	if(NOT MYSQL_LIBRARIES)
-		FIND_LIBRARY(MYSQL_LIBRARIES libmysqlclient.a ${MYSQL_DIR}/lib NO_DEFAULT_PATH)
+		FIND_LIBRARY(MYSQL_LIBRARIES libmysqlclient.a ${MYSQL_DIR} NO_DEFAULT_PATH)
 	endif()
 
 	# Static
