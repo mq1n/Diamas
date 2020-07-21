@@ -19,8 +19,8 @@ projeyi indirme:
 git clone https://github.com/mq1n/Diamas
 git submodule update --init --recursive
 git submodule update --recursive --remote
-chmod +x build.sh
-chmod +x rebuild.sh
+chmod +x Diamas/build.sh
+chmod +x Diamas/rebuild.sh
 
 build etme:
 ./build.sh <build_modu> (Debug/Release/MinSizeRel/RelWithDebInfo)
