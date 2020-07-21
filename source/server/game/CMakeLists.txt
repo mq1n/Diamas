@@ -86,7 +86,7 @@ else()
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 	# Link
-	target_link_libraries(${EXE_NAME} sourceCommon -pthread -static-libgcc -static-libstdc++ ${MYSQL_LIBRARIES} ${IL_LIBRARIES} lualib thecorelib sqllib gamelib cryptopp)
+	target_link_libraries(${EXE_NAME} sourceCommon -pthread -static-libgcc -static-libstdc++ ${MYSQL_LIBRARIES} ${IL_LIBRARIES} lualib thecorelib sqllib gamelib)
 
 endif()
 
