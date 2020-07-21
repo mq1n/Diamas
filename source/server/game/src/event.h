@@ -38,7 +38,7 @@ struct TQueueElement;
 struct event
 {
 	event() : 
-		func(nullptr), info(nullptr), q_el(nullptr), ref_count(0), is_force_to_end(0), is_processing(0)
+		func(nullptr), info(nullptr), q_el(nullptr), is_force_to_end(0), is_processing(0), ref_count(0)
 	{
 	}
 	~event() 

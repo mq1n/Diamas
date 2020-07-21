@@ -72,7 +72,6 @@ if (MSVC)
 	add_executable(${EXE_NAME} ${GAMESERVER_HEADERS} ${GAMESERVER_SOURCES})
 	
 	target_link_libraries(${EXE_NAME} sourceCommon lualib thecorelib sqllib gamelib ${EXTRA_LIBS} DevIL)
-#	set_target_properties(${EXE_NAME} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT")
 
 else()
 	add_executable(${EXE_NAME} ${GAMESERVER_HEADERS} ${GAMESERVER_SOURCES})
@@ -82,13 +81,12 @@ else()
 	if(NOT MYSQL_LIBRARIES)
 		FIND_LIBRARY(MYSQL_LIBRARIES libmysqlclient.a ${MYSQL_DIR}/lib NO_DEFAULT_PATH)
 	endif()
-#	FIND_LIBRARY(LIBZ libz.a /usr/lib)
 
 	# Static
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 	# Link
-	target_link_libraries(${EXE_NAME} sourceCommon -pthread ${LIBZ} -static-libgcc -static-libstdc++ ${MYSQL_LIBRARIES} ${IL_LIBRARIES} lualib thecorelib sqllib gamelib) # x64: z ve lzma
+	target_link_libraries(${EXE_NAME} sourceCommon -pthread -static-libgcc -static-libstdc++ ${MYSQL_LIBRARIES} ${IL_LIBRARIES} lualib thecorelib sqllib gamelib libcryptopp)
 
 endif()
 
