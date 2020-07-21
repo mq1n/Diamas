@@ -1034,26 +1034,26 @@ ACMD(do_state)
 			return;
 		}
 	}
-	char buf[256];
 
-	snprintf (buf, sizeof (buf), "%s's VID:(%d) CH:(%d) State: ", tch->GetName(), (uint32_t) tch->GetVID(), g_bChannel);
+	std::string state = "";
 
 	if (tch->IsPosition(POS_FIGHTING))
-		strlcat(buf, "Battle", sizeof(buf));
+		state = "Battle";
 	else if (tch->IsPosition(POS_DEAD))
-		strlcat(buf, "Dead", sizeof(buf));
+		state = "Dead";
 	else if (tch->IsPosition (POS_FISHING))
-		strlcat (buf, "Fishing", sizeof (buf));
+		state = "Fishing";
 	else
-		strlcat(buf, "Standing", sizeof(buf));
+		state = "Standing";
 
 	if (ch->GetShop())
-		strlcat(buf, ", Shop", sizeof(buf));
+		state += ", Shop";
 
 	if (ch->GetExchange())
-		strlcat(buf, ", Exchange", sizeof(buf));
+		state += ", Exchange";
 
-	ch->ChatPacket(CHAT_TYPE_INFO, "%s", buf);
+	char buf[256];
+	snprintf (buf, sizeof (buf), "%s's VID:(%d) CH:(%d) State: %s", tch->GetName(), (uint32_t)tch->GetVID(), g_bChannel, state.c_str());
 
 	int32_t len;
 	len = snprintf(buf, sizeof(buf), "Coordinate %dx%d (%dx%d) (rotation %.2f)",
