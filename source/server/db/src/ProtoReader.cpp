@@ -5,16 +5,18 @@
 bool bDumpProtoDebugFlag = false;
 void writeDebug(const char* szMsg, int iInput, int type_value)
 {
-	static char __buf[512];
-	static FILE* f1 = NULL;
-	if (NULL == f1)
-		fopen_s(&f1, "debug.log", "a+");
+	char __buf[512];
+	
+	auto f1 = fopen("debug.log", "a+");
+	if (!f1)
+		return;
 
 	if (type_value)
-		_snprintf_s(__buf, sizeof(__buf), "ERROR: (%d->%d) %s\n", type_value, iInput, szMsg);
+		snprintf(__buf, sizeof(__buf), "ERROR: (%d->%d) %s\n", type_value, iInput, szMsg);
 	else
-		_snprintf_s(__buf, sizeof(__buf), "ERROR: (%d) %s\n", iInput, szMsg);
+		snprintf(__buf, sizeof(__buf), "ERROR: (%d) %s\n", iInput, szMsg);
 	fwrite(__buf, sizeof(char), strlen(__buf), f1);
+	fclose(f1);
 }
 
 static std::string arItemType[] = {
