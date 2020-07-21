@@ -179,7 +179,7 @@ void ContinueOnFatalError()
 #endif
 }
 
-void __cdecl InterruptHandler(int)
+void InterruptHandler(int)
 {
 	ContinueOnFatalError();
 	g_bSignalHandled = true;

@@ -2928,7 +2928,7 @@ void CInputMain::ItemGive(LPCHARACTER ch, const char* c_pData)
 void CInputMain::Hack(LPCHARACTER ch, const char * c_pData)
 {
 	SPacketCGHack * p = (SPacketCGHack *) c_pData;
-	if (!p || p->szBuf == '\0')
+	if (!p || p->szBuf[0] == '\0')
 		return;
 
 	char buf[sizeof(p->szBuf)];
