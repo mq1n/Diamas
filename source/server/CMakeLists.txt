@@ -39,8 +39,8 @@ endif()
 if(NOT MSVC)
 #	# x86 build for x64 os
 # TODO?: -mtune=i686
-#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-#	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
 
 	# Pipe
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
