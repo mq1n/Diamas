@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.2)
 project(NetEngine)
 
 # Preprocessor flags
@@ -35,7 +35,7 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CMAKE_CXX_EXTENSIONS OFF)
 
 option(NETENGINE_BUILD_TEST "Build the network engine test binaries" ON)
-if(NETENGINE_BUILD_TEST)
+if(NETENGINE_BUILD_TEST AND WIN32)
 	include_directories(include)
 
 	file(GLOB NETENGINE_TEST_HEADERS

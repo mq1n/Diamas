@@ -16,7 +16,7 @@
 #pragma once
 
 #include <cstdio>
-#include <string>
+#include <cstring>
 #include <vector>
 
 namespace msl

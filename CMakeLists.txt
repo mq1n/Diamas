@@ -25,8 +25,8 @@ file (STRINGS "VERSION.txt" MAJOR_VERSION)
 # Build options
 option(BUILD_UTILITIES "Build the common utilities" ON)
 option(BUILD_CLIENT "Build the client binaries" ON)
-option(BUILD_SERVER "Build the server binaries" OFF)
-option(BUILD_TOOLS "Build the tool binaries" OFF)
+option(BUILD_SERVER "Build the server binaries" ON)
+option(BUILD_TOOLS "Build the tool binaries" ON)
 option(ENABLE_STATIC_ANALYSIS "Enable static code analysis with PVS Studio" OFF)
 option(ENABLE_AUTO_RELEASE "Enable auto release create in git repo" OFF)
 option(ENABLE_CYTHON "Cythonize python scripts" OFF)
@@ -64,6 +64,7 @@ add_definitions(-DJM_XORSTR_DISABLE_AVX_INTRINSICS) # xorstr
 add_definitions(-DCRYPTOPP_ENABLE_NAMESPACE_WEAK=1) # cryptopp
 add_definitions(-DASIO_STANDALONE) # websocketpp
 add_definitions(-DUSE_BOOST_ASIO=0) # amy
+add_definitions(-DFMT_HEADER_ONLY) # fmt
 
 # Platform defination
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)

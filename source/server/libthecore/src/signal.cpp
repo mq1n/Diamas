@@ -70,7 +70,7 @@ void signal_timer_enable(int sec)
     setitimer(ITIMER_VIRTUAL, &itime, NULL);
 }
 
-void signal_setup(void)
+void signal_setup()
 {
     signal_timer_enable(30);
 
