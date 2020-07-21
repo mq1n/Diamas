@@ -31,7 +31,7 @@ void CInputProcessor::BindPacketInfo(CPacketInfo * pPacketInfo)
 
 bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int32_t iBytes, int32_t & r_iBytesProceed)
 {
-	const auto c_pData = reinterpret_cast<const char *>(c_pvOrig);
+	auto c_pData = reinterpret_cast<const char *>(c_pvOrig);
 
 	uint8_t	bLastHeader = 0;
 	int32_t	iLastPacketLen = 0;

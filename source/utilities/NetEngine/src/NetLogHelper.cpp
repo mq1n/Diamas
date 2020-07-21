@@ -4,12 +4,6 @@
 #include <sstream>
 #include "../include/NetLogHelper.hpp"
 
-#ifdef _DEBUG
-	#pragma comment( lib, "fmt_debug.lib" )
-#else
-	#pragma comment( lib, "fmt.lib" )
-#endif
-
 namespace net_engine
 {
     static CNetLogger* gs_pNetLogInstance = nullptr;

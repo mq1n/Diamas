@@ -18,7 +18,7 @@ if (MSVC)
 	add_definitions(-D__WIN32__)
 endif()
 
-add_definitions(-D_USE_32BIT_TIME_T)
+# add_definitions(-D_USE_32BIT_TIME_T)
 add_definitions(-DNOMINMAX)
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")

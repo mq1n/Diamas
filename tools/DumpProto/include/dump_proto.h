@@ -1,5 +1,5 @@
 #pragma once
-#define _USE_32BIT_TIME_T
+// #define _USE_32BIT_TIME_T
 
 #include <cstdio>
 #include <ctime>
