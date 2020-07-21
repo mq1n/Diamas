@@ -660,31 +660,6 @@ PyObject* netSendItemUseToItemPacket(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
-PyObject* netSendItemDropPacket(PyObject* poSelf, PyObject* poArgs)
-{
-	TItemPos Cell;
-	switch (PyTuple_Size(poArgs))
-	{
-	case 1:
-		if (!PyTuple_GetInteger(poArgs, 0, &Cell.cell))
-			return Py_BuildException();
-		break;
-	case 2:
-		if (!PyTuple_GetByte(poArgs, 0, &Cell.window_type))
-			return Py_BuildException();
-		if (!PyTuple_GetInteger(poArgs, 1, &Cell.cell))
-			return Py_BuildException();
-		break;
-	default:
-		return Py_BuildException();
-	}
-
-
-	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendItemDropPacket(Cell, 0);
-	return Py_BuildNone();
-}
-
 PyObject* netSendItemDropPacketNew(PyObject* poSelf, PyObject* poArgs)
 {
 	TItemPos Cell;
@@ -712,17 +687,6 @@ PyObject* netSendItemDropPacketNew(PyObject* poSelf, PyObject* poArgs)
 	}
 	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
 	rkNetStream.SendItemDropPacketNew(Cell, 0, count);
-	return Py_BuildNone();
-}
-
-PyObject* netSendElkDropPacket(PyObject* poSelf, PyObject* poArgs)
-{
-	int32_t iElk;
-	if (!PyTuple_GetInteger(poArgs, 0, &iElk))
-		return Py_BuildException();
-
-	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
-	rkNetStream.SendItemDropPacket(TItemPos(RESERVED_WINDOW, 0), (uint32_t) iElk);
 	return Py_BuildNone();
 }
 
@@ -1695,9 +1659,7 @@ void initnet()
 
 		{ "SendItemUsePacket",					netSendItemUsePacket,					METH_VARARGS },
 		{ "SendItemUseToItemPacket",			netSendItemUseToItemPacket,				METH_VARARGS },
-		{ "SendItemDropPacket",					netSendItemDropPacket,					METH_VARARGS },
 		{ "SendItemDropPacketNew",				netSendItemDropPacketNew,				METH_VARARGS },
-		{ "SendElkDropPacket",					netSendElkDropPacket,					METH_VARARGS },
 		{ "SendGoldDropPacketNew",				netSendGoldDropPacketNew,				METH_VARARGS },
 		{ "SendItemMovePacket",					netSendItemMovePacket,					METH_VARARGS },
 		{ "SendItemPickUpPacket",				netSendItemPickUpPacket,				METH_VARARGS },

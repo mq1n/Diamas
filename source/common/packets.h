@@ -30,7 +30,6 @@ enum EClientToGameHeaders : TPacketHeader
 	HEADER_CG_ENTERGAME = 9,
 	HEADER_CG_ITEM_USE = 10,
 
-	HEADER_CG_ITEM_DROP = 11,
 	HEADER_CG_ITEM_MOVE = 12,
 	HEADER_CG_ITEM_PICKUP = 13,
 	HEADER_CG_QUICKSLOT_ADD = 14,
@@ -783,14 +782,6 @@ struct SPacketCGItemUse : SNetPacket
 	TItemPos pos{};
 
 	NET_DECLARE_PACKET(HEADER_CG_ITEM_USE, SPacketCGItemUse); // 10
-};
-
-struct SPacketCGItemDrop : SNetPacket
-{
-	TItemPos pos{};
-	uint32_t elk{};
-
-	NET_DECLARE_PACKET(HEADER_CG_ITEM_DROP, SPacketCGItemDrop); // 11
 };
 
 struct SPacketCGItemMove : SNetPacket

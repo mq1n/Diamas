@@ -15,7 +15,10 @@
 #include "utils.h"
 #include "desc_client.h"
 
-CInputProcessor::CInputProcessor() : m_pPacketInfo(nullptr), m_iBufferLeft(0)
+std::vector <TPlayerTable> g_vec_save;
+
+CInputProcessor::CInputProcessor() :
+	m_pPacketInfo(nullptr), m_iBufferLeft(0)
 {
 	if (!m_pPacketInfo)
 		BindPacketInfo(&m_packetInfoCG);
@@ -28,11 +31,11 @@ void CInputProcessor::BindPacketInfo(CPacketInfo * pPacketInfo)
 
 bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int32_t iBytes, int32_t & r_iBytesProceed)
 {
-	const char * c_pData = (const char *) c_pvOrig;
+	const auto c_pData = reinterpret_cast<const char *>(c_pvOrig);
 
 	uint8_t	bLastHeader = 0;
-	int32_t		iLastPacketLen = 0;
-	int32_t		iPacketLen;
+	int32_t	iLastPacketLen = 0;
+	int32_t	iPacketLen;
 
 	if (!m_pPacketInfo)
 	{
@@ -68,7 +71,6 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int32_t iByt
 			m_pPacketInfo->Start();
 
 			int32_t iExtraPacketSize = Analyze(lpDesc, bHeader, c_pData);
-
 			if (iExtraPacketSize < 0)
 				return true;
 
@@ -140,54 +142,43 @@ void LoginFailure(LPDESC d, const char * c_pszStatus)
 	d->Packet(&failurePacket, sizeof(failurePacket));
 }
 
+
 CInputHandshake::CInputHandshake()
 {
 	CPacketInfoCG * pkPacketInfo = M2_NEW CPacketInfoCG;
 	m_pMainPacketInfo = m_pPacketInfo;
 	BindPacketInfo(pkPacketInfo);
 }
-
 CInputHandshake::~CInputHandshake()
 {
-	if( nullptr != m_pPacketInfo )
+	if (m_pPacketInfo)
 	{
 		M2_DELETE(m_pPacketInfo);
 		m_pPacketInfo = nullptr;
 	}
 }
 
-std::vector<TPlayerTable> g_vec_save;
-
-// BLOCK_CHAT
-ACMD(do_block_chat);
-// END_OF_BLOCK_CHAT
-
 int32_t CInputHandshake::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 {
-	if (bHeader == 10) // 엔터는 무시
-		return 0;
-
 	if (bHeader == HEADER_CG_MARK_LOGIN)
 	{
 		if (!guild_mark_server)
 		{
-			// 끊어버려! - 마크 서버가 아닌데 마크를 요청하려고?
 			sys_err("Guild Mark login requested but i'm not a mark server!");
 			d->SetPhase(PHASE_CLOSE);
 			return 0;
 		}
 
-		// 무조건 인증 --;
 		sys_log(0, "MARK_SERVER: Login");
 		d->SetPhase(PHASE_LOGIN);
 		return 0;
 	}
 	else if (bHeader == HEADER_CG_STATE_CHECKER)
 	{
-		if (d->isChannelStatusRequested()) {
+		if (d->isChannelStatusRequested())
 			return 0;
-		}
 		d->SetChannelStatusRequested(true);
+
 		db_clientdesc->DBPacket(HEADER_GD_REQUEST_CHANNELSTATUS, d->GetHandle(), nullptr, 0);
 	}
 	else if (bHeader == HEADER_CG_PONG)

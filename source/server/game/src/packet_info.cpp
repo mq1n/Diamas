@@ -118,7 +118,6 @@ CPacketInfoCG::CPacketInfoCG()
 	Set(HEADER_CG_ENTERGAME, sizeof(SPacketCGEnterFrontGame), "EnterGame");
 
 	Set(HEADER_CG_ITEM_USE, sizeof(SPacketCGItemUse), "ItemUse");
-	Set(HEADER_CG_ITEM_DROP, sizeof(SPacketCGItemDrop), "ItemDrop");
 	Set(HEADER_CG_ITEM_DROP2, sizeof(SPacketCGItemDrop2), "ItemDrop2");
 	Set(HEADER_CG_ITEM_MOVE, sizeof(SPacketCGItemMove), "ItemMove");
 	Set(HEADER_CG_ITEM_PICKUP, sizeof(SPacketCGItemPickUp), "ItemPickup");

@@ -429,13 +429,25 @@ bool ProcessArchiveFile(FileSystemManager * fs, const std::shared_ptr <SArchiveC
 	auto workingdirectory = GetWorkingDirectory();
 	for (const auto& entry : std::filesystem::recursive_directory_iterator(pack->stArchiveDirectory))
 	{
-//		FileSystem::Log(0, "%ls", entry.path().c_str());
-
 		if (entry.is_directory())
 			continue;
 
-		auto extension = entry.path().extension().wstring();
-		auto namewithoutpath = entry.path().wstring();
+		auto target_file = entry.path();
+//		FileSystem::Log(0, "%ls", target_file.c_str());
+
+		/*
+		while (std::filesystem::is_symlink(target_file))
+		{
+			FileSystem::Log(0, "Symlink detected: %ls", target_file.c_str());
+
+			target_file = std::filesystem::read_symlink(target_file);
+
+			FileSystem::Log(0, "Symlink redirected to: %ls", target_file.c_str());
+		}
+		*/
+
+		auto extension = target_file.extension().wstring();
+		auto namewithoutpath = target_file.wstring();
 		auto wstrdirectory = std::wstring(pack->stArchiveDirectory.begin(), pack->stArchiveDirectory.end());
 		std::size_t pos = namewithoutpath.find(wstrdirectory + L"\\");
 		if (pos != std::string::npos)
@@ -490,7 +502,7 @@ bool ProcessArchiveFile(FileSystemManager * fs, const std::shared_ptr <SArchiveC
 		}
 		if (skipfile)
 		{
-			FileSystem::Log(0, "Content skipped: %ls", entry.path().c_str());
+			FileSystem::Log(0, "Content skipped: %ls", target_file.c_str());
 			continue;
 		}
 
@@ -505,7 +517,7 @@ bool ProcessArchiveFile(FileSystemManager * fs, const std::shared_ptr <SArchiveC
 		if (!pack->strVisualDirectory.empty())
 			namewithoutpath = pack->strVisualDirectory + namewithoutpath;
 
-		if (!archiveMaker->Add(namewithoutpath, entry.path().wstring(), pack->iType))
+		if (!archiveMaker->Add(namewithoutpath, target_file.wstring(), pack->iType))
 		{
 			FileSystem::Log(1, "Entry file can NOT writed");
 			return false;

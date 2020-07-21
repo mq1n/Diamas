@@ -757,23 +757,6 @@ void CInputMain::ItemToItem(LPCHARACTER ch, const char * pcData)
 		ch->UseItem(p->source_pos, p->target_pos);
 }
 
-void CInputMain::ItemDrop(LPCHARACTER ch, const char * data)
-{
-	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
-		return;
-
-	SPacketCGItemDrop* pinfo = (SPacketCGItemDrop*) data;
-
-	if (!ch)
-		return;
-
-	// 엘크가 0보다 크면 엘크를 버리는 것 이다.
-	if (pinfo->elk > 0)
-		ch->DropGold(pinfo->elk);
-	else
-		ch->DropItem(pinfo->pos);
-}
-
 void CInputMain::ItemDrop2(LPCHARACTER ch, const char * data)
 {
 	if (ch && CBattlegroundManager::Instance().IsEventMap(ch->GetMapIndex()))
@@ -3166,13 +3149,6 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 		case HEADER_CG_ITEM_USE:
 			if (!ch->IsObserverMode())
 				ItemUse(ch, c_pData);
-			break;
-
-		case HEADER_CG_ITEM_DROP:
-			if (!ch->IsObserverMode())
-			{
-				ItemDrop(ch, c_pData);
-			}
 			break;
 			
 #ifdef ENABLE_ACCE_SYSTEM

@@ -134,14 +134,13 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool SendCharacterStatePacket(const TPixelPosition& c_rkPPosDst, float fDstRot, uint32_t eFunc, uint32_t uArg);
 		bool SendUseSkillPacket(uint32_t dwSkillIndex, uint32_t dwTargetVID=0);
 		bool SendTargetPacket(uint32_t dwVID);
-	bool SendTargetDropPacket();
-	bool SendChestDropInfo(uint16_t wInventoryCell);
+		bool SendTargetDropPacket();
+		bool SendChestDropInfo(uint16_t wInventoryCell);
 
 		bool SendCharacterPositionPacket(uint8_t iPosition);
 
 		bool SendItemUsePacket(TItemPos pos);
 		bool SendItemUseToItemPacket(TItemPos source_pos, TItemPos target_pos);
-		bool SendItemDropPacket(TItemPos pos, uint32_t elk);
 		bool SendItemDropPacketNew(TItemPos pos, uint32_t elk, uint32_t count);
 		bool SendItemMovePacket(TItemPos pos, TItemPos change_pos, uint8_t num);
 		bool SendItemPickUpPacket(uint32_t vid);

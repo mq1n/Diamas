@@ -521,24 +521,6 @@ bool CPythonNetworkStream::SendItemUseToItemPacket(TItemPos source_pos, TItemPos
 	return true;
 }
 
-bool CPythonNetworkStream::SendItemDropPacket(TItemPos pos, uint32_t elk)
-{
-	if (!__CanActMainInstance())
-		return true;
-
-	SPacketCGItemDrop itemDropPacket;
-	itemDropPacket.pos = pos;
-	itemDropPacket.elk = elk;
-
-	if (!Send(sizeof(itemDropPacket), &itemDropPacket))
-	{
-		Tracen("SendItemDropPacket Error");
-		return false;
-	}
-
-	return true;
-}
-
 bool CPythonNetworkStream::SendItemDropPacketNew(TItemPos pos, uint32_t elk, uint32_t count)
 {
 	if (!__CanActMainInstance())
