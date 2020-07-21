@@ -19,7 +19,8 @@ projeyi indirme:
 git clone https://github.com/mq1n/Diamas
 git submodule update --init --recursive
 git submodule update --recursive --remote
+chmod +x build.sh
+chmod +x rebuild.sh
 
 build etme:
-build.sh ve rebuild.sh için 777 izni
 ./build.sh <build_modu> (Debug/Release/MinSizeRel/RelWithDebInfo)
