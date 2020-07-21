@@ -1,10 +1,11 @@
 ﻿kurulcaklar:
 pkg -vv
 pkg install git
-pkg install gcc9-devel-9
-pkg install cmake-3.13
+pkg install gcc10
+pkg install cmake-3.17
 pkg install gmake
-pkg install mysql-server
+pkg install mysql57-server
+pkg install gdb-9
 
 linux gerekenler:
 libmysqlclient20
