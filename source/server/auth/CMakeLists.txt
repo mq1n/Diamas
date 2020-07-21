@@ -73,7 +73,7 @@ else()
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 	# Link
-	target_link_libraries(${EXE_NAME} ${LIBZ} ${MYSQL_LIBRARIES} pthread -static-libgcc -static-libstdc++ thecorelib NetEngine)
+	target_link_libraries(${EXE_NAME} ${LIBZ} ${MYSQL_LIBRARIES} pthread -static-libgcc -static-libstdc++ thecorelib NetEngine cryptopp)
 
 endif()
 
