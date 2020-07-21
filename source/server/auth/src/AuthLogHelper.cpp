@@ -23,8 +23,7 @@ CAuthLogger::CAuthLogger(const std::string& stLoggerName, const std::string& stF
 #if defined(_WIN32)
 		sinks.emplace_back(std::make_shared<spdlog::sinks::wincolor_stdout_sink_mt>());
 		sinks.emplace_back(std::make_shared<spdlog::sinks::msvc_sink_mt>());
-#endif
-#if defined(__FreeBSD__)
+#else
 		sinks.emplace_back(std::make_shared<spdlog::sinks::ansicolor_sink>(std::make_shared<spdlog::sinks::stdout_sink_mt>()));
 #endif
 		sinks.emplace_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>("auth", 1024 * 1024 * 4, 4));
