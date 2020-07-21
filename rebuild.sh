@@ -1,3 +1,4 @@
+#!/bin/bash
 if [ "$#" -ne 1 ]; then
   echo "Usage: $0 <build_mode>" >&2
   exit 1
