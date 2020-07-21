@@ -1,6 +1,7 @@
 #pragma once
 #include "gposition.h"
 #include "typedef.h"
+#include "char_manager.h"
 #include <unordered_map>
 #include <functional>
 
@@ -89,8 +90,6 @@ class CEntity
 		bool			m_isShow;
 		ENTITY_REQ_FUNC m_fReq;
 };
-
-class CharacterSnapshotGuard;
 
 template <typename Function>
 void CEntity::ForEachSeen(Function& f)

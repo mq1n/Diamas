@@ -52,12 +52,6 @@ file(GLOB GAMESERVER_SOURCES
 	"${PROJECT_SOURCE_DIR}/src/*.cpp"
 )
 
-#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-#	set(STDLIB_FLAG "-stdlib=libc++")
-#ELSE() # gcc
-#	set(STDLIB_FLAG "-stdlib=libstdc++")
-#ENDIF()
-
 if (MSVC)
 	link_directories(${PROJECT_SOURCE_DIR}/../liblua/lib)
 
@@ -83,10 +77,10 @@ else()
 	endif()
 
 	# Static
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${STDLIB_FLAG} -static")
 
 	# Link
-	target_link_libraries(${EXE_NAME} sourceCommon -pthread -static-libgcc -static-libstdc++ ${MYSQL_LIBRARIES} ${IL_LIBRARIES} lualib thecorelib sqllib gamelib cryptopp)
+	target_link_libraries(${EXE_NAME} sourceCommon -pthread ${MYSQL_LIBRARIES} ${IL_LIBRARIES} lualib thecorelib sqllib gamelib cryptopp)
 
 endif()
 

@@ -9,11 +9,8 @@ if [ ! $? -eq 0 ]; then
 fi
 cd build
 
-# CXX=clang++
-# CC=clang
-
-CXX=g++10
-CC=gcc10
+CXX=clang++
+CC=clang
 
 export CXX
 export CC

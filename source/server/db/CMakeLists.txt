@@ -46,12 +46,6 @@ file(GLOB DBCACHE_SOURCES
     "src/*.cpp"
 )
 
-#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-#	set(STDLIB_FLAG "-stdlib=libc++")
-#ELSE() # gcc
-#	set(STDLIB_FLAG "-stdlib=libstdc++")
-#ENDIF()
-
 if (MSVC)
 	set(EXTRA_LIBS ws2_32 dbghelp shlwapi)
 
@@ -75,10 +69,10 @@ else()
 #	FIND_LIBRARY(LIBZ libz.a /usr/lib)
 
 	# Static
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${STDLIB_FLAG} -static")
 
 	# Link
-	target_link_libraries(${EXE_NAME} sourceCommon ${LIBZ} ${MYSQL_LIBRARIES} pthread -static-libgcc -static-libstdc++ thecorelib sqllib gamelib)
+	target_link_libraries(${EXE_NAME} sourceCommon ${LIBZ} ${MYSQL_LIBRARIES} pthread thecorelib sqllib gamelib)
 
 endif()
 

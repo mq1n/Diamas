@@ -70,10 +70,10 @@ else()
 #	FIND_LIBRARY(LIBZ libz.a /usr/lib)
 
 	# Static
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${STDLIB_FLAG} -static")
 
 	# Link
-	target_link_libraries(${EXE_NAME} ${LIBZ} ${MYSQL_LIBRARIES} pthread -static-libgcc -static-libstdc++ thecorelib NetEngine cryptopp)
+	target_link_libraries(${EXE_NAME} ${LIBZ} ${MYSQL_LIBRARIES} pthread thecorelib NetEngine cryptopp)
 
 endif()
 

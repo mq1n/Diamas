@@ -35,6 +35,12 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 	# -Wall -Wextra -Weverything -Wpedantic
 endif()
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set(STDLIB_FLAG "-stdlib=libc++")
+else() # gcc
+	set(STDLIB_FLAG "-stdlib=libstdc++")
+endif()
+
 # Non-MSVC specific
 if(NOT MSVC)
 #	# x86 build for x64 os
