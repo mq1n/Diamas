@@ -1,3 +1,4 @@
+#!/bin/bash
 if [ "$#" -ne 1 ]; then
   echo "Usage: $0 <build_mode>" >&2
   exit 1
@@ -18,7 +19,7 @@ CC=gcc10
 export CXX
 export CC
 
-cmake .. -DCMAKE_BUILD_TYPE=$1 -DBUILD_STATIC=ON -DBUILD_SHARED=OFF -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF
+cmake .. -DCMAKE_BUILD_TYPE="$1" -DBUILD_STATIC=ON -DBUILD_SHARED=OFF -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF
 if [ ! $? -eq 0 ]; then
 	echo "Cmake was not successfull"
 	exit 2
