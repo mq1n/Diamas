@@ -12,7 +12,7 @@
 #include "p2p.h"
 #include "ip_ban.h"
 #include "dev_log.h"
-#include "../../libthecore/include/Random.h"
+#include "../../libthecore/include/random.h"
 
 DESC_MANAGER::DESC_MANAGER() : m_bDestroyed(false)
 {
