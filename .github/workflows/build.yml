@@ -54,6 +54,15 @@ jobs:
       run: |
         cmake .. -A Win32 -DBUILD_TESTING=ON -DBUILD_CLIENT=0 -DCMAKE_CXX_FLAGS=/W1 -G"${{ matrix.generator }}"
         cmake --build . -j 12
+    - name: Collect outputs
+      run: |
+        mkdir _output
+        cp sql\Debug\* _output
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: output
+        path: _output
     - name: Run tests
       working-directory: sql
       env:
