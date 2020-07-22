@@ -65,6 +65,10 @@ add_definitions(-DCRYPTOPP_ENABLE_NAMESPACE_WEAK=1) # cryptopp
 add_definitions(-DASIO_STANDALONE) # websocketpp
 add_definitions(-DUSE_BOOST_ASIO=0) # amy
 add_definitions(-DFMT_HEADER_ONLY) # fmt
+if (CI_BUILD)
+	add_definitions(-DCI_BUILD=1)
+	message(STATUS "CI Build mode detected.")
+endif()
 
 # Platform defination
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
