@@ -26,6 +26,17 @@ jobs:
       run: |
         cmake -DBUILD_TESTING=ON ..
         make -j12
+    - name: Collect outputs
+      run: |
+        mkdir _output
+        dir ..
+        dir ../Bin
+        cp ..\Bin\* _output
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: output
+        path: _output
     - name: Run tests
       working-directory: sql
       env:
@@ -57,7 +68,9 @@ jobs:
     - name: Collect outputs
       run: |
         mkdir _output
-        cp sql\Debug\* _output
+        dir ..
+        dir ../Bin
+        copy ..\Bin\* _output
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
