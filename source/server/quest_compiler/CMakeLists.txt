@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.2)
 project(qc)
 set(EXE_NAME qc)
 
+add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
+
 # Output dir
 set(OUTPUT_DIR ${PROJECT_SOURCE_DIR}/../../../Bin)
 
