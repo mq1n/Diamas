@@ -104,6 +104,8 @@ else()
 endif()
 add_definitions(-D_DIRECTORY_="${CMAKE_SOURCE_DIR}")
 
+message(FATAL_ERROR "HOST: ${HOSTNAME}")
+
 add_definitions(-D__MAJOR_VERSION__="${MAJOR_VERSION}")
 add_definitions(-D__PRODUCT_VERSION__="${MAJOR_VERSION}.${gitVersion}")
 add_definitions(-D__FILE_VERSION__=${MAJOR_VERSION},${gitVersion},0,0)
