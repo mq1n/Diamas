@@ -45,7 +45,7 @@ if(NOT MSVC)
 
 	# Static build
 	if (DIAMAS_STATIC_BUILD)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static")
 	endif()
