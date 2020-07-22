@@ -44,7 +44,7 @@ if(NOT MSVC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pipe")
 
 	# Static build
-	if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+	if (DIAMAS_STATIC_BUILD)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static")
