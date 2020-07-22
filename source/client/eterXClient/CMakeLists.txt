@@ -64,7 +64,6 @@ target_link_libraries(
 	sourceCommon
 	eterBase ${CYTHON_LIB} eterEffectLib eterGameLib eterGrnLib eterImageLib eterLib eterPythonLib
 	eterScriptLib eterSoundLib eterSphereLib eterSecurity eterTerrainLib eterTreeLib eterWebBrowser
-	discord_sdk
 )
 
 set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 17)

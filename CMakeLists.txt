@@ -23,6 +23,7 @@ endif()
 
 # Version
 file (STRINGS "VERSION.txt" MAJOR_VERSION)
+message(STATUS "VERSION: ${MAJOR_VERSION}")
 
 # Build options
 option(BUILD_UTILITIES "Build the common utilities" ON)
@@ -110,7 +111,7 @@ else()
 endif()
 
 add_definitions(-D_DIRECTORY_="${CMAKE_SOURCE_DIR}")
-MESSAGE(STATUS "D_DIRECTORY_=${CMAKE_SOURCE_DIR}")
+MESSAGE(STATUS "DIRECTORY=${CMAKE_SOURCE_DIR}")
 
 add_definitions(-D__MAJOR_VERSION__="${MAJOR_VERSION}")
 add_definitions(-D__PRODUCT_VERSION__="${MAJOR_VERSION}.${gitVersion}")

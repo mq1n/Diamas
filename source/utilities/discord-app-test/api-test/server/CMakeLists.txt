@@ -5,12 +5,10 @@ set(EXE_NAME DiscordAPITest_Server)
 file(GLOB ServerApp_HEADERS
     "${PROJECT_SOURCE_DIR}/src/*.h"
     "${PROJECT_SOURCE_DIR}/src/*.hpp"
-    "${PROJECT_SOURCE_DIR}/../../../../../extern/3rd/fmt/include/*.h"
 )
 file(GLOB ServerApp_SOURCES
     "${PROJECT_SOURCE_DIR}/src/*.c"
     "${PROJECT_SOURCE_DIR}/src/*.cpp"
-    "${PROJECT_SOURCE_DIR}/../../../../../extern/3rd/fmt/src/*.cc"
 )
 add_executable(${EXE_NAME} ${ServerApp_HEADERS} ${ServerApp_SOURCES})
 

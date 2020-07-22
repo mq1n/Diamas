@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <memory>
 #include <iostream>
-#include <fmt/format.h>
 
 using TPacketHeader = uint8_t;
 

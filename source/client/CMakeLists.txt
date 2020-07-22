@@ -6,7 +6,7 @@ if (ENABLE_CYTHON)
 	add_definitions(-D__USE_CYTHON__)
 endif()
 
-# Kayma sorunu(?) için: add_definitions(-D_WIN32_WINNT_WINXP)
+# Kayma sorunu(?) icin: add_definitions(-D_WIN32_WINNT_WINXP)
 add_definitions(-DNOMINMAX)
 add_definitions(-DBUILDING_GRANNY_STATIC=1)
 

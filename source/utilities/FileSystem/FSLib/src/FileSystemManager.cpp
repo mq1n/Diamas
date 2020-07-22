@@ -15,28 +15,14 @@
 #include <cryptopp/tea.h>
 #include <cryptopp/blowfish.h>
 
-#ifdef _WIN32
-	#ifdef _DEBUG
-		#ifdef CI_BUILD
-			#pragma comment( lib, "cryptopp_debug.lib" )
-		#else
-			#pragma comment( lib, "cryptopp-static_debug.lib" )
-		#endif
-	#else
-		#ifdef CI_BUILD
-			#pragma comment( lib, "cryptopp_release.lib" )
-		#else
-			#pragma comment( lib, "cryptopp-static_release.lib" )
-		#endif
-	#endif
-#endif
-
 #ifdef _DEBUG
+	#pragma comment( lib, "cryptopp-static_debug.lib" )
 	#pragma comment( lib, "xxhash_debug.lib" )
 	#pragma comment( lib, "lzo2_debug.lib" )
 	#pragma comment( lib, "lz4_debug.lib" )
 	#pragma comment( lib, "zlib_debug.lib" )
 #else
+	#pragma comment( lib, "cryptopp-static_release.lib" )
 	#pragma comment( lib, "xxhash.lib" )
 	#pragma comment( lib, "lzo2.lib" )
 	#pragma comment( lib, "lz4.lib" )

@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include "Debug.h"
 #include "Timer.h"
-#include <fmt/format.h>
 
 const uint32_t DEBUG_STRING_MAX_LEN = 1024;
 
