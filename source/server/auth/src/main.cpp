@@ -4,6 +4,22 @@
 #include "../../libthecore/include/winminidump.h"
 using namespace net_engine;
 
+#ifdef _WIN32
+	#ifdef _DEBUG
+		#ifdef CI_BUILD
+			#pragma comment( lib, "cryptopp_debug.lib" )
+		#else
+			#pragma comment( lib, "cryptopp-static_debug.lib" )
+		#endif
+	#else
+		#ifdef CI_BUILD
+			#pragma comment( lib, "cryptopp_release.lib" )
+		#else
+			#pragma comment( lib, "cryptopp-static_release.lib" )
+		#endif
+	#endif
+#endif
+
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
 static const auto gsc_securityLevel = ESecurityLevels::SECURITY_LEVEL_KEY_AGREEMENT;
 #else

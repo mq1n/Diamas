@@ -24,9 +24,9 @@
 		#endif
 	#else
 		#ifdef CI_BUILD
-			#pragma comment( lib, "cryptopp.lib" )
+			#pragma comment( lib, "cryptopp_release.lib" )
 		#else
-			#pragma comment( lib, "cryptopp-static.lib" )
+			#pragma comment( lib, "cryptopp-static_release.lib" )
 		#endif
 	#endif
 #endif
