@@ -45,9 +45,9 @@ if(NOT MSVC)
 
 	# Static build
 	if (DIAMAS_STATIC_BUILD)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static")
+	#	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
+	#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
+	#	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static")
 	endif()
 
 	# CLang specific
@@ -98,5 +98,5 @@ add_subdirectory(libcrypt)
 add_subdirectory(db)
 add_subdirectory(game)
 add_subdirectory(auth)
-#add_subdirectory(quest_compiler)
+add_subdirectory(quest_compiler)
 add_subdirectory(vrunner)
