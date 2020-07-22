@@ -29,9 +29,9 @@ jobs:
     - name: Collect outputs
       run: |
         mkdir _output
-        dir ..
-        dir ../Bin
-        cp ..\Bin\* _output
+        dir
+        dir Bin
+        cp Bin\* _output
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
