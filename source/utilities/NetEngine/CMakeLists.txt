@@ -30,13 +30,7 @@ file(GLOB NETENGINE_SOURCES
 
 add_library(${PROJECT_NAME} STATIC ${NETENGINE_HEADERS} ${NETENGINE_SOURCES})
 
-if (MSVC)
-	if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-		set(EXTRA_LIBS ${EXTRA_LIBS} cryptopp-static_debug)
-	else()
-		set(EXTRA_LIBS ${EXTRA_LIBS} cryptopp-static)
-	endif()
-else()
+if (NOT MSVC)
 	set(EXTRA_LIBS ${EXTRA_LIBS} cryptopp)
 endif()
 target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})

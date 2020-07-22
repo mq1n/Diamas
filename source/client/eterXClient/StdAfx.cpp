@@ -22,14 +22,10 @@
 #pragma comment( lib, "discord-rpc.lib" )
 
 #ifdef _DEBUG
-	#pragma comment( lib, "cryptopp-static_debug.lib" )
 	#pragma comment( lib, "python27_debug.lib" )
-	#pragma comment( lib, "fmt_debug.lib" )
 	#pragma comment( lib, "lzo2_debug.lib" )
 #else
-	#pragma comment( lib, "cryptopp-static.lib" )
 	#pragma comment( lib, "python27.lib" )
-	#pragma comment( lib, "fmt.lib" )
 	#pragma comment( lib, "lzo2.lib" )
 #endif
 

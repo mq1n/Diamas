@@ -58,9 +58,9 @@ if (MSVC)
 	set(EXTRA_LIBS ws2_32 dbghelp shlwapi)
 
 	if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb_debug mariadbclient_debug cryptopp-static_debug)
+		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb_debug mariadbclient_debug)
 	else()
-		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb mariadbclient cryptopp-static)
+		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb mariadbclient)
 	endif()
 
 	add_executable(${EXE_NAME} ${GAMESERVER_HEADERS} ${GAMESERVER_SOURCES})

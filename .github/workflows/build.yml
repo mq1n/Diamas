@@ -24,14 +24,16 @@ jobs:
       env:
         CXX: ${{ matrix.compiler }}
       run: |
-        cmake -DBUILD_TESTING=ON ..
+        cmake -DBUILD_TESTING=1 ..
         make -j12
     - name: Collect outputs
       run: |
         mkdir _output
-        dir
-        dir Bin
-        cp Bin/* _output
+        cp Bin/auth_server _output
+        cp Bin/db_cache _output
+        cp Bin/game_server _output
+        cp Bin/qc _output
+        cp Bin/vrunner _output
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
@@ -63,14 +65,12 @@ jobs:
     - name: Compile tests
       working-directory: sql
       run: |
-        cmake .. -A Win32 -DBUILD_TESTING=ON -DBUILD_CLIENT=0 -DCMAKE_CXX_FLAGS=/W1 -G"${{ matrix.generator }}"
+        cmake .. -A Win32 -DBUILD_TESTING=ON -DCI_BUILD=1 -DCMAKE_CXX_FLAGS=/W1 -G"${{ matrix.generator }}"
         cmake --build . -j 12
     - name: Collect outputs
       run: |
         mkdir _output
-        dir ..
-        dir ../Bin
-        copy ..\Bin\* _output
+        copy Bin\* _output
     - name: Upload
       uses: actions/upload-artifact@v1
       with:

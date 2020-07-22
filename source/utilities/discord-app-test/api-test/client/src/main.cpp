@@ -16,12 +16,6 @@
 #pragma comment( lib, "discord_game_sdk.dll.lib" )
 #pragma comment( lib, "discord_sdk.lib" )
 
-#ifdef _DEBUG
-	#pragma comment( lib, "fmt_debug.lib" )
-#else
-	#pragma comment( lib, "fmt.lib" )
-#endif
-
 static inline std::string __ReadFromFile(const std::string& stFileName)
 {
 	std::ifstream in(stFileName.c_str(), std::ios_base::binary);

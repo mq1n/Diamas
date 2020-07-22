@@ -53,6 +53,7 @@
 #include "desc.h"
 #include "desc_client.h"
 #include "../../libthecore/include/winminidump.h"
+#include <signal.h>
 
 #ifdef USE_STACKTRACE
 	#ifdef _WIN32
@@ -62,7 +63,22 @@
 	#endif
 #endif
 
-#include <signal.h>
+#ifdef _WIN32
+	#ifdef _DEBUG
+		#ifdef CI_BUILD
+			#pragma comment( lib, "cryptopp_debug.lib" )
+		#else
+			#pragma comment( lib, "cryptopp-static_debug.lib" )
+		#endif
+	#else
+		#ifdef CI_BUILD
+			#pragma comment( lib, "cryptopp.lib" )
+		#else
+			#pragma comment( lib, "cryptopp-static.lib" )
+		#endif
+	#endif
+#endif
+
 
 #if defined(__FreeBSD__) && defined(DEBUG_ALLOC)
 extern void (*_malloc_message)(const char* p1, const char* p2, const char* p3, const char* p4);

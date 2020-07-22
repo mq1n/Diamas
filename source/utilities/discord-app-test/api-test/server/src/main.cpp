@@ -17,12 +17,6 @@
 #pragma comment( lib, "discord_game_sdk.dll.lib" )
 #pragma comment( lib, "discord_sdk.lib" )
 
-#ifdef _DEBUG
-	#pragma comment( lib, "fmt_debug.lib" )
-#else
-	#pragma comment( lib, "fmt.lib" )
-#endif
-
 #define LOBBY_DATA_FILENAME "lobby_info.dat"
 
 // https://discordapp.com/developers/docs/game-sdk/networking#example-connecting-to-another-player-in-a-lobby

@@ -3,12 +3,20 @@
 #include <vector>
 #include "../../FSLib/include/FileSystemIncl.hpp"
 
-#ifdef _DEBUG
-	#pragma comment( lib, "cryptopp-static_debug.lib" )
-	#pragma comment( lib, "fmt_debug.lib" )
-#else
-	#pragma comment( lib, "cryptopp-static.lib" )
-	#pragma comment( lib, "fmt.lib" )
+#ifdef _WIN32
+	#ifdef _DEBUG
+		#ifdef CI_BUILD
+			#pragma comment( lib, "cryptopp_debug.lib" )
+		#else
+			#pragma comment( lib, "cryptopp-static_debug.lib" )
+		#endif
+	#else
+		#ifdef CI_BUILD
+			#pragma comment( lib, "cryptopp.lib" )
+		#else
+			#pragma comment( lib, "cryptopp-static.lib" )
+		#endif
+	#endif
 #endif
 
 int32_t main(int32_t argc, char* argv[])

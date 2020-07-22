@@ -16,14 +16,26 @@
 
 #include "../../FSLib/include/FileSystemIncl.hpp"
 
+#ifdef _WIN32
+	#ifdef _DEBUG
+		#ifdef CI_BUILD
+			#pragma comment( lib, "cryptopp_debug.lib" )
+		#else
+			#pragma comment( lib, "cryptopp-static_debug.lib" )
+		#endif
+	#else
+		#ifdef CI_BUILD
+			#pragma comment( lib, "cryptopp.lib" )
+		#else
+			#pragma comment( lib, "cryptopp-static.lib" )
+		#endif
+	#endif
+#endif
+
 #ifdef _DEBUG
-	#pragma comment( lib, "tbb.lib" )
-	#pragma comment( lib, "cryptopp-static_debug.lib" )
-	#pragma comment( lib, "fmt_debug.lib" )
-#else
 	#pragma comment( lib, "tbb_debug.lib" )
-	#pragma comment( lib, "cryptopp-static.lib" )
-	#pragma comment( lib, "fmt.lib" )
+#else
+	#pragma comment( lib, "tbb.lib" )
 #endif
 
 #ifdef SHOW_FILE_NAMES

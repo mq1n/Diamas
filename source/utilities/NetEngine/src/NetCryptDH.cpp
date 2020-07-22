@@ -22,12 +22,6 @@
 
 #include "../include/NetEngine.hpp"
 
-#ifdef _DEBUG
-	#pragma comment( lib, "cryptopp-static_debug.lib" )
-#else
-	#pragma comment( lib, "cryptopp-static.lib" )
-#endif
-
 namespace net_engine
 {
 	KeyAgreementCryptation::KeyAgreementCryptation() :
