@@ -19,6 +19,7 @@ jobs:
       with:
         token: ${{ secrets.ACCESS_TOKEN }}
         submodules: true
+        lfs:  true
     - name: Compile tests
       working-directory: sql
       env:
