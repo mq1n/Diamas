@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.2)
 project(server)
 
-set(OUTPUT_DIR  ${PROJECT_SOURCE_DIR}/../../Bin)
+set(OUTPUT_DIR ${PROJECT_SOURCE_DIR}/../../Bin)
 
 include_directories(${PROJECT_SOURCE_DIR}/../utilities/NetEngine/include)
 
 # Setting global warning settings
-if(MSVC)
+if (MSVC)
 	# Force to always compile with W4
 	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
 		string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -28,46 +28,48 @@ if(MSVC)
 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS} ${MT_BUILD}")
 
-elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-
-	# TODO: Enable all shits
-	# -Wall -Wextra -Weverything -Wpedantic
-endif()
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set(STDLIB_FLAG "-stdlib=libc++")
-else() # gcc
-	set(STDLIB_FLAG "-stdlib=libstdc++")
+elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	# TODO: Works but not yet enabled
+	# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Weverything -Wpedantic")
 endif()
 
 # Non-MSVC specific
 if(NOT MSVC)
 #	# x86 build for x64 os
-# TODO?: -mtune=i686
-#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-#	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32 -mtune=i686 -msse2 -mssse3")
+#	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32 -mtune=i686 -msse2 -mssse3")
 
 	# Pipe
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pipe")
 
-# CHECKME: msse2 - mssse3 ?
-
-	#  CHECKME: Static build
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static")
-
-	# Disable encoding warnings
-	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-source-encoding")
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-invalid-source-encoding")
+	# Static build
+	if (DIAMAS_STATIC_BUILD)
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static")
 	endif()
 
-	# TODO: Try ASAN
-	# -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer
+	# CLang specific
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		# Disable encoding warnings
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-source-encoding")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-invalid-source-encoding")
+	else() # GCC specific
+		# ASAN (static link not supported)
+		if (NOT DIAMAS_STATIC_BUILD)
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libasan")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer")
+			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer")
+		endif()
+	endif()
 
-	# TODO: CCACHE
+	# CCACHE
+	find_program(CCACHE_PROGRAM ccache)
+	if (CCACHE_PROGRAM)
+		set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+		set(CMAKE_C_COMPILER_LAUNCHER   ${CCACHE_PROGRAM})
+	endif()
 
 	# Threading
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -D_THREAD_SAFE")

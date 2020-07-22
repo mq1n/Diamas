@@ -72,21 +72,18 @@ else()
 
 	set(IL_LIBRARIES IL png tiff mng lcms jpeg jbig)
 
-	if(NOT MYSQL_LIBRARIES)
-		FIND_LIBRARY(MYSQL_LIBRARIES libmysqlclient.a ${MYSQL_DIR} NO_DEFAULT_PATH)
-	endif()
-
-	# Static
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${STDLIB_FLAG} -static")
-
 	# Link
-	target_link_libraries(${EXE_NAME} sourceCommon -pthread ${MYSQL_LIBRARIES} ${IL_LIBRARIES} lualib thecorelib sqllib gamelib cryptopp)
+	target_link_libraries(${EXE_NAME} sourceCommon mysqlclient cryptopp ${IL_LIBRARIES} lualib thecorelib sqllib gamelib -ldl -lm -lpthread -pthread)
 
 endif()
 
-SET_TARGET_PROPERTIES(${exe} PROPERTIES COMPILE_DEFINITIONS "${_definitions}") 
+set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ${EXE_NAME} PROPERTY CMAKE_CXX_EXTENSIONS OFF)
+
+SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES COMPILE_DEFINITIONS "${_definitions}") 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	SET_TARGET_PROPERTIES(${exe} PROPERTIES LINK_SEARCH_END_STATIC 1) #STATIC LINKING for clang
+	SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES LINK_SEARCH_END_STATIC 1) #STATIC LINKING for clang
 	set(CMAKE_EXE_LINK_DYNAMIC_C_FLAGS)       # remove -Wl,-Bdynamic 
 	set(CMAKE_EXE_LINK_DYNAMIC_CXX_FLAGS) 
 	set(CMAKE_SHARED_LIBRARY_C_FLAGS)         # remove -fPIC 

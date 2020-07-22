@@ -30,6 +30,7 @@ option(BUILD_TOOLS "Build the tool binaries" ON)
 option(ENABLE_STATIC_ANALYSIS "Enable static code analysis with PVS Studio" OFF)
 option(ENABLE_AUTO_RELEASE "Enable auto release create in git repo" OFF)
 option(ENABLE_CYTHON "Cythonize python scripts" OFF)
+option(DIAMAS_STATIC_BUILD "Static linking for serverside" ON)
 
 # Output dir
 set(OUTPUT_DIR ${PROJECT_SOURCE_DIR}/Bin)
@@ -129,15 +130,6 @@ if(NOT WIN32)
 
 	# Disable client build for non win32
 	set(BUILD_CLIENT OFF)
-	
-	# Register MySQL path
-	#if(MYSQL_FOUND)
-	#	include_directories(${MYSQL_INCLUDE_DIR})
-	#else()
-	#	message(STATUS "FindMySQL has been failed! Set MySQL path manually.")
-
-	set(MYSQL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/mysql/${COMPILER_SUBDIR})
-	#endif()
 endif()
 
 # Check enabled projects
@@ -177,11 +169,21 @@ include_directories(${PROJECT_SOURCE_DIR}/extern/3rd)
 
 # Register 3rd dependecies precompiled library path
 link_directories(${PROJECT_SOURCE_DIR}/Bin/Utilities)
-link_directories(${PROJECT_SOURCE_DIR}/extern/lib_win_x${TARGET_ARCH_STR})
-if (NOT MSVC)
+if (WIN32)
+	link_directories(${PROJECT_SOURCE_DIR}/extern/lib_win_x${TARGET_ARCH_STR})
+else()
 	link_directories(${PROJECT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR})
-	link_directories(${PROJECT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/cryptopp/${COMPILER_SUBDIR})
-	link_directories(${PROJECT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/devil/${COMPILER_SUBDIR})
+	if (CMAKE_SYSTEM_NAME MATCHES "kFreeBSD.*")
+		link_directories(${PROJECT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/cryptopp/${COMPILER_SUBDIR})
+		link_directories(${PROJECT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/devil/${COMPILER_SUBDIR})
+		link_directories(${PROJECT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR}/mysql)
+	elseif (CMAKE_SYSTEM_NAME MATCHES ".*Linux")
+		link_directories(${PROJECT_SOURCE_DIR}/extern/lib_ubuntu_x${TARGET_ARCH_STR}/cryptopp/${COMPILER_SUBDIR})
+		link_directories(${PROJECT_SOURCE_DIR}/extern/lib_ubuntu_x${TARGET_ARCH_STR}/devil/${COMPILER_SUBDIR})
+		link_directories(${PROJECT_SOURCE_DIR}/extern/lib_ubuntu_x${TARGET_ARCH_STR}/mysql)
+	else()
+		message(FATAL_ERROR "Unknown OS: ${CMAKE_SYSTEM_NAME}")
+	endif()
 endif()
 
 # Sub-projects

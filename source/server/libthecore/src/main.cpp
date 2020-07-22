@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "memory.h"
 #include "srandomdev.h"
+#include "signal.h"
 
 LPHEART		thecore_heart = nullptr;
 
@@ -51,7 +52,9 @@ bool thecore_init()
     srandom(time(nullptr) + getpid() + getuid());
     srandomdev();
 #endif
+#ifdef __FreeBSD__
     signal_setup();
+#endif
 
 	if (!log_init() || !pid_init())
 		return false;

@@ -1,13 +1,13 @@
 #define __LIBTHECORE__
 #include "stdafx.h"
 
-#ifdef _WIN32
+#ifndef __FreeBSD__
 
 void signal_setup() {}
 void signal_timer_disable() {}
 void signal_timer_enable(int timeout_seconds) {}
 
-#elif __FreeBSD__
+#else
 
 #define RETSIGTYPE void
 

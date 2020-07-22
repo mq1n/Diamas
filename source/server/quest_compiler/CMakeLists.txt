@@ -27,6 +27,17 @@ link_directories(${PROJECT_SOURCE_DIR}/../liblua/lib)
 add_executable(${EXE_NAME} ${QC_SOURCES} ${QC_HEADERS})
 target_link_libraries(${EXE_NAME} lualib)
 
+SET_TARGET_PROPERTIES(${exe} PROPERTIES COMPILE_DEFINITIONS "${_definitions}") 
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	SET_TARGET_PROPERTIES(${exe} PROPERTIES LINK_SEARCH_END_STATIC 1) #STATIC LINKING for clang
+	set(CMAKE_EXE_LINK_DYNAMIC_C_FLAGS)       # remove -Wl,-Bdynamic 
+	set(CMAKE_EXE_LINK_DYNAMIC_CXX_FLAGS) 
+	set(CMAKE_SHARED_LIBRARY_C_FLAGS)         # remove -fPIC 
+	set(CMAKE_SHARED_LIBRARY_CXX_FLAGS) 
+	set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS)    # remove -rdynamic 
+	set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS) 
+endif()
+
 if (WIN32)
     add_custom_command(
         TARGET ${EXE_NAME}

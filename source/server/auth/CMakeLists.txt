@@ -59,27 +59,22 @@ if (MSVC)
 	add_executable(${EXE_NAME} ${AUTH_HEADERS} ${AUTH_SOURCES})
 	
 	target_link_libraries(${EXE_NAME} thecorelib ${EXTRA_LIBS} DevIL)
-#	set_target_properties(${EXE_NAME} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT")
 
 else()
 	add_executable(${EXE_NAME} ${AUTH_HEADERS} ${AUTH_SOURCES})
 
-	if(NOT MYSQL_LIBRARIES)
-		FIND_LIBRARY(MYSQL_LIBRARIES libmysqlclient.a ${MYSQL_DIR} NO_DEFAULT_PATH)
-	endif()
-#	FIND_LIBRARY(LIBZ libz.a /usr/lib)
-
-	# Static
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${STDLIB_FLAG} -static")
-
 	# Link
-	target_link_libraries(${EXE_NAME} ${LIBZ} ${MYSQL_LIBRARIES} pthread thecorelib NetEngine cryptopp)
+	target_link_libraries(${EXE_NAME} sourceCommon mysqlclient cryptopp NetEngine thecorelib -ldl -lm -lpthread -pthread)
 
 endif()
 
-SET_TARGET_PROPERTIES(${exe} PROPERTIES COMPILE_DEFINITIONS "${_definitions}") 
+set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ${EXE_NAME} PROPERTY CMAKE_CXX_EXTENSIONS OFF)
+
+SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES COMPILE_DEFINITIONS "${_definitions}") 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	SET_TARGET_PROPERTIES(${exe} PROPERTIES LINK_SEARCH_END_STATIC 1) #STATIC LINKING for clang
+	SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES LINK_SEARCH_END_STATIC 1) #STATIC LINKING for clang
 	set(CMAKE_EXE_LINK_DYNAMIC_C_FLAGS)       # remove -Wl,-Bdynamic 
 	set(CMAKE_EXE_LINK_DYNAMIC_CXX_FLAGS) 
 	set(CMAKE_SHARED_LIBRARY_C_FLAGS)         # remove -fPIC 
