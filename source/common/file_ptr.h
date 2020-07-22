@@ -16,7 +16,11 @@
 #pragma once
 
 #include <cstdio>
+#ifdef _WIN32
+#include <string>
+#else
 #include <cstring>
+#endif
 #include <vector>
 
 namespace msl

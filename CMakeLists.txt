@@ -17,6 +17,8 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 if (MSVC)
 	message(STATUS "MSVC: ${MSVC_VERSION}")
+else()
+	message(STATUS "Compiler: ${CMAKE_SYSTEM_NAME}")
 endif()
 
 # Version
@@ -51,9 +53,6 @@ add_definitions(-DCMAKE_BUILD_SYSTEM)
 if (ENABLE_STATIC_ANALYSIS)
 	include(${CMAKE_MODULE_PATH}/PVS-Studio.cmake)
 endif()
-#if(NOT WIN32)
-#	include(${CMAKE_MODULE_PATH}/FindMYSQL.cmake)
-#endif()
 
 # C++ options
 set(CMAKE_CXX_STANDARD 17)
@@ -94,17 +93,20 @@ string(STRIP ${GIT_REV_LIST_OUTPUT} GIT_REV_LIST_OUTPUT)
 string(REPLACE "\n" ";" GIT_REV_LIST ${GIT_REV_LIST_OUTPUT} )
 
 list(LENGTH GIT_REV_LIST gitVersion )
-MESSAGE(STATUS "GitREV=${gitVersion}")
 
 add_definitions(-D_GIT_VERSION_="${gitVersion}")
+MESSAGE(STATUS "GitREV=${gitVersion}")
+
 if (WIN32)
-    add_definitions(-D_HOSTNAME_="${USERNAME}")
+	add_definitions(-D_HOSTNAME_="${USERNAME}")
+	MESSAGE(STATUS "USERNAME=${USERNAME}")
 else()
     add_definitions(-D_HOSTNAME_="${HOSTNAME}")
+	MESSAGE(STATUS "HOSTNAME=${HOSTNAME}")
 endif()
-add_definitions(-D_DIRECTORY_="${CMAKE_SOURCE_DIR}")
 
-message(FATAL_ERROR "HOST: ${HOSTNAME}")
+add_definitions(-D_DIRECTORY_="${CMAKE_SOURCE_DIR}")
+MESSAGE(STATUS "D_DIRECTORY_=${CMAKE_SOURCE_DIR}")
 
 add_definitions(-D__MAJOR_VERSION__="${MAJOR_VERSION}")
 add_definitions(-D__PRODUCT_VERSION__="${MAJOR_VERSION}.${gitVersion}")
