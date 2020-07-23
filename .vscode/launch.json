@@ -14,7 +14,7 @@
             "name": "Windows ------------------------------------"
         },
         {
-            "name": "DB Server",
+            "name": "win/ DB Server",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/win_server/db/db_cache.exe",
@@ -25,7 +25,7 @@
             "externalConsole": false
         },
         {
-            "name": "Auth Server",
+            "name": "win/ Auth Server",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/win_server/auth/game_server.exe",
@@ -36,7 +36,7 @@
             "externalConsole": false
         },
         {
-            "name": "Game Server",
+            "name": "win/ Game Server",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/win_server/kanal/game_server.exe",
@@ -47,7 +47,7 @@
             "externalConsole": true
         },
         {
-            "name": "Game99 Server",
+            "name": "win/ Game99 Server",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/win_server/game99/game_server.exe",
@@ -83,8 +83,8 @@
             "name": "*nix ------------------------------------"
         },
         {
-            "name": "DB Server",
-            "type": "cppvsdbg",
+            "name": "*nix/ DB Server",
+            "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/win_server/db/db_cache",
             "args": [],
@@ -94,8 +94,8 @@
             "externalConsole": true
         },
         {
-            "name": "Auth Server",
-            "type": "cppvsdbg",
+            "name": "*nix/ Auth Server",
+            "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/win_server/auth/game_server",
             "args": [],
@@ -105,8 +105,8 @@
             "externalConsole": true
         },
         {
-            "name": "Game Server",
-            "type": "cppvsdbg",
+            "name": "*nix/ Game Server",
+            "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/win_server/kanal/game_server",
             "args": [],
@@ -116,8 +116,8 @@
             "externalConsole": true
         },
         {
-            "name": "Game99 Server",
-            "type": "cppvsdbg",
+            "name": "*nix/ Game99 Server",
+            "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/win_server/game99/game_server",
             "args": [],

@@ -317,7 +317,7 @@ class WinSFHelper:
 			if self.is_windows:
 				target_file = "{} {}".format(i[0], i[1]) # to > from
 			else:
-				target_file = "{} {}".format(i[1], i[0]) # from > to
+				target_file = "../{} {}".format(i[1], i[0]) # from > to
 			target_file = target_file.replace("/", os.path.sep) #*insert_shrug_emote_here*
 
 			try:
@@ -335,7 +335,7 @@ class WinSFHelper:
 			if self.is_windows:
 				target_file = "{} {}".format(i[0], i[1]) # to > from
 			else:
-				target_file = "{} {}".format(i[1], i[0]) # from > to
+				target_file = "../{} {}".format(i[1], i[0]) # from > to
 			target_file = target_file.replace("/", os.path.sep) #*insert_shrug_emote_here*
 
 			try:
