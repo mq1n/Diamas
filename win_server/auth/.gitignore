@@ -10,6 +10,5 @@ syslog.txt
 packet_info.txt
 p2p_packet_info.txt
 PTS.txt
-game_d.exe
-game.exe
+game_server.exe
 GAME_VERSION.txt

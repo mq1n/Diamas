@@ -101,17 +101,23 @@ if (ENABLE_STATIC_ANALYSIS)
 	)
 endif()
 
-if (WIN32 AND NOT CI_BUILD)
+if (WIN32)
+	set(PYTHON_EXE C:/Python27/python.exe)
+else()
+	set(PYTHON_EXE python)
+endif()
+
+if (NOT CI_BUILD)
     add_custom_command(
         TARGET ${EXE_NAME}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../share/bin/${EXE_NAME}.exe"
-        COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../share/bin/${EXE_NAME}.exe
+        COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../share/bin/${OUTPUT_NAME}"
+        COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../share/bin/${OUTPUT_NAME}
         COMMAND ${CMAKE_COMMAND} -E echo "DIR: ${PROJECT_BINARY_DIR}/../../../../win_server/"
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/../../../../win_server/
-        COMMAND ${CMAKE_COMMAND} -E echo "SYMLINK-REMOVE: C:/Python27/python.exe ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kaldir ${BUILD_MODE}"
-        COMMAND C:/Python27/python.exe ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kaldir ${BUILD_MODE}
-        COMMAND ${CMAKE_COMMAND} -E echo "SYMLINK-SETUP: C:/Python27/python.exe ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kur ${BUILD_MODE} ${TARGET_ARCH_STR}"
-        COMMAND C:/Python27/python.exe ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kur ${BUILD_MODE} ${TARGET_ARCH_STR}
+        COMMAND ${CMAKE_COMMAND} -E echo "SYMLINK-REMOVE: ${PYTHON_EXE} ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kaldir ${BUILD_MODE}"
+        COMMAND ${PYTHON_EXE} ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kaldir ${BUILD_MODE}
+        COMMAND ${CMAKE_COMMAND} -E echo "SYMLINK-SETUP: ${PYTHON_EXE} ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kur ${BUILD_MODE} ${TARGET_ARCH_STR}"
+        COMMAND ${PYTHON_EXE} ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kur ${BUILD_MODE} ${TARGET_ARCH_STR}
     )
 endif()

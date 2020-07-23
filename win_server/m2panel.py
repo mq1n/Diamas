@@ -112,10 +112,7 @@ class WinSFHelper:
 		self.sys_log("stop_game triggered.")
 
 		if self.is_windows:
-			if self.build_type == "debug":
-				core_names = ["db_d.exe", "game_d.exe"]
-			elif self.build_type == "normal":
-				core_names = ["db.exe", "game.exe"]
+			core_names = ["db_cache.exe", "game_server.exe"]
 		else:
 			core_names = ["db_cache", "game_server"]
 		
@@ -170,10 +167,7 @@ class WinSFHelper:
 		container_roots = ["/auth/", "/db/", "/game99/", "/kanal/"]
 		
 		if self.is_windows:
-			if self.build_type == "normal":
-				container_core = ["game.exe", "db.exe"]
-			if self.build_type == "debug":
-				container_core = ["game_d.exe", "db_d.exe"]
+			container_core = ["game_server.exe", "db_cache.exe"]
 		else:
 			container_core = ["game_server", "db_cache"]
 		
@@ -188,6 +182,7 @@ class WinSFHelper:
 				coreFile = container_core[0]
 
 			target_file = "{}{}".format(target_path, coreFile)
+			target_file = target_file.replace("/", os.path.sep) #*insert_shrug_emote_here*
 			self.sys_log("'{}' starting...".format(target_file))
 
 			try:
@@ -214,6 +209,7 @@ class WinSFHelper:
 				file_name, ext = os.path.splitext(file)
 				if ext == ".dmp" or file in garbage_container_log:
 					target_file = "{}{}{}".format(self.root_path, i, file)
+					target_file = target_file.replace("/", os.path.sep) #*insert_shrug_emote_here*
 					self.sys_log("'{}' removing...".format(target_file))
 
 					try:
@@ -231,10 +227,7 @@ class WinSFHelper:
 		garbage_container_roots =     ["/auth/", "/db/", "/game99/", "/kanal/"]
 		garbage_container_dirs =      ["data", "locale", "log", "package", "mark"]
 		if self.is_windows:
-			if self.build_type == "debug":
-				garbage_container_files = ["db_d.exe", "game_d.exe", "DevIL.dll"]
-			elif self.build_type == "normal":
-				garbage_container_files = ["db.exe", "game.exe", "DevIL.dll"]
+			garbage_container_files = ["db_cache.exe", "game_server.exe", "DevIL.dll"]
 		else:
 			garbage_container_files = ["db_cache", "game_server"]
 
@@ -246,6 +239,7 @@ class WinSFHelper:
 		for i in garbage_container_roots:
 			for j in garbage_container_dirs:
 				target_dir = "{}{}{}".format(self.root_path, i, j)
+				target_dir = target_dir.replace("/", os.path.sep) #*insert_shrug_emote_here*
 
 				try:
 					os.rmdir(target_dir)
@@ -256,6 +250,7 @@ class WinSFHelper:
 				
 			for j in garbage_container_files:
 				target_file = "{}{}{}".format(self.root_path, i, j)
+				target_file = target_file.replace("/", os.path.sep) #*insert_shrug_emote_here*
 
 				try:
 					os.remove(target_file)
@@ -265,6 +260,7 @@ class WinSFHelper:
 		
 		for i in garbage_container_configs:
 			target_file = "{}{}".format(self.root_path, i)
+			target_file = target_file.replace("/", os.path.sep) #*insert_shrug_emote_here*
 
 			try:
 				os.remove(target_file)
@@ -282,14 +278,9 @@ class WinSFHelper:
 			sys.exit(5)
 
 		if self.is_windows:
-			if self.build_type == "normal":
-				container_core = ["game.exe", "db.exe"]
-			if self.build_type == "debug":
-				container_core = ["game_d.exe", "db_d.exe"]
-			container_core_source = ["game_server.exe", "db_cache.exe"]
+			container_core = ["game_server.exe", "db_cache.exe"]
 		else:
 			container_core = ["game_server", "db_cache"]
-			container_core_source = ["game_server", "db_cache"]
 
 		symlink_targets_dir = [
 			["kanal/package",  "../share/package"], ["kanal/locale",  "../share/locale"], ["kanal/data",  "../share/data"], ["kanal/log",  "../share/log"],       ["kanal/mark", "../share/mark"],
@@ -299,10 +290,10 @@ class WinSFHelper:
 		]
 		
 		symlink_targets_file = [
-			["db/{}".format(container_core[1]),     "../Bin/{}".format(container_core_source[1])],
-			["auth/{}".format(container_core[0]),   "../Bin/{}".format(container_core_source[0])],
-			["game99/{}".format(container_core[0]), "../Bin/{}".format(container_core_source[0])],
-			["kanal/{}".format(container_core[0]),  "../Bin/{}".format(container_core_source[0])],
+			["db/{}".format(container_core[1]),     "../Bin/{}".format(container_core[1])],
+			["auth/{}".format(container_core[0]),   "../Bin/{}".format(container_core[0])],
+			["game99/{}".format(container_core[0]), "../Bin/{}".format(container_core[0])],
+			["kanal/{}".format(container_core[0]),  "../Bin/{}".format(container_core[0])],
 
 			["db/item_names.txt",   "../share/conf/item_names.txt"], ["db/mob_names.txt", "../share/conf/mob_names.txt"],
 			["db/item_proto.csv",   "../share/conf/item_proto.csv"], ["db/mob_proto.csv", "../share/conf/mob_proto.csv"],
@@ -327,6 +318,7 @@ class WinSFHelper:
 				target_file = "{} {}".format(i[0], i[1]) # to > from
 			else:
 				target_file = "{} {}".format(i[1], i[0]) # from > to
+			target_file = target_file.replace("/", os.path.sep) #*insert_shrug_emote_here*
 
 			try:
 				if self.is_windows:
@@ -344,6 +336,7 @@ class WinSFHelper:
 				target_file = "{} {}".format(i[0], i[1]) # to > from
 			else:
 				target_file = "{} {}".format(i[1], i[0]) # from > to
+			target_file = target_file.replace("/", os.path.sep) #*insert_shrug_emote_here*
 
 			try:
 				if self.is_windows:

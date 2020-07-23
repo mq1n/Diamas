@@ -44,11 +44,11 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL
 	set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS) 
 endif()
 
-if (WIN32 AND NOT CI_BUILD)
+if (NOT CI_BUILD)
     add_custom_command(
         TARGET ${EXE_NAME}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../share/locale/turkey/quest/${EXE_NAME}.exe"
-        COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../share/locale/turkey/quest/${EXE_NAME}.exe
+        COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../share/locale/turkey/quest/${OUTPUT_NAME}"
+        COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../share/locale/turkey/quest/${OUTPUT_NAME}
     )
 endif()
