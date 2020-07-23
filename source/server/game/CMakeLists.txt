@@ -113,11 +113,11 @@ if (NOT CI_BUILD)
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../share/bin/${OUTPUT_NAME}"
         COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../share/bin/${OUTPUT_NAME}
-        COMMAND ${CMAKE_COMMAND} -E echo "DIR: ${PROJECT_BINARY_DIR}/../../../../win_server/"
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/../../../../win_server/
-        COMMAND ${CMAKE_COMMAND} -E echo "SYMLINK-REMOVE: ${PYTHON_EXE} ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kaldir ${BUILD_MODE}"
-        COMMAND ${PYTHON_EXE} ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kaldir ${BUILD_MODE}
-        COMMAND ${CMAKE_COMMAND} -E echo "SYMLINK-SETUP: ${PYTHON_EXE} ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kur ${BUILD_MODE} ${TARGET_ARCH_STR}"
-        COMMAND ${PYTHON_EXE} ${PROJECT_BINARY_DIR}/../../../../win_server/m2panel.py kur ${BUILD_MODE} ${TARGET_ARCH_STR}
+        COMMAND ${CMAKE_COMMAND} -E echo "DIR: ${PROJECT_BINARY_DIR}/../../../../test_sf/"
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/../../../../test_sf/
+        COMMAND ${CMAKE_COMMAND} -E echo "SYMLINK-REMOVE: ${PYTHON_EXE} ${PROJECT_BINARY_DIR}/../../../../test_sf/m2panel.py kaldir ${BUILD_MODE}"
+        COMMAND ${PYTHON_EXE} ${PROJECT_BINARY_DIR}/../../../../test_sf/m2panel.py kaldir ${BUILD_MODE}
+        COMMAND ${CMAKE_COMMAND} -E echo "SYMLINK-SETUP: ${PYTHON_EXE} ${PROJECT_BINARY_DIR}/../../../../test_sf/m2panel.py kur ${BUILD_MODE} ${TARGET_ARCH_STR}"
+        COMMAND ${PYTHON_EXE} ${PROJECT_BINARY_DIR}/../../../../test_sf/m2panel.py kur ${BUILD_MODE} ${TARGET_ARCH_STR}
     )
 endif()
