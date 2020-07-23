@@ -11,10 +11,13 @@
             "processId": "${command:pickProcess}"
         },
         {
+            "name": "Windows ------------------------------------"
+        },
+        {
             "name": "DB Server",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/win_server/db/db.exe",
+            "program": "${workspaceFolder}/win_server/db/db_cache.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/win_server/db/",
@@ -25,7 +28,7 @@
             "name": "Auth Server",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/win_server/auth/game.exe",
+            "program": "${workspaceFolder}/win_server/auth/game_server.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/win_server/auth/",
@@ -36,10 +39,21 @@
             "name": "Game Server",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/win_server/kanal/game.exe",
+            "program": "${workspaceFolder}/win_server/kanal/game_server.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/win_server/kanal/",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "Game99 Server",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/win_server/game99/game_server.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/win_server/game99/",
             "environment": [],
             "externalConsole": true
         },
@@ -55,42 +69,6 @@
             "externalConsole": false
         },
         {
-            "name": "------------------------------------"
-        },
-        {
-            "name": "DB Server/Debug",
-            "type": "cppvsdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/win_server/db/db_d.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/win_server/db/",
-            "environment": [],
-            "externalConsole": true
-        },
-        {
-            "name": "Auth Server/Debug",
-            "type": "cppvsdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/win_server/auth/game_d.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/win_server/auth/",
-            "environment": [],
-            "externalConsole": true
-        },
-        {
-            "name": "Game Server/Debug",
-            "type": "cppvsdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/win_server/kanal/game_d.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/win_server/kanal/",
-            "environment": [],
-            "externalConsole": true
-        },
-        {
             "name": "Client (x86) / Debug",
             "type": "cppvsdbg",
             "request": "launch",
@@ -101,6 +79,53 @@
             "environment": [],
             "externalConsole": false
         },
+        {
+            "name": "*nix ------------------------------------"
+        },
+        {
+            "name": "DB Server",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/win_server/db/db_cache",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/win_server/db/",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "Auth Server",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/win_server/auth/game_server",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/win_server/auth/",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "Game Server",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/win_server/kanal/game_server",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/win_server/kanal/",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "Game99 Server",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/win_server/game99/game_server",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/win_server/game99/",
+            "environment": [],
+            "externalConsole": true
+        },      
         {
             "name": "------------------------------------"
         },
