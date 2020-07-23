@@ -1,14 +1,8 @@
 #-*- coding: utf-8 -*-
 import sys, os, time, signal, psutil
 
-def sys_argc():
-	return int(len(sys.argv)) - 1
-
-def sys_argv():
-	return sys.argv[1:]
-
-class WinSFHelper:
-	def __init__(self):
+class TestSFHelper:
+	def __init__(self, argv):
 		self.work_type = 0
 		self.build_type = "<undefined>"
 		self.arch = "86" # Default: x86
@@ -27,21 +21,21 @@ class WinSFHelper:
 		if os.path.isfile(self.syslog_file):
 			os.remove(self.syslog_file)
 		
-		if sys_argc() < 2:
+		argc = len(argv)
+		if argc < 2:
 			self.show_usage()
 			sys.exit(1)
 
 		# Minimum arg count: 2
 		# Usage: script.py <work_type> <core_build_type> [channel_count] [arch]
 
-		args = sys_argv()
-		self.sys_log("Args({}): {}".format(sys_argc(), args))
+		self.sys_log("Args({}): {}".format(argc, argv))
 		
-		self.set_work_type(args[0])
-		self.set_build_type(args[1])
-		if sys_argc() == 3:
-			self.set_arch_type(args[2])
-			self.channel_count = int(args[2])
+		self.set_work_type(argv[0])
+		self.set_build_type(argv[1])
+		if argc == 3:
+			self.set_arch_type(argv[2])
+			self.channel_count = int(argv[2])
 
 		self.sys_log("Work type: {} Build type: {} Arch: {}".format(self.work_type, self.build_type, self.arch))
 
@@ -364,5 +358,5 @@ class WinSFHelper:
 			  "Kurulum yapmak icin: kur\n\t")
 
 if __name__ == "__main__":
-	helper = WinSFHelper()
+	helper = TestSFHelper(sys.argv[1:])
 	helper.start_worker()
