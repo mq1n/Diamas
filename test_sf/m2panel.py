@@ -199,14 +199,14 @@ class TestSFHelper:
 		garbage_container_log = [
 			"syserr.txt", "syslog.txt", "neterr.txt", "PTS.txt", "usage.txt",
 			"packet_info.txt", "VERSION.txt", "mob_count", "p2p_packet_info.txt",
-			"DEV_LOG.log"
+			"DEV_LOG.log", "profile.txt"
 		]
 		
 		for i in garbage_container_roots:
 			file_list = os.listdir("{}{}".format(self.root_path, i))
 			for file in file_list:
 				file_name, ext = os.path.splitext(file)
-				if ext == ".dmp" or file in garbage_container_log:
+				if ext == ".dmp" or ext == ".core" or file in garbage_container_log:
 					target_file = "{}{}{}".format(self.root_path, i, file)
 					target_file = target_file.replace("/", os.path.sep) #*insert_shrug_emote_here*
 					self.sys_log("'{}' removing...".format(target_file))
