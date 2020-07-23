@@ -39,7 +39,7 @@ class TestSFHelper:
 
 		self.sys_log("Work type: {} Build type: {} Arch: {}".format(self.work_type, self.build_type, self.arch))
 
-		if self.work_type < 1 or self.work_type > 5: 
+		if self.work_type < 1 or self.work_type > 7: 
 			self.sys_err("Unknown work_type: {}".format(self.work_type))
 			sys.exit(2)
 
@@ -65,8 +65,12 @@ class TestSFHelper:
 			self.work_type = 3
 		elif type in ["kur", "install", "yukle"]:
 			self.work_type = 4
-		elif type == "test":
+		elif type in ["kapat", "close", "stop", "kill"]:
 			self.work_type = 5
+		elif type in ["backup", "yedek", "save"]
+			self.work_type = 6
+		elif type == "test":
+			self.work_type = 7
 	
 	def set_build_type(self, type):
 		if type in ["normal", "n"]:
@@ -89,7 +93,11 @@ class TestSFHelper:
 			self.uninstall_game()
 		elif self.work_type == 4:
 			self.install_game()
-		elif self.work_type == 5: # test phase
+		elif self.work_type == 5:
+			self.stop_game()
+		elif self.work_type == 6:
+			self.get_backup()
+		elif self.work_type == 7: # test phase
 			# Try delete old installed files
 			self.uninstall_game()
 
@@ -106,6 +114,12 @@ class TestSFHelper:
 			self.stop_game()
 			self.clean_logs()
 			self.uninstall_game()
+
+	def get_backup(self): # TODO
+		# for db in db_names
+		#	mysqldump --opt -u [uname] -p[pass] [db] > [{db}_backupfile.sql]
+		# tar cvzf // self.root_path > timestamp_backup.tar.gz
+		pass
 
 	def stop_game(self):
 		self.sys_log("stop_game triggered.")
