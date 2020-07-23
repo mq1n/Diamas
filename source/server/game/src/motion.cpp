@@ -9,12 +9,13 @@
 static float MSA_GetNormalAttackDuration(const char* msaPath)
 {
 	float duration = 99.0f;
-	FILE * fp = fopen(msaPath, "rt");
+
+	auto fp = msl::file_ptr(msaPath, "rt");
 	if (!fp)
 		return duration;
 
 	char line[1024];
-	while (fgets(line, sizeof(line), fp))
+	while (fgets(line, sizeof(line), fp.get()))
 	{
 		char key[1024];
 		char val[1024];
@@ -26,7 +27,6 @@ static float MSA_GetNormalAttackDuration(const char* msaPath)
 			break;
 		}
 	}
-	fclose(fp);
 
 	return duration;
 }
@@ -40,12 +40,12 @@ static float MOB_GetNormalAttackDuration(TMobTable* mobTable)
 	char motlistPath[1024];
 	snprintf(motlistPath, sizeof(motlistPath), "data/monster/%s/motlist.txt", folder);
 
-	FILE * fp = fopen(motlistPath, "rt");
+	auto fp = msl::file_ptr(motlistPath, "rt");
 	if (!fp)
 		return minDuration;
 
 	char line[1024];
-	while (fgets(line, sizeof(line), fp))
+	while (fgets(line, sizeof(line), fp.get()))
 	{
 		char mode[1024];
 		char type[1024];
@@ -62,7 +62,6 @@ static float MOB_GetNormalAttackDuration(TMobTable* mobTable)
 				minDuration = curDuration;
 		}
 	}
-	fclose(fp);
 
 	return minDuration;
 }
@@ -70,14 +69,15 @@ static float MOB_GetNormalAttackDuration(TMobTable* mobTable)
 
 static const char* GetMotionFileName(TMobTable* mobTable, EPublicMotion motion)
 {
-	char buf[1024];
 	const char * folder = mobTable->szFolder;
+
+	char buf[1024];
 	snprintf(buf, sizeof(buf), "data/monster/%s/motlist.txt", folder);
 
-	FILE * fp = fopen(buf, "rt");
 	char * v[4];
 
-	if (fp != nullptr)
+	auto fp = msl::file_ptr(buf, "rt");
+	if (fp)
 	{
 		const char* field = nullptr;
 
@@ -93,12 +93,11 @@ static const char* GetMotionFileName(TMobTable* mobTable, EPublicMotion motion)
 			case MOTION_SPECIAL_5			: field = "SPECIAL4"; break;
 
 			default:
-				fclose(fp);
 				sys_err("Motion: no process for this motion(%d) vnum(%d)", motion, mobTable->dwVnum);
 				return nullptr;
 		}
 
-		while (fgets(buf, 1024, fp))
+		while (fgets(buf, 1024, fp.get()))
 		{
 			v[0] = strtok(buf,  " \t\r\n");
 			v[1] = strtok(nullptr, " \t\r\n");
@@ -107,8 +106,6 @@ static const char* GetMotionFileName(TMobTable* mobTable, EPublicMotion motion)
 
 			if (nullptr != v[0] && nullptr != v[1] && nullptr != v[2] && nullptr != v[3] && !strcasecmp(v[1], field))
 			{
-				fclose(fp);
-
 				static std::string str;
 				str = "data/monster/";
 				str += folder;
@@ -118,8 +115,6 @@ static const char* GetMotionFileName(TMobTable* mobTable, EPublicMotion motion)
 				return str.c_str();
 			}
 		}
-
-		fclose(fp);
 	}
 	else
 	{

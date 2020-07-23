@@ -2588,16 +2588,13 @@ int32_t CClientManager::AnalyzeQueryResult(SQLMsg * msg)
 
 void UsageLog()
 {   
-	FILE* fp = nullptr;
-
 	time_t      ct;
 	char        *time_s;
 	struct tm   lt;
 
 	int32_t         avg = g_dwUsageAvg / 3600; // 60 УЪ * 60 Ка
 
-	fp = fopen("usage.txt", "a+");
-
+	auto fp = msl::file_ptr("usage.txt", "a+");
 	if (!fp)
 		return;
 
@@ -2607,10 +2604,8 @@ void UsageLog()
 
 	time_s[strlen(time_s) - 1] = '\0';
 
-	fprintf(fp, "| %4d %-15.15s | %5d | %5u |", lt.tm_year + 1900, time_s + 4, avg, g_dwUsageMax);
-
-	fprintf(fp, "\n");
-	fclose(fp);
+	fprintf(fp.get(), "| %4d %-15.15s | %5d | %5u |", lt.tm_year + 1900, time_s + 4, avg, g_dwUsageMax);
+	fprintf(fp.get(), "\n");
 
 	g_dwUsageMax = g_dwUsageAvg = 0;
 }

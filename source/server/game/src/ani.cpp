@@ -72,9 +72,8 @@ static class ANI s_ANI;
 
 uint32_t FN_attack_speed_from_file(const char *file)
 {
-	FILE * fp = fopen(file, "r");
-
-	if (nullptr == fp)
+	auto fp = msl::file_ptr(file, "r");
+	if (!fp)
 		return 0;
 
 	int32_t speed = 1000;
@@ -85,7 +84,7 @@ uint32_t FN_attack_speed_from_file(const char *file)
 
 	char buf[1024];
 
-	while (fgets(buf, 1024, fp))
+	while (fgets(buf, 1024, fp.get()))
 	{
 		field	= strtok(buf, delim);
 		value	= strtok(nullptr, delim);
@@ -100,8 +99,6 @@ uint32_t FN_attack_speed_from_file(const char *file)
 			}
 		}
 	}
-
-	fclose(fp);
 	return speed;
 }
 

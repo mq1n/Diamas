@@ -144,17 +144,14 @@ void Initialize()
 	memset(fish_info, 0, sizeof(fish_info));
 
 
-	// LOCALE_SERVICE
 	const int32_t FILE_NAME_LEN = 256;
 	char szFishingFileName[FILE_NAME_LEN+1];
-	snprintf(szFishingFileName, sizeof(szFishingFileName),
-			"%s/fishing.txt", LocaleService_GetBasePath().c_str());
-	FILE * fp = fopen(szFishingFileName, "r");
-	// END_OF_LOCALE_SERVICE
+	snprintf(szFishingFileName, sizeof(szFishingFileName), "%s/fishing.txt", LocaleService_GetBasePath().c_str());
 
 	if (*fish_info_bak[0].name)
 		sys_err("Reloading fish table.");
 
+	auto fp = msl::file_ptr(szFishingFileName, "r");
 	if (!fp)
 	{
 		SendLog("error! cannot open fishing.txt");
@@ -173,7 +170,7 @@ void Initialize()
 	char buf[512];
 	int32_t idx = 0;
 
-	while (fgets(buf, 512, fp))
+	while (fgets(buf, 512, fp.get()))
 	{
 		if (*buf == '#')
 			continue;
@@ -251,7 +248,6 @@ void Initialize()
 			break;
 	}
 
-	fclose(fp);
 /*
 	for (int32_t i = 0; i < MAX_FISH; ++i)
 	{

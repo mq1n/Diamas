@@ -62,7 +62,6 @@ void DESC::Initialize()
 
 	memset( &m_SockAddr, 0, sizeof(m_SockAddr) );
 
-	m_pLogFile = nullptr;
 	m_stRelayName.clear();
 
 #ifndef _IMPROVED_PACKET_ENCRYPTION_
@@ -99,12 +98,6 @@ void DESC::Destroy()
 	if (GetAccountTable().id)
 		DESC_MANAGER::Instance().DisconnectAccount(GetAccountTable().login);
 
-	if (m_pLogFile)
-	{
-		fclose(m_pLogFile);
-		m_pLogFile = nullptr;
-	}
-
 	if (m_lpCharacter)
 	{
 		const char * closeReason = GetCloseReason().c_str();
@@ -137,7 +130,7 @@ void DESC::Destroy()
 	if (m_sock != INVALID_SOCKET)
 	{
 		sys_log(0, "SYSTEM: closing socket. DESC #%d", m_sock);
-		Log("SYSTEM: closing socket. DESC #%d", m_sock);
+		//Log("SYSTEM: closing socket. DESC #%d", m_sock);
 		fdwatch_del_fd(m_lpFdw, m_sock);
 
 #ifdef _IMPROVED_PACKET_ENCRYPTION_
@@ -233,7 +226,7 @@ bool DESC::Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSoc
 	sys_log(0, "SYSTEM: new connection from [%s] fd: %d handshake %lu output input_len %lu, ptr %p",
 			m_stHost.c_str(), m_sock, m_dwHandshake, buffer_size(m_lpInputBuffer), this);
 
-	Log("SYSTEM: new connection from [%s] fd: %d handshake %u ptr %p", m_stHost.c_str(), m_sock, m_dwHandshake, this);
+	//Log("SYSTEM: new connection from [%s] fd: %d handshake %u ptr %p", m_stHost.c_str(), m_sock, m_dwHandshake, this);
 	return true;
 }
 
@@ -561,33 +554,6 @@ void DESC::BindAccountTable(TAccountTable * pAccountTable)
 	assert(pAccountTable != nullptr);
 	memcpy(&m_accountTable, pAccountTable, sizeof(TAccountTable));
 	DESC_MANAGER::Instance().ConnectAccount(m_accountTable.login, this);
-}
-
-void DESC::Log(const char * format, ...)
-{
-	if (!m_pLogFile)
-		return;
-
-	va_list args;
-
-	time_t ct = get_unix_time();
-	struct tm tm = *localtime(&ct);
-
-	fprintf(m_pLogFile,
-			"%02d %02d %02d:%02d:%02d | ",
-			tm.tm_mon + 1,
-			tm.tm_mday,
-			tm.tm_hour,
-			tm.tm_min,
-			tm.tm_sec);
-
-	va_start(args, format);
-	vfprintf(m_pLogFile, format, args);
-	va_end(args);
-
-	fputs("\n", m_pLogFile);
-
-	fflush(m_pLogFile);
 }
 
 void DESC::StartHandshake(uint32_t _handshake)

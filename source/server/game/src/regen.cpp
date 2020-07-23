@@ -397,24 +397,23 @@ bool regen_do(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t b
 	if (g_bNoRegen)
 		return true;
 
-	if ( lMapIndex >= 114 && lMapIndex <= 117 )
+	if (lMapIndex >= 114 && lMapIndex <= 117)
 		return true;
 
-	LPREGEN regen = nullptr;
-	FILE* fp = fopen(filename, "rt");
-
-	if (nullptr == fp)
+	auto fp = msl::file_ptr(filename, "rt");
+	if (!fp)
 	{
 		sys_err("SYSTEM: regen_do: %s: file not found", filename);
 		return false;
 	}
 
+	LPREGEN regen = nullptr;
 	while (true)
 	{
 		REGEN tmp;
 		memset(&tmp, 0, sizeof(tmp));
 
-		if (!read_line(fp, &tmp))
+		if (!read_line(fp.get(), &tmp))
 			break;
 
 		if (tmp.type == REGEN_TYPE_MOB ||
@@ -490,7 +489,6 @@ bool regen_do(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t b
 		}
 	}
 
-	fclose(fp);
 	return true;
 }
 
@@ -500,9 +498,9 @@ bool regen_load_in_file(const char* filename, int32_t lMapIndex, int32_t base_x,
 		return true;
 
 	LPREGEN regen = nullptr;
-	FILE * fp = fopen(filename, "rt");
 
-	if (nullptr == fp)
+	auto fp = msl::file_ptr(filename, "rt");
+	if (!fp)
 	{
 		sys_err("SYSTEM: regen_do: %s: file not found", filename);
 		return false;
@@ -513,7 +511,7 @@ bool regen_load_in_file(const char* filename, int32_t lMapIndex, int32_t base_x,
 		REGEN tmp;
 		memset(&tmp, 0, sizeof(tmp));
 
-		if (!read_line(fp, &tmp))
+		if (!read_line(fp.get(), &tmp))
 			break;
 
 		if (tmp.type == REGEN_TYPE_MOB ||
@@ -564,7 +562,6 @@ bool regen_load_in_file(const char* filename, int32_t lMapIndex, int32_t base_x,
 		}
 	}
 
-	fclose(fp);
 	return true;
 }
 
@@ -593,9 +590,9 @@ bool regen_load(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t
 		return true;
 
 	LPREGEN regen = nullptr;
-	FILE* fp = fopen(filename, "rt");
 
-	if (nullptr == fp)
+	auto fp = msl::file_ptr(filename, "rt");
+	if (!fp)
 	{
 		sys_log(0, "SYSTEM: regen_load: %s: file not found", filename);
 		return false;
@@ -606,7 +603,7 @@ bool regen_load(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t
 		REGEN tmp;
 		memset(&tmp, 0, sizeof(tmp));
 
-		if (!read_line(fp, &tmp))
+		if (!read_line(fp.get(), &tmp))
 			break;
 
 		if (tmp.type == REGEN_TYPE_MOB ||
@@ -696,7 +693,6 @@ bool regen_load(const char* filename, int32_t lMapIndex, int32_t base_x, int32_t
 		}
 	}
 
-	fclose(fp);
 	return true;
 }
 

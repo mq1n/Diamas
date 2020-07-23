@@ -17,11 +17,10 @@ static int pid_init(void)
 #ifdef _WIN32
 	return true;
 #else
-	FILE*	fp;
-	if ((fp = fopen("pid", "w")))
+	auto fp = msl::file_ptr("pid", "w")
+	if (fp)
 	{
-		fprintf(fp, "%d", getpid());
-		fclose(fp);
+		fprintf(fp.get(), "%d", getpid());
 		sys_log(0, "\nStart of pid: %d\n", getpid());
 	}
 	else

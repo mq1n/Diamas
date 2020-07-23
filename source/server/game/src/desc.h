@@ -193,7 +193,6 @@ class DESC
 
 		struct sockaddr_in	m_SockAddr;
 
-		FILE *			m_pLogFile;
 		std::string		m_stRelayName;
 
 		std::string		m_stP2PHost;

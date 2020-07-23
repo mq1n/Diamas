@@ -129,3 +129,4 @@ inline unsigned sleep(unsigned sec) {
 #include "utils.h"
 #include "crypt.h"
 #include "random.h"
+#include "../../../common/file_ptr.h"

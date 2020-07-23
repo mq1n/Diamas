@@ -77,12 +77,11 @@ extern void (*_malloc_message)(const char* p1, const char* p2, const char* p3, c
 // FreeBSD _malloc_message replacement
 void WriteMallocMessage(const char* p1, const char* p2, const char* p3, const char* p4)
 {
-	FILE* fp = ::fopen(DBGALLOC_LOG_FILENAME, "a");
-	if (fp == nullptr) {
+	auto fp = msl::file_ptr(DBGALLOC_LOG_FILENAME, "a");
+	if (!fp)
 		return;
-	}
-	::fprintf(fp, "%s %s %s %s\n", p1, p2, p3, p4);
-	::fclose(fp);
+	
+	fp.write("%s %s %s %s\n", p1, p2, p3, p4);
 }
 #endif
 

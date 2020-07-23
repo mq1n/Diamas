@@ -208,20 +208,15 @@ void CMobManager::IncRegenCount(uint8_t bRegenType, uint32_t dwVnum, int32_t iCo
 
 void CMobManager::DumpRegenCount(const char* c_szFilename)
 {
-	FILE* fp = fopen(c_szFilename, "w");
-
+	auto fp = msl::file_ptr(c_szFilename, "w");
 	if (fp)
 	{
-		std::map<uint32_t, double>::iterator it;
+		fprintf(fp.get(), "MOB_VNUM\tCOUNT\n");
 
-		fprintf(fp,"MOB_VNUM\tCOUNT\n");
-
-		for (it = m_mapRegenCount.begin(); it != m_mapRegenCount.end(); ++it)
+		for (auto it = m_mapRegenCount.begin(); it != m_mapRegenCount.end(); ++it)
 		{
-			fprintf(fp,"%u\t%g\n", it->first, it->second);
+			fprintf(fp.get(), "%u\t%g\n", it->first, it->second);
 		}
-
-		fclose(fp);
 	}
 }
 

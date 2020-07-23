@@ -176,8 +176,7 @@ int32_t SECTREE_MANAGER::LoadSettingFile(int32_t lMapIndex, const char * c_pszSe
 {
 	memset(&r_setting, 0, sizeof(TMapSetting));
 
-	FILE * fp = fopen(c_pszSettingFileName, "r");
-
+	auto fp = msl::file_ptr(c_pszSettingFileName, "r");
 	if (!fp)
 	{
 		sys_err("cannot open file: %s", c_pszSettingFileName);
@@ -187,7 +186,7 @@ int32_t SECTREE_MANAGER::LoadSettingFile(int32_t lMapIndex, const char * c_pszSe
 	char buf[256], cmd[256];
 	int32_t iWidth = 0, iHeight = 0;
 
-	while (fgets(buf, 256, fp))
+	while (fgets(buf, 256, fp.get()))
 	{
 		sscanf(buf, " %s ", cmd);
 
@@ -204,8 +203,6 @@ int32_t SECTREE_MANAGER::LoadSettingFile(int32_t lMapIndex, const char * c_pszSe
 			sscanf(buf, " %s %d ", cmd, &r_setting.iCellScale);
 		}
 	}
-
-	fclose(fp);
 
 	if ((iWidth == 0 && iHeight == 0) || r_setting.iCellScale == 0)
 	{
@@ -261,18 +258,17 @@ LPSECTREE_MAP SECTREE_MANAGER::BuildSectreeFromSetting(TMapSetting & r_setting)
 
 void SECTREE_MANAGER::LoadDungeon(int32_t iIndex, const char * c_pszFileName)
 {
-	FILE* fp = fopen(c_pszFileName, "r");
-
+	auto fp = msl::file_ptr(c_pszFileName, "r");
 	if (!fp)
 		return;
 
 	int32_t count = 0; // for debug
 
-	while (!feof(fp))
+	while (!feof(fp.get()))
 	{
 		char buf[1024];
 
-		if (nullptr == fgets(buf, 1024, fp))
+		if (nullptr == fgets(buf, 1024, fp.get()))
 			break;
 
 		if (buf[0] == '#' || (buf[0] == '/' && buf[1] == '/'))
@@ -299,8 +295,6 @@ void SECTREE_MANAGER::LoadDungeon(int32_t iIndex, const char * c_pszFileName)
 		count++;
 	}
 
-	fclose(fp);
-
 	sys_log(0, "Dungeon Position Load [%3d]%s count %d", iIndex, c_pszFileName, count);
 }
 
@@ -312,25 +306,22 @@ void SECTREE_MANAGER::LoadDungeon(int32_t iIndex, const char * c_pszFileName)
 // by rtsummit
 bool SECTREE_MANAGER::LoadMapRegion(const char * c_pszFileName, TMapSetting & r_setting, const char * c_pszMapName)
 {
-	FILE * fp = fopen(c_pszFileName, "r");
-
-	if ( g_bIsTestServer )
+	if (g_bIsTestServer)
 		sys_log( 0, "[LoadMapRegion] file(%s)", c_pszFileName );
 
+	auto fp = msl::file_ptr(c_pszFileName, "r");
 	if (!fp)
 		return false;
 
 	int32_t iX=0, iY=0;
 	GPOS pos[3] = { {0,0,0}, {0,0,0}, {0,0,0} };
 
-	fscanf(fp, " %d %d ", &iX, &iY);
+	fscanf(fp.get(), " %d %d ", &iX, &iY);
 
-	int32_t iEmpirePositionCount = fscanf(fp, " %d %d %d %d %d %d ", 
+	int32_t iEmpirePositionCount = fscanf(fp.get(), " %d %d %d %d %d %d ", 
 			&pos[0].x, &pos[0].y,
 			&pos[1].x, &pos[1].y,
 			&pos[2].x, &pos[2].y);
-
-	fclose(fp);
 
 	if( iEmpirePositionCount == 6 )
 	{
@@ -389,8 +380,7 @@ bool SECTREE_MANAGER::LoadMapRegion(const char * c_pszFileName, TMapSetting & r_
 
 bool SECTREE_MANAGER::LoadAttribute(LPSECTREE_MAP pkMapSectree, const char * c_pszFileName, TMapSetting & r_setting)
 {
-	FILE * fp = fopen(c_pszFileName, "rb");
-
+	auto fp = msl::file_ptr(c_pszFileName, "rb");
 	if (!fp)
 	{
 		sys_err("SECTREE_MANAGER::LoadAttribute : cannot open %s", c_pszFileName);
@@ -399,8 +389,8 @@ bool SECTREE_MANAGER::LoadAttribute(LPSECTREE_MAP pkMapSectree, const char * c_p
 
 	int32_t iWidth, iHeight;
 
-	fread(&iWidth, sizeof(int32_t), 1, fp);
-	fread(&iHeight, sizeof(int32_t), 1, fp);
+	fread(&iWidth, sizeof(int32_t), 1, fp.get());
+	fread(&iHeight, sizeof(int32_t), 1, fp.get());
 
 	int32_t maxMemSize = LZOManager::Instance().GetMaxCompressedSize(sizeof(uint32_t) * (SECTREE_SIZE / CELL_SIZE) * (SECTREE_SIZE / CELL_SIZE));
 
@@ -441,7 +431,6 @@ bool SECTREE_MANAGER::LoadAttribute(LPSECTREE_MAP pkMapSectree, const char * c_p
 			{
 				sys_err("returned tree id mismatch! return %u, request %u", 
 						tree->m_id.package, id.package);
-				fclose(fp);
 
 				M2_DELETE_ARRAY(attr);
 #ifdef _MSC_VER
@@ -450,8 +439,8 @@ bool SECTREE_MANAGER::LoadAttribute(LPSECTREE_MAP pkMapSectree, const char * c_p
 				return false;
 			}
 
-			fread(&uiSize, sizeof(int32_t), 1, fp);
-			fread(abComp, sizeof(char), uiSize, fp);
+			fread(&uiSize, sizeof(int32_t), 1, fp.get());
+			fread(abComp, sizeof(char), uiSize, fp.get());
 
 			//LZOManager::Instance().Decompress(abComp, uiSize, (uint8_t *) tree->GetAttributePointer(), &uiDestSize);
 			uiDestSize = sizeof(uint32_t) * maxMemSize;
@@ -461,7 +450,6 @@ bool SECTREE_MANAGER::LoadAttribute(LPSECTREE_MAP pkMapSectree, const char * c_p
 			{
 				sys_err("SECTREE_MANAGER::LoadAttribte : %s : %d %d size mismatch! %d",
 						c_pszFileName, tree->m_id.coord.x, tree->m_id.coord.y, uiDestSize);
-				fclose(fp);
 
 				M2_DELETE_ARRAY(attr);
 #ifdef _MSC_VER
@@ -473,7 +461,6 @@ bool SECTREE_MANAGER::LoadAttribute(LPSECTREE_MAP pkMapSectree, const char * c_p
 			tree->BindAttribute(M2_NEW CAttribute(attr, SECTREE_SIZE / CELL_SIZE, SECTREE_SIZE / CELL_SIZE));
 		}
 
-	fclose(fp);
 
 	M2_DELETE_ARRAY(attr);
 #ifdef _MSC_VER
@@ -672,9 +659,8 @@ int32_t SECTREE_MANAGER::Build(const char * c_pszListFileName, const char* c_psz
 		sys_log ( 0, "[BUILD] Build %s %s ", c_pszListFileName, c_pszMapBasePath );
 	}
 
-	FILE* fp = fopen(c_pszListFileName, "r");
-
-	if (nullptr == fp)
+	auto fp = msl::file_ptr(c_pszListFileName, "r");
+	if (!fp)
 		return 0;
 
 	char buf[256 + 1];
@@ -682,7 +668,7 @@ int32_t SECTREE_MANAGER::Build(const char * c_pszListFileName, const char* c_psz
 	char szMapName[256];
 	int32_t iIndex;
 
-	while (fgets(buf, 256, fp))
+	while (fgets(buf, 256, fp.get()))
 	{
 		char * szEndline = strrchr(buf, '\n');
 		if (!szEndline)
@@ -705,7 +691,6 @@ int32_t SECTREE_MANAGER::Build(const char * c_pszListFileName, const char* c_psz
 		if (!LoadSettingFile(iIndex, szFilename, setting))
 		{
 			sys_err("can't load file %s in LoadSettingFile", szFilename);
-			fclose(fp);
 			return 0;
 		}
 
@@ -714,7 +699,6 @@ int32_t SECTREE_MANAGER::Build(const char * c_pszListFileName, const char* c_psz
 		if (!LoadMapRegion(szFilename, setting, szMapName))
 		{
 			sys_err("can't load file %s in LoadMapRegion", szFilename);
-			fclose(fp);
 			return 0;
 		}
 
@@ -750,8 +734,6 @@ int32_t SECTREE_MANAGER::Build(const char * c_pszListFileName, const char* c_psz
 			pkMapSectree->Build();
 		}
 	}
-
-	fclose(fp);
 
 	return 1;
 }

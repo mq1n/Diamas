@@ -75,7 +75,7 @@ bool CInputProcessor::Process(LPDESC lpDesc, const void * c_pvOrig, int32_t iByt
 				return true;
 
 			iPacketLen += iExtraPacketSize;
-			lpDesc->Log("%s %d", c_pszName, iPacketLen);
+			//lpDesc->Log("%s %d", c_pszName, iPacketLen);
 			m_pPacketInfo->End();
 		}
 

@@ -1,20 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "../../../common/file_ptr.h"
 
 void WriteVersion()
 {
-	FILE* fp(fopen("VERSION.txt", "w"));
+	auto fp = msl::file_ptr("VERSION.txt", "w");
 
 	if (fp)
 	{
-		fprintf(fp, "auth_server perforce revision: %s\n", _GIT_VERSION_);
-		fprintf(fp, "Hostname: %s Path: %s\n", _HOSTNAME_, _DIRECTORY_);
-		fclose(fp);
+		fprintf(fp.get(), "auth_server perforce revision: %s\n", _GIT_VERSION_);
+		fprintf(fp.get(), "Hostname: %s Path: %s\n", _HOSTNAME_, _DIRECTORY_);
+		return;
 	}
-	else
-	{
-		fprintf(stderr, "cannot open VERSION.txt\n");
-		exit(0);
-	}
+	
+	fprintf(stderr, "cannot open VERSION.txt\n");
+	exit(0);
 }
 

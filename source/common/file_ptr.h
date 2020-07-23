@@ -16,11 +16,8 @@
 #pragma once
 
 #include <cstdio>
-#ifdef _WIN32
 #include <string>
-#else
 #include <cstring>
-#endif
 #include <vector>
 
 namespace msl
@@ -34,6 +31,10 @@ public:
 	file_ptr() = default;
 	explicit file_ptr(const std::string & fn, const char * mode = "r") : file_ptr(fn.c_str(), mode){};
 	explicit file_ptr(const char * filename, const char * mode = "r") { open(filename, mode); }
+#ifdef _WIN32
+	explicit file_ptr(const std::wstring& fn, const wchar_t* mode = L"r") : file_ptr(fn.c_str(), mode) {};
+	explicit file_ptr(const wchar_t * filename, const wchar_t * mode = L"r") { open(filename, mode); }
+#endif
 	explicit file_ptr(std::FILE * ptr) { m_ptr_ = ptr; }
 	// move constructor
 	file_ptr(file_ptr && fp) noexcept
@@ -87,6 +88,29 @@ public:
 		m_ptr_ = std::fopen(filename, mode);
 #endif
 	}
+
+#ifdef _WIN32
+	//! @brief close the file ptr and reset it
+	void open(const std::wstring& fn, const wchar_t* mode = L"r") { open(fn.c_str(), mode); }
+
+	//! @brief close the file ptr and reset it
+	void open(const wchar_t* filename, const wchar_t* mode = L"r")
+	{
+		_wfopen_s(&m_ptr_, filename, mode);
+	}
+
+	//! @brief reset and reopen new file
+	void reset(const std::wstring& fn, const wchar_t* mode = L"r") { reset(fn.c_str(), mode); }
+
+	//! @brief reset and reopen new file
+	void reset(const wchar_t* filename, const wchar_t* mode = L"r")
+	{
+		reset();
+		open(filename, mode);
+	}
+
+#endif
+
 	//! @brief alias of reset()
 	void close() { reset(); }
 
@@ -156,6 +180,13 @@ public:
 	//! @brief write into the file from zstring
 	void string_write(const char * str) const { std::fwrite(str, std::strlen(str), 1, m_ptr_); }
 
+#ifdef _WIN32
+	//! @brief write into the file from wstring
+	void string_write(const std::wstring& str) const { std::fwrite(str.data(), str.size(), 1, m_ptr_); }
+	//! @brief write into the file from wchar
+	void string_write(const wchar_t* str) const { std::fwrite(str, std::wcslen(str), 1, m_ptr_); }
+#endif
+
 	//! @brief read the file from the current position as byte stream returning a vector
 	std::vector<char> read(std::size_t n = 0) const
 	{
@@ -167,7 +198,7 @@ public:
 	}
 
 	//! @brief read the file as std::fread as does
-	std::size_t read_(void* buf, std::size_t n) const
+	std::size_t fread(void* buf, std::size_t n) const
 	{
 		return std::fread(buf, 1, n, m_ptr_);
 	}
@@ -177,7 +208,7 @@ public:
 	{
 		if (n == 0) // 0 implies reading the whole remaining file
 			n = this->remain_size();
-		read_(buf, n);
+		this->fread(buf, n);
 	}
 
 	//! @brief read the file from the current position returning null-terminated string
@@ -196,5 +227,11 @@ public:
 		if (buf[n - 1] != '\0')
 			buf[n - 1] = '\0';
 	}
+
+	//! @brief move unwritten memory buffer data to the target file.
+    void flush() const
+    {
+        std::fflush(m_ptr_);
+    }
 };
 } // namespace msl

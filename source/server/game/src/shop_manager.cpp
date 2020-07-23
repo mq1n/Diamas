@@ -489,10 +489,9 @@ bool CShopManager::ReadShopTableEx(const char* stFileName)
 {
 	// file 유무 체크.
 	// 없는 경우는 에러로 처리하지 않는다.
-	FILE* fp = fopen(stFileName, "rb");
-	if (nullptr == fp)
+	auto fp = msl::file_ptr(stFileName, "rb");
+	if (!fp)
 		return true;
-	fclose(fp);
 
 	CGroupTextParseTreeLoader loader;
 	if (!loader.Load(stFileName))

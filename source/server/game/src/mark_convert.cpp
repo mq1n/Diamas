@@ -10,8 +10,7 @@
 
 static Pixel * LoadOldGuildMarkImageFile()
 {
-	FILE * fp = fopen(OLD_MARK_DATA_FILENAME, "rb");
-
+	auto fp = msl::file_ptr(OLD_MARK_DATA_FILENAME, "rb");
 	if (!fp)
 	{
 		sys_err("cannot open %s", OLD_MARK_INDEX_FILENAME);
@@ -19,11 +18,9 @@ static Pixel * LoadOldGuildMarkImageFile()
 	}
 
 	int32_t dataSize = 512 * 512 * sizeof(Pixel);
-	Pixel * dataPtr = (Pixel *) malloc(dataSize);
+	Pixel * dataPtr = (Pixel *)malloc(dataSize);
 
-	fread(dataPtr, dataSize, 1, fp);
-
-	fclose(fp);
+	fp.read(dataPtr, dataSize);
 
 	return dataPtr;
 }
@@ -46,17 +43,14 @@ bool GuildMarkConvert(const std::vector<uint32_t> & vecGuildID)
 		return true;
 
 	// 인덱스 파일 열기
-	FILE* fp = fopen(OLD_MARK_INDEX_FILENAME, "r");
-
-	if (nullptr == fp)
+	auto fp = msl::file_ptr(OLD_MARK_INDEX_FILENAME, "r");
+	if (!fp)
 		return false;
 
 	// 이미지 파일 열기
-	Pixel * oldImagePtr = LoadOldGuildMarkImageFile();
-
-	if (nullptr == oldImagePtr)
+	auto oldImagePtr = LoadOldGuildMarkImageFile();
+	if (!oldImagePtr)
 	{
-		fclose(fp);
 		return false;
 	}
 
@@ -76,7 +70,7 @@ bool GuildMarkConvert(const std::vector<uint32_t> & vecGuildID)
 	uint32_t mark_id;
 	Pixel mark[SGuildMark::SIZE];
 
-	while (fgets(line, sizeof(line)-1, fp))
+	while (fgets(line, sizeof(line)-1, fp.get()))
 	{
 		sscanf(line, "%u %u", &guild_id, &mark_id);
 
@@ -117,7 +111,6 @@ bool GuildMarkConvert(const std::vector<uint32_t> & vecGuildID)
 	}
 
 	free(oldImagePtr);
-	fclose(fp);
 
 	// 컨버트는 한번만 하면되므로 파일을 옮겨준다.
 #ifndef __WIN32__

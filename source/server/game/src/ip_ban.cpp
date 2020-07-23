@@ -139,8 +139,7 @@ std::map<int32_t, std::vector<IP> > mapBanIP;
 
 bool LoadBanIP(const char * filename)
 {
-	FILE * fp = fopen(filename, "r");
-
+	auto fp = msl::file_ptr(filename, "r");
 	if (!fp)
 		return false;
 
@@ -150,7 +149,7 @@ bool LoadBanIP(const char * filename)
 
 	fprintf(stderr, "LOADING BANNED IP LIST\n");
 
-	while (fgets(buf, 256, fp))
+	while (fgets(buf, 256, fp.get()))
 	{
 		*strchr(buf, '\n') = '\0';
 		char * p = strchr(buf, '\t');
@@ -187,8 +186,6 @@ bool LoadBanIP(const char * filename)
 			it->second.push_back(ip);
 	}
 
-	fclose(fp);
-
 	return true;
 }
 
@@ -209,164 +206,3 @@ bool IsBanIP(struct in_addr in)
 
 	return false;
 }
-
-#ifdef __MAIN__
-void UniqueIP(std::vector<IP> & v)
-{
-	using namespace std;
-
-	bool found;
-	vector<IP>::iterator it1;
-
-	do
-	{
-		vector<IP> o;
-		it1 = v.begin();
-
-		while (it1 != v.end())
-		{
-			IP & ip1 = *(it1++);
-
-			found = false;
-
-			if (it1 != v.end())
-			{
-				vector<IP>::iterator it2 = it1;
-
-				while (it2 != v.end())
-				{
-					IP & ip2 = *(it2++);
-
-					if (ip1.IsEqual(ip2))
-					{
-						found = true;
-						break;
-					}
-				}
-			}
-
-			if (!found)
-				o.push_back(ip1);
-		}
-
-		if (o.size() == v.size())
-			break;
-
-		v.clear();
-		it1 = o.begin();
-
-		while (it1 != o.end())
-			v.push_back(*(it1++));
-	}
-	while (1);
-}
-
-void FilterIP(std::vector<IP> & v)
-{
-	using namespace std;
-
-	bool found;
-	vector<IP>::iterator it1;
-
-	do
-	{
-		vector<IP> o;
-		it1 = v.begin();
-
-		while (it1 != v.end())
-		{
-			IP & ip1 = *(it1++);
-
-			found = false;
-
-			vector<IP>::iterator it2 = v.begin();
-
-			while (it2 != v.end())
-			{
-				IP & ip2 = *(it2++);
-
-				if (ip1.IsEqual(ip2))
-					continue;
-
-				if (ip1.IsChildOf(ip2))
-				{
-					found = true;
-					break;
-				}
-			}
-
-			if (!found)
-				o.push_back(ip1);
-		}
-
-		if (o.size() == v.size())
-			break;
-
-		v.clear();
-		it1 = o.begin();
-
-		while (it1 != o.end())
-			v.push_back(*(it1++));
-	}
-	while (1);
-}
-
-int32_t main(int32_t argc, char **argv)
-{
-	using namespace std;
-
-	if (argc != 2)
-	{
-		printf("Syntax: %s <filename>\n", *argv);
-		return 1;
-	}
-
-	argc--, argv++;
-
-	FILE * fp = fopen(*argv, "r");
-
-	if (!fp)
-		return 0;
-
-	vector<IP> v;
-	char buf[256];
-	char start[32];
-	char end[32];
-
-	while (fgets(buf, 256, fp))
-	{
-		*strchr(buf, '\n') = '\0';
-		char * p = strchr(buf, '\t');
-
-		if (!p)
-		{
-			strlcpy(start, buf, sizeof(start));
-			*end = '\0';
-		}
-		else
-		{
-			strlcpy(end, p + 1, sizeof(end));
-			*p = '\0';
-			strlcpy(start, buf, sizeof(start));
-		}
-
-		v.push_back(IP(start, end));
-	}
-
-	fclose(fp);
-
-	printf("size %d\n", v.size());
-	UniqueIP(v);
-	printf("result1 %d\n", v.size());
-	FilterIP(v);
-	printf("result2 %d\n", v.size());
-
-	vector<IP>::iterator it = v.begin();
-
-	while (it != v.end())
-		(*(it++)).Print();
-
-	return 1;
-}
-
-#endif

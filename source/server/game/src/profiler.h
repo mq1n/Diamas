@@ -145,13 +145,11 @@ class CProfiler : public CSingleton<CProfiler>
 
 		void Log(const char * c_pszFileName)
 		{
-			FILE * fp = fopen(c_pszFileName, "w");
-
+			auto fp = msl::file_ptr(c_pszFileName, "w");
 			if (!fp)
 				return;
 
-			Print(fp);
-			fclose(fp);
+			Print(fp.get());
 		}
 
 		void Print(FILE * fp = stderr)

@@ -32,18 +32,13 @@ bool CTextFileLoader::Load(const char * c_szFileName)
 
 	m_dwcurLineIndex = 0;
 
-	FILE* fp = fopen(c_szFileName, "rb");
-
-	if (nullptr == fp)
+	auto fp = msl::file_ptr(c_szFileName, "rb");
+	if (!fp)
 		return false;
 
-	fseek(fp, 0L, SEEK_END);
-	const size_t fileSize = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
+	const size_t fileSize = fp.size();
 	char * pData = M2_NEW char[fileSize];
-	fread(pData, fileSize, 1, fp);
-	fclose(fp);
+	fp.read(pData, fileSize);
 
 	m_fileLoader.Bind(fileSize, pData);
 	M2_DELETE_ARRAY(pData);

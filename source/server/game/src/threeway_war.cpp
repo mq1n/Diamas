@@ -133,9 +133,8 @@ bool CThreeWayWar::LoadSetting(const char* szFileName)
 	char szPath[1024];
 	snprintf( szPath, sizeof(szPath), "%s/%s", LocaleService_GetBasePath().c_str(), szFileName);
 
-	FILE* pf = fopen( szPath, "r" );
-
-	if (nullptr == pf)
+	auto pf = msl::file_ptr(szPath, "r");
+	if (!pf)
 	{
 		sys_err("[INIT_FORKED] Do not open file (%s)", szPath );
 		return false;
@@ -145,7 +144,7 @@ bool CThreeWayWar::LoadSetting(const char* szFileName)
 	char szSungziName[128];
 	char szPassName[3][128];
 
-	while( nullptr != fgets(szLine, 256, pf) )
+	while (fgets(szLine, 256, pf.get()))
 	{
 		if (0 == strncmp(szLine, "sungzi:", 7))
 		{
@@ -187,8 +186,6 @@ bool CThreeWayWar::LoadSetting(const char* szFileName)
 			MapIndexSet_.insert( passinfo.m_iForkedPass[2] );
 		}
 	}
-
-	fclose(pf);
 
 	return true;
 }

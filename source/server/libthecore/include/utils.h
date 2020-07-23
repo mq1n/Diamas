@@ -18,10 +18,9 @@ extern "C"
 
     extern char *	str_dup(const char * source);	// ¸Ş¸ğ¸® ÇÒ´ç ÇØ¼­ source º¹»ç ÇÑ°Å ¸®ÅÏ
     extern void		printdata(const unsigned char * data, int bytes); // data¸¦ hex¶û ascii·Î Ãâ·Â (ÆĞÅ¶ ºĞ¼® µî¿¡ ¾²ÀÓ)
-    extern int		filesize(FILE * fp);	// ÆÄÀÏ Å©±â ¸®ÅÏ
 
 #define core_dump()	core_dump_ex(__FILE__, __LINE__, __FUNCTION__)
-    extern void		core_dump_ex(const char *who, long line, char const* function);	// ì½”ì–´ë¥¼ ê°•ì œë¡œ ë¤í”„
+    extern void		core_dump_ex(const char *who, long line, char const* function);	// ì½”ì–´ë¥¼ ê°•ì œë¡œ ë¤í”„
 
 #define TOKEN(string) if (!strcasecmp(token_string, string))
     // src = ÅäÅ« : °ª
@@ -127,7 +126,7 @@ extern "C"
 }
 #endif	// __cplusplus
 
-extern int		number_ex(int from, int to, const char *file, int line); // fromìœ¼ë¡œ ë¶€í„° toê¹Œì§€ì˜ ëœë¤ ê°’ ë¦¬í„´
+extern int		number_ex(int from, int to, const char *file, int line); // fromìœ¼ë¡œ ë¶€í„° toê¹Œì§€ì˜ ëœë¤ ê°’ ë¦¬í„´
 #define number(from, to) number_ex(from, to, __FILE__, __LINE__)
 
 // _countof for gcc/g++

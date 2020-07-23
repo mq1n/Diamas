@@ -286,15 +286,14 @@ static bool __LoadConnectConfigFile(const char* configName)
 	bool isCommonSQL = false;	
 	bool isPlayerSQL = false;
 
-	FILE* fpOnlyForDB;
-
-	if (!(fpOnlyForDB = fopen(configName, "r")))
+	auto fpOnlyForDB = msl::file_ptr(configName, "r");
+	if (!fpOnlyForDB)
 	{
 		fprintf(stderr, "Can not open [%s]\n", configName);
 		exit(1);
 	}
 
-	while (fgets(buf, 256, fpOnlyForDB))
+	while (fgets(buf, 256, fpOnlyForDB.get()))
 	{
 		parse_token(buf, token_string, value_string);
 
@@ -382,9 +381,6 @@ static bool __LoadConnectConfigFile(const char* configName)
 			continue;
 		}
 	}
-
-	
-	fclose(fpOnlyForDB);
 
 	// CONFIG_SQL_INFO_ERROR
 	if (!isCommonSQL)

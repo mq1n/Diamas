@@ -214,22 +214,6 @@ int is_abbrev(char* arg1, char* arg2)
 	return 0;
 }
 
-
-int filesize(FILE* fp)
-{
-	int pos;
-	int size;
-
-	pos = ftell(fp);
-
-	fseek(fp, 0, SEEK_END);
-	size = ftell(fp);
-	fseek(fp, pos, SEEK_SET);
-
-	return (size);
-}
-
-
 /* "Name : 비엽" 과 같이 "항목 : 값" 으로 이루어진 문자열에서
    항목을 token 으로, 값을 value 로 복사하여 리턴한다. */
 void parse_token(char* src, char* token, char* value)

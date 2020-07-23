@@ -3,10 +3,10 @@
 #include <string.h>
 #include "targa.h"
 
-CTargaImage::CTargaImage()
-	: m_pbuf(nullptr), m_x(0), m_y(0)
+CTargaImage::CTargaImage() :
+    m_pbuf(nullptr), m_x(0), m_y(0)
 {
-	memset( &m_header, 0, sizeof(m_header) );
+	memset(&m_header, 0, sizeof(m_header));
 }
 
 CTargaImage::~CTargaImage()
@@ -38,15 +38,12 @@ void CTargaImage::Create(int32_t x, int32_t y)
 
 bool CTargaImage::Save(const char * filename)
 {
-    FILE * fp = fopen(filename, "wb");
-
+    auto fp = msl::file_ptr(filename, "wb");
     if (!fp)
-	return false;
+		return false;
 
-    fwrite(&m_header, sizeof(TGA_HEADER), 1, fp);
-    fwrite(m_pbuf, m_x * m_y * sizeof(uint32_t), 1, fp);
+    fp.write(&m_header, sizeof(TGA_HEADER));
+    fp.write(m_pbuf, m_x * m_y * sizeof(uint32_t));
 
-    fclose(fp);
     return true;
 }
-
