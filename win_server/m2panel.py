@@ -230,7 +230,7 @@ class WinSFHelper:
 		self.sys_log("uninstall_game triggered.")
 
 		garbage_container_roots =     ["/auth/", "/db/", "/game99/", "/kanal/"]
-		garbage_container_dirs =      ["data", "locale", "log", "package", "mark"]
+		garbage_container_dirs =      ["data", "locale", "mark"]
 		if self.is_windows:
 			garbage_container_files = ["db_cache.exe", "game_server.exe", "DevIL.dll"]
 		else:
@@ -288,10 +288,10 @@ class WinSFHelper:
 			container_core = ["game_server", "db_cache"]
 
 		symlink_targets_dir = [
-			["kanal/package",  "../share/package"], ["kanal/locale",  "../share/locale"], ["kanal/data",  "../share/data"], ["kanal/log",  "../share/log"],       ["kanal/mark", "../share/mark"],
-			["auth/package",   "../share/package"], ["auth/locale",   "../share/locale"], ["auth/data",   "../share/data"], ["auth/log",   "../share/auth/log"], ["auth/mark",  "../share/mark"],
-			["db/package",     "../share/package"], ["db/locale",     "../share/locale"], ["db/data",     "../share/data"], ["db/log",     "../share/db/log"],
-			["game99/package", "../share/package"], ["game99/locale", "../share/locale"], ["game99/data", "../share/data"], ["game99/log", "../share/game99/log"]
+			["kanal/locale",  "../share/locale"], ["kanal/data",  "../share/data"], ["kanal/mark", "../share/mark"],
+			["auth/locale",   "../share/locale"], ["auth/data",   "../share/data"], ["auth/mark",  "../share/mark"],
+			["db/locale",     "../share/locale"], ["db/data",     "../share/data"],
+			["game99/locale", "../share/locale"], ["game99/data", "../share/data"], ["game99/mark",  "../share/mark"],
 		]
 		
 		symlink_targets_file = [
