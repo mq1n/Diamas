@@ -13,7 +13,9 @@ file(GLOB ClientApp_SOURCES
 add_executable(${EXE_NAME} ${ClientApp_HEADERS} ${ClientApp_SOURCES})
 target_link_libraries(${EXE_NAME} discord_sdk)
 
-ADD_CUSTOM_COMMAND(TARGET ${EXE_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/../../../../../extern/bin/discord_game_sdk.dll ${PROJECT_SOURCE_DIR}/../../../../../Bin/discord_game_sdk.dll
-)
+if (NOT CI_BUILD)
+    ADD_CUSTOM_COMMAND(TARGET ${EXE_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/../../../../../extern/bin/discord_game_sdk.dll ${PROJECT_SOURCE_DIR}/../../../../../Bin/discord_game_sdk.dll
+    )
+endif()

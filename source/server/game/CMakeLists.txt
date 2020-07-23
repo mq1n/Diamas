@@ -101,7 +101,7 @@ if (ENABLE_STATIC_ANALYSIS)
 	)
 endif()
 
-if (WIN32)
+if (WIN32 AND NOT CI_BUILD)
     add_custom_command(
         TARGET ${EXE_NAME}
         POST_BUILD

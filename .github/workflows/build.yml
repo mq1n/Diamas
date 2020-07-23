@@ -46,7 +46,7 @@ jobs:
       run: ctest --timeout 20 -C Debug -j12
 
   windows:
-    timeout-minutes: 20
+    timeout-minutes: 22
 
     strategy:
       matrix:
@@ -81,4 +81,4 @@ jobs:
       working-directory: sql
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 20 -C Debug -j12
+      run: ctest --timeout 22 -C Debug -j12

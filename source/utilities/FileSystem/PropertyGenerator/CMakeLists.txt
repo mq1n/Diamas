@@ -25,9 +25,11 @@ add_executable(${EXE_NAME}
 
 target_link_libraries(${EXE_NAME} ${EXTRA_LIBS})
 
-add_custom_command(
-    TARGET ${EXE_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../../../Diamas_Client/CRYPTION/${EXE_NAME}.exe"
-    COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../../../Diamas_Client/CRYPTION/${EXE_NAME}.exe
-)
+if (NOT CI_BUILD)
+    add_custom_command(
+        TARGET ${EXE_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../../../Diamas_Client/CRYPTION/${EXE_NAME}.exe"
+        COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${EXE_NAME}.exe ${PROJECT_BINARY_DIR}/../../../../../../Diamas_Client/CRYPTION/${EXE_NAME}.exe
+    )
+endif()
