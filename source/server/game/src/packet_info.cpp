@@ -27,7 +27,7 @@ void CPacketInfo::Set(int32_t header, int32_t iSize, const char * c_pszName)
 	element->iCalled = 0;
 	element->dwLoad = 0;
 
-	m_pPacketMap.insert(std::map<int32_t, TPacketElement *>::value_type(header, element));
+	m_pPacketMap.emplace(header, element);
 }
 
 bool CPacketInfo::Get(int32_t header, int32_t * size, const char ** c_ppszName)

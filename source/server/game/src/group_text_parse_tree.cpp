@@ -98,7 +98,7 @@ bool CGroupTextParseTreeLoader::LoadGroup(CGroupNode * pGroupNode)
 			for (TTokenVector::size_type i = 1; i < stTokenVector.size(); i++)
 			{
 				stl_lowers(stTokenVector[i]);
-				pGroupNode->m_map_columnNameToIndex.insert(TMapNameToIndex::value_type (stTokenVector[i], i - 1));
+				pGroupNode->m_map_columnNameToIndex.emplace(stTokenVector[i], i - 1);
 			}
 		}
 		else
@@ -148,27 +148,26 @@ uint32_t CGroupNode::GetChildNodeCount()
 
 bool CGroupNode::SetChildNode(const char * c_szKey, CGroupNode* pChildGroup)
 {
-	if (nullptr == pChildGroup)
+	if (!pChildGroup)
 	{
 		m_mapChildNodes.erase(c_szKey);
 		return true;
 	}
-	TMapGroup::iterator it = m_mapChildNodes.find(c_szKey);
+
+	auto it = m_mapChildNodes.find(c_szKey);
 	if (it != m_mapChildNodes.end())
 		return false;
 
-	m_mapChildNodes.insert (TMapGroup::value_type (c_szKey, pChildGroup));
-	
+	m_mapChildNodes.emplace(c_szKey, pChildGroup);
 	return true;
 }
 
 CGroupNode* CGroupNode::GetChildNode(const std::string & c_rstrKey) const
 {
-	TMapGroup::const_iterator it = m_mapChildNodes.find(c_rstrKey);
+	auto it = m_mapChildNodes.find(c_rstrKey);
 	if (it != m_mapChildNodes.end())
 		return it->second;
-	else
-		return nullptr;
+	return nullptr;
 }
 
 std::string CGroupNode::GetNodeName() const

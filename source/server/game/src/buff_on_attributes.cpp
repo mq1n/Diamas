@@ -78,7 +78,7 @@ void CBuffOnAttributes::AddBuffFromItem(LPITEM pItem)
 			if (it2 == m_map_additional_attrs.end())
 			{
 				m_pBuffOwner->ApplyPoint(attr.bType, attr.sValue * m_bBuffValue / 100);
-				m_map_additional_attrs.insert(TMapAttr::value_type(attr.bType, attr.sValue));
+				m_map_additional_attrs.emplace(attr.bType, attr.sValue);
 			}
 			// m_map_additional_attrs에서 해당 attribute type에 대한 값이 있다면, 그 값을 증가시키고,
 			// 변경된 값의 (m_bBuffValue)%만큼의 버프 효과 추가
@@ -137,7 +137,7 @@ bool CBuffOnAttributes::On(uint8_t bValue)
 				}
 				else
 				{
-					m_map_additional_attrs.insert(TMapAttr::value_type(attr.bType, attr.sValue));
+					m_map_additional_attrs.emplace(attr.bType, attr.sValue);
 				}
 			}
 		}

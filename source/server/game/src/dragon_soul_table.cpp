@@ -140,8 +140,8 @@ bool DragonSoulTable::ReadVnumMapper()
 				sys_err ("In Group VnumMapper, duplicated vnum exist.");
 				return false;
 			}
-			m_map_name_to_type.insert(TMapNameToType::value_type(stDragonSoulName, bType));
-			m_map_type_to_name.insert(TMapTypeToName::value_type(bType, stDragonSoulName));
+			m_map_name_to_type.emplace(stDragonSoulName, bType);
+			m_map_type_to_name.emplace(bType, stDragonSoulName);
 			m_vecDragonSoulTypes.push_back(bType);
 			m_vecDragonSoulNames.push_back(stDragonSoulName);
 		}
@@ -203,7 +203,7 @@ bool DragonSoulTable::ReadBasicApplys()
 			}
 			vecApplys.push_back(SApply(at, av));
 		}
-		m_map_basic_applys_group.insert (TMapApplyGroup::value_type (m_map_name_to_type[m_vecDragonSoulNames[i]], vecApplys));
+		m_map_basic_applys_group.emplace(m_map_name_to_type[m_vecDragonSoulNames[i]], vecApplys);
 	}
 
 	return true;
@@ -262,7 +262,7 @@ bool DragonSoulTable::ReadAdditionalApplys()
 			}
 			vecApplys.push_back(SApply(at, av, prob));
 		}
-		m_map_additional_applys_group.insert (TMapApplyGroup::value_type (m_map_name_to_type[m_vecDragonSoulNames[i]], vecApplys));
+		m_map_additional_applys_group.emplace(m_map_name_to_type[m_vecDragonSoulNames[i]], vecApplys);
 	}
 
 	return true;

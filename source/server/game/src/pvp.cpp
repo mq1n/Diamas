@@ -191,7 +191,7 @@ void CPVPManager::Insert(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	pkPVP->SetVID(pkChr->GetPlayerID(), pkChr->GetVID());
 	pkPVP->SetVID(pkVictim->GetPlayerID(), pkVictim->GetVID());
 
-	m_map_pkPVP.insert(map<uint32_t, CPVP *>::value_type(pkPVP->m_dwCRC, pkPVP));
+	m_map_pkPVP.emplace(pkPVP->m_dwCRC, pkPVP);
 
 	m_map_pkPVPSetByID[pkChr->GetPlayerID()].insert(pkPVP);
 	m_map_pkPVPSetByID[pkVictim->GetPlayerID()].insert(pkPVP);

@@ -130,7 +130,7 @@ CGuildMarkImage * CGuildMarkManager::__GetImage(uint32_t imgIdx)
 		if (GetMarkImageFilename(imgIdx, imagePath))
 		{
 			CGuildMarkImage * pkImage = __NewImage();
-			m_mapIdx_Image.insert(std::map<uint32_t, CGuildMarkImage *>::value_type(imgIdx, pkImage));
+			m_mapIdx_Image.emplace(imgIdx, pkImage);
 			
 			if (!pkImage->Load(imagePath.c_str()))
 			{
@@ -153,7 +153,7 @@ bool CGuildMarkManager::AddMarkIDByGuildID(uint32_t guildID, uint32_t markID)
 		return false;
 
 	//sys_log(0, "MarkManager: guild_id=%d mark_id=%d", guildID, markID);
-	m_mapGID_MarkID.insert(std::map<uint32_t, uint32_t>::value_type(guildID, markID));
+	m_mapGID_MarkID.emplace(guildID, markID);
 	m_setFreeMarkID.erase(markID);
 	return true;
 }

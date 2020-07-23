@@ -5,7 +5,7 @@
 #include "pool.h"
 #endif
 
-#include "stable_priority_queue.h"
+// TODO: concurrentqueue (quantumcore)
 
 struct TQueueElement
 {
@@ -41,7 +41,7 @@ class CEventQueue
 		void		Destroy();
 
 	private:
-		stable_priority_queue<TQueueElement *, std::vector<TQueueElement *>, FuncQueueComp> m_pq_queue;
+		std::priority_queue<TQueueElement *, std::vector<TQueueElement *>, FuncQueueComp> m_pq_queue;
 
 #ifdef M2_USE_POOL
 		ObjectPool<TQueueElement> pool_;

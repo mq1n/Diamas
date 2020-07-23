@@ -203,7 +203,7 @@ void CPartyManager::SetPartyMember(uint32_t dwPID, LPPARTY pParty)
 			}
 		}
 		else
-			m_map_pkParty.insert(TPartyMap::value_type(dwPID, pParty));
+			m_map_pkParty.emplace(dwPID, pParty);
 	}
 }
 
@@ -429,7 +429,7 @@ void CParty::P2PJoin(uint32_t dwPID)
 
 		sys_log(2, "PARTY[%d] MemberCountChange %d -> %d", GetLeaderPID(), GetMemberCount(), GetMemberCount()+1);
 
-		m_memberMap.insert(TMemberMap::value_type(dwPID, Member));
+		m_memberMap.emplace(dwPID, Member);
 
 		if (m_memberMap.size() == 1)
 			m_itNextOwner = m_memberMap.begin();

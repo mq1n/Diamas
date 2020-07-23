@@ -726,7 +726,7 @@ int32_t SECTREE_MANAGER::Build(const char * c_pszListFileName, const char* c_psz
 		{
 			LPSECTREE_MAP pkMapSectree = BuildSectreeFromSetting(setting);
 			sys_log ( 0, "[BUILD] Build %s %s [w/h %d %d, base %d %d]", c_pszListFileName, c_pszMapBasePath, setting.iWidth, setting.iHeight, setting.iBaseX, setting.iBaseY);
-			m_map_pkSectree.insert(std::map<uint32_t, LPSECTREE_MAP>::value_type(iIndex, pkMapSectree));
+			m_map_pkSectree.emplace(iIndex, pkMapSectree);
 
 			sys_log(0, "[SECTREE] INSERT %s %d ", szMapName, iIndex);
 			snprintf(szFilename, sizeof(szFilename), "%s/%s/server_attr", c_pszMapBasePath, szMapName);
@@ -939,7 +939,7 @@ int32_t SECTREE_MANAGER::CreatePrivateMap(int32_t lMapIndex)
 	}
 	auto it = next_private_index_map_.find(lMapIndex);
 	if (it == next_private_index_map_.end()) {
-		it = next_private_index_map_.insert(PrivateIndexMapType::value_type(lMapIndex, 0)).first;
+		it = next_private_index_map_.emplace(lMapIndex, 0).first;
 	}
 	int32_t i, next_index = it->second;
 	for (i = 0; i < index_cap; ++i) {
@@ -997,7 +997,7 @@ int32_t SECTREE_MANAGER::CreatePrivateMap(int32_t lMapIndex)
 	*/
 
 	pkMapSectree = M2_NEW SECTREE_MAP(*pkMapSectree);
-	m_map_pkSectree.insert(std::map<uint32_t, LPSECTREE_MAP>::value_type(lNewMapIndex, pkMapSectree));
+	m_map_pkSectree.emplace(lNewMapIndex, pkMapSectree);
 
 	sys_log(0, "PRIVATE_MAP: %d created (original %d)", lNewMapIndex, lMapIndex);
 	return lNewMapIndex;

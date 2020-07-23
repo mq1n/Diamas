@@ -60,7 +60,7 @@ bool CShopEx::AddGuest(LPCHARACTER ch,uint32_t owner_vid, bool bOtherEmpire)
 
 	ch->SetShop(this);
 
-	m_map_guest.insert(GuestMapType::value_type(ch, bOtherEmpire));
+	m_map_guest.emplace(ch, bOtherEmpire);
 
 	SPacketGCShop pack;
 	pack.subheader	= SHOP_SUBHEADER_GC_START_EX;

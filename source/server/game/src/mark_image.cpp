@@ -233,15 +233,17 @@ void CGuildMarkImage::GetDiffBlocks(const uint32_t * crcList, std::map<uint8_t, 
 	uint8_t posBlock = 0;
 
 	for (uint32_t row = 0; row < BLOCK_ROW_COUNT; ++row)
+	{
 		for (uint32_t col = 0; col < BLOCK_COL_COUNT; ++col)
 		{
 			if (m_aakBlock[row][col].m_crc != *crcList)
 			{
-				mapDiffBlocks.insert(std::map<uint8_t, const SGuildMarkBlock *>::value_type(posBlock, &m_aakBlock[row][col]));
+				mapDiffBlocks.emplace(posBlock, &m_aakBlock[row][col]);
 			}
 			++crcList;
 			++posBlock;
 		}
+	}
 }
 
 void CGuildMarkImage::GetBlockCRCList(uint32_t * crcList)

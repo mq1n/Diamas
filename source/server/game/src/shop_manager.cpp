@@ -50,8 +50,8 @@ bool CShopManager::Initialize(TShopTable * table, int32_t size)
 			continue;
 		}
 
-		m_map_pkShop.insert(TShopMap::value_type(table->dwVnum, shop));
-		m_map_pkShopByNPCVnum.insert(TShopMap::value_type(table->dwNPCVnum, shop));
+		m_map_pkShop.emplace(table->dwVnum, shop);
+		m_map_pkShopByNPCVnum.emplace(table->dwNPCVnum, shop);
 	}
 	char szShopTableExFileName[256];
 
@@ -169,7 +169,7 @@ LPSHOP CShopManager::CreatePCShop(LPCHARACTER ch, TShopItemTable * pTable, uint8
 	pkShop->SetPCShop(ch);
 	pkShop->SetShopItems(pTable, bItemCount);
 
-	m_map_pkShopByPC.insert(TShopMap::value_type(ch->GetVID(), pkShop));
+	m_map_pkShopByPC.emplace(ch->GetVID(), pkShop);
 	return pkShop;
 }
 
@@ -538,7 +538,7 @@ bool CShopManager::ReadShopTableEx(const char* stFileName)
 			return false;
 		}
 		
-		map_npcShop.insert(TMapNPCshop::value_type(npcVnum, table));	
+		map_npcShop.emplace(npcVnum, table);	
 	}
 
 	for (TMapNPCshop::iterator it = map_npcShop.begin(); it != map_npcShop.end(); ++it)
@@ -557,7 +557,7 @@ bool CShopManager::ReadShopTableEx(const char* stFileName)
 		{
 			pkShopEx = M2_NEW CShopEx;
 			pkShopEx->Create(0, npcVnum);
-			m_map_pkShopByNPCVnum.insert(TShopMap::value_type(npcVnum, pkShopEx));
+			m_map_pkShopByNPCVnum.emplace(npcVnum, pkShopEx);
 		}
 		else
 		{
@@ -580,7 +580,7 @@ bool CShopManager::ReadShopTableEx(const char* stFileName)
 			sys_err("Shop vnum(%d) already exist.", pkShopEx->GetVnum());
 			return false;
 		}
-		m_map_pkShop.insert(TShopMap::value_type (pkShopEx->GetVnum(), pkShopEx));
+		m_map_pkShop.emplace(pkShopEx->GetVnum(), pkShopEx);
 		pkShopEx->AddShopTable(table);
 	}
 

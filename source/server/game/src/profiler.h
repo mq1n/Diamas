@@ -120,7 +120,7 @@ class CProfiler : public CSingleton<CProfiler>
 				ProfileAccumData.strName = c_szName;
 				ProfileAccumData.iDepth = m_iAccumDepth;
 
-				m_ProfileAccumDataMap.insert(TProfileAccumDataMap::value_type(c_szName, ProfileAccumData));
+				m_ProfileAccumDataMap.emplace(c_szName, ProfileAccumData);
 				it = m_ProfileAccumDataMap.find(c_szName);
 				m_vec_Accum.push_back(&it->second);
 			}

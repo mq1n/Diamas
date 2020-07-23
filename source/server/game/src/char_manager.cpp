@@ -127,7 +127,7 @@ LPCHARACTER CHARACTER_MANAGER::CreateCharacter(std::string stName, uint32_t dwPI
 	{
 		std::transform(stName.begin(), stName.end(), stName.begin(), ::tolower);
 
-        m_map_pkPCChr.insert(NAME_MAP::value_type(stName.c_str(), ch));
+        m_map_pkPCChr.emplace(stName.c_str(), ch);
 		m_map_pkChrByPID.insert(std::make_pair(dwPID, ch));
 	}
 

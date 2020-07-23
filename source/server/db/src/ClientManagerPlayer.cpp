@@ -197,7 +197,7 @@ void CClientManager::PutPlayerCache(TPlayerTable * pNew)
 	if (!c)
 	{
 		c = new CPlayerTableCache;
-		m_map_playerCache.insert(TPlayerTableCacheMap::value_type(pNew->id, c));
+		m_map_playerCache.emplace(pNew->id, c);
 	}
 
 	c->Put(pNew);
@@ -221,7 +221,7 @@ void CClientManager::PutActivityCache(TActivityTable * pNew)
 	if (!c)
 	{
 		c = new CActivityCache;
-		m_map_activityCache.insert(TActivityCacheMap::value_type(pNew->pid, c));
+		m_map_activityCache.emplace(pNew->pid, c);
 	}
 
 	c->Put(pNew);

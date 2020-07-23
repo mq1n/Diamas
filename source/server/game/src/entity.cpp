@@ -133,21 +133,17 @@ void CEntity::SetObserverMode(bool bFlag)
 	
 	if (m_isObserver) 
 	{
-		auto f = [this](const MAP_VIEW::value_type& p)
+		std::for_each(m_mapView.begin(), m_mapView.end(), [this](const auto& p)
 		{
 			EncodeRemovePacket(p.first); 
-		};
-
-		std::for_each(m_mapView.begin(), m_mapView.end(), f);
+		});
 	}
 	else 
 	{
-		auto f = [this](const MAP_VIEW::value_type& p)
+		std::for_each(m_mapView.begin(), m_mapView.end(), [this](const auto& p)
 		{
 			EncodeInsertPacket(p.first); 
-		};
-
-		std::for_each(m_mapView.begin(), m_mapView.end(), f);
+		});
 	}
 
 	if (IsType(ENTITY_CHARACTER))

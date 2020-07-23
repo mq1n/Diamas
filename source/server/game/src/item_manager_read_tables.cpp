@@ -650,7 +650,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 
 				break;
 			}
-			m_map_pkMobItemGroup.insert(std::map<uint32_t, CMobItemGroup*>::value_type(iMobVnum, pkGroup));
+			m_map_pkMobItemGroup.emplace(iMobVnum, pkGroup);
 
 		}
 		else if (strType == "drop")
@@ -716,7 +716,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				break;
 			}
 			if (bNew)
-				m_map_pkDropItemGroup.insert(std::map<uint32_t, CDropItemGroup*>::value_type(iMobVnum, pkGroup));
+				m_map_pkDropItemGroup.emplace(iMobVnum, pkGroup);
 
 		}
 		else if ( strType == "limit" )
@@ -768,7 +768,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				break;
 			}
 
-			m_map_pkLevelItemGroup.insert(std::map<uint32_t, CLevelItemGroup*>::value_type(iMobVnum, pkLevelItemGroup));
+			m_map_pkLevelItemGroup.emplace(iMobVnum, pkLevelItemGroup);
 		}
 		else if (strType == "thiefgloves")
 		{
@@ -822,7 +822,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName)
 				break;
 			}
 
-			m_map_pkGloveItemGroup.insert(std::map<uint32_t, CBuyerThiefGlovesItemGroup*>::value_type(iMobVnum, pkGroup));
+			m_map_pkGloveItemGroup.emplace(iMobVnum, pkGroup);
 		}
 		else
 		{
@@ -933,7 +933,7 @@ bool ITEM_MANAGER::ReadDropItemGroup(const char * c_pszFileName)
 		}
 
 		if (it == m_map_pkDropItemGroup.end())
-			m_map_pkDropItemGroup.insert(std::map<uint32_t, CDropItemGroup*>::value_type(iMobVnum, pkGroup));
+			m_map_pkDropItemGroup.emplace(iMobVnum, pkGroup);
 
 		loader.SetParentNode();
 	}
@@ -952,7 +952,7 @@ bool ITEM_MANAGER::ReadItemVnumMaskTable(const char * c_pszFileName)
 	int32_t ori_vnum, new_vnum;
 	while (fscanf(fp, "%u %u", &ori_vnum, &new_vnum) != EOF)
 	{
-		m_map_new_to_ori.insert (TMapDW2DW::value_type (new_vnum, ori_vnum));
+		m_map_new_to_ori.emplace(new_vnum, ori_vnum);
 	}
 	fclose(fp);
 	return true;

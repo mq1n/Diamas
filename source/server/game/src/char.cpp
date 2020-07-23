@@ -4983,7 +4983,7 @@ void CHARACTER::PartyInvite(LPCHARACTER pchInvitee)
 	info->dwGuestPID = pchInvitee->GetPlayerID();
 	info->dwLeaderPID = GetPlayerID();
 
-	m_PartyInviteEventMap.insert(EventMap::value_type(pchInvitee->GetPlayerID(), event_create(party_invite_event, info, PASSES_PER_SEC(10))));
+	m_PartyInviteEventMap.emplace(pchInvitee->GetPlayerID(), event_create(party_invite_event, info, PASSES_PER_SEC(10)));
 
 	//
 	// 초대 받는 character 에게 초대 패킷 전송

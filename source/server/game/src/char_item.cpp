@@ -6726,12 +6726,13 @@ void CHARACTER::BuffOnAttr_ValueChange(uint8_t bType, uint8_t bOldValue, uint8_t
 			default:
 				break;
 			}
-			m_map_buff_on_attrs.insert(TMapBuffOnAttrs::value_type(bType, pBuff));
+			m_map_buff_on_attrs.emplace(bType, pBuff);
 
 		}
 		else
 			pBuff = it->second;
-		if (pBuff != nullptr)
+
+		if (pBuff)
 			pBuff->On(bNewValue);
 	}
 	else

@@ -345,7 +345,7 @@ bool CSkillManager::Initialize(TSkillTable * pTab, int32_t iSize)
 		sys_log(0, "#%-3d %-24s type %u flag %u affect %u point_poly: %s", 
 				pkProto->dwVnum, pkProto->szName, pkProto->dwType, pkProto->dwFlag, pkProto->dwAffectFlag, t->szPointPoly);
 
-		map_pkSkillProto.insert(std::map<uint32_t, CSkillProto *>::value_type(pkProto->dwVnum, pkProto));
+		map_pkSkillProto.emplace(pkProto->dwVnum, pkProto);
 	}
 
 	if (!bError)
@@ -365,7 +365,7 @@ bool CSkillManager::Initialize(TSkillTable * pTab, int32_t iSize)
 
 		while (it != map_pkSkillProto.end())
 		{
-			m_map_pkSkillProto.insert(std::map<uint32_t, CSkillProto *>::value_type(it->first, it->second));
+			m_map_pkSkillProto.emplace(it->first, it->second);
 			++it;
 		}
 

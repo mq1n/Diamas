@@ -1411,7 +1411,7 @@ void CClientManager::CreateItemCacheSet(uint32_t pid)
 		return;
 
 	auto pSet = new TItemCacheSet;
-	m_map_pkItemCacheSetPtr.insert(TItemCacheSetPtrMap::value_type(pid, pSet));
+	m_map_pkItemCacheSetPtr.emplace(pid, pSet);
 
 	if (g_log)
 		sys_log(0, "ITEM_CACHE: new cache %u", pid);
@@ -1471,7 +1471,7 @@ void CClientManager::PutItemCache(const TPlayerItem * pNew, bool bSkipQuery)
 			sys_log(0, "ITEM_CACHE: PutItemCache ==> New CItemCache id%d vnum%d new owner%d", pNew->id, pNew->vnum, pNew->owner);
 
 		c = new CItemCache;
-		m_map_itemCache.insert(TItemCacheMap::value_type(pNew->id, c));
+		m_map_itemCache.emplace(pNew->id, c);
 	}
 	// ÀÖÀ»½Ã
 	else
@@ -1548,7 +1548,7 @@ void CClientManager::PutItemPriceListCache(TItemPriceListTable* pItemPriceList)
 	if (!pCache)
 	{
 		pCache = new CItemPriceListTableCache;
-		m_mapItemPriceListCache.insert(TItemPriceListCacheMap::value_type(pItemPriceList->dwOwnerID, pCache));
+		m_mapItemPriceListCache.emplace(pItemPriceList->dwOwnerID, pCache);
 	}
 
 	pCache->Put(pItemPriceList, true);
@@ -2062,7 +2062,7 @@ void CPacketInfo::Add(int32_t header)
 	auto it = m_map_info.find(header);
 
 	if (it == m_map_info.end())
-		m_map_info.insert(std::map<int32_t, int32_t>::value_type(header, 1));
+		m_map_info.emplace(header, 1);
 	else
 		++it->second;
 }
@@ -3141,7 +3141,7 @@ void CClientManager::UpdateChannelStatus(TChannelStatus* pData)
 		it->second = pData->bStatus;
 	}
 	else {
-		m_mChannelStatus.insert(TChannelStatusMap::value_type(pData->nPort, pData->bStatus));
+		m_mChannelStatus.emplace(pData->nPort, pData->bStatus);
 	}
 }
 

@@ -213,7 +213,7 @@ public:
 		}
 		else {
 			pool = new Pool(size);
-			pools_.insert(PoolMapType::value_type(size, pool));
+			pools_.emplace(size, pool);
 		}
 		return pool->Acquire();
 	}

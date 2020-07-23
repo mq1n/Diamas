@@ -282,7 +282,7 @@ bool CMotionManager::Build()
 	for (int32_t i = 0; i < MAIN_RACE_MAX_NUM; ++i)
 	{
 		CMotionSet * pkMotionSet = M2_NEW CMotionSet;
-		m_map_pkMotionSet.insert(TContainer::value_type(i, pkMotionSet));
+		m_map_pkMotionSet.emplace(i, pkMotionSet);
 
 		char sz[256];
 
@@ -343,7 +343,7 @@ bool CMotionManager::Build()
 		if ('\0' != t->szFolder[0])
 		{
 			CMotionSet * pkMotionSet = M2_NEW CMotionSet;
-			m_map_pkMotionSet.insert(TContainer::value_type(t->dwVnum, pkMotionSet));
+			m_map_pkMotionSet.emplace(t->dwVnum, pkMotionSet);
 
 			LoadMotion(pkMotionSet, t, MOTION_WALK);
 			LoadMotion(pkMotionSet, t, MOTION_RUN);
@@ -358,7 +358,7 @@ bool CMotionManager::Build()
 			// POLYMORPH_BUG_FIX
 			float normalAttackDuration = MOB_GetNormalAttackDuration(t);
 			sys_log(0, "mob_normal_attack_duration:%d:%s:%.2f", t->dwVnum, t->szFolder, normalAttackDuration);
-			m_map_normalAttackDuration.insert(std::map<uint32_t, float>::value_type(t->dwVnum, normalAttackDuration));
+			m_map_normalAttackDuration.emplace(t->dwVnum, normalAttackDuration);
 			// END_OF_POLYMORPH_BUG_FIX
 		}
 	}
@@ -390,7 +390,7 @@ const CMotion * CMotionSet::GetMotion(uint32_t dwKey) const
 
 void CMotionSet::Insert(uint32_t dwKey, CMotion * pkMotion)
 {
-	m_map_pkMotion.insert(TContainer::value_type(dwKey, pkMotion));
+	m_map_pkMotion.emplace(dwKey, pkMotion);
 }
 
 bool CMotionSet::Load(const char * szFileName, int32_t mode, int32_t motion)

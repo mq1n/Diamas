@@ -2432,7 +2432,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int32_t dam, EDamageType type) // 
 
 		if (it == m_map_kDamage.end())
 		{
-			m_map_kDamage.insert(TDamageMap::value_type(pAttacker->GetVID(), TBattleInfo(dam, 0)));
+			m_map_kDamage.emplace(pAttacker->GetVID(), TBattleInfo(dam, 0));
 			it = m_map_kDamage.find(pAttacker->GetVID());
 		}
 		else
@@ -3696,7 +3696,7 @@ void CHARACTER::UpdateAggrPoint(LPCHARACTER pAttacker, EDamageType type, int32_t
 
 	if (it == m_map_kDamage.end())
 	{
-		m_map_kDamage.insert(TDamageMap::value_type(pAttacker->GetVID(), TBattleInfo(0, dam)));
+		m_map_kDamage.emplace(pAttacker->GetVID(), TBattleInfo(0, dam));
 		it = m_map_kDamage.find(pAttacker->GetVID());
 	}
 

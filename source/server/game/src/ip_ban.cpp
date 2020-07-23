@@ -181,7 +181,7 @@ bool LoadBanIP(const char * filename)
 		{
 			std::vector<IP> v;
 			v.push_back(ip);
-			mapBanIP.insert(std::map<uint32_t, std::vector<IP> >::value_type(ip.hash(), v));
+			mapBanIP.emplace(ip.hash(), v);
 		}
 		else
 			it->second.push_back(ip);

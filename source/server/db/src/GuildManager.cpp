@@ -98,7 +98,7 @@ TGuild & CGuildManager::TouchGuild(uint32_t GID)
 		return it->second;
 
 	TGuild info;
-	m_map_kGuild.insert(std::map<uint32_t, TGuild>::value_type(GID, info));
+	m_map_kGuild.emplace(GID, info);
 	return m_map_kGuild[GID];
 }
 

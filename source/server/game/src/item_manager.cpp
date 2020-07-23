@@ -86,7 +86,7 @@ bool ITEM_MANAGER::Initialize(SItemTable_Server * table, int32_t size)
 		)
 			quest::CQuestManager::Instance().RegisterNPCVnum(m_vec_prototype[i].dwVnum);
 
-		m_map_vid.insert( std::map<uint32_t,SItemTable_Server>::value_type( m_vec_prototype[i].dwVnum, m_vec_prototype[i] ) ); 
+		m_map_vid.emplace(m_vec_prototype[i].dwVnum, m_vec_prototype[i]); 
 		if ( g_bIsTestServer )
 			sys_log( 0, "ITEM_INFO %d %s ", m_vec_prototype[i].dwVnum, m_vec_prototype[i].szName );	
 	}
@@ -246,10 +246,10 @@ LPITEM ITEM_MANAGER::CreateItem(uint32_t vnum, uint32_t count, uint32_t id, bool
 	item->SetVID(++m_dwVIDCount);
 
 	if (bSkipSave == false)
-		m_VIDMap.insert(ITEM_VID_MAP::value_type(item->GetVID(), item));
+		m_VIDMap.emplace(item->GetVID(), item);
 
 	if (item->GetID() != 0 && bSkipSave == false)
-		m_map_pkItemByID.insert(std::map<uint32_t, LPITEM>::value_type(item->GetID(), item));
+		m_map_pkItemByID.emplace(item->GetID(), item);
 
 	if (!item->SetCount(count))
 		return nullptr;

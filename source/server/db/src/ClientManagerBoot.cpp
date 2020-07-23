@@ -375,7 +375,7 @@ bool CClientManager::InitializeItemTableFile()
 		if (!Set_Proto_Item_Table(item_table, data, localMap))
 			fprintf(stderr, "Invalid item table. VNUM: %d\n", item_table->dwVnum);
 
-		m_map_itemTableByVnum.insert(std::map<uint32_t, SItemTable_Server *>::value_type(item_table->dwVnum, item_table));
+		m_map_itemTableByVnum.emplace(item_table->dwVnum, item_table);
 	}
 	
 	sort(m_vec_itemTable.begin(), m_vec_itemTable.end(), FCompareVnumItem());
@@ -1434,7 +1434,7 @@ bool CClientManager::InitializeItemTableFromDB()
 			item_table->dwVnumRange = 99;
 #endif
 
-		m_map_itemTableByVnum.insert(std::map<uint32_t, SItemTable_Server *>::value_type(item_table->dwVnum, item_table));
+		m_map_itemTableByVnum.emplace(item_table->dwVnum, item_table);
 		sys_log(0, "ITEM: #%-5lu %-24s %-24s VAL: %d %d %d %d %d %d WEAR %d ANTI %d IMMUNE %d REFINE %u REFINE_SET %u MAGIC_PCT %u",
 			item_table->dwVnum,
 			item_table->szName,

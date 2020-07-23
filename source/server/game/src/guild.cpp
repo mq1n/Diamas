@@ -1919,7 +1919,7 @@ void CGuild::Invite( LPCHARACTER pchInviter, LPCHARACTER pchInvitee )
 	pInfo->dwInviteePID = pchInvitee->GetPlayerID();
 	pInfo->dwGuildID = GetID();
 
-	m_GuildInviteEventMap.insert(EventMap::value_type(pchInvitee->GetPlayerID(), event_create(GuildInviteEvent, pInfo, PASSES_PER_SEC(10))));
+	m_GuildInviteEventMap.emplace(pchInvitee->GetPlayerID(), event_create(GuildInviteEvent, pInfo, PASSES_PER_SEC(10)));
 
 	//
 	// 초대 받는 character 에게 초대 패킷 전송

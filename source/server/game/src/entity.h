@@ -10,8 +10,8 @@ class SECTREE;
 class CEntity
 {
 	public:
-		typedef std::unordered_map<LPENTITY, int32_t> MAP_VIEW;
-		typedef std::function<bool(LPCHARACTER)> ENTITY_REQ_FUNC;
+		using MAP_VIEW = std::unordered_map<LPENTITY, int32_t>;
+		using ENTITY_REQ_FUNC = std::function<bool(LPCHARACTER)>;
 
 	public:
 		CEntity();
@@ -94,20 +94,18 @@ class CEntity
 template <typename Function>
 void CEntity::ForEachSeen(Function& f)
 {
-	std::vector<CEntity*> seen;
+	std::vector <CEntity*> seen;
 	seen.reserve(m_mapView.size());
-
-	auto collector = [&seen](const MAP_VIEW::value_type& p)
-	{
-		seen.push_back(p.first);
-	};
 
 	// TODO: Some functions expect the old behaviour of including this in
 	// their around view.
 	// figure those out and manually call f on this
 	seen.push_back(this);
 
-	std::for_each(m_mapView.begin(), m_mapView.end(), collector);
+	std::for_each(m_mapView.begin(), m_mapView.end(), [&seen](const MAP_VIEW::value_type& p)
+	{
+		seen.push_back(p.first);
+	});
 
 	// This is very fragile. All of ForEachSeen()'s callers are only interested
 	// in characters. One of these characters might however be destroyed while

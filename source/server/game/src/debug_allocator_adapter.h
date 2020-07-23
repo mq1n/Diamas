@@ -112,7 +112,7 @@ public:
 		AllocMapType::iterator it = alloc_map.find(p);
 		if (it == alloc_map.end()) {
 			AllocTag tag(file, line);
-			alloc_map.insert(AllocMapType::value_type(p, tag));
+			alloc_map.emplace(p, tag);
 			age = tag.age;
 		} else {
 			AllocTag& tag = it->second;

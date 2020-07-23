@@ -27,7 +27,7 @@ bool CClientManager::InsertLogonAccount(const char * c_pszLogin, uint32_t dwHand
 	pkLD->SetConnectedPeerHandle(dwHandle);
 	pkLD->SetIP(c_pszIP);
 
-	m_map_kLogonAccount.insert(TLogonAccountMap::value_type(szLogin, pkLD));
+	m_map_kLogonAccount.emplace(szLogin, pkLD);
 	return true;
 }
 

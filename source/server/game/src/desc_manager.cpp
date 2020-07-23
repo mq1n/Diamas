@@ -143,8 +143,8 @@ LPDESC DESC_MANAGER::AcceptDesc(LPFDWATCH fdw, socket_t s)
 		return nullptr;
 	}
 
-	m_map_handshake.insert(DESC_HANDSHAKE_MAP::value_type(handshake, newd));
-	m_map_handle.insert(DESC_HANDLE_MAP::value_type(newd->GetHandle(), newd));
+	m_map_handshake.emplace(handshake, newd);
+	m_map_handle.emplace(newd->GetHandle(), newd);
 
 	m_set_pkDesc.insert(newd);
 	++m_iSocketsConnected;
@@ -183,8 +183,8 @@ LPDESC DESC_MANAGER::AcceptP2PDesc(LPFDWATCH fdw, socket_t bind_fd)
 void DESC_MANAGER::ConnectAccount(const std::string& login, LPDESC d)
 {
 	dev_log(LOG_DEB0, "ConnectAccount(%s)", login.c_str());
-	m_map_loginName.insert(DESC_LOGINNAME_MAP::value_type(login,d));
-	m_AccountIDMap.insert(DESC_ACCOUNTID_MAP::value_type(d->GetAccountTable().id, d));
+	m_map_loginName.emplace(login,d);
+	m_AccountIDMap.emplace(d->GetAccountTable().id, d);
 }
 
 void DESC_MANAGER::DisconnectAccount(const std::string& login)
@@ -322,12 +322,12 @@ void DESC_MANAGER::BroadcastCommand(const std::string& cmd) const
 void DESC_MANAGER::UpdateUserCountOnServer(int16_t port, uint32_t userCount)
 {
 	auto it = m_userCountMap.find(port);
-	if (it != m_userCountMap.end()) {
-		it->second = userCount;
+	if (it == m_userCountMap.end())
+	{
+		m_userCountMap.emplace(port, userCount);
+		return;
 	}
-	else {
-		m_userCountMap.insert(TPlayerCountMap::value_type(port, userCount));
-	}
+	it->second = userCount;
 }
 
 LPCLIENT_DESC DESC_MANAGER::CreateConnectionDesc(LPFDWATCH fdw, const char * host, uint16_t port, int32_t iPhaseWhenSucceed, bool bRetryWhenClosed)

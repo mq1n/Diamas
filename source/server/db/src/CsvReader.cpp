@@ -46,8 +46,8 @@ void cCsvAlias::AddAlias(const char* name, size_t index)
     Assert(m_Name2Index.find(converted) == m_Name2Index.end());
     Assert(m_Index2Name.find(index) == m_Index2Name.end());
 
-    m_Name2Index.insert(NAME2INDEX_MAP::value_type(converted, index));
-    m_Index2Name.insert(INDEX2NAME_MAP::value_type(index, name));
+    m_Name2Index.emplace(converted, index);
+    m_Index2Name.emplace(index, name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

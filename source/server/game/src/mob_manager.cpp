@@ -67,8 +67,8 @@ bool CMobManager::Initialize(TMobTable * pTable, int32_t iSize)
 
 		memcpy(&pkMob->m_table, t, sizeof(TMobTable));
 
-		m_map_pkMobByVnum.insert(std::map<uint32_t, CMob *>::value_type(t->dwVnum, pkMob));
-		m_map_pkMobByName.insert(std::map<std::string, CMob *>::value_type(t->szLocaleName, pkMob));
+		m_map_pkMobByVnum.emplace(t->dwVnum, pkMob);
+		m_map_pkMobByName.emplace(t->szLocaleName, pkMob);
 
 		int32_t SkillCount = 0;
 
@@ -374,7 +374,7 @@ bool CMobManager::LoadGroup(const char * c_pszFileName)
 		}
 
 		loader.SetParentNode();
-		m_map_pkMobGroup.insert(std::map<uint32_t, CMobGroup *>::value_type(iVnum, pkGroup));
+		m_map_pkMobGroup.emplace(iVnum, pkGroup);
 	}
 
 	return true;

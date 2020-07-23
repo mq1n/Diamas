@@ -1416,14 +1416,13 @@ bool CDungeon::IsAllPCNearTo(int32_t x, int32_t y, int32_t dist)
 
 void CDungeon::CreateItemGroup (std::string& group_name, ItemGroup& item_group)
 {
-	m_map_ItemGroup.insert (ItemGroupMap::value_type (group_name, item_group));
+	m_map_ItemGroup.emplace(group_name, item_group);
 }
 
 const CDungeon::ItemGroup* CDungeon::GetItemGroup (std::string& group_name)
 {
-	ItemGroupMap::iterator it = m_map_ItemGroup.find (group_name);
+	auto it = m_map_ItemGroup.find (group_name);
 	if (it != m_map_ItemGroup.end())
 		return &(it->second);
-	else
-		return nullptr;
+	return nullptr;
 }
