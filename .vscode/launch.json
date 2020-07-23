@@ -105,6 +105,18 @@
             "name": "------------------------------------"
         },
         {
+            "name": "Server files test",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/win_server/m2panel.py",
+            "cwd": "${workspaceFolder}/win_server/",
+            "console": "internalConsole",
+            "args": ["test", "debug", "1"]
+        },    
+        {
+            "name": "------------------------------------"
+        },
+        {
             "name": "FSTest",
             "type": "cppvsdbg",
             "request": "launch",

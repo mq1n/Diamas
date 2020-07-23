@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-import sys, os, time
+import sys, os, time, signal, psutil
 
 def sys_argc():
 	return int(len(sys.argv)) - 1
@@ -14,6 +14,7 @@ class WinSFHelper:
 		self.arch = "86" # Default: x86
 		self.channel_count = 1
 		self.root_path = os.getcwd()
+		self.is_windows = sys.platform.startswith('win32')
 		
 		if os.path.isfile("{}\\syserr.txt".format(self.root_path)):
 			os.remove("{}\\syserr.txt".format(self.root_path))
@@ -39,7 +40,7 @@ class WinSFHelper:
 
 		self.sys_log("Work type: {} Build type: {} Arch: {}".format(self.work_type, self.build_type, self.arch))
 
-		if self.work_type < 1 or self.work_type > 4: 
+		if self.work_type < 1 or self.work_type > 5: 
 			self.sys_err("Unknown work_type: {}".format(self.work_type))
 			sys.exit(2)
 
@@ -65,6 +66,8 @@ class WinSFHelper:
 			self.work_type = 3
 		elif type in ["kur", "install", "yukle"]:
 			self.work_type = 4
+		elif type == "test":
+			self.work_type = 5
 	
 	def set_build_type(self, type):
 		if type in ["normal", "n"]:
@@ -87,6 +90,75 @@ class WinSFHelper:
 			self.uninstall_game()
 		elif self.work_type == 4:
 			self.install_game()
+		elif self.work_type == 5: # test phase
+			# Try delete old installed files
+			self.uninstall_game()
+
+			# Try install files and later uninstall
+			self.install_game()
+			self.uninstall_game()
+
+			# Try install files and start game
+			self.install_game()
+			time.sleep(5.0)
+			self.start_game()
+
+			# Try stop game, clean logs and uninstall files
+			self.stop_game()
+			self.clean_logs()
+			self.uninstall_game()
+
+	def stop_game(self):
+		self.sys_log("stop_game triggered.")
+
+		if self.is_windows:
+			if self.build_type == "debug":
+				core_names = ["db_d.exe", "game_d.exe"]
+			elif self.build_type == "normal":
+				core_names = ["db.exe", "game.exe"]
+		else:
+			core_names = ["db_cache", "game_server"]
+		
+		kill_checklist = []
+		try:
+			for process in psutil.process_iter():
+				if process.name() in core_names:
+					try:
+						path = process.exe()
+					except psutil.AccessDenied:
+						path = ""
+
+					if len(path):
+						self.sys_log("Game process found! {}: '{}' / '{}'".format(process.pid, process.name(), path))
+						kill_checklist.append([process.pid, process.name(), path])
+		except psutil.Error as e:
+			self.sys_err("psutil enumeration has been failed. Error: {}".format(e))
+			return
+
+		kill_list_size = len(kill_checklist)
+		if not kill_list_size:
+			self.sys_err("there have not been any working game process")
+			return
+		else:
+			self.sys_log("{} game process found!".format(kill_list_size))
+
+		for curr_proc in kill_checklist:
+			pid = curr_proc[0]
+			name = curr_proc[1]
+			path = curr_proc[2]
+
+			self.sys_log("Current process: {}: '{}' / '{}'.".format(pid, name, path))
+
+			proc = psutil.Process(pid)
+			if proc:
+				try:
+					proc.kill()
+					self.sys_log("Process: {}: '{}' / '{}' killed.".format(pid, name, path))
+				except psutil.Error as e:
+					self.sys_err("psutil kill has been failed. Error: {}".format(e))
+					continue
+
+		self.sys_log("stop_game completed.")
 
 	def start_game(self):
 		self.sys_log("start_game triggered.")
@@ -96,11 +168,14 @@ class WinSFHelper:
 			sys.exit(4)
 
 		container_roots = ["\\auth\\", "\\db\\", "\\game99\\", "\\kanal\\"]
-			
-		if self.build_type == "normal":
-			container_core = ["game.exe", "db.exe"]
-		if self.build_type == "debug":
-			container_core = ["game_d.exe", "db_d.exe"]
+		
+		if self.is_windows:
+			if self.build_type == "normal":
+				container_core = ["game.exe", "db.exe"]
+			if self.build_type == "debug":
+				container_core = ["game_d.exe", "db_d.exe"]
+		else:
+			container_core = ["game_server", "db_cache"]
 		
 		for i in container_roots:
 			target_path = "{}{}".format(self.root_path, i)
@@ -155,10 +230,13 @@ class WinSFHelper:
 
 		garbage_container_roots =     ["\\auth\\", "\\db\\", "\\game99\\", "\\kanal\\"]
 		garbage_container_dirs =      ["data", "locale", "log", "package", "mark"]
-		if self.build_type == "debug":
-			garbage_container_files = ["db_d.exe", "game_d.exe", "DevIL.dll"]
-		elif self.build_type == "normal":
-			garbage_container_files = ["db.exe", "game.exe", "DevIL.dll"]
+		if self.is_windows:
+			if self.build_type == "debug":
+				garbage_container_files = ["db_d.exe", "game_d.exe", "DevIL.dll"]
+			elif self.build_type == "normal":
+				garbage_container_files = ["db.exe", "game.exe", "DevIL.dll"]
+		else:
+			garbage_container_files = ["db_cache", "game_server"]
 
 		garbage_container_configs = [
 			"\\db\\mob_proto.csv","\\db\\mob_names.txt", "\\db\\item_names.txt", "\\db\\item_proto.csv", "\\db\\object_proto.csv",
@@ -203,10 +281,15 @@ class WinSFHelper:
 			self.sys_err("Unknown arch: {}".format(self.arch))
 			sys.exit(5)
 
-		if self.build_type == "normal":
-			container_core = ["game.exe", "db.exe"]
-		if self.build_type == "debug":
-			container_core = ["game_d.exe", "db_d.exe"]
+		if self.is_windows:
+			if self.build_type == "normal":
+				container_core = ["game.exe", "db.exe"]
+			if self.build_type == "debug":
+				container_core = ["game_d.exe", "db_d.exe"]
+			container_core_source = ["game_server.exe", "db_cache.exe"]
+		else:
+			container_core = ["game_server", "db_cache"]
+			container_core_source = ["game_server", "db_cache"]
 
 		symlink_targets_dir = [
 			["kanal\\package",  "..\\share\\package"], ["kanal\\locale",  "..\\share\\locale"], ["kanal\\data",  "..\\share\\data"], ["kanal\\log",  "..\\share\\log"],       ["kanal\\mark", "..\\share\\mark"],
@@ -216,10 +299,10 @@ class WinSFHelper:
 		]
 		
 		symlink_targets_file = [
-			["db\\{}".format(container_core[1]),     "..\\Bin\\db_cache.exe"],
-			["auth\\{}".format(container_core[0]),   "..\\Bin\\game_server.exe"],
-			["game99\\{}".format(container_core[0]), "..\\Bin\\game_server.exe"],
-			["kanal\\{}".format(container_core[0]),  "..\\Bin\\game_server.exe"],
+			["db\\{}".format(container_core[1]),     "..\\Bin\\{}".format(container_core_source[1])],
+			["auth\\{}".format(container_core[0]),   "..\\Bin\\{}".format(container_core_source[0])],
+			["game99\\{}".format(container_core[0]), "..\\Bin\\{}".format(container_core_source[0])],
+			["kanal\\{}".format(container_core[0]),  "..\\Bin\\{}".format(container_core_source[0])],
 
 			["db\\item_names.txt",   "..\\share\\conf\\item_names.txt"], ["db\\mob_names.txt", "..\\share\\conf\\mob_names.txt"],
 			["db\\item_proto.csv",   "..\\share\\conf\\item_proto.csv"], ["db\\mob_proto.csv", "..\\share\\conf\\mob_proto.csv"],
@@ -229,36 +312,49 @@ class WinSFHelper:
 			["ayar\\kanal_config.txt", "kanal\\CONFIG"], ["ayar\\db_conf.json",      "db\\CONFIG.json"],
 		]			
 
-		if self.arch == "64":
-			symlink_targets_file.append(["auth\\DevIL.dll",   "..\\extern\\bin\\DevIL_x64.dll"])
-			symlink_targets_file.append(["game99\\DevIL.dll", "..\\extern\\bin\\DevIL_x64.dll"])
-			symlink_targets_file.append(["kanal\\DevIL.dll",  "..\\extern\\bin\\DevIL_x64.dll"])
-		elif self.arch == "86":
-			symlink_targets_file.append(["auth\\DevIL.dll",   "..\\extern\\bin\\DevIL_x86.dll"])
-			symlink_targets_file.append(["game99\\DevIL.dll", "..\\extern\\bin\\DevIL_x86.dll"])
-			symlink_targets_file.append(["kanal\\DevIL.dll",  "..\\extern\\bin\\DevIL_x86.dll"])
+		if self.is_windows:
+			if self.arch == "64":
+				symlink_targets_file.append(["auth\\DevIL.dll",   "..\\extern\\bin\\DevIL_x64.dll"])
+				symlink_targets_file.append(["game99\\DevIL.dll", "..\\extern\\bin\\DevIL_x64.dll"])
+				symlink_targets_file.append(["kanal\\DevIL.dll",  "..\\extern\\bin\\DevIL_x64.dll"])
+			elif self.arch == "86":
+				symlink_targets_file.append(["auth\\DevIL.dll",   "..\\extern\\bin\\DevIL_x86.dll"])
+				symlink_targets_file.append(["game99\\DevIL.dll", "..\\extern\\bin\\DevIL_x86.dll"])
+				symlink_targets_file.append(["kanal\\DevIL.dll",  "..\\extern\\bin\\DevIL_x86.dll"])
 			
 		for i in symlink_targets_dir:
-			target_file = "{} {}".format(i[0], i[1])
+			if self.is_windows:
+				target_file = "{} {}".format(i[0], i[1]) # to > from
+			else:
+				target_file = "{} {}".format(i[1], i[0]) # from > to
 
 			try:
-				os.system("mklink /D/J {}".format(target_file)) # Directory & junction
+				if self.is_windows:
+					os.system("mklink /D/J {}".format(target_file)) # Directory & junction
+				else:
+					os.system("ln -s {}".format(target_file)) 
 			except OSError as e:
 				self.sys_err("'{}' could not linked. Error: {}".format(target_file, e))
 				pass	
 
-			self.sys_log("{} -> {} linked.".format(i[1], i[0]))
+			self.sys_log("Dir: {} linked.".format(target_file))
 
 		for i in symlink_targets_file:
-			target_file = "{} {}".format(i[0], i[1])
+			if self.is_windows:
+				target_file = "{} {}".format(i[0], i[1]) # to > from
+			else:
+				target_file = "{} {}".format(i[1], i[0]) # from > to
 
 			try:
-				os.system("mklink /H {}".format(target_file)) # Hardlink
+				if self.is_windows:
+					os.system("mklink /H {}".format(target_file)) # Hardlink
+				else:
+					os.system("ln -s {}".format(target_file)) 
 			except OSError as e:
 				self.sys_err("'{}' could not linked. Error: {}".format(target_file, e))
 				pass	
 
-			self.sys_log("{} -> {} linked.".format(i[1], i[0]))		
+			self.sys_log("File: {} linked.".format(target_file))
 
 		self.sys_log("install_game completed.")
 	
