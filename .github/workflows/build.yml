@@ -37,7 +37,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
-        name: output
+        name: output_nix
         path: _output
     - name: Run tests
       working-directory: sql
@@ -71,11 +71,11 @@ jobs:
     - name: Collect outputs
       run: |
         mkdir _output
-        copy Bin\* _output
+        copy Bin\*.exe _output
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
-        name: output
+        name: output_win
         path: _output
     - name: Run tests
       working-directory: sql
