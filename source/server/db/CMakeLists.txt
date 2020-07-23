@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.2)
 project(db_cache CXX)
-set(EXE_NAME db_cache)
+
+# Output name
+set(OUTPUT_NAME "${PROJECT_NAME}")
+if (WIN32)
+	set(OUTPUT_NAME "${OUTPUT_NAME}.exe")
+endif()
 
 # Output dir
 set(OUTPUT_DIR ${PROJECT_SOURCE_DIR}/../../../Bin)
@@ -55,15 +60,15 @@ if (MSVC)
 		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb mariadbclient)
 	endif()
 
-	add_executable(${EXE_NAME} ${DBCACHE_HEADERS} ${DBCACHE_SOURCES})
+	add_executable(${PROJECT_NAME} ${DBCACHE_HEADERS} ${DBCACHE_SOURCES})
 	
-	target_link_libraries(${EXE_NAME} sourceCommon thecorelib sqllib gamelib ${EXTRA_LIBS} DevIL)
+	target_link_libraries(${PROJECT_NAME} sourceCommon thecorelib sqllib gamelib ${EXTRA_LIBS} DevIL)
 
 else()
-	add_executable(${EXE_NAME} ${DBCACHE_HEADERS} ${DBCACHE_SOURCES})
+	add_executable(${PROJECT_NAME} ${DBCACHE_HEADERS} ${DBCACHE_SOURCES})
 
 	# Link
-	target_link_libraries(${EXE_NAME} sourceCommon mysqlclient -ldl -lm -lpthread -pthread thecorelib sqllib gamelib)
+	target_link_libraries(${PROJECT_NAME} sourceCommon mysqlclient -ldl -lm -lpthread -pthread thecorelib sqllib gamelib)
 
 endif()
 
@@ -71,14 +76,14 @@ if (ENABLE_STATIC_ANALYSIS)
 	pvs_studio_add_target(
 		TARGET db_cache.analyze ALL
         OUTPUT FORMAT errorfile
-        ANALYZE ${EXE_NAME}
+        ANALYZE ${PROJECT_NAME}
 		LOG db_cache_analysis.err
 	)
 endif()
 
-SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES COMPILE_DEFINITIONS "${_definitions}") 
+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS "${_definitions}") 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES LINK_SEARCH_END_STATIC 1) #STATIC LINKING for clang
+	SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_SEARCH_END_STATIC 1) #STATIC LINKING for clang
 	set(CMAKE_EXE_LINK_DYNAMIC_C_FLAGS)       # remove -Wl,-Bdynamic 
 	set(CMAKE_EXE_LINK_DYNAMIC_CXX_FLAGS) 
 	set(CMAKE_SHARED_LIBRARY_C_FLAGS)         # remove -fPIC 
@@ -88,9 +93,17 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL
 endif()
 
 if (NOT CI_BUILD)
-    ADD_CUSTOM_COMMAND(
-        TARGET ${EXE_NAME}
+	add_custom_command(
+		TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../Bin_public/${MAJOR_VERSION}.${gitVersion}/${OUTPUT_NAME}"
+		COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../Bin_public/${MAJOR_VERSION}.${gitVersion}/${OUTPUT_NAME}
+	)
+	
+	add_custom_command(
+        TARGET ${PROJECT_NAME}
         POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../share/bin/${OUTPUT_NAME}"
         COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../share/bin/${OUTPUT_NAME}
     )
 endif()

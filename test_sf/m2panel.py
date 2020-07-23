@@ -67,7 +67,7 @@ class TestSFHelper:
 			self.work_type = 4
 		elif type in ["kapat", "close", "stop", "kill"]:
 			self.work_type = 5
-		elif type in ["backup", "yedek", "save"]
+		elif type in ["backup", "yedek", "save"]:
 			self.work_type = 6
 		elif type == "test":
 			self.work_type = 7

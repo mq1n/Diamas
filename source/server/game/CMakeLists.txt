@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.2)
 project(game_server C CXX)
-set(EXE_NAME game_server)
+
+# Output name
+set(OUTPUT_NAME "${PROJECT_NAME}")
+if (WIN32)
+	set(OUTPUT_NAME "${OUTPUT_NAME}.exe")
+endif()
 
 # Output dir
 set(OUTPUT_DIR ${PROJECT_SOURCE_DIR}/../../../Bin)
@@ -63,27 +68,27 @@ if (MSVC)
 		set(EXTRA_LIBS ${EXTRA_LIBS} libmariadb mariadbclient)
 	endif()
 
-	add_executable(${EXE_NAME} ${GAMESERVER_HEADERS} ${GAMESERVER_SOURCES})
+	add_executable(${PROJECT_NAME} ${GAMESERVER_HEADERS} ${GAMESERVER_SOURCES})
 	
-	target_link_libraries(${EXE_NAME} sourceCommon lualib thecorelib sqllib gamelib ${EXTRA_LIBS} DevIL)
+	target_link_libraries(${PROJECT_NAME} sourceCommon lualib thecorelib sqllib gamelib ${EXTRA_LIBS} DevIL)
 
 else()
-	add_executable(${EXE_NAME} ${GAMESERVER_HEADERS} ${GAMESERVER_SOURCES})
+	add_executable(${PROJECT_NAME} ${GAMESERVER_HEADERS} ${GAMESERVER_SOURCES})
 
 	set(IL_LIBRARIES IL png tiff mng lcms jpeg jbig)
 
 	# Link
-	target_link_libraries(${EXE_NAME} sourceCommon mysqlclient cryptopp ${IL_LIBRARIES} lualib thecorelib sqllib gamelib -ldl -lm -lpthread -pthread)
+	target_link_libraries(${PROJECT_NAME} sourceCommon mysqlclient cryptopp ${IL_LIBRARIES} lualib thecorelib sqllib gamelib -ldl -lm -lpthread -pthread)
 
 endif()
 
-set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD 17)
-set_property(TARGET ${EXE_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
-set_property(TARGET ${EXE_NAME} PROPERTY CMAKE_CXX_EXTENSIONS OFF)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CMAKE_CXX_EXTENSIONS OFF)
 
-SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES COMPILE_DEFINITIONS "${_definitions}") 
+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS "${_definitions}") 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES LINK_SEARCH_END_STATIC 1) #STATIC LINKING for clang
+	SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_SEARCH_END_STATIC 1) #STATIC LINKING for clang
 	set(CMAKE_EXE_LINK_DYNAMIC_C_FLAGS)       # remove -Wl,-Bdynamic 
 	set(CMAKE_EXE_LINK_DYNAMIC_CXX_FLAGS) 
 	set(CMAKE_SHARED_LIBRARY_C_FLAGS)         # remove -fPIC 
@@ -96,8 +101,19 @@ if (ENABLE_STATIC_ANALYSIS)
 	pvs_studio_add_target(
 		TARGET game_server.analyze ALL
         OUTPUT FORMAT errorfile
-        ANALYZE ${EXE_NAME} gamelib sqllib thecorelib
+        ANALYZE ${PROJECT_NAME} gamelib sqllib thecorelib
 		LOG game_server_analysis.err
+	)
+endif()
+
+# Git release
+if (ENABLE_AUTO_RELEASE)
+	add_custom_command(
+		TARGET ${PROJECT_NAME}
+		POST_BUILD
+
+		COMMAND git tag -f -a ${MAJOR_VERSION}.${gitVersion} -m \"Automated post-build release\" dev
+		COMMAND git push -f --tags
 	)
 endif()
 
@@ -108,8 +124,15 @@ else()
 endif()
 
 if (NOT CI_BUILD)
+	add_custom_command(
+		TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../Bin_public/${MAJOR_VERSION}.${gitVersion}/${OUTPUT_NAME}"
+		COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../Bin_public/${MAJOR_VERSION}.${gitVersion}/${OUTPUT_NAME}
+	)
+
     add_custom_command(
-        TARGET ${EXE_NAME}
+        TARGET ${PROJECT_NAME}
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E echo "LINKING: ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../share/bin/${OUTPUT_NAME}"
         COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/${OUTPUT_NAME} ${PROJECT_BINARY_DIR}/../../../../share/bin/${OUTPUT_NAME}
