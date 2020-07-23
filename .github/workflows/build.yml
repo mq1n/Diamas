@@ -4,47 +4,6 @@ on: [push, pull_request]
 
 jobs:
 
-  linux:
-    timeout-minutes: 20
-
-    strategy:
-      matrix:
-        os: [ubuntu-18.04]
-        compiler: [clang++-8]
-
-    runs-on: ${{ matrix.os }}
-
-    steps:
-    - uses: actions/checkout@v1
-      with:
-        token: ${{ secrets.ACCESS_TOKEN }}
-        submodules: true
-    - name: Compile tests
-      working-directory: sql
-      env:
-        CXX: ${{ matrix.compiler }}
-      run: |
-        cmake -DBUILD_TESTING=1 ..
-        make -j12
-    - name: Collect outputs
-      run: |
-        mkdir _output
-        cp Bin/auth_server _output
-        cp Bin/db_cache _output
-        cp Bin/game_server _output
-        cp Bin/qc _output
-        cp Bin/vrunner _output
-    - name: Upload
-      uses: actions/upload-artifact@v1
-      with:
-        name: output
-        path: _output
-    - name: Run tests
-      working-directory: sql
-      env:
-        CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 20 -C Debug -j12
-
   windows:
     timeout-minutes: 20
 
@@ -62,22 +21,12 @@ jobs:
       with:
         token: ${{ secrets.ACCESS_TOKEN }}
         submodules: true
-    - name: Compile tests
-      working-directory: sql
-      run: |
-        cmake .. -A Win32 -DBUILD_TESTING=ON -DCI_BUILD=1 -DCMAKE_CXX_FLAGS=/W1 -G"${{ matrix.generator }}"
-        cmake --build . -j 12
     - name: Collect outputs
       run: |
         mkdir _output
-        copy Bin\* _output
+        copy extern\\lib_win_x86\\cryptopp-static_debug.lib _output
     - name: Upload
       uses: actions/upload-artifact@v1
       with:
         name: output
         path: _output
-    - name: Run tests
-      working-directory: sql
-      env:
-        CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 20 -C Debug -j12
