@@ -15,12 +15,17 @@ class WinSFHelper:
 		self.channel_count = 1
 		self.root_path = os.getcwd()
 		self.is_windows = sys.platform.startswith('win32')
-		
-		if os.path.isfile("{}/syserr.txt".format(self.root_path)):
-			os.remove("{}/syserr.txt".format(self.root_path))
+		self.syserr_file = "{}/syserr.txt".format(self.root_path)
+		self.syslog_file = "{}/syslog.txt".format(self.root_path)
 
-		if os.path.isfile("{}/syslog.txt".format(self.root_path)):
-			os.remove("{}/syslog.txt".format(self.root_path))
+		self.syserr_file = self.syserr_file.replace("/", os.path.sep) #*insert_shrug_emote_here*
+		self.syslog_file = self.syslog_file.replace("/", os.path.sep) #*insert_shrug_emote_here*
+
+		if os.path.isfile(self.syserr_file):
+			os.remove(self.syserr_file)
+
+		if os.path.isfile(self.syslog_file):
+			os.remove(self.syslog_file)
 		
 		if sys_argc() < 2:
 			self.show_usage()
@@ -49,12 +54,12 @@ class WinSFHelper:
 			sys.exit(3)
 
 	def sys_log(self, data):
-		with open("{}/syslog.txt".format(self.root_path), "a") as f:
+		with open(self.syslog_file, "a") as f:
 			f.write("SYS_LOG {}: {}\n".format(str(time.strftime("%H.%M.%S - %d.%m.%Y")), str(data)))
 
 	def sys_err(self, data):
 		print("SYS_ERR: {}".format(data))
-		with open("{}/syserr.txt".format(self.root_path), "a") as f:
+		with open(self.syserr_file, "a") as f:
 			f.write("SYS_ERR {}: {}\n".format(str(time.strftime("%H.%M.%S - %d.%m.%Y")), str(data)))
 	
 	def set_work_type(self, type):
