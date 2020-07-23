@@ -33,7 +33,10 @@ option(BUILD_TOOLS "Build the tool binaries" ON)
 option(ENABLE_STATIC_ANALYSIS "Enable static code analysis with PVS Studio" OFF)
 option(ENABLE_AUTO_RELEASE "Enable auto release create in git repo" OFF)
 option(ENABLE_CYTHON "Cythonize python scripts" OFF)
-option(DIAMAS_STATIC_BUILD "Static linking for serverside" OFF)
+option(DIAMAS_STATIC_BUILD "Static linking for serverside" ON)
+if (CI_BUILD)
+	set(DIAMAS_STATIC_BUILD OFF)
+endif()
 
 # Output dir
 set(OUTPUT_DIR ${PROJECT_SOURCE_DIR}/Bin)
@@ -124,12 +127,10 @@ if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 
 # Compiler subdir for MySQL libs
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") # TODO: AppleClang 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set(COMPILER_SUBDIR "clang")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(COMPILER_SUBDIR "gcc")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-	set(COMPILER_SUBDIR "intel")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	set(COMPILER_SUBDIR "msvc")
 endif()
@@ -174,7 +175,6 @@ endif()
 
 # Register 3rd dependecies include paths
 include_directories(${PROJECT_SOURCE_DIR}/extern/include)
-include_directories(${PROJECT_SOURCE_DIR}/extern/3rd)
 
 # Register 3rd dependecies precompiled library path
 link_directories(${PROJECT_SOURCE_DIR}/Bin/Utilities)
