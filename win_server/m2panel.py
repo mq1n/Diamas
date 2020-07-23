@@ -16,11 +16,11 @@ class WinSFHelper:
 		self.root_path = os.getcwd()
 		self.is_windows = sys.platform.startswith('win32')
 		
-		if os.path.isfile("{}\\syserr.txt".format(self.root_path)):
-			os.remove("{}\\syserr.txt".format(self.root_path))
+		if os.path.isfile("{}/syserr.txt".format(self.root_path)):
+			os.remove("{}/syserr.txt".format(self.root_path))
 
-		if os.path.isfile("{}\\syslog.txt".format(self.root_path)):
-			os.remove("{}\\syslog.txt".format(self.root_path))
+		if os.path.isfile("{}/syslog.txt".format(self.root_path)):
+			os.remove("{}/syslog.txt".format(self.root_path))
 		
 		if sys_argc() < 2:
 			self.show_usage()
@@ -49,12 +49,12 @@ class WinSFHelper:
 			sys.exit(3)
 
 	def sys_log(self, data):
-		with open("{}\\syslog.txt".format(self.root_path), "a") as f:
+		with open("{}/syslog.txt".format(self.root_path), "a") as f:
 			f.write("SYS_LOG {}: {}\n".format(str(time.strftime("%H.%M.%S - %d.%m.%Y")), str(data)))
 
 	def sys_err(self, data):
 		print("SYS_ERR: {}".format(data))
-		with open("{}\\syserr.txt".format(self.root_path), "a") as f:
+		with open("{}/syserr.txt".format(self.root_path), "a") as f:
 			f.write("SYS_ERR {}: {}\n".format(str(time.strftime("%H.%M.%S - %d.%m.%Y")), str(data)))
 	
 	def set_work_type(self, type):
@@ -167,7 +167,7 @@ class WinSFHelper:
 			self.sys_err("Unknown channel_count: {}".format(self.channel_count))
 			sys.exit(4)
 
-		container_roots = ["\\auth\\", "\\db\\", "\\game99\\", "\\kanal\\"]
+		container_roots = ["/auth/", "/db/", "/game99/", "/kanal/"]
 		
 		if self.is_windows:
 			if self.build_type == "normal":
@@ -182,7 +182,7 @@ class WinSFHelper:
 			os.chdir(target_path)
 
 			coreFile = ""
-			if str(i) == "\\db\\":
+			if str(i) == "/db/":
 				coreFile = container_core[1]
 			else:
 				coreFile = container_core[0]
@@ -201,7 +201,7 @@ class WinSFHelper:
 	def clean_logs(self):
 		self.sys_log("clean_logs triggered.")
 
-		garbage_container_roots = ["\\auth\\", "\\db\\", "\\game99\\", "\\kanal\\"]
+		garbage_container_roots = ["/auth/", "/db/", "/game99/", "/kanal/"]
 		garbage_container_log = [
 			"syserr.txt", "syslog.txt", "neterr.txt", "PTS.txt", "usage.txt",
 			"packet_info.txt", "VERSION.txt", "mob_count", "p2p_packet_info.txt",
@@ -228,7 +228,7 @@ class WinSFHelper:
 	def uninstall_game(self):
 		self.sys_log("uninstall_game triggered.")
 
-		garbage_container_roots =     ["\\auth\\", "\\db\\", "\\game99\\", "\\kanal\\"]
+		garbage_container_roots =     ["/auth/", "/db/", "/game99/", "/kanal/"]
 		garbage_container_dirs =      ["data", "locale", "log", "package", "mark"]
 		if self.is_windows:
 			if self.build_type == "debug":
@@ -239,8 +239,8 @@ class WinSFHelper:
 			garbage_container_files = ["db_cache", "game_server"]
 
 		garbage_container_configs = [
-			"\\db\\mob_proto.csv","\\db\\mob_names.txt", "\\db\\item_names.txt", "\\db\\item_proto.csv", "\\db\\object_proto.csv",
-			"\\ayar\\kanal_config.txt", "\\ayar\\game99_config.txt", "\\ayar\\auth_config.txt", "\\ayar\\db_conf.json"
+			"/db/mob_proto.csv","/db/mob_names.txt", "/db/item_names.txt", "/db/item_proto.csv", "/db/object_proto.csv",
+			"/ayar/kanal_config.txt", "/ayar/game99_config.txt", "/ayar/auth_config.txt", "/ayar/db_conf.json"
 		]
 
 		for i in garbage_container_roots:
@@ -292,35 +292,35 @@ class WinSFHelper:
 			container_core_source = ["game_server", "db_cache"]
 
 		symlink_targets_dir = [
-			["kanal\\package",  "..\\share\\package"], ["kanal\\locale",  "..\\share\\locale"], ["kanal\\data",  "..\\share\\data"], ["kanal\\log",  "..\\share\\log"],       ["kanal\\mark", "..\\share\\mark"],
-			["auth\\package",   "..\\share\\package"], ["auth\\locale",   "..\\share\\locale"], ["auth\\data",   "..\\share\\data"], ["auth\\log",   "..\\share\\auth\\log"], ["auth\\mark",  "..\\share\\mark"],
-			["db\\package",     "..\\share\\package"], ["db\\locale",     "..\\share\\locale"], ["db\\data",     "..\\share\\data"], ["db\\log",     "..\\share\\db\\log"],
-			["game99\\package", "..\\share\\package"], ["game99\\locale", "..\\share\\locale"], ["game99\\data", "..\\share\\data"], ["game99\\log", "..\\share\\game99\\log"]
+			["kanal/package",  "../share/package"], ["kanal/locale",  "../share/locale"], ["kanal/data",  "../share/data"], ["kanal/log",  "../share/log"],       ["kanal/mark", "../share/mark"],
+			["auth/package",   "../share/package"], ["auth/locale",   "../share/locale"], ["auth/data",   "../share/data"], ["auth/log",   "../share/auth/log"], ["auth/mark",  "../share/mark"],
+			["db/package",     "../share/package"], ["db/locale",     "../share/locale"], ["db/data",     "../share/data"], ["db/log",     "../share/db/log"],
+			["game99/package", "../share/package"], ["game99/locale", "../share/locale"], ["game99/data", "../share/data"], ["game99/log", "../share/game99/log"]
 		]
 		
 		symlink_targets_file = [
-			["db\\{}".format(container_core[1]),     "..\\Bin\\{}".format(container_core_source[1])],
-			["auth\\{}".format(container_core[0]),   "..\\Bin\\{}".format(container_core_source[0])],
-			["game99\\{}".format(container_core[0]), "..\\Bin\\{}".format(container_core_source[0])],
-			["kanal\\{}".format(container_core[0]),  "..\\Bin\\{}".format(container_core_source[0])],
+			["db/{}".format(container_core[1]),     "../Bin/{}".format(container_core_source[1])],
+			["auth/{}".format(container_core[0]),   "../Bin/{}".format(container_core_source[0])],
+			["game99/{}".format(container_core[0]), "../Bin/{}".format(container_core_source[0])],
+			["kanal/{}".format(container_core[0]),  "../Bin/{}".format(container_core_source[0])],
 
-			["db\\item_names.txt",   "..\\share\\conf\\item_names.txt"], ["db\\mob_names.txt", "..\\share\\conf\\mob_names.txt"],
-			["db\\item_proto.csv",   "..\\share\\conf\\item_proto.csv"], ["db\\mob_proto.csv", "..\\share\\conf\\mob_proto.csv"],
-			["db\\object_proto.csv", "..\\share\\conf\\object_proto.csv"],
+			["db/item_names.txt",   "../share/conf/item_names.txt"], ["db/mob_names.txt", "../share/conf/mob_names.txt"],
+			["db/item_proto.csv",   "../share/conf/item_proto.csv"], ["db/mob_proto.csv", "../share/conf/mob_proto.csv"],
+			["db/object_proto.csv", "../share/conf/object_proto.csv"],
 
-			["ayar\\auth_config.txt",  "auth\\CONFIG"],  ["ayar\\game99_config.txt", "game99\\CONFIG"],
-			["ayar\\kanal_config.txt", "kanal\\CONFIG"], ["ayar\\db_conf.json",      "db\\CONFIG.json"],
+			["ayar/auth_config.txt",  "auth/CONFIG"],  ["ayar/game99_config.txt", "game99/CONFIG"],
+			["ayar/kanal_config.txt", "kanal/CONFIG"], ["ayar/db_conf.json",      "db/CONFIG.json"],
 		]			
 
 		if self.is_windows:
 			if self.arch == "64":
-				symlink_targets_file.append(["auth\\DevIL.dll",   "..\\extern\\bin\\DevIL_x64.dll"])
-				symlink_targets_file.append(["game99\\DevIL.dll", "..\\extern\\bin\\DevIL_x64.dll"])
-				symlink_targets_file.append(["kanal\\DevIL.dll",  "..\\extern\\bin\\DevIL_x64.dll"])
+				symlink_targets_file.append(["auth/DevIL.dll",   "../extern/bin/DevIL_x64.dll"])
+				symlink_targets_file.append(["game99/DevIL.dll", "../extern/bin/DevIL_x64.dll"])
+				symlink_targets_file.append(["kanal/DevIL.dll",  "../extern/bin/DevIL_x64.dll"])
 			elif self.arch == "86":
-				symlink_targets_file.append(["auth\\DevIL.dll",   "..\\extern\\bin\\DevIL_x86.dll"])
-				symlink_targets_file.append(["game99\\DevIL.dll", "..\\extern\\bin\\DevIL_x86.dll"])
-				symlink_targets_file.append(["kanal\\DevIL.dll",  "..\\extern\\bin\\DevIL_x86.dll"])
+				symlink_targets_file.append(["auth/DevIL.dll",   "../extern/bin/DevIL_x86.dll"])
+				symlink_targets_file.append(["game99/DevIL.dll", "../extern/bin/DevIL_x86.dll"])
+				symlink_targets_file.append(["kanal/DevIL.dll",  "../extern/bin/DevIL_x86.dll"])
 			
 		for i in symlink_targets_dir:
 			if self.is_windows:
