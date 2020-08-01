@@ -29,6 +29,9 @@
 	#pragma comment( lib, "lzo2.lib" )
 #endif
 
+//#pragma comment( lib, "libcef.lib" )
+//#pragma comment( lib, "libcef_dll_wrapper.lib" )
+
 #pragma comment( lib, "FSLib.lib" )
 #pragma comment( lib, "granny2.11.8.0_static.lib" )
 #pragma comment( lib, "CrashRpt1403.lib" )

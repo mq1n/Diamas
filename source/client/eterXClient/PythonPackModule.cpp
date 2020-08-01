@@ -4,6 +4,7 @@
 #include "../eterSecurity/PythonStackCheck.h"
 #include "PythonDynamicModuleNames.h"
 
+#ifdef __USE_CYTHON__
 std::string GetPackFileData(const std::string& szFileName)
 {
 	CFile file;
@@ -31,6 +32,7 @@ std::string GetPackFileData(const std::string& szFileName)
 
 	return std::string();
 }
+#endif
 
 PyObject * packExist(PyObject * poSelf, PyObject * poArgs)
 {

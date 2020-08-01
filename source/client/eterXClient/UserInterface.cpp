@@ -291,22 +291,16 @@ int32_t APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 
 #ifdef _DEBUG
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_LEAK_CHECK_DF );
-
 	OpenConsoleWindow();
-	OpenLogFile(true); // true == uses syserr.txt and log.txt
-#else
-	OpenLogFile(true); // true == uses syserr.txt and log.txt
-#endif
 
-#ifndef _DEBUG
-	SetLogLevel(2);
-#else
+	OpenLogFile(true); // true == uses syserr.txt and log.txt
 	SetLogLevel(1);
-#endif
 
-#ifdef LEAK_DETECT
 	SymInitialize(GetCurrentProcess(), 0, true);
-	SymSetOptions(SYMOPT_LOAD_LINES);
+	SymSetOptions(SYMOPT_LOAD_LINES);	
+#else
+	OpenLogFile(true); // true == uses syserr.txt and log.txt
+	SetLogLevel(2);
 #endif
 
 #ifdef ENABLE_ANTICHEAT

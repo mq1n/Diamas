@@ -54,6 +54,9 @@ namespace
 				if (pkChr->IsDead())
 					return;
 
+		        if (!m_pkChr || !m_pkChr->IsPC() || !m_pkChr->GetGuild() || m_pkChr->IsDead())
+		            return;
+
 				int32_t iDist = DISTANCE_APPROX(pkChr->GetX()-m_pkChr->GetX(), pkChr->GetY()-m_pkChr->GetY());
 
 				if (iDist <= 500 && m_iMinDistance > iDist &&
@@ -62,7 +65,7 @@ namespace
 						!pkChr->IsAffectFlag(AFF_WAR_FLAG3))
 				{
 					// 快府祈 标惯老 版快
-					if ((uint32_t) m_pkChr->GetPoint(POINT_STAT) == pkChr->GetGuild()->GetID())
+					if ((uint32_t) m_pkChr->GetGuild()->GetID() == pkChr->GetGuild()->GetID())
 					{
 						CWarMap * pMap = pkChr->GetWarMap();
 						uint8_t idx;
@@ -117,6 +120,9 @@ namespace
 				if (!pkGuild)
 					return;
 
+		        if (!m_pkChr || !m_pkChr->IsPC() || !m_pkChr->GetGuild())
+		            return;
+        
 				int32_t iDist = DISTANCE_APPROX(pkChr->GetX()-m_pkChr->GetX(), pkChr->GetY()-m_pkChr->GetY());
 
 				if (iDist <= 500 &&
@@ -127,13 +133,13 @@ namespace
 					CAffect * pkAff = pkChr->FindAffect(AFFECT_WAR_FLAG);
 
 					sys_log(0, "FlagBase %s dist %d aff %p flag gid %d chr gid %u",
-							pkChr->GetName(), iDist, pkAff, m_pkChr->GetPoint(POINT_STAT),
+							pkChr->GetName(), iDist, pkAff, m_pkChr->GetGuild()->GetID(),
 							pkChr->GetGuild()->GetID());
 
 					if (pkAff)
 					{
-						if ((uint32_t) m_pkChr->GetPoint(POINT_STAT) == pkGuild->GetID() &&
-								m_pkChr->GetPoint(POINT_STAT) != pkAff->lApplyValue)
+						if ((uint32_t) m_pkChr->GetGuild()->GetID() == pkGuild->GetID() &&
+								m_pkChr->GetGuild()->GetID() != pkAff->lApplyValue)
 						{
 							CWarMap * pMap = pkChr->GetWarMap();
 							uint8_t idx;
@@ -145,8 +151,8 @@ namespace
 							{
 								uint8_t idx_opp = idx == 0 ? 1 : 0;
 
-								SendGuildWarScore(m_pkChr->GetPoint(POINT_STAT), pkAff->lApplyValue, 1);
-								//SendGuildWarScore(pkAff->lApplyValue, m_pkChr->GetPoint(POINT_STAT), -1);
+								SendGuildWarScore(m_pkChr->GetGuild()->GetID(), pkAff->lApplyValue, 1);
+								//SendGuildWarScore(pkAff->lApplyValue, m_pkChr->GetGuild()->GetID(), -1);
 
 								pMap->ResetFlag();
 								//pMap->AddFlag(idx_opp);
@@ -1356,10 +1362,10 @@ void CHARACTER::StateFlag()
 	char buf[256];
 	uint8_t idx;
 
-	if (!pMap->GetTeamIndex(GetPoint(POINT_STAT), idx))
+	if (!pMap->GetTeamIndex(GetGuild()->GetID(), idx))
 		return;
 
-	f.m_pkChrFind->AddAffect(AFFECT_WAR_FLAG, POINT_NONE, GetPoint(POINT_STAT), idx == 0 ? AFF_WAR_FLAG1 : AFF_WAR_FLAG2, INFINITE_AFFECT_DURATION, 0, false);
+	f.m_pkChrFind->AddAffect(AFFECT_WAR_FLAG, POINT_NONE, GetGuild()->GetID(), idx == 0 ? AFF_WAR_FLAG1 : AFF_WAR_FLAG2, INFINITE_AFFECT_DURATION, 0, false);
 	f.m_pkChrFind->AddAffect(AFFECT_WAR_FLAG, POINT_MOV_SPEED, 50 - f.m_pkChrFind->GetPoint(POINT_MOV_SPEED), 0, INFINITE_AFFECT_DURATION, 0, false);
 
 	pMap->RemoveFlag(idx);

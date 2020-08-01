@@ -2,12 +2,11 @@ cmake_minimum_required(VERSION 3.2)
 project(eterWebBrowser)
 
 file(GLOB ETERWEBBROWSER_HEADERS
-    "*.h"
-    "*.hpp"
+    "${PROJECT_SOURCE_DIR}/*.h"
 )
 file(GLOB ETERWEBBROWSER_SOURCES
-    "*.c"
-    "*.cpp"
+#   "${PROJECT_SOURCE_DIR}/*.c"
+    "${PROJECT_SOURCE_DIR}/*.cpp"
 )
 
 add_library(${PROJECT_NAME} STATIC ${ETERWEBBROWSER_HEADERS} ${ETERWEBBROWSER_SOURCES})

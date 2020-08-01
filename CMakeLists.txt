@@ -177,11 +177,17 @@ endif()
 
 # Register 3rd dependecies include paths
 include_directories(${PROJECT_SOURCE_DIR}/extern/include)
+include_directories(${PROJECT_SOURCE_DIR}/extern/include/cef)
 
 # Register 3rd dependecies precompiled library path
 link_directories(${PROJECT_SOURCE_DIR}/Bin/Utilities)
 if (WIN32)
 	link_directories(${PROJECT_SOURCE_DIR}/extern/lib_win_x${TARGET_ARCH_STR})
+	if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+		link_directories(${PROJECT_SOURCE_DIR}/extern/lib_win_x${TARGET_ARCH_STR}/cef/debug)
+	else()
+		link_directories(${PROJECT_SOURCE_DIR}/extern/lib_win_x${TARGET_ARCH_STR}/cef/release)
+	endif()
 else()
 	link_directories(${PROJECT_SOURCE_DIR}/extern/lib_bsd_x${TARGET_ARCH_STR})
 	if (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
