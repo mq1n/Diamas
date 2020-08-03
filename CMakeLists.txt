@@ -109,7 +109,7 @@ if (WIN32)
 	add_definitions(-D_HOSTNAME_="${USERNAME}")
 	MESSAGE(STATUS "USERNAME=${USERNAME}")
 else()
-    add_definitions(-D_HOSTNAME_="${HOSTNAME}")
+	add_definitions(-D_HOSTNAME_="${HOSTNAME}")
 	MESSAGE(STATUS "HOSTNAME=${HOSTNAME}")
 endif()
 
