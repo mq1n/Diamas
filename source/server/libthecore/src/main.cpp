@@ -17,7 +17,7 @@ static int pid_init(void)
 #ifdef _WIN32
 	return true;
 #else
-	auto fp = msl::file_ptr("pid", "w")
+	auto fp = msl::file_ptr("pid", "w");
 	if (fp)
 	{
 		fprintf(fp.get(), "%d", getpid());
