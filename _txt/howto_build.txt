@@ -1,0 +1,26 @@
+﻿kurulcaklar:
+pkg -vv
+pkg install git
+pkg install gcc10
+pkg install cmake-3.17
+pkg install gmake
+pkg install mysql57-server
+pkg install gdb-9
+
+linux gerekenler:
+libmysqlclient20
+libmysqlclient-dev
+
+git configleri:
+git config --global http.sslVerify false
+git config --global credential.helper "cache --timeout=3600"
+
+projeyi indirme:
+git clone https://github.com/mq1n/Diamas
+git submodule update --init --recursive
+git submodule update --recursive --remote
+chmod +x Diamas/build.sh
+chmod +x Diamas/rebuild.sh
+
+build etme:
+./build.sh <build_modu> (Debug/Release/MinSizeRel/RelWithDebInfo)
