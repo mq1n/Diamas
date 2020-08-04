@@ -9,6 +9,7 @@
 #include <random>
 #include <algorithm>
 #include <cctype>
+#include <cstring>
 #include <thread>
 #include <chrono>
 

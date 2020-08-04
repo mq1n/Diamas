@@ -11,7 +11,7 @@
 
 void Normalize(VECTOR * pV1, VECTOR * pV2)
 {
-	float l = sqrtf(pV1->x * pV1->x + pV1->y * pV1->y + pV1->z * pV1->z + 1.0e-12);
+	float l = (float)sqrt(pV1->x * pV1->x + pV1->y * pV1->y + pV1->z * pV1->z + 1.0e-12);
 
 	pV2->x = pV1->x / l;
 	pV2->y = pV1->y / l;
@@ -73,7 +73,7 @@ float GetDegreeDelta(float iDegree, float iDegree2)
 
 inline float RadiansFromDegrees(float value)
 {
-	return value * _PI / 180.0f;
+	return value * M_PI / 180.0f;
 }
 
 void RotateRegion(int32_t& sx, int32_t& sy, int32_t& ex, int32_t& ey, float xRot, float yRot, float zRot)

@@ -8,6 +8,7 @@
 #include <string.h>
 #include <random>
 #include <cctype>
+#include "gposition.h"
 
 #define IS_SET(flag, bit)		((flag) & (bit))
 #define SET_BIT(var, bit)		((var) |= (bit))
@@ -56,6 +57,11 @@ inline float DISTANCE(int64_t x, int64_t y, int64_t dx, int64_t dy)
 	return DISTANCE_SQRT(x - dx, y - dy);
 }
 
+inline float DISTANCE(const GPOS& rpos1, const GPOS& rpos2)
+{
+	return DISTANCE(rpos1.x, rpos1.y, rpos2.x, rpos2.y);
+}
+
 inline int32_t DISTANCE_APPROX(int32_t dx, int32_t dy)
 {
 	int32_t min, max;
@@ -101,6 +107,7 @@ extern void	skip_spaces(char **string);
 
 extern const char *	one_argument(const char *argument, char *first_arg, size_t first_size);
 extern const char *	two_arguments(const char *argument, char *first_arg, size_t first_size, char *second_arg, size_t second_size);
+extern const char * three_arguments(const char *argument, char *first_arg, size_t first_size, char *second_arg, size_t second_size, char *third_arg, size_t third_size);
 extern const char *	first_cmd(const char *argument, char *first_arg, size_t first_arg_size, size_t *first_arg_len_result);
 extern void split_argument(const char *argument, std::vector<std::string> & vecArgs);
 

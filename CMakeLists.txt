@@ -27,9 +27,9 @@ message(STATUS "VERSION: ${MAJOR_VERSION}")
 
 # Build options
 option(BUILD_UTILITIES "Build the common utilities" ON)
-option(BUILD_CLIENT "Build the client binaries" ON)
+option(BUILD_CLIENT "Build the client binaries" OFF)
 option(BUILD_SERVER "Build the server binaries" ON)
-option(BUILD_TOOLS "Build the tool binaries" ON)
+option(BUILD_TOOLS "Build the tool binaries" OFF)
 option(ENABLE_STATIC_ANALYSIS "Enable static code analysis with PVS Studio" OFF)
 option(ENABLE_AUTO_RELEASE "Enable auto release create in git repo" OFF)
 option(ENABLE_CYTHON "Cythonize python scripts" OFF)
