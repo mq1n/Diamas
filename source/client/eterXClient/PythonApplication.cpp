@@ -380,6 +380,9 @@ bool CPythonApplication::Process()
 	}		
 #endif
 
+//	m_cDiscordGameSDKManager.OnUpdate();
+	CDiscordGameSDKIntegration::Instance().OnUpdate();
+
 	//Update하는데 걸린시간.delta값
 	m_dwCurUpdateTime = ELTimer_GetMSec() - updatestart;
 
@@ -1050,7 +1053,8 @@ bool CPythonApplication::Create(PyObject * poSelf, const char * c_szName, int32_
 		CGrannyMaterial::CreateSphereMap(1, "d:/ymir work/special/spheremap01.jpg");
 
 		// Discord
-		m_cDiscordRPCManager.InitializeDiscordAPI(m_hWnd);
+		// m_cDiscordRPCManager.InitializeDiscordAPI(m_hWnd);
+		m_cDiscordGameSDKManager.InitializeDiscordAPI();
 
 		// Render Target
 		for (int32_t i = 0; i < CPythonRenderTargetManager::RENDER_TYPE_MAX_NUM; i++) {
@@ -1251,7 +1255,8 @@ void CPythonApplication::Destroy()
 	CTextFileLoader::DestroySystem();
 	DestroyCursors();
 
-	m_cDiscordRPCManager.ReleaseDiscordAPI();
+	//m_cDiscordRPCManager.ReleaseDiscordAPI();
+	m_cDiscordGameSDKManager.ReleaseDiscordAPI();
 	
 	CMSApplication::Destroy();
 

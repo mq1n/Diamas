@@ -270,10 +270,18 @@ ACMD(do_unblock_exp);
 ACMD(do_cmdchati);
 ACMD(do_remove_polymorph);
 
+ACMD(do_create_discord_lobby);
+ACMD(do_join_discord_lobby);
+ACMD(do_get_discord_lobby);
 
 struct command_info cmd_info[] =
 {
 	{ "!RESERVED!",	nullptr,			0,			POS_DEAD,	GM_IMPLEMENTOR	}, /* 반드시 이 것이 처음이어야 한다. */
+
+	{ "create_discord_lobby",		do_create_discord_lobby,			0,			POS_DEAD,	GM_PLAYER	},
+	{ "join_discord_lobby",		do_join_discord_lobby,			0,			POS_DEAD,	GM_PLAYER	},
+	{ "get_discord_lobby",		do_get_discord_lobby,			0,			POS_DEAD,	GM_PLAYER	},
+
 	{ "who",		do_who,			0,			POS_DEAD,	GM_IMPLEMENTOR	},
 	{ "war",		do_war,			0,			POS_DEAD,	GM_PLAYER	},
 	{ "warp",		do_warp,		0,			POS_DEAD,	GM_LOW_WIZARD	},

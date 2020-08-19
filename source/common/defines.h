@@ -17,6 +17,8 @@
 #define _IMPROVED_PACKET_ENCRYPTION_
 //#define __PERFORMANCE_CHECK__
 
+//#define ENABLE_NOMERCY
+
 
 
 /* ---------------- COMMON -------------------*/

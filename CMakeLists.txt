@@ -27,7 +27,7 @@ message(STATUS "VERSION: ${MAJOR_VERSION}")
 
 # Build options
 option(BUILD_UTILITIES "Build the common utilities" ON)
-option(BUILD_CLIENT "Build the client binaries" OFF)
+option(BUILD_CLIENT "Build the client binaries" ON)
 option(BUILD_SERVER "Build the server binaries" ON)
 option(BUILD_TOOLS "Build the tool binaries" OFF)
 option(ENABLE_STATIC_ANALYSIS "Enable static code analysis with PVS Studio" OFF)

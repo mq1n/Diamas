@@ -155,6 +155,9 @@ class CInputMain : public CInputProcessor
 #ifdef ENABLE_ACCE_SYSTEM
 		void		Acce(LPCHARACTER pkChar, const char* c_pData);
 #endif
+
+		void DiscordLobbyCreate(LPCHARACTER ch, const char* c_pData);
+		void DiscordLobbyJoin(LPCHARACTER ch, const char* c_pData);
 };
 
 class CInputDB : public CInputProcessor

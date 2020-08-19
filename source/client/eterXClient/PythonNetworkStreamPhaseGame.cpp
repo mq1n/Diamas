@@ -376,13 +376,13 @@ void CPythonNetworkStream::GamePhase()
 				ret = RecvTargetPacket();
 				break;
 
-		case HEADER_GC_TARGET_DROP:
-			ret = RecvTargetDropPacket();
-			break;
+			case HEADER_GC_TARGET_DROP:
+				ret = RecvTargetDropPacket();
+				break;
 
-		case HEADER_GC_CHEST_DROP_INFO:
-			ret = RecvChestDropInfo();
-			break;
+			case HEADER_GC_CHEST_DROP_INFO:
+				ret = RecvChestDropInfo();
+				break;
 
 			case HEADER_GC_DAMAGE_INFO:
 				ret = RecvDamageInfoPacket();
@@ -591,6 +591,15 @@ void CPythonNetworkStream::GamePhase()
 				ret = RecvAccePacket();
 				break;
 #endif
+
+			case HEADER_GC_DISCORD_LOBBY_CREATE:
+				ret = RecvDiscordLobbyCreate();
+				break;
+
+			case HEADER_GC_DISCORD_LOBBY_JOIN:
+				ret = RecvDiscordLobbyJoin();
+				break;
+
 			default:
 				ret = RecvDefaultPacket(header);
 				break;
@@ -1613,6 +1622,31 @@ bool CPythonNetworkStream::RecvChestDropInfo()
 
 	return true;
 }
+
+
+bool CPythonNetworkStream::RecvDiscordLobbyCreate()
+{
+	SPacketGCDiscordLobbyCreate packet;
+	if (!Recv(sizeof(packet), &packet))
+		return false;
+
+	DiscordLobbyData lobby_data{};
+	CDiscordGameSDKIntegration::Instance().CreateLobby(packet.capacity, discord::LobbyType::Private, lobby_data);
+
+	return true;
+}
+bool CPythonNetworkStream::RecvDiscordLobbyJoin()
+{
+	SPacketGCDiscordLobbyJoin packet;
+	if (!Recv(sizeof(packet), &packet))
+		return false;
+
+	DiscordLobbyData lobby_data{ packet.lobby, packet.secret };
+	CDiscordGameSDKIntegration::Instance().ConnectToLobby(lobby_data);
+
+	return true;
+}
+
 
 bool CPythonNetworkStream::RecvShopPacket()
 {

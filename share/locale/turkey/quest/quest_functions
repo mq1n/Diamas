@@ -1,3 +1,6 @@
+game.create_discord_lobby
+game.join_discord_lobby
+game.get_discord_lobby
 pc.open_sash
 DragonLair.startRaid
 _TRACEBACK

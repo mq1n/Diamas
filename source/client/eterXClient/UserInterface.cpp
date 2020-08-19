@@ -10,8 +10,12 @@
 #include <array>
 #include <memory>
 #include <filesystem>
-
+#include <ImageHlp.h>
 #include <FileSystemIncl.hpp>
+#ifdef ENABLE_NOMERCY
+#include <NoMercy.hpp>
+#endif
+
 #include "../eterBase/error.h"
 #include "../eterBase/lzo.h"
 #include "../eterLib/Util.h"
@@ -282,6 +286,13 @@ bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 	return ret;
 }
 
+#ifdef ENABLE_NOMERCY
+void __stdcall OnNoMercyMessage(int Code, const char* c_szMessage, const void* lpParam)
+{
+	TraceError("[NoMercy] %u (%s)", Code, c_szMessage);
+}
+#endif
+
 int32_t APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int32_t nCmdShow)
 {
 	SetEterExceptionHandler();
@@ -303,6 +314,12 @@ int32_t APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 	SetLogLevel(2);
 #endif
 
+#ifdef ENABLE_NOMERCY
+	auto nm_data = NoMercy::NoMercyData_V1{ "lic_cod", __DIAMAS_VERSION__, &OnNoMercyMessage };
+	if (!NM_Initialize(1, &nm_data))
+		return EXIT_FAILURE;
+#endif
+
 #ifdef ENABLE_ANTICHEAT
 	static CAnticheatManager kAnticheatManager;
 	kAnticheatManager.InitializePythonHooks();
@@ -314,6 +331,10 @@ int32_t APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 
 	// Main routine
 	Main(hInstance, lpCmdLine);
+
+#ifdef ENABLE_NOMERCY
+	NM_Finalize();
+#endif
 
 	// Cleanup Web Browser
 	WebBrowser_Cleanup();

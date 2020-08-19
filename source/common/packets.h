@@ -91,12 +91,32 @@ enum EClientToGameHeaders : TPacketHeader
 	HEADER_CG_STATE_CHECKER = 65,
 	HEADER_CG_ACCE = 66,
 
+	HEADER_CG_DISCORD_LOBBY_CREATE_RET = 67,
+	HEADER_CG_DISCORD_LOBBY_JOIN_RET = 68,
+
 	HEADER_CG_PONG = 252,
 	HEADER_CG_TIME_SYNC = 253,
 	HEADER_CG_KEY_AGREEMENT = HEADER_KEY_AGREEMENT, // 254
 	HEADER_CG_HANDSHAKE = HEADER_HANDSHAKE // 255
 };
 // =========================================================================================================================
+
+struct SPacketCGDiscordLobbyCreateRet : SNetPacket
+{
+	uint8_t result{};
+	int64_t lobby{};
+	char secret[128]{};
+
+	NET_DECLARE_PACKET(HEADER_CG_DISCORD_LOBBY_CREATE_RET, SPacketCGDiscordLobbyCreateRet);
+};
+struct SPacketCGDiscordLobbyJoinRet : SNetPacket
+{
+	uint8_t result{};
+	int64_t lobby{};
+	char secret[128]{};
+
+	NET_DECLARE_PACKET(HEADER_CG_DISCORD_LOBBY_JOIN_RET, SPacketCGDiscordLobbyJoinRet);
+};
 
 // GC
 // =========================================================================================================================
@@ -215,6 +235,8 @@ enum EGameToClientHeaders : TPacketHeader
 	HEADER_GC_SKILL_LEVEL = 101,
 	HEADER_GC_ACCE = 102,
 	HEADER_GC_GUILD_DCINFO = 103,
+	HEADER_GC_DISCORD_LOBBY_CREATE = 104,
+	HEADER_GC_DISCORD_LOBBY_JOIN = 105,
 
 	HEADER_GC_PHASE = 251,
 	HEADER_GC_KEY_AGREEMENT_COMPLETED = 252,
@@ -223,6 +245,20 @@ enum EGameToClientHeaders : TPacketHeader
 	HEADER_GC_HANDSHAKE = HEADER_HANDSHAKE,
 };
 // =========================================================================================================================
+
+struct SPacketGCDiscordLobbyCreate : SNetPacket
+{
+	uint32_t capacity{};
+
+	NET_DECLARE_PACKET(HEADER_GC_DISCORD_LOBBY_CREATE, SPacketGCDiscordLobbyCreate);
+};
+struct SPacketGCDiscordLobbyJoin : SNetPacket
+{
+	int64_t lobby{};
+	char secret[128]{};
+
+	NET_DECLARE_PACKET(HEADER_GC_DISCORD_LOBBY_JOIN, SPacketGCDiscordLobbyJoin);
+};
 
 // GG
 // =========================================================================================================================

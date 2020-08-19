@@ -4929,3 +4929,26 @@ ACMD(do_gamemaster)
 	ch->SetGMInvisible(false);
 }
 
+ACMD(do_create_discord_lobby)
+{
+	ch->CreateDiscordLobby();
+}
+ACMD(do_join_discord_lobby)
+{
+	char arg1[256], arg2[256];
+	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+	if (!*arg1 || !str_is_number(arg1) || !*arg2)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "usage: join_discord_lobby <lobby_id> <lobby_secret>");
+		return;
+	}
+
+	int64_t lobby_id = 0;
+	str_to_number(lobby_id, arg1);
+
+	ch->JoinDiscordLobby(lobby_id, arg2);
+}
+ACMD(do_get_discord_lobby)
+{
+	ch->ChatPacket(CHAT_TYPE_INFO, "Lobby ID: %lld Lobby secret: %s", ch->GetDiscordLobbyID(), ch->GetDiscordLobbySecret());
+}

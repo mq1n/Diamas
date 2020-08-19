@@ -2986,6 +2986,33 @@ int32_t CInputMain::MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes)
 	return (iExtraLen);
 }
 
+void CInputMain::DiscordLobbyCreate(LPCHARACTER ch, const char* c_pData)
+{
+	const auto p = reinterpret_cast<const SPacketCGDiscordLobbyCreateRet*>(c_pData);
+
+	if (!ch || !p || p->result)
+	{
+		sys_err("Discord lobby create failed by %s (%u) result (%u)", ch->GetName(), ch->GetPlayerID(), p ? p->result : 0);
+		return;
+	}
+
+	ch->SetDiscordLobbyData(p->lobby, p->secret);
+	sys_log(0, "%s (%u) created discord lobby: %lld", ch->GetName(), ch->GetPlayerID(), p->lobby);
+}
+void CInputMain::DiscordLobbyJoin(LPCHARACTER ch, const char* c_pData)
+{
+	const auto p = reinterpret_cast<const SPacketCGDiscordLobbyJoinRet*>(c_pData);
+
+	if (!ch || !p || p->result)
+	{
+		sys_err("Discord lobby join failed by %s (%u) result (%u)", ch->GetName(), ch->GetPlayerID(), p ? p->result : 0);
+		return;
+	}
+
+	ch->SetDiscordLobbyData(p->lobby, p->secret);
+	sys_log(0, "%s (%u) connected to discord lobby: %lld", ch->GetName(), ch->GetPlayerID(), p->lobby);
+}
+
 void CInputMain::Refine(LPCHARACTER ch, const char* c_pData)
 {
 	const SPacketCGRefine* p = reinterpret_cast<const SPacketCGRefine*>(c_pData);
@@ -3334,6 +3361,14 @@ int32_t CInputMain::Analyze(LPDESC d, uint8_t bHeader, const char * c_pData)
 
 		case HEADER_CG_REFINE:
 			Refine(ch, c_pData);
+			break;
+
+		case HEADER_CG_DISCORD_LOBBY_CREATE_RET:
+			DiscordLobbyCreate(ch, c_pData);
+			break;
+
+		case HEADER_CG_DISCORD_LOBBY_JOIN_RET:
+			DiscordLobbyJoin(ch, c_pData);
 			break;
 
 		case HEADER_CG_DRAGON_SOUL_REFINE:

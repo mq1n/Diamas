@@ -591,6 +591,18 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void			ResetStopTime();
 		uint32_t			GetStopTime() const;
 
+		void CreateDiscordLobby();
+		void JoinDiscordLobby(int64_t lobby, const std::string& secret);
+
+		void SetDiscordLobbyData(int64_t lobby, const std::string& secret) { m_nDiscordLobbyID = lobby; m_stDiscordLobbySecret = secret; };
+		auto GetDiscordLobbyID() const { return m_nDiscordLobbyID; };
+		auto GetDiscordLobbySecret() const { return m_stDiscordLobbySecret; };
+	
+	private:
+		int64_t m_nDiscordLobbyID;
+		std::string m_stDiscordLobbySecret;
+
+	public:
         const GPOS& GetLastMoveAblePosition(int32_t index = 0)
         {
             return m_lastMoveAblePos;

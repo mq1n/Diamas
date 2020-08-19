@@ -32,6 +32,7 @@ endforeach(d)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS} ${MT_BUILD}")
 
 include_directories(${PROJECT_SOURCE_DIR}/../utilities/FileSystem/FSLib/include)
+include_directories(${PROJECT_SOURCE_DIR}/../utilities/discord-sdk/src)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/eterBase)
 if (ENABLE_CYTHON)

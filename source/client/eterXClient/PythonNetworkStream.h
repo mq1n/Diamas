@@ -464,6 +464,9 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 		bool RecvChestDropInfo();
 
+		bool RecvDiscordLobbyCreate();
+		bool RecvDiscordLobbyJoin();
+
 		// Fly
 		bool RecvCreateFlyPacket();
 		bool RecvFlyTargetingPacket();

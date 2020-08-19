@@ -183,6 +183,9 @@ CPacketInfoCG::CPacketInfoCG()
 #ifdef ENABLE_ACCE_SYSTEM
 	Set(HEADER_CG_ACCE, sizeof(TPacketAcce), "Acce");
 #endif
+
+	Set(HEADER_CG_DISCORD_LOBBY_CREATE_RET, sizeof(SPacketCGDiscordLobbyCreateRet), "DiscordCreateLobbyRet");
+	Set(HEADER_CG_DISCORD_LOBBY_JOIN_RET, sizeof(SPacketCGDiscordLobbyJoinRet), "DiscordJoinLobbyRet");
 }
 
 CPacketInfoCG::~CPacketInfoCG()

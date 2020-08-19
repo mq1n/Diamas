@@ -163,6 +163,8 @@ class CMainPacketHeaderMap : public CNetworkPacketHeaderMap
 
 			Set(HEADER_GC_GUILD_DCINFO, TPacketType(sizeof(SPacketGCGuildDiscordInfo), STATIC_SIZE_PACKET));
 
+			Set(HEADER_GC_DISCORD_LOBBY_CREATE, TPacketType(sizeof(SPacketGCDiscordLobbyCreate), STATIC_SIZE_PACKET));
+			Set(HEADER_GC_DISCORD_LOBBY_JOIN, TPacketType(sizeof(SPacketGCDiscordLobbyJoin), STATIC_SIZE_PACKET));
 		}
 };
 
@@ -553,9 +555,10 @@ bool CPythonNetworkStream::RecvErrorPacket(int32_t header)
 bool CPythonNetworkStream::RecvPhasePacket()
 {
 	SPacketGCPhase packet_phase;
-
 	if (!Recv(sizeof(SPacketGCPhase), &packet_phase))
 		return false;
+
+	CDiscordGameSDKIntegration::Instance().DisconnectLobby();
 
 	switch (packet_phase.phase)
 	{

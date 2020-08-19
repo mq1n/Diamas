@@ -20,6 +20,8 @@
 #pragma comment( lib, "Netapi32.lib" )
 #pragma comment( lib, "DevIL.lib" )
 #pragma comment( lib, "discord-rpc.lib" )
+#pragma comment( lib, "discord_game_sdk.dll.lib" )
+#pragma comment( lib, "discord_sdk.lib" )
 
 #ifdef _DEBUG
 	#pragma comment( lib, "python27_debug.lib" )
@@ -29,8 +31,13 @@
 	#pragma comment( lib, "lzo2.lib" )
 #endif
 
-//#pragma comment( lib, "libcef.lib" )
-//#pragma comment( lib, "libcef_dll_wrapper.lib" )
+#ifdef ENABLE_NOMERCY
+	#ifdef _DEBUG
+		#pragma comment( lib, "NoMercy_x86_d.lib" )
+	#else
+		#pragma comment( lib, "NoMercy_x86.lib" )
+	#endif
+#endif
 
 #pragma comment( lib, "FSLib.lib" )
 #pragma comment( lib, "granny2.11.8.0_static.lib" )

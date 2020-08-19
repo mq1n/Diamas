@@ -43,6 +43,7 @@
 #include "ServerStateChecker.h"
 #include "AbstractApplication.h"
 #include "DiscordRPCIntegration.h"
+#include "DiscordGameSDKIntegration.h"
 
 class CPythonApplication : public CMSApplication, public CInputKeyboard, public IAbstractApplication
 {
@@ -363,6 +364,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		CPythonRenderTargetManager	m_pyRenderTargetManager;
 
 		CDiscordRPCIntegration		m_cDiscordRPCManager;
+		CDiscordGameSDKIntegration		m_cDiscordGameSDKManager;
 
 		uint32_t				m_iFPS;
 		float						m_fAveRenderTime;

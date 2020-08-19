@@ -1,9 +1,8 @@
 #include "stdafx.h"
-
 #include "config.h"
 #include "char.h"
 #include "item.h"
-#include "questmanager.h"
+#include "quest_manager.h"
 #include "item_manager.h"
 #include "log.h"
 #include "inventory.h"
@@ -72,7 +71,7 @@ CInventory::EStatus CInventory::Add(LPITEM &item)
 #ifdef __ENABLE_EXTEND_INVEN_SYSTEM__
 			TryStack(0, m_owner->GetExtendInvenMax(), item, match, bCount);
 #else
-			TryStack(0, INVENTORY_MAX_COUNT, item, match, bCount);
+//			TryStack(0, INVENTORY_MAX_COUNT, item, match, bCount);
 #endif
 
 		if (bCount == 0)
@@ -127,8 +126,8 @@ LPITEM CInventory::GetItemAtPos(const uint16_t& wCell) const
 	if (wCell < m_owner->GetExtendInvenMax() || (wCell >= BELT_INVENTORY_SLOT_START && wCell < BELT_INVENTORY_SLOT_END))
 		return m_owner->GetItem(TItemPos(INVENTORY, wCell));
 #else
-	if (wCell < INVENTORY_MAX_COUNT || (wCell >= BELT_INVENTORY_SLOT_START && wCell < BELT_INVENTORY_SLOT_END))
-		return m_owner->GetItem(TItemPos(INVENTORY, wCell));
+//	if (wCell < INVENTORY_MAX_COUNT || (wCell >= BELT_INVENTORY_SLOT_START && wCell < BELT_INVENTORY_SLOT_END))
+//		return m_owner->GetItem(TItemPos(INVENTORY, wCell));
 #endif
 	if (wCell < DRAGON_SOUL_INVENTORY_MAX_NUM)
 		return m_owner->GetItem(TItemPos(DRAGON_SOUL_INVENTORY, wCell));

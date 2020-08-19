@@ -246,6 +246,8 @@ void CHARACTER::Initialize()
 
 	m_pGuild = nullptr;
 
+	m_nDiscordLobbyID = 0;
+
 	m_pkBattleground = nullptr;
 	m_nBGTeamID = 0;
 	m_nBGCurrentMovingWayIndex = 0;
@@ -8460,3 +8462,22 @@ bool CHARACTER::CleanAcceAttr(LPITEM pkItem, LPITEM pkTarget)
 }
 #endif
 
+void CHARACTER::CreateDiscordLobby()
+{
+	if (!GetDesc())
+		return;
+
+	SPacketGCDiscordLobbyCreate packet;
+	packet.capacity = 1024;
+	GetDesc()->Packet(&packet, sizeof(packet));
+}
+void CHARACTER::JoinDiscordLobby(int64_t lobby, const std::string& secret)
+{
+	if (!GetDesc())
+		return;
+
+	SPacketGCDiscordLobbyJoin packet;
+	packet.lobby = lobby;
+	strcpy(packet.secret, secret.c_str());
+	GetDesc()->Packet(&packet, sizeof(packet));
+}

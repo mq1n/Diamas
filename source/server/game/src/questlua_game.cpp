@@ -384,10 +384,68 @@ namespace quest
 		return 0;
 	}
 
+	int32_t game_create_discord_lobby(lua_State* L)
+	{
+		const auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("cannot get character");
+			return 0;
+		}		
+
+		ch->CreateDiscordLobby();
+		return 0;
+	}
+	int32_t game_join_discord_lobby(lua_State* L)
+	{	
+		if (!lua_isnumber(L, 1) || !lua_isstring(L, 2)) 
+		{
+			sys_err("Invalid Argument");
+			return 0;
+		}
+		const auto lobby = static_cast<int64_t>(rint(lua_tonumber(L, 1)));
+		const auto secret = std::string(lua_tostring(L, 2));
+
+		if (!lobby || secret.empty())
+		{
+			sys_err("Sanity failed");
+			return 0;		
+		}
+
+		const auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("cannot get character");
+			return 0;
+		}		
+
+		ch->JoinDiscordLobby(lobby, secret);
+		return 0;
+	}
+	int32_t game_get_discord_lobby(lua_State* L)
+	{	
+		const auto ch = CQuestManager::Instance().GetCurrentCharacterPtr();
+		if (!ch)
+		{
+			sys_err("cannot get character");
+			lua_pushnumber(L, 0);
+			lua_pushstring(L, "");
+			return 2;
+		}		
+
+		lua_pushnumber(L, ch->GetDiscordLobbyID());
+		lua_pushstring(L, ch->GetDiscordLobbySecret().c_str());
+		return 2;
+	}
+
 	void RegisterGameFunctionTable()
 	{
 		luaL_reg game_functions[] = 
 		{
+			{ "create_discord_lobby",		game_create_discord_lobby		},
+			{ "join_discord_lobby",			game_join_discord_lobby			},
+			{ "get_discord_lobby",			game_get_discord_lobby			},
+
 			{ "get_safebox_level",			game_get_safebox_level			},
 			{ "request_make_guild",			game_request_make_guild			},
 			{ "set_safebox_level",			game_set_safebox_level			},

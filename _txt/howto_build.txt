@@ -7,10 +7,6 @@ pkg install gmake
 pkg install mysql57-server
 pkg install gdb-9
 
-linux gerekenler:
-libmysqlclient20
-libmysqlclient-dev
-
 git configleri:
 git config --global http.sslVerify false
 git config --global credential.helper "cache --timeout=3600"
