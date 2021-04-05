@@ -125,9 +125,9 @@ class TestSFHelper:
 		self.sys_log("stop_game triggered.")
 
 		if self.is_windows:
-			core_names = ["db_cache.exe", "game_server.exe"]
+			core_names = ["db_cache.exe", "game_server.exe", "auth_server.exe"]
 		else:
-			core_names = ["db_cache", "game_server"]
+			core_names = ["db_cache", "game_server", "auth_server"]
 		
 		kill_checklist = []
 		try:
@@ -180,9 +180,9 @@ class TestSFHelper:
 		container_roots = ["/auth/", "/db/", "/game99/", "/kanal/"]
 		
 		if self.is_windows:
-			container_core = ["game_server.exe", "db_cache.exe"]
+			container_core = ["game_server.exe", "db_cache.exe", "auth_server.exe"]
 		else:
-			container_core = ["game_server", "db_cache"]
+			container_core = ["game_server", "db_cache", "auth_server"]
 		
 		for i in container_roots:
 			target_path = "{}{}".format(self.root_path, i)
@@ -191,6 +191,8 @@ class TestSFHelper:
 			coreFile = ""
 			if str(i) == "/db/":
 				coreFile = container_core[1]
+			elif str(i) == "/auth/":
+				coreFile = container_core[2]				
 			else:
 				coreFile = container_core[0]
 
@@ -240,9 +242,9 @@ class TestSFHelper:
 		garbage_container_roots =     ["/auth/", "/db/", "/game99/", "/kanal/"]
 		garbage_container_dirs =      ["data", "locale", "mark"]
 		if self.is_windows:
-			garbage_container_files = ["db_cache.exe", "game_server.exe", "DevIL.dll"]
+			garbage_container_files = ["db_cache.exe", "game_server.exe", "auth_server.exe", "DevIL.dll"]
 		else:
-			garbage_container_files = ["db_cache", "game_server"]
+			garbage_container_files = ["db_cache", "game_server", "auth_server"]
 
 		garbage_container_configs = [
 			"/db/mob_proto.csv","/db/mob_names.txt", "/db/item_names.txt", "/db/item_proto.csv", "/db/object_proto.csv",
@@ -291,9 +293,9 @@ class TestSFHelper:
 			sys.exit(5)
 
 		if self.is_windows:
-			container_core = ["game_server.exe", "db_cache.exe"]
+			container_core = ["game_server.exe", "db_cache.exe", "auth_server.exe"]
 		else:
-			container_core = ["game_server", "db_cache"]
+			container_core = ["game_server", "db_cache", "auth_server"]
 
 		symlink_targets_dir = [
 			["kanal/locale",  "../share/locale"], ["kanal/data",  "../share/data"], ["kanal/mark", "../share/mark"],
@@ -304,7 +306,7 @@ class TestSFHelper:
 		
 		symlink_targets_file = [
 			["db/{}".format(container_core[1]),     "../Bin/{}".format(container_core[1])],
-			["auth/{}".format(container_core[0]),   "../Bin/{}".format(container_core[0])],
+			["auth/{}".format(container_core[0]),   "../Bin/{}".format(container_core[2])],
 			["game99/{}".format(container_core[0]), "../Bin/{}".format(container_core[0])],
 			["kanal/{}".format(container_core[0]),  "../Bin/{}".format(container_core[0])],
 
