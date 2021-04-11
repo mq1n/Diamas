@@ -1,0 +1,87 @@
+name: build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  linux:
+    timeout-minutes: 20
+
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+        compiler: [g++-9, clang++-8]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        submodules: true
+    - name: Compile tests
+      working-directory: sql
+      env:
+        CXX: ${{ matrix.compiler }}
+      run: |
+        cmake -DBUILD_TESTING=1 ..
+        make -j12
+    - name: Collect outputs
+      run: |
+        mkdir _output
+        cp Bin/auth_server _output
+        cp Bin/db_cache _output
+        cp Bin/game_server _output
+        cp Bin/qc _output
+        cp Bin/vrunner _output
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: output_nix
+        path: _output
+    - name: Run tests
+      working-directory: sql
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest --timeout 20 -C Debug -j12
+
+  windows:
+    timeout-minutes: 22
+
+    strategy:
+      matrix:
+        os: [windows-2019]
+        include:
+          - os: windows-2019
+            generator: Visual Studio 16 2019
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        submodules: true
+        lfs: true
+    - name: Compile tests
+      working-directory: sql
+      run: |
+        cmake .. -A Win32 -DBUILD_TESTING=ON -DCI_BUILD=1 -DCMAKE_CXX_FLAGS=/W1 -G"${{ matrix.generator }}"
+        cmake --build . -j 12
+    - name: Collect outputs
+      run: |
+        mkdir _output
+        copy Bin\*.exe _output
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: output_win
+        path: _output
+    - name: Run tests
+      working-directory: sql
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest --timeout 22 -C Debug -j12
