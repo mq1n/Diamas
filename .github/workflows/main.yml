@@ -36,31 +36,31 @@ jobs:
         run: |
           git lfs install
           git lfs pull
-    - name: Compile tests
-      working-directory: sql
-      env:
-        CXX: ${{ matrix.compiler }}
-      run: |
-        cmake -DBUILD_TESTING=1 ..
-        make -j12
-    - name: Collect outputs
-      run: |
-        mkdir _output
-        cp Bin/auth_server _output
-        cp Bin/db_cache _output
-        cp Bin/game_server _output
-        cp Bin/qc _output
-        cp Bin/vrunner _output
-    - name: Upload
-      uses: actions/upload-artifact@v1
-      with:
-        name: output_nix
-        path: _output
-    - name: Run tests
-      working-directory: sql
-      env:
-        CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest --timeout 20 -C Debug -j12
+      - name: Compile tests
+        working-directory: sql
+        env:
+          CXX: ${{ matrix.compiler }}
+        run: |
+          cmake -DBUILD_TESTING=1 ..
+          make -j12
+      - name: Collect outputs
+        run: |
+          mkdir _output
+          cp Bin/auth_server _output
+          cp Bin/db_cache _output
+          cp Bin/game_server _output
+          cp Bin/qc _output
+          cp Bin/vrunner _output
+      - name: Upload
+        uses: actions/upload-artifact@v1
+        with:
+          name: output_nix
+          path: _output
+      - name: Run tests
+        working-directory: sql
+        env:
+          CTEST_OUTPUT_ON_FAILURE: 1
+        run: ctest --timeout 20 -C Debug -j12
 
   # windows:
   #   timeout-minutes: 22
