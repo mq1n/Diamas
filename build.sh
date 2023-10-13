@@ -9,8 +9,16 @@ if [ ! $? -eq 0 ]; then
 fi
 cd build
 
-CXX=g++10
-CC=gcc10
+if [ "$(uname -s)" == "Linux" ]; then
+  CXX=g++-10
+  CC=gcc-10
+elif [ "$(uname -s)" == "FreeBSD" ]; then
+  CXX=g++10
+  CC=gcc10
+else
+  echo "Unsupported operating system"
+  exit 4
+fi
 
 export CXX
 export CC
