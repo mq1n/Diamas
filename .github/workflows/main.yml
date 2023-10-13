@@ -7,48 +7,48 @@ on:
       - dev
 
 jobs:
-  bsd:
-    runs-on: macos-12
-    name: A job to run test in FreeBSD
-    # env:
-    #   MYTOKEN : ${{ secrets.MYTOKEN }}
-    #   MYTOKEN2: "value2"
-    steps:
-    - uses: actions/checkout@v3
-    - name: FreeBSD-vm
-      uses: vmactions/freebsd-vm@v0.3.1
-      with:
-        usesh: true
-        prepare: |
-          pkg install -y git gcc10 cmake-3.17 gmake mysql57-server gdb-9
+  # bsd:
+  #   runs-on: macos-12
+  #   name: A job to run test in FreeBSD
+  #   # env:
+  #   #   MYTOKEN : ${{ secrets.MYTOKEN }}
+  #   #   MYTOKEN2: "value2"
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - name: FreeBSD-vm
+  #     uses: vmactions/freebsd-vm@v0.3.1
+  #     with:
+  #       usesh: true
+  #       prepare: |
+  #         pkg install -y git gcc10 cmake-3.17 gmake mysql57-server gdb-9
 
-        run: |
-          pwd
-          ls -lah
-          whoami
-          env
-          freebsd-version
-          mkdir workspace && cd workspace
-          git clone https://github.com/mq1n/Diamas
-          cd Diamas
-          git submodule update --init --recursive
-          git submodule update --recursive --remote
-          chmod +x build.sh
-          chmod +x rebuild.sh
-          ./build.sh Debug
-    - name: Collect outputs
-      run: |
-        mkdir _output
-        cp Bin/auth_server _output
-        cp Bin/db_cache _output
-        cp Bin/game_server _output
-        cp Bin/qc _output
-        cp Bin/vrunner _output
-    - name: Upload
-      uses: actions/upload-artifact@v1
-      with:
-        name: output_bsd
-        path: _output
+  #       run: |
+  #         pwd
+  #         ls -lah
+  #         whoami
+  #         env
+  #         freebsd-version
+  #         mkdir workspace && cd workspace
+  #         git clone https://github.com/mq1n/Diamas
+  #         cd Diamas
+  #         git submodule update --init --recursive
+  #         git submodule update --recursive --remote
+  #         chmod +x build.sh
+  #         chmod +x rebuild.sh
+  #         ./build.sh Debug
+  #   - name: Collect outputs
+  #     run: |
+  #       mkdir _output
+  #       cp Bin/auth_server _output
+  #       cp Bin/db_cache _output
+  #       cp Bin/game_server _output
+  #       cp Bin/qc _output
+  #       cp Bin/vrunner _output
+  #   - name: Upload
+  #     uses: actions/upload-artifact@v1
+  #     with:
+  #       name: output_bsd
+  #       path: _output
 
   # linux:
   #   timeout-minutes: 20
