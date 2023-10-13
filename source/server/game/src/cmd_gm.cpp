@@ -4950,5 +4950,6 @@ ACMD(do_join_discord_lobby)
 }
 ACMD(do_get_discord_lobby)
 {
-	ch->ChatPacket(CHAT_TYPE_INFO, "Lobby ID: %lld Lobby secret: %s", ch->GetDiscordLobbyID(), ch->GetDiscordLobbySecret());
+	const auto stSecret = ch->GetDiscordLobbySecret();
+	ch->ChatPacket(CHAT_TYPE_INFO, "Lobby ID: %lld Lobby secret: %s", ch->GetDiscordLobbyID(), stSecret.c_str());
 }
