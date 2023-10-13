@@ -1,5 +1,10 @@
-#include "../include/NetEngine.hpp"
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// Source: https://gitlab.com/quantum-core/core
+// License https://gitlab.com/quantum-core/core/-/blob/master/LICENSE?ref_type=heads
 
+#include "../include/NetEngine.hpp"
 #include <utility>
 
 namespace net_engine
