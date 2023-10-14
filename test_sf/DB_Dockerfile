@@ -1,0 +1,28 @@
+FROM ubuntu:22.04
+
+# # Install dependencies
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+#    apt-get install -y mariadb-server-10.6 python3
+    apt-get install -y mariadb-client-10.6 python3
+
+# Set arguments
+ARG MYSQL_ROOT_PASSWORD
+ARG MYSQL_USER
+ARG MYSQL_PASSWORD
+ARG MYSQL_HOST
+
+# Set environment variables
+ENV MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+ENV MYSQL_USER=${MYSQL_USER}
+ENV MYSQL_PASSWORD=${MYSQL_PASSWORD}
+ENV MYSQL_HOST=${MYSQL_HOST}
+
+# Copy source code
+COPY . /app
+
+# Set working directory
+WORKDIR /app/db
+
+# Set entrypoint
+ENTRYPOINT ["/app/db/db_cache"]

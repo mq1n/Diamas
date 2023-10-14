@@ -1,0 +1,97 @@
+version: "3.7"
+
+networks:
+  gamenet:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    attachable: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.172.0.0/16
+
+services:
+  mysql:
+    container_name: mysql
+    # image: mysql:5.7
+    image: mariadb:10.11
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?err}
+      MYSQL_USER: ${MYSQL_USER:?err}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?err}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?err}
+    volumes:
+      - './mysql/data:/var/lib/mysql'
+    # restart: "on-failure"
+    restart: unless-stopped
+    healthcheck:
+      # test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      gamenet:
+        ipv4_address: 172.172.0.4
+
+  mysqlsetup:
+    image: mariadb:10.11
+    depends_on:
+      - mysql
+    restart: "no"
+    environment:
+      MYSQL_HOST_ENV: ${MYSQL_HOST:?err}
+      MYSQL_ROOT_PASSWORD_ENV: ${MYSQL_ROOT_PASSWORD:?err}
+      MYSQL_USER_ENV: root
+      MYSQL_PASSWORD_ENV: ${MYSQL_ROOT_PASSWORD:?err}
+    entrypoint: [ "bash", "-c", "sleep 5 && ./setup_db.sh"]   
+    volumes:
+      - ./setup_db.sh:/setup_db.sh
+      - ./backup:/backup
+    networks:
+      gamenet:
+        ipv4_address: 172.172.0.5
+
+  dbcache:
+    container_name: dbcache
+    # depends_on: 
+    #   mysql:
+    #     condition: service_healthy
+    privileged: true
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST:?err}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?err}
+      MYSQL_USER: ${MYSQL_USER:?err}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?err}        
+    build:
+      context: .
+      args:
+        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:?err}
+        - MYSQL_USER=${MYSQL_USER:?err}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD:?err}
+        - MYSQL_HOST=${MYSQL_HOST:?err}
+      dockerfile: DB_Dockerfile
+   # restart: unless-stopped
+    networks:
+      gamenet:
+        ipv4_address: 172.172.0.6
+
+  # auth:
+  #   container_name: auth
+  #   build:
+  #     context: ./core/auth_server
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - './core/auth:/auth'
+  #   restart: unless-stopped
+
+  # game:
+  #   container_name: game
+  #   build:
+  #     context: ./core/game_server
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - './core/ch:/ch'
+  #   restart: unless-stopped
